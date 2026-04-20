@@ -7,6 +7,7 @@ import { toggleInputSelectErrors, toggleTableErrors, setFormReadOnly, toggleButt
 import { on } from "../../utils/domUtils.js";
 import { formatDateLongWithTime } from "../../utils/formatters.js";
 import { handleAction, handleSubmit, validateFields } from "../../utils/formUtils.js";
+import { backModal, openModal } from "../../ui/modalUI.js";
 
 const modalId = '#goodsIssueModal';
 const formId = '#goodsIssueForm';
@@ -167,8 +168,7 @@ export const openGoodsIssueModal = async ({ mode, data = null }) => {
 
     initDetailsGoodsIssueTable(mode, data?.status?.name);
 
-    const modal = mdb.Modal.getOrCreateInstance(modalElement);
-    modal.show();
+    openModal(modalElement);
 };
 
 const addProduct = () => {
@@ -206,3 +206,4 @@ on('click', '#confirmBtn', async () => {
     if (!rightAction) return;
     await handleAction({ action: rightAction, formId });
 });
+on('click', `#backBtn-${modalId}`, backModal());

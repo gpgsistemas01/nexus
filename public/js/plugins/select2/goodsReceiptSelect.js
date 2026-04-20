@@ -1,4 +1,5 @@
 import { openProductModal } from "../../components/modals/productModal.js";
+import { cleanAddedProduct } from "../../pages/warehouse/goodsReceiptsPage.js";
 import { initMdbWrapperInput, updateMdbWrapperInput } from "../mdb/baseInstance.js";
 import { initbaseSelect2 } from "./baseSelect.js";
 
@@ -87,7 +88,10 @@ export const initGoodsReceiptSelect2 = async (data = null) => {
 
         if (selectedProduct.newTag) {
 
-            const productName = selectedProduct.id.replace('new:', '');
+            const tempValue = selectedProduct.id;
+            const productName = tempValue.replace('new:', '');
+
+            cleanAddedProduct()
             openProductModal({ 
                 mode: 'create', 
                 data: { name: productName },
@@ -101,7 +105,7 @@ export const initGoodsReceiptSelect2 = async (data = null) => {
                     $(productSelector).append(newOption).trigger('change');
                 }
             });
-            $(productSelector).val(null).trigger('change');
+            
             return;
         }
 

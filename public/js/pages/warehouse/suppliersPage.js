@@ -4,6 +4,8 @@ import { editSupplier, registerSupplier } from "../../application/warehouse/supp
 import { handleSubmit, validateFields } from "../../utils/formUtils.js";
 import { setFormReadOnly } from "../../ui/formUI.js";
 import { supplierValidators } from "../../utils/validations/validators.js";
+import { backModal, openModal } from "../../ui/modalUI.js";
+import { on } from "../../utils/domUtils.js";
 
 const modalId = '#supplierModal';
 const formId = '#supplierForm';
@@ -71,6 +73,7 @@ export const openSupplierModal = ({ mode, data = null }) => {
         }
     }
 
-    const modal = mdb.Modal.getOrCreateInstance(modalElement);
-    modal.show();
+    openModal(modalElement);
 }
+
+on('click', `#backBtn-${modalId}`, backModal());

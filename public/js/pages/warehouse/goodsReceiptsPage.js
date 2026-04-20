@@ -8,9 +8,11 @@ import { toggleInputSelectErrors, toggleTableErrors, setFormReadOnly, toggleButt
 import { on } from "../../utils/domUtils.js";
 import { formatDateLongWithTime } from "../../utils/formatters.js";
 import { handleAction, handleSubmit, validateFields } from "../../utils/formUtils.js";
+import { backModal, openModal } from "../../ui/modalUI.js";
 
 const modalId = '#goodsReceiptModal';
 const formId = '#goodsReceiptForm';
+const backSelector = `#backBtn-${modalId.replace('#', '')}`;
 
 createGoodsReceiptDatatable();
 
@@ -49,7 +51,7 @@ useForm({
     }
 });
 
-export const openGoodsReceiptModal = async ({ mode, data = null, onSave = null }) => {
+export const openGoodsReceiptModal = async ({ mode, data = null }) => {
 
     const form = document.querySelector(formId);
     const modalElement = document.querySelector(modalId);
@@ -101,12 +103,9 @@ export const openGoodsReceiptModal = async ({ mode, data = null, onSave = null }
         }
     }
 
-    initDetailsGoodsReceiptTable(mode)
+    initDetailsGoodsReceiptTable(mode);
 
-    form.onSave = onSave;
-
-    const modal = mdb.Modal.getOrCreateInstance(modalElement);
-    modal.show();
+    openModal(modalElement);
 }
 
 const addProduct = () => {
@@ -130,6 +129,10 @@ const addProduct = () => {
     details.push(product);
 
     refreshProductTable(details);
+    cleanAddedProduct();
+}
+
+export const cleanAddedProduct = () => {
 
     $('#productInput').empty().trigger('change');
     document.querySelector('#quantityInput').value = '';
@@ -139,3 +142,4 @@ const addProduct = () => {
 on('click', '#addProductBtn', addProduct);
 on('click', '#cancelBtn', async () => await handleAction({ action: cancelGoodsReceipt, formId }));
 on('click', '#confirmBtn', async () => await handleAction({ action: confirmGoodsReceipt, formId }));
+on('click', backSelector, () => backModal());

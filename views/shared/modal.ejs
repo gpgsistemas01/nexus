@@ -1,6 +1,6 @@
 <% const header = {
     button: {
-        id: `close${idModal}`,
+        id: `close${modalId}`,
         dismissTarget: 'modal'
     },
     class: 'modal-header',
@@ -30,13 +30,8 @@ const buttons = {
         content: 'Agregar'
     },
     backButton: {
-        id: 'backBtn',
+        id: `backBtn-${modalId}`,
         class: 'btn btn-link',
-        attrs: {
-            'data-mdb-modal-init': '',
-            'data-mdb-target': `#${idModal}`,
-            'data-mdb-dismiss': 'modal'
-        },
         content: 'Regresar'
     },
     cancelButton: {
@@ -51,7 +46,7 @@ const buttons = {
     }
 }; %>
 
-<div class="modal fade" id="<%= idModal %>" tabindex="-1" aria-labelledby="<%= header.title.id %>">
+<div class="modal fade" id="<%= modalId %>" tabindex="-1" aria-labelledby="<%= header.title.id %>">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
         

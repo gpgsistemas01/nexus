@@ -51,3 +51,6 @@ coverage/
 # Optional: Svelte output if used
 .svelte-kit/
 /generated/prisma
+
+
+*.xlsx

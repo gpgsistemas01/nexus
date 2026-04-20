@@ -1,9 +1,15 @@
 import { setFormReadOnly } from "../../ui/formUI.js";
+import { backModal, openModal } from "../../ui/modalUI.js";
+import { on } from "../../utils/domUtils.js";
+
+const productModalId = '#productModal';
+const goodsReceiptModalId = '#goodsReceiptModal';
+const backSelector = `#backBtn-${productModalId.replace('#', '')}`;
 
 export const openProductModal = async ({ mode, data = null, onSave = null }) => {
     
     const form = document.querySelector('#productForm');
-    const modalElement = document.querySelector('#productModal');
+    const modalElement = document.querySelector(productModalId);
 
     form.dataset.mode = mode;
     form.dataset.id = data?.id || '';
@@ -40,6 +46,9 @@ export const openProductModal = async ({ mode, data = null, onSave = null }) => 
         }
     }
 
-    const modal = mdb.Modal.getOrCreateInstance(modalElement);
-    modal.show();
+    form.onSave = onSave;
+
+    openModal(modalElement);
 }
+
+on('click', backSelector, () => backModal());

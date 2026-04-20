@@ -4,6 +4,7 @@ import { refreshProductTable } from "../../plugins/datatable/baseDatatable.js";
 import { createPurchaseRequisitionDatatable, details, initDetailsPurchaseRequisitionTable } from "../../plugins/datatable/purchaseRequisitionDatatable.js";
 import { initPurchaseRequisitionSelect2 } from "../../plugins/select2/purchaseRequisitionSelect.js";
 import { toggleInputSelectErrors, toggleTableErrors, setFormReadOnly, toggleButtons } from "../../ui/formUI.js";
+import { backModal, openModal } from "../../ui/modalUI.js";
 import { on } from "../../utils/domUtils.js";
 import { formatDateLongWithTime } from "../../utils/formatters.js";
 import { handleAction, handleSubmit, validateFields } from "../../utils/formUtils.js";
@@ -104,8 +105,7 @@ export const openPurchaseRequisitionModal = async ({ mode, data = null }) => {
 
     initDetailsPurchaseRequisitionTable(mode);
 
-    const modal = mdb.Modal.getOrCreateInstance(modalElement);
-    modal.show();
+    openModal(modalElement);
 };
 
 const addProduct = () => {
@@ -138,3 +138,4 @@ const addProduct = () => {
 on('click', '#addProductBtn', addProduct);
 on('click', '#cancelBtn', async ()=> await handleAction({ action: cancelPurchaseRequisition, formId }));
 on('click', '#confirmBtn', async () => await handleAction({ action: confirmPurchaseRequisition, formId }));
+on('click', `#backBtn-${modalId}`, backModal());
