@@ -19,6 +19,7 @@ export const openProductModal = async ({ mode, data = null, onSave = null }) => 
     if (mode === 'create') {
         
         form.reset();
+        if (form.elements.isActive) form.elements.isActive.checked = true;
         modalElement.querySelector('#modalTitle').textContent = 'Registrar producto';
         form.querySelector('#submitBtn').textContent = 'Guardar';
     }
@@ -26,11 +27,10 @@ export const openProductModal = async ({ mode, data = null, onSave = null }) => 
     if (mode === 'edit' || mode === 'view') {
 
         form.elements.name.value = data.name;
-        form.elements.unitCost.value = data.unitCost;
         form.elements.minStock.value = data.minStock;
         form.elements.base.value = data.base || '';
         form.elements.height.value = data.height || '';
-        form.elements.isActive.checked = data.isActive;
+        if (form.elements.isActive) form.elements.isActive.checked = Boolean(data.isActive);
 
         if (mode === 'edit') {
 

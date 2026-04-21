@@ -16,7 +16,6 @@ table.innerHTML = `
             <th colspan="2">Medidas</th>
             <th colspan="3">Existencias</th>
             <th rowspan="2">Stock mínimo</th>
-            <th rowspan="2">Costo Unitario</th>
             <th rowspan="2">Acciones</th>
         </tr>
         <tr>
@@ -61,7 +60,6 @@ export const createProductDatatable = (context) => {
             }
         },
         { data: 'minStock', title: 'Stock mínimo' },
-        { data: 'unitCost', title: 'Costo Unitario' },
     ];
 
     if (isWarehouseDepartment || isSystemDepartment) {
@@ -71,7 +69,6 @@ export const createProductDatatable = (context) => {
             render: () => {
                 return `
                     <button class="btn-edit">✏️</button>
-                    <button class="btn-view">👁️</button>
                 `;
             }
         });
@@ -111,15 +108,7 @@ export const createProductDatatable = (context) => {
                 notifications.showWarning(
                     `Hay ${lowStockProducts.length} producto(s) por debajo del stock mínimo: ${productNames}${lowStockProducts.length > 3 ? '...' : ''}`
                 );
-            },
-            buttons: [
-                {
-                    text: 'Nuevo producto',
-                    action: () => {
-                        openProductModal({ mode: 'create' });
-                    }
-                }
-            ]
+            }
         }
     });
 
@@ -132,10 +121,4 @@ export const createProductDatatable = (context) => {
         await openProductModal({ mode: 'edit', data });
     });
 
-    $(`${ selectorTable } tbody`).on('click', '.btn-view', function() {
-
-        const data = table.row($(this).closest('tr')).data();
-
-        openProductModal({ mode: 'view', data });
-    });
 }

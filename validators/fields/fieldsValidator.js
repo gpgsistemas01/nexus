@@ -73,7 +73,7 @@ export const validateNumber = (fieldName) => {
         .toFloat()
 }
 
-export const validateNumberOptional = (fieldName) => {
+export const validateNumberOptional = (fieldName, { disableTooLong = false } = {}) => {
 
     const errors = errorMap[fieldName];
 
@@ -81,6 +81,7 @@ export const validateNumberOptional = (fieldName) => {
         .if(body(fieldName).notEmpty())
         .notEmpty().withMessage(errors.REQUIRED)
         .isFloat().withMessage(errors.INVALID_NUMBER)
+        .if(() => !disableTooLong)
         .matches(/^\d{1,7}(\.\d{1,3})?$/).withMessage(errors.TOO_LONG)
         .toFloat()
 }
@@ -125,11 +126,17 @@ export const validateDetailsArray =
 
             details.forEach(detail => {
 
-                if (!detail.productId || !detail.quantity) throw new Error(errorMap['details'].INVALID_FORMAT_REQUIRED);
+                if (!detail.productId || !detail.quantity || !detail.unitCost || !detail.amount) {
+                    throw new Error(errorMap['details'].INVALID_FORMAT_REQUIRED);
+                }
 
                 const qty = Number(detail.quantity);
+                const unitCost = Number(detail.unitCost);
+                const amount = Number(detail.amount);
 
                 if (!Number.isFinite(qty) || qty < 1) throw new Error(errorMap['details'].INVALID_FORMAT_QUANTITY);
+                if (!Number.isFinite(unitCost) || unitCost <= 0) throw new Error(errorMap['details'].INVALID_FORMAT_QUANTITY);
+                if (!Number.isFinite(amount) || amount <= 0) throw new Error(errorMap['details'].INVALID_FORMAT_QUANTITY);
             });
 
             return true;

@@ -83,6 +83,10 @@ export const openGoodsReceiptModal = async ({ mode, data = null }) => {
             name: detail.product.name,
             productId: detail.product.id,
             quantity: detail.quantity,
+            unitCost: detail.unitCost,
+            amount: detail.amount,
+            base: detail.product.base,
+            height: detail.product.height,
             description: detail.description,
             presentation: detail.product.presentation
         })));
@@ -114,9 +118,12 @@ const addProduct = () => {
     const selectedProduct = $('#productInput').select2('data')?.[0];
     const productName = selectedProduct?.text || '';
     const quantity = document.querySelector('#quantityInput').value;
+    const amount = document.querySelector('#amountInput').value;
+    const base = Number(selectedProduct?.base);
+    const height = Number(selectedProduct?.height);
 
-    if (!productId || !quantity) {
-        alert('Por favor, complete los campos de producto y cantidad.');
+    if (!productId || !quantity || !amount) {
+        alert('Por favor, complete los campos de producto, cantidad e importe.');
         return;
     }
 
@@ -125,7 +132,33 @@ const addProduct = () => {
         return;
     }
 
-    const product = { productId: productId, name: productName, quantity, presentation: selectedProduct?.presentation || 'PIEZA' };
+    if (isNaN(amount) || parseFloat(amount) <= 0) {
+        alert('El importe debe ser un número mayor a cero.');
+        return;
+    }
+
+    const amountValue = Number(amount);
+    const quantityValue = Number(quantity);
+    const measuredFactor = Number.isFinite(base) && base > 0 && Number.isFinite(height) && height > 0
+        ? (base * height * quantityValue)
+        : quantityValue;
+
+    if (!Number.isFinite(measuredFactor) || measuredFactor <= 0) {
+        alert('No se pudo calcular el costo unitario para este detalle.');
+        return;
+    }
+
+    const unitCost = (amountValue / measuredFactor).toFixed(2);
+    const product = {
+        productId,
+        name: productName,
+        quantity,
+        unitCost,
+        amount,
+        base: Number.isFinite(base) ? base : null,
+        height: Number.isFinite(height) ? height : null,
+        presentation: selectedProduct?.presentation || 'PIEZA'
+    };
     details.push(product);
 
     refreshProductTable(details);
@@ -136,6 +169,7 @@ export const cleanAddedProduct = () => {
 
     $('#productInput').empty().trigger('change');
     document.querySelector('#quantityInput').value = '';
+    document.querySelector('#amountInput').value = '';
     document.querySelector('#presentationDisplayInput').value = '';
 }
 

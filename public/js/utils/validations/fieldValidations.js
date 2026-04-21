@@ -171,12 +171,20 @@ export const validateDetailsArray = (details) => {
 
     for (const detail of details) {
 
-        if (!detail.productId || !detail.quantity) {
-            return 'Cada detalle debe contener un producto y una cantidad.';
+        if (!detail.productId || !detail.quantity || !detail.unitCost || !detail.amount) {
+            return 'Cada detalle debe contener producto, cantidad, costo unitario e importe.';
         }
 
         if (isNaN(detail.quantity) || parseFloat(detail.quantity) < 1) {
             return 'La cantidad de cada detalle debe ser un número mayor a cero.';
+        }
+
+        if (isNaN(detail.unitCost) || parseFloat(detail.unitCost) <= 0) {
+            return 'El costo unitario de cada detalle debe ser un número mayor a cero.';
+        }
+
+        if (isNaN(detail.amount) || parseFloat(detail.amount) <= 0) {
+            return 'El importe de cada detalle debe ser un número mayor a cero.';
         }
     }
 

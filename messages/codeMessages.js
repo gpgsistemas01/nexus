@@ -60,7 +60,6 @@ export const errorMap = {
     minStock: {
         REQUIRED: 'MIN_STOCK_REQUIRED',
         INVALID_NUMBER: 'MIN_STOCK_INVALID_NUMBER',
-        TOO_LONG: 'MIN_STOCK_TOO_LONG',
         MIN_GREATER_THAN_MAX: 'MIN_STOCK_GREATER_THAN_MAX'
     },
     receptionDate: {

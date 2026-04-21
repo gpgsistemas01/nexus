@@ -61,7 +61,6 @@ export const errorMessages = {
     // 📉 MIN STOCK
     MIN_STOCK_REQUIRED: 'El stock mínimo es requerido.',
     MIN_STOCK_INVALID_NUMBER: 'Debe ser un número.',
-    MIN_STOCK_TOO_LONG: 'El valor es demasiado grande.',
     MIN_STOCK_GREATER_THAN_MAX: 'El stock mínimo no puede ser mayor al máximo.',
 
     // RECEPTION DATE

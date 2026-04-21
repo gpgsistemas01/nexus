@@ -5,6 +5,8 @@ export const createGoodsReceiptDtoForRegister = (body = {}) => ({
     observations: body.observations?.trim() || null,
     details: (body.details).map(d => ({
         productId: d.productId.trim(),
-        quantity: Number(d.quantity)
+        quantity: Number(d.quantity),
+        unitCost: Number(d.unitCost),
+        amount: Number(d.amount)
     }))
 });

@@ -80,7 +80,11 @@ export const initDetailsGoodsReceiptTable = (mode) => {
 
     const columns = [
         { data: 'name', title: 'Producto' },
+        { data: 'base', title: 'Base' },
+        { data: 'height', title: 'Altura' },
         { data: 'quantity', title: 'Cantidad' },
+        { data: 'unitCost', title: 'Costo unitario' },
+        { data: 'amount', title: 'Importe' },
         { 
             data: 'presentation', 
             title: 'Unidad',

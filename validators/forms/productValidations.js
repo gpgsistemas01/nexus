@@ -2,8 +2,7 @@ import { validateIsActive, validateName, validateNumberOptional } from "../field
 
 export const productValidation = [
     validateName(200),
-    validateNumberOptional('unitCost'),
-    validateNumberOptional('minStock'),
+    validateNumberOptional('minStock', { disableTooLong: true }),
     validateNumberOptional('base'),
     validateNumberOptional('height'),
     validateIsActive

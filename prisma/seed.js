@@ -230,7 +230,6 @@ async function main() {
     const productParsed = productRows.map(row => ({
         name: row.name,
         sku: row.sku,
-        unitCost: isNaN(toDecimal(row.unitCost)) ? 0 : toDecimal(row.unitCost),
         currentStock: isNaN(toDecimal(row.currentStock)) ? 0 : toDecimal(row.currentStock),
         presentation: getPresentation(row.presentation),
         minStock: isNaN(toDecimal(row.minStock)) ? 0 : toDecimal(row.minStock),

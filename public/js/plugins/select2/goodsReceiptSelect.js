@@ -64,7 +64,9 @@ export const initGoodsReceiptSelect2 = async (data = null) => {
                 results: list.map(product => ({
                     id: product.id,
                     text: product.name,
-                    presentation: product.presentation || 'PIEZA'
+                    presentation: product.presentation || 'PIEZA',
+                    base: product.base,
+                    height: product.height
                 })) 
             }; 
         },

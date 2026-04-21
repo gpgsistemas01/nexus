@@ -8,7 +8,6 @@ export const supplierValidators = {
 
 export const productValidators = {
     name: (value) => validateName(value, 200),
-    unitCost: (value) => validateNumberOptional(value, 'El costo unitario'),
     minStock: (value) => validateNumberOptional(value, 'El stock mínimo'),
     base: (value) => validateNumberOptional(value, 'La base'),
     height: (value) => validateNumberOptional(value, 'La altura'),
