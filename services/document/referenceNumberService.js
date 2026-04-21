@@ -10,7 +10,7 @@ export const incrementReferenceNumberCounter = async ({ type, tx }) => {
     });
 }
 
-export const generateReferenceNumber = async ({ type, sequence, tx }) => {
+export const generateReferenceNumber = async ({ type, tx }) => {
 
     const counter = await incrementReferenceNumberCounter({
         type,

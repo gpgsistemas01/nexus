@@ -3,6 +3,20 @@ import { prisma } from "../../lib/prisma.js";
 
 const MAX_RETRIES = 5;
 
+const mapProductWithSupplier = (product) => {
+
+    const relation = product.supplierProducts?.[0];
+    const supplier = relation?.supplier;
+
+    return {
+        ...product,
+        supplierId: supplier?.id || null,
+        supplierName: supplier ? `${supplier.code} - ${supplier.tradeName}` : null,
+        supplierCode: supplier?.code || null,
+        supplierProductSku: relation?.sku || null
+    };
+};
+
 export const findAllProducts = async ({
     skip = 0,
     take = 10,
@@ -24,6 +38,23 @@ export const findAllProducts = async ({
         skip,
         take,
         where,
+        include: {
+            supplierProducts: {
+                include: {
+                    supplier: {
+                        select: {
+                            id: true,
+                            code: true,
+                            tradeName: true
+                        }
+                    }
+                },
+                take: 1,
+                orderBy: {
+                    id: 'asc'
+                }
+            }
+        },
         orderBy: {
             [orderBy]: orderDir
         }
@@ -43,58 +74,69 @@ export const findAllProducts = async ({
     const filtered = await prisma.product.count({ where });
 
     return {
-        data: sortedProducts,
+        data: sortedProducts.map(mapProductWithSupplier),
         recordsTotal: total,
         recordsFiltered: filtered
     };
 };
 
-const normalizeWords = (name) => {
-    const words = name.split(/\s+/).filter(Boolean);
-    const result = [];
-
-    for (let i = 0; i < words.length; i++) {
-        const current = words[i];
-
-        if (/^\d+$/.test(current) && words[i + 1]) {
-            result.push(current + words[i + 1]);
-            i++;
-        } else {
-            result.push(current);
-        }
-    }
-
-    return result;
+const cleanNameForSku = (name = '') => {
+    return name
+        .replace(/\([^)]*\)/g, ' ')
+        .replace(/"[^"]*"/g, ' ')
+        .replace(/"/g, ' PUL ')
+        .replace(/[.-]/g, ' ')
+        .replace(/\s{2,}/g, ' ')
+        .trim();
 };
 
 const getChunk = (word) => {
-    const cleaned = word
-        .toUpperCase()
-        .replace(/[^A-Z0-9]/g, '');
+
+    const normalizedWord = word.toUpperCase().trim();
+
+    if (/^\d+$/.test(normalizedWord)) return normalizedWord;
+    if (/^\d+\/\d+$/.test(normalizedWord)) return normalizedWord;
+    if (/^[A-Z]\/\d+$/.test(normalizedWord)) return normalizedWord;
+
+    const cleaned = normalizedWord.replace(/[^A-Z0-9]/g, '');
 
     return cleaned.slice(0, 3);
 };
 
 const generateSku = (name) => {
-    const maxLength = 9;
-    return normalizeWords(name)
+
+    const cleanedName = cleanNameForSku(name);
+
+    return cleanedName
+        .split(' ')
+        .map((word) => word.trim())
+        .filter(Boolean)
         .map(getChunk)
-        .slice(0, maxLength)
+        .filter(Boolean)
         .join('-');
 };
 
-const ensureUniqueSku = async (baseSku) => {
+const ensureUniqueSku = async (baseSku, excludeProductId = null) => {
+
+    const where = {
+        sku: {
+            startsWith: baseSku
+        }
+    };
+
+    if (excludeProductId) {
+        where.NOT = {
+            id: excludeProductId
+        };
+    }
 
     const existingSkus = await prisma.product.findMany({
-        where: {
-            sku: {
-                startsWith: baseSku
-            }
-        },
+        where,
         select: { sku: true }
     });
 
-    const regex = new RegExp(`^${baseSku}(?:-(\\d+))?$`);
+    const escapedBaseSku = baseSku.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const regex = new RegExp(`^${escapedBaseSku}(?:-(\\d+))?$`);
 
     let max = 0;
     let baseExists = false;
@@ -124,29 +166,57 @@ const inferPresentation = (base, height) => {
     return 'PIEZA';
 }
 
+const buildSupplierProductSku = ({ productSku, supplierCode }) => `${productSku}-${supplierCode}`;
+
 export const createProduct = async (productDto) => {
 
-    let uniqueSku;
     let success = false;
     let attempts = 0;
 
-    while (attempts < MAX_RETRIES) {
+    while (attempts < MAX_RETRIES && !success) {
         try {
 
-            const sku = generateSku(productDto.name, productDto.base, productDto.height);
+            const product = await prisma.$transaction(async (tx) => {
 
-            uniqueSku = await ensureUniqueSku(sku);
+                const sku = generateSku(productDto.name);
+                const uniqueSku = await ensureUniqueSku(sku);
+                const presentation = inferPresentation(productDto.base, productDto.height);
 
-            const presentation = inferPresentation(productDto.base, productDto.height);
+                const supplier = await tx.supplier.findUnique({
+                    where: {
+                        id: productDto.supplierId
+                    },
+                    select: {
+                        code: true
+                    }
+                });
 
-            const product = await prisma.product.create({
-                data: {
-                    ...productDto,
-                    sku: uniqueSku,
-                    presentation
+                const createdProduct = await tx.product.create({
+                    data: {
+                        name: productDto.name,
+                        minStock: productDto.minStock,
+                        base: productDto.base,
+                        height: productDto.height,
+                        isActive: productDto.isActive,
+                        sku: uniqueSku,
+                        presentation
+                    }
+                });
+
+                if (supplier) {
+                    await tx.supplierProduct.create({
+                        data: {
+                            supplierId: productDto.supplierId,
+                            productId: createdProduct.id,
+                            sku: buildSupplierProductSku({ productSku: uniqueSku, supplierCode: supplier.code })
+                        }
+                    });
                 }
+
+                return createdProduct;
             });
 
+            success = true;
             return product;
 
         } catch (err) {
@@ -179,21 +249,53 @@ export const updateProduct = async (productDto, id) => {
 
     try {
 
-        const sku = generateSku(productDto.name, productDto.base, productDto.height);
+        const product = await prisma.$transaction(async (tx) => {
 
-        uniqueSku = await ensureUniqueSku(sku);
+            const sku = generateSku(productDto.name);
+            const uniqueSku = await ensureUniqueSku(sku, id);
+            const presentation = inferPresentation(productDto.base, productDto.height);
 
-        const presentation = inferPresentation(productDto.base, productDto.height);
+            const supplier = await tx.supplier.findUnique({
+                where: {
+                    id: productDto.supplierId
+                },
+                select: {
+                    code: true
+                }
+            });
 
-        const product = await prisma.product.update({
-            data: {
-                ...productDto,
-                sku: uniqueSku,
-                presentation
-            },
-            where: {
-                id: id
+            const updatedProduct = await tx.product.update({
+                data: {
+                    name: productDto.name,
+                    minStock: productDto.minStock,
+                    base: productDto.base,
+                    height: productDto.height,
+                    isActive: productDto.isActive,
+                    sku: uniqueSku,
+                    presentation
+                },
+                where: {
+                    id
+                }
+            });
+
+            await tx.supplierProduct.deleteMany({
+                where: {
+                    productId: id
+                }
+            });
+
+            if (supplier) {
+                await tx.supplierProduct.create({
+                    data: {
+                        supplierId: productDto.supplierId,
+                        productId: id,
+                        sku: buildSupplierProductSku({ productSku: uniqueSku, supplierCode: supplier.code })
+                    }
+                });
             }
+
+            return updatedProduct;
         });
 
         return product;

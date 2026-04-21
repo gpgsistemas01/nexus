@@ -9,6 +9,7 @@ export const supplierValidators = {
 
 export const productValidators = {
     name: (value) => validateName(value, 200),
+    supplierId: (value) => isEmptyOrNull(value, 'El proveedor'),
     minStock: (value) => validateNumberOptional(value, 'El stock mínimo'),
     base: (value) => validateNumberOptional(value, 'La base'),
     height: (value) => validateNumberOptional(value, 'La altura'),

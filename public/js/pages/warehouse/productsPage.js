@@ -24,6 +24,7 @@ useForm({
         return errors;
     },
     normalizeErrors: ({ form, errors }) => toggleInputSelectErrors(form, errors),
+    normalizeServerErrors: (form, errors) => toggleInputSelectErrors(form, errors),
     sendRequest: async ({ formData, form }) => {
 
         const product = await handleSubmit({

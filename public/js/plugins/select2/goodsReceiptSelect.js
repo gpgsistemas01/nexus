@@ -92,11 +92,16 @@ export const initGoodsReceiptSelect2 = async (data = null) => {
 
             const tempValue = selectedProduct.id;
             const productName = tempValue.replace('new:', '');
+            const selectedSupplier = $(supplierSelector).select2('data')?.[0];
 
             cleanAddedProduct()
             openProductModal({ 
                 mode: 'create', 
-                data: { name: productName },
+                data: {
+                    name: productName,
+                    supplierId: selectedSupplier?.id || null,
+                    supplierName: selectedSupplier?.text || null
+                },
                 onSave: (createdProduct) => {
                     const newOption = new Option(
                         createdProduct.name, 
