@@ -3,14 +3,17 @@ import { initbaseSelect2 } from "./baseSelect.js";
 const productModalSelector = '#productModal';
 const supplierSelector = '#supplierInput';
 
-export const initProductSelect2 = () => {
+export const initProductFormSelect2 = () => {
+
     initbaseSelect2({
         baseSelector: supplierSelector,
         modalSelector: productModalSelector,
         url: '/api/warehouse/suppliers/',
         placeholder: 'Buscar proveedor...',
         processResults: (data) => {
+            
             const list = data.data || data;
+            
             return {
                 results: list.map((supplier) => ({
                     id: supplier.id,
@@ -22,7 +25,8 @@ export const initProductSelect2 = () => {
     });
 };
 
-export const preloadSupplierOption = ({ supplierId, supplierName }) => {
+export const setSupplierOption = ({ supplierId = null, supplierName = null } = {}) => {
+    
     $(supplierSelector).empty().trigger('change');
 
     if (!supplierId || !supplierName) return;

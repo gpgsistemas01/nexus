@@ -1,11 +1,11 @@
-import { openProductModal } from "../../components/modals/productModal.js";
+import { openProductModal } from "../../modules/products/productModal.js";
 import { cleanAddedProduct } from "../../pages/warehouse/goodsReceiptsPage.js";
 import { initMdbWrapperInput, updateMdbWrapperInput } from "../mdb/baseInstance.js";
 import { initbaseSelect2 } from "./baseSelect.js";
 
 const modalSelector = '#goodsReceiptModal';
 
-export const initGoodsReceiptSelect2 = async (data = null) => {
+export const initGoodsReceiptFormSelect2 = async (data = null) => {
 
     const supplierSelector = '#supplierInput';
     const receivedBySelector = '#receivedByInput';
@@ -19,6 +19,7 @@ export const initGoodsReceiptSelect2 = async (data = null) => {
         processResults: (data) => {
             
             const list = data.data || data;
+
             return { 
                 results: list.map(supplier => ({ 
                     id: supplier.id, 
@@ -34,6 +35,7 @@ export const initGoodsReceiptSelect2 = async (data = null) => {
         url: '/api/admin/profiles/',
         placeholder: 'Buscar persona que recibe...',
         data: (params) => {
+
             return {
                 search: params.term,
                 department: 'Almacén',
@@ -43,6 +45,7 @@ export const initGoodsReceiptSelect2 = async (data = null) => {
         processResults: (data) => {
             
             const list = data.data || data;
+
             return { 
                 results: list.map(receivedBy => ({ 
                     id: receivedBy.id, 
@@ -60,6 +63,7 @@ export const initGoodsReceiptSelect2 = async (data = null) => {
         processResults: (data) => {
 
             const list = data.data || data;
+            
             return { 
                 results: list.map(product => ({
                     id: product.id,
@@ -84,7 +88,7 @@ export const initGoodsReceiptSelect2 = async (data = null) => {
         },
     });
 
-    $(productSelector).on('select2:select', (e) => {
+    $(productSelector).off('select2:select').on('select2:select', (e) => {
     
         const selectedProduct = e.params.data;
 
@@ -99,8 +103,6 @@ export const initGoodsReceiptSelect2 = async (data = null) => {
                 mode: 'create', 
                 data: {
                     name: productName,
-                    supplierId: selectedSupplier?.id || null,
-                    supplierName: selectedSupplier?.text || null
                 },
                 onSave: (createdProduct) => {
                     const newOption = new Option(

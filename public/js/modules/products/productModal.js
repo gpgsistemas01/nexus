@@ -1,7 +1,7 @@
 import { setFormReadOnly } from "../../ui/formUI.js";
 import { backModal, openModal } from "../../ui/modalUI.js";
 import { on } from "../../utils/domUtils.js";
-import { initProductSelect2, preloadSupplierOption } from "../../plugins/select2/productSelect.js";
+import { initProductFormSelect2, setSupplierOption } from "../../plugins/select2/productSelect.js";
 
 const productModalId = '#productModal';
 const backSelector = `#backBtn-${productModalId.replace('#', '')}`;
@@ -15,14 +15,14 @@ export const openProductModal = async ({ mode, data = null, onSave = null }) => 
     form.dataset.id = data?.id || '';
 
     setFormReadOnly({ form, isReadOnly: false });
-    initProductSelect2();
+    initProductFormSelect2();
 
     if (mode === 'create') {
         
         form.reset();
         if (form.elements.isActive) form.elements.isActive.checked = true;
         form.elements.name.value = data?.name || '';
-        preloadSupplierOption({ supplierId: data?.supplierId, supplierName: data?.supplierName });
+        setSupplierOption();
 
         modalElement.querySelector('#modalTitle').textContent = 'Registrar producto';
         form.querySelector('#submitBtn').textContent = 'Guardar';
@@ -35,7 +35,7 @@ export const openProductModal = async ({ mode, data = null, onSave = null }) => 
         form.elements.base.value = data.base || '';
         form.elements.height.value = data.height || '';
         if (form.elements.isActive) form.elements.isActive.checked = Boolean(data.isActive);
-        preloadSupplierOption({ supplierId: data.supplierId, supplierName: data.supplierName });
+        setSupplierOption({ supplierId: data.supplierId, supplierName: data.supplierName });
 
         if (mode === 'edit') {
 

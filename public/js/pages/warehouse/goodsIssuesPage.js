@@ -2,7 +2,7 @@ import { useForm } from "../../application/form.js";
 import { approveGoodsIssue, cancelGoodsIssue, confirmGoodsIssue, editGoodsIssue, registerGoodsIssue, rejectGoodsIssue } from "../../application/warehouse/goodsIssues.js";import { validateGoodsIssueValidators } from "../../utils/validations/validators.js";
 import { refreshProductTable } from "../../plugins/datatable/baseDatatable.js";
 import { createGoodsIssueDatatable, details, initDetailsGoodsIssueTable } from "../../plugins/datatable/goodsIssueDatatable.js";
-import { initGoodsIssueSelect2 } from "../../plugins/select2/goodsIssueSelect.js";
+import { initGoodsIssueFormSelect2 } from "../../plugins/select2/goodsIssueSelect.js";
 import { toggleInputSelectErrors, toggleTableErrors, setFormReadOnly, toggleButtons } from "../../ui/formUI.js";
 import { on } from "../../utils/domUtils.js";
 import { formatDateLongWithTime } from "../../utils/formatters.js";
@@ -87,7 +87,7 @@ export const openGoodsIssueModal = async ({ mode, data = null }) => {
         form.querySelector('#submitBtn').textContent = 'Guardar';
         form.querySelector('#presentationDisplayInput').value = '';
 
-        await initGoodsIssueSelect2({ context });
+        await initGoodsIssueFormSelect2({ context });
     }
 
     if (mode === 'edit' || mode === 'view') {
@@ -118,7 +118,7 @@ export const openGoodsIssueModal = async ({ mode, data = null }) => {
             })
         );
 
-        await initGoodsIssueSelect2({ data, context });
+        await initGoodsIssueFormSelect2({ data, context });
 
         if (mode === 'edit') {
             modalElement.querySelector('#modalTitle').textContent = 'Editar salida';

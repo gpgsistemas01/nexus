@@ -2,7 +2,7 @@ import { useForm } from "../../application/form.js";
 import { cancelPurchaseRequisition, confirmPurchaseRequisition, editPurchaseRequisition, registerPurchaseRequisition } from "../../application/warehouse/purchaseRequisitions.js";
 import { refreshProductTable } from "../../plugins/datatable/baseDatatable.js";
 import { createPurchaseRequisitionDatatable, details, initDetailsPurchaseRequisitionTable } from "../../plugins/datatable/purchaseRequisitionDatatable.js";
-import { initPurchaseRequisitionSelect2 } from "../../plugins/select2/purchaseRequisitionSelect.js";
+import { initPurchaseRequisitionFormSelect2 } from "../../plugins/select2/purchaseRequisitionSelect.js";
 import { toggleInputSelectErrors, toggleTableErrors, setFormReadOnly, toggleButtons } from "../../ui/formUI.js";
 import { backModal, openModal } from "../../ui/modalUI.js";
 import { on } from "../../utils/domUtils.js";
@@ -72,7 +72,7 @@ export const openPurchaseRequisitionModal = async ({ mode, data = null }) => {
         form.querySelector('#submitBtn').textContent = 'Guardar';
         form.querySelector('#presentationDisplayInput').value = '';
 
-        await initPurchaseRequisitionSelect2();
+        await initPurchaseRequisitionFormSelect2();
     }
 
     if (mode === 'edit' || mode === 'view') {
@@ -88,7 +88,7 @@ export const openPurchaseRequisitionModal = async ({ mode, data = null }) => {
             uom: detail.product.presentation || 'PIEZA'
         })));
 
-        await initPurchaseRequisitionSelect2(data);
+        await initPurchaseRequisitionFormSelect2(data);
 
         if (mode === 'edit') {
 

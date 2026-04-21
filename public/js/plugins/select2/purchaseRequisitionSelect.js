@@ -3,7 +3,7 @@ import { initbaseSelect2 } from "./baseSelect.js";
 
 const modalSelector = '#goodsIssueModal';
 
-export const initPurchaseRequisitionSelect2 = async (data = null) => {
+export const initPurchaseRequisitionFormSelect2 = async (data = null) => {
 
     const projectSelector = '#projectInput';
     const requesterSelector = '#requesterInput';

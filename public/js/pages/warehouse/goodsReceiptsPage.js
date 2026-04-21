@@ -3,7 +3,7 @@ import { cancelGoodsReceipt, confirmGoodsReceipt, editGoodsReceipt, registerGood
 import { validateGoodsReceiptValidators } from "../../utils/validations/validators.js";
 import { refreshProductTable } from "../../plugins/datatable/baseDatatable.js";
 import { createGoodsReceiptDatatable, details, initDetailsGoodsReceiptTable } from "../../plugins/datatable/goodsReceiptDatatable.js";
-import { initGoodsReceiptSelect2 } from "../../plugins/select2/goodsReceiptSelect.js";
+import { initGoodsReceiptFormSelect2 } from "../../plugins/select2/goodsReceiptSelect.js";
 import { toggleInputSelectErrors, toggleTableErrors, setFormReadOnly, toggleButtons } from "../../ui/formUI.js";
 import { on } from "../../utils/domUtils.js";
 import { formatDateLongWithTime } from "../../utils/formatters.js";
@@ -71,7 +71,7 @@ export const openGoodsReceiptModal = async ({ mode, data = null }) => {
         form.querySelector('#submitBtn').textContent = 'Guardar';
         form.querySelector('#presentationDisplayInput').value = '';
 
-        await initGoodsReceiptSelect2();
+        await initGoodsReceiptFormSelect2();
     }
 
     if (mode === 'edit' || mode === 'view') {
@@ -91,7 +91,7 @@ export const openGoodsReceiptModal = async ({ mode, data = null }) => {
             presentation: detail.product.presentation
         })));
 
-        await initGoodsReceiptSelect2(data);
+        await initGoodsReceiptFormSelect2(data);
 
         if (mode === 'edit') {
 

@@ -1,0 +1,34 @@
+import { useForm } from "../../application/form.js";
+import { editProduct, registerProduct } from "../../application/warehouse/products.js";
+import { toggleInputSelectErrors } from "../../ui/formUI.js";
+import { handleSubmit, validateFields } from "../../utils/formUtils.js";
+
+const formId = '#productForm';
+
+useForm({
+    selector: formId,
+    normalizeData: ({ formData }) => {
+        formData.isActive = document.getElementById('isActiveInput').checked;
+    },
+    getErrors: (formData) => {
+        
+        let errors = {};
+
+        errors = validateFields(productValidators, formData);
+
+        return errors;
+    },
+    normalizeErrors: ({ form, errors }) => toggleInputSelectErrors(form, errors),
+    normalizeServerErrors: (form, errors) => toggleInputSelectErrors(form, errors),
+    sendRequest: async ({ formData, form }) => {
+
+        const product = await handleSubmit({
+            form,
+            formData,
+            create: registerProduct,
+            update: editProduct
+        });
+
+        form.onSave?.(product);
+    },
+});
