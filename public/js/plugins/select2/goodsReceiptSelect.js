@@ -7,7 +7,7 @@ const modalSelector = '#goodsReceiptModal';
 
 export const initGoodsReceiptFormSelect2 = async (data = null) => {
 
-    const supplierSelector = '#supplierInput';
+    const supplierSelector = '.supplier-select';
     const receivedBySelector = '#receivedByInput';
     const productSelector = '#productInput';
 
@@ -131,7 +131,7 @@ export const initGoodsReceiptFormSelect2 = async (data = null) => {
             true, 
             true
         );
-        $(supplierSelector).append(supplierOption).trigger('change');
+        $(`${modalSelector} ${supplierSelector}`).append(supplierOption).trigger('change');
         const receivedByOption = new Option(
             `${data.receivedBy.name} ${data.receivedBy.lastName}`, 
             data.receivedBy.id, 
@@ -142,7 +142,7 @@ export const initGoodsReceiptFormSelect2 = async (data = null) => {
 
     } else {
 
-        $(supplierSelector).empty().trigger('change');
+        $(`${modalSelector} ${supplierSelector}`).empty().trigger('change');
         $(receivedBySelector).empty().trigger('change');
     }
 }

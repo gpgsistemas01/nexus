@@ -2,6 +2,7 @@ import { useForm } from "../../application/form.js";
 import { editProduct, registerProduct } from "../../application/warehouse/products.js";
 import { toggleInputSelectErrors } from "../../ui/formUI.js";
 import { handleSubmit, validateFields } from "../../utils/formUtils.js";
+import { productValidators } from "../../utils/validations/validators.js";
 
 const formId = '#productForm';
 

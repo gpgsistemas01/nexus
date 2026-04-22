@@ -218,13 +218,13 @@ export const updateGoodsReceipt = async (goodsReceiptDto, id) => {
 
             if (incomingDetailsIds.length) deleteFilter.id = { notIn: incomingDetailsIds };
 
-            await tx.detailGoodsReceiptProduct.deleteMany({
+            await tx.goodsReceiptDetail.deleteMany({
                 where: deleteFilter
             });
 
-            const detailsGoodsReceipt = await Promise.all(details.map(async detail => {
+            const goodsReceiptDetails = await Promise.all(details.map(async detail => {
 
-                return await tx.detailGoodsReceiptProduct.create({
+                return await tx.goodsReceiptDetail.create({
                     data: {
                         ...detail,
                         goodsReceiptId: id
@@ -232,7 +232,7 @@ export const updateGoodsReceipt = async (goodsReceiptDto, id) => {
                 });
             }));
 
-            goodsReceipt.details = detailsGoodsReceipt;
+            goodsReceipt.details = goodsReceiptDetails;
 
             return { goodsReceipt };
         });
@@ -303,13 +303,13 @@ const updateGoodsReceiptStatus = async ({ id, statusName, userId }) => {
 
             if (statusName === STATUS_CONFIRMED) {
                 
-                const approver = await findProfileByUserId({ tx, userId });
+                const approverId = await findProfileByUserId({ tx, userId });
 
-                if (!approver) throw new GoodsReceiptApproverProfileNotFound();
+                if (!approverId) throw new GoodsReceiptApproverProfileNotFound();
 
                 data.approver = {
                     connect: {
-                        id: approver.id
+                        id: approverId
                     }
                 };
                 data.approveDate = new Date();
@@ -353,6 +353,7 @@ const updateGoodsReceiptStatus = async ({ id, statusName, userId }) => {
             throw new GoodsReceiptStatusUpdateDatabaseError();
         }
         if (err.code === PRISMA_RECORD_NOT_FOUND) throw new GoodsReceiptStatusNotFound();
+
         throw new GoodsReceiptStatusUpdateDatabaseError();
     }
 };

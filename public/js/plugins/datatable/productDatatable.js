@@ -46,7 +46,11 @@ export const createProductDatatable = (context) => {
 
     const columns = [
         { data: 'sku', title: 'Código' },
-        { data: 'name', title: 'Nombre' },
+        { 
+            data: null, 
+            title: 'Nombre',
+            render: (data) => `${ data.name } ${ data.supplierName }`
+        },
         { data: 'base', title: 'Base' },
         { data: 'height', title: 'Altura' },
         { data: 'currentStock', title: 'Stock' },

@@ -1,13 +1,13 @@
 import { initbaseSelect2 } from "./baseSelect.js";
 
-const productModalSelector = '#productModal';
-const supplierSelector = '#supplierInput';
+const modalSelector = '#productModal';
+const supplierSelector = '.supplier-select';
 
 export const initProductFormSelect2 = () => {
 
     initbaseSelect2({
-        baseSelector: `${productModalSelector} ${supplierSelector}`,
-        modalSelector: productModalSelector,
+        baseSelector: `${modalSelector} ${supplierSelector}`,
+        modalSelector: modalSelector,
         url: '/api/warehouse/suppliers/',
         placeholder: 'Buscar proveedor...',
         processResults: (data) => {
@@ -27,7 +27,7 @@ export const initProductFormSelect2 = () => {
 
 export const setSupplierOption = ({ supplierId = null, supplierName = null } = {}) => {
     
-    $(supplierSelector).empty().trigger('change');
+    $(`${modalSelector} ${supplierSelector}`).empty().trigger('change');
 
     if (!supplierId || !supplierName) return;
 
@@ -38,5 +38,5 @@ export const setSupplierOption = ({ supplierId = null, supplierName = null } = {
         true
     );
 
-    $(supplierSelector).append(supplierOption).trigger('change');
+    $(`${modalSelector} ${supplierSelector}`).append(supplierOption).trigger('change');
 };

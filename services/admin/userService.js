@@ -7,7 +7,7 @@ export const getDepartmentByProfileId = async (profileId) => {
         where: {
             profiles: {
                 some: {
-                    id: receivedById
+                    id: profileId
                 }
             }
         },

@@ -24,7 +24,7 @@ export const createGoodsReceiptDatatable = () => {
                         return `<div>${ name }<br><small>${ date }</small></div>`;
                     }
                 },
-                { data: 'supplier.name', title: 'Proveedor' },
+                { data: 'supplier.tradeName', title: 'Proveedor' },
                 {
                     data: null,
                     title: 'Aprobación',
