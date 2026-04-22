@@ -12,7 +12,7 @@ export const initGoodsReceiptFormSelect2 = async (data = null) => {
     const productSelector = '#productInput';
 
     initbaseSelect2({
-        baseSelector: supplierSelector,
+        baseSelector: `${modalSelector} ${supplierSelector}`,
         modalSelector,
         url: '/api/warehouse/suppliers/',
         placeholder: 'Buscar proveedor...',
@@ -96,7 +96,6 @@ export const initGoodsReceiptFormSelect2 = async (data = null) => {
 
             const tempValue = selectedProduct.id;
             const productName = tempValue.replace('new:', '');
-            const selectedSupplier = $(supplierSelector).select2('data')?.[0];
 
             cleanAddedProduct()
             openProductModal({ 

@@ -6,7 +6,7 @@ const supplierSelector = '#supplierInput';
 export const initProductFormSelect2 = () => {
 
     initbaseSelect2({
-        baseSelector: supplierSelector,
+        baseSelector: `${productModalSelector} ${supplierSelector}`,
         modalSelector: productModalSelector,
         url: '/api/warehouse/suppliers/',
         placeholder: 'Buscar proveedor...',
