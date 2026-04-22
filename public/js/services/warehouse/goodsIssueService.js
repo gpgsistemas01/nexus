@@ -1,35 +1,35 @@
 import { apiRequest } from "../axiosInstanceApi.js";
 
-const route = '/api/warehouse';
+export const GOODS_RECEIPTS_API_ROUTE = '/api/warehouse/goods-issues';
 
 export const registerGoodsIssueRequest = (data) => apiRequest({
     method: 'post',
-    url: `${ route }/goods-issues`,
+    url: `${ GOODS_RECEIPTS_API_ROUTE }`,
     data
 });
 
 export const editGoodsIssueRequest = (data, id) => apiRequest({
     method: 'put',
-    url: `${ route }/goods-issues/${ id }`,
+    url: `${ GOODS_RECEIPTS_API_ROUTE }/${ id }`,
     data
 });
 
 export const cancelGoodsIssueRequest = (id) => apiRequest({
     method: 'patch',
-    url: `${ route }//goods-issues/${ id }/cancel`
+    url: `${ GOODS_RECEIPTS_API_ROUTE }/${ id }/cancel`
 });
 
 export const confirmGoodsIssueRequest = (id) => apiRequest({
     method: 'patch',
-    url: `${ route }/goods-issues/${ id }/confirm`
+    url: `${ GOODS_RECEIPTS_API_ROUTE }/${ id }/confirm`
 });
 
 export const rejectGoodsIssueRequest = (id) => apiRequest({
     method: 'patch',
-    url: `${ route }/goods-issues/${ id }/reject`
+    url: `${ GOODS_RECEIPTS_API_ROUTE }/${ id }/reject`
 });
 
 export const approveGoodsIssueRequest = (id) => apiRequest({
     method: 'patch',
-    url: `${ route }/goods-issues/${ id }/approve`
+    url: `${ GOODS_RECEIPTS_API_ROUTE }/${ id }/approve`
 });

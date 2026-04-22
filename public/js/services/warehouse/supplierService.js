@@ -1,15 +1,15 @@
 import { apiRequest } from "../axiosInstanceApi.js";
 
-const route = '/api/warehouse';
+export const SUPPLIERS_API_ROUTE = '/api/warehouse/suppliers';
 
 export const registerSupplierRequest = (data) => apiRequest({
     method: 'post',
-    url: `${ route }/suppliers`,
+    url: `${ SUPPLIERS_API_ROUTE }`,
     data
 });
 
 export const editSupplierRequest = (data, id) => apiRequest({
     method: 'put',
-    url: `${ route }/suppliers/${ id }`,
+    url: `${ SUPPLIERS_API_ROUTE }/${ id }`,
     data
 });

@@ -1,12 +1,11 @@
-import { setFormReadOnly } from "../../ui/formUI.js";
 import { backModal, openModal } from "../../ui/modalUI.js";
 import { on } from "../../utils/domUtils.js";
-import { initProductFormSelect2, setSupplierOption } from "../../plugins/select2/productSelect.js";
+import { initProductFormSelect2, setProductFormSelectOptions } from "../../plugins/select2/productSelect.js";
 
 const productModalId = '#productModal';
 const backSelector = `#backBtn-${productModalId.replace('#', '')}`;
 
-export const openProductModal = async ({ mode, data = null, onSave = null }) => {
+export const openProductModal = async ({ mode = 'create', data = null, onSave = null }) => {
     
     const form = document.querySelector('#productForm');
     const modalElement = document.querySelector(productModalId);
@@ -14,7 +13,6 @@ export const openProductModal = async ({ mode, data = null, onSave = null }) => 
     form.dataset.mode = mode;
     form.dataset.id = data?.id || '';
 
-    setFormReadOnly({ form, isReadOnly: false });
     initProductFormSelect2();
 
     if (mode === 'create') {
@@ -22,33 +20,23 @@ export const openProductModal = async ({ mode, data = null, onSave = null }) => 
         form.reset();
         if (form.elements.isActive) form.elements.isActive.checked = true;
         form.elements.name.value = data?.name || '';
-        setSupplierOption();
+        setProductFormSelectOptions();
 
         modalElement.querySelector('#modalTitle').textContent = 'Registrar producto';
         form.querySelector('#submitBtn').textContent = 'Guardar';
     }
 
-    if (mode === 'edit' || mode === 'view') {
+    if (mode === 'edit') {
 
         form.elements.name.value = data.name;
         form.elements.minStock.value = data.minStock;
         form.elements.base.value = data.base || '';
         form.elements.height.value = data.height || '';
         if (form.elements.isActive) form.elements.isActive.checked = Boolean(data.isActive);
-        setSupplierOption({ supplierId: data.supplierId, supplierName: data.supplierName });
+        setProductFormSelectOptions(data);
 
-        if (mode === 'edit') {
-
-            modalElement.querySelector('#modalTitle').textContent = 'Editar producto';
-            form.querySelector('#submitBtn').textContent = 'Actualizar';
-        }
-
-        if (mode === 'view') {
-
-            modalElement.querySelector('#modalTitle').textContent = 'Ver producto';
-
-            setFormReadOnly({ form, isReadOnly: true });
-        }
+        modalElement.querySelector('#modalTitle').textContent = 'Editar producto';
+        form.querySelector('#submitBtn').textContent = 'Actualizar';
     }
 
     form.onSave = onSave;

@@ -1,10 +1,10 @@
 import { useForm } from "../../application/form.js";
-import { editProduct, registerProduct } from "../../application/warehouse/products.js";
+import { editSupplier, registerSupplier } from "../../application/warehouse/suppliers.js";
 import { toggleInputSelectErrors } from "../../ui/formUI.js";
 import { handleSubmit, validateFields } from "../../utils/formUtils.js";
-import { productValidators } from "../../utils/validations/validators.js";
+import { supplierValidators } from "../../utils/validations/validators.js";
 
-const formId = '#productForm';
+const formId = '#supplierForm';
 
 useForm({
     selector: formId,
@@ -15,7 +15,7 @@ useForm({
         
         let errors = {};
 
-        errors = validateFields(productValidators, formData);
+        errors = validateFields(supplierValidators, formData);
 
         return errors;
     },
@@ -23,13 +23,13 @@ useForm({
     normalizeServerErrors: (form, errors) => toggleInputSelectErrors(form, errors),
     sendRequest: async ({ formData, form }) => {
 
-        const product = await handleSubmit({
+        const supplier = await handleSubmit({
             form,
             formData,
-            create: registerProduct,
-            update: editProduct
+            create: registerSupplier,
+            update: editSupplier,
         });
 
-        form.onSave?.(product);
-    },
+        form.onSave?.(supplier);
+    }
 });

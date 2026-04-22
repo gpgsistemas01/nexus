@@ -37,3 +37,19 @@ export const initbaseSelect2 = ({
         createTag
     });
 }
+
+export const toggleSelectOption = ({ selector, id = null, name = null }) => {
+    
+    $(selector).empty().trigger('change');
+
+    if (!id || !name) return;
+
+    const option = new Option(
+        name,
+        id,
+        true,
+        true
+    );
+
+    $(selector).append(option).trigger('change');
+};

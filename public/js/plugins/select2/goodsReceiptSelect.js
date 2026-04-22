@@ -1,38 +1,35 @@
 import { openProductModal } from "../../modules/products/productModal.js";
+import { openSupplierModal } from "../../modules/suppliers/supplierModal.js";
 import { cleanAddedProduct } from "../../pages/warehouse/goodsReceiptsPage.js";
 import { initMdbWrapperInput, updateMdbWrapperInput } from "../mdb/baseInstance.js";
 import { initbaseSelect2 } from "./baseSelect.js";
+import { attachProductHandler, initProductSelect, toggleProductOption } from "./domains/product.js";
+import { initProfileSelect, toggleProfileOption } from "./domains/profiles.js";
+import { attachSupplierHandler, initSupplierSelect } from "./domains/supplier.js";
 
 const modalSelector = '#goodsReceiptModal';
+const productSelector = '#productInput';
+const supplierSelector = '.supplier-select';
+const receivedBySelector = '#receivedByInput';
 
-export const initGoodsReceiptFormSelect2 = async (data = null) => {
+export const initGoodsReceiptFormSelect2 = async (data = null) => {    
 
-    const supplierSelector = '.supplier-select';
-    const receivedBySelector = '#receivedByInput';
-    const productSelector = '#productInput';
-
-    initbaseSelect2({
-        baseSelector: `${modalSelector} ${supplierSelector}`,
+    initSupplierSelect({
         modalSelector,
-        url: '/api/warehouse/suppliers/',
-        placeholder: 'Buscar proveedor...',
-        processResults: (data) => {
-            
-            const list = data.data || data;
-
-            return { 
-                results: list.map(supplier => ({ 
-                    id: supplier.id, 
-                    text: supplier.tradeName 
-                })) 
-            }; 
-        }
+        baseSelector: `${ modalSelector } ${ supplierSelector }`,
     });
 
-    initbaseSelect2({
-        baseSelector: receivedBySelector,
-        modalSelector,
-        url: '/api/admin/profiles/',
+    attachSupplierHandler({
+        supplierSelector,
+        openModal: (name, done) => openSupplierModal({
+            data: { name },
+            onSave: done,
+        })
+    });
+
+    initProfileSelect({
+        modalSelector, 
+        baseSelector: `${ modalSelector } ${ receivedBySelector }`,
         placeholder: 'Buscar persona que recibe...',
         data: (params) => {
 
@@ -42,85 +39,29 @@ export const initGoodsReceiptFormSelect2 = async (data = null) => {
                 strictDepartmentFilter: true
             };
         },
-        processResults: (data) => {
-            
-            const list = data.data || data;
+        allowCreate: false,
+    })
 
-            return { 
-                results: list.map(receivedBy => ({ 
-                    id: receivedBy.id, 
-                    text: `${ receivedBy.name } ${ receivedBy.lastName }`
-                })) 
-            }; 
-        }
-    });
-
-    initbaseSelect2({
-        baseSelector: productSelector,
+    initProductSelect({
         modalSelector,
-        url: '/api/warehouse/products/',
-        placeholder: 'Buscar producto...',
-        processResults: (data) => {
-
-            const list = data.data || data;
-            
-            return { 
-                results: list.map(product => ({
-                    id: product.id,
-                    text: product.name,
-                    presentation: product.presentation || 'PIEZA',
-                    base: product.base,
-                    height: product.height
-                })) 
-            }; 
-        },
-        tags: true,
-        createTag: (params) => {
-            const term = params.term.trim();
-
-            if (term === '') return null;
-
-            return {
-                id: `new:${term}`,
-                text: `${term} (Nuevo producto)`,
-                newTag: true
-            }
-        },
+        baseSelector: `${ modalSelector } ${ productSelector }`,
     });
 
-    $(productSelector).off('select2:select').on('select2:select', (e) => {
-    
-        const selectedProduct = e.params.data;
+    attachProductHandler({
+        productSelector,
+        openModal: (name, done) => openProductModal({
+            data: { name },
+            onSave: done,
+        }),
+        onSelect: (product) => {
 
-        if (selectedProduct.newTag) {
-
-            const tempValue = selectedProduct.id;
-            const productName = tempValue.replace('new:', '');
-
-            cleanAddedProduct()
-            openProductModal({ 
-                mode: 'create', 
-                data: {
-                    name: productName,
-                },
-                onSave: (createdProduct) => {
-                    const newOption = new Option(
-                        createdProduct.name, 
-                        createdProduct.id, 
-                        true, 
-                        true
-                    );
-                    $(productSelector).append(newOption).trigger('change');
-                }
+            const value = product.presentation;
+            const instance = initMdbWrapperInput({
+                selector: '#presentationDisplayInput',
+                value
             });
-            
-            return;
+            updateMdbWrapperInput(instance);
         }
-
-        const value = `PIEZA(${selectedProduct?.presentation || 'PIEZA'})`;
-
-        const instance = initMdbWrapperInput({ selector: '#presentationDisplayInput', value });
-        updateMdbWrapperInput(instance);
     });
 
     if (data) {
@@ -145,4 +86,19 @@ export const initGoodsReceiptFormSelect2 = async (data = null) => {
         $(`${modalSelector} ${supplierSelector}`).empty().trigger('change');
         $(receivedBySelector).empty().trigger('change');
     }
+}
+
+export const setGoodsReceiptFormSelect = (data = null) => {
+
+    toggleSupplierOption({
+        selector: `${ modalSelector } ${ supplierSelector }`,
+        supplierId: data?.supplier.id,
+        supplierName: data?.supplier.tradeName
+    });
+
+    toggleProfileOption({
+        selector: `${ modalSelector } ${ receivedBySelector }`,
+        profileId: data?.receivedBy.id,
+        profileName: `${data?.receivedBy.name} ${data?.receivedBy.lastName}`,
+    });
 }

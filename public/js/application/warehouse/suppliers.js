@@ -8,10 +8,11 @@ export const registerSupplier = async (formData) => {
         const response = await registerSupplierRequest(formData);
 
         const { data } = response;
-        const { code } = data;
+        const { code, supplier } = data;
         let message = getSuccessMessage(code);
 
         return {
+            data: supplier,
             message
         };
 

@@ -1,0 +1,1 @@
+export const PROFILES_API_ROUTE = '/api/admin/profiles/';
