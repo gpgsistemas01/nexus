@@ -1,11 +1,9 @@
 import { openProductModal } from "../../modules/products/productModal.js";
 import { openSupplierModal } from "../../modules/suppliers/supplierModal.js";
-import { cleanAddedProduct } from "../../pages/warehouse/goodsReceiptsPage.js";
 import { initMdbWrapperInput, updateMdbWrapperInput } from "../mdb/baseInstance.js";
-import { initbaseSelect2 } from "./baseSelect.js";
-import { attachProductHandler, initProductSelect, toggleProductOption } from "./domains/product.js";
+import { attachProductHandler, initProductSelect } from "./domains/product.js";
 import { initProfileSelect, toggleProfileOption } from "./domains/profiles.js";
-import { attachSupplierHandler, initSupplierSelect } from "./domains/supplier.js";
+import { setupSupplierSelect } from "./domains/supplier.js";
 
 const modalSelector = '#goodsReceiptModal';
 const productSelector = '#productInput';
@@ -14,12 +12,8 @@ const receivedBySelector = '#receivedByInput';
 
 export const initGoodsReceiptFormSelect2 = async (data = null) => {    
 
-    initSupplierSelect({
+    setupSupplierSelect({
         modalSelector,
-        baseSelector: `${ modalSelector } ${ supplierSelector }`,
-    });
-
-    attachSupplierHandler({
         supplierSelector,
         openModal: (name, done) => openSupplierModal({
             data: { name },

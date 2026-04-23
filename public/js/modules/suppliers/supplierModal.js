@@ -1,9 +1,7 @@
-import { backModal, openModal } from "../../ui/modalUI.js";
-import { on } from "../../utils/domUtils.js";
+import { openModal } from "../../ui/modalUI.js";
 
 const modalId = '#supplierModal';
 const formId = '#supplierForm';
-const backSelector = `#backBtn-${modalId.replace('#', '')}`;
 
 export const openSupplierModal = ({ 
     mode = 'create', 
@@ -24,5 +22,3 @@ export const openSupplierModal = ({
 
     openModal(modalElement);
 }
-
-on('click', backSelector, () => backModal());

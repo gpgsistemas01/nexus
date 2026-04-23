@@ -1,14 +1,18 @@
-import { initbaseSelect2 } from "./baseSelect.js";
-import { initSupplierSelect, toggleSupplierOption } from "./domains/supplier.js";
+import { openSupplierModal } from "../../modules/suppliers/supplierModal.js";
+import { setupSupplierSelect, toggleSupplierOption } from "./domains/supplier.js";
 
 const modalSelector = '#productModal';
 const supplierSelector = '.supplier-select';
 
 export const initProductFormSelect2 = () => {
 
-    initSupplierSelect({
+    setupSupplierSelect({
         modalSelector,
-        baseSelector: `${ modalSelector } ${ supplierSelector }`,
+        supplierSelector,
+        openModal: (name, done) => openSupplierModal({
+            data: { name },
+            onSave: done,
+        })
     });
 };
 

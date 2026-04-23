@@ -1,23 +1,20 @@
 import { cleanForm } from "../../utils/formUtils.js";
 
-export const modalStack = []
 export const initMdbModal = (el) => mdb.Modal.getOrCreateInstance(el);
 
 export const showModal = (instance) => {
 
-    const last = modalStack[modalStack.length - 1];
+    if (!instance) return;
 
-    if (last !== instance) modalStack.push(instance);
-    
     instance.show();
 }
 
-export const hideModal = ({ el, modal, form }) => {
+export const hideModal = ({ el, instance, form }) => {
 
     el.addEventListener('hidden.mdb.modal', () => {
         cleanForm(form);
     });
-    modal.hide();
+    instance.hide();
 }
 
 export const initMdbWrapperInput = ({ selector, value }) => {

@@ -8,11 +8,10 @@ import { toggleInputSelectErrors, toggleTableErrors, setFormReadOnly, toggleButt
 import { on } from "../../utils/domUtils.js";
 import { formatDateLongWithTime } from "../../utils/formatters.js";
 import { handleAction, handleSubmit, validateFields } from "../../utils/formUtils.js";
-import { backModal, openModal } from "../../ui/modalUI.js";
+import { openModal } from "../../ui/modalUI.js";
 
 const modalId = '#goodsReceiptModal';
 const formId = '#goodsReceiptForm';
-const backSelector = `#backBtn-${modalId.replace('#', '')}`;
 
 createGoodsReceiptDatatable();
 
@@ -176,4 +175,3 @@ export const cleanAddedProduct = () => {
 on('click', '#addProductBtn', addProduct);
 on('click', '#cancelBtn', async () => await handleAction({ action: cancelGoodsReceipt, formId }));
 on('click', '#confirmBtn', async () => await handleAction({ action: confirmGoodsReceipt, formId }));
-on('click', backSelector, () => backModal());

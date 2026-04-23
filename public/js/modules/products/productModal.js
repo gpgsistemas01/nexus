@@ -1,13 +1,12 @@
-import { backModal, openModal } from "../../ui/modalUI.js";
-import { on } from "../../utils/domUtils.js";
+import { openModal } from "../../ui/modalUI.js";
 import { initProductFormSelect2, setProductFormSelectOptions } from "../../plugins/select2/productSelect.js";
 
 const productModalId = '#productModal';
-const backSelector = `#backBtn-${productModalId.replace('#', '')}`;
+const formId = '#productForm';
 
 export const openProductModal = async ({ mode = 'create', data = null, onSave = null }) => {
     
-    const form = document.querySelector('#productForm');
+    const form = document.querySelector(formId);
     const modalElement = document.querySelector(productModalId);
 
     form.dataset.mode = mode;
@@ -43,5 +42,3 @@ export const openProductModal = async ({ mode = 'create', data = null, onSave = 
 
     openModal(modalElement);
 }
-
-on('click', backSelector, () => backModal());

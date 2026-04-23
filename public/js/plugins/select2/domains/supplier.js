@@ -1,7 +1,7 @@
 import { SUPPLIERS_API_ROUTE } from "../../../services/warehouse/supplierService.js";
 import { initbaseSelect2, toggleSelectOption } from "../baseSelect.js";
 
-export const initSupplierSelect = ({ 
+const initSupplierSelect = ({ 
     modalSelector, 
     baseSelector, 
     allowCreate = true
@@ -41,7 +41,7 @@ export const initSupplierSelect = ({
     });
 };
 
-export const attachSupplierHandler = ({ supplierSelector, openModal, onSelect }) => {
+const attachSupplierHandler = ({ supplierSelector, openModal }) => {
 
     $(supplierSelector).off('select2:select').on('select2:select', (e) => {
 
@@ -75,3 +75,20 @@ export const toggleSupplierOption = ({
     id: supplierId,
     name: supplierName,
 });
+
+export const setupSupplierSelect = ({ 
+    modalSelector, 
+    supplierSelector, 
+    openModal 
+}) => {
+
+    initSupplierSelect({
+        modalSelector,
+        baseSelector: `${ modalSelector } ${ supplierSelector }`,
+    });
+
+    attachSupplierHandler({
+        supplierSelector: `${ modalSelector } ${ supplierSelector }`,
+        openModal
+    });
+};

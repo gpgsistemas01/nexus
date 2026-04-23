@@ -32,7 +32,10 @@ const buttons = {
     backButton: {
         id: `backBtn-${modalId}`,
         class: 'btn btn-link',
-        content: 'Regresar'
+        content: 'Regresar',
+        attrs: {
+            'data-mdb-dismiss': 'modal'
+        }
     },
     cancelButton: {
         id: 'cancelBtn',

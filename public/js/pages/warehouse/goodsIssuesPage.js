@@ -7,7 +7,7 @@ import { toggleInputSelectErrors, toggleTableErrors, setFormReadOnly, toggleButt
 import { on } from "../../utils/domUtils.js";
 import { formatDateLongWithTime } from "../../utils/formatters.js";
 import { handleAction, handleSubmit, validateFields } from "../../utils/formUtils.js";
-import { backModal, openModal } from "../../ui/modalUI.js";
+import { openModal } from "../../ui/modalUI.js";
 
 const modalId = '#goodsIssueModal';
 const formId = '#goodsIssueForm';
@@ -207,4 +207,3 @@ on('click', '#confirmBtn', async () => {
     if (!rightAction) return;
     await handleAction({ action: rightAction, formId });
 });
-on('click', backSelector, () => backModal());
