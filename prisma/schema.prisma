@@ -166,6 +166,9 @@ model GoodsReceipt {
   departmentId    String                      @db.Uuid
   receivedById    String                      @db.Uuid
   approverId      String?                     @db.Uuid
+  totalQuantity     Decimal                     @db.Decimal(10, 3)
+  totalnetPurchaseAmount Decimal                     @db.Decimal(10, 3)
+  totalGrossPurchaseAmount Decimal                     @db.Decimal(10, 3)
   department      Department                  @relation(fields: [departmentId], references: [id])
   receivedBy      Profile                     @relation(fields: [receivedById], references: [id])
   approver        Profile?                    @relation("ApproverGoodsReceiptRelation", fields: [approverId], references: [id])

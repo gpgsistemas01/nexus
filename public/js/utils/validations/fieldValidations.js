@@ -161,7 +161,7 @@ export const validateDetailsArray = (details) => {
 
     for (const detail of details) {
 
-        if (!detail.productId || !detail.quantity || !detail.unitCost || !detail.amount) {
+        if (!detail.productId || !detail.quantity || !detail.netPurchaseAmount) {
             return 'Cada detalle debe contener producto, cantidad, costo unitario e importe.';
         }
 
@@ -169,12 +169,8 @@ export const validateDetailsArray = (details) => {
             return 'La cantidad de cada detalle debe ser un número mayor a cero.';
         }
 
-        if (isNaN(detail.unitCost) || parseFloat(detail.unitCost) <= 0) {
-            return 'El costo unitario de cada detalle debe ser un número mayor a cero.';
-        }
-
-        if (isNaN(detail.amount) || parseFloat(detail.amount) <= 0) {
-            return 'El importe de cada detalle debe ser un número mayor a cero.';
+        if (isNaN(detail.netPurchaseAmount) || parseFloat(detail.netPurchaseAmount) <= 0) {
+            return 'El costo por rollo s/ IVA de cada detalle debe ser un número mayor a cero.';
         }
     }
 

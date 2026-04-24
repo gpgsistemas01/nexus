@@ -15,13 +15,49 @@ const inputs = {
         id: 'presentationDisplayInput',
         name: 'presentationDisplay',
         type: 'text',
-        label: 'Unidad',
+        label: 'Presentación',
         attrs: {
             readonly: '',
             tabindex: '-1'
         }
     }
 }
+
+const totalInputs = [
+    {
+        id: 'totalQuantityDisplayInput',
+        name: 'totalQuantity',
+        type: 'number',
+        label: 'Cantidad Total',
+        col: '4',
+        attrs: {
+            readonly: '',
+            tabindex: '-1'
+        }
+    },
+    {
+        id: 'totalNetPurchaseAmountDisplayInput',
+        name: 'totalNetPurchaseAmount',
+        type: 'number',
+        label: 'Total de Compra s/ IVA',
+        col: '4',
+        attrs: {
+            readonly: '',
+            tabindex: '-1'
+        }
+    },
+    {
+        id: 'totalGrossPurchaseAmountDisplayInput',
+        name: 'totalGrossPurchaseAmount',
+        type: 'number',
+        label: 'Total de Compra c/ IVA',
+        col: '4',
+        attrs: {
+            readonly: '',
+            tabindex: '-1'
+        }
+    }
+];
 
 const buttons = {
     addProductButton: {
@@ -50,7 +86,7 @@ const buttons = {
 }; %>
 
 <div class="modal fade" id="<%= modalId %>" tabindex="-1" aria-labelledby="<%= header.title.id %>">
-    <div class="modal-dialog modal-lg">
+    <div class="modal-dialog modal-xl">
         <div class="modal-content">
         
         <%- include('./header', { header }) %>
@@ -85,6 +121,10 @@ const buttons = {
                     </div>
 
                     <%- include('./productTable') %>
+
+                    <div class="row g-2 mb-3 add-product-container">
+                        <%- include('./outlineInputList', { inputs: totalInputs }) %>
+                    </div>
                 <% } %>
 
                 <div class="col-12">

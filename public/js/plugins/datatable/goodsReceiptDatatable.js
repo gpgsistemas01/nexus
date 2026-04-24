@@ -82,14 +82,13 @@ export const initDetailsGoodsReceiptTable = (mode) => {
         { data: 'name', title: 'Producto' },
         { data: 'base', title: 'Base' },
         { data: 'height', title: 'Altura' },
+        { data: 'area', title: 'm2' },
         { data: 'quantity', title: 'Cantidad' },
-        { data: 'unitCost', title: 'Costo unitario' },
-        { data: 'amount', title: 'Importe' },
-        { 
-            data: 'presentation', 
-            title: 'Unidad',
-            render: (data) => `PIEZA (${ data })`
-        },
+        { data: 'unitCostByQuantity', title: 'Costo por Rollo s/ IVA' },
+        { data: 'unitCostByArea', title: 'Costo m2' },
+        { data: 'netPurchaseAmount', title: 'Valor de Compra s/ IVA' },
+        { data: 'grossPurchaseAmount', title: 'Valor de Compra c/ IVA' },
+        { data: 'totalArea', title: 'm2 Totales' },
     ];
 
     if (mode !== 'view') columns.push({

@@ -116,60 +116,68 @@ const addProduct = () => {
 
     const productId = document.querySelector('#productInput').value;
     const selectedProduct = $('#productInput').select2('data')?.[0];
-    const productName = selectedProduct?.text || '';
-    const quantity = document.querySelector('#quantityInput').value;
-    const amount = document.querySelector('#amountInput').value;
+    const name = selectedProduct?.text || '';
+    const quantity = Number(document.querySelector('#quantityInput').value);
+    const unitCostByQuantity = Number(document.querySelector('#unitCostByQuantityInput').value);
     const base = Number(selectedProduct?.base);
     const height = Number(selectedProduct?.height);
 
-    if (!productId || !quantity || !amount) {
+    if (!productId || !quantity || !unitCostByQuantity) {
         alert('Por favor, complete los campos de producto, cantidad e importe.');
         return;
     }
 
-    if (isNaN(quantity) || parseFloat(quantity) < 1) {
+    if (isNaN(quantity) || quantity < 1) {
         alert('La cantidad debe ser un número mayor a cero.');
         return;
     }
 
-    if (isNaN(amount) || parseFloat(amount) <= 0) {
-        alert('El importe debe ser un número mayor a cero.');
+    if (isNaN(unitCostByQuantity) || unitCostByQuantity <= 0) {
+        alert('El costo por Rollo s/ IVA debe ser un número positivo.');
         return;
     }
 
-    const amountValue = Number(amount);
-    const quantityValue = Number(quantity);
-    const measuredFactor = Number.isFinite(base) && base > 0 && Number.isFinite(height) && height > 0
-        ? (base * height * quantityValue)
-        : quantityValue;
-
-    if (!Number.isFinite(measuredFactor) || measuredFactor <= 0) {
-        alert('No se pudo calcular el costo unitario para este detalle.');
-        return;
-    }
-
-    const unitCost = (amountValue / measuredFactor).toFixed(2);
+    const area = (base * height);
+    const netPurchaseAmount = (quantity * unitCostByQuantity).toFixed(2);
+    const grossPurchaseAmount = netPurchaseAmount * 1.16;
+    const totalArea = (area * quantity).toFixed(2);
+    const unitCostByArea = netPurchaseAmount / totalArea;
     const product = {
         productId,
-        name: productName,
+        name,
+        base,
+        height,
+        area,
         quantity,
-        unitCost,
-        amount,
-        base: Number.isFinite(base) ? base : null,
-        height: Number.isFinite(height) ? height : null,
-        presentation: selectedProduct?.presentation || 'PIEZA'
+        unitCostByQuantity,
+        unitCostByArea,
+        netPurchaseAmount,
+        grossPurchaseAmount,
+        totalArea,
     };
     details.push(product);
 
     refreshProductTable(details);
     cleanAddedProduct();
+
+    const totalQuantityEl = document.querySelector('#totalQuantityDisplayInput');
+    const totalNetPurchaseAmountEl = document.querySelector('#totalNetPurchaseAmountDisplayInput');
+    const totalGrossPurchaseAmountEl = document.querySelector('#totalGrossPurchaseAmountDisplayInput');
+
+    const totalQuantity = totalQuantityEl.value || 0;
+    const totalNetPurchaseAmount = totalNetPurchaseAmountEl.value || 0;
+    const totalGrossPurchaseAmount = totalGrossPurchaseAmountEl.value || 0;
+
+    totalQuantityEl.value = Number(totalQuantity) + quantity;
+    totalNetPurchaseAmountEl.value = (Number(totalNetPurchaseAmount) + Number(netPurchaseAmount)).toFixed(2);
+    totalGrossPurchaseAmountEl.value = (Number(totalGrossPurchaseAmount) + Number(grossPurchaseAmount)).toFixed(2);
 }
 
 export const cleanAddedProduct = () => {
 
     $('#productInput').empty().trigger('change');
     document.querySelector('#quantityInput').value = '';
-    document.querySelector('#amountInput').value = '';
+    document.querySelector('#netPurchaseAmountInput').value = '';
     document.querySelector('#presentationDisplayInput').value = '';
 }
 

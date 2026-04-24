@@ -22,7 +22,8 @@ const initProductSelect = ({
                 results: list.map(p => ({
                     id: p.id,
                     text: p.name,
-                    presentation: p.presentation || 'PIEZA'
+                    presentation: p.presentation.name || 'PIEZA',
+                    unitMeasure: p.unitMeasure.name,
                 }))
             };
         },
