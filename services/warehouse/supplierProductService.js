@@ -105,9 +105,11 @@ export const createSupplierProduct = async ({
         const db = tx || prisma;
 
         return db.supplierProduct.create({
-            supplierId,
-            productId,
-            sku: `${ skuProduct }-${ skuSupllier }`
+            data: {
+                supplierId,
+                productId,
+                sku: `${ skuProduct }-${ skuSupllier }`
+            }
         });
 
     } catch (err) {

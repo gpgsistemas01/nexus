@@ -4,6 +4,9 @@ import { findUniqueSupplierCode } from "../supplierService.js";
 import { findUniqueUnitMeasure } from "../unitMeasureService.js";
 import { findExistingSkus } from "./productService.js";
 
+const MAX_RETRIES = 5;
+const PRISMA_RECORD_NOT_UNIQUE = 'P2002';
+
 const cleanNameForSku = (name = '') => {
     return name
         .replace(/\([^)]*\)/g, ' ')

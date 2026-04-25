@@ -86,6 +86,8 @@ export const findUniqueSupplierCode = async ({
 
         if (!supplier) throw new SupplierCodeNotFound();
 
+        return supplier;
+
     } catch (err) {
 
         throw new SupplierCodeFindDatabaseError();

@@ -4,9 +4,7 @@ import { findAllSupplierProducts } from "../supplierProductService.js";
 import { prepareProductData, withRetry } from "./productHelpers.js";
 import { syncSupplierProduct } from "./productRelations.js";
 
-const MAX_RETRIES = 5;
 const PRISMA_RECORD_NOT_FOUND = 'P2025';
-const PRISMA_RECORD_NOT_UNIQUE = 'P2002';
 
 export const findAllProducts = async ({
     skip = 0,
@@ -86,7 +84,7 @@ export const createProduct = async (productDto) => {
             return createdProduct;
         });
 
-    }).catch(() => {
+    }).catch((err) => {console.log(err)
         throw new ProductCreateDatabaseError();
     });
 };
