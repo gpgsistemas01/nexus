@@ -29,22 +29,22 @@ export const initProductFormSelect2 = () => {
 };
 
 export const setProductFormSelectOptions = (data = null) => {
-    
+    console.log(data)
     toggleSupplierOption({
         selector: `${ modalSelector } ${ supplierSelector }`,
-        supplierId: data?.supplierId,
-        supplierName: data?.supplierName
+        id: data?.supplier?.id,
+        name: `${ data?.supplier?.code } - ${ data?.supplier?.tradeName }`
     });
 
     toggleUnitMeasureOption({
         selector: `${ modalSelector } ${ unitMeasureSelector }`,
-        id: data?.unitMeasure.id,
-        name: data?.unitMeasure.name
+        id: data?.unitMeasure?.id,
+        name: data?.unitMeasure?.name
     });
 
     togglePresentationOption({
         selector: `${ modalSelector } ${ presentationSelector }`,
-        id: data?.presentation.id,
-        name: data?.presentation.name
+        id: data?.presentation?.id,
+        name: data?.presentation?.name
     });
 };

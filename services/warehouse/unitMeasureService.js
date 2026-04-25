@@ -1,3 +1,4 @@
+import { UnitMeasureFindDatabaseError, UnitMeasureNotFound } from "../../errors/warehouse/unitMeasureError.js";
 import { prisma } from "../../lib/prisma.js";
 
 export const findAllUnitMeasures = async ({
@@ -34,4 +35,26 @@ export const findAllUnitMeasures = async ({
         recordsTotal: total,
         recordsFiltered: filtered
     };
+}
+
+export const findUniqueUnitMeasure = async ({
+    tx,
+    id
+}) => {
+
+    try {
+
+        const db = tx || prisma;
+
+        const unit = await db.unitMeasure.findUnique({
+            where: { id },
+            select: { id: true }
+        });
+
+        if (!unit) throw new UnitMeasureNotFound();
+
+    } catch (err) {
+
+        throw new UnitMeasureFindDatabaseError();
+    }
 }

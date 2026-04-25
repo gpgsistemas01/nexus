@@ -1,6 +1,6 @@
 import { createProductDtoForRegister } from "../../../dtos/productDTO.js";
 import { successCodeMessages } from "../../../messages/codeMessages.js";
-import { findAllProducts, createProduct, updateProduct } from "../../../services/warehouse/productService.js";
+import { findAllProducts, createProduct, updateProduct } from "../../../services/warehouse/products/productService.js";
 import { sanitizeEmptyStrings } from "../../../utils/formattersUtils.js";
 
 export const getAllProducts = async (req, res) => {

@@ -17,17 +17,25 @@
     ],
     inputs: [
         {
-            id: 'observationsInput',
-            name: 'observations',
+            id: 'invoiceInput',
+            name: 'invoice',
             type: 'text',
-            label: 'Observaciones',
+            label: 'Número de Factura',
+            col: '6'
         },
         {
             id: 'receptionDateInput',
             name: 'receptionDate',
             type: 'datetime-local',
             label: 'Fecha y hora de recepción:',
-        }
+            col: '6'
+        },
+        {
+            id: 'observationsInput',
+            name: 'observations',
+            type: 'text',
+            label: 'Observaciones',
+        },
     ],
     table: {
         select: {

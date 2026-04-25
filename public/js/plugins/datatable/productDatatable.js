@@ -28,14 +28,14 @@ export const createProductDatatable = (context) => {
         { 
             data: null, 
             title: 'Nombre',
-            render: (data) => `${ data.name } ${ data.supplierName }`
+            render: (data) => `${ data.name } || ${ data.supplier.code } - ${ data.supplier.tradeName }`
         },
         { data: 'base', title: 'Base' },
         { data: 'height', title: 'Altura' },
         { data: 'currentStock', title: 'Existencia' },
         { data: 'minStock', title: 'Stock Mínimo' },
         { data: 'presentation.name', title: 'Presentación' },
-        { data: 'convertedQuantity', title: 'Conversión' },
+        { data: 'convertedQuantity', title: 'Cantidad' },
         { data: 'unitMeasure.name', title: 'Unidad' }
     ];
 

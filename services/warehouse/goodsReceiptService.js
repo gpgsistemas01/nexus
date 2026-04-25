@@ -22,6 +22,57 @@ const STATUS_CONFIRMED = 'Confirmada';
 const STATUS_CANCELED = 'Cancelada';
 const PRISMA_RECORD_NOT_FOUND = 'P2025';
 
+const buildGoodsReceiptDetails = async (tx, details) => {
+
+    const productIds = details.map(d => d.productId);
+
+    const products = await tx.product.findMany({
+        where: {
+            id: {
+                in: productIds
+            }
+        },
+        select: {
+            id: true,
+            base: true,
+            height: true
+        }
+    });
+
+    const productMap = new Map(products.map(p => [p.id, p]));
+
+    return details.map(({ productId, quantity, unitCostByQuantity }) => {
+
+        const product = productMap.get(productId);
+
+        if (!product) {
+            throw new Error(`Producto no encontrado: ${productId}`);
+        }
+
+        const area = product.base * product.height;
+
+        const netPurchaseAmount = quantity * unitCostByQuantity;
+        const grossPurchaseAmount = netPurchaseAmount * 1.16;
+
+        const totalArea = area * quantity;
+
+        const unitCostByArea = totalArea > 0
+            ? netPurchaseAmount / totalArea
+            : 0;
+
+        return {
+            productId,
+            quantity,
+            area,
+            totalArea,
+            unitCostByQuantity,
+            unitCostByArea,
+            netPurchaseAmount,
+            grossPurchaseAmount
+        };
+    });
+}
+
 export const findAllGoodsReceipts = async ({
     skip = 0,
     take = 10,
@@ -128,11 +179,25 @@ export const createGoodsReceipt = async (goodsReceiptDto) => {
 
         await findProfileById({ tx, id: receivedById });
 
+        const processedDetails = buildGoodsReceiptDetails(tx, details);
+
+        const totals = processedDetails.reduce((acc, d) => {
+            acc.totalQuantity += Number(d.quantity);
+            acc.totalnetPurchaseAmount += Number(d.netPurchaseAmount);
+            acc.totalGrossPurchaseAmount += Number(d.grossPurchaseAmount);
+            return acc;
+        }, {
+            totalQuantity: 0,
+            totalnetPurchaseAmount: 0,
+            totalGrossPurchaseAmount: 0
+        });
+
         const referenceNumber = await generateReferenceNumber({ type: REFERENCE_NUMBER_TYPE, tx });
 
         const goodsReceipt = await tx.goodsReceipt.create({
             data: {
                 ...goodsReceiptData,
+                ...totals,
                 status: {
                     connect: {
                         name: STATUS_OPEN
@@ -155,27 +220,12 @@ export const createGoodsReceipt = async (goodsReceiptDto) => {
                 },
                 referenceNumber,
                 details: {
-                    create: details.map(({ productId, ...rest }) => {
-
-                        const area = (rest.base * rest.height);
-                        const netPurchaseAmount = (rest.quantity * rest.unitCostByQuantity).toFixed(2);
-                        const grossPurchaseAmount = netPurchaseAmount * 1.16;
-                        const totalArea = (area * rest.quantity).toFixed(2);
-                        const unitCostByArea = netPurchaseAmount / totalArea;
-
-                        return {
-                            ...rest,
-                            netPurchaseAmount,
-                            grossPurchaseAmount,
-                            totalArea,
-                            unitCostByArea,
-                            product: {
-                                connect: {
-                                    id: productId
-                                }
-                            }
+                    create: processedDetails.map(({ productId, ...rest }) => ({
+                        ...rest,
+                        product: {
+                            connect: { id: productId }
                         }
-                    })
+                    }))
                 }
             }
         });
@@ -207,9 +257,23 @@ export const updateGoodsReceipt = async (goodsReceiptDto, id) => {
 
             await findProfileById({ tx, id: receivedById });
 
+            const processedDetails = buildGoodsReceiptDetails(tx, details);
+
+            const totals = processedDetails.reduce((acc, d) => {
+                acc.totalQuantity += Number(d.quantity);
+                acc.totalnetPurchaseAmount += Number(d.netPurchaseAmount);
+                acc.totalGrossPurchaseAmount += Number(d.grossPurchaseAmount);
+                return acc;
+            }, {
+                totalQuantity: 0,
+                totalnetPurchaseAmount: 0,
+                totalGrossPurchaseAmount: 0
+            });
+
             const goodsReceipt = await tx.goodsReceipt.update({
                 data: {
                     ...goodsReceiptData,
+                    ...totals,
                     supplier: {
                         connect: {
                             id: supplierId
@@ -233,7 +297,7 @@ export const updateGoodsReceipt = async (goodsReceiptDto, id) => {
                 where: deleteFilter
             });
 
-            const goodsReceiptDetails = await Promise.all(details.map(async detail => {
+            const goodsReceiptDetails = await Promise.all(processedDetails.map(async detail => {
 
                 return await tx.goodsReceiptDetail.create({
                     data: {

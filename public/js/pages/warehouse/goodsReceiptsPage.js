@@ -9,6 +9,7 @@ import { on } from "../../utils/domUtils.js";
 import { formatDateLongWithTime } from "../../utils/formatters.js";
 import { handleAction, handleSubmit, validateFields } from "../../utils/formUtils.js";
 import { openModal } from "../../ui/modalUI.js";
+import { initMdbWrapperInput, updateMdbWrapperInput } from "../../plugins/mdb/baseInstance.js";
 
 const modalId = '#goodsReceiptModal';
 const formId = '#goodsReceiptForm';
@@ -137,11 +138,11 @@ const addProduct = () => {
         return;
     }
 
-    const area = (base * height);
-    const netPurchaseAmount = (quantity * unitCostByQuantity).toFixed(2);
-    const grossPurchaseAmount = netPurchaseAmount * 1.16;
-    const totalArea = (area * quantity).toFixed(2);
-    const unitCostByArea = netPurchaseAmount / totalArea;
+    const area = Number((base * height).toFixed(2));
+    const netPurchaseAmount = Number((quantity * unitCostByQuantity).toFixed(2));
+    const grossPurchaseAmount = Number((netPurchaseAmount * 1.16).toFixed(2));
+    const totalArea = Number((area * quantity).toFixed(2));
+    const unitCostByArea = Number((netPurchaseAmount / totalArea).toFixed(2));
     const product = {
         productId,
         name,
@@ -164,20 +165,37 @@ const addProduct = () => {
     const totalNetPurchaseAmountEl = document.querySelector('#totalNetPurchaseAmountDisplayInput');
     const totalGrossPurchaseAmountEl = document.querySelector('#totalGrossPurchaseAmountDisplayInput');
 
-    const totalQuantity = totalQuantityEl.value || 0;
-    const totalNetPurchaseAmount = totalNetPurchaseAmountEl.value || 0;
-    const totalGrossPurchaseAmount = totalGrossPurchaseAmountEl.value || 0;
+    let totalQuantity = Number(totalQuantityEl.value) || 0;
+    let totalNetPurchaseAmount = Number(totalNetPurchaseAmountEl.value) || 0;
+    let totalGrossPurchaseAmount = Number(totalGrossPurchaseAmountEl.value) || 0;
 
-    totalQuantityEl.value = Number(totalQuantity) + quantity;
-    totalNetPurchaseAmountEl.value = (Number(totalNetPurchaseAmount) + Number(netPurchaseAmount)).toFixed(2);
-    totalGrossPurchaseAmountEl.value = (Number(totalGrossPurchaseAmount) + Number(grossPurchaseAmount)).toFixed(2);
+    totalQuantity += quantity;
+    totalNetPurchaseAmount += netPurchaseAmount;
+    totalGrossPurchaseAmount += grossPurchaseAmount;
+
+    const instanceTotalQuantity = initMdbWrapperInput({
+        selector: '#totalQuantityDisplayInput',
+        value: totalQuantity
+    });
+    const instanceTotalNetPurchaseAmount = initMdbWrapperInput({
+        selector: '#totalNetPurchaseAmountDisplayInput',
+        value: totalNetPurchaseAmount
+    });
+    const instanceTotalGrossPurchaseAmount = initMdbWrapperInput({
+        selector: '#totalGrossPurchaseAmountDisplayInput',
+        value: totalGrossPurchaseAmount
+    });
+
+    updateMdbWrapperInput(instanceTotalQuantity);
+    updateMdbWrapperInput(instanceTotalNetPurchaseAmount);
+    updateMdbWrapperInput(instanceTotalGrossPurchaseAmount);
 }
 
 export const cleanAddedProduct = () => {
 
     $('#productInput').empty().trigger('change');
     document.querySelector('#quantityInput').value = '';
-    document.querySelector('#netPurchaseAmountInput').value = '';
+    document.querySelector('#unitCostByQuantityInput').value = '';
     document.querySelector('#presentationDisplayInput').value = '';
 }
 

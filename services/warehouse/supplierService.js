@@ -1,4 +1,4 @@
-import { SupplierNotFound, SupplierUpdateDatabaseError } from "../../errors/warehouse/supplierError.js";
+import { SupplierCodeFindDatabaseError, SupplierCodeNotFound, SupplierNotFound, SupplierUpdateDatabaseError } from "../../errors/warehouse/supplierError.js";
 import { prisma } from "../../lib/prisma.js";
 import { incrementReferenceNumberCounter } from "../document/referenceNumberService.js";
 
@@ -69,6 +69,28 @@ export const findAllSuppliers = async ({
         recordsFiltered: filtered
     };
 };
+
+export const findUniqueSupplierCode = async ({
+    tx,
+    id
+}) => {
+
+    const db = tx || prisma;
+
+    try {
+
+        const supplier = await db.supplier.findUnique({
+            where: { id },
+            select: { code: true }
+        });
+
+        if (!supplier) throw new SupplierCodeNotFound();
+
+    } catch (err) {
+
+        throw new SupplierCodeFindDatabaseError();
+    }
+}
 
 export const createSupplier = async (supplierDto) => {
 

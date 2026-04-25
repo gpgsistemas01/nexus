@@ -1,6 +1,7 @@
 import { openGoodsReceiptModal } from "../../pages/warehouse/goodsReceiptsPage.js";
 import { createDataTable, refreshProductTable, renderActionButtons } from "./baseDatatable.js";
 import { GOODS_RECEIPTS_API_ROUTE } from "../../services/warehouse/goodsReceiptService.js";
+import { initMdbWrapperInput, updateMdbWrapperInput } from "../mdb/baseInstance.js";
 
 export let details = [];
 const selectorProductTable = '#productTable';
@@ -56,13 +57,6 @@ export const createGoodsReceiptDatatable = () => {
         }
     });
 
-    $(`${ selectorTable } tbody`).on('click', '.btn-edit', async function() {
-
-        const data = table.row($(this).closest('tr')).data();
-
-        await openGoodsReceiptModal({ mode: 'edit', data });
-    });
-
     $(`${ selectorTable } tbody`).on('click', '.btn-view', function() {
 
         const data = table.row($(this).closest('tr')).data();
@@ -115,8 +109,38 @@ export const initDetailsGoodsReceiptTable = (mode) => {
 $(selectorProductTable).on('click', '.delete-btn', function () {
 
     const index = $(this).data('index');
+    const product = details[index];
 
     details.splice(index, 1);
+
+    const totalQuantityEl = document.querySelector('#totalQuantityDisplayInput');
+    const totalNetPurchaseAmountEl = document.querySelector('#totalNetPurchaseAmountDisplayInput');
+    const totalGrossPurchaseAmountEl = document.querySelector('#totalGrossPurchaseAmountDisplayInput');
+
+    let totalQuantity = Number(totalQuantityEl.value) || 0;
+    let totalNetPurchaseAmount = Number(totalNetPurchaseAmountEl.value) || 0;
+    let totalGrossPurchaseAmount = Number(totalGrossPurchaseAmountEl.value) || 0;
+
+    totalQuantity -= product.quantity;
+    totalNetPurchaseAmount -= product.netPurchaseAmount;
+    totalGrossPurchaseAmount -= product.grossPurchaseAmount;
+
+    const instanceTotalQuantity = initMdbWrapperInput({
+        selector: '#totalQuantityDisplayInput',
+        value: totalQuantity
+    });
+    const instanceTotalNetPurchaseAmount = initMdbWrapperInput({
+        selector: '#totalNetPurchaseAmountDisplayInput',
+        value: totalNetPurchaseAmount
+    });
+    const instanceTotalGrossPurchaseAmount = initMdbWrapperInput({
+        selector: '#totalGrossPurchaseAmountDisplayInput',
+        value: totalGrossPurchaseAmount
+    });
+
+    updateMdbWrapperInput(instanceTotalQuantity);
+    updateMdbWrapperInput(instanceTotalNetPurchaseAmount);
+    updateMdbWrapperInput(instanceTotalGrossPurchaseAmount);
 
     refreshProductTable(details);
 });

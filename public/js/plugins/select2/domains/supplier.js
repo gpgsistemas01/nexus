@@ -18,9 +18,9 @@ const initSupplierSelect = ({
             const list = data.data || data;
 
             return {
-                results: list.map(p => ({
-                    id: p.id,
-                    text: p.tradeName,
+                results: list.map(s => ({
+                    id: s.id,
+                    text: `${ s.code } - ${ s.tradeName }`,
                 }))
             };
         },
@@ -73,12 +73,12 @@ const attachSupplierHandler = ({ supplierSelector }) => {
 
 export const toggleSupplierOption = ({ 
     selector, 
-    supplierId = null, 
-    supplierName = null
+    id = null, 
+    name = null
 }) => toggleSelectOption({
     selector,
-    id: supplierId,
-    name: supplierName,
+    id,
+    name,
 });
 
 export const setupSupplierSelect = ({ 

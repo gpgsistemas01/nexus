@@ -24,6 +24,8 @@ const initProductSelect = ({
                     text: p.name,
                     presentation: p.presentation.name || 'PIEZA',
                     unitMeasure: p.unitMeasure.name,
+                    base: p.base,
+                    height: p.height
                 }))
             };
         },
