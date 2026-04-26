@@ -104,7 +104,8 @@ export const findAllGoodsReceipts = async ({
             supplier: {
                 select: {
                     id: true,
-                    tradeName: true
+                    tradeName: true,
+                    code: true
                 }
             },
             details: {

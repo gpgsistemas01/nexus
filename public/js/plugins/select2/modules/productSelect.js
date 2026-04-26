@@ -1,7 +1,7 @@
-import { openSupplierModal } from "../../modules/suppliers/supplierModal.js";
-import { initPresentationSelect, togglePresentationOption } from "./domains/presentations.js";
-import { setupSupplierSelect, toggleSupplierOption } from "./domains/supplier.js";
-import { initUnitMeasureSelect, toggleUnitMeasureOption } from "./domains/unitMeasures.js";
+import { openSupplierModal } from "../../../modules/suppliers/supplierModal.js";
+import { initPresentationSelect, togglePresentationOption } from "../domains/presentations.js";
+import { setupSupplierSelect, toggleSupplierOption } from "../domains/supplier.js";
+import { initUnitMeasureSelect, toggleUnitMeasureOption } from "../domains/unitMeasures.js";
 
 const modalSelector = '#productModal';
 const supplierSelector = '.supplier-select';
@@ -29,7 +29,7 @@ export const initProductFormSelect2 = () => {
 };
 
 export const setProductFormSelectOptions = (data = null) => {
-    console.log(data)
+
     toggleSupplierOption({
         selector: `${ modalSelector } ${ supplierSelector }`,
         id: data?.supplier?.id,

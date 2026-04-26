@@ -1,6 +1,6 @@
 import { ProductCreateDatabaseError, ProductNotFound, ProductUpdateDatabaseError } from "../../../errors/warehouse/productError.js";
 import { prisma } from "../../../lib/prisma.js";
-import { findAllSupplierProducts } from "../supplierProductService.js";
+import { findAllSupplierProducts } from "./supplierProductService.js";
 import { prepareProductData, withRetry } from "./productHelpers.js";
 import { syncSupplierProduct } from "./productRelations.js";
 
@@ -10,6 +10,7 @@ export const findAllProducts = async ({
     skip = 0,
     take = 10,
     search = '',
+    supplierId = null,
     orderBy = 'name',
     orderDir = 'asc'
 }) => {
@@ -18,6 +19,7 @@ export const findAllProducts = async ({
         skip,
         take,
         search,
+        supplierId,
         orderBy,
         orderDir
     });

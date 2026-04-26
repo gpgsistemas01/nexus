@@ -4,8 +4,8 @@ import { getAllProjects } from '../../../controllers/api/admin/projectController
 
 const router = express.Router();
 const projectPermissions = {
-    roles: ['Administrador del sistema'],
-    departments: ['Sistemas']
+    roles: ['Administrador del sistema', 'Coordinador', 'Auxiliar', 'Operador', 'Instalador', 'Almacenista'],
+    departments: ['Sistemas', 'Impresión', 'Router', 'Taller 3d', 'Herrería', 'Acabados', 'PT', 'Tráfico', 'Instalaciones', 'Almacén']
 };
 
 router.get(

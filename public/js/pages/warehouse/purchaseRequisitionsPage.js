@@ -2,7 +2,7 @@ import { useForm } from "../../application/form.js";
 import { cancelPurchaseRequisition, confirmPurchaseRequisition, editPurchaseRequisition, registerPurchaseRequisition } from "../../application/warehouse/purchaseRequisitions.js";
 import { refreshProductTable } from "../../plugins/datatable/baseDatatable.js";
 import { createPurchaseRequisitionDatatable, details, initDetailsPurchaseRequisitionTable } from "../../plugins/datatable/purchaseRequisitionDatatable.js";
-import { initPurchaseRequisitionFormSelect2 } from "../../plugins/select2/purchaseRequisitionSelect.js";
+import { initPurchaseRequisitionFormSelect2 } from "../../plugins/select2/modules/purchaseRequisitionSelect.js";
 import { toggleInputSelectErrors, toggleTableErrors, setFormReadOnly, toggleButtons } from "../../ui/formUI.js";
 import { openModal } from "../../ui/modalUI.js";
 import { on } from "../../utils/domUtils.js";

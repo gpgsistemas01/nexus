@@ -3,8 +3,8 @@ import { registerGoodsReceipt } from "../../application/warehouse/goodsReceipts.
 import { validateGoodsReceiptValidators } from "../../utils/validations/validators.js";
 import { refreshProductTable } from "../../plugins/datatable/baseDatatable.js";
 import { createGoodsReceiptDatatable, details, initDetailsGoodsReceiptTable } from "../../plugins/datatable/goodsReceiptDatatable.js";
-import { initGoodsReceiptFormSelect2, setGoodsReceiptFormSelectOptions } from "../../plugins/select2/goodsReceiptSelect.js";
-import { toggleInputSelectErrors, toggleTableErrors, setFormReadOnly, toggleButtons } from "../../ui/formUI.js";
+import { initGoodsReceiptFormSelect2, setGoodsReceiptFormSelectOptions } from "../../plugins/select2/modules/goodsReceiptSelect.js";
+import { toggleInputSelectErrors, toggleTableErrors, setFormReadOnly } from "../../ui/formUI.js";
 import { on } from "../../utils/domUtils.js";
 import { formatDateLongWithTime } from "../../utils/formatters.js";
 import { handleSubmit, validateFields } from "../../utils/formUtils.js";
@@ -58,7 +58,6 @@ export const openGoodsReceiptModal = ({ mode, data = null }) => {
     form.dataset.mode = mode;
     form.dataset.id = data?.id || '';
 
-    toggleButtons({ mode, status: data?.status?.name });
     setFormReadOnly({ form, isReadOnly: false });
 
     details.length = 0;
@@ -70,7 +69,7 @@ export const openGoodsReceiptModal = ({ mode, data = null }) => {
         form.reset();
         setGoodsReceiptFormSelectOptions();
         modalElement.querySelector('#modalTitle').textContent = 'Registrar compra';
-        form.querySelector('#submitBtn').textContent = 'Guardar';
+        form.querySelector('#submitBtn').textContent = 'Confirmar';
         form.querySelector('#presentationDisplayInput').value = '';
     }
 

@@ -42,7 +42,6 @@ model Profile {
   lastName                      String                @db.VarChar(50)
   isActive                      Boolean               @default(true)
   goodsReceipts                 GoodsReceipt[]
-  approvedGoodsReceipts         GoodsReceipt[]        @relation("ApproverGoodsReceiptRelation")
   users                         User[]                @relation("ProfileToUser")
   approverPurchaseRequisitions  PurchaseRequisition[] @relation("ApproverRelation")
   requesterPurchaseRequisitions PurchaseRequisition[] @relation("RequesterRelation")
@@ -161,18 +160,15 @@ model GoodsReceipt {
   invoice String? @db.VarChar(50)
   supplierId      String                      @db.Uuid
   receptionDate   DateTime
-  approveDate     DateTime?
   observations    String?                     @db.VarChar(50)
   statusId        String                      @db.Uuid
   departmentId    String                      @db.Uuid
   receivedById    String                      @db.Uuid
-  approverId      String?                     @db.Uuid
   totalQuantity     Decimal                     @db.Decimal(10, 3)
   totalnetPurchaseAmount Decimal                     @db.Decimal(10, 3)
   totalGrossPurchaseAmount Decimal                     @db.Decimal(10, 3)
   department      Department                  @relation(fields: [departmentId], references: [id])
   receivedBy      Profile                     @relation(fields: [receivedById], references: [id])
-  approver        Profile?                    @relation("ApproverGoodsReceiptRelation", fields: [approverId], references: [id])
   supplier        Supplier                    @relation(fields: [supplierId], references: [id])
   status          Status                      @relation(fields: [statusId], references: [id])
   details         GoodsReceiptDetail[]

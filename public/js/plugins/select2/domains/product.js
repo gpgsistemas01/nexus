@@ -5,6 +5,7 @@ import { initbaseSelect2, toggleSelectOption } from "../baseSelect.js";
 
 const initProductSelect = ({ 
     modalSelector, 
+    supplierSelector,
     baseSelector, 
     allowCreate = true 
 }) => {
@@ -14,6 +15,22 @@ const initProductSelect = ({
         modalSelector,
         url: PRODUCTS_API_ROUTE,
         placeholder: 'Buscar producto...',
+        data: (params) => {
+
+            const supplierId = $(`${ modalSelector } ${ supplierSelector }`).val();
+
+            if (!supplierId) {
+                return {
+                    search: '',
+                    supplierId: ''
+                };
+            }
+
+            return {
+                search: params.term,
+                supplierId
+            };
+        },
         processResults: (data) => {
 
             const list = data.data || data;
@@ -62,12 +79,22 @@ const attachProductHandler = ({
             const name = selected.id.replace('new:', '');
             const supplierId = $(`${ modalSelector } ${ supplierSelector }`).val();
             const supplierName = $(`${ modalSelector } ${ supplierSelector } option:selected`).text();
+            const [code, tradeName] = supplierName.split(' - ');
+
+            if (!supplierId) {
+                $(productSelector).val(null).trigger('change');
+                alert('Selecciona primero un proveedor para crear o buscar productos.');
+                return;
+            }
 
             openProductModal({
                 data: {
                     name,
-                    supplierId,
-                    supplierName
+                    supplier: {
+                        id: supplierId,
+                        tradeName,
+                        code
+                    }
                 },
                 onSave: (createdProduct) => {
 
@@ -112,6 +139,7 @@ export const setupProductSelect = ({
 
     initProductSelect({
         modalSelector,
+        supplierSelector,
         baseSelector: `${ modalSelector } ${ productSelector }`,
     });
 

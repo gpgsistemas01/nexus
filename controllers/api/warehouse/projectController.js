@@ -1,4 +1,4 @@
-import { findAllProjects } from "../../../services/warehouse/projectService.js";
+import { findAllProjects } from "../../../services/admin/projectService.js";
 
 export const getAllProjects = async (req, res) => {
 

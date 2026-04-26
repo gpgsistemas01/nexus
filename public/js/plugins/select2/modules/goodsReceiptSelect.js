@@ -1,9 +1,9 @@
-import { openProductModal } from "../../modules/products/productModal.js";
-import { openSupplierModal } from "../../modules/suppliers/supplierModal.js";
-import { initMdbWrapperInput, updateMdbWrapperInput } from "../mdb/baseInstance.js";
-import { setupProductSelect, toggleProductOption } from "./domains/product.js";
-import { initProfileSelect, toggleProfileOption } from "./domains/profile.js";
-import { setupSupplierSelect, toggleSupplierOption } from "./domains/supplier.js";
+import { openProductModal } from "../../../modules/products/productModal.js";
+import { openSupplierModal } from "../../../modules/suppliers/supplierModal.js";
+import { initMdbWrapperInput, updateMdbWrapperInput } from "../../mdb/baseInstance.js";
+import { setupProductSelect, toggleProductOption } from "../domains/product.js";
+import { initProfileSelect, toggleProfileOption } from "../domains/profile.js";
+import { setupSupplierSelect, toggleSupplierOption } from "../domains/supplier.js";
 
 const modalSelector = '#goodsReceiptModal';
 const productSelector = '#productInput';
@@ -37,6 +37,17 @@ export const initGoodsReceiptFormSelect2 = () => {
         supplierSelector,
         productSelector,
     });
+
+    $(`${ modalSelector } ${ supplierSelector }`)
+        .off('change.product-filter')
+        .on('change.product-filter', () => {
+            $(`${ modalSelector } ${ productSelector }`).val(null).trigger('change');
+            const instance = initMdbWrapperInput({
+                selector: '#presentationDisplayInput',
+                value: ''
+            });
+            updateMdbWrapperInput(instance);
+        });
 }
 
 export const setGoodsReceiptFormSelectOptions = (data = null) => {
@@ -44,7 +55,7 @@ export const setGoodsReceiptFormSelectOptions = (data = null) => {
     toggleSupplierOption({
         selector: `${ modalSelector } ${ supplierSelector }`,
         supplierId: data?.supplier?.id,
-        supplierName: data?.supplier?.tradeName
+        supplierName:`${  data?.supplier?.code } - ${ data?.supplier?.tradeName }`
     });
 
     toggleProfileOption({

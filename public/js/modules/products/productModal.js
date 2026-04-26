@@ -1,5 +1,5 @@
 import { openModal } from "../../ui/modalUI.js";
-import { initProductFormSelect2, setProductFormSelectOptions } from "../../plugins/select2/productSelect.js";
+import { initProductFormSelect2, setProductFormSelectOptions } from "../../plugins/select2/modules/productSelect.js";
 
 const productModalId = '#productModal';
 const formId = '#productForm';

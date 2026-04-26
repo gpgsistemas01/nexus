@@ -1,5 +1,5 @@
-import { SupplierProductCreateDatabaseError, SupplierProductDeleteDatabaseError } from "../../errors/warehouse/productError.js";
-import { prisma } from "../../lib/prisma.js";
+import { SupplierProductCreateDatabaseError, SupplierProductDeleteDatabaseError } from "../../../errors/warehouse/productError.js";
+import { prisma } from "../../../lib/prisma.js";
 
 const mapSupplierProduct = (sp) => {
 
@@ -15,20 +15,26 @@ export const findAllSupplierProducts = async ({
     skip= 0,
     take = 10,
     search = '',
+    supplierId = null,
     orderBy = 'id',
     orderDir = 'asc'
 }) => {
 
-    const where = search
-        ? {
-            product: {
-                name: {
-                    contains: search,
-                    mode: 'insensitive'
-                }
+    const where = {};
+
+    if (search) {
+
+        where.product = {
+            name: {
+                contains: search,
+                mode: 'insensitive'
             }
-        }
-        : {};
+        };
+    }
+
+    if (supplierId) {
+        where.supplierId = supplierId;
+    }
 
     const supplierProducts = await prisma.supplierProduct.findMany({
         skip,

@@ -1,5 +1,5 @@
-import { initMdbWrapperInput, updateMdbWrapperInput } from "../mdb/baseInstance.js";
-import { initbaseSelect2 } from "./baseSelect.js";
+import { initMdbWrapperInput, updateMdbWrapperInput } from "../../mdb/baseInstance.js";
+import { initbaseSelect2 } from "../baseSelect.js";
 
 const modalSelector = '#goodsIssueModal';
 

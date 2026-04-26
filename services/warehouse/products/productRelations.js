@@ -1,4 +1,4 @@
-import { createSupplierProduct, deleteSupplierProduct } from "../supplierProductService.js";
+import { createSupplierProduct, deleteSupplierProduct } from "./supplierProductService.js";
 
 export const syncSupplierProduct = async ({
     tx,
