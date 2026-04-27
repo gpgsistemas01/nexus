@@ -66,7 +66,9 @@ export const setGoodsReceiptFormSelectOptions = (data = null) => {
 
     toggleProductOption({
         selector: `${ modalSelector } ${ productSelector }`,
-        id: data?.product?.id,
-        name: data?.name
+        data: {
+            id: data?.details?.[0]?.product?.id,
+            text: data?.details?.[0]?.product?.name,
+        }
     })
 }

@@ -1,6 +1,6 @@
 import { ProductCreateDatabaseError, ProductNotFound, ProductUpdateDatabaseError } from "../../../errors/warehouse/productError.js";
 import { prisma } from "../../../lib/prisma.js";
-import { findAllSupplierProducts } from "./supplierProductService.js";
+import { findAllSupplierProducts, findSupplierProductByIds } from "./supplierProductService.js";
 import { prepareProductData, withRetry } from "./productHelpers.js";
 import { syncSupplierProduct } from "./productRelations.js";
 
@@ -72,8 +72,11 @@ export const createProduct = async (productDto) => {
                     unitMeasure: {
                         connect: { id: relations.unitMeasureId }
                     }
+                },
+                select: {
+                    id: true
                 }
-            });
+             });
 
             await syncSupplierProduct({
                 tx,
@@ -83,10 +86,16 @@ export const createProduct = async (productDto) => {
                 supplierCode: supplier.code
             });
 
-            return createdProduct;
+            const fullProduct = await findSupplierProductByIds({
+                tx,
+                productId: createdProduct.id,
+                supplierId: relations.supplierId
+            });
+
+            return fullProduct;
         });
 
-    }).catch((err) => {console.log(err)
+    }).catch((err) => {
         throw new ProductCreateDatabaseError();
     });
 };

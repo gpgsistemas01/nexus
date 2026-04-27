@@ -50,6 +50,8 @@ export const toggleProfileOption = ({
     profileName = null
 }) => toggleSelectOption({
     selector,
-    id: profileId,
-    name: profileName,
+    data: {
+        id: profileId,
+        text: profileName
+    }
 });

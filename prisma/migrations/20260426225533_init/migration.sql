@@ -1,6 +1,3 @@
--- CreateEnum
-CREATE TYPE "Presentation" AS ENUM ('ROLLO', 'CARTUCHO', 'PIEZA', 'HOJA', 'OJILLOS', 'ML775', 'LT1', 'LT3', 'LT5');
-
 -- CreateTable
 CREATE TABLE "Department" (
     "id" UUID NOT NULL DEFAULT gen_random_uuid(),
@@ -51,35 +48,45 @@ CREATE TABLE "Status" (
 CREATE TABLE "Product" (
     "id" UUID NOT NULL DEFAULT gen_random_uuid(),
     "name" VARCHAR(200) NOT NULL,
-    "sku" VARCHAR(200) NOT NULL,
-    "unitCost" DECIMAL(10,2),
-    "currentStock" DECIMAL(10,2) NOT NULL,
-    "presentation" "Presentation" NOT NULL,
-    "unitMeasure" VARCHAR(20) DEFAULT 'PIEZA',
+    "sku" VARCHAR(200),
+    "currentStock" DECIMAL(10,2) NOT NULL DEFAULT 0,
+    "presentationId" UUID NOT NULL,
+    "unitMeasureId" UUID NOT NULL,
     "isActive" BOOLEAN NOT NULL DEFAULT true,
-    "minStock" DECIMAL(10,2),
+    "minStock" DECIMAL(10,2) NOT NULL DEFAULT 0,
     "base" DECIMAL(10,3),
     "height" DECIMAL(10,3),
-    "weigthedM2" DECIMAL(10,3),
+    "area" DECIMAL(12,3),
+    "unitCost" DECIMAL(10,3),
+    "convertedQuantity" DECIMAL(10,3),
 
     CONSTRAINT "Product_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
-CREATE TABLE "weightedM2Records" (
+CREATE TABLE "UnitMeasure" (
     "id" UUID NOT NULL DEFAULT gen_random_uuid(),
-    "productId" UUID NOT NULL,
-    "date" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "weightedM2" DECIMAL(10,3) NOT NULL,
+    "name" VARCHAR(20) NOT NULL,
+    "symbol" VARCHAR(10) NOT NULL,
 
-    CONSTRAINT "weightedM2Records_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "UnitMeasure_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Presentation" (
+    "id" UUID NOT NULL DEFAULT gen_random_uuid(),
+    "name" VARCHAR(50) NOT NULL,
+
+    CONSTRAINT "Presentation_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "Supplier" (
     "id" UUID NOT NULL DEFAULT gen_random_uuid(),
-    "name" VARCHAR(50) NOT NULL,
-    "numberphone" VARCHAR(20),
+    "codeNumber" INTEGER NOT NULL,
+    "code" VARCHAR(10) NOT NULL,
+    "legalName" VARCHAR(200) NOT NULL,
+    "tradeName" VARCHAR(100) NOT NULL,
     "isActive" BOOLEAN NOT NULL DEFAULT true,
 
     CONSTRAINT "Supplier_pkey" PRIMARY KEY ("id")
@@ -88,7 +95,7 @@ CREATE TABLE "Supplier" (
 -- CreateTable
 CREATE TABLE "SupplierProduct" (
     "id" UUID NOT NULL DEFAULT gen_random_uuid(),
-    "price" DECIMAL(10,2) NOT NULL,
+    "price" DECIMAL(10,2),
     "sku" VARCHAR(50),
     "supplierId" UUID NOT NULL,
     "productId" UUID NOT NULL,
@@ -136,28 +143,35 @@ CREATE TABLE "ReferenceNumberCounter" (
 -- CreateTable
 CREATE TABLE "GoodsReceipt" (
     "id" UUID NOT NULL DEFAULT gen_random_uuid(),
-    "referenceNumber" VARCHAR(50) NOT NULL,
+    "invoice" VARCHAR(50),
+    "isInvoiced" BOOLEAN NOT NULL DEFAULT false,
     "supplierId" UUID NOT NULL,
-    "receptionDate" TIMESTAMP(3) NOT NULL,
-    "approveDate" TIMESTAMP(3),
-    "observations" VARCHAR(50),
     "statusId" UUID NOT NULL,
-    "departmentId" UUID NOT NULL,
     "receivedById" UUID NOT NULL,
-    "approverId" UUID,
+    "referenceNumber" VARCHAR(50) NOT NULL,
+    "receptionDate" TIMESTAMP(3) NOT NULL,
+    "observations" VARCHAR(50),
+    "totalQuantity" DECIMAL(10,3) NOT NULL,
+    "totalnetPurchaseAmount" DECIMAL(10,3) NOT NULL,
+    "totalGrossPurchaseAmount" DECIMAL(10,3) NOT NULL,
 
     CONSTRAINT "GoodsReceipt_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
-CREATE TABLE "DetailGoodsReceiptProduct" (
+CREATE TABLE "GoodsReceiptDetail" (
     "id" UUID NOT NULL DEFAULT gen_random_uuid(),
     "productId" UUID NOT NULL,
     "goodsReceiptId" UUID NOT NULL,
-    "quantity" DECIMAL(10,2) NOT NULL,
-    "detailMovementId" UUID,
+    "area" DECIMAL(12,3) NOT NULL,
+    "quantity" DECIMAL(10,3) NOT NULL,
+    "unitCostByArea" DECIMAL(10,3) NOT NULL,
+    "unitCostByQuantity" DECIMAL(10,3) NOT NULL,
+    "totalArea" DECIMAL(10,3) NOT NULL,
+    "netPurchaseAmount" DECIMAL(10,3) NOT NULL,
+    "grossPurchaseAmount" DECIMAL(10,3) NOT NULL,
 
-    CONSTRAINT "DetailGoodsReceiptProduct_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "GoodsReceiptDetail_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -179,13 +193,13 @@ CREATE TABLE "PurchaseRequisition" (
 );
 
 -- CreateTable
-CREATE TABLE "DetailPurchaseRequisitionProduct" (
+CREATE TABLE "PurchaseRequisitionDetail" (
     "id" UUID NOT NULL DEFAULT gen_random_uuid(),
     "productId" UUID NOT NULL,
     "purchaseRequisitionId" UUID NOT NULL,
     "quantity" DECIMAL(10,2) NOT NULL,
 
-    CONSTRAINT "DetailPurchaseRequisitionProduct_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "PurchaseRequisitionDetail_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -207,14 +221,13 @@ CREATE TABLE "GoodsIssue" (
 );
 
 -- CreateTable
-CREATE TABLE "DetailGoodsIssueProduct" (
+CREATE TABLE "GoodsIssueDetail" (
     "id" UUID NOT NULL DEFAULT gen_random_uuid(),
     "productId" UUID NOT NULL,
     "goodsIssueId" UUID NOT NULL,
     "quantity" DECIMAL(10,2) NOT NULL,
-    "detailMovementId" UUID,
 
-    CONSTRAINT "DetailGoodsIssueProduct_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "GoodsIssueDetail_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -222,20 +235,21 @@ CREATE TABLE "InventoryMovement" (
     "id" UUID NOT NULL DEFAULT gen_random_uuid(),
     "goodsReceiptId" UUID,
     "goodsIssueId" UUID,
-    "reasonId" UUID NOT NULL,
     "date" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "InventoryMovement_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
-CREATE TABLE "DetailMovement" (
+CREATE TABLE "MovementDetail" (
     "id" UUID NOT NULL DEFAULT gen_random_uuid(),
     "quantity" DECIMAL(10,2) NOT NULL,
-    "movementId" UUID NOT NULL,
     "productId" UUID NOT NULL,
+    "goodsReceiptDetailId" UUID,
+    "goodsIssueDetailId" UUID,
+    "movementId" UUID NOT NULL,
 
-    CONSTRAINT "DetailMovement_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "MovementDetail_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -262,7 +276,22 @@ CREATE UNIQUE INDEX "Status_name_key" ON "Status"("name");
 CREATE UNIQUE INDEX "Product_sku_key" ON "Product"("sku");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Supplier_name_key" ON "Supplier"("name");
+CREATE UNIQUE INDEX "UnitMeasure_name_symbol_key" ON "UnitMeasure"("name", "symbol");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Presentation_name_key" ON "Presentation"("name");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Supplier_code_key" ON "Supplier"("code");
+
+-- CreateIndex
+CREATE INDEX "SupplierProduct_supplierId_idx" ON "SupplierProduct"("supplierId");
+
+-- CreateIndex
+CREATE INDEX "SupplierProduct_productId_idx" ON "SupplierProduct"("productId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "SupplierProduct_supplierId_productId_key" ON "SupplierProduct"("supplierId", "productId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Project_referenceNumber_key" ON "Project"("referenceNumber");
@@ -274,16 +303,10 @@ CREATE UNIQUE INDEX "ReferenceNumberCounter_prefix_key" ON "ReferenceNumberCount
 CREATE UNIQUE INDEX "GoodsReceipt_referenceNumber_key" ON "GoodsReceipt"("referenceNumber");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "DetailGoodsReceiptProduct_detailMovementId_key" ON "DetailGoodsReceiptProduct"("detailMovementId");
-
--- CreateIndex
 CREATE UNIQUE INDEX "PurchaseRequisition_referenceNumber_key" ON "PurchaseRequisition"("referenceNumber");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "GoodsIssue_referenceNumber_key" ON "GoodsIssue"("referenceNumber");
-
--- CreateIndex
-CREATE UNIQUE INDEX "DetailGoodsIssueProduct_detailMovementId_key" ON "DetailGoodsIssueProduct"("detailMovementId");
 
 -- CreateIndex
 CREATE INDEX "_ProfileToUser_B_index" ON "_ProfileToUser"("B");
@@ -295,7 +318,10 @@ ALTER TABLE "User" ADD CONSTRAINT "User_departmentId_fkey" FOREIGN KEY ("departm
 ALTER TABLE "User" ADD CONSTRAINT "User_roleId_fkey" FOREIGN KEY ("roleId") REFERENCES "Role"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "weightedM2Records" ADD CONSTRAINT "weightedM2Records_productId_fkey" FOREIGN KEY ("productId") REFERENCES "Product"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Product" ADD CONSTRAINT "Product_presentationId_fkey" FOREIGN KEY ("presentationId") REFERENCES "Presentation"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Product" ADD CONSTRAINT "Product_unitMeasureId_fkey" FOREIGN KEY ("unitMeasureId") REFERENCES "UnitMeasure"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "SupplierProduct" ADD CONSTRAINT "SupplierProduct_supplierId_fkey" FOREIGN KEY ("supplierId") REFERENCES "Supplier"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -310,13 +336,7 @@ ALTER TABLE "Notification" ADD CONSTRAINT "Notification_userId_fkey" FOREIGN KEY
 ALTER TABLE "Notification" ADD CONSTRAINT "Notification_departmentId_fkey" FOREIGN KEY ("departmentId") REFERENCES "Department"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "GoodsReceipt" ADD CONSTRAINT "GoodsReceipt_departmentId_fkey" FOREIGN KEY ("departmentId") REFERENCES "Department"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
 ALTER TABLE "GoodsReceipt" ADD CONSTRAINT "GoodsReceipt_receivedById_fkey" FOREIGN KEY ("receivedById") REFERENCES "Profile"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "GoodsReceipt" ADD CONSTRAINT "GoodsReceipt_approverId_fkey" FOREIGN KEY ("approverId") REFERENCES "Profile"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "GoodsReceipt" ADD CONSTRAINT "GoodsReceipt_supplierId_fkey" FOREIGN KEY ("supplierId") REFERENCES "Supplier"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -325,13 +345,10 @@ ALTER TABLE "GoodsReceipt" ADD CONSTRAINT "GoodsReceipt_supplierId_fkey" FOREIGN
 ALTER TABLE "GoodsReceipt" ADD CONSTRAINT "GoodsReceipt_statusId_fkey" FOREIGN KEY ("statusId") REFERENCES "Status"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "DetailGoodsReceiptProduct" ADD CONSTRAINT "DetailGoodsReceiptProduct_goodsReceiptId_fkey" FOREIGN KEY ("goodsReceiptId") REFERENCES "GoodsReceipt"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "GoodsReceiptDetail" ADD CONSTRAINT "GoodsReceiptDetail_goodsReceiptId_fkey" FOREIGN KEY ("goodsReceiptId") REFERENCES "GoodsReceipt"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "DetailGoodsReceiptProduct" ADD CONSTRAINT "DetailGoodsReceiptProduct_productId_fkey" FOREIGN KEY ("productId") REFERENCES "Product"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "DetailGoodsReceiptProduct" ADD CONSTRAINT "DetailGoodsReceiptProduct_detailMovementId_fkey" FOREIGN KEY ("detailMovementId") REFERENCES "DetailMovement"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "GoodsReceiptDetail" ADD CONSTRAINT "GoodsReceiptDetail_productId_fkey" FOREIGN KEY ("productId") REFERENCES "Product"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "PurchaseRequisition" ADD CONSTRAINT "PurchaseRequisition_departmentId_fkey" FOREIGN KEY ("departmentId") REFERENCES "Department"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -352,10 +369,10 @@ ALTER TABLE "PurchaseRequisition" ADD CONSTRAINT "PurchaseRequisition_statusId_f
 ALTER TABLE "PurchaseRequisition" ADD CONSTRAINT "PurchaseRequisition_projectId_fkey" FOREIGN KEY ("projectId") REFERENCES "Project"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "DetailPurchaseRequisitionProduct" ADD CONSTRAINT "DetailPurchaseRequisitionProduct_purchaseRequisitionId_fkey" FOREIGN KEY ("purchaseRequisitionId") REFERENCES "PurchaseRequisition"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "PurchaseRequisitionDetail" ADD CONSTRAINT "PurchaseRequisitionDetail_purchaseRequisitionId_fkey" FOREIGN KEY ("purchaseRequisitionId") REFERENCES "PurchaseRequisition"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "DetailPurchaseRequisitionProduct" ADD CONSTRAINT "DetailPurchaseRequisitionProduct_productId_fkey" FOREIGN KEY ("productId") REFERENCES "Product"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "PurchaseRequisitionDetail" ADD CONSTRAINT "PurchaseRequisitionDetail_productId_fkey" FOREIGN KEY ("productId") REFERENCES "Product"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "GoodsIssue" ADD CONSTRAINT "GoodsIssue_departmentId_fkey" FOREIGN KEY ("departmentId") REFERENCES "Department"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -376,13 +393,10 @@ ALTER TABLE "GoodsIssue" ADD CONSTRAINT "GoodsIssue_statusId_fkey" FOREIGN KEY (
 ALTER TABLE "GoodsIssue" ADD CONSTRAINT "GoodsIssue_projectId_fkey" FOREIGN KEY ("projectId") REFERENCES "Project"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "DetailGoodsIssueProduct" ADD CONSTRAINT "DetailGoodsIssueProduct_goodsIssueId_fkey" FOREIGN KEY ("goodsIssueId") REFERENCES "GoodsIssue"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "GoodsIssueDetail" ADD CONSTRAINT "GoodsIssueDetail_goodsIssueId_fkey" FOREIGN KEY ("goodsIssueId") REFERENCES "GoodsIssue"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "DetailGoodsIssueProduct" ADD CONSTRAINT "DetailGoodsIssueProduct_productId_fkey" FOREIGN KEY ("productId") REFERENCES "Product"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "DetailGoodsIssueProduct" ADD CONSTRAINT "DetailGoodsIssueProduct_detailMovementId_fkey" FOREIGN KEY ("detailMovementId") REFERENCES "DetailMovement"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "GoodsIssueDetail" ADD CONSTRAINT "GoodsIssueDetail_productId_fkey" FOREIGN KEY ("productId") REFERENCES "Product"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "InventoryMovement" ADD CONSTRAINT "InventoryMovement_goodsReceiptId_fkey" FOREIGN KEY ("goodsReceiptId") REFERENCES "GoodsReceipt"("id") ON DELETE SET NULL ON UPDATE CASCADE;
@@ -391,10 +405,16 @@ ALTER TABLE "InventoryMovement" ADD CONSTRAINT "InventoryMovement_goodsReceiptId
 ALTER TABLE "InventoryMovement" ADD CONSTRAINT "InventoryMovement_goodsIssueId_fkey" FOREIGN KEY ("goodsIssueId") REFERENCES "GoodsIssue"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "DetailMovement" ADD CONSTRAINT "DetailMovement_movementId_fkey" FOREIGN KEY ("movementId") REFERENCES "InventoryMovement"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "MovementDetail" ADD CONSTRAINT "MovementDetail_productId_fkey" FOREIGN KEY ("productId") REFERENCES "Product"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "DetailMovement" ADD CONSTRAINT "DetailMovement_productId_fkey" FOREIGN KEY ("productId") REFERENCES "Product"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "MovementDetail" ADD CONSTRAINT "MovementDetail_goodsReceiptDetailId_fkey" FOREIGN KEY ("goodsReceiptDetailId") REFERENCES "GoodsReceiptDetail"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "MovementDetail" ADD CONSTRAINT "MovementDetail_goodsIssueDetailId_fkey" FOREIGN KEY ("goodsIssueDetailId") REFERENCES "GoodsIssueDetail"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "MovementDetail" ADD CONSTRAINT "MovementDetail_movementId_fkey" FOREIGN KEY ("movementId") REFERENCES "InventoryMovement"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "_ProfileToUser" ADD CONSTRAINT "_ProfileToUser_A_fkey" FOREIGN KEY ("A") REFERENCES "Profile"("id") ON DELETE CASCADE ON UPDATE CASCADE;

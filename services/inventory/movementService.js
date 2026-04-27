@@ -1,4 +1,4 @@
-import { Prisma, prisma, ReferenceType, ReferenceDetailType } from "../../lib/prisma.js";
+import { prisma } from "../../lib/prisma.js";
 
 const REFERENCE_MOVEMENT_IN = 'IN';
 const REFERENCE_TYPE_GOODS_RECEIPT = 'GOODS_RECEIPT';
@@ -7,7 +7,7 @@ const REFERENCE_TYPE_PURCHASE_REQUISITION = 'PURCHASE_REQUISITION';
 
 export const applyInventoryMovement = async ({ 
     tx, 
-    referenceId, 
+    goodsReceiptId, 
     referenceType,
     details, 
     movementType 
@@ -15,30 +15,23 @@ export const applyInventoryMovement = async ({
 
     const db = tx || prisma;
 
-    let reference = null;
-    let referenceDetailType = null;
+    const data = {};
 
-    if (referenceType === 'GOODS_RECEIPT') {
-
-        reference = ReferenceType.GOODS_RECEIPT;
-        referenceDetailType = ReferenceDetailType.GOODS_RECEIPT_DETAIL;
-    }
+    if (goodsReceiptId) {
+        
+        data.goodsReceiptId = goodsReceiptId;
+        data.date = new Date();
+        data.details = {
+            create: details.map(detail => ({
+                goodsReceiptDetailId: detail.id,
+                productId: detail.productId,
+                quantity: detail.quantity
+            }))
+        }
+    };
 
     const movement = await db.inventoryMovement.create({
-        data: {
-            referenceId,
-            referenceType: reference,
-            date: new Date(),
-            movementType,
-            details: {
-                create: details.map(detail => ({
-                    referenceDetailId: detail.id,
-                    referenceDetailType,
-                    productId: detail.productId,
-                    quantity: detail.quantity
-                }))
-            }
-        },
+        data,
         include: {
             details: {
                 select: {

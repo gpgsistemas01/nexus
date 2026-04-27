@@ -20,21 +20,22 @@ export const findAllSupplierProducts = async ({
     orderDir = 'asc'
 }) => {
 
-    const where = {};
+    const where = { AND: [] };
 
-    if (search) {
-
-        where.product = {
+    if (search) where.AND.push({
+        product: {
             name: {
                 contains: search,
                 mode: 'insensitive'
             }
-        };
-    }
+        }
+    });
 
-    if (supplierId) {
-        where.supplierId = supplierId;
-    }
+    if (supplierId) where.AND.push({
+        supplierId
+    });
+
+    if (where.AND.length === 0) delete where.AND;
 
     const supplierProducts = await prisma.supplierProduct.findMany({
         skip,
@@ -94,6 +95,51 @@ export const findAllSupplierProducts = async ({
     };
 }
 
+export const findSupplierProductByIds = async ({
+    tx,
+    productId,
+    supplierId
+}) => {
+
+    const db = tx || prisma;
+
+    const supplierProduct = await db.supplierProduct.findUnique({
+        where: { 
+            supplierId_productId: { 
+                productId, 
+                supplierId 
+            } 
+        },
+        select: {
+            product: {
+                select: {
+                    id: true,
+                    name: true,
+                    currentStock: true,
+                    minStock: true,
+                    isActive: true,
+                    base: true,
+                    height: true,
+                    area: true,
+                    unitCost: true,
+                    convertedQuantity: true,
+                    presentation: true,
+                    unitMeasure: true
+                }
+            },
+            supplier: {
+                select: {
+                    id: true,
+                    code: true,
+                    tradeName: true
+                }
+            }
+        }
+    });
+
+    return mapSupplierProduct(supplierProduct);
+};
+
 export const countTotalSupplierProducts = async ({
     where
 } = {}) => await prisma.supplierProduct.count({ where });
@@ -136,8 +182,10 @@ export const deleteSupplierProduct = async ({
 
         return await db.supplierProduct.delete({
             where: {
-                productId,
-                supplierId
+                supplierId_productId: {
+                    productId,
+                    supplierId
+                }
             }
         });
 

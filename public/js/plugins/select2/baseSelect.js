@@ -1,3 +1,5 @@
+import { initMdbWrapperInput, updateMdbWrapperInput } from "../mdb/baseInstance.js";
+
 export const initbaseSelect2 = ({ 
     baseSelector, 
     modalSelector,
@@ -38,14 +40,16 @@ export const initbaseSelect2 = ({
     });
 }
 
-export const toggleSelectOption = ({ selector, id = null, name = null }) => {
+export const toggleSelectOption = ({ selector, data = null }) => {
     
-    $(selector).empty().trigger('change');
+    $(selector).val(null).trigger('change');
 
-    if (!id || !name) return;
+    const { id, text, ...rest } = data || {};
+
+    if (!text || !id) return;
 
     const option = new Option(
-        name,
+        text,
         id,
         true,
         true
@@ -53,3 +57,16 @@ export const toggleSelectOption = ({ selector, id = null, name = null }) => {
 
     $(selector).append(option).trigger('change');
 };
+
+export const setMdbWrapperInputValue = ({
+    selector, 
+    value
+}) => {
+
+    const instance = initMdbWrapperInput({
+        selector,
+        value
+    });
+
+    updateMdbWrapperInput(instance);
+}

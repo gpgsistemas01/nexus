@@ -47,6 +47,8 @@ export const togglePresentationOption = ({
     name = null
 }) => toggleSelectOption({
     selector,
-    id,
-    name,
+    data: {
+        id,
+        text: name
+    }
 });

@@ -19,7 +19,7 @@ export const initUnitMeasureSelect = ({
             return {
                 results: list.map(u => ({
                     id: u.id,
-                    text: `${ u.name } - ${ u.symbol }`,
+                    text: `${ u.symbol } - ${ u.name }`,
                 }))
             };
         },
@@ -47,6 +47,8 @@ export const toggleUnitMeasureOption = ({
     name = null
 }) => toggleSelectOption({
     selector,
-    id,
-    name,
+    data: {
+        id,
+        text: name
+    }
 });

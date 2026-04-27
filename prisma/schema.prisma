@@ -11,7 +11,6 @@ model Department {
   id                   String                @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name                 String                @unique @db.VarChar(50)
   users                User[]
-  goodsReceipts        GoodsReceipt[]
   purchaseRequisitions PurchaseRequisition[]
   goodsIssues          GoodsIssue[]
   notifications        Notification[]
@@ -65,7 +64,7 @@ model Product {
   sku                         String?                            @unique @db.VarChar(200)
   currentStock                Decimal                            @default(0) @db.Decimal(10, 2)
   presentationId String @db.Uuid
-  unitMasureId String @db.Uuid
+  unitMeasureId String @db.Uuid
   isActive                    Boolean                            @default(true)
   minStock                    Decimal                           @default(0) @db.Decimal(10, 2)
   base                        Decimal?                           @db.Decimal(10, 3)
@@ -74,7 +73,7 @@ model Product {
   unitCost                    Decimal?                           @db.Decimal(10, 3)
   convertedQuantity Decimal? @db.Decimal(10, 3)
   presentation Presentation @relation(fields: [presentationId], references: [id])
-  unitMeasure UnitMeasure @relation(fields: [unitMasureId], references: [id])
+  unitMeasure UnitMeasure @relation(fields: [unitMeasureId], references: [id])
   detailsGoodsReceipts        GoodsReceiptDetail[]
   detailsPurchaseRequisitions PurchaseRequisitionDetail[]
   detailsGoodsIssues          GoodsIssueDetail[]
@@ -156,21 +155,21 @@ model ReferenceNumberCounter {
 
 model GoodsReceipt {
   id              String                      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  referenceNumber String                      @unique @db.VarChar(50)
   invoice String? @db.VarChar(50)
+  isInvoiced        Boolean                     @default(false)
   supplierId      String                      @db.Uuid
+  statusId        String                      @db.Uuid
+  receivedById    String                      @db.Uuid
+  referenceNumber String                      @unique @db.VarChar(50)
   receptionDate   DateTime
   observations    String?                     @db.VarChar(50)
-  statusId        String                      @db.Uuid
-  departmentId    String                      @db.Uuid
-  receivedById    String                      @db.Uuid
   totalQuantity     Decimal                     @db.Decimal(10, 3)
   totalnetPurchaseAmount Decimal                     @db.Decimal(10, 3)
   totalGrossPurchaseAmount Decimal                     @db.Decimal(10, 3)
-  department      Department                  @relation(fields: [departmentId], references: [id])
   receivedBy      Profile                     @relation(fields: [receivedById], references: [id])
   supplier        Supplier                    @relation(fields: [supplierId], references: [id])
   status          Status                      @relation(fields: [statusId], references: [id])
+  movements        InventoryMovement[]
   details         GoodsReceiptDetail[]
 }
 
@@ -187,6 +186,7 @@ model GoodsReceiptDetail {
   grossPurchaseAmount Decimal @db.Decimal(10, 3)
   goodsReceipt     GoodsReceipt   @relation(fields: [goodsReceiptId], references: [id])
   product          Product        @relation(fields: [productId], references: [id])
+  movementDetails        MovementDetail[]
 }
 
 model PurchaseRequisition {
@@ -247,6 +247,7 @@ model GoodsIssue {
   project        Project    @relation(fields: [projectId], references: [id])
 
   details  GoodsIssueDetail[]
+  movements InventoryMovement[]
 }
 
 model GoodsIssueDetail {
@@ -257,36 +258,20 @@ model GoodsIssueDetail {
 
   goodsIssue       GoodsIssue     @relation(fields: [goodsIssueId], references: [id])
   product          Product        @relation(fields: [productId], references: [id])
-}
-
-enum ReferenceType {
-  GOODS_RECEIPT
-  PURCHASE_REQUISITION
-  GOODS_ISSUE
-  OTHER
-}
-enum MovementType {
-  IN
-  OUT
+  movementDetails  MovementDetail[]
 }
 
 model InventoryMovement {
   id String @id  @default(dbgenerated("gen_random_uuid()")) @db.Uuid
 
-  referenceId String @db.Uuid
-  referenceType ReferenceType
-  movementType MovementType
+  goodsReceiptId String? @db.Uuid
+  goodsIssueId String? @db.Uuid
 
   date DateTime
 
+  goodsReceipt GoodsReceipt? @relation(fields: [goodsReceiptId], references: [id])
+  goodsIssue GoodsIssue? @relation(fields: [goodsIssueId], references: [id])
   details MovementDetail[]
-}
-
-enum ReferenceDetailType {
-  GOODS_RECEIPT_DETAIL
-  PURCHASE_REQUISITION_DETAIL
-  GOODS_ISSUE_DETAIL
-  OTHER
 }
 
 model MovementDetail {
@@ -294,12 +279,13 @@ model MovementDetail {
 
   quantity Decimal @db.Decimal(10, 2)
 
-  movementId String            @db.Uuid
-  movement   InventoryMovement @relation(fields: [movementId], references: [id])
-
   productId String  @db.Uuid
-  product   Product @relation(fields: [productId], references: [id])
+  goodsReceiptDetailId String? @db.Uuid
+  goodsIssueDetailId String? @db.Uuid
+  movementId String            @db.Uuid
 
-  referenceDetailId String? @db.Uuid
-  referenceDetailType ReferenceDetailType?
+  product   Product @relation(fields: [productId], references: [id])
+  goodsReceiptDetail GoodsReceiptDetail? @relation(fields: [goodsReceiptDetailId], references: [id])
+  goodsIssueDetail GoodsIssueDetail? @relation(fields: [goodsIssueDetailId], references: [id])
+  movement   InventoryMovement @relation(fields: [movementId], references: [id])
 }

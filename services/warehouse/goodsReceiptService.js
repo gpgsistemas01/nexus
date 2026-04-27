@@ -205,8 +205,6 @@ export const createGoodsReceipt = async ({ goodsReceiptDto }) => {
 
     await validateGoodsReceiptRelations({ receivedById, supplierId });
 
-    const departmentId = await getDepartmentByProfileId(receivedById);
-
     const result = await prisma.$transaction(async (tx) => {
 
         await findProfileById({ tx, id: receivedById });
@@ -245,11 +243,6 @@ export const createGoodsReceipt = async ({ goodsReceiptDto }) => {
                         id: receivedById
                     }
                 },
-                department: {
-                    connect: {
-                        id: departmentId,
-                    }
-                },
                 referenceNumber,
                 details: {
                     create: processedDetails.map(({ productId, ...rest }) => ({
@@ -264,8 +257,7 @@ export const createGoodsReceipt = async ({ goodsReceiptDto }) => {
 
         const impactedProductIds = await applyInventoryMovement({
             tx,
-            referenceId: goodsReceipt.id,
-            referenceType: REFERENCE_TYPE_GOODS_RECEIPT,
+            goodsReceiptId: goodsReceipt.id,
             details: goodsReceipt.details,
             movementType: MOVEMENT_TYPE_IN
         });

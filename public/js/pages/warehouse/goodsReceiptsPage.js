@@ -103,6 +103,7 @@ export const openGoodsReceiptModal = ({ mode, data = null }) => {
 
 const addProduct = () => {
 
+    const supplierId = document.querySelector('#supplierInput').value;
     const productId = document.querySelector('#productInput').value;
     const selectedProduct = $('#productInput').select2('data')?.[0];
     const name = selectedProduct?.text || '';
@@ -110,6 +111,11 @@ const addProduct = () => {
     const unitCostByQuantity = Number(document.querySelector('#unitCostByQuantityInput').value);
     const base = Number(selectedProduct?.base);
     const height = Number(selectedProduct?.height);
+
+    if (!supplierId) {
+        alert('Selecciona un proveedor antes de agregar productos.');
+        return;
+    }
 
     if (!productId || !quantity || !unitCostByQuantity) {
         alert('Por favor, complete los campos de producto, cantidad e importe.');

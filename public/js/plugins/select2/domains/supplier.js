@@ -56,13 +56,11 @@ const attachSupplierHandler = ({ supplierSelector }) => {
                 data: { tradeName },
                 onSave: (createdsupplier) => {
 
-                    const option = new Option(
-                        createdsupplier.tradeName,
-                        createdsupplier.id,
-                        true,
-                        true
-                    );
-                    $(supplierSelector).append(option).trigger('change');
+                    toggleSupplierOption({
+                        selector: supplierSelector,
+                        id: createdsupplier.id,
+                        name: `${ createdsupplier.code } - ${ createdsupplier.tradeName }`
+                    });
                 }
             });
 
@@ -77,8 +75,10 @@ export const toggleSupplierOption = ({
     name = null
 }) => toggleSelectOption({
     selector,
-    id,
-    name,
+    data: {
+        id,
+        text: name
+    }
 });
 
 export const setupSupplierSelect = ({ 

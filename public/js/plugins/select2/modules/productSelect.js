@@ -39,7 +39,7 @@ export const setProductFormSelectOptions = (data = null) => {
     toggleUnitMeasureOption({
         selector: `${ modalSelector } ${ unitMeasureSelector }`,
         id: data?.unitMeasure?.id,
-        name: data?.unitMeasure?.name
+        name: `${ data?.unitMeasure?.symbol } - ${ data?.unitMeasure?.name }`
     });
 
     togglePresentationOption({

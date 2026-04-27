@@ -1,7 +1,8 @@
 import { openProductModal } from "../../../modules/products/productModal.js";
 import { PRODUCTS_API_ROUTE } from "../../../services/warehouse/productService.js";
-import { initMdbWrapperInput, updateMdbWrapperInput } from "../../mdb/baseInstance.js";
-import { initbaseSelect2, toggleSelectOption } from "../baseSelect.js";
+import { initbaseSelect2, setMdbWrapperInputValue, toggleSelectOption } from "../baseSelect.js";
+
+const wrapperSelector = '#presentationDisplayInput';
 
 const initProductSelect = ({ 
     modalSelector, 
@@ -19,16 +20,9 @@ const initProductSelect = ({
 
             const supplierId = $(`${ modalSelector } ${ supplierSelector }`).val();
 
-            if (!supplierId) {
-                return {
-                    search: '',
-                    supplierId: ''
-                };
-            }
-
             return {
                 search: params.term,
-                supplierId
+                supplierId: supplierId || ''
             };
         },
         processResults: (data) => {
@@ -39,7 +33,7 @@ const initProductSelect = ({
                 results: list.map(p => ({
                     id: p.id,
                     text: p.name,
-                    presentation: p.presentation.name || 'PIEZA',
+                    presentation: p.presentation.name,
                     unitMeasure: p.unitMeasure.name,
                     base: p.base,
                     height: p.height
@@ -83,7 +77,7 @@ const attachProductHandler = ({
 
             if (!supplierId) {
                 $(productSelector).val(null).trigger('change');
-                alert('Selecciona primero un proveedor para crear o buscar productos.');
+                alert('Selecciona primero un proveedor para crear productos.');
                 return;
             }
 
@@ -98,13 +92,32 @@ const attachProductHandler = ({
                 },
                 onSave: (createdProduct) => {
 
-                    const option = new Option(
-                        createdProduct.tradeName,
-                        createdProduct.id,
-                        true,
-                        true
-                    );
-                    $(productSelector).append(option).trigger('change');
+                    toggleProductOption({
+                        selector: productSelector,
+                        data: {
+                            id: createdProduct.id,
+                            text: createdProduct.name
+                        }
+                    });
+
+                    $(productSelector).trigger({
+                        type: 'select2:select',
+                        params: {
+                            data: {
+                                id: createdProduct.id,
+                                text: createdProduct.name,
+                                presentation: createdProduct.presentation.name,
+                                unitMeasure: createdProduct.unitMeasure.name,
+                                base: createdProduct.base,
+                                height: createdProduct.height
+                            }
+                        }
+                    });
+
+                    setMdbWrapperInputValue({
+                        selector: wrapperSelector,
+                        value: createdProduct.presentation.name
+                    });
                 }
             });
 
@@ -112,23 +125,19 @@ const attachProductHandler = ({
         }
 
         const value = selected.presentation;
-        const instance = initMdbWrapperInput({
-            selector: '#presentationDisplayInput',
+        setMdbWrapperInputValue({
+            selector: wrapperSelector,
             value
         });
-
-        updateMdbWrapperInput(instance);
     });
 };
 
 export const toggleProductOption = ({ 
     selector, 
-    id = null, 
-    name = null 
+    data
 }) => toggleSelectOption({
     selector,
-    id,
-    name,
+    data
 });
 
 export const setupProductSelect = ({ 
