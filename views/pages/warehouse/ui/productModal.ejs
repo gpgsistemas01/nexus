@@ -1,6 +1,7 @@
 <% const form = {
     id: 'productForm',
     canApprove: false,
+    invoice: false,
     selects: [
         {
             id: 'productSupplierInput',
@@ -57,7 +58,8 @@
             id: 'isActiveInput',
             type: 'checkbox',
             name: 'isActive',
-            label: 'Activo'
+            label: 'Activo',
+            isChecked: true
         }
     ]
 } %>

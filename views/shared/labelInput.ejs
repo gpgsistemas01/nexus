@@ -1,3 +1,7 @@
-<label for="<%= id %>" class="form-label">
-    <%- content %>
-</label>
+<%- include('./label', {
+    label: {
+        id,
+        class: 'form-label',
+        content
+    }
+}) %>

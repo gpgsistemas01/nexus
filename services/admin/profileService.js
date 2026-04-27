@@ -1,3 +1,4 @@
+import { ProfileFindDatabaseError } from "../../errors/admin/profileError.js";
 import { prisma } from "../../lib/prisma.js";
 
 export const findAllProfiles = async ({
@@ -50,16 +51,24 @@ export const findAllProfiles = async ({
 export const findProfileById = async ({ tx, id }) => {
 
     const db = tx || prisma;
+    let profile;
 
-    const profile = await db.profile.findUnique({
-        where: { 
-            id,
-            isActive: true
-        },
-        select: {
-            id: true,
-        }
-    });
+    try {
+
+        profile = await db.profile.findUnique({
+            where: { 
+                id,
+                isActive: true
+            },
+            select: {
+                id: true,
+            }
+        });
+
+    } catch (err) {
+
+        throw new ProfileFindDatabaseError();
+    }
 
     return profile?.id || null;
 };
@@ -67,20 +76,28 @@ export const findProfileById = async ({ tx, id }) => {
 export const findProfileByUserId = async ({ tx, userId }) => {
 
     const db = tx || prisma;
+    let profile;
 
-    const profile = await db.profile.findFirst({
-        where: { 
-            isActive: true,
-            users: {
-                some: {
-                    id: userId
+    try {
+
+        profile = await db.profile.findFirst({
+            where: { 
+                isActive: true,
+                users: {
+                    some: {
+                        id: userId
+                    }
                 }
+            },
+            select: {
+                id: true,
             }
-        },
-        select: {
-            id: true,
-        }
-    });
+        });
+
+    } catch (err) {
+
+        throw new ProfileFindDatabaseError();
+    }
 
     return profile?.id || null;
 }

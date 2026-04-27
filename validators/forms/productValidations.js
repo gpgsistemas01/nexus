@@ -1,4 +1,4 @@
-import { validateIsActive, validateName, validateNumberOptional, validateUUID } from "../fields/fieldsValidator.js";
+import { validateBoolean, validateName, validateNumberOptional, validateUUID } from "../fields/fieldsValidator.js";
 
 export const productValidation = [
     validateName(200),
@@ -8,5 +8,5 @@ export const productValidation = [
     validateNumberOptional('minStock', { disableTooLong: true }),
     validateNumberOptional('base'),
     validateNumberOptional('height'),
-    validateIsActive
+    validateBoolean('isActive')
 ]

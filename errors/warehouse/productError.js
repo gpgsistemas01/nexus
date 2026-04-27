@@ -29,6 +29,13 @@ export class SupplierProductDeleteDatabaseError extends AppError {
     }
 }
 
+export class ProductAreaFindDatabaseError extends AppError {
+
+    constructor () {
+        super('Error de base de datos al buscar el área del producto', 'PRODUCT_AREA_FIND_DB_ERROR', 500);
+    }
+}
+
 export class ProductCreateDatabaseError extends AppError {
 
     constructor () {
@@ -40,5 +47,19 @@ export class ProductUpdateDatabaseError extends AppError {
 
     constructor () {
         super('Error de base de datos al editar el producto', 'PRODUCT_UPDATE_DB_ERROR', 500);
+    }
+}
+
+export class ProductQuantityUpdateDatabaseError extends AppError {
+
+    constructor () {
+        super('Error de base de datos al editar la cantidad del producto', 'PRODUCT_QUANTITY_UPDATE_DB_ERROR', 500);
+    }
+}
+
+export class ProductCurrentStockUpdateDatabaseError extends AppError {
+
+    constructor () {
+        super('Error de base de datos al editar el stock actual del producto', 'PRODUCT_CURRENT_STOCK_UPDATE_DB_ERROR', 500);
     }
 }

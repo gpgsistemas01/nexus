@@ -1,9 +1,10 @@
-import { ProductCreateDatabaseError, ProductNotFound, ProductUpdateDatabaseError } from "../../../errors/warehouse/productError.js";
+import { ProductAreaFindDatabaseError, ProductCreateDatabaseError, ProductCurrentStockUpdateDatabaseError, ProductNotFound, ProductQuantityUpdateDatabaseError, ProductUpdateDatabaseError } from "../../../errors/warehouse/productError.js";
 import { prisma } from "../../../lib/prisma.js";
 import { findAllSupplierProducts, findSupplierProductByIds } from "./supplierProductService.js";
 import { prepareProductData, withRetry } from "./productHelpers.js";
 import { syncSupplierProduct } from "./productRelations.js";
 
+const REFERENCE_MOVEMENT_IN = 'IN';
 const PRISMA_RECORD_NOT_FOUND = 'P2025';
 
 export const findAllProducts = async ({
@@ -24,6 +25,35 @@ export const findAllProducts = async ({
         orderDir
     });
 };
+
+export const findAllProductAreas = async ({
+    tx,
+    productIds
+}) => {
+
+    const db = tx || prisma;
+
+    try {
+
+        const products = await tx.product.findMany({
+            where: {
+                id: {
+                    in: productIds
+                }
+            },
+            select: {
+                id: true,
+                area: true
+            }
+        });
+
+        return products;
+
+    } catch (err) {
+
+        throw new ProductAreaFindDatabaseError();
+    }
+}
 
 export const findExistingSkus = (tx) => async ({ 
     baseSku, 
@@ -163,3 +193,73 @@ export const updateProduct = async (productDto, id) => {
         throw new ProductUpdateDatabaseError();
     });
 };
+
+export const updateConvertedQuantityByCurrentStock = async ({ tx, productIds }) => {
+
+    const db = tx || prisma;
+    const uniqueProductIds = [...new Set(productIds)];
+
+    if (!uniqueProductIds.length) return;
+
+    try {
+        const products = await db.product.findMany({
+            where: {
+                id: {
+                    in: uniqueProductIds
+                }
+            },
+            select: {
+                id: true,
+                currentStock: true,
+                area: true,
+                base: true,
+                height: true
+            }
+        });
+
+        await Promise.all(products.map((product) => {
+
+            const area = Number(product.area ?? (product.base * product.height) ?? 0);
+            const convertedQuantity = Number(product.currentStock) * area;
+
+            return db.product.update({
+                where: { id: product.id },
+                data: {
+                    convertedQuantity
+                }
+            });
+        }));
+
+    } catch (err) {
+
+        throw new ProductQuantityUpdateDatabaseError();
+    }
+};
+
+export const updateProductCurrentStock = async ({
+    tx,
+    grouped,
+    movementType
+}) => {
+
+    const db = tx || prisma;
+
+    try {
+        await Promise.all(
+            Object.entries(grouped).map(([productId, quantity]) =>
+                db.product.update({
+                    where: { id: productId },
+                    data: {
+                        currentStock: {
+                            [movementType === REFERENCE_MOVEMENT_IN ? 'increment' : 'decrement']: quantity
+                        }
+                    }
+                })
+            )
+        );
+
+    } catch (err) {
+
+        throw new ProductCurrentStockUpdateDatabaseError();
+    }
+}

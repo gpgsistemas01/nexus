@@ -1,6 +1,32 @@
 <% const form = {
     id: 'goodsReceiptForm',
     canApprove: false,
+    invoice: {
+        radios: [
+            {
+                id: 'invoiceRadio',
+                type: 'radio',
+                name: 'isInvoiced',
+                label: 'Factura',
+                value: 'invoice',
+                isChecked: true
+            },
+            {
+                id: 'noInvoiceRadio',
+                type: 'radio',
+                name: 'isInvoiced',
+                label: 'Remisión',
+                value: 'none',
+                isChecked: false
+            }
+        ],
+        input: {
+            id: 'invoiceInput',
+            name: 'invoice',
+            type: 'text',
+            label: 'Número de Factura'
+        }
+    },
     selects: [
         {
             id: 'supplierInput',
@@ -16,13 +42,6 @@
         }
     ],
     inputs: [
-        {
-            id: 'invoiceInput',
-            name: 'invoice',
-            type: 'text',
-            label: 'Número de Factura',
-            col: '6'
-        },
         {
             id: 'receptionDateInput',
             name: 'receptionDate',

@@ -152,9 +152,9 @@ export const createSupplierProduct = async ({
     skuSupllier
 }) => {
 
-    try {
+    const db = tx || prisma;
 
-        const db = tx || prisma;
+    try {
 
         return db.supplierProduct.create({
             data: {
@@ -176,9 +176,9 @@ export const deleteSupplierProduct = async ({
     supplierId
 }) => {
 
-    try {
+    const db = tx || prisma;
 
-        const db = tx || prisma;
+    try {
 
         return await db.supplierProduct.delete({
             where: {

@@ -11,7 +11,6 @@ import { openModal } from "../../ui/modalUI.js";
 
 const modalId = '#goodsIssueModal';
 const formId = '#goodsIssueForm';
-const backSelector = `#backBtn-${modalId.replace('#', '')}`;
 
 const context = window.GOODS_ISSUE_CONTEXT || {};
 let leftAction = null;

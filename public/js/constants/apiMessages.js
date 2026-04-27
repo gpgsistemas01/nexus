@@ -40,17 +40,22 @@ export const errorMessages = {
     // 🔑 PASSWORD
     PASSWORD_REQUIRED: 'La contraseña es requerida.',
     PASSWORD_INVALID_TYPE: 'La contraseña debe ser texto.',
-    PASSWORD_NEEDS_NUMBER: 'Debe contener al menos un número.',
-    PASSWORD_NEEDS_UPPERCASE: 'Debe contener al menos una mayúscula.',
-    PASSWORD_INVALID_FORMAT: 'Debe contener al menos un carácter especial.',
-    PASSWORD_TOO_SHORT: 'Debe tener al menos 8 caracteres.',
-    PASSWORD_TOO_LONG: 'No debe exceder 50 caracteres.',
+    PASSWORD_NEEDS_NUMBER: 'La contrañse debe contener al menos un número.',
+    PASSWORD_NEEDS_UPPERCASE: 'La contraseña debe contener al menos una mayúscula.',
+    PASSWORD_INVALID_FORMAT: 'La contraseña debe contener al menos un carácter especial.',
+    PASSWORD_TOO_SHORT: 'La contraseña debe tener al menos 8 caracteres.',
+    PASSWORD_TOO_LONG: 'La contraseña no debe exceder 50 caracteres.',
 
     // 🧑 NAME
     NAME_REQUIRED: 'El nombre es requerido.',
     NAME_INVALID_TYPE: 'El nombre debe ser texto.',
     NAME_TOO_LONG: (meta) => `El nombre no debe exceder ${meta.value} caracteres.`,
-    NAME_INVALID_FORMAT: 'Contiene caracteres no válidos.',
+    NAME_INVALID_FORMAT: 'El nombre contiene caracteres no válidos.',
+
+    INVOICE_REQUIRED: 'El número de factura es requerido.',
+    INVOICE_INVALIDA_TYPE: 'El número de factura debe ser texto.',
+    INVOICE_TOO_LONG: (meta) => `El número de factura no debe exceder ${meta.value} caracteres.`,
+    INVOICE_INVALIDA_FORMAT: 'El número de factura debe contener letras, números y guiones',
 
     // 💰 UNIT COST
     UNIT_COST_BY_QUANTITY_REQUIRED: 'El costo por rollo s/ IVA es requerido.',
@@ -77,6 +82,9 @@ export const errorMessages = {
     // OBSERVATIONS
     OBSERVATIONS_INVALID_TYPE: 'Las observaciones deben ser texto.',
     OBSERVATIONS_TOO_LONG: 'Las observaciones no deben exceder más de 50 caracteres.',
+
+    INVOICED_REQUIRED: 'El tipo de factura debe ser seleccionado.',
+    INVOICED_INVALID_BOOLEAN: 'El estado de la factura debe ser verdadero o falso.',
 
     // 🔘 ACTIVE
     ACTIVE_REQUIRED: 'El estado activo es requerido.',
@@ -108,6 +116,7 @@ export const errorMessages = {
     PRODUCT_NOT_FOUND: 'Producto no encontrado.',
     PRODUCT_CREATE_DB_ERROR: 'Error de base de datos al crear el producto.',
     PRODUCT_UPDATE_DB_ERROR: 'Error de base de datos al editar el producto.',
+    PRODUCT_AREA_FIND_DB_ERROR: 'Error de base de datos al buscar el área del producto.',
     SUPPLIER_PRODUCT_CREATE_DB_ERROR: 'Error de base de datos al relacionar el producto a un proveedor.',
     SUPPLIER_PRODUCT_DELETE_DB_ERROR: 'Error de base de datos al eliminar la relación entre producto y proveedor.',
     UNIT_MEASURE_FIND_DB_ERROR: 'Error de base de datos al buscar la unidad.',
@@ -119,7 +128,11 @@ export const errorMessages = {
     PROFILE_NOT_FOUND: 'Perfil no encontrado.',
     SUPPLIER_NOT_FOUND: 'Proveedor no encontrado.',
     SUPPLIER_CODE_NOT_FOUND: 'Código del proveedor no encontrado.',
+    SUPPLIER_FIND_DB_ERROR: 'Error de base de datos al buscar el proveedor',
+    CUPPLIER_CREATE_DB_ERROR: 'Error de base de datos al crear el proveedor',
     SUPPLIER_UPDATE_DB_ERROR: 'Error de base de datos al editar el proveedor.',
+    PROFILE_FIND_DB_ERROR: 'Error de base de datos al buscar el perfil.',
+    REFERENCE_NUMBER_UPDATE_DB_ERROR: 'Error de base de datos al actualizar el folio.',
     UNIT_MEASURE_NOT_FOUND: 'Unidad no encontrada.',
     PRESENTATION_NOT_FOUND: 'Presentación no encontrada.',
 };

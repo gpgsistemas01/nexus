@@ -1,73 +1,20 @@
 import {
     ProfileReceivedByNotFound,
     SupplierNotFound
-} from "../../errors/warehouse/goodsReceiptError.js";
-import { prisma } from "../../lib/prisma.js";
-import { getDepartmentByProfileId } from "../admin/userService.js";
-import { generateReferenceNumber } from "../document/referenceNumberService.js";
-import { findProfileById } from "../admin/profileService.js";
-import { applyInventoryMovement } from "../inventory/movementService.js";
+} from "../../../errors/warehouse/goodsReceiptError.js";
+import { prisma } from "../../../lib/prisma.js";
+import { getDepartmentByProfileId } from "../../admin/userService.js";
+import { generateReferenceNumber } from "../../document/referenceNumberService.js";
+import { findProfileById } from "../../admin/profileService.js";
+import { applyInventoryMovement } from "../../inventory/movementService.js";
+import { findUniqueSupplier } from "../supplierService.js";
+import { buildGoodsReceiptDetails } from "./goodsReceiptsHelpers.js";
+import { updateConvertedQuantityByCurrentStock } from "../products/productService.js";
 
 const REFERENCE_NUMBER_TYPE = 'REC';
-const REFERENCE_TYPE_GOODS_RECEIPT = 'GOODS_RECEIPT';
 const MOVEMENT_TYPE_IN = 'IN';
 const STATUS_CONFIRMED = 'Confirmada';
-const IVA_RATE = 1.16;
 
-const roundTo = (value, decimals = 2) => {
-
-    const factor = 10 ** decimals;
-    return Math.round((Number(value) + Number.EPSILON) * factor) / factor;
-};
-
-const buildGoodsReceiptDetails = async (tx, details) => {
-
-    const productIds = details.map(d => d.productId);
-
-    const products = await tx.product.findMany({
-        where: {
-            id: {
-                in: productIds
-            }
-        },
-        select: {
-            id: true,
-            area: true
-        }
-    });
-
-    const productMap = new Map(products.map(p => [p.id, p]));
-
-    return details.map(({ productId, quantity, unitCostByQuantity }) => {
-
-        const product = productMap.get(productId);
-
-        if (!product) {
-            throw new Error(`Producto no encontrado: ${productId}`);
-        }
-
-        const area = roundTo(product.area ?? 0);
-        const normalizedQuantity = Number(quantity);
-        const normalizedUnitCostByQuantity = Number(unitCostByQuantity);
-        const netPurchaseAmount = roundTo(normalizedQuantity * normalizedUnitCostByQuantity);
-        const grossPurchaseAmount = roundTo(netPurchaseAmount * IVA_RATE);
-        const totalArea = roundTo(area * normalizedQuantity);
-        const unitCostByArea = totalArea > 0
-            ? roundTo(netPurchaseAmount / totalArea)
-            : 0;
-
-        return {
-            productId,
-            quantity: normalizedQuantity,
-            area,
-            totalArea,
-            unitCostByQuantity: normalizedUnitCostByQuantity,
-            unitCostByArea,
-            netPurchaseAmount,
-            grossPurchaseAmount
-        };
-    });
-}
 
 export const findAllGoodsReceipts = async ({
     skip = 0,
@@ -149,65 +96,21 @@ export const findAllGoodsReceipts = async ({
     };
 };
 
-const validateGoodsReceiptRelations = async ({ receivedById, supplierId }) => {
-
-    const [supplier, receivedBy] = await Promise.all([
-        prisma.supplier.findUnique({
-            where: { id: supplierId }
-        }),
-        prisma.profile.findUnique({
-            where: { id: receivedById }
-        })
-    ]);
-
-    if (!supplier) throw new SupplierNotFound();
-    if (!receivedBy) throw new ProfileReceivedByNotFound();
-};
-
-const updateConvertedQuantityByCurrentStock = async ({ tx, productIds }) => {
-
-    const uniqueProductIds = [...new Set(productIds)];
-
-    if (!uniqueProductIds.length) return;
-
-    const products = await tx.product.findMany({
-        where: {
-            id: {
-                in: uniqueProductIds
-            }
-        },
-        select: {
-            id: true,
-            currentStock: true,
-            area: true,
-            base: true,
-            height: true
-        }
-    });
-
-    await Promise.all(products.map((product) => {
-
-        const area = Number(product.area ?? (product.base * product.height) ?? 0);
-        const convertedQuantity = Number(product.currentStock) * area;
-
-        return tx.product.update({
-            where: { id: product.id },
-            data: {
-                convertedQuantity
-            }
-        });
-    }));
-};
-
 export const createGoodsReceipt = async ({ goodsReceiptDto }) => {
-
-    const { receivedById, supplierId, details, ...goodsReceiptData } = goodsReceiptDto;
-
-    await validateGoodsReceiptRelations({ receivedById, supplierId });
 
     const result = await prisma.$transaction(async (tx) => {
 
-        await findProfileById({ tx, id: receivedById });
+        const { receivedById, supplierId, details, ...goodsReceiptData } = goodsReceiptDto;
+
+        await findUniqueSupplier({
+            tx,
+            id: supplierId
+        });
+
+        await findProfileById({ 
+            tx, 
+            id: receivedById 
+        });
 
         const processedDetails = await buildGoodsReceiptDetails(tx, details);
 
@@ -252,6 +155,9 @@ export const createGoodsReceipt = async ({ goodsReceiptDto }) => {
                         }
                     }))
                 }
+            },
+            include: {
+                details: true
             }
         });
 
@@ -261,6 +167,7 @@ export const createGoodsReceipt = async ({ goodsReceiptDto }) => {
             details: goodsReceipt.details,
             movementType: MOVEMENT_TYPE_IN
         });
+
         await updateConvertedQuantityByCurrentStock({
             tx,
             productIds: impactedProductIds

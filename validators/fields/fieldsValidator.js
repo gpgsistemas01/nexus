@@ -5,6 +5,7 @@ const numberRegex = /\d/;
 const UppercaseRegex = /[A-Z]/;
 const whitespaceRegex = /^\S+$/;
 const usernameRegex = /^[a-zA-Z0-9_]+$/;
+const invoiceRegex = /^[a-zA-Z0-9\-]+$/;
 const passwordRegex = /^[A-Za-z0-9!@#\$%\^&\*]+$/;
 const nameRegex = /^[\p{L}0-9]+(?:[ '\-.,:;()¿?¡!][\p{L}0-9]+)*[.,:;()¿?¡!]*$/u;
 
@@ -38,6 +39,18 @@ export const validateName = (maxLength = 50) =>
         .matches(nameRegex).withMessage(errorMap['name'].INVALID_FORMAT)
 ;
 
+export const validateInvoice = (maxLength = 50) =>
+    body('invoice')
+        .if((value, { req }) => {
+            const val = req.body.isInvoiced;
+            return val === true || val === 'true'
+        })
+        .notEmpty().withMessage(errorMap['invoice'].REQUIRED)
+        .isString().withMessage(errorMap['invoice'].INVALID_TYPE)
+        .isLength({ max: maxLength }).withMessage(errorMap['invoice'].TOO_LONG(maxLength))
+        .matches(invoiceRegex).withMessage(errorMap['invoice'].INVALID_FORMAT)
+;
+
 export const validateText = (fieldName, maxLength) =>
     body(fieldName)
         .trim()
@@ -47,10 +60,10 @@ export const validateText = (fieldName, maxLength) =>
         .matches(nameRegex).withMessage(errorMap['name'].INVALID_FORMAT)
 ;
 
-export const validateIsActive = 
-    body('isActive')
-        .notEmpty().withMessage(errorMap['isActive'].REQUIRED)
-        .isBoolean().withMessage(errorMap['isActive'].INVALID_BOOLEAN)
+export const validateBoolean = (fieldName) =>
+    body(fieldName)
+        .exists().withMessage(errorMap[fieldName].REQUIRED)
+        .isBoolean().withMessage(errorMap[fieldName].INVALID_BOOLEAN)
         .toBoolean()
 ;
 

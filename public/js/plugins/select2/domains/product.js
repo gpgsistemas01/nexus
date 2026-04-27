@@ -32,7 +32,7 @@ const initProductSelect = ({
             return {
                 results: list.map(p => ({
                     id: p.id,
-                    text: p.name,
+                    text: `${ p.name } (${ p.base } x ${ p.height })`,
                     presentation: p.presentation.name,
                     unitMeasure: p.unitMeasure.name,
                     base: p.base,
@@ -105,7 +105,7 @@ const attachProductHandler = ({
                         params: {
                             data: {
                                 id: createdProduct.id,
-                                text: createdProduct.name,
+                                text: `${ createdProduct.name } (${ createdProduct.base } x ${ createdProduct.height })`,
                                 presentation: createdProduct.presentation.name,
                                 unitMeasure: createdProduct.unitMeasure.name,
                                 base: createdProduct.base,

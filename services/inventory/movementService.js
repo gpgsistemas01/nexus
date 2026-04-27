@@ -1,14 +1,13 @@
 import { prisma } from "../../lib/prisma.js";
+import { updateProductCurrentStock } from "../warehouse/products/productService.js";
 
-const REFERENCE_MOVEMENT_IN = 'IN';
 const REFERENCE_TYPE_GOODS_RECEIPT = 'GOODS_RECEIPT';
 const REFERENCE_TYPE_GOODS_ISSUE = 'GOODS_ISSUE';
 const REFERENCE_TYPE_PURCHASE_REQUISITION = 'PURCHASE_REQUISITION';
 
 export const applyInventoryMovement = async ({ 
     tx, 
-    goodsReceiptId, 
-    referenceType,
+    goodsReceiptId,
     details, 
     movementType 
 }) => {
@@ -48,18 +47,11 @@ export const applyInventoryMovement = async ({
         grouped[detail.productId] = (grouped[detail.productId] || 0) + detail.quantity;
     }
 
-    await Promise.all(
-        Object.entries(grouped).map(([productId, quantity]) =>
-            db.product.update({
-                where: { id: productId },
-                data: {
-                    currentStock: {
-                        [movementType === REFERENCE_MOVEMENT_IN ? 'increment' : 'decrement']: quantity
-                    }
-                }
-            })
-        )
-    );
+    await updateProductCurrentStock({
+        tx,
+        grouped,
+        movementType
+    });
 
     return movement.details.map((detail) => detail.productId);
 }

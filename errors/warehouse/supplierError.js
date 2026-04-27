@@ -14,6 +14,20 @@ export class SupplierCodeNotFound extends AppError {
     }
 }
 
+export class SupplierFindDatabaseError extends AppError {
+
+    constructor () {
+        super('Error de base de datos al buscar el proveedor', 'SUPPLIER_FIND_DB_ERROR', 500);
+    }
+}
+
+export class SupplierCreateDatabaseError extends AppError {
+
+    constructor () {
+        super('Error de base de datos al crear el proveedor', 'SUPPLIER_CREATE_DB_ERROR', 500);
+    }
+}
+
 export class SupplierUpdateDatabaseError extends AppError {
 
     constructor () {

@@ -27,7 +27,7 @@ export const createProductDatatable = (context) => {
     const columns = [
         { 
             data: null, 
-            title: 'Nombre',
+            title: 'Material',
             render: (data) => `${ data.name } || ${ data.supplier.code } - ${ data.supplier.tradeName }`
         },
         { data: 'base', title: 'Base' },

@@ -3,19 +3,37 @@
     canApprove: true,
     selects: [
         {
+            id: 'salesAdvisorInput',
+            name: 'salesAdvisorId',
+            class: 'sales-advisor-select',
+            col: '6'
+        },
+        {
+            id: 'clientInput',
+            name: 'clientId',
+            class: 'client-select',
+            col: '6'
+        },
+        {
+            id: 'departmentInput',
+            name: 'departmentId',
+            class: 'department-select',
+            col: '6'
+        },
+        {
             id: 'requesterInput',
             name: 'requesterId',
             class: 'request-select',
             col: '6'
-        },
-        {
-            id: 'projectInput',
-            name: 'projectId',
-            class: 'project-select',
-            col: '6'
         }
     ],
     inputs: [
+        {
+            id: 'projectNumber',
+            name: 'projectNumber',
+            type: 'text',
+            label: 'Número de proyecto'
+        },
         {
             id: 'observationsInput',
             name: 'observations',

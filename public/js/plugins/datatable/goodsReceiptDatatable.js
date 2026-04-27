@@ -2,6 +2,7 @@ import { openGoodsReceiptModal } from "../../pages/warehouse/goodsReceiptsPage.j
 import { createDataTable, refreshProductTable } from "./baseDatatable.js";
 import { GOODS_RECEIPTS_API_ROUTE } from "../../services/warehouse/goodsReceiptService.js";
 import { initMdbWrapperInput, updateMdbWrapperInput } from "../mdb/baseInstance.js";
+import { updateTotals } from "../../ui/formUI.js";
 
 export let details = [];
 const selectorProductTable = '#productTable';
@@ -59,16 +60,22 @@ export const initDetailsGoodsReceiptTable = (mode) => {
     }
 
     const columns = [
-        { data: 'name', title: 'Producto' },
+        { 
+            data: null, 
+            title: 'Material',
+            render: (data, type, row) => `${ row.name } (${ row.base } x ${ row.height })`,
+        },
         { data: 'base', title: 'Base' },
         { data: 'height', title: 'Altura' },
-        { data: 'area', title: 'm2' },
         { data: 'quantity', title: 'Cantidad' },
-        { data: 'unitCostByQuantity', title: 'Costo por Rollo s/ IVA' },
+        { data: 'presentation', title: 'Presentación' },
+        { data: 'totalArea', title: 'm2 Totales' },
+        { data: 'unitMeasure', title: 'Unidad' },
         { data: 'unitCostByArea', title: 'Costo m2' },
+        { data: 'area', title: 'm2' },
+        { data: 'unitCostByQuantity', title: 'Costo por Rollo s/ IVA' },
         { data: 'netPurchaseAmount', title: 'Valor de Compra s/ IVA' },
         { data: 'grossPurchaseAmount', title: 'Valor de Compra c/ IVA' },
-        { data: 'totalArea', title: 'm2 Totales' },
     ];
 
     if (mode !== 'view') columns.push({
@@ -99,34 +106,12 @@ $(selectorProductTable).on('click', '.delete-btn', function () {
 
     details.splice(index, 1);
 
-    const totalQuantityEl = document.querySelector('#totalQuantityDisplayInput');
-    const totalNetPurchaseAmountEl = document.querySelector('#totalNetPurchaseAmountDisplayInput');
-    const totalGrossPurchaseAmountEl = document.querySelector('#totalGrossPurchaseAmountDisplayInput');
-
-    let totalQuantity = Number(totalQuantityEl.value) || 0;
-    let totalNetPurchaseAmount = Number(totalNetPurchaseAmountEl.value) || 0;
-    let totalGrossPurchaseAmount = Number(totalGrossPurchaseAmountEl.value) || 0;
-
-    totalQuantity -= product.quantity;
-    totalNetPurchaseAmount -= product.netPurchaseAmount;
-    totalGrossPurchaseAmount -= product.grossPurchaseAmount;
-
-    const instanceTotalQuantity = initMdbWrapperInput({
-        selector: '#totalQuantityDisplayInput',
-        value: totalQuantity
+    updateTotals({
+        quantity: product.quantity,
+        net: product.netPurchaseAmount,
+        gross: product.grossPurchaseAmount,
+        operation: 'substract'
     });
-    const instanceTotalNetPurchaseAmount = initMdbWrapperInput({
-        selector: '#totalNetPurchaseAmountDisplayInput',
-        value: totalNetPurchaseAmount
-    });
-    const instanceTotalGrossPurchaseAmount = initMdbWrapperInput({
-        selector: '#totalGrossPurchaseAmountDisplayInput',
-        value: totalGrossPurchaseAmount
-    });
-
-    updateMdbWrapperInput(instanceTotalQuantity);
-    updateMdbWrapperInput(instanceTotalNetPurchaseAmount);
-    updateMdbWrapperInput(instanceTotalGrossPurchaseAmount);
 
     refreshProductTable(details);
 });

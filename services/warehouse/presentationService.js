@@ -42,19 +42,22 @@ export const findUniquePresentation = async ({
     id
 }) => {
 
+    const db = tx || prisma;
+    let presentation;
+
     try {
 
-        const db = tx || prisma;
-
-        const presentation = await db.presentation.findUnique({
+        presentation = await db.presentation.findUnique({
             where: { id },
             select: { id: true }
         });
-
-        if (!presentation) throw new PresentationNotFound();
 
     } catch (err) {
 
         throw new PresentationFindDatabaseError();
     }
+
+    if (!presentation) throw new PresentationNotFound();
+
+    return presentation;
 }

@@ -93,6 +93,22 @@ const buttons = {
 
         <div class="modal-body dark">
             <form id="<%= form.id %>" class="row g-3" novalidate>
+                <% if (form.invoice) { %>
+                    <div class="row g-2">
+                        <div class="col-6 mb-2">
+                            <label class="form-label">Tipo de comprobante</label>
+
+                            <%- include('./checkbox', { input: form.invoice.radios[0] }) %>
+
+                            <%- include('./checkbox', { input: form.invoice.radios[1] }) %>
+                        </div>
+
+                        <div id="invoiceContainer" class="col-6">
+                            <%- include('./outlineInput', { input: form.invoice.input }) %>
+                        </div>
+                    </div>
+                <% } %>
+
                 <% if (form.selects) { %>
                     <%- include('./selectList', { inputs: form.selects }) %>
                 <% } %>

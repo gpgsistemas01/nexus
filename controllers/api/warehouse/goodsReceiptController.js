@@ -3,7 +3,7 @@ import { successCodeMessages } from "../../../messages/codeMessages.js";
 import {
     createGoodsReceipt,
     findAllGoodsReceipts
-} from "../../../services/warehouse/goodsReceiptService.js";
+} from "../../../services/warehouse/goodsReceipts/goodsReceiptService.js";
 import {
     createStockNotification,
     notifyProductStockStatusChanges,
@@ -40,35 +40,39 @@ export const registerGoodsReceipt = async (req, res) => {
     const { goodsReceipt, impactedProductIds } = await createGoodsReceipt({
         goodsReceiptDto: sanitizedGoodsReceiptDto
     });
-    const productStockNotifications = await notifyProductStockStatusChanges({
-        productIds: impactedProductIds || [],
-        userId: req.userId
-    });
-    const restoredProductsCount = new Set(
-        productStockNotifications
-            .filter((notification) => notification.entityType === 'product-stock-restored')
-            .map((notification) => notification.entityId)
-    ).size;
 
-    const notification = await createStockNotification({
-        title: 'Recepción de compra',
-        message: `La recepción ${goodsReceipt.referenceNumber} restauró el stock de ${restoredProductsCount} producto(s).`,
-        type: 'info',
-        referenceNumber: goodsReceipt.referenceNumber,
-        entityId: goodsReceipt.id,
-        entityType: 'goods-receipt',
-        userId: null,
-        departmentId: null
-    });
-
-    emitStockUpdated({ source: 'goods-receipt-create', notification });
-
-    for (const productNotification of productStockNotifications) {
-        emitStockUpdated({ source: 'product-stock-status', notification: productNotification });
-    }
-
-    return res.status(200).json({
+    res.status(200).json({
         goodsReceipt,
         code: successCodeMessages.CREATED_GOODS_RECEIPT
+    });
+
+    (async () => {
+
+        const productStockNotifications = await notifyProductStockStatusChanges({
+            productIds: impactedProductIds || [],
+            userId: req.userId
+        });
+        const restoredProductsCount = new Set(
+            productStockNotifications
+                .filter((notification) => notification.entityType === 'product-stock-restored')
+                .map((notification) => notification.entityId)
+        ).size;
+
+        const notification = await createStockNotification({
+            title: 'Recepción de compra',
+            message: `La recepción ${goodsReceipt.referenceNumber} restauró el stock de ${restoredProductsCount} producto(s).`,
+            type: 'info',
+            referenceNumber: goodsReceipt.referenceNumber,
+            entityId: goodsReceipt.id,
+            entityType: 'goods-receipt',
+            userId: null,
+            departmentId: null
+        });
+
+        emitStockUpdated({ source: 'goods-receipt-create', notification });
+
+        for (const productNotification of productStockNotifications) {
+            emitStockUpdated({ source: 'product-stock-status', notification: productNotification });
+        }
     });
 }

@@ -1,3 +1,11 @@
+import { initMdbWrapperInput, updateMdbWrapperInput } from "../plugins/mdb/baseInstance.js";
+
+const TOTAL_FIELDS = {
+    quantity: '#totalQuantityDisplayInput',
+    net: '#totalNetPurchaseAmountDisplayInput',
+    gross: '#totalGrossPurchaseAmountDisplayInput',
+}
+
 export const toggleErrorMessages = (form, errors) => {
 
     Object.entries(errors).forEach(([field, message]) => {
@@ -105,7 +113,51 @@ export const toggleButtons = ({
 }) => {
 
     const isView = mode === 'view';
-    const canApprove = !showActions || !(isView && status === 'Abierta');
     document.querySelector('.add-product-container').classList.toggle('d-none', isView);
-    document.querySelector('.approve-container').classList.toggle('d-none', canApprove);
+    const approveContainer = document.querySelector('.approve-container');
+
+    if (approveContainer) {
+        
+        const canApprove = !showActions || !(isView && status === 'Abierta');
+        approveContainer.classList.toggle('d-none', canApprove);
+    }
+}
+
+export const updateTotals = ({
+    quantity = 0,
+    net = 0,
+    gross = 0,
+    operation
+}) => {
+
+    const totalQuantityEl = document.querySelector(TOTAL_FIELDS.quantity);
+    const totalNetPurchaseAmountEl = document.querySelector(TOTAL_FIELDS.net);
+    const totalGrossPurchaseAmountEl = document.querySelector(TOTAL_FIELDS.gross);
+
+    let totalQuantity = Number(totalQuantityEl.value) || 0;
+    let totalNetPurchaseAmount = Number(totalNetPurchaseAmountEl.value) || 0;
+    let totalGrossPurchaseAmount = Number(totalGrossPurchaseAmountEl.value) || 0;
+
+    const op = operation === 'add' ? 1 : -1;
+
+    totalQuantity += quantity * op;
+    totalNetPurchaseAmount += net * op;
+    totalGrossPurchaseAmount += gross * op;
+
+    const instanceTotalQuantity = initMdbWrapperInput({
+        selector: TOTAL_FIELDS.quantity,
+        value: totalQuantity
+    });
+    const instanceTotalNetPurchaseAmount = initMdbWrapperInput({
+        selector: TOTAL_FIELDS.net,
+        value: totalNetPurchaseAmount
+    });
+    const instanceTotalGrossPurchaseAmount = initMdbWrapperInput({
+        selector: TOTAL_FIELDS.gross,
+        value: totalGrossPurchaseAmount
+    });
+
+    updateMdbWrapperInput(instanceTotalQuantity);
+    updateMdbWrapperInput(instanceTotalNetPurchaseAmount);
+    updateMdbWrapperInput(instanceTotalGrossPurchaseAmount);
 }

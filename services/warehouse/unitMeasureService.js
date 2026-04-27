@@ -42,19 +42,22 @@ export const findUniqueUnitMeasure = async ({
     id
 }) => {
 
+    const db = tx || prisma;
+    let unit;
+
     try {
 
-        const db = tx || prisma;
-
-        const unit = await db.unitMeasure.findUnique({
+        unit = await db.unitMeasure.findUnique({
             where: { id },
             select: { id: true }
         });
-
-        if (!unit) throw new UnitMeasureNotFound();
 
     } catch (err) {
 
         throw new UnitMeasureFindDatabaseError();
     }
+
+    if (!unit) throw new UnitMeasureNotFound();
+
+    return unit;
 }

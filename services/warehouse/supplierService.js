@@ -1,4 +1,4 @@
-import { SupplierCodeFindDatabaseError, SupplierCodeNotFound, SupplierNotFound, SupplierUpdateDatabaseError } from "../../errors/warehouse/supplierError.js";
+import { SupplierCodeFindDatabaseError, SupplierCodeNotFound, SupplierCreateDatabaseError, SupplierFindDatabaseError, SupplierNotFound, SupplierUpdateDatabaseError } from "../../errors/warehouse/supplierError.js";
 import { prisma } from "../../lib/prisma.js";
 import { cleanSearchTerm } from "../../utils/formattersUtils.js";
 import { incrementReferenceNumberCounter } from "../document/referenceNumberService.js";
@@ -66,52 +66,85 @@ export const findAllSuppliers = async ({
     };
 };
 
+export const findUniqueSupplier = async ({
+    tx,
+    id
+}) => {
+
+    const db = tx || prisma;
+    let supplier;
+
+    try {
+
+        supplier = await db.supplier.findUnique({
+            where: { id },
+            select: { id: true }
+        });
+
+    } catch (err) {
+
+        throw new SupplierFindDatabaseError();
+    }
+
+    if (!supplier) throw new SupplierNotFound();
+
+    return supplier;
+}
+
 export const findUniqueSupplierCode = async ({
     tx,
     id
 }) => {
 
     const db = tx || prisma;
+    let supplier;
 
     try {
 
-        const supplier = await db.supplier.findUnique({
+        supplier = await db.supplier.findUnique({
             where: { id },
             select: { code: true }
         });
-
-        if (!supplier) throw new SupplierCodeNotFound();
-
-        return supplier;
 
     } catch (err) {
 
         throw new SupplierCodeFindDatabaseError();
     }
+
+    if (!supplier) throw new SupplierCodeNotFound();
+
+    return supplier;
 }
 
 export const createSupplier = async (supplierDto) => {
 
-    const supplier = await prisma.$transaction(async (tx) => {
+    try {
 
-        const counter = await incrementReferenceNumberCounter({
-            type: 'PRO',
-            tx
+        const supplier = await prisma.$transaction(async (tx) => {
+
+            const counter = await incrementReferenceNumberCounter({
+                type: 'PRO',
+                tx
+            });
+
+            const codeNumber = counter.counter;
+            const generatedCode = numberToSupplierCode(codeNumber - 1);
+
+            return tx.supplier.create({
+                data: {
+                    ...supplierDto,
+                    codeNumber,
+                    code: generatedCode,
+                }
+            });
         });
 
-        const codeNumber = counter.counter;
-        const generatedCode = numberToSupplierCode(codeNumber - 1);
+        return supplier;
 
-        return tx.supplier.create({
-            data: {
-                ...supplierDto,
-                codeNumber,
-                code: generatedCode,
-            }
-        });
-    });
+    } catch (err) {
 
-    return supplier;
+        throw new SupplierCreateDatabaseError();
+    }
 };
 
 export const updateSupplier = async (supplierDto, id) => {

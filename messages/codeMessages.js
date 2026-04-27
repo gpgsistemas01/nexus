@@ -56,6 +56,15 @@ export const errorMap = {
         }),
         INVALID_FORMAT: 'NAME_INVALID_FORMAT'
     },
+    invoice: {
+        REQUIRED: 'INVOICE_REQUIRED',
+        INVALID_TYPE: 'INVOICE_INVALID_TYPE',
+        TOO_LONG: (value) => ({
+            code: 'INVOICE_TOO_LONG',
+            meta: { value }
+        }),
+        INVALID_FORMAT: 'INVOICE_INVALID_FORMAT'
+    },
     unitCostByQuantity: {
         REQUIRED: 'UNIT_COST_BY_QUANTITY_REQUIRED',
         INVALID_NUMBER: 'UNIT_COST_BY_QUANTITY_INVALID_NUMBER',
@@ -85,6 +94,10 @@ export const errorMap = {
     observations: {
         INVALID_TYPE: 'OBSERVATIONS_INVALID_TYPE',
         TOO_LONG: 'OBSERVATIONS_TOO_LONG'
+    },
+    isInvoiced: {
+        REQUIRED: 'INVOICED_REQUIRED',
+        INVALID_BOOLEAN: 'INVOICED_REQUIRED',
     },
     isActive: {
         REQUIRED: 'ACTIVE_REQUIRED',

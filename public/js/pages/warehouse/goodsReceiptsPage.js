@@ -4,7 +4,7 @@ import { validateGoodsReceiptValidators } from "../../utils/validations/validato
 import { refreshProductTable } from "../../plugins/datatable/baseDatatable.js";
 import { createGoodsReceiptDatatable, details, initDetailsGoodsReceiptTable } from "../../plugins/datatable/goodsReceiptDatatable.js";
 import { initGoodsReceiptFormSelect2, setGoodsReceiptFormSelectOptions } from "../../plugins/select2/modules/goodsReceiptSelect.js";
-import { toggleInputSelectErrors, toggleTableErrors, setFormReadOnly } from "../../ui/formUI.js";
+import { toggleInputSelectErrors, toggleTableErrors, setFormReadOnly, updateTotals, toggleButtons } from "../../ui/formUI.js";
 import { on } from "../../utils/domUtils.js";
 import { formatDateLongWithTime } from "../../utils/formatters.js";
 import { handleSubmit, validateFields } from "../../utils/formUtils.js";
@@ -20,13 +20,31 @@ useForm({
     selector: formId,
     normalizeData: ({ formData }) => {
 
+        formData.isInvoiced = document.querySelector('input[name="isInvoiced"]').checked;
+
+        if (!formData.isInvoiced) delete formData.invoice;
+
         formData.details = details;
     },
     getErrors: (formData) => {
         
+        const allowedUsername = /^[a-zA-Z0-9\-]+$/;
         let errors = {};
 
         errors = validateFields(validateGoodsReceiptValidators, formData);
+
+        if (formData.isInvoiced) {
+
+            if (!formData.invoice) errors.invoice = 'El número de factura es obligatorio';
+            else if (typeof formData.invoice !== 'string') errors.invoice = 'El número de factura no es una cadena de texto';
+            else if (!allowedUsername.test(formData.invoice)) errors.invoice = 'El número de factura debe tener solo letras, números y guiones.';
+            else if (formData.invoice.length > 50) errors.invoice = 'El número de factura no debe exceder los 50 caracteres';
+            else errors.invoice = null;
+
+        } else {
+
+            errors.invoice = null;
+        }
 
         return errors;
     },
@@ -71,6 +89,12 @@ export const openGoodsReceiptModal = ({ mode, data = null }) => {
         modalElement.querySelector('#modalTitle').textContent = 'Registrar compra';
         form.querySelector('#submitBtn').textContent = 'Confirmar';
         form.querySelector('#presentationDisplayInput').value = '';
+
+        toggleButtons({
+            mode,
+            status: 'Abierta',
+            showActions: true
+        });
     }
 
     if (mode === 'view') {
@@ -79,21 +103,31 @@ export const openGoodsReceiptModal = ({ mode, data = null }) => {
         form.querySelector('#receptionDateInput').value = formatDateLongWithTime(data.receptionDate);
         details.push(...data?.details.map(detail => ({
             id: detail.id,
-            name: detail.product.name,
             productId: detail.product.id,
-            quantity: detail.quantity,
-            unitCost: detail.unitCost,
-            amount: detail.amount,
+            name: detail.product.name,
             base: detail.product.base,
             height: detail.product.height,
-            description: detail.description,
-            presentation: detail.product.presentation
+            quantity: detail.quantity,
+            presentation: detail.product.presentation.name,
+            totalArea: detail.totalArea,
+            unitMeasure: detail.product.unitMeasure.name,
+            unitCostByArea: detail.unitCostByArea,
+            area: detail.product.area,
+            unitCostByQuantity: detail.unitCostByQuantity,
+            netPurchaseAmount: detail.netPurchaseAmount,
+            grossPurchaseAmount: detail.grossPurchaseAmount,
         })));
 
         setGoodsReceiptFormSelectOptions(data);
 
         modalElement.querySelector('#modalTitle').textContent = 'Ver compra';
         setFormReadOnly({ form, isReadOnly: true });
+
+        toggleButtons({
+            mode,
+            status: 'Confirmada',
+            showActions: false
+        });
     }
 
     initDetailsGoodsReceiptTable(mode);
@@ -111,6 +145,7 @@ const addProduct = () => {
     const unitCostByQuantity = Number(document.querySelector('#unitCostByQuantityInput').value);
     const base = Number(selectedProduct?.base);
     const height = Number(selectedProduct?.height);
+    const { presentation, unitMeasure } = selectedProduct;
 
     if (!supplierId) {
         alert('Selecciona un proveedor antes de agregar productos.');
@@ -144,6 +179,8 @@ const addProduct = () => {
         height,
         area,
         quantity,
+        unitMeasure,
+        presentation,
         unitCostByQuantity,
         unitCostByArea,
         netPurchaseAmount,
@@ -155,34 +192,12 @@ const addProduct = () => {
     refreshProductTable(details);
     cleanAddedProduct();
 
-    const totalQuantityEl = document.querySelector('#totalQuantityDisplayInput');
-    const totalNetPurchaseAmountEl = document.querySelector('#totalNetPurchaseAmountDisplayInput');
-    const totalGrossPurchaseAmountEl = document.querySelector('#totalGrossPurchaseAmountDisplayInput');
-
-    let totalQuantity = Number(totalQuantityEl.value) || 0;
-    let totalNetPurchaseAmount = Number(totalNetPurchaseAmountEl.value) || 0;
-    let totalGrossPurchaseAmount = Number(totalGrossPurchaseAmountEl.value) || 0;
-
-    totalQuantity += quantity;
-    totalNetPurchaseAmount += netPurchaseAmount;
-    totalGrossPurchaseAmount += grossPurchaseAmount;
-
-    const instanceTotalQuantity = initMdbWrapperInput({
-        selector: '#totalQuantityDisplayInput',
-        value: totalQuantity
+    updateTotals({
+        quantity,
+        net: netPurchaseAmount,
+        gross: grossPurchaseAmount,
+        operation: 'add'
     });
-    const instanceTotalNetPurchaseAmount = initMdbWrapperInput({
-        selector: '#totalNetPurchaseAmountDisplayInput',
-        value: totalNetPurchaseAmount
-    });
-    const instanceTotalGrossPurchaseAmount = initMdbWrapperInput({
-        selector: '#totalGrossPurchaseAmountDisplayInput',
-        value: totalGrossPurchaseAmount
-    });
-
-    updateMdbWrapperInput(instanceTotalQuantity);
-    updateMdbWrapperInput(instanceTotalNetPurchaseAmount);
-    updateMdbWrapperInput(instanceTotalGrossPurchaseAmount);
 }
 
 export const cleanAddedProduct = () => {
@@ -194,3 +209,22 @@ export const cleanAddedProduct = () => {
 }
 
 on('click', '#addProductBtn', addProduct);
+
+const invoiceContainer = document.getElementById('invoiceContainer');
+const invoiceRadios = document.querySelectorAll('input[name="isInvoiced"]');
+
+invoiceRadios.forEach(radio => {
+
+    radio.addEventListener('change', () => {
+
+        if (radio.value === 'invoice' && radio.checked) {
+
+            invoiceContainer.style.display = '';
+            document.getElementById('invoiceInput').value = '';
+
+        } else if (radio.value === 'none' && radio.checked) {
+
+            invoiceContainer.style.display = 'none';
+        }
+    });
+});
