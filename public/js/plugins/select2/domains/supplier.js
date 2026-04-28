@@ -20,7 +20,7 @@ const initSupplierSelect = ({
             return {
                 results: list.map(s => ({
                     id: s.id,
-                    text: `${ s.code } - ${ s.tradeName }`,
+                    text: `${ s.tradeName }`,
                 }))
             };
         },
@@ -58,8 +58,8 @@ const attachSupplierHandler = ({ supplierSelector }) => {
 
                     toggleSupplierOption({
                         selector: supplierSelector,
-                        id: createdsupplier.id,
-                        name: `${ createdsupplier.code } - ${ createdsupplier.tradeName }`
+                        supplierId: createdsupplier.id,
+                        supplierName: `${ createdsupplier.tradeName }`
                     });
                 }
             });
@@ -71,13 +71,13 @@ const attachSupplierHandler = ({ supplierSelector }) => {
 
 export const toggleSupplierOption = ({ 
     selector, 
-    id = null, 
-    name = null
+    supplierId = null, 
+    supplierName = null
 }) => toggleSelectOption({
     selector,
     data: {
-        id,
-        text: name
+        id: supplierId,
+        text: supplierName
     }
 });
 

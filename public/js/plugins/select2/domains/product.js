@@ -30,14 +30,22 @@ const initProductSelect = ({
             const list = data.data || data;
 
             return {
-                results: list.map(p => ({
-                    id: p.id,
-                    text: `${ p.name } (${ p.base } x ${ p.height })`,
-                    presentation: p.presentation.name,
-                    unitMeasure: p.unitMeasure.name,
-                    base: p.base,
-                    height: p.height
-                }))
+                results: list.map(p => {
+
+                    let text;
+
+                    if (!p.base || !p.height) text = p.name;
+                    else text = `${ p.name } (${ p.base } x ${ p.height })`;
+
+                    return {
+                        id: p.id,
+                        text,
+                        presentation: p.presentation.name,
+                        unitMeasure: p.unitMeasure.name,
+                        base: p.base,
+                        height: p.height
+                    }
+                })
             };
         },
         ...(allowCreate && {
@@ -100,12 +108,17 @@ const attachProductHandler = ({
                         }
                     });
 
+                    let text;
+
+                    if (!createdProduct.base || !createdProduct.height) text = name;
+                    else text = `${ createdProduct.name } (${ createdProduct.base } x ${ createdProduct.height })`;
+
                     $(productSelector).trigger({
                         type: 'select2:select',
                         params: {
                             data: {
                                 id: createdProduct.id,
-                                text: `${ createdProduct.name } (${ createdProduct.base } x ${ createdProduct.height })`,
+                                text,
                                 presentation: createdProduct.presentation.name,
                                 unitMeasure: createdProduct.unitMeasure.name,
                                 base: createdProduct.base,

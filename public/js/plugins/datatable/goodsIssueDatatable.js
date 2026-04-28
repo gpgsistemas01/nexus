@@ -112,7 +112,10 @@ export const createGoodsIssueDatatable = (context) => {
     });
 };
 
-export const initDetailsGoodsIssueTable = (mode, status = 'Abierta') => {
+export const initDetailsGoodsIssueTable = (mode, context) => {
+
+    const isWarehouseDepartment = context.department === 'Almacén';
+    const isSystemDepartment = context.department === 'Sistemas';
 
     if ($.fn.DataTable.isDataTable(selectorProductTable)) {
         $(selectorProductTable).DataTable().clear().destroy();
@@ -120,22 +123,21 @@ export const initDetailsGoodsIssueTable = (mode, status = 'Abierta') => {
     }
 
     const columns = [
-        { data: 'name', title: 'Producto' },
-        { data: 'quantity', title: 'Cantidad solicitada' },
-        { 
-            data: 'presentation', 
-            title: 'Unidad',
-            render: (data) => `PIEZA (${ data })`
-        },
+        { data: 'name', title: 'Material' },
+        { data: 'base', title: 'Base' },
+        { data: 'height', title: 'Altura' },
+        { data: 'quantity', title: 'Cantidad' },
+        { data: 'presentation', title: 'Presentación' },
+        { data: 'totalArea', title: 'm2 Totales' },
+        { data: 'unitMeasure', title: 'Unidad' },
     ];
 
-    const showPendingColumns = mode === 'view' && status !== 'Abierta';
-
-    if (showPendingColumns) {
-        columns.push(
-            { data: 'pendingQuantity', title: 'Cantidad pendiente' },
-            { data: 'deliveredQuantity', title: 'Cantidad surtida' }
-        );
+    if (isWarehouseDepartment || isSystemDepartment) {
+        columns.push(...[
+            { data: 'unitCost', title: 'Costo unitario' },
+            { data: 'projectQuantity', title: 'Cantidad de proyecto' },
+            { data: 'difference', title: 'Diferencia' }
+        ]);
     }
 
     if (mode !== 'view') {

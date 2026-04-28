@@ -63,7 +63,17 @@ export const initDetailsGoodsReceiptTable = (mode) => {
         { 
             data: null, 
             title: 'Material',
-            render: (data, type, row) => `${ row.name } (${ row.base } x ${ row.height })`,
+            render: (data, type, row) => {
+
+                let name;
+                const select = document.querySelector('.supplier-select');
+                const supplier = select.options[select.selectedIndex].text;
+
+                if (!row.base || !row.height) name = `${ row.name } || ${ supplier }`;
+                else name = `${ row.name } (${ row.base } x ${ row.height }) || ${ supplier }`;
+
+                return name;
+            },
         },
         { data: 'base', title: 'Base' },
         { data: 'height', title: 'Altura' },

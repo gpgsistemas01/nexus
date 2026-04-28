@@ -166,7 +166,7 @@ export const openGoodsIssueModal = async ({ mode, data = null }) => {
         }
     }
 
-    initDetailsGoodsIssueTable(mode, data?.status?.name);
+    initDetailsGoodsIssueTable(mode, context);
 
     openModal(modalElement);
 };

@@ -46,33 +46,33 @@ export const registerGoodsReceipt = async (req, res) => {
         code: successCodeMessages.CREATED_GOODS_RECEIPT
     });
 
-    (async () => {
+    // (async () => {
 
-        const productStockNotifications = await notifyProductStockStatusChanges({
-            productIds: impactedProductIds || [],
-            userId: req.userId
-        });
-        const restoredProductsCount = new Set(
-            productStockNotifications
-                .filter((notification) => notification.entityType === 'product-stock-restored')
-                .map((notification) => notification.entityId)
-        ).size;
+    //     const productStockNotifications = await notifyProductStockStatusChanges({
+    //         productIds: impactedProductIds || [],
+    //         userId: req.userId
+    //     });
+    //     const restoredProductsCount = new Set(
+    //         productStockNotifications
+    //             .filter((notification) => notification.entityType === 'product-stock-restored')
+    //             .map((notification) => notification.entityId)
+    //     ).size;
 
-        const notification = await createStockNotification({
-            title: 'Recepción de compra',
-            message: `La recepción ${goodsReceipt.referenceNumber} restauró el stock de ${restoredProductsCount} producto(s).`,
-            type: 'info',
-            referenceNumber: goodsReceipt.referenceNumber,
-            entityId: goodsReceipt.id,
-            entityType: 'goods-receipt',
-            userId: null,
-            departmentId: null
-        });
+    //     const notification = await createStockNotification({
+    //         title: 'Recepción de compra',
+    //         message: `La recepción ${goodsReceipt.referenceNumber} restauró el stock de ${restoredProductsCount} producto(s).`,
+    //         type: 'info',
+    //         referenceNumber: goodsReceipt.referenceNumber,
+    //         entityId: goodsReceipt.id,
+    //         entityType: 'goods-receipt',
+    //         userId: null,
+    //         departmentId: null
+    //     });
 
-        emitStockUpdated({ source: 'goods-receipt-create', notification });
+    //     emitStockUpdated({ source: 'goods-receipt-create', notification });
 
-        for (const productNotification of productStockNotifications) {
-            emitStockUpdated({ source: 'product-stock-status', notification: productNotification });
-        }
-    });
+    //     for (const productNotification of productStockNotifications) {
+    //         emitStockUpdated({ source: 'product-stock-status', notification: productNotification });
+    //     }
+    // });
 }

@@ -99,8 +99,11 @@ export const openGoodsReceiptModal = ({ mode, data = null }) => {
 
     if (mode === 'view') {
 
-        form.querySelector('#observationsInput').value = data.observations || '';
-        form.querySelector('#receptionDateInput').value = formatDateLongWithTime(data.receptionDate);
+        if (form.elements.isInvoiced) form.elements.isInvoiced.checked = Boolean(data.isInvoiced);
+        if (Boolean(data.isInvoiced)) form.elements.invoice.value = data.invoice;
+        form.elements.invoice.value = data.invoice || '';
+        form.elements.observations.value = data.observations || '';
+        form.elements.receptionDate.value = formatDateLongWithTime(data.receptionDate);
         details.push(...data?.details.map(detail => ({
             id: detail.id,
             productId: detail.product.id,
@@ -119,6 +122,10 @@ export const openGoodsReceiptModal = ({ mode, data = null }) => {
         })));
 
         setGoodsReceiptFormSelectOptions(data);
+
+        form.elements.totalQuantityDisplayInput.value = data.totalQuantityDisplayInput;
+        form.elements.totalNetPurchaseAmountDisplayInput.value = data.totalNetPurchaseAmountDisplayInput;
+        form.elements.totalGrossPurchaseAmountDisplayInput.value = data.totalGrossPurchaseAmountDisplayInput;
 
         modalElement.querySelector('#modalTitle').textContent = 'Ver compra';
         setFormReadOnly({ form, isReadOnly: true });
@@ -143,8 +150,8 @@ const addProduct = () => {
     const name = selectedProduct?.text || '';
     const quantity = Number(document.querySelector('#quantityInput').value);
     const unitCostByQuantity = Number(document.querySelector('#unitCostByQuantityInput').value);
-    const base = Number(selectedProduct?.base);
-    const height = Number(selectedProduct?.height);
+    const base = selectedProduct?.base ? Number(selectedProduct?.base) : null;
+    const height = selectedProduct?.height ? Number(selectedProduct?.height) : null;
     const { presentation, unitMeasure } = selectedProduct;
 
     if (!supplierId) {
@@ -167,11 +174,23 @@ const addProduct = () => {
         return;
     }
 
-    const area = Number((base * height).toFixed(2));
+    let area;
+    let unitCostByArea;
+
+    if (!base || !height) {
+
+        area = 0;
+        unitCostByArea = 0;
+
+    } else {
+
+        area = Number((base * height).toFixed(2));
+        unitCostByArea = Number((netPurchaseAmount / totalArea).toFixed(2));
+    }
+
     const netPurchaseAmount = Number((quantity * unitCostByQuantity).toFixed(2));
     const grossPurchaseAmount = Number((netPurchaseAmount * 1.16).toFixed(2));
     const totalArea = Number((area * quantity).toFixed(2));
-    const unitCostByArea = Number((netPurchaseAmount / totalArea).toFixed(2));
     const product = {
         productId,
         name,

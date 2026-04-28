@@ -28,7 +28,15 @@ export const createProductDatatable = (context) => {
         { 
             data: null, 
             title: 'Material',
-            render: (data) => `${ data.name } || ${ data.supplier.code } - ${ data.supplier.tradeName }`
+            render: (data, type, row) => {
+
+                let name;
+
+                if (!row.base || !row.height) name = `${ row.name } || ${ row.supplier.tradeName }`;
+                else name = `${ row.name } (${ row.base } x ${ row.height }) || ${ row.supplier.tradeName }`;
+
+                return name;
+            }
         },
         { data: 'base', title: 'Base' },
         { data: 'height', title: 'Altura' },

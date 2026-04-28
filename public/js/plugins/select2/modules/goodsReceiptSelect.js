@@ -55,7 +55,7 @@ export const setGoodsReceiptFormSelectOptions = (data = null) => {
     toggleSupplierOption({
         selector: `${ modalSelector } ${ supplierSelector }`,
         supplierId: data?.supplier?.id,
-        supplierName:`${  data?.supplier?.code } - ${ data?.supplier?.tradeName }`
+        supplierName:`${ data?.supplier?.tradeName }`
     });
 
     toggleProfileOption({
