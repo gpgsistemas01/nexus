@@ -125,7 +125,6 @@ export const openGoodsReceiptModal = ({ mode, data = null }) => {
             totalArea: detail.totalArea,
             unitMeasure: detail.product.unitMeasure.name,
             unitCostByArea: detail.unitCostByArea,
-            area: detail.product.area,
             unitCostByQuantity: detail.unitCostByQuantity,
             netPurchaseAmount: detail.netPurchaseAmount,
             grossPurchaseAmount: detail.grossPurchaseAmount,
@@ -183,18 +182,15 @@ const addProduct = () => {
     }
 
     const netPurchaseAmount = Number((quantity * unitCostByQuantity).toFixed(2));
-    let area;
     let totalArea;
 
     if (!base || !height) {
 
-        area = null;
         totalArea = quantity;
 
     } else {
 
-        area = Number((base * height).toFixed(2));
-        totalArea = Number((area * quantity).toFixed(2));
+        totalArea = Number(((base * height) * quantity).toFixed(2));
     }
 
     const unitCostByArea = Number((netPurchaseAmount / totalArea).toFixed(2));
@@ -204,7 +200,6 @@ const addProduct = () => {
         name,
         base,
         height,
-        area,
         quantity,
         unitMeasure,
         presentation,

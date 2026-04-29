@@ -90,7 +90,6 @@ model Product {
   minStock                    Decimal                           @default(0) @db.Decimal(10, 2)
   base                        Decimal?                           @db.Decimal(10, 3)
   height                      Decimal?                           @db.Decimal(10, 3)
-  area                       Decimal?                           @db.Decimal(12, 3)
   unitCost                    Decimal?                           @db.Decimal(10, 3)
   convertedQuantity Decimal? @db.Decimal(10, 3)
   presentation Presentation @relation(fields: [presentationId], references: [id])

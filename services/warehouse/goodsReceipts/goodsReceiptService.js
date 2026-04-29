@@ -72,7 +72,6 @@ export const findAllGoodsReceipts = async ({
                             isActive: true,
                             base: true,
                             height: true,
-                            area: true,
                             unitCost: true,
                             convertedQuantity: true,
                             presentation: true,

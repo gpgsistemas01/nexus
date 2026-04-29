@@ -236,7 +236,6 @@ async function main() {
         convertedQuantity: 0,
         presentationId: presentationMap.get(row.presentation.trim()) || null,
         unitMeasureId: unitMeasureMap.get(row.unitMeasure.trim()) || null,
-        area: (!row.base || !row.height) ? null : toDecimal(row.base) * toDecimal(row.height)
     }));
 
     if(productParsed.some(p => !p.presentationId || !p.unitMeasureId)) {
