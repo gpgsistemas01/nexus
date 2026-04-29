@@ -43,7 +43,8 @@ export const findAllProductAreas = async ({
             },
             select: {
                 id: true,
-                area: true
+                base: true,
+                height: true
             }
         });
 
@@ -91,13 +92,10 @@ export const createProduct = async (productDto) => {
                 relations
             } = await prepareProductData({ tx, productDto });
 
-            const area = (!rest.base || !rest.height) ? null : rest.base * rest.height;
-
             const createdProduct = await tx.product.create({
                 data: {
                     ...rest,
                     sku,
-                    area,
                     presentation: {
                         connect: { id: relations.presentationId }
                     },
@@ -156,14 +154,11 @@ export const updateProduct = async (productDto, id) => {
                 productId: id
             });
 
-            const area = (!rest.base || !rest.height) ? null : rest.base * rest.height;
-
             const updatedProduct = await tx.product.update({
                 where: { id },
                 data: {
                     ...rest,
                     sku,
-                    area,
                     supplier: {
                         connect: { id: relations.supplierId }
                     },
@@ -215,7 +210,6 @@ export const updateConvertedQuantityByCurrentStock = async ({ tx, productIds }) 
             select: {
                 id: true,
                 currentStock: true,
-                area: true,
                 base: true,
                 height: true
             }
@@ -223,8 +217,12 @@ export const updateConvertedQuantityByCurrentStock = async ({ tx, productIds }) 
 
         await Promise.all(products.map((product) => {
 
-            const area = Number(product.area ?? (product.base * product.height) ?? 0);
-            const convertedQuantity = Number(product.currentStock) * area;
+            const { base, height } = product;
+            const currentStock = Number(product.currentStock) || 0;
+            const hasDimensions = base !== null && height !== null && base > 0 && height > 0;
+            const convertedQuantity = hasDimensions
+                ? currentStock * (base * height)
+                : currentStock;
 
             return db.product.update({
                 where: { id: product.id },

@@ -28,7 +28,9 @@ export const buildGoodsReceiptDetails = async (tx, details) => {
 
         const netPurchaseAmount = roundTo(quantity * unitCostByQuantity);
         const grossPurchaseAmount = roundTo(netPurchaseAmount * IVA_RATE);
-        const totalArea = product.area ? roundTo(product.area * quantity) : quantity;
+        const { base, height } = product;
+        const hasDimensions = base !== null && height !== null && base > 0 && height > 0;
+        const totalArea = hasDimensions ? roundTo((base * height) * quantity) : quantity;
         let unitCostByArea = null;
 
         if (totalArea) unitCostByArea = totalArea > 0 ? roundTo(netPurchaseAmount / totalArea) : 0;
