@@ -136,8 +136,7 @@ export const openGoodsReceiptModal = ({ mode, data = null }) => {
         toggleButtons({
             mode,
             status: 'Confirmada',
-            showActions: false,
-            withoutTotal: false
+            showActions: false
         });
     }
 

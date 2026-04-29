@@ -7,6 +7,29 @@ import { updateTotals } from "../../ui/formUI.js";
 export let details = [];
 const selectorProductTable = '#productTable';
 const selectorTable = '#table';
+const table = document.querySelector(selectorProductTable);
+table.innerHTML = `
+    <thead>
+        <tr>
+            <th rowspan="2">Material</th>
+            <th colspan="2">Medidas</th>
+            <th rowspan="2">Compra</th>
+            <th rowspan="2">Presentación</th>
+            <th colspan="2">Conversión</th>
+            <th rowspan="2">Costo Unitario de Conversión</th>
+            <th rowspan="2">Costo por Presentación</th>
+            <th rowspan="2">Monto s/ IVA</th>
+            <th rowspan="2">Monto c/ IVA</th>
+            <th rowspan="2">Acciones</th>
+        </tr>
+        <tr>
+            <th>Base</th>
+            <th>Altura</th>
+            <th>Cantidad</th>
+            <th>Unidad</th>
+        </tr>
+    </thead>
+`;
 
 export const createGoodsReceiptDatatable = () => {
     
@@ -56,7 +79,6 @@ export const initDetailsGoodsReceiptTable = (mode) => {
 
     if ($.fn.DataTable.isDataTable(selectorProductTable)) {
         $(selectorProductTable).DataTable().clear().destroy();
-        $(selectorProductTable).empty();
     }
 
     const columns = [
@@ -77,15 +99,14 @@ export const initDetailsGoodsReceiptTable = (mode) => {
         },
         { data: 'base', title: 'Base' },
         { data: 'height', title: 'Altura' },
-        { data: 'quantity', title: 'Cantidad' },
+        { data: 'quantity', title: 'Compra' },
         { data: 'presentation', title: 'Presentación' },
-        { data: 'totalArea', title: 'm2 Totales' },
+        { data: 'totalArea', title: 'Cantidad' },
         { data: 'unitMeasure', title: 'Unidad' },
-        { data: 'unitCostByArea', title: 'Costo m2' },
-        { data: 'area', title: 'm2' },
-        { data: 'unitCostByQuantity', title: 'Costo por Rollo s/ IVA' },
-        { data: 'netPurchaseAmount', title: 'Valor de Compra s/ IVA' },
-        { data: 'grossPurchaseAmount', title: 'Valor de Compra c/ IVA' },
+        { data: 'unitCostByArea', title: 'Costo Unitario de Conversión' },
+        { data: 'unitCostByQuantity', title: 'Costo por Presentación' },
+        { data: 'netPurchaseAmount', title: 'Monto s/ IVA' },
+        { data: 'grossPurchaseAmount', title: 'Monto c/ IVA' },
     ];
 
     if (mode !== 'view') columns.push({

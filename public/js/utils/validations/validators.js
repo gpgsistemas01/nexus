@@ -1,5 +1,5 @@
 import { isEmptyOrNull } from "./baseValidations.js";
-import { validateName, validatePassword, validateNumber, validateUsername, validateTextOptional, validateMeasure, validateDateOptional, validateDetailsArray, validateDate, validateText, validateNumberOptional } from "./fieldValidations.js";
+import { validateName, validatePassword, validateNumber, validateUsername, validateTextOptional, validateMeasure, validateDateOptional, validateGoodsReceiptDetailsArray, validateDate, validateText, validateNumberOptional, validateGoodsIssueDetailsArray } from "./fieldValidations.js";
 
 export const supplierValidators = {
     legalName: (value) => validateText(value, 200, 'La razón social'),
@@ -26,20 +26,23 @@ export const validateGoodsReceiptValidators = {
     supplierId: (value) => isEmptyOrNull(value, 'El proveedor'),
     observations: (value) => validateTextOptional(value, 'Las observaciones'),
     receptionDate: (value) => validateDate(value, 'La fecha de recepción'),
-    details: validateDetailsArray
+    details: validateGoodsReceiptDetailsArray
 }
 
 export const validateGoodsIssueValidators = {
+    referenceNumber: (value) => validateText(value, 50, 'El número de proyecto'),
+    advisorId: (value) => isEmptyOrNull(value, 'El asesor'),
+    clientId: (value) => isEmptyOrNull(value, 'El cliente'),
+    departmentId: (value) => isEmptyOrNull(value, 'El cliente'),
     requesterId: (value) => isEmptyOrNull(value, 'El solicitante'),
-    projectId: (value) => isEmptyOrNull(value, 'El proyecto'),
     observations: (value) => validateTextOptional(value, 'Las observaciones'),
     requestDate: (value) => validateDate(value, 'La fecha de solicitud'),
-    details: validateDetailsArray
+    details: validateGoodsIssueDetailsArray
 }
 
 export const validatePurchaseRequisitionValidators = {
     projectId: (value) => isEmptyOrNull(value, 'El proyecto'),
     observations: (value) => validateTextOptional(value, 'Las observaciones'),
     requestDate: (value) => validateDate(value, 'La fecha de solicitud'),
-    details: validateDetailsArray
+    details: validateGoodsReceiptDetailsArray
 };

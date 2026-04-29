@@ -110,12 +110,12 @@ export const toggleButtons = ({
     mode,
     status = 'Cerrada',
     showActions = true,
-    withoutTotal = true
+    withTotal = true
 }) => {
 
     const isView = mode === 'view';
     document.querySelector('.add-product-container').classList.toggle('d-none', isView);
-    document.querySelector('.total-container').classList.toggle('d-none', withoutTotal);
+    document.querySelector('.total-container').classList.toggle('d-none', !withTotal);
     const approveContainer = document.querySelector('.approve-container');
 
     if (approveContainer) {

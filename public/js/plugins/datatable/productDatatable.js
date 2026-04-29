@@ -14,7 +14,7 @@ table.innerHTML = `
         <tr>
             <th rowspan="2">Material</th>
             <th colspan="2">Medidas</th>
-            <th rowspan="2">Existencia</th>
+            <th rowspan="2">Compra</th>
             <th rowspan="2">Stock Mínimo</th>
             <th rowspan="2">Presentación</th>
             <th colspan="2">Conversión</th>
@@ -61,7 +61,7 @@ export const createProductDatatable = (context) => {
         },
         { data: 'base', title: 'Base' },
         { data: 'height', title: 'Altura' },
-        { data: 'currentStock', title: 'Existencia' },
+        { data: 'currentStock', title: 'Compra' },
         { data: 'minStock', title: 'Stock Mínimo' },
         { data: 'presentation.name', title: 'Presentación' },
         { data: 'convertedQuantity', title: 'Cantidad' },
@@ -70,7 +70,7 @@ export const createProductDatatable = (context) => {
 
     if (isWarehouse || isSystem) {
         columns.push(...[
-            { data: 'unitCost', title: 'Costo Unitario' },
+            { data: 'unitCost', title: 'Costo Unitario de Conversión' },
             {
                 data: null,
                 title: 'Acciones',

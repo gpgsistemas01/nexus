@@ -83,22 +83,19 @@ export const findAllGoodsIssues = async ({
             requester: {
                 select: {
                     id: true,
-                    name: true,
-                    lastName: true
+                    fullName: true
                 }
             },
             approver: {
                 select: {
                     id: true,
-                    name: true,
-                    lastName: true
+                    fullName: true,
                 }
             },
             warehouseStaff: {
                 select: {
                     id: true,
-                    name: true,
-                    lastName: true
+                    fullName: true,
                 }
             },
             project: {
@@ -117,17 +114,17 @@ export const findAllGoodsIssues = async ({
             details: {
                 select: {
                     id: true,
-                    product: {
+                    supplierProduct: {
                         select: {
                             id: true,
-                            name: true,
-                            presentation: true
+                            product: true,
+                            supplier: true
                         }
                     },
                     quantity: true
                 }
             },
-            movement: {
+            movements: {
                 select: {
                     details: {
                         select: {

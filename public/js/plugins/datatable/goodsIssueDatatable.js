@@ -118,8 +118,44 @@ export const initDetailsGoodsIssueTable = (mode, context) => {
 
     if ($.fn.DataTable.isDataTable(selectorProductTable)) {
         $(selectorProductTable).DataTable().clear().destroy();
-        $(selectorProductTable).empty();
     }
+
+    const table = document.querySelector(selectorProductTable);
+
+    let extraHeaders = '';
+    let extraSubHeaders = '';
+
+    if (isWarehouse || isSystem) {
+        extraHeaders += `
+            <th rowspan="2">Costo unitario de Conversión</th>
+            <th rowspan="2">Cantidad de proyecto</th>
+            <th rowspan="2">Diferencia</th>
+        `;
+    }
+
+    if (mode !== 'view') {
+        extraHeaders += `<th rowspan="2">Acciones</th>`;
+    }
+
+    table.innerHTML = `
+        <thead>
+            <tr>
+                <th rowspan="2">Material</th>
+                <th colspan="2">Medidas</th>
+                <th rowspan="2">Salida</th>
+                <th rowspan="2">Presentación</th>
+                <th colspan="2">Conversión</th>
+                ${extraHeaders}
+            </tr>
+            <tr>
+                <th>Base</th>
+                <th>Altura</th>
+                <th>Cantidad</th>
+                <th>Unidad</th>
+                ${extraSubHeaders}
+            </tr>
+        </thead>
+    `;
 
     const columns = [
         { 
@@ -137,17 +173,17 @@ export const initDetailsGoodsIssueTable = (mode, context) => {
         },
         { data: 'base', title: 'Base' },
         { data: 'height', title: 'Altura' },
-        { data: 'quantity', title: 'Cantidad' },
+        { data: 'quantity', title: 'Salida' },
         { data: 'presentation', title: 'Presentación' },
-        { data: 'totalArea', title: 'm2 Totales' },
+        { data: 'totalArea', title: 'Cantidad' },
         { data: 'unitMeasure', title: 'Unidad' },
     ];
 
     if (isWarehouse || isSystem) {
         columns.push(...[
-            { data: 'unitCost', title: 'Costo unitario' },
-            // { data: 'projectQuantity', title: 'Cantidad de proyecto' },
-            // { data: 'difference', title: 'Diferencia' }
+            { data: 'unitCost', title: 'Costo unitario de Conversión' },
+            { data: 'projectQuantity', title: 'Cantidad de proyecto' },
+            { data: 'difference', title: 'Diferencia' }
         ]);
     }
 

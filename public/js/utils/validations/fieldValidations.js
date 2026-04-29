@@ -153,7 +153,7 @@ export const validateTextOptional = (name, length, fieldName) => {
 
 export const validateName = (name, length = 50) => validateText(name, length, 'El nombre');
 
-export const validateDetailsArray = (details) => {
+export const validateGoodsReceiptDetailsArray = (details) => {
 
     if (!Array.isArray(details) || details.length === 0) {
         return 'La lista de detalles debe contener al menos un producto.';
@@ -176,3 +176,23 @@ export const validateDetailsArray = (details) => {
 
     return null;
 };
+
+export const validateGoodsIssueDetailsArray = (details) => {
+
+    if (!Array.isArray(details) || details.length === 0) {
+        return 'La lista de detalles debe contener al menos un producto.';
+    }
+
+    for (const detail of details) {
+
+        if (!detail.productId || !detail.quantity) {
+            return 'Cada detalle debe contener producto, cantidad, costo unitario e importe.';
+        }
+
+        if (isNaN(detail.quantity) || parseFloat(detail.quantity) < 1) {
+            return 'La cantidad de cada detalle debe ser un número mayor a cero.';
+        }
+    }
+
+    return null;
+}
