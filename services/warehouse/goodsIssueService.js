@@ -155,11 +155,26 @@ export const findAllGoodsIssues = async ({
     };
 };
 
-const validateGoodsIssueRelations = async ({ projectId, requesterId }) => {
+const resolveProjectIdByReferenceNumber = async ({ referenceNumber }) => {
 
-    const [requester] = await Promise.all([
-        prisma.profile.findUnique({ where: { id: requesterId } })
-    ]);
+    const project = await prisma.project.findFirst({
+        where: {
+            referenceNumber: {
+                equals: referenceNumber,
+                mode: 'insensitive'
+            }
+        },
+        select: { id: true }
+    });
+
+    if (!project) throw new GoodsIssueProjectNotFound();
+
+    return project.id;
+};
+
+const validateGoodsIssueRelations = async ({ requesterId }) => {
+
+    const requester = await prisma.profile.findUnique({ where: { id: requesterId } });
 
     if (!requester) throw new GoodsIssueRequesterProfileNotFound();
 };
@@ -220,9 +235,10 @@ export const createGoodsIssue = async ({
     goodsIssueDto
 }) => {
 
-    const { requesterId, projectId, details, ...goodsIssueData } = goodsIssueDto;
+    const { requesterId, referenceNumber, details, ...goodsIssueData } = goodsIssueDto;
 
-    await validateGoodsIssueRelations({ projectId, requesterId });
+    await validateGoodsIssueRelations({ requesterId });
+    const projectId = await resolveProjectIdByReferenceNumber({ referenceNumber });
 
     const result = await prisma.$transaction(async (tx) => {
 
@@ -281,9 +297,10 @@ export const updateGoodsIssue = async ({
     userRole
 }) => {
 
-    const { requesterId, projectId, details, ...goodsIssueData } = goodsIssueDto;
+    const { requesterId, referenceNumber, details, ...goodsIssueData } = goodsIssueDto;
 
-    await validateGoodsIssueRelations({ projectId, requesterId });
+    await validateGoodsIssueRelations({ requesterId });
+    const projectId = await resolveProjectIdByReferenceNumber({ referenceNumber });
 
     const goodsIssueExists = await prisma.goodsIssue.findUnique({
         where: { id },

@@ -1,6 +1,6 @@
 export const createGoodsIssueDtoForRegister = (body = {}) => ({
     requesterId: body.requesterId.trim(),
-    projectId: body.projectId.trim(),
+    referenceNumber: body.referenceNumber.trim(),
     requestDate: new Date(body.requestDate),
     observations: body.observations?.trim() || null,
     details: (body.details).map(d => ({

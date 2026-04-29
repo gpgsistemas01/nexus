@@ -15,8 +15,18 @@ export const errorMessages = {
     RECEIVED_BY_ID_REQUIRED: 'La person que recibe es requerida.',
     RECEIVED_BY_ID_INVALID_UUID: 'La persona que recibe no es válida.',
 
-    PROJECT_ID_REQUIRED: 'El proyecto es requerido.',
-    PROJECT_ID_INVALID_UUID: 'El proyecto no es válido.',
+    REFERENCE_NUMBER_REQUIRED: 'El número de proyecto es requerido.',
+    REFERENCE_NUMBER_INVALID_TYPE: 'El número de proyecto debe ser texto.',
+    REFERENCE_NUMBER_TOO_LONG: 'El número de proyecto no debe exceder 50 caracteres.',
+
+    ADVISOR_ID_REQUIRED: 'El asesor es requerido.',
+    ADVISOR_ID_INVALID_UUID: 'El asesor no es válido.',
+
+    CLIENT_ID_REQUIRED: 'El cliente es requerido.',
+    CLIENT_ID_INVALID_UUID: 'El cliente no es válido.',
+
+    DEPARTMENT_ID_REQUIRED: 'El departamento es requerido.',
+    DEPARTMENT_ID_INVALID_UUID: 'El departamento no es válido.',
 
     REQUESTER_ID_REQUIRED: 'El solicitante es requerido.',
     REQUESTER_ID_INVALID_UUID: 'El solicitante no es válido.',

@@ -15,9 +15,22 @@ export const errorMap = {
         REQUIRED: 'RECEIVED_BY_ID_REQUIRED',
         INVALID_UUID: 'RECEIVED_BY_ID_INVALID_UUID'
     },
-    projectId: {
-        REQUIRED: 'PROJECT_ID_REQUIRED',
-        INVALID_UUID: 'PROJECT_ID_INVALID_UUID'
+    referenceNumber: {
+        REQUIRED: 'REFERENCE_NUMBER_REQUIRED',
+        INVALID_TYPE: 'REFERENCE_NUMBER_INVALID_TYPE',
+        TOO_LONG: 'REFERENCE_NUMBER_TOO_LONG'
+    },
+    advisorId: {
+        REQUIRED: 'ADVISOR_ID_REQUIRED',
+        INVALID_UUID: 'ADVISOR_ID_INVALID_UUID'
+    },
+    clientId: {
+        REQUIRED: 'CLIENT_ID_REQUIRED',
+        INVALID_UUID: 'CLIENT_ID_INVALID_UUID'
+    },
+    departmentId: {
+        REQUIRED: 'DEPARTMENT_ID_REQUIRED',
+        INVALID_UUID: 'DEPARTMENT_ID_INVALID_UUID'
     },
     requesterId: {
         REQUIRED: 'REQUESTER_ID_REQUIRED',

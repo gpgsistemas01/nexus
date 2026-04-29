@@ -76,6 +76,18 @@ export const validateUUID = (fieldName) => {
         .isUUID('4').withMessage(errors.INVALID_UUID)
 }
 
+
+export const validateReferenceNumber = (fieldName) => {
+
+    const errors = errorMap[fieldName];
+
+    return body(fieldName)
+        .trim()
+        .notEmpty().withMessage(errors.REQUIRED)
+        .isString().withMessage(errors.INVALID_TYPE)
+        .isLength({ max: 50 }).withMessage(errors.TOO_LONG)
+}
+
 export const validateNumber = (fieldName) => {
 
     const errors = errorMap[fieldName];
