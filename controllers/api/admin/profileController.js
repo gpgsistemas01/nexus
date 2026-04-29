@@ -1,6 +1,6 @@
 import { findAllProfiles } from "../../../services/admin/profileService.js";
 
-const allowedDepartments = ['Almacén', 'Sistemas'];
+const allowedDepartments = ['ALMACÉN Y PROVEDURÍA', 'SISTEMAS'];
 
 export const getAllProfiles = async (req, res) => {
 
@@ -11,7 +11,7 @@ export const getAllProfiles = async (req, res) => {
     const length = parseInt(req.query.length) || 10;
     const search = req.query.search?.value || req.query.search || '';
 
-    const columns = ['name'];
+    const columns = ['fullName'];
     const orderColumnIndex = req.query.order?.[0]?.column || 0;
     const orderDir = req.query.order?.[0]?.dir || 'asc';
 

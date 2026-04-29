@@ -9,7 +9,7 @@ router.get(
     verifyCookiesAuthTokenRequired,
     authorizeUserWeb({
         roles: ['Almacenista', 'Coordinador', 'Auxiliar', 'Administrador del sistema'],
-        departments: ['Almacén', 'Sistemas']
+        departments: ['ALMACÉN Y PROVEDURÍA', 'SISTEMAS']
     }),
     getGoodsReceiptsPage
 );

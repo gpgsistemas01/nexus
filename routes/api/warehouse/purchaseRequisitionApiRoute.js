@@ -14,12 +14,25 @@ const router = express.Router();
 
 const purchaseRequisitionPermissions = {
     roles: ['Administrador del sistema', 'Coordinador', 'Auxiliar', 'Operador', 'Instalador', 'Almacenista'],
-    departments: ['Sistemas', 'Impresión', 'Router', 'Taller 3d', 'Herrería', 'Acabados', 'PT', 'Tráfico', 'Instalaciones', 'Almacén']
+    ddepartments: [
+        'DIRECCIÓN',
+        'ACABADOS',
+        'ADMINISTRATIVO',
+        'ALMACÉN Y PROVEDURÍA',
+        'DISEÑO',
+        'INSTALACIONES',
+        'IMPRESIÓN',
+        'ROUTER',
+        'PT/TRÁFICO',
+        'SISTEMAS',
+        'TALLER 3D',
+        'VENTAS Y PROYECTOS ESPECIALES'
+    ]
 };
 
 const purchaseRequisitionWarehousePermissions = {
     roles: ['Administrador del sistema', 'Coordinador', 'Auxiliar', 'Operador', 'Instalador', 'Almacenista'],
-    departments: ['Almacén', 'Sistemas']
+    departments: ['ALMACÉN Y PROVEDURÍA', 'SISTEMAS']
 };
 
 router.get(

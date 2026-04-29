@@ -16,17 +16,41 @@ const router = express.Router();
 
 const goodsIssuePermissions = {
     roles: ['Administrador del sistema', 'Coordinador', 'Auxiliar', 'Operador', 'Instalador', 'Almacenista'],
-    departments: ['Sistemas', 'Impresión', 'Router', 'Taller 3d', 'Herrería', 'Acabados', 'PT', 'Tráfico', 'Instalaciones', 'Almacén']
+    departments: [
+        'DIRECCIÓN',
+        'ACABADOS',
+        'ADMINISTRATIVO',
+        'ALMACÉN Y PROVEDURÍA',
+        'DISEÑO',
+        'INSTALACIONES',
+        'IMPRESIÓN',
+        'ROUTER',
+        'PT/TRÁFICO',
+        'SISTEMAS',
+        'TALLER 3D',
+        'VENTAS Y PROYECTOS ESPECIALES'
+    ]
 };
 
 const goodsIssueApprovalPermissions = {
     roles: ['Almacenista', 'Coordinador', 'Auxiliar', 'Administrador del sistema'],
-    departments: ['Sistemas', 'Impresión', 'Router', 'Taller 3d', 'Herrería', 'Acabados', 'PT', 'Tráfico', 'Instalaciones', 'Almacén']
+    departments: [
+        'ACABADOS',
+        'ALMACÉN Y PROVEDURÍA',
+        'DISEÑO',
+        'INSTALACIONES',
+        'IMPRESIÓN',
+        'ROUTER',
+        'PT/TRÁFICO',
+        'SISTEMAS',
+        'TALLER 3D',
+        'VENTAS Y PROYECTOS ESPECIALES'
+    ]
 };
 
 const goodsIssueConfirmationPermissions = {
     roles: ['Coordinador', 'Auxiliar', 'Almacenista', 'Administrador del sistema'],
-    departments: ['Sistemas', 'Almacén']
+    departments: ['ALMACÉN Y PROVEDURÍA', 'SISTEMAS']
 };
 
 router.get(

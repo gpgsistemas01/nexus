@@ -93,7 +93,7 @@ app.use(apiRoute + sales + '/clients', clientApiRoutes);
 app.use(apiRoute + warehouse + '/products', productApiRoutes);
 app.use(apiRoute + warehouse + '/suppliers', supplierApiRoutes);
 app.use(apiRoute + warehouse + '/goods-receipts', goodsReceiptApiRoutes);
-app.use(apiRoute + warehouse + '/purchase-requisitions', purchaseRequisitionApiRoutes);
+// app.use(apiRoute + warehouse + '/purchase-requisitions', purchaseRequisitionApiRoutes);
 app.use(apiRoute + warehouse + '/goods-issues', goodsIssueApiRoutes);
 app.use(apiRoute + warehouse + '/notifications', notificationApiRoutes);
 app.use(apiRoute + warehouse + '/unit-measures', unitMeasuresApiRoutes);

@@ -1,4 +1,5 @@
 import { openGoodsIssueModal } from "../../pages/warehouse/goodsIssuesPage.js";
+import { hasPermission } from "../../utils/permissions.js";
 import { createDataTable, refreshProductTable, renderActionButtons } from "./baseDatatable.js";
 
 export let details = [];
@@ -7,8 +8,7 @@ const selectorTable = '#table';
 
 export const createGoodsIssueDatatable = (context) => {
 
-    const isWarehouseDepartment = context.department === 'Almacén';
-    const isSystemDepartment = context.department === 'Sistemas';
+    const { isWarehouse, isSystem } = hasPermission(context);
 
     const columns = [
         { data: 'referenceNumber', title: 'Folio' },
@@ -25,7 +25,7 @@ export const createGoodsIssueDatatable = (context) => {
         }
     ];
 
-    if (isWarehouseDepartment || isSystemDepartment) {
+    if (isWarehouse || isSystem) {
         columns.push({
             data: 'department.name',
             title: 'Área'
@@ -114,8 +114,7 @@ export const createGoodsIssueDatatable = (context) => {
 
 export const initDetailsGoodsIssueTable = (mode, context) => {
 
-    const isWarehouseDepartment = context.department === 'Almacén';
-    const isSystemDepartment = context.department === 'Sistemas';
+    const { isWarehouse, isSystem } = hasPermission(context);
 
     if ($.fn.DataTable.isDataTable(selectorProductTable)) {
         $(selectorProductTable).DataTable().clear().destroy();
@@ -144,7 +143,7 @@ export const initDetailsGoodsIssueTable = (mode, context) => {
         { data: 'unitMeasure', title: 'Unidad' },
     ];
 
-    if (isWarehouseDepartment || isSystemDepartment) {
+    if (isWarehouse || isSystem) {
         columns.push(...[
             { data: 'unitCost', title: 'Costo unitario' },
             // { data: 'projectQuantity', title: 'Cantidad de proyecto' },

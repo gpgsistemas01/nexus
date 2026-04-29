@@ -1,11 +1,12 @@
-<%
-const role = user?.role ?? '';
-const department = user?.department ?? '';
+<% const accesses = user?.accesses || [];
 
-const isAdmin = role === 'Administrador del sistema';
-const isSalesOrDesign = ['Ventas', 'Diseño'].includes(department);
-const isWarehouse = department === 'Almacén';
-const isCoordinator = role === 'Coordinador';
+const hasRole = role => accesses.some(a => a.role === role);
+const hasDepartment = department => accesses.some(a => a.department === department);
+
+const isAdmin = hasRole('Administrador del sistema');
+const isSalesOrDesign = ['Ventas', 'Diseño'].some(department => hasDepartment(department));
+const isWarehouse = hasDepartment('Almacén');
+const isCoordinator = hasRole('Coordinador');
 
 const canSeeAll = isAdmin;
 const canSeeOnlyProducts = !canSeeAll && isSalesOrDesign;

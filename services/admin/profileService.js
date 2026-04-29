@@ -6,7 +6,7 @@ export const findAllProfiles = async ({
     skip = 0,
     take = 10,
     search = '',
-    orderBy = 'name',
+    orderBy = 'fullName',
     orderDir = 'asc'
 }) => {
 
@@ -19,7 +19,7 @@ export const findAllProfiles = async ({
             }
         }),
         ...(department && {
-            users: {
+            departments: {
                 some: {
                     department: {
                         name: department

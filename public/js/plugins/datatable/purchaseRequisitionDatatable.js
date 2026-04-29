@@ -1,6 +1,7 @@
 import { openPurchaseRequisitionModal } from "../../pages/warehouse/purchaseRequisitionsPage.js";
 import { createDataTable, refreshProductTable, renderActionButtons } from "./baseDatatable.js";
 import { PURCHASE_REQUISITIONS_API_ROUTE } from "../../services/warehouse/purchaseRequisitionService.js";
+import { hasPermission } from "../../utils/permissions.js";
 
 export let details = [];
 const selectorProductTable = '#productTable';
@@ -8,8 +9,7 @@ const selectorTable = '#table';
 
 export const createPurchaseRequisitionDatatable = (context) => {
 
-    const isWarehouseDepartment = context.department === 'Almacén';
-    const isSystemDepartment = context.department === 'Sistemas';
+    const { isWarehouse, isSystem } = hasPermission(context);
     const columns = [
         { data: 'referenceNumber', title: 'Folio' },
         {
@@ -25,7 +25,7 @@ export const createPurchaseRequisitionDatatable = (context) => {
         }
     ];
 
-    if (isWarehouseDepartment || isSystemDepartment) {
+    if (isWarehouse || isSystem) {
         columns.push({
             data: 'department.name',
             title: 'Área'

@@ -25,7 +25,7 @@ export const initGoodsReceiptFormSelect2 = () => {
 
             return {
                 search: params.term,
-                department: 'Almacén',
+                department: 'ALMACÉN Y PROVEDURÍA',
                 strictDepartmentFilter: true
             };
         },
@@ -54,14 +54,14 @@ export const setGoodsReceiptFormSelectOptions = (data = null) => {
 
     toggleSupplierOption({
         selector: `${ modalSelector } ${ supplierSelector }`,
-        supplierId: data?.supplier?.id,
-        supplierName:`${ data?.supplier?.tradeName }`
+        id: data?.supplier?.id,
+        name: `${ data?.supplier?.tradeName }`
     });
 
     toggleProfileOption({
         selector: `${ modalSelector } ${ receivedBySelector }`,
         profileId: data?.receivedBy?.id,
-        profileName: `${data?.receivedBy?.name} ${data?.receivedBy?.lastName}`,
+        profileName: data?.receivedBy?.fullName,
     });
 
     toggleProductOption({

@@ -13,23 +13,97 @@ const toDecimal = (value) => {
     return parsed;
 }
 
+const cleanValue = val => {
+    if (val === 0 || val === "0" || val == null) return null;
+
+    const str = String(val).trim();
+    return str || null;
+};
+
 async function main() {
 
+    const __filename = fileURLToPath(import.meta.url);
+    const __dirname = path.dirname(__filename);
+    const filePath1 = path.join(__dirname, 'LISTA_ADMIN.xlsx');
+    const workbook1 = XLSX.readFile(filePath1);
+
+    const departmentSheet = workbook1.Sheets['AREAS'];
+    const departmentRows = XLSX.utils.sheet_to_json(departmentSheet, {
+        defval: null,
+    });
+
+    const departmentParsed = departmentRows.map(row => {
+        const name = cleanValue(row.department);
+        if (!name) return null;
+
+        return { name };
+    }).filter(Boolean);
+
     await prisma.department.createMany({
-        data: [
-            { id: '00000000-0000-0000-0000-000000000001', name: 'Sistemas' },
-            { id: '00000000-0000-0000-0000-000000000002', name: 'Ventas' },
-            { id: '00000000-0000-0000-0000-000000000003', name: 'Diseño' },
-            { id: '00000000-0000-0000-0000-000000000004', name: 'Impresión' },
-            { id: '00000000-0000-0000-0000-000000000005', name: 'Router' },
-            { id: '00000000-0000-0000-0000-000000000006', name: 'Taller 3d' },
-            { id: '00000000-0000-0000-0000-000000000007', name: 'Herrería' },
-            { id: '00000000-0000-0000-0000-000000000008', name: 'Acabados' },
-            { id: '00000000-0000-0000-0000-000000000009', name: 'PT' },
-            { id: '00000000-0000-0000-0000-000000000010', name: 'Tráfico' },
-            { id: '00000000-0000-0000-0000-000000000011', name: 'Instalaciones' },
-            { id: '00000000-0000-0000-0000-000000000012', name: 'Almacén' }
-        ],
+        data: departmentParsed,
+        skipDuplicates: true
+    });
+    
+    const relationDepartmentSheet = workbook1.Sheets['RELACIONES_PERFIL'];
+    const relationProfileDepartmentRows = XLSX.utils.sheet_to_json(relationDepartmentSheet, {
+        defval: null,
+    });
+
+    const profileParsed = relationProfileDepartmentRows.map(row => {
+        const fullName = cleanValue(row.fullName);
+        if (!fullName) return null;
+
+        return { fullName };
+    }).filter(Boolean);
+
+    await prisma.profile.createMany({
+        data: profileParsed,
+        skipDuplicates: true
+    });
+
+    const profiles = await prisma.profile.findMany({
+        select: {
+            id: true,
+            fullName: true
+        }
+    });
+    const profileMap = new Map(profiles.map(p => [cleanValue(p.fullName), p.id]));
+
+    const departments = await prisma.department.findMany({
+        select: {
+            id: true,
+            name: true
+        }
+    });
+    const departmentMap = new Map(departments.map(d => [cleanValue(d.name), d.id]));
+
+    const relationProfileDepartmentParsed = relationProfileDepartmentRows.map(row => {
+
+        const fullName = cleanValue(row.fullName);
+        const department = cleanValue(row.department);
+
+        if (!fullName || !department) {
+            console.log('Error en fila: ', row);
+            return null;
+        }
+
+        const profileId = profileMap.get(fullName);
+        const departmentId = departmentMap.get(department);
+
+        if (!profileId || !departmentId) {
+            console.log('No encontrado en Map: ', { fullName, department });
+            return null;
+        }
+
+        return {
+            profileId,
+            departmentId
+        };
+
+    }).filter(Boolean);
+
+    await prisma.departmentProfile.createMany({
+        data: relationProfileDepartmentParsed,
         skipDuplicates: true
     });
 
@@ -75,9 +149,6 @@ async function main() {
         },
     });
 
-    const departments = await prisma.department.findMany({
-        select: { id: true },
-    });
     const roles = await prisma.role.findMany({
         select: { id: true, name: true }
     });
@@ -148,12 +219,9 @@ async function main() {
     const presentationMap = new Map(presentations.map(p => [p.name, p.id]));
     const unitMeasureMap = new Map(unitMeasures.map(um => [um.symbol, um.id]));
 
-    const __filename = fileURLToPath(import.meta.url);
-    const __dirname = path.dirname(__filename);
-    const filePath = path.join(__dirname, 'inventario_BD - UNIDAD DE MEDIDA.xlsx');
-
-    const workbook = XLSX.readFile(filePath);
-    const productSheet = workbook.Sheets['PRODUCTOS'];
+    const filePath2 = path.join(__dirname, 'inventario_BD - UNIDAD DE MEDIDA.xlsx');
+    const workbook2 = XLSX.readFile(filePath2);
+    const productSheet = workbook2.Sheets['PRODUCTOS'];
     const productRows = XLSX.utils.sheet_to_json(productSheet, {
         defval: null,
     });
@@ -170,16 +238,18 @@ async function main() {
         unitMeasureId: unitMeasureMap.get(row.unitMeasure.trim()) || null,
         area: (!row.base || !row.height) ? null : toDecimal(row.base) * toDecimal(row.height)
     }));
-if(productParsed.some(p => !p.presentationId || !p.unitMeasureId)) {
-    console.log('Error: Algunos productos tienen presentación o unidad de medida no encontrados');
-    console.log(productParsed.filter(p => !p.presentationId || !p.unitMeasureId));
-}
+
+    if(productParsed.some(p => !p.presentationId || !p.unitMeasureId)) {
+        console.log('Error: Algunos productos tienen presentación o unidad de medida no encontrados');
+        console.log(productParsed.filter(p => !p.presentationId || !p.unitMeasureId));
+    }
+
     await prisma.product.createMany({
         data: productParsed,
         skipDuplicates: true
     });
 
-    const supplierSheet = workbook.Sheets['PROVEEDORES'];
+    const supplierSheet = workbook2.Sheets['PROVEEDORES'];
     const supplierRows = XLSX.utils.sheet_to_json(supplierSheet, {
         defval: null,
     });
@@ -244,7 +314,7 @@ if(productParsed.some(p => !p.presentationId || !p.unitMeasureId)) {
 
     const supplierMap = new Map(suppliers.map(s => [s.tradeName, s.id]))
 
-    const relationSupplierProductSheet = workbook.Sheets['RELACIONES'];
+    const relationSupplierProductSheet = workbook2.Sheets['RELACIONES'];
     const relationSupplierProductRows = XLSX.utils.sheet_to_json(relationSupplierProductSheet, {
         defval: null,
     });

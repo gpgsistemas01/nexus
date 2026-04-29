@@ -8,7 +8,7 @@ const router = express.Router();
 
 const productPermissions = {
     roles: ['Almacenista', 'Coordinador', 'Auxiliar', 'Administrador del sistema'],
-    departments: ['Almacén', 'Sistemas']
+    departments: ['ALMACÉN Y PROVEDURÍA', 'SISTEMAS']
 };
 
 router.get(

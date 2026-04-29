@@ -33,7 +33,7 @@ export const setProductFormSelectOptions = (data = null) => {
     toggleSupplierOption({
         selector: `${ modalSelector } ${ supplierSelector }`,
         id: data?.supplier?.id,
-        name: `${ data?.supplier?.code } - ${ data?.supplier?.tradeName }`
+        name: `${ data?.supplier?.tradeName }`
     });
 
     toggleUnitMeasureOption({

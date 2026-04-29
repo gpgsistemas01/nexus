@@ -22,7 +22,7 @@ export const initProfileSelect = ({
             return {
                 results: list.map(p => ({
                     id: p.id,
-                    text: `${ p.name } ${ p.lastName }`
+                    text: p.fullName
                 }))
             };
         },

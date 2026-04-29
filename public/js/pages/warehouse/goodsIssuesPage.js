@@ -12,7 +12,7 @@ import { openModal } from "../../ui/modalUI.js";
 const modalId = '#goodsIssueModal';
 const formId = '#goodsIssueForm';
 
-const context = window.GOODS_ISSUE_CONTEXT || {};
+const context = window.meta || {};
 let leftAction = null;
 let rightAction = null;
 

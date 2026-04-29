@@ -10,7 +10,7 @@ import { goodsReceiptValidation } from '../../../validators/forms/goodsReceiptVa
 const router = express.Router();
 const goodsReceiptPermissions = {
     roles: ['Almacenista', 'Coordinador', 'Auxiliar', 'Administrador del sistema'],
-    departments: ['Almacén', 'Sistemas']
+    departments: ['ALMACÉN Y PROVEDURÍA', 'SISTEMAS']
 };
 
 router.get(

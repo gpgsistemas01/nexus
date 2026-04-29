@@ -6,18 +6,21 @@ const ENTITY_PRODUCT_LOW_STOCK = 'product-low-stock';
 const ENTITY_PRODUCT_STOCK_RESTORED = 'product-stock-restored';
 const ENTITY_GOODS_RECEIPT = 'goods-receipt';
 
-const getNotificationWhereByUser = async (department, role) => {
+const getNotificationWhereByUser = async (departments, roles) => {
 
-    const existsDepartment = await prisma.department.findUnique({
-        where: { name: department },
-        select: {
-            id: true
+    if (!departments?.length || !roles?.length) return {};
+
+    const dbDepartments = await prisma.department.findMany({
+        where: {
+            name: { in: departments }
         }
     });
 
-    if (!existsDepartment) return {};
+    if (!dbDepartments.length) return {};
 
-    const canViewAllNotifications = role === ROLE_SYSTEM_ADMIN || department === DEPARTMENT_WAREHOUSE;
+    const departmentIds = dbDepartments.map(d => d.id);
+
+   const canViewAllNotifications = roles.includes(ROLE_SYSTEM_ADMIN) || departments.includes(DEPARTMENT_WAREHOUSE);
 
     if (canViewAllNotifications) {
         return {
@@ -37,7 +40,7 @@ const getNotificationWhereByUser = async (department, role) => {
             {
                 OR: [
                     {
-                        departmentId: existsDepartment.id
+                        departmentId: { in: departmentIds }
                     },
                     {
                         entityType: ENTITY_PRODUCT_LOW_STOCK
@@ -180,9 +183,9 @@ export const notifyProductStockStatusChanges = async ({ productIds = [], userId 
     });
 };
 
-export const findLatestNotifications = async ({ take = 10, department, role } = {}) => {
+export const findLatestNotifications = async ({ take = 10, departments, roles } = {}) => {
 
-    const where = await getNotificationWhereByUser(department, role);
+    const where = await getNotificationWhereByUser(departments, roles);
 
     const [items, unreadCount] = await Promise.all([
         prisma.notification.findMany({

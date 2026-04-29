@@ -56,10 +56,10 @@ const createAuthorizeMiddleware = (handler) => (permissions) => async (req, res,
 
     if (!user) return handler(req, res);
 
-    const hasAccess = user.accesses.some(access => {
+    const hasAccess = user.accesses.some(access => 
         permissions.departments.includes(access.department) &&
         permissions.roles.includes(access.role)
-    });
+    );
 
     if (!hasAccess) return handler(req, res);
 

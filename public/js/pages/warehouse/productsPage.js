@@ -1,5 +1,5 @@
 import { createProductDatatable } from "../../plugins/datatable/productDatatable.js";
 
-const context = window.PRODUCT_CONTEXT || {};
+const context = window.meta || {};
 
 createProductDatatable(context);

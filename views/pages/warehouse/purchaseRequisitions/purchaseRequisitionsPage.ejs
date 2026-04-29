@@ -44,10 +44,6 @@
 
 <%- include('../../../shared/modal', { modalId: 'purchaseRequisitionModal', form }) %>
 
-<script>
-    window.PURCHASE_REQUISITION_CONTEXT = <%- JSON.stringify(user) %>;
-</script>
-
 <script type="module" src="/js/pages/warehouse/purchaseRequisitionsPage.js"></script>
 
 <%- contentFor('title') %>

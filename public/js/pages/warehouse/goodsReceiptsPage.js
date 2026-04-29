@@ -4,7 +4,7 @@ import { validateGoodsReceiptValidators } from "../../utils/validations/validato
 import { refreshProductTable } from "../../plugins/datatable/baseDatatable.js";
 import { createGoodsReceiptDatatable, details, initDetailsGoodsReceiptTable } from "../../plugins/datatable/goodsReceiptDatatable.js";
 import { initGoodsReceiptFormSelect2, setGoodsReceiptFormSelectOptions } from "../../plugins/select2/modules/goodsReceiptSelect.js";
-import { toggleInputSelectErrors, toggleTableErrors, setFormReadOnly, updateTotals, toggleButtons, cleanAddedProductInput } from "../../ui/formUI.js";
+import { toggleInputSelectErrors, toggleTableErrors, setFormReadOnly, updateTotals, toggleButtons, cleanAddedProductInput, toggleInvoiceInput } from "../../ui/formUI.js";
 import { on } from "../../utils/domUtils.js";
 import { formatDateLongWithTime } from "../../utils/formatters.js";
 import { handleSubmit, validateFields } from "../../utils/formUtils.js";
@@ -86,6 +86,9 @@ export const openGoodsReceiptModal = ({ mode, data = null }) => {
     if (mode === 'create') {
         
         form.reset();
+        const value = data?.isInvoiced ? 'invoice' : 'none';
+        form.elements.isInvoiced.value = value;
+        toggleInvoiceInput(value);
         modalElement.querySelector('#modalTitle').textContent = 'Registrar compra';
         form.querySelector('#submitBtn').textContent = 'Confirmar';
         form.querySelector('#presentationDisplayInput').value = '';
@@ -98,16 +101,6 @@ export const openGoodsReceiptModal = ({ mode, data = null }) => {
     }
 
     if (mode === 'view') {
-
-        if (data.isInvoiced) {
-
-            form.elements.isInvoiced[0].checked = true;
-            form.elements.invoice.value = data.invoice;
-
-        } else {
-            
-            form.elements.isInvoiced[1].checked = true;
-        }
 
         const select = document.querySelector('.supplier-select');
         const supplier = select.options[select.selectedIndex].text;
@@ -239,14 +232,6 @@ invoiceRadios.forEach(radio => {
 
     radio.addEventListener('change', () => {
 
-        if (radio.value === 'invoice' && radio.checked) {
-
-            invoiceContainer.style.display = '';
-            document.getElementById('invoiceInput').value = '';
-
-        } else if (radio.value === 'none' && radio.checked) {
-
-            invoiceContainer.style.display = 'none';
-        }
+        if (radio.checked) toggleInvoiceInput(radio.value);
     });
 });

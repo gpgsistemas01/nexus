@@ -71,13 +71,13 @@ const attachSupplierHandler = ({ supplierSelector }) => {
 
 export const toggleSupplierOption = ({ 
     selector, 
-    supplierId = null, 
-    supplierName = null
+    id = null, 
+    name = null
 }) => toggleSelectOption({
     selector,
     data: {
-        id: supplierId,
-        text: supplierName
+        id,
+        text: name
     }
 });
 

@@ -1,6 +1,8 @@
 import { openProductModal } from "../../modules/products/productModal.js";
 import { createDataTable } from "./baseDatatable.js";
 import { notifications } from "../swal/swalComponent.js";
+import { hasPermission } from "../../utils/permissions.js";
+import { PRODUCTS_API_ROUTE } from "../../services/warehouse/productService.js";
 
 const selectorTable = '#table';
 let lastLowStockNotification = '';
@@ -41,8 +43,7 @@ const configureStockRealtime = (table) => {
 
 export const createProductDatatable = (context) => {
 
-    const isWarehouseDepartment = context.department === 'Almacén';
-    const isSystemDepartment = context.department === 'Sistemas';
+    const { isWarehouse, isSystem } = hasPermission(context);
 
     const columns = [
         { 
@@ -67,7 +68,7 @@ export const createProductDatatable = (context) => {
         { data: 'unitMeasure.name', title: 'Unidad' }
     ];
 
-    if (isWarehouseDepartment || isSystemDepartment) {
+    if (isWarehouse || isSystem) {
         columns.push(...[
             { data: 'unitCost', title: 'Costo Unitario' },
             {
@@ -84,7 +85,7 @@ export const createProductDatatable = (context) => {
 
     const table = createDataTable({
         options: {
-            ajax: '/api/warehouse/products/',
+            ajax: PRODUCTS_API_ROUTE,
             columns,
             createdRow: (row, data) => {
 
@@ -128,5 +129,4 @@ export const createProductDatatable = (context) => {
 
         await openProductModal({ mode: 'edit', data });
     });
-
 }

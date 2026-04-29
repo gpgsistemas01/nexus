@@ -48,8 +48,7 @@ model UserRoleDepartment {
 
 model Profile {
   id                            String                @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name                          String                @db.VarChar(50)
-  lastName                      String                @db.VarChar(50)
+  fullName                      String                @db.VarChar(255)
   isActive                      Boolean               @default(true)
   goodsReceipts                 GoodsReceipt[]
   departments DepartmentProfile[]

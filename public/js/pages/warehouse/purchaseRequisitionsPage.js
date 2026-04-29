@@ -10,7 +10,7 @@ import { formatDateLongWithTime } from "../../utils/formatters.js";
 import { handleAction, handleSubmit, validateFields } from "../../utils/formUtils.js";
 import { validatePurchaseRequisitionValidators } from "../../utils/validations/validators.js";
 
-const context = window.PURCHASE_REQUISITION_CONTEXT || {};
+const context = window.meta || {};
 const modalId = '#purchaseRequisitionModal';
 const formId = '#purchaseRequisitionForm';
 const backSelector = `#backBtn-${modalId.replace('#', '')}`;

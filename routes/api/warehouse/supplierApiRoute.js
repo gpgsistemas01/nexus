@@ -5,14 +5,15 @@ import { supplierValidation } from '../../../validators/forms/supplierValidation
 import { validate } from '../../../middleware/validatorMiddleware.js';
 
 const router = express.Router();
+const warehousePermissions = {
+    roles: ['Almacenista', 'Coordinador', 'Auxiliar', 'Administrador del sistema'],
+    departments: ['ALMACÉN Y PROVEDURÍA', 'SISTEMAS']
+};
 
 router.get(
     '/',
     verifyCookiesAuthTokenRequired,
-    authorizeUserApi({
-        roles: ['Almacenista', 'Coordinador', 'Auxiliar', 'Administrador del sistema'],
-        departments: ['Almacén', 'Sistemas']
-    }),
+    authorizeUserApi(warehousePermissions),
     getAllSuppliers
 );
 
@@ -21,10 +22,7 @@ router.post(
     verifyCookiesAuthTokenRequired,
     supplierValidation,
     validate,
-    authorizeUserApi({
-        roles: ['Almacenista', 'Coordinador', 'Auxiliar', 'Administrador del sistema'],
-        departments: ['Almacén', 'Sistemas']
-    }),
+    authorizeUserApi(warehousePermissions),
     registerSupplier
 );
 
@@ -33,10 +31,7 @@ router.put(
     verifyCookiesAuthTokenRequired,
     supplierValidation,
     validate,
-    authorizeUserApi({
-        roles: ['Almacenista', 'Coordinador', 'Auxiliar', 'Administrador del sistema'],
-        departments: ['Almacén', 'Sistemas']
-    }),
+    authorizeUserApi(warehousePermissions),
     editSupplier
 );
 

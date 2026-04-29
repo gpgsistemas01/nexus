@@ -20,7 +20,7 @@ export const createGoodsReceiptDatatable = () => {
                     title: 'Recepción',
                     render: (data, type, row) => {
 
-                        const name = `${ row.receivedBy.name } ${ row.receivedBy.lastName }`;
+                        const name = row.receivedBy ? row.receivedBy.fullName : 'Usuario Eliminado';
                         const date = new Date(row.receptionDate).toLocaleString();
 
                         return `<div>${ name }<br><small>${ date }</small></div>`;

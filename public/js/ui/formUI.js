@@ -173,3 +173,18 @@ export const cleanAddedProductInput = () => {
 
     if (display) display.value = '';
 }
+
+export const toggleInvoiceInput = (value) => {
+
+    const invoiceContainer = document.getElementById('invoiceContainer');
+
+    if (value === 'invoice') {
+
+        invoiceContainer.style.display = '';
+        invoiceContainer.querySelector('#invoiceInput').value = '';
+
+    } else {
+        
+        invoiceContainer.style.display = 'none';
+    }
+}

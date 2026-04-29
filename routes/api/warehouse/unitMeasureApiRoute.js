@@ -6,7 +6,7 @@ const router = express.Router();
 
 const unitMeasurePermissions = {
     roles: ['Almacenista', 'Coordinador', 'Auxiliar', 'Administrador del sistema'],
-    departments: ['Almacén', 'Sistemas']
+    departments: ['ALMACÉN Y PROVEDURÍA', 'SISTEMAS']
 };
 
 router.get(
