@@ -9,7 +9,7 @@ import { findProfileById } from "../../admin/profileService.js";
 import { applyInventoryMovement } from "../../inventory/movementService.js";
 import { findUniqueSupplier } from "../supplierService.js";
 import { buildGoodsReceiptDetails } from "./goodsReceiptsHelpers.js";
-import { updateConvertedQuantityByCurrentStock } from "../products/productService.js";
+import { updateConvertedQuantityByCurrentStock, updateProductUnitCostIfHigher } from "../products/productService.js";
 
 const REFERENCE_NUMBER_TYPE = 'REC';
 const MOVEMENT_TYPE_IN = 'IN';
@@ -163,6 +163,11 @@ export const createGoodsReceipt = async ({ goodsReceiptDto }) => {
             goodsReceiptId: goodsReceipt.id,
             details: goodsReceipt.details,
             movementType: MOVEMENT_TYPE_IN
+        });
+
+        await updateProductUnitCostIfHigher({
+            tx,
+            details: goodsReceipt.details
         });
 
         await updateConvertedQuantityByCurrentStock({

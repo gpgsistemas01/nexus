@@ -1,4 +1,4 @@
-import { ProductAreaFindDatabaseError, ProductCreateDatabaseError, ProductCurrentStockUpdateDatabaseError, ProductNotFound, ProductQuantityUpdateDatabaseError, ProductUpdateDatabaseError } from "../../../errors/warehouse/productError.js";
+import { ProductDimensionsFindDatabaseError, ProductCreateDatabaseError, ProductCurrentStockUpdateDatabaseError, ProductNotFound, ProductQuantityUpdateDatabaseError, ProductUpdateDatabaseError } from "../../../errors/warehouse/productError.js";
 import { prisma } from "../../../lib/prisma.js";
 import { findAllSupplierProducts, findSupplierProductByIds } from "./supplierProductService.js";
 import { prepareProductData, withRetry } from "./productHelpers.js";
@@ -26,7 +26,7 @@ export const findAllProducts = async ({
     });
 };
 
-export const findAllProductAreas = async ({
+export const findAllProductDimensions = async ({
     tx,
     productIds
 }) => {
@@ -52,7 +52,7 @@ export const findAllProductAreas = async ({
 
     } catch (err) {
 
-        throw new ProductAreaFindDatabaseError();
+        throw new ProductDimensionsFindDatabaseError();
     }
 }
 
@@ -193,7 +193,10 @@ export const updateProduct = async (productDto, id) => {
     });
 };
 
-export const updateConvertedQuantityByCurrentStock = async ({ tx, productIds }) => {
+export const updateConvertedQuantityByCurrentStock = async ({ 
+    tx, 
+    productIds 
+}) => {
 
     const db = tx || prisma;
     const uniqueProductIds = [...new Set(productIds)];
@@ -201,6 +204,7 @@ export const updateConvertedQuantityByCurrentStock = async ({ tx, productIds }) 
     if (!uniqueProductIds.length) return;
 
     try {
+
         const products = await db.product.findMany({
             where: {
                 id: {
@@ -217,8 +221,7 @@ export const updateConvertedQuantityByCurrentStock = async ({ tx, productIds }) 
 
         await Promise.all(products.map((product) => {
 
-            const { base, height } = product;
-            const currentStock = Number(product.currentStock) || 0;
+            const { base, height, currentStock } = product;
             const hasDimensions = base !== null && height !== null && base > 0 && height > 0;
             const convertedQuantity = hasDimensions
                 ? currentStock * (base * height)
@@ -234,6 +237,59 @@ export const updateConvertedQuantityByCurrentStock = async ({ tx, productIds }) 
 
     } catch (err) {
 
+        throw new ProductQuantityUpdateDatabaseError();
+    }
+};
+
+export const updateProductUnitCostIfHigher = async ({
+    tx,
+    details
+}) => {
+
+    const db = tx || prisma;
+
+    try {
+
+        const maxCostByProduct = {};
+
+        for (const detail of details) {
+
+            const { productId, unitCostByArea } = detail;
+
+            if (
+                !maxCostByProduct[productId] ||
+                unitCostByArea > maxCostByProduct[productId]
+            ) {
+                maxCostByProduct[productId] = unitCostByArea;
+            }
+        }
+
+        const productIds = Object.keys(maxCostByProduct);
+
+        const products = await db.product.findMany({
+            where: {
+                id: { in: productIds }
+            },
+            select: {
+                id: true,
+                unitCost: true
+            }
+        });
+
+        await Promise.all(products.map(product => {
+
+            const newCost = maxCostByProduct[product.id];
+
+            if (newCost > product.unitCost) {
+                return db.product.update({
+                    where: { id: product.id },
+                    data: { unitCost: newCost }
+                });
+            }
+
+        }));
+
+    } catch (err) {
         throw new ProductQuantityUpdateDatabaseError();
     }
 };

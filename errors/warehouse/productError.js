@@ -29,10 +29,10 @@ export class SupplierProductDeleteDatabaseError extends AppError {
     }
 }
 
-export class ProductAreaFindDatabaseError extends AppError {
+export class ProductDimensionsFindDatabaseError extends AppError {
 
     constructor () {
-        super('Error de base de datos al buscar el área del producto', 'PRODUCT_AREA_FIND_DB_ERROR', 500);
+        super('Error de base de datos al buscar las medidas del producto', 'PRODUCT_DIMENSIONS_FIND_DB_ERROR', 500);
     }
 }
 
@@ -47,6 +47,13 @@ export class ProductUpdateDatabaseError extends AppError {
 
     constructor () {
         super('Error de base de datos al editar el producto', 'PRODUCT_UPDATE_DB_ERROR', 500);
+    }
+}
+
+export class ProductUnitCostUpdateDatabaseError extends AppError {
+
+    constructor () {
+        super('Error de base de datos al editar el costo unitario del producto', 'PRODUCT_UNIT_COST_UPDATE_DB_ERROR', 500);
     }
 }
 
