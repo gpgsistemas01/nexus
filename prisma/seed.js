@@ -62,7 +62,7 @@ async function main() {
 
     // const hashedPassword = await bcrypt.hash('A%54321', 10)
 
-    await prisma.user.upsert({
+    const user = await prisma.user.upsert({
         where: {
             name: 'Soporte01',
         },
@@ -72,100 +72,31 @@ async function main() {
             name: 'Soporte01',
             password: 'A%54321',
             isActive: true,
-            departmentId: '00000000-0000-0000-0000-000000000001',
-            roleId: '00000000-0000-0000-0000-000000000020'
         },
     });
 
-    const soporte = await prisma.user.findUnique({
-        where: { name: 'Soporte01' }
-        });
-
-        await prisma.user.update({
-            where: { id: soporte.id },
-            data: {
-                profiles: {
-                    create: [
-                        {
-                            name: 'Administrador',
-                            lastName: 'Sistema'
-                        }
-                    ]
-                }
-            }
-        });
-
-    const departamentos = await prisma.department.findMany({
-        select: { id: true, name: true },
-        orderBy: { id: 'asc' }
+    const departments = await prisma.department.findMany({
+        select: { id: true },
     });
     const roles = await prisma.role.findMany({
         select: { id: true, name: true }
     });
     const roleByName = Object.fromEntries(roles.map((role) => [role.name, role.id]));
 
-    const usersSeed = [];
-
-    for (const [index, departamento] of departamentos.entries()) {
-        const safeName = departamento.name.toLowerCase().replace(/\s+/g, '_');
-        const numero = String(index + 1).padStart(2, '0');
-        const isVentas = departamento.name === 'Ventas';
-        const isDiseno = departamento.name === 'Diseño';
-        const isInstalaciones = departamento.name === 'Instalaciones';
-        const isPt = departamento.name === 'PT';
-
-        let roleName = 'Operador';
-        if (isVentas) roleName = 'Vendedor';
-        if (isDiseno) roleName = 'Diseñador';
-        if (isInstalaciones) roleName = 'Instalador';
-        if (isPt) roleName = 'Repartidor';
-
-        usersSeed.push(
-            {
-                name: `coord_${safeName}_${numero}`,
-                password: '12345',
-                departmentId: departamento.id,
-                roleId: roleByName['Coordinador'],
-                profileName: `Coordinador ${departamento.name}`,
-                profileLastName: 'General'
+    for (const dept of departments) {
+        await prisma.userRoleDepartment.upsert({
+            where: {
+                userId_roleId_departmentId: {
+                    userId: user.id,
+                    roleId: '00000000-0000-0000-0000-000000000020', // Admin
+                    departmentId: dept.id
+                }
             },
-            {
-                name: `${safeName}_${numero}_${roleName.toLowerCase()}`,
-                password: '12345',
-                departmentId: departamento.id,
-                roleId: roleByName[roleName],
-                profileName: roleName,
-                profileLastName: departamento.name
-            }
-        );
-
-        if (!isVentas && !isDiseno) {
-            usersSeed.push({
-                name: `${safeName}_${numero}_auxiliar`,
-                password: 'A%54321',
-                departmentId: departamento.id,
-                roleId: roleByName['Auxiliar'],
-                profileName: 'Auxiliar',
-                profileLastName: departamento.name
-            });
-        }
-    }
-
-    for (const userSeed of usersSeed) {
-        await prisma.user.upsert({
-            where: { name: userSeed.name },
-            update: {
-                password: userSeed.password,
-                departmentId: userSeed.departmentId,
-                roleId: userSeed.roleId,
-                isActive: true
-            },
+            update: {},
             create: {
-                name: userSeed.name,
-                password: userSeed.password,
-                departmentId: userSeed.departmentId,
-                roleId: userSeed.roleId,
-                isActive: true
+                userId: user.id,
+                roleId: '00000000-0000-0000-0000-000000000020',
+                departmentId: dept.id
             }
         });
     }
@@ -179,19 +110,6 @@ async function main() {
         ],
         skipDuplicates: true
     });
-
-    for (const userSeed of usersSeed) {
-        await prisma.user.update({
-            where: { name: userSeed.name },
-            data: {
-                profiles: {
-                    create: [
-                        { name: userSeed.profileName, lastName: userSeed.profileLastName }
-                    ]
-                }
-            }
-        });
-    }
 
     await prisma.project.upsert({
         where: { referenceNumber: 'PROY-001' },

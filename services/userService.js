@@ -21,34 +21,27 @@ export const getUserIdByLogin = async (name, password) => {
 
 export const getLoggedUser = async (userId) => {
 
-    const user = await prisma.user.findUnique({
+    const accesses = await prisma.userRoleDepartment.findMany({
         where: {
-            id: userId
+            userId
         },
         select: {
-            id: true,
-            name: true,
-            role: {
-                select: {
-                    id: true,
-                    name: true,
-                }
-            },
-            department: {
-                select: {
-                    id: true,
-                    name: true,
-                }
-            },
+            user: true,
+            role: true,
+            department: true
         }
     });
 
-    return user ? {
-        id: user.id,
-        departmentId: user.department.id,
-        department: user.department.name,
-        roleId: user.role.id,
-        role: user.role.name,
-        name: user.name
-    } : null;
+    if (!accesses.length) return null;
+
+    return {
+        id: accesses[0].user.id,
+        name: accesses[0].user.name,
+        accesses: accesses.map(a => ({
+            roleId: a.role.id,
+            role: a.role.name,
+            departmentId: a.department.id,
+            department: a.department.name
+        }))
+    };
 }

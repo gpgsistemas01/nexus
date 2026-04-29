@@ -160,12 +160,10 @@ export const findAllGoodsIssues = async ({
 
 const validateGoodsIssueRelations = async ({ projectId, requesterId }) => {
 
-    const [project, requester] = await Promise.all([
-        prisma.project.findUnique({ where: { id: projectId } }),
+    const [requester] = await Promise.all([
         prisma.profile.findUnique({ where: { id: requesterId } })
     ]);
 
-    if (!project) throw new GoodsIssueProjectNotFound();
     if (!requester) throw new GoodsIssueRequesterProfileNotFound();
 };
 

@@ -1,36 +1,37 @@
 import { prisma } from "../lib/prisma.js";
 
-export const getDepartmentById = async (id) => {
+export const findAllDepartments = async ({
+    skip = 0,
+    take = 10,
+    search = '',
+    orderBy = 'name',
+    orderDir = 'asc'
+}) => {
 
-    const department = await prisma.department.findFirst({
-        where: {
-            id: id
-        }
-    });
-
-    return department ? department.name : null;
-}
-
-export const getAllDepartmentIds = async () => {
+    const where = {
+        ...(search && {
+            name: {
+                contains: search,
+                mode: 'insensitive'
+            }
+        })
+    };
 
     const departments = await prisma.department.findMany({
-        select: {
-            id: true
+        skip,
+        take,
+        where,
+        orderBy: {
+            [orderBy]: orderDir
         }
     });
-    return departments;
-}
 
-export const getDepartmentWarehouseId = async () => {
+    const total = await prisma.department.count();
+    const filtered = await prisma.department.count({ where });
 
-    const warehouseDepartment = await prisma.department.findFirst({
-        where: {
-            name: 'Almacén'
-        },
-        select: {
-            id: true
-        }
-    });
-    
-    return warehouseDepartment ? warehouseDepartment.id : null;
+    return {
+        data: departments,
+        recordsTotal: total,
+        recordsFiltered: filtered
+    };
 }

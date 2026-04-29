@@ -1,6 +1,6 @@
 import express from 'express';
-import { getAllProfiles } from "../../../controllers/api/admin/profileController.js";
 import { authorizeUserApi, verifyCookiesAuthTokenRequired } from "../../../middleware/authMiddleware.js";
+import { getAllDepartments } from '../../../controllers/api/admin/departmentController.js';
 
 const router = express.Router();
 const profilePermissions = {
@@ -12,7 +12,7 @@ router.get(
     '/',
     verifyCookiesAuthTokenRequired,
     authorizeUserApi(profilePermissions),
-    getAllProfiles
+    getAllDepartments
 );
 
 export default router;
