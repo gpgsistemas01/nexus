@@ -11,6 +11,24 @@ const departmentSelector = '#departmentInput';
 const advisorSelector = '#advisorInput';
 const productSelector = '#productInput';
 
+const bindChangeResetSelect = ({ sourceSelector, targetSelector, reset }) => {
+    const source = document.querySelector(sourceSelector);
+
+    if (!source) return;
+    if (source.dataset.resetBound === 'true') return;
+    source.dataset.resetBound = 'true';
+
+    source.addEventListener('change', () => {
+        if (typeof reset === 'function') reset();
+        else {
+            const target = document.querySelector(targetSelector);
+            if (!target) return;
+            target.value = '';
+            target.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+    });
+};
+
 export const initGoodsIssueFormSelect2 = ({
     context
 }) => {
@@ -38,11 +56,39 @@ export const initGoodsIssueFormSelect2 = ({
         baseSelector: `${ modalSelector } ${ requesterSelector }`,
         placeholder: 'Buscar solicitante...',
         data: (params) => {
+            const departmentName = $(`${ modalSelector } ${ departmentSelector }`).find(':selected').text()?.trim();
+
             return {
-                search: params.term
+                search: params.term,
+                department: departmentName || '',
+                strictDepartmentFilter: true
             };
         },
         allowCreate: false,
+    });
+
+    bindChangeResetSelect({
+        sourceSelector: `${ modalSelector } ${ departmentSelector }`,
+        targetSelector: `${ modalSelector } ${ requesterSelector }`,
+        reset: () => {
+        toggleProfileOption({
+            selector: `${ modalSelector } ${ requesterSelector }`,
+            profileId: null,
+            profileName: null
+        });
+        }
+    });
+
+    bindChangeResetSelect({
+        sourceSelector: `${ modalSelector } ${ advisorSelector }`,
+        targetSelector: `${ modalSelector } ${ clientSelector }`,
+        reset: () => {
+            toggleClientOption({
+                selector: `${ modalSelector } ${ clientSelector }`,
+                id: null,
+                name: null
+            });
+        }
     });
 
     setupProductSelect({

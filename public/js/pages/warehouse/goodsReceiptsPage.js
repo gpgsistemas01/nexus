@@ -3,7 +3,7 @@ import { registerGoodsReceipt } from "../../application/warehouse/goodsReceipts.
 import { validateGoodsReceiptValidators } from "../../utils/validations/validators.js";
 import { refreshProductTable } from "../../plugins/datatable/baseDatatable.js";
 import { createGoodsReceiptDatatable, details, initDetailsGoodsReceiptTable } from "../../plugins/datatable/goodsReceiptDatatable.js";
-import { initGoodsReceiptFormSelect2, setGoodsReceiptFormSelectOptions } from "../../plugins/select2/modules/goodsReceiptSelect.js";
+import { GOODS_RECEIPT_SUPPLIER_CHANGED_EVENT, initGoodsReceiptFormSelect2, setGoodsReceiptFormSelectOptions } from "../../plugins/select2/modules/goodsReceiptSelect.js";
 import { toggleInputSelectErrors, toggleTableErrors, setFormReadOnly, updateTotals, toggleButtons, cleanAddedProductInput, toggleInvoiceInput } from "../../ui/formUI.js";
 import { on } from "../../utils/domUtils.js";
 import { formatDateLongWithTime } from "../../utils/formatters.js";
@@ -15,6 +15,12 @@ const modalId = '#goodsReceiptModal';
 const formId = '#goodsReceiptForm';
 
 createGoodsReceiptDatatable();
+
+document.addEventListener(GOODS_RECEIPT_SUPPLIER_CHANGED_EVENT, () => {
+    details.length = 0;
+    refreshProductTable(details);
+    cleanAddedProductInput();
+});
 
 useForm({
     selector: formId,

@@ -9,6 +9,7 @@ const modalSelector = '#goodsReceiptModal';
 const productSelector = '#productInput';
 const supplierSelector = '.supplier-select';
 const receivedBySelector = '#receivedByInput';
+const supplierChangedEventName = 'goods-receipt:supplier-changed';
 
 export const initGoodsReceiptFormSelect2 = () => {    
 
@@ -37,17 +38,31 @@ export const initGoodsReceiptFormSelect2 = () => {
         productSelector,
     });
 
-    $(`${ modalSelector } ${ supplierSelector }`)
-        .off('change.product-filter')
-        .on('change.product-filter', () => {
-            $(`${ modalSelector } ${ productSelector }`).val(null).trigger('change');
+    const supplierInput = document.querySelector(`${ modalSelector } ${ supplierSelector }`);
+    const productInput = document.querySelector(`${ modalSelector } ${ productSelector }`);
+
+    if (supplierInput) {
+        if (supplierInput.dataset.productFilterBound === 'true') return;
+        supplierInput.dataset.productFilterBound = 'true';
+
+        supplierInput.addEventListener('change', () => {
+            if (productInput) {
+                productInput.value = '';
+                productInput.dispatchEvent(new Event('change', { bubbles: true }));
+            }
+
             const instance = initMdbWrapperInput({
                 selector: '#presentationDisplayInput',
                 value: ''
             });
             updateMdbWrapperInput(instance);
+
+            document.dispatchEvent(new Event(supplierChangedEventName));
         });
+    }
 }
+
+export const GOODS_RECEIPT_SUPPLIER_CHANGED_EVENT = supplierChangedEventName;
 
 export const setGoodsReceiptFormSelectOptions = (data = null) => {
 
