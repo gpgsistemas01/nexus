@@ -60,7 +60,7 @@ export const buildDetailsColumns = ({ type, mode, render, isWarehouse, isSystem 
 
     if (type === 'issue' && (isWarehouse || isSystem)) {
         columns.push(
-            { data: 'unitCost' },
+            { data: 'maxUnitCost' },
             { data: 'projectQuantity' },
             { data: 'difference' }
         );
