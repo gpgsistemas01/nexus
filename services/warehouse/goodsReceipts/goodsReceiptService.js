@@ -57,27 +57,21 @@ export const findAllGoodsReceipts = async ({
             details: {
                 select: {
                     id: true,
+                    productName: true,
+                    productBase: true,
+                    productHeight: true,
                     quantity: true,
-                    totalArea: true,
-                    unitCostByQuantity: true,
-                    unitCostByArea: true,
+                    presentationId: true,
+                    presentationName: true,
+                    convertedQuantity: true,
+                    unitMeasureId: true,
+                    unitMeasureName: true,
+                    unitMeasureSymbol: true,
+                    costPerUnitType: true,
+                    conversionUnitCost: true,
                     netPurchaseAmount: true,
                     grossPurchaseAmount: true,
-                    product: {
-                        select: {
-                            id: true,
-                            name: true,
-                            currentStock: true,
-                            minStock: true,
-                            isActive: true,
-                            base: true,
-                            height: true,
-                            unitCost: true,
-                            convertedQuantity: true,
-                            presentation: true,
-                            unitMeasure: true,
-                        }
-                    },
+                    productId: true,
                 }
             }
         }

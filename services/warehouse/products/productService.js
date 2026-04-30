@@ -43,8 +43,12 @@ export const findAllProductDimensions = async ({
             },
             select: {
                 id: true,
+                name: true,
+                minStock: true,
                 base: true,
-                height: true
+                height: true,
+                presentation: true,
+                unitMeasure: true
             }
         });
 

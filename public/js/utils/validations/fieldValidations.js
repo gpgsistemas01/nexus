@@ -161,16 +161,16 @@ export const validateGoodsReceiptDetailsArray = (details) => {
 
     for (const detail of details) {
 
-        if (!detail.productId || !detail.quantity || !detail.netPurchaseAmount) {
-            return 'Cada detalle debe contener producto, cantidad, costo unitario e importe.';
+        if (!detail.productId || !detail.quantity || !detail.costPerUnitType) {
+            return 'Cada detalle debe contener producto, cantidad y costo por presentación.';
         }
 
         if (isNaN(detail.quantity) || parseFloat(detail.quantity) < 1) {
             return 'La cantidad de cada detalle debe ser un número mayor a cero.';
         }
 
-        if (isNaN(detail.netPurchaseAmount) || parseFloat(detail.netPurchaseAmount) <= 0) {
-            return 'El costo por rollo s/ IVA de cada detalle debe ser un número mayor a cero.';
+        if (isNaN(detail.costPerUnitType) || parseFloat(detail.costPerUnitType) <= 0) {
+            return 'El costo por presentación de cada detalle debe ser un número mayor a cero.';
         }
     }
 

@@ -116,19 +116,19 @@ export const openGoodsReceiptModal = ({ mode, data = null }) => {
         form.elements.receptionDate.value = formatDateLongWithTime(data.receptionDate);
         details.push(...data?.details.map(detail => ({
             id: detail.id,
-            productId: detail.product.id,
-            name: detail.product.name,
-            base: detail.product.base,
-            height: detail.product.height,
+            productId: detail.productId,
+            name: detail.productName,
+            base: detail.productBase,
+            height: detail.productHeight,
             quantity: detail.quantity,
-            presentation: detail.product.presentation.name,
-            totalArea: detail.totalArea,
-            unitMeasure: detail.product.unitMeasure.name,
-            unitCostByArea: detail.unitCostByArea,
-            unitCostByQuantity: detail.unitCostByQuantity,
+            presentationName: detail.presentationName,
+            convertedQuantity: detail.convertedQuantity,
+            unitMeasureName: detail.unitMeasureName,
+            conversionUnitCost: detail.conversionUnitCost,
+            costPerUnitType: detail.costPerUnitType,
             netPurchaseAmount: detail.netPurchaseAmount,
             grossPurchaseAmount: detail.grossPurchaseAmount,
-            supplier
+            supplierName: supplier
         })));
 
         form.elements.totalQuantityDisplayInput.value = data.totalQuantity;
@@ -156,7 +156,7 @@ const addProduct = () => {
     const productId = document.querySelector('#productInput').value;
     const selectedProduct = $('#productInput').select2('data')?.[0];
     const quantity = Number(document.querySelector('#quantityInput').value);
-    const unitCostByQuantity = Number(document.querySelector('#unitCostByQuantityInput').value);
+    const costPerUnitType = Number(document.querySelector('#unitCostByQuantityInput').value);
     const base = selectedProduct?.base ? Number(selectedProduct?.base) : null;
     const height = selectedProduct?.height ? Number(selectedProduct?.height) : null;
     const { presentation, unitMeasure, name, supplier } = selectedProduct;
@@ -166,7 +166,7 @@ const addProduct = () => {
         return;
     }
 
-    if (!productId || !quantity || !unitCostByQuantity) {
+    if (!productId || !quantity || !costPerUnitType) {
         alert('Por favor, complete los campos de producto, cantidad e importe.');
         return;
     }
@@ -176,38 +176,38 @@ const addProduct = () => {
         return;
     }
 
-    if (isNaN(unitCostByQuantity) || unitCostByQuantity <= 0) {
-        alert('El costo por Rollo s/ IVA debe ser un número positivo.');
+    if (isNaN(costPerUnitType) || costPerUnitType <= 0) {
+        alert('El costo por RoPresentación debe ser un número positivo.');
         return;
     }
 
-    const netPurchaseAmount = Number((quantity * unitCostByQuantity).toFixed(2));
-    let totalArea;
+    const netPurchaseAmount = Number((quantity * costPerUnitType).toFixed(2));
+    let convertedQuantity;
 
     if (!base || !height) {
 
-        totalArea = quantity;
+        convertedQuantity = quantity;
 
     } else {
 
-        totalArea = Number(((base * height) * quantity).toFixed(2));
+        convertedQuantity = Number(((base * height) * quantity).toFixed(2));
     }
 
-    const unitCostByArea = Number((netPurchaseAmount / totalArea).toFixed(2));
+    const conversionUnitCost = Number((netPurchaseAmount / convertedQuantity).toFixed(2));
     const grossPurchaseAmount = Number((netPurchaseAmount * 1.16).toFixed(2));
     const product = {
         productId,
-        name,
-        base,
-        height,
+        productName: name,
+        productBase: base,
+        productHeight: height,
         quantity,
-        unitMeasure,
-        presentation,
-        unitCostByQuantity,
-        unitCostByArea,
+        unitMeasureName: unitMeasure,
+        presentationName: presentation,
+        costPerUnitType,
+        conversionUnitCost,
         netPurchaseAmount,
         grossPurchaseAmount,
-        totalArea,
+        convertedQuantity,
         supplier
     };
     details.push(product);

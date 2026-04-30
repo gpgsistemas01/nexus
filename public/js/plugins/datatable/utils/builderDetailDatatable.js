@@ -50,12 +50,12 @@ export const buildDetailsColumns = ({ type, mode, render, isWarehouse, isSystem 
             data: null,
             render
         },
-        { data: 'base' },
-        { data: 'height' },
+        { data: 'productBase' },
+        { data: 'productHeight' },
         { data: 'quantity' },
-        { data: 'presentation' },
-        { data: 'totalArea' },
-        { data: 'unitMeasure' },
+        { data: 'presentationName' },
+        { data: 'convertedQuantity' },
+        { data: 'unitMeasureName' },
     ];
 
     if (type === 'issue' && (isWarehouse || isSystem)) {
@@ -68,8 +68,8 @@ export const buildDetailsColumns = ({ type, mode, render, isWarehouse, isSystem 
 
     if (type === 'receipt') {
         columns.push(
-            { data: 'unitCostByArea' },
-            { data: 'unitCostByQuantity' },
+            { data: 'conversionUnitCost' },
+            { data: 'costPerUnitType' },
             { data: 'netPurchaseAmount' },
             { data: 'grossPurchaseAmount' }
         );

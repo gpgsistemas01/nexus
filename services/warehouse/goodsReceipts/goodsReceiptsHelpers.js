@@ -20,29 +20,37 @@ export const buildGoodsReceiptDetails = async (tx, details) => {
 
     const productMap = new Map(products.map(p => [p.id, p]));
 
-    return details.map(({ productId, quantity, unitCostByQuantity }) => {
+    return details.map(({ productId, quantity, unitCostByQuantity: costPerUnitType }) => {
 
         const product = productMap.get(productId);
 
         if (!product) throw new ProductNotFound();
 
-        const netPurchaseAmount = roundTo(quantity * unitCostByQuantity);
+        const { name, base, height, presentation, unitMeasure } = product;
+        const netPurchaseAmount = roundTo(quantity * costPerUnitType);
         const grossPurchaseAmount = roundTo(netPurchaseAmount * IVA_RATE);
-        const { base, height } = product;
         const hasDimensions = base !== null && height !== null && base > 0 && height > 0;
-        const totalArea = hasDimensions ? roundTo((base * height) * quantity) : quantity;
-        let unitCostByArea = null;
+        const convertedQuantity = hasDimensions ? roundTo((base * height) * quantity) : quantity;
+        let conversionUnitCost = null;
 
-        if (totalArea) unitCostByArea = totalArea > 0 ? roundTo(netPurchaseAmount / totalArea) : 0;
+        if (convertedQuantity) conversionUnitCost = convertedQuantity > 0 ? roundTo(netPurchaseAmount / convertedQuantity) : 0;
 
         return {
             productId,
             quantity,
-            totalArea,
-            unitCostByQuantity,
-            unitCostByArea,
+            convertedQuantity,
+            costPerUnitType,
+            conversionUnitCost,
             netPurchaseAmount,
-            grossPurchaseAmount
+            grossPurchaseAmount,
+            productName: name,
+            productBase: base,
+            productHeight: height,
+            presentationId: presentation.id,
+            presentationName: presentation.name,
+            unitMeasureId: unitMeasure.id,
+            unitMeasureName: unitMeasure.name,
+            unitMeasureSymbol: unitMeasure.symbol
         };
     });
 }

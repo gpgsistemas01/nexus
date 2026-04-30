@@ -130,7 +130,8 @@ const attachProductHandler = ({
                                 unitMeasure: createdProduct.unitMeasure.name,
                                 base: createdProduct.base,
                                 height: createdProduct.height,
-                                supplier: createdProduct.supplier.name
+                                supplier: createdProduct.supplier.name,
+                                unitCost: createdProduct.unitCost
                             }
                         }
                     });

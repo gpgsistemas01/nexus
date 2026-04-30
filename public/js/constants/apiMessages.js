@@ -102,9 +102,9 @@ export const errorMessages = {
 
     // DETAILS
     DETAILS_REQUIRED: 'La lista de detalles debe contener al menos un producto.',
-    DETAILS_INVALID_FORMAT_REQUIRED: 'Cada detalle debe contener un producto y una cantidad.',
+    DETAILS_INVALID_FORMAT_REQUIRED: 'Cada detalle debe contener un producto, una cantidad y un costo por presentación.',
     DETAILS_INVALID_FORMAT_QUANTITY: 'La cantidad de cada detalle debe ser un número mayor a cero.',
-    DETAILS_INVALID_FORMAT_UNIT_COST_BY_QUANTITY: 'El costo por rollo s/ IVA de cada detalle debe ser un número mayor a cero.',
+    DETAILS_INVALID_FORMAT_COST_PER_UNIT_TYPE: 'El costo por presentación de cada detalle debe ser un número mayor a cero.',
 
     PROJECT_NOT_FOUND: 'Proyecto no encontrado.',
     REQUESTER_PROFILE_NOT_FOUND: 'Perfil solicitante no encontrado.',

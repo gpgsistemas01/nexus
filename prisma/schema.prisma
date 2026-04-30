@@ -94,9 +94,10 @@ model Product {
   convertedQuantity Decimal? @db.Decimal(10, 3)
   presentation Presentation @relation(fields: [presentationId], references: [id])
   unitMeasure UnitMeasure @relation(fields: [unitMeasureId], references: [id])
-  detailsGoodsReceipts GoodsReceiptDetail[]
-  detailsPurchaseRequisitions PurchaseRequisitionDetail[]
-  detailsMovement             MovementDetail[]
+  goodsIssueDetails GoodsIssueDetail[]
+  goodsReceiptDetails GoodsReceiptDetail[]
+  purchaseRequisitionsDetails PurchaseRequisitionDetail[]
+  movementDetails             MovementDetail[]
   supplierProducts            SupplierProduct[]
 }
 
@@ -104,6 +105,7 @@ model UnitMeasure {
   id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name String @db.VarChar(20)
   symbol String @db.VarChar(10)
+  goodsIssueDetails GoodsIssueDetail[]
   products Product[]
 
   @@unique([name, symbol])
@@ -112,6 +114,7 @@ model UnitMeasure {
 model Presentation {
   id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name String @unique @db.VarChar(50)
+  goodsIssueDetail GoodsIssueDetail[]
   products Product[]
 }
 
@@ -123,6 +126,7 @@ model Supplier {
   tradeName String @db.VarChar(100)
   isActive      Boolean        @default(true)
   goodsReceipts GoodsReceipt[]
+  goodsIssueDetails GoodsIssueDetail[]
   products       SupplierProduct[]
 }
 
@@ -134,7 +138,6 @@ model SupplierProduct {
   productId  String   @db.Uuid
   supplier   Supplier @relation(fields: [supplierId], references: [id])
   product    Product  @relation(fields: [productId], references: [id])
-  goodsIssueDetails GoodsIssueDetail[]
 
   @@unique([supplierId, productId])
   @@index([supplierId])
@@ -198,11 +201,19 @@ model GoodsReceiptDetail {
   productId        String         @db.Uuid
   goodsReceiptId   String         @db.Uuid
   quantity         Decimal        @db.Decimal(10, 3)
-  unitCostByArea         Decimal?  @db.Decimal(10, 3)
-  unitCostByQuantity Decimal @db.Decimal(10, 3)
-  totalArea           Decimal        @db.Decimal(10, 3)
+  conversionUnitCost         Decimal  @db.Decimal(10, 3)
+  costPerUnitType Decimal @db.Decimal(10, 3)
+  convertedQuantity           Decimal        @db.Decimal(10, 3)
   netPurchaseAmount Decimal @db.Decimal(10, 3)
   grossPurchaseAmount Decimal @db.Decimal(10, 3)
+  presentationId String @db.Uuid
+  presentationName String @db.VarChar(50)
+  unitMeasureId String @db.Uuid
+  unitMeasureName String @db.VarChar(20)
+  unitMeasureSymbol String @db.VarChar(10)
+  productName String @db.VarChar(200)
+  productBase                        Decimal?                           @db.Decimal(10, 3)
+  productHeight                      Decimal?                           @db.Decimal(10, 3)
   goodsReceipt     GoodsReceipt   @relation(fields: [goodsReceiptId], references: [id])
   product          Product        @relation(fields: [productId], references: [id])
   movementDetails        MovementDetail[]
@@ -271,12 +282,24 @@ model GoodsIssue {
 
 model GoodsIssueDetail {
   id           String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  supplierProductId    String  @db.Uuid
+  productId    String  @db.Uuid
   goodsIssueId String  @db.Uuid
-  quantity     Decimal @db.Decimal(10, 2)
+  supplierId String @db.Uuid
 
+  presentationId String @db.Uuid
+  unitMeasureId String @db.Uuid
+  base                        Decimal?                           @db.Decimal(10, 3)
+  height                      Decimal?                           @db.Decimal(10, 3)
+  unitCost                    Decimal                           @db.Decimal(10, 3)
+  quantity     Decimal @db.Decimal(10, 2)
+  projectQuantity Decimal? @db.Decimal(10, 2)
+  difference Decimal? @db.Decimal(10, 3)
+
+  presentation Presentation @relation(fields: [presentationId], references: [id])
+  unitMeasure UnitMeasure @relation(fields: [unitMeasureId], references: [id])
+  product Product @relation(fields: [productId], references: [id])
+  supplier Supplier @relation(fields: [supplierId], references: [id])
   goodsIssue       GoodsIssue     @relation(fields: [goodsIssueId], references: [id])
-  supplierProduct          SupplierProduct        @relation(fields: [supplierProductId], references: [id])
   movementDetails  MovementDetail[]
 }
 
