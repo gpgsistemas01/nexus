@@ -23,6 +23,7 @@ export const initGoodsReceiptFormSelect2 = () => {
         baseSelector: `${ modalSelector } ${ receivedBySelector }`,
         placeholder: 'Buscar persona que recibe...',
         data: (params) => {
+            
             return {
                 search: params.term,
                 department: 'ALMACÉN Y PROVEDURÍA',
@@ -68,14 +69,14 @@ export const setGoodsReceiptFormSelectOptions = (data = null) => {
 
     toggleSupplierOption({
         selector: `${ modalSelector } ${ supplierSelector }`,
-        id: data?.supplier?.id,
-        name: `${ data?.supplier?.tradeName }`
+        id: data?.supplierId,
+        name: `${ data?.supplierName }`
     });
 
     toggleProfileOption({
         selector: `${ modalSelector } ${ receivedBySelector }`,
-        profileId: data?.receivedBy?.id,
-        profileName: data?.receivedBy?.fullName,
+        profileId: data?.receivedById,
+        profileName: data?.receivedByName,
     });
 
     toggleProductOption({

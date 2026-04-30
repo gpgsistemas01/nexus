@@ -169,9 +169,9 @@ export const cleanAddedProductInput = () => {
     $('#productInput').empty().trigger('change');
     document.querySelector('#quantityInput').value = '';
     document.querySelector('#presentationDisplayInput').value = '';
-    const display = document.querySelector('#unitCostByQuantityInput');
+    const costInput = document.querySelector('#costPerUnitInput');
 
-    if (display) display.value = '';
+    if (costInput) costInput.value = '';
 }
 
 export const toggleInvoiceInput = ({ value, mode, form }) => {

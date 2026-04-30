@@ -40,20 +40,17 @@ export const findAllGoodsReceipts = async ({
         orderBy: {
             [orderBy]: orderDir
         },
-        include: {
-            receivedBy: {
-                select: {
-                    id: true,
-                    fullName: true,
-                }
-            },
-            supplier: {
-                select: {
-                    id: true,
-                    tradeName: true,
-                    code: true
-                }
-            },
+        select: {
+            referenceNumber: true,
+            receivedById: true,
+            receivedByName: true,
+            supplierId: true,
+            supplierName: true,
+            totalGrossPurchaseAmount: true,
+            totalNetPurchaseAmount: true,
+            totalQuantity: true,
+            receptionDate: true,
+            id: true,
             details: {
                 select: {
                     id: true,
@@ -93,12 +90,12 @@ export const createGoodsReceipt = async ({ goodsReceiptDto }) => {
 
         const { receivedById, supplierId, details, ...goodsReceiptData } = goodsReceiptDto;
 
-        await findUniqueSupplier({
+        const supplier = await findUniqueSupplier({
             tx,
             id: supplierId
         });
 
-        await findProfileById({ 
+        const receivedBy = await findProfileById({ 
             tx, 
             id: receivedById 
         });
@@ -122,6 +119,8 @@ export const createGoodsReceipt = async ({ goodsReceiptDto }) => {
             data: {
                 ...goodsReceiptData,
                 ...totals,
+                supplierName: supplier.tradeName,
+                receivedByName: receivedBy.fullName,
                 status: {
                     connect: {
                         name: STATUS_CONFIRMED

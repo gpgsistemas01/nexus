@@ -64,6 +64,7 @@ export const findProfileById = async ({ tx, id }) => {
             },
             select: {
                 id: true,
+                fullName: true,
             }
         });
 
@@ -72,7 +73,7 @@ export const findProfileById = async ({ tx, id }) => {
         throw new ProfileFindDatabaseError();
     }
 
-    return profile?.id || null;
+    return profile || null;
 };
 
 export const findProfileByUserId = async ({ tx, userId }) => {

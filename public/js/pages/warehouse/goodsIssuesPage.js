@@ -8,6 +8,7 @@ import { on } from "../../utils/domUtils.js";
 import { formatDateLongWithTime } from "../../utils/formatters.js";
 import { handleAction, handleSubmit, validateFields } from "../../utils/formUtils.js";
 import { openModal } from "../../ui/modalUI.js";
+import { hasPermission } from "../../utils/permissions.js";
 
 const modalId = '#goodsIssueModal';
 const formId = '#goodsIssueForm';
@@ -88,25 +89,26 @@ export const openGoodsIssueModal = async ({ mode, data = null }) => {
         form.querySelector('#observationsInput').value = data.observations || '';
         form.querySelector('#requestDateInput').value = formatDateLongWithTime(data.requestDate);
         form.querySelector('#projectNumberInput').value = data.projectNumber;
-        details.push(...data?.details.map(detail => ({
+        details.push(...data.details.map(detail => ({
             id: detail.id,
-            supplierProductId: detail.supplierProduct.id,
-            name: detail.supplierProduct.product.name,
-            base: detail.supplierProduct.product.base,
-            height: detail.supplierProduct.product.height,
+            productId: detail.productId,
+            supplierId: detail.supplierId,
+            presentationId: detail.presentationId,
+            unitMeasureId: detail.unitMeasureId,
+            productName: detail.productName,
+            productBase: detail.productBase,
+            productHeight: detail.productHeight,
             quantity: detail.quantity,
-            presentation: detail.supplierProduct.product.presentation.name,
-            totalArea: detail.totalArea,
-            unitMeasure: detail.supplierProduct.product.unitMeasure.name,
-            unitCost: detail.supplierProduct.product.unitCost,
+            presentationName: detail.presentationName,
+            convertedQuantity: detail.convertedQuantity,
+            unitMeasureId: detail.unitMeasureId,
+            unitMeasureName: detail.unitMeasureName,
+            unitMeasureSymbol: detail.unitMeasureSymbol,
+            maxUnitCost: detail.maxUnitCost,
             projectQuantity: detail.projectQuantity,
             difference: detail.difference,
-            supplier: detail.supplierProduct.supplier.tradeName
+            supplierName: detail.supplierName
         })));
-
-        form.elements.totalQuantityDisplayInput.value = data.totalQuantity;
-        form.elements.totalNetPurchaseAmountDisplayInput.value = data.totalNetPurchaseAmount;
-        form.elements.totalGrossPurchaseAmountDisplayInput.value = data.totalGrossPurchaseAmount;
 
         if (mode === 'edit') {
             modalElement.querySelector('#modalTitle').textContent = 'Editar salida';
@@ -121,12 +123,10 @@ export const openGoodsIssueModal = async ({ mode, data = null }) => {
 
     if (mode === 'view' && data?.status?.name) {
 
-        const isAdmin = context.role === 'Administrador del sistema';
-        const isWarehouse = context.department === 'Almacén';
-        const isCoordinatorOfArea = context.role === 'Coordinador' && data?.department?.name === context.department;
+        const { isAdmin, isWarehouse, isCoordinatorOfArea } = hasPermission(context);
         const status = data.status.name;
 
-        const canApproveReject = status === 'Abierta' && (isAdmin || isWarehouse || isCoordinatorOfArea);
+        const canApproveReject = status === 'Abierta' && (isAdmin || isWarehouse || isCoordinatorOfArea(data?.department?.name));
         const canConfirmCancel = status === 'Aprobada' && (isAdmin || isWarehouse);
 
         const actionContainer = form.querySelector('.approve-container');
@@ -165,9 +165,9 @@ const addProduct = () => {
     const productId = document.querySelector('#productInput').value;
     const selectedProduct = $('#productInput').select2('data')?.[0];
     const quantity = Number(document.querySelector('#quantityInput').value);
-    const base = selectedProduct?.base ? Number(selectedProduct?.base) : null;
-    const height = selectedProduct?.height ? Number(selectedProduct?.height) : null;
-    const { presentation, unitMeasure, name, supplier, unitCost } = selectedProduct;
+    const productBase = selectedProduct?.productBase ? Number(selectedProduct?.productBase) : null;
+    const productHeight = selectedProduct?.productHeight ? Number(selectedProduct?.productHeight) : null;
+    const { presentationName, unitMeasureName, productName, supplierName, unitCost } = selectedProduct;
 
     if (!productId || !quantity) {
         alert('Por favor, complete los campos de producto y cantidad.');
@@ -179,32 +179,23 @@ const addProduct = () => {
         return;
     }
 
-    let area;
-    let totalArea;
+    let convertedQuantity;
 
-    if (!base || !height) {
+    if (!productBase || !productHeight) convertedQuantity = quantity;
+    else convertedQuantity = Number((productBase * productHeight * quantity).toFixed(2));
 
-        area = null;
-        totalArea = quantity;
-
-    } else {
-
-        area = Number((base * height).toFixed(2));
-        totalArea = Number((area * quantity).toFixed(2));
-    }
-
+    const maxUnitCost = unitCost;
     const product = {
         productId,
-        name,
-        base,
-        height,
-        area,
+        productName,
+        productBase,
+        productHeight,
         quantity,
-        unitMeasure,
-        presentation,
-        totalArea,
-        supplier,
-        unitCost
+        unitMeasureName,
+        presentationName,
+        convertedQuantity,
+        supplierName,
+        maxUnitCost
     };
 
     details.push(product);

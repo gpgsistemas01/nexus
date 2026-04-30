@@ -66,7 +66,10 @@ export const findUniqueSupplier = async ({
 
         supplier = await db.supplier.findUnique({
             where: { id },
-            select: { id: true }
+            select: { 
+                id: true,
+                tradeName: true,
+            }
         });
 
     } catch (err) {

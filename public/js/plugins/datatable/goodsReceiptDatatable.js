@@ -45,13 +45,13 @@ export const createGoodsReceiptDatatable = () => {
                     title: 'Recepción',
                     render: (data, type, row) => {
 
-                        const name = row.receivedBy ? row.receivedBy.fullName : 'Usuario Eliminado';
+                        const name = row.receivedByName;
                         const date = new Date(row.receptionDate).toLocaleString();
 
                         return `<div>${ name }<br><small>${ date }</small></div>`;
                     }
                 },
-                { data: 'supplier.tradeName', title: 'Proveedor' },
+                { data: 'supplierName', title: 'Proveedor' },
                 {
                     data: 'id',
                     title: 'Acciones',

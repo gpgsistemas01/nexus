@@ -114,24 +114,21 @@ export const findAllGoodsIssues = async ({
             details: {
                 select: {
                     id: true,
-                    supplierProduct: {
-                        select: {
-                            id: true,
-                            product: true,
-                            supplier: true
-                        }
-                    },
-                    quantity: true
-                }
-            },
-            movements: {
-                select: {
-                    details: {
-                        select: {
-                            productId: true,
-                            quantity: true
-                        }
-                    }
+                    productId: true,
+                    productName: true,
+                    productBase: true,
+                    productHeight: true,
+                    quantity: true,
+                    presentationId: true,
+                    presentationName: true,
+                    convertedQuantity: true,
+                    unitMeasureId: true,
+                    unitMeasureName: true,
+                    unitMeasureSymbol: true,
+                    maxUnitCost: true,
+                    projectQuantity: true,
+                    difference: true,
+                    supplierName: true,
                 }
             }
         }

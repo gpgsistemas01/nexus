@@ -1,1 +1,0 @@
-export const ADVISORS_API_ROUTE = '/api/sales/advisors/';

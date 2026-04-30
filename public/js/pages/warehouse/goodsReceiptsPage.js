@@ -158,9 +158,9 @@ const addProduct = () => {
     const selectedProduct = $('#productInput').select2('data')?.[0];
     const quantity = Number(document.querySelector('#quantityInput').value);
     const costPerUnitType = Number(document.querySelector('#costPerUnitInput').value);
-    const base = selectedProduct?.base ? Number(selectedProduct?.base) : null;
-    const height = selectedProduct?.height ? Number(selectedProduct?.height) : null;
-    const { presentation, unitMeasure, name, supplier } = selectedProduct;
+    const productBase = selectedProduct?.productBase ? Number(selectedProduct?.productBase) : null;
+    const productHeight = selectedProduct?.productHeight ? Number(selectedProduct?.productHeight) : null;
+    const { presentationName, unitMeasureName, productName, supplierName } = selectedProduct;
 
     if (!supplierId) {
         alert('Selecciona un proveedor antes de agregar productos.');
@@ -185,31 +185,25 @@ const addProduct = () => {
     const netPurchaseAmount = Number((quantity * costPerUnitType).toFixed(2));
     let convertedQuantity;
 
-    if (!base || !height) {
-
-        convertedQuantity = quantity;
-
-    } else {
-
-        convertedQuantity = Number(((base * height) * quantity).toFixed(2));
-    }
+    if (!productBase || !productHeight) convertedQuantity = quantity;
+    else convertedQuantity = Number(((productBase * productHeight) * quantity).toFixed(2));
 
     const conversionUnitCost = Number((netPurchaseAmount / convertedQuantity).toFixed(2));
     const grossPurchaseAmount = Number((netPurchaseAmount * 1.16).toFixed(2));
     const product = {
         productId,
-        productName: name,
-        productBase: base,
-        productHeight: height,
+        productName,
+        productBase,
+        productHeight,
         quantity,
-        unitMeasureName: unitMeasure,
-        presentationName: presentation,
+        unitMeasureName,
+        presentationName,
         costPerUnitType,
         conversionUnitCost,
         netPurchaseAmount,
         grossPurchaseAmount,
         convertedQuantity,
-        supplier
+        supplierName,
     };
     details.push(product);
 

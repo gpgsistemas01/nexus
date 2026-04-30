@@ -43,12 +43,12 @@ const initProductSelect = ({
                     return {
                         id: p.id,
                         text,
-                        name: p.name,
-                        presentation: p.presentation.name,
-                        unitMeasure: p.unitMeasure.name,
-                        base: p.base,
-                        height: p.height,
-                        supplier: p.supplier.tradeName,
+                        productName: p.name,
+                        presentationName: p.presentation.name,
+                        unitMeasureName: p.unitMeasure.name,
+                        productBase: p.base,
+                        productHeight: p.height,
+                        supplierName: p.supplier.tradeName,
                         unitCost: p.unitCost
                     }
                 })
@@ -126,11 +126,11 @@ const attachProductHandler = ({
                                 id: createdProduct.id,
                                 text,
                                 name: createdProduct.name,
-                                presentation: createdProduct.presentation.name,
-                                unitMeasure: createdProduct.unitMeasure.name,
-                                base: createdProduct.base,
-                                height: createdProduct.height,
-                                supplier: createdProduct.supplier.name,
+                                presentationName: createdProduct.presentation.name,
+                                unitMeasureName: createdProduct.unitMeasure.name,
+                                productBase: createdProduct.base,
+                                productHeight: createdProduct.height,
+                                supplierName: createdProduct.supplier.tradeName,
                                 unitCost: createdProduct.unitCost
                             }
                         }
@@ -146,7 +146,7 @@ const attachProductHandler = ({
             return;
         }
 
-        const value = selected.presentation;
+        const value = selected.presentationName || '';
         setMdbWrapperInputValue({
             selector: wrapperSelector,
             value

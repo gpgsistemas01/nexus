@@ -1,7 +1,6 @@
 import 'dotenv/config.js';
 
 import authApiRoutes from './routes/api/authApiRoute.js';
-import advisorApiRoutes from './routes/api/sales/advisorApiRoute.js';
 import clientApiRoutes from './routes/api/sales/clientApiRoute.js';
 import productApiRoutes from './routes/api/warehouse/productApiRoute.js';
 import supplierApiRoutes  from './routes/api/warehouse/supplierApiRoute.js';
@@ -88,7 +87,6 @@ app.use('/salidas-almacen', goodsIssueWebRoutes);
 
 // api routes
 app.use(apiRoute + authRoute, authApiRoutes);
-app.use(apiRoute + sales + '/advisors', advisorApiRoutes);
 app.use(apiRoute + sales + '/clients', clientApiRoutes);
 app.use(apiRoute + warehouse + '/products', productApiRoutes);
 app.use(apiRoute + warehouse + '/suppliers', supplierApiRoutes);
