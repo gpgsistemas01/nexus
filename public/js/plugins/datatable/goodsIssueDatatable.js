@@ -19,7 +19,7 @@ export const createGoodsIssueDatatable = (context) => {
             title: 'Solicitud',
             render: (data, type, row) => {
 
-                const name = `${ row.requester.name } ${ row.requester.lastName }`;
+                const name = row.requesterName;
                 const date = new Date(row.requestDate).toLocaleString();
 
                 return `<div>${ name }<br><small>${ date }</small></div>`;
@@ -29,7 +29,7 @@ export const createGoodsIssueDatatable = (context) => {
 
     if (isWarehouse || isSystem) {
         columns.push({
-            data: 'department.name',
+            data: 'departmentName',
             title: 'Área'
         });
     }
@@ -40,8 +40,7 @@ export const createGoodsIssueDatatable = (context) => {
             title: 'Proyecto',
             render: (data, type, row) => {
 
-                const projectDate = new Date(row.project.date).toLocaleDateString();
-                return `<div>${ row.project.referenceNumber } - ${ row.project.name }<br><small>${ row.project.client } | ${ projectDate }</small></div>`;
+                return `<div>${ row.projectNumber }<br><small>${ row.clientName }</small></div>`;
             }
         },
         {
@@ -71,7 +70,6 @@ export const createGoodsIssueDatatable = (context) => {
             }
         },
         { data: 'dispatchStatus', title: 'Estado surtido' },
-        { data: 'status.name', title: 'Estado' },
         {
             data: 'id',
             title: 'Acciones',

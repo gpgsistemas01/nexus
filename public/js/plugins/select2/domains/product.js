@@ -49,7 +49,8 @@ const initProductSelect = ({
                         productBase: p.base,
                         productHeight: p.height,
                         supplierName: p.supplier.tradeName,
-                        unitCost: p.unitCost
+                        unitCost: p.unitCost,
+                        supplierId: p.supplier.id
                     }
                 })
             };
@@ -130,8 +131,9 @@ const attachProductHandler = ({
                                 unitMeasureName: createdProduct.unitMeasure.name,
                                 productBase: createdProduct.base,
                                 productHeight: createdProduct.height,
+                                supplierId: createdProduct.supplier.id,
                                 supplierName: createdProduct.supplier.tradeName,
-                                unitCost: createdProduct.unitCost
+                                maxUnitCost: createdProduct.maxUnitCost
                             }
                         }
                     });

@@ -69,7 +69,7 @@ export const openGoodsIssueModal = async ({ mode, data = null }) => {
         withTotal: false
     });
     setFormReadOnly({ form, isReadOnly: false });
-    initGoodsIssueFormSelect2({ context });
+    initGoodsIssueFormSelect2();
     setGoodsIssueFormSelectOptions(data);
 
     leftAction = null;
@@ -167,7 +167,7 @@ const addProduct = () => {
     const quantity = Number(document.querySelector('#quantityInput').value);
     const productBase = selectedProduct?.productBase ? Number(selectedProduct?.productBase) : null;
     const productHeight = selectedProduct?.productHeight ? Number(selectedProduct?.productHeight) : null;
-    const { presentationName, unitMeasureName, productName, supplierName, unitCost } = selectedProduct;
+    const { presentationName, unitMeasureName, productName, supplierName, supplierId, maxUnitCost } = selectedProduct;
 
     if (!productId || !quantity) {
         alert('Por favor, complete los campos de producto y cantidad.');
@@ -184,7 +184,6 @@ const addProduct = () => {
     if (!productBase || !productHeight) convertedQuantity = quantity;
     else convertedQuantity = Number((productBase * productHeight * quantity).toFixed(2));
 
-    const maxUnitCost = unitCost;
     const product = {
         productId,
         productName,
@@ -195,7 +194,8 @@ const addProduct = () => {
         presentationName,
         convertedQuantity,
         supplierName,
-        maxUnitCost
+        maxUnitCost,
+        supplierId
     };
 
     details.push(product);

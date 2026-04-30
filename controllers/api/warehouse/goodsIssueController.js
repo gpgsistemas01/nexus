@@ -8,7 +8,7 @@ import {
     findAllGoodsIssues,
     rejectGoodsIssue,
     updateGoodsIssue
-} from "../../../services/warehouse/goodsIssueService.js";
+} from "../../../services/warehouse/goodsIssues/goodsIssueService.js";
 import { createStockNotification, notifyProductStockStatusChanges } from "../../../services/warehouse/notificationService.js";
 import { emitStockUpdated } from "../../../utils/socketUtils.js";
 import { sanitizeEmptyStrings } from "../../../utils/formattersUtils.js";
@@ -29,8 +29,7 @@ export const getAllGoodsIssues = async (req, res) => {
         search,
         orderBy: columns[orderColumnIndex],
         orderDir,
-        userDepartment: req.user?.department,
-        userRole: req.user?.role
+        accesses: req.user?.accesses
     });
 
     res.status(200).json(result);
@@ -62,8 +61,6 @@ export const editGoodsIssue = async (req, res) => {
         goodsIssueDto: sanitizedGoodsIssueDto, 
         id: req.params.id,
         canEditDepartment,
-        userDepartment: req.user.department,
-        userRole: req.user.role
     });
 
     return res.status(200).json({
@@ -110,33 +107,6 @@ export const confirmGoodsIssueStatus = async (req, res) => {
         userRole: req.user.role,
         userId: req.userId
     });
-    const productStockNotifications = await notifyProductStockStatusChanges({
-        productIds: goodsIssue.dispatchedProductIds || [],
-        userId: req.userId
-    });
-
-    const isPartialDispatch = goodsIssue.status?.name === 'Aprobada';
-    const totalProducts = goodsIssue.totalRequestedProducts || 0;
-    const issueMessage = isPartialDispatch
-        ? `Salida con folio ${goodsIssue.referenceNumber} aprobada parcialmente con ${totalProducts} producto(s).`
-        : `Salida con folio ${goodsIssue.referenceNumber} aprobada completamente con ${totalProducts} producto(s).`;
-
-    const notification = await createStockNotification({
-        title: 'Salida aprobada',
-        message: issueMessage,
-        type: isPartialDispatch ? 'warning' : 'info',
-        referenceNumber: goodsIssue.referenceNumber,
-        entityId: goodsIssue.id,
-        entityType: 'goods-issue',
-        userId: req.userId,
-        departmentId: goodsIssue.department?.id || null
-    });
-
-    emitStockUpdated({ source: 'goods-issue-confirm', notification });
-
-    for (const productNotification of productStockNotifications) {
-        emitStockUpdated({ source: 'product-stock-status', notification: productNotification });
-    }
 
     return res.status(200).json({
         goodsIssue,

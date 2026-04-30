@@ -59,6 +59,8 @@ model Profile {
   requesterGoodsIssues          GoodsIssue[]          @relation("RequesterGoodsIssueRelation")
   warehouseStaffGoodsIssues     GoodsIssue[]          @relation("WarehouseStaffGoodsIssueRelation")
   deliveredPurchaseRequisitions PurchaseRequisition[] @relation("DeliveredByRelation")
+  clients Client[]
+  goodsIssues GoodsIssue[]
 }
 
 model DepartmentProfile {
@@ -90,7 +92,7 @@ model Product {
   minStock                    Decimal                           @default(0) @db.Decimal(10, 2)
   base                        Decimal?                           @db.Decimal(10, 3)
   height                      Decimal?                           @db.Decimal(10, 3)
-  unitCost                    Decimal?                           @db.Decimal(10, 3)
+  maxUnitCost                    Decimal?                           @db.Decimal(10, 3)
   convertedQuantity Decimal? @db.Decimal(10, 3)
   presentation Presentation @relation(fields: [presentationId], references: [id])
   unitMeasure UnitMeasure @relation(fields: [unitMeasureId], references: [id])
@@ -168,6 +170,14 @@ model Project {
   date                 DateTime
   purchaseRequisitions PurchaseRequisition[]
   goodsIssues          GoodsIssue[]
+}
+
+model Client {
+  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name String @db.VarChar(255)
+  advisorId String? @db.Uuid
+  advisor Profile? @relation(fields: [advisorId], references: [id])
+  goodsIssues GoodsIssue[]
 }
 
 model ReferenceNumberCounter {
@@ -263,20 +273,29 @@ model GoodsIssue {
   requestDate     DateTime
   deliveryDate    DateTime?
   observations    String?   @db.VarChar(50)
+  projectNumber String @db.VarChar(10)
+  departmentName String @db.VarChar(50)
+  requesterName String @db.VarChar(255)
+  clientName String @db.VarChar(255)
+  advisorName String @db.VarChar(255)
 
   statusId         String  @db.Uuid
   departmentId     String  @db.Uuid
   approverId       String? @db.Uuid
   requesterId      String  @db.Uuid
   warehouseStaffId String? @db.Uuid
-  projectId        String  @db.Uuid
+  projectId        String?  @db.Uuid
+  clientId String @db.Uuid
+  advisorId String @db.Uuid
 
   department     Department @relation(fields: [departmentId], references: [id])
   approver       Profile?   @relation("ApproverGoodsIssueRelation", fields: [approverId], references: [id])
   requester      Profile    @relation("RequesterGoodsIssueRelation", fields: [requesterId], references: [id])
   warehouseStaff Profile?   @relation("WarehouseStaffGoodsIssueRelation", fields: [warehouseStaffId], references: [id])
   status         Status     @relation(fields: [statusId], references: [id])
-  project        Project    @relation(fields: [projectId], references: [id])
+  project        Project?    @relation(fields: [projectId], references: [id])
+  client Client @relation(fields: [clientId], references: [id])
+  advisor Profile @relation(fields: [advisorId], references: [id])
 
   details  GoodsIssueDetail[]
   movements InventoryMovement[]
@@ -338,17 +357,4 @@ model MovementDetail {
   goodsReceiptDetail GoodsReceiptDetail? @relation(fields: [goodsReceiptDetailId], references: [id])
   goodsIssueDetail GoodsIssueDetail? @relation(fields: [goodsIssueDetailId], references: [id])
   movement   InventoryMovement @relation(fields: [movementId], references: [id])
-}
-
-model Advisor {
-  id String @id  @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name String @db.VarChar(100)
-  clients Client[]
-}
-
-model Client {
-  id String @id  @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name String @db.VarChar(100)
-  advisorId String @db.Uuid
-  advisor Advisor @relation(fields: [advisorId], references: [id])
 }

@@ -16,8 +16,15 @@ export class GoodsIssueProjectNotFound extends AppError {
 
 export class GoodsIssueRequesterProfileNotFound extends AppError {
 
-    constructor() {
+    constructor () {
         super('Perfil solicitante no encontrado', 'REQUESTER_PROFILE_NOT_FOUND', 404);
+    }
+}
+
+export class GoodsIssueAdvisorProfileNotFound extends AppError {
+
+    constructor () {
+        super('Perfil de asesor no encontrado', 'ADVISOR_PROFILE_NOT_FOUND', 404);
     }
 }
 

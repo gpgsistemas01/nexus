@@ -75,8 +75,8 @@ export const setGoodsReceiptFormSelectOptions = (data = null) => {
 
     toggleProfileOption({
         selector: `${ modalSelector } ${ receivedBySelector }`,
-        profileId: data?.receivedById,
-        profileName: data?.receivedByName,
+        id: data?.receivedById,
+        name: data?.receivedByName,
     });
 
     toggleProductOption({

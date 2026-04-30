@@ -1,3 +1,4 @@
+import { ClientFindDatabaseError, ClientNotFound } from "../../errors/sales/clientError.js";
 import { prisma } from "../../lib/prisma.js";
 
 export const findAllClients = async ({
@@ -36,4 +37,29 @@ export const findAllClients = async ({
         recordsTotal: total,
         recordsFiltered: filtered
     };
+}
+
+export const findClientById = async ({ tx, id }) => {
+
+    const db = tx || prisma;
+    let client;
+
+    try {
+
+        client = await db.client.findFirst({
+            where: { id },
+            select: {
+                id: true,
+                name: true
+            }
+        });
+
+    } catch (err) {
+
+        throw new ClientFindDatabaseError();
+    }
+
+    if (!client) throw new ClientNotFound();
+
+    return client || null;
 }

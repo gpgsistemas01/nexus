@@ -30,7 +30,7 @@ export const validateGoodsReceiptValidators = {
 }
 
 export const validateGoodsIssueValidators = {
-    referenceNumber: (value) => validateText(value, 50, 'El número de proyecto'),
+    projectNumber: (value) => validateText(value, 50, 'El número de proyecto'),
     advisorId: (value) => isEmptyOrNull(value, 'El asesor'),
     clientId: (value) => isEmptyOrNull(value, 'El cliente'),
     departmentId: (value) => isEmptyOrNull(value, 'El cliente'),

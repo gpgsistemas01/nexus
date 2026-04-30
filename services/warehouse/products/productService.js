@@ -35,7 +35,7 @@ export const findProductsSnapshot = async ({
 
     try {
 
-        const products = await tx.product.findMany({
+        const products = await db.product.findMany({
             where: {
                 id: {
                     in: productIds
@@ -48,7 +48,8 @@ export const findProductsSnapshot = async ({
                 base: true,
                 height: true,
                 presentation: true,
-                unitMeasure: true
+                unitMeasure: true,
+                maxUnitCost: true
             }
         });
 
@@ -276,7 +277,7 @@ export const updateProductUnitCostIfHigher = async ({
             },
             select: {
                 id: true,
-                unitCost: true
+                maxUnitCost: true
             }
         });
 
@@ -284,10 +285,10 @@ export const updateProductUnitCostIfHigher = async ({
 
             const newCost = maxCostByProduct[product.id];
 
-            if (newCost > product.unitCost) {
+            if (newCost > product.maxUnitCost) {
                 return db.product.update({
                     where: { id: product.id },
-                    data: { unitCost: newCost }
+                    data: { maxUnitCost: newCost }
                 });
             }
 

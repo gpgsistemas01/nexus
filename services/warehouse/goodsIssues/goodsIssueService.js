@@ -1,3 +1,4 @@
+import { GoodsIssueInsufficientStock } from "../../../errors/inventory/stockError.js";
 import {
     GoodsIssueApprovalForbidden,
     GoodsIssueConfirmationForbidden,
@@ -9,10 +10,15 @@ import {
     GoodsIssueApproverProfileNotFound,
     GoodsIssueWarehouseStaffProfileNotFound,
     GoodsIssueStatusUpdateDatabaseError,
-    GoodsIssueUpdateDatabaseError
-} from "../../errors/warehouse/goodsIssueError.js";
-import { prisma } from "../../lib/prisma.js";
-import { getDepartmentByProfileId } from "../admin/userService.js";
+    GoodsIssueUpdateDatabaseError,
+    GoodsIssueAdvisorProfileNotFound
+} from "../../../errors/warehouse/goodsIssueError.js";
+import { prisma } from "../../../lib/prisma.js";
+import { findProfileById } from "../../admin/profileService.js";
+import { findDepartmentById } from "../../admin/departmentService.js";
+import { generateReferenceNumber } from "../../document/referenceNumberService.js";
+import { findClientById } from "../../sales/clientService.js";
+import { buildGoodsIssueDetails } from "./goodsIssueHelpers.js";
 
 const ROLE_SYSTEM_ADMIN = 'Administrador del sistema';
 const ROLE_COORDINATOR = 'Coordinador';
@@ -37,16 +43,18 @@ export const findAllGoodsIssues = async ({
     skip = 0,
     take = 10,
     search = '',
-    orderBy = 'requestDate',
+    orderBy = 'referenceNumber',
     orderDir = 'asc',
-    userDepartment = '',
-    userRole = ''
+    accesses = []
 }) => {
 
-    const isAdmin = userRole === ROLE_SYSTEM_ADMIN;
-    const isWarehouseCoordinator = userRole === ROLE_COORDINATOR && userDepartment === DEPARTMENT_WAREHOUSE;
-
+    const isAdmin = accesses.some(access => access.role === ROLE_SYSTEM_ADMIN);
+    const isWarehouseCoordinator = accesses.some(access => 
+        access.role === ROLE_COORDINATOR && 
+        access.department === DEPARTMENT_WAREHOUSE
+    );
     const canViewAll = isAdmin || isWarehouseCoordinator;
+    const userDepartments = accesses.map(a => a.department);
 
     const where = {
         ...(search && {
@@ -56,13 +64,11 @@ export const findAllGoodsIssues = async ({
             }
         }),
         ...(!canViewAll && {
-            OR: [
-                {
-                    department: {
-                        name: userDepartment
-                    }
+            department: {
+                name: {
+                    in: userDepartments
                 }
-            ]
+            }
         })
     };
 
@@ -74,18 +80,6 @@ export const findAllGoodsIssues = async ({
             [orderBy]: orderDir
         },
         include: {
-            department: {
-                select: {
-                    id: true,
-                    name: true
-                }
-            },
-            requester: {
-                select: {
-                    id: true,
-                    fullName: true
-                }
-            },
             approver: {
                 select: {
                     id: true,
@@ -96,19 +90,6 @@ export const findAllGoodsIssues = async ({
                 select: {
                     id: true,
                     fullName: true,
-                }
-            },
-            project: {
-                select: {
-                    id: true,
-                    referenceNumber: true,
-                    name: true
-                }
-            },
-            status: {
-                select: {
-                    id: true,
-                    name: true
                 }
             },
             details: {
@@ -130,7 +111,8 @@ export const findAllGoodsIssues = async ({
                     difference: true,
                     supplierName: true,
                 }
-            }
+            },
+            movements: true
         }
     });
 
@@ -138,7 +120,7 @@ export const findAllGoodsIssues = async ({
         ...goodsIssue,
         dispatchStatus: getDispatchStatus({
             details: goodsIssue.details,
-            movement: goodsIssue.movement
+            movement: goodsIssue.movements
         })
     }));
 
@@ -150,30 +132,6 @@ export const findAllGoodsIssues = async ({
         recordsTotal: total,
         recordsFiltered: filtered
     };
-};
-
-const resolveProjectIdByReferenceNumber = async ({ referenceNumber }) => {
-
-    const project = await prisma.project.findFirst({
-        where: {
-            referenceNumber: {
-                equals: referenceNumber,
-                mode: 'insensitive'
-            }
-        },
-        select: { id: true }
-    });
-
-    if (!project) throw new GoodsIssueProjectNotFound();
-
-    return project.id;
-};
-
-const validateGoodsIssueRelations = async ({ requesterId }) => {
-
-    const requester = await prisma.profile.findUnique({ where: { id: requesterId } });
-
-    if (!requester) throw new GoodsIssueRequesterProfileNotFound();
 };
 
 const getActiveProfileIdByUserId = async ({ tx, userId, errorClass }) => {
@@ -206,7 +164,7 @@ const addQuantityToMap = (map, productId, quantity) => {
 const getDispatchStatus = ({ details, movement }) => {
     const requestedByProduct = new Map();
     details.forEach((detail) => {
-        addQuantityToMap(requestedByProduct, detail.product.id, detail.quantity);
+        addQuantityToMap(requestedByProduct, detail.productId, detail.quantity);
     });
 
     const deliveredByProduct = new Map();
@@ -232,33 +190,46 @@ export const createGoodsIssue = async ({
     goodsIssueDto
 }) => {
 
-    const { requesterId, referenceNumber, details, ...goodsIssueData } = goodsIssueDto;
+    const { requesterId, advisorId, departmentId, clientId, details, ...goodsIssueData } = goodsIssueDto;
 
-    await validateGoodsIssueRelations({ requesterId });
-    const projectId = await resolveProjectIdByReferenceNumber({ referenceNumber });
+    const requester = await findProfileById({ id: requesterId });
+
+    if (!requester) throw new GoodsIssueRequesterProfileNotFound();
+    
+    const advisor = await findProfileById({ id: advisorId });
+
+    if (!advisor) throw new GoodsIssueAdvisorProfileNotFound();
+
+    const client = await findClientById({ id: clientId });
+    const department = await findDepartmentById({ departmentId });
+
+    const processedDetails = await buildGoodsIssueDetails({ details });
 
     const result = await prisma.$transaction(async (tx) => {
-
-        const departmentId = await getDepartmentByProfileId(requesterId);
 
         const referenceNumber = await generateReferenceNumber({ type: REFERENCE_NUMBER_TYPE, tx });
 
         const goodsIssue = await tx.goodsIssue.create({
             data: {
                 ...goodsIssueData,
+                referenceNumber,
+                departmentName: department.name,
+                requesterName: requester.fullName,
+                advisorName: advisor.fullName,
+                clientName: client.name,
                 status: {
                     connect: {
-                        name: STATUS_OPEN
-                    }
-                },
-                project: {
-                    connect: {
-                        id: projectId
+                        name: STATUS_APPROVED
                     }
                 },
                 requester: {
                     connect: {
                         id: requesterId
+                    }
+                },
+                advisor: {
+                    connect: {
+                        id: advisorId
                     }
                 },
                 department: {
@@ -266,127 +237,47 @@ export const createGoodsIssue = async ({
                         id: departmentId
                     }
                 },
-                referenceNumber,
+                client: {
+                    connect: {
+                        id: clientId
+                    }
+                },
                 details: {
-                    create: details.map(({ productId, ...rest }) => ({
-                        ...rest,
-                        product: {
-                            connect: {
-                                id: productId
-                            }
-                        }
-                    }))
+                    createMany: {
+                        data: processedDetails
+                    }
+                }
+            },
+            include: {
+                details: {
+                    select: {
+                        productId: true,
+                        quantity: true,
+                        convertedQuantity: true,
+                        maxUnitCost: true,
+                        productName: true,
+                        productBase: true,
+                        productHeight: true,
+                        presentationId: true,
+                        presentationName: true,
+                        unitMeasureId: true,
+                        unitMeasureName: true,
+                        unitMeasureSymbol: true
+                    }
                 }
             }
         });
 
-        return { goodsIssue };
+        return { ...goodsIssue };
     });
 
     return result.goodsIssue;
 };
 
-export const updateGoodsIssue = async ({
-    goodsIssueDto, 
-    id,
-    canEditDepartment,
-    userDepartment,
-    userRole
-}) => {
+export const updateGoodsIssue = async ({ id, goodsIssueDto, canEditDepartment }) => {
 
-    const { requesterId, referenceNumber, details, ...goodsIssueData } = goodsIssueDto;
-
-    await validateGoodsIssueRelations({ requesterId });
-    const projectId = await resolveProjectIdByReferenceNumber({ referenceNumber });
-
-    const goodsIssueExists = await prisma.goodsIssue.findUnique({
-        where: { id },
-        select: {
-            id: true,
-            department: {
-                select: {
-                    name: true
-                }
-            }
-        }
-    });
-
-    if (!goodsIssueExists) throw new GoodsIssueNotFound();
-
-    const canEditAnyDepartment = userDepartment === DEPARTMENT_WAREHOUSE || userRole === ROLE_SYSTEM_ADMIN;
-
-    if (!canEditAnyDepartment && goodsIssueExists.department?.name !== userDepartment) {
-        throw new GoodsIssueEditForbidden();
-    }
-
-    try {
-
-        const result = await prisma.$transaction(async (tx) => {
-
-            const departmentId = await getDepartmentByProfileId(requesterId);
-
-            const updatedData = {
-                ...goodsIssueData,
-                project: {
-                    connect: {
-                        id: projectId
-                    }
-                },
-                requester: {
-                    connect: {
-                        id: requesterId
-                    }
-                }
-            };
-
-            if (canEditDepartment) {
-                updatedData.department = {
-                    connect: {
-                        id: departmentId
-                    }
-                };
-            }
-
-            const goodsIssue = await tx.goodsIssue.update({
-                data: updatedData,
-                where: { id }
-            });
-
-            const incomingDetailsIds = details.map(detail => detail.id).filter(Boolean);
-            const deleteFilter = { goodsIssueId: id };
-
-            if (incomingDetailsIds.length) deleteFilter.id = { notIn: incomingDetailsIds };
-
-            await tx.detailGoodsIssueProduct.deleteMany({
-                where: deleteFilter
-            });
-
-            const detailsGoodsIssue = [];
-
-            for (const detail of details) {
-                const detailGoodsIssue = await tx.detailGoodsIssueProduct.create({
-                    data: {
-                        ...detail,
-                        goodsIssueId: id
-                    }
-                });
-
-                detailsGoodsIssue.push(detailGoodsIssue);
-            }
-
-            goodsIssue.details = detailsGoodsIssue;
-
-            return { goodsIssue };
-        });
-
-        return result.goodsIssue;
-    } catch (err) {
-
-        if (err.code === PRISMA_RECORD_NOT_FOUND) throw new GoodsIssueNotFound();
-
-        throw new GoodsIssueUpdateDatabaseError();
-    }
-};
+    return {};
+}
 
 const updateGoodsIssueApprovalStatus = async ({
     id,
@@ -574,19 +465,19 @@ const updateGoodsIssueDeliveryStatus = async ({
                     stockProducts.map((product) => [product.id, Number(product.currentStock)])
                 );
 
-                const detailsToDispatch = pendingProducts
-                    .map((product) => {
-                        const currentStock = stockByProduct.get(product.productId) || 0;
-                        const quantityToDispatch = Math.min(product.pendingQuantity, Math.max(currentStock, 0));
+                for (const product of pendingProducts) {
 
-                        if (quantityToDispatch <= FLOAT_EPSILON) return null;
+                    const currentStock = stockByProduct.get(product.productId) || 0;
 
-                        return {
-                            productId: product.productId,
-                            quantity: quantityToDispatch
-                        };
-                    })
-                    .filter(Boolean);
+                    if (currentStock + FLOAT_EPSILON < product.pendingQuantity) {
+                        throw new GoodsIssueInsufficientStock();
+                    }
+                }
+
+                const detailsToDispatch = pendingProducts.map((product) => ({
+                    productId: product.productId,
+                    quantity: product.pendingQuantity
+                }));
 
                 if (detailsToDispatch.length) {
 
@@ -621,14 +512,9 @@ const updateGoodsIssueDeliveryStatus = async ({
 
                 dispatchedProductIds = detailsToDispatch.map((detail) => detail.productId);
 
-                const isFullyDispatched = Array.from(requestedByProduct.entries()).every(
-                    ([productId, requestedQuantity]) =>
-                        ((deliveredByProduct.get(productId) || 0) + FLOAT_EPSILON) >= requestedQuantity
-                );
-
                 data.status = {
                     connect: {
-                        name: isFullyDispatched ? STATUS_CONFIRMED : STATUS_APPROVED
+                        name: STATUS_CONFIRMED
                     }
                 };
 

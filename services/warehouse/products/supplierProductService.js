@@ -1,4 +1,4 @@
-import { SupplierProductCreateDatabaseError, SupplierProductDeleteDatabaseError } from "../../../errors/warehouse/productError.js";
+import { ProductSnapshotFindDatabaseError, SupplierProductCreateDatabaseError, SupplierProductDeleteDatabaseError } from "../../../errors/warehouse/productError.js";
 import { prisma } from "../../../lib/prisma.js";
 
 const mapSupplierProduct = (sp) => {
@@ -52,7 +52,7 @@ export const findAllSupplierProducts = async ({
                     isActive: true,
                     base: true,
                     height: true,
-                    unitCost: true,
+                    maxUnitCost: true,
                     convertedQuantity: true,
                     presentation: true,
                     unitMeasure: true
@@ -137,6 +137,48 @@ export const findSupplierProductByIds = async ({
 
     return mapSupplierProduct(supplierProduct);
 };
+
+export const findSupplierProductsSnapshot = async ({
+    tx,
+    pairs
+}) => {
+
+    const db = tx || prisma;
+
+    try {
+
+        const products = await db.supplierProduct.findMany({
+            where: {
+                OR: pairs
+            },
+            include: {
+                product: {
+                    select: {
+                        id: true,
+                        name:true,
+                        base: true,
+                        height: true,
+                        maxUnitCost: true,
+                        presentation: true,
+                        unitMeasure: true
+                    }
+                },
+                supplier: {
+                    select: {
+                        id: true,
+                        tradeName: true
+                    }
+                }
+            }
+        });
+
+        return products.map(mapSupplierProduct);
+
+    } catch (err) {
+
+        throw new ProductSnapshotFindDatabaseError();
+    }
+}
 
 export const countTotalSupplierProducts = async ({
     where

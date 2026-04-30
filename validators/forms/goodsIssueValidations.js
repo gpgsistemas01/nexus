@@ -1,12 +1,12 @@
-import { validateDate, validateDetailsArray, validateReferenceNumber, validateTextOptional, validateUUID } from "../fields/fieldsValidator.js";
+import { validateDate, validateGoodsIssueDetailsArray, validateProjectNumber, validateTextOptional, validateUUID } from "../fields/fieldsValidator.js";
 
 export const goodsIssueValidation = [
     validateUUID('advisorId'),
     validateUUID('clientId'),
     validateUUID('departmentId'),
     validateUUID('requesterId'),
-    validateReferenceNumber('referenceNumber'),
+    validateProjectNumber('projectNumber'),
     validateDate('requestDate'),
     validateTextOptional('observations'),
-    validateDetailsArray
+    validateGoodsIssueDetailsArray
 ];

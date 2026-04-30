@@ -13,18 +13,18 @@ export const initClientSelect = ({
         modalSelector,
         url: CLIENTS_API_ROUTE,
         placeholder: 'Buscar cliente...',
-        data: (params) => {
+        // data: (params) => {
 
-            let advisorId;
+        //     let advisorId;
 
-            if (advisorSelector) advisorId = document.querySelector(`${ modalSelector } ${ advisorSelector }`).value;
-            else advisorId = '';
+        //     if (advisorSelector) advisorId = document.querySelector(`${ modalSelector } ${ advisorSelector }`).value;
+        //     else advisorId = '';
 
-            return {
-                search: params.term,
-                advisorId
-            }
-        },
+        //     return {
+        //         search: params.term,
+        //         advisorId
+        //     }
+        // },
         processResults: (data) => {
 
             const list = data.data || data;

@@ -107,6 +107,23 @@ async function main() {
         skipDuplicates: true
     });
 
+    const clientSheet = workbook1.Sheets['CLIENTES'];
+    const clientRows = XLSX.utils.sheet_to_json(clientSheet, {
+        defval: null,
+    });
+
+    const clientParsed = clientRows.map(row => {
+        const name = cleanValue(row.client);
+        if (!name) return null;
+
+        return { name };
+    }).filter(Boolean);
+
+    await prisma.client.createMany({
+        data: clientParsed,
+        skipDuplicates: true
+    });
+
     await prisma.role.createMany({
         data: [
             { id: '00000000-0000-0000-0000-000000000020', name: 'Administrador del sistema' },
@@ -180,17 +197,6 @@ async function main() {
             { prefix: 'PRO' },
         ],
         skipDuplicates: true
-    });
-
-    await prisma.project.upsert({
-        where: { referenceNumber: 'PROY-001' },
-        update: {},
-        create: {
-            referenceNumber: 'PROY-001',
-            client: 'Cliente Demo',
-            name: 'Proyecto Demo',
-            date: new Date('2026-04-01T00:00:00.000Z')
-        }
     });
 
     await prisma.presentation.createMany({

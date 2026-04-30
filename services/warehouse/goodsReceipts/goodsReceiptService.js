@@ -3,12 +3,11 @@ import {
     SupplierNotFound
 } from "../../../errors/warehouse/goodsReceiptError.js";
 import { prisma } from "../../../lib/prisma.js";
-import { getDepartmentByProfileId } from "../../admin/userService.js";
 import { generateReferenceNumber } from "../../document/referenceNumberService.js";
 import { findProfileById } from "../../admin/profileService.js";
 import { applyInventoryMovement } from "../../inventory/movementService.js";
 import { findUniqueSupplier } from "../supplierService.js";
-import { buildGoodsReceiptDetails } from "./goodsReceiptsHelpers.js";
+import { buildGoodsReceiptDetails } from "./goodsReceiptHelpers.js";
 import { updateConvertedQuantityByCurrentStock, updateProductUnitCostIfHigher } from "../products/productService.js";
 
 const REFERENCE_NUMBER_TYPE = 'REC';
@@ -86,21 +85,23 @@ export const findAllGoodsReceipts = async ({
 
 export const createGoodsReceipt = async ({ goodsReceiptDto }) => {
 
+    const { receivedById, supplierId, details, ...goodsReceiptData } = goodsReceiptDto;
+
+    const supplier = await findUniqueSupplier({
+        tx,
+        id: supplierId
+    });
+
+    const receivedBy = await findProfileById({ 
+        tx, 
+        id: receivedById 
+    });
+
+    if (!receivedBy) throw new ProfileReceivedByNotFound();
+
+    const processedDetails = await buildGoodsReceiptDetails(details);
+
     const result = await prisma.$transaction(async (tx) => {
-
-        const { receivedById, supplierId, details, ...goodsReceiptData } = goodsReceiptDto;
-
-        const supplier = await findUniqueSupplier({
-            tx,
-            id: supplierId
-        });
-
-        const receivedBy = await findProfileById({ 
-            tx, 
-            id: receivedById 
-        });
-
-        const processedDetails = await buildGoodsReceiptDetails(tx, details);
 
         const totals = processedDetails.reduce((acc, d) => {
             acc.totalQuantity += d.quantity;

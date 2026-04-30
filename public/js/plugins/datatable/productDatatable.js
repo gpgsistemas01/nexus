@@ -63,7 +63,7 @@ export const createProductDatatable = (context) => {
 
     if (isWarehouse || isSystem) {
         columns.push(...[
-            { data: 'unitCost', title: 'Costo Unitario de Conversión' },
+            { data: 'maxUnitCost', title: 'Costo Unitario de Conversión' },
             {
                 data: null,
                 title: 'Acciones',

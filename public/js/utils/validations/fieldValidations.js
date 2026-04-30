@@ -19,7 +19,7 @@ export const validatePassword = (password) => {
 
     if (!allowedNumber.test(password)) return `${ fieldName } debe tener al menos un número.`;
 
-    if (!allowedPassword.test(password)) return  `${ fieldName }debe tener al menos un símbolo especial.`;
+    if (!allowedPassword.test(password)) return  `${ fieldName } debe tener al menos un símbolo especial.`;
 
     result = isLengthInRangeMin(password, 6, fieldName);
 

@@ -77,7 +77,7 @@ export const validateUUID = (fieldName) => {
 }
 
 
-export const validateReferenceNumber = (fieldName) => {
+export const validateProjectNumber = (fieldName) => {
 
     const errors = errorMap[fieldName];
 
@@ -161,6 +161,30 @@ export const validateDetailsArray =
 
                 if (!Number.isFinite(qty) || qty < 1) throw new Error(errorMap['details'].INVALID_FORMAT_QUANTITY);
                 if (!Number.isFinite(costPerUnitType) || costPerUnitType <= 0) throw new Error(errorMap['details'].INVALID_FORMAT_UNIT_COST_BY_QUANTITY);
+            });
+
+            return true;
+        })
+;
+
+export const validateGoodsIssueDetailsArray = 
+    body('details')
+        .isArray({ min: 1 }).withMessage(errorMap['details'].REQUIRED)
+        .custom(details => {
+
+            details.forEach(detail => {
+
+                if (!detail.productId || !detail.quantity) {
+                    throw new Error(errorMap['details'].INVALID_FORMAT_REQUIRED);
+                }
+
+                if (!detail.supplierId) {
+                    throw new Error(errorMap['details'].INVALID_FORMAT_SUPPLIER);
+                }
+
+                const qty = Number(detail.quantity);
+
+                if (!Number.isFinite(qty) || qty < 1) throw new Error(errorMap['details'].INVALID_FORMAT_QUANTITY);
             });
 
             return true;

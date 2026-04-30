@@ -11,9 +11,7 @@ const departmentSelector = '#departmentInput';
 const advisorSelector = '#advisorInput';
 const productSelector = '#productInput';
 
-export const initGoodsIssueFormSelect2 = ({
-    context
-}) => {
+export const initGoodsIssueFormSelect2 = () => {
     initDepartmentSelect({
         modalSelector,
         baseSelector: `${ modalSelector } ${ departmentSelector }`,
@@ -66,23 +64,23 @@ export const initGoodsIssueFormSelect2 = ({
         reset: () => {
             toggleProfileOption({
                 selector: `${ modalSelector } ${ requesterSelector }`,
-                profileId: null,
-                profileName: null
-            });
-        }
-    });
-
-    bindChangeResetSelect({
-        sourceSelector: `${ modalSelector } ${ advisorSelector }`,
-        targetSelector: `${ modalSelector } ${ clientSelector }`,
-        reset: () => {
-            toggleClientOption({
-                selector: `${ modalSelector } ${ clientSelector }`,
                 id: null,
                 name: null
             });
         }
     });
+
+    // bindChangeResetSelect({
+    //     sourceSelector: `${ modalSelector } ${ advisorSelector }`,
+    //     targetSelector: `${ modalSelector } ${ clientSelector }`,
+    //     reset: () => {
+    //         toggleClientOption({
+    //             selector: `${ modalSelector } ${ clientSelector }`,
+    //             id: null,
+    //             name: null
+    //         });
+    //     }
+    // });
 
     setupProductSelect({
         modalSelector,
@@ -95,26 +93,26 @@ export const setGoodsIssueFormSelectOptions = (data = null) => {
 
     toggleDepartmentOption({
         selector: `${ modalSelector } ${ departmentSelector }`,
-        id: data?.department?.id,
-        name: data?.department?.name
+        id: data?.departmentId,
+        name: data?.departmentName
     });
 
     toggleClientOption({
         selector: `${ modalSelector } ${ clientSelector }`,
-        id: data?.client?.id,
-        name: data?.client?.name
+        id: data?.clientId,
+        name: data?.clientName
     });
 
     toggleProfileOption({
         selector: `${ modalSelector } ${ advisorSelector }`,
-        profileId: data?.advisor?.id,
-        profileName: data?.advisor?.fullName
+        id: data?.advisorId,
+        name: data?.advisorName
     });
 
     toggleProfileOption({
         selector: `${ modalSelector } ${ requesterSelector }`,
-        profileId: data?.requester?.id,
-        profileName: data?.requester?.fullName, 
+        id: data?.requesterId,
+        name: data?.requesterName
     });
 
     toggleProductOption({

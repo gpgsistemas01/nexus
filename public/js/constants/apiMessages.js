@@ -10,32 +10,52 @@ export const errorMessages = {
     // SUPPLIER
     SUPPLIER_ID_REQUIRED: 'El proveedor es requerido.',
     SUPPLIER_ID_INVALID_UUID: 'El proveedor no es válido.',
+    SUPPLIER_NOT_FOUND: 'Proveedor no encontrado.',
+    SUPPLIER_CODE_NOT_FOUND: 'Código del proveedor no encontrado.',
+    SUPPLIER_FIND_DB_ERROR: 'Error de base de datos al buscar el proveedor',
+    SUPPLIER_CREATE_DB_ERROR: 'Error de base de datos al crear el proveedor',
+    SUPPLIER_UPDATE_DB_ERROR: 'Error de base de datos al editar el proveedor.',
+    SUPPLIER_CODE_FIND_DB_ERROR: 'Error de base de datos al buscar el código del proveedor',
 
     // RECEIVED BY
     RECEIVED_BY_ID_REQUIRED: 'La person que recibe es requerida.',
     RECEIVED_BY_ID_INVALID_UUID: 'La persona que recibe no es válida.',
+    PROFILE_RECEIVED_BY_NOT_FOUND: 'Perfil de quien recibe no encontrado.',
 
-    REFERENCE_NUMBER_REQUIRED: 'El número de proyecto es requerido.',
-    REFERENCE_NUMBER_INVALID_TYPE: 'El número de proyecto debe ser texto.',
-    REFERENCE_NUMBER_TOO_LONG: 'El número de proyecto no debe exceder 50 caracteres.',
+    PROJECT_NUMBER_REQUIRED: 'El número de proyecto es requerido.',
+    PROJECT_NUMBER_INVALID_TYPE: 'El número de proyecto debe ser texto.',
+    PROJECT_NUMBER_TOO_LONG: 'El número de proyecto no debe exceder 50 caracteres.',
 
     ADVISOR_ID_REQUIRED: 'El asesor es requerido.',
     ADVISOR_ID_INVALID_UUID: 'El asesor no es válido.',
+    ADVISOR_PROFILE_NOT_FOUND: 'Perfil de asesor no encontrado.',
 
     CLIENT_ID_REQUIRED: 'El cliente es requerido.',
     CLIENT_ID_INVALID_UUID: 'El cliente no es válido.',
 
     DEPARTMENT_ID_REQUIRED: 'El departamento es requerido.',
     DEPARTMENT_ID_INVALID_UUID: 'El departamento no es válido.',
+    DEPARTMENT_NOT_FOUND: 'Departamento no encontrado.',
 
     REQUESTER_ID_REQUIRED: 'El solicitante es requerido.',
     REQUESTER_ID_INVALID_UUID: 'El solicitante no es válido.',
+    REQUESTER_PROFILE_NOT_FOUND: 'Perfil solicitante no encontrado.',
 
     PRESENTATION_ID_REQUIRED: 'La presentación es requerida.',
     PRESENTATION_ID_INVALID_UUID: 'La presentación no es válida.',
+    PRESENTATION_NOT_FOUND: 'Presentación no encontrada.',
+    PRESENTATION_FIND_DB_ERROR: 'Error de base de datos al buscar la presentación.',
 
     UNIT_MEASURE_ID_REQUIRED: 'La unidad es requerida.',
     UNIT_MEASURE_ID_REQUIRED: 'La unidad no es válida.',
+    UNIT_MEASURE_NOT_FOUND: 'Unidad no encontrada.',
+    UNIT_MEASURE_FIND_DB_ERROR: 'Error de base de datos al buscar la unidad.',
+
+    DEPARTMENT_NOT_FOUND: 'Área no encontrada.',
+    DEPARTMENT_FIND_DB_ERROR: 'Error de la base de datos al buscar el área.',
+
+    CLIENT_NOT_FOUND: 'Cliente no encontrado.',
+    CLIENT_FIND_DB_ERROR: 'Error de la base de datos al buscar el cliente.',
 
     REQUEST_DATE_REQUIRED: 'La fecha de solicitud es requerida.',
     REQUEST_DATE_INVALID_FORMAT: 'La fecha de solicitud no es válida.',
@@ -66,11 +86,6 @@ export const errorMessages = {
     INVOICE_INVALIDA_TYPE: 'El número de factura debe ser texto.',
     INVOICE_TOO_LONG: (meta) => `El número de factura no debe exceder ${meta.value} caracteres.`,
     INVOICE_INVALIDA_FORMAT: 'El número de factura debe contener letras, números y guiones',
-
-    // 💰 UNIT COST
-    UNIT_COST_BY_QUANTITY_REQUIRED: 'El costo por rollo s/ IVA es requerido.',
-    UNIT_COST_BY_QUANTITY_INVALID_NUMBER: 'El costo por rollo s/ IVA debe ser numérico.',
-    UNIT_COST_BY_QUANTITY_TOO_LONG: 'El costo por rollo s/ IVA es demasiado grande.',
 
     // 📉 MIN STOCK
     MIN_STOCK_REQUIRED: 'El stock mínimo es requerido.',
@@ -104,10 +119,9 @@ export const errorMessages = {
     DETAILS_REQUIRED: 'La lista de detalles debe contener al menos un producto.',
     DETAILS_INVALID_FORMAT_REQUIRED: 'Cada detalle debe contener un producto, una cantidad y un costo por presentación.',
     DETAILS_INVALID_FORMAT_QUANTITY: 'La cantidad de cada detalle debe ser un número mayor a cero.',
+    DETAILS_INVALID_FROMAT_SUPPLIER: 'El proveedor de cada detalle es requerido.',
     DETAILS_INVALID_FORMAT_COST_PER_UNIT_TYPE: 'El costo por presentación de cada detalle debe ser un número mayor a cero.',
 
-    PROJECT_NOT_FOUND: 'Proyecto no encontrado.',
-    REQUESTER_PROFILE_NOT_FOUND: 'Perfil solicitante no encontrado.',
     PURCHASE_REQUISITION_NOT_FOUND: 'Requisición de compra no encontrada.',
     PURCHASE_REQUISITION_STATUS_NOT_FOUND: 'Estado de requisición no encontrado.',
     PURCHASE_REQUISITION_UPDATE_DB_ERROR: 'Error de base de datos al editar la requisición de compra.',
@@ -130,22 +144,15 @@ export const errorMessages = {
     PRODUCT_UNIT_COST_UPDATE_DB_ERROR: 'Error de base de datos al editar el costo unitario del producto.',
     SUPPLIER_PRODUCT_CREATE_DB_ERROR: 'Error de base de datos al relacionar el producto a un proveedor.',
     SUPPLIER_PRODUCT_DELETE_DB_ERROR: 'Error de base de datos al eliminar la relación entre producto y proveedor.',
-    UNIT_MEASURE_FIND_DB_ERROR: 'Error de base de datos al buscar la unidad.',
-    PRESENTATION_FIND_DB_ERROR: 'Error de base de datos al buscar la presentación.',
-    SUPPLIER_CODE_FIND_DB_ERROR: 'Error de base de datos al buscar el código del proveedor',
+    
     EXCEDED_MAX_RETRIES_SKU: 'Excedido el número máximo de intentos para generar un SKU único.',
-    DEPARTMENT_NOT_FOUND: 'Departamento no encontrado.',
-    PROFILE_RECEIVED_BY_NOT_FOUND: 'Perfil de quien recibe no encontrado.',
+    
     PROFILE_NOT_FOUND: 'Perfil no encontrado.',
-    SUPPLIER_NOT_FOUND: 'Proveedor no encontrado.',
-    SUPPLIER_CODE_NOT_FOUND: 'Código del proveedor no encontrado.',
-    SUPPLIER_FIND_DB_ERROR: 'Error de base de datos al buscar el proveedor',
-    SUPPLIER_CREATE_DB_ERROR: 'Error de base de datos al crear el proveedor',
-    SUPPLIER_UPDATE_DB_ERROR: 'Error de base de datos al editar el proveedor.',
     PROFILE_FIND_DB_ERROR: 'Error de base de datos al buscar el perfil.',
+
     REFERENCE_NUMBER_UPDATE_DB_ERROR: 'Error de base de datos al actualizar el folio.',
-    UNIT_MEASURE_NOT_FOUND: 'Unidad no encontrada.',
-    PRESENTATION_NOT_FOUND: 'Presentación no encontrada.',
+
+    GOODS_ISSUE_INSUFFICIENT_STOCK: 'Stock insuficiente para realizar la salida.'
 };
 
 const successMessages = {
@@ -156,7 +163,6 @@ const successMessages = {
     CREATED_PRODUCT: '¡Producto creada exitosamente!',
     UPDATED_PRODUCT: '¡Producto actuallizada exitosamente!',
     CREATED_SUPPLIER: '¡Proveedor creada exitosamente!',
-    UPDATED_SUPPLIER: '¡Proveedor actuallizada exitosamente!',
     CREATED_GOODS_RECEIPT: '¡Entrada de mercancía creada exitosamente!',
     CREATED_GOODS_ISSUE: '¡Salida de almacén creada exitosamente!',
     UPDATED_GOODS_ISSUE: '¡Salida de almacén actualizada exitosamente!',

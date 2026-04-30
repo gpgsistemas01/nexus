@@ -46,12 +46,12 @@ export const initProfileSelect = ({
 
 export const toggleProfileOption = ({ 
     selector, 
-    profileId = null, 
-    profileName = null
+    id = null, 
+    name = null
 }) => toggleSelectOption({
     selector,
     data: {
-        id: profileId,
-        text: profileName
+        id,
+        text: name
     }
 });
