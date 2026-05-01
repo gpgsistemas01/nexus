@@ -201,7 +201,7 @@ export const createGoodsIssue = async ({
     if (!advisor) throw new GoodsIssueAdvisorProfileNotFound();
 
     const client = await findClientById({ id: clientId });
-    const department = await findDepartmentById({ departmentId });
+    const department = await findDepartmentById({ id: departmentId });
 
     const processedDetails = await buildGoodsIssueDetails({ details });
 
@@ -268,7 +268,7 @@ export const createGoodsIssue = async ({
             }
         });
 
-        return { ...goodsIssue };
+        return { goodsIssue };
     });
 
     return result.goodsIssue;

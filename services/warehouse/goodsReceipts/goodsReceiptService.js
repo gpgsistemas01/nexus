@@ -87,32 +87,26 @@ export const createGoodsReceipt = async ({ goodsReceiptDto }) => {
 
     const { receivedById, supplierId, details, ...goodsReceiptData } = goodsReceiptDto;
 
-    const supplier = await findUniqueSupplier({
-        tx,
-        id: supplierId
-    });
+    const supplier = await findUniqueSupplier({ id: supplierId });
 
-    const receivedBy = await findProfileById({ 
-        tx, 
-        id: receivedById 
-    });
+    const receivedBy = await findProfileById({ id: receivedById });
 
     if (!receivedBy) throw new ProfileReceivedByNotFound();
 
     const processedDetails = await buildGoodsReceiptDetails(details);
 
-    const result = await prisma.$transaction(async (tx) => {
+    const totals = processedDetails.reduce((acc, d) => {
+        acc.totalQuantity += d.quantity;
+        acc.totalNetPurchaseAmount += d.netPurchaseAmount;
+        acc.totalGrossPurchaseAmount += d.grossPurchaseAmount;
+        return acc;
+    }, {
+        totalQuantity: 0,
+        totalNetPurchaseAmount: 0,
+        totalGrossPurchaseAmount: 0
+    });
 
-        const totals = processedDetails.reduce((acc, d) => {
-            acc.totalQuantity += d.quantity;
-            acc.totalNetPurchaseAmount += d.netPurchaseAmount;
-            acc.totalGrossPurchaseAmount += d.grossPurchaseAmount;
-            return acc;
-        }, {
-            totalQuantity: 0,
-            totalNetPurchaseAmount: 0,
-            totalGrossPurchaseAmount: 0
-        });
+    const result = await prisma.$transaction(async (tx) => {
 
         const referenceNumber = await generateReferenceNumber({ type: REFERENCE_NUMBER_TYPE, tx });
 
@@ -120,6 +114,7 @@ export const createGoodsReceipt = async ({ goodsReceiptDto }) => {
             data: {
                 ...goodsReceiptData,
                 ...totals,
+                referenceNumber,
                 supplierName: supplier.tradeName,
                 receivedByName: receivedBy.fullName,
                 status: {
@@ -137,14 +132,10 @@ export const createGoodsReceipt = async ({ goodsReceiptDto }) => {
                         id: receivedById
                     }
                 },
-                referenceNumber,
                 details: {
-                    create: processedDetails.map(({ productId, ...rest }) => ({
-                        ...rest,
-                        product: {
-                            connect: { id: productId }
-                        }
-                    }))
+                    createMany: {
+                        data: processedDetails
+                    }
                 }
             },
             include: {
