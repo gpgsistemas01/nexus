@@ -113,7 +113,7 @@ export const toggleButtons = ({
     withTotal = true
 }) => {
 
-    const isView = mode === 'view';
+    const isView = mode === 'view' || mode === 'edit-detail';
     document.querySelector('.add-product-container').classList.toggle('d-none', isView);
     document.querySelector('.total-container').classList.toggle('d-none', !withTotal);
     const approveContainer = document.querySelector('.approve-container');

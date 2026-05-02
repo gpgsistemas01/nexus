@@ -27,15 +27,15 @@ export const refreshProductTable = (details) => {
     table.draw();
 }
 
-export const renderActionButtons = (statusName) => {
+export const renderActionButtons = ({ status, context }) => {
 
     const actions = [];
 
-    if (statusName === 'Abierta') {
-        actions.push('<button class="btn-edit">✏️</button>');
-    }
+    if (status === 'Abierta') actions.push('<button class="btn-edit"><i class="fa-solid fa-pencil"></i></button>');
 
-    actions.push('<button class="btn-view">👁️</button>');
+    if (status === 'Aprobada' && context === 'goodsIssue') actions.push('<button class="btn-edit-detail"><i class="fa fa-edit"></i></button>');
+
+    if (context !== 'product') actions.push('<button class="btn-view"><i class="fa fa-eye"></i></button>');
 
     return actions.join('');
 }

@@ -8,6 +8,7 @@ import { renderMaterialName } from "./utils/renderProductDatatable.js";
 export let details = [];
 const selectorProductTable = '#productTable';
 const selectorTable = '#table';
+let productTable;
 
 export const createGoodsIssueDatatable = (context) => {
 
@@ -74,35 +75,28 @@ export const createGoodsIssueDatatable = (context) => {
         {
             data: 'id',
             title: 'Acciones',
-            render: (data, type, row) => renderActionButtons(row.status?.name)
+            render: (data, type, row) => renderActionButtons({ status: row.status?.name, context: 'goodsIssue' })
         }
     );
 
     const table = createDataTable({
         options: {
-            ajax: {
-                url: GOODS_ISSUES_API_ROUTE,
-                data: (d) => {
-                    d.department = context.department || '';
-                }
-            },
+            ajax: GOODS_ISSUES_API_ROUTE,
             columns,
             buttons: [
                 {
                     text: 'Nueva salida',
-                    action: () => {
-                        openGoodsIssueModal({ mode: 'create' });
-                    }
+                    action: () => openGoodsIssueModal({ mode: 'create' })
                 }
             ]
         }
     });
 
-    $(`${ selectorTable } tbody`).on('click', '.btn-edit', async function() {
+    $(`${ selectorTable } tbody`).on('click', '.btn-edit-detail', function() {
 
         const data = table.row($(this).closest('tr')).data();
 
-        await openGoodsIssueModal({ mode: 'edit', data });
+        openGoodsIssueModal({ mode: 'edit-detail', data });
     });
 
     $(`${ selectorTable } tbody`).on('click', '.btn-view', function() {
@@ -115,7 +109,7 @@ export const createGoodsIssueDatatable = (context) => {
 
 export const initDetailsGoodsIssueTable = (mode, context) => {
 
-    const { isWarehouse, isSystem } = hasPermission(context);
+    const { isWarehouse, isSystem, hasRole } = hasPermission(context);
 
     if ($.fn.DataTable.isDataTable(selectorProductTable)) {
         $(selectorProductTable).DataTable().clear().destroy();
@@ -128,6 +122,7 @@ export const initDetailsGoodsIssueTable = (mode, context) => {
         type: 'issue',
         mode,
         isWarehouse,
+        isCoordinator: hasRole('Coordinador'),
         isSystem
     });
 
@@ -136,10 +131,11 @@ export const initDetailsGoodsIssueTable = (mode, context) => {
         mode,
         render: (_, __, row) => renderMaterialName(row),
         isWarehouse,
+        isCoordinator: hasRole('Coordinador'),
         isSystem
     });
 
-    createDataTable({
+    productTable = createDataTable({
         selector: selectorProductTable,
         options: { data: details, columns }
     });
@@ -153,3 +149,11 @@ $(selectorProductTable).on('click', '.delete-btn', function () {
 
     refreshProductTable(details);
 });
+
+export const updateDetailRow = (input, product) => {
+
+    const row = productTable.row(input.closest('tr'));
+    const rowData = row.data();
+    rowData.convertedQuantityDifference = product.convertedQuantityDifference;
+    row.data(rowData).invalidate();
+}

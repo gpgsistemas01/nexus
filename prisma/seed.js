@@ -189,6 +189,15 @@ async function main() {
         });
     }
 
+    await prisma.fulfillmentStatus.createMany({
+        data: [
+            { name: 'Pendiente' },
+            { name: 'Surtido parcial' },
+            { name: 'Surtido' },
+        ],
+        skipDuplicates: true
+    });
+
     await prisma.referenceNumberCounter.createMany({
         data: [
             { prefix: 'REC' },

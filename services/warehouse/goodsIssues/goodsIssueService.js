@@ -80,6 +80,7 @@ export const findAllGoodsIssues = async ({
             [orderBy]: orderDir
         },
         include: {
+            status: true,
             approver: {
                 select: {
                     id: true,
@@ -107,8 +108,8 @@ export const findAllGoodsIssues = async ({
                     unitMeasureName: true,
                     unitMeasureSymbol: true,
                     maxUnitCost: true,
-                    projectQuantity: true,
-                    difference: true,
+                    projectConvertedQuantity: true,
+                    convertedQuantityDifference: true,
                     supplierName: true,
                 }
             },

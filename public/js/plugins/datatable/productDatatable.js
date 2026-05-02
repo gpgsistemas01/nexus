@@ -1,5 +1,5 @@
 import { openProductModal } from "../../modules/products/productModal.js";
-import { createDataTable } from "./baseDatatable.js";
+import { createDataTable, renderActionButtons } from "./baseDatatable.js";
 import { notifications } from "../swal/swalComponent.js";
 import { hasPermission } from "../../utils/permissions.js";
 import { PRODUCTS_API_ROUTE } from "../../services/warehouse/productService.js";
@@ -54,7 +54,7 @@ export const createProductDatatable = (context) => {
         },
         { data: 'base', title: 'Base' },
         { data: 'height', title: 'Altura' },
-        { data: 'currentStock', title: 'Compra' },
+        { data: 'currentStock', title: 'Existencia' },
         { data: 'minStock', title: 'Stock Mínimo' },
         { data: 'presentation.name', title: 'Presentación' },
         { data: 'convertedQuantity', title: 'Cantidad' },
@@ -67,11 +67,7 @@ export const createProductDatatable = (context) => {
             {
                 data: null,
                 title: 'Acciones',
-                render: () => {
-                    return `
-                        <button class="btn-edit">✏️</button>
-                    `;
-                }
+                render: () => renderActionButtons({ status: 'Abierta', context: 'product' }) // Pasamos 'Abierta' para mostrar siempre el botón de editar, ya que no tenemos un estado específico para los productos
             }
         ]);
     }

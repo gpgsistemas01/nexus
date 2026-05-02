@@ -1,5 +1,5 @@
 import { openGoodsReceiptModal } from "../../pages/warehouse/goodsReceiptsPage.js";
-import { createDataTable, refreshProductTable } from "./baseDatatable.js";
+import { createDataTable, refreshProductTable, renderActionButtons } from "./baseDatatable.js";
 import { GOODS_RECEIPTS_API_ROUTE } from "../../services/warehouse/goodsReceiptService.js";
 import { initMdbWrapperInput, updateMdbWrapperInput } from "../mdb/baseInstance.js";
 import { updateTotals } from "../../ui/formUI.js";
@@ -55,15 +55,13 @@ export const createGoodsReceiptDatatable = () => {
                 {
                     data: 'id',
                     title: 'Acciones',
-                    render: () => '<button class="btn-view">👁️</button>'
+                    render: (_, __, row) => renderActionButtons({ status: row.status?.name, context: 'goodsReceipt' })
                 }
             ],
             buttons: [
                 {
                     text: 'Nueva compra',
-                    action: () => {
-                        openGoodsReceiptModal({ mode: 'create' });
-                    }
+                    action: () => openGoodsReceiptModal({ mode: 'create' })
                 }
             ]
         }

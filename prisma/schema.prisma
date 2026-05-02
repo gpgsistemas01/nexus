@@ -287,6 +287,7 @@ model GoodsIssue {
   projectId        String?  @db.Uuid
   clientId String @db.Uuid
   advisorId String @db.Uuid
+  fulfillmentStatusId String? @db.Uuid
 
   department     Department @relation(fields: [departmentId], references: [id])
   approver       Profile?   @relation("ApproverGoodsIssueRelation", fields: [approverId], references: [id])
@@ -296,6 +297,7 @@ model GoodsIssue {
   project        Project?    @relation(fields: [projectId], references: [id])
   client Client @relation(fields: [clientId], references: [id])
   advisor Profile @relation(fields: [advisorId], references: [id])
+  fulfillmentStatus FulfillmentStatus? @relation(fields: [fulfillmentStatusId], references: [id])
 
   details  GoodsIssueDetail[]
   movements InventoryMovement[]
@@ -314,20 +316,32 @@ model GoodsIssueDetail {
   productBase                        Decimal?                           @db.Decimal(10, 3)
   productHeight                      Decimal?                           @db.Decimal(10, 3)
   quantity     Decimal @db.Decimal(10, 2)
+  applyWaste Boolean @default(false)
   presentationName String @db.VarChar(50)
   convertedQuantity Decimal @db.Decimal(10, 3)
   unitMeasureName String @db.VarChar(20)
   unitMeasureSymbol String @db.VarChar(10)
   maxUnitCost                    Decimal                           @db.Decimal(10, 3)
-  projectQuantity Decimal? @db.Decimal(10, 2)
-  difference Decimal? @db.Decimal(10, 3)
+  projectConvertedQuantity Decimal? @db.Decimal(10, 3)
+  convertedQuantityDifference Decimal? @db.Decimal(10, 3)
+  suppliedQuantity Decimal? @db.Decimal(10, 2)
+  isSupplied Boolean @default(false)
+  fulfillmentStatusId String? @db.Uuid
 
   presentation Presentation @relation(fields: [presentationId], references: [id])
   unitMeasure UnitMeasure @relation(fields: [unitMeasureId], references: [id])
   product Product @relation(fields: [productId], references: [id])
   supplier Supplier @relation(fields: [supplierId], references: [id])
   goodsIssue       GoodsIssue     @relation(fields: [goodsIssueId], references: [id])
+  fulfillmentStatus FulfillmentStatus? @relation(fields: [fulfillmentStatusId], references: [id])
   movementDetails  MovementDetail[]
+}
+
+model FulfillmentStatus {
+  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name String @unique @db.VarChar(50)
+  goodsIssues GoodsIssue[]
+  goodsIssueDetails GoodsIssueDetail[]
 }
 
 model InventoryMovement {

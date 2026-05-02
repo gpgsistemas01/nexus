@@ -1,7 +1,7 @@
 import { useForm } from "../../application/form.js";
 import { approveGoodsIssue, cancelGoodsIssue, confirmGoodsIssue, editGoodsIssue, registerGoodsIssue, rejectGoodsIssue } from "../../application/warehouse/goodsIssues.js";import { validateGoodsIssueValidators } from "../../utils/validations/validators.js";
 import { refreshProductTable } from "../../plugins/datatable/baseDatatable.js";
-import { createGoodsIssueDatatable, details, initDetailsGoodsIssueTable } from "../../plugins/datatable/goodsIssueDatatable.js";
+import { createGoodsIssueDatatable, details, initDetailsGoodsIssueTable, updateDetailRow } from "../../plugins/datatable/goodsIssueDatatable.js";
 import { initGoodsIssueFormSelect2, setGoodsIssueFormSelectOptions } from "../../plugins/select2/modules/goodsIssueSelect.js";
 import { toggleInputSelectErrors, toggleTableErrors, setFormReadOnly, toggleButtons, cleanAddedProductInput } from "../../ui/formUI.js";
 import { on } from "../../utils/domUtils.js";
@@ -14,8 +14,6 @@ const modalId = '#goodsIssueModal';
 const formId = '#goodsIssueForm';
 
 const context = window.meta || {};
-let leftAction = null;
-let rightAction = null;
 
 createGoodsIssueDatatable(context);
 
@@ -72,8 +70,6 @@ export const openGoodsIssueModal = async ({ mode, data = null }) => {
     initGoodsIssueFormSelect2();
     setGoodsIssueFormSelectOptions(data);
 
-    leftAction = null;
-    rightAction = null;
     details.length = 0;
 
     if (mode === 'create') {
@@ -84,7 +80,7 @@ export const openGoodsIssueModal = async ({ mode, data = null }) => {
         form.querySelector('#presentationDisplayInput').value = '';
     }
 
-    if (mode === 'edit' || mode === 'view') {
+    if (mode === 'edit-detail' || mode === 'view') {
 
         form.querySelector('#observationsInput').value = data.observations || '';
         form.querySelector('#requestDateInput').value = formatDateLongWithTime(data.requestDate);
@@ -105,53 +101,21 @@ export const openGoodsIssueModal = async ({ mode, data = null }) => {
             unitMeasureName: detail.unitMeasureName,
             unitMeasureSymbol: detail.unitMeasureSymbol,
             maxUnitCost: detail.maxUnitCost,
-            projectQuantity: detail.projectQuantity,
-            difference: detail.difference,
-            supplierName: detail.supplierName
+            projectConvertedQuantity: detail.projectConvertedQuantity,
+            convertedQuantityDifference: detail.convertedQuantityDifference,
+            supplierName: detail.supplierName,
+            isSupplied: detail.isSupplied,
         })));
 
-        if (mode === 'edit') {
+        setFormReadOnly({ form, isReadOnly: true });
+
+        if (mode === 'edit-detail') {
             modalElement.querySelector('#modalTitle').textContent = 'Editar salida';
             form.querySelector('#submitBtn').textContent = 'Actualizar';
         }
 
         if (mode === 'view') {
             modalElement.querySelector('#modalTitle').textContent = 'Ver salida';
-            setFormReadOnly({ form, isReadOnly: true });
-        }
-    }
-
-    if (mode === 'view' && data?.status?.name) {
-
-        const { isAdmin, isWarehouse, isCoordinatorOfArea } = hasPermission(context);
-        const status = data.status.name;
-
-        const canApproveReject = status === 'Abierta' && (isAdmin || isWarehouse || isCoordinatorOfArea(data?.department?.name));
-        const canConfirmCancel = status === 'Aprobada' && (isAdmin || isWarehouse);
-
-        const actionContainer = form.querySelector('.approve-container');
-        const cancelBtn = form.querySelector('#cancelBtn');
-        const confirmBtn = form.querySelector('#confirmBtn');
-
-        if (canApproveReject) {
-
-            actionContainer.classList.remove('d-none');
-            cancelBtn.textContent = 'Rechazar';
-            confirmBtn.textContent = 'Aprobar';
-            leftAction = rejectGoodsIssue;
-            rightAction = approveGoodsIssue;
-
-        } else if (canConfirmCancel) {
-
-            actionContainer.classList.remove('d-none');
-            cancelBtn.textContent = 'Cancelar';
-            confirmBtn.textContent = 'Confirmar';
-            leftAction = cancelGoodsIssue;
-            rightAction = confirmGoodsIssue;
-
-        } else {
-
-            actionContainer.classList.add('d-none');
         }
     }
 
@@ -195,7 +159,7 @@ const addProduct = () => {
         convertedQuantity,
         supplierName,
         maxUnitCost,
-        supplierId
+        supplierId,
     };
 
     details.push(product);
@@ -205,11 +169,20 @@ const addProduct = () => {
 };
 
 on('click', '#addProductBtn', addProduct);
-on('click', '#cancelBtn', async () => {
-    if (!leftAction) return;
-    await handleAction({ action: leftAction, formId });
+on('change', '.supply-checkbox', (e, checkbox) => {
+    const { id } = checkbox.dataset;
+    const product = details.find(detail => detail.id === id);
+    product.isSupplied = checkbox.checked;
 });
-on('click', '#confirmBtn', async () => {
-    if (!rightAction) return;
-    await handleAction({ action: rightAction, formId });
+on('input', '.project-converted-quantity-input', (e, input) => {
+    const { id } = input.dataset;
+    const value = Number(input.value);
+    const product = details.find(detail => detail.id === id);
+
+    if (!product) return;
+
+    product.projectConvertedQuantity = value;
+    product.convertedQuantityDifference = product.convertedQuantity - product.projectConvertedQuantity;
+
+    updateDetailRow(input, product);
 });

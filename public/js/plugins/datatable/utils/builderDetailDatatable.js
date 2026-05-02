@@ -1,8 +1,8 @@
-export const buildDetailsHeader = ({ type, mode, isWarehouse, isSystem }) => {
+export const buildDetailsHeader = ({ type, mode, isWarehouse, isCoordinator, isSystem }) => {
 
     let extraHeaders = '';
 
-    if (type === 'issue' && (isWarehouse || isSystem)) {
+    if (type === 'issue' && ((isWarehouse && isCoordinator) || isSystem) && mode !== 'create') {
         extraHeaders += `
             <th rowspan="2">Costo unitario de Conversión</th>
             <th rowspan="2">Cantidad de proyecto</th>
@@ -19,7 +19,11 @@ export const buildDetailsHeader = ({ type, mode, isWarehouse, isSystem }) => {
         `;
     }
 
-    if (mode !== 'view') {
+    if (type === 'issue' && mode !== 'create') {
+        extraHeaders += `<th rowspan="2">Surtir</th>`;
+    }
+
+    if (mode !== 'view' && mode !== 'edit-detail') {
         extraHeaders += `<th rowspan="2">Acciones</th>`;
     }
 
@@ -28,10 +32,10 @@ export const buildDetailsHeader = ({ type, mode, isWarehouse, isSystem }) => {
             <tr>
                 <th rowspan="2">Material</th>
                 <th colspan="2">Medidas</th>
-                <th rowspan="2">${type === 'issue' ? 'Salida' : 'Compra'}</th>
+                <th rowspan="2">${ type === 'issue' ? 'Salida' : 'Compra' }</th>
                 <th rowspan="2">Presentación</th>
                 <th colspan="2">Conversión</th>
-                ${extraHeaders}
+                ${ extraHeaders }
             </tr>
             <tr>
                 <th>Base</th>
@@ -43,7 +47,7 @@ export const buildDetailsHeader = ({ type, mode, isWarehouse, isSystem }) => {
     `;
 };
 
-export const buildDetailsColumns = ({ type, mode, render, isWarehouse, isSystem }) => {
+export const buildDetailsColumns = ({ type, mode, render, isWarehouse, isCoordinator, isSystem }) => {
 
     const columns = [
         {
@@ -58,11 +62,26 @@ export const buildDetailsColumns = ({ type, mode, render, isWarehouse, isSystem 
         { data: 'unitMeasureName' },
     ];
 
-    if (type === 'issue' && (isWarehouse || isSystem)) {
+    if (type === 'issue' && ((isWarehouse && isCoordinator) || isSystem) && mode !== 'create') {
         columns.push(
             { data: 'maxUnitCost' },
-            { data: 'projectQuantity' },
-            { data: 'difference' }
+            { 
+                data: null,
+                render: (_, __, row) => `
+                    <div class="form-outline" data-mdb-input-init>
+                        <input
+                            type="number"
+                            name="projectConvertedQuantity"
+                            value="${ row.projectConvertedQuantity || '' }"
+                            class="form-control project-converted-quantity-input"
+                            ${ mode === 'view' ? 'disabled' : '' }
+                            data-id="${ row.id }"
+                            min=0
+                        >
+                    </div>
+                `
+            },
+            { data: 'convertedQuantityDifference' }
         );
     }
 
@@ -75,12 +94,26 @@ export const buildDetailsColumns = ({ type, mode, render, isWarehouse, isSystem 
         );
     }
 
-    if (mode !== 'view') {
+    if (type === 'issue' && mode !== 'create') {
+        columns.push({
+            data: null,
+            render: (_, __, row) => `
+                <input type="checkbox" 
+                    class="form-check-input supply-checkbox" 
+                    data-id="${ row.id }" 
+                    ${ row.isSupplied ? 'checked' : '' }
+                    ${ mode === 'view' ? 'disabled' : '' }
+                >
+            `
+        });
+    }
+
+    if (mode !== 'view' && mode !== 'edit-detail') {
         columns.push({
             data: null,
             render: (_, __, ___, meta) => `
-                <button class="btn btn-danger btn-sm delete-btn" data-index="${meta.row}">
-                    Eliminar
+                <button class="btn btn-danger btn-sm delete-btn" data-index="${ meta.row }">
+                    <i class="fas fa-trash-alt"></i>
                 </button>
             `
         });
