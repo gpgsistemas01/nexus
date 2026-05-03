@@ -62,6 +62,20 @@ export const validateFields = (validators, formData) => {
     return errors;
 }
 
+export const validateDetailsFields = (validators, details) => {
+
+    const errors = {};
+
+    details.forEach(detail => {
+
+        const detailErrors = validateFields(validators, detail);
+
+        if (Object.keys(detailErrors).length > 0) errors[detail.id] = detailErrors;
+    })
+
+    return errors;
+}
+
 export const mapServerErrors = (serverErrors) => {
 
     const errors = {};

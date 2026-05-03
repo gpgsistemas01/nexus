@@ -4,7 +4,7 @@ import { validateGoodsReceiptValidators } from "../../utils/validations/validato
 import { refreshProductTable } from "../../plugins/datatable/baseDatatable.js";
 import { createGoodsReceiptDatatable, details, initDetailsGoodsReceiptTable } from "../../plugins/datatable/goodsReceiptDatatable.js";
 import { GOODS_RECEIPT_SUPPLIER_CHANGED_EVENT, initGoodsReceiptFormSelect2, setGoodsReceiptFormSelectOptions } from "../../plugins/select2/modules/goodsReceiptSelect.js";
-import { toggleInputSelectErrors, toggleTableErrors, setFormReadOnly, updateTotals, toggleButtons, cleanAddedProductInput, toggleInvoiceInput } from "../../ui/formUI.js";
+import { toggleInputSelectErrors, toggleTableErrors, setFormReadOnly, updateTotals, toggleButtons, clearAddedProductInput, toggleInvoiceInput, clearFormErrors } from "../../ui/formUI.js";
 import { on } from "../../utils/domUtils.js";
 import { formatDateLongWithTime } from "../../utils/formatters.js";
 import { handleSubmit, validateFields } from "../../utils/formUtils.js";
@@ -19,7 +19,7 @@ createGoodsReceiptDatatable();
 document.addEventListener(GOODS_RECEIPT_SUPPLIER_CHANGED_EVENT, () => {
     details.length = 0;
     refreshProductTable(details);
-    cleanAddedProductInput();
+    clearAddedProductInput();
 });
 
 useForm({
@@ -31,8 +31,10 @@ useForm({
         if (!formData.isInvoiced) delete formData.invoice;
 
         formData.details = details;
+
+        return formData;
     },
-    getErrors: (formData) => {
+    getErrors: ({ formData }) => {
         
         const allowedUsername = /^[a-zA-Z0-9\-]+$/;
         let errors = {};
@@ -83,6 +85,7 @@ export const openGoodsReceiptModal = ({ mode, data = null }) => {
     form.dataset.mode = mode;
     form.dataset.id = data?.id || '';
 
+    clearFormErrors(form);
     setFormReadOnly({ form, isReadOnly: false });
 
     details.length = 0;
@@ -208,7 +211,7 @@ const addProduct = () => {
     details.push(product);
 
     refreshProductTable(details);
-    cleanAddedProductInput();
+    clearAddedProductInput();
 
     updateTotals({
         quantity,

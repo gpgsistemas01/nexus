@@ -40,6 +40,10 @@ export const validateGoodsIssueValidators = {
     details: validateGoodsIssueDetailsArray
 }
 
+export const validateGoodsIssueDetailValidators = {
+    projectConvertedQuantity: (value) => validateNumber(value, 'La cantidad')
+}
+
 export const validatePurchaseRequisitionValidators = {
     projectId: (value) => isEmptyOrNull(value, 'El proyecto'),
     observations: (value) => validateTextOptional(value, 'Las observaciones'),

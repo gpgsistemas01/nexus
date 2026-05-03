@@ -1,5 +1,5 @@
 import { getSuccessMessage } from "../../constants/apiMessages.js";
-import { approveGoodsIssueRequest, cancelGoodsIssueRequest, confirmGoodsIssueRequest, editGoodsIssueRequest, registerGoodsIssueRequest, rejectGoodsIssueRequest } from "../../services/warehouse/goodsIssueService.js";
+import { approveGoodsIssueRequest, cancelGoodsIssueRequest, confirmGoodsIssueRequest, editGoodsIssueDetailsRequest, registerGoodsIssueRequest, rejectGoodsIssueRequest } from "../../services/warehouse/goodsIssueService.js";
 
 export const registerGoodsIssue = async (formData) => {
 
@@ -39,11 +39,11 @@ export const registerGoodsIssue = async (formData) => {
     }
 };
 
-export const editGoodsIssue = async (formData, id) => {
+export const editGoodsIssueDetails = async (formData, id) => {
 
     try {
     
-        const response = await editGoodsIssueRequest(formData, id);
+        const response = await editGoodsIssueDetailsRequest(formData, id);
 
         const { data } = response;
         const { code } = data;

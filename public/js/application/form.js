@@ -17,11 +17,11 @@ export const useForm = async ({
 
         e.preventDefault();
 
-        const formData = Object.fromEntries(new FormData(form));
+        let formData = Object.fromEntries(new FormData(form));
 
-        normalizeData({ form, formData });
+        formData = normalizeData({ form, formData });
 
-        const errors = getErrors(formData);
+        const errors = getErrors({ form, formData });
 
         normalizeErrors({ form, errors });
         toggleErrorMessages(form, errors);

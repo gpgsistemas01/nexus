@@ -5,6 +5,8 @@ const TOTAL_FIELDS = {
     net: '#totalNetPurchaseAmountDisplayInput',
     gross: '#totalGrossPurchaseAmountDisplayInput',
 }
+const MODE_EDIT_DETAIL = 'edit-detail';
+const MODE_VIEW = 'view';
 
 export const toggleErrorMessages = (form, errors) => {
 
@@ -83,16 +85,88 @@ const setTableError = (form, key, message = null) => {
 
 export const toggleTableErrors = (form, errors) => {
 
-    const key = 'details';
-    const value = errors[key];
-    setTableError(form, key, value);
+    const { mode } = form.dataset;
+
+    if (mode === MODE_EDIT_DETAIL) {
+
+        Object.keys(errors).forEach(id => {
+
+            const fields = errors[id];
+
+            Object.keys(fields).forEach(field => {
+
+                const input = form.querySelector(`[data-id="${ id }"][name="${ field }"]`);
+
+                if (!input) return;
+
+                const message = fields[field];
+                const feedback = form.querySelector(`[data-error-for="${ field }-${ id }"]`);
+
+                if (message) {
+
+                    input.classList.add('is-invalid');
+                    feedback.textContent = message;
+                    feedback.classList.add('d-block');
+
+                } else {
+
+                    input.classList.remove('is-invalid');
+                    feedback.textContent = null;
+                    feedback.classList.remove('d-block');
+                }
+            });
+        });
+
+    } else {
+
+        const key = 'details';
+        const value = errors[key];
+        setTableError(form, key, value);
+    }
 }
+
+export const clearFormErrors = (form) => {
+
+    form.querySelectorAll('.is-invalid').forEach(input => {
+        input.classList.remove('is-invalid');
+        input.removeAttribute('title');
+    });
+
+    form.querySelectorAll('.was-validated').forEach(el => {
+        el.classList.remove('was-validated');
+    });
+
+    form.querySelectorAll('[data-error-for]').forEach(feedback => {
+        feedback.textContent = '';
+        feedback.classList.remove('d-block');
+        feedback.classList.add('d-none');
+    });
+
+    form.querySelectorAll('select').forEach(input => {
+
+        if ($(input).hasClass('select2-hidden-accessible')) {
+
+            $(input)
+                .next('.select2-container')
+                .find('.select2-selection')
+                .removeClass('is-invalid');
+        }
+    });
+
+    const tableError = form.querySelector('[data-error-for="details"]');
+
+    if (tableError) {
+        tableError.textContent = '';
+        tableError.classList.add('d-none');
+    }
+};
 
 export const setFormReadOnly = ({
     form,
     isReadOnly
 }) => {
     
+    const { mode } = form.dataset;
     const elements = form.querySelectorAll('input, select, textarea');
 
     elements.forEach(el => {
@@ -103,7 +177,7 @@ export const setFormReadOnly = ({
         }
     });
 
-    form.querySelector('#submitBtn').classList.toggle('d-none', isReadOnly);
+    form.querySelector('#submitBtn').classList.toggle('d-none', mode === MODE_VIEW);
 };
 
 export const toggleButtons = ({
@@ -164,7 +238,7 @@ export const updateTotals = ({
     updateMdbWrapperInput(instanceTotalGrossPurchaseAmount);
 }
 
-export const cleanAddedProductInput = () => {
+export const clearAddedProductInput = () => {
 
     $('#productInput').empty().trigger('change');
     document.querySelector('#quantityInput').value = '';

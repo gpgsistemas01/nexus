@@ -69,8 +69,8 @@ router.post(
     registerGoodsIssue
 );
 
-router.put(
-    '/:id',
+router.patch(
+    '/:id/details',
     verifyCookiesAuthTokenRequired,
     goodsIssueValidation,
     validate,

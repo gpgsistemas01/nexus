@@ -23,13 +23,6 @@
 
   --mdb-heading-color: var(--mdb-secondary);
   --mdb-font-sans-serif: "Montserrat", sans-serif;
-
-  --btn-color-facebook: #3b5998;
-  --btn-color-instagram: #E1306C;
-  --btn-color-tiktok: #000000;
-  --btn-color-twitter: #1DA1F2;
-  --btn-color-youtube: #FF0000;
-  --btn-color-google: #dd4b39;
 }
 
 body {
@@ -101,6 +94,12 @@ body {
   --mdb-list-group-bg: var(--mdb-secondary);
   --mdb-list-group-action-hover-color: var(--mdb-accent);
   --mdb-list-group-action-hover-bg: var(--mdb-dark);
+}
+
+/* table styles */
+
+#productTable .form-control {
+  background-color: rgb(168, 217, 245);
 }
 
 /* card styles */

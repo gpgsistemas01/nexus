@@ -9,16 +9,12 @@ const formId = '#productForm';
 useForm({
     selector: formId,
     normalizeData: ({ formData }) => {
+
         formData.isActive = document.querySelector(`${ formId } #isActiveInput`).checked;
-    },
-    getErrors: (formData) => {
         
-        let errors = {};
-
-        errors = validateFields(productValidators, formData);
-
-        return errors;
+        return formData;
     },
+    getErrors: ({ formData }) => validateFields(productValidators, formData),
     normalizeErrors: ({ form, errors }) => toggleInputSelectErrors(form, errors),
     normalizeServerErrors: (form, errors) => toggleInputSelectErrors(form, errors),
     sendRequest: async ({ formData, form }) => {

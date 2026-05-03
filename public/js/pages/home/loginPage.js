@@ -8,14 +8,8 @@ document.getElementById('submitBtn').textContent = 'Ingresar';
 
 useForm({
     selector: formId,
-    getErrors: (formData) => {
-
-        let errors = {};
-
-        errors = validateFields(loginValidators, formData);
-
-        return errors;
-    },
+    normalizeData: ({ formData }) => formData,
+    getErrors: ({ formData }) => validateFields(loginValidators, formData),
     normalizeErrors: ({ errors }) => {
 
         errors.name = errors.name ? 'Usuario incorrecto' : null;

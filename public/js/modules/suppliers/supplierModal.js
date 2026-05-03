@@ -1,3 +1,4 @@
+import { clearFormErrors } from "../../ui/formUI.js";
 import { openModal } from "../../ui/modalUI.js";
 
 const modalId = '#supplierModal';
@@ -15,6 +16,7 @@ export const openSupplierModal = ({
     form.dataset.mode = mode;
     form.dataset.id = data?.id || '';
 
+    clearFormErrors(form);
     form.reset();
     if (form.elements.isActive) form.elements.isActive.checked = true;
     form.elements.tradeName.value = data?.tradeName || '';

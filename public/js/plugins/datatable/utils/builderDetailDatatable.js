@@ -68,17 +68,16 @@ export const buildDetailsColumns = ({ type, mode, render, isWarehouse, isCoordin
             { 
                 data: null,
                 render: (_, __, row) => `
-                    <div class="form-outline" data-mdb-input-init>
-                        <input
-                            type="number"
-                            name="projectConvertedQuantity"
-                            value="${ row.projectConvertedQuantity || '' }"
-                            class="form-control project-converted-quantity-input"
-                            ${ mode === 'view' ? 'disabled' : '' }
-                            data-id="${ row.id }"
-                            min=0
-                        >
-                    </div>
+                    <input
+                        type="number"
+                        name="projectConvertedQuantity"
+                        value="${ row.projectConvertedQuantity || '' }"
+                        class="form-control project-converted-quantity-input"
+                        ${ mode === 'view' ? 'disabled' : '' }
+                        data-id="${ row.id }"
+                        min=0
+                    >
+                    <div data-error-for="projectConvertedQuantity-${ row.id }" class="invalid-feedback"></div>
                 `
             },
             { data: 'convertedQuantityDifference' }
