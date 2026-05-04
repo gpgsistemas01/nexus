@@ -85,14 +85,12 @@ model Product {
   id                          String                             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name                        String                             @db.VarChar(200)
   sku                         String?                            @unique @db.VarChar(200)
-  currentStock                Decimal                            @default(0) @db.Decimal(10, 2)
   presentationId String @db.Uuid
   unitMeasureId String @db.Uuid
   isActive                    Boolean                            @default(true)
   minStock                    Decimal                           @default(0) @db.Decimal(10, 2)
   base                        Decimal?                           @db.Decimal(10, 3)
   height                      Decimal?                           @db.Decimal(10, 3)
-  maxUnitCost                    Decimal?                           @db.Decimal(10, 3)
   convertedQuantity Decimal? @db.Decimal(10, 3)
   presentation Presentation @relation(fields: [presentationId], references: [id])
   unitMeasure UnitMeasure @relation(fields: [unitMeasureId], references: [id])
@@ -134,8 +132,9 @@ model Supplier {
 
 model SupplierProduct {
   id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  price     Decimal?  @db.Decimal(10, 2)
+  maxUnitCost                    Decimal?                           @db.Decimal(10, 3)
   sku       String?  @db.VarChar(50)
+  currentStock Decimal @db.Decimal(10, 2)
   supplierId String   @db.Uuid
   productId  String   @db.Uuid
   supplier   Supplier @relation(fields: [supplierId], references: [id])

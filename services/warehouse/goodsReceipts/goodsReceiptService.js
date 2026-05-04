@@ -163,6 +163,7 @@ export const createGoodsReceipt = async ({ goodsReceiptDto }) => {
 
         await updateProductUnitCostIfHigher({
             tx,
+            supplierId: goodsReceipt.supplierId,
             details: goodsReceipt.details
         });
 

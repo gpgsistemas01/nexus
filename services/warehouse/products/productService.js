@@ -216,53 +216,6 @@ export const updateProduct = async (productDto, id) => {
     });
 };
 
-export const updateProductUnitCostIfHigher = async ({
-    tx,
-    details
-}) => {
-
-    const db = tx || prisma;
-
-    const maxCostByProduct = {};
-
-    for (const detail of details) {
-
-        const { productId, conversionUnitCost } = detail;
-
-        if (
-            !maxCostByProduct[productId] ||
-            conversionUnitCost > maxCostByProduct[productId]
-        ) {
-            maxCostByProduct[productId] = conversionUnitCost;
-        }
-    }
-
-    const productIds = Object.keys(maxCostByProduct);
-
-    const products = await db.product.findMany({
-        where: {
-            id: { in: productIds }
-        },
-        select: {
-            id: true,
-            maxUnitCost: true
-        }
-    });
-
-    await Promise.all(products.map(product => {
-
-        const newCost = maxCostByProduct[product.id];
-
-        if (newCost > product.maxUnitCost) {
-            return db.product.update({
-                where: { id: product.id },
-                data: { maxUnitCost: newCost }
-            });
-        }
-
-    }));
-};
-
 export const updateProductCurrentStock = async ({
     tx,
     grouped,

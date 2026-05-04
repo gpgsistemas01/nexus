@@ -44,68 +44,72 @@ async function main() {
         skipDuplicates: true
     });
     
-    const relationDepartmentSheet = workbook1.Sheets['RELACIONES_PERFIL'];
-    const relationProfileDepartmentRows = XLSX.utils.sheet_to_json(relationDepartmentSheet, {
-        defval: null,
-    });
+    const countProfile = await prisma.profile.count();
 
-    const profileParsed = relationProfileDepartmentRows.map(row => {
-        const fullName = cleanValue(row.fullName);
-        if (!fullName) return null;
+    if (countProfile < 1) {
+        const relationDepartmentSheet = workbook1.Sheets['RELACIONES_PERFIL'];
+        const relationProfileDepartmentRows = XLSX.utils.sheet_to_json(relationDepartmentSheet, {
+            defval: null,
+        });
 
-        return { fullName };
-    }).filter(Boolean);
+        const profileParsed = relationProfileDepartmentRows.map(row => {
+            const fullName = cleanValue(row.fullName);
+            if (!fullName) return null;
 
-    await prisma.profile.createMany({
-        data: profileParsed,
-        skipDuplicates: true
-    });
+            return { fullName };
+        }).filter(Boolean);
 
-    const profiles = await prisma.profile.findMany({
-        select: {
-            id: true,
-            fullName: true
-        }
-    });
-    const profileMap = new Map(profiles.map(p => [cleanValue(p.fullName), p.id]));
+        await prisma.profile.createMany({
+            data: profileParsed,
+            skipDuplicates: true
+        });
 
-    const departments = await prisma.department.findMany({
-        select: {
-            id: true,
-            name: true
-        }
-    });
-    const departmentMap = new Map(departments.map(d => [cleanValue(d.name), d.id]));
+        const profiles = await prisma.profile.findMany({
+            select: {
+                id: true,
+                fullName: true
+            }
+        });
+        const profileMap = new Map(profiles.map(p => [cleanValue(p.fullName), p.id]));
 
-    const relationProfileDepartmentParsed = relationProfileDepartmentRows.map(row => {
+        const departments = await prisma.department.findMany({
+            select: {
+                id: true,
+                name: true
+            }
+        });
+        const departmentMap = new Map(departments.map(d => [cleanValue(d.name), d.id]));
 
-        const fullName = cleanValue(row.fullName);
-        const department = cleanValue(row.department);
+        const relationProfileDepartmentParsed = relationProfileDepartmentRows.map(row => {
 
-        if (!fullName || !department) {
-            console.log('Error en fila: ', row);
-            return null;
-        }
+            const fullName = cleanValue(row.fullName);
+            const department = cleanValue(row.department);
 
-        const profileId = profileMap.get(fullName);
-        const departmentId = departmentMap.get(department);
+            if (!fullName || !department) {
+                console.log('Error en fila: ', row);
+                return null;
+            }
 
-        if (!profileId || !departmentId) {
-            console.log('No encontrado en Map: ', { fullName, department });
-            return null;
-        }
+            const profileId = profileMap.get(fullName);
+            const departmentId = departmentMap.get(department);
 
-        return {
-            profileId,
-            departmentId
-        };
+            if (!profileId || !departmentId) {
+                console.log('No encontrado en Map: ', { fullName, department });
+                return null;
+            }
 
-    }).filter(Boolean);
+            return {
+                profileId,
+                departmentId
+            };
 
-    await prisma.departmentProfile.createMany({
-        data: relationProfileDepartmentParsed,
-        skipDuplicates: true
-    });
+        }).filter(Boolean);
+
+        await prisma.departmentProfile.createMany({
+            data: relationProfileDepartmentParsed,
+            skipDuplicates: true
+        });
+    }
 
     const clientSheet = workbook1.Sheets['CLIENTES'];
     const clientRows = XLSX.utils.sheet_to_json(clientSheet, {
@@ -153,40 +157,45 @@ async function main() {
 
     // const hashedPassword = await bcrypt.hash('A%54321', 10)
 
-    const user = await prisma.user.upsert({
-        where: {
-            name: 'Soporte01',
-        },
-        update: {},
-        create: {
-            id: '00000000-0000-0000-0000-000000000040',
-            name: 'Soporte01',
-            password: 'A%54321',
-            isActive: true,
-        },
-    });
+    const countUser = prisma.user.count();
 
-    const roles = await prisma.role.findMany({
-        select: { id: true, name: true }
-    });
-    const roleByName = Object.fromEntries(roles.map((role) => [role.name, role.id]));
+    if (countUser < 1) {
 
-    for (const dept of departments) {
-        await prisma.userRoleDepartment.upsert({
+        const user = await prisma.user.upsert({
             where: {
-                userId_roleId_departmentId: {
-                    userId: user.id,
-                    roleId: '00000000-0000-0000-0000-000000000020', // Admin
-                    departmentId: dept.id
-                }
+                name: 'Soporte01',
             },
             update: {},
             create: {
-                userId: user.id,
-                roleId: '00000000-0000-0000-0000-000000000020',
-                departmentId: dept.id
-            }
+                id: '00000000-0000-0000-0000-000000000040',
+                name: 'Soporte01',
+                password: 'A%54321',
+                isActive: true,
+            },
         });
+
+        const roles = await prisma.role.findMany({
+            select: { id: true, name: true }
+        });
+        const roleByName = Object.fromEntries(roles.map((role) => [role.name, role.id]));
+
+        for (const dept of departments) {
+            await prisma.userRoleDepartment.upsert({
+                where: {
+                    userId_roleId_departmentId: {
+                        userId: user.id,
+                        roleId: '00000000-0000-0000-0000-000000000020', // Admin
+                        departmentId: dept.id
+                    }
+                },
+                update: {},
+                create: {
+                    userId: user.id,
+                    roleId: '00000000-0000-0000-0000-000000000020',
+                    departmentId: dept.id
+                }
+            });
+        }
     }
 
     await prisma.fulfillmentStatus.createMany({
@@ -244,7 +253,6 @@ async function main() {
     const productParsed = productRows.map(row => ({
         name: row.name,
         sku: row.sku,
-        currentStock: isNaN(toDecimal(row.currentStock)) ? 0 : toDecimal(row.currentStock),
         minStock: isNaN(toDecimal(row.minStock)) ? 0 : toDecimal(row.minStock),
         base: isNaN(toDecimal(row.base)) || row.base === 0 ? null : toDecimal(row.base),
         height: isNaN(toDecimal(row.height)) || row.height === 0 ? null : toDecimal(row.height),
@@ -346,6 +354,7 @@ async function main() {
         return {
             productId,
             supplierId,
+            currentStock: row.currentStock,
             sku: row.sku
         }
     }).filter(Boolean);
