@@ -9,6 +9,8 @@ import { applyInventoryMovement } from "../../inventory/movementService.js";
 import { findUniqueSupplier } from "../supplierService.js";
 import { buildGoodsReceiptDetails } from "./goodsReceiptHelpers.js";
 import { updateProductUnitCostIfHigher } from "../products/supplierProductService.js";
+import { findSupplierProduct } from "../../../repository/warehouse/productRepository.js";
+import { buildStockKey, parseStockKey } from "../../../utils/formattersUtils.js";
 
 const REFERENCE_NUMBER_TYPE = 'REC';
 const MOVEMENT_TYPE_IN = 'IN';
@@ -106,6 +108,42 @@ export const createGoodsReceipt = async ({ goodsReceiptDto }) => {
         totalGrossPurchaseAmount: 0
     });
 
+    const grouped = new Map();
+    
+    for (const detail of processedDetails) {
+        const key = buildStockKey(detail.productId, supplierId);
+        grouped.set(
+            key,
+            Number((grouped.get(key) || 0)) + Number(detail.quantity)
+        );
+    }
+
+    const filters = Array.from(grouped.keys()).map(key => parseStockKey(key));
+
+    const supplierProducts = await findSupplierProduct({
+        where: {
+            OR: filters
+        },
+        select: {
+            id: true,
+            productId: true,
+            supplierId: true,
+            currentStock: true,
+            product: {
+                select: {
+                    base: true,
+                    height: true,
+                    name: true
+                }
+            },
+            supplier: {
+                select: {
+                    tradeName: true
+                }
+            }
+        }
+    });
+
     const result = await prisma.$transaction(async (tx) => {
 
         const referenceNumber = await generateReferenceNumber({ type: REFERENCE_NUMBER_TYPE, tx });
@@ -159,16 +197,17 @@ export const createGoodsReceipt = async ({ goodsReceiptDto }) => {
                 supplierId: goodsReceipt.supplierId,
                 quantity: detail.quantity
             })),
-            movementType: MOVEMENT_TYPE_IN
-        });
-
-        await updateProductUnitCostIfHigher({
-            tx,
-            supplierId: goodsReceipt.supplierId,
-            details: goodsReceipt.details
+            movementType: MOVEMENT_TYPE_IN,
+            grouped,
+            supplierProducts
         });
 
         return { goodsReceipt, impactedProductIds };
+    });
+
+    await updateProductUnitCostIfHigher({
+        supplierId: result.goodsReceipt.supplierId,
+        details: result.goodsReceipt.details
     });
 
     return result;

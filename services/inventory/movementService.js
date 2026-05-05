@@ -11,7 +11,9 @@ export const applyInventoryMovement = async ({
     tx,
     reference = {},
     details,
-    movementType
+    movementType,
+    grouped,
+    supplierProducts
 }) => {
 
     for (const detail of details) {
@@ -47,20 +49,11 @@ export const applyInventoryMovement = async ({
         }
     });
 
-    const grouped = new Map();
-
-    for (const detail of movement.details) {
-        const key = buildStockKey(detail.productId, detail.supplierId);
-        grouped.set(
-            key,
-            Number((grouped.get(key) || 0)) + Number(detail.quantity)
-        );
-    }
-
     await updateSupplierProductStock({
         tx,
         grouped,
-        movementType
+        movementType,
+        supplierProducts
     });
 
     return movement.details.map(detail => ({

@@ -164,7 +164,7 @@ const addProduct = () => {
     const productBase = selectedProduct?.productBase ? Number(selectedProduct?.productBase) : null;
     const productHeight = selectedProduct?.productHeight ? Number(selectedProduct?.productHeight) : null;
     const { presentationName, unitMeasureName, productName, supplierName } = selectedProduct;
-
+console.log($('#productInput').select2('data'))
     if (!supplierId) {
         alert('Selecciona un proveedor antes de agregar productos.');
         return;

@@ -49,7 +49,6 @@ const initProductSelect = ({
                         productBase: p.base,
                         productHeight: p.height,
                         supplierName: p.supplier.tradeName,
-                        unitCost: p.unitCost,
                         supplierId: p.supplier.id
                     }
                 })
@@ -105,37 +104,25 @@ const attachProductHandler = ({
                 },
                 onSave: (createdProduct) => {
 
-                    toggleProductOption({
-                        selector: productSelector,
-                        data: {
-                            id: createdProduct.id,
-                            text: createdProduct.name
-                        }
-                    });
-
                     let text;
 
                     if (!createdProduct.base || !createdProduct.height) text = `${ createdProduct.name } || ${ createdProduct.supplier.tradeName }`;
                     else text = `${ createdProduct.name } (${ createdProduct.base } x ${ createdProduct.height }) || ${ createdProduct.supplier.tradeName }`;
 
-                    $(productSelector).trigger({
-                        type: 'select2:select',
-                        params: {
-                            data: {
-                                id: createdProduct.id,
-                                text,
-                                name: createdProduct.name,
-                                presentationName: createdProduct.presentation.name,
-                                unitMeasureName: createdProduct.unitMeasure.name,
-                                productBase: createdProduct.base,
-                                productHeight: createdProduct.height,
-                                supplierId: createdProduct.supplier.id,
-                                supplierName: createdProduct.supplier.tradeName,
-                                maxUnitCost: createdProduct.maxUnitCost
-                            }
+                    toggleProductOption({
+                        selector: productSelector,
+                        data: {
+                            id: createdProduct.id,
+                            text,
+                            base: createdProduct.base,
+                            height: createdProduct.height,
+                            presentationName: createdProduct.presentation.name,
+                            unitMeasureName: createdProduct.unitMeasure.name,
+                            supplierName: createdProduct.supplier.tradeName,
+                            supplierId: createdProduct.supplier.id
                         }
                     });
-
+                    
                     setMdbWrapperInputValue({
                         selector: wrapperSelector,
                         value: createdProduct.presentation.name

@@ -55,6 +55,10 @@ export const toggleSelectOption = ({ selector, data = null }) => {
         true
     );
 
+    if (rest) {
+        $(option).data({...rest});
+    }
+
     $(selector).append(option).trigger('change');
 };
 

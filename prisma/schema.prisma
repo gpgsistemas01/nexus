@@ -134,7 +134,7 @@ model SupplierProduct {
   id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   maxUnitCost                    Decimal?                           @db.Decimal(10, 2)
   sku       String?  @db.VarChar(50)
-  currentStock Decimal @db.Decimal(10, 2)
+  currentStock Decimal @default(0) @db.Decimal(10, 2)
   convertedQuantity Decimal? @db.Decimal(10, 2)
   supplierId String   @db.Uuid
   productId  String   @db.Uuid

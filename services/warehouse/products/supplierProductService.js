@@ -118,17 +118,17 @@ export const findSupplierProductByIds = async ({
             } 
         },
         select: {
+            currentStock: true,
+            convertedQuantity: true,
+            maxUnitCost: true,
             product: {
                 select: {
                     id: true,
                     name: true,
-                    currentStock: true,
                     minStock: true,
                     isActive: true,
                     base: true,
                     height: true,
-                    unitCost: true,
-                    convertedQuantity: true,
                     presentation: true,
                     unitMeasure: true
                 }
@@ -239,68 +239,33 @@ export const updateProductUnitCostIfHigher = async ({
         }
     }
 
-    const productIds = Object.keys(maxCostByProduct);
-
-    const supplierProducts = await findSupplierProduct({
-        tx,
-        where: {
-            productId: { in: productIds },
-            supplierId
-        },
-        select: {
-            productId: true,
-            maxUnitCost: true
-        }
-    });
-
-    await Promise.all(supplierProducts
-        .filter(sp => maxCostByProduct[sp.productId] > sp.maxUnitCost)
-        .map(sp => db.supplierProduct.update({
-                where: { 
-                    supplierId_productId: { supplierId, productId: sp.productId }
+    await Promise.all(
+        Object.entries(maxCostByProduct).map(([productId, cost]) =>
+            prisma.supplierProduct.updateMany({
+                where: {
+                    supplierId,
+                    productId,
+                    OR: [
+                        { maxUnitCost: null },
+                        { maxUnitCost: { lt: cost } }
+                    ]
                 },
-                data: { maxUnitCost: maxCostByProduct[sp.productId] }
+                data: {
+                    maxUnitCost: cost
+                }
             })
         )
-
     );
 };
 
 export const updateSupplierProductStock = async ({
     tx,
     grouped,
-    movementType
+    movementType,
+    supplierProducts
 }) => {
 
     const db = tx || prisma;
-
-    const keys = Array.from(grouped.keys());
-    const filters = keys.map(key => parseStockKey(key));
-
-    const supplierProducts = await findSupplierProduct({
-        tx,
-        where: {
-            OR: filters
-        },
-        select: {
-            id: true,
-            productId: true,
-            supplierId: true,
-            currentStock: true,
-            product: {
-                select: {
-                    base: true,
-                    height: true,
-                    name: true
-                }
-            },
-            supplier: {
-                select: {
-                    tradeName: true
-                }
-            }
-        }
-    });
 
     const psMap = new Map(supplierProducts.map(ps => [buildStockKey(ps.productId, ps.supplierId), ps]));
 
@@ -319,36 +284,47 @@ export const updateSupplierProductStock = async ({
             supplierName: ps?.supplier?.name ?? 'Proveedor desconocido'
         });
 
-        const newStock = movementType === MOVEMENT_TYPE_IN
-            ? Number(ps.currentStock) + Number(quantity)
-            : Number(ps.currentStock) - Number(quantity);
-
-        if (newStock < -1e-6) throw new GoodsIssueInsufficientStock({
-            productName: ps?.product?.name ?? 'Producto desconocido',
-            height: ps?.product?.height ?? 'Desconocido',
-            base: ps?.product?.base ?? 'Desconocido',
-            supplierName: ps?.supplier?.name ?? 'Proveedor desconocido'
-        });
-
         const hasDimensions = ps.product.base && ps.product.height;
-        const convertedQuantity = hasDimensions
-            ? newStock * (ps.product.base * ps.product.height)
-            : newStock;
+        const factor = hasDimensions
+            ? (ps.product.base * ps.product.height)
+            : 1;
 
-        operations.push(
-            db.supplierProduct.update({
-                where: { 
-                    supplierId_productId: { supplierId, productId } 
+        if (movementType !== MOVEMENT_TYPE_IN) {
+
+            const result = await db.supplierProduct.updateMany({
+                where: {
+                    supplierId,
+                    productId,
+                    currentStock: { gte: quantity }
                 },
                 data: {
-                    currentStock: newStock,
-                    convertedQuantity
+                    currentStock: { decrement: quantity },
+                    convertedQuantity: { decrement: quantity * factor }
                 }
-            })
-        );
-    }
+            });
 
-    await Promise.all(operations);
+            if (result.count === 0) {
+                throw new GoodsIssueInsufficientStock({
+                    productName: ps?.product?.name ?? 'Producto desconocido',
+                    height: ps?.product?.height ?? 'Desconocido',
+                    base: ps?.product?.base ?? 'Desconocido',
+                    supplierName: ps?.supplier?.name ?? 'Proveedor desconocido'
+                });
+            }
+
+        } else {
+
+            await db.supplierProduct.update({
+                where: {
+                    supplierId_productId: { supplierId, productId }
+                },
+                data: {
+                    currentStock: { increment: quantity },
+                    convertedQuantity: { increment: quantity * factor }
+                }
+            });
+        }
+    }
 }
 
 export const deleteSupplierProduct = async ({

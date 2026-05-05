@@ -129,7 +129,7 @@ export const createProduct = async (productDto) => {
             return fullProduct;
         });
 
-    }).catch((err) => {
+    }).catch((err) => { console.log(err)
         throw new ProductCreateDatabaseError();
     });
 };
