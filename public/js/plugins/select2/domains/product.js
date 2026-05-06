@@ -78,6 +78,10 @@ const attachProductHandler = ({
     supplierSelector
 }) => {
 
+    $(productSelector).on('select2:opening', () => {
+        $(productSelector).find('option').remove();
+    });
+
     $(productSelector).off('select2:select').on('select2:select', (e) => {
 
         const { data } = e.params;
