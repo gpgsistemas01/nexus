@@ -103,13 +103,7 @@ export const buildGoodsIssueDetailUpdate = ({ current, detail, currentStock }) =
     const fulfillmentName = isFullySupplied
         ? FULFILLMENT_COMPLETE
         : (isSupplied ? FULFILLMENT_PARTIAL : FULFILLMENT_PENDING);
-console.log({
-    quantity: current.quantity,
-    suppliedQty: current.suppliedQuantity,
-    currentStock,
-    suppliedPartialBase,
-    suppliedBase
-});
+
     return {
         updateData: {
             projectConvertedQuantity: detail.projectConvertedQuantity,

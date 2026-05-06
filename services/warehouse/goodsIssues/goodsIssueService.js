@@ -225,94 +225,113 @@ export const updateGoodsIssueDetails = async ({ id, goodsIssueDto }) => {
 
     try {
 
-        return await prisma.$transaction(async (tx) => {
-
-            const goodsIssue = await tx.goodsIssue.findUnique({
-                where: { id },
-                select: {
-                    id: true,
-                    fulfillmentStatus: true,
-                    details: {
-                        select: {
-                            id: true,
-                            productId: true,
-                            quantity: true,
-                            supplierId: true,
-                            convertedQuantity: true,
-                            suppliedQuantity: true,
-                            projectConvertedQuantity: true
-                        }
+        const goodsIssue = await tx.goodsIssue.findUnique({
+            where: { id },
+            select: {
+                id: true,
+                fulfillmentStatus: true,
+                details: {
+                    select: {
+                        id: true,
+                        productId: true,
+                        quantity: true,
+                        supplierId: true,
+                        convertedQuantity: true,
+                        suppliedQuantity: true,
+                        projectConvertedQuantity: true
                     }
                 }
-            });
+            }
+        });
 
-            if (!goodsIssue) throw new GoodsIssueNotFound();
+        if (!goodsIssue) throw new GoodsIssueNotFound();
 
-            if (goodsIssue.fulfillmentStatus?.name === FULFILLMENT_COMPLETE) throw new GoodsIssueFulfillmentCompleteConflict();
+        if (goodsIssue.fulfillmentStatus?.name === FULFILLMENT_COMPLETE) throw new GoodsIssueFulfillmentCompleteConflict();
 
-            const detailIds = details.map(d => d.id).filter(Boolean);
-            const currentDetails = goodsIssue.details.filter(d => detailIds.includes(d.id));
-            const currentById = new Map(currentDetails.map(d => [d.id, d]));
-            const productIds = [...new Set(currentDetails.map(d => d.productId))];
+        const detailIds = details.map(d => d.id).filter(Boolean);
+        const currentDetails = goodsIssue.details.filter(d => detailIds.includes(d.id));
+        const currentById = new Map(currentDetails.map(d => [d.id, d]));
+        const productIds = [...new Set(currentDetails.map(d => d.productId))];
 
-            const supplierProducts = await findSupplierProduct({
-                tx,
-                where: {
-                    productId: { in: productIds }
-                },
-                select: {
-                    id: true,
-                    productId: true,
-                    supplierId: true,
-                    currentStock: true
-                }
-            });
-
-            const availableStockByKey = new Map(supplierProducts.map(sp => 
-                [buildStockKey(sp.productId, sp.supplierId), Number(sp.currentStock ?? 0)])
-            );
+        return await prisma.$transaction(async (tx) => {
 
             const movementDetails = [];
 
             for (const detail of details) {
 
                 const current = currentById.get(detail.id);
+
                 if (!current) continue;
 
-                const key = buildStockKey(current.productId, current.supplierId);
-                const currentStock = availableStockByKey.get(key) ?? 0;
-
-                const result = buildGoodsIssueDetailUpdate({
-                    current,
-                    detail,
-                    currentStock
-                });
-
-                await tx.goodsIssueDetail.update({
-                    where: { id: current.id },
-                    data: {
-                        ...result.updateData,
-                        fulfillmentStatus: {
-                            connect: { name: result.fulfillmentName }
+                if (!detail.isSupplied) {
+                    await tx.goodsIssueDetail.update({
+                        where: { id: current.id },
+                        data: {
+                            projectConvertedQuantity: detail.projectConvertedQuantity,
+                            isSupplied: false
                         }
-                    }
+                    });
+                    continue;
+                }
+
+                const pending = current.quantity - current.suppliedQuantity;
+
+                if (pending <= FLOAT_EPSILON) continue;
+
+                movementDetails.push({
+                    productId: current.productId,
+                    supplierId: current.supplierId,
+                    goodsIssueDetailId: current.id,
+                    quantity: pending // 🔥 aquí va TODO lo pendiente
                 });
-
-                if (result.movement) movementDetails.push(result.movement);
-
-                availableStockByKey.set(
-                    key,
-                    result.remainingStock
-                );
             }
 
             if (movementDetails.length) {
+
+                const grouped = new Map();
+
+                for (const detail of movementDetails) {
+                    const key = buildStockKey(detail.productId, detail.supplierId);
+                    grouped.set(
+                        key,
+                        Number((grouped.get(key) || 0)) + Number(detail.quantity)
+                    );
+                }
+
+                const filters = Array.from(grouped.keys()).map(key => parseStockKey(key));
+
+                const supplierProducts = await findSupplierProduct({
+                    tx,
+                    where: {
+                        OR: filters
+                    },
+                    select: {
+                        id: true,
+                        productId: true,
+                        supplierId: true,
+                        currentStock: true,
+                        product: {
+                            select: {
+                                base: true,
+                                height: true,
+                                name: true
+                            }
+                        },
+                        supplier: {
+                            select: {
+                                tradeName: true
+                            }
+                        }
+                    }
+                });
                 
                 await applyInventoryMovement({
                     tx,
                     reference: { goodsIssueId: goodsIssue.id },
                     details: movementDetails,
-                    movementType: MOVEMENT_TYPE_OUT
+                    movementType: MOVEMENT_TYPE_OUT,
+                    grouped,
+                    supplierProducts
                 });
             }
 
