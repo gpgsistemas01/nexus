@@ -222,15 +222,15 @@ export const updateTotals = ({
 
     const instanceTotalQuantity = initMdbWrapperInput({
         selector: TOTAL_FIELDS.quantity,
-        value: totalQuantity
+        value: totalQuantity.toFixed(2)
     });
     const instanceTotalNetPurchaseAmount = initMdbWrapperInput({
         selector: TOTAL_FIELDS.net,
-        value: totalNetPurchaseAmount
+        value: totalNetPurchaseAmount.toFixed(2)
     });
     const instanceTotalGrossPurchaseAmount = initMdbWrapperInput({
         selector: TOTAL_FIELDS.gross,
-        value: totalGrossPurchaseAmount
+        value: totalGrossPurchaseAmount.toFixed(2)
     });
 
     updateMdbWrapperInput(instanceTotalQuantity);

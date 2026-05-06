@@ -135,7 +135,7 @@ model SupplierProduct {
   maxUnitCost                    Decimal?                           @db.Decimal(10, 2)
   sku       String?  @db.VarChar(50)
   currentStock Decimal @default(0) @db.Decimal(10, 2)
-  convertedQuantity Decimal? @db.Decimal(10, 2)
+  convertedQuantity Decimal @default(0) @db.Decimal(10, 2)
   supplierId String   @db.Uuid
   productId  String   @db.Uuid
   supplier   Supplier @relation(fields: [supplierId], references: [id])

@@ -38,6 +38,10 @@ export const initbaseSelect2 = ({
         tags,
         createTag
     });
+
+    $(baseSelector).on('select2:opening', () => {
+        $(baseSelector).find('option').remove();
+    });
 }
 
 export const toggleSelectOption = ({ selector, data = null }) => {
