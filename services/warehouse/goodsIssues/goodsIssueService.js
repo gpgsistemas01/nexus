@@ -356,6 +356,7 @@ export const updateGoodsIssueDetails = async ({ id, goodsIssueDto }) => {
             const refreshed = await tx.goodsIssueDetail.findMany({
                 where: { goodsIssueId: id },
                 select: {
+                    isSupplied: true,
                     quantity: true,
                     suppliedQuantity: true
                 }
