@@ -74,10 +74,10 @@ export const buildDetailsColumns = ({ type, mode, render, isWarehouse, isCoordin
                         value="${ row.projectConvertedQuantity || '' }"
                         class="form-control project-converted-quantity-input"
                         ${ mode === 'view' ? 'disabled' : '' }
-                        data-id="${ row.id }"
+                        data-id="${ row.productId }"
                         min=0
                     >
-                    <div data-error-for="projectConvertedQuantity-${ row.id }" class="invalid-feedback"></div>
+                    <div data-error-for="projectConvertedQuantity-${ row.productId }" class="invalid-feedback"></div>
                 `
             },
             { data: 'convertedQuantityDifference' }
@@ -99,7 +99,7 @@ export const buildDetailsColumns = ({ type, mode, render, isWarehouse, isCoordin
             render: (_, __, row) => `
                 <input type="checkbox" 
                     class="form-check-input supply-checkbox" 
-                    data-id="${ row.id }" 
+                    data-id="${ row.productId }" 
                     ${ row.isSupplied ? 'checked' : '' }
                     ${ mode === 'view' ? 'disabled' : '' }
                 >
@@ -111,7 +111,7 @@ export const buildDetailsColumns = ({ type, mode, render, isWarehouse, isCoordin
         columns.push({
             data: null,
             render: (_, __, row) => `
-                <button class="btn btn-danger btn-sm delete-btn" data-id="${ row.id }">
+                <button type="button" class="btn btn-danger btn-sm delete-btn" data-id="${ row.productId }">
                     <i class="fas fa-trash-alt"></i>
                 </button>
             `

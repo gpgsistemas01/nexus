@@ -194,7 +194,7 @@ on('change', '.supply-checkbox', (e, checkbox) => {
 on('input', '.project-converted-quantity-input', (e, input) => {
     const { id } = input.dataset;
     const value = Number(input.value);
-    const product = details.find(detail => detail.id === id);
+    const product = details.find(detail => detail.productId === id);
 
     if (!product) return;
 

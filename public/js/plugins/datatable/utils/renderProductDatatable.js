@@ -46,7 +46,7 @@ export const initDetailsTable = ({ selector, type, mode, context, data }) => {
 
 export const handleDelete = ({ id, details, context }) => {
 
-    const index = details.findIndex(p => p.id === id);
+    const index = details.findIndex(p => p.productId === id);
 
     if (index < 0) return;
 
