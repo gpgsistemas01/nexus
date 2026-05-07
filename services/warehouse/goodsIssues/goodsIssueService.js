@@ -5,7 +5,7 @@ import {
     GoodsIssueAdvisorProfileNotFound,
     GoodsIssueFulfillmentCompleteConflict
 } from "../../../errors/warehouse/goodsIssueError.js";
-import { prisma } from "../../../lib/prisma.js";
+import { getDb } from "../../../repository/baseRepository.js";
 import { findProfileById } from "../../admin/profileService.js";
 import { findDepartmentById } from "../../admin/departmentService.js";
 import { generateReferenceNumber } from "../../document/referenceNumberService.js";
@@ -13,7 +13,7 @@ import { findClientById } from "../../sales/clientService.js";
 import { buildGoodsIssueDetails, resolveFulfillmentStatus } from "./goodsIssueHelpers.js";
 import { applyInventoryMovement } from "../../inventory/movementService.js";
 import { buildStockKey, parseStockKey } from "../../../utils/formattersUtils.js";
-import { findSupplierProduct } from "../../../repository/warehouse/productRepository.js";
+import { findSupplierProduct } from "../products/supplierProductService.js";
 
 const ROLE_SYSTEM_ADMIN = 'Administrador del sistema';
 const ROLE_COORDINATOR = 'Coordinador';
@@ -66,7 +66,7 @@ export const findAllGoodsIssues = async ({
         })
     };
 
-    const goodsIssues = await prisma.goodsIssue.findMany({
+    const goodsIssues = await getDb().goodsIssue.findMany({
         skip,
         take,
         where,
@@ -116,7 +116,7 @@ export const findAllGoodsIssues = async ({
         }
     });
 
-    const total = await prisma.goodsIssue.count({ where });
+    const total = await getDb().goodsIssue.count({ where });
     const filtered = total;
 
     return {
@@ -145,7 +145,7 @@ export const createGoodsIssue = async ({
 
     const processedDetails = await buildGoodsIssueDetails({ details });
 
-    const result = await prisma.$transaction(async (tx) => {
+    const result = await getDb().$transaction(async (tx) => {
 
         const referenceNumber = await generateReferenceNumber({ type: REFERENCE_NUMBER_TYPE, tx });
 
@@ -225,7 +225,7 @@ export const updateGoodsIssueDetails = async ({ id, goodsIssueDto }) => {
 
     try {
 
-        const goodsIssue = await prisma.goodsIssue.findUnique({
+        const goodsIssue = await getDb().goodsIssue.findUnique({
             where: { id },
             select: {
                 id: true,
@@ -253,7 +253,7 @@ export const updateGoodsIssueDetails = async ({ id, goodsIssueDto }) => {
         const currentDetails = goodsIssue.details.filter(d => detailIds.includes(d.id));
         const currentById = new Map(currentDetails.map(d => [d.id, d]));
 
-        return await prisma.$transaction(async (tx) => {
+        return await getDb().$transaction(async (tx) => {
 
             const movementDetails = [];
             const updates = [];

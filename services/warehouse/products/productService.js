@@ -1,5 +1,5 @@
 import { ProductSnapshotFindDatabaseError, ProductCreateDatabaseError, ProductNotFound, ProductUpdateDatabaseError } from "../../../errors/warehouse/productError.js";
-import { prisma } from "../../../lib/prisma.js";
+import { getDb } from "../../../repository/baseRepository.js";
 import { findAllSupplierProducts, findSupplierProductByIds } from "./supplierProductService.js";
 import { prepareProductData, withRetry } from "./productHelpers.js";
 import { syncSupplierProduct } from "./productRelations.js";
@@ -31,7 +31,7 @@ export const findProductsSnapshot = async ({
     productIds
 }) => {
 
-    const db = tx || prisma;
+    const db = getDb(tx);
 
     try {
 
@@ -65,7 +65,7 @@ export const findExistingSkus = (tx) => async ({
     excludeProductId 
 }) => {
 
-    const db = tx || prisma;
+    const db = getDb(tx);
 
     const where = {
         sku: {
@@ -89,7 +89,7 @@ export const createProduct = async (productDto) => {
 
     return withRetry(async () => {
 
-        return await prisma.$transaction(async (tx) => {
+        return await getDb().$transaction(async (tx) => {
 
             const {
                 rest,
@@ -140,7 +140,7 @@ export const updateProduct = async (productDto, id) => {
 
     return withRetry(async () => {
 
-        return await prisma.$transaction(async (tx) => {
+        return await getDb().$transaction(async (tx) => {
 
             const productExists = await tx.product.findUnique({
                 where: { id },
