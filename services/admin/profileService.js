@@ -13,7 +13,7 @@ export const findAllProfiles = async ({
     const where = {
         isActive: true,
         ...(search && {
-            name: {
+            fullName: {
                 contains: search,
                 mode: 'insensitive'
             }
