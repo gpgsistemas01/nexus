@@ -3,7 +3,7 @@ import { authorizeUserApi, verifyCookiesAuthTokenRequired } from '../../../middl
 import { getAllClients } from '../../../controllers/api/sales/clientController.js';
 
 const router = express.Router();
-const generalPermissions = {
+const clientReadPermissions = {
     roles: ['Administrador del sistema', 'Coordinador', 'Auxiliar', 'Operador', 'Instalador', 'Almacenista'],
     departments: [
         'DIRECCIÓN',
@@ -24,7 +24,7 @@ const generalPermissions = {
 router.get(
     '/',
     verifyCookiesAuthTokenRequired,
-    authorizeUserApi(generalPermissions),
+    authorizeUserApi(clientReadPermissions),
     getAllClients
 );
 

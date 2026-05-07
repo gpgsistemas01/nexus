@@ -14,7 +14,7 @@ const router = express.Router();
 
 const purchaseRequisitionPermissions = {
     roles: ['Administrador del sistema', 'Coordinador', 'Auxiliar', 'Operador', 'Instalador', 'Almacenista'],
-    ddepartments: [
+    departments: [
         'DIRECCIÓN',
         'ACABADOS',
         'ADMINISTRATIVO',

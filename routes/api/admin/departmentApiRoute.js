@@ -3,7 +3,7 @@ import { authorizeUserApi, verifyCookiesAuthTokenRequired } from "../../../middl
 import { getAllDepartments } from '../../../controllers/api/admin/departmentController.js';
 
 const router = express.Router();
-const profilePermissions = {
+const departmentReadPermissions = {
     roles: [ 'Administrador del sistema', 'Coordinador', 'Auxiliar', 'Operador', 'Instalador', 'Diseñador', 'Almacenista', 'Vendedor', 'Repartidor' ],
     departments: [
         'DIRECCIÓN',
@@ -24,7 +24,7 @@ const profilePermissions = {
 router.get(
     '/',
     verifyCookiesAuthTokenRequired,
-    authorizeUserApi(profilePermissions),
+    authorizeUserApi(departmentReadPermissions),
     getAllDepartments
 );
 

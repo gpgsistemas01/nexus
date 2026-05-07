@@ -5,7 +5,7 @@ import { supplierValidation } from '../../../validators/forms/supplierValidation
 import { validate } from '../../../middleware/validatorMiddleware.js';
 
 const router = express.Router();
-const warehousePermissions = {
+const supplierPermissions = {
     roles: ['Almacenista', 'Coordinador', 'Auxiliar', 'Administrador del sistema'],
     departments: ['ALMACÉN Y PROVEDURÍA', 'SISTEMAS']
 };
@@ -13,7 +13,7 @@ const warehousePermissions = {
 router.get(
     '/',
     verifyCookiesAuthTokenRequired,
-    authorizeUserApi(warehousePermissions),
+    authorizeUserApi(supplierPermissions),
     getAllSuppliers
 );
 
@@ -22,7 +22,7 @@ router.post(
     verifyCookiesAuthTokenRequired,
     supplierValidation,
     validate,
-    authorizeUserApi(warehousePermissions),
+    authorizeUserApi(supplierPermissions),
     registerSupplier
 );
 
@@ -31,7 +31,7 @@ router.put(
     verifyCookiesAuthTokenRequired,
     supplierValidation,
     validate,
-    authorizeUserApi(warehousePermissions),
+    authorizeUserApi(supplierPermissions),
     editSupplier
 );
 

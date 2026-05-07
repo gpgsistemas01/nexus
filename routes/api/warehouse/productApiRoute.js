@@ -6,7 +6,12 @@ import { validate } from '../../../middleware/validatorMiddleware.js';
 
 const router = express.Router();
 
-const productPermissions = {
+const productReadPermissions = {
+    roles: ['Almacenista', 'Coordinador', 'Auxiliar', 'Operador', 'Instalador', 'Vendedor', 'Administrador del sistema'],
+    departments: ['ALMACÉN Y PROVEDURÍA', 'SISTEMAS', 'VENTAS Y PROYECTOS ESPECIALES']
+};
+
+const productWritePermissions = {
     roles: ['Almacenista', 'Coordinador', 'Auxiliar', 'Administrador del sistema'],
     departments: ['ALMACÉN Y PROVEDURÍA', 'SISTEMAS']
 };
@@ -14,7 +19,7 @@ const productPermissions = {
 router.get(
     '/',
     verifyCookiesAuthTokenRequired,
-    authorizeUserApi(productPermissions),
+    authorizeUserApi(productReadPermissions),
     getAllProducts
 );
 
@@ -23,7 +28,7 @@ router.post(
     verifyCookiesAuthTokenRequired,
     productValidation,
     validate,
-    authorizeUserApi(productPermissions),
+    authorizeUserApi(productWritePermissions),
     registerProduct
 );
 
@@ -32,7 +37,7 @@ router.put(
     verifyCookiesAuthTokenRequired,
     productValidation,
     validate,
-    authorizeUserApi(productPermissions),
+    authorizeUserApi(productWritePermissions),
     editProduct
 );
 
