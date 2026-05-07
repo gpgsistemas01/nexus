@@ -2,14 +2,13 @@ import {
     ProfileReceivedByNotFound,
     SupplierNotFound
 } from "../../../errors/warehouse/goodsReceiptError.js";
-import { prisma } from "../../../lib/prisma.js";
+import { getDb } from "../../../repository/baseRepository.js";
 import { generateReferenceNumber } from "../../document/referenceNumberService.js";
 import { findProfileById } from "../../admin/profileService.js";
 import { applyInventoryMovement } from "../../inventory/movementService.js";
 import { findUniqueSupplier } from "../supplierService.js";
 import { buildGoodsReceiptDetails } from "./goodsReceiptHelpers.js";
-import { updateProductUnitCostIfHigher } from "../products/supplierProductService.js";
-import { findSupplierProduct } from "../../../repository/warehouse/productRepository.js";
+import { findSupplierProduct, updateProductUnitCostIfHigher } from "../products/supplierProductService.js";
 import { buildStockKey, parseStockKey } from "../../../utils/formattersUtils.js";
 
 const REFERENCE_NUMBER_TYPE = 'REC';
@@ -34,7 +33,7 @@ export const findAllGoodsReceipts = async ({
         }
         : {};
 
-    const goodsReceipts = await prisma.goodsReceipt.findMany({
+    const goodsReceipts = await getDb().goodsReceipt.findMany({
         skip,
         take,
         where,
@@ -75,8 +74,8 @@ export const findAllGoodsReceipts = async ({
         }
     });
 
-    const total = await prisma.goodsReceipt.count();
-    const filtered = await prisma.goodsReceipt.count({ where });
+    const total = await getDb().goodsReceipt.count();
+    const filtered = await getDb().goodsReceipt.count({ where });
 
     return {
         data: goodsReceipts,
@@ -144,7 +143,7 @@ export const createGoodsReceipt = async ({ goodsReceiptDto }) => {
         }
     });
 
-    const result = await prisma.$transaction(async (tx) => {
+    const result = await getDb().$transaction(async (tx) => {
 
         const referenceNumber = await generateReferenceNumber({ type: REFERENCE_NUMBER_TYPE, tx });
 

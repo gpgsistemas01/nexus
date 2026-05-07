@@ -1,5 +1,5 @@
 import { MovementDetailRelationConflict } from "../../errors/inventory/movementError.js";
-import { prisma } from "../../lib/prisma.js";
+import { getDb } from "../../repository/baseRepository.js";
 import { buildStockKey } from "../../utils/formattersUtils.js";
 import { updateSupplierProductStock } from "../warehouse/products/supplierProductService.js";
 
@@ -21,7 +21,7 @@ export const applyInventoryMovement = async ({
         if (!detail.productId || !detail.supplierId) throw new MovementDetailRelationConflict();
     }
 
-    const db = tx || prisma;
+    const db = getDb(tx);
 
     const data = {
         ...reference,

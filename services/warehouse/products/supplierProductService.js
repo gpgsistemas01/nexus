@@ -1,10 +1,23 @@
 import { GoodsIssueInexistentStock, GoodsIssueInsufficientStock } from "../../../errors/inventory/stockError.js";
 import { ProductSnapshotFindDatabaseError, SupplierProductCreateDatabaseError, SupplierProductDeleteDatabaseError } from "../../../errors/warehouse/productError.js";
-import { prisma } from "../../../lib/prisma.js";
-import { findSupplierProduct } from "../../../repository/warehouse/productRepository.js";
+import { getDb } from "../../../repository/baseRepository.js";
 import { buildStockKey, parseStockKey } from "../../../utils/formattersUtils.js";
 
 const MOVEMENT_TYPE_IN = 'IN';
+
+export const findSupplierProduct = async ({
+    tx,
+    where,
+    select
+}) => {
+
+    const db = getDb(tx);
+
+    return db.supplierProduct.findMany({
+        where,
+        select
+    });
+};
 
 const mapSupplierProduct = (sp) => {
 
@@ -45,7 +58,7 @@ export const findAllSupplierProducts = async ({
 
     if (where.AND.length === 0) delete where.AND;
 
-    const supplierProducts = await prisma.supplierProduct.findMany({
+    const supplierProducts = await getDb().supplierProduct.findMany({
         skip,
         take,
         where,
@@ -108,7 +121,7 @@ export const findSupplierProductByIds = async ({
     supplierId
 }) => {
 
-    const db = tx || prisma;
+    const db = getDb(tx);
 
     const supplierProduct = await db.supplierProduct.findUnique({
         where: { 
@@ -151,7 +164,7 @@ export const findSupplierProductsSnapshot = async ({
     pairs
 }) => {
 
-    const db = tx || prisma;
+    const db = getDb(tx);
 
     const products = await db.supplierProduct.findMany({
         where: {
@@ -182,7 +195,7 @@ export const findSupplierProductsSnapshot = async ({
 
 export const countTotalSupplierProducts = async ({
     where
-} = {}) => await prisma.supplierProduct.count({ where });
+} = {}) => await getDb().supplierProduct.count({ where });
 
 export const createSupplierProduct = async ({
     tx,
@@ -192,7 +205,7 @@ export const createSupplierProduct = async ({
     skuSupllier
 }) => {
 
-    const db = tx || prisma;
+    const db = getDb(tx);
 
     return db.supplierProduct.create({
         data: {
@@ -209,7 +222,7 @@ export const updateProductUnitCostIfHigher = async ({
     details
 }) => {
 
-    const db = tx || prisma;
+    const db = getDb(tx);
 
     const maxCostByProduct = {};
 
@@ -251,7 +264,7 @@ export const updateSupplierProductStock = async ({
     supplierProducts
 }) => {
 
-    const db = tx || prisma;
+    const db = getDb(tx);
 
     const psMap = new Map(supplierProducts.map(ps => [buildStockKey(ps.productId, ps.supplierId), ps]));
 
@@ -319,7 +332,7 @@ export const deleteSupplierProduct = async ({
     supplierId
 }) => {
 
-    const db = tx || prisma;
+    const db = getDb(tx);
 
     return await db.supplierProduct.delete({
         where: {
