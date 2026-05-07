@@ -240,7 +240,7 @@ async function main() {
     const presentationMap = new Map(presentations.map(p => [p.name, p.id]));
     const unitMeasureMap = new Map(unitMeasures.map(um => [um.symbol, um.id]));
 
-    const filePath2 = path.join(__dirname, 'inventario_BD - UNIDAD DE MEDIDA.xlsx');
+    const filePath2 = path.join(__dirname, 'inventario_BD - PRECIOS.xlsx');
     const workbook2 = XLSX.readFile(filePath2);
     const productSheet = workbook2.Sheets['PRODUCTOS'];
     const productRows = XLSX.utils.sheet_to_json(productSheet, {
@@ -353,8 +353,9 @@ async function main() {
         const supplierId = supplierMap.get(row.supplier);
         const currentStock = toDecimal(row.currentStock);
         const convertedQuantity = toDecimal(row.convertedQuantity);
+        const maxUnitCost = toDecimal(row.maxUnitCost); 
 
-        if (!supplierId || !productId) {
+        if (!supplierId || !productId || !maxUnitCost) {
             console.log('Error en fila: ',row);
             return null;
         }
@@ -364,6 +365,7 @@ async function main() {
             supplierId,
             currentStock: isNaN(currentStock) ? 0 : currentStock,
             convertedQuantity: isNaN(convertedQuantity) ? 0 : convertedQuantity,
+            maxUnitCost: isNaN(maxUnitCost) ? 0 : maxUnitCost,
             sku: row.sku
         }
     }).filter(Boolean);
