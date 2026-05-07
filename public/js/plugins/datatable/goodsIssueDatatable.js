@@ -45,32 +45,6 @@ export const createGoodsIssueDatatable = (context) => {
                 return `<div>${ row.projectNumber }<br><small>${ row.clientName }</small></div>`;
             }
         },
-        {
-            data: null,
-            title: 'Aprobación',
-            render: (data, type, row) => {
-
-                if (!row.approverId || !row.approvedDate) return '<small>Sin Autorizar</small>';
-
-                const approver = `${ row.approver.name } ${ row.approver.lastName }`;
-                const approvedDate = new Date(row.approvedDate).toLocaleString();
-
-                return `<div>${ approver }<br><small>${ approvedDate }</small></div>`;
-            }
-        },
-        {
-            data: null,
-            title: 'Entrega',
-            render: (data, type, row) => {
-
-                if (!row.warehouseStaff || !row.deliveryDate) return '<small>Sin entrega</small>';
-
-                const deliveredBy = `${ row.warehouseStaff.name } ${ row.warehouseStaff.lastName }`;
-                const deliveryDate = new Date(row.deliveryDate).toLocaleString();
-
-                return `<div>${ deliveredBy }<br><small>${ deliveryDate }</small></div>`;
-            }
-        },
         { data: 'fulfillmentStatus.name', title: 'Estado surtido' },
         {
             data: 'id',
