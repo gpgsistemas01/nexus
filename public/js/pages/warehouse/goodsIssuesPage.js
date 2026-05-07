@@ -2,7 +2,7 @@ import { useForm } from "../../application/form.js";
 import { editGoodsIssueDetails, registerGoodsIssue } from "../../application/warehouse/goodsIssues.js";
 import { validateGoodsIssueDetailValidators, validateGoodsIssueValidators } from "../../utils/validations/validators.js";
 import { refreshProductTable } from "../../plugins/datatable/baseDatatable.js";
-import { createGoodsIssueDatatable, details, initDetailsGoodsIssueTable, updateDetailRow } from "../../plugins/datatable/goodsIssueDatatable.js";
+import { createGoodsIssueDatatable, details, initDetailsGoodsIssueTable } from "../../plugins/datatable/goodsIssueDatatable.js";
 import { initGoodsIssueFormSelect2, setGoodsIssueFormSelectOptions } from "../../plugins/select2/modules/goodsIssueSelect.js";
 import { toggleInputSelectErrors, toggleTableErrors, setFormReadOnly, toggleButtons, clearAddedProductInput, clearFormErrors } from "../../ui/formUI.js";
 import { on } from "../../utils/domUtils.js";
@@ -192,6 +192,7 @@ on('change', '.supply-checkbox', (e, checkbox) => {
     product.isSupplied = checkbox.checked;
 });
 on('input', '.project-converted-quantity-input', (e, input) => {
+
     const { id } = input.dataset;
     const value = Number(input.value);
     const product = details.find(detail => detail.productId === id);
@@ -199,7 +200,10 @@ on('input', '.project-converted-quantity-input', (e, input) => {
     if (!product) return;
 
     product.projectConvertedQuantity = value;
-    product.convertedQuantityDifference = product.convertedQuantity - product.projectConvertedQuantity;
+    product.convertedQuantityDifference = (product.convertedQuantity - product.projectConvertedQuantity).toFixed(2);
 
-    updateDetailRow(input, product);
+    const currenTd = input.closest('td');
+    const nextTd = currenTd.nextElementSibling;
+
+    if (nextTd) nextTd.textContent = product.convertedQuantityDifference;
 });

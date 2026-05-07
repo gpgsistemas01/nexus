@@ -151,11 +151,3 @@ $(selectorProductTable).on('click', '.delete-btn', function () {
         context: 'issue'
     })
 });
-
-export const updateDetailRow = (input, product) => {
-
-    const row = productTable.row(input.closest('tr'));
-    const rowData = row.data();
-    rowData.convertedQuantityDifference = product.convertedQuantityDifference;
-    row.data(rowData).invalidate();
-}
