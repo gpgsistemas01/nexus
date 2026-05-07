@@ -188,14 +188,14 @@ export const findLatestNotifications = async ({ take = 10, departments, roles } 
     const where = await getNotificationWhereByUser(departments, roles);
 
     const [items, unreadCount] = await Promise.all([
-        prisma.notification.findMany({
+        getDb().notification.findMany({
             where,
             take,
             orderBy: {
                 createdAt: 'desc'
             }
         }),
-        prisma.notification.count({
+        getDb().notification.count({
             where: {
                 ...where,
                 isRead: false
