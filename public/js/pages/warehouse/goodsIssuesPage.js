@@ -186,7 +186,7 @@ const addProduct = () => {
 on('click', '#addProductBtn', addProduct);
 on('change', '.supply-checkbox', (e, checkbox) => {
     const { id } = checkbox.dataset;
-    const product = details.find(detail => detail.id === id);
+    const product = details.find(detail => detail.productId === id);
     product.isSupplied = checkbox.checked;
 });
 on('input', '.project-converted-quantity-input', (e, input) => {
