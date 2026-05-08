@@ -152,8 +152,16 @@ const addProduct = () => {
 
     let convertedQuantity;
 
-    if (!productBase || !productHeight) convertedQuantity = quantity;
-    else convertedQuantity = Number((productBase * productHeight * quantity).toFixed(2));
+    if (!productBase || !productHeight) {
+
+        productBase = null;
+        productHeight = null;
+        convertedQuantity = quantity;
+
+    } else {
+
+        convertedQuantity = Number((productBase * productHeight * quantity).toFixed(2));
+    }
 
     const product = {
         productId,
