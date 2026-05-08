@@ -4,7 +4,7 @@ import { validateGoodsIssueDetailValidators, validateGoodsIssueValidators } from
 import { refreshProductTable } from "../../plugins/datatable/baseDatatable.js";
 import { createGoodsIssueDatatable, details, initDetailsGoodsIssueTable } from "../../plugins/datatable/goodsIssueDatatable.js";
 import { initGoodsIssueFormSelect2, setGoodsIssueFormSelectOptions } from "../../plugins/select2/modules/goodsIssueSelect.js";
-import { toggleInputSelectErrors, toggleTableErrors, setFormReadOnly, toggleButtons, clearAddedProductInput, clearFormErrors } from "../../ui/formUI.js";
+import { setFormReadOnly, toggleButtons, clearAddedProductInput, clearFormErrors } from "../../ui/formUI.js";
 import { on } from "../../utils/domUtils.js";
 import { formatDateLongWithTime } from "../../utils/formatters.js";
 import { handleAction, handleSubmit, validateDetailsFields, validateFields } from "../../utils/formUtils.js";
@@ -47,11 +47,6 @@ useForm({
 
         return validateFields(validateGoodsIssueValidators, formData);
     },
-    normalizeErrors: ({ form, errors }) => {
-
-        toggleTableErrors(form, errors);
-        toggleInputSelectErrors(form, errors);
-    },
     sendRequest: async ({ formData, form }) => {
 
         await handleSubmit({
@@ -61,11 +56,6 @@ useForm({
             update: editGoodsIssueDetails
         });
     },
-    normalizeServerErrors: (form, serverErrors) => {
-
-        toggleTableErrors(form, serverErrors);
-        toggleInputSelectErrors(form, serverErrors);
-    }
 });
 
 export const openGoodsIssueModal = async ({ mode, data = null }) => {

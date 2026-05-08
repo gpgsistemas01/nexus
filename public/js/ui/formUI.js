@@ -125,6 +125,14 @@ export const toggleTableErrors = (form, errors) => {
     }
 }
 
+export const normalizeFormErrors = ({ form, errors }) => {
+
+    toggleTableErrors(form, errors);
+    toggleInputSelectErrors(form, errors);
+
+    return errors;
+}
+
 export const clearFormErrors = (form) => {
 
     form.querySelectorAll('.is-invalid').forEach(input => {

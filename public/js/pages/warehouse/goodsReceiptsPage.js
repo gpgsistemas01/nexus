@@ -4,7 +4,7 @@ import { validateGoodsReceiptValidators } from "../../utils/validations/validato
 import { refreshProductTable } from "../../plugins/datatable/baseDatatable.js";
 import { createGoodsReceiptDatatable, details, initDetailsGoodsReceiptTable } from "../../plugins/datatable/goodsReceiptDatatable.js";
 import { GOODS_RECEIPT_SUPPLIER_CHANGED_EVENT, initGoodsReceiptFormSelect2, setGoodsReceiptFormSelectOptions } from "../../plugins/select2/modules/goodsReceiptSelect.js";
-import { toggleInputSelectErrors, toggleTableErrors, setFormReadOnly, updateTotals, toggleButtons, clearAddedProductInput, toggleInvoiceInput, clearFormErrors } from "../../ui/formUI.js";
+import { setFormReadOnly, updateTotals, toggleButtons, clearAddedProductInput, toggleInvoiceInput, clearFormErrors } from "../../ui/formUI.js";
 import { on } from "../../utils/domUtils.js";
 import { formatDateLongWithTime } from "../../utils/formatters.js";
 import { handleSubmit, validateFields } from "../../utils/formUtils.js";
@@ -56,11 +56,6 @@ useForm({
 
         return errors;
     },
-    normalizeErrors: ({ form, errors }) => {
-
-        toggleTableErrors(form, errors);
-        toggleInputSelectErrors(form, errors);
-    },
     sendRequest: async ({ formData, form }) => {
 
         await handleSubmit({
@@ -69,11 +64,6 @@ useForm({
             create: registerGoodsReceipt
         });
     },
-    normalizeServerErrors: (form, serverErrors) => {
-        
-        toggleTableErrors(form, serverErrors);
-        toggleInputSelectErrors(form, serverErrors);
-    }
 });
 
 export const openGoodsReceiptModal = ({ mode, data = null }) => {
