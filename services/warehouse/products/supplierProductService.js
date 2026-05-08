@@ -276,7 +276,7 @@ export const updateSupplierProductStock = async ({
             productName: ps?.product?.name ?? 'Producto desconocido',
             height: ps?.product?.height ?? 'Desconocido',
             base: ps?.product?.base ?? 'Desconocido',
-            supplierName: ps?.supplier?.name ?? 'Proveedor desconocido'
+            supplierName: ps?.supplier?.tradeName ?? 'Proveedor desconocido'
         });
 
         const hasDimensions = ps.product.base && ps.product.height;
@@ -303,7 +303,7 @@ export const updateSupplierProductStock = async ({
                     productName: ps?.product?.name ?? 'Producto desconocido',
                     height: ps?.product?.height ?? 'Desconocido',
                     base: ps?.product?.base ?? 'Desconocido',
-                    supplierName: ps?.supplier?.name ?? 'Proveedor desconocido'
+                    supplierName: ps?.supplier?.tradeName ?? 'Proveedor desconocido'
                 });
             }
 

@@ -135,6 +135,7 @@ export const errorMessages = {
     // Warehouse
     EXCEDED_MAX_RETRIES_SKU: 'Excedido el número máximo de intentos para generar un SKU único.',
     GOODS_RECEIPT_NOT_FOUND: 'Recibo de mercancía no encontrado.',
+    GOODS_RECEIPT_CREATE_DB_ERROR: 'Error de base de datos al crear la compra.',
     PRODUCT_NOT_FOUND: 'Producto no encontrado.',
     PRODUCT_CREATE_DB_ERROR: 'Error de base de datos al crear el producto.',
     PRODUCT_UPDATE_DB_ERROR: 'Error de base de datos al editar el producto.',
@@ -143,9 +144,40 @@ export const errorMessages = {
     SUPPLIER_PRODUCT_CREATE_DB_ERROR: 'Error de base de datos al relacionar el producto a un proveedor.',
     SUPPLIER_PRODUCT_DELETE_DB_ERROR: 'Error de base de datos al eliminar la relación entre producto y proveedor.',
     GOODS_ISSUE_NOT_FOUND: 'Salida de almacén no encontrada.',
+    GOODS_ISSUE_CREATE_DB_ERROR: 'Error de base de datos al crear la salida de almacén.',
     GOODS_ISSUE_UPDATE_DB_ERROR: 'Error de base de datos al editar la salida de almacén.',
-    GOODS_ISSUE_INSUFFICIENT_STOCK: (meta) => `Stock insuficiente para realizar la salida con el producto: ${ meta.productName } y proveedor: ${ meta.supplierName }.`,
-    GOODS_ISSUE_INEXISTENT_STOCK: (meta) => `Stock inexistente para realizar la salida con el producto: ${ meta.productName } y proveedor: ${ meta.supplierName }.`,
+    GOODS_ISSUE_INEXISTENT_STOCK: (meta) => {
+
+        const hasDimensions =
+            meta.base != null &&
+            meta.height != null;
+
+        const dimensions = hasDimensions
+            ? ` (${ meta.base } x ${ meta.height })`
+            : '';
+
+        const supplier = meta.supplierName
+            ? ` y proveedor: ${ meta.supplierName }`
+            : '';
+
+        return `Stock inexistente para realizar la salida con el producto: ${ meta.productName }${ dimensions }${ supplier }.`;
+    },
+    GOODS_ISSUE_INSUFFICIENT_STOCK: (meta) => {
+
+        const hasDimensions =
+            meta.base != null &&
+            meta.height != null;
+
+        const dimensions = hasDimensions
+            ? ` (${ meta.base } x ${ meta.height })`
+            : '';
+
+        const supplier = meta.supplierName
+            ? ` y proveedor: ${ meta.supplierName }`
+            : '';
+
+        return `Stock insuficiente para realizar la salida con el producto: ${ meta.productName }${ dimensions }${ supplier }.`;
+    },
     GOODS_ISSUE_MISSING_MAX_UNIT_COST: (meta) => `No se puede realizar la salida porque el producto: ${ meta.productName } y proveedor: ${ meta.supplierName } no tiene costo unitario máximo configurado.`,
     GOODS_ISSUE_FULFILLMENT_COMPLETE_CONFLICT: 'La salida ya está completamente surtida y no puede modificarse.',
     MOVEMENT_DETAIL_RELATION_CONFLICT: 'El detalle del movimiento no está asociado a un producto o proveedor.',

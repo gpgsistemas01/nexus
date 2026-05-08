@@ -1,4 +1,5 @@
 import {
+    GoodsReceiptCreateDatabaseError,
     ProfileReceivedByNotFound,
     SupplierNotFound
 } from "../../../errors/warehouse/goodsReceiptError.js";
@@ -10,6 +11,7 @@ import { findUniqueSupplier } from "../supplierService.js";
 import { buildGoodsReceiptDetails } from "./goodsReceiptHelpers.js";
 import { findSupplierProduct, updateProductUnitCostIfHigher } from "../products/supplierProductService.js";
 import { buildStockKey, parseStockKey } from "../../../utils/formattersUtils.js";
+import { AppError } from "../../../errors/AppError.js";
 
 const REFERENCE_NUMBER_TYPE = 'REC';
 const MOVEMENT_TYPE_IN = 'IN';
@@ -86,128 +88,137 @@ export const findAllGoodsReceipts = async ({
 
 export const createGoodsReceipt = async ({ goodsReceiptDto }) => {
 
-    const { receivedById, supplierId, details, ...goodsReceiptData } = goodsReceiptDto;
+    try {
 
-    const supplier = await findUniqueSupplier({ id: supplierId });
+        const { receivedById, supplierId, details, ...goodsReceiptData } = goodsReceiptDto;
 
-    const receivedBy = await findProfileById({ id: receivedById });
+        const supplier = await findUniqueSupplier({ id: supplierId });
 
-    if (!receivedBy) throw new ProfileReceivedByNotFound();
+        const receivedBy = await findProfileById({ id: receivedById });
 
-    const processedDetails = await buildGoodsReceiptDetails(details);
+        if (!receivedBy) throw new ProfileReceivedByNotFound();
 
-    const totals = processedDetails.reduce((acc, d) => {
-        acc.totalQuantity += d.quantity;
-        acc.totalNetPurchaseAmount += d.netPurchaseAmount;
-        acc.totalGrossPurchaseAmount += d.grossPurchaseAmount;
-        return acc;
-    }, {
-        totalQuantity: 0,
-        totalNetPurchaseAmount: 0,
-        totalGrossPurchaseAmount: 0
-    });
+        const processedDetails = await buildGoodsReceiptDetails(details);
 
-    const grouped = new Map();
-    
-    for (const detail of processedDetails) {
-        const key = buildStockKey(detail.productId, supplierId);
-        grouped.set(
-            key,
-            Number((grouped.get(key) || 0)) + Number(detail.quantity)
-        );
-    }
+        const totals = processedDetails.reduce((acc, d) => {
+            acc.totalQuantity += d.quantity;
+            acc.totalNetPurchaseAmount += d.netPurchaseAmount;
+            acc.totalGrossPurchaseAmount += d.grossPurchaseAmount;
+            return acc;
+        }, {
+            totalQuantity: 0,
+            totalNetPurchaseAmount: 0,
+            totalGrossPurchaseAmount: 0
+        });
 
-    const filters = Array.from(grouped.keys()).map(key => parseStockKey(key));
-
-    const supplierProducts = await findSupplierProduct({
-        where: {
-            OR: filters
-        },
-        select: {
-            id: true,
-            productId: true,
-            supplierId: true,
-            currentStock: true,
-            product: {
-                select: {
-                    base: true,
-                    height: true,
-                    name: true
-                }
-            },
-            supplier: {
-                select: {
-                    tradeName: true
-                }
-            }
+        const grouped = new Map();
+        
+        for (const detail of processedDetails) {
+            const key = buildStockKey(detail.productId, supplierId);
+            grouped.set(
+                key,
+                Number((grouped.get(key) || 0)) + Number(detail.quantity)
+            );
         }
-    });
 
-    const result = await getDb().$transaction(async (tx) => {
+        const filters = Array.from(grouped.keys()).map(key => parseStockKey(key));
 
-        const referenceNumber = await generateReferenceNumber({ type: REFERENCE_NUMBER_TYPE, tx });
-
-        const goodsReceipt = await tx.goodsReceipt.create({
-            data: {
-                ...goodsReceiptData,
-                ...totals,
-                referenceNumber,
-                supplierName: supplier.tradeName,
-                receivedByName: receivedBy.fullName,
-                status: {
-                    connect: {
-                        name: STATUS_CONFIRMED
+        const supplierProducts = await findSupplierProduct({
+            where: {
+                OR: filters
+            },
+            select: {
+                id: true,
+                productId: true,
+                supplierId: true,
+                currentStock: true,
+                product: {
+                    select: {
+                        base: true,
+                        height: true,
+                        name: true
                     }
                 },
                 supplier: {
-                    connect: {
-                        id: supplierId
-                    }
-                },
-                receivedBy: {
-                    connect: {
-                        id: receivedById
-                    }
-                },
-                details: {
-                    createMany: {
-                        data: processedDetails
-                    }
-                }
-            },
-            include: {
-                details: {
                     select: {
-                        id: true,
-                        productId: true,
-                        quantity: true,
-                        conversionUnitCost: true
+                        tradeName: true
                     }
                 }
             }
         });
 
-        await applyInventoryMovement({
-            tx,
-            reference: { goodsReceiptId: goodsReceipt.id },
-            details: goodsReceipt.details.map(detail => ({
-                productId: detail.productId,
-                goodsReceiptDetailId: detail.id,
-                supplierId: goodsReceipt.supplierId,
-                quantity: detail.quantity
-            })),
-            movementType: MOVEMENT_TYPE_IN,
-            grouped,
-            supplierProducts
+        const result = await getDb().$transaction(async (tx) => {
+
+            const referenceNumber = await generateReferenceNumber({ type: REFERENCE_NUMBER_TYPE, tx });
+
+            const goodsReceipt = await tx.goodsReceipt.create({
+                data: {
+                    ...goodsReceiptData,
+                    ...totals,
+                    referenceNumber,
+                    supplierName: supplier.tradeName,
+                    receivedByName: receivedBy.fullName,
+                    status: {
+                        connect: {
+                            name: STATUS_CONFIRMED
+                        }
+                    },
+                    supplier: {
+                        connect: {
+                            id: supplierId
+                        }
+                    },
+                    receivedBy: {
+                        connect: {
+                            id: receivedById
+                        }
+                    },
+                    details: {
+                        createMany: {
+                            data: processedDetails
+                        }
+                    }
+                },
+                include: {
+                    details: {
+                        select: {
+                            id: true,
+                            productId: true,
+                            quantity: true,
+                            conversionUnitCost: true
+                        }
+                    }
+                }
+            });
+
+            await applyInventoryMovement({
+                tx,
+                reference: { goodsReceiptId: goodsReceipt.id },
+                details: goodsReceipt.details.map(detail => ({
+                    productId: detail.productId,
+                    goodsReceiptDetailId: detail.id,
+                    supplierId: goodsReceipt.supplierId,
+                    quantity: detail.quantity
+                })),
+                movementType: MOVEMENT_TYPE_IN,
+                grouped,
+                supplierProducts
+            });
+
+            return goodsReceipt;
         });
 
-        return goodsReceipt;
-    });
+        await updateProductUnitCostIfHigher({
+            supplierId: result.supplierId,
+            details: result.details
+        });
 
-    await updateProductUnitCostIfHigher({
-        supplierId: result.supplierId,
-        details: result.details
-    });
+        return result;
 
-    return result;
+    } catch (err) {
+
+        if (err instanceof AppError) throw err;
+
+        throw new GoodsReceiptCreateDatabaseError();
+    }
 }

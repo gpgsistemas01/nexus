@@ -3,7 +3,8 @@ import {
     GoodsIssueRequesterProfileNotFound,
     GoodsIssueUpdateDatabaseError,
     GoodsIssueAdvisorProfileNotFound,
-    GoodsIssueFulfillmentCompleteConflict
+    GoodsIssueFulfillmentCompleteConflict,
+    GoodsIssueCreateDatabaseError
 } from "../../../errors/warehouse/goodsIssueError.js";
 import { getDb } from "../../../repository/baseRepository.js";
 import { findProfileById } from "../../admin/profileService.js";
@@ -14,6 +15,7 @@ import { buildGoodsIssueDetails, resolveFulfillmentStatus } from "./goodsIssueHe
 import { applyInventoryMovement } from "../../inventory/movementService.js";
 import { buildStockKey, parseStockKey } from "../../../utils/formattersUtils.js";
 import { findSupplierProduct } from "../products/supplierProductService.js";
+import { AppError } from "../../../errors/AppError.js";
 
 const ROLE_SYSTEM_ADMIN = 'Administrador del sistema';
 const ROLE_COORDINATOR = 'Coordinador';
@@ -130,93 +132,102 @@ export const createGoodsIssue = async ({
     goodsIssueDto
 }) => {
 
-    const { requesterId, advisorId, departmentId, clientId, details, ...goodsIssueData } = goodsIssueDto;
+    try {
 
-    const requester = await findProfileById({ id: requesterId });
+        const { requesterId, advisorId, departmentId, clientId, details, ...goodsIssueData } = goodsIssueDto;
 
-    if (!requester) throw new GoodsIssueRequesterProfileNotFound();
-    
-    const advisor = await findProfileById({ id: advisorId });
+        const requester = await findProfileById({ id: requesterId });
 
-    if (!advisor) throw new GoodsIssueAdvisorProfileNotFound();
+        if (!requester) throw new GoodsIssueRequesterProfileNotFound();
+        
+        const advisor = await findProfileById({ id: advisorId });
 
-    const client = await findClientById({ id: clientId });
-    const department = await findDepartmentById({ id: departmentId });
+        if (!advisor) throw new GoodsIssueAdvisorProfileNotFound();
 
-    const processedDetails = await buildGoodsIssueDetails({ details });
+        const client = await findClientById({ id: clientId });
+        const department = await findDepartmentById({ id: departmentId });
 
-    const result = await getDb().$transaction(async (tx) => {
+        const processedDetails = await buildGoodsIssueDetails({ details });
 
-        const referenceNumber = await generateReferenceNumber({ type: REFERENCE_NUMBER_TYPE, tx });
+        const result = await getDb().$transaction(async (tx) => {
 
-        const goodsIssue = await tx.goodsIssue.create({
-            data: {
-                ...goodsIssueData,
-                referenceNumber,
-                departmentName: department.name,
-                requesterName: requester.fullName,
-                advisorName: advisor.fullName,
-                clientName: client.name,
-                status: {
-                    connect: {
-                        name: STATUS_APPROVED
+            const referenceNumber = await generateReferenceNumber({ type: REFERENCE_NUMBER_TYPE, tx });
+
+            const goodsIssue = await tx.goodsIssue.create({
+                data: {
+                    ...goodsIssueData,
+                    referenceNumber,
+                    departmentName: department.name,
+                    requesterName: requester.fullName,
+                    advisorName: advisor.fullName,
+                    clientName: client.name,
+                    status: {
+                        connect: {
+                            name: STATUS_APPROVED
+                        }
+                    },
+                    requester: {
+                        connect: {
+                            id: requesterId
+                        }
+                    },
+                    advisor: {
+                        connect: {
+                            id: advisorId
+                        }
+                    },
+                    department: {
+                        connect: {
+                            id: departmentId
+                        }
+                    },
+                    client: {
+                        connect: {
+                            id: clientId
+                        }
+                    },
+                    fulfillmentStatus: {
+                        connect: {
+                            name: FULFILLMENT_PENDING
+                        }
+                    },
+                    details: {
+                        createMany: {
+                            data: processedDetails
+                        }
                     }
                 },
-                requester: {
-                    connect: {
-                        id: requesterId
-                    }
-                },
-                advisor: {
-                    connect: {
-                        id: advisorId
-                    }
-                },
-                department: {
-                    connect: {
-                        id: departmentId
-                    }
-                },
-                client: {
-                    connect: {
-                        id: clientId
-                    }
-                },
-                fulfillmentStatus: {
-                    connect: {
-                        name: FULFILLMENT_PENDING
-                    }
-                },
-                details: {
-                    createMany: {
-                        data: processedDetails
+                include: {
+                    details: {
+                        select: {
+                            productId: true,
+                            quantity: true,
+                            convertedQuantity: true,
+                            maxUnitCost: true,
+                            productName: true,
+                            productBase: true,
+                            productHeight: true,
+                            presentationId: true,
+                            presentationName: true,
+                            unitMeasureId: true,
+                            unitMeasureName: true,
+                            unitMeasureSymbol: true
+                        }
                     }
                 }
-            },
-            include: {
-                details: {
-                    select: {
-                        productId: true,
-                        quantity: true,
-                        convertedQuantity: true,
-                        maxUnitCost: true,
-                        productName: true,
-                        productBase: true,
-                        productHeight: true,
-                        presentationId: true,
-                        presentationName: true,
-                        unitMeasureId: true,
-                        unitMeasureName: true,
-                        unitMeasureSymbol: true
-                    }
-                }
-            }
+            });
+
+            return { goodsIssue };
         });
 
-        return { goodsIssue };
-    });
+        return result.goodsIssue;
 
-    return result.goodsIssue;
+    } catch (err) {
+
+        if (err instanceof AppError) throw err;
+
+        throw new GoodsIssueCreateDatabaseError();
+    }
 };
 
 export const updateGoodsIssueDetails = async ({ id, goodsIssueDto }) => {
@@ -384,6 +395,8 @@ export const updateGoodsIssueDetails = async ({ id, goodsIssueDto }) => {
         });
 
     } catch (err) {
+
+        if (err instanceof AppError) throw err;
 
         throw new GoodsIssueUpdateDatabaseError();
     }

@@ -1,3 +1,4 @@
+import { AppError } from "../../errors/AppError.js";
 import { SupplierCodeFindDatabaseError, SupplierCodeNotFound, SupplierCreateDatabaseError, SupplierFindDatabaseError, SupplierNotFound, SupplierUpdateDatabaseError } from "../../errors/warehouse/supplierError.js";
 import { getDb } from "../../repository/baseRepository.js";
 import { incrementReferenceNumberCounter } from "../document/referenceNumberService.js";
@@ -146,7 +147,7 @@ export const updateSupplier = async (supplierDto, id) => {
 
     } catch (err) {
 
-        if (err.code === 'P2025') throw new SupplierNotFound();
+        if (err instanceof AppError) throw err;
 
         throw new SupplierUpdateDatabaseError();
     }

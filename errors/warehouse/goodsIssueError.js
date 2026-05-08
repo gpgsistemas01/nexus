@@ -28,6 +28,13 @@ export class GoodsIssueAdvisorProfileNotFound extends AppError {
     }
 }
 
+export class GoodsIssueCreateDatabaseError extends AppError {
+
+    constructor () {
+        super('Error de base de datos al crear la salida de almacén', 'GOODS_ISSUE_CREATE_DB_ERROR', 500);
+    }
+}
+
 export class GoodsIssueUpdateDatabaseError extends AppError {
 
     constructor () {

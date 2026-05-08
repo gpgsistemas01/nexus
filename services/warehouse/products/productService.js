@@ -3,6 +3,7 @@ import { getDb } from "../../../repository/baseRepository.js";
 import { findAllSupplierProducts, findSupplierProductByIds } from "./supplierProductService.js";
 import { prepareProductData, withRetry } from "./productHelpers.js";
 import { syncSupplierProduct } from "./productRelations.js";
+import { AppError } from "../../../errors/AppError.js";
 
 const REFERENCE_MOVEMENT_IN = 'IN';
 const PRISMA_RECORD_NOT_FOUND = 'P2025';
@@ -71,31 +72,24 @@ export const findProductsSnapshot = async ({
 
     const db = getDb(tx);
 
-    try {
-
-        const products = await db.product.findMany({
-            where: {
-                id: {
-                    in: productIds
-                }
-            },
-            select: {
-                id: true,
-                name: true,
-                minStock: true,
-                base: true,
-                height: true,
-                presentation: true,
-                unitMeasure: true
+    const products = await db.product.findMany({
+        where: {
+            id: {
+                in: productIds
             }
-        });
+        },
+        select: {
+            id: true,
+            name: true,
+            minStock: true,
+            base: true,
+            height: true,
+            presentation: true,
+            unitMeasure: true
+        }
+    });
 
-        return products;
-
-    } catch (err) {
-
-        throw new ProductSnapshotFindDatabaseError();
-    }
+    return products;
 }
 
 export const createProduct = async (productDto) => {
@@ -110,6 +104,9 @@ export const createProduct = async (productDto) => {
         );
 
     }).catch(() => {
+
+        if (err instanceof AppError) throw err;
+        
         throw new ProductCreateDatabaseError();
     });
 };
@@ -173,6 +170,8 @@ export const updateProduct = async (productDto, id) => {
         if (err.code === PRISMA_RECORD_NOT_FOUND) {
             throw new ProductNotFound();
         }
+
+        if (err instanceof AppError) throw err;
 
         throw new ProductUpdateDatabaseError();
     });
