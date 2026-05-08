@@ -44,6 +44,8 @@ export const findAllGoodsReceipts = async ({
         },
         select: {
             referenceNumber: true,
+            invoice: true,
+            isInvoiced: true,
             receivedById: true,
             receivedByName: true,
             supplierId: true,
