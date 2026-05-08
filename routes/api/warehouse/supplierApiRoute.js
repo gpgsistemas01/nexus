@@ -1,5 +1,5 @@
 import express from 'express';
-import { authorizeUserApi, verifyCookiesAuthTokenRequired } from '../../../middleware/authMiddleware.js';
+import { authorizeUserApi, verifyApiTokenRequired } from '../../../middleware/authMiddleware.js';
 import { editSupplier, getAllSuppliers, registerSupplier } from '../../../controllers/api/warehouse/supplierController.js';
 import { supplierValidation } from '../../../validators/forms/supplierValidations.js';
 import { validate } from '../../../middleware/validatorMiddleware.js';
@@ -12,14 +12,14 @@ const supplierPermissions = {
 
 router.get(
     '/',
-    verifyCookiesAuthTokenRequired,
+    verifyApiTokenRequired,
     authorizeUserApi(supplierPermissions),
     getAllSuppliers
 );
 
 router.post(
     '/',
-    verifyCookiesAuthTokenRequired,
+    verifyApiTokenRequired,
     supplierValidation,
     validate,
     authorizeUserApi(supplierPermissions),
@@ -28,7 +28,7 @@ router.post(
 
 router.put(
     '/:id',
-    verifyCookiesAuthTokenRequired,
+    verifyApiTokenRequired,
     supplierValidation,
     validate,
     authorizeUserApi(supplierPermissions),

@@ -1,5 +1,5 @@
 import express from 'express';
-import { authorizeUserApi, verifyCookiesAuthTokenRequired } from '../../../middleware/authMiddleware.js';
+import { authorizeUserApi, verifyApiTokenRequired } from '../../../middleware/authMiddleware.js';
 import { editProduct, getAllProducts, registerProduct } from '../../../controllers/api/warehouse/productController.js';
 import { productValidation } from '../../../validators/forms/productValidations.js';
 import { validate } from '../../../middleware/validatorMiddleware.js';
@@ -18,14 +18,14 @@ const productWritePermissions = {
 
 router.get(
     '/',
-    verifyCookiesAuthTokenRequired,
+    verifyApiTokenRequired,
     authorizeUserApi(productReadPermissions),
     getAllProducts
 );
 
 router.post(
     '/',
-    verifyCookiesAuthTokenRequired,
+    verifyApiTokenRequired,
     productValidation,
     validate,
     authorizeUserApi(productWritePermissions),
@@ -34,7 +34,7 @@ router.post(
 
 router.put(
     '/:id',
-    verifyCookiesAuthTokenRequired,
+    verifyApiTokenRequired,
     productValidation,
     validate,
     authorizeUserApi(productWritePermissions),

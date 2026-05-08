@@ -1,6 +1,6 @@
 import express from 'express';
 import { getAllProfiles } from "../../../controllers/api/admin/profileController.js";
-import { authorizeUserApi, verifyCookiesAuthTokenRequired } from "../../../middleware/authMiddleware.js";
+import { authorizeUserApi, verifyApiTokenRequired } from "../../../middleware/authMiddleware.js";
 
 const router = express.Router();
 const profileReadPermissions = {
@@ -23,7 +23,7 @@ const profileReadPermissions = {
 
 router.get(
     '/',
-    verifyCookiesAuthTokenRequired,
+    verifyApiTokenRequired,
     authorizeUserApi(profileReadPermissions),
     getAllProfiles
 );

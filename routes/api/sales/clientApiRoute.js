@@ -1,5 +1,5 @@
 import express from 'express';
-import { authorizeUserApi, verifyCookiesAuthTokenRequired } from '../../../middleware/authMiddleware.js';
+import { authorizeUserApi, verifyApiTokenRequired } from '../../../middleware/authMiddleware.js';
 import { getAllClients } from '../../../controllers/api/sales/clientController.js';
 
 const router = express.Router();
@@ -23,7 +23,7 @@ const clientReadPermissions = {
 
 router.get(
     '/',
-    verifyCookiesAuthTokenRequired,
+    verifyApiTokenRequired,
     authorizeUserApi(clientReadPermissions),
     getAllClients
 );

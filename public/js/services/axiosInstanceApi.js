@@ -25,11 +25,19 @@ api.interceptors.response.use(
 
             try {
 
-                await axios.post("/api/auth/refresh");
+                await axios.post("/api/auth/refresh", {}, { withCredentials: true });
                 queue.forEach(cb => cb());
                 queue = [];
 
                 return api(original);
+
+            } catch (refreshErr) {
+
+                queue.forEach(p => p.reject(refreshErr));
+                queue = [];
+
+                window.location.href = '/';
+                return Promise.reject(refreshErr);
 
             } finally {
 
