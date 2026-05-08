@@ -17,7 +17,6 @@ const numberToSupplierCode = (number) => {
 
     return code;
 };
-
 export const findAllSuppliers = async ({
     skip = 0,
     take = 10,

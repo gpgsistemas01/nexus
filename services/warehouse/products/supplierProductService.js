@@ -200,9 +200,7 @@ export const countTotalSupplierProducts = async ({
 export const createSupplierProduct = async ({
     tx,
     supplierId,
-    productId,
-    skuProduct,
-    skuSupllier
+    productId
 }) => {
 
     const db = getDb(tx);
@@ -210,8 +208,7 @@ export const createSupplierProduct = async ({
     return db.supplierProduct.create({
         data: {
             supplierId,
-            productId,
-            sku: `${ skuProduct }-${ skuSupllier }`
+            productId
         }
     });
 }

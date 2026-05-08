@@ -7,6 +7,44 @@ import { syncSupplierProduct } from "./productRelations.js";
 const REFERENCE_MOVEMENT_IN = 'IN';
 const PRISMA_RECORD_NOT_FOUND = 'P2025';
 
+const createProductInTransaction = async ({
+    tx,
+    productDto
+}) => {
+
+    const {
+        rest,
+        relations
+    } = await prepareProductData({ tx, productDto });
+
+    const createdProduct = await tx.product.create({
+        data: {
+            ...rest,
+            presentation: {
+                connect: { id: relations.presentationId }
+            },
+            unitMeasure: {
+                connect: { id: relations.unitMeasureId }
+            }
+        },
+        select: {
+            id: true
+        }
+     });
+
+    await syncSupplierProduct({
+        tx,
+        supplierId: relations.supplierId,
+        productId: createdProduct.id,
+    });
+
+    return findSupplierProductByIds({
+        tx,
+        productId: createdProduct.id,
+        supplierId: relations.supplierId
+    });
+};
+
 export const findAllProducts = async ({
     skip = 0,
     take = 10,
@@ -60,78 +98,18 @@ export const findProductsSnapshot = async ({
     }
 }
 
-export const findExistingSkus = (tx) => async ({ 
-    baseSku, 
-    excludeProductId 
-}) => {
-
-    const db = getDb(tx);
-
-    const where = {
-        sku: {
-            startsWith: baseSku
-        }
-    };
-
-    if (excludeProductId) {
-        where.NOT = {
-            id: excludeProductId
-        };
-    }
-
-    return db.product.findMany({
-        where,
-        select: { sku: true }
-    });
-};
-
 export const createProduct = async (productDto) => {
 
     return withRetry(async () => {
 
-        return await getDb().$transaction(async (tx) => {
-
-            const {
-                rest,
-                sku,
-                supplier,
-                relations
-            } = await prepareProductData({ tx, productDto });
-
-            const createdProduct = await tx.product.create({
-                data: {
-                    ...rest,
-                    sku,
-                    presentation: {
-                        connect: { id: relations.presentationId }
-                    },
-                    unitMeasure: {
-                        connect: { id: relations.unitMeasureId }
-                    }
-                },
-                select: {
-                    id: true
-                }
-             });
-
-            await syncSupplierProduct({
+        return getDb().$transaction((tx) =>
+            createProductInTransaction({
                 tx,
-                supplierId: relations.supplierId,
-                productId: createdProduct.id,
-                sku,
-                supplierCode: supplier.code
-            });
+                productDto
+            })
+        );
 
-            const fullProduct = await findSupplierProductByIds({
-                tx,
-                productId: createdProduct.id,
-                supplierId: relations.supplierId
-            });
-
-            return fullProduct;
-        });
-
-    }).catch((err) => {
+    }).catch(() => {
         throw new ProductCreateDatabaseError();
     });
 };
@@ -151,8 +129,6 @@ export const updateProduct = async (productDto, id) => {
 
             const {
                 rest,
-                sku,
-                supplier,
                 relations
             } = await prepareProductData({
                 tx,
@@ -164,7 +140,6 @@ export const updateProduct = async (productDto, id) => {
                 where: { id },
                 data: {
                     ...rest,
-                    sku,
                     supplier: {
                         connect: { id: relations.supplierId }
                     },
@@ -181,8 +156,6 @@ export const updateProduct = async (productDto, id) => {
                 tx,
                 supplierId: relations.supplierId,
                 productId: id,
-                sku,
-                supplierCode: supplier.code,
                 isUpdate: true
             });
 
