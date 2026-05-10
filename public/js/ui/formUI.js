@@ -91,8 +91,8 @@ export const toggleTableErrors = (form, errors) => {
 
                 const message = fields[field];
                 const feedback = form.querySelector(`[data-error-for="${ field }-${ id }"]`);
-                input.classList.toggle('is-invalid', !!message);
-                feedback.classList.toggle('d-block', !message);
+                input.classList.toggle('is-invalid', !!message);console.log(message)
+                feedback.classList.toggle('d-none', !message);
 
                 if (message) feedback.textContent = message;
                 else feedback.textContent = null;
