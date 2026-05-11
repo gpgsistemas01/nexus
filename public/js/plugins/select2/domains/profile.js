@@ -5,6 +5,7 @@ export const initProfileSelect = ({
     modalSelector, 
     baseSelector, 
     placeholder, 
+    clearOnOpen = true,
     data, 
     allowCreate = true 
 }) => {
@@ -13,6 +14,7 @@ export const initProfileSelect = ({
         baseSelector,
         modalSelector,
         url: PROFILES_API_ROUTE,
+        clearOnOpen,
         data,
         placeholder,
         processResults: (data) => {

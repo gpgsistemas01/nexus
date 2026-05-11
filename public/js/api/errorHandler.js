@@ -57,3 +57,29 @@ export const handleApiError = ({
             if (rethrow) throw err;
     }
 };
+
+export const handleDataTableError = (err, table = null) => {
+
+    const { status, message } = err;
+
+    switch (status) {
+
+        case 401:
+            localStorage.setItem('showErrorToast', getFallbackMessage(err));
+            window.location.replace('/');
+            return [];
+
+        case 404:
+            notifications.showError(message || 'No se encontraron registros.');
+            return [];
+
+        default:
+            notifications.showError(
+                message || 'No fue posible cargar la información.'
+            );
+
+            if (table) table.clear().draw();
+
+            return [];
+    }
+};

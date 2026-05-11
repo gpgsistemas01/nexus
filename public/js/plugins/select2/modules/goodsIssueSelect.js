@@ -1,4 +1,5 @@
 import { bindChangeResetSelect } from "../../../utils/domUtils.js";
+import { notifications } from "../../swal/swalComponent.js";
 import { initClientSelect, toggleClientOption } from "../domains/client.js";
 import { initDepartmentSelect, toggleDepartmentOption } from "../domains/department.js";
 import { setupProductSelect, toggleProductOption } from "../domains/product.js";
@@ -12,6 +13,7 @@ const advisorSelector = '#advisorInput';
 const productSelector = '#productInput';
 
 export const initGoodsIssueFormSelect2 = () => {
+
     initDepartmentSelect({
         modalSelector,
         baseSelector: `${ modalSelector } ${ departmentSelector }`,
@@ -44,6 +46,7 @@ export const initGoodsIssueFormSelect2 = () => {
         modalSelector, 
         baseSelector: `${ modalSelector } ${ requesterSelector }`,
         placeholder: 'Buscar solicitante...',
+        clearOnOpen: false,
         data: (params) => {
 
             const select = document.querySelector(`${modalSelector} ${departmentSelector}`);
@@ -58,15 +61,37 @@ export const initGoodsIssueFormSelect2 = () => {
         allowCreate: false,
     });
 
+    $(requesterSelector).prop('disabled', true);
+
     bindChangeResetSelect({
         sourceSelector: `${ modalSelector } ${ departmentSelector }`,
         targetSelector: `${ modalSelector } ${ requesterSelector }`,
         reset: () => {
+
+            const departmentId = $(departmentSelector).val();
+
             toggleProfileOption({
                 selector: `${ modalSelector } ${ requesterSelector }`,
                 id: null,
                 name: null
             });
+
+            $(requesterSelector).val(null).trigger('change');
+            $(requesterSelector).prop('disabled', !!departmentId)
+        }
+    });
+
+    $(requesterSelector).on('select2:opening', (e) => {
+
+        const departmentId = $(departmentSelector).val();
+
+        if (!departmentId) {
+
+            e.preventDefault();
+
+            notifications.showWarning(
+                'Seleccione un área primero.'
+            );
         }
     });
 

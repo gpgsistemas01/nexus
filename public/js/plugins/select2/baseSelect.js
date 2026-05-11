@@ -5,6 +5,7 @@ export const initbaseSelect2 = ({
     baseSelector, 
     modalSelector,
     url, 
+    clearOnOpen = true,
     placeholder,
     processResults,
     data = (params) => {
@@ -53,8 +54,8 @@ export const initbaseSelect2 = ({
         createTag
     });
 
-    $(baseSelector).on('select2:opening', () => {
-        $(baseSelector).find('option').remove();
+    if (clearOnOpen) $(baseSelector).on('select2:opening', () => {
+        $(baseSelector).val(null).trigger('change');
     });
 }
 

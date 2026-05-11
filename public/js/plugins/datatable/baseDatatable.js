@@ -1,7 +1,37 @@
+import { handleDataTableError, normalizeJqAjaxError } from "../../api/errorHandler.js";
+
 export const createDataTable = ({ selector = '#table', options = {} }) => {
+
+    const ajaxUrl = options.ajax || null;
 
     return $(selector).DataTable({
         ...options,
+        ajax: ajaxUrl ? async (data, callback) => {
+
+            try {
+
+                const response = await $.ajax({
+                    url: ajaxUrl,
+                    method: 'GET',
+                    data
+                });
+
+                callback(response);
+
+            } catch (jdqXHR) {
+
+                const err = normalizeJqAjaxError(jdqXHR);
+
+                handleDataTableError(err);
+
+                callback({
+                    draw: data.draw,
+                    data: [],
+                    recordsTotal: 0,
+                    recordsFiltered: 0
+                });
+            }
+        } : undefined,
         dom: 'Bfrtip',
         language: {
             url: "https://cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json",
