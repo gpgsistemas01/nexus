@@ -209,9 +209,9 @@ const successMessages = {
     CANCELED_PURCHASE_REQUISITION: '¡Requisición de compra cancelada exitosamente!'
 };
 
-export const getErrorMessage = (data) => {
+export const getErrorMessage = (data = {}) => {
 
-    const { code, meta } = data;
+    const { code, meta } = data ?? {};
 
     if (meta) {
 

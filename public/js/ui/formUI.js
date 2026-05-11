@@ -31,7 +31,8 @@ const setInputSelectError = (form, key, message = null) => {
 
     if (!feedback) return;
 
-    feedback.classList.toggle('d-none', !!message)
+    feedback.classList.toggle('d-none', !message);
+    feedback.classList.toggle('d-block', !!message);
 
     if (message) feedback.textContent = message;
     else feedback.textContent = null;
@@ -46,8 +47,17 @@ export const toggleInputSelectErrors = (form, errors) => {
         
         setInputSelectError(form, key, value);
 
-        if ($(input).hasClass('select2-hidden-accessible')) $(input).next('.select2-container').toggleClass('is-invalid', !!value);
+        if ($(input).hasClass('select2-hidden-accessible')) {
+
+            $(input)
+                .next('.select2-container')
+                .toggleClass('is-invalid', !!value)
+                .find('.select2-selection')
+                .toggleClass('is-invalid', !!value);
+        }
+
         input.classList.toggle('is-invalid', !!value);
+        input.toggleAttribute('aria-invalid', !!value);
     });
 
     form.querySelectorAll('input[type="checkbox"]').forEach(input => {
@@ -130,6 +140,7 @@ export const clearFormErrors = (form) => {
     form.querySelectorAll('.is-invalid').forEach(input => {
         input.classList.remove('is-invalid');
         input.removeAttribute('title');
+        input.removeAttribute('aria-invalid');
     });
 
     form.querySelectorAll('.was-validated').forEach(el => {
@@ -148,6 +159,7 @@ export const clearFormErrors = (form) => {
 
             $(input)
                 .next('.select2-container')
+                .removeClass('is-invalid')
                 .find('.select2-selection')
                 .removeClass('is-invalid');
         }

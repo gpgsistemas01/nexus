@@ -51,6 +51,8 @@ export const cleanForm = (form) => {
     form.dataset.mode = '';
 }
 
+export const hasValidationErrors = (errors) => Object.values(errors).some(error => error);
+
 export const validateFields = (validators, formData) => {
 
     const errors = {};
