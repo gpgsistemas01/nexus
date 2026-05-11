@@ -51,7 +51,19 @@ export const cleanForm = (form) => {
     form.dataset.mode = '';
 }
 
-export const hasValidationErrors = (errors) => Object.values(errors).some(error => error);
+export const hasValidationErrors = (errors) => {
+
+    const check = (value) => {
+
+        if (value == null) return false;
+
+        if (typeof value !== 'object') return true;
+
+        return Object.values(value).some(check);
+    };
+
+    return check(errors);
+};
 
 export const validateFields = (validators, formData) => {
 
