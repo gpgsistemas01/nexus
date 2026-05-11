@@ -217,12 +217,12 @@ export const getErrorMessage = (data) => {
 
         const fn = errorMessages[code];
 
-        return typeof fn === 'function' ? fn(meta) : null;
+        return typeof fn === 'function' ? fn(meta) : code;
     }
 
-    if (code) return errorMessages[code] ?? null;
+    if (code) return errorMessages[code] ?? code;
     
     return null;
 }
 
-export const getSuccessMessage = (code) => successMessages[code] ?? null;
+export const getSuccessMessage = (code) => successMessages[code] ?? code;

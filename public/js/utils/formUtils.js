@@ -71,29 +71,51 @@ export const validateDetailsFields = (validators, details) => {
     details.forEach(detail => {
 
         const detailErrors = validateFields(validators, detail);
+        const hasErrors = Object.values(detailErrors).some(Boolean);
 
-        if (Object.keys(detailErrors).length > 0) errors[detail.id] = detailErrors;
+        errors[detail.id] = detailErrors;
     })
 
     return errors;
 }
 
-export const mapServerErrors = (obj) => {
+const hasOwn = (obj, key) => Object.prototype.hasOwnProperty.call(obj, key);
+const isObject = (value) => typeof value === 'object' && value !== null;
+const isErrorCodeObject = (error) => isObject(error) && hasOwn(error, 'code');
+const isPathErrorObject = (error) => isObject(error) && hasOwn(error, 'path') && hasOwn(error, 'msg');
 
-    if (Array.isArray(obj)) {
-        return obj.map(mapErrorsRecursive);
+const mergeServerErrorList = (errors) => errors.reduce((result, error) => {
+
+    if (isPathErrorObject(error)) {
+
+        result[error.path] = mapServerErrors(error.msg);
+
+        return result;
     }
 
-    if (typeof obj === 'object' && obj !== null) {
+    const mappedError = mapServerErrors(error);
+
+    if (isObject(mappedError)) Object.assign(result, mappedError);
+
+    return result;
+}, {});
+
+export const mapServerErrors = (errors) => {
+
+    if (Array.isArray(errors)) return mergeServerErrorsList(errors);
+
+    if (isObject(errors)) {
+
+        if (isErrorCodeObject(errors)) return getErrorMessage(errors) ?? errors;
 
         const result = {};
 
-        for (const key in obj) {
-            result[key] = mapErrorsRecursive(obj[key]);
+        for (const key in errors) {
+            result[key] = mapServerErrors(errors[key]);
         }
 
         return result;
     }
 
-    return getErrorMessage(obj);
+    return null;
 };
