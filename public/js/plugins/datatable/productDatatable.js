@@ -2,7 +2,7 @@ import { openProductModal } from "../../modules/products/productModal.js";
 import { createDataTable, renderActionButtons } from "./baseDatatable.js";
 import { notifications } from "../swal/swalComponent.js";
 import { hasPermission } from "../../utils/permissions.js";
-import { PRODUCTS_API_ROUTE } from "../../services/warehouse/productService.js";
+import { getAllProductsRequest } from "../../services/warehouse/productService.js";
 import { renderMaterialName } from "./utils/renderProductDatatable.js";
 
 const selectorTable = '#table';
@@ -75,7 +75,9 @@ export const createProductDatatable = (context) => {
 
     const table = createDataTable({
         options: {
-            ajax: PRODUCTS_API_ROUTE,
+            ajax: {
+                get: getAllProductsRequest
+            },
             columns,
             createdRow: (row, data) => {
 

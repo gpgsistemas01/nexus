@@ -4,7 +4,7 @@ import { initMdbWrapperInput, updateMdbWrapperInput } from "../mdb/baseInstance.
 export const initbaseSelect2 = ({ 
     baseSelector, 
     modalSelector,
-    url, 
+    get, 
     clearOnOpen = true,
     placeholder,
     processResults,
@@ -33,21 +33,28 @@ export const initbaseSelect2 = ({
         placeholder: placeholder, 
         dropdownParent: $(modalSelector),
         minimumInputLength: 0, 
-        ajax: { 
-            url: url, 
+        ajax: {  
             dataType: 'json', 
             delay: 250, 
             data, 
             processResults,
-            error: (jqXHR, textStatus, errorThrown) => {
+            transport: async (params, success, failure) => {
 
-                if (textStatus === 'abort') return;
+                try {
 
-                handleApiError({
-                    err: normalizeJqAjaxError(jqXHR, errorThrown),
-                    form,
-                    rethrow: false
-                });
+                    const response = await get(params.data);
+
+                    return success(response.data);
+
+                } catch (err) {
+
+                    handleApiError({
+                        err,
+                        rethrow: false
+                    });
+
+                    failure(err);
+                }
             }
         },
         tags,

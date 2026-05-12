@@ -2,30 +2,23 @@ import { handleDataTableError, normalizeJqAjaxError } from "../../api/errorHandl
 
 export const createDataTable = ({ selector = '#table', options = {} }) => {
 
-    const ajaxUrl = options.ajax || null;
+    const ajaxConfig = options.ajax;
 
     return $(selector).DataTable({
         ...options,
-        ajax: ajaxUrl ? async (data, callback) => {
+        ajax: ajaxConfig ? async (data, callback) => {
 
             try {
 
-                const response = await $.ajax({
-                    url: ajaxUrl,
-                    method: 'GET',
-                    data
-                });
+                const response = await ajaxConfig.get(data);
 
-                callback(response);
+                callback(response.data);
 
-            } catch (jdqXHR) {
-
-                const err = normalizeJqAjaxError(jdqXHR);
+            } catch (err) {
 
                 handleDataTableError(err);
 
                 callback({
-                    draw: data.draw,
                     data: [],
                     recordsTotal: 0,
                     recordsFiltered: 0
