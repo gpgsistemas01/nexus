@@ -1,5 +1,5 @@
-import { bindChangeResetSelect } from "../../../utils/domUtils.js";
 import { notifications } from "../../swal/swalComponent.js";
+import { bindChangeResetSelect } from "../baseSelect.js";
 import { initClientSelect, toggleClientOption } from "../domains/client.js";
 import { initDepartmentSelect, toggleDepartmentOption } from "../domains/department.js";
 import { setupProductSelect, toggleProductOption } from "../domains/product.js";
@@ -61,14 +61,14 @@ export const initGoodsIssueFormSelect2 = () => {
         allowCreate: false,
     });
 
-    $(requesterSelector).prop('disabled', true);
+    $(`${ modalSelector } ${ requesterSelector }`).prop('disabled', true);
 
     bindChangeResetSelect({
         sourceSelector: `${ modalSelector } ${ departmentSelector }`,
         targetSelector: `${ modalSelector } ${ requesterSelector }`,
         reset: () => {
 
-            const departmentId = $(departmentSelector).val();
+            const departmentId = $(`${ modalSelector } ${ departmentSelector }`).val();
 
             toggleProfileOption({
                 selector: `${ modalSelector } ${ requesterSelector }`,
@@ -76,22 +76,8 @@ export const initGoodsIssueFormSelect2 = () => {
                 name: null
             });
 
-            $(requesterSelector).val(null).trigger('change');
-            $(requesterSelector).prop('disabled', !!departmentId)
-        }
-    });
-
-    $(requesterSelector).on('select2:opening', (e) => {
-
-        const departmentId = $(departmentSelector).val();
-
-        if (!departmentId) {
-
-            e.preventDefault();
-
-            notifications.showWarning(
-                'Seleccione un área primero.'
-            );
+            $(`${ modalSelector } ${ requesterSelector }`).val(null).trigger('change');
+            $(`${ modalSelector } ${ requesterSelector }`).prop('disabled', !departmentId);
         }
     });
 

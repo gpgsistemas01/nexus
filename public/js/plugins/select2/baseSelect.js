@@ -95,3 +95,36 @@ export const setMdbWrapperInputValue = ({
 
     updateMdbWrapperInput(instance);
 }
+
+export const bindChangeResetSelect = ({
+    sourceSelector,
+    targetSelector,
+    reset
+}) => {
+
+    const $source = $(sourceSelector);
+
+    if (!$source.length) return;
+
+    const source = $source[0];
+
+    if (source.dataset.resetBound === 'true') return;
+
+    source.dataset.resetBound = 'true';
+
+    $source.on('change', () => {
+
+        if (typeof reset === 'function') {
+            reset();
+        } else {
+
+            const $target = $(targetSelector);
+
+            if (!$target.length) return;
+
+            $target
+                .val(null)
+                .trigger('change');
+        }
+    });
+};
