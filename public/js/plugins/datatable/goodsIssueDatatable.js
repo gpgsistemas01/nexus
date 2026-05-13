@@ -37,14 +37,8 @@ export const createGoodsIssueDatatable = (context) => {
     }
 
     columns.push(
-        {
-            data: null,
-            title: 'Proyecto',
-            render: (data, type, row) => {
-
-                return `<div>${ row.projectNumber }<br><small>${ row.clientName }</small></div>`;
-            }
-        },
+        { data: 'projectNumber', title: 'Proyecto' },
+        { data: 'clientName', title: 'Cliente' },
         { data: 'fulfillmentStatus.name', title: 'Estado surtido' },
         {
             data: 'id',
