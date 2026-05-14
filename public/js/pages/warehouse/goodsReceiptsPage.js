@@ -171,11 +171,6 @@ const addProduct = () => {
 
     if (!option) return null;
 
-    if (isNaN(costPerUnitType) || costPerUnitType <= 0) {
-        alert('El costo por RoPresentación debe ser un número positivo.');
-        return;
-    }
-
     const netPurchaseAmount = Number((quantity * costPerUnitType).toFixed(2));
     let convertedQuantity;
 
