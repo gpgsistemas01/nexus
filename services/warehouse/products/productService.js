@@ -94,7 +94,7 @@ export const findProductsSnapshot = async ({
 
 export const createProduct = async (productDto) => {
 
-    return withRetry(async () => {
+    try {
 
         return getDb().$transaction((tx) =>
             createProductInTransaction({
@@ -103,17 +103,17 @@ export const createProduct = async (productDto) => {
             })
         );
 
-    }).catch(() => {
+    } catch (err) {
 
         if (err instanceof AppError) throw err;
         
         throw new ProductCreateDatabaseError();
-    });
+    };
 };
 
 export const updateProduct = async (productDto, id) => {
 
-    return withRetry(async () => {
+    try {
 
         return await getDb().$transaction(async (tx) => {
 
@@ -165,7 +165,7 @@ export const updateProduct = async (productDto, id) => {
             return fullProduct;
         });
 
-    }).catch((err) => {
+    } catch (err) {
 
         if (err.code === PRISMA_RECORD_NOT_FOUND) {
             throw new ProductNotFound();
@@ -174,5 +174,5 @@ export const updateProduct = async (productDto, id) => {
         if (err instanceof AppError) throw err;
 
         throw new ProductUpdateDatabaseError();
-    });
+    };
 };

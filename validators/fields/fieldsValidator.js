@@ -51,13 +51,13 @@ export const validateInvoice = (maxLength = 50) =>
         .matches(invoiceRegex).withMessage(errorMap['invoice'].INVALID_FORMAT)
 ;
 
-export const validateText = (fieldName, maxLength) =>
+export const validateText = ({ fieldName, maxLength, regex = nameRegex }) =>
     body(fieldName)
         .trim()
         .notEmpty().withMessage(errorMap['name'].REQUIRED)
         .isString().withMessage(errorMap['name'].INVALID_TYPE)
         .isLength({ max: maxLength }).withMessage(errorMap['name'].TOO_LONG(maxLength))
-        .matches(nameRegex).withMessage(errorMap['name'].INVALID_FORMAT)
+        .matches(regex).withMessage(errorMap['name'].INVALID_FORMAT)
 ;
 
 export const validateBoolean = (fieldName) =>

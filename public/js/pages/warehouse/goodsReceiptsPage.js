@@ -150,8 +150,8 @@ const addProduct = () => {
     const option = document.querySelector('#productInput option:checked');
 
     let { productBase, productHeight, presentationName, unitMeasureName, supplierName, productName } = option?.dataset;
-    productHeight = Number(productHeight);
-    productBase = Number(productBase);
+    productHeight = isNaN(Number(productHeight)) ? null : Number(productHeight);
+    productBase = isNaN(Number(productBase)) ? null : Number(productBase);
 
     const productId = option.value;
 
