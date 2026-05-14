@@ -62,3 +62,7 @@ export const validatePurchaseRequisitionValidators = {
     requestDate: (value) => validateDate(value, 'La fecha de solicitud'),
     details: validateGoodsReceiptDetailsArray
 };
+
+export const validateClientValidators = {
+    name: (value) => validateText({ name: value, length: 100, fieldName: 'El nombre' }),
+}
