@@ -1,6 +1,6 @@
 import { ProductSnapshotFindDatabaseError, ProductCreateDatabaseError, ProductNotFound, ProductUpdateDatabaseError } from "../../../errors/warehouse/productError.js";
 import { getDb } from "../../../repository/baseRepository.js";
-import { findAllSupplierProducts, findSupplierProductByIds } from "./supplierProductService.js";
+import { findAllSupplierProducts, findCurrentSupplierProductByProductId, findSupplierProductByIds } from "./supplierProductService.js";
 import { prepareProductData, withRetry } from "./productHelpers.js";
 import { syncSupplierProduct } from "./productRelations.js";
 import { AppError } from "../../../errors/AppError.js";
@@ -124,6 +124,11 @@ export const updateProduct = async (productDto, id) => {
 
             if (!productExists) throw new ProductNotFound();
 
+            const currentSupplierProduct = await findCurrentSupplierProductByProductId({
+                tx,
+                productId: id
+            });
+
             const {
                 rest,
                 relations
@@ -132,6 +137,7 @@ export const updateProduct = async (productDto, id) => {
                 productDto,
                 productId: id
             });
+
 
             const updatedProduct = await tx.product.update({
                 where: { id },
@@ -149,6 +155,8 @@ export const updateProduct = async (productDto, id) => {
             await syncSupplierProduct({
                 tx,
                 supplierId: relations.supplierId,
+                previousSupplierId: currentSupplierProduct?.supplierId,
+                previousMaxUnitCost: currentSupplierProduct?.maxUnitCost,
                 productId: id,
                 isUpdate: true
             });
