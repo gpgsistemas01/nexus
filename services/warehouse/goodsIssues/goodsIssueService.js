@@ -132,8 +132,7 @@ export const findAllGoodsIssues = async ({
                     convertedQuantityDifference: true,
                     suppliedQuantity: true,
                     isSupplied: true,
-                    status: true,
-                fulfillmentStatus: true,
+                    fulfillmentStatus: true,
                     supplierId: true,
                     supplierName: true
                 }
