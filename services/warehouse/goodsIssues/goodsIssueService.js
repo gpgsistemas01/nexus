@@ -283,7 +283,6 @@ export const updateGoodsIssue = async ({ id, goodsIssueDto }) => {
 
         if (goodsIssue.fulfillmentStatus?.name !== FULFILLMENT_PENDING) throw new GoodsIssueNotPendingConflict();
 
-
         const hasSuppliedInAnyDetail = goodsIssue.details.some(
             detail => Number(detail.suppliedQuantity ?? 0) > FLOAT_EPSILON || detail.isSupplied
         );
@@ -300,93 +299,21 @@ export const updateGoodsIssue = async ({ id, goodsIssueDto }) => {
 
         const client = await findClientById({ id: clientId });
         const department = await findDepartmentById({ id: departmentId });
-        const currentById = new Map(goodsIssue.details.map(detail => [detail.id, detail]));
-        const incomingDetailIds = new Set(details.map(detail => detail.id).filter(Boolean));
-        const hasSuppliedQuantity = (detail) => Number(detail.suppliedQuantity ?? 0) > FLOAT_EPSILON || detail.isSupplied;
-        const hasSameSuppliedDetailValues = (current, detail) => (
-            current.productId === detail.productId &&
-            current.supplierId === detail.supplierId &&
-            current.presentationId === (detail.presentationId ?? current.presentationId) &&
-            Number(current.quantity) === Number(detail.quantity)
-        );
 
-        for (const detail of details) {
-
-            if (!detail.id) continue;
-
-            const current = currentById.get(detail.id);
-
-            if (!current) throw new GoodsIssueDetailNotFound();
-
-            if (hasSuppliedQuantity(current) && !hasSameSuppliedDetailValues(current, detail)) {
-                throw new GoodsIssueSuppliedDetailConflict();
-            }
-        }
-
-        const removedSuppliedDetail = goodsIssue.details.some(
-            detail => hasSuppliedQuantity(detail) && !incomingDetailIds.has(detail.id)
-        );
-
-        if (removedSuppliedDetail) throw new GoodsIssueSuppliedDetailConflict();
-
-        const editableDetails = details.filter(detail => {
-            const current = detail.id ? currentById.get(detail.id) : null;
-            return !current || !hasSuppliedQuantity(current);
-        });
-        const processedDetails = editableDetails.length
-            ? await buildGoodsIssueDetails({ details: editableDetails })
-            : [];
+        const processedDetails = await buildGoodsIssueDetails({ details });
 
         return await getDb().$transaction(async (tx) => {
 
-            for (let index = 0; index < editableDetails.length; index += 1) {
-
-                const detail = editableDetails[index];
-                const processedDetail = processedDetails[index];
-                const current = detail.id ? currentById.get(detail.id) : null;
-
-                if (current) {
-                    await tx.goodsIssueDetail.update({
-                        where: { id: current.id },
-                        data: processedDetail
-                    });
-                    continue;
-                }
-
-                await tx.goodsIssueDetail.create({
-                    data: {
-                        ...processedDetail,
-                        goodsIssue: {
-                            connect: { id }
-                        }
-                    }
-                });
-            }
-
-            const removableDetailIds = goodsIssue.details
-                .filter(detail => !incomingDetailIds.has(detail.id) && !hasSuppliedQuantity(detail))
-                .map(detail => detail.id);
-
-            if (removableDetailIds.length) {
-                await tx.goodsIssueDetail.deleteMany({
-                    where: {
-                        id: {
-                            in: removableDetailIds
-                        }
-                    }
-                });
-            }
-
-            const refreshed = await tx.goodsIssueDetail.findMany({
-                where: { goodsIssueId: id },
-                select: {
-                    isSupplied: true,
-                    quantity: true,
-                    suppliedQuantity: true
-                }
+            await tx.goodsIssueDetail.deleteMany({
+                where: { goodsIssueId: id }
             });
 
-            const fulfillmentName = resolveFulfillmentStatus(refreshed);
+            await tx.goodsIssueDetail.createMany({
+                data: processedDetails.map(d => ({
+                    ...d,
+                    goodsIssueId: id
+                }))
+            });
 
             return await tx.goodsIssue.update({
                 where: { id },
@@ -396,30 +323,39 @@ export const updateGoodsIssue = async ({ id, goodsIssueDto }) => {
                     requesterName: requester.fullName,
                     advisorName: advisor.fullName,
                     clientName: client.name,
+
                     department: {
                         connect: { id: departmentId }
                     },
+
                     requester: {
                         connect: { id: requesterId }
                     },
+
                     advisor: {
                         connect: { id: advisorId }
                     },
+
                     client: {
                         connect: { id: clientId }
                     },
+
                     status: {
-                        connect: { name: STATUS_APPROVED }
+                        connect: {
+                            name: STATUS_APPROVED
+                        }
                     },
+
                     fulfillmentStatus: {
-                        connect: { name: fulfillmentName }
+                        connect: {
+                            name: FULFILLMENT_PENDING
+                        }
                     }
                 },
                 include: {
                     details: true,
                     status: true,
-                fulfillmentStatus: true,
-                    status: true
+                    fulfillmentStatus: true
                 }
             });
         });
@@ -594,8 +530,7 @@ export const updateGoodsIssueDetails = async ({ id, goodsIssueDto }) => {
                 select: {
                     id: true,
                     status: true,
-                fulfillmentStatus: true,
-                    status: true
+                    fulfillmentStatus: true,
                 }
             });
 
