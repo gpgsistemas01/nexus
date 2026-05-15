@@ -3,7 +3,7 @@ import {
     GoodsIssueRequesterProfileNotFound,
     GoodsIssueUpdateDatabaseError,
     GoodsIssueAdvisorProfileNotFound,
-    GoodsIssueFulfillmentCompleteConflict,
+    GoodsIssueNotPendingConflict,
     GoodsIssueSuppliedConflict,
     GoodsIssueCreateDatabaseError
 } from "../../../errors/warehouse/goodsIssueError.js";
@@ -132,7 +132,8 @@ export const findAllGoodsIssues = async ({
                     convertedQuantityDifference: true,
                     suppliedQuantity: true,
                     isSupplied: true,
-                    fulfillmentStatus: true,
+                    status: true,
+                fulfillmentStatus: true,
                     supplierId: true,
                     supplierName: true
                 }
@@ -263,6 +264,7 @@ export const updateGoodsIssue = async ({ id, goodsIssueDto }) => {
             where: { id },
             select: {
                 id: true,
+                status: true,
                 fulfillmentStatus: true,
                 details: {
                     select: {
@@ -270,6 +272,7 @@ export const updateGoodsIssue = async ({ id, goodsIssueDto }) => {
                         productId: true,
                         supplierId: true,
                         quantity: true,
+                        presentationId: true,
                         suppliedQuantity: true,
                         isSupplied: true
                     }
@@ -279,7 +282,8 @@ export const updateGoodsIssue = async ({ id, goodsIssueDto }) => {
 
         if (!goodsIssue) throw new GoodsIssueNotFound();
 
-        if (goodsIssue.fulfillmentStatus?.name === FULFILLMENT_COMPLETE) throw new GoodsIssueFulfillmentCompleteConflict();
+        if (goodsIssue.fulfillmentStatus?.name !== FULFILLMENT_PENDING) throw new GoodsIssueNotPendingConflict();
+
 
         const hasSuppliedInAnyDetail = goodsIssue.details.some(
             detail => Number(detail.suppliedQuantity ?? 0) > FLOAT_EPSILON || detail.isSupplied
@@ -303,6 +307,7 @@ export const updateGoodsIssue = async ({ id, goodsIssueDto }) => {
         const hasSameSuppliedDetailValues = (current, detail) => (
             current.productId === detail.productId &&
             current.supplierId === detail.supplierId &&
+            current.presentationId === (detail.presentationId ?? current.presentationId) &&
             Number(current.quantity) === Number(detail.quantity)
         );
 
@@ -413,7 +418,8 @@ export const updateGoodsIssue = async ({ id, goodsIssueDto }) => {
                 },
                 include: {
                     details: true,
-                    fulfillmentStatus: true,
+                    status: true,
+                fulfillmentStatus: true,
                     status: true
                 }
             });
@@ -437,6 +443,7 @@ export const updateGoodsIssueDetails = async ({ id, goodsIssueDto }) => {
             where: { id },
             select: {
                 id: true,
+                status: true,
                 fulfillmentStatus: true,
                 details: {
                     select: {
@@ -454,8 +461,8 @@ export const updateGoodsIssueDetails = async ({ id, goodsIssueDto }) => {
 
         if (!goodsIssue) throw new GoodsIssueNotFound();
 
-        if (goodsIssue.fulfillmentStatus?.name === FULFILLMENT_COMPLETE) {
-            throw new GoodsIssueFulfillmentCompleteConflict();
+        if (goodsIssue.fulfillmentStatus?.name !== FULFILLMENT_PENDING) {
+            throw new GoodsIssueNotPendingConflict();
         }
         const detailIds = details.map(d => d.id).filter(Boolean);
         const currentDetails = goodsIssue.details.filter(d => detailIds.includes(d.id));
@@ -587,7 +594,8 @@ export const updateGoodsIssueDetails = async ({ id, goodsIssueDto }) => {
                 },
                 select: {
                     id: true,
-                    fulfillmentStatus: true,
+                    status: true,
+                fulfillmentStatus: true,
                     status: true
                 }
             });

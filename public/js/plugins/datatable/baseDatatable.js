@@ -53,7 +53,7 @@ export const refreshProductTable = (details) => {
 export const renderActionButtons = ({ status, fulfillmentStatus, context }) => {
 
     const actions = [];
-    const canEditGoodsIssue = context === 'goodsIssue' && fulfillmentStatus !== 'Surtido';
+    const canEditGoodsIssue = context === 'goodsIssue' && fulfillmentStatus === 'Pendiente';
 
     if (status === 'Abierta' || canEditGoodsIssue) actions.push('<button class="btn-edit"><i class="fa-solid fa-pencil"></i></button>');
 

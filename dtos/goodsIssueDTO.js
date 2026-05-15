@@ -10,6 +10,7 @@ const createGoodsIssueDto = (body = {}, { includeDetailId = false } = {}) => ({
         ...(includeDetailId && d.id ? { id: d.id.trim() } : {}),
         productId: d.productId.trim(),
         supplierId: d.supplierId.trim(),
+        ...(d.presentationId ? { presentationId: d.presentationId.trim() } : {}),
         quantity: Number(d.quantity)
     }))
 });

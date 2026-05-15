@@ -14,6 +14,14 @@ export class GoodsIssueFulfillmentCompleteConflict extends AppError {
     }
 }
 
+
+export class GoodsIssueNotPendingConflict extends AppError {
+
+    constructor () {
+        super('La salida solo puede editarse cuando está pendiente', 'GOODS_ISSUE_NOT_PENDING_CONFLICT', 409);
+    }
+}
+
 export class GoodsIssueSuppliedConflict extends AppError {
 
     constructor () {
