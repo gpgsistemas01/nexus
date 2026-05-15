@@ -14,6 +14,19 @@ export const registerGoodsIssue = async (formData) => {
     };
 };
 
+export const editGoodsIssue = async (formData, id) => {
+
+    const response = await editGoodsIssueRequest(formData, id);
+
+    const { data } = response;
+    const { code } = data;
+    let message = getSuccessMessage(code);
+
+    return {
+        message
+    };
+};
+
 export const editGoodsIssueDetails = async (formData, id) => {
 
     const response = await editGoodsIssueDetailsRequest(formData, id);

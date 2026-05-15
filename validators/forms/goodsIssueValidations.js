@@ -12,7 +12,6 @@ export const goodsIssueValidation = [
 ];
 
 export const goodsIssueUpdateValidation = [
-    validateParamUUID('id'),
     validateUUID('advisorId'),
     validateUUID('clientId'),
     validateUUID('departmentId'),

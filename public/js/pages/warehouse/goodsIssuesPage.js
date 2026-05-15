@@ -1,5 +1,5 @@
 import { useForm } from "../../application/form.js";
-import { editGoodsIssueDetails, registerGoodsIssue } from "../../application/warehouse/goodsIssues.js";
+import { editGoodsIssue, editGoodsIssueDetails, registerGoodsIssue } from "../../application/warehouse/goodsIssues.js";
 import { validateAddProductValidators, validateGoodsIssueDetailValidators, validateGoodsIssueValidators } from "../../utils/validations/validators.js";
 import { refreshProductTable } from "../../plugins/datatable/baseDatatable.js";
 import { createGoodsIssueDatatable, details, initDetailsGoodsIssueTable } from "../../plugins/datatable/goodsIssueDatatable.js";
@@ -10,7 +10,6 @@ import { formatDateLongWithTime } from "../../utils/formatters.js";
 import { handleSubmit, hasValidationErrors, validateDetailsFields, validateFields } from "../../utils/formUtils.js";
 import { openModal } from "../../ui/modalUI.js";
 import { hasPermission } from "../../utils/permissions.js";
-import { editGoodsIssue } from "../../../../controllers/api/warehouse/goodsIssueController.js";
 
 const MODE_EDIT = 'edit';
 const MODE_EDIT_DETAIL = 'edit-detail';

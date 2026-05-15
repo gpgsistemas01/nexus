@@ -2,7 +2,7 @@ export const buildDetailsHeader = ({ type, mode, isWarehouse, isCoordinator, isS
 
     let extraHeaders = '';
 
-    if (type === 'issue' && ((isWarehouse && isCoordinator) || isSystem) && mode !== 'edit-detail') {
+    if (type === 'issue' && ((isWarehouse && isCoordinator) || isSystem) && mode !== 'create') {
         extraHeaders += `
             <th rowspan="2">Costo unitario de Conversión</th>
             <th rowspan="2">Cantidad de proyecto</th>
@@ -19,7 +19,7 @@ export const buildDetailsHeader = ({ type, mode, isWarehouse, isCoordinator, isS
         `;
     }
 
-    if (type === 'issue' && mode !== 'edit-detail') {
+    if (type === 'issue' && mode !== 'create') {
         extraHeaders += `<th rowspan="2">Surtir</th>`;
     }
 
