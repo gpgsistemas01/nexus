@@ -14,6 +14,13 @@ export class GoodsIssueFulfillmentCompleteConflict extends AppError {
     }
 }
 
+export class GoodsIssueSuppliedConflict extends AppError {
+
+    constructor () {
+        super('La salida ya tiene productos surtidos y no puede editarse en general', 'GOODS_ISSUE_SUPPLIED_CONFLICT', 409);
+    }
+}
+
 export class GoodsIssueRequesterProfileNotFound extends AppError {
 
     constructor () {
