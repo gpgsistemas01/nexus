@@ -202,7 +202,13 @@ const findDetailByElement = (element) => {
 
     const { detailId } = element.dataset;
 
-    if (detailId) return details.find(detail => detail.id === detailId);
+    if (detailId) {
+        const detail = details.find(item => item.id === detailId);
+
+        if (detail) return detail;
+
+        return details.find(item => item.productId === detailId);
+    }
 
     return details.find(detail => detail.productId === element.dataset.id);
 };

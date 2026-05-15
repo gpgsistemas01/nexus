@@ -226,7 +226,10 @@ export const validateGoodsIssueDetailsEdition =
                 }
 
                 const quantity = Number(detail?.projectConvertedQuantity);
-                const isSupplied = Boolean(detail?.isSupplied);
+                const isSuppliedRaw = detail?.isSupplied;
+                const isSupplied = typeof isSuppliedRaw === 'string'
+                    ? isSuppliedRaw.toLowerCase() === 'true'
+                    : isSuppliedRaw;
 
                 if (!quantity) {
 
@@ -242,7 +245,7 @@ export const validateGoodsIssueDetailsEdition =
                     errors[detailId].projectConvertedQuantity = errorMap['details'].INVALID_FORMAT_QUANTITY;
                 }
 
-                if (isSupplied === null || isSupplied === undefined) {
+                if (isSuppliedRaw === null || isSuppliedRaw === undefined) {
 
                     if (!errors[detailId]) errors[detailId] = {};
 
