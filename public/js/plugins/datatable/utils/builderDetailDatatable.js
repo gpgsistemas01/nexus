@@ -69,6 +69,7 @@ export const buildDetailsColumns = ({ type, mode, render, isWarehouse, isCoordin
                 data: null,
                 render: (_, __, row) => {
                     const detailId = row.id || row.productId;
+                    const isEditableDetail = mode === 'edit-detail' && !row.isSupplied;
 
                     return `
                         <input
@@ -76,7 +77,7 @@ export const buildDetailsColumns = ({ type, mode, render, isWarehouse, isCoordin
                             name="projectConvertedQuantity"
                             value="${ row.projectConvertedQuantity || '' }"
                             class="form-control project-converted-quantity-input"
-                            ${ mode === 'view' ? 'disabled' : '' }
+                            ${ isEditableDetail ? '' : 'disabled' }
                             data-detail-id="${ detailId }"
                             min=0
                         >
@@ -103,6 +104,7 @@ export const buildDetailsColumns = ({ type, mode, render, isWarehouse, isCoordin
             render: (_, __, row) => {
                 
                 const detailId = row.id || row.productId;
+                const isEditableDetail = mode === 'edit-detail' && !row.isSupplied;
 
                 return `
                     <input type="checkbox"
@@ -110,7 +112,7 @@ export const buildDetailsColumns = ({ type, mode, render, isWarehouse, isCoordin
                         class="form-check-input supply-checkbox"
                         data-detail-id="${ detailId }"
                         ${ row.isSupplied ? 'checked' : '' }
-                        ${ mode === 'view' ? 'disabled' : '' }
+                        ${ isEditableDetail ? '' : 'disabled' }
                     >
                 `;
             }

@@ -7,7 +7,7 @@ import {
     getAllGoodsIssues,
     registerGoodsIssue,
 } from '../../../controllers/api/warehouse/goodsIssueController.js';
-import { goodsIssueDetailsValidation, goodsIssueValidation } from '../../../validators/forms/goodsIssueValidations.js';
+import { goodsIssueDetailsValidation, goodsIssueUpdateValidation, goodsIssueValidation } from '../../../validators/forms/goodsIssueValidations.js';
 
 const router = express.Router();
 
@@ -53,7 +53,7 @@ router.post(
 router.patch(
     '/:id',
     verifyApiTokenRequired,
-    goodsIssueValidation,
+    goodsIssueUpdateValidation,
     validate,
     authorizeUserApi(goodsIssuePermissions),
     editGoodsIssue

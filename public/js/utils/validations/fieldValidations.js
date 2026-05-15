@@ -207,8 +207,8 @@ export const validateGoodsIssueDetailsArray = (details) => {
 
     for (const detail of details) {
 
-        if (!detail.productId || !detail.quantity) {
-            return 'Cada detalle debe contener producto y cantidad.';
+        if (!detail.productId || !detail.supplierId || !detail.quantity) {
+            return 'Cada detalle debe contener producto, proveedor y cantidad.';
         }
 
         if (isNaN(detail.quantity) || parseFloat(detail.quantity) < 1) {
