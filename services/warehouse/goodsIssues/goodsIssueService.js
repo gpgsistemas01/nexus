@@ -4,6 +4,7 @@ import {
     GoodsIssueUpdateDatabaseError,
     GoodsIssueAdvisorProfileNotFound,
     GoodsIssueFulfillmentCompleteConflict,
+    GoodsIssueSuppliedConflict,
     GoodsIssueCreateDatabaseError
 } from "../../../errors/warehouse/goodsIssueError.js";
 import { getDb } from "../../../repository/baseRepository.js";
@@ -280,6 +281,12 @@ export const updateGoodsIssue = async ({ id, goodsIssueDto }) => {
 
         if (goodsIssue.fulfillmentStatus?.name === FULFILLMENT_COMPLETE) throw new GoodsIssueFulfillmentCompleteConflict();
 
+        const hasSuppliedInAnyDetail = goodsIssue.details.some(
+            detail => Number(detail.suppliedQuantity ?? 0) > FLOAT_EPSILON || detail.isSupplied
+        );
+
+        if (hasSuppliedInAnyDetail) throw new GoodsIssueSuppliedConflict();
+
         const requester = await findProfileById({ id: requesterId });
 
         if (!requester) throw new GoodsIssueRequesterProfileNotFound();
@@ -450,7 +457,6 @@ export const updateGoodsIssueDetails = async ({ id, goodsIssueDto }) => {
         if (goodsIssue.fulfillmentStatus?.name === FULFILLMENT_COMPLETE) {
             throw new GoodsIssueFulfillmentCompleteConflict();
         }
-
         const detailIds = details.map(d => d.id).filter(Boolean);
         const currentDetails = goodsIssue.details.filter(d => detailIds.includes(d.id));
         const currentById = new Map(currentDetails.map(d => [d.id, d]));
