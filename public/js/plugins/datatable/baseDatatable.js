@@ -1,4 +1,24 @@
 import { handleDataTableError, normalizeJqAjaxError } from "../../api/errorHandler.js";
+import { exportWarehouseReportRequest } from "../../services/warehouse/reportService.js";
+
+const downloadBlob = ({ blob, filename }) => {
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    window.URL.revokeObjectURL(url);
+};
+
+export const buildExcelButton = ({ filename = 'reporte.xlsx' } = {}) => ({
+    text: 'Exportar Excel',
+    action: async () => {
+        const response = await exportWarehouseReportRequest();
+        downloadBlob({ blob: response.data, filename });
+    }
+});
 
 export const createDataTable = ({ selector = '#table', options = {} }) => {
 

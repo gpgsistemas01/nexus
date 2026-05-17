@@ -1,5 +1,5 @@
 import { openProductModal } from "../../modules/products/productModal.js";
-import { createDataTable, renderActionButtons } from "./baseDatatable.js";
+import { buildExcelButton, createDataTable, renderActionButtons } from "./baseDatatable.js";
 import { notifications } from "../swal/swalComponent.js";
 import { hasPermission } from "../../utils/permissions.js";
 import { getAllProductsRequest } from "../../services/warehouse/productService.js";
@@ -109,7 +109,12 @@ export const createProductDatatable = (context) => {
                 notifications.showWarning(
                     `Hay ${lowStockProducts.length} producto(s) por debajo del stock mínimo: ${productNames}${lowStockProducts.length > 3 ? '...' : ''}`
                 );
-            }
+            },
+            buttons: [
+                buildExcelButton({
+                    filename: 'reporte_inventario_productos.xlsx'
+                })
+            ]
         }
     });
 
