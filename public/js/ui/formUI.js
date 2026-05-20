@@ -8,6 +8,19 @@ const TOTAL_FIELDS = {
 const MODE_EDIT_DETAIL = 'edit-detail';
 const MODE_VIEW = 'view';
 
+export const initForm = ({
+    form, 
+    mode, 
+    id = ''
+}) => {
+
+    form.reset();
+    form.dataset.id = id;
+    form.dataset.mode = mode;
+    form.dataset.submitting = 'false';
+    form.querySelector('button[type="submit"]').disabled = false;
+}
+
 export const toggleErrorMessages = (form, errors) => {
 
     Object.entries(errors).forEach(([field, message]) => {

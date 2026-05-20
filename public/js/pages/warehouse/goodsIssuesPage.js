@@ -4,7 +4,7 @@ import { validateAddProductValidators, validateGoodsIssueDetailValidators, valid
 import { refreshProductTable } from "../../plugins/datatable/baseDatatable.js";
 import { createGoodsIssueDatatable, details, initDetailsGoodsIssueTable } from "../../plugins/datatable/goodsIssueDatatable.js";
 import { initGoodsIssueFormSelect2, setGoodsIssueFormSelectOptions } from "../../plugins/select2/modules/goodsIssueSelect.js";
-import { setFormReadOnly, toggleButtons, clearAddedProductInput, clearFormErrors, normalizeFormErrors } from "../../ui/formUI.js";
+import { setFormReadOnly, toggleButtons, clearAddedProductInput, clearFormErrors, normalizeFormErrors, initForm } from "../../ui/formUI.js";
 import { on } from "../../utils/domUtils.js";
 import { formatDateLongWithTime } from "../../utils/formatters.js";
 import { handleSubmit, hasValidationErrors, validateDetailsFields, validateFields } from "../../utils/formUtils.js";
@@ -24,7 +24,7 @@ createGoodsIssueDatatable(context);
 const normalizeGoodsIssueData = ({ form, formData }) => {
 
     const { mode } = form.dataset;
-
+console.log(mode)
     if (mode === MODE_EDIT_DETAIL) {
         return {
             id: form.dataset.id,
@@ -67,9 +67,7 @@ export const openGoodsIssueModal = async ({ mode, data = null }) => {
     const form = document.querySelector(formId);
     const modalElement = document.querySelector(modalId);
 
-    form.dataset.mode = mode;
-    form.dataset.id = data?.id || '';
-
+    initForm({ form, mode, id: data?.id || '' });
     clearFormErrors(form);
     toggleButtons({
         mode,
