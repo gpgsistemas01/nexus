@@ -4,6 +4,7 @@ import { getAllGoodsReceiptsRequest } from "../../services/warehouse/goodsReceip
 import { initMdbWrapperInput, updateMdbWrapperInput } from "../mdb/baseInstance.js";
 import { buildDetailsColumns, buildDetailsHeader } from "./utils/builderDetailDatatable.js";
 import { handleDelete, renderMaterialName } from "./utils/renderProductDatatable.js";
+import { getResponsiveRowData } from "./utils/responsive.js";
 
 export let details = [];
 const selectorProductTable = '#productTable';
@@ -70,7 +71,7 @@ export const createGoodsReceiptDatatable = () => {
 
     $(`${ selectorTable } tbody`).on('click', '.btn-view', function() {
 
-        const data = table.row($(this).closest('tr')).data();
+        const data = getResponsiveRowData(table, this);
 
         openGoodsReceiptModal({ mode: 'view', data });
     });

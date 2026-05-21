@@ -72,7 +72,7 @@ export const openGoodsReceiptModal = ({ mode, data = null }) => {
     const modalElement = document.querySelector(modalId);
     let value;
 
-    initForm(form, data?.id || '');
+    initForm({ form, mode, id: data?.id || '' });
     clearFormErrors(form);
     setFormReadOnly({ form, isReadOnly: false });
 

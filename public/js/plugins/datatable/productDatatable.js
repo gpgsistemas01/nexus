@@ -4,6 +4,7 @@ import { notifications } from "../swal/swalComponent.js";
 import { hasPermission } from "../../utils/permissions.js";
 import { getAllProductsRequest } from "../../services/warehouse/productService.js";
 import { renderMaterialName } from "./utils/renderProductDatatable.js";
+import { getResponsiveRowData } from "./utils/responsive.js";
 import { buildExcelButton } from "../../ui/excelUI.js";
 import { exportWarehouseReport } from "../../application/warehouse/report.js";
 import { formatInventoryFileName as formatFileName } from "../../utils/formatters.js";
@@ -13,8 +14,8 @@ const selectorTable = '#table';
 let lastLowStockNotification = '';
 let stockSocketConfigured = false;
 
-const table = document.querySelector(selectorTable);
-table.innerHTML = `
+const tableElement = document.querySelector(selectorTable);
+tableElement.innerHTML = `
     <thead>
         <tr>
             <th rowspan="2">Material</th>
@@ -127,14 +128,14 @@ export const createProductDatatable = (context) => {
 
     $(`${ selectorTable } tbody`).on('click', '.btn-edit', function () {
 
-        const data = table.row($(this).closest('tr')).data();
-
+        const data = getResponsiveRowData(table, this);
+    
         openProductModal({ mode: 'edit', data });
     });
 
     $(`${ selectorTable } tbody`).on('click', '.btn-adjust-stock', function() {
 
-        const data = table.row($(this).closest('tr')).data();
+        const data = getResponsiveRowData(table, this);
 
         openStockAdjustmentModal({ mode: 'edit-stock', data });
     });

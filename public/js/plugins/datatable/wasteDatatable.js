@@ -4,6 +4,7 @@ import { hasPermission } from "../../utils/permissions.js";
 import { renderMaterialName } from "./utils/renderProductDatatable.js";
 import { getAllWastesRequest } from "../../services/warehouse/wasteService.js";
 import { openWasteModal } from "../../pages/warehouse/wastesPage.js";
+import { getResponsiveRowData } from "./utils/responsive.js";
 
 const selectorTable = '#table';
 let lastLowStockNotification = '';
@@ -79,7 +80,7 @@ export const createWasteDatatable = (context) => {
 
     $(`${ selectorTable } tbody`).on('click', '.btn-edit', async function() {
 
-        const data = table.row($(this).closest('tr')).data();
+        const data = getResponsiveRowData(table, this);
 
         await openWasteModal({ mode: 'edit', data });
     });
