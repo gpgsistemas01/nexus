@@ -125,17 +125,17 @@ export const createProductDatatable = (context) => {
 
     configureStockRealtime(table);
 
-    $(`${ selectorTable } tbody`).on('click', '.btn-edit', async function() {
+    $(`${ selectorTable } tbody`).on('click', '.btn-edit', function () {
 
         const data = table.row($(this).closest('tr')).data();
 
-        await openProductModal({ mode: 'edit', data });
+        openProductModal({ mode: 'edit', data });
     });
 
-    $(`${ selectorTable } tbody`).on('click', '.btn-adjust-stock', async function() {
+    $(`${ selectorTable } tbody`).on('click', '.btn-adjust-stock', function() {
 
         const data = table.row($(this).closest('tr')).data();
 
-        await openStockAdjustmentModal({ mode: 'edit-stock', data });
+        openStockAdjustmentModal({ mode: 'edit-stock', data });
     });
 }

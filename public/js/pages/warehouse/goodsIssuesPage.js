@@ -62,7 +62,7 @@ useForm({
     },
 });
 
-export const openGoodsIssueModal = async ({ mode, data = null }) => {
+export const openGoodsIssueModal = ({ mode, data = null }) => {
 
     const form = document.querySelector(formId);
     const modalElement = document.querySelector(modalId);

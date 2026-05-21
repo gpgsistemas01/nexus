@@ -8,18 +8,27 @@
                 id: 'productSupplierInput',
                 name: 'supplierId',
                 class: 'supplier-select',
-                col: '12'
+                attrs: {
+                    'readonly': ''
+                },
+                col: '6'
             },
             {
                 id: 'presentationInput',
                 name: 'presentationId',
                 class: 'presentation-select',
+                attrs: {
+                    'readonly': ''
+                },
                 col: '6'
             },
             {
                 id: 'unitMeasureInput',
                 name: 'unitMeasureId',
                 class: 'unit-measure-select',
+                attrs: {
+                    'readonly': ''
+                },
                 col: '6'
             }
         ],
@@ -29,6 +38,9 @@
                 type: 'text',
                 name: 'name',
                 label: 'Nombre',
+                attrs: {
+                    'readonly': ''
+                },
                 col: '6'
             },
             {
@@ -37,6 +49,7 @@
                 name: 'base',
                 label: 'Base',
                 attrs: {
+                    'readonly': '',
                     'min': '0'
                 },
                 col: '6'
@@ -47,6 +60,7 @@
                 name: 'height',
                 label: 'Altura',
                 attrs: {
+                    'readonly': '',
                     'min': '0'
                 },
                 col: '6'
@@ -58,7 +72,7 @@
             id: 'reasonInput',
             name: 'reasonId',
             class: 'reason-select',
-            col: '6'
+            col: '12'
         }
     ],
     inputs: [
@@ -70,7 +84,7 @@
             attrs: {
                 'min': '0'
             },
-            col: '6'
+            col: '12'
         },
     ],
     textArea: {

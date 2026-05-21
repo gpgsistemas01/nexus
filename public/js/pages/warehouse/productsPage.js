@@ -44,9 +44,6 @@ export const openStockAdjustmentModal = ({
 
     clearFormErrors(form);
 
-    form.elements.observations.value = data.observations || '';
-    form.elements.newStock.value = data.newStock || '';
-
     modalElement.querySelector('#modalTitle').textContent = 'Editar stock de producto';
     form.querySelector('#submitBtn').textContent = 'Actualizar';
 
