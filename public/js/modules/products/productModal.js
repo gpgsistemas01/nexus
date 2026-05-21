@@ -16,14 +16,16 @@ export const openProductModal = ({
 
     initForm({ form, mode, id: data?.id });
     clearFormErrors(form);
-    initProductFormSelect2();
+    initProductFormSelect2({ modalSelector: productModalId });
 
     if (mode === 'create') {
 
         form.reset();
+
         if (form.elements.isActive) form.elements.isActive.checked = true;
+
         form.elements.name.value = data?.name || '';
-        setProductFormSelectOptions(data);
+        setProductFormSelectOptions({ modalSelector: productModalId, data });
 
         modalElement.querySelector('#modalTitle').textContent = 'Registrar producto';
         form.querySelector('#submitBtn').textContent = 'Guardar';
@@ -35,8 +37,10 @@ export const openProductModal = ({
         form.elements.minStock.value = data.minStock;
         form.elements.base.value = data.base || '';
         form.elements.height.value = data.height || '';
+
         if (form.elements.isActive) form.elements.isActive.checked = Boolean(data.isActive);
-        setProductFormSelectOptions(data);
+
+        setProductFormSelectOptions({ modalSelector: productModalId, data });
 
         modalElement.querySelector('#modalTitle').textContent = 'Editar producto';
         form.querySelector('#submitBtn').textContent = 'Actualizar';

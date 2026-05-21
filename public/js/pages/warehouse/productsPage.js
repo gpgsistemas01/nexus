@@ -1,6 +1,7 @@
 import { useForm } from "../../application/form.js";
 import { createProductDatatable } from "../../plugins/datatable/productDatatable.js";
-import { clearFormErrors, initForm } from "../../ui/formUI.js";
+import { initProductFormSelect2, setProductFormSelectOptions } from "../../plugins/select2/modules/productSelect.js";
+import { clearFormErrors, initForm, setFormReadOnly } from "../../ui/formUI.js";
 import { openModal } from "../../ui/modalUI.js";
 
 const formId = '#stockAdjustmentForm';
@@ -39,10 +40,23 @@ export const openStockAdjustmentModal = ({
     
     const form = document.querySelector(formId);
     const modalElement = document.querySelector(productModalId);
+    const fields = ['name', 'base', 'height', 'supplierId', 'presentationId', 'unitMeasureId'];
 
     initForm({ form, mode, id: data?.id });
+    setFormReadOnly({ form, fields, isReadOnly: true });
+    initProductFormSelect2({ modalSelector: productModalId, isStockAdjustment: true });
 
     clearFormErrors(form);
+
+    form.elements.name.value = data.name;
+    form.elements.height.value = data.height || '';
+    form.elements.base.value = data.base || '';
+
+    setProductFormSelectOptions({ 
+        modalSelector: productModalId, 
+        data, 
+        isStockAdjustment: true 
+    });
 
     modalElement.querySelector('#modalTitle').textContent = 'Editar stock de producto';
     form.querySelector('#submitBtn').textContent = 'Actualizar';

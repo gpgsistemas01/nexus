@@ -188,8 +188,23 @@ export const clearFormErrors = (form) => {
 
 export const setFormReadOnly = ({
     form,
+    fields = 'all',
     isReadOnly
 }) => {
+    
+    if (fields !== 'all') {
+
+        fields.forEach(field => {
+            const input = form.querySelector(`[name='${ field }']`);
+
+            if (input) {
+                if (isReadOnly) input.setAttribute('disabled', 'disabled');
+                else input.removeAttribute('disabled');
+            }
+        });
+
+        return;
+    }
     
     const { mode } = form.dataset;
     const elements = form.querySelectorAll('input, select, textarea');
