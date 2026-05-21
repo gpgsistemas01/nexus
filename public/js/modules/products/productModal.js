@@ -1,6 +1,6 @@
 import { openModal } from "../../ui/modalUI.js";
 import { initProductFormSelect2, setProductFormSelectOptions } from "../../plugins/select2/modules/productSelect.js";
-import { clearFormErrors } from "../../ui/formUI.js";
+import { clearFormErrors, initForm } from "../../ui/formUI.js";
 
 const productModalId = '#productModal';
 const formId = '#productForm';
@@ -14,8 +14,7 @@ export const openProductModal = ({
     const form = document.querySelector(formId);
     const modalElement = document.querySelector(productModalId);
 
-    form.dataset.mode = mode;
-    form.dataset.id = data?.id || '';
+    initForm(form, data?.id);
 
     clearFormErrors(form);
     initProductFormSelect2();
