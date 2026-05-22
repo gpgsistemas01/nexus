@@ -109,7 +109,10 @@ export const errorMap = {
     },
     observations: {
         INVALID_TYPE: 'OBSERVATIONS_INVALID_TYPE',
-        TOO_LONG: 'OBSERVATIONS_TOO_LONG'
+        TOO_LONG: (value) => ({
+            code: 'OBSERVATIONS_TOO_LONG',
+            meta: { value }
+        })
     },
     isInvoiced: {
         REQUIRED: 'INVOICED_REQUIRED',

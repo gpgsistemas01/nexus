@@ -116,7 +116,7 @@ export const errorMessages = {
 
     // OBSERVATIONS
     OBSERVATIONS_INVALID_TYPE: 'Las observaciones deben ser texto.',
-    OBSERVATIONS_TOO_LONG: 'Las observaciones no deben exceder más de 50 caracteres.',
+    OBSERVATIONS_TOO_LONG: (meta) => `Las observaciones no deben exceder más de ${meta.value} caracteres.`,
 
     INVOICED_REQUIRED: 'El tipo de factura debe ser seleccionado.',
     INVOICED_INVALID_BOOLEAN: 'El estado de la factura debe ser verdadero o falso.',
