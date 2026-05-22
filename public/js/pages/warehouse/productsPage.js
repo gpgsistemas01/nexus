@@ -4,7 +4,7 @@ import { createProductDatatable } from "../../plugins/datatable/productDatatable
 import { initProductFormSelect2, setProductFormSelectOptions } from "../../plugins/select2/modules/productSelect.js";
 import { clearFormErrors, initForm, setFormReadOnly } from "../../ui/formUI.js";
 import { openModal } from "../../ui/modalUI.js";
-import { validateFields } from "../../utils/formUtils.js";
+import { handleSubmit, validateFields } from "../../utils/formUtils.js";
 import { productStockValidators } from "../../utils/validations/validators.js";
 
 const formId = '#stockAdjustmentForm';
@@ -15,7 +15,12 @@ createProductDatatable(context);
 
 useForm({
     selector: formId,
-    normalizeData: ({ formData }) => formData,
+    normalizeData: ({ formData }) => {
+
+        formData.supplierId = document.querySelector(`${ productModalId } select[name='supplierId']`).value;
+        
+        return formData;
+    },
     getErrors: ({ formData }) => validateFields(productStockValidators, formData),
     sendRequest: async ({ formData, form }) => {
 

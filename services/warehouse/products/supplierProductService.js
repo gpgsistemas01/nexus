@@ -27,10 +27,12 @@ export const findCurrentSupplierProductByProductId = async ({
 
     const db = getDb(tx);
 
-    return db.supplierProduct.findFirst({
+    const currentSupplierProduct = await db.supplierProduct.findFirst({
         where: { productId },
         select: { supplierId: true, maxUnitCost: true }
     });
+
+    return currentSupplierProduct;
 };
 
 const mapSupplierProduct = (sp) => {
@@ -170,7 +172,7 @@ export const findSupplierProductByIds = async ({
         }
     });
 
-    if (!suppierProduct) return ProductNotFound();
+    if (!supplierProduct) return ProductNotFound();
 
     return mapSupplierProduct(supplierProduct);
 };
@@ -367,15 +369,19 @@ export const adjustSupplierProductStock = async ({
     productId,
     supplierId,
     newStock,
+    newConvertedQuantity
 }) => {
     
     const db = getDb(tx);
 
-    return await createStockAdjustment({
-        tx: db,
-        productId,
-        supplierId,
-        newStock
+    return await db.supplierProduct.update({
+        where: {
+            supplierId_productId: { productId, supplierId }
+        },
+        data: {
+            currentStock: newStock,
+            convertedQuantity: newConvertedQuantity
+        }
     });
 };
 

@@ -1,4 +1,5 @@
 import { MovementDetailRelationConflict } from "../../errors/inventory/movementError.js";
+import { InventoryMovementType } from "../../generated/prisma/enums.ts";
 import { getDb } from "../../repository/baseRepository.js";
 import { buildStockKey } from "../../utils/formattersUtils.js";
 import { updateSupplierProductStock } from "../warehouse/products/supplierProductService.js";
@@ -61,6 +62,7 @@ export const applyInventoryMovement = async ({
 
 export const createStockAdjustmentMovement = async ({
     tx,
+    adjustment,
     productId,
     supplierId,
     reasonId,
@@ -76,37 +78,32 @@ export const createStockAdjustmentMovement = async ({
     return await db.inventoryMovement.create({
         data: {
             type: InventoryMovementType.ADJUSTMENT,
-            connect: {
-                stockAdjustment: {
+            stockAdjustment: {
+                connect: {
                     id: adjustment.id
                 }
             },
 
             details: {
                 create: {
-                    quantity: Math.abs(difference),
+                    quantity: difference,
                     newStock,
                     newConvertedQuantity,
                     convertedQuantity: newConvertedQuantity,
                     previousStock,
                     previousConvertedQuantity,
-                    connect: {
-                        product: {
+                    product: {
+                        connect: {
                             id: productId
                         }
                     },
-                    connect: {
-                        supplier: {
+                    supplier: {
+                        connect: {
                             id: supplierId
                         }
                     },
-                    connect: {
-                        reason: {
-                            id: reasonId
-                        }
-                    },
-                    connect: {
-                        stockAdjustmentDetail: {
+                    stockAdjustmentDetail: {
+                        connect: {
                             id: adjustment.details[0].id
                         }
                     }

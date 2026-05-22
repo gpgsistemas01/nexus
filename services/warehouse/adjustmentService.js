@@ -1,7 +1,10 @@
-import { AdjustmentStatus, InventoryMovementType, StockAdjustmentType } from "../../generated/prisma/enums.js";
+import { AdjustmentStatus, InventoryMovementType, StockAdjustmentType } from "../../generated/prisma/enums.ts";
 import { getDb } from "../../repository/baseRepository.js";
+import { generateReferenceNumber } from "../document/referenceNumberService.js";
 import { createStockAdjustmentMovement } from "../inventory/movementService.js";
 import { adjustSupplierProductStock, findSupplierProductByIds } from "./products/supplierProductService.js";
+
+const REFERENCE_NUMBER_TYPE = 'AJU';
 
 export const createStockAdjustment = async ({
     productId,
@@ -12,13 +15,14 @@ export const createStockAdjustment = async ({
     userId
 }) => {
 
+    const product = await findSupplierProductByIds({
+        productId,
+        supplierId
+    });
+
     return await getDb().$transaction(async (tx) => {
 
-        const product = await findSupplierProductByIds({
-            tx,
-            productId,
-            supplierId
-        });
+        const referenceNumber = await generateReferenceNumber({ type: REFERENCE_NUMBER_TYPE, tx });
 
         const previousStock = Number(product.currentStock);
 
@@ -41,15 +45,26 @@ export const createStockAdjustment = async ({
 
         const adjustment = await tx.stockAdjustment.create({
             data: {
-                referenceNumber: crypto.randomUUID(),
+                referenceNumber,
                 type: adjustmentType,
-                reasonId,
                 observations,
                 status: AdjustmentStatus.APPLIED,
-                createdById: userId,
-                approvedById: userId,
                 appliedAt: new Date(),
-
+                reason: {
+                    connect: {
+                        id: reasonId
+                    }
+                },
+                createdBy: {
+                    connect: {
+                        id: userId
+                    }
+                },
+                approvedBy: {
+                    connect: {
+                        id: userId
+                    }
+                },
                 details: {
                     create: {
                         productId,
@@ -75,6 +90,7 @@ export const createStockAdjustment = async ({
 
         await createStockAdjustmentMovement({
             tx,
+            adjustment,
             productId,
             supplierId,
             reasonId,

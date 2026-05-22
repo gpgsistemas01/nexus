@@ -12,6 +12,7 @@ export const productValidation = [
 ]
 
 export const productStockValidation = [
+    validateUUID('supplierId'),
     validateNumber('newStock'),
     validateTextOptional('observations', 255),
     validateUUID('reasonId'),

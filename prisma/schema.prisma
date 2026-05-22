@@ -31,7 +31,9 @@ model User {
   isActive     Boolean              @default(true)
   profile      Profile?             @relation(fields: [profileId], references: [id])
   accesses     UserRoleDepartment[]
-  Notification Notification[]
+  notifications        Notification[]
+  createrStockAdjustment        StockAdjustment[]     @relation("CreatedStockAdjustments")
+  approverStockAdjustment       StockAdjustment[]     @relation("ApprovedStockAdjustments")
 }
 
 model UserRoleDepartment {
@@ -61,8 +63,6 @@ model Profile {
   deliveredPurchaseRequisitions PurchaseRequisition[] @relation("DeliveredByRelation")
   clients                       Client[]
   goodsIssues                   GoodsIssue[]
-  createrStockAdjustment        StockAdjustment[]     @relation("CreatedStockAdjustments")
-  approverStockAdjustment       StockAdjustment[]     @relation("ApprovedStockAdjustments")
 }
 
 model DepartmentProfile {
@@ -392,7 +392,7 @@ model MovementDetail {
   id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
 
   quantity          Decimal  @db.Decimal(10, 2)
-  quantityConverted Decimal? @db.Decimal(10, 2)
+  convertedQuantity Decimal? @db.Decimal(10, 2)
 
   newStock                  Decimal? @db.Decimal(10, 2)
   newConvertedQuantity      Decimal? @db.Decimal(10, 2)
@@ -432,8 +432,8 @@ model StockAdjustment {
   approvedById String? @db.Uuid
 
   reason     StockAdjustmentReason @relation(fields: [reasonId], references: [id])
-  createdBy  Profile               @relation("CreatedStockAdjustments", fields: [createdById], references: [id])
-  approvedBy Profile?              @relation("ApprovedStockAdjustments", fields: [approvedById], references: [id])
+  createdBy  User               @relation("CreatedStockAdjustments", fields: [createdById], references: [id])
+  approvedBy User?              @relation("ApprovedStockAdjustments", fields: [approvedById], references: [id])
 
   movement InventoryMovement?
 

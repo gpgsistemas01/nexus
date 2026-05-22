@@ -23,7 +23,7 @@ export const initReasonSelect = ({
             return {
                 results: list.map(p => ({
                     id: p.id,
-                    text: p.fullName
+                    text: p.name
                 }))
             };
         },
