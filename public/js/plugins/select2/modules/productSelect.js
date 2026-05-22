@@ -41,6 +41,7 @@ export const initProductFormSelect2 = ({
     initReasonSelect({
         modalSelector,
         baseSelector: reasonScopedSelector,
+        allowCreate: false
     });
 };
 
