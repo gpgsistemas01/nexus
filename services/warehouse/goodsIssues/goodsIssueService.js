@@ -23,7 +23,6 @@ const ROLE_SYSTEM_ADMIN = 'Administrador del sistema';
 const ROLE_COORDINATOR = 'Coordinador';
 const DEPARTMENT_WAREHOUSE = 'ALMACÉN Y PROVEDURÍA';
 const FULFILLMENT_PENDING = 'Pendiente';
-const FULFILLMENT_COMPLETE = 'Surtido';
 const STATUS_APPROVED = 'Aprobada';
 const REFERENCE_NUMBER_TYPE = 'SAL';
 const MOVEMENT_TYPE_OUT = 'OUT';
@@ -33,9 +32,9 @@ export const findAllGoodsIssues = async ({
     skip = 0,
     take = 10,
     search = '',
+    fulfillmentStatusId = '',
     orderBy = 'referenceNumber',
     orderDir = 'asc',
-    onlyPending = true,
     accesses = []
 }) => {
 
@@ -76,12 +75,8 @@ export const findAllGoodsIssues = async ({
                 }
             ]
         }),
-        ...(onlyPending && {
-            fulfillmentStatus: {
-                name: {
-                    not: FULFILLMENT_COMPLETE
-                }
-            }
+        ...(fulfillmentStatusId && {
+            fulfillmentStatusId
         }),
         ...(!canViewAll && {
             department: {

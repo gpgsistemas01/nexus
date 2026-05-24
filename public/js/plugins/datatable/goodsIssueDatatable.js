@@ -5,10 +5,13 @@ import { createDataTable, refreshProductTable, renderActionButtons } from "./bas
 import { buildDetailsColumns, buildDetailsHeader } from "./utils/builderDetailDatatable.js";
 import { handleDelete, renderMaterialName } from "./utils/renderProductDatatable.js";
 import { getResponsiveRowData } from "./utils/responsive.js";
+import { setupTableSelectFilter } from "./utils/tableFilter.js";
 
 export let details = [];
 const selectorProductTable = '#productTable';
-const selectorTable = '#table';
+const tableSelector = '#table';
+let getFulfillmentStatusFilterValue = () => undefined;
+
 let productTable;
 
 export const createGoodsIssueDatatable = (context) => {
@@ -55,7 +58,10 @@ export const createGoodsIssueDatatable = (context) => {
     const table = createDataTable({
         options: {
             ajax: {
-                get: getAllGoodsIssuesRequest
+                get: (params) => getAllGoodsIssuesRequest({
+                    ...params,
+                    fulfillmentStatusId: getFulfillmentStatusFilterValue()
+                })
             },
             columns,
             buttons: [
@@ -67,21 +73,29 @@ export const createGoodsIssueDatatable = (context) => {
         }
     });
 
-    $(`${ selectorTable } tbody`).on('click', '.btn-edit', function () {
+    setupTableSelectFilter({
+        table,
+        tableSelector,
+        preset: 'fulfillmentStatus'
+    }).then(({ getValue }) => {
+        getFulfillmentStatusFilterValue = getValue;
+    });
+
+    $(`${ tableSelector } tbody`).on('click', '.btn-edit', function () {
 
         const data = getResponsiveRowData(table, this);
 
         openGoodsIssueModal({ mode: 'edit', data });
     })
 
-    $(`${ selectorTable } tbody`).on('click', '.btn-edit-detail', function() {
+    $(`${ tableSelector } tbody`).on('click', '.btn-edit-detail', function() {
 
         const data = getResponsiveRowData(table, this);
 
         openGoodsIssueModal({ mode: 'edit-detail', data });
     });
 
-    $(`${ selectorTable } tbody`).on('click', '.btn-view', function() {
+    $(`${ tableSelector } tbody`).on('click', '.btn-view', function() {
 
         const data = getResponsiveRowData(table, this);
 

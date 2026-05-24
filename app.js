@@ -14,6 +14,7 @@ import presentationApiRoutes from './routes/api/warehouse/presentationApiRoute.j
 import departmentApiRoutes from './routes/api/admin/departmentApiRoute.js';
 import profileApiRoutes from './routes/api/admin/profileApiRoute.js';
 import reasonApiRoutes from './routes/api/warehouse/reasonApiRoute.js';
+import fulfillmentStatusApiRoutes from './routes/api/warehouse/fulfillmentStatusApiRoute.js';
 
 import loginWebRoutes from './routes/web/auth/loginWebRoute.js';
 import logoutWebRoutes from './routes/web/auth/logoutWebRoute.js';
@@ -104,6 +105,7 @@ app.use(apiRoute + warehouse + '/presentations', presentationApiRoutes);
 app.use(apiRoute + admin + '/departments', departmentApiRoutes);
 app.use(apiRoute + admin + '/profiles', profileApiRoutes);
 app.use(apiRoute + warehouse + '/reasons', reasonApiRoutes);
+app.use(apiRoute + warehouse + '/fulfillment-statuses', fulfillmentStatusApiRoutes);
 
 app.use((req, res, next) => {
     res.status(404).json({ message: 'Ruta no encontrada.' });
