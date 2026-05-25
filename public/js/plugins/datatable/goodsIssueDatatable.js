@@ -1,5 +1,5 @@
 import { openGoodsIssueModal } from "../../pages/warehouse/goodsIssuesPage.js";
-import { getAllGoodsIssues } from "../../application/warehouse/goodsIssues.js";
+import { getAllGoodsIssues } from "../../application/warehouse/goodsIssues/goodsIssues.js";
 import { hasPermission } from "../../utils/permissions.js";
 import { createDataTable, refreshProductTable, renderActionButtons } from "./baseDatatable.js";
 import { buildDetailsColumns, buildDetailsHeader } from "./utils/builderDetailDatatable.js";

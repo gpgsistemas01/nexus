@@ -1,5 +1,5 @@
 import { useForm } from "../../application/form.js";
-import { editGoodsIssue, editGoodsIssueDetails, registerGoodsIssue } from "../../application/warehouse/goodsIssues.js";
+import { editGoodsIssue, editGoodsIssueDetails, registerGoodsIssue } from "../../application/warehouse/goodsIssues/goodsIssues.js";
 import { validateAddProductValidators, validateGoodsIssueDetailValidators, validateGoodsIssueValidators } from "../../utils/validations/validators.js";
 import { refreshProductTable } from "../../plugins/datatable/baseDatatable.js";
 import { createGoodsIssueDatatable, details, initDetailsGoodsIssueTable } from "../../plugins/datatable/goodsIssueDatatable.js";
