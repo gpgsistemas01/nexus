@@ -2,7 +2,7 @@ import { createDataTable, renderActionButtons } from "./baseDatatable.js";
 import { notifications } from "../swal/swalComponent.js";
 import { hasPermission } from "../../utils/permissions.js";
 import { renderMaterialName } from "./utils/renderProductDatatable.js";
-import { getAllWastesRequest } from "../../services/warehouse/wasteService.js";
+import { getAllWastes } from "../../application/warehouse/wastes.js";
 import { openWasteModal } from "../../pages/warehouse/wastesPage.js";
 import { getResponsiveRowData } from "./utils/responsive.js";
 
@@ -66,7 +66,7 @@ export const createWasteDatatable = (context) => {
     const table = createDataTable({
         options: {
             ajax: {
-                get: getAllWastesRequest
+                get: getAllWastes
             },
             columns,
             buttons: [

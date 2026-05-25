@@ -1,4 +1,4 @@
-import { getAllReasonsRequest } from "../../../services/warehouse/reasonService.js";
+import { getAllReasons } from "../../../application/warehouse/reasons.js";
 import { initbaseSelect2, toggleSelectOption } from "../baseSelect.js";
 
 export const initReasonSelect = ({ 
@@ -12,7 +12,7 @@ export const initReasonSelect = ({
     initbaseSelect2({
         baseSelector,
         modalSelector,
-        get: getAllReasonsRequest,
+        get: getAllReasons,
         clearOnOpen,
         data,
         placeholder: 'Seleccione una razón...',

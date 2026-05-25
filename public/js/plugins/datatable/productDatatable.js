@@ -2,7 +2,7 @@ import { openProductModal } from "../../modules/products/productModal.js";
 import { createDataTable, renderActionButtons } from "./baseDatatable.js";
 import { notifications } from "../swal/swalComponent.js";
 import { hasPermission } from "../../utils/permissions.js";
-import { getAllProductsRequest } from "../../services/warehouse/productService.js";
+import { getAllProducts } from "../../application/warehouse/products.js";
 import { renderMaterialName } from "./utils/renderProductDatatable.js";
 import { getResponsiveRowData } from "./utils/responsive.js";
 import { buildExcelButton } from "../../ui/excelUI.js";
@@ -81,7 +81,7 @@ export const createProductDatatable = (context) => {
     const table = createDataTable({
         options: {
             ajax: {
-                get: getAllProductsRequest
+                get: getAllProducts
             },
             columns,
             createdRow: (row, data) => {

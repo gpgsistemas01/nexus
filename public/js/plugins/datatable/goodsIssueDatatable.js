@@ -1,5 +1,5 @@
 import { openGoodsIssueModal } from "../../pages/warehouse/goodsIssuesPage.js";
-import { getAllGoodsIssuesRequest } from "../../services/warehouse/goodsIssueService.js";
+import { getAllGoodsIssues } from "../../application/warehouse/goodsIssues.js";
 import { hasPermission } from "../../utils/permissions.js";
 import { createDataTable, refreshProductTable, renderActionButtons } from "./baseDatatable.js";
 import { buildDetailsColumns, buildDetailsHeader } from "./utils/builderDetailDatatable.js";
@@ -14,7 +14,7 @@ let getFulfillmentStatusFilterValue = () => undefined;
 
 let productTable;
 
-export const createGoodsIssueDatatable = (context) => {
+export const createGoodsIssueDatatable = async (context) => {
 
     const { isWarehouse, isSystem } = hasPermission(context);
 
@@ -55,12 +55,16 @@ export const createGoodsIssueDatatable = (context) => {
         }
     );
 
+    const filterConfig = await setupTableSelectFilter();
+
+    getFulfillmentStatusFilterValue = filterConfig?.getValue || (() => undefined);
+
     const table = createDataTable({
         options: {
             ajax: {
-                get: (params) => getAllGoodsIssuesRequest({
+                get: (params) => getAllGoodsIssues({
                     ...params,
-                    fulfillmentStatusId: getFulfillmentStatusFilterValue()
+                    fulfillmentStatusId: getFulfillmentStatusFilterValue() || ''
                 })
             },
             columns,
@@ -74,11 +78,7 @@ export const createGoodsIssueDatatable = (context) => {
     });
 
     setupTableSelectFilter({
-        table,
-        tableSelector,
-        preset: 'fulfillmentStatus'
-    }).then(({ getValue }) => {
-        getFulfillmentStatusFilterValue = getValue;
+        table
     });
 
     $(`${ tableSelector } tbody`).on('click', '.btn-edit', function () {

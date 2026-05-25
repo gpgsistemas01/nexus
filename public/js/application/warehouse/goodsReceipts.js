@@ -1,7 +1,5 @@
 import { getErrorMessage, getSuccessMessage } from "../../constants/apiMessages.js";
-import {
-    registerGoodsReceiptRequest
-} from "../../services/warehouse/goodsReceiptService.js";
+import { getAllGoodsReceiptsRequest, registerGoodsReceiptRequest } from "../../services/warehouse/goodsReceiptService.js";
 
 export const registerGoodsReceipt = async (formData) => {
 
@@ -15,3 +13,10 @@ export const registerGoodsReceipt = async (formData) => {
         message
     };
 }
+
+export const getAllGoodsReceipts = async (params = {}) => {
+
+    const response = await getAllGoodsReceiptsRequest(params);
+
+    return response.data;
+};
