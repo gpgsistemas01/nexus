@@ -21,3 +21,17 @@ export const registerClient = async (formData) => {
         data: client 
     };
 }
+
+export const editClient = async (id, formData) => {
+
+    const response = await editClientRequest(id, formData);
+
+    const { data } = response;
+    const { code, client } = data;
+    let message = getSuccessMessage(code);
+
+    return { 
+        message, 
+        data: client 
+    };
+}
