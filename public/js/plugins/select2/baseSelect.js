@@ -29,7 +29,6 @@ export const initbaseSelect2 = ({
 
     if ($(baseSelector).hasClass("select2-hidden-accessible")) $(baseSelector).select2('destroy');
 
-
     $(baseSelector).select2({ 
         language: 'es',
         multiple,

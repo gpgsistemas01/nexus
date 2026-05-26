@@ -14,7 +14,15 @@ createProfilesDatatable();
 
 useForm({
     selector: formId,
-    normalizeData: ({ formData }) => formData,
+    normalizeData: ({ form, formData }) => {
+
+        const fd = new FormData(form);
+        
+        return {
+            ...formData,
+            departmentIds: fd.getAll('departmentIds')
+        }
+    },
     getErrors: ({ formData }) => validateFields(profileValidators, formData),
     sendRequest: async ({ formData, form }) => {
         
