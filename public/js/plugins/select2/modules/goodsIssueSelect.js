@@ -1,5 +1,5 @@
 import { getSelectedOptionText } from "../../../utils/domUtils.js";
-import { resolveAdvisorDepartmentByClientName, isInternalClientName, resolveProjectNumberByClientAndDepartment, salesDepartmentName } from "../../../application/warehouse/goodsIssues/goodsIssueRules.js";
+import { resolveAdvisorDepartmentByClientName, resolveProjectNumberByClientAndDepartment } from "../../../application/warehouse/goodsIssues/goodsIssueRules.js";
 import { toggleDisabledElement } from "../../../utils/formUtils.js";
 import { bindDependency } from "../baseSelect.js";
 import { setupClientSelect, toggleClientOption } from "../domains/client.js";
@@ -28,19 +28,20 @@ export const initGoodsIssueFormSelect2 = () => {
 
     const syncInternalClientProjectNumber = () => {
         const projectNumberInput = modal?.querySelector(projectNumberSelector);
+        if (!projectNumberInput) return;
+
         const projectNumber = resolveProjectNumberByClientAndDepartment({
             clientName: getSelectedOptionText(clientScopedSelector),
             departmentName: getSelectedOptionText(departmentScopedSelector)
         });
 
-        if (projectNumberInput && projectNumber) {
-            projectNumberInput.value = projectNumber;
-            const projectNumberInputInstance = initMdbWrapperInput({
-                selector: `${ modalSelector } ${ projectNumberSelector }`,
-                value: projectNumber
-            });
-            updateMdbWrapperInput(projectNumberInputInstance);
-        }
+        projectNumberInput.value = projectNumber || '';
+
+        const projectNumberInputInstance = initMdbWrapperInput({
+            selector: `${ modalSelector } ${ projectNumberSelector }`,
+            value: projectNumber || ''
+        });
+        updateMdbWrapperInput(projectNumberInputInstance);
     };
 
     initDepartmentSelect({
@@ -63,8 +64,7 @@ export const initGoodsIssueFormSelect2 = () => {
             return {
                 search: params.term,
                 department: resolveAdvisorDepartmentByClientName({
-                    clientName: getSelectedOptionText(clientScopedSelector),
-                    fallbackDepartment: salesDepartmentName
+                    clientName: getSelectedOptionText(clientScopedSelector)
                 }),
                 strictDepartmentFilter: true
             };
@@ -120,8 +120,6 @@ export const initGoodsIssueFormSelect2 = () => {
         sourceSelector: clientScopedSelector,
         onChange: () => {
             syncInternalClientProjectNumber();
-
-            if (!isInternalClientName(getSelectedOptionText(clientScopedSelector))) return;
 
             toggleProfileOption({
                 selector: advisorScopedSelector,
