@@ -6,7 +6,9 @@ const allowedDepartments = ['ALMACÉN Y PROVEDURÍA', 'SISTEMAS'];
 
 export const getAllProfiles = async (req, res) => {
 
-    const { department } = req.query;
+    const rawDepartment =
+        req.query.department ??
+        req.query['department[]'];
     const strictDepartmentFilter = req.query.strictDepartmentFilter === 'true';
     const { user } = req;
     const start = parseInt(req.query.start) || 0;
@@ -24,9 +26,17 @@ export const getAllProfiles = async (req, res) => {
         allowedDepartments.includes(departmentName)
     );
 
-    const departments = department
-        ? [department]
-        : (canViewAllProfiles && !strictDepartmentFilter ? [] : userDepartments);
+    const departmentFilters = Array.isArray(rawDepartment)
+        ? rawDepartment
+        : rawDepartment
+            ? [rawDepartment]
+            : [];
+
+    const shouldUseExplicitDepartmentFilters = strictDepartmentFilter || departmentFilters.length > 0;
+
+    const departments = shouldUseExplicitDepartmentFilters
+        ? departmentFilters
+        : (canViewAllProfiles ? [] : userDepartments);
 
     const result = await findAllProfiles({
         departments,

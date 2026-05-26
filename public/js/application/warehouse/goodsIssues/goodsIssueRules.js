@@ -3,6 +3,7 @@ import { normalizeText } from "../../../utils/formatters.js";
 export const internalClientName = 'GPG INTERNO';
 export const warehouseDepartmentName = 'ALMACÉN Y PROVEDURÍA';
 export const salesDepartmentName = 'VENTAS Y PROYECTOS ESPECIALES';
+export const managementDepartmentName = 'DIRECCIÓN';
 
 export const projectNumberByDepartment = new Map([
     ['DIRECCIÓN', '120000'],
@@ -25,13 +26,12 @@ export const isInternalClientName = (clientName = '') => (
 );
 
 export const resolveAdvisorDepartmentByClientName = ({
-    clientName = '',
-    fallbackDepartment = ''
+    clientName = ''
 } = {}) => {
 
     if (isInternalClientName(clientName)) return warehouseDepartmentName;
 
-    return fallbackDepartment;
+    return [salesDepartmentName, managementDepartmentName];
 };
 
 export const resolveProjectNumberByClientAndDepartment = ({
