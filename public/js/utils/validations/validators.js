@@ -74,6 +74,15 @@ export const validateClientValidators = {
 }
 
 export const profileValidators = {
-    name: (value) => validateText({ name: value, length: 100, fieldName: 'El nombre' }),
-    departmentId: (value) => isEmptyOrNull(value, 'El departamento'),
+    fullName: (value) => validateText({ name: value, length: 100, fieldName: 'El nombre' }),
+    departments: (value) => {
+
+        if (!Array.isArray(value) || !value.length) return 'Seleccione al menos un departamento';
+
+        const hasInvalid = value.some(department => isEmptyOrNull(department));
+
+        if (hasInvalid) return 'Todos los departamentos seleccionados deben ser válidos';
+
+        return null;
+    },
 }

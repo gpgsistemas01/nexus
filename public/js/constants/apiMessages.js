@@ -66,6 +66,9 @@ export const errorMessages = {
     REASON_ID_REQUIRED: 'La razón es requerida.',
     REASON_ID_INVALID_UUID: 'La razón no es válida.',
 
+    DEPARTMENTS_REQUIRED: 'Los departamentos son requeridos.',
+    DEPARTMENTS_INVALID_FORMAT: 'Los departamentos seleccionados no son válidos.',
+
     // 👤 USERNAME
     USERNAME_REQUIRED: 'El nombre de usuario es requerido.',
     USERNAME_INVALID_TYPE: 'El nombre de usuario debe ser texto.',
