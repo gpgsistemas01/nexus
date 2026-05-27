@@ -15,6 +15,7 @@ import departmentApiRoutes from './routes/api/admin/departmentApiRoute.js';
 import profileApiRoutes from './routes/api/admin/profileApiRoute.js';
 import reasonApiRoutes from './routes/api/warehouse/reasonApiRoute.js';
 import fulfillmentStatusApiRoutes from './routes/api/warehouse/fulfillmentStatusApiRoute.js';
+import movementApiRoutes from './routes/api/admin/movementApiRoute.js';
 
 import loginWebRoutes from './routes/web/auth/loginWebRoute.js';
 import logoutWebRoutes from './routes/web/auth/logoutWebRoute.js';
@@ -28,6 +29,7 @@ import goodsReceiptWebRoutes from './routes/web/warehouse/goodsReceiptWebRoute.j
 import goodsIssueWebRoutes from './routes/web/warehouse/goodsIssueWebRoute.js';
 import profileWebRoutes from './routes/web/admin/profileWebRoute.js';
 import clientWebRoutes from './routes/web/sales/clientWebRoute.js';
+import movementWebRoutes from './routes/web/admin/movementWebRoute.js';
 
 import { checkTypeContentJson, checkTypeContentFile, checkContentTypePlainText } from './middleware/contentTypeMiddleware.js';
 import cookieParser from 'cookie-parser';
@@ -94,6 +96,7 @@ app.use('/salidas-almacen', goodsIssueWebRoutes);
 app.use('/perfiles', profileWebRoutes);
 app.use('/clientes', clientWebRoutes);
 app.use('/proveedores', supplierWebRoutes);
+app.use('/movimientos', movementWebRoutes);
 
 // api routes
 app.use(apiRoute + authRoute, authApiRoutes);
@@ -111,6 +114,7 @@ app.use(apiRoute + admin + '/departments', departmentApiRoutes);
 app.use(apiRoute + admin + '/profiles', profileApiRoutes);
 app.use(apiRoute + warehouse + '/reasons', reasonApiRoutes);
 app.use(apiRoute + warehouse + '/fulfillment-statuses', fulfillmentStatusApiRoutes);
+app.use(apiRoute + warehouse + '/movements', movementApiRoutes);
 
 app.use((req, res, next) => {
     res.status(404).json({ message: 'Ruta no encontrada.' });
