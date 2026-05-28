@@ -43,6 +43,12 @@ const items = [
         isVisible: isAdmin
     },
     {
+        content: 'Usuarios',
+        href: '/usuarios-sistemas',
+        isActive: currentRoute === '/usuarios-sistemas',
+        isVisible: hasDepartment('SISTEMAS') && hasRole('Administrador del sistema')
+    },
+    {
         content: 'Perfiles',
         href: '/perfiles',
         isActive: currentRoute === '/perfiles',

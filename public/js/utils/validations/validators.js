@@ -73,6 +73,23 @@ export const validateClientValidators = {
     name: (value) => validateText({ name: value, length: 100, fieldName: 'El nombre', regex: /^[^<>\\{}[\]]+$/u }),
 }
 
+export const userValidators = {
+    name: validateUsername,
+    password: validatePassword,
+    departmentId: (value) => isEmptyOrNull(value, 'El área'),
+    roleId: (value) => isEmptyOrNull(value, 'El rol')
+};
+
+export const userEditValidators = {
+    name: validateUsername,
+    departmentId: (value) => isEmptyOrNull(value, 'El área'),
+    roleId: (value) => isEmptyOrNull(value, 'El rol')
+};
+
+export const userPasswordValidators = {
+    password: validatePassword,
+};
+
 export const profileValidators = {
     fullName: (value) => validateText({ name: value, length: 100, fieldName: 'El nombre' }),
     departments: (value) => {
