@@ -115,6 +115,10 @@ export const findAllMovements = async ({
 
             productName: detail.product.name,
 
+            productBase: detail.productBase,
+
+            productHeight: detail.productHeight,
+
             supplierName: detail.supplier?.tradeName,
 
             quantity: detail.quantity,
