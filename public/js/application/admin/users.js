@@ -8,9 +8,9 @@ export const getAllUsers = async (params = {}) => {
     return response;
 };
 
-export const registerUser = async (formData) => {
+export const registerUser = async ({ formData }) => {
 
-    const response = await registerUserRequest(formData);
+    const response = await registerUserRequest({ data: formData });
 
     const { data } = response;
     const { code, user } = data;
@@ -24,7 +24,7 @@ export const registerUser = async (formData) => {
 
 export const editUser = async ({ formData, id }) => {
 
-    const response = await editUserRequest({ formData, id });
+    const response = await editUserRequest({ data: formData, id });
 
     const { data } = response;
     const { code, user } = data;

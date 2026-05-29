@@ -21,7 +21,7 @@ export const getAllSuppliers = async (params = {}) => {
     return response;
 };
 
-export const registerSupplier = async (formData) => {
+export const registerSupplier = async ({ formData }) => {
 
     const response = await registerSupplierRequest({ data: formData });
 

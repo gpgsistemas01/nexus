@@ -29,7 +29,7 @@ export const getAllProducts = async (params = {}) => {
     return response;
 };
 
-export const registerProduct = async (formData) => {
+export const registerProduct = async ({ formData }) => {
 
     const response = await registerProductRequest({ data: formData });
 

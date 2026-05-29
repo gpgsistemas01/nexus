@@ -8,7 +8,7 @@ export const getAllUsersRequest = (params) => apiRequest({
     params
 });
 
-export const registerUserRequest = (data) => apiRequest({
+export const registerUserRequest = ({ data }) => apiRequest({
     method: 'post',
     url: USERS_API_ROUTE,
     data

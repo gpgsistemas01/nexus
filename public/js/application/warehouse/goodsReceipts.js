@@ -8,7 +8,7 @@ export const getAllGoodsReceipts = async (params = {}) => {
     return response;
 };
 
-export const registerGoodsReceipt = async (formData) => {
+export const registerGoodsReceipt = async ({ formData }) => {
 
     const response = await registerGoodsReceiptRequest({ data: formData });
 

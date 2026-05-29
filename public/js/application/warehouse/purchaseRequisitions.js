@@ -6,7 +6,7 @@ import {
     registerPurchaseRequisitionRequest
 } from "../../services/warehouse/purchaseRequisitionService.js";
 
-export const registerPurchaseRequisition = async (formData) => {
+export const registerPurchaseRequisition = async ({ formData }) => {
 
     const response = await registerPurchaseRequisitionRequest({ data: formData });
 

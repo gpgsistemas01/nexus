@@ -8,7 +8,7 @@ export const getAllClients = async (params = {}) => {
     return response;
 };
 
-export const registerClient = async (formData) => {
+export const registerClient = async ({ formData }) => {
 
     const response = await createClientRequest({ data: formData });
 

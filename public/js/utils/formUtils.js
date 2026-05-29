@@ -9,7 +9,7 @@ export const handleSubmit = async ({ form, formData, create, update }) => {
     const mode = form.dataset.mode;
     let response;
 
-    if (mode === 'create') response = await create(formData);
+    if (mode === 'create') response = await create({ formData });
     else {
 
         if (!id) {

@@ -8,9 +8,9 @@ export const getAllProfiles = async (params = {}) => {
     return response;
 };
 
-export const registerProfile = async (formData) => {
+export const registerProfile = async ({ formData }) => {
 
-    const response = await registerProfileRequest(formData);
+    const response = await registerProfileRequest({ data: formData });
 
     const { data } = response;
     const { code, profile } = data;
