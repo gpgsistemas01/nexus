@@ -3,8 +3,8 @@ import { getAllProfilesRequest, registerProfileRequest, updateProfileRequest } f
 
 export const getAllProfiles = async (params = {}) => {
 
-    const response = await getAllProfilesRequest(params);
-    
+    const response = await getAllProfilesRequest({ params });
+
     return response;
 };
 

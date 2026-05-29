@@ -2,7 +2,7 @@ import { apiRequest } from '../axiosInstanceApi.js';
 
 const USERS_API_ROUTE = '/api/admin/users';
 
-export const getAllUsersRequest = (params) => apiRequest({
+export const getAllUsersRequest = ({ params }) => apiRequest({
     method: 'get',
     url: USERS_API_ROUTE,
     params

@@ -3,7 +3,7 @@ import { editUserPasswordRequest, editUserRequest, getAllUsersRequest, registerU
 
 export const getAllUsers = async (params = {}) => {
 
-    const response = await getAllUsersRequest(params);
+    const response = await getAllUsersRequest({ params });
 
     return response;
 };
