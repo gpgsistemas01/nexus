@@ -1,16 +1,32 @@
 import xlsx from 'xlsx';
-import { findWarehouseReportRows } from "../../../services/warehouse/reportService.js";
+import { findGoodsIssueReportRows, findWarehouseReportRows } from "../../../services/warehouse/reportService.js";
 
 const SHEET_NAME = 'Inventario';
 const FILENAME = 'reporte_inventario_productos';
+const GOODS_ISSUE_SHEET_NAME = 'Salidas';
+const GOODS_ISSUE_FILENAME = 'reporte_salidas';
 
-const getReportFilename = () => {
+const getReportFilename = (filename = FILENAME) => {
 
     const now = new Date();
     const month = String(now.getUTCMonth() + 1).padStart(2, '0');
     const year = now.getUTCFullYear();
 
-    return `${ FILENAME }_${ month }_${ year }`;
+    return `${ filename }_${ month }_${ year }`;
+};
+
+const sendExcelResponse = ({ res, data, sheetName, filename }) => {
+
+    const workbook = xlsx.utils.book_new();
+    const worksheet = xlsx.utils.aoa_to_sheet(data);
+
+    xlsx.utils.book_append_sheet(workbook, worksheet, sheetName);
+
+    const excelBuffer = xlsx.write(workbook, { bookType: 'xlsx', type: 'buffer' });
+
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    res.setHeader('Content-Disposition', `attachment; filename="${ getReportFilename(filename) }.xlsx"`);
+    return res.send(excelBuffer);
 };
 
 export const exportWarehouseReportExcel = async (req, res) => {
@@ -45,14 +61,64 @@ export const exportWarehouseReportExcel = async (req, res) => {
         ])
     ];
 
-    const workbook = xlsx.utils.book_new();
-    const worksheet = xlsx.utils.aoa_to_sheet(data);
+    return sendExcelResponse({
+        res,
+        data,
+        sheetName: SHEET_NAME,
+        filename: FILENAME
+    });
+};
 
-    xlsx.utils.book_append_sheet(workbook, worksheet, SHEET_NAME);
+export const exportGoodsIssueReportExcel = async (req, res) => {
 
-    const excelBuffer = xlsx.write(workbook, { bookType: 'xlsx', type: 'buffer' });
+    const rows = await findGoodsIssueReportRows({
+        search: req.query.search || '',
+        fulfillmentStatusId: req.query.fulfillmentStatusId || '',
+        accesses: req.user?.accesses || []
+    });
 
-    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-    res.setHeader('Content-Disposition', `attachment; filename="${ getReportFilename() }.xlsx"`);
-    return res.send(excelBuffer);
+    const data = [
+        [
+            'Folio',
+            'Fecha de solicitud',
+            'Área',
+            'Solicitante',
+            'Cliente',
+            'Proyecto',
+            'Estado de surtido',
+            'Material',
+            'Proveedor',
+            'Base',
+            'Altura',
+            'Cantidad solicitada',
+            'Cantidad convertida',
+            'Cantidad surtida',
+            'Estado del detalle'
+        ],
+
+        ...rows.map(row => [
+            row.referenceNumber,
+            row.requestDate,
+            row.departmentName,
+            row.requesterName,
+            row.clientName,
+            row.projectNumber,
+            row.fulfillmentStatusName,
+            row.productName,
+            row.supplierName,
+            row.productBase,
+            row.productHeight,
+            row.requestedQuantity,
+            row.convertedQuantity,
+            row.suppliedQuantity,
+            row.detailFulfillmentStatusName
+        ])
+    ];
+
+    return sendExcelResponse({
+        res,
+        data,
+        sheetName: GOODS_ISSUE_SHEET_NAME,
+        filename: GOODS_ISSUE_FILENAME
+    });
 };
