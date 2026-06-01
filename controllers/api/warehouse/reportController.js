@@ -1,10 +1,12 @@
 import xlsx from 'xlsx';
-import { findGoodsIssueReportRows, findWarehouseReportRows } from "../../../services/warehouse/reportService.js";
+import { findGoodsIssueReportRows, findGoodsReceiptReportRows, findWarehouseReportRows } from "../../../services/warehouse/reportService.js";
 
 const SHEET_NAME = 'Inventario';
 const FILENAME = 'reporte_inventario_productos';
 const GOODS_ISSUE_SHEET_NAME = 'Salidas';
 const GOODS_ISSUE_FILENAME = 'reporte_salidas';
+const GOODS_RECEIPT_SHEET_NAME = 'Compras';
+const GOODS_RECEIPT_FILENAME = 'reporte_compras';
 
 const getReportFilename = (filename = FILENAME) => {
 
@@ -120,5 +122,55 @@ export const exportGoodsIssueReportExcel = async (req, res) => {
         data,
         sheetName: GOODS_ISSUE_SHEET_NAME,
         filename: GOODS_ISSUE_FILENAME
+    });
+};
+
+export const exportGoodsReceiptReportExcel = async (req, res) => {
+
+    const rows = await findGoodsReceiptReportRows({
+        search: req.query.search || ''
+    });
+
+    const data = [
+        [
+            'Folio',
+            'Fecha de recepción',
+            'Recibió',
+            'Proveedor',
+            'N° Factura',
+            'Material',
+            'Base',
+            'Altura',
+            'Compra',
+            'Conversión',
+            'Costo unitario de conversión',
+            'Costo por presentación',
+            'Monto s/ IVA',
+            'Monto c/ IVA'
+        ],
+
+        ...rows.map(row => [
+            row.referenceNumber,
+            row.receptionDate,
+            row.receivedByName,
+            row.supplierName,
+            row.invoice,
+            row.productName,
+            row.productBase,
+            row.productHeight,
+            row.quantity,
+            row.convertedQuantity,
+            row.conversionUnitCost,
+            row.costPerUnitType,
+            row.netPurchaseAmount,
+            row.grossPurchaseAmount
+        ])
+    ];
+
+    return sendExcelResponse({
+        res,
+        data,
+        sheetName: GOODS_RECEIPT_SHEET_NAME,
+        filename: GOODS_RECEIPT_FILENAME
     });
 };

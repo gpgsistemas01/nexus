@@ -1,6 +1,7 @@
 import { formatDateLongWithTime, toNumber } from "../../utils/formattersUtils.js";
 import { findAllSupplierProducts } from "./products/supplierProductService.js";
 import { findAllGoodsIssues } from "./goodsIssues/goodsIssueService.js";
+import { findAllGoodsReceipts } from "./goodsReceipts/goodsReceiptService.js";
 
 const mapProductRows = (products = []) => products.map((item) => ({
     supplier: item.supplier?.tradeName,
@@ -56,6 +57,34 @@ const mapGoodsIssueDetailRows = (goodsIssues = []) => goodsIssues.flatMap((goods
     }));
 });
 
+const mapGoodsReceiptDetailRows = (goodsReceipts = []) => goodsReceipts.flatMap((goodsReceipt) => {
+
+    const details = goodsReceipt.details || [];
+
+    return details.map((detail) => ({
+        referenceNumber: goodsReceipt.referenceNumber,
+        receptionDate: formatDateLongWithTime(goodsReceipt.receptionDate),
+        receivedByName: goodsReceipt.receivedByName,
+        supplierName: goodsReceipt.supplierName,
+        invoice: goodsReceipt.isInvoiced ? goodsReceipt.invoice : 'Sin factura',
+        productName: detail.productName,
+        productBase: toNumber(detail.productBase),
+        productHeight: toNumber(detail.productHeight),
+        quantity: formatQuantity({
+            quantity: detail.quantity,
+            unit: detail.presentationName
+        }),
+        convertedQuantity: formatQuantity({
+            quantity: detail.convertedQuantity,
+            unit: detail.unitMeasureSymbol || detail.unitMeasureName
+        }),
+        conversionUnitCost: toNumber(detail.conversionUnitCost),
+        costPerUnitType: toNumber(detail.costPerUnitType),
+        netPurchaseAmount: toNumber(detail.netPurchaseAmount),
+        grossPurchaseAmount: toNumber(detail.grossPurchaseAmount)
+    }));
+});
+
 export const findWarehouseReportRows = async () => {
 
     const productsResult = await findAllSupplierProducts({
@@ -87,4 +116,19 @@ export const findGoodsIssueReportRows = async ({
     });
 
     return mapGoodsIssueDetailRows(goodsIssuesResult.data);
+};
+
+export const findGoodsReceiptReportRows = async ({
+    search = ''
+} = {}) => {
+
+    const goodsReceiptsResult = await findAllGoodsReceipts({
+        skip: 0,
+        take: 100000,
+        search,
+        orderBy: 'referenceNumber',
+        orderDir: 'desc'
+    });
+
+    return mapGoodsReceiptDetailRows(goodsReceiptsResult.data);
 };

@@ -1,6 +1,6 @@
 import express from 'express';
 import { authorizeUserApi, verifyApiTokenRequired } from '../../../middleware/authMiddleware.js';
-import { exportGoodsIssueReportExcel, exportWarehouseReportExcel } from '../../../controllers/api/warehouse/reportController.js';
+import { exportGoodsIssueReportExcel, exportGoodsReceiptReportExcel, exportWarehouseReportExcel } from '../../../controllers/api/warehouse/reportController.js';
 
 const router = express.Router();
 
@@ -21,6 +21,13 @@ router.get(
     verifyApiTokenRequired,
     authorizeUserApi(reportPermissions),
     exportGoodsIssueReportExcel
+);
+
+router.get(
+    '/goods-receipts/excel',
+    verifyApiTokenRequired,
+    authorizeUserApi(reportPermissions),
+    exportGoodsReceiptReportExcel
 );
 
 export default router;

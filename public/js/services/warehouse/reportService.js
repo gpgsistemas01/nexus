@@ -14,3 +14,11 @@ export const exportGoodsIssueReportRequest = async (params = {}) =>
         responseType: 'blob',
         params
     });
+
+export const exportGoodsReceiptReportRequest = async (params = {}) =>
+    apiRequest({
+        method: 'get',
+        url: '/api/warehouse/reports/goods-receipts/excel',
+        responseType: 'blob',
+        params
+    });
