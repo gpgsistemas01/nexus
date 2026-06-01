@@ -113,8 +113,11 @@ export const exportGoodsIssueReportExcel = async (req, res) => {
             'Base',
             'Altura',
             'Cantidad solicitada',
+            'Presentación',
             'Cantidad convertida',
+            'Unidad de conversión',
             'Cantidad surtida',
+            'Unidad surtida',
             'Estado del detalle'
         ],
 
@@ -131,8 +134,11 @@ export const exportGoodsIssueReportExcel = async (req, res) => {
             row.productBase,
             row.productHeight,
             row.requestedQuantity,
+            row.presentationName,
             row.convertedQuantity,
+            row.convertedUnitMeasureName,
             row.suppliedQuantity,
+            row.suppliedUnitMeasureName,
             row.detailFulfillmentStatusName
         ])
     ];
@@ -170,8 +176,10 @@ export const exportGoodsReceiptReportExcel = async (req, res) => {
             'Material',
             'Base',
             'Altura',
-            'Compra',
-            'Conversión',
+            'Cantidad de compra',
+            'Presentación',
+            'Cantidad convertida',
+            'Unidad de conversión',
             'Costo unitario de conversión',
             'Costo por presentación',
             'Monto s/ IVA',
@@ -188,7 +196,9 @@ export const exportGoodsReceiptReportExcel = async (req, res) => {
             row.productBase,
             row.productHeight,
             row.quantity,
+            row.presentationName,
             row.convertedQuantity,
+            row.unitMeasureName,
             row.conversionUnitCost,
             row.costPerUnitType,
             row.netPurchaseAmount,

@@ -16,15 +16,6 @@ const mapProductRows = (products = []) => products.map((item) => ({
     maxUnitCost: toNumber(item.maxUnitCost)
 }));
 
-const formatQuantity = ({ quantity, unit = '' }) => {
-
-    const normalizedQuantity = toNumber(quantity);
-
-    if (normalizedQuantity == null) return '';
-
-    return [normalizedQuantity, unit].filter(Boolean).join(' ');
-};
-
 const mapGoodsIssueDetailRows = (goodsIssues = []) => goodsIssues.flatMap((goodsIssue) => {
 
     const details = goodsIssue.details || [];
@@ -41,18 +32,12 @@ const mapGoodsIssueDetailRows = (goodsIssues = []) => goodsIssues.flatMap((goods
         supplierName: detail.supplierName,
         productBase: toNumber(detail.productBase),
         productHeight: toNumber(detail.productHeight),
-        requestedQuantity: formatQuantity({
-            quantity: detail.quantity,
-            unit: detail.presentationName
-        }),
-        convertedQuantity: formatQuantity({
-            quantity: detail.convertedQuantity,
-            unit: detail.unitMeasureSymbol || detail.unitMeasureName
-        }),
-        suppliedQuantity: formatQuantity({
-            quantity: detail.suppliedQuantity,
-            unit: detail.unitMeasureSymbol || detail.unitMeasureName
-        }),
+        requestedQuantity: toNumber(detail.quantity),
+        presentationName: detail.presentationName,
+        convertedQuantity: toNumber(detail.convertedQuantity),
+        convertedUnitMeasureName: detail.unitMeasureSymbol || detail.unitMeasureName,
+        suppliedQuantity: toNumber(detail.suppliedQuantity),
+        suppliedUnitMeasureName: detail.unitMeasureSymbol || detail.unitMeasureName,
         detailFulfillmentStatusName: detail.fulfillmentStatus?.name
     }));
 });
@@ -70,14 +55,10 @@ const mapGoodsReceiptDetailRows = (goodsReceipts = []) => goodsReceipts.flatMap(
         productName: detail.productName,
         productBase: toNumber(detail.productBase),
         productHeight: toNumber(detail.productHeight),
-        quantity: formatQuantity({
-            quantity: detail.quantity,
-            unit: detail.presentationName
-        }),
-        convertedQuantity: formatQuantity({
-            quantity: detail.convertedQuantity,
-            unit: detail.unitMeasureSymbol || detail.unitMeasureName
-        }),
+        quantity: toNumber(detail.quantity),
+        presentationName: detail.presentationName,
+        convertedQuantity: toNumber(detail.convertedQuantity),
+        unitMeasureName: detail.unitMeasureSymbol || detail.unitMeasureName,
         conversionUnitCost: toNumber(detail.conversionUnitCost),
         costPerUnitType: toNumber(detail.costPerUnitType),
         netPurchaseAmount: toNumber(detail.netPurchaseAmount),
