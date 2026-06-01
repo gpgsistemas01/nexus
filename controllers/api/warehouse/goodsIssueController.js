@@ -17,7 +17,7 @@ export const getAllGoodsIssues = async (req, res) => {
     const search = getDataTableSearch(req.query);
     const fulfillmentStatusId = req.query.fulfillmentStatusId || '';
 
-    const columns = ['referenceNumber'];
+    const columns = ['referenceNumber', 'requestDate', 'departmentName', 'projectNumber', 'clientName', null, null];
     const { orderBy, orderDir } = getDataTableOrder({
         query: req.query,
         columns,

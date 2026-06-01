@@ -10,7 +10,7 @@ export const getAllClients = async (req, res) => {
     const search = getDataTableSearch(req.query);
     const advisorId = req.query.advisorId || null;
 
-    const columns = ['name'];
+    const columns = ['name', null];
     const { orderBy, orderDir } = getDataTableOrder({
         query: req.query,
         columns

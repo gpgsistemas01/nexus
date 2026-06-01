@@ -1,5 +1,6 @@
 import xlsx from 'xlsx';
 import { findGoodsIssueReportRows, findGoodsReceiptReportRows, findWarehouseReportRows } from "../../../services/warehouse/reportService.js";
+import { getDataTableOrder, getDataTableSearch } from "../../../utils/requestQueryUtils.js";
 
 const SHEET_NAME = 'Inventario';
 const FILENAME = 'reporte_inventario_productos';
@@ -33,7 +34,17 @@ const sendExcelResponse = ({ res, data, sheetName, filename }) => {
 
 export const exportWarehouseReportExcel = async (req, res) => {
 
-    const rows = await findWarehouseReportRows();
+    const columns = ['name', 'base', 'height', null, 'minStock', null, null, null, null, null];
+    const { orderBy, orderDir } = getDataTableOrder({
+        query: req.query,
+        columns
+    });
+
+    const rows = await findWarehouseReportRows({
+        search: getDataTableSearch(req.query),
+        orderBy,
+        orderDir
+    });
 
     const data = [
         [
@@ -73,10 +84,19 @@ export const exportWarehouseReportExcel = async (req, res) => {
 
 export const exportGoodsIssueReportExcel = async (req, res) => {
 
+    const columns = ['referenceNumber', 'requestDate', 'departmentName', 'projectNumber', 'clientName', null, null];
+    const { orderBy, orderDir } = getDataTableOrder({
+        query: req.query,
+        columns,
+        defaultDirection: 'desc'
+    });
+
     const rows = await findGoodsIssueReportRows({
-        search: req.query.search || '',
+        search: getDataTableSearch(req.query),
         fulfillmentStatusId: req.query.fulfillmentStatusId || '',
-        accesses: req.user?.accesses || []
+        accesses: req.user?.accesses || [],
+        orderBy,
+        orderDir
     });
 
     const data = [
@@ -127,8 +147,17 @@ export const exportGoodsIssueReportExcel = async (req, res) => {
 
 export const exportGoodsReceiptReportExcel = async (req, res) => {
 
+    const columns = ['referenceNumber', 'receptionDate', 'supplierName', 'invoice', null];
+    const { orderBy, orderDir } = getDataTableOrder({
+        query: req.query,
+        columns,
+        defaultDirection: 'desc'
+    });
+
     const rows = await findGoodsReceiptReportRows({
-        search: req.query.search || ''
+        search: getDataTableSearch(req.query),
+        orderBy,
+        orderDir
     });
 
     const data = [

@@ -1,8 +1,8 @@
 import { exportGoodsIssueReportRequest, exportGoodsReceiptReportRequest, exportWarehouseReportRequest } from "../../services/warehouse/reportService.js";
 
-export const exportWarehouseReport = async () => {
+export const exportWarehouseReport = async (params = {}) => {
 
-    const response = await exportWarehouseReportRequest();
+    const response = await exportWarehouseReportRequest(params);
 
     return response.data;
 };

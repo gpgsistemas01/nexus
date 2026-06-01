@@ -10,7 +10,7 @@ export const getAllMovements = async (req, res) => {
     const movementType = req.query.movementType || '';
     const productId = req.query.productId || '';
     const supplierId = req.query.supplierId || '';
-    const columns = ['date'];
+    const columns = ['date', 'type', 'referenceNumber', null, null, null, null, null, null, null, null, null, null];
     const { orderBy, orderDir } = getDataTableOrder({
         query: req.query,
         columns,

@@ -19,7 +19,7 @@ export const getAllPurchaseRequisitions = async (req, res) => {
     const { skip, take } = getDataTablePaging(req.query);
     const search = getDataTableSearch(req.query);
 
-    const columns = ['referenceNumber'];
+    const columns = ['referenceNumber', 'requestDate', null, null, 'approveDate', null, null];
     const { orderBy, orderDir } = getDataTableOrder({
         query: req.query,
         columns,

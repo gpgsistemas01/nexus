@@ -8,6 +8,17 @@ const parseInteger = (value, fallback) => {
     return Number.isNaN(parsed) ? fallback : parsed;
 };
 
+const getFirstOrder = (query = {}) => {
+
+    if (Array.isArray(query.order)) return query.order[0] || {};
+
+    if (query.order?.[0]) return query.order[0];
+
+    return {};
+};
+
+const resolveFallbackColumn = (columns = []) => columns.find(Boolean);
+
 export const getDataTablePaging = (query = {}) => ({
     skip: Math.max(parseInteger(query.start, 0), 0),
     take: Math.max(parseInteger(query.length, DEFAULT_PAGE_LENGTH), 0)
@@ -30,20 +41,22 @@ export const getDataTableOrder = ({
     defaultDirection = 'asc'
 } = {}) => {
 
-    const order = Array.isArray(query.order)
-        ? query.order[0]
-        : query.order?.[0];
+    const order = getFirstOrder(query);
+    const fallbackColumn = resolveFallbackColumn(columns);
 
     const columnIndex = parseInteger(
         order?.column ?? query['order[0][column]'],
         0
     );
 
-    const rawDirection = order?.dir ?? query['order[0][dir]'] ?? defaultDirection;
-    const orderDir = ORDER_DIRECTIONS.has(rawDirection) ? rawDirection : defaultDirection;
+    const rawDirection = String(order?.dir ?? query['order[0][dir]'] ?? defaultDirection).toLowerCase();
+    const normalizedDefaultDirection = String(defaultDirection).toLowerCase();
+    const fallbackDirection = ORDER_DIRECTIONS.has(normalizedDefaultDirection) ? normalizedDefaultDirection : 'asc';
+    const orderDir = ORDER_DIRECTIONS.has(rawDirection) ? rawDirection : fallbackDirection;
+    const requestedColumn = columns[columnIndex];
 
     return {
-        orderBy: columns[columnIndex] || columns[0],
+        orderBy: requestedColumn || fallbackColumn,
         orderDir
     };
 };

@@ -6,7 +6,7 @@ import { initMdbWrapperInput, updateMdbWrapperInput } from "../mdb/baseInstance.
 import { buildDetailsColumns, buildDetailsHeader } from "./utils/builderDetailDatatable.js";
 import { handleDelete, renderMaterialName } from "./utils/renderProductDatatable.js";
 import { getResponsiveRowData } from "./utils/responsive.js";
-import { buildExcelButton } from "../../ui/tableUI.js";
+import { buildExcelButton, buildTableExportParams } from "../../ui/tableUI.js";
 import { formatFileName } from "../../utils/formatters.js";
 
 export let details = [];
@@ -75,9 +75,7 @@ export const createGoodsReceiptDatatable = () => {
                 },
                 buildExcelButton({
                     filename: formatFileName('reporte_compras'),
-                    request: () => exportGoodsReceiptReport({
-                        search: table.search()
-                    })
+                    request: () => exportGoodsReceiptReport(buildTableExportParams(table))
                 })
             ]
         }

@@ -10,7 +10,7 @@ export const getAllProducts = async (req, res) => {
     const search = getDataTableSearch(req.query);
     const supplierId = req.query.supplierId || null;
 
-    const columns = ['name'];
+    const columns = ['name', 'base', 'height', null, 'minStock', null, null, null, null, null];
     const { orderBy, orderDir } = getDataTableOrder({
         query: req.query,
         columns

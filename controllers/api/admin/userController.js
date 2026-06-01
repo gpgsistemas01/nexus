@@ -9,7 +9,7 @@ export const getAllUsers = async (req, res) => {
     const { skip, take } = getDataTablePaging(req.query);
     const search = getDataTableSearch(req.query);
 
-    const columns = ['name'];
+    const columns = ['name', null, null];
     const { orderBy, orderDir } = getDataTableOrder({
         query: req.query,
         columns

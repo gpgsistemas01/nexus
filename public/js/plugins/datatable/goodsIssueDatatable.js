@@ -2,7 +2,7 @@ import { openGoodsIssueModal } from "../../pages/warehouse/goodsIssuesPage.js";
 import { getAllGoodsIssues } from "../../application/warehouse/goodsIssues/goodsIssues.js";
 import { exportGoodsIssueReport } from "../../application/warehouse/report.js";
 import { hasPermission } from "../../utils/permissions.js";
-import { buildExcelButton } from "../../ui/tableUI.js";
+import { buildExcelButton, buildTableExportParams } from "../../ui/tableUI.js";
 import { formatFileName } from "../../utils/formatters.js";
 import { createDataTable, refreshProductTable, renderActionButtons } from "./baseDatatable.js";
 import { buildDetailsColumns, buildDetailsHeader } from "./utils/builderDetailDatatable.js";
@@ -92,10 +92,7 @@ export const createGoodsIssueDatatable = async (context) => {
                 },
                 buildExcelButton({
                     filename: formatFileName('reporte_salidas'),
-                    request: () => exportGoodsIssueReport({
-                        ...filters.getValues(),
-                        search: table.search()
-                    })
+                    request: () => exportGoodsIssueReport(buildTableExportParams(table, filters.getValues()))
                 })
             ]
         }

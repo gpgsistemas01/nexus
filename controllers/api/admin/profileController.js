@@ -16,7 +16,7 @@ export const getAllProfiles = async (req, res) => {
     const { skip, take } = getDataTablePaging(req.query);
     const search = getDataTableSearch(req.query);
 
-    const columns = ['fullName'];
+    const columns = ['fullName', null, null];
     const { orderBy, orderDir } = getDataTableOrder({
         query: req.query,
         columns

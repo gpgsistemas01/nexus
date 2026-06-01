@@ -1,10 +1,11 @@
 import { apiRequest } from "../axiosInstanceApi.js";
 
-export const exportWarehouseReportRequest = async () =>
+export const exportWarehouseReportRequest = async (params = {}) =>
     apiRequest({
         method: 'get',
         url: '/api/warehouse/reports/inventory/excel',
-        responseType: 'blob'
+        responseType: 'blob',
+        params
     });
 
 export const exportGoodsIssueReportRequest = async (params = {}) =>

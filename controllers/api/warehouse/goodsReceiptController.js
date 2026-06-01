@@ -17,7 +17,7 @@ export const getAllGoodsReceipts = async (req, res) => {
     const { skip, take } = getDataTablePaging(req.query);
     const search = getDataTableSearch(req.query);
 
-    const columns = ['referenceNumber'];
+    const columns = ['referenceNumber', 'receptionDate', 'supplierName', 'invoice', null];
     const { orderBy, orderDir } = getDataTableOrder({
         query: req.query,
         columns,

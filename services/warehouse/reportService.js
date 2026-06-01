@@ -85,15 +85,19 @@ const mapGoodsReceiptDetailRows = (goodsReceipts = []) => goodsReceipts.flatMap(
     }));
 });
 
-export const findWarehouseReportRows = async () => {
+export const findWarehouseReportRows = async ({
+    search = '',
+    orderBy = 'name',
+    orderDir = 'asc'
+} = {}) => {
 
     const productsResult = await findAllSupplierProducts({
         skip: 0,
         take: 100000,
-        search: '',
+        search,
         supplierId: null,
-        orderBy: 'name',
-        orderDir: 'asc'
+        orderBy,
+        orderDir
     });
 
     return mapProductRows(productsResult.data);
@@ -102,7 +106,9 @@ export const findWarehouseReportRows = async () => {
 export const findGoodsIssueReportRows = async ({
     search = '',
     fulfillmentStatusId = '',
-    accesses = []
+    accesses = [],
+    orderBy = 'referenceNumber',
+    orderDir = 'desc'
 } = {}) => {
 
     const goodsIssuesResult = await findAllGoodsIssues({
@@ -110,8 +116,8 @@ export const findGoodsIssueReportRows = async ({
         take: 100000,
         search,
         fulfillmentStatusId,
-        orderBy: 'referenceNumber',
-        orderDir: 'desc',
+        orderBy,
+        orderDir,
         accesses
     });
 
@@ -119,15 +125,17 @@ export const findGoodsIssueReportRows = async ({
 };
 
 export const findGoodsReceiptReportRows = async ({
-    search = ''
+    search = '',
+    orderBy = 'referenceNumber',
+    orderDir = 'desc'
 } = {}) => {
 
     const goodsReceiptsResult = await findAllGoodsReceipts({
         skip: 0,
         take: 100000,
         search,
-        orderBy: 'referenceNumber',
-        orderDir: 'desc'
+        orderBy,
+        orderDir
     });
 
     return mapGoodsReceiptDetailRows(goodsReceiptsResult.data);
