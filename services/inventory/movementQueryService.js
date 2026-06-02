@@ -18,12 +18,32 @@ const MOVEMENT_DETAIL_SELECT = {
     newStock: true,
     product: {
         select: {
-            name: true
+            name: true,
+            base: true,
+            height: true
         }
     },
     supplier: {
         select: {
             tradeName: true
+        }
+    },
+    goodsReceiptDetail: {
+        select: {
+            productBase: true,
+            productHeight: true
+        }
+    },
+    goodsIssueDetail: {
+        select: {
+            productBase: true,
+            productHeight: true
+        }
+    },
+    stockAdjustmentDetail: {
+        select: {
+            productBase: true,
+            productHeight: true
         }
     },
     movement: {
@@ -132,6 +152,22 @@ const getMovementSearchFilter = (search) => {
     };
 };
 
+const resolveProductBase = (detail) =>
+    detail.productBase ??
+    detail.stockAdjustmentDetail?.productBase ??
+    detail.goodsReceiptDetail?.productBase ??
+    detail.goodsIssueDetail?.productBase ??
+    detail.product?.base ??
+    null;
+
+const resolveProductHeight = (detail) =>
+    detail.productHeight ??
+    detail.stockAdjustmentDetail?.productHeight ??
+    detail.goodsReceiptDetail?.productHeight ??
+    detail.goodsIssueDetail?.productHeight ??
+    detail.product?.height ??
+    null;
+
 const mapMovementDetail = (detail) => ({
     id: detail.id,
 
@@ -143,9 +179,9 @@ const mapMovementDetail = (detail) => ({
 
     productName: detail.product.name,
 
-    productBase: detail.productBase,
+    productBase: resolveProductBase(detail),
 
-    productHeight: detail.productHeight,
+    productHeight: resolveProductHeight(detail),
 
     supplierName: detail.supplier?.tradeName,
 
@@ -177,6 +213,9 @@ export const findAllMovements = async ({
     search = '',
     productId = '',
     supplierId = '',
+    goodsIssueId = '',
+    goodsReceiptId = '',
+    stockAdjustmentId = '',
     orderBy = 'date',
     orderDir = 'asc',
 }) => {
@@ -187,6 +226,9 @@ export const findAllMovements = async ({
 
         const movementFilters = {
             ...(movementType && { type: movementType }),
+            ...(goodsIssueId && { goodsIssueId }),
+            ...(goodsReceiptId && { goodsReceiptId }),
+            ...(stockAdjustmentId && { stockAdjustmentId }),
             ...getMovementDateFilter({ startDate, endDate })
         };
 
