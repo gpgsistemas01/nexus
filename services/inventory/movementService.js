@@ -1,7 +1,8 @@
 import { MovementDetailRelationConflict } from "../../errors/inventory/movementError.js";
+import { GoodsIssueInexistentStock, GoodsIssueInsufficientStock } from "../../errors/inventory/stockError.js";
 import { InventoryMovementType } from "../../generated/prisma/enums.ts";
 import { getDb } from "../../repository/baseRepository.js";
-import { buildStockKey } from "../../utils/formattersUtils.js";
+import { buildStockKey, hasProductDimensions, normalizeDecimal } from "../../utils/formattersUtils.js";
 import { updateSupplierProductStock } from "../warehouse/products/supplierProductService.js";
 
 const REFERENCE_TYPE_GOODS_RECEIPT = 'GOODS_RECEIPT';
@@ -9,18 +10,6 @@ const REFERENCE_TYPE_GOODS_ISSUE = 'GOODS_ISSUE';
 const REFERENCE_TYPE_PURCHASE_REQUISITION = 'PURCHASE_REQUISITION';
 const MOVEMENT_TYPE_OUT = 'ISSUE';
 const FLOAT_EPSILON = 0.000001;
-
-export const round2 = (value) =>
-    Math.round((Number(value) + Number.EPSILON) * 100) / 100;
-
-export const normalizeDecimal = (value) => {
-
-    const rounded = round2(value);
-
-    return Math.abs(rounded) <= FLOAT_EPSILON
-        ? 0
-        : rounded;
-};
 
 export const applyInventoryMovement = async ({
     tx,
@@ -67,10 +56,11 @@ export const applyInventoryMovement = async ({
 
         const height = Number(ps.product.height || 0);
 
-        const factor =
-            base > 0 && height > 0
-                ? base * height
-                : 1;
+        const hasDimensions = hasProductDimensions(ps.product);
+
+        const factor = hasDimensions
+            ? base * height
+            : 1;
 
         const quantity = normalizeDecimal(detail.quantity);
 
@@ -109,6 +99,15 @@ export const applyInventoryMovement = async ({
             previousConvertedQuantity + signedConvertedQuantity
         );
 
+        if (isOut && newStock < 0) {
+            throw new GoodsIssueInsufficientStock({
+                productName: ps.product?.name ?? 'Producto desconocido',
+                height: hasDimensions ? ps.product.height : null,
+                base: hasDimensions ? ps.product.base : null,
+                supplierName: ps.supplier?.tradeName ?? 'Proveedor desconocido'
+            });
+        }
+
         /**
          * MUY IMPORTANTE:
          * actualizamos el estado local
@@ -132,8 +131,8 @@ export const applyInventoryMovement = async ({
             previousConvertedQuantity,
             newConvertedQuantity: newConverted,
 
-            productBase: base,
-            productHeight: height,
+            productBase: hasDimensions ? base : null,
+            productHeight: hasDimensions ? height : null,
 
             ...(detail.goodsReceiptDetailId && {
                 goodsReceiptDetailId: detail.goodsReceiptDetailId

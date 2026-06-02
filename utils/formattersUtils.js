@@ -41,6 +41,24 @@ export const roundTo = (value, decimals = 2) => {
     return Math.round((Number(value) + Number.EPSILON) * factor) / factor;
 };
 
+const FLOAT_EPSILON = 0.000001;
+
+export const round2 = (value) => roundTo(value);
+
+export const normalizeDecimal = (value) => {
+
+    const rounded = round2(value);
+
+    return Math.abs(rounded) <= FLOAT_EPSILON
+        ? 0
+        : rounded;
+};
+
+export const hasProductDimensions = (product = {}) => (
+    Number(product.base || 0) > 0 &&
+    Number(product.height || 0) > 0
+);
+
 export const buildStockKey = (productId, supplierId) =>
     `${productId}:${supplierId}`;
 

@@ -1,10 +1,22 @@
 import { GoodsIssueInexistentStock, GoodsIssueInsufficientStock } from "../../../errors/inventory/stockError.js";
 import { ProductNotFound, ProductSnapshotFindDatabaseError, SupplierProductCreateDatabaseError, SupplierProductDeleteDatabaseError } from "../../../errors/warehouse/productError.js";
 import { getDb } from "../../../repository/baseRepository.js";
-import { buildStockKey, parseStockKey } from "../../../utils/formattersUtils.js";
+import { buildStockKey, hasProductDimensions, normalizeDecimal, parseStockKey } from "../../../utils/formattersUtils.js";
 import { createStockAdjustment } from "../adjustmentService.js";
 
-const MOVEMENT_TYPE_IN = 'IN';
+const MOVEMENT_TYPE_IN = 'ENTRY';
+
+const buildStockErrorMeta = (ps) => {
+
+    const hasDimensions = hasProductDimensions(ps?.product);
+
+    return {
+        productName: ps?.product?.name ?? 'Producto desconocido',
+        height: hasDimensions ? ps.product.height : null,
+        base: hasDimensions ? ps.product.base : null,
+        supplierName: ps?.supplier?.tradeName ?? 'Proveedor desconocido'
+    };
+};
 
 const SUPPLIER_PRODUCT_SNAPSHOT_INCLUDE = {
     product: {
@@ -333,17 +345,13 @@ export const updateSupplierProductStock = async ({
 
         const ps = psMap.get(key);
 
-        if (!ps) throw new GoodsIssueInexistentStock({
-            productName: ps?.product?.name ?? 'Producto desconocido',
-            height: ps?.product?.height ?? 'Desconocido',
-            base: ps?.product?.base ?? 'Desconocido',
-            supplierName: ps?.supplier?.tradeName ?? 'Proveedor desconocido'
-        });
+        if (!ps) throw new GoodsIssueInexistentStock(buildStockErrorMeta(ps));
 
-        const hasDimensions = ps.product.base && ps.product.height;
+        const hasDimensions = hasProductDimensions(ps.product);
         const factor = hasDimensions
-            ? (ps.product.base * ps.product.height)
+            ? Number(ps.product.base) * Number(ps.product.height)
             : 1;
+        const convertedQuantity = normalizeDecimal(quantity * factor);
 
         if (movementType !== MOVEMENT_TYPE_IN) {
 
@@ -351,21 +359,17 @@ export const updateSupplierProductStock = async ({
                 where: {
                     supplierId,
                     productId,
-                    currentStock: { gte: quantity }
+                    currentStock: { gte: quantity },
+                    convertedQuantity: { gte: convertedQuantity }
                 },
                 data: {
                     currentStock: { decrement: quantity },
-                    convertedQuantity: { decrement: quantity * factor }
+                    convertedQuantity: { decrement: convertedQuantity }
                 }
             });
 
-            if (result.count < 0) {
-                throw new GoodsIssueInsufficientStock({
-                    productName: ps?.product?.name ?? 'Producto desconocido',
-                    height: ps?.product?.height ?? 'Desconocido',
-                    base: ps?.product?.base ?? 'Desconocido',
-                    supplierName: ps?.supplier?.tradeName ?? 'Proveedor desconocido'
-                });
+            if (result.count < 1) {
+                throw new GoodsIssueInsufficientStock(buildStockErrorMeta(ps));
             }
 
         } else {
@@ -376,7 +380,7 @@ export const updateSupplierProductStock = async ({
                 },
                 data: {
                     currentStock: { increment: quantity },
-                    convertedQuantity: { increment: quantity * factor }
+                    convertedQuantity: { increment: convertedQuantity }
                 }
             });
         }
