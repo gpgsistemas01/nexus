@@ -99,18 +99,6 @@ export const findAllGoodsIssues = async ({
         },
         include: {
             status: true,
-            approver: {
-                select: {
-                    id: true,
-                    fullName: true,
-                }
-            },
-            warehouseStaff: {
-                select: {
-                    id: true,
-                    fullName: true,
-                }
-            },
             fulfillmentStatus: true,
             details: {
                 select: {
