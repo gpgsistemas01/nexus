@@ -115,8 +115,8 @@ const attachSupplierHandler = ({ supplierSelector }) => {
 
                     toggleSupplierOption({
                         selector: supplierSelector,
-                        supplierId: createdsupplier.id,
-                        supplierName: `${ createdsupplier.tradeName }`
+                        id: createdsupplier.id,
+                        name: `${ createdsupplier.tradeName }`
                     });
                 }
             });
