@@ -35,7 +35,7 @@ export const findAllGoodsIssues = async ({
     search = '',
     fulfillmentStatusId = '',
     orderBy = 'referenceNumber',
-    orderDir = 'asc',
+    orderDir = 'desc',
     accesses = []
 }) => {
 

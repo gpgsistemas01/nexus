@@ -11,11 +11,15 @@ export const getAllMovements = async (req, res) => {
     const productId = req.query.productId || '';
     const supplierId = req.query.supplierId || '';
     const columns = ['date', 'type', 'referenceNumber', null, null, null, null, null, null, null, null, null, null];
-    const { orderBy, orderDir } = getDataTableOrder({
+    const hasRequestedOrder = Boolean(req.query.order || req.query['order[0][column]']);
+    const requestedOrder = getDataTableOrder({
         query: req.query,
         columns,
         defaultDirection: 'desc'
     });
+    const { orderBy, orderDir } = hasRequestedOrder
+        ? requestedOrder
+        : { orderBy: 'referenceNumber', orderDir: 'desc' };
 
     const result = await findAllMovements({
         skip,

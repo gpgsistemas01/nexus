@@ -43,6 +43,7 @@ export const createGoodsReceiptDatatable = () => {
             ajax: {
                 get: getAllGoodsReceipts
             },
+            order: [[0, 'desc']],
             columns: [
                 { data: 'referenceNumber', title: 'Folio' },
                 { 

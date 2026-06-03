@@ -85,6 +85,7 @@ export const createGoodsIssueDatatable = async (context) => {
                 })
             },
             columns,
+            order: [[0, 'desc']],
             buttons: [
                 {
                     text: 'Nueva salida',

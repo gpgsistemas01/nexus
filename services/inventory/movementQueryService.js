@@ -152,6 +152,7 @@ const getMovementSearchFilter = (search) => {
     };
 };
 
+
 const resolveProductBase = (detail) =>
     detail.productBase ??
     detail.stockAdjustmentDetail?.productBase ??
@@ -216,8 +217,8 @@ export const findAllMovements = async ({
     goodsIssueId = '',
     goodsReceiptId = '',
     stockAdjustmentId = '',
-    orderBy = 'date',
-    orderDir = 'asc',
+    orderBy = 'referenceNumber',
+    orderDir = 'desc',
 }) => {
 
     const db = getDb();

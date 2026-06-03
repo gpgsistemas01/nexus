@@ -21,8 +21,8 @@ export const findAllGoodsReceipts = async ({
     skip = 0,
     take = 10,
     search = '',
-    orderBy = 'receptionDate',
-    orderDir = 'asc'
+    orderBy = 'referenceNumber',
+    orderDir = 'desc'
 }) => {
 
     const where = {
