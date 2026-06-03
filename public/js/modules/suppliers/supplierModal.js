@@ -22,17 +22,18 @@ export const openSupplierModal = ({
     
     form.elements.tradeName.value = data?.tradeName || '';
     form.elements.legalName.value = data?.legalName || '';
+    form.elements.numberphone.value = data?.numberphone || '';
 
-    if (mode = 'create') {
+    if (mode === 'create') {
 
         modalElement.querySelector('#modalTitle').textContent = 'Registrar proveedor';
         form.querySelector('#submitBtn').textContent = 'Guardar';
     }
 
-    if (mode = 'edit') {
+    if (mode === 'edit') {
 
-        modalElement.querySelector('#modalTitle').textContent = 'Registrar proveedor';
-        form.querySelector('#submitBtn').textContent = 'Guardar';
+        modalElement.querySelector('#modalTitle').textContent = 'Editar proveedor';
+        form.querySelector('#submitBtn').textContent = 'Actualizar';
     }
     
     form.onSave = onSave;
