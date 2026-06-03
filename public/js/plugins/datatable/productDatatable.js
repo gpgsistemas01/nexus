@@ -124,6 +124,10 @@ export const createProductDatatable = (context) => {
                 );
             },
             buttons: [
+                ...(canManageProducts ? [{
+                    text: 'Nuevo producto',
+                    action: () => openProductModal({ mode: 'create' })
+                }] : []),
                 buildExcelButton({
                     filename: formatFileName('reporte_inventario_productos'),
                     request: () => exportWarehouseReport(buildTableExportParams(table))
