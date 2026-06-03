@@ -64,7 +64,7 @@ const attachClientHandler = ({
                     toggleClientOption({
                         selector: baseSelector,
                         id: createdClient.id,
-                        text: createdClient.name
+                        name: createdClient.name
                     });
                 }
             });
