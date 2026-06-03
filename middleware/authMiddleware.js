@@ -2,6 +2,7 @@ import { verifyAccessToken } from "../services/jwtService.js";
 import { errorMap } from "../messages/codeMessages.js";
 import { clearAccessCookie } from "../utils/cookiesUtils.js";
 import { getLoggedUser } from "../services/admin/userService.js";
+import { hasStockAdjustmentPayload } from "../validators/forms/productValidations.js";
 
 const getAuthTokenInfo = ( req, res) => {
 
@@ -74,3 +75,17 @@ export const authorizeUserApi = createAuthorizeMiddleware((req, res) =>
 export const authorizeUserWeb = createAuthorizeMiddleware((req, res) =>
     res.redirect('/error/404')
 );
+
+export const authorizeInitialStockAdjustment = (permissions) => (req, res, next) => {
+
+    if (!hasStockAdjustmentPayload(req.body)) return next();
+
+    const canAdjustStock = req.user?.accesses?.some(access =>
+        permissions.departments.includes(access.department) &&
+        permissions.roles.includes(access.role)
+    );
+
+    if (!canAdjustStock) return res.status(401).json({ code: errorMap.message.INVALID_AUTH });
+
+    next();
+};

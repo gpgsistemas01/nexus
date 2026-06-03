@@ -1,4 +1,19 @@
-import { validateBoolean, validateNumber, validateNumberOptional, validateText, validateTextOptional, validateUUID } from "../fields/fieldsValidator.js";
+import { validateBoolean, validateNumber, validateNumberOptional, validateNumberWhen, validateText, validateTextOptional, validateTextOptionalWhen, validateUUID, validateUUIDWhen } from "../fields/fieldsValidator.js";
+
+const stockAdjustmentFields = ['newStock', 'reasonId', 'observations'];
+
+export const hasStockAdjustmentPayload = (body = {}) =>
+    stockAdjustmentFields.some(field => Object.prototype.hasOwnProperty.call(body, field));
+
+const validateStockAdjustmentOnCreate = [
+    validateNumberWhen('newStock', hasStockAdjustmentPayload),
+    validateTextOptionalWhen({
+        fieldName: 'observations',
+        maxLength: 500,
+        predicate: hasStockAdjustmentPayload
+    }),
+    validateUUIDWhen('reasonId', hasStockAdjustmentPayload)
+];
 
 export const productValidation = [
     validateText({ fieldName: 'name', maxLength: 200 }),
@@ -10,6 +25,11 @@ export const productValidation = [
     validateNumberOptional('height'),
     validateBoolean('isActive')
 ]
+
+export const productCreateValidation = [
+    ...productValidation,
+    ...validateStockAdjustmentOnCreate
+];
 
 export const productStockValidation = [
     validateUUID('supplierId'),

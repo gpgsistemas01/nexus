@@ -1,4 +1,4 @@
-import { getErrorMessage, getSuccessMessage } from "../../constants/apiMessages.js";
+import { getSuccessMessage } from "../../constants/apiMessages.js";
 import { editProductRequest, editProductStockRequest, getAllProductsRequest, registerProductRequest } from "../../services/warehouse/productService.js";
 
 export const getProductOptions = async (params = {}) => {
@@ -29,13 +29,38 @@ export const getAllProducts = async (params = {}) => {
     return response;
 };
 
-export const registerProduct = async ({ formData }) => {
+const buildProductPayload = (formData) => ({
+    name: formData.name,
+    supplierId: formData.supplierId,
+    presentationId: formData.presentationId,
+    unitMeasureId: formData.unitMeasureId,
+    minStock: formData.minStock,
+    base: formData.base,
+    height: formData.height,
+    isActive: formData.isActive
+});
 
-    const response = await registerProductRequest({ data: formData });
+const buildStockPayload = (formData) => ({
+    supplierId: formData.supplierId,
+    newStock: formData.newStock,
+    reasonId: formData.reasonId,
+    observations: formData.observations
+});
+
+export const registerProduct = async ({ formData, withInitialStockAdjustment = false }) => {
+
+    const payload = {
+        ...buildProductPayload(formData),
+        ...(withInitialStockAdjustment ? buildStockPayload(formData) : {})
+    };
+
+    const response = await registerProductRequest({ data: payload });
 
     const { data } = response;
     const { code, product } = data;
-    let message = getSuccessMessage(code);
+    let message = withInitialStockAdjustment
+        ? '¡Producto creado y stock registrado exitosamente!'
+        : getSuccessMessage(code);
 
     return {
         message,

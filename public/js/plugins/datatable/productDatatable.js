@@ -56,6 +56,8 @@ export const createProductDatatable = (context) => {
     const isWarehouseProductManager = isWarehouse && (hasRole('Almacenista') || hasRole('Coordinador') || hasRole('Auxiliar'));
     const canSeeCost = isWarehouse || isSystem || isSales;
     const canManageProducts = isAdmin || isWarehouseProductManager;
+    const canCreateProductsFromModule = isSystem && isAdmin;
+    const canAdjustStock = isSystem && isAdmin;
 
     renderProductTableHeader({ canSeeCost, canManageProducts });
 
@@ -82,7 +84,7 @@ export const createProductDatatable = (context) => {
         columns.push({
             data: null,
             title: 'Acciones',
-            render: () => renderActionButtons({ status: 'Abierta', context: 'product', canAdjustStock: isAdmin })
+            render: () => renderActionButtons({ status: 'Abierta', context: 'product', canAdjustStock })
         });
     }
 
@@ -124,9 +126,12 @@ export const createProductDatatable = (context) => {
                 );
             },
             buttons: [
-                ...(canManageProducts ? [{
+                ...(canCreateProductsFromModule ? [{
                     text: 'Nuevo producto',
-                    action: () => openProductModal({ mode: 'create' })
+                    action: () => openProductModal({
+                        mode: 'create',
+                        includeStockAdjustmentOnCreate: true
+                    })
                 }] : []),
                 buildExcelButton({
                     filename: formatFileName('reporte_inventario_productos'),

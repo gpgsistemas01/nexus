@@ -7,6 +7,9 @@ const formId = '#productForm';
 const productFields = ['name', 'minStock', 'base', 'height', 'supplierId', 'presentationId', 'unitMeasureId', 'isActive'];
 const stockFields = ['newStock', 'reasonId', 'observations'];
 
+const shouldShowStockFields = ({ mode, includeStockAdjustmentOnCreate, isStockAdjustment }) =>
+    isStockAdjustment || (mode === 'create' && includeStockAdjustmentOnCreate);
+
 const setProductValues = ({ form, data = null }) => {
 
     form.elements.name.value = data?.name || '';
@@ -17,19 +20,31 @@ const setProductValues = ({ form, data = null }) => {
     if (form.elements.isActive) form.elements.isActive.checked = data?.isActive === undefined ? true : Boolean(data.isActive);
 };
 
-const prepareProductModal = ({ mode, data, isStockAdjustment }) => {
+const prepareProductModal = ({
+    mode,
+    data,
+    isStockAdjustment,
+    includeStockAdjustmentOnCreate = false
+}) => {
 
     const form = document.querySelector(formId);
     const modalElement = document.querySelector(productModalId);
 
+    const showStockFields = shouldShowStockFields({
+        mode,
+        includeStockAdjustmentOnCreate,
+        isStockAdjustment
+    });
+
     initForm({ form, mode, id: data?.id });
     clearFormErrors(form);
+    form.dataset.includeStockAdjustmentOnCreate = showStockFields && !isStockAdjustment ? 'true' : 'false';
     toggleFormFields({ form, fields: productFields, isVisible: true });
-    toggleFormFields({ form, fields: stockFields, isVisible: isStockAdjustment });
+    toggleFormFields({ form, fields: stockFields, isVisible: showStockFields });
     setFormReadOnly({ form, fields: productFields, isReadOnly: isStockAdjustment });
 
-    initProductFormSelect2({ modalSelector: productModalId, isStockAdjustment });
-    setProductFormSelectOptions({ modalSelector: productModalId, data, isStockAdjustment });
+    initProductFormSelect2({ modalSelector: productModalId, isStockAdjustment: showStockFields });
+    setProductFormSelectOptions({ modalSelector: productModalId, data, isStockAdjustment: showStockFields });
 
     return { form, modalElement };
 };
@@ -37,10 +52,16 @@ const prepareProductModal = ({ mode, data, isStockAdjustment }) => {
 export const openProductModal = ({
     mode = 'create',
     data = null,
-    onSave = null
+    onSave = null,
+    includeStockAdjustmentOnCreate = false
 }) => {
 
-    const { form, modalElement } = prepareProductModal({ mode, data, isStockAdjustment: false });
+    const { form, modalElement } = prepareProductModal({
+        mode,
+        data,
+        isStockAdjustment: false,
+        includeStockAdjustmentOnCreate
+    });
 
     setProductValues({ form, data: mode === 'edit' ? data : { name: data?.name, supplier: data?.supplier } });
 

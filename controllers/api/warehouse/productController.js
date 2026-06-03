@@ -2,6 +2,7 @@ import { createProductDtoForRegister, createProductDtoForStockUpdate } from "../
 import { successCodeMessages } from "../../../messages/codeMessages.js";
 import { findAllProducts, createProduct, updateProduct, updateProductStock } from "../../../services/warehouse/products/productService.js";
 import { sanitizeEmptyStrings } from "../../../utils/formattersUtils.js";
+import { hasStockAdjustmentPayload } from "../../../validators/forms/productValidations.js";
 import { getDataTableOrder, getDataTablePaging, getDataTableSearch } from "../../../utils/requestQueryUtils.js";
 
 export const getAllProducts = async (req, res) => {
@@ -32,8 +33,15 @@ export const registerProduct = async (req, res) => {
 
     const productDto = createProductDtoForRegister(req.body);
     const sanitizedProductDto = sanitizeEmptyStrings(productDto);
+    const stockDto = hasStockAdjustmentPayload(req.body)
+        ? sanitizeEmptyStrings(createProductDtoForStockUpdate(req.body))
+        : null;
 
-    const product = await createProduct(sanitizedProductDto);
+    const product = await createProduct({
+        productDto: sanitizedProductDto,
+        stockDto,
+        userId: req.user.id
+    });
 
     return res.status(200).json({
         product,
