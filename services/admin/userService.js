@@ -238,7 +238,7 @@ export const updateUserPassword = async ({ id, userDto }) => {
         });
 
     } catch (err) {
-console.log(err)
+
         if (err instanceof UserNotFound) throw err;
 
         throw new UserUpdateDatabaseError();
