@@ -105,6 +105,7 @@ export const errorMessages = {
     // 📈 NEW STOCK
     NEW_STOCK_REQUIRED: 'El stock nuevo es requerido.',
     NEW_STOCK_INVALID_NUMBER: 'El stock nuevo debe ser un número.',
+    NEW_STOCK_TOO_LONG: 'El stock nuevo es demasiado grande.',
 
     REQUIRED_QUANTITY: 'La cantidad es requerido.',
     INVALID_FORMAT_QUANTITY: 'La cantidad debe ser un número mayor a cero.',
@@ -124,6 +125,7 @@ export const errorMessages = {
     // OBSERVATIONS
     OBSERVATIONS_INVALID_TYPE: 'Las observaciones deben ser texto.',
     OBSERVATIONS_TOO_LONG: (meta) => `Las observaciones no deben exceder más de ${meta.value} caracteres.`,
+    OBSERVATIONS_INVALID_FORMAT: 'Las observaciones contienen caracteres no válidos.',
 
     INVOICED_REQUIRED: 'El tipo de factura debe ser seleccionado.',
     INVOICED_INVALID_BOOLEAN: 'El estado de la factura debe ser verdadero o falso.',

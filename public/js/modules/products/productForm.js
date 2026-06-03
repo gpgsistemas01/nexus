@@ -9,18 +9,20 @@ const productModalId = '#productModal';
 const stockMode = 'edit-stock';
 
 const isStockMode = (form) => form.dataset.mode === stockMode;
+const includesStockAdjustmentOnCreate = (form) => form.dataset.includeStockAdjustmentOnCreate === 'true';
+const shouldValidateStockFields = (form) => isStockMode(form) || includesStockAdjustmentOnCreate(form);
 
 useForm({
     selector: formId,
     normalizeData: ({ form, formData }) => {
 
-        if (isStockMode(form)) {
+        if (shouldValidateStockFields(form)) {
             formData.supplierId = document.querySelector(`${ productModalId } select[name='supplierId']`).value;
-
-            return formData;
         }
 
-        formData.isActive = document.querySelector(`${ formId } #isActiveInput`).checked;
+        if (!isStockMode(form)) {
+            formData.isActive = document.querySelector(`${ formId } #isActiveInput`).checked;
+        }
         
         return formData;
     },
@@ -28,14 +30,24 @@ useForm({
 
         if (isStockMode(form)) return validateFields(productStockValidators, formData);
 
-        return validateFields(productValidators, formData);
+        const errors = validateFields(productValidators, formData);
+
+        if (!includesStockAdjustmentOnCreate(form)) return errors;
+
+        return {
+            ...errors,
+            ...validateFields(productStockValidators, formData)
+        };
     },
     sendRequest: async ({ formData, form }) => {
 
         const product = await handleSubmit({
             form,
             formData,
-            create: registerProduct,
+            create: ({ formData }) => registerProduct({
+                formData,
+                withInitialStockAdjustment: includesStockAdjustmentOnCreate(form)
+            }),
             update: isStockMode(form) ? editProductStock : editProduct
         });
 

@@ -90,6 +90,28 @@ export const validateUUID = (fieldName) => {
         .isUUID('4').withMessage(errors.INVALID_UUID)
 }
 
+export const validateTextOptionalWhen = ({ fieldName, maxLength, predicate }) => {
+
+    const errors = errorMap[fieldName];
+
+    return body(fieldName)
+        .if((value, { req }) => predicate(req.body, value, req) && value)
+        .trim()
+        .isString().withMessage(errors.INVALID_TYPE)
+        .isLength({ max: maxLength }).withMessage(errors.TOO_LONG(maxLength))
+        .matches(genericRegex).withMessage(errors.INVALID_FORMAT)
+}
+
+export const validateUUIDWhen = (fieldName, predicate) => {
+
+    const errors = errorMap[fieldName];
+
+    return body(fieldName)
+        .if((value, { req }) => predicate(req.body, value, req))
+        .notEmpty().withMessage(errors.REQUIRED)
+        .isUUID('4').withMessage(errors.INVALID_UUID)
+}
+
 
 export const validateProjectNumber = (fieldName) => {
 
@@ -107,6 +129,18 @@ export const validateNumber = (fieldName) => {
     const errors = errorMap[fieldName];
 
     return body(fieldName)
+        .notEmpty().withMessage(errors.REQUIRED)
+        .isFloat().withMessage(errors.INVALID_NUMBER)
+        .matches(/^\d{1,8}(\.\d{1,2})?$/).withMessage(errors.TOO_LONG)
+        .toFloat()
+}
+
+export const validateNumberWhen = (fieldName, predicate) => {
+
+    const errors = errorMap[fieldName];
+
+    return body(fieldName)
+        .if((value, { req }) => predicate(req.body, value, req))
         .notEmpty().withMessage(errors.REQUIRED)
         .isFloat().withMessage(errors.INVALID_NUMBER)
         .matches(/^\d{1,8}(\.\d{1,2})?$/).withMessage(errors.TOO_LONG)
