@@ -47,10 +47,15 @@ const buildStockPayload = (formData) => ({
     observations: formData.observations
 });
 
-export const registerProduct = async ({ formData, withInitialStockAdjustment = false }) => {
+export const registerProduct = async ({
+    formData,
+    withInitialStockAdjustment = false,
+    creationContext = null
+}) => {
 
     const payload = {
         ...buildProductPayload(formData),
+        ...(creationContext ? { creationContext } : {}),
         ...(withInitialStockAdjustment ? buildStockPayload(formData) : {})
     };
 

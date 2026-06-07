@@ -70,6 +70,8 @@ export const initGoodsReceiptFormSelect2 = () => {
         modalSelector,
         supplierSelector,
         productSelector,
+        includeStockAdjustmentOnCreate: false,
+        productCreationContext: 'goodsReceipt'
     });
 
     if (supplierInput) {

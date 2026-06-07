@@ -25,7 +25,8 @@ const prepareProductModal = ({
     mode,
     data,
     isStockAdjustment,
-    includeStockAdjustmentOnCreate = mode === 'create'
+    includeStockAdjustmentOnCreate = mode === 'create',
+    creationContext = null
 }) => {
 
     const form = document.querySelector(formId);
@@ -40,6 +41,7 @@ const prepareProductModal = ({
     initForm({ form, mode, id: data?.id });
     clearFormErrors(form);
     form.dataset.includeStockAdjustmentOnCreate = showStockFields && !isStockAdjustment ? 'true' : 'false';
+    form.dataset.creationContext = creationContext || '';
     toggleFormFields({ form, fields: productFields, isVisible: true });
     toggleFormFields({ form, fields: stockFields, isVisible: showStockFields });
     form.querySelector(stockSectionSelector)?.classList.toggle('d-none', !showStockFields);
@@ -55,14 +57,16 @@ export const openProductModal = ({
     mode = 'create',
     data = null,
     onSave = null,
-    includeStockAdjustmentOnCreate = mode === 'create'
+    includeStockAdjustmentOnCreate = mode === 'create',
+    creationContext = null
 }) => {
 
     const { form, modalElement } = prepareProductModal({
         mode,
         data,
         isStockAdjustment: false,
-        includeStockAdjustmentOnCreate
+        includeStockAdjustmentOnCreate,
+        creationContext
     });
 
     setProductValues({ form, data: mode === 'edit' ? data : { name: data?.name, supplier: data?.supplier } });

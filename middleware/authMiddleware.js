@@ -2,7 +2,7 @@ import { verifyAccessToken } from "../services/jwtService.js";
 import { errorMap } from "../messages/codeMessages.js";
 import { clearAccessCookie } from "../utils/cookiesUtils.js";
 import { getLoggedUser } from "../services/admin/userService.js";
-import { hasStockAdjustmentPayload } from "../validators/forms/productValidations.js";
+import { requiresInitialStockAdjustmentOnCreate } from "../validators/forms/productValidations.js";
 
 const getAuthTokenInfo = ( req, res) => {
 
@@ -78,7 +78,7 @@ export const authorizeUserWeb = createAuthorizeMiddleware((req, res) =>
 
 export const authorizeInitialStockAdjustment = (permissions) => (req, res, next) => {
 
-    if (!hasStockAdjustmentPayload(req.body)) return next();
+    if (!requiresInitialStockAdjustmentOnCreate(req.body)) return next();
 
     const canAdjustStock = req.user?.accesses?.some(access =>
         permissions.departments.includes(access.department) &&

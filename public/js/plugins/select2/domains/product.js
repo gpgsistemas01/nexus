@@ -140,7 +140,9 @@ const initProductSelect = ({
 const attachProductHandler = ({ 
     modalSelector,
     baseSelector, 
-    supplierSelector
+    supplierSelector,
+    includeStockAdjustmentOnCreate = true,
+    productCreationContext = null
 }) => {
 
     $(baseSelector).off('select2:select').on('select2:select', (e) => {
@@ -161,6 +163,8 @@ const attachProductHandler = ({
                         tradeName,
                     }
                 },
+                includeStockAdjustmentOnCreate,
+                creationContext: productCreationContext,
                 onSave: (createdProduct) => {
 
                     let text;
@@ -222,7 +226,9 @@ export const setupProductSelect = ({
     modalSelector, 
     supplierSelector = null,
     productSelector,
-    allowCreate = true
+    allowCreate = true,
+    includeStockAdjustmentOnCreate = true,
+    productCreationContext = null
 }) => {
 
     initProductSelect({
@@ -235,6 +241,8 @@ export const setupProductSelect = ({
     attachProductHandler({
         modalSelector,
         baseSelector: `${ modalSelector } ${ productSelector }`,
-        supplierSelector
+        supplierSelector,
+        includeStockAdjustmentOnCreate,
+        productCreationContext
     });
 };
