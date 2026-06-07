@@ -108,7 +108,7 @@ export const validateUUIDWhen = (fieldName, predicate) => {
 
     return body(fieldName)
         .if((value, { req }) => predicate(req.body, value, req))
-        .notEmpty().withMessage(errors.REQUIRED)
+        .notEmpty().withMessage(errors.REQUIRED).bail()
         .isUUID('4').withMessage(errors.INVALID_UUID)
 }
 
@@ -141,8 +141,8 @@ export const validateNumberWhen = (fieldName, predicate) => {
 
     return body(fieldName)
         .if((value, { req }) => predicate(req.body, value, req))
-        .notEmpty().withMessage(errors.REQUIRED)
-        .isFloat().withMessage(errors.INVALID_NUMBER)
+        .notEmpty().withMessage(errors.REQUIRED).bail()
+        .isFloat().withMessage(errors.INVALID_NUMBER).bail()
         .matches(/^\d{1,8}(\.\d{1,2})?$/).withMessage(errors.TOO_LONG)
         .toFloat()
 }

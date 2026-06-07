@@ -11,6 +11,7 @@ const stockMode = 'edit-stock';
 const isStockMode = (form) => form.dataset.mode === stockMode;
 const includesStockAdjustmentOnCreate = (form) => form.dataset.includeStockAdjustmentOnCreate === 'true';
 const shouldValidateStockFields = (form) => isStockMode(form) || includesStockAdjustmentOnCreate(form);
+const getCreationContext = (form) => form.dataset.creationContext || null;
 
 useForm({
     selector: formId,
@@ -46,7 +47,8 @@ useForm({
             formData,
             create: ({ formData }) => registerProduct({
                 formData,
-                withInitialStockAdjustment: includesStockAdjustmentOnCreate(form)
+                withInitialStockAdjustment: includesStockAdjustmentOnCreate(form),
+                creationContext: getCreationContext(form)
             }),
             update: isStockMode(form) ? editProductStock : editProduct
         });

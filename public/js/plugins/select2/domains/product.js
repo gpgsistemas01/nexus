@@ -123,7 +123,9 @@ const initProductSelect = ({
 const attachProductHandler = ({ 
     modalSelector,
     baseSelector, 
-    supplierSelector
+    supplierSelector,
+    includeStockAdjustmentOnCreate = true,
+    productCreationContext = null
 }) => {
 
     $(baseSelector).off('select2:select').on('select2:select', (e) => {
@@ -144,6 +146,8 @@ const attachProductHandler = ({
                         tradeName,
                     }
                 },
+                includeStockAdjustmentOnCreate,
+                creationContext: productCreationContext,
                 onSave: (createdProduct) => {
 
                     toggleProductOption({
@@ -191,7 +195,9 @@ export const setupProductSelect = ({
     modalSelector, 
     supplierSelector = null,
     productSelector,
-    allowCreate = true
+    allowCreate = true,
+    includeStockAdjustmentOnCreate = true,
+    productCreationContext = null
 }) => {
 
     const baseSelector = `${ modalSelector } ${ productSelector }`;
@@ -206,6 +212,8 @@ export const setupProductSelect = ({
     attachProductHandler({
         modalSelector,
         baseSelector,
-        supplierSelector
+        supplierSelector,
+        includeStockAdjustmentOnCreate,
+        productCreationContext
     });
 };
