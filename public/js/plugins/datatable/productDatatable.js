@@ -15,6 +15,7 @@ let stockSocketConfigured = false;
 
 const tableElement = document.querySelector(selectorTable);
 
+
 const renderProductTableHeader = ({ canSeeCost, canManageProducts }) => {
 
     tableElement.innerHTML = `

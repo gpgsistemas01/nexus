@@ -42,6 +42,8 @@ const MOVEMENT_DETAIL_SELECT = {
     },
     stockAdjustmentDetail: {
         select: {
+            productName: true,
+            supplierName: true,
             productBase: true,
             productHeight: true
         }
@@ -111,6 +113,22 @@ const getMovementSearchFilter = (search) => {
                 }
             },
             {
+                stockAdjustmentDetail: {
+                    productName: {
+                        contains: search,
+                        mode: 'insensitive'
+                    }
+                }
+            },
+            {
+                stockAdjustmentDetail: {
+                    supplierName: {
+                        contains: search,
+                        mode: 'insensitive'
+                    }
+                }
+            },
+            {
                 movement: {
                     referenceNumber: {
                         contains: search,
@@ -169,6 +187,14 @@ const resolveProductHeight = (detail) =>
     detail.product?.height ??
     null;
 
+const resolveProductName = (detail) =>
+    detail.stockAdjustmentDetail?.productName ??
+    detail.product?.name;
+
+const resolveSupplierName = (detail) =>
+    detail.stockAdjustmentDetail?.supplierName ??
+    detail.supplier?.tradeName;
+
 const mapMovementDetail = (detail) => ({
     id: detail.id,
 
@@ -178,13 +204,13 @@ const mapMovementDetail = (detail) => ({
 
     type: detail.movement.type,
 
-    productName: detail.product.name,
+    productName: resolveProductName(detail),
 
     productBase: resolveProductBase(detail),
 
     productHeight: resolveProductHeight(detail),
 
-    supplierName: detail.supplier?.tradeName,
+    supplierName: resolveSupplierName(detail),
 
     quantity: detail.quantity,
 

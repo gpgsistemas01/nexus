@@ -15,6 +15,7 @@ export const renderMaterialName = (row, supplierOverride) => {
     return `${ productName } (${ row.productBase } x ${ row.productHeight }) || ${ supplierName }`;
 };
 
+
 export const initDetailsTable = ({ selector, type, mode, context, data }) => {
 
     const { isWarehouse, isSystem } = hasPermission(context);

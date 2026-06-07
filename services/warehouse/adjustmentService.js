@@ -13,7 +13,9 @@ const createStockAdjustmentInTransaction = async ({
     reasonId,
     observations,
     newStock,
-    userId
+    userId,
+    base = null,
+    height = null
 }) => {
 
     const product = await findSupplierProductByIds({
@@ -23,6 +25,9 @@ const createStockAdjustmentInTransaction = async ({
     });
 
     const referenceNumber = await generateReferenceNumber({ type: REFERENCE_NUMBER_TYPE, tx });
+
+    const productName = product.name;
+    const supplierName = product.supplier?.tradeName || '';
 
     const previousStock = Number(product.currentStock);
 
@@ -34,11 +39,17 @@ const createStockAdjustmentInTransaction = async ({
 
     const previousConvertedQuantity = Number(product.convertedQuantity);
 
-    const conversionFactor =
-        (Number(product.base || 1) * Number(product.height || 1));
+    const hasCustomDimensions = base !== null && height !== null;
+    const productBase = hasCustomDimensions ? base : product.base;
+    const productHeight = hasCustomDimensions ? height : product.height;
 
-    const newConvertedQuantity =
-        newStock * conversionFactor;
+    const conversionFactor = productBase && productHeight
+        ? (Number(productBase) * Number(productHeight))
+        : 1;
+
+    const newConvertedQuantity = hasCustomDimensions
+        ? previousConvertedQuantity + (difference * conversionFactor)
+        : newStock * conversionFactor;
 
     const convertedDifference =
         newConvertedQuantity - previousConvertedQuantity;
@@ -69,6 +80,8 @@ const createStockAdjustmentInTransaction = async ({
                 create: {
                     productId,
                     supplierId,
+                    productName,
+                    supplierName,
 
                     previousStock,
                     newStock,
@@ -78,8 +91,8 @@ const createStockAdjustmentInTransaction = async ({
                     newConvertedQuantity,
                     convertedDifference,
 
-                    productBase: product.base,
-                    productHeight: product.height
+                    productBase,
+                    productHeight
                 }
             }
         },
@@ -118,7 +131,9 @@ export const createStockAdjustment = async ({
     reasonId,
     observations,
     newStock,
-    userId
+    userId,
+    base = null,
+    height = null
 }) => {
 
     const execute = (transaction) => createStockAdjustmentInTransaction({
@@ -128,7 +143,9 @@ export const createStockAdjustment = async ({
         reasonId,
         observations,
         newStock,
-        userId
+        userId,
+        base,
+        height
     });
 
     if (tx) return execute(tx);

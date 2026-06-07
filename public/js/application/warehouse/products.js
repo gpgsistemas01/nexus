@@ -1,4 +1,5 @@
 import { getSuccessMessage } from "../../constants/apiMessages.js";
+import { buildProductSelectText } from "../../utils/productSelectUtils.js";
 import { editProductRequest, editProductStockRequest, getAllProductsRequest, registerProductRequest } from "../../services/warehouse/productService.js";
 
 export const getProductOptions = async (params = {}) => {
@@ -8,18 +9,10 @@ export const getProductOptions = async (params = {}) => {
     const list = response.data?.data || [];
 
     return list.filter(product => product?.id && product?.name)
-        .map(p => {
-
-            let text;
-
-            if (!p.base || !p.height) text = `${ p.name } || ${ p.supplier.tradeName }`;
-            else text = `${ p.name } (${ p.base } x ${ p.height }) || ${ p.supplier.tradeName }`;
-            
-            return {
-                id: p.id,
-                text: text
-            }
-        });
+        .map(p => ({
+            id: p.id,
+            text: buildProductSelectText(p)
+        }));
 }
 
 export const getAllProducts = async (params = {}) => {

@@ -10,6 +10,11 @@ export const errorMessages = {
     // SUPPLIER
     SUPPLIER_ID_REQUIRED: 'El proveedor es requerido.',
     SUPPLIER_ID_INVALID_UUID: 'El proveedor no es válido.',
+    PRODUCT_ID_REQUIRED: 'El producto es requerido.',
+    PRODUCT_ID_INVALID_UUID: 'El producto no es válido.',
+    QUANTITY_REQUIRED: 'La cantidad es requerida.',
+    QUANTITY_INVALID_NUMBER: 'La cantidad debe ser un número.',
+    QUANTITY_TOO_LONG: 'La cantidad es demasiado grande.',
     SUPPLIER_NOT_FOUND: 'Proveedor no encontrado.',
     SUPPLIER_CODE_NOT_FOUND: 'Código del proveedor no encontrado.',
     SUPPLIER_FIND_DB_ERROR: 'Error de base de datos al buscar el proveedor',
@@ -115,10 +120,12 @@ export const errorMessages = {
     RECEPTION_DATE_INVALID_FORMAT: 'La fecha de recepción no es válida.',
 
     // 📐 BASE
+    BASE_REQUIRED: 'La base es requerida.',
     BASE_INVALID_NUMBER: 'Debe ser un número.',
     BASE_TOO_LONG: 'El valor es demasiado grande.',
 
     // 📏 HEIGHT
+    HEIGHT_REQUIRED: 'La altura es requerida.',
     HEIGHT_INVALID_NUMBER: 'Debe ser un número.',
     HEIGHT_TOO_LONG: 'El valor es demasiado grande.',
 
@@ -263,6 +270,7 @@ const successMessages = {
     UPDATED_USER: '¡Usuario actualizado exitosamente!',
     UPDATED_USER_PASSWORD: '¡Contraseña actualizada exitosamente!',
     UPDATED_CLIENT: '¡Cliente actualizado exitosamente!',
+    CREATED_WASTE: '¡Merma registrada exitosamente!',
 };
 
 export const getErrorMessage = (data = {}) => {

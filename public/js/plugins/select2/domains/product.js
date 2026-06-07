@@ -1,6 +1,7 @@
 import { openProductModal } from "../../../modules/products/productModal.js";
 import { getAllProducts, getProductOptions } from "../../../application/warehouse/products.js";
 import { initbaseSelect2, setMdbWrapperInputValue, toggleSelectOption } from "../baseSelect.js";
+import { mapProductToSelectData } from "../../../utils/productSelectUtils.js";
 
 const wrapperSelector = '#presentationDisplayInput';
 const productSelector = '#productFilter';
@@ -98,25 +99,7 @@ const initProductSelect = ({
             const list = data.data || data;
 
             return {
-                results: list.map(p => {
-
-                    let text;
-
-                    if (!p.base || !p.height) text = `${ p.name } || ${ p.supplier.tradeName }`;
-                    else text = `${ p.name } (${ p.base } x ${ p.height }) || ${ p.supplier.tradeName }`;
-
-                    return {
-                        id: p.id,
-                        text,
-                        productName: p.name,
-                        presentationName: p.presentation.name,
-                        unitMeasureName: p.unitMeasure.name,
-                        productBase: p.base,
-                        productHeight: p.height,
-                        supplierName: p.supplier.tradeName,
-                        supplierId: p.supplier.id
-                    }
-                })
+                results: list.map(mapProductToSelectData)
             };
         },
         ...(allowCreate && {
@@ -167,24 +150,9 @@ const attachProductHandler = ({
                 creationContext: productCreationContext,
                 onSave: (createdProduct) => {
 
-                    let text;
-
-                    if (!createdProduct.base || !createdProduct.height) text = `${ createdProduct.name } || ${ createdProduct.supplier.tradeName }`;
-                    else text = `${ createdProduct.name } (${ createdProduct.base } x ${ createdProduct.height }) || ${ createdProduct.supplier.tradeName }`;
-
                     toggleProductOption({
                         selector: baseSelector,
-                        data: {
-                            id: createdProduct.id,
-                            text,
-                            productName: createdProduct.name,
-                            presentationName: createdProduct.presentation.name,
-                            unitMeasureName: createdProduct.unitMeasure.name,
-                            productBase: createdProduct.base,
-                            productHeight: createdProduct.height,
-                            supplierName: createdProduct.supplier.tradeName,
-                            supplierId: createdProduct.supplier.id
-                        }
+                        data: mapProductToSelectData(createdProduct)
                     });
                     
                     setMdbWrapperInputValue({
@@ -222,6 +190,7 @@ export const toggleProductOption = ({
     data
 });
 
+
 export const setupProductSelect = ({ 
     modalSelector, 
     supplierSelector = null,
@@ -231,16 +200,18 @@ export const setupProductSelect = ({
     productCreationContext = null
 }) => {
 
+    const baseSelector = `${ modalSelector } ${ productSelector }`;
+
     initProductSelect({
         modalSelector,
         supplierSelector,
-        baseSelector: `${ modalSelector } ${ productSelector }`,
+        baseSelector,
         allowCreate
     });
 
     attachProductHandler({
         modalSelector,
-        baseSelector: `${ modalSelector } ${ productSelector }`,
+        baseSelector,
         supplierSelector,
         includeStockAdjustmentOnCreate,
         productCreationContext

@@ -1,74 +1,82 @@
 <% const form = {
-    id: 'productForm',
+    id: 'wasteForm',
     canApprove: false,
     invoice: false,
-    selects: [
+    sections: [
         {
-            id: 'productSupplierInput',
-            name: 'supplierId',
-            class: 'supplier-select',
-            col: '12'
-        },
-        {
-            id: 'presentationInput',
-            name: 'presentationId',
-            class: 'presentation-select',
-            col: '6'
-        },
-        {
-            id: 'unitMeasureInput',
-            name: 'unitMeasureId',
-            class: 'unit-measure-select',
-            col: '6'
-        }
-    ],
-    inputs: [
-        {
-            id: 'nameInput',
-            type: 'text',
-            name: 'name',
-            label: 'Nombre',
-            col: '6'
-        },
-        {
-            id: 'minStockInput',
-            type: 'number',
-            name: 'minStock',
-            label: 'Stock Mínimo',
-            attrs: {
-                'min': '0'
-            },
-            col: '6'
-        },
-        {
-            id: 'baseInput',
-            type: 'number',
-            name: 'base',
-            label: 'Base',
-            attrs: {
-                'min': '0'
-            },
-            col: '6'
-        },
-        {
-            id: 'heightInput',
-            type: 'number',
-            name: 'height',
-            label: 'Altura',
-            attrs: {
-                'min': '0'
-            },
-            col: '6'
-        },
-    ]
-    ,
-    checkboxes: [
-        {
-            id: 'isActiveInput',
-            type: 'checkbox',
-            name: 'isActive',
-            label: 'Activo',
-            isChecked: true
+            title: 'Datos de la merma',
+            class: 'waste-data-section',
+            groups: [
+                {
+                    type: 'selects',
+                    items: [
+                        {
+                            id: 'productSupplierInput',
+                            name: 'supplierId',
+                            class: 'supplier-select',
+                            col: '4'
+                        },
+                        {
+                            id: 'productInput',
+                            name: 'productId',
+                            class: 'product-select',
+                            col: '4'
+                        },
+                        {
+                            id: 'reasonInput',
+                            name: 'reasonId',
+                            class: 'reason-select',
+                            col: '4'
+                        }
+                    ]
+                },
+                {
+                    type: 'inputs',
+                    items: [
+                        {
+                            id: 'baseInput',
+                            type: 'number',
+                            name: 'base',
+                            label: 'Base de la merma',
+                            value: '',
+                            attrs: {
+                                min: '0'
+                            },
+                            col: '4'
+                        },
+                        {
+                            id: 'heightInput',
+                            type: 'number',
+                            name: 'height',
+                            label: 'Altura de la merma',
+                            value: '',
+                            attrs: {
+                                min: '0'
+                            },
+                            col: '4'
+                        },
+                        {
+                            id: 'quantityInput',
+                            type: 'number',
+                            name: 'quantity',
+                            label: 'Cantidad de merma',
+                            value: '',
+                            attrs: {
+                                min: '0'
+                            },
+                            col: '4'
+                        }
+                    ]
+                },
+                {
+                    type: 'textarea',
+                    input: {
+                        id: 'observationsInput',
+                        name: 'observations',
+                        label: 'Observaciones'
+                    }
+                }
+            ]
         }
     ]
 } %>

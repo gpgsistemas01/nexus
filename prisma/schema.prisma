@@ -463,8 +463,10 @@ model StockAdjustmentDetail {
 
   stockAdjustmentId String @db.Uuid
 
-  productId  String @db.Uuid
-  supplierId String @db.Uuid
+  productId    String @db.Uuid
+  supplierId   String @db.Uuid
+  productName  String @db.VarChar(200)
+  supplierName String @db.VarChar(200)
 
   previousStock Decimal @db.Decimal(10, 2)
   newStock      Decimal @db.Decimal(10, 2)

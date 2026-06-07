@@ -140,12 +140,14 @@ export const toggleSupplierOption = ({
 
 export const setupSupplierSelect = ({ 
     modalSelector, 
-    supplierSelector
+    supplierSelector,
+    allowCreate = true
 }) => {
 
     initSupplierSelect({
         modalSelector,
         baseSelector: `${ modalSelector } ${ supplierSelector }`,
+        allowCreate
     });
 
     attachSupplierHandler({

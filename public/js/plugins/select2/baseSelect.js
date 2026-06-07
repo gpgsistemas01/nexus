@@ -1,5 +1,6 @@
 import { handleApiError, normalizeJqAjaxError } from "../../api/errorHandler.js";
 import { initMdbWrapperInput, updateMdbWrapperInput } from "../mdb/baseInstance.js";
+import { toggleDisabledElement } from "../../utils/formUtils.js";
 
 const wrapperSelector = '#presentationDisplayInput';
 
@@ -149,5 +150,44 @@ export const bindDependency = ({
             value: $source.val(),
             source: $source
         });
+    });
+};
+
+
+export const bindDisabledSelectDependency = ({
+    sourceSelector,
+    targetSelector,
+    clearTarget = () => {},
+    onChange = () => {},
+    isDisabled = (value) => !value
+}) => {
+
+    const targetElement = document.querySelector(targetSelector);
+    const getDisabledState = (value) => isDisabled(value);
+
+    toggleDisabledElement({
+        element: targetElement,
+        isDisabled: getDisabledState($(sourceSelector).val())
+    });
+
+    bindDependency({
+        sourceSelector,
+        onChange: (payload) => {
+
+            const disabled = getDisabledState(payload.value);
+
+            clearTarget(payload);
+
+            toggleDisabledElement({
+                element: targetElement,
+                isDisabled: disabled
+            });
+
+            onChange({
+                ...payload,
+                targetElement,
+                isDisabled: disabled
+            });
+        }
     });
 };

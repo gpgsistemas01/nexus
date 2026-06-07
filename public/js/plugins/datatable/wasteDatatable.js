@@ -1,5 +1,4 @@
 import { createDataTable, renderActionButtons } from "./baseDatatable.js";
-import { notifications } from "../swal/swalComponent.js";
 import { hasPermission } from "../../utils/permissions.js";
 import { renderMaterialName } from "./utils/renderProductDatatable.js";
 import { getAllWastes } from "../../application/warehouse/wastes.js";
@@ -7,34 +6,40 @@ import { openWasteModal } from "../../pages/warehouse/wastesPage.js";
 import { getResponsiveRowData } from "./utils/responsive.js";
 
 const selectorTable = '#table';
-let lastLowStockNotification = '';
-let stockSocketConfigured = false;
+const tableElement = document.querySelector(selectorTable);
 
-const table = document.querySelector(selectorTable);
-table.innerHTML = `
-    <thead>
-        <tr>
-            <th rowspan="2">Material</th>
-            <th colspan="2">Medidas</th>
-            <th rowspan="2">Compra</th>
-            <th rowspan="2">Stock Mínimo</th>
-            <th rowspan="2">Presentación</th>
-            <th colspan="2">Conversión</th>
-            <th rowspan="2">Costo Unitario</th>
-            <th rowspan="2">Acciones</th>
-        </tr>
-        <tr>
-            <th>Base</th>
-            <th>Altura</th>
-            <th>Cantidad</th>
-            <th>Unidad</th>
-        </tr>
-    </thead>
-`;
+
+const renderWasteTableHeader = ({ canSeeCost, canManageWastes }) => {
+
+    tableElement.innerHTML = `
+        <thead>
+            <tr>
+                <th rowspan="2">Material</th>
+                <th colspan="2">Medidas</th>
+                <th rowspan="2">Existencia</th>
+                <th rowspan="2">Stock Mínimo</th>
+                <th rowspan="2">Presentación</th>
+                <th colspan="2">Conversión</th>
+                ${ canSeeCost ? '<th rowspan="2">Costo Unitario</th>' : '' }
+                ${ canManageWastes ? '<th rowspan="2">Acciones</th>' : '' }
+            </tr>
+            <tr>
+                <th>Base</th>
+                <th>Altura</th>
+                <th>Cantidad</th>
+                <th>Unidad</th>
+            </tr>
+        </thead>
+    `;
+};
 
 export const createWasteDatatable = (context) => {
 
     const { isWarehouse, isSystem, isSales } = hasPermission(context);
+    const canSeeCost = isWarehouse || isSystem || isSales;
+    const canManageWastes = isWarehouse || isSystem;
+
+    renderWasteTableHeader({ canSeeCost, canManageWastes });
 
     const columns = [
         { 
@@ -51,11 +56,11 @@ export const createWasteDatatable = (context) => {
         { data: 'unitMeasure.name', title: 'Unidad' }
     ];
 
-    if (isWarehouse || isSystem || isSales) {
+    if (canSeeCost) {
         columns.push({ data: 'maxUnitCost', title: 'Costo Unitario de Conversión' });
     }
 
-    if (isWarehouse || isSystem) {
+    if (canManageWastes) {
         columns.push({
             data: null,
             title: 'Acciones',
@@ -70,10 +75,10 @@ export const createWasteDatatable = (context) => {
             },
             columns,
             buttons: [
-                {
+                ...(canManageWastes ? [{
                     text: 'Nueva merma',
                     action: () => openWasteModal({ mode: 'create' })
-                }
+                }] : [])
             ]
         }
     });
@@ -84,4 +89,4 @@ export const createWasteDatatable = (context) => {
 
         await openWasteModal({ mode: 'edit', data });
     });
-}
+};

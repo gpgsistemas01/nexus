@@ -220,7 +220,7 @@ export const findSupplierProductByIds = async ({
         }
     });
 
-    if (!supplierProduct) return ProductNotFound();
+    if (!supplierProduct) throw new ProductNotFound();
 
     return mapSupplierProduct(supplierProduct);
 };

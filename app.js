@@ -5,6 +5,7 @@ import clientApiRoutes from './routes/api/sales/clientApiRoute.js';
 import authApiRoutes from './routes/api/authApiRoute.js';
 
 import productApiRoutes from './routes/api/warehouse/productApiRoute.js';
+import wasteApiRoutes from './routes/api/warehouse/wasteApiRoute.js';
 import supplierApiRoutes  from './routes/api/warehouse/supplierApiRoute.js';
 import goodsReceiptApiRoutes from './routes/api/warehouse/goodsReceiptApiRoute.js';
 import purchaseRequisitionApiRoutes from './routes/api/warehouse/purchaseRequisitionApiRoute.js';
@@ -114,6 +115,7 @@ app.use('/movimientos', movementWebRoutes);
 app.use(apiRoute + authRoute, authApiRoutes);
 app.use(apiRoute + sales + '/clients', clientApiRoutes);
 app.use(apiRoute + warehouse + '/products', productApiRoutes);
+app.use(apiRoute + warehouse + '/wastes', wasteApiRoutes);
 app.use(apiRoute + warehouse + '/suppliers', supplierApiRoutes);
 app.use(apiRoute + warehouse + '/goods-receipts', goodsReceiptApiRoutes);
 // app.use(apiRoute + warehouse + '/purchase-requisitions', purchaseRequisitionApiRoutes);

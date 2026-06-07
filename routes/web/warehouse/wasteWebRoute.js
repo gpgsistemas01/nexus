@@ -4,15 +4,15 @@ import { getWastesPage } from '../../../controllers/web/warehouse/wasteControlle
 
 const router = express.Router();
 
-const productPagePermissions = {
-    roles: ['Almacenista', 'Coordinador', 'Auxiliar', 'Operador', 'Instalador', 'Vendedor', 'Administrador del sistema'],
+const wastePagePermissions = {
+    roles: ['Almacenista', 'Coordinador', 'Auxiliar', 'Vendedor', 'Administrador del sistema'],
     departments: ['ALMACÉN Y PROVEDURÍA', 'SISTEMAS', 'VENTAS Y PROYECTOS ESPECIALES']
 };
 
 router.get(
     '/', 
     verifyCookiesAuthTokenRequired,
-    authorizeUserWeb(productPagePermissions),
+    authorizeUserWeb(wastePagePermissions),
     getWastesPage
 );
 

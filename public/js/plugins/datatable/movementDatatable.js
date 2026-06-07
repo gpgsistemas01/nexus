@@ -5,8 +5,7 @@ import { getSupplierOptions } from "../../application/warehouse/suppliers.js";
 import { buildExcelButton, buildTableExportParams, clearTableFilters, isClearingFilters } from "../../ui/tableUI.js";
 import { on } from "../../utils/domUtils.js";
 import { formatFileName } from "../../utils/formatters.js";
-import { toggleDisabledElement } from "../../utils/formUtils.js";
-import { bindDependency } from "../select2/baseSelect.js";
+import { bindDisabledSelectDependency } from "../select2/baseSelect.js";
 import { getMovementTypeSelectApi, getMovementTypeData, attachMovementTypeFilterHandler, initMovementTypeFilterSelect } from "../select2/domains/movementType.js";
 import { attachProductFilterHandler, getProductSelectApi, initProductFilterSelect, toggleProductOption } from "../select2/domains/product.js";
 import { attachSupplierFilterHandler, getSupplierSelectApi, initSupplierFilterSelect } from "../select2/domains/supplier.js";
@@ -22,14 +21,10 @@ export const createMovementDatatable = async () => {
 
     const productFilterSelector = '#productFilter';
     const supplierFilterSelector = '#supplierFilter';
-    const productFilterElement = document.querySelector(productFilterSelector);
-
-    bindDependency({
+    bindDisabledSelectDependency({
         sourceSelector: supplierFilterSelector,
-        onChange: ({ value }) => {
-
-            const isDisabled = !value;
-
+        targetSelector: productFilterSelector,
+        clearTarget: () => {
             toggleProductOption({
                 selector: productFilterSelector,
                 data: {
@@ -39,11 +34,6 @@ export const createMovementDatatable = async () => {
             });
 
             $(productFilterSelector).val(null).trigger('change');
-
-            toggleDisabledElement({
-                element: productFilterElement,
-                isDisabled
-            });
         }
     });
 

@@ -1,7 +1,6 @@
 import { getSelectedOptionText } from "../../../utils/domUtils.js";
 import { resolveAdvisorDepartmentByClientName, resolveProjectNumberByClientAndDepartment } from "../../../application/warehouse/goodsIssues/goodsIssueRules.js";
-import { toggleDisabledElement } from "../../../utils/formUtils.js";
-import { bindDependency } from "../baseSelect.js";
+import { bindDependency, bindDisabledSelectDependency } from "../baseSelect.js";
 import { setupClientSelect, toggleClientOption } from "../domains/client.js";
 import { initDepartmentSelect, toggleDepartmentOption } from "../domains/department.js";
 import { setupProductSelect, toggleProductOption } from "../domains/product.js";
@@ -24,8 +23,6 @@ const productScopedSelector = `${ modalSelector } ${ productSelector }`;
 export const initGoodsIssueFormSelect2 = () => {
 
     const modal = document.querySelector(modalSelector);
-    const requesterSelectElement = modal?.querySelector(requesterSelector);
-
     const syncInternalClientProjectNumber = () => {
         const projectNumberInput = modal?.querySelector(projectNumberSelector);
         if (!projectNumberInput) return;
@@ -89,19 +86,10 @@ export const initGoodsIssueFormSelect2 = () => {
         allowCreate: false,
     });
 
-    toggleDisabledElement({
-        element: requesterSelectElement,
-        isDisabled: true
-    });
-
-    bindDependency({
+    bindDisabledSelectDependency({
         sourceSelector: departmentScopedSelector,
-        onChange: ({ value }) => {
-            
-            const isDisabled = !value;
-
-            syncInternalClientProjectNumber();
-
+        targetSelector: requesterScopedSelector,
+        clearTarget: () => {
             toggleProfileOption({
                 selector: requesterScopedSelector,
                 id: null,
@@ -109,12 +97,8 @@ export const initGoodsIssueFormSelect2 = () => {
             });
 
             $(requesterScopedSelector).val(null).trigger('change');
-
-            toggleDisabledElement({
-                element: requesterSelectElement,
-                isDisabled
-            });
-        }
+        },
+        onChange: () => syncInternalClientProjectNumber()
     });
 
     bindDependency({

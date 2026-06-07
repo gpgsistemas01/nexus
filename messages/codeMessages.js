@@ -11,6 +11,15 @@ export const errorMap = {
         REQUIRED: 'SUPPLIER_ID_REQUIRED',
         INVALID_UUID: 'SUPPLIER_ID_INVALID_UUID'
     },
+    productId: {
+        REQUIRED: 'PRODUCT_ID_REQUIRED',
+        INVALID_UUID: 'PRODUCT_ID_INVALID_UUID'
+    },
+    quantity: {
+        REQUIRED: 'QUANTITY_REQUIRED',
+        INVALID_NUMBER: 'QUANTITY_INVALID_NUMBER',
+        TOO_LONG: 'QUANTITY_TOO_LONG'
+    },
     receivedById: {
         REQUIRED: 'RECEIVED_BY_ID_REQUIRED',
         INVALID_UUID: 'RECEIVED_BY_ID_INVALID_UUID'
@@ -105,10 +114,12 @@ export const errorMap = {
         INVALID_FORMAT: 'REQUEST_DATE_INVALID_FORMAT'
     },
     base: {
+        REQUIRED: 'BASE_REQUIRED',
         INVALID_NUMBER: 'BASE_INVALID_NUMBER',
         TOO_LONG: 'BASE_TOO_LONG'
     },
     height: {
+        REQUIRED: 'HEIGHT_REQUIRED',
         INVALID_NUMBER: 'HEIGHT_INVALID_NUMBER',
         TOO_LONG: 'HEIGHT_TOO_LONG'
     },
@@ -170,4 +181,5 @@ export const successCodeMessages = {
     UPDATED_USER: 'UPDATED_USER',
     UPDATED_USER_PASSWORD: 'UPDATED_USER_PASSWORD',
     UPDATED_CLIENT: 'UPDATED_CLIENT',
+    CREATED_WASTE: 'CREATED_WASTE',
 }
