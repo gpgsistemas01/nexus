@@ -330,6 +330,44 @@ export const resolveMaxUnitCostForSync = async ({
 
     return exactSupplierProduct?.maxUnitCost ?? fallbackMaxUnitCost;
 };
+
+export const recalculateConvertedQuantityByProduct = async ({
+    tx,
+    productId,
+    base = null,
+    height = null
+}) => {
+
+    const db = getDb(tx);
+
+    const supplierProducts = await db.supplierProduct.findMany({
+        where: { productId },
+        select: {
+            supplierId: true,
+            currentStock: true
+        }
+    });
+
+    await Promise.all(
+        supplierProducts.map(({ supplierId, currentStock }) =>
+            db.supplierProduct.update({
+                where: {
+                    supplierId_productId: {
+                        supplierId,
+                        productId
+                    }
+                },
+                data: {
+                    convertedQuantity: calculateConvertedQuantity({
+                        currentStock,
+                        base,
+                        height
+                    })
+                }
+            })
+        )
+    );
+};
 export const updateProductUnitCostIfHigher = async ({
     supplierId,
     details
