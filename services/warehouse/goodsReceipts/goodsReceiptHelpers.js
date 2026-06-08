@@ -1,5 +1,6 @@
 import { ProductNotFound } from "../../../errors/warehouse/productError.js";
 import { roundTo } from "../../../utils/formattersUtils.js";
+import { calculateConvertedQuantity } from "../../inventory/stockHelpers.js";
 import { findProductsSnapshot } from "../products/productService.js";
 
 const IVA_RATE = 1.16;
@@ -21,8 +22,11 @@ export const buildGoodsReceiptDetails = async (details) => {
         const { name, base, height, presentation, unitMeasure } = product;
         const netPurchaseAmount = roundTo(quantity * costPerUnitType);
         const grossPurchaseAmount = roundTo(netPurchaseAmount * IVA_RATE);
-        const hasDimensions = base !== null && height !== null && base > 0 && height > 0;
-        const convertedQuantity = hasDimensions ? roundTo((Number(base) * Number(height)) * quantity) : quantity;
+        const convertedQuantity = calculateConvertedQuantity({
+            quantity,
+            base,
+            height
+        });
         let conversionUnitCost = null;
 
         if (convertedQuantity) conversionUnitCost = convertedQuantity > 0 ? roundTo(netPurchaseAmount / convertedQuantity) : 0;

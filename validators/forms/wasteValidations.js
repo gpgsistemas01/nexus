@@ -2,15 +2,21 @@ import { validateNumber, validateTextOptional, validateUUID } from '../fields/fi
 
 const wasteDataValidation = [
     validateUUID('supplierProductId'),
-    validateNumber('quantity'),
     validateNumber('base'),
     validateNumber('height')
 ];
 
-export const wasteValidation = [
-    ...wasteDataValidation,
+const wasteStockValidationFields = [
+    validateNumber('currentStock'),
     validateTextOptional({ fieldName: 'observations', maxLength: 500 }),
     validateUUID('reasonId')
 ];
 
+export const wasteValidation = [
+    ...wasteDataValidation,
+    ...wasteStockValidationFields
+];
+
 export const wasteUpdateValidation = wasteDataValidation;
+
+export const wasteStockValidation = wasteStockValidationFields;

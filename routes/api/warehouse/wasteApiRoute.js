@@ -1,7 +1,7 @@
 import express from 'express';
 import { authorizeUserApi, verifyApiTokenRequired } from '../../../middleware/authMiddleware.js';
-import { editWaste, getAllWastes, registerWaste } from '../../../controllers/api/warehouse/wasteController.js';
-import { wasteUpdateValidation, wasteValidation } from '../../../validators/forms/wasteValidations.js';
+import { editWaste, editWasteStock, getAllWastes, registerWaste } from '../../../controllers/api/warehouse/wasteController.js';
+import { wasteStockValidation, wasteUpdateValidation, wasteValidation } from '../../../validators/forms/wasteValidations.js';
 import { validate } from '../../../middleware/validatorMiddleware.js';
 
 const router = express.Router();
@@ -14,6 +14,11 @@ const wasteReadPermissions = {
 const wasteWritePermissions = {
     roles: ['Almacenista', 'Coordinador', 'Auxiliar', 'Administrador del sistema'],
     departments: ['ALMACÉN Y PROVEDURÍA', 'SISTEMAS']
+};
+
+const wasteStockWritePermissions = {
+    roles: ['Administrador del sistema'],
+    departments: ['SISTEMAS']
 };
 
 router.get(
@@ -32,13 +37,22 @@ router.post(
     registerWaste
 );
 
-router.put(
+router.patch(
     '/:id',
     verifyApiTokenRequired,
     wasteUpdateValidation,
     validate,
     authorizeUserApi(wasteWritePermissions),
     editWaste
+);
+
+router.patch(
+    '/:id/stock',
+    verifyApiTokenRequired,
+    wasteStockValidation,
+    validate,
+    authorizeUserApi(wasteStockWritePermissions),
+    editWasteStock
 );
 
 export default router;

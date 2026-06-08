@@ -1,10 +1,59 @@
 import { AdjustmentStatus, StockAdjustmentType } from "../../generated/prisma/enums.ts";
 import { getDb } from "../../repository/baseRepository.js";
 import { generateReferenceNumber } from "../document/referenceNumberService.js";
+import { normalizeDecimal, toNumber } from "../../utils/formattersUtils.js";
+import { assertSufficientStock, calculateConvertedQuantity } from "../inventory/stockHelpers.js";
 import { createStockAdjustmentMovement } from "../inventory/movementService.js";
 import { adjustSupplierProductStock, findSupplierProductByIds } from "./products/supplierProductService.js";
 
 const REFERENCE_NUMBER_TYPE = 'AJU';
+
+const calculateStockAdjustmentValues = ({
+    product,
+    newStock,
+    base = null,
+    height = null
+}) => {
+
+    const previousStock = Number(toNumber(product.currentStock) || 0);
+    const difference = normalizeDecimal(newStock - previousStock);
+    const previousConvertedQuantity = Number(toNumber(product.convertedQuantity) || 0);
+    const hasCustomDimensions = base !== null && height !== null;
+    const productBase = hasCustomDimensions ? base : product.base;
+    const productHeight = hasCustomDimensions ? height : product.height;
+    const calculatedNewConvertedQuantity = hasCustomDimensions
+        ? previousConvertedQuantity + calculateConvertedQuantity({
+            quantity: difference,
+            base: productBase,
+            height: productHeight
+        })
+        : calculateConvertedQuantity({
+            currentStock: newStock,
+            base: productBase,
+            height: productHeight
+        });
+    const newConvertedQuantity = normalizeDecimal(calculatedNewConvertedQuantity);
+    const convertedDifference = normalizeDecimal(
+        newConvertedQuantity - previousConvertedQuantity
+    );
+
+    assertSufficientStock({
+        product,
+        newStock,
+        newConvertedQuantity
+    });
+
+    return {
+        previousStock,
+        newStock,
+        difference,
+        previousConvertedQuantity,
+        newConvertedQuantity,
+        convertedDifference,
+        productBase,
+        productHeight
+    };
+};
 
 const createStockAdjustmentInTransaction = async ({
     tx,
@@ -29,30 +78,24 @@ const createStockAdjustmentInTransaction = async ({
     const productName = product.name;
     const supplierName = product.supplier?.tradeName || '';
 
-    const previousStock = Number(product.currentStock);
-
-    const difference = newStock - previousStock;
+    const {
+        previousStock,
+        difference,
+        previousConvertedQuantity,
+        newConvertedQuantity,
+        convertedDifference,
+        productBase,
+        productHeight
+    } = calculateStockAdjustmentValues({
+        product,
+        newStock,
+        base,
+        height
+    });
 
     const adjustmentType = difference >= 0
         ? StockAdjustmentType.INCREASE
         : StockAdjustmentType.DECREASE;
-
-    const previousConvertedQuantity = Number(product.convertedQuantity);
-
-    const hasCustomDimensions = base !== null && height !== null;
-    const productBase = hasCustomDimensions ? base : product.base;
-    const productHeight = hasCustomDimensions ? height : product.height;
-
-    const conversionFactor = productBase && productHeight
-        ? (Number(productBase) * Number(productHeight))
-        : 1;
-
-    const newConvertedQuantity = hasCustomDimensions
-        ? previousConvertedQuantity + (difference * conversionFactor)
-        : newStock * conversionFactor;
-
-    const convertedDifference =
-        newConvertedQuantity - previousConvertedQuantity;
 
     const adjustment = await tx.stockAdjustment.create({
         data: {

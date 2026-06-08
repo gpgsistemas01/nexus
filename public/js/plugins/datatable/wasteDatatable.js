@@ -2,7 +2,7 @@ import { createDataTable, renderActionButtons } from "./baseDatatable.js";
 import { hasPermission } from "../../utils/permissions.js";
 import { renderMaterialName } from "./utils/renderProductDatatable.js";
 import { getAllWastes } from "../../application/warehouse/wastes.js";
-import { openWasteModal } from "../../pages/warehouse/wastesPage.js";
+import { openWasteModal, openWasteStockAdjustmentModal } from "../../pages/warehouse/wastesPage.js";
 import { getResponsiveRowData } from "./utils/responsive.js";
 
 const selectorTable = '#table';
@@ -34,9 +34,10 @@ const renderWasteTableHeader = ({ canSeeCost, canManageWastes }) => {
 
 export const createWasteDatatable = (context) => {
 
-    const { isWarehouse, isSystem, isSales } = hasPermission(context);
+    const { isAdmin, isWarehouse, isSystem, isSales } = hasPermission(context);
     const canSeeCost = isWarehouse || isSystem || isSales;
     const canManageWastes = isWarehouse || isSystem;
+    const canAdjustStock = isSystem && isAdmin;
 
     renderWasteTableHeader({ canSeeCost, canManageWastes });
 
@@ -63,7 +64,7 @@ export const createWasteDatatable = (context) => {
         columns.push({
             data: null,
             title: 'Acciones',
-            render: () => renderActionButtons({ status: 'Abierta', context: 'product' })
+            render: () => renderActionButtons({ status: 'Abierta', context: 'waste', canAdjustStock })
         });
     }
 
@@ -87,5 +88,12 @@ export const createWasteDatatable = (context) => {
         const data = getResponsiveRowData(table, this);
 
         await openWasteModal({ mode: 'edit', data });
+    });
+
+    $(`${ selectorTable } tbody`).on('click', '.btn-adjust-stock', async function() {
+
+        const data = getResponsiveRowData(table, this);
+
+        await openWasteStockAdjustmentModal({ mode: 'edit-stock', data });
     });
 };

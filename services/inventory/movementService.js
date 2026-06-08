@@ -1,15 +1,15 @@
 import { MovementDetailRelationConflict } from "../../errors/inventory/movementError.js";
-import { GoodsIssueInexistentStock, GoodsIssueInsufficientStock } from "../../errors/inventory/stockError.js";
+import { GoodsIssueInexistentStock } from "../../errors/inventory/stockError.js";
 import { InventoryMovementType } from "../../generated/prisma/enums.ts";
 import { getDb } from "../../repository/baseRepository.js";
 import { buildStockKey, hasProductDimensions, normalizeDecimal } from "../../utils/formattersUtils.js";
+import { assertSufficientStock, calculateConvertedQuantity } from "./stockHelpers.js";
 import { updateSupplierProductStock } from "../warehouse/products/supplierProductService.js";
 
 const REFERENCE_TYPE_GOODS_RECEIPT = 'GOODS_RECEIPT';
 const REFERENCE_TYPE_GOODS_ISSUE = 'GOODS_ISSUE';
 const REFERENCE_TYPE_PURCHASE_REQUISITION = 'PURCHASE_REQUISITION';
 const MOVEMENT_TYPE_OUT = 'ISSUE';
-const FLOAT_EPSILON = 0.000001;
 
 export const applyInventoryMovement = async ({
     tx,
@@ -58,18 +58,13 @@ export const applyInventoryMovement = async ({
 
         const hasDimensions = hasProductDimensions(ps.product);
 
-        const factor = hasDimensions
-            ? base * height
-            : 1;
-
         const quantity = normalizeDecimal(detail.quantity);
 
-        const rawConvertedQuantity = quantity * factor;
-
-        const convertedQuantity =
-            Math.abs(rawConvertedQuantity) <= FLOAT_EPSILON
-                ? 0
-                : normalizeDecimal(rawConvertedQuantity);
+        const convertedQuantity = calculateConvertedQuantity({
+            quantity,
+            base,
+            height
+        });
 
         const previousStock = normalizeDecimal(ps.currentStock || 0);
 
@@ -99,12 +94,15 @@ export const applyInventoryMovement = async ({
             previousConvertedQuantity + signedConvertedQuantity
         );
 
-        if (isOut && newStock < 0) {
-            throw new GoodsIssueInsufficientStock({
-                productName: ps.product?.name ?? 'Producto desconocido',
-                height: hasDimensions ? ps.product.height : null,
-                base: hasDimensions ? ps.product.base : null,
-                supplierName: ps.supplier?.tradeName ?? 'Proveedor desconocido'
+        if (isOut) {
+            assertSufficientStock({
+                product: {
+                    ...ps.product,
+                    base: hasDimensions ? ps.product.base : null,
+                    height: hasDimensions ? ps.product.height : null,
+                    supplier: ps.supplier
+                },
+                newStock
             });
         }
 

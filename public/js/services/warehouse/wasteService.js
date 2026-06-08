@@ -16,7 +16,13 @@ export const registerWasteRequest = ({ data }) => apiRequest({
 
 
 export const editWasteRequest = ({ data, id }) => apiRequest({
-    method: 'put',
+    method: 'patch',
     url: `${ WASTES_API_ROUTE }/${ id }`,
+    data
+});
+
+export const editWasteStockRequest = ({ data, id }) => apiRequest({
+    method: 'patch',
+    url: `${ WASTES_API_ROUTE }/${ id }/stock`,
     data
 });

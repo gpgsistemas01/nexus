@@ -1,8 +1,20 @@
-export const createWasteDto = (body = {}) => ({
+const buildWasteBaseDto = (body = {}) => ({
     supplierProductId: body.supplierProductId,
-    quantity: Number(body.quantity),
     base: Number(body.base),
-    height: Number(body.height),
+    height: Number(body.height)
+});
+
+const buildWasteStockDto = (body = {}) => ({
+    currentStock: Number(body.currentStock),
     ...Object.prototype.hasOwnProperty.call(body, 'observations') ? { observations: body.observations ? body.observations.trim() : null } : {},
     reasonId: body.reasonId
 });
+
+export const createWasteDto = (body = {}) => ({
+    ...buildWasteBaseDto(body),
+    ...buildWasteStockDto(body)
+});
+
+export const createWasteDataDto = (body = {}) => buildWasteBaseDto(body);
+
+export const createWasteStockDto = (body = {}) => buildWasteStockDto(body);

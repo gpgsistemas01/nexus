@@ -9,6 +9,16 @@ import { createStockAdjustment } from "../adjustmentService.js";
 const REFERENCE_MOVEMENT_IN = 'IN';
 const PRISMA_RECORD_NOT_FOUND = 'P2025';
 
+const buildProductData = ({ rest, relations }) => ({
+    ...rest,
+    presentation: {
+        connect: { id: relations.presentationId }
+    },
+    unitMeasure: {
+        connect: { id: relations.unitMeasureId }
+    }
+});
+
 const createProductInTransaction = async ({
     tx,
     productDto,
@@ -22,15 +32,7 @@ const createProductInTransaction = async ({
     } = await prepareProductData({ tx, productDto });
 
     const createdProduct = await tx.product.create({
-        data: {
-            ...rest,
-            presentation: {
-                connect: { id: relations.presentationId }
-            },
-            unitMeasure: {
-                connect: { id: relations.unitMeasureId }
-            }
-        },
+        data: buildProductData({ rest, relations }),
         select: {
             id: true
         }
@@ -176,15 +178,7 @@ export const updateProduct = async (productDto, id) => {
 
             const updatedProduct = await tx.product.update({
                 where: { id },
-                data: {
-                    ...rest,
-                    presentation: {
-                        connect: { id: relations.presentationId }
-                    },
-                    unitMeasure: {
-                        connect: { id: relations.unitMeasureId }
-                    }
-                }
+                data: buildProductData({ rest, relations })
             });
 
             await syncSupplierProduct({

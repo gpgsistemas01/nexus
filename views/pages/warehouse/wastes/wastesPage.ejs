@@ -14,13 +14,7 @@
                             id: 'productInput',
                             name: 'supplierProductId',
                             class: 'product-select',
-                            col: '8'
-                        },
-                        {
-                            id: 'reasonInput',
-                            name: 'reasonId',
-                            class: 'reason-select',
-                            col: '4'
+                            col: '12'
                         }
                     ]
                 },
@@ -65,7 +59,7 @@
                             attrs: {
                                 min: '0'
                             },
-                            col: '4'
+                            col: '6'
                         },
                         {
                             id: 'heightInput',
@@ -76,18 +70,40 @@
                             attrs: {
                                 min: '0'
                             },
-                            col: '4'
-                        },
+                            col: '6'
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            title: 'Datos de ajuste',
+            class: 'stock-data-section',
+            groups: [
+                {
+                    type: 'selects',
+                    items: [
                         {
-                            id: 'quantityInput',
+                            id: 'reasonInput',
+                            name: 'reasonId',
+                            class: 'reason-select',
+                            col: '6'
+                        }
+                    ]
+                },
+                {
+                    type: 'inputs',
+                    items: [
+                        {
+                            id: 'currentStockInput',
                             type: 'number',
-                            name: 'quantity',
-                            label: 'Cantidad de merma',
+                            name: 'currentStock',
+                            label: 'Stock de merma',
                             value: '',
                             attrs: {
                                 min: '0'
                             },
-                            col: '4'
+                            col: '6'
                         }
                     ]
                 },

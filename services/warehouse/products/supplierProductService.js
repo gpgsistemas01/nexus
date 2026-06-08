@@ -2,6 +2,7 @@ import { GoodsIssueInexistentStock, GoodsIssueInsufficientStock } from "../../..
 import { ProductNotFound, ProductSnapshotFindDatabaseError, SupplierProductCreateDatabaseError, SupplierProductDeleteDatabaseError } from "../../../errors/warehouse/productError.js";
 import { getDb } from "../../../repository/baseRepository.js";
 import { buildStockKey, hasProductDimensions, normalizeDecimal, parseStockKey } from "../../../utils/formattersUtils.js";
+import { calculateConvertedQuantity } from "../../inventory/stockHelpers.js";
 import { createStockAdjustment } from "../adjustmentService.js";
 
 const MOVEMENT_TYPE_IN = 'ENTRY';
@@ -390,11 +391,11 @@ export const updateSupplierProductStock = async ({
 
         if (!ps) throw new GoodsIssueInexistentStock(buildStockErrorMeta(ps));
 
-        const hasDimensions = hasProductDimensions(ps.product);
-        const factor = hasDimensions
-            ? Number(ps.product.base) * Number(ps.product.height)
-            : 1;
-        const convertedQuantity = normalizeDecimal(quantity * factor);
+        const convertedQuantity = calculateConvertedQuantity({
+            quantity,
+            base: ps.product.base,
+            height: ps.product.height
+        });
 
         if (movementType !== MOVEMENT_TYPE_IN) {
 

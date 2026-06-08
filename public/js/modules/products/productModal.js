@@ -1,15 +1,13 @@
 import { openModal } from "../../ui/modalUI.js";
 import { initProductFormSelect2, setProductFormSelectOptions } from "../../plugins/select2/modules/productSelect.js";
-import { clearFormErrors, initForm, setFormReadOnly, toggleFormFields } from "../../ui/formUI.js";
+import { configureStockAdjustmentForm, shouldShowStockAdjustmentFields } from "../stockAdjustmentForm.js";
+import { clearFormErrors, initForm } from "../../ui/formUI.js";
 
 const productModalId = '#productModal';
 const formId = '#productForm';
 const productFields = ['name', 'minStock', 'base', 'height', 'supplierId', 'presentationId', 'unitMeasureId', 'isActive'];
 const stockFields = ['newStock', 'reasonId', 'observations'];
 const stockSectionSelector = '.stock-data-section';
-
-const shouldShowStockFields = ({ mode, includeStockAdjustmentOnCreate, isStockAdjustment }) =>
-    isStockAdjustment || (mode === 'create' && includeStockAdjustmentOnCreate);
 
 const setProductValues = ({ form, data = null }) => {
 
@@ -32,7 +30,7 @@ const prepareProductModal = ({
     const form = document.querySelector(formId);
     const modalElement = document.querySelector(productModalId);
 
-    const showStockFields = shouldShowStockFields({
+    const showStockFields = shouldShowStockAdjustmentFields({
         mode,
         includeStockAdjustmentOnCreate,
         isStockAdjustment
@@ -42,10 +40,14 @@ const prepareProductModal = ({
     clearFormErrors(form);
     form.dataset.includeStockAdjustmentOnCreate = showStockFields && !isStockAdjustment ? 'true' : 'false';
     form.dataset.creationContext = creationContext || '';
-    toggleFormFields({ form, fields: productFields, isVisible: true });
-    toggleFormFields({ form, fields: stockFields, isVisible: showStockFields });
-    form.querySelector(stockSectionSelector)?.classList.toggle('d-none', !showStockFields);
-    setFormReadOnly({ form, fields: productFields, isReadOnly: isStockAdjustment });
+    configureStockAdjustmentForm({
+        form,
+        dataFields: productFields,
+        stockFields,
+        stockSectionSelector,
+        showStockFields,
+        isStockAdjustment
+    });
 
     initProductFormSelect2({ modalSelector: productModalId, isStockAdjustment: showStockFields });
     setProductFormSelectOptions({ modalSelector: productModalId, data, isStockAdjustment: showStockFields });

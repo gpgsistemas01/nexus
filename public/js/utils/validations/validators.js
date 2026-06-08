@@ -32,15 +32,19 @@ export const productStockValidators = {
 
 export const wasteDataValidators = {
     supplierProductId: (value) => isEmptyOrNull(value, 'El producto'),
-    quantity: (value) => validateNumber(value, 'La cantidad de merma'),
     base: (value) => validateNumber(value, 'La base de la merma'),
     height: (value) => validateNumber(value, 'La altura de la merma'),
 }
 
-export const wasteValidators = {
-    ...wasteDataValidators,
+export const wasteStockValidators = {
+    currentStock: (value) => validateNumber(value, 'El stock de merma'),
     reasonId: (value) => isEmptyOrNull(value, 'La razón de ajuste'),
     observations: (value) => validateTextOptional(value, 500, 'Las observaciones'),
+}
+
+export const wasteValidators = {
+    ...wasteDataValidators,
+    ...wasteStockValidators,
 }
 
 export const loginValidators = {
