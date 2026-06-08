@@ -153,11 +153,9 @@ const addProduct = () => {
 
     const productId = option.value;
 
-    const supplierId = document.querySelector('#supplierInput').value;
     const quantity = Number(document.querySelector('#quantityInput').value);
     const costPerUnitType = Number(document.querySelector('#costPerUnitInput').value);
     const errors = validateFields(validateAddGoodsReceiptProductValidators, {
-        supplierId,
         productId,
         quantity,
         costPerUnitType

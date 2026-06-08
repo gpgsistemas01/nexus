@@ -53,14 +53,19 @@ export const loginValidators = {
 }
 
 export const validateAddGoodsReceiptProductValidators = {
-    supplierId: (value) => isEmptyOrNull(value, 'El proveedor'),
-    supplierProductId: (value) => isEmptyOrNull(value, 'El producto'),
+    productId: (value) => isEmptyOrNull(value, 'El producto'),
     quantity: (value) => validatePositiveNumber(value, 'La cantidad'),
     costPerUnitType: (value) => validatePositiveNumber(value, 'El costo por presentación'),
 }
 
 export const validateAddProductValidators = {
-    supplierProductId: (value) => isEmptyOrNull(value, 'El producto'),
+    productId: (value) => isEmptyOrNull(value, 'El producto'),
+    quantity: (value) => validatePositiveNumber(value, 'La cantidad'),
+}
+
+export const validateAddGoodsIssueProductValidators = {
+    productId: (value) => isEmptyOrNull(value, 'El producto'),
+    supplierId: (value) => isEmptyOrNull(value, 'El proveedor'),
     quantity: (value) => validatePositiveNumber(value, 'La cantidad'),
 }
 

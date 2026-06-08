@@ -1,6 +1,6 @@
 import { useForm } from "../../application/form.js";
 import { editGoodsIssue, editGoodsIssueDetails, registerGoodsIssue } from "../../application/warehouse/goodsIssues/goodsIssues.js";
-import { validateAddProductValidators, validateGoodsIssueDetailValidators, validateGoodsIssueValidators } from "../../utils/validations/validators.js";
+import { validateAddGoodsIssueProductValidators, validateGoodsIssueDetailValidators, validateGoodsIssueValidators } from "../../utils/validations/validators.js";
 import { refreshProductTable } from "../../plugins/datatable/baseDatatable.js";
 import { createGoodsIssueDatatable, details, initDetailsGoodsIssueTable } from "../../plugins/datatable/goodsIssueDatatable.js";
 import { initGoodsIssueFormSelect2, setGoodsIssueFormSelectOptions } from "../../plugins/select2/modules/goodsIssueSelect.js";
@@ -152,8 +152,9 @@ const addProduct = () => {
     const productId = option?.value;
     const quantity = Number(document.querySelector('#quantityInput').value);
 
-    const errors = validateFields(validateAddProductValidators, {
+    const errors = validateFields(validateAddGoodsIssueProductValidators, {
         productId,
+        supplierId,
         quantity
     });
 
