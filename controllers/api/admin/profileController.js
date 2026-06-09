@@ -1,4 +1,5 @@
 import { createProfileDTO } from "../../../dtos/profileDTO.js";
+import { successCodeMessages } from "../../../messages/codeMessages.js";
 import { createProfile, findAllProfiles, updateProfile } from "../../../services/admin/profileService.js";
 import { sanitizeEmptyStrings } from "../../../utils/formattersUtils.js";
 import { getDataTableOrder, getDataTablePaging, getDataTableSearch } from "../../../utils/requestQueryUtils.js";
@@ -61,7 +62,7 @@ export const registerProfile = async (req, res) => {
 
     const profile = await createProfile({ profileDto: sanitizedProfileDto });
 
-    return res.status(201).json(profile);
+    return res.status(201).json({ profile, code: successCodeMessages.CREATED_PROFILE });
 }
 
 export const editProfile = async (req, res) => {
@@ -72,5 +73,5 @@ export const editProfile = async (req, res) => {
 
     const profile = await updateProfile({ id, profileDto: sanitizedProfileDto });
 
-    return res.status(200).json(profile);
+    return res.status(200).json({ profile, code: successCodeMessages.UPDATED_PROFILE });
 }
