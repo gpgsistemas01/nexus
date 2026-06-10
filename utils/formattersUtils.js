@@ -69,4 +69,22 @@ export const parseStockKey = (key) => {
 
 export const toNumber = value => value == null || value === '' ? null : Number(value);
 
+export const normalizeProductDimensions = ({ base, height } = {}) => {
+
+    const parsedBase = toNumber(base);
+    const parsedHeight = toNumber(height);
+
+    if (parsedBase === 0 && parsedHeight === 0) {
+        return {
+            base: null,
+            height: null
+        };
+    }
+
+    return {
+        base: parsedBase,
+        height: parsedHeight
+    };
+};
+
 export const normalizeText = (value = '') => value.trim().toUpperCase();

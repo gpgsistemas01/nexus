@@ -103,8 +103,8 @@ export const validateFields = (validators, formData) => {
 
     const errors = {};
 
-    Object.keys(validators).forEach(field => {
-        const error = validators[field](formData[field]);
+    Object.entries(validators).forEach(([field, validator]) => {
+        const error = validator(formData[field], formData);
 
         errors[field] = error;
     });

@@ -102,7 +102,7 @@ export const validateTextOptionalWhen = ({ fieldName, maxLength, predicate }) =>
         .matches(genericRegex).withMessage(errors.INVALID_FORMAT)
 }
 
-export const validateUUIDWhen = (fieldName, predicate) => {
+export const validateUUIDWhen = ({ fieldName, predicate }) => {
 
     const errors = errorMap[fieldName];
 
@@ -135,7 +135,7 @@ export const validateNumber = (fieldName) => {
         .toFloat()
 }
 
-export const validateNumberWhen = (fieldName, predicate) => {
+export const validateNumberWhen = ({ fieldName, predicate }) => {
 
     const errors = errorMap[fieldName];
 
@@ -145,6 +145,17 @@ export const validateNumberWhen = (fieldName, predicate) => {
         .isFloat().withMessage(errors.INVALID_NUMBER).bail()
         .matches(/^\d{1,8}(\.\d{1,2})?$/).withMessage(errors.TOO_LONG)
         .toFloat()
+}
+
+const hasValue = (value) => value !== undefined && value !== null && value !== '';
+
+export const validateNumberRequiredWhenOtherPresent = ({ fieldName, pairedFieldName }) => {
+
+    const errors = errorMap[fieldName];
+
+    return body(fieldName)
+        .if((value, { req }) => hasValue(req.body[pairedFieldName]))
+        .notEmpty().withMessage(errors.REQUIRED)
 }
 
 export const validateNumberOptional = (fieldName, { disableTooLong = false } = {}) => {

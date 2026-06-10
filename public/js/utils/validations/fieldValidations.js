@@ -106,6 +106,15 @@ export const validateNumberOptional = (number, fieldName) => {
     return result;
 }
 
+const hasValue = (value) => value !== undefined && value !== null && value !== '';
+
+export const validatePairedOptionalNumber = ({ value, pairedValue, fieldName }) => {
+
+    if (!hasValue(value) && hasValue(pairedValue)) return `${ fieldName } es requerida.`;
+
+    return validateNumberOptional(value, fieldName);
+}
+
 export const validateDate = (date, fieldName) => {
 
     let result = isEmptyOrNull(date, fieldName);

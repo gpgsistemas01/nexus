@@ -1,5 +1,5 @@
 import { isEmptyOrNull } from "./baseValidations.js";
-import { validateName, validatePassword, validateNumber, validateUsername, validateTextOptional, validateMeasure, validateDateOptional, validateGoodsReceiptDetailsArray, validateDate, validateText, validateNumberOptional, validateGoodsIssueDetailsArray, validatePositiveNumber } from "./fieldValidations.js";
+import { validateName, validatePassword, validateNumber, validateUsername, validateTextOptional, validateMeasure, validateDateOptional, validateGoodsReceiptDetailsArray, validateDate, validateText, validateNumberOptional, validateGoodsIssueDetailsArray, validatePositiveNumber, validatePairedOptionalNumber } from "./fieldValidations.js";
 
 export const supplierValidators = {
     legalName: (value) => validateText({ 
@@ -20,8 +20,16 @@ export const productValidators = {
     presentationId: (value) => isEmptyOrNull(value, 'La presentación'),
     unitMeasureId: (value) => isEmptyOrNull(value, 'La unidad'),
     minStock: (value) => validateNumberOptional(value, 'El stock mínimo'),
-    base: (value) => validateNumberOptional(value, 'La base'),
-    height: (value) => validateNumberOptional(value, 'La altura'),
+    base: (_, { base, height }) => validatePairedOptionalNumber({
+        value: base,
+        pairedValue: height,
+        fieldName: 'La base'
+    }),
+    height: (_, { base, height }) => validatePairedOptionalNumber({
+        value: height,
+        pairedValue: base,
+        fieldName: 'La altura'
+    }),
 }
 
 export const productStockValidators = {

@@ -1,4 +1,4 @@
-import { validateBoolean, validateNumber, validateNumberOptional, validateNumberWhen, validateText, validateTextOptional, validateTextOptionalWhen, validateUUID, validateUUIDWhen } from "../fields/fieldsValidator.js";
+import { validateBoolean, validateNumber, validateNumberOptional, validateNumberRequiredWhenOtherPresent, validateNumberWhen, validateText, validateTextOptional, validateTextOptionalWhen, validateUUID, validateUUIDWhen } from "../fields/fieldsValidator.js";
 
 const stockAdjustmentFields = ['newStock', 'reasonId', 'observations'];
 export const PRODUCT_CREATION_CONTEXT_GOODS_RECEIPT = 'goodsReceipt';
@@ -13,13 +13,19 @@ export const requiresInitialStockAdjustmentOnCreate = (body = {}) =>
     !isGoodsReceiptProductCreation(body) || hasStockAdjustmentPayload(body);
 
 const validateStockAdjustmentOnCreate = [
-    validateNumberWhen('newStock', requiresInitialStockAdjustmentOnCreate),
+    validateNumberWhen({
+        fieldName: 'newStock',
+        predicate: requiresInitialStockAdjustmentOnCreate
+    }),
     validateTextOptionalWhen({
         fieldName: 'observations',
         maxLength: 500,
         predicate: requiresInitialStockAdjustmentOnCreate
     }),
-    validateUUIDWhen('reasonId', requiresInitialStockAdjustmentOnCreate)
+    validateUUIDWhen({
+        fieldName: 'reasonId',
+        predicate: requiresInitialStockAdjustmentOnCreate
+    })
 ];
 
 export const productValidation = [
@@ -28,6 +34,8 @@ export const productValidation = [
     validateUUID('presentationId'),
     validateUUID('unitMeasureId'),
     validateNumberOptional('minStock', { disableTooLong: true }),
+    validateNumberRequiredWhenOtherPresent({ fieldName: 'base', pairedFieldName: 'height' }),
+    validateNumberRequiredWhenOtherPresent({ fieldName: 'height', pairedFieldName: 'base' }),
     validateNumberOptional('base'),
     validateNumberOptional('height'),
     validateBoolean('isActive')
