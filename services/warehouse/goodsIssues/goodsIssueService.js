@@ -12,7 +12,7 @@ import {
 import { getDb } from "../../../repository/baseRepository.js";
 import { findProfileById, findProfileWithDepartmentsById } from "../../admin/profileService.js";
 import { findDepartmentById } from "../../admin/departmentService.js";
-import { generateReferenceNumber } from "../../document/referenceNumberService.js";
+import { generateYearlyReferenceNumber } from "../../document/referenceNumberService.js";
 import { findClientById } from "../../sales/clientService.js";
 import { buildGoodsIssueDetails, isValidInternalClientAdvisor, isValidInternalClientProjectNumberByDepartment, resolveFulfillmentStatus } from "./goodsIssueHelpers.js";
 import { applyInventoryMovement } from "../../inventory/movementService.js";
@@ -174,7 +174,7 @@ export const createGoodsIssue = async ({ goodsIssueDto }) => {
 
         const result = await getDb().$transaction(async (tx) => {
 
-            const referenceNumber = await generateReferenceNumber({ type: REFERENCE_NUMBER_TYPE, tx });
+            const referenceNumber = await generateYearlyReferenceNumber({ type: REFERENCE_NUMBER_TYPE, tx });
 
             const goodsIssue = await tx.goodsIssue.create({
                 data: {

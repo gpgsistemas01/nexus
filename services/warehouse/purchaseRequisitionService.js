@@ -8,7 +8,7 @@ import {
     PurchaseRequisitionApproverProfileNotFound
 } from "../../errors/warehouse/purchaseRequisitionError.js";
 import { getDb } from "../../repository/baseRepository.js";
-import { generateReferenceNumber } from "../document/referenceNumberService.js";
+import { generateYearlyReferenceNumber } from "../document/referenceNumberService.js";
 
 const allowedDepartments = ['Almcén', 'Sistemas'];
 const allowedUsers = ['Coordinador', 'Administrador del sistema'];
@@ -153,7 +153,7 @@ export const createPurchaseRequisition = async ({
 
     const result = await getDb().$transaction(async (tx) => {
 
-        const referenceNumber = await generateReferenceNumber({ type: REFERENCE_NUMBER_TYPE, tx });
+        const referenceNumber = await generateYearlyReferenceNumber({ type: REFERENCE_NUMBER_TYPE, tx });
 
         const purchaseRequisition = await tx.purchaseRequisition.create({
             data: {

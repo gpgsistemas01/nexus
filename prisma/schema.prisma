@@ -205,8 +205,11 @@ model Client {
 
 model ReferenceNumberCounter {
   id      String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  prefix  String @unique @db.VarChar(10)
+  prefix  String @db.VarChar(10)
   counter Int    @default(0)
+  year    Int    @default(0)
+
+  @@unique([prefix, year])
 }
 
 model GoodsReceipt {
