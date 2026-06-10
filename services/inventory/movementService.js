@@ -121,13 +121,9 @@ export const applyInventoryMovement = async ({
             supplierId: detail.supplierId,
 
             quantity: signedQuantity,
-            convertedQuantity: signedConvertedQuantity,
 
             previousStock,
             newStock,
-
-            previousConvertedQuantity,
-            newConvertedQuantity: newConverted,
 
             productBase: hasDimensions ? base : null,
             productHeight: hasDimensions ? height : null,
@@ -176,11 +172,8 @@ export const createStockAdjustmentMovement = async ({
     supplierId,
     reasonId,
     previousStock,
-    previousConvertedQuantity,
     newStock,
-    newConvertedQuantity,
-    difference,
-    convertedDifference
+    difference
 }) => {
 
     const db = getDb(tx);
@@ -200,10 +193,7 @@ export const createStockAdjustmentMovement = async ({
                 create: {
                     quantity: difference,
                     newStock,
-                    newConvertedQuantity,
-                    convertedQuantity: convertedDifference,
                     previousStock,
-                    previousConvertedQuantity,
                     productBase: adjustmentDetail.productBase,
                     productHeight: adjustmentDetail.productHeight,
                     product: {

@@ -121,9 +121,6 @@ export const createMovementDatatable = async () => {
                 { data: 'previousStock', title: 'Stock Anterior' },
                 { data: 'quantity', title: 'Movimiento' },
                 { data: 'newStock', title: 'Stock Nuevo' },
-                { data: 'previousConvertedQuantity', title: 'Cantidad Convertida Anterior' },
-                { data: 'convertedQuantity', title: 'Cantidad Convertida' },
-                { data: 'newConvertedQuantity', title: 'Cantidad Convertida Nueva' },
             ],
             buttons: [
                 buildExcelButton({
