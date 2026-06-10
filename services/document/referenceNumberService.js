@@ -1,31 +1,50 @@
-import { ReferenceNumberUpdateDatabaseError } from "../../errors/document/referenceNumberError.js";
+const incrementYearlyReferenceNumberCounter = async ({ type, tx, year }) => {
 
-export const incrementReferenceNumberCounter = async ({ type, tx }) => {
-
-    try {
-
-        return tx.referenceNumberCounter.update({
-            where: { prefix: type },
-            data: {
-                counter: {
-                    increment: 1
-                }
+    return tx.referenceNumberCounter.upsert({
+        where: {
+            prefix_year: {
+                prefix: type,
+                year
             }
-        });
-
-    } catch (err) {
-
-        throw new ReferenceNumberUpdateDatabaseError();
-    }
+        },
+        update: {
+            counter: {
+                increment: 1
+            }
+        },
+        create: {
+            prefix: type,
+            year,
+            counter: 1
+        }
+    });
 }
 
-export const generateReferenceNumber = async ({ type, tx }) => {
+export const incrementNonYearlyReferenceNumberCounter = async ({ type, tx }) => {
 
-    const counter = await incrementReferenceNumberCounter({
-        type,
-        tx
+    return tx.referenceNumberCounter.update({
+        where: {
+            prefix_year: {
+                prefix: type,
+                year: 0
+            }
+        },
+        data: {
+            counter: {
+                increment: 1
+            }
+        }
     });
+}
+
+export const generateYearlyReferenceNumber = async ({ type, tx }) => {
 
     const year = new Date().getFullYear();
+    const counter = await incrementYearlyReferenceNumberCounter({
+        type,
+        tx,
+        year
+    });
+
     return `${type}-${year}-${counter.counter.toString().padStart(6, '0')}`;
 }

@@ -1,6 +1,6 @@
 import { AdjustmentStatus, StockAdjustmentType } from "../../generated/prisma/enums.ts";
 import { getDb } from "../../repository/baseRepository.js";
-import { generateReferenceNumber } from "../document/referenceNumberService.js";
+import { generateYearlyReferenceNumber } from "../document/referenceNumberService.js";
 import { normalizeDecimal, toNumber } from "../../utils/formattersUtils.js";
 import { assertSufficientStock, calculateConvertedQuantity } from "../inventory/stockHelpers.js";
 import { createStockAdjustmentMovement } from "../inventory/movementService.js";
@@ -73,7 +73,7 @@ const createStockAdjustmentInTransaction = async ({
         supplierId
     });
 
-    const referenceNumber = await generateReferenceNumber({ type: REFERENCE_NUMBER_TYPE, tx });
+    const referenceNumber = await generateYearlyReferenceNumber({ type: REFERENCE_NUMBER_TYPE, tx });
 
     const productName = product.name;
     const supplierName = product.supplier?.tradeName || '';

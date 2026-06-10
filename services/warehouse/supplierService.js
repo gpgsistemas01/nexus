@@ -1,10 +1,10 @@
 import { AppError } from "../../errors/AppError.js";
 import { SupplierCodeFindDatabaseError, SupplierCodeNotFound, SupplierCreateDatabaseError, SupplierNotFound, SupplierUpdateDatabaseError } from "../../errors/warehouse/supplierError.js";
 import { getDb } from "../../repository/baseRepository.js";
-import { incrementReferenceNumberCounter } from "../document/referenceNumberService.js";
+import { incrementNonYearlyReferenceNumberCounter } from "../document/referenceNumberService.js";
 
 const SUPPLIER_CODE_ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-
+const SUPPLIER_REFERENCE_PREFIX = 'PRO';
 const numberToSupplierCode = (number) => {
 
     let current = number + 1;
@@ -18,6 +18,7 @@ const numberToSupplierCode = (number) => {
 
     return code;
 };
+
 export const findAllSuppliers = async ({
     skip = 0,
     take = 10,
@@ -113,8 +114,8 @@ export const createSupplier = async (supplierDto) => {
 
         return await getDb().$transaction(async (tx) => {
 
-            const counter = await incrementReferenceNumberCounter({
-                type: 'PRO',
+            const counter = await incrementNonYearlyReferenceNumberCounter({
+                type: SUPPLIER_REFERENCE_PREFIX,
                 tx
             });
 

@@ -4,7 +4,7 @@ import {
     SupplierNotFound
 } from "../../../errors/warehouse/goodsReceiptError.js";
 import { getDb } from "../../../repository/baseRepository.js";
-import { generateReferenceNumber } from "../../document/referenceNumberService.js";
+import { generateYearlyReferenceNumber } from "../../document/referenceNumberService.js";
 import { findProfileById } from "../../admin/profileService.js";
 import { applyInventoryMovement } from "../../inventory/movementService.js";
 import { findUniqueSupplier } from "../supplierService.js";
@@ -142,7 +142,7 @@ export const createGoodsReceipt = async ({ goodsReceiptDto }) => {
 
         const result = await getDb().$transaction(async (tx) => {
 
-            const referenceNumber = await generateReferenceNumber({ type: REFERENCE_NUMBER_TYPE, tx });
+            const referenceNumber = await generateYearlyReferenceNumber({ type: REFERENCE_NUMBER_TYPE, tx });
 
             const goodsReceipt = await tx.goodsReceipt.create({
                 data: {

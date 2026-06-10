@@ -204,12 +204,15 @@ async function main() {
         skipDuplicates: true
     });
 
+    const referenceNumberYear = new Date().getFullYear();
+
     await prisma.referenceNumberCounter.createMany({
         data: [
-            { prefix: 'REC' },
-            { prefix: 'SAL'},
-            { prefix: 'REQ' },
-            { prefix: 'PRO' },
+            { prefix: 'REC', year: referenceNumberYear },
+            { prefix: 'SAL', year: referenceNumberYear },
+            { prefix: 'REQ', year: referenceNumberYear },
+            { prefix: 'AJU', year: referenceNumberYear },
+            { prefix: 'PRO', year: 0 },
         ],
         skipDuplicates: true
     });
@@ -298,7 +301,10 @@ async function main() {
 
     await prisma.referenceNumberCounter.update({
         where: {
-            prefix: 'PRO'
+            prefix_year: {
+                prefix: 'PRO',
+                year: 0
+            }
         },
         data: {
             counter: counter
