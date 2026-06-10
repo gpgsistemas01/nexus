@@ -55,7 +55,7 @@ export const loginValidators = {
 export const validateAddGoodsReceiptProductValidators = {
     productId: (value) => isEmptyOrNull(value, 'El producto'),
     quantity: (value) => validatePositiveNumber(value, 'La cantidad'),
-    costPerUnitType: (value) => validatePositiveNumber(value, 'El costo por presentación'),
+    costPerUnitType: (value) => validateNumber(value, 'El costo por presentación', { allowZero: false }),
 }
 
 export const validateAddProductValidators = {

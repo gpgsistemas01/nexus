@@ -70,7 +70,7 @@ export const validatePositiveNumber = (number, fieldName) => {
     return null;
 }
 
-export const validateNumber = (number, fieldName) => {
+export const validateNumber = (number, fieldName, { allowZero = true } = {}) => {
 
     let result = isEmptyOrNull(number, fieldName);
 
@@ -84,7 +84,11 @@ export const validateNumber = (number, fieldName) => {
 
     result = isNegative(number, fieldName);
 
-    return result;
+    if (result) return result;
+
+    if (!allowZero && number === 0) return `${ fieldName } debe ser un número mayor a cero`;
+
+    return null;
 }
 
 export const validateNumberOptional = (number, fieldName) => {
