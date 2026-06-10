@@ -413,13 +413,10 @@ model InventoryMovement {
 model MovementDetail {
   id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
 
-  quantity          Decimal  @db.Decimal(10, 2)
-  convertedQuantity Decimal? @db.Decimal(10, 2)
+  quantity Decimal @db.Decimal(10, 2)
 
-  newStock                  Decimal? @db.Decimal(10, 2)
-  newConvertedQuantity      Decimal? @db.Decimal(10, 2)
-  previousStock             Decimal? @db.Decimal(10, 2)
-  previousConvertedQuantity Decimal? @db.Decimal(10, 2)
+  newStock      Decimal? @db.Decimal(10, 2)
+  previousStock Decimal? @db.Decimal(10, 2)
 
   productId               String   @db.Uuid
   productBase             Decimal? @db.Decimal(10, 2)

@@ -38,8 +38,5 @@ export const findMovementReportRows = async ({
         newStock: toNumber(movement.newStock),
         productBase: toNumber(movement.productBase),
         productHeight: toNumber(movement.productHeight),
-        previousConvertedQuantity: toNumber(movement.previousConvertedQuantity),
-        convertedQuantity: toNumber(movement.convertedQuantity),
-        newConvertedQuantity: toNumber(movement.newConvertedQuantity),
     }));
 };

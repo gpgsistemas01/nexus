@@ -16,7 +16,7 @@ const getReportFilename = () => {
 
 export const exportMovementReport = async (req, res) => {
 
-    const columns = ['date', 'type', 'referenceNumber', null, null, null, null, null, null, null, null, null, null];
+    const columns = ['date', 'type', 'referenceNumber', null, null, null, null, null, null, null];
     const { orderBy, orderDir } = getDataTableOrder({
         query: req.query,
         columns,
@@ -49,10 +49,7 @@ export const exportMovementReport = async (req, res) => {
             'Proveedor',
             'Stock Anterior',
             'Movimiento',
-            'Stock Nuevo',
-            'Cantidad Convertida Anterior',
-            'Cantidad Convertida',
-            'Cantidad Convertida Nueva'
+            'Stock Nuevo'
         ],
 
         ...rows.map(row => [
@@ -66,10 +63,7 @@ export const exportMovementReport = async (req, res) => {
             row.supplierName,
             row.previousStock,
             row.quantity,
-            row.newStock,
-            row.previousConvertedQuantity,
-            row.convertedQuantity,
-            row.newConvertedQuantity
+            row.newStock
         ])
     ];
 

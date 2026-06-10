@@ -11,9 +11,6 @@ const MOVEMENT_DETAIL_SELECT = {
     productBase: true,
     productHeight: true,
     quantity: true,
-    previousConvertedQuantity: true,
-    convertedQuantity: true,
-    newConvertedQuantity: true,
     previousStock: true,
     newStock: true,
     product: {
@@ -213,12 +210,6 @@ const mapMovementDetail = (detail) => ({
     supplierName: resolveSupplierName(detail),
 
     quantity: detail.quantity,
-
-    previousConvertedQuantity: detail.previousConvertedQuantity,
-
-    convertedQuantity: detail.convertedQuantity,
-
-    newConvertedQuantity: detail.newConvertedQuantity,
 
     previousStock: detail.previousStock,
 
