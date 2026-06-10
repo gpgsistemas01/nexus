@@ -40,6 +40,7 @@ const buildProductPayload = (formData) => ({
     presentationId: formData.presentationId,
     unitMeasureId: formData.unitMeasureId,
     minStock: formData.minStock,
+    maxUnitCost: formData.maxUnitCost,
     base: formData.base,
     height: formData.height,
     isActive: formData.isActive

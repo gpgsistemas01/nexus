@@ -7,7 +7,7 @@ const PRISMA_RECORD_NOT_UNIQUE = 'P2002';
 
 export const prepareProductData = async ({ tx, productDto, productId = null }) => {
 
-    const { presentationId, unitMeasureId, supplierId, ...rest } = productDto;
+    const { presentationId, unitMeasureId, supplierId, maxUnitCost, ...rest } = productDto;
 
     await findUniqueUnitMeasure({ tx, id: unitMeasureId });
     await findUniquePresentation({ tx, id: presentationId });
@@ -17,7 +17,8 @@ export const prepareProductData = async ({ tx, productDto, productId = null }) =
         relations: {
             presentationId,
             unitMeasureId,
-            supplierId
+            supplierId,
+            maxUnitCost
         }
     };
 };

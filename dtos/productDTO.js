@@ -6,6 +6,7 @@ export const createProductDtoForRegister = (body = {}) => ({
     presentationId: body.presentationId,
     unitMeasureId: body.unitMeasureId,
     minStock: Number(body.minStock),
+    maxUnitCost: Number(body.maxUnitCost),
     ...normalizeProductDimensions(body),
     ...(Object.prototype.hasOwnProperty.call(body, 'isActive') ? { isActive: Boolean(body.isActive) } : {})
 });

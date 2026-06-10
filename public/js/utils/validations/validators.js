@@ -20,6 +20,7 @@ export const productValidators = {
     presentationId: (value) => isEmptyOrNull(value, 'La presentación'),
     unitMeasureId: (value) => isEmptyOrNull(value, 'La unidad'),
     minStock: (value) => validateNumberOptional(value, 'El stock mínimo'),
+    maxUnitCost: (value) => validateNumber(value, 'El costo máximo'),
     base: (_, { base, height }) => validatePairedOptionalNumber({
         value: base,
         pairedValue: height,

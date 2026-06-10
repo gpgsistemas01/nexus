@@ -80,7 +80,7 @@ export const findCurrentSupplierProductByProductId = async ({
 
     const currentSupplierProduct = await db.supplierProduct.findFirst({
         where: { productId },
-        select: { supplierId: true, maxUnitCost: true }
+        select: { supplierId: true }
     });
 
     return currentSupplierProduct;
@@ -290,46 +290,35 @@ export const countTotalSupplierProducts = async ({
     where
 } = {}) => await getDb().supplierProduct.count({ where });
 
-export const createSupplierProduct = async ({
+export const saveSupplierProduct = async ({
     tx,
     supplierId,
     productId,
-    maxUnitCost = null
+    maxUnitCost
 }) => {
 
     const db = getDb(tx);
 
-    return db.supplierProduct.create({
-        data: {
-            supplierId,
-            productId,
-            maxUnitCost
-        }
-    });
-}
+    const data = {
+        supplierId,
+        productId,
+        maxUnitCost
+    };
 
-
-export const resolveMaxUnitCostForSync = async ({
-    tx,
-    supplierId,
-    productId,
-    fallbackMaxUnitCost
-}) => {
-
-    const db = getDb(tx);
-
-    const exactSupplierProduct = await db.supplierProduct.findUnique({
+    return db.supplierProduct.upsert({
         where: {
             supplierId_productId: {
                 supplierId,
                 productId
             }
         },
-        select: { maxUnitCost: true }
+        create: data,
+        update: {
+            maxUnitCost
+        }
     });
-
-    return exactSupplierProduct?.maxUnitCost ?? fallbackMaxUnitCost;
 };
+
 
 export const recalculateConvertedQuantityByProduct = async ({
     tx,

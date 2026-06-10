@@ -5,7 +5,7 @@ import { clearFormErrors, initForm } from "../../ui/formUI.js";
 
 const productModalId = '#productModal';
 const formId = '#productForm';
-const productFields = ['name', 'minStock', 'base', 'height', 'supplierId', 'presentationId', 'unitMeasureId', 'isActive'];
+const productFields = ['name', 'minStock', 'maxUnitCost', 'base', 'height', 'supplierId', 'presentationId', 'unitMeasureId', 'isActive'];
 const stockFields = ['newStock', 'reasonId', 'observations'];
 const stockSectionSelector = '.stock-data-section';
 
@@ -13,6 +13,7 @@ const setProductValues = ({ form, data = null }) => {
 
     form.elements.name.value = data?.name || '';
     form.elements.minStock.value = data?.minStock || '';
+    form.elements.maxUnitCost.value = data?.maxUnitCost ?? '';
     form.elements.base.value = data?.base || '';
     form.elements.height.value = data?.height || '';
 

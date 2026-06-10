@@ -1,18 +1,15 @@
-import { createSupplierProduct, deleteSupplierProduct, resolveMaxUnitCostForSync } from "./supplierProductService.js";
+import { deleteSupplierProduct, saveSupplierProduct } from "./supplierProductService.js";
 
 
 export const syncSupplierProduct = async ({
     tx,
     supplierId,
     previousSupplierId = null,
-    previousMaxUnitCost = null,
     productId,
-    isUpdate = false
+    maxUnitCost
 }) => {
 
-    if (isUpdate && previousSupplierId === supplierId) return;
-
-    if (isUpdate && previousSupplierId) {
+    if (previousSupplierId && previousSupplierId !== supplierId) {
         await deleteSupplierProduct({
             tx,
             productId,
@@ -20,16 +17,7 @@ export const syncSupplierProduct = async ({
         });
     }
 
-    const maxUnitCost = isUpdate
-        ? await resolveMaxUnitCostForSync({
-            tx,
-            supplierId,
-            productId,
-            fallbackMaxUnitCost: previousMaxUnitCost
-        })
-        : null;
-
-    await createSupplierProduct({
+    return saveSupplierProduct({
         tx,
         supplierId,
         productId,

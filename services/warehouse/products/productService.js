@@ -42,6 +42,7 @@ const createProductInTransaction = async ({
         tx,
         supplierId: relations.supplierId,
         productId: createdProduct.id,
+        maxUnitCost: relations.maxUnitCost
     });
 
     if (stockDto) {
@@ -185,9 +186,8 @@ export const updateProduct = async (productDto, id) => {
                 tx,
                 supplierId: relations.supplierId,
                 previousSupplierId: currentSupplierProduct?.supplierId,
-                previousMaxUnitCost: currentSupplierProduct?.maxUnitCost,
                 productId: id,
-                isUpdate: true
+                maxUnitCost: relations.maxUnitCost
             });
 
             await recalculateConvertedQuantityByProduct({

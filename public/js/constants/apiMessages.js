@@ -112,6 +112,11 @@ export const errorMessages = {
     MIN_STOCK_INVALID_NUMBER: 'Debe ser un número.',
     MIN_STOCK_GREATER_THAN_MAX: 'El stock mínimo no puede ser mayor al máximo.',
 
+    // 💰 MAX UNIT COST
+    MAX_UNIT_COST_REQUIRED: 'El costo máximo es requerido.',
+    MAX_UNIT_COST_INVALID_NUMBER: 'El costo máximo debe ser un número.',
+    MAX_UNIT_COST_TOO_LONG: 'El costo máximo es demasiado grande.',
+
     // 📈 NEW STOCK
     NEW_STOCK_REQUIRED: 'El stock nuevo es requerido.',
     NEW_STOCK_INVALID_NUMBER: 'El stock nuevo debe ser un número.',

@@ -34,6 +34,7 @@ export const productValidation = [
     validateUUID('presentationId'),
     validateUUID('unitMeasureId'),
     validateNumberOptional('minStock', { disableTooLong: true }),
+    validateNumber('maxUnitCost'),
     validateNumberRequiredWhenOtherPresent({ fieldName: 'base', pairedFieldName: 'height' }),
     validateNumberRequiredWhenOtherPresent({ fieldName: 'height', pairedFieldName: 'base' }),
     validateNumberOptional('base'),
