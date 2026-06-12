@@ -1,4 +1,4 @@
-import { validateBoolean, validateNumber, validateNumberOptional, validateNumberRequiredWhenOtherPresent, validateNumberWhen, validateText, validateTextOptional, validateTextOptionalWhen, validateUUID, validateUUIDWhen } from "../fields/fieldsValidator.js";
+import { validateBoolean, validateNumber, validateNumberOptional, validateNumberOptionalWhen, validateNumberRequiredWhenOtherPresent, validateNumberWhen, validateText, validateTextOptional, validateTextOptionalWhen, validateUUID, validateUUIDWhen } from "../fields/fieldsValidator.js";
 
 const stockAdjustmentFields = ['newStock', 'reasonId', 'observations'];
 export const PRODUCT_CREATION_CONTEXT_GOODS_RECEIPT = 'goodsReceipt';
@@ -11,6 +11,8 @@ export const isGoodsReceiptProductCreation = (body = {}) =>
 
 export const requiresInitialStockAdjustmentOnCreate = (body = {}) =>
     !isGoodsReceiptProductCreation(body) || hasStockAdjustmentPayload(body);
+
+const requiresMaxUnitCost = (body = {}) => !isGoodsReceiptProductCreation(body);
 
 const validateStockAdjustmentOnCreate = [
     validateNumberWhen({
@@ -34,7 +36,8 @@ export const productValidation = [
     validateUUID('presentationId'),
     validateUUID('unitMeasureId'),
     validateNumberOptional('minStock', { disableTooLong: true }),
-    validateNumber('maxUnitCost'),
+    validateNumberWhen({ fieldName: 'maxUnitCost', predicate: requiresMaxUnitCost }),
+    validateNumberOptionalWhen({ fieldName: 'maxUnitCost', predicate: isGoodsReceiptProductCreation }),
     validateNumberRequiredWhenOtherPresent({ fieldName: 'base', pairedFieldName: 'height' }),
     validateNumberRequiredWhenOtherPresent({ fieldName: 'height', pairedFieldName: 'base' }),
     validateNumberOptional('base'),

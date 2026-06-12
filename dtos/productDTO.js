@@ -1,4 +1,4 @@
-import { normalizeProductDimensions } from '../utils/formattersUtils.js';
+import { normalizeProductDimensions, toNumber } from '../utils/formattersUtils.js';
 
 export const createProductDtoForRegister = (body = {}) => ({
     name: body.name.trim(),
@@ -6,7 +6,7 @@ export const createProductDtoForRegister = (body = {}) => ({
     presentationId: body.presentationId,
     unitMeasureId: body.unitMeasureId,
     minStock: Number(body.minStock),
-    maxUnitCost: Number(body.maxUnitCost),
+    maxUnitCost: toNumber(body.maxUnitCost),
     ...normalizeProductDimensions(body),
     ...(Object.prototype.hasOwnProperty.call(body, 'isActive') ? { isActive: Boolean(body.isActive) } : {})
 });
