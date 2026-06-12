@@ -158,18 +158,25 @@ export const validateNumberRequiredWhenOtherPresent = ({ fieldName, pairedFieldN
         .notEmpty().withMessage(errors.REQUIRED)
 }
 
-export const validateNumberOptional = (fieldName, { disableTooLong = false } = {}) => {
+const validateOptionalNumberChain = ({ fieldName, disableTooLong = false, predicate = () => true }) => {
 
     const errors = errorMap[fieldName];
 
     return body(fieldName)
-        .if(body(fieldName).notEmpty())
-        .notEmpty().withMessage(errors.REQUIRED)
+        .if((value, { req }) => predicate(req.body, value, req) && hasValue(value))
         .isFloat().withMessage(errors.INVALID_NUMBER)
         .if(() => !disableTooLong)
         .matches(/^\d{1,7}(\.\d{1,3})?$/).withMessage(errors.TOO_LONG)
         .toFloat()
 }
+
+export const validateNumberOptional = (fieldName, { disableTooLong = false } = {}) =>
+    validateOptionalNumberChain({ fieldName, disableTooLong })
+;
+
+export const validateNumberOptionalWhen = ({ fieldName, predicate, disableTooLong = false }) =>
+    validateOptionalNumberChain({ fieldName, disableTooLong, predicate })
+;
 
 export const validateDate = (fieldName) => {
 

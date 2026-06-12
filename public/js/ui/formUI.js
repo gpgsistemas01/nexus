@@ -195,6 +195,39 @@ const getFormFieldContainer = (form, fieldName) => {
     return field.closest('[class*="col-"]') || field.closest('.form-outline') || field.parentElement;
 };
 
+export const setFormFieldVisibility = ({
+    form,
+    fieldName,
+    isVisible,
+    clearWhenHidden = false,
+    requiredWhenVisible = false,
+    enableWhenVisible = true,
+    labelContent = null
+}) => {
+
+    const field = form.elements[fieldName];
+
+    if (!field) return;
+
+    const container = getFormFieldContainer(form, fieldName);
+    const label = field.id ? form.querySelector(`label[for="${ field.id }"]`) : null;
+
+    if (container) container.classList.toggle('d-none', !isVisible);
+
+    field.required = isVisible && requiredWhenVisible;
+
+    if (!isVisible) {
+
+        if (clearWhenHidden) field.value = '';
+
+        field.disabled = true;
+    }
+
+    if (isVisible && enableWhenVisible) field.disabled = false;
+
+    if (label && labelContent !== null) label.textContent = labelContent;
+};
+
 export const toggleFormFields = ({
     form,
     fields,
@@ -203,11 +236,11 @@ export const toggleFormFields = ({
 
     fields.forEach((fieldName) => {
 
-        const field = form.elements[fieldName];
-        const container = getFormFieldContainer(form, fieldName);
-
-        if (container) container.classList.toggle('d-none', !isVisible);
-        if (field) field.disabled = !isVisible;
+        setFormFieldVisibility({
+            form,
+            fieldName,
+            isVisible
+        });
     });
 };
 

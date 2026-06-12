@@ -1,13 +1,15 @@
 import { openModal } from "../../ui/modalUI.js";
 import { initProductFormSelect2, setProductFormSelectOptions } from "../../plugins/select2/modules/productSelect.js";
 import { configureStockAdjustmentForm, shouldShowStockAdjustmentFields } from "../stockAdjustmentForm.js";
-import { clearFormErrors, initForm } from "../../ui/formUI.js";
+import { clearFormErrors, initForm, setFormFieldVisibility } from "../../ui/formUI.js";
 
 const productModalId = '#productModal';
 const formId = '#productForm';
 const productFields = ['name', 'minStock', 'maxUnitCost', 'base', 'height', 'supplierId', 'presentationId', 'unitMeasureId', 'isActive'];
 const stockFields = ['newStock', 'reasonId', 'observations'];
 const stockSectionSelector = '.stock-data-section';
+const goodsReceiptCreationContext = 'goodsReceipt';
+const maxUnitCostLabel = 'Costo Máximo';
 
 const setProductValues = ({ form, data = null }) => {
 
@@ -48,6 +50,15 @@ const prepareProductModal = ({
         stockSectionSelector,
         showStockFields,
         isStockAdjustment
+    });
+    setFormFieldVisibility({
+        form,
+        fieldName: 'maxUnitCost',
+        isVisible: creationContext !== goodsReceiptCreationContext,
+        clearWhenHidden: true,
+        requiredWhenVisible: true,
+        enableWhenVisible: !isStockAdjustment,
+        labelContent: maxUnitCostLabel
     });
 
     initProductFormSelect2({ modalSelector: productModalId, isStockAdjustment: showStockFields });

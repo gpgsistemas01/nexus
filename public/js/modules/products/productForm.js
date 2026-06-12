@@ -7,11 +7,25 @@ import { productStockValidators, productValidators } from "../../utils/validatio
 const formId = '#productForm';
 const productModalId = '#productModal';
 const stockMode = 'edit-stock';
+const goodsReceiptCreationContext = 'goodsReceipt';
 
 const isStockMode = (form) => form.dataset.mode === stockMode;
 const includesStockAdjustmentOnCreate = (form) => form.dataset.includeStockAdjustmentOnCreate === 'true';
 const shouldValidateStockFields = (form) => isStockMode(form) || includesStockAdjustmentOnCreate(form);
 const getCreationContext = (form) => form.dataset.creationContext || null;
+const isGoodsReceiptCreation = (form) => getCreationContext(form) === goodsReceiptCreationContext;
+
+const getProductValidators = (form) => {
+
+    if (!isGoodsReceiptCreation(form)) return productValidators;
+
+    return {
+        ...productValidators,
+        maxUnitCost: (value) => value
+            ? productValidators.maxUnitCost(value)
+            : null
+    };
+};
 
 useForm({
     selector: formId,
@@ -31,7 +45,7 @@ useForm({
 
         if (isStockMode(form)) return validateFields(productStockValidators, formData);
 
-        const errors = validateFields(productValidators, formData);
+        const errors = validateFields(getProductValidators(form), formData);
 
         if (!includesStockAdjustmentOnCreate(form)) return errors;
 
