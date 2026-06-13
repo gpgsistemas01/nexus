@@ -55,16 +55,3 @@ export const initMovementTypeFilterSelect = ({
 
     if (currentOption.length) $(movementTypeSelector).val(selectedId).trigger('change');
 }
-
-export const attachMovementTypeFilterHandler = ({
-    onChange
-}) => {
-
-    $(movementTypeSelector).off('select2:select').on('select2:select', () => {
-
-        const select = document.querySelector(movementTypeSelector);
-        const value = select?.value || '';
-
-        onChange?.(value);
-    });
-}

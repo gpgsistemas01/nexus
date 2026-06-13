@@ -10,6 +10,7 @@ export const FILTER_SELECTORS = {
     SUPPLIER: '#supplierFilter',
     FULFILLMENT_STATUS: '#fulfillmentStatusFilter',
     MOVEMENT_TYPE: '#movementTypeFilter',
+    CLIENT: '#clientFilter',
     DEPARTMENT: '#departmentFilter',
     PROFILE: '#profileFilter',
     CLEAR_BUTTON: '#clearFiltersButton'

@@ -47,19 +47,6 @@ export const initSupplierFilterSelect = ({
     if (currentOption.length) $(supplierSelector).val(selectedId).trigger('change');
 };
 
-export const attachSupplierFilterHandler = ({
-    onChange
-}) => {
-    
-    $(supplierSelector).off('select2:select').on('select2:select', () => {
-
-        const select = document.querySelector(supplierSelector);
-        const value = select?.value || '';
-
-        onChange?.(value);
-    });
-};
-
 const initSupplierSelect = ({ 
     modalSelector, 
     baseSelector, 

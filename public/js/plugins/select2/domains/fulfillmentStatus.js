@@ -43,16 +43,3 @@ export const initFulfillmentStatusFilterSelect = ({
         $(fulfillmentStatusSelector).val(selectedId).trigger('change');
     }
 };
-
-export const attachFulfillmentStatusFilterHandler = ({
-    onChange
-}) => {
-    
-$(fulfillmentStatusSelector).off('select2:select').on('select2:select', () => {
-        
-        const select = document.querySelector(fulfillmentStatusSelector);
-        const value = select?.value || '';
-
-        onChange?.(value);
-    });
-};

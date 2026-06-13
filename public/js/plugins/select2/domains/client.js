@@ -47,19 +47,6 @@ export const initClientFilterSelect = ({
     if (currentOption.length) $(clientFilterSelector).val(selectedId).trigger('change');
 };
 
-export const attachClientFilterHandler = ({
-    onChange
-}) => {
-
-    $(clientFilterSelector).off('select2:select').on('select2:select', () => {
-
-        const select = document.querySelector(clientFilterSelector);
-        const value = select?.value || '';
-
-        onChange?.(value);
-    });
-};
-
 export const initClientSelect = ({ 
     modalSelector, 
     advisorSelector = null,

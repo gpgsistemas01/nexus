@@ -58,19 +58,6 @@ export const initProfileFilterSelect = ({
     if (currentOption.length) $(profileFilterSelector).val(selectedId).trigger('change');
 };
 
-export const attachProfileFilterHandler = ({
-    onChange
-}) => {
-
-    $(profileFilterSelector).off('select2:select').on('select2:select', () => {
-
-        const select = document.querySelector(profileFilterSelector);
-        const value = select?.value || '';
-
-        onChange?.(value);
-    });
-};
-
 export const initProfileSelect = ({ 
     modalSelector, 
     baseSelector, 

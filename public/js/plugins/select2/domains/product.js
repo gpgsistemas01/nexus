@@ -58,19 +58,6 @@ export const initProductFilterSelect = ({
     if (currentOption.length) $(productSelector).val(selectedId).trigger('change');
 };
 
-export const attachProductFilterHandler = ({
-    onChange
-}) => {
-    
-    $(productSelector).off('select2:select').on('select2:select', () => {
-            
-        const select = document.querySelector(productSelector);
-        const value = select?.value || '';
-
-        onChange?.(value);
-    });
-};
-
 const initProductSelect = ({ 
     modalSelector, 
     supplierSelector,

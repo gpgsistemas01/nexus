@@ -46,19 +46,6 @@ export const initDepartmentFilterSelect = ({
     if (currentOption.length) $(departmentFilterSelector).val(selectedId).trigger('change');
 };
 
-export const attachDepartmentFilterHandler = ({
-    onChange
-}) => {
-
-    $(departmentFilterSelector).off('select2:select').on('select2:select', () => {
-
-        const select = document.querySelector(departmentFilterSelector);
-        const value = select?.value || '';
-
-        onChange?.(value);
-    });
-};
-
 export const initDepartmentSelect = ({ 
     multiple = false,
     clearOnOpen = true,

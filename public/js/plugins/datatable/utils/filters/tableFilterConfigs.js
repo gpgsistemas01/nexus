@@ -1,13 +1,14 @@
 import { getProductOptions } from "../../../../application/warehouse/products.js";
 import { getSupplierOptions } from "../../../../application/warehouse/suppliers.js";
 import { getFulfillmentStatusOptions } from "../../../../application/warehouse/fulfillmentStatuses.js";
-import { attachProductFilterHandler, getProductSelectApi, initProductFilterSelect } from "../../../select2/domains/product.js";
-import { attachSupplierFilterHandler, getSupplierSelectApi, initSupplierFilterSelect } from "../../../select2/domains/supplier.js";
-import { attachFulfillmentStatusFilterHandler, getFulfillmentStatusSelectApi, initFulfillmentStatusFilterSelect } from "../../../select2/domains/fulfillmentStatus.js";
-import { attachClientFilterHandler, getClientSelectApi, initClientFilterSelect } from "../../../select2/domains/client.js";
-import { attachDepartmentFilterHandler, getDepartmentSelectApi, initDepartmentFilterSelect } from "../../../select2/domains/department.js";
-import { attachProfileFilterHandler, getProfileSelectApi, initProfileFilterSelect } from "../../../select2/domains/profile.js";
+import { getProductSelectApi, initProductFilterSelect } from "../../../select2/domains/product.js";
+import { getSupplierSelectApi, initSupplierFilterSelect } from "../../../select2/domains/supplier.js";
+import { getFulfillmentStatusSelectApi, initFulfillmentStatusFilterSelect } from "../../../select2/domains/fulfillmentStatus.js";
+import { getClientSelectApi, initClientFilterSelect } from "../../../select2/domains/client.js";
+import { getDepartmentSelectApi, initDepartmentFilterSelect } from "../../../select2/domains/department.js";
+import { getProfileSelectApi, initProfileFilterSelect } from "../../../select2/domains/profile.js";
 import { FILTER_SELECTORS } from "../../../../constants/selectors.js";
+import { attachSelectFilterHandler } from "./selectFilterEvents.js";
 
 export const getDateFilterApi = () => ({
     getValues: () => ({
@@ -49,7 +50,8 @@ const buildSupplierFilterConfig = ({
     getSelectApi: getSupplierSelectApi,
     getOptions: getSupplierOptions,
     initSelect: initSupplierFilterSelect,
-    attachHandler: () => attachSupplierFilterHandler({
+    attachHandler: () => attachSelectFilterHandler({
+        selector: FILTER_SELECTORS.SUPPLIER,
         onChange
     })
 });
@@ -62,7 +64,8 @@ const buildProductFilterConfig = ({
     getSelectApi: getProductSelectApi,
     getOptions: getProductOptions,
     initSelect: ({ selectedId }) => initProductFilterSelect({ selectedId, supplierFilterSelector: FILTER_SELECTORS.SUPPLIER }),
-    attachHandler: () => attachProductFilterHandler({
+    attachHandler: () => attachSelectFilterHandler({
+        selector: FILTER_SELECTORS.PRODUCT,
         onChange
     })
 });
@@ -74,7 +77,8 @@ const buildFulfillmentStatusFilterConfig = ({
     getSelectApi: getFulfillmentStatusSelectApi,
     getOptions: getFulfillmentStatusOptions,
     initSelect: initFulfillmentStatusFilterSelect,
-    attachHandler: () => attachFulfillmentStatusFilterHandler({
+    attachHandler: () => attachSelectFilterHandler({
+        selector: FILTER_SELECTORS.FULFILLMENT_STATUS,
         onChange
     })
 });
@@ -87,7 +91,10 @@ const buildClientFilterConfig = ({
     getSelectApi: getClientSelectApi,
     getOptions: async () => [],
     initSelect: initClientFilterSelect,
-    attachHandler: () => attachClientFilterHandler({ onChange })
+    attachHandler: () => attachSelectFilterHandler({
+        selector: FILTER_SELECTORS.CLIENT,
+        onChange
+    })
 });
 
 const buildDepartmentFilterConfig = ({
@@ -98,7 +105,10 @@ const buildDepartmentFilterConfig = ({
     getSelectApi: getDepartmentSelectApi,
     getOptions: async () => [],
     initSelect: initDepartmentFilterSelect,
-    attachHandler: () => attachDepartmentFilterHandler({ onChange })
+    attachHandler: () => attachSelectFilterHandler({
+        selector: FILTER_SELECTORS.DEPARTMENT,
+        onChange
+    })
 });
 
 const buildProfileFilterConfig = ({
@@ -109,7 +119,10 @@ const buildProfileFilterConfig = ({
     getSelectApi: getProfileSelectApi,
     getOptions: async () => [],
     initSelect: ({ selectedId }) => initProfileFilterSelect({ selectedId, departmentFilterSelector: FILTER_SELECTORS.DEPARTMENT }),
-    attachHandler: () => attachProfileFilterHandler({ onChange })
+    attachHandler: () => attachSelectFilterHandler({
+        selector: FILTER_SELECTORS.PROFILE,
+        onChange
+    })
 });
 
 const tableFilterConfigBuilders = {
