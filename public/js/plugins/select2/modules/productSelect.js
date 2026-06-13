@@ -3,11 +3,12 @@ import { initPresentationSelect, togglePresentationOption } from "../domains/pre
 import { initReasonSelect, toggleReasonOption } from "../domains/reason.js";
 import { setupSupplierSelect, toggleSupplierOption } from "../domains/supplier.js";
 import { initUnitMeasureSelect, toggleUnitMeasureOption } from "../domains/unitMeasure.js";
+import { FORM_SELECTORS } from "../../../constants/selectors.js";
 
-const supplierSelector = '.supplier-select';
-const unitMeasureSelector = '#unitMeasureInput';
-const presentationSelector = '#presentationInput';
-const reasonSelector = '#reasonInput';
+const supplierSelector = FORM_SELECTORS.SUPPLIER;
+const unitMeasureSelector = FORM_SELECTORS.UNIT_MEASURE;
+const presentationSelector = FORM_SELECTORS.PRESENTATION;
+const reasonSelector = FORM_SELECTORS.REASON;
 
 export const initProductFormSelect2 = ({ 
     modalSelector,

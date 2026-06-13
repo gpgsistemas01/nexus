@@ -2,9 +2,10 @@ import { openProductModal } from "../../../modules/products/productModal.js";
 import { getAllProducts, getProductOptions } from "../../../application/warehouse/products.js";
 import { initbaseSelect2, setMdbWrapperInputValue, toggleSelectOption } from "../baseSelect.js";
 import { mapProductToSelectData } from "../../../utils/productSelectUtils.js";
+import { FORM_SELECTORS, FILTER_SELECTORS } from "../../../constants/selectors.js";
 
-const wrapperSelector = '#presentationDisplayInput';
-const productSelector = '#productFilter';
+const wrapperSelector = FORM_SELECTORS.PRESENTATION_DISPLAY;
+const productSelector = FILTER_SELECTORS.PRODUCT;
 
 export const getProductSelectApi = () => ({
     getSelect: () => document.querySelector(productSelector),

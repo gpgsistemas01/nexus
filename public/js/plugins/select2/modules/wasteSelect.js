@@ -1,9 +1,10 @@
 import { mapSupplierProductToSelectData } from "../../../utils/productSelectUtils.js";
 import { initReasonSelect, toggleReasonOption } from "../domains/reason.js";
 import { setupSupplierProductSelect, toggleSupplierProductOption } from "../domains/supplierProduct.js";
+import { FORM_SELECTORS } from "../../../constants/selectors.js";
 
-const productSelector = '#productInput';
-const reasonSelector = '#reasonInput';
+const productSelector = FORM_SELECTORS.PRODUCT;
+const reasonSelector = FORM_SELECTORS.REASON;
 
 export const initWasteSelect2 = ({ modalSelector }) => {
 

@@ -1,10 +1,11 @@
 import { useForm } from "../../application/form.js";
 import { editSupplier, registerSupplier } from "../../application/warehouse/suppliers.js";
+import { FORM_SELECTORS } from "../../constants/selectors.js";
 
 import { handleSubmit, validateFields } from "../../utils/formUtils.js";
 import { supplierValidators } from "../../utils/validations/validators.js";
 
-const formId = '#supplierForm';
+const formId = FORM_SELECTORS.SUPPLIER_FORM;
 
 useForm({
     selector: formId,

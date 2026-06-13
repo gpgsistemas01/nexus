@@ -1,5 +1,63 @@
-import { getAllDepartments } from "../../../application/admin/departments.js";
+import { getAllDepartments, getDepartmentOptions } from "../../../application/admin/departments.js";
 import { initbaseSelect2, toggleSelectOption, toggleSelectOptions } from "../baseSelect.js";
+import { FILTER_SELECTORS } from "../../../constants/selectors.js";
+
+const departmentFilterSelector = FILTER_SELECTORS.DEPARTMENT;
+
+export const getDepartmentSelectApi = () => ({
+    getSelect: () => document.querySelector(departmentFilterSelector),
+    getValue: () => document.querySelector(departmentFilterSelector)?.value || ''
+});
+
+export const initDepartmentFilterSelect = ({
+    selectedId = null
+} = {}) => {
+
+    initbaseSelect2({
+        baseSelector: departmentFilterSelector,
+        containerSelector: 'body',
+        get: async (params) => ({
+            data: await getDepartmentOptions(params)
+        }),
+        clearOnOpen: false,
+        placeholder: 'Filtrar por área',
+        data: (params) => ({
+            search: params.term
+        }),
+        processResults: (data) => {
+            const list = data.data || data;
+            return {
+                results: list.map(department => ({
+                    id: department.value,
+                    text: department.label
+                }))
+            };
+        }
+    });
+
+    if (!selectedId) {
+
+        $(departmentFilterSelector).val('').trigger('change');
+        return;
+    }
+
+    const currentOption = $(`${ departmentFilterSelector } option[value=\"${ selectedId }\"]`);
+
+    if (currentOption.length) $(departmentFilterSelector).val(selectedId).trigger('change');
+};
+
+export const attachDepartmentFilterHandler = ({
+    onChange
+}) => {
+
+    $(departmentFilterSelector).off('select2:select').on('select2:select', () => {
+
+        const select = document.querySelector(departmentFilterSelector);
+        const value = select?.value || '';
+
+        onChange?.(value);
+    });
+};
 
 export const initDepartmentSelect = ({ 
     multiple = false,
@@ -71,4 +129,4 @@ export const toggleDepartmentOptions = ({
         selector,
         data: options
     });
-}
+};

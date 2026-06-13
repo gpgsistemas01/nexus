@@ -2,8 +2,9 @@ import { getAllSuppliers } from "../../application/warehouse/suppliers.js";
 import { openSupplierModal } from "../../modules/suppliers/supplierModal.js";
 import { createDataTable, renderActionButtons } from "./baseDatatable.js";
 import { getResponsiveRowData } from "./utils/responsive.js";
+import { DATATABLE_SELECTORS } from "../../constants/selectors.js";
 
-const selector = '#table';
+const selector = DATATABLE_SELECTORS.MAIN;
 
 export const createSupplierDatatable = () => {
 

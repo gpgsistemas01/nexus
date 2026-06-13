@@ -95,9 +95,10 @@ export const exportGoodsIssueReportExcel = async (req, res) => {
         search: getDataTableSearch(req.query),
         startDate: req.query.startDate || '',
         endDate: req.query.endDate || '',
-        supplierId: req.query.supplierId || '',
-        productId: req.query.productId || '',
         fulfillmentStatusId: req.query.fulfillmentStatusId || '',
+        clientId: req.query.clientId || '',
+        departmentId: req.query.departmentId || '',
+        profileId: req.query.profileId || '',
         accesses: req.user?.accesses || [],
         orderBy,
         orderDir
@@ -169,7 +170,7 @@ export const exportGoodsReceiptReportExcel = async (req, res) => {
         startDate: req.query.startDate || '',
         endDate: req.query.endDate || '',
         supplierId: req.query.supplierId || '',
-        productId: req.query.productId || '',
+        profileId: req.query.profileId || '',
         orderBy,
         orderDir
     });

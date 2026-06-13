@@ -1,5 +1,75 @@
-import { getAllProfiles } from "../../../application/admin/profiles.js";
+import { getAllProfiles, getProfileOptions } from "../../../application/admin/profiles.js";
 import { initbaseSelect2, toggleSelectOption } from "../baseSelect.js";
+import { FILTER_SELECTORS } from "../../../constants/selectors.js";
+
+const profileFilterSelector = FILTER_SELECTORS.PROFILE;
+
+export const getProfileSelectApi = () => ({
+    getSelect: () => document.querySelector(profileFilterSelector),
+    getValue: () => document.querySelector(profileFilterSelector)?.value || ''
+});
+
+export const initProfileFilterSelect = ({
+    selectedId = null,
+    departmentFilterSelector = null
+} = {}) => {
+
+    initbaseSelect2({
+        baseSelector: profileFilterSelector,
+        containerSelector: 'body',
+        get: async (params) => ({
+            data: await getProfileOptions(params)
+        }),
+        clearOnOpen: false,
+        placeholder: 'Filtrar por perfil',
+        data: (params) => {
+
+            const departmentName = departmentFilterSelector
+                ? $(`${ departmentFilterSelector } option:selected`).text()
+                : '';
+
+            return {
+                search: params.term,
+                ...(departmentName && {
+                    department: departmentName,
+                    strictDepartmentFilter: true
+                })
+            };
+        },
+        processResults: (data) => {
+            const list = data.data || data;
+            return {
+                results: list.map(profile => ({
+                    id: profile.value,
+                    text: profile.label
+                }))
+            };
+        }
+    });
+
+    if (!selectedId) {
+
+        $(profileFilterSelector).val('').trigger('change');
+        return;
+    }
+
+    const currentOption = $(`${ profileFilterSelector } option[value=\"${ selectedId }\"]`);
+
+    if (currentOption.length) $(profileFilterSelector).val(selectedId).trigger('change');
+};
+
+export const attachProfileFilterHandler = ({
+    onChange
+}) => {
+
+    $(profileFilterSelector).off('select2:select').on('select2:select', () => {
+
+        const select = document.querySelector(profileFilterSelector);
+        const value = select?.value || '';
+
+        onChange?.(value);
+    });
+};
 
 export const initProfileSelect = ({ 
     modalSelector, 

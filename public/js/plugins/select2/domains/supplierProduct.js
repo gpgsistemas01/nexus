@@ -1,8 +1,9 @@
 import { getSupplierProductOptions } from "../../../application/warehouse/products.js";
 import { initbaseSelect2, setMdbWrapperInputValue, toggleSelectOption } from "../baseSelect.js";
+import { FORM_SELECTORS } from "../../../constants/selectors.js";
 
-const presentationDisplaySelector = '#presentationDisplayInput';
-const unitMeasureDisplaySelector = '#unitMeasureDisplayInput';
+const presentationDisplaySelector = FORM_SELECTORS.PRESENTATION_DISPLAY;
+const unitMeasureDisplaySelector = FORM_SELECTORS.UNIT_MEASURE_DISPLAY;
 
 export const setSupplierProductDisplayValues = ({
     modalSelector,

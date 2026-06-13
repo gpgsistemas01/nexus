@@ -38,9 +38,10 @@ export const findAllGoodsIssues = async ({
     search = '',
     startDate = '',
     endDate = '',
-    supplierId = '',
-    productId = '',
     fulfillmentStatusId = '',
+    clientId = '',
+    departmentId = '',
+    profileId = '',
     orderBy = 'referenceNumber',
     orderDir = 'desc',
     accesses = []
@@ -57,15 +58,10 @@ export const findAllGoodsIssues = async ({
     const userDepartments = accesses.map(a => a.department);
 
     const where = {
-        ...((supplierId || productId) && {
-            details: {
-                some: {
-                    ...(supplierId && { supplierId }),
-                    ...(productId && { productId })
-                }
-            }
-        }),
         ...buildDateRangeFilter({ field: 'requestDate', startDate, endDate }),
+        ...(clientId && { clientId }),
+        ...(departmentId && { departmentId }),
+        ...(profileId && { requesterId: profileId }),
         ...(search && {
             OR: [
                 {
@@ -76,18 +72,6 @@ export const findAllGoodsIssues = async ({
                 },
                 {
                     projectNumber: {
-                        contains: search,
-                        mode: 'insensitive'
-                    }
-                },
-                {
-                    clientName: {
-                        contains: search,
-                        mode: 'insensitive'
-                    }
-                },
-                {
-                    departmentName: {
                         contains: search,
                         mode: 'insensitive'
                     }

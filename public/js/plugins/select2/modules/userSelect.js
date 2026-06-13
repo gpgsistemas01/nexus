@@ -1,9 +1,10 @@
 import { initDepartmentSelect, toggleDepartmentOption } from "../domains/department.js";
 import { initRoleSelect, toggleRoleOption } from "../domains/role.js";
+import { FORM_SELECTORS, MODAL_SELECTORS } from "../../../constants/selectors.js";
 
-const modalSelector = '#userModal';
-const departmentSelector = '#departmentIdInput';
-const roleSelector = '#roleIdInput';
+const modalSelector = MODAL_SELECTORS.USER;
+const departmentSelector = FORM_SELECTORS.DEPARTMENT_ID;
+const roleSelector = FORM_SELECTORS.ROLE_ID;
 
 const departmentScopedSelector = `${ modalSelector } ${ departmentSelector }`;
 const roleScopedSelector = `${ modalSelector } ${ roleSelector }`;

@@ -1,8 +1,9 @@
 import { clearFormErrors, initForm } from "../../ui/formUI.js";
 import { openModal } from "../../ui/modalUI.js";
+import { FORM_SELECTORS, MODAL_SELECTORS } from "../../constants/selectors.js";
 
-const clientModalId = '#clientModal';
-const formId = '#clientForm';
+const clientModalId = MODAL_SELECTORS.CLIENT;
+const formId = FORM_SELECTORS.CLIENT_FORM;
 
 export const openClientModal = ({ 
     mode = 'create', 

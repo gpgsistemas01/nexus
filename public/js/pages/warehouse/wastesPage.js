@@ -7,13 +7,14 @@ import { openModal } from "../../ui/modalUI.js";
 import { configureStockAdjustmentForm, shouldShowStockAdjustmentFields } from "../../modules/stockAdjustmentForm.js";
 import { handleSubmit, validateFields } from "../../utils/formUtils.js";
 import { wasteDataValidators, wasteStockValidators, wasteValidators } from "../../utils/validations/validators.js";
+import { FORM_SELECTORS, MODAL_SELECTORS } from "../../constants/selectors.js";
 
 const context = window.meta || {};
 
 createWasteDatatable(context);
 
-const wasteModalId = '#wasteModal';
-const formId = '#wasteForm';
+const wasteModalId = MODAL_SELECTORS.WASTE;
+const formId = FORM_SELECTORS.WASTE_FORM;
 const stockMode = 'edit-stock';
 const wasteDataFields = ['supplierProductId', 'base', 'height'];
 const wasteStockFields = ['currentStock', 'reasonId', 'observations'];

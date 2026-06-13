@@ -93,9 +93,10 @@ export const findGoodsIssueReportRows = async ({
     search = '',
     startDate = '',
     endDate = '',
-    supplierId = '',
-    productId = '',
     fulfillmentStatusId = '',
+    clientId = '',
+    departmentId = '',
+    profileId = '',
     accesses = [],
     orderBy = 'referenceNumber',
     orderDir = 'desc'
@@ -107,15 +108,16 @@ export const findGoodsIssueReportRows = async ({
         search,
         startDate,
         endDate,
-        supplierId,
-        productId,
         fulfillmentStatusId,
+        clientId,
+        departmentId,
+        profileId,
         orderBy,
         orderDir,
         accesses
     });
 
-    return mapGoodsIssueDetailRows(goodsIssuesResult.data, { supplierId, productId });
+    return mapGoodsIssueDetailRows(goodsIssuesResult.data);
 };
 
 export const findGoodsReceiptReportRows = async ({
@@ -123,7 +125,7 @@ export const findGoodsReceiptReportRows = async ({
     startDate = '',
     endDate = '',
     supplierId = '',
-    productId = '',
+    profileId = '',
     orderBy = 'referenceNumber',
     orderDir = 'desc'
 } = {}) => {
@@ -135,10 +137,10 @@ export const findGoodsReceiptReportRows = async ({
         startDate,
         endDate,
         supplierId,
-        productId,
+        profileId,
         orderBy,
         orderDir
     });
 
-    return mapGoodsReceiptDetailRows(goodsReceiptsResult.data, { productId });
+    return mapGoodsReceiptDetailRows(goodsReceiptsResult.data);
 };

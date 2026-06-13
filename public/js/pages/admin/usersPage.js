@@ -6,9 +6,10 @@ import { clearFormErrors, initForm, setFormReadOnly } from '../../ui/formUI.js';
 import { openModal } from '../../ui/modalUI.js';
 import { handleSubmit, validateFields } from '../../utils/formUtils.js';
 import { userEditValidators, userPasswordValidators, userValidators } from '../../utils/validations/validators.js';
+import { FORM_SELECTORS, MODAL_SELECTORS } from "../../constants/selectors.js";
 
-const formId = '#userForm';
-const userModalId = '#userModal';
+const formId = FORM_SELECTORS.USER_FORM;
+const userModalId = MODAL_SELECTORS.USER;
 
 const setModeFields = ({ form, mode }) => {
 

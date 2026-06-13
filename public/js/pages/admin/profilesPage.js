@@ -6,9 +6,10 @@ import { clearFormErrors, initForm } from "../../ui/formUI.js";
 import { openModal } from "../../ui/modalUI.js";
 import { handleSubmit, validateFields } from "../../utils/formUtils.js";
 import { profileValidators } from "../../utils/validations/validators.js";
+import { FORM_SELECTORS, MODAL_SELECTORS } from "../../constants/selectors.js";
 
-const formId = '#profileForm';
-const modalId = '#profileModal';
+const formId = FORM_SELECTORS.PROFILE_FORM;
+const modalId = MODAL_SELECTORS.PROFILE;
 
 createProfilesDatatable();
 

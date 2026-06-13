@@ -10,9 +10,10 @@ import { formatDateLongWithTime } from "../../utils/formatters.js";
 import { handleSubmit, hasValidationErrors, toggleContainerElements, validateFields } from "../../utils/formUtils.js";
 import { openModal } from "../../ui/modalUI.js";
 import { initMdbWrapperInput, updateMdbWrapperInput } from "../../plugins/mdb/baseInstance.js";
+import { FORM_SELECTORS, MODAL_SELECTORS } from "../../constants/selectors.js";
 
-const modalId = '#goodsReceiptModal';
-const formId = '#goodsReceiptForm';
+const modalId = MODAL_SELECTORS.GOODS_RECEIPT;
+const formId = FORM_SELECTORS.GOODS_RECEIPT;
 
 createGoodsReceiptDatatable();
 
@@ -145,7 +146,7 @@ export const openGoodsReceiptModal = ({ mode, data = null }) => {
 
 const addProduct = () => {
 
-    const option = document.querySelector('#productInput option:checked');
+    const option = document.querySelector(`${ FORM_SELECTORS.PRODUCT } option:checked`);
 
     let { productBase, productHeight, presentationName, unitMeasureName, supplierName, productName } = option?.dataset;
     productHeight = isNaN(Number(productHeight)) ? null : Number(productHeight);
@@ -153,8 +154,8 @@ const addProduct = () => {
 
     const productId = option.value;
 
-    const quantity = Number(document.querySelector('#quantityInput').value);
-    const costPerUnitType = Number(document.querySelector('#costPerUnitInput').value);
+    const quantity = Number(document.querySelector(FORM_SELECTORS.QUANTITY).value);
+    const costPerUnitType = Number(document.querySelector(FORM_SELECTORS.COST_PER_UNIT).value);
     const errors = validateFields(validateAddGoodsReceiptProductValidators, {
         productId,
         quantity,

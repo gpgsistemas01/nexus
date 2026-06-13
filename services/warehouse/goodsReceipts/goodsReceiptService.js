@@ -25,31 +25,19 @@ export const findAllGoodsReceipts = async ({
     startDate = '',
     endDate = '',
     supplierId = '',
-    productId = '',
+    profileId = '',
     orderBy = 'referenceNumber',
     orderDir = 'desc'
 }) => {
 
     const where = {
         ...(supplierId && { supplierId }),
-        ...(productId && {
-            details: {
-                some: {
-                    productId
-                }
-            }
-        }),
+        ...(profileId && { receivedById: profileId }),
         ...buildDateRangeFilter({ field: 'receptionDate', startDate, endDate }),
         ...(search && {
             OR: [
                 {
                     referenceNumber: {
-                        contains: search,
-                        mode: 'insensitive'
-                    }
-                },
-                {
-                    supplierName: {
                         contains: search,
                         mode: 'insensitive'
                     }

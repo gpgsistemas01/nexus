@@ -2,8 +2,9 @@ import { getAllProfiles } from "../../application/admin/profiles.js";
 import { openProfileModal } from "../../pages/admin/profilesPage.js";
 import { createDataTable, renderActionButtons } from "./baseDatatable.js";
 import { getResponsiveRowData } from "./utils/responsive.js";
+import { DATATABLE_SELECTORS } from "../../constants/selectors.js";
 
-const selector = '#table';
+const selector = DATATABLE_SELECTORS.MAIN;
 
 export const createProfilesDatatable = () => {
 

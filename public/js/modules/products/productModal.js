@@ -2,9 +2,10 @@ import { openModal } from "../../ui/modalUI.js";
 import { initProductFormSelect2, setProductFormSelectOptions } from "../../plugins/select2/modules/productSelect.js";
 import { configureStockAdjustmentForm, shouldShowStockAdjustmentFields } from "../stockAdjustmentForm.js";
 import { clearFormErrors, initForm, setFormFieldVisibility } from "../../ui/formUI.js";
+import { FORM_SELECTORS, MODAL_SELECTORS } from "../../constants/selectors.js";
 
-const productModalId = '#productModal';
-const formId = '#productForm';
+const productModalId = MODAL_SELECTORS.PRODUCT;
+const formId = FORM_SELECTORS.PRODUCT_FORM;
 const productFields = ['name', 'minStock', 'maxUnitCost', 'base', 'height', 'supplierId', 'presentationId', 'unitMeasureId', 'isActive'];
 const stockFields = ['newStock', 'reasonId', 'observations'];
 const stockSectionSelector = '.stock-data-section';

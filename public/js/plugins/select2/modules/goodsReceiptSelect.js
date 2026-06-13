@@ -7,15 +7,16 @@ import { bindDisabledSelectDependency } from "../baseSelect.js";
 import { setupProductSelect, toggleProductOption } from "../domains/product.js";
 import { initProfileSelect, toggleProfileOption } from "../domains/profile.js";
 import { setupSupplierSelect, toggleSupplierOption } from "../domains/supplier.js";
+import { FORM_SELECTORS, MODAL_SELECTORS } from "../../../constants/selectors.js";
 
-const modalSelector = '#goodsReceiptModal';
-const productSelector = '#productInput';
-const supplierSelector = '.supplier-select';
-const receivedBySelector = '#receivedByInput';
+const modalSelector = MODAL_SELECTORS.GOODS_RECEIPT;
+const productSelector = FORM_SELECTORS.PRODUCT;
+const supplierSelector = FORM_SELECTORS.SUPPLIER;
+const receivedBySelector = FORM_SELECTORS.RECEIVED_BY;
 const supplierScopedSelector = `${ modalSelector } ${ supplierSelector }`;
 const productScopedSelector = `${ modalSelector } ${ productSelector }`;
 const receivedByScopedSelector = `${ modalSelector } ${ receivedBySelector }`;
-const presentationDisplayScopedSelector = `${ modalSelector } #presentationDisplayInput`;
+const presentationDisplayScopedSelector = `${ modalSelector } ${ FORM_SELECTORS.PRESENTATION_DISPLAY }`;
 const supplierChangedEventName = 'goods-receipt:supplier-changed';
 
 const clearProductSelection = () => {

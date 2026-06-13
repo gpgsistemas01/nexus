@@ -8,14 +8,15 @@ import { handleDelete, renderMaterialName } from "./utils/renderProductDatatable
 import { getResponsiveRowData } from "./utils/responsive.js";
 import { buildExcelButton, buildTableExportParams } from "../../ui/tableUI.js";
 import { formatFileName } from "../../utils/formatters.js";
-import { setupTableFilters } from "./utils/tableFilter.js";
+import { setupTableFilters } from "./utils/filters/tableFilter.js";
+import { DATATABLE_SELECTORS, MODAL_SELECTORS, FORM_SELECTORS } from "../../constants/selectors.js";
 
 export let details = [];
 let filters = {
     getValues: () => ({})
 };
-const selectorProductTable = '#productTable';
-const selectorTable = '#table';
+const selectorProductTable = DATATABLE_SELECTORS.PRODUCT;
+const selectorTable = DATATABLE_SELECTORS.MAIN;
 const table = document.querySelector(selectorProductTable);
 table.innerHTML = `
     <thead>
@@ -45,7 +46,7 @@ export const createGoodsReceiptDatatable = async () => {
     let table;
 
     filters = await setupTableFilters({
-        fields: ['date', 'supplier', 'product']
+        fields: ['date', 'supplier', 'profile']
     });
 
     table = createDataTable({
@@ -122,8 +123,8 @@ export const initDetailsGoodsReceiptTable = (mode) => {
         mode,
         render: (_, __, row) => {
 
-            const modal = document.querySelector('#goodsReceiptModal');
-            const select = modal?.querySelector('.supplier-select');
+            const modal = document.querySelector(MODAL_SELECTORS.GOODS_RECEIPT);
+            const select = modal?.querySelector(FORM_SELECTORS.SUPPLIER);
             const supplier = select?.options[select.selectedIndex]?.text || '';
 
             return renderMaterialName(row, supplier);

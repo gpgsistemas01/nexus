@@ -6,14 +6,15 @@ import { initDepartmentSelect, toggleDepartmentOption } from "../domains/departm
 import { setupProductSelect, toggleProductOption } from "../domains/product.js";
 import { initProfileSelect, toggleProfileOption } from "../domains/profile.js";
 import { initMdbWrapperInput, updateMdbWrapperInput } from "../../mdb/baseInstance.js";
+import { FORM_SELECTORS, MODAL_SELECTORS } from "../../../constants/selectors.js";
 
-const modalSelector = '#goodsIssueModal';
-const requesterSelector = '#requesterInput';
-const clientSelector = '#clientInput';
-const departmentSelector = '#departmentInput';
-const advisorSelector = '#advisorInput';
-const productSelector = '#productInput';
-const projectNumberSelector = '#projectNumberInput';
+const modalSelector = MODAL_SELECTORS.GOODS_ISSUE;
+const requesterSelector = FORM_SELECTORS.REQUESTER;
+const clientSelector = FORM_SELECTORS.CLIENT;
+const departmentSelector = FORM_SELECTORS.DEPARTMENT;
+const advisorSelector = FORM_SELECTORS.ADVISOR;
+const productSelector = FORM_SELECTORS.PRODUCT;
+const projectNumberSelector = FORM_SELECTORS.PROJECT_NUMBER;
 const requesterScopedSelector = `${ modalSelector } ${ requesterSelector }`;
 const clientScopedSelector = `${ modalSelector } ${ clientSelector }`;
 const departmentScopedSelector = `${ modalSelector } ${ departmentSelector }`;

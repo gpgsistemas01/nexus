@@ -2,8 +2,9 @@ import { useForm } from "../../application/form.js";
 import { editClient, registerClient } from "../../application/sales/clients.js";
 import { handleSubmit, validateFields } from "../../utils/formUtils.js";
 import { validateClientValidators } from "../../utils/validations/validators.js";
+import { FORM_SELECTORS } from "../../constants/selectors.js";
 
-const formId = '#clientForm';
+const formId = FORM_SELECTORS.CLIENT_FORM;
 
 useForm({
     selector: formId,

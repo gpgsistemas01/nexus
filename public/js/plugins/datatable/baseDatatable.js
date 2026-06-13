@@ -1,3 +1,4 @@
+import { DATATABLE_SELECTORS } from "../../constants/selectors.js";
 import { handleDataTableError } from "../../api/errorHandler.js";
 
 const SORT_DIRECTIONS = ['asc', 'desc'];
@@ -18,7 +19,7 @@ const normalizeColumns = (columns) => {
     }));
 };
 
-export const createDataTable = ({ selector = '#table', options = {} }) => {
+export const createDataTable = ({ selector = DATATABLE_SELECTORS.MAIN, options = {} }) => {
 
     const ajaxConfig = options.ajax;
     const searchDelay = 1000;
@@ -60,13 +61,13 @@ export const createDataTable = ({ selector = '#table', options = {} }) => {
 
 export const reloadMainTable = () => {
 
-    const table = $('#table').DataTable();
+    const table = $(DATATABLE_SELECTORS.MAIN).DataTable();
     table.ajax.reload(null, false);
 }
 
 export const refreshProductTable = (details) => {
 
-    const table = $('#productTable').DataTable();
+    const table = $(DATATABLE_SELECTORS.PRODUCT).DataTable();
     table.clear();
     table.rows.add(details);
     table.draw();

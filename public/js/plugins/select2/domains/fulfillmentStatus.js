@@ -1,7 +1,8 @@
 import { getFulfillmentStatusOptions } from "../../../application/warehouse/fulfillmentStatuses.js";
 import { initbaseSelect2 } from "../baseSelect.js";
+import { FILTER_SELECTORS } from "../../../constants/selectors.js";
 
-const fulfillmentStatusSelector = '#fulfillmentStatusFilter';
+const fulfillmentStatusSelector = FILTER_SELECTORS.FULFILLMENT_STATUS;
 
 export const getFulfillmentStatusSelectApi = () => ({
     getSelect: () => document.querySelector(fulfillmentStatusSelector),

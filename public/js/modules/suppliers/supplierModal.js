@@ -1,8 +1,9 @@
 import { clearFormErrors, initForm } from "../../ui/formUI.js";
 import { openModal } from "../../ui/modalUI.js";
+import { FORM_SELECTORS, MODAL_SELECTORS } from "../../constants/selectors.js";
 
-const modalId = '#supplierModal';
-const formId = '#supplierForm';
+const modalId = MODAL_SELECTORS.SUPPLIER;
+const formId = FORM_SELECTORS.SUPPLIER_FORM;
 
 export const openSupplierModal = ({ 
     mode = 'create', 

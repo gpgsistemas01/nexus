@@ -1,8 +1,9 @@
 import { openSupplierModal } from "../../../modules/suppliers/supplierModal.js";
 import { getAllSuppliers, getSupplierOptions } from "../../../application/warehouse/suppliers.js";
 import { initbaseSelect2, toggleSelectOption } from "../baseSelect.js";
+import { FILTER_SELECTORS } from "../../../constants/selectors.js";
 
-const supplierSelector = '#supplierFilter';
+const supplierSelector = FILTER_SELECTORS.SUPPLIER;
 
 export const getSupplierSelectApi = () => ({
     getSelect: () => document.querySelector(supplierSelector),

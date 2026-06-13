@@ -1,6 +1,19 @@
 import { createSuccessResponseFromRequest } from "../../utils/responseUtils.js";
 import { createClientRequest, editClientRequest, getAllClientsRequest } from "../../services/sales/clientService.js";
 
+export const getClientOptions = async (params = {}) => {
+
+    const response = await getAllClientsRequest({ params });
+
+    const list = response.data?.data || [];
+
+    return list.filter(client => client?.id && client?.name)
+        .map(client => ({
+            value: client.id,
+            label: client.name
+        }));
+};
+
 export const getAllClients = async (params = {}) => {
 
     const response = await getAllClientsRequest({ params });

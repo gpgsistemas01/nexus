@@ -73,19 +73,24 @@
 <%- include('../../../shared/movementFilters', {
     selectInputs: [
         {
+            id: 'clientFilter',
+            label: 'Cliente:',
+            col: 'col-12 col-md-6 col-lg-3'
+        },
+        {
+            id: 'departmentFilter',
+            label: 'Área:',
+            col: 'col-12 col-md-6 col-lg-3'
+        },
+        {
+            id: 'profileFilter',
+            label: 'Perfil:',
+            col: 'col-12 col-md-6 col-lg-3'
+        },
+        {
             id: 'fulfillmentStatusFilter',
             label: 'Estado de surtido:',
-            col: 'col-12 col-md-4'
-        },
-        {
-            id: 'supplierFilter',
-            label: 'Proveedor:',
-            col: 'col-12 col-md-4'
-        },
-        {
-            id: 'productFilter',
-            label: 'Material:',
-            col: 'col-12 col-md-4'
+            col: 'col-12 col-md-6 col-lg-3'
         }
     ]
 }) %>

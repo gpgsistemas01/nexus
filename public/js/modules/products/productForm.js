@@ -1,11 +1,12 @@
 import { useForm } from "../../application/form.js";
 import { editProduct, editProductStock, registerProduct } from "../../application/warehouse/products.js";
+import { FORM_SELECTORS, MODAL_SELECTORS } from "../../constants/selectors.js";
 
 import { handleSubmit, validateFields } from "../../utils/formUtils.js";
 import { productStockValidators, productValidators } from "../../utils/validations/validators.js";
 
-const formId = '#productForm';
-const productModalId = '#productModal';
+const formId = FORM_SELECTORS.PRODUCT_FORM;
+const productModalId = MODAL_SELECTORS.PRODUCT;
 const stockMode = 'edit-stock';
 const goodsReceiptCreationContext = 'goodsReceipt';
 

@@ -4,9 +4,10 @@ import { buildExcelButton, buildTableExportParams } from "../../ui/tableUI.js";
 import { formatFileName } from "../../utils/formatters.js";
 import { getMovementTypeSelectApi, getMovementTypeData, attachMovementTypeFilterHandler, initMovementTypeFilterSelect } from "../select2/domains/movementType.js";
 import { createDataTable, renderActionButtons } from "./baseDatatable.js";
-import { setupTableFilters } from "./utils/tableFilter.js";
+import { setupTableFilters } from "./utils/filters/tableFilter.js";
+import { DATATABLE_SELECTORS } from "../../constants/selectors.js";
 
-const selector = '#table';
+const selector = DATATABLE_SELECTORS.MAIN;
 let filters = {
     getValues: () => ({})
 };

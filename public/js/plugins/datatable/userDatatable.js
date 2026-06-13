@@ -2,8 +2,9 @@ import { getAllUsers } from '../../application/admin/users.js';
 import { openUserModal } from '../../pages/admin/usersPage.js';
 import { createDataTable } from './baseDatatable.js';
 import { getResponsiveRowData } from './utils/responsive.js';
+import { DATATABLE_SELECTORS } from "../../constants/selectors.js";
 
-const selectorTable = '#table';
+const selectorTable = DATATABLE_SELECTORS.MAIN;
 
 export const createUserDatatable = () => {
 

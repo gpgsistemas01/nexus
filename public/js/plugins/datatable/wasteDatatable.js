@@ -4,8 +4,9 @@ import { renderMaterialName } from "./utils/renderProductDatatable.js";
 import { getAllWastes } from "../../application/warehouse/wastes.js";
 import { openWasteModal, openWasteStockAdjustmentModal } from "../../pages/warehouse/wastesPage.js";
 import { getResponsiveRowData } from "./utils/responsive.js";
+import { DATATABLE_SELECTORS } from "../../constants/selectors.js";
 
-const selectorTable = '#table';
+const selectorTable = DATATABLE_SELECTORS.MAIN;
 const tableElement = document.querySelector(selectorTable);
 
 const renderWasteTableHeader = ({ canSeeCost, canManageWastes }) => {

@@ -8,11 +8,12 @@ import { createDataTable, refreshProductTable, renderActionButtons } from "./bas
 import { buildDetailsColumns, buildDetailsHeader } from "./utils/builderDetailDatatable.js";
 import { handleDelete, renderMaterialName } from "./utils/renderProductDatatable.js";
 import { getResponsiveRowData } from "./utils/responsive.js";
-import { setupTableFilters } from "./utils/tableFilter.js";
+import { setupTableFilters } from "./utils/filters/tableFilter.js";
+import { DATATABLE_SELECTORS } from "../../constants/selectors.js";
 
 export let details = [];
-const selectorProductTable = '#productTable';
-const tableSelector = '#table';
+const selectorProductTable = DATATABLE_SELECTORS.PRODUCT;
+const tableSelector = DATATABLE_SELECTORS.MAIN;
 let filters = {
     getValues: () => ({})
 };
@@ -63,7 +64,7 @@ export const createGoodsIssueDatatable = async (context) => {
     );
 
     filters = await setupTableFilters({
-        fields: ['date', 'fulfillmentStatus', 'supplier', 'product']
+        fields: ['date', 'client', 'department', 'profile', 'fulfillmentStatus']
     });
 
     table = createDataTable({

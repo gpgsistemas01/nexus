@@ -2,8 +2,9 @@ import { getAllClients } from "../../application/sales/clients.js";
 import { openClientModal } from "../../modules/clients/clientModal.js";
 import { createDataTable, renderActionButtons } from "./baseDatatable.js";
 import { getResponsiveRowData } from "./utils/responsive.js";
+import { DATATABLE_SELECTORS } from "../../constants/selectors.js";
 
-const selector = '#table';
+const selector = DATATABLE_SELECTORS.MAIN;
 
 export const createClientDatatable = () => {
 

@@ -9,10 +9,11 @@ import { on } from "../../utils/domUtils.js";
 import { formatDateLongWithTime } from "../../utils/formatters.js";
 import { handleAction, handleSubmit, hasValidationErrors, validateFields } from "../../utils/formUtils.js";
 import { validatePurchaseRequisitionValidators } from "../../utils/validations/validators.js";
+import { FORM_SELECTORS, MODAL_SELECTORS } from "../../constants/selectors.js";
 
 const context = window.meta || {};
-const modalId = '#purchaseRequisitionModal';
-const formId = '#purchaseRequisitionForm';
+const modalId = MODAL_SELECTORS.PURCHASE_REQUISITION;
+const formId = FORM_SELECTORS.PURCHASE_REQUISITION;
 const backSelector = `#backBtn-${modalId.replace('#', '')}`;
 
 createPurchaseRequisitionDatatable(context);

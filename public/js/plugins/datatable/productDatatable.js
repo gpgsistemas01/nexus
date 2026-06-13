@@ -8,8 +8,9 @@ import { getResponsiveRowData } from "./utils/responsive.js";
 import { buildExcelButton, buildTableExportParams } from "../../ui/tableUI.js";
 import { exportWarehouseReport } from "../../application/warehouse/report.js";
 import { formatFileName } from "../../utils/formatters.js";
+import { DATATABLE_SELECTORS } from "../../constants/selectors.js";
 
-const selectorTable = '#table';
+const selectorTable = DATATABLE_SELECTORS.MAIN;
 let lastLowStockNotification = '';
 let stockSocketConfigured = false;
 

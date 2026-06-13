@@ -10,12 +10,13 @@ import { formatDateLongWithTime } from "../../utils/formatters.js";
 import { handleSubmit, hasValidationErrors, validateDetailsFields, validateFields } from "../../utils/formUtils.js";
 import { openModal } from "../../ui/modalUI.js";
 import { hasPermission } from "../../utils/permissions.js";
+import { FORM_SELECTORS, MODAL_SELECTORS } from "../../constants/selectors.js";
 
 const MODE_EDIT = 'edit';
 const MODE_EDIT_DETAIL = 'edit-detail';
 const MODE_VIEW = 'view';
-const modalId = '#goodsIssueModal';
-const formId = '#goodsIssueForm';
+const modalId = MODAL_SELECTORS.GOODS_ISSUE;
+const formId = FORM_SELECTORS.GOODS_ISSUE;
 
 const context = window.meta || {};
 
@@ -144,14 +145,14 @@ export const openGoodsIssueModal = ({ mode, data = null }) => {
 
 const addProduct = () => {
 
-    const option = document.querySelector('#productInput option:checked');
+    const option = document.querySelector(`${ FORM_SELECTORS.PRODUCT } option:checked`);
 
     let { productBase, productHeight, presentationName, unitMeasureName, productName, supplierName, supplierId, maxUnitCost } = option?.dataset || {};
     productHeight = Number(productHeight);
     productBase = Number(productBase);
 
     const productId = option?.value;
-    const quantity = Number(document.querySelector('#quantityInput').value);
+    const quantity = Number(document.querySelector(FORM_SELECTORS.QUANTITY).value);
 
     const errors = validateFields(validateAddGoodsIssueProductValidators, {
         productId,

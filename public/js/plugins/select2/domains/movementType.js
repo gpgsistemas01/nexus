@@ -1,6 +1,7 @@
 import { initbaseSelect2 } from "../baseSelect.js";
+import { FILTER_SELECTORS } from "../../../constants/selectors.js";
 
-const movementTypeSelector = '#movementTypeFilter';
+const movementTypeSelector = FILTER_SELECTORS.MOVEMENT_TYPE;
 export const getMovementTypeData = () => ([
     {
         id: 'ENTRY',

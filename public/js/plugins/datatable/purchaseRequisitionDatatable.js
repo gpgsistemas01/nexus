@@ -3,10 +3,11 @@ import { createDataTable, refreshProductTable, renderActionButtons } from "./bas
 import { PURCHASE_REQUISITIONS_API_ROUTE } from "../../services/warehouse/purchaseRequisitionService.js";
 import { hasPermission } from "../../utils/permissions.js";
 import { getResponsiveRowData } from "./utils/responsive.js";
+import { DATATABLE_SELECTORS } from "../../constants/selectors.js";
 
 export let details = [];
-const selectorProductTable = '#productTable';
-const selectorTable = '#table';
+const selectorProductTable = DATATABLE_SELECTORS.PRODUCT;
+const selectorTable = DATATABLE_SELECTORS.MAIN;
 
 export const createPurchaseRequisitionDatatable = (context) => {
 

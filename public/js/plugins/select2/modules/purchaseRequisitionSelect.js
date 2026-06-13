@@ -1,14 +1,15 @@
 import { initMdbWrapperInput, updateMdbWrapperInput } from "../../mdb/baseInstance.js";
 import { initbaseSelect2 } from "../baseSelect.js";
+import { FORM_SELECTORS, MODAL_SELECTORS } from "../../../constants/selectors.js";
 
-const modalSelector = '#goodsIssueModal';
-const projectSelector = '#projectInput';
-const requesterSelector = '#requesterInput';
-const productSelector = '#productInput';
+const modalSelector = MODAL_SELECTORS.PURCHASE_REQUISITION;
+const projectSelector = FORM_SELECTORS.PROJECT;
+const requesterSelector = FORM_SELECTORS.REQUESTER;
+const productSelector = FORM_SELECTORS.PRODUCT;
 const projectScopedSelector = `${ modalSelector } ${ projectSelector }`;
 const requesterScopedSelector = `${ modalSelector } ${ requesterSelector }`;
 const productScopedSelector = `${ modalSelector } ${ productSelector }`;
-const presentationDisplayScopedSelector = `${ modalSelector } #presentationDisplayInput`;
+const presentationDisplayScopedSelector = `${ modalSelector } ${ FORM_SELECTORS.PRESENTATION_DISPLAY }`;
 
 export const initPurchaseRequisitionFormSelect2 = async (data = null) => {
 

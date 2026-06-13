@@ -2,8 +2,9 @@ import { login } from "../../application/auth/login.js";
 import { useForm } from "../../application/form.js";
 import { validateFields } from "../../utils/formUtils.js";
 import { loginValidators } from "../../utils/validations/validators.js";
+import { FORM_SELECTORS } from "../../constants/selectors.js";
 
-const formId = '#loginForm';
+const formId = FORM_SELECTORS.LOGIN;
 document.getElementById('submitBtn').textContent = 'Ingresar';
 
 useForm({
