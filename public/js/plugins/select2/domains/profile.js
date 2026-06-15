@@ -11,7 +11,7 @@ export const getProfileSelectApi = () => ({
 
 export const initProfileFilterSelect = ({
     selectedId = null,
-    departmentFilterSelector = null
+    departmentFilterSelector = FILTER_SELECTORS.DEPARTMENT
 } = {}) => {
 
     initbaseSelect2({

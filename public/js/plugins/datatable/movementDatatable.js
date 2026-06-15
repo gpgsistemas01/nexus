@@ -2,11 +2,9 @@ import { getAllMovements } from "../../application/admin/movements.js";
 import { exportMovementReport } from "../../application/admin/report.js";
 import { buildExcelButton, buildTableExportParams } from "../../ui/tableUI.js";
 import { formatFileName } from "../../utils/formatters.js";
-import { getMovementTypeSelectApi, getMovementTypeData, initMovementTypeFilterSelect } from "../select2/domains/movementType.js";
 import { createDataTable, renderActionButtons } from "./baseDatatable.js";
 import { setupTableFilters } from "./utils/filters/tableFilter.js";
-import { attachSelectFilterHandler } from "./utils/filters/selectFilterEvents.js";
-import { DATATABLE_SELECTORS, FILTER_SELECTORS } from "../../constants/selectors.js";
+import { DATATABLE_SELECTORS } from "../../constants/selectors.js";
 
 const selector = DATATABLE_SELECTORS.MAIN;
 let filters = {
@@ -20,17 +18,7 @@ export const createMovementDatatable = async () => {
     filters = await setupTableFilters({
         fields: [
             'date',
-            {
-                key: 'movementType',
-                isSelected: false,
-                getSelectApi: getMovementTypeSelectApi,
-                getOptions: getMovementTypeData,
-                initSelect: initMovementTypeFilterSelect,
-                attachHandler: ({ onChange }) => attachSelectFilterHandler({
-                    selector: FILTER_SELECTORS.MOVEMENT_TYPE,
-                    onChange
-                })
-            },
+            'movementType',
             'supplier',
             'product'
         ]

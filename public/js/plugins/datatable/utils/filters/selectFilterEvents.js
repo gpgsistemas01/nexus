@@ -1,11 +1,13 @@
+const selectEvent = 'select2:select';
+
 export const attachSelectFilterHandler = ({
     selector,
     onChange
 }) => {
 
     $(selector)
-        .off('select2:select.tableFilter')
-        .on('select2:select.tableFilter', () => {
+        .off(selectEvent)
+        .on(selectEvent, () => {
             onChange?.();
         });
 };

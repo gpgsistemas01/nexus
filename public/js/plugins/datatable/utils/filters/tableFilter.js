@@ -49,7 +49,7 @@ export const setupTableFilters = async ({
             key,
             isSelected = true,
             getSelectApi,
-            getOptions,
+            getOptions = async () => [],
             initSelect,
             attachHandler
         } = filter;

@@ -7,132 +7,64 @@ import { getFulfillmentStatusSelectApi, initFulfillmentStatusFilterSelect } from
 import { getClientSelectApi, initClientFilterSelect } from "../../../select2/domains/client.js";
 import { getDepartmentSelectApi, initDepartmentFilterSelect } from "../../../select2/domains/department.js";
 import { getProfileSelectApi, initProfileFilterSelect } from "../../../select2/domains/profile.js";
+import { getMovementTypeSelectApi, getMovementTypeData, initMovementTypeFilterSelect } from "../../../select2/domains/movementType.js";
 import { FILTER_SELECTORS } from "../../../../constants/selectors.js";
+import { buildDateFilterConfig } from "./modules/dateFilter.js";
 import { attachSelectFilterHandler } from "./selectFilterEvents.js";
 
-export const getDateFilterApi = () => ({
-    getValues: () => ({
-        startDate: document.querySelector(FILTER_SELECTORS.START_DATE)?.value || '',
-        endDate: document.querySelector(FILTER_SELECTORS.END_DATE)?.value || ''
-    })
-});
-
-export const attachDateFilterHandler = ({
-    onChange
-}) => {
-
-    $(FILTER_SELECTORS.START_DATE).on('change', () => {
-        onChange?.();
-    });
-
-    $(FILTER_SELECTORS.END_DATE).on('change', () => {
-        onChange?.();
-    });
-};
-
-const buildDateFilterConfig = ({
-    onChange
-}) => ({
-    customGetValues: () => ({
-        startDate: document.querySelector(FILTER_SELECTORS.START_DATE)?.value || '',
-        endDate: document.querySelector(FILTER_SELECTORS.END_DATE)?.value || ''
-    }),
-    attachHandler: () => attachDateFilterHandler({
-        onChange
-    })
-});
-
-const buildSupplierFilterConfig = ({
-    onChange
-}) => ({
-    key: 'supplierId',
-    isSelected: false,
-    getSelectApi: getSupplierSelectApi,
-    getOptions: getSupplierOptions,
-    initSelect: initSupplierFilterSelect,
-    attachHandler: () => attachSelectFilterHandler({
+const selectFilterConfigs = {
+    supplier: {
+        key: 'supplierId',
         selector: FILTER_SELECTORS.SUPPLIER,
-        onChange
-    })
-});
-
-const buildProductFilterConfig = ({
-    onChange
-}) => ({
-    key: 'productId',
-    isSelected: false,
-    getSelectApi: getProductSelectApi,
-    getOptions: getProductOptions,
-    initSelect: ({ selectedId }) => initProductFilterSelect({ selectedId, supplierFilterSelector: FILTER_SELECTORS.SUPPLIER }),
-    attachHandler: () => attachSelectFilterHandler({
+        isSelected: false,
+        getSelectApi: getSupplierSelectApi,
+        getOptions: getSupplierOptions,
+        initSelect: initSupplierFilterSelect
+    },
+    product: {
+        key: 'productId',
         selector: FILTER_SELECTORS.PRODUCT,
-        onChange
-    })
-});
-
-const buildFulfillmentStatusFilterConfig = ({
-    onChange
-}) => ({
-    key: 'fulfillmentStatusId',
-    getSelectApi: getFulfillmentStatusSelectApi,
-    getOptions: getFulfillmentStatusOptions,
-    initSelect: initFulfillmentStatusFilterSelect,
-    attachHandler: () => attachSelectFilterHandler({
+        isSelected: false,
+        getSelectApi: getProductSelectApi,
+        getOptions: getProductOptions,
+        initSelect: ({ selectedId }) => initProductFilterSelect({ selectedId, supplierFilterSelector: FILTER_SELECTORS.SUPPLIER })
+    },
+    fulfillmentStatus: {
+        key: 'fulfillmentStatusId',
         selector: FILTER_SELECTORS.FULFILLMENT_STATUS,
-        onChange
-    })
-});
-
-const buildClientFilterConfig = ({
-    onChange
-}) => ({
-    key: 'clientId',
-    isSelected: false,
-    getSelectApi: getClientSelectApi,
-    getOptions: async () => [],
-    initSelect: initClientFilterSelect,
-    attachHandler: () => attachSelectFilterHandler({
+        getSelectApi: getFulfillmentStatusSelectApi,
+        getOptions: getFulfillmentStatusOptions,
+        initSelect: initFulfillmentStatusFilterSelect
+    },
+    client: {
+        key: 'clientId',
         selector: FILTER_SELECTORS.CLIENT,
-        onChange
-    })
-});
-
-const buildDepartmentFilterConfig = ({
-    onChange
-}) => ({
-    key: 'departmentId',
-    isSelected: false,
-    getSelectApi: getDepartmentSelectApi,
-    getOptions: async () => [],
-    initSelect: initDepartmentFilterSelect,
-    attachHandler: () => attachSelectFilterHandler({
+        isSelected: false,
+        getSelectApi: getClientSelectApi,
+        initSelect: initClientFilterSelect
+    },
+    department: {
+        key: 'departmentId',
         selector: FILTER_SELECTORS.DEPARTMENT,
-        onChange
-    })
-});
-
-const buildProfileFilterConfig = ({
-    onChange
-}) => ({
-    key: 'profileId',
-    isSelected: false,
-    getSelectApi: getProfileSelectApi,
-    getOptions: async () => [],
-    initSelect: ({ selectedId }) => initProfileFilterSelect({ selectedId, departmentFilterSelector: FILTER_SELECTORS.DEPARTMENT }),
-    attachHandler: () => attachSelectFilterHandler({
+        isSelected: false,
+        getSelectApi: getDepartmentSelectApi,
+        initSelect: initDepartmentFilterSelect
+    },
+    profile: {
+        key: 'profileId',
         selector: FILTER_SELECTORS.PROFILE,
-        onChange
-    })
-});
-
-const tableFilterConfigBuilders = {
-    date: buildDateFilterConfig,
-    supplier: buildSupplierFilterConfig,
-    product: buildProductFilterConfig,
-    fulfillmentStatus: buildFulfillmentStatusFilterConfig,
-    client: buildClientFilterConfig,
-    department: buildDepartmentFilterConfig,
-    profile: buildProfileFilterConfig
+        isSelected: false,
+        getSelectApi: getProfileSelectApi,
+        initSelect: initProfileFilterSelect
+    },
+    movementType: {
+        key: 'movementType',
+        selector: FILTER_SELECTORS.MOVEMENT_TYPE,
+        isSelected: false,
+        getSelectApi: getMovementTypeSelectApi,
+        getOptions: getMovementTypeData,
+        initSelect: initMovementTypeFilterSelect
+    }
 };
 
 const resolveTableFilterConfig = ({
@@ -142,7 +74,21 @@ const resolveTableFilterConfig = ({
 
     if (typeof field !== 'string') return field;
 
-    return tableFilterConfigBuilders[field]?.({ onChange });
+    if (field === 'date') return buildDateFilterConfig({ onChange });
+
+    const selectFilterConfig = selectFilterConfigs[field];
+
+    if (!selectFilterConfig) return null;
+
+    const { selector, ...filterConfig } = selectFilterConfig;
+
+    return {
+        ...filterConfig,
+        attachHandler: () => attachSelectFilterHandler({
+            selector,
+            onChange
+        })
+    };
 };
 
 export const buildTableFilterConfigs = ({

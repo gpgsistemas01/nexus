@@ -1,15 +1,57 @@
-import { bindDisabledSelectDependency } from "../../../select2/baseSelect.js";
 import { toggleProductOption } from "../../../select2/domains/product.js";
 import { FILTER_SELECTORS } from "../../../../constants/selectors.js";
+import { toggleDisabledElement } from "../../../../utils/formUtils.js";
+
+const dependencyEvent = 'change.tableFilterDependency';
 
 const clearSelectFilter = (selector) => {
 
     $(selector).val(null).trigger('change');
 };
 
+const bindDisabledFilterDependency = ({
+    sourceSelector,
+    targetSelector,
+    clearTarget = () => {},
+    isDisabled = (value) => !value
+}) => {
+
+    const $source = $(sourceSelector);
+    const targetElement = document.querySelector(targetSelector);
+
+    if (!$source.length || !targetElement) return;
+
+    const getDisabledState = (value) => isDisabled(value);
+
+    toggleDisabledElement({
+        element: targetElement,
+        isDisabled: getDisabledState($source.val())
+    });
+
+    $source
+        .off(dependencyEvent)
+        .on(dependencyEvent, () => {
+
+            const value = $source.val();
+            const disabled = getDisabledState(value);
+
+            clearTarget({
+                value,
+                source: $source,
+                targetElement,
+                isDisabled: disabled
+            });
+
+            toggleDisabledElement({
+                element: targetElement,
+                isDisabled: disabled
+            });
+        });
+};
+
 const bindSupplierProductFilterDependency = () => {
 
-    bindDisabledSelectDependency({
+    bindDisabledFilterDependency({
         sourceSelector: FILTER_SELECTORS.SUPPLIER,
         targetSelector: FILTER_SELECTORS.PRODUCT,
         clearTarget: () => {
@@ -28,7 +70,7 @@ const bindSupplierProductFilterDependency = () => {
 
 const bindDepartmentProfileFilterDependency = () => {
 
-    bindDisabledSelectDependency({
+    bindDisabledFilterDependency({
         sourceSelector: FILTER_SELECTORS.DEPARTMENT,
         targetSelector: FILTER_SELECTORS.PROFILE,
         clearTarget: () => clearSelectFilter(FILTER_SELECTORS.PROFILE)
