@@ -19,7 +19,7 @@ export const getAllMovements = async (req, res) => {
     });
     const { orderBy, orderDir } = hasRequestedOrder
         ? requestedOrder
-        : { orderBy: 'referenceNumber', orderDir: 'desc' };
+        : { orderBy: 'date', orderDir: 'desc' };
 
     const result = await findAllMovements({
         skip,
