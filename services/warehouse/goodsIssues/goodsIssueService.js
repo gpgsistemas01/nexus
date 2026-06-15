@@ -32,6 +32,29 @@ const REFERENCE_NUMBER_TYPE = 'SAL';
 const MOVEMENT_TYPE_OUT = 'ISSUE';
 const FLOAT_EPSILON = 0.000001;
 
+const GOODS_ISSUE_DETAIL_SELECT = {
+    id: true,
+    productId: true,
+    quantity: true,
+    convertedQuantity: true,
+    maxUnitCost: true,
+    productName: true,
+    productBase: true,
+    productHeight: true,
+    presentationId: true,
+    presentationName: true,
+    unitMeasureId: true,
+    unitMeasureName: true,
+    unitMeasureSymbol: true,
+    projectConvertedQuantity: true,
+    convertedQuantityDifference: true,
+    suppliedQuantity: true,
+    isSupplied: true,
+    fulfillmentStatus: true,
+    supplierId: true,
+    supplierName: true
+};
+
 export const findAllGoodsIssues = async ({
     skip = 0,
     take = 10,
@@ -101,28 +124,7 @@ export const findAllGoodsIssues = async ({
             status: true,
             fulfillmentStatus: true,
             details: {
-                select: {
-                    id: true,
-                    productId: true,
-                    quantity: true,
-                    convertedQuantity: true,
-                    maxUnitCost: true,
-                    productName: true,
-                    productBase: true,
-                    productHeight: true,
-                    presentationId: true,
-                    presentationName: true,
-                    unitMeasureId: true,
-                    unitMeasureName: true,
-                    unitMeasureSymbol: true,
-                    projectConvertedQuantity: true,
-                    convertedQuantityDifference: true,
-                    suppliedQuantity: true,
-                    isSupplied: true,
-                    fulfillmentStatus: true,
-                    supplierId: true,
-                    supplierName: true
-                }
+                select: GOODS_ISSUE_DETAIL_SELECT
             }
         }
     });
@@ -221,20 +223,7 @@ export const createGoodsIssue = async ({ goodsIssueDto }) => {
                 },
                 include: {
                     details: {
-                        select: {
-                            productId: true,
-                            quantity: true,
-                            convertedQuantity: true,
-                            maxUnitCost: true,
-                            productName: true,
-                            productBase: true,
-                            productHeight: true,
-                            presentationId: true,
-                            presentationName: true,
-                            unitMeasureId: true,
-                            unitMeasureName: true,
-                            unitMeasureSymbol: true
-                        }
+                        select: GOODS_ISSUE_DETAIL_SELECT
                     }
                 }
             });
@@ -367,7 +356,9 @@ export const updateGoodsIssue = async ({ id, goodsIssueDto }) => {
                     }
                 },
                 include: {
-                    details: true,
+                    details: {
+                        select: GOODS_ISSUE_DETAIL_SELECT
+                    },
                     status: true,
                     fulfillmentStatus: true
                 }
@@ -575,6 +566,9 @@ export const updateGoodsIssueDetails = async ({ id, goodsIssueDto }) => {
                     id: true,
                     status: true,
                     fulfillmentStatus: true,
+                    details: {
+                        select: GOODS_ISSUE_DETAIL_SELECT
+                    }
                 }
             });
 

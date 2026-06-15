@@ -36,6 +36,7 @@ const mapGoodsIssueDetailRows = (goodsIssues = [], { supplierId = '', productId 
         productBase: toNumber(detail.productBase),
         productHeight: toNumber(detail.productHeight),
         requestedQuantity: toNumber(detail.quantity),
+        suppliedQuantity: toNumber(detail.suppliedQuantity),
         presentationName: detail.presentationName,
         convertedQuantity: toNumber(detail.convertedQuantity),
         convertedUnitMeasureName: detail.unitMeasureSymbol || detail.unitMeasureName,
