@@ -7,10 +7,9 @@ const shouldShowIssueProjectColumns = ({ type, mode, isWarehouse, isCoordinator,
 export const buildDetailsHeader = ({ type, mode, isWarehouse, isCoordinator, isSystem }) => {
 
     let extraHeaders = '';
-
-    if (type === 'issue' && (mode === 'edit-detail' || mode === 'view')) {
-        extraHeaders += `<th rowspan="2">Surtido</th>`;
-    }
+    const suppliedQuantityHeader = type === 'issue' && (mode === 'edit-detail' || mode === 'view')
+        ? '<th rowspan="2">Cantidad surtida</th>'
+        : '';
 
     if (shouldShowIssueProjectColumns({ type, mode, isWarehouse, isCoordinator, isSystem })) {
         extraHeaders += `
@@ -43,6 +42,7 @@ export const buildDetailsHeader = ({ type, mode, isWarehouse, isCoordinator, isS
                 <th rowspan="2">Material</th>
                 <th colspan="2">Medidas</th>
                 <th rowspan="2">${ type === 'issue' ? 'Salida' : 'Compra' }</th>
+                ${ suppliedQuantityHeader }
                 <th rowspan="2">Presentación</th>
                 <th colspan="2">Conversión</th>
                 ${ extraHeaders }
