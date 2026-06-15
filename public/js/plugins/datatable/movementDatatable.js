@@ -32,7 +32,7 @@ export const createMovementDatatable = async () => {
                     ...filters.getValues()
                 })
             },
-            order: [[2, 'desc']],
+            order: [[0, 'desc']],
             columns: [
                 { data: 'date', title: 'Fecha' },
                 {
