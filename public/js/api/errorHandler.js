@@ -53,7 +53,11 @@ export const handleApiError = ({
         case 409:
             form.dataset.submitting = 'false';
             form.querySelector('button[type="submit"]').disabled = false;
-            notifications.showError(getFallbackMessage(err));
+            notifications.showModal({
+                title: 'No se pudo completar la acción',
+                text: getFallbackMessage(err),
+                icon: 'warning'
+            });
             return;
 
         default:

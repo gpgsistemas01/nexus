@@ -19,7 +19,7 @@ import { applyInventoryMovement } from "../../inventory/movementService.js";
 import { buildStockKey, normalizeDecimal, parseStockKey } from "../../../utils/formattersUtils.js";
 import { findSupplierProductsForStockMovement } from "../products/supplierProductService.js";
 import { AppError } from "../../../errors/AppError.js";
-import { GoodsIssueInexistentStock } from "../../../errors/inventory/stockError.js";
+import { GoodsIssueInexistentStock, GoodsIssueInsufficientStock } from "../../../errors/inventory/stockError.js";
 import { buildDateRangeFilter } from "../../../utils/requestQueryUtils.js";
 
 const ROLE_SYSTEM_ADMIN = 'Administrador del sistema';
@@ -393,7 +393,11 @@ export const updateGoodsIssueDetails = async ({ id, goodsIssueDto }) => {
                         quantity: true,
                         suppliedQuantity: true,
                         convertedQuantity: true,
-                        projectConvertedQuantity: true
+                        projectConvertedQuantity: true,
+                        productName: true,
+                        productBase: true,
+                        productHeight: true,
+                        supplierName: true
                     }
                 }
             }
@@ -477,22 +481,23 @@ export const updateGoodsIssueDetails = async ({ id, goodsIssueDto }) => {
 
                     if (!stock?.supplierProduct) {
                         throw new GoodsIssueInexistentStock({
-                            productName: 'Producto desconocido',
-                            height: null,
-                            base: null,
-                            supplierName: 'Proveedor desconocido'
+                            productName: current.productName,
+                            height: current.productHeight,
+                            base: current.productBase,
+                            supplierName: current.supplierName
                         });
                     }
 
-                    const quantityToSupply = normalizeDecimal(Math.min(pending, stock.availableStock));
-
-                    if (quantityToSupply <= FLOAT_EPSILON) {
-                        updates.push({
-                            id: current.id,
-                            data: baseUpdate
+                    if (stock.availableStock < pending) {
+                        throw new GoodsIssueInsufficientStock({
+                            productName: current.productName,
+                            height: current.productHeight,
+                            base: current.productBase,
+                            supplierName: current.supplierName
                         });
-                        continue;
                     }
+
+                    const quantityToSupply = pending;
 
                     stock.availableStock = normalizeDecimal(stock.availableStock - quantityToSupply);
 
