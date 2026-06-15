@@ -1,6 +1,7 @@
 import { getAllProfiles, getProfileOptions } from "../../../application/admin/profiles.js";
 import { initbaseSelect2, toggleSelectOption } from "../baseSelect.js";
 import { FILTER_SELECTORS } from "../../../constants/selectors.js";
+import { getSelectedDepartmentName } from "./department.js";
 
 const profileFilterSelector = FILTER_SELECTORS.PROFILE;
 
@@ -25,7 +26,7 @@ export const initProfileFilterSelect = ({
         data: (params) => {
 
             const departmentName = departmentFilterSelector
-                ? $(`${ departmentFilterSelector } option:selected`).text()
+                ? getSelectedDepartmentName(departmentFilterSelector)
                 : '';
 
             return {

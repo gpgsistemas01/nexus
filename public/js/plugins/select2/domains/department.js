@@ -9,6 +9,15 @@ export const getDepartmentSelectApi = () => ({
     getValue: () => document.querySelector(departmentFilterSelector)?.value || ''
 });
 
+export const getSelectedDepartmentName = (selector = departmentFilterSelector) => {
+
+    const departmentFilter = document.querySelector(selector);
+
+    if (!departmentFilter?.value) return '';
+
+    return departmentFilter.options[departmentFilter.selectedIndex]?.text || '';
+};
+
 export const initDepartmentFilterSelect = ({
     selectedId = null
 } = {}) => {

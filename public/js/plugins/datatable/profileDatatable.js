@@ -2,18 +2,26 @@ import { getAllProfiles } from "../../application/admin/profiles.js";
 import { openProfileModal } from "../../pages/admin/profilesPage.js";
 import { createDataTable, renderActionButtons } from "./baseDatatable.js";
 import { getResponsiveRowData } from "./utils/responsive.js";
+import { setupTableFilters } from "./utils/filters/tableFilter.js";
+import { getSelectedDepartmentName } from "../select2/domains/department.js";
 import { DATATABLE_SELECTORS } from "../../constants/selectors.js";
 
 const selector = DATATABLE_SELECTORS.MAIN;
 
-export const createProfilesDatatable = () => {
+export const createProfilesDatatable = async () => {
+
+    const filters = await setupTableFilters({
+        fields: ['department']
+    });
 
     const table = createDataTable({
         options: {
             ajax: {
                 get: (data) => getAllProfiles({
                     ...data,
-                    includeDepartments: true
+                    includeDepartments: true,
+                    department: getSelectedDepartmentName(),
+                    strictDepartmentFilter: Boolean(filters.getValues().departmentId)
                 })
             },
             columns: [

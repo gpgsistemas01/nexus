@@ -19,6 +19,17 @@
     ]
 } %>
 
+<%- include('../../../shared/tableFilters', {
+    dateInputs: [],
+    selectInputs: [
+        {
+            id: 'departmentFilter',
+            label: 'Área:',
+            col: 'col-12 col-md-6 col-lg-3'
+        }
+    ]
+}) %>
+
 <%- include('../../../shared/mainTable', { title: 'Perfiles' }) %>
 
 <%- include('../../../shared/modal', { modalId: 'profileModal', form }) %>
