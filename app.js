@@ -1,4 +1,5 @@
 import 'dotenv/config.js';
+import { logger, pinoLogger } from './utils/logger.js';
 
 import clientApiRoutes from './routes/api/sales/clientApiRoute.js';
 
@@ -84,6 +85,8 @@ app.use(textRoute, express.text({ type: 'text/plain' }));
 app.use(cookieParser());
 // app.use(express.urlencoded({ extended: true }));
 
+app.use(pinoLogger);
+
 //middleware
 app.use(apiRoute, checkTypeContentJson);
 app.use(uploadRoute, checkTypeContentFile);
@@ -139,7 +142,15 @@ app.use((req, res, next) => {
 });
 
 app.use((err, req, res, next) => {
-    console.error(err.stack);
+    
+    logger.error(
+        {
+            err,
+            path: req.originalUrl,
+            method: req.method
+        },
+        'Error no controlado'
+    );
 
     if (err instanceof AppError) return res.status(err.statusCode).json({
         code: err.code,
@@ -150,20 +161,19 @@ app.use((err, req, res, next) => {
 });
 
 io.on('connection', (socket) => {
-    console.log(`Socket conectado: ${socket.id}`);
+    logger.info({ socketId: socket.id }, 'Socket conectado');
 
     socket.on('disconnect', () => {
-        console.log(`Socket desconectado: ${socket.id}`);
+        logger.info({ socketId: socket.id }, 'Socket desconectado');
     });
 });
 
 const PORT = process.env.PORT || 3000;
 
 server.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
+    logger.info({ port: PORT }, `Server running on http://localhost:${PORT}`);
 });
 
 process.on('warning', (warning) => {
-    console.log('⚠️ WARNING DETECTADO');
-    console.log(warning.stack);
+    logger.warn({ warning }, 'Warning detectado');
 });
