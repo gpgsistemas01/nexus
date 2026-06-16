@@ -123,19 +123,20 @@ export const findAllPurchaseRequisitions = async ({
 
 const validatePurchaseRequisitionRelations = async ({ projectId, userId }) => {
 
-    const [project, user] = await Promise.all([
-        prisma.project.findFirst({
-            where: { id: projectId }
-        }),
-        prisma.user.findUnique({
-            where: { 
-                id: userId
-            },
-            include: {
-                profiles: true
-            }
-        })
-    ]);
+    const db = getDb();
+
+    const project = await db.project.findFirst({
+        where: { id: projectId }
+    });
+
+    const user = await db.user.findUnique({
+        where: {
+            id: userId
+        },
+        include: {
+            profiles: true
+        }
+    });
 
     const requester = user?.profiles[0];
     const departmentId = user?.departmentId;
@@ -244,9 +245,9 @@ export const updatePurchaseRequisition = async ({
 
     try {
 
-        const result = await getDb().$transaction(async (prisma) => {
+        const result = await getDb().$transaction(async (tx) => {
 
-            const purchaseRequisition = await getDb().purchaseRequisition.update({
+            const purchaseRequisition = await tx.purchaseRequisition.update({
                 data: {
                     ...purchaseRequisitionData,
                     project: {
@@ -268,19 +269,22 @@ export const updatePurchaseRequisition = async ({
 
             if (incomingDetailsIds.length) deleteFilter.id = { notIn: incomingDetailsIds };
 
-            await getDb().detailPurchaseRequisitionProduct.deleteMany({
+            await tx.detailPurchaseRequisitionProduct.deleteMany({
                 where: deleteFilter
             });
 
-            const detailsPurchaseRequisition = await Promise.all(details.map(async detail => {
+            const detailsPurchaseRequisition = [];
 
-                return await getDb().detailPurchaseRequisitionProduct.create({
+            for (const detail of details) {
+                const detailPurchaseRequisition = await tx.detailPurchaseRequisitionProduct.create({
                     data: {
                         ...detail,
                         purchaseRequisitionId: id
                     }
                 });
-            }));
+
+                detailsPurchaseRequisition.push(detailPurchaseRequisition);
+            }
 
             purchaseRequisition.details = detailsPurchaseRequisition;
 

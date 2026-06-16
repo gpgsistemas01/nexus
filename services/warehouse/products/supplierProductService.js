@@ -340,25 +340,23 @@ export const recalculateConvertedQuantityByProduct = async ({
         }
     });
 
-    await Promise.all(
-        supplierProducts.map(({ supplierId, currentStock }) =>
-            db.supplierProduct.update({
-                where: {
-                    supplierId_productId: {
-                        supplierId,
-                        productId
-                    }
-                },
-                data: {
-                    convertedQuantity: calculateConvertedQuantity({
-                        currentStock,
-                        base,
-                        height
-                    })
+    for (const { supplierId, currentStock } of supplierProducts) {
+        await db.supplierProduct.update({
+            where: {
+                supplierId_productId: {
+                    supplierId,
+                    productId
                 }
-            })
-        )
-    );
+            },
+            data: {
+                convertedQuantity: calculateConvertedQuantity({
+                    currentStock,
+                    base,
+                    height
+                })
+            }
+        });
+    }
 };
 export const updateProductUnitCostIfHigher = async ({
     supplierId,
@@ -381,23 +379,21 @@ export const updateProductUnitCostIfHigher = async ({
         }
     }
 
-    await Promise.all(
-        Object.entries(maxCostByProduct).map(([productId, cost]) =>
-            db.supplierProduct.updateMany({
-                where: {
-                    supplierId,
-                    productId,
-                    OR: [
-                        { maxUnitCost: null },
-                        { maxUnitCost: { lt: cost } }
-                    ]
-                },
-                data: {
-                    maxUnitCost: cost
-                }
-            })
-        )
-    );
+    for (const [productId, cost] of Object.entries(maxCostByProduct)) {
+        await db.supplierProduct.updateMany({
+            where: {
+                supplierId,
+                productId,
+                OR: [
+                    { maxUnitCost: null },
+                    { maxUnitCost: { lt: cost } }
+                ]
+            },
+            data: {
+                maxUnitCost: cost
+            }
+        });
+    }
 };
 
 export const updateSupplierProductStock = async ({

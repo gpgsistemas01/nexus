@@ -187,21 +187,20 @@ export const findLatestNotifications = async ({ take = 10, departments, roles } 
 
     const where = await getNotificationWhereByUser(departments, roles);
 
-    const [items, unreadCount] = await Promise.all([
-        getDb().notification.findMany({
-            where,
-            take,
-            orderBy: {
-                createdAt: 'desc'
-            }
-        }),
-        getDb().notification.count({
-            where: {
-                ...where,
-                isRead: false
-            }
-        })
-    ]);
+    const items = await getDb().notification.findMany({
+        where,
+        take,
+        orderBy: {
+            createdAt: 'desc'
+        }
+    });
+
+    const unreadCount = await getDb().notification.count({
+        where: {
+            ...where,
+            isRead: false
+        }
+    });
 
     return {
         items,

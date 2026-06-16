@@ -576,12 +576,12 @@ export const updateGoodsIssueDetails = async ({ id, goodsIssueDto }) => {
                 }
             }
 
-            await Promise.all(updates.map(u => (
-                tx.goodsIssueDetail.update({
+            for (const u of updates) {
+                await tx.goodsIssueDetail.update({
                     where: { id: u.id },
                     data: u.data
-                })
-            )));
+                });
+            }
 
             const refreshed = await tx.goodsIssueDetail.findMany({
                 where: { goodsIssueId: id },
