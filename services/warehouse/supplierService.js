@@ -2,7 +2,7 @@ import { AppError } from "../../errors/AppError.js";
 import { SupplierCodeFindDatabaseError, SupplierCodeNotFound, SupplierCreateDatabaseError, SupplierNotFound, SupplierUpdateDatabaseError } from "../../errors/warehouse/supplierError.js";
 import { getDb } from "../../repository/baseRepository.js";
 import { incrementNonYearlyReferenceNumberCounter } from "../document/referenceNumberService.js";
-import { createServiceLogger, getModelLogContext, logServiceError } from "../../utils/logger.js";
+import { createServiceLogger, getModelLogContext, logServiceError, logServiceInfo } from "../../utils/logger.js";
 
 const serviceLogger = createServiceLogger('warehouse.supplierService');
 
@@ -116,7 +116,7 @@ export const createSupplier = async (supplierDto) => {
 
     try {
 
-        return await getDb().$transaction(async (tx) => {
+        const supplier = await getDb().$transaction(async (tx) => {
 
             const counter = await incrementNonYearlyReferenceNumberCounter({
                 type: SUPPLIER_REFERENCE_PREFIX,
@@ -134,6 +134,13 @@ export const createSupplier = async (supplierDto) => {
                 }
             });
         });
+
+        logServiceInfo(serviceLogger, {
+            operation: 'warehouse.supplierService.createSupplier',
+            ...getModelLogContext('supplier', supplier)
+        }, 'Proveedor creado correctamente');
+
+        return supplier;
 
     } catch (err) {
         logServiceError(serviceLogger, err, {
@@ -158,10 +165,17 @@ export const updateSupplier = async (supplierDto, id) => {
 
     try {
 
-        return await db.supplier.update({
+        const supplier = await db.supplier.update({
             data: { ...supplierDto },
             where: { id }
         });
+
+        logServiceInfo(serviceLogger, {
+            operation: 'warehouse.supplierService.updateSupplier',
+            ...getModelLogContext('supplier', supplier)
+        }, 'Proveedor actualizado correctamente');
+
+        return supplier;
 
     } catch (err) {
         logServiceError(serviceLogger, err, {

@@ -5,7 +5,7 @@ import { normalizeDecimal, toNumber } from '../../utils/formattersUtils.js';
 import { assertSufficientStock, calculateConvertedQuantity } from '../inventory/stockHelpers.js';
 import { createStockAdjustment } from './adjustmentService.js';
 import { findSupplierProductById } from './products/supplierProductService.js';
-import { createServiceLogger, getModelLogContext, logServiceError } from "../../utils/logger.js";
+import { createServiceLogger, getModelLogContext, logServiceError, logServiceInfo } from "../../utils/logger.js";
 
 const serviceLogger = createServiceLogger('warehouse.wasteService');
 
@@ -222,33 +222,54 @@ export const createWasteAdjustment = async ({
     userId
 }) => {
 
-    return getDb().$transaction(async (tx) => {
+    try {
 
-        const product = await findSupplierProductById({
-            tx,
-            id: wasteDto.supplierProductId
+        const waste = await getDb().$transaction(async (tx) => {
+
+            const product = await findSupplierProductById({
+                tx,
+                id: wasteDto.supplierProductId
+            });
+            const newStock = validateProductStockForWaste({ product, wasteDto });
+
+            await createStockAdjustment({
+                tx,
+                productId: product.id,
+                supplierId: product.supplier?.id,
+                reasonId: wasteDto.reasonId,
+                observations: wasteDto.observations,
+                newStock,
+                userId,
+                base: wasteDto.base,
+                height: wasteDto.height
+            });
+
+            const waste = await tx.waste.create({
+                data: buildWasteData(wasteDto),
+                include: WASTE_INCLUDE
+            });
+
+            return mapWaste(waste);
         });
-        const newStock = validateProductStockForWaste({ product, wasteDto });
 
-        await createStockAdjustment({
-            tx,
-            productId: product.id,
-            supplierId: product.supplier?.id,
-            reasonId: wasteDto.reasonId,
-            observations: wasteDto.observations,
-            newStock,
-            userId,
-            base: wasteDto.base,
-            height: wasteDto.height
+        logServiceInfo(serviceLogger, {
+            operation: 'warehouse.wasteService.createWasteAdjustment',
+            ...getModelLogContext('waste', { userId, ...wasteDto, id: waste.id })
+        }, 'Merma registrada correctamente');
+
+        return waste;
+
+    } catch (err) {
+        logServiceError(serviceLogger, err, {
+            operation: 'warehouse.wasteService.createWasteAdjustment',
+            ...getModelLogContext('waste', { userId, ...wasteDto })
+        }, 'Error específico al registrar merma en transacción');
+
+        handleWasteServiceError({
+            err,
+            fallbackError: new WasteUpdateDatabaseError()
         });
-
-        const waste = await tx.waste.create({
-            data: buildWasteData(wasteDto),
-            include: WASTE_INCLUDE
-        });
-
-        return mapWaste(waste);
-    });
+    }
 };
 
 export const updateWaste = async ({
@@ -258,7 +279,7 @@ export const updateWaste = async ({
 
     try {
 
-        return await getDb().$transaction(async (tx) => {
+        const waste = await getDb().$transaction(async (tx) => {
 
             const currentWaste = await findWasteById({ tx, id });
 
@@ -278,6 +299,13 @@ export const updateWaste = async ({
 
             return mapWaste(updatedWaste);
         });
+
+        logServiceInfo(serviceLogger, {
+            operation: 'warehouse.wasteService.updateWaste',
+            ...getModelLogContext('waste', { id, ...wasteDto })
+        }, 'Merma actualizada correctamente');
+
+        return waste;
 
     } catch (err) {
         logServiceError(serviceLogger, err, {
@@ -300,7 +328,7 @@ export const updateWasteStock = async ({
 
     try {
 
-        return await getDb().$transaction(async (tx) => {
+        const waste = await getDb().$transaction(async (tx) => {
 
             const currentWaste = await findWasteById({ tx, id });
             const { supplierProduct } = currentWaste;
@@ -332,6 +360,13 @@ export const updateWasteStock = async ({
 
             return mapWaste(updatedWaste);
         });
+
+        logServiceInfo(serviceLogger, {
+            operation: 'warehouse.wasteService.updateWasteStock',
+            ...getModelLogContext('wasteStock', { id, userId, ...wasteStockDto })
+        }, 'Stock de merma ajustado correctamente');
+
+        return waste;
 
     } catch (err) {
         logServiceError(serviceLogger, err, {

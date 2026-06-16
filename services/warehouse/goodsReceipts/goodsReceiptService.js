@@ -3,7 +3,7 @@ import {
     ProfileReceivedByNotFound,
     SupplierNotFound
 } from "../../../errors/warehouse/goodsReceiptError.js";
-import { createServiceLogger, getModelLogContext, logServiceError } from "../../../utils/logger.js";
+import { createServiceLogger, getModelLogContext, logServiceError, logServiceInfo } from "../../../utils/logger.js";
 
 const serviceLogger = createServiceLogger('warehouse.goodsReceipts.goodsReceiptService');
 
@@ -217,6 +217,15 @@ export const createGoodsReceipt = async ({ goodsReceiptDto }) => {
             supplierId: result.supplierId,
             details: result.details
         });
+
+        logServiceInfo(serviceLogger, {
+            operation: 'warehouse.goodsReceipts.goodsReceiptService.createGoodsReceipt',
+            ...getModelLogContext('goodsReceipt', {
+                ...goodsReceiptDto,
+                id: result.id,
+                referenceNumber: result.referenceNumber
+            })
+        }, 'Compra registrada correctamente');
 
         return result;
 

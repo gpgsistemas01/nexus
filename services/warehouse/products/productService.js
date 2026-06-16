@@ -5,7 +5,7 @@ import { prepareProductData, withRetry } from "./productHelpers.js";
 import { syncSupplierProduct } from "./productRelations.js";
 import { AppError } from "../../../errors/AppError.js";
 import { createStockAdjustment } from "../adjustmentService.js";
-import { createServiceLogger, getModelLogContext, logServiceError } from "../../../utils/logger.js";
+import { createServiceLogger, getModelLogContext, logServiceError, logServiceInfo } from "../../../utils/logger.js";
 
 const serviceLogger = createServiceLogger('warehouse.products.productService');
 
@@ -141,7 +141,7 @@ export const createProduct = async ({
 
     try {
 
-        return await getDb().$transaction((tx) =>
+        const product = await getDb().$transaction((tx) =>
             createProductInTransaction({
                 tx,
                 productDto,
@@ -149,6 +149,13 @@ export const createProduct = async ({
                 userId
             })
         );
+
+        logServiceInfo(serviceLogger, {
+            operation: 'warehouse.products.productService.createProduct',
+            ...getModelLogContext('product', { userId, ...productDto, ...stockDto, id: product?.productId ?? product?.id })
+        }, 'Producto creado correctamente');
+
+        return product;
 
     } catch (err) {
         logServiceError(serviceLogger, err, {
@@ -166,7 +173,7 @@ export const updateProduct = async (productDto, id) => {
 
     try {
 
-        return await getDb().$transaction(async (tx) => {
+        const product = await getDb().$transaction(async (tx) => {
 
             await existsProduct({ tx, id });
 
@@ -214,6 +221,13 @@ export const updateProduct = async (productDto, id) => {
             return fullProduct;
         });
 
+        logServiceInfo(serviceLogger, {
+            operation: 'warehouse.products.productService.updateProduct',
+            ...getModelLogContext('product', { id, ...productDto })
+        }, 'Producto actualizado correctamente');
+
+        return product;
+
     } catch (err) {
         logServiceError(serviceLogger, err, {
             operation: 'warehouse.products.productService.updateProduct',
@@ -238,7 +252,7 @@ export const updateProductStock = async ({
 
     try {
 
-        return await createStockAdjustment({
+        const stockAdjustment = await createStockAdjustment({
             productId: id,
             supplierId: productDto.supplierId,
             reasonId: productDto.reasonId,
@@ -246,6 +260,13 @@ export const updateProductStock = async ({
             newStock: productDto.newStock,
             userId
         });
+
+        logServiceInfo(serviceLogger, {
+            operation: 'warehouse.products.productService.updateProductStock',
+            ...getModelLogContext('productStock', { id, userId, ...productDto })
+        }, 'Stock de producto ajustado correctamente');
+
+        return stockAdjustment;
 
     } catch (err) {
         logServiceError(serviceLogger, err, {

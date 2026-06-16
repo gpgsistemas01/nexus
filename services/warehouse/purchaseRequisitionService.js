@@ -7,7 +7,7 @@ import {
     RequesterProfileNotFound,
     PurchaseRequisitionApproverProfileNotFound
 } from "../../errors/warehouse/purchaseRequisitionError.js";
-import { createServiceLogger, getModelLogContext, logServiceError } from "../../utils/logger.js";
+import { createServiceLogger, getModelLogContext, logServiceError, logServiceInfo } from "../../utils/logger.js";
 
 const serviceLogger = createServiceLogger('warehouse.purchaseRequisitionService');
 
@@ -151,55 +151,76 @@ export const createPurchaseRequisition = async ({
     userId
 }) => {
 
-    const { projectId, details, ...purchaseRequisitionData } = purchaseRequisitionDto;
+    try {
 
-    const { requester, departmentId } = await validatePurchaseRequisitionRelations({ projectId, userId });
+        const { projectId, details, ...purchaseRequisitionData } = purchaseRequisitionDto;
 
-    const result = await getDb().$transaction(async (tx) => {
+        const { requester, departmentId } = await validatePurchaseRequisitionRelations({ projectId, userId });
 
-        const referenceNumber = await generateYearlyReferenceNumber({ type: REFERENCE_NUMBER_TYPE, tx });
+        const result = await getDb().$transaction(async (tx) => {
 
-        const purchaseRequisition = await tx.purchaseRequisition.create({
-            data: {
-                ...purchaseRequisitionData,
-                status: {
-                    connect: {
-                        name: STATUS_OPEN
-                    }
-                },
-                project: {
-                    connect: {
-                        id: projectId
-                    }
-                },
-                requester: {
-                    connect: {
-                        id: requester.id
-                    }
-                },
-                department: {
-                    connect: {
-                        id: departmentId
-                    }
-                },
-                referenceNumber,
-                details: {
-                    create: details.map(({ productId, ...rest }) => ({
-                        ...rest,
-                        product: {
-                            connect: {
-                                id: productId
-                            }
+            const referenceNumber = await generateYearlyReferenceNumber({ type: REFERENCE_NUMBER_TYPE, tx });
+
+            const purchaseRequisition = await tx.purchaseRequisition.create({
+                data: {
+                    ...purchaseRequisitionData,
+                    status: {
+                        connect: {
+                            name: STATUS_OPEN
                         }
-                    }))
+                    },
+                    project: {
+                        connect: {
+                            id: projectId
+                        }
+                    },
+                    requester: {
+                        connect: {
+                            id: requester.id
+                        }
+                    },
+                    department: {
+                        connect: {
+                            id: departmentId
+                        }
+                    },
+                    referenceNumber,
+                    details: {
+                        create: details.map(({ productId, ...rest }) => ({
+                            ...rest,
+                            product: {
+                                connect: {
+                                    id: productId
+                                }
+                            }
+                        }))
+                    }
                 }
-            }
+            });
+
+            return { purchaseRequisition };
         });
 
-        return { purchaseRequisition };
-    });
+        logServiceInfo(serviceLogger, {
+            operation: 'warehouse.purchaseRequisitionService.createPurchaseRequisition',
+            ...getModelLogContext('purchaseRequisition', {
+                userId,
+                ...purchaseRequisitionDto,
+                id: result.purchaseRequisition.id,
+                referenceNumber: result.purchaseRequisition.referenceNumber
+            })
+        }, 'Requisición creada correctamente');
 
-    return result.purchaseRequisition;
+        return result.purchaseRequisition;
+
+    } catch (err) {
+        logServiceError(serviceLogger, err, {
+            operation: 'warehouse.purchaseRequisitionService.createPurchaseRequisition',
+            ...getModelLogContext('purchaseRequisition', { userId, ...purchaseRequisitionDto })
+        }, 'Error específico al crear requisición en transacción');
+
+        throw err;
+    }
 };
 
 export const updatePurchaseRequisition = async ({
@@ -265,6 +286,16 @@ export const updatePurchaseRequisition = async ({
 
             return { purchaseRequisition };
         });
+
+        logServiceInfo(serviceLogger, {
+            operation: 'warehouse.purchaseRequisitionService.updatePurchaseRequisition',
+            ...getModelLogContext('purchaseRequisition', {
+                id,
+                userId,
+                ...purchaseRequisitionDto,
+                referenceNumber: result.purchaseRequisition.referenceNumber
+            })
+        }, 'Requisición actualizada correctamente');
 
         return result;
 
@@ -359,12 +390,26 @@ const updatePurchaseRequisitionStatus = async ({ id, statusName, userId }) => {
             }
         });
 
-        return {
+        const statusResult = {
             ...updatedPurchaseRequisition,
             referenceNumber: purchaseRequisition.referenceNumber,
             department: purchaseRequisition.department,
             totalRequestedProducts: purchaseRequisition.details.length
         };
+
+        logServiceInfo(serviceLogger, {
+            operation: 'warehouse.purchaseRequisitionService.updateStatus',
+            ...getModelLogContext('purchaseRequisition', {
+                id,
+                userId,
+                statusName,
+                referenceNumber: purchaseRequisition.referenceNumber,
+                departmentId: purchaseRequisition.department?.id,
+                departmentName: purchaseRequisition.department?.name
+            })
+        }, 'Estatus de requisición actualizado correctamente');
+
+        return statusResult;
     } catch (err) {
         logServiceError(serviceLogger, err, {
             operation: 'warehouse.purchaseRequisitionService.updateStatus',

@@ -110,13 +110,32 @@ export const createServiceLogger = (service) => logger.child({ layer: 'service',
 
 const getDefaultErrorLogLevel = (err) => err instanceof AppError ? 'warn' : 'error';
 
+const getAppErrorLogContext = (err) => err instanceof AppError
+    ? {
+        errorCode: err.code,
+        statusCode: err.statusCode,
+        meta: err.meta
+    }
+    : {};
+
 export const logServiceError = (
     serviceLogger,
     err,
     { level, ...context } = {},
     message = 'Error en servicio'
 ) => {
-    serviceLogger[normalizeLogLevel(level, getDefaultErrorLogLevel(err))]({ err, ...context }, message);
+    serviceLogger[normalizeLogLevel(level, getDefaultErrorLogLevel(err))](
+        { err, ...getAppErrorLogContext(err), ...context },
+        message
+    );
+};
+
+export const logServiceInfo = (
+    serviceLogger,
+    context = {},
+    message = 'Operación de negocio completada'
+) => {
+    serviceLogger.info(context, message);
 };
 
 export const pinoLogger = pinoHttp({
@@ -125,9 +144,8 @@ export const pinoLogger = pinoHttp({
     customLogLevel: (_req, res, err) => {
         if (err || res.statusCode >= 500) return 'error';
         if (res.statusCode >= 400) return 'warn';
-        if (res.statusCode >= 300) return 'silent';
 
-        return 'info';
+        return 'silent';
     },
     customSuccessMessage: (req, res) => `${req.method} ${req.url} completado`,
     customErrorMessage: (req, res) => `${req.method} ${req.url} falló`,

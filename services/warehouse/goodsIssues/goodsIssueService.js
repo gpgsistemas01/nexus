@@ -9,7 +9,7 @@ import {
     GoodsIssueInternalClientAdvisorDepartmentConflict,
     GoodsIssueInternalClientProjectNumberConflict
 } from "../../../errors/warehouse/goodsIssueError.js";
-import { createServiceLogger, getModelLogContext, logServiceError } from "../../../utils/logger.js";
+import { createServiceLogger, getModelLogContext, logServiceError, logServiceInfo } from "../../../utils/logger.js";
 
 const serviceLogger = createServiceLogger('warehouse.goodsIssues.goodsIssueService');
 
@@ -235,6 +235,15 @@ export const createGoodsIssue = async ({ goodsIssueDto }) => {
             return { goodsIssue };
         });
 
+        logServiceInfo(serviceLogger, {
+            operation: 'warehouse.goodsIssues.goodsIssueService.createGoodsIssue',
+            ...getModelLogContext('goodsIssue', {
+                ...goodsIssueDto,
+                id: result.goodsIssue.id,
+                referenceNumber: result.goodsIssue.referenceNumber
+            })
+        }, 'Salida de almacén registrada correctamente');
+
         return result.goodsIssue;
 
     } catch (err) {
@@ -313,7 +322,7 @@ export const updateGoodsIssue = async ({ id, goodsIssueDto }) => {
 
         const processedDetails = await buildGoodsIssueDetails({ details });
 
-        return await getDb().$transaction(async (tx) => {
+        const updatedGoodsIssue = await getDb().$transaction(async (tx) => {
 
             await tx.goodsIssueDetail.deleteMany({
                 where: { goodsIssueId: id }
@@ -372,6 +381,17 @@ export const updateGoodsIssue = async ({ id, goodsIssueDto }) => {
                 }
             });
         });
+
+        logServiceInfo(serviceLogger, {
+            operation: 'warehouse.goodsIssues.goodsIssueService.updateGoodsIssue',
+            ...getModelLogContext('goodsIssue', {
+                id,
+                ...goodsIssueDto,
+                referenceNumber: updatedGoodsIssue.referenceNumber
+            })
+        }, 'Salida de almacén actualizada correctamente');
+
+        return updatedGoodsIssue;
 
     } catch (err) {
         logServiceError(serviceLogger, err, {
