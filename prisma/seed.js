@@ -1,4 +1,4 @@
-import { prisma } from "../lib/prisma.js";
+import { prisma } from "../src/lib/prisma.js";
 import XLSX from 'xlsx';
 import fs from 'fs';
 import { fileURLToPath } from 'url';

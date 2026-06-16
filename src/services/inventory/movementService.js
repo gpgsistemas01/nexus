@@ -1,6 +1,6 @@
 import { MovementDetailRelationConflict } from "../../errors/inventory/movementError.js";
 import { GoodsIssueInexistentStock } from "../../errors/inventory/stockError.js";
-import { InventoryMovementType } from "../../generated/prisma/enums.ts";
+import { InventoryMovementType } from "../../../generated/prisma/enums.ts";
 import { getDb } from "../../repository/baseRepository.js";
 import { buildStockKey, hasProductDimensions, normalizeDecimal } from "../../utils/formattersUtils.js";
 import { assertSufficientStock, calculateConvertedQuantity } from "./stockHelpers.js";

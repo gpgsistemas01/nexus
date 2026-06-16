@@ -1,4 +1,4 @@
-import { AdjustmentStatus, StockAdjustmentType } from "../../generated/prisma/enums.ts";
+import { AdjustmentStatus, StockAdjustmentType } from "../../../generated/prisma/enums.ts";
 import { getDb } from "../../repository/baseRepository.js";
 import { generateYearlyReferenceNumber } from "../document/referenceNumberService.js";
 import { normalizeDecimal, toNumber } from "../../utils/formattersUtils.js";
