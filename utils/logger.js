@@ -145,9 +145,9 @@ export const pinoLogger = pinoHttp({
         if (err || res.statusCode >= 500) return 'error';
         if (res.statusCode >= 400) return 'warn';
 
-        return 'silent';
+        return 'info';
     },
-    customSuccessMessage: (req, res) => `${req.method} ${req.url} completado`,
+    customSuccessMessage: (req, res) => `${req.method} ${req.url} operación completada`,
     customErrorMessage: (req, res) => `${req.method} ${req.url} falló`,
     redact: [
         'req.headers.cookie',
