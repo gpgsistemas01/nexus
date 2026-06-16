@@ -40,7 +40,8 @@ const calculateStockAdjustmentValues = ({
     assertSufficientStock({
         product,
         newStock,
-        newConvertedQuantity
+        newConvertedQuantity,
+        requestedQuantity: Math.abs(difference)
     });
 
     return {

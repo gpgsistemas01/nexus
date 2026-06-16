@@ -2,7 +2,7 @@ import { AppError } from "../AppError.js";
 
 export class GoodsIssueInsufficientStock extends AppError {
 
-    constructor ({ productName, height, base, supplierName }) {
+    constructor ({ productName, height, base, supplierName, productId, supplierId, requestedQuantity }) {
 
         const hasDimensions =
             base != null &&
@@ -22,13 +22,13 @@ export class GoodsIssueInsufficientStock extends AppError {
             409
         );
 
-        this.meta = { productName, height, base, supplierName };
+        this.meta = { productName, height, base, supplierName, productId, supplierId, requestedQuantity };
     }
 }
 
 export class GoodsIssueInexistentStock extends AppError {
 
-    constructor ({ productName, height, base, supplierName }) {
+    constructor ({ productName, height, base, supplierName, productId, supplierId }) {
 
         const hasDimensions =
             base != null &&
@@ -52,7 +52,9 @@ export class GoodsIssueInexistentStock extends AppError {
             productName,
             height,
             base,
-            supplierName
+            supplierName,
+            productId,
+            supplierId
         };
     }
 }

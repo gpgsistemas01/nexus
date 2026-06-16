@@ -144,7 +144,11 @@ const validateProductStockForWaste = ({ product, wasteDto }) => {
     const previousStock = Number(toNumber(product.currentStock) || 0);
     const newStock = normalizeDecimal(previousStock - wasteDto.currentStock);
 
-    assertSufficientStock({ product, newStock });
+    assertSufficientStock({
+        product,
+        newStock,
+        requestedQuantity: wasteDto.currentStock
+    });
 
     return newStock;
 };

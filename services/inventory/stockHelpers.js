@@ -27,18 +27,25 @@ export const calculateConvertedQuantity = ({
 
 const getStockErrorMeta = (product = {}) => ({
     productName: product.name ?? product.product?.name ?? 'Producto desconocido',
+    productId: product.id ?? product.productId ?? product.product?.id,
+    supplierId: product.supplierId ?? product.supplier?.id,
     height: product.height ?? product.product?.height ?? null,
     base: product.base ?? product.product?.base ?? null,
-    supplierName: product.supplier?.tradeName ?? product.supplierName ?? 'Proveedor desconocido'
+    supplierName: product.supplier?.tradeName ?? product.supplierName ?? 'Proveedor desconocido',
+    requestedQuantity: product.requestedQuantity
 });
 
 export const assertSufficientStock = ({
     product,
     newStock,
-    newConvertedQuantity = null
+    newConvertedQuantity = null,
+    requestedQuantity = null
 }) => {
 
     if (newStock >= 0 && (newConvertedQuantity === null || newConvertedQuantity >= 0)) return;
 
-    throw new GoodsIssueInsufficientStock(getStockErrorMeta(product));
+    throw new GoodsIssueInsufficientStock(getStockErrorMeta({
+        ...product,
+        requestedQuantity
+    }));
 };

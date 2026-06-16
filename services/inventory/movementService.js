@@ -102,7 +102,8 @@ export const applyInventoryMovement = async ({
                     height: hasDimensions ? ps.product.height : null,
                     supplier: ps.supplier
                 },
-                newStock
+                newStock,
+                requestedQuantity: quantity
             });
         }
 

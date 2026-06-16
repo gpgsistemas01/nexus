@@ -15,71 +15,54 @@ const normalizeLogLevel = (level, fallback = DEFAULT_LOG_LEVEL) => {
 
 const configuredLogLevel = normalizeLogLevel(process.env.LOG_LEVEL);
 
+const isLogValuePresent = (value) => value !== undefined && value !== null && value !== '';
+
 const getObjectIfNotEmpty = (value) =>
     value && Object.keys(value).length > 0 ? value : undefined;
 
-const MODEL_CONTEXT_FIELDS = new Set([
-    'id',
-    'userId',
-    'referenceNumber',
-    'folio',
-    'code',
-    'sku',
-    'name',
-    'fullName',
-    'lastName',
-    'tradeName',
-    'legalName',
-    'projectNumber',
-    'invoice',
-    'supplierId',
-    'supplierName',
-    'productId',
-    'productName',
-    'clientId',
-    'clientName',
-    'departmentId',
-    'departmentName',
-    'requesterId',
-    'advisorId',
-    'receivedById',
-    'reasonId',
-    'statusName',
-    'quantity',
-    'newStock',
-    'currentStock',
-    'base',
-    'height'
-]);
+const isIdentifierField = (key) => key === 'id' || key.endsWith('Id') || key.endsWith('Ids');
 
-const getModelContextDetails = (details) => Array.isArray(details)
-    ? {
-        detailsCount: details.length,
-        details: details.slice(0, 5).map(getModelLogContextData)
-    }
-    : {};
+const getLogSafeField = (key, value) => {
+    if (!isLogValuePresent(value)) return undefined;
 
-const getModelLogContextData = (data = {}) => Object.entries(data).reduce((context, [key, value]) => {
+    if (isIdentifierField(key)) return value;
+
+    return undefined;
+};
+
+const getLogSafeData = (data = {}) => Object.entries(data).reduce((context, [key, value]) => {
     if (key === 'details') return { ...context, ...getModelContextDetails(value) };
 
-    if (MODEL_CONTEXT_FIELDS.has(key) && value !== undefined && value !== null && value !== '') {
-        context[key] = value;
-    }
+    const safeValue = getLogSafeField(key, value);
+
+    if (safeValue !== undefined) context[key] = safeValue;
+
+    return context;
+}, {});
+
+const getModelContextDetails = (details) => Array.isArray(details)
+    ? { detailsCount: details.length }
+    : {};
+
+const getRequestDataLogContext = (data = {}) => Object.entries(data).reduce((context, [key, value]) => {
+    const safeValue = getLogSafeField(key, value);
+
+    if (safeValue !== undefined) context[key] = safeValue;
 
     return context;
 }, {});
 
 export const getModelLogContext = (model, data = {}) => ({
     model,
-    ...getModelLogContextData(data)
+    ...getLogSafeData(data)
 });
 
 export const getRequestLogContext = (req) => ({
     userId: req.userId ?? req.user?.id,
-    path: req.originalUrl ?? req.url,
+    path: req.path ?? req.baseUrl ?? req.url,
     route: req.route?.path,
-    params: getObjectIfNotEmpty(req.params),
-    query: getObjectIfNotEmpty(req.query),
+    params: getObjectIfNotEmpty(getRequestDataLogContext(req.params)),
+    query: getObjectIfNotEmpty(getRequestDataLogContext(req.query)),
     ip: req.ip,
     userAgent: req.get?.('user-agent')
 });
@@ -110,11 +93,28 @@ export const createServiceLogger = (service) => logger.child({ layer: 'service',
 
 const getDefaultErrorLogLevel = (err) => err instanceof AppError ? 'warn' : 'error';
 
+const STOCK_ERROR_CODES_WITH_REQUESTED_QUANTITY = new Set([
+    'GOODS_ISSUE_INSUFFICIENT_STOCK'
+]);
+
+const getAppErrorMetaLogContext = (err) => {
+    const meta = getLogSafeData(err.meta);
+
+    if (
+        STOCK_ERROR_CODES_WITH_REQUESTED_QUANTITY.has(err.code) &&
+        isLogValuePresent(err.meta?.requestedQuantity)
+    ) {
+        meta.requestedQuantity = err.meta.requestedQuantity;
+    }
+
+    return meta;
+};
+
 const getAppErrorLogContext = (err) => err instanceof AppError
     ? {
         errorCode: err.code,
         statusCode: err.statusCode,
-        meta: err.meta
+        meta: getAppErrorMetaLogContext(err)
     }
     : {};
 
@@ -125,7 +125,7 @@ export const logServiceError = (
     message = 'Error en servicio'
 ) => {
     serviceLogger[normalizeLogLevel(level, getDefaultErrorLogLevel(err))](
-        { err, ...getAppErrorLogContext(err), ...context },
+        { err, errorMessage: err?.message, ...getAppErrorLogContext(err), ...context },
         message
     );
 };

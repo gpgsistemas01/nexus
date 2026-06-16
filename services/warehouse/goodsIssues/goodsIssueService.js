@@ -514,6 +514,8 @@ export const updateGoodsIssueDetails = async ({ id, goodsIssueDto }) => {
                     if (!stock?.supplierProduct) {
                         throw new GoodsIssueInexistentStock({
                             productName: current.productName,
+                            productId: current.productId,
+                            supplierId: current.supplierId,
                             height: current.productHeight,
                             base: current.productBase,
                             supplierName: current.supplierName
@@ -523,9 +525,12 @@ export const updateGoodsIssueDetails = async ({ id, goodsIssueDto }) => {
                     if (stock.availableStock < pending) {
                         throw new GoodsIssueInsufficientStock({
                             productName: current.productName,
+                            productId: current.productId,
+                            supplierId: current.supplierId,
                             height: current.productHeight,
                             base: current.productBase,
-                            supplierName: current.supplierName
+                            supplierName: current.supplierName,
+                            requestedQuantity: pending
                         });
                     }
 

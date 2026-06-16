@@ -7,15 +7,18 @@ import { createStockAdjustment } from "../adjustmentService.js";
 
 const MOVEMENT_TYPE_IN = 'ENTRY';
 
-const buildStockErrorMeta = (ps) => {
+const buildStockErrorMeta = (ps, requestedQuantity = null) => {
 
     const hasDimensions = hasProductDimensions(ps?.product);
 
     return {
         productName: ps?.product?.name ?? 'Producto desconocido',
+        productId: ps?.productId,
+        supplierId: ps?.supplierId,
         height: hasDimensions ? ps.product.height : null,
         base: hasDimensions ? ps.product.base : null,
-        supplierName: ps?.supplier?.tradeName ?? 'Proveedor desconocido'
+        supplierName: ps?.supplier?.tradeName ?? 'Proveedor desconocido',
+        requestedQuantity
     };
 };
 
@@ -440,7 +443,7 @@ export const updateSupplierProductStock = async ({
             });
 
             if (result.count < 1) {
-                throw new GoodsIssueInsufficientStock(buildStockErrorMeta(ps));
+                throw new GoodsIssueInsufficientStock(buildStockErrorMeta(ps, quantity));
             }
 
         } else {
