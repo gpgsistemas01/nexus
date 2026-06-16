@@ -20,6 +20,18 @@
     <%- include('../../shared/outlineInputList', { inputs: form.inputs }) %>
 
     <div class="col-12">
+        <%- include('../../shared/checkbox', {
+            input: {
+                id: 'rememberCredentialsInput',
+                name: 'rememberCredentials',
+                type: 'checkbox',
+                value: 'true',
+                label: 'Recordar credenciales'
+            }
+        }) %>
+    </div>
+
+    <div class="col-12">
         <%- include('../../shared/submit') %>
     </div>
 </form>
