@@ -332,31 +332,17 @@ export const recalculateConvertedQuantityByProduct = async ({
 
     const db = getDb(tx);
 
-    const supplierProducts = await db.supplierProduct.findMany({
-        where: { productId },
-        select: {
-            supplierId: true,
-            currentStock: true
-        }
-    });
+    const query = `
+        UPDATE "SupplierProduct"
+        SET "convertedQuantity" = CASE
+            WHEN $1::numeric > 0 AND $2::numeric > 0
+                THEN ROUND("currentStock" * $1::numeric * $2::numeric, 2)
+            ELSE "currentStock"
+        END
+        WHERE "productId" = $3::uuid
+    `;
 
-    for (const { supplierId, currentStock } of supplierProducts) {
-        await db.supplierProduct.update({
-            where: {
-                supplierId_productId: {
-                    supplierId,
-                    productId
-                }
-            },
-            data: {
-                convertedQuantity: calculateConvertedQuantity({
-                    currentStock,
-                    base,
-                    height
-                })
-            }
-        });
-    }
+    return db.$executeRawUnsafe(query, base, height, productId);
 };
 export const updateProductUnitCostIfHigher = async ({
     supplierId,
@@ -365,35 +351,50 @@ export const updateProductUnitCostIfHigher = async ({
 
     const db = getDb();
 
-    const maxCostByProduct = {};
+    const maxCostByProduct = new Map();
 
     for (const detail of details) {
 
         const { productId, conversionUnitCost } = detail;
 
         if (
-            !maxCostByProduct[productId] ||
-            conversionUnitCost > maxCostByProduct[productId]
+            !maxCostByProduct.has(productId) ||
+            Number(conversionUnitCost) > Number(maxCostByProduct.get(productId))
         ) {
-            maxCostByProduct[productId] = conversionUnitCost;
+            maxCostByProduct.set(productId, conversionUnitCost);
         }
     }
 
-    for (const [productId, cost] of Object.entries(maxCostByProduct)) {
-        await db.supplierProduct.updateMany({
-            where: {
-                supplierId,
-                productId,
-                OR: [
-                    { maxUnitCost: null },
-                    { maxUnitCost: { lt: cost } }
-                ]
-            },
-            data: {
-                maxUnitCost: cost
-            }
-        });
+    if (maxCostByProduct.size === 0) return { count: 0 };
+
+    const values = [];
+
+    const params = [];
+
+    let paramIndex = 1;
+
+    for (const [productId, cost] of maxCostByProduct.entries()) {
+        values.push(`($${paramIndex++}::uuid, $${paramIndex++}::numeric)`);
+        params.push(productId, cost);
     }
+
+    const supplierIdParam = `$${paramIndex}::uuid`;
+
+    params.push(supplierId);
+
+    const query = `
+        UPDATE "SupplierProduct" AS sp
+        SET "maxUnitCost" = incoming."maxUnitCost"
+        FROM (VALUES ${values.join(', ')}) AS incoming("productId", "maxUnitCost")
+        WHERE sp."supplierId" = ${supplierIdParam}
+          AND sp."productId" = incoming."productId"
+          AND (
+            sp."maxUnitCost" IS NULL
+            OR sp."maxUnitCost" < incoming."maxUnitCost"
+          )
+    `;
+
+    return db.$executeRawUnsafe(query, ...params);
 };
 
 export const updateSupplierProductStock = async ({
