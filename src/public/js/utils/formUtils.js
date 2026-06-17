@@ -23,7 +23,9 @@ export const handleSubmit = async ({ form, formData, create, update }) => {
 
     notifications.showSuccess(response.message);
     closeModal(form);
-    reloadMainTable();
+    reloadMainTable({
+        resetPaging: mode === 'create'
+    });
 
     return response.data;
 }

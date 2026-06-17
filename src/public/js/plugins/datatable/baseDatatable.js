@@ -59,10 +59,10 @@ export const createDataTable = ({ selector = DATATABLE_SELECTORS.MAIN, options =
     });
 }
 
-export const reloadMainTable = () => {
+export const reloadMainTable = ({ resetPaging = false } = {}) => {
 
     const table = $(DATATABLE_SELECTORS.MAIN).DataTable();
-    table.ajax.reload(null, false);
+    table.ajax.reload(null, resetPaging);
 }
 
 export const refreshProductTable = (details) => {
