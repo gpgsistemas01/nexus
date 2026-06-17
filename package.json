@@ -26,8 +26,11 @@
   "scripts": {
     "start": "node src/app.js",
     "dev": "nodemon src/app.js",
-    "test": "vitest run",
-    "test:watch": "vitest watch"
+    "test": "NODE_ENV=test vitest run --config vitestConfig.js",
+    "test:watch": "NODE_ENV=test vitest watch --config vitestConfig.js",
+    "test:db:migrate": "npm run test:db:verify && NODE_ENV=test prisma migrate deploy",
+    "test:db": "npm run test:db:verify && NODE_ENV=test prisma migrate deploy && NODE_ENV=test vitest run --config vitestConfig.js",
+    "test:db:verify": "NODE_ENV=test node scripts/verifyTestDatabaseEnv.js"
   },
   "repository": {
     "type": "git",
