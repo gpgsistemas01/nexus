@@ -33,16 +33,6 @@ Las pruebas en `tests/integration/services` guardan información real en `DATABA
 
 Para que las corridas sean repetibles, cada integración limpia registros previos por nombre único al iniciar y `tests/teardownTestDatabase.js` ejecuta limpieza global al finalizar toda la suite.
 
-## Servicios relacionados a submit
-
-Estado actualizado de submit:
-
-- Cubiertos con unitarias e integración directa: `clientService.createClient`, `clientService.updateClient`, `supplierService.createSupplier` y `supplierService.updateSupplier`.
-- Cubiertos con unitarias e integración directa: `userService.createUser`, `userService.updateUser`, `userService.updateUserPassword`, `profileService.createProfile` y `profileService.updateProfile`.
-- Cubiertos con unitarias e integración directa entre dominios: `productService.createProduct`, `productService.updateProduct`, `productService.updateProductStock` y `adjustmentService.createStockAdjustment`.
-- Cubiertos con integración directa de merma/salidas: `wasteService.createWasteAdjustment`, `wasteService.updateWaste`, `wasteService.updateWasteStock`, `goodsIssueService.createGoodsIssue`, `goodsIssueService.updateGoodsIssue` y `goodsIssueService.updateGoodsIssueDetails`.
-- Cubierto con integración directa de compra/entrada: `goodsReceiptService.createGoodsReceipt`.
-
 ## Pendientes importantes
 
 Quedan pendientes de integración transaccional completa con BD:
@@ -53,8 +43,9 @@ Quedan pendientes de integración transaccional completa con BD:
 
 Cuando un servicio usa otro servicio de otro dominio, no se duplica la misma prueba unitaria en ambos lugares. Esos casos deben cubrirse como integración del flujo completo:
 
-- `productService.updateProductStock` delega en `adjustmentService.createStockAdjustment`; ese flujo ya tiene integración completa con movimientos/stock reales en `stockAdjustmentDbTest.js`.
-- `wasteService.createWasteAdjustment`, `wasteService.updateWaste`, `wasteService.updateWasteStock`, `goodsIssueService.createGoodsIssue`, `goodsIssueService.updateGoodsIssue`, `goodsIssueService.updateGoodsIssueDetails`, `goodsReceiptService.createGoodsReceipt` y `adjustmentService.createStockAdjustment` ya tienen integración directa con BD; quedan pendientes requisiciones (`purchaseRequisitionService`).
+- `productService.updateProductStock` delega en `adjustmentService.createStockAdjustment`; su cobertura se registra en `stockAdjustmentDbTest.js`.
+- `wasteService` y `goodsIssueService` comparten stock, proveedor-producto, perfiles, cliente y movimientos; su cobertura cruzada se registra en `wasteGoodsIssueDbTest.js`.
+- `goodsReceiptService` comparte stock, proveedor-producto y movimientos; su cobertura cruzada se registra en `goodsReceiptServiceDbTest.js`.
 - `notificationService` y reportes deben probarse como integración cuando el objetivo sea validar datos reales generados por otros servicios.
 
 ## Implicación para CI
