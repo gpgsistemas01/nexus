@@ -22,6 +22,7 @@ const names = {
 
 let prisma;
 let productService;
+let adjustmentService;
 let product;
 let supplier;
 let reason;
@@ -98,9 +99,10 @@ const cleanupStockAdjustmentData = async () => {
 
 describeDb('stock adjustment cross-domain database integration', () => {
   beforeAll(async () => {
-    [{ prisma }, productService] = await Promise.all([
+    [{ prisma }, productService, adjustmentService] = await Promise.all([
       import('../../../src/lib/prisma.js'),
-      import('../../../src/services/warehouse/products/productService.js')
+      import('../../../src/services/warehouse/products/productService.js'),
+      import('../../../src/services/warehouse/adjustmentService.js')
     ]);
 
     await cleanupStockAdjustmentData();
@@ -220,6 +222,42 @@ describeDb('stock adjustment cross-domain database integration', () => {
         supplierId: supplier.id
       })
     ]);
+  });
+
+
+  it('cubre adjustmentService.createStockAdjustment directo con movimiento real', async () => {
+    await expect(adjustmentService.createStockAdjustment({
+      productId: product.id,
+      supplierId: supplier.id,
+      reasonId: reason.id,
+      observations: 'Ajuste directo integración',
+      newStock: 6,
+      userId: user.id
+    })).resolves.toMatchObject({
+      productId: product.id,
+      supplierId: supplier.id,
+      currentStock: expect.anything(),
+      convertedQuantity: expect.anything()
+    });
+
+    const adjustment = await prisma.stockAdjustment.findFirst({
+      where: {
+        observations: 'Ajuste directo integración',
+        reasonId: reason.id,
+        createdById: user.id
+      },
+      include: {
+        details: true,
+        movement: { include: { details: true } }
+      }
+    });
+
+    expect(adjustment).toMatchObject({
+      details: [expect.objectContaining({ productId: product.id, supplierId: supplier.id })],
+      movement: expect.objectContaining({
+        details: [expect.objectContaining({ productId: product.id, supplierId: supplier.id })]
+      })
+    });
   });
 
   it('cubre createProduct/updateProduct con relación proveedor-producto y ajuste inicial en BD', async () => {

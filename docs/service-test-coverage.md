@@ -26,8 +26,8 @@ Las pruebas en `tests/integration/services` guardan información real en `DATABA
 - `clientServiceDbTest.js`: crea, lista, consulta y actualiza clientes.
 - `supplierServiceDbTest.js`: crea, lista, consulta y actualiza proveedores, incluyendo la transacción de creación con contador de referencia.
 - `adminServicesDbTest.js`: crea y actualiza perfiles/usuarios con relaciones reales de departamento/rol, cubriendo transacciones de `profileService` y `userService`.
-- `stockAdjustmentDbTest.js`: cubre `productService.createProduct`, `productService.updateProduct` y `productService.updateProductStock` atravesando relaciones proveedor-producto, `adjustmentService`, `movementService` y `supplierProductService` con producto/proveedor/usuario/razón reales.
-- `wasteGoodsIssueDbTest.js`: cubre merma (`wasteService.createWasteAdjustment`, `updateWasteStock`) y salidas (`goodsIssueService.createGoodsIssue`, `findAllGoodsIssues`) con producto/proveedor/stock/perfiles/departamento/cliente reales.
+- `stockAdjustmentDbTest.js`: cubre `productService.createProduct`, `productService.updateProduct`, `productService.updateProductStock` y `adjustmentService.createStockAdjustment` atravesando relaciones proveedor-producto, `movementService` y `supplierProductService` con producto/proveedor/usuario/razón reales.
+- `wasteGoodsIssueDbTest.js`: cubre merma (`wasteService.createWasteAdjustment`, `updateWaste`, `updateWasteStock`) y salidas (`goodsIssueService.createGoodsIssue`, `updateGoodsIssue`, `findAllGoodsIssues`) con producto/proveedor/stock/perfiles/departamento/cliente reales.
 - `catalogServicesDbTest.js`: crea catálogos de administración/almacén y los lee con servicios GET.
 
 Para que las corridas sean repetibles, cada integración limpia registros previos por nombre único al iniciar y `tests/teardownTestDatabase.js` ejecuta limpieza global al finalizar toda la suite.
@@ -38,15 +38,23 @@ Estado actualizado de submit:
 
 - Cubiertos con unitarias e integración directa: `clientService.createClient`, `clientService.updateClient`, `supplierService.createSupplier` y `supplierService.updateSupplier`.
 - Cubiertos con unitarias e integración directa: `userService.createUser`, `userService.updateUser`, `userService.updateUserPassword`, `profileService.createProfile` y `profileService.updateProfile`.
-- Cubiertos con unitarias e integración directa entre dominios: `productService.createProduct`, `productService.updateProduct` y `productService.updateProductStock`.
-- Pendientes de integración transaccional completa con BD: `purchaseRequisitionService.createPurchaseRequisition`, `purchaseRequisitionService.updatePurchaseRequisition`, `goodsIssueService.updateGoodsIssue`, `goodsIssueService.updateGoodsIssueDetails`, `goodsReceiptService.createGoodsReceipt`, `wasteService.updateWaste` y `adjustmentService.createStockAdjustment` directo.
+- Cubiertos con unitarias e integración directa entre dominios: `productService.createProduct`, `productService.updateProduct`, `productService.updateProductStock` y `adjustmentService.createStockAdjustment`.
+- Cubiertos con integración directa de merma/salidas: `wasteService.createWasteAdjustment`, `wasteService.updateWaste`, `wasteService.updateWasteStock`, `goodsIssueService.createGoodsIssue` y `goodsIssueService.updateGoodsIssue`.
+
+## Pendientes importantes
+
+Quedan pendientes de integración transaccional completa con BD:
+
+- `goodsReceiptService.createGoodsReceipt`: entrada de almacén, movimiento de inventario `ENTRY` y actualización de costo proveedor-producto.
+- `purchaseRequisitionService.createPurchaseRequisition` y `purchaseRequisitionService.updatePurchaseRequisition`: requisiciones con proyecto, solicitante, departamento, detalles y cambio de estado.
+- `goodsIssueService.updateGoodsIssueDetails`: surtido parcial/total de detalles y movimiento de inventario `ISSUE`; `updateGoodsIssue` ya está cubierto, pero este método aplica reglas adicionales de suministro.
 
 ## Dependencias entre dominios
 
 Cuando un servicio usa otro servicio de otro dominio, no se duplica la misma prueba unitaria en ambos lugares. Esos casos deben cubrirse como integración del flujo completo:
 
 - `productService.updateProductStock` delega en `adjustmentService.createStockAdjustment`; ese flujo ya tiene integración completa con movimientos/stock reales en `stockAdjustmentDbTest.js`.
-- `wasteService.createWasteAdjustment`, `wasteService.updateWasteStock` y `goodsIssueService.createGoodsIssue` ya tienen integración directa con BD; quedan pendientes las actualizaciones de salida, entradas, requisiciones y ajuste directo.
+- `wasteService.createWasteAdjustment`, `wasteService.updateWaste`, `wasteService.updateWasteStock`, `goodsIssueService.createGoodsIssue`, `goodsIssueService.updateGoodsIssue` y `adjustmentService.createStockAdjustment` ya tienen integración directa con BD; quedan pendientes entradas (`goodsReceiptService`) y requisiciones (`purchaseRequisitionService`).
 - `notificationService` y reportes deben probarse como integración cuando el objetivo sea validar datos reales generados por otros servicios.
 
 ## Implicación para CI

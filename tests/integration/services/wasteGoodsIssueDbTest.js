@@ -20,7 +20,8 @@ const names = {
   advisor: `IT WasteIssue Advisor ${testSuffix}`,
   department: `IT WasteIssue Department ${testSuffix}`,
   client: `IT WasteIssue Client ${testSuffix}`,
-  projectNumber: `IW${testSuffix.slice(-6)}`
+  projectNumber: `IW${testSuffix.slice(-6)}`,
+  updatedProjectNumber: `UW${testSuffix.slice(-6)}`
 };
 
 let prisma;
@@ -189,6 +190,18 @@ describeDb('waste and goods issue database integration', () => {
       supplier: expect.objectContaining({ id: supplier.id })
     });
 
+    await expect(services.updateWaste({
+      id: waste.id,
+      wasteDto: {
+        supplierProductId: supplierProduct.id,
+        base: 1,
+        height: 2
+      }
+    })).resolves.toMatchObject({
+      id: waste.id,
+      supplierProductId: supplierProduct.id
+    });
+
     await expect(services.updateWasteStock({
       id: waste.id,
       userId: user.id,
@@ -228,6 +241,35 @@ describeDb('waste and goods issue database integration', () => {
       projectNumber: names.projectNumber,
       clientId: client.id,
       requesterId: requester.id,
+      details: [expect.objectContaining({
+        productId: product.id,
+        supplierId: supplier.id,
+        quantity: expect.anything()
+      })]
+    });
+
+    const updatedGoodsIssue = await services.updateGoodsIssue({
+      id: goodsIssue.id,
+      goodsIssueDto: {
+        requesterId: requester.id,
+        advisorId: advisor.id,
+        clientId: client.id,
+        departmentId: department.id,
+        projectNumber: names.updatedProjectNumber,
+        requestDate: goodsIssue.requestDate,
+        observations: 'Salida integración actualizada',
+        details: [{
+          productId: product.id,
+          supplierId: supplier.id,
+          presentationId: presentation.id,
+          quantity: 2
+        }]
+      }
+    });
+
+    expect(updatedGoodsIssue).toMatchObject({
+      id: goodsIssue.id,
+      projectNumber: names.updatedProjectNumber,
       details: [expect.objectContaining({
         productId: product.id,
         supplierId: supplier.id,
