@@ -50,6 +50,34 @@ export default async function teardownTestDatabase() {
   await prisma.role.deleteMany({ where: { id: { in: adminRoles.map(({ id }) => id) } } });
   await prisma.department.deleteMany({ where: { id: { in: adminDepartments.map(({ id }) => id) } } });
 
+  const receiptProducts = await prisma.product.findMany({ where: { name: { startsWith: 'IT Receipt Product ' } }, select: { id: true } });
+  const receiptSuppliers = await prisma.supplier.findMany({ where: { tradeName: { startsWith: 'IT Receipt Supplier ' } }, select: { id: true } });
+  const receiptProfiles = await prisma.profile.findMany({ where: { fullName: { startsWith: 'IT Receipt Profile ' } }, select: { id: true } });
+  const receiptPresentations = await prisma.presentation.findMany({ where: { name: { startsWith: 'IT Receipt Presentation ' } }, select: { id: true } });
+  const receiptUnits = await prisma.unitMeasure.findMany({ where: { name: { startsWith: 'IT REC Unit ' } }, select: { id: true } });
+  const receipts = await prisma.goodsReceipt.findMany({
+    where: {
+      OR: [
+        { invoice: { startsWith: 'REC-' } },
+        { supplierId: { in: receiptSuppliers.map(({ id }) => id) } },
+        { receivedById: { in: receiptProfiles.map(({ id }) => id) } }
+      ]
+    },
+    select: { id: true }
+  });
+  const receiptDetails = await prisma.goodsReceiptDetail.findMany({ where: { goodsReceiptId: { in: receipts.map(({ id }) => id) } }, select: { id: true } });
+
+  await prisma.movementDetail.deleteMany({ where: { goodsReceiptDetailId: { in: receiptDetails.map(({ id }) => id) } } });
+  await prisma.inventoryMovement.deleteMany({ where: { goodsReceiptId: { in: receipts.map(({ id }) => id) } } });
+  await prisma.goodsReceiptDetail.deleteMany({ where: { id: { in: receiptDetails.map(({ id }) => id) } } });
+  await prisma.goodsReceipt.deleteMany({ where: { id: { in: receipts.map(({ id }) => id) } } });
+  await prisma.supplierProduct.deleteMany({ where: { OR: [{ productId: { in: receiptProducts.map(({ id }) => id) } }, { supplierId: { in: receiptSuppliers.map(({ id }) => id) } }] } });
+  await prisma.product.deleteMany({ where: { id: { in: receiptProducts.map(({ id }) => id) } } });
+  await prisma.supplier.deleteMany({ where: { id: { in: receiptSuppliers.map(({ id }) => id) } } });
+  await prisma.profile.deleteMany({ where: { id: { in: receiptProfiles.map(({ id }) => id) } } });
+  await prisma.presentation.deleteMany({ where: { id: { in: receiptPresentations.map(({ id }) => id) } } });
+  await prisma.unitMeasure.deleteMany({ where: { id: { in: receiptUnits.map(({ id }) => id) } } });
+
   const wasteIssueProducts = await prisma.product.findMany({ where: { name: { startsWith: 'IT WasteIssue Product ' } }, select: { id: true } });
   const wasteIssueSuppliers = await prisma.supplier.findMany({ where: { tradeName: { startsWith: 'IT WasteIssue Supplier ' } }, select: { id: true } });
   const wasteIssueReasons = await prisma.stockAdjustmentReason.findMany({ where: { name: { startsWith: 'IT WasteIssue Reason ' } }, select: { id: true } });

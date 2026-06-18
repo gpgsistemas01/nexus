@@ -167,6 +167,11 @@ describeDb('waste and goods issue database integration', () => {
         where: { name: 'Pendiente' },
         update: {},
         create: { name: 'Pendiente' }
+      }),
+      prisma.fulfillmentStatus.upsert({
+        where: { name: 'Surtido' },
+        update: {},
+        create: { name: 'Surtido' }
       })
     ]);
   });
@@ -275,6 +280,35 @@ describeDb('waste and goods issue database integration', () => {
         supplierId: supplier.id,
         quantity: expect.anything()
       })]
+    });
+
+    const suppliedGoodsIssue = await services.updateGoodsIssueDetails({
+      id: goodsIssue.id,
+      goodsIssueDto: {
+        details: updatedGoodsIssue.details.map(detail => ({
+          id: detail.id,
+          isSupplied: true,
+          projectConvertedQuantity: detail.convertedQuantity
+        }))
+      }
+    });
+
+    expect(suppliedGoodsIssue).toMatchObject({
+      id: goodsIssue.id,
+      fulfillmentStatus: expect.objectContaining({ name: 'Surtido' }),
+      details: [expect.objectContaining({
+        productId: product.id,
+        supplierId: supplier.id,
+        isSupplied: true
+      })]
+    });
+
+    await expect(prisma.inventoryMovement.findFirst({
+      where: { goodsIssueId: goodsIssue.id },
+      include: { details: true }
+    })).resolves.toMatchObject({
+      type: 'ISSUE',
+      details: [expect.objectContaining({ productId: product.id, supplierId: supplier.id })]
     });
 
     await expect(services.findAllGoodsIssues({
