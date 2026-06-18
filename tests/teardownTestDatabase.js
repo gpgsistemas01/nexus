@@ -80,7 +80,7 @@ export default async function teardownTestDatabase() {
         { clientId: { in: wasteIssueClients.map(({ id }) => id) } },
         { requesterId: { in: wasteIssueProfiles.map(({ id }) => id) } },
         { departmentId: { in: wasteIssueDepartments.map(({ id }) => id) } },
-        { projectNumber: { startsWith: 'ITWI-' } }
+        { projectNumber: { startsWith: 'IW' } }
       ]
     },
     select: { id: true }

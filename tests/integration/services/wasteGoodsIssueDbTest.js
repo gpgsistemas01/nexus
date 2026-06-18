@@ -20,7 +20,7 @@ const names = {
   advisor: `IT WasteIssue Advisor ${testSuffix}`,
   department: `IT WasteIssue Department ${testSuffix}`,
   client: `IT WasteIssue Client ${testSuffix}`,
-  projectNumber: `ITWI-${testSuffix.slice(-8)}`
+  projectNumber: `IW${testSuffix.slice(-6)}`
 };
 
 let prisma;
@@ -65,7 +65,7 @@ const cleanupWasteIssueData = async () => {
         { clientId: { in: clients.map(({ id }) => id) } },
         { requesterId: { in: profiles.map(({ id }) => id) } },
         { departmentId: { in: departments.map(({ id }) => id) } },
-        { projectNumber: { startsWith: 'ITWI-' } }
+        { projectNumber: { startsWith: 'IW' } }
       ]
     },
     select: { id: true }

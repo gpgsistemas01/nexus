@@ -137,22 +137,30 @@ export const createUser = async ({ userDto }) => {
 
         const db = getDb();
 
-        const hashedPassword = await encryptPassword(userDto.password);
+        const { password, profileId, roleId, departmentId, ...userData } = userDto;
+        const hashedPassword = await encryptPassword(password);
 
         return await db.user.create({
             data: {
-                ...userDto,
+                ...userData,
                 password: hashedPassword,
+                ...(profileId && {
+                    profile: {
+                        connect: {
+                            id: profileId
+                        }
+                    }
+                }),
                 accesses: {
                     create: {
                         role: { 
                             connect: { 
-                                id: userDto.roleId 
+                                id: roleId 
                             } 
                         },
                         department: { 
                             connect: { 
-                                id: userDto.departmentId 
+                                id: departmentId 
                             } 
                         }
                     }

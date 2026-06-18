@@ -156,8 +156,9 @@ describe('userService submit operations', () => {
     await expect(createUser({ userDto })).resolves.toEqual(createdUser);
     expect(userCreate).toHaveBeenCalledWith({
       data: {
-        ...userDto,
+        name: 'usuario',
         password: 'hashed:secret',
+        profile: { connect: { id: 'profile-1' } },
         accesses: {
           create: {
             role: { connect: { id: 'role-1' } },
