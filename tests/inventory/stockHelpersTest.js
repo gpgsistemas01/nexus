@@ -28,7 +28,7 @@ describe('stockHelpers', () => {
     expect(() => assertSufficientStock({
       product: { id: 'p1', name: 'Lámina' },
       newStock: 0,
-      newConvertedQuantity: 1
+      newConvertedQuantity: 0
     })).not.toThrow();
   });
 

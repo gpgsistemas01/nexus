@@ -1,6 +1,9 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { GoodsIssueInsufficientStock } from '../../../src/errors/inventory/stockError.js';
 
 const executeRawUnsafe = vi.fn();
+const supplierProductUpdateMany = vi.fn();
+const supplierProductUpdate = vi.fn();
 
 vi.mock('../../../src/services/warehouse/adjustmentService.js', () => ({
   createStockAdjustment: vi.fn()
@@ -8,19 +11,26 @@ vi.mock('../../../src/services/warehouse/adjustmentService.js', () => ({
 
 vi.mock('../../../src/repository/baseRepository.js', () => ({
   getDb: () => ({
-    $executeRawUnsafe: executeRawUnsafe
+    $executeRawUnsafe: executeRawUnsafe,
+    supplierProduct: {
+      updateMany: supplierProductUpdateMany,
+      update: supplierProductUpdate
+    }
   })
 }));
 
 const {
   recalculateConvertedQuantityByProduct,
-  updateProductUnitCostIfHigher
+  updateProductUnitCostIfHigher,
+  updateSupplierProductStock
 } = await import('../../../src/services/warehouse/products/supplierProductService.js');
 
 describe('supplierProductService', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     executeRawUnsafe.mockResolvedValue(0);
+    supplierProductUpdateMany.mockResolvedValue({ count: 1 });
+    supplierProductUpdate.mockResolvedValue({});
   });
 
   it('actualiza costos máximos en una sola consulta para evitar N+1', async () => {
@@ -75,6 +85,52 @@ describe('supplierProductService', () => {
       3,
       '00000000-0000-0000-0000-000000000101'
     ]);
+  });
+
+
+  it('permite surtir hasta dejar el stock exactamente en cero', async () => {
+    await updateSupplierProductStock({
+      grouped: new Map([['product-1:supplier-1', 5]]),
+      movementType: 'ISSUE',
+      supplierProducts: [{
+        productId: 'product-1',
+        supplierId: 'supplier-1',
+        currentStock: 5,
+        convertedQuantity: 4.99,
+        product: { id: 'product-1', name: 'Producto', base: 1, height: 1 },
+        supplier: { tradeName: 'Proveedor' }
+      }]
+    });
+
+    expect(supplierProductUpdateMany).toHaveBeenCalledWith({
+      where: {
+        supplierId: 'supplier-1',
+        productId: 'product-1',
+        currentStock: { gte: 5 }
+      },
+      data: {
+        currentStock: { decrement: 5 },
+        convertedQuantity: 0
+      }
+    });
+  });
+
+
+  it('lanza stock insuficiente si ninguna fila cumple la condición atómica de stock', async () => {
+    supplierProductUpdateMany.mockResolvedValueOnce({ count: 0 });
+
+    await expect(updateSupplierProductStock({
+      grouped: new Map([['product-1:supplier-1', 5]]),
+      movementType: 'ISSUE',
+      supplierProducts: [{
+        productId: 'product-1',
+        supplierId: 'supplier-1',
+        currentStock: 5,
+        convertedQuantity: 5,
+        product: { id: 'product-1', name: 'Producto', base: 1, height: 1 },
+        supplier: { tradeName: 'Proveedor' }
+      }]
+    })).rejects.toThrow(GoodsIssueInsufficientStock);
   });
 
   it('omite la consulta cuando no hay detalles por actualizar', async () => {

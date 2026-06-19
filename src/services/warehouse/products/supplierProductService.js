@@ -426,16 +426,19 @@ export const updateSupplierProductStock = async ({
 
         if (movementType !== MOVEMENT_TYPE_IN) {
 
+            const remainingStock = normalizeDecimal(Number(ps.currentStock ?? 0) - quantity);
+
             const result = await db.supplierProduct.updateMany({
                 where: {
                     supplierId,
                     productId,
-                    currentStock: { gte: quantity },
-                    convertedQuantity: { gte: convertedQuantity }
+                    currentStock: { gte: quantity }
                 },
                 data: {
                     currentStock: { decrement: quantity },
-                    convertedQuantity: { decrement: convertedQuantity }
+                    convertedQuantity: remainingStock === 0
+                        ? 0
+                        : { decrement: convertedQuantity }
                 }
             });
 
