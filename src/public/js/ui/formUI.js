@@ -51,9 +51,13 @@ const setInputSelectError = (form, key, message = null) => {
     else feedback.textContent = null;
 }
 
-export const toggleInputSelectErrors = (form, errors) => {
+export const toggleInputSelectErrors = (form, errors, fields = null) => {
+
+    const shouldUpdateField = (field) => !fields || fields.includes(field);
 
     form.querySelectorAll('select').forEach(input => {
+
+        if (!shouldUpdateField(input.name)) return;
 
         const key = input.name;
         const value = errors[key];
@@ -74,6 +78,8 @@ export const toggleInputSelectErrors = (form, errors) => {
     });
 
     form.querySelectorAll('input[type="checkbox"]').forEach(input => {
+
+        if (!shouldUpdateField(input.name)) return;
 
         const key = input.name;
         const value = errors[key];
@@ -96,7 +102,7 @@ const setTableError = (form, key, message = null) => {
     else feedback.textContent = null;
 }
 
-export const toggleTableErrors = (form, errors) => {
+export const toggleTableErrors = (form, errors, fields = null) => {
 
     const { mode } = form.dataset;
 
@@ -134,16 +140,19 @@ export const toggleTableErrors = (form, errors) => {
     } else {
 
         const key = 'details';
+
+        if (fields && !fields.includes(key)) return;
+
         const value = errors[key];
         setTableError(form, key, value);
     }
 }
 
-export const normalizeFormErrors = ({ form, errors }) => {
+export const normalizeFormErrors = ({ form, errors, fields = Object.keys(errors) }) => {
 
     toggleErrorMessages(form, errors);
-    toggleTableErrors(form, errors);
-    toggleInputSelectErrors(form, errors);
+    toggleTableErrors(form, errors, fields);
+    toggleInputSelectErrors(form, errors, fields);
 
     return errors;
 }
