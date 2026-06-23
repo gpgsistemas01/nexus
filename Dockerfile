@@ -36,4 +36,4 @@ USER node
 
 EXPOSE 3000
 
-CMD ["npm", "start"]
+CMD ["sh", "-c", "npx --no-install prisma migrate deploy && npm start"]
