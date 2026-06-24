@@ -8,6 +8,57 @@ const TOTAL_FIELDS = {
 const MODE_EDIT_DETAIL = 'edit-detail';
 const MODE_VIEW = 'view';
 
+
+const getFirstInvalidControl = (form) => {
+
+    const invalidElement = form.querySelector('.is-invalid, [aria-invalid="true"]');
+
+    if (invalidElement) return invalidElement;
+
+    const visibleError = Array.from(form.querySelectorAll('[data-error-for]'))
+        .find(feedback => feedback.textContent.trim() && !feedback.classList.contains('d-none'));
+
+    if (!visibleError) return null;
+
+    const fieldName = visibleError.dataset.errorFor;
+    const field = fieldName ? form.querySelector(`[name="${ fieldName }"]`) : null;
+
+    return field || visibleError;
+};
+
+const getScrollTarget = (element) => {
+
+    if (!element) return null;
+
+    if (element.tagName === 'SELECT' && typeof window !== 'undefined' && window.jQuery && window.jQuery(element).hasClass('select2-hidden-accessible')) {
+
+        const select2Container = window.jQuery(element).next('.select2-container').get(0);
+
+        if (select2Container) return select2Container;
+    }
+
+    return element.closest('[class*="col-"]') || element.closest('.form-outline') || element;
+};
+
+export const scrollToFirstFormError = (form) => {
+
+    const invalidElement = getFirstInvalidControl(form);
+    const scrollTarget = getScrollTarget(invalidElement);
+
+    if (!scrollTarget) return;
+
+    scrollTarget.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center',
+        inline: 'nearest'
+    });
+
+    if (typeof invalidElement.focus === 'function' && !invalidElement.disabled) {
+
+        invalidElement.focus({ preventScroll: true });
+    }
+};
+
 export const initForm = ({
     form, 
     mode, 

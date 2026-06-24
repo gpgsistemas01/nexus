@@ -1,5 +1,5 @@
 import { handleApiError } from "../api/errorHandler.js";
-import { toggleErrorMessages, normalizeFormErrors } from "../ui/formUI.js";
+import { toggleErrorMessages, normalizeFormErrors, scrollToFirstFormError } from "../ui/formUI.js";
 import { on } from "../utils/domUtils.js";
 import { hasValidationErrors } from "../utils/formUtils.js";
 
@@ -25,7 +25,11 @@ export const useForm = async ({
         normalizeErrors({ form, errors });
         toggleErrorMessages(form, errors);
 
-        if (hasValidationErrors(errors)) return;
+        if (hasValidationErrors(errors)) {
+
+            scrollToFirstFormError(form);
+            return;
+        }
 
         if (form.dataset.submitting === 'true') return false;
 
