@@ -1,22 +1,22 @@
 /* color variables */
 
 :root {
-  --mdb-primary: #0077B6; 
-  --mdb-primary-rgb: 0, 119, 182;
+  --mdb-primary: #14A44D;
+  --mdb-primary-rgb: 20, 164, 77;
 
-  --mdb-secondary: #33415C; 
-  --mdb-secondary-rgb: 51, 65, 92;
+  --mdb-secondary: #332D2D;
+  --mdb-secondary-rgb: 51, 45, 45;
 
   --mdb-accent: #FCA311;
   --mdb-accent-rgb: 252, 163, 17;
 
-  --mdb-light: #FFFFFF;
-  --mdb-light-rgb: 255, 255, 255;
+  --mdb-light: #FBFBFB;
+  --mdb-light-rgb: 251, 251, 251;
 
-  --mdb-dark: #1b1b20;
-  --mdb-dark-rgb: 27, 27, 32;
+  --mdb-dark: #000000;
+  --mdb-dark-rgb: 0, 0, 0;
 
-  --mdb-dar-secondary: #84B3F0;
+  --mdb-dar-secondary: #0b5f2a;
 
   --mdb-highlight-bg-color: var(--mdb-primary);
   --mdb-surface-color: var(--mdb-light);
@@ -26,8 +26,8 @@
 }
 
 body {
-  --mdb-body-color: #333333;
-  --mdb-body-bg: #474c53;
+  --mdb-body-color: #332D2D;
+  --mdb-body-bg: #ffffff;
 }
 
 /* tooltip styles */
@@ -57,7 +57,7 @@ body {
 }
 
 .btn-secondary {
-  --btn-color-hover-secondary: #0A1A2F;
+  --btn-color-hover-secondary: #000000;
   --mdb-btn-color: var(--mdb-light);
   --mdb-btn-bg: var(--mdb-secondary);
   --mdb-btn-border-color: var(--mdb-secondary);
@@ -274,7 +274,7 @@ table.dataTable.datatable-table .sorting_desc::after {
 }
 
 #productTable .form-control {
-  background-color: rgb(168, 217, 245);
+  background-color: rgba(var(--mdb-primary-rgb), 0.12);
 }
 
 /* card styles */
