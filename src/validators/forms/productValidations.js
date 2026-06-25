@@ -1,7 +1,10 @@
-import { validateBoolean, validateNumber, validateNumberOptional, validateNumberOptionalWhen, validateNumberRequiredWhenOtherPresent, validateNumberWhen, validateText, validateTextOptional, validateTextOptionalWhen, validateUUID, validateUUIDWhen } from "../fields/fieldsValidator.js";
+import { validateBoolean, validateNumberOptional, validateNumberOptionalWhen, validateNumberRequiredWhenOtherPresent, validateNumberWhen, validateText, validateTextOptional, validateTextOptionalWhen, validateUUID, validateUUIDWhen } from "../fields/fieldsValidator.js";
 
 const stockAdjustmentFields = ['newStock', 'reasonId', 'observations'];
 export const PRODUCT_CREATION_CONTEXT_GOODS_RECEIPT = 'goodsReceipt';
+
+const hasReturnedQuantity = (body = {}) => Object.prototype.hasOwnProperty.call(body, 'returnedQuantity');
+const requiresNewStock = (body = {}) => !hasReturnedQuantity(body);
 
 export const hasStockAdjustmentPayload = (body = {}) =>
     stockAdjustmentFields.some(field => Object.prototype.hasOwnProperty.call(body, field));
@@ -52,7 +55,8 @@ export const productCreateValidation = [
 
 export const productStockValidation = [
     validateUUID('supplierId'),
-    validateNumber('newStock'),
+    validateNumberWhen({ fieldName: 'newStock', predicate: requiresNewStock }),
+    validateNumberWhen({ fieldName: 'returnedQuantity', predicate: hasReturnedQuantity }),
     validateTextOptional({ fieldName: 'observations', maxLength: 500 }),
-    validateUUID('reasonId'),
+    validateUUIDWhen({ fieldName: 'reasonId', predicate: requiresNewStock }),
 ]
