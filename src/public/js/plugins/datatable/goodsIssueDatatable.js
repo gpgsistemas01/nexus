@@ -143,7 +143,14 @@ export const initDetailsGoodsIssueTable = (mode, context) => {
 
     productTable = createDataTable({
         selector: selectorProductTable,
-        options: { data: details, columns, responsive: false, scrollX: true }
+        options: {
+            data: details,
+            columns,
+            responsive: false,
+            scrollX: true,
+            scrollCollapse: true,
+            autoWidth: false
+        }
     });
 };
 

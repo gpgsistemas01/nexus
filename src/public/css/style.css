@@ -306,9 +306,16 @@ table.dataTable.datatable-table {
   width: 100% !important;
 }
 
+.dataTables_wrapper .dataTables_scroll,
+.dataTables_wrapper .dataTables_scrollHeadInner {
+  width: 100% !important;
+}
+
 .dataTables_wrapper .dataTables_scrollHead table.dataTable,
 .dataTables_wrapper .dataTables_scrollBody table.dataTable {
   margin: 0 !important;
+  min-width: 100%;
+  width: 100% !important;
 }
 
 .dataTables_wrapper .dataTables_scrollBody {
@@ -573,12 +580,16 @@ table.dataTable#productTable.product-detail-table {
   border-color: #c8dfce !important;
   font-size: 0.9rem;
   margin-block: 0.5rem 0.75rem !important;
-  min-width: max-content;
+  min-width: 100%;
+  width: 100% !important;
 }
 
 .modal #productTable_wrapper .dataTables_scroll,
+.modal #productTable_wrapper .dataTables_scrollHead,
+.modal #productTable_wrapper .dataTables_scrollHeadInner,
 .modal #productTable_wrapper .dataTables_scrollBody {
   max-width: 100%;
+  width: 100% !important;
 }
 
 .modal #productTable_wrapper .dataTables_scrollBody {

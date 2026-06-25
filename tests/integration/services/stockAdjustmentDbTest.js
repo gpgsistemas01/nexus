@@ -135,19 +135,13 @@ describeDb('stock adjustment cross-domain database integration', () => {
       prisma.user.create({ data: { name: names.user, password: 'test-password' } })
     ]);
 
-    await prisma.referenceNumberCounter.upsert({
-      where: {
-        prefix_year: {
-          prefix: 'AJU',
-          year: new Date().getFullYear()
-        }
-      },
-      update: {},
-      create: {
+    await prisma.referenceNumberCounter.createMany({
+      data: [{
         prefix: 'AJU',
         year: new Date().getFullYear(),
         counter: 0
-      }
+      }],
+      skipDuplicates: true
     });
 
     await prisma.supplierProduct.create({

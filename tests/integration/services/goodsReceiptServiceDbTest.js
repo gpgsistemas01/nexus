@@ -99,10 +99,13 @@ describeDb('goods receipt database integration', () => {
     });
 
     await Promise.all([
-      prisma.referenceNumberCounter.upsert({
-        where: { prefix_year: { prefix: 'REC', year: new Date().getFullYear() } },
-        update: {},
-        create: { prefix: 'REC', year: new Date().getFullYear(), counter: 0 }
+      prisma.referenceNumberCounter.createMany({
+        data: [{
+          prefix: 'REC',
+          year: new Date().getFullYear(),
+          counter: 0
+        }],
+        skipDuplicates: true
       }),
       prisma.status.upsert({
         where: { name: 'Confirmada' },

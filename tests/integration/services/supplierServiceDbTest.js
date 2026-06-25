@@ -33,19 +33,13 @@ describeDb('supplierService database integration', () => {
       import('../../../src/services/warehouse/supplierService.js')
     ]);
 
-    await prisma.referenceNumberCounter.upsert({
-      where: {
-        prefix_year: {
-          prefix: 'PRO',
-          year: 0
-        }
-      },
-      update: {},
-      create: {
+    await prisma.referenceNumberCounter.createMany({
+      data: [{
         prefix: 'PRO',
         year: 0,
         counter: 0
-      }
+      }],
+      skipDuplicates: true
     });
     await cleanupSupplier();
   });

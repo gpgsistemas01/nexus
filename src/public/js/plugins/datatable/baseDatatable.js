@@ -103,12 +103,12 @@ export const createDataTable = ({ selector = DATATABLE_SELECTORS.MAIN, options =
 
             if (typeof drawCallback === 'function') drawCallback.call(this, settings);
         },
-        responsive: {
+        responsive: responsive === false ? false : {
             details: {
                 type: 'inline'
             }
         },
-        autoWidth: false,
+        autoWidth,
         serverSide: Boolean(ajax),
         processing: Boolean(ajax),
     });
