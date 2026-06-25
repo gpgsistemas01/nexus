@@ -1,5 +1,6 @@
 import { DATATABLE_SELECTORS } from "../../constants/selectors.js";
 import { handleDataTableError } from "../../api/errorHandler.js";
+import { buildMdbActionButton } from "../mdb/actionButton.js";
 
 const SORT_DIRECTIONS = ['asc', 'desc'];
 
@@ -79,15 +80,46 @@ export const renderActionButtons = ({ status, fulfillmentStatus, context, canAdj
     const canEditGoodsIssue = context === 'goodsIssue' && fulfillmentStatus === 'Pendiente';
     const canSupplyGoodsIssue = context === 'goodsIssue' && ['Pendiente', 'Surtido parcial'].includes(fulfillmentStatus);
 
-    if ((status === 'Abierta' || canEditGoodsIssue) || context === 'profile' || context === 'client' || context === 'supplier') actions.push('<button class="btn-edit"><i class="fa-solid fa-pencil"></i></button>');
+    if ((status === 'Abierta' || canEditGoodsIssue) || context === 'profile' || context === 'client' || context === 'supplier') actions.push(buildMdbActionButton({
+        className: 'btn-edit',
+        colorClass: 'btn-primary',
+        iconClass: 'fa-solid fa-pencil',
+        title: 'Editar',
+        ariaLabel: 'Editar registro'
+    }));
 
-    if ((context === 'product' || context === 'waste') && canAdjustStock) actions.push('<button class="btn-adjust-stock"><i class="fa-solid fa-boxes-stacked"></i></button>');
+    if ((context === 'product' || context === 'waste') && canAdjustStock) actions.push(buildMdbActionButton({
+        className: 'btn-adjust-stock',
+        colorClass: 'btn-success',
+        iconClass: 'fa-solid fa-boxes-stacked',
+        title: 'Ajustar stock',
+        ariaLabel: 'Ajustar stock'
+    }));
 
-    if (context === 'product' && canReturnProduct) actions.push('<button class="btn-return-product"><i class="fa-solid fa-rotate-left"></i></button>');
+    if (context === 'product' && canReturnProduct) actions.push(buildMdbActionButton({
+        className: 'btn-return-product',
+        colorClass: 'btn-warning',
+        iconClass: 'fa-solid fa-rotate-left',
+        title: 'Devolver producto',
+        ariaLabel: 'Devolver producto',
+        rippleColor: 'dark'
+    }));
 
-    if (status === 'Aprobada' && context === 'goodsIssue' && canSupplyGoodsIssue) actions.push('<button class="btn-edit-detail"><i class="fa fa-edit"></i></button>');
+    if (status === 'Aprobada' && context === 'goodsIssue' && canSupplyGoodsIssue) actions.push(buildMdbActionButton({
+        className: 'btn-edit-detail',
+        colorClass: 'btn-info',
+        iconClass: 'fa fa-edit',
+        title: 'Surtir detalle',
+        ariaLabel: 'Surtir detalle'
+    }));
 
-    if (context !== 'product' && context !== 'waste' && context !== 'profile' && context !== 'client' && context !== 'supplier') actions.push('<button class="btn-view"><i class="fa fa-eye"></i></button>');
+    if (context !== 'product' && context !== 'waste' && context !== 'profile' && context !== 'client' && context !== 'supplier') actions.push(buildMdbActionButton({
+        className: 'btn-view',
+        colorClass: 'btn-secondary',
+        iconClass: 'fa fa-eye',
+        title: 'Ver detalle',
+        ariaLabel: 'Ver detalle'
+    }));
 
     return actions.join('');
 }

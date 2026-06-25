@@ -1,6 +1,7 @@
 import { getAllUsers } from '../../application/admin/users.js';
 import { openUserModal } from '../../pages/admin/usersPage.js';
 import { createDataTable } from './baseDatatable.js';
+import { buildMdbActionButton } from '../mdb/actionButton.js';
 import { getResponsiveRowData } from './utils/responsive.js';
 import { DATATABLE_SELECTORS } from "../../constants/selectors.js";
 
@@ -20,10 +21,23 @@ export const createUserDatatable = () => {
                     data: null,
                     title: 'Acciones',
                     orderable: false,
-                    render: () => `
-                        <button class="btn-edit"><i class="fa-solid fa-pencil"></i></button>
-                        <button class="btn-edit-password"><i class="fa-solid fa-key"></i></button>
-                    `
+                    render: () => [
+                        buildMdbActionButton({
+                            className: 'btn-edit',
+                            colorClass: 'btn-primary',
+                            iconClass: 'fa-solid fa-pencil',
+                            title: 'Editar',
+                            ariaLabel: 'Editar usuario'
+                        }),
+                        buildMdbActionButton({
+                            className: 'btn-edit-password',
+                            colorClass: 'btn-warning',
+                            iconClass: 'fa-solid fa-key',
+                            title: 'Cambiar contraseña',
+                            ariaLabel: 'Cambiar contraseña',
+                            rippleColor: 'dark'
+                        })
+                    ].join('')
                 }
             ],
             buttons: [
