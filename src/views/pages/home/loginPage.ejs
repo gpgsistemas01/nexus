@@ -1,40 +1,32 @@
 <% const form = {
     id: 'loginForm',
+    attrs: { novalidate: true },
     inputs: [
-        { 
+        {
             id: 'nameInput',
-            name: 'name', 
+            name: 'name',
             type: 'name',
             label: 'Nombre de usuario:',
         },
-        { 
+        {
             id: 'passwordInput',
-            name: 'password', 
+            name: 'password',
             type: 'password',
             label: 'Contraseña:',
         }
+    ],
+    checkboxes: [
+        {
+            id: 'rememberCredentialsInput',
+            name: 'rememberCredentials',
+            type: 'checkbox',
+            value: 'true',
+            label: 'Recordar credenciales'
+        }
     ]
-} %>
+}; %>
 
-<form id="<%= form.id %>" class="row g-3" novalidate>
-    <%- include('../../shared/outlineInputList', { inputs: form.inputs }) %>
-
-    <div class="col-12">
-        <%- include('../../shared/checkbox', {
-            input: {
-                id: 'rememberCredentialsInput',
-                name: 'rememberCredentials',
-                type: 'checkbox',
-                value: 'true',
-                label: 'Recordar credenciales'
-            }
-        }) %>
-    </div>
-
-    <div class="col-12">
-        <%- include('../../shared/submit') %>
-    </div>
-</form>
+<%- include('../../shared/form', { form }) %>
 
 <script>
     window.FLASH_MESSAGE = <%- JSON.stringify(flash) %>;

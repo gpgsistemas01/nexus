@@ -1,6 +1,9 @@
-<table id="productTable" class="display"></table>
+<%- include('./dataTable', {
+    id: 'productTable',
+    classes: 'table table-hover align-middle mb-0 datatable-table product-detail-table w-100'
+}) %>
 
-<%- include('./validationMessage', { 
-    name: 'details', 
-    errorClass: 'alert alert-danger d-none mt-2' 
+<%- include('./validationMessage', {
+    name: 'details',
+    errorClass: 'alert alert-danger d-none mt-2'
 }) %>

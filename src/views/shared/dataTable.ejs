@@ -1,0 +1,22 @@
+<%
+const dataTable = {
+    id: typeof id !== 'undefined' ? id : 'table',
+    class: typeof classes !== 'undefined'
+        ? classes
+        : 'table table-hover align-middle mb-0 datatable-table w-100'
+};
+const tableTitle = typeof title !== 'undefined' ? title : null;
+const titlePrefix = typeof prefix !== 'undefined' ? prefix : 'Tabla de';
+%>
+
+<% if (tableTitle) { %>
+<section class="card shadow-3 border-0 datatable-card">
+    <div class="card-body p-3 p-md-4">
+        <h1 class="card-title datatable-title text-center mb-4"><%= titlePrefix %> <%= tableTitle %></h1>
+
+        <%- include('./table', { table: dataTable }) %>
+    </div>
+</section>
+<% } else { %>
+<%- include('./table', { table: dataTable }) %>
+<% } %>

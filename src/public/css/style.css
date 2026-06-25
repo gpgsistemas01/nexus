@@ -3,6 +3,11 @@
 :root {
   --mdb-primary: #14A44D;
   --mdb-primary-rgb: 20, 164, 77;
+  --mdb-primary-hover: #0f7f3a;
+  --mdb-primary-hover-rgb: 15, 127, 58;
+  --mdb-primary-active: #0b5f2a;
+  --mdb-primary-active-rgb: 11, 95, 42;
+  --mdb-primary-soft: #e8f6ee;
 
   --mdb-secondary: #332D2D;
   --mdb-secondary-rgb: 51, 45, 45;
@@ -16,7 +21,7 @@
   --mdb-dark: #000000;
   --mdb-dark-rgb: 0, 0, 0;
 
-  --mdb-dar-secondary: #0b5f2a;
+  --mdb-dark-secondary: var(--mdb-primary-active);
 
   --mdb-highlight-bg-color: var(--mdb-primary);
   --mdb-surface-color: var(--mdb-light);
@@ -44,16 +49,50 @@ body {
   --mdb-btn-bg: var(--mdb-primary);
   --mdb-btn-border-color: var(--mdb-primary);
   --mdb-btn-hover-color: var(--mdb-light);
-  --mdb-btn-hover-bg: var(--mdb-secondary);
-  --mdb-btn-hover-border-color: var(--mdb-secondary);
+  --mdb-btn-hover-bg: var(--mdb-primary-hover);
+  --mdb-btn-hover-border-color: var(--mdb-primary-hover);
+  --mdb-btn-focus-shadow-rgb: var(--mdb-primary-hover-rgb);
+  --mdb-btn-active-color: var(--mdb-light);
+  --mdb-btn-active-bg: var(--mdb-primary-active);
+  --mdb-btn-active-border-color: var(--mdb-primary-active);
+}
+
+.btn-success {
+  --mdb-btn-color: var(--mdb-light);
+  --mdb-btn-bg: #1f9d55;
+  --mdb-btn-border-color: #1f9d55;
+  --mdb-btn-hover-color: var(--mdb-light);
+  --mdb-btn-hover-bg: #178247;
+  --mdb-btn-hover-border-color: #178247;
+  --mdb-btn-focus-shadow-rgb: 23, 130, 71;
+  --mdb-btn-active-color: var(--mdb-light);
+  --mdb-btn-active-bg: #0e6637;
+  --mdb-btn-active-border-color: #0e6637;
+}
+
+.btn-warning {
+  --mdb-btn-color: #0f351f;
+  --mdb-btn-bg: #a7d948;
+  --mdb-btn-border-color: #a7d948;
+  --mdb-btn-hover-color: var(--mdb-light);
+  --mdb-btn-hover-bg: #6ea82f;
+  --mdb-btn-hover-border-color: #6ea82f;
+  --mdb-btn-focus-shadow-rgb: 110, 168, 47;
+  --mdb-btn-active-color: var(--mdb-light);
+  --mdb-btn-active-bg: #4f7f22;
+  --mdb-btn-active-border-color: #4f7f22;
 }
 
 .btn-outline-primary {
   --mdb-btn-color: var(--mdb-primary);
   --mdb-btn-border-color: var(--mdb-primary);
   --mdb-btn-hover-color: var(--mdb-light);
-  --mdb-btn-hover-bg: var(--mdb-primary);
-  --mdb-btn-hover-border-color: var(--mdb-primary);
+  --mdb-btn-hover-bg: var(--mdb-primary-hover);
+  --mdb-btn-hover-border-color: var(--mdb-primary-hover);
+  --mdb-btn-focus-shadow-rgb: var(--mdb-primary-hover-rgb);
+  --mdb-btn-active-color: var(--mdb-light);
+  --mdb-btn-active-bg: var(--mdb-primary-active);
+  --mdb-btn-active-border-color: var(--mdb-primary-active);
 }
 
 .btn-secondary {
@@ -448,8 +487,41 @@ table.dataTable.datatable-table .table-action-btn:focus-visible {
   }
 }
 
-#productTable .form-control {
-  background-color: rgba(var(--mdb-primary-rgb), 0.12);
+
+#productTable.product-detail-table,
+table.dataTable#productTable.product-detail-table {
+  border-color: #c8dfce !important;
+  font-size: 0.9rem;
+  margin-block: 0.5rem 0.75rem !important;
+}
+
+#productTable.product-detail-table thead th,
+table.dataTable#productTable.product-detail-table thead th {
+  background: linear-gradient(180deg, var(--mdb-primary-hover) 0%, var(--mdb-primary) 100%);
+  color: var(--mdb-light);
+  text-align: center;
+  white-space: nowrap;
+}
+
+#productTable.product-detail-table tbody td,
+table.dataTable#productTable.product-detail-table tbody td {
+  color: var(--mdb-secondary);
+}
+
+#productTable.product-detail-table .form-control,
+#productTable.product-detail-table .form-select {
+  background-color: var(--mdb-primary-soft);
+  border: 1px solid #a8cfb2;
+  border-radius: 0.55rem;
+  color: var(--mdb-secondary);
+  min-height: 2.35rem;
+}
+
+#productTable.product-detail-table .form-control:focus,
+#productTable.product-detail-table .form-select:focus {
+  background-color: #ffffff;
+  border-color: var(--mdb-primary-hover);
+  box-shadow: 0 0 0 0.18rem rgba(var(--mdb-primary-rgb), 0.18);
 }
 
 /* card styles */

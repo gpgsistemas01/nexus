@@ -1,0 +1,30 @@
+<%
+const formConfig = typeof form !== 'undefined' ? form : {};
+const formClass = formConfig.class || 'row g-3';
+const formAttrs = formConfig.attrs || {};
+const formInputs = formConfig.inputs || [];
+const formCheckboxes = formConfig.checkboxes || [];
+const includeSubmit = formConfig.includeSubmit !== false;
+%>
+
+<form id="<%= formConfig.id %>" class="<%= formClass %>"
+    <% for (let key in formAttrs) { %>
+        <%= key %>="<%= formAttrs[key] %>"
+    <% } %>
+>
+    <% if (formInputs.length) { %>
+        <%- include('./outlineInputList', { inputs: formInputs }) %>
+    <% } %>
+
+    <% if (formCheckboxes.length) { %>
+        <div class="col-12">
+            <%- include('./checkboxList', { inputs: formCheckboxes }) %>
+        </div>
+    <% } %>
+
+    <% if (includeSubmit) { %>
+        <div class="col-12">
+            <%- include('./submit') %>
+        </div>
+    <% } %>
+</form>
