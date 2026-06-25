@@ -7,7 +7,10 @@ const adjustModalDataTables = (modalElement) => {
     $(modalElement).find('table.dataTable').each(function() {
         if (!$.fn.DataTable.isDataTable(this)) return;
 
-        $(this).DataTable().columns.adjust();
+        const table = $(this).DataTable();
+
+        table.columns.adjust();
+        if (typeof table.responsive?.recalc === 'function') table.responsive.recalc();
     });
 };
 

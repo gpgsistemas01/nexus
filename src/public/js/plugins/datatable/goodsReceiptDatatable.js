@@ -137,9 +137,7 @@ export const initDetailsGoodsReceiptTable = (mode) => {
         options: {
             data: details,
             columns,
-            responsive: false,
-            scrollX: true,
-            scrollCollapse: true,
+            responsive: true,
             autoWidth: false
         }
     });

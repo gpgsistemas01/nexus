@@ -146,9 +146,7 @@ export const initDetailsGoodsIssueTable = (mode, context) => {
         options: {
             data: details,
             columns,
-            responsive: false,
-            scrollX: true,
-            scrollCollapse: true,
+            responsive: true,
             autoWidth: false
         }
     });

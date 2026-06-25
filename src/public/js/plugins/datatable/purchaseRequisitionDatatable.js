@@ -137,8 +137,7 @@ export const initDetailsPurchaseRequisitionTable = (mode) => {
         options: {
             data: details,
             columns,
-            responsive: false,
-            scrollX: true
+            responsive: true
         }
     });
 };

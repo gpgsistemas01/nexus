@@ -36,9 +36,10 @@ describe('baseDatatable', () => {
 
   it('habilita responsive de DataTables y recalcula columnas al redibujar', () => {
     const adjust = vi.fn();
+    const recalc = vi.fn();
     const page = Object.assign(vi.fn(), { info: vi.fn(() => ({ page: 0, pages: 1, recordsDisplay: 1 })) });
     const dataTable = vi.fn((options) => {
-      options.drawCallback.call({ api: () => ({ columns: { adjust }, page }) }, {});
+      options.drawCallback.call({ api: () => ({ columns: { adjust }, page, responsive: { recalc } }) }, {});
       return {};
     });
 
@@ -55,5 +56,6 @@ describe('baseDatatable', () => {
       }
     }));
     expect(adjust).toHaveBeenCalledOnce();
+    expect(recalc).toHaveBeenCalledOnce();
   });
 });

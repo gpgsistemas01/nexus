@@ -36,6 +36,8 @@ const adjustDataTableColumns = (table) => {
     if (typeof table?.columns?.adjust !== 'function') return;
 
     table.columns.adjust();
+
+    if (typeof table?.responsive?.recalc === 'function') table.responsive.recalc();
 };
 
 const initDataTableActionTooltips = (table) => {
