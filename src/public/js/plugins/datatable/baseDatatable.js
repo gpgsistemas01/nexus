@@ -1,6 +1,7 @@
 import { DATATABLE_SELECTORS } from "../../constants/selectors.js";
 import { handleDataTableError } from "../../api/errorHandler.js";
 import { buildMdbActionButton } from "../mdb/actionButton.js";
+import { initMdbTooltips } from "../mdb/baseInstance.js";
 
 const SORT_DIRECTIONS = ['asc', 'desc'];
 
@@ -35,6 +36,15 @@ const adjustDataTableColumns = (table) => {
     if (typeof table?.columns?.adjust !== 'function') return;
 
     table.columns.adjust();
+};
+
+const initDataTableActionTooltips = (table) => {
+
+    const tableNode = table?.table?.().node?.();
+
+    if (!tableNode) return;
+
+    initMdbTooltips(tableNode);
 };
 
 export const createDataTable = ({ selector = DATATABLE_SELECTORS.MAIN, options = {} }) => {
@@ -82,9 +92,12 @@ export const createDataTable = ({ selector = DATATABLE_SELECTORS.MAIN, options =
             ...language
         },
         initComplete(settings, json) {
-            adjustDataTableColumns(this.api());
+            const table = this.api();
 
-            $(this.api().table().container())
+            adjustDataTableColumns(table);
+            initDataTableActionTooltips(table);
+
+            $(table.table().container())
                 .find('.dataTables_filter input')
                 .attr('placeholder', resolvedSearchPlaceholder);
 
@@ -100,6 +113,7 @@ export const createDataTable = ({ selector = DATATABLE_SELECTORS.MAIN, options =
             }
 
             adjustDataTableColumns(table);
+            initDataTableActionTooltips(table);
 
             if (typeof drawCallback === 'function') drawCallback.call(this, settings);
         },
