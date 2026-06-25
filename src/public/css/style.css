@@ -411,10 +411,23 @@ table.dataTable.datatable-table .sorting_desc::after {
 /* DataTables Responsive detail rows */
 table.dataTable.dtr-inline.collapsed > tbody > tr > td.dtr-control::before,
 table.dataTable.dtr-inline.collapsed > tbody > tr > th.dtr-control::before {
-  background-color: var(--mdb-primary) !important;
-  border: 0 !important;
+  align-items: center;
+  background: linear-gradient(180deg, #ffffff 0%, #dff4e5 100%) !important;
+  border: 2px solid var(--datatable-excel-header) !important;
   box-shadow: 0 0.25rem 0.5rem rgba(var(--mdb-primary-rgb), 0.25);
-  line-height: 1.05rem;
+  color: var(--datatable-excel-header-hover) !important;
+  display: inline-flex;
+  font-weight: 900;
+  height: 1.35rem;
+  justify-content: center;
+  line-height: 1;
+  width: 1.35rem;
+}
+
+table.dataTable.dtr-inline.collapsed > tbody > tr.parent > td.dtr-control::before,
+table.dataTable.dtr-inline.collapsed > tbody > tr.parent > th.dtr-control::before {
+  background: linear-gradient(180deg, var(--datatable-excel-header) 0%, var(--datatable-excel-header-hover) 100%) !important;
+  color: var(--mdb-light) !important;
 }
 
 table.dataTable > tbody > tr.child,
@@ -630,10 +643,16 @@ table.dataTable.datatable-table .table-action-btn:focus-visible {
 
 #productTable.product-detail-table,
 table.dataTable#productTable.product-detail-table {
-  border-color: #c8dfce !important;
+  background-color: #ffffff;
+  border: 1px solid var(--datatable-excel-border) !important;
+  border-collapse: separate !important;
+  border-radius: 0.5rem;
+  border-spacing: 0;
+  box-shadow: 0 0.35rem 0.9rem rgba(var(--mdb-secondary-rgb), 0.06);
   font-size: 0.9rem;
   margin-block: 0.5rem 0.75rem !important;
   min-width: 100%;
+  overflow: hidden;
   width: 100% !important;
 }
 
@@ -647,14 +666,33 @@ table.dataTable#productTable.product-detail-table {
 
 #productTable.product-detail-table thead th,
 table.dataTable#productTable.product-detail-table thead th {
-  background: linear-gradient(180deg, var(--mdb-primary-hover) 0%, var(--mdb-primary) 100%);
+  background: linear-gradient(180deg, #2fbf73 0%, #148a4c 100%);
+  border-bottom: 2px solid #0d6a38 !important;
+  border-inline-end: 1px solid rgba(255, 255, 255, 0.28);
   color: var(--mdb-light);
+  font-weight: 700;
+  padding: 0.75rem;
   text-align: center;
+  vertical-align: middle;
 }
 
 #productTable.product-detail-table tbody td,
 table.dataTable#productTable.product-detail-table tbody td {
+  border-block-end: 1px solid var(--datatable-excel-border-soft);
+  border-inline-end: 1px solid var(--datatable-excel-border-soft);
   color: var(--mdb-secondary);
+  padding: 0.75rem;
+  vertical-align: middle;
+}
+
+#productTable.product-detail-table tbody tr:nth-child(even),
+table.dataTable#productTable.product-detail-table tbody tr:nth-child(even) {
+  background-color: var(--datatable-excel-row-alt);
+}
+
+#productTable.product-detail-table tbody tr:hover,
+table.dataTable#productTable.product-detail-table tbody tr:hover {
+  background-color: var(--datatable-excel-row-hover);
 }
 
 #productTable.product-detail-table .form-control,

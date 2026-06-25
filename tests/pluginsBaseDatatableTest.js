@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { createDataTable } from '../src/public/js/plugins/datatable/baseDatatable.js';
-import { buildResponsiveHeaderLabels } from '../src/public/js/plugins/datatable/utils/responsive.js';
+import { buildResponsiveHeaderLabels, configureResponsiveHeaderGroups } from '../src/public/js/plugins/datatable/utils/responsive.js';
 
 describe('baseDatatable', () => {
   afterEach(() => {
@@ -94,6 +94,53 @@ describe('baseDatatable', () => {
       'Conversión / Cantidad',
       'Conversión / Unidad'
     ]);
+  });
+
+  it('sincroniza encabezados agrupados responsive reutilizando data-responsive-group', () => {
+    const on = vi.fn();
+    vi.stubGlobal('$', () => ({ on }));
+
+    const groupHeader = {
+      hidden: false,
+      colSpan: 2,
+      getAttribute: (name) => ({ colspan: '2', 'data-responsive-group': 'measures' })[name]
+    };
+    const childHeaders = [
+      { hidden: false, getAttribute: (name) => ({ 'data-responsive-parent': 'measures' })[name] },
+      { hidden: false, getAttribute: (name) => ({ 'data-responsive-parent': 'measures' })[name] }
+    ];
+    const rowspannedHeader = {
+      hidden: false,
+      getAttribute: (name) => ({ rowspan: '2' })[name]
+    };
+    const rows = [
+      { children: [rowspannedHeader, groupHeader] },
+      { children: childHeaders }
+    ];
+    const tableNode = {
+      querySelector: vi.fn(() => groupHeader),
+      querySelectorAll: vi.fn((selector) => {
+        if (selector === 'thead tr') return rows;
+        if (selector === 'thead th[data-responsive-parent]') return childHeaders;
+        return childHeaders;
+      })
+    };
+    const columns = {
+      1: { visible: vi.fn(() => true), responsiveHidden: vi.fn(() => true) },
+      2: { visible: vi.fn(() => true), responsiveHidden: vi.fn(() => false) }
+    };
+    const table = {
+      table: () => ({ node: () => tableNode }),
+      column: (index) => columns[index]
+    };
+
+    configureResponsiveHeaderGroups(table);
+
+    expect(groupHeader.hidden).toBe(false);
+    expect(groupHeader.colSpan).toBe(1);
+    expect(childHeaders[0].hidden).toBe(false);
+    expect(childHeaders[1].hidden).toBe(true);
+    expect(on).toHaveBeenCalledWith('responsive-resize.dt column-visibility.dt draw.dt', expect.any(Function));
   });
 
 });

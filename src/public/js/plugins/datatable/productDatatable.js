@@ -4,7 +4,7 @@ import { notifications } from "../swal/swalComponent.js";
 import { hasPermission } from "../../utils/permissions.js";
 import { getAllProducts } from "../../application/warehouse/products.js";
 import { renderMaterialName } from "./utils/renderProductDatatable.js";
-import { getResponsiveRowData } from "./utils/responsive.js";
+import { configureResponsiveHeaderGroups, getResponsiveRowData } from "./utils/responsive.js";
 import { buildExcelButton, buildTableExportParams } from "../../ui/tableUI.js";
 import { exportWarehouseReport } from "../../application/warehouse/report.js";
 import { formatFileName } from "../../utils/formatters.js";
@@ -16,26 +16,25 @@ let stockSocketConfigured = false;
 
 const tableElement = document.querySelector(selectorTable);
 
-
 const renderProductTableHeader = ({ canSeeCost, canManageProducts }) => {
 
     tableElement.innerHTML = `
         <thead>
             <tr>
                 <th rowspan="2">Material</th>
-                <th colspan="2">Medidas</th>
+                <th colspan="2" data-responsive-group="measures">Medidas</th>
                 <th rowspan="2">Compra</th>
                 <th rowspan="2">Stock Mínimo</th>
                 <th rowspan="2">Presentación</th>
-                <th colspan="2">Conversión</th>
+                <th colspan="2" data-responsive-group="conversion">Conversión</th>
                 ${ canSeeCost ? '<th rowspan="2">Costo Unitario</th>' : '' }
                 ${ canManageProducts ? '<th rowspan="2">Acciones</th>' : '' }
             </tr>
             <tr>
-                <th>Base</th>
-                <th>Altura</th>
-                <th>Cantidad</th>
-                <th>Unidad</th>
+                <th data-responsive-parent="measures">Base</th>
+                <th data-responsive-parent="measures">Altura</th>
+                <th data-responsive-parent="conversion">Cantidad</th>
+                <th data-responsive-parent="conversion">Unidad</th>
             </tr>
         </thead>
     `;
@@ -149,6 +148,7 @@ export const createProductDatatable = (context, { onReturnProduct = null } = {})
         }
     });
 
+    configureResponsiveHeaderGroups(table);
     configureStockRealtime(table);
 
     $(`${ selectorTable } tbody`).on('click', '.btn-edit', function () {
