@@ -1,0 +1,37 @@
+<% const loginForm = typeof form !== 'undefined' ? form : {
+    id: 'loginForm',
+    inputs: [
+        {
+            id: 'nameInput',
+            name: 'name',
+            type: 'name',
+            label: 'Nombre de usuario:',
+        },
+        {
+            id: 'passwordInput',
+            name: 'password',
+            type: 'password',
+            label: 'Contraseña:',
+        }
+    ]
+}; %>
+
+<form id="<%= loginForm.id %>" class="row g-3" novalidate>
+    <%- include('./outlineInputList', { inputs: loginForm.inputs }) %>
+
+    <div class="col-12">
+        <%- include('./checkbox', {
+            input: {
+                id: 'rememberCredentialsInput',
+                name: 'rememberCredentials',
+                type: 'checkbox',
+                value: 'true',
+                label: 'Recordar credenciales'
+            }
+        }) %>
+    </div>
+
+    <div class="col-12">
+        <%- include('./submit') %>
+    </div>
+</form>
