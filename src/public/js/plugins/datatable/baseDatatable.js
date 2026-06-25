@@ -22,19 +22,25 @@ const normalizeColumns = (columns) => {
 
 export const createDataTable = ({ selector = DATATABLE_SELECTORS.MAIN, options = {} }) => {
 
-    const ajaxConfig = options.ajax;
-    const searchDelay = 1000;
-    const normalizedColumns = normalizeColumns(options.columns);
+    const {
+        ajax,
+        columns,
+        initComplete,
+        language = {},
+        searchPlaceholder = 'Buscar en la tabla',
+        ...dataTableOptions
+    } = options;
+    const resolvedSearchPlaceholder = language.searchPlaceholder || searchPlaceholder;
 
     return $(selector).DataTable({
-        ...options,
-        columns: normalizedColumns,
-        searchDelay,
-        ajax: ajaxConfig ? async (data, callback) => {
+        ...dataTableOptions,
+        columns: normalizeColumns(columns),
+        searchDelay: 1000,
+        ajax: ajax ? async (data, callback) => {
 
             try {
 
-                const response = await ajaxConfig.get(data);
+                const response = await ajax.get(data);
 
                 callback(response.data);
 
@@ -52,11 +58,20 @@ export const createDataTable = ({ selector = DATATABLE_SELECTORS.MAIN, options =
         dom: 'Bfrtip',
         language: {
             url: "https://cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json",
+            searchPlaceholder: resolvedSearchPlaceholder,
+            ...language
+        },
+        initComplete(settings, json) {
+            $(this.api().table().container())
+                .find('.dataTables_filter input')
+                .attr('placeholder', resolvedSearchPlaceholder);
+
+            if (typeof initComplete === 'function') initComplete.call(this, settings, json);
         },
         responsive: true,
         autoWidth: false,
-        serverSide: options.ajax ? true : false,
-        processing: options.ajax ? true : false,
+        serverSide: Boolean(ajax),
+        processing: Boolean(ajax),
     });
 }
 

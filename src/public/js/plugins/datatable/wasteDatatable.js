@@ -74,6 +74,7 @@ export const createWasteDatatable = (context) => {
             ajax: {
                 get: getAllWastes
             },
+            searchPlaceholder: 'Buscar por Material o Proveedor',
             columns,
             buttons: [
                 ...(canManageWastes ? [{

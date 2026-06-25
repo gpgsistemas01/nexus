@@ -58,6 +58,7 @@ export const createGoodsReceiptDatatable = async () => {
                 })
             },
             order: [[0, 'desc']],
+            searchPlaceholder: 'Buscar por Folio o N° Factura',
             columns: [
                 { data: 'referenceNumber', title: 'Folio' },
                 {

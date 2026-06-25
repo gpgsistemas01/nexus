@@ -13,6 +13,7 @@ export const createClientDatatable = () => {
             ajax: {
                 get: getAllClients
             },
+            searchPlaceholder: 'Buscar por Nombre',
             columns: [
                 { data: 'name', title: 'Nombre' },
                 {

@@ -33,6 +33,7 @@ export const createMovementDatatable = async () => {
                 })
             },
             order: [[0, 'desc']],
+            searchPlaceholder: 'Buscar por Material, Proveedor o Folio',
             columns: [
                 { data: 'date', title: 'Fecha' },
                 {

@@ -73,6 +73,7 @@ export const createPurchaseRequisitionDatatable = (context) => {
                     d.department = context.department || '';
                 }
             },
+            searchPlaceholder: 'Buscar por Folio',
             columns,
             buttons: [
                 {

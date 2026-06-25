@@ -75,6 +75,7 @@ export const createGoodsIssueDatatable = async (context) => {
                     ...filters.getValues()
                 })
             },
+            searchPlaceholder: 'Buscar por Folio o Proyecto',
             columns,
             order: [[0, 'desc']],
             buttons: [

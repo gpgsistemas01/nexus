@@ -100,6 +100,7 @@ export const createProductDatatable = (context, { onReturnProduct = null } = {})
             ajax: {
                 get: getAllProducts
             },
+            searchPlaceholder: 'Buscar por Material',
             columns,
             createdRow: (row, data) => {
 

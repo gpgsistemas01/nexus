@@ -13,6 +13,7 @@ export const createSupplierDatatable = () => {
             ajax: {
                 get: getAllSuppliers
             },
+            searchPlaceholder: 'Buscar por Nombre comercial o Razón social',
             columns: [
                 { data: 'tradeName', title: 'Nombre comercial' },
                 { data: 'legalName', title: 'Razón social' },

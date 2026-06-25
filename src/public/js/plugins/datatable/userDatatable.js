@@ -14,6 +14,7 @@ export const createUserDatatable = () => {
             ajax: {
                 get: getAllUsers
             },
+            searchPlaceholder: 'Buscar por Usuario',
             columns: [
                 { data: 'name', title: 'Usuario' },
                 { data: 'profile.fullName', title: 'Perfil', defaultContent: '-' },

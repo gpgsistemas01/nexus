@@ -24,6 +24,7 @@ export const createProfilesDatatable = async () => {
                     strictDepartmentFilter: Boolean(filters.getValues().departmentId)
                 })
             },
+            searchPlaceholder: 'Buscar por Nombre',
             columns: [
                 { data: 'fullName', title: 'Nombre' },
                 { 
