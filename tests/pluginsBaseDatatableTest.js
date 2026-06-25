@@ -1,31 +1,36 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { getFallbackPageForEmptyDataTableResponse } from '../src/public/js/plugins/datatable/baseDatatable.js';
+import { createDataTable } from '../src/public/js/plugins/datatable/baseDatatable.js';
 
 describe('baseDatatable', () => {
-  it('regresa a la última página disponible cuando la página actual queda vacía', () => {
-    expect(getFallbackPageForEmptyDataTableResponse({
-      requestData: { start: 20, length: 10 },
-      responseData: { data: [], recordsFiltered: 19 }
-    })).toBe(1);
+  afterEach(() => {
+    vi.unstubAllGlobals();
   });
 
-  it('usa la página anterior cuando todavía hay más de una página disponible', () => {
-    expect(getFallbackPageForEmptyDataTableResponse({
-      requestData: { start: 30, length: 10 },
-      responseData: { data: [], recordsFiltered: 29 }
-    })).toBe(2);
+  it('agrega un drawCallback que mueve la tabla a la última página disponible si la actual queda fuera de rango', () => {
+    const page = vi.fn(() => ({ draw }));
+    const draw = vi.fn();
+    const info = vi.fn(() => ({ page: 2, pages: 2, recordsDisplay: 19 }));
+    const dataTable = vi.fn((options) => options.drawCallback.call({ api: () => ({ page: Object.assign(page, { info }) }) }, {}));
+
+    vi.stubGlobal('$', () => ({ DataTable: dataTable }));
+
+    createDataTable({ options: {} });
+
+    expect(page).toHaveBeenCalledWith(1);
+    expect(draw).toHaveBeenCalledWith('page');
   });
 
-  it('mantiene la página actual si la respuesta tiene datos o no quedan registros', () => {
-    expect(getFallbackPageForEmptyDataTableResponse({
-      requestData: { start: 10, length: 10 },
-      responseData: { data: [{ id: 1 }], recordsFiltered: 11 }
-    })).toBeNull();
+  it('ejecuta el drawCallback personalizado cuando la página actual sigue siendo válida', () => {
+    const customDrawCallback = vi.fn();
+    const page = Object.assign(vi.fn(), { info: vi.fn(() => ({ page: 1, pages: 2, recordsDisplay: 11 })) });
+    const dataTable = vi.fn((options) => options.drawCallback.call({ api: () => ({ page }) }, { draw: true }));
 
-    expect(getFallbackPageForEmptyDataTableResponse({
-      requestData: { start: 10, length: 10 },
-      responseData: { data: [], recordsFiltered: 0 }
-    })).toBeNull();
+    vi.stubGlobal('$', () => ({ DataTable: dataTable }));
+
+    createDataTable({ options: { drawCallback: customDrawCallback } });
+
+    expect(page).not.toHaveBeenCalled();
+    expect(customDrawCallback).toHaveBeenCalledWith({ draw: true });
   });
 });

@@ -6,22 +6,14 @@ const SORT_DIRECTIONS = ['asc', 'desc'];
 
 const isActionColumn = (column = {}) => column.title === 'Acciones';
 
-export const getFallbackPageForEmptyDataTableResponse = ({ requestData = {}, responseData = {} } = {}) => {
+const getLastAvailableDataTablePage = (pageInfo = {}) => {
 
-    const start = Number(requestData.start) || 0;
-    const length = Number(requestData.length) || 0;
-    const recordsFiltered = Number(responseData.recordsFiltered) || 0;
-    const currentPage = length > 0 ? Math.floor(start / length) : 0;
-    const totalPages = length > 0 ? Math.ceil(recordsFiltered / length) : 0;
+    const recordsDisplay = Number(pageInfo.recordsDisplay) || 0;
+    const pages = Number(pageInfo.pages) || 0;
 
-    if (start <= 0 || length <= 0 || recordsFiltered <= 0 || !Array.isArray(responseData.data) || responseData.data.length > 0) {
-        return null;
-    }
+    if (recordsDisplay <= 0 || pages <= 0 || pageInfo.page < pages) return null;
 
-    const lastAvailablePage = Math.max(totalPages - 1, 0);
-    const fallbackPage = Math.min(currentPage - 1, lastAvailablePage);
-
-    return fallbackPage >= 0 && fallbackPage !== currentPage ? fallbackPage : null;
+    return pages - 1;
 };
 
 const normalizeColumns = (columns) => {
@@ -44,6 +36,7 @@ export const createDataTable = ({ selector = DATATABLE_SELECTORS.MAIN, options =
         ajax,
         columns,
         initComplete,
+        drawCallback,
         language = {},
         searchPlaceholder = 'Buscar en la tabla',
         ...dataTableOptions
@@ -54,21 +47,13 @@ export const createDataTable = ({ selector = DATATABLE_SELECTORS.MAIN, options =
         ...dataTableOptions,
         columns: normalizeColumns(columns),
         searchDelay: 1000,
-        ajax: ajax ? async (data, callback, settings) => {
+        ajax: ajax ? async (data, callback) => {
 
             try {
 
                 const response = await ajax.get(data);
-                const fallbackPage = getFallbackPageForEmptyDataTableResponse({
-                    requestData: data,
-                    responseData: response.data
-                });
 
                 callback(response.data);
-
-                if (fallbackPage !== null) {
-                    setTimeout(() => new $.fn.dataTable.Api(settings).page(fallbackPage).draw('page'), 0);
-                }
 
             } catch (err) {
 
@@ -93,6 +78,17 @@ export const createDataTable = ({ selector = DATATABLE_SELECTORS.MAIN, options =
                 .attr('placeholder', resolvedSearchPlaceholder);
 
             if (typeof initComplete === 'function') initComplete.call(this, settings, json);
+        },
+        drawCallback(settings) {
+            const table = this.api();
+            const lastAvailablePage = getLastAvailableDataTablePage(table.page.info());
+
+            if (lastAvailablePage !== null) {
+                table.page(lastAvailablePage).draw('page');
+                return;
+            }
+
+            if (typeof drawCallback === 'function') drawCallback.call(this, settings);
         },
         responsive: true,
         autoWidth: false,
