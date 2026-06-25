@@ -253,7 +253,6 @@ table.dataTable.datatable-table .sorting_desc::after {
 
 
 .dataTables_wrapper .dt-buttons .dt-button,
-.dataTables_wrapper .dataTables_paginate .paginate_button:not(.page-item),
 .dataTables_wrapper .dataTables_paginate .paginate_button.page-item .page-link {
   align-items: center;
   background: #ffffff !important;
@@ -293,8 +292,6 @@ table.dataTable.datatable-table .sorting_desc::after {
   padding-inline: 0.95rem;
 }
 
-.dataTables_wrapper .dataTables_paginate .paginate_button.current:not(.page-item),
-.dataTables_wrapper .dataTables_paginate .paginate_button.current:not(.page-item):hover,
 .dataTables_wrapper .dataTables_paginate .paginate_button.page-item.active .page-link,
 .dataTables_wrapper .dataTables_paginate .paginate_button.page-item.active:hover .page-link {
   background: linear-gradient(180deg, #21a366 0%, var(--mdb-primary) 100%) !important;
@@ -304,7 +301,6 @@ table.dataTable.datatable-table .sorting_desc::after {
 }
 
 .dataTables_wrapper .dt-buttons .dt-button:hover,
-.dataTables_wrapper .dataTables_paginate .paginate_button:not(.page-item):hover,
 .dataTables_wrapper .dataTables_paginate .paginate_button.page-item .page-link:hover {
   background: #f8fff9 !important;
   border-color: var(--mdb-primary) !important;
@@ -313,7 +309,6 @@ table.dataTable.datatable-table .sorting_desc::after {
   transform: translateY(-1px);
 }
 
-.dataTables_wrapper .dataTables_paginate .paginate_button:not(.page-item):focus,
 .dataTables_wrapper .dataTables_paginate .paginate_button.page-item .page-link:focus,
 .dataTables_wrapper .dt-buttons .dt-button:focus,
 .table.datatable-table .table-action-btn:focus,
@@ -322,7 +317,6 @@ table.dataTable.datatable-table .table-action-btn:focus {
   outline: 0 !important;
 }
 
-.dataTables_wrapper .dataTables_paginate .paginate_button:not(.page-item):focus-visible,
 .dataTables_wrapper .dataTables_paginate .paginate_button.page-item .page-link:focus-visible,
 .dataTables_wrapper .dt-buttons .dt-button:focus-visible,
 .table.datatable-table .table-action-btn:focus-visible,
@@ -332,8 +326,6 @@ table.dataTable.datatable-table .table-action-btn:focus-visible {
   outline-offset: 2px;
 }
 
-.dataTables_wrapper .dataTables_paginate .paginate_button.disabled:not(.page-item),
-.dataTables_wrapper .dataTables_paginate .paginate_button.disabled:not(.page-item):hover,
 .dataTables_wrapper .dataTables_paginate .paginate_button.page-item.disabled .page-link,
 .dataTables_wrapper .dataTables_paginate .paginate_button.page-item.disabled:hover .page-link {
   background: #eef4f0 !important;
