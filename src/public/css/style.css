@@ -8,6 +8,14 @@
   --mdb-primary-active: #0b5f2a;
   --mdb-primary-active-rgb: 11, 95, 42;
   --mdb-primary-soft: #e8f6ee;
+  --datatable-excel-header: #107c41;
+  --datatable-excel-header-rgb: 16, 124, 65;
+  --datatable-excel-header-hover: #0b5f2a;
+  --datatable-excel-border: #a9d08e;
+  --datatable-excel-border-soft: #d9ead3;
+  --datatable-excel-row-alt: #f3fbf6;
+  --datatable-excel-row-hover: #e2f0d9;
+  --datatable-excel-selection: #c6e0b4;
 
   --mdb-secondary: #332D2D;
   --mdb-secondary-rgb: 51, 45, 45;
@@ -139,7 +147,7 @@ body {
 
 .datatable-card {
   background: linear-gradient(180deg, #ffffff 0%, #f8fbf8 100%);
-  border: 1px solid rgba(var(--mdb-secondary-rgb), 0.08);
+  border: 1px solid rgba(var(--datatable-excel-header-rgb), 0.16);
   border-radius: 1.25rem;
   box-shadow: 0 1rem 2.25rem rgba(var(--mdb-secondary-rgb), 0.1);
   overflow: hidden;
@@ -283,8 +291,11 @@ body {
 
 .table.datatable-table,
 table.dataTable.datatable-table {
-  border: 1px solid var(--mdb-border-color, #dee2e6) !important;
+  background-color: #ffffff;
+  border: 1px solid var(--datatable-excel-border) !important;
+  border-collapse: separate !important;
   border-radius: 0.5rem;
+  border-spacing: 0;
   min-width: 100%;
   overflow: hidden;
   width: 100%;
@@ -327,9 +338,10 @@ table.dataTable.datatable-table td {
 
 .table.datatable-table thead th,
 table.dataTable.datatable-table thead th {
-  background: #f8f9fa;
-  border-bottom: 1px solid var(--mdb-border-color, #dee2e6) !important;
-  color: var(--mdb-body-color);
+  background: linear-gradient(180deg, #21a366 0%, var(--datatable-excel-header) 100%);
+  border-bottom: 2px solid var(--datatable-excel-header-hover) !important;
+  border-inline-end: 1px solid rgba(255, 255, 255, 0.28);
+  color: var(--mdb-light);
   font-weight: 700;
   letter-spacing: normal;
   padding: 0.75rem;
@@ -341,20 +353,34 @@ table.dataTable.datatable-table thead th {
 
 .table.datatable-table thead tr:not(:first-child) th,
 table.dataTable.datatable-table thead tr:not(:first-child) th {
-  background: #ffffff;
+  background: #eef7ee;
+  color: var(--datatable-excel-header-hover);
   font-size: 0.85rem;
 }
 
 .table.datatable-table tbody td,
 table.dataTable.datatable-table tbody td {
-  border-block-end: 1px solid var(--mdb-border-color, #dee2e6);
+  border-block-end: 1px solid var(--datatable-excel-border-soft);
+  border-inline-end: 1px solid var(--datatable-excel-border-soft);
   padding: 0.75rem;
   vertical-align: middle;
 }
 
+.table.datatable-table tbody tr:nth-child(even),
+table.dataTable.datatable-table tbody tr:nth-child(even) {
+  background-color: var(--datatable-excel-row-alt);
+}
+
 .table.datatable-table tbody tr:hover,
 table.dataTable.datatable-table tbody tr:hover {
-  background-color: rgba(var(--mdb-primary-rgb), 0.04);
+  background-color: var(--datatable-excel-row-hover);
+}
+
+.table.datatable-table tbody tr.selected,
+table.dataTable.datatable-table tbody tr.selected,
+table.dataTable.datatable-table tbody tr.selected > * {
+  background-color: var(--datatable-excel-selection) !important;
+  color: var(--mdb-secondary) !important;
 }
 
 .table.datatable-table .sorting,
@@ -379,7 +405,7 @@ table.dataTable.datatable-table .sorting_asc::after,
 table.dataTable.datatable-table .sorting_desc::before,
 table.dataTable.datatable-table .sorting_desc::after {
   color: var(--mdb-light);
-  opacity: 0.85 !important;
+  opacity: 0.9 !important;
 }
 
 /* DataTables Responsive detail rows */
