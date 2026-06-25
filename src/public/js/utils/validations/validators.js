@@ -39,6 +39,11 @@ export const productStockValidators = {
     observations: (value) => validateTextOptional(value, 500, 'Las observaciones'),
 }
 
+export const productReturnValidators = {
+    newStock: (value) => validatePositiveNumber(value, 'La cantidad devuelta'),
+    observations: (value) => validateTextOptional(value, 500, 'Las observaciones'),
+}
+
 export const wasteDataValidators = {
     supplierProductId: (value) => isEmptyOrNull(value, 'El producto'),
     base: (value) => validateNumber(value, 'La base de la merma'),

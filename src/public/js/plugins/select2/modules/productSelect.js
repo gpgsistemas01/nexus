@@ -4,6 +4,7 @@ import { initReasonSelect, toggleReasonOption } from "../domains/reason.js";
 import { setupSupplierSelect, toggleSupplierOption } from "../domains/supplier.js";
 import { initUnitMeasureSelect, toggleUnitMeasureOption } from "../domains/unitMeasure.js";
 import { FORM_SELECTORS } from "../../../constants/selectors.js";
+import { toggleDisabledElement } from "../../../utils/formUtils.js";
 
 const supplierSelector = FORM_SELECTORS.SUPPLIER;
 const unitMeasureSelector = FORM_SELECTORS.UNIT_MEASURE;
@@ -82,4 +83,28 @@ export const setProductFormSelectOptions = ({
         id: data?.reason?.id,
         name: data?.reason?.name
     });
+};
+
+export const setProductReasonVisualOption = ({
+    modalSelector,
+    name,
+    isDisabled = false
+}) => {
+
+    const reasonScopedSelector = `${ modalSelector } ${ reasonSelector }`;
+    const reasonSelect = document.querySelector(reasonScopedSelector);
+
+    toggleReasonOption({
+        selector: reasonScopedSelector,
+        id: `visual:${ name }`,
+        name
+    });
+
+    if (reasonSelect) {
+        toggleDisabledElement({
+            element: reasonSelect,
+            isDisabled
+        });
+        $(reasonScopedSelector).trigger('change.select2');
+    }
 };

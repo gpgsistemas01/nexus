@@ -3,16 +3,18 @@ import { editProduct, editProductStock, registerProduct } from "../../applicatio
 import { FORM_SELECTORS, MODAL_SELECTORS } from "../../constants/selectors.js";
 
 import { handleSubmit, validateFields } from "../../utils/formUtils.js";
-import { productStockValidators, productValidators } from "../../utils/validations/validators.js";
+import { productReturnValidators, productStockValidators, productValidators } from "../../utils/validations/validators.js";
 
 const formId = FORM_SELECTORS.PRODUCT_FORM;
 const productModalId = MODAL_SELECTORS.PRODUCT;
 const stockMode = 'edit-stock';
+const returnMode = 'return-product';
 const goodsReceiptCreationContext = 'goodsReceipt';
 
 const isStockMode = (form) => form.dataset.mode === stockMode;
+const isReturnMode = (form) => form.dataset.mode === returnMode;
 const includesStockAdjustmentOnCreate = (form) => form.dataset.includeStockAdjustmentOnCreate === 'true';
-const shouldValidateStockFields = (form) => isStockMode(form) || includesStockAdjustmentOnCreate(form);
+const shouldValidateStockFields = (form) => isStockMode(form) || isReturnMode(form) || includesStockAdjustmentOnCreate(form);
 const getCreationContext = (form) => form.dataset.creationContext || null;
 const isGoodsReceiptCreation = (form) => getCreationContext(form) === goodsReceiptCreationContext;
 
@@ -44,6 +46,8 @@ useForm({
     },
     getErrors: ({ form, formData }) => {
 
+        if (isReturnMode(form)) return validateFields(productReturnValidators, formData);
+
         if (isStockMode(form)) return validateFields(productStockValidators, formData);
 
         const errors = validateFields(getProductValidators(form), formData);
@@ -65,7 +69,19 @@ useForm({
                 withInitialStockAdjustment: includesStockAdjustmentOnCreate(form),
                 creationContext: getCreationContext(form)
             }),
-            update: isStockMode(form) ? editProductStock : editProduct
+            update: isStockMode(form) || isReturnMode(form) ? ({ formData, id }) => {
+
+                if (!isReturnMode(form)) return editProductStock({ formData, id });
+
+                return editProductStock({
+                    id,
+                    formData: {
+                        supplierId: formData.supplierId,
+                        returnedQuantity: formData.newStock,
+                        observations: formData.observations
+                    }
+                });
+            } : editProduct
         });
 
         form.onSave?.(product);

@@ -11,6 +11,8 @@ const stockFields = ['newStock', 'reasonId', 'observations'];
 const stockSectionSelector = '.stock-data-section';
 const goodsReceiptCreationContext = 'goodsReceipt';
 const maxUnitCostLabel = 'Costo Máximo';
+const newStockLabel = 'Nueva cantidad';
+const returnedQuantityLabel = 'Cantidad devuelta';
 
 const setProductValues = ({ form, data = null }) => {
 
@@ -39,6 +41,7 @@ const prepareProductModal = ({
         includeStockAdjustmentOnCreate,
         isStockAdjustment
     });
+    const isProductReturn = mode === 'return-product';
 
     initForm({ form, mode, id: data?.id });
     clearFormErrors(form);
@@ -60,6 +63,15 @@ const prepareProductModal = ({
         requiredWhenVisible: true,
         enableWhenVisible: !isStockAdjustment,
         labelContent: maxUnitCostLabel
+    });
+    setFormFieldVisibility({
+        form,
+        fieldName: 'newStock',
+        isVisible: showStockFields,
+        clearWhenHidden: !showStockFields,
+        requiredWhenVisible: showStockFields,
+        enableWhenVisible: true,
+        labelContent: isProductReturn ? returnedQuantityLabel : newStockLabel
     });
 
     initProductFormSelect2({ modalSelector: productModalId, isStockAdjustment: showStockFields });
@@ -104,15 +116,19 @@ export const openProductModal = ({
 export const openStockAdjustmentModal = ({
     mode = 'edit-stock',
     data = null,
-    onSave = null
+    onSave = null,
+    title = 'Editar stock de producto',
+    submitText = 'Actualizar',
+    beforeOpen = null
 }) => {
 
     const { form, modalElement } = prepareProductModal({ mode, data, isStockAdjustment: true });
 
     setProductValues({ form, data });
+    beforeOpen?.({ form, modalElement });
 
-    modalElement.querySelector('#modalTitle').textContent = 'Editar stock de producto';
-    form.querySelector('#submitBtn').textContent = 'Actualizar';
+    modalElement.querySelector('#modalTitle').textContent = title;
+    form.querySelector('#submitBtn').textContent = submitText;
 
     form.onSave = onSave;
 
