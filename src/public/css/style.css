@@ -158,6 +158,12 @@ body {
   overflow: hidden;
 }
 
+.modal .dataTables_wrapper {
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: visible;
+}
+
 .dataTables_wrapper .dataTables_scroll,
 .dataTables_wrapper .dataTables_scrollBody {
   border-radius: 1rem;
@@ -567,6 +573,16 @@ table.dataTable#productTable.product-detail-table {
   border-color: #c8dfce !important;
   font-size: 0.9rem;
   margin-block: 0.5rem 0.75rem !important;
+  min-width: max-content;
+}
+
+.modal #productTable_wrapper .dataTables_scroll,
+.modal #productTable_wrapper .dataTables_scrollBody {
+  max-width: 100%;
+}
+
+.modal #productTable_wrapper .dataTables_scrollBody {
+  overflow-x: auto !important;
 }
 
 #productTable.product-detail-table thead th,

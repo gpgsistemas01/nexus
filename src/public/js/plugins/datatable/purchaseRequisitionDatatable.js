@@ -136,7 +136,9 @@ export const initDetailsPurchaseRequisitionTable = (mode) => {
         selector: selectorProductTable,
         options: {
             data: details,
-            columns
+            columns,
+            responsive: false,
+            scrollX: true
         }
     });
 };

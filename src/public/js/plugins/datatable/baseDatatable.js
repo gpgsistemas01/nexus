@@ -46,6 +46,8 @@ export const createDataTable = ({ selector = DATATABLE_SELECTORS.MAIN, options =
         drawCallback,
         language = {},
         searchPlaceholder = 'Buscar en la tabla',
+        responsive = true,
+        autoWidth = false,
         ...dataTableOptions
     } = options;
     const resolvedSearchPlaceholder = language.searchPlaceholder || searchPlaceholder;
