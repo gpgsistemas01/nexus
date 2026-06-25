@@ -3,4 +3,6 @@ const tableId = table.id || 'table';
 const tableClass = table.class || 'table table-hover align-middle mb-0 datatable-table w-100';
 %>
 
-<table id="<%= tableId %>" class="<%= tableClass %>"></table>
+<div class="table-responsive datatable-responsive-wrapper">
+    <table id="<%= tableId %>" class="<%= tableClass %>"></table>
+</div>

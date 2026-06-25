@@ -33,4 +33,27 @@ describe('baseDatatable', () => {
     expect(page).not.toHaveBeenCalled();
     expect(customDrawCallback).toHaveBeenCalledWith({ draw: true });
   });
+
+  it('habilita responsive de DataTables y recalcula columnas al redibujar', () => {
+    const adjust = vi.fn();
+    const page = Object.assign(vi.fn(), { info: vi.fn(() => ({ page: 0, pages: 1, recordsDisplay: 1 })) });
+    const dataTable = vi.fn((options) => {
+      options.drawCallback.call({ api: () => ({ columns: { adjust }, page }) }, {});
+      return {};
+    });
+
+    vi.stubGlobal('$', () => ({ DataTable: dataTable }));
+
+    createDataTable({ options: {} });
+
+    expect(dataTable).toHaveBeenCalledWith(expect.objectContaining({
+      autoWidth: false,
+      responsive: {
+        details: {
+          type: 'inline'
+        }
+      }
+    }));
+    expect(adjust).toHaveBeenCalledOnce();
+  });
 });
