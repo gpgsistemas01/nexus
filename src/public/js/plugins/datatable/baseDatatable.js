@@ -6,6 +6,24 @@ const SORT_DIRECTIONS = ['asc', 'desc'];
 
 const isActionColumn = (column = {}) => column.title === 'Acciones';
 
+export const getFallbackPageForEmptyDataTableResponse = ({ requestData = {}, responseData = {} } = {}) => {
+
+    const start = Number(requestData.start) || 0;
+    const length = Number(requestData.length) || 0;
+    const recordsFiltered = Number(responseData.recordsFiltered) || 0;
+    const currentPage = length > 0 ? Math.floor(start / length) : 0;
+    const totalPages = length > 0 ? Math.ceil(recordsFiltered / length) : 0;
+
+    if (start <= 0 || length <= 0 || recordsFiltered <= 0 || !Array.isArray(responseData.data) || responseData.data.length > 0) {
+        return null;
+    }
+
+    const lastAvailablePage = Math.max(totalPages - 1, 0);
+    const fallbackPage = Math.min(currentPage - 1, lastAvailablePage);
+
+    return fallbackPage >= 0 && fallbackPage !== currentPage ? fallbackPage : null;
+};
+
 const normalizeColumns = (columns) => {
 
     if (!Array.isArray(columns)) return columns;
@@ -36,13 +54,21 @@ export const createDataTable = ({ selector = DATATABLE_SELECTORS.MAIN, options =
         ...dataTableOptions,
         columns: normalizeColumns(columns),
         searchDelay: 1000,
-        ajax: ajax ? async (data, callback) => {
+        ajax: ajax ? async (data, callback, settings) => {
 
             try {
 
                 const response = await ajax.get(data);
+                const fallbackPage = getFallbackPageForEmptyDataTableResponse({
+                    requestData: data,
+                    responseData: response.data
+                });
 
                 callback(response.data);
+
+                if (fallbackPage !== null) {
+                    setTimeout(() => new $.fn.dataTable.Api(settings).page(fallbackPage).draw('page'), 0);
+                }
 
             } catch (err) {
 
