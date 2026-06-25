@@ -283,8 +283,31 @@ table.dataTable.datatable-table {
   border-radius: 1rem;
   border-spacing: 0;
   box-shadow: 0 0.65rem 1.25rem rgba(var(--mdb-secondary-rgb), 0.08);
+  min-width: 100%;
   overflow: hidden;
+  width: 100%;
+}
+
+.dataTables_wrapper .dataTables_scrollHead,
+.dataTables_wrapper .dataTables_scrollBody {
   width: 100% !important;
+}
+
+.dataTables_wrapper .dataTables_scrollHead table.dataTable,
+.dataTables_wrapper .dataTables_scrollBody table.dataTable {
+  margin: 0 !important;
+}
+
+.dataTables_wrapper .dataTables_scrollBody {
+  border-bottom: 0 !important;
+  overflow-x: auto !important;
+}
+
+.table.datatable-table th,
+.table.datatable-table td,
+table.dataTable.datatable-table th,
+table.dataTable.datatable-table td {
+  box-sizing: border-box;
 }
 
 .table.datatable-table thead th,

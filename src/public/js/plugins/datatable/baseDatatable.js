@@ -30,6 +30,13 @@ const normalizeColumns = (columns) => {
     }));
 };
 
+const adjustDataTableColumns = (table) => {
+
+    if (typeof table?.columns?.adjust !== 'function') return;
+
+    table.columns.adjust();
+};
+
 export const createDataTable = ({ selector = DATATABLE_SELECTORS.MAIN, options = {} }) => {
 
     const {
@@ -73,6 +80,8 @@ export const createDataTable = ({ selector = DATATABLE_SELECTORS.MAIN, options =
             ...language
         },
         initComplete(settings, json) {
+            adjustDataTableColumns(this.api());
+
             $(this.api().table().container())
                 .find('.dataTables_filter input')
                 .attr('placeholder', resolvedSearchPlaceholder);
@@ -88,10 +97,14 @@ export const createDataTable = ({ selector = DATATABLE_SELECTORS.MAIN, options =
                 return;
             }
 
+            adjustDataTableColumns(table);
+
             if (typeof drawCallback === 'function') drawCallback.call(this, settings);
         },
         responsive: true,
         autoWidth: false,
+        scrollX: true,
+        scrollCollapse: true,
         serverSide: Boolean(ajax),
         processing: Boolean(ajax),
     });
