@@ -148,15 +148,12 @@ describeDb('waste and goods issue database integration', () => {
 
     const year = new Date().getFullYear();
     await Promise.all([
-      prisma.referenceNumberCounter.upsert({
-        where: { prefix_year: { prefix: 'AJU', year } },
-        update: {},
-        create: { prefix: 'AJU', year, counter: 0 }
-      }),
-      prisma.referenceNumberCounter.upsert({
-        where: { prefix_year: { prefix: 'SAL', year } },
-        update: {},
-        create: { prefix: 'SAL', year, counter: 0 }
+      prisma.referenceNumberCounter.createMany({
+        data: [
+          { prefix: 'AJU', year, counter: 0 },
+          { prefix: 'SAL', year, counter: 0 }
+        ],
+        skipDuplicates: true
       }),
       prisma.status.upsert({
         where: { name: 'Aprobada' },
