@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { createDataTable } from '../src/public/js/plugins/datatable/baseDatatable.js';
+import { buildResponsiveHeaderLabels } from '../src/public/js/plugins/datatable/utils/responsive.js';
 
 describe('baseDatatable', () => {
   afterEach(() => {
@@ -51,11 +52,48 @@ describe('baseDatatable', () => {
       autoWidth: false,
       responsive: {
         details: {
-          type: 'inline'
+          type: 'inline',
+          renderer: expect.any(Function)
         }
       }
     }));
     expect(adjust).toHaveBeenCalledOnce();
     expect(recalc).toHaveBeenCalledOnce();
   });
+
+  it('genera etiquetas responsive combinando encabezados con rowspan y colspan', () => {
+    const cell = (text, attrs = {}) => ({
+      textContent: text,
+      getAttribute: (name) => attrs[name]
+    });
+    const rows = [
+      {
+        children: [
+          cell('Material', { rowspan: '2' }),
+          cell('Medidas', { colspan: '2' }),
+          cell('Compra', { rowspan: '2' }),
+          cell('Conversión', { colspan: '2' })
+        ]
+      },
+      {
+        children: [
+          cell('Base'),
+          cell('Altura'),
+          cell('Cantidad'),
+          cell('Unidad')
+        ]
+      }
+    ];
+    const tableNode = { querySelectorAll: () => rows };
+
+    expect(buildResponsiveHeaderLabels(tableNode)).toEqual([
+      'Material',
+      'Medidas / Base',
+      'Medidas / Altura',
+      'Compra',
+      'Conversión / Cantidad',
+      'Conversión / Unidad'
+    ]);
+  });
+
 });

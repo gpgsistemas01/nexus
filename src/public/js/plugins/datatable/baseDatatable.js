@@ -2,6 +2,7 @@ import { DATATABLE_SELECTORS } from "../../constants/selectors.js";
 import { handleDataTableError } from "../../api/errorHandler.js";
 import { buildMdbActionButton } from "../mdb/actionButton.js";
 import { initMdbTooltips } from "../mdb/baseInstance.js";
+import { renderResponsiveDetails } from "./utils/responsive.js";
 
 const SORT_DIRECTIONS = ['asc', 'desc'];
 
@@ -121,7 +122,8 @@ export const createDataTable = ({ selector = DATATABLE_SELECTORS.MAIN, options =
         },
         responsive: responsive === false ? false : {
             details: {
-                type: 'inline'
+                type: 'inline',
+                renderer: renderResponsiveDetails
             }
         },
         autoWidth,
