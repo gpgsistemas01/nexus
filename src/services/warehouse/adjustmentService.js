@@ -7,6 +7,7 @@ import { createStockAdjustmentMovement } from "../inventory/movementService.js";
 import { adjustSupplierProductStock, findSupplierProductByIds } from "./products/supplierProductService.js";
 
 const REFERENCE_NUMBER_TYPE = 'AJU';
+const RETURN_REASON_NAME = 'Devolución';
 
 const calculateStockAdjustmentValues = ({
     product,
@@ -56,118 +57,6 @@ const calculateStockAdjustmentValues = ({
     };
 };
 
-const createStockAdjustmentInTransaction = async ({
-    tx,
-    productId,
-    supplierId,
-    reasonId,
-    observations,
-    newStock,
-    userId,
-    base = null,
-    height = null
-}) => {
-
-    const product = await findSupplierProductByIds({
-        tx,
-        productId,
-        supplierId
-    });
-
-    const referenceNumber = await generateYearlyReferenceNumber({ type: REFERENCE_NUMBER_TYPE, tx });
-
-    const productName = product.name;
-    const supplierName = product.supplier?.tradeName || '';
-
-    const {
-        previousStock,
-        difference,
-        previousConvertedQuantity,
-        newConvertedQuantity,
-        convertedDifference,
-        productBase,
-        productHeight
-    } = calculateStockAdjustmentValues({
-        product,
-        newStock,
-        base,
-        height
-    });
-
-    const adjustmentType = difference >= 0
-        ? StockAdjustmentType.INCREASE
-        : StockAdjustmentType.DECREASE;
-
-    const adjustment = await tx.stockAdjustment.create({
-        data: {
-            referenceNumber,
-            type: adjustmentType,
-            observations,
-            status: AdjustmentStatus.APPLIED,
-            appliedAt: new Date(),
-            reason: {
-                connect: {
-                    id: reasonId
-                }
-            },
-            createdBy: {
-                connect: {
-                    id: userId
-                }
-            },
-            approvedBy: {
-                connect: {
-                    id: userId
-                }
-            },
-            details: {
-                create: {
-                    productId,
-                    supplierId,
-                    productName,
-                    supplierName,
-
-                    previousStock,
-                    newStock,
-                    difference,
-
-                    previousConvertedQuantity,
-                    newConvertedQuantity,
-                    convertedDifference,
-
-                    productBase,
-                    productHeight
-                }
-            }
-        },
-        include: {
-            details: true
-        }
-    });
-
-    await createStockAdjustmentMovement({
-        tx,
-        adjustment,
-        productId,
-        supplierId,
-        reasonId,
-        previousStock,
-        previousConvertedQuantity,
-        newStock,
-        newConvertedQuantity,
-        difference,
-        convertedDifference
-    });
-
-    return adjustSupplierProductStock({
-        tx,
-        productId,
-        supplierId,
-        newStock,
-        newConvertedQuantity
-    });
-};
-
 export const createStockAdjustment = async ({
     tx = null,
     productId,
@@ -177,20 +66,116 @@ export const createStockAdjustment = async ({
     newStock,
     userId,
     base = null,
-    height = null
+    height = null,
+    returnedQuantity = null
 }) => {
 
-    const execute = (transaction) => createStockAdjustmentInTransaction({
-        tx: transaction,
-        productId,
-        supplierId,
-        reasonId,
-        observations,
-        newStock,
-        userId,
-        base,
-        height
-    });
+    const execute = async (transaction) => {
+
+        const product = await findSupplierProductByIds({
+            tx: transaction,
+            productId,
+            supplierId
+        });
+
+        const referenceNumber = await generateYearlyReferenceNumber({ type: REFERENCE_NUMBER_TYPE, tx: transaction });
+
+        const productName = product.name;
+        const supplierName = product.supplier?.tradeName || '';
+        const isReturnAdjustment = returnedQuantity !== null && returnedQuantity !== undefined;
+        const resolvedNewStock = isReturnAdjustment
+            ? normalizeDecimal(Number(toNumber(product.currentStock) || 0) + Number(returnedQuantity))
+            : newStock;
+
+        const {
+            previousStock,
+            newStock: adjustedNewStock,
+            difference,
+            previousConvertedQuantity,
+            newConvertedQuantity,
+            convertedDifference,
+            productBase,
+            productHeight
+        } = calculateStockAdjustmentValues({
+            product,
+            newStock: resolvedNewStock,
+            base,
+            height
+        });
+
+        const adjustmentType = difference >= 0
+            ? StockAdjustmentType.INCREASE
+            : StockAdjustmentType.DECREASE;
+
+        const adjustment = await transaction.stockAdjustment.create({
+            data: {
+                referenceNumber,
+                type: adjustmentType,
+                observations,
+                status: AdjustmentStatus.APPLIED,
+                appliedAt: new Date(),
+                reason: {
+                    connect: isReturnAdjustment
+                        ? { name: RETURN_REASON_NAME }
+                        : { id: reasonId }
+                },
+                createdBy: {
+                    connect: {
+                        id: userId
+                    }
+                },
+                approvedBy: {
+                    connect: {
+                        id: userId
+                    }
+                },
+                details: {
+                    create: {
+                        productId,
+                        supplierId,
+                        productName,
+                        supplierName,
+
+                        previousStock,
+                        newStock: adjustedNewStock,
+                        difference,
+
+                        previousConvertedQuantity,
+                        newConvertedQuantity,
+                        convertedDifference,
+
+                        productBase,
+                        productHeight
+                    }
+                }
+            },
+            include: {
+                details: true
+            }
+        });
+
+        await createStockAdjustmentMovement({
+            tx: transaction,
+            adjustment,
+            productId,
+            supplierId,
+            reasonId,
+            previousStock,
+            previousConvertedQuantity,
+            newStock: adjustedNewStock,
+            newConvertedQuantity,
+            difference,
+            convertedDifference
+        });
+
+        return adjustSupplierProductStock({
+            tx: transaction,
+            productId,
+            supplierId,
+            newStock: adjustedNewStock,
+            newConvertedQuantity
+        });
+    };
 
     if (tx) return execute(tx);
 

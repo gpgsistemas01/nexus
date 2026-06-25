@@ -115,6 +115,29 @@ describe('productService submit operations', () => {
       reasonId: 'reason-1',
       observations: 'Ajuste por conteo',
       newStock: 25,
+      returnedQuantity: undefined,
+      userId: 'user-1'
+    });
+  });
+
+  it('delega la cantidad devuelta para que el ajuste calcule el nuevo stock en backend', async () => {
+    const productDto = {
+      supplierId: 'supplier-1',
+      observations: 'Producto devuelto',
+      returnedQuantity: 4
+    };
+    const adjustment = { id: 'adjustment-1', productId: 'product-1' };
+
+    createStockAdjustment.mockResolvedValue(adjustment);
+
+    await expect(updateProductStock({ id: 'product-1', userId: 'user-1', productDto })).resolves.toEqual(adjustment);
+    expect(createStockAdjustment).toHaveBeenCalledWith({
+      productId: 'product-1',
+      supplierId: 'supplier-1',
+      reasonId: undefined,
+      observations: 'Producto devuelto',
+      newStock: undefined,
+      returnedQuantity: 4,
       userId: 'user-1'
     });
   });

@@ -258,6 +258,7 @@ export const updateProductStock = async ({
             reasonId: productDto.reasonId,
             observations: productDto.observations,
             newStock: productDto.newStock,
+            returnedQuantity: productDto.returnedQuantity,
             userId
         });
 

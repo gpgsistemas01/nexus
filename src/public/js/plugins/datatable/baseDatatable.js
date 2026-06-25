@@ -73,7 +73,7 @@ export const refreshProductTable = (details) => {
     table.draw();
 }
 
-export const renderActionButtons = ({ status, fulfillmentStatus, context, canAdjustStock = false }) => {
+export const renderActionButtons = ({ status, fulfillmentStatus, context, canAdjustStock = false, canReturnProduct = false }) => {
 
     const actions = [];
     const canEditGoodsIssue = context === 'goodsIssue' && fulfillmentStatus === 'Pendiente';
@@ -82,6 +82,8 @@ export const renderActionButtons = ({ status, fulfillmentStatus, context, canAdj
     if ((status === 'Abierta' || canEditGoodsIssue) || context === 'profile' || context === 'client' || context === 'supplier') actions.push('<button class="btn-edit"><i class="fa-solid fa-pencil"></i></button>');
 
     if ((context === 'product' || context === 'waste') && canAdjustStock) actions.push('<button class="btn-adjust-stock"><i class="fa-solid fa-boxes-stacked"></i></button>');
+
+    if (context === 'product' && canReturnProduct) actions.push('<button class="btn-return-product"><i class="fa-solid fa-rotate-left"></i></button>');
 
     if (status === 'Aprobada' && context === 'goodsIssue' && canSupplyGoodsIssue) actions.push('<button class="btn-edit-detail"><i class="fa fa-edit"></i></button>');
 
