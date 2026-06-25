@@ -134,7 +134,14 @@ export const initDetailsGoodsReceiptTable = (mode) => {
 
     createDataTable({
         selector: selectorProductTable,
-        options: { data: details, columns, responsive: false, scrollX: true }
+        options: {
+            data: details,
+            columns,
+            responsive: false,
+            scrollX: true,
+            scrollCollapse: true,
+            autoWidth: false
+        }
     });
 };
 
