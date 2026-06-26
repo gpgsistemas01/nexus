@@ -18,6 +18,10 @@
   --mdb-success-active-rgb: 14, 102, 55;
   --mdb-success-disabled: #a5d8b8;
   --mdb-success-disabled-rgb: 165, 216, 184;
+  --bs-primary: var(--mdb-primary);
+  --bs-primary-rgb: var(--mdb-primary-rgb);
+  --bs-success: var(--mdb-success);
+  --bs-success-rgb: var(--mdb-success-rgb);
   --datatable-excel-header: #107c41;
   --datatable-excel-header-rgb: 16, 124, 65;
   --datatable-excel-header-hover: #0b5f2a;
@@ -91,6 +95,19 @@ body {
   --mdb-btn-disabled-color: var(--mdb-light);
   --mdb-btn-disabled-bg: var(--mdb-primary-disabled);
   --mdb-btn-disabled-border-color: var(--mdb-primary-disabled);
+  --bs-btn-color: var(--mdb-btn-color);
+  --bs-btn-bg: var(--mdb-btn-bg);
+  --bs-btn-border-color: var(--mdb-btn-border-color);
+  --bs-btn-hover-color: var(--mdb-btn-hover-color);
+  --bs-btn-hover-bg: var(--mdb-btn-hover-bg);
+  --bs-btn-hover-border-color: var(--mdb-btn-hover-border-color);
+  --bs-btn-focus-shadow-rgb: var(--mdb-btn-focus-shadow-rgb);
+  --bs-btn-active-color: var(--mdb-btn-active-color);
+  --bs-btn-active-bg: var(--mdb-btn-active-bg);
+  --bs-btn-active-border-color: var(--mdb-btn-active-border-color);
+  --bs-btn-disabled-color: var(--mdb-btn-disabled-color);
+  --bs-btn-disabled-bg: var(--mdb-btn-disabled-bg);
+  --bs-btn-disabled-border-color: var(--mdb-btn-disabled-border-color);
 }
 
 .btn-success {
@@ -135,6 +152,18 @@ body {
   --mdb-btn-disabled-color: var(--mdb-primary-disabled);
   --mdb-btn-disabled-bg: transparent;
   --mdb-btn-disabled-border-color: var(--mdb-primary-disabled);
+  --bs-btn-color: var(--mdb-btn-color);
+  --bs-btn-border-color: var(--mdb-btn-border-color);
+  --bs-btn-hover-color: var(--mdb-btn-hover-color);
+  --bs-btn-hover-bg: var(--mdb-btn-hover-bg);
+  --bs-btn-hover-border-color: var(--mdb-btn-hover-border-color);
+  --bs-btn-focus-shadow-rgb: var(--mdb-btn-focus-shadow-rgb);
+  --bs-btn-active-color: var(--mdb-btn-active-color);
+  --bs-btn-active-bg: var(--mdb-btn-active-bg);
+  --bs-btn-active-border-color: var(--mdb-btn-active-border-color);
+  --bs-btn-disabled-color: var(--mdb-btn-disabled-color);
+  --bs-btn-disabled-bg: var(--mdb-btn-disabled-bg);
+  --bs-btn-disabled-border-color: var(--mdb-btn-disabled-border-color);
 }
 
 .btn-outline-success {
@@ -150,49 +179,6 @@ body {
   --mdb-btn-disabled-color: var(--mdb-success-disabled);
   --mdb-btn-disabled-bg: transparent;
   --mdb-btn-disabled-border-color: var(--mdb-success-disabled);
-}
-
-
-.btn-info,
-.btn-danger {
-  --mdb-btn-color: var(--mdb-light);
-  --mdb-btn-bg: var(--mdb-primary);
-  --mdb-btn-border-color: var(--mdb-primary);
-  --mdb-btn-hover-color: var(--mdb-light);
-  --mdb-btn-hover-bg: var(--mdb-primary-hover);
-  --mdb-btn-hover-border-color: var(--mdb-primary-hover);
-  --mdb-btn-focus-shadow-rgb: var(--mdb-primary-hover-rgb);
-  --mdb-btn-active-color: var(--mdb-light);
-  --mdb-btn-active-bg: var(--mdb-primary-active);
-  --mdb-btn-active-border-color: var(--mdb-primary-active);
-  --mdb-btn-disabled-color: var(--mdb-light);
-  --mdb-btn-disabled-bg: var(--mdb-primary-disabled);
-  --mdb-btn-disabled-border-color: var(--mdb-primary-disabled);
-}
-
-.btn-secondary {
-  --mdb-btn-color: var(--mdb-light);
-  --mdb-btn-bg: var(--mdb-primary);
-  --mdb-btn-border-color: var(--mdb-primary);
-  --mdb-btn-hover-color: var(--mdb-light);
-  --mdb-btn-hover-bg: var(--mdb-primary-hover);
-  --mdb-btn-hover-border-color: var(--mdb-primary-hover);
-  --mdb-btn-focus-shadow-rgb: var(--mdb-primary-hover-rgb);
-  --mdb-btn-active-color: var(--mdb-light);
-  --mdb-btn-active-bg: var(--mdb-primary-active);
-  --mdb-btn-active-border-color: var(--mdb-primary-active);
-}
-
-.btn-outline-secondary {
-  --mdb-btn-color: var(--mdb-primary);
-  --mdb-btn-border-color: var(--mdb-primary);
-  --mdb-btn-hover-color: var(--mdb-light);
-  --mdb-btn-hover-bg: var(--mdb-primary-hover);
-  --mdb-btn-hover-border-color: var(--mdb-primary-hover);
-  --mdb-btn-focus-shadow-rgb: var(--mdb-primary-hover-rgb);
-  --mdb-btn-active-color: var(--mdb-light);
-  --mdb-btn-active-bg: var(--mdb-primary-active);
-  --mdb-btn-active-border-color: var(--mdb-primary-active);
 }
 
 /* list styles */
@@ -915,6 +901,31 @@ a:hover {
 :where(.form-control, .form-select, input, select, textarea):focus,
 :where(.form-control, .form-select, input, select, textarea):focus-visible {
   background-color: #ffffff;
+}
+
+.form-outline .form-control:focus ~ .form-label,
+.form-outline .form-control.active ~ .form-label {
+  color: var(--mdb-accent) !important;
+}
+
+.form-outline .form-control:focus ~ .form-notch .form-notch-leading,
+.form-outline .form-control:focus ~ .form-notch .form-notch-middle,
+.form-outline .form-control:focus ~ .form-notch .form-notch-trailing,
+.form-outline .form-control.active ~ .form-notch .form-notch-leading,
+.form-outline .form-control.active ~ .form-notch .form-notch-middle,
+.form-outline .form-control.active ~ .form-notch .form-notch-trailing {
+  border-color: var(--mdb-accent) !important;
+  box-shadow: 0 1px 0 0 var(--mdb-accent) !important;
+}
+
+.form-check-input:focus {
+  border-color: var(--mdb-accent) !important;
+  box-shadow: 0 0 0 0.26rem rgba(var(--mdb-focus-rgb), 0.28) !important;
+}
+
+.form-check-input:checked {
+  background-color: var(--mdb-primary) !important;
+  border-color: var(--mdb-primary) !important;
 }
 
 .select2-container--default.select2-container--focus .select2-selection--single,
