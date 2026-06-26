@@ -63,6 +63,18 @@ body {
   --mdb-body-bg: #ffffff;
 }
 
+/* accessibility focus styles */
+
+:where(a, button, input, select, textarea, [role="button"], [tabindex]):focus-visible {
+  box-shadow: 0 0 0 0.24rem rgba(var(--mdb-primary-rgb), 0.24) !important;
+  outline: 2px solid var(--mdb-primary) !important;
+  outline-offset: 2px;
+}
+
+:where(a, button, input, select, textarea, [role="button"], [tabindex]):focus:not(:focus-visible) {
+  outline: 0;
+}
+
 /* tooltip styles */
 
 .tooltip {
@@ -899,8 +911,45 @@ a:hover {
 
 /* text styles */
 
-.form-control, .form-control:focus {
-    color: #000000
+/* form styles */
+
+.form-outline .form-control,
+.form-outline .form-select,
+textarea.form-control {
+  background-color: #ffffff;
+  border: 1px solid rgba(var(--mdb-secondary-rgb), 0.22);
+  border-radius: 0.65rem;
+  color: var(--mdb-dark);
+  min-height: 2.55rem;
+  transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.form-outline .form-control:focus,
+.form-outline .form-select:focus,
+textarea.form-control:focus {
+  background-color: #ffffff;
+  border-color: var(--mdb-primary);
+  box-shadow: 0 0 0 0.18rem rgba(var(--mdb-primary-rgb), 0.18);
+  color: var(--mdb-dark);
+}
+
+.form-outline .form-control:focus ~ .form-label,
+.form-outline .form-control.active ~ .form-label,
+.form-outline .form-select:focus ~ .form-label,
+.form-outline .form-select.active ~ .form-label {
+  color: var(--mdb-primary);
+}
+
+.form-outline .form-control[readonly],
+.form-outline .form-control:disabled {
+  background-color: #f6f8f6;
+  border-color: rgba(var(--mdb-secondary-rgb), 0.16);
+  color: rgba(var(--mdb-secondary-rgb), 0.72);
+}
+
+.form-control,
+.form-control:focus {
+  color: var(--mdb-dark);
 }
 
 label {
