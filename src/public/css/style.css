@@ -987,11 +987,20 @@ a:hover {
 
 /* focus styles: keep MDB's native input border/notch behavior intact */
 
-:where(.form-control, .form-select, input, select, textarea, [tabindex]):focus,
-:where(.form-control, .form-select, input, select, textarea, [tabindex]):focus-visible {
+:where(.form-control, .form-select, input, select, textarea, [tabindex]):not(.form-check-input):focus,
+:where(.form-control, .form-select, input, select, textarea, [tabindex]):not(.form-check-input):focus-visible {
   border-color: var(--mdb-focus) !important;
   box-shadow: 0 0 0 0.26rem rgba(var(--mdb-focus-rgb), 0.28) !important;
   outline: none !important;
+}
+
+
+.form-check-input:checked {
+  border-color: var(--mdb-primary) !important;
+}
+
+.form-check-input[type="radio"]:checked::after {
+  background-color: var(--mdb-primary) !important;
 }
 
 .form-check:not(.form-switch) .form-check-input[type="checkbox"] {
