@@ -1042,8 +1042,8 @@ a:hover {
   background-color: var(--mdb-primary) !important;
 }
 
-.form-check-input:checked:focus::before {
-  box-shadow: 0 0 0 0.26rem rgba(var(--mdb-primary-rgb), 0.28) !important;
+.form-check:not(.form-switch) .form-check-input[type="checkbox"]:checked:focus:before {
+  box-shadow: rgb(var(--mdb-primary-rgb)) 0px 0px 0px 13px !important;
 }
 
 .select2-container--default.select2-container--focus .select2-selection--single,
