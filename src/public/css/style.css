@@ -1010,7 +1010,6 @@ a:hover {
 .form-check:not(.form-switch) .form-check-input[type="checkbox"]:focus,
 .form-check:not(.form-switch) .form-check-input[type="checkbox"]:focus-visible {
   border-color: var(--mdb-primary) !important;
-  box-shadow: 0 0 0 0.26rem rgba(var(--mdb-primary-rgb), 0.28) !important;
 }
 
 
@@ -1036,12 +1035,15 @@ a:hover {
 .form-check:not(.form-switch) .form-check-input[type="checkbox"]:indeterminate:focus-visible {
   background-color: var(--mdb-primary) !important;
   border-color: var(--mdb-primary) !important;
-  box-shadow: 0 0 0 0.26rem rgba(var(--mdb-primary-rgb), 0.28) !important;
 }
 
 .form-check:not(.form-switch) .form-check-input[type="checkbox"]:checked::before,
 .form-check:not(.form-switch) .form-check-input[type="checkbox"]:indeterminate::before {
   background-color: var(--mdb-primary) !important;
+}
+
+.form-check-input:checked:focus::before {
+  box-shadow: 0 0 0 0.26rem rgba(var(--mdb-primary-rgb), 0.28) !important;
 }
 
 .select2-container--default.select2-container--focus .select2-selection--single,
