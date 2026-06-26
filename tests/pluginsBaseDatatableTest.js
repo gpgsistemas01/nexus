@@ -96,7 +96,7 @@ describe('baseDatatable', () => {
     ]);
   });
 
-  it('sincroniza encabezados agrupados responsive reutilizando data-responsive-group', () => {
+  it('mantiene visible el encabezado con colspan mientras alguna subcolumna permanezca visible', () => {
     const on = vi.fn();
     vi.stubGlobal('$', () => ({ on }));
 
@@ -136,14 +136,14 @@ describe('baseDatatable', () => {
 
     configureResponsiveHeaderGroups(table);
 
-    expect(groupHeader.hidden).toBe(true);
+    expect(groupHeader.hidden).toBe(false);
     expect(groupHeader.colSpan).toBe(1);
     expect(childHeaders[0].hidden).toBe(false);
     expect(childHeaders[1].hidden).toBe(true);
     expect(on).toHaveBeenCalledWith('responsive-resize.dt column-visibility.dt draw.dt', expect.any(Function));
   });
 
-  it('oculta encabezados con colspan aunque no tengan data-responsive-group', () => {
+  it('oculta encabezados con colspan cuando todas sus subcolumnas están ocultas aunque no tengan data-responsive-group', () => {
     const on = vi.fn();
     vi.stubGlobal('$', () => ({ on }));
 
