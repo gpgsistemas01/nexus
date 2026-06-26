@@ -16,6 +16,16 @@
   --datatable-excel-row-alt: #f3fbf6;
   --datatable-excel-row-hover: #e2f0d9;
   --datatable-excel-selection: #c6e0b4;
+  --product-detail-header: #128a5a;
+  --product-detail-header-rgb: 18, 138, 90;
+  --product-detail-header-light: #34c986;
+  --product-detail-header-hover: #0b6843;
+  --product-detail-border: #91d5b4;
+  --product-detail-border-soft: #cfeee0;
+  --product-detail-row-alt: #f0fbf6;
+  --product-detail-row-hover: #daf4e7;
+  --product-detail-selection: #bdebd3;
+
 
   --mdb-secondary: #332D2D;
   --mdb-secondary-rgb: 51, 45, 45;
@@ -644,7 +654,7 @@ table.dataTable.datatable-table .table-action-btn:focus-visible {
 #productTable.product-detail-table,
 table.dataTable#productTable.product-detail-table {
   background-color: #ffffff;
-  border: 1px solid var(--datatable-excel-border) !important;
+  border: 1px solid var(--product-detail-border) !important;
   border-collapse: separate !important;
   border-radius: 0.5rem;
   border-spacing: 0;
@@ -666,20 +676,30 @@ table.dataTable#productTable.product-detail-table {
 
 #productTable.product-detail-table thead th,
 table.dataTable#productTable.product-detail-table thead th {
-  background: linear-gradient(180deg, #2fbf73 0%, #148a4c 100%);
-  border-bottom: 2px solid #0d6a38 !important;
+  background: linear-gradient(180deg, var(--product-detail-header-light) 0%, var(--product-detail-header) 100%);
+  border-bottom: 2px solid var(--product-detail-header-hover) !important;
   border-inline-end: 1px solid rgba(255, 255, 255, 0.28);
   color: var(--mdb-light);
   font-weight: 700;
+  letter-spacing: normal;
   padding: 0.75rem;
-  text-align: center;
+  text-align: left;
+  text-shadow: none;
+  text-transform: none;
   vertical-align: middle;
+}
+
+#productTable.product-detail-table thead tr:not(:first-child) th,
+table.dataTable#productTable.product-detail-table thead tr:not(:first-child) th {
+  background: #e9f9f1;
+  color: var(--product-detail-header-hover);
+  font-size: 0.85rem;
 }
 
 #productTable.product-detail-table tbody td,
 table.dataTable#productTable.product-detail-table tbody td {
-  border-block-end: 1px solid var(--datatable-excel-border-soft);
-  border-inline-end: 1px solid var(--datatable-excel-border-soft);
+  border-block-end: 1px solid var(--product-detail-border-soft);
+  border-inline-end: 1px solid var(--product-detail-border-soft);
   color: var(--mdb-secondary);
   padding: 0.75rem;
   vertical-align: middle;
@@ -687,18 +707,41 @@ table.dataTable#productTable.product-detail-table tbody td {
 
 #productTable.product-detail-table tbody tr:nth-child(even),
 table.dataTable#productTable.product-detail-table tbody tr:nth-child(even) {
-  background-color: var(--datatable-excel-row-alt);
+  background-color: var(--product-detail-row-alt);
 }
 
 #productTable.product-detail-table tbody tr:hover,
 table.dataTable#productTable.product-detail-table tbody tr:hover {
-  background-color: var(--datatable-excel-row-hover);
+  background-color: var(--product-detail-row-hover);
+}
+
+#productTable.product-detail-table tbody tr.selected,
+table.dataTable#productTable.product-detail-table tbody tr.selected,
+table.dataTable#productTable.product-detail-table tbody tr.selected > * {
+  background-color: var(--product-detail-selection) !important;
+  color: var(--mdb-secondary) !important;
+}
+
+#productTable.product-detail-table .sorting::before,
+#productTable.product-detail-table .sorting::after,
+#productTable.product-detail-table .sorting_asc::before,
+#productTable.product-detail-table .sorting_asc::after,
+#productTable.product-detail-table .sorting_desc::before,
+#productTable.product-detail-table .sorting_desc::after,
+table.dataTable#productTable.product-detail-table .sorting::before,
+table.dataTable#productTable.product-detail-table .sorting::after,
+table.dataTable#productTable.product-detail-table .sorting_asc::before,
+table.dataTable#productTable.product-detail-table .sorting_asc::after,
+table.dataTable#productTable.product-detail-table .sorting_desc::before,
+table.dataTable#productTable.product-detail-table .sorting_desc::after {
+  color: var(--mdb-light);
+  opacity: 0.9 !important;
 }
 
 #productTable.product-detail-table .form-control,
 #productTable.product-detail-table .form-select {
-  background-color: var(--mdb-primary-soft);
-  border: 1px solid #a8cfb2;
+  background-color: #eefaf4;
+  border: 1px solid var(--product-detail-border);
   border-radius: 0.55rem;
   color: var(--mdb-secondary);
   min-height: 2.35rem;
@@ -707,8 +750,8 @@ table.dataTable#productTable.product-detail-table tbody tr:hover {
 #productTable.product-detail-table .form-control:focus,
 #productTable.product-detail-table .form-select:focus {
   background-color: #ffffff;
-  border-color: var(--mdb-primary-hover);
-  box-shadow: 0 0 0 0.18rem rgba(var(--mdb-primary-rgb), 0.18);
+  border-color: var(--product-detail-header);
+  box-shadow: 0 0 0 0.18rem rgba(var(--product-detail-header-rgb), 0.18);
 }
 
 /* card styles */
