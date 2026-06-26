@@ -884,22 +884,6 @@ a:hover {
 
 /* form styles */
 
-input.form-control[type="text"],
-input.form-control[type="search"],
-input.form-control[type="email"],
-input.form-control[type="password"],
-input.form-control[type="tel"],
-input.form-control[type="url"],
-input.form-control:not([type]) {
-  background-color: #ffffff;
-  border: 1px solid var(--form-field-border);
-  border-radius: var(--form-field-border-radius);
-  color: var(--mdb-dark);
-  min-height: 2.55rem;
-  padding: var(--form-field-padding);
-  transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
-}
-
 .select2-container--default .select2-selection--single .select2-selection__rendered {
   color: var(--mdb-dark);
 }
@@ -908,18 +892,8 @@ input.form-control:not([type]) {
   color: rgba(var(--mdb-secondary-rgb), 0.7);
 }
 
-input.form-control[type="text"].active ~ .form-label,
-input.form-control[type="search"].active ~ .form-label,
-input.form-control[type="email"].active ~ .form-label,
-input.form-control[type="password"].active ~ .form-label,
-input.form-control[type="tel"].active ~ .form-label,
-input.form-control[type="url"].active ~ .form-label,
-input.form-control:not([type]).active ~ .form-label {
-  color: var(--mdb-focus);
-}
-
-.form-outline .form-control[readonly],
-.form-outline .form-control:disabled {
+.form-outline .form-control[readonly][type]:not([type="text"]):not([type="search"]):not([type="email"]):not([type="password"]):not([type="tel"]):not([type="url"]),
+.form-outline .form-control:disabled[type]:not([type="text"]):not([type="search"]):not([type="email"]):not([type="password"]):not([type="tel"]):not([type="url"]) {
   background-color: #f6f8f6;
   border-color: rgba(var(--mdb-secondary-rgb), 0.16);
   color: rgba(var(--mdb-secondary-rgb), 0.72);
