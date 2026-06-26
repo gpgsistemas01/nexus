@@ -884,9 +884,6 @@ a:hover {
 
 /* form styles */
 
-.form-outline .form-control,
-.form-outline .form-select,
-textarea.form-control,
 input.form-control[type="text"],
 input.form-control[type="search"],
 input.form-control[type="email"],
@@ -911,8 +908,13 @@ input.form-control:not([type]) {
   color: rgba(var(--mdb-secondary-rgb), 0.7);
 }
 
-.form-outline .form-control.active ~ .form-label,
-.form-outline .form-select.active ~ .form-label {
+input.form-control[type="text"].active ~ .form-label,
+input.form-control[type="search"].active ~ .form-label,
+input.form-control[type="email"].active ~ .form-label,
+input.form-control[type="password"].active ~ .form-label,
+input.form-control[type="tel"].active ~ .form-label,
+input.form-control[type="url"].active ~ .form-label,
+input.form-control:not([type]).active ~ .form-label {
   color: var(--mdb-focus);
 }
 
