@@ -49,8 +49,8 @@
 
   --mdb-accent: #FCA311;
   --mdb-accent-rgb: 252, 163, 17;
-  --mdb-focus: #ff6f00;
-  --mdb-focus-rgb: 255, 111, 0;
+  --mdb-focus: var(--mdb-primary);
+  --mdb-focus-rgb: var(--mdb-primary-rgb);
 
   --mdb-light: #FBFBFB;
   --mdb-light-rgb: 251, 251, 251;
@@ -295,12 +295,12 @@ body {
 .table-filters .form-control,
 .table-filters .form-select,
 .table-filters .select2-container--default .select2-selection--single {
-  background-color: #fffdf8;
-  border: 1px solid rgba(var(--mdb-accent-rgb), 0.5);
+  background-color: var(--mdb-light);
+  border: 1px solid var(--form-field-border);
   border-radius: var(--form-field-border-radius);
-  box-shadow: 0 0.25rem 0.65rem rgba(var(--mdb-secondary-rgb), 0.06);
-  color: var(--mdb-secondary);
-  min-height: 2.55rem;
+  box-shadow: none;
+  color: var(--mdb-body-color);
+  min-height: 2.45rem;
   padding: var(--form-field-padding);
   transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
 }
@@ -382,7 +382,7 @@ table.dataTable.datatable-table thead th {
   font-weight: 700;
   letter-spacing: normal;
   padding: 0.75rem;
-  text-align: left;
+  text-align: center;
   text-shadow: none;
   text-transform: none;
   vertical-align: middle;
@@ -693,7 +693,7 @@ table.dataTable#productTable.product-detail-table thead th {
   font-weight: 700;
   letter-spacing: normal;
   padding: 0.75rem;
-  text-align: left;
+  text-align: center;
   text-shadow: none;
   text-transform: none;
   vertical-align: middle;
@@ -885,15 +885,11 @@ a:hover {
   color: rgba(var(--mdb-secondary-rgb), 0.72);
 }
 
-.form-control {
-  color: var(--mdb-dark);
-}
-
 /* unified focus styles */
 
 :where(.form-control, .form-select, .btn, button, input, select, textarea, [role="button"], [tabindex]):focus,
 :where(.form-control, .form-select, .btn, button, input, select, textarea, [role="button"], [tabindex]):focus-visible {
-  border-color: var(--mdb-accent) !important;
+  border-color: var(--mdb-focus) !important;
   box-shadow: 0 0 0 0.26rem rgba(var(--mdb-focus-rgb), 0.28) !important;
   outline: none !important;
 }
@@ -905,7 +901,7 @@ a:hover {
 
 .form-outline .form-control:focus ~ .form-label,
 .form-outline .form-control.active ~ .form-label {
-  color: var(--mdb-accent) !important;
+  color: var(--mdb-primary) !important;
 }
 
 .form-outline .form-control:focus ~ .form-notch .form-notch-leading,
@@ -914,12 +910,12 @@ a:hover {
 .form-outline .form-control.active ~ .form-notch .form-notch-leading,
 .form-outline .form-control.active ~ .form-notch .form-notch-middle,
 .form-outline .form-control.active ~ .form-notch .form-notch-trailing {
-  border-color: var(--mdb-accent) !important;
-  box-shadow: 0 1px 0 0 var(--mdb-accent) !important;
+  border-color: var(--mdb-primary) !important;
+  box-shadow: 0 1px 0 0 var(--mdb-primary) !important;
 }
 
 .form-check-input:focus {
-  border-color: var(--mdb-accent) !important;
+  border-color: var(--mdb-focus) !important;
   box-shadow: 0 0 0 0.26rem rgba(var(--mdb-focus-rgb), 0.28) !important;
 }
 
@@ -930,7 +926,7 @@ a:hover {
 
 .select2-container--default.select2-container--focus .select2-selection--single,
 .select2-container--default.select2-container--open .select2-selection--single {
-  border-color: var(--mdb-accent) !important;
+  border-color: var(--mdb-focus) !important;
   box-shadow: 0 0 0 0.26rem rgba(var(--mdb-focus-rgb), 0.28) !important;
   outline: none !important;
 }
@@ -941,7 +937,6 @@ label {
 
 span {
   text-transform: none;
-  font-size: large;
 }
 
 textarea ~ div[data-error-for] {
@@ -949,7 +944,7 @@ textarea ~ div[data-error-for] {
 }
 
 .modal-content {
-  color: var(--mdb-body-bg);
+  color: var(--mdb-body-color);
 }
 
 /* background styles */
@@ -974,4 +969,87 @@ body section {
 
 .table-action-btn i {
   pointer-events: none;
+}
+
+/* refinements for form controls and table actions */
+.form-select,
+.table-filters .form-select {
+  background-position: right 0.8rem center;
+  padding-right: 2.25rem;
+}
+
+.select2-container--default .select2-selection--single {
+  min-height: 2.45rem;
+}
+
+.select2-container--default .select2-selection--single .select2-selection__rendered {
+  color: var(--mdb-body-color);
+  line-height: 2.35rem;
+  padding-left: 0.8rem;
+  padding-right: 2.25rem;
+}
+
+.select2-container--default .select2-selection--single .select2-selection__arrow {
+  height: 100%;
+  right: 0.55rem;
+  top: 0;
+}
+
+.form-control,
+.form-select,
+.form-outline .form-control,
+.form-outline .form-select,
+.select2-container--default .select2-selection--single .select2-selection__rendered {
+  color: var(--mdb-body-color);
+}
+
+.form-control::placeholder,
+.form-select::placeholder {
+  color: rgba(var(--mdb-secondary-rgb), 0.65);
+}
+
+.form-control:disabled,
+.form-select:disabled,
+.form-control[readonly] {
+  -webkit-text-fill-color: rgba(var(--mdb-secondary-rgb), 0.72);
+  color: rgba(var(--mdb-secondary-rgb), 0.72);
+}
+
+.form-check-input {
+  border-color: rgba(var(--mdb-secondary-rgb), 0.45);
+}
+
+.form-check-input:checked,
+.form-check-input[type="checkbox"]:checked,
+.form-check-input[type="radio"]:checked {
+  background-color: var(--mdb-primary) !important;
+  border-color: var(--mdb-primary) !important;
+}
+
+.form-check-input:checked:focus,
+.form-check-input[type="checkbox"]:checked:focus,
+.form-check-input[type="radio"]:checked:focus {
+  box-shadow: 0 0 0 0.26rem rgba(var(--mdb-primary-rgb), 0.28) !important;
+}
+
+.table.datatable-table td:has(.table-action-btn),
+table.dataTable.datatable-table td:has(.table-action-btn),
+#productTable.product-detail-table td:has(.table-action-btn),
+table.dataTable#productTable.product-detail-table td:has(.table-action-btn) {
+  text-align: center;
+  white-space: nowrap;
+}
+
+.table.datatable-table td:has(.table-action-btn) > *,
+table.dataTable.datatable-table td:has(.table-action-btn) > *,
+#productTable.product-detail-table td:has(.table-action-btn) > *,
+table.dataTable#productTable.product-detail-table td:has(.table-action-btn) > * {
+  vertical-align: middle;
+}
+
+.nav-tabs .nav-link:focus,
+.nav-tabs .nav-link:focus-visible {
+  border-color: var(--mdb-primary) !important;
+  box-shadow: 0 0 0 0.26rem rgba(var(--mdb-primary-rgb), 0.28) !important;
+  color: var(--mdb-primary) !important;
 }
