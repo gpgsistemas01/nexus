@@ -8,6 +8,16 @@
   --mdb-primary-active: #0b5f2a;
   --mdb-primary-active-rgb: 11, 95, 42;
   --mdb-primary-soft: #e8f6ee;
+  --mdb-primary-disabled: #9bd5b4;
+  --mdb-primary-disabled-rgb: 155, 213, 180;
+  --mdb-success: #1f9d55;
+  --mdb-success-rgb: 31, 157, 85;
+  --mdb-success-hover: #178247;
+  --mdb-success-hover-rgb: 23, 130, 71;
+  --mdb-success-active: #0e6637;
+  --mdb-success-active-rgb: 14, 102, 55;
+  --mdb-success-disabled: #a5d8b8;
+  --mdb-success-disabled-rgb: 165, 216, 184;
   --datatable-excel-header: #107c41;
   --datatable-excel-header-rgb: 16, 124, 65;
   --datatable-excel-header-hover: #0b5f2a;
@@ -73,19 +83,25 @@ body {
   --mdb-btn-active-color: var(--mdb-light);
   --mdb-btn-active-bg: var(--mdb-primary-active);
   --mdb-btn-active-border-color: var(--mdb-primary-active);
+  --mdb-btn-disabled-color: var(--mdb-light);
+  --mdb-btn-disabled-bg: var(--mdb-primary-disabled);
+  --mdb-btn-disabled-border-color: var(--mdb-primary-disabled);
 }
 
 .btn-success {
   --mdb-btn-color: var(--mdb-light);
-  --mdb-btn-bg: #1f9d55;
-  --mdb-btn-border-color: #1f9d55;
+  --mdb-btn-bg: var(--mdb-success);
+  --mdb-btn-border-color: var(--mdb-success);
   --mdb-btn-hover-color: var(--mdb-light);
-  --mdb-btn-hover-bg: #178247;
-  --mdb-btn-hover-border-color: #178247;
-  --mdb-btn-focus-shadow-rgb: 23, 130, 71;
+  --mdb-btn-hover-bg: var(--mdb-success-hover);
+  --mdb-btn-hover-border-color: var(--mdb-success-hover);
+  --mdb-btn-focus-shadow-rgb: var(--mdb-success-hover-rgb);
   --mdb-btn-active-color: var(--mdb-light);
-  --mdb-btn-active-bg: #0e6637;
-  --mdb-btn-active-border-color: #0e6637;
+  --mdb-btn-active-bg: var(--mdb-success-active);
+  --mdb-btn-active-border-color: var(--mdb-success-active);
+  --mdb-btn-disabled-color: var(--mdb-light);
+  --mdb-btn-disabled-bg: var(--mdb-success-disabled);
+  --mdb-btn-disabled-border-color: var(--mdb-success-disabled);
 }
 
 .btn-warning {
@@ -111,6 +127,24 @@ body {
   --mdb-btn-active-color: var(--mdb-light);
   --mdb-btn-active-bg: var(--mdb-primary-active);
   --mdb-btn-active-border-color: var(--mdb-primary-active);
+  --mdb-btn-disabled-color: var(--mdb-primary-disabled);
+  --mdb-btn-disabled-bg: transparent;
+  --mdb-btn-disabled-border-color: var(--mdb-primary-disabled);
+}
+
+.btn-outline-success {
+  --mdb-btn-color: var(--mdb-success);
+  --mdb-btn-border-color: var(--mdb-success);
+  --mdb-btn-hover-color: var(--mdb-light);
+  --mdb-btn-hover-bg: var(--mdb-success-hover);
+  --mdb-btn-hover-border-color: var(--mdb-success-hover);
+  --mdb-btn-focus-shadow-rgb: var(--mdb-success-hover-rgb);
+  --mdb-btn-active-color: var(--mdb-light);
+  --mdb-btn-active-bg: var(--mdb-success-active);
+  --mdb-btn-active-border-color: var(--mdb-success-active);
+  --mdb-btn-disabled-color: var(--mdb-success-disabled);
+  --mdb-btn-disabled-bg: transparent;
+  --mdb-btn-disabled-border-color: var(--mdb-success-disabled);
 }
 
 .btn-secondary {
