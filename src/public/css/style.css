@@ -65,18 +65,6 @@ body {
   --mdb-body-bg: #ffffff;
 }
 
-/* accessibility focus styles */
-
-:where(a, button, input, select, textarea, [role="button"], [tabindex]):focus-visible {
-  box-shadow: 0 0 0 0.32rem rgba(var(--mdb-focus-rgb), 0.34) !important;
-  outline: 3px solid var(--mdb-focus) !important;
-  outline-offset: 2px;
-}
-
-:where(a, button, input, select, textarea, [role="button"], [tabindex]):focus:not(:focus-visible) {
-  outline: 0;
-}
-
 /* tooltip styles */
 
 .tooltip {
@@ -177,30 +165,6 @@ body {
   --mdb-btn-disabled-color: var(--mdb-light);
   --mdb-btn-disabled-bg: var(--mdb-primary-disabled);
   --mdb-btn-disabled-border-color: var(--mdb-primary-disabled);
-}
-
-.btn-primary:focus-visible,
-.btn-success:focus-visible,
-.btn-info:focus-visible,
-.btn-danger:focus-visible,
-.btn-warning:focus-visible,
-.btn-secondary:focus-visible,
-.btn-outline-primary:focus-visible,
-.btn-outline-success:focus-visible,
-.btn-outline-secondary:focus-visible,
-.table-filter-button:focus-visible {
-  background-color: var(--mdb-primary-active) !important;
-  border-color: var(--mdb-primary-active) !important;
-  box-shadow: 0 0 0 0.32rem rgba(var(--mdb-focus-rgb), 0.38) !important;
-  color: var(--mdb-light) !important;
-  outline: 3px solid var(--mdb-focus) !important;
-  outline-offset: 2px;
-}
-
-.btn-outline-primary:focus-visible,
-.btn-outline-success:focus-visible,
-.btn-outline-secondary:focus-visible {
-  --mdb-btn-color: var(--mdb-light);
 }
 
 .btn-secondary {
@@ -326,14 +290,6 @@ body {
   width: 100%;
 }
 
-.dataTables_wrapper .dataTables_filter input:focus,
-.dataTables_wrapper .dataTables_length select:focus {
-  background-color: #ffffff;
-  border-color: var(--mdb-focus);
-  box-shadow: 0 0 0 0.26rem rgba(var(--mdb-focus-rgb), 0.26), inset 0 0 0 1px rgba(var(--mdb-focus-rgb), 0.32);
-  outline: none;
-}
-
 .table-filters {
   align-items: end;
   row-gap: 0.75rem;
@@ -359,16 +315,6 @@ body {
   transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-.table-filters .form-control:focus,
-.table-filters .form-select:focus,
-.table-filters .select2-container--default.select2-container--focus .select2-selection--single,
-.table-filters .select2-container--default.select2-container--open .select2-selection--single {
-  background-color: #ffffff;
-  border-color: var(--mdb-accent);
-  box-shadow: 0 0 0 0.26rem rgba(var(--mdb-focus-rgb), 0.28);
-  outline: none;
-}
-
 .table-filter-button {
   background: linear-gradient(180deg, #fff3d9 0%, #ffe2a8 100%) !important;
   border: 1px solid rgba(var(--mdb-accent-rgb), 0.85) !important;
@@ -382,18 +328,12 @@ body {
   transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, color 0.2s ease, transform 0.2s ease;
 }
 
-.table-filter-button:hover,
-.table-filter-button:focus {
+.table-filter-button:hover {
   background: linear-gradient(180deg, var(--mdb-accent) 0%, #e18d00 100%) !important;
   border-color: #d88500 !important;
   box-shadow: 0 0.45rem 0.9rem rgba(var(--mdb-accent-rgb), 0.28);
   color: var(--mdb-dark) !important;
   transform: translateY(-1px);
-}
-
-.table-filter-button:focus-visible {
-  outline: 2px solid var(--mdb-accent) !important;
-  outline-offset: 2px;
 }
 
 .table.datatable-table,
@@ -679,23 +619,6 @@ table.dataTable > tbody > tr.child td.child {
   transform: translateY(-1px);
 }
 
-.dataTables_wrapper .dataTables_paginate .paginate_button.page-item .page-link:focus,
-.dataTables_wrapper .dt-buttons .dt-button:focus,
-.table.datatable-table .table-action-btn:focus,
-table.dataTable.datatable-table .table-action-btn:focus {
-  box-shadow: 0 0 0 0.26rem rgba(var(--mdb-focus-rgb), 0.28) !important;
-  outline: 0 !important;
-}
-
-.dataTables_wrapper .dataTables_paginate .paginate_button.page-item .page-link:focus-visible,
-.dataTables_wrapper .dt-buttons .dt-button:focus-visible,
-.table.datatable-table .table-action-btn:focus-visible,
-table.dataTable.datatable-table .table-action-btn:focus-visible {
-  box-shadow: 0 0 0 0.3rem rgba(var(--mdb-focus-rgb), 0.34) !important;
-  outline: 3px solid var(--mdb-focus) !important;
-  outline-offset: 2px;
-}
-
 .dataTables_wrapper .dataTables_paginate .paginate_button.page-item.disabled .page-link,
 .dataTables_wrapper .dataTables_paginate .paginate_button.page-item.disabled:hover .page-link {
   background: #eef4f0 !important;
@@ -844,20 +767,6 @@ table.dataTable#productTable.product-detail-table .sorting_desc::after {
   min-height: 2.35rem;
 }
 
-#productTable.product-detail-table .form-control:focus,
-#productTable.product-detail-table .form-select:focus {
-  background-color: #ffffff;
-  border-color: var(--product-detail-header);
-  box-shadow: 0 0 0 0.18rem rgba(var(--product-detail-header-rgb), 0.18);
-}
-
-#productTable.product-detail-table .select2-container--default.select2-container--focus .select2-selection--single,
-#productTable.product-detail-table .select2-container--default.select2-container--open .select2-selection--single {
-  border-color: var(--product-detail-header);
-  box-shadow: 0 0 0 0.18rem rgba(var(--product-detail-header-rgb), 0.18);
-  outline: none;
-}
-
 /* card styles */
 
 .list-group .card {
@@ -982,15 +891,6 @@ textarea.form-control {
   transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-.form-outline .form-control:focus,
-.form-outline .form-select:focus,
-textarea.form-control:focus {
-  background-color: #ffffff;
-  border-color: var(--mdb-focus);
-  box-shadow: 0 0 0 0.26rem rgba(var(--mdb-focus-rgb), 0.28);
-  color: var(--mdb-dark);
-}
-
 .select2-container--default .select2-selection--single .select2-selection__rendered {
   color: var(--mdb-dark);
 }
@@ -999,16 +899,7 @@ textarea.form-control:focus {
   color: rgba(var(--mdb-secondary-rgb), 0.7);
 }
 
-.select2-container--default.select2-container--focus .select2-selection--single,
-.select2-container--default.select2-container--open .select2-selection--single {
-  border-color: var(--mdb-focus);
-  box-shadow: 0 0 0 0.26rem rgba(var(--mdb-focus-rgb), 0.28);
-  outline: none;
-}
-
-.form-outline .form-control:focus ~ .form-label,
 .form-outline .form-control.active ~ .form-label,
-.form-outline .form-select:focus ~ .form-label,
 .form-outline .form-select.active ~ .form-label {
   color: var(--mdb-focus);
 }
@@ -1020,9 +911,29 @@ textarea.form-control:focus {
   color: rgba(var(--mdb-secondary-rgb), 0.72);
 }
 
-.form-control,
-.form-control:focus {
+.form-control {
   color: var(--mdb-dark);
+}
+
+/* unified focus styles */
+
+:where(.form-control, .form-select, .btn, button, input, select, textarea, [role="button"], [tabindex]):focus,
+:where(.form-control, .form-select, .btn, button, input, select, textarea, [role="button"], [tabindex]):focus-visible {
+  border-color: var(--mdb-accent) !important;
+  box-shadow: 0 0 0 0.26rem rgba(var(--mdb-focus-rgb), 0.28) !important;
+  outline: none !important;
+}
+
+:where(.form-control, .form-select, input, select, textarea):focus,
+:where(.form-control, .form-select, input, select, textarea):focus-visible {
+  background-color: #ffffff;
+}
+
+.select2-container--default.select2-container--focus .select2-selection--single,
+.select2-container--default.select2-container--open .select2-selection--single {
+  border-color: var(--mdb-accent) !important;
+  box-shadow: 0 0 0 0.26rem rgba(var(--mdb-focus-rgb), 0.28) !important;
+  outline: none !important;
 }
 
 label {
