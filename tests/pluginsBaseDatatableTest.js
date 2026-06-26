@@ -136,7 +136,7 @@ describe('baseDatatable', () => {
 
     configureResponsiveHeaderGroups(table);
 
-    expect(groupHeader.hidden).toBe(false);
+    expect(groupHeader.hidden).toBe(true);
     expect(groupHeader.colSpan).toBe(1);
     expect(childHeaders[0].hidden).toBe(false);
     expect(childHeaders[1].hidden).toBe(true);

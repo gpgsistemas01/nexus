@@ -116,7 +116,7 @@ const syncResponsiveHeaderGroups = (table, groupedHeaders) => {
                 .find(header => header.getAttribute('data-responsive-group') === groupName)
             || null;
         const visibleChildren = children.filter(({ columnIndex }) => isResponsiveColumnVisible(table, columnIndex));
-        const isGroupVisible = visibleChildren.length > 0;
+        const isGroupVisible = visibleChildren.length === children.length;
 
         if (groupHeader) {
             groupHeader.hidden = !isGroupVisible;
