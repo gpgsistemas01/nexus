@@ -851,6 +851,13 @@ table.dataTable#productTable.product-detail-table .sorting_desc::after {
   box-shadow: 0 0 0 0.18rem rgba(var(--product-detail-header-rgb), 0.18);
 }
 
+#productTable.product-detail-table .select2-container--default.select2-container--focus .select2-selection--single,
+#productTable.product-detail-table .select2-container--default.select2-container--open .select2-selection--single {
+  border-color: var(--product-detail-header);
+  box-shadow: 0 0 0 0.18rem rgba(var(--product-detail-header-rgb), 0.18);
+  outline: none;
+}
+
 /* card styles */
 
 .list-group .card {
@@ -982,6 +989,21 @@ textarea.form-control:focus {
   border-color: var(--mdb-focus);
   box-shadow: 0 0 0 0.26rem rgba(var(--mdb-focus-rgb), 0.28);
   color: var(--mdb-dark);
+}
+
+.select2-container--default .select2-selection--single .select2-selection__rendered {
+  color: var(--mdb-dark);
+}
+
+.select2-container--default .select2-selection--single .select2-selection__placeholder {
+  color: rgba(var(--mdb-secondary-rgb), 0.7);
+}
+
+.select2-container--default.select2-container--focus .select2-selection--single,
+.select2-container--default.select2-container--open .select2-selection--single {
+  border-color: var(--mdb-focus);
+  box-shadow: 0 0 0 0.26rem rgba(var(--mdb-focus-rgb), 0.28);
+  outline: none;
 }
 
 .form-outline .form-control:focus ~ .form-label,
