@@ -3,6 +3,7 @@ const formConfig = typeof form !== 'undefined' ? form : {};
 const formClass = formConfig.class || 'row g-3';
 const formAttrs = formConfig.attrs || {};
 const formInputs = formConfig.inputs || [];
+const formSelects = formConfig.selects || [];
 const formCheckboxes = formConfig.checkboxes || [];
 const includeSubmit = formConfig.includeSubmit !== false;
 %>
@@ -14,6 +15,10 @@ const includeSubmit = formConfig.includeSubmit !== false;
 >
     <% if (formInputs.length) { %>
         <%- include('./outlineInputList', { inputs: formInputs }) %>
+    <% } %>
+
+    <% if (formSelects.length) { %>
+        <%- include('./selectList', { inputs: formSelects }) %>
     <% } %>
 
     <% if (formCheckboxes.length) { %>
