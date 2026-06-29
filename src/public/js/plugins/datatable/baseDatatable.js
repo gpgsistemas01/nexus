@@ -2,10 +2,9 @@ import { DATATABLE_SELECTORS } from "../../constants/selectors.js";
 import { handleDataTableError } from "../../api/errorHandler.js";
 import { buildMdbActionButton } from "../mdb/actionButton.js";
 import { initMdbTooltips } from "../mdb/baseInstance.js";
-import { configureResponsiveHeaderGroups, renderResponsiveDetails } from "./utils/responsive.js";
+import { configureResponsiveHeaderGroups, mergeMainTableColumnDefs, renderResponsiveDetails } from "./utils/responsive.js";
 
 const SORT_DIRECTIONS = ['asc', 'desc'];
-
 const isActionColumn = (column = {}) => column.title === 'Acciones';
 
 const getLastAvailableDataTablePage = (pageInfo = {}) => {
@@ -61,6 +60,7 @@ export const createDataTable = ({ selector = DATATABLE_SELECTORS.MAIN, options =
         searchPlaceholder = 'Buscar en la tabla',
         responsive = true,
         autoWidth = false,
+        columnDefs,
         ...dataTableOptions
     } = options;
     const resolvedSearchPlaceholder = language.searchPlaceholder || searchPlaceholder;
@@ -68,6 +68,7 @@ export const createDataTable = ({ selector = DATATABLE_SELECTORS.MAIN, options =
     return $(selector).DataTable({
         ...dataTableOptions,
         columns: normalizeColumns(columns),
+        columnDefs: mergeMainTableColumnDefs(selector, columnDefs),
         searchDelay: 1000,
         ajax: ajax ? async (data, callback) => {
 

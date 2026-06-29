@@ -1,3 +1,24 @@
+import { DATATABLE_SELECTORS } from "../../../constants/selectors.js";
+
+
+const MAIN_TABLE_DEFAULT_COLUMN_DEFS = [
+    { targets: 0, responsivePriority: 1 },
+    { targets: -1, responsivePriority: 2 },
+    { targets: 1, responsivePriority: 3 }
+];
+
+const isMainTableSelector = (selector) => selector === DATATABLE_SELECTORS.MAIN;
+
+export const mergeMainTableColumnDefs = (selector, columnDefs = []) => {
+
+    if (!isMainTableSelector(selector)) return columnDefs;
+
+    return [
+        ...MAIN_TABLE_DEFAULT_COLUMN_DEFS,
+        ...(Array.isArray(columnDefs) ? columnDefs : [])
+    ];
+};
+
 export const getResponsiveRowData = (datatable, element) => {
 
     let tr = $(element).closest('tr');
@@ -56,6 +77,15 @@ const getHeaderColumnMapFromGrid = (grid) => grid.reduce((cellMap, row) => {
 
     return cellMap;
 }, new Map());
+
+
+const setHeaderVisibility = (header, isVisible) => {
+
+    if (!header) return;
+
+    header.hidden = !isVisible;
+    header.style.display = isVisible ? '' : 'none';
+};
 
 const addGroupChild = (groups, groupName, header, columnIndex) => {
 
@@ -118,14 +148,14 @@ const syncResponsiveHeaderGroups = (table, groupedHeaders) => {
         const visibleChildren = children.filter(({ columnIndex }) => isResponsiveColumnVisible(table, columnIndex));
         const isGroupVisible = visibleChildren.length > 0;
 
-        if (groupHeader) {
-            groupHeader.hidden = !isGroupVisible;
-            groupHeader.colSpan = Math.max(visibleChildren.length, 1);
-        }
-
         children.forEach(({ header, columnIndex }) => {
-            header.hidden = !isResponsiveColumnVisible(table, columnIndex);
+            setHeaderVisibility(header, isResponsiveColumnVisible(table, columnIndex));
         });
+
+        if (groupHeader) {
+            groupHeader.colSpan = Math.max(visibleChildren.length, 1);
+            setHeaderVisibility(groupHeader, isGroupVisible);
+        }
     });
 };
 
@@ -149,6 +179,8 @@ export const configureResponsiveHeaderGroups = (table) => {
 };
 
 const getHeaderText = (cell) => cell?.textContent?.replace(/\s+/g, ' ').trim() || '';
+
+const isGroupHeaderCell = (cell) => (Number(cell?.getAttribute?.('colspan')) || 1) > 1;
 
 export const buildResponsiveHeaderLabels = (tableNode) => {
 
@@ -186,8 +218,13 @@ export const buildResponsiveHeaderLabels = (tableNode) => {
     return Array.from({ length: columnCount }, (_, columnIndex) => {
         const parts = [];
 
-        grid.forEach((row) => {
+        grid.forEach((row, rowIndex) => {
             const item = row[columnIndex];
+            const hasChildHeader = grid
+                .slice(rowIndex + 1)
+                .some(nextRow => nextRow[columnIndex]?.cell && nextRow[columnIndex].cell !== item?.cell);
+
+            if (isGroupHeaderCell(item?.cell) && hasChildHeader) return;
 
             if (item?.text && parts[parts.length - 1] !== item.text) parts.push(item.text);
         });
