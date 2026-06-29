@@ -97,6 +97,13 @@ export const createGoodsReceiptDatatable = async () => {
         }
     });
 
+    $(`${ selectorTable } tbody`).on('click', '.btn-edit', function() {
+
+        const data = getResponsiveRowData(table, this);
+
+        openGoodsReceiptModal({ mode: 'edit', data });
+    });
+
     $(`${ selectorTable } tbody`).on('click', '.btn-view', function() {
 
         const data = getResponsiveRowData(table, this);

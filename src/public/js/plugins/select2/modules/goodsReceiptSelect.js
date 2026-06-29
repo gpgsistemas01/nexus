@@ -102,6 +102,7 @@ export const initGoodsReceiptFormSelect2 = () => {
 
 export const GOODS_RECEIPT_SUPPLIER_CHANGED_EVENT = supplierChangedEventName;
 
+
 export const setGoodsReceiptFormSelectOptions = (data = null) => {
 
     toggleSupplierOption({

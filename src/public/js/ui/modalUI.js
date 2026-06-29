@@ -14,6 +14,13 @@ const adjustModalDataTables = (modalElement) => {
     });
 };
 
+export const buildModalTitle = ({ action, entityName, referenceNumber }) => {
+
+    const baseTitle = `${ action } ${ entityName }`;
+
+    return referenceNumber ? `${ baseTitle } - Folio ${ referenceNumber }` : baseTitle;
+};
+
 export const openModal = (modalElement) => {
 
     const instance = initMdbModal(modalElement);

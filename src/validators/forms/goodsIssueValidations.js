@@ -25,3 +25,13 @@ export const goodsIssueUpdateValidation = [
 export const goodsIssueDetailsValidation = [
     validateGoodsIssueDetailsEdition
 ];
+
+export const goodsIssueHeaderValidation = [
+    validateUUID('advisorId'),
+    validateUUID('clientId'),
+    validateUUID('departmentId'),
+    validateUUID('requesterId'),
+    validateProjectNumber('projectNumber'),
+    validateDate('requestDate'),
+    validateTextOptional({ fieldName: 'observations', maxLength: 500 })
+];

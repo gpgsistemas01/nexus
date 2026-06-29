@@ -1,5 +1,5 @@
 import { useForm } from "../../application/form.js";
-import { editGoodsIssue, editGoodsIssueDetails, registerGoodsIssue } from "../../application/warehouse/goodsIssues/goodsIssues.js";
+import { editGoodsIssue, editGoodsIssueDetails, editGoodsIssueHeader, registerGoodsIssue } from "../../application/warehouse/goodsIssues/goodsIssues.js";
 import { validateAddGoodsIssueProductValidators, validateGoodsIssueDetailValidators, validateGoodsIssueValidators } from "../../utils/validations/validators.js";
 import { refreshProductTable } from "../../plugins/datatable/baseDatatable.js";
 import { createGoodsIssueDatatable, details, initDetailsGoodsIssueTable } from "../../plugins/datatable/goodsIssueDatatable.js";
@@ -8,12 +8,13 @@ import { setFormReadOnly, toggleButtons, clearAddedProductInput, clearFormErrors
 import { on } from "../../utils/domUtils.js";
 import { formatDateLongWithTime } from "../../utils/formatters.js";
 import { handleSubmit, hasValidationErrors, validateDetailsFields, validateFields } from "../../utils/formUtils.js";
-import { openModal } from "../../ui/modalUI.js";
+import { buildModalTitle, openModal } from "../../ui/modalUI.js";
 import { hasPermission } from "../../utils/permissions.js";
 import { FORM_SELECTORS, MODAL_SELECTORS } from "../../constants/selectors.js";
 
 const MODE_EDIT = 'edit';
 const MODE_EDIT_DETAIL = 'edit-detail';
+const MODE_EDIT_HEADER = 'edit-header';
 const MODE_VIEW = 'view';
 const modalId = MODAL_SELECTORS.GOODS_ISSUE;
 const formId = FORM_SELECTORS.GOODS_ISSUE;
@@ -33,6 +34,8 @@ const normalizeGoodsIssueData = ({ form, formData }) => {
         };
     }
 
+    if (mode === MODE_EDIT_HEADER) return formData;
+
     return {
         ...formData,
         details
@@ -48,11 +51,19 @@ useForm({
 
         if (mode === MODE_EDIT_DETAIL) return validateDetailsFields(validateGoodsIssueDetailValidators, details);
 
-        return validateFields(validateGoodsIssueValidators, formData);
+        const errors = validateFields(validateGoodsIssueValidators, formData);
+
+        if (mode === MODE_EDIT_HEADER) errors.details = null;
+
+        return errors;
     },
     sendRequest: async ({ formData, form }) => {
 
-        const update = form.dataset.mode === MODE_EDIT_DETAIL ? editGoodsIssueDetails : editGoodsIssue;
+        const update = form.dataset.mode === MODE_EDIT_DETAIL
+            ? editGoodsIssueDetails
+            : form.dataset.mode === MODE_EDIT_HEADER
+                ? editGoodsIssueHeader
+                : editGoodsIssue;
 
         await handleSubmit({
             form,
@@ -62,6 +73,7 @@ useForm({
         });
     },
 });
+
 
 export const openGoodsIssueModal = ({ mode, data = null }) => {
 
@@ -90,7 +102,7 @@ export const openGoodsIssueModal = ({ mode, data = null }) => {
         form.querySelector('#presentationDisplayInput').value = '';
     }
 
-    if (mode === MODE_EDIT || mode === MODE_EDIT_DETAIL || mode === MODE_VIEW) {
+    if (mode === MODE_EDIT || mode === MODE_EDIT_DETAIL || mode === MODE_EDIT_HEADER || mode === MODE_VIEW) {
 
         form.querySelector('#observationsInput').value = data.observations || '';
         form.querySelector('#requestDateInput').value = formatDateLongWithTime(data.requestDate);
@@ -118,27 +130,29 @@ export const openGoodsIssueModal = ({ mode, data = null }) => {
             isSupplied: detail.isSupplied,
         })));
 
-        setFormReadOnly({ form, isReadOnly: mode !== MODE_EDIT });
+        setFormReadOnly({ form, isReadOnly: mode !== MODE_EDIT && mode !== MODE_EDIT_HEADER });
 
-        if (mode === MODE_EDIT) {
+        if (mode === MODE_EDIT || mode === MODE_EDIT_HEADER) {
 
-            modalElement.querySelector('#modalTitle').textContent = 'Editar salida';
+            modalElement.querySelector('#modalTitle').textContent = buildModalTitle({ action: 'Editar', entityName: 'salida', referenceNumber: data?.referenceNumber });
             form.querySelector('#submitBtn').textContent = 'Actualizar';
+
+            if (mode === MODE_EDIT_HEADER) toggleContainerElements({ selector: '.add-product-container', root: modalElement });
         }
 
         if (mode === MODE_EDIT_DETAIL) {
 
-            modalElement.querySelector('#modalTitle').textContent = 'Editar detalles de la salida';
+            modalElement.querySelector('#modalTitle').textContent = buildModalTitle({ action: 'Editar detalles de la', entityName: 'salida', referenceNumber: data?.referenceNumber });
             form.querySelector('#submitBtn').textContent = 'Actualizar';
         }
 
         if (mode === MODE_VIEW) {
             
-            modalElement.querySelector('#modalTitle').textContent = 'Ver salida';
+            modalElement.querySelector('#modalTitle').textContent = buildModalTitle({ action: 'Ver', entityName: 'salida', referenceNumber: data?.referenceNumber });
         }
     }
 
-    initDetailsGoodsIssueTable(mode, context);
+    initDetailsGoodsIssueTable(mode === MODE_EDIT_HEADER ? MODE_VIEW : mode, context);
 
     openModal(modalElement);
 };

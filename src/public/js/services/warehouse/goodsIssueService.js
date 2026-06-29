@@ -25,3 +25,9 @@ export const editGoodsIssueDetailsRequest = ({ data, id }) => apiRequest({
     url: `${ GOODS_ISSUES_API_ROUTE }/${ id }/details`,
     data
 });
+
+export const editGoodsIssueHeaderRequest = ({ data, id }) => apiRequest({
+    method: 'patch',
+    url: `${ GOODS_ISSUES_API_ROUTE }/${ id }/header`,
+    data
+});

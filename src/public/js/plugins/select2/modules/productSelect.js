@@ -100,11 +100,8 @@ export const setProductReasonVisualOption = ({
         name
     });
 
-    if (reasonSelect) {
-        toggleDisabledElement({
-            element: reasonSelect,
-            isDisabled
-        });
-        $(reasonScopedSelector).trigger('change.select2');
-    }
+    toggleDisabledElement({
+        element: reasonSelect,
+        isDisabled
+    });
 };

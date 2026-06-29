@@ -26,3 +26,14 @@ export const createGoodsIssueDetailsDtoForEdit = (body = {}) => ({
         projectConvertedQuantity: Number(d.projectConvertedQuantity)
     }))
 });
+
+
+export const createGoodsIssueHeaderDtoForEdit = (body = {}) => ({
+    requesterId: body.requesterId.trim(),
+    advisorId: body.advisorId.trim(),
+    clientId: body.clientId.trim(),
+    departmentId: body.departmentId.trim(),
+    projectNumber: body.projectNumber.trim(),
+    requestDate: new Date(body.requestDate),
+    ...(Object.prototype.hasOwnProperty.call(body, 'observations') ? { observations: body.observations.trim() } : {})
+});

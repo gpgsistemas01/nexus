@@ -563,3 +563,98 @@ export const updateGoodsIssueDetails = async ({ id, goodsIssueDto }) => {
         throw new GoodsIssueUpdateDatabaseError();
     }
 };
+
+export const updateGoodsIssueHeader = async ({ id, goodsIssueDto }) => {
+
+    try {
+
+        const { requesterId, advisorId, departmentId, clientId, ...goodsIssueData } = goodsIssueDto;
+
+        const goodsIssue = await getDb().goodsIssue.findUnique({
+            where: { id },
+            select: { id: true }
+        });
+
+        if (!goodsIssue) throw new GoodsIssueNotFound();
+
+        const requester = await findProfileById({ id: requesterId });
+
+        if (!requester) throw new GoodsIssueRequesterProfileNotFound();
+
+        const advisor = await findProfileWithDepartmentsById({ id: advisorId });
+
+        if (!advisor) throw new GoodsIssueAdvisorProfileNotFound();
+
+        const client = await findClientById({ id: clientId });
+        const department = await findDepartmentById({ id: departmentId });
+
+        if (!isValidInternalClientAdvisor({ client, advisor })) {
+            throw new GoodsIssueInternalClientAdvisorDepartmentConflict();
+        }
+
+        if (!isValidInternalClientProjectNumberByDepartment({
+            client,
+            department,
+            projectNumber: goodsIssueData.projectNumber
+        })) {
+            throw new GoodsIssueInternalClientProjectNumberConflict({
+                projectNumber: goodsIssueData.projectNumber,
+                departmentName: department.name
+            });
+        }
+
+        const updatedGoodsIssue = await getDb().goodsIssue.update({
+            where: { id },
+            data: {
+                ...goodsIssueData,
+                departmentName: department.name,
+                requesterName: requester.fullName,
+                advisorName: advisor.fullName,
+                clientName: client.name,
+                department: {
+                    connect: { id: departmentId }
+                },
+                requester: {
+                    connect: { id: requesterId }
+                },
+                advisor: {
+                    connect: { id: advisorId }
+                },
+                client: {
+                    connect: { id: clientId }
+                },
+                status: {
+                    connect: { name: STATUS_APPROVED }
+                }
+            },
+            include: {
+                details: {
+                    select: GOODS_ISSUE_DETAIL_SELECT
+                },
+                status: true,
+                fulfillmentStatus: true
+            }
+        });
+
+        logServiceInfo(serviceLogger, {
+            operation: 'warehouse.goodsIssues.goodsIssueService.updateGoodsIssueHeader',
+            ...getModelLogContext('goodsIssue', {
+                id,
+                ...goodsIssueDto,
+                referenceNumber: updatedGoodsIssue.referenceNumber
+            })
+        }, 'Encabezado de salida actualizado correctamente');
+
+        return updatedGoodsIssue;
+
+    } catch (err) {
+        logServiceError(serviceLogger, err, {
+            operation: 'warehouse.goodsIssues.goodsIssueService.updateGoodsIssueHeader',
+            ...getModelLogContext('goodsIssue', { id, ...goodsIssueDto })
+        });
+
+        if (err instanceof AppError) throw err;
+
+        throw new GoodsIssueUpdateDatabaseError();
+    }
+};

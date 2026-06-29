@@ -1,10 +1,11 @@
-import { createGoodsIssueDetailsDtoForEdit, createGoodsIssueDtoForEdit, createGoodsIssueDtoForRegister } from "../../../dtos/goodsIssueDTO.js";
+import { createGoodsIssueDetailsDtoForEdit, createGoodsIssueDtoForEdit, createGoodsIssueDtoForRegister, createGoodsIssueHeaderDtoForEdit } from "../../../dtos/goodsIssueDTO.js";
 import { successCodeMessages } from "../../../messages/codeMessages.js";
 import {
     createGoodsIssue,
     findAllGoodsIssues,
     updateGoodsIssue,
-    updateGoodsIssueDetails
+    updateGoodsIssueDetails,
+    updateGoodsIssueHeader
 } from "../../../services/warehouse/goodsIssues/goodsIssueService.js";
 import { getDataTableOrder, getDataTablePaging, getDataTableSearch } from "../../../utils/requestQueryUtils.js";
 import { createStockNotification, notifyProductStockStatusChanges } from "../../../services/warehouse/notificationService.js";
@@ -85,6 +86,23 @@ export const editGoodsIssueDetails = async (req, res) => {
 
     const goodsIssue = await updateGoodsIssueDetails({
         goodsIssueDto: sanitizedGoodsIssueDto, 
+        id: req.params.id
+    });
+
+    return res.status(200).json({
+        goodsIssue,
+        code: successCodeMessages.UPDATED_GOODS_ISSUE
+    });
+};
+
+
+export const editGoodsIssueHeader = async (req, res) => {
+
+    const goodsIssueDto = createGoodsIssueHeaderDtoForEdit(req.body);
+    const sanitizedGoodsIssueDto = sanitizeEmptyStrings(goodsIssueDto);
+
+    const goodsIssue = await updateGoodsIssueHeader({
+        goodsIssueDto: sanitizedGoodsIssueDto,
         id: req.params.id
     });
 

@@ -1,8 +1,9 @@
-import { createGoodsReceiptDtoForRegister } from "../../../dtos/goodsReceiptDTO.js";
+import { createGoodsReceiptDtoForEdit, createGoodsReceiptDtoForRegister } from "../../../dtos/goodsReceiptDTO.js";
 import { successCodeMessages } from "../../../messages/codeMessages.js";
 import {
     createGoodsReceipt,
-    findAllGoodsReceipts
+    findAllGoodsReceipts,
+    updateGoodsReceiptHeader
 } from "../../../services/warehouse/goodsReceipts/goodsReceiptService.js";
 import { getDataTableOrder, getDataTablePaging, getDataTableSearch } from "../../../utils/requestQueryUtils.js";
 import {
@@ -57,3 +58,20 @@ export const registerGoodsReceipt = async (req, res) => {
         code: successCodeMessages.CREATED_GOODS_RECEIPT
     });
 }
+
+
+export const editGoodsReceiptHeader = async (req, res) => {
+
+    const goodsReceiptDto = createGoodsReceiptDtoForEdit(req.body);
+    const sanitizedGoodsReceiptDto = sanitizeEmptyStrings(goodsReceiptDto);
+
+    const goodsReceipt = await updateGoodsReceiptHeader({
+        id: req.params.id,
+        goodsReceiptDto: sanitizedGoodsReceiptDto
+    });
+
+    return res.status(200).json({
+        goodsReceipt,
+        code: successCodeMessages.UPDATED_GOODS_RECEIPT
+    });
+};

@@ -4,10 +4,11 @@ import { validate } from '../../../middleware/validatorMiddleware.js';
 import {
     editGoodsIssue,
     editGoodsIssueDetails,
+    editGoodsIssueHeader,
     getAllGoodsIssues,
     registerGoodsIssue,
 } from '../../../controllers/api/warehouse/goodsIssueController.js';
-import { goodsIssueDetailsValidation, goodsIssueUpdateValidation, goodsIssueValidation } from '../../../validators/forms/goodsIssueValidations.js';
+import { goodsIssueDetailsValidation, goodsIssueHeaderValidation, goodsIssueUpdateValidation, goodsIssueValidation } from '../../../validators/forms/goodsIssueValidations.js';
 
 const router = express.Router();
 
@@ -57,6 +58,15 @@ router.patch(
     validate,
     authorizeUserApi(goodsIssuePermissions),
     editGoodsIssue
+);
+
+router.patch(
+    '/:id/header',
+    verifyApiTokenRequired,
+    goodsIssueHeaderValidation,
+    validate,
+    authorizeUserApi(goodsIssuePermissions),
+    editGoodsIssueHeader
 );
 
 router.patch(

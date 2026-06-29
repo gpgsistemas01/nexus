@@ -9,3 +9,13 @@ export const goodsReceiptValidation = [
     validateTextOptional({ fieldName: 'observations', maxLength: 500 }),
     validateDetailsArray
 ]
+
+
+export const goodsReceiptHeaderValidation = [
+    validateUUID('supplierId'),
+    validateUUID('receivedById'),
+    validateBoolean('isInvoiced'),
+    validateInvoice(),
+    validateDate('receptionDate'),
+    validateTextOptional({ fieldName: 'observations', maxLength: 500 })
+];

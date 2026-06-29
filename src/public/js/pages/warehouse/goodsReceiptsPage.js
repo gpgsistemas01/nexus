@@ -1,5 +1,5 @@
 import { useForm } from "../../application/form.js";
-import { registerGoodsReceipt } from "../../application/warehouse/goodsReceipts.js";
+import { editGoodsReceiptHeader, registerGoodsReceipt } from "../../application/warehouse/goodsReceipts.js";
 import { validateAddGoodsReceiptProductValidators, validateGoodsReceiptValidators } from "../../utils/validations/validators.js";
 import { refreshProductTable } from "../../plugins/datatable/baseDatatable.js";
 import { createGoodsReceiptDatatable, details, initDetailsGoodsReceiptTable } from "../../plugins/datatable/goodsReceiptDatatable.js";
@@ -7,13 +7,14 @@ import { GOODS_RECEIPT_SUPPLIER_CHANGED_EVENT, initGoodsReceiptFormSelect2, setG
 import { setFormReadOnly, updateTotals, toggleButtons, clearAddedProductInput, toggleInvoiceInput, clearFormErrors, normalizeFormErrors, initForm } from "../../ui/formUI.js";
 import { on } from "../../utils/domUtils.js";
 import { formatDateLongWithTime } from "../../utils/formatters.js";
-import { handleSubmit, hasValidationErrors, toggleContainerElements, validateFields } from "../../utils/formUtils.js";
-import { openModal } from "../../ui/modalUI.js";
+import { handleSubmit, hasValidationErrors, toggleContainerElements, toggleDisabledElement, validateFields } from "../../utils/formUtils.js";
+import { buildModalTitle, openModal } from "../../ui/modalUI.js";
 import { initMdbWrapperInput, updateMdbWrapperInput } from "../../plugins/mdb/baseInstance.js";
 import { FORM_SELECTORS, MODAL_SELECTORS } from "../../constants/selectors.js";
 
 const modalId = MODAL_SELECTORS.GOODS_RECEIPT;
 const formId = FORM_SELECTORS.GOODS_RECEIPT;
+
 
 createGoodsReceiptDatatable();
 
@@ -31,16 +32,22 @@ useForm({
 
         if (!formData.isInvoiced) delete formData.invoice;
 
-        formData.details = details;
+        if (document.querySelector(formId).dataset.mode === 'edit') {
+            formData.supplierId = document.querySelector(`${ formId } ${ FORM_SELECTORS.SUPPLIER }`)?.value;
+        } else {
+            formData.details = details;
+        }
 
         return formData;
     },
-    getErrors: ({ formData }) => {
+    getErrors: ({ form, formData }) => {
         
         const allowedUsername = /^[a-zA-Z0-9\-]+$/;
         let errors = {};
 
         errors = validateFields(validateGoodsReceiptValidators, formData);
+
+        if (form.dataset.mode === 'edit') errors.details = null;
 
         if (formData.isInvoiced) {
 
@@ -62,10 +69,12 @@ useForm({
         await handleSubmit({
             form,
             formData,
-            create: registerGoodsReceipt
+            create: registerGoodsReceipt,
+            update: editGoodsReceiptHeader
         });
     },
 });
+
 
 export const openGoodsReceiptModal = ({ mode, data = null }) => {
 
@@ -76,6 +85,10 @@ export const openGoodsReceiptModal = ({ mode, data = null }) => {
     initForm({ form, mode, id: data?.id || '' });
     clearFormErrors(form);
     setFormReadOnly({ form, isReadOnly: false });
+    toggleDisabledElement({
+        element: form.querySelector(FORM_SELECTORS.SUPPLIER),
+        isDisabled: false
+    });
 
     details.length = 0;
 
@@ -98,7 +111,7 @@ export const openGoodsReceiptModal = ({ mode, data = null }) => {
         });
     }
 
-    if (mode === 'view') {
+    if (mode === 'edit' || mode === 'view') {
 
         value = data.isInvoiced ? 'invoice' : 'none';
         const supplierName = data.supplierName;
@@ -125,8 +138,20 @@ export const openGoodsReceiptModal = ({ mode, data = null }) => {
         form.elements.totalNetPurchaseAmountDisplayInput.value = data.totalNetPurchaseAmount;
         form.elements.totalGrossPurchaseAmountDisplayInput.value = data.totalGrossPurchaseAmount;
 
-        modalElement.querySelector('#modalTitle').textContent = 'Ver compra';
-        setFormReadOnly({ form, isReadOnly: true });
+        if (mode === 'edit') {
+            modalElement.querySelector('#modalTitle').textContent = buildModalTitle({ action: 'Editar', entityName: 'compra', referenceNumber: data?.referenceNumber });
+            form.querySelector('#submitBtn').textContent = 'Actualizar';
+            toggleDisabledElement({
+                element: form.querySelector(FORM_SELECTORS.SUPPLIER),
+                isDisabled: true
+            });
+            toggleContainerElements({ selector: '.add-product-container', root: modalElement });
+        }
+
+        if (mode === 'view') {
+            modalElement.querySelector('#modalTitle').textContent = buildModalTitle({ action: 'Ver', entityName: 'compra', referenceNumber: data?.referenceNumber });
+            setFormReadOnly({ form, isReadOnly: true });
+        }
 
         toggleButtons({
             mode,

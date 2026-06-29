@@ -151,10 +151,10 @@ export const refreshProductTable = (details) => {
 export const renderActionButtons = ({ status, fulfillmentStatus, context, canAdjustStock = false, canReturnProduct = false }) => {
 
     const actions = [];
-    const canEditGoodsIssue = context === 'goodsIssue' && fulfillmentStatus === 'Pendiente';
+    const canEditGoodsIssue = context === 'goodsIssue' && status === 'Aprobada';
     const canSupplyGoodsIssue = context === 'goodsIssue' && ['Pendiente', 'Surtido parcial'].includes(fulfillmentStatus);
 
-    if ((status === 'Abierta' || canEditGoodsIssue) || context === 'profile' || context === 'client' || context === 'supplier') actions.push(buildMdbActionButton({
+    if ((status === 'Abierta' || canEditGoodsIssue) || context === 'goodsReceipt' || context === 'profile' || context === 'client' || context === 'supplier') actions.push(buildMdbActionButton({
         className: 'btn-edit',
         colorClass: 'btn-primary',
         iconClass: 'fa-solid fa-pencil',

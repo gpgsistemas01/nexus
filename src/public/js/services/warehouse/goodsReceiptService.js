@@ -13,3 +13,10 @@ export const registerGoodsReceiptRequest = ({ data }) => apiRequest({
     url: GOODS_RECEIPTS_API_ROUTE,
     data
 });
+
+
+export const editGoodsReceiptHeaderRequest = ({ data, id }) => apiRequest({
+    method: 'patch',
+    url: `${ GOODS_RECEIPTS_API_ROUTE }/${ id }`,
+    data
+});

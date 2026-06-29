@@ -64,6 +64,19 @@ export const toggleDisabledElement = ({ element, isDisabled }) => {
     if ('disabled' in element) {
         element.disabled = isDisabled;
     }
+
+    if (
+        typeof window !== 'undefined'
+        && window.$
+        && element.matches?.('select')
+        && window.$(element).hasClass('select2-hidden-accessible')
+    ) {
+        window.$(element)
+            .prop('disabled', isDisabled)
+            .trigger('change.select2')
+            .next('.select2-container')
+            .toggleClass('disabled', isDisabled);
+    }
 };
 
 export const toggleContainerElements = ({

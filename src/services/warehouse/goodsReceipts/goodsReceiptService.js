@@ -1,7 +1,9 @@
 import {
     GoodsReceiptCreateDatabaseError,
-    ProfileReceivedByNotFound,
-    SupplierNotFound
+    GoodsReceiptNotFound,
+    GoodsReceiptSupplierChangeConflict,
+    GoodsReceiptUpdateDatabaseError,
+    ProfileReceivedByNotFound
 } from "../../../errors/warehouse/goodsReceiptError.js";
 import { createServiceLogger, getModelLogContext, logServiceError, logServiceInfo } from "../../../utils/logger.js";
 
@@ -219,3 +221,68 @@ export const createGoodsReceipt = async ({ goodsReceiptDto }) => {
         throw new GoodsReceiptCreateDatabaseError();
     }
 }
+
+export const updateGoodsReceiptHeader = async ({ id, goodsReceiptDto }) => {
+
+    try {
+
+        const { receivedById, supplierId, ...goodsReceiptData } = goodsReceiptDto;
+
+        const goodsReceipt = await getDb().goodsReceipt.findUnique({
+            where: { id },
+            select: {
+                id: true,
+                supplierId: true
+            }
+        });
+
+        if (!goodsReceipt) throw new GoodsReceiptNotFound();
+
+        if (goodsReceipt.supplierId !== supplierId) throw new GoodsReceiptSupplierChangeConflict();
+
+        const supplier = await findUniqueSupplier({ id: supplierId });
+        const receivedBy = await findProfileById({ id: receivedById });
+
+        if (!receivedBy) throw new ProfileReceivedByNotFound();
+
+        const updatedGoodsReceipt = await getDb().goodsReceipt.update({
+            where: { id },
+            data: {
+                ...goodsReceiptData,
+                supplierName: supplier.tradeName,
+                receivedByName: receivedBy.fullName,
+                supplier: {
+                    connect: { id: supplierId }
+                },
+                receivedBy: {
+                    connect: { id: receivedById }
+                }
+            },
+            include: {
+                details: true,
+                status: true
+            }
+        });
+
+        logServiceInfo(serviceLogger, {
+            operation: 'warehouse.goodsReceipts.goodsReceiptService.updateGoodsReceiptHeader',
+            ...getModelLogContext('goodsReceipt', {
+                id,
+                ...goodsReceiptDto,
+                referenceNumber: updatedGoodsReceipt.referenceNumber
+            })
+        }, 'Encabezado de compra actualizado correctamente');
+
+        return updatedGoodsReceipt;
+
+    } catch (err) {
+        logServiceError(serviceLogger, err, {
+            operation: 'warehouse.goodsReceipts.goodsReceiptService.updateGoodsReceiptHeader',
+            ...getModelLogContext('goodsReceipt', { id, ...goodsReceiptDto })
+        });
+
+        if (err instanceof AppError) throw err;
+
+        throw new GoodsReceiptUpdateDatabaseError();
+    }
+};

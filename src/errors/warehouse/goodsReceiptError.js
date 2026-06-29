@@ -27,3 +27,19 @@ export class ProfileReceivedByNotFound extends AppError {
         super('Perfil de quien recibe no encontrado', 'PROFILE_RECEIVED_BY_NOT_FOUND', 404);
     }
 }
+
+
+export class GoodsReceiptUpdateDatabaseError extends AppError {
+
+    constructor () {
+        super('Error de base de datos al actualizar la compra', 'GOODS_RECEIPT_UPDATE_DB_ERROR', 500);
+    }
+}
+
+
+export class GoodsReceiptSupplierChangeConflict extends AppError {
+
+    constructor () {
+        super('No se puede cambiar el proveedor de una compra confirmada porque sus movimientos de inventario ya están asociados al proveedor original', 'GOODS_RECEIPT_SUPPLIER_CHANGE_CONFLICT', 409);
+    }
+}
