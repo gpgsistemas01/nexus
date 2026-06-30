@@ -11,9 +11,10 @@
 <nav aria-label="Paginación de resultados">
     <ul class="pagination pagination-circle pagination-lg justify-content-center">
         <% if (pagination.hasPrevPage) { %>
-            <li class="pagination-item">
+            <li class="page-item">
                 <a href="<%= buildPageURL(pagination.currentPage - 1) %>" 
                     class="page-link"
+                    aria-label="Ir a la página anterior"
                 >
                     Anterior
                 </a>
@@ -21,7 +22,7 @@
         <% } %>
 
         <% pagination.visiblePages.forEach(page => { %>
-            <li class="pagination-item <%= (page === pagination.currentPage) ? 'active' : '' %>"
+            <li class="page-item <%= (page === pagination.currentPage) ? 'active' : '' %>"
                 <% if (page === pagination.currentPage) { %> aria-current="page" <% } %>
             >
                 <% if (page === pagination.currentPage) { %>
@@ -32,6 +33,7 @@
                 <% } else { %>
                     <a href="<%= buildPageURL(page) %>" 
                         class="page-link"
+                        aria-label="Ir a la página <%= page %>"
                     >
                         <%= page %>
                     </a>
@@ -40,9 +42,10 @@
         <% }); %>
 
         <% if (pagination.hasNextPage) { %>
-            <li class="pagination-item">
+            <li class="page-item">
                 <a href="<%= buildPageURL(pagination.currentPage + 1) %>" 
                     class="page-link"
+                    aria-label="Ir a la página siguiente"
                 >
                     Siguiente
                 </a>
