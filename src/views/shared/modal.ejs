@@ -75,13 +75,13 @@ const buttons = {
     }
 }; %>
 
-<div class="modal fade" id="<%= modalId %>" tabindex="-1" aria-labelledby="<%= header.title.id %>">
-    <div class="modal-dialog modal-fullscreen">
+<div class="modal fade" id="<%= modalId %>" tabindex="-1" aria-labelledby="<%= header.title.id %>" aria-hidden="true">
+    <div class="modal-dialog modal-fullscreen modal-dialog-scrollable">
         <div class="modal-content">
         
         <%- include('./header', { header }) %>
 
-        <div class="modal-body dark">
+        <div class="modal-body dark overflow-auto">
             <form id="<%= form.id %>" class="row g-3" novalidate>
                 <% if (form.invoice) { %>
                     <div class="row g-2">
