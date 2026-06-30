@@ -322,15 +322,19 @@ body {
 
 .dataTables_wrapper .dataTables_filter {
   display: flex;
+  float: none;
   justify-content: flex-end;
+  margin-block-end: 0.85rem;
+  width: 100%;
 }
 
 .dataTables_wrapper .dataTables_filter label {
   align-items: center;
   display: inline-grid;
   gap: 0.55rem;
-  grid-template-columns: auto minmax(16rem, 1fr);
+  grid-template-columns: auto minmax(0, 18rem);
   margin: 0;
+  max-width: 100%;
   text-align: left;
 }
 
