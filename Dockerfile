@@ -43,4 +43,4 @@ USER node
 
 EXPOSE 3000
 
-CMD ["sh", "-c", "npx --no-install prisma migrate deploy && npm start"]
+CMD ["sh", "-c", "echo DATABASE_URL_EXISTS=${DATABASE_URL:+YES} && npx --no-install prisma migrate deploy && npm start"]
