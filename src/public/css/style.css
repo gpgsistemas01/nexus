@@ -1305,3 +1305,175 @@ table.dataTable.modal-detail-table td:has(.table-action-btn) > * {
     padding: 1.5rem;
   }
 }
+
+/* app shell and user header */
+body {
+  background: radial-gradient(circle at top left, rgba(var(--mdb-primary-rgb), 0.12), transparent 28rem), #f3faf5;
+}
+
+.app-shell {
+  background: linear-gradient(135deg, #f3faf5 0%, #edf7f0 48%, #ffffff 100%);
+  color: var(--mdb-body-color);
+}
+
+.app-header {
+  background: linear-gradient(90deg, #ffffff 0%, #f1fbf5 50%, #dff4e8 100%);
+  border-bottom: 1px solid rgba(var(--mdb-primary-rgb), 0.18);
+  min-height: 4.5rem;
+}
+
+.app-header-action {
+  border-radius: 999rem;
+  font-weight: 800;
+}
+
+.app-userbar {
+  background: rgba(255, 255, 255, 0.82);
+  border: 1px solid rgba(var(--mdb-primary-rgb), 0.18);
+  border-radius: 999rem;
+  box-shadow: 0 0.5rem 1.5rem rgba(var(--mdb-primary-rgb), 0.12);
+  max-width: 100%;
+  padding: 0.35rem 0.5rem;
+}
+
+.app-user-name {
+  color: var(--mdb-primary-active);
+  font-weight: 800;
+  line-height: 1;
+  max-width: clamp(9rem, 28vw, 18rem);
+  overflow: hidden;
+  padding-inline: 0.5rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.app-logout-btn {
+  margin-left: 0 !important;
+}
+
+.app-notifications-toggle {
+  color: var(--mdb-primary-active) !important;
+  transition: background-color 0.2s ease, box-shadow 0.2s ease, color 0.2s ease, transform 0.2s ease;
+}
+
+.app-notifications-toggle:hover,
+.app-notifications-toggle:focus,
+.app-header-action:hover,
+.app-header-action:focus {
+  box-shadow: 0 0.35rem 0.8rem rgba(var(--mdb-primary-rgb), 0.16);
+  transform: translateY(-1px);
+}
+
+.app-notifications-toggle:hover,
+.app-notifications-toggle:focus {
+  background-color: rgba(var(--mdb-primary-rgb), 0.12) !important;
+  color: var(--mdb-primary-hover) !important;
+}
+
+.app-notifications-badge {
+  background: linear-gradient(180deg, #ff6b6b 0%, #c92a2a 100%);
+  box-shadow: 0 0.2rem 0.45rem rgba(201, 42, 42, 0.3);
+}
+
+.app-notifications-menu {
+  border: 1px solid rgba(var(--mdb-primary-rgb), 0.18);
+  border-radius: 1rem;
+  box-shadow: 0 1rem 2.5rem rgba(var(--mdb-secondary-rgb), 0.18);
+  min-width: min(24rem, calc(100vw - 2rem));
+  overflow: hidden;
+}
+
+.app-notifications-header {
+  background: linear-gradient(135deg, var(--mdb-primary) 0%, var(--mdb-primary-active) 100%);
+  color: var(--mdb-light);
+}
+
+.app-notifications-header .small {
+  color: rgba(var(--mdb-light-rgb), 0.78);
+  font-weight: 600;
+}
+
+.app-notifications-header .btn-outline-success {
+  --mdb-btn-color: var(--mdb-light);
+  --mdb-btn-border-color: rgba(var(--mdb-light-rgb), 0.7);
+  --mdb-btn-hover-bg: var(--mdb-light);
+  --mdb-btn-hover-border-color: var(--mdb-light);
+  --mdb-btn-hover-color: var(--mdb-primary-active);
+}
+
+#notificationsList {
+  background-color: #ffffff;
+  max-height: min(28rem, 70vh);
+  overflow-y: auto;
+}
+
+#notificationsList .notification-empty {
+  color: rgba(var(--mdb-secondary-rgb), 0.58);
+}
+
+#notificationsList .notification-item {
+  background: linear-gradient(180deg, #ffffff 0%, #f7fcf9 100%) !important;
+  border-bottom: 1px solid rgba(var(--mdb-primary-rgb), 0.14) !important;
+  color: var(--mdb-body-color);
+  padding: 0.85rem 1rem;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+#notificationsList .notification-item:hover {
+  background: #eff9f2 !important;
+  transform: translateX(2px);
+}
+
+.notification-title {
+  color: var(--mdb-primary-active);
+}
+
+.notification-message {
+  color: rgba(var(--mdb-secondary-rgb), 0.82);
+  margin-top: 0.2rem;
+}
+
+.notification-date {
+  color: rgba(var(--mdb-secondary-rgb), 0.58);
+  display: inline-block;
+  font-weight: 700;
+  margin-top: 0.35rem;
+}
+
+.swal2-toast.swal2-popup {
+  border: 1px solid rgba(var(--mdb-primary-rgb), 0.18);
+  border-left: 0.35rem solid var(--mdb-primary);
+  border-radius: 1rem;
+  box-shadow: 0 1rem 2rem rgba(var(--mdb-secondary-rgb), 0.18);
+  padding: 0.85rem 1rem;
+}
+
+.swal2-toast .swal2-title {
+  color: var(--mdb-secondary);
+  font-family: var(--mdb-font-sans-serif);
+  font-weight: 800;
+}
+
+@media (max-width: 575.98px) {
+  .app-header {
+    align-items: stretch;
+    min-height: auto;
+  }
+
+  .app-userbar {
+    border-radius: 1.25rem;
+    flex: 1 1 100%;
+    justify-content: space-between;
+    margin-left: 0 !important;
+    order: 2;
+  }
+
+  .app-user-name {
+    flex: 1 1 auto;
+    max-width: none;
+  }
+
+  .app-notifications-menu {
+    min-width: calc(100vw - 2rem);
+  }
+}

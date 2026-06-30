@@ -73,15 +73,15 @@ const renderNotifications = (items = []) => {
     if (!notificationsList) return;
 
     if (!items.length) {
-        notificationsList.innerHTML = '<li class="px-3 py-3 text-center text-white-50">Sin notificaciones</li>';
+        notificationsList.innerHTML = '<li class="notification-empty px-3 py-4 text-center"><i class="far fa-bell-slash d-block mb-2 fs-4"></i>Sin notificaciones</li>';
         return;
     }
 
     notificationsList.innerHTML = items.map((item) => `
-        <li class="list-group-item bg-transparent border-0 border-bottom border-secondary-subtle notification-item">
-            <div class="fw-bold">${item.title}</div>
-            <div class="small">${item.message}</div>
-            <small>${formatNotificationDate(item.createdAt)}</small>
+        <li class="list-group-item notification-item">
+            <div class="notification-title fw-bold">${item.title}</div>
+            <div class="notification-message small">${item.message}</div>
+            <small class="notification-date">${formatNotificationDate(item.createdAt)}</small>
         </li>
     `).join('');
 };
