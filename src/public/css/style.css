@@ -1102,6 +1102,35 @@ body section {
   --mdb-heading-color: var(--mdb-light);
 }
 
+.error-card {
+  inline-size: min(100%, 34rem);
+}
+
+/* application layout styles */
+.app-shell {
+  background: var(--mdb-body-bg);
+}
+
+.app-sidebar {
+  background: var(--mdb-dark);
+  color: var(--mdb-light);
+  inline-size: 260px;
+}
+
+.app-header {
+  background: var(--mdb-body-bg);
+}
+
+.app-mobile-menu .offcanvas-header,
+.app-mobile-menu .offcanvas-body {
+  background: var(--mdb-dark);
+  color: var(--mdb-light);
+}
+
+#notificationsMenu {
+  min-inline-size: min(320px, calc(100vw - 2rem));
+}
+
 /* table action button styles */
 .table-action-btn {
   margin: 0 0.125rem;
@@ -1192,7 +1221,9 @@ table.dataTable.modal-detail-table td:has(.table-action-btn) > * {
 /* login page styles */
 .login-shell {
   align-items: center;
-  background: linear-gradient(135deg, #f4fbf7 0%, #ffffff 52%, #edf8f1 100%);
+  background:
+    radial-gradient(circle at top left, rgba(var(--mdb-primary-rgb), 0.28), transparent 34rem),
+    linear-gradient(135deg, var(--mdb-dark) 0%, rgba(var(--mdb-secondary-rgb), 0.96) 52%, var(--mdb-secondary) 100%);
   display: flex;
   justify-content: center;
   margin: -1.5rem;
@@ -1201,8 +1232,8 @@ table.dataTable.modal-detail-table td:has(.table-action-btn) > * {
 }
 
 .login-card {
-  background: rgba(255, 255, 255, 0.96);
-  border: 1px solid rgba(var(--mdb-primary-rgb), 0.14);
+  background: rgba(var(--mdb-light-rgb), 0.96);
+  border: 1px solid rgba(var(--mdb-light-rgb), 0.14);
   border-radius: 1.5rem;
   display: grid;
   gap: 1.5rem;
@@ -1213,7 +1244,7 @@ table.dataTable.modal-detail-table td:has(.table-action-btn) > * {
 
 .login-card__brand {
   align-items: center;
-  background: var(--mdb-primary-soft);
+  background: linear-gradient(135deg, var(--mdb-primary-soft) 0%, rgba(var(--mdb-secondary-rgb), 0.14) 100%);
   border-radius: 1.25rem;
   display: flex;
   justify-content: center;

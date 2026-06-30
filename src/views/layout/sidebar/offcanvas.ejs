@@ -11,12 +11,16 @@
     }
 }; %>
 
-<div id="mobileMenu" tabindex="-1" class="offcanvas offcanvas-start w-md-50" 
+<div
+    id="mobileMenu"
+    tabindex="-1"
+    class="app-mobile-menu offcanvas offcanvas-start w-md-50"
+    data-mdb-theme="dark"
     aria-labelledby="<%= header.title.id %>"
 >
     <%- include('../../shared/header', { header }) %>
 
-    <div class="offcanvas-body d-flex flex-column bg-dark">
+    <div class="offcanvas-body d-flex flex-column">
         <div class="flex-grow-1 mb-5">
             <div class="mb-5">
                 <%- include('../ui/navList', { 

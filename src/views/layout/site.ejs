@@ -11,12 +11,12 @@
     content: '<i class="fas fa-bars me-2"></i>Menú'
 }; %>
 
-<div class="d-flex min-vh-100 bg-white">
+<div class="app-shell d-flex min-vh-100">
 
     <%- include('./sidebar/offcanvas') %>
 
-    <aside class="d-none d-md-block bg-dark text-white p-3" style="width:260px;">
-        <nav class="navbar navbar-expand-lg bg-dark p-0">
+    <aside class="app-sidebar d-none d-md-block p-3" data-mdb-theme="dark">
+        <nav class="navbar navbar-expand-lg p-0">
             <div class="container-fluid justify-content-between">
 
                 <div role="navigation">
@@ -29,7 +29,7 @@
     </aside>
 
     <div class="flex-fill d-flex flex-column">
-        <header class="navbar bg-white shadow px-3">
+        <header class="app-header navbar shadow-2 px-3">
 
             <div class="d-md-none">
                 <%- include('../shared/button', { button: menuButton }) %>
@@ -40,10 +40,11 @@
                     <button
                         id="notificationsBellBtn"
                         type="button"
-                        class="btn btn-link text-dark position-relative p-0"
+                        class="btn btn-link btn-floating link-secondary position-relative"
                         data-mdb-dropdown-init
                         data-mdb-ripple-init
                         aria-expanded="false"
+                        aria-label="Abrir notificaciones"
                     >
                         <i class="fas fa-bell fs-5"></i>
                         <span
@@ -58,7 +59,6 @@
                         id="notificationsMenu"
                         class="dropdown-menu dropdown-menu-end p-0"
                         aria-labelledby="notificationsBellBtn"
-                        style="min-width: 320px;"
                     >
                         <li class="px-3 py-2 border-bottom d-flex justify-content-between align-items-center">
                             <strong>Notificaciones</strong>
@@ -68,7 +68,7 @@
                     </ul>
                 </div>
 
-                <span class="text-dark"><%= user.name %></span>
+                <span class="text-body"><%= user.name %></span>
 
                 <%- include('./ui/logoutForm', {
                     buttonClass: 'btn btn-sm btn-outline-secondary ms-2'
