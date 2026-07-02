@@ -1055,8 +1055,8 @@ a:hover {
 
 /* focus styles: keep MDB's native input border/notch behavior intact */
 
-:where(.form-control, .form-select, input, select, textarea, [tabindex]):not(.form-check-input):focus,
-:where(.form-control, .form-select, input, select, textarea, [tabindex]):not(.form-check-input):focus-visible {
+:where(.form-control, .form-select, input, select, textarea, [tabindex]):not(.form-check-input):not(.form-outline .form-control):focus,
+:where(.form-control, .form-select, input, select, textarea, [tabindex]):not(.form-check-input):not(.form-outline .form-control):focus-visible {
   border-color: var(--mdb-focus) !important;
   box-shadow: 0 0 0 0.26rem rgba(var(--mdb-focus-rgb), 0.28) !important;
   outline: none !important;
@@ -1399,9 +1399,16 @@ table.dataTable.modal-detail-table td:has(.table-action-btn) > * {
 
 .login-card .form-outline .form-control {
   background-color: rgba(255, 255, 255, 0.96);
+  border-color: transparent !important;
   border-radius: 1rem;
+  box-shadow: none !important;
   color: var(--mdb-secondary);
   min-height: 3.25rem;
+}
+
+.login-card .form-outline .form-control:focus {
+  border-color: transparent !important;
+  box-shadow: none !important;
 }
 
 .login-card .form-outline .form-label,
