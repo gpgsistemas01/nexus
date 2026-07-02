@@ -1268,10 +1268,22 @@ table.dataTable.modal-detail-table td:has(.table-action-btn) > * {
 
 /* login page styles */
 .login-shell {
+  --mdb-primary: #14A44D;
+  --mdb-primary-rgb: 20, 164, 77;
+  --mdb-primary-hover: #0f7f3a;
+  --mdb-primary-hover-rgb: 15, 127, 58;
+  --mdb-primary-active: #0b5f2a;
+  --mdb-primary-active-rgb: 11, 95, 42;
+  --mdb-primary-soft: #e8f6ee;
+  --mdb-focus: var(--mdb-primary);
+  --mdb-focus-rgb: var(--mdb-primary-rgb);
+  --bs-primary: var(--mdb-primary);
+  --bs-primary-rgb: var(--mdb-primary-rgb);
   align-items: center;
   background:
-    radial-gradient(circle at top left, rgba(var(--mdb-primary-rgb), 0.28), transparent 34rem),
-    linear-gradient(135deg, var(--mdb-dark) 0%, rgba(var(--mdb-secondary-rgb), 0.96) 52%, var(--mdb-secondary) 100%);
+    radial-gradient(circle at top left, rgba(var(--mdb-primary-rgb), 0.18), transparent 34rem),
+    radial-gradient(circle at bottom right, rgba(var(--mdb-primary-rgb), 0.12), transparent 28rem),
+    linear-gradient(135deg, #f3faf5 0%, #edf7f0 48%, #ffffff 100%);
   display: flex;
   justify-content: center;
   margin: -1.5rem;
@@ -1280,8 +1292,8 @@ table.dataTable.modal-detail-table td:has(.table-action-btn) > * {
 }
 
 .login-card {
-  background: rgba(var(--mdb-light-rgb), 0.96);
-  border: 1px solid rgba(var(--mdb-light-rgb), 0.14);
+  background: rgba(255, 255, 255, 0.96);
+  border: 1px solid rgba(var(--mdb-primary-rgb), 0.18);
   border-radius: 1.5rem;
   display: grid;
   gap: 1.5rem;
@@ -1292,7 +1304,7 @@ table.dataTable.modal-detail-table td:has(.table-action-btn) > * {
 
 .login-card__brand {
   align-items: center;
-  background: linear-gradient(135deg, var(--mdb-primary-soft) 0%, rgba(var(--mdb-secondary-rgb), 0.14) 100%);
+  background: linear-gradient(135deg, var(--mdb-primary-soft) 0%, #dff4e8 100%);
   border-radius: 1.25rem;
   display: flex;
   justify-content: center;
@@ -1333,7 +1345,24 @@ table.dataTable.modal-detail-table td:has(.table-action-btn) > * {
   margin-top: -0.25rem;
 }
 
+
+.login-shell .form-outline .form-control:focus ~ .form-label,
+.login-shell .form-outline .form-control.active ~ .form-label {
+  color: var(--mdb-primary) !important;
+}
+
+.login-shell .form-outline .form-control:focus ~ .form-notch .form-notch-leading,
+.login-shell .form-outline .form-control:focus ~ .form-notch .form-notch-middle,
+.login-shell .form-outline .form-control:focus ~ .form-notch .form-notch-trailing,
+.login-shell .form-outline .form-control.active ~ .form-notch .form-notch-leading,
+.login-shell .form-outline .form-control.active ~ .form-notch .form-notch-middle,
+.login-shell .form-outline .form-control.active ~ .form-notch .form-notch-trailing {
+  border-color: var(--mdb-primary) !important;
+}
+
 .login-form #submitBtn {
+  background: linear-gradient(180deg, #21a366 0%, var(--mdb-primary) 100%) !important;
+  border-color: var(--mdb-primary) !important;
   border-radius: 999px;
   font-weight: 800;
   padding: 0.85rem 1.25rem;
