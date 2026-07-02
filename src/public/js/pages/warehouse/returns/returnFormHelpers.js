@@ -66,17 +66,23 @@ const updateReturnDetail = (params) => {
 
 export const bindReturnDetailEvents = ({
     details,
-    selectorPrefix = '',
-    afterToggle = null
+    selectorPrefix = ''
 }) => {
     on('change', `${ selectorPrefix }.return-checkbox`, (_event, checkbox) => {
-        updateReturnDetail({
+        const detail = updateReturnDetail({
             details,
             detailId: checkbox.dataset.detailId,
             isReturned: checkbox.checked
         });
 
-        afterToggle?.({ details, checkbox });
+        const input = checkbox
+            .closest('tr')
+            ?.querySelector(`.return-quantity-input[data-detail-id="${ checkbox.dataset.detailId }"]`);
+
+        if (!input) return;
+
+        input.disabled = !checkbox.checked;
+        input.value = detail?.returnedQuantity || '';
     });
 
     on('input', `${ selectorPrefix }.return-quantity-input`, (_event, input) => {

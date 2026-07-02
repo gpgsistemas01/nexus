@@ -299,6 +299,5 @@ on('input', '.project-converted-quantity-input', (e, input) => {
 });
 
 bindReturnDetailEvents({
-    details,
-    afterToggle: () => refreshProductTable(details)
+    details
 });

@@ -272,8 +272,7 @@ on('click', '#addProductBtn', addProduct);
 
 bindReturnDetailEvents({
     details,
-    selectorPrefix: `${ formId } `,
-    afterToggle: () => refreshProductTable(details)
+    selectorPrefix: `${ formId } `
 });
 
 const invoiceContainer = document.getElementById('invoiceContainer');
