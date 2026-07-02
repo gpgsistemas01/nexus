@@ -43,3 +43,43 @@ export class GoodsReceiptSupplierChangeConflict extends AppError {
         super('No se puede cambiar el proveedor de una compra confirmada porque sus movimientos de inventario ya están asociados al proveedor original', 'GOODS_RECEIPT_SUPPLIER_CHANGE_CONFLICT', 409);
     }
 }
+
+export class GoodsReceiptReturnConflict extends AppError {
+
+    constructor () {
+        super('La cantidad devuelta de la compra no es válida', 'GOODS_RECEIPT_RETURN_CONFLICT', 409);
+    }
+}
+
+export class GoodsReceiptReturnQuantityExceeded extends AppError {
+
+    constructor () {
+        super('La cantidad devuelta excede la cantidad disponible para devolver en la compra', 'GOODS_RECEIPT_RETURN_QUANTITY_EXCEEDED', 409);
+    }
+}
+
+export class GoodsReceiptReturnInsufficientStock extends AppError {
+
+    constructor ({ productName, height, base, supplierName, productId, supplierId, requestedQuantity } = {}) {
+
+        const hasDimensions =
+            base != null &&
+            height != null;
+
+        const dimensions = hasDimensions
+            ? ` (${ base } x ${ height })`
+            : '';
+
+        const supplier = supplierName
+            ? ` y proveedor: ${ supplierName }`
+            : '';
+
+        super(
+            `Stock insuficiente para devolver la compra con el producto: ${ productName ?? 'Producto desconocido' }${ dimensions }${ supplier }`,
+            'GOODS_RECEIPT_RETURN_INSUFFICIENT_STOCK',
+            409
+        );
+
+        this.meta = { productName, height, base, supplierName, productId, supplierId, requestedQuantity };
+    }
+}

@@ -1,6 +1,6 @@
 import { useForm } from "../../application/form.js";
-import { editGoodsReceiptHeader, registerGoodsReceipt } from "../../application/warehouse/goodsReceipts.js";
-import { validateAddGoodsReceiptProductValidators, validateGoodsReceiptValidators } from "../../utils/validations/validators.js";
+import { editGoodsReceiptHeader, registerGoodsReceipt, returnGoodsReceipt } from "../../application/warehouse/goodsReceipts.js";
+import { validateAddGoodsReceiptProductValidators, validateGoodsIssueReturnValidators, validateGoodsReceiptValidators } from "../../utils/validations/validators.js";
 import { refreshProductTable } from "../../plugins/datatable/baseDatatable.js";
 import { createGoodsReceiptDatatable, details, initDetailsGoodsReceiptTable } from "../../plugins/datatable/goodsReceiptDatatable.js";
 import { GOODS_RECEIPT_SUPPLIER_CHANGED_EVENT, initGoodsReceiptFormSelect2, setGoodsReceiptFormSelectOptions } from "../../plugins/select2/modules/goodsReceiptSelect.js";
@@ -11,12 +11,29 @@ import { handleSubmit, hasValidationErrors, toggleContainerElements, toggleDisab
 import { buildModalTitle, openModal } from "../../ui/modalUI.js";
 import { initMdbWrapperInput, updateMdbWrapperInput } from "../../plugins/mdb/baseInstance.js";
 import { FORM_SELECTORS, MODAL_SELECTORS } from "../../constants/selectors.js";
+import {
+    bindReturnDetailEvents,
+    buildReturnDetailState,
+    createReturnFormHandlers,
+    RETURN_MODE
+} from "./returns/returnFormHelpers.js";
+import { configureReturnModal } from "./returns/returnModalHelpers.js";
 
 const modalId = MODAL_SELECTORS.GOODS_RECEIPT;
 const formId = FORM_SELECTORS.GOODS_RECEIPT;
+const MODE_RETURN = RETURN_MODE;
 
 
 createGoodsReceiptDatatable();
+
+const returnForm = createReturnFormHandlers({
+    details,
+    validators: validateGoodsIssueReturnValidators,
+    validateFields,
+    returnUpdate: returnGoodsReceipt,
+    defaultUpdate: editGoodsReceiptHeader,
+    emptyMessage: 'Debe seleccionar al menos un material a devolver'
+});
 
 document.querySelector(modalId).addEventListener(GOODS_RECEIPT_SUPPLIER_CHANGED_EVENT, () => {
     details.length = 0;
@@ -26,13 +43,15 @@ document.querySelector(modalId).addEventListener(GOODS_RECEIPT_SUPPLIER_CHANGED_
 
 useForm({
     selector: formId,
-    normalizeData: ({ formData }) => {
+    normalizeData: ({ form, formData }) => {
 
         formData.isInvoiced = document.querySelector('input[name="isInvoiced"]').checked;
 
         if (!formData.isInvoiced) delete formData.invoice;
 
-        if (document.querySelector(formId).dataset.mode === 'edit') {
+        if (returnForm.isActive(form)) return returnForm.normalizeData({ form });
+
+        if (form.dataset.mode === 'edit') {
             formData.supplierId = document.querySelector(`${ formId } ${ FORM_SELECTORS.SUPPLIER }`)?.value;
         } else {
             formData.details = details;
@@ -48,6 +67,7 @@ useForm({
         errors = validateFields(validateGoodsReceiptValidators, formData);
 
         if (form.dataset.mode === 'edit') errors.details = null;
+        if (returnForm.isActive(form)) return returnForm.getErrors();
 
         if (formData.isInvoiced) {
 
@@ -70,7 +90,7 @@ useForm({
             form,
             formData,
             create: registerGoodsReceipt,
-            update: editGoodsReceiptHeader
+            update: returnForm.resolveUpdate(form)
         });
     },
 });
@@ -111,7 +131,7 @@ export const openGoodsReceiptModal = ({ mode, data = null }) => {
         });
     }
 
-    if (mode === 'edit' || mode === 'view') {
+    if (mode === 'edit' || mode === 'view' || mode === MODE_RETURN) {
 
         value = data.isInvoiced ? 'invoice' : 'none';
         const supplierName = data.supplierName;
@@ -131,7 +151,11 @@ export const openGoodsReceiptModal = ({ mode, data = null }) => {
             costPerUnitType: detail.costPerUnitType,
             netPurchaseAmount: detail.netPurchaseAmount,
             grossPurchaseAmount: detail.grossPurchaseAmount,
-            supplierName
+            supplierName,
+            ...buildReturnDetailState({
+                detail,
+                baseQuantity: detail.quantity
+            })
         })));
 
         form.elements.totalQuantityDisplayInput.value = data.totalQuantity;
@@ -151,6 +175,21 @@ export const openGoodsReceiptModal = ({ mode, data = null }) => {
         if (mode === 'view') {
             modalElement.querySelector('#modalTitle').textContent = buildModalTitle({ action: 'Ver', entityName: 'compra', referenceNumber: data?.referenceNumber });
             setFormReadOnly({ form, isReadOnly: true });
+        }
+
+        if (mode === MODE_RETURN) {
+            configureReturnModal({
+                modalElement,
+                form,
+                buildModalTitle,
+                referenceNumber: data?.referenceNumber,
+                entityName: 'compra',
+                action: 'Devolver',
+                submitText: 'Registrar devolución',
+                toggleContainerElements,
+                toggleDisabledElement,
+                disabledElement: form.querySelector(FORM_SELECTORS.SUPPLIER)
+            });
         }
 
         toggleButtons({
@@ -230,6 +269,12 @@ const addProduct = () => {
 }
 
 on('click', '#addProductBtn', addProduct);
+
+bindReturnDetailEvents({
+    details,
+    selectorPrefix: `${ formId } `,
+    afterToggle: () => refreshProductTable(details)
+});
 
 const invoiceContainer = document.getElementById('invoiceContainer');
 const invoiceRadios = document.querySelectorAll('input[name="isInvoiced"]');

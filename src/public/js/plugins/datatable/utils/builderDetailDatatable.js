@@ -7,7 +7,7 @@ const shouldShowIssueProjectColumns = ({ type, mode, isWarehouse, isCoordinator,
 export const buildDetailsHeader = ({ type, mode, isWarehouse, isCoordinator, isSystem }) => {
 
     let extraHeaders = '';
-    const suppliedQuantityHeader = type === 'issue' && (mode === 'edit-detail' || mode === 'view')
+    const suppliedQuantityHeader = type === 'issue' && (mode === 'edit-detail' || mode === 'view' || mode === 'return')
         ? '<th rowspan="2">Cantidad surtida</th>'
         : '';
 
@@ -32,7 +32,15 @@ export const buildDetailsHeader = ({ type, mode, isWarehouse, isCoordinator, isS
         extraHeaders += `<th rowspan="2">Surtir</th>`;
     }
 
-    if (mode !== 'view' && mode !== 'edit-detail') {
+    if ((type === 'issue' || type === 'receipt') && mode === 'return') {
+        extraHeaders += `
+            <th rowspan="2">Total devuelto</th>
+            <th rowspan="2">Cantidad devuelta registrada</th>
+            <th rowspan="2">Devolver</th>
+        `;
+    }
+
+    if (mode !== 'view' && mode !== 'edit-detail' && mode !== 'return') {
         extraHeaders += `<th rowspan="2">Acciones</th>`;
     }
 
@@ -67,7 +75,7 @@ export const buildDetailsColumns = ({ type, mode, render, isWarehouse, isCoordin
         { data: 'productBase' },
         { data: 'productHeight' },
         { data: 'quantity' },
-        ...(type === 'issue' && (mode === 'edit-detail' || mode === 'view') ? [{ data: 'suppliedQuantity' }] : []),
+        ...(type === 'issue' && (mode === 'edit-detail' || mode === 'view' || mode === 'return') ? [{ data: 'suppliedQuantity' }] : []),
         { data: 'presentationName' },
         { data: 'convertedQuantity' },
         { data: 'unitMeasureName' },
@@ -112,6 +120,45 @@ export const buildDetailsColumns = ({ type, mode, render, isWarehouse, isCoordin
         );
     }
 
+    if ((type === 'issue' || type === 'receipt') && mode === 'return') {
+        columns.push(
+            { data: 'returnedQuantityTotal', defaultContent: 0 },
+            {
+                data: 'returnedQuantity',
+                render: (value, _, row) => {
+                    const detailId = row.id || row.productId;
+                    return `
+                        <input
+                            type="number"
+                            name="returnedQuantity"
+                            value="${ value ?? '' }"
+                            class="form-control return-quantity-input"
+                            data-detail-id="${ detailId }"
+                            min="0.01"
+                            step="0.01"
+                            ${ row.isReturned ? '' : 'disabled' }
+                        >
+                        <div data-error-for="returnedQuantity-${ detailId }" class="invalid-feedback d-none"></div>
+                    `;
+                }
+            },
+            {
+                data: null,
+                render: (_, __, row) => {
+                    const detailId = row.id || row.productId;
+                    return `
+                        <input type="checkbox"
+                            name="isReturned"
+                            class="form-check-input return-checkbox"
+                            data-detail-id="${ detailId }"
+                            ${ row.isReturned ? 'checked' : '' }
+                        >
+                    `;
+                }
+            }
+        );
+    }
+
     if (type === 'issue' && mode === 'edit-detail') {
         columns.push({
             data: null,
@@ -133,7 +180,7 @@ export const buildDetailsColumns = ({ type, mode, render, isWarehouse, isCoordin
         });
     }
 
-    if (mode !== 'view' && mode !== 'edit-detail') {
+    if (mode !== 'view' && mode !== 'edit-detail' && mode !== 'return') {
         columns.push({
             data: null,
             render: (_, __, row) => {

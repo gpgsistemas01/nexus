@@ -4,13 +4,18 @@ import { validate } from '../../../middleware/validatorMiddleware.js';
 import {
     editGoodsReceiptHeader,
     getAllGoodsReceipts,
-    registerGoodsReceipt
+    registerGoodsReceipt,
+    returnGoodsReceipt
 } from '../../../controllers/api/warehouse/goodsReceiptController.js';
-import { goodsReceiptHeaderValidation, goodsReceiptValidation } from '../../../validators/forms/goodsReceiptValidations.js';
+import { goodsReceiptHeaderValidation, goodsReceiptReturnValidation, goodsReceiptValidation } from '../../../validators/forms/goodsReceiptValidations.js';
 
 const router = express.Router();
 const goodsReceiptPermissions = {
     roles: ['Almacenista', 'Coordinador', 'Auxiliar', 'Administrador del sistema'],
+    departments: ['ALMACÉN Y PROVEDURÍA', 'SISTEMAS']
+};
+const goodsReceiptReturnPermissions = {
+    roles: ['Almacenista', 'Auxiliar', 'Coordinador', 'Administrador del sistema'],
     departments: ['ALMACÉN Y PROVEDURÍA', 'SISTEMAS']
 };
 
@@ -37,6 +42,15 @@ router.patch(
     validate,
     authorizeUserApi(goodsReceiptPermissions),
     editGoodsReceiptHeader
+);
+
+router.patch(
+    '/:id/returns',
+    verifyApiTokenRequired,
+    goodsReceiptReturnValidation,
+    validate,
+    authorizeUserApi(goodsReceiptReturnPermissions),
+    returnGoodsReceipt
 );
 
 export default router;

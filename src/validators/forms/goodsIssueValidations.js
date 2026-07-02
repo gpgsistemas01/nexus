@@ -1,4 +1,4 @@
-import { validateDate, validateGoodsIssueDetailsArray, validateGoodsIssueDetailsEdition, validateProjectNumber, validateTextOptional, validateUUID } from "../fields/fieldsValidator.js";
+import { validateDate, validateGoodsIssueDetailsArray, validateGoodsIssueDetailsEdition, validateGoodsIssueReturns, validateProjectNumber, validateTextOptional, validateUUID } from "../fields/fieldsValidator.js";
 
 export const goodsIssueValidation = [
     validateUUID('advisorId'),
@@ -34,4 +34,9 @@ export const goodsIssueHeaderValidation = [
     validateProjectNumber('projectNumber'),
     validateDate('requestDate'),
     validateTextOptional({ fieldName: 'observations', maxLength: 500 })
+];
+
+
+export const goodsIssueReturnValidation = [
+    validateGoodsIssueReturns
 ];

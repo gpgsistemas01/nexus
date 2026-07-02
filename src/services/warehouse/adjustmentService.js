@@ -7,7 +7,13 @@ import { createStockAdjustmentMovement } from "../inventory/movementService.js";
 import { adjustSupplierProductStock, findSupplierProductByIds } from "./products/supplierProductService.js";
 
 const REFERENCE_NUMBER_TYPE = 'AJU';
-const RETURN_REASON_NAME = 'Devolución';
+const GOODS_RECEIPT_RETURN_REASON_NAME = 'Devolución de compra';
+const GOODS_ISSUE_RETURN_REASON_NAME = 'Devolución de salida';
+export const StockReturnSource = Object.freeze({
+    GOODS_RECEIPT: 'GOODS_RECEIPT',
+    GOODS_ISSUE: 'GOODS_ISSUE'
+});
+
 
 const calculateStockAdjustmentValues = ({
     product,
@@ -67,7 +73,12 @@ export const createStockAdjustment = async ({
     userId,
     base = null,
     height = null,
-    returnedQuantity = null
+    returnedQuantity = null,
+    returnSource = StockReturnSource.GOODS_RECEIPT,
+    goodsIssueId = null,
+    goodsIssueDetailId = null,
+    goodsReceiptId = null,
+    goodsReceiptDetailId = null
 }) => {
 
     const execute = async (transaction) => {
@@ -83,8 +94,13 @@ export const createStockAdjustment = async ({
         const productName = product.name;
         const supplierName = product.supplier?.tradeName || '';
         const isReturnAdjustment = returnedQuantity !== null && returnedQuantity !== undefined;
+        const isGoodsReceiptReturn = returnSource === StockReturnSource.GOODS_RECEIPT;
+        const returnSign = isGoodsReceiptReturn ? -1 : 1;
+        const returnReasonName = isGoodsReceiptReturn
+            ? GOODS_RECEIPT_RETURN_REASON_NAME
+            : GOODS_ISSUE_RETURN_REASON_NAME;
         const resolvedNewStock = isReturnAdjustment
-            ? normalizeDecimal(Number(toNumber(product.currentStock) || 0) + Number(returnedQuantity))
+            ? normalizeDecimal(Number(toNumber(product.currentStock) || 0) + (Number(returnedQuantity) * returnSign))
             : newStock;
 
         const {
@@ -116,7 +132,7 @@ export const createStockAdjustment = async ({
                 appliedAt: new Date(),
                 reason: {
                     connect: isReturnAdjustment
-                        ? { name: RETURN_REASON_NAME }
+                        ? { name: returnReasonName }
                         : { id: reasonId }
                 },
                 createdBy: {
@@ -160,6 +176,10 @@ export const createStockAdjustment = async ({
             productId,
             supplierId,
             reasonId,
+            goodsIssueId,
+            goodsIssueDetailId,
+            goodsReceiptId,
+            goodsReceiptDetailId,
             previousStock,
             previousConvertedQuantity,
             newStock: adjustedNewStock,
@@ -181,3 +201,46 @@ export const createStockAdjustment = async ({
 
     return getDb().$transaction(execute);
 };
+
+
+export const createGoodsReceiptReturnStockAdjustment = ({
+    tx = null,
+    productId,
+    supplierId,
+    observations,
+    returnedQuantity,
+    userId,
+    goodsReceiptId = null,
+    goodsReceiptDetailId = null
+}) => createStockAdjustment({
+    tx,
+    productId,
+    supplierId,
+    observations,
+    returnedQuantity,
+    returnSource: StockReturnSource.GOODS_RECEIPT,
+    userId,
+    goodsReceiptId,
+    goodsReceiptDetailId
+});
+
+export const createGoodsIssueReturnStockAdjustment = ({
+    tx,
+    productId,
+    supplierId,
+    observations,
+    returnedQuantity,
+    userId,
+    goodsIssueId,
+    goodsIssueDetailId
+}) => createStockAdjustment({
+    tx,
+    productId,
+    supplierId,
+    observations,
+    returnedQuantity,
+    returnSource: StockReturnSource.GOODS_ISSUE,
+    userId,
+    goodsIssueId,
+    goodsIssueDetailId
+});

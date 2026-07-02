@@ -29,3 +29,11 @@ export const createGoodsReceiptDtoForEdit = (body = {}) => {
         ...(Object.prototype.hasOwnProperty.call(body, 'observations') ? { observations: body.observations.trim() } : {})
     };
 };
+
+export const createGoodsReceiptReturnDto = (body = {}) => ({
+    details: (body.details || []).map(d => ({
+        id: d.id?.trim?.() || d.id,
+        isReturned: Boolean(d.isReturned),
+        returnedQuantity: Number(d.returnedQuantity)
+    }))
+});

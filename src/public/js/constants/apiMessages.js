@@ -184,6 +184,24 @@ export const errorMessages = {
     GOODS_RECEIPT_CREATE_DB_ERROR: 'Error de base de datos al crear la compra.',
     GOODS_RECEIPT_UPDATE_DB_ERROR: 'Error de base de datos al actualizar la compra.',
     GOODS_RECEIPT_SUPPLIER_CHANGE_CONFLICT: 'No se puede cambiar el proveedor de una compra confirmada porque sus movimientos de inventario ya están asociados al proveedor original.',
+    GOODS_RECEIPT_RETURN_CONFLICT: 'La cantidad devuelta de la compra no es válida.',
+    GOODS_RECEIPT_RETURN_QUANTITY_EXCEEDED: 'La cantidad devuelta excede la cantidad disponible para devolver en la compra.',
+    GOODS_RECEIPT_RETURN_INSUFFICIENT_STOCK: (meta) => {
+
+        const hasDimensions =
+            meta.base != null &&
+            meta.height != null;
+
+        const dimensions = hasDimensions
+            ? ` (${ meta.base } x ${ meta.height })`
+            : '';
+
+        const supplier = meta.supplierName
+            ? ` y proveedor: ${ meta.supplierName }`
+            : '';
+
+        return `Stock insuficiente para devolver la compra con el producto: ${ meta.productName }${ dimensions }${ supplier }.`;
+    },
     PRODUCT_NOT_FOUND: 'Producto no encontrado.',
     PRODUCT_CREATE_DB_ERROR: 'Error de base de datos al crear el producto.',
     PRODUCT_UPDATE_DB_ERROR: 'Error de base de datos al editar el producto.',

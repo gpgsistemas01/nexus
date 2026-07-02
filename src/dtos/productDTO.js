@@ -13,9 +13,7 @@ export const createProductDtoForRegister = (body = {}) => ({
 
 export const createProductDtoForStockUpdate = (body = {}) => ({
     supplierId: body.supplierId,
-    ...(Object.prototype.hasOwnProperty.call(body, 'returnedQuantity')
-        ? { returnedQuantity: Number(body.returnedQuantity) }
-        : { newStock: Number(body.newStock) }),
+    newStock: Number(body.newStock),
     ...Object.prototype.hasOwnProperty.call(body, 'observations') ? { observations: body.observations ? body.observations.trim() : null } : {},
     reasonId: body.reasonId
 });
