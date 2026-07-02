@@ -73,6 +73,18 @@ const buttons = {
             'data-mdb-dismiss': 'modal'
         }
     }
+};
+
+const getSelectColumnClass = col => {
+    const colValue = String(col || '12').trim();
+
+    return colValue.split(/\s+/).map(token => {
+        if (token.startsWith('col-')) {
+            return token;
+        }
+
+        return `col-${token}`;
+    }).join(' ');
 }; %>
 
 <div class="modal fade" id="<%= modalId %>" tabindex="-1" aria-labelledby="<%= header.title.id %>" aria-hidden="true">
@@ -156,7 +168,7 @@ const buttons = {
 
                 <% if (form.table) { %>
                     <div class="row g-2 mb-3 add-product-container">
-                        <div class="<%= form.table.select.col %>  mb-2">
+                        <div class="<%= getSelectColumnClass(form.table.select.col) %> mb-2">
                             <%- include('./select', { input: form.table.select }) %>
                         </div>
 

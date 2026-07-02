@@ -1,5 +1,20 @@
+<%
+const getSelectColumnClass = col => {
+    const defaultCol = '12';
+    const colValue = String(col || defaultCol).trim();
+
+    return colValue.split(/\s+/).map(token => {
+        if (token.startsWith('col-')) {
+            return token;
+        }
+
+        return `col-${token}`;
+    }).join(' ');
+};
+%>
+
 <% inputs.forEach( input => { %>
-    <div class="col-<%= input.col || 12 %>">
+    <div class="<%= getSelectColumnClass(input.col) %>">
         <%- include('./select', { input }) %>
     </div>
 <% }); %>

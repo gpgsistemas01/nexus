@@ -1,4 +1,18 @@
-<div class="mb-3 <%= col %>">
+<%
+const getFilterColumnClass = col => {
+    const colValue = String(col || 'col-12').trim();
+
+    return colValue.split(/\s+/).map(token => {
+        if (token.startsWith('col-')) {
+            return token;
+        }
+
+        return `col-${token}`;
+    }).join(' ');
+};
+%>
+
+<div class="mb-3 <%= getFilterColumnClass(col) %>">
     <label for="<%= id %>" class="form-label"><%= label %></label>
 
     <select id="<%= id %>" class="form-select w-100">
