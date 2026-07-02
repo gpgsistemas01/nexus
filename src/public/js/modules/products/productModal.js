@@ -12,7 +12,6 @@ const stockSectionSelector = '.stock-data-section';
 const goodsReceiptCreationContext = 'goodsReceipt';
 const maxUnitCostLabel = 'Costo Máximo';
 const newStockLabel = 'Nueva cantidad';
-const returnedQuantityLabel = 'Cantidad devuelta';
 
 const setProductValues = ({ form, data = null }) => {
 
@@ -41,7 +40,6 @@ const prepareProductModal = ({
         includeStockAdjustmentOnCreate,
         isStockAdjustment
     });
-    const isProductReturn = mode === 'return-product';
 
     initForm({ form, mode, id: data?.id });
     clearFormErrors(form);
@@ -71,7 +69,7 @@ const prepareProductModal = ({
         clearWhenHidden: !showStockFields,
         requiredWhenVisible: showStockFields,
         enableWhenVisible: true,
-        labelContent: isProductReturn ? returnedQuantityLabel : newStockLabel
+        labelContent: newStockLabel
     });
 
     initProductFormSelect2({ modalSelector: productModalId, isStockAdjustment: showStockFields });

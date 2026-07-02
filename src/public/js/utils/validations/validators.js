@@ -39,11 +39,6 @@ export const productStockValidators = {
     observations: (value) => validateTextOptional(value, 500, 'Las observaciones'),
 }
 
-export const productReturnValidators = {
-    newStock: (value) => validatePositiveNumber(value, 'La cantidad devuelta'),
-    observations: (value) => validateTextOptional(value, 500, 'Las observaciones'),
-}
-
 export const wasteDataValidators = {
     supplierProductId: (value) => isEmptyOrNull(value, 'El producto'),
     base: (value) => validateNumber(value, 'La base de la merma'),
@@ -109,6 +104,48 @@ export const validateGoodsIssueValidators = {
 export const validateGoodsIssueDetailValidators = {
     projectConvertedQuantity: (value) => validateNumber(value, 'La cantidad')
 }
+
+export const validateGoodsIssueReturnValidators = {
+    returnedQuantity: (value, detail = {}) => {
+        const positiveError = validatePositiveNumber(value, 'La cantidad devuelta');
+        if (positiveError) return positiveError;
+
+        const returnedQuantity = Number(value);
+        const availableQuantity = Number(detail.availableReturnQuantity ?? detail.suppliedQuantity ?? 0);
+
+        if (returnedQuantity > availableQuantity) {
+            return 'La cantidad devuelta no puede ser mayor a la cantidad disponible para devolver';
+        }
+
+        return null;
+    }
+}
+
+
+export const validateReturnDetails = ({
+    details = [],
+    validators,
+    validateFields,
+    emptyMessage
+}) => {
+    const errors = { details: null };
+    const selected = details.filter(detail => detail.isReturned);
+
+    if (!selected.length) return { details: emptyMessage || null };
+
+    selected.forEach((detail) => {
+        const detailErrors = validateFields(validators, {
+            returnedQuantity: detail.returnedQuantity,
+            availableReturnQuantity: detail.availableReturnQuantity
+        });
+
+        if (detailErrors.returnedQuantity) {
+            errors[`returnedQuantity-${ detail.id }`] = detailErrors.returnedQuantity;
+        }
+    });
+
+    return errors;
+};
 
 export const validatePurchaseRequisitionValidators = {
     projectId: (value) => isEmptyOrNull(value, 'El proyecto'),

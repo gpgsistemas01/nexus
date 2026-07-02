@@ -4,7 +4,6 @@ import {
     GoodsIssueUpdateDatabaseError,
     GoodsIssueAdvisorProfileNotFound,
     GoodsIssueNotPendingConflict,
-    GoodsIssueSuppliedConflict,
     GoodsIssueCreateDatabaseError,
     GoodsIssueInternalClientAdvisorDepartmentConflict,
     GoodsIssueInternalClientProjectNumberConflict
@@ -23,6 +22,7 @@ import { applyInventoryMovement } from "../../inventory/movementService.js";
 import { normalizeDecimal } from "../../../utils/formattersUtils.js";
 import { AppError } from "../../../errors/AppError.js";
 import { buildDateRangeFilter } from "../../../utils/requestQueryUtils.js";
+import { findReturnedQuantityTotalsByDetailIds } from "../returns/returnHelpers.js";
 
 const ROLE_SYSTEM_ADMIN = 'Administrador del sistema';
 const ROLE_COORDINATOR = 'Coordinador';
@@ -33,6 +33,8 @@ const STATUS_APPROVED = 'Aprobada';
 const REFERENCE_NUMBER_TYPE = 'SAL';
 const MOVEMENT_TYPE_OUT = 'ISSUE';
 const FLOAT_EPSILON = 0.000001;
+
+
 
 const GOODS_ISSUE_DETAIL_SELECT = {
     id: true,
@@ -133,6 +135,25 @@ export const findAllGoodsIssues = async ({
 
     const total = await db.goodsIssue.count({ where });
     const filtered = total;
+
+    const detailIds = [];
+
+    goodsIssues.forEach(issue => {
+        issue.details.forEach(detail => {
+            detailIds.push(detail.id);
+        });
+    });
+    const returnedByDetailId = await findReturnedQuantityTotalsByDetailIds({
+        tx: db,
+        detailIds,
+        detailField: 'goodsIssueDetailId'
+    });
+
+    goodsIssues.forEach(issue => {
+        issue.details.forEach(detail => {
+            detail.returnedQuantityTotal = returnedByDetailId.get(detail.id) ?? 0;
+        });
+    });
 
     return {
         data: goodsIssues,
@@ -406,6 +427,7 @@ export const updateGoodsIssue = async ({ id, goodsIssueDto }) => {
 export const updateGoodsIssueDetails = async ({ id, goodsIssueDto }) => {
 
     const { details = [] } = goodsIssueDto;
+    const detailIds = details.map(detail => detail.id);
 
     try {
 
@@ -416,6 +438,7 @@ export const updateGoodsIssueDetails = async ({ id, goodsIssueDto }) => {
                 status: true,
                 fulfillmentStatus: true,
                 details: {
+                    where: { id: { in: detailIds } },
                     select: {
                         id: true,
                         productId: true,

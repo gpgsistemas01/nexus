@@ -148,11 +148,12 @@ export const refreshProductTable = (details) => {
     table.draw();
 }
 
-export const renderActionButtons = ({ status, fulfillmentStatus, context, canAdjustStock = false, canReturnProduct = false }) => {
+export const renderActionButtons = ({ status, fulfillmentStatus, context, canAdjustStock = false, canReturnGoodsIssue = false, canReturnGoodsReceipt = false }) => {
 
     const actions = [];
     const canEditGoodsIssue = context === 'goodsIssue' && status === 'Aprobada';
     const canSupplyGoodsIssue = context === 'goodsIssue' && ['Pendiente', 'Surtido parcial'].includes(fulfillmentStatus);
+    const canReturnGoodsIssueByStatus = context === 'goodsIssue' && ['Surtido parcial', 'Surtido'].includes(fulfillmentStatus);
 
     if ((status === 'Abierta' || canEditGoodsIssue) || context === 'goodsReceipt' || context === 'profile' || context === 'client' || context === 'supplier') actions.push(buildMdbActionButton({
         className: 'btn-edit',
@@ -170,21 +171,24 @@ export const renderActionButtons = ({ status, fulfillmentStatus, context, canAdj
         ariaLabel: 'Ajustar stock'
     }));
 
-    if (context === 'product' && canReturnProduct) actions.push(buildMdbActionButton({
-        className: 'btn-return-product',
-        colorClass: 'btn-warning',
-        iconClass: 'fa-solid fa-rotate-left',
-        title: 'Devolver producto',
-        ariaLabel: 'Devolver producto',
-        rippleColor: 'dark'
-    }));
-
     if (status === 'Aprobada' && context === 'goodsIssue' && canSupplyGoodsIssue) actions.push(buildMdbActionButton({
         className: 'btn-edit-detail',
         colorClass: 'btn-info',
         iconClass: 'fa fa-edit',
         title: 'Surtir detalle',
         ariaLabel: 'Surtir detalle'
+    }));
+
+    if (
+        (status === 'Aprobada' && canReturnGoodsIssue && canReturnGoodsIssueByStatus)
+        || (status === 'Confirmada' && context === 'goodsReceipt' && canReturnGoodsReceipt)
+    ) actions.push(buildMdbActionButton({
+        className: context === 'goodsReceipt' ? 'btn-return-goods-receipt' : 'btn-return-goods-issue',
+        colorClass: 'btn-warning',
+        iconClass: 'fa-solid fa-rotate-left',
+        title: 'Registrar devolución',
+        ariaLabel: 'Registrar devolución',
+        rippleColor: 'dark'
     }));
 
     if (context !== 'product' && context !== 'waste' && context !== 'profile' && context !== 'client' && context !== 'supplier') actions.push(buildMdbActionButton({

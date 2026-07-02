@@ -1,4 +1,4 @@
-import { createGoodsReceiptDtoForEdit, createGoodsReceiptDtoForRegister } from "../../../dtos/goodsReceiptDTO.js";
+import { createGoodsReceiptDtoForEdit, createGoodsReceiptDtoForRegister, createGoodsReceiptReturnDto } from "../../../dtos/goodsReceiptDTO.js";
 import { successCodeMessages } from "../../../messages/codeMessages.js";
 import {
     createGoodsReceipt,
@@ -12,6 +12,7 @@ import {
 } from "../../../services/warehouse/notificationService.js";
 import { emitStockUpdated } from "../../../utils/socketUtils.js";
 import { sanitizeEmptyStrings } from "../../../utils/formattersUtils.js";
+import { returnGoodsReceiptProducts } from "../../../services/warehouse/returns/returnService.js";
 
 export const getAllGoodsReceipts = async (req, res) => {
 
@@ -72,6 +73,23 @@ export const editGoodsReceiptHeader = async (req, res) => {
 
     return res.status(200).json({
         goodsReceipt,
+        code: successCodeMessages.UPDATED_GOODS_RECEIPT
+    });
+};
+
+export const returnGoodsReceipt = async (req, res) => {
+
+    const goodsReceiptDto = createGoodsReceiptReturnDto(req.body);
+    const sanitizedGoodsReceiptDto = sanitizeEmptyStrings(goodsReceiptDto);
+
+    const goodsReceiptReturn = await returnGoodsReceiptProducts({
+        id: req.params.id,
+        goodsReceiptDto: sanitizedGoodsReceiptDto,
+        userId: req.user.profile.id
+    });
+
+    return res.status(200).json({
+        goodsReceiptReturn,
         code: successCodeMessages.UPDATED_GOODS_RECEIPT
     });
 };

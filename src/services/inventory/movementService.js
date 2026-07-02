@@ -181,6 +181,10 @@ export const createStockAdjustmentMovement = async ({
     productId,
     supplierId,
     reasonId,
+    goodsIssueId = null,
+    goodsIssueDetailId = null,
+    goodsReceiptId = null,
+    goodsReceiptDetailId = null,
     previousStock,
     newStock,
     difference
@@ -198,6 +202,16 @@ export const createStockAdjustmentMovement = async ({
                     id: adjustment.id
                 }
             },
+            ...(goodsIssueId && {
+                goodsIssue: {
+                    connect: { id: goodsIssueId }
+                }
+            }),
+            ...(goodsReceiptId && {
+                goodsReceipt: {
+                    connect: { id: goodsReceiptId }
+                }
+            }),
 
             details: {
                 create: {
@@ -220,7 +234,17 @@ export const createStockAdjustmentMovement = async ({
                         connect: {
                             id: adjustmentDetail.id
                         }
-                    }
+                    },
+                    ...(goodsIssueDetailId && {
+                        goodsIssueDetail: {
+                            connect: { id: goodsIssueDetailId }
+                        }
+                    }),
+                    ...(goodsReceiptDetailId && {
+                        goodsReceiptDetail: {
+                            connect: { id: goodsReceiptDetailId }
+                        }
+                    })
                 }
             }
         }

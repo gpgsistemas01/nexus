@@ -3,9 +3,6 @@ import { validateBoolean, validateNumberOptional, validateNumberOptionalWhen, va
 const stockAdjustmentFields = ['newStock', 'reasonId', 'observations'];
 export const PRODUCT_CREATION_CONTEXT_GOODS_RECEIPT = 'goodsReceipt';
 
-const hasReturnedQuantity = (body = {}) => Object.prototype.hasOwnProperty.call(body, 'returnedQuantity');
-const requiresNewStock = (body = {}) => !hasReturnedQuantity(body);
-
 export const hasStockAdjustmentPayload = (body = {}) =>
     stockAdjustmentFields.some(field => Object.prototype.hasOwnProperty.call(body, field));
 
@@ -55,8 +52,7 @@ export const productCreateValidation = [
 
 export const productStockValidation = [
     validateUUID('supplierId'),
-    validateNumberWhen({ fieldName: 'newStock', predicate: requiresNewStock }),
-    validateNumberWhen({ fieldName: 'returnedQuantity', predicate: hasReturnedQuantity }),
+    validateNumberWhen({ fieldName: 'newStock', predicate: () => true }),
     validateTextOptional({ fieldName: 'observations', maxLength: 500 }),
-    validateUUIDWhen({ fieldName: 'reasonId', predicate: requiresNewStock }),
+    validateUUIDWhen({ fieldName: 'reasonId', predicate: () => true }),
 ]

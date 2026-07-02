@@ -18,6 +18,7 @@ import { buildGoodsReceiptDetails } from "./goodsReceiptHelpers.js";
 import { updateProductUnitCostIfHigher } from "../products/supplierProductService.js";
 import { AppError } from "../../../errors/AppError.js";
 import { buildDateRangeFilter } from "../../../utils/requestQueryUtils.js";
+import { findReturnedQuantityTotalsByDetailIds } from "../returns/returnHelpers.js";
 
 const REFERENCE_NUMBER_TYPE = 'REC';
 const MOVEMENT_TYPE_IN = 'ENTRY';
@@ -77,6 +78,11 @@ export const findAllGoodsReceipts = async ({
             totalQuantity: true,
             receptionDate: true,
             id: true,
+            status: {
+                select: {
+                    name: true
+                }
+            },
             details: {
                 select: {
                     id: true,
@@ -102,6 +108,26 @@ export const findAllGoodsReceipts = async ({
 
     const total = await getDb().goodsReceipt.count();
     const filtered = await getDb().goodsReceipt.count({ where });
+
+    const detailIds = [];
+
+    goodsReceipts.forEach(receipt => {
+        receipt.details.forEach(detail => {
+            detailIds.push(detail.id);
+        });
+    });
+    const returnedByDetailId = await findReturnedQuantityTotalsByDetailIds({
+        tx: getDb(),
+        detailIds,
+        detailField: 'goodsReceiptDetailId',
+        normalizeTotal: Math.abs
+    });
+
+    goodsReceipts.forEach(receipt => {
+        receipt.details.forEach(detail => {
+            detail.returnedQuantityTotal = returnedByDetailId.get(detail.id) ?? 0;
+        });
+    });
 
     return {
         data: goodsReceipts,

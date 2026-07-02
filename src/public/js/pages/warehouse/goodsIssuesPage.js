@@ -1,27 +1,44 @@
 import { useForm } from "../../application/form.js";
-import { editGoodsIssue, editGoodsIssueDetails, editGoodsIssueHeader, registerGoodsIssue } from "../../application/warehouse/goodsIssues/goodsIssues.js";
-import { validateAddGoodsIssueProductValidators, validateGoodsIssueDetailValidators, validateGoodsIssueValidators } from "../../utils/validations/validators.js";
+import { editGoodsIssue, editGoodsIssueDetails, editGoodsIssueHeader, registerGoodsIssue, returnGoodsIssue } from "../../application/warehouse/goodsIssues/goodsIssues.js";
+import { validateAddGoodsIssueProductValidators, validateGoodsIssueDetailValidators, validateGoodsIssueReturnValidators, validateGoodsIssueValidators } from "../../utils/validations/validators.js";
 import { refreshProductTable } from "../../plugins/datatable/baseDatatable.js";
 import { createGoodsIssueDatatable, details, initDetailsGoodsIssueTable } from "../../plugins/datatable/goodsIssueDatatable.js";
 import { initGoodsIssueFormSelect2, setGoodsIssueFormSelectOptions } from "../../plugins/select2/modules/goodsIssueSelect.js";
 import { setFormReadOnly, toggleButtons, clearAddedProductInput, clearFormErrors, normalizeFormErrors, initForm } from "../../ui/formUI.js";
 import { on } from "../../utils/domUtils.js";
 import { formatDateLongWithTime } from "../../utils/formatters.js";
-import { handleSubmit, hasValidationErrors, validateDetailsFields, validateFields } from "../../utils/formUtils.js";
+import { handleSubmit, hasValidationErrors, toggleContainerElements, validateDetailsFields, validateFields } from "../../utils/formUtils.js";
 import { buildModalTitle, openModal } from "../../ui/modalUI.js";
 import { hasPermission } from "../../utils/permissions.js";
 import { FORM_SELECTORS, MODAL_SELECTORS } from "../../constants/selectors.js";
+import {
+    bindReturnDetailEvents,
+    buildReturnDetailState,
+    createReturnFormHandlers,
+    RETURN_MODE
+} from "./returns/returnFormHelpers.js";
+import { configureReturnModal } from "./returns/returnModalHelpers.js";
 
 const MODE_EDIT = 'edit';
 const MODE_EDIT_DETAIL = 'edit-detail';
 const MODE_EDIT_HEADER = 'edit-header';
 const MODE_VIEW = 'view';
+const MODE_RETURN = RETURN_MODE;
 const modalId = MODAL_SELECTORS.GOODS_ISSUE;
 const formId = FORM_SELECTORS.GOODS_ISSUE;
 
 const context = window.meta || {};
 
 createGoodsIssueDatatable(context);
+
+const returnForm = createReturnFormHandlers({
+    details,
+    validators: validateGoodsIssueReturnValidators,
+    validateFields,
+    returnUpdate: returnGoodsIssue,
+    defaultUpdate: editGoodsIssue,
+    emptyMessage: 'Seleccione al menos un producto para devolver.'
+});
 
 const normalizeGoodsIssueData = ({ form, formData }) => {
 
@@ -30,11 +47,19 @@ const normalizeGoodsIssueData = ({ form, formData }) => {
     if (mode === MODE_EDIT_DETAIL) {
         return {
             id: form.dataset.id,
-            details
+            details: details
+                .filter(detail => detail.isSupplied && !detail.originalIsSupplied)
+                .map(({ id, isSupplied, projectConvertedQuantity }) => ({
+                    id,
+                    isSupplied,
+                    projectConvertedQuantity
+                }))
         };
     }
 
     if (mode === MODE_EDIT_HEADER) return formData;
+
+    if (returnForm.isActive(form)) return returnForm.normalizeData({ form });
 
     return {
         ...formData,
@@ -51,6 +76,8 @@ useForm({
 
         if (mode === MODE_EDIT_DETAIL) return validateDetailsFields(validateGoodsIssueDetailValidators, details);
 
+        if (returnForm.isActive(form)) return returnForm.getErrors();
+
         const errors = validateFields(validateGoodsIssueValidators, formData);
 
         if (mode === MODE_EDIT_HEADER) errors.details = null;
@@ -63,7 +90,7 @@ useForm({
             ? editGoodsIssueDetails
             : form.dataset.mode === MODE_EDIT_HEADER
                 ? editGoodsIssueHeader
-                : editGoodsIssue;
+                : returnForm.resolveUpdate(form);
 
         await handleSubmit({
             form,
@@ -102,9 +129,9 @@ export const openGoodsIssueModal = ({ mode, data = null }) => {
         form.querySelector('#presentationDisplayInput').value = '';
     }
 
-    if (mode === MODE_EDIT || mode === MODE_EDIT_DETAIL || mode === MODE_EDIT_HEADER || mode === MODE_VIEW) {
+    if (mode === MODE_EDIT || mode === MODE_EDIT_DETAIL || mode === MODE_EDIT_HEADER || mode === MODE_VIEW || mode === MODE_RETURN) {
 
-        form.querySelector('#observationsInput').value = data.observations || '';
+        form.querySelector('#observationsInput').value = mode === MODE_RETURN ? '' : (data.observations || '');
         form.querySelector('#requestDateInput').value = formatDateLongWithTime(data.requestDate);
         form.querySelector('#projectNumberInput').value = data.projectNumber;
         details.push(...data.details.map(detail => ({
@@ -128,6 +155,11 @@ export const openGoodsIssueModal = ({ mode, data = null }) => {
             supplierName: detail.supplierName,
             suppliedQuantity: detail.suppliedQuantity,
             isSupplied: detail.isSupplied,
+            originalIsSupplied: detail.isSupplied,
+            ...buildReturnDetailState({
+                detail,
+                baseQuantity: detail.suppliedQuantity
+            })
         })));
 
         setFormReadOnly({ form, isReadOnly: mode !== MODE_EDIT && mode !== MODE_EDIT_HEADER });
@@ -144,6 +176,19 @@ export const openGoodsIssueModal = ({ mode, data = null }) => {
 
             modalElement.querySelector('#modalTitle').textContent = buildModalTitle({ action: 'Editar detalles de la', entityName: 'salida', referenceNumber: data?.referenceNumber });
             form.querySelector('#submitBtn').textContent = 'Actualizar';
+        }
+
+        if (mode === MODE_RETURN) {
+            configureReturnModal({
+                modalElement,
+                form,
+                buildModalTitle,
+                referenceNumber: data?.referenceNumber,
+                entityName: 'salida',
+                toggleContainerElements,
+                setFormReadOnly,
+                observationsElement: form.querySelector('#observationsInput')
+            });
         }
 
         if (mode === MODE_VIEW) {
@@ -251,4 +296,9 @@ on('input', '.project-converted-quantity-input', (e, input) => {
     const nextTd = currenTd.nextElementSibling;
 
     if (nextTd) nextTd.textContent = product.convertedQuantityDifference;
+});
+
+bindReturnDetailEvents({
+    details,
+    afterToggle: () => refreshProductTable(details)
 });

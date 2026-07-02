@@ -20,3 +20,9 @@ export const editGoodsReceiptHeaderRequest = ({ data, id }) => apiRequest({
     url: `${ GOODS_RECEIPTS_API_ROUTE }/${ id }`,
     data
 });
+
+export const returnGoodsReceiptRequest = ({ data, id }) => apiRequest({
+    method: 'patch',
+    url: `${ GOODS_RECEIPTS_API_ROUTE }/${ id }/returns`,
+    data
+});

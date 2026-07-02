@@ -24,7 +24,8 @@ export const createGoodsIssueDatatable = async (context) => {
 
     let table;
 
-    const { isWarehouse, isSystem } = hasPermission(context);
+    const { hasRole, isWarehouse, isSystem, canManageWarehouseReturns } = hasPermission(context);
+    const canReturnGoodsIssue = canManageWarehouseReturns();
 
     const columns = [
         { data: 'referenceNumber', title: 'Folio' },
@@ -58,7 +59,8 @@ export const createGoodsIssueDatatable = async (context) => {
             render: (data, type, row) => renderActionButtons({ 
                 status: row.status?.name, 
                 fulfillmentStatus: row.fulfillmentStatus?.name,
-                context: 'goodsIssue' 
+                context: 'goodsIssue',
+                canReturnGoodsIssue
             })
         }
     );
@@ -105,6 +107,13 @@ export const createGoodsIssueDatatable = async (context) => {
         const data = getResponsiveRowData(table, this);
 
         openGoodsIssueModal({ mode: 'edit-detail', data });
+    });
+
+    $(`${ tableSelector } tbody`).on('click', '.btn-return-goods-issue', function() {
+
+        const data = getResponsiveRowData(table, this);
+
+        openGoodsIssueModal({ mode: 'return', data });
     });
 
     $(`${ tableSelector } tbody`).on('click', '.btn-view', function() {

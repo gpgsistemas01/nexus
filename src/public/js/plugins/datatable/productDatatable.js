@@ -51,7 +51,7 @@ const configureStockRealtime = (table) => {
     });
 };
 
-export const createProductDatatable = (context, { onReturnProduct = null } = {}) => {
+export const createProductDatatable = (context) => {
 
     const { hasRole, isAdmin, isWarehouse, isSystem, isSales } = hasPermission(context);
     const isWarehouseProductManager = isWarehouse && (hasRole('Almacenista') || hasRole('Coordinador') || hasRole('Auxiliar'));
@@ -88,8 +88,7 @@ export const createProductDatatable = (context, { onReturnProduct = null } = {})
             render: () => renderActionButtons({
                 status: 'Abierta',
                 context: 'product',
-                canAdjustStock,
-                canReturnProduct: canAdjustStock
+                canAdjustStock
             })
         });
     }
@@ -165,10 +164,4 @@ export const createProductDatatable = (context, { onReturnProduct = null } = {})
         openStockAdjustmentModal({ mode: 'edit-stock', data });
     });
 
-    $(`${ selectorTable } tbody`).on('click', '.btn-return-product', function() {
-
-        const data = getResponsiveRowData(table, this);
-
-        onReturnProduct?.({ data });
-    });
 }

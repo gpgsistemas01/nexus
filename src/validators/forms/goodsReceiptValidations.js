@@ -1,4 +1,4 @@
-import { validateBoolean, validateDate, validateDetailsArray, validateInvoice, validateTextOptional, validateUUID } from "../fields/fieldsValidator.js";
+import { validateBoolean, validateDate, validateDetailsArray, validateGoodsIssueReturns, validateInvoice, validateTextOptional, validateUUID } from "../fields/fieldsValidator.js";
 
 export const goodsReceiptValidation = [
     validateUUID('supplierId'),
@@ -18,4 +18,8 @@ export const goodsReceiptHeaderValidation = [
     validateInvoice(),
     validateDate('receptionDate'),
     validateTextOptional({ fieldName: 'observations', maxLength: 500 })
+];
+
+export const goodsReceiptReturnValidation = [
+    validateGoodsIssueReturns
 ];

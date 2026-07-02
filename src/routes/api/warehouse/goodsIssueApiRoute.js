@@ -7,8 +7,9 @@ import {
     editGoodsIssueHeader,
     getAllGoodsIssues,
     registerGoodsIssue,
+    returnGoodsIssue,
 } from '../../../controllers/api/warehouse/goodsIssueController.js';
-import { goodsIssueDetailsValidation, goodsIssueHeaderValidation, goodsIssueUpdateValidation, goodsIssueValidation } from '../../../validators/forms/goodsIssueValidations.js';
+import { goodsIssueDetailsValidation, goodsIssueHeaderValidation, goodsIssueReturnValidation, goodsIssueUpdateValidation, goodsIssueValidation } from '../../../validators/forms/goodsIssueValidations.js';
 
 const router = express.Router();
 
@@ -31,7 +32,7 @@ const goodsIssuePermissions = {
 };
 
 const goodsIssueDetailsPermissions = {
-    roles: ['Coordinador', 'Administrador del sistema'],
+    roles: ['Almacenista', 'Auxiliar', 'Coordinador', 'Administrador del sistema'],
     departments: ['ALMACÉN Y PROVEDURÍA', 'SISTEMAS']
 };
 
@@ -67,6 +68,15 @@ router.patch(
     validate,
     authorizeUserApi(goodsIssuePermissions),
     editGoodsIssueHeader
+);
+
+router.patch(
+    '/:id/returns',
+    verifyApiTokenRequired,
+    goodsIssueReturnValidation,
+    validate,
+    authorizeUserApi(goodsIssueDetailsPermissions),
+    returnGoodsIssue
 );
 
 router.patch(
