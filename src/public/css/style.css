@@ -1325,36 +1325,8 @@ table.dataTable.modal-detail-table td:has(.table-action-btn) > * {
   margin-bottom: 1.5rem;
 }
 
-.login-form .form-outline .form-control {
-  background-color: var(--mdb-light);
-  border: 1px solid var(--form-field-border);
-  border-radius: var(--form-field-border-radius);
-  box-shadow: none;
+.login-card .form-outline {
   color: var(--mdb-body-color);
-  min-height: 2.45rem;
-  padding: var(--form-field-padding);
-  transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
-}
-
-.login-form .form-outline .form-control::placeholder {
-  color: rgba(var(--mdb-secondary-rgb), 0.65);
-  opacity: 1;
-}
-
-.login-form .form-outline .form-label {
-  color: rgba(var(--mdb-secondary-rgb), 0.82);
-}
-
-.login-form .form-outline .form-control:focus {
-  background-color: var(--mdb-light);
-  border-color: var(--mdb-primary) !important;
-  color: var(--mdb-body-color);
-  box-shadow: 0 0 0 0.26rem rgba(var(--mdb-focus-rgb), 0.28) !important;
-}
-
-.login-form .form-outline .form-control:focus ~ .form-label,
-.login-form .form-outline .form-control.active ~ .form-label {
-  color: var(--mdb-primary-active);
 }
 
 .login-form .form-check {
