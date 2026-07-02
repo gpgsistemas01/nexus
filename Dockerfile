@@ -44,4 +44,4 @@ USER node
 
 EXPOSE 3000
 
-CMD ["sh", "-c", "echo INICIO && npx --no-install prisma migrate deploy && echo MIGRACIONES_OK && npm start"]
+CMD ["sh", "-c", "echo INICIO && echo DATABASE_URL_EXISTS=${DATABASE_URL:+YES} && npx --no-install prisma migrate deploy && echo MIGRACIONES_OK && npm start"]
