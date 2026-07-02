@@ -55,7 +55,7 @@
   --mdb-secondary: #332D2D;
   --mdb-secondary-rgb: 51, 45, 45;
   --form-field-border: rgba(var(--mdb-secondary-rgb), 0.22);
-  --form-field-border-radius: 0.75rem;
+  --form-field-border-radius: 1rem;
   --form-field-padding: 0.45rem 0.8rem;
 
   --mdb-accent: #FCA311;
@@ -1400,15 +1400,10 @@ table.dataTable.modal-detail-table td:has(.table-action-btn) > * {
 .login-card .form-outline .form-control {
   background-color: rgba(255, 255, 255, 0.96);
   border-color: transparent !important;
-  border-radius: 1rem;
+  border-radius: var(--form-field-border-radius);
   box-shadow: none !important;
   color: var(--mdb-secondary);
   min-height: 3.25rem;
-}
-
-.login-card .form-outline .form-control:focus {
-  border-color: transparent !important;
-  box-shadow: none !important;
 }
 
 .login-card .form-outline .form-label,
@@ -1441,12 +1436,21 @@ table.dataTable.modal-detail-table td:has(.table-action-btn) > * {
 }
 
 .login-shell .form-outline .form-control:focus ~ .form-notch .form-notch-leading,
-.login-shell .form-outline .form-control:focus ~ .form-notch .form-notch-middle,
+.login-shell .form-outline .form-control.active ~ .form-notch .form-notch-leading {
+  border-color: var(--form-field-border);
+  border-radius: var(--form-field-border-radius) 0 0 var(--form-field-border-radius);
+}
+
 .login-shell .form-outline .form-control:focus ~ .form-notch .form-notch-trailing,
-.login-shell .form-outline .form-control.active ~ .form-notch .form-notch-leading,
-.login-shell .form-outline .form-control.active ~ .form-notch .form-notch-middle,
 .login-shell .form-outline .form-control.active ~ .form-notch .form-notch-trailing {
-  border-color: #8fe0ac !important;
+  border-color: var(--form-field-border);
+  border-radius: 0 var(--form-field-border-radius) var(--form-field-border-radius) 0;
+}
+
+.login-shell .form-outline .form-control:focus ~ .form-notch .form-notch-middle,
+.login-shell .form-outline .form-control.active ~ .form-notch .form-notch-middle {
+  border-color: var(--form-field-border);
+  border-radius: 0;
 }
 
 .login-form #submitBtn {
