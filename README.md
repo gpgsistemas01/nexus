@@ -1,6 +1,6 @@
-# SistemaMerma
+# Nexus
 
-SistemaMerma es una aplicación web para administrar inventario, compras, salidas de almacén, mermas, proveedores, clientes, usuarios y reportes. El proyecto expone vistas web renderizadas con EJS y una API REST sobre Express, con persistencia en PostgreSQL mediante Prisma.
+Nexus es una plataforma de control operativo para administrar inventario, compras, salidas de almacén, mermas, proveedores, clientes, usuarios, reportes y KPIs. El proyecto expone vistas web renderizadas con EJS y una API REST sobre Express, con persistencia en PostgreSQL mediante Prisma.
 
 ## Tabla de contenido
 
@@ -111,8 +111,8 @@ PORT=3000
 NODE_ENV=development
 
 # Base de datos
-DATABASE_URL="postgresql://usuario:password@localhost:5432/sistema_merma"
-DATABASE_TEST_URL="postgresql://usuario:password@localhost:5432/sistema_merma_test"
+DATABASE_URL="postgresql://usuario:password@localhost:5432/nexus"
+DATABASE_TEST_URL="postgresql://usuario:password@localhost:5432/nexus_test"
 
 # Autenticación / seguridad
 JWT_SECRET_ACCESS="cambiar-en-produccion"
