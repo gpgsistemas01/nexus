@@ -31,7 +31,6 @@ const returnForm = createReturnFormHandlers({
     validators: validateGoodsIssueReturnValidators,
     validateFields,
     returnUpdate: returnGoodsReceipt,
-    defaultUpdate: editGoodsReceiptHeader,
     emptyMessage: 'Debe seleccionar al menos un material a devolver'
 });
 
@@ -90,7 +89,7 @@ useForm({
             form,
             formData,
             create: registerGoodsReceipt,
-            update: returnForm.resolveUpdate(form)
+            update: returnForm.isActive(form) ? returnGoodsReceipt : editGoodsReceiptHeader
         });
     },
 });
