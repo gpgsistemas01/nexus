@@ -191,6 +191,11 @@ export const openGoodsIssueModal = ({ mode, data = null }) => {
                 setFormReadOnly,
                 observationsElement: form.querySelector('#observationsInput')
             });
+            setFormReadOnly({
+                form,
+                fields: ['clientId', 'advisorId', 'departmentId', 'requesterId', 'projectNumber', 'requestDate', 'observations'],
+                isReadOnly: true
+            });
         }
 
         if (mode === MODE_VIEW) {

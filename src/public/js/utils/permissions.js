@@ -6,14 +6,21 @@ export const hasPermission = (user) => {
 
     const hasDepartment = (dept) => departments.includes(dept);
     const hasRole = (role) => roles.includes(role);
+    const hasAccess = ({ departments: allowedDepartments = [], roles: allowedRoles = [] }) => accesses.some(access => (
+        allowedDepartments.includes(access.department)
+        && allowedRoles.includes(access.role)
+    ));
     const isWarehouse = hasDepartment('ALMACÉN Y PROVEDURÍA');
     const isSystem = hasDepartment('SISTEMAS');
-    const canManageWarehouseReturns = () => (isWarehouse || isSystem)
-        && ['Almacenista', 'Auxiliar', 'Coordinador', 'Administrador del sistema'].some(hasRole);
+    const canManageWarehouseReturns = () => hasAccess({
+        departments: ['ALMACÉN Y PROVEDURÍA', 'SISTEMAS'],
+        roles: ['Almacenista', 'Auxiliar', 'Coordinador', 'Administrador del sistema']
+    });
 
     return {
         hasDepartment,
         hasRole,
+        hasAccess,
         canManageWarehouseReturns,
         isAdmin: hasRole('Administrador del sistema'),
         isWarehouse,
