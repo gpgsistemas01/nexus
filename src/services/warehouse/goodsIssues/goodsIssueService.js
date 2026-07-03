@@ -6,7 +6,8 @@ import {
     GoodsIssueNotPendingConflict,
     GoodsIssueCreateDatabaseError,
     GoodsIssueInternalClientAdvisorDepartmentConflict,
-    GoodsIssueInternalClientProjectNumberConflict
+    GoodsIssueInternalClientProjectNumberConflict,
+    GoodsIssueSuppliedConflict
 } from "../../../errors/warehouse/goodsIssueError.js";
 import { createServiceLogger, getModelLogContext, logServiceError, logServiceInfo } from "../../../utils/logger.js";
 
@@ -35,6 +36,57 @@ const MOVEMENT_TYPE_OUT = 'ISSUE';
 const FLOAT_EPSILON = 0.000001;
 
 
+const resolveGoodsIssueHeaderData = async ({ requesterId, advisorId, departmentId, clientId, goodsIssueData }) => {
+
+    const requester = await findProfileById({ id: requesterId });
+
+    if (!requester) throw new GoodsIssueRequesterProfileNotFound();
+
+    const advisor = await findProfileWithDepartmentsById({ id: advisorId });
+
+    if (!advisor) throw new GoodsIssueAdvisorProfileNotFound();
+
+    const client = await findClientById({ id: clientId });
+    const department = await findDepartmentById({ id: departmentId });
+
+    if (!isValidInternalClientAdvisor({ client, advisor })) {
+        throw new GoodsIssueInternalClientAdvisorDepartmentConflict();
+    }
+
+    if (!isValidInternalClientProjectNumberByDepartment({
+        client,
+        department,
+        projectNumber: goodsIssueData.projectNumber
+    })) {
+        throw new GoodsIssueInternalClientProjectNumberConflict({
+            projectNumber: goodsIssueData.projectNumber,
+            departmentName: department.name
+        });
+    }
+
+    return {
+        ...goodsIssueData,
+        departmentName: department.name,
+        requesterName: requester.fullName,
+        advisorName: advisor.fullName,
+        clientName: client.name,
+        department: {
+            connect: { id: departmentId }
+        },
+        requester: {
+            connect: { id: requesterId }
+        },
+        advisor: {
+            connect: { id: advisorId }
+        },
+        client: {
+            connect: { id: clientId }
+        },
+        status: {
+            connect: { name: STATUS_APPROVED }
+        }
+    };
+};
 
 const GOODS_ISSUE_DETAIL_SELECT = {
     id: true,
@@ -168,31 +220,13 @@ export const createGoodsIssue = async ({ goodsIssueDto }) => {
 
         const { requesterId, advisorId, departmentId, clientId, details, ...goodsIssueData } = goodsIssueDto;
 
-        const requester = await findProfileById({ id: requesterId });
-
-        if (!requester) throw new GoodsIssueRequesterProfileNotFound();
-        
-        const advisor = await findProfileWithDepartmentsById({ id: advisorId });
-
-        if (!advisor) throw new GoodsIssueAdvisorProfileNotFound();
-
-        const client = await findClientById({ id: clientId });
-        const department = await findDepartmentById({ id: departmentId });
-
-        if (!isValidInternalClientAdvisor({ client, advisor })) {
-            throw new GoodsIssueInternalClientAdvisorDepartmentConflict();
-        }
-
-        if (!isValidInternalClientProjectNumberByDepartment({
-            client,
-            department,
-            projectNumber: goodsIssueData.projectNumber
-        })) {
-            throw new GoodsIssueInternalClientProjectNumberConflict({
-                projectNumber: goodsIssueData.projectNumber,
-                departmentName: department.name
-            });
-        }
+        const headerData = await resolveGoodsIssueHeaderData({
+            requesterId,
+            advisorId,
+            departmentId,
+            clientId,
+            goodsIssueData
+        });
 
         const processedDetails = await buildGoodsIssueDetails({ details });
 
@@ -202,37 +236,8 @@ export const createGoodsIssue = async ({ goodsIssueDto }) => {
 
             const goodsIssue = await tx.goodsIssue.create({
                 data: {
-                    ...goodsIssueData,
+                    ...headerData,
                     referenceNumber,
-                    departmentName: department.name,
-                    requesterName: requester.fullName,
-                    advisorName: advisor.fullName,
-                    clientName: client.name,
-                    status: {
-                        connect: {
-                            name: STATUS_APPROVED
-                        }
-                    },
-                    requester: {
-                        connect: {
-                            id: requesterId
-                        }
-                    },
-                    advisor: {
-                        connect: {
-                            id: advisorId
-                        }
-                    },
-                    department: {
-                        connect: {
-                            id: departmentId
-                        }
-                    },
-                    client: {
-                        connect: {
-                            id: clientId
-                        }
-                    },
                     fulfillmentStatus: {
                         connect: {
                             name: FULFILLMENT_PENDING
@@ -313,31 +318,13 @@ export const updateGoodsIssue = async ({ id, goodsIssueDto }) => {
 
         if (hasSuppliedInAnyDetail) throw new GoodsIssueSuppliedConflict();
 
-        const requester = await findProfileById({ id: requesterId });
-
-        if (!requester) throw new GoodsIssueRequesterProfileNotFound();
-
-        const advisor = await findProfileWithDepartmentsById({ id: advisorId });
-
-        if (!advisor) throw new GoodsIssueAdvisorProfileNotFound();
-
-        const client = await findClientById({ id: clientId });
-        const department = await findDepartmentById({ id: departmentId });
-
-        if (!isValidInternalClientAdvisor({ client, advisor })) {
-            throw new GoodsIssueInternalClientAdvisorDepartmentConflict();
-        }
-
-        if (!isValidInternalClientProjectNumberByDepartment({
-            client,
-            department,
-            projectNumber: goodsIssueData.projectNumber
-        })) {
-            throw new GoodsIssueInternalClientProjectNumberConflict({
-                projectNumber: goodsIssueData.projectNumber,
-                departmentName: department.name
-            });
-        }
+        const headerData = await resolveGoodsIssueHeaderData({
+            requesterId,
+            advisorId,
+            departmentId,
+            clientId,
+            goodsIssueData
+        });
 
         const processedDetails = await buildGoodsIssueDetails({ details });
 
@@ -357,33 +344,7 @@ export const updateGoodsIssue = async ({ id, goodsIssueDto }) => {
             return await tx.goodsIssue.update({
                 where: { id },
                 data: {
-                    ...goodsIssueData,
-                    departmentName: department.name,
-                    requesterName: requester.fullName,
-                    advisorName: advisor.fullName,
-                    clientName: client.name,
-
-                    department: {
-                        connect: { id: departmentId }
-                    },
-
-                    requester: {
-                        connect: { id: requesterId }
-                    },
-
-                    advisor: {
-                        connect: { id: advisorId }
-                    },
-
-                    client: {
-                        connect: { id: clientId }
-                    },
-
-                    status: {
-                        connect: {
-                            name: STATUS_APPROVED
-                        }
-                    },
+                    ...headerData,
 
                     fulfillmentStatus: {
                         connect: {
@@ -600,55 +561,18 @@ export const updateGoodsIssueHeader = async ({ id, goodsIssueDto }) => {
 
         if (!goodsIssue) throw new GoodsIssueNotFound();
 
-        const requester = await findProfileById({ id: requesterId });
-
-        if (!requester) throw new GoodsIssueRequesterProfileNotFound();
-
-        const advisor = await findProfileWithDepartmentsById({ id: advisorId });
-
-        if (!advisor) throw new GoodsIssueAdvisorProfileNotFound();
-
-        const client = await findClientById({ id: clientId });
-        const department = await findDepartmentById({ id: departmentId });
-
-        if (!isValidInternalClientAdvisor({ client, advisor })) {
-            throw new GoodsIssueInternalClientAdvisorDepartmentConflict();
-        }
-
-        if (!isValidInternalClientProjectNumberByDepartment({
-            client,
-            department,
-            projectNumber: goodsIssueData.projectNumber
-        })) {
-            throw new GoodsIssueInternalClientProjectNumberConflict({
-                projectNumber: goodsIssueData.projectNumber,
-                departmentName: department.name
-            });
-        }
+        const headerData = await resolveGoodsIssueHeaderData({
+            requesterId,
+            advisorId,
+            departmentId,
+            clientId,
+            goodsIssueData
+        });
 
         const updatedGoodsIssue = await getDb().goodsIssue.update({
             where: { id },
             data: {
-                ...goodsIssueData,
-                departmentName: department.name,
-                requesterName: requester.fullName,
-                advisorName: advisor.fullName,
-                clientName: client.name,
-                department: {
-                    connect: { id: departmentId }
-                },
-                requester: {
-                    connect: { id: requesterId }
-                },
-                advisor: {
-                    connect: { id: advisorId }
-                },
-                client: {
-                    connect: { id: clientId }
-                },
-                status: {
-                    connect: { name: STATUS_APPROVED }
-                }
+                ...headerData
             },
             include: {
                 details: {
