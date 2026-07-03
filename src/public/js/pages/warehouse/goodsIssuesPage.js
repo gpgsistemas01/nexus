@@ -7,7 +7,7 @@ import { initGoodsIssueFormSelect2, setGoodsIssueFormSelectOptions } from "../..
 import { setFormReadOnly, toggleButtons, clearAddedProductInput, clearFormErrors, normalizeFormErrors, initForm } from "../../ui/formUI.js";
 import { on } from "../../utils/domUtils.js";
 import { formatDateLongWithTime } from "../../utils/formatters.js";
-import { handleSubmit, hasValidationErrors, syncCheckboxControlledInputs, toggleContainerElements, validateDetailsFields, validateFields } from "../../utils/formUtils.js";
+import { handleSubmit, hasValidationErrors, syncCheckboxControlledInputs, toggleContainerElements, toggleDisabledElement, validateDetailsFields, validateFields } from "../../utils/formUtils.js";
 import { buildModalTitle, openModal } from "../../ui/modalUI.js";
 import { hasPermission } from "../../utils/permissions.js";
 import { FORM_SELECTORS, MODAL_SELECTORS } from "../../constants/selectors.js";
@@ -25,12 +25,29 @@ const MODE_EDIT_HEADER = 'edit-header';
 const MODE_VIEW = 'view';
 const MODE_RETURN = RETURN_MODE;
 const FULFILLMENT_PENDING = 'Pendiente';
+const HEADER_FIELD_NAMES = ['clientId', 'advisorId', 'departmentId', 'requesterId', 'projectNumber', 'requestDate', 'observations'];
+const ENABLED_HEADER_MODES = ['create', MODE_EDIT, MODE_EDIT_HEADER];
 const modalId = MODAL_SELECTORS.GOODS_ISSUE;
 const formId = FORM_SELECTORS.GOODS_ISSUE;
 
 const context = window.meta || {};
 
 createGoodsIssueDatatable(context);
+
+
+const setGoodsIssueHeaderFieldsReadOnly = ({ form, isReadOnly }) => {
+
+    HEADER_FIELD_NAMES.forEach(fieldName => {
+        const field = form.elements[fieldName];
+
+        if (!field) return;
+
+        toggleDisabledElement({
+            element: field,
+            isDisabled: isReadOnly
+        });
+    });
+};
 
 const returnForm = createReturnFormHandlers({
     details,
@@ -121,6 +138,10 @@ export const openGoodsIssueModal = ({ mode, data = null }) => {
     setFormReadOnly({ form, isReadOnly: false });
     initGoodsIssueFormSelect2();
     setGoodsIssueFormSelectOptions(data);
+    setGoodsIssueHeaderFieldsReadOnly({
+        form,
+        isReadOnly: !ENABLED_HEADER_MODES.includes(mode)
+    });
 
     details.length = 0;
 
@@ -166,6 +187,10 @@ export const openGoodsIssueModal = ({ mode, data = null }) => {
         })));
 
         setFormReadOnly({ form, isReadOnly: mode !== MODE_EDIT && mode !== MODE_EDIT_HEADER });
+        setGoodsIssueHeaderFieldsReadOnly({
+            form,
+            isReadOnly: !ENABLED_HEADER_MODES.includes(mode)
+        });
 
         if (mode === MODE_EDIT || mode === MODE_EDIT_HEADER) {
 
