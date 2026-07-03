@@ -6,7 +6,7 @@
     class: 'offcanvas-header',
     title: {
         id: 'menuTitle',
-        content: 'Menú de navegación',
+        content: appName,
         class: 'offcanvas-title'
     }
 }; %>
@@ -20,6 +20,10 @@
     aria-hidden="true"
 >
     <%- include('../../shared/header', { header }) %>
+
+    <div class="px-3 pb-3">
+        <%- include('../ui/appBrand') %>
+    </div>
 
     <div class="offcanvas-body d-flex flex-column">
         <div class="flex-grow-1 mb-5">

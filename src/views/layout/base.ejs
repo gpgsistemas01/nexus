@@ -1,7 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
     <head>
-        <title><%- title %></title>
+        <% const pageTitle = typeof title !== 'undefined' && title ? title : null; %>
+        <% const documentTitle = pageTitle && pageTitle !== appName ? `${ appName } | ${ pageTitle }` : appName; %>
+        <title><%- documentTitle %></title>
 
         <meta charset="utf-8">
         <meta content="width=device-width, initial-scale=1.0" name="viewport">

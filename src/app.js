@@ -55,6 +55,7 @@ import { publicDir, viewsDir } from './utils/pathsUtils.js';
 import { errorMap } from './messages/codeMessages.js';
 import { initSocket } from './utils/socketUtils.js';
 import { AppError } from './errors/AppError.js';
+import { appConfig } from './config/appConfig.js';
 
 const app = express();
 const server = http.createServer(app);
@@ -93,6 +94,7 @@ app.use(uploadRoute, checkTypeContentFile);
 app.use(textRoute, checkContentTypePlainText);
 
 app.use((req, res, next) => {
+    res.locals.appName = appConfig.name;
     res.locals.flash = req.cookies.flash || null;
     res.clearCookie('flash');
     next();
