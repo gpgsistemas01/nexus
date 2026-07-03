@@ -14,6 +14,7 @@ import { DATATABLE_SELECTORS } from "../../constants/selectors.js";
 export let details = [];
 const selectorProductTable = DATATABLE_SELECTORS.PRODUCT;
 const tableSelector = DATATABLE_SELECTORS.MAIN;
+const FULFILLMENT_PENDING = 'Pendiente';
 let filters = {
     getValues: () => ({})
 };
@@ -96,8 +97,9 @@ export const createGoodsIssueDatatable = async (context) => {
     $(`${ tableSelector } tbody`).on('click', '.btn-edit', function () {
 
         const data = getResponsiveRowData(table, this);
+        const mode = data?.fulfillmentStatus?.name === FULFILLMENT_PENDING ? 'edit' : 'edit-header';
 
-        openGoodsIssueModal({ mode: 'edit', data });
+        openGoodsIssueModal({ mode, data });
     })
 
     $(`${ tableSelector } tbody`).on('click', '.btn-edit-detail', function() {
