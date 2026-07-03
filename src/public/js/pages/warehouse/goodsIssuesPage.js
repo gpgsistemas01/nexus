@@ -24,6 +24,7 @@ const MODE_EDIT_DETAIL = 'edit-detail';
 const MODE_EDIT_HEADER = 'edit-header';
 const MODE_VIEW = 'view';
 const MODE_RETURN = RETURN_MODE;
+const FULFILLMENT_PENDING = 'Pendiente';
 const modalId = MODAL_SELECTORS.GOODS_ISSUE;
 const formId = FORM_SELECTORS.GOODS_ISSUE;
 
@@ -115,7 +116,7 @@ export const openGoodsIssueModal = ({ mode, data = null }) => {
         status: data?.status?.name,
         showActions: false,
         withTotal: false,
-        showAddProduct: mode === 'create' || mode === MODE_EDIT
+        showAddProduct: mode === 'create' || (mode === MODE_EDIT && data?.fulfillmentStatus?.name === FULFILLMENT_PENDING)
     });
     setFormReadOnly({ form, isReadOnly: false });
     initGoodsIssueFormSelect2();

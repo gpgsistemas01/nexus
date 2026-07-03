@@ -97,9 +97,7 @@ export const createGoodsIssueDatatable = async (context) => {
 
         const data = getResponsiveRowData(table, this);
 
-        const mode = data.fulfillmentStatus?.name === 'Pendiente' ? 'edit' : 'edit-header';
-
-        openGoodsIssueModal({ mode, data });
+        openGoodsIssueModal({ mode: 'edit', data });
     })
 
     $(`${ tableSelector } tbody`).on('click', '.btn-edit-detail', function() {
