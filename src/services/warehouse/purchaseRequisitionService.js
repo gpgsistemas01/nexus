@@ -22,6 +22,13 @@ const STATUS_CONFIRMED = 'Confirmada';
 const STATUS_CANCELED = 'Cancelada';
 const PRISMA_RECORD_NOT_FOUND = 'P2025';
 
+const buildPurchaseRequisitionDetailRows = ({ details, purchaseRequisitionId }) => (
+    details.map(detail => ({
+        ...detail,
+        purchaseRequisitionId
+    }))
+);
+
 export const findAllPurchaseRequisitions = async ({
     currentDepartment = '',
     skip = 0,
@@ -264,27 +271,26 @@ export const updatePurchaseRequisition = async ({
                 where: { id }
             });
 
-            const incomingDetailsIds = details.map(detail => detail.id).filter(Boolean);
-            const deleteFilter = { purchaseRequisitionId: id };
-
-            if (incomingDetailsIds.length) deleteFilter.id = { notIn: incomingDetailsIds };
-
             await tx.detailPurchaseRequisitionProduct.deleteMany({
-                where: deleteFilter
+                where: {
+                    purchaseRequisitionId: id
+                }
             });
 
-            const detailsPurchaseRequisition = [];
-
-            for (const detail of details) {
-                const detailPurchaseRequisition = await tx.detailPurchaseRequisitionProduct.create({
-                    data: {
-                        ...detail,
+            if (details.length) {
+                await tx.detailPurchaseRequisitionProduct.createMany({
+                    data: buildPurchaseRequisitionDetailRows({
+                        details,
                         purchaseRequisitionId: id
-                    }
+                    })
                 });
-
-                detailsPurchaseRequisition.push(detailPurchaseRequisition);
             }
+
+            const detailsPurchaseRequisition = await tx.detailPurchaseRequisitionProduct.findMany({
+                where: {
+                    purchaseRequisitionId: id
+                }
+            });
 
             purchaseRequisition.details = detailsPurchaseRequisition;
 
