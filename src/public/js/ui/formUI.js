@@ -1,4 +1,5 @@
 import { initMdbWrapperInput, updateMdbWrapperInput } from "../plugins/mdb/baseInstance.js";
+import { toggleContainerElements } from "../utils/formUtils.js";
 
 const TOTAL_FIELDS = {
     quantity: '#totalQuantityDisplayInput',
@@ -7,7 +8,6 @@ const TOTAL_FIELDS = {
 }
 const MODE_EDIT_DETAIL = 'edit-detail';
 const MODE_VIEW = 'view';
-
 
 const getFirstInvalidControl = (form) => {
 
@@ -344,11 +344,23 @@ export const toggleButtons = ({
     mode,
     status = 'Cerrada',
     showActions = true,
-    withTotal = true
+    withTotal = true,
+    showAddProduct = null
 }) => {
 
     const isView = mode === 'view' || mode === 'edit-detail';
-    document.querySelector('.add-product-container').classList.toggle('d-none', isView);
+    const addProductContainer = document.querySelector('.add-product-container');
+    const shouldShowAddProduct = showAddProduct ?? !isView;
+
+    addProductContainer?.classList.toggle('d-none', !shouldShowAddProduct);
+
+    if (showAddProduct !== null) {
+        toggleContainerElements({
+            selector: '.add-product-container',
+            isDisabled: !shouldShowAddProduct
+        });
+    }
+
     document.querySelector('.total-container').classList.toggle('d-none', !withTotal);
     const approveContainer = document.querySelector('.approve-container');
 
