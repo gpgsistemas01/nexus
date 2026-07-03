@@ -1,0 +1,10 @@
+<% const brand = {
+    href: typeof href !== 'undefined' ? href : '/productos',
+    class: typeof className !== 'undefined' ? `app-brand ${ className }` : 'app-brand',
+    label: typeof ariaLabel !== 'undefined' ? ariaLabel : `Ir al inicio de ${ appName }`
+}; %>
+
+<a class="<%= brand.class %>" href="<%= brand.href %>" aria-label="<%= brand.label %>">
+    <img src="/img/logo.png" alt="" class="app-brand__logo">
+    <span class="app-brand__name"><%= appName %></span>
+</a>
