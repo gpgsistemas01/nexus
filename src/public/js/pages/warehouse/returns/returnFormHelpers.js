@@ -24,7 +24,6 @@ export const createReturnFormHandlers = ({
     validators,
     validateFields,
     returnUpdate,
-    defaultUpdate,
     emptyMessage
 }) => ({
     isActive: (form) => form?.dataset?.mode === RETURN_MODE,
@@ -43,8 +42,7 @@ export const createReturnFormHandlers = ({
         validators,
         validateFields,
         emptyMessage
-    }),
-    resolveUpdate: (form) => (form?.dataset?.mode === RETURN_MODE ? returnUpdate : defaultUpdate)
+    })
 });
 
 const updateReturnDetail = (params) => {

@@ -36,7 +36,6 @@ const returnForm = createReturnFormHandlers({
     validators: validateGoodsIssueReturnValidators,
     validateFields,
     returnUpdate: returnGoodsIssue,
-    defaultUpdate: editGoodsIssue,
     emptyMessage: 'Seleccione al menos un producto para devolver.'
 });
 
@@ -90,7 +89,9 @@ useForm({
             ? editGoodsIssueDetails
             : form.dataset.mode === MODE_EDIT_HEADER
                 ? editGoodsIssueHeader
-                : returnForm.resolveUpdate(form);
+                : returnForm.isActive(form)
+                    ? returnGoodsIssue
+                    : editGoodsIssue;
 
         await handleSubmit({
             form,
