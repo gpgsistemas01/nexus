@@ -33,6 +33,8 @@ export const useForm = async ({
 
         if (form.dataset.submitting === 'true') return false;
 
+        form.dataset.submitting = 'true';
+
         const submitButton = form.querySelector('button[type="submit"]');
 
         if (submitButton) {

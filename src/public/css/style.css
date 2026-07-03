@@ -309,6 +309,7 @@ body {
 
 .dataTables_wrapper {
   color: var(--mdb-body-color);
+  max-width: 100%;
   overflow: hidden;
 }
 
@@ -475,7 +476,12 @@ table.dataTable.datatable-table {
 
 .dataTables_wrapper .dataTables_scrollBody {
   border-bottom: 0 !important;
-  overflow: visible !important;
+  overflow-x: auto !important;
+  overflow-y: visible !important;
+}
+
+.modal .dataTables_wrapper .dataTables_scrollBody {
+  overflow-x: visible !important;
 }
 
 .table.datatable-table th,
@@ -908,6 +914,40 @@ table.dataTable.modal-detail-table .sorting_desc::after {
   border-radius: 0.55rem;
   color: var(--mdb-secondary);
   min-height: 2.35rem;
+}
+
+@media (max-width: 767.98px) {
+  .datatable-card {
+    margin-inline: -0.75rem;
+  }
+
+  .datatable-card .card-body {
+    padding-inline: 0.75rem !important;
+  }
+
+  .datatable-responsive-wrapper {
+    border-radius: 0.75rem;
+    margin-inline: -0.25rem;
+    padding-inline: 0.25rem;
+  }
+
+  .dataTables_wrapper .dataTables_scroll,
+  .dataTables_wrapper .dataTables_scrollHead,
+  .dataTables_wrapper .dataTables_scrollHeadInner,
+  .dataTables_wrapper .dataTables_scrollBody {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .modal-dialog {
+    margin: 0.5rem;
+    max-width: calc(100vw - 1rem);
+  }
+
+  .modal-content {
+    max-height: calc(100vh - 1rem);
+  }
 }
 
 /* card styles */
