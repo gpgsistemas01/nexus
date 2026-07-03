@@ -113,7 +113,8 @@ export const openGoodsIssueModal = ({ mode, data = null }) => {
         mode,
         status: data?.status?.name,
         showActions: false,
-        withTotal: false
+        withTotal: false,
+        showAddProduct: mode === 'create' || mode === MODE_EDIT
     });
     setFormReadOnly({ form, isReadOnly: false });
     initGoodsIssueFormSelect2();
@@ -169,7 +170,6 @@ export const openGoodsIssueModal = ({ mode, data = null }) => {
             modalElement.querySelector('#modalTitle').textContent = buildModalTitle({ action: 'Editar', entityName: 'salida', referenceNumber: data?.referenceNumber });
             form.querySelector('#submitBtn').textContent = 'Actualizar';
 
-            if (mode === MODE_EDIT_HEADER) toggleContainerElements({ selector: '.add-product-container', root: modalElement });
         }
 
         if (mode === MODE_EDIT_DETAIL) {
