@@ -1,0 +1,95 @@
+import { createGoodsReceiptDtoForEdit, createGoodsReceiptDtoForRegister, createGoodsReceiptReturnDto } from "../../../dtos/goodsReceiptDTO.js";
+import { successCodeMessages } from "../../../messages/codeMessages.js";
+import {
+    createGoodsReceipt,
+    findAllGoodsReceipts,
+    updateGoodsReceiptHeader
+} from "../../../services/warehouse/goodsReceipts/goodsReceiptService.js";
+import { getDataTableOrder, getDataTablePaging, getDataTableSearch } from "../../../utils/requestQueryUtils.js";
+import {
+    createStockNotification,
+    notifyProductStockStatusChanges,
+} from "../../../services/warehouse/notificationService.js";
+import { emitStockUpdated } from "../../../utils/socketUtils.js";
+import { sanitizeEmptyStrings } from "../../../utils/formattersUtils.js";
+import { returnGoodsReceiptProducts } from "../../../services/warehouse/returns/returnService.js";
+
+export const getAllGoodsReceipts = async (req, res) => {
+
+    const { skip, take } = getDataTablePaging(req.query);
+    const search = getDataTableSearch(req.query);
+    const startDate = req.query.startDate || '';
+    const endDate = req.query.endDate || '';
+    const supplierId = req.query.supplierId || '';
+    const profileId = req.query.profileId || '';
+
+    const columns = ['referenceNumber', 'receptionDate', 'supplierName', 'invoice', null];
+    const { orderBy, orderDir } = getDataTableOrder({
+        query: req.query,
+        columns,
+        defaultDirection: 'desc'
+    });
+
+    const result = await findAllGoodsReceipts({
+        skip,
+        take,
+        search,
+        startDate,
+        endDate,
+        supplierId,
+        profileId,
+        orderBy,
+        orderDir
+    });
+
+    return res.status(200).json(result);
+}
+
+export const registerGoodsReceipt = async (req, res) => {
+
+    const goodsReceiptDto = createGoodsReceiptDtoForRegister(req.body);
+    const sanitizedGoodsReceiptDto = sanitizeEmptyStrings(goodsReceiptDto);
+
+    const goodsReceipt = await createGoodsReceipt({
+        goodsReceiptDto: sanitizedGoodsReceiptDto
+    });
+
+    return res.status(200).json({
+        goodsReceipt,
+        code: successCodeMessages.CREATED_GOODS_RECEIPT
+    });
+}
+
+
+export const editGoodsReceiptHeader = async (req, res) => {
+
+    const goodsReceiptDto = createGoodsReceiptDtoForEdit(req.body);
+    const sanitizedGoodsReceiptDto = sanitizeEmptyStrings(goodsReceiptDto);
+
+    const goodsReceipt = await updateGoodsReceiptHeader({
+        id: req.params.id,
+        goodsReceiptDto: sanitizedGoodsReceiptDto
+    });
+
+    return res.status(200).json({
+        goodsReceipt,
+        code: successCodeMessages.UPDATED_GOODS_RECEIPT
+    });
+};
+
+export const returnGoodsReceipt = async (req, res) => {
+
+    const goodsReceiptDto = createGoodsReceiptReturnDto(req.body);
+    const sanitizedGoodsReceiptDto = sanitizeEmptyStrings(goodsReceiptDto);
+
+    const goodsReceiptReturn = await returnGoodsReceiptProducts({
+        id: req.params.id,
+        goodsReceiptDto: sanitizedGoodsReceiptDto,
+        userId: req.user.profile.id
+    });
+
+    return res.status(200).json({
+        goodsReceiptReturn,
+        code: successCodeMessages.UPDATED_GOODS_RECEIPT
+    });
+};

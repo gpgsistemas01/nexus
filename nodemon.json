@@ -1,4 +1,7 @@
 {
-  "watch": ["views", "public", "routes", "app.js"],
+  "watch": [
+    "src",
+    "prisma"
+  ],
   "ext": "js,ejs"
 }

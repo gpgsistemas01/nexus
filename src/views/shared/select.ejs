@@ -1,0 +1,10 @@
+<div>
+    <select id="<%= input.id %>" name="<%= input.name %>" class="form-select w-100 <%= input.class %>">
+        <option></option>
+    </select>
+
+    <%- include('./validationMessage', { 
+        name: input.name, 
+        errorClass: input.errorClass || 'invalid-feedback' 
+    }) %>
+</div>

@@ -1,0 +1,239 @@
+import { includeSpace, includeUppercase, isDateTime, isEmptyOrNull, isLengthInRangeMax, isLengthInRangeMin, isNegative, isNumber, isNumberphone, isPositive, isString } from "./baseValidations.js";
+
+export const validatePassword = (password) => {
+
+    const allowedNumber = /\d/;
+    const allowedPassword = /^[A-Za-z0-9!@#\$%\^&\*]+$/;
+    const fieldName = 'La contraseña';
+    let result = isEmptyOrNull(password, fieldName);
+
+    if (result) return result;
+
+    result = isString(password, fieldName);
+
+    if (result) return result;
+
+    result = includeUppercase(password, fieldName);
+
+    if (result) return result;
+
+    if (!allowedNumber.test(password)) return `${ fieldName } debe tener al menos un número.`;
+
+    if (!allowedPassword.test(password)) return  `${ fieldName } debe tener al menos un símbolo especial.`;
+
+    result = isLengthInRangeMin(password, 6, fieldName);
+
+    if (result) return result;
+
+    result = isLengthInRangeMax(password, 50, fieldName);
+
+    return result;
+}
+
+export const validateUsername = (username) => {
+
+    const allowedUsername = /^[a-zA-Z0-9_]+$/;
+    const fieldName = 'El nombre de usuario';
+    let result = isEmptyOrNull(username, fieldName);
+
+    if (result) return result;
+
+    result = isString(username, fieldName);
+
+    if (result) return result;
+
+    result = includeSpace(username, fieldName);
+
+    if (result) return result;
+
+    result = includeUppercase(username, fieldName);
+
+    if (result) return result;
+
+    if (!allowedUsername.test(username)) return `${ fieldName } debe tener solo letras, numeros y guiones bajos`;
+    
+    result = isLengthInRangeMax(username, 50, fieldName);
+
+    return result;
+}
+
+export const validatePositiveNumber = (number, fieldName) => {
+
+    let result = validateNumber(number, fieldName);
+
+    if (result) return result;
+
+    result = isPositive(number, fieldName);
+
+    if (result) return result;
+
+    return null;
+}
+
+export const validateNumber = (number, fieldName, { allowZero = true } = {}) => {
+
+    let result = isEmptyOrNull(number, fieldName);
+
+    if (result) return result;
+
+    number = parseFloat(number);
+
+    result = isNumber(number, fieldName);
+
+    if (result) return result;
+
+    result = isNegative(number, fieldName);
+
+    if (result) return result;
+
+    if (!allowZero && number === 0) return `${ fieldName } debe ser un número mayor a cero`;
+
+    return null;
+}
+
+export const validateNumberOptional = (number, fieldName) => {
+
+    if (!number) return null;
+
+    number = parseFloat(number);
+
+    let result = isNumber(number, fieldName);
+
+    if (result) return result;
+
+    result = isNegative(number, fieldName);
+
+    return result;
+}
+
+const hasValue = (value) => value !== undefined && value !== null && value !== '';
+
+export const validatePairedOptionalNumber = ({ value, pairedValue, fieldName }) => {
+
+    if (!hasValue(value) && hasValue(pairedValue)) return `${ fieldName } es requerida.`;
+
+    return validateNumberOptional(value, fieldName);
+}
+
+export const validateDate = (date, fieldName) => {
+
+    let result = isEmptyOrNull(date, fieldName);
+
+    if (result) return result;
+
+    result = isDateTime(date, fieldName);
+
+    return result;
+}
+
+export const validateDateOptional = (date, fieldName) => {
+
+    if (!date) return null;
+
+    const result = isDateTime(date, fieldName);
+
+    return result;
+}
+
+export const validateMeasure = (measure, fieldName) => {
+
+    if (!measure) return null;
+
+    let result = isEmptyOrNull(measure, fieldName);
+
+    if (result) return result;
+
+    measure = parseFloat(measure);
+
+    result = isNumber(measure, fieldName);
+
+    return result;
+}
+
+export const validateText = ({ 
+    name, 
+    length, 
+    fieldName,
+    regex = /^[^<>\\{}[\]]+$/u
+}) => {
+
+    let result = isEmptyOrNull(name, fieldName);
+
+    if (result) return result;
+
+    result = isString(name, fieldName);
+
+    if (result) return result;
+
+    if (!regex.test(name)) return `${ fieldName } debe tener solo letras, números, signos de puntuación o espacios.`;
+
+    result = isLengthInRangeMax(name, length, fieldName);
+
+    return result;
+}
+
+export const validateTextOptional = (name, length, fieldName) => {
+
+    if (!name) return null;
+
+    const result = validateText({ 
+        name, 
+        length, 
+        fieldName,
+        regex: /^[^<>\\{}[\]]+$/u
+    });
+
+    return result;
+}
+
+export const validateName = (name, length = 50) => validateText({ 
+    name, 
+    length, 
+    fieldName: 'El nombre',
+    regex: /^[^<>\\{}[\]]+$/u
+});
+
+export const validateGoodsReceiptDetailsArray = (details) => {
+
+    if (!Array.isArray(details) || details.length === 0) {
+        return 'La lista de detalles debe contener al menos un producto.';
+    }
+
+    for (const detail of details) {
+
+        if (!detail.productId || !detail.quantity || !detail.costPerUnitType) {
+            return 'Cada detalle debe contener producto, cantidad y costo por presentación.';
+        }
+
+        if (isNaN(detail.quantity) || parseFloat(detail.quantity) < 1) {
+            return 'La cantidad de cada detalle debe ser un número mayor a cero.';
+        }
+
+        if (isNaN(detail.costPerUnitType) || parseFloat(detail.costPerUnitType) <= 0) {
+            return 'El costo por presentación de cada detalle debe ser un número mayor a cero.';
+        }
+    }
+
+    return null;
+};
+
+export const validateGoodsIssueDetailsArray = (details) => {
+
+    if (!Array.isArray(details) || details.length === 0) {
+        return 'La lista de detalles debe contener al menos un producto.';
+    }
+
+    for (const detail of details) {
+
+        if (!detail.productId || !detail.supplierId || !detail.quantity) {
+            return 'Cada detalle debe contener producto, proveedor y cantidad.';
+        }
+
+        if (isNaN(detail.quantity) || parseFloat(detail.quantity) < 1) {
+            return 'La cantidad de cada detalle debe ser un número mayor a cero.';
+        }
+
+    }
+
+    return null;
+}

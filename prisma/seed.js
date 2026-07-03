@@ -1,22 +1,127 @@
-import { prisma } from "../lib/prisma.js";
+import { prisma } from "../src/lib/prisma.js";
+import XLSX from 'xlsx';
+import fs from 'fs';
+import { fileURLToPath } from 'url';
+import path from 'path';
+
+const toDecimal = (value) => {
+    if (value === null || value === undefined || value === '') return NaN;
+    return Number(value);
+};
+
+const cleanValue = val => {
+    if (val === 0 || val === "0" || val == null) return null;
+
+    const str = String(val).trim();
+    return str || null;
+};
 
 async function main() {
 
+    const __filename = fileURLToPath(import.meta.url);
+    const __dirname = path.dirname(__filename);
+    const filePath1 = path.join(__dirname, 'LISTA_ADMIN.xlsx');
+    const workbook1 = XLSX.readFile(filePath1);
+
+    const departmentSheet = workbook1.Sheets['AREAS'];
+    const departmentRows = XLSX.utils.sheet_to_json(departmentSheet, {
+        defval: null,
+    });
+
+    const departmentParsed = departmentRows.map(row => {
+        const name = cleanValue(row.department);
+        if (!name) return null;
+
+        return { name };
+    }).filter(Boolean);
+
     await prisma.department.createMany({
-        data: [
-            { id: '00000000-0000-0000-0000-000000000001', name: 'Sistemas' },
-            { id: '00000000-0000-0000-0000-000000000002', name: 'Ventas' },
-            { id: '00000000-0000-0000-0000-000000000003', name: 'Diseño' },
-            { id: '00000000-0000-0000-0000-000000000004', name: 'Impresión' },
-            { id: '00000000-0000-0000-0000-000000000005', name: 'Router' },
-            { id: '00000000-0000-0000-0000-000000000006', name: 'Taller 3d' },
-            { id: '00000000-0000-0000-0000-000000000007', name: 'Herrería' },
-            { id: '00000000-0000-0000-0000-000000000008', name: 'Acabados' },
-            { id: '00000000-0000-0000-0000-000000000009', name: 'PT' },
-            { id: '00000000-0000-0000-0000-000000000010', name: 'Tráfico' },
-            { id: '00000000-0000-0000-0000-000000000011', name: 'Instalaciones' },
-            { id: '00000000-0000-0000-0000-000000000012', name: 'Almacén' }
-        ],
+        data: departmentParsed,
+        skipDuplicates: true
+    });
+
+    const departments = await prisma.department.findMany({
+        select: {
+            id: true,
+            name: true
+        }
+    });
+    
+    const countProfile = await prisma.profile.count();
+
+    if (countProfile < 1) {
+        const relationDepartmentSheet = workbook1.Sheets['RELACIONES_PERFIL'];
+        const relationProfileDepartmentRows = XLSX.utils.sheet_to_json(relationDepartmentSheet, {
+            defval: null,
+        });
+
+        const profileParsed = relationProfileDepartmentRows.map(row => {
+            const fullName = cleanValue(row.fullName);
+            if (!fullName) return null;
+
+            return { fullName };
+        }).filter(Boolean);
+
+        await prisma.profile.createMany({
+            data: profileParsed,
+            skipDuplicates: true
+        });
+
+        const profiles = await prisma.profile.findMany({
+            select: {
+                id: true,
+                fullName: true
+            }
+        });
+        const profileMap = new Map(profiles.map(p => [cleanValue(p.fullName), p.id]));
+
+        const departmentMap = new Map(departments.map(d => [cleanValue(d.name), d.id]));
+
+        const relationProfileDepartmentParsed = relationProfileDepartmentRows.map(row => {
+
+            const fullName = cleanValue(row.fullName);
+            const department = cleanValue(row.department);
+
+            if (!fullName || !department) {
+                console.log('Error en fila: ', row);
+                return null;
+            }
+
+            const profileId = profileMap.get(fullName);
+            const departmentId = departmentMap.get(department);
+
+            if (!profileId || !departmentId) {
+                console.log('No encontrado en Map: ', { fullName, department });
+                return null;
+            }
+
+            return {
+                profileId,
+                departmentId
+            };
+
+        }).filter(Boolean);
+
+        await prisma.departmentProfile.createMany({
+            data: relationProfileDepartmentParsed,
+            skipDuplicates: true
+        });
+    }
+
+    const clientSheet = workbook1.Sheets['CLIENTES'];
+    const clientRows = XLSX.utils.sheet_to_json(clientSheet, {
+        defval: null,
+    });
+
+    const clientParsed = clientRows.map(row => {
+        const name = cleanValue(row.client);
+        if (!name) return null;
+
+        return { name };
+    }).filter(Boolean);
+
+    await prisma.client.createMany({
+        data: clientParsed,
         skipDuplicates: true
     });
 
@@ -47,375 +152,234 @@ async function main() {
         skipDuplicates: true
     });
 
-    await prisma.reason.createMany({
-        data: [
-            { name: 'reestock' }
-        ],
-        skipDuplicates: true
-    });
-
     // const hashedPassword = await bcrypt.hash('A%54321', 10)
 
-    await prisma.user.upsert({
-        where: {
-            name: 'Soporte01',
-        },
-        update: {},
-        create: {
-            id: '00000000-0000-0000-0000-000000000040',
-            name: 'Soporte01',
-            password: 'A%54321',
-            isActive: true,
-            departmentId: '00000000-0000-0000-0000-000000000001',
-            roleId: '00000000-0000-0000-0000-000000000020'
-        },
-    });
+    const countUser = await prisma.user.count();
 
-    const soporte = await prisma.user.findUnique({
-        where: { name: 'Soporte01' }
-        });
+    if (countUser < 1) {
 
-        await prisma.user.update({
-            where: { id: soporte.id },
-            data: {
-                profiles: {
-                    create: [
-                        {
-                            name: 'Administrador',
-                            lastName: 'Sistema'
-                        }
-                    ]
-                }
-            }
-        });
-
-    const departamentos = await prisma.department.findMany({
-        select: { id: true, name: true },
-        orderBy: { id: 'asc' }
-    });
-    const roles = await prisma.role.findMany({
-        select: { id: true, name: true }
-    });
-    const roleByName = Object.fromEntries(roles.map((role) => [role.name, role.id]));
-
-    const usersSeed = [];
-
-    for (const [index, departamento] of departamentos.entries()) {
-        const safeName = departamento.name.toLowerCase().replace(/\s+/g, '_');
-        const numero = String(index + 1).padStart(2, '0');
-        const isVentas = departamento.name === 'Ventas';
-        const isDiseno = departamento.name === 'Diseño';
-        const isInstalaciones = departamento.name === 'Instalaciones';
-        const isPt = departamento.name === 'PT';
-
-        let roleName = 'Operador';
-        if (isVentas) roleName = 'Vendedor';
-        if (isDiseno) roleName = 'Diseñador';
-        if (isInstalaciones) roleName = 'Instalador';
-        if (isPt) roleName = 'Repartidor';
-
-        usersSeed.push(
-            {
-                name: `coord_${safeName}_${numero}`,
-                password: '12345',
-                departmentId: departamento.id,
-                roleId: roleByName['Coordinador'],
-                profileName: `Coordinador ${departamento.name}`,
-                profileLastName: 'General'
+        const user = await prisma.user.upsert({
+            where: {
+                name: 'Soporte01',
             },
-            {
-                name: `${safeName}_${numero}_${roleName.toLowerCase()}`,
-                password: '12345',
-                departmentId: departamento.id,
-                roleId: roleByName[roleName],
-                profileName: roleName,
-                profileLastName: departamento.name
-            }
-        );
-
-        if (!isVentas && !isDiseno) {
-            usersSeed.push({
-                name: `${safeName}_${numero}_auxiliar`,
+            update: {},
+            create: {
+                id: '00000000-0000-0000-0000-000000000040',
+                name: 'Soporte01',
                 password: 'A%54321',
-                departmentId: departamento.id,
-                roleId: roleByName['Auxiliar'],
-                profileName: 'Auxiliar',
-                profileLastName: departamento.name
+                isActive: true,
+            },
+        });
+
+        const roles = await prisma.role.findMany({
+            select: { id: true, name: true }
+        });
+        const roleByName = Object.fromEntries(roles.map((role) => [role.name, role.id]));
+
+        for (const dept of departments) {
+            await prisma.userRoleDepartment.upsert({
+                where: {
+                    userId_roleId_departmentId: {
+                        userId: user.id,
+                        roleId: '00000000-0000-0000-0000-000000000020', // Admin
+                        departmentId: dept.id
+                    }
+                },
+                update: {},
+                create: {
+                    userId: user.id,
+                    roleId: '00000000-0000-0000-0000-000000000020',
+                    departmentId: dept.id
+                }
             });
         }
     }
 
-    for (const userSeed of usersSeed) {
-        await prisma.user.upsert({
-            where: { name: userSeed.name },
-            update: {
-                password: userSeed.password,
-                departmentId: userSeed.departmentId,
-                roleId: userSeed.roleId,
-                isActive: true
-            },
-            create: {
-                name: userSeed.name,
-                password: userSeed.password,
-                departmentId: userSeed.departmentId,
-                roleId: userSeed.roleId,
-                isActive: true
-            }
-        });
-    }
-
-    await prisma.category.createMany({
+    await prisma.fulfillmentStatus.createMany({
         data: [
-            { name: 'Flexibles' },
-            { name: 'Rígidos' },
-            { name: 'Papel' }
+            { name: 'Pendiente' },
+            { name: 'Surtido parcial' },
+            { name: 'Surtido' },
         ],
         skipDuplicates: true
     });
 
-    await prisma.uoM.createMany({
-        data: [
-            { name: 'litros', abbrevation: 'L' },
-            { name: 'metros', abbrevation: 'm' },
-            { name: 'milimetros', abbrevation: 'mm' }
-        ],
-        skipDuplicates: true
-    });
+    const referenceNumberYear = new Date().getFullYear();
 
     await prisma.referenceNumberCounter.createMany({
         data: [
-            { prefix: 'REC' },
-            { prefix: 'SAL'},
-            { prefix: 'REQ' },
+            { prefix: 'REC', year: referenceNumberYear },
+            { prefix: 'SAL', year: referenceNumberYear },
+            { prefix: 'REQ', year: referenceNumberYear },
+            { prefix: 'AJU', year: referenceNumberYear },
+            { prefix: 'PRO', year: 0 },
         ],
         skipDuplicates: true
+    });
+
+    await prisma.presentation.createMany({
+        data: [
+            { name: 'ROLLO' },
+            { name: 'PIEZA' },
+            { name: 'CARTUCHO' },
+            { name: 'HOJA' },
+        ],
+        skipDuplicates: true
+    });
+
+    await prisma.unitMeasure.createMany({
+        data: [
+            { name: 'PIEZA', symbol: 'PZA.' },
+            { name: 'METRO CUADRADO', symbol: 'M2'},
+            { name: 'METRO LINEAL', symbol: 'ML' },
+            { name: 'LITROS', symbol: 'LTS.' },
+        ],
+        skipDuplicates: true
+    });
+
+    const presentations = await prisma.presentation.findMany();
+    const unitMeasures = await prisma.unitMeasure.findMany();
+
+    const presentationMap = new Map(presentations.map(p => [p.name, p.id]));
+    const unitMeasureMap = new Map(unitMeasures.map(um => [um.symbol, um.id]));
+
+    const filePath2 = path.join(__dirname, 'inventario_BD - PRECIOS.xlsx');
+    const workbook2 = XLSX.readFile(filePath2);
+    const productSheet = workbook2.Sheets['PRODUCTOS'];
+    const productRows = XLSX.utils.sheet_to_json(productSheet, {
+        defval: null,
+    });
+
+    const productParsed = productRows.map(row => {
+
+        const base = toDecimal(row.base);
+        const height = toDecimal(row.height);
+        const minStock = toDecimal(row.minStock);
+
+        return {
+            name: row.name,
+            sku: row.sku,
+
+            minStock: isNaN(minStock) ? 0 : minStock,
+
+            base: (!base || isNaN(base)) ? null : base,
+            height: (!height || isNaN(height)) ? null : height,
+
+            presentationId: presentationMap.get(row.presentation.trim()) || null,
+            unitMeasureId: unitMeasureMap.get(row.unitMeasure.trim()) || null,
+        };
+    });
+
+    if(productParsed.some(p => !p.presentationId || !p.unitMeasureId)) {
+        console.log('Error: Algunos productos tienen presentación o unidad de medida no encontrados');
+        console.log(productParsed.filter(p => !p.presentationId || !p.unitMeasureId));
+    }
+
+    await prisma.product.createMany({
+        data: productParsed,
+        skipDuplicates: true
+    });
+
+    const supplierSheet = workbook2.Sheets['PROVEEDORES'];
+    const supplierRows = XLSX.utils.sheet_to_json(supplierSheet, {
+        defval: null,
+    });
+
+    let counter;
+
+    const supplierParsed = supplierRows.map((row, index) => {
+
+        counter = index + 1;
+        
+        return {
+            codeNumber: counter,
+            code: row.code,
+            legalName: row.legalName,
+            tradeName: row.tradeName
+        }
+    });
+
+    await prisma.referenceNumberCounter.update({
+        where: {
+            prefix_year: {
+                prefix: 'PRO',
+                year: 0
+            }
+        },
+        data: {
+            counter: counter
+        }
     });
 
     await prisma.supplier.createMany({
-        data: [
-            { name: 'Proveedor 1' },
-            { name: 'Proveedor 2' },
-        ],
-        skipDuplicates: true
+        data: supplierParsed,
+        skipDuplicates: true,
     });
 
-    const uoms = await prisma.uoM.findMany();
+    const skus = productParsed.map(p => p.sku);
 
-    const categories = await prisma.category.findMany();
-
-    await prisma.product.createMany({
-        data: [
-            { name: 'Producto 1', unitCost: 2, currentStock: 2, minStock: 3, maxStock: 8, categoryId: categories[0].id, uomId: uoms[0].id },
-            { name: 'Producto 2', unitCost: 4, currentStock: 3, minStock: 60, maxStock: 80, categoryId: categories[1].id, uomId: uoms[1].id },
-            { name: 'Producto 3', unitCost: 7, currentStock: 10, minStock: 2, maxStock: 20, categoryId: categories[2].id, uomId: uoms[2].id },
-        ],
-        skipDuplicates: true
-    });
-
-    for (const userSeed of usersSeed) {
-        await prisma.user.update({
-            where: { name: userSeed.name },
-            data: {
-                profiles: {
-                    create: [
-                        { name: userSeed.profileName, lastName: userSeed.profileLastName }
-                    ]
-                }
-            }
-        });
-    }
-
-    const productos = await prisma.product.findMany({
-        where: { name: { in: ['Producto 1', 'Producto 2', 'Producto 3'] } },
-        orderBy: { name: 'asc' }
-    });
-    const proveedor = await prisma.supplier.findFirst({ where: { name: 'Proveedor 1' } });
-    const estatusAbierta = await prisma.status.findFirst({ where: { name: 'Abierta' } });
-    const perfilAlmacenista = await prisma.profile.findFirst({
+    const products = await prisma.product.findMany({
         where: {
-            users: {
-                some: {
-                    department: {
-                        name: 'Almacén'
-                    }
-                }
+            sku: {
+                in: skus
             }
         },
-        orderBy: { name: 'asc' }
-    });
-    const perfilAprobador = await prisma.profile.findFirst({
-        where: {
-            users: {
-                some: {
-                    department: { name: 'Almacén' },
-                    role: { name: 'Coordinador' }
-                }
-            }
-        }
-    });
-    const perfilSolicitante = await prisma.profile.findFirst({
-        where: {
-            users: {
-                some: {
-                    department: {
-                        name: {
-                            notIn: ['Ventas', 'Diseño']
-                        }
-                    }
-                }
-            }
-        },
-        orderBy: { name: 'asc' }
-    });
-
-    await prisma.project.upsert({
-        where: { referenceNumber: 'PROY-001' },
-        update: {},
-        create: {
-            referenceNumber: 'PROY-001',
-            client: 'Cliente Demo',
-            name: 'Proyecto Demo',
-            date: new Date('2026-04-01T00:00:00.000Z')
+        select: {
+            id: true,
+            sku: true
         }
     });
 
-    const proyectoDemo = await prisma.project.findUnique({
-        where: { referenceNumber: 'PROY-001' }
+    const productMap = new Map(products.map(p => [p.sku, p.id]));
+
+    const supplierTradeNames = supplierParsed.map(s => s.tradeName);
+
+    const suppliers = await prisma.supplier.findMany({
+        where: {
+            tradeName: {
+                in: supplierTradeNames
+            }
+        },
+        select: {
+            id: true,
+            tradeName: true
+        }
     });
 
-    if (
-        proveedor &&
-        estatusAbierta &&
-        perfilAlmacenista &&
-        perfilSolicitante &&
-        perfilAprobador &&
-        proyectoDemo &&
-        productos.length >= 2
-    ) {
-        await prisma.goodsReceipt.upsert({
-            where: { referenceNumber: 'REC-2026-000001' },
-            update: {
-                details: {
-                    deleteMany: {},
-                    create: [
-                        { productId: productos[0].id, quantity: 5, description: 'Recepción de prueba 1' },
-                        { productId: productos[1].id, quantity: 8, description: 'Recepción de prueba 2' },
-                    ]
-                }
-            },
-            create: {
-                referenceNumber: 'REC-2026-000001',
-                supplierId: proveedor.id,
-                receptionDate: new Date('2026-04-02T00:00:00.000Z'),
-                observations: 'Recepción inicial de materiales',
-                statusId: estatusAbierta.id,
-                departmentId: '00000000-0000-0000-0000-000000000012',
-                receivedById: perfilAlmacenista.id,
-                details: {
-                    create: [
-                        { productId: productos[0].id, quantity: 5, description: 'Recepción de prueba 1' },
-                        { productId: productos[1].id, quantity: 8, description: 'Recepción de prueba 2' },
-                    ]
-                }
-            }
-        });
+    const supplierMap = new Map(suppliers.map(s => [s.tradeName, s.id]))
 
-        await prisma.purchaseRequisition.upsert({
-            where: { referenceNumber: 'REQ-2026-000001' },
-            update: {
-                requestDate: new Date('2026-04-03T00:00:00.000Z'),
-                observations: 'Requisición inicial de materiales',
-                statusId: estatusAbierta.id,
-                departmentId: '00000000-0000-0000-0000-000000000012',
-                approverId: perfilAprobador.id,
-                requesterId: perfilSolicitante.id,
-                projectId: proyectoDemo.id,
-                details: {
-                    deleteMany: {},
-                    create: [
-                        { productId: productos[0].id, quantity: 2, description: 'Requisición de prueba 1' },
-                        { productId: productos[1].id, quantity: 1, description: 'Requisición de prueba 2' },
-                        ...(productos[2]
-                            ? [{ productId: productos[2].id, quantity: 3, description: 'Requisición de prueba 3' }]
-                            : []),
-                    ]
-                }
-            },
-            create: {
-                referenceNumber: 'REQ-2026-000001',
-                requestDate: new Date('2026-04-03T00:00:00.000Z'),
-                observations: 'Requisición inicial de materiales',
-                status: {
-                    connect: { id: "00000000-0000-0000-0000-000000000030" }
-                },
-                department: {
-                    connect: { id: "00000000-0000-0000-0000-000000000012" }
-                },
-                approver: {
-                    connect: { id: perfilAprobador.id }
-                },
-                requester: {
-                    connect: { id: perfilSolicitante.id }
-                },
-                project: {
-                    connect: { id: proyectoDemo.id }
-                },
-                details: {
-                    create: [
-                        { productId: productos[0].id, quantity: 2, description: 'Requisición de prueba 1' },
-                        { productId: productos[1].id, quantity: 1, description: 'Requisición de prueba 2' },
-                        ...(productos[2]
-                            ? [{ productId: productos[2].id, quantity: 3, description: 'Requisición de prueba 3' }]
-                            : []),
-                    ]
-                }
-            }
-        });
+    const relationSupplierProductSheet = workbook2.Sheets['RELACIONES'];
+    const relationSupplierProductRows = XLSX.utils.sheet_to_json(relationSupplierProductSheet, {
+        defval: null,
+    });
 
-        await prisma.goodsIssue.upsert({
-            where: { referenceNumber: 'SAL-2026-000001' },
-            update: {
-                requestDate: new Date('2026-04-04T00:00:00.000Z'),
-                observations: 'Salida inicial de materiales',
-                statusId: estatusAbierta.id,
-                departmentId: '00000000-0000-0000-0000-000000000012',
-                approverId: perfilAprobador.id,
-                requesterId: perfilSolicitante.id,
-                warehouseStaffId: perfilAlmacenista.id,
-                projectId: proyectoDemo.id,
-                details: {
-                    deleteMany: {},
-                    create: [
-                        { productId: productos[0].id, quantity: 1, description: 'Salida de prueba 1' },
-                        { productId: productos[1].id, quantity: 2, description: 'Salida de prueba 2' },
-                        ...(productos[2]
-                            ? [{ productId: productos[2].id, quantity: 1, description: 'Salida de prueba 3' }]
-                            : []),
-                    ]
-                }
-            },
-            create: {
-                referenceNumber: 'SAL-2026-0001',
-                requestDate: new Date('2026-04-04T00:00:00.000Z'),
-                observations: 'Salida inicial de materiales',
-                statusId: estatusAbierta.id,
-                departmentId: '00000000-0000-0000-0000-000000000012',
-                approverId: perfilAprobador.id,
-                requesterId: perfilSolicitante.id,
-                warehouseStaffId: perfilAlmacenista.id,
-                projectId: proyectoDemo.id,
-                details: {
-                    create: [
-                        { productId: productos[0].id, quantity: 1, description: 'Salida de prueba 1' },
-                        { productId: productos[1].id, quantity: 2, description: 'Salida de prueba 2' },
-                        ...(productos[2]
-                            ? [{ productId: productos[2].id, quantity: 1, description: 'Salida de prueba 3' }]
-                            : []),
-                    ]
-                }
-            }
-        });
-    }
+    const relationsSupplierProductParsed = relationSupplierProductRows.map(row => {
+
+        const productId = productMap.get(row.skuProduct);
+        const supplierId = supplierMap.get(row.supplier);
+        const currentStock = toDecimal(row.currentStock);
+        const convertedQuantity = toDecimal(row.convertedQuantity);
+        const maxUnitCost = toDecimal(row.maxUnitCost); 
+
+        if (!supplierId || !productId || !maxUnitCost) {
+            console.log('Error en fila: ',row);
+            return null;
+        }
+
+        return {
+            productId,
+            supplierId,
+            currentStock: isNaN(currentStock) ? 0 : currentStock,
+            convertedQuantity: isNaN(convertedQuantity) ? 0 : convertedQuantity,
+            maxUnitCost: isNaN(maxUnitCost) ? 0 : maxUnitCost,
+            sku: row.sku
+        }
+    }).filter(Boolean);
+
+    await prisma.supplierProduct.createMany({
+        data: relationsSupplierProductParsed,
+        skipDuplicates: true
+    });
 }
 
 main().finally(() => {

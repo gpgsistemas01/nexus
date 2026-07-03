@@ -1,0 +1,53 @@
+<% const form = {
+    id: 'purchaseRequisitionForm',
+    canApprove: true,
+    selects: [
+        {
+            id: 'projectInput',
+            name: 'projectId',
+            class: 'project-select',
+            col: 'col-12'
+        }
+    ],
+    inputs: [
+        {
+            id: 'requestDateInput',
+            name: 'requestDate',
+            type: 'datetime-local',
+            label: 'Fecha y hora de solicitud:',
+        }
+    ],
+    textArea: {
+        id: 'observationsInput',
+        name: 'observations',
+        label: 'Observaciones',
+    },
+    table: {
+        select: {
+            id: 'productInput',
+            name: 'productId',
+            class: 'project-select',
+            col: 'col-md-6'
+        },
+        inputs: [
+            {
+                id: 'quantityInput',
+                name: 'quantity',
+                type: 'number',
+                label: 'Cantidad',
+                col: '3'
+            }
+        ]
+    }
+} %>
+
+<%- include('../../../shared/mainTable', { title: 'Requisiciones' }) %>
+
+<%- include('../../../shared/modal', { modalId: 'purchaseRequisitionModal', form }) %>
+
+<script type="module" src="/js/pages/warehouse/purchaseRequisitionsPage.js"></script>
+
+<%- contentFor('title') %>
+Requisiciones
+<%- contentFor('layoutType') %>
+site

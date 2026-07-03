@@ -1,0 +1,19 @@
+<%
+const getInputColumnClass = col => {
+    const colValue = String(col || '12').trim();
+
+    return colValue.split(/\s+/).map(token => {
+        if (token.startsWith('col-')) {
+            return token;
+        }
+
+        return `col-${token}`;
+    }).join(' ');
+};
+%>
+
+<% inputs.forEach( input => { %>
+    <div class="<%= getInputColumnClass(input.col) %>">
+        <%- include('./outlineInput', { input }) %>
+    </div>
+<% }); %>

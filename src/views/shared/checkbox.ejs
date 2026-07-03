@@ -1,0 +1,16 @@
+<% if (input.type === 'checkbox') { %> <div class="form-check"> <% } %>
+  <input class="form-check-input" name="<%= input.name %>" type="<%= input.type %>" value="<%- input.value %>" id="<%= input.id %>" <%= input.isChecked ? 'checked' : '' %>>
+
+  <%- include('./label', { 
+    label: {
+      id: input.id,
+      content: input.label,
+      class: 'form-check-label'
+    }
+  }) %>
+<% if (input.type === 'checkbox') { %> </div> <% } %>
+
+<%- include('./validationMessage', { 
+  name: input.name, 
+  errorClass: input.errorClass || 'invalid-feedback' 
+}) %>

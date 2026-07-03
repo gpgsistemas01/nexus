@@ -1,0 +1,15 @@
+<%- include('../../../shared/mainTable', { title: 'Existencias' }) %>
+
+<%- include('../ui/productModal') %>
+
+<%- include('../ui/supplierModal') %>
+
+<script type="module" src="/js/pages/warehouse/productsPage.js"></script>
+<script type="module" src="/js/modules/products/productModal.js"></script>
+<script type="module" src="/js/modules/products/productForm.js"></script>
+<script type="module" src="/js/modules/suppliers/supplierForm.js"></script>
+
+<%- contentFor('title') %>
+Productos
+<%- contentFor('layoutType') %>
+site

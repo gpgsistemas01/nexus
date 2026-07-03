@@ -8,256 +8,522 @@ datasource db {
 }
 
 model Department {
-  id    String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name  String @unique @db.VarChar(50)
-  users User[]
-  goodsReceipts GoodsReceipt[]
+  id                   String                @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name                 String                @unique @db.VarChar(50)
+  profiles             DepartmentProfile[]
+  accesses             UserRoleDepartment[]
   purchaseRequisitions PurchaseRequisition[]
-  goodsIssues GoodsIssue[]
+  goodsIssues          GoodsIssue[]
+  notifications        Notification[]
 }
 
 model Role {
-  id    String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name  String @unique @db.VarChar(50)
-  users User[]
+  id       String               @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name     String               @unique @db.VarChar(50)
+  accesses UserRoleDepartment[]
 }
 
 model User {
-  id           String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  departmentId String     @db.Uuid
-  roleId       String     @db.Uuid
-  name         String     @unique @db.VarChar(50)
-  password     String     @db.VarChar(50)
-  isActive     Boolean    @default(true)
-  department   Department @relation(fields: [departmentId], references: [id])
-  role         Role       @relation(fields: [roleId], references: [id])
-  profiles     Profile[]  @relation("ProfileToUser")
+  id                      String               @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  profileId               String?              @db.Uuid
+  name                    String               @unique @db.VarChar(50)
+  password                String               @db.VarChar(100)
+  isActive                Boolean              @default(true)
+  profile                 Profile?             @relation(fields: [profileId], references: [id])
+  accesses                UserRoleDepartment[]
+  notifications           Notification[]
+  createrStockAdjustment  StockAdjustment[]    @relation("CreatedStockAdjustments")
+  approverStockAdjustment StockAdjustment[]    @relation("ApprovedStockAdjustments")
+}
+
+model UserRoleDepartment {
+  userId       String @db.Uuid
+  roleId       String @db.Uuid
+  departmentId String @db.Uuid
+
+  user       User       @relation(fields: [userId], references: [id])
+  role       Role       @relation(fields: [roleId], references: [id])
+  department Department @relation(fields: [departmentId], references: [id])
+
+  @@id([userId, roleId, departmentId])
 }
 
 model Profile {
-  id       String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name     String  @db.VarChar(50)
-  lastName String  @db.VarChar(50)
-  isActive Boolean @default(true)
-  goodsReceipts GoodsReceipt[]
-  users         User[]         @relation("ProfileToUser")
-  approverPurchaseRequisitions PurchaseRequisition[] @relation("ApproverRelation")
+  id                            String                @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  fullName                      String                @db.VarChar(255)
+  isActive                      Boolean               @default(true)
+  goodsReceipts                 GoodsReceipt[]
+  departments                   DepartmentProfile[]
+  users                         User[]
+  approverPurchaseRequisitions  PurchaseRequisition[] @relation("ApproverRelation")
   requesterPurchaseRequisitions PurchaseRequisition[] @relation("RequesterRelation")
-  approverGoodsIssues GoodsIssue[] @relation("ApproverGoodsIssueRelation")
-  requesterGoodsIssues GoodsIssue[] @relation("RequesterGoodsIssueRelation")
-  warehouseStaffGoodsIssues GoodsIssue[] @relation("WarehouseStaffGoodsIssueRelation")
+  approverGoodsIssues           GoodsIssue[]          @relation("ApproverGoodsIssueRelation")
+  requesterGoodsIssues          GoodsIssue[]          @relation("RequesterGoodsIssueRelation")
+  warehouseStaffGoodsIssues     GoodsIssue[]          @relation("WarehouseStaffGoodsIssueRelation")
   deliveredPurchaseRequisitions PurchaseRequisition[] @relation("DeliveredByRelation")
+  clients                       Client[]
+  goodsIssues                   GoodsIssue[]
 }
 
-model Category {
-  id       String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name     String    @unique
-  products Product[]
+model DepartmentProfile {
+  departmentId String @db.Uuid
+  profileId    String @db.Uuid
+
+  department Department @relation(fields: [departmentId], references: [id])
+  profile    Profile    @relation(fields: [profileId], references: [id])
+
+  @@id([departmentId, profileId])
 }
 
 model Status {
-  id   String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name String @unique
-  goodsReceipts GoodsReceipt[]
+  id                   String                @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name                 String                @unique
+  goodsReceipts        GoodsReceipt[]
   purchaseRequisitions PurchaseRequisition[]
-  goodsIssues GoodsIssue[]
+  goodsIssues          GoodsIssue[]
 }
 
 model Product {
-  id           String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name         String   @unique @db.VarChar(50)
-  sku          String?   @db.VarChar(50)
-  unitCost     Decimal  @db.Decimal(10, 2)
-  currentStock Decimal  @db.Decimal(10, 2)
-  expiryDate   DateTime?
-  thickness    Decimal? @db.Decimal(10, 3)
-  color        String?  @db.VarChar(50)
-  type         String?  @db.VarChar(50)
-  presentation String?  @db.VarChar(50)
-  uomId        String   @db.Uuid
-  categoryId   String   @db.Uuid
-  isActive     Boolean  @default(true)
-  maxStock     Decimal  @db.Decimal(10, 2)
-  minStock     Decimal  @db.Decimal(10, 2)
-  base         Decimal? @db.Decimal(10, 3)
-  height       Decimal? @db.Decimal(10, 3)
-  category     Category @relation(fields: [categoryId], references: [id])
-  uom          UoM      @relation(fields: [uomId], references: [id])
-  detailsGoodsReceipts DetailGoodsReceiptProduct[]
-  detailsPurchaseRequisitions DetailPurchaseRequisitionProduct[]
-  detailsGoodsIssues DetailGoodsIssueProduct[]
-  detailsMovement DetailMovement[]
+  id                          String                      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name                        String                      @db.VarChar(200)
+  sku                         String?                     @unique @db.VarChar(200)
+  presentationId              String                      @db.Uuid
+  unitMeasureId               String                      @db.Uuid
+  isActive                    Boolean                     @default(true)
+  minStock                    Decimal                     @default(0) @db.Decimal(10, 2)
+  base                        Decimal?                    @db.Decimal(10, 2)
+  height                      Decimal?                    @db.Decimal(10, 2)
+  presentation                Presentation                @relation(fields: [presentationId], references: [id])
+  unitMeasure                 UnitMeasure                 @relation(fields: [unitMeasureId], references: [id])
+  goodsIssueDetails           GoodsIssueDetail[]
+  goodsReceiptDetails         GoodsReceiptDetail[]
+  purchaseRequisitionsDetails PurchaseRequisitionDetail[]
+  movementDetails             MovementDetail[]
+  supplierProducts            SupplierProduct[]
+  stockAdjustmentDetails      StockAdjustmentDetail[]
 }
 
-model UoM {
-  id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name        String    @unique @db.VarChar(10)
-  abbrevation String    @unique @db.VarChar(10)
-  product     Product[]
+model UnitMeasure {
+  id                String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name              String             @db.VarChar(20)
+  symbol            String             @db.VarChar(10)
+  goodsIssueDetails GoodsIssueDetail[]
+  products          Product[]
+
+  @@unique([name, symbol])
+}
+
+model Presentation {
+  id               String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name             String             @unique @db.VarChar(50)
+  goodsIssueDetail GoodsIssueDetail[]
+  products         Product[]
 }
 
 model Supplier {
-  id          String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name        String  @unique @db.VarChar(50)
-  numberphone String? @db.VarChar(20)
-  isActive    Boolean @default(true)
-  goodsReceipts GoodsReceipt[]
+  id                     String                  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  codeNumber             Int
+  code                   String                  @unique @db.VarChar(10)
+  legalName              String                  @db.VarChar(200)
+  tradeName              String                  @db.VarChar(100)
+  isActive               Boolean                 @default(true)
+  goodsReceipts          GoodsReceipt[]
+  goodsIssueDetails      GoodsIssueDetail[]
+  products               SupplierProduct[]
+  movementDetails        MovementDetail[]
+  stockAdjustmentDetails StockAdjustmentDetail[]
 }
 
+model SupplierProduct {
+  id                String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  maxUnitCost       Decimal? @db.Decimal(10, 2)
+  sku               String?  @db.VarChar(50)
+  currentStock      Decimal  @default(0) @db.Decimal(10, 2)
+  convertedQuantity Decimal  @default(0) @db.Decimal(10, 2)
+  supplierId        String   @db.Uuid
+  productId         String   @db.Uuid
+  supplier          Supplier @relation(fields: [supplierId], references: [id])
+  product           Product  @relation(fields: [productId], references: [id])
+  wastes            Waste[]
+
+  @@unique([supplierId, productId])
+  @@index([supplierId])
+  @@index([productId])
+}
+
+model Waste {
+  id                String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  supplierProductId String          @db.Uuid
+  isActive          Boolean         @default(true)
+  minStock          Decimal         @default(0) @db.Decimal(10, 2)
+  base              Decimal         @db.Decimal(10, 2)
+  height            Decimal         @db.Decimal(10, 2)
+  currentStock      Decimal         @default(0) @db.Decimal(10, 2)
+  convertedQuantity Decimal         @default(0) @db.Decimal(10, 2)
+  supplierProduct   SupplierProduct @relation(fields: [supplierProductId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([supplierProductId, base, height])
+  @@index([supplierProductId])
+}
+
+model Notification {
+  id              String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  title           String      @db.VarChar(100)
+  message         String      @db.VarChar(255)
+  type            String      @default("info") @db.VarChar(20)
+  isRead          Boolean     @default(false)
+  createdAt       DateTime    @default(now())
+  entityId        String      @db.Uuid
+  entityType      String      @db.VarChar(50)
+  referenceNumber String?     @db.VarChar(50)
+  userId          String?     @db.Uuid
+  user            User?       @relation(fields: [userId], references: [id])
+  departmentId    String?     @db.Uuid
+  department      Department? @relation(fields: [departmentId], references: [id])
+}
 
 model Project {
-  id              String                @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  referenceNumber String                @unique @db.VarChar(50)
-  client          String                @db.VarChar(50)
-  name            String                @db.VarChar(50)
-  date            DateTime
+  id                   String                @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  referenceNumber      String                @unique @db.VarChar(50)
+  client               String                @db.VarChar(50)
+  name                 String                @db.VarChar(50)
+  date                 DateTime
   purchaseRequisitions PurchaseRequisition[]
+  goodsIssues          GoodsIssue[]
+}
+
+model Client {
+  id          String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name        String       @db.VarChar(255)
+  advisorId   String?      @db.Uuid
+  advisor     Profile?     @relation(fields: [advisorId], references: [id])
   goodsIssues GoodsIssue[]
 }
 
 model ReferenceNumberCounter {
-  id        String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  prefix    String @unique @db.VarChar(10)
-  counter   Int    @default(0)
+  id      String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  prefix  String @db.VarChar(10)
+  counter Int    @default(0)
+  year    Int    @default(0)
+
+  @@unique([prefix, year])
 }
 
 model GoodsReceipt {
-  id           String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  referenceNumber String     @unique @db.VarChar(50)
-  supplierId   String     @db.Uuid
-  receptionDate         DateTime
-  observations String?    @db.VarChar(50)
-  statusId     String     @db.Uuid
-  departmentId String     @db.Uuid
-  receivedById String     @db.Uuid
-  department   Department @relation(fields: [departmentId], references: [id])
-  receivedBy   Profile       @relation(fields: [receivedById], references: [id])
-  supplier     Supplier   @relation(fields: [supplierId], references: [id])
-  status       Status     @relation(fields: [statusId], references: [id])
-  details        DetailGoodsReceiptProduct[]
-  movements InventoryMovement[]
+  id                       String               @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  invoice                  String?              @db.VarChar(50)
+  isInvoiced               Boolean              @default(false)
+  supplierId               String               @db.Uuid
+  supplierName             String               @db.VarChar(200)
+  statusId                 String               @db.Uuid
+  receivedById             String               @db.Uuid
+  receivedByName           String               @db.VarChar(255)
+  referenceNumber          String               @unique @db.VarChar(50)
+  receptionDate            DateTime
+  observations             String?              @db.VarChar(500)
+  totalQuantity            Decimal              @db.Decimal(10, 2)
+  totalNetPurchaseAmount   Decimal              @db.Decimal(10, 2)
+  totalGrossPurchaseAmount Decimal              @db.Decimal(10, 2)
+  receivedBy               Profile              @relation(fields: [receivedById], references: [id])
+  supplier                 Supplier             @relation(fields: [supplierId], references: [id])
+  status                   Status               @relation(fields: [statusId], references: [id])
+  movements                InventoryMovement[]
+  details                  GoodsReceiptDetail[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
-model DetailGoodsReceiptProduct {
-  id             String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  productId      String       @db.Uuid
-  goodsReceiptId String       @db.Uuid
-  quantity       Decimal      @db.Decimal(10, 2)
-  description    String?      @db.VarChar(50)
-  goodsReceipt   GoodsReceipt @relation(fields: [goodsReceiptId], references: [id])
-  product        Product      @relation(fields: [productId], references: [id])
-  detailMovementId String @unique @db.Uuid
-  detailMovement DetailMovement @relation(fields: [detailMovementId], references: [id])
+model GoodsReceiptDetail {
+  id                  String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  productId           String           @db.Uuid
+  goodsReceiptId      String           @db.Uuid
+  quantity            Decimal          @db.Decimal(10, 2)
+  conversionUnitCost  Decimal          @db.Decimal(10, 2)
+  costPerUnitType     Decimal          @db.Decimal(10, 2)
+  convertedQuantity   Decimal          @db.Decimal(10, 2)
+  netPurchaseAmount   Decimal          @db.Decimal(10, 2)
+  grossPurchaseAmount Decimal          @db.Decimal(10, 2)
+  presentationId      String           @db.Uuid
+  presentationName    String           @db.VarChar(50)
+  unitMeasureId       String           @db.Uuid
+  unitMeasureName     String           @db.VarChar(20)
+  unitMeasureSymbol   String           @db.VarChar(10)
+  productName         String           @db.VarChar(200)
+  productBase         Decimal?         @db.Decimal(10, 2)
+  productHeight       Decimal?         @db.Decimal(10, 2)
+  goodsReceipt        GoodsReceipt     @relation(fields: [goodsReceiptId], references: [id])
+  product             Product          @relation(fields: [productId], references: [id])
+  movementDetails     MovementDetail[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
-model PurchaseRequisition { 
-  id               String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  referenceNumber  String   @unique @db.VarChar(50)
-  authDate         DateTime?
-  requestDate      DateTime
-  deliveryDate     DateTime?
-  observations     String?  @db.VarChar(50)
+model PurchaseRequisition {
+  id              String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  referenceNumber String    @unique @db.VarChar(50)
+  approveDate     DateTime?
+  requestDate     DateTime
+  deliveryDate    DateTime?
+  observations    String?   @db.VarChar(500)
 
-  statusId         String   @db.Uuid
-  departmentId     String   @db.Uuid
-  approverId       String?  @db.Uuid
-  deliveredById    String?  @db.Uuid
-  requesterId      String   @db.Uuid
-  projectId        String   @db.Uuid
+  statusId      String  @db.Uuid
+  departmentId  String  @db.Uuid
+  approverId    String? @db.Uuid
+  deliveredById String? @db.Uuid
+  requesterId   String  @db.Uuid
+  projectId     String  @db.Uuid
 
-  department       Department @relation(fields: [departmentId], references: [id])
-  approver         Profile?   @relation("ApproverRelation", fields: [approverId], references: [id]) 
-  deliveredBy      Profile?   @relation("DeliveredByRelation", fields: [deliveredById], references: [id])
-  requester        Profile    @relation("RequesterRelation", fields: [requesterId], references: [id])
-  status           Status     @relation(fields: [statusId], references: [id])
-  project          Project     @relation(fields: [projectId], references: [id])
+  department  Department @relation(fields: [departmentId], references: [id])
+  approver    Profile?   @relation("ApproverRelation", fields: [approverId], references: [id])
+  deliveredBy Profile?   @relation("DeliveredByRelation", fields: [deliveredById], references: [id])
+  requester   Profile    @relation("RequesterRelation", fields: [requesterId], references: [id])
+  status      Status     @relation(fields: [statusId], references: [id])
+  project     Project    @relation(fields: [projectId], references: [id])
 
-  details          DetailPurchaseRequisitionProduct[]
+  details PurchaseRequisitionDetail[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
-model DetailPurchaseRequisitionProduct {
-  id                      String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  productId               String   @db.Uuid
-  purchaseRequisitionId   String   @db.Uuid
-  quantity                Decimal  @db.Decimal(10, 2)
-  description             String?  @db.VarChar(50)
+model PurchaseRequisitionDetail {
+  id                    String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  productId             String  @db.Uuid
+  purchaseRequisitionId String  @db.Uuid
+  quantity              Decimal @db.Decimal(10, 2)
 
-  purchaseRequisition     PurchaseRequisition @relation(fields: [purchaseRequisitionId], references: [id])
-  product                 Product             @relation(fields: [productId], references: [id])
+  purchaseRequisition PurchaseRequisition @relation(fields: [purchaseRequisitionId], references: [id])
+  product             Product             @relation(fields: [productId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model GoodsIssue {
-  id               String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  referenceNumber  String   @unique @db.VarChar(50)
-  approvedDate         DateTime?
-  requestDate      DateTime
-  deliveryDate     DateTime?
-  observations     String?  @db.VarChar(50)
+  id              String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  referenceNumber String    @unique @db.VarChar(50)
+  approvedDate    DateTime?
+  requestDate     DateTime
+  deliveryDate    DateTime?
+  observations    String?   @db.VarChar(500)
+  projectNumber   String    @db.VarChar(10)
+  departmentName  String    @db.VarChar(50)
+  requesterName   String    @db.VarChar(255)
+  clientName      String    @db.VarChar(255)
+  advisorName     String    @db.VarChar(255)
 
-  statusId         String   @db.Uuid
-  departmentId     String   @db.Uuid
-  approverId       String?  @db.Uuid
-  requesterId      String   @db.Uuid
-  warehouseStaffId String?  @db.Uuid
-  projectId        String   @db.Uuid
+  statusId            String  @db.Uuid
+  departmentId        String  @db.Uuid
+  approverId          String? @db.Uuid
+  requesterId         String  @db.Uuid
+  warehouseStaffId    String? @db.Uuid
+  projectId           String? @db.Uuid
+  clientId            String  @db.Uuid
+  advisorId           String  @db.Uuid
+  fulfillmentStatusId String? @db.Uuid
 
-  department       Department @relation(fields: [departmentId], references: [id])
-  approver         Profile?   @relation("ApproverGoodsIssueRelation", fields: [approverId], references: [id])
-  requester        Profile    @relation("RequesterGoodsIssueRelation", fields: [requesterId], references: [id])
-  warehouseStaff   Profile?   @relation("WarehouseStaffGoodsIssueRelation", fields: [warehouseStaffId], references: [id])
-  status           Status     @relation(fields: [statusId], references: [id])
-  project          Project    @relation(fields: [projectId], references: [id])
+  department        Department         @relation(fields: [departmentId], references: [id])
+  approver          Profile?           @relation("ApproverGoodsIssueRelation", fields: [approverId], references: [id])
+  requester         Profile            @relation("RequesterGoodsIssueRelation", fields: [requesterId], references: [id])
+  warehouseStaff    Profile?           @relation("WarehouseStaffGoodsIssueRelation", fields: [warehouseStaffId], references: [id])
+  status            Status             @relation(fields: [statusId], references: [id])
+  project           Project?           @relation(fields: [projectId], references: [id])
+  client            Client             @relation(fields: [clientId], references: [id])
+  advisor           Profile            @relation(fields: [advisorId], references: [id])
+  fulfillmentStatus FulfillmentStatus? @relation(fields: [fulfillmentStatusId], references: [id])
 
-  details          DetailGoodsIssueProduct[]
-  movement InventoryMovement[]
-}
-
-model DetailGoodsIssueProduct {
-  id            String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  productId     String   @db.Uuid
-  goodsIssueId  String   @db.Uuid
-  quantity      Decimal  @db.Decimal(10, 2)
-  description   String?  @db.VarChar(50)
-
-  goodsIssue    GoodsIssue @relation(fields: [goodsIssueId], references: [id])
-  product       Product    @relation(fields: [productId], references: [id])
-  detailMovementId String  @unique @db.Uuid
-  detailMovement DetailMovement @relation(fields: [detailMovementId], references: [id])
-}
-
-model Reason {
-  id String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name String @db.VarChar(50)
+  details   GoodsIssueDetail[]
   movements InventoryMovement[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model GoodsIssueDetail {
+  id           String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  productId    String @db.Uuid
+  goodsIssueId String @db.Uuid
+  supplierId   String @db.Uuid
+
+  presentationId              String   @db.Uuid
+  unitMeasureId               String   @db.Uuid
+  productName                 String   @db.VarChar(200)
+  supplierName                String   @db.VarChar(200)
+  productBase                 Decimal? @db.Decimal(10, 2)
+  productHeight               Decimal? @db.Decimal(10, 2)
+  quantity                    Decimal  @db.Decimal(10, 2)
+  applyWaste                  Boolean  @default(false)
+  presentationName            String   @db.VarChar(50)
+  convertedQuantity           Decimal  @db.Decimal(10, 2)
+  unitMeasureName             String   @db.VarChar(20)
+  unitMeasureSymbol           String   @db.VarChar(10)
+  maxUnitCost                 Decimal  @db.Decimal(10, 2)
+  projectConvertedQuantity    Decimal? @db.Decimal(10, 2)
+  convertedQuantityDifference Decimal? @db.Decimal(10, 2)
+  suppliedQuantity            Decimal? @db.Decimal(10, 2)
+  isSupplied                  Boolean  @default(false)
+  fulfillmentStatusId         String?  @db.Uuid
+
+  presentation      Presentation       @relation(fields: [presentationId], references: [id])
+  unitMeasure       UnitMeasure        @relation(fields: [unitMeasureId], references: [id])
+  product           Product            @relation(fields: [productId], references: [id])
+  supplier          Supplier           @relation(fields: [supplierId], references: [id])
+  goodsIssue        GoodsIssue         @relation(fields: [goodsIssueId], references: [id])
+  fulfillmentStatus FulfillmentStatus? @relation(fields: [fulfillmentStatusId], references: [id])
+  movementDetails   MovementDetail[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model FulfillmentStatus {
+  id                String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name              String             @unique @db.VarChar(50)
+  goodsIssues       GoodsIssue[]
+  goodsIssueDetails GoodsIssueDetail[]
 }
 
 model InventoryMovement {
-  id String @id @default(uuid())
+  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
 
-  goodsReceiptId String? @db.Uuid
-  goodsIssueId   String? @db.Uuid
-  reasonId String @db.Uuid
+  referenceNumber String? @unique @db.VarChar(50)
 
-  goodsReceipt GoodsReceipt? @relation(fields: [goodsReceiptId], references: [id])
-  goodsIssue   GoodsIssue?   @relation(fields: [goodsIssueId], references: [id])
-  reason Reason @relation(fields: [reasonId], references: [id])
+  type InventoryMovementType
 
-  date DateTime
+  goodsReceiptId    String? @db.Uuid
+  goodsIssueId      String? @db.Uuid
+  stockAdjustmentId String? @unique @db.Uuid
 
-  details DetailMovement[]
+  date DateTime @default(now())
+
+  goodsReceipt    GoodsReceipt?    @relation(fields: [goodsReceiptId], references: [id])
+  goodsIssue      GoodsIssue?      @relation(fields: [goodsIssueId], references: [id])
+  stockAdjustment StockAdjustment? @relation(fields: [stockAdjustmentId], references: [id])
+  details         MovementDetail[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
-model DetailMovement {
-  id String @id @default(uuid())
+model MovementDetail {
+  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
 
   quantity Decimal @db.Decimal(10, 2)
 
-  movementId String @db.Uuid
-  movement InventoryMovement @relation(fields: [movementId], references: [id])
+  newStock      Decimal? @db.Decimal(10, 2)
+  previousStock Decimal? @db.Decimal(10, 2)
 
-  productId String @db.Uuid
-  product Product @relation(fields: [productId], references: [id])
+  productId               String   @db.Uuid
+  productBase             Decimal? @db.Decimal(10, 2)
+  productHeight           Decimal? @db.Decimal(10, 2)
+  supplierId              String   @db.Uuid
+  goodsReceiptDetailId    String?  @db.Uuid
+  goodsIssueDetailId      String?  @db.Uuid
+  stockAdjustmentDetailId String?  @db.Uuid
+  movementId              String   @db.Uuid
 
-  detailGoodsIssueProduct DetailGoodsIssueProduct?
-  detailGoodsReceiptProduct DetailGoodsReceiptProduct?
+  product               Product                @relation(fields: [productId], references: [id])
+  supplier              Supplier               @relation(fields: [supplierId], references: [id])
+  goodsReceiptDetail    GoodsReceiptDetail?    @relation(fields: [goodsReceiptDetailId], references: [id])
+  goodsIssueDetail      GoodsIssueDetail?      @relation(fields: [goodsIssueDetailId], references: [id])
+  stockAdjustmentDetail StockAdjustmentDetail? @relation(fields: [stockAdjustmentDetailId], references: [id])
+  movement              InventoryMovement      @relation(fields: [movementId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model StockAdjustment {
+  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+
+  referenceNumber String @unique @db.VarChar(50)
+
+  type         StockAdjustmentType
+  reasonId     String              @db.Uuid
+  observations String?             @db.VarChar(500)
+
+  status AdjustmentStatus @default(PENDING)
+
+  createdById  String  @db.Uuid
+  approvedById String? @db.Uuid
+
+  reason     StockAdjustmentReason @relation(fields: [reasonId], references: [id])
+  createdBy  User                  @relation("CreatedStockAdjustments", fields: [createdById], references: [id])
+  approvedBy User?                 @relation("ApprovedStockAdjustments", fields: [approvedById], references: [id])
+
+  movement InventoryMovement?
+
+  details StockAdjustmentDetail[]
+
+  appliedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum AdjustmentStatus {
+  PENDING
+  APPLIED
+  CANCELLED
+}
+
+enum StockAdjustmentType {
+  INCREASE
+  DECREASE
+}
+
+model StockAdjustmentDetail {
+  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+
+  stockAdjustmentId String @db.Uuid
+
+  productId    String @db.Uuid
+  supplierId   String @db.Uuid
+  productName  String @db.VarChar(200)
+  supplierName String @db.VarChar(200)
+
+  previousStock Decimal @db.Decimal(10, 2)
+  newStock      Decimal @db.Decimal(10, 2)
+  difference    Decimal @db.Decimal(10, 2)
+
+  previousConvertedQuantity Decimal @db.Decimal(10, 2)
+  newConvertedQuantity      Decimal @db.Decimal(10, 2)
+  convertedDifference       Decimal @db.Decimal(10, 2)
+
+  productBase   Decimal? @db.Decimal(10, 2)
+  productHeight Decimal? @db.Decimal(10, 2)
+
+  stockAdjustment StockAdjustment @relation(fields: [stockAdjustmentId], references: [id])
+
+  product  Product  @relation(fields: [productId], references: [id])
+  supplier Supplier @relation(fields: [supplierId], references: [id])
+
+  movementDetails MovementDetail[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum InventoryMovementType {
+  ENTRY
+  ISSUE
+  ADJUSTMENT
+}
+
+model StockAdjustmentReason {
+  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+
+  name String @unique @db.VarChar(100)
+
+  isActive Boolean @default(true)
+
+  stockAdjustments StockAdjustment[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

@@ -1,0 +1,167 @@
+import { openProductModal, openStockAdjustmentModal } from "../../modules/products/productModal.js";
+import { createDataTable, renderActionButtons } from "./baseDatatable.js";
+import { notifications } from "../swal/swalComponent.js";
+import { hasPermission } from "../../utils/permissions.js";
+import { getAllProducts } from "../../application/warehouse/products.js";
+import { renderMaterialName } from "./utils/renderProductDatatable.js";
+import { configureResponsiveHeaderGroups, getResponsiveRowData } from "./utils/responsive.js";
+import { buildExcelButton, buildTableExportParams } from "../../ui/tableUI.js";
+import { exportWarehouseReport } from "../../application/warehouse/report.js";
+import { formatFileName } from "../../utils/formatters.js";
+import { DATATABLE_SELECTORS } from "../../constants/selectors.js";
+
+const selectorTable = DATATABLE_SELECTORS.MAIN;
+let lastLowStockNotification = '';
+let stockSocketConfigured = false;
+
+const tableElement = document.querySelector(selectorTable);
+
+const renderProductTableHeader = ({ canSeeCost, canManageProducts }) => {
+
+    tableElement.innerHTML = `
+        <thead>
+            <tr>
+                <th rowspan="2">Material</th>
+                <th colspan="2" data-responsive-group="measures">Medidas</th>
+                <th rowspan="2">Compra</th>
+                <th rowspan="2">Stock Mínimo</th>
+                <th rowspan="2">Presentación</th>
+                <th colspan="2" data-responsive-group="conversion">Conversión</th>
+                ${ canSeeCost ? '<th rowspan="2">Costo Unitario</th>' : '' }
+                ${ canManageProducts ? '<th rowspan="2">Acciones</th>' : '' }
+            </tr>
+            <tr>
+                <th data-responsive-parent="measures">Base</th>
+                <th data-responsive-parent="measures">Altura</th>
+                <th data-responsive-parent="conversion">Cantidad</th>
+                <th data-responsive-parent="conversion">Unidad</th>
+            </tr>
+        </thead>
+    `;
+};
+
+const configureStockRealtime = (table) => {
+
+    if (stockSocketConfigured) return;
+
+    stockSocketConfigured = true;
+
+    window.addEventListener('stock:updated', () => {
+        table.ajax.reload(null, false);
+    });
+};
+
+export const createProductDatatable = (context) => {
+
+    const { hasRole, isAdmin, isWarehouse, isSystem, isSales } = hasPermission(context);
+    const isWarehouseProductManager = isWarehouse && (hasRole('Almacenista') || hasRole('Coordinador') || hasRole('Auxiliar'));
+    const canSeeCost = isWarehouse || isSystem || isSales;
+    const canManageProducts = isAdmin || isWarehouseProductManager;
+    const canCreateProductsFromModule = isSystem && isAdmin;
+    const canAdjustStock = isSystem && isAdmin;
+
+    renderProductTableHeader({ canSeeCost, canManageProducts });
+
+    const columns = [
+        { 
+            data: null, 
+            title: 'Material',
+            render: (data, type, row) => renderMaterialName(row)
+        },
+        { data: 'base', title: 'Base' },
+        { data: 'height', title: 'Altura' },
+        { data: 'currentStock', title: 'Existencia' },
+        { data: 'minStock', title: 'Stock Mínimo' },
+        { data: 'presentation.name', title: 'Presentación' },
+        { data: 'convertedQuantity', title: 'Cantidad' },
+        { data: 'unitMeasure.name', title: 'Unidad' }
+    ];
+
+    if (canSeeCost) {
+        columns.push({ data: 'maxUnitCost', title: 'Costo Unitario de Conversión' });
+    }
+
+    if (canManageProducts) {
+        columns.push({
+            data: null,
+            title: 'Acciones',
+            render: () => renderActionButtons({
+                status: 'Abierta',
+                context: 'product',
+                canAdjustStock
+            })
+        });
+    }
+
+    const table = createDataTable({
+        options: {
+            ajax: {
+                get: getAllProducts
+            },
+            searchPlaceholder: 'Buscar por Material',
+            columns,
+            createdRow: (row, data) => {
+
+                if (Number(data.currentStock) < Number(data.minStock)) {
+                    row.classList.add('table-warning');
+                }
+            },
+            drawCallback: function() {
+
+                const currentData = this.api().rows({ page: 'current' }).data().toArray();
+                const lowStockProducts = currentData.filter((product) => Number(product.currentStock) < Number(product.minStock));
+
+                if (!lowStockProducts.length) {
+                    lastLowStockNotification = '';
+                    return;
+                }
+
+                const lowStockSignature = lowStockProducts.map((product) => product.id).join(',');
+
+                if (lastLowStockNotification === lowStockSignature) return;
+
+                lastLowStockNotification = lowStockSignature;
+
+                const productNames = lowStockProducts
+                    .slice(0, 3)
+                    .map((product) => product.name)
+                    .join(', ');
+
+                notifications.showWarning(
+                    `Hay ${lowStockProducts.length} producto(s) por debajo del stock mínimo: ${productNames}${lowStockProducts.length > 3 ? '...' : ''}`
+                );
+            },
+            buttons: [
+                ...(canCreateProductsFromModule ? [{
+                    text: 'Nuevo producto',
+                    action: () => openProductModal({
+                        mode: 'create',
+                        includeStockAdjustmentOnCreate: true
+                    })
+                }] : []),
+                buildExcelButton({
+                    filename: formatFileName('reporte_inventario_productos'),
+                    request: () => exportWarehouseReport(buildTableExportParams(table))
+                })
+            ]
+        }
+    });
+
+    configureResponsiveHeaderGroups(table);
+    configureStockRealtime(table);
+
+    $(`${ selectorTable } tbody`).on('click', '.btn-edit', function () {
+
+        const data = getResponsiveRowData(table, this);
+    
+        openProductModal({ mode: 'edit', data });
+    });
+
+    $(`${ selectorTable } tbody`).on('click', '.btn-adjust-stock', function() {
+
+        const data = getResponsiveRowData(table, this);
+
+        openStockAdjustmentModal({ mode: 'edit-stock', data });
+    });
+
+}

@@ -1,0 +1,133 @@
+import { ProductNotFound } from "../../../errors/warehouse/productError.js";
+import { GoodsIssueMissingMaxUnitCost } from "../../../errors/inventory/stockError.js";
+import { buildStockKey, normalizeText } from "../../../utils/formattersUtils.js";
+import { calculateConvertedQuantity } from "../../inventory/stockHelpers.js";
+import { profileBelongsToDepartment } from "../../admin/profileService.js";
+import { findSupplierProductsSnapshot } from "../products/supplierProductService.js";
+
+const FLOAT_EPSILON = 0.000001;
+const FULFILLMENT_PENDING = 'Pendiente';
+const FULFILLMENT_PARTIAL = 'Surtido parcial';
+const FULFILLMENT_COMPLETE = 'Surtido';
+const DEPARTMENT_WAREHOUSE = 'ALMACÉN Y PROVEDURÍA';
+const INTERNAL_CLIENT_NAME = 'GPG INTERNO';
+const PROJECT_NUMBER_BY_DEPARTMENT = new Map([
+    ['DIRECCIÓN', '120000'],
+    ['ACABADOS', '120001'],
+    ['ADMINISTRATIVO', '120002'],
+    ['ALMACÉN Y PROVEDURÍA', '120003'],
+    ['DISEÑO', '120004'],
+    ['INSTALACIONES', '120005'],
+    ['IMPRESIÓN', '120006'],
+    ['ROUTER', '120007'],
+    ['PT/TRÁFICO', '120008'],
+    ['SERVICIOS Y VIGILANCIA', '120009'],
+    ['SISTEMAS', '120010'],
+    ['TALLER 3D', '120011'],
+    ['VENTAS Y PROYECTOS ESPECIALES', '120012']
+]);
+
+export const isInternalClient = (client) => (
+    normalizeText(client?.name || '') === normalizeText(INTERNAL_CLIENT_NAME)
+);
+
+export const isValidInternalClientAdvisor = ({ client, advisor }) => {
+
+    if (!isInternalClient(client)) return true;
+
+    return profileBelongsToDepartment({
+        profile: advisor,
+        departmentName: DEPARTMENT_WAREHOUSE
+    });
+};
+
+export const isValidInternalClientProjectNumberByDepartment = ({ client, department, projectNumber = '' }) => {
+
+    if (!isInternalClient(client)) return true;
+
+    const expectedProjectNumber = PROJECT_NUMBER_BY_DEPARTMENT.get(department?.name || '');
+
+    return !!expectedProjectNumber && expectedProjectNumber === projectNumber;
+};
+
+export const buildGoodsIssueDetails = async ({
+    details
+}) => {
+
+    const pairs = [
+        ...new Map(
+            details.map(detail => [
+                buildStockKey(detail.productId, detail.supplierId),
+                {
+                    productId: detail.productId,
+                    supplierId: detail.supplierId
+                }
+            ])
+        ).values()
+    ];
+
+    const supplierProducts = await findSupplierProductsSnapshot({ pairs });
+
+    const spMap = new Map(
+        supplierProducts.map(sp => [
+            buildStockKey(sp.id, sp.supplier.id),
+            sp
+        ])
+    );
+
+    return details.map(({ productId, quantity, supplierId, presentationId }) => {
+
+        const key = buildStockKey(productId, supplierId);
+        const sp = spMap.get(key);
+
+        if (!sp) throw new ProductNotFound();
+
+        if (presentationId && sp.presentation?.id !== presentationId) throw new ProductNotFound();
+
+        const { name, base, height, presentation, unitMeasure, maxUnitCost } = sp;
+        const convertedQuantity = calculateConvertedQuantity({
+            quantity,
+            base,
+            height
+        });
+
+        if (maxUnitCost === null || maxUnitCost === undefined) {
+            throw new GoodsIssueMissingMaxUnitCost({
+                productName: name,
+                height,
+                base,
+                supplierName: sp.supplier.tradeName
+            });
+        }
+
+        return {
+            productId,
+            supplierId,
+            supplierName: sp.supplier.tradeName,
+            quantity,
+            convertedQuantity,
+            maxUnitCost,
+            productName: name,
+            productBase: base,
+            productHeight: height,
+            presentationId: presentation.id,
+            presentationName: presentation.name,
+            unitMeasureId: unitMeasure.id,
+            unitMeasureName: unitMeasure.name,
+            unitMeasureSymbol: unitMeasure.symbol
+        };
+    });
+}
+
+export const resolveFulfillmentStatus = (details) => {
+
+    const allSupplied = details.every((d) => d.isSupplied);
+
+    const anySupplied = details.some(
+        (d) => (d.suppliedQuantity ?? 0) > FLOAT_EPSILON
+    );
+
+    return allSupplied
+        ? FULFILLMENT_COMPLETE
+        : (anySupplied ? FULFILLMENT_PARTIAL : FULFILLMENT_PENDING);
+};

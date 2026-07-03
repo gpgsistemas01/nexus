@@ -1,0 +1,65 @@
+import { registerProfile, updateProfile } from "../../application/admin/profiles.js";
+import { useForm } from "../../application/form.js";
+import { createProfilesDatatable } from "../../plugins/datatable/profileDatatable.js";
+import { initProfileFormSelect2, setProfileFormSelectOptions } from "../../plugins/select2/modules/profileSelect.js";
+import { clearFormErrors, initForm } from "../../ui/formUI.js";
+import { openModal } from "../../ui/modalUI.js";
+import { handleSubmit, validateFields } from "../../utils/formUtils.js";
+import { profileValidators } from "../../utils/validations/validators.js";
+import { FORM_SELECTORS, MODAL_SELECTORS } from "../../constants/selectors.js";
+
+const formId = FORM_SELECTORS.PROFILE_FORM;
+const modalId = MODAL_SELECTORS.PROFILE;
+
+createProfilesDatatable();
+
+useForm({
+    selector: formId,
+    normalizeData: ({ form, formData }) => {
+
+        const fd = new FormData(form);
+
+        return {
+            ...formData,
+            departments: fd.getAll('departments').filter(Boolean)
+        }
+    },
+    getErrors: ({ formData }) => validateFields(profileValidators, formData),
+    sendRequest: async ({ formData, form }) => {
+
+        await handleSubmit({
+            form,
+            formData,
+            create: registerProfile,
+            update: updateProfile
+        });
+    }
+});
+
+export const openProfileModal = ({ mode, data = null }) => {
+
+    const form = document.querySelector(formId);
+    const modalElement = document.querySelector(modalId);
+
+    initForm({ form, mode, id: data?.id || '' });
+    clearFormErrors(form);
+    initProfileFormSelect2({ modalSelector: modalId });
+    setProfileFormSelectOptions({ modalSelector: modalId, data });
+
+    if (mode === 'create') {
+
+        form.reset();
+        modalElement.querySelector('#modalTitle').textContent = 'Registrar perfil';
+        form.querySelector('#submitBtn').textContent = 'Guardar';
+
+    } 
+    
+    if (mode === 'edit') {
+
+        form.elements.fullName.value = data.fullName;
+        modalElement.querySelector('#modalTitle').textContent = 'Editar perfil';
+        form.querySelector('#submitBtn').textContent = 'Actualizar';
+    }
+
+    openModal(modalElement);
+}

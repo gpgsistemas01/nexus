@@ -1,0 +1,123 @@
+<% const form = {
+    id: 'goodsReceiptForm',
+    canApprove: false,
+    invoice: {
+        radios: [
+            {
+                id: 'invoiceRadio',
+                type: 'radio',
+                name: 'isInvoiced',
+                label: 'Factura',
+                value: 'invoice',
+                isChecked: true
+            },
+            {
+                id: 'noInvoiceRadio',
+                type: 'radio',
+                name: 'isInvoiced',
+                label: 'Remisión',
+                value: 'none',
+                isChecked: false
+            }
+        ],
+        input: {
+            id: 'invoiceInput',
+            name: 'invoice',
+            type: 'text',
+            label: 'Número de Factura'
+        }
+    },
+    selects: [
+        {
+            id: 'supplierInput',
+            name: 'supplierId',
+            class: 'supplier-select',
+            col: 'col-6'
+        },
+        {
+            id: 'receivedByInput',
+            name: 'receivedById',
+            class: 'received-by-select',
+            col: 'col-6'
+        }
+    ],
+    inputs: [
+        {
+            id: 'receptionDateInput',
+            name: 'receptionDate',
+            type: 'datetime-local',
+            label: 'Fecha y hora de recepción:',
+            col: '6'
+        },
+    ],
+    textArea: {
+        id: 'observationsInput',
+        name: 'observations',
+        label: 'Observaciones',
+    },
+    table: {
+        select: {
+            id: 'productInput',
+            name: 'productId',
+            class: 'product-select',
+            col: 'col-md-4 col-lg-6'
+        },
+        inputs: [
+            {
+                id: 'quantityInput',
+                name: 'quantity',
+                type: 'number',
+                label: 'Cantidad',
+                attrs: {
+                    'min': '0'
+                },
+                col: 'md-2 col-lg-1'
+            },
+            {
+                id: 'costPerUnitInput',
+                name: 'costPerUnitType',
+                type: 'number',
+                label: 'Costo por Presentación',
+                attrs: {
+                    'min': '0',
+                    'step': 'any'
+                },
+                col: 'md-2 col-lg-1'
+            },
+        ]
+    }
+} %>
+
+<%- include('../../../shared/tableFilters', {
+    selectInputs: [
+        {
+            id: 'supplierFilter',
+            label: 'Proveedor:',
+            col: 'col-12 col-md-6 col-lg-4'
+        },
+        {
+            id: 'profileFilter',
+            label: 'Perfil de quien recibe:',
+            col: 'col-12 col-md-6 col-lg-4'
+        }
+    ]
+}) %>
+
+<%- include('../../../shared/mainTable', { title: 'Registro de Compras' }) %>
+
+<%- include('../../../shared/modal', { modalId: 'goodsReceiptModal', form }) %>
+
+<%- include('../ui/productModal') %>
+
+<%- include('../ui/supplierModal') %>
+
+<script type="module" src="/js/pages/warehouse/goodsReceiptsPage.js"></script>
+<script type="module" src="/js/modules/products/productModal.js"></script>
+<script type="module" src="/js/modules/products/productForm.js"></script>
+<script type="module" src="/js/modules/suppliers/supplierModal.js"></script>
+<script type="module" src="/js/modules/suppliers/supplierForm.js"></script>
+
+<%- contentFor('title') %>
+Compras
+<%- contentFor('layoutType') %>
+site

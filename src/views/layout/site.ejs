@@ -1,0 +1,90 @@
+<% const menuButton = {
+    id: 'mobileMenuOffcanvasBtn',
+    class: 'navbar-toggler p-2 app-header-action',
+    attrs: {
+        'data-mdb-ripple-init': '',
+        'data-mdb-offcanvas-init': '',
+        'data-mdb-target': '#mobileMenu',
+        'aria-controls': 'mobileMenu',
+        'aria-expanded': 'false'
+    },
+    content: '<i class="fas fa-bars me-2"></i>Menú'
+}; %>
+
+<div class="app-shell d-flex min-vh-100">
+
+    <%- include('./sidebar/offcanvas') %>
+
+    <aside class="app-sidebar d-none d-md-block p-3" data-mdb-theme="dark">
+        <nav class="navbar navbar-expand-lg p-0">
+            <div class="container-fluid justify-content-between">
+
+                <div role="navigation">
+                    <%- include('./ui/navList', { 
+                        listClass: 'navbar-nav flex-column',
+                    }) %>
+                </div>
+            </div>
+        </nav>
+    </aside>
+
+    <div class="flex-fill d-flex flex-column">
+        <header class="app-header navbar shadow-2 px-3 gap-2">
+
+            <div class="d-md-none">
+                <%- include('../shared/button', { button: menuButton }) %>
+            </div>
+
+            <div class="app-userbar d-flex align-items-center gap-2 gap-sm-3 ms-auto">
+                <div class="dropdown">
+                    <button
+                        id="notificationsBellBtn"
+                        type="button"
+                        class="btn btn-link btn-floating app-header-action app-notifications-toggle position-relative"
+                        data-mdb-dropdown-init
+                        data-mdb-ripple-init
+                        aria-expanded="false"
+                        aria-label="Abrir notificaciones"
+                    >
+                        <i class="fas fa-bell fs-5"></i>
+                        <span
+                            id="notificationsUnreadCount"
+                            class="position-absolute top-0 start-100 translate-middle badge rounded-pill app-notifications-badge d-none"
+                        >
+                            0
+                        </span>
+                    </button>
+
+                    <ul
+                        id="notificationsMenu"
+                        class="dropdown-menu dropdown-menu-end p-0 app-notifications-menu"
+                        aria-labelledby="notificationsBellBtn"
+                    >
+                        <li class="app-notifications-header px-3 py-3 d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong>Notificaciones</strong>
+                                <div class="small">Alertas recientes del sistema</div>
+                            </div>
+                            <button id="markNotificationsReadBtn" class="btn btn-sm btn-outline-success">Marcar leídas</button>
+                        </li>
+                        <li id="notificationsList" class="list-group list-group-flush"></li>
+                    </ul>
+                </div>
+
+                <span class="app-user-name"><%= user.name %></span>
+
+                <%- include('./ui/logoutForm', {
+                    buttonClass: 'btn btn-sm btn-outline-success app-header-action app-logout-btn'
+                }) %>
+            </div>
+        </header>
+
+        <main class="container-fluid p-3 p-md-4">
+            <%- body %>
+        </main>
+    </div>
+</div>
+
+<script>
+    window.meta = <%- JSON.stringify(user || {}) %>;
+</script>

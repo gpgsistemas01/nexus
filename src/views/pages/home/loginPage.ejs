@@ -1,0 +1,62 @@
+<% const form = {
+    id: 'loginForm',
+    class: 'login-form row g-3',
+    attrs: { novalidate: true },
+    inputs: [
+        {
+            id: 'nameInput',
+            name: 'name',
+            type: 'text',
+            label: 'Nombre de usuario',
+            attrs: {
+                autocomplete: 'username',
+                placeholder: 'Ingresa tu usuario'
+            }
+        },
+        {
+            id: 'passwordInput',
+            name: 'password',
+            type: 'password',
+            label: 'Contraseña',
+            attrs: {
+                autocomplete: 'current-password',
+                placeholder: 'Ingresa tu contraseña'
+            }
+        }
+    ],
+    checkboxes: [
+        {
+            id: 'rememberCredentialsInput',
+            name: 'rememberCredentials',
+            type: 'checkbox',
+            value: 'true',
+            label: 'Recordar credenciales'
+        }
+    ]
+}; %>
+
+<section class="login-shell" aria-labelledby="loginTitle">
+    <div class="login-card shadow-5-strong">
+        <div class="login-card__brand" aria-hidden="true">
+            <img src="/img/logo.png" alt="" class="login-card__logo">
+        </div>
+
+        <div class="login-card__content">
+            <p class="login-card__eyebrow">Sistema Merma</p>
+            <h1 id="loginTitle">Iniciar sesión</h1>
+            <p class="login-card__text">Accede con tu usuario y contraseña.</p>
+
+            <%- include('../../shared/form', { form }) %>
+        </div>
+    </div>
+</section>
+
+<script>
+    window.FLASH_MESSAGE = <%- JSON.stringify(flash) %>;
+</script>
+<script type="module" src="/js/pages/home/loginPage.js"></script>
+
+<%- contentFor('title') %>
+Inicio
+<%- contentFor('layoutType') %>
+clean

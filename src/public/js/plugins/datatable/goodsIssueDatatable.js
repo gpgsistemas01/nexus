@@ -1,0 +1,175 @@
+import { openGoodsIssueModal } from "../../pages/warehouse/goodsIssuesPage.js";
+import { getAllGoodsIssues } from "../../application/warehouse/goodsIssues/goodsIssues.js";
+import { exportGoodsIssueReport } from "../../application/warehouse/report.js";
+import { hasPermission } from "../../utils/permissions.js";
+import { buildExcelButton, buildTableExportParams } from "../../ui/tableUI.js";
+import { formatFileName } from "../../utils/formatters.js";
+import { createDataTable, refreshProductTable, renderActionButtons } from "./baseDatatable.js";
+import { buildDetailsColumns, buildDetailsHeader } from "./utils/builderDetailDatatable.js";
+import { handleDelete, renderMaterialName } from "./utils/renderProductDatatable.js";
+import { getResponsiveRowData } from "./utils/responsive.js";
+import { setupTableFilters } from "./utils/filters/tableFilter.js";
+import { DATATABLE_SELECTORS } from "../../constants/selectors.js";
+
+export let details = [];
+const selectorProductTable = DATATABLE_SELECTORS.PRODUCT;
+const tableSelector = DATATABLE_SELECTORS.MAIN;
+let filters = {
+    getValues: () => ({})
+};
+
+let productTable;
+
+export const createGoodsIssueDatatable = async (context) => {
+
+    let table;
+
+    const { hasRole, isWarehouse, isSystem, canManageWarehouseReturns } = hasPermission(context);
+    const canReturnGoodsIssue = canManageWarehouseReturns();
+
+    const columns = [
+        { data: 'referenceNumber', title: 'Folio' },
+        {
+            data: null,
+            title: 'Solicitud',
+            render: (data, type, row) => {
+
+                const name = row.requesterName;
+                const date = new Date(row.requestDate).toLocaleString();
+
+                return `<div>${ name }<br><small>${ date }</small></div>`;
+            }
+        }
+    ];
+
+    if (isWarehouse || isSystem) {
+        columns.push({
+            data: 'departmentName',
+            title: 'Área'
+        });
+    }
+
+    columns.push(
+        { data: 'projectNumber', title: 'Proyecto' },
+        { data: 'clientName', title: 'Cliente' },
+        { data: 'fulfillmentStatus.name', title: 'Estado surtido' },
+        {
+            data: 'id',
+            title: 'Acciones',
+            render: (data, type, row) => renderActionButtons({ 
+                status: row.status?.name, 
+                fulfillmentStatus: row.fulfillmentStatus?.name,
+                context: 'goodsIssue',
+                canReturnGoodsIssue
+            })
+        }
+    );
+
+    filters = await setupTableFilters({
+        fields: ['date', 'client', 'department', 'profile', 'fulfillmentStatus']
+    });
+
+    table = createDataTable({
+        options: {
+            ajax: {
+                get: (params) => getAllGoodsIssues({
+                    ...params,
+                    ...filters.getValues()
+                })
+            },
+            searchPlaceholder: 'Buscar por Folio o Proyecto',
+            columns,
+            order: [[0, 'desc']],
+            buttons: [
+                {
+                    text: 'Nueva salida',
+                    action: () => openGoodsIssueModal({ mode: 'create' })
+                },
+                buildExcelButton({
+                    filename: formatFileName('reporte_salidas'),
+                    request: () => exportGoodsIssueReport(buildTableExportParams(table, filters.getValues()))
+                })
+            ]
+        }
+    });
+
+    $(`${ tableSelector } tbody`).on('click', '.btn-edit', function () {
+
+        const data = getResponsiveRowData(table, this);
+
+        const mode = data.fulfillmentStatus?.name === 'Pendiente' ? 'edit' : 'edit-header';
+
+        openGoodsIssueModal({ mode, data });
+    })
+
+    $(`${ tableSelector } tbody`).on('click', '.btn-edit-detail', function() {
+
+        const data = getResponsiveRowData(table, this);
+
+        openGoodsIssueModal({ mode: 'edit-detail', data });
+    });
+
+    $(`${ tableSelector } tbody`).on('click', '.btn-return-goods-issue', function() {
+
+        const data = getResponsiveRowData(table, this);
+
+        openGoodsIssueModal({ mode: 'return', data });
+    });
+
+    $(`${ tableSelector } tbody`).on('click', '.btn-view', function() {
+
+        const data = getResponsiveRowData(table, this);
+
+        openGoodsIssueModal({ mode: 'view', data });
+    });
+};
+
+export const initDetailsGoodsIssueTable = (mode, context) => {
+
+    const { isWarehouse, isSystem, hasRole } = hasPermission(context);
+
+    if ($.fn.DataTable.isDataTable(selectorProductTable)) {
+        $(selectorProductTable).DataTable().clear().destroy();
+        $(selectorProductTable).empty();
+    }
+
+    const table = document.querySelector(selectorProductTable);
+
+    table.innerHTML = buildDetailsHeader({
+        type: 'issue',
+        mode,
+        isWarehouse,
+        isCoordinator: hasRole('Coordinador'),
+        isSystem
+    });
+
+    const columns = buildDetailsColumns({
+        type: 'issue',
+        mode,
+        render: (_, __, row) => renderMaterialName(row),
+        isWarehouse,
+        isCoordinator: hasRole('Coordinador'),
+        isSystem
+    });
+
+    productTable = createDataTable({
+        selector: selectorProductTable,
+        options: {
+            data: details,
+            columns,
+            responsive: true,
+            autoWidth: false
+        }
+    });
+};
+
+$(selectorProductTable).on('click', '.delete-btn', function () {
+
+    const id = $(this).data('id');
+
+    handleDelete({
+        id,
+        details,
+        context: 'issue'
+    })
+});

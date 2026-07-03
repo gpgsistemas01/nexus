@@ -1,0 +1,28 @@
+<%- include('../../../shared/tableFilters', {
+    selectInputs: [
+        {
+            id: 'movementTypeFilter',
+            label: 'Tipo de movimiento:',
+            col: 'col-12 col-md-6'
+        },
+        {
+            id: 'supplierFilter',
+            label: 'Proveedor:',
+            col: 'col-12 col-md-6'
+        },
+        {
+            id: 'productFilter',
+            label: 'Material:',
+            col: 'col-12 col-md-6'
+        }
+    ]
+}) %>
+
+<%- include('../../../shared/mainTable', { title: 'Movmientos' }) %>
+
+<script type="module" src="/js/pages/admin/movementsPage.js"></script>
+
+<%- contentFor('title') %>
+Movimientos
+<%- contentFor('layoutType') %>
+site

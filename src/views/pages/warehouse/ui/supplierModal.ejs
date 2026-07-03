@@ -1,0 +1,38 @@
+<% const form = {
+    id: 'supplierForm',
+    canApprove: false,
+    inputs: [
+        {
+            id: 'legalNameInput',
+            type: 'text',
+            name: 'legalName',
+            label: 'Razón social',
+            col: '6'
+        },
+        {
+            id: 'tradeNameInput',
+            type: 'text',
+            name: 'tradeName',
+            label: 'Nombre comercial',
+            col: '6'
+        },
+        {
+            id: 'numberphoneInput',
+            type: 'tel',
+            name: 'numberphone',
+            label: 'Teléfono',
+            col: '6'
+        },
+    ],
+    checkboxes: [
+        {
+            id: 'isActiveInput',
+            type: 'checkbox',
+            name: 'isActive',
+            label: 'Activo',
+            isChecked: true
+        }
+    ]
+} %>
+
+<%- include('../../../shared/modal', { modalId: 'supplierModal', form }) %>

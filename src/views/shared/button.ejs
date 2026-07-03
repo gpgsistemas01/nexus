@@ -1,0 +1,11 @@
+<%
+const buttonAttrs = button.attrs || {};
+%>
+
+<button id="<%= button.id %>" type="button" data-mdb-ripple-init class="<%= button.class %>"
+    <% for (let key in buttonAttrs) { %>
+        <%= key %>="<%= buttonAttrs[key] %>"
+    <% } %>
+>
+    <%- button.content %>
+</button>

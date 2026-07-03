@@ -1,0 +1,25 @@
+# Git metadata
+.git
+.gitignore
+
+# Dependencies and local package manager output
+node_modules
+npm-debug.log*
+
+# Docker-only files are not needed inside the runtime image
+Dockerfile
+docker-compose*.yml
+.dockerignore
+
+# Keep every .env file out of the Docker build context
+.env
+.env.*
+
+# Test sources/configuration and generated test artifacts are not needed in production images
+tests
+vitestConfig.js
+coverage
+.vitest
+
+# Local OS files
+.DS_Store

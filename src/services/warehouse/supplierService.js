@@ -1,0 +1,190 @@
+import { AppError } from "../../errors/AppError.js";
+import { SupplierCodeFindDatabaseError, SupplierCodeNotFound, SupplierCreateDatabaseError, SupplierNotFound, SupplierUpdateDatabaseError } from "../../errors/warehouse/supplierError.js";
+import { getDb } from "../../repository/baseRepository.js";
+import { incrementNonYearlyReferenceNumberCounter } from "../document/referenceNumberService.js";
+import { createServiceLogger, getModelLogContext, logServiceError, logServiceInfo } from "../../utils/logger.js";
+
+const serviceLogger = createServiceLogger('warehouse.supplierService');
+
+
+const SUPPLIER_CODE_ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+const SUPPLIER_REFERENCE_PREFIX = 'PRO';
+const numberToSupplierCode = (number) => {
+
+    let current = number + 1;
+    let code = '';
+
+    while (current > 0) {
+        current -= 1;
+        code = SUPPLIER_CODE_ALPHABET[current % 26] + code;
+        current = Math.floor(current / 26);
+    }
+
+    return code;
+};
+
+export const findAllSuppliers = async ({
+    skip = 0,
+    take = 10,
+    search = '',
+    orderBy = 'legalName',
+    orderDir = 'asc'
+}) => {
+
+    const db = getDb();
+
+    const where = search
+        ? {
+            OR: [
+                {
+                    tradeName: {
+                        contains: search,
+                        mode: 'insensitive'
+                    }
+                },
+                {
+                    legalName: {
+                        contains: search,
+                        mode: 'insensitive'
+                    }
+                }
+            ]
+        }
+        : {};
+
+    const suppliers = await db.supplier.findMany({
+        skip,
+        take,
+        where,
+        orderBy: {
+            [orderBy]: orderDir
+        },
+        select: {
+            id: true,
+            tradeName: true,
+            legalName: true,
+            isActive: true
+        }
+    });
+
+    const total = await db.supplier.count();
+    const filtered = await db.supplier.count({ where });
+
+    return {
+        data: suppliers,
+        recordsTotal: total,
+        recordsFiltered: filtered
+    };
+};
+
+const DEFAULT_SUPPLIER_SELECT = {
+    id: true,
+    tradeName: true
+};
+
+export const findUniqueSupplier = async ({
+    tx = null,
+    id
+}) => {
+
+    const supplier = await getDb(tx).supplier.findUnique({
+        where: { id },
+        select: DEFAULT_SUPPLIER_SELECT
+    });
+
+    if (!supplier) throw new SupplierNotFound();
+
+    return supplier;
+};
+
+export const findUniqueSupplierCode = async ({
+    tx = null,
+    id
+}) => {
+
+    const supplier = await getDb(tx).supplier.findUnique({
+        where: { id },
+        select: { code: true }
+    });
+
+    if (!supplier) throw new SupplierCodeNotFound();
+
+    return supplier;
+};
+
+export const createSupplier = async (supplierDto) => {
+
+    try {
+
+        const supplier = await getDb().$transaction(async (tx) => {
+
+            const counter = await incrementNonYearlyReferenceNumberCounter({
+                type: SUPPLIER_REFERENCE_PREFIX,
+                tx
+            });
+
+            const codeNumber = counter.counter;
+            const generatedCode = numberToSupplierCode(codeNumber - 1);
+
+            return tx.supplier.create({
+                data: {
+                    ...supplierDto,
+                    codeNumber,
+                    code: generatedCode,
+                }
+            });
+        });
+
+        logServiceInfo(serviceLogger, {
+            operation: 'warehouse.supplierService.createSupplier',
+            ...getModelLogContext('supplier', supplier)
+        }, 'Proveedor creado correctamente');
+
+        return supplier;
+
+    } catch (err) {
+        logServiceError(serviceLogger, err, {
+            operation: 'warehouse.supplierService.createSupplier',
+            ...getModelLogContext('supplier', supplierDto)
+        });
+
+        throw new SupplierCreateDatabaseError();
+    }
+};
+
+export const updateSupplier = async (supplierDto, id) => {
+
+    const db = getDb();
+
+    const supplierExists = await db.supplier.findUnique({
+        where: { id },
+        select: { id: true }
+    });
+
+    if (!supplierExists) throw new SupplierNotFound();
+
+    try {
+
+        const supplier = await db.supplier.update({
+            data: { ...supplierDto },
+            where: { id }
+        });
+
+        logServiceInfo(serviceLogger, {
+            operation: 'warehouse.supplierService.updateSupplier',
+            ...getModelLogContext('supplier', supplier)
+        }, 'Proveedor actualizado correctamente');
+
+        return supplier;
+
+    } catch (err) {
+        logServiceError(serviceLogger, err, {
+            operation: 'warehouse.supplierService.updateSupplier',
+            ...getModelLogContext('supplier', { id, ...supplierDto })
+        });
+
+        if (err instanceof AppError) throw err;
+
+        throw new SupplierUpdateDatabaseError();
+    }
+};

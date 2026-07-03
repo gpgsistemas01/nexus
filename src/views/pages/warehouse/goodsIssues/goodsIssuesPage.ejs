@@ -1,0 +1,111 @@
+<% const form = {
+    id: 'goodsIssueForm',
+    canApprove: true,
+    selects: [
+        {
+            id: 'clientInput',
+            name: 'clientId',
+            class: 'client-select',
+            col: 'col-6'
+        },
+        {
+            id: 'advisorInput',
+            name: 'advisorId',
+            class: 'advisor-select',
+            col: 'col-6'
+        },
+        {
+            id: 'departmentInput',
+            name: 'departmentId',
+            class: 'department-select',
+            col: 'col-6'
+        },
+        {
+            id: 'requesterInput',
+            name: 'requesterId',
+            class: 'request-select',
+            col: 'col-6'
+        }
+    ],
+    inputs: [
+        {
+            id: 'projectNumberInput',
+            name: 'projectNumber',
+            type: 'text',
+            label: 'Número de proyecto',
+            col: '6'
+        },
+        {
+            id: 'requestDateInput',
+            name: 'requestDate',
+            type: 'datetime-local',
+            label: 'Fecha y hora de solicitud:',
+            col: '6'
+        },
+    ],
+    textArea: {
+        id: 'observationsInput',
+        name: 'observations',
+        label: 'Observaciones',
+    },
+    table: {
+        select: {
+            id: 'productInput',
+            name: 'productId',
+            class: 'product-select',
+            col: 'col-md-6'
+        },
+        inputs: [
+            {
+                id: 'quantityInput',
+                name: 'quantity',
+                type: 'number',
+                label: 'Cantidad',
+                attrs: {
+                    'min': '0'
+                },
+                col: 'md-2'
+            },
+        ]
+    }
+} %>
+
+<%- include('../../../shared/tableFilters', {
+    selectInputs: [
+        {
+            id: 'clientFilter',
+            label: 'Cliente:',
+            col: 'col-12 col-md-6 col-lg-3'
+        },
+        {
+            id: 'departmentFilter',
+            label: 'Área:',
+            col: 'col-12 col-md-6 col-lg-3'
+        },
+        {
+            id: 'profileFilter',
+            label: 'Perfil:',
+            col: 'col-12 col-md-6 col-lg-3'
+        },
+        {
+            id: 'fulfillmentStatusFilter',
+            label: 'Estado de surtido:',
+            col: 'col-12 col-md-6 col-lg-3'
+        }
+    ]
+}) %>
+
+<%- include('../../../shared/mainTable', { title: 'Salidas de almacén' }) %>
+
+<%- include('../../../shared/modal', { modalId: 'goodsIssueModal', form }) %>
+
+<%- include('../../ui/clientModal') %>
+
+<script type="module" src="/js/pages/warehouse/goodsIssuesPage.js"></script>
+<script type="module" src="/js/modules/clients/clientModal.js"></script>
+<script type="module" src="/js/modules/clients/clientForm.js"></script>
+
+<%- contentFor('title') %>
+Salidas del almacén
+<%- contentFor('layoutType') %>
+site

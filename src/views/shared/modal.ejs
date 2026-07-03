@@ -1,0 +1,203 @@
+<% const header = {
+    button: {
+        id: `close${modalId}`,
+        dismissTarget: 'modal'
+    },
+    class: 'modal-header',
+    title: {
+        id: 'modalTitle',
+        class: 'modal-title',
+    }
+}; 
+
+const inputs = {
+    presentationDisplayInput: {
+        id: 'presentationDisplayInput',
+        name: 'presentationDisplay',
+        type: 'text',
+        label: 'Presentación',
+        attrs: {
+            readonly: '',
+            tabindex: '-1'
+        }
+    }
+}
+
+const totalInputs = [
+    {
+        id: 'totalQuantityDisplayInput',
+        name: 'totalQuantity',
+        type: 'number',
+        label: 'Cantidad Total',
+        col: '4',
+        attrs: {
+            disabled: '',
+            tabindex: '-1'
+        }
+    },
+    {
+        id: 'totalNetPurchaseAmountDisplayInput',
+        name: 'totalNetPurchaseAmount',
+        type: 'number',
+        label: 'Total de Compra s/ IVA',
+        col: '4',
+        attrs: {
+            disabled: '',
+            tabindex: '-1'
+        }
+    },
+    {
+        id: 'totalGrossPurchaseAmountDisplayInput',
+        name: 'totalGrossPurchaseAmount',
+        type: 'number',
+        label: 'Total de Compra c/ IVA',
+        col: '4',
+        attrs: {
+            disabled: '',
+            tabindex: '-1'
+        }
+    }
+];
+
+const buttons = {
+    addProductButton: {
+        id: 'addProductBtn',
+        class: 'btn btn-primary w-100',
+        content: 'Agregar'
+    },
+    backButton: {
+        id: `backBtn-${modalId}`,
+        class: 'btn btn-link',
+        content: 'Regresar',
+        attrs: {
+            'data-mdb-dismiss': 'modal'
+        }
+    }
+};
+
+const getSelectColumnClass = col => {
+    const colValue = String(col || '12').trim();
+
+    return colValue.split(/\s+/).map(token => {
+        if (token.startsWith('col-')) {
+            return token;
+        }
+
+        return `col-${token}`;
+    }).join(' ');
+}; %>
+
+<div class="modal fade" id="<%= modalId %>" tabindex="-1" aria-labelledby="<%= header.title.id %>" aria-hidden="true">
+    <div class="modal-dialog modal-fullscreen modal-dialog-scrollable">
+        <div class="modal-content">
+        
+        <%- include('./header', { header }) %>
+
+        <div class="modal-body dark overflow-auto">
+            <form id="<%= form.id %>" class="row g-3" novalidate>
+                <% if (form.invoice) { %>
+                    <div class="col-12 row g-2">
+                        <div class="col-6 mb-2">
+                            <label class="form-label">Tipo de comprobante</label>
+
+                            <%- include('./checkbox', { input: form.invoice.radios[0] }) %>
+
+                            <%- include('./checkbox', { input: form.invoice.radios[1] }) %>
+                        </div>
+
+                        <div id="invoiceContainer" class="col-6">
+                            <%- include('./outlineInput', { input: form.invoice.input }) %>
+                        </div>
+                    </div>
+                <% } %>
+
+                <% if (form.sections) { %>
+                    <% form.sections.forEach(section => { %>
+                        <section class="col-12 <%= section.class || '' %>">
+                            <div class="border-bottom pb-2 mb-3">
+                                <h5 class="mb-1"><%= section.title %></h5>
+                                <% if (section.description) { %>
+                                    <p class="text-muted mb-0"><%= section.description %></p>
+                                <% } %>
+                            </div>
+
+                            <div class="row g-3">
+                                <% section.groups.forEach(group => { %>
+                                    <% if (group.type === 'selects') { %>
+                                        <%- include('./selectList', { inputs: group.items }) %>
+                                    <% } %>
+
+                                    <% if (group.type === 'inputs') { %>
+                                        <%- include('./outlineInputList', { inputs: group.items }) %>
+                                    <% } %>
+
+                                    <% if (group.type === 'textarea') { %>
+                                        <div class="col-12">
+                                            <%- include('./textarea', { input: group.input }) %>
+                                        </div>
+                                    <% } %>
+
+                                    <% if (group.type === 'checkboxes') { %>
+                                        <%- include('./checkboxList', { inputs: group.items }) %>
+                                    <% } %>
+                                <% }); %>
+                            </div>
+                        </section>
+                    <% }); %>
+                <% } else { %>
+                    <% if (form.stockAdjustment) { %>
+                        <%- include('./selectList', { inputs: form.stockAdjustment.selects }) %>
+
+                        <%- include('./outlineInputList', { inputs: form.stockAdjustment.inputs }) %>
+                    <% } %>
+
+                    <% if (form.selects) { %>
+                        <%- include('./selectList', { inputs: form.selects }) %>
+                    <% } %>
+
+                    <%- include('./outlineInputList', { inputs: form.inputs }) %>
+
+                    <% if (form.textArea) { %>
+                        <%- include('./textarea', { input: form.textArea }) %>
+                    <% } %>
+
+                    <% if (form.checkboxes) { %>
+                        <%- include('./checkboxList', { inputs: form.checkboxes }) %>
+                    <% } %>
+                <% } %>
+
+                <% if (form.table) { %>
+                    <div class="col-12 row g-2 mb-3 add-product-container">
+                        <div class="<%= getSelectColumnClass(form.table.select.col) %> mb-2">
+                            <%- include('./select', { input: form.table.select }) %>
+                        </div>
+
+                        <%- include('./outlineInputList', { inputs: form.table.inputs }) %>
+
+                        <div class="col-md-2 col-lg-2">
+                            <%- include('./outlineInput', { input: inputs.presentationDisplayInput }) %>
+                        </div>
+
+                        <div class="col-md-2 col-lg-2">
+                            <%- include('./button', { button: buttons.addProductButton }) %>
+                        </div>
+                    </div>
+
+                    <%- include('./productTable') %>
+
+                    <div class="col-12 row g-2 mb-3 total-container">
+                        <%- include('./outlineInputList', { inputs: totalInputs }) %>
+                    </div>
+                <% } %>
+
+                <div class="col-12">
+                    <%- include('./button', { button: buttons.backButton }) %>
+                    
+                    <%- include('./submit') %>
+                </div>
+            </form>
+        </div>
+
+        </div>
+    </div>
+</div>
