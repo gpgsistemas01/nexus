@@ -451,7 +451,8 @@ table.dataTable.datatable-table {
 
 .datatable-responsive-wrapper {
   border-radius: 1rem;
-  overflow: visible;
+  overflow-x: auto;
+  overflow-y: visible;
   width: 100%;
 }
 
@@ -664,10 +665,6 @@ table.dataTable > tbody > tr.child td.child {
 }
 
 @media (max-width: 575.98px) {
-  .datatable-responsive-wrapper {
-    overflow-x: hidden;
-  }
-
   .table.datatable-table,
   table.dataTable.datatable-table {
     table-layout: auto;
