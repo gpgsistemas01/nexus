@@ -958,6 +958,44 @@ form .dropdown-item {
 
 /* navbar styles */
 
+
+.app-brand {
+  align-items: center;
+  border-radius: 1rem;
+  color: var(--mdb-light);
+  display: inline-flex;
+  font-weight: 800;
+  gap: 0.75rem;
+  letter-spacing: 0.08em;
+  padding: 0.35rem 0.5rem;
+  text-transform: uppercase;
+}
+
+.app-brand:hover,
+.app-brand:focus {
+  color: var(--mdb-accent);
+  text-decoration: none;
+}
+
+.app-brand__logo {
+  background: rgba(255, 255, 255, 0.96);
+  border-radius: 0.85rem;
+  height: 2.75rem;
+  object-fit: contain;
+  padding: 0.35rem;
+  width: 2.75rem;
+}
+
+.app-brand__name {
+  line-height: 1;
+}
+
+.app-brand--header {
+  color: var(--mdb-secondary);
+  letter-spacing: 0.06em;
+  padding-left: 0;
+}
+
 nav .nav-link, .offcanvas .nav-link {
   position: relative;
   --mdb-nav-link-color: var(--mdb-light);
