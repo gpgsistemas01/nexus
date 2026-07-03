@@ -76,15 +76,34 @@ const buttons = {
 };
 
 const getSelectColumnClass = col => {
-    const colValue = String(col || '12').trim();
+    const tokens = String(col || '12').trim().split(/\s+/).filter(Boolean);
+    const hasBaseColumn = tokens.some(token => token === 'col' || /^col(-\d+)?$/.test(token));
+    const normalizedTokens = [];
 
-    return colValue.split(/\s+/).map(token => {
+    if (!hasBaseColumn) {
+        normalizedTokens.push('col-12');
+    }
+
+    tokens.forEach(token => {
         if (token.startsWith('col-')) {
-            return token;
+            normalizedTokens.push(token);
+            return;
         }
 
-        return `col-12 col-md-${token}`;
-    }).join(' ');
+        if (/^(sm|md|lg|xl|xxl)-\d+$/.test(token)) {
+            normalizedTokens.push(`col-${token}`);
+            return;
+        }
+
+        if (/^\d+$/.test(token)) {
+            normalizedTokens.push(`col-md-${token}`);
+            return;
+        }
+
+        normalizedTokens.push(token);
+    });
+
+    return [...new Set(normalizedTokens)].join(' ');
 }; %>
 
 <div class="modal fade" id="<%= modalId %>" tabindex="-1" aria-labelledby="<%= header.title.id %>" aria-hidden="true">
