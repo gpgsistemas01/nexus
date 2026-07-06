@@ -5,10 +5,18 @@ import { mapServerErrors } from "../utils/formUtils.js";
 
 const getFallbackMessage = (err) => err?.message || 'Ocurrió un error inesperado.';
 
+const resetFormSubmission = (form) => {
+
+    if (!form) return;
+
+    form.dataset.submitting = 'false';
+    form.querySelector('button[type="submit"]')?.removeAttribute('disabled');
+};
+
 export const normalizeJqAjaxError = (jqXHR, errorThrown = null) => {
 
     const data = jqXHR?.responseJSON ?? null;
-    const message = getErrorMessage(data) || errorThrown || jqXHR?.statusText || 'No fue posible conectar con el servidor.';
+    const message = getErrorMessage(data) || data?.message || data?.detail || data?.error || errorThrown || jqXHR?.statusText || 'No fue posible conectar con el servidor.';
 
     return {
         status: jqXHR?.status ?? 0,
@@ -36,11 +44,11 @@ export const handleApiError = ({
                 clearFormErrors(form);
                 normalizeServerErrors({ form, errors: serverErrors });
                 scrollToFirstFormError(form);
+                resetFormSubmission(form);
                 return;
             }
 
-            form.dataset.submitting = 'false';
-            form.querySelector('button[type="submit"]').disabled = false;
+            resetFormSubmission(form);
             notifications.showError(message || 'Errores de validación.');
             return;
         }
@@ -52,8 +60,7 @@ export const handleApiError = ({
 
         case 404:
         case 409:
-            form.dataset.submitting = 'false';
-            form.querySelector('button[type="submit"]').disabled = false;
+            resetFormSubmission(form);
             notifications.showModal({
                 title: 'No se pudo completar la acción',
                 text: getFallbackMessage(err),

@@ -159,7 +159,10 @@ app.use((err, req, res, next) => {
         'Error no controlado'
     );
 
-    res.status(500).json({ code: errorMap.message.SERVER_ERROR });
+    res.status(500).json({
+        code: errorMap.message.SERVER_ERROR,
+        message: err?.message || 'Error interno del servidor.'
+    });
 });
 
 const PORT = process.env.PORT || 3000;

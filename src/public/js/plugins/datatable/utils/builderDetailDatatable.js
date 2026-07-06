@@ -10,6 +10,8 @@ const shouldShowIssueProjectColumns = ({ type, mode, isWarehouse, isCoordinator,
     && (mode === 'edit-detail' || mode === 'view')
 );
 
+const shouldShowActionsColumn = (mode) => !['view', 'edit-detail', 'return'].includes(mode);
+
 export const buildDetailsHeader = ({ type, mode, isWarehouse, isCoordinator, isSystem }) => {
 
     let extraHeaders = '';
@@ -53,7 +55,7 @@ export const buildDetailsHeader = ({ type, mode, isWarehouse, isCoordinator, isS
         `;
     }
 
-    if (mode !== 'view' && mode !== 'edit-detail' && mode !== 'return') {
+    if (shouldShowActionsColumn(mode)) {
         extraHeaders += `<th rowspan="2">Acciones</th>`;
     }
 
@@ -197,7 +199,7 @@ export const buildDetailsColumns = ({ type, mode, render, isWarehouse, isCoordin
         });
     }
 
-    if (mode !== 'view' && mode !== 'edit-detail' && mode !== 'return') {
+    if (shouldShowActionsColumn(mode)) {
         columns.push({
             data: null,
             render: (_, __, row) => {

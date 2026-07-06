@@ -147,7 +147,15 @@ export const pinoLogger = pinoHttp({
 
         return 'info';
     },
-    customSuccessMessage: (req, res) => `${req.method} ${req.url} operación completada`,
+    customSuccessMessage: (req, res) => {
+        const statusMessage = res.statusCode >= 500
+            ? 'falló'
+            : res.statusCode >= 400
+                ? 'fue rechazado'
+                : 'operación completada';
+
+        return `${req.method} ${req.url} ${statusMessage}`;
+    },
     customErrorMessage: (req, res) => `${req.method} ${req.url} falló`,
     redact: [
         'req.headers.cookie',
