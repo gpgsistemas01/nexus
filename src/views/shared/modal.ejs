@@ -186,19 +186,23 @@ const getSelectColumnClass = col => {
                 <% } %>
 
                 <% if (form.table) { %>
-                    <div class="col-12 row g-2 mb-3 add-product-container">
-                        <div class="<%= getSelectColumnClass(form.table.select.col) %> mb-2">
-                            <%- include('./select', { input: form.table.select }) %>
+                    <div class="col-12 mb-3 add-product-container">
+                        <div class="row g-3 mb-3">
+                            <div class="col-12">
+                                <%- include('./select', { input: form.table.select }) %>
+                            </div>
                         </div>
 
-                        <%- include('./outlineInputList', { inputs: form.table.inputs }) %>
+                        <div class="row g-3 align-items-end">
+                            <%- include('./outlineInputList', { inputs: form.table.inputs }) %>
 
-                        <div class="col-md-2 col-lg-2">
-                            <%- include('./outlineInput', { input: inputs.presentationDisplayInput }) %>
-                        </div>
+                            <div class="col-12 col-md-4 col-lg-3">
+                                <%- include('./outlineInput', { input: inputs.presentationDisplayInput }) %>
+                            </div>
 
-                        <div class="col-md-2 col-lg-2">
-                            <%- include('./button', { button: buttons.addProductButton }) %>
+                            <div class="col-12 col-md-2 col-lg-2">
+                                <%- include('./button', { button: buttons.addProductButton }) %>
+                            </div>
                         </div>
                     </div>
 

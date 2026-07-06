@@ -1443,6 +1443,30 @@ body section {
 }
 
 /* refinements for form controls and table actions */
+.add-product-container > div {
+    min-width: 0;
+}
+
+.add-product-container .form-outline,
+.add-product-container .form-select {
+    width: 100%;
+}
+
+.add-product-container .btn {
+    width: 100%;
+    min-height: 48px;
+}
+
+.add-product-container .form-outline .form-control,
+.add-product-container .form-outline .form-select {
+    min-height: 48px;
+}
+
+@media (max-width: 767.98px) {
+    .add-product-container > div {
+        width: 100%;
+    }
+}
 .form-select,
 .select2-container--default .select2-selection--single {
   background-color: var(--mdb-light);
