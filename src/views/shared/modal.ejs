@@ -73,37 +73,6 @@ const buttons = {
             'data-mdb-dismiss': 'modal'
         }
     }
-};
-
-const getSelectColumnClass = col => {
-    const tokens = String(col || '12').trim().split(/\s+/).filter(Boolean);
-    const hasBaseColumn = tokens.some(token => token === 'col' || /^col(-\d+)?$/.test(token));
-    const normalizedTokens = [];
-
-    if (!hasBaseColumn) {
-        normalizedTokens.push('col-12');
-    }
-
-    tokens.forEach(token => {
-        if (token.startsWith('col-')) {
-            normalizedTokens.push(token);
-            return;
-        }
-
-        if (/^(sm|md|lg|xl|xxl)-\d+$/.test(token)) {
-            normalizedTokens.push(`col-${token}`);
-            return;
-        }
-
-        if (/^\d+$/.test(token)) {
-            normalizedTokens.push(`col-md-${token}`);
-            return;
-        }
-
-        normalizedTokens.push(token);
-    });
-
-    return [...new Set(normalizedTokens)].join(' ');
 }; %>
 
 <div class="modal fade" id="<%= modalId %>" tabindex="-1" aria-labelledby="<%= header.title.id %>" aria-hidden="true">
@@ -112,7 +81,7 @@ const getSelectColumnClass = col => {
         
         <%- include('./header', { header }) %>
 
-        <div class="modal-body dark overflow-auto">
+        <div class="modal-body dark">
             <form id="<%= form.id %>" class="row g-3" novalidate>
                 <% if (form.invoice) { %>
                     <div class="col-12 row g-2">
@@ -186,19 +155,27 @@ const getSelectColumnClass = col => {
                 <% } %>
 
                 <% if (form.table) { %>
-                    <div class="col-12 row g-2 mb-3 add-product-container">
-                        <div class="<%= getSelectColumnClass(form.table.select.col) %> mb-2">
-                            <%- include('./select', { input: form.table.select }) %>
+                    <div class="col-12 mb-3 add-product-container">
+                        <div class="row mb-3">
+                            <div class="col-12">
+                                <%- include('./select', { input: form.table.select }) %>
+                            </div>
                         </div>
 
-                        <%- include('./outlineInputList', { inputs: form.table.inputs }) %>
+                        <div class="row g-3 align-items-end">
+                            <% form.table.inputs.forEach(input => { %>
+                                <div class="<%= input.col || 'col-12' %>">
+                                    <%- include('./outlineInput', { input }) %>
+                                </div>
+                            <% }); %>
 
-                        <div class="col-md-2 col-lg-2">
-                            <%- include('./outlineInput', { input: inputs.presentationDisplayInput }) %>
-                        </div>
+                            <div class="col-12 col-md-4 col-lg-3">
+                                <%- include('./outlineInput', { input: inputs.presentationDisplayInput }) %>
+                            </div>
 
-                        <div class="col-md-2 col-lg-2">
-                            <%- include('./button', { button: buttons.addProductButton }) %>
+                            <div class="col-12 col-md-2 col-lg-2">
+                                <%- include('./button', { button: buttons.addProductButton }) %>
+                            </div>
                         </div>
                     </div>
 
@@ -209,7 +186,7 @@ const getSelectColumnClass = col => {
                     </div>
                 <% } %>
 
-                <div class="col-12">
+                <div class="col-12 modal-actions">
                     <%- include('./button', { button: buttons.backButton }) %>
                     
                     <%- include('./submit') %>
