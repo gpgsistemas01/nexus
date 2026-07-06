@@ -10,7 +10,11 @@ const shouldShowIssueProjectColumns = ({ type, mode, isWarehouse, isCoordinator,
     && (mode === 'edit-detail' || mode === 'view')
 );
 
-const shouldShowActionsColumn = (mode) => !['view', 'edit-detail', 'return'].includes(mode);
+const shouldShowActionsColumn = ({ type, mode }) => {
+    if (type === 'receipt') return mode === 'create';
+
+    return !['view', 'edit-detail', 'return'].includes(mode);
+};
 
 export const buildDetailsHeader = ({ type, mode, isWarehouse, isCoordinator, isSystem }) => {
 
@@ -55,7 +59,7 @@ export const buildDetailsHeader = ({ type, mode, isWarehouse, isCoordinator, isS
         `;
     }
 
-    if (shouldShowActionsColumn(mode)) {
+    if (shouldShowActionsColumn({ type, mode })) {
         extraHeaders += `<th rowspan="2">Acciones</th>`;
     }
 
@@ -199,7 +203,7 @@ export const buildDetailsColumns = ({ type, mode, render, isWarehouse, isCoordin
         });
     }
 
-    if (shouldShowActionsColumn(mode)) {
+    if (shouldShowActionsColumn({ type, mode })) {
         columns.push({
             data: null,
             render: (_, __, row) => {

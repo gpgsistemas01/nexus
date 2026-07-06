@@ -111,7 +111,6 @@ export const openGoodsReceiptModal = ({ mode, data = null }) => {
 
     details.length = 0;
 
-    toggleContainerElements({ selector: '.add-product-container' });
     initGoodsReceiptFormSelect2();
     setGoodsReceiptFormSelectOptions(data);
 
@@ -126,7 +125,8 @@ export const openGoodsReceiptModal = ({ mode, data = null }) => {
         toggleButtons({
             mode,
             status: 'Abierta',
-            showActions: true
+            showActions: true,
+            showAddProduct: true
         });
     }
 
@@ -194,7 +194,8 @@ export const openGoodsReceiptModal = ({ mode, data = null }) => {
         toggleButtons({
             mode,
             status: 'Confirmada',
-            showActions: false
+            showActions: false,
+            showAddProduct: false
         });
     }
     
