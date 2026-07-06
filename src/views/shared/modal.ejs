@@ -112,7 +112,7 @@ const getSelectColumnClass = col => {
         
         <%- include('./header', { header }) %>
 
-        <div class="modal-body dark overflow-auto">
+        <div class="modal-body dark">
             <form id="<%= form.id %>" class="row g-3" novalidate>
                 <% if (form.invoice) { %>
                     <div class="col-12 row g-2">
@@ -209,7 +209,7 @@ const getSelectColumnClass = col => {
                     </div>
                 <% } %>
 
-                <div class="col-12">
+                <div class="col-12 modal-actions">
                     <%- include('./button', { button: buttons.backButton }) %>
                     
                     <%- include('./submit') %>
