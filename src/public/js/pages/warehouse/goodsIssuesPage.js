@@ -49,6 +49,8 @@ const setGoodsIssueHeaderFieldsReadOnly = ({ form, isReadOnly }) => {
     });
 };
 
+const getDetailsTableMode = (mode) => mode === MODE_EDIT_HEADER ? MODE_VIEW : mode;
+
 const returnForm = createReturnFormHandlers({
     details,
     validators: validateGoodsIssueReturnValidators,
@@ -216,9 +218,9 @@ export const openGoodsIssueModal = ({ mode, data = null }) => {
                 setFormReadOnly,
                 observationsElement: form.querySelector('#observationsInput')
             });
-            setFormReadOnly({
+
+            setGoodsIssueHeaderFieldsReadOnly({
                 form,
-                fields: ['clientId', 'advisorId', 'departmentId', 'requesterId', 'projectNumber', 'requestDate', 'observations'],
                 isReadOnly: true
             });
         }
@@ -229,7 +231,7 @@ export const openGoodsIssueModal = ({ mode, data = null }) => {
         }
     }
 
-    initDetailsGoodsIssueTable(mode === MODE_EDIT_HEADER ? MODE_VIEW : mode, context);
+    initDetailsGoodsIssueTable(getDetailsTableMode(mode), context);
 
     openModal(modalElement);
 };
