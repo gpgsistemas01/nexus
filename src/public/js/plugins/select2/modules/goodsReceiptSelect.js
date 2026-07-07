@@ -1,4 +1,5 @@
 import { updateTotals } from "../../../ui/formUI.js";
+import { PRODUCT_SELECT_RESULTS_LIMIT } from "../../../application/warehouse/products.js";
 import { toggleContainerElements } from "../../../utils/formUtils.js";
 import { refreshProductTable } from "../../datatable/baseDatatable.js";
 import { details } from "../../datatable/goodsReceiptDatatable.js";
@@ -96,7 +97,8 @@ export const initGoodsReceiptFormSelect2 = () => {
         supplierSelector,
         productSelector,
         includeStockAdjustmentOnCreate: false,
-        productCreationContext: 'goodsReceipt'
+        productCreationContext: 'goodsReceipt',
+        resultsLimit: PRODUCT_SELECT_RESULTS_LIMIT
     });
 };
 
