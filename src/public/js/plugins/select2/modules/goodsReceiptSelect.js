@@ -1,4 +1,5 @@
 import { updateTotals } from "../../../ui/formUI.js";
+import { PRODUCT_SELECT_RESULTS_LIMIT } from "../../../application/warehouse/products.js";
 import { toggleContainerElements } from "../../../utils/formUtils.js";
 import { refreshProductTable } from "../../datatable/baseDatatable.js";
 import { details } from "../../datatable/goodsReceiptDatatable.js";
@@ -18,7 +19,6 @@ const productScopedSelector = `${ modalSelector } ${ productSelector }`;
 const receivedByScopedSelector = `${ modalSelector } ${ receivedBySelector }`;
 const presentationDisplayScopedSelector = `${ modalSelector } ${ FORM_SELECTORS.PRESENTATION_DISPLAY }`;
 const supplierChangedEventName = 'goods-receipt:supplier-changed';
-const productSelectResultsLimit = 20;
 
 const clearProductSelection = () => {
 
@@ -98,7 +98,7 @@ export const initGoodsReceiptFormSelect2 = () => {
         productSelector,
         includeStockAdjustmentOnCreate: false,
         productCreationContext: 'goodsReceipt',
-        resultsLimit: productSelectResultsLimit
+        resultsLimit: PRODUCT_SELECT_RESULTS_LIMIT
     });
 };
 

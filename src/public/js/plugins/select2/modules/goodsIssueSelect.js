@@ -1,5 +1,6 @@
 import { getSelectedOptionText } from "../../../utils/domUtils.js";
 import { resolveAdvisorDepartmentByClientName, resolveProjectNumberByClientAndDepartment } from "../../../application/warehouse/goodsIssues/goodsIssueRules.js";
+import { PRODUCT_SELECT_RESULTS_LIMIT } from "../../../application/warehouse/products.js";
 import { bindDependency, bindDisabledSelectDependency } from "../baseSelect.js";
 import { setupClientSelect, toggleClientOption } from "../domains/client.js";
 import { initDepartmentSelect, toggleDepartmentOption } from "../domains/department.js";
@@ -20,7 +21,6 @@ const clientScopedSelector = `${ modalSelector } ${ clientSelector }`;
 const departmentScopedSelector = `${ modalSelector } ${ departmentSelector }`;
 const advisorScopedSelector = `${ modalSelector } ${ advisorSelector }`;
 const productScopedSelector = `${ modalSelector } ${ productSelector }`;
-const productSelectResultsLimit = 20;
 
 export const initGoodsIssueFormSelect2 = () => {
 
@@ -134,7 +134,7 @@ export const initGoodsIssueFormSelect2 = () => {
         modalSelector,
         productSelector,
         allowCreate: false,
-        resultsLimit: productSelectResultsLimit
+        resultsLimit: PRODUCT_SELECT_RESULTS_LIMIT
     });
 };
 
