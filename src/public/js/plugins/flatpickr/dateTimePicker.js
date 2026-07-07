@@ -1,14 +1,49 @@
 import { createBrowserDateFromTimeZone, zonedDateTimeToUtcIso } from "../../utils/timeZone.js";
 
 const DATE_TIME_SELECTOR = '.js-flatpickr-datetime';
+const DISPLAY_DATE_TIME_REGEX = /^(\d{1,2})\/(\d{1,2})\/(\d{4})(?:\s+(\d{1,2}):(\d{2}))?$/;
 
 const getFlatpickrLocale = () => window.flatpickr?.l10ns?.es || 'es';
 
-const parseVeracruzDate = (value) => {
+const parseDisplayDateTime = (value) => {
+
+    const match = String(value).trim().match(DISPLAY_DATE_TIME_REGEX);
+
+    if (!match) return null;
+
+    const [, day, month, year, hour = '0', minute = '0'] = match;
+    const dateParts = {
+        year: Number(year),
+        month: Number(month),
+        day: Number(day),
+        hour: Number(hour),
+        minute: Number(minute)
+    };
+    const date = new Date(
+        dateParts.year,
+        dateParts.month - 1,
+        dateParts.day,
+        dateParts.hour,
+        dateParts.minute
+    );
+
+    if (date.getFullYear() !== dateParts.year
+        || date.getMonth() !== dateParts.month - 1
+        || date.getDate() !== dateParts.day
+        || date.getHours() !== dateParts.hour
+        || date.getMinutes() !== dateParts.minute
+    ) {
+        return null;
+    }
+
+    return date;
+};
+
+export const parseMexicoDate = (value) => {
 
     if (!value) return null;
 
-    return createBrowserDateFromTimeZone(value) || new Date(value);
+    return parseDisplayDateTime(value) || createBrowserDateFromTimeZone(value) || new Date(value);
 };
 
 export const initDateTimePickers = (root = document) => {
@@ -31,7 +66,7 @@ export const initDateTimePickers = (root = document) => {
                     : window.flatpickr.formatDate(date, format, locale)
             ),
             locale: getFlatpickrLocale(),
-            parseDate: parseVeracruzDate,
+            parseDate: parseMexicoDate,
             time_24hr: true
         });
     });
@@ -42,7 +77,7 @@ export const setDateTimePickerValue = (input, value) => {
     if (!input) return;
 
     if (input._flatpickr) {
-        input._flatpickr.setDate(value ? parseVeracruzDate(value) : '', false);
+        input._flatpickr.setDate(value ? parseMexicoDate(value) : '', false);
         return;
     }
 

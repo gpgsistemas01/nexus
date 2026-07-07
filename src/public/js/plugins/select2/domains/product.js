@@ -62,7 +62,8 @@ const initProductSelect = ({
     modalSelector, 
     supplierSelector,
     baseSelector, 
-    allowCreate = true 
+    allowCreate = true,
+    resultsLimit = null
 }) => {
 
     initbaseSelect2({
@@ -79,7 +80,8 @@ const initProductSelect = ({
 
             return {
                 search: params.term,
-                supplierId
+                supplierId,
+                ...(resultsLimit ? { length: resultsLimit } : {})
             };
         },
         processResults: (data) => {
@@ -185,7 +187,8 @@ export const setupProductSelect = ({
     productSelector,
     allowCreate = true,
     includeStockAdjustmentOnCreate = true,
-    productCreationContext = null
+    productCreationContext = null,
+    resultsLimit = null
 }) => {
 
     const baseSelector = `${ modalSelector } ${ productSelector }`;
@@ -194,7 +197,8 @@ export const setupProductSelect = ({
         modalSelector,
         supplierSelector,
         baseSelector,
-        allowCreate
+        allowCreate,
+        resultsLimit
     });
 
     attachProductHandler({

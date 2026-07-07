@@ -2,6 +2,8 @@ import { createSuccessResponseFromRequest } from "../../utils/responseUtils.js";
 import { buildProductSelectText, mapSupplierProductToSelectData } from "../../utils/productSelectUtils.js";
 import { editProductRequest, editProductStockRequest, getAllProductsRequest, registerProductRequest } from "../../services/warehouse/productService.js";
 
+export const PRODUCT_SELECT_RESULTS_LIMIT = 20;
+
 export const getProductOptions = async (params = {}) => {
 
     const response = await getAllProductsRequest({ params });

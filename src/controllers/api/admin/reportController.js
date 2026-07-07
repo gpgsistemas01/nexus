@@ -1,15 +1,14 @@
 import xlsx from 'xlsx';
 import { findMovementReportRows } from "../../../services/inventory/reportService.js";
 import { getDataTableOrder, getDataTableSearch } from "../../../utils/requestQueryUtils.js";
+import { getMexicoMonthYearParts } from "../../../utils/formattersUtils.js";
 
 const SHEET_NAME = 'Movimientos';
 const FILENAME = 'informe_movimientos';
 
 const getReportFilename = () => {
 
-    const now = new Date();
-    const month = String(now.getUTCMonth() + 1).padStart(2, '0');
-    const year = now.getUTCFullYear();
+    const { month, year } = getMexicoMonthYearParts();
 
     return `${FILENAME}_${year}-${month}`;
 };
