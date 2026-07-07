@@ -1,8 +1,8 @@
-export const VERACRUZ_TIME_ZONE = 'America/Mexico_City';
+export const MEXICO_TIME_ZONE = 'America/Mexico_City';
 
 const pad = (value) => String(value).padStart(2, '0');
 
-export const getTimeZoneDateTimeParts = (dateValue, timeZone = VERACRUZ_TIME_ZONE) => {
+export const getTimeZoneDateTimeParts = (dateValue, timeZone = MEXICO_TIME_ZONE) => {
 
     const date = new Date(dateValue);
 
@@ -32,7 +32,7 @@ export const getTimeZoneDateTimeParts = (dateValue, timeZone = VERACRUZ_TIME_ZON
     };
 };
 
-export const formatDateTimeInputInTimeZone = (dateValue, timeZone = VERACRUZ_TIME_ZONE) => {
+export const formatDateTimeInputInTimeZone = (dateValue, timeZone = MEXICO_TIME_ZONE) => {
 
     const parts = getTimeZoneDateTimeParts(dateValue, timeZone);
 
@@ -41,7 +41,7 @@ export const formatDateTimeInputInTimeZone = (dateValue, timeZone = VERACRUZ_TIM
     return `${parts.year}-${pad(parts.month)}-${pad(parts.day)}T${pad(parts.hour)}:${pad(parts.minute)}`;
 };
 
-export const createBrowserDateFromTimeZone = (dateValue, timeZone = VERACRUZ_TIME_ZONE) => {
+export const createBrowserDateFromTimeZone = (dateValue, timeZone = MEXICO_TIME_ZONE) => {
 
     const parts = getTimeZoneDateTimeParts(dateValue, timeZone);
 
@@ -57,7 +57,7 @@ export const createBrowserDateFromTimeZone = (dateValue, timeZone = VERACRUZ_TIM
     );
 };
 
-export const zonedDateTimeToUtcIso = (date, timeZone = VERACRUZ_TIME_ZONE) => {
+export const zonedDateTimeToUtcIso = (date, timeZone = MEXICO_TIME_ZONE) => {
 
     if (!(date instanceof Date) || Number.isNaN(date.getTime())) return '';
 

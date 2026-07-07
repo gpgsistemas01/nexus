@@ -1,4 +1,4 @@
-import { toNumber } from "../../utils/formattersUtils.js";
+import { formatDateLongWithTime, toNumber } from "../../utils/formattersUtils.js";
 import { findAllMovements } from "./movementQueryService.js";
 
 export const findMovementReportRows = async ({
@@ -33,6 +33,8 @@ export const findMovementReportRows = async ({
 
     return movementsResult.data.map((movement) => ({
         ...movement,
+        date: formatDateLongWithTime(movement.date),
+        createdAt: formatDateLongWithTime(movement.createdAt),
         previousStock: toNumber(movement.previousStock),
         quantity: toNumber(movement.quantity),
         newStock: toNumber(movement.newStock),
