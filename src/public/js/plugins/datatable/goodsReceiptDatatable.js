@@ -7,7 +7,7 @@ import { buildDetailsColumns, buildDetailsHeader } from "./utils/builderDetailDa
 import { handleDelete, renderMaterialName } from "./utils/renderProductDatatable.js";
 import { getResponsiveRowData } from "./utils/responsive.js";
 import { buildExcelButton, buildTableExportParams } from "../../ui/tableUI.js";
-import { formatFileName } from "../../utils/formatters.js";
+import { formatDateTimeDisplay, formatFileName } from "../../utils/formatters.js";
 import { setupTableFilters } from "./utils/filters/tableFilter.js";
 import { DATATABLE_SELECTORS, MODAL_SELECTORS, FORM_SELECTORS } from "../../constants/selectors.js";
 import { hasPermission } from "../../utils/permissions.js";
@@ -70,7 +70,7 @@ export const createGoodsReceiptDatatable = async (context = window.meta || {}) =
                     render: (data, type, row) => {
 
                         const name = row.receivedByName;
-                        const date = new Date(row.receptionDate).toLocaleString();
+                        const date = formatDateTimeDisplay(row.receptionDate);
 
                         return `<div>${ name }<br><small>${ date }</small></div>`;
                     }

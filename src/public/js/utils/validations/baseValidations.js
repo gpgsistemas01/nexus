@@ -39,17 +39,47 @@ export const isPositive = (value, fieldName) => {
     return null;
 }
 
+const isValidDateTimeParts = ({ year, month, day, hour, minute, second }) => {
+
+    const date = new Date(Date.UTC(year, month - 1, day, hour, minute, second));
+
+    return date.getUTCFullYear() === year
+        && date.getUTCMonth() === month - 1
+        && date.getUTCDate() === day
+        && date.getUTCHours() === hour
+        && date.getUTCMinutes() === minute
+        && date.getUTCSeconds() === second;
+};
+
+const parseDateTimeParts = (value) => {
+
+    const match = String(value).match(
+        /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})(?::(\d{2})(?:\.\d{3})?)?(?:Z)?$/
+    );
+
+    if (!match) return null;
+
+    const [, year, month, day, hour, minute, second = '0'] = match;
+
+    return {
+        year: Number(year),
+        month: Number(month),
+        day: Number(day),
+        hour: Number(hour),
+        minute: Number(minute),
+        second: Number(second)
+    };
+};
+
 export const isDateTime = (value, fieldName) => {
 
     if (!value) return `${ fieldName } es requerido`;
 
-    const regex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2})?$/;
+    const parts = parseDateTimeParts(value);
 
-    if (!regex.test(value)) return `${ fieldName } no tiene un formato válido`;
+    if (!parts) return `${ fieldName } no tiene un formato válido`;
 
-    const date = new Date(value);
-
-    if (isNaN(date.getTime())) return `${ fieldName } no es una fecha válida`;
+    if (!isValidDateTimeParts(parts)) return `${ fieldName } no es una fecha válida`;
 
     return null;
 }

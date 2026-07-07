@@ -6,7 +6,6 @@ import { createGoodsReceiptDatatable, details, initDetailsGoodsReceiptTable } fr
 import { GOODS_RECEIPT_SUPPLIER_CHANGED_EVENT, initGoodsReceiptFormSelect2, setGoodsReceiptFormSelectOptions } from "../../plugins/select2/modules/goodsReceiptSelect.js";
 import { setFormReadOnly, updateTotals, toggleButtons, clearAddedProductInput, toggleInvoiceInput, clearFormErrors, normalizeFormErrors, initForm } from "../../ui/formUI.js";
 import { on } from "../../utils/domUtils.js";
-import { formatDateLongWithTime } from "../../utils/formatters.js";
 import { setDateTimePickerValue } from "../../plugins/flatpickr/dateTimePicker.js";
 import { handleSubmit, hasValidationErrors, toggleContainerElements, toggleDisabledElement, validateFields } from "../../utils/formUtils.js";
 import { buildModalTitle, openModal } from "../../ui/modalUI.js";
@@ -155,7 +154,7 @@ export const openGoodsReceiptModal = ({ mode, data = null }) => {
         value = data.isInvoiced ? 'invoice' : 'none';
         const supplierName = data.supplierName;
         form.elements.observations.value = data.observations || '';
-        setDateTimePickerValue(form.elements.receptionDate, formatDateLongWithTime(data.receptionDate));
+        setDateTimePickerValue(form.elements.receptionDate, data.receptionDate);
         details.push(...data.details.map(detail => ({
             id: detail.id,
             productId: detail.productId,
