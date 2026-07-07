@@ -22,9 +22,20 @@ export const formatDateLongWithTime = (dateTime) => {
     const localHours = String(date.getHours()).padStart(2, '0');
     const localMinutes = String(date.getMinutes()).padStart(2, '0');
 
-    const formatted = `${localYear}-${localMonth}-${localDay}T${localHours}:${localMinutes}`;
+    return `${localYear}-${localMonth}-${localDay}T${localHours}:${localMinutes}`;
+}
 
-    return formatted;
+export const formatDateTimeDisplay = (dateTime) => {
+
+    if (!dateTime) return '';
+
+    return new Date(dateTime).toLocaleString('es-MX', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit'
+    });
 }
 
 export const formatFileName = (filename) => {

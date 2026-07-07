@@ -14,7 +14,7 @@ export const initDateTimePickers = (root = document) => {
             altInput: true,
             altFormat: 'd/m/Y H:i',
             allowInput: true,
-            dateFormat: 'Y-m-d\\TH:i',
+            dateFormat: 'Z',
             enableTime: true,
             locale: getFlatpickrLocale(),
             time_24hr: true
@@ -27,7 +27,7 @@ export const setDateTimePickerValue = (input, value) => {
     if (!input) return;
 
     if (input._flatpickr) {
-        input._flatpickr.setDate(value || '', false, 'Y-m-d\\TH:i');
+        input._flatpickr.setDate(value || '', false);
         return;
     }
 
