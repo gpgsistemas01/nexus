@@ -4,6 +4,7 @@ import { PURCHASE_REQUISITIONS_API_ROUTE } from "../../services/warehouse/purcha
 import { hasPermission } from "../../utils/permissions.js";
 import { getResponsiveRowData } from "./utils/responsive.js";
 import { DATATABLE_SELECTORS } from "../../constants/selectors.js";
+import { formatDateTimeDisplay } from "../../utils/formatters.js";
 
 export let details = [];
 const selectorProductTable = DATATABLE_SELECTORS.PRODUCT;
@@ -20,7 +21,7 @@ export const createPurchaseRequisitionDatatable = (context) => {
             render: (data, type, row) => {
 
                 const name = `${ row.requester.name } ${ row.requester.lastName }`;
-                const date = new Date(row.requestDate).toLocaleString();
+                const date = formatDateTimeDisplay(row.requestDate);
 
                 return `<div>${ name }<br><small>${ date }</small></div>`;
             }
@@ -52,7 +53,7 @@ export const createPurchaseRequisitionDatatable = (context) => {
                 if (!row.approverId || !row.approveDate) return '<small>Sin autorizar</small>';
 
                 const approver = `${ row.approver.name } ${ row.approver.lastName }`;
-                const approveDate = new Date(row.approveDate).toLocaleString();
+                const approveDate = formatDateTimeDisplay(row.approveDate);
 
                 return `<div>${ approver }<br><small>${ approveDate }</small></div>`;
             }

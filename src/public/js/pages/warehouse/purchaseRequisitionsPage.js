@@ -6,7 +6,6 @@ import { initPurchaseRequisitionFormSelect2 } from "../../plugins/select2/module
 import { setFormReadOnly, toggleButtons, clearFormErrors, normalizeFormErrors, clearAddedProductInput, initForm } from "../../ui/formUI.js";
 import { openModal } from "../../ui/modalUI.js";
 import { on } from "../../utils/domUtils.js";
-import { formatDateLongWithTime } from "../../utils/formatters.js";
 import { setDateTimePickerValue } from "../../plugins/flatpickr/dateTimePicker.js";
 import { handleAction, handleSubmit, hasValidationErrors, validateFields } from "../../utils/formUtils.js";
 import { validatePurchaseRequisitionValidators } from "../../utils/validations/validators.js";
@@ -71,7 +70,7 @@ export const openPurchaseRequisitionModal = async ({ mode, data = null }) => {
     if (mode === 'edit' || mode === 'view') {
 
         form.querySelector('#observationsInput').value = data.observations || '';
-        setDateTimePickerValue(form.querySelector('#requestDateInput'), formatDateLongWithTime(data.requestDate));
+        setDateTimePickerValue(form.querySelector('#requestDateInput'), data.requestDate);
         details.push(...data?.details.map(detail => ({
             id: detail.id,
             name: detail.product.name,
