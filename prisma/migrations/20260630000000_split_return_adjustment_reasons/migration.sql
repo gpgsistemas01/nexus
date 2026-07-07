@@ -15,6 +15,13 @@ INSERT INTO "StockAdjustmentReason"
 VALUES
 (
     gen_random_uuid(),
+    'Devolución de compra',
+    true,
+    NOW(),
+    NOW()
+),
+(
+    gen_random_uuid(),
     'Devolución de salida',
     true,
     NOW(),
