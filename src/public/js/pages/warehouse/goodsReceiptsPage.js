@@ -23,9 +23,28 @@ import { configureReturnModal } from "./returns/returnModalHelpers.js";
 const modalId = MODAL_SELECTORS.GOODS_RECEIPT;
 const formId = FORM_SELECTORS.GOODS_RECEIPT;
 const MODE_RETURN = RETURN_MODE;
+const RETURN_READ_ONLY_HEADER_FIELD_NAMES = [
+    'isInvoiced',
+    'invoice',
+    'receivedById',
+    'receptionDate',
+    'observations'
+];
 
 
 createGoodsReceiptDatatable();
+
+const setGoodsReceiptReturnHeaderFieldsReadOnly = ({ form, isReadOnly }) => {
+
+    RETURN_READ_ONLY_HEADER_FIELD_NAMES.forEach(fieldName => {
+        form.querySelectorAll(`[name='${ fieldName }']`).forEach(field => {
+            toggleDisabledElement({
+                element: field,
+                isDisabled: isReadOnly
+            });
+        });
+    });
+};
 
 const returnForm = createReturnFormHandlers({
     details,
@@ -187,8 +206,14 @@ export const openGoodsReceiptModal = ({ mode, data = null }) => {
                 action: 'Devolver',
                 submitText: 'Registrar devolución',
                 toggleContainerElements,
+                setFormReadOnly,
                 toggleDisabledElement,
                 disabledElement: form.querySelector(FORM_SELECTORS.SUPPLIER)
+            });
+
+            setGoodsReceiptReturnHeaderFieldsReadOnly({
+                form,
+                isReadOnly: true
             });
         }
 
