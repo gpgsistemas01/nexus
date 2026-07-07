@@ -304,38 +304,37 @@ export const toggleFormFields = ({
     });
 };
 
+const toggleReadOnlyElement = ({ element, isReadOnly }) => {
+
+    if (isReadOnly) {
+        if (!element.disabled) element.dataset.readOnlyDisabled = 'true';
+        element.setAttribute('disabled', 'disabled');
+        return;
+    }
+
+    if (element.dataset.readOnlyDisabled !== 'true') return;
+
+    element.removeAttribute('disabled');
+    delete element.dataset.readOnlyDisabled;
+};
+
 export const setFormReadOnly = ({
     form,
     fields = 'all',
     isReadOnly
 }) => {
     
-    if (fields !== 'all') {
+    const elements = fields === 'all'
+        ? form.querySelectorAll('input, select, textarea')
+        : fields
+            .map(field => form.querySelector(`[name='${ field }']`))
+            .filter(Boolean);
 
-        fields.forEach(field => {
-            const input = form.querySelector(`[name='${ field }']`);
+    elements.forEach(element => toggleReadOnlyElement({ element, isReadOnly }));
 
-            if (input) {
-                if (isReadOnly) input.setAttribute('disabled', 'disabled');
-                else input.removeAttribute('disabled');
-            }
-        });
-
-        return;
-    }
+    if (fields !== 'all') return;
     
     const { mode } = form.dataset;
-    const elements = form.querySelectorAll('input, select, textarea');
-
-    elements.forEach(el => {
-        if (isReadOnly) {
-            if (!el.disabled) el.dataset.readOnlyDisabled = 'true';
-            el.setAttribute('disabled', 'disabled');
-        } else if (el.dataset.readOnlyDisabled === 'true') {
-            el.removeAttribute('disabled');
-            delete el.dataset.readOnlyDisabled;
-        }
-    });
 
     form.querySelector('#submitBtn').classList.toggle('d-none', mode === MODE_VIEW);
 };
