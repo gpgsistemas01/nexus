@@ -187,6 +187,14 @@ export const openGoodsReceiptModal = ({ mode, data = null }) => {
                 action: 'Devolver',
                 submitText: 'Registrar devolución',
                 toggleContainerElements,
+                setFormReadOnly,
+                readOnlyFields: [
+                    'isInvoiced',
+                    'invoice',
+                    'receivedById',
+                    'receptionDate',
+                    'observations'
+                ],
                 toggleDisabledElement,
                 disabledElement: form.querySelector(FORM_SELECTORS.SUPPLIER)
             });

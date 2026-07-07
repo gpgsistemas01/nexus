@@ -327,9 +327,9 @@ export const setFormReadOnly = ({
 }) => {
     
     const elements = fields === 'all'
-        ? form.querySelectorAll('input, select, textarea')
+        ? Array.from(form.querySelectorAll('input, select, textarea'))
         : fields
-            .map(field => form.querySelector(`[name='${ field }']`))
+            .flatMap(field => Array.from(form.querySelectorAll(`[name='${ field }']`)))
             .filter(Boolean);
 
     elements.forEach(element => toggleReadOnlyElement({ element, isReadOnly }));

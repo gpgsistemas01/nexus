@@ -8,6 +8,7 @@ export const configureReturnModal = ({
     submitText = 'Devolver',
     toggleContainerElements,
     setFormReadOnly = null,
+    readOnlyFields = [],
     toggleDisabledElement = null,
     disabledElement = null,
     observationsElement = null
@@ -20,6 +21,14 @@ export const configureReturnModal = ({
     form.querySelector('#submitBtn').textContent = submitText;
 
     setFormReadOnly?.({ form, isReadOnly: false });
+
+    if (readOnlyFields.length) {
+        setFormReadOnly?.({
+            form,
+            fields: readOnlyFields,
+            isReadOnly: true
+        });
+    }
 
     if (toggleDisabledElement && disabledElement) {
         toggleDisabledElement({
