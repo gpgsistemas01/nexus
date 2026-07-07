@@ -1,9 +1,12 @@
+import { VERACRUZ_TIME_ZONE, formatDateTimeInputInTimeZone } from './timeZone.js';
+
 export const formatShortDate = (date) => {
     const options = { year: 'numeric', month: '2-digit', day: '2-digit' };
-    return new Date(date).toLocaleDateString('es-MX', options);
+    return new Date(date).toLocaleDateString('es-MX', { ...options, timeZone: VERACRUZ_TIME_ZONE });
 }
 
-export const formatNotificationDate = (dateValue) => new Date(dateValue).toLocaleString('es-ES', {
+export const formatNotificationDate = (dateValue) => new Date(dateValue).toLocaleString('es-MX', {
+    timeZone: VERACRUZ_TIME_ZONE,
     day: '2-digit',
     month: '2-digit',
     year: 'numeric',
@@ -15,21 +18,16 @@ export const formatDateLongWithTime = (dateTime) => {
 
     if (!dateTime) return '';
 
-    const date = new Date(dateTime);
-    const localYear = date.getFullYear();
-    const localMonth = String(date.getMonth() + 1).padStart(2, '0');
-    const localDay = String(date.getDate()).padStart(2, '0');
-    const localHours = String(date.getHours()).padStart(2, '0');
-    const localMinutes = String(date.getMinutes()).padStart(2, '0');
-
-    return `${localYear}-${localMonth}-${localDay}T${localHours}:${localMinutes}`;
+    return formatDateTimeInputInTimeZone(dateTime);
 }
+
 
 export const formatDateTimeDisplay = (dateTime) => {
 
     if (!dateTime) return '';
 
     return new Date(dateTime).toLocaleString('es-MX', {
+        timeZone: VERACRUZ_TIME_ZONE,
         year: 'numeric',
         month: '2-digit',
         day: '2-digit',
