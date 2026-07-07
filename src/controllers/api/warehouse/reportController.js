@@ -1,6 +1,7 @@
 import xlsx from 'xlsx';
 import { findGoodsIssueReportRows, findGoodsReceiptReportRows, findWarehouseReportRows } from "../../../services/warehouse/reportService.js";
 import { getDataTableOrder, getDataTableSearch } from "../../../utils/requestQueryUtils.js";
+import { getMexicoMonthYearParts } from "../../../utils/formattersUtils.js";
 
 const SHEET_NAME = 'Inventario';
 const FILENAME = 'reporte_inventario_productos';
@@ -11,9 +12,7 @@ const GOODS_RECEIPT_FILENAME = 'reporte_compras';
 
 const getReportFilename = (filename = FILENAME) => {
 
-    const now = new Date();
-    const month = String(now.getUTCMonth() + 1).padStart(2, '0');
-    const year = now.getUTCFullYear();
+    const { month, year } = getMexicoMonthYearParts();
 
     return `${ filename }_${ month }_${ year }`;
 };

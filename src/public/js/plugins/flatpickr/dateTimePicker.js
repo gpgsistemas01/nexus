@@ -4,7 +4,7 @@ const DATE_TIME_SELECTOR = '.js-flatpickr-datetime';
 
 const getFlatpickrLocale = () => window.flatpickr?.l10ns?.es || 'es';
 
-const parseVeracruzDate = (value) => {
+const parseMexicoDate = (value) => {
 
     if (!value) return null;
 
@@ -31,7 +31,7 @@ export const initDateTimePickers = (root = document) => {
                     : window.flatpickr.formatDate(date, format, locale)
             ),
             locale: getFlatpickrLocale(),
-            parseDate: parseVeracruzDate,
+            parseDate: parseMexicoDate,
             time_24hr: true
         });
     });
@@ -42,7 +42,7 @@ export const setDateTimePickerValue = (input, value) => {
     if (!input) return;
 
     if (input._flatpickr) {
-        input._flatpickr.setDate(value ? parseVeracruzDate(value) : '', false);
+        input._flatpickr.setDate(value ? parseMexicoDate(value) : '', false);
         return;
     }
 
