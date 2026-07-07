@@ -18,6 +18,7 @@ const productScopedSelector = `${ modalSelector } ${ productSelector }`;
 const receivedByScopedSelector = `${ modalSelector } ${ receivedBySelector }`;
 const presentationDisplayScopedSelector = `${ modalSelector } ${ FORM_SELECTORS.PRESENTATION_DISPLAY }`;
 const supplierChangedEventName = 'goods-receipt:supplier-changed';
+const productSelectResultsLimit = 20;
 
 const clearProductSelection = () => {
 
@@ -96,7 +97,8 @@ export const initGoodsReceiptFormSelect2 = () => {
         supplierSelector,
         productSelector,
         includeStockAdjustmentOnCreate: false,
-        productCreationContext: 'goodsReceipt'
+        productCreationContext: 'goodsReceipt',
+        resultsLimit: productSelectResultsLimit
     });
 };
 

@@ -20,6 +20,7 @@ const clientScopedSelector = `${ modalSelector } ${ clientSelector }`;
 const departmentScopedSelector = `${ modalSelector } ${ departmentSelector }`;
 const advisorScopedSelector = `${ modalSelector } ${ advisorSelector }`;
 const productScopedSelector = `${ modalSelector } ${ productSelector }`;
+const productSelectResultsLimit = 20;
 
 export const initGoodsIssueFormSelect2 = () => {
 
@@ -132,7 +133,8 @@ export const initGoodsIssueFormSelect2 = () => {
     setupProductSelect({
         modalSelector,
         productSelector,
-        allowCreate: false
+        allowCreate: false,
+        resultsLimit: productSelectResultsLimit
     });
 };
 
