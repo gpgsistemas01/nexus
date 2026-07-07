@@ -2,6 +2,9 @@ import { notifications } from "../plugins/swal/swalComponent.js";
 import { handleFlashMessage } from "../handlers/flashMessageHandler.js";
 import { getLatestNotificationsRequest, markAllNotificationsAsReadRequest } from "../services/warehouse/notificationService.js";
 import { formatNotificationDate } from "../utils/formatters.js";
+import { initDateTimePickers } from "../plugins/flatpickr/dateTimePicker.js";
+
+initDateTimePickers();
 
 handleFlashMessage(window.FLASH_MESSAGE || null);
 

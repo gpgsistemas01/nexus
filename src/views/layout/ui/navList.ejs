@@ -2,11 +2,16 @@
 
 const hasRole = role => accesses.some(a => a.role === role);
 const hasDepartment = department => accesses.some(a => a.department === department);
+const hasAccess = ({ departments = [], roles = [] }) => accesses.some(access => (
+    departments.includes(access.department) && roles.includes(access.role)
+));
 
 const isAdmin = hasRole('Administrador del sistema');
 const isSalesOrDesign = ['Ventas', 'Diseño'].some(department => hasDepartment(department));
-const isWarehouse = hasDepartment('Almacén');
-const isCoordinator = hasRole('Coordinador');
+const canSeePurchases = hasAccess({
+    departments: ['ALMACÉN Y PROVEDURÍA'],
+    roles: ['Coordinador', 'Auxiliar']
+});
 
 const canSeeAll = isAdmin;
 const canSeeOnlyProducts = !canSeeAll && isSalesOrDesign;
@@ -28,7 +33,7 @@ const items = [
         content: 'Compras',
         href: '/compras',
         isActive: currentRoute === '/compras',
-        isVisible: canSeeAll || isWarehouse
+        isVisible: canSeeAll || canSeePurchases
     },
     {
         content: 'Salidas de almacén',

@@ -7,6 +7,7 @@ import { GOODS_RECEIPT_SUPPLIER_CHANGED_EVENT, initGoodsReceiptFormSelect2, setG
 import { setFormReadOnly, updateTotals, toggleButtons, clearAddedProductInput, toggleInvoiceInput, clearFormErrors, normalizeFormErrors, initForm } from "../../ui/formUI.js";
 import { on } from "../../utils/domUtils.js";
 import { formatDateLongWithTime } from "../../utils/formatters.js";
+import { setDateTimePickerValue } from "../../plugins/flatpickr/dateTimePicker.js";
 import { handleSubmit, hasValidationErrors, toggleContainerElements, toggleDisabledElement, validateFields } from "../../utils/formUtils.js";
 import { buildModalTitle, openModal } from "../../ui/modalUI.js";
 import { initMdbWrapperInput, updateMdbWrapperInput } from "../../plugins/mdb/baseInstance.js";
@@ -135,7 +136,7 @@ export const openGoodsReceiptModal = ({ mode, data = null }) => {
         value = data.isInvoiced ? 'invoice' : 'none';
         const supplierName = data.supplierName;
         form.elements.observations.value = data.observations || '';
-        form.elements.receptionDate.value = formatDateLongWithTime(data.receptionDate);
+        setDateTimePickerValue(form.elements.receptionDate, formatDateLongWithTime(data.receptionDate));
         details.push(...data.details.map(detail => ({
             id: detail.id,
             productId: detail.productId,

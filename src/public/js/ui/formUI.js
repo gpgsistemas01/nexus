@@ -1,4 +1,5 @@
 import { initMdbWrapperInput, updateMdbWrapperInput } from "../plugins/mdb/baseInstance.js";
+import { setDateTimePickerValue } from "../plugins/flatpickr/dateTimePicker.js";
 import { toggleContainerElements } from "../utils/formUtils.js";
 
 const TOTAL_FIELDS = {
@@ -66,6 +67,7 @@ export const initForm = ({
 }) => {
 
     form.reset();
+    form.querySelectorAll('.js-flatpickr-datetime').forEach(input => setDateTimePickerValue(input, input.value));
     form.dataset.id = id;
     form.dataset.mode = mode;
     form.dataset.submitting = 'false';

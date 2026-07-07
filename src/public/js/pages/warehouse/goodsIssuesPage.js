@@ -7,6 +7,7 @@ import { initGoodsIssueFormSelect2, setGoodsIssueFormSelectOptions } from "../..
 import { setFormReadOnly, toggleButtons, clearAddedProductInput, clearFormErrors, normalizeFormErrors, initForm } from "../../ui/formUI.js";
 import { on } from "../../utils/domUtils.js";
 import { formatDateLongWithTime } from "../../utils/formatters.js";
+import { setDateTimePickerValue } from "../../plugins/flatpickr/dateTimePicker.js";
 import { handleSubmit, hasValidationErrors, syncCheckboxControlledInputs, toggleContainerElements, toggleDisabledElement, validateDetailsFields, validateFields } from "../../utils/formUtils.js";
 import { buildModalTitle, openModal } from "../../ui/modalUI.js";
 import { hasPermission } from "../../utils/permissions.js";
@@ -158,7 +159,7 @@ export const openGoodsIssueModal = ({ mode, data = null }) => {
     if (mode === MODE_EDIT || mode === MODE_EDIT_DETAIL || mode === MODE_EDIT_HEADER || mode === MODE_VIEW || mode === MODE_RETURN) {
 
         form.querySelector('#observationsInput').value = mode === MODE_RETURN ? '' : (data.observations || '');
-        form.querySelector('#requestDateInput').value = formatDateLongWithTime(data.requestDate);
+        setDateTimePickerValue(form.querySelector('#requestDateInput'), formatDateLongWithTime(data.requestDate));
         form.querySelector('#projectNumberInput').value = data.projectNumber;
         details.push(...data.details.map(detail => ({
             id: detail.id,
