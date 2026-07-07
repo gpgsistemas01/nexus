@@ -1,9 +1,3 @@
-UPDATE "StockAdjustmentReason"
-SET
-    name = 'Devolución de compra',
-    "updatedAt" = NOW()
-WHERE name = 'Devolución';
-
 INSERT INTO "StockAdjustmentReason"
 (
     id,
@@ -15,7 +9,7 @@ INSERT INTO "StockAdjustmentReason"
 VALUES
 (
     gen_random_uuid(),
-    'Devolución de salida',
+    'Devolución de compra',
     true,
     NOW(),
     NOW()
