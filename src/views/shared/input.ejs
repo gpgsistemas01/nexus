@@ -1,5 +1,5 @@
 <input id="<%= input.id %>" type="<%= input.type %>" name="<%= input.name %>" 
-    class="form-control" value="<%= input.value %>"
+    class="form-control <%= input.class || '' %>" value="<%= input.value %>"
     aria-describedby="<%= `${ input.id }Error` %>"
     <% for (let key in input.attrs) { %> 
         <%= key %>="<%= input.attrs[key] %>" 
