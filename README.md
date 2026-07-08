@@ -131,9 +131,12 @@ LOG_LEVEL="info"
 
 La conexión se resuelve desde `src/lib/databaseUrl.js`:
 
-- Los servicios de la aplicación usan `DATABASE_URL`; cuando `NODE_ENV` es `test`, usan `DATABASE_TEST_URL`.
-- Las migraciones de Prisma usan `DIRECT_URL`; cuando `NODE_ENV` es `test`, usan `DIRECT_TEST_URL`.
-- Si falta `DATABASE_URL`/`DATABASE_TEST_URL` en servicios o `DIRECT_URL`/`DIRECT_TEST_URL` en migraciones, el resolver falla indicando el `NODE_ENV` activo.
+| Uso | Normal | Pruebas (`NODE_ENV=test`) |
+| --- | --- | --- |
+| Servicios de la aplicación | `DATABASE_URL` | `DATABASE_TEST_URL` |
+| Migraciones de Prisma | `DIRECT_URL` | `DIRECT_TEST_URL` |
+
+Si falta la variable requerida para el modo activo, el resolver falla indicando el `NODE_ENV`.
 
 Comandos útiles:
 
@@ -143,8 +146,6 @@ npx prisma generate          # Genera el cliente Prisma
 npm exec prisma db seed      # Ejecuta prisma/seed.js
 npx prisma studio            # Abre Prisma Studio para inspección local
 ```
-
-En CI/CD no es necesario validar las URLs de migración durante `npm test`. En pruebas con BD, `npm run test:db:migrate` usa `DIRECT_TEST_URL` para migraciones de prueba. En despliegues, `prisma migrate deploy` usa `DIRECT_URL` y falla explícitamente si falta.
 
 El seed lee archivos XLSX ubicados en `prisma/` para cargar catálogos y datos iniciales. Verifica que los archivos requeridos existan antes de ejecutar `npm exec prisma db seed`.
 
@@ -172,7 +173,7 @@ npm start
 | `npm run dev` | Ejecuta la aplicación con Nodemon. |
 | `npm test` | Ejecuta la suite de Vitest con `vitestConfig.js`. |
 | `npm run test:watch` | Ejecuta Vitest en modo observación. |
-| `npm run test:db:verify` | Valida que `DATABASE_TEST_URL` y `DIRECT_TEST_URL` existan, que las URLs de prueba no sean iguales a las URLs principales y que cada una apunte al uso correcto. |
+| `npm run test:db:verify` | Valida `DATABASE_TEST_URL` y `DIRECT_TEST_URL` antes de migrar la base de pruebas. |
 | `npm run test:db:migrate` | Verifica variables y aplica migraciones en la base de pruebas. |
 | `npm run test:db` | Verifica variables, migra la base de pruebas y ejecuta pruebas. |
 
@@ -212,7 +213,7 @@ Todas las rutas API cuelgan de `/api` y esperan `Content-Type: application/json`
 
 ## Pruebas automatizadas
 
-Se mantiene un solo punto de creación de cliente Prisma en `src/lib/prisma.js`. En pruebas, Vitest ejecuta con `NODE_ENV=test`, por lo que el resolver de servicios usa `DATABASE_TEST_URL` sin crear un segundo cliente. Las migraciones se resuelven aparte desde `prisma.config.ts` con `DIRECT_URL` o `DIRECT_TEST_URL`.
+Se mantiene un solo cliente Prisma en `src/lib/prisma.js`. En pruebas, los servicios usan `DATABASE_TEST_URL`; las migraciones de prueba usan `DIRECT_TEST_URL` desde `prisma.config.ts`.
 
 Las pruebas que escriban datos en la base deben ejecutarse dentro de una transacción y forzar rollback al terminar. Para esos casos existe `tests/helpers/rollbackTransaction.js`, que recibe el cliente Prisma y ejecuta el cuerpo de la prueba con el `tx` transaccional, revirtiendo los cambios al finalizar para no persistir datos de prueba.
 
@@ -222,8 +223,6 @@ Flujo recomendado para automatización independiente:
 npm run test:db:migrate
 npm run test:db
 ```
-
-Los scripts de prueba validan primero que existan `DATABASE_TEST_URL` para servicios y `DIRECT_TEST_URL` para migraciones, además de verificar que no apunten a las URLs principales. Para migraciones de prueba, ejecutan Prisma con `NODE_ENV=test`; `prisma.config.ts` usa `DIRECT_TEST_URL` y los servicios siguen usando `DATABASE_TEST_URL`.
 
 Para pruebas que no requieren base de datos real, usa:
 
