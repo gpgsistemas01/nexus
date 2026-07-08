@@ -1,6 +1,6 @@
 import { initMdbWrapperInput, updateMdbWrapperInput } from "../plugins/mdb/baseInstance.js";
 import { setDateTimePickerValue } from "../plugins/flatpickr/dateTimePicker.js";
-import { toggleContainerElements } from "../utils/formUtils.js";
+import { toggleContainerElements, toggleDisabledElement } from "../utils/formUtils.js";
 
 const TOTAL_FIELDS = {
     quantity: '#totalQuantityDisplayInput',
@@ -282,10 +282,18 @@ export const setFormFieldVisibility = ({
 
         if (clearWhenHidden) field.value = '';
 
-        field.disabled = true;
+        toggleDisabledElement({
+            element: field,
+            isDisabled: true
+        });
     }
 
-    if (isVisible && enableWhenVisible) field.disabled = false;
+    if (isVisible && enableWhenVisible) {
+        toggleDisabledElement({
+            element: field,
+            isDisabled: false
+        });
+    }
 
     if (label && labelContent !== null) label.textContent = labelContent;
 };
@@ -310,13 +318,19 @@ const toggleReadOnlyElement = ({ element, isReadOnly }) => {
 
     if (isReadOnly) {
         if (!element.disabled) element.dataset.readOnlyDisabled = 'true';
-        element.setAttribute('disabled', 'disabled');
+        toggleDisabledElement({
+            element,
+            isDisabled: true
+        });
         return;
     }
 
     if (element.dataset.readOnlyDisabled !== 'true') return;
 
-    element.removeAttribute('disabled');
+    toggleDisabledElement({
+        element,
+        isDisabled: false
+    });
     delete element.dataset.readOnlyDisabled;
 };
 
