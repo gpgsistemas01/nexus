@@ -100,6 +100,7 @@ export const initGoodsIssueFormSelect2 = () => {
 
             $(requesterScopedSelector).val(null).trigger('change');
         },
+        disabledMessage: 'Seleccione un área antes de buscar solicitante.',
         onChange: () => syncInternalClientProjectNumber()
     });
 
