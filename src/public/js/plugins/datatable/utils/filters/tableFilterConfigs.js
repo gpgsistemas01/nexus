@@ -1,6 +1,7 @@
 import { getProductOptions } from "../../../../application/warehouse/products.js";
 import { getSupplierOptions } from "../../../../application/warehouse/suppliers.js";
 import { getFulfillmentStatusOptions } from "../../../../application/warehouse/fulfillmentStatuses.js";
+import { getProfileOptions } from "../../../../application/admin/profiles.js";
 import { getProductSelectApi, initProductFilterSelect } from "../../../select2/domains/product.js";
 import { getSupplierSelectApi, initSupplierFilterSelect } from "../../../select2/domains/supplier.js";
 import { getFulfillmentStatusSelectApi, initFulfillmentStatusFilterSelect } from "../../../select2/domains/fulfillmentStatus.js";

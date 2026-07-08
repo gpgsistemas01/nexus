@@ -15,8 +15,8 @@ const buildDetailTableInput = ({ name, value, className, detailId, disabled = fa
             data-detail-id="${ detailId }"
             ${ disabled ? 'disabled' : '' }
             ${ disabledWarning ? `data-disabled-warning="${ disabledWarning }"` : '' }
-            ${ min ? `min="${ min }"` : '' }
-            ${ step ? `step="${ step }"` : '' }
+            ${ min !== undefined && min !== null ? `min="${ min }"` : '' }
+            ${ step !== undefined && step !== null ? `step="${ step }"` : '' }
         >
     </div>
 `;
