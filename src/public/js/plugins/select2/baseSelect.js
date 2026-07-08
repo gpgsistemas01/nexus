@@ -78,6 +78,13 @@ export const initbaseSelect2 = ({
         createTag
     });
 
+    const baseElement = document.querySelector(baseSelector);
+
+    toggleDisabledElement({
+        element: baseElement,
+        isDisabled: Boolean(baseElement?.disabled)
+    });
+
     if (clearOnOpen) $(baseSelector).on('select2:open', () => {
 
         setTimeout(() => {
