@@ -1,9 +1,21 @@
 import { toggleProductOption } from "../../../select2/domains/product.js";
 import { FILTER_SELECTORS } from "../../../../constants/selectors.js";
 import { toggleDisabledElement } from "../../../../utils/formUtils.js";
-import { setSelect2DisabledWarning } from "../../../../ui/select2DisabledWarning.js";
+import { bindDisabledControlWarning, setDisabledControlWarning } from "../../../../ui/disabledControlWarning.js";
 
 const dependencyEvent = 'change.tableFilterDependency';
+const select2DisabledWarningConfig = {
+    eventTargetSelector: '.select2-container',
+    eventNamespace: 'select2DisabledWarning',
+    resolveControl: (container) => {
+        const select = container?.previousElementSibling;
+
+        return select?.tagName === 'SELECT' ? select : null;
+    }
+};
+
+bindDisabledControlWarning(select2DisabledWarningConfig);
+
 
 const DEPENDENT_FILTER_MESSAGES = {
     productRequiresSupplier: 'Seleccione un proveedor antes de filtrar por producto.',
@@ -31,7 +43,7 @@ const bindDisabledFilterDependency = ({
 
     const getDisabledState = (value) => isDisabled(value);
 
-    setSelect2DisabledWarning({
+    setDisabledControlWarning({
         element: targetElement,
         message: disabledMessage
     });

@@ -90,7 +90,7 @@ La aplicación usa una separación por capas: las rutas delegan en controladores
 3. Preparar la base de datos de desarrollo:
 
    ```bash
-   npx prisma migrate deploy
+   npm run db:migrate
    npx prisma generate
    npm exec prisma db seed
    ```
@@ -111,8 +111,10 @@ PORT=3000
 NODE_ENV=development
 
 # Base de datos
-DATABASE_URL="postgresql://usuario:password@localhost:5432/nexus"
-DATABASE_TEST_URL="postgresql://usuario:password@localhost:5432/nexus_test"
+DATABASE_URL="postgresql://usuario:password@pooler.example.com:6543/nexus"
+DIRECT_URL="postgresql://usuario:password@localhost:5432/nexus"
+DATABASE_TEST_URL="postgresql://usuario:password@pooler.example.com:6543/nexus_test"
+DIRECT_TEST_URL="postgresql://usuario:password@localhost:5432/nexus_test"
 
 # Autenticación / seguridad
 JWT_SECRET_ACCESS="cambiar-en-produccion"
@@ -130,13 +132,15 @@ LOG_LEVEL="info"
 La conexión se resuelve desde `src/lib/databaseUrl.js`:
 
 - Cuando `NODE_ENV` es `test`, se usa `DATABASE_TEST_URL`.
-- En cualquier otro entorno se usa `DATABASE_URL`.
+- La aplicación usa `DATABASE_URL` en cualquier otro entorno.
+- Prisma CLI usa `DIRECT_URL` automáticamente en producción cuando existe, por ejemplo para `migrate deploy`; si no existe, usa `DATABASE_URL`.
+- Prisma CLI usa `DIRECT_TEST_URL` automáticamente en pruebas cuando existe; si no existe, usa `DATABASE_TEST_URL`.
 - Si falta la variable requerida, el resolver falla indicando el `NODE_ENV` activo.
 
 Comandos útiles:
 
 ```bash
-npx prisma migrate deploy    # Aplica migraciones pendientes
+npm run db:migrate         # Aplica migraciones pendientes usando DIRECT_URL si está definida
 npx prisma generate          # Genera el cliente Prisma
 npm exec prisma db seed      # Ejecuta prisma/seed.js
 npx prisma studio            # Abre Prisma Studio para inspección local
@@ -166,10 +170,11 @@ npm start
 | --- | --- |
 | `npm start` | Ejecuta `node src/app.js`. |
 | `npm run dev` | Ejecuta la aplicación con Nodemon. |
+| `npm run db:migrate` | Aplica migraciones pendientes con Prisma; usa `DIRECT_URL` automáticamente cuando está definida. |
 | `npm test` | Ejecuta la suite de Vitest con `vitestConfig.js`. |
 | `npm run test:watch` | Ejecuta Vitest en modo observación. |
 | `npm run test:db:verify` | Valida que `DATABASE_TEST_URL` exista y no sea igual a `DATABASE_URL`. |
-| `npm run test:db:migrate` | Verifica variables y aplica migraciones en la base de pruebas. |
+| `npm run test:db:migrate` | Verifica variables y aplica migraciones en la base de pruebas; usa `DIRECT_TEST_URL` automáticamente cuando está definida. |
 | `npm run test:db` | Verifica variables, migra la base de pruebas y ejecuta pruebas. |
 
 ## Rutas principales
@@ -219,7 +224,7 @@ npm run test:db:migrate
 npm run test:db
 ```
 
-Los scripts de prueba validan primero que exista `DATABASE_TEST_URL` y que no sea la misma URL que `DATABASE_URL`. Para migraciones de prueba, los scripts asignan temporalmente `DATABASE_URL="$DATABASE_TEST_URL"` solo durante el comando de Prisma, porque Prisma CLI lee la variable `DATABASE_URL` para aplicar migraciones.
+Los scripts de prueba validan primero que exista `DATABASE_TEST_URL` y que no sea la misma URL que `DATABASE_URL`. Para migraciones de prueba, los scripts ejecutan Prisma con `NODE_ENV=test`, por lo que el resolver usa `DIRECT_TEST_URL` si está definida y, si no existe, `DATABASE_TEST_URL`, sin sobrescribir manualmente `DATABASE_URL`.
 
 Para pruebas que no requieren base de datos real, usa:
 

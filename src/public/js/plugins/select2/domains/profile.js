@@ -12,7 +12,8 @@ export const getProfileSelectApi = () => ({
 
 export const initProfileFilterSelect = ({
     selectedId = null,
-    departmentFilterSelector = FILTER_SELECTORS.DEPARTMENT
+    departmentFilterSelector = FILTER_SELECTORS.DEPARTMENT,
+    data: resolveData = null
 } = {}) => {
 
     initbaseSelect2({
@@ -24,6 +25,8 @@ export const initProfileFilterSelect = ({
         clearOnOpen: false,
         placeholder: 'Filtrar por perfil',
         data: (params) => {
+
+            if (typeof resolveData === 'function') return resolveData(params);
 
             const departmentName = departmentFilterSelector
                 ? getSelectedDepartmentName(departmentFilterSelector)
