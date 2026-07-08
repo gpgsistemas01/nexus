@@ -12,6 +12,16 @@ import { FILTER_SELECTORS } from "../../../../constants/selectors.js";
 import { buildDateFilterConfig } from "./modules/dateFilter.js";
 import { attachSelectFilterHandler } from "./selectFilterEvents.js";
 
+const WAREHOUSE_PROFILE_FILTER_PARAMS = {
+    department: 'ALMACÉN Y PROVEDURÍA',
+    strictDepartmentFilter: true
+};
+
+const getWarehouseProfileFilterParams = (params = {}) => ({
+    search: params.term,
+    ...WAREHOUSE_PROFILE_FILTER_PARAMS
+});
+
 const selectFilterConfigs = {
     supplier: {
         key: 'supplierId',
@@ -56,6 +66,18 @@ const selectFilterConfigs = {
         isSelected: false,
         getSelectApi: getProfileSelectApi,
         initSelect: initProfileFilterSelect
+    },
+    warehouseProfile: {
+        key: 'profileId',
+        selector: FILTER_SELECTORS.PROFILE,
+        isSelected: false,
+        getSelectApi: getProfileSelectApi,
+        getOptions: () => getProfileOptions(WAREHOUSE_PROFILE_FILTER_PARAMS),
+        initSelect: ({ selectedId }) => initProfileFilterSelect({
+            selectedId,
+            departmentFilterSelector: null,
+            data: getWarehouseProfileFilterParams
+        })
     },
     movementType: {
         key: 'movementType',
