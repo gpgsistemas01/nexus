@@ -144,7 +144,7 @@ npm exec prisma db seed      # Ejecuta prisma/seed.js
 npx prisma studio            # Abre Prisma Studio para inspección local
 ```
 
-En CI/CD no es necesario validar las URLs de migración durante `npm test`. En pruebas con BD, `npm run test:db:migrate` usa `DIRECT_TEST_URL` si existe; si no está configurada, usa `DATABASE_TEST_URL` sólo para ese comando de migración de prueba. En despliegues, `prisma migrate deploy` sigue usando `DIRECT_URL` y falla explícitamente si falta.
+En CI/CD no es necesario validar las URLs de migración durante `npm test`. En pruebas con BD, `npm run test:db:migrate` usa `DIRECT_TEST_URL` para migraciones de prueba. En despliegues, `prisma migrate deploy` usa `DIRECT_URL` y falla explícitamente si falta.
 
 El seed lee archivos XLSX ubicados en `prisma/` para cargar catálogos y datos iniciales. Verifica que los archivos requeridos existan antes de ejecutar `npm exec prisma db seed`.
 
@@ -223,7 +223,7 @@ npm run test:db:migrate
 npm run test:db
 ```
 
-Los scripts de prueba validan primero que exista `DATABASE_TEST_URL` y que no sea la misma URL que `DATABASE_URL`. Para migraciones de prueba, ejecutan Prisma con `NODE_ENV=test`; el script asigna `DIRECT_TEST_URL` desde su propio valor o desde `DATABASE_TEST_URL` si no está configurada, y los servicios siguen usando `DATABASE_TEST_URL`.
+Los scripts de prueba validan primero que existan `DATABASE_TEST_URL` para servicios y `DIRECT_TEST_URL` para migraciones, además de verificar que no apunten a las URLs principales. Para migraciones de prueba, ejecutan Prisma con `NODE_ENV=test`; `prisma.config.ts` usa `DIRECT_TEST_URL` y los servicios siguen usando `DATABASE_TEST_URL`.
 
 Para pruebas que no requieren base de datos real, usa:
 

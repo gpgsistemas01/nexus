@@ -21,6 +21,7 @@ export const validateTestDatabaseEnv = ({
   directTestUrl = process.env.DIRECT_TEST_URL
 } = {}) => {
   requireEnv('DATABASE_TEST_URL', databaseTestUrl, 'database service tests');
+  requireEnv('DIRECT_TEST_URL', directTestUrl, 'database migrations');
 
   assertDifferentDatabases('DATABASE_TEST_URL', databaseTestUrl, 'DATABASE_URL', databaseUrl);
   assertDifferentDatabases('DIRECT_TEST_URL', directTestUrl, 'DIRECT_URL', directUrl);
