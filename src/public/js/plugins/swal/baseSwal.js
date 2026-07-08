@@ -1,3 +1,10 @@
+const toastClassByIcon = {
+    success: 'swal2-toast-success',
+    warning: 'swal2-toast-warning',
+    error: 'swal2-toast-error',
+    info: 'swal2-toast-info'
+};
+
 export const showToast = ({ 
     title, 
     text = null, 
@@ -10,6 +17,9 @@ export const showToast = ({
         title,
         text,
         icon,
+        customClass: {
+            popup: toastClassByIcon[icon] ?? toastClassByIcon.info
+        },
         showConfirmButton: false,
         timer: 3000
     });

@@ -1917,11 +1917,33 @@ body {
 }
 
 .swal2-toast.swal2-popup {
-  border: 1px solid rgba(var(--mdb-primary-rgb), 0.18);
-  border-left: 0.35rem solid var(--mdb-primary);
+  --swal-toast-accent: var(--mdb-primary);
+  --swal-toast-accent-rgb: var(--mdb-primary-rgb);
+  border: 1px solid rgba(var(--swal-toast-accent-rgb), 0.2);
+  border-left: 0.35rem solid var(--swal-toast-accent);
   border-radius: 1rem;
   box-shadow: 0 1rem 2rem rgba(var(--mdb-secondary-rgb), 0.18);
   padding: 0.85rem 1rem;
+}
+
+.swal2-toast.swal2-toast-success {
+  --swal-toast-accent: var(--mdb-success);
+  --swal-toast-accent-rgb: var(--mdb-success-rgb);
+}
+
+.swal2-toast.swal2-toast-warning {
+  --swal-toast-accent: var(--mdb-warning);
+  --swal-toast-accent-rgb: var(--mdb-warning-rgb);
+}
+
+.swal2-toast.swal2-toast-error {
+  --swal-toast-accent: var(--mdb-danger);
+  --swal-toast-accent-rgb: var(--mdb-danger-rgb);
+}
+
+.swal2-toast.swal2-toast-info {
+  --swal-toast-accent: var(--mdb-info);
+  --swal-toast-accent-rgb: var(--mdb-info-rgb);
 }
 
 .swal2-toast .swal2-title {
