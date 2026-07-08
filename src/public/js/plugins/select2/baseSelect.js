@@ -1,9 +1,21 @@
 import { handleApiError, normalizeJqAjaxError } from "../../api/errorHandler.js";
 import { initMdbWrapperInput, updateMdbWrapperInput } from "../mdb/baseInstance.js";
 import { toggleDisabledElement } from "../../utils/formUtils.js";
-import { setSelect2DisabledWarning } from "../../ui/select2DisabledWarning.js";
+import { bindDisabledControlWarning, setDisabledControlWarning } from "../../ui/disabledControlWarning.js";
 
 const wrapperSelector = '#presentationDisplayInput';
+const select2DisabledWarningConfig = {
+    eventTargetSelector: '.select2-container',
+    eventNamespace: 'select2DisabledWarning',
+    resolveControl: (container) => {
+        const select = container?.previousElementSibling;
+
+        return select?.tagName === 'SELECT' ? select : null;
+    }
+};
+
+bindDisabledControlWarning(select2DisabledWarningConfig);
+
 export const initbaseSelect2 = ({ 
     baseSelector, 
     containerSelector,
@@ -170,7 +182,7 @@ export const bindDisabledSelectDependency = ({
 
     const getDisabledState = (value) => isDisabled(value);
 
-    setSelect2DisabledWarning({
+    setDisabledControlWarning({
         element: targetElement,
         message: disabledMessage
     });
