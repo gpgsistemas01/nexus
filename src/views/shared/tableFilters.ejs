@@ -18,26 +18,30 @@
     selectInputs: typeof selectInputs !== 'undefined' ? selectInputs : []
 } %>
 
-<% if (filterConfig.selectInputs.length) { %>
+<div class="table-filters-panel" aria-label="Filtros de tabla">
+    <% if (filterConfig.selectInputs.length) { %>
+        <div class="row table-filters">
+            <% filterConfig.selectInputs.forEach(filter => { %>
+                <%- include('./tableSelectFilter', {
+                    id: filter.id,
+                    label: filter.label,
+                    col: filter.col
+                }) %>
+            <% }) %>
+        </div>
+    <% } %>
+
     <div class="row table-filters">
-        <% filterConfig.selectInputs.forEach(filter => { %>
-            <%- include('./tableSelectFilter', {
-                id: filter.id,
-                label: filter.label,
-                col: filter.col
-            }) %>
-        <% }) %>
+        <%- include('./outlineInputList', { inputs: filterConfig.dateInputs }) %>
     </div>
-<% } %>
 
-<div class="row mb-3 table-filters">
-    <%- include('./outlineInputList', { inputs: filterConfig.dateInputs }) %>
+    <div class="table-filters-actions">
+        <%- include('./button', {
+            button : {
+                id: 'clearFiltersButton',
+                class: 'btn table-filter-button',
+                content: 'Limpiar filtros'
+            }
+        }) %>
+    </div>
 </div>
-
-<%- include('./button', {
-    button : {
-        id: 'clearFiltersButton',
-        class: 'btn table-filter-button mb-3',
-        content: 'Limpiar filtros'
-    }
-}) %>
