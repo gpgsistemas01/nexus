@@ -378,6 +378,19 @@ body {
   width: 100%;
 }
 
+.table-filters-panel {
+  background: rgba(255, 255, 255, 0.88);
+  border: 1px solid rgba(var(--mdb-secondary-rgb), 0.12);
+  border-radius: 1rem;
+  box-shadow: 0 0.35rem 1rem rgba(var(--mdb-secondary-rgb), 0.08);
+  margin-block-end: 1rem;
+  padding: 1rem;
+}
+
+.table-filters-panel .table-filters + .table-filters {
+  margin-block-start: 0.75rem;
+}
+
 .table-filters {
   align-items: end;
   row-gap: 0.75rem;
@@ -415,6 +428,12 @@ body {
 
 .table-filters .select2-container--default .select2-selection--single {
   padding: 0;
+}
+
+.table-filters-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-block-start: 0.9rem;
 }
 
 .table-filter-button {
@@ -814,6 +833,16 @@ table.dataTable > tbody > tr.child td.child {
 
   .dataTables_wrapper .dataTables_filter input {
     margin-block-start: 0.1rem;
+    width: 100%;
+  }
+
+  .table-filters-panel {
+    border-radius: 0.85rem;
+    padding: 0.85rem;
+  }
+
+  .table-filters-actions,
+  .table-filter-button {
     width: 100%;
   }
 }
