@@ -1,19 +1,27 @@
 import { toggleProductOption } from "../../../select2/domains/product.js";
 import { FILTER_SELECTORS } from "../../../../constants/selectors.js";
 import { toggleDisabledElement } from "../../../../utils/formUtils.js";
+import { setSelect2DisabledWarning } from "../../../../ui/select2DisabledWarning.js";
 
 const dependencyEvent = 'change.tableFilterDependency';
+
+const DEPENDENT_FILTER_MESSAGES = {
+    productRequiresSupplier: 'Seleccione un proveedor antes de filtrar por producto.',
+    profileRequiresDepartment: 'Seleccione un área antes de filtrar por perfil.'
+};
 
 const clearSelectFilter = (selector) => {
 
     $(selector).val(null).trigger('change');
 };
 
+
 const bindDisabledFilterDependency = ({
     sourceSelector,
     targetSelector,
     clearTarget = () => {},
-    isDisabled = (value) => !value
+    isDisabled = (value) => !value,
+    disabledMessage = null
 }) => {
 
     const $source = $(sourceSelector);
@@ -22,6 +30,11 @@ const bindDisabledFilterDependency = ({
     if (!$source.length || !targetElement) return;
 
     const getDisabledState = (value) => isDisabled(value);
+
+    setSelect2DisabledWarning({
+        element: targetElement,
+        message: disabledMessage
+    });
 
     toggleDisabledElement({
         element: targetElement,
@@ -64,7 +77,8 @@ const bindSupplierProductFilterDependency = () => {
             });
 
             clearSelectFilter(FILTER_SELECTORS.PRODUCT);
-        }
+        },
+        disabledMessage: DEPENDENT_FILTER_MESSAGES.productRequiresSupplier
     });
 };
 
@@ -73,7 +87,8 @@ const bindDepartmentProfileFilterDependency = () => {
     bindDisabledFilterDependency({
         sourceSelector: FILTER_SELECTORS.DEPARTMENT,
         targetSelector: FILTER_SELECTORS.PROFILE,
-        clearTarget: () => clearSelectFilter(FILTER_SELECTORS.PROFILE)
+        clearTarget: () => clearSelectFilter(FILTER_SELECTORS.PROFILE),
+        disabledMessage: DEPENDENT_FILTER_MESSAGES.profileRequiresDepartment
     });
 };
 

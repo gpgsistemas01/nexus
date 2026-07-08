@@ -51,6 +51,7 @@ export const initGoodsReceiptFormSelect2 = () => {
         sourceSelector: supplierScopedSelector,
         targetSelector: productScopedSelector,
         clearTarget: clearProductSelection,
+        disabledMessage: 'Seleccione un proveedor antes de buscar producto.',
         onChange: ({ value }) => {
 
             const isDisabled = !value;
