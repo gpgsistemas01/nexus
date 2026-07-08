@@ -108,7 +108,7 @@ export const toggleSelectOption = ({ selector, data = null }) => {
 
     if (!text || !id) return;
 
-    const option = new Option(text, id, true, true);
+    const option = new Option(text, id, false, true);
 
     Object.entries(data).forEach(([key, value]) => {
         option.dataset[key] = value;
@@ -127,7 +127,7 @@ export const toggleSelectOptions = ({ selector, data = [] }) => {
 
         if (!text || !id) return;
 
-        const option = new Option(text, id, true, true);
+        const option = new Option(text, id, false, true);
 
         $(selector).append(option);
     });
