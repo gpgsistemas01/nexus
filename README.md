@@ -112,7 +112,9 @@ NODE_ENV=development
 
 # Base de datos
 DATABASE_URL="postgresql://usuario:password@localhost:5432/nexus"
+DIRECT_URL="postgresql://usuario:password@localhost:5432/nexus"
 DATABASE_TEST_URL="postgresql://usuario:password@localhost:5432/nexus_test"
+DIRECT_TEST_URL="postgresql://usuario:password@localhost:5432/nexus_test"
 
 # Autenticación / seguridad
 JWT_SECRET_ACCESS="cambiar-en-produccion"
@@ -129,9 +131,9 @@ LOG_LEVEL="info"
 
 La conexión se resuelve desde `src/lib/databaseUrl.js`:
 
-- Cuando `NODE_ENV` es `test`, se usa `DATABASE_TEST_URL`.
-- En cualquier otro entorno se usa `DATABASE_URL`.
-- Si falta la variable requerida, el resolver falla indicando el `NODE_ENV` activo.
+- Los servicios de la aplicación usan `DATABASE_URL`; cuando `NODE_ENV` es `test`, usan `DATABASE_TEST_URL`.
+- Las migraciones de Prisma usan `DIRECT_URL`; cuando `NODE_ENV` es `test`, usan `DIRECT_TEST_URL`.
+- Si falta `DATABASE_URL`/`DATABASE_TEST_URL` en servicios o `DIRECT_URL`/`DIRECT_TEST_URL` en migraciones, el resolver falla indicando el `NODE_ENV` activo.
 
 Comandos útiles:
 
@@ -168,7 +170,7 @@ npm start
 | `npm run dev` | Ejecuta la aplicación con Nodemon. |
 | `npm test` | Ejecuta la suite de Vitest con `vitestConfig.js`. |
 | `npm run test:watch` | Ejecuta Vitest en modo observación. |
-| `npm run test:db:verify` | Valida que `DATABASE_TEST_URL` exista y no sea igual a `DATABASE_URL`. |
+| `npm run test:db:verify` | Valida que `DATABASE_TEST_URL` y `DIRECT_TEST_URL` existan, que las URLs de prueba no sean iguales a las URLs principales y que cada una apunte al uso correcto. |
 | `npm run test:db:migrate` | Verifica variables y aplica migraciones en la base de pruebas. |
 | `npm run test:db` | Verifica variables, migra la base de pruebas y ejecuta pruebas. |
 
@@ -208,7 +210,7 @@ Todas las rutas API cuelgan de `/api` y esperan `Content-Type: application/json`
 
 ## Pruebas automatizadas
 
-Se mantiene un solo punto de creación de cliente Prisma en `src/lib/prisma.js`. En pruebas, Vitest ejecuta con `NODE_ENV=test`, por lo que el mismo resolver usa `DATABASE_TEST_URL` sin crear un segundo cliente.
+Se mantiene un solo punto de creación de cliente Prisma en `src/lib/prisma.js`. En pruebas, Vitest ejecuta con `NODE_ENV=test`, por lo que el resolver de servicios usa `DATABASE_TEST_URL` sin crear un segundo cliente. Las migraciones se resuelven aparte desde `prisma.config.ts` con `DIRECT_URL` o `DIRECT_TEST_URL`.
 
 Las pruebas que escriban datos en la base deben ejecutarse dentro de una transacción y forzar rollback al terminar. Para esos casos existe `tests/helpers/rollbackTransaction.js`, que recibe el cliente Prisma y ejecuta el cuerpo de la prueba con el `tx` transaccional, revirtiendo los cambios al finalizar para no persistir datos de prueba.
 
@@ -219,7 +221,7 @@ npm run test:db:migrate
 npm run test:db
 ```
 
-Los scripts de prueba validan primero que exista `DATABASE_TEST_URL` y que no sea la misma URL que `DATABASE_URL`. Para migraciones de prueba, los scripts asignan temporalmente `DATABASE_URL="$DATABASE_TEST_URL"` solo durante el comando de Prisma, porque Prisma CLI lee la variable `DATABASE_URL` para aplicar migraciones.
+Los scripts de prueba validan primero que exista `DATABASE_TEST_URL` y que no sea la misma URL que `DATABASE_URL`. Para migraciones de prueba, ejecutan Prisma con `NODE_ENV=test`; `prisma.config.ts` usa `DIRECT_TEST_URL` para migraciones; los servicios siguen usando `DATABASE_TEST_URL`.
 
 Para pruebas que no requieren base de datos real, usa:
 

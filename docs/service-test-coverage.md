@@ -22,7 +22,7 @@ La suite ya cubre:
 
 ## Estrategia de integración con BD
 
-Las pruebas de integración se ejecutan contra `DATABASE_TEST_URL`, guardan información real y no usan rollback. La limpieza se hace por datos de prueba al iniciar cada integración y con `tests/teardownTestDatabase.js` al finalizar toda la suite. Los servicios marcados arriba como integración directa ya incluyen ese flujo de BD; esta sección sólo documenta la estrategia para evitar repetir el listado de cobertura.
+Las pruebas de integración de servicios se ejecutan contra `DATABASE_TEST_URL`; las migraciones de esa base usan únicamente `DIRECT_TEST_URL`. Guardan información real y no usan rollback. La limpieza se hace por datos de prueba al iniciar cada integración y con `tests/teardownTestDatabase.js` al finalizar toda la suite. Los servicios marcados arriba como integración directa ya incluyen ese flujo de BD; esta sección sólo documenta la estrategia para evitar repetir el listado de cobertura.
 
 ## Pendientes importantes
 
@@ -41,4 +41,4 @@ Cuando un servicio usa otro servicio de otro dominio, no se duplica la misma pru
 
 ## Implicación para CI
 
-Las pruebas que dependan de Prisma o migraciones deben ejecutarse en CI con `npm run test:db`, porque ese script valida `DATABASE_TEST_URL`, aplica migraciones y después corre Vitest contra la base de pruebas. Además, Vitest carga `tests/setupTestDatabaseEnv.js`: si una corrida define `DATABASE_URL` o `DATABASE_TEST_URL`, la suite valida que exista `DATABASE_TEST_URL`, confirma que no sea igual a `DATABASE_URL`; en runtime el resolver usa `DATABASE_TEST_URL` porque `NODE_ENV=test`.
+Las pruebas que dependan de Prisma o migraciones deben ejecutarse en CI con `npm run test:db`, porque ese script valida `DATABASE_TEST_URL` y `DIRECT_TEST_URL`, aplica migraciones y después corre Vitest contra la base de pruebas. En runtime el resolver de servicios usa `DATABASE_TEST_URL` porque `NODE_ENV=test` y Prisma usa `DIRECT_TEST_URL` para migraciones.
