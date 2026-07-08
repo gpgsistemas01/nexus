@@ -138,11 +138,13 @@ La conexión se resuelve desde `src/lib/databaseUrl.js`:
 Comandos útiles:
 
 ```bash
-npx prisma migrate deploy    # Aplica migraciones pendientes
+npx prisma migrate deploy    # Aplica migraciones pendientes usando DIRECT_URL
 npx prisma generate          # Genera el cliente Prisma
 npm exec prisma db seed      # Ejecuta prisma/seed.js
 npx prisma studio            # Abre Prisma Studio para inspección local
 ```
+
+En CI/CD no es necesario validar las URLs de migración durante `npm test`. La validación debe ejecutarse sólo en los jobs que aplican migraciones: `npm run test:db:verify` valida `DIRECT_TEST_URL` para migraciones de prueba y `prisma migrate deploy` falla explícitamente si falta `DIRECT_URL` en despliegues.
 
 El seed lee archivos XLSX ubicados en `prisma/` para cargar catálogos y datos iniciales. Verifica que los archivos requeridos existan antes de ejecutar `npm exec prisma db seed`.
 

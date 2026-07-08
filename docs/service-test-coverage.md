@@ -41,4 +41,4 @@ Cuando un servicio usa otro servicio de otro dominio, no se duplica la misma pru
 
 ## Implicación para CI
 
-Las pruebas que dependan de Prisma o migraciones deben ejecutarse en CI con `npm run test:db`, porque ese script valida `DATABASE_TEST_URL` y `DIRECT_TEST_URL`, aplica migraciones y después corre Vitest contra la base de pruebas. En runtime el resolver de servicios usa `DATABASE_TEST_URL` porque `NODE_ENV=test` y Prisma usa `DIRECT_TEST_URL` para migraciones.
+Las pruebas que dependan de Prisma o migraciones deben ejecutarse en CI con `npm run test:db`, porque ese script valida `DATABASE_TEST_URL` y `DIRECT_TEST_URL`, aplica migraciones y después corre Vitest contra la base de pruebas. No es necesario validar URLs de migración en jobs de pruebas unitarias que sólo ejecutan `npm test`; esa validación pertenece a los jobs que aplican migraciones. En runtime el resolver de servicios usa `DATABASE_TEST_URL` porque `NODE_ENV=test` y Prisma usa `DIRECT_TEST_URL` para migraciones.
