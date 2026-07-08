@@ -40,13 +40,25 @@ const adjustDataTableColumns = (table) => {
     if (typeof table?.responsive?.recalc === 'function') table.responsive.recalc();
 };
 
-const initDataTableActionTooltips = (table) => {
+const initDataTableMdbInputs = (tableNode) => {
+
+    if (!tableNode || !globalThis.mdb?.Input) return;
+
+    tableNode.querySelectorAll('[data-mdb-input-init]').forEach((wrapper) => {
+        const instance = globalThis.mdb.Input.getOrCreateInstance(wrapper);
+
+        instance.update();
+    });
+};
+
+const initDataTableMdbComponents = (table) => {
 
     const tableNode = table?.table?.().node?.();
 
     if (!tableNode) return;
 
     initMdbTooltips(tableNode);
+    initDataTableMdbInputs(tableNode);
 };
 
 export const createDataTable = ({ selector = DATATABLE_SELECTORS.MAIN, options = {} }) => {
@@ -99,7 +111,7 @@ export const createDataTable = ({ selector = DATATABLE_SELECTORS.MAIN, options =
             const table = this.api();
 
             adjustDataTableColumns(table);
-            initDataTableActionTooltips(table);
+            initDataTableMdbComponents(table);
             configureResponsiveHeaderGroups(table);
 
             $(table.table().container())
@@ -118,7 +130,7 @@ export const createDataTable = ({ selector = DATATABLE_SELECTORS.MAIN, options =
             }
 
             adjustDataTableColumns(table);
-            initDataTableActionTooltips(table);
+            initDataTableMdbComponents(table);
 
             if (typeof drawCallback === 'function') drawCallback.call(this, settings);
         },
