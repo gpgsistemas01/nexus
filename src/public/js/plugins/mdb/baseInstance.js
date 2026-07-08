@@ -35,3 +35,4 @@ export const initMdbTooltips = (root = document) => {
         globalThis.mdb.Tooltip.getOrCreateInstance(el);
     });
 }
+
