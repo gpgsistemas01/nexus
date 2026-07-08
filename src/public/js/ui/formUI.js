@@ -291,7 +291,7 @@ export const setFormFieldVisibility = ({
     if (isVisible && enableWhenVisible) {
         toggleDisabledElement({
             element: field,
-            isDisabled: false
+            isDisabled: field.defaultDisabled
         });
     }
 
