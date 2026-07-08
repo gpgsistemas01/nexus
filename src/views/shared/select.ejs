@@ -1,7 +1,10 @@
+<% const selectAttrs = input.attrs || {}; %>
 <div>
     <select id="<%= input.id %>" name="<%= input.name %>" class="form-select w-100 <%= input.class %>"
-        <% for (let key in input.attrs) { %>
-            <%= key %>="<%= input.attrs[key] %>"
+        <% for (let key in selectAttrs) { %>
+            <% if (selectAttrs[key] !== false && selectAttrs[key] !== null && selectAttrs[key] !== undefined) { %>
+                <%= key %>="<%= selectAttrs[key] %>"
+            <% } %>
         <% } %>>
         <option></option>
     </select>
