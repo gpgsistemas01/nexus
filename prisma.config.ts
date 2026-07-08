@@ -11,6 +11,6 @@ export default defineConfig({
     seed: "node prisma/seed.js",
   },
   datasource: {
-    url: resolveDatabaseUrl(),
+    url: resolveDatabaseUrl({ preferDirectUrl: true }),
   },
 });

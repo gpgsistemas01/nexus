@@ -23,6 +23,25 @@ describe('databaseUrl', () => {
     })).toBe('postgresql://app-db');
   });
 
+  it('prioriza DIRECT_URL cuando se solicita una conexión directa fuera de pruebas', () => {
+    expect(resolveDatabaseUrl({
+      nodeEnv: 'production',
+      databaseUrl: 'postgresql://pooler-db',
+      directUrl: 'postgresql://direct-db',
+      preferDirectUrl: true
+    })).toBe('postgresql://direct-db');
+  });
+
+  it('mantiene DATABASE_TEST_URL en pruebas aunque se solicite DIRECT_URL', () => {
+    expect(resolveDatabaseUrl({
+      nodeEnv: 'test',
+      databaseUrl: 'postgresql://pooler-db',
+      testDatabaseUrl: 'postgresql://test-db',
+      directUrl: 'postgresql://direct-db',
+      preferDirectUrl: true
+    })).toBe('postgresql://test-db');
+  });
+
   it('lee DATABASE_TEST_URL desde process.env en pruebas', () => {
     vi.stubEnv('NODE_ENV', 'test');
     vi.stubEnv('DATABASE_URL', 'postgresql://env-app-db');

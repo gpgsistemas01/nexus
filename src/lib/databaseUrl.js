@@ -1,8 +1,20 @@
 export const resolveDatabaseUrl = ({
     nodeEnv = process.env.NODE_ENV,
     databaseUrl = process.env.DATABASE_URL,
-    testDatabaseUrl = process.env.DATABASE_TEST_URL
-} = {}) => (nodeEnv === 'test' ? testDatabaseUrl : databaseUrl);
+    testDatabaseUrl = process.env.DATABASE_TEST_URL,
+    directUrl = process.env.DIRECT_URL,
+    preferDirectUrl = false
+} = {}) => {
+    if (nodeEnv === 'test') {
+        return testDatabaseUrl;
+    }
+
+    if (preferDirectUrl && directUrl) {
+        return directUrl;
+    }
+
+    return databaseUrl;
+};
 
 export const getDatabaseUrl = (options = {}) => {
 
