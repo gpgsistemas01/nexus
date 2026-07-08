@@ -5,6 +5,22 @@ const DISABLED_RETURN_QUANTITY_MESSAGE = 'Marque el detalle para devolución ant
 
 const DISABLED_TABLE_INPUT_SELECTOR = 'input[data-disabled-warning], textarea[data-disabled-warning]';
 
+const buildDetailTableInput = ({ name, value, className, detailId, disabled = false, disabledWarning, min, step }) => `
+    <div class="form-outline table-input-outline" data-mdb-input-init>
+        <input
+            type="number"
+            name="${ name }"
+            value="${ value ?? '' }"
+            class="form-control ${ className }"
+            data-detail-id="${ detailId }"
+            ${ disabled ? 'disabled' : '' }
+            ${ disabledWarning ? `data-disabled-warning="${ disabledWarning }"` : '' }
+            ${ min ? `min="${ min }"` : '' }
+            ${ step ? `step="${ step }"` : '' }
+        >
+    </div>
+`;
+
 const getElementFromEventPoint = (event) => {
 
     const point = event.touches?.[0] || event.changedTouches?.[0] || event;
@@ -150,16 +166,15 @@ export const buildDetailsColumns = ({ type, mode, render, isWarehouse, isCoordin
                     const isProjectQuantityDisabled = !isEditableDetail || !row.isSupplied;
 
                     return `
-                        <input
-                            type="number"
-                            name="projectConvertedQuantity"
-                            value="${ value ?? '' }"
-                            class="form-control project-converted-quantity-input"
-                            ${ isProjectQuantityDisabled ? 'disabled' : '' }
-                            data-disabled-warning="${ DISABLED_PROJECT_QUANTITY_MESSAGE }"
-                            data-detail-id="${ detailId }"
-                            min=0
-                        >
+                        ${ buildDetailTableInput({
+                            name: 'projectConvertedQuantity',
+                            value,
+                            className: 'project-converted-quantity-input',
+                            detailId,
+                            disabled: isProjectQuantityDisabled,
+                            disabledWarning: DISABLED_PROJECT_QUANTITY_MESSAGE,
+                            min: '0'
+                        }) }
                         <div data-error-for="projectConvertedQuantity-${ detailId }" class="invalid-feedback d-none"></div>
                     `;
                 }
@@ -185,17 +200,16 @@ export const buildDetailsColumns = ({ type, mode, render, isWarehouse, isCoordin
                 render: (value, _, row) => {
                     const detailId = row.id || row.productId;
                     return `
-                        <input
-                            type="number"
-                            name="returnedQuantity"
-                            value="${ value ?? '' }"
-                            class="form-control return-quantity-input"
-                            data-detail-id="${ detailId }"
-                            min="0.01"
-                            step="0.01"
-                            ${ row.isReturned ? '' : 'disabled' }
-                            data-disabled-warning="${ DISABLED_RETURN_QUANTITY_MESSAGE }"
-                        >
+                        ${ buildDetailTableInput({
+                            name: 'returnedQuantity',
+                            value,
+                            className: 'return-quantity-input',
+                            detailId,
+                            disabled: !row.isReturned,
+                            disabledWarning: DISABLED_RETURN_QUANTITY_MESSAGE,
+                            min: '0.01',
+                            step: '0.01'
+                        }) }
                         <div data-error-for="returnedQuantity-${ detailId }" class="invalid-feedback d-none"></div>
                     `;
                 }
