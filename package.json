@@ -29,8 +29,8 @@
     "dev": "nodemon src/app.js",
     "test": "vitest run --config vitestConfig.js",
     "test:watch": "vitest watch --config vitestConfig.js",
-    "test:db:migrate": "npm run test:db:verify && NODE_ENV=test prisma migrate deploy",
-    "test:db": "npm run test:db:verify && NODE_ENV=test prisma migrate deploy && vitest run --config vitestConfig.js",
+    "test:db:migrate": "npm run test:db:verify && DIRECT_TEST_URL=\"${DIRECT_TEST_URL:-$DATABASE_TEST_URL}\" NODE_ENV=test prisma migrate deploy",
+    "test:db": "npm run test:db:verify && DIRECT_TEST_URL=\"${DIRECT_TEST_URL:-$DATABASE_TEST_URL}\" NODE_ENV=test prisma migrate deploy && vitest run --config vitestConfig.js",
     "test:db:verify": "node scripts/verifyTestDatabaseEnv.js"
   },
   "repository": {
