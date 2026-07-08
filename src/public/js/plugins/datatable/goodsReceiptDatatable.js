@@ -49,7 +49,7 @@ export const createGoodsReceiptDatatable = async (context = window.meta || {}) =
     const canReturnGoodsReceipt = canManageWarehouseReturns();
 
     filters = await setupTableFilters({
-        fields: ['date', 'supplier', 'profile']
+        fields: ['date', 'supplier', 'warehouseProfile']
     });
 
     table = createDataTable({
