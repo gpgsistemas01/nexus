@@ -3,7 +3,7 @@ import { editGoodsIssue, editGoodsIssueDetails, editGoodsIssueHeader, registerGo
 import { validateAddGoodsIssueProductValidators, validateGoodsIssueDetailValidators, validateGoodsIssueReturnValidators, validateGoodsIssueValidators } from "../../utils/validations/validators.js";
 import { refreshProductTable } from "../../plugins/datatable/baseDatatable.js";
 import { createGoodsIssueDatatable, details, initDetailsGoodsIssueTable } from "../../plugins/datatable/goodsIssueDatatable.js";
-import { initGoodsIssueFormSelect2, setGoodsIssueFormSelectOptions } from "../../plugins/select2/modules/goodsIssueSelect.js";
+import { initGoodsIssueFormSelect2, setGoodsIssueFormSelectOptions, syncGoodsIssueDependentSelectsState } from "../../plugins/select2/modules/goodsIssueSelect.js";
 import { setFormReadOnly, toggleButtons, clearAddedProductInput, clearFormErrors, normalizeFormErrors, initForm } from "../../ui/formUI.js";
 import { on } from "../../utils/domUtils.js";
 import { setDateTimePickerValue } from "../../plugins/flatpickr/dateTimePicker.js";
@@ -144,12 +144,14 @@ export const openGoodsIssueModal = ({ mode, data = null }) => {
         form,
         isReadOnly: !ENABLED_HEADER_MODES.includes(mode)
     });
+    syncGoodsIssueDependentSelectsState();
 
     details.length = 0;
 
     if (mode === 'create') {
 
         form.reset();
+        syncGoodsIssueDependentSelectsState();
         modalElement.querySelector('#modalTitle').textContent = 'Registrar salida';
         form.querySelector('#submitBtn').textContent = 'Guardar';
         form.querySelector('#presentationDisplayInput').value = '';
@@ -193,6 +195,7 @@ export const openGoodsIssueModal = ({ mode, data = null }) => {
             form,
             isReadOnly: !ENABLED_HEADER_MODES.includes(mode)
         });
+        syncGoodsIssueDependentSelectsState();
 
         if (mode === MODE_EDIT || mode === MODE_EDIT_HEADER) {
 
@@ -223,6 +226,7 @@ export const openGoodsIssueModal = ({ mode, data = null }) => {
                 form,
                 isReadOnly: true
             });
+            syncGoodsIssueDependentSelectsState();
         }
 
         if (mode === MODE_VIEW) {
