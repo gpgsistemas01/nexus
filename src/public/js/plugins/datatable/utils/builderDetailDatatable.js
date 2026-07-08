@@ -1,3 +1,30 @@
+import { bindDisabledControlWarning } from "../../../ui/disabledControlWarning.js";
+
+const DISABLED_PROJECT_QUANTITY_MESSAGE = 'Marque el detalle como surtido para capturar la cantidad de proyecto.';
+const DISABLED_RETURN_QUANTITY_MESSAGE = 'Marque el detalle para devolución antes de capturar la cantidad devuelta.';
+
+const DISABLED_TABLE_INPUT_SELECTOR = 'input[data-disabled-warning], textarea[data-disabled-warning]';
+
+const getElementFromEventPoint = (event) => {
+
+    const point = event.touches?.[0] || event.changedTouches?.[0] || event;
+
+    if (typeof document === 'undefined' || typeof document.elementFromPoint !== 'function') return null;
+    if (typeof point.clientX !== 'number' || typeof point.clientY !== 'number') return null;
+
+    return document.elementFromPoint(point.clientX, point.clientY);
+};
+
+const resolveDisabledTableInput = (cell, event) => {
+
+    const pointedElement = getElementFromEventPoint(event) || event.target;
+    const pointedInput = pointedElement?.closest?.(DISABLED_TABLE_INPUT_SELECTOR);
+
+    if (pointedInput && cell.contains(pointedInput)) return pointedInput;
+
+    return cell.querySelector(`${ DISABLED_TABLE_INPUT_SELECTOR }:disabled:hover`);
+};
+
 const isReturnMode = (mode) => mode === 'return';
 
 const shouldShowTransactionQuantity = (mode) => !isReturnMode(mode);
@@ -87,6 +114,12 @@ export const buildDetailsHeader = ({ type, mode, isWarehouse, isCoordinator, isS
 
 export const buildDetailsColumns = ({ type, mode, render, isWarehouse, isCoordinator, isSystem }) => {
 
+    bindDisabledControlWarning({
+        eventTargetSelector: '#productTable td',
+        eventNamespace: 'productTableDisabledInputWarning',
+        resolveControl: resolveDisabledTableInput
+    });
+
     const showReturnColumns = (type === 'issue' || type === 'receipt') && isReturnMode(mode);
     const columns = [
         {
@@ -123,6 +156,7 @@ export const buildDetailsColumns = ({ type, mode, render, isWarehouse, isCoordin
                             value="${ value ?? '' }"
                             class="form-control project-converted-quantity-input"
                             ${ isProjectQuantityDisabled ? 'disabled' : '' }
+                            data-disabled-warning="${ DISABLED_PROJECT_QUANTITY_MESSAGE }"
                             data-detail-id="${ detailId }"
                             min=0
                         >
@@ -160,6 +194,7 @@ export const buildDetailsColumns = ({ type, mode, render, isWarehouse, isCoordin
                             min="0.01"
                             step="0.01"
                             ${ row.isReturned ? '' : 'disabled' }
+                            data-disabled-warning="${ DISABLED_RETURN_QUANTITY_MESSAGE }"
                         >
                         <div data-error-for="returnedQuantity-${ detailId }" class="invalid-feedback d-none"></div>
                     `;
