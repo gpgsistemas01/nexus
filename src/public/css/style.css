@@ -2040,6 +2040,19 @@ body {
   font-weight: 700;
 }
 
+.report-export-cancel-button {
+  background-color: #ffffff !important;
+  border: 1px solid var(--mdb-primary) !important;
+  color: var(--mdb-primary) !important;
+}
+
+.report-export-cancel-button:hover,
+.report-export-cancel-button:focus {
+  background-color: var(--mdb-primary-soft) !important;
+  border-color: var(--mdb-primary-hover) !important;
+  color: var(--mdb-primary-hover) !important;
+}
+
 .swal2-toast.swal2-popup {
   --swal-toast-accent: var(--mdb-primary);
   --swal-toast-accent-rgb: var(--mdb-primary-rgb);
