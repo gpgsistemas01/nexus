@@ -16,57 +16,68 @@ const canSeePurchases = hasAccess({
 const canSeeAll = isAdmin;
 const canSeeOnlyProducts = !canSeeAll && isSalesOrDesign;
 
+const shouldShowIcons = typeof showIcons !== 'undefined' ? showIcons : false;
+
 const items = [
     {
         content: 'Almacén',
+        icon: 'fa-solid fa-boxes-stacked',
         href: '/productos',
         isActive: currentRoute === '/productos',
         isVisible: true
     },
     {
         content: 'Mermas',
+        icon: 'fa-solid fa-recycle',
         href: '/mermas',
         isActive: currentRoute === '/mermas',
         isVisible: true
     },
     {
         content: 'Compras',
+        icon: 'fa-solid fa-cart-shopping',
         href: '/compras',
         isActive: currentRoute === '/compras',
         isVisible: canSeeAll || canSeePurchases
     },
     {
         content: 'Salidas de almacén',
+        icon: 'fa-solid fa-truck-ramp-box',
         href: '/salidas-almacen',
         isActive: currentRoute === '/salidas-almacen',
         isVisible: canSeeAll || !canSeeOnlyProducts
     },
     {
         content: 'Movimientos',
+        icon: 'fa-solid fa-arrow-right-arrow-left',
         href: '/movimientos',
         isActive: currentRoute === '/movimientos',
         isVisible: isAdmin
     },
     {
         content: 'Usuarios',
+        icon: 'fa-solid fa-users-gear',
         href: '/usuarios-sistemas',
         isActive: currentRoute === '/usuarios-sistemas',
         isVisible: hasDepartment('SISTEMAS') && hasRole('Administrador del sistema')
     },
     {
         content: 'Perfiles',
+        icon: 'fa-solid fa-id-badge',
         href: '/perfiles',
         isActive: currentRoute === '/perfiles',
         isVisible: isAdmin
     },
     {
         content: 'Clientes',
+        icon: 'fa-solid fa-handshake',
         href: '/clientes',
         isActive: currentRoute === '/clientes',
         isVisible: isAdmin
     },
     {
         content: 'Proveedores',
+        icon: 'fa-solid fa-warehouse',
         href: '/proveedores',
         isActive: currentRoute === '/proveedores',
         isVisible: isAdmin
@@ -78,7 +89,7 @@ const items = [
     return item.isVisible;
 }).map(item => ({
     ...item,
-    class: `nav-link ${ item.isActive ? 'active' : ''}`
+    class: `nav-link ${ shouldShowIcons ? 'app-nav-link--icon' : '' } ${ item.isActive ? 'active' : ''}`
 })); %>
 
 <ul class="<%= listClass %>">
@@ -87,7 +98,10 @@ const items = [
             <a class="<%= item.class %>" href="<%= item.href %>"
                 <%= item.isActive ? 'aria-current="page"' : '' %>
             >
-                <%- item.content %>
+                <% if (shouldShowIcons && item.icon) { %>
+                    <i class="<%= item.icon %> app-nav-link__icon" aria-hidden="true"></i>
+                <% } %>
+                <span><%- item.content %></span>
             </a>
         </li>
     <% }); %>
