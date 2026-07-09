@@ -200,14 +200,14 @@ export const openGoodsIssueModal = ({ mode, data = null }) => {
         if (mode === MODE_EDIT_FULL || mode === MODE_EDIT_HEADER) {
 
             modalElement.querySelector('#modalTitle').textContent = buildModalTitle({ action: 'Editar', entityName: 'salida', referenceNumber: data?.referenceNumber });
-            form.querySelector('#submitBtn').textContent = 'Actualizar';
+            form.querySelector('#submitBtn').textContent = 'Editar';
 
         }
 
         if (mode === MODE_EDIT_DETAIL) {
 
             modalElement.querySelector('#modalTitle').textContent = buildModalTitle({ action: 'Editar detalles de la', entityName: 'salida', referenceNumber: data?.referenceNumber });
-            form.querySelector('#submitBtn').textContent = 'Actualizar';
+            form.querySelector('#submitBtn').textContent = 'Surtir';
         }
 
         if (mode === MODE_RETURN) {
@@ -217,6 +217,7 @@ export const openGoodsIssueModal = ({ mode, data = null }) => {
                 buildModalTitle,
                 referenceNumber: data?.referenceNumber,
                 entityName: 'salida',
+                submitText: 'Devolver',
                 toggleContainerElements,
                 setFormReadOnly,
                 observationsElement: form.querySelector('#observationsInput')
