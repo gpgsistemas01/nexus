@@ -8,3 +8,17 @@ export const exportMovementReportRequest = (params) => apiRequest({
     responseType: 'blob',
     params
 });
+
+export const exportUserReportRequest = (params) => apiRequest({
+    method: 'get',
+    url: `${ REPORTS_API_ROUTE }/users/excel`,
+    responseType: 'blob',
+    params
+});
+
+export const exportProfileReportRequest = (params) => apiRequest({
+    method: 'get',
+    url: `${ REPORTS_API_ROUTE }/profiles/excel`,
+    responseType: 'blob',
+    params
+});
