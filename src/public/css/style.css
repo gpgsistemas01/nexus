@@ -1149,8 +1149,35 @@ a:hover {
 
 /* form styles */
 
+.form-select,
+.select2-container--default .select2-selection--single,
+.dataTables_wrapper .dataTables_length select {
+  background-color: var(--mdb-light);
+  border: 1px solid var(--form-field-border);
+  border-radius: var(--form-field-border-radius);
+  box-shadow: none;
+  color: var(--mdb-body-color) !important;
+  min-height: 2.45rem;
+  transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.form-select {
+  background-position: right 0.8rem center;
+  padding: var(--form-field-padding);
+  padding-right: 2.25rem;
+}
+
+.select2-container--default .select2-selection--single {
+  align-items: center;
+  display: flex;
+  padding: 0;
+}
+
 .select2-container--default .select2-selection--single .select2-selection__rendered {
   color: var(--mdb-dark);
+  line-height: normal;
+  padding-left: 0.75rem;
+  padding-right: 2.25rem;
 }
 
 .select2-container--default .select2-selection--single .select2-selection__placeholder {
