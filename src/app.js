@@ -2,6 +2,7 @@ import 'dotenv/config.js';
 import { getRequestLogContext, logger, pinoLogger } from './utils/logger.js';
 
 import clientApiRoutes from './routes/api/sales/clientApiRoute.js';
+import salesReportApiRoutes from './routes/api/sales/reportApiRoute.js';
 
 import authApiRoutes from './routes/api/authApiRoute.js';
 
@@ -119,6 +120,7 @@ app.use('/movimientos', movementWebRoutes);
 // api routes
 app.use(apiRoute + authRoute, authApiRoutes);
 app.use(apiRoute + sales + '/clients', clientApiRoutes);
+app.use(apiRoute + sales + '/reports', salesReportApiRoutes);
 app.use(apiRoute + warehouse + '/products', productApiRoutes);
 app.use(apiRoute + warehouse + '/wastes', wasteApiRoutes);
 app.use(apiRoute + warehouse + '/suppliers', supplierApiRoutes);

@@ -34,3 +34,4 @@ export const editClient = async ({ formData, id }) => {
 
     return createSuccessResponseFromRequest({ response, dataKey: 'client' });
 }
+
