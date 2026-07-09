@@ -1,7 +1,6 @@
 import {
     GoodsReceiptCreateDatabaseError,
     GoodsReceiptNotFound,
-    GoodsReceiptSupplierChangeConflict,
     GoodsReceiptUpdateDatabaseError,
     ProfileReceivedByNotFound
 } from "../../../errors/warehouse/goodsReceiptError.js";
@@ -252,21 +251,17 @@ export const updateGoodsReceiptHeader = async ({ id, goodsReceiptDto }) => {
 
     try {
 
-        const { receivedById, supplierId, ...goodsReceiptData } = goodsReceiptDto;
+        const { receivedById, supplierId: _ignoredSupplierId, details: _ignoredDetails, ...goodsReceiptData } = goodsReceiptDto;
 
         const goodsReceipt = await getDb().goodsReceipt.findUnique({
             where: { id },
             select: {
-                id: true,
-                supplierId: true
+                id: true
             }
         });
 
         if (!goodsReceipt) throw new GoodsReceiptNotFound();
 
-        if (goodsReceipt.supplierId !== supplierId) throw new GoodsReceiptSupplierChangeConflict();
-
-        const supplier = await findUniqueSupplier({ id: supplierId });
         const receivedBy = await findProfileById({ id: receivedById });
 
         if (!receivedBy) throw new ProfileReceivedByNotFound();
@@ -275,11 +270,7 @@ export const updateGoodsReceiptHeader = async ({ id, goodsReceiptDto }) => {
             where: { id },
             data: {
                 ...goodsReceiptData,
-                supplierName: supplier.tradeName,
                 receivedByName: receivedBy.fullName,
-                supplier: {
-                    connect: { id: supplierId }
-                },
                 receivedBy: {
                     connect: { id: receivedById }
                 }
