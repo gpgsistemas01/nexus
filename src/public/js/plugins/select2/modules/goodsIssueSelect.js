@@ -22,13 +22,15 @@ const clientScopedSelector = `${ modalSelector } ${ clientSelector }`;
 const departmentScopedSelector = `${ modalSelector } ${ departmentSelector }`;
 const advisorScopedSelector = `${ modalSelector } ${ advisorSelector }`;
 const productScopedSelector = `${ modalSelector } ${ productSelector }`;
-const modeEdit = 'edit';
+const enabledHeaderDependentSelectModes = ['create', 'edit', 'edit-header'];
 const dependentSelects = [
     { sourceSelector: departmentScopedSelector, targetSelector: requesterScopedSelector },
     { sourceSelector: clientScopedSelector, targetSelector: advisorScopedSelector }
 ];
 
-const canEnableDependentSelects = () => document.querySelector(FORM_SELECTORS.GOODS_ISSUE)?.dataset.mode === modeEdit;
+const canEnableHeaderDependentSelects = () => enabledHeaderDependentSelectModes.includes(
+    document.querySelector(FORM_SELECTORS.GOODS_ISSUE)?.dataset.mode
+);
 
 export const syncGoodsIssueDependentSelectsState = () => {
 
@@ -37,7 +39,7 @@ export const syncGoodsIssueDependentSelectsState = () => {
 
         toggleDisabledElement({
             element: document.querySelector(targetSelector),
-            isDisabled: !canEnableDependentSelects() || !sourceValue
+            isDisabled: !canEnableHeaderDependentSelects() || !sourceValue
         });
     });
 };
@@ -120,7 +122,7 @@ export const initGoodsIssueFormSelect2 = () => {
 
             $(requesterScopedSelector).val(null).trigger('change');
         },
-        isDisabled: (value) => !canEnableDependentSelects() || !value,
+        isDisabled: (value) => !canEnableHeaderDependentSelects() || !value,
         disabledMessage: 'Seleccione un área antes de buscar solicitante.',
         onChange: () => syncInternalClientProjectNumber()
     });
@@ -137,7 +139,7 @@ export const initGoodsIssueFormSelect2 = () => {
 
             $(advisorScopedSelector).val(null).trigger('change');
         },
-        isDisabled: (value) => !canEnableDependentSelects() || !value,
+        isDisabled: (value) => !canEnableHeaderDependentSelects() || !value,
         disabledMessage: 'Seleccione un cliente antes de buscar asesor.',
         onChange: () => syncInternalClientProjectNumber()
     });
