@@ -1184,6 +1184,20 @@ a:hover {
   padding-right: 2.25rem;
 }
 
+.select2-container--default .select2-selection--single .select2-selection__arrow {
+  align-items: center;
+  display: flex;
+  height: 100%;
+  justify-content: center;
+  right: 0.55rem;
+  top: 0;
+}
+
+.select2-container--default .select2-selection--single .select2-selection__arrow b {
+  margin: 0;
+  position: static;
+}
+
 .select2-container--default .select2-selection--single .select2-selection__placeholder {
   color: rgba(var(--mdb-secondary-rgb), 0.7);
 }
