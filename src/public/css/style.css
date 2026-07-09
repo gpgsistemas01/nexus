@@ -1070,6 +1070,17 @@ nav .nav-link, .offcanvas .nav-link {
   transition: color 0.3s ease;
 }
 
+.app-nav-link--icon {
+  align-items: center;
+  display: inline-flex;
+  gap: 0.75rem;
+}
+
+.app-nav-link__icon {
+  flex: 0 0 1.25rem;
+  text-align: center;
+}
+
 nav .nav-link::after, .offcanvas .nav-link::after {
   content: '';
   position: absolute;
