@@ -36,15 +36,15 @@ export const buildExcelButton = ({
                 const result = await Swal.fire({
                     title: 'Exportar reporte',
                     html: `
-                        <div class="text-start">
+                        <div class="text-start report-export-options">
                             <p class="mb-3">Selecciona el alcance del reporte que deseas descargar.</p>
-                            <div class="form-check mb-2">
+                            <div class="form-check mb-2 report-export-option">
                                 <input class="form-check-input" type="radio" name="reportType" id="customReportRadio" value="custom" checked>
                                 <label class="form-check-label" for="customReportRadio">
                                     Personalizado: usar filtros aplicados
                                 </label>
                             </div>
-                            <div class="form-check">
+                            <div class="form-check report-export-option">
                                 <input class="form-check-input" type="radio" name="reportType" id="monthlyReportRadio" value="monthly">
                                 <label class="form-check-label" for="monthlyReportRadio">
                                     Mensual: todos los registros del mes actual
@@ -55,6 +55,14 @@ export const buildExcelButton = ({
                     showCancelButton: true,
                     confirmButtonText: 'Descargar',
                     cancelButtonText: 'Cancelar',
+                    buttonsStyling: false,
+                    customClass: {
+                        popup: 'report-export-modal',
+                        title: 'report-export-title',
+                        htmlContainer: 'report-export-content',
+                        confirmButton: 'btn btn-primary',
+                        cancelButton: 'btn btn-outline-primary ms-2'
+                    },
                     preConfirm: () => document.querySelector('input[name="reportType"]:checked')?.value || 'custom'
                 });
 
