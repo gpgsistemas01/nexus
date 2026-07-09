@@ -1924,6 +1924,70 @@ body {
   margin-top: 0.35rem;
 }
 
+.report-export-modal.swal2-popup {
+  background:
+    linear-gradient(180deg, rgba(var(--mdb-primary-rgb), 0.1) 0%, rgba(var(--mdb-primary-rgb), 0) 12rem),
+    var(--mdb-light);
+  border: 1px solid rgba(var(--mdb-primary-rgb), 0.18);
+  border-radius: 1.25rem;
+  box-shadow: 0 1.25rem 3rem rgba(var(--mdb-secondary-rgb), 0.18);
+  color: var(--mdb-body-color);
+  font-family: var(--mdb-font-sans-serif);
+  padding: 1.6rem;
+}
+
+.report-export-title {
+  color: var(--mdb-primary-hover);
+  font-weight: 800;
+}
+
+.report-export-content {
+  color: rgba(var(--mdb-secondary-rgb), 0.82);
+}
+
+.report-export-options {
+  background: rgba(255, 255, 255, 0.82);
+  border: 1px solid rgba(var(--mdb-primary-rgb), 0.12);
+  border-radius: 1rem;
+  padding: 1rem;
+}
+
+.report-export-option {
+  align-items: center;
+  background: #ffffff;
+  border: 1px solid rgba(var(--mdb-secondary-rgb), 0.08);
+  border-radius: 0.85rem;
+  display: flex;
+  gap: 0.65rem;
+  padding: 0.85rem 0.95rem;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.report-export-option:has(.form-check-input:checked) {
+  border-color: rgba(var(--mdb-primary-rgb), 0.45);
+  box-shadow: 0 0.35rem 0.9rem rgba(var(--mdb-primary-rgb), 0.12);
+}
+
+.report-export-option .form-check-input {
+  border-color: var(--mdb-primary);
+  margin-top: 0;
+}
+
+.report-export-option .form-check-input:checked {
+  background-color: var(--mdb-primary);
+  border-color: var(--mdb-primary);
+}
+
+.report-export-option .form-check-input:focus {
+  border-color: var(--mdb-primary-hover);
+  box-shadow: 0 0 0 0.22rem rgba(var(--mdb-primary-rgb), 0.22);
+}
+
+.report-export-option .form-check-label {
+  color: var(--mdb-secondary);
+  font-weight: 700;
+}
+
 .swal2-toast.swal2-popup {
   --swal-toast-accent: var(--mdb-primary);
   --swal-toast-accent-rgb: var(--mdb-primary-rgb);
