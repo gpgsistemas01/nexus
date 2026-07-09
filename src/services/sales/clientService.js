@@ -30,8 +30,7 @@ export const findAllClients = async ({
     };
 
     const clients = await getDb().client.findMany({
-        skip,
-        take,
+        ...(take > 0 && { skip, take }),
         where,
         orderBy: {
             [orderBy]: orderDir
