@@ -1,6 +1,6 @@
 import { createSuccessResponseFromRequest } from "../../utils/responseUtils.js";
 import { buildProductSelectText, mapSupplierProductToSelectData } from "../../utils/productSelectUtils.js";
-import { editProductRequest, editProductStockRequest, getAllProductsRequest, registerProductRequest } from "../../services/warehouse/productService.js";
+import { deleteProductRequest, editProductRequest, editProductStockRequest, getAllProductsRequest, registerProductRequest } from "../../services/warehouse/productService.js";
 
 export const PRODUCT_SELECT_RESULTS_LIMIT = 20;
 
@@ -89,6 +89,14 @@ export const editProduct = async ({ formData, id }) => {
 export const editProductStock = async ({ formData, id }) => {
 
     const response = await editProductStockRequest({ data: formData, id });
+
+    return createSuccessResponseFromRequest({ response });
+}
+
+
+export const deleteProduct = async (id) => {
+
+    const response = await deleteProductRequest({ id });
 
     return createSuccessResponseFromRequest({ response });
 }

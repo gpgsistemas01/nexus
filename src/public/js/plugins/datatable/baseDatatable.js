@@ -160,7 +160,7 @@ export const refreshProductTable = (details) => {
     table.draw();
 }
 
-export const renderActionButtons = ({ status, fulfillmentStatus, context, canAdjustStock = false, canReturnGoodsIssue = false, canReturnGoodsReceipt = false }) => {
+export const renderActionButtons = ({ status, fulfillmentStatus, context, canAdjustStock = false, canDeleteProduct = false, canReturnGoodsIssue = false, canReturnGoodsReceipt = false }) => {
 
     const actions = [];
     const canEditGoodsIssue = context === 'goodsIssue' && status === 'Aprobada';
@@ -181,6 +181,14 @@ export const renderActionButtons = ({ status, fulfillmentStatus, context, canAdj
         iconClass: 'fa-solid fa-boxes-stacked',
         title: 'Ajustar stock',
         ariaLabel: 'Ajustar stock'
+    }));
+
+    if (context === 'product' && canDeleteProduct) actions.push(buildMdbActionButton({
+        className: 'btn-delete-product',
+        colorClass: 'btn-danger',
+        iconClass: 'fa-solid fa-trash',
+        title: 'Eliminar producto',
+        ariaLabel: 'Eliminar producto'
     }));
 
     if (status === 'Aprobada' && context === 'goodsIssue' && canSupplyGoodsIssue) actions.push(buildMdbActionButton({

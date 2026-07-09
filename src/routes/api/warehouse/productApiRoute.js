@@ -1,6 +1,6 @@
 import express from 'express';
 import { authorizeInitialStockAdjustment, authorizeUserApi, verifyApiTokenRequired } from '../../../middleware/authMiddleware.js';
-import { editProduct, editProductStock, getAllProducts, registerProduct } from '../../../controllers/api/warehouse/productController.js';
+import { editProduct, editProductStock, getAllProducts, registerProduct, removeProduct } from '../../../controllers/api/warehouse/productController.js';
 import { productCreateValidation, productStockValidation, productValidation } from '../../../validators/forms/productValidations.js';
 import { validate } from '../../../middleware/validatorMiddleware.js';
 
@@ -45,6 +45,14 @@ router.patch(
     validate,
     authorizeUserApi(productWritePermissions),
     editProduct
+);
+
+
+router.delete(
+    '/:id',
+    verifyApiTokenRequired,
+    authorizeUserApi(productWritePermissions),
+    removeProduct
 );
 
 router.patch(
