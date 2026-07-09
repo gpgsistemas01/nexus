@@ -4,7 +4,7 @@ import { authorizeUserApi, verifyApiTokenRequired } from '../../../middleware/au
 
 const router = express.Router();
 const reportPermissions = {
-    roles: ['Administrador del sistema', 'Coordinador', 'Auxiliar', 'Operador', 'Instalador', 'Almacenista'],
+    roles: ['Administrador del sistema', 'Coordinador', 'Auxiliar'],
     departments: ['SISTEMAS']
 };
 
