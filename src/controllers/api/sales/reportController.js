@@ -1,34 +1,9 @@
-import xlsx from 'xlsx';
 import { findAllClients } from "../../../services/sales/clientService.js";
-import { getMexicoMonthYearParts } from "../../../utils/formattersUtils.js";
+import { sendExcelReport } from "../../../utils/reportExcelUtils.js";
 import { getDataTableOrder, getDataTableSearch } from "../../../utils/requestQueryUtils.js";
 
 const CLIENT_SHEET_NAME = 'Clientes';
 const CLIENT_FILENAME = 'reporte_clientes';
-
-const getReportFilename = (filename = CLIENT_FILENAME) => {
-
-    const { month, year } = getMexicoMonthYearParts();
-
-    return `${ filename }_${ month }_${ year }`;
-};
-
-const createWorkbookBuffer = ({ sheetName, data }) => {
-
-    const workbook = xlsx.utils.book_new();
-    const worksheet = xlsx.utils.aoa_to_sheet(data);
-
-    xlsx.utils.book_append_sheet(workbook, worksheet, sheetName);
-
-    return xlsx.write(workbook, { bookType: 'xlsx', type: 'buffer' });
-};
-
-const sendExcelBuffer = ({ res, buffer, filename }) => {
-
-    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-    res.setHeader('Content-Disposition', `attachment; filename="${ filename }.xlsx"`);
-    return res.send(buffer);
-};
 
 export const exportClientReport = async (req, res) => {
 
@@ -52,11 +27,10 @@ export const exportClientReport = async (req, res) => {
         ...rows.map(row => [row.name])
     ];
 
-    const excelBuffer = createWorkbookBuffer({ sheetName: CLIENT_SHEET_NAME, data });
-
-    return sendExcelBuffer({
+    return sendExcelReport({
         res,
-        buffer: excelBuffer,
-        filename: getReportFilename(CLIENT_FILENAME)
+        data,
+        sheetName: CLIENT_SHEET_NAME,
+        filename: CLIENT_FILENAME
     });
 };

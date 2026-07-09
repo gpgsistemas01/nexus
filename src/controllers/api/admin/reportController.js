@@ -1,9 +1,9 @@
-import xlsx from 'xlsx';
 import { findMovementReportRows } from "../../../services/inventory/reportService.js";
 import { findAllProfiles } from "../../../services/admin/profileService.js";
 import { findAllUsers } from "../../../services/admin/userService.js";
 import { getDataTableOrder, getDataTableSearch } from "../../../utils/requestQueryUtils.js";
-import { getMexicoMonthDateRange, getMexicoMonthYearParts } from "../../../utils/formattersUtils.js";
+import { getMexicoMonthDateRange } from "../../../utils/formattersUtils.js";
+import { sendExcelReport } from "../../../utils/reportExcelUtils.js";
 
 const SHEET_NAME = 'Movimientos';
 const USER_SHEET_NAME = 'Usuarios';
@@ -12,13 +12,6 @@ const FILENAME = 'informe_movimientos';
 const USER_FILENAME = 'informe_usuarios';
 const PROFILE_FILENAME = 'informe_perfiles';
 const isMonthlyReportRequest = (query = {}) => query.monthlyReport === 'true' || query.monthlyReport === true;
-
-const getReportFilename = (filename = FILENAME) => {
-
-    const { month, year } = getMexicoMonthYearParts();
-
-    return `${filename}_${year}-${month}`;
-};
 
 export const exportMovementReport = async (req, res) => {
 
@@ -76,34 +69,14 @@ export const exportMovementReport = async (req, res) => {
         ])
     ];
 
-    const workbook = xlsx.utils.book_new();
-    const worksheet = xlsx.utils.aoa_to_sheet(data);
-
-    xlsx.utils.book_append_sheet(workbook, worksheet, SHEET_NAME);
-
-    const excelBuffer = xlsx.write(workbook, { bookType: 'xlsx', type: 'buffer' });
-
-    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-    res.setHeader('Content-Disposition', `attachment; filename="${ getReportFilename() }.xlsx"`);
-    return res.send(excelBuffer);
+    return sendExcelReport({
+        res,
+        data,
+        sheetName: SHEET_NAME,
+        filename: FILENAME,
+        filenameOptions: { separator: '-', order: 'year-month' }
+    });
 }
-
-const createWorkbookBuffer = ({ sheetName, data }) => {
-
-    const workbook = xlsx.utils.book_new();
-    const worksheet = xlsx.utils.aoa_to_sheet(data);
-
-    xlsx.utils.book_append_sheet(workbook, worksheet, sheetName);
-
-    return xlsx.write(workbook, { bookType: 'xlsx', type: 'buffer' });
-};
-
-const sendExcelBuffer = ({ res, buffer, filename }) => {
-
-    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-    res.setHeader('Content-Disposition', `attachment; filename="${ filename }.xlsx"`);
-    return res.send(buffer);
-};
 
 export const exportUserReport = async (req, res) => {
 
@@ -136,12 +109,12 @@ export const exportUserReport = async (req, res) => {
         ])
     ];
 
-    const excelBuffer = createWorkbookBuffer({ sheetName: USER_SHEET_NAME, data });
-
-    return sendExcelBuffer({
+    return sendExcelReport({
         res,
-        buffer: excelBuffer,
-        filename: getReportFilename(USER_FILENAME)
+        data,
+        sheetName: USER_SHEET_NAME,
+        filename: USER_FILENAME,
+        filenameOptions: { separator: '-', order: 'year-month' }
     });
 };
 
@@ -180,11 +153,11 @@ export const exportProfileReport = async (req, res) => {
         ])
     ];
 
-    const excelBuffer = createWorkbookBuffer({ sheetName: PROFILE_SHEET_NAME, data });
-
-    return sendExcelBuffer({
+    return sendExcelReport({
         res,
-        buffer: excelBuffer,
-        filename: getReportFilename(PROFILE_FILENAME)
+        data,
+        sheetName: PROFILE_SHEET_NAME,
+        filename: PROFILE_FILENAME,
+        filenameOptions: { separator: '-', order: 'year-month' }
     });
 };

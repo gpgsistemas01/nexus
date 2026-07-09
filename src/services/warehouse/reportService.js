@@ -2,6 +2,7 @@ import { formatDateLongWithTime, toNumber } from "../../utils/formattersUtils.js
 import { findAllSupplierProducts } from "./products/supplierProductService.js";
 import { findAllGoodsIssues } from "./goodsIssues/goodsIssueService.js";
 import { findAllGoodsReceipts } from "./goodsReceipts/goodsReceiptService.js";
+import { findAllSuppliers } from "./supplierService.js";
 
 const mapProductRows = (products = []) => products.map((item) => ({
     supplier: item.supplier?.tradeName,
@@ -144,4 +145,21 @@ export const findGoodsReceiptReportRows = async ({
     });
 
     return mapGoodsReceiptDetailRows(goodsReceiptsResult.data);
+};
+
+export const findSupplierReportRows = async ({
+    search = '',
+    orderBy = 'tradeName',
+    orderDir = 'asc'
+} = {}) => {
+
+    const suppliersResult = await findAllSuppliers({
+        skip: 0,
+        take: 0,
+        search,
+        orderBy,
+        orderDir
+    });
+
+    return suppliersResult.data;
 };
