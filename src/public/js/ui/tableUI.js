@@ -18,7 +18,8 @@ export const buildTableExportParams = (table, params = {}) => {
 
 export const buildExcelButton = ({
     filename = 'reporte.xlsx',
-    request
+    request,
+    allowMonthlyReport = true
 } = {}) => ({
     text: 'Exportar Excel',
     action: async () => {
@@ -29,7 +30,40 @@ export const buildExcelButton = ({
 
         try {
 
-            const blob = await request();
+            let reportType = 'custom';
+
+            if (allowMonthlyReport) {
+                const result = await Swal.fire({
+                    title: 'Exportar reporte',
+                    html: `
+                        <div class="text-start">
+                            <p class="mb-3">Selecciona el alcance del reporte que deseas descargar.</p>
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="radio" name="reportType" id="customReportRadio" value="custom" checked>
+                                <label class="form-check-label" for="customReportRadio">
+                                    Personalizado: usar filtros aplicados
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="reportType" id="monthlyReportRadio" value="monthly">
+                                <label class="form-check-label" for="monthlyReportRadio">
+                                    Mensual: todos los registros del mes actual
+                                </label>
+                            </div>
+                        </div>
+                    `,
+                    showCancelButton: true,
+                    confirmButtonText: 'Descargar',
+                    cancelButtonText: 'Cancelar',
+                    preConfirm: () => document.querySelector('input[name="reportType"]:checked')?.value || 'custom'
+                });
+
+                if (!result.isConfirmed) return;
+
+                reportType = result.value;
+            }
+
+            const blob = await request({ monthlyReport: reportType === 'monthly' });
             downloadBlob({ blob, filename });
 
         } catch (err) {

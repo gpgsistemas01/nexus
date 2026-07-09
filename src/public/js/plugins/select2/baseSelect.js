@@ -46,6 +46,7 @@ export const initbaseSelect2 = ({
         language: 'es',
         multiple,
         placeholder: placeholder, 
+        width: '100%',
         dropdownParent: $(containerSelector),
         minimumInputLength: 0, 
         ajax: {  
