@@ -21,7 +21,7 @@ import { configureReturnModal } from "./returns/returnModalHelpers.js";
 
 const modalId = MODAL_SELECTORS.GOODS_RECEIPT;
 const formId = FORM_SELECTORS.GOODS_RECEIPT;
-const MODE_EDIT_HEADER = 'edit';
+const MODE_EDIT = 'edit';
 const MODE_RETURN = RETURN_MODE;
 const RETURN_READ_ONLY_HEADER_FIELD_NAMES = [
     'isInvoiced',
@@ -70,7 +70,7 @@ const normalizeGoodsReceiptData = ({ form, formData }) => {
 
     if (returnForm.isActive(form)) return returnForm.normalizeData({ form });
 
-    if (mode === MODE_EDIT_HEADER) return formData;
+    if (mode === MODE_EDIT) return formData;
 
     return {
         ...formData,
@@ -184,7 +184,7 @@ export const openGoodsReceiptModal = ({ mode, data = null }) => {
         form.elements.totalNetPurchaseAmountDisplayInput.value = data.totalNetPurchaseAmount;
         form.elements.totalGrossPurchaseAmountDisplayInput.value = data.totalGrossPurchaseAmount;
 
-        if (mode === MODE_EDIT_HEADER) {
+        if (mode === MODE_EDIT) {
             modalElement.querySelector('#modalTitle').textContent = buildModalTitle({ action: 'Editar', entityName: 'compra', referenceNumber: data?.referenceNumber });
             form.querySelector('#submitBtn').textContent = 'Actualizar';
             toggleDisabledElement({
