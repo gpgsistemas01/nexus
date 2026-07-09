@@ -19,14 +19,14 @@ import {
 } from "./returns/returnFormHelpers.js";
 import { configureReturnModal } from "./returns/returnModalHelpers.js";
 
-const MODE_EDIT = 'edit';
+const MODE_EDIT_FULL = 'edit';
 const MODE_EDIT_DETAIL = 'edit-detail';
 const MODE_EDIT_HEADER = 'edit-header';
 const MODE_VIEW = 'view';
 const MODE_RETURN = RETURN_MODE;
 const FULFILLMENT_PENDING = 'Pendiente';
 const HEADER_FIELD_NAMES = ['clientId', 'advisorId', 'departmentId', 'requesterId', 'projectNumber', 'requestDate', 'observations'];
-const ENABLED_HEADER_MODES = ['create', MODE_EDIT, MODE_EDIT_HEADER];
+const ENABLED_HEADER_MODES = ['create', MODE_EDIT_FULL, MODE_EDIT_HEADER];
 const modalId = MODAL_SELECTORS.GOODS_ISSUE;
 const formId = FORM_SELECTORS.GOODS_ISSUE;
 
@@ -135,7 +135,7 @@ export const openGoodsIssueModal = ({ mode, data = null }) => {
         status: data?.status?.name,
         showActions: false,
         withTotal: false,
-        showAddProduct: mode === 'create' || (mode === MODE_EDIT && data?.fulfillmentStatus?.name === FULFILLMENT_PENDING)
+        showAddProduct: mode === 'create' || (mode === MODE_EDIT_FULL && data?.fulfillmentStatus?.name === FULFILLMENT_PENDING)
     });
     setFormReadOnly({ form, isReadOnly: false });
     initGoodsIssueFormSelect2();
@@ -157,7 +157,7 @@ export const openGoodsIssueModal = ({ mode, data = null }) => {
         form.querySelector('#presentationDisplayInput').value = '';
     }
 
-    if (mode === MODE_EDIT || mode === MODE_EDIT_DETAIL || mode === MODE_EDIT_HEADER || mode === MODE_VIEW || mode === MODE_RETURN) {
+    if (mode === MODE_EDIT_FULL || mode === MODE_EDIT_DETAIL || mode === MODE_EDIT_HEADER || mode === MODE_VIEW || mode === MODE_RETURN) {
 
         form.querySelector('#observationsInput').value = mode === MODE_RETURN ? '' : (data.observations || '');
         setDateTimePickerValue(form.querySelector('#requestDateInput'), data.requestDate);
@@ -190,14 +190,14 @@ export const openGoodsIssueModal = ({ mode, data = null }) => {
             })
         })));
 
-        setFormReadOnly({ form, isReadOnly: mode !== MODE_EDIT && mode !== MODE_EDIT_HEADER });
+        setFormReadOnly({ form, isReadOnly: mode !== MODE_EDIT_FULL && mode !== MODE_EDIT_HEADER });
         setGoodsIssueHeaderFieldsReadOnly({
             form,
             isReadOnly: !ENABLED_HEADER_MODES.includes(mode)
         });
         syncGoodsIssueDependentSelectsState();
 
-        if (mode === MODE_EDIT || mode === MODE_EDIT_HEADER) {
+        if (mode === MODE_EDIT_FULL || mode === MODE_EDIT_HEADER) {
 
             modalElement.querySelector('#modalTitle').textContent = buildModalTitle({ action: 'Editar', entityName: 'salida', referenceNumber: data?.referenceNumber });
             form.querySelector('#submitBtn').textContent = 'Actualizar';
