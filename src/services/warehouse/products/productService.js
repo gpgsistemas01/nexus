@@ -1,4 +1,4 @@
-import { ProductSnapshotFindDatabaseError, ProductCreateDatabaseError, ProductNotFound, ProductUpdateDatabaseError, ProductStockAdjustmentDatabaseError } from "../../../errors/warehouse/productError.js";
+import { ProductSnapshotFindDatabaseError, ProductCreateDatabaseError, ProductNotFound, ProductUpdateDatabaseError, ProductStockAdjustmentDatabaseError, ProductDeleteDatabaseError, ProductDeleteRelationConflict } from "../../../errors/warehouse/productError.js";
 import { getDb } from "../../../repository/baseRepository.js";
 import { findAllSupplierProducts, findCurrentSupplierProductByProductId, findSupplierProductByIds, recalculateConvertedQuantityByProduct } from "./supplierProductService.js";
 import { prepareProductData, withRetry } from "./productHelpers.js";
@@ -12,6 +12,7 @@ const serviceLogger = createServiceLogger('warehouse.products.productService');
 
 const REFERENCE_MOVEMENT_IN = 'IN';
 const PRISMA_RECORD_NOT_FOUND = 'P2025';
+const PRISMA_FOREIGN_KEY_CONSTRAINT = 'P2003';
 
 const buildProductData = ({ rest, relations }) => ({
     ...rest,
@@ -242,6 +243,54 @@ export const updateProduct = async (productDto, id) => {
 
         throw new ProductUpdateDatabaseError();
     };
+};
+
+export const deleteProduct = async (id) => {
+
+    try {
+
+        const deletedProduct = await getDb().$transaction(async (tx) => {
+
+            await existsProduct({ tx, id });
+
+            const linkedRecords = await Promise.all([
+                tx.goodsReceiptDetail.count({ where: { productId: id } }),
+                tx.goodsIssueDetail.count({ where: { productId: id } }),
+                tx.purchaseRequisitionDetail.count({ where: { productId: id } }),
+                tx.movementDetail.count({ where: { productId: id } }),
+                tx.stockAdjustmentDetail.count({ where: { productId: id } }),
+                tx.waste.count({ where: { supplierProduct: { productId: id } } })
+            ]);
+
+            if (linkedRecords.some((count) => count > 0)) throw new ProductDeleteRelationConflict();
+
+            await tx.supplierProduct.deleteMany({ where: { productId: id } });
+
+            return tx.product.delete({
+                where: { id },
+                select: { id: true }
+            });
+        });
+
+        logServiceInfo(serviceLogger, {
+            operation: 'warehouse.products.productService.deleteProduct',
+            ...getModelLogContext('product', { id })
+        }, 'Producto y relación con proveedor eliminados correctamente');
+
+        return deletedProduct;
+
+    } catch (err) {
+        logServiceError(serviceLogger, err, {
+            operation: 'warehouse.products.productService.deleteProduct',
+            ...getModelLogContext('product', { id })
+        });
+
+        if (err.code === PRISMA_RECORD_NOT_FOUND) throw new ProductNotFound();
+        if (err.code === PRISMA_FOREIGN_KEY_CONSTRAINT) throw new ProductDeleteRelationConflict();
+        if (err instanceof AppError) throw err;
+
+        throw new ProductDeleteDatabaseError();
+    }
 };
 
 export const updateProductStock = async ({ 

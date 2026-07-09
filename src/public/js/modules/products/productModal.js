@@ -103,7 +103,7 @@ export const openProductModal = ({
 
     if (mode === 'edit') {
         modalElement.querySelector('#modalTitle').textContent = 'Editar producto';
-        form.querySelector('#submitBtn').textContent = 'Actualizar';
+        form.querySelector('#submitBtn').textContent = 'Editar';
     }
 
     form.onSave = onSave;
@@ -116,7 +116,7 @@ export const openStockAdjustmentModal = ({
     data = null,
     onSave = null,
     title = 'Editar stock de producto',
-    submitText = 'Actualizar',
+    submitText = 'Ajustar',
     beforeOpen = null
 }) => {
 

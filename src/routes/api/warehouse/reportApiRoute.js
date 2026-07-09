@@ -10,7 +10,7 @@ const reportPermissions = {
 };
 
 const supplierReportPermissions = {
-    ...reportPermissions,
+    roles: ['Coordinador', 'Auxiliar', 'Administrador del sistema'],
     departments: ['SISTEMAS']
 };
 

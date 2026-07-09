@@ -1,6 +1,6 @@
 import { createProductDtoForRegister, createProductDtoForStockUpdate } from "../../../dtos/productDTO.js";
 import { successCodeMessages } from "../../../messages/codeMessages.js";
-import { findAllProducts, createProduct, updateProduct, updateProductStock } from "../../../services/warehouse/products/productService.js";
+import { findAllProducts, createProduct, updateProduct, updateProductStock, deleteProduct } from "../../../services/warehouse/products/productService.js";
 import { sanitizeEmptyStrings } from "../../../utils/formattersUtils.js";
 import { hasStockAdjustmentPayload } from "../../../validators/forms/productValidations.js";
 import { getDataTableOrder, getDataTablePaging, getDataTableSearch } from "../../../utils/requestQueryUtils.js";
@@ -76,5 +76,15 @@ export const editProductStock = async (req, res) => {
     return res.status(200).json({
         product,
         code: successCodeMessages.UPDATED_PRODUCT
+    });
+}
+
+export const removeProduct = async (req, res) => {
+
+    const product = await deleteProduct(req.params.id);
+
+    return res.status(200).json({
+        product,
+        code: successCodeMessages.DELETED_PRODUCT
     });
 }

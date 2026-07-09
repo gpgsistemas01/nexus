@@ -6,7 +6,7 @@ const DISABLED_RETURN_QUANTITY_MESSAGE = 'Marque el detalle para devolución ant
 const DISABLED_TABLE_INPUT_SELECTOR = 'input[data-disabled-warning], textarea[data-disabled-warning]';
 
 const buildDetailTableInput = ({ name, value, className, detailId, disabled = false, disabledWarning, min, step }) => `
-    <div class="form-outline table-input-outline" data-mdb-input-init>
+    <div class="table-input-outline">
         <input
             type="number"
             name="${ name }"

@@ -4,7 +4,7 @@ import { exportMovementReport, exportProfileReport, exportUserReport } from '../
 
 const router = express.Router();
 const reportPermissions = {
-    roles: ['Administrador del sistema'],
+    roles: ['Coordinador', 'Auxiliar', 'Administrador del sistema'],
     departments: ['SISTEMAS']
 };
 

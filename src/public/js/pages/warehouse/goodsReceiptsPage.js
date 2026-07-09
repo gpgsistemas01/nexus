@@ -203,7 +203,7 @@ export const openGoodsReceiptModal = ({ mode, data = null }) => {
                 referenceNumber: data?.referenceNumber,
                 entityName: 'compra',
                 action: 'Devolver',
-                submitText: 'Registrar devolución',
+                submitText: 'Devolver',
                 toggleContainerElements,
                 setFormReadOnly,
                 toggleDisabledElement,
