@@ -62,7 +62,10 @@ export const createMovementDatatable = async () => {
             buttons: [
                 buildExcelButton({
                     filename: formatFileName('reporte_movimientos'),
-                    request: () => exportMovementReport(buildTableExportParams(table, filters.getValues()))
+                    request: ({ monthlyReport = false } = {}) => exportMovementReport(buildTableExportParams(table, {
+                        ...filters.getValues(),
+                        monthlyReport
+                    }))
                 })
             ]
         }

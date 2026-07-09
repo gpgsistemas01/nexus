@@ -141,6 +141,7 @@ export const createProductDatatable = (context) => {
                 }] : []),
                 buildExcelButton({
                     filename: formatFileName('reporte_inventario_productos'),
+                    allowMonthlyReport: false,
                     request: () => exportWarehouseReport(buildTableExportParams(table))
                 })
             ]

@@ -1,10 +1,11 @@
 import xlsx from 'xlsx';
 import { findMovementReportRows } from "../../../services/inventory/reportService.js";
 import { getDataTableOrder, getDataTableSearch } from "../../../utils/requestQueryUtils.js";
-import { getMexicoMonthYearParts } from "../../../utils/formattersUtils.js";
+import { getMexicoMonthDateRange, getMexicoMonthYearParts } from "../../../utils/formattersUtils.js";
 
 const SHEET_NAME = 'Movimientos';
 const FILENAME = 'informe_movimientos';
+const isMonthlyReportRequest = (query = {}) => query.monthlyReport === 'true' || query.monthlyReport === true;
 
 const getReportFilename = () => {
 
@@ -22,16 +23,19 @@ export const exportMovementReport = async (req, res) => {
         defaultDirection: 'desc'
     });
 
+    const monthlyReport = isMonthlyReportRequest(req.query);
+    const monthDateRange = monthlyReport ? getMexicoMonthDateRange() : {};
+
     const rows = await findMovementReportRows({
-        startDate: req.query.startDate || '',
-        endDate: req.query.endDate || '',
-        search: getDataTableSearch(req.query),
-        movementType: req.query.movementType || '',
-        productId: req.query.productId || '',
-        supplierId: req.query.supplierId || '',
-        goodsIssueId: req.query.goodsIssueId || '',
-        goodsReceiptId: req.query.goodsReceiptId || '',
-        stockAdjustmentId: req.query.stockAdjustmentId || '',
+        startDate: monthlyReport ? monthDateRange.startDate : req.query.startDate || '',
+        endDate: monthlyReport ? monthDateRange.endDate : req.query.endDate || '',
+        search: monthlyReport ? '' : getDataTableSearch(req.query),
+        movementType: monthlyReport ? '' : req.query.movementType || '',
+        productId: monthlyReport ? '' : req.query.productId || '',
+        supplierId: monthlyReport ? '' : req.query.supplierId || '',
+        goodsIssueId: monthlyReport ? '' : req.query.goodsIssueId || '',
+        goodsReceiptId: monthlyReport ? '' : req.query.goodsReceiptId || '',
+        stockAdjustmentId: monthlyReport ? '' : req.query.stockAdjustmentId || '',
         orderBy,
         orderDir
     });

@@ -42,6 +42,27 @@ export const getMexicoMonthYearParts = (dateTime = new Date()) => {
     };
 };
 
+
+export const getMexicoMonthDateRange = (dateTime = new Date()) => {
+
+    const { month, year } = getMexicoMonthYearParts(dateTime);
+    const monthIndex = Number(month) - 1;
+    const firstDay = new Date(Number(year), monthIndex, 1);
+    const lastDay = new Date(Number(year), monthIndex + 1, 0);
+    const formatDate = (date) => [
+        date.getFullYear(),
+        String(date.getMonth() + 1).padStart(2, '0'),
+        String(date.getDate()).padStart(2, '0')
+    ].join('-');
+
+    return {
+        startDate: formatDate(firstDay),
+        endDate: formatDate(lastDay),
+        month,
+        year
+    };
+};
+
 export const cleanSearchTerm = (search) => {
 
   const cleaned = search.trim();

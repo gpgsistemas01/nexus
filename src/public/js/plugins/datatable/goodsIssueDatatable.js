@@ -88,7 +88,10 @@ export const createGoodsIssueDatatable = async (context) => {
                 },
                 buildExcelButton({
                     filename: formatFileName('reporte_salidas'),
-                    request: () => exportGoodsIssueReport(buildTableExportParams(table, filters.getValues()))
+                    request: ({ monthlyReport = false } = {}) => exportGoodsIssueReport(buildTableExportParams(table, {
+                        ...filters.getValues(),
+                        monthlyReport
+                    }))
                 })
             ]
         }

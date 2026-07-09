@@ -1,7 +1,7 @@
 import xlsx from 'xlsx';
 import { findGoodsIssueReportRows, findGoodsReceiptReportRows, findWarehouseReportRows } from "../../../services/warehouse/reportService.js";
 import { getDataTableOrder, getDataTableSearch } from "../../../utils/requestQueryUtils.js";
-import { getMexicoMonthYearParts } from "../../../utils/formattersUtils.js";
+import { getMexicoMonthDateRange, getMexicoMonthYearParts } from "../../../utils/formattersUtils.js";
 
 const SHEET_NAME = 'Inventario';
 const FILENAME = 'reporte_inventario_productos';
@@ -9,6 +9,7 @@ const GOODS_ISSUE_SHEET_NAME = 'Salidas';
 const GOODS_ISSUE_FILENAME = 'reporte_salidas';
 const GOODS_RECEIPT_SHEET_NAME = 'Compras';
 const GOODS_RECEIPT_FILENAME = 'reporte_compras';
+const isMonthlyReportRequest = (query = {}) => query.monthlyReport === 'true' || query.monthlyReport === true;
 
 const getReportFilename = (filename = FILENAME) => {
 
@@ -90,14 +91,17 @@ export const exportGoodsIssueReportExcel = async (req, res) => {
         defaultDirection: 'desc'
     });
 
+    const monthlyReport = isMonthlyReportRequest(req.query);
+    const monthDateRange = monthlyReport ? getMexicoMonthDateRange() : {};
+
     const rows = await findGoodsIssueReportRows({
-        search: getDataTableSearch(req.query),
-        startDate: req.query.startDate || '',
-        endDate: req.query.endDate || '',
-        fulfillmentStatusId: req.query.fulfillmentStatusId || '',
-        clientId: req.query.clientId || '',
-        departmentId: req.query.departmentId || '',
-        profileId: req.query.profileId || '',
+        search: monthlyReport ? '' : getDataTableSearch(req.query),
+        startDate: monthlyReport ? monthDateRange.startDate : req.query.startDate || '',
+        endDate: monthlyReport ? monthDateRange.endDate : req.query.endDate || '',
+        fulfillmentStatusId: monthlyReport ? '' : req.query.fulfillmentStatusId || '',
+        clientId: monthlyReport ? '' : req.query.clientId || '',
+        departmentId: monthlyReport ? '' : req.query.departmentId || '',
+        profileId: monthlyReport ? '' : req.query.profileId || '',
         accesses: req.user?.accesses || [],
         orderBy,
         orderDir
@@ -166,12 +170,15 @@ export const exportGoodsReceiptReportExcel = async (req, res) => {
         defaultDirection: 'desc'
     });
 
+    const monthlyReport = isMonthlyReportRequest(req.query);
+    const monthDateRange = monthlyReport ? getMexicoMonthDateRange() : {};
+
     const rows = await findGoodsReceiptReportRows({
-        search: getDataTableSearch(req.query),
-        startDate: req.query.startDate || '',
-        endDate: req.query.endDate || '',
-        supplierId: req.query.supplierId || '',
-        profileId: req.query.profileId || '',
+        search: monthlyReport ? '' : getDataTableSearch(req.query),
+        startDate: monthlyReport ? monthDateRange.startDate : req.query.startDate || '',
+        endDate: monthlyReport ? monthDateRange.endDate : req.query.endDate || '',
+        supplierId: monthlyReport ? '' : req.query.supplierId || '',
+        profileId: monthlyReport ? '' : req.query.profileId || '',
         orderBy,
         orderDir
     });
