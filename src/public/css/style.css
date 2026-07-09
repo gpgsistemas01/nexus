@@ -1081,8 +1081,27 @@ nav .nav-link, .offcanvas .nav-link {
 }
 
 .app-nav-link__icon {
-  flex: 0 0 1.25rem;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.96);
+  border-radius: 999rem;
+  box-shadow: 0 0.35rem 0.8rem rgba(var(--mdb-primary-rgb), 0.16);
+  color: var(--mdb-primary-active);
+  display: inline-flex;
+  flex: 0 0 2.25rem;
+  font-size: 1rem;
+  height: 2.25rem;
+  justify-content: center;
   text-align: center;
+  transition: background-color 0.2s ease, box-shadow 0.2s ease, color 0.2s ease, transform 0.2s ease;
+  width: 2.25rem;
+}
+
+.app-nav-link--icon:hover .app-nav-link__icon,
+.app-nav-link--icon:focus .app-nav-link__icon,
+.app-nav-link--icon.active .app-nav-link__icon {
+  background-color: rgba(var(--mdb-primary-rgb), 0.12);
+  color: var(--mdb-accent);
+  transform: translateY(-1px);
 }
 
 nav .nav-link::after, .offcanvas .nav-link::after {
