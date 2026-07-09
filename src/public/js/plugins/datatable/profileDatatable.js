@@ -1,6 +1,9 @@
 import { getAllProfiles } from "../../application/admin/profiles.js";
+import { exportProfileReport } from "../../application/admin/report.js";
 import { openProfileModal } from "../../pages/admin/profilesPage.js";
 import { createDataTable, renderActionButtons } from "./baseDatatable.js";
+import { buildExcelButton, buildTableExportParams } from "../../ui/tableUI.js";
+import { formatFileName } from "../../utils/formatters.js";
 import { getResponsiveRowData } from "./utils/responsive.js";
 import { setupTableFilters } from "./utils/filters/tableFilter.js";
 import { getSelectedDepartmentName } from "../select2/domains/department.js";
@@ -39,6 +42,15 @@ export const createProfilesDatatable = async () => {
                 }
             ],
             buttons: [
+                buildExcelButton({
+                    filename: formatFileName('reporte_perfiles'),
+                    allowMonthlyReport: false,
+                    request: () => exportProfileReport(buildTableExportParams(table, {
+                        includeDepartments: true,
+                        department: getSelectedDepartmentName(),
+                        strictDepartmentFilter: Boolean(filters.getValues().departmentId)
+                    }))
+                }),
                 {
                     text: 'Nuevo perfil',
                     action: () => openProfileModal({ mode: 'create' })

@@ -1,5 +1,6 @@
 import xlsx from 'xlsx';
 import { findGoodsIssueReportRows, findGoodsReceiptReportRows, findWarehouseReportRows } from "../../../services/warehouse/reportService.js";
+import { findAllSuppliers } from "../../../services/warehouse/supplierService.js";
 import { getDataTableOrder, getDataTableSearch } from "../../../utils/requestQueryUtils.js";
 import { getMexicoMonthDateRange, getMexicoMonthYearParts } from "../../../utils/formattersUtils.js";
 
@@ -9,6 +10,8 @@ const GOODS_ISSUE_SHEET_NAME = 'Salidas';
 const GOODS_ISSUE_FILENAME = 'reporte_salidas';
 const GOODS_RECEIPT_SHEET_NAME = 'Compras';
 const GOODS_RECEIPT_FILENAME = 'reporte_compras';
+const SUPPLIER_SHEET_NAME = 'Proveedores';
+const SUPPLIER_FILENAME = 'reporte_proveedores';
 const isMonthlyReportRequest = (query = {}) => query.monthlyReport === 'true' || query.monthlyReport === true;
 
 const getReportFilename = (filename = FILENAME) => {
@@ -228,5 +231,43 @@ export const exportGoodsReceiptReportExcel = async (req, res) => {
         data,
         sheetName: GOODS_RECEIPT_SHEET_NAME,
         filename: GOODS_RECEIPT_FILENAME
+    });
+};
+
+
+export const exportSupplierReportExcel = async (req, res) => {
+
+    const columns = ['tradeName', 'legalName', null];
+    const { orderBy, orderDir } = getDataTableOrder({
+        query: req.query,
+        columns
+    });
+
+    const { data: rows } = await findAllSuppliers({
+        skip: 0,
+        take: 0,
+        search: getDataTableSearch(req.query),
+        orderBy,
+        orderDir
+    });
+
+    const data = [
+        [
+            'Nombre comercial',
+            'Razón social',
+            'Estatus'
+        ],
+        ...rows.map(row => [
+            row.tradeName,
+            row.legalName,
+            row.isActive ? 'Activo' : 'Inactivo'
+        ])
+    ];
+
+    return sendExcelResponse({
+        res,
+        data,
+        sheetName: SUPPLIER_SHEET_NAME,
+        filename: SUPPLIER_FILENAME
     });
 };

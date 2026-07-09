@@ -40,8 +40,7 @@ export const findAllProfiles = async ({
     };
 
     let profiles = await db.profile.findMany({
-        skip,
-        take,
+        ...(take > 0 && { skip, take }),
         where,
         orderBy: {
             [orderBy]: orderDir

@@ -1,6 +1,9 @@
 import { getAllUsers } from '../../application/admin/users.js';
 import { openUserModal } from '../../pages/admin/usersPage.js';
 import { createDataTable } from './baseDatatable.js';
+import { exportUserReport } from '../../application/admin/report.js';
+import { buildExcelButton, buildTableExportParams } from '../../ui/tableUI.js';
+import { formatFileName } from '../../utils/formatters.js';
 import { buildMdbActionButton } from '../mdb/actionButton.js';
 import { getResponsiveRowData } from './utils/responsive.js';
 import { DATATABLE_SELECTORS } from "../../constants/selectors.js";
@@ -42,6 +45,11 @@ export const createUserDatatable = () => {
                 }
             ],
             buttons: [
+                buildExcelButton({
+                    filename: formatFileName('reporte_usuarios'),
+                    allowMonthlyReport: false,
+                    request: () => exportUserReport(buildTableExportParams(table))
+                }),
                 {
                     text: 'Nuevo usuario',
                     action: () => openUserModal({ mode: 'create' })
