@@ -1,18 +1,17 @@
-import xlsx from 'xlsx';
 import { findMovementReportRows } from "../../../services/inventory/reportService.js";
+import { findAllProfiles } from "../../../services/admin/profileService.js";
+import { findAllUsers } from "../../../services/admin/userService.js";
 import { getDataTableOrder, getDataTableSearch } from "../../../utils/requestQueryUtils.js";
-import { getMexicoMonthDateRange, getMexicoMonthYearParts } from "../../../utils/formattersUtils.js";
+import { getMexicoMonthDateRange } from "../../../utils/formattersUtils.js";
+import { sendExcelReport } from "../../../utils/reportExcelUtils.js";
 
 const SHEET_NAME = 'Movimientos';
+const USER_SHEET_NAME = 'Usuarios';
+const PROFILE_SHEET_NAME = 'Perfiles';
 const FILENAME = 'informe_movimientos';
+const USER_FILENAME = 'informe_usuarios';
+const PROFILE_FILENAME = 'informe_perfiles';
 const isMonthlyReportRequest = (query = {}) => query.monthlyReport === 'true' || query.monthlyReport === true;
-
-const getReportFilename = () => {
-
-    const { month, year } = getMexicoMonthYearParts();
-
-    return `${FILENAME}_${year}-${month}`;
-};
 
 export const exportMovementReport = async (req, res) => {
 
@@ -70,14 +69,95 @@ export const exportMovementReport = async (req, res) => {
         ])
     ];
 
-    const workbook = xlsx.utils.book_new();
-    const worksheet = xlsx.utils.aoa_to_sheet(data);
-
-    xlsx.utils.book_append_sheet(workbook, worksheet, SHEET_NAME);
-
-    const excelBuffer = xlsx.write(workbook, { bookType: 'xlsx', type: 'buffer' });
-
-    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-    res.setHeader('Content-Disposition', `attachment; filename="${ getReportFilename() }.xlsx"`);
-    return res.send(excelBuffer);
+    return sendExcelReport({
+        res,
+        data,
+        sheetName: SHEET_NAME,
+        filename: FILENAME,
+        filenameOptions: { separator: '-', order: 'year-month' }
+    });
 }
+
+export const exportUserReport = async (req, res) => {
+
+    const columns = ['name', null, null];
+    const { orderBy, orderDir } = getDataTableOrder({
+        query: req.query,
+        columns
+    });
+
+    const { data: rows } = await findAllUsers({
+        skip: 0,
+        take: 0,
+        search: getDataTableSearch(req.query),
+        orderBy,
+        orderDir
+    });
+
+    const data = [
+        [
+            'Usuario',
+            'Perfil',
+            'Rol',
+            'Área'
+        ],
+        ...rows.map(row => [
+            row.name,
+            row.profile?.fullName || '-',
+            row.roleName || '-',
+            row.departmentName || '-'
+        ])
+    ];
+
+    return sendExcelReport({
+        res,
+        data,
+        sheetName: USER_SHEET_NAME,
+        filename: USER_FILENAME,
+        filenameOptions: { separator: '-', order: 'year-month' }
+    });
+};
+
+export const exportProfileReport = async (req, res) => {
+
+    const rawDepartment = req.query.department ?? req.query['department[]'];
+    const departments = Array.isArray(rawDepartment)
+        ? rawDepartment
+        : rawDepartment
+            ? [rawDepartment]
+            : [];
+    const columns = ['fullName', null, null];
+    const { orderBy, orderDir } = getDataTableOrder({
+        query: req.query,
+        columns
+    });
+
+    const { data: rows } = await findAllProfiles({
+        departments,
+        includeDepartments: true,
+        skip: 0,
+        take: 0,
+        search: getDataTableSearch(req.query),
+        orderBy,
+        orderDir
+    });
+
+    const data = [
+        [
+            'Nombre',
+            'Áreas'
+        ],
+        ...rows.map(row => [
+            row.fullName,
+            row.departments?.map(department => department.name).join(', ') || '-'
+        ])
+    ];
+
+    return sendExcelReport({
+        res,
+        data,
+        sheetName: PROFILE_SHEET_NAME,
+        filename: PROFILE_FILENAME,
+        filenameOptions: { separator: '-', order: 'year-month' }
+    });
+};

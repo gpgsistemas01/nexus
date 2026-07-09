@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 const findAllSupplierProducts = vi.fn();
 const findAllGoodsIssues = vi.fn();
 const findAllGoodsReceipts = vi.fn();
+const findAllSuppliers = vi.fn();
 
 vi.mock('../../../src/services/warehouse/products/supplierProductService.js', () => ({
   findAllSupplierProducts
@@ -16,9 +17,14 @@ vi.mock('../../../src/services/warehouse/goodsReceipts/goodsReceiptService.js', 
   findAllGoodsReceipts
 }));
 
+vi.mock('../../../src/services/warehouse/supplierService.js', () => ({
+  findAllSuppliers
+}));
+
 const {
   findGoodsIssueReportRows,
   findGoodsReceiptReportRows,
+  findSupplierReportRows,
   findWarehouseReportRows
 } = await import('../../../src/services/warehouse/reportService.js');
 
@@ -170,4 +176,24 @@ describe('warehouse reportService', () => {
 
     expect(findAllGoodsReceipts).toHaveBeenCalledWith(expect.objectContaining({ skip: 0, take: 100000, search: 'REC', supplierId: 'supplier-1' }));
   });
+
+  it('obtiene reporte de proveedores desde el servicio base de proveedores', async () => {
+    const suppliers = [
+      { id: 'supplier-1', tradeName: 'Proveedor Uno', legalName: 'Proveedor Uno SA', isActive: true },
+      { id: 'supplier-2', tradeName: 'Proveedor Dos', legalName: 'Proveedor Dos SA', isActive: false }
+    ];
+
+    findAllSuppliers.mockResolvedValue({ data: suppliers });
+
+    await expect(findSupplierReportRows({ search: 'Proveedor', orderBy: 'legalName', orderDir: 'desc' })).resolves.toEqual(suppliers);
+
+    expect(findAllSuppliers).toHaveBeenCalledWith({
+      skip: 0,
+      take: 0,
+      search: 'Proveedor',
+      orderBy: 'legalName',
+      orderDir: 'desc'
+    });
+  });
+
 });

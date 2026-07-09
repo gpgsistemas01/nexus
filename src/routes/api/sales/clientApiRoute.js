@@ -42,6 +42,7 @@ router.get(
     getAllClients
 );
 
+
 router.post(
     '/',
     verifyApiTokenRequired,

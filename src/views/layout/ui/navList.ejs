@@ -16,7 +16,7 @@ const canSeePurchases = hasAccess({
 const canSeeAll = isAdmin;
 const canSeeOnlyProducts = !canSeeAll && isSalesOrDesign;
 
-const shouldShowIcons = typeof showIcons !== 'undefined' ? showIcons : false;
+const shouldShowIcons = typeof showIcons !== 'undefined' ? showIcons : true;
 
 const items = [
     {
@@ -99,7 +99,9 @@ const items = [
                 <%= item.isActive ? 'aria-current="page"' : '' %>
             >
                 <% if (shouldShowIcons && item.icon) { %>
-                    <i class="<%= item.icon %> app-nav-link__icon" aria-hidden="true"></i>
+                    <span class="app-nav-link__icon" aria-hidden="true">
+                        <i class="<%= item.icon %>"></i>
+                    </span>
                 <% } %>
                 <span><%- item.content %></span>
             </a>

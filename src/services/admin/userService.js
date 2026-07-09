@@ -29,8 +29,7 @@ export const findAllUsers = async ({
         const db = getDb();
 
         const users = await db.user.findMany({
-            skip,
-            take,
+            ...(take > 0 && { skip, take }),
             where,
             orderBy: {
                 [orderBy]: orderDir

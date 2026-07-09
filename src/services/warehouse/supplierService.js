@@ -53,8 +53,7 @@ export const findAllSuppliers = async ({
         : {};
 
     const suppliers = await db.supplier.findMany({
-        skip,
-        take,
+        ...(take > 0 && { skip, take }),
         where,
         orderBy: {
             [orderBy]: orderDir
