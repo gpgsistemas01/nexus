@@ -1,12 +1,13 @@
 import { getSelectedOptionText } from "../../../utils/domUtils.js";
 import { resolveAdvisorDepartmentByClientName, resolveProjectNumberByClientAndDepartment } from "../../../application/warehouse/goodsIssues/goodsIssueRules.js";
 import { PRODUCT_SELECT_RESULTS_LIMIT } from "../../../application/warehouse/products.js";
-import { bindDependency, bindDisabledSelectDependency } from "../baseSelect.js";
+import { bindDisabledSelectDependency } from "../baseSelect.js";
 import { setupClientSelect, toggleClientOption } from "../domains/client.js";
 import { initDepartmentSelect, toggleDepartmentOption } from "../domains/department.js";
 import { setupProductSelect, toggleProductOption } from "../domains/product.js";
 import { initProfileSelect, toggleProfileOption } from "../domains/profile.js";
 import { initMdbWrapperInput, updateMdbWrapperInput } from "../../mdb/baseInstance.js";
+import { toggleDisabledElement } from "../../../utils/formUtils.js";
 import { FORM_SELECTORS, MODAL_SELECTORS } from "../../../constants/selectors.js";
 
 const modalSelector = MODAL_SELECTORS.GOODS_ISSUE;
@@ -21,6 +22,25 @@ const clientScopedSelector = `${ modalSelector } ${ clientSelector }`;
 const departmentScopedSelector = `${ modalSelector } ${ departmentSelector }`;
 const advisorScopedSelector = `${ modalSelector } ${ advisorSelector }`;
 const productScopedSelector = `${ modalSelector } ${ productSelector }`;
+const modeEdit = 'edit';
+const dependentSelects = [
+    { sourceSelector: departmentScopedSelector, targetSelector: requesterScopedSelector },
+    { sourceSelector: clientScopedSelector, targetSelector: advisorScopedSelector }
+];
+
+const canEnableDependentSelects = () => document.querySelector(FORM_SELECTORS.GOODS_ISSUE)?.dataset.mode === modeEdit;
+
+export const syncGoodsIssueDependentSelectsState = () => {
+
+    dependentSelects.forEach(({ sourceSelector, targetSelector }) => {
+        const sourceValue = $(sourceSelector).val();
+
+        toggleDisabledElement({
+            element: document.querySelector(targetSelector),
+            isDisabled: !canEnableDependentSelects() || !sourceValue
+        });
+    });
+};
 
 export const initGoodsIssueFormSelect2 = () => {
 
@@ -100,15 +120,15 @@ export const initGoodsIssueFormSelect2 = () => {
 
             $(requesterScopedSelector).val(null).trigger('change');
         },
+        isDisabled: (value) => !canEnableDependentSelects() || !value,
         disabledMessage: 'Seleccione un área antes de buscar solicitante.',
         onChange: () => syncInternalClientProjectNumber()
     });
 
-    bindDependency({
+    bindDisabledSelectDependency({
         sourceSelector: clientScopedSelector,
-        onChange: () => {
-            syncInternalClientProjectNumber();
-
+        targetSelector: advisorScopedSelector,
+        clearTarget: () => {
             toggleProfileOption({
                 selector: advisorScopedSelector,
                 id: null,
@@ -116,7 +136,10 @@ export const initGoodsIssueFormSelect2 = () => {
             });
 
             $(advisorScopedSelector).val(null).trigger('change');
-        }
+        },
+        isDisabled: (value) => !canEnableDependentSelects() || !value,
+        disabledMessage: 'Seleccione un cliente antes de buscar asesor.',
+        onChange: () => syncInternalClientProjectNumber()
     });
 
     // bindChangeResetSelect({
