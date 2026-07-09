@@ -40,17 +40,6 @@ const adjustDataTableColumns = (table) => {
     if (typeof table?.responsive?.recalc === 'function') table.responsive.recalc();
 };
 
-const initDataTableMdbInputs = (tableNode) => {
-
-    if (!tableNode || !globalThis.mdb?.Input) return;
-
-    tableNode.querySelectorAll('[data-mdb-input-init]').forEach((wrapper) => {
-        const instance = globalThis.mdb.Input.getOrCreateInstance(wrapper);
-
-        instance.update();
-    });
-};
-
 const initDataTableMdbComponents = (table) => {
 
     const tableNode = table?.table?.().node?.();
@@ -58,7 +47,6 @@ const initDataTableMdbComponents = (table) => {
     if (!tableNode) return;
 
     initMdbTooltips(tableNode);
-    initDataTableMdbInputs(tableNode);
 };
 
 export const createDataTable = ({ selector = DATATABLE_SELECTORS.MAIN, options = {} }) => {
