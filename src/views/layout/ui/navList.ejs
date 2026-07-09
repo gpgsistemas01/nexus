@@ -16,7 +16,7 @@ const canSeePurchases = hasAccess({
 const canSeeAll = isAdmin;
 const canSeeOnlyProducts = !canSeeAll && isSalesOrDesign;
 
-const shouldShowIcons = typeof showIcons !== 'undefined' ? showIcons : false;
+const shouldShowIcons = typeof showIcons !== 'undefined' ? showIcons : true;
 
 const items = [
     {
