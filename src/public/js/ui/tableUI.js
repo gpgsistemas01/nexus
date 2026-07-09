@@ -61,7 +61,7 @@ export const buildExcelButton = ({
                         title: 'report-export-title',
                         htmlContainer: 'report-export-content',
                         confirmButton: 'btn btn-primary',
-                        cancelButton: 'btn btn-outline-primary ms-2'
+                        cancelButton: 'btn btn-outline-primary report-export-cancel-button ms-2'
                     },
                     preConfirm: () => document.querySelector('input[name="reportType"]:checked')?.value || 'custom'
                 });
