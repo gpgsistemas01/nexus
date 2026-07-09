@@ -9,6 +9,11 @@ const reportPermissions = {
     departments: ['ALMACÉN Y PROVEDURÍA', 'SISTEMAS']
 };
 
+const supplierReportPermissions = {
+    ...reportPermissions,
+    departments: ['SISTEMAS']
+};
+
 router.get(
     '/inventory/excel', 
     verifyApiTokenRequired, 
@@ -33,7 +38,7 @@ router.get(
 router.get(
     '/suppliers/excel',
     verifyApiTokenRequired,
-    authorizeUserApi(reportPermissions),
+    authorizeUserApi(supplierReportPermissions),
     exportSupplierReportExcel
 );
 
