@@ -25,3 +25,8 @@ export const editProductStockRequest = ({ data, id }) => apiRequest({
     url: `${ PRODUCTS_API_ROUTE }/${ id }/stock`,
     data
 });
+
+export const deleteProductRequest = ({ id }) => apiRequest({
+    method: 'delete',
+    url: `${ PRODUCTS_API_ROUTE }/${ id }`
+});

@@ -1,11 +1,20 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { ProductNotFound, ProductStockAdjustmentDatabaseError } from '../../../../src/errors/warehouse/productError.js';
+import { ProductDeleteRelationConflict, ProductNotFound, ProductStockAdjustmentDatabaseError } from '../../../../src/errors/warehouse/productError.js';
 
 const createStockAdjustment = vi.fn();
 const findAllSupplierProducts = vi.fn();
 const productFindMany = vi.fn();
 const productFindUnique = vi.fn();
+const transaction = vi.fn();
+const goodsReceiptDetailCount = vi.fn();
+const goodsIssueDetailCount = vi.fn();
+const purchaseRequisitionDetailCount = vi.fn();
+const movementDetailCount = vi.fn();
+const stockAdjustmentDetailCount = vi.fn();
+const wasteCount = vi.fn();
+const supplierProductDeleteMany = vi.fn();
+const productDelete = vi.fn();
 
 vi.mock('../../../../src/utils/logger.js', () => ({
   createServiceLogger: () => ({}),
@@ -16,10 +25,19 @@ vi.mock('../../../../src/utils/logger.js', () => ({
 
 vi.mock('../../../../src/repository/baseRepository.js', () => ({
   getDb: () => ({
+    $transaction: transaction,
     product: {
       findMany: productFindMany,
-      findUnique: productFindUnique
-    }
+      findUnique: productFindUnique,
+      delete: productDelete
+    },
+    goodsReceiptDetail: { count: goodsReceiptDetailCount },
+    goodsIssueDetail: { count: goodsIssueDetailCount },
+    purchaseRequisitionDetail: { count: purchaseRequisitionDetailCount },
+    movementDetail: { count: movementDetailCount },
+    stockAdjustmentDetail: { count: stockAdjustmentDetailCount },
+    waste: { count: wasteCount },
+    supplierProduct: { deleteMany: supplierProductDeleteMany }
   })
 }));
 
@@ -43,11 +61,21 @@ vi.mock('../../../../src/services/warehouse/products/supplierProductService.js',
   recalculateConvertedQuantityByProduct: vi.fn()
 }));
 
-const { existsProduct, findAllProducts, findProductsSnapshot, updateProductStock } = await import('../../../../src/services/warehouse/products/productService.js');
+const { deleteProduct, existsProduct, findAllProducts, findProductsSnapshot, updateProductStock } = await import('../../../../src/services/warehouse/products/productService.js');
 
 describe('productService submit operations', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    transaction.mockImplementation((callback) => callback({
+      product: { findUnique: productFindUnique, delete: productDelete },
+      goodsReceiptDetail: { count: goodsReceiptDetailCount },
+      goodsIssueDetail: { count: goodsIssueDetailCount },
+      purchaseRequisitionDetail: { count: purchaseRequisitionDetailCount },
+      movementDetail: { count: movementDetailCount },
+      stockAdjustmentDetail: { count: stockAdjustmentDetailCount },
+      waste: { count: wasteCount },
+      supplierProduct: { deleteMany: supplierProductDeleteMany }
+    }));
   });
 
   it('delega el listado GET a supplierProductService con filtros', async () => {
@@ -95,6 +123,43 @@ describe('productService submit operations', () => {
     productFindUnique.mockResolvedValue(null);
 
     await expect(existsProduct({ id: 'missing-product' })).rejects.toThrow(ProductNotFound);
+  });
+
+
+
+  it('elimina el producto y sus relaciones con proveedores cuando no tiene vínculos operativos', async () => {
+    const deleted = { id: 'product-1' };
+
+    productFindUnique.mockResolvedValue({ id: 'product-1' });
+    goodsReceiptDetailCount.mockResolvedValue(0);
+    goodsIssueDetailCount.mockResolvedValue(0);
+    purchaseRequisitionDetailCount.mockResolvedValue(0);
+    movementDetailCount.mockResolvedValue(0);
+    stockAdjustmentDetailCount.mockResolvedValue(0);
+    wasteCount.mockResolvedValue(0);
+    supplierProductDeleteMany.mockResolvedValue({ count: 1 });
+    productDelete.mockResolvedValue(deleted);
+
+    await expect(deleteProduct('product-1')).resolves.toEqual(deleted);
+    expect(supplierProductDeleteMany).toHaveBeenCalledWith({ where: { productId: 'product-1' } });
+    expect(productDelete).toHaveBeenCalledWith({
+      where: { id: 'product-1' },
+      select: { id: true }
+    });
+  });
+
+  it('bloquea la eliminación si el producto tiene compras o salidas relacionadas', async () => {
+    productFindUnique.mockResolvedValue({ id: 'product-1' });
+    goodsReceiptDetailCount.mockResolvedValue(1);
+    goodsIssueDetailCount.mockResolvedValue(0);
+    purchaseRequisitionDetailCount.mockResolvedValue(0);
+    movementDetailCount.mockResolvedValue(0);
+    stockAdjustmentDetailCount.mockResolvedValue(0);
+    wasteCount.mockResolvedValue(0);
+
+    await expect(deleteProduct('product-1')).rejects.toThrow(ProductDeleteRelationConflict);
+    expect(supplierProductDeleteMany).not.toHaveBeenCalled();
+    expect(productDelete).not.toHaveBeenCalled();
   });
 
   it('delega el submit de ajuste de stock a createStockAdjustment', async () => {

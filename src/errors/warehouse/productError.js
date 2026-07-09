@@ -50,6 +50,20 @@ export class ProductUpdateDatabaseError extends AppError {
     }
 }
 
+export class ProductDeleteDatabaseError extends AppError {
+
+    constructor () {
+        super('Error de base de datos al eliminar el producto', 'PRODUCT_DELETE_DB_ERROR', 500);
+    }
+}
+
+export class ProductDeleteRelationConflict extends AppError {
+
+    constructor () {
+        super('No se puede eliminar el producto porque está vinculado a una compra, salida u otro movimiento de almacén.', 'PRODUCT_DELETE_RELATION_CONFLICT', 409);
+    }
+}
+
 export class ProductStockAdjustmentDatabaseError extends AppError {
 
     constructor () {

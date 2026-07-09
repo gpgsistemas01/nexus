@@ -2,13 +2,14 @@ import { openProductModal, openStockAdjustmentModal } from "../../modules/produc
 import { createDataTable, renderActionButtons } from "./baseDatatable.js";
 import { notifications } from "../swal/swalComponent.js";
 import { hasPermission } from "../../utils/permissions.js";
-import { getAllProducts } from "../../application/warehouse/products.js";
+import { deleteProduct, getAllProducts } from "../../application/warehouse/products.js";
 import { renderMaterialName } from "./utils/renderProductDatatable.js";
 import { configureResponsiveHeaderGroups, getResponsiveRowData } from "./utils/responsive.js";
 import { buildExcelButton, buildTableExportParams } from "../../ui/tableUI.js";
 import { exportWarehouseReport } from "../../application/warehouse/report.js";
 import { formatFileName } from "../../utils/formatters.js";
 import { DATATABLE_SELECTORS } from "../../constants/selectors.js";
+import { handleApiError } from "../../api/errorHandler.js";
 
 const selectorTable = DATATABLE_SELECTORS.MAIN;
 let lastLowStockNotification = '';
@@ -57,6 +58,7 @@ export const createProductDatatable = (context) => {
     const isWarehouseProductManager = isWarehouse && (hasRole('Almacenista') || hasRole('Coordinador') || hasRole('Auxiliar'));
     const canSeeCost = isWarehouse || isSystem || isSales;
     const canManageProducts = isAdmin || isWarehouseProductManager;
+    const canDeleteProducts = isSystem || isWarehouse;
     const canCreateProductsFromModule = isSystem && isAdmin;
     const canAdjustStock = isSystem && isAdmin;
 
@@ -88,7 +90,8 @@ export const createProductDatatable = (context) => {
             render: () => renderActionButtons({
                 status: 'Abierta',
                 context: 'product',
-                canAdjustStock
+                canAdjustStock,
+                canDeleteProduct: canDeleteProducts
             })
         });
     }
@@ -163,6 +166,32 @@ export const createProductDatatable = (context) => {
         const data = getResponsiveRowData(table, this);
 
         openStockAdjustmentModal({ mode: 'edit-stock', data });
+    });
+
+    $(`${ selectorTable } tbody`).on('click', '.btn-delete-product', async function() {
+
+        const data = getResponsiveRowData(table, this);
+
+        const result = await Swal.fire({
+            title: '¿Eliminar producto?',
+            text: 'Se eliminará la relación del producto con el proveedor y el producto. El proveedor no se eliminará.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Eliminar',
+            cancelButtonText: 'Cancelar',
+            confirmButtonColor: '#dc3545'
+        });
+
+        if (!result.isConfirmed) return;
+
+        try {
+            const response = await deleteProduct(data.id);
+
+            notifications.showSuccess(response.message || '¡Producto eliminado exitosamente!');
+            table.ajax.reload(null, false);
+        } catch (err) {
+            handleApiError({ err, rethrow: false });
+        }
     });
 
 }
