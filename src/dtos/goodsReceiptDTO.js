@@ -21,7 +21,6 @@ export const createGoodsReceiptDtoForEdit = (body = {}) => {
     const isInvoiced = Object.prototype.hasOwnProperty.call(body, 'isInvoiced') ? Boolean(body.isInvoiced) : null;
 
     return {
-        supplierId: body.supplierId.trim(),
         receivedById: body.receivedById.trim(),
         isInvoiced: Boolean(isInvoiced),
         ...(isInvoiced ? { invoice: body.invoice.trim() } : { invoice: null }),
