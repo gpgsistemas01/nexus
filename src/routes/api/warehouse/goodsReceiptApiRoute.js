@@ -5,9 +5,10 @@ import {
     editGoodsReceiptHeader,
     getAllGoodsReceipts,
     registerGoodsReceipt,
-    returnGoodsReceipt
+    returnGoodsReceipt,
+    correctGoodsReceiptDetail
 } from '../../../controllers/api/warehouse/goodsReceiptController.js';
-import { goodsReceiptHeaderValidation, goodsReceiptReturnValidation, goodsReceiptValidation } from '../../../validators/forms/goodsReceiptValidations.js';
+import { goodsReceiptCorrectionValidation, goodsReceiptHeaderValidation, goodsReceiptReturnValidation, goodsReceiptValidation } from '../../../validators/forms/goodsReceiptValidations.js';
 
 const router = express.Router();
 const goodsReceiptPermissions = {
@@ -42,6 +43,16 @@ router.patch(
     validate,
     authorizeUserApi(goodsReceiptPermissions),
     editGoodsReceiptHeader
+);
+
+
+router.patch(
+    '/:id/corrections',
+    verifyApiTokenRequired,
+    goodsReceiptCorrectionValidation,
+    validate,
+    authorizeUserApi(goodsReceiptPermissions),
+    correctGoodsReceiptDetail
 );
 
 router.patch(

@@ -18,6 +18,7 @@ import {
     RETURN_MODE
 } from "./returns/returnFormHelpers.js";
 import { configureReturnModal } from "./returns/returnModalHelpers.js";
+import { createGoodsReceiptCorrectionHandlers } from "./goodsReceipts/correctionFormHelpers.js";
 
 const modalId = MODAL_SELECTORS.GOODS_RECEIPT;
 const formId = FORM_SELECTORS.GOODS_RECEIPT;
@@ -53,6 +54,13 @@ const returnForm = createReturnFormHandlers({
     returnUpdate: returnGoodsReceipt,
     emptyMessage: 'Debe seleccionar al menos un material a devolver'
 });
+
+const correctionForm = createGoodsReceiptCorrectionHandlers({
+    details,
+    parentModalSelector: modalId
+});
+
+correctionForm.bindEvents();
 
 document.querySelector(modalId).addEventListener(GOODS_RECEIPT_SUPPLIER_CHANGED_EVENT, () => {
     details.length = 0;
@@ -125,6 +133,7 @@ export const openGoodsReceiptModal = ({ mode, data = null }) => {
     let value;
 
     initForm({ form, mode, id: data?.id || '' });
+    correctionForm.setReceipt(data);
     clearFormErrors(form);
     setFormReadOnly({ form, isReadOnly: false });
     toggleDisabledElement({

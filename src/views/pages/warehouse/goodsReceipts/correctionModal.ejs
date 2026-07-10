@@ -1,0 +1,129 @@
+<% const correction = {
+    hiddenDetailInput: {
+        id: 'correctionDetailIdInput',
+        name: 'detailId',
+        value: ''
+    },
+    hiddenSupplierInput: {
+        id: 'correctionSupplierInput',
+        name: 'correctionSupplierId',
+        value: ''
+    },
+    productSelect: {
+        id: 'correctionProductInput',
+        name: 'productId',
+        class: 'product-select'
+    },
+    quantityInput: {
+        id: 'correctionQuantityInput',
+        name: 'quantity',
+        type: 'number',
+        label: 'Stock correcto',
+        attrs: {
+            min: '0.01',
+            step: '0.01'
+        }
+    },
+    costInput: {
+        id: 'correctionCostPerUnitInput',
+        name: 'costPerUnitType',
+        type: 'number',
+        label: 'Costo por presentación correcto',
+        attrs: {
+            min: '0.01',
+            step: 'any'
+        }
+    },
+    reasonSelect: {
+        id: 'correctionReasonInput',
+        name: 'reasonId',
+        class: ''
+    },
+    observations: {
+        id: 'correctionObservationsInput',
+        name: 'observations',
+        label: 'Observaciones'
+    },
+    confirmInput: {
+        id: 'correctionConfirmInput',
+        name: 'confirmCorrection',
+        type: 'checkbox',
+        label: 'Entiendo que esta corrección crea un nuevo registro de ajuste y conserva la trazabilidad del movimiento original.'
+    },
+    cancelButton: {
+        id: 'cancelGoodsReceiptCorrectionBtn',
+        class: 'btn btn-secondary',
+        content: 'Cancelar',
+        attrs: {
+            'data-mdb-dismiss': 'modal',
+            'data-bs-dismiss': 'modal'
+        }
+    },
+    submitButton: {
+        id: 'confirmGoodsReceiptCorrectionBtn',
+        type: 'submit',
+        class: 'btn btn-primary',
+        content: 'Confirmar corrección'
+    }
+}; %>
+
+<div class="modal fade" id="goodsReceiptCorrectionModal" tabindex="-1" aria-labelledby="goodsReceiptCorrectionModalTitle" aria-hidden="true">
+  <div class="modal-dialog modal-xl modal-dialog-scrollable">
+    <form id="goodsReceiptCorrectionForm" class="modal-content" novalidate>
+      <div class="modal-header">
+        <h5 class="modal-title" id="goodsReceiptCorrectionModalTitle">Corregir línea de compra</h5>
+        <button type="button" class="btn-close" data-mdb-dismiss="modal" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body">
+        <%- include('../../../shared/hiddenInput', { input: correction.hiddenDetailInput }) %>
+        <%- include('../../../shared/hiddenInput', { input: correction.hiddenSupplierInput }) %>
+        <div class="alert alert-warning mb-3">
+          Esta acción genera ajustes compensatorios de inventario y costo. No se registrará como devolución al proveedor.
+        </div>
+        <div class="row g-3">
+          <div class="col-12 col-lg-6">
+            <h6>Datos registrados</h6>
+            <div class="table-responsive">
+              <table class="table table-sm table-bordered mb-0">
+                <tbody id="correctionCurrentDataBody"></tbody>
+              </table>
+            </div>
+          </div>
+          <div class="col-12 col-lg-6">
+            <h6>Datos corregidos</h6>
+            <div class="row g-3">
+              <div class="col-12">
+                <label class="form-label" for="correctionProductInput">Producto correcto</label>
+                <%- include('../../../shared/select', { input: correction.productSelect }) %>
+              </div>
+              <div class="col-6">
+                <%- include('../../../shared/outlineInput', { input: correction.quantityInput }) %>
+              </div>
+              <div class="col-6">
+                <%- include('../../../shared/outlineInput', { input: correction.costInput }) %>
+              </div>
+              <div class="col-12">
+                <label class="form-label" for="correctionReasonInput">Razón de corrección</label>
+                <%- include('../../../shared/select', { input: correction.reasonSelect }) %>
+              </div>
+              <div class="col-12">
+                <%- include('../../../shared/textarea', { input: correction.observations }) %>
+              </div>
+            </div>
+          </div>
+          <div class="col-12">
+            <h6>Impacto estimado</h6>
+            <div id="correctionImpactContainer" class="table-responsive"></div>
+          </div>
+          <div class="col-12 form-check ms-2">
+            <%- include('../../../shared/checkbox', { input: correction.confirmInput }) %>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <%- include('../../../shared/button', { button: correction.cancelButton }) %>
+        <%- include('../../../shared/button', { button: correction.submitButton }) %>
+      </div>
+    </form>
+  </div>
+</div>

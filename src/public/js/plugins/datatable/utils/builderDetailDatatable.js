@@ -102,6 +102,10 @@ export const buildDetailsHeader = ({ type, mode, isWarehouse, isCoordinator, isS
         `;
     }
 
+    if (type === 'receipt' && ['edit', 'view'].includes(mode)) {
+        extraHeaders += `<th rowspan="2">Corrección</th>`;
+    }
+
     if (shouldShowActionsColumn({ type, mode })) {
         extraHeaders += `<th rowspan="2">Acciones</th>`;
     }
@@ -249,6 +253,25 @@ export const buildDetailsColumns = ({ type, mode, render, isWarehouse, isCoordin
                     >
                 `;
             }
+        });
+    }
+
+    if (type === 'receipt' && ['edit', 'view'].includes(mode)) {
+        columns.push({
+            data: null,
+            title: 'Corrección',
+            orderable: false,
+            searchable: false,
+            render: (_, __, row) => `
+                <button
+                    type="button"
+                    class="btn btn-info btn-sm correct-detail-btn"
+                    data-id="${ row.id }"
+                    title="Corregir producto/costo"
+                >
+                    <i class="fa-solid fa-pen-to-square"></i>
+                </button>
+            `
         });
     }
 

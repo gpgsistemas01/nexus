@@ -1,4 +1,5 @@
-import { AdjustmentStatus, StockAdjustmentType } from "../../../generated/prisma/enums.ts";
+const AdjustmentStatus = Object.freeze({ APPLIED: 'APPLIED' });
+const StockAdjustmentType = Object.freeze({ INCREASE: 'INCREASE', DECREASE: 'DECREASE' });
 import { getDb } from "../../repository/baseRepository.js";
 import { generateYearlyReferenceNumber } from "../document/referenceNumberService.js";
 import { normalizeDecimal, toNumber } from "../../utils/formattersUtils.js";
