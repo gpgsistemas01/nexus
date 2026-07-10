@@ -65,6 +65,13 @@ export const toggleDisabledElement = ({ element, isDisabled }) => {
         element.disabled = isDisabled;
     }
 
+    const flatpickrAltInput = element._flatpickr?.altInput;
+
+    if (flatpickrAltInput) {
+        flatpickrAltInput.disabled = isDisabled;
+        flatpickrAltInput.classList.toggle('disabled', isDisabled);
+    }
+
     if (
         typeof window !== 'undefined'
         && window.$
