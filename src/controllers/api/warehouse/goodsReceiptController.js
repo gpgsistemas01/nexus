@@ -100,6 +100,7 @@ export const correctGoodsReceiptDetail = async (req, res) => {
 
     const correction = await correctGoodsReceiptDetailLine({
         id: req.params.id,
+        detailId: req.params.detailId,
         correctionDto: sanitizeEmptyStrings(req.body),
         userId: req.user.id
     });

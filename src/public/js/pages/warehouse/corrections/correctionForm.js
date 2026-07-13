@@ -44,8 +44,8 @@ export const initGoodsReceiptCorrectionForm = () => {
 
             const response = await correctGoodsReceiptDetail({
                 id: form.dataset.id,
+                detailId: form.dataset.detailId,
                 formData: {
-                    detailId: form.dataset.detailId,
                     productId: formData.productId,
                     quantity: formData.quantity,
                     costPerUnitType: formData.costPerUnitType,
