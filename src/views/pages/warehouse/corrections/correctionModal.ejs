@@ -2,7 +2,7 @@
     id: 'goodsReceiptCorrectionForm',
     notice: {
         class: 'alert alert-warning mb-0',
-        content: 'Esta acción corrige únicamente el detalle seleccionado. Genera ajustes compensatorios de inventario y costo; no se registrará como devolución al proveedor.'
+        content: 'Corrige el detalle seleccionado y ajusta inventario automáticamente.'
     },
     sections: [
         {
@@ -70,8 +70,7 @@
             ]
         },
         {
-            title: 'Totales estimados del detalle',
-            description: 'Se actualizará solo este detalle y se recalcularán los totales de la compra. Inventario conservará la trazabilidad con ajustes de salida y entrada.',
+            title: 'Resumen de totales',
             groups: [
                 {
                     type: 'inputs',
@@ -110,14 +109,6 @@
                             }
                         }
                     ]
-                },
-                {
-                    type: 'html',
-                    content: `
-                        <div class="alert alert-info mb-0">
-                            Estos valores son solo de referencia para confirmar la corrección antes de guardarla.
-                        </div>
-                    `
                 }
             ]
         }

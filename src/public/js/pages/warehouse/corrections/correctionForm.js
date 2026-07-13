@@ -33,7 +33,7 @@ export const initGoodsReceiptCorrectionForm = () => {
 
             const confirmation = await notifications.showConfirmation({
                 title: '¿Corregir detalle de compra?',
-                text: 'Se actualizará únicamente el detalle seleccionado, se recalcularán los totales de la compra y se generarán ajustes de inventario para conservar la trazabilidad.',
+                text: 'Se guardará la corrección y se ajustará inventario automáticamente.',
                 confirmButtonText: 'Corregir detalle'
             });
 
