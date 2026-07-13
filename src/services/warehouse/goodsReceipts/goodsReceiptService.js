@@ -13,7 +13,7 @@ import { generateYearlyReferenceNumber } from "../../document/referenceNumberSer
 import { findProfileById } from "../../admin/profileService.js";
 import { applyInventoryMovement } from "../../inventory/movementService.js";
 import { findUniqueSupplier } from "../supplierService.js";
-import { buildGoodsReceiptDetails } from "./goodsReceiptHelpers.js";
+import { buildGoodsReceiptDetails, calculateGoodsReceiptTotals } from "./goodsReceiptHelpers.js";
 import { updateProductUnitCostIfHigher } from "../products/supplierProductService.js";
 import { AppError } from "../../../errors/AppError.js";
 import { buildDateRangeFilter } from "../../../utils/requestQueryUtils.js";
@@ -149,16 +149,7 @@ export const createGoodsReceipt = async ({ goodsReceiptDto }) => {
 
         const processedDetails = await buildGoodsReceiptDetails(details);
 
-        const totals = processedDetails.reduce((acc, d) => {
-            acc.totalQuantity += d.quantity;
-            acc.totalNetPurchaseAmount += d.netPurchaseAmount;
-            acc.totalGrossPurchaseAmount += d.grossPurchaseAmount;
-            return acc;
-        }, {
-            totalQuantity: 0,
-            totalNetPurchaseAmount: 0,
-            totalGrossPurchaseAmount: 0
-        });
+        const totals = calculateGoodsReceiptTotals(processedDetails);
 
         const result = await getDb().$transaction(async (tx) => {
 

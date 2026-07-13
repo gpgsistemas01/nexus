@@ -19,6 +19,37 @@ export const buildReturnDetailState = ({
     };
 };
 
+export const replaceDetailsWithReturnState = ({
+    targetDetails,
+    sourceDetails,
+    mapDetail = detail => detail,
+    getBaseQuantity,
+    getPreviousReturnedQuantity = detail => detail.returnedQuantityTotal
+}) => {
+
+    const previousReturnedByDetailId = new Map(targetDetails.map(detail => [detail.id, detail.returnedQuantityTotal]));
+
+    targetDetails.length = 0;
+    targetDetails.push(...sourceDetails.map(detail => {
+        const returnedQuantityTotal = detail.returnedQuantityTotal
+            ?? getPreviousReturnedQuantity(detail)
+            ?? previousReturnedByDetailId.get(detail.id)
+            ?? 0;
+
+        return {
+            ...mapDetail(detail),
+            ...buildReturnDetailState({
+                detail: {
+                    ...detail,
+                    returnedQuantityTotal
+                },
+                baseQuantity: getBaseQuantity(detail),
+                returnedQuantityTotal
+            })
+        };
+    }));
+};
+
 export const createReturnFormHandlers = ({
     details,
     validators,

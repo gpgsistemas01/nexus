@@ -38,3 +38,20 @@ export const showModal = ({
         confirmButtonText: 'Aceptar'
     });
 }
+
+export const showConfirmation = ({
+    title,
+    text,
+    icon = 'warning',
+    confirmButtonText = 'Confirmar',
+    cancelButtonText = 'Cancelar',
+    confirmButtonColor = '#0d6efd'
+}) => Swal.fire({
+    title,
+    text,
+    icon,
+    showCancelButton: true,
+    confirmButtonText,
+    cancelButtonText,
+    confirmButtonColor
+});
