@@ -3,9 +3,9 @@ import { successCodeMessages } from "../../../messages/codeMessages.js";
 import {
     createGoodsReceipt,
     findAllGoodsReceipts,
-    updateGoodsReceiptHeader,
-    correctGoodsReceiptDetailLine
+    updateGoodsReceiptHeader
 } from "../../../services/warehouse/goodsReceipts/goodsReceiptService.js";
+import { correctGoodsReceiptDetailLine } from "../../../services/warehouse/goodsReceipts/goodsReceiptCorrectionService.js";
 import { getDataTableOrder, getDataTablePaging, getDataTableSearch } from "../../../utils/requestQueryUtils.js";
 import {
     createStockNotification,

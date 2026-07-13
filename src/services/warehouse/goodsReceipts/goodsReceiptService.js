@@ -14,11 +14,10 @@ import { findProfileById } from "../../admin/profileService.js";
 import { applyInventoryMovement } from "../../inventory/movementService.js";
 import { findUniqueSupplier } from "../supplierService.js";
 import { buildGoodsReceiptDetails } from "./goodsReceiptHelpers.js";
-import { findSupplierProductByIds, updateProductUnitCostIfHigher } from "../products/supplierProductService.js";
+import { updateProductUnitCostIfHigher } from "../products/supplierProductService.js";
 import { AppError } from "../../../errors/AppError.js";
 import { buildDateRangeFilter } from "../../../utils/requestQueryUtils.js";
 import { findReturnedQuantityTotalsByDetailIds } from "../returns/returnHelpers.js";
-import { createStockAdjustment } from "../adjustmentService.js";
 
 const REFERENCE_NUMBER_TYPE = 'REC';
 const MOVEMENT_TYPE_IN = 'ENTRY';
@@ -297,126 +296,6 @@ export const updateGoodsReceiptHeader = async ({ id, goodsReceiptDto }) => {
         logServiceError(serviceLogger, err, {
             operation: 'warehouse.goodsReceipts.goodsReceiptService.updateGoodsReceiptHeader',
             ...getModelLogContext('goodsReceipt', { id, ...goodsReceiptDto })
-        });
-
-        if (err instanceof AppError) throw err;
-
-        throw new GoodsReceiptUpdateDatabaseError();
-    }
-};
-
-export const correctGoodsReceiptDetailLine = async ({ id, correctionDto, userId }) => {
-
-    try {
-        const { detailId, productId, quantity, costPerUnitType, reasonId, observations } = correctionDto;
-        const db = getDb();
-
-        const currentDetail = await db.goodsReceiptDetail.findFirst({
-            where: {
-                id: detailId,
-                goodsReceiptId: id
-            },
-            include: {
-                goodsReceipt: true
-            }
-        });
-
-        if (!currentDetail) throw new GoodsReceiptNotFound();
-
-        const [correctedDetail] = await buildGoodsReceiptDetails([{ productId, quantity, costPerUnitType }]);
-        const correctionObservations = observations || `Corrección de compra ${ currentDetail.goodsReceipt.referenceNumber }`;
-
-        const result = await db.$transaction(async (tx) => {
-            const adjustments = [];
-            const originalQuantity = Number(currentDetail.quantity);
-            const hasOriginalStockImpact = originalQuantity > 0;
-            const hasCorrectedStockImpact = Number(quantity) > 0;
-
-            if (hasOriginalStockImpact) {
-                const originalProduct = await findSupplierProductByIds({
-                    tx,
-                    productId: currentDetail.productId,
-                    supplierId: currentDetail.goodsReceipt.supplierId
-                });
-
-                adjustments.push(await createStockAdjustment({
-                    tx,
-                    productId: currentDetail.productId,
-                    supplierId: currentDetail.goodsReceipt.supplierId,
-                    reasonId,
-                    observations: `${ correctionObservations } | Reversa de línea registrada: ${ currentDetail.productName }`,
-                    newStock: Number(originalProduct.currentStock) - originalQuantity,
-                    userId,
-                    goodsReceiptId: id,
-                    goodsReceiptDetailId: detailId
-                }));
-            }
-
-            if (hasCorrectedStockImpact) {
-                const correctedProduct = await findSupplierProductByIds({
-                    tx,
-                    productId,
-                    supplierId: currentDetail.goodsReceipt.supplierId
-                });
-
-                adjustments.push(await createStockAdjustment({
-                    tx,
-                    productId,
-                    supplierId: currentDetail.goodsReceipt.supplierId,
-                    reasonId,
-                    observations: `${ correctionObservations } | Ingreso de línea corregida: ${ correctedDetail.productName }`,
-                    newStock: Number(correctedProduct.currentStock) + Number(quantity),
-                    userId,
-                    goodsReceiptId: id,
-                    goodsReceiptDetailId: detailId
-                }));
-            }
-
-            const updatedDetail = await tx.goodsReceiptDetail.update({
-                where: { id: detailId },
-                data: correctedDetail
-            });
-
-            const totals = await tx.goodsReceiptDetail.aggregate({
-                where: { goodsReceiptId: id },
-                _sum: {
-                    quantity: true,
-                    netPurchaseAmount: true,
-                    grossPurchaseAmount: true
-                }
-            });
-
-            const updatedReceipt = await tx.goodsReceipt.update({
-                where: { id },
-                data: {
-                    totalQuantity: totals._sum.quantity || 0,
-                    totalNetPurchaseAmount: totals._sum.netPurchaseAmount || 0,
-                    totalGrossPurchaseAmount: totals._sum.grossPurchaseAmount || 0
-                },
-                include: {
-                    details: true
-                }
-            });
-
-            return {
-                updatedDetail,
-                updatedReceipt,
-                adjustments,
-                costDifference: Number(correctedDetail.netPurchaseAmount) - Number(currentDetail.netPurchaseAmount)
-            };
-        });
-
-        await updateProductUnitCostIfHigher({
-            supplierId: result.updatedReceipt.supplierId,
-            details: [result.updatedDetail]
-        });
-
-        return result;
-
-    } catch (err) {
-        logServiceError(serviceLogger, err, {
-            operation: 'warehouse.goodsReceipts.goodsReceiptService.correctGoodsReceiptDetailLine',
-            ...getModelLogContext('goodsReceipt', { id, ...correctionDto })
         });
 
         if (err instanceof AppError) throw err;
