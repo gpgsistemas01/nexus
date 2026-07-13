@@ -89,7 +89,6 @@ export const validateUUID = (fieldName) => {
         .notEmpty().withMessage(errors.REQUIRED)
         .isUUID('4').withMessage(errors.INVALID_UUID)
 }
-
 export const validateTextOptionalWhen = ({ fieldName, maxLength, predicate }) => {
 
     const errors = errorMap[fieldName];

@@ -47,7 +47,7 @@ router.patch(
 
 
 router.patch(
-    '/:id/corrections',
+    '/:id/details/:detailId/corrections',
     verifyApiTokenRequired,
     goodsReceiptCorrectionValidation,
     validate,

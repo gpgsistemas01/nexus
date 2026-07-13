@@ -28,8 +28,8 @@ export const returnGoodsReceiptRequest = ({ data, id }) => apiRequest({
 });
 
 
-export const correctGoodsReceiptDetailRequest = ({ data, id }) => apiRequest({
+export const correctGoodsReceiptDetailRequest = ({ data, id, detailId }) => apiRequest({
     method: 'patch',
-    url: `${ GOODS_RECEIPTS_API_ROUTE }/${ id }/corrections`,
+    url: `${ GOODS_RECEIPTS_API_ROUTE }/${ id }/details/${ detailId }/corrections`,
     data
 });

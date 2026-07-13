@@ -34,8 +34,8 @@ const buildCorrectionType = ({ productChanged, quantityDifference, costDifferenc
     ].filter(Boolean).join('_AND_')
 );
 
-export const correctGoodsReceiptDetailLine = async ({ id, correctionDto, userId }) => {
-    const { detailId, productId, quantity, costPerUnitType, reasonId, observations } = correctionDto;
+export const correctGoodsReceiptDetailLine = async ({ id, detailId, correctionDto, userId }) => {
+    const { productId, quantity, costPerUnitType, reasonId, observations } = correctionDto;
 
     try {
         const db = getDb();

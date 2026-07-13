@@ -31,9 +31,9 @@ export const returnGoodsReceipt = async ({ formData, id }) => {
 };
 
 
-export const correctGoodsReceiptDetail = async ({ formData, id }) => {
+export const correctGoodsReceiptDetail = async ({ formData, id, detailId }) => {
 
-    const response = await correctGoodsReceiptDetailRequest({ data: formData, id });
+    const response = await correctGoodsReceiptDetailRequest({ data: formData, id, detailId });
 
     return createSuccessResponseFromRequest({
         response,
