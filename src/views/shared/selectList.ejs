@@ -33,6 +33,10 @@ const getSelectColumnClass = col => {
 
 <% inputs.forEach( input => { %>
     <div class="<%= getSelectColumnClass(input.col) %>">
+        <% if (input.label) { %>
+            <%- include('./label', { label: { id: input.id, class: 'form-label', content: input.label } }) %>
+        <% } %>
+
         <%- include('./select', { input }) %>
     </div>
 <% }); %>

@@ -1,3 +1,4 @@
+import { buildMdbActionButton } from "../../mdb/actionButton.js";
 import { bindDisabledControlWarning } from "../../../ui/disabledControlWarning.js";
 
 const DISABLED_PROJECT_QUANTITY_MESSAGE = 'Marque el detalle como surtido para capturar la cantidad de proyecto.';
@@ -100,6 +101,10 @@ export const buildDetailsHeader = ({ type, mode, isWarehouse, isCoordinator, isS
             <th rowspan="2">Cantidad devuelta registrada</th>
             <th rowspan="2">Devolver</th>
         `;
+    }
+
+    if (type === 'receipt' && ['edit', 'view'].includes(mode)) {
+        extraHeaders += `<th rowspan="2">Acciones</th>`;
     }
 
     if (shouldShowActionsColumn({ type, mode })) {
@@ -249,6 +254,25 @@ export const buildDetailsColumns = ({ type, mode, render, isWarehouse, isCoordin
                     >
                 `;
             }
+        });
+    }
+
+    if (type === 'receipt' && ['edit', 'view'].includes(mode)) {
+        columns.push({
+            data: null,
+            title: 'Acciones',
+            orderable: false,
+            searchable: false,
+            render: (_, __, row) => buildMdbActionButton({
+                className: 'correct-detail-btn',
+                colorClass: 'btn-info',
+                iconClass: 'fa-solid fa-pen-to-square',
+                title: 'Corregir detalle',
+                ariaLabel: 'Corregir detalle de compra',
+                htmlAttrs: {
+                    'data-id': row.id
+                }
+            })
         });
     }
 

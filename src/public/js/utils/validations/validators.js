@@ -86,6 +86,15 @@ export const validateGoodsReceiptValidators = {
     details: validateGoodsReceiptDetailsArray
 }
 
+export const validateGoodsReceiptCorrectionValidators = {
+    productId: (value) => isEmptyOrNull(value, 'El producto correcto'),
+    quantity: (value) => validatePositiveNumber(value, 'El stock correcto'),
+    costPerUnitType: (value) => validateNumber(value, 'El costo por presentación correcto', { allowZero: false }),
+    reasonId: (value) => isEmptyOrNull(value, 'La razón de corrección'),
+    observations: (value) => validateTextOptional(value, 500, 'Las observaciones')
+};
+
+
 export const validateGoodsIssueValidators = {
     projectNumber: (value) => validateText({ 
         name: value, 
