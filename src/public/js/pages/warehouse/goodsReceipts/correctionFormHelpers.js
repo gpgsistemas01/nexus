@@ -1,10 +1,13 @@
+import { useForm } from "../../../application/form.js";
 import { correctGoodsReceiptDetail } from "../../../application/warehouse/goodsReceipts.js";
 import { PRODUCT_SELECT_RESULTS_LIMIT } from "../../../application/warehouse/products.js";
-import { handleApiError } from "../../../api/errorHandler.js";
 import { initMdbModal } from "../../../plugins/mdb/baseInstance.js";
 import { initReasonSelect } from "../../../plugins/select2/domains/reason.js";
 import { setupProductSelect, toggleProductOption } from "../../../plugins/select2/domains/product.js";
 import { notifications } from "../../../plugins/swal/swalComponent.js";
+import { normalizeFormErrors, clearFormErrors } from "../../../ui/formUI.js";
+import { validateGoodsReceiptCorrectionValidators } from "../../../utils/validations/validators.js";
+import { validateFields } from "../../../utils/formUtils.js";
 import { reloadMainTable } from "../../../plugins/datatable/baseDatatable.js";
 import { on } from "../../../utils/domUtils.js";
 
@@ -125,7 +128,10 @@ export const createGoodsReceiptCorrectionHandlers = ({ details, parentModalSelec
         const form = getForm();
 
         form.reset();
+        clearFormErrors(form);
         form.dataset.id = receipt.id;
+        form.dataset.submitting = 'false';
+        form.querySelector('button[type="submit"]').disabled = false;
         form.elements.detailId.value = detail.id;
         form.elements.quantity.value = detail.quantity;
         form.elements.costPerUnitType.value = detail.costPerUnitType;
@@ -139,57 +145,65 @@ export const createGoodsReceiptCorrectionHandlers = ({ details, parentModalSelec
         initMdbModal(modal).show();
     };
 
-    const validateStockAvailability = () => {
-        const availableStock = toNumberValue(correctionDetail?.availableReturnQuantity ?? correctionDetail?.quantity);
-        const originalQuantity = toNumberValue(correctionDetail?.quantity);
+    const normalizeCorrectionData = ({ form, formData }) => ({
+        detailId: formData.detailId,
+        productId: formData.productId,
+        quantity: Number(formData.quantity),
+        costPerUnitType: Number(formData.costPerUnitType),
+        reasonId: formData.reasonId,
+        observations: formData.observations,
+        confirmCorrection: formData.confirmCorrection,
+        availableStock: toNumberValue(correctionDetail?.availableReturnQuantity ?? correctionDetail?.quantity),
+        originalQuantity: toNumberValue(correctionDetail?.quantity),
+        receiptId: form.dataset.id
+    });
 
-        if (availableStock >= originalQuantity) return true;
+    const normalizeCorrectionErrors = ({ form, errors }) => {
+        if (errors.stockAvailability) {
+            notifications.showModal({
+                title: 'Corrección no disponible',
+                text: errors.stockAvailability,
+                icon: 'warning'
+            });
+        }
 
-        notifications.showModal({
-            title: 'Corrección no disponible',
-            text: 'El producto registrado ya tuvo movimientos posteriores o devoluciones. Revise el kardex antes de corregirlo.',
-            icon: 'warning'
-        });
+        const { stockAvailability: _ignoredStockAvailability, ...fieldErrors } = errors;
 
-        return false;
+        return normalizeFormErrors({ form, errors: fieldErrors });
     };
 
-    const submitCorrection = async (event) => {
-        event.preventDefault();
+    const submitCorrection = async ({ formData }) => {
+        const response = await correctGoodsReceiptDetail({
+            id: formData.receiptId,
+            formData: {
+                detailId: formData.detailId,
+                productId: formData.productId,
+                quantity: formData.quantity,
+                costPerUnitType: formData.costPerUnitType,
+                reasonId: formData.reasonId,
+                observations: formData.observations
+            }
+        });
 
-        const form = event.currentTarget;
-        const formData = getCorrectionFormData(form);
+        notifications.showSuccess(response.message);
+        initMdbModal(getModal()).hide();
+        initMdbModal(document.querySelector(parentModalSelector)).hide();
+        reloadMainTable();
+    };
 
-        if (!form.elements.confirmCorrection.checked) {
-            notifications.showWarning('Debe confirmar que entiende el impacto de la corrección.');
-            return;
-        }
-
-        if (!validateStockAvailability()) return;
-
-        try {
-            await correctGoodsReceiptDetail({
-                id: form.dataset.id,
-                formData: {
-                    detailId: formData.detailId,
-                    productId: formData.productId,
-                    quantity: Number(formData.quantity),
-                    costPerUnitType: Number(formData.costPerUnitType),
-                    reasonId: formData.reasonId,
-                    observations: formData.observations
-                }
-            });
-
-            notifications.showSuccess('Corrección de compra registrada correctamente.');
-            initMdbModal(getModal()).hide();
-            initMdbModal(document.querySelector(parentModalSelector)).hide();
-            reloadMainTable();
-        } catch (err) {
-            handleApiError({ err, form, rethrow: false });
-        }
+    const bindCorrectionForm = () => {
+        useForm({
+            selector: CORRECTION_FORM_SELECTOR,
+            normalizeData: normalizeCorrectionData,
+            normalizeErrors: normalizeCorrectionErrors,
+            getErrors: ({ formData }) => validateFields(validateGoodsReceiptCorrectionValidators, formData),
+            sendRequest: submitCorrection
+        });
     };
 
     const bindEvents = () => {
+        bindCorrectionForm();
+
         on('click', CORRECTION_DETAIL_BUTTON_SELECTOR, (event, button) => {
             const detail = details.find(item => item.id === button.dataset.id);
             if (!detail || !correctionReceipt) return;
@@ -199,8 +213,6 @@ export const createGoodsReceiptCorrectionHandlers = ({ details, parentModalSelec
 
         on('input', `${ CORRECTION_FORM_SELECTOR } input, ${ CORRECTION_FORM_SELECTOR } textarea`, renderImpact);
         on('change', `${ CORRECTION_FORM_SELECTOR } select, ${ CORRECTION_FORM_SELECTOR } input`, renderImpact);
-
-        document.querySelector(CORRECTION_FORM_SELECTOR)?.addEventListener('submit', submitCorrection);
     };
 
     return {

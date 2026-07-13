@@ -86,6 +86,21 @@ export const validateGoodsReceiptValidators = {
     details: validateGoodsReceiptDetailsArray
 }
 
+export const validateGoodsReceiptCorrectionValidators = {
+    productId: (value) => isEmptyOrNull(value, 'El producto correcto'),
+    quantity: (value) => validatePositiveNumber(value, 'El stock correcto'),
+    costPerUnitType: (value) => validateNumber(value, 'El costo por presentación correcto', { allowZero: false }),
+    reasonId: (value) => isEmptyOrNull(value, 'La razón de corrección'),
+    observations: (value) => validateTextOptional(value, 500, 'Las observaciones'),
+    confirmCorrection: (value) => value ? null : 'Debe confirmar que entiende el impacto de la corrección.',
+    stockAvailability: (_, { availableStock, originalQuantity }) => {
+        if (Number(availableStock) >= Number(originalQuantity)) return null;
+
+        return 'El producto registrado ya tuvo movimientos posteriores o devoluciones. Revise el kardex antes de corregirlo.';
+    }
+};
+
+
 export const validateGoodsIssueValidators = {
     projectNumber: (value) => validateText({ 
         name: value, 
