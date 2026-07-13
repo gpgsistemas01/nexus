@@ -1,4 +1,3 @@
-import { AdjustmentStatus, StockAdjustmentType } from "../../../generated/prisma/enums.ts";
 import { getDb } from "../../repository/baseRepository.js";
 import { generateYearlyReferenceNumber } from "../document/referenceNumberService.js";
 import { normalizeDecimal, toNumber } from "../../utils/formattersUtils.js";
@@ -7,6 +6,9 @@ import { createStockAdjustmentMovement } from "../inventory/movementService.js";
 import { adjustSupplierProductStock, findSupplierProductByIds } from "./products/supplierProductService.js";
 
 const REFERENCE_NUMBER_TYPE = 'AJU';
+const ADJUSTMENT_STATUS_APPLIED = 'APPLIED';
+const STOCK_ADJUSTMENT_TYPE_INCREASE = 'INCREASE';
+const STOCK_ADJUSTMENT_TYPE_DECREASE = 'DECREASE';
 const GOODS_RECEIPT_RETURN_REASON_NAME = 'Devolución de compra';
 const GOODS_ISSUE_RETURN_REASON_NAME = 'Devolución de salida';
 export const StockReturnSource = Object.freeze({
@@ -94,13 +96,14 @@ export const createStockAdjustment = async ({
         const productName = product.name;
         const supplierName = product.supplier?.tradeName || '';
         const isReturnAdjustment = returnedQuantity !== null && returnedQuantity !== undefined;
+        const currentStock = Number(toNumber(product.currentStock) || 0);
         const isGoodsReceiptReturn = returnSource === StockReturnSource.GOODS_RECEIPT;
         const returnSign = isGoodsReceiptReturn ? -1 : 1;
         const returnReasonName = isGoodsReceiptReturn
             ? GOODS_RECEIPT_RETURN_REASON_NAME
             : GOODS_ISSUE_RETURN_REASON_NAME;
         const resolvedNewStock = isReturnAdjustment
-            ? normalizeDecimal(Number(toNumber(product.currentStock) || 0) + (Number(returnedQuantity) * returnSign))
+            ? normalizeDecimal(currentStock + (Number(returnedQuantity) * returnSign))
             : newStock;
 
         const {
@@ -120,15 +123,15 @@ export const createStockAdjustment = async ({
         });
 
         const adjustmentType = difference >= 0
-            ? StockAdjustmentType.INCREASE
-            : StockAdjustmentType.DECREASE;
+            ? STOCK_ADJUSTMENT_TYPE_INCREASE
+            : STOCK_ADJUSTMENT_TYPE_DECREASE;
 
         const adjustment = await transaction.stockAdjustment.create({
             data: {
                 referenceNumber,
                 type: adjustmentType,
                 observations,
-                status: AdjustmentStatus.APPLIED,
+                status: ADJUSTMENT_STATUS_APPLIED,
                 appliedAt: new Date(),
                 reason: {
                     connect: isReturnAdjustment
@@ -202,6 +205,52 @@ export const createStockAdjustment = async ({
     return getDb().$transaction(execute);
 };
 
+export const createStockAdjustmentByQuantityChange = async ({
+    tx = null,
+    productId,
+    supplierId,
+    reasonId,
+    observations,
+    quantityChange,
+    userId,
+    base = null,
+    height = null,
+    goodsIssueId = null,
+    goodsIssueDetailId = null,
+    goodsReceiptId = null,
+    goodsReceiptDetailId = null
+}) => {
+
+    const execute = async (transaction) => {
+        const product = await findSupplierProductByIds({
+            tx: transaction,
+            productId,
+            supplierId
+        });
+        const newStock = normalizeDecimal(Number(toNumber(product.currentStock) || 0) + Number(quantityChange));
+
+        return createStockAdjustment({
+            tx: transaction,
+            productId,
+            supplierId,
+            reasonId,
+            observations,
+            newStock,
+            userId,
+            base,
+            height,
+            goodsIssueId,
+            goodsIssueDetailId,
+            goodsReceiptId,
+            goodsReceiptDetailId
+        });
+    };
+
+    if (tx) return execute(tx);
+
+    return getDb().$transaction(execute);
+};
+
 
 export const createGoodsReceiptReturnStockAdjustment = ({
     tx = null,
@@ -244,3 +293,64 @@ export const createGoodsIssueReturnStockAdjustment = ({
     goodsIssueId,
     goodsIssueDetailId
 });
+
+export const createGoodsReceiptCorrectionAdjustments = async ({
+    tx,
+    currentDetail,
+    correctedDetail,
+    correctionObservations,
+    reasonId,
+    userId,
+    goodsReceiptId,
+    goodsReceiptDetailId
+}) => {
+    const productChanged = currentDetail.productId !== correctedDetail.productId;
+    const quantityDifference = Number(correctedDetail.quantity) - Number(currentDetail.quantity);
+    const quantityChanged = quantityDifference !== 0;
+    const supplierId = currentDetail.goodsReceipt.supplierId;
+    const createCorrectionAdjustment = ({
+        productId,
+        quantityChange,
+        fallbackObservation
+    }) => createStockAdjustmentByQuantityChange({
+        tx,
+        productId,
+        supplierId,
+        reasonId,
+        observations: correctionObservations || fallbackObservation,
+        quantityChange,
+        userId,
+        goodsReceiptId,
+        goodsReceiptDetailId
+    });
+
+    if (!productChanged && !quantityChanged) return [];
+
+    if (!productChanged) {
+        return [await createCorrectionAdjustment({
+            productId: currentDetail.productId,
+            quantityChange: quantityDifference,
+            fallbackObservation: 'Corrección de stock del mismo producto por diferencia de cantidad.'
+        })];
+    }
+
+    const adjustments = [];
+
+    if (Number(currentDetail.quantity) > 0) {
+        adjustments.push(await createCorrectionAdjustment({
+            productId: currentDetail.productId,
+            quantityChange: -Number(currentDetail.quantity),
+            fallbackObservation: 'Cambio de producto en compra: reversa del producto registrado anteriormente.'
+        }));
+    }
+
+    if (Number(correctedDetail.quantity) > 0) {
+        adjustments.push(await createCorrectionAdjustment({
+            productId: correctedDetail.productId,
+            quantityChange: Number(correctedDetail.quantity),
+            fallbackObservation: 'Cambio de producto en compra: entrada del producto corregido.'
+        }));
+    }
+
+    return adjustments;
+};

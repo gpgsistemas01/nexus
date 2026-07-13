@@ -1,0 +1,150 @@
+import { AppError } from '../../../errors/AppError.js';
+import { GoodsIssueInsufficientStock } from '../../../errors/inventory/stockError.js';
+import {
+    GoodsReceiptCorrectionInsufficientStock,
+    GoodsReceiptCorrectionNoChanges,
+    GoodsReceiptNotFound,
+    GoodsReceiptUpdateDatabaseError
+} from '../../../errors/warehouse/goodsReceiptError.js';
+import { getDb } from '../../../repository/baseRepository.js';
+import { createServiceLogger, getModelLogContext, logServiceError } from '../../../utils/logger.js';
+import { createGoodsReceiptCorrectionAdjustments } from '../adjustmentService.js';
+import { updateProductUnitCostIfHigher } from '../products/supplierProductService.js';
+import { buildGoodsReceiptDetails, updateGoodsReceiptDetailAndTotals } from '../goodsReceipts/goodsReceiptHelpers.js';
+
+const serviceLogger = createServiceLogger('warehouse.corrections.goodsReceiptCorrectionService');
+
+const findReceiptDetailForCorrection = ({ tx, goodsReceiptId, detailId }) => (
+    tx.goodsReceiptDetail.findFirst({
+        where: {
+            id: detailId,
+            goodsReceiptId
+        },
+        include: {
+            goodsReceipt: true
+        }
+    })
+);
+
+const buildCorrectionType = ({ productChanged, quantityDifference, costDifference }) => (
+    [
+        productChanged ? 'PRODUCT' : null,
+        quantityDifference !== 0 ? 'QUANTITY' : null,
+        costDifference !== 0 ? 'COST' : null
+    ].filter(Boolean).join('_AND_')
+);
+
+export const correctGoodsReceiptDetailLine = async ({ id, correctionDto, userId }) => {
+    const { detailId, productId, quantity, costPerUnitType, reasonId, observations } = correctionDto;
+
+    try {
+        const db = getDb();
+
+        const result = await db.$transaction(async (tx) => {
+            const currentDetail = await findReceiptDetailForCorrection({
+                tx,
+                goodsReceiptId: id,
+                detailId
+            });
+
+            if (!currentDetail) throw new GoodsReceiptNotFound();
+
+            const [correctedDetail] = await buildGoodsReceiptDetails([{
+                productId,
+                quantity,
+                costPerUnitType
+            }]);
+            const productChanged = currentDetail.productId !== correctedDetail.productId;
+            const quantityDifference = Number(correctedDetail.quantity) - Number(currentDetail.quantity);
+            const costDifference = Number(correctedDetail.costPerUnitType) - Number(currentDetail.costPerUnitType);
+            const hasChanges = productChanged || quantityDifference !== 0 || costDifference !== 0;
+
+            if (!hasChanges) throw new GoodsReceiptCorrectionNoChanges();
+
+            const adjustments = await createGoodsReceiptCorrectionAdjustments({
+                tx,
+                currentDetail,
+                correctedDetail,
+                correctionObservations: observations,
+                reasonId,
+                userId,
+                goodsReceiptId: id,
+                goodsReceiptDetailId: detailId
+            });
+            const { updatedDetail, updatedReceipt } = await updateGoodsReceiptDetailAndTotals({
+                tx,
+                goodsReceiptId: id,
+                detailId,
+                correctedDetail
+            });
+            const adjustmentLinks = adjustments.map(adjustment => ({ stockAdjustmentId: adjustment.id }));
+            const correction = await tx.goodsReceiptCorrection.create({
+                data: {
+                    goodsReceiptId: id,
+                    goodsReceiptDetailId: detailId,
+                    reasonId,
+                    observations,
+
+                    previousProductId: currentDetail.productId,
+                    previousProductName: currentDetail.productName,
+                    previousQuantity: currentDetail.quantity,
+                    previousCostPerUnitType: currentDetail.costPerUnitType,
+                    previousNetPurchaseAmount: currentDetail.netPurchaseAmount,
+                    previousGrossPurchaseAmount: currentDetail.grossPurchaseAmount,
+
+                    correctedProductId: correctedDetail.productId,
+                    correctedProductName: correctedDetail.productName,
+                    correctedQuantity: correctedDetail.quantity,
+                    correctedCostPerUnitType: correctedDetail.costPerUnitType,
+                    correctedNetPurchaseAmount: correctedDetail.netPurchaseAmount,
+                    correctedGrossPurchaseAmount: correctedDetail.grossPurchaseAmount,
+
+                    correctionType: buildCorrectionType({ productChanged, quantityDifference, costDifference }),
+                    productChanged,
+                    quantityDifference,
+                    costDifference,
+                    ...(adjustmentLinks.length ? {
+                        adjustments: {
+                            create: adjustmentLinks
+                        }
+                    } : {})
+                },
+                include: {
+                    adjustments: {
+                        include: {
+                            stockAdjustment: true
+                        }
+                    }
+                }
+            });
+
+            return {
+                updatedDetail,
+                updatedReceipt,
+                correction,
+                adjustments,
+                costDifference: Number(correctedDetail.netPurchaseAmount) - Number(currentDetail.netPurchaseAmount)
+            };
+        });
+
+        await updateProductUnitCostIfHigher({
+            supplierId: result.updatedReceipt.supplierId,
+            details: [result.updatedDetail]
+        });
+
+        return result;
+    } catch (err) {
+        logServiceError(serviceLogger, err, {
+            operation: 'warehouse.corrections.goodsReceiptCorrectionService.correctGoodsReceiptDetailLine',
+            ...getModelLogContext('goodsReceiptCorrection', { id, ...correctionDto })
+        });
+
+        if (err instanceof GoodsIssueInsufficientStock) {
+            throw new GoodsReceiptCorrectionInsufficientStock(err.meta);
+        }
+
+        if (err instanceof AppError) throw err;
+
+        throw new GoodsReceiptUpdateDatabaseError();
+    }
+};

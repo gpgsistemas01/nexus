@@ -60,6 +60,14 @@ export const scrollToFirstFormError = (form) => {
     }
 };
 
+export const resetFormSubmitState = (form) => {
+
+    if (!form) return;
+
+    form.dataset.submitting = 'false';
+    form.querySelector('button[type="submit"]')?.removeAttribute('disabled');
+};
+
 export const initForm = ({
     form, 
     mode, 
@@ -70,8 +78,7 @@ export const initForm = ({
     form.querySelectorAll('.js-flatpickr-datetime').forEach(input => setDateTimePickerValue(input, input.value));
     form.dataset.id = id;
     form.dataset.mode = mode;
-    form.dataset.submitting = 'false';
-    form.querySelector('button[type="submit"]').disabled = false;
+    resetFormSubmitState(form);
 }
 
 export const toggleErrorMessages = (form, errors) => {
@@ -393,29 +400,15 @@ export const updateTotals = ({
     operation = 'none'
 } = {}) => {
 
-    const totalQuantityEl = document.querySelector(TOTAL_FIELDS.quantity);
-    const totalNetPurchaseAmountEl = document.querySelector(TOTAL_FIELDS.net);
-    const totalGrossPurchaseAmountEl = document.querySelector(TOTAL_FIELDS.gross);
-
     if (operation === 'none') {
 
-        [
-            TOTAL_FIELDS.quantity,
-            TOTAL_FIELDS.net,
-            TOTAL_FIELDS.gross
-        ].forEach(selector => {
-
-            const instance = initMdbWrapperInput({
-                selector,
-                value: ''
-            });
-
-            updateMdbWrapperInput(instance);
-        });
-
+        setTotals();
         return;
     }
 
+    const totalQuantityEl = document.querySelector(TOTAL_FIELDS.quantity);
+    const totalNetPurchaseAmountEl = document.querySelector(TOTAL_FIELDS.net);
+    const totalGrossPurchaseAmountEl = document.querySelector(TOTAL_FIELDS.gross);
     let totalQuantity = Number(totalQuantityEl.value) || 0;
     let totalNetPurchaseAmount = Number(totalNetPurchaseAmountEl.value) || 0;
     let totalGrossPurchaseAmount = Number(totalGrossPurchaseAmountEl.value) || 0;
@@ -426,17 +419,30 @@ export const updateTotals = ({
     totalNetPurchaseAmount += net * op;
     totalGrossPurchaseAmount += gross * op;
 
+    setTotals({
+        quantity: totalQuantity.toFixed(2),
+        net: totalNetPurchaseAmount.toFixed(2),
+        gross: totalGrossPurchaseAmount.toFixed(2)
+    });
+}
+
+export const setTotals = ({
+    quantity = '',
+    net = '',
+    gross = ''
+} = {}) => {
+
     const instanceTotalQuantity = initMdbWrapperInput({
         selector: TOTAL_FIELDS.quantity,
-        value: totalQuantity.toFixed(2)
+        value: quantity
     });
     const instanceTotalNetPurchaseAmount = initMdbWrapperInput({
         selector: TOTAL_FIELDS.net,
-        value: totalNetPurchaseAmount.toFixed(2)
+        value: net
     });
     const instanceTotalGrossPurchaseAmount = initMdbWrapperInput({
         selector: TOTAL_FIELDS.gross,
-        value: totalGrossPurchaseAmount.toFixed(2)
+        value: gross
     });
 
     updateMdbWrapperInput(instanceTotalQuantity);
