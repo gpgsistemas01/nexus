@@ -8,10 +8,6 @@
 `;
 const form = {
     id: 'goodsReceiptCorrectionForm',
-    notice: {
-        class: 'alert alert-warning mb-0',
-        content: 'Corrige el detalle seleccionado. La cantidad ajusta inventario automáticamente y los cambios de cantidad o costo pueden actualizar el total de la compra al guardar.'
-    },
     sections: [
         {
             title: 'Corrección del detalle',
@@ -67,7 +63,6 @@ const form = {
         },
         {
             title: 'Nuevos totales estimados',
-            description: 'Se actualizan con la cantidad y el costo capturados antes de guardar la corrección.',
             groups: [
                 {
                     type: 'html',
