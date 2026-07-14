@@ -15,6 +15,7 @@ import { buildGoodsReceiptDetails, updateGoodsReceiptDetailAndTotals } from '../
 import { findGoodsReceiptCorrectionReason } from '../reasonService.js';
 
 const serviceLogger = createServiceLogger('warehouse.corrections.goodsReceiptCorrectionService');
+
 const findReceiptDetailForCorrection = ({ tx, goodsReceiptId, detailId }) => (
     tx.goodsReceiptDetail.findFirst({
         where: {
@@ -28,6 +29,16 @@ const findReceiptDetailForCorrection = ({ tx, goodsReceiptId, detailId }) => (
 );
 
 
+const correctionObservationByType = {
+    PRODUCT: 'Corrección de compra: se actualiza el detalle por cambio de producto.',
+    QUANTITY: 'Corrección de compra: se actualiza el detalle por cambio de cantidad.',
+    COST: 'Corrección de compra: se actualiza el detalle por cambio de costo.',
+    PRODUCT_AND_QUANTITY: 'Corrección de compra: se actualiza el detalle por cambio de producto y cantidad.',
+    PRODUCT_AND_COST: 'Corrección de compra: se actualiza el detalle por cambio de producto y costo.',
+    QUANTITY_AND_COST: 'Corrección de compra: se actualiza el detalle por cambio de cantidad y costo.',
+    PRODUCT_AND_QUANTITY_AND_COST: 'Corrección de compra: se actualiza el detalle por cambio de producto, cantidad y costo.'
+};
+
 const buildCorrectionType = ({ productChanged, quantityDifference, costDifference }) => (
     [
         productChanged ? 'PRODUCT' : null,
@@ -37,7 +48,7 @@ const buildCorrectionType = ({ productChanged, quantityDifference, costDifferenc
 );
 
 export const correctGoodsReceiptDetailLine = async ({ id, detailId, correctionDto, userId }) => {
-    const { productId, quantity, costPerUnitType, observations } = correctionDto;
+    const { productId, quantity, costPerUnitType } = correctionDto;
 
     try {
         const db = getDb();
@@ -63,6 +74,9 @@ export const correctGoodsReceiptDetailLine = async ({ id, detailId, correctionDt
 
             if (!hasChanges) throw new GoodsReceiptCorrectionNoChanges();
 
+            const correctionType = buildCorrectionType({ productChanged, quantityDifference, costDifference });
+            const observations = correctionObservationByType[correctionType];
+
             const correctionReason = await findGoodsReceiptCorrectionReason({ tx });
 
             if (!correctionReason) throw new GoodsReceiptCorrectionReasonNotFound();
@@ -71,7 +85,6 @@ export const correctGoodsReceiptDetailLine = async ({ id, detailId, correctionDt
                 tx,
                 currentDetail,
                 correctedDetail,
-                correctionObservations: observations,
                 reasonId: correctionReason.id,
                 userId,
                 goodsReceiptId: id,
@@ -105,7 +118,7 @@ export const correctGoodsReceiptDetailLine = async ({ id, detailId, correctionDt
                     correctedNetPurchaseAmount: correctedDetail.netPurchaseAmount,
                     correctedGrossPurchaseAmount: correctedDetail.grossPurchaseAmount,
 
-                    correctionType: buildCorrectionType({ productChanged, quantityDifference, costDifference }),
+                    correctionType,
                     productChanged,
                     quantityDifference,
                     costDifference,

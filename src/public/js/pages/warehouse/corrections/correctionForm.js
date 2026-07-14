@@ -48,8 +48,7 @@ export const initGoodsReceiptCorrectionForm = () => {
                 formData: {
                     productId: formData.productId,
                     quantity: formData.quantity,
-                    costPerUnitType: formData.costPerUnitType,
-                    observations: formData.observations
+                    costPerUnitType: formData.costPerUnitType
                 }
             });
 
