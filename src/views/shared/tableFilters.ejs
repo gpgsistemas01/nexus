@@ -18,8 +18,17 @@
     selectInputs: typeof selectInputs !== 'undefined' ? selectInputs : []
 } %>
 
-<div class="table-filters-panel" aria-label="Filtros de tabla">
-    <% if (filterConfig.selectInputs.length) { %>
+<details class="table-filters-panel" open>
+    <summary class="table-filters-summary" aria-label="Mostrar u ocultar filtros de tabla">
+        <span class="table-filters-summary-title">
+            <i class="fas fa-filter" aria-hidden="true"></i>
+            Filtros
+        </span>
+        <span class="table-filters-summary-hint">Mostrar / ocultar</span>
+    </summary>
+
+    <div class="table-filters-content" aria-label="Filtros de tabla">
+        <% if (filterConfig.selectInputs.length) { %>
         <div class="row table-filters">
             <% filterConfig.selectInputs.forEach(filter => { %>
                 <%- include('./tableSelectFilter', {
@@ -35,13 +44,14 @@
         <%- include('./outlineInputList', { inputs: filterConfig.dateInputs }) %>
     </div>
 
-    <div class="table-filters-actions">
-        <%- include('./button', {
-            button : {
-                id: 'clearFiltersButton',
-                class: 'btn table-filter-button',
-                content: 'Limpiar filtros'
-            }
-        }) %>
+        <div class="table-filters-actions">
+            <%- include('./button', {
+                button : {
+                    id: 'clearFiltersButton',
+                    class: 'btn table-filter-button',
+                    content: 'Limpiar filtros'
+                }
+            }) %>
+        </div>
     </div>
-</div>
+</details>
