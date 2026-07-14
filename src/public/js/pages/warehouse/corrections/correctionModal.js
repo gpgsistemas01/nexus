@@ -1,42 +1,61 @@
-import { initMdbModal, initMdbWrapperInput, updateMdbWrapperInput } from "../../../plugins/mdb/baseInstance.js";
+import { initMdbModal } from "../../../plugins/mdb/baseInstance.js";
 import { initGoodsReceiptCorrectionSelect2 } from "../../../plugins/select2/modules/correctionSelect.js";
 import { clearFormErrors } from "../../../ui/formUI.js";
-import { formatCurrency } from "../../../utils/formatUtils.js";
+import { formatCurrency, formatDecimal } from "../../../utils/formatUtils.js";
 import { GOODS_RECEIPT_CORRECTION_APPLIED_EVENT, initGoodsReceiptCorrectionForm } from "./correctionForm.js";
 
 export { GOODS_RECEIPT_CORRECTION_APPLIED_EVENT };
 
 const CORRECTION_MODAL_SELECTOR = '#goodsReceiptCorrectionModal';
 const CORRECTION_FORM_SELECTOR = '#goodsReceiptCorrectionForm';
-const CORRECTION_PRODUCT_SELECTOR = '#correctionProductInput';
+const CORRECTION_TOTAL_SELECTORS = {
+    totalQuantity: '#correctionTotalQuantity',
+    totalNetPurchaseAmount: '#correctionTotalNetPurchaseAmount',
+    totalGrossPurchaseAmount: '#correctionTotalGrossPurchaseAmount'
+};
 
 const getModal = () => document.querySelector(CORRECTION_MODAL_SELECTOR);
 const getForm = () => document.querySelector(CORRECTION_FORM_SELECTOR);
 
-const setCorrectionTotalValue = ({ form, fieldName, value }) => {
-    const field = form.elements[fieldName];
+const IVA_RATE = 1.16;
 
-    if (!field) return;
+const calculateCorrectionTotals = ({ receipt, currentDetail, formData }) => {
+    const correctedQuantity = Number(formData.quantity || 0);
+    const correctedNetPurchaseAmount = correctedQuantity * Number(formData.costPerUnitType || 0);
+    const correctedGrossPurchaseAmount = correctedNetPurchaseAmount * IVA_RATE;
 
-    const instance = initMdbWrapperInput({
-        selector: `#${ field.id }`,
-        value
-    });
-
-    updateMdbWrapperInput(instance);
+    return {
+        totalQuantity: Number(receipt?.totalQuantity || 0) - Number(currentDetail.quantity || 0) + correctedQuantity,
+        totalNetPurchaseAmount: Number(receipt?.totalNetPurchaseAmount || 0) - Number(currentDetail.netPurchaseAmount || 0) + correctedNetPurchaseAmount,
+        totalGrossPurchaseAmount: Number(receipt?.totalGrossPurchaseAmount || 0) - Number(currentDetail.grossPurchaseAmount || 0) + correctedGrossPurchaseAmount
+    };
 };
 
-const updateCorrectionTotals = () => {
+const formatCorrectionTotals = (totals) => ({
+    totalQuantity: formatDecimal(totals.totalQuantity),
+    totalNetPurchaseAmount: formatCurrency(totals.totalNetPurchaseAmount),
+    totalGrossPurchaseAmount: formatCurrency(totals.totalGrossPurchaseAmount)
+});
+
+const updateCorrectionTotalsSummary = () => {
     const form = getForm();
-    const detail = form?.correctionDetail;
-    if (!form || !detail) return;
 
-    const currentTotal = Number(detail.quantity || 0) * Number(detail.costPerUnitType || 0);
-    const correctedTotal = Number(form.elements.quantity.value || 0) * Number(form.elements.costPerUnitType.value || 0);
+    if (!form?.correctionReceipt || !form?.correctionDetail) return;
 
-    setCorrectionTotalValue({ form, fieldName: 'currentTotal', value: formatCurrency(currentTotal) });
-    setCorrectionTotalValue({ form, fieldName: 'correctedTotal', value: formatCurrency(correctedTotal) });
-    setCorrectionTotalValue({ form, fieldName: 'totalDifference', value: formatCurrency(correctedTotal - currentTotal) });
+    const totals = formatCorrectionTotals(calculateCorrectionTotals({
+        receipt: form.correctionReceipt,
+        currentDetail: form.correctionDetail,
+        formData: {
+            quantity: form.elements.quantity.value,
+            costPerUnitType: form.elements.costPerUnitType.value
+        }
+    }));
+
+    Object.entries(CORRECTION_TOTAL_SELECTORS).forEach(([key, selector]) => {
+        const element = document.querySelector(selector);
+
+        if (element) element.textContent = totals[key];
+    });
 };
 
 const setCorrectionFormValues = ({ form, receipt, detail }) => {
@@ -46,10 +65,11 @@ const setCorrectionFormValues = ({ form, receipt, detail }) => {
     form.dataset.detailId = detail.id;
     form.dataset.submitting = 'false';
     form.correctionDetail = detail;
+    form.correctionReceipt = receipt;
     form.querySelector('button[type="submit"]').disabled = false;
     form.elements.quantity.value = detail.quantity;
     form.elements.costPerUnitType.value = detail.costPerUnitType;
-    form.elements.observations.value = `Corrección de compra ${ receipt.referenceNumber }: producto/costo registrado incorrectamente.`;
+    form.elements.observations.value = `Corrección de compra ${ receipt.referenceNumber }: producto/cantidad/costo registrado incorrectamente.`;
 };
 
 export const openGoodsReceiptCorrectionModal = ({ receipt, detail }) => {
@@ -58,23 +78,18 @@ export const openGoodsReceiptCorrectionModal = ({ receipt, detail }) => {
 
     setCorrectionFormValues({ form, receipt, detail });
     initGoodsReceiptCorrectionSelect2({ detail });
-    updateCorrectionTotals();
+    updateCorrectionTotalsSummary();
     initMdbModal(modal).show();
-};
-
-export const initGoodsReceiptCorrectionModal = () => {
-    document.addEventListener('input', (event) => {
-        if (!event.target.closest(CORRECTION_FORM_SELECTOR)) return;
-        updateCorrectionTotals();
-    });
-
-    document.addEventListener('change', (event) => {
-        if (!event.target.closest(CORRECTION_FORM_SELECTOR)) return;
-        updateCorrectionTotals();
-    });
 };
 
 export const initGoodsReceiptCorrection = () => {
     initGoodsReceiptCorrectionForm();
-    initGoodsReceiptCorrectionModal();
+
+    document.addEventListener('input', (event) => {
+        if (event.target.closest(CORRECTION_FORM_SELECTOR)) updateCorrectionTotalsSummary();
+    });
+
+    document.addEventListener('change', (event) => {
+        if (event.target.closest(CORRECTION_FORM_SELECTOR)) updateCorrectionTotalsSummary();
+    });
 };

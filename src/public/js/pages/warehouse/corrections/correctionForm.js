@@ -26,14 +26,14 @@ export const initGoodsReceiptCorrectionForm = () => {
             );
 
             if (!hasChanges) {
-                notifications.showWarning('Debe modificar el producto, stock o costo para corregir el detalle.');
+                notifications.showWarning('Debe modificar el producto, cantidad o costo para corregir el detalle.');
                 resetFormSubmitState(form);
                 return;
             }
 
             const confirmation = await notifications.showConfirmation({
                 title: '¿Corregir detalle de compra?',
-                text: 'Se guardará la corrección y se ajustará inventario automáticamente.',
+                text: 'Revisa los nuevos totales estimados en el formulario. Se guardará la corrección y se ajustará inventario automáticamente.',
                 confirmButtonText: 'Corregir detalle'
             });
 
