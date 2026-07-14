@@ -1,10 +1,8 @@
 import { PRODUCT_SELECT_RESULTS_LIMIT } from "../../../application/warehouse/products.js";
 import { setupProductSelect, toggleProductOption } from "../domains/product.js";
-import { initReasonSelect } from "../domains/reason.js";
 
 const modalSelector = '#goodsReceiptCorrectionModal';
 const productSelector = '#correctionProductInput';
-const reasonSelector = '#correctionReasonInput';
 const supplierSelector = '#correctionSupplierInput';
 
 export const initGoodsReceiptCorrectionSelect2 = ({ detail }) => {
@@ -19,12 +17,5 @@ export const initGoodsReceiptCorrectionSelect2 = ({ detail }) => {
     toggleProductOption({
         selector: `${ modalSelector } ${ productSelector }`,
         data: { id: detail.productId, text: detail.productName }
-    });
-
-    initReasonSelect({
-        modalSelector,
-        baseSelector: `${ modalSelector } ${ reasonSelector }`,
-        allowCreate: false,
-        data: () => ({ search: 'Corrección de compra' })
     });
 };

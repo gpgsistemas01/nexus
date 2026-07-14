@@ -3,6 +3,7 @@ import { GoodsIssueInsufficientStock } from '../../../errors/inventory/stockErro
 import {
     GoodsReceiptCorrectionInsufficientStock,
     GoodsReceiptCorrectionNoChanges,
+    GoodsReceiptCorrectionReasonNotFound,
     GoodsReceiptNotFound,
     GoodsReceiptUpdateDatabaseError
 } from '../../../errors/warehouse/goodsReceiptError.js';
@@ -11,9 +12,9 @@ import { createServiceLogger, getModelLogContext, logServiceError } from '../../
 import { createGoodsReceiptCorrectionAdjustments } from '../adjustmentService.js';
 import { updateProductUnitCostIfHigher } from '../products/supplierProductService.js';
 import { buildGoodsReceiptDetails, updateGoodsReceiptDetailAndTotals } from '../goodsReceipts/goodsReceiptHelpers.js';
+import { findGoodsReceiptCorrectionReason } from '../reasonService.js';
 
 const serviceLogger = createServiceLogger('warehouse.corrections.goodsReceiptCorrectionService');
-
 const findReceiptDetailForCorrection = ({ tx, goodsReceiptId, detailId }) => (
     tx.goodsReceiptDetail.findFirst({
         where: {
@@ -26,6 +27,7 @@ const findReceiptDetailForCorrection = ({ tx, goodsReceiptId, detailId }) => (
     })
 );
 
+
 const buildCorrectionType = ({ productChanged, quantityDifference, costDifference }) => (
     [
         productChanged ? 'PRODUCT' : null,
@@ -35,7 +37,7 @@ const buildCorrectionType = ({ productChanged, quantityDifference, costDifferenc
 );
 
 export const correctGoodsReceiptDetailLine = async ({ id, detailId, correctionDto, userId }) => {
-    const { productId, quantity, costPerUnitType, reasonId, observations } = correctionDto;
+    const { productId, quantity, costPerUnitType, observations } = correctionDto;
 
     try {
         const db = getDb();
@@ -61,12 +63,16 @@ export const correctGoodsReceiptDetailLine = async ({ id, detailId, correctionDt
 
             if (!hasChanges) throw new GoodsReceiptCorrectionNoChanges();
 
+            const correctionReason = await findGoodsReceiptCorrectionReason({ tx });
+
+            if (!correctionReason) throw new GoodsReceiptCorrectionReasonNotFound();
+
             const adjustments = await createGoodsReceiptCorrectionAdjustments({
                 tx,
                 currentDetail,
                 correctedDetail,
                 correctionObservations: observations,
-                reasonId,
+                reasonId: correctionReason.id,
                 userId,
                 goodsReceiptId: id,
                 goodsReceiptDetailId: detailId
@@ -82,7 +88,7 @@ export const correctGoodsReceiptDetailLine = async ({ id, detailId, correctionDt
                 data: {
                     goodsReceiptId: id,
                     goodsReceiptDetailId: detailId,
-                    reasonId,
+                    reasonId: correctionReason.id,
                     observations,
 
                     previousProductId: currentDetail.productId,

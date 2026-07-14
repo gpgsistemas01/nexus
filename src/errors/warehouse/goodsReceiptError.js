@@ -117,3 +117,11 @@ export class GoodsReceiptCorrectionInsufficientStock extends AppError {
         this.meta = { productName, height, base, supplierName, productId, supplierId, requestedQuantity };
     }
 }
+
+
+export class GoodsReceiptCorrectionReasonNotFound extends AppError {
+
+    constructor () {
+        super('Razón de corrección de compra no encontrada', 'GOODS_RECEIPT_CORRECTION_REASON_NOT_FOUND', 404);
+    }
+}

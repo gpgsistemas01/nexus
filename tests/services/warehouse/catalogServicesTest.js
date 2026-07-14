@@ -13,6 +13,7 @@ const fulfillmentStatusFindMany = vi.fn();
 const fulfillmentStatusCount = vi.fn();
 const stockAdjustmentReasonFindMany = vi.fn();
 const stockAdjustmentReasonCount = vi.fn();
+const stockAdjustmentReasonFindFirst = vi.fn();
 
 vi.mock('../../../src/repository/baseRepository.js', () => ({
   getDb: () => ({
@@ -32,7 +33,8 @@ vi.mock('../../../src/repository/baseRepository.js', () => ({
     },
     stockAdjustmentReason: {
       findMany: stockAdjustmentReasonFindMany,
-      count: stockAdjustmentReasonCount
+      count: stockAdjustmentReasonCount,
+      findFirst: stockAdjustmentReasonFindFirst
     }
   })
 }));
@@ -40,7 +42,7 @@ vi.mock('../../../src/repository/baseRepository.js', () => ({
 const { findAllPresentations, findUniquePresentation } = await import('../../../src/services/warehouse/presentationService.js');
 const { findAllUnitMeasures, findUniqueUnitMeasure } = await import('../../../src/services/warehouse/unitMeasureService.js');
 const { findAllFulfillmentStatuses } = await import('../../../src/services/warehouse/fulfillmentStatusService.js');
-const { findAllReasons } = await import('../../../src/services/warehouse/reasonService.js');
+const { findAllReasons, findGoodsReceiptCorrectionReason } = await import('../../../src/services/warehouse/reasonService.js');
 
 describe('warehouse catalog GET services', () => {
   beforeEach(() => vi.clearAllMocks());
@@ -99,6 +101,18 @@ describe('warehouse catalog GET services', () => {
     expect(fulfillmentStatusFindMany).toHaveBeenCalledWith(expect.objectContaining({
       where: { name: { contains: 'pend', mode: 'insensitive' } }
     }));
+  });
+
+  it('busca la razón fija de corrección de compra', async () => {
+    const correctionReason = { id: 'reason-correction' };
+    stockAdjustmentReasonFindFirst.mockResolvedValue(correctionReason);
+
+    await expect(findGoodsReceiptCorrectionReason()).resolves.toEqual(correctionReason);
+
+    expect(stockAdjustmentReasonFindFirst).toHaveBeenCalledWith({
+      where: { name: 'Corrección de compra' },
+      select: { id: true }
+    });
   });
 
   it('lista razones de ajuste', async () => {
