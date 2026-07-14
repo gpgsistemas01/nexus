@@ -1,5 +1,6 @@
 import { buildMdbActionButton } from "../../mdb/actionButton.js";
 import { bindDisabledControlWarning } from "../../../ui/disabledControlWarning.js";
+import { formatCurrency, formatDecimal } from "../../../utils/formatUtils.js";
 
 const DISABLED_PROJECT_QUANTITY_MESSAGE = 'Marque el detalle como surtido para capturar la cantidad de proyecto.';
 const DISABLED_RETURN_QUANTITY_MESSAGE = 'Marque el detalle para devolución antes de capturar la cantidad devuelta.';
@@ -147,19 +148,19 @@ export const buildDetailsColumns = ({ type, mode, render, isWarehouse, isCoordin
             data: null,
             render
         },
-        { data: 'productBase' },
-        { data: 'productHeight' },
-        ...(shouldShowTransactionQuantity(mode) ? [{ data: 'quantity' }] : []),
-        ...(type === 'issue' && (mode === 'edit-detail' || mode === 'view') ? [{ data: 'suppliedQuantity' }] : []),
-        ...(showReturnColumns ? [{ data: 'availableReturnQuantity', defaultContent: 0 }] : []),
+        { data: 'productBase', render: formatDecimal },
+        { data: 'productHeight', render: formatDecimal },
+        ...(shouldShowTransactionQuantity(mode) ? [{ data: 'quantity', render: formatDecimal }] : []),
+        ...(type === 'issue' && (mode === 'edit-detail' || mode === 'view') ? [{ data: 'suppliedQuantity', render: formatDecimal }] : []),
+        ...(showReturnColumns ? [{ data: 'availableReturnQuantity', defaultContent: 0, render: formatDecimal }] : []),
         { data: 'presentationName' },
-        { data: 'convertedQuantity' },
+        { data: 'convertedQuantity', render: formatDecimal },
         { data: 'unitMeasureName' },
     ];
 
     if (shouldShowIssueProjectColumns({ type, mode, isWarehouse, isCoordinator, isSystem })) {
         columns.push(
-            { data: 'maxUnitCost' },
+            { data: 'maxUnitCost', render: formatCurrency },
             {
                 data: 'projectConvertedQuantity',
                 render: (value, _, row) => {
@@ -184,22 +185,22 @@ export const buildDetailsColumns = ({ type, mode, render, isWarehouse, isCoordin
                     `;
                 }
             },
-            { data: 'convertedQuantityDifference' }
+            { data: 'convertedQuantityDifference', render: formatDecimal }
         );
     }
 
     if (shouldShowReceiptPurchaseColumns({ type, mode })) {
         columns.push(
-            { data: 'conversionUnitCost' },
-            { data: 'costPerUnitType' },
-            { data: 'netPurchaseAmount' },
-            { data: 'grossPurchaseAmount' }
+            { data: 'conversionUnitCost', render: formatCurrency },
+            { data: 'costPerUnitType', render: formatCurrency },
+            { data: 'netPurchaseAmount', render: formatCurrency },
+            { data: 'grossPurchaseAmount', render: formatCurrency }
         );
     }
 
     if (showReturnColumns) {
         columns.push(
-            { data: 'returnedQuantityTotal', defaultContent: 0 },
+            { data: 'returnedQuantityTotal', defaultContent: 0, render: formatDecimal },
             {
                 data: 'returnedQuantity',
                 render: (value, _, row) => {

@@ -10,6 +10,7 @@ import { setDateTimePickerValue } from "../../plugins/flatpickr/dateTimePicker.j
 import { handleSubmit, hasValidationErrors, toggleContainerElements, toggleDisabledElement, validateFields } from "../../utils/formUtils.js";
 import { buildModalTitle, openModal } from "../../ui/modalUI.js";
 import { FORM_SELECTORS, MODAL_SELECTORS } from "../../constants/selectors.js";
+import { roundTo } from "../../utils/formatUtils.js";
 import {
     bindReturnDetailEvents,
     createReturnFormHandlers,
@@ -260,14 +261,14 @@ const addProduct = () => {
 
     if (!option) return null;
 
-    const netPurchaseAmount = Number((quantity * costPerUnitType).toFixed(2));
+    const netPurchaseAmount = roundTo(quantity * costPerUnitType);
     let convertedQuantity;
 
     if (!productBase || !productHeight) convertedQuantity = quantity;
-    else convertedQuantity = Number(((productBase * productHeight) * quantity).toFixed(2));
+    else convertedQuantity = roundTo(productBase * productHeight * quantity);
 
-    const conversionUnitCost = Number((netPurchaseAmount / convertedQuantity).toFixed(2));
-    const grossPurchaseAmount = Number((netPurchaseAmount * 1.16).toFixed(2));
+    const conversionUnitCost = roundTo(netPurchaseAmount / convertedQuantity);
+    const grossPurchaseAmount = roundTo(netPurchaseAmount * 1.16);
     const product = {
         productId,
         productName,
