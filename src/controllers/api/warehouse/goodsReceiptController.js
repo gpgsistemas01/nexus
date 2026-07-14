@@ -1,4 +1,4 @@
-import { createGoodsReceiptDtoForEdit, createGoodsReceiptDtoForRegister, createGoodsReceiptReturnDto } from "../../../dtos/goodsReceiptDTO.js";
+import { createGoodsReceiptCorrectionDto, createGoodsReceiptDtoForEdit, createGoodsReceiptDtoForRegister, createGoodsReceiptReturnDto } from "../../../dtos/goodsReceiptDTO.js";
 import { successCodeMessages } from "../../../messages/codeMessages.js";
 import {
     createGoodsReceipt,
@@ -98,10 +98,13 @@ export const returnGoodsReceipt = async (req, res) => {
 
 export const correctGoodsReceiptDetail = async (req, res) => {
 
+    const correctionDto = createGoodsReceiptCorrectionDto(req.body);
+    const sanitizedCorrectionDto = sanitizeEmptyStrings(correctionDto);
+
     const correction = await correctGoodsReceiptDetailLine({
         id: req.params.id,
         detailId: req.params.detailId,
-        correctionDto: sanitizeEmptyStrings(req.body),
+        correctionDto: sanitizedCorrectionDto,
         userId: req.user.id
     });
 
