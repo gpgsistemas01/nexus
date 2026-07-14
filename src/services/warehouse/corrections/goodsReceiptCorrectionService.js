@@ -9,7 +9,7 @@ import {
 } from '../../../errors/warehouse/goodsReceiptError.js';
 import { getDb } from '../../../repository/baseRepository.js';
 import { createServiceLogger, getModelLogContext, logServiceError } from '../../../utils/logger.js';
-import { createGoodsReceiptCorrectionAdjustments } from '../adjustmentService.js';
+import { createStockAdjustmentByQuantityChange } from '../adjustmentService.js';
 import { updateProductUnitCostIfHigher } from '../products/supplierProductService.js';
 import { buildGoodsReceiptDetails, updateGoodsReceiptDetailAndTotals } from '../goodsReceipts/goodsReceiptHelpers.js';
 import { findGoodsReceiptCorrectionReason } from '../reasonService.js';
@@ -28,15 +28,85 @@ const findReceiptDetailForCorrection = ({ tx, goodsReceiptId, detailId }) => (
     })
 );
 
+const buildCorrectionAdjustmentObservations = ({ currentDetail, correctedDetail, goodsReceiptId }) => {
+    const productChanged = currentDetail.productId !== correctedDetail.productId;
+    const quantityDifference = Number(correctedDetail.quantity) - Number(currentDetail.quantity);
+    const quantityChanged = quantityDifference !== 0;
+    const receiptReference = currentDetail.goodsReceipt.referenceNumber || goodsReceiptId;
+    const affectedFields = productChanged && quantityChanged
+        ? 'producto y cantidad'
+        : productChanged ? 'producto' : 'cantidad';
+    const correctionContext = `Corrección de compra ${receiptReference}; campos afectados: ${affectedFields}.`;
 
-const correctionObservationByType = {
-    PRODUCT: 'Corrección de compra: se actualiza el detalle por cambio de producto.',
-    QUANTITY: 'Corrección de compra: se actualiza el detalle por cambio de cantidad.',
-    COST: 'Corrección de compra: se actualiza el detalle por cambio de costo.',
-    PRODUCT_AND_QUANTITY: 'Corrección de compra: se actualiza el detalle por cambio de producto y cantidad.',
-    PRODUCT_AND_COST: 'Corrección de compra: se actualiza el detalle por cambio de producto y costo.',
-    QUANTITY_AND_COST: 'Corrección de compra: se actualiza el detalle por cambio de cantidad y costo.',
-    PRODUCT_AND_QUANTITY_AND_COST: 'Corrección de compra: se actualiza el detalle por cambio de producto, cantidad y costo.'
+    return {
+        quantityIncrease: `${correctionContext} Ajuste de entrada por aumento de cantidad.`,
+        quantityDecrease: `${correctionContext} Ajuste de salida por disminución de cantidad.`,
+        reverseIncorrectProduct: `${correctionContext} Reversa de stock; se elimina el producto registrado incorrectamente.`,
+        registerCorrectProduct: `${correctionContext} Ajuste de entrada; se registra el producto correcto.`
+    };
+};
+
+const createGoodsReceiptCorrectionAdjustments = async ({
+    tx,
+    currentDetail,
+    correctedDetail,
+    reasonId,
+    userId,
+    goodsReceiptId,
+    goodsReceiptDetailId,
+    adjustmentObservations
+}) => {
+    const productChanged = currentDetail.productId !== correctedDetail.productId;
+    const quantityDifference = Number(correctedDetail.quantity) - Number(currentDetail.quantity);
+    const quantityChanged = quantityDifference !== 0;
+    const supplierId = currentDetail.goodsReceipt.supplierId;
+    const createCorrectionAdjustment = ({
+        productId,
+        quantityChange,
+        observations
+    }) => createStockAdjustmentByQuantityChange({
+        tx,
+        productId,
+        supplierId,
+        reasonId,
+        observations,
+        quantityChange,
+        userId,
+        goodsReceiptId,
+        goodsReceiptDetailId
+    });
+
+    if (!productChanged && !quantityChanged) return [];
+
+    if (!productChanged) {
+        return [await createCorrectionAdjustment({
+            productId: currentDetail.productId,
+            quantityChange: quantityDifference,
+            observations: quantityDifference > 0
+                ? adjustmentObservations.quantityIncrease
+                : adjustmentObservations.quantityDecrease
+        })];
+    }
+
+    const adjustments = [];
+
+    if (Number(currentDetail.quantity) > 0) {
+        adjustments.push(await createCorrectionAdjustment({
+            productId: currentDetail.productId,
+            quantityChange: -Number(currentDetail.quantity),
+            observations: adjustmentObservations.reverseIncorrectProduct
+        }));
+    }
+
+    if (Number(correctedDetail.quantity) > 0) {
+        adjustments.push(await createCorrectionAdjustment({
+            productId: correctedDetail.productId,
+            quantityChange: Number(correctedDetail.quantity),
+            observations: adjustmentObservations.registerCorrectProduct
+        }));
+    }
+
+    return adjustments;
 };
 
 const buildCorrectionType = ({ productChanged, quantityDifference, costDifference }) => (
@@ -75,7 +145,6 @@ export const correctGoodsReceiptDetailLine = async ({ id, detailId, correctionDt
             if (!hasChanges) throw new GoodsReceiptCorrectionNoChanges();
 
             const correctionType = buildCorrectionType({ productChanged, quantityDifference, costDifference });
-            const observations = correctionObservationByType[correctionType];
 
             const correctionReason = await findGoodsReceiptCorrectionReason({ tx });
 
@@ -88,7 +157,12 @@ export const correctGoodsReceiptDetailLine = async ({ id, detailId, correctionDt
                 reasonId: correctionReason.id,
                 userId,
                 goodsReceiptId: id,
-                goodsReceiptDetailId: detailId
+                goodsReceiptDetailId: detailId,
+                adjustmentObservations: buildCorrectionAdjustmentObservations({
+                    currentDetail,
+                    correctedDetail,
+                    goodsReceiptId: id
+                })
             });
             const { updatedDetail, updatedReceipt } = await updateGoodsReceiptDetailAndTotals({
                 tx,
@@ -102,8 +176,6 @@ export const correctGoodsReceiptDetailLine = async ({ id, detailId, correctionDt
                     goodsReceiptId: id,
                     goodsReceiptDetailId: detailId,
                     reasonId: correctionReason.id,
-                    observations,
-
                     previousProductId: currentDetail.productId,
                     previousProductName: currentDetail.productName,
                     previousQuantity: currentDetail.quantity,

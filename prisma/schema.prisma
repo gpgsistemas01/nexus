@@ -526,8 +526,6 @@ model GoodsReceiptCorrection {
   goodsReceiptId       String @db.Uuid
   goodsReceiptDetailId String @db.Uuid
   reasonId             String @db.Uuid
-  observations         String? @db.VarChar(500)
-
   previousProductId           String @db.Uuid
   previousProductName         String @db.VarChar(200)
   previousQuantity            Decimal @db.Decimal(10, 2)
