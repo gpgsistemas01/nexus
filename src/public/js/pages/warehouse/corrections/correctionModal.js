@@ -69,7 +69,6 @@ const setCorrectionFormValues = ({ form, receipt, detail }) => {
     form.querySelector('button[type="submit"]').disabled = false;
     form.elements.quantity.value = detail.quantity;
     form.elements.costPerUnitType.value = detail.costPerUnitType;
-    form.elements.observations.value = `Corrección de compra ${ receipt.referenceNumber }: producto/cantidad/costo registrado incorrectamente.`;
 };
 
 export const openGoodsReceiptCorrectionModal = ({ receipt, detail }) => {

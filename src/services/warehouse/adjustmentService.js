@@ -298,7 +298,6 @@ export const createGoodsReceiptCorrectionAdjustments = async ({
     tx,
     currentDetail,
     correctedDetail,
-    correctionObservations,
     reasonId,
     userId,
     goodsReceiptId,
@@ -308,16 +307,21 @@ export const createGoodsReceiptCorrectionAdjustments = async ({
     const quantityDifference = Number(correctedDetail.quantity) - Number(currentDetail.quantity);
     const quantityChanged = quantityDifference !== 0;
     const supplierId = currentDetail.goodsReceipt.supplierId;
+    const receiptReference = currentDetail.goodsReceipt.referenceNumber || goodsReceiptId;
+    const affectedFields = productChanged && quantityChanged
+        ? 'producto y cantidad'
+        : productChanged ? 'producto' : 'cantidad';
+    const correctionContext = `Corrección de compra ${receiptReference}; campos afectados: ${affectedFields}.`;
     const createCorrectionAdjustment = ({
         productId,
         quantityChange,
-        fallbackObservation
+        observations
     }) => createStockAdjustmentByQuantityChange({
         tx,
         productId,
         supplierId,
         reasonId,
-        observations: correctionObservations || fallbackObservation,
+        observations,
         quantityChange,
         userId,
         goodsReceiptId,
@@ -330,7 +334,9 @@ export const createGoodsReceiptCorrectionAdjustments = async ({
         return [await createCorrectionAdjustment({
             productId: currentDetail.productId,
             quantityChange: quantityDifference,
-            fallbackObservation: 'Corrección de stock del mismo producto por diferencia de cantidad.'
+            observations: quantityDifference > 0
+                ? `${correctionContext} Ajuste de entrada por aumento de cantidad.`
+                : `${correctionContext} Ajuste de salida por disminución de cantidad.`
         })];
     }
 
@@ -340,7 +346,7 @@ export const createGoodsReceiptCorrectionAdjustments = async ({
         adjustments.push(await createCorrectionAdjustment({
             productId: currentDetail.productId,
             quantityChange: -Number(currentDetail.quantity),
-            fallbackObservation: 'Cambio de producto en compra: reversa del producto registrado anteriormente.'
+            observations: `${correctionContext} Reversa de stock; se elimina el producto registrado incorrectamente.`
         }));
     }
 
@@ -348,7 +354,7 @@ export const createGoodsReceiptCorrectionAdjustments = async ({
         adjustments.push(await createCorrectionAdjustment({
             productId: correctedDetail.productId,
             quantityChange: Number(correctedDetail.quantity),
-            fallbackObservation: 'Cambio de producto en compra: entrada del producto corregido.'
+            observations: `${correctionContext} Ajuste de entrada; se registra el producto correcto.`
         }));
     }
 

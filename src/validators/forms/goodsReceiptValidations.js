@@ -27,6 +27,5 @@ export const goodsReceiptReturnValidation = [
 export const goodsReceiptCorrectionValidation = [
     validateUUID('productId'),
     validatePositiveNumber('quantity'),
-    validatePositiveNumber('costPerUnitType'),
-    validateTextOptional({ fieldName: 'observations', maxLength: 500 })
+    validatePositiveNumber('costPerUnitType')
 ];
