@@ -11,6 +11,7 @@ import { handleSubmit, hasValidationErrors, syncCheckboxControlledInputs, toggle
 import { buildModalTitle, openModal } from "../../ui/modalUI.js";
 import { hasPermission } from "../../utils/permissions.js";
 import { FORM_SELECTORS, MODAL_SELECTORS } from "../../constants/selectors.js";
+import { formatDecimal, roundTo } from "../../utils/formatUtils.js";
 import {
     bindReturnDetailEvents,
     buildReturnDetailState,
@@ -274,7 +275,7 @@ const addProduct = () => {
 
     } else {
 
-        convertedQuantity = Number((productBase * productHeight * quantity).toFixed(2));
+        convertedQuantity = roundTo(productBase * productHeight * quantity);
     }
 
     const product = {
@@ -336,12 +337,12 @@ on('input', '.project-converted-quantity-input', (e, input) => {
     if (!product) return;
 
     product.projectConvertedQuantity = value;
-    product.convertedQuantityDifference = (product.convertedQuantity - product.projectConvertedQuantity).toFixed(2);
+    product.convertedQuantityDifference = roundTo(product.convertedQuantity - product.projectConvertedQuantity);
 
     const currenTd = input.closest('td');
     const nextTd = currenTd.nextElementSibling;
 
-    if (nextTd) nextTd.textContent = product.convertedQuantityDifference;
+    if (nextTd) nextTd.textContent = formatDecimal(product.convertedQuantityDifference);
 });
 
 bindReturnDetailEvents({

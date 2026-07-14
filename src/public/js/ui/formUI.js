@@ -420,9 +420,9 @@ export const updateTotals = ({
     totalGrossPurchaseAmount += gross * op;
 
     setTotals({
-        quantity: totalQuantity.toFixed(2),
-        net: totalNetPurchaseAmount.toFixed(2),
-        gross: totalGrossPurchaseAmount.toFixed(2)
+        quantity: roundTo(totalQuantity),
+        net: roundTo(totalNetPurchaseAmount),
+        gross: roundTo(totalGrossPurchaseAmount)
     });
 }
 

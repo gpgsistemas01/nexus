@@ -5,6 +5,7 @@ import { formatFileName } from "../../utils/formatters.js";
 import { createDataTable, renderActionButtons } from "./baseDatatable.js";
 import { setupTableFilters } from "./utils/filters/tableFilter.js";
 import { DATATABLE_SELECTORS } from "../../constants/selectors.js";
+import { formatDecimal } from "../../utils/formatUtils.js";
 
 const selector = DATATABLE_SELECTORS.MAIN;
 let filters = {
@@ -52,12 +53,12 @@ export const createMovementDatatable = async () => {
                 },
                 { data: 'referenceNumber', title: 'Folio' },
                 { data: 'productName', title: 'Material' },
-                { data: 'productBase', title: 'Base' },
-                { data: 'productHeight', title: 'Altura' },
+                { data: 'productBase', render: formatDecimal, title: 'Base' },
+                { data: 'productHeight', render: formatDecimal, title: 'Altura' },
                 { data: 'supplierName', title: 'Proveedor' },
-                { data: 'previousStock', title: 'Stock Anterior' },
-                { data: 'quantity', title: 'Movimiento' },
-                { data: 'newStock', title: 'Stock Nuevo' },
+                { data: 'previousStock', render: formatDecimal, title: 'Stock Anterior' },
+                { data: 'quantity', render: formatDecimal, title: 'Movimiento' },
+                { data: 'newStock', render: formatDecimal, title: 'Stock Nuevo' },
             ],
             buttons: [
                 buildExcelButton({

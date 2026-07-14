@@ -8,6 +8,7 @@ import { configureResponsiveHeaderGroups, getResponsiveRowData } from "./utils/r
 import { buildExcelButton, buildTableExportParams } from "../../ui/tableUI.js";
 import { exportWarehouseReport } from "../../application/warehouse/report.js";
 import { formatFileName } from "../../utils/formatters.js";
+import { formatCurrency, formatDecimal } from "../../utils/formatUtils.js";
 import { DATATABLE_SELECTORS } from "../../constants/selectors.js";
 import { handleApiError } from "../../api/errorHandler.js";
 
@@ -70,17 +71,17 @@ export const createProductDatatable = (context) => {
             title: 'Material',
             render: (data, type, row) => renderMaterialName(row)
         },
-        { data: 'base', title: 'Base' },
-        { data: 'height', title: 'Altura' },
-        { data: 'currentStock', title: 'Existencia' },
-        { data: 'minStock', title: 'Stock Mínimo' },
+        { data: 'base', render: formatDecimal, title: 'Base' },
+        { data: 'height', render: formatDecimal, title: 'Altura' },
+        { data: 'currentStock', render: formatDecimal, title: 'Existencia' },
+        { data: 'minStock', render: formatDecimal, title: 'Stock Mínimo' },
         { data: 'presentation.name', title: 'Presentación' },
-        { data: 'convertedQuantity', title: 'Cantidad' },
+        { data: 'convertedQuantity', render: formatDecimal, title: 'Cantidad' },
         { data: 'unitMeasure.name', title: 'Unidad' }
     ];
 
     if (canSeeCost) {
-        columns.push({ data: 'maxUnitCost', title: 'Costo Unitario de Conversión' });
+        columns.push({ data: 'maxUnitCost', title: 'Costo Unitario de Conversión', render: formatCurrency });
     }
 
     if (canManageProducts) {

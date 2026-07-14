@@ -1,7 +1,7 @@
 import { initMdbModal } from "../../../plugins/mdb/baseInstance.js";
 import { initGoodsReceiptCorrectionSelect2 } from "../../../plugins/select2/modules/correctionSelect.js";
 import { clearFormErrors } from "../../../ui/formUI.js";
-import { formatCurrency, formatDecimal } from "../../../utils/formatUtils.js";
+import { formatCurrency, formatDecimal, roundTo } from "../../../utils/formatUtils.js";
 import { GOODS_RECEIPT_CORRECTION_APPLIED_EVENT, initGoodsReceiptCorrectionForm } from "./correctionForm.js";
 
 export { GOODS_RECEIPT_CORRECTION_APPLIED_EVENT };
@@ -21,13 +21,13 @@ const IVA_RATE = 1.16;
 
 const calculateCorrectionTotals = ({ receipt, currentDetail, formData }) => {
     const correctedQuantity = Number(formData.quantity || 0);
-    const correctedNetPurchaseAmount = correctedQuantity * Number(formData.costPerUnitType || 0);
-    const correctedGrossPurchaseAmount = correctedNetPurchaseAmount * IVA_RATE;
+    const correctedNetPurchaseAmount = roundTo(correctedQuantity * Number(formData.costPerUnitType || 0));
+    const correctedGrossPurchaseAmount = roundTo(correctedNetPurchaseAmount * IVA_RATE);
 
     return {
-        totalQuantity: Number(receipt?.totalQuantity || 0) - Number(currentDetail.quantity || 0) + correctedQuantity,
-        totalNetPurchaseAmount: Number(receipt?.totalNetPurchaseAmount || 0) - Number(currentDetail.netPurchaseAmount || 0) + correctedNetPurchaseAmount,
-        totalGrossPurchaseAmount: Number(receipt?.totalGrossPurchaseAmount || 0) - Number(currentDetail.grossPurchaseAmount || 0) + correctedGrossPurchaseAmount
+        totalQuantity: roundTo(Number(receipt?.totalQuantity || 0) - Number(currentDetail.quantity || 0) + correctedQuantity),
+        totalNetPurchaseAmount: roundTo(Number(receipt?.totalNetPurchaseAmount || 0) - Number(currentDetail.netPurchaseAmount || 0) + correctedNetPurchaseAmount),
+        totalGrossPurchaseAmount: roundTo(Number(receipt?.totalGrossPurchaseAmount || 0) - Number(currentDetail.grossPurchaseAmount || 0) + correctedGrossPurchaseAmount)
     };
 };
 
