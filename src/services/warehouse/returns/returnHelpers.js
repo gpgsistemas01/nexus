@@ -10,8 +10,7 @@ import {
 import { getDb } from '../../../repository/baseRepository.js';
 import { normalizeDecimal } from '../../../utils/formattersUtils.js';
 import { createGoodsIssueReturnStockAdjustment, createGoodsReceiptReturnStockAdjustment } from '../adjustmentService.js';
-
-const MOVEMENT_TYPE_ADJUSTMENT = 'ADJUSTMENT';
+import { INVENTORY_MOVEMENT_TYPES } from '../../../constants/inventory.js';
 
 export const findReturnedQuantityTotalsByDetailIds = async ({
     tx = null,
@@ -27,7 +26,7 @@ export const findReturnedQuantityTotalsByDetailIds = async ({
         by: [detailField],
         where: {
             [detailField]: { in: detailIds },
-            movement: { type: MOVEMENT_TYPE_ADJUSTMENT }
+            movement: { type: INVENTORY_MOVEMENT_TYPES.ADJUSTMENT }
         },
         _sum: { quantity: true }
     });

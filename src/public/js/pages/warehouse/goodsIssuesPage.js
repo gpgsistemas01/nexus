@@ -11,25 +11,22 @@ import { handleSubmit, hasValidationErrors, syncCheckboxControlledInputs, toggle
 import { buildModalTitle, openModal } from "../../ui/modalUI.js";
 import { hasPermission } from "../../utils/permissions.js";
 import { FORM_SELECTORS, MODAL_SELECTORS } from "../../constants/selectors.js";
+import { FORM_MODES } from "../../constants/formModes.js";
+import { FULFILLMENT_STATUS_NAMES } from "../../constants/fulfillmentStatuses.js";
 import { formatDecimal, roundTo } from "../../utils/formatUtils.js";
 import {
     bindReturnDetailEvents,
     buildReturnDetailState,
-    createReturnFormHandlers,
-    RETURN_MODE
+    createReturnFormHandlers
 } from "./returns/returnFormHelpers.js";
 import { configureReturnModal } from "./returns/returnModalHelpers.js";
 
-const MODE_EDIT_FULL = 'edit';
-const MODE_EDIT_DETAIL = 'edit-detail';
-const MODE_EDIT_HEADER = 'edit-header';
-const MODE_VIEW = 'view';
-const MODE_RETURN = RETURN_MODE;
-const FULFILLMENT_PENDING = 'Pendiente';
 const HEADER_FIELD_NAMES = ['clientId', 'advisorId', 'departmentId', 'requesterId', 'projectNumber', 'requestDate', 'observations'];
-const ENABLED_HEADER_MODES = ['create', MODE_EDIT_FULL, MODE_EDIT_HEADER];
+const ENABLED_HEADER_MODES = [FORM_MODES.CREATE, FORM_MODES.EDIT, FORM_MODES.EDIT_HEADER];
 const modalId = MODAL_SELECTORS.GOODS_ISSUE;
 const formId = FORM_SELECTORS.GOODS_ISSUE;
+const GOODS_ISSUE_ENTITY_NAME = 'salida';
+const RETURN_SUBMIT_TEXT = 'Devolver';
 
 const context = window.meta || {};
 
@@ -50,7 +47,7 @@ const setGoodsIssueHeaderFieldsReadOnly = ({ form, isReadOnly }) => {
     });
 };
 
-const getDetailsTableMode = (mode) => mode === MODE_EDIT_HEADER ? MODE_VIEW : mode;
+const getDetailsTableMode = (mode) => mode === FORM_MODES.EDIT_HEADER ? FORM_MODES.VIEW : mode;
 
 const returnForm = createReturnFormHandlers({
     details,
@@ -64,7 +61,7 @@ const normalizeGoodsIssueData = ({ form, formData }) => {
 
     const { mode } = form.dataset;
 
-    if (mode === MODE_EDIT_DETAIL) {
+    if (mode === FORM_MODES.EDIT_DETAIL) {
         return {
             id: form.dataset.id,
             details: details
@@ -77,7 +74,7 @@ const normalizeGoodsIssueData = ({ form, formData }) => {
         };
     }
 
-    if (mode === MODE_EDIT_HEADER) return formData;
+    if (mode === FORM_MODES.EDIT_HEADER) return formData;
 
     if (returnForm.isActive(form)) return returnForm.normalizeData({ form });
 
@@ -94,21 +91,21 @@ useForm({
 
         const { mode } = form.dataset;
 
-        if (mode === MODE_EDIT_DETAIL) return validateDetailsFields(validateGoodsIssueDetailValidators, details);
+        if (mode === FORM_MODES.EDIT_DETAIL) return validateDetailsFields(validateGoodsIssueDetailValidators, details);
 
         if (returnForm.isActive(form)) return returnForm.getErrors();
 
         const errors = validateFields(validateGoodsIssueValidators, formData);
 
-        if (mode === MODE_EDIT_HEADER) errors.details = null;
+        if (mode === FORM_MODES.EDIT_HEADER) errors.details = null;
 
         return errors;
     },
     sendRequest: async ({ formData, form }) => {
 
-        const update = form.dataset.mode === MODE_EDIT_DETAIL
+        const update = form.dataset.mode === FORM_MODES.EDIT_DETAIL
             ? editGoodsIssueDetails
-            : form.dataset.mode === MODE_EDIT_HEADER
+            : form.dataset.mode === FORM_MODES.EDIT_HEADER
                 ? editGoodsIssueHeader
                 : returnForm.isActive(form)
                     ? returnGoodsIssue
@@ -136,7 +133,7 @@ export const openGoodsIssueModal = ({ mode, data = null }) => {
         status: data?.status?.name,
         showActions: false,
         withTotal: false,
-        showAddProduct: mode === 'create' || (mode === MODE_EDIT_FULL && data?.fulfillmentStatus?.name === FULFILLMENT_PENDING)
+        showAddProduct: mode === FORM_MODES.CREATE || (mode === FORM_MODES.EDIT && data?.fulfillmentStatus?.name === FULFILLMENT_STATUS_NAMES.PENDING)
     });
     setFormReadOnly({ form, isReadOnly: false });
     initGoodsIssueFormSelect2();
@@ -149,7 +146,7 @@ export const openGoodsIssueModal = ({ mode, data = null }) => {
 
     details.length = 0;
 
-    if (mode === 'create') {
+    if (mode === FORM_MODES.CREATE) {
 
         form.reset();
         syncGoodsIssueDependentSelectsState();
@@ -158,9 +155,9 @@ export const openGoodsIssueModal = ({ mode, data = null }) => {
         form.querySelector('#presentationDisplayInput').value = '';
     }
 
-    if (mode === MODE_EDIT_FULL || mode === MODE_EDIT_DETAIL || mode === MODE_EDIT_HEADER || mode === MODE_VIEW || mode === MODE_RETURN) {
+    if (mode === FORM_MODES.EDIT || mode === FORM_MODES.EDIT_DETAIL || mode === FORM_MODES.EDIT_HEADER || mode === FORM_MODES.VIEW || mode === FORM_MODES.RETURN) {
 
-        form.querySelector('#observationsInput').value = mode === MODE_RETURN ? '' : (data.observations || '');
+        form.querySelector('#observationsInput').value = mode === FORM_MODES.RETURN ? '' : (data.observations || '');
         setDateTimePickerValue(form.querySelector('#requestDateInput'), data.requestDate);
         form.querySelector('#projectNumberInput').value = data.projectNumber;
         details.push(...data.details.map(detail => ({
@@ -191,34 +188,34 @@ export const openGoodsIssueModal = ({ mode, data = null }) => {
             })
         })));
 
-        setFormReadOnly({ form, isReadOnly: mode !== MODE_EDIT_FULL && mode !== MODE_EDIT_HEADER });
+        setFormReadOnly({ form, isReadOnly: mode !== FORM_MODES.EDIT && mode !== FORM_MODES.EDIT_HEADER });
         setGoodsIssueHeaderFieldsReadOnly({
             form,
             isReadOnly: !ENABLED_HEADER_MODES.includes(mode)
         });
         syncGoodsIssueDependentSelectsState();
 
-        if (mode === MODE_EDIT_FULL || mode === MODE_EDIT_HEADER) {
+        if (mode === FORM_MODES.EDIT || mode === FORM_MODES.EDIT_HEADER) {
 
-            modalElement.querySelector('#modalTitle').textContent = buildModalTitle({ action: 'Editar', entityName: 'salida', referenceNumber: data?.referenceNumber });
+            modalElement.querySelector('#modalTitle').textContent = buildModalTitle({ action: 'Editar', entityName: GOODS_ISSUE_ENTITY_NAME, referenceNumber: data?.referenceNumber });
             form.querySelector('#submitBtn').textContent = 'Editar';
 
         }
 
-        if (mode === MODE_EDIT_DETAIL) {
+        if (mode === FORM_MODES.EDIT_DETAIL) {
 
-            modalElement.querySelector('#modalTitle').textContent = buildModalTitle({ action: 'Editar detalles de la', entityName: 'salida', referenceNumber: data?.referenceNumber });
+            modalElement.querySelector('#modalTitle').textContent = buildModalTitle({ action: 'Editar detalles de la', entityName: GOODS_ISSUE_ENTITY_NAME, referenceNumber: data?.referenceNumber });
             form.querySelector('#submitBtn').textContent = 'Surtir';
         }
 
-        if (mode === MODE_RETURN) {
+        if (mode === FORM_MODES.RETURN) {
             configureReturnModal({
                 modalElement,
                 form,
                 buildModalTitle,
                 referenceNumber: data?.referenceNumber,
-                entityName: 'salida',
-                submitText: 'Devolver',
+                entityName: GOODS_ISSUE_ENTITY_NAME,
+                submitText: RETURN_SUBMIT_TEXT,
                 toggleContainerElements,
                 setFormReadOnly,
                 observationsElement: form.querySelector('#observationsInput')
@@ -231,9 +228,9 @@ export const openGoodsIssueModal = ({ mode, data = null }) => {
             syncGoodsIssueDependentSelectsState();
         }
 
-        if (mode === MODE_VIEW) {
+        if (mode === FORM_MODES.VIEW) {
             
-            modalElement.querySelector('#modalTitle').textContent = buildModalTitle({ action: 'Ver', entityName: 'salida', referenceNumber: data?.referenceNumber });
+            modalElement.querySelector('#modalTitle').textContent = buildModalTitle({ action: 'Ver', entityName: GOODS_ISSUE_ENTITY_NAME, referenceNumber: data?.referenceNumber });
         }
     }
 

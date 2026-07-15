@@ -4,8 +4,8 @@ import { getDb } from "../../../repository/baseRepository.js";
 import { buildStockKey, hasProductDimensions, normalizeDecimal, parseStockKey } from "../../../utils/formattersUtils.js";
 import { calculateConvertedQuantity } from "../../inventory/stockHelpers.js";
 import { createStockAdjustment } from "../adjustmentService.js";
+import { INVENTORY_MOVEMENT_TYPES } from "../../../constants/inventory.js";
 
-const MOVEMENT_TYPE_IN = 'ENTRY';
 
 const buildStockErrorMeta = (ps, requestedQuantity = null) => {
 
@@ -424,7 +424,7 @@ export const updateSupplierProductStock = async ({
             height: ps.product.height
         });
 
-        if (movementType !== MOVEMENT_TYPE_IN) {
+        if (movementType !== INVENTORY_MOVEMENT_TYPES.ENTRY) {
 
             const remainingStock = normalizeDecimal(Number(ps.currentStock ?? 0) - quantity);
 

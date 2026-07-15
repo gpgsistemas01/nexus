@@ -18,10 +18,10 @@ import { updateProductUnitCostIfHigher } from "../products/supplierProductServic
 import { AppError } from "../../../errors/AppError.js";
 import { buildDateRangeFilter } from "../../../utils/requestQueryUtils.js";
 import { findReturnedQuantityTotalsByDetailIds } from "../returns/returnHelpers.js";
+import { GOODS_RECEIPT_STATUS_NAMES } from "../../../constants/warehouseStatuses.js";
+import { INVENTORY_MOVEMENT_TYPES } from "../../../constants/inventory.js";
+import { DOCUMENT_REFERENCE_TYPES } from "../../../constants/documentReferenceTypes.js";
 
-const REFERENCE_NUMBER_TYPE = 'REC';
-const MOVEMENT_TYPE_IN = 'ENTRY';
-const STATUS_CONFIRMED = 'Confirmada';
 
 export const findAllGoodsReceipts = async ({
     skip = 0,
@@ -153,7 +153,7 @@ export const createGoodsReceipt = async ({ goodsReceiptDto }) => {
 
         const result = await getDb().$transaction(async (tx) => {
 
-            const referenceNumber = await generateYearlyReferenceNumber({ type: REFERENCE_NUMBER_TYPE, tx });
+            const referenceNumber = await generateYearlyReferenceNumber({ type: DOCUMENT_REFERENCE_TYPES.GOODS_RECEIPT, tx });
 
             const goodsReceipt = await tx.goodsReceipt.create({
                 data: {
@@ -164,7 +164,7 @@ export const createGoodsReceipt = async ({ goodsReceiptDto }) => {
                     receivedByName: receivedBy.fullName,
                     status: {
                         connect: {
-                            name: STATUS_CONFIRMED
+                            name: GOODS_RECEIPT_STATUS_NAMES.CONFIRMED
                         }
                     },
                     supplier: {
@@ -204,7 +204,7 @@ export const createGoodsReceipt = async ({ goodsReceiptDto }) => {
                     supplierId: goodsReceipt.supplierId,
                     quantity: detail.quantity
                 })),
-                movementType: MOVEMENT_TYPE_IN
+                movementType: INVENTORY_MOVEMENT_TYPES.ENTRY
             });
 
             return goodsReceipt;

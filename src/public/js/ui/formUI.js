@@ -1,5 +1,6 @@
 import { setDateTimePickerValue } from "../plugins/flatpickr/dateTimePicker.js";
 import { toggleContainerElements, toggleDisabledElement } from "../utils/formUtils.js";
+import { FORM_MODES } from "../constants/formModes.js";
 
 export { setTotals, updateTotals } from "./totalsSummaryUI.js";
 
@@ -159,7 +160,7 @@ export const toggleTableErrors = (form, errors, fields = null) => {
 
     const { mode } = form.dataset;
 
-    if (mode === MODE_EDIT_DETAIL) {
+    if (mode === FORM_MODES.EDIT_DETAIL) {
 
         form.querySelectorAll('#productTable .is-invalid').forEach(input => {
             input.classList.remove('is-invalid');
@@ -352,7 +353,7 @@ export const setFormReadOnly = ({
     
     const { mode } = form.dataset;
 
-    form.querySelector('#submitBtn').classList.toggle('d-none', mode === MODE_VIEW);
+    form.querySelector('#submitBtn').classList.toggle('d-none', mode === FORM_MODES.VIEW);
 };
 
 export const toggleButtons = ({
