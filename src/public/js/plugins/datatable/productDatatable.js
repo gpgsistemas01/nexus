@@ -173,14 +173,13 @@ export const createProductDatatable = (context) => {
 
         const data = getResponsiveRowData(table, this);
 
-        const result = await Swal.fire({
+        const result = await notifications.showConfirmation({
             title: '¿Eliminar producto?',
             text: 'Se eliminará la relación del producto con el proveedor y el producto. El proveedor no se eliminará.',
             icon: 'warning',
-            showCancelButton: true,
             confirmButtonText: 'Eliminar',
             cancelButtonText: 'Cancelar',
-            confirmButtonColor: '#dc3545'
+            variant: 'danger'
         });
 
         if (!result.isConfirmed) return;
