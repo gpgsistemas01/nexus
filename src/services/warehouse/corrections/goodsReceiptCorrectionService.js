@@ -96,10 +96,8 @@ const createGoodsReceiptCorrectionAdjustments = async ({
         correctedDetail,
         adjustmentObservations
     });
-    const adjustments = [];
-
-    for (const adjustmentRequest of adjustmentRequests) {
-        adjustments.push(await createStockAdjustmentByQuantityChange({
+    return Promise.all(adjustmentRequests.map(adjustmentRequest => (
+        createStockAdjustmentByQuantityChange({
             tx,
             supplierId,
             reasonId,
@@ -108,10 +106,8 @@ const createGoodsReceiptCorrectionAdjustments = async ({
             goodsReceiptDetailId,
             returnAdjustment: true,
             ...adjustmentRequest
-        }));
-    }
-
-    return adjustments;
+        })
+    )));
 };
 
 const buildCorrectionType = ({ productChanged, quantityDifference, costDifference }) => (
