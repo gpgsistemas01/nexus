@@ -170,7 +170,13 @@ export const correctGoodsReceiptDetailLine = async ({ id, detailId, correctionDt
                 detailId,
                 correctedDetail
             });
-            const adjustmentLinks = adjustments.map(adjustment => ({ stockAdjustmentId: adjustment.id }));
+            const adjustmentLinks = adjustments.map(adjustment => ({
+                stockAdjustment: {
+                    connect: {
+                        id: adjustment.id
+                    }
+                }
+            }));
             const correction = await tx.goodsReceiptCorrection.create({
                 data: {
                     goodsReceiptId: id,
