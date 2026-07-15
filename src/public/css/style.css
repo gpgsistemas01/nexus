@@ -178,6 +178,14 @@ body {
   color: var(--mdb-btn-disabled-color);
 }
 
+.btn-link {
+  --mdb-btn-color: var(--mdb-secondary);
+  --mdb-btn-hover-color: var(--mdb-primary-hover);
+  --mdb-btn-focus-color: var(--mdb-primary-hover);
+  --mdb-btn-active-color: var(--mdb-primary-active);
+  --mdb-btn-disabled-color: rgba(var(--mdb-secondary-rgb), 0.45);
+}
+
 .btn-success {
   --mdb-btn-color: var(--mdb-light);
   --mdb-btn-bg: var(--mdb-success);
