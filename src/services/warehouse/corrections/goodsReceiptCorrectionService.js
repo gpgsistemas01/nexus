@@ -1,4 +1,4 @@
-import { AppError } from '../../../errors/AppError.js';
+import { isAppError } from '../../../errors/AppError.js';
 import { GoodsIssueInsufficientStock } from '../../../errors/inventory/stockError.js';
 import {
     GoodsReceiptCorrectionInsufficientStock,
@@ -234,7 +234,7 @@ export const correctGoodsReceiptDetailLine = async ({ id, detailId, correctionDt
             throw new GoodsReceiptCorrectionInsufficientStock(err.meta);
         }
 
-        if (err instanceof AppError) throw err;
+        if (isAppError(err)) throw err;
 
         throw new GoodsReceiptUpdateDatabaseError();
     }

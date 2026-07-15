@@ -15,7 +15,7 @@ import { applyInventoryMovement } from "../../inventory/movementService.js";
 import { findUniqueSupplier } from "../supplierService.js";
 import { buildGoodsReceiptDetails, calculateGoodsReceiptTotals } from "./goodsReceiptHelpers.js";
 import { updateProductUnitCostIfHigher } from "../products/supplierProductService.js";
-import { AppError } from "../../../errors/AppError.js";
+import { isAppError } from "../../../errors/AppError.js";
 import { buildDateRangeFilter } from "../../../utils/requestQueryUtils.js";
 import { findReturnedQuantityTotalsByDetailIds } from "../returns/returnHelpers.js";
 import { GOODS_RECEIPT_STATUS_NAMES } from "../../../constants/warehouseStatuses.js";
@@ -232,7 +232,7 @@ export const createGoodsReceipt = async ({ goodsReceiptDto }) => {
             ...getModelLogContext('goodsReceipt', goodsReceiptDto)
         });
 
-        if (err instanceof AppError) throw err;
+        if (isAppError(err)) throw err;
 
         throw new GoodsReceiptCreateDatabaseError();
     }
@@ -289,7 +289,7 @@ export const updateGoodsReceiptHeader = async ({ id, goodsReceiptDto }) => {
             ...getModelLogContext('goodsReceipt', { id, ...goodsReceiptDto })
         });
 
-        if (err instanceof AppError) throw err;
+        if (isAppError(err)) throw err;
 
         throw new GoodsReceiptUpdateDatabaseError();
     }

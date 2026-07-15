@@ -55,7 +55,7 @@ import { Server } from 'socket.io';
 import { publicDir, viewsDir } from './utils/pathsUtils.js';
 import { errorMap } from './messages/codeMessages.js';
 import { initSocket } from './utils/socketUtils.js';
-import { AppError } from './errors/AppError.js';
+import { isAppError } from './errors/AppError.js';
 import { appConfig } from './config/appConfig.js';
 
 const app = express();
@@ -147,8 +147,9 @@ app.use((req, res, next) => {
 
 app.use((err, req, res, next) => {
 
-    if (err instanceof AppError) return res.status(err.statusCode).json({
+    if (isAppError(err)) return res.status(err.statusCode).json({
         code: err.code,
+        message: err.message,
         meta: err.meta
     });
 

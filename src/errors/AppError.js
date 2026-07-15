@@ -8,3 +8,11 @@ export class AppError extends Error {
         Error.captureStackTrace(this, this.constructor);
     }
 }
+
+export const isAppError = (err) => Boolean(
+    err instanceof AppError || (
+        err?.isOperational === true &&
+        typeof err?.code === 'string' &&
+        Number.isInteger(err?.statusCode)
+    )
+);

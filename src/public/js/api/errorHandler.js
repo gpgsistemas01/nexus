@@ -16,7 +16,7 @@ const resetFormSubmission = (form) => {
 export const normalizeJqAjaxError = (jqXHR, errorThrown = null) => {
 
     const data = jqXHR?.responseJSON ?? null;
-    const message = getErrorMessage(data) || data?.message || data?.detail || data?.error || errorThrown || jqXHR?.statusText || 'No fue posible conectar con el servidor.';
+    const message = data?.message || getErrorMessage(data) || data?.detail || data?.error || errorThrown || jqXHR?.statusText || 'No fue posible conectar con el servidor.';
 
     return {
         status: jqXHR?.status ?? 0,

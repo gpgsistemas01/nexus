@@ -1,4 +1,4 @@
-import { AppError } from '../../errors/AppError.js';
+import { isAppError } from '../../errors/AppError.js';
 import { WasteNotFound, WasteStockAdjustmentDatabaseError, WasteUpdateDatabaseError } from '../../errors/warehouse/wasteError.js';
 import { getDb } from '../../repository/baseRepository.js';
 import { normalizeDecimal, toNumber } from '../../utils/formattersUtils.js';
@@ -18,7 +18,7 @@ const handleWasteServiceError = ({ err, fallbackError }) => {
         throw new WasteNotFound();
     }
 
-    if (err instanceof AppError) throw err;
+    if (isAppError(err)) throw err;
 
     throw fallbackError;
 };
