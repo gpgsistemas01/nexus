@@ -99,6 +99,11 @@ describe('goodsReceiptCorrectionService', () => {
       userId: 'user-1'
     });
 
+    expect(buildGoodsReceiptDetails).toHaveBeenCalledWith([{
+      productId: 'product-new',
+      quantity: 7,
+      costPerUnitType: 10
+    }], expect.objectContaining({ tx: expect.any(Object) }));
     expect(goodsReceiptCorrectionCreate).toHaveBeenCalledOnce();
     expect(result.correction).toEqual({ id: 'correction-1' });
   });

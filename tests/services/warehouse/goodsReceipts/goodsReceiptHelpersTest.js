@@ -47,7 +47,7 @@ describe('goodsReceiptHelpers', () => {
       }
     ]);
 
-    expect(findProductsSnapshot).toHaveBeenCalledWith({ productIds: ['product-1'] });
+    expect(findProductsSnapshot).toHaveBeenCalledWith({ tx: null, productIds: ['product-1'] });
   });
 
   it('lanza ProductNotFound si el producto solicitado no existe en el snapshot', async () => {
