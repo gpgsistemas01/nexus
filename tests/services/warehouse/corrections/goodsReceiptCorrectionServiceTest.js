@@ -121,4 +121,5 @@ describe('goodsReceiptCorrectionService', () => {
     });
     expect(result.correction).toEqual({ id: 'correction-1', adjustments: [] });
   });
+
 });

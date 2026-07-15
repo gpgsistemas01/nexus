@@ -46,6 +46,40 @@ const buildCorrectionAdjustmentObservations = ({ currentDetail, correctedDetail,
     };
 };
 
+const buildCorrectionAdjustmentRequests = ({ currentDetail, correctedDetail, adjustmentObservations }) => {
+    const productChanged = currentDetail.productId !== correctedDetail.productId;
+    const quantityDifference = Number(correctedDetail.quantity) - Number(currentDetail.quantity);
+
+    if (!productChanged) {
+        return quantityDifference === 0
+            ? []
+            : [{
+                productId: currentDetail.productId,
+                quantityChange: quantityDifference,
+                observations: quantityDifference > 0
+                    ? adjustmentObservations.quantityIncrease
+                    : adjustmentObservations.quantityDecrease
+            }];
+    }
+
+    return [
+        Number(currentDetail.quantity) > 0
+            ? {
+                productId: currentDetail.productId,
+                quantityChange: -Number(currentDetail.quantity),
+                observations: adjustmentObservations.reverseIncorrectProduct
+            }
+            : null,
+        Number(correctedDetail.quantity) > 0
+            ? {
+                productId: correctedDetail.productId,
+                quantityChange: Number(correctedDetail.quantity),
+                observations: adjustmentObservations.registerCorrectProduct
+            }
+            : null
+    ].filter(Boolean);
+};
+
 const createGoodsReceiptCorrectionAdjustments = async ({
     tx,
     currentDetail,
@@ -56,54 +90,24 @@ const createGoodsReceiptCorrectionAdjustments = async ({
     goodsReceiptDetailId,
     adjustmentObservations
 }) => {
-    const productChanged = currentDetail.productId !== correctedDetail.productId;
-    const quantityDifference = Number(correctedDetail.quantity) - Number(currentDetail.quantity);
-    const quantityChanged = quantityDifference !== 0;
     const supplierId = currentDetail.goodsReceipt.supplierId;
-    const createCorrectionAdjustment = ({
-        productId,
-        quantityChange,
-        observations
-    }) => createStockAdjustmentByQuantityChange({
-        tx,
-        productId,
-        supplierId,
-        reasonId,
-        observations,
-        quantityChange,
-        userId,
-        goodsReceiptId,
-        goodsReceiptDetailId,
-        returnAdjustment: true
+    const adjustmentRequests = buildCorrectionAdjustmentRequests({
+        currentDetail,
+        correctedDetail,
+        adjustmentObservations
     });
-
-    if (!productChanged && !quantityChanged) return [];
-
-    if (!productChanged) {
-        return [await createCorrectionAdjustment({
-            productId: currentDetail.productId,
-            quantityChange: quantityDifference,
-            observations: quantityDifference > 0
-                ? adjustmentObservations.quantityIncrease
-                : adjustmentObservations.quantityDecrease
-        })];
-    }
-
     const adjustments = [];
 
-    if (Number(currentDetail.quantity) > 0) {
-        adjustments.push(await createCorrectionAdjustment({
-            productId: currentDetail.productId,
-            quantityChange: -Number(currentDetail.quantity),
-            observations: adjustmentObservations.reverseIncorrectProduct
-        }));
-    }
-
-    if (Number(correctedDetail.quantity) > 0) {
-        adjustments.push(await createCorrectionAdjustment({
-            productId: correctedDetail.productId,
-            quantityChange: Number(correctedDetail.quantity),
-            observations: adjustmentObservations.registerCorrectProduct
+    for (const adjustmentRequest of adjustmentRequests) {
+        adjustments.push(await createStockAdjustmentByQuantityChange({
+            tx,
+            supplierId,
+            reasonId,
+            userId,
+            goodsReceiptId,
+            goodsReceiptDetailId,
+            returnAdjustment: true,
+            ...adjustmentRequest
         }));
     }
 
