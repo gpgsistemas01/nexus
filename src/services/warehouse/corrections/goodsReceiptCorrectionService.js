@@ -73,7 +73,8 @@ const createGoodsReceiptCorrectionAdjustments = async ({
         quantityChange,
         userId,
         goodsReceiptId,
-        goodsReceiptDetailId
+        goodsReceiptDetailId,
+        returnAdjustment: true
     });
 
     if (!productChanged && !quantityChanged) return [];
@@ -170,7 +171,9 @@ export const correctGoodsReceiptDetailLine = async ({ id, detailId, correctionDt
                 detailId,
                 correctedDetail
             });
-            const adjustmentLinks = adjustments.map(adjustment => ({ stockAdjustmentId: adjustment.id }));
+            const adjustmentLinks = adjustments.map(adjustment => ({
+                stockAdjustmentId: adjustment.id
+            }));
             const correction = await tx.goodsReceiptCorrection.create({
                 data: {
                     goodsReceiptId: id,
@@ -193,13 +196,21 @@ export const correctGoodsReceiptDetailLine = async ({ id, detailId, correctionDt
                     correctionType,
                     productChanged,
                     quantityDifference,
-                    costDifference,
-                    ...(adjustmentLinks.length ? {
-                        adjustments: {
-                            create: adjustmentLinks
-                        }
-                    } : {})
-                },
+                    costDifference
+                }
+            });
+
+            if (adjustmentLinks.length) {
+                await tx.goodsReceiptCorrectionAdjustment.createMany({
+                    data: adjustmentLinks.map(adjustmentLink => ({
+                        goodsReceiptCorrectionId: correction.id,
+                        stockAdjustmentId: adjustmentLink.stockAdjustmentId
+                    }))
+                });
+            }
+
+            const correctionWithAdjustments = await tx.goodsReceiptCorrection.findUnique({
+                where: { id: correction.id },
                 include: {
                     adjustments: {
                         include: {
@@ -212,7 +223,7 @@ export const correctGoodsReceiptDetailLine = async ({ id, detailId, correctionDt
             return {
                 updatedDetail,
                 updatedReceipt,
-                correction,
+                correction: correctionWithAdjustments,
                 adjustments,
                 costDifference: Number(correctedDetail.netPurchaseAmount) - Number(currentDetail.netPurchaseAmount)
             };
