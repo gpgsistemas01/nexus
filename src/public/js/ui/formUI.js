@@ -1,14 +1,7 @@
-import { initMdbWrapperInput, updateMdbWrapperInput } from "../plugins/mdb/baseInstance.js";
 import { setDateTimePickerValue } from "../plugins/flatpickr/dateTimePicker.js";
 import { toggleContainerElements, toggleDisabledElement } from "../utils/formUtils.js";
 
-const TOTAL_FIELDS = {
-    quantity: '#totalQuantityDisplayInput',
-    net: '#totalNetPurchaseAmountDisplayInput',
-    gross: '#totalGrossPurchaseAmountDisplayInput',
-}
-const MODE_EDIT_DETAIL = 'edit-detail';
-const MODE_VIEW = 'view';
+export { setTotals, updateTotals } from "./totalsSummaryUI.js";
 
 const getFirstInvalidControl = (form) => {
 
@@ -391,63 +384,6 @@ export const toggleButtons = ({
         const canApprove = !showActions || !(isView && status === 'Abierta');
         approveContainer.classList.toggle('d-none', canApprove);
     }
-}
-
-export const updateTotals = ({
-    quantity = 0,
-    net = 0,
-    gross = 0,
-    operation = 'none'
-} = {}) => {
-
-    if (operation === 'none') {
-
-        setTotals();
-        return;
-    }
-
-    const totalQuantityEl = document.querySelector(TOTAL_FIELDS.quantity);
-    const totalNetPurchaseAmountEl = document.querySelector(TOTAL_FIELDS.net);
-    const totalGrossPurchaseAmountEl = document.querySelector(TOTAL_FIELDS.gross);
-    let totalQuantity = Number(totalQuantityEl.value) || 0;
-    let totalNetPurchaseAmount = Number(totalNetPurchaseAmountEl.value) || 0;
-    let totalGrossPurchaseAmount = Number(totalGrossPurchaseAmountEl.value) || 0;
-
-    const op = operation === 'add' ? 1 : operation === 'subtract' ? -1 : 0;
-
-    totalQuantity += quantity * op;
-    totalNetPurchaseAmount += net * op;
-    totalGrossPurchaseAmount += gross * op;
-
-    setTotals({
-        quantity: roundTo(totalQuantity),
-        net: roundTo(totalNetPurchaseAmount),
-        gross: roundTo(totalGrossPurchaseAmount)
-    });
-}
-
-export const setTotals = ({
-    quantity = '',
-    net = '',
-    gross = ''
-} = {}) => {
-
-    const instanceTotalQuantity = initMdbWrapperInput({
-        selector: TOTAL_FIELDS.quantity,
-        value: quantity
-    });
-    const instanceTotalNetPurchaseAmount = initMdbWrapperInput({
-        selector: TOTAL_FIELDS.net,
-        value: net
-    });
-    const instanceTotalGrossPurchaseAmount = initMdbWrapperInput({
-        selector: TOTAL_FIELDS.gross,
-        value: gross
-    });
-
-    updateMdbWrapperInput(instanceTotalQuantity);
-    updateMdbWrapperInput(instanceTotalNetPurchaseAmount);
-    updateMdbWrapperInput(instanceTotalGrossPurchaseAmount);
 }
 
 export const clearAddedProductInput = () => {
