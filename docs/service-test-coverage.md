@@ -24,6 +24,13 @@ La suite ya cubre:
 
 Las pruebas de integración se ejecutan contra `DATABASE_TEST_URL`, guardan información real y no usan rollback. La limpieza se hace por datos de prueba al iniciar cada integración y con `tests/teardownTestDatabase.js` al finalizar toda la suite. Los servicios marcados arriba como integración directa ya incluyen ese flujo de BD; esta sección sólo documenta la estrategia para evitar repetir el listado de cobertura.
 
+Para confirmar si una corrida realmente modifica la base de pruebas, hay que revisar estas condiciones antes de interpretar el resultado:
+
+1. Ejecutar `npm run test:db`, no sólo `npm test`. El script de BD valida `DATABASE_TEST_URL`, aplica migraciones con `NODE_ENV=test` y luego corre Vitest; `npm test` puede servir para unitarias, pero las integraciones con BD se saltan si no existe `DATABASE_TEST_URL` o si no está generado `generated/prisma/client.ts`.
+2. Definir `DATABASE_TEST_URL` con una base distinta a `DATABASE_URL`. `tests/setupTestDatabaseEnv.js` invoca la validación cuando existe alguna URL de base, y `scripts/verifyTestDatabaseEnv.js` falla si falta la URL de pruebas o si ambas URLs normalizadas apuntan al mismo destino.
+3. Verificar que los archivos `tests/integration/services/*DbTest.js` no aparezcan como `skipped`. Esos archivos usan `describe.skip` cuando falta `DATABASE_TEST_URL` o el cliente generado de Prisma; cuando sí corren, hacen `create`, `update`, `deleteMany` y lecturas reales mediante `src/lib/prisma.js`.
+4. Recordar que el cambio puede no quedar visible al final: cada integración limpia sus datos de prueba al iniciar y el teardown global vuelve a borrar registros con prefijos de integración. Que no queden registros persistidos después de la suite no significa que no se hayan escrito durante la prueba.
+
 ## Pendientes importantes
 
 Quedan pendientes de integración transaccional completa con BD:
