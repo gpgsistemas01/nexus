@@ -78,7 +78,8 @@ export const createStockAdjustment = async ({
     goodsIssueId = null,
     goodsIssueDetailId = null,
     goodsReceiptId = null,
-    goodsReceiptDetailId = null
+    goodsReceiptDetailId = null,
+    returnAdjustment = false
 }) => {
 
     const execute = async (transaction) => {
@@ -189,13 +190,15 @@ export const createStockAdjustment = async ({
             convertedDifference
         });
 
-        return adjustSupplierProductStock({
+        const updatedSupplierProduct = await adjustSupplierProductStock({
             tx: transaction,
             productId,
             supplierId,
             newStock: adjustedNewStock,
             newConvertedQuantity
         });
+
+        return returnAdjustment ? adjustment : updatedSupplierProduct;
     };
 
     if (tx) return execute(tx);
@@ -216,7 +219,8 @@ export const createStockAdjustmentByQuantityChange = async ({
     goodsIssueId = null,
     goodsIssueDetailId = null,
     goodsReceiptId = null,
-    goodsReceiptDetailId = null
+    goodsReceiptDetailId = null,
+    returnAdjustment = false
 }) => {
 
     const execute = async (transaction) => {
@@ -240,7 +244,8 @@ export const createStockAdjustmentByQuantityChange = async ({
             goodsIssueId,
             goodsIssueDetailId,
             goodsReceiptId,
-            goodsReceiptDetailId
+            goodsReceiptDetailId,
+            returnAdjustment
         });
     };
 

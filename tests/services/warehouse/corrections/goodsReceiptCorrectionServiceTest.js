@@ -3,6 +3,8 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 const transaction = vi.fn();
 const goodsReceiptDetailFindFirst = vi.fn();
 const goodsReceiptCorrectionCreate = vi.fn();
+const goodsReceiptCorrectionFindUnique = vi.fn();
+const goodsReceiptCorrectionAdjustmentCreateMany = vi.fn();
 const buildGoodsReceiptDetails = vi.fn();
 const updateGoodsReceiptDetailAndTotals = vi.fn();
 const createStockAdjustmentByQuantityChange = vi.fn();
@@ -49,7 +51,11 @@ describe('goodsReceiptCorrectionService', () => {
         findFirst: goodsReceiptDetailFindFirst
       },
       goodsReceiptCorrection: {
-        create: goodsReceiptCorrectionCreate
+        create: goodsReceiptCorrectionCreate,
+        findUnique: goodsReceiptCorrectionFindUnique
+      },
+      goodsReceiptCorrectionAdjustment: {
+        createMany: goodsReceiptCorrectionAdjustmentCreateMany
       }
     }));
 
@@ -84,6 +90,8 @@ describe('goodsReceiptCorrectionService', () => {
       updatedReceipt: { id: 'receipt-1', supplierId: 'supplier-1' }
     });
     goodsReceiptCorrectionCreate.mockResolvedValue({ id: 'correction-1' });
+    goodsReceiptCorrectionAdjustmentCreateMany.mockResolvedValue({ count: 2 });
+    goodsReceiptCorrectionFindUnique.mockResolvedValue({ id: 'correction-1', adjustments: [] });
     updateProductUnitCostIfHigher.mockResolvedValue();
   });
 
@@ -105,6 +113,12 @@ describe('goodsReceiptCorrectionService', () => {
       costPerUnitType: 10
     }], expect.objectContaining({ tx: expect.any(Object) }));
     expect(goodsReceiptCorrectionCreate).toHaveBeenCalledOnce();
-    expect(result.correction).toEqual({ id: 'correction-1' });
+    expect(goodsReceiptCorrectionAdjustmentCreateMany).toHaveBeenCalledWith({
+      data: [
+        { goodsReceiptCorrectionId: 'correction-1', stockAdjustmentId: 'adjustment-1' },
+        { goodsReceiptCorrectionId: 'correction-1', stockAdjustmentId: 'adjustment-2' }
+      ]
+    });
+    expect(result.correction).toEqual({ id: 'correction-1', adjustments: [] });
   });
 });
