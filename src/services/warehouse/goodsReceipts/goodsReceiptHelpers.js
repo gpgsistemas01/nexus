@@ -5,11 +5,11 @@ import { findProductsSnapshot } from "../products/productService.js";
 
 const IVA_RATE = 1.16;
 
-export const buildGoodsReceiptDetails = async (details) => {
+export const buildGoodsReceiptDetails = async (details, { tx = null } = {}) => {
 
     const productIds = details.map(d => d.productId);
 
-    const products = await findProductsSnapshot({ productIds });
+    const products = await findProductsSnapshot({ tx, productIds });
 
     const productMap = new Map(products.map(p => [p.id, p]));
 

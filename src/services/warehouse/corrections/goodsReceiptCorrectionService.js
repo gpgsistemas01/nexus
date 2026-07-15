@@ -136,7 +136,7 @@ export const correctGoodsReceiptDetailLine = async ({ id, detailId, correctionDt
                 productId,
                 quantity,
                 costPerUnitType
-            }]);
+            }], { tx });
             const productChanged = currentDetail.productId !== correctedDetail.productId;
             const quantityDifference = Number(correctedDetail.quantity) - Number(currentDetail.quantity);
             const costDifference = Number(correctedDetail.costPerUnitType) - Number(currentDetail.costPerUnitType);

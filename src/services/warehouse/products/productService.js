@@ -98,7 +98,7 @@ const DEFAULT_PRODUCT_SNAPSHOT_SELECT = {
 };
 
 export const findProductsSnapshot = async ({
-    tx,
+    tx = null,
     productIds
 }) => {
 
