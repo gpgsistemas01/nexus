@@ -16,6 +16,7 @@ const getModal = () => document.querySelector(CORRECTION_MODAL_SELECTOR);
 export const initGoodsReceiptCorrectionForm = () => {
     useForm({
         selector: CORRECTION_FORM_SELECTOR,
+        normalizeData: ({ formData }) => formData,
         getErrors: ({ formData }) => validateFields(validateGoodsReceiptCorrectionValidators, formData),
         sendRequest: async ({ formData, form }) => {
             const currentDetail = form.correctionDetail;
