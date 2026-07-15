@@ -1,0 +1,19 @@
+<%
+const totalsConfig = typeof totals !== 'undefined' ? totals : {};
+const summaryClass = totalsConfig.class || 'row g-2';
+const items = totalsConfig.items || [];
+const defaultFormat = (value) => value ?? '0.00';
+%>
+
+<div class="<%= summaryClass %>" aria-live="<%= totalsConfig.ariaLive || 'polite' %>">
+    <% items.forEach(item => { %>
+        <div class="<%= item.col || 'col-12 col-md-4' %>">
+            <div class="<%= item.cardClass || 'border rounded p-3 h-100 bg-light' %>">
+                <span class="d-block small text-muted mb-1"><%= item.label %></span>
+                <span id="<%= item.id %>" class="<%= item.valueClass || 'fw-semibold' %>" data-value="<%= item.rawValue ?? 0 %>">
+                    <%= item.value !== undefined ? item.value : defaultFormat(item.rawValue) %>
+                </span>
+            </div>
+        </div>
+    <% }); %>
+</div>

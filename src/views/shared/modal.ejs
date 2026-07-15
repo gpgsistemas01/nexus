@@ -24,41 +24,29 @@ const inputs = {
     }
 }
 
-const totalInputs = [
-    {
-        id: 'totalQuantityDisplayInput',
-        name: 'totalQuantity',
-        type: 'number',
-        label: 'Cantidad Total',
-        col: '4',
-        attrs: {
-            disabled: '',
-            tabindex: '-1'
+const totalSummary = {
+    class: 'row g-2',
+    items: [
+        {
+            id: 'totalQuantityDisplayValue',
+            label: 'Cantidad Total',
+            value: '0.00',
+            rawValue: 0
+        },
+        {
+            id: 'totalNetPurchaseAmountDisplayValue',
+            label: 'Total de Compra s/ IVA',
+            value: '$0.00',
+            rawValue: 0
+        },
+        {
+            id: 'totalGrossPurchaseAmountDisplayValue',
+            label: 'Total de Compra c/ IVA',
+            value: '$0.00',
+            rawValue: 0
         }
-    },
-    {
-        id: 'totalNetPurchaseAmountDisplayInput',
-        name: 'totalNetPurchaseAmount',
-        type: 'number',
-        label: 'Total de Compra s/ IVA',
-        col: '4',
-        attrs: {
-            disabled: '',
-            tabindex: '-1'
-        }
-    },
-    {
-        id: 'totalGrossPurchaseAmountDisplayInput',
-        name: 'totalGrossPurchaseAmount',
-        type: 'number',
-        label: 'Total de Compra c/ IVA',
-        col: '4',
-        attrs: {
-            disabled: '',
-            tabindex: '-1'
-        }
-    }
-];
+    ]
+};
 
 const buttons = {
     addProductButton: {
@@ -199,8 +187,8 @@ const modalDialogClass = typeof dialogClass !== 'undefined' ? dialogClass : 'mod
 
                     <%- include('./productTable') %>
 
-                    <div class="col-12 row g-2 mb-3 total-container">
-                        <%- include('./outlineInputList', { inputs: totalInputs }) %>
+                    <div class="col-12 mb-3 total-container">
+                        <%- include('./totalsSummary', { totals: totalSummary }) %>
                     </div>
                 <% } %>
 
