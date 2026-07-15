@@ -21,7 +21,7 @@ import { findClientById } from "../../sales/clientService.js";
 import { buildGoodsIssueDetails, isValidInternalClientAdvisor, isValidInternalClientProjectNumberByDepartment, resolveFulfillmentStatus } from "./goodsIssueHelpers.js";
 import { applyInventoryMovement } from "../../inventory/movementService.js";
 import { normalizeDecimal } from "../../../utils/formattersUtils.js";
-import { AppError } from "../../../errors/AppError.js";
+import { isAppError } from "../../../errors/AppError.js";
 import { buildDateRangeFilter } from "../../../utils/requestQueryUtils.js";
 import { findReturnedQuantityTotalsByDetailIds } from "../returns/returnHelpers.js";
 import { ROLE_NAMES } from "../../../constants/roles.js";
@@ -273,7 +273,7 @@ export const createGoodsIssue = async ({ goodsIssueDto }) => {
             ...getModelLogContext('goodsIssue', goodsIssueDto)
         });
 
-        if (err instanceof AppError) throw err;
+        if (isAppError(err)) throw err;
 
         throw new GoodsIssueCreateDatabaseError();
     }
@@ -376,7 +376,7 @@ export const updateGoodsIssue = async ({ id, goodsIssueDto }) => {
             ...getModelLogContext('goodsIssue', { id, ...goodsIssueDto })
         });
 
-        if (err instanceof AppError) throw err;
+        if (isAppError(err)) throw err;
 
         throw new GoodsIssueUpdateDatabaseError();
     }
@@ -539,7 +539,7 @@ export const updateGoodsIssueDetails = async ({ id, goodsIssueDto }) => {
             ...getModelLogContext('goodsIssue', { id, details })
         });
 
-        if (err instanceof AppError) throw err;
+        if (isAppError(err)) throw err;
 
         throw new GoodsIssueUpdateDatabaseError();
     }
@@ -597,7 +597,7 @@ export const updateGoodsIssueHeader = async ({ id, goodsIssueDto }) => {
             ...getModelLogContext('goodsIssue', { id, ...goodsIssueDto })
         });
 
-        if (err instanceof AppError) throw err;
+        if (isAppError(err)) throw err;
 
         throw new GoodsIssueUpdateDatabaseError();
     }

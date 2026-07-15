@@ -1,6 +1,6 @@
 import pino from 'pino';
 import pinoHttp from 'pino-http';
-import { AppError } from '../errors/AppError.js';
+import { isAppError } from '../errors/AppError.js';
 
 const DEFAULT_LOG_LEVEL = 'warn';
 const LOG_LEVELS = new Set(['fatal', 'error', 'warn', 'info', 'debug', 'trace', 'silent']);
@@ -91,7 +91,7 @@ if (process.env.LOG_LEVEL && configuredLogLevel !== process.env.LOG_LEVEL.toLowe
 
 export const createServiceLogger = (service) => logger.child({ layer: 'service', service });
 
-const getDefaultErrorLogLevel = (err) => err instanceof AppError ? 'warn' : 'error';
+const getDefaultErrorLogLevel = (err) => isAppError(err) ? 'warn' : 'error';
 
 const STOCK_ERROR_CODES_WITH_REQUESTED_QUANTITY = new Set([
     'GOODS_ISSUE_INSUFFICIENT_STOCK'
@@ -110,7 +110,7 @@ const getAppErrorMetaLogContext = (err) => {
     return meta;
 };
 
-const getAppErrorLogContext = (err) => err instanceof AppError
+const getAppErrorLogContext = (err) => isAppError(err)
     ? {
         errorCode: err.code,
         statusCode: err.statusCode,

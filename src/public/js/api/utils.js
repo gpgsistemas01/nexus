@@ -14,7 +14,7 @@ export const normalizeHttpError = (err) => {
     return {
         status,
         data,
-        message: getErrorMessage(data) || data?.message || data?.detail || data?.error || err.message,
+        message: data?.message || getErrorMessage(data) || data?.detail || data?.error || err.message,
         raw: err
     };
 };
