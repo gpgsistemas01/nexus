@@ -16,6 +16,9 @@ export const initGoodsReceiptCorrectionSelect2 = ({ detail }) => {
 
     toggleProductOption({
         selector: `${ modalSelector } ${ productSelector }`,
-        data: { id: detail.productId, text: detail.productName }
+        data: {
+            id: detail.productId || detail.product?.id,
+            text: detail.productName || detail.product?.name
+        }
     });
 };
