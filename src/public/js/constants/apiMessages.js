@@ -186,6 +186,23 @@ export const errorMessages = {
     GOODS_RECEIPT_SUPPLIER_CHANGE_CONFLICT: 'No se puede cambiar el proveedor de una compra confirmada porque sus movimientos de inventario ya están asociados al proveedor original.',
     GOODS_RECEIPT_RETURN_CONFLICT: 'La cantidad devuelta de la compra no es válida.',
     GOODS_RECEIPT_CORRECTION_NO_CHANGES: 'No hay cambios para aplicar en el detalle de la compra.',
+    GOODS_RECEIPT_CORRECTION_INSUFFICIENT_STOCK: (meta) => {
+
+        const hasDimensions =
+            meta.base != null &&
+            meta.height != null;
+
+        const dimensions = hasDimensions
+            ? ` (${ meta.base } x ${ meta.height })`
+            : '';
+
+        const supplier = meta.supplierName
+            ? ` y proveedor: ${ meta.supplierName }`
+            : '';
+
+        return `Stock insuficiente para corregir la compra con el producto: ${ meta.productName ?? 'Producto desconocido' }${ dimensions }${ supplier }.`;
+    },
+    GOODS_RECEIPT_CORRECTION_REASON_NOT_FOUND: 'Razón de corrección de compra no encontrada.',
     GOODS_RECEIPT_RETURN_QUANTITY_EXCEEDED: 'La cantidad devuelta excede la cantidad disponible para devolver en la compra.',
     GOODS_RECEIPT_RETURN_INSUFFICIENT_STOCK: (meta) => {
 
@@ -320,7 +337,9 @@ export const getErrorMessage = (data = {}) => {
 
         const fn = errorMessages[code];
 
-        return typeof fn === 'function' ? fn(meta) : code;
+        if (typeof fn === 'function') return fn(meta);
+
+        return fn ?? code;
     }
 
     if (code) return errorMessages[code] ?? code;
