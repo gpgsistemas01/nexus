@@ -178,13 +178,86 @@ body {
   color: var(--mdb-btn-disabled-color);
 }
 
-.btn-link {
+.btn-link,
+.btn.btn-link {
   --mdb-btn-color: var(--mdb-secondary);
+  --mdb-btn-bg: transparent;
+  --mdb-btn-border-color: transparent;
   --mdb-btn-hover-color: var(--mdb-primary-hover);
+  --mdb-btn-hover-bg: transparent;
+  --mdb-btn-hover-border-color: transparent;
   --mdb-btn-focus-color: var(--mdb-primary-hover);
+  --mdb-btn-focus-bg: transparent;
   --mdb-btn-active-color: var(--mdb-primary-active);
+  --mdb-btn-active-bg: transparent;
+  --mdb-btn-active-border-color: transparent;
   --mdb-btn-disabled-color: rgba(var(--mdb-secondary-rgb), 0.45);
+  --mdb-btn-disabled-bg: transparent;
+  --mdb-btn-disabled-border-color: transparent;
+  --mdb-btn-box-shadow: none;
+  --mdb-btn-hover-box-shadow: none;
+  --mdb-btn-focus-box-shadow: 0 0 0 0.2rem rgba(var(--mdb-primary-rgb), 0.18);
+  --mdb-btn-active-box-shadow: none;
+  --bs-btn-color: var(--mdb-btn-color);
+  --bs-btn-bg: var(--mdb-btn-bg);
+  --bs-btn-border-color: var(--mdb-btn-border-color);
+  --bs-btn-hover-color: var(--mdb-btn-hover-color);
+  --bs-btn-hover-bg: var(--mdb-btn-hover-bg);
+  --bs-btn-hover-border-color: var(--mdb-btn-hover-border-color);
+  --bs-btn-focus-shadow-rgb: var(--mdb-primary-rgb);
+  --bs-btn-active-color: var(--mdb-btn-active-color);
+  --bs-btn-active-bg: var(--mdb-btn-active-bg);
+  --bs-btn-active-border-color: var(--mdb-btn-active-border-color);
+  --bs-btn-disabled-color: var(--mdb-btn-disabled-color);
+  --bs-btn-disabled-bg: var(--mdb-btn-disabled-bg);
+  --bs-btn-disabled-border-color: var(--mdb-btn-disabled-border-color);
+  background-color: var(--mdb-btn-bg);
+  border-color: var(--mdb-btn-border-color);
+  box-shadow: var(--mdb-btn-box-shadow);
+  color: var(--mdb-btn-color);
+  text-decoration: none;
 }
+
+.btn-link:hover,
+.btn.btn-link:hover {
+  background-color: var(--mdb-btn-hover-bg);
+  border-color: var(--mdb-btn-hover-border-color);
+  box-shadow: var(--mdb-btn-hover-box-shadow);
+  color: var(--mdb-btn-hover-color);
+  text-decoration: underline;
+}
+
+.btn-link:focus,
+.btn-link:focus-visible,
+.btn.btn-link:focus,
+.btn.btn-link:focus-visible {
+  background-color: var(--mdb-btn-focus-bg);
+  border-color: var(--mdb-btn-hover-border-color);
+  box-shadow: var(--mdb-btn-focus-box-shadow);
+  color: var(--mdb-btn-focus-color);
+  outline: none;
+}
+
+.btn-link:active,
+.btn-link.active,
+.btn.btn-link:active,
+.btn.btn-link.active {
+  background-color: var(--mdb-btn-active-bg);
+  border-color: var(--mdb-btn-active-border-color);
+  box-shadow: var(--mdb-btn-active-box-shadow);
+  color: var(--mdb-btn-active-color);
+}
+
+.btn-link:disabled,
+.btn-link.disabled,
+.btn.btn-link:disabled,
+.btn.btn-link.disabled {
+  background-color: var(--mdb-btn-disabled-bg);
+  border-color: var(--mdb-btn-disabled-border-color);
+  color: var(--mdb-btn-disabled-color);
+  pointer-events: none;
+}
+
 
 .btn-success {
   --mdb-btn-color: var(--mdb-light);
