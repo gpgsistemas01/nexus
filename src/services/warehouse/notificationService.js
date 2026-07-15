@@ -1,7 +1,7 @@
 import { getDb } from "../../repository/baseRepository.js";
+import { ROLE_NAMES } from "../../constants/roles.js";
+import { DEPARTMENT_NAMES } from "../../constants/departments.js";
 
-const ROLE_SYSTEM_ADMIN = 'Administrador del sistema';
-const DEPARTMENT_WAREHOUSE = 'Almacén';
 const ENTITY_PRODUCT_LOW_STOCK = 'product-low-stock';
 const ENTITY_PRODUCT_STOCK_RESTORED = 'product-stock-restored';
 const ENTITY_GOODS_RECEIPT = 'goods-receipt';
@@ -20,7 +20,7 @@ const getNotificationWhereByUser = async (departments, roles) => {
 
     const departmentIds = dbDepartments.map(d => d.id);
 
-   const canViewAllNotifications = roles.includes(ROLE_SYSTEM_ADMIN) || departments.includes(DEPARTMENT_WAREHOUSE);
+   const canViewAllNotifications = roles.includes(ROLE_NAMES.SYSTEM_ADMIN) || departments.includes(DEPARTMENT_NAMES.WAREHOUSE);
 
     if (canViewAllNotifications) {
         return {

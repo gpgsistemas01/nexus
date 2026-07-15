@@ -6,13 +6,12 @@ import { syncSupplierProduct } from "./productRelations.js";
 import { AppError } from "../../../errors/AppError.js";
 import { createStockAdjustment } from "../adjustmentService.js";
 import { createServiceLogger, getModelLogContext, logServiceError, logServiceInfo } from "../../../utils/logger.js";
+import { PRISMA_ERROR_CODES } from "../../../constants/prisma.js";
 
 const serviceLogger = createServiceLogger('warehouse.products.productService');
 
 
 const REFERENCE_MOVEMENT_IN = 'IN';
-const PRISMA_RECORD_NOT_FOUND = 'P2025';
-const PRISMA_FOREIGN_KEY_CONSTRAINT = 'P2003';
 
 const buildProductData = ({ rest, relations }) => ({
     ...rest,
@@ -235,7 +234,7 @@ export const updateProduct = async (productDto, id) => {
             ...getModelLogContext('product', { id, ...productDto })
         });
 
-        if (err.code === PRISMA_RECORD_NOT_FOUND) {
+        if (err.code === PRISMA_ERROR_CODES.RECORD_NOT_FOUND) {
             throw new ProductNotFound();
         }
 
@@ -285,8 +284,8 @@ export const deleteProduct = async (id) => {
             ...getModelLogContext('product', { id })
         });
 
-        if (err.code === PRISMA_RECORD_NOT_FOUND) throw new ProductNotFound();
-        if (err.code === PRISMA_FOREIGN_KEY_CONSTRAINT) throw new ProductDeleteRelationConflict();
+        if (err.code === PRISMA_ERROR_CODES.RECORD_NOT_FOUND) throw new ProductNotFound();
+        if (err.code === PRISMA_ERROR_CODES.FOREIGN_KEY_CONSTRAINT) throw new ProductDeleteRelationConflict();
         if (err instanceof AppError) throw err;
 
         throw new ProductDeleteDatabaseError();
@@ -323,7 +322,7 @@ export const updateProductStock = async ({
             ...getModelLogContext('productStock', { id, userId, ...productDto })
         });
 
-        if (err.code === PRISMA_RECORD_NOT_FOUND) {
+        if (err.code === PRISMA_ERROR_CODES.RECORD_NOT_FOUND) {
             throw new ProductNotFound();
         }
 

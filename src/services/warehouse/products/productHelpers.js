@@ -2,12 +2,12 @@ import { ExcededMaxRetriesSkuError } from "../../../errors/warehouse/productErro
 import { findUniquePresentation } from "../presentationService.js";
 import { findUniqueUnitMeasure } from "../unitMeasureService.js";
 import { createServiceLogger, logServiceError } from "../../../utils/logger.js";
+import { PRISMA_ERROR_CODES } from "../../../constants/prisma.js";
 
 const serviceLogger = createServiceLogger('warehouse.products.productHelpers');
 
 
 const MAX_RETRIES = 5;
-const PRISMA_RECORD_NOT_UNIQUE = 'P2002';
 
 export const prepareProductData = async ({ tx, productDto, productId = null }) => {
 
@@ -35,7 +35,7 @@ export const withRetry = async (fn) => {
         try {
             return await fn();
         } catch (err) {
-            if (err.code === PRISMA_RECORD_NOT_UNIQUE) {
+            if (err.code === PRISMA_ERROR_CODES.RECORD_NOT_UNIQUE) {
                 logServiceError(
                     serviceLogger,
                     err,

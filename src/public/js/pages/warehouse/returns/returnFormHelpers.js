@@ -1,8 +1,7 @@
 import { on } from "../../../utils/domUtils.js";
 import { syncCheckboxControlledInputs } from "../../../utils/formUtils.js";
 import { validateReturnDetails } from "../../../utils/validations/validators.js";
-
-export const RETURN_MODE = 'return';
+import { FORM_MODES } from "../../../constants/formModes.js";
 
 export const buildReturnDetailState = ({
     detail,
@@ -57,7 +56,7 @@ export const createReturnFormHandlers = ({
     returnUpdate,
     emptyMessage
 }) => ({
-    isActive: (form) => form?.dataset?.mode === RETURN_MODE,
+    isActive: (form) => form?.dataset?.mode === FORM_MODES.RETURN,
     normalizeData: ({ form }) => ({
         id: form.dataset.id,
         details: details

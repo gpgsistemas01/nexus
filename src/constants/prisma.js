@@ -1,0 +1,5 @@
+export const PRISMA_ERROR_CODES = Object.freeze({
+    RECORD_NOT_FOUND: 'P2025',
+    RECORD_NOT_UNIQUE: 'P2002',
+    FOREIGN_KEY_CONSTRAINT: 'P2003'
+});

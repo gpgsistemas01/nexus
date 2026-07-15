@@ -4,16 +4,14 @@ import { normalizeDecimal, toNumber } from "../../utils/formattersUtils.js";
 import { assertSufficientStock, calculateConvertedQuantity } from "../inventory/stockHelpers.js";
 import { createStockAdjustmentMovement } from "../inventory/movementService.js";
 import { adjustSupplierProductStock, findSupplierProductByIds } from "./products/supplierProductService.js";
+import { INVENTORY_MOVEMENT_TYPES, INVENTORY_REFERENCE_TYPES, STOCK_ADJUSTMENT_STATUS_NAMES, STOCK_ADJUSTMENT_TYPES } from "../../constants/inventory.js";
+import { DOCUMENT_REFERENCE_TYPES } from "../../constants/documentReferenceTypes.js";
 
-const REFERENCE_NUMBER_TYPE = 'AJU';
-const ADJUSTMENT_STATUS_APPLIED = 'APPLIED';
-const STOCK_ADJUSTMENT_TYPE_INCREASE = 'INCREASE';
-const STOCK_ADJUSTMENT_TYPE_DECREASE = 'DECREASE';
 const GOODS_RECEIPT_RETURN_REASON_NAME = 'Devolución de compra';
 const GOODS_ISSUE_RETURN_REASON_NAME = 'Devolución de salida';
 export const StockReturnSource = Object.freeze({
-    GOODS_RECEIPT: 'GOODS_RECEIPT',
-    GOODS_ISSUE: 'GOODS_ISSUE'
+    GOODS_RECEIPT: INVENTORY_REFERENCE_TYPES.GOODS_RECEIPT,
+    GOODS_ISSUE: INVENTORY_REFERENCE_TYPES.GOODS_ISSUE
 });
 
 
@@ -91,7 +89,7 @@ export const createStockAdjustment = async ({
             supplierId
         });
 
-        const referenceNumber = await generateYearlyReferenceNumber({ type: REFERENCE_NUMBER_TYPE, tx: transaction });
+        const referenceNumber = await generateYearlyReferenceNumber({ type: DOCUMENT_REFERENCE_TYPES.STOCK_ADJUSTMENT, tx: transaction });
 
         const productName = product.name;
         const supplierName = product.supplier?.tradeName || '';
@@ -123,15 +121,15 @@ export const createStockAdjustment = async ({
         });
 
         const adjustmentType = difference >= 0
-            ? STOCK_ADJUSTMENT_TYPE_INCREASE
-            : STOCK_ADJUSTMENT_TYPE_DECREASE;
+            ? STOCK_ADJUSTMENT_TYPES.INCREASE
+            : STOCK_ADJUSTMENT_TYPES.DECREASE;
 
         const adjustment = await transaction.stockAdjustment.create({
             data: {
                 referenceNumber,
                 type: adjustmentType,
                 observations,
-                status: ADJUSTMENT_STATUS_APPLIED,
+                status: STOCK_ADJUSTMENT_STATUS_NAMES.APPLIED,
                 appliedAt: new Date(),
                 reason: {
                     connect: isReturnAdjustment

@@ -13,14 +13,13 @@ const serviceLogger = createServiceLogger('warehouse.purchaseRequisitionService'
 
 import { getDb } from "../../repository/baseRepository.js";
 import { generateYearlyReferenceNumber } from "../document/referenceNumberService.js";
+import { ROLE_NAMES } from "../../constants/roles.js";
+import { PURCHASE_REQUISITION_STATUS_NAMES } from "../../constants/warehouseStatuses.js";
+import { DOCUMENT_REFERENCE_TYPES } from "../../constants/documentReferenceTypes.js";
+import { PRISMA_ERROR_CODES } from "../../constants/prisma.js";
 
 const allowedDepartments = ['Almcén', 'Sistemas'];
-const allowedUsers = ['Coordinador', 'Administrador del sistema'];
-const REFERENCE_NUMBER_TYPE = 'REQ';
-const STATUS_OPEN = 'Abierta';
-const STATUS_CONFIRMED = 'Confirmada';
-const STATUS_CANCELED = 'Cancelada';
-const PRISMA_RECORD_NOT_FOUND = 'P2025';
+const allowedUsers = [ROLE_NAMES.COORDINATOR, ROLE_NAMES.SYSTEM_ADMIN];
 
 const buildPurchaseRequisitionDetailRows = ({ details, purchaseRequisitionId }) => (
     details.map(detail => ({
@@ -167,14 +166,14 @@ export const createPurchaseRequisition = async ({
 
         const result = await getDb().$transaction(async (tx) => {
 
-            const referenceNumber = await generateYearlyReferenceNumber({ type: REFERENCE_NUMBER_TYPE, tx });
+            const referenceNumber = await generateYearlyReferenceNumber({ type: DOCUMENT_REFERENCE_TYPES.PURCHASE_REQUISITION, tx });
 
             const purchaseRequisition = await tx.purchaseRequisition.create({
                 data: {
                     ...purchaseRequisitionData,
                     status: {
                         connect: {
-                            name: STATUS_OPEN
+                            name: PURCHASE_REQUISITION_STATUS_NAMES.OPEN
                         }
                     },
                     project: {
@@ -315,7 +314,7 @@ export const updatePurchaseRequisition = async ({
             ...getModelLogContext('purchaseRequisition', { id, userId, ...purchaseRequisitionDto })
         });
 
-        if (err.code === PRISMA_RECORD_NOT_FOUND) throw new PurchaseRequisitionNotFound();
+        if (err.code === PRISMA_ERROR_CODES.RECORD_NOT_FOUND) throw new PurchaseRequisitionNotFound();
 
         throw new PurchaseRequisitionUpdateDatabaseError();
     }
@@ -348,7 +347,7 @@ const updatePurchaseRequisitionStatus = async ({ id, statusName, userId }) => {
     });
 
     if (!purchaseRequisition) throw new PurchaseRequisitionNotFound();
-    if (purchaseRequisition.status?.name !== STATUS_OPEN) throw new PurchaseRequisitionStatusNotFound();
+    if (purchaseRequisition.status?.name !== PURCHASE_REQUISITION_STATUS_NAMES.OPEN) throw new PurchaseRequisitionStatusNotFound();
 
     try {
 
@@ -360,7 +359,7 @@ const updatePurchaseRequisitionStatus = async ({ id, statusName, userId }) => {
             }
         };
 
-        if (statusName === STATUS_CONFIRMED) {
+        if (statusName === PURCHASE_REQUISITION_STATUS_NAMES.CONFIRMED) {
             const approver = await getDb().profile.findFirst({
                 where: {
                     isActive: true,
@@ -433,13 +432,13 @@ const updatePurchaseRequisitionStatus = async ({ id, statusName, userId }) => {
             })
         });
 
-        if (err.code === PRISMA_RECORD_NOT_FOUND) throw new PurchaseRequisitionStatusNotFound();
+        if (err.code === PRISMA_ERROR_CODES.RECORD_NOT_FOUND) throw new PurchaseRequisitionStatusNotFound();
         throw new PurchaseRequisitionStatusUpdateDatabaseError();
     }
 };
 
 export const confirmPurchaseRequisition = async ({ id, userId }) =>
-    await updatePurchaseRequisitionStatus({ id, statusName: STATUS_CONFIRMED, userId });
+    await updatePurchaseRequisitionStatus({ id, statusName: PURCHASE_REQUISITION_STATUS_NAMES.CONFIRMED, userId });
 
 export const cancelPurchaseRequisition = async ({ id, userId }) =>
-    await updatePurchaseRequisitionStatus({ id, statusName: STATUS_CANCELED, userId });
+    await updatePurchaseRequisitionStatus({ id, statusName: PURCHASE_REQUISITION_STATUS_NAMES.CANCELED, userId });

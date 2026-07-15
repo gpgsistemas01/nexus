@@ -6,11 +6,8 @@ import { buildStockKey, hasProductDimensions, normalizeDecimal, parseStockKey } 
 import { assertSufficientStock, calculateConvertedQuantity } from "./stockHelpers.js";
 import { buildStockUpdateSummary } from "./movementHelpers.js";
 import { findSupplierProductsForStockMovement, updateSupplierProductStock } from "../warehouse/products/supplierProductService.js";
+import { INVENTORY_MOVEMENT_TYPES, INVENTORY_REFERENCE_TYPES } from "../../constants/inventory.js";
 
-const REFERENCE_TYPE_GOODS_RECEIPT = 'GOODS_RECEIPT';
-const REFERENCE_TYPE_GOODS_ISSUE = 'GOODS_ISSUE';
-const REFERENCE_TYPE_PURCHASE_REQUISITION = 'PURCHASE_REQUISITION';
-const MOVEMENT_TYPE_OUT = 'ISSUE';
 
 export const applyInventoryMovement = async ({
     tx,
@@ -81,7 +78,7 @@ export const applyInventoryMovement = async ({
             ps.convertedQuantity || 0
         );
 
-        const isOut = movementType === MOVEMENT_TYPE_OUT;
+        const isOut = movementType === INVENTORY_MOVEMENT_TYPES.ISSUE;
 
         const signedQuantity = normalizeDecimal(
             isOut
