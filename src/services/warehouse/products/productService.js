@@ -73,6 +73,7 @@ export const findAllProducts = async ({
     take = 10,
     search = '',
     supplierId = null,
+    productId = null,
     orderBy = 'name',
     orderDir = 'asc'
 }) => {
@@ -82,6 +83,7 @@ export const findAllProducts = async ({
         take,
         search,
         supplierId,
+        ...(productId ? { productId } : {}),
         orderBy,
         orderDir
     });

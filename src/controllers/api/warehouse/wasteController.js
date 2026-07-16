@@ -9,6 +9,7 @@ export const getAllWastes = async (req, res) => {
     const { skip, take } = getDataTablePaging(req.query);
     const search = getDataTableSearch(req.query);
     const supplierId = req.query.supplierId || null;
+    const productId = req.query.productId || null;
 
     const columns = ['name', null, null, null, null, null, null, null, null, null];
     const { orderBy, orderDir } = getDataTableOrder({
@@ -21,6 +22,7 @@ export const getAllWastes = async (req, res) => {
         take,
         search,
         supplierId,
+        productId,
         orderBy,
         orderDir
     });

@@ -1,4 +1,5 @@
 import { createDataTable, renderActionButtons } from "./baseDatatable.js";
+import { setupTableFilters } from "./utils/filters/tableFilter.js";
 import { hasPermission } from "../../utils/permissions.js";
 import { renderMaterialName } from "./utils/renderProductDatatable.js";
 import { getAllWastes } from "../../application/warehouse/wastes.js";
@@ -34,7 +35,7 @@ const renderWasteTableHeader = ({ canSeeCost, canManageWastes }) => {
     `;
 };
 
-export const createWasteDatatable = (context) => {
+export const createWasteDatatable = async (context) => {
 
     const { isAdmin, isWarehouse, isSystem, isSales } = hasPermission(context);
     const canSeeCost = isWarehouse || isSystem || isSales;
@@ -42,6 +43,10 @@ export const createWasteDatatable = (context) => {
     const canAdjustStock = isSystem && isAdmin;
 
     renderWasteTableHeader({ canSeeCost, canManageWastes });
+
+    const filters = await setupTableFilters({
+        fields: ['supplier', 'product']
+    });
 
     const columns = [
         {
@@ -73,7 +78,10 @@ export const createWasteDatatable = (context) => {
     const table = createDataTable({
         options: {
             ajax: {
-                get: getAllWastes
+                get: (params) => getAllWastes({
+                    ...params,
+                    ...filters.getValues()
+                })
             },
             searchPlaceholder: 'Buscar por Material o Proveedor',
             columns,

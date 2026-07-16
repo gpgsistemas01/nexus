@@ -120,6 +120,22 @@
     ]
 } %>
 
+<%- include('../../../shared/tableFilters', {
+    selectInputs: [
+        {
+            id: 'supplierFilter',
+            label: 'Proveedor:',
+            col: 'col-12 col-md-6'
+        },
+        {
+            id: 'productFilter',
+            label: 'Producto:',
+            col: 'col-12 col-md-6'
+        }
+    ],
+    dateInputs: []
+}) %>
+
 <%- include('../../../shared/mainTable', { title: 'Mermas' }) %>
 
 <%- include('../../../shared/modal', { modalId: 'wasteModal', form }) %>
