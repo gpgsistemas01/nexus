@@ -1,5 +1,6 @@
 import { openProductModal, openStockAdjustmentModal } from "../../modules/products/productModal.js";
 import { createDataTable, renderActionButtons } from "./baseDatatable.js";
+import { setupTableFilters } from "./utils/filters/tableFilter.js";
 import { notifications } from "../swal/swalComponent.js";
 import { hasPermission } from "../../utils/permissions.js";
 import { deleteProduct, getAllProducts } from "../../application/warehouse/products.js";
@@ -53,7 +54,7 @@ const configureStockRealtime = (table) => {
     });
 };
 
-export const createProductDatatable = (context) => {
+export const createProductDatatable = async (context) => {
 
     const { hasRole, isAdmin, isWarehouse, isSystem, isSales } = hasPermission(context);
     const isWarehouseProductManager = isWarehouse && (hasRole('Almacenista') || hasRole('Coordinador') || hasRole('Auxiliar'));
@@ -64,6 +65,10 @@ export const createProductDatatable = (context) => {
     const canAdjustStock = isSystem && isAdmin;
 
     renderProductTableHeader({ canSeeCost, canManageProducts });
+
+    const filters = await setupTableFilters({
+        fields: ['supplier']
+    });
 
     const columns = [
         { 
@@ -100,7 +105,10 @@ export const createProductDatatable = (context) => {
     const table = createDataTable({
         options: {
             ajax: {
-                get: getAllProducts
+                get: (params) => getAllProducts({
+                    ...params,
+                    ...filters.getValues()
+                })
             },
             searchPlaceholder: 'Buscar por Material',
             columns,
@@ -146,7 +154,7 @@ export const createProductDatatable = (context) => {
                 buildExcelButton({
                     filename: formatFileName('reporte_inventario_productos'),
                     allowMonthlyReport: false,
-                    request: () => exportWarehouseReport(buildTableExportParams(table))
+                    request: () => exportWarehouseReport(buildTableExportParams(table, filters.getValues()))
                 })
             ]
         }

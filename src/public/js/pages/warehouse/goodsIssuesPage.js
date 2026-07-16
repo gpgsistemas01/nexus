@@ -218,6 +218,7 @@ export const openGoodsIssueModal = ({ mode, data = null }) => {
                 submitText: RETURN_SUBMIT_TEXT,
                 toggleContainerElements,
                 setFormReadOnly,
+                toggleDisabledElement,
                 observationsElement: form.querySelector('#observationsInput')
             });
 

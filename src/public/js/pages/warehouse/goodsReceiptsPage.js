@@ -165,6 +165,10 @@ export const openGoodsReceiptModal = ({ mode, data = null }) => {
     currentGoodsReceipt = data;
     clearFormErrors(form);
     setFormReadOnly({ form, isReadOnly: false });
+    setGoodsReceiptReturnHeaderFieldsReadOnly({
+        form,
+        isReadOnly: false
+    });
     toggleDisabledElement({
         element: form.querySelector(FORM_SELECTORS.SUPPLIER),
         isDisabled: false
