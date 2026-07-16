@@ -210,7 +210,7 @@ export const validateDateOptional = (fieldName) => {
         .toDate()
 }
 
-export const validateDetailsArray = 
+export const validateDetailsArray =
     body('details')
         .isArray({ min: 1 }).withMessage(errorMap['details'].REQUIRED)
         .custom(details => {

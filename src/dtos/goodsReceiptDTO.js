@@ -25,7 +25,12 @@ export const createGoodsReceiptDtoForEdit = (body = {}) => {
         isInvoiced: Boolean(isInvoiced),
         ...(isInvoiced ? { invoice: body.invoice.trim() } : { invoice: null }),
         receptionDate: new Date(body.receptionDate),
-        ...(Object.prototype.hasOwnProperty.call(body, 'observations') ? { observations: body.observations.trim() } : {})
+        ...(Object.prototype.hasOwnProperty.call(body, 'observations') ? { observations: body.observations.trim() } : {}),
+        details: (body.details || []).map(d => ({
+            productId: d.productId.trim(),
+            quantity: Number(d.quantity),
+            costPerUnitType: Number(d.costPerUnitType)
+        }))
     };
 };
 
