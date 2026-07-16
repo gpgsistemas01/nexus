@@ -57,6 +57,8 @@ export const validateUsername = (username) => {
     return result;
 }
 
+export const validateNonNegativeNumber = (number, fieldName) => validateNumber(number, fieldName);
+
 export const validatePositiveNumber = (number, fieldName) => {
 
     let result = validateNumber(number, fieldName);
