@@ -186,6 +186,7 @@ export const errorMessages = {
     GOODS_RECEIPT_SUPPLIER_CHANGE_CONFLICT: 'No se puede cambiar el proveedor de una compra confirmada porque sus movimientos de inventario ya están asociados al proveedor original.',
     GOODS_RECEIPT_RETURN_CONFLICT: 'La cantidad devuelta de la compra no es válida.',
     GOODS_RECEIPT_CORRECTION_NO_CHANGES: 'No hay cambios para aplicar en el detalle de la compra.',
+    GOODS_RECEIPT_CORRECTION_QUANTITY_CONFLICT: 'La cantidad corregida debe estar entre cero y la cantidad registrada del detalle.',
     GOODS_RECEIPT_CORRECTION_INSUFFICIENT_STOCK: (meta) => {
 
         const hasDimensions =
