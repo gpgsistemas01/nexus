@@ -114,13 +114,6 @@ export const createGoodsReceiptDatatable = async (context = window.meta || {}) =
         openGoodsReceiptModal({ mode: 'edit', data });
     });
 
-    $(`${ selectorTable } tbody`).on('click', '.btn-view', function() {
-
-        const data = getResponsiveRowData(table, this);
-
-        openGoodsReceiptModal({ mode: 'view', data });
-    });
-
     $(`${ selectorTable } tbody`).on('click', '.btn-return-goods-receipt', function() {
 
         const data = getResponsiveRowData(table, this);

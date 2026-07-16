@@ -94,13 +94,6 @@ export const createPurchaseRequisitionDatatable = (context) => {
 
         await openPurchaseRequisitionModal({ mode: 'edit', data });
     });
-
-    $(`${ selectorTable } tbody`).on('click', '.btn-view', function() {
-
-        const data = getResponsiveRowData(table, this);
-
-        openPurchaseRequisitionModal({ mode: 'view', data });
-    });
 };
 
 export const initDetailsPurchaseRequisitionTable = (mode) => {
