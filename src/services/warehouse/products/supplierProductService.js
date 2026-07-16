@@ -108,7 +108,6 @@ export const findAllSupplierProducts = async ({
     take = 10,
     search = '',
     supplierId = null,
-    productId = null,
     orderBy = 'id',
     orderDir = 'asc'
 }) => {
@@ -126,10 +125,6 @@ export const findAllSupplierProducts = async ({
 
     if (supplierId) where.AND.push({
         supplierId
-    });
-
-    if (productId) where.AND.push({
-        productId
     });
 
     if (where.AND.length === 0) delete where.AND;

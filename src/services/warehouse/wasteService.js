@@ -158,7 +158,6 @@ export const findAllWastes = async ({
     take = 10,
     search = '',
     supplierId = null,
-    productId = null,
     orderBy = 'name',
     orderDir = 'asc'
 }) => {
@@ -193,12 +192,6 @@ export const findAllWastes = async ({
     if (supplierId) where.AND.push({
         supplierProduct: {
             supplierId
-        }
-    });
-
-    if (productId) where.AND.push({
-        supplierProduct: {
-            productId
         }
     });
 

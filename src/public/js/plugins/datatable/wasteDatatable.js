@@ -45,7 +45,7 @@ export const createWasteDatatable = async (context) => {
     renderWasteTableHeader({ canSeeCost, canManageWastes });
 
     const filters = await setupTableFilters({
-        fields: ['supplier', 'product']
+        fields: ['supplier']
     });
 
     const columns = [

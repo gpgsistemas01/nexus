@@ -67,7 +67,7 @@ export const createProductDatatable = async (context) => {
     renderProductTableHeader({ canSeeCost, canManageProducts });
 
     const filters = await setupTableFilters({
-        fields: ['supplier', 'product']
+        fields: ['supplier']
     });
 
     const columns = [

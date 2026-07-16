@@ -10,7 +10,6 @@ export const getAllProducts = async (req, res) => {
     const { skip, take } = getDataTablePaging(req.query);
     const search = getDataTableSearch(req.query);
     const supplierId = req.query.supplierId || null;
-    const productId = req.query.productId || null;
 
     const columns = ['name', 'base', 'height', null, 'minStock', null, null, null, null, null];
     const { orderBy, orderDir } = getDataTableOrder({
@@ -23,7 +22,6 @@ export const getAllProducts = async (req, res) => {
         take,
         search,
         supplierId,
-        productId,
         orderBy,
         orderDir
     });
