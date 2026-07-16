@@ -1,6 +1,6 @@
 import { body } from "express-validator";
 import { errorMap } from "../../messages/codeMessages.js";
-import { validateBoolean, validateDate, validateDetailsArray, validateGoodsIssueReturns, validateInvoice, validatePositiveNumber, validateTextOptional, validateUUID } from "../fields/fieldsValidator.js";
+import { validateBoolean, validateDate, validateDetailsArray, validateGoodsIssueReturns, validateInvoice, validateNonNegativeNumber, validatePositiveNumber, validateTextOptional, validateUUID } from "../fields/fieldsValidator.js";
 
 const validateOptionalGoodsReceiptDetails = body('details')
     .optional({ values: 'undefined' })
@@ -49,6 +49,6 @@ export const goodsReceiptReturnValidation = [
 
 
 export const goodsReceiptCorrectionValidation = [
-    validatePositiveNumber('quantity'),
+    validateNonNegativeNumber('quantity'),
     validatePositiveNumber('costPerUnitType')
 ];

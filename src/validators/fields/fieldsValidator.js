@@ -134,6 +134,17 @@ export const validateNumber = (fieldName) => {
         .toFloat()
 }
 
+export const validateNonNegativeNumber = (fieldName) => {
+
+    const errors = errorMap[fieldName];
+
+    return body(fieldName)
+        .notEmpty().withMessage(errors.REQUIRED)
+        .isFloat({ min: 0 }).withMessage(errors.INVALID_NUMBER)
+        .matches(/^\d{1,8}(\.\d{1,2})?$/).withMessage(errors.TOO_LONG)
+        .toFloat()
+}
+
 export const validatePositiveNumber = (fieldName) => {
 
     const errors = errorMap[fieldName];
