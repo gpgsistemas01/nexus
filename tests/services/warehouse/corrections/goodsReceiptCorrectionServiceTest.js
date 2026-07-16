@@ -115,7 +115,52 @@ describe('goodsReceiptCorrectionService', () => {
       })
     }));
     expect(createStockAdjustmentByQuantityChange).toHaveBeenCalledOnce();
+    expect(createStockAdjustmentByQuantityChange).toHaveBeenCalledWith(expect.objectContaining({
+      quantityChange: -1,
+      goodsReceiptId: 'receipt-1',
+      goodsReceiptDetailId: 'detail-1',
+      returnCreatedAdjustment: true
+    }));
+    expect(updateGoodsReceiptDetailAndTotals).toHaveBeenCalledWith(expect.objectContaining({
+      correctedDetail: expect.not.objectContaining({
+        previousStock: expect.anything(),
+        newStock: expect.anything(),
+        difference: expect.anything()
+      })
+    }));
     expect(result.correction).toEqual({ id: 'correction-1', stockAdjustment: { id: 'adjustment-1' } });
+  });
+
+
+  it('no ajusta inventario cuando solo cambia el costo del detalle', async () => {
+    buildGoodsReceiptDetails.mockResolvedValueOnce([{
+      productId: 'product-old',
+      productName: 'Producto anterior',
+      quantity: 5,
+      costPerUnitType: 12,
+      netPurchaseAmount: 60,
+      grossPurchaseAmount: 71.4
+    }]);
+
+    await correctGoodsReceiptDetailLine({
+      id: 'receipt-1',
+      detailId: 'detail-1',
+      correctionDto: {
+        quantity: 5,
+        costPerUnitType: 12
+      },
+      userId: 'user-1'
+    });
+
+    expect(createStockAdjustmentByQuantityChange).not.toHaveBeenCalled();
+    expect(goodsReceiptCorrectionCreate).toHaveBeenCalledWith(expect.objectContaining({
+      data: expect.objectContaining({
+        stockAdjustmentId: null,
+        correctionType: 'COST',
+        quantityDifference: 0,
+        costDifference: 2
+      })
+    }));
   });
 
   it('maneja la cancelación del detalle como modo CANCEL_DETAIL sin actualizar costo unitario', async () => {

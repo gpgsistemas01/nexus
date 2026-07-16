@@ -62,7 +62,7 @@ const createGoodsReceiptCorrectionAdjustment = async ({
         userId,
         goodsReceiptId,
         goodsReceiptDetailId,
-        returnAdjustment: true,
+        returnCreatedAdjustment: true,
         productId: currentDetail.productId,
         quantityChange: quantityDifference,
         observations: quantityDifference > 0
