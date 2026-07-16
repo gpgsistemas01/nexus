@@ -25,7 +25,6 @@ export const goodsReceiptReturnValidation = [
 
 
 export const goodsReceiptCorrectionValidation = [
-    validateUUID('productId'),
     validatePositiveNumber('quantity'),
     validatePositiveNumber('costPerUnitType')
 ];

@@ -4,7 +4,6 @@ const transaction = vi.fn();
 const goodsReceiptDetailFindFirst = vi.fn();
 const goodsReceiptCorrectionCreate = vi.fn();
 const goodsReceiptCorrectionFindUnique = vi.fn();
-const goodsReceiptCorrectionAdjustmentCreateMany = vi.fn();
 const buildGoodsReceiptDetails = vi.fn();
 const updateGoodsReceiptDetailAndTotals = vi.fn();
 const createStockAdjustmentByQuantityChange = vi.fn();
@@ -40,7 +39,10 @@ vi.mock('../../../../src/services/warehouse/reasonService.js', () => ({
   findGoodsReceiptCorrectionReason
 }));
 
-const { correctGoodsReceiptDetailLine } = await import('../../../../src/services/warehouse/corrections/goodsReceiptCorrectionService.js');
+const {
+  correctGoodsReceiptDetailLine,
+  cancelGoodsReceiptDetailLine
+} = await import('../../../../src/services/warehouse/corrections/goodsReceiptCorrectionService.js');
 
 describe('goodsReceiptCorrectionService', () => {
   beforeEach(() => {
@@ -54,9 +56,6 @@ describe('goodsReceiptCorrectionService', () => {
         create: goodsReceiptCorrectionCreate,
         findUnique: goodsReceiptCorrectionFindUnique
       },
-      goodsReceiptCorrectionAdjustment: {
-        createMany: goodsReceiptCorrectionAdjustmentCreateMany
-      }
     }));
 
     goodsReceiptDetailFindFirst.mockResolvedValue({
@@ -73,8 +72,8 @@ describe('goodsReceiptCorrectionService', () => {
     });
 
     buildGoodsReceiptDetails.mockResolvedValue([{
-      productId: 'product-new',
-      productName: 'Producto correcto',
+      productId: 'product-old',
+      productName: 'Producto anterior',
       quantity: 7,
       costPerUnitType: 10,
       netPurchaseAmount: 70,
@@ -90,8 +89,7 @@ describe('goodsReceiptCorrectionService', () => {
       updatedReceipt: { id: 'receipt-1', supplierId: 'supplier-1' }
     });
     goodsReceiptCorrectionCreate.mockResolvedValue({ id: 'correction-1' });
-    goodsReceiptCorrectionAdjustmentCreateMany.mockResolvedValue({ count: 2 });
-    goodsReceiptCorrectionFindUnique.mockResolvedValue({ id: 'correction-1', adjustments: [] });
+    goodsReceiptCorrectionFindUnique.mockResolvedValue({ id: 'correction-1', stockAdjustment: { id: 'adjustment-1' } });
     updateProductUnitCostIfHigher.mockResolvedValue();
   });
 
@@ -100,7 +98,6 @@ describe('goodsReceiptCorrectionService', () => {
       id: 'receipt-1',
       detailId: 'detail-1',
       correctionDto: {
-        productId: 'product-new',
         quantity: 7,
         costPerUnitType: 10
       },
@@ -108,18 +105,53 @@ describe('goodsReceiptCorrectionService', () => {
     });
 
     expect(buildGoodsReceiptDetails).toHaveBeenCalledWith([{
-      productId: 'product-new',
+      productId: 'product-old',
       quantity: 7,
       costPerUnitType: 10
     }], expect.objectContaining({ tx: expect.any(Object) }));
-    expect(goodsReceiptCorrectionCreate).toHaveBeenCalledOnce();
-    expect(goodsReceiptCorrectionAdjustmentCreateMany).toHaveBeenCalledWith({
-      data: [
-        { goodsReceiptCorrectionId: 'correction-1', stockAdjustmentId: 'adjustment-1' },
-        { goodsReceiptCorrectionId: 'correction-1', stockAdjustmentId: 'adjustment-2' }
-      ]
+    expect(goodsReceiptCorrectionCreate).toHaveBeenCalledWith(expect.objectContaining({
+      data: expect.objectContaining({
+        stockAdjustmentId: 'adjustment-1'
+      })
+    }));
+    expect(createStockAdjustmentByQuantityChange).toHaveBeenCalledOnce();
+    expect(result.correction).toEqual({ id: 'correction-1', stockAdjustment: { id: 'adjustment-1' } });
+  });
+
+  it('maneja la cancelación del detalle como modo CANCEL_DETAIL sin actualizar costo unitario', async () => {
+    buildGoodsReceiptDetails.mockResolvedValueOnce([{
+      productId: 'product-old',
+      productName: 'Producto anterior',
+      quantity: 0,
+      costPerUnitType: 0,
+      netPurchaseAmount: 0,
+      grossPurchaseAmount: 0
+    }]);
+
+    await cancelGoodsReceiptDetailLine({
+      id: 'receipt-1',
+      detailId: 'detail-1',
+      userId: 'user-1'
     });
-    expect(result.correction).toEqual({ id: 'correction-1', adjustments: [] });
+
+    expect(buildGoodsReceiptDetails).toHaveBeenCalledWith([{
+      productId: 'product-old',
+      quantity: 0,
+      costPerUnitType: 0
+    }], expect.objectContaining({ tx: expect.any(Object) }));
+    expect(updateGoodsReceiptDetailAndTotals).toHaveBeenCalledWith(expect.objectContaining({
+      correctedDetail: expect.objectContaining({
+        status: 'CANCELED'
+      })
+    }));
+    expect(goodsReceiptCorrectionCreate).toHaveBeenCalledWith(expect.objectContaining({
+      data: expect.objectContaining({
+        correctionType: 'CANCEL_DETAIL',
+        correctedQuantity: 0,
+        correctedCostPerUnitType: 0
+      })
+    }));
+    expect(updateProductUnitCostIfHigher).not.toHaveBeenCalled();
   });
 
 });

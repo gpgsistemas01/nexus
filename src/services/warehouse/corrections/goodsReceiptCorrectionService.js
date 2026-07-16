@@ -16,6 +16,16 @@ import { findGoodsReceiptCorrectionReason } from '../reasonService.js';
 
 const serviceLogger = createServiceLogger('warehouse.corrections.goodsReceiptCorrectionService');
 
+const GOODS_RECEIPT_CORRECTION_MODES = Object.freeze({
+    UPDATE: 'UPDATE',
+    CANCEL_DETAIL: 'CANCEL_DETAIL'
+});
+
+const GOODS_RECEIPT_DETAIL_STATUS = Object.freeze({
+    ACTIVE: 'ACTIVE',
+    CANCELED: 'CANCELED'
+});
+
 const findReceiptDetailForCorrection = ({ tx, goodsReceiptId, detailId }) => (
     tx.goodsReceiptDetail.findFirst({
         where: {
@@ -28,157 +38,105 @@ const findReceiptDetailForCorrection = ({ tx, goodsReceiptId, detailId }) => (
     })
 );
 
-const buildCorrectionAdjustmentObservations = ({ currentDetail, correctedDetail, goodsReceiptId }) => {
-    const productChanged = currentDetail.productId !== correctedDetail.productId;
-    const quantityDifference = Number(correctedDetail.quantity) - Number(currentDetail.quantity);
-    const quantityChanged = quantityDifference !== 0;
-    const receiptReference = currentDetail.goodsReceipt.referenceNumber || goodsReceiptId;
-    const affectedFields = productChanged && quantityChanged
-        ? 'producto y cantidad'
-        : productChanged ? 'producto' : 'cantidad';
-    const correctionContext = `Corrección de compra ${receiptReference}; campos afectados: ${affectedFields}.`;
-
-    return {
-        quantityIncrease: `${correctionContext} Ajuste de entrada por aumento de cantidad.`,
-        quantityDecrease: `${correctionContext} Ajuste de salida por disminución de cantidad.`,
-        reverseIncorrectProduct: `${correctionContext} Reversa de stock; se elimina el producto registrado incorrectamente.`,
-        registerCorrectProduct: `${correctionContext} Ajuste de entrada; se registra el producto correcto.`
-    };
-};
-
-const buildCorrectionAdjustmentRequests = ({ currentDetail, correctedDetail, adjustmentObservations }) => {
-    const productChanged = currentDetail.productId !== correctedDetail.productId;
-    const quantityDifference = Number(correctedDetail.quantity) - Number(currentDetail.quantity);
-
-    if (!productChanged) {
-        return quantityDifference === 0
-            ? []
-            : [{
-                productId: currentDetail.productId,
-                quantityChange: quantityDifference,
-                observations: quantityDifference > 0
-                    ? adjustmentObservations.quantityIncrease
-                    : adjustmentObservations.quantityDecrease
-            }];
-    }
-
-    return [
-        Number(currentDetail.quantity) > 0
-            ? {
-                productId: currentDetail.productId,
-                quantityChange: -Number(currentDetail.quantity),
-                observations: adjustmentObservations.reverseIncorrectProduct
-            }
-            : null,
-        Number(correctedDetail.quantity) > 0
-            ? {
-                productId: correctedDetail.productId,
-                quantityChange: Number(correctedDetail.quantity),
-                observations: adjustmentObservations.registerCorrectProduct
-            }
-            : null
-    ].filter(Boolean);
-};
-
-const createGoodsReceiptCorrectionAdjustments = async ({
+const createGoodsReceiptCorrectionAdjustment = async ({
     tx,
     currentDetail,
     correctedDetail,
     reasonId,
     userId,
     goodsReceiptId,
-    goodsReceiptDetailId,
-    adjustmentObservations
+    goodsReceiptDetailId
 }) => {
-    const supplierId = currentDetail.goodsReceipt.supplierId;
-    const adjustmentRequests = buildCorrectionAdjustmentRequests({
-        currentDetail,
-        correctedDetail,
-        adjustmentObservations
+    const quantityDifference = Number(correctedDetail.quantity) - Number(currentDetail.quantity);
+
+    if (quantityDifference === 0) return null;
+
+    const receiptReference = currentDetail.goodsReceipt.referenceNumber || goodsReceiptId;
+    const correctionContext = `Corrección de compra ${receiptReference}; campos afectados: cantidad.`;
+
+    return createStockAdjustmentByQuantityChange({
+        tx,
+        supplierId: currentDetail.goodsReceipt.supplierId,
+        reasonId,
+        userId,
+        goodsReceiptId,
+        goodsReceiptDetailId,
+        returnAdjustment: true,
+        productId: currentDetail.productId,
+        quantityChange: quantityDifference,
+        observations: quantityDifference > 0
+            ? `${correctionContext} Ajuste de entrada por aumento de cantidad.`
+            : `${correctionContext} Ajuste de salida por disminución de cantidad.`
     });
-    return Promise.all(adjustmentRequests.map(adjustmentRequest => (
-        createStockAdjustmentByQuantityChange({
-            tx,
-            supplierId,
-            reasonId,
-            userId,
-            goodsReceiptId,
-            goodsReceiptDetailId,
-            returnAdjustment: true,
-            ...adjustmentRequest
-        })
-    )));
 };
 
-const buildCorrectionType = ({ productChanged, quantityDifference, costDifference }) => (
-    [
-        productChanged ? 'PRODUCT' : null,
-        quantityDifference !== 0 ? 'QUANTITY' : null,
-        costDifference !== 0 ? 'COST' : null
-    ].filter(Boolean).join('_AND_')
-);
-
-export const correctGoodsReceiptDetailLine = async ({ id, detailId, correctionDto, userId }) => {
-    const { productId, quantity, costPerUnitType } = correctionDto;
+export const correctGoodsReceiptDetailLine = async ({
+    id,
+    detailId,
+    correctionDto,
+    userId,
+    correctionMode = GOODS_RECEIPT_CORRECTION_MODES.UPDATE
+}) => {
+    const { quantity, costPerUnitType } = correctionDto;
 
     try {
         const db = getDb();
 
         const result = await db.$transaction(async (tx) => {
-            const currentDetail = await findReceiptDetailForCorrection({
-                tx,
-                goodsReceiptId: id,
-                detailId
-            });
+            const [currentDetail, correctionReason] = await Promise.all([
+                findReceiptDetailForCorrection({
+                    tx,
+                    goodsReceiptId: id,
+                    detailId
+                }),
+                findGoodsReceiptCorrectionReason({ tx })
+            ]);
 
             if (!currentDetail) throw new GoodsReceiptNotFound();
+            if (!correctionReason) throw new GoodsReceiptCorrectionReasonNotFound();
 
             const [correctedDetail] = await buildGoodsReceiptDetails([{
-                productId,
+                productId: currentDetail.productId,
                 quantity,
                 costPerUnitType
             }], { tx });
-            const productChanged = currentDetail.productId !== correctedDetail.productId;
             const quantityDifference = Number(correctedDetail.quantity) - Number(currentDetail.quantity);
             const costDifference = Number(correctedDetail.costPerUnitType) - Number(currentDetail.costPerUnitType);
-            const hasChanges = productChanged || quantityDifference !== 0 || costDifference !== 0;
+            const hasChanges = quantityDifference !== 0 || costDifference !== 0;
 
             if (!hasChanges) throw new GoodsReceiptCorrectionNoChanges();
 
-            const correctionType = buildCorrectionType({ productChanged, quantityDifference, costDifference });
+            const correctionType = correctionMode === GOODS_RECEIPT_CORRECTION_MODES.CANCEL_DETAIL
+                ? GOODS_RECEIPT_CORRECTION_MODES.CANCEL_DETAIL
+                : [
+                    quantityDifference !== 0 ? 'QUANTITY' : null,
+                    costDifference !== 0 ? 'COST' : null
+                ].filter(Boolean).join('_AND_');
 
-            const correctionReason = await findGoodsReceiptCorrectionReason({ tx });
-
-            if (!correctionReason) throw new GoodsReceiptCorrectionReasonNotFound();
-
-            const adjustments = await createGoodsReceiptCorrectionAdjustments({
+            const adjustment = await createGoodsReceiptCorrectionAdjustment({
                 tx,
                 currentDetail,
                 correctedDetail,
                 reasonId: correctionReason.id,
                 userId,
                 goodsReceiptId: id,
-                goodsReceiptDetailId: detailId,
-                adjustmentObservations: buildCorrectionAdjustmentObservations({
-                    currentDetail,
-                    correctedDetail,
-                    goodsReceiptId: id
-                })
+                goodsReceiptDetailId: detailId
             });
+            const detailUpdate = correctionMode === GOODS_RECEIPT_CORRECTION_MODES.CANCEL_DETAIL
+                ? { ...correctedDetail, status: GOODS_RECEIPT_DETAIL_STATUS.CANCELED }
+                : correctedDetail;
             const { updatedDetail, updatedReceipt } = await updateGoodsReceiptDetailAndTotals({
                 tx,
                 goodsReceiptId: id,
                 detailId,
-                correctedDetail
+                correctedDetail: detailUpdate
             });
-            const adjustmentLinks = adjustments.map(adjustment => ({
-                stockAdjustmentId: adjustment.id
-            }));
             const correction = await tx.goodsReceiptCorrection.create({
                 data: {
                     goodsReceiptId: id,
                     goodsReceiptDetailId: detailId,
                     reasonId: correctionReason.id,
+                    stockAdjustmentId: adjustment?.id || null,
                     previousProductId: currentDetail.productId,
                     previousProductName: currentDetail.productName,
                     previousQuantity: currentDetail.quantity,
@@ -194,45 +152,35 @@ export const correctGoodsReceiptDetailLine = async ({ id, detailId, correctionDt
                     correctedGrossPurchaseAmount: correctedDetail.grossPurchaseAmount,
 
                     correctionType,
-                    productChanged,
+                    productChanged: false,
                     quantityDifference,
                     costDifference
                 }
             });
 
-            if (adjustmentLinks.length) {
-                await tx.goodsReceiptCorrectionAdjustment.createMany({
-                    data: adjustmentLinks.map(adjustmentLink => ({
-                        goodsReceiptCorrectionId: correction.id,
-                        stockAdjustmentId: adjustmentLink.stockAdjustmentId
-                    }))
-                });
-            }
-
-            const correctionWithAdjustments = await tx.goodsReceiptCorrection.findUnique({
+            const correctionWithAdjustment = await tx.goodsReceiptCorrection.findUnique({
                 where: { id: correction.id },
                 include: {
-                    adjustments: {
-                        include: {
-                            stockAdjustment: true
-                        }
-                    }
+                    stockAdjustment: true
                 }
             });
 
             return {
                 updatedDetail,
                 updatedReceipt,
-                correction: correctionWithAdjustments,
-                adjustments,
+                correction: correctionWithAdjustment,
+                adjustment,
+                correctionMode,
                 costDifference: Number(correctedDetail.netPurchaseAmount) - Number(currentDetail.netPurchaseAmount)
             };
         });
 
-        await updateProductUnitCostIfHigher({
-            supplierId: result.updatedReceipt.supplierId,
-            details: [result.updatedDetail]
-        });
+        if (result.correctionMode !== GOODS_RECEIPT_CORRECTION_MODES.CANCEL_DETAIL) {
+            await updateProductUnitCostIfHigher({
+                supplierId: result.updatedReceipt.supplierId,
+                details: [result.updatedDetail]
+            });
+        }
 
         return result;
     } catch (err) {
@@ -249,4 +197,17 @@ export const correctGoodsReceiptDetailLine = async ({ id, detailId, correctionDt
 
         throw new GoodsReceiptUpdateDatabaseError();
     }
+};
+
+export const cancelGoodsReceiptDetailLine = async ({ id, detailId, userId }) => {
+    return correctGoodsReceiptDetailLine({
+        id,
+        detailId,
+        userId,
+        correctionMode: GOODS_RECEIPT_CORRECTION_MODES.CANCEL_DETAIL,
+        correctionDto: {
+            quantity: 0,
+            costPerUnitType: 0
+        }
+    });
 };

@@ -27,7 +27,7 @@ export const buildGoodsReceiptDetails = async (details, { tx = null } = {}) => {
             base,
             height
         });
-        let conversionUnitCost = null;
+        let conversionUnitCost = 0;
 
         if (convertedQuantity) conversionUnitCost = convertedQuantity > 0 ? roundTo(netPurchaseAmount / convertedQuantity) : 0;
 

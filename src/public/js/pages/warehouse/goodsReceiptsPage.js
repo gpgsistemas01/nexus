@@ -1,5 +1,5 @@
 import { useForm } from "../../application/form.js";
-import { editGoodsReceiptHeader, registerGoodsReceipt, returnGoodsReceipt } from "../../application/warehouse/goodsReceipts.js";
+import { editGoodsReceiptHeader, registerGoodsReceipt, cancelGoodsReceiptDetail, returnGoodsReceipt } from "../../application/warehouse/goodsReceipts.js";
 import { validateAddGoodsReceiptProductValidators, validateGoodsIssueReturnValidators, validateGoodsReceiptValidators } from "../../utils/validations/validators.js";
 import { refreshProductTable } from "../../plugins/datatable/baseDatatable.js";
 import { createGoodsReceiptDatatable, details, initDetailsGoodsReceiptTable } from "../../plugins/datatable/goodsReceiptDatatable.js";
@@ -18,6 +18,7 @@ import {
     replaceDetailsWithReturnState
 } from "./returns/returnFormHelpers.js";
 import { configureReturnModal } from "./returns/returnModalHelpers.js";
+import { notifications } from "../../plugins/swal/swalComponent.js";
 import { GOODS_RECEIPT_CORRECTION_APPLIED_EVENT, initGoodsReceiptCorrection, openGoodsReceiptCorrectionModal } from "./corrections/correctionModal.js";
 
 const modalId = MODAL_SELECTORS.GOODS_RECEIPT;
@@ -29,6 +30,9 @@ const INVOICE_VALUES = Object.freeze({
 const GOODS_RECEIPT_STATUS_LABELS = Object.freeze({
     OPEN: 'Abierta',
     CONFIRMED: 'Confirmada'
+});
+const GOODS_RECEIPT_DETAIL_STATUS = Object.freeze({
+    CANCELED: 'CANCELED'
 });
 const GOODS_RECEIPT_ENTITY_NAME = 'compra';
 const RETURN_SUBMIT_TEXT = 'Devolver';
@@ -71,7 +75,7 @@ const replaceGoodsReceiptDetails = ({ receipt }) => {
     const supplierName = receipt.supplierName;
     replaceDetailsWithReturnState({
         targetDetails: details,
-        sourceDetails: receipt.details,
+        sourceDetails: receipt.details.filter(detail => detail.status !== GOODS_RECEIPT_DETAIL_STATUS.CANCELED),
         getBaseQuantity: detail => detail.quantity,
         mapDetail: detail => ({
             ...detail,
@@ -321,6 +325,31 @@ on('click', '#productTable .correct-detail-btn', (event, button) => {
         receipt: currentGoodsReceipt,
         detail
     });
+});
+
+
+on('click', '#productTable .cancel-receipt-detail-btn', async (event, button) => {
+    const detail = details.find(item => item.id === button.dataset.id);
+
+    if (!detail || !currentGoodsReceipt) return;
+
+    const confirmation = await notifications.showConfirmation({
+        title: '¿Cancelar detalle de compra?',
+        text: 'Se marcará el detalle como cancelado, se dejará en cero y se generará el ajuste de inventario correspondiente sin abrir la corrección completa.',
+        confirmButtonText: 'Cancelar detalle'
+    });
+
+    if (!confirmation.isConfirmed) return;
+
+    const response = await cancelGoodsReceiptDetail({
+        id: currentGoodsReceipt.id,
+        detailId: detail.id
+    });
+
+    notifications.showSuccess(response.message);
+    document.querySelector('#goodsReceiptCorrectionModal').dispatchEvent(new CustomEvent(GOODS_RECEIPT_CORRECTION_APPLIED_EVENT, {
+        detail: response.data
+    }));
 });
 
 document.querySelector('#goodsReceiptCorrectionModal').addEventListener(GOODS_RECEIPT_CORRECTION_APPLIED_EVENT, (event) => {

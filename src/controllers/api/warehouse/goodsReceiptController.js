@@ -5,7 +5,7 @@ import {
     findAllGoodsReceipts,
     updateGoodsReceiptHeader
 } from "../../../services/warehouse/goodsReceipts/goodsReceiptService.js";
-import { correctGoodsReceiptDetailLine } from "../../../services/warehouse/corrections/goodsReceiptCorrectionService.js";
+import { correctGoodsReceiptDetailLine, cancelGoodsReceiptDetailLine } from "../../../services/warehouse/corrections/goodsReceiptCorrectionService.js";
 import { getDataTableOrder, getDataTablePaging, getDataTableSearch } from "../../../utils/requestQueryUtils.js";
 import {
     createStockNotification,
@@ -105,6 +105,20 @@ export const correctGoodsReceiptDetail = async (req, res) => {
         id: req.params.id,
         detailId: req.params.detailId,
         correctionDto: sanitizedCorrectionDto,
+        userId: req.user.id
+    });
+
+    return res.status(200).json({
+        correction,
+        code: successCodeMessages.UPDATED_GOODS_RECEIPT
+    });
+};
+
+export const cancelGoodsReceiptDetail = async (req, res) => {
+
+    const correction = await cancelGoodsReceiptDetailLine({
+        id: req.params.id,
+        detailId: req.params.detailId,
         userId: req.user.id
     });
 

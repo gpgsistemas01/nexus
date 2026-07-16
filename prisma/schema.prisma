@@ -258,6 +258,7 @@ model GoodsReceiptDetail {
   productName         String           @db.VarChar(200)
   productBase         Decimal?         @db.Decimal(10, 2)
   productHeight       Decimal?         @db.Decimal(10, 2)
+  status              GoodsReceiptDetailStatus @default(ACTIVE)
   goodsReceipt        GoodsReceipt     @relation(fields: [goodsReceiptId], references: [id])
   product             Product          @relation(fields: [productId], references: [id])
   movementDetails     MovementDetail[]
@@ -265,6 +266,11 @@ model GoodsReceiptDetail {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+enum GoodsReceiptDetailStatus {
+  ACTIVE
+  CANCELED
 }
 
 model PurchaseRequisition {
@@ -463,7 +469,7 @@ model StockAdjustment {
   movement InventoryMovement?
 
   details StockAdjustmentDetail[]
-  correctionLinks GoodsReceiptCorrectionAdjustment[]
+  goodsReceiptCorrection GoodsReceiptCorrection?
 
   appliedAt DateTime?
 
@@ -526,6 +532,7 @@ model GoodsReceiptCorrection {
   goodsReceiptId       String @db.Uuid
   goodsReceiptDetailId String @db.Uuid
   reasonId             String @db.Uuid
+  stockAdjustmentId    String? @unique @db.Uuid
   previousProductId           String @db.Uuid
   previousProductName         String @db.VarChar(200)
   previousQuantity            Decimal @db.Decimal(10, 2)
@@ -550,7 +557,7 @@ model GoodsReceiptCorrection {
   reason             StockAdjustmentReason @relation(fields: [reasonId], references: [id])
   previousProduct    Product @relation("PreviousGoodsReceiptCorrectionProduct", fields: [previousProductId], references: [id])
   correctedProduct   Product @relation("CorrectedGoodsReceiptCorrectionProduct", fields: [correctedProductId], references: [id])
-  adjustments        GoodsReceiptCorrectionAdjustment[]
+  stockAdjustment    StockAdjustment? @relation(fields: [stockAdjustmentId], references: [id], onDelete: SetNull)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -560,23 +567,6 @@ model GoodsReceiptCorrection {
   @@index([reasonId])
   @@index([previousProductId])
   @@index([correctedProductId])
-}
-
-model GoodsReceiptCorrectionAdjustment {
-  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-
-  goodsReceiptCorrectionId String @db.Uuid
-  stockAdjustmentId        String @db.Uuid
-
-  correction      GoodsReceiptCorrection @relation(fields: [goodsReceiptCorrectionId], references: [id])
-  stockAdjustment StockAdjustment        @relation(fields: [stockAdjustmentId], references: [id])
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@unique([goodsReceiptCorrectionId, stockAdjustmentId])
-  @@index([goodsReceiptCorrectionId])
-  @@index([stockAdjustmentId])
 }
 
 model StockAdjustmentReason {
