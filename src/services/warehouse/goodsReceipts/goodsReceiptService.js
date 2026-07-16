@@ -13,7 +13,7 @@ import { generateYearlyReferenceNumber } from "../../document/referenceNumberSer
 import { findProfileById } from "../../admin/profileService.js";
 import { applyInventoryMovement } from "../../inventory/movementService.js";
 import { findUniqueSupplier } from "../supplierService.js";
-import { buildGoodsReceiptDetails, calculateGoodsReceiptTotals } from "./goodsReceiptHelpers.js";
+import { buildGoodsReceiptDetails, calculateGoodsReceiptTotals, createGoodsReceiptDetailsAndUpdateTotals } from "./goodsReceiptHelpers.js";
 import { updateProductUnitCostIfHigher } from "../products/supplierProductService.js";
 import { isAppError } from "../../../errors/AppError.js";
 import { buildDateRangeFilter } from "../../../utils/requestQueryUtils.js";
@@ -215,6 +215,7 @@ export const createGoodsReceipt = async ({ goodsReceiptDto }) => {
             details: result.details
         });
 
+
         logServiceInfo(serviceLogger, {
             operation: 'warehouse.goodsReceipts.goodsReceiptService.createGoodsReceipt',
             ...getModelLogContext('goodsReceipt', {
@@ -238,54 +239,91 @@ export const createGoodsReceipt = async ({ goodsReceiptDto }) => {
     }
 }
 
-export const updateGoodsReceiptHeader = async ({ id, goodsReceiptDto }) => {
+export const updateGoodsReceipt = async ({ id, goodsReceiptDto }) => {
 
     try {
 
-        const { receivedById, supplierId: _ignoredSupplierId, details: _ignoredDetails, ...goodsReceiptData } = goodsReceiptDto;
+        const { receivedById, supplierId: _ignoredSupplierId, details = [], userId, ...goodsReceiptData } = goodsReceiptDto;
+        const newDetails = details.filter(detail => !detail.id);
 
-        const goodsReceipt = await getDb().goodsReceipt.findUnique({
-            where: { id },
-            select: {
-                id: true
-            }
-        });
+        const [goodsReceipt, receivedBy] = await Promise.all([
+            getDb().goodsReceipt.findUnique({
+                where: { id },
+                select: {
+                    id: true
+                }
+            }),
+            findProfileById({ id: receivedById })
+        ]);
 
         if (!goodsReceipt) throw new GoodsReceiptNotFound();
 
-        const receivedBy = await findProfileById({ id: receivedById });
-
         if (!receivedBy) throw new ProfileReceivedByNotFound();
 
-        const updatedGoodsReceipt = await getDb().goodsReceipt.update({
-            where: { id },
-            data: {
-                ...goodsReceiptData,
-                receivedByName: receivedBy.fullName,
-                receivedBy: {
-                    connect: { id: receivedById }
+        let addedDetails = [];
+
+        const updatedGoodsReceipt = await getDb().$transaction(async (tx) => {
+            const updatedHeader = await tx.goodsReceipt.update({
+                where: { id },
+                data: {
+                    ...goodsReceiptData,
+                    receivedByName: receivedBy.fullName,
+                    receivedBy: {
+                        connect: { id: receivedById }
+                    }
+                },
+                include: {
+                    details: true,
+                    status: true
                 }
-            },
-            include: {
-                details: true,
-                status: true
-            }
+            });
+
+            if (!newDetails.length) return updatedHeader;
+
+            const { createdDetails, updatedReceipt } = await createGoodsReceiptDetailsAndUpdateTotals({
+                tx,
+                goodsReceiptId: id,
+                details: newDetails
+            });
+
+            await applyInventoryMovement({
+                tx,
+                reference: { goodsReceiptId: id },
+                details: createdDetails.map(detail => ({
+                    productId: detail.productId,
+                    goodsReceiptDetailId: detail.id,
+                    supplierId: updatedHeader.supplierId,
+                    quantity: detail.quantity
+                })),
+                movementType: INVENTORY_MOVEMENT_TYPES.ENTRY
+            });
+
+            addedDetails = createdDetails;
+
+            return updatedReceipt;
         });
 
+        if (newDetails.length) {
+            await updateProductUnitCostIfHigher({
+                supplierId: updatedGoodsReceipt.supplierId,
+                details: addedDetails
+            });
+        }
+
         logServiceInfo(serviceLogger, {
-            operation: 'warehouse.goodsReceipts.goodsReceiptService.updateGoodsReceiptHeader',
+            operation: 'warehouse.goodsReceipts.goodsReceiptService.updateGoodsReceipt',
             ...getModelLogContext('goodsReceipt', {
                 id,
                 ...goodsReceiptDto,
                 referenceNumber: updatedGoodsReceipt.referenceNumber
             })
-        }, 'Encabezado de compra actualizado correctamente');
+        }, 'Compra actualizada correctamente');
 
         return updatedGoodsReceipt;
 
     } catch (err) {
         logServiceError(serviceLogger, err, {
-            operation: 'warehouse.goodsReceipts.goodsReceiptService.updateGoodsReceiptHeader',
+            operation: 'warehouse.goodsReceipts.goodsReceiptService.updateGoodsReceipt',
             ...getModelLogContext('goodsReceipt', { id, ...goodsReceiptDto })
         });
 
