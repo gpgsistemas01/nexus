@@ -6,7 +6,8 @@ import {
     getAllGoodsReceipts,
     registerGoodsReceipt,
     returnGoodsReceipt,
-    correctGoodsReceiptDetail
+    correctGoodsReceiptDetail,
+    cancelGoodsReceiptDetail
 } from '../../../controllers/api/warehouse/goodsReceiptController.js';
 import { goodsReceiptCorrectionValidation, goodsReceiptHeaderValidation, goodsReceiptReturnValidation, goodsReceiptValidation } from '../../../validators/forms/goodsReceiptValidations.js';
 
@@ -53,6 +54,13 @@ router.patch(
     validate,
     authorizeUserApi(goodsReceiptPermissions),
     correctGoodsReceiptDetail
+);
+
+router.patch(
+    '/:id/details/:detailId/cancel',
+    verifyApiTokenRequired,
+    authorizeUserApi(goodsReceiptPermissions),
+    cancelGoodsReceiptDetail
 );
 
 router.patch(

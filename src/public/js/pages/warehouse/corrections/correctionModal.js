@@ -1,5 +1,4 @@
 import { initMdbModal } from "../../../plugins/mdb/baseInstance.js";
-import { initGoodsReceiptCorrectionSelect2 } from "../../../plugins/select2/modules/correctionSelect.js";
 import { clearFormErrors } from "../../../ui/formUI.js";
 import { formatCurrency, formatDecimal, roundTo } from "../../../utils/formatUtils.js";
 import { GOODS_RECEIPT_CORRECTION_APPLIED_EVENT, initGoodsReceiptCorrectionForm } from "./correctionForm.js";
@@ -76,7 +75,6 @@ export const openGoodsReceiptCorrectionModal = ({ receipt, detail }) => {
     const form = getForm();
 
     setCorrectionFormValues({ form, receipt, detail });
-    initGoodsReceiptCorrectionSelect2({ detail });
     updateCorrectionTotalsSummary();
     initMdbModal(modal).show();
 };

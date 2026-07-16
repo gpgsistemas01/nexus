@@ -33,3 +33,8 @@ export const correctGoodsReceiptDetailRequest = ({ data, id, detailId }) => apiR
     url: `${ GOODS_RECEIPTS_API_ROUTE }/${ id }/details/${ detailId }/corrections`,
     data
 });
+
+export const cancelGoodsReceiptDetailRequest = ({ id, detailId }) => apiRequest({
+    method: 'patch',
+    url: `${ GOODS_RECEIPTS_API_ROUTE }/${ id }/details/${ detailId }/cancel`
+});

@@ -21,13 +21,12 @@ export const initGoodsReceiptCorrectionForm = () => {
         sendRequest: async ({ formData, form }) => {
             const currentDetail = form.correctionDetail;
             const hasChanges = currentDetail && (
-                currentDetail.productId !== formData.productId
-                || Number(currentDetail.quantity) !== Number(formData.quantity)
+                Number(currentDetail.quantity) !== Number(formData.quantity)
                 || Number(currentDetail.costPerUnitType) !== Number(formData.costPerUnitType)
             );
 
             if (!hasChanges) {
-                notifications.showWarning('Debe modificar el producto, cantidad o costo para corregir el detalle.');
+                notifications.showWarning('Debe modificar la cantidad o el costo para corregir el detalle.');
                 resetFormSubmitState(form);
                 return;
             }
@@ -47,7 +46,6 @@ export const initGoodsReceiptCorrectionForm = () => {
                 id: form.dataset.id,
                 detailId: form.dataset.detailId,
                 formData: {
-                    productId: formData.productId,
                     quantity: formData.quantity,
                     costPerUnitType: formData.costPerUnitType
                 }

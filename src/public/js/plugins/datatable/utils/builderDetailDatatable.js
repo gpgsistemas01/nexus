@@ -264,16 +264,32 @@ export const buildDetailsColumns = ({ type, mode, render, isWarehouse, isCoordin
             title: 'Acciones',
             orderable: false,
             searchable: false,
-            render: (_, __, row) => buildMdbActionButton({
-                className: 'correct-detail-btn',
-                colorClass: 'btn-info',
-                iconClass: 'fa-solid fa-pen-to-square',
-                title: 'Corregir detalle',
-                ariaLabel: 'Corregir detalle de compra',
-                htmlAttrs: {
-                    'data-id': row.id
-                }
-            })
+            render: (_, __, row) => {
+                const detailId = row.id;
+
+                return `
+                    ${ buildMdbActionButton({
+                        className: 'correct-detail-btn',
+                        colorClass: 'btn-info',
+                        iconClass: 'fa-solid fa-pen-to-square',
+                        title: 'Corregir detalle',
+                        ariaLabel: 'Corregir detalle de compra',
+                        htmlAttrs: {
+                            'data-id': detailId
+                        }
+                    }) }
+                    ${ buildMdbActionButton({
+                        className: 'cancel-receipt-detail-btn',
+                        colorClass: 'btn-danger',
+                        iconClass: 'fa-solid fa-ban',
+                        title: 'Cancelar detalle',
+                        ariaLabel: 'Cancelar detalle de compra',
+                        htmlAttrs: {
+                            'data-id': detailId
+                        }
+                    }) }
+                `;
+            }
         });
     }
 
