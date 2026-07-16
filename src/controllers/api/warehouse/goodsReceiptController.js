@@ -3,7 +3,7 @@ import { successCodeMessages } from "../../../messages/codeMessages.js";
 import {
     createGoodsReceipt,
     findAllGoodsReceipts,
-    updateGoodsReceiptHeader
+    updateGoodsReceipt
 } from "../../../services/warehouse/goodsReceipts/goodsReceiptService.js";
 import { correctGoodsReceiptDetailLine, cancelGoodsReceiptDetailLine } from "../../../services/warehouse/corrections/goodsReceiptCorrectionService.js";
 import { getDataTableOrder, getDataTablePaging, getDataTableSearch } from "../../../utils/requestQueryUtils.js";
@@ -67,9 +67,12 @@ export const editGoodsReceiptHeader = async (req, res) => {
     const goodsReceiptDto = createGoodsReceiptDtoForEdit(req.body);
     const sanitizedGoodsReceiptDto = sanitizeEmptyStrings(goodsReceiptDto);
 
-    const goodsReceipt = await updateGoodsReceiptHeader({
+    const goodsReceipt = await updateGoodsReceipt({
         id: req.params.id,
-        goodsReceiptDto: sanitizedGoodsReceiptDto
+        goodsReceiptDto: {
+            ...sanitizedGoodsReceiptDto,
+            userId: req.user.id
+        }
     });
 
     return res.status(200).json({

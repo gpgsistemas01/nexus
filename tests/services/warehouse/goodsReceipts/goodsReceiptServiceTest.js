@@ -3,6 +3,13 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 const goodsReceiptFindUnique = vi.fn();
 const goodsReceiptUpdate = vi.fn();
 const findProfileById = vi.fn();
+const applyInventoryMovement = vi.fn();
+const createGoodsReceiptDetailsAndUpdateTotals = vi.fn();
+const dbTransaction = vi.fn(async (callback) => callback({
+  goodsReceipt: {
+    update: goodsReceiptUpdate
+  }
+}));
 
 vi.mock('../../../../src/utils/logger.js', () => ({
   createServiceLogger: vi.fn(() => ({})),
@@ -13,6 +20,7 @@ vi.mock('../../../../src/utils/logger.js', () => ({
 
 vi.mock('../../../../src/repository/baseRepository.js', () => ({
   getDb: () => ({
+    $transaction: dbTransaction,
     goodsReceipt: {
       findUnique: goodsReceiptFindUnique,
       update: goodsReceiptUpdate
@@ -29,7 +37,7 @@ vi.mock('../../../../src/services/document/referenceNumberService.js', () => ({
 }));
 
 vi.mock('../../../../src/services/inventory/movementService.js', () => ({
-  applyInventoryMovement: vi.fn()
+  applyInventoryMovement
 }));
 
 vi.mock('../../../../src/services/warehouse/supplierService.js', () => ({
@@ -37,7 +45,9 @@ vi.mock('../../../../src/services/warehouse/supplierService.js', () => ({
 }));
 
 vi.mock('../../../../src/services/warehouse/goodsReceipts/goodsReceiptHelpers.js', () => ({
-  buildGoodsReceiptDetails: vi.fn()
+  buildGoodsReceiptDetails: vi.fn(),
+  calculateGoodsReceiptTotals: vi.fn(() => ({})),
+  createGoodsReceiptDetailsAndUpdateTotals
 }));
 
 vi.mock('../../../../src/services/warehouse/products/supplierProductService.js', () => ({
@@ -48,18 +58,32 @@ vi.mock('../../../../src/services/warehouse/returns/returnHelpers.js', () => ({
   findReturnedQuantityTotalsByDetailIds: vi.fn(() => new Map())
 }));
 
-const { updateGoodsReceiptHeader } = await import('../../../../src/services/warehouse/goodsReceipts/goodsReceiptService.js');
+const { updateGoodsReceipt } = await import('../../../../src/services/warehouse/goodsReceipts/goodsReceiptService.js');
 
 describe('goodsReceiptService', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     goodsReceiptFindUnique.mockResolvedValue({ id: 'receipt-1' });
     findProfileById.mockResolvedValue({ id: 'profile-1', fullName: 'Usuario Almacén' });
-    goodsReceiptUpdate.mockResolvedValue({ id: 'receipt-1', referenceNumber: 'REC-2026-0001' });
+    goodsReceiptUpdate.mockResolvedValue({
+      id: 'receipt-1',
+      referenceNumber: 'REC-2026-0001',
+      supplierId: 'supplier-1',
+      details: []
+    });
+    createGoodsReceiptDetailsAndUpdateTotals.mockResolvedValue({
+      createdDetails: [{ id: 'detail-new', productId: 'product-1', quantity: 2 }],
+      updatedReceipt: {
+        id: 'receipt-1',
+        referenceNumber: 'REC-2026-0001',
+        supplierId: 'supplier-1',
+        details: [{ id: 'detail-new', productId: 'product-1', quantity: 2 }]
+      }
+    });
   });
 
-  it('actualiza solo encabezado editable y no modifica proveedor ni detalles de la compra', async () => {
-    await updateGoodsReceiptHeader({
+  it('actualiza compra con encabezado editable y no modifica proveedor ni detalles de la compra', async () => {
+    await updateGoodsReceipt({
       id: 'receipt-1',
       goodsReceiptDto: {
         supplierId: 'supplier-changed',
@@ -91,5 +115,37 @@ describe('goodsReceiptService', () => {
     expect(updateData).not.toHaveProperty('supplierName');
     expect(updateData).not.toHaveProperty('supplier');
     expect(updateData).not.toHaveProperty('details');
+  });
+
+  it('crea los detalles nuevos y registra su movimiento de entrada al editar una compra', async () => {
+    await updateGoodsReceipt({
+      id: 'receipt-1',
+      goodsReceiptDto: {
+        receivedById: 'profile-1',
+        isInvoiced: false,
+        invoice: null,
+        receptionDate: new Date('2026-07-09T00:00:00.000Z'),
+        details: [{ productId: 'product-1', quantity: 2, costPerUnitType: 50 }],
+        userId: 'user-1'
+      }
+    });
+
+    expect(createGoodsReceiptDetailsAndUpdateTotals).toHaveBeenCalledWith({
+      tx: expect.any(Object),
+      goodsReceiptId: 'receipt-1',
+      details: [{ productId: 'product-1', quantity: 2, costPerUnitType: 50 }]
+    });
+
+    expect(applyInventoryMovement).toHaveBeenCalledWith({
+      tx: expect.any(Object),
+      reference: { goodsReceiptId: 'receipt-1' },
+      details: [{
+        productId: 'product-1',
+        goodsReceiptDetailId: 'detail-new',
+        supplierId: 'supplier-1',
+        quantity: 2
+      }],
+      movementType: 'ENTRY'
+    });
   });
 });

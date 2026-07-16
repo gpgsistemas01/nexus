@@ -95,3 +95,36 @@ export const updateGoodsReceiptDetailAndTotals = async ({ tx, goodsReceiptId, de
         updatedReceipt
     };
 };
+
+export const createGoodsReceiptDetailsAndUpdateTotals = async ({ tx, goodsReceiptId, details }) => {
+    const processedDetails = await buildGoodsReceiptDetails(details, { tx });
+    const createdDetails = await tx.goodsReceiptDetail.createManyAndReturn({
+        data: processedDetails.map(detail => ({
+            ...detail,
+            goodsReceiptId
+        }))
+    });
+
+    const receiptDetails = await tx.goodsReceiptDetail.findMany({
+        where: { goodsReceiptId },
+        select: {
+            quantity: true,
+            netPurchaseAmount: true,
+            grossPurchaseAmount: true
+        }
+    });
+
+    const updatedReceipt = await tx.goodsReceipt.update({
+        where: { id: goodsReceiptId },
+        data: calculateGoodsReceiptTotals(receiptDetails),
+        include: {
+            details: true,
+            status: true
+        }
+    });
+
+    return {
+        createdDetails,
+        updatedReceipt
+    };
+};

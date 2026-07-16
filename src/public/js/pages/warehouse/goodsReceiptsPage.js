@@ -100,7 +100,14 @@ const normalizeGoodsReceiptData = ({ form, formData }) => {
 
     if (returnForm.isActive(form)) return returnForm.normalizeData({ form });
 
-    if (mode === FORM_MODES.EDIT) return formData;
+    if (mode === FORM_MODES.EDIT) {
+        const newDetails = details.filter(detail => !detail.id);
+
+        return {
+            ...formData,
+            details: newDetails
+        };
+    }
 
     return {
         ...formData,
@@ -203,7 +210,11 @@ export const openGoodsReceiptModal = ({ mode, data = null }) => {
                 element: form.querySelector(FORM_SELECTORS.SUPPLIER),
                 isDisabled: true
             });
-            toggleContainerElements({ selector: '.add-product-container', root: modalElement });
+            toggleContainerElements({
+                selector: '.add-product-container',
+                root: modalElement,
+                isDisabled: false
+            });
         }
 
         if (mode === FORM_MODES.VIEW) {
@@ -236,7 +247,7 @@ export const openGoodsReceiptModal = ({ mode, data = null }) => {
             mode,
             status: GOODS_RECEIPT_STATUS_LABELS.CONFIRMED,
             showActions: false,
-            showAddProduct: false
+            showAddProduct: mode === FORM_MODES.EDIT
         });
     }
     
@@ -335,7 +346,7 @@ on('click', '#productTable .cancel-receipt-detail-btn', async (event, button) =>
 
     const confirmation = await notifications.showConfirmation({
         title: '¿Cancelar detalle de compra?',
-        text: 'Se marcará el detalle como cancelado, se dejará en cero y se generará el ajuste de inventario correspondiente sin abrir la corrección completa.',
+        text: 'Se marcará el detalle como cancelado, se dejará en cero y se generará el ajuste de inventario correspondiente.',
         confirmButtonText: 'Cancelar detalle'
     });
 
