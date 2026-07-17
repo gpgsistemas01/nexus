@@ -36,8 +36,6 @@ vi.mock('../../../../src/services/warehouse/goodsReceipts/goodsReceiptHelpers.js
 }));
 
 vi.mock('../../../../src/services/warehouse/reasonService.js', () => ({
-  GOODS_RECEIPT_CORRECTION_REASON_NAME: 'Corrección de compra',
-  GOODS_RECEIPT_RETURN_REASON_NAME: 'Devolución de compra',
   findGoodsReceiptCorrectionReason
 }));
 
@@ -106,9 +104,6 @@ describe('goodsReceiptCorrectionService', () => {
       userId: 'user-1'
     });
 
-    expect(findGoodsReceiptCorrectionReason).toHaveBeenCalledWith(expect.objectContaining({
-      name: 'Corrección de compra'
-    }));
     expect(buildGoodsReceiptDetails).toHaveBeenCalledWith([{
       productId: 'product-old',
       quantity: 4,
@@ -139,9 +134,6 @@ describe('goodsReceiptCorrectionService', () => {
       userId: 'user-1'
     });
 
-    expect(findGoodsReceiptCorrectionReason).toHaveBeenCalledWith(expect.objectContaining({
-      name: 'Corrección de compra'
-    }));
     expect(buildGoodsReceiptDetails).toHaveBeenCalledWith([{
       productId: 'product-old',
       quantity: 0,
@@ -195,27 +187,6 @@ describe('goodsReceiptCorrectionService', () => {
       })
     }));
     expect(updateProductUnitCostIfHigher).not.toHaveBeenCalled();
-  });
-
-
-  it('permite registrar una disminución como devolución de compra', async () => {
-    await correctGoodsReceiptDetailLine({
-      id: 'receipt-1',
-      detailId: 'detail-1',
-      correctionDto: {
-        quantity: 4,
-        costPerUnitType: 10,
-        reasonName: 'Devolución de compra'
-      },
-      userId: 'user-1'
-    });
-
-    expect(findGoodsReceiptCorrectionReason).toHaveBeenCalledWith(expect.objectContaining({
-      name: 'Devolución de compra'
-    }));
-    expect(createStockAdjustmentByQuantityChange).toHaveBeenCalledWith(expect.objectContaining({
-      observations: expect.stringContaining('Devolución de compra')
-    }));
   });
 
   it('rechaza correcciones con cantidad mayor a la registrada del detalle', async () => {

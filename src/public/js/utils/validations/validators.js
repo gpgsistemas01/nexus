@@ -86,14 +86,9 @@ export const validateGoodsReceiptValidators = {
     details: validateGoodsReceiptDetailsArray
 }
 
-const GOODS_RECEIPT_CORRECTION_REASON_NAMES = ['Corrección de compra', 'Devolución de compra'];
-
 export const validateGoodsReceiptCorrectionValidators = {
     quantity: (value) => validateNonNegativeNumber(value, 'La cantidad correcta'),
-    costPerUnitType: (value) => validateNumber(value, 'El costo por presentación correcto', { allowZero: false }),
-    reasonName: (value) => GOODS_RECEIPT_CORRECTION_REASON_NAMES.includes(value)
-        ? null
-        : 'La razón debe ser Corrección de compra o Devolución de compra'
+    costPerUnitType: (value) => validateNumber(value, 'El costo por presentación correcto', { allowZero: false })
 };
 
 

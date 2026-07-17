@@ -54,21 +54,6 @@ const form = {
                             }
                         }
                     ]
-
-                },
-                {
-                    type: 'html',
-                    content: `
-                        <div class="col-12">
-                            <label class="form-label" for="correctionReasonNameInput">Razón del ajuste</label>
-                            <select id="correctionReasonNameInput" name="reasonName" class="form-select w-100">
-                                <option value="Corrección de compra">Corrección de compra</option>
-                                <option value="Devolución de compra">Devolución de compra</option>
-                            </select>
-                            <div data-error-for="reasonName" class="invalid-feedback d-none"></div>
-                            <div class="form-text">Use devolución cuando la disminución corresponde a material regresado al proveedor; use corrección cuando se está corrigiendo el registro de la compra.</div>
-                        </div>
-                    `
                 }
             ]
         },

@@ -13,7 +13,7 @@ import { createServiceLogger, getModelLogContext, logServiceError } from '../../
 import { createStockAdjustmentByQuantityChange } from '../adjustmentService.js';
 import { updateProductUnitCostIfHigher } from '../products/supplierProductService.js';
 import { buildGoodsReceiptDetails, updateGoodsReceiptDetailAndTotals } from '../goodsReceipts/goodsReceiptHelpers.js';
-import { GOODS_RECEIPT_CORRECTION_REASON_NAME, GOODS_RECEIPT_RETURN_REASON_NAME, findGoodsReceiptCorrectionReason } from '../reasonService.js';
+import { findGoodsReceiptCorrectionReason } from '../reasonService.js';
 
 const serviceLogger = createServiceLogger('warehouse.corrections.goodsReceiptCorrectionService');
 
@@ -44,7 +44,6 @@ const createGoodsReceiptCorrectionAdjustment = async ({
     currentDetail,
     correctedDetail,
     reasonId,
-    reasonName,
     userId,
     goodsReceiptId,
     goodsReceiptDetailId
@@ -54,7 +53,7 @@ const createGoodsReceiptCorrectionAdjustment = async ({
     if (quantityDifference === 0) return null;
 
     const receiptReference = currentDetail.goodsReceipt.referenceNumber || goodsReceiptId;
-    const correctionContext = `${reasonName || GOODS_RECEIPT_CORRECTION_REASON_NAME} ${receiptReference}; campos afectados: cantidad.`;
+    const correctionContext = `Corrección de compra ${receiptReference}; campos afectados: cantidad.`;
 
     return createStockAdjustmentByQuantityChange({
         tx,
@@ -77,11 +76,11 @@ const createGoodsReceiptCorrectionAdjustment = async ({
 export const correctGoodsReceiptDetailLine = async ({
     id,
     detailId,
-    correctionDto = {},
+    correctionDto,
     userId,
     correctionMode = GOODS_RECEIPT_CORRECTION_MODES.UPDATE
 }) => {
-    const { quantity, costPerUnitType, reasonName = GOODS_RECEIPT_CORRECTION_REASON_NAME } = correctionDto;
+    const { quantity, costPerUnitType } = correctionDto;
 
     try {
         const db = getDb();
@@ -93,7 +92,7 @@ export const correctGoodsReceiptDetailLine = async ({
                     goodsReceiptId: id,
                     detailId
                 }),
-                findGoodsReceiptCorrectionReason({ tx, name: reasonName })
+                findGoodsReceiptCorrectionReason({ tx })
             ]);
 
             if (!currentDetail) throw new GoodsReceiptNotFound();
@@ -108,10 +107,6 @@ export const correctGoodsReceiptDetailLine = async ({
             const currentQuantity = Number(currentDetail.quantity);
 
             if (correctedQuantity < 0 || correctedQuantity > currentQuantity) {
-                throw new GoodsReceiptCorrectionQuantityConflict();
-            }
-
-            if (reasonName === GOODS_RECEIPT_RETURN_REASON_NAME && correctedQuantity >= currentQuantity) {
                 throw new GoodsReceiptCorrectionQuantityConflict();
             }
 
@@ -136,7 +131,6 @@ export const correctGoodsReceiptDetailLine = async ({
                 currentDetail,
                 correctedDetail,
                 reasonId: correctionReason.id,
-                reasonName,
                 userId,
                 goodsReceiptId: id,
                 goodsReceiptDetailId: detailId
