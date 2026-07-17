@@ -3,7 +3,12 @@ import { notifications } from "../plugins/swal/swalComponent.js";
 import { clearFormErrors, normalizeFormErrors, scrollToFirstFormError } from "../ui/formUI.js";
 import { mapServerErrors } from "../utils/formUtils.js";
 
-const getFallbackMessage = (err) => err?.message || 'Ocurrió un error inesperado.';
+const getFallbackMessage = (err) => {
+
+    const data = err?.data ?? err?.response?.data ?? null;
+
+    return data?.message || getErrorMessage(data) || data?.detail || data?.error || err?.message || 'Ocurrió un error inesperado.';
+};
 
 const resetFormSubmission = (form) => {
 
@@ -59,14 +64,19 @@ export const handleApiError = ({
             return;
 
         case 404:
-        case 409:
+        case 409: {
+            const modalData = data ?? err?.response?.data ?? null;
+            const modalTitle = getErrorMessage(modalData) || 'No se pudo completar la acción';
+            const modalMessage = getFallbackMessage(err);
+
             resetFormSubmission(form);
             notifications.showModal({
-                title: 'No se pudo completar la acción',
-                text: getFallbackMessage(err),
+                title: modalTitle,
+                text: modalMessage === modalTitle ? null : modalMessage,
                 icon: 'warning'
             });
             return;
+        }
 
         default:
             notifications.showError(getFallbackMessage(err));
@@ -87,6 +97,10 @@ export const handleDataTableError = (err, table = null) => {
 
         case 404:
             notifications.showError(message || 'No se encontraron registros.');
+            return [];
+
+        case 409:
+            notifications.showWarning(getFallbackMessage(err));
             return [];
 
         default:
