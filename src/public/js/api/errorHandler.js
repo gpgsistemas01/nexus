@@ -3,7 +3,14 @@ import { notifications } from "../plugins/swal/swalComponent.js";
 import { clearFormErrors, normalizeFormErrors, scrollToFirstFormError } from "../ui/formUI.js";
 import { mapServerErrors } from "../utils/formUtils.js";
 
-const getFallbackMessage = (err) => err?.message || err?.data?.message || getErrorMessage(err?.data) || err?.data?.detail || err?.data?.error || 'Ocurrió un error inesperado.';
+const getErrorData = (err) => err?.data ?? err?.response?.data ?? null;
+
+const getFallbackMessage = (err) => {
+
+    const data = getErrorData(err);
+
+    return data?.message || getErrorMessage(data) || data?.detail || data?.error || err?.message || 'Ocurrió un error inesperado.';
+};
 
 const resetFormSubmission = (form) => {
 
