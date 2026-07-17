@@ -64,8 +64,7 @@ const normalizeGoodsIssueData = ({ form, formData }) => {
     if (mode === FORM_MODES.EDIT_DETAIL) {
         return {
             id: form.dataset.id,
-            details: details
-                .filter(detail => detail.isSupplied && !detail.originalIsSupplied)
+            details: details.filter(detail => detail.isSupplied && !detail.originalIsSupplied)
                 .map(({ id, isSupplied, projectConvertedQuantity }) => ({
                     id,
                     isSupplied,
@@ -181,7 +180,10 @@ export const openGoodsIssueModal = ({ mode, data = null }) => {
             supplierName: detail.supplierName,
             suppliedQuantity: detail.suppliedQuantity,
             isSupplied: detail.isSupplied,
+            fulfillmentStatus: detail.fulfillmentStatus,
             originalIsSupplied: detail.isSupplied,
+            originalProjectConvertedQuantity: detail.projectConvertedQuantity ?? null,
+            originalConvertedQuantityDifference: detail.convertedQuantityDifference ?? null,
             ...buildReturnDetailState({
                 detail,
                 baseQuantity: detail.suppliedQuantity
@@ -320,12 +322,28 @@ on('change', '.supply-checkbox', (e, checkbox) => {
 
     product.isSupplied = checkbox.checked;
 
+    if (!checkbox.checked) {
+        product.projectConvertedQuantity = product.originalProjectConvertedQuantity ?? null;
+        product.convertedQuantityDifference = product.originalConvertedQuantityDifference ?? null;
+    }
+
     syncCheckboxControlledInputs({
         root: document.querySelector(formId),
         inputSelector: '.project-converted-quantity-input',
         detailId: checkbox.dataset.detailId,
         isChecked: checkbox.checked
     });
+
+    const projectQuantityInput = document.querySelector(`.project-converted-quantity-input[data-detail-id="${ checkbox.dataset.detailId }"]`);
+
+    if (projectQuantityInput && !checkbox.checked) {
+        projectQuantityInput.value = product.projectConvertedQuantity ?? '';
+
+        const currentTd = projectQuantityInput.closest('td');
+        const nextTd = currentTd?.nextElementSibling;
+
+        if (nextTd) nextTd.textContent = product.convertedQuantityDifference ?? '';
+    }
 });
 on('input', '.project-converted-quantity-input', (e, input) => {
 
@@ -337,8 +355,8 @@ on('input', '.project-converted-quantity-input', (e, input) => {
     product.projectConvertedQuantity = value;
     product.convertedQuantityDifference = roundTo(product.convertedQuantity - product.projectConvertedQuantity);
 
-    const currenTd = input.closest('td');
-    const nextTd = currenTd.nextElementSibling;
+    const currentTd = input.closest('td');
+    const nextTd = currentTd.nextElementSibling;
 
     if (nextTd) nextTd.textContent = formatDecimal(product.convertedQuantityDifference);
 });
