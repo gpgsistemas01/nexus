@@ -9,6 +9,7 @@ import { validateGoodsReceiptCorrectionValidators } from "../../../utils/validat
 
 const CORRECTION_MODAL_SELECTOR = '#goodsReceiptCorrectionModal';
 const CORRECTION_FORM_SELECTOR = '#goodsReceiptCorrectionForm';
+const GOODS_RECEIPT_RETURN_REASON_NAME = 'Devolución de compra';
 export const GOODS_RECEIPT_CORRECTION_APPLIED_EVENT = 'goods-receipt-correction:applied';
 
 const getModal = () => document.querySelector(CORRECTION_MODAL_SELECTOR);
@@ -31,6 +32,12 @@ export const initGoodsReceiptCorrectionForm = () => {
                 return;
             }
 
+            if (formData.reasonName === GOODS_RECEIPT_RETURN_REASON_NAME && Number(formData.quantity) >= Number(currentDetail.quantity)) {
+                notifications.showWarning('Para registrar una devolución de compra, la cantidad correcta debe ser menor a la cantidad actual.');
+                resetFormSubmitState(form);
+                return;
+            }
+
             const confirmation = await notifications.showConfirmation({
                 title: '¿Corregir detalle de compra?',
                 text: 'Revisa los nuevos totales estimados en el formulario. Se guardará la corrección y se ajustará inventario automáticamente.',
@@ -47,7 +54,8 @@ export const initGoodsReceiptCorrectionForm = () => {
                 detailId: form.dataset.detailId,
                 formData: {
                     quantity: formData.quantity,
-                    costPerUnitType: formData.costPerUnitType
+                    costPerUnitType: formData.costPerUnitType,
+                    reasonName: formData.reasonName
                 }
             });
 

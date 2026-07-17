@@ -1,4 +1,5 @@
 import { body } from "express-validator";
+import { GOODS_RECEIPT_CORRECTION_REASON_NAMES } from "../../services/warehouse/reasonService.js";
 import { errorMap } from "../../messages/codeMessages.js";
 import { validateBoolean, validateDate, validateDetailsArray, validateGoodsIssueReturns, validateInvoice, validateNonNegativeNumber, validatePositiveNumber, validateTextOptional, validateUUID } from "../fields/fieldsValidator.js";
 
@@ -50,5 +51,9 @@ export const goodsReceiptReturnValidation = [
 
 export const goodsReceiptCorrectionValidation = [
     validateNonNegativeNumber('quantity'),
-    validatePositiveNumber('costPerUnitType')
+    validatePositiveNumber('costPerUnitType'),
+    body('reasonName')
+        .optional({ values: 'undefined' })
+        .isIn(GOODS_RECEIPT_CORRECTION_REASON_NAMES)
+        .withMessage('La razón debe ser Corrección de compra o Devolución de compra')
 ];

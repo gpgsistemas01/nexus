@@ -45,5 +45,6 @@ export const createGoodsReceiptReturnDto = (body = {}) => ({
 
 export const createGoodsReceiptCorrectionDto = (body = {}) => ({
     quantity: Number(body.quantity),
-    costPerUnitType: Number(body.costPerUnitType)
+    costPerUnitType: Number(body.costPerUnitType),
+    ...(body.reasonName ? { reasonName: String(body.reasonName).trim() } : {})
 });

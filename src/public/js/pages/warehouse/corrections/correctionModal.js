@@ -17,6 +17,7 @@ const getModal = () => document.querySelector(CORRECTION_MODAL_SELECTOR);
 const getForm = () => document.querySelector(CORRECTION_FORM_SELECTOR);
 
 const IVA_RATE = 1.16;
+const DEFAULT_CORRECTION_REASON_NAME = 'Corrección de compra';
 
 const calculateCorrectionTotals = ({ receipt, currentDetail, formData }) => {
     const correctedQuantity = Number(formData.quantity || 0);
@@ -68,6 +69,7 @@ const setCorrectionFormValues = ({ form, receipt, detail }) => {
     form.querySelector('button[type="submit"]').disabled = false;
     form.elements.quantity.value = detail.quantity;
     form.elements.costPerUnitType.value = detail.costPerUnitType;
+    form.elements.reasonName.value = DEFAULT_CORRECTION_REASON_NAME;
 };
 
 export const openGoodsReceiptCorrectionModal = ({ receipt, detail }) => {
