@@ -291,7 +291,7 @@ on('click', '#productTable .cancel-receipt-detail-btn', async (event, button) =>
 
     const confirmation = await notifications.showConfirmation({
         title: '¿Cancelar detalle de compra?',
-        text: 'Se marcará el detalle como cancelado, se dejará en cero y se generará el ajuste de inventario correspondiente.',
+        text: 'Se marcará el detalle como cancelado, se descontará de los totales y se generará el ajuste de inventario correspondiente.',
         confirmButtonText: 'Cancelar detalle'
     });
 

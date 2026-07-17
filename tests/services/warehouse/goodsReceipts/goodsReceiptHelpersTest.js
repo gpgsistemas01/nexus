@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { ProductNotFound } from '../../../../src/errors/warehouse/productError.js';
-import { buildGoodsReceiptDetails } from '../../../../src/services/warehouse/goodsReceipts/goodsReceiptHelpers.js';
+import { buildGoodsReceiptDetails, calculateGoodsReceiptTotals } from '../../../../src/services/warehouse/goodsReceipts/goodsReceiptHelpers.js';
 import { findProductsSnapshot } from '../../../../src/services/warehouse/products/productService.js';
 
 vi.mock('../../../../src/services/warehouse/products/productService.js', () => ({
@@ -48,6 +48,17 @@ describe('goodsReceiptHelpers', () => {
     ]);
 
     expect(findProductsSnapshot).toHaveBeenCalledWith({ tx: null, productIds: ['product-1'] });
+  });
+
+  it('calcula totales sólo con detalles activos para mantener visibles los cancelados', () => {
+    expect(calculateGoodsReceiptTotals([
+      { quantity: 5, netPurchaseAmount: 50, grossPurchaseAmount: 58, status: 'ACTIVE' },
+      { quantity: 3, netPurchaseAmount: 30, grossPurchaseAmount: 34.8, status: 'CANCELED' }
+    ])).toEqual({
+      totalQuantity: 5,
+      totalNetPurchaseAmount: 50,
+      totalGrossPurchaseAmount: 58
+    });
   });
 
   it('lanza ProductNotFound si el producto solicitado no existe en el snapshot', async () => {
