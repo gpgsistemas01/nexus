@@ -4,6 +4,9 @@ import { formatCurrency, formatDecimal } from "../../../utils/formatUtils.js";
 
 const DISABLED_PROJECT_QUANTITY_MESSAGE = 'Marque el detalle como surtido para capturar la cantidad de proyecto.';
 const DISABLED_RETURN_QUANTITY_MESSAGE = 'Marque el detalle para devolución antes de capturar la cantidad devuelta.';
+const GOODS_RECEIPT_DETAIL_STATUS = Object.freeze({
+    CANCELED: 'CANCELED'
+});
 
 const DISABLED_TABLE_INPUT_SELECTOR = 'input[data-disabled-warning], textarea[data-disabled-warning]';
 
@@ -266,6 +269,9 @@ export const buildDetailsColumns = ({ type, mode, render, isWarehouse, isCoordin
             searchable: false,
             render: (_, __, row) => {
                 const detailId = row.id;
+                const canManageDetail = Boolean(detailId) && row.status !== GOODS_RECEIPT_DETAIL_STATUS.CANCELED;
+
+                if (!canManageDetail) return '';
 
                 return `
                     ${ buildMdbActionButton({
