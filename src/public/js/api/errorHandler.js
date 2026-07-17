@@ -3,7 +3,7 @@ import { notifications } from "../plugins/swal/swalComponent.js";
 import { clearFormErrors, normalizeFormErrors, scrollToFirstFormError } from "../ui/formUI.js";
 import { mapServerErrors } from "../utils/formUtils.js";
 
-const getFallbackMessage = (err) => err?.message || 'Ocurrió un error inesperado.';
+const getFallbackMessage = (err) => err?.message || err?.data?.message || getErrorMessage(err?.data) || err?.data?.detail || err?.data?.error || 'Ocurrió un error inesperado.';
 
 const resetFormSubmission = (form) => {
 
@@ -87,6 +87,14 @@ export const handleDataTableError = (err, table = null) => {
 
         case 404:
             notifications.showError(message || 'No se encontraron registros.');
+            return [];
+
+        case 409:
+            notifications.showModal({
+                title: 'No se pudo completar la acción',
+                text: getFallbackMessage(err),
+                icon: 'warning'
+            });
             return [];
 
         default:
