@@ -80,6 +80,7 @@ const replaceGoodsReceiptDetails = ({ receipt }) => {
         mapDetail: detail => ({
             ...detail,
             supplierName,
+            goodsReceiptStatusName: receipt.status?.name
         })
     });
 };
