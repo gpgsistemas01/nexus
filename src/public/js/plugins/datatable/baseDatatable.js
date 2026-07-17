@@ -150,7 +150,8 @@ export const refreshProductTable = (details) => {
 
 const DOCUMENT_STATUS_LABELS = Object.freeze({
     APPROVED: 'Aprobada',
-    CONFIRMED: 'Confirmada'
+    CONFIRMED: 'Confirmada',
+    CANCELED: 'Cancelada'
 });
 
 export const renderActionButtons = ({ status, fulfillmentStatus, context, canAdjustStock = false, canDeleteProduct = false, canReturnGoodsIssue = false }) => {
@@ -159,8 +160,18 @@ export const renderActionButtons = ({ status, fulfillmentStatus, context, canAdj
     const canEditGoodsIssue = context === 'goodsIssue' && status === DOCUMENT_STATUS_LABELS.APPROVED;
     const canSupplyGoodsIssue = context === 'goodsIssue' && ['Pendiente', 'Surtido parcial'].includes(fulfillmentStatus);
     const canReturnGoodsIssueByStatus = context === 'goodsIssue' && ['Surtido parcial', 'Surtido'].includes(fulfillmentStatus);
+    const canEditGoodsReceipt = context === 'goodsReceipt' && status !== DOCUMENT_STATUS_LABELS.CANCELED;
+    const canViewGoodsReceipt = context === 'goodsReceipt' && status === DOCUMENT_STATUS_LABELS.CANCELED;
 
-    if ((status === 'Abierta' || canEditGoodsIssue) || context === 'goodsReceipt' || context === 'profile' || context === 'client' || context === 'supplier') actions.push(buildMdbActionButton({
+    if (canViewGoodsReceipt) actions.push(buildMdbActionButton({
+        className: 'btn-edit',
+        colorClass: 'btn-secondary',
+        iconClass: 'fa-solid fa-eye',
+        title: 'Ver',
+        ariaLabel: 'Ver registro'
+    }));
+
+    if ((status === 'Abierta' || canEditGoodsIssue) || canEditGoodsReceipt || context === 'profile' || context === 'client' || context === 'supplier') actions.push(buildMdbActionButton({
         className: 'btn-edit',
         colorClass: 'btn-primary',
         iconClass: 'fa-solid fa-pencil',
