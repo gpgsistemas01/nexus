@@ -150,19 +150,15 @@ export const refreshProductTable = (details) => {
 
 const DOCUMENT_STATUS_LABELS = Object.freeze({
     APPROVED: 'Aprobada',
-    CONFIRMED: 'Confirmada',
-    CANCELED: 'Cancelada'
+    CONFIRMED: 'Confirmada'
 });
 
-export const renderActionButtons = ({ status, fulfillmentStatus, context, canAdjustStock = false, canDeleteProduct = false, canReturnGoodsIssue = false, canReturnGoodsReceipt = false }) => {
+export const renderActionButtons = ({ status, fulfillmentStatus, context, canAdjustStock = false, canDeleteProduct = false, canReturnGoodsIssue = false }) => {
 
     const actions = [];
     const canEditGoodsIssue = context === 'goodsIssue' && status === DOCUMENT_STATUS_LABELS.APPROVED;
     const canSupplyGoodsIssue = context === 'goodsIssue' && ['Pendiente', 'Surtido parcial'].includes(fulfillmentStatus);
     const canReturnGoodsIssueByStatus = context === 'goodsIssue' && ['Surtido parcial', 'Surtido'].includes(fulfillmentStatus);
-    const canReturnGoodsReceiptByStatus = context === 'goodsReceipt'
-        && status === DOCUMENT_STATUS_LABELS.CONFIRMED
-        && status !== DOCUMENT_STATUS_LABELS.CANCELED;
 
     if ((status === 'Abierta' || canEditGoodsIssue) || context === 'goodsReceipt' || context === 'profile' || context === 'client' || context === 'supplier') actions.push(buildMdbActionButton({
         className: 'btn-edit',
@@ -196,11 +192,8 @@ export const renderActionButtons = ({ status, fulfillmentStatus, context, canAdj
         ariaLabel: 'Surtir detalle'
     }));
 
-    if (
-        (status === DOCUMENT_STATUS_LABELS.APPROVED && canReturnGoodsIssue && canReturnGoodsIssueByStatus)
-        || (canReturnGoodsReceiptByStatus && canReturnGoodsReceipt)
-    ) actions.push(buildMdbActionButton({
-        className: context === 'goodsReceipt' ? 'btn-return-goods-receipt' : 'btn-return-goods-issue',
+    if (status === DOCUMENT_STATUS_LABELS.APPROVED && canReturnGoodsIssue && canReturnGoodsIssueByStatus) actions.push(buildMdbActionButton({
+        className: 'btn-return-goods-issue',
         colorClass: 'btn-warning',
         iconClass: 'fa-solid fa-rotate-left',
         title: 'Registrar devolución',

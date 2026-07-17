@@ -10,7 +10,6 @@ import { buildExcelButton, buildTableExportParams } from "../../ui/tableUI.js";
 import { formatDateTimeDisplay, formatFileName } from "../../utils/formatters.js";
 import { setupTableFilters } from "./utils/filters/tableFilter.js";
 import { DATATABLE_SELECTORS, MODAL_SELECTORS, FORM_SELECTORS } from "../../constants/selectors.js";
-import { hasPermission } from "../../utils/permissions.js";
 
 export let details = [];
 let filters = {
@@ -42,12 +41,9 @@ table.innerHTML = `
     </thead>
 `;
 
-export const createGoodsReceiptDatatable = async (context = window.meta || {}) => {
+export const createGoodsReceiptDatatable = async () => {
 
     let table;
-    const { canManageWarehouseReturns } = hasPermission(context);
-    const canReturnGoodsReceipt = canManageWarehouseReturns();
-
     filters = await setupTableFilters({
         fields: ['date', 'supplier', 'warehouseProfile']
     });
@@ -86,8 +82,7 @@ export const createGoodsReceiptDatatable = async (context = window.meta || {}) =
                     title: 'Acciones',
                     render: (_, __, row) => renderActionButtons({
                         status: row.status?.name,
-                        context: 'goodsReceipt',
-                        canReturnGoodsReceipt
+                        context: 'goodsReceipt'
                     })
                 }
             ],
@@ -112,13 +107,6 @@ export const createGoodsReceiptDatatable = async (context = window.meta || {}) =
         const data = getResponsiveRowData(table, this);
 
         openGoodsReceiptModal({ mode: 'edit', data });
-    });
-
-    $(`${ selectorTable } tbody`).on('click', '.btn-return-goods-receipt', function() {
-
-        const data = getResponsiveRowData(table, this);
-
-        openGoodsReceiptModal({ mode: 'return', data });
     });
 }
 
