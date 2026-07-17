@@ -106,11 +106,14 @@ export const correctGoodsReceiptDetailLine = async ({
             const correctedQuantity = Number(correctedDetail.quantity);
             const currentQuantity = Number(currentDetail.quantity);
 
-            if (correctedQuantity < 0 || correctedQuantity > currentQuantity) {
+            if (correctedQuantity > currentQuantity || (
+                correctionMode !== GOODS_RECEIPT_CORRECTION_MODES.CANCEL_DETAIL &&
+                correctedQuantity <= 0
+            )) {
                 throw new GoodsReceiptCorrectionQuantityConflict();
             }
 
-            const effectiveCorrectionMode = correctionMode === GOODS_RECEIPT_CORRECTION_MODES.CANCEL_DETAIL || correctedQuantity === 0
+            const effectiveCorrectionMode = correctionMode === GOODS_RECEIPT_CORRECTION_MODES.CANCEL_DETAIL
                 ? GOODS_RECEIPT_CORRECTION_MODES.CANCEL_DETAIL
                 : GOODS_RECEIPT_CORRECTION_MODES.UPDATE;
             const quantityDifference = correctedQuantity - currentQuantity;

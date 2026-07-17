@@ -87,7 +87,7 @@ export const validateGoodsReceiptValidators = {
 }
 
 export const validateGoodsReceiptCorrectionValidators = {
-    quantity: (value) => validateNonNegativeNumber(value, 'La cantidad correcta'),
+    quantity: (value) => validatePositiveNumber(value, 'La cantidad correcta'),
     costPerUnitType: (value) => validateNumber(value, 'El costo por presentación correcto', { allowZero: false })
 };
 

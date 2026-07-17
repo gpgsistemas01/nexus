@@ -155,7 +155,7 @@ describe('goodsReceiptCorrectionService', () => {
   });
 
 
-  it('trata una corrección con cantidad cero como cancelación del detalle', async () => {
+  it('rechaza correcciones con cantidad cero para usar el flujo explícito de cancelación', async () => {
     buildGoodsReceiptDetails.mockResolvedValueOnce([{
       productId: 'product-old',
       productName: 'Producto anterior',
@@ -165,7 +165,7 @@ describe('goodsReceiptCorrectionService', () => {
       grossPurchaseAmount: 0
     }]);
 
-    await correctGoodsReceiptDetailLine({
+    await expect(correctGoodsReceiptDetailLine({
       id: 'receipt-1',
       detailId: 'detail-1',
       correctionDto: {
@@ -173,20 +173,13 @@ describe('goodsReceiptCorrectionService', () => {
         costPerUnitType: 10
       },
       userId: 'user-1'
+    })).rejects.toMatchObject({
+      code: 'GOODS_RECEIPT_CORRECTION_QUANTITY_CONFLICT'
     });
 
-    expect(updateGoodsReceiptDetailAndTotals).toHaveBeenCalledWith(expect.objectContaining({
-      correctedDetail: expect.objectContaining({
-        status: 'CANCELED'
-      })
-    }));
-    expect(goodsReceiptCorrectionCreate).toHaveBeenCalledWith(expect.objectContaining({
-      data: expect.objectContaining({
-        correctionType: 'CANCEL_DETAIL',
-        correctedQuantity: 0
-      })
-    }));
-    expect(updateProductUnitCostIfHigher).not.toHaveBeenCalled();
+    expect(createStockAdjustmentByQuantityChange).not.toHaveBeenCalled();
+    expect(updateGoodsReceiptDetailAndTotals).not.toHaveBeenCalled();
+    expect(goodsReceiptCorrectionCreate).not.toHaveBeenCalled();
   });
 
   it('rechaza correcciones con cantidad mayor a la registrada del detalle', async () => {

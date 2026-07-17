@@ -95,7 +95,7 @@ export class GoodsReceiptCorrectionNoChanges extends AppError {
 export class GoodsReceiptCorrectionQuantityConflict extends AppError {
 
     constructor () {
-        super('La cantidad corregida del detalle debe estar entre cero y la cantidad registrada', 'GOODS_RECEIPT_CORRECTION_QUANTITY_CONFLICT', 409);
+        super('La cantidad corregida del detalle debe ser mayor a cero y no exceder la cantidad registrada', 'GOODS_RECEIPT_CORRECTION_QUANTITY_CONFLICT', 409);
     }
 }
 
