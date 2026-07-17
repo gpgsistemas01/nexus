@@ -5,21 +5,17 @@ import {
     editGoodsReceiptHeader,
     getAllGoodsReceipts,
     registerGoodsReceipt,
-    returnGoodsReceipt,
     correctGoodsReceiptDetail,
     cancelGoodsReceiptDetail
 } from '../../../controllers/api/warehouse/goodsReceiptController.js';
-import { goodsReceiptCorrectionValidation, goodsReceiptHeaderValidation, goodsReceiptReturnValidation, goodsReceiptValidation } from '../../../validators/forms/goodsReceiptValidations.js';
+import { goodsReceiptCorrectionValidation, goodsReceiptHeaderValidation, goodsReceiptValidation } from '../../../validators/forms/goodsReceiptValidations.js';
 
 const router = express.Router();
 const goodsReceiptPermissions = {
     roles: ['Almacenista', 'Coordinador', 'Auxiliar', 'Administrador del sistema'],
     departments: ['ALMACÉN Y PROVEDURÍA', 'SISTEMAS']
 };
-const goodsReceiptReturnPermissions = {
-    roles: ['Almacenista', 'Auxiliar', 'Coordinador', 'Administrador del sistema'],
-    departments: ['ALMACÉN Y PROVEDURÍA', 'SISTEMAS']
-};
+
 
 router.get(
     '/',
@@ -61,15 +57,6 @@ router.patch(
     verifyApiTokenRequired,
     authorizeUserApi(goodsReceiptPermissions),
     cancelGoodsReceiptDetail
-);
-
-router.patch(
-    '/:id/returns',
-    verifyApiTokenRequired,
-    goodsReceiptReturnValidation,
-    validate,
-    authorizeUserApi(goodsReceiptReturnPermissions),
-    returnGoodsReceipt
 );
 
 export default router;

@@ -34,14 +34,6 @@ export const createGoodsReceiptDtoForEdit = (body = {}) => {
     };
 };
 
-export const createGoodsReceiptReturnDto = (body = {}) => ({
-    details: (body.details || []).map(d => ({
-        id: d.id?.trim?.() || d.id,
-        isReturned: Boolean(d.isReturned),
-        returnedQuantity: Number(d.returnedQuantity)
-    }))
-});
-
 
 export const createGoodsReceiptCorrectionDto = (body = {}) => ({
     quantity: Number(body.quantity),
