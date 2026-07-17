@@ -63,10 +63,11 @@ const normalizeGoodsReceiptData = ({ form, formData }) => {
     if (!formData.isInvoiced) delete formData.invoice;
 
     if (mode === FORM_MODES.EDIT) {
+        const { supplierId, ...editableFormData } = formData;
         const newDetails = details.filter(detail => !detail.id);
 
         return {
-            ...formData,
+            ...editableFormData,
             details: newDetails
         };
     }
@@ -85,9 +86,17 @@ useForm({
         const allowedUsername = /^[a-zA-Z0-9\-]+$/;
         let errors = {};
 
-        errors = validateFields(validateGoodsReceiptValidators, formData);
+        let validators = validateGoodsReceiptValidators;
 
-        if (form.dataset.mode === FORM_MODES.EDIT) errors.details = null;
+        if (form.dataset.mode === FORM_MODES.EDIT) {
+            const { supplierId, details, ...editableValidators } = validateGoodsReceiptValidators;
+            validators = {
+                ...editableValidators,
+                details: (value) => value.length === 0 ? null : details(value)
+            };
+        }
+
+        errors = validateFields(validators, formData);
         if (formData.isInvoiced) {
 
             if (!formData.invoice) errors.invoice = 'El número de factura es obligatorio';
