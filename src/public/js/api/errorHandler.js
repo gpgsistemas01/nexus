@@ -12,6 +12,17 @@ const getFallbackMessage = (err) => {
     return data?.message || getErrorMessage(data) || data?.detail || data?.error || err?.message || 'Ocurrió un error inesperado.';
 };
 
+const getModalErrorContent = (err) => {
+
+    const title = getErrorMessage(getErrorData(err)) || 'No se pudo completar la acción';
+    const message = getFallbackMessage(err);
+
+    return {
+        title,
+        text: message === title ? null : message
+    };
+};
+
 const resetFormSubmission = (form) => {
 
     if (!form) return;
@@ -66,14 +77,16 @@ export const handleApiError = ({
             return;
 
         case 404:
-        case 409:
+        case 409: {
+            const modalContent = getModalErrorContent(err);
+
             resetFormSubmission(form);
             notifications.showModal({
-                title: 'No se pudo completar la acción',
-                text: getFallbackMessage(err),
+                ...modalContent,
                 icon: 'warning'
             });
             return;
+        }
 
         default:
             notifications.showError(getFallbackMessage(err));
