@@ -33,6 +33,9 @@ const returnDocumentProducts = async ({ id, details = [], userId, config }) => {
             });
 
             if (!document) throw new config.NotFoundError();
+            if (document.details.length !== detailIds.length) {
+                throw new config.DetailNotFoundError();
+            }
 
             const returnedByDetailId = await findReturnedQuantityTotalsByDetailIds({
                 tx,
