@@ -7,7 +7,8 @@ import {
     GoodsIssueCreateDatabaseError,
     GoodsIssueInternalClientAdvisorDepartmentConflict,
     GoodsIssueInternalClientProjectNumberConflict,
-    GoodsIssueSuppliedConflict
+    GoodsIssueSuppliedConflict,
+    GoodsIssueDetailNotFound
 } from "../../../errors/warehouse/goodsIssueError.js";
 import { createServiceLogger, getModelLogContext, logServiceError, logServiceInfo } from "../../../utils/logger.js";
 
@@ -425,7 +426,7 @@ export const updateGoodsIssueDetails = async ({ id, goodsIssueDto }) => {
         for (const detail of details) {
 
             const current = currentById.get(detail.id);
-            if (!current) continue;
+            if (!current) throw new GoodsIssueDetailNotFound();
 
             const currentQuantity = normalizeDecimal(current.quantity ?? 0);
             const currentSupplied = normalizeDecimal(current.suppliedQuantity ?? 0);

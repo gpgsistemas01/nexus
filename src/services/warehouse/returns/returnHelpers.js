@@ -1,4 +1,4 @@
-import { GoodsIssueNotFound, GoodsIssueSuppliedConflict, GoodsIssueUpdateDatabaseError } from '../../../errors/warehouse/goodsIssueError.js';
+import { GoodsIssueDetailNotFound, GoodsIssueNotFound, GoodsIssueSuppliedConflict, GoodsIssueUpdateDatabaseError } from '../../../errors/warehouse/goodsIssueError.js';
 import { getDb } from '../../../repository/baseRepository.js';
 import { normalizeDecimal } from '../../../utils/formattersUtils.js';
 import { createGoodsIssueReturnStockAdjustment } from '../adjustmentService.js';
@@ -51,6 +51,7 @@ export const RETURN_DOCUMENT_CONFIGS = Object.freeze({
         }),
         NotFoundError: GoodsIssueNotFound,
         InvalidQuantityError: GoodsIssueSuppliedConflict,
+        DetailNotFoundError: GoodsIssueDetailNotFound,
         UpdateError: GoodsIssueUpdateDatabaseError
     }
 });
