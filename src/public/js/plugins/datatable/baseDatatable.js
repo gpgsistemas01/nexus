@@ -148,12 +148,21 @@ export const refreshProductTable = (details) => {
     table.draw();
 }
 
+const DOCUMENT_STATUS_LABELS = Object.freeze({
+    APPROVED: 'Aprobada',
+    CONFIRMED: 'Confirmada',
+    CANCELED: 'Cancelada'
+});
+
 export const renderActionButtons = ({ status, fulfillmentStatus, context, canAdjustStock = false, canDeleteProduct = false, canReturnGoodsIssue = false, canReturnGoodsReceipt = false }) => {
 
     const actions = [];
-    const canEditGoodsIssue = context === 'goodsIssue' && status === 'Aprobada';
+    const canEditGoodsIssue = context === 'goodsIssue' && status === DOCUMENT_STATUS_LABELS.APPROVED;
     const canSupplyGoodsIssue = context === 'goodsIssue' && ['Pendiente', 'Surtido parcial'].includes(fulfillmentStatus);
     const canReturnGoodsIssueByStatus = context === 'goodsIssue' && ['Surtido parcial', 'Surtido'].includes(fulfillmentStatus);
+    const canReturnGoodsReceiptByStatus = context === 'goodsReceipt'
+        && status === DOCUMENT_STATUS_LABELS.CONFIRMED
+        && status !== DOCUMENT_STATUS_LABELS.CANCELED;
 
     if ((status === 'Abierta' || canEditGoodsIssue) || context === 'goodsReceipt' || context === 'profile' || context === 'client' || context === 'supplier') actions.push(buildMdbActionButton({
         className: 'btn-edit',
@@ -179,7 +188,7 @@ export const renderActionButtons = ({ status, fulfillmentStatus, context, canAdj
         ariaLabel: 'Eliminar producto'
     }));
 
-    if (status === 'Aprobada' && context === 'goodsIssue' && canSupplyGoodsIssue) actions.push(buildMdbActionButton({
+    if (status === DOCUMENT_STATUS_LABELS.APPROVED && context === 'goodsIssue' && canSupplyGoodsIssue) actions.push(buildMdbActionButton({
         className: 'btn-edit-detail',
         colorClass: 'btn-info',
         iconClass: 'fa fa-edit',
@@ -188,8 +197,8 @@ export const renderActionButtons = ({ status, fulfillmentStatus, context, canAdj
     }));
 
     if (
-        (status === 'Aprobada' && canReturnGoodsIssue && canReturnGoodsIssueByStatus)
-        || (status === 'Confirmada' && context === 'goodsReceipt' && canReturnGoodsReceipt)
+        (status === DOCUMENT_STATUS_LABELS.APPROVED && canReturnGoodsIssue && canReturnGoodsIssueByStatus)
+        || (canReturnGoodsReceiptByStatus && canReturnGoodsReceipt)
     ) actions.push(buildMdbActionButton({
         className: context === 'goodsReceipt' ? 'btn-return-goods-receipt' : 'btn-return-goods-issue',
         colorClass: 'btn-warning',

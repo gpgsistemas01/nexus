@@ -100,6 +100,7 @@ export const findAllGoodsReceipts = async ({
                     netPurchaseAmount: true,
                     grossPurchaseAmount: true,
                     productId: true,
+                    status: true,
                 }
             }
         }

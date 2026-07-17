@@ -7,6 +7,9 @@ const DISABLED_RETURN_QUANTITY_MESSAGE = 'Marque el detalle para devolución ant
 const GOODS_RECEIPT_DETAIL_STATUS = Object.freeze({
     CANCELED: 'CANCELED'
 });
+const GOODS_RECEIPT_STATUS_LABELS = Object.freeze({
+    CANCELED: 'Cancelada'
+});
 
 const DISABLED_TABLE_INPUT_SELECTOR = 'input[data-disabled-warning], textarea[data-disabled-warning]';
 
@@ -288,7 +291,9 @@ export const buildDetailsColumns = ({ type, mode, render, isWarehouse, isCoordin
             searchable: false,
             render: (_, __, row) => {
                 const detailId = row.id;
-                const canManageDetail = Boolean(detailId) && row.status !== GOODS_RECEIPT_DETAIL_STATUS.CANCELED;
+                const isCanceledDetail = row.status === GOODS_RECEIPT_DETAIL_STATUS.CANCELED;
+                const isCanceledReceipt = row.goodsReceiptStatusName === GOODS_RECEIPT_STATUS_LABELS.CANCELED;
+                const canManageDetail = Boolean(detailId) && !isCanceledDetail && !isCanceledReceipt;
 
                 if (!canManageDetail) return '';
 
