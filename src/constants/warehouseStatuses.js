@@ -9,7 +9,8 @@ export const GOODS_ISSUE_STATUS_NAMES = Object.freeze({
 });
 
 export const GOODS_RECEIPT_STATUS_NAMES = Object.freeze({
-    CONFIRMED: 'Confirmada'
+    CONFIRMED: 'Confirmada',
+    CANCELED: 'Cancelada'
 });
 
 export const PURCHASE_REQUISITION_STATUS_NAMES = Object.freeze({

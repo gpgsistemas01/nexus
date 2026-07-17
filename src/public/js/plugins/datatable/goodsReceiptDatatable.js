@@ -15,6 +15,9 @@ export let details = [];
 let filters = {
     getValues: () => ({})
 };
+const GOODS_RECEIPT_STATUS_LABELS = Object.freeze({
+    CANCELED: 'Cancelada'
+});
 const selectorProductTable = DATATABLE_SELECTORS.PRODUCT;
 const selectorTable = DATATABLE_SELECTORS.MAIN;
 const table = document.querySelector(selectorProductTable);
@@ -77,6 +80,7 @@ export const createGoodsReceiptDatatable = async () => {
                     title: 'N° Factura',
                     render: (_, __, row) => row.isInvoiced ? row.invoice : 'Sin factura'
                 },
+                { data: 'status.name', title: 'Estado' },
                 {
                     data: 'id',
                     title: 'Acciones',
@@ -106,7 +110,10 @@ export const createGoodsReceiptDatatable = async () => {
 
         const data = getResponsiveRowData(table, this);
 
-        openGoodsReceiptModal({ mode: 'edit', data });
+        openGoodsReceiptModal({
+            mode: data.status?.name === GOODS_RECEIPT_STATUS_LABELS.CANCELED ? 'view' : 'edit',
+            data
+        });
     });
 }
 

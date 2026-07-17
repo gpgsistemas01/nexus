@@ -23,7 +23,8 @@ const INVOICE_VALUES = Object.freeze({
 });
 const GOODS_RECEIPT_STATUS_LABELS = Object.freeze({
     OPEN: 'Abierta',
-    CONFIRMED: 'Confirmada'
+    CONFIRMED: 'Confirmada',
+    CANCELED: 'Cancelada'
 });
 const GOODS_RECEIPT_DETAIL_STATUS = Object.freeze({
     CANCELED: 'CANCELED'
@@ -35,11 +36,11 @@ let currentGoodsReceipt = null;
 
 initGoodsReceiptCorrection();
 
-const replaceGoodsReceiptDetails = ({ receipt }) => {
+const replaceGoodsReceiptDetails = ({ receipt, includeCanceledDetails = false }) => {
     const supplierName = receipt.supplierName;
     details.length = 0;
     details.push(...receipt.details
-        .filter(detail => detail.status !== GOODS_RECEIPT_DETAIL_STATUS.CANCELED)
+        .filter(detail => includeCanceledDetails || detail.status !== GOODS_RECEIPT_DETAIL_STATUS.CANCELED)
         .map(detail => ({
             ...detail,
             supplierName,
@@ -154,7 +155,10 @@ export const openGoodsReceiptModal = ({ mode, data = null }) => {
         value = data.isInvoiced ? INVOICE_VALUES.INVOICE : INVOICE_VALUES.NONE;
         form.elements.observations.value = data.observations || '';
         setDateTimePickerValue(form.elements.receptionDate, data.receptionDate);
-        replaceGoodsReceiptDetails({ receipt: data });
+        replaceGoodsReceiptDetails({
+            receipt: data,
+            includeCanceledDetails: data.status?.name === GOODS_RECEIPT_STATUS_LABELS.CANCELED
+        });
         setTotals({
             quantity: data.totalQuantity,
             net: data.totalNetPurchaseAmount,
@@ -182,9 +186,9 @@ export const openGoodsReceiptModal = ({ mode, data = null }) => {
 
         toggleButtons({
             mode,
-            status: GOODS_RECEIPT_STATUS_LABELS.CONFIRMED,
+            status: data.status?.name || GOODS_RECEIPT_STATUS_LABELS.CONFIRMED,
             showActions: false,
-            showAddProduct: mode === FORM_MODES.EDIT
+            showAddProduct: mode === FORM_MODES.EDIT && data.status?.name !== GOODS_RECEIPT_STATUS_LABELS.CANCELED
         });
     }
     
