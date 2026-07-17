@@ -124,7 +124,7 @@ describe('goodsReceiptCorrectionService', () => {
       productId: 'product-old',
       productName: 'Producto anterior',
       quantity: 0,
-      costPerUnitType: 0,
+      costPerUnitType: 10,
       netPurchaseAmount: 0,
       grossPurchaseAmount: 0
     }]);
@@ -138,18 +138,19 @@ describe('goodsReceiptCorrectionService', () => {
     expect(buildGoodsReceiptDetails).toHaveBeenCalledWith([{
       productId: 'product-old',
       quantity: 0,
-      costPerUnitType: 0
+      costPerUnitType: 10
     }], expect.objectContaining({ tx: expect.any(Object) }));
     expect(updateGoodsReceiptDetailAndTotals).toHaveBeenCalledWith(expect.objectContaining({
-      correctedDetail: expect.objectContaining({
+      correctedDetail: {
         status: 'CANCELED'
-      })
+      }
     }));
     expect(goodsReceiptCorrectionCreate).toHaveBeenCalledWith(expect.objectContaining({
       data: expect.objectContaining({
         correctionType: 'CANCEL_DETAIL',
         correctedQuantity: 0,
-        correctedCostPerUnitType: 0
+        correctedCostPerUnitType: 10,
+        costDifference: 0
       })
     }));
     expect(updateProductUnitCostIfHigher).not.toHaveBeenCalled();

@@ -54,6 +54,8 @@ export const buildGoodsReceiptDetails = async (details, { tx = null } = {}) => {
 
 // Keep totals calculation side-effect free so create/update flows can reuse the same arithmetic.
 export const calculateGoodsReceiptTotals = (details = []) => details.reduce((acc, detail) => {
+    if (detail.status === 'CANCELED') return acc;
+
     acc.totalQuantity += Number(detail.quantity || 0);
     acc.totalNetPurchaseAmount += Number(detail.netPurchaseAmount || 0);
     acc.totalGrossPurchaseAmount += Number(detail.grossPurchaseAmount || 0);
