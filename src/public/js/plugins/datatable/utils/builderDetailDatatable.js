@@ -59,6 +59,25 @@ const shouldShowActionsColumn = ({ type, mode }) => {
     return !['view', 'edit-detail', 'return'].includes(mode);
 };
 
+const isCanceledDetail = (row = {}) => {
+    const statusName = row.fulfillmentStatus?.name || row.status?.name || row.status;
+
+    return Boolean(
+        row.isCanceled
+        || row.isCancelled
+        || row.canceledAt
+        || row.cancelledAt
+        || statusName === 'Cancelado'
+        || statusName === 'Cancelada'
+    );
+};
+
+const shouldShowDetailActionButtons = ({ row, mode }) => {
+    if (mode === 'create') return true;
+
+    return Boolean(row?.id) && !isCanceledDetail(row);
+};
+
 export const buildDetailsHeader = ({ type, mode, isWarehouse, isCoordinator, isSystem }) => {
 
     let extraHeaders = '';
@@ -256,6 +275,8 @@ export const buildDetailsColumns = ({ type, mode, render, isWarehouse, isCoordin
         columns.push({
             data: null,
             render: (_, __, row) => {
+                if (!shouldShowDetailActionButtons({ row, mode })) return '';
+
                 const isSuppliedDetail = type === 'issue' && row.isSupplied;
 
                 return `

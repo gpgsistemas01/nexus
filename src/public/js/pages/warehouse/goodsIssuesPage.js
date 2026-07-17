@@ -59,6 +59,8 @@ const returnForm = createReturnFormHandlers({
     emptyMessage: 'Seleccione al menos un producto para devolver.'
 });
 
+const getNewSuppliedDetails = () => details.filter(detail => detail.isSupplied && !detail.originalIsSupplied);
+
 const normalizeGoodsIssueData = ({ form, formData }) => {
 
     const { mode } = form.dataset;
@@ -66,8 +68,7 @@ const normalizeGoodsIssueData = ({ form, formData }) => {
     if (mode === MODE_EDIT_DETAIL) {
         return {
             id: form.dataset.id,
-            details: details
-                .filter(detail => detail.isSupplied && !detail.originalIsSupplied)
+            details: getNewSuppliedDetails()
                 .map(({ id, isSupplied, projectConvertedQuantity }) => ({
                     id,
                     isSupplied,
@@ -93,7 +94,7 @@ useForm({
 
         const { mode } = form.dataset;
 
-        if (mode === MODE_EDIT_DETAIL) return validateDetailsFields(validateGoodsIssueDetailValidators, details);
+        if (mode === MODE_EDIT_DETAIL) return validateDetailsFields(validateGoodsIssueDetailValidators, getNewSuppliedDetails());
 
         if (returnForm.isActive(form)) return returnForm.getErrors();
 
@@ -183,6 +184,7 @@ export const openGoodsIssueModal = ({ mode, data = null }) => {
             supplierName: detail.supplierName,
             suppliedQuantity: detail.suppliedQuantity,
             isSupplied: detail.isSupplied,
+            fulfillmentStatus: detail.fulfillmentStatus,
             originalIsSupplied: detail.isSupplied,
             ...buildReturnDetailState({
                 detail,
