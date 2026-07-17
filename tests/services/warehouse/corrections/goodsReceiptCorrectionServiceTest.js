@@ -65,6 +65,7 @@ describe('goodsReceiptCorrectionService', () => {
       costPerUnitType: 10,
       netPurchaseAmount: 50,
       grossPurchaseAmount: 59.5,
+      status: 'ACTIVE',
       goodsReceipt: {
         supplierId: 'supplier-1',
         referenceNumber: 'OC-2026-0001'
@@ -154,6 +155,36 @@ describe('goodsReceiptCorrectionService', () => {
     expect(updateProductUnitCostIfHigher).not.toHaveBeenCalled();
   });
 
+
+
+  it('rechaza cancelar un detalle de compra que ya está cancelado', async () => {
+    goodsReceiptDetailFindFirst.mockResolvedValueOnce({
+      productId: 'product-old',
+      productName: 'Producto anterior',
+      quantity: 0,
+      costPerUnitType: 0,
+      netPurchaseAmount: 0,
+      grossPurchaseAmount: 0,
+      status: 'CANCELED',
+      goodsReceipt: {
+        supplierId: 'supplier-1',
+        referenceNumber: 'OC-2026-0001'
+      }
+    });
+
+    await expect(cancelGoodsReceiptDetailLine({
+      id: 'receipt-1',
+      detailId: 'detail-1',
+      userId: 'user-1'
+    })).rejects.toMatchObject({
+      code: 'GOODS_RECEIPT_DETAIL_ALREADY_CANCELED'
+    });
+
+    expect(buildGoodsReceiptDetails).not.toHaveBeenCalled();
+    expect(createStockAdjustmentByQuantityChange).not.toHaveBeenCalled();
+    expect(updateGoodsReceiptDetailAndTotals).not.toHaveBeenCalled();
+    expect(goodsReceiptCorrectionCreate).not.toHaveBeenCalled();
+  });
 
   it('rechaza correcciones con cantidad cero para usar el flujo explícito de cancelación', async () => {
     buildGoodsReceiptDetails.mockResolvedValueOnce([{

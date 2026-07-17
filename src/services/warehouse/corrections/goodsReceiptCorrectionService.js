@@ -5,6 +5,7 @@ import {
     GoodsReceiptCorrectionNoChanges,
     GoodsReceiptCorrectionQuantityConflict,
     GoodsReceiptCorrectionReasonNotFound,
+    GoodsReceiptDetailAlreadyCanceled,
     GoodsReceiptNotFound,
     GoodsReceiptUpdateDatabaseError
 } from '../../../errors/warehouse/goodsReceiptError.js';
@@ -96,6 +97,12 @@ export const correctGoodsReceiptDetailLine = async ({
             ]);
 
             if (!currentDetail) throw new GoodsReceiptNotFound();
+            if (
+                correctionMode === GOODS_RECEIPT_CORRECTION_MODES.CANCEL_DETAIL &&
+                currentDetail.status === GOODS_RECEIPT_DETAIL_STATUS.CANCELED
+            ) {
+                throw new GoodsReceiptDetailAlreadyCanceled();
+            }
             if (!correctionReason) throw new GoodsReceiptCorrectionReasonNotFound();
 
             const [correctedDetail] = await buildGoodsReceiptDetails([{

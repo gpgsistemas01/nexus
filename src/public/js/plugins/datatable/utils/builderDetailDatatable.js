@@ -51,9 +51,11 @@ const resolveDisabledTableInput = (cell, event) => {
 
 const isReturnMode = (mode) => mode === 'return';
 
-const shouldShowTransactionQuantity = (mode) => !isReturnMode(mode);
+const shouldShowReturnColumns = ({ type, mode }) => type === 'issue' && isReturnMode(mode);
 
-const shouldShowReceiptPurchaseColumns = ({ type, mode }) => type === 'receipt' && !isReturnMode(mode);
+const shouldShowTransactionQuantity = ({ type, mode }) => !shouldShowReturnColumns({ type, mode });
+
+const shouldShowReceiptPurchaseColumns = ({ type }) => type === 'receipt';
 
 const shouldShowIssueProjectColumns = ({ type, mode, isWarehouse, isCoordinator, isSystem }) => (
     type === 'issue'
@@ -89,11 +91,11 @@ const shouldShowDetailActionButtons = ({ row, mode }) => {
 export const buildDetailsHeader = ({ type, mode, isWarehouse, isCoordinator, isSystem }) => {
 
     let extraHeaders = '';
-    const showReturnColumns = (type === 'issue' || type === 'receipt') && isReturnMode(mode);
+    const showReturnColumns = shouldShowReturnColumns({ type, mode });
     const suppliedQuantityHeader = type === 'issue' && (mode === 'edit-detail' || mode === 'view')
         ? '<th rowspan="2">Cantidad surtida</th>'
         : '';
-    const transactionQuantityHeader = shouldShowTransactionQuantity(mode)
+    const transactionQuantityHeader = shouldShowTransactionQuantity({ type, mode })
         ? `<th rowspan="2">${ type === 'issue' ? 'Salida' : 'Compra' }</th>`
         : '';
     const availableReturnQuantityHeader = showReturnColumns
@@ -167,7 +169,7 @@ export const buildDetailsColumns = ({ type, mode, render, isWarehouse, isCoordin
         resolveControl: resolveDisabledTableInput
     });
 
-    const showReturnColumns = (type === 'issue' || type === 'receipt') && isReturnMode(mode);
+    const showReturnColumns = shouldShowReturnColumns({ type, mode });
     const columns = [
         {
             data: null,
@@ -175,7 +177,7 @@ export const buildDetailsColumns = ({ type, mode, render, isWarehouse, isCoordin
         },
         { data: 'productBase', render: formatDecimal },
         { data: 'productHeight', render: formatDecimal },
-        ...(shouldShowTransactionQuantity(mode) ? [{ data: 'quantity', render: formatDecimal }] : []),
+        ...(shouldShowTransactionQuantity({ type, mode }) ? [{ data: 'quantity', render: formatDecimal }] : []),
         ...(type === 'issue' && (mode === 'edit-detail' || mode === 'view') ? [{ data: 'suppliedQuantity', render: formatDecimal }] : []),
         ...(showReturnColumns ? [{ data: 'availableReturnQuantity', defaultContent: 0, render: formatDecimal }] : []),
         { data: 'presentationName' },

@@ -98,12 +98,3 @@ export const returnGoodsIssueProducts = async ({ id, goodsIssueDto, userId }) =>
         config: RETURN_DOCUMENT_CONFIGS.goodsIssue
     })
 );
-
-export const returnGoodsReceiptProducts = async ({ id, goodsReceiptDto, userId }) => (
-    returnDocumentProducts({
-        id,
-        details: goodsReceiptDto.details,
-        userId,
-        config: RETURN_DOCUMENT_CONFIGS.goodsReceipt
-    })
-);

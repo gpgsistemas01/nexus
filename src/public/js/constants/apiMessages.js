@@ -184,7 +184,6 @@ export const errorMessages = {
     GOODS_RECEIPT_CREATE_DB_ERROR: 'Error de base de datos al crear la compra.',
     GOODS_RECEIPT_UPDATE_DB_ERROR: 'Error de base de datos al actualizar la compra.',
     GOODS_RECEIPT_SUPPLIER_CHANGE_CONFLICT: 'No se puede cambiar el proveedor de una compra confirmada porque sus movimientos de inventario ya están asociados al proveedor original.',
-    GOODS_RECEIPT_RETURN_CONFLICT: 'La cantidad devuelta de la compra no es válida.',
     GOODS_RECEIPT_CORRECTION_NO_CHANGES: 'No hay cambios para aplicar en el detalle de la compra.',
     GOODS_RECEIPT_CORRECTION_QUANTITY_CONFLICT: 'La cantidad corregida debe ser mayor a cero y no exceder la cantidad registrada del detalle.',
     GOODS_RECEIPT_CORRECTION_INSUFFICIENT_STOCK: (meta) => {
@@ -203,24 +202,8 @@ export const errorMessages = {
 
         return `Stock insuficiente para corregir la compra con el producto: ${ meta.productName ?? 'Producto desconocido' }${ dimensions }${ supplier }.`;
     },
+    GOODS_RECEIPT_DETAIL_ALREADY_CANCELED: 'El detalle de la compra ya está cancelado.',
     GOODS_RECEIPT_CORRECTION_REASON_NOT_FOUND: 'Razón de corrección de compra no encontrada.',
-    GOODS_RECEIPT_RETURN_QUANTITY_EXCEEDED: 'La cantidad devuelta excede la cantidad disponible para devolver en la compra.',
-    GOODS_RECEIPT_RETURN_INSUFFICIENT_STOCK: (meta) => {
-
-        const hasDimensions =
-            meta.base != null &&
-            meta.height != null;
-
-        const dimensions = hasDimensions
-            ? ` (${ meta.base } x ${ meta.height })`
-            : '';
-
-        const supplier = meta.supplierName
-            ? ` y proveedor: ${ meta.supplierName }`
-            : '';
-
-        return `Stock insuficiente para devolver la compra con el producto: ${ meta.productName }${ dimensions }${ supplier }.`;
-    },
     PRODUCT_NOT_FOUND: 'Producto no encontrado.',
     PRODUCT_CREATE_DB_ERROR: 'Error de base de datos al crear el producto.',
     PRODUCT_UPDATE_DB_ERROR: 'Error de base de datos al editar el producto.',

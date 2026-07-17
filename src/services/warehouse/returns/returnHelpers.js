@@ -1,15 +1,7 @@
-import { GoodsIssueInsufficientStock } from '../../../errors/inventory/stockError.js';
 import { GoodsIssueNotFound, GoodsIssueSuppliedConflict, GoodsIssueUpdateDatabaseError } from '../../../errors/warehouse/goodsIssueError.js';
-import {
-    GoodsReceiptNotFound,
-    GoodsReceiptReturnConflict,
-    GoodsReceiptReturnInsufficientStock,
-    GoodsReceiptReturnQuantityExceeded,
-    GoodsReceiptUpdateDatabaseError
-} from '../../../errors/warehouse/goodsReceiptError.js';
 import { getDb } from '../../../repository/baseRepository.js';
 import { normalizeDecimal } from '../../../utils/formattersUtils.js';
-import { createGoodsIssueReturnStockAdjustment, createGoodsReceiptReturnStockAdjustment } from '../adjustmentService.js';
+import { createGoodsIssueReturnStockAdjustment } from '../adjustmentService.js';
 import { INVENTORY_MOVEMENT_TYPES } from '../../../constants/inventory.js';
 
 export const findReturnedQuantityTotalsByDetailIds = async ({
@@ -60,39 +52,5 @@ export const RETURN_DOCUMENT_CONFIGS = Object.freeze({
         NotFoundError: GoodsIssueNotFound,
         InvalidQuantityError: GoodsIssueSuppliedConflict,
         UpdateError: GoodsIssueUpdateDatabaseError
-    },
-    goodsReceipt: {
-        modelName: 'goodsReceipt',
-        resultKey: 'goodsReceiptId',
-        logModel: 'goodsReceiptReturn',
-        operation: 'warehouse.returns.returnService.returnGoodsReceiptProducts',
-        documentSelect: {
-            supplierId: true
-        },
-        detailSelect: {
-            id: true,
-            productId: true,
-            quantity: true
-        },
-        quantityField: 'quantity',
-        detailReturnField: 'goodsReceiptDetailId',
-        normalizeReturnedTotal: Math.abs,
-        getSupplierId: ({ document }) => document.supplierId,
-        createAdjustment: createGoodsReceiptReturnStockAdjustment,
-        buildDocumentLink: ({ document, detail }) => ({
-            goodsReceiptId: document.id,
-            goodsReceiptDetailId: detail.id
-        }),
-        NotFoundError: GoodsReceiptNotFound,
-        InvalidQuantityError: GoodsReceiptReturnConflict,
-        QuantityExceededError: GoodsReceiptReturnQuantityExceeded,
-        mapError: (err) => {
-            if (err instanceof GoodsIssueInsufficientStock) {
-                return new GoodsReceiptReturnInsufficientStock(err.meta);
-            }
-
-            return err;
-        },
-        UpdateError: GoodsReceiptUpdateDatabaseError
     }
 });

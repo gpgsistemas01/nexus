@@ -44,45 +44,7 @@ export class GoodsReceiptSupplierChangeConflict extends AppError {
     }
 }
 
-export class GoodsReceiptReturnConflict extends AppError {
 
-    constructor () {
-        super('La cantidad devuelta de la compra no es válida', 'GOODS_RECEIPT_RETURN_CONFLICT', 409);
-    }
-}
-
-export class GoodsReceiptReturnQuantityExceeded extends AppError {
-
-    constructor () {
-        super('La cantidad devuelta excede la cantidad disponible para devolver en la compra', 'GOODS_RECEIPT_RETURN_QUANTITY_EXCEEDED', 409);
-    }
-}
-
-export class GoodsReceiptReturnInsufficientStock extends AppError {
-
-    constructor ({ productName, height, base, supplierName, productId, supplierId, requestedQuantity } = {}) {
-
-        const hasDimensions =
-            base != null &&
-            height != null;
-
-        const dimensions = hasDimensions
-            ? ` (${ base } x ${ height })`
-            : '';
-
-        const supplier = supplierName
-            ? ` y proveedor: ${ supplierName }`
-            : '';
-
-        super(
-            `Stock insuficiente para devolver la compra con el producto: ${ productName ?? 'Producto desconocido' }${ dimensions }${ supplier }`,
-            'GOODS_RECEIPT_RETURN_INSUFFICIENT_STOCK',
-            409
-        );
-
-        this.meta = { productName, height, base, supplierName, productId, supplierId, requestedQuantity };
-    }
-}
 
 
 export class GoodsReceiptCorrectionNoChanges extends AppError {
@@ -123,6 +85,14 @@ export class GoodsReceiptCorrectionInsufficientStock extends AppError {
         );
 
         this.meta = { productName, height, base, supplierName, productId, supplierId, requestedQuantity };
+    }
+}
+
+
+export class GoodsReceiptDetailAlreadyCanceled extends AppError {
+
+    constructor () {
+        super('El detalle de la compra ya está cancelado', 'GOODS_RECEIPT_DETAIL_ALREADY_CANCELED', 409);
     }
 }
 
