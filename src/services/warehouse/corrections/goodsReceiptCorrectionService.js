@@ -65,6 +65,8 @@ const createGoodsReceiptCorrectionAdjustment = async ({
         returnAdjustment: true,
         productId: currentDetail.productId,
         quantityChange: quantityDifference,
+        base: currentDetail.productBase,
+        height: currentDetail.productHeight,
         observations: quantityDifference > 0
             ? `${correctionContext} Ajuste de entrada por aumento de cantidad.`
             : `${correctionContext} Ajuste de salida por disminución de cantidad.`
