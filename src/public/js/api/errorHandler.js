@@ -3,24 +3,11 @@ import { notifications } from "../plugins/swal/swalComponent.js";
 import { clearFormErrors, normalizeFormErrors, scrollToFirstFormError } from "../ui/formUI.js";
 import { mapServerErrors } from "../utils/formUtils.js";
 
-const getErrorData = (err) => err?.data ?? err?.response?.data ?? null;
-
 const getFallbackMessage = (err) => {
 
-    const data = getErrorData(err);
+    const data = err?.data ?? err?.response?.data ?? null;
 
     return data?.message || getErrorMessage(data) || data?.detail || data?.error || err?.message || 'Ocurrió un error inesperado.';
-};
-
-const getModalErrorContent = (err) => {
-
-    const title = getErrorMessage(getErrorData(err)) || 'No se pudo completar la acción';
-    const message = getFallbackMessage(err);
-
-    return {
-        title,
-        text: message === title ? null : message
-    };
 };
 
 const resetFormSubmission = (form) => {
@@ -78,11 +65,14 @@ export const handleApiError = ({
 
         case 404:
         case 409: {
-            const modalContent = getModalErrorContent(err);
+            const modalData = data ?? err?.response?.data ?? null;
+            const modalTitle = getErrorMessage(modalData) || 'No se pudo completar la acción';
+            const modalMessage = getFallbackMessage(err);
 
             resetFormSubmission(form);
             notifications.showModal({
-                ...modalContent,
+                title: modalTitle,
+                text: modalMessage === modalTitle ? null : modalMessage,
                 icon: 'warning'
             });
             return;
