@@ -1,7 +1,6 @@
 import {
     GoodsReceiptCreateDatabaseError,
     GoodsReceiptNotFound,
-    GoodsReceiptSupplierChangeConflict,
     GoodsReceiptUpdateDatabaseError,
     ProfileReceivedByNotFound
 } from "../../../errors/warehouse/goodsReceiptError.js";
@@ -14,15 +13,15 @@ import { generateYearlyReferenceNumber } from "../../document/referenceNumberSer
 import { findProfileById } from "../../admin/profileService.js";
 import { applyInventoryMovement } from "../../inventory/movementService.js";
 import { findUniqueSupplier } from "../supplierService.js";
-import { buildGoodsReceiptDetails } from "./goodsReceiptHelpers.js";
+import { buildGoodsReceiptDetails, calculateGoodsReceiptTotals, createGoodsReceiptDetailsAndUpdateTotals } from "./goodsReceiptHelpers.js";
 import { updateProductUnitCostIfHigher } from "../products/supplierProductService.js";
-import { AppError } from "../../../errors/AppError.js";
+import { isAppError } from "../../../errors/AppError.js";
 import { buildDateRangeFilter } from "../../../utils/requestQueryUtils.js";
 import { findReturnedQuantityTotalsByDetailIds } from "../returns/returnHelpers.js";
+import { GOODS_RECEIPT_STATUS_NAMES } from "../../../constants/warehouseStatuses.js";
+import { INVENTORY_MOVEMENT_TYPES } from "../../../constants/inventory.js";
+import { DOCUMENT_REFERENCE_TYPES } from "../../../constants/documentReferenceTypes.js";
 
-const REFERENCE_NUMBER_TYPE = 'REC';
-const MOVEMENT_TYPE_IN = 'ENTRY';
-const STATUS_CONFIRMED = 'Confirmada';
 
 export const findAllGoodsReceipts = async ({
     skip = 0,
@@ -150,20 +149,11 @@ export const createGoodsReceipt = async ({ goodsReceiptDto }) => {
 
         const processedDetails = await buildGoodsReceiptDetails(details);
 
-        const totals = processedDetails.reduce((acc, d) => {
-            acc.totalQuantity += d.quantity;
-            acc.totalNetPurchaseAmount += d.netPurchaseAmount;
-            acc.totalGrossPurchaseAmount += d.grossPurchaseAmount;
-            return acc;
-        }, {
-            totalQuantity: 0,
-            totalNetPurchaseAmount: 0,
-            totalGrossPurchaseAmount: 0
-        });
+        const totals = calculateGoodsReceiptTotals(processedDetails);
 
         const result = await getDb().$transaction(async (tx) => {
 
-            const referenceNumber = await generateYearlyReferenceNumber({ type: REFERENCE_NUMBER_TYPE, tx });
+            const referenceNumber = await generateYearlyReferenceNumber({ type: DOCUMENT_REFERENCE_TYPES.GOODS_RECEIPT, tx });
 
             const goodsReceipt = await tx.goodsReceipt.create({
                 data: {
@@ -174,7 +164,7 @@ export const createGoodsReceipt = async ({ goodsReceiptDto }) => {
                     receivedByName: receivedBy.fullName,
                     status: {
                         connect: {
-                            name: STATUS_CONFIRMED
+                            name: GOODS_RECEIPT_STATUS_NAMES.CONFIRMED
                         }
                     },
                     supplier: {
@@ -214,7 +204,7 @@ export const createGoodsReceipt = async ({ goodsReceiptDto }) => {
                     supplierId: goodsReceipt.supplierId,
                     quantity: detail.quantity
                 })),
-                movementType: MOVEMENT_TYPE_IN
+                movementType: INVENTORY_MOVEMENT_TYPES.ENTRY
             });
 
             return goodsReceipt;
@@ -224,6 +214,7 @@ export const createGoodsReceipt = async ({ goodsReceiptDto }) => {
             supplierId: result.supplierId,
             details: result.details
         });
+
 
         logServiceInfo(serviceLogger, {
             operation: 'warehouse.goodsReceipts.goodsReceiptService.createGoodsReceipt',
@@ -242,72 +233,101 @@ export const createGoodsReceipt = async ({ goodsReceiptDto }) => {
             ...getModelLogContext('goodsReceipt', goodsReceiptDto)
         });
 
-        if (err instanceof AppError) throw err;
+        if (isAppError(err)) throw err;
 
         throw new GoodsReceiptCreateDatabaseError();
     }
 }
 
-export const updateGoodsReceiptHeader = async ({ id, goodsReceiptDto }) => {
+export const updateGoodsReceipt = async ({ id, goodsReceiptDto }) => {
 
     try {
 
-        const { receivedById, supplierId, ...goodsReceiptData } = goodsReceiptDto;
+        const { receivedById, supplierId: _ignoredSupplierId, details = [], userId, ...goodsReceiptData } = goodsReceiptDto;
+        const newDetails = details.filter(detail => !detail.id);
 
-        const goodsReceipt = await getDb().goodsReceipt.findUnique({
-            where: { id },
-            select: {
-                id: true,
-                supplierId: true
-            }
-        });
+        const [goodsReceipt, receivedBy] = await Promise.all([
+            getDb().goodsReceipt.findUnique({
+                where: { id },
+                select: {
+                    id: true
+                }
+            }),
+            findProfileById({ id: receivedById })
+        ]);
 
         if (!goodsReceipt) throw new GoodsReceiptNotFound();
 
-        if (goodsReceipt.supplierId !== supplierId) throw new GoodsReceiptSupplierChangeConflict();
-
-        const supplier = await findUniqueSupplier({ id: supplierId });
-        const receivedBy = await findProfileById({ id: receivedById });
-
         if (!receivedBy) throw new ProfileReceivedByNotFound();
 
-        const updatedGoodsReceipt = await getDb().goodsReceipt.update({
-            where: { id },
-            data: {
-                ...goodsReceiptData,
-                supplierName: supplier.tradeName,
-                receivedByName: receivedBy.fullName,
-                supplier: {
-                    connect: { id: supplierId }
+        let addedDetails = [];
+
+        const updatedGoodsReceipt = await getDb().$transaction(async (tx) => {
+            const updatedHeader = await tx.goodsReceipt.update({
+                where: { id },
+                data: {
+                    ...goodsReceiptData,
+                    receivedByName: receivedBy.fullName,
+                    receivedBy: {
+                        connect: { id: receivedById }
+                    }
                 },
-                receivedBy: {
-                    connect: { id: receivedById }
+                include: {
+                    details: true,
+                    status: true
                 }
-            },
-            include: {
-                details: true,
-                status: true
-            }
+            });
+
+            if (!newDetails.length) return updatedHeader;
+
+            const { createdDetails, updatedReceipt } = await createGoodsReceiptDetailsAndUpdateTotals({
+                tx,
+                goodsReceiptId: id,
+                details: newDetails
+            });
+
+            await applyInventoryMovement({
+                tx,
+                reference: { goodsReceiptId: id },
+                details: createdDetails.map(detail => ({
+                    productId: detail.productId,
+                    goodsReceiptDetailId: detail.id,
+                    supplierId: updatedHeader.supplierId,
+                    quantity: detail.quantity
+                })),
+                movementType: INVENTORY_MOVEMENT_TYPES.ENTRY
+            });
+
+            addedDetails = createdDetails;
+
+            return updatedReceipt;
         });
 
+        if (newDetails.length) {
+            await updateProductUnitCostIfHigher({
+                supplierId: updatedGoodsReceipt.supplierId,
+                details: addedDetails
+            });
+        }
+
         logServiceInfo(serviceLogger, {
-            operation: 'warehouse.goodsReceipts.goodsReceiptService.updateGoodsReceiptHeader',
+            operation: 'warehouse.goodsReceipts.goodsReceiptService.updateGoodsReceipt',
             ...getModelLogContext('goodsReceipt', {
                 id,
                 ...goodsReceiptDto,
                 referenceNumber: updatedGoodsReceipt.referenceNumber
             })
-        }, 'Encabezado de compra actualizado correctamente');
+        }, 'Compra actualizada correctamente');
 
         return updatedGoodsReceipt;
 
     } catch (err) {
         logServiceError(serviceLogger, err, {
-            operation: 'warehouse.goodsReceipts.goodsReceiptService.updateGoodsReceiptHeader',
+            operation: 'warehouse.goodsReceipts.goodsReceiptService.updateGoodsReceipt',
             ...getModelLogContext('goodsReceipt', { id, ...goodsReceiptDto })
         });
 
-        if (err instanceof AppError) throw err;
+        if (isAppError(err)) throw err;
 
         throw new GoodsReceiptUpdateDatabaseError();
     }

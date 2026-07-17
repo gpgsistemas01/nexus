@@ -83,3 +83,53 @@ export class GoodsReceiptReturnInsufficientStock extends AppError {
         this.meta = { productName, height, base, supplierName, productId, supplierId, requestedQuantity };
     }
 }
+
+
+export class GoodsReceiptCorrectionNoChanges extends AppError {
+
+    constructor () {
+        super('No hay cambios para aplicar en el detalle de la compra', 'GOODS_RECEIPT_CORRECTION_NO_CHANGES', 409);
+    }
+}
+
+export class GoodsReceiptCorrectionQuantityConflict extends AppError {
+
+    constructor () {
+        super('La cantidad corregida del detalle debe estar entre cero y la cantidad registrada', 'GOODS_RECEIPT_CORRECTION_QUANTITY_CONFLICT', 409);
+    }
+}
+
+
+export class GoodsReceiptCorrectionInsufficientStock extends AppError {
+
+    constructor ({ productName, height, base, supplierName, productId, supplierId, requestedQuantity } = {}) {
+
+        const hasDimensions =
+            base != null &&
+            height != null;
+
+        const dimensions = hasDimensions
+            ? ` (${ base } x ${ height })`
+            : '';
+
+        const supplier = supplierName
+            ? ` y proveedor: ${ supplierName }`
+            : '';
+
+        super(
+            `Stock insuficiente para corregir la compra con el producto: ${ productName ?? 'Producto desconocido' }${ dimensions }${ supplier }`,
+            'GOODS_RECEIPT_CORRECTION_INSUFFICIENT_STOCK',
+            409
+        );
+
+        this.meta = { productName, height, base, supplierName, productId, supplierId, requestedQuantity };
+    }
+}
+
+
+export class GoodsReceiptCorrectionReasonNotFound extends AppError {
+
+    constructor () {
+        super('Razón de corrección de compra no encontrada', 'GOODS_RECEIPT_CORRECTION_REASON_NOT_FOUND', 404);
+    }
+}

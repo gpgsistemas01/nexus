@@ -1,4 +1,4 @@
-import { AppError } from '../../errors/AppError.js';
+import { isAppError } from '../../errors/AppError.js';
 import { WasteNotFound, WasteStockAdjustmentDatabaseError, WasteUpdateDatabaseError } from '../../errors/warehouse/wasteError.js';
 import { getDb } from '../../repository/baseRepository.js';
 import { normalizeDecimal, toNumber } from '../../utils/formattersUtils.js';
@@ -6,19 +6,19 @@ import { assertSufficientStock, calculateConvertedQuantity } from '../inventory/
 import { createStockAdjustment } from './adjustmentService.js';
 import { findSupplierProductById } from './products/supplierProductService.js';
 import { createServiceLogger, getModelLogContext, logServiceError, logServiceInfo } from "../../utils/logger.js";
+import { PRISMA_ERROR_CODES } from "../../constants/prisma.js";
 
 const serviceLogger = createServiceLogger('warehouse.wasteService');
 
 
-const PRISMA_RECORD_NOT_FOUND = 'P2025';
 
 const handleWasteServiceError = ({ err, fallbackError }) => {
 
-    if (err.code === PRISMA_RECORD_NOT_FOUND) {
+    if (err.code === PRISMA_ERROR_CODES.RECORD_NOT_FOUND) {
         throw new WasteNotFound();
     }
 
-    if (err instanceof AppError) throw err;
+    if (isAppError(err)) throw err;
 
     throw fallbackError;
 };

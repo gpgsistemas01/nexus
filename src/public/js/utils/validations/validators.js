@@ -1,5 +1,5 @@
 import { isEmptyOrNull } from "./baseValidations.js";
-import { validateName, validatePassword, validateNumber, validateUsername, validateTextOptional, validateMeasure, validateDateOptional, validateGoodsReceiptDetailsArray, validateDate, validateText, validateNumberOptional, validateGoodsIssueDetailsArray, validatePositiveNumber, validatePairedOptionalNumber } from "./fieldValidations.js";
+import { validateName, validatePassword, validateNumber, validateUsername, validateTextOptional, validateMeasure, validateDateOptional, validateGoodsReceiptDetailsArray, validateDate, validateText, validateNumberOptional, validateGoodsIssueDetailsArray, validateNonNegativeNumber, validatePositiveNumber, validatePairedOptionalNumber } from "./fieldValidations.js";
 
 export const supplierValidators = {
     legalName: (value) => validateText({ 
@@ -85,6 +85,12 @@ export const validateGoodsReceiptValidators = {
     receptionDate: (value) => validateDate(value, 'La fecha de recepción'),
     details: validateGoodsReceiptDetailsArray
 }
+
+export const validateGoodsReceiptCorrectionValidators = {
+    quantity: (value) => validateNonNegativeNumber(value, 'La cantidad correcta'),
+    costPerUnitType: (value) => validateNumber(value, 'El costo por presentación correcto', { allowZero: false })
+};
+
 
 export const validateGoodsIssueValidators = {
     projectNumber: (value) => validateText({ 

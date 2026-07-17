@@ -30,5 +30,14 @@ export const configureReturnModal = ({
 
     toggleContainerElements({ selector: '.add-product-container', root: modalElement });
 
-    if (observationsElement) observationsElement.disabled = true;
+    if (observationsElement) {
+        if (toggleDisabledElement) {
+            toggleDisabledElement({
+                element: observationsElement,
+                isDisabled: true
+            });
+        } else {
+            observationsElement.disabled = true;
+        }
+    }
 };

@@ -198,14 +198,5 @@ export const renderActionButtons = ({ status, fulfillmentStatus, context, canAdj
         ariaLabel: 'Registrar devolución',
         rippleColor: 'dark'
     }));
-
-    if (context !== 'product' && context !== 'waste' && context !== 'profile' && context !== 'client' && context !== 'supplier') actions.push(buildMdbActionButton({
-        className: 'btn-view',
-        colorClass: 'btn-secondary',
-        iconClass: 'fa fa-eye',
-        title: 'Ver detalle',
-        ariaLabel: 'Ver detalle'
-    }));
-
     return actions.join('');
 }

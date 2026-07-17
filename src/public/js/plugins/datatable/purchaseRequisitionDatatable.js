@@ -5,6 +5,7 @@ import { hasPermission } from "../../utils/permissions.js";
 import { getResponsiveRowData } from "./utils/responsive.js";
 import { DATATABLE_SELECTORS } from "../../constants/selectors.js";
 import { formatDateTimeDisplay } from "../../utils/formatters.js";
+import { formatDecimal } from "../../utils/formatUtils.js";
 
 export let details = [];
 const selectorProductTable = DATATABLE_SELECTORS.PRODUCT;
@@ -93,13 +94,6 @@ export const createPurchaseRequisitionDatatable = (context) => {
 
         await openPurchaseRequisitionModal({ mode: 'edit', data });
     });
-
-    $(`${ selectorTable } tbody`).on('click', '.btn-view', function() {
-
-        const data = getResponsiveRowData(table, this);
-
-        openPurchaseRequisitionModal({ mode: 'view', data });
-    });
 };
 
 export const initDetailsPurchaseRequisitionTable = (mode) => {
@@ -111,7 +105,7 @@ export const initDetailsPurchaseRequisitionTable = (mode) => {
 
     const columns = [
         { data: 'name', title: 'Producto' },
-        { data: 'quantity', title: 'Cantidad' },
+        { data: 'quantity', title: 'Cantidad', render: formatDecimal },
         { 
             data: 'presentation', 
             title: 'Presentación',

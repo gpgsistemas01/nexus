@@ -89,7 +89,6 @@ export const validateUUID = (fieldName) => {
         .notEmpty().withMessage(errors.REQUIRED)
         .isUUID('4').withMessage(errors.INVALID_UUID)
 }
-
 export const validateTextOptionalWhen = ({ fieldName, maxLength, predicate }) => {
 
     const errors = errorMap[fieldName];
@@ -131,6 +130,28 @@ export const validateNumber = (fieldName) => {
     return body(fieldName)
         .notEmpty().withMessage(errors.REQUIRED)
         .isFloat().withMessage(errors.INVALID_NUMBER)
+        .matches(/^\d{1,8}(\.\d{1,2})?$/).withMessage(errors.TOO_LONG)
+        .toFloat()
+}
+
+export const validateNonNegativeNumber = (fieldName) => {
+
+    const errors = errorMap[fieldName];
+
+    return body(fieldName)
+        .notEmpty().withMessage(errors.REQUIRED)
+        .isFloat({ min: 0 }).withMessage(errors.INVALID_NUMBER)
+        .matches(/^\d{1,8}(\.\d{1,2})?$/).withMessage(errors.TOO_LONG)
+        .toFloat()
+}
+
+export const validatePositiveNumber = (fieldName) => {
+
+    const errors = errorMap[fieldName];
+
+    return body(fieldName)
+        .notEmpty().withMessage(errors.REQUIRED)
+        .isFloat({ gt: 0 }).withMessage(errors.INVALID_NUMBER)
         .matches(/^\d{1,8}(\.\d{1,2})?$/).withMessage(errors.TOO_LONG)
         .toFloat()
 }
@@ -200,7 +221,7 @@ export const validateDateOptional = (fieldName) => {
         .toDate()
 }
 
-export const validateDetailsArray = 
+export const validateDetailsArray =
     body('details')
         .isArray({ min: 1 }).withMessage(errorMap['details'].REQUIRED)
         .custom(details => {

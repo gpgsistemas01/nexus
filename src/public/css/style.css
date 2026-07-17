@@ -383,12 +383,63 @@ body {
 }
 
 .table-filters-panel {
-  background: rgba(255, 255, 255, 0.88);
-  border: 1px solid rgba(var(--mdb-secondary-rgb), 0.12);
-  border-radius: 1rem;
-  box-shadow: 0 0.35rem 1rem rgba(var(--mdb-secondary-rgb), 0.08);
-  margin-block-end: 1rem;
-  padding: 1rem;
+  background: rgba(255, 255, 255, 0.62);
+  border: 1px solid rgba(var(--mdb-secondary-rgb), 0.10);
+  border-radius: 0.85rem;
+  box-shadow: 0 0.2rem 0.65rem rgba(var(--mdb-secondary-rgb), 0.04);
+  margin-block-end: 0.85rem;
+  padding: 0.65rem 0.8rem;
+}
+
+.table-filters-panel[open] {
+  background: rgba(255, 255, 255, 0.76);
+}
+
+.table-filters-summary {
+  align-items: center;
+  color: var(--mdb-secondary);
+  cursor: pointer;
+  display: flex;
+  gap: 0.75rem;
+  justify-content: space-between;
+  list-style: none;
+  user-select: none;
+}
+
+.table-filters-summary::-webkit-details-marker {
+  display: none;
+}
+
+.table-filters-summary::after {
+  color: rgba(var(--mdb-secondary-rgb), 0.66);
+  content: '\f078';
+  font-family: 'Font Awesome 6 Free';
+  font-size: 0.78rem;
+  font-weight: 900;
+  transition: transform 0.2s ease;
+}
+
+.table-filters-panel[open] .table-filters-summary::after {
+  transform: rotate(180deg);
+}
+
+.table-filters-summary-title {
+  align-items: center;
+  display: inline-flex;
+  font-size: 0.95rem;
+  font-weight: 700;
+  gap: 0.45rem;
+}
+
+.table-filters-summary-hint {
+  color: rgba(var(--mdb-secondary-rgb), 0.72);
+  font-size: 0.78rem;
+  font-weight: 600;
+  margin-left: auto;
+}
+
+.table-filters-content {
+  margin-block-start: 0.75rem;
 }
 
 .table-filters-panel .table-filters + .table-filters {
@@ -2070,6 +2121,77 @@ body {
   background-color: var(--mdb-primary-soft) !important;
   border-color: var(--mdb-primary-hover) !important;
   color: var(--mdb-primary-hover) !important;
+}
+
+.swal2-confirmation-modal.swal2-popup {
+  --swal-confirmation-accent: var(--mdb-primary);
+  --swal-confirmation-accent-rgb: var(--mdb-primary-rgb);
+  --swal-confirmation-accent-hover: var(--mdb-primary-hover);
+  background:
+    linear-gradient(180deg, rgba(var(--swal-confirmation-accent-rgb), 0.1) 0%, rgba(var(--swal-confirmation-accent-rgb), 0) 11rem),
+    var(--mdb-light);
+  border: 1px solid rgba(var(--swal-confirmation-accent-rgb), 0.18);
+  border-radius: 1.25rem;
+  box-shadow: 0 1.25rem 3rem rgba(var(--mdb-secondary-rgb), 0.18);
+  color: var(--mdb-body-color);
+  font-family: var(--mdb-font-sans-serif);
+  padding: 1.6rem;
+}
+
+.swal2-confirmation-modal.swal2-confirmation-danger {
+  --swal-confirmation-accent: var(--mdb-danger);
+  --swal-confirmation-accent-rgb: var(--mdb-danger-rgb);
+  --swal-confirmation-accent-hover: #b02a37;
+}
+
+.swal2-confirmation-modal.swal2-confirmation-warning {
+  --swal-confirmation-accent: var(--mdb-warning);
+  --swal-confirmation-accent-rgb: var(--mdb-warning-rgb);
+  --swal-confirmation-accent-hover: #cc8500;
+}
+
+.swal2-confirmation-title {
+  color: var(--swal-confirmation-accent-hover);
+  font-weight: 800;
+}
+
+.swal2-confirmation-content {
+  color: rgba(var(--mdb-secondary-rgb), 0.82);
+}
+
+.swal2-confirmation-confirm-button,
+.swal2-confirmation-cancel-button {
+  border-radius: 0.75rem;
+  font-weight: 800;
+  padding: 0.65rem 1.2rem;
+  transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, color 0.2s ease;
+}
+
+.swal2-confirmation-confirm-button {
+  background-color: var(--swal-confirmation-accent) !important;
+  border: 1px solid var(--swal-confirmation-accent) !important;
+  color: #ffffff !important;
+}
+
+.swal2-confirmation-confirm-button:hover,
+.swal2-confirmation-confirm-button:focus {
+  background-color: var(--swal-confirmation-accent-hover) !important;
+  border-color: var(--swal-confirmation-accent-hover) !important;
+  box-shadow: 0 0.35rem 0.9rem rgba(var(--swal-confirmation-accent-rgb), 0.22) !important;
+}
+
+.swal2-confirmation-cancel-button {
+  background-color: #ffffff !important;
+  border: 1px solid var(--swal-confirmation-accent) !important;
+  color: var(--swal-confirmation-accent) !important;
+  margin-left: 0.5rem;
+}
+
+.swal2-confirmation-cancel-button:hover,
+.swal2-confirmation-cancel-button:focus {
+  background-color: rgba(var(--swal-confirmation-accent-rgb), 0.1) !important;
+  border-color: var(--swal-confirmation-accent-hover) !important;
+  color: var(--swal-confirmation-accent-hover) !important;
 }
 
 .swal2-toast.swal2-popup {

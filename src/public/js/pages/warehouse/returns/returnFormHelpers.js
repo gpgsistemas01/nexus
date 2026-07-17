@@ -1,8 +1,7 @@
 import { on } from "../../../utils/domUtils.js";
 import { syncCheckboxControlledInputs } from "../../../utils/formUtils.js";
 import { validateReturnDetails } from "../../../utils/validations/validators.js";
-
-export const RETURN_MODE = 'return';
+import { FORM_MODES } from "../../../constants/formModes.js";
 
 export const buildReturnDetailState = ({
     detail,
@@ -19,6 +18,37 @@ export const buildReturnDetailState = ({
     };
 };
 
+export const replaceDetailsWithReturnState = ({
+    targetDetails,
+    sourceDetails,
+    mapDetail = detail => detail,
+    getBaseQuantity,
+    getPreviousReturnedQuantity = detail => detail.returnedQuantityTotal
+}) => {
+
+    const previousReturnedByDetailId = new Map(targetDetails.map(detail => [detail.id, detail.returnedQuantityTotal]));
+
+    targetDetails.length = 0;
+    targetDetails.push(...sourceDetails.map(detail => {
+        const returnedQuantityTotal = detail.returnedQuantityTotal
+            ?? getPreviousReturnedQuantity(detail)
+            ?? previousReturnedByDetailId.get(detail.id)
+            ?? 0;
+
+        return {
+            ...mapDetail(detail),
+            ...buildReturnDetailState({
+                detail: {
+                    ...detail,
+                    returnedQuantityTotal
+                },
+                baseQuantity: getBaseQuantity(detail),
+                returnedQuantityTotal
+            })
+        };
+    }));
+};
+
 export const createReturnFormHandlers = ({
     details,
     validators,
@@ -26,7 +56,7 @@ export const createReturnFormHandlers = ({
     returnUpdate,
     emptyMessage
 }) => ({
-    isActive: (form) => form?.dataset?.mode === RETURN_MODE,
+    isActive: (form) => form?.dataset?.mode === FORM_MODES.RETURN,
     normalizeData: ({ form }) => ({
         id: form.dataset.id,
         details: details

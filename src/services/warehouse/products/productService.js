@@ -3,16 +3,15 @@ import { getDb } from "../../../repository/baseRepository.js";
 import { findAllSupplierProducts, findCurrentSupplierProductByProductId, findSupplierProductByIds, recalculateConvertedQuantityByProduct } from "./supplierProductService.js";
 import { prepareProductData, withRetry } from "./productHelpers.js";
 import { syncSupplierProduct } from "./productRelations.js";
-import { AppError } from "../../../errors/AppError.js";
+import { isAppError } from "../../../errors/AppError.js";
 import { createStockAdjustment } from "../adjustmentService.js";
 import { createServiceLogger, getModelLogContext, logServiceError, logServiceInfo } from "../../../utils/logger.js";
+import { PRISMA_ERROR_CODES } from "../../../constants/prisma.js";
 
 const serviceLogger = createServiceLogger('warehouse.products.productService');
 
 
 const REFERENCE_MOVEMENT_IN = 'IN';
-const PRISMA_RECORD_NOT_FOUND = 'P2025';
-const PRISMA_FOREIGN_KEY_CONSTRAINT = 'P2003';
 
 const buildProductData = ({ rest, relations }) => ({
     ...rest,
@@ -99,7 +98,7 @@ const DEFAULT_PRODUCT_SNAPSHOT_SELECT = {
 };
 
 export const findProductsSnapshot = async ({
-    tx,
+    tx = null,
     productIds
 }) => {
 
@@ -164,7 +163,7 @@ export const createProduct = async ({
             ...getModelLogContext('product', { userId, ...productDto, ...stockDto })
         });
 
-        if (err instanceof AppError) throw err;
+        if (isAppError(err)) throw err;
         
         throw new ProductCreateDatabaseError();
     };
@@ -235,11 +234,11 @@ export const updateProduct = async (productDto, id) => {
             ...getModelLogContext('product', { id, ...productDto })
         });
 
-        if (err.code === PRISMA_RECORD_NOT_FOUND) {
+        if (err.code === PRISMA_ERROR_CODES.RECORD_NOT_FOUND) {
             throw new ProductNotFound();
         }
 
-        if (err instanceof AppError) throw err;
+        if (isAppError(err)) throw err;
 
         throw new ProductUpdateDatabaseError();
     };
@@ -285,9 +284,9 @@ export const deleteProduct = async (id) => {
             ...getModelLogContext('product', { id })
         });
 
-        if (err.code === PRISMA_RECORD_NOT_FOUND) throw new ProductNotFound();
-        if (err.code === PRISMA_FOREIGN_KEY_CONSTRAINT) throw new ProductDeleteRelationConflict();
-        if (err instanceof AppError) throw err;
+        if (err.code === PRISMA_ERROR_CODES.RECORD_NOT_FOUND) throw new ProductNotFound();
+        if (err.code === PRISMA_ERROR_CODES.FOREIGN_KEY_CONSTRAINT) throw new ProductDeleteRelationConflict();
+        if (isAppError(err)) throw err;
 
         throw new ProductDeleteDatabaseError();
     }
@@ -323,11 +322,11 @@ export const updateProductStock = async ({
             ...getModelLogContext('productStock', { id, userId, ...productDto })
         });
 
-        if (err.code === PRISMA_RECORD_NOT_FOUND) {
+        if (err.code === PRISMA_ERROR_CODES.RECORD_NOT_FOUND) {
             throw new ProductNotFound();
         }
 
-        if (err instanceof AppError) throw err;
+        if (isAppError(err)) throw err;
 
         throw new ProductStockAdjustmentDatabaseError();
     }

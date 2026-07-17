@@ -1,17 +1,17 @@
-import { AdjustmentStatus, StockAdjustmentType } from "../../../generated/prisma/enums.ts";
 import { getDb } from "../../repository/baseRepository.js";
 import { generateYearlyReferenceNumber } from "../document/referenceNumberService.js";
 import { normalizeDecimal, toNumber } from "../../utils/formattersUtils.js";
 import { assertSufficientStock, calculateConvertedQuantity } from "../inventory/stockHelpers.js";
 import { createStockAdjustmentMovement } from "../inventory/movementService.js";
 import { adjustSupplierProductStock, findSupplierProductByIds } from "./products/supplierProductService.js";
+import { INVENTORY_MOVEMENT_TYPES, INVENTORY_REFERENCE_TYPES, STOCK_ADJUSTMENT_STATUS_NAMES, STOCK_ADJUSTMENT_TYPES } from "../../constants/inventory.js";
+import { DOCUMENT_REFERENCE_TYPES } from "../../constants/documentReferenceTypes.js";
 
-const REFERENCE_NUMBER_TYPE = 'AJU';
 const GOODS_RECEIPT_RETURN_REASON_NAME = 'Devolución de compra';
 const GOODS_ISSUE_RETURN_REASON_NAME = 'Devolución de salida';
 export const StockReturnSource = Object.freeze({
-    GOODS_RECEIPT: 'GOODS_RECEIPT',
-    GOODS_ISSUE: 'GOODS_ISSUE'
+    GOODS_RECEIPT: INVENTORY_REFERENCE_TYPES.GOODS_RECEIPT,
+    GOODS_ISSUE: INVENTORY_REFERENCE_TYPES.GOODS_ISSUE
 });
 
 
@@ -78,7 +78,8 @@ export const createStockAdjustment = async ({
     goodsIssueId = null,
     goodsIssueDetailId = null,
     goodsReceiptId = null,
-    goodsReceiptDetailId = null
+    goodsReceiptDetailId = null,
+    returnAdjustment = false
 }) => {
 
     const execute = async (transaction) => {
@@ -89,18 +90,19 @@ export const createStockAdjustment = async ({
             supplierId
         });
 
-        const referenceNumber = await generateYearlyReferenceNumber({ type: REFERENCE_NUMBER_TYPE, tx: transaction });
+        const referenceNumber = await generateYearlyReferenceNumber({ type: DOCUMENT_REFERENCE_TYPES.STOCK_ADJUSTMENT, tx: transaction });
 
         const productName = product.name;
         const supplierName = product.supplier?.tradeName || '';
         const isReturnAdjustment = returnedQuantity !== null && returnedQuantity !== undefined;
+        const currentStock = Number(toNumber(product.currentStock) || 0);
         const isGoodsReceiptReturn = returnSource === StockReturnSource.GOODS_RECEIPT;
         const returnSign = isGoodsReceiptReturn ? -1 : 1;
         const returnReasonName = isGoodsReceiptReturn
             ? GOODS_RECEIPT_RETURN_REASON_NAME
             : GOODS_ISSUE_RETURN_REASON_NAME;
         const resolvedNewStock = isReturnAdjustment
-            ? normalizeDecimal(Number(toNumber(product.currentStock) || 0) + (Number(returnedQuantity) * returnSign))
+            ? normalizeDecimal(currentStock + (Number(returnedQuantity) * returnSign))
             : newStock;
 
         const {
@@ -120,15 +122,15 @@ export const createStockAdjustment = async ({
         });
 
         const adjustmentType = difference >= 0
-            ? StockAdjustmentType.INCREASE
-            : StockAdjustmentType.DECREASE;
+            ? STOCK_ADJUSTMENT_TYPES.INCREASE
+            : STOCK_ADJUSTMENT_TYPES.DECREASE;
 
         const adjustment = await transaction.stockAdjustment.create({
             data: {
                 referenceNumber,
                 type: adjustmentType,
                 observations,
-                status: AdjustmentStatus.APPLIED,
+                status: STOCK_ADJUSTMENT_STATUS_NAMES.APPLIED,
                 appliedAt: new Date(),
                 reason: {
                     connect: isReturnAdjustment
@@ -188,12 +190,62 @@ export const createStockAdjustment = async ({
             convertedDifference
         });
 
-        return adjustSupplierProductStock({
+        const updatedSupplierProduct = await adjustSupplierProductStock({
             tx: transaction,
             productId,
             supplierId,
             newStock: adjustedNewStock,
             newConvertedQuantity
+        });
+
+        return returnAdjustment ? adjustment : updatedSupplierProduct;
+    };
+
+    if (tx) return execute(tx);
+
+    return getDb().$transaction(execute);
+};
+
+export const createStockAdjustmentByQuantityChange = async ({
+    tx = null,
+    productId,
+    supplierId,
+    reasonId,
+    observations,
+    quantityChange,
+    userId,
+    base = null,
+    height = null,
+    goodsIssueId = null,
+    goodsIssueDetailId = null,
+    goodsReceiptId = null,
+    goodsReceiptDetailId = null,
+    returnAdjustment = false
+}) => {
+
+    const execute = async (transaction) => {
+        const product = await findSupplierProductByIds({
+            tx: transaction,
+            productId,
+            supplierId
+        });
+        const newStock = normalizeDecimal(Number(toNumber(product.currentStock) || 0) + Number(quantityChange));
+
+        return createStockAdjustment({
+            tx: transaction,
+            productId,
+            supplierId,
+            reasonId,
+            observations,
+            newStock,
+            userId,
+            base,
+            height,
+            goodsIssueId,
+            goodsIssueDetailId,
+            goodsReceiptId,
+            goodsReceiptDetailId,
+            returnAdjustment
         });
     };
 

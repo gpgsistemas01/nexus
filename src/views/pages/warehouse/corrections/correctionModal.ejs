@@ -1,0 +1,94 @@
+<% const correctionTotalsSummary = {
+    class: 'row g-2 correction-totals-summary',
+    items: [
+        {
+            id: 'correctionTotalQuantity',
+            label: 'Cantidad total',
+            value: '0.00',
+            rawValue: 0
+        },
+        {
+            id: 'correctionTotalNetPurchaseAmount',
+            label: 'Subtotal',
+            value: '$0.00',
+            rawValue: 0
+        },
+        {
+            id: 'correctionTotalGrossPurchaseAmount',
+            label: 'Total con IVA',
+            value: '$0.00',
+            rawValue: 0
+        }
+    ]
+};
+
+const form = {
+    id: 'goodsReceiptCorrectionForm',
+    sections: [
+        {
+            title: 'Corrección del detalle',
+            groups: [
+                {
+                    type: 'inputs',
+                    items: [
+                        {
+                            id: 'correctionQuantityInput',
+                            name: 'quantity',
+                            type: 'number',
+                            label: 'Cantidad correcta',
+                            col: '6',
+                            attrs: {
+                                min: '0.01',
+                                step: '0.01'
+                            }
+                        },
+                        {
+                            id: 'correctionCostPerUnitInput',
+                            name: 'costPerUnitType',
+                            type: 'number',
+                            label: 'Costo por presentación correcto',
+                            col: '6',
+                            attrs: {
+                                min: '0.01',
+                                step: 'any'
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            title: 'Nuevos totales estimados',
+            groups: [
+                {
+                    type: 'html',
+                    content: include('../../../shared/totalsSummary', { totals: correctionTotalsSummary })
+                }
+            ]
+        }
+    ],
+    actions: [
+        {
+            id: 'cancelGoodsReceiptCorrectionBtn',
+            class: 'btn btn-link',
+            content: 'Regresar',
+            attrs: {
+                'data-mdb-dismiss': 'modal',
+                'data-bs-dismiss': 'modal'
+            }
+        },
+        {
+            id: 'confirmGoodsReceiptCorrectionBtn',
+            type: 'submit',
+            class: 'btn btn-primary',
+            content: 'Corregir detalle'
+        }
+    ]
+}; %>
+
+<%- include('../../../shared/modal', {
+    modalId: 'goodsReceiptCorrectionModal',
+    modalTitle: 'Corregir detalle de compra',
+    dialogClass: 'modal-lg modal-dialog-scrollable',
+    form
+}) %>

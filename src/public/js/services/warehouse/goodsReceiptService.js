@@ -26,3 +26,15 @@ export const returnGoodsReceiptRequest = ({ data, id }) => apiRequest({
     url: `${ GOODS_RECEIPTS_API_ROUTE }/${ id }/returns`,
     data
 });
+
+
+export const correctGoodsReceiptDetailRequest = ({ data, id, detailId }) => apiRequest({
+    method: 'patch',
+    url: `${ GOODS_RECEIPTS_API_ROUTE }/${ id }/details/${ detailId }/corrections`,
+    data
+});
+
+export const cancelGoodsReceiptDetailRequest = ({ id, detailId }) => apiRequest({
+    method: 'patch',
+    url: `${ GOODS_RECEIPTS_API_ROUTE }/${ id }/details/${ detailId }/cancel`
+});

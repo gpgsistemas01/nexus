@@ -131,4 +131,5 @@ export const normalizeProductDimensions = ({ base, height } = {}) => {
     };
 };
 
+
 export const normalizeText = (value = '') => value.trim().toUpperCase();

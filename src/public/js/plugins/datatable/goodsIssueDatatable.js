@@ -10,11 +10,12 @@ import { handleDelete, renderMaterialName } from "./utils/renderProductDatatable
 import { getResponsiveRowData } from "./utils/responsive.js";
 import { setupTableFilters } from "./utils/filters/tableFilter.js";
 import { DATATABLE_SELECTORS } from "../../constants/selectors.js";
+import { FORM_MODES } from "../../constants/formModes.js";
+import { FULFILLMENT_STATUS_NAMES } from "../../constants/fulfillmentStatuses.js";
 
 export let details = [];
 const selectorProductTable = DATATABLE_SELECTORS.PRODUCT;
 const tableSelector = DATATABLE_SELECTORS.MAIN;
-const FULFILLMENT_PENDING = 'Pendiente';
 let filters = {
     getValues: () => ({})
 };
@@ -84,7 +85,7 @@ export const createGoodsIssueDatatable = async (context) => {
             buttons: [
                 {
                     text: 'Nueva salida',
-                    action: () => openGoodsIssueModal({ mode: 'create' })
+                    action: () => openGoodsIssueModal({ mode: FORM_MODES.CREATE })
                 },
                 buildExcelButton({
                     filename: formatFileName('reporte_salidas'),
@@ -100,7 +101,7 @@ export const createGoodsIssueDatatable = async (context) => {
     $(`${ tableSelector } tbody`).on('click', '.btn-edit', function () {
 
         const data = getResponsiveRowData(table, this);
-        const mode = data?.fulfillmentStatus?.name === FULFILLMENT_PENDING ? 'edit' : 'edit-header';
+        const mode = data?.fulfillmentStatus?.name === FULFILLMENT_STATUS_NAMES.PENDING ? FORM_MODES.EDIT : FORM_MODES.EDIT_HEADER;
 
         openGoodsIssueModal({ mode, data });
     })
@@ -109,21 +110,14 @@ export const createGoodsIssueDatatable = async (context) => {
 
         const data = getResponsiveRowData(table, this);
 
-        openGoodsIssueModal({ mode: 'edit-detail', data });
+        openGoodsIssueModal({ mode: FORM_MODES.EDIT_DETAIL, data });
     });
 
     $(`${ tableSelector } tbody`).on('click', '.btn-return-goods-issue', function() {
 
         const data = getResponsiveRowData(table, this);
 
-        openGoodsIssueModal({ mode: 'return', data });
-    });
-
-    $(`${ tableSelector } tbody`).on('click', '.btn-view', function() {
-
-        const data = getResponsiveRowData(table, this);
-
-        openGoodsIssueModal({ mode: 'view', data });
+        openGoodsIssueModal({ mode: FORM_MODES.RETURN, data });
     });
 };
 

@@ -1,10 +1,11 @@
-import { createGoodsReceiptDtoForEdit, createGoodsReceiptDtoForRegister, createGoodsReceiptReturnDto } from "../../../dtos/goodsReceiptDTO.js";
+import { createGoodsReceiptCorrectionDto, createGoodsReceiptDtoForEdit, createGoodsReceiptDtoForRegister, createGoodsReceiptReturnDto } from "../../../dtos/goodsReceiptDTO.js";
 import { successCodeMessages } from "../../../messages/codeMessages.js";
 import {
     createGoodsReceipt,
     findAllGoodsReceipts,
-    updateGoodsReceiptHeader
+    updateGoodsReceipt
 } from "../../../services/warehouse/goodsReceipts/goodsReceiptService.js";
+import { correctGoodsReceiptDetailLine, cancelGoodsReceiptDetailLine } from "../../../services/warehouse/corrections/goodsReceiptCorrectionService.js";
 import { getDataTableOrder, getDataTablePaging, getDataTableSearch } from "../../../utils/requestQueryUtils.js";
 import {
     createStockNotification,
@@ -66,9 +67,12 @@ export const editGoodsReceiptHeader = async (req, res) => {
     const goodsReceiptDto = createGoodsReceiptDtoForEdit(req.body);
     const sanitizedGoodsReceiptDto = sanitizeEmptyStrings(goodsReceiptDto);
 
-    const goodsReceipt = await updateGoodsReceiptHeader({
+    const goodsReceipt = await updateGoodsReceipt({
         id: req.params.id,
-        goodsReceiptDto: sanitizedGoodsReceiptDto
+        goodsReceiptDto: {
+            ...sanitizedGoodsReceiptDto,
+            userId: req.user.id
+        }
     });
 
     return res.status(200).json({
@@ -90,6 +94,39 @@ export const returnGoodsReceipt = async (req, res) => {
 
     return res.status(200).json({
         goodsReceiptReturn,
+        code: successCodeMessages.UPDATED_GOODS_RECEIPT
+    });
+};
+
+
+export const correctGoodsReceiptDetail = async (req, res) => {
+
+    const correctionDto = createGoodsReceiptCorrectionDto(req.body);
+    const sanitizedCorrectionDto = sanitizeEmptyStrings(correctionDto);
+
+    const correction = await correctGoodsReceiptDetailLine({
+        id: req.params.id,
+        detailId: req.params.detailId,
+        correctionDto: sanitizedCorrectionDto,
+        userId: req.user.id
+    });
+
+    return res.status(200).json({
+        correction,
+        code: successCodeMessages.UPDATED_GOODS_RECEIPT
+    });
+};
+
+export const cancelGoodsReceiptDetail = async (req, res) => {
+
+    const correction = await cancelGoodsReceiptDetailLine({
+        id: req.params.id,
+        detailId: req.params.detailId,
+        userId: req.user.id
+    });
+
+    return res.status(200).json({
+        correction,
         code: successCodeMessages.UPDATED_GOODS_RECEIPT
     });
 };

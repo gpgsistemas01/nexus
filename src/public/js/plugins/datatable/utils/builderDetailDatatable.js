@@ -1,7 +1,12 @@
+import { buildMdbActionButton } from "../../mdb/actionButton.js";
 import { bindDisabledControlWarning } from "../../../ui/disabledControlWarning.js";
+import { formatCurrency, formatDecimal } from "../../../utils/formatUtils.js";
 
 const DISABLED_PROJECT_QUANTITY_MESSAGE = 'Marque el detalle como surtido para capturar la cantidad de proyecto.';
 const DISABLED_RETURN_QUANTITY_MESSAGE = 'Marque el detalle para devolución antes de capturar la cantidad devuelta.';
+const GOODS_RECEIPT_DETAIL_STATUS = Object.freeze({
+    CANCELED: 'CANCELED'
+});
 
 const DISABLED_TABLE_INPUT_SELECTOR = 'input[data-disabled-warning], textarea[data-disabled-warning]';
 
@@ -121,6 +126,10 @@ export const buildDetailsHeader = ({ type, mode, isWarehouse, isCoordinator, isS
         `;
     }
 
+    if (type === 'receipt' && ['edit', 'view'].includes(mode)) {
+        extraHeaders += `<th rowspan="2">Acciones</th>`;
+    }
+
     if (shouldShowActionsColumn({ type, mode })) {
         extraHeaders += `<th rowspan="2">Acciones</th>`;
     }
@@ -161,19 +170,19 @@ export const buildDetailsColumns = ({ type, mode, render, isWarehouse, isCoordin
             data: null,
             render
         },
-        { data: 'productBase' },
-        { data: 'productHeight' },
-        ...(shouldShowTransactionQuantity(mode) ? [{ data: 'quantity' }] : []),
-        ...(type === 'issue' && (mode === 'edit-detail' || mode === 'view') ? [{ data: 'suppliedQuantity' }] : []),
-        ...(showReturnColumns ? [{ data: 'availableReturnQuantity', defaultContent: 0 }] : []),
+        { data: 'productBase', render: formatDecimal },
+        { data: 'productHeight', render: formatDecimal },
+        ...(shouldShowTransactionQuantity(mode) ? [{ data: 'quantity', render: formatDecimal }] : []),
+        ...(type === 'issue' && (mode === 'edit-detail' || mode === 'view') ? [{ data: 'suppliedQuantity', render: formatDecimal }] : []),
+        ...(showReturnColumns ? [{ data: 'availableReturnQuantity', defaultContent: 0, render: formatDecimal }] : []),
         { data: 'presentationName' },
-        { data: 'convertedQuantity' },
+        { data: 'convertedQuantity', render: formatDecimal },
         { data: 'unitMeasureName' },
     ];
 
     if (shouldShowIssueProjectColumns({ type, mode, isWarehouse, isCoordinator, isSystem })) {
         columns.push(
-            { data: 'maxUnitCost' },
+            { data: 'maxUnitCost', render: formatCurrency },
             {
                 data: 'projectConvertedQuantity',
                 render: (value, _, row) => {
@@ -198,22 +207,22 @@ export const buildDetailsColumns = ({ type, mode, render, isWarehouse, isCoordin
                     `;
                 }
             },
-            { data: 'convertedQuantityDifference' }
+            { data: 'convertedQuantityDifference', render: formatDecimal }
         );
     }
 
     if (shouldShowReceiptPurchaseColumns({ type, mode })) {
         columns.push(
-            { data: 'conversionUnitCost' },
-            { data: 'costPerUnitType' },
-            { data: 'netPurchaseAmount' },
-            { data: 'grossPurchaseAmount' }
+            { data: 'conversionUnitCost', render: formatCurrency },
+            { data: 'costPerUnitType', render: formatCurrency },
+            { data: 'netPurchaseAmount', render: formatCurrency },
+            { data: 'grossPurchaseAmount', render: formatCurrency }
         );
     }
 
     if (showReturnColumns) {
         columns.push(
-            { data: 'returnedQuantityTotal', defaultContent: 0 },
+            { data: 'returnedQuantityTotal', defaultContent: 0, render: formatDecimal },
             {
                 data: 'returnedQuantity',
                 render: (value, _, row) => {
@@ -266,6 +275,44 @@ export const buildDetailsColumns = ({ type, mode, render, isWarehouse, isCoordin
                         ${ row.isSupplied ? 'checked' : '' }
                         ${ isEditableDetail ? '' : 'disabled' }
                     >
+                `;
+            }
+        });
+    }
+
+    if (type === 'receipt' && ['edit', 'view'].includes(mode)) {
+        columns.push({
+            data: null,
+            title: 'Acciones',
+            orderable: false,
+            searchable: false,
+            render: (_, __, row) => {
+                const detailId = row.id;
+                const canManageDetail = Boolean(detailId) && row.status !== GOODS_RECEIPT_DETAIL_STATUS.CANCELED;
+
+                if (!canManageDetail) return '';
+
+                return `
+                    ${ buildMdbActionButton({
+                        className: 'correct-detail-btn',
+                        colorClass: 'btn-info',
+                        iconClass: 'fa-solid fa-pen-to-square',
+                        title: 'Corregir detalle',
+                        ariaLabel: 'Corregir detalle de compra',
+                        htmlAttrs: {
+                            'data-id': detailId
+                        }
+                    }) }
+                    ${ buildMdbActionButton({
+                        className: 'cancel-receipt-detail-btn',
+                        colorClass: 'btn-danger',
+                        iconClass: 'fa-solid fa-ban',
+                        title: 'Cancelar detalle',
+                        ariaLabel: 'Cancelar detalle de compra',
+                        htmlAttrs: {
+                            'data-id': detailId
+                        }
+                    }) }
                 `;
             }
         });

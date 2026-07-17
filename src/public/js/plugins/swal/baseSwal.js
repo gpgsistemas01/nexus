@@ -5,6 +5,12 @@ const toastClassByIcon = {
     info: 'swal2-toast-info'
 };
 
+const confirmationClassByVariant = {
+    primary: 'swal2-confirmation-primary',
+    danger: 'swal2-confirmation-danger',
+    warning: 'swal2-confirmation-warning'
+};
+
 export const showToast = ({ 
     title, 
     text = null, 
@@ -38,3 +44,27 @@ export const showModal = ({
         confirmButtonText: 'Aceptar'
     });
 }
+
+export const showConfirmation = ({
+    title,
+    text,
+    icon = 'warning',
+    confirmButtonText = 'Confirmar',
+    cancelButtonText = 'Cancelar',
+    variant = 'primary'
+}) => Swal.fire({
+    title,
+    text,
+    icon,
+    showCancelButton: true,
+    confirmButtonText,
+    cancelButtonText,
+    buttonsStyling: false,
+    customClass: {
+        popup: `swal2-confirmation-modal ${confirmationClassByVariant[variant] ?? confirmationClassByVariant.primary}`,
+        title: 'swal2-confirmation-title',
+        htmlContainer: 'swal2-confirmation-content',
+        confirmButton: 'swal2-confirmation-confirm-button',
+        cancelButton: 'swal2-confirmation-cancel-button'
+    }
+});

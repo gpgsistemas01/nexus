@@ -1,9 +1,20 @@
 import { createBrowserDateFromTimeZone, zonedDateTimeToUtcIso } from "../../utils/timeZone.js";
 
-const DATE_TIME_SELECTOR = '.js-flatpickr-datetime';
+const FLATPICKR_DATE_TIME_SELECTOR = '.js-flatpickr-datetime';
 const DISPLAY_DATE_TIME_REGEX = /^(\d{1,2})\/(\d{1,2})\/(\d{4})(?:\s+(\d{1,2}):(\d{2}))?$/;
 
 const getFlatpickrLocale = () => window.flatpickr?.l10ns?.es || 'es';
+
+const syncFlatpickrAltInputDisabled = (flatpickrInstance) => {
+
+    const altInput = flatpickrInstance?.altInput;
+    const originalInput = flatpickrInstance?.input;
+
+    if (!altInput || !originalInput) return;
+
+    altInput.disabled = originalInput.disabled;
+    altInput.classList.toggle('disabled', originalInput.disabled);
+};
 
 const parseDisplayDateTime = (value) => {
 
@@ -50,11 +61,14 @@ export const initDateTimePickers = (root = document) => {
 
     if (typeof window.flatpickr !== 'function') return [];
 
-    return Array.from(root.querySelectorAll(DATE_TIME_SELECTOR)).map((input) => {
+    return Array.from(root.querySelectorAll(FLATPICKR_DATE_TIME_SELECTOR)).map((input) => {
 
-        if (input._flatpickr) return input._flatpickr;
+        if (input._flatpickr) {
+            syncFlatpickrAltInputDisabled(input._flatpickr);
+            return input._flatpickr;
+        }
 
-        return window.flatpickr(input, {
+        const instance = window.flatpickr(input, {
             altInput: true,
             altFormat: 'd/m/Y H:i',
             allowInput: true,
@@ -69,6 +83,10 @@ export const initDateTimePickers = (root = document) => {
             parseDate: parseMexicoDate,
             time_24hr: true
         });
+
+        syncFlatpickrAltInputDisabled(instance);
+
+        return instance;
     });
 };
 

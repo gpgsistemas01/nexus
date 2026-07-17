@@ -1,14 +1,8 @@
-import { initMdbWrapperInput, updateMdbWrapperInput } from "../plugins/mdb/baseInstance.js";
 import { setDateTimePickerValue } from "../plugins/flatpickr/dateTimePicker.js";
 import { toggleContainerElements, toggleDisabledElement } from "../utils/formUtils.js";
+import { FORM_MODES } from "../constants/formModes.js";
 
-const TOTAL_FIELDS = {
-    quantity: '#totalQuantityDisplayInput',
-    net: '#totalNetPurchaseAmountDisplayInput',
-    gross: '#totalGrossPurchaseAmountDisplayInput',
-}
-const MODE_EDIT_DETAIL = 'edit-detail';
-const MODE_VIEW = 'view';
+export { setTotals, updateTotals } from "./totalsSummaryUI.js";
 
 const getFirstInvalidControl = (form) => {
 
@@ -60,6 +54,14 @@ export const scrollToFirstFormError = (form) => {
     }
 };
 
+export const resetFormSubmitState = (form) => {
+
+    if (!form) return;
+
+    form.dataset.submitting = 'false';
+    form.querySelector('button[type="submit"]')?.removeAttribute('disabled');
+};
+
 export const initForm = ({
     form, 
     mode, 
@@ -70,8 +72,7 @@ export const initForm = ({
     form.querySelectorAll('.js-flatpickr-datetime').forEach(input => setDateTimePickerValue(input, input.value));
     form.dataset.id = id;
     form.dataset.mode = mode;
-    form.dataset.submitting = 'false';
-    form.querySelector('button[type="submit"]').disabled = false;
+    resetFormSubmitState(form);
 }
 
 export const toggleErrorMessages = (form, errors) => {
@@ -159,7 +160,7 @@ export const toggleTableErrors = (form, errors, fields = null) => {
 
     const { mode } = form.dataset;
 
-    if (mode === MODE_EDIT_DETAIL) {
+    if (mode === FORM_MODES.EDIT_DETAIL) {
 
         form.querySelectorAll('#productTable .is-invalid').forEach(input => {
             input.classList.remove('is-invalid');
@@ -352,7 +353,7 @@ export const setFormReadOnly = ({
     
     const { mode } = form.dataset;
 
-    form.querySelector('#submitBtn').classList.toggle('d-none', mode === MODE_VIEW);
+    form.querySelector('#submitBtn').classList.toggle('d-none', mode === FORM_MODES.VIEW);
 };
 
 export const toggleButtons = ({
@@ -384,64 +385,6 @@ export const toggleButtons = ({
         const canApprove = !showActions || !(isView && status === 'Abierta');
         approveContainer.classList.toggle('d-none', canApprove);
     }
-}
-
-export const updateTotals = ({
-    quantity = 0,
-    net = 0,
-    gross = 0,
-    operation = 'none'
-} = {}) => {
-
-    const totalQuantityEl = document.querySelector(TOTAL_FIELDS.quantity);
-    const totalNetPurchaseAmountEl = document.querySelector(TOTAL_FIELDS.net);
-    const totalGrossPurchaseAmountEl = document.querySelector(TOTAL_FIELDS.gross);
-
-    if (operation === 'none') {
-
-        [
-            TOTAL_FIELDS.quantity,
-            TOTAL_FIELDS.net,
-            TOTAL_FIELDS.gross
-        ].forEach(selector => {
-
-            const instance = initMdbWrapperInput({
-                selector,
-                value: ''
-            });
-
-            updateMdbWrapperInput(instance);
-        });
-
-        return;
-    }
-
-    let totalQuantity = Number(totalQuantityEl.value) || 0;
-    let totalNetPurchaseAmount = Number(totalNetPurchaseAmountEl.value) || 0;
-    let totalGrossPurchaseAmount = Number(totalGrossPurchaseAmountEl.value) || 0;
-
-    const op = operation === 'add' ? 1 : operation === 'subtract' ? -1 : 0;
-
-    totalQuantity += quantity * op;
-    totalNetPurchaseAmount += net * op;
-    totalGrossPurchaseAmount += gross * op;
-
-    const instanceTotalQuantity = initMdbWrapperInput({
-        selector: TOTAL_FIELDS.quantity,
-        value: totalQuantity.toFixed(2)
-    });
-    const instanceTotalNetPurchaseAmount = initMdbWrapperInput({
-        selector: TOTAL_FIELDS.net,
-        value: totalNetPurchaseAmount.toFixed(2)
-    });
-    const instanceTotalGrossPurchaseAmount = initMdbWrapperInput({
-        selector: TOTAL_FIELDS.gross,
-        value: totalGrossPurchaseAmount.toFixed(2)
-    });
-
-    updateMdbWrapperInput(instanceTotalQuantity);
-    updateMdbWrapperInput(instanceTotalNetPurchaseAmount);
-    updateMdbWrapperInput(instanceTotalGrossPurchaseAmount);
 }
 
 export const clearAddedProductInput = () => {

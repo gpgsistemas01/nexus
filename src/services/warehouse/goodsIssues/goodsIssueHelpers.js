@@ -4,29 +4,11 @@ import { buildStockKey, normalizeText } from "../../../utils/formattersUtils.js"
 import { calculateConvertedQuantity } from "../../inventory/stockHelpers.js";
 import { profileBelongsToDepartment } from "../../admin/profileService.js";
 import { findSupplierProductsSnapshot } from "../products/supplierProductService.js";
+import { DEPARTMENT_NAMES } from "../../../constants/departments.js";
+import { FULFILLMENT_STATUS_NAMES } from "../../../constants/warehouseStatuses.js";
+import { INTERNAL_CLIENT_NAME, PROJECT_NUMBER_BY_DEPARTMENT } from "../../../constants/goodsIssueRules.js";
 
 const FLOAT_EPSILON = 0.000001;
-const FULFILLMENT_PENDING = 'Pendiente';
-const FULFILLMENT_PARTIAL = 'Surtido parcial';
-const FULFILLMENT_COMPLETE = 'Surtido';
-const DEPARTMENT_WAREHOUSE = 'ALMACÉN Y PROVEDURÍA';
-const INTERNAL_CLIENT_NAME = 'GPG INTERNO';
-const PROJECT_NUMBER_BY_DEPARTMENT = new Map([
-    ['DIRECCIÓN', '120000'],
-    ['ACABADOS', '120001'],
-    ['ADMINISTRATIVO', '120002'],
-    ['ALMACÉN Y PROVEDURÍA', '120003'],
-    ['DISEÑO', '120004'],
-    ['INSTALACIONES', '120005'],
-    ['IMPRESIÓN', '120006'],
-    ['ROUTER', '120007'],
-    ['PT/TRÁFICO', '120008'],
-    ['SERVICIOS Y VIGILANCIA', '120009'],
-    ['SISTEMAS', '120010'],
-    ['TALLER 3D', '120011'],
-    ['VENTAS Y PROYECTOS ESPECIALES', '120012']
-]);
-
 export const isInternalClient = (client) => (
     normalizeText(client?.name || '') === normalizeText(INTERNAL_CLIENT_NAME)
 );
@@ -37,7 +19,7 @@ export const isValidInternalClientAdvisor = ({ client, advisor }) => {
 
     return profileBelongsToDepartment({
         profile: advisor,
-        departmentName: DEPARTMENT_WAREHOUSE
+        departmentName: DEPARTMENT_NAMES.WAREHOUSE_AND_SUPPLY
     });
 };
 
@@ -128,6 +110,6 @@ export const resolveFulfillmentStatus = (details) => {
     );
 
     return allSupplied
-        ? FULFILLMENT_COMPLETE
-        : (anySupplied ? FULFILLMENT_PARTIAL : FULFILLMENT_PENDING);
+        ? FULFILLMENT_STATUS_NAMES.COMPLETE
+        : (anySupplied ? FULFILLMENT_STATUS_NAMES.PARTIAL : FULFILLMENT_STATUS_NAMES.PENDING);
 };

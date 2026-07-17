@@ -1,5 +1,6 @@
 import { openProductModal, openStockAdjustmentModal } from "../../modules/products/productModal.js";
 import { createDataTable, renderActionButtons } from "./baseDatatable.js";
+import { setupTableFilters } from "./utils/filters/tableFilter.js";
 import { notifications } from "../swal/swalComponent.js";
 import { hasPermission } from "../../utils/permissions.js";
 import { deleteProduct, getAllProducts } from "../../application/warehouse/products.js";
@@ -8,6 +9,7 @@ import { configureResponsiveHeaderGroups, getResponsiveRowData } from "./utils/r
 import { buildExcelButton, buildTableExportParams } from "../../ui/tableUI.js";
 import { exportWarehouseReport } from "../../application/warehouse/report.js";
 import { formatFileName } from "../../utils/formatters.js";
+import { formatCurrency, formatDecimal } from "../../utils/formatUtils.js";
 import { DATATABLE_SELECTORS } from "../../constants/selectors.js";
 import { handleApiError } from "../../api/errorHandler.js";
 
@@ -52,7 +54,7 @@ const configureStockRealtime = (table) => {
     });
 };
 
-export const createProductDatatable = (context) => {
+export const createProductDatatable = async (context) => {
 
     const { hasRole, isAdmin, isWarehouse, isSystem, isSales } = hasPermission(context);
     const isWarehouseProductManager = isWarehouse && (hasRole('Almacenista') || hasRole('Coordinador') || hasRole('Auxiliar'));
@@ -64,23 +66,27 @@ export const createProductDatatable = (context) => {
 
     renderProductTableHeader({ canSeeCost, canManageProducts });
 
+    const filters = await setupTableFilters({
+        fields: ['supplier']
+    });
+
     const columns = [
         { 
             data: null, 
             title: 'Material',
             render: (data, type, row) => renderMaterialName(row)
         },
-        { data: 'base', title: 'Base' },
-        { data: 'height', title: 'Altura' },
-        { data: 'currentStock', title: 'Existencia' },
-        { data: 'minStock', title: 'Stock Mínimo' },
+        { data: 'base', render: formatDecimal, title: 'Base' },
+        { data: 'height', render: formatDecimal, title: 'Altura' },
+        { data: 'currentStock', render: formatDecimal, title: 'Existencia' },
+        { data: 'minStock', render: formatDecimal, title: 'Stock Mínimo' },
         { data: 'presentation.name', title: 'Presentación' },
-        { data: 'convertedQuantity', title: 'Cantidad' },
+        { data: 'convertedQuantity', render: formatDecimal, title: 'Cantidad' },
         { data: 'unitMeasure.name', title: 'Unidad' }
     ];
 
     if (canSeeCost) {
-        columns.push({ data: 'maxUnitCost', title: 'Costo Unitario de Conversión' });
+        columns.push({ data: 'maxUnitCost', title: 'Costo Unitario de Conversión', render: formatCurrency });
     }
 
     if (canManageProducts) {
@@ -99,7 +105,10 @@ export const createProductDatatable = (context) => {
     const table = createDataTable({
         options: {
             ajax: {
-                get: getAllProducts
+                get: (params) => getAllProducts({
+                    ...params,
+                    ...filters.getValues()
+                })
             },
             searchPlaceholder: 'Buscar por Material',
             columns,
@@ -145,7 +154,7 @@ export const createProductDatatable = (context) => {
                 buildExcelButton({
                     filename: formatFileName('reporte_inventario_productos'),
                     allowMonthlyReport: false,
-                    request: () => exportWarehouseReport(buildTableExportParams(table))
+                    request: () => exportWarehouseReport(buildTableExportParams(table, filters.getValues()))
                 })
             ]
         }
@@ -172,14 +181,13 @@ export const createProductDatatable = (context) => {
 
         const data = getResponsiveRowData(table, this);
 
-        const result = await Swal.fire({
+        const result = await notifications.showConfirmation({
             title: '¿Eliminar producto?',
             text: 'Se eliminará la relación del producto con el proveedor y el producto. El proveedor no se eliminará.',
             icon: 'warning',
-            showCancelButton: true,
             confirmButtonText: 'Eliminar',
             cancelButtonText: 'Cancelar',
-            confirmButtonColor: '#dc3545'
+            variant: 'danger'
         });
 
         if (!result.isConfirmed) return;

@@ -76,8 +76,8 @@ export const setupTableFilters = async ({
         options.forEach((option) => {
             select.add(
                 new Option(
-                    option.label,
-                    option.value,
+                    option.label ?? option.text,
+                    option.value ?? option.id,
                     false,
                     false
                 )

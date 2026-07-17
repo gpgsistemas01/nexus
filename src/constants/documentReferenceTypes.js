@@ -1,0 +1,6 @@
+export const DOCUMENT_REFERENCE_TYPES = Object.freeze({
+    GOODS_ISSUE: 'SAL',
+    GOODS_RECEIPT: 'REC',
+    PURCHASE_REQUISITION: 'REQ',
+    STOCK_ADJUSTMENT: 'AJU'
+});

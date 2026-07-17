@@ -1,9 +1,11 @@
 import { createDataTable, renderActionButtons } from "./baseDatatable.js";
+import { setupTableFilters } from "./utils/filters/tableFilter.js";
 import { hasPermission } from "../../utils/permissions.js";
 import { renderMaterialName } from "./utils/renderProductDatatable.js";
 import { getAllWastes } from "../../application/warehouse/wastes.js";
 import { openWasteModal, openWasteStockAdjustmentModal } from "../../pages/warehouse/wastesPage.js";
 import { getResponsiveRowData } from "./utils/responsive.js";
+import { formatCurrency, formatDecimal } from "../../utils/formatUtils.js";
 import { DATATABLE_SELECTORS } from "../../constants/selectors.js";
 
 const selectorTable = DATATABLE_SELECTORS.MAIN;
@@ -33,7 +35,7 @@ const renderWasteTableHeader = ({ canSeeCost, canManageWastes }) => {
     `;
 };
 
-export const createWasteDatatable = (context) => {
+export const createWasteDatatable = async (context) => {
 
     const { isAdmin, isWarehouse, isSystem, isSales } = hasPermission(context);
     const canSeeCost = isWarehouse || isSystem || isSales;
@@ -42,23 +44,27 @@ export const createWasteDatatable = (context) => {
 
     renderWasteTableHeader({ canSeeCost, canManageWastes });
 
+    const filters = await setupTableFilters({
+        fields: ['supplier']
+    });
+
     const columns = [
         {
             data: null,
             title: 'Material',
             render: (data, type, row) => renderMaterialName(row)
         },
-        { data: 'base', title: 'Base' },
-        { data: 'height', title: 'Altura' },
-        { data: 'currentStock', title: 'Existencia' },
-        { data: 'minStock', title: 'Stock Mínimo' },
+        { data: 'base', render: formatDecimal, title: 'Base' },
+        { data: 'height', render: formatDecimal, title: 'Altura' },
+        { data: 'currentStock', render: formatDecimal, title: 'Existencia' },
+        { data: 'minStock', render: formatDecimal, title: 'Stock Mínimo' },
         { data: 'product.presentation.name', title: 'Presentación' },
-        { data: 'convertedQuantity', title: 'Cantidad' },
+        { data: 'convertedQuantity', render: formatDecimal, title: 'Cantidad' },
         { data: 'product.unitMeasure.name', title: 'Unidad' }
     ];
 
     if (canSeeCost) {
-        columns.push({ data: 'maxUnitCost', title: 'Costo Unitario de Conversión' });
+        columns.push({ data: 'maxUnitCost', title: 'Costo Unitario de Conversión', render: formatCurrency });
     }
 
     if (canManageWastes) {
@@ -72,7 +78,10 @@ export const createWasteDatatable = (context) => {
     const table = createDataTable({
         options: {
             ajax: {
-                get: getAllWastes
+                get: (params) => getAllWastes({
+                    ...params,
+                    ...filters.getValues()
+                })
             },
             searchPlaceholder: 'Buscar por Material o Proveedor',
             columns,

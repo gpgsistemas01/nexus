@@ -21,18 +21,15 @@ import { findClientById } from "../../sales/clientService.js";
 import { buildGoodsIssueDetails, isValidInternalClientAdvisor, isValidInternalClientProjectNumberByDepartment, resolveFulfillmentStatus } from "./goodsIssueHelpers.js";
 import { applyInventoryMovement } from "../../inventory/movementService.js";
 import { normalizeDecimal } from "../../../utils/formattersUtils.js";
-import { AppError } from "../../../errors/AppError.js";
+import { isAppError } from "../../../errors/AppError.js";
 import { buildDateRangeFilter } from "../../../utils/requestQueryUtils.js";
 import { findReturnedQuantityTotalsByDetailIds } from "../returns/returnHelpers.js";
+import { ROLE_NAMES } from "../../../constants/roles.js";
+import { DEPARTMENT_NAMES } from "../../../constants/departments.js";
+import { FULFILLMENT_STATUS_NAMES, GOODS_ISSUE_STATUS_NAMES } from "../../../constants/warehouseStatuses.js";
+import { INVENTORY_MOVEMENT_TYPES } from "../../../constants/inventory.js";
+import { DOCUMENT_REFERENCE_TYPES } from "../../../constants/documentReferenceTypes.js";
 
-const ROLE_SYSTEM_ADMIN = 'Administrador del sistema';
-const ROLE_COORDINATOR = 'Coordinador';
-const DEPARTMENT_WAREHOUSE = 'ALMACÉN Y PROVEDURÍA';
-const FULFILLMENT_PENDING = 'Pendiente';
-const FULFILLMENT_PARTIAL = 'Surtido parcial';
-const STATUS_APPROVED = 'Aprobada';
-const REFERENCE_NUMBER_TYPE = 'SAL';
-const MOVEMENT_TYPE_OUT = 'ISSUE';
 const FLOAT_EPSILON = 0.000001;
 
 
@@ -83,7 +80,7 @@ const resolveGoodsIssueHeaderData = async ({ requesterId, advisorId, departmentI
             connect: { id: clientId }
         },
         status: {
-            connect: { name: STATUS_APPROVED }
+            connect: { name: GOODS_ISSUE_STATUS_NAMES.APPROVED }
         }
     };
 };
@@ -128,10 +125,10 @@ export const findAllGoodsIssues = async ({
 
     const db = getDb();
 
-    const isAdmin = accesses.some(access => access.role === ROLE_SYSTEM_ADMIN);
-    const isWarehouseCoordinator = accesses.some(access => 
-        access.role === ROLE_COORDINATOR && 
-        access.department === DEPARTMENT_WAREHOUSE
+    const isAdmin = accesses.some(access => access.role === ROLE_NAMES.SYSTEM_ADMIN);
+    const isWarehouseCoordinator = accesses.some(access =>
+        access.role === ROLE_NAMES.COORDINATOR &&
+        access.department === DEPARTMENT_NAMES.WAREHOUSE_AND_SUPPLY
     );
     const canViewAll = isAdmin || isWarehouseCoordinator;
     const userDepartments = accesses.map(a => a.department);
@@ -232,7 +229,7 @@ export const createGoodsIssue = async ({ goodsIssueDto }) => {
 
         const result = await getDb().$transaction(async (tx) => {
 
-            const referenceNumber = await generateYearlyReferenceNumber({ type: REFERENCE_NUMBER_TYPE, tx });
+            const referenceNumber = await generateYearlyReferenceNumber({ type: DOCUMENT_REFERENCE_TYPES.GOODS_ISSUE, tx });
 
             const goodsIssue = await tx.goodsIssue.create({
                 data: {
@@ -240,7 +237,7 @@ export const createGoodsIssue = async ({ goodsIssueDto }) => {
                     referenceNumber,
                     fulfillmentStatus: {
                         connect: {
-                            name: FULFILLMENT_PENDING
+                            name: FULFILLMENT_STATUS_NAMES.PENDING
                         }
                     },
                     details: {
@@ -276,7 +273,7 @@ export const createGoodsIssue = async ({ goodsIssueDto }) => {
             ...getModelLogContext('goodsIssue', goodsIssueDto)
         });
 
-        if (err instanceof AppError) throw err;
+        if (isAppError(err)) throw err;
 
         throw new GoodsIssueCreateDatabaseError();
     }
@@ -310,7 +307,7 @@ export const updateGoodsIssue = async ({ id, goodsIssueDto }) => {
 
         if (!goodsIssue) throw new GoodsIssueNotFound();
 
-        if (goodsIssue.fulfillmentStatus?.name !== FULFILLMENT_PENDING) throw new GoodsIssueNotPendingConflict();
+        if (goodsIssue.fulfillmentStatus?.name !== FULFILLMENT_STATUS_NAMES.PENDING) throw new GoodsIssueNotPendingConflict();
 
         const hasSuppliedInAnyDetail = goodsIssue.details.some(
             detail => Number(detail.suppliedQuantity ?? 0) > FLOAT_EPSILON || detail.isSupplied
@@ -348,7 +345,7 @@ export const updateGoodsIssue = async ({ id, goodsIssueDto }) => {
 
                     fulfillmentStatus: {
                         connect: {
-                            name: FULFILLMENT_PENDING
+                            name: FULFILLMENT_STATUS_NAMES.PENDING
                         }
                     }
                 },
@@ -379,7 +376,7 @@ export const updateGoodsIssue = async ({ id, goodsIssueDto }) => {
             ...getModelLogContext('goodsIssue', { id, ...goodsIssueDto })
         });
 
-        if (err instanceof AppError) throw err;
+        if (isAppError(err)) throw err;
 
         throw new GoodsIssueUpdateDatabaseError();
     }
@@ -419,7 +416,7 @@ export const updateGoodsIssueDetails = async ({ id, goodsIssueDto }) => {
 
         if (!goodsIssue) throw new GoodsIssueNotFound();
 
-        if (![FULFILLMENT_PENDING, FULFILLMENT_PARTIAL].includes(goodsIssue.fulfillmentStatus?.name)) {
+        if (![FULFILLMENT_STATUS_NAMES.PENDING, FULFILLMENT_STATUS_NAMES.PARTIAL].includes(goodsIssue.fulfillmentStatus?.name)) {
             throw new GoodsIssueNotPendingConflict();
         }
         const currentById = new Map(goodsIssue.details.map(d => [d.id, d]));
@@ -476,7 +473,7 @@ export const updateGoodsIssueDetails = async ({ id, goodsIssueDto }) => {
                     tx,
                     reference: { goodsIssueId: goodsIssue.id },
                     details: detailSupplyMovements,
-                    movementType: MOVEMENT_TYPE_OUT
+                    movementType: INVENTORY_MOVEMENT_TYPES.ISSUE
                 });
 
                 for (const { current, currentQuantity, quantityToSupply, baseUpdate } of supplyRequests) {
@@ -521,7 +518,7 @@ export const updateGoodsIssueDetails = async ({ id, goodsIssueDto }) => {
                         connect: { name: fulfillmentName }
                     },
                     status: {
-                        connect: { name: STATUS_APPROVED }
+                        connect: { name: GOODS_ISSUE_STATUS_NAMES.APPROVED }
                     }
                 },
                 select: {
@@ -542,7 +539,7 @@ export const updateGoodsIssueDetails = async ({ id, goodsIssueDto }) => {
             ...getModelLogContext('goodsIssue', { id, details })
         });
 
-        if (err instanceof AppError) throw err;
+        if (isAppError(err)) throw err;
 
         throw new GoodsIssueUpdateDatabaseError();
     }
@@ -600,7 +597,7 @@ export const updateGoodsIssueHeader = async ({ id, goodsIssueDto }) => {
             ...getModelLogContext('goodsIssue', { id, ...goodsIssueDto })
         });
 
-        if (err instanceof AppError) throw err;
+        if (isAppError(err)) throw err;
 
         throw new GoodsIssueUpdateDatabaseError();
     }

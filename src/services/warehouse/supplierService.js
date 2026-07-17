@@ -1,4 +1,4 @@
-import { AppError } from "../../errors/AppError.js";
+import { isAppError } from "../../errors/AppError.js";
 import { SupplierCodeFindDatabaseError, SupplierCodeNotFound, SupplierCreateDatabaseError, SupplierNotFound, SupplierUpdateDatabaseError } from "../../errors/warehouse/supplierError.js";
 import { getDb } from "../../repository/baseRepository.js";
 import { incrementNonYearlyReferenceNumberCounter } from "../document/referenceNumberService.js";
@@ -182,7 +182,7 @@ export const updateSupplier = async (supplierDto, id) => {
             ...getModelLogContext('supplier', { id, ...supplierDto })
         });
 
-        if (err instanceof AppError) throw err;
+        if (isAppError(err)) throw err;
 
         throw new SupplierUpdateDatabaseError();
     }

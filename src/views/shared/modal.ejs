@@ -7,8 +7,9 @@
     title: {
         id: 'modalTitle',
         class: 'modal-title',
+        content: typeof modalTitle !== 'undefined' ? modalTitle : '',
     }
-}; 
+};
 
 const inputs = {
     presentationDisplayInput: {
@@ -23,41 +24,29 @@ const inputs = {
     }
 }
 
-const totalInputs = [
-    {
-        id: 'totalQuantityDisplayInput',
-        name: 'totalQuantity',
-        type: 'number',
-        label: 'Cantidad Total',
-        col: '4',
-        attrs: {
-            disabled: '',
-            tabindex: '-1'
+const totalSummary = {
+    class: 'row g-2',
+    items: [
+        {
+            id: 'totalQuantityDisplayValue',
+            label: 'Cantidad Total',
+            value: '0.00',
+            rawValue: 0
+        },
+        {
+            id: 'totalNetPurchaseAmountDisplayValue',
+            label: 'Total de Compra s/ IVA',
+            value: '$0.00',
+            rawValue: 0
+        },
+        {
+            id: 'totalGrossPurchaseAmountDisplayValue',
+            label: 'Total de Compra c/ IVA',
+            value: '$0.00',
+            rawValue: 0
         }
-    },
-    {
-        id: 'totalNetPurchaseAmountDisplayInput',
-        name: 'totalNetPurchaseAmount',
-        type: 'number',
-        label: 'Total de Compra s/ IVA',
-        col: '4',
-        attrs: {
-            disabled: '',
-            tabindex: '-1'
-        }
-    },
-    {
-        id: 'totalGrossPurchaseAmountDisplayInput',
-        name: 'totalGrossPurchaseAmount',
-        type: 'number',
-        label: 'Total de Compra c/ IVA',
-        col: '4',
-        attrs: {
-            disabled: '',
-            tabindex: '-1'
-        }
-    }
-];
+    ]
+};
 
 const buttons = {
     addProductButton: {
@@ -73,16 +62,27 @@ const buttons = {
             'data-mdb-dismiss': 'modal'
         }
     }
-}; %>
+};
+
+const modalDialogClass = typeof dialogClass !== 'undefined' ? dialogClass : 'modal-fullscreen modal-dialog-scrollable';
+%>
 
 <div class="modal fade" id="<%= modalId %>" tabindex="-1" aria-labelledby="<%= header.title.id %>" aria-hidden="true">
-    <div class="modal-dialog modal-fullscreen modal-dialog-scrollable">
+    <div class="modal-dialog <%= modalDialogClass %>">
         <div class="modal-content">
-        
+
         <%- include('./header', { header }) %>
 
         <div class="modal-body dark">
             <form id="<%= form.id %>" class="row g-3" novalidate>
+                <% if (form.notice) { %>
+                    <div class="<%= form.notice.col || 'col-12' %>">
+                        <div class="<%= form.notice.class || 'alert alert-info mb-0' %>">
+                            <%- form.notice.content %>
+                        </div>
+                    </div>
+                <% } %>
+
                 <% if (form.invoice) { %>
                     <div class="col-12 row g-2">
                         <div class="col-12 col-md-6 mb-2">
@@ -127,6 +127,12 @@ const buttons = {
 
                                     <% if (group.type === 'checkboxes') { %>
                                         <%- include('./checkboxList', { inputs: group.items }) %>
+                                    <% } %>
+
+                                    <% if (group.type === 'html') { %>
+                                        <div class="<%= group.col || 'col-12' %>">
+                                            <%- group.content %>
+                                        </div>
                                     <% } %>
                                 <% }); %>
                             </div>
@@ -181,15 +187,21 @@ const buttons = {
 
                     <%- include('./productTable') %>
 
-                    <div class="col-12 row g-2 mb-3 total-container">
-                        <%- include('./outlineInputList', { inputs: totalInputs }) %>
+                    <div class="col-12 mb-3 total-container">
+                        <%- include('./totalsSummary', { totals: totalSummary }) %>
                     </div>
                 <% } %>
 
                 <div class="col-12 modal-actions">
-                    <%- include('./button', { button: buttons.backButton }) %>
-                    
-                    <%- include('./submit') %>
+                    <% if (form.actions) { %>
+                        <% form.actions.forEach(actionButton => { %>
+                            <%- include('./button', { button: actionButton }) %>
+                        <% }); %>
+                    <% } else { %>
+                        <%- include('./button', { button: buttons.backButton }) %>
+
+                        <%- include('./submit') %>
+                    <% } %>
                 </div>
             </form>
         </div>
