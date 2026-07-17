@@ -62,7 +62,8 @@ export const handleApiError = ({
         case 409:
             resetFormSubmission(form);
             notifications.showModal({
-                title: getFallbackMessage(err),
+                title: 'No se pudo completar la acción',
+                text: getFallbackMessage(err),
                 icon: 'warning'
             });
             return;
@@ -89,10 +90,7 @@ export const handleDataTableError = (err, table = null) => {
             return [];
 
         case 409:
-            notifications.showModal({
-                title: getFallbackMessage(err),
-                icon: 'warning'
-            });
+            notifications.showWarning(getFallbackMessage(err));
             return [];
 
         default:
