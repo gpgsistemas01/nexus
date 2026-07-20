@@ -50,10 +50,6 @@
                     ]
                 },
                 {
-                    type: 'html',
-                    content: include('../../../shared/totalsSummary', { totals: selectedProductSummary })
-                },
-                {
                     type: 'inputs',
                     items: [
                         {
@@ -79,6 +75,16 @@
                             col: '6'
                         }
                     ]
+                }
+            ]
+        },
+        {
+            title: 'Datos del producto seleccionado',
+            class: 'selected-product-section',
+            groups: [
+                {
+                    type: 'html',
+                    content: include('../../../shared/totalsSummary', { totals: selectedProductSummary })
                 }
             ]
         },
