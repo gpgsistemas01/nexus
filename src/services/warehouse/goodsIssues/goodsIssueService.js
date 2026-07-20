@@ -8,7 +8,9 @@ import {
     GoodsIssueInternalClientAdvisorDepartmentConflict,
     GoodsIssueInternalClientProjectNumberConflict,
     GoodsIssueSuppliedConflict,
-    GoodsIssueDetailNotFound
+    GoodsIssueDetailNotFound,
+    GoodsIssueReturnQuantityConflict,
+    GoodsIssueReturnDatabaseError
 } from "../../../errors/warehouse/goodsIssueError.js";
 import { createServiceLogger, getModelLogContext, logServiceError, logServiceInfo } from "../../../utils/logger.js";
 
@@ -102,6 +104,7 @@ const GOODS_ISSUE_DETAIL_SELECT = {
     projectConvertedQuantity: true,
     convertedQuantityDifference: true,
     suppliedQuantity: true,
+    returnedQuantity: true,
     isSupplied: true,
     fulfillmentStatus: true,
     supplierId: true,
@@ -384,6 +387,7 @@ export const updateGoodsIssueDetails = async ({ id, goodsIssueDto }) => {
                         supplierId: true,
                         quantity: true,
                         suppliedQuantity: true,
+                        returnedQuantity: true,
                         convertedQuantity: true,
                         projectConvertedQuantity: true,
                         productName: true,
@@ -486,7 +490,8 @@ export const updateGoodsIssueDetails = async ({ id, goodsIssueDto }) => {
                 select: {
                     isSupplied: true,
                     quantity: true,
-                    suppliedQuantity: true
+                    suppliedQuantity: true,
+                    returnedQuantity: true
                 }
             });
 
@@ -525,6 +530,7 @@ export const updateGoodsIssueDetails = async ({ id, goodsIssueDto }) => {
         throw new GoodsIssueUpdateDatabaseError();
     }
 };
+
 
 export const updateGoodsIssueHeader = async ({ id, goodsIssueDto }) => {
 
@@ -581,5 +587,90 @@ export const updateGoodsIssueHeader = async ({ id, goodsIssueDto }) => {
         if (isAppError(err)) throw err;
 
         throw new GoodsIssueUpdateDatabaseError();
+    }
+};
+
+
+export const returnGoodsIssueDetail = async ({ id, detailId, returnDto, userId }) => {
+
+    const { returnQuantity: requestedReturnQuantityInput, observations = null } = returnDto;
+
+    try {
+        const db = getDb();
+
+        return await db.$transaction(async (tx) => {
+            const detail = await tx.goodsIssueDetail.findFirst({
+                where: { id: detailId, goodsIssueId: id },
+                include: { goodsIssue: true }
+            });
+
+            if (!detail) throw new GoodsIssueDetailNotFound();
+
+            const totalSuppliedQuantity = normalizeDecimal(detail.suppliedQuantity ?? 0);
+            const currentTotalReturnedQuantity = normalizeDecimal(detail.returnedQuantity ?? 0);
+            const requestedReturnQuantity = normalizeDecimal(requestedReturnQuantityInput);
+            const newTotalReturnedQuantity = normalizeDecimal(currentTotalReturnedQuantity + requestedReturnQuantity);
+            const availableReturnQuantity = normalizeDecimal(totalSuppliedQuantity - currentTotalReturnedQuantity);
+
+            if (
+                requestedReturnQuantity <= FLOAT_EPSILON ||
+                requestedReturnQuantity > availableReturnQuantity ||
+                newTotalReturnedQuantity > totalSuppliedQuantity
+            ) {
+                throw new GoodsIssueReturnQuantityConflict();
+            }
+
+            const movement = await applyInventoryMovement({
+                tx,
+                reference: { goodsIssueId: id },
+                details: [{
+                    productId: detail.productId,
+                    supplierId: detail.supplierId,
+                    goodsIssueDetailId: detail.id,
+                    quantity: requestedReturnQuantity
+                }],
+                movementType: INVENTORY_MOVEMENT_TYPES.ENTRY
+            });
+
+            await tx.goodsIssueDetail.update({
+                where: { id: detail.id },
+                data: {
+                    returnedQuantity: newTotalReturnedQuantity
+                }
+            });
+
+            const goodsIssueReturn = await tx.goodsIssueReturn.create({
+                data: {
+                    goodsIssueId: id,
+                    goodsIssueDetailId: detail.id,
+                    movementDetailId: movement.details[0]?.id || null,
+                    returnedById: userId,
+                    productId: detail.productId,
+                    productName: detail.productName,
+                    supplierId: detail.supplierId,
+                    supplierName: detail.supplierName,
+                    productBase: detail.productBase,
+                    productHeight: detail.productHeight,
+                    currentTotalReturnedQuantity: currentTotalReturnedQuantity,
+                    newTotalReturnedQuantity: newTotalReturnedQuantity,
+                    observations
+                },
+                include: {
+                    movementDetail: true,
+                    returnedBy: true
+                }
+            });
+
+            return goodsIssueReturn;
+        });
+    } catch (err) {
+        logServiceError(serviceLogger, err, {
+            operation: 'warehouse.goodsIssues.goodsIssueService.returnGoodsIssueDetail',
+            ...getModelLogContext('goodsIssueReturn', { id, detailId, ...returnDto })
+        });
+
+        if (isAppError(err)) throw err;
+
+        throw new GoodsIssueReturnDatabaseError();
     }
 };

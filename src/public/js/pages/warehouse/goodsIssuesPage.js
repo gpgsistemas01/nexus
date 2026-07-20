@@ -14,6 +14,7 @@ import { FORM_SELECTORS, MODAL_SELECTORS } from "../../constants/selectors.js";
 import { FORM_MODES } from "../../constants/formModes.js";
 import { FULFILLMENT_STATUS_NAMES } from "../../constants/fulfillmentStatuses.js";
 import { formatDecimal, roundTo } from "../../utils/formatUtils.js";
+import { initGoodsIssueReturnModal, openGoodsIssueReturnModal } from "./goodsIssues/returnModal.js";
 
 const HEADER_FIELD_NAMES = ['clientId', 'advisorId', 'departmentId', 'requesterId', 'projectNumber', 'requestDate', 'observations'];
 const ENABLED_HEADER_MODES = [FORM_MODES.CREATE, FORM_MODES.EDIT, FORM_MODES.EDIT_HEADER];
@@ -22,8 +23,10 @@ const formId = FORM_SELECTORS.GOODS_ISSUE;
 const GOODS_ISSUE_ENTITY_NAME = 'salida';
 
 const context = window.meta || {};
+let currentGoodsIssue = null;
 
 createGoodsIssueDatatable(context);
+initGoodsIssueReturnModal();
 
 
 const setGoodsIssueHeaderFieldsReadOnly = ({ form, isReadOnly }) => {
@@ -105,6 +108,8 @@ export const openGoodsIssueModal = ({ mode, data = null }) => {
     const form = document.querySelector(formId);
     const modalElement = document.querySelector(modalId);
 
+    currentGoodsIssue = data;
+
     initForm({ form, mode, id: data?.id || '' });
     clearFormErrors(form);
     toggleButtons({
@@ -159,6 +164,7 @@ export const openGoodsIssueModal = ({ mode, data = null }) => {
             convertedQuantityDifference: detail.convertedQuantityDifference,
             supplierName: detail.supplierName,
             suppliedQuantity: detail.suppliedQuantity,
+            returnedQuantity: detail.returnedQuantity,
             isSupplied: detail.isSupplied,
             fulfillmentStatus: detail.fulfillmentStatus,
             originalIsSupplied: detail.isSupplied,
@@ -315,4 +321,17 @@ on('input', '.project-converted-quantity-input', (e, input) => {
     const nextTd = currentTd.nextElementSibling;
 
     if (nextTd) nextTd.textContent = formatDecimal(product.convertedQuantityDifference);
+});
+
+
+on('click', '#productTable .return-issue-detail-btn', (event, button) => {
+    const detail = details.find(item => item.id === button.dataset.id);
+
+    if (!detail || !currentGoodsIssue) return;
+
+    openGoodsIssueReturnModal({
+        goodsIssue: currentGoodsIssue,
+        detail,
+        issueDetails: details
+    });
 });

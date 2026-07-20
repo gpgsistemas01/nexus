@@ -1,5 +1,5 @@
 import { createSuccessResponseFromRequest } from "../../../utils/responseUtils.js";
-import { editGoodsIssueDetailsRequest, editGoodsIssueHeaderRequest, editGoodsIssueRequest, getAllGoodsIssuesRequest, registerGoodsIssueRequest } from "../../../services/warehouse/goodsIssueService.js";
+import { editGoodsIssueDetailsRequest, editGoodsIssueHeaderRequest, editGoodsIssueRequest, getAllGoodsIssuesRequest, registerGoodsIssueRequest, returnGoodsIssueDetailRequest } from "../../../services/warehouse/goodsIssueService.js";
 
 export const getAllGoodsIssues = async (params = {}) => {
 
@@ -35,4 +35,12 @@ export const editGoodsIssueHeader = async ({ formData, id }) => {
     const response = await editGoodsIssueHeaderRequest({ data: formData, id });
 
     return createSuccessResponseFromRequest({ response });
+};
+
+
+export const returnGoodsIssueDetail = async ({ formData, id, detailId }) => {
+
+    const response = await returnGoodsIssueDetailRequest({ data: formData, id, detailId });
+
+    return createSuccessResponseFromRequest({ response, dataKey: 'goodsIssueReturn' });
 };

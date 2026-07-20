@@ -85,8 +85,8 @@ const shouldShowDetailActionButtons = ({ row, mode }) => {
 export const buildDetailsHeader = ({ type, mode, isWarehouse, isCoordinator, isSystem }) => {
 
     let extraHeaders = '';
-    const suppliedQuantityHeader = type === 'issue' && (mode === 'edit-detail' || mode === 'view')
-        ? '<th rowspan="2">Cantidad surtida</th>'
+    const issueReturnHeaders = type === 'issue' && (mode === 'edit-detail' || mode === 'view')
+        ? '<th rowspan="2">Cantidad surtida</th><th rowspan="2">Cantidad devuelta</th>'
         : '';
     const transactionQuantityHeader = `<th rowspan="2">${ type === 'issue' ? 'Salida' : 'Compra' }</th>`;
 
@@ -111,6 +111,9 @@ export const buildDetailsHeader = ({ type, mode, isWarehouse, isCoordinator, isS
         extraHeaders += `<th rowspan="2">Surtir</th>`;
     }
 
+    if (type === 'issue' && mode === 'edit-detail') {
+        extraHeaders += `<th rowspan="2">Acciones</th>`;
+    }
 
     if (type === 'receipt' && ['edit', 'view'].includes(mode)) {
         extraHeaders += `<th rowspan="2">Acciones</th>`;
@@ -126,7 +129,7 @@ export const buildDetailsHeader = ({ type, mode, isWarehouse, isCoordinator, isS
                 <th rowspan="2">Material</th>
                 <th colspan="2">Medidas</th>
                 ${ transactionQuantityHeader }
-                ${ suppliedQuantityHeader }
+                ${ issueReturnHeaders }
                 <th rowspan="2">Presentación</th>
                 <th colspan="2">Conversión</th>
                 ${ extraHeaders }
@@ -157,7 +160,10 @@ export const buildDetailsColumns = ({ type, mode, render, isWarehouse, isCoordin
         { data: 'productBase', render: formatDecimal },
         { data: 'productHeight', render: formatDecimal },
         { data: 'quantity', render: formatDecimal },
-        ...(type === 'issue' && (mode === 'edit-detail' || mode === 'view') ? [{ data: 'suppliedQuantity', render: formatDecimal }] : []),
+        ...(type === 'issue' && (mode === 'edit-detail' || mode === 'view') ? [
+            { data: 'suppliedQuantity', render: formatDecimal },
+            { data: 'returnedQuantity', render: formatDecimal }
+        ] : []),
         { data: 'presentationName' },
         { data: 'convertedQuantity', render: formatDecimal },
         { data: 'unitMeasureName' },
@@ -221,6 +227,34 @@ export const buildDetailsColumns = ({ type, mode, render, isWarehouse, isCoordin
                         ${ isEditableDetail ? '' : 'disabled' }
                     >
                 `;
+            }
+        });
+    }
+
+
+    if (type === 'issue' && mode === 'edit-detail') {
+        columns.push({
+            data: null,
+            orderable: false,
+            searchable: false,
+            render: (_, __, row) => {
+                const suppliedQuantity = Number(row.suppliedQuantity ?? 0);
+                const returnedQuantity = Number(row.returnedQuantity ?? 0);
+                const returnableQuantity = suppliedQuantity - returnedQuantity;
+
+                if (!row.id || returnableQuantity <= 0) return '';
+
+                return `${ buildMdbActionButton({
+                    className: 'return-issue-detail-btn',
+                    colorClass: 'btn-warning',
+                    iconClass: 'fa-solid fa-rotate-left',
+                    title: 'Devolver detalle',
+                    ariaLabel: 'Devolver detalle de salida',
+                    htmlAttrs: {
+                        'data-id': row.id,
+                        'data-returnable-quantity': returnableQuantity
+                    }
+                }) }`;
             }
         });
     }

@@ -111,6 +111,12 @@ export const validateGoodsIssueDetailValidators = {
     projectConvertedQuantity: (value) => validateNumber(value, 'La cantidad')
 }
 
+
+export const validateGoodsIssueReturnValidators = {
+    returnQuantity: (value) => validatePositiveNumber(value, 'La cantidad a devolver'),
+    observations: (value) => validateTextOptional(value, 500, 'Las observaciones')
+};
+
 export const validatePurchaseRequisitionValidators = {
     projectId: (value) => isEmptyOrNull(value, 'El proyecto'),
     observations: (value) => validateTextOptional(value, 500, 'Las observaciones'),

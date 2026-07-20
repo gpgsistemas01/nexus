@@ -31,3 +31,10 @@ export const editGoodsIssueHeaderRequest = ({ data, id }) => apiRequest({
     url: `${ GOODS_ISSUES_API_ROUTE }/${ id }/header`,
     data
 });
+
+
+export const returnGoodsIssueDetailRequest = ({ data, id, detailId }) => apiRequest({
+    method: 'patch',
+    url: `${ GOODS_ISSUES_API_ROUTE }/${ id }/details/${ detailId }/returns`,
+    data
+});

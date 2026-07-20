@@ -37,3 +37,9 @@ export const createGoodsIssueHeaderDtoForEdit = (body = {}) => ({
     requestDate: new Date(body.requestDate),
     ...(Object.prototype.hasOwnProperty.call(body, 'observations') ? { observations: body.observations.trim() } : {})
 });
+
+
+export const createGoodsIssueReturnDto = (body = {}) => ({
+    returnQuantity: Number(body.returnQuantity),
+    ...(Object.prototype.hasOwnProperty.call(body, 'observations') ? { observations: body.observations.trim() } : {})
+});

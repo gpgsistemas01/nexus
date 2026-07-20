@@ -73,6 +73,20 @@ export class GoodsIssueSuppliedDetailConflict extends AppError {
     }
 }
 
+export class GoodsIssueReturnQuantityConflict extends AppError {
+
+    constructor () {
+        super('La cantidad a devolver no puede exceder la cantidad surtida del detalle', 'GOODS_ISSUE_RETURN_QUANTITY_CONFLICT', 409);
+    }
+}
+
+export class GoodsIssueReturnDatabaseError extends AppError {
+
+    constructor () {
+        super('Error de base de datos al registrar la devolución de salida', 'GOODS_ISSUE_RETURN_DB_ERROR', 500);
+    }
+}
+
 export class GoodsIssueCreateDatabaseError extends AppError {
 
     constructor () {

@@ -53,6 +53,7 @@ export const initGoodsReceiptCorrectionForm = () => {
 
             notifications.showSuccess(response.message);
             getModal().dispatchEvent(new CustomEvent(GOODS_RECEIPT_CORRECTION_APPLIED_EVENT, {
+                bubbles: true,
                 detail: response.data
             }));
             initMdbModal(getModal()).hide();
