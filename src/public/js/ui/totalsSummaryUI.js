@@ -22,6 +22,14 @@ const setTotalSummaryValue = ({ selector, value, formatter }) => {
     element.textContent = formatter(rawValue);
 };
 
+
+export const setSummaryValues = (items = []) => {
+
+    items.forEach(({ selector, value, formatter = formatDecimal }) => {
+        setTotalSummaryValue({ selector, value, formatter });
+    });
+};
+
 export const updateTotals = ({
     quantity = 0,
     net = 0,

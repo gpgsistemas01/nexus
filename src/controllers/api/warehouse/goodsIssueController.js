@@ -1,11 +1,12 @@
-import { createGoodsIssueDetailsDtoForEdit, createGoodsIssueDtoForEdit, createGoodsIssueDtoForRegister, createGoodsIssueHeaderDtoForEdit } from "../../../dtos/goodsIssueDTO.js";
+import { createGoodsIssueDetailsDtoForEdit, createGoodsIssueDtoForEdit, createGoodsIssueDtoForRegister, createGoodsIssueHeaderDtoForEdit, createGoodsIssueReturnDto } from "../../../dtos/goodsIssueDTO.js";
 import { successCodeMessages } from "../../../messages/codeMessages.js";
 import {
     createGoodsIssue,
     findAllGoodsIssues,
     updateGoodsIssue,
     updateGoodsIssueDetails,
-    updateGoodsIssueHeader
+    updateGoodsIssueHeader,
+    returnGoodsIssueDetail
 } from "../../../services/warehouse/goodsIssues/goodsIssueService.js";
 import { getDataTableOrder, getDataTablePaging, getDataTableSearch } from "../../../utils/requestQueryUtils.js";
 import { sanitizeEmptyStrings } from "../../../utils/formattersUtils.js";
@@ -106,6 +107,25 @@ export const editGoodsIssueHeader = async (req, res) => {
 
     return res.status(200).json({
         goodsIssue,
+        code: successCodeMessages.UPDATED_GOODS_ISSUE
+    });
+};
+
+
+export const returnGoodsIssueDetailLine = async (req, res) => {
+
+    const returnDto = createGoodsIssueReturnDto(req.body);
+    const sanitizedReturnDto = sanitizeEmptyStrings(returnDto);
+
+    const goodsIssueReturn = await returnGoodsIssueDetail({
+        id: req.params.id,
+        detailId: req.params.detailId,
+        returnDto: sanitizedReturnDto,
+        userId: req.user.id
+    });
+
+    return res.status(200).json({
+        goodsIssueReturn,
         code: successCodeMessages.UPDATED_GOODS_ISSUE
     });
 };

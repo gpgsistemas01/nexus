@@ -304,11 +304,12 @@ on('click', '#productTable .cancel-receipt-detail-btn', async (event, button) =>
 
     notifications.showSuccess(response.message);
     document.querySelector('#goodsReceiptCorrectionModal').dispatchEvent(new CustomEvent(GOODS_RECEIPT_CORRECTION_APPLIED_EVENT, {
+        bubbles: true,
         detail: response.data
     }));
 });
 
-document.querySelector('#goodsReceiptCorrectionModal').addEventListener(GOODS_RECEIPT_CORRECTION_APPLIED_EVENT, (event) => {
+on(GOODS_RECEIPT_CORRECTION_APPLIED_EVENT, '#goodsReceiptCorrectionModal', (event) => {
     const updatedReceipt = event.detail?.updatedReceipt;
 
     if (!updatedReceipt || !currentGoodsReceipt || updatedReceipt.id !== currentGoodsReceipt.id) return;
