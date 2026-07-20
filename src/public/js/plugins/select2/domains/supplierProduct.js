@@ -1,38 +1,32 @@
 import { getSupplierProductOptions } from "../../../application/warehouse/products.js";
-import { initbaseSelect2, setMdbWrapperInputValue, toggleSelectOption } from "../baseSelect.js";
-import { FORM_SELECTORS } from "../../../constants/selectors.js";
-
-const presentationDisplaySelector = FORM_SELECTORS.PRESENTATION_DISPLAY;
-const unitMeasureDisplaySelector = FORM_SELECTORS.UNIT_MEASURE_DISPLAY;
-
-export const setSupplierProductDisplayValues = ({
-    modalSelector,
-    data = {}
-}) => {
-
-    setMdbWrapperInputValue({
-        selector: `${ modalSelector } ${ presentationDisplaySelector }`,
-        value: data.presentationName || ''
-    });
-
-    setMdbWrapperInputValue({
-        selector: `${ modalSelector } ${ unitMeasureDisplaySelector }`,
-        value: data.unitMeasureName || ''
-    });
-};
+import { initbaseSelect2, toggleSelectOption } from "../baseSelect.js";
+import { setSupplierProductSummaryValues } from "../../../modules/products/supplierProductSummary.js";
 
 const attachSupplierProductDisplayHandler = ({
     modalSelector,
     baseSelector
 }) => {
 
-    $(baseSelector).off('select2:select.supplierProductDisplay').on('select2:select.supplierProductDisplay', ({ params }) => {
+    $(baseSelector)
+        .off('.supplierProductDisplay')
+        .on('select2:select.supplierProductDisplay', ({ params }) => {
 
-        setSupplierProductDisplayValues({
-            modalSelector,
-            data: params?.data
+            setSupplierProductSummaryValues({
+                modalSelector,
+                data: params?.data
+            });
+        })
+        .on('select2:clear.supplierProductDisplay change.supplierProductDisplay', () => {
+
+            const selectedValue = $(baseSelector).val();
+
+            if (selectedValue) return;
+
+            setSupplierProductSummaryValues({
+                modalSelector,
+                data: null
+            });
         });
-    });
 };
 
 const initSupplierProductSelect = ({
@@ -70,7 +64,7 @@ export const toggleSupplierProductOption = ({
 
     if (!modalSelector) return;
 
-    setSupplierProductDisplayValues({
+    setSupplierProductSummaryValues({
         modalSelector,
         data
     });
