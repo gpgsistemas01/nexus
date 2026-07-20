@@ -154,12 +154,11 @@ const DOCUMENT_STATUS_LABELS = Object.freeze({
     CANCELED: 'Cancelada'
 });
 
-export const renderActionButtons = ({ status, fulfillmentStatus, context, canAdjustStock = false, canDeleteProduct = false, canReturnGoodsIssue = false }) => {
+export const renderActionButtons = ({ status, fulfillmentStatus, context, canAdjustStock = false, canDeleteProduct = false }) => {
 
     const actions = [];
     const canEditGoodsIssue = context === 'goodsIssue' && status === DOCUMENT_STATUS_LABELS.APPROVED;
     const canSupplyGoodsIssue = context === 'goodsIssue' && ['Pendiente', 'Surtido parcial'].includes(fulfillmentStatus);
-    const canReturnGoodsIssueByStatus = context === 'goodsIssue' && ['Surtido parcial', 'Surtido'].includes(fulfillmentStatus);
     const canEditGoodsReceipt = context === 'goodsReceipt' && status !== DOCUMENT_STATUS_LABELS.CANCELED;
     const canViewGoodsReceipt = context === 'goodsReceipt' && status === DOCUMENT_STATUS_LABELS.CANCELED;
 
@@ -203,13 +202,5 @@ export const renderActionButtons = ({ status, fulfillmentStatus, context, canAdj
         ariaLabel: 'Surtir detalle'
     }));
 
-    if (status === DOCUMENT_STATUS_LABELS.APPROVED && canReturnGoodsIssue && canReturnGoodsIssueByStatus) actions.push(buildMdbActionButton({
-        className: 'btn-return-goods-issue',
-        colorClass: 'btn-warning',
-        iconClass: 'fa-solid fa-rotate-left',
-        title: 'Registrar devolución',
-        ariaLabel: 'Registrar devolución',
-        rippleColor: 'dark'
-    }));
     return actions.join('');
 }

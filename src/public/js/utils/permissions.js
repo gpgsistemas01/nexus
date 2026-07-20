@@ -12,16 +12,11 @@ export const hasPermission = (user) => {
     ));
     const isWarehouse = hasDepartment('ALMACÉN Y PROVEDURÍA');
     const isSystem = hasDepartment('SISTEMAS');
-    const canManageWarehouseReturns = () => hasAccess({
-        departments: ['ALMACÉN Y PROVEDURÍA', 'SISTEMAS'],
-        roles: ['Almacenista', 'Auxiliar', 'Coordinador', 'Administrador del sistema']
-    });
 
     return {
         hasDepartment,
         hasRole,
         hasAccess,
-        canManageWarehouseReturns,
         isAdmin: hasRole('Administrador del sistema'),
         isWarehouse,
         isSystem,

@@ -1,5 +1,5 @@
 import { createSuccessResponseFromRequest } from "../../../utils/responseUtils.js";
-import { editGoodsIssueDetailsRequest, editGoodsIssueHeaderRequest, editGoodsIssueRequest, getAllGoodsIssuesRequest, registerGoodsIssueRequest, returnGoodsIssueRequest } from "../../../services/warehouse/goodsIssueService.js";
+import { editGoodsIssueDetailsRequest, editGoodsIssueHeaderRequest, editGoodsIssueRequest, getAllGoodsIssuesRequest, registerGoodsIssueRequest } from "../../../services/warehouse/goodsIssueService.js";
 
 export const getAllGoodsIssues = async (params = {}) => {
 
@@ -33,14 +33,6 @@ export const editGoodsIssueDetails = async ({ formData, id }) => {
 export const editGoodsIssueHeader = async ({ formData, id }) => {
 
     const response = await editGoodsIssueHeaderRequest({ data: formData, id });
-
-    return createSuccessResponseFromRequest({ response });
-};
-
-
-export const returnGoodsIssue = async ({ formData, id }) => {
-
-    const response = await returnGoodsIssueRequest({ data: formData, id });
 
     return createSuccessResponseFromRequest({ response });
 };

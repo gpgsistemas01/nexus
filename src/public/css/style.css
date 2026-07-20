@@ -1339,15 +1339,13 @@ a:hover {
   padding-block: 0.35rem;
 }
 
-.modal-detail-table .project-converted-quantity-input:not(:disabled),
-.modal-detail-table .return-quantity-input:not(:disabled) {
+.modal-detail-table .project-converted-quantity-input:not(:disabled) {
   background-color: var(--product-detail-input-enabled-bg);
   border-color: var(--product-detail-input-enabled-border);
   color: var(--product-detail-input-enabled-color);
 }
 
-.modal-detail-table .project-converted-quantity-input:disabled,
-.modal-detail-table .return-quantity-input:disabled {
+.modal-detail-table .project-converted-quantity-input:disabled {
   background-color: var(--product-detail-input-disabled-bg);
   border-color: var(--product-detail-input-disabled-border);
   color: var(--product-detail-input-disabled-color);
@@ -1355,8 +1353,7 @@ a:hover {
   opacity: 1;
 }
 
-.modal-detail-table .project-converted-quantity-input:not(:disabled):focus,
-.modal-detail-table .return-quantity-input:not(:disabled):focus {
+.modal-detail-table .project-converted-quantity-input:not(:disabled):focus {
   background-color: #ffffff;
   border-color: var(--product-detail-header-hover) !important;
   box-shadow: 0 0 0 0.22rem rgba(var(--product-detail-header-rgb), 0.2) !important;
