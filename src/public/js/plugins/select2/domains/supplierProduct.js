@@ -1,42 +1,6 @@
 import { getSupplierProductOptions } from "../../../application/warehouse/products.js";
 import { initbaseSelect2, toggleSelectOption } from "../baseSelect.js";
-import { FORM_SELECTORS } from "../../../constants/selectors.js";
-import { setTextSummaryValues } from "../../../ui/totalsSummaryUI.js";
-
-const supplierSummarySelector = FORM_SELECTORS.SELECTED_PRODUCT_SUPPLIER;
-const presentationSummarySelector = FORM_SELECTORS.SELECTED_PRODUCT_PRESENTATION;
-const unitMeasureSummarySelector = FORM_SELECTORS.SELECTED_PRODUCT_UNIT_MEASURE;
-const baseSummarySelector = FORM_SELECTORS.SELECTED_PRODUCT_BASE;
-const heightSummarySelector = FORM_SELECTORS.SELECTED_PRODUCT_HEIGHT;
-
-export const setSupplierProductDisplayValues = ({
-    modalSelector,
-    data = {}
-}) => {
-
-    setTextSummaryValues([
-        {
-            selector: `${ modalSelector } ${ supplierSummarySelector }`,
-            value: data.supplierName
-        },
-        {
-            selector: `${ modalSelector } ${ presentationSummarySelector }`,
-            value: data.presentationName
-        },
-        {
-            selector: `${ modalSelector } ${ unitMeasureSummarySelector }`,
-            value: data.unitMeasureName
-        },
-        {
-            selector: `${ modalSelector } ${ baseSummarySelector }`,
-            value: data.productBase
-        },
-        {
-            selector: `${ modalSelector } ${ heightSummarySelector }`,
-            value: data.productHeight
-        }
-    ]);
-};
+import { setSupplierProductSummaryValues } from "../../../modules/products/supplierProductSummary.js";
 
 const attachSupplierProductDisplayHandler = ({
     modalSelector,
@@ -47,7 +11,7 @@ const attachSupplierProductDisplayHandler = ({
         .off('.supplierProductDisplay')
         .on('select2:select.supplierProductDisplay', ({ params }) => {
 
-            setSupplierProductDisplayValues({
+            setSupplierProductSummaryValues({
                 modalSelector,
                 data: params?.data
             });
@@ -58,7 +22,7 @@ const attachSupplierProductDisplayHandler = ({
 
             if (selectedValue) return;
 
-            setSupplierProductDisplayValues({
+            setSupplierProductSummaryValues({
                 modalSelector,
                 data: null
             });
@@ -100,7 +64,7 @@ export const toggleSupplierProductOption = ({
 
     if (!modalSelector) return;
 
-    setSupplierProductDisplayValues({
+    setSupplierProductSummaryValues({
         modalSelector,
         data
     });
