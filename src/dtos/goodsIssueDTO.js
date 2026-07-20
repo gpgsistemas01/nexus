@@ -37,12 +37,3 @@ export const createGoodsIssueHeaderDtoForEdit = (body = {}) => ({
     requestDate: new Date(body.requestDate),
     ...(Object.prototype.hasOwnProperty.call(body, 'observations') ? { observations: body.observations.trim() } : {})
 });
-
-
-export const createGoodsIssueReturnDto = (body = {}) => ({
-    details: (body.details || []).map(d => ({
-        id: d.id?.trim?.() || d.id,
-        isReturned: Boolean(d.isReturned),
-        returnedQuantity: Number(d.returnedQuantity)
-    }))
-});

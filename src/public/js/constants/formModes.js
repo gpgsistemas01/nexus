@@ -3,6 +3,5 @@ export const FORM_MODES = Object.freeze({
     EDIT: 'edit',
     EDIT_DETAIL: 'edit-detail',
     EDIT_HEADER: 'edit-header',
-    VIEW: 'view',
-    RETURN: 'return'
+    VIEW: 'view'
 });

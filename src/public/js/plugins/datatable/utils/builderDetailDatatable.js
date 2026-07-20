@@ -3,7 +3,6 @@ import { bindDisabledControlWarning } from "../../../ui/disabledControlWarning.j
 import { formatCurrency, formatDecimal } from "../../../utils/formatUtils.js";
 
 const DISABLED_PROJECT_QUANTITY_MESSAGE = 'Marque el detalle como surtido para capturar la cantidad de proyecto.';
-const DISABLED_RETURN_QUANTITY_MESSAGE = 'Marque el detalle para devolución antes de capturar la cantidad devuelta.';
 const GOODS_RECEIPT_DETAIL_STATUS = Object.freeze({
     CANCELED: 'CANCELED'
 });
@@ -49,11 +48,6 @@ const resolveDisabledTableInput = (cell, event) => {
     return cell.querySelector(`${ DISABLED_TABLE_INPUT_SELECTOR }:disabled:hover`);
 };
 
-const isReturnMode = (mode) => mode === 'return';
-
-const shouldShowReturnColumns = ({ type, mode }) => type === 'issue' && isReturnMode(mode);
-
-const shouldShowTransactionQuantity = ({ type, mode }) => !shouldShowReturnColumns({ type, mode });
 
 const shouldShowReceiptPurchaseColumns = ({ type }) => type === 'receipt';
 
@@ -66,7 +60,7 @@ const shouldShowIssueProjectColumns = ({ type, mode, isWarehouse, isCoordinator,
 const shouldShowActionsColumn = ({ type, mode }) => {
     if (type === 'receipt') return mode === 'create';
 
-    return !['view', 'edit-detail', 'return'].includes(mode);
+    return !['view', 'edit-detail'].includes(mode);
 };
 
 const isCanceledDetail = (row = {}) => {
@@ -91,16 +85,10 @@ const shouldShowDetailActionButtons = ({ row, mode }) => {
 export const buildDetailsHeader = ({ type, mode, isWarehouse, isCoordinator, isSystem }) => {
 
     let extraHeaders = '';
-    const showReturnColumns = shouldShowReturnColumns({ type, mode });
     const suppliedQuantityHeader = type === 'issue' && (mode === 'edit-detail' || mode === 'view')
         ? '<th rowspan="2">Cantidad surtida</th>'
         : '';
-    const transactionQuantityHeader = shouldShowTransactionQuantity({ type, mode })
-        ? `<th rowspan="2">${ type === 'issue' ? 'Salida' : 'Compra' }</th>`
-        : '';
-    const availableReturnQuantityHeader = showReturnColumns
-        ? '<th rowspan="2">Disponible para devolver</th>'
-        : '';
+    const transactionQuantityHeader = `<th rowspan="2">${ type === 'issue' ? 'Salida' : 'Compra' }</th>`;
 
     if (shouldShowIssueProjectColumns({ type, mode, isWarehouse, isCoordinator, isSystem })) {
         extraHeaders += `
@@ -123,13 +111,6 @@ export const buildDetailsHeader = ({ type, mode, isWarehouse, isCoordinator, isS
         extraHeaders += `<th rowspan="2">Surtir</th>`;
     }
 
-    if (showReturnColumns) {
-        extraHeaders += `
-            <th rowspan="2">Total devuelto</th>
-            <th rowspan="2">Cantidad devuelta registrada</th>
-            <th rowspan="2">Devolver</th>
-        `;
-    }
 
     if (type === 'receipt' && ['edit', 'view'].includes(mode)) {
         extraHeaders += `<th rowspan="2">Acciones</th>`;
@@ -146,7 +127,6 @@ export const buildDetailsHeader = ({ type, mode, isWarehouse, isCoordinator, isS
                 <th colspan="2">Medidas</th>
                 ${ transactionQuantityHeader }
                 ${ suppliedQuantityHeader }
-                ${ availableReturnQuantityHeader }
                 <th rowspan="2">Presentación</th>
                 <th colspan="2">Conversión</th>
                 ${ extraHeaders }
@@ -169,7 +149,6 @@ export const buildDetailsColumns = ({ type, mode, render, isWarehouse, isCoordin
         resolveControl: resolveDisabledTableInput
     });
 
-    const showReturnColumns = shouldShowReturnColumns({ type, mode });
     const columns = [
         {
             data: null,
@@ -177,9 +156,8 @@ export const buildDetailsColumns = ({ type, mode, render, isWarehouse, isCoordin
         },
         { data: 'productBase', render: formatDecimal },
         { data: 'productHeight', render: formatDecimal },
-        ...(shouldShowTransactionQuantity({ type, mode }) ? [{ data: 'quantity', render: formatDecimal }] : []),
+        { data: 'quantity', render: formatDecimal },
         ...(type === 'issue' && (mode === 'edit-detail' || mode === 'view') ? [{ data: 'suppliedQuantity', render: formatDecimal }] : []),
-        ...(showReturnColumns ? [{ data: 'availableReturnQuantity', defaultContent: 0, render: formatDecimal }] : []),
         { data: 'presentationName' },
         { data: 'convertedQuantity', render: formatDecimal },
         { data: 'unitMeasureName' },
@@ -225,44 +203,6 @@ export const buildDetailsColumns = ({ type, mode, render, isWarehouse, isCoordin
         );
     }
 
-    if (showReturnColumns) {
-        columns.push(
-            { data: 'returnedQuantityTotal', defaultContent: 0, render: formatDecimal },
-            {
-                data: 'returnedQuantity',
-                render: (value, _, row) => {
-                    const detailId = row.id || row.productId;
-                    return `
-                        ${ buildDetailTableInput({
-                            name: 'returnedQuantity',
-                            value,
-                            className: 'return-quantity-input',
-                            detailId,
-                            disabled: !row.isReturned,
-                            disabledWarning: DISABLED_RETURN_QUANTITY_MESSAGE,
-                            min: '0.01',
-                            step: '0.01'
-                        }) }
-                        <div data-error-for="returnedQuantity-${ detailId }" class="invalid-feedback d-none"></div>
-                    `;
-                }
-            },
-            {
-                data: null,
-                render: (_, __, row) => {
-                    const detailId = row.id || row.productId;
-                    return `
-                        <input type="checkbox"
-                            name="isReturned"
-                            class="form-check-input return-checkbox"
-                            data-detail-id="${ detailId }"
-                            ${ row.isReturned ? 'checked' : '' }
-                        >
-                    `;
-                }
-            }
-        );
-    }
 
     if (type === 'issue' && mode === 'edit-detail') {
         columns.push({

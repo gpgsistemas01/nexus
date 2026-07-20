@@ -7,9 +7,6 @@ import { adjustSupplierProductStock, findSupplierProductByIds } from "./products
 import { INVENTORY_MOVEMENT_TYPES, STOCK_ADJUSTMENT_STATUS_NAMES, STOCK_ADJUSTMENT_TYPES } from "../../constants/inventory.js";
 import { DOCUMENT_REFERENCE_TYPES } from "../../constants/documentReferenceTypes.js";
 
-const GOODS_ISSUE_RETURN_REASON_NAME = 'Devolución de salida';
-
-
 const calculateStockAdjustmentValues = ({
     product,
     newStock,
@@ -68,7 +65,6 @@ export const createStockAdjustment = async ({
     userId,
     base = null,
     height = null,
-    returnedQuantity = null,
     goodsIssueId = null,
     goodsIssueDetailId = null,
     goodsReceiptId = null,
@@ -88,11 +84,6 @@ export const createStockAdjustment = async ({
 
         const productName = product.name;
         const supplierName = product.supplier?.tradeName || '';
-        const isReturnAdjustment = returnedQuantity !== null && returnedQuantity !== undefined;
-        const currentStock = Number(toNumber(product.currentStock) || 0);
-        const resolvedNewStock = isReturnAdjustment
-            ? normalizeDecimal(currentStock + Number(returnedQuantity))
-            : newStock;
 
         const {
             previousStock,
@@ -105,7 +96,7 @@ export const createStockAdjustment = async ({
             productHeight
         } = calculateStockAdjustmentValues({
             product,
-            newStock: resolvedNewStock,
+            newStock,
             base,
             height
         });
@@ -122,9 +113,7 @@ export const createStockAdjustment = async ({
                 status: STOCK_ADJUSTMENT_STATUS_NAMES.APPLIED,
                 appliedAt: new Date(),
                 reason: {
-                    connect: isReturnAdjustment
-                        ? { name: GOODS_ISSUE_RETURN_REASON_NAME }
-                        : { id: reasonId }
+                    connect: { id: reasonId }
                 },
                 createdBy: {
                     connect: {
@@ -242,24 +231,3 @@ export const createStockAdjustmentByQuantityChange = async ({
 
     return getDb().$transaction(execute);
 };
-
-
-export const createGoodsIssueReturnStockAdjustment = ({
-    tx,
-    productId,
-    supplierId,
-    observations,
-    returnedQuantity,
-    userId,
-    goodsIssueId,
-    goodsIssueDetailId
-}) => createStockAdjustment({
-    tx,
-    productId,
-    supplierId,
-    observations,
-    returnedQuantity,
-    userId,
-    goodsIssueId,
-    goodsIssueDetailId
-});

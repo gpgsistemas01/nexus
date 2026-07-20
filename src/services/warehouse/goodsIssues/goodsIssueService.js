@@ -24,7 +24,6 @@ import { applyInventoryMovement } from "../../inventory/movementService.js";
 import { normalizeDecimal } from "../../../utils/formattersUtils.js";
 import { isAppError } from "../../../errors/AppError.js";
 import { buildDateRangeFilter } from "../../../utils/requestQueryUtils.js";
-import { findReturnedQuantityTotalsByDetailIds } from "../returns/returnHelpers.js";
 import { ROLE_NAMES } from "../../../constants/roles.js";
 import { DEPARTMENT_NAMES } from "../../../constants/departments.js";
 import { FULFILLMENT_STATUS_NAMES, GOODS_ISSUE_STATUS_NAMES } from "../../../constants/warehouseStatuses.js";
@@ -185,25 +184,6 @@ export const findAllGoodsIssues = async ({
 
     const total = await db.goodsIssue.count({ where });
     const filtered = total;
-
-    const detailIds = [];
-
-    goodsIssues.forEach(issue => {
-        issue.details.forEach(detail => {
-            detailIds.push(detail.id);
-        });
-    });
-    const returnedByDetailId = await findReturnedQuantityTotalsByDetailIds({
-        tx: db,
-        detailIds,
-        detailField: 'goodsIssueDetailId'
-    });
-
-    goodsIssues.forEach(issue => {
-        issue.details.forEach(detail => {
-            detail.returnedQuantityTotal = returnedByDetailId.get(detail.id) ?? 0;
-        });
-    });
 
     return {
         data: goodsIssues,
