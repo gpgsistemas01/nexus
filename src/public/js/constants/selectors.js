@@ -56,5 +56,10 @@ export const FORM_SELECTORS = {
     REASON: '#reasonInput',
     UNIT_MEASURE: '#unitMeasureInput',
     UNIT_MEASURE_DISPLAY: '#unitMeasureDisplayInput',
+    SELECTED_PRODUCT_SUPPLIER: '#selectedProductSupplierValue',
+    SELECTED_PRODUCT_PRESENTATION: '#selectedProductPresentationValue',
+    SELECTED_PRODUCT_UNIT_MEASURE: '#selectedProductUnitMeasureValue',
+    SELECTED_PRODUCT_BASE: '#selectedProductBaseValue',
+    SELECTED_PRODUCT_HEIGHT: '#selectedProductHeightValue',
     SUPPLIER: '.supplier-select'
 };
