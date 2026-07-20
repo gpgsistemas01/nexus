@@ -23,6 +23,22 @@ const setTotalSummaryValue = ({ selector, value, formatter }) => {
 };
 
 
+
+export const setTextSummaryValue = ({ selector, value, emptyValue = '-' }) => {
+    const element = document.querySelector(selector);
+
+    if (!element) return;
+
+    const displayValue = value || emptyValue;
+
+    element.textContent = displayValue;
+    element.dataset.value = displayValue;
+};
+
+export const setTextSummaryValues = (items = []) => {
+    items.forEach(setTextSummaryValue);
+};
+
 export const setSummaryValues = (items = []) => {
 
     items.forEach(({ selector, value, formatter = formatDecimal }) => {

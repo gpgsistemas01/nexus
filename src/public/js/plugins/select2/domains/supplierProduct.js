@@ -1,6 +1,7 @@
 import { getSupplierProductOptions } from "../../../application/warehouse/products.js";
 import { initbaseSelect2, toggleSelectOption } from "../baseSelect.js";
 import { FORM_SELECTORS } from "../../../constants/selectors.js";
+import { setTextSummaryValues } from "../../../ui/totalsSummaryUI.js";
 
 const supplierSummarySelector = FORM_SELECTORS.SELECTED_PRODUCT_SUPPLIER;
 const presentationSummarySelector = FORM_SELECTORS.SELECTED_PRODUCT_PRESENTATION;
@@ -8,46 +9,33 @@ const unitMeasureSummarySelector = FORM_SELECTORS.SELECTED_PRODUCT_UNIT_MEASURE;
 const baseSummarySelector = FORM_SELECTORS.SELECTED_PRODUCT_BASE;
 const heightSummarySelector = FORM_SELECTORS.SELECTED_PRODUCT_HEIGHT;
 
-const setSummaryText = ({ selector, value }) => {
-    const element = document.querySelector(selector);
-
-    if (!element) return;
-
-    const displayValue = value || '-';
-
-    element.textContent = displayValue;
-    element.dataset.value = displayValue;
-};
-
 export const setSupplierProductDisplayValues = ({
     modalSelector,
     data = {}
 }) => {
 
-    setSummaryText({
-        selector: `${ modalSelector } ${ supplierSummarySelector }`,
-        value: data.supplierName
-    });
-
-    setSummaryText({
-        selector: `${ modalSelector } ${ presentationSummarySelector }`,
-        value: data.presentationName
-    });
-
-    setSummaryText({
-        selector: `${ modalSelector } ${ unitMeasureSummarySelector }`,
-        value: data.unitMeasureName
-    });
-
-    setSummaryText({
-        selector: `${ modalSelector } ${ baseSummarySelector }`,
-        value: data.productBase
-    });
-
-    setSummaryText({
-        selector: `${ modalSelector } ${ heightSummarySelector }`,
-        value: data.productHeight
-    });
+    setTextSummaryValues([
+        {
+            selector: `${ modalSelector } ${ supplierSummarySelector }`,
+            value: data.supplierName
+        },
+        {
+            selector: `${ modalSelector } ${ presentationSummarySelector }`,
+            value: data.presentationName
+        },
+        {
+            selector: `${ modalSelector } ${ unitMeasureSummarySelector }`,
+            value: data.unitMeasureName
+        },
+        {
+            selector: `${ modalSelector } ${ baseSummarySelector }`,
+            value: data.productBase
+        },
+        {
+            selector: `${ modalSelector } ${ heightSummarySelector }`,
+            value: data.productHeight
+        }
+    ]);
 };
 
 const attachSupplierProductDisplayHandler = ({
