@@ -53,7 +53,8 @@ export const wasteStockValidators = {
 
 export const wasteValidators = {
     ...wasteDataValidators,
-    ...wasteStockValidators,
+    currentStock: wasteStockValidators.currentStock,
+    observations: wasteStockValidators.observations,
 }
 
 export const loginValidators = {
