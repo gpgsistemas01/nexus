@@ -9,7 +9,10 @@ const findReasonByName = ({ name, tx = null } = {}) => {
 
     return db.stockAdjustmentReason.findFirst({
         where: {
-            name
+            name: {
+                equals: name,
+                mode: 'insensitive'
+            }
         },
         select: {
             id: true
