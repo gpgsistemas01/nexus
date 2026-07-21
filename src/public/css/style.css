@@ -1324,10 +1324,14 @@ a:hover {
   color: rgba(var(--mdb-secondary-rgb), 0.7);
 }
 
-.form-outline .form-control[readonly][type]:not([type="text"]):not([type="search"]):not([type="email"]):not([type="password"]):not([type="tel"]):not([type="url"]),
-.form-outline .form-control:disabled[type]:not([type="text"]):not([type="search"]):not([type="email"]):not([type="password"]):not([type="tel"]):not([type="url"]) {
+.form-outline .form-control[readonly],
+.form-outline .form-control:disabled {
   background-color: #f6f8f6;
-  color: rgba(var(--mdb-secondary-rgb), 0.72);
+  border-color: #c8d0cc !important;
+  box-shadow: none;
+  color: rgba(var(--mdb-secondary-rgb), 0.72) !important;
+  opacity: 1;
+  -webkit-text-fill-color: rgba(var(--mdb-secondary-rgb), 0.72);
 }
 
 .modal-detail-table .table-input-outline {
