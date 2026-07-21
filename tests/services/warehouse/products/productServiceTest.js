@@ -162,6 +162,7 @@ describe('productService submit operations', () => {
     expect(productDelete).not.toHaveBeenCalled();
   });
 
+
   it('delega el submit de ajuste de stock a createStockAdjustment', async () => {
     const productDto = {
       supplierId: 'supplier-1',

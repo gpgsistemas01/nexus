@@ -2,18 +2,27 @@ import { getDb } from "../../repository/baseRepository.js";
 
 
 export const GOODS_RECEIPT_CORRECTION_REASON_NAME = 'Corrección de compra';
+export const INITIAL_STOCK_REASON_NAME = 'Stock inicial';
 
-export const findGoodsReceiptCorrectionReason = ({ tx = null } = {}) => {
+const findReasonByName = ({ name, tx = null } = {}) => {
     const db = tx || getDb();
 
     return db.stockAdjustmentReason.findFirst({
         where: {
-            name: GOODS_RECEIPT_CORRECTION_REASON_NAME
+            name
         },
         select: {
             id: true
         }
     });
+};
+
+export const findGoodsReceiptCorrectionReason = ({ tx = null } = {}) => {
+    return findReasonByName({ name: GOODS_RECEIPT_CORRECTION_REASON_NAME, tx });
+};
+
+export const findInitialStockAdjustmentReason = ({ tx = null } = {}) => {
+    return findReasonByName({ name: INITIAL_STOCK_REASON_NAME, tx });
 };
 
 export const findAllReasons = async ({

@@ -64,6 +64,13 @@ export class ProductDeleteRelationConflict extends AppError {
     }
 }
 
+export class ProductInitialStockReasonNotFound extends AppError {
+
+    constructor () {
+        super('Razón de stock inicial no encontrada', 'PRODUCT_INITIAL_STOCK_REASON_NOT_FOUND', 404);
+    }
+}
+
 export class ProductStockAdjustmentDatabaseError extends AppError {
 
     constructor () {

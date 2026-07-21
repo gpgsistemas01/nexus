@@ -94,11 +94,13 @@ export const setProductReasonVisualOption = ({
     const reasonScopedSelector = `${ modalSelector } ${ reasonSelector }`;
     const reasonSelect = document.querySelector(reasonScopedSelector);
 
-    toggleReasonOption({
-        selector: reasonScopedSelector,
-        id: `visual:${ name }`,
-        name
-    });
+    if (name) {
+        toggleReasonOption({
+            selector: reasonScopedSelector,
+            id: `visual:${ name }`,
+            name
+        });
+    }
 
     toggleDisabledElement({
         element: reasonSelect,

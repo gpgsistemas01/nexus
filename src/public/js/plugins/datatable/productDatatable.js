@@ -61,8 +61,8 @@ export const createProductDatatable = async (context) => {
     const canSeeCost = isWarehouse || isSystem || isSales;
     const canManageProducts = isAdmin || isWarehouseProductManager;
     const canDeleteProducts = isSystem || isWarehouse;
-    const canCreateProductsFromModule = isSystem && isAdmin;
     const canAdjustStock = isSystem && isAdmin;
+    const canCreateProductsFromModule = canAdjustStock || isWarehouseProductManager;
 
     renderProductTableHeader({ canSeeCost, canManageProducts });
 
@@ -148,7 +148,7 @@ export const createProductDatatable = async (context) => {
                     text: 'Nuevo producto',
                     action: () => openProductModal({
                         mode: 'create',
-                        includeStockAdjustmentOnCreate: true
+                        includeStockAdjustmentOnCreate: canAdjustStock
                     })
                 }] : []),
                 buildExcelButton({
