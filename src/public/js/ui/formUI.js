@@ -287,12 +287,10 @@ export const setFormFieldVisibility = ({
             element: field,
             isDisabled: true
         });
-    }
-
-    if (isVisible && enableWhenVisible) {
+    } else {
         toggleDisabledElement({
             element: field,
-            isDisabled: field.defaultDisabled
+            isDisabled: enableWhenVisible ? field.defaultDisabled : true
         });
     }
 
