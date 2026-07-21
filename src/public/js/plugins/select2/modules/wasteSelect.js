@@ -18,7 +18,6 @@ export const initWasteSelect2 = ({ modalSelector }) => {
         baseSelector: `${ modalSelector } ${ reasonSelector }`,
         allowCreate: false
     });
-
 };
 
 export const setWasteSelectOptions = ({ modalSelector, data = null }) => {

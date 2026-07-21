@@ -155,21 +155,24 @@ model SupplierProduct {
 }
 
 model Waste {
-  id                String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  supplierProductId String          @db.Uuid
-  isActive          Boolean         @default(true)
-  minStock          Decimal         @default(0) @db.Decimal(10, 2)
-  base              Decimal         @db.Decimal(10, 2)
-  height            Decimal         @db.Decimal(10, 2)
-  currentStock      Decimal         @default(0) @db.Decimal(10, 2)
-  convertedQuantity Decimal         @default(0) @db.Decimal(10, 2)
-  supplierProduct   SupplierProduct @relation(fields: [supplierProductId], references: [id])
+  id                String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  supplierProductId String           @db.Uuid
+  stockAdjustmentId String?          @unique @db.Uuid
+  isActive          Boolean          @default(true)
+  minStock          Decimal          @default(0) @db.Decimal(10, 2)
+  base              Decimal          @db.Decimal(10, 2)
+  height            Decimal          @db.Decimal(10, 2)
+  currentStock      Decimal          @default(0) @db.Decimal(10, 2)
+  convertedQuantity Decimal          @default(0) @db.Decimal(10, 2)
+  supplierProduct   SupplierProduct  @relation(fields: [supplierProductId], references: [id])
+  stockAdjustment   StockAdjustment? @relation(fields: [stockAdjustmentId], references: [id], onDelete: SetNull)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@unique([supplierProductId, base, height])
   @@index([supplierProductId])
+  @@index([stockAdjustmentId])
 }
 
 model Notification {
@@ -410,14 +413,14 @@ model GoodsIssueReturn {
   productBase   Decimal? @db.Decimal(10, 2)
   productHeight Decimal? @db.Decimal(10, 2)
 
-  currentTotalReturnedQuantity  Decimal @db.Decimal(10, 2)
-  newTotalReturnedQuantity Decimal @db.Decimal(10, 2)
-  observations              String? @db.VarChar(500)
+  currentTotalReturnedQuantity Decimal @db.Decimal(10, 2)
+  newTotalReturnedQuantity     Decimal @db.Decimal(10, 2)
+  observations                 String? @db.VarChar(500)
 
-  goodsIssue       GoodsIssue         @relation(fields: [goodsIssueId], references: [id])
-  goodsIssueDetail GoodsIssueDetail   @relation(fields: [goodsIssueDetailId], references: [id])
-  movementDetail   MovementDetail?   @relation(fields: [movementDetailId], references: [id], onDelete: SetNull)
-  returnedBy       User?              @relation(fields: [returnedById], references: [id], onDelete: SetNull)
+  goodsIssue       GoodsIssue       @relation(fields: [goodsIssueId], references: [id])
+  goodsIssueDetail GoodsIssueDetail @relation(fields: [goodsIssueDetailId], references: [id])
+  movementDetail   MovementDetail?  @relation(fields: [movementDetailId], references: [id], onDelete: SetNull)
+  returnedBy       User?            @relation(fields: [returnedById], references: [id], onDelete: SetNull)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -447,10 +450,10 @@ model InventoryMovement {
 
   date DateTime @default(now())
 
-  goodsReceipt     GoodsReceipt?     @relation(fields: [goodsReceiptId], references: [id])
-  goodsIssue       GoodsIssue?       @relation(fields: [goodsIssueId], references: [id])
-  stockAdjustment  StockAdjustment?  @relation(fields: [stockAdjustmentId], references: [id])
-  details          MovementDetail[]
+  goodsReceipt    GoodsReceipt?    @relation(fields: [goodsReceiptId], references: [id])
+  goodsIssue      GoodsIssue?      @relation(fields: [goodsIssueId], references: [id])
+  stockAdjustment StockAdjustment? @relation(fields: [stockAdjustmentId], references: [id])
+  details         MovementDetail[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -507,6 +510,7 @@ model StockAdjustment {
 
   details                StockAdjustmentDetail[]
   goodsReceiptCorrection GoodsReceiptCorrection?
+  waste                  Waste?
 
   appliedAt DateTime?
 

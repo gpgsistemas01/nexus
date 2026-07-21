@@ -1,9 +1,10 @@
 import { isAppError } from '../../errors/AppError.js';
-import { WasteNotFound, WasteStockAdjustmentDatabaseError, WasteUpdateDatabaseError } from '../../errors/warehouse/wasteError.js';
+import { WasteInitialStockReasonNotFound, WasteNotFound, WasteStockAdjustmentDatabaseError, WasteUpdateDatabaseError } from '../../errors/warehouse/wasteError.js';
 import { getDb } from '../../repository/baseRepository.js';
-import { normalizeDecimal, toNumber } from '../../utils/formattersUtils.js';
-import { assertSufficientStock, calculateConvertedQuantity } from '../inventory/stockHelpers.js';
-import { createStockAdjustment } from './adjustmentService.js';
+import { toNumber } from '../../utils/formattersUtils.js';
+import { calculateConvertedQuantity } from '../inventory/stockHelpers.js';
+import { createStockAdjustmentByQuantityChange } from './adjustmentService.js';
+import { findInitialStockAdjustmentReason } from './reasonService.js';
 import { findSupplierProductById } from './products/supplierProductService.js';
 import { createServiceLogger, getModelLogContext, logServiceError, logServiceInfo } from "../../utils/logger.js";
 import { PRISMA_ERROR_CODES } from "../../constants/prisma.js";
@@ -61,6 +62,7 @@ const mapWaste = (waste) => {
     return {
         id: waste.id,
         supplierProductId: waste.supplierProductId,
+        stockAdjustmentId: waste.stockAdjustmentId,
         supplierProduct: supplierProduct ? { ...supplierProduct } : null,
         productId: product?.id,
         productName: product?.name,
@@ -109,24 +111,6 @@ const buildWasteStockData = ({
     })
 });
 
-const buildWasteData = ({
-    supplierProductId,
-    base,
-    height,
-    currentStock = 0
-}) => ({
-    supplierProduct: {
-        connect: { id: supplierProductId }
-    },
-    base,
-    height,
-    ...buildWasteStockData({
-        currentStock,
-        base,
-        height
-    })
-});
-
 const adjustWasteStock = async ({
     tx,
     id,
@@ -146,20 +130,6 @@ const adjustWasteStock = async ({
         }),
         include: WASTE_INCLUDE
     });
-};
-
-const validateProductStockForWaste = ({ product, wasteDto }) => {
-
-    const previousStock = Number(toNumber(product.currentStock) || 0);
-    const newStock = normalizeDecimal(previousStock - wasteDto.currentStock);
-
-    assertSufficientStock({
-        product,
-        newStock,
-        requestedQuantity: wasteDto.currentStock
-    });
-
-    return newStock;
 };
 
 export const findAllWastes = async ({
@@ -239,26 +209,36 @@ export const createWasteAdjustment = async ({
 
         const waste = await getDb().$transaction(async (tx) => {
 
-            const product = await findSupplierProductById({
+            const supplierProduct = await findSupplierProductById({
                 tx,
                 id: wasteDto.supplierProductId
             });
-            const newStock = validateProductStockForWaste({ product, wasteDto });
 
-            await createStockAdjustment({
+            const initialStockReason = await findInitialStockAdjustmentReason({ tx });
+
+            if (!initialStockReason) throw new WasteInitialStockReasonNotFound();
+
+            const stockAdjustment = await createStockAdjustmentByQuantityChange({
                 tx,
-                productId: product.id,
-                supplierId: product.supplier?.id,
-                reasonId: wasteDto.reasonId,
+                productId: supplierProduct.id,
+                supplierId: supplierProduct.supplier?.id,
+                reasonId: initialStockReason.id,
                 observations: wasteDto.observations,
-                newStock,
+                quantityChange: -Number(toNumber(wasteDto.currentStock) || 0),
                 userId,
                 base: wasteDto.base,
-                height: wasteDto.height
+                height: wasteDto.height,
+                returnAdjustment: true
             });
 
             const waste = await tx.waste.create({
-                data: buildWasteData(wasteDto),
+                data: {
+                    supplierProduct: { connect: { id: wasteDto.supplierProductId } },
+                    stockAdjustment: { connect: { id: stockAdjustment.id } },
+                    base: wasteDto.base,
+                    height: wasteDto.height,
+                    ...buildWasteStockData(wasteDto)
+                },
                 include: WASTE_INCLUDE
             });
 
@@ -303,10 +283,15 @@ export const updateWaste = async ({
 
             const updatedWaste = await tx.waste.update({
                 where: { id },
-                data: buildWasteData({
-                    ...wasteDto,
-                    currentStock: Number(toNumber(currentWaste.currentStock) || 0)
-                }),
+                data: {
+                    supplierProduct: { connect: { id: wasteDto.supplierProductId } },
+                    base: wasteDto.base,
+                    height: wasteDto.height,
+                    ...buildWasteStockData({
+                        ...wasteDto,
+                        currentStock: Number(toNumber(currentWaste.currentStock) || 0)
+                    })
+                },
                 include: WASTE_INCLUDE
             });
 
@@ -344,24 +329,7 @@ export const updateWasteStock = async ({
         const waste = await getDb().$transaction(async (tx) => {
 
             const currentWaste = await findWasteById({ tx, id });
-            const { supplierProduct } = currentWaste;
             const newWasteStock = wasteStockDto.currentStock;
-            const previousWasteStock = Number(toNumber(currentWaste.currentStock) || 0);
-            const wasteStockDifference = normalizeDecimal(newWasteStock - previousWasteStock);
-            const newProductStock = normalizeDecimal(
-                Number(toNumber(supplierProduct.currentStock) || 0) - wasteStockDifference
-            );
-            await createStockAdjustment({
-                tx,
-                productId: supplierProduct.productId,
-                supplierId: supplierProduct.supplierId,
-                reasonId: wasteStockDto.reasonId,
-                observations: wasteStockDto.observations,
-                newStock: newProductStock,
-                userId,
-                base: currentWaste.base,
-                height: currentWaste.height
-            });
 
             const updatedWaste = await adjustWasteStock({
                 tx,

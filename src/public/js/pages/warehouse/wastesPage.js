@@ -17,9 +17,33 @@ const wasteModalId = MODAL_SELECTORS.WASTE;
 const formId = FORM_SELECTORS.WASTE_FORM;
 const stockMode = 'edit-stock';
 const wasteDataFields = ['supplierProductId', 'base', 'height'];
-const wasteStockFields = ['currentStock', 'reasonId', 'observations'];
+const wasteInitialStockFields = ['currentStock', 'reasonId', 'observations'];
+const wasteStockAdjustmentFields = ['currentStock', 'reasonId', 'observations'];
 const stockSectionSelector = '.stock-data-section';
 const isStockMode = (form) => form.dataset.mode === stockMode;
+const initialStockReasonName = 'Stock inicial';
+
+const setInitialStockReasonOption = ({ form, isInitialStockCreation }) => {
+
+    const reasonSelect = form.elements.reasonId;
+
+    if (!reasonSelect) return;
+
+    if (isInitialStockCreation) {
+        const initialStockReasonId = `visual:${ initialStockReasonName }`;
+        const hasInitialStockReasonOption = Array.from(reasonSelect.options)
+            .some(option => option.value === initialStockReasonId);
+
+        if (!hasInitialStockReasonOption) {
+            reasonSelect.append(new Option(initialStockReasonName, initialStockReasonId, true, true));
+        }
+
+        $(reasonSelect).val(initialStockReasonId);
+    }
+
+    reasonSelect.disabled = isInitialStockCreation;
+    $(reasonSelect).trigger('change');
+};
 
 const setWasteValues = ({ form, data = null }) => {
 
@@ -42,6 +66,7 @@ const prepareWasteModal = ({
         includeStockAdjustmentOnCreate: true,
         isStockAdjustment
     });
+    const isInitialStockCreation = mode === 'create' && !isStockAdjustment;
 
     initForm({ form, mode, id: mode === 'create' ? '' : data?.id });
     initWasteSelect2({ modalSelector: wasteModalId });
@@ -53,11 +78,12 @@ const prepareWasteModal = ({
     configureStockAdjustmentForm({
         form,
         dataFields: wasteDataFields,
-        stockFields: wasteStockFields,
+        stockFields: isStockAdjustment ? wasteStockAdjustmentFields : wasteInitialStockFields,
         stockSectionSelector,
         showStockFields,
         isStockAdjustment
     });
+    setInitialStockReasonOption({ form, isInitialStockCreation });
     clearFormErrors(form);
 
     return { form, modalElement };
@@ -105,7 +131,7 @@ useForm({
     selector: formId,
     getErrors: ({ form, formData }) => {
 
-        if (isStockMode(form)) return validateFields(wasteStockValidators, formData);
+        if (isStockMode(form)) return validateFields({ currentStock: wasteStockValidators.currentStock }, formData);
 
         if (form.dataset.mode === 'edit') return validateFields(wasteDataValidators, formData);
 

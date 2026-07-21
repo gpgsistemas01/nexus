@@ -8,7 +8,11 @@ const wasteDataValidation = [
 
 const wasteStockValidationFields = [
     validateNumber('currentStock'),
-    validateTextOptional({ fieldName: 'observations', maxLength: 500 }),
+    validateTextOptional({ fieldName: 'observations', maxLength: 500 })
+];
+
+const wasteStockAdjustmentValidationFields = [
+    ...wasteStockValidationFields,
     validateUUID('reasonId')
 ];
 
@@ -19,4 +23,4 @@ export const wasteValidation = [
 
 export const wasteUpdateValidation = wasteDataValidation;
 
-export const wasteStockValidation = wasteStockValidationFields;
+export const wasteStockValidation = wasteStockAdjustmentValidationFields;
