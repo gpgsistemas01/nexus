@@ -37,6 +37,8 @@ const WASTE_INCLUDE = {
                     id: true,
                     name: true,
                     isActive: true,
+                    base: true,
+                    height: true,
                     presentation: true,
                     unitMeasure: true
                 }
@@ -59,14 +61,21 @@ const mapWaste = (waste) => {
     return {
         id: waste.id,
         supplierProductId: waste.supplierProductId,
+        supplierProduct: supplierProduct ? { ...supplierProduct } : null,
+        productId: product?.id,
+        productName: product?.name,
         name: product?.name,
         isActive: waste.isActive,
         base: waste.base,
         height: waste.height,
+        productBase: product?.base,
+        productHeight: product?.height,
         minStock: waste.minStock,
         currentStock: waste.currentStock,
         convertedQuantity: waste.convertedQuantity,
         maxUnitCost: supplierProduct?.maxUnitCost ?? null,
+        presentation: product?.presentation ?? null,
+        unitMeasure: product?.unitMeasure ?? null,
         product,
         supplier
     };

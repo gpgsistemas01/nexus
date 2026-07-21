@@ -58,9 +58,9 @@ export const createWasteDatatable = async (context) => {
         { data: 'height', render: formatDecimal, title: 'Altura' },
         { data: 'currentStock', render: formatDecimal, title: 'Existencia' },
         { data: 'minStock', render: formatDecimal, title: 'Stock Mínimo' },
-        { data: 'product.presentation.name', title: 'Presentación' },
+        { data: 'presentation.name', title: 'Presentación' },
         { data: 'convertedQuantity', render: formatDecimal, title: 'Cantidad' },
-        { data: 'product.unitMeasure.name', title: 'Unidad' }
+        { data: 'unitMeasure.name', title: 'Unidad' }
     ];
 
     if (canSeeCost) {
