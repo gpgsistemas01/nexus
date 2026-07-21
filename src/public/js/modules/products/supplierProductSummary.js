@@ -12,26 +12,28 @@ export const setSupplierProductSummaryValues = ({
     data = {}
 }) => {
 
+    const summaryData = data ?? {};
+
     setTextSummaryValues([
         {
             selector: `${ modalSelector } ${ supplierSummarySelector }`,
-            value: data.supplierName
+            value: summaryData.supplierName
         },
         {
             selector: `${ modalSelector } ${ presentationSummarySelector }`,
-            value: data.presentationName
+            value: summaryData.presentationName
         },
         {
             selector: `${ modalSelector } ${ unitMeasureSummarySelector }`,
-            value: data.unitMeasureName
+            value: summaryData.unitMeasureName
         },
         {
             selector: `${ modalSelector } ${ baseSummarySelector }`,
-            value: data.productBase
+            value: summaryData.productBase
         },
         {
             selector: `${ modalSelector } ${ heightSummarySelector }`,
-            value: data.productHeight
+            value: summaryData.productHeight
         }
     ]);
 };
