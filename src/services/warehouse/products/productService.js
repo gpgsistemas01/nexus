@@ -1,10 +1,11 @@
-import { ProductSnapshotFindDatabaseError, ProductCreateDatabaseError, ProductNotFound, ProductUpdateDatabaseError, ProductStockAdjustmentDatabaseError, ProductDeleteDatabaseError, ProductDeleteRelationConflict } from "../../../errors/warehouse/productError.js";
+import { ProductSnapshotFindDatabaseError, ProductCreateDatabaseError, ProductInitialStockReasonNotFound, ProductNotFound, ProductUpdateDatabaseError, ProductStockAdjustmentDatabaseError, ProductDeleteDatabaseError, ProductDeleteRelationConflict } from "../../../errors/warehouse/productError.js";
 import { getDb } from "../../../repository/baseRepository.js";
 import { findAllSupplierProducts, findCurrentSupplierProductByProductId, findSupplierProductByIds, recalculateConvertedQuantityByProduct } from "./supplierProductService.js";
 import { prepareProductData, withRetry } from "./productHelpers.js";
 import { syncSupplierProduct } from "./productRelations.js";
 import { isAppError } from "../../../errors/AppError.js";
 import { createStockAdjustment } from "../adjustmentService.js";
+import { findInitialStockAdjustmentReason } from "../reasonService.js";
 import { createServiceLogger, getModelLogContext, logServiceError, logServiceInfo } from "../../../utils/logger.js";
 import { PRISMA_ERROR_CODES } from "../../../constants/prisma.js";
 
@@ -50,11 +51,15 @@ const createProductInTransaction = async ({
     });
 
     if (stockDto) {
+        const initialStockReason = await findInitialStockAdjustmentReason({ tx });
+
+        if (!initialStockReason) throw new ProductInitialStockReasonNotFound();
+
         return createStockAdjustment({
             tx,
             productId: createdProduct.id,
             supplierId: relations.supplierId,
-            reasonId: stockDto.reasonId,
+            reasonId: initialStockReason.id,
             observations: stockDto.observations,
             newStock: stockDto.newStock,
             userId

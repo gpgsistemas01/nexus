@@ -48,10 +48,10 @@ const buildProductPayload = (formData) => ({
     isActive: formData.isActive
 });
 
-const buildStockPayload = (formData) => ({
+const buildStockPayload = (formData, { includeReason = true } = {}) => ({
     supplierId: formData.supplierId,
     newStock: formData.newStock,
-    reasonId: formData.reasonId,
+    ...(includeReason ? { reasonId: formData.reasonId } : {}),
     observations: formData.observations
 });
 
@@ -64,7 +64,7 @@ export const registerProduct = async ({
     const payload = {
         ...buildProductPayload(formData),
         ...(creationContext ? { creationContext } : {}),
-        ...(withInitialStockAdjustment ? buildStockPayload(formData) : {})
+        ...(withInitialStockAdjustment ? buildStockPayload(formData, { includeReason: false }) : {})
     };
 
     const response = await registerProductRequest({ data: payload });

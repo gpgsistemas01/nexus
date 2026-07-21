@@ -1,5 +1,5 @@
 import { openModal } from "../../ui/modalUI.js";
-import { initProductFormSelect2, setProductFormSelectOptions } from "../../plugins/select2/modules/productSelect.js";
+import { initProductFormSelect2, setProductFormSelectOptions, setProductReasonVisualOption } from "../../plugins/select2/modules/productSelect.js";
 import { configureStockAdjustmentForm, shouldShowStockAdjustmentFields } from "../stockAdjustmentForm.js";
 import { clearFormErrors, initForm, setFormFieldVisibility } from "../../ui/formUI.js";
 import { FORM_SELECTORS, MODAL_SELECTORS } from "../../constants/selectors.js";
@@ -12,6 +12,7 @@ const stockSectionSelector = '.stock-data-section';
 const goodsReceiptCreationContext = 'goodsReceipt';
 const maxUnitCostLabel = 'Costo Máximo';
 const newStockLabel = 'Nueva cantidad';
+const initialStockReasonName = 'Stock inicial';
 
 const setProductValues = ({ form, data = null }) => {
 
@@ -40,6 +41,7 @@ const prepareProductModal = ({
         includeStockAdjustmentOnCreate,
         isStockAdjustment
     });
+    const isInitialStockCreation = showStockFields && mode === 'create' && !isStockAdjustment;
 
     initForm({ form, mode, id: data?.id });
     clearFormErrors(form);
@@ -72,8 +74,16 @@ const prepareProductModal = ({
         labelContent: newStockLabel
     });
 
-    initProductFormSelect2({ modalSelector: productModalId, isStockAdjustment: showStockFields });
+    initProductFormSelect2({
+        modalSelector: productModalId,
+        isStockAdjustment: showStockFields
+    });
     setProductFormSelectOptions({ modalSelector: productModalId, data, isStockAdjustment: showStockFields });
+    setProductReasonVisualOption({
+        modalSelector: productModalId,
+        name: isInitialStockCreation ? initialStockReasonName : null,
+        isDisabled: isInitialStockCreation
+    });
 
     return { form, modalElement };
 };

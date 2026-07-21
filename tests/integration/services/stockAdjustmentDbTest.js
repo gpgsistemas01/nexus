@@ -7,6 +7,8 @@ const hasGeneratedPrismaClient = existsSync(resolve('generated/prisma/client.ts'
 const describeDb = process.env.DATABASE_TEST_URL && hasGeneratedPrismaClient ? describe : describe.skip;
 
 const testSuffix = Math.random().toString(36).slice(2, 8);
+const initialStockReasonName = 'Stock inicial';
+
 const names = {
   presentation: `IT Adjustment Presentation ${testSuffix}`,
   unit: `IT Adj Unit ${testSuffix}`,
@@ -26,6 +28,7 @@ let adjustmentService;
 let product;
 let supplier;
 let reason;
+let initialStockReason;
 let user;
 
 const cleanupStockAdjustmentData = async () => {
@@ -106,6 +109,23 @@ describeDb('stock adjustment cross-domain database integration', () => {
     ]);
 
     await cleanupStockAdjustmentData();
+
+    initialStockReason = await prisma.stockAdjustmentReason.findFirst({
+      where: {
+        name: {
+          equals: initialStockReasonName,
+          mode: 'insensitive'
+        }
+      },
+      select: { id: true }
+    });
+
+    if (!initialStockReason) {
+      initialStockReason = await prisma.stockAdjustmentReason.create({
+        data: { name: initialStockReasonName },
+        select: { id: true }
+      });
+    }
 
     const [presentation, unit] = await Promise.all([
       prisma.presentation.create({ data: { name: names.presentation } }),
@@ -267,7 +287,6 @@ describeDb('stock adjustment cross-domain database integration', () => {
         maxUnitCost: 15
       },
       stockDto: {
-        reasonId: reason.id,
         observations: 'Alta inicial integración',
         newStock: 3
       },
@@ -288,6 +307,15 @@ describeDb('stock adjustment cross-domain database integration', () => {
       presentationId: product.presentationId,
       unitMeasureId: product.unitMeasureId
     });
+
+    await expect(prisma.stockAdjustment.findFirst({
+      where: {
+        observations: 'Alta inicial integración',
+        reasonId: initialStockReason.id,
+        createdById: user.id
+      },
+      select: { id: true }
+    })).resolves.toEqual(expect.objectContaining({ id: expect.any(String) }));
 
     await expect(productService.updateProduct({
       name: names.updatedProduct,
