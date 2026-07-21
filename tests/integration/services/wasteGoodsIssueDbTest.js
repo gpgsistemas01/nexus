@@ -206,6 +206,13 @@ describeDb('waste and goods issue database integration', () => {
       select: { id: true }
     })).resolves.toEqual({ id: waste.stockAdjustmentId });
 
+    const stockAfterWasteCreation = await prisma.supplierProduct.findUnique({
+      where: { id: supplierProduct.id },
+      select: { currentStock: true, convertedQuantity: true }
+    });
+    expect(stockAfterWasteCreation.currentStock.toNumber()).toBe(8);
+    expect(stockAfterWasteCreation.convertedQuantity.toNumber()).toBe(58);
+
     await expect(services.updateWaste({
       id: waste.id,
       wasteDto: {
@@ -230,6 +237,13 @@ describeDb('waste and goods issue database integration', () => {
       id: waste.id,
       currentStock: expect.anything()
     });
+
+    const updatedWasteStock = await prisma.waste.findUnique({
+      where: { id: waste.id },
+      select: { currentStock: true, convertedQuantity: true }
+    });
+    expect(updatedWasteStock.currentStock.toNumber()).toBe(3);
+    expect(updatedWasteStock.convertedQuantity.toNumber()).toBe(6);
 
     await expect(prisma.waste.findUnique({ where: { id: waste.id }, select: { id: true } })).resolves.toEqual({ id: waste.id });
   });
