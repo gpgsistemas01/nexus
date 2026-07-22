@@ -8,6 +8,7 @@ const serviceLogger = createServiceLogger('admin.profileService');
 
 export const findAllProfiles = async ({
     departments = [],
+    roles = [],
     includeDepartments = false,
     skip = 0,
     take = 10,
@@ -32,6 +33,22 @@ export const findAllProfiles = async ({
                     department: {
                         name: {
                             in: departments
+                        }
+                    }
+                }
+            }
+        }),
+        ...(roles.length && {
+            users: {
+                some: {
+                    isActive: true,
+                    accesses: {
+                        some: {
+                            role: {
+                                name: {
+                                    in: roles
+                                }
+                            }
                         }
                     }
                 }

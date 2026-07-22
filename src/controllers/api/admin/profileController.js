@@ -11,6 +11,9 @@ export const getAllProfiles = async (req, res) => {
     const rawDepartment =
         req.query.department ??
         req.query['department[]'];
+    const rawRole =
+        req.query.role ??
+        req.query['role[]'];
     const strictDepartmentFilter = req.query.strictDepartmentFilter === 'true';
     const includeDepartments = req.query.includeDepartments === 'true';
     const { user } = req;
@@ -36,6 +39,12 @@ export const getAllProfiles = async (req, res) => {
             ? [rawDepartment]
             : [];
 
+    const roleFilters = Array.isArray(rawRole)
+        ? rawRole
+        : rawRole
+            ? [rawRole]
+            : [];
+
     const shouldUseExplicitDepartmentFilters = strictDepartmentFilter || departmentFilters.length > 0;
 
     const departments = shouldUseExplicitDepartmentFilters
@@ -44,6 +53,7 @@ export const getAllProfiles = async (req, res) => {
 
     const result = await findAllProfiles({
         departments,
+        roles: roleFilters,
         skip,
         take,
         search,
