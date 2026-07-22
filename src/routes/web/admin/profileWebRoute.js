@@ -5,8 +5,8 @@ import { getProfilePage } from '../../../controllers/web/admin/profileController
 const router = express.Router();
 
 const profilePagePermissions = {
-    roles: ['Administrador del sistema'],
-    departments: ['SISTEMAS']
+    roles: ['Administrador del sistema', 'Coordinador', 'Auxiliar', 'Almacenista'],
+    departments: ['ALMACÉN Y PROVEDURÍA', 'SISTEMAS']
 };
 
 router.get(

@@ -7,6 +7,10 @@ const hasAccess = ({ departments = [], roles = [] }) => accesses.some(access => 
 ));
 
 const isAdmin = hasRole('Administrador del sistema');
+const canManageWarehouseProfiles = hasAccess({
+    departments: ['ALMACÉN Y PROVEDURÍA'],
+    roles: ['Coordinador', 'Auxiliar', 'Almacenista']
+});
 const isSalesOrDesign = ['Ventas', 'Diseño'].some(department => hasDepartment(department));
 const canSeePurchases = hasAccess({
     departments: ['ALMACÉN Y PROVEDURÍA'],
@@ -66,7 +70,7 @@ const items = [
         icon: 'fa-solid fa-id-badge',
         href: '/perfiles',
         isActive: currentRoute === '/perfiles',
-        isVisible: isAdmin
+        isVisible: isAdmin || canManageWarehouseProfiles
     },
     {
         content: 'Clientes',
