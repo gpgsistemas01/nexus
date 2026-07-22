@@ -25,19 +25,6 @@ const setProductValues = ({ form, data = null }) => {
     if (form.elements.isActive) form.elements.isActive.checked = data?.isActive === undefined ? true : Boolean(data.isActive);
 };
 
-const setProductModeFields = ({ form, isStockAdjustment }) => {
-    setFormReadOnly({
-        form,
-        isReadOnly: false
-    });
-
-    if (isStockAdjustment) setFormReadOnly({
-        form,
-        fields: productFields,
-        isReadOnly: true
-    });
-};
-
 const prepareProductModal = ({
     mode,
     data,
@@ -58,6 +45,10 @@ const prepareProductModal = ({
 
     initForm({ form, mode, id: data?.id });
     clearFormErrors(form);
+    setFormReadOnly({
+        form,
+        isReadOnly: false
+    });
     form.dataset.includeStockAdjustmentOnCreate = showStockFields && !isStockAdjustment ? 'true' : 'false';
     form.dataset.creationContext = creationContext || '';
     configureStockAdjustmentForm({
@@ -87,7 +78,13 @@ const prepareProductModal = ({
         enableWhenVisible: true,
         labelContent: newStockLabel
     });
-    setProductModeFields({ form, isStockAdjustment });
+    if (isStockAdjustment) {
+        setFormReadOnly({
+            form,
+            fields: productFields,
+            isReadOnly: true
+        });
+    }
 
     initProductFormSelect2({
         modalSelector: productModalId,
