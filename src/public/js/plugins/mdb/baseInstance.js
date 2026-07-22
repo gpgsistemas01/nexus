@@ -27,15 +27,6 @@ export const updateMdbWrapperInput = (instance) => {
     instance.update();
 }
 
-export const syncMdbWrapperInputs = (root = document) => {
-
-    if (!root || !globalThis.mdb?.Input) return;
-
-    root.querySelectorAll('.form-outline').forEach((wrapper) => {
-
-        globalThis.mdb.Input.getOrCreateInstance(wrapper).update();
-    });
-}
 
 export const initMdbTooltips = (root = document) => {
 
