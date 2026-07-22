@@ -9,11 +9,11 @@ import {
   isValidInternalClientProjectNumberByDepartment,
   resolveFulfillmentStatus
 } from '../../../../src/services/warehouse/goodsIssues/goodsIssueHelpers.js';
-import { profileBelongsToDepartment } from '../../../../src/services/admin/profileService.js';
+import { profileHasRole } from '../../../../src/services/admin/profileService.js';
 import { findSupplierProductsSnapshot } from '../../../../src/services/warehouse/products/supplierProductService.js';
 
 vi.mock('../../../../src/services/admin/profileService.js', () => ({
-  profileBelongsToDepartment: vi.fn()
+  profileHasRole: vi.fn()
 }));
 
 vi.mock('../../../../src/services/warehouse/products/supplierProductService.js', () => ({
@@ -34,12 +34,12 @@ describe('goodsIssueHelpers', () => {
     const client = { name: 'GPG INTERNO' };
     const advisor = { departments: [] };
 
-    profileBelongsToDepartment.mockReturnValue(true);
+    profileHasRole.mockReturnValue(true);
 
     expect(isValidInternalClientAdvisor({ client, advisor })).toBe(true);
-    expect(profileBelongsToDepartment).toHaveBeenCalledWith({
+    expect(profileHasRole).toHaveBeenCalledWith({
       profile: advisor,
-      departmentName: 'ALMACÉN Y PROVEDURÍA'
+      roleName: 'Coordinador'
     });
     expect(isValidInternalClientProjectNumberByDepartment({
       client,

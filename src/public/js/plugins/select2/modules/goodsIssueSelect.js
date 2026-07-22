@@ -84,15 +84,18 @@ export const initGoodsIssueFormSelect2 = () => {
 
             const clientName = getSelectedOptionText(clientScopedSelector);
 
+            const isInternalClient = isInternalClientName(clientName);
+
             return {
                 search: params.term,
-                department: resolveAdvisorDepartmentByClientName({
-                    clientName
-                }),
-                ...(isInternalClientName(clientName) && {
-                    role: 'Coordinador'
-                }),
-                strictDepartmentFilter: true
+                ...(isInternalClient
+                    ? { role: 'Coordinador' }
+                    : {
+                        department: resolveAdvisorDepartmentByClientName({
+                            clientName
+                        }),
+                        strictDepartmentFilter: true
+                    })
             };
         },
         allowCreate: false,
