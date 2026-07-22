@@ -2,6 +2,7 @@ import { mapSupplierProductToSelectData } from "../../../utils/productSelectUtil
 import { initReasonSelect, toggleReasonOption } from "../domains/reason.js";
 import { setupSupplierProductSelect, toggleSupplierProductOption } from "../domains/supplierProduct.js";
 import { FORM_SELECTORS } from "../../../constants/selectors.js";
+import { toggleDisabledElement } from "../../../utils/formUtils.js";
 
 const productSelector = FORM_SELECTORS.PRODUCT;
 const reasonSelector = FORM_SELECTORS.REASON;
@@ -32,5 +33,29 @@ export const setWasteSelectOptions = ({ modalSelector, data = null }) => {
         selector: `${ modalSelector } ${ reasonSelector }`,
         id: data?.reason?.id,
         name: data?.reason?.name
+    });
+};
+
+
+export const setWasteReasonVisualOption = ({
+    modalSelector,
+    name,
+    isDisabled = false
+}) => {
+
+    const reasonScopedSelector = `${ modalSelector } ${ reasonSelector }`;
+    const reasonSelect = document.querySelector(reasonScopedSelector);
+
+    if (name) {
+        toggleReasonOption({
+            selector: reasonScopedSelector,
+            id: `visual:${ name }`,
+            name
+        });
+    }
+
+    toggleDisabledElement({
+        element: reasonSelect,
+        isDisabled
     });
 };

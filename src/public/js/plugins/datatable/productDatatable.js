@@ -13,10 +13,9 @@ import { buildWarehouseInventoryColumns, renderWarehouseInventoryHeader } from "
 import { handleApiError } from "../../api/errorHandler.js";
 
 const selectorTable = DATATABLE_SELECTORS.MAIN;
+const tableElement = document.querySelector(selectorTable);
 let lastLowStockNotification = '';
 let stockSocketConfigured = false;
-
-const tableElement = document.querySelector(selectorTable);
 
 const configureStockRealtime = (table) => {
 
