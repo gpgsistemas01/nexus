@@ -26,15 +26,15 @@ export const createClientDatatable = () => {
                 }
             ],
             buttons: [
+                {
+                    text: 'Nuevo cliente',
+                    action: () => openClientModal({ mode: 'create' })
+                },
                 buildExcelButton({
                     filename: formatFileName('reporte_clientes'),
                     allowMonthlyReport: false,
                     request: () => exportClientReport(buildTableExportParams(table))
-                }),
-                {
-                    text: 'Nuevo cliente',
-                    action: () => openClientModal({ mode: 'create' })
-                }
+                })
             ]
         }
     });

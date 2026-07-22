@@ -22,6 +22,7 @@ export const buildExcelButton = ({
     allowMonthlyReport = true
 } = {}) => ({
     text: 'Exportar Excel',
+    className: 'datatable-export-button',
     action: async () => {
         if (typeof request !== 'function') {
             notifications.showError('No se pudo exportar el archivo. Inténtalo nuevamente.');

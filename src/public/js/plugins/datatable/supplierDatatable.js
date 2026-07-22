@@ -27,15 +27,15 @@ export const createSupplierDatatable = () => {
                 }
             ],
             buttons: [
+                {
+                    text: 'Nuevo proveedor',
+                    action: () => openSupplierModal({ mode: 'create' })
+                },
                 buildExcelButton({
                     filename: formatFileName('reporte_proveedores'),
                     allowMonthlyReport: false,
                     request: () => exportSupplierReport(buildTableExportParams(table))
-                }),
-                {
-                    text: 'Nuevo proveedor',
-                    action: () => openSupplierModal({ mode: 'create' })
-                }
+                })
             ]
         }
     });

@@ -42,7 +42,11 @@ export const createProfilesDatatable = async ({ canManageProfiles = false } = {}
                 }
             ],
             buttons: [
-                ...(canManageProfiles ? [buildExcelButton({
+                ...(canManageProfiles ? [{
+                    text: 'Nuevo perfil',
+                    action: () => openProfileModal({ mode: 'create' })
+                },
+                buildExcelButton({
                     filename: formatFileName('reporte_perfiles'),
                     allowMonthlyReport: false,
                     request: () => exportProfileReport(buildTableExportParams(table, {
@@ -50,11 +54,7 @@ export const createProfilesDatatable = async ({ canManageProfiles = false } = {}
                         department: getSelectedDepartmentName(),
                         strictDepartmentFilter: Boolean(filters.getValues().departmentId)
                     }))
-                }),
-                {
-                    text: 'Nuevo perfil',
-                    action: () => openProfileModal({ mode: 'create' })
-                }] : [])
+                })] : [])
             ]
         }
     });
