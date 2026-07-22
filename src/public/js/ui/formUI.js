@@ -313,30 +313,10 @@ export const toggleFormFields = ({
     });
 };
 
-const toggleReadOnlyElement = ({ element, isReadOnly }) => {
-
-    if (isReadOnly) {
-        if (!element.disabled) element.dataset.readOnlyDisabled = 'true';
-        toggleDisabledElement({
-            element,
-            isDisabled: true
-        });
-        return;
-    }
-
-    if (element.dataset.readOnlyDisabled !== 'true') return;
-
-    toggleDisabledElement({
-        element,
-        isDisabled: false
-    });
-    delete element.dataset.readOnlyDisabled;
-};
-
-export const setFormReadOnly = ({
+export const setFormDisabled = ({
     form,
     fields = 'all',
-    isReadOnly
+    isDisabled
 }) => {
     
     const elements = fields === 'all'
@@ -345,7 +325,7 @@ export const setFormReadOnly = ({
             .map(field => form.querySelector(`[name='${ field }']`))
             .filter(Boolean);
 
-    elements.forEach(element => toggleReadOnlyElement({ element, isReadOnly }));
+    elements.forEach(element => toggleDisabledElement({ element, isDisabled }));
 
     if (fields !== 'all') return;
     

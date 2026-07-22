@@ -4,7 +4,7 @@ import { validateAddGoodsIssueProductValidators, validateGoodsIssueDetailValidat
 import { refreshProductTable } from "../../plugins/datatable/baseDatatable.js";
 import { createGoodsIssueDatatable, details, initDetailsGoodsIssueTable } from "../../plugins/datatable/goodsIssueDatatable.js";
 import { initGoodsIssueFormSelect2, setGoodsIssueFormSelectOptions, syncGoodsIssueDependentSelectsState } from "../../plugins/select2/modules/goodsIssueSelect.js";
-import { setFormReadOnly, toggleButtons, clearAddedProductInput, clearFormErrors, normalizeFormErrors, initForm } from "../../ui/formUI.js";
+import { setFormDisabled, toggleButtons, clearAddedProductInput, clearFormErrors, normalizeFormErrors, initForm } from "../../ui/formUI.js";
 import { on } from "../../utils/domUtils.js";
 import { setDateTimePickerValue } from "../../plugins/flatpickr/dateTimePicker.js";
 import { handleSubmit, hasValidationErrors, syncCheckboxControlledInputs, toggleDisabledElement, validateDetailsFields, validateFields } from "../../utils/formUtils.js";
@@ -29,7 +29,7 @@ createGoodsIssueDatatable(context);
 initGoodsIssueReturnModal();
 
 
-const setGoodsIssueHeaderFieldsReadOnly = ({ form, isReadOnly }) => {
+const setGoodsIssueHeaderFieldsDisabled = ({ form, isDisabled }) => {
 
     HEADER_FIELD_NAMES.forEach(fieldName => {
         const field = form.elements[fieldName];
@@ -38,7 +38,7 @@ const setGoodsIssueHeaderFieldsReadOnly = ({ form, isReadOnly }) => {
 
         toggleDisabledElement({
             element: field,
-            isDisabled: isReadOnly
+            isDisabled: isDisabled
         });
     });
 };
@@ -118,12 +118,12 @@ export const openGoodsIssueModal = ({ mode, data = null }) => {
         withTotal: false,
         showAddProduct: mode === FORM_MODES.CREATE || (mode === FORM_MODES.EDIT && data?.fulfillmentStatus?.name === FULFILLMENT_STATUS_NAMES.PENDING)
     });
-    setFormReadOnly({ form, isReadOnly: false });
+    setFormDisabled({ form, isDisabled: false });
     initGoodsIssueFormSelect2();
     setGoodsIssueFormSelectOptions(data);
-    setGoodsIssueHeaderFieldsReadOnly({
+    setGoodsIssueHeaderFieldsDisabled({
         form,
-        isReadOnly: !ENABLED_HEADER_MODES.includes(mode)
+        isDisabled: !ENABLED_HEADER_MODES.includes(mode)
     });
     syncGoodsIssueDependentSelectsState();
 
@@ -171,10 +171,10 @@ export const openGoodsIssueModal = ({ mode, data = null }) => {
             originalConvertedQuantityDifference: detail.convertedQuantityDifference ?? null
         })));
 
-        setFormReadOnly({ form, isReadOnly: mode !== FORM_MODES.EDIT && mode !== FORM_MODES.EDIT_HEADER });
-        setGoodsIssueHeaderFieldsReadOnly({
+        setFormDisabled({ form, isDisabled: mode !== FORM_MODES.EDIT && mode !== FORM_MODES.EDIT_HEADER });
+        setGoodsIssueHeaderFieldsDisabled({
             form,
-            isReadOnly: !ENABLED_HEADER_MODES.includes(mode)
+            isDisabled: !ENABLED_HEADER_MODES.includes(mode)
         });
         syncGoodsIssueDependentSelectsState();
 

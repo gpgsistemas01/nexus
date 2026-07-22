@@ -1323,7 +1323,6 @@ a:hover {
   color: rgba(var(--mdb-secondary-rgb), 0.7);
 }
 
-.form-outline .form-control[readonly],
 .form-outline .form-control:disabled {
   background-color: #f6f8f6;
   border-color: #c8d0cc !important;
