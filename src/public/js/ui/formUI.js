@@ -69,13 +69,6 @@ export const initForm = ({
 }) => {
 
     form.reset();
-    form.querySelectorAll('input, select, textarea').forEach(element => {
-        delete element.dataset.readOnlyDisabled;
-        toggleDisabledElement({
-            element,
-            isDisabled: Boolean(element.defaultDisabled)
-        });
-    });
     form.querySelectorAll('.js-flatpickr-datetime').forEach(input => setDateTimePickerValue(input, input.value));
     form.dataset.id = id;
     form.dataset.mode = mode;
