@@ -131,7 +131,7 @@ useForm({
     selector: formId,
     getErrors: ({ form, formData }) => {
 
-        if (isStockMode(form)) return validateFields({ currentStock: wasteStockValidators.currentStock }, formData);
+        if (isStockMode(form)) return validateFields(wasteStockValidators, formData);
 
         if (form.dataset.mode === 'edit') return validateFields(wasteDataValidators, formData);
 

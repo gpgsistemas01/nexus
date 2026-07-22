@@ -61,5 +61,6 @@ export const FORM_SELECTORS = {
     SELECTED_PRODUCT_UNIT_MEASURE: '#selectedProductUnitMeasureValue',
     SELECTED_PRODUCT_BASE: '#selectedProductBaseValue',
     SELECTED_PRODUCT_HEIGHT: '#selectedProductHeightValue',
+    SELECTED_PRODUCT_MAX_UNIT_COST: '#selectedProductMaxUnitCostValue',
     SUPPLIER: '.supplier-select'
 };

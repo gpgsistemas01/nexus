@@ -4,7 +4,7 @@ import { hasPermission } from "../../utils/permissions.js";
 import { renderMaterialName } from "./utils/renderProductDatatable.js";
 import { getAllWastes } from "../../application/warehouse/wastes.js";
 import { openWasteModal, openWasteStockAdjustmentModal } from "../../pages/warehouse/wastesPage.js";
-import { getResponsiveRowData } from "./utils/responsive.js";
+import { configureResponsiveHeaderGroups, getResponsiveRowData } from "./utils/responsive.js";
 import { formatCurrency, formatDecimal } from "../../utils/formatUtils.js";
 import { DATATABLE_SELECTORS } from "../../constants/selectors.js";
 
@@ -17,19 +17,19 @@ const renderWasteTableHeader = ({ canSeeCost, canManageWastes }) => {
         <thead>
             <tr>
                 <th rowspan="2">Material</th>
-                <th colspan="2">Medidas</th>
+                <th colspan="2" data-responsive-group="measures">Medidas</th>
                 <th rowspan="2">Existencia</th>
                 <th rowspan="2">Stock Mínimo</th>
                 <th rowspan="2">Presentación</th>
-                <th colspan="2">Conversión</th>
-                ${ canSeeCost ? '<th rowspan="2">Costo Unitario</th>' : '' }
+                <th colspan="2" data-responsive-group="conversion">Conversión</th>
+                ${ canSeeCost ? '<th rowspan="2">Costo Unitario de Conversión</th>' : '' }
                 ${ canManageWastes ? '<th rowspan="2">Acciones</th>' : '' }
             </tr>
             <tr>
-                <th>Base</th>
-                <th>Altura</th>
-                <th>Cantidad</th>
-                <th>Unidad</th>
+                <th data-responsive-parent="measures">Base</th>
+                <th data-responsive-parent="measures">Altura</th>
+                <th data-responsive-parent="conversion">Cantidad</th>
+                <th data-responsive-parent="conversion">Unidad</th>
             </tr>
         </thead>
     `;
@@ -94,6 +94,8 @@ export const createWasteDatatable = async (context) => {
         }
     });
 
+    configureResponsiveHeaderGroups(table);
+
     $(`${ selectorTable } tbody`).on('click', '.btn-edit', async function() {
 
         const data = getResponsiveRowData(table, this);
@@ -107,4 +109,6 @@ export const createWasteDatatable = async (context) => {
 
         await openWasteStockAdjustmentModal({ mode: 'edit-stock', data });
     });
+
+    return table;
 };
