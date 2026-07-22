@@ -111,6 +111,13 @@ export const createGoodsIssueDatatable = async (context) => {
         openGoodsIssueModal({ mode: FORM_MODES.EDIT_DETAIL, data });
     });
 
+    $(`${ tableSelector } tbody`).on('click', '.btn-return-detail', function() {
+
+        const data = getResponsiveRowData(table, this);
+
+        openGoodsIssueModal({ mode: FORM_MODES.RETURN, data });
+    });
+
 };
 
 export const initDetailsGoodsIssueTable = (mode, context) => {

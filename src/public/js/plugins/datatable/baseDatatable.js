@@ -157,8 +157,12 @@ const DOCUMENT_STATUS_LABELS = Object.freeze({
 export const renderActionButtons = ({ status, fulfillmentStatus, context, canAdjustStock = false, canDeleteProduct = false }) => {
 
     const actions = [];
-    const canEditGoodsIssue = context === 'goodsIssue' && status === DOCUMENT_STATUS_LABELS.APPROVED;
-    const canSupplyGoodsIssue = context === 'goodsIssue' && ['Pendiente', 'Surtido parcial'].includes(fulfillmentStatus);
+    const canEditGoodsIssue = context === 'goodsIssue'
+        && status === DOCUMENT_STATUS_LABELS.APPROVED;
+    const canSupplyGoodsIssue = context === 'goodsIssue'
+        && ['Pendiente', 'Surtido parcial'].includes(fulfillmentStatus);
+    const canReturnGoodsIssue = context === 'goodsIssue'
+        && fulfillmentStatus === 'Surtido';
     const canEditGoodsReceipt = context === 'goodsReceipt' && status !== DOCUMENT_STATUS_LABELS.CANCELED;
     const canViewGoodsReceipt = context === 'goodsReceipt' && status === DOCUMENT_STATUS_LABELS.CANCELED;
 
@@ -200,6 +204,14 @@ export const renderActionButtons = ({ status, fulfillmentStatus, context, canAdj
         iconClass: 'fa fa-edit',
         title: 'Surtir detalle',
         ariaLabel: 'Surtir detalle'
+    }));
+
+    if (status === DOCUMENT_STATUS_LABELS.APPROVED && context === 'goodsIssue' && canReturnGoodsIssue) actions.push(buildMdbActionButton({
+        className: 'btn-return-detail',
+        colorClass: 'btn-warning',
+        iconClass: 'fa-solid fa-rotate-left',
+        title: 'Devolver producto surtido',
+        ariaLabel: 'Devolver producto surtido'
     }));
 
     return actions.join('');
