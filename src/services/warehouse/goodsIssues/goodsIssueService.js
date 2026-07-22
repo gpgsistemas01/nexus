@@ -10,6 +10,7 @@ import {
     GoodsIssueSuppliedConflict,
     GoodsIssueDetailNotFound,
     GoodsIssueReturnQuantityConflict,
+    GoodsIssueReturnStatusConflict,
     GoodsIssueReturnDatabaseError
 } from "../../../errors/warehouse/goodsIssueError.js";
 import { createServiceLogger, getModelLogContext, logServiceError, logServiceInfo } from "../../../utils/logger.js";
@@ -601,10 +602,18 @@ export const returnGoodsIssueDetail = async ({ id, detailId, returnDto, userId }
         return await db.$transaction(async (tx) => {
             const detail = await tx.goodsIssueDetail.findFirst({
                 where: { id: detailId, goodsIssueId: id },
-                include: { goodsIssue: true }
+                include: {
+                    goodsIssue: {
+                        include: { fulfillmentStatus: true }
+                    }
+                }
             });
 
             if (!detail) throw new GoodsIssueDetailNotFound();
+
+            if (detail.goodsIssue.fulfillmentStatus?.name !== FULFILLMENT_STATUS_NAMES.COMPLETE) {
+                throw new GoodsIssueReturnStatusConflict();
+            }
 
             const totalSuppliedQuantity = normalizeDecimal(detail.suppliedQuantity ?? 0);
             const currentTotalReturnedQuantity = normalizeDecimal(detail.returnedQuantity ?? 0);

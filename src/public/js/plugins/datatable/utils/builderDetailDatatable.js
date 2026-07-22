@@ -51,17 +51,34 @@ const resolveDisabledTableInput = (cell, event) => {
 
 const shouldShowReceiptPurchaseColumns = ({ type }) => type === 'receipt';
 
+const ISSUE_DETAIL_RETURN_MODES = ['edit-detail', 'return'];
+const RECEIPT_DETAIL_ACTION_MODES = ['edit'];
+
 const shouldShowIssueProjectColumns = ({ type, mode, isWarehouse, isCoordinator, isSystem }) => (
     type === 'issue'
     && ((isWarehouse && isCoordinator) || isSystem)
-    && (mode === 'edit-detail' || mode === 'view')
+    && mode === 'edit-detail'
 );
 
 const shouldShowActionsColumn = ({ type, mode }) => {
     if (type === 'receipt') return mode === 'create';
 
-    return !['view', 'edit-detail'].includes(mode);
+    return !['edit-detail', 'edit-header', 'return'].includes(mode);
 };
+
+
+const shouldShowIssueReturnActions = ({ type, mode }) => type === 'issue' && mode === 'return';
+
+const shouldShowReceiptDetailActions = ({ type, mode }) => (
+    type === 'receipt'
+    && RECEIPT_DETAIL_ACTION_MODES.includes(mode)
+);
+
+const shouldShowDetailActionsHeader = ({ type, mode }) => (
+    shouldShowIssueReturnActions({ type, mode })
+    || shouldShowReceiptDetailActions({ type, mode })
+    || shouldShowActionsColumn({ type, mode })
+);
 
 const isCanceledDetail = (row = {}) => {
     const statusName = row.fulfillmentStatus?.name || row.status?.name || row.status;
@@ -85,7 +102,7 @@ const shouldShowDetailActionButtons = ({ row, mode }) => {
 export const buildDetailsHeader = ({ type, mode, isWarehouse, isCoordinator, isSystem }) => {
 
     let extraHeaders = '';
-    const issueReturnHeaders = type === 'issue' && (mode === 'edit-detail' || mode === 'view')
+    const issueReturnHeaders = type === 'issue' && ISSUE_DETAIL_RETURN_MODES.includes(mode)
         ? '<th rowspan="2">Cantidad surtida</th><th rowspan="2">Cantidad devuelta</th>'
         : '';
     const transactionQuantityHeader = `<th rowspan="2">${ type === 'issue' ? 'Salida' : 'Compra' }</th>`;
@@ -111,15 +128,7 @@ export const buildDetailsHeader = ({ type, mode, isWarehouse, isCoordinator, isS
         extraHeaders += `<th rowspan="2">Surtir</th>`;
     }
 
-    if (type === 'issue' && mode === 'edit-detail') {
-        extraHeaders += `<th rowspan="2">Acciones</th>`;
-    }
-
-    if (type === 'receipt' && ['edit', 'view'].includes(mode)) {
-        extraHeaders += `<th rowspan="2">Acciones</th>`;
-    }
-
-    if (shouldShowActionsColumn({ type, mode })) {
+    if (shouldShowDetailActionsHeader({ type, mode })) {
         extraHeaders += `<th rowspan="2">Acciones</th>`;
     }
 
@@ -160,7 +169,7 @@ export const buildDetailsColumns = ({ type, mode, render, isWarehouse, isCoordin
         { data: 'productBase', render: formatDecimal },
         { data: 'productHeight', render: formatDecimal },
         { data: 'quantity', render: formatDecimal },
-        ...(type === 'issue' && (mode === 'edit-detail' || mode === 'view') ? [
+        ...(type === 'issue' && ISSUE_DETAIL_RETURN_MODES.includes(mode) ? [
             { data: 'suppliedQuantity', render: formatDecimal },
             { data: 'returnedQuantity', render: formatDecimal }
         ] : []),
@@ -175,8 +184,6 @@ export const buildDetailsColumns = ({ type, mode, render, isWarehouse, isCoordin
             {
                 data: 'projectConvertedQuantity',
                 render: (value, _, row) => {
-
-                    if (mode === 'view') return value ?? '';
 
                     const detailId = row.id || row.productId;
                     const isEditableDetail = mode === 'edit-detail' && !row.originalIsSupplied;
@@ -232,7 +239,7 @@ export const buildDetailsColumns = ({ type, mode, render, isWarehouse, isCoordin
     }
 
 
-    if (type === 'issue' && mode === 'edit-detail') {
+    if (shouldShowIssueReturnActions({ type, mode })) {
         columns.push({
             data: null,
             orderable: false,
@@ -259,7 +266,7 @@ export const buildDetailsColumns = ({ type, mode, render, isWarehouse, isCoordin
         });
     }
 
-    if (type === 'receipt' && ['edit', 'view'].includes(mode)) {
+    if (shouldShowReceiptDetailActions({ type, mode })) {
         columns.push({
             data: null,
             title: 'Acciones',

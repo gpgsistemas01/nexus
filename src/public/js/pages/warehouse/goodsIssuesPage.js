@@ -43,8 +43,6 @@ const setGoodsIssueHeaderFieldsReadOnly = ({ form, isReadOnly }) => {
     });
 };
 
-const getDetailsTableMode = (mode) => mode === FORM_MODES.EDIT_HEADER ? FORM_MODES.VIEW : mode;
-
 
 const normalizeGoodsIssueData = ({ form, formData }) => {
 
@@ -111,6 +109,7 @@ export const openGoodsIssueModal = ({ mode, data = null }) => {
     currentGoodsIssue = data;
 
     initForm({ form, mode, id: data?.id || '' });
+    form.querySelector('#submitBtn')?.classList.remove('d-none');
     clearFormErrors(form);
     toggleButtons({
         mode,
@@ -139,7 +138,7 @@ export const openGoodsIssueModal = ({ mode, data = null }) => {
         form.querySelector('#presentationDisplayInput').value = '';
     }
 
-    if (mode === FORM_MODES.EDIT || mode === FORM_MODES.EDIT_DETAIL || mode === FORM_MODES.EDIT_HEADER || mode === FORM_MODES.VIEW) {
+    if ([FORM_MODES.EDIT, FORM_MODES.EDIT_DETAIL, FORM_MODES.EDIT_HEADER, FORM_MODES.RETURN].includes(mode)) {
 
         form.querySelector('#observationsInput').value = data.observations || '';
         setDateTimePickerValue(form.querySelector('#requestDateInput'), data.requestDate);
@@ -192,14 +191,19 @@ export const openGoodsIssueModal = ({ mode, data = null }) => {
             form.querySelector('#submitBtn').textContent = 'Surtir';
         }
 
+        if (mode === FORM_MODES.RETURN) {
 
-        if (mode === FORM_MODES.VIEW) {
-            
-            modalElement.querySelector('#modalTitle').textContent = buildModalTitle({ action: 'Ver', entityName: GOODS_ISSUE_ENTITY_NAME, referenceNumber: data?.referenceNumber });
+            modalElement.querySelector('#modalTitle').textContent = buildModalTitle({
+                action: 'Devolver productos surtidos de la',
+                entityName: GOODS_ISSUE_ENTITY_NAME,
+                referenceNumber: data?.referenceNumber
+            });
+            form.querySelector('#submitBtn').classList.add('d-none');
         }
+
     }
 
-    initDetailsGoodsIssueTable(getDetailsTableMode(mode), context);
+    initDetailsGoodsIssueTable(mode, context);
 
     openModal(modalElement);
 };

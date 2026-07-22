@@ -80,6 +80,13 @@ export class GoodsIssueReturnQuantityConflict extends AppError {
     }
 }
 
+export class GoodsIssueReturnStatusConflict extends AppError {
+
+    constructor () {
+        super('Solo se pueden registrar devoluciones cuando la salida está surtida', 'GOODS_ISSUE_RETURN_STATUS_CONFLICT', 409);
+    }
+}
+
 export class GoodsIssueReturnDatabaseError extends AppError {
 
     constructor () {
