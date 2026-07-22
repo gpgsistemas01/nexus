@@ -1288,6 +1288,36 @@ a:hover {
   color: var(--mdb-primary) !important;
 }
 
+.form-section {
+  background-color: rgba(var(--mdb-light-rgb), 0.62);
+  border: 1px solid rgba(var(--mdb-primary-rgb), 0.12);
+  border-radius: 0.9rem;
+  padding: 1rem;
+}
+
+.form-section > .border-bottom {
+  border-bottom-color: rgba(var(--mdb-primary-rgb), 0.22) !important;
+}
+
+.form-section .form-control,
+.form-section .form-select,
+.form-section textarea.form-control,
+.form-section .select2-container--default .select2-selection--single {
+  background-color: var(--form-field-bg);
+  border-color: var(--form-field-border) !important;
+  color: var(--form-field-color) !important;
+}
+
+.form-section .form-control:focus,
+.form-section .form-select:focus,
+.form-section textarea.form-control:focus,
+.form-section .select2-container--default.select2-container--focus .select2-selection--single,
+.form-section .select2-container--default.select2-container--open .select2-selection--single {
+  background-color: var(--form-field-bg);
+  border-color: var(--form-field-border-focus) !important;
+  box-shadow: 0 0 0 0.2rem rgba(var(--mdb-primary-rgb), 0.16);
+}
+
 .select2-container {
   width: 100% !important;
 }

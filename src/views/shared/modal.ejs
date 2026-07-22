@@ -101,7 +101,7 @@ const modalDialogClass = typeof dialogClass !== 'undefined' ? dialogClass : 'mod
 
                 <% if (form.sections) { %>
                     <% form.sections.forEach(section => { %>
-                        <section class="col-12 <%= section.class || '' %>">
+                        <section class="col-12 form-section <%= section.class || '' %>">
                             <div class="border-bottom pb-2 mb-3">
                                 <h5 class="mb-1"><%= section.title %></h5>
                                 <% if (section.description) { %>
