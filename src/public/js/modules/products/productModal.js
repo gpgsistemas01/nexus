@@ -1,4 +1,5 @@
 import { openModal } from "../../ui/modalUI.js";
+import { syncMdbWrapperInputs } from "../../plugins/mdb/baseInstance.js";
 import { initProductFormSelect2, setProductFormSelectOptions, setProductReasonVisualOption } from "../../plugins/select2/modules/productSelect.js";
 import { configureStockAdjustmentForm, shouldShowStockAdjustmentFields } from "../stockAdjustmentForm.js";
 import { clearFormErrors, initForm, setFormFieldVisibility } from "../../ui/formUI.js";
@@ -105,6 +106,7 @@ export const openProductModal = ({
     });
 
     setProductValues({ form, data: mode === 'edit' ? data : { name: data?.name, supplier: data?.supplier } });
+    syncMdbWrapperInputs(form);
 
     if (mode === 'create') {
         modalElement.querySelector('#modalTitle').textContent = 'Registrar producto';
@@ -134,6 +136,7 @@ export const openStockAdjustmentModal = ({
 
     setProductValues({ form, data });
     beforeOpen?.({ form, modalElement });
+    syncMdbWrapperInputs(form);
 
     modalElement.querySelector('#modalTitle').textContent = title;
     form.querySelector('#submitBtn').textContent = submitText;
