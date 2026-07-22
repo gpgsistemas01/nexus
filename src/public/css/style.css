@@ -1300,19 +1300,14 @@ a:hover {
 }
 
 .form-section .form-control,
-.form-section .form-select,
-.form-section textarea.form-control,
-.form-section .select2-container--default .select2-selection--single {
+.form-section textarea.form-control {
   background-color: var(--form-field-bg);
   border-color: var(--form-field-border) !important;
   color: var(--form-field-color) !important;
 }
 
 .form-section .form-control:focus,
-.form-section .form-select:focus,
-.form-section textarea.form-control:focus,
-.form-section .select2-container--default.select2-container--focus .select2-selection--single,
-.form-section .select2-container--default.select2-container--open .select2-selection--single {
+.form-section textarea.form-control:focus {
   background-color: var(--form-field-bg);
   border-color: var(--form-field-border-focus) !important;
   box-shadow: 0 0 0 0.2rem rgba(var(--mdb-primary-rgb), 0.16);
