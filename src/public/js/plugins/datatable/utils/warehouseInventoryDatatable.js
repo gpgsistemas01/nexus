@@ -3,6 +3,8 @@ import { formatCurrency, formatDecimal } from "../../../utils/formatUtils.js";
 
 export const renderWarehouseInventoryHeader = ({ tableElement, canSeeCost, canManageItems, stockTitle, costTitle }) => {
 
+    if (!tableElement) return;
+
     tableElement.innerHTML = `
         <thead>
             <tr>
