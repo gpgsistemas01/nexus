@@ -101,6 +101,126 @@ export const initbaseSelect2 = ({
     });
 }
 
+
+export const mapValueLabelToSelectData = (item) => ({
+    id: item.value,
+    text: item.label
+});
+
+export const createNewSelectTag = ({
+    term,
+    label
+}) => {
+
+    const value = term.trim();
+
+    if (!value) return null;
+
+    return {
+        id: `new:${ value }`,
+        text: `${ value } (${ label })`,
+        newTag: true
+    };
+};
+
+export const applySelectedSelectValue = ({
+    selector,
+    selectedId = null,
+    emptyValue = '',
+    clearWhenEmpty = true
+}) => {
+
+    if (!selectedId) {
+
+        if (clearWhenEmpty) $(selector).val(emptyValue).trigger('change');
+        return;
+    }
+
+    const currentOption = $(`${ selector } option[value=\"${ selectedId }\"]`);
+
+    if (currentOption.length) $(selector).val(selectedId).trigger('change');
+};
+
+export const initFilterSelect2 = ({
+    selector,
+    getOptions,
+    placeholder,
+    selectedId = null,
+    data = (params) => ({
+        search: params.term
+    }),
+    mapOption = mapValueLabelToSelectData,
+    processResults = null,
+    clearWhenEmpty = true
+}) => {
+
+    initbaseSelect2({
+        baseSelector: selector,
+        containerSelector: 'body',
+        get: async (params) => ({
+            data: await getOptions(params)
+        }),
+        clearOnOpen: false,
+        placeholder,
+        data,
+        processResults: processResults || ((response) => {
+
+            const list = response.data || response;
+
+            return {
+                results: list.map(mapOption)
+            };
+        })
+    });
+
+    applySelectedSelectValue({
+        selector,
+        selectedId,
+        clearWhenEmpty
+    });
+};
+
+
+export const initDomainSelect2 = ({
+    selector,
+    containerSelector,
+    get,
+    placeholder,
+    mapOption,
+    allowCreate = true,
+    newTagLabel = null,
+    processResults = null,
+    data,
+    multiple = false,
+    clearOnOpen = true
+}) => {
+
+    initbaseSelect2({
+        baseSelector: selector,
+        containerSelector,
+        multiple,
+        clearOnOpen,
+        get,
+        placeholder,
+        ...(data && { data }),
+        processResults: processResults || ((response) => {
+
+            const list = response.data || response;
+
+            return {
+                results: list.map(mapOption)
+            };
+        }),
+        ...(allowCreate && {
+            tags: true,
+            createTag: (params) => createNewSelectTag({
+                term: params.term,
+                label: newTagLabel
+            })
+        })
+    });
+};
+
 export const toggleSelectOption = ({ selector, data = null }) => {
     
     $(selector).val(null).trigger('change');
