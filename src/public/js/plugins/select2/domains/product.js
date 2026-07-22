@@ -34,19 +34,30 @@ export const initProductFilterSelect = ({
             if (supplierFilterSelector) supplierId = $(`${ baseSelector } ${ supplierFilterSelector }`).val();
             else supplierId = ''
 
+            const page = Number(params.page) || 1;
+            const length = 20;
+
             return {
                 search: params.term,
-                supplierId
+                supplierId,
+                start: (page - 1) * length,
+                length
             };
         },
-        processResults: (data) => {
+        processResults: (data, params) => {
 
+            const page = Number(params.page) || 1;
             const list = data.data || data;
+            const recordsFiltered = Number(data.recordsFiltered) || list.length;
+            const length = Number(params?.data?.length) || 20;
             
             return {
                 results: list.map(p => ({
                     ...p
-                }))
+                })),
+                pagination: {
+                    more: page * length < recordsFiltered
+                }
             };
         }
     });
@@ -78,18 +89,29 @@ const initProductSelect = ({
             if (supplierSelector) supplierId = $(`${ modalSelector } ${ supplierSelector }`).val();
             else supplierId = ''
 
+            const page = Number(params.page) || 1;
+
             return {
                 search: params.term,
                 supplierId,
-                ...(resultsLimit ? { length: resultsLimit } : {})
+                ...(resultsLimit ? {
+                    start: (page - 1) * resultsLimit,
+                    length: resultsLimit
+                } : {})
             };
         },
-        processResults: (data) => {
+        processResults: (data, params) => {
 
+            const page = Number(params.page) || 1;
             const list = data.data || data;
+            const recordsFiltered = Number(data.recordsFiltered) || list.length;
+            const length = resultsLimit || list.length;
 
             return {
-                results: list.map(mapProductToSelectData)
+                results: list.map(mapProductToSelectData),
+                pagination: {
+                    more: Boolean(resultsLimit) && page * length < recordsFiltered
+                }
             };
         },
         ...(allowCreate && {
