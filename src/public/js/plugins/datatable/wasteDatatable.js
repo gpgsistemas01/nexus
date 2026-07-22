@@ -6,6 +6,9 @@ import { openWasteModal, openWasteStockAdjustmentModal } from "../../modules/was
 import { configureResponsiveHeaderGroups, getResponsiveRowData } from "./utils/responsive.js";
 import { DATATABLE_SELECTORS } from "../../constants/selectors.js";
 import { buildWarehouseInventoryColumns, renderWarehouseInventoryHeader } from "./utils/warehouseInventoryDatatable.js";
+import { buildExcelButton, buildTableExportParams } from "../../ui/tableUI.js";
+import { exportWasteReport } from "../../application/warehouse/report.js";
+import { formatFileName } from "../../utils/formatters.js";
 
 const selectorTable = DATATABLE_SELECTORS.MAIN;
 const tableElement = document.querySelector(selectorTable);
@@ -49,7 +52,12 @@ export const createWasteDatatable = async (context) => {
                 ...(canManageWastes ? [{
                     text: 'Nueva merma',
                     action: () => openWasteModal({ mode: 'create' })
-                }] : [])
+                }] : []),
+                buildExcelButton({
+                    filename: formatFileName('reporte_mermas'),
+                    allowMonthlyReport: false,
+                    request: () => exportWasteReport(buildTableExportParams(table, filters.getValues()))
+                })
             ]
         }
     });
