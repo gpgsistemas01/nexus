@@ -1,5 +1,5 @@
 import { initWasteSelect2, setWasteReasonVisualOption, setWasteSelectOptions } from "../../plugins/select2/modules/wasteSelect.js";
-import { clearFormErrors, initForm } from "../../ui/formUI.js";
+import { clearFormErrors, initForm, setFormDisabled } from "../../ui/formUI.js";
 import { openModal } from "../../ui/modalUI.js";
 import { configureStockAdjustmentForm, shouldShowStockAdjustmentFields } from "../stockAdjustmentForm.js";
 import { FORM_SELECTORS, MODAL_SELECTORS } from "../../constants/selectors.js";
@@ -12,6 +12,45 @@ const wasteInitialStockFields = ['currentStock', 'reasonId', 'observations'];
 const wasteStockAdjustmentFields = ['currentStock', 'reasonId', 'observations'];
 const stockSectionSelector = '.stock-data-section';
 const initialStockReasonName = 'Stock inicial';
+
+const resetWasteFormFieldStates = (form) => {
+
+    setFormDisabled({
+        form,
+        isDisabled: false
+    });
+};
+
+const setWasteModalFieldStates = ({
+    form,
+    showStockFields,
+    isStockAdjustment
+}) => {
+
+    resetWasteFormFieldStates(form);
+
+    configureStockAdjustmentForm({
+        form,
+        dataFields: wasteDataFields,
+        stockFields: isStockAdjustment ? wasteStockAdjustmentFields : wasteInitialStockFields,
+        stockSectionSelector,
+        showStockFields,
+        isStockAdjustment,
+        setDataFieldsDisabled: false
+    });
+
+    setFormDisabled({
+        form,
+        fields: wasteDataFields,
+        isDisabled: isStockAdjustment
+    });
+
+    setFormDisabled({
+        form,
+        fields: isStockAdjustment ? wasteStockAdjustmentFields : wasteInitialStockFields,
+        isDisabled: false
+    });
+};
 
 const setWasteValues = ({ form, data = null }) => {
 
@@ -43,11 +82,8 @@ const prepareWasteModal = ({
         form,
         data: mode === 'create' ? null : data
     });
-    configureStockAdjustmentForm({
+    setWasteModalFieldStates({
         form,
-        dataFields: wasteDataFields,
-        stockFields: isStockAdjustment ? wasteStockAdjustmentFields : wasteInitialStockFields,
-        stockSectionSelector,
         showStockFields,
         isStockAdjustment
     });
