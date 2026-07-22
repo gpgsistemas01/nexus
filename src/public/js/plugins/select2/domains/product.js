@@ -1,6 +1,6 @@
 import { openProductModal } from "../../../modules/products/productModal.js";
 import { getAllProducts, getProductOptions } from "../../../application/warehouse/products.js";
-import { initbaseSelect2, setMdbWrapperInputValue, toggleSelectOption } from "../baseSelect.js";
+import { applySelectedSelectValue, initDomainSelect2, initbaseSelect2, setMdbWrapperInputValue, toggleSelectOption } from "../baseSelect.js";
 import { mapProductToSelectData } from "../../../utils/productSelectUtils.js";
 import { FORM_SELECTORS, FILTER_SELECTORS } from "../../../constants/selectors.js";
 
@@ -62,11 +62,11 @@ export const initProductFilterSelect = ({
         }
     });
 
-    if (!selectedId) return;
-
-    const currentOption = $(`${ productSelector } option[value=\"${ selectedId }\"]`);
-
-    if (currentOption.length) $(productSelector).val(selectedId).trigger('change');
+    applySelectedSelectValue({
+        selector: productSelector,
+        selectedId,
+        clearWhenEmpty: false
+    });
 };
 
 const initProductSelect = ({ 
@@ -75,62 +75,46 @@ const initProductSelect = ({
     baseSelector, 
     allowCreate = true,
     resultsLimit = null
-}) => {
+}) => initDomainSelect2({
+    selector: baseSelector,
+    containerSelector: modalSelector,
+    get: getAllProducts,
+    placeholder: 'Buscar producto...',
+    data: (params) => {
 
-    initbaseSelect2({
-        baseSelector,
-        containerSelector: modalSelector,
-        get: getAllProducts,
-        placeholder: 'Buscar producto...',
-        data: (params) => {
+        let supplierId;
 
-            let supplierId;
+        if (supplierSelector) supplierId = $(`${ modalSelector } ${ supplierSelector }`).val();
+        else supplierId = ''
 
-            if (supplierSelector) supplierId = $(`${ modalSelector } ${ supplierSelector }`).val();
-            else supplierId = ''
+        const page = Number(params.page) || 1;
 
-            const page = Number(params.page) || 1;
+        return {
+            search: params.term,
+            supplierId,
+            ...(resultsLimit ? {
+                start: (page - 1) * resultsLimit,
+                length: resultsLimit
+            } : {})
+        };
+    },
+    processResults: (data, params) => {
 
-            return {
-                search: params.term,
-                supplierId,
-                ...(resultsLimit ? {
-                    start: (page - 1) * resultsLimit,
-                    length: resultsLimit
-                } : {})
-            };
-        },
-        processResults: (data, params) => {
+        const page = Number(params.page) || 1;
+        const list = data.data || data;
+        const recordsFiltered = Number(data.recordsFiltered) || list.length;
+        const length = resultsLimit || list.length;
 
-            const page = Number(params.page) || 1;
-            const list = data.data || data;
-            const recordsFiltered = Number(data.recordsFiltered) || list.length;
-            const length = resultsLimit || list.length;
-
-            return {
-                results: list.map(mapProductToSelectData),
-                pagination: {
-                    more: Boolean(resultsLimit) && page * length < recordsFiltered
-                }
-            };
-        },
-        ...(allowCreate && {
-            tags: true,
-            createTag: (params) => {
-
-                const term = params.term.trim();
-
-                if (!term) return null;
-
-                return {
-                    id: `new:${ term }`,
-                    text: `${ term } (Nuevo producto)`,
-                    newTag: true
-                };
+        return {
+            results: list.map(mapProductToSelectData),
+            pagination: {
+                more: Boolean(resultsLimit) && page * length < recordsFiltered
             }
-        })
-    });
-};
+        };
+    },
+    allowCreate,
+    newTagLabel: 'Nuevo producto'
+});
 
 const attachProductHandler = ({ 
     modalSelector,

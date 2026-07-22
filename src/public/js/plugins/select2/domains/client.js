@@ -1,6 +1,6 @@
 import { openClientModal } from "../../../modules/clients/clientModal.js";
 import { getAllClients, getClientOptions } from "../../../application/sales/clients.js";
-import { initbaseSelect2, toggleSelectOption } from "../baseSelect.js";
+import { initDomainSelect2, initFilterSelect2, toggleSelectOption } from "../baseSelect.js";
 import { FILTER_SELECTORS } from "../../../constants/selectors.js";
 
 const clientFilterSelector = FILTER_SELECTORS.CLIENT;
@@ -12,81 +12,30 @@ export const getClientSelectApi = () => ({
 
 export const initClientFilterSelect = ({
     selectedId = null
-} = {}) => {
-
-    initbaseSelect2({
-        baseSelector: clientFilterSelector,
-        containerSelector: 'body',
-        get: async (params) => ({
-            data: await getClientOptions(params)
-        }),
-        clearOnOpen: false,
-        placeholder: 'Filtrar por cliente',
-        data: (params) => ({
-            search: params.term
-        }),
-        processResults: (data) => {
-            const list = data.data || data;
-            return {
-                results: list.map(client => ({
-                    id: client.value,
-                    text: client.label
-                }))
-            };
-        }
-    });
-
-    if (!selectedId) {
-
-        $(clientFilterSelector).val('').trigger('change');
-        return;
-    }
-
-    const currentOption = $(`${ clientFilterSelector } option[value=\"${ selectedId }\"]`);
-
-    if (currentOption.length) $(clientFilterSelector).val(selectedId).trigger('change');
-};
+} = {}) => initFilterSelect2({
+    selector: clientFilterSelector,
+    getOptions: getClientOptions,
+    placeholder: 'Filtrar por cliente',
+    selectedId
+});
 
 export const initClientSelect = ({ 
     modalSelector, 
     advisorSelector = null,
     baseSelector, 
     allowCreate = true
-}) => {
-
-    initbaseSelect2({
-        baseSelector,
-        containerSelector: modalSelector,
-        get: getAllClients,
-        placeholder: 'Buscar cliente...',
-        processResults: (data) => {
-
-            const list = data.data || data;
-
-            return {
-                results: list.map(c => ({
-                    id: c.id,
-                    text: c.name,
-                }))
-            };
-        },
-        ...(allowCreate && {
-            tags: true,
-            createTag: (params) => {
-
-                const term = params.term.trim();
-
-                if (!term) return null;
-
-                return {
-                    id: `new:${ term }`,
-                    text: `${ term } (Nuevo cliente)`,
-                    newTag: true
-                };
-            }
-        })
-    });
-};
+}) => initDomainSelect2({
+    selector: baseSelector,
+    containerSelector: modalSelector,
+    get: getAllClients,
+    placeholder: 'Buscar cliente...',
+    mapOption: (client) => ({
+        id: client.id,
+        text: client.name,
+    }),
+    allowCreate,
+    newTagLabel: 'Nuevo cliente'
+});
 
 const attachClientHandler = ({
     baseSelector

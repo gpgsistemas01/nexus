@@ -1,5 +1,5 @@
 import { getAllDepartments, getDepartmentOptions } from "../../../application/admin/departments.js";
-import { initbaseSelect2, toggleSelectOption, toggleSelectOptions } from "../baseSelect.js";
+import { initDomainSelect2, initFilterSelect2, toggleSelectOption, toggleSelectOptions } from "../baseSelect.js";
 import { FILTER_SELECTORS } from "../../../constants/selectors.js";
 
 const departmentFilterSelector = FILTER_SELECTORS.DEPARTMENT;
@@ -20,40 +20,12 @@ export const getSelectedDepartmentName = (selector = departmentFilterSelector) =
 
 export const initDepartmentFilterSelect = ({
     selectedId = null
-} = {}) => {
-
-    initbaseSelect2({
-        baseSelector: departmentFilterSelector,
-        containerSelector: 'body',
-        get: async (params) => ({
-            data: await getDepartmentOptions(params)
-        }),
-        clearOnOpen: false,
-        placeholder: 'Filtrar por área',
-        data: (params) => ({
-            search: params.term
-        }),
-        processResults: (data) => {
-            const list = data.data || data;
-            return {
-                results: list.map(department => ({
-                    id: department.value,
-                    text: department.label
-                }))
-            };
-        }
-    });
-
-    if (!selectedId) {
-
-        $(departmentFilterSelector).val('').trigger('change');
-        return;
-    }
-
-    const currentOption = $(`${ departmentFilterSelector } option[value=\"${ selectedId }\"]`);
-
-    if (currentOption.length) $(departmentFilterSelector).val(selectedId).trigger('change');
-};
+} = {}) => initFilterSelect2({
+    selector: departmentFilterSelector,
+    getOptions: getDepartmentOptions,
+    placeholder: 'Filtrar por área',
+    selectedId
+});
 
 export const initDepartmentSelect = ({ 
     multiple = false,
@@ -61,43 +33,20 @@ export const initDepartmentSelect = ({
     modalSelector, 
     baseSelector, 
     allowCreate = true
-}) => {
-
-    initbaseSelect2({
-        baseSelector,
-        clearOnOpen,
-        containerSelector: modalSelector,
-        multiple,
-        get: getAllDepartments,
-        placeholder: 'Buscar área...',
-        processResults: (data) => {
-
-            const list = data.data || data;
-
-            return {
-                results: list.map(d => ({
-                    id: d.id,
-                    text: d.name,
-                }))
-            };
-        },
-        ...(allowCreate && {
-            tags: true,
-            createTag: (params) => {
-
-                const term = params.term.trim();
-
-                if (!term) return null;
-
-                return {
-                    id: `new:${ term }`,
-                    text: `${ term } (Nueva área)`,
-                    newTag: true
-                };
-            }
-        })
-    });
-};
+}) => initDomainSelect2({
+    selector: baseSelector,
+    containerSelector: modalSelector,
+    multiple,
+    clearOnOpen,
+    get: getAllDepartments,
+    placeholder: 'Buscar área...',
+    mapOption: (department) => ({
+        id: department.id,
+        text: department.name,
+    }),
+    allowCreate,
+    newTagLabel: 'Nueva área'
+});
 
 export const toggleDepartmentOption = ({ 
     selector, 
