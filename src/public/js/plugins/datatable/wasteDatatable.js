@@ -2,7 +2,7 @@ import { createDataTable, renderActionButtons } from "./baseDatatable.js";
 import { setupTableFilters } from "./utils/filters/tableFilter.js";
 import { hasPermission } from "../../utils/permissions.js";
 import { getAllWastes } from "../../application/warehouse/wastes.js";
-import { openWasteModal, openWasteStockAdjustmentModal } from "../../pages/warehouse/wastesPage.js";
+import { openWasteModal, openWasteStockAdjustmentModal } from "../../modules/wastes/wasteModal.js";
 import { configureResponsiveHeaderGroups, getResponsiveRowData } from "./utils/responsive.js";
 import { DATATABLE_SELECTORS } from "../../constants/selectors.js";
 import { buildWarehouseInventoryColumns, renderWarehouseInventoryHeader } from "./utils/warehouseInventoryDatatable.js";
@@ -11,7 +11,6 @@ const selectorTable = DATATABLE_SELECTORS.MAIN;
 const tableElement = document.querySelector(selectorTable);
 
 export const createWasteDatatable = async (context) => {
-
     const { isAdmin, isWarehouse, isSystem, isSales } = hasPermission(context);
     const canSeeCost = isWarehouse || isSystem || isSales;
     const canManageWastes = isWarehouse || isSystem;
