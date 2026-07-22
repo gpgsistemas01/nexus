@@ -324,11 +324,14 @@ const toggleReadOnlyElement = ({ element, isReadOnly }) => {
         return;
     }
 
-    if (element.dataset.readOnlyDisabled !== 'true') return;
+    const shouldRestoreEnabledState = element.dataset.readOnlyDisabled === 'true'
+        || (!element.defaultDisabled && element.disabled && element.classList.contains('disabled'));
+
+    if (!shouldRestoreEnabledState) return;
 
     toggleDisabledElement({
         element,
-        isDisabled: false
+        isDisabled: Boolean(element.defaultDisabled)
     });
     delete element.dataset.readOnlyDisabled;
 };

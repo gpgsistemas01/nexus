@@ -3,7 +3,6 @@ import { initProductFormSelect2, setProductFormSelectOptions, setProductReasonVi
 import { configureStockAdjustmentForm, shouldShowStockAdjustmentFields } from "../stockAdjustmentForm.js";
 import { clearFormErrors, initForm, setFormFieldVisibility, setFormReadOnly } from "../../ui/formUI.js";
 import { FORM_SELECTORS, MODAL_SELECTORS } from "../../constants/selectors.js";
-import { toggleDisabledElement } from "../../utils/formUtils.js";
 
 const productModalId = MODAL_SELECTORS.PRODUCT;
 const formId = FORM_SELECTORS.PRODUCT_FORM;
@@ -26,20 +25,6 @@ const setProductValues = ({ form, data = null }) => {
     if (form.elements.isActive) form.elements.isActive.checked = data?.isActive === undefined ? true : Boolean(data.isActive);
 };
 
-const resetProductControlState = (form) => {
-    [...productFields, ...stockFields].forEach(fieldName => {
-        const element = form.elements[fieldName];
-
-        if (!element) return;
-
-        delete element.dataset.readOnlyDisabled;
-        toggleDisabledElement({
-            element,
-            isDisabled: Boolean(element.defaultDisabled)
-        });
-    });
-};
-
 const prepareProductModal = ({
     mode,
     data,
@@ -59,7 +44,6 @@ const prepareProductModal = ({
     const isInitialStockCreation = showStockFields && mode === 'create' && !isStockAdjustment;
 
     initForm({ form, mode, id: data?.id });
-    resetProductControlState(form);
     clearFormErrors(form);
     setFormReadOnly({ form, isReadOnly: false });
     form.dataset.includeStockAdjustmentOnCreate = showStockFields && !isStockAdjustment ? 'true' : 'false';
