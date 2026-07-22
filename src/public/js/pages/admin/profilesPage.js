@@ -7,11 +7,19 @@ import { openModal } from "../../ui/modalUI.js";
 import { handleSubmit, validateFields } from "../../utils/formUtils.js";
 import { profileValidators } from "../../utils/validations/validators.js";
 import { FORM_SELECTORS, MODAL_SELECTORS } from "../../constants/selectors.js";
+import { hasPermission } from "../../utils/permissions.js";
 
 const formId = FORM_SELECTORS.PROFILE_FORM;
 const modalId = MODAL_SELECTORS.PROFILE;
 
-createProfilesDatatable();
+const context = window.meta || {};
+const { hasAccess } = hasPermission(context);
+const canManageProfiles = hasAccess({
+    departments: ['ALMACÉN Y PROVEDURÍA', 'SISTEMAS'],
+    roles: ['Administrador del sistema', 'Coordinador', 'Auxiliar', 'Almacenista']
+});
+
+createProfilesDatatable({ canManageProfiles });
 
 useForm({
     selector: formId,
@@ -37,6 +45,8 @@ useForm({
 });
 
 export const openProfileModal = ({ mode, data = null }) => {
+
+    if (!canManageProfiles) return;
 
     const form = document.querySelector(formId);
     const modalElement = document.querySelector(modalId);

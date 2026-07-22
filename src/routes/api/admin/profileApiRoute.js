@@ -23,8 +23,8 @@ const profileReadPermissions = {
 };
 
 const registerProfilePermissions = {
-    ...profileReadPermissions,
-    roles: [ 'Administrador del sistema' ]
+    roles: ['Administrador del sistema', 'Coordinador', 'Auxiliar', 'Almacenista'],
+    departments: ['ALMACÉN Y PROVEDURÍA', 'SISTEMAS']
 };
 
 router.get(
