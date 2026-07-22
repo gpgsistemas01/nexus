@@ -3,6 +3,7 @@ import { findAllSupplierProducts } from "./products/supplierProductService.js";
 import { findAllGoodsIssues } from "./goodsIssues/goodsIssueService.js";
 import { findAllGoodsReceipts } from "./goodsReceipts/goodsReceiptService.js";
 import { findAllSuppliers } from "./supplierService.js";
+import { findAllWastes } from "./wasteService.js";
 
 const mapProductRows = (products = []) => products.map((item) => ({
     supplier: item.supplier?.tradeName,
@@ -11,6 +12,19 @@ const mapProductRows = (products = []) => products.map((item) => ({
     height: toNumber(item.height),
     currentStock: toNumber(item.currentStock),
     minStock: toNumber(item.minStock),
+    presentation: item.presentation?.name,
+    convertedQuantity: toNumber(item.convertedQuantity),
+    unitMeasure: item.unitMeasure?.name,
+    maxUnitCost: toNumber(item.maxUnitCost)
+}));
+
+
+const mapWasteRows = (wastes = []) => wastes.map((item) => ({
+    supplier: item.supplier?.tradeName,
+    name: item.name,
+    base: toNumber(item.base),
+    height: toNumber(item.height),
+    currentStock: toNumber(item.currentStock),
     presentation: item.presentation?.name,
     convertedQuantity: toNumber(item.convertedQuantity),
     unitMeasure: item.unitMeasure?.name,
@@ -162,4 +176,24 @@ export const findSupplierReportRows = async ({
     });
 
     return suppliersResult.data;
+};
+
+
+export const findWasteReportRows = async ({
+    search = '',
+    supplierId = null,
+    orderBy = 'name',
+    orderDir = 'asc'
+} = {}) => {
+
+    const wastesResult = await findAllWastes({
+        skip: 0,
+        take: 100000,
+        search,
+        supplierId,
+        orderBy,
+        orderDir
+    });
+
+    return mapWasteRows(wastesResult.data);
 };
