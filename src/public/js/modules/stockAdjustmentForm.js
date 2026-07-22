@@ -12,11 +12,13 @@ export const configureStockAdjustmentForm = ({
     stockFields,
     stockSectionSelector = '.stock-data-section',
     showStockFields,
-    isStockAdjustment = false
+    isStockAdjustment = false,
+    setDataFieldsReadOnly = true
 }) => {
 
     toggleFormFields({ form, fields: dataFields, isVisible: true });
     toggleFormFields({ form, fields: stockFields, isVisible: showStockFields });
     form.querySelector(stockSectionSelector)?.classList.toggle('d-none', !showStockFields);
-    setFormReadOnly({ form, fields: dataFields, isReadOnly: isStockAdjustment });
+
+    if (setDataFieldsReadOnly) setFormReadOnly({ form, fields: dataFields, isReadOnly: isStockAdjustment });
 };
