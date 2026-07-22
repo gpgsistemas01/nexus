@@ -104,6 +104,22 @@ const PROFILE_WITH_DEPARTMENTS_SELECT = {
     }
 };
 
+const PROFILE_WITH_DEPARTMENTS_AND_ROLES_SELECT = {
+    ...PROFILE_WITH_DEPARTMENTS_SELECT,
+    users: {
+        where: {
+            isActive: true
+        },
+        select: {
+            accesses: {
+                select: {
+                    role: true
+                }
+            }
+        }
+    }
+};
+
 export const findProfileById = async ({ tx, id }) => {
 
     const db = getDb(tx);
@@ -126,13 +142,21 @@ export const findProfileWithDepartmentsById = async ({ tx, id }) => {
             id,
             isActive: true
         },
-        select: PROFILE_WITH_DEPARTMENTS_SELECT
+        select: PROFILE_WITH_DEPARTMENTS_AND_ROLES_SELECT
     });
 };
 
 export const profileBelongsToDepartment = ({ profile, departmentName }) => (
     profile?.departments?.some(({ department }) => (
         normalizeText(department?.name || '') === normalizeText(departmentName)
+    ))
+);
+
+export const profileHasRole = ({ profile, roleName }) => (
+    profile?.users?.some(user => (
+        user.accesses?.some(({ role }) => (
+            normalizeText(role?.name || '') === normalizeText(roleName)
+        ))
     ))
 );
 

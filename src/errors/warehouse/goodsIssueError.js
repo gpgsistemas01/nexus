@@ -46,7 +46,7 @@ export class GoodsIssueAdvisorProfileNotFound extends AppError {
 export class GoodsIssueInternalClientAdvisorDepartmentConflict extends AppError {
 
     constructor () {
-        super('Para el cliente GPG INTERNO, el asesor debe pertenecer al área de almacén', 'GOODS_ISSUE_INTERNAL_CLIENT_ADVISOR_DEPARTMENT_CONFLICT', 409);
+        super('Para el cliente GPG INTERNO, el asesor debe tener el rol Coordinador', 'GOODS_ISSUE_INTERNAL_CLIENT_ADVISOR_DEPARTMENT_CONFLICT', 409);
     }
 }
 
