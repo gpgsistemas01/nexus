@@ -4,7 +4,7 @@ import { validateAddGoodsReceiptProductValidators, validateGoodsReceiptValidator
 import { refreshProductTable } from "../../plugins/datatable/baseDatatable.js";
 import { createGoodsReceiptDatatable, details, initDetailsGoodsReceiptTable } from "../../plugins/datatable/goodsReceiptDatatable.js";
 import { GOODS_RECEIPT_SUPPLIER_CHANGED_EVENT, initGoodsReceiptFormSelect2, setGoodsReceiptFormSelectOptions } from "../../plugins/select2/modules/goodsReceiptSelect.js";
-import { setFormReadOnly, setTotals, updateTotals, toggleButtons, clearAddedProductInput, toggleInvoiceInput, clearFormErrors, normalizeFormErrors, initForm } from "../../ui/formUI.js";
+import { setFormDisabled, setTotals, updateTotals, toggleButtons, clearAddedProductInput, toggleInvoiceInput, clearFormErrors, normalizeFormErrors, initForm } from "../../ui/formUI.js";
 import { on } from "../../utils/domUtils.js";
 import { setDateTimePickerValue } from "../../plugins/flatpickr/dateTimePicker.js";
 import { handleSubmit, hasValidationErrors, toggleContainerElements, toggleDisabledElement, validateFields } from "../../utils/formUtils.js";
@@ -133,7 +133,7 @@ export const openGoodsReceiptModal = ({ mode, data = null }) => {
     initForm({ form, mode, id: data?.id || '' });
     currentGoodsReceipt = data;
     clearFormErrors(form);
-    setFormReadOnly({ form, isReadOnly: false });
+    setFormDisabled({ form, isDisabled: false });
     toggleDisabledElement({
         element: form.querySelector(FORM_SELECTORS.SUPPLIER),
         isDisabled: false
@@ -190,7 +190,7 @@ export const openGoodsReceiptModal = ({ mode, data = null }) => {
 
         if (mode === FORM_MODES.VIEW) {
             modalElement.querySelector('#modalTitle').textContent = buildModalTitle({ action: 'Ver', entityName: GOODS_RECEIPT_ENTITY_NAME, referenceNumber: data?.referenceNumber });
-            setFormReadOnly({ form, isReadOnly: true });
+            setFormDisabled({ form, isDisabled: true });
         }
 
         toggleButtons({

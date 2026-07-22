@@ -1,7 +1,7 @@
 import { openModal } from "../../ui/modalUI.js";
 import { initProductFormSelect2, setProductFormSelectOptions, setProductReasonVisualOption } from "../../plugins/select2/modules/productSelect.js";
 import { configureStockAdjustmentForm, shouldShowStockAdjustmentFields } from "../stockAdjustmentForm.js";
-import { clearFormErrors, initForm, setFormFieldVisibility, setFormReadOnly } from "../../ui/formUI.js";
+import { clearFormErrors, initForm, setFormFieldVisibility, setFormDisabled } from "../../ui/formUI.js";
 import { FORM_SELECTORS, MODAL_SELECTORS } from "../../constants/selectors.js";
 
 const productModalId = MODAL_SELECTORS.PRODUCT;
@@ -27,9 +27,9 @@ const setProductValues = ({ form, data = null }) => {
 
 const resetProductFormFieldStates = (form) => {
 
-    setFormReadOnly({
+    setFormDisabled({
         form,
-        isReadOnly: false
+        isDisabled: false
     });
 };
 
@@ -47,7 +47,7 @@ const setProductModalFieldVisibility = ({
         stockSectionSelector,
         showStockFields,
         isStockAdjustment,
-        setDataFieldsReadOnly: false
+        setDataFieldsDisabled: false
     });
 
     setFormFieldVisibility({
@@ -73,39 +73,39 @@ const setProductModalFieldVisibility = ({
 
 const setCreateOrEditProductFieldStates = ({ form, hasInitialStockFields }) => {
 
-    setFormReadOnly({
+    setFormDisabled({
         form,
         fields: productDataFields,
-        isReadOnly: false
+        isDisabled: false
     });
 
-    setFormReadOnly({
+    setFormDisabled({
         form,
         fields: stockFields,
-        isReadOnly: false
+        isDisabled: false
     });
 
     if (!hasInitialStockFields) return;
 
-    setFormReadOnly({
+    setFormDisabled({
         form,
         fields: ['reasonId'],
-        isReadOnly: true
+        isDisabled: true
     });
 };
 
 const setStockAdjustmentFieldStates = ({ form }) => {
 
-    setFormReadOnly({
+    setFormDisabled({
         form,
         fields: productDataFields,
-        isReadOnly: true
+        isDisabled: true
     });
 
-    setFormReadOnly({
+    setFormDisabled({
         form,
         fields: stockFields,
-        isReadOnly: false
+        isDisabled: false
     });
 };
 
