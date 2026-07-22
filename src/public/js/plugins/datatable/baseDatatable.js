@@ -89,7 +89,7 @@ export const createDataTable = ({ selector = DATATABLE_SELECTORS.MAIN, options =
                 });
             }
         } : undefined,
-        dom: 'Bfrtip',
+        dom: "<'datatable-toolbar'Bf>rtip",
         language: {
             url: "https://cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json",
             searchPlaceholder: resolvedSearchPlaceholder,

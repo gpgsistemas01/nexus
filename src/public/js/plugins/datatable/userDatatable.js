@@ -45,15 +45,15 @@ export const createUserDatatable = () => {
                 }
             ],
             buttons: [
+                {
+                    text: 'Nuevo usuario',
+                    action: () => openUserModal({ mode: 'create' })
+                },
                 buildExcelButton({
                     filename: formatFileName('reporte_usuarios'),
                     allowMonthlyReport: false,
                     request: () => exportUserReport(buildTableExportParams(table))
-                }),
-                {
-                    text: 'Nuevo usuario',
-                    action: () => openUserModal({ mode: 'create' })
-                }
+                })
             ]
         }
     });
