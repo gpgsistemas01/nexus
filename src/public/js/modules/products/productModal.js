@@ -6,7 +6,7 @@ import { FORM_SELECTORS, MODAL_SELECTORS } from "../../constants/selectors.js";
 
 const productModalId = MODAL_SELECTORS.PRODUCT;
 const formId = FORM_SELECTORS.PRODUCT_FORM;
-const productFields = ['name', 'minStock', 'maxUnitCost', 'base', 'height', 'supplierId', 'presentationId', 'unitMeasureId', 'isActive'];
+const productDataFields = ['name', 'minStock', 'maxUnitCost', 'base', 'height', 'supplierId', 'presentationId', 'unitMeasureId', 'isActive'];
 const stockFields = ['newStock', 'reasonId', 'observations'];
 const stockSectionSelector = '.stock-data-section';
 const goodsReceiptCreationContext = 'goodsReceipt';
@@ -25,23 +25,113 @@ const setProductValues = ({ form, data = null }) => {
     if (form.elements.isActive) form.elements.isActive.checked = data?.isActive === undefined ? true : Boolean(data.isActive);
 };
 
-const resetProductFieldStates = (form) => {
+const resetProductFormFieldStates = (form) => {
 
     setFormReadOnly({
         form,
-        fields: [...productFields, ...stockFields],
         isReadOnly: false
     });
 };
 
-const setStockAdjustmentProductFieldsReadOnly = ({ form, isStockAdjustment }) => {
+const setProductModalFieldVisibility = ({
+    form,
+    showStockFields,
+    isStockAdjustment,
+    creationContext
+}) => {
 
-    if (!isStockAdjustment) return;
+    configureStockAdjustmentForm({
+        form,
+        dataFields: productDataFields,
+        stockFields,
+        stockSectionSelector,
+        showStockFields,
+        isStockAdjustment,
+        setDataFieldsReadOnly: false
+    });
+
+    setFormFieldVisibility({
+        form,
+        fieldName: 'maxUnitCost',
+        isVisible: creationContext !== goodsReceiptCreationContext,
+        clearWhenHidden: true,
+        requiredWhenVisible: true,
+        enableWhenVisible: true,
+        labelContent: maxUnitCostLabel
+    });
+
+    setFormFieldVisibility({
+        form,
+        fieldName: 'newStock',
+        isVisible: showStockFields,
+        clearWhenHidden: !showStockFields,
+        requiredWhenVisible: showStockFields,
+        enableWhenVisible: true,
+        labelContent: newStockLabel
+    });
+};
+
+const setCreateOrEditProductFieldStates = ({ form, hasInitialStockFields }) => {
 
     setFormReadOnly({
         form,
-        fields: productFields,
+        fields: productDataFields,
+        isReadOnly: false
+    });
+
+    setFormReadOnly({
+        form,
+        fields: stockFields,
+        isReadOnly: false
+    });
+
+    if (!hasInitialStockFields) return;
+
+    setFormReadOnly({
+        form,
+        fields: ['reasonId'],
         isReadOnly: true
+    });
+};
+
+const setStockAdjustmentFieldStates = ({ form }) => {
+
+    setFormReadOnly({
+        form,
+        fields: productDataFields,
+        isReadOnly: true
+    });
+
+    setFormReadOnly({
+        form,
+        fields: stockFields,
+        isReadOnly: false
+    });
+};
+
+const setProductModalFieldStates = ({
+    form,
+    showStockFields,
+    isStockAdjustment,
+    creationContext
+}) => {
+
+    resetProductFormFieldStates(form);
+    setProductModalFieldVisibility({
+        form,
+        showStockFields,
+        isStockAdjustment,
+        creationContext
+    });
+
+    if (isStockAdjustment) {
+        setStockAdjustmentFieldStates({ form });
+        return;
+    }
+
+    setCreateOrEditProductFieldStates({
+        form,
+        hasInitialStockFields: showStockFields
     });
 };
 
@@ -65,35 +155,13 @@ const prepareProductModal = ({
 
     initForm({ form, mode, id: data?.id });
     clearFormErrors(form);
-    resetProductFieldStates(form);
     form.dataset.includeStockAdjustmentOnCreate = showStockFields && !isStockAdjustment ? 'true' : 'false';
     form.dataset.creationContext = creationContext || '';
-    configureStockAdjustmentForm({
+    setProductModalFieldStates({
         form,
-        dataFields: productFields,
-        stockFields,
-        stockSectionSelector,
         showStockFields,
         isStockAdjustment,
-        setDataFieldsReadOnly: false
-    });
-    setFormFieldVisibility({
-        form,
-        fieldName: 'maxUnitCost',
-        isVisible: creationContext !== goodsReceiptCreationContext,
-        clearWhenHidden: true,
-        requiredWhenVisible: true,
-        enableWhenVisible: !isStockAdjustment,
-        labelContent: maxUnitCostLabel
-    });
-    setFormFieldVisibility({
-        form,
-        fieldName: 'newStock',
-        isVisible: showStockFields,
-        clearWhenHidden: !showStockFields,
-        requiredWhenVisible: showStockFields,
-        enableWhenVisible: true,
-        labelContent: newStockLabel
+        creationContext
     });
     initProductFormSelect2({
         modalSelector: productModalId,
@@ -105,7 +173,6 @@ const prepareProductModal = ({
         name: isInitialStockCreation ? initialStockReasonName : null,
         isDisabled: isInitialStockCreation
     });
-    setStockAdjustmentProductFieldsReadOnly({ form, isStockAdjustment });
 
     return { form, modalElement };
 };
