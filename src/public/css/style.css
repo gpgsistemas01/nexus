@@ -1278,6 +1278,7 @@ a:hover {
   -webkit-text-fill-color: var(--form-field-color);
 }
 
+
 .form-outline .form-label {
   color: rgba(var(--mdb-secondary-rgb), 0.78);
 }

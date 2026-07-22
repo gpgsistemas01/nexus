@@ -25,6 +25,16 @@ const setProductValues = ({ form, data = null }) => {
     if (form.elements.isActive) form.elements.isActive.checked = data?.isActive === undefined ? true : Boolean(data.isActive);
 };
 
+const syncProductInputOutlines = (form) => {
+
+    if (!globalThis.mdb?.Input) return;
+
+    form.querySelectorAll('.form-outline').forEach((wrapper) => {
+
+        globalThis.mdb.Input.getOrCreateInstance(wrapper).update();
+    });
+};
+
 const prepareProductModal = ({
     mode,
     data,
@@ -105,6 +115,7 @@ export const openProductModal = ({
     });
 
     setProductValues({ form, data: mode === 'edit' ? data : { name: data?.name, supplier: data?.supplier } });
+    syncProductInputOutlines(form);
 
     if (mode === 'create') {
         modalElement.querySelector('#modalTitle').textContent = 'Registrar producto';
@@ -134,6 +145,7 @@ export const openStockAdjustmentModal = ({
 
     setProductValues({ form, data });
     beforeOpen?.({ form, modalElement });
+    syncProductInputOutlines(form);
 
     modalElement.querySelector('#modalTitle').textContent = title;
     form.querySelector('#submitBtn').textContent = submitText;
