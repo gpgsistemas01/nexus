@@ -9,6 +9,7 @@ import { setupProductSelect, toggleProductOption } from "../domains/product.js";
 import { initProfileSelect, toggleProfileOption } from "../domains/profile.js";
 import { setupSupplierSelect, toggleSupplierOption } from "../domains/supplier.js";
 import { FORM_SELECTORS, MODAL_SELECTORS } from "../../../constants/selectors.js";
+import { normalizeText } from "../../../utils/formatters.js";
 
 const modalSelector = MODAL_SELECTORS.GOODS_RECEIPT;
 const productSelector = FORM_SELECTORS.PRODUCT;
@@ -19,6 +20,7 @@ const productScopedSelector = `${ modalSelector } ${ productSelector }`;
 const receivedByScopedSelector = `${ modalSelector } ${ receivedBySelector }`;
 const presentationDisplayScopedSelector = `${ modalSelector } ${ FORM_SELECTORS.PRESENTATION_DISPLAY }`;
 const supplierChangedEventName = 'goods-receipt:supplier-changed';
+const internalGpgSupplierName = 'GPG INTERNO';
 
 const clearProductSelection = () => {
 
@@ -64,6 +66,12 @@ export const initGoodsReceiptFormSelect2 = () => {
 
             details.length = 0;
 
+            toggleProfileOption({
+                selector: receivedByScopedSelector,
+                id: null,
+                name: null
+            });
+
             refreshProductTable(details);
 
             updateTotals();
@@ -83,10 +91,15 @@ export const initGoodsReceiptFormSelect2 = () => {
         baseSelector: receivedByScopedSelector,
         placeholder: 'Buscar persona que recibe...',
         data: (params) => {
-            
+
+            const selectedSupplierText = document.querySelector(`${ supplierScopedSelector } option:checked`)?.textContent || '';
+
             return {
                 search: params.term,
                 department: 'ALMACÉN Y PROVEDURÍA',
+                ...(normalizeText(selectedSupplierText) === normalizeText(internalGpgSupplierName) && {
+                    role: 'Coordinador'
+                }),
                 strictDepartmentFilter: true
             };
         },
