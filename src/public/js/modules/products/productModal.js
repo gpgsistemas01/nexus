@@ -1,7 +1,7 @@
 import { openModal } from "../../ui/modalUI.js";
 import { initProductFormSelect2, setProductFormSelectOptions, setProductReasonVisualOption } from "../../plugins/select2/modules/productSelect.js";
 import { configureStockAdjustmentForm, shouldShowStockAdjustmentFields } from "../stockAdjustmentForm.js";
-import { clearFormErrors, initForm, setFormFieldVisibility, setFormReadOnly } from "../../ui/formUI.js";
+import { clearFormErrors, initForm, setFormFieldVisibility, setFormReadOnly, updateMdbFormInputs } from "../../ui/formUI.js";
 import { FORM_SELECTORS, MODAL_SELECTORS } from "../../constants/selectors.js";
 
 const productModalId = MODAL_SELECTORS.PRODUCT;
@@ -23,6 +23,8 @@ const setProductValues = ({ form, data = null }) => {
     form.elements.height.value = data?.height || '';
 
     if (form.elements.isActive) form.elements.isActive.checked = data?.isActive === undefined ? true : Boolean(data.isActive);
+
+    updateMdbFormInputs(form);
 };
 
 const prepareProductModal = ({
@@ -130,6 +132,7 @@ export const openProductModal = ({
     form.onSave = onSave;
 
     openModal(modalElement);
+    updateMdbFormInputs(form);
 };
 
 export const openStockAdjustmentModal = ({
@@ -151,4 +154,5 @@ export const openStockAdjustmentModal = ({
     form.onSave = onSave;
 
     openModal(modalElement);
+    updateMdbFormInputs(form);
 };

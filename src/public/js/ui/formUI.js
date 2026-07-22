@@ -54,6 +54,16 @@ export const scrollToFirstFormError = (form) => {
     }
 };
 
+
+export const updateMdbFormInputs = (form) => {
+
+    if (!form || !globalThis.mdb?.Input) return;
+
+    form.querySelectorAll('.form-outline').forEach(wrapper => {
+        globalThis.mdb.Input.getOrCreateInstance(wrapper)?.update();
+    });
+};
+
 export const resetFormSubmitState = (form) => {
 
     if (!form) return;
