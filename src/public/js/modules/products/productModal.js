@@ -52,7 +52,7 @@ const setProductModalFieldVisibility = ({
 
     setFormFieldVisibility({
         form,
-        fieldName: 'maxUnitCost',
+        fieldName: productDataFields,
         isVisible: creationContext !== goodsReceiptCreationContext,
         clearWhenHidden: true,
         requiredWhenVisible: true,
@@ -62,7 +62,7 @@ const setProductModalFieldVisibility = ({
 
     setFormFieldVisibility({
         form,
-        fieldName: 'newStock',
+        fieldName: stockFields,
         isVisible: showStockFields,
         clearWhenHidden: !showStockFields,
         requiredWhenVisible: showStockFields,
@@ -188,7 +188,7 @@ export const openProductModal = ({
     const { form, modalElement } = prepareProductModal({
         mode,
         data,
-        isStockAdjustment: false,
+        isStockAdjustment: mode === 'edit-stock',
         includeStockAdjustmentOnCreate,
         creationContext
     });
