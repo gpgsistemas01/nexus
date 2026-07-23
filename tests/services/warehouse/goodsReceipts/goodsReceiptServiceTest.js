@@ -54,10 +54,6 @@ vi.mock('../../../../src/services/warehouse/products/supplierProductService.js',
   updateProductUnitCostIfHigher: vi.fn()
 }));
 
-vi.mock('../../../../src/services/warehouse/returns/returnHelpers.js', () => ({
-  findReturnedQuantityTotalsByDetailIds: vi.fn(() => new Map())
-}));
-
 const { updateGoodsReceipt } = await import('../../../../src/services/warehouse/goodsReceipts/goodsReceiptService.js');
 
 describe('goodsReceiptService', () => {

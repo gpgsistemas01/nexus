@@ -1,5 +1,5 @@
 import { getSelectedOptionText } from "../../../utils/domUtils.js";
-import { resolveAdvisorDepartmentByClientName, resolveProjectNumberByClientAndDepartment } from "../../../application/warehouse/goodsIssues/goodsIssueRules.js";
+import { isInternalClientName, resolveAdvisorDepartmentByClientName, resolveProjectNumberByClientAndDepartment } from "../../../application/warehouse/goodsIssues/goodsIssueRules.js";
 import { PRODUCT_SELECT_RESULTS_LIMIT } from "../../../application/warehouse/products.js";
 import { bindDisabledSelectDependency } from "../baseSelect.js";
 import { setupClientSelect, toggleClientOption } from "../domains/client.js";
@@ -82,12 +82,20 @@ export const initGoodsIssueFormSelect2 = () => {
         placeholder: 'Buscar asesor...',
         data: (params) => {
 
+            const clientName = getSelectedOptionText(clientScopedSelector);
+
+            const isInternalClient = isInternalClientName(clientName);
+
             return {
                 search: params.term,
-                department: resolveAdvisorDepartmentByClientName({
-                    clientName: getSelectedOptionText(clientScopedSelector)
-                }),
-                strictDepartmentFilter: true
+                ...(isInternalClient
+                    ? { role: 'Coordinador' }
+                    : {
+                        department: resolveAdvisorDepartmentByClientName({
+                            clientName
+                        }),
+                        strictDepartmentFilter: true
+                    })
             };
         },
         allowCreate: false,

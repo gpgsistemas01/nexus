@@ -3,9 +3,11 @@ import { bindDisabledControlWarning } from "../../../ui/disabledControlWarning.j
 import { formatCurrency, formatDecimal } from "../../../utils/formatUtils.js";
 
 const DISABLED_PROJECT_QUANTITY_MESSAGE = 'Marque el detalle como surtido para capturar la cantidad de proyecto.';
-const DISABLED_RETURN_QUANTITY_MESSAGE = 'Marque el detalle para devolución antes de capturar la cantidad devuelta.';
 const GOODS_RECEIPT_DETAIL_STATUS = Object.freeze({
     CANCELED: 'CANCELED'
+});
+const GOODS_RECEIPT_STATUS_LABELS = Object.freeze({
+    CANCELED: 'Cancelada'
 });
 
 const DISABLED_TABLE_INPUT_SELECTOR = 'input[data-disabled-warning], textarea[data-disabled-warning]';
@@ -46,23 +48,37 @@ const resolveDisabledTableInput = (cell, event) => {
     return cell.querySelector(`${ DISABLED_TABLE_INPUT_SELECTOR }:disabled:hover`);
 };
 
-const isReturnMode = (mode) => mode === 'return';
 
-const shouldShowTransactionQuantity = (mode) => !isReturnMode(mode);
+const shouldShowReceiptPurchaseColumns = ({ type }) => type === 'receipt';
 
-const shouldShowReceiptPurchaseColumns = ({ type, mode }) => type === 'receipt' && !isReturnMode(mode);
+const ISSUE_DETAIL_RETURN_MODES = ['edit-detail', 'return'];
+const RECEIPT_DETAIL_ACTION_MODES = ['edit'];
 
 const shouldShowIssueProjectColumns = ({ type, mode, isWarehouse, isCoordinator, isSystem }) => (
     type === 'issue'
     && ((isWarehouse && isCoordinator) || isSystem)
-    && (mode === 'edit-detail' || mode === 'view')
+    && mode === 'edit-detail'
 );
 
 const shouldShowActionsColumn = ({ type, mode }) => {
     if (type === 'receipt') return mode === 'create';
 
-    return !['view', 'edit-detail', 'return'].includes(mode);
+    return !['edit-detail', 'edit-header', 'return'].includes(mode);
 };
+
+
+const shouldShowIssueReturnActions = ({ type, mode }) => type === 'issue' && mode === 'return';
+
+const shouldShowReceiptDetailActions = ({ type, mode }) => (
+    type === 'receipt'
+    && RECEIPT_DETAIL_ACTION_MODES.includes(mode)
+);
+
+const shouldShowDetailActionsHeader = ({ type, mode }) => (
+    shouldShowIssueReturnActions({ type, mode })
+    || shouldShowReceiptDetailActions({ type, mode })
+    || shouldShowActionsColumn({ type, mode })
+);
 
 const isCanceledDetail = (row = {}) => {
     const statusName = row.fulfillmentStatus?.name || row.status?.name || row.status;
@@ -86,16 +102,10 @@ const shouldShowDetailActionButtons = ({ row, mode }) => {
 export const buildDetailsHeader = ({ type, mode, isWarehouse, isCoordinator, isSystem }) => {
 
     let extraHeaders = '';
-    const showReturnColumns = (type === 'issue' || type === 'receipt') && isReturnMode(mode);
-    const suppliedQuantityHeader = type === 'issue' && (mode === 'edit-detail' || mode === 'view')
-        ? '<th rowspan="2">Cantidad surtida</th>'
+    const issueReturnHeaders = type === 'issue' && ISSUE_DETAIL_RETURN_MODES.includes(mode)
+        ? '<th rowspan="2">Cantidad surtida</th><th rowspan="2">Cantidad devuelta</th>'
         : '';
-    const transactionQuantityHeader = shouldShowTransactionQuantity(mode)
-        ? `<th rowspan="2">${ type === 'issue' ? 'Salida' : 'Compra' }</th>`
-        : '';
-    const availableReturnQuantityHeader = showReturnColumns
-        ? '<th rowspan="2">Disponible para devolver</th>'
-        : '';
+    const transactionQuantityHeader = `<th rowspan="2">${ type === 'issue' ? 'Salida' : 'Compra' }</th>`;
 
     if (shouldShowIssueProjectColumns({ type, mode, isWarehouse, isCoordinator, isSystem })) {
         extraHeaders += `
@@ -118,19 +128,7 @@ export const buildDetailsHeader = ({ type, mode, isWarehouse, isCoordinator, isS
         extraHeaders += `<th rowspan="2">Surtir</th>`;
     }
 
-    if (showReturnColumns) {
-        extraHeaders += `
-            <th rowspan="2">Total devuelto</th>
-            <th rowspan="2">Cantidad devuelta registrada</th>
-            <th rowspan="2">Devolver</th>
-        `;
-    }
-
-    if (type === 'receipt' && ['edit', 'view'].includes(mode)) {
-        extraHeaders += `<th rowspan="2">Acciones</th>`;
-    }
-
-    if (shouldShowActionsColumn({ type, mode })) {
+    if (shouldShowDetailActionsHeader({ type, mode })) {
         extraHeaders += `<th rowspan="2">Acciones</th>`;
     }
 
@@ -140,8 +138,7 @@ export const buildDetailsHeader = ({ type, mode, isWarehouse, isCoordinator, isS
                 <th rowspan="2">Material</th>
                 <th colspan="2">Medidas</th>
                 ${ transactionQuantityHeader }
-                ${ suppliedQuantityHeader }
-                ${ availableReturnQuantityHeader }
+                ${ issueReturnHeaders }
                 <th rowspan="2">Presentación</th>
                 <th colspan="2">Conversión</th>
                 ${ extraHeaders }
@@ -164,7 +161,6 @@ export const buildDetailsColumns = ({ type, mode, render, isWarehouse, isCoordin
         resolveControl: resolveDisabledTableInput
     });
 
-    const showReturnColumns = (type === 'issue' || type === 'receipt') && isReturnMode(mode);
     const columns = [
         {
             data: null,
@@ -172,9 +168,11 @@ export const buildDetailsColumns = ({ type, mode, render, isWarehouse, isCoordin
         },
         { data: 'productBase', render: formatDecimal },
         { data: 'productHeight', render: formatDecimal },
-        ...(shouldShowTransactionQuantity(mode) ? [{ data: 'quantity', render: formatDecimal }] : []),
-        ...(type === 'issue' && (mode === 'edit-detail' || mode === 'view') ? [{ data: 'suppliedQuantity', render: formatDecimal }] : []),
-        ...(showReturnColumns ? [{ data: 'availableReturnQuantity', defaultContent: 0, render: formatDecimal }] : []),
+        { data: 'quantity', render: formatDecimal },
+        ...(type === 'issue' && ISSUE_DETAIL_RETURN_MODES.includes(mode) ? [
+            { data: 'suppliedQuantity', render: formatDecimal },
+            { data: 'returnedQuantity', render: formatDecimal }
+        ] : []),
         { data: 'presentationName' },
         { data: 'convertedQuantity', render: formatDecimal },
         { data: 'unitMeasureName' },
@@ -186,8 +184,6 @@ export const buildDetailsColumns = ({ type, mode, render, isWarehouse, isCoordin
             {
                 data: 'projectConvertedQuantity',
                 render: (value, _, row) => {
-
-                    if (mode === 'view') return value ?? '';
 
                     const detailId = row.id || row.productId;
                     const isEditableDetail = mode === 'edit-detail' && !row.originalIsSupplied;
@@ -220,44 +216,6 @@ export const buildDetailsColumns = ({ type, mode, render, isWarehouse, isCoordin
         );
     }
 
-    if (showReturnColumns) {
-        columns.push(
-            { data: 'returnedQuantityTotal', defaultContent: 0, render: formatDecimal },
-            {
-                data: 'returnedQuantity',
-                render: (value, _, row) => {
-                    const detailId = row.id || row.productId;
-                    return `
-                        ${ buildDetailTableInput({
-                            name: 'returnedQuantity',
-                            value,
-                            className: 'return-quantity-input',
-                            detailId,
-                            disabled: !row.isReturned,
-                            disabledWarning: DISABLED_RETURN_QUANTITY_MESSAGE,
-                            min: '0.01',
-                            step: '0.01'
-                        }) }
-                        <div data-error-for="returnedQuantity-${ detailId }" class="invalid-feedback d-none"></div>
-                    `;
-                }
-            },
-            {
-                data: null,
-                render: (_, __, row) => {
-                    const detailId = row.id || row.productId;
-                    return `
-                        <input type="checkbox"
-                            name="isReturned"
-                            class="form-check-input return-checkbox"
-                            data-detail-id="${ detailId }"
-                            ${ row.isReturned ? 'checked' : '' }
-                        >
-                    `;
-                }
-            }
-        );
-    }
 
     if (type === 'issue' && mode === 'edit-detail') {
         columns.push({
@@ -280,7 +238,35 @@ export const buildDetailsColumns = ({ type, mode, render, isWarehouse, isCoordin
         });
     }
 
-    if (type === 'receipt' && ['edit', 'view'].includes(mode)) {
+
+    if (shouldShowIssueReturnActions({ type, mode })) {
+        columns.push({
+            data: null,
+            orderable: false,
+            searchable: false,
+            render: (_, __, row) => {
+                const suppliedQuantity = Number(row.suppliedQuantity ?? 0);
+                const returnedQuantity = Number(row.returnedQuantity ?? 0);
+                const returnableQuantity = suppliedQuantity - returnedQuantity;
+
+                if (!row.id || returnableQuantity <= 0) return '';
+
+                return `${ buildMdbActionButton({
+                    className: 'return-issue-detail-btn',
+                    colorClass: 'btn-warning',
+                    iconClass: 'fa-solid fa-rotate-left',
+                    title: 'Devolver detalle',
+                    ariaLabel: 'Devolver detalle de salida',
+                    htmlAttrs: {
+                        'data-id': row.id,
+                        'data-returnable-quantity': returnableQuantity
+                    }
+                }) }`;
+            }
+        });
+    }
+
+    if (shouldShowReceiptDetailActions({ type, mode })) {
         columns.push({
             data: null,
             title: 'Acciones',
@@ -288,7 +274,9 @@ export const buildDetailsColumns = ({ type, mode, render, isWarehouse, isCoordin
             searchable: false,
             render: (_, __, row) => {
                 const detailId = row.id;
-                const canManageDetail = Boolean(detailId) && row.status !== GOODS_RECEIPT_DETAIL_STATUS.CANCELED;
+                const isCanceledDetail = row.status === GOODS_RECEIPT_DETAIL_STATUS.CANCELED;
+                const isCanceledReceipt = row.goodsReceiptStatusName === GOODS_RECEIPT_STATUS_LABELS.CANCELED;
+                const canManageDetail = Boolean(detailId) && !isCanceledDetail && !isCanceledReceipt;
 
                 if (!canManageDetail) return '';
 

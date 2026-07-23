@@ -1,4 +1,4 @@
-import { findGoodsIssueReportRows, findGoodsReceiptReportRows, findSupplierReportRows, findWarehouseReportRows } from "../../../services/warehouse/reportService.js";
+import { findGoodsIssueReportRows, findGoodsReceiptReportRows, findSupplierReportRows, findWarehouseReportRows, findWasteReportRows } from "../../../services/warehouse/reportService.js";
 import { getDataTableOrder, getDataTableSearch } from "../../../utils/requestQueryUtils.js";
 import { getMexicoMonthDateRange } from "../../../utils/formattersUtils.js";
 import { sendExcelReport } from "../../../utils/reportExcelUtils.js";
@@ -11,6 +11,8 @@ const GOODS_RECEIPT_SHEET_NAME = 'Compras';
 const GOODS_RECEIPT_FILENAME = 'reporte_compras';
 const SUPPLIER_SHEET_NAME = 'Proveedores';
 const SUPPLIER_FILENAME = 'reporte_proveedores';
+const WASTE_SHEET_NAME = 'Mermas';
+const WASTE_FILENAME = 'reporte_mermas';
 const isMonthlyReportRequest = (query = {}) => query.monthlyReport === 'true' || query.monthlyReport === true;
 
 export const exportWarehouseReportExcel = async (req, res) => {
@@ -209,6 +211,56 @@ export const exportGoodsReceiptReportExcel = async (req, res) => {
         data,
         sheetName: GOODS_RECEIPT_SHEET_NAME,
         filename: GOODS_RECEIPT_FILENAME
+    });
+};
+
+
+export const exportWasteReportExcel = async (req, res) => {
+
+    const columns = ['name', 'base', 'height', null, null, null, null, null, null];
+    const { orderBy, orderDir } = getDataTableOrder({
+        query: req.query,
+        columns
+    });
+
+    const rows = await findWasteReportRows({
+        search: getDataTableSearch(req.query),
+        supplierId: req.query.supplierId || null,
+        orderBy,
+        orderDir
+    });
+
+    const data = [
+        [
+            'Proveedor',
+            'Material',
+            'Base de merma',
+            'Altura de merma',
+            'Existencia',
+            'Presentación',
+            'Conversión',
+            'Unidad',
+            'Costo unitario de conversión'
+        ],
+
+        ...rows.map(row => [
+            row.supplier,
+            row.name,
+            row.base,
+            row.height,
+            row.currentStock,
+            row.presentation,
+            row.convertedQuantity,
+            row.unitMeasure,
+            row.maxUnitCost
+        ])
+    ];
+
+    return sendExcelReport({
+        res,
+        data,
+        sheetName: WASTE_SHEET_NAME,
+        filename: WASTE_FILENAME
     });
 };
 

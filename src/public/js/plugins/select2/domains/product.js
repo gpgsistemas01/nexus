@@ -1,6 +1,6 @@
 import { openProductModal } from "../../../modules/products/productModal.js";
 import { getAllProducts, getProductOptions } from "../../../application/warehouse/products.js";
-import { initbaseSelect2, setMdbWrapperInputValue, toggleSelectOption } from "../baseSelect.js";
+import { initDomainSelect2, initFilterSelect2, setMdbWrapperInputValue, toggleSelectOption } from "../baseSelect.js";
 import { mapProductToSelectData } from "../../../utils/productSelectUtils.js";
 import { FORM_SELECTORS, FILTER_SELECTORS } from "../../../constants/selectors.js";
 
@@ -19,14 +19,11 @@ export const initProductFilterSelect = ({
 
     const baseSelector = 'body';
 
-    initbaseSelect2({
-        baseSelector: productSelector,
-        containerSelector: baseSelector,
-        get: async (params) => ({
-            data: await getProductOptions(params)
-        }),
-        clearOnOpen: false,
+    initFilterSelect2({
+        selector: productSelector,
+        getOptions: getProductOptions,
         placeholder: 'Filtrar por producto',
+        selectedId,
         data: (params) => {
 
             let supplierId;
@@ -34,28 +31,33 @@ export const initProductFilterSelect = ({
             if (supplierFilterSelector) supplierId = $(`${ baseSelector } ${ supplierFilterSelector }`).val();
             else supplierId = ''
 
+            const page = Number(params.page) || 1;
+            const length = 20;
+
             return {
                 search: params.term,
-                supplierId
+                supplierId,
+                start: (page - 1) * length,
+                length
             };
         },
-        processResults: (data) => {
+        processResults: (data, params) => {
 
+            const page = Number(params.page) || 1;
             const list = data.data || data;
+            const recordsFiltered = Number(data.recordsFiltered) || list.length;
+            const length = Number(params?.data?.length) || 20;
             
             return {
                 results: list.map(p => ({
                     ...p
-                }))
+                })),
+                pagination: {
+                    more: page * length < recordsFiltered
+                }
             };
         }
     });
-
-    if (!selectedId) return;
-
-    const currentOption = $(`${ productSelector } option[value=\"${ selectedId }\"]`);
-
-    if (currentOption.length) $(productSelector).val(selectedId).trigger('change');
 };
 
 const initProductSelect = ({ 
@@ -64,51 +66,46 @@ const initProductSelect = ({
     baseSelector, 
     allowCreate = true,
     resultsLimit = null
-}) => {
+}) => initDomainSelect2({
+    selector: baseSelector,
+    containerSelector: modalSelector,
+    get: getAllProducts,
+    placeholder: 'Buscar producto...',
+    data: (params) => {
 
-    initbaseSelect2({
-        baseSelector,
-        containerSelector: modalSelector,
-        get: getAllProducts,
-        placeholder: 'Buscar producto...',
-        data: (params) => {
+        let supplierId;
 
-            let supplierId;
+        if (supplierSelector) supplierId = $(`${ modalSelector } ${ supplierSelector }`).val();
+        else supplierId = ''
 
-            if (supplierSelector) supplierId = $(`${ modalSelector } ${ supplierSelector }`).val();
-            else supplierId = ''
+        const page = Number(params.page) || 1;
 
-            return {
-                search: params.term,
-                supplierId,
-                ...(resultsLimit ? { length: resultsLimit } : {})
-            };
-        },
-        processResults: (data) => {
+        return {
+            search: params.term,
+            supplierId,
+            ...(resultsLimit ? {
+                start: (page - 1) * resultsLimit,
+                length: resultsLimit
+            } : {})
+        };
+    },
+    processResults: (data, params) => {
 
-            const list = data.data || data;
+        const page = Number(params.page) || 1;
+        const list = data.data || data;
+        const recordsFiltered = Number(data.recordsFiltered) || list.length;
+        const length = resultsLimit || list.length;
 
-            return {
-                results: list.map(mapProductToSelectData)
-            };
-        },
-        ...(allowCreate && {
-            tags: true,
-            createTag: (params) => {
-
-                const term = params.term.trim();
-
-                if (!term) return null;
-
-                return {
-                    id: `new:${ term }`,
-                    text: `${ term } (Nuevo producto)`,
-                    newTag: true
-                };
+        return {
+            results: list.map(mapProductToSelectData),
+            pagination: {
+                more: Boolean(resultsLimit) && page * length < recordsFiltered
             }
-        })
-    });
-};
+        };
+    },
+    allowCreate,
+    newTagLabel: 'Nuevo producto'
+});
 
 const attachProductHandler = ({ 
     modalSelector,

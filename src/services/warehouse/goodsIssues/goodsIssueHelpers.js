@@ -2,10 +2,10 @@ import { ProductNotFound } from "../../../errors/warehouse/productError.js";
 import { GoodsIssueMissingMaxUnitCost } from "../../../errors/inventory/stockError.js";
 import { buildStockKey, normalizeText } from "../../../utils/formattersUtils.js";
 import { calculateConvertedQuantity } from "../../inventory/stockHelpers.js";
-import { profileBelongsToDepartment } from "../../admin/profileService.js";
+import { profileHasRole } from "../../admin/profileService.js";
 import { findSupplierProductsSnapshot } from "../products/supplierProductService.js";
-import { DEPARTMENT_NAMES } from "../../../constants/departments.js";
 import { FULFILLMENT_STATUS_NAMES } from "../../../constants/warehouseStatuses.js";
+import { ROLE_NAMES } from "../../../constants/roles.js";
 import { INTERNAL_CLIENT_NAME, PROJECT_NUMBER_BY_DEPARTMENT } from "../../../constants/goodsIssueRules.js";
 
 const FLOAT_EPSILON = 0.000001;
@@ -17,9 +17,9 @@ export const isValidInternalClientAdvisor = ({ client, advisor }) => {
 
     if (!isInternalClient(client)) return true;
 
-    return profileBelongsToDepartment({
+    return profileHasRole({
         profile: advisor,
-        departmentName: DEPARTMENT_NAMES.WAREHOUSE_AND_SUPPLY
+        roleName: ROLE_NAMES.COORDINATOR
     });
 };
 
@@ -33,7 +33,8 @@ export const isValidInternalClientProjectNumberByDepartment = ({ client, departm
 };
 
 export const buildGoodsIssueDetails = async ({
-    details
+    details,
+    initialFulfillmentStatusId = null
 }) => {
 
     const pairs = [
@@ -96,10 +97,12 @@ export const buildGoodsIssueDetails = async ({
             presentationName: presentation.name,
             unitMeasureId: unitMeasure.id,
             unitMeasureName: unitMeasure.name,
-            unitMeasureSymbol: unitMeasure.symbol
+            unitMeasureSymbol: unitMeasure.symbol,
+            ...(initialFulfillmentStatusId ? { fulfillmentStatusId: initialFulfillmentStatusId } : {})
         };
     });
 }
+
 
 export const resolveFulfillmentStatus = (details) => {
 

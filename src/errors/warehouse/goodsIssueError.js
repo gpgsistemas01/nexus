@@ -46,7 +46,7 @@ export class GoodsIssueAdvisorProfileNotFound extends AppError {
 export class GoodsIssueInternalClientAdvisorDepartmentConflict extends AppError {
 
     constructor () {
-        super('Para el cliente GPG INTERNO, el asesor debe pertenecer al área de almacén', 'GOODS_ISSUE_INTERNAL_CLIENT_ADVISOR_DEPARTMENT_CONFLICT', 409);
+        super('Para el cliente GPG INTERNO, el asesor debe tener el rol Coordinador', 'GOODS_ISSUE_INTERNAL_CLIENT_ADVISOR_DEPARTMENT_CONFLICT', 409);
     }
 }
 
@@ -70,6 +70,27 @@ export class GoodsIssueSuppliedDetailConflict extends AppError {
 
     constructor () {
         super('No se pueden editar o eliminar detalles que ya fueron surtidos', 'GOODS_ISSUE_SUPPLIED_DETAIL_CONFLICT', 409);
+    }
+}
+
+export class GoodsIssueReturnQuantityConflict extends AppError {
+
+    constructor () {
+        super('La cantidad a devolver no puede exceder la cantidad surtida del detalle', 'GOODS_ISSUE_RETURN_QUANTITY_CONFLICT', 409);
+    }
+}
+
+export class GoodsIssueReturnStatusConflict extends AppError {
+
+    constructor () {
+        super('Solo se pueden registrar devoluciones cuando la salida está surtida', 'GOODS_ISSUE_RETURN_STATUS_CONFLICT', 409);
+    }
+}
+
+export class GoodsIssueReturnDatabaseError extends AppError {
+
+    constructor () {
+        super('Error de base de datos al registrar la devolución de salida', 'GOODS_ISSUE_RETURN_DB_ERROR', 500);
     }
 }
 

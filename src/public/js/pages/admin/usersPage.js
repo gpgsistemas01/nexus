@@ -2,7 +2,7 @@ import { useForm } from '../../application/form.js';
 import { editUser, editUserPassword, registerUser } from '../../application/admin/users.js';
 import { createUserDatatable } from '../../plugins/datatable/userDatatable.js';
 import { initUserFormSelect2, setUserFormSelectOptions } from '../../plugins/select2/modules/userSelect.js';
-import { clearFormErrors, initForm, setFormReadOnly } from '../../ui/formUI.js';
+import { clearFormErrors, initForm, setFormDisabled } from '../../ui/formUI.js';
 import { openModal } from '../../ui/modalUI.js';
 import { handleSubmit, validateFields } from '../../utils/formUtils.js';
 import { userEditValidators, userPasswordValidators, userValidators } from '../../utils/validations/validators.js';
@@ -13,21 +13,21 @@ const userModalId = MODAL_SELECTORS.USER;
 
 const setModeFields = ({ form, mode }) => {
 
-    setFormReadOnly({
+    setFormDisabled({
         form,
-        isReadOnly: false
+        isDisabled: false
     });
 
-    if (mode === 'edit-password') setFormReadOnly({
+    if (mode === 'edit-password') setFormDisabled({
         form,
         fields: ['name', 'departmentId', 'roleId'],
-        isReadOnly: true
+        isDisabled: true
     });
 
-    if (mode === 'edit') setFormReadOnly({
+    if (mode === 'edit') setFormDisabled({
         form,
         fields: ['password'],
-        isReadOnly: true
+        isDisabled: true
     });
 };
 

@@ -89,7 +89,7 @@ export const createDataTable = ({ selector = DATATABLE_SELECTORS.MAIN, options =
                 });
             }
         } : undefined,
-        dom: 'Bfrtip',
+        dom: "<'datatable-toolbar'Bf>rtip",
         language: {
             url: "https://cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json",
             searchPlaceholder: resolvedSearchPlaceholder,
@@ -148,14 +148,33 @@ export const refreshProductTable = (details) => {
     table.draw();
 }
 
-export const renderActionButtons = ({ status, fulfillmentStatus, context, canAdjustStock = false, canDeleteProduct = false, canReturnGoodsIssue = false, canReturnGoodsReceipt = false }) => {
+const DOCUMENT_STATUS_LABELS = Object.freeze({
+    APPROVED: 'Aprobada',
+    CONFIRMED: 'Confirmada',
+    CANCELED: 'Cancelada'
+});
+
+export const renderActionButtons = ({ status, fulfillmentStatus, context, canAdjustStock = false, canDeleteProduct = false }) => {
 
     const actions = [];
-    const canEditGoodsIssue = context === 'goodsIssue' && status === 'Aprobada';
-    const canSupplyGoodsIssue = context === 'goodsIssue' && ['Pendiente', 'Surtido parcial'].includes(fulfillmentStatus);
-    const canReturnGoodsIssueByStatus = context === 'goodsIssue' && ['Surtido parcial', 'Surtido'].includes(fulfillmentStatus);
+    const canEditGoodsIssue = context === 'goodsIssue'
+        && status === DOCUMENT_STATUS_LABELS.APPROVED;
+    const canSupplyGoodsIssue = context === 'goodsIssue'
+        && ['Pendiente', 'Surtido parcial'].includes(fulfillmentStatus);
+    const canReturnGoodsIssue = context === 'goodsIssue'
+        && fulfillmentStatus === 'Surtido';
+    const canEditGoodsReceipt = context === 'goodsReceipt' && status !== DOCUMENT_STATUS_LABELS.CANCELED;
+    const canViewGoodsReceipt = context === 'goodsReceipt' && status === DOCUMENT_STATUS_LABELS.CANCELED;
 
-    if ((status === 'Abierta' || canEditGoodsIssue) || context === 'goodsReceipt' || context === 'profile' || context === 'client' || context === 'supplier') actions.push(buildMdbActionButton({
+    if (canViewGoodsReceipt) actions.push(buildMdbActionButton({
+        className: 'btn-edit',
+        colorClass: 'btn-secondary',
+        iconClass: 'fa-solid fa-eye',
+        title: 'Ver',
+        ariaLabel: 'Ver registro'
+    }));
+
+    if ((status === 'Abierta' || canEditGoodsIssue) || canEditGoodsReceipt || context === 'profile' || context === 'client' || context === 'supplier') actions.push(buildMdbActionButton({
         className: 'btn-edit',
         colorClass: 'btn-primary',
         iconClass: 'fa-solid fa-pencil',
@@ -179,7 +198,7 @@ export const renderActionButtons = ({ status, fulfillmentStatus, context, canAdj
         ariaLabel: 'Eliminar producto'
     }));
 
-    if (status === 'Aprobada' && context === 'goodsIssue' && canSupplyGoodsIssue) actions.push(buildMdbActionButton({
+    if (status === DOCUMENT_STATUS_LABELS.APPROVED && context === 'goodsIssue' && canSupplyGoodsIssue) actions.push(buildMdbActionButton({
         className: 'btn-edit-detail',
         colorClass: 'btn-info',
         iconClass: 'fa fa-edit',
@@ -187,16 +206,13 @@ export const renderActionButtons = ({ status, fulfillmentStatus, context, canAdj
         ariaLabel: 'Surtir detalle'
     }));
 
-    if (
-        (status === 'Aprobada' && canReturnGoodsIssue && canReturnGoodsIssueByStatus)
-        || (status === 'Confirmada' && context === 'goodsReceipt' && canReturnGoodsReceipt)
-    ) actions.push(buildMdbActionButton({
-        className: context === 'goodsReceipt' ? 'btn-return-goods-receipt' : 'btn-return-goods-issue',
+    if (status === DOCUMENT_STATUS_LABELS.APPROVED && context === 'goodsIssue' && canReturnGoodsIssue) actions.push(buildMdbActionButton({
+        className: 'btn-return-detail',
         colorClass: 'btn-warning',
         iconClass: 'fa-solid fa-rotate-left',
-        title: 'Registrar devolución',
-        ariaLabel: 'Registrar devolución',
-        rippleColor: 'dark'
+        title: 'Devolver producto surtido',
+        ariaLabel: 'Devolver producto surtido'
     }));
+
     return actions.join('');
 }

@@ -10,12 +10,14 @@ import { buildExcelButton, buildTableExportParams } from "../../ui/tableUI.js";
 import { formatDateTimeDisplay, formatFileName } from "../../utils/formatters.js";
 import { setupTableFilters } from "./utils/filters/tableFilter.js";
 import { DATATABLE_SELECTORS, MODAL_SELECTORS, FORM_SELECTORS } from "../../constants/selectors.js";
-import { hasPermission } from "../../utils/permissions.js";
 
 export let details = [];
 let filters = {
     getValues: () => ({})
 };
+const GOODS_RECEIPT_STATUS_LABELS = Object.freeze({
+    CANCELED: 'Cancelada'
+});
 const selectorProductTable = DATATABLE_SELECTORS.PRODUCT;
 const selectorTable = DATATABLE_SELECTORS.MAIN;
 const table = document.querySelector(selectorProductTable);
@@ -42,12 +44,9 @@ table.innerHTML = `
     </thead>
 `;
 
-export const createGoodsReceiptDatatable = async (context = window.meta || {}) => {
+export const createGoodsReceiptDatatable = async () => {
 
     let table;
-    const { canManageWarehouseReturns } = hasPermission(context);
-    const canReturnGoodsReceipt = canManageWarehouseReturns();
-
     filters = await setupTableFilters({
         fields: ['date', 'supplier', 'warehouseProfile']
     });
@@ -81,13 +80,13 @@ export const createGoodsReceiptDatatable = async (context = window.meta || {}) =
                     title: 'N° Factura',
                     render: (_, __, row) => row.isInvoiced ? row.invoice : 'Sin factura'
                 },
+                { data: 'status.name', title: 'Estado' },
                 {
                     data: 'id',
                     title: 'Acciones',
                     render: (_, __, row) => renderActionButtons({
                         status: row.status?.name,
-                        context: 'goodsReceipt',
-                        canReturnGoodsReceipt
+                        context: 'goodsReceipt'
                     })
                 }
             ],
@@ -111,14 +110,10 @@ export const createGoodsReceiptDatatable = async (context = window.meta || {}) =
 
         const data = getResponsiveRowData(table, this);
 
-        openGoodsReceiptModal({ mode: 'edit', data });
-    });
-
-    $(`${ selectorTable } tbody`).on('click', '.btn-return-goods-receipt', function() {
-
-        const data = getResponsiveRowData(table, this);
-
-        openGoodsReceiptModal({ mode: 'return', data });
+        openGoodsReceiptModal({
+            mode: data.status?.name === GOODS_RECEIPT_STATUS_LABELS.CANCELED ? 'view' : 'edit',
+            data
+        });
     });
 }
 

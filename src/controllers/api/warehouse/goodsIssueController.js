@@ -5,9 +5,9 @@ import {
     findAllGoodsIssues,
     updateGoodsIssue,
     updateGoodsIssueDetails,
-    updateGoodsIssueHeader
+    updateGoodsIssueHeader,
+    returnGoodsIssueDetail
 } from "../../../services/warehouse/goodsIssues/goodsIssueService.js";
-import { returnGoodsIssueProducts } from "../../../services/warehouse/returns/returnService.js";
 import { getDataTableOrder, getDataTablePaging, getDataTableSearch } from "../../../utils/requestQueryUtils.js";
 import { sanitizeEmptyStrings } from "../../../utils/formattersUtils.js";
 
@@ -112,20 +112,20 @@ export const editGoodsIssueHeader = async (req, res) => {
 };
 
 
-export const returnGoodsIssue = async (req, res) => {
+export const returnGoodsIssueDetailLine = async (req, res) => {
 
-    const goodsIssueDto = createGoodsIssueReturnDto(req.body);
-    const sanitizedGoodsIssueDto = sanitizeEmptyStrings(goodsIssueDto);
+    const returnDto = createGoodsIssueReturnDto(req.body);
+    const sanitizedReturnDto = sanitizeEmptyStrings(returnDto);
 
-    const result = await returnGoodsIssueProducts({
-        goodsIssueDto: sanitizedGoodsIssueDto,
+    const goodsIssueReturn = await returnGoodsIssueDetail({
         id: req.params.id,
+        detailId: req.params.detailId,
+        returnDto: sanitizedReturnDto,
         userId: req.user.id
     });
 
-
     return res.status(200).json({
-        ...result,
+        goodsIssueReturn,
         code: successCodeMessages.UPDATED_GOODS_ISSUE
     });
 };

@@ -13,6 +13,14 @@ const goodsReceiptCreationContext = 'goodsReceipt';
 const isStockMode = (form) => form.dataset.mode === stockMode;
 const includesStockAdjustmentOnCreate = (form) => form.dataset.includeStockAdjustmentOnCreate === 'true';
 const shouldValidateStockFields = (form) => isStockMode(form) || includesStockAdjustmentOnCreate(form);
+const getProductStockValidators = (form) => {
+
+    if (!includesStockAdjustmentOnCreate(form)) return productStockValidators;
+
+    const { reasonId, ...initialStockValidators } = productStockValidators;
+
+    return initialStockValidators;
+};
 const getCreationContext = (form) => form.dataset.creationContext || null;
 const isGoodsReceiptCreation = (form) => getCreationContext(form) === goodsReceiptCreationContext;
 
@@ -52,7 +60,7 @@ useForm({
 
         return {
             ...errors,
-            ...validateFields(productStockValidators, formData)
+            ...validateFields(getProductStockValidators(form), formData)
         };
     },
     sendRequest: async ({ formData, form }) => {

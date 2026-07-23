@@ -64,6 +64,12 @@ export const initGoodsReceiptFormSelect2 = () => {
 
             details.length = 0;
 
+            toggleProfileOption({
+                selector: receivedByScopedSelector,
+                id: null,
+                name: null
+            });
+
             refreshProductTable(details);
 
             updateTotals();
@@ -83,7 +89,7 @@ export const initGoodsReceiptFormSelect2 = () => {
         baseSelector: receivedByScopedSelector,
         placeholder: 'Buscar persona que recibe...',
         data: (params) => {
-            
+
             return {
                 search: params.term,
                 department: 'ALMACÉN Y PROVEDURÍA',

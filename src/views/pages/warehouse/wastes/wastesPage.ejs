@@ -1,4 +1,40 @@
-<% const form = {
+<% const selectedProductSummary = {
+    class: 'row g-2 selected-product-summary',
+    items: [
+        {
+            id: 'selectedProductSupplierValue',
+            label: 'Proveedor',
+            value: '-'
+        },
+        {
+            id: 'selectedProductPresentationValue',
+            label: 'Presentación',
+            value: '-'
+        },
+        {
+            id: 'selectedProductUnitMeasureValue',
+            label: 'Unidad',
+            value: '-'
+        },
+        {
+            id: 'selectedProductBaseValue',
+            label: 'Base del producto',
+            value: '-'
+        },
+        {
+            id: 'selectedProductHeightValue',
+            label: 'Altura del producto',
+            value: '-'
+        },
+        {
+            id: 'selectedProductMaxUnitCostValue',
+            label: 'Costo unitario de conversión',
+            value: '-'
+        }
+    ]
+};
+
+const form = {
     id: 'wasteForm',
     canApprove: false,
     invoice: false,
@@ -15,35 +51,6 @@
                             name: 'supplierProductId',
                             class: 'product-select',
                             col: 'col-12'
-                        }
-                    ]
-                },
-                {
-                    type: 'inputs',
-                    items: [
-                        {
-                            id: 'presentationDisplayInput',
-                            type: 'text',
-                            name: 'presentationDisplay',
-                            label: 'Presentación',
-                            value: '',
-                            attrs: {
-                                disabled: '',
-                                tabindex: '-1'
-                            },
-                            col: '6'
-                        },
-                        {
-                            id: 'unitMeasureDisplayInput',
-                            type: 'text',
-                            name: 'unitMeasureDisplay',
-                            label: 'Unidad',
-                            value: '',
-                            attrs: {
-                                disabled: '',
-                                tabindex: '-1'
-                            },
-                            col: '6'
                         }
                     ]
                 },
@@ -73,6 +80,16 @@
                             col: '6'
                         }
                     ]
+                }
+            ]
+        },
+        {
+            title: 'Datos del producto seleccionado',
+            class: 'selected-product-section',
+            groups: [
+                {
+                    type: 'html',
+                    content: include('../../../shared/totalsSummary', { totals: selectedProductSummary })
                 }
             ]
         },
@@ -118,7 +135,7 @@
             ]
         }
     ]
-} %>
+}; %>
 
 <%- include('../../../shared/tableFilters', {
     selectInputs: [

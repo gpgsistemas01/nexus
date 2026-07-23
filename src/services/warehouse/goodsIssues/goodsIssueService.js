@@ -7,7 +7,11 @@ import {
     GoodsIssueCreateDatabaseError,
     GoodsIssueInternalClientAdvisorDepartmentConflict,
     GoodsIssueInternalClientProjectNumberConflict,
-    GoodsIssueSuppliedConflict
+    GoodsIssueSuppliedConflict,
+    GoodsIssueDetailNotFound,
+    GoodsIssueReturnQuantityConflict,
+    GoodsIssueReturnStatusConflict,
+    GoodsIssueReturnDatabaseError
 } from "../../../errors/warehouse/goodsIssueError.js";
 import { createServiceLogger, getModelLogContext, logServiceError, logServiceInfo } from "../../../utils/logger.js";
 
@@ -18,12 +22,12 @@ import { findProfileById, findProfileWithDepartmentsById } from "../../admin/pro
 import { findDepartmentById } from "../../admin/departmentService.js";
 import { generateYearlyReferenceNumber } from "../../document/referenceNumberService.js";
 import { findClientById } from "../../sales/clientService.js";
+import { findFulfillmentStatusIdByName, findFulfillmentStatusIdsByName } from "../fulfillmentStatusService.js";
 import { buildGoodsIssueDetails, isValidInternalClientAdvisor, isValidInternalClientProjectNumberByDepartment, resolveFulfillmentStatus } from "./goodsIssueHelpers.js";
 import { applyInventoryMovement } from "../../inventory/movementService.js";
 import { normalizeDecimal } from "../../../utils/formattersUtils.js";
 import { isAppError } from "../../../errors/AppError.js";
 import { buildDateRangeFilter } from "../../../utils/requestQueryUtils.js";
-import { findReturnedQuantityTotalsByDetailIds } from "../returns/returnHelpers.js";
 import { ROLE_NAMES } from "../../../constants/roles.js";
 import { DEPARTMENT_NAMES } from "../../../constants/departments.js";
 import { FULFILLMENT_STATUS_NAMES, GOODS_ISSUE_STATUS_NAMES } from "../../../constants/warehouseStatuses.js";
@@ -32,6 +36,14 @@ import { DOCUMENT_REFERENCE_TYPES } from "../../../constants/documentReferenceTy
 
 const FLOAT_EPSILON = 0.000001;
 
+const resolveDetailFulfillmentStatusName = (detail = {}) => {
+
+    if (detail.isSupplied && (detail.suppliedQuantity ?? 0) > FLOAT_EPSILON && (detail.returnedQuantity ?? 0) >= (detail.suppliedQuantity ?? 0) - FLOAT_EPSILON) {
+        return FULFILLMENT_STATUS_NAMES.CANCELED;
+    }
+
+    return detail.isSupplied ? FULFILLMENT_STATUS_NAMES.COMPLETE : FULFILLMENT_STATUS_NAMES.PENDING;
+};
 
 const resolveGoodsIssueHeaderData = async ({ requesterId, advisorId, departmentId, clientId, goodsIssueData }) => {
 
@@ -102,6 +114,7 @@ const GOODS_ISSUE_DETAIL_SELECT = {
     projectConvertedQuantity: true,
     convertedQuantityDifference: true,
     suppliedQuantity: true,
+    returnedQuantity: true,
     isSupplied: true,
     fulfillmentStatus: true,
     supplierId: true,
@@ -177,6 +190,11 @@ export const findAllGoodsIssues = async ({
             status: true,
             fulfillmentStatus: true,
             details: {
+                where: {
+                    fulfillmentStatus: {
+                        is: { name: { not: FULFILLMENT_STATUS_NAMES.CANCELED } }
+                    }
+                },
                 select: GOODS_ISSUE_DETAIL_SELECT
             }
         }
@@ -184,25 +202,6 @@ export const findAllGoodsIssues = async ({
 
     const total = await db.goodsIssue.count({ where });
     const filtered = total;
-
-    const detailIds = [];
-
-    goodsIssues.forEach(issue => {
-        issue.details.forEach(detail => {
-            detailIds.push(detail.id);
-        });
-    });
-    const returnedByDetailId = await findReturnedQuantityTotalsByDetailIds({
-        tx: db,
-        detailIds,
-        detailField: 'goodsIssueDetailId'
-    });
-
-    goodsIssues.forEach(issue => {
-        issue.details.forEach(detail => {
-            detail.returnedQuantityTotal = returnedByDetailId.get(detail.id) ?? 0;
-        });
-    });
 
     return {
         data: goodsIssues,
@@ -225,7 +224,11 @@ export const createGoodsIssue = async ({ goodsIssueDto }) => {
             goodsIssueData
         });
 
-        const processedDetails = await buildGoodsIssueDetails({ details });
+        const pendingFulfillmentStatusId = await findFulfillmentStatusIdByName({ name: FULFILLMENT_STATUS_NAMES.PENDING });
+        const processedDetails = await buildGoodsIssueDetails({
+            details,
+            initialFulfillmentStatusId: pendingFulfillmentStatusId
+        });
 
         const result = await getDb().$transaction(async (tx) => {
 
@@ -323,7 +326,11 @@ export const updateGoodsIssue = async ({ id, goodsIssueDto }) => {
             goodsIssueData
         });
 
-        const processedDetails = await buildGoodsIssueDetails({ details });
+        const pendingFulfillmentStatusId = await findFulfillmentStatusIdByName({ name: FULFILLMENT_STATUS_NAMES.PENDING });
+        const processedDetails = await buildGoodsIssueDetails({
+            details,
+            initialFulfillmentStatusId: pendingFulfillmentStatusId
+        });
 
         const updatedGoodsIssue = await getDb().$transaction(async (tx) => {
 
@@ -332,8 +339,8 @@ export const updateGoodsIssue = async ({ id, goodsIssueDto }) => {
             });
 
             await tx.goodsIssueDetail.createMany({
-                data: processedDetails.map(d => ({
-                    ...d,
+                data: processedDetails.map(detail => ({
+                    ...detail,
                     goodsIssueId: id
                 }))
             });
@@ -403,6 +410,7 @@ export const updateGoodsIssueDetails = async ({ id, goodsIssueDto }) => {
                         supplierId: true,
                         quantity: true,
                         suppliedQuantity: true,
+                        returnedQuantity: true,
                         convertedQuantity: true,
                         projectConvertedQuantity: true,
                         productName: true,
@@ -425,7 +433,7 @@ export const updateGoodsIssueDetails = async ({ id, goodsIssueDto }) => {
         for (const detail of details) {
 
             const current = currentById.get(detail.id);
-            if (!current) continue;
+            if (!current) throw new GoodsIssueDetailNotFound();
 
             const currentQuantity = normalizeDecimal(current.quantity ?? 0);
             const currentSupplied = normalizeDecimal(current.suppliedQuantity ?? 0);
@@ -460,6 +468,8 @@ export const updateGoodsIssueDetails = async ({ id, goodsIssueDto }) => {
 
         return await getDb().$transaction(async (tx) => {
 
+            const statusIdsByName = await findFulfillmentStatusIdsByName({ tx, names: Object.values(FULFILLMENT_STATUS_NAMES) });
+
             if (supplyRequests.length) {
 
                 const detailSupplyMovements = supplyRequests.map(({ current, quantityToSupply }) => ({
@@ -482,12 +492,19 @@ export const updateGoodsIssueDetails = async ({ id, goodsIssueDto }) => {
                         normalizeDecimal(current.suppliedQuantity ?? 0) + quantityToSupply
                     );
 
+                    const isSupplied = newSupplied >= normalizeDecimal(currentQuantity - FLOAT_EPSILON);
+
                     updates.push({
                         id: current.id,
                         data: {
                             ...baseUpdate,
                             suppliedQuantity: newSupplied,
-                            isSupplied: newSupplied >= normalizeDecimal(currentQuantity - FLOAT_EPSILON)
+                            isSupplied,
+                            fulfillmentStatusId: statusIdsByName.get(resolveDetailFulfillmentStatusName({
+                                ...current,
+                                suppliedQuantity: newSupplied,
+                                isSupplied
+                            }))
                         }
                     });
                 }
@@ -505,7 +522,8 @@ export const updateGoodsIssueDetails = async ({ id, goodsIssueDto }) => {
                 select: {
                     isSupplied: true,
                     quantity: true,
-                    suppliedQuantity: true
+                    suppliedQuantity: true,
+                    returnedQuantity: true
                 }
             });
 
@@ -544,6 +562,7 @@ export const updateGoodsIssueDetails = async ({ id, goodsIssueDto }) => {
         throw new GoodsIssueUpdateDatabaseError();
     }
 };
+
 
 export const updateGoodsIssueHeader = async ({ id, goodsIssueDto }) => {
 
@@ -600,5 +619,107 @@ export const updateGoodsIssueHeader = async ({ id, goodsIssueDto }) => {
         if (isAppError(err)) throw err;
 
         throw new GoodsIssueUpdateDatabaseError();
+    }
+};
+
+
+export const returnGoodsIssueDetail = async ({ id, detailId, returnDto, userId }) => {
+
+    const { returnQuantity: requestedReturnQuantityInput, observations = null } = returnDto;
+
+    try {
+        const db = getDb();
+
+        return await db.$transaction(async (tx) => {
+            const statusIdsByName = await findFulfillmentStatusIdsByName({ tx, names: Object.values(FULFILLMENT_STATUS_NAMES) });
+            const detail = await tx.goodsIssueDetail.findFirst({
+                where: { id: detailId, goodsIssueId: id },
+                include: {
+                    goodsIssue: {
+                        include: { fulfillmentStatus: true }
+                    }
+                }
+            });
+
+            if (!detail) throw new GoodsIssueDetailNotFound();
+
+            if (detail.goodsIssue.fulfillmentStatus?.name !== FULFILLMENT_STATUS_NAMES.COMPLETE) {
+                throw new GoodsIssueReturnStatusConflict();
+            }
+
+            const totalSuppliedQuantity = normalizeDecimal(detail.suppliedQuantity ?? 0);
+            const currentTotalReturnedQuantity = normalizeDecimal(detail.returnedQuantity ?? 0);
+            const requestedReturnQuantity = normalizeDecimal(requestedReturnQuantityInput);
+            const newTotalReturnedQuantity = normalizeDecimal(currentTotalReturnedQuantity + requestedReturnQuantity);
+            const availableReturnQuantity = normalizeDecimal(totalSuppliedQuantity - currentTotalReturnedQuantity);
+
+            if (
+                requestedReturnQuantity <= FLOAT_EPSILON ||
+                requestedReturnQuantity > availableReturnQuantity ||
+                newTotalReturnedQuantity > totalSuppliedQuantity
+            ) {
+                throw new GoodsIssueReturnQuantityConflict();
+            }
+
+            const movement = await applyInventoryMovement({
+                tx,
+                reference: { goodsIssueId: id },
+                details: [{
+                    productId: detail.productId,
+                    supplierId: detail.supplierId,
+                    goodsIssueDetailId: detail.id,
+                    quantity: requestedReturnQuantity
+                }],
+                movementType: INVENTORY_MOVEMENT_TYPES.ENTRY
+            });
+
+            const updatedDetail = await tx.goodsIssueDetail.update({
+                where: { id: detail.id },
+                data: {
+                    returnedQuantity: newTotalReturnedQuantity,
+                    fulfillmentStatusId: statusIdsByName.get(resolveDetailFulfillmentStatusName({
+                        ...detail,
+                        returnedQuantity: newTotalReturnedQuantity
+                    }))
+                },
+                select: GOODS_ISSUE_DETAIL_SELECT
+            });
+
+            const goodsIssueReturn = await tx.goodsIssueReturn.create({
+                data: {
+                    goodsIssueId: id,
+                    goodsIssueDetailId: detail.id,
+                    movementDetailId: movement.details[0]?.id || null,
+                    returnedById: userId,
+                    productId: detail.productId,
+                    productName: detail.productName,
+                    supplierId: detail.supplierId,
+                    supplierName: detail.supplierName,
+                    productBase: detail.productBase,
+                    productHeight: detail.productHeight,
+                    currentTotalReturnedQuantity: currentTotalReturnedQuantity,
+                    newTotalReturnedQuantity: newTotalReturnedQuantity,
+                    observations
+                },
+                include: {
+                    movementDetail: true,
+                    returnedBy: true
+                }
+            });
+
+            return {
+                ...goodsIssueReturn,
+                detail: updatedDetail
+            };
+        });
+    } catch (err) {
+        logServiceError(serviceLogger, err, {
+            operation: 'warehouse.goodsIssues.goodsIssueService.returnGoodsIssueDetail',
+            ...getModelLogContext('goodsIssueReturn', { id, detailId, ...returnDto })
+        });
+
+        if (isAppError(err)) throw err;
+
+        throw new GoodsIssueReturnDatabaseError();
     }
 };

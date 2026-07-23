@@ -23,10 +23,6 @@ const validateStockAdjustmentOnCreate = [
         fieldName: 'observations',
         maxLength: 500,
         predicate: requiresInitialStockAdjustmentOnCreate
-    }),
-    validateUUIDWhen({
-        fieldName: 'reasonId',
-        predicate: requiresInitialStockAdjustmentOnCreate
     })
 ];
 

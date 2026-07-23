@@ -33,8 +33,8 @@ export const editGoodsIssueHeaderRequest = ({ data, id }) => apiRequest({
 });
 
 
-export const returnGoodsIssueRequest = ({ data, id }) => apiRequest({
+export const returnGoodsIssueDetailRequest = ({ data, id, detailId }) => apiRequest({
     method: 'patch',
-    url: `${ GOODS_ISSUES_API_ROUTE }/${ id }/returns`,
+    url: `${ GOODS_ISSUES_API_ROUTE }/${ id }/details/${ detailId }/returns`,
     data
 });

@@ -20,9 +20,6 @@ export const errorMessages = {
     CURRENT_STOCK_REQUIRED: 'El stock es requerido.',
     CURRENT_STOCK_INVALID_NUMBER: 'El stock debe ser un número.',
     CURRENT_STOCK_TOO_LONG: 'El stock es demasiado grande.',
-    RETURNED_QUANTITY_REQUIRED: 'La cantidad devuelta es requerida.',
-    RETURNED_QUANTITY_INVALID_NUMBER: 'La cantidad devuelta debe ser un número.',
-    RETURNED_QUANTITY_TOO_LONG: 'La cantidad devuelta es demasiado grande.',
     SUPPLIER_NOT_FOUND: 'Proveedor no encontrado.',
     SUPPLIER_CODE_NOT_FOUND: 'Código del proveedor no encontrado.',
     SUPPLIER_FIND_DB_ERROR: 'Error de base de datos al buscar el proveedor',
@@ -184,9 +181,8 @@ export const errorMessages = {
     GOODS_RECEIPT_CREATE_DB_ERROR: 'Error de base de datos al crear la compra.',
     GOODS_RECEIPT_UPDATE_DB_ERROR: 'Error de base de datos al actualizar la compra.',
     GOODS_RECEIPT_SUPPLIER_CHANGE_CONFLICT: 'No se puede cambiar el proveedor de una compra confirmada porque sus movimientos de inventario ya están asociados al proveedor original.',
-    GOODS_RECEIPT_RETURN_CONFLICT: 'La cantidad devuelta de la compra no es válida.',
     GOODS_RECEIPT_CORRECTION_NO_CHANGES: 'No hay cambios para aplicar en el detalle de la compra.',
-    GOODS_RECEIPT_CORRECTION_QUANTITY_CONFLICT: 'La cantidad corregida debe estar entre cero y la cantidad registrada del detalle.',
+    GOODS_RECEIPT_CORRECTION_QUANTITY_CONFLICT: 'La cantidad corregida debe ser mayor a cero y no exceder la cantidad registrada del detalle.',
     GOODS_RECEIPT_CORRECTION_INSUFFICIENT_STOCK: (meta) => {
 
         const hasDimensions =
@@ -203,24 +199,8 @@ export const errorMessages = {
 
         return `Stock insuficiente para corregir la compra con el producto: ${ meta.productName ?? 'Producto desconocido' }${ dimensions }${ supplier }.`;
     },
+    GOODS_RECEIPT_DETAIL_ALREADY_CANCELED: 'El detalle de la compra ya está cancelado.',
     GOODS_RECEIPT_CORRECTION_REASON_NOT_FOUND: 'Razón de corrección de compra no encontrada.',
-    GOODS_RECEIPT_RETURN_QUANTITY_EXCEEDED: 'La cantidad devuelta excede la cantidad disponible para devolver en la compra.',
-    GOODS_RECEIPT_RETURN_INSUFFICIENT_STOCK: (meta) => {
-
-        const hasDimensions =
-            meta.base != null &&
-            meta.height != null;
-
-        const dimensions = hasDimensions
-            ? ` (${ meta.base } x ${ meta.height })`
-            : '';
-
-        const supplier = meta.supplierName
-            ? ` y proveedor: ${ meta.supplierName }`
-            : '';
-
-        return `Stock insuficiente para devolver la compra con el producto: ${ meta.productName }${ dimensions }${ supplier }.`;
-    },
     PRODUCT_NOT_FOUND: 'Producto no encontrado.',
     PRODUCT_CREATE_DB_ERROR: 'Error de base de datos al crear el producto.',
     PRODUCT_UPDATE_DB_ERROR: 'Error de base de datos al editar el producto.',
@@ -286,7 +266,7 @@ export const errorMessages = {
     GOODS_ISSUE_NOT_PENDING_CONFLICT: 'La salida solo puede editarse cuando está pendiente.',
     GOODS_ISSUE_SUPPLIED_CONFLICT: 'La salida ya tiene productos surtidos y no puede editarse en general.',
     GOODS_ISSUE_SUPPLIED_DETAIL_CONFLICT: 'No se pueden editar o eliminar detalles que ya fueron surtidos.',
-    GOODS_ISSUE_INTERNAL_CLIENT_ADVISOR_DEPARTMENT_CONFLICT: 'Para el cliente GPG INTERNO, el asesor debe pertenecer al área de almacén.',
+    GOODS_ISSUE_INTERNAL_CLIENT_ADVISOR_DEPARTMENT_CONFLICT: 'Para el cliente GPG INTERNO, el asesor debe tener el rol Coordinador.',
     GOODS_ISSUE_INTERNAL_CLIENT_PROJECT_NUMBER_CONFLICT: (meta) => `Para el cliente GPG INTERNO, el número de proyecto ${ meta.projectNumber } no coincide con el área ${ meta.departmentName }.`,
     MOVEMENT_DETAIL_RELATION_CONFLICT: 'El detalle del movimiento no está asociado a un producto o proveedor.',
     PURCHASE_REQUISITION_NOT_FOUND: 'Requisición de compra no encontrada.',

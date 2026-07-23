@@ -1,10 +1,10 @@
 import { useForm } from "../../application/form.js";
-import { editGoodsReceiptHeader, registerGoodsReceipt, cancelGoodsReceiptDetail, returnGoodsReceipt } from "../../application/warehouse/goodsReceipts.js";
-import { validateAddGoodsReceiptProductValidators, validateGoodsIssueReturnValidators, validateGoodsReceiptValidators } from "../../utils/validations/validators.js";
+import { editGoodsReceiptHeader, registerGoodsReceipt, cancelGoodsReceiptDetail } from "../../application/warehouse/goodsReceipts.js";
+import { validateAddGoodsReceiptProductValidators, validateGoodsReceiptValidators } from "../../utils/validations/validators.js";
 import { refreshProductTable } from "../../plugins/datatable/baseDatatable.js";
 import { createGoodsReceiptDatatable, details, initDetailsGoodsReceiptTable } from "../../plugins/datatable/goodsReceiptDatatable.js";
 import { GOODS_RECEIPT_SUPPLIER_CHANGED_EVENT, initGoodsReceiptFormSelect2, setGoodsReceiptFormSelectOptions } from "../../plugins/select2/modules/goodsReceiptSelect.js";
-import { setFormReadOnly, setTotals, updateTotals, toggleButtons, clearAddedProductInput, toggleInvoiceInput, clearFormErrors, normalizeFormErrors, initForm } from "../../ui/formUI.js";
+import { setFormDisabled, setTotals, updateTotals, toggleButtons, clearAddedProductInput, toggleInvoiceInput, clearFormErrors, normalizeFormErrors, initForm } from "../../ui/formUI.js";
 import { on } from "../../utils/domUtils.js";
 import { setDateTimePickerValue } from "../../plugins/flatpickr/dateTimePicker.js";
 import { handleSubmit, hasValidationErrors, toggleContainerElements, toggleDisabledElement, validateFields } from "../../utils/formUtils.js";
@@ -12,12 +12,6 @@ import { buildModalTitle, openModal } from "../../ui/modalUI.js";
 import { FORM_SELECTORS, MODAL_SELECTORS } from "../../constants/selectors.js";
 import { FORM_MODES } from "../../constants/formModes.js";
 import { roundTo } from "../../utils/formatUtils.js";
-import {
-    bindReturnDetailEvents,
-    createReturnFormHandlers,
-    replaceDetailsWithReturnState
-} from "./returns/returnFormHelpers.js";
-import { configureReturnModal } from "./returns/returnModalHelpers.js";
 import { notifications } from "../../plugins/swal/swalComponent.js";
 import { GOODS_RECEIPT_CORRECTION_APPLIED_EVENT, initGoodsReceiptCorrection, openGoodsReceiptCorrectionModal } from "./corrections/correctionModal.js";
 
@@ -29,59 +23,29 @@ const INVOICE_VALUES = Object.freeze({
 });
 const GOODS_RECEIPT_STATUS_LABELS = Object.freeze({
     OPEN: 'Abierta',
-    CONFIRMED: 'Confirmada'
+    CONFIRMED: 'Confirmada',
+    CANCELED: 'Cancelada'
 });
 const GOODS_RECEIPT_DETAIL_STATUS = Object.freeze({
     CANCELED: 'CANCELED'
 });
 const GOODS_RECEIPT_ENTITY_NAME = 'compra';
-const RETURN_SUBMIT_TEXT = 'Devolver';
-const RETURN_READ_ONLY_HEADER_FIELD_NAMES = [
-    'isInvoiced',
-    'invoice',
-    'receivedById',
-    'receptionDate',
-    'observations'
-];
-
-
 createGoodsReceiptDatatable();
-
-const setGoodsReceiptReturnHeaderFieldsReadOnly = ({ form, isReadOnly }) => {
-
-    RETURN_READ_ONLY_HEADER_FIELD_NAMES.forEach(fieldName => {
-        form.querySelectorAll(`[name='${ fieldName }']`).forEach(field => {
-            toggleDisabledElement({
-                element: field,
-                isDisabled: isReadOnly
-            });
-        });
-    });
-};
-
-const returnForm = createReturnFormHandlers({
-    details,
-    validators: validateGoodsIssueReturnValidators,
-    validateFields,
-    returnUpdate: returnGoodsReceipt,
-    emptyMessage: 'Debe seleccionar al menos un material a devolver'
-});
 
 let currentGoodsReceipt = null;
 
 initGoodsReceiptCorrection();
 
-const replaceGoodsReceiptDetails = ({ receipt }) => {
+const replaceGoodsReceiptDetails = ({ receipt, includeCanceledDetails = false }) => {
     const supplierName = receipt.supplierName;
-    replaceDetailsWithReturnState({
-        targetDetails: details,
-        sourceDetails: receipt.details.filter(detail => detail.status !== GOODS_RECEIPT_DETAIL_STATUS.CANCELED),
-        getBaseQuantity: detail => detail.quantity,
-        mapDetail: detail => ({
+    details.length = 0;
+    details.push(...receipt.details
+        .filter(detail => includeCanceledDetails || detail.status !== GOODS_RECEIPT_DETAIL_STATUS.CANCELED)
+        .map(detail => ({
             ...detail,
             supplierName,
-        })
-    });
+            goodsReceiptStatusName: receipt.status?.name
+        })));
 };
 
 document.querySelector(modalId).addEventListener(GOODS_RECEIPT_SUPPLIER_CHANGED_EVENT, () => {
@@ -98,13 +62,12 @@ const normalizeGoodsReceiptData = ({ form, formData }) => {
 
     if (!formData.isInvoiced) delete formData.invoice;
 
-    if (returnForm.isActive(form)) return returnForm.normalizeData({ form });
-
     if (mode === FORM_MODES.EDIT) {
+        const { supplierId, ...editableFormData } = formData;
         const newDetails = details.filter(detail => !detail.id);
 
         return {
-            ...formData,
+            ...editableFormData,
             details: newDetails
         };
     }
@@ -123,11 +86,17 @@ useForm({
         const allowedUsername = /^[a-zA-Z0-9\-]+$/;
         let errors = {};
 
-        errors = validateFields(validateGoodsReceiptValidators, formData);
+        let validators = validateGoodsReceiptValidators;
 
-        if (form.dataset.mode === FORM_MODES.EDIT) errors.details = null;
-        if (returnForm.isActive(form)) return returnForm.getErrors();
+        if (form.dataset.mode === FORM_MODES.EDIT) {
+            const { supplierId, details, ...editableValidators } = validateGoodsReceiptValidators;
+            validators = {
+                ...editableValidators,
+                details: (value) => value.length === 0 ? null : details(value)
+            };
+        }
 
+        errors = validateFields(validators, formData);
         if (formData.isInvoiced) {
 
             if (!formData.invoice) errors.invoice = 'El número de factura es obligatorio';
@@ -149,7 +118,7 @@ useForm({
             form,
             formData,
             create: registerGoodsReceipt,
-            update: returnForm.isActive(form) ? returnGoodsReceipt : editGoodsReceiptHeader
+            update: editGoodsReceiptHeader
         });
     },
 });
@@ -164,11 +133,7 @@ export const openGoodsReceiptModal = ({ mode, data = null }) => {
     initForm({ form, mode, id: data?.id || '' });
     currentGoodsReceipt = data;
     clearFormErrors(form);
-    setFormReadOnly({ form, isReadOnly: false });
-    setGoodsReceiptReturnHeaderFieldsReadOnly({
-        form,
-        isReadOnly: false
-    });
+    setFormDisabled({ form, isDisabled: false });
     toggleDisabledElement({
         element: form.querySelector(FORM_SELECTORS.SUPPLIER),
         isDisabled: false
@@ -186,7 +151,6 @@ export const openGoodsReceiptModal = ({ mode, data = null }) => {
         modalElement.querySelector('#modalTitle').textContent = 'Registrar compra';
         form.querySelector('#submitBtn').textContent = 'Confirmar';
         form.querySelector('#presentationDisplayInput').value = '';
-
         toggleButtons({
             mode,
             status: GOODS_RECEIPT_STATUS_LABELS.OPEN,
@@ -195,12 +159,15 @@ export const openGoodsReceiptModal = ({ mode, data = null }) => {
         });
     }
 
-    if (mode === FORM_MODES.EDIT || mode === FORM_MODES.VIEW || mode === FORM_MODES.RETURN) {
+    if (mode === FORM_MODES.EDIT || mode === FORM_MODES.VIEW) {
 
         value = data.isInvoiced ? INVOICE_VALUES.INVOICE : INVOICE_VALUES.NONE;
         form.elements.observations.value = data.observations || '';
         setDateTimePickerValue(form.elements.receptionDate, data.receptionDate);
-        replaceGoodsReceiptDetails({ receipt: data });
+        replaceGoodsReceiptDetails({
+            receipt: data,
+            includeCanceledDetails: data.status?.name === GOODS_RECEIPT_STATUS_LABELS.CANCELED
+        });
         setTotals({
             quantity: data.totalQuantity,
             net: data.totalNetPurchaseAmount,
@@ -223,35 +190,14 @@ export const openGoodsReceiptModal = ({ mode, data = null }) => {
 
         if (mode === FORM_MODES.VIEW) {
             modalElement.querySelector('#modalTitle').textContent = buildModalTitle({ action: 'Ver', entityName: GOODS_RECEIPT_ENTITY_NAME, referenceNumber: data?.referenceNumber });
-            setFormReadOnly({ form, isReadOnly: true });
-        }
-
-        if (mode === FORM_MODES.RETURN) {
-            configureReturnModal({
-                modalElement,
-                form,
-                buildModalTitle,
-                referenceNumber: data?.referenceNumber,
-                entityName: GOODS_RECEIPT_ENTITY_NAME,
-                action: RETURN_SUBMIT_TEXT,
-                submitText: RETURN_SUBMIT_TEXT,
-                toggleContainerElements,
-                setFormReadOnly,
-                toggleDisabledElement,
-                disabledElement: form.querySelector(FORM_SELECTORS.SUPPLIER)
-            });
-
-            setGoodsReceiptReturnHeaderFieldsReadOnly({
-                form,
-                isReadOnly: true
-            });
+            setFormDisabled({ form, isDisabled: true });
         }
 
         toggleButtons({
             mode,
-            status: GOODS_RECEIPT_STATUS_LABELS.CONFIRMED,
+            status: data.status?.name || GOODS_RECEIPT_STATUS_LABELS.CONFIRMED,
             showActions: false,
-            showAddProduct: mode === FORM_MODES.EDIT
+            showAddProduct: mode === FORM_MODES.EDIT && data.status?.name !== GOODS_RECEIPT_STATUS_LABELS.CANCELED
         });
     }
     
@@ -326,11 +272,6 @@ const addProduct = () => {
 
 on('click', '#addProductBtn', addProduct);
 
-bindReturnDetailEvents({
-    details,
-    selectorPrefix: `${ formId } `
-});
-
 on('click', '#productTable .correct-detail-btn', (event, button) => {
     const detail = details.find(item => item.id === button.dataset.id);
 
@@ -350,7 +291,7 @@ on('click', '#productTable .cancel-receipt-detail-btn', async (event, button) =>
 
     const confirmation = await notifications.showConfirmation({
         title: '¿Cancelar detalle de compra?',
-        text: 'Se marcará el detalle como cancelado, se dejará en cero y se generará el ajuste de inventario correspondiente.',
+        text: 'Se marcará el detalle como cancelado, se descontará de los totales y se generará el ajuste de inventario correspondiente.',
         confirmButtonText: 'Cancelar detalle'
     });
 
@@ -363,11 +304,12 @@ on('click', '#productTable .cancel-receipt-detail-btn', async (event, button) =>
 
     notifications.showSuccess(response.message);
     document.querySelector('#goodsReceiptCorrectionModal').dispatchEvent(new CustomEvent(GOODS_RECEIPT_CORRECTION_APPLIED_EVENT, {
+        bubbles: true,
         detail: response.data
     }));
 });
 
-document.querySelector('#goodsReceiptCorrectionModal').addEventListener(GOODS_RECEIPT_CORRECTION_APPLIED_EVENT, (event) => {
+on(GOODS_RECEIPT_CORRECTION_APPLIED_EVENT, '#goodsReceiptCorrectionModal', (event) => {
     const updatedReceipt = event.detail?.updatedReceipt;
 
     if (!updatedReceipt || !currentGoodsReceipt || updatedReceipt.id !== currentGoodsReceipt.id) return;

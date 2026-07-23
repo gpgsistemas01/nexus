@@ -5,6 +5,7 @@ import { beforeAll, describe, expect, it } from 'vitest';
 
 const hasGeneratedPrismaClient = existsSync(resolve('generated/prisma/client.ts'));
 const describeDb = process.env.DATABASE_TEST_URL && hasGeneratedPrismaClient ? describe : describe.skip;
+const INITIAL_STOCK_REASON_NAME = 'Stock inicial';
 
 const testSuffix = Math.random().toString(36).slice(2, 8);
 const names = {
@@ -160,6 +161,11 @@ describeDb('waste and goods issue database integration', () => {
         update: {},
         create: { name: 'Aprobada' }
       }),
+      prisma.stockAdjustmentReason.upsert({
+        where: { name: INITIAL_STOCK_REASON_NAME },
+        update: {},
+        create: { name: INITIAL_STOCK_REASON_NAME }
+      }),
       prisma.fulfillmentStatus.upsert({
         where: { name: 'Pendiente' },
         update: {},
@@ -181,16 +187,31 @@ describeDb('waste and goods issue database integration', () => {
         base: 1,
         height: 1,
         currentStock: 2,
-        reasonId: reason.id,
         observations: 'Merma integración'
       }
     });
 
     expect(waste).toMatchObject({
       supplierProductId: supplierProduct.id,
+      stockAdjustmentId: expect.any(String),
       name: names.product,
       supplier: expect.objectContaining({ id: supplier.id })
     });
+
+    await expect(prisma.stockAdjustment.findFirst({
+      where: {
+        id: waste.stockAdjustmentId,
+        reason: { name: INITIAL_STOCK_REASON_NAME }
+      },
+      select: { id: true }
+    })).resolves.toEqual({ id: waste.stockAdjustmentId });
+
+    const stockAfterWasteCreation = await prisma.supplierProduct.findUnique({
+      where: { id: supplierProduct.id },
+      select: { currentStock: true, convertedQuantity: true }
+    });
+    expect(stockAfterWasteCreation.currentStock.toNumber()).toBe(8);
+    expect(stockAfterWasteCreation.convertedQuantity.toNumber()).toBe(58);
 
     await expect(services.updateWaste({
       id: waste.id,
@@ -216,6 +237,13 @@ describeDb('waste and goods issue database integration', () => {
       id: waste.id,
       currentStock: expect.anything()
     });
+
+    const updatedWasteStock = await prisma.waste.findUnique({
+      where: { id: waste.id },
+      select: { currentStock: true, convertedQuantity: true }
+    });
+    expect(updatedWasteStock.currentStock.toNumber()).toBe(3);
+    expect(updatedWasteStock.convertedQuantity.toNumber()).toBe(6);
 
     await expect(prisma.waste.findUnique({ where: { id: waste.id }, select: { id: true } })).resolves.toEqual({ id: waste.id });
   });

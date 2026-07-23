@@ -53,7 +53,8 @@ export const wasteStockValidators = {
 
 export const wasteValidators = {
     ...wasteDataValidators,
-    ...wasteStockValidators,
+    currentStock: wasteStockValidators.currentStock,
+    observations: wasteStockValidators.observations,
 }
 
 export const loginValidators = {
@@ -87,7 +88,7 @@ export const validateGoodsReceiptValidators = {
 }
 
 export const validateGoodsReceiptCorrectionValidators = {
-    quantity: (value) => validateNonNegativeNumber(value, 'La cantidad correcta'),
+    quantity: (value) => validatePositiveNumber(value, 'La cantidad correcta'),
     costPerUnitType: (value) => validateNumber(value, 'El costo por presentación correcto', { allowZero: false })
 };
 
@@ -111,46 +112,10 @@ export const validateGoodsIssueDetailValidators = {
     projectConvertedQuantity: (value) => validateNumber(value, 'La cantidad')
 }
 
+
 export const validateGoodsIssueReturnValidators = {
-    returnedQuantity: (value, detail = {}) => {
-        const positiveError = validatePositiveNumber(value, 'La cantidad devuelta');
-        if (positiveError) return positiveError;
-
-        const returnedQuantity = Number(value);
-        const availableQuantity = Number(detail.availableReturnQuantity ?? detail.suppliedQuantity ?? 0);
-
-        if (returnedQuantity > availableQuantity) {
-            return 'La cantidad devuelta no puede ser mayor a la cantidad disponible para devolver';
-        }
-
-        return null;
-    }
-}
-
-
-export const validateReturnDetails = ({
-    details = [],
-    validators,
-    validateFields,
-    emptyMessage
-}) => {
-    const errors = { details: null };
-    const selected = details.filter(detail => detail.isReturned);
-
-    if (!selected.length) return { details: emptyMessage || null };
-
-    selected.forEach((detail) => {
-        const detailErrors = validateFields(validators, {
-            returnedQuantity: detail.returnedQuantity,
-            availableReturnQuantity: detail.availableReturnQuantity
-        });
-
-        if (detailErrors.returnedQuantity) {
-            errors[`returnedQuantity-${ detail.id }`] = detailErrors.returnedQuantity;
-        }
-    });
-
-    return errors;
+    returnQuantity: (value) => validatePositiveNumber(value, 'La cantidad a devolver'),
+    observations: (value) => validateTextOptional(value, 500, 'Las observaciones')
 };
 
 export const validatePurchaseRequisitionValidators = {

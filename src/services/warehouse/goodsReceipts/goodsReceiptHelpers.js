@@ -1,6 +1,7 @@
 import { ProductNotFound } from "../../../errors/warehouse/productError.js";
 import { roundTo } from "../../../utils/formattersUtils.js";
 import { calculateConvertedQuantity } from "../../inventory/stockHelpers.js";
+import { GOODS_RECEIPT_STATUS_NAMES } from "../../../constants/warehouseStatuses.js";
 import { findProductsSnapshot } from "../products/productService.js";
 
 const IVA_RATE = 1.16;
@@ -53,6 +54,8 @@ export const buildGoodsReceiptDetails = async (details, { tx = null } = {}) => {
 
 // Keep totals calculation side-effect free so create/update flows can reuse the same arithmetic.
 export const calculateGoodsReceiptTotals = (details = []) => details.reduce((acc, detail) => {
+    if (detail.status === 'CANCELED') return acc;
+
     acc.totalQuantity += Number(detail.quantity || 0);
     acc.totalNetPurchaseAmount += Number(detail.netPurchaseAmount || 0);
     acc.totalGrossPurchaseAmount += Number(detail.grossPurchaseAmount || 0);
@@ -77,14 +80,26 @@ export const updateGoodsReceiptDetailAndTotals = async ({ tx, goodsReceiptId, de
         select: {
             quantity: true,
             netPurchaseAmount: true,
-            grossPurchaseAmount: true
+            grossPurchaseAmount: true,
+            status: true
         }
     });
     const totals = calculateGoodsReceiptTotals(receiptDetails);
+    const allDetailsCanceled = receiptDetails.length > 0
+        && receiptDetails.every(detail => detail.status === 'CANCELED');
 
     const updatedReceipt = await tx.goodsReceipt.update({
         where: { id: goodsReceiptId },
-        data: totals,
+        data: {
+            ...totals,
+            ...(allDetailsCanceled && {
+                status: {
+                    connect: {
+                        name: GOODS_RECEIPT_STATUS_NAMES.CANCELED
+                    }
+                }
+            })
+        },
         include: {
             details: true
         }

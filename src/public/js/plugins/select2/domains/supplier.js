@@ -1,6 +1,6 @@
 import { openSupplierModal } from "../../../modules/suppliers/supplierModal.js";
 import { getAllSuppliers, getSupplierOptions } from "../../../application/warehouse/suppliers.js";
-import { initbaseSelect2, toggleSelectOption } from "../baseSelect.js";
+import { initDomainSelect2, initFilterSelect2, toggleSelectOption } from "../baseSelect.js";
 import { FILTER_SELECTORS } from "../../../constants/selectors.js";
 
 const supplierSelector = FILTER_SELECTORS.SUPPLIER;
@@ -12,80 +12,29 @@ export const getSupplierSelectApi = () => ({
 
 export const initSupplierFilterSelect = ({
     selectedId = null
-}) => {
-
-    initbaseSelect2({
-        baseSelector: supplierSelector,
-        containerSelector: 'body',
-        get: async (params) => ({
-            data: await getSupplierOptions(params)
-        }),
-        clearOnOpen: false,
-        placeholder: 'Filtrar por proveedor',
-        data: (params) => ({
-            search: params.term
-        }),
-        processResults: (data) => {
-            const list = data.data || data;
-            return {
-                results: list.map(supplier => ({
-                    id: supplier.value,
-                    text: supplier.label
-                }))
-            };
-        }
-    });
-
-    if (!selectedId) {
-
-        $(supplierSelector).val('').trigger('change');
-        return;
-    }
-
-    const currentOption = $(`${ supplierSelector } option[value=\"${ selectedId }\"]`);
-
-    if (currentOption.length) $(supplierSelector).val(selectedId).trigger('change');
-};
+}) => initFilterSelect2({
+    selector: supplierSelector,
+    getOptions: getSupplierOptions,
+    placeholder: 'Filtrar por proveedor',
+    selectedId
+});
 
 const initSupplierSelect = ({ 
     modalSelector, 
     baseSelector, 
     allowCreate = true
-}) => {
-
-    initbaseSelect2({
-        baseSelector,
-        containerSelector: modalSelector,
-        get: getAllSuppliers,
-        placeholder: 'Buscar proveedor...',
-        processResults: (data) => {
-
-            const list = data.data || data;
-
-            return {
-                results: list.map(s => ({
-                    id: s.id,
-                    text: `${ s.tradeName }`,
-                }))
-            };
-        },
-        ...(allowCreate && {
-            tags: true,
-            createTag: (params) => {
-
-                const term = params.term.trim();
-
-                if (!term) return null;
-
-                return {
-                    id: `new:${ term }`,
-                    text: `${ term } (Nuevo proveedor)`,
-                    newTag: true
-                };
-            }
-        })
-    });
-};
+}) => initDomainSelect2({
+    selector: baseSelector,
+    containerSelector: modalSelector,
+    get: getAllSuppliers,
+    placeholder: 'Buscar proveedor...',
+    mapOption: (supplier) => ({
+        id: supplier.id,
+        text: `${ supplier.tradeName }`,
+    }),
+    allowCreate,
+    newTagLabel: 'Nuevo proveedor'
+});
 
 const attachSupplierHandler = ({ supplierSelector }) => {
 

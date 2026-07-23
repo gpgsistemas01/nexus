@@ -110,7 +110,12 @@ describe('warehouse catalog GET services', () => {
     await expect(findGoodsReceiptCorrectionReason()).resolves.toEqual(correctionReason);
 
     expect(stockAdjustmentReasonFindFirst).toHaveBeenCalledWith({
-      where: { name: 'Corrección de compra' },
+      where: {
+        name: {
+          equals: 'Corrección de compra',
+          mode: 'insensitive'
+        }
+      },
       select: { id: true }
     });
   });

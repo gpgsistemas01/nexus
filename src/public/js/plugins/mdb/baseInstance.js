@@ -27,6 +27,7 @@ export const updateMdbWrapperInput = (instance) => {
     instance.update();
 }
 
+
 export const initMdbTooltips = (root = document) => {
 
     if (!root || !globalThis.mdb?.Tooltip) return;

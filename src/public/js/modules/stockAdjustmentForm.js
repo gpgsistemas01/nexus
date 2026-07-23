@@ -1,4 +1,4 @@
-import { setFormReadOnly, toggleFormFields } from "../ui/formUI.js";
+import { setFormDisabled, toggleFormFields } from "../ui/formUI.js";
 
 export const shouldShowStockAdjustmentFields = ({
     mode,
@@ -12,11 +12,13 @@ export const configureStockAdjustmentForm = ({
     stockFields,
     stockSectionSelector = '.stock-data-section',
     showStockFields,
-    isStockAdjustment = false
+    isStockAdjustment = false,
+    setDataFieldsDisabled = true
 }) => {
 
     toggleFormFields({ form, fields: dataFields, isVisible: true });
     toggleFormFields({ form, fields: stockFields, isVisible: showStockFields });
     form.querySelector(stockSectionSelector)?.classList.toggle('d-none', !showStockFields);
-    setFormReadOnly({ form, fields: dataFields, isReadOnly: isStockAdjustment });
+
+    if (setDataFieldsDisabled) setFormDisabled({ form, fields: dataFields, isDisabled: isStockAdjustment });
 };

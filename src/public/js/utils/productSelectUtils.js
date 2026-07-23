@@ -37,6 +37,10 @@ export const mapSupplierProductToSelectData = (supplierProduct = {}) => {
             supplierName: supplierProduct.supplierName
         }),
         presentationName: product.presentation?.name,
-        unitMeasureName: product.unitMeasure?.name
+        unitMeasureName: product.unitMeasure?.name,
+        supplierName: supplierProduct.supplierName || supplierProduct.supplier?.tradeName || product.supplier?.tradeName,
+        productBase: supplierProduct.productBase ?? product.base ?? supplierProduct.base,
+        productHeight: supplierProduct.productHeight ?? product.height ?? supplierProduct.height,
+        maxUnitCost: supplierProduct.maxUnitCost ?? product.maxUnitCost
     };
 };

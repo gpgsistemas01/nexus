@@ -3,7 +3,7 @@ import { cancelPurchaseRequisition, confirmPurchaseRequisition, editPurchaseRequ
 import { refreshProductTable } from "../../plugins/datatable/baseDatatable.js";
 import { createPurchaseRequisitionDatatable, details, initDetailsPurchaseRequisitionTable } from "../../plugins/datatable/purchaseRequisitionDatatable.js";
 import { initPurchaseRequisitionFormSelect2 } from "../../plugins/select2/modules/purchaseRequisitionSelect.js";
-import { setFormReadOnly, toggleButtons, clearFormErrors, normalizeFormErrors, clearAddedProductInput, initForm } from "../../ui/formUI.js";
+import { setFormDisabled, toggleButtons, clearFormErrors, normalizeFormErrors, clearAddedProductInput, initForm } from "../../ui/formUI.js";
 import { openModal } from "../../ui/modalUI.js";
 import { on } from "../../utils/domUtils.js";
 import { setDateTimePickerValue } from "../../plugins/flatpickr/dateTimePicker.js";
@@ -53,7 +53,7 @@ export const openPurchaseRequisitionModal = async ({ mode, data = null }) => {
     initForm(form, data?.id || '');
     clearFormErrors(form);
     toggleButtons({ mode, status: data?.status?.name });
-    setFormReadOnly({ form, isReadOnly: false });
+    setFormDisabled({ form, isDisabled: false });
 
     details.length = 0;
 
@@ -92,7 +92,7 @@ export const openPurchaseRequisitionModal = async ({ mode, data = null }) => {
 
             modalElement.querySelector('#modalTitle').textContent = 'Ver requisición';
 
-            setFormReadOnly({ form, isReadOnly: true });
+            setFormDisabled({ form, isDisabled: true });
         }
     }
 

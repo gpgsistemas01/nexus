@@ -1,5 +1,5 @@
 import { getAllProfiles, getProfileOptions } from "../../../application/admin/profiles.js";
-import { initbaseSelect2, toggleSelectOption } from "../baseSelect.js";
+import { initDomainSelect2, initFilterSelect2, toggleSelectOption } from "../baseSelect.js";
 import { FILTER_SELECTORS } from "../../../constants/selectors.js";
 import { getSelectedDepartmentName } from "./department.js";
 
@@ -14,53 +14,28 @@ export const initProfileFilterSelect = ({
     selectedId = null,
     departmentFilterSelector = FILTER_SELECTORS.DEPARTMENT,
     data: resolveData = null
-} = {}) => {
+} = {}) => initFilterSelect2({
+    selector: profileFilterSelector,
+    getOptions: getProfileOptions,
+    placeholder: 'Filtrar por perfil',
+    selectedId,
+    data: (params) => {
 
-    initbaseSelect2({
-        baseSelector: profileFilterSelector,
-        containerSelector: 'body',
-        get: async (params) => ({
-            data: await getProfileOptions(params)
-        }),
-        clearOnOpen: false,
-        placeholder: 'Filtrar por perfil',
-        data: (params) => {
+        if (typeof resolveData === 'function') return resolveData(params);
 
-            if (typeof resolveData === 'function') return resolveData(params);
+        const departmentName = departmentFilterSelector
+            ? getSelectedDepartmentName(departmentFilterSelector)
+            : '';
 
-            const departmentName = departmentFilterSelector
-                ? getSelectedDepartmentName(departmentFilterSelector)
-                : '';
-
-            return {
-                search: params.term,
-                ...(departmentName && {
-                    department: departmentName,
-                    strictDepartmentFilter: true
-                })
-            };
-        },
-        processResults: (data) => {
-            const list = data.data || data;
-            return {
-                results: list.map(profile => ({
-                    id: profile.value,
-                    text: profile.label
-                }))
-            };
-        }
-    });
-
-    if (!selectedId) {
-
-        $(profileFilterSelector).val('').trigger('change');
-        return;
+        return {
+            search: params.term,
+            ...(departmentName && {
+                department: departmentName,
+                strictDepartmentFilter: true
+            })
+        };
     }
-
-    const currentOption = $(`${ profileFilterSelector } option[value=\"${ selectedId }\"]`);
-
-    if (currentOption.length) $(profileFilterSelector).val(selectedId).trigger('change');
-};
+});
 
 export const initProfileSelect = ({ 
     modalSelector, 
@@ -69,43 +44,20 @@ export const initProfileSelect = ({
     clearOnOpen = true,
     data, 
     allowCreate = true 
-}) => {
-
-    initbaseSelect2({
-        baseSelector,
-        containerSelector: modalSelector,
-        get: getAllProfiles,
-        clearOnOpen,
-        data,
-        placeholder,
-        processResults: (data) => {
-
-            const list = data.data || data;
-
-            return {
-                results: list.map(p => ({
-                    id: p.id,
-                    text: p.fullName
-                }))
-            };
-        },
-        ...(allowCreate && {
-            tags: true,
-            createTag: (params) => {
-
-                const term = params.term.trim();
-
-                if (!term) return null;
-
-                return {
-                    id: `new:${ term }`,
-                    text: `${ term } (Nuevo perfil)`,
-                    newTag: true
-                };
-            }
-        })
-    });
-};
+}) => initDomainSelect2({
+    selector: baseSelector,
+    containerSelector: modalSelector,
+    get: getAllProfiles,
+    clearOnOpen,
+    data,
+    placeholder,
+    mapOption: (profile) => ({
+        id: profile.id,
+        text: profile.fullName
+    }),
+    allowCreate,
+    newTagLabel: 'Nuevo perfil'
+});
 
 export const toggleProfileOption = ({ 
     selector, 

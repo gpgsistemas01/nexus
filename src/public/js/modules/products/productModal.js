@@ -1,17 +1,18 @@
 import { openModal } from "../../ui/modalUI.js";
-import { initProductFormSelect2, setProductFormSelectOptions } from "../../plugins/select2/modules/productSelect.js";
+import { initProductFormSelect2, setProductFormSelectOptions, setProductReasonVisualOption } from "../../plugins/select2/modules/productSelect.js";
 import { configureStockAdjustmentForm, shouldShowStockAdjustmentFields } from "../stockAdjustmentForm.js";
-import { clearFormErrors, initForm, setFormFieldVisibility } from "../../ui/formUI.js";
+import { clearFormErrors, initForm, setFormFieldVisibility, setFormDisabled } from "../../ui/formUI.js";
 import { FORM_SELECTORS, MODAL_SELECTORS } from "../../constants/selectors.js";
 
 const productModalId = MODAL_SELECTORS.PRODUCT;
 const formId = FORM_SELECTORS.PRODUCT_FORM;
-const productFields = ['name', 'minStock', 'maxUnitCost', 'base', 'height', 'supplierId', 'presentationId', 'unitMeasureId', 'isActive'];
+const productDataFields = ['name', 'minStock', 'maxUnitCost', 'base', 'height', 'supplierId', 'presentationId', 'unitMeasureId', 'isActive'];
 const stockFields = ['newStock', 'reasonId', 'observations'];
 const stockSectionSelector = '.stock-data-section';
 const goodsReceiptCreationContext = 'goodsReceipt';
 const maxUnitCostLabel = 'Costo Máximo';
 const newStockLabel = 'Nueva cantidad';
+const initialStockReasonName = 'Stock inicial';
 
 const setProductValues = ({ form, data = null }) => {
 
@@ -22,6 +23,116 @@ const setProductValues = ({ form, data = null }) => {
     form.elements.height.value = data?.height || '';
 
     if (form.elements.isActive) form.elements.isActive.checked = data?.isActive === undefined ? true : Boolean(data.isActive);
+};
+
+const resetProductFormFieldStates = (form) => {
+
+    setFormDisabled({
+        form,
+        isDisabled: false
+    });
+};
+
+const setProductModalFieldVisibility = ({
+    form,
+    showStockFields,
+    isStockAdjustment,
+    creationContext
+}) => {
+
+    configureStockAdjustmentForm({
+        form,
+        dataFields: productDataFields,
+        stockFields,
+        stockSectionSelector,
+        showStockFields,
+        isStockAdjustment,
+        setDataFieldsDisabled: false
+    });
+
+    setFormFieldVisibility({
+        form,
+        fieldName: productDataFields,
+        isVisible: creationContext !== goodsReceiptCreationContext,
+        clearWhenHidden: true,
+        requiredWhenVisible: true,
+        enableWhenVisible: true,
+        labelContent: maxUnitCostLabel
+    });
+
+    setFormFieldVisibility({
+        form,
+        fieldName: stockFields,
+        isVisible: showStockFields,
+        clearWhenHidden: !showStockFields,
+        requiredWhenVisible: showStockFields,
+        enableWhenVisible: true,
+        labelContent: newStockLabel
+    });
+};
+
+const setCreateOrEditProductFieldStates = ({ form, hasInitialStockFields }) => {
+
+    setFormDisabled({
+        form,
+        fields: productDataFields,
+        isDisabled: false
+    });
+
+    setFormDisabled({
+        form,
+        fields: stockFields,
+        isDisabled: false
+    });
+
+    if (!hasInitialStockFields) return;
+
+    setFormDisabled({
+        form,
+        fields: ['reasonId'],
+        isDisabled: true
+    });
+};
+
+const setStockAdjustmentFieldStates = ({ form }) => {
+
+    setFormDisabled({
+        form,
+        fields: productDataFields,
+        isDisabled: true
+    });
+
+    setFormDisabled({
+        form,
+        fields: stockFields,
+        isDisabled: false
+    });
+};
+
+const setProductModalFieldStates = ({
+    form,
+    showStockFields,
+    isStockAdjustment,
+    creationContext
+}) => {
+
+    resetProductFormFieldStates(form);
+    setProductModalFieldVisibility({
+        form,
+        showStockFields,
+        isStockAdjustment,
+        creationContext
+    });
+
+    if (isStockAdjustment) {
+        setStockAdjustmentFieldStates({ form });
+        return;
+    }
+
+    setCreateOrEditProductFieldStates({
+        form,
+        hasInitialStockFields: showStockFields
+    });
 };
 
 const prepareProductModal = ({
@@ -40,40 +151,28 @@ const prepareProductModal = ({
         includeStockAdjustmentOnCreate,
         isStockAdjustment
     });
+    const isInitialStockCreation = showStockFields && mode === 'create' && !isStockAdjustment;
 
     initForm({ form, mode, id: data?.id });
     clearFormErrors(form);
     form.dataset.includeStockAdjustmentOnCreate = showStockFields && !isStockAdjustment ? 'true' : 'false';
     form.dataset.creationContext = creationContext || '';
-    configureStockAdjustmentForm({
+    setProductModalFieldStates({
         form,
-        dataFields: productFields,
-        stockFields,
-        stockSectionSelector,
         showStockFields,
-        isStockAdjustment
+        isStockAdjustment,
+        creationContext
     });
-    setFormFieldVisibility({
-        form,
-        fieldName: 'maxUnitCost',
-        isVisible: creationContext !== goodsReceiptCreationContext,
-        clearWhenHidden: true,
-        requiredWhenVisible: true,
-        enableWhenVisible: !isStockAdjustment,
-        labelContent: maxUnitCostLabel
+    initProductFormSelect2({
+        modalSelector: productModalId,
+        isStockAdjustment: showStockFields
     });
-    setFormFieldVisibility({
-        form,
-        fieldName: 'newStock',
-        isVisible: showStockFields,
-        clearWhenHidden: !showStockFields,
-        requiredWhenVisible: showStockFields,
-        enableWhenVisible: true,
-        labelContent: newStockLabel
-    });
-
-    initProductFormSelect2({ modalSelector: productModalId, isStockAdjustment: showStockFields });
     setProductFormSelectOptions({ modalSelector: productModalId, data, isStockAdjustment: showStockFields });
+    setProductReasonVisualOption({
+        modalSelector: productModalId,
+        name: isInitialStockCreation ? initialStockReasonName : null,
+        isDisabled: isInitialStockCreation
+    });
 
     return { form, modalElement };
 };
@@ -89,13 +188,12 @@ export const openProductModal = ({
     const { form, modalElement } = prepareProductModal({
         mode,
         data,
-        isStockAdjustment: false,
+        isStockAdjustment: mode === 'edit-stock',
         includeStockAdjustmentOnCreate,
         creationContext
     });
 
     setProductValues({ form, data: mode === 'edit' ? data : { name: data?.name, supplier: data?.supplier } });
-
     if (mode === 'create') {
         modalElement.querySelector('#modalTitle').textContent = 'Registrar producto';
         form.querySelector('#submitBtn').textContent = 'Guardar';
@@ -124,7 +222,6 @@ export const openStockAdjustmentModal = ({
 
     setProductValues({ form, data });
     beforeOpen?.({ form, modalElement });
-
     modalElement.querySelector('#modalTitle').textContent = title;
     form.querySelector('#submitBtn').textContent = submitText;
 

@@ -1,6 +1,7 @@
 import { initMdbModal } from "../../../plugins/mdb/baseInstance.js";
 import { clearFormErrors } from "../../../ui/formUI.js";
 import { formatCurrency, formatDecimal, roundTo } from "../../../utils/formatUtils.js";
+import { on } from "../../../utils/domUtils.js";
 import { GOODS_RECEIPT_CORRECTION_APPLIED_EVENT, initGoodsReceiptCorrectionForm } from "./correctionForm.js";
 
 export { GOODS_RECEIPT_CORRECTION_APPLIED_EVENT };
@@ -82,11 +83,6 @@ export const openGoodsReceiptCorrectionModal = ({ receipt, detail }) => {
 export const initGoodsReceiptCorrection = () => {
     initGoodsReceiptCorrectionForm();
 
-    document.addEventListener('input', (event) => {
-        if (event.target.closest(CORRECTION_FORM_SELECTOR)) updateCorrectionTotalsSummary();
-    });
-
-    document.addEventListener('change', (event) => {
-        if (event.target.closest(CORRECTION_FORM_SELECTOR)) updateCorrectionTotalsSummary();
-    });
+    on('input', CORRECTION_FORM_SELECTOR, updateCorrectionTotalsSummary);
+    on('change', CORRECTION_FORM_SELECTOR, updateCorrectionTotalsSummary);
 };

@@ -4,44 +4,18 @@ import { setupTableFilters } from "./utils/filters/tableFilter.js";
 import { notifications } from "../swal/swalComponent.js";
 import { hasPermission } from "../../utils/permissions.js";
 import { deleteProduct, getAllProducts } from "../../application/warehouse/products.js";
-import { renderMaterialName } from "./utils/renderProductDatatable.js";
 import { configureResponsiveHeaderGroups, getResponsiveRowData } from "./utils/responsive.js";
 import { buildExcelButton, buildTableExportParams } from "../../ui/tableUI.js";
 import { exportWarehouseReport } from "../../application/warehouse/report.js";
 import { formatFileName } from "../../utils/formatters.js";
-import { formatCurrency, formatDecimal } from "../../utils/formatUtils.js";
 import { DATATABLE_SELECTORS } from "../../constants/selectors.js";
+import { buildWarehouseInventoryColumns, renderWarehouseInventoryHeader } from "./utils/warehouseInventoryDatatable.js";
 import { handleApiError } from "../../api/errorHandler.js";
 
 const selectorTable = DATATABLE_SELECTORS.MAIN;
+const tableElement = document.querySelector(selectorTable);
 let lastLowStockNotification = '';
 let stockSocketConfigured = false;
-
-const tableElement = document.querySelector(selectorTable);
-
-const renderProductTableHeader = ({ canSeeCost, canManageProducts }) => {
-
-    tableElement.innerHTML = `
-        <thead>
-            <tr>
-                <th rowspan="2">Material</th>
-                <th colspan="2" data-responsive-group="measures">Medidas</th>
-                <th rowspan="2">Compra</th>
-                <th rowspan="2">Stock Mínimo</th>
-                <th rowspan="2">Presentación</th>
-                <th colspan="2" data-responsive-group="conversion">Conversión</th>
-                ${ canSeeCost ? '<th rowspan="2">Costo Unitario</th>' : '' }
-                ${ canManageProducts ? '<th rowspan="2">Acciones</th>' : '' }
-            </tr>
-            <tr>
-                <th data-responsive-parent="measures">Base</th>
-                <th data-responsive-parent="measures">Altura</th>
-                <th data-responsive-parent="conversion">Cantidad</th>
-                <th data-responsive-parent="conversion">Unidad</th>
-            </tr>
-        </thead>
-    `;
-};
 
 const configureStockRealtime = (table) => {
 
@@ -61,46 +35,32 @@ export const createProductDatatable = async (context) => {
     const canSeeCost = isWarehouse || isSystem || isSales;
     const canManageProducts = isAdmin || isWarehouseProductManager;
     const canDeleteProducts = isSystem || isWarehouse;
-    const canCreateProductsFromModule = isSystem && isAdmin;
     const canAdjustStock = isSystem && isAdmin;
+    const canCreateProductsFromModule = canAdjustStock || isWarehouseProductManager;
 
-    renderProductTableHeader({ canSeeCost, canManageProducts });
+    renderWarehouseInventoryHeader({
+        tableElement,
+        canSeeCost,
+        canManageItems: canManageProducts,
+        stockTitle: 'Compra',
+        costTitle: 'Costo Unitario'
+    });
 
     const filters = await setupTableFilters({
         fields: ['supplier']
     });
 
-    const columns = [
-        { 
-            data: null, 
-            title: 'Material',
-            render: (data, type, row) => renderMaterialName(row)
-        },
-        { data: 'base', render: formatDecimal, title: 'Base' },
-        { data: 'height', render: formatDecimal, title: 'Altura' },
-        { data: 'currentStock', render: formatDecimal, title: 'Existencia' },
-        { data: 'minStock', render: formatDecimal, title: 'Stock Mínimo' },
-        { data: 'presentation.name', title: 'Presentación' },
-        { data: 'convertedQuantity', render: formatDecimal, title: 'Cantidad' },
-        { data: 'unitMeasure.name', title: 'Unidad' }
-    ];
-
-    if (canSeeCost) {
-        columns.push({ data: 'maxUnitCost', title: 'Costo Unitario de Conversión', render: formatCurrency });
-    }
-
-    if (canManageProducts) {
-        columns.push({
-            data: null,
-            title: 'Acciones',
-            render: () => renderActionButtons({
-                status: 'Abierta',
-                context: 'product',
-                canAdjustStock,
-                canDeleteProduct: canDeleteProducts
-            })
-        });
-    }
+    const columns = buildWarehouseInventoryColumns({
+        canSeeCost,
+        canManageItems: canManageProducts,
+        costTitle: 'Costo Unitario de Conversión',
+        renderActions: () => renderActionButtons({
+            status: 'Abierta',
+            context: 'product',
+            canAdjustStock,
+            canDeleteProduct: canDeleteProducts
+        })
+    });
 
     const table = createDataTable({
         options: {
@@ -148,7 +108,7 @@ export const createProductDatatable = async (context) => {
                     text: 'Nuevo producto',
                     action: () => openProductModal({
                         mode: 'create',
-                        includeStockAdjustmentOnCreate: true
+                        includeStockAdjustmentOnCreate: canAdjustStock
                     })
                 }] : []),
                 buildExcelButton({

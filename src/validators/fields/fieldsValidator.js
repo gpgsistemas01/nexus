@@ -345,50 +345,6 @@ export const validateGoodsIssueDetailsEdition =
 ;
 
 
-export const validateGoodsIssueReturns =
-    body('details')
-        .isArray({ min: 1 }).withMessage(errorMap['details'].REQUIRED)
-        .custom((details) => {
-
-            const errors = {};
-            let selectedCount = 0;
-
-            details.forEach((detail) => {
-
-                const detailId = detail?.id;
-
-                if (!detailId || !uuidV4Regex.test(detailId)) {
-                    errors[detailId || 'details'] = { id: errorMap['details'].INVALID_FORMAT_ID };
-                    return;
-                }
-
-                const isReturned = typeof detail?.isReturned === 'string'
-                    ? detail.isReturned.toLowerCase() === 'true'
-                    : Boolean(detail?.isReturned);
-
-                if (!isReturned) return;
-
-                selectedCount += 1;
-                const returnedQuantity = Number(detail?.returnedQuantity);
-
-                if (!Number.isFinite(returnedQuantity) || returnedQuantity <= 0) {
-                    if (!errors[detailId]) errors[detailId] = {};
-                    errors[detailId].returnedQuantity = errorMap['returnedQuantity'].INVALID_NUMBER;
-                }
-            });
-
-            if (!selectedCount) {
-                errors.details = { isReturned: errorMap['details'].REQUIRED };
-            }
-
-            if (Object.keys(errors).length) {
-                throw new Error(JSON.stringify(errors));
-            }
-
-            return true;
-        })
-;
-
 export const validateArrayOfUUIDs = ({ fieldName }) =>
     body(fieldName)
         .isArray({ min: 1 }).withMessage(errorMap[fieldName].REQUIRED)

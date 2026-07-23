@@ -1,39 +1,35 @@
 import { useForm } from "../../application/form.js";
-import { editGoodsIssue, editGoodsIssueDetails, editGoodsIssueHeader, registerGoodsIssue, returnGoodsIssue } from "../../application/warehouse/goodsIssues/goodsIssues.js";
-import { validateAddGoodsIssueProductValidators, validateGoodsIssueDetailValidators, validateGoodsIssueReturnValidators, validateGoodsIssueValidators } from "../../utils/validations/validators.js";
+import { editGoodsIssue, editGoodsIssueDetails, editGoodsIssueHeader, registerGoodsIssue } from "../../application/warehouse/goodsIssues/goodsIssues.js";
+import { validateAddGoodsIssueProductValidators, validateGoodsIssueDetailValidators, validateGoodsIssueValidators } from "../../utils/validations/validators.js";
 import { refreshProductTable } from "../../plugins/datatable/baseDatatable.js";
 import { createGoodsIssueDatatable, details, initDetailsGoodsIssueTable } from "../../plugins/datatable/goodsIssueDatatable.js";
 import { initGoodsIssueFormSelect2, setGoodsIssueFormSelectOptions, syncGoodsIssueDependentSelectsState } from "../../plugins/select2/modules/goodsIssueSelect.js";
-import { setFormReadOnly, toggleButtons, clearAddedProductInput, clearFormErrors, normalizeFormErrors, initForm } from "../../ui/formUI.js";
+import { setFormDisabled, toggleButtons, clearAddedProductInput, clearFormErrors, normalizeFormErrors, initForm } from "../../ui/formUI.js";
 import { on } from "../../utils/domUtils.js";
 import { setDateTimePickerValue } from "../../plugins/flatpickr/dateTimePicker.js";
-import { handleSubmit, hasValidationErrors, syncCheckboxControlledInputs, toggleContainerElements, toggleDisabledElement, validateDetailsFields, validateFields } from "../../utils/formUtils.js";
+import { handleSubmit, hasValidationErrors, syncCheckboxControlledInputs, toggleDisabledElement, validateDetailsFields, validateFields } from "../../utils/formUtils.js";
 import { buildModalTitle, openModal } from "../../ui/modalUI.js";
 import { hasPermission } from "../../utils/permissions.js";
 import { FORM_SELECTORS, MODAL_SELECTORS } from "../../constants/selectors.js";
 import { FORM_MODES } from "../../constants/formModes.js";
 import { FULFILLMENT_STATUS_NAMES } from "../../constants/fulfillmentStatuses.js";
 import { formatDecimal, roundTo } from "../../utils/formatUtils.js";
-import {
-    bindReturnDetailEvents,
-    buildReturnDetailState,
-    createReturnFormHandlers
-} from "./returns/returnFormHelpers.js";
-import { configureReturnModal } from "./returns/returnModalHelpers.js";
+import { initGoodsIssueReturnModal, openGoodsIssueReturnModal } from "./goodsIssues/returnModal.js";
 
 const HEADER_FIELD_NAMES = ['clientId', 'advisorId', 'departmentId', 'requesterId', 'projectNumber', 'requestDate', 'observations'];
 const ENABLED_HEADER_MODES = [FORM_MODES.CREATE, FORM_MODES.EDIT, FORM_MODES.EDIT_HEADER];
 const modalId = MODAL_SELECTORS.GOODS_ISSUE;
 const formId = FORM_SELECTORS.GOODS_ISSUE;
 const GOODS_ISSUE_ENTITY_NAME = 'salida';
-const RETURN_SUBMIT_TEXT = 'Devolver';
 
 const context = window.meta || {};
+let currentGoodsIssue = null;
 
 createGoodsIssueDatatable(context);
+initGoodsIssueReturnModal();
 
 
-const setGoodsIssueHeaderFieldsReadOnly = ({ form, isReadOnly }) => {
+const setGoodsIssueHeaderFieldsDisabled = ({ form, isDisabled }) => {
 
     HEADER_FIELD_NAMES.forEach(fieldName => {
         const field = form.elements[fieldName];
@@ -42,20 +38,11 @@ const setGoodsIssueHeaderFieldsReadOnly = ({ form, isReadOnly }) => {
 
         toggleDisabledElement({
             element: field,
-            isDisabled: isReadOnly
+            isDisabled: isDisabled
         });
     });
 };
 
-const getDetailsTableMode = (mode) => mode === FORM_MODES.EDIT_HEADER ? FORM_MODES.VIEW : mode;
-
-const returnForm = createReturnFormHandlers({
-    details,
-    validators: validateGoodsIssueReturnValidators,
-    validateFields,
-    returnUpdate: returnGoodsIssue,
-    emptyMessage: 'Seleccione al menos un producto para devolver.'
-});
 
 const normalizeGoodsIssueData = ({ form, formData }) => {
 
@@ -75,8 +62,6 @@ const normalizeGoodsIssueData = ({ form, formData }) => {
 
     if (mode === FORM_MODES.EDIT_HEADER) return formData;
 
-    if (returnForm.isActive(form)) return returnForm.normalizeData({ form });
-
     return {
         ...formData,
         details
@@ -92,8 +77,6 @@ useForm({
 
         if (mode === FORM_MODES.EDIT_DETAIL) return validateDetailsFields(validateGoodsIssueDetailValidators, details);
 
-        if (returnForm.isActive(form)) return returnForm.getErrors();
-
         const errors = validateFields(validateGoodsIssueValidators, formData);
 
         if (mode === FORM_MODES.EDIT_HEADER) errors.details = null;
@@ -106,9 +89,7 @@ useForm({
             ? editGoodsIssueDetails
             : form.dataset.mode === FORM_MODES.EDIT_HEADER
                 ? editGoodsIssueHeader
-                : returnForm.isActive(form)
-                    ? returnGoodsIssue
-                    : editGoodsIssue;
+                : editGoodsIssue;
 
         await handleSubmit({
             form,
@@ -125,7 +106,10 @@ export const openGoodsIssueModal = ({ mode, data = null }) => {
     const form = document.querySelector(formId);
     const modalElement = document.querySelector(modalId);
 
+    currentGoodsIssue = data;
+
     initForm({ form, mode, id: data?.id || '' });
+    form.querySelector('#submitBtn')?.classList.remove('d-none');
     clearFormErrors(form);
     toggleButtons({
         mode,
@@ -134,12 +118,12 @@ export const openGoodsIssueModal = ({ mode, data = null }) => {
         withTotal: false,
         showAddProduct: mode === FORM_MODES.CREATE || (mode === FORM_MODES.EDIT && data?.fulfillmentStatus?.name === FULFILLMENT_STATUS_NAMES.PENDING)
     });
-    setFormReadOnly({ form, isReadOnly: false });
+    setFormDisabled({ form, isDisabled: false });
     initGoodsIssueFormSelect2();
     setGoodsIssueFormSelectOptions(data);
-    setGoodsIssueHeaderFieldsReadOnly({
+    setGoodsIssueHeaderFieldsDisabled({
         form,
-        isReadOnly: !ENABLED_HEADER_MODES.includes(mode)
+        isDisabled: !ENABLED_HEADER_MODES.includes(mode)
     });
     syncGoodsIssueDependentSelectsState();
 
@@ -154,12 +138,12 @@ export const openGoodsIssueModal = ({ mode, data = null }) => {
         form.querySelector('#presentationDisplayInput').value = '';
     }
 
-    if (mode === FORM_MODES.EDIT || mode === FORM_MODES.EDIT_DETAIL || mode === FORM_MODES.EDIT_HEADER || mode === FORM_MODES.VIEW || mode === FORM_MODES.RETURN) {
+    if ([FORM_MODES.EDIT, FORM_MODES.EDIT_DETAIL, FORM_MODES.EDIT_HEADER, FORM_MODES.RETURN].includes(mode)) {
 
-        form.querySelector('#observationsInput').value = mode === FORM_MODES.RETURN ? '' : (data.observations || '');
+        form.querySelector('#observationsInput').value = data.observations || '';
         setDateTimePickerValue(form.querySelector('#requestDateInput'), data.requestDate);
         form.querySelector('#projectNumberInput').value = data.projectNumber;
-        details.push(...data.details.map(detail => ({
+        const modalDetails = data.details.map(detail => ({
             id: detail.id,
             productId: detail.productId,
             supplierId: detail.supplierId,
@@ -179,21 +163,20 @@ export const openGoodsIssueModal = ({ mode, data = null }) => {
             convertedQuantityDifference: detail.convertedQuantityDifference,
             supplierName: detail.supplierName,
             suppliedQuantity: detail.suppliedQuantity,
+            returnedQuantity: detail.returnedQuantity,
             isSupplied: detail.isSupplied,
             fulfillmentStatus: detail.fulfillmentStatus,
             originalIsSupplied: detail.isSupplied,
             originalProjectConvertedQuantity: detail.projectConvertedQuantity ?? null,
-            originalConvertedQuantityDifference: detail.convertedQuantityDifference ?? null,
-            ...buildReturnDetailState({
-                detail,
-                baseQuantity: detail.suppliedQuantity
-            })
-        })));
+            originalConvertedQuantityDifference: detail.convertedQuantityDifference ?? null
+        }));
 
-        setFormReadOnly({ form, isReadOnly: mode !== FORM_MODES.EDIT && mode !== FORM_MODES.EDIT_HEADER });
-        setGoodsIssueHeaderFieldsReadOnly({
+        details.push(...modalDetails);
+
+        setFormDisabled({ form, isDisabled: mode !== FORM_MODES.EDIT && mode !== FORM_MODES.EDIT_HEADER });
+        setGoodsIssueHeaderFieldsDisabled({
             form,
-            isReadOnly: !ENABLED_HEADER_MODES.includes(mode)
+            isDisabled: !ENABLED_HEADER_MODES.includes(mode)
         });
         syncGoodsIssueDependentSelectsState();
 
@@ -211,33 +194,18 @@ export const openGoodsIssueModal = ({ mode, data = null }) => {
         }
 
         if (mode === FORM_MODES.RETURN) {
-            configureReturnModal({
-                modalElement,
-                form,
-                buildModalTitle,
-                referenceNumber: data?.referenceNumber,
+
+            modalElement.querySelector('#modalTitle').textContent = buildModalTitle({
+                action: 'Devolver productos surtidos de la',
                 entityName: GOODS_ISSUE_ENTITY_NAME,
-                submitText: RETURN_SUBMIT_TEXT,
-                toggleContainerElements,
-                setFormReadOnly,
-                toggleDisabledElement,
-                observationsElement: form.querySelector('#observationsInput')
+                referenceNumber: data?.referenceNumber
             });
-
-            setGoodsIssueHeaderFieldsReadOnly({
-                form,
-                isReadOnly: true
-            });
-            syncGoodsIssueDependentSelectsState();
+            form.querySelector('#submitBtn').classList.add('d-none');
         }
 
-        if (mode === FORM_MODES.VIEW) {
-            
-            modalElement.querySelector('#modalTitle').textContent = buildModalTitle({ action: 'Ver', entityName: GOODS_ISSUE_ENTITY_NAME, referenceNumber: data?.referenceNumber });
-        }
     }
 
-    initDetailsGoodsIssueTable(getDetailsTableMode(mode), context);
+    initDetailsGoodsIssueTable(mode, context);
 
     openModal(modalElement);
 };
@@ -361,6 +329,15 @@ on('input', '.project-converted-quantity-input', (e, input) => {
     if (nextTd) nextTd.textContent = formatDecimal(product.convertedQuantityDifference);
 });
 
-bindReturnDetailEvents({
-    details
+
+on('click', '#productTable .return-issue-detail-btn', (event, button) => {
+    const detail = details.find(item => item.id === button.dataset.id);
+
+    if (!detail || !currentGoodsIssue) return;
+
+    openGoodsIssueReturnModal({
+        goodsIssue: currentGoodsIssue,
+        detail,
+        issueDetails: details
+    });
 });

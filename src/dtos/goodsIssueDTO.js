@@ -40,9 +40,6 @@ export const createGoodsIssueHeaderDtoForEdit = (body = {}) => ({
 
 
 export const createGoodsIssueReturnDto = (body = {}) => ({
-    details: (body.details || []).map(d => ({
-        id: d.id?.trim?.() || d.id,
-        isReturned: Boolean(d.isReturned),
-        returnedQuantity: Number(d.returnedQuantity)
-    }))
+    returnQuantity: Number(body.returnQuantity),
+    ...(Object.prototype.hasOwnProperty.call(body, 'observations') ? { observations: body.observations.trim() } : {})
 });

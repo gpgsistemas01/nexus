@@ -11,7 +11,7 @@ import { DATATABLE_SELECTORS } from "../../constants/selectors.js";
 
 const selector = DATATABLE_SELECTORS.MAIN;
 
-export const createProfilesDatatable = async () => {
+export const createProfilesDatatable = async ({ canManageProfiles = false } = {}) => {
 
     const filters = await setupTableFilters({
         fields: ['department']
@@ -38,10 +38,14 @@ export const createProfilesDatatable = async () => {
                 {
                     data: null,
                     title: 'Acciones',
-                    render: () => renderActionButtons({ context: 'profile' })
+                    render: () => canManageProfiles ? renderActionButtons({ context: 'profile' }) : ''
                 }
             ],
             buttons: [
+                ...(canManageProfiles ? [{
+                    text: 'Nuevo perfil',
+                    action: () => openProfileModal({ mode: 'create' })
+                },
                 buildExcelButton({
                     filename: formatFileName('reporte_perfiles'),
                     allowMonthlyReport: false,
@@ -50,11 +54,7 @@ export const createProfilesDatatable = async () => {
                         department: getSelectedDepartmentName(),
                         strictDepartmentFilter: Boolean(filters.getValues().departmentId)
                     }))
-                }),
-                {
-                    text: 'Nuevo perfil',
-                    action: () => openProfileModal({ mode: 'create' })
-                }
+                })] : [])
             ]
         }
     });

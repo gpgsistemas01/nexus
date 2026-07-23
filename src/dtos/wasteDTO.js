@@ -7,7 +7,7 @@ const buildWasteBaseDto = (body = {}) => ({
 const buildWasteStockDto = (body = {}) => ({
     currentStock: Number(body.currentStock),
     ...Object.prototype.hasOwnProperty.call(body, 'observations') ? { observations: body.observations ? body.observations.trim() : null } : {},
-    reasonId: body.reasonId
+    ...Object.prototype.hasOwnProperty.call(body, 'reasonId') ? { reasonId: body.reasonId } : {}
 });
 
 export const createWasteDto = (body = {}) => ({

@@ -8,6 +8,11 @@ const reportPermissions = {
     departments: ['SISTEMAS']
 };
 
+const profileReportPermissions = {
+    roles: ['Coordinador', 'Auxiliar', 'Almacenista', 'Administrador del sistema'],
+    departments: ['ALMACÉN Y PROVEDURÍA', 'SISTEMAS']
+};
+
 router.get(
     '/movements/excel', 
     verifyApiTokenRequired, 
@@ -25,7 +30,7 @@ router.get(
 router.get(
     '/profiles/excel',
     verifyApiTokenRequired,
-    authorizeUserApi(reportPermissions),
+    authorizeUserApi(profileReportPermissions),
     exportProfileReport
 );
 

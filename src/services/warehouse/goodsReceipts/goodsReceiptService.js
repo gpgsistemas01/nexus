@@ -17,7 +17,6 @@ import { buildGoodsReceiptDetails, calculateGoodsReceiptTotals, createGoodsRecei
 import { updateProductUnitCostIfHigher } from "../products/supplierProductService.js";
 import { isAppError } from "../../../errors/AppError.js";
 import { buildDateRangeFilter } from "../../../utils/requestQueryUtils.js";
-import { findReturnedQuantityTotalsByDetailIds } from "../returns/returnHelpers.js";
 import { GOODS_RECEIPT_STATUS_NAMES } from "../../../constants/warehouseStatuses.js";
 import { INVENTORY_MOVEMENT_TYPES } from "../../../constants/inventory.js";
 import { DOCUMENT_REFERENCE_TYPES } from "../../../constants/documentReferenceTypes.js";
@@ -100,6 +99,7 @@ export const findAllGoodsReceipts = async ({
                     netPurchaseAmount: true,
                     grossPurchaseAmount: true,
                     productId: true,
+                    status: true,
                 }
             }
         }
@@ -107,26 +107,6 @@ export const findAllGoodsReceipts = async ({
 
     const total = await getDb().goodsReceipt.count();
     const filtered = await getDb().goodsReceipt.count({ where });
-
-    const detailIds = [];
-
-    goodsReceipts.forEach(receipt => {
-        receipt.details.forEach(detail => {
-            detailIds.push(detail.id);
-        });
-    });
-    const returnedByDetailId = await findReturnedQuantityTotalsByDetailIds({
-        tx: getDb(),
-        detailIds,
-        detailField: 'goodsReceiptDetailId',
-        normalizeTotal: Math.abs
-    });
-
-    goodsReceipts.forEach(receipt => {
-        receipt.details.forEach(detail => {
-            detail.returnedQuantityTotal = returnedByDetailId.get(detail.id) ?? 0;
-        });
-    });
 
     return {
         data: goodsReceipts,

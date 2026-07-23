@@ -5,6 +5,7 @@ import {
     GoodsReceiptCorrectionNoChanges,
     GoodsReceiptCorrectionQuantityConflict,
     GoodsReceiptCorrectionReasonNotFound,
+    GoodsReceiptDetailAlreadyCanceled,
     GoodsReceiptNotFound,
     GoodsReceiptUpdateDatabaseError
 } from '../../../errors/warehouse/goodsReceiptError.js';
@@ -96,21 +97,30 @@ export const correctGoodsReceiptDetailLine = async ({
             ]);
 
             if (!currentDetail) throw new GoodsReceiptNotFound();
+            if (currentDetail.status === GOODS_RECEIPT_DETAIL_STATUS.CANCELED) {
+                throw new GoodsReceiptDetailAlreadyCanceled();
+            }
             if (!correctionReason) throw new GoodsReceiptCorrectionReasonNotFound();
 
-            const [correctedDetail] = await buildGoodsReceiptDetails([{
+            const correctionDetailInput = {
                 productId: currentDetail.productId,
                 quantity,
-                costPerUnitType
-            }], { tx });
+                costPerUnitType: correctionMode === GOODS_RECEIPT_CORRECTION_MODES.CANCEL_DETAIL
+                    ? currentDetail.costPerUnitType
+                    : costPerUnitType
+            };
+            const [correctedDetail] = await buildGoodsReceiptDetails([correctionDetailInput], { tx });
             const correctedQuantity = Number(correctedDetail.quantity);
             const currentQuantity = Number(currentDetail.quantity);
 
-            if (correctedQuantity < 0 || correctedQuantity > currentQuantity) {
+            if (correctedQuantity > currentQuantity || (
+                correctionMode !== GOODS_RECEIPT_CORRECTION_MODES.CANCEL_DETAIL &&
+                correctedQuantity <= 0
+            )) {
                 throw new GoodsReceiptCorrectionQuantityConflict();
             }
 
-            const effectiveCorrectionMode = correctionMode === GOODS_RECEIPT_CORRECTION_MODES.CANCEL_DETAIL || correctedQuantity === 0
+            const effectiveCorrectionMode = correctionMode === GOODS_RECEIPT_CORRECTION_MODES.CANCEL_DETAIL
                 ? GOODS_RECEIPT_CORRECTION_MODES.CANCEL_DETAIL
                 : GOODS_RECEIPT_CORRECTION_MODES.UPDATE;
             const quantityDifference = correctedQuantity - currentQuantity;
@@ -136,7 +146,7 @@ export const correctGoodsReceiptDetailLine = async ({
                 goodsReceiptDetailId: detailId
             });
             const detailUpdate = effectiveCorrectionMode === GOODS_RECEIPT_CORRECTION_MODES.CANCEL_DETAIL
-                ? { ...correctedDetail, status: GOODS_RECEIPT_DETAIL_STATUS.CANCELED }
+                ? { status: GOODS_RECEIPT_DETAIL_STATUS.CANCELED }
                 : correctedDetail;
             const { updatedDetail, updatedReceipt } = await updateGoodsReceiptDetailAndTotals({
                 tx,
@@ -219,8 +229,7 @@ export const cancelGoodsReceiptDetailLine = async ({ id, detailId, userId }) => 
         userId,
         correctionMode: GOODS_RECEIPT_CORRECTION_MODES.CANCEL_DETAIL,
         correctionDto: {
-            quantity: 0,
-            costPerUnitType: 0
+            quantity: 0
         }
     });
 };
