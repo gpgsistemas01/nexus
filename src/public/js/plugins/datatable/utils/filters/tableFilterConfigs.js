@@ -43,6 +43,7 @@ const selectFilterConfigs = {
     fulfillmentStatus: {
         key: 'fulfillmentStatusId',
         selector: FILTER_SELECTORS.FULFILLMENT_STATUS,
+        defaultSelectedLabel: 'Pendiente',
         getSelectApi: getFulfillmentStatusSelectApi,
         getOptions: getFulfillmentStatusOptions,
         initSelect: initFulfillmentStatusFilterSelect
