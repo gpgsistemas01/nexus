@@ -106,6 +106,18 @@ export const buildGoodsIssueDetails = async ({
 
 export const resolveFulfillmentStatus = (details) => {
 
+    const allCanceled = details.length > 0 && details.every((d) => (
+        d.fulfillmentStatus?.name === FULFILLMENT_STATUS_NAMES.CANCELED
+        || d.fulfillmentStatusName === FULFILLMENT_STATUS_NAMES.CANCELED
+        || (
+            d.isSupplied
+            && (d.suppliedQuantity ?? 0) > FLOAT_EPSILON
+            && (d.returnedQuantity ?? 0) >= (d.suppliedQuantity ?? 0) - FLOAT_EPSILON
+        )
+    ));
+
+    if (allCanceled) return FULFILLMENT_STATUS_NAMES.CANCELED;
+
     const allSupplied = details.every((d) => d.isSupplied);
 
     const anySupplied = details.some(
