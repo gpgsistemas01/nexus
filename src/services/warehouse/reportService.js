@@ -33,10 +33,15 @@ const mapWasteRows = (wastes = []) => wastes.map((item) => ({
 
 const mapGoodsIssueDetailRows = (goodsIssues = [], { supplierId = '', productId = '' } = {}) => goodsIssues.flatMap((goodsIssue) => {
 
-    const details = (goodsIssue.details || []).filter((detail) => (
-        (!supplierId || detail.supplierId === supplierId) &&
-        (!productId || detail.productId === productId)
-    ));
+    const details = (goodsIssue.details || []).filter((detail) => {
+        const isCanceledDetail = detail.fulfillmentStatus?.name === 'Cancelado';
+
+        return (
+            !isCanceledDetail &&
+            (!supplierId || detail.supplierId === supplierId) &&
+            (!productId || detail.productId === productId)
+        );
+    });
 
     return details.map((detail) => ({
         referenceNumber: goodsIssue.referenceNumber,
@@ -63,9 +68,14 @@ const mapGoodsIssueDetailRows = (goodsIssues = [], { supplierId = '', productId 
 
 const mapGoodsReceiptDetailRows = (goodsReceipts = [], { productId = '' } = {}) => goodsReceipts.flatMap((goodsReceipt) => {
 
-    const details = (goodsReceipt.details || []).filter((detail) => (
-        !productId || detail.productId === productId
-    ));
+    const details = (goodsReceipt.details || []).filter((detail) => {
+        const isCanceledDetail = detail.status === 'CANCELED';
+
+        return (
+            !isCanceledDetail &&
+            (!productId || detail.productId === productId)
+        );
+    });
 
     return details.map((detail) => ({
         referenceNumber: goodsReceipt.referenceNumber,
