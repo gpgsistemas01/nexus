@@ -66,6 +66,11 @@ describe('goodsIssueHelpers', () => {
       { isSupplied: false, suppliedQuantity: 0 },
       { isSupplied: false, suppliedQuantity: 0 }
     ])).toBe('Pendiente');
+
+    expect(resolveFulfillmentStatus([
+      { isSupplied: true, suppliedQuantity: 5, returnedQuantity: 5, fulfillmentStatus: { name: 'Cancelado' } },
+      { isSupplied: true, suppliedQuantity: 1, returnedQuantity: 1, fulfillmentStatus: { name: 'Cancelado' } }
+    ])).toBe('Cancelado');
   });
 
 

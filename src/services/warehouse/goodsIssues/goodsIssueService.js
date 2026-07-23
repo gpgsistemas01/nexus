@@ -190,11 +190,6 @@ export const findAllGoodsIssues = async ({
             status: true,
             fulfillmentStatus: true,
             details: {
-                where: {
-                    fulfillmentStatus: {
-                        is: { name: { not: FULFILLMENT_STATUS_NAMES.CANCELED } }
-                    }
-                },
                 select: GOODS_ISSUE_DETAIL_SELECT
             }
         }
@@ -203,8 +198,20 @@ export const findAllGoodsIssues = async ({
     const total = await db.goodsIssue.count({ where });
     const filtered = total;
 
+    const data = goodsIssues.map(goodsIssue => {
+        const allDetailsCanceled = goodsIssue.details.length > 0
+            && goodsIssue.details.every(detail => detail.fulfillmentStatus?.name === FULFILLMENT_STATUS_NAMES.CANCELED);
+
+        return {
+            ...goodsIssue,
+            details: allDetailsCanceled
+                ? goodsIssue.details
+                : goodsIssue.details.filter(detail => detail.fulfillmentStatus?.name !== FULFILLMENT_STATUS_NAMES.CANCELED)
+        };
+    });
+
     return {
-        data: goodsIssues,
+        data,
         recordsTotal: total,
         recordsFiltered: filtered
     };
@@ -683,6 +690,33 @@ export const returnGoodsIssueDetail = async ({ id, detailId, returnDto, userId }
                     }))
                 },
                 select: GOODS_ISSUE_DETAIL_SELECT
+            });
+
+            const refreshedDetails = await tx.goodsIssueDetail.findMany({
+                where: { goodsIssueId: id },
+                select: {
+                    isSupplied: true,
+                    suppliedQuantity: true,
+                    returnedQuantity: true,
+                    fulfillmentStatus: true
+                }
+            });
+            const fulfillmentName = resolveFulfillmentStatus(refreshedDetails);
+
+            await tx.goodsIssue.update({
+                where: { id },
+                data: {
+                    fulfillmentStatus: {
+                        connect: { name: fulfillmentName }
+                    },
+                    status: {
+                        connect: {
+                            name: fulfillmentName === FULFILLMENT_STATUS_NAMES.CANCELED
+                                ? GOODS_ISSUE_STATUS_NAMES.CANCELED
+                                : GOODS_ISSUE_STATUS_NAMES.APPROVED
+                        }
+                    }
+                }
             });
 
             const goodsIssueReturn = await tx.goodsIssueReturn.create({

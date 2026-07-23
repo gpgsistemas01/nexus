@@ -138,7 +138,7 @@ export const openGoodsIssueModal = ({ mode, data = null }) => {
         form.querySelector('#presentationDisplayInput').value = '';
     }
 
-    if ([FORM_MODES.EDIT, FORM_MODES.EDIT_DETAIL, FORM_MODES.EDIT_HEADER, FORM_MODES.RETURN].includes(mode)) {
+    if ([FORM_MODES.EDIT, FORM_MODES.EDIT_DETAIL, FORM_MODES.EDIT_HEADER, FORM_MODES.RETURN, FORM_MODES.VIEW].includes(mode)) {
 
         form.querySelector('#observationsInput').value = data.observations || '';
         setDateTimePickerValue(form.querySelector('#requestDateInput'), data.requestDate);
@@ -201,6 +201,17 @@ export const openGoodsIssueModal = ({ mode, data = null }) => {
                 referenceNumber: data?.referenceNumber
             });
             form.querySelector('#submitBtn').classList.add('d-none');
+        }
+
+        if (mode === FORM_MODES.VIEW) {
+
+            modalElement.querySelector('#modalTitle').textContent = buildModalTitle({
+                action: 'Consultar',
+                entityName: GOODS_ISSUE_ENTITY_NAME,
+                referenceNumber: data?.referenceNumber
+            });
+            form.querySelector('#submitBtn').classList.add('d-none');
+            setFormDisabled({ form, isDisabled: true });
         }
 
     }
