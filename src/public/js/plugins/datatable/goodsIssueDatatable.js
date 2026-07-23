@@ -53,6 +53,7 @@ export const createGoodsIssueDatatable = async (context) => {
     columns.push(
         { data: 'projectNumber', title: 'Proyecto' },
         { data: 'clientName', title: 'Cliente' },
+        { data: 'status.name', title: 'Estado' },
         { data: 'fulfillmentStatus.name', title: 'Estado surtido' },
         {
             data: 'id',
