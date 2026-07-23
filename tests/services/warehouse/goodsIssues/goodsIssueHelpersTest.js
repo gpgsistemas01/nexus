@@ -68,6 +68,7 @@ describe('goodsIssueHelpers', () => {
     ])).toBe('Pendiente');
   });
 
+
   it('construye detalles de salida con snapshot de proveedor y costo máximo', async () => {
     findSupplierProductsSnapshot.mockResolvedValue([
       {
