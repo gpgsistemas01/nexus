@@ -159,6 +159,8 @@ export const renderActionButtons = ({ status, fulfillmentStatus, context, canAdj
     const actions = [];
     const canEditGoodsIssue = context === 'goodsIssue'
         && status === DOCUMENT_STATUS_LABELS.APPROVED;
+    const canViewGoodsIssue = context === 'goodsIssue'
+        && status === DOCUMENT_STATUS_LABELS.CANCELED;
     const canSupplyGoodsIssue = context === 'goodsIssue'
         && ['Pendiente', 'Surtido parcial'].includes(fulfillmentStatus);
     const canReturnGoodsIssue = context === 'goodsIssue'
@@ -166,7 +168,7 @@ export const renderActionButtons = ({ status, fulfillmentStatus, context, canAdj
     const canEditGoodsReceipt = context === 'goodsReceipt' && status !== DOCUMENT_STATUS_LABELS.CANCELED;
     const canViewGoodsReceipt = context === 'goodsReceipt' && status === DOCUMENT_STATUS_LABELS.CANCELED;
 
-    if (canViewGoodsReceipt) actions.push(buildMdbActionButton({
+    if (canViewGoodsReceipt || canViewGoodsIssue) actions.push(buildMdbActionButton({
         className: 'btn-edit',
         colorClass: 'btn-secondary',
         iconClass: 'fa-solid fa-eye',

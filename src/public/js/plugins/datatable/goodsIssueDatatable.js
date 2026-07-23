@@ -53,6 +53,7 @@ export const createGoodsIssueDatatable = async (context) => {
     columns.push(
         { data: 'projectNumber', title: 'Proyecto' },
         { data: 'clientName', title: 'Cliente' },
+        { data: 'status.name', title: 'Estado' },
         { data: 'fulfillmentStatus.name', title: 'Estado surtido' },
         {
             data: 'id',
@@ -99,7 +100,11 @@ export const createGoodsIssueDatatable = async (context) => {
     $(`${ tableSelector } tbody`).on('click', '.btn-edit', function () {
 
         const data = getResponsiveRowData(table, this);
-        const mode = data?.fulfillmentStatus?.name === FULFILLMENT_STATUS_NAMES.PENDING ? FORM_MODES.EDIT : FORM_MODES.EDIT_HEADER;
+        const mode = data?.status?.name === 'Cancelada'
+            ? FORM_MODES.VIEW
+            : data?.fulfillmentStatus?.name === FULFILLMENT_STATUS_NAMES.PENDING
+                ? FORM_MODES.EDIT
+                : FORM_MODES.EDIT_HEADER;
 
         openGoodsIssueModal({ mode, data });
     })
