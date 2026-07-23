@@ -191,9 +191,20 @@ export const findAllGoodsIssues = async ({
             fulfillmentStatus: true,
             details: {
                 where: {
-                    fulfillmentStatus: {
-                        is: { name: { not: FULFILLMENT_STATUS_NAMES.CANCELED } }
-                    }
+                    OR: [
+                        {
+                            fulfillmentStatus: {
+                                is: { name: { not: FULFILLMENT_STATUS_NAMES.CANCELED } }
+                            }
+                        },
+                        {
+                            goodsIssue: {
+                                fulfillmentStatus: {
+                                    is: { name: FULFILLMENT_STATUS_NAMES.CANCELED }
+                                }
+                            }
+                        }
+                    ]
                 },
                 select: GOODS_ISSUE_DETAIL_SELECT
             }
@@ -203,36 +214,8 @@ export const findAllGoodsIssues = async ({
     const total = await db.goodsIssue.count({ where });
     const filtered = total;
 
-    const canceledGoodsIssueIds = goodsIssues
-        .filter(goodsIssue => goodsIssue.fulfillmentStatus?.name === FULFILLMENT_STATUS_NAMES.CANCELED)
-        .map(goodsIssue => goodsIssue.id);
-    const canceledDetails = canceledGoodsIssueIds.length
-        ? await db.goodsIssueDetail.findMany({
-            where: { goodsIssueId: { in: canceledGoodsIssueIds } },
-            select: {
-                ...GOODS_ISSUE_DETAIL_SELECT,
-                goodsIssueId: true
-            }
-        })
-        : [];
-    const canceledDetailsByGoodsIssueId = new Map();
-
-    canceledDetails.forEach(detail => {
-        const { goodsIssueId, ...detailData } = detail;
-        const currentDetails = canceledDetailsByGoodsIssueId.get(goodsIssueId) || [];
-        currentDetails.push(detailData);
-        canceledDetailsByGoodsIssueId.set(goodsIssueId, currentDetails);
-    });
-
-    const data = goodsIssues.map(goodsIssue => ({
-        ...goodsIssue,
-        details: goodsIssue.fulfillmentStatus?.name === FULFILLMENT_STATUS_NAMES.CANCELED
-            ? canceledDetailsByGoodsIssueId.get(goodsIssue.id) || []
-            : goodsIssue.details
-    }));
-
     return {
-        data,
+        data: goodsIssues,
         recordsTotal: total,
         recordsFiltered: filtered
     };

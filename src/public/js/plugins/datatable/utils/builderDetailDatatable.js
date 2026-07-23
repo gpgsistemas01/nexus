@@ -51,7 +51,7 @@ const resolveDisabledTableInput = (cell, event) => {
 
 const shouldShowReceiptPurchaseColumns = ({ type }) => type === 'receipt';
 
-const ISSUE_DETAIL_RETURN_MODES = ['edit-detail', 'return', 'view'];
+const ISSUE_DETAIL_RETURN_MODES = ['edit-detail', 'return'];
 const RECEIPT_DETAIL_ACTION_MODES = ['edit'];
 
 const shouldShowIssueProjectColumns = ({ type, mode, isWarehouse, isCoordinator, isSystem }) => (
@@ -66,8 +66,6 @@ const shouldShowActionsColumn = ({ type, mode }) => {
     return !['edit-detail', 'edit-header', 'return'].includes(mode);
 };
 
-
-const shouldShowIssueStatusColumn = ({ type, mode }) => type === 'issue' && ['return', 'view'].includes(mode);
 
 const shouldShowIssueReturnActions = ({ type, mode }) => type === 'issue' && mode === 'return';
 
@@ -128,10 +126,6 @@ export const buildDetailsHeader = ({ type, mode, isWarehouse, isCoordinator, isS
 
     if (type === 'issue' && mode === 'edit-detail') {
         extraHeaders += `<th rowspan="2">Surtir</th>`;
-    }
-
-    if (shouldShowIssueStatusColumn({ type, mode })) {
-        extraHeaders += `<th rowspan="2">Estado</th>`;
     }
 
     if (shouldShowDetailActionsHeader({ type, mode })) {
@@ -241,14 +235,6 @@ export const buildDetailsColumns = ({ type, mode, render, isWarehouse, isCoordin
                     >
                 `;
             }
-        });
-    }
-
-
-    if (shouldShowIssueStatusColumn({ type, mode })) {
-        columns.push({
-            data: 'fulfillmentStatus.name',
-            defaultContent: ''
         });
     }
 
