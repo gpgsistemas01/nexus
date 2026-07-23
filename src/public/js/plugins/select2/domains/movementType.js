@@ -14,6 +14,10 @@ export const getMovementTypeData = () => ([
     {
         id: 'ADJUSTMENT',
         text: 'Ajuste'
+    },
+    {
+        id: 'RETURN',
+        text: 'Devolución'
     }
 ]);
 
