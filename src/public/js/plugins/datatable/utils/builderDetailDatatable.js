@@ -63,7 +63,7 @@ const shouldShowIssueProjectColumns = ({ type, mode, isWarehouse, isCoordinator,
 const shouldShowActionsColumn = ({ type, mode }) => {
     if (type === 'receipt') return mode === 'create';
 
-    return !['edit-detail', 'edit-header', 'return'].includes(mode);
+    return !['edit-detail', 'edit-header', 'return', 'view'].includes(mode);
 };
 
 
