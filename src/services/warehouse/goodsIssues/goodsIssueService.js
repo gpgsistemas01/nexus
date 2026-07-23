@@ -22,6 +22,7 @@ import { findProfileById, findProfileWithDepartmentsById } from "../../admin/pro
 import { findDepartmentById } from "../../admin/departmentService.js";
 import { generateYearlyReferenceNumber } from "../../document/referenceNumberService.js";
 import { findClientById } from "../../sales/clientService.js";
+import { findFulfillmentStatusIdByName, findFulfillmentStatusIdsByName } from "../fulfillmentStatusService.js";
 import { buildGoodsIssueDetails, isValidInternalClientAdvisor, isValidInternalClientProjectNumberByDepartment, resolveFulfillmentStatus } from "./goodsIssueHelpers.js";
 import { applyInventoryMovement } from "../../inventory/movementService.js";
 import { normalizeDecimal } from "../../../utils/formattersUtils.js";
@@ -35,6 +36,14 @@ import { DOCUMENT_REFERENCE_TYPES } from "../../../constants/documentReferenceTy
 
 const FLOAT_EPSILON = 0.000001;
 
+const resolveDetailFulfillmentStatusName = (detail = {}) => {
+
+    if (detail.isSupplied && (detail.suppliedQuantity ?? 0) > FLOAT_EPSILON && (detail.returnedQuantity ?? 0) >= (detail.suppliedQuantity ?? 0) - FLOAT_EPSILON) {
+        return FULFILLMENT_STATUS_NAMES.CANCELED;
+    }
+
+    return detail.isSupplied ? FULFILLMENT_STATUS_NAMES.COMPLETE : FULFILLMENT_STATUS_NAMES.PENDING;
+};
 
 const resolveGoodsIssueHeaderData = async ({ requesterId, advisorId, departmentId, clientId, goodsIssueData }) => {
 
@@ -181,6 +190,11 @@ export const findAllGoodsIssues = async ({
             status: true,
             fulfillmentStatus: true,
             details: {
+                where: {
+                    fulfillmentStatus: {
+                        is: { name: { not: FULFILLMENT_STATUS_NAMES.CANCELED } }
+                    }
+                },
                 select: GOODS_ISSUE_DETAIL_SELECT
             }
         }
@@ -210,7 +224,11 @@ export const createGoodsIssue = async ({ goodsIssueDto }) => {
             goodsIssueData
         });
 
-        const processedDetails = await buildGoodsIssueDetails({ details });
+        const pendingFulfillmentStatusId = await findFulfillmentStatusIdByName({ name: FULFILLMENT_STATUS_NAMES.PENDING });
+        const processedDetails = await buildGoodsIssueDetails({
+            details,
+            initialFulfillmentStatusId: pendingFulfillmentStatusId
+        });
 
         const result = await getDb().$transaction(async (tx) => {
 
@@ -308,7 +326,11 @@ export const updateGoodsIssue = async ({ id, goodsIssueDto }) => {
             goodsIssueData
         });
 
-        const processedDetails = await buildGoodsIssueDetails({ details });
+        const pendingFulfillmentStatusId = await findFulfillmentStatusIdByName({ name: FULFILLMENT_STATUS_NAMES.PENDING });
+        const processedDetails = await buildGoodsIssueDetails({
+            details,
+            initialFulfillmentStatusId: pendingFulfillmentStatusId
+        });
 
         const updatedGoodsIssue = await getDb().$transaction(async (tx) => {
 
@@ -317,8 +339,8 @@ export const updateGoodsIssue = async ({ id, goodsIssueDto }) => {
             });
 
             await tx.goodsIssueDetail.createMany({
-                data: processedDetails.map(d => ({
-                    ...d,
+                data: processedDetails.map(detail => ({
+                    ...detail,
                     goodsIssueId: id
                 }))
             });
@@ -446,6 +468,8 @@ export const updateGoodsIssueDetails = async ({ id, goodsIssueDto }) => {
 
         return await getDb().$transaction(async (tx) => {
 
+            const statusIdsByName = await findFulfillmentStatusIdsByName({ tx, names: Object.values(FULFILLMENT_STATUS_NAMES) });
+
             if (supplyRequests.length) {
 
                 const detailSupplyMovements = supplyRequests.map(({ current, quantityToSupply }) => ({
@@ -468,12 +492,19 @@ export const updateGoodsIssueDetails = async ({ id, goodsIssueDto }) => {
                         normalizeDecimal(current.suppliedQuantity ?? 0) + quantityToSupply
                     );
 
+                    const isSupplied = newSupplied >= normalizeDecimal(currentQuantity - FLOAT_EPSILON);
+
                     updates.push({
                         id: current.id,
                         data: {
                             ...baseUpdate,
                             suppliedQuantity: newSupplied,
-                            isSupplied: newSupplied >= normalizeDecimal(currentQuantity - FLOAT_EPSILON)
+                            isSupplied,
+                            fulfillmentStatusId: statusIdsByName.get(resolveDetailFulfillmentStatusName({
+                                ...current,
+                                suppliedQuantity: newSupplied,
+                                isSupplied
+                            }))
                         }
                     });
                 }
@@ -600,6 +631,7 @@ export const returnGoodsIssueDetail = async ({ id, detailId, returnDto, userId }
         const db = getDb();
 
         return await db.$transaction(async (tx) => {
+            const statusIdsByName = await findFulfillmentStatusIdsByName({ tx, names: Object.values(FULFILLMENT_STATUS_NAMES) });
             const detail = await tx.goodsIssueDetail.findFirst({
                 where: { id: detailId, goodsIssueId: id },
                 include: {
@@ -641,11 +673,16 @@ export const returnGoodsIssueDetail = async ({ id, detailId, returnDto, userId }
                 movementType: INVENTORY_MOVEMENT_TYPES.ENTRY
             });
 
-            await tx.goodsIssueDetail.update({
+            const updatedDetail = await tx.goodsIssueDetail.update({
                 where: { id: detail.id },
                 data: {
-                    returnedQuantity: newTotalReturnedQuantity
-                }
+                    returnedQuantity: newTotalReturnedQuantity,
+                    fulfillmentStatusId: statusIdsByName.get(resolveDetailFulfillmentStatusName({
+                        ...detail,
+                        returnedQuantity: newTotalReturnedQuantity
+                    }))
+                },
+                select: GOODS_ISSUE_DETAIL_SELECT
             });
 
             const goodsIssueReturn = await tx.goodsIssueReturn.create({
@@ -670,7 +707,10 @@ export const returnGoodsIssueDetail = async ({ id, detailId, returnDto, userId }
                 }
             });
 
-            return goodsIssueReturn;
+            return {
+                ...goodsIssueReturn,
+                detail: updatedDetail
+            };
         });
     } catch (err) {
         logServiceError(serviceLogger, err, {

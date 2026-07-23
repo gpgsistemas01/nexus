@@ -143,7 +143,7 @@ export const openGoodsIssueModal = ({ mode, data = null }) => {
         form.querySelector('#observationsInput').value = data.observations || '';
         setDateTimePickerValue(form.querySelector('#requestDateInput'), data.requestDate);
         form.querySelector('#projectNumberInput').value = data.projectNumber;
-        details.push(...data.details.map(detail => ({
+        const modalDetails = data.details.map(detail => ({
             id: detail.id,
             productId: detail.productId,
             supplierId: detail.supplierId,
@@ -169,7 +169,9 @@ export const openGoodsIssueModal = ({ mode, data = null }) => {
             originalIsSupplied: detail.isSupplied,
             originalProjectConvertedQuantity: detail.projectConvertedQuantity ?? null,
             originalConvertedQuantityDifference: detail.convertedQuantityDifference ?? null
-        })));
+        }));
+
+        details.push(...modalDetails);
 
         setFormDisabled({ form, isDisabled: mode !== FORM_MODES.EDIT && mode !== FORM_MODES.EDIT_HEADER });
         setGoodsIssueHeaderFieldsDisabled({

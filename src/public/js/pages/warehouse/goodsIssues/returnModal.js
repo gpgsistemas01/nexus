@@ -3,6 +3,7 @@ import { refreshProductTable } from '../../../plugins/datatable/baseDatatable.js
 import { clearFormErrors, resetFormSubmitState } from '../../../ui/formUI.js';
 import { setSummaryValues } from '../../../ui/totalsSummaryUI.js';
 import { on } from '../../../utils/domUtils.js';
+import { FULFILLMENT_STATUS_NAMES } from '../../../constants/fulfillmentStatuses.js';
 import { GOODS_ISSUE_RETURN_APPLIED_EVENT, initGoodsIssueReturnForm } from './returnForm.js';
 
 const RETURN_MODAL_SELECTOR = '#goodsIssueReturnModal';
@@ -14,6 +15,7 @@ const RETURN_SUMMARY_SELECTORS = {
     returnedQuantity: '#goodsIssueReturnReturnedQuantity',
     availableQuantity: '#goodsIssueReturnAvailableQuantity'
 };
+
 
 let currentReturnDetail = null;
 let returnQuantityInputInstance = null;
@@ -61,19 +63,23 @@ export const initGoodsIssueReturnModal = () => {
     on(GOODS_ISSUE_RETURN_APPLIED_EVENT, RETURN_MODAL_SELECTOR, (event) => {
         if (!currentReturnDetail) return;
 
-        currentReturnDetail.returnedQuantity = Number(
-            event.detail.goodsIssueReturn?.newTotalReturnedQuantity
-            ?? Number(currentReturnDetail.returnedQuantity ?? 0) + event.detail.returnQuantity
-        );
+        const returnedDetail = event.detail.goodsIssueReturn?.detail;
 
-        setSummaryValues([
-            { selector: RETURN_SUMMARY_SELECTORS.suppliedQuantity, value: currentReturnDetail.suppliedQuantity },
-            { selector: RETURN_SUMMARY_SELECTORS.returnedQuantity, value: currentReturnDetail.returnedQuantity },
-            {
-                selector: RETURN_SUMMARY_SELECTORS.availableQuantity,
-                value: Number(currentReturnDetail.suppliedQuantity ?? 0) - Number(currentReturnDetail.returnedQuantity ?? 0)
-            }
-        ]);
+        if (!returnedDetail) {
+            refreshProductTable(details);
+            return;
+        }
+
+        const detailIndex = details.findIndex(detail => detail.id === returnedDetail.id);
+
+        if (returnedDetail.fulfillmentStatus?.name === FULFILLMENT_STATUS_NAMES.CANCELED) {
+            if (detailIndex >= 0) details.splice(detailIndex, 1);
+        } else if (detailIndex >= 0) {
+            details[detailIndex] = { ...details[detailIndex], ...returnedDetail };
+        } else {
+            details.push(returnedDetail);
+        }
+
         refreshProductTable(details);
     });
 };

@@ -383,14 +383,14 @@ model GoodsIssueDetail {
   suppliedQuantity            Decimal? @db.Decimal(10, 2)
   returnedQuantity            Decimal  @default(0) @db.Decimal(10, 2)
   isSupplied                  Boolean  @default(false)
-  fulfillmentStatusId         String?  @db.Uuid
+  fulfillmentStatusId         String   @db.Uuid
 
   presentation      Presentation       @relation(fields: [presentationId], references: [id])
   unitMeasure       UnitMeasure        @relation(fields: [unitMeasureId], references: [id])
   product           Product            @relation(fields: [productId], references: [id])
   supplier          Supplier           @relation(fields: [supplierId], references: [id])
   goodsIssue        GoodsIssue         @relation(fields: [goodsIssueId], references: [id])
-  fulfillmentStatus FulfillmentStatus? @relation(fields: [fulfillmentStatusId], references: [id])
+  fulfillmentStatus FulfillmentStatus  @relation(fields: [fulfillmentStatusId], references: [id], onDelete: Restrict)
   movementDetails   MovementDetail[]
   returns           GoodsIssueReturn[]
 

@@ -33,7 +33,8 @@ export const isValidInternalClientProjectNumberByDepartment = ({ client, departm
 };
 
 export const buildGoodsIssueDetails = async ({
-    details
+    details,
+    initialFulfillmentStatusId = null
 }) => {
 
     const pairs = [
@@ -96,10 +97,12 @@ export const buildGoodsIssueDetails = async ({
             presentationName: presentation.name,
             unitMeasureId: unitMeasure.id,
             unitMeasureName: unitMeasure.name,
-            unitMeasureSymbol: unitMeasure.symbol
+            unitMeasureSymbol: unitMeasure.symbol,
+            ...(initialFulfillmentStatusId ? { fulfillmentStatusId: initialFulfillmentStatusId } : {})
         };
     });
 }
+
 
 export const resolveFulfillmentStatus = (details) => {
 
