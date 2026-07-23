@@ -1,5 +1,6 @@
 import { useForm } from "../../application/form.js";
 import { editGoodsReceiptHeader, registerGoodsReceipt, cancelGoodsReceiptDetail } from "../../application/warehouse/goodsReceipts.js";
+import { handleApiError } from "../../api/errorHandler.js";
 import { validateAddGoodsReceiptProductValidators, validateGoodsReceiptValidators } from "../../utils/validations/validators.js";
 import { refreshProductTable } from "../../plugins/datatable/baseDatatable.js";
 import { createGoodsReceiptDatatable, details, initDetailsGoodsReceiptTable } from "../../plugins/datatable/goodsReceiptDatatable.js";
@@ -297,16 +298,23 @@ on('click', '#productTable .cancel-receipt-detail-btn', async (event, button) =>
 
     if (!confirmation.isConfirmed) return;
 
-    const response = await cancelGoodsReceiptDetail({
-        id: currentGoodsReceipt.id,
-        detailId: detail.id
-    });
+    try {
+        const response = await cancelGoodsReceiptDetail({
+            id: currentGoodsReceipt.id,
+            detailId: detail.id
+        });
 
-    notifications.showSuccess(response.message);
-    document.querySelector('#goodsReceiptCorrectionModal').dispatchEvent(new CustomEvent(GOODS_RECEIPT_CORRECTION_APPLIED_EVENT, {
-        bubbles: true,
-        detail: response.data
-    }));
+        notifications.showSuccess(response.message);
+        document.querySelector('#goodsReceiptCorrectionModal').dispatchEvent(new CustomEvent(GOODS_RECEIPT_CORRECTION_APPLIED_EVENT, {
+            bubbles: true,
+            detail: response.data
+        }));
+    } catch (err) {
+        handleApiError({
+            err,
+            rethrow: false
+        });
+    }
 });
 
 on(GOODS_RECEIPT_CORRECTION_APPLIED_EVENT, '#goodsReceiptCorrectionModal', (event) => {
