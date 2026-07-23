@@ -51,7 +51,8 @@ export const setupTableFilters = async ({
             getSelectApi,
             getOptions = async () => [],
             initSelect,
-            attachHandler
+            attachHandler,
+            defaultSelectedLabel
         } = filter;
 
         if (filter.customGetValues) {
@@ -84,8 +85,12 @@ export const setupTableFilters = async ({
             );
         });
 
+        const defaultSelectedOption = defaultSelectedLabel
+            ? options.find(option => option.label === defaultSelectedLabel || option.text === defaultSelectedLabel)
+            : options[0];
+
         initSelect({
-            selectedId: isSelected ? options[0]?.value : null
+            selectedId: isSelected ? defaultSelectedOption?.value : null
         });
 
         if (attachHandler) attachHandler({ onChange });
