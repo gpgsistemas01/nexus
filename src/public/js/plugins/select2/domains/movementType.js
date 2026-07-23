@@ -35,6 +35,5 @@ export const initMovementTypeFilterSelect = ({
     selectedId,
     mapOption: (status) => ({
         ...status
-    }),
-    clearWhenEmpty: false
+    })
 });

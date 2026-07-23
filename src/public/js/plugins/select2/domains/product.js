@@ -1,6 +1,6 @@
 import { openProductModal } from "../../../modules/products/productModal.js";
 import { getAllProducts, getProductOptions } from "../../../application/warehouse/products.js";
-import { applySelectedSelectValue, initDomainSelect2, initbaseSelect2, setMdbWrapperInputValue, toggleSelectOption } from "../baseSelect.js";
+import { initDomainSelect2, initFilterSelect2, setMdbWrapperInputValue, toggleSelectOption } from "../baseSelect.js";
 import { mapProductToSelectData } from "../../../utils/productSelectUtils.js";
 import { FORM_SELECTORS, FILTER_SELECTORS } from "../../../constants/selectors.js";
 
@@ -19,14 +19,11 @@ export const initProductFilterSelect = ({
 
     const baseSelector = 'body';
 
-    initbaseSelect2({
-        baseSelector: productSelector,
-        containerSelector: baseSelector,
-        get: async (params) => ({
-            data: await getProductOptions(params)
-        }),
-        clearOnOpen: false,
+    initFilterSelect2({
+        selector: productSelector,
+        getOptions: getProductOptions,
         placeholder: 'Filtrar por producto',
+        selectedId,
         data: (params) => {
 
             let supplierId;
@@ -60,12 +57,6 @@ export const initProductFilterSelect = ({
                 }
             };
         }
-    });
-
-    applySelectedSelectValue({
-        selector: productSelector,
-        selectedId,
-        clearWhenEmpty: false
     });
 };
 
