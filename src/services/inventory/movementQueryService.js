@@ -10,6 +10,15 @@ const REFERENCE_NUMBER_SELECT = {
     referenceNumber: true
 };
 
+const MOVEMENT_TYPE_NAMES = Object.freeze({
+    ENTRY: 'Entrada',
+    ISSUE: 'Salida',
+    ADJUSTMENT: 'Ajuste',
+    RETURN: 'Devolución'
+});
+
+const RETURN_MOVEMENT_TYPE = 'RETURN';
+
 const MOVEMENT_DETAIL_SELECT = {
     id: true,
     productBase: true,
@@ -47,6 +56,11 @@ const MOVEMENT_DETAIL_SELECT = {
             supplierName: true,
             productBase: true,
             productHeight: true
+        }
+    },
+    goodsIssueReturn: {
+        select: {
+            id: true
         }
     },
     movement: {
@@ -196,6 +210,13 @@ const resolveSupplierName = (detail) =>
     detail.stockAdjustmentDetail?.supplierName ??
     detail.supplier?.tradeName;
 
+const resolveMovementTypeName = (detail) => {
+
+    if (detail.goodsIssueReturn) return MOVEMENT_TYPE_NAMES.RETURN;
+
+    return MOVEMENT_TYPE_NAMES[detail.movement.type] ?? detail.movement.type;
+};
+
 const mapMovementDetail = (detail) => ({
     id: detail.id,
 
@@ -203,7 +224,7 @@ const mapMovementDetail = (detail) => ({
 
     createdAt: formatDateLongWithTime(detail.movement.createdAt),
 
-    type: detail.movement.type,
+    type: resolveMovementTypeName(detail),
 
     productName: resolveProductName(detail),
 
@@ -246,8 +267,12 @@ export const findAllMovements = async ({
 
     try {
 
+        const isReturnMovementFilter = movementType === RETURN_MOVEMENT_TYPE;
+
         const movementFilters = {
-            ...(movementType && { type: movementType }),
+            ...(movementType && {
+                type: isReturnMovementFilter ? 'ENTRY' : movementType
+            }),
             ...(goodsIssueId && { goodsIssueId }),
             ...(goodsReceiptId && { goodsReceiptId }),
             ...(stockAdjustmentId && { stockAdjustmentId }),
@@ -262,6 +287,18 @@ export const findAllMovements = async ({
 
             ...(supplierId && {
                 supplierId
+            }),
+
+            ...(isReturnMovementFilter && {
+                goodsIssueReturn: {
+                    isNot: null
+                }
+            }),
+
+            ...(movementType === 'ENTRY' && {
+                goodsIssueReturn: {
+                    is: null
+                }
             }),
 
             ...getMovementSearchFilter(search),

@@ -57,7 +57,7 @@ export const exportMovementReport = async (req, res) => {
         ...rows.map(row => [
             row.date,
             row.createdAt,
-            row.type === 'ENTRY' ? 'Entrada' : row.type === 'ISSUE' ? 'Salida' : row.type === 'ADJUSTMENT' ? 'Ajuste' : row.type,
+            row.type,
             row.referenceNumber,
             row.productName,
             row.productBase,

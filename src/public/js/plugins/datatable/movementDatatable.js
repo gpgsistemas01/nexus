@@ -37,20 +37,7 @@ export const createMovementDatatable = async () => {
             searchPlaceholder: 'Buscar por Material, Proveedor o Folio',
             columns: [
                 { data: 'date', title: 'Fecha' },
-                {
-                    data: 'type',
-                    title: 'Tipo',
-                    render: (data) => {
-
-                        if (data === 'ENTRY') return 'Entrada';
-
-                        if (data === 'ADJUSTMENT') return 'Ajuste';
-
-                        if (data === 'ISSUE') return 'Salida';
-
-                        return data;
-                    }
-                },
+                { data: 'type', title: 'Tipo' },
                 { data: 'referenceNumber', title: 'Folio' },
                 { data: 'productName', title: 'Material' },
                 { data: 'productBase', render: formatDecimal, title: 'Base' },
