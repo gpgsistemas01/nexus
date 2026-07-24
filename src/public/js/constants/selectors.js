@@ -10,10 +10,12 @@ export const FILTER_SELECTORS = {
     SUPPLIER: '#supplierFilter',
     FULFILLMENT_STATUS: '#fulfillmentStatusFilter',
     MOVEMENT_TYPE: '#movementTypeFilter',
+    OBSERVATIONS: '#observationsFilter',
     CLIENT: '#clientFilter',
     DEPARTMENT: '#departmentFilter',
     PROFILE: '#profileFilter',
-    CLEAR_BUTTON: '#clearFiltersButton'
+    CLEAR_BUTTON: '#clearFiltersButton',
+    APPLY_BUTTON: '#applyFiltersButton'
 };
 
 export const MODAL_SELECTORS = {

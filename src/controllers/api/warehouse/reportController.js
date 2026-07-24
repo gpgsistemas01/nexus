@@ -82,6 +82,7 @@ export const exportGoodsIssueReportExcel = async (req, res) => {
         startDate: monthlyReport ? monthDateRange.startDate : req.query.startDate || '',
         endDate: monthlyReport ? monthDateRange.endDate : req.query.endDate || '',
         fulfillmentStatusId: monthlyReport ? '' : req.query.fulfillmentStatusId || '',
+        observationsSearch: monthlyReport ? '' : req.query.observationsSearch || '',
         clientId: monthlyReport ? '' : req.query.clientId || '',
         departmentId: monthlyReport ? '' : req.query.departmentId || '',
         profileId: monthlyReport ? '' : req.query.profileId || '',
