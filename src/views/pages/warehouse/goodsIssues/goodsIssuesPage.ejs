@@ -93,7 +93,21 @@
             label: 'Estado de surtido:',
             col: 'col-12 col-md-6 col-lg-3'
         }
-    ]
+    ],
+    textInputs: [
+        {
+            id: 'observationsFilter',
+            name: 'observationsSearch',
+            type: 'search',
+            label: 'Observaciones contiene:',
+            value: '',
+            attrs: {
+                placeholder: 'Escribe una observación y usa Buscar / filtrar'
+            },
+            col: 'col-12'
+        }
+    ],
+    showApplyButton: true
 }) %>
 
 <%- include('../../../shared/mainTable', { title: 'Salidas de almacén' }) %>

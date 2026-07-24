@@ -21,6 +21,16 @@ const attachClearFiltersHandler = (selector = DATATABLE_SELECTORS.MAIN) => {
     });
 };
 
+const attachApplyFiltersHandler = (selector = DATATABLE_SELECTORS.MAIN) => {
+
+    on('click', FILTER_SELECTORS.APPLY_BUTTON, (e) => {
+
+        getDataTable(selector)?.ajax.reload();
+
+        e.target.blur();
+    });
+};
+
 export const setupTableFilters = async ({
     fields = [],
     selector = DATATABLE_SELECTORS.MAIN
@@ -34,6 +44,7 @@ export const setupTableFilters = async ({
     };
 
     attachClearFiltersHandler(selector);
+    attachApplyFiltersHandler(selector);
     bindTableFilterDependencies(fields);
 
     const filters = buildTableFilterConfigs({

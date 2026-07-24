@@ -16,6 +16,7 @@ export const getAllGoodsIssues = async (req, res) => {
     const { skip, take } = getDataTablePaging(req.query);
     const search = getDataTableSearch(req.query);
     const fulfillmentStatusId = req.query.fulfillmentStatusId || '';
+    const observationsSearch = req.query.observationsSearch || '';
     const startDate = req.query.startDate || '';
     const endDate = req.query.endDate || '';
     const clientId = req.query.clientId || '';
@@ -39,6 +40,7 @@ export const getAllGoodsIssues = async (req, res) => {
         departmentId,
         profileId,
         fulfillmentStatusId,
+        observationsSearch,
         orderBy,
         orderDir,
         accesses: req.user?.accesses

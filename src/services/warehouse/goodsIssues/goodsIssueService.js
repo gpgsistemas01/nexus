@@ -128,6 +128,7 @@ export const findAllGoodsIssues = async ({
     startDate = '',
     endDate = '',
     fulfillmentStatusId = '',
+    observationsSearch = '',
     clientId = '',
     departmentId = '',
     profileId = '',
@@ -169,6 +170,12 @@ export const findAllGoodsIssues = async ({
         }),
         ...(fulfillmentStatusId && {
             fulfillmentStatusId
+        }),
+        ...(observationsSearch && {
+            observations: {
+                contains: observationsSearch,
+                mode: 'insensitive'
+            }
         }),
         ...(!canViewAll && {
             department: {
