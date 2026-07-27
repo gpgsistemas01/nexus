@@ -471,7 +471,7 @@ body {
   margin-bottom: 0.35rem;
 }
 
-.table-filters .form-control:not([type="date"]):not([type="datetime-local"]),
+.table-filters .form-control:not([type="date"]):not([type="datetime-local"]):not([type="search"]),
 .table-filters .form-select,
 .table-filters .select2-container--default .select2-selection--single {
   background-color: var(--mdb-light);
@@ -483,7 +483,7 @@ body {
   transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-.table-filters .form-control:not([type="date"]):not([type="datetime-local"]),
+.table-filters .form-control:not([type="date"]):not([type="datetime-local"]):not([type="search"]),
 .table-filters .form-select {
   padding: var(--form-field-padding);
 }
