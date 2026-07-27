@@ -57,7 +57,7 @@ export const createGoodsReceiptDetailChange = async ({
     goodsReceiptId,
     goodsReceiptDetailId
 }) => {
-    const change = await tx.goodsReceiptDetailChange.create({
+    return tx.goodsReceiptDetailChange.create({
         data: {
             goodsReceiptId,
             goodsReceiptDetailId,
@@ -79,11 +79,7 @@ export const createGoodsReceiptDetailChange = async ({
             productChanged: false,
             quantityDifference: Number(resultingDetail.quantity) - Number(currentDetail.quantity),
             costDifference: Number(resultingDetail.costPerUnitType) - Number(currentDetail.costPerUnitType)
-        }
-    });
-
-    return tx.goodsReceiptDetailChange.findUnique({
-        where: { id: change.id },
+        },
         include: {
             stockAdjustment: true
         }

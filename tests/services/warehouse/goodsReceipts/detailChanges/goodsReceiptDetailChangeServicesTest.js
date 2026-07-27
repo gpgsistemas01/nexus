@@ -5,7 +5,8 @@ const goodsReceiptDetailFindFirst = vi.fn();
 const goodsReceiptDetailChangeCreate = vi.fn();
 const goodsReceiptDetailChangeFindUnique = vi.fn();
 const buildGoodsReceiptDetails = vi.fn();
-const updateGoodsReceiptDetailAndTotals = vi.fn();
+const correctGoodsReceiptDetailAndTotals = vi.fn();
+const cancelGoodsReceiptDetailAndTotals = vi.fn();
 const createStockAdjustmentByQuantityChange = vi.fn();
 const findGoodsReceiptDetailChangeReason = vi.fn();
 const updateProductUnitCostIfHigher = vi.fn();
@@ -32,7 +33,8 @@ vi.mock('../../../../../src/services/warehouse/products/supplierProductService.j
 
 vi.mock('../../../../../src/services/warehouse/goodsReceipts/goodsReceiptHelpers.js', () => ({
   buildGoodsReceiptDetails,
-  updateGoodsReceiptDetailAndTotals
+  correctGoodsReceiptDetailAndTotals,
+  cancelGoodsReceiptDetailAndTotals
 }));
 
 vi.mock('../../../../../src/services/warehouse/reasonService.js', () => ({
@@ -83,12 +85,15 @@ describe('goods receipt detail change services', () => {
     createStockAdjustmentByQuantityChange
       .mockResolvedValueOnce({ id: 'adjustment-1' })
       .mockResolvedValueOnce({ id: 'adjustment-2' });
-    updateGoodsReceiptDetailAndTotals.mockResolvedValue({
+    correctGoodsReceiptDetailAndTotals.mockResolvedValue({
       updatedDetail: { id: 'detail-1' },
       updatedReceipt: { id: 'receipt-1', supplierId: 'supplier-1' }
     });
-    goodsReceiptDetailChangeCreate.mockResolvedValue({ id: 'change-1' });
-    goodsReceiptDetailChangeFindUnique.mockResolvedValue({ id: 'change-1', stockAdjustment: { id: 'adjustment-1' } });
+    cancelGoodsReceiptDetailAndTotals.mockResolvedValue({
+      updatedDetail: { id: 'detail-1', status: 'CANCELED' },
+      updatedReceipt: { id: 'receipt-1', supplierId: 'supplier-1' }
+    });
+    goodsReceiptDetailChangeCreate.mockResolvedValue({ id: 'change-1', stockAdjustment: { id: 'adjustment-1' } });
     updateProductUnitCostIfHigher.mockResolvedValue();
   });
 
@@ -120,11 +125,28 @@ describe('goods receipt detail change services', () => {
       quantityChange: -1,
       observations: 'Corrección de compra OC-2026-0001; campos afectados: cantidad. Ajuste de salida por disminución de cantidad.'
     }));
+    expect(correctGoodsReceiptDetailAndTotals).toHaveBeenCalledWith(expect.objectContaining({
+      goodsReceiptId: 'receipt-1',
+      detailId: 'detail-1',
+      correctedDetail: expect.objectContaining({ quantity: 4 })
+    }));
+    expect(cancelGoodsReceiptDetailAndTotals).not.toHaveBeenCalled();
     expect(result.detailChange).toEqual({ id: 'change-1', stockAdjustment: { id: 'adjustment-1' } });
     expect(result).not.toHaveProperty('costDifference');
   });
 
   it('cancela el detalle con un flujo independiente sin actualizar costo unitario', async () => {
+    const tx = {
+      goodsReceiptDetail: {
+        findFirst: goodsReceiptDetailFindFirst
+      },
+      goodsReceiptDetailChange: {
+        create: goodsReceiptDetailChangeCreate,
+        findUnique: goodsReceiptDetailChangeFindUnique
+      }
+    };
+    transaction.mockImplementationOnce(callback => callback(tx));
+
     const result = await cancelGoodsReceiptDetailLine({
       id: 'receipt-1',
       detailId: 'detail-1',
@@ -132,26 +154,30 @@ describe('goods receipt detail change services', () => {
     });
 
     expect(buildGoodsReceiptDetails).not.toHaveBeenCalled();
-    expect(findGoodsReceiptDetailChangeReason).toHaveBeenCalledWith(expect.objectContaining({
+    expect(findGoodsReceiptDetailChangeReason).toHaveBeenCalledWith({
+      tx,
       changeType: 'CANCELLATION'
-    }));
+    });
     expect(createStockAdjustmentByQuantityChange).toHaveBeenCalledWith(expect.objectContaining({
+      tx,
       quantityChange: -5,
       observations: 'Cancelación de detalle de compra OC-2026-0001. Ajuste de salida por cancelación del detalle.'
     }));
-    expect(updateGoodsReceiptDetailAndTotals).toHaveBeenCalledWith(expect.objectContaining({
-      correctedDetail: {
-        status: 'CANCELED'
-      }
-    }));
+    expect(cancelGoodsReceiptDetailAndTotals).toHaveBeenCalledWith({
+      tx,
+      goodsReceiptId: 'receipt-1',
+      detailId: 'detail-1'
+    });
     expect(goodsReceiptDetailChangeCreate).toHaveBeenCalledWith(expect.objectContaining({
       data: expect.objectContaining({
         changeType: 'CANCELLATION',
         correctedQuantity: 0,
         correctedCostPerUnitType: 10,
         costDifference: 0
-      })
+      }),
+      include: { stockAdjustment: true }
     }));
+    expect(goodsReceiptDetailChangeFindUnique).not.toHaveBeenCalled();
     expect(updateProductUnitCostIfHigher).not.toHaveBeenCalled();
     expect(result).not.toHaveProperty('costDifference');
   });
@@ -183,7 +209,7 @@ describe('goods receipt detail change services', () => {
 
     expect(buildGoodsReceiptDetails).not.toHaveBeenCalled();
     expect(createStockAdjustmentByQuantityChange).not.toHaveBeenCalled();
-    expect(updateGoodsReceiptDetailAndTotals).not.toHaveBeenCalled();
+    expect(correctGoodsReceiptDetailAndTotals).not.toHaveBeenCalled();
     expect(goodsReceiptDetailChangeCreate).not.toHaveBeenCalled();
   });
 
@@ -210,7 +236,7 @@ describe('goods receipt detail change services', () => {
     });
 
     expect(createStockAdjustmentByQuantityChange).not.toHaveBeenCalled();
-    expect(updateGoodsReceiptDetailAndTotals).not.toHaveBeenCalled();
+    expect(correctGoodsReceiptDetailAndTotals).not.toHaveBeenCalled();
     expect(goodsReceiptDetailChangeCreate).not.toHaveBeenCalled();
   });
 
@@ -237,7 +263,7 @@ describe('goods receipt detail change services', () => {
     });
 
     expect(createStockAdjustmentByQuantityChange).not.toHaveBeenCalled();
-    expect(updateGoodsReceiptDetailAndTotals).not.toHaveBeenCalled();
+    expect(cancelGoodsReceiptDetailAndTotals).not.toHaveBeenCalled();
   });
 
 });

@@ -10,7 +10,7 @@ import {
 } from '../../../../errors/warehouse/goodsReceiptError.js';
 import { getDb } from '../../../../repository/baseRepository.js';
 import { createServiceLogger, getModelLogContext, logServiceError } from '../../../../utils/logger.js';
-import { updateGoodsReceiptDetailAndTotals } from '../goodsReceiptHelpers.js';
+import { cancelGoodsReceiptDetailAndTotals } from '../goodsReceiptHelpers.js';
 import {
     createGoodsReceiptDetailChange,
     createGoodsReceiptDetailChangeAdjustment,
@@ -53,11 +53,10 @@ export const cancelGoodsReceiptDetailLine = async ({ id, detailId, userId }) => 
                 goodsReceiptDetailId: detailId,
                 observations: `Cancelación de detalle de compra ${receiptReference}. Ajuste de salida por cancelación del detalle.`
             });
-            const { updatedDetail, updatedReceipt } = await updateGoodsReceiptDetailAndTotals({
+            const { updatedDetail, updatedReceipt } = await cancelGoodsReceiptDetailAndTotals({
                 tx,
                 goodsReceiptId: id,
-                detailId,
-                correctedDetail: { status: GOODS_RECEIPT_DETAIL_STATUS.CANCELED }
+                detailId
             });
             const detailChange = await createGoodsReceiptDetailChange({
                 tx,
