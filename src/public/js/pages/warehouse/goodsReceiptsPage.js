@@ -174,6 +174,11 @@ export const openGoodsReceiptModal = ({ mode, data = null }) => {
             showActions: true,
             showAddProduct: true
         });
+        toggleContainerElements({
+            selector: '.add-product-container',
+            root: modalElement,
+            isDisabled: !form.elements.supplierId.value
+        });
     }
 
     if (mode === FORM_MODES.EDIT || mode === FORM_MODES.VIEW) {
