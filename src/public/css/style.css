@@ -499,6 +499,8 @@ body {
 
 .table-filters-actions {
   display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
   justify-content: flex-end;
   margin-block-start: 0.9rem;
 }
@@ -919,6 +921,10 @@ table.dataTable > tbody > tr.child td.child {
   .table-filters-actions,
   .table-filter-button {
     width: 100%;
+  }
+
+  .table-filters-actions {
+    flex-direction: column;
   }
 }
 
