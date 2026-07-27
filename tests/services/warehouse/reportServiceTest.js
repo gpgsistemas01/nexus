@@ -150,7 +150,12 @@ describe('warehouse reportService', () => {
           conversionUnitCost: '1.50',
           costPerUnitType: '9',
           netPurchaseAmount: '45',
-          grossPurchaseAmount: '52.20'
+          grossPurchaseAmount: '52.20',
+          status: 'ACTIVE'
+        }, {
+          productId: 'product-2',
+          productName: 'Producto cancelado',
+          status: 'CANCELED'
         }]
       }]
     });

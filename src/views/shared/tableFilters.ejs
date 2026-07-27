@@ -15,7 +15,9 @@
             col: '6'
         }
     ],
-    selectInputs: typeof selectInputs !== 'undefined' ? selectInputs : []
+    selectInputs: typeof selectInputs !== 'undefined' ? selectInputs : [],
+    textInputs: typeof textInputs !== 'undefined' ? textInputs : [],
+    showApplyButton: typeof showApplyButton !== 'undefined' ? showApplyButton : false
 } %>
 
 <details class="table-filters-panel">
@@ -44,7 +46,23 @@
         <%- include('./outlineInputList', { inputs: filterConfig.dateInputs }) %>
     </div>
 
+    <% if (filterConfig.textInputs.length) { %>
+        <div class="row table-filters">
+            <%- include('./outlineInputList', { inputs: filterConfig.textInputs }) %>
+        </div>
+    <% } %>
+
         <div class="table-filters-actions">
+            <% if (filterConfig.showApplyButton) { %>
+                <%- include('./button', {
+                    button : {
+                        id: 'applyFiltersButton',
+                        class: 'btn table-filter-button',
+                        content: 'Buscar / filtrar'
+                    }
+                }) %>
+            <% } %>
+
             <%- include('./button', {
                 button : {
                     id: 'clearFiltersButton',

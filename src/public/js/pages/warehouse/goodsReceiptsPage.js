@@ -1,5 +1,6 @@
 import { useForm } from "../../application/form.js";
 import { editGoodsReceiptHeader, registerGoodsReceipt, cancelGoodsReceiptDetail } from "../../application/warehouse/goodsReceipts.js";
+import { handleApiError } from "../../api/errorHandler.js";
 import { validateAddGoodsReceiptProductValidators, validateGoodsReceiptValidators } from "../../utils/validations/validators.js";
 import { refreshProductTable } from "../../plugins/datatable/baseDatatable.js";
 import { createGoodsReceiptDatatable, details, initDetailsGoodsReceiptTable } from "../../plugins/datatable/goodsReceiptDatatable.js";
@@ -36,16 +37,16 @@ let currentGoodsReceipt = null;
 
 initGoodsReceiptCorrection();
 
-const replaceGoodsReceiptDetails = ({ receipt, includeCanceledDetails = false }) => {
+const buildGoodsReceiptModalDetails = ({ receipt, includeCanceledDetails = false }) => {
     const supplierName = receipt.supplierName;
-    details.length = 0;
-    details.push(...receipt.details
+
+    return receipt.details
         .filter(detail => includeCanceledDetails || detail.status !== GOODS_RECEIPT_DETAIL_STATUS.CANCELED)
         .map(detail => ({
             ...detail,
             supplierName,
             goodsReceiptStatusName: receipt.status?.name
-        })));
+        }));
 };
 
 document.querySelector(modalId).addEventListener(GOODS_RECEIPT_SUPPLIER_CHANGED_EVENT, () => {
@@ -164,10 +165,10 @@ export const openGoodsReceiptModal = ({ mode, data = null }) => {
         value = data.isInvoiced ? INVOICE_VALUES.INVOICE : INVOICE_VALUES.NONE;
         form.elements.observations.value = data.observations || '';
         setDateTimePickerValue(form.elements.receptionDate, data.receptionDate);
-        replaceGoodsReceiptDetails({
+        details.push(...buildGoodsReceiptModalDetails({
             receipt: data,
             includeCanceledDetails: data.status?.name === GOODS_RECEIPT_STATUS_LABELS.CANCELED
-        });
+        }));
         setTotals({
             quantity: data.totalQuantity,
             net: data.totalNetPurchaseAmount,
@@ -297,16 +298,23 @@ on('click', '#productTable .cancel-receipt-detail-btn', async (event, button) =>
 
     if (!confirmation.isConfirmed) return;
 
-    const response = await cancelGoodsReceiptDetail({
-        id: currentGoodsReceipt.id,
-        detailId: detail.id
-    });
+    try {
+        const response = await cancelGoodsReceiptDetail({
+            id: currentGoodsReceipt.id,
+            detailId: detail.id
+        });
 
-    notifications.showSuccess(response.message);
-    document.querySelector('#goodsReceiptCorrectionModal').dispatchEvent(new CustomEvent(GOODS_RECEIPT_CORRECTION_APPLIED_EVENT, {
-        bubbles: true,
-        detail: response.data
-    }));
+        notifications.showSuccess(response.message);
+        document.querySelector('#goodsReceiptCorrectionModal').dispatchEvent(new CustomEvent(GOODS_RECEIPT_CORRECTION_APPLIED_EVENT, {
+            bubbles: true,
+            detail: response.data
+        }));
+    } catch (err) {
+        handleApiError({
+            err,
+            rethrow: false
+        });
+    }
 });
 
 on(GOODS_RECEIPT_CORRECTION_APPLIED_EVENT, '#goodsReceiptCorrectionModal', (event) => {
@@ -319,7 +327,8 @@ on(GOODS_RECEIPT_CORRECTION_APPLIED_EVENT, '#goodsReceiptCorrectionModal', (even
         ...updatedReceipt
     };
 
-    replaceGoodsReceiptDetails({ receipt: currentGoodsReceipt });
+    details.length = 0;
+    details.push(...buildGoodsReceiptModalDetails({ receipt: currentGoodsReceipt }));
     refreshProductTable(details);
     setTotals({
         quantity: currentGoodsReceipt.totalQuantity,

@@ -105,7 +105,6 @@ export const buildGoodsIssueDetails = async ({
 
 
 export const resolveFulfillmentStatus = (details) => {
-
     const allSupplied = details.every((d) => d.isSupplied);
 
     const anySupplied = details.some(

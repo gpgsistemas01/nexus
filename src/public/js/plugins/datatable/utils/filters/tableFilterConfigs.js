@@ -13,6 +13,33 @@ import { FILTER_SELECTORS } from "../../../../constants/selectors.js";
 import { buildDateFilterConfig } from "./modules/dateFilter.js";
 import { attachSelectFilterHandler } from "./selectFilterEvents.js";
 
+
+const attachTextFilterHandler = ({
+    selector,
+    onChange
+}) => {
+
+    $(selector).on('keydown', (event) => {
+        if (event.key !== 'Enter') return;
+
+        event.preventDefault();
+        onChange?.();
+    });
+};
+
+const buildTextFilterConfig = ({
+    key,
+    selector
+}) => ({
+    customGetValues: () => ({
+        [key]: document.querySelector(selector)?.value?.trim() || ''
+    }),
+    attachHandler: ({ onChange }) => attachTextFilterHandler({
+        selector,
+        onChange
+    })
+});
+
 const WAREHOUSE_PROFILE_FILTER_PARAMS = {
     department: 'ALMACÉN Y PROVEDURÍA',
     strictDepartmentFilter: true
@@ -43,6 +70,7 @@ const selectFilterConfigs = {
     fulfillmentStatus: {
         key: 'fulfillmentStatusId',
         selector: FILTER_SELECTORS.FULFILLMENT_STATUS,
+        defaultSelectedLabel: 'Pendiente',
         getSelectApi: getFulfillmentStatusSelectApi,
         getOptions: getFulfillmentStatusOptions,
         initSelect: initFulfillmentStatusFilterSelect
@@ -87,7 +115,11 @@ const selectFilterConfigs = {
         getSelectApi: getMovementTypeSelectApi,
         getOptions: getMovementTypeData,
         initSelect: initMovementTypeFilterSelect
-    }
+    },
+    observations: buildTextFilterConfig({
+        key: 'observationsSearch',
+        selector: FILTER_SELECTORS.OBSERVATIONS
+    })
 };
 
 const resolveTableFilterConfig = ({

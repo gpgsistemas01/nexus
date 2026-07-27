@@ -21,6 +21,16 @@ const attachClearFiltersHandler = (selector = DATATABLE_SELECTORS.MAIN) => {
     });
 };
 
+const attachApplyFiltersHandler = (selector = DATATABLE_SELECTORS.MAIN) => {
+
+    on('click', FILTER_SELECTORS.APPLY_BUTTON, (e) => {
+
+        getDataTable(selector)?.ajax.reload();
+
+        e.target.blur();
+    });
+};
+
 export const setupTableFilters = async ({
     fields = [],
     selector = DATATABLE_SELECTORS.MAIN
@@ -34,6 +44,7 @@ export const setupTableFilters = async ({
     };
 
     attachClearFiltersHandler(selector);
+    attachApplyFiltersHandler(selector);
     bindTableFilterDependencies(fields);
 
     const filters = buildTableFilterConfigs({
@@ -51,7 +62,8 @@ export const setupTableFilters = async ({
             getSelectApi,
             getOptions = async () => [],
             initSelect,
-            attachHandler
+            attachHandler,
+            defaultSelectedLabel
         } = filter;
 
         if (filter.customGetValues) {
@@ -84,8 +96,12 @@ export const setupTableFilters = async ({
             );
         });
 
+        const defaultSelectedOption = defaultSelectedLabel
+            ? options.find(option => option.label === defaultSelectedLabel || option.text === defaultSelectedLabel)
+            : options[0];
+
         initSelect({
-            selectedId: isSelected ? options[0]?.value : null
+            selectedId: isSelected ? defaultSelectedOption?.value : null
         });
 
         if (attachHandler) attachHandler({ onChange });

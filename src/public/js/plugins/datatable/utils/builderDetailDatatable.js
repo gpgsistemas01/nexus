@@ -63,7 +63,7 @@ const shouldShowIssueProjectColumns = ({ type, mode, isWarehouse, isCoordinator,
 const shouldShowActionsColumn = ({ type, mode }) => {
     if (type === 'receipt') return mode === 'create';
 
-    return !['edit-detail', 'edit-header', 'return'].includes(mode);
+    return !['edit-detail', 'edit-header', 'return', 'view'].includes(mode);
 };
 
 
@@ -97,6 +97,12 @@ const shouldShowDetailActionButtons = ({ row, mode }) => {
     if (mode === 'create') return true;
 
     return Boolean(row?.id) && !isCanceledDetail(row);
+};
+
+const resolveIssueSuppliedQuantityForDisplay = (row = {}) => {
+    if (isCanceledDetail(row)) return row.returnedQuantity;
+
+    return row.suppliedQuantity;
 };
 
 export const buildDetailsHeader = ({ type, mode, isWarehouse, isCoordinator, isSystem }) => {
@@ -170,7 +176,10 @@ export const buildDetailsColumns = ({ type, mode, render, isWarehouse, isCoordin
         { data: 'productHeight', render: formatDecimal },
         { data: 'quantity', render: formatDecimal },
         ...(type === 'issue' && ISSUE_DETAIL_RETURN_MODES.includes(mode) ? [
-            { data: 'suppliedQuantity', render: formatDecimal },
+            {
+                data: null,
+                render: (_, __, row) => formatDecimal(resolveIssueSuppliedQuantityForDisplay(row))
+            },
             { data: 'returnedQuantity', render: formatDecimal }
         ] : []),
         { data: 'presentationName' },
