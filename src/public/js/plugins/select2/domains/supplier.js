@@ -1,7 +1,6 @@
 import { openSupplierModal } from "../../../modules/suppliers/supplierModal.js";
 import { getAllSuppliers, getSupplierOptions } from "../../../application/warehouse/suppliers.js";
-import { initDomainSelect2, initFilterSelect2, toggleSelectOption } from "../baseSelect.js";
-import { runAfterSelect2Close } from "../select2Lifecycle.js";
+import { initDomainSelect2, initFilterSelect2, runAfterSelect2Close, toggleSelectOption } from "../baseSelect.js";
 import { FILTER_SELECTORS } from "../../../constants/selectors.js";
 
 const supplierSelector = FILTER_SELECTORS.SUPPLIER;
