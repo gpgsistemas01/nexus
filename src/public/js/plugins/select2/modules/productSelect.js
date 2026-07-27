@@ -1,4 +1,3 @@
-import { openSupplierModal } from "../../../modules/suppliers/supplierModal.js";
 import { initPresentationSelect, togglePresentationOption } from "../domains/presentation.js";
 import { initReasonSelect, toggleReasonOption } from "../domains/reason.js";
 import { setupSupplierSelect, toggleSupplierOption } from "../domains/supplier.js";

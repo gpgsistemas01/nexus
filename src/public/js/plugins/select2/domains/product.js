@@ -1,6 +1,6 @@
 import { openProductModal } from "../../../modules/products/productModal.js";
 import { getAllProducts, getProductOptions } from "../../../application/warehouse/products.js";
-import { initDomainSelect2, initFilterSelect2, setMdbWrapperInputValue, toggleSelectOption } from "../baseSelect.js";
+import { initDomainSelect2, initFilterSelect2, runAfterSelect2Close, setMdbWrapperInputValue, toggleSelectOption } from "../baseSelect.js";
 import { mapProductToSelectData } from "../../../utils/productSelectUtils.js";
 import { FORM_SELECTORS, FILTER_SELECTORS } from "../../../constants/selectors.js";
 
@@ -125,28 +125,31 @@ const attachProductHandler = ({
             const id = $(`${ modalSelector } ${ supplierSelector }`).val();
             const tradeName = $(`${ modalSelector } ${ supplierSelector } option:selected`).text();
 
-            openProductModal({
-                data: {
-                    name,
-                    supplier: {
-                        id,
-                        tradeName,
-                    }
-                },
-                includeStockAdjustmentOnCreate,
-                creationContext: productCreationContext,
-                onSave: (createdProduct) => {
+            runAfterSelect2Close({
+                selector: baseSelector,
+                action: () => openProductModal({
+                    data: {
+                        name,
+                        supplier: {
+                            id,
+                            tradeName,
+                        }
+                    },
+                    includeStockAdjustmentOnCreate,
+                    creationContext: productCreationContext,
+                    onSave: (createdProduct) => {
 
-                    toggleProductOption({
-                        selector: baseSelector,
-                        data: mapProductToSelectData(createdProduct)
-                    });
-                    
-                    setMdbWrapperInputValue({
-                        selector: `${ modalSelector } ${ wrapperSelector }`,
-                        value: createdProduct.presentation.name
-                    });
-                }
+                        toggleProductOption({
+                            selector: baseSelector,
+                            data: mapProductToSelectData(createdProduct)
+                        });
+
+                        setMdbWrapperInputValue({
+                            selector: `${ modalSelector } ${ wrapperSelector }`,
+                            value: createdProduct.presentation.name
+                        });
+                    }
+                })
             });
 
             return;

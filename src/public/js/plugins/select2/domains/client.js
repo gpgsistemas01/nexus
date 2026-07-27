@@ -1,6 +1,6 @@
 import { openClientModal } from "../../../modules/clients/clientModal.js";
 import { getAllClients, getClientOptions } from "../../../application/sales/clients.js";
-import { initDomainSelect2, initFilterSelect2, toggleSelectOption } from "../baseSelect.js";
+import { initDomainSelect2, initFilterSelect2, runAfterSelect2Close, toggleSelectOption } from "../baseSelect.js";
 import { FILTER_SELECTORS } from "../../../constants/selectors.js";
 
 const clientFilterSelector = FILTER_SELECTORS.CLIENT;
@@ -49,16 +49,19 @@ const attachClientHandler = ({
 
             const name = data.id.replace('new:', '');
             
-            openClientModal({
-                data: { name },
-                onSave: (createdClient) => {
+            runAfterSelect2Close({
+                selector: baseSelector,
+                action: () => openClientModal({
+                    data: { name },
+                    onSave: (createdClient) => {
 
-                    toggleClientOption({
-                        selector: baseSelector,
-                        id: createdClient.id,
-                        name: createdClient.name
-                    });
-                }
+                        toggleClientOption({
+                            selector: baseSelector,
+                            id: createdClient.id,
+                            name: createdClient.name
+                        });
+                    }
+                })
             });
 
             return;
