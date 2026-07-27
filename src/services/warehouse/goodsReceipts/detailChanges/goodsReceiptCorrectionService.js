@@ -13,7 +13,7 @@ import {
 import { getDb } from '../../../../repository/baseRepository.js';
 import { createServiceLogger, getModelLogContext, logServiceError } from '../../../../utils/logger.js';
 import { updateProductUnitCostIfHigher } from '../../products/supplierProductService.js';
-import { buildGoodsReceiptDetails, updateGoodsReceiptDetailAndTotals } from '../goodsReceiptHelpers.js';
+import { buildGoodsReceiptDetails, correctGoodsReceiptDetailAndTotals } from '../goodsReceiptHelpers.js';
 import {
     createGoodsReceiptDetailChange,
     createGoodsReceiptDetailChangeAdjustment,
@@ -82,7 +82,7 @@ export const correctGoodsReceiptDetailLine = async ({
                 goodsReceiptDetailId: detailId,
                 observations: adjustmentObservations
             });
-            const { updatedDetail, updatedReceipt } = await updateGoodsReceiptDetailAndTotals({
+            const { updatedDetail, updatedReceipt } = await correctGoodsReceiptDetailAndTotals({
                 tx,
                 goodsReceiptId: id,
                 detailId,
