@@ -3,9 +3,31 @@ import { GoodsIssueInexistentStock } from "../../errors/inventory/stockError.js"
 import { getDb } from "../../repository/baseRepository.js";
 import { buildStockKey, hasProductDimensions, normalizeDecimal, parseStockKey } from "../../utils/formattersUtils.js";
 import { assertSufficientStock, calculateConvertedQuantity } from "./stockHelpers.js";
-import { buildStockUpdateSummary } from "./movementHelpers.js";
+import { buildInventoryMovementDetail, buildStockUpdateSummary } from "./movementHelpers.js";
 import { findSupplierProductsForStockMovement, updateSupplierProductStock } from "../warehouse/products/supplierProductService.js";
-import { INVENTORY_MOVEMENT_TYPES, INVENTORY_REFERENCE_TYPES } from "../../constants/inventory.js";
+import { INVENTORY_MOVEMENT_TYPES } from "../../constants/inventory.js";
+
+export const createInventoryMovement = ({
+    tx = null,
+    reference = {},
+    details,
+    movementType
+}) => {
+    const db = getDb(tx);
+
+    return db.inventoryMovement.create({
+        data: {
+            ...reference,
+            type: movementType,
+            details: {
+                create: details
+            }
+        },
+        include: {
+            details: true
+        }
+    });
+};
 
 
 export const applyInventoryMovement = async ({
@@ -22,8 +44,6 @@ export const applyInventoryMovement = async ({
             throw new MovementDetailRelationConflict();
         }
     }
-
-    const db = getDb(tx);
 
     const stockUpdateSummary = buildStockUpdateSummary({ details });
 
@@ -122,43 +142,25 @@ export const applyInventoryMovement = async ({
 
         ps.convertedQuantity = newConverted;
 
-        return {
+        return buildInventoryMovementDetail({
             productId: detail.productId,
             supplierId: detail.supplierId,
-
             quantity: signedQuantity,
-
             previousStock,
             newStock,
-
             productBase: hasDimensions ? base : null,
             productHeight: hasDimensions ? height : null,
-
-            ...(detail.goodsReceiptDetailId && {
-                goodsReceiptDetailId: detail.goodsReceiptDetailId
-            }),
-
-            ...(detail.goodsIssueDetailId && {
-                goodsIssueDetailId: detail.goodsIssueDetailId
-            }),
-
-            ...(detail.stockAdjustmentDetailId && {
-                stockAdjustmentDetailId: detail.stockAdjustmentDetailId
-            })
-        };
+            goodsReceiptDetailId: detail.goodsReceiptDetailId,
+            goodsIssueDetailId: detail.goodsIssueDetailId,
+            stockAdjustmentDetailId: detail.stockAdjustmentDetailId
+        });
     });
 
-    const movement = await db.inventoryMovement.create({
-        data: {
-            ...reference,
-            type: movementType,
-            details: {
-                create: movementDetails
-            }
-        },
-        include: {
-            details: true
-        }
+    const movement = await createInventoryMovement({
+        tx,
+        reference,
+        details: movementDetails,
+        movementType
     });
 
     await updateSupplierProductStock({
