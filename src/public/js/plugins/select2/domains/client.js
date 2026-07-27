@@ -1,6 +1,7 @@
 import { openClientModal } from "../../../modules/clients/clientModal.js";
 import { getAllClients, getClientOptions } from "../../../application/sales/clients.js";
-import { initDomainSelect2, initFilterSelect2, runAfterSelect2Close, toggleSelectOption } from "../baseSelect.js";
+import { initDomainSelect2, initFilterSelect2, toggleSelectOption } from "../baseSelect.js";
+import { runAfterSelect2Close } from "../select2Lifecycle.js";
 import { FILTER_SELECTORS } from "../../../constants/selectors.js";
 
 const clientFilterSelector = FILTER_SELECTORS.CLIENT;

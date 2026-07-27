@@ -1,6 +1,7 @@
 import { openProductModal } from "../../../modules/products/productModal.js";
 import { getAllProducts, getProductOptions } from "../../../application/warehouse/products.js";
-import { initDomainSelect2, initFilterSelect2, runAfterSelect2Close, setMdbWrapperInputValue, toggleSelectOption } from "../baseSelect.js";
+import { initDomainSelect2, initFilterSelect2, setMdbWrapperInputValue, toggleSelectOption } from "../baseSelect.js";
+import { runAfterSelect2Close } from "../select2Lifecycle.js";
 import { mapProductToSelectData } from "../../../utils/productSelectUtils.js";
 import { FORM_SELECTORS, FILTER_SELECTORS } from "../../../constants/selectors.js";
 
