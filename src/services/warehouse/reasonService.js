@@ -1,7 +1,7 @@
 import { getDb } from "../../repository/baseRepository.js";
+import { getGoodsReceiptDetailChangeReasonName } from "../../constants/goodsReceiptDetailChanges.js";
 
 
-export const GOODS_RECEIPT_CORRECTION_REASON_NAME = 'Corrección de compra';
 export const INITIAL_STOCK_REASON_NAME = 'Stock inicial';
 
 const findReasonByName = ({ name, tx = null } = {}) => {
@@ -20,8 +20,10 @@ const findReasonByName = ({ name, tx = null } = {}) => {
     });
 };
 
-export const findGoodsReceiptCorrectionReason = ({ tx = null } = {}) => {
-    return findReasonByName({ name: GOODS_RECEIPT_CORRECTION_REASON_NAME, tx });
+export const findGoodsReceiptDetailChangeReason = ({ changeType, tx = null }) => {
+    const reasonName = getGoodsReceiptDetailChangeReasonName(changeType);
+
+    return findReasonByName({ name: reasonName, tx });
 };
 
 export const findInitialStockAdjustmentReason = ({ tx = null } = {}) => {

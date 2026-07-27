@@ -49,6 +49,22 @@ const buildGoodsReceiptModalDetails = ({ receipt, includeCanceledDetails = false
         }));
 };
 
+const setGoodsReceiptViewMode = ({ form, modalElement, receipt }) => {
+    form.dataset.mode = FORM_MODES.VIEW;
+    modalElement.querySelector('#modalTitle').textContent = buildModalTitle({
+        action: 'Ver',
+        entityName: GOODS_RECEIPT_ENTITY_NAME,
+        referenceNumber: receipt.referenceNumber
+    });
+    setFormDisabled({ form, isDisabled: true });
+    toggleButtons({
+        mode: FORM_MODES.VIEW,
+        status: receipt.status?.name || GOODS_RECEIPT_STATUS_LABELS.CONFIRMED,
+        showActions: false,
+        showAddProduct: false
+    });
+};
+
 document.querySelector(modalId).addEventListener(GOODS_RECEIPT_SUPPLIER_CHANGED_EVENT, () => {
     details.length = 0;
     refreshProductTable(details);
@@ -187,19 +203,17 @@ export const openGoodsReceiptModal = ({ mode, data = null }) => {
                 root: modalElement,
                 isDisabled: false
             });
+            toggleButtons({
+                mode,
+                status: data.status?.name || GOODS_RECEIPT_STATUS_LABELS.CONFIRMED,
+                showActions: false,
+                showAddProduct: data.status?.name !== GOODS_RECEIPT_STATUS_LABELS.CANCELED
+            });
         }
 
         if (mode === FORM_MODES.VIEW) {
-            modalElement.querySelector('#modalTitle').textContent = buildModalTitle({ action: 'Ver', entityName: GOODS_RECEIPT_ENTITY_NAME, referenceNumber: data?.referenceNumber });
-            setFormDisabled({ form, isDisabled: true });
+            setGoodsReceiptViewMode({ form, modalElement, receipt: data });
         }
-
-        toggleButtons({
-            mode,
-            status: data.status?.name || GOODS_RECEIPT_STATUS_LABELS.CONFIRMED,
-            showActions: false,
-            showAddProduct: mode === FORM_MODES.EDIT && data.status?.name !== GOODS_RECEIPT_STATUS_LABELS.CANCELED
-        });
     }
     
     form.elements.invoice.value = data?.invoice || '';
@@ -326,10 +340,24 @@ on(GOODS_RECEIPT_CORRECTION_APPLIED_EVENT, '#goodsReceiptCorrectionModal', (even
         ...currentGoodsReceipt,
         ...updatedReceipt
     };
+    const isCanceledReceipt = currentGoodsReceipt.status?.name === GOODS_RECEIPT_STATUS_LABELS.CANCELED;
 
     details.length = 0;
-    details.push(...buildGoodsReceiptModalDetails({ receipt: currentGoodsReceipt }));
-    refreshProductTable(details);
+    details.push(...buildGoodsReceiptModalDetails({
+        receipt: currentGoodsReceipt,
+        includeCanceledDetails: isCanceledReceipt
+    }));
+
+    if (isCanceledReceipt) {
+        const form = document.querySelector(formId);
+        const modalElement = document.querySelector(modalId);
+
+        setGoodsReceiptViewMode({ form, modalElement, receipt: currentGoodsReceipt });
+        initDetailsGoodsReceiptTable(FORM_MODES.VIEW);
+    } else {
+        refreshProductTable(details);
+    }
+
     setTotals({
         quantity: currentGoodsReceipt.totalQuantity,
         net: currentGoodsReceipt.totalNetPurchaseAmount,

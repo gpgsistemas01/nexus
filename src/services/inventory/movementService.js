@@ -1,6 +1,5 @@
 import { MovementDetailRelationConflict } from "../../errors/inventory/movementError.js";
 import { GoodsIssueInexistentStock } from "../../errors/inventory/stockError.js";
-import { InventoryMovementType } from "../../../generated/prisma/enums.ts";
 import { getDb } from "../../repository/baseRepository.js";
 import { buildStockKey, hasProductDimensions, normalizeDecimal, parseStockKey } from "../../utils/formattersUtils.js";
 import { assertSufficientStock, calculateConvertedQuantity } from "./stockHelpers.js";
@@ -171,79 +170,3 @@ export const applyInventoryMovement = async ({
 
     return movement;
 };
-
-export const createStockAdjustmentMovement = async ({
-    tx,
-    adjustment,
-    productId,
-    supplierId,
-    reasonId,
-    goodsIssueId = null,
-    goodsIssueDetailId = null,
-    goodsReceiptId = null,
-    goodsReceiptDetailId = null,
-    previousStock,
-    newStock,
-    difference
-}) => {
-
-    const db = getDb(tx);
-
-    const [adjustmentDetail] = adjustment.details;
-
-    return await db.inventoryMovement.create({
-        data: {
-            type: InventoryMovementType.ADJUSTMENT,
-            stockAdjustment: {
-                connect: {
-                    id: adjustment.id
-                }
-            },
-            ...(goodsIssueId && {
-                goodsIssue: {
-                    connect: { id: goodsIssueId }
-                }
-            }),
-            ...(goodsReceiptId && {
-                goodsReceipt: {
-                    connect: { id: goodsReceiptId }
-                }
-            }),
-
-            details: {
-                create: {
-                    quantity: difference,
-                    newStock,
-                    previousStock,
-                    productBase: adjustmentDetail.productBase,
-                    productHeight: adjustmentDetail.productHeight,
-                    product: {
-                        connect: {
-                            id: productId
-                        }
-                    },
-                    supplier: {
-                        connect: {
-                            id: supplierId
-                        }
-                    },
-                    stockAdjustmentDetail: {
-                        connect: {
-                            id: adjustmentDetail.id
-                        }
-                    },
-                    ...(goodsIssueDetailId && {
-                        goodsIssueDetail: {
-                            connect: { id: goodsIssueDetailId }
-                        }
-                    }),
-                    ...(goodsReceiptDetailId && {
-                        goodsReceiptDetail: {
-                            connect: { id: goodsReceiptDetailId }
-                        }
-                    })
-                }
-            }
-        }
-    });
-}
