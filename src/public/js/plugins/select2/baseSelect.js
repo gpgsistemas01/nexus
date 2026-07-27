@@ -19,13 +19,24 @@ bindDisabledControlWarning(select2DisabledWarningConfig);
 export const runAfterSelect2Close = ({ selector, action }) => {
 
     const $select = $(selector);
+    const deferAction = () => setTimeout(action, 0);
 
-    if ($select.hasClass('select2-hidden-accessible')) $select.select2('close');
+    if (!$select.hasClass('select2-hidden-accessible')) {
+        deferAction();
+        return;
+    }
 
-    // Select2 finishes its selection/close lifecycle after select2:select returns.
-    // Opening a modal in that same stack is racy because the closing dropdown can
-    // restore focus over the modal. Defer the action until that lifecycle is done.
-    setTimeout(action, 0);
+    const select2 = $select.data('select2');
+
+    if (!select2?.isOpen()) {
+        deferAction();
+        return;
+    }
+
+    // Wait for Select2's real close event before scheduling the modal. Calling
+    // close and merely starting a timer here races Select2's own close handlers.
+    $select.one('select2:close', deferAction);
+    $select.select2('close');
 };
 
 export const initbaseSelect2 = ({ 
