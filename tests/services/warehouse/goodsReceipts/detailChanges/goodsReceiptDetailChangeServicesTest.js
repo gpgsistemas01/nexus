@@ -2,49 +2,47 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const transaction = vi.fn();
 const goodsReceiptDetailFindFirst = vi.fn();
-const goodsReceiptCorrectionCreate = vi.fn();
-const goodsReceiptCorrectionFindUnique = vi.fn();
+const goodsReceiptDetailChangeCreate = vi.fn();
+const goodsReceiptDetailChangeFindUnique = vi.fn();
 const buildGoodsReceiptDetails = vi.fn();
 const updateGoodsReceiptDetailAndTotals = vi.fn();
 const createStockAdjustmentByQuantityChange = vi.fn();
-const findGoodsReceiptCorrectionReason = vi.fn();
+const findGoodsReceiptDetailChangeReason = vi.fn();
 const updateProductUnitCostIfHigher = vi.fn();
 
-vi.mock('../../../../src/utils/logger.js', () => ({
+vi.mock('../../../../../src/utils/logger.js', () => ({
   createServiceLogger: vi.fn(() => ({})),
   getModelLogContext: vi.fn((_model, data) => data),
   logServiceError: vi.fn()
 }));
 
-vi.mock('../../../../src/repository/baseRepository.js', () => ({
+vi.mock('../../../../../src/repository/baseRepository.js', () => ({
   getDb: () => ({
     $transaction: transaction
   })
 }));
 
-vi.mock('../../../../src/services/warehouse/adjustmentService.js', () => ({
+vi.mock('../../../../../src/services/warehouse/adjustmentService.js', () => ({
   createStockAdjustmentByQuantityChange
 }));
 
-vi.mock('../../../../src/services/warehouse/products/supplierProductService.js', () => ({
+vi.mock('../../../../../src/services/warehouse/products/supplierProductService.js', () => ({
   updateProductUnitCostIfHigher
 }));
 
-vi.mock('../../../../src/services/warehouse/goodsReceipts/goodsReceiptHelpers.js', () => ({
+vi.mock('../../../../../src/services/warehouse/goodsReceipts/goodsReceiptHelpers.js', () => ({
   buildGoodsReceiptDetails,
   updateGoodsReceiptDetailAndTotals
 }));
 
-vi.mock('../../../../src/services/warehouse/reasonService.js', () => ({
-  findGoodsReceiptCorrectionReason
+vi.mock('../../../../../src/services/warehouse/reasonService.js', () => ({
+  findGoodsReceiptDetailChangeReason
 }));
 
-const {
-  correctGoodsReceiptDetailLine,
-  cancelGoodsReceiptDetailLine
-} = await import('../../../../src/services/warehouse/corrections/goodsReceiptCorrectionService.js');
+const { correctGoodsReceiptDetailLine } = await import('../../../../../src/services/warehouse/goodsReceipts/detailChanges/goodsReceiptCorrectionService.js');
+const { cancelGoodsReceiptDetailLine } = await import('../../../../../src/services/warehouse/goodsReceipts/detailChanges/goodsReceiptCancellationService.js');
 
-describe('goodsReceiptCorrectionService', () => {
+describe('goods receipt detail change services', () => {
   beforeEach(() => {
     vi.clearAllMocks();
 
@@ -52,9 +50,9 @@ describe('goodsReceiptCorrectionService', () => {
       goodsReceiptDetail: {
         findFirst: goodsReceiptDetailFindFirst
       },
-      goodsReceiptCorrection: {
-        create: goodsReceiptCorrectionCreate,
-        findUnique: goodsReceiptCorrectionFindUnique
+      goodsReceiptDetailChange: {
+        create: goodsReceiptDetailChangeCreate,
+        findUnique: goodsReceiptDetailChangeFindUnique
       },
     }));
 
@@ -81,7 +79,7 @@ describe('goodsReceiptCorrectionService', () => {
       grossPurchaseAmount: 47.6
     }]);
 
-    findGoodsReceiptCorrectionReason.mockResolvedValue({ id: 'reason-correction' });
+    findGoodsReceiptDetailChangeReason.mockResolvedValue({ id: 'reason-correction' });
     createStockAdjustmentByQuantityChange
       .mockResolvedValueOnce({ id: 'adjustment-1' })
       .mockResolvedValueOnce({ id: 'adjustment-2' });
@@ -89,8 +87,8 @@ describe('goodsReceiptCorrectionService', () => {
       updatedDetail: { id: 'detail-1' },
       updatedReceipt: { id: 'receipt-1', supplierId: 'supplier-1' }
     });
-    goodsReceiptCorrectionCreate.mockResolvedValue({ id: 'correction-1' });
-    goodsReceiptCorrectionFindUnique.mockResolvedValue({ id: 'correction-1', stockAdjustment: { id: 'adjustment-1' } });
+    goodsReceiptDetailChangeCreate.mockResolvedValue({ id: 'change-1' });
+    goodsReceiptDetailChangeFindUnique.mockResolvedValue({ id: 'change-1', stockAdjustment: { id: 'adjustment-1' } });
     updateProductUnitCostIfHigher.mockResolvedValue();
   });
 
@@ -110,50 +108,52 @@ describe('goodsReceiptCorrectionService', () => {
       quantity: 4,
       costPerUnitType: 10
     }], expect.objectContaining({ tx: expect.any(Object) }));
-    expect(goodsReceiptCorrectionCreate).toHaveBeenCalledWith(expect.objectContaining({
+    expect(findGoodsReceiptDetailChangeReason).toHaveBeenCalledWith(expect.objectContaining({
+      changeType: 'QUANTITY'
+    }));
+    expect(goodsReceiptDetailChangeCreate).toHaveBeenCalledWith(expect.objectContaining({
       data: expect.objectContaining({
         stockAdjustmentId: 'adjustment-1'
       })
     }));
-    expect(createStockAdjustmentByQuantityChange).toHaveBeenCalledOnce();
-    expect(result.correction).toEqual({ id: 'correction-1', stockAdjustment: { id: 'adjustment-1' } });
+    expect(createStockAdjustmentByQuantityChange).toHaveBeenCalledWith(expect.objectContaining({
+      quantityChange: -1,
+      observations: 'Corrección de compra OC-2026-0001; campos afectados: cantidad. Ajuste de salida por disminución de cantidad.'
+    }));
+    expect(result.detailChange).toEqual({ id: 'change-1', stockAdjustment: { id: 'adjustment-1' } });
+    expect(result).not.toHaveProperty('costDifference');
   });
 
-  it('maneja la cancelación del detalle como modo CANCEL_DETAIL sin actualizar costo unitario', async () => {
-    buildGoodsReceiptDetails.mockResolvedValueOnce([{
-      productId: 'product-old',
-      productName: 'Producto anterior',
-      quantity: 0,
-      costPerUnitType: 10,
-      netPurchaseAmount: 0,
-      grossPurchaseAmount: 0
-    }]);
-
-    await cancelGoodsReceiptDetailLine({
+  it('cancela el detalle con un flujo independiente sin actualizar costo unitario', async () => {
+    const result = await cancelGoodsReceiptDetailLine({
       id: 'receipt-1',
       detailId: 'detail-1',
       userId: 'user-1'
     });
 
-    expect(buildGoodsReceiptDetails).toHaveBeenCalledWith([{
-      productId: 'product-old',
-      quantity: 0,
-      costPerUnitType: 10
-    }], expect.objectContaining({ tx: expect.any(Object) }));
+    expect(buildGoodsReceiptDetails).not.toHaveBeenCalled();
+    expect(findGoodsReceiptDetailChangeReason).toHaveBeenCalledWith(expect.objectContaining({
+      changeType: 'CANCELLATION'
+    }));
+    expect(createStockAdjustmentByQuantityChange).toHaveBeenCalledWith(expect.objectContaining({
+      quantityChange: -5,
+      observations: 'Cancelación de detalle de compra OC-2026-0001. Ajuste de salida por cancelación del detalle.'
+    }));
     expect(updateGoodsReceiptDetailAndTotals).toHaveBeenCalledWith(expect.objectContaining({
       correctedDetail: {
         status: 'CANCELED'
       }
     }));
-    expect(goodsReceiptCorrectionCreate).toHaveBeenCalledWith(expect.objectContaining({
+    expect(goodsReceiptDetailChangeCreate).toHaveBeenCalledWith(expect.objectContaining({
       data: expect.objectContaining({
-        correctionType: 'CANCEL_DETAIL',
+        changeType: 'CANCELLATION',
         correctedQuantity: 0,
         correctedCostPerUnitType: 10,
         costDifference: 0
       })
     }));
     expect(updateProductUnitCostIfHigher).not.toHaveBeenCalled();
+    expect(result).not.toHaveProperty('costDifference');
   });
 
 
@@ -184,7 +184,7 @@ describe('goodsReceiptCorrectionService', () => {
     expect(buildGoodsReceiptDetails).not.toHaveBeenCalled();
     expect(createStockAdjustmentByQuantityChange).not.toHaveBeenCalled();
     expect(updateGoodsReceiptDetailAndTotals).not.toHaveBeenCalled();
-    expect(goodsReceiptCorrectionCreate).not.toHaveBeenCalled();
+    expect(goodsReceiptDetailChangeCreate).not.toHaveBeenCalled();
   });
 
   it('rechaza correcciones con cantidad cero para usar el flujo explícito de cancelación', async () => {
@@ -211,7 +211,7 @@ describe('goodsReceiptCorrectionService', () => {
 
     expect(createStockAdjustmentByQuantityChange).not.toHaveBeenCalled();
     expect(updateGoodsReceiptDetailAndTotals).not.toHaveBeenCalled();
-    expect(goodsReceiptCorrectionCreate).not.toHaveBeenCalled();
+    expect(goodsReceiptDetailChangeCreate).not.toHaveBeenCalled();
   });
 
   it('rechaza correcciones con cantidad mayor a la registrada del detalle', async () => {

@@ -85,25 +85,25 @@ model Status {
 }
 
 model Product {
-  id                               String                      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name                             String                      @db.VarChar(200)
-  sku                              String?                     @unique @db.VarChar(200)
-  presentationId                   String                      @db.Uuid
-  unitMeasureId                    String                      @db.Uuid
-  isActive                         Boolean                     @default(true)
-  minStock                         Decimal                     @default(0) @db.Decimal(10, 2)
-  base                             Decimal?                    @db.Decimal(10, 2)
-  height                           Decimal?                    @db.Decimal(10, 2)
-  presentation                     Presentation                @relation(fields: [presentationId], references: [id])
-  unitMeasure                      UnitMeasure                 @relation(fields: [unitMeasureId], references: [id])
-  goodsIssueDetails                GoodsIssueDetail[]
-  goodsReceiptDetails              GoodsReceiptDetail[]
-  previousGoodsReceiptCorrections  GoodsReceiptCorrection[]    @relation("PreviousGoodsReceiptCorrectionProduct")
-  correctedGoodsReceiptCorrections GoodsReceiptCorrection[]    @relation("CorrectedGoodsReceiptCorrectionProduct")
-  purchaseRequisitionsDetails      PurchaseRequisitionDetail[]
-  movementDetails                  MovementDetail[]
-  supplierProducts                 SupplierProduct[]
-  stockAdjustmentDetails           StockAdjustmentDetail[]
+  id                                 String                      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name                               String                      @db.VarChar(200)
+  sku                                String?                     @unique @db.VarChar(200)
+  presentationId                     String                      @db.Uuid
+  unitMeasureId                      String                      @db.Uuid
+  isActive                           Boolean                     @default(true)
+  minStock                           Decimal                     @default(0) @db.Decimal(10, 2)
+  base                               Decimal?                    @db.Decimal(10, 2)
+  height                             Decimal?                    @db.Decimal(10, 2)
+  presentation                       Presentation                @relation(fields: [presentationId], references: [id])
+  unitMeasure                        UnitMeasure                 @relation(fields: [unitMeasureId], references: [id])
+  goodsIssueDetails                  GoodsIssueDetail[]
+  goodsReceiptDetails                GoodsReceiptDetail[]
+  previousGoodsReceiptDetailChanges  GoodsReceiptDetailChange[]  @relation("PreviousGoodsReceiptDetailChangeProduct")
+  correctedGoodsReceiptDetailChanges GoodsReceiptDetailChange[]  @relation("CorrectedGoodsReceiptDetailChangeProduct")
+  purchaseRequisitionsDetails        PurchaseRequisitionDetail[]
+  movementDetails                    MovementDetail[]
+  supplierProducts                   SupplierProduct[]
+  stockAdjustmentDetails             StockAdjustmentDetail[]
 }
 
 model UnitMeasure {
@@ -219,54 +219,54 @@ model ReferenceNumberCounter {
 }
 
 model GoodsReceipt {
-  id                       String                   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  invoice                  String?                  @db.VarChar(50)
-  isInvoiced               Boolean                  @default(false)
-  supplierId               String                   @db.Uuid
-  supplierName             String                   @db.VarChar(200)
-  statusId                 String                   @db.Uuid
-  receivedById             String                   @db.Uuid
-  receivedByName           String                   @db.VarChar(255)
-  referenceNumber          String                   @unique @db.VarChar(50)
+  id                       String                     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  invoice                  String?                    @db.VarChar(50)
+  isInvoiced               Boolean                    @default(false)
+  supplierId               String                     @db.Uuid
+  supplierName             String                     @db.VarChar(200)
+  statusId                 String                     @db.Uuid
+  receivedById             String                     @db.Uuid
+  receivedByName           String                     @db.VarChar(255)
+  referenceNumber          String                     @unique @db.VarChar(50)
   receptionDate            DateTime
-  observations             String?                  @db.VarChar(500)
-  totalQuantity            Decimal                  @db.Decimal(10, 2)
-  totalNetPurchaseAmount   Decimal                  @db.Decimal(10, 2)
-  totalGrossPurchaseAmount Decimal                  @db.Decimal(10, 2)
-  receivedBy               Profile                  @relation(fields: [receivedById], references: [id])
-  supplier                 Supplier                 @relation(fields: [supplierId], references: [id])
-  status                   Status                   @relation(fields: [statusId], references: [id])
+  observations             String?                    @db.VarChar(500)
+  totalQuantity            Decimal                    @db.Decimal(10, 2)
+  totalNetPurchaseAmount   Decimal                    @db.Decimal(10, 2)
+  totalGrossPurchaseAmount Decimal                    @db.Decimal(10, 2)
+  receivedBy               Profile                    @relation(fields: [receivedById], references: [id])
+  supplier                 Supplier                   @relation(fields: [supplierId], references: [id])
+  status                   Status                     @relation(fields: [statusId], references: [id])
   movements                InventoryMovement[]
   details                  GoodsReceiptDetail[]
-  corrections              GoodsReceiptCorrection[]
+  detailChanges            GoodsReceiptDetailChange[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model GoodsReceiptDetail {
-  id                  String                   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  productId           String                   @db.Uuid
-  goodsReceiptId      String                   @db.Uuid
-  quantity            Decimal                  @db.Decimal(10, 2)
-  conversionUnitCost  Decimal                  @db.Decimal(10, 2)
-  costPerUnitType     Decimal                  @db.Decimal(10, 2)
-  convertedQuantity   Decimal                  @db.Decimal(10, 2)
-  netPurchaseAmount   Decimal                  @db.Decimal(10, 2)
-  grossPurchaseAmount Decimal                  @db.Decimal(10, 2)
-  presentationId      String                   @db.Uuid
-  presentationName    String                   @db.VarChar(50)
-  unitMeasureId       String                   @db.Uuid
-  unitMeasureName     String                   @db.VarChar(20)
-  unitMeasureSymbol   String                   @db.VarChar(10)
-  productName         String                   @db.VarChar(200)
-  productBase         Decimal?                 @db.Decimal(10, 2)
-  productHeight       Decimal?                 @db.Decimal(10, 2)
-  status              GoodsReceiptDetailStatus @default(ACTIVE)
-  goodsReceipt        GoodsReceipt             @relation(fields: [goodsReceiptId], references: [id])
-  product             Product                  @relation(fields: [productId], references: [id])
+  id                  String                     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  productId           String                     @db.Uuid
+  goodsReceiptId      String                     @db.Uuid
+  quantity            Decimal                    @db.Decimal(10, 2)
+  conversionUnitCost  Decimal                    @db.Decimal(10, 2)
+  costPerUnitType     Decimal                    @db.Decimal(10, 2)
+  convertedQuantity   Decimal                    @db.Decimal(10, 2)
+  netPurchaseAmount   Decimal                    @db.Decimal(10, 2)
+  grossPurchaseAmount Decimal                    @db.Decimal(10, 2)
+  presentationId      String                     @db.Uuid
+  presentationName    String                     @db.VarChar(50)
+  unitMeasureId       String                     @db.Uuid
+  unitMeasureName     String                     @db.VarChar(20)
+  unitMeasureSymbol   String                     @db.VarChar(10)
+  productName         String                     @db.VarChar(200)
+  productBase         Decimal?                   @db.Decimal(10, 2)
+  productHeight       Decimal?                   @db.Decimal(10, 2)
+  status              GoodsReceiptDetailStatus   @default(ACTIVE)
+  goodsReceipt        GoodsReceipt               @relation(fields: [goodsReceiptId], references: [id])
+  product             Product                    @relation(fields: [productId], references: [id])
   movementDetails     MovementDetail[]
-  corrections         GoodsReceiptCorrection[]
+  changes             GoodsReceiptDetailChange[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -508,9 +508,9 @@ model StockAdjustment {
 
   movement InventoryMovement?
 
-  details                StockAdjustmentDetail[]
-  goodsReceiptCorrection GoodsReceiptCorrection?
-  waste                  Waste?
+  details                  StockAdjustmentDetail[]
+  goodsReceiptDetailChange GoodsReceiptDetailChange?
+  waste                    Waste?
 
   appliedAt DateTime?
 
@@ -567,7 +567,7 @@ enum InventoryMovementType {
   ADJUSTMENT
 }
 
-model GoodsReceiptCorrection {
+model GoodsReceiptDetailChange {
   id                          String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   goodsReceiptId              String  @db.Uuid
   goodsReceiptDetailId        String  @db.Uuid
@@ -587,16 +587,16 @@ model GoodsReceiptCorrection {
   correctedNetPurchaseAmount   Decimal @db.Decimal(10, 2)
   correctedGrossPurchaseAmount Decimal @db.Decimal(10, 2)
 
-  correctionType     String  @db.VarChar(50)
-  productChanged     Boolean @default(false)
-  quantityDifference Decimal @db.Decimal(10, 2)
-  costDifference     Decimal @db.Decimal(10, 2)
+  changeType         GoodsReceiptDetailChangeType
+  productChanged     Boolean                      @default(false)
+  quantityDifference Decimal                      @db.Decimal(10, 2)
+  costDifference     Decimal                      @db.Decimal(10, 2)
 
   goodsReceipt       GoodsReceipt          @relation(fields: [goodsReceiptId], references: [id])
   goodsReceiptDetail GoodsReceiptDetail    @relation(fields: [goodsReceiptDetailId], references: [id])
   reason             StockAdjustmentReason @relation(fields: [reasonId], references: [id])
-  previousProduct    Product               @relation("PreviousGoodsReceiptCorrectionProduct", fields: [previousProductId], references: [id])
-  correctedProduct   Product               @relation("CorrectedGoodsReceiptCorrectionProduct", fields: [correctedProductId], references: [id])
+  previousProduct    Product               @relation("PreviousGoodsReceiptDetailChangeProduct", fields: [previousProductId], references: [id])
+  correctedProduct   Product               @relation("CorrectedGoodsReceiptDetailChangeProduct", fields: [correctedProductId], references: [id])
   stockAdjustment    StockAdjustment?      @relation(fields: [stockAdjustmentId], references: [id], onDelete: SetNull)
 
   createdAt DateTime @default(now())
@@ -609,6 +609,13 @@ model GoodsReceiptCorrection {
   @@index([correctedProductId])
 }
 
+enum GoodsReceiptDetailChangeType {
+  QUANTITY
+  COST
+  QUANTITY_AND_COST
+  CANCELLATION
+}
+
 model StockAdjustmentReason {
   id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
 
@@ -616,8 +623,8 @@ model StockAdjustmentReason {
 
   isActive Boolean @default(true)
 
-  stockAdjustments        StockAdjustment[]
-  goodsReceiptCorrections GoodsReceiptCorrection[]
+  stockAdjustments          StockAdjustment[]
+  goodsReceiptDetailChanges GoodsReceiptDetailChange[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

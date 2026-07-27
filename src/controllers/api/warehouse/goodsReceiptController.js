@@ -5,7 +5,8 @@ import {
     findAllGoodsReceipts,
     updateGoodsReceipt
 } from "../../../services/warehouse/goodsReceipts/goodsReceiptService.js";
-import { correctGoodsReceiptDetailLine, cancelGoodsReceiptDetailLine } from "../../../services/warehouse/corrections/goodsReceiptCorrectionService.js";
+import { cancelGoodsReceiptDetailLine } from "../../../services/warehouse/goodsReceipts/detailChanges/goodsReceiptCancellationService.js";
+import { correctGoodsReceiptDetailLine } from "../../../services/warehouse/goodsReceipts/detailChanges/goodsReceiptCorrectionService.js";
 import { getDataTableOrder, getDataTablePaging, getDataTableSearch } from "../../../utils/requestQueryUtils.js";
 import {
     createStockNotification,
