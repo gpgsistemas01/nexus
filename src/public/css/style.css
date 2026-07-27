@@ -1297,6 +1297,20 @@ a:hover {
   -webkit-text-fill-color: var(--form-field-color);
 }
 
+/* This search field also belongs to the table-filter component. Its ID keeps
+   these overrides local while preserving native search input behavior. */
+.table-filters .form-outline input[type="search"]#observationsFilter {
+  background-color: var(--mdb-light);
+  border-color: var(--form-field-border) !important;
+  color: var(--mdb-body-color) !important;
+  -webkit-text-fill-color: var(--mdb-body-color);
+}
+
+.table-filters .form-outline input[type="search"]#observationsFilter:focus {
+  background-color: var(--mdb-light);
+  border-color: var(--form-field-border-focus) !important;
+}
+
 .form-outline .form-label {
   color: rgba(var(--mdb-secondary-rgb), 0.78);
 }
