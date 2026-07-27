@@ -6,6 +6,30 @@ const resolveValue = (item, resolver) => (
         : item[resolver]
 );
 
+export const buildInventoryMovementDetail = ({
+    productId,
+    supplierId,
+    quantity,
+    previousStock,
+    newStock,
+    productBase,
+    productHeight,
+    goodsReceiptDetailId = null,
+    goodsIssueDetailId = null,
+    stockAdjustmentDetailId = null
+}) => ({
+    productId,
+    supplierId,
+    quantity,
+    previousStock,
+    newStock,
+    productBase,
+    productHeight,
+    ...(goodsReceiptDetailId && { goodsReceiptDetailId }),
+    ...(goodsIssueDetailId && { goodsIssueDetailId }),
+    ...(stockAdjustmentDetailId && { stockAdjustmentDetailId })
+});
+
 export const buildStockUpdateSummary = ({
     details,
     productId = 'productId',

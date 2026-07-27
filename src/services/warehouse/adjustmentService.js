@@ -1,11 +1,12 @@
 import { getDb } from "../../repository/baseRepository.js";
-import { InventoryMovementType } from "../../../generated/prisma/enums.ts";
 import { generateYearlyReferenceNumber } from "../document/referenceNumberService.js";
 import { normalizeDecimal, toNumber } from "../../utils/formattersUtils.js";
 import { assertSufficientStock, calculateConvertedQuantity } from "../inventory/stockHelpers.js";
 import { adjustSupplierProductStock, findSupplierProductByIds } from "./products/supplierProductService.js";
 import { INVENTORY_MOVEMENT_TYPES, STOCK_ADJUSTMENT_STATUS_NAMES, STOCK_ADJUSTMENT_TYPES } from "../../constants/inventory.js";
 import { DOCUMENT_REFERENCE_TYPES } from "../../constants/documentReferenceTypes.js";
+import { createInventoryMovement } from "../inventory/movementService.js";
+import { buildInventoryMovementDetail } from "../inventory/movementHelpers.js";
 
 const createStockAdjustmentMovement = async ({
     tx,
@@ -22,39 +23,26 @@ const createStockAdjustmentMovement = async ({
 }) => {
     const [adjustmentDetail] = adjustment.details;
 
-    await tx.stockAdjustment.update({
-        where: { id: adjustment.id },
-        data: {
-            movement: {
-                create: {
-                    type: InventoryMovementType.ADJUSTMENT,
-                    ...(goodsIssueId && {
-                        goodsIssue: { connect: { id: goodsIssueId } }
-                    }),
-                    ...(goodsReceiptId && {
-                        goodsReceipt: { connect: { id: goodsReceiptId } }
-                    }),
-                    details: {
-                        create: {
-                            quantity: difference,
-                            newStock,
-                            previousStock,
-                            productBase: adjustmentDetail.productBase,
-                            productHeight: adjustmentDetail.productHeight,
-                            product: { connect: { id: productId } },
-                            supplier: { connect: { id: supplierId } },
-                            stockAdjustmentDetail: { connect: { id: adjustmentDetail.id } },
-                            ...(goodsIssueDetailId && {
-                                goodsIssueDetail: { connect: { id: goodsIssueDetailId } }
-                            }),
-                            ...(goodsReceiptDetailId && {
-                                goodsReceiptDetail: { connect: { id: goodsReceiptDetailId } }
-                            })
-                        }
-                    }
-                }
-            }
-        }
+    await createInventoryMovement({
+        tx,
+        movementType: INVENTORY_MOVEMENT_TYPES.ADJUSTMENT,
+        reference: {
+            stockAdjustmentId: adjustment.id,
+            ...(goodsIssueId && { goodsIssueId }),
+            ...(goodsReceiptId && { goodsReceiptId })
+        },
+        details: [buildInventoryMovementDetail({
+            quantity: difference,
+            newStock,
+            previousStock,
+            productBase: adjustmentDetail.productBase,
+            productHeight: adjustmentDetail.productHeight,
+            productId,
+            supplierId,
+            stockAdjustmentDetailId: adjustmentDetail.id,
+            goodsIssueDetailId,
+            goodsReceiptDetailId
+        })]
     });
 };
 
