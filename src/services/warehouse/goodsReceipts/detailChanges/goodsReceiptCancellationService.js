@@ -10,10 +10,11 @@ import {
 } from '../../../../errors/warehouse/goodsReceiptError.js';
 import { getDb } from '../../../../repository/baseRepository.js';
 import { createServiceLogger, getModelLogContext, logServiceError } from '../../../../utils/logger.js';
+import { normalizeDecimal } from '../../../../utils/formattersUtils.js';
 import { cancelGoodsReceiptDetailAndTotals } from '../goodsReceiptHelpers.js';
 import {
     createGoodsReceiptDetailChange,
-    createGoodsReceiptDetailChangeAdjustment,
+    createGoodsReceiptDetailChangeMovementAndUpdateStock,
     findReceiptDetailForChange,
     GOODS_RECEIPT_DETAIL_STATUS
 } from './goodsReceiptDetailChangeService.js';
@@ -21,7 +22,7 @@ import { findGoodsReceiptDetailChangeReason } from '../../reasonService.js';
 
 const serviceLogger = createServiceLogger('warehouse.goodsReceipts.detailChanges.goodsReceiptCancellationService');
 
-export const cancelGoodsReceiptDetailLine = async ({ id, detailId, userId }) => {
+export const cancelGoodsReceiptDetailLine = async ({ id, detailId }) => {
     try {
         return await getDb().$transaction(async (tx) => {
             const currentDetail = await findReceiptDetailForChange({ tx, goodsReceiptId: id, detailId });
@@ -37,21 +38,18 @@ export const cancelGoodsReceiptDetailLine = async ({ id, detailId, userId }) => 
             const canceledDetailSnapshot = {
                 productId: currentDetail.productId,
                 productName: currentDetail.productName,
-                quantity: 0,
+                quantity: currentDetail.quantity,
                 costPerUnitType: currentDetail.costPerUnitType,
-                netPurchaseAmount: 0,
-                grossPurchaseAmount: 0
+                netPurchaseAmount: currentDetail.netPurchaseAmount,
+                grossPurchaseAmount: currentDetail.grossPurchaseAmount
             };
-            const receiptReference = currentDetail.goodsReceipt.referenceNumber || id;
-            const adjustment = await createGoodsReceiptDetailChangeAdjustment({
+            const quantityDifference = normalizeDecimal(-canceledDetailSnapshot.quantity);
+            const movement = await createGoodsReceiptDetailChangeMovementAndUpdateStock({
                 tx,
                 currentDetail,
-                resultingQuantity: canceledDetailSnapshot.quantity,
-                reasonId: cancellationReason.id,
-                userId,
+                quantityDifference,
                 goodsReceiptId: id,
-                goodsReceiptDetailId: detailId,
-                observations: `Cancelación de detalle de compra ${receiptReference}. Ajuste de salida por cancelación del detalle.`
+                goodsReceiptDetailId: detailId
             });
             const { updatedDetail, updatedReceipt } = await cancelGoodsReceiptDetailAndTotals({
                 tx,
@@ -63,17 +61,18 @@ export const cancelGoodsReceiptDetailLine = async ({ id, detailId, userId }) => 
                 currentDetail,
                 resultingDetail: canceledDetailSnapshot,
                 reasonId: cancellationReason.id,
-                stockAdjustmentId: adjustment?.id || null,
+                inventoryMovementId: movement.id,
                 changeType,
                 goodsReceiptId: id,
-                goodsReceiptDetailId: detailId
+                goodsReceiptDetailId: detailId,
+                quantityDifference
             });
 
             return {
                 updatedDetail,
                 updatedReceipt,
                 detailChange,
-                adjustment
+                movement
             };
         });
     } catch (err) {

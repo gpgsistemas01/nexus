@@ -12,11 +12,12 @@ import {
 } from '../../../../errors/warehouse/goodsReceiptError.js';
 import { getDb } from '../../../../repository/baseRepository.js';
 import { createServiceLogger, getModelLogContext, logServiceError } from '../../../../utils/logger.js';
+import { normalizeDecimal } from '../../../../utils/formattersUtils.js';
 import { updateProductUnitCostIfHigher } from '../../products/supplierProductService.js';
 import { buildGoodsReceiptDetails, correctGoodsReceiptDetailAndTotals } from '../goodsReceiptHelpers.js';
 import {
     createGoodsReceiptDetailChange,
-    createGoodsReceiptDetailChangeAdjustment,
+    createGoodsReceiptDetailChangeMovementAndUpdateStock,
     findReceiptDetailForChange,
     GOODS_RECEIPT_DETAIL_STATUS
 } from './goodsReceiptDetailChangeService.js';
@@ -27,8 +28,7 @@ const serviceLogger = createServiceLogger('warehouse.goodsReceipts.detailChanges
 export const correctGoodsReceiptDetailLine = async ({
     id,
     detailId,
-    correctionDto,
-    userId
+    correctionDto
 }) => {
     const { quantity, costPerUnitType } = correctionDto;
 
@@ -45,13 +45,15 @@ export const correctGoodsReceiptDetailLine = async ({
                 quantity,
                 costPerUnitType
             }], { tx });
-            const quantityDifference = Number(correctedDetail.quantity) - Number(currentDetail.quantity);
-            const costDifference = Number(correctedDetail.costPerUnitType) - Number(currentDetail.costPerUnitType);
+            const correctedQuantity = normalizeDecimal(correctedDetail.quantity);
+            const currentQuantity = normalizeDecimal(currentDetail.quantity);
+            const quantityDifference = normalizeDecimal(correctedQuantity - currentQuantity);
+            const costDifference = normalizeDecimal(correctedDetail.costPerUnitType - currentDetail.costPerUnitType);
             const hasQuantityChange = quantityDifference !== 0;
             const hasCostChange = costDifference !== 0;
             const hasQuantityAndCostChange = hasQuantityChange && hasCostChange;
 
-            if (Number(correctedDetail.quantity) <= 0 || Number(correctedDetail.quantity) > Number(currentDetail.quantity)) {
+            if (correctedQuantity <= 0 || correctedQuantity > currentQuantity) {
                 throw new GoodsReceiptCorrectionQuantityConflict();
             }
             if (!hasQuantityChange && !hasCostChange) {
@@ -67,20 +69,12 @@ export const correctGoodsReceiptDetailLine = async ({
             const correctionReason = await findGoodsReceiptDetailChangeReason({ tx, changeType });
             if (!correctionReason) throw new GoodsReceiptDetailChangeReasonNotFound();
 
-            const receiptReference = currentDetail.goodsReceipt.referenceNumber || id;
-            const adjustmentDirection = quantityDifference > 0
-                ? 'Ajuste de entrada por aumento de cantidad.'
-                : 'Ajuste de salida por disminución de cantidad.';
-            const adjustmentObservations = `Corrección de compra ${receiptReference}; campos afectados: cantidad. ${adjustmentDirection}`;
-            const adjustment = await createGoodsReceiptDetailChangeAdjustment({
+            const movement = await createGoodsReceiptDetailChangeMovementAndUpdateStock({
                 tx,
                 currentDetail,
-                resultingQuantity: correctedDetail.quantity,
-                reasonId: correctionReason.id,
-                userId,
+                quantityDifference,
                 goodsReceiptId: id,
-                goodsReceiptDetailId: detailId,
-                observations: adjustmentObservations
+                goodsReceiptDetailId: detailId
             });
             const { updatedDetail, updatedReceipt } = await correctGoodsReceiptDetailAndTotals({
                 tx,
@@ -93,7 +87,7 @@ export const correctGoodsReceiptDetailLine = async ({
                 currentDetail,
                 resultingDetail: correctedDetail,
                 reasonId: correctionReason.id,
-                stockAdjustmentId: adjustment?.id || null,
+                inventoryMovementId: movement?.id || null,
                 changeType,
                 goodsReceiptId: id,
                 goodsReceiptDetailId: detailId
@@ -103,7 +97,7 @@ export const correctGoodsReceiptDetailLine = async ({
                 updatedDetail,
                 updatedReceipt,
                 detailChange,
-                adjustment
+                movement
             };
         });
 
