@@ -450,10 +450,11 @@ model InventoryMovement {
 
   date DateTime @default(now())
 
-  goodsReceipt    GoodsReceipt?    @relation(fields: [goodsReceiptId], references: [id])
-  goodsIssue      GoodsIssue?      @relation(fields: [goodsIssueId], references: [id])
-  stockAdjustment StockAdjustment? @relation(fields: [stockAdjustmentId], references: [id])
-  details         MovementDetail[]
+  goodsReceipt             GoodsReceipt?             @relation(fields: [goodsReceiptId], references: [id])
+  goodsIssue               GoodsIssue?               @relation(fields: [goodsIssueId], references: [id])
+  stockAdjustment          StockAdjustment?          @relation(fields: [stockAdjustmentId], references: [id])
+  goodsReceiptDetailChange GoodsReceiptDetailChange?
+  details                  MovementDetail[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -508,9 +509,8 @@ model StockAdjustment {
 
   movement InventoryMovement?
 
-  details                  StockAdjustmentDetail[]
-  goodsReceiptDetailChange GoodsReceiptDetailChange?
-  waste                    Waste?
+  details StockAdjustmentDetail[]
+  waste   Waste?
 
   appliedAt DateTime?
 
@@ -572,7 +572,7 @@ model GoodsReceiptDetailChange {
   goodsReceiptId              String  @db.Uuid
   goodsReceiptDetailId        String  @db.Uuid
   reasonId                    String  @db.Uuid
-  stockAdjustmentId           String? @unique @db.Uuid
+  inventoryMovementId         String? @unique @db.Uuid
   previousProductId           String  @db.Uuid
   previousProductName         String  @db.VarChar(200)
   previousQuantity            Decimal @db.Decimal(10, 2)
@@ -597,7 +597,7 @@ model GoodsReceiptDetailChange {
   reason             StockAdjustmentReason @relation(fields: [reasonId], references: [id])
   previousProduct    Product               @relation("PreviousGoodsReceiptDetailChangeProduct", fields: [previousProductId], references: [id])
   correctedProduct   Product               @relation("CorrectedGoodsReceiptDetailChangeProduct", fields: [correctedProductId], references: [id])
-  stockAdjustment    StockAdjustment?      @relation(fields: [stockAdjustmentId], references: [id], onDelete: SetNull)
+  inventoryMovement  InventoryMovement?    @relation(fields: [inventoryMovementId], references: [id], onDelete: SetNull)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

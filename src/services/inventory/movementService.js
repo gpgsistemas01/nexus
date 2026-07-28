@@ -132,12 +132,6 @@ export const applyInventoryMovement = async ({
             });
         }
 
-        /**
-         * MUY IMPORTANTE:
-         * actualizamos el estado local
-         * para acumulaciones dentro
-         * de la misma transacción
-         */
         ps.currentStock = newStock;
 
         ps.convertedQuantity = newConverted;
