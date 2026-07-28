@@ -2,10 +2,49 @@ import { getDb } from "../../repository/baseRepository.js";
 import { generateYearlyReferenceNumber } from "../document/referenceNumberService.js";
 import { normalizeDecimal, toNumber } from "../../utils/formattersUtils.js";
 import { assertSufficientStock, calculateConvertedQuantity } from "../inventory/stockHelpers.js";
-import { createStockAdjustmentMovement } from "../inventory/movementService.js";
 import { adjustSupplierProductStock, findSupplierProductByIds } from "./products/supplierProductService.js";
 import { INVENTORY_MOVEMENT_TYPES, STOCK_ADJUSTMENT_STATUS_NAMES, STOCK_ADJUSTMENT_TYPES } from "../../constants/inventory.js";
 import { DOCUMENT_REFERENCE_TYPES } from "../../constants/documentReferenceTypes.js";
+import { createInventoryMovement } from "../inventory/movementService.js";
+import { buildInventoryMovementDetail } from "../inventory/movementHelpers.js";
+
+const createStockAdjustmentMovement = async ({
+    tx,
+    adjustment,
+    productId,
+    supplierId,
+    goodsIssueId,
+    goodsIssueDetailId,
+    goodsReceiptId,
+    goodsReceiptDetailId,
+    previousStock,
+    newStock,
+    difference
+}) => {
+    const [adjustmentDetail] = adjustment.details;
+
+    await createInventoryMovement({
+        tx,
+        movementType: INVENTORY_MOVEMENT_TYPES.ADJUSTMENT,
+        reference: {
+            stockAdjustmentId: adjustment.id,
+            ...(goodsIssueId && { goodsIssueId }),
+            ...(goodsReceiptId && { goodsReceiptId })
+        },
+        details: [buildInventoryMovementDetail({
+            quantity: difference,
+            newStock,
+            previousStock,
+            productBase: adjustmentDetail.productBase,
+            productHeight: adjustmentDetail.productHeight,
+            productId,
+            supplierId,
+            stockAdjustmentDetailId: adjustmentDetail.id,
+            goodsIssueDetailId,
+            goodsReceiptDetailId
+        })]
+    });
+};
 
 const calculateStockAdjustmentValues = ({
     product,
@@ -155,17 +194,13 @@ export const createStockAdjustment = async ({
             adjustment,
             productId,
             supplierId,
-            reasonId,
             goodsIssueId,
             goodsIssueDetailId,
             goodsReceiptId,
             goodsReceiptDetailId,
             previousStock,
-            previousConvertedQuantity,
             newStock: adjustedNewStock,
-            newConvertedQuantity,
-            difference,
-            convertedDifference
+            difference
         });
 
         const updatedSupplierProduct = await adjustSupplierProductStock({

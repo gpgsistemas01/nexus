@@ -36,6 +36,13 @@ export class GoodsReceiptUpdateDatabaseError extends AppError {
     }
 }
 
+export class GoodsReceiptAlreadyCanceled extends AppError {
+
+    constructor () {
+        super('No se puede modificar una compra cancelada', 'GOODS_RECEIPT_ALREADY_CANCELED', 409);
+    }
+}
+
 
 export class GoodsReceiptSupplierChangeConflict extends AppError {
 
@@ -97,9 +104,9 @@ export class GoodsReceiptDetailAlreadyCanceled extends AppError {
 }
 
 
-export class GoodsReceiptCorrectionReasonNotFound extends AppError {
+export class GoodsReceiptDetailChangeReasonNotFound extends AppError {
 
     constructor () {
-        super('Razón de corrección de compra no encontrada', 'GOODS_RECEIPT_CORRECTION_REASON_NOT_FOUND', 404);
+        super('Razón para modificar el detalle de compra no encontrada', 'GOODS_RECEIPT_DETAIL_CHANGE_REASON_NOT_FOUND', 404);
     }
 }

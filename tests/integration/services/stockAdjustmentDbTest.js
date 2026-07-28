@@ -175,7 +175,7 @@ describeDb('stock adjustment cross-domain database integration', () => {
     });
   });
 
-  it('cubre productService -> adjustmentService -> movementService actualizando stock real', async () => {
+  it('cubre productService -> adjustmentService actualizando stock y movimiento real', async () => {
     await expect(productService.updateProductStock({
       id: product.id,
       userId: user.id,

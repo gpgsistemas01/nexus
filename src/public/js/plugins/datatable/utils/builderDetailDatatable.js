@@ -1,14 +1,9 @@
 import { buildMdbActionButton } from "../../mdb/actionButton.js";
 import { bindDisabledControlWarning } from "../../../ui/disabledControlWarning.js";
 import { formatCurrency, formatDecimal } from "../../../utils/formatUtils.js";
+import { GOODS_RECEIPT_DETAIL_STATUSES, GOODS_RECEIPT_STATUS_LABELS } from "../../../constants/goodsReceiptStatuses.js";
 
 const DISABLED_PROJECT_QUANTITY_MESSAGE = 'Marque el detalle como surtido para capturar la cantidad de proyecto.';
-const GOODS_RECEIPT_DETAIL_STATUS = Object.freeze({
-    CANCELED: 'CANCELED'
-});
-const GOODS_RECEIPT_STATUS_LABELS = Object.freeze({
-    CANCELED: 'Cancelada'
-});
 
 const DISABLED_TABLE_INPUT_SELECTOR = 'input[data-disabled-warning], textarea[data-disabled-warning]';
 
@@ -283,7 +278,7 @@ export const buildDetailsColumns = ({ type, mode, render, isWarehouse, isCoordin
             searchable: false,
             render: (_, __, row) => {
                 const detailId = row.id;
-                const isCanceledDetail = row.status === GOODS_RECEIPT_DETAIL_STATUS.CANCELED;
+                const isCanceledDetail = row.status === GOODS_RECEIPT_DETAIL_STATUSES.CANCELED;
                 const isCanceledReceipt = row.goodsReceiptStatusName === GOODS_RECEIPT_STATUS_LABELS.CANCELED;
                 const canManageDetail = Boolean(detailId) && !isCanceledDetail && !isCanceledReceipt;
 

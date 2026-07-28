@@ -12,23 +12,17 @@ import { handleSubmit, hasValidationErrors, toggleContainerElements, toggleDisab
 import { buildModalTitle, openModal } from "../../ui/modalUI.js";
 import { FORM_SELECTORS, MODAL_SELECTORS } from "../../constants/selectors.js";
 import { FORM_MODES } from "../../constants/formModes.js";
+import { GOODS_RECEIPT_STATUS_LABELS } from "../../constants/goodsReceiptStatuses.js";
 import { roundTo } from "../../utils/formatUtils.js";
 import { notifications } from "../../plugins/swal/swalComponent.js";
 import { GOODS_RECEIPT_CORRECTION_APPLIED_EVENT, initGoodsReceiptCorrection, openGoodsReceiptCorrectionModal } from "./corrections/correctionModal.js";
+import { buildGoodsReceiptModalDetails } from "./goodsReceiptDetails.js";
 
 const modalId = MODAL_SELECTORS.GOODS_RECEIPT;
 const formId = FORM_SELECTORS.GOODS_RECEIPT;
 const INVOICE_VALUES = Object.freeze({
     INVOICE: 'invoice',
     NONE: 'none'
-});
-const GOODS_RECEIPT_STATUS_LABELS = Object.freeze({
-    OPEN: 'Abierta',
-    CONFIRMED: 'Confirmada',
-    CANCELED: 'Cancelada'
-});
-const GOODS_RECEIPT_DETAIL_STATUS = Object.freeze({
-    CANCELED: 'CANCELED'
 });
 const GOODS_RECEIPT_ENTITY_NAME = 'compra';
 createGoodsReceiptDatatable();
@@ -37,16 +31,20 @@ let currentGoodsReceipt = null;
 
 initGoodsReceiptCorrection();
 
-const buildGoodsReceiptModalDetails = ({ receipt, includeCanceledDetails = false }) => {
-    const supplierName = receipt.supplierName;
-
-    return receipt.details
-        .filter(detail => includeCanceledDetails || detail.status !== GOODS_RECEIPT_DETAIL_STATUS.CANCELED)
-        .map(detail => ({
-            ...detail,
-            supplierName,
-            goodsReceiptStatusName: receipt.status?.name
-        }));
+const setGoodsReceiptViewMode = ({ form, modalElement, receipt }) => {
+    form.dataset.mode = FORM_MODES.VIEW;
+    modalElement.querySelector('#modalTitle').textContent = buildModalTitle({
+        action: 'Ver',
+        entityName: GOODS_RECEIPT_ENTITY_NAME,
+        referenceNumber: receipt.referenceNumber
+    });
+    setFormDisabled({ form, isDisabled: true });
+    toggleButtons({
+        mode: FORM_MODES.VIEW,
+        status: receipt.status?.name || GOODS_RECEIPT_STATUS_LABELS.CONFIRMED,
+        showActions: false,
+        showAddProduct: false
+    });
 };
 
 document.querySelector(modalId).addEventListener(GOODS_RECEIPT_SUPPLIER_CHANGED_EVENT, () => {
@@ -158,6 +156,11 @@ export const openGoodsReceiptModal = ({ mode, data = null }) => {
             showActions: true,
             showAddProduct: true
         });
+        toggleContainerElements({
+            selector: '.add-product-container',
+            root: modalElement,
+            isDisabled: !form.elements.supplierId.value
+        });
     }
 
     if (mode === FORM_MODES.EDIT || mode === FORM_MODES.VIEW) {
@@ -165,10 +168,7 @@ export const openGoodsReceiptModal = ({ mode, data = null }) => {
         value = data.isInvoiced ? INVOICE_VALUES.INVOICE : INVOICE_VALUES.NONE;
         form.elements.observations.value = data.observations || '';
         setDateTimePickerValue(form.elements.receptionDate, data.receptionDate);
-        details.push(...buildGoodsReceiptModalDetails({
-            receipt: data,
-            includeCanceledDetails: data.status?.name === GOODS_RECEIPT_STATUS_LABELS.CANCELED
-        }));
+        details.push(...buildGoodsReceiptModalDetails(data));
         setTotals({
             quantity: data.totalQuantity,
             net: data.totalNetPurchaseAmount,
@@ -187,19 +187,17 @@ export const openGoodsReceiptModal = ({ mode, data = null }) => {
                 root: modalElement,
                 isDisabled: false
             });
+            toggleButtons({
+                mode,
+                status: data.status?.name || GOODS_RECEIPT_STATUS_LABELS.CONFIRMED,
+                showActions: false,
+                showAddProduct: data.status?.name !== GOODS_RECEIPT_STATUS_LABELS.CANCELED
+            });
         }
 
         if (mode === FORM_MODES.VIEW) {
-            modalElement.querySelector('#modalTitle').textContent = buildModalTitle({ action: 'Ver', entityName: GOODS_RECEIPT_ENTITY_NAME, referenceNumber: data?.referenceNumber });
-            setFormDisabled({ form, isDisabled: true });
+            setGoodsReceiptViewMode({ form, modalElement, receipt: data });
         }
-
-        toggleButtons({
-            mode,
-            status: data.status?.name || GOODS_RECEIPT_STATUS_LABELS.CONFIRMED,
-            showActions: false,
-            showAddProduct: mode === FORM_MODES.EDIT && data.status?.name !== GOODS_RECEIPT_STATUS_LABELS.CANCELED
-        });
     }
     
     form.elements.invoice.value = data?.invoice || '';
@@ -326,10 +324,21 @@ on(GOODS_RECEIPT_CORRECTION_APPLIED_EVENT, '#goodsReceiptCorrectionModal', (even
         ...currentGoodsReceipt,
         ...updatedReceipt
     };
+    const isCanceledReceipt = currentGoodsReceipt.status?.name === GOODS_RECEIPT_STATUS_LABELS.CANCELED;
 
     details.length = 0;
-    details.push(...buildGoodsReceiptModalDetails({ receipt: currentGoodsReceipt }));
-    refreshProductTable(details);
+    details.push(...buildGoodsReceiptModalDetails(currentGoodsReceipt));
+
+    if (isCanceledReceipt) {
+        const form = document.querySelector(formId);
+        const modalElement = document.querySelector(modalId);
+
+        setGoodsReceiptViewMode({ form, modalElement, receipt: currentGoodsReceipt });
+        initDetailsGoodsReceiptTable(FORM_MODES.VIEW);
+    } else {
+        refreshProductTable(details);
+    }
+
     setTotals({
         quantity: currentGoodsReceipt.totalQuantity,
         net: currentGoodsReceipt.totalNetPurchaseAmount,

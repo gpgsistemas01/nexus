@@ -4,6 +4,10 @@ services:
     container_name: sistema-merma-app
     env_file:
       - .env
+    environment:
+      # El entrypoint aplica `prisma migrate deploy` antes de iniciar la app.
+      # Prisma usa DIRECT_URL si está definida en .env.
+      RUN_MIGRATIONS: "true"
     ports:
       - "3000:3000"
     read_only: true

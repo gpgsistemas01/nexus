@@ -59,7 +59,10 @@ const { updateGoodsReceipt } = await import('../../../../src/services/warehouse/
 describe('goodsReceiptService', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    goodsReceiptFindUnique.mockResolvedValue({ id: 'receipt-1' });
+    goodsReceiptFindUnique.mockResolvedValue({
+      id: 'receipt-1',
+      status: { name: 'Confirmada' }
+    });
     findProfileById.mockResolvedValue({ id: 'profile-1', fullName: 'Usuario Almacén' });
     goodsReceiptUpdate.mockResolvedValue({
       id: 'receipt-1',

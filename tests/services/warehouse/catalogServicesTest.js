@@ -42,7 +42,7 @@ vi.mock('../../../src/repository/baseRepository.js', () => ({
 const { findAllPresentations, findUniquePresentation } = await import('../../../src/services/warehouse/presentationService.js');
 const { findAllUnitMeasures, findUniqueUnitMeasure } = await import('../../../src/services/warehouse/unitMeasureService.js');
 const { findAllFulfillmentStatuses } = await import('../../../src/services/warehouse/fulfillmentStatusService.js');
-const { findAllReasons, findGoodsReceiptCorrectionReason } = await import('../../../src/services/warehouse/reasonService.js');
+const { findAllReasons, findGoodsReceiptDetailChangeReason } = await import('../../../src/services/warehouse/reasonService.js');
 
 describe('warehouse catalog GET services', () => {
   beforeEach(() => vi.clearAllMocks());
@@ -103,16 +103,33 @@ describe('warehouse catalog GET services', () => {
     }));
   });
 
-  it('busca la razón fija de corrección de compra', async () => {
+  it('busca la razón de corrección según el tipo de cambio', async () => {
     const correctionReason = { id: 'reason-correction' };
     stockAdjustmentReasonFindFirst.mockResolvedValue(correctionReason);
 
-    await expect(findGoodsReceiptCorrectionReason()).resolves.toEqual(correctionReason);
+    await expect(findGoodsReceiptDetailChangeReason({ changeType: 'QUANTITY' })).resolves.toEqual(correctionReason);
 
     expect(stockAdjustmentReasonFindFirst).toHaveBeenCalledWith({
       where: {
         name: {
-          equals: 'Corrección de compra',
+          equals: 'Corrección de detalle de compra',
+          mode: 'insensitive'
+        }
+      },
+      select: { id: true }
+    });
+  });
+
+  it('busca una razón distinta para cancelar el detalle', async () => {
+    const cancellationReason = { id: 'reason-cancellation' };
+    stockAdjustmentReasonFindFirst.mockResolvedValue(cancellationReason);
+
+    await expect(findGoodsReceiptDetailChangeReason({ changeType: 'CANCELLATION' })).resolves.toEqual(cancellationReason);
+
+    expect(stockAdjustmentReasonFindFirst).toHaveBeenCalledWith({
+      where: {
+        name: {
+          equals: 'Cancelación de detalle de compra',
           mode: 'insensitive'
         }
       },

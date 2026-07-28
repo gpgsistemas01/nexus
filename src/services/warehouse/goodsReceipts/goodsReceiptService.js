@@ -1,5 +1,6 @@
 import {
     GoodsReceiptCreateDatabaseError,
+    GoodsReceiptAlreadyCanceled,
     GoodsReceiptNotFound,
     GoodsReceiptUpdateDatabaseError,
     ProfileReceivedByNotFound
@@ -230,13 +231,20 @@ export const updateGoodsReceipt = async ({ id, goodsReceiptDto }) => {
             getDb().goodsReceipt.findUnique({
                 where: { id },
                 select: {
-                    id: true
+                    id: true,
+                    status: {
+                        select: { name: true }
+                    }
                 }
             }),
             findProfileById({ id: receivedById })
         ]);
 
         if (!goodsReceipt) throw new GoodsReceiptNotFound();
+
+        if (goodsReceipt.status.name === GOODS_RECEIPT_STATUS_NAMES.CANCELED) {
+            throw new GoodsReceiptAlreadyCanceled();
+        }
 
         if (!receivedBy) throw new ProfileReceivedByNotFound();
 

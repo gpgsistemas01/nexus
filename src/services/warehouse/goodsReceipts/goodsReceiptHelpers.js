@@ -3,6 +3,7 @@ import { roundTo } from "../../../utils/formattersUtils.js";
 import { calculateConvertedQuantity } from "../../inventory/stockHelpers.js";
 import { GOODS_RECEIPT_STATUS_NAMES } from "../../../constants/warehouseStatuses.js";
 import { findProductsSnapshot } from "../products/productService.js";
+import { GoodsReceiptDetailAlreadyCanceled } from "../../../errors/warehouse/goodsReceiptError.js";
 
 const IVA_RATE = 1.16;
 
@@ -52,9 +53,8 @@ export const buildGoodsReceiptDetails = async (details, { tx = null } = {}) => {
     });
 }
 
-// Keep totals calculation side-effect free so create/update flows can reuse the same arithmetic.
-export const calculateGoodsReceiptTotals = (details = []) => details.reduce((acc, detail) => {
-    if (detail.status === 'CANCELED') return acc;
+export const calculateGoodsReceiptTotals = (details = [], { includeCanceled = false } = {}) => details.reduce((acc, detail) => {
+    if (!includeCanceled && detail.status === 'CANCELED') return acc;
 
     acc.totalQuantity += Number(detail.quantity || 0);
     acc.totalNetPurchaseAmount += Number(detail.netPurchaseAmount || 0);
@@ -67,26 +67,53 @@ export const calculateGoodsReceiptTotals = (details = []) => details.reduce((acc
     totalGrossPurchaseAmount: 0
 });
 
-// Keep persistence separate from the pure totals calculation because corrections must update one detail,
-// reload all receipt details, and then persist recalculated receipt totals in the same transaction.
-export const updateGoodsReceiptDetailAndTotals = async ({ tx, goodsReceiptId, detailId, correctedDetail }) => {
-    const updatedDetail = await tx.goodsReceiptDetail.update({
-        where: { id: detailId },
-        data: correctedDetail
+const updateActiveGoodsReceiptDetailAndTotals = async ({ tx, goodsReceiptId, detailId, detailData }) => {
+    const { count: updatedDetailsCount } = await tx.goodsReceiptDetail.updateMany({
+        where: {
+            id: detailId,
+            goodsReceiptId,
+            status: 'ACTIVE'
+        },
+        data: detailData
     });
 
-    const receiptDetails = await tx.goodsReceiptDetail.findMany({
-        where: { goodsReceiptId },
+    // The header and totals must never change unless this receipt's detail was
+    // still active. This also makes concurrent cancellation attempts safe.
+    if (updatedDetailsCount !== 1) throw new GoodsReceiptDetailAlreadyCanceled();
+
+    const updatedDetail = await tx.goodsReceiptDetail.findUnique({
+        where: { id: detailId }
+    });
+
+    const activeReceiptDetails = await tx.goodsReceiptDetail.findMany({
+        where: {
+            goodsReceiptId,
+            status: 'ACTIVE'
+        },
         select: {
             quantity: true,
             netPurchaseAmount: true,
-            grossPurchaseAmount: true,
-            status: true
+            grossPurchaseAmount: true
         }
     });
-    const totals = calculateGoodsReceiptTotals(receiptDetails);
-    const allDetailsCanceled = receiptDetails.length > 0
-        && receiptDetails.every(detail => detail.status === 'CANCELED');
+    const allDetailsCanceled = activeReceiptDetails.length === 0;
+    const historicalReceiptDetails = allDetailsCanceled
+        ? await tx.goodsReceiptDetail.findMany({
+            where: { goodsReceiptId },
+            select: {
+                quantity: true,
+                netPurchaseAmount: true,
+                grossPurchaseAmount: true,
+                status: true
+            }
+        })
+        : [];
+    const detailsForTotals = allDetailsCanceled
+        ? historicalReceiptDetails
+        : activeReceiptDetails;
+    const totals = calculateGoodsReceiptTotals(detailsForTotals, {
+        includeCanceled: allDetailsCanceled
+    });
 
     const updatedReceipt = await tx.goodsReceipt.update({
         where: { id: goodsReceiptId },
@@ -110,6 +137,24 @@ export const updateGoodsReceiptDetailAndTotals = async ({ tx, goodsReceiptId, de
         updatedReceipt
     };
 };
+
+export const correctGoodsReceiptDetailAndTotals = ({ tx, goodsReceiptId, detailId, correctedDetail }) => (
+    updateActiveGoodsReceiptDetailAndTotals({
+        tx,
+        goodsReceiptId,
+        detailId,
+        detailData: correctedDetail
+    })
+);
+
+export const cancelGoodsReceiptDetailAndTotals = ({ tx, goodsReceiptId, detailId }) => (
+    updateActiveGoodsReceiptDetailAndTotals({
+        tx,
+        goodsReceiptId,
+        detailId,
+        detailData: { status: 'CANCELED' }
+    })
+);
 
 export const createGoodsReceiptDetailsAndUpdateTotals = async ({ tx, goodsReceiptId, details }) => {
     const processedDetails = await buildGoodsReceiptDetails(details, { tx });

@@ -1,6 +1,6 @@
 import { openSupplierModal } from "../../../modules/suppliers/supplierModal.js";
 import { getAllSuppliers, getSupplierOptions } from "../../../application/warehouse/suppliers.js";
-import { initDomainSelect2, initFilterSelect2, toggleSelectOption } from "../baseSelect.js";
+import { initDomainSelect2, initFilterSelect2, runAfterSelect2Close, toggleSelectOption } from "../baseSelect.js";
 import { FILTER_SELECTORS } from "../../../constants/selectors.js";
 
 const supplierSelector = FILTER_SELECTORS.SUPPLIER;
@@ -46,16 +46,19 @@ const attachSupplierHandler = ({ supplierSelector }) => {
 
             const tradeName = selected.id.replace('new:', '');
 
-            openSupplierModal({
-                data: { tradeName },
-                onSave: (createdsupplier) => {
+            runAfterSelect2Close({
+                selector: supplierSelector,
+                action: () => openSupplierModal({
+                    data: { tradeName },
+                    onSave: (createdsupplier) => {
 
-                    toggleSupplierOption({
-                        selector: supplierSelector,
-                        id: createdsupplier.id,
-                        name: `${ createdsupplier.tradeName }`
-                    });
-                }
+                        toggleSupplierOption({
+                            selector: supplierSelector,
+                            id: createdsupplier.id,
+                            name: `${ createdsupplier.tradeName }`
+                        });
+                    }
+                })
             });
 
             return;

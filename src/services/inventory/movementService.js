@@ -1,12 +1,33 @@
 import { MovementDetailRelationConflict } from "../../errors/inventory/movementError.js";
 import { GoodsIssueInexistentStock } from "../../errors/inventory/stockError.js";
-import { InventoryMovementType } from "../../../generated/prisma/enums.ts";
 import { getDb } from "../../repository/baseRepository.js";
 import { buildStockKey, hasProductDimensions, normalizeDecimal, parseStockKey } from "../../utils/formattersUtils.js";
 import { assertSufficientStock, calculateConvertedQuantity } from "./stockHelpers.js";
-import { buildStockUpdateSummary } from "./movementHelpers.js";
+import { buildInventoryMovementDetail, buildStockUpdateSummary } from "./movementHelpers.js";
 import { findSupplierProductsForStockMovement, updateSupplierProductStock } from "../warehouse/products/supplierProductService.js";
-import { INVENTORY_MOVEMENT_TYPES, INVENTORY_REFERENCE_TYPES } from "../../constants/inventory.js";
+import { INVENTORY_MOVEMENT_TYPES } from "../../constants/inventory.js";
+
+export const createInventoryMovement = ({
+    tx = null,
+    reference = {},
+    details,
+    movementType
+}) => {
+    const db = getDb(tx);
+
+    return db.inventoryMovement.create({
+        data: {
+            ...reference,
+            type: movementType,
+            details: {
+                create: details
+            }
+        },
+        include: {
+            details: true
+        }
+    });
+};
 
 
 export const applyInventoryMovement = async ({
@@ -23,8 +44,6 @@ export const applyInventoryMovement = async ({
             throw new MovementDetailRelationConflict();
         }
     }
-
-    const db = getDb(tx);
 
     const stockUpdateSummary = buildStockUpdateSummary({ details });
 
@@ -113,53 +132,29 @@ export const applyInventoryMovement = async ({
             });
         }
 
-        /**
-         * MUY IMPORTANTE:
-         * actualizamos el estado local
-         * para acumulaciones dentro
-         * de la misma transacción
-         */
         ps.currentStock = newStock;
 
         ps.convertedQuantity = newConverted;
 
-        return {
+        return buildInventoryMovementDetail({
             productId: detail.productId,
             supplierId: detail.supplierId,
-
             quantity: signedQuantity,
-
             previousStock,
             newStock,
-
             productBase: hasDimensions ? base : null,
             productHeight: hasDimensions ? height : null,
-
-            ...(detail.goodsReceiptDetailId && {
-                goodsReceiptDetailId: detail.goodsReceiptDetailId
-            }),
-
-            ...(detail.goodsIssueDetailId && {
-                goodsIssueDetailId: detail.goodsIssueDetailId
-            }),
-
-            ...(detail.stockAdjustmentDetailId && {
-                stockAdjustmentDetailId: detail.stockAdjustmentDetailId
-            })
-        };
+            goodsReceiptDetailId: detail.goodsReceiptDetailId,
+            goodsIssueDetailId: detail.goodsIssueDetailId,
+            stockAdjustmentDetailId: detail.stockAdjustmentDetailId
+        });
     });
 
-    const movement = await db.inventoryMovement.create({
-        data: {
-            ...reference,
-            type: movementType,
-            details: {
-                create: movementDetails
-            }
-        },
-        include: {
-            details: true
-        }
+    const movement = await createInventoryMovement({
+        tx,
+        reference,
+        details: movementDetails,
+        movementType
     });
 
     await updateSupplierProductStock({
@@ -171,79 +166,3 @@ export const applyInventoryMovement = async ({
 
     return movement;
 };
-
-export const createStockAdjustmentMovement = async ({
-    tx,
-    adjustment,
-    productId,
-    supplierId,
-    reasonId,
-    goodsIssueId = null,
-    goodsIssueDetailId = null,
-    goodsReceiptId = null,
-    goodsReceiptDetailId = null,
-    previousStock,
-    newStock,
-    difference
-}) => {
-
-    const db = getDb(tx);
-
-    const [adjustmentDetail] = adjustment.details;
-
-    return await db.inventoryMovement.create({
-        data: {
-            type: InventoryMovementType.ADJUSTMENT,
-            stockAdjustment: {
-                connect: {
-                    id: adjustment.id
-                }
-            },
-            ...(goodsIssueId && {
-                goodsIssue: {
-                    connect: { id: goodsIssueId }
-                }
-            }),
-            ...(goodsReceiptId && {
-                goodsReceipt: {
-                    connect: { id: goodsReceiptId }
-                }
-            }),
-
-            details: {
-                create: {
-                    quantity: difference,
-                    newStock,
-                    previousStock,
-                    productBase: adjustmentDetail.productBase,
-                    productHeight: adjustmentDetail.productHeight,
-                    product: {
-                        connect: {
-                            id: productId
-                        }
-                    },
-                    supplier: {
-                        connect: {
-                            id: supplierId
-                        }
-                    },
-                    stockAdjustmentDetail: {
-                        connect: {
-                            id: adjustmentDetail.id
-                        }
-                    },
-                    ...(goodsIssueDetailId && {
-                        goodsIssueDetail: {
-                            connect: { id: goodsIssueDetailId }
-                        }
-                    }),
-                    ...(goodsReceiptDetailId && {
-                        goodsReceiptDetail: {
-                            connect: { id: goodsReceiptDetailId }
-                        }
-                    })
-                }
-            }
-        }
-    });
-}
