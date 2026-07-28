@@ -11,7 +11,7 @@ const serviceLogger = createServiceLogger('warehouse.goodsReceipts.goodsReceiptS
 
 import { getDb } from "../../../repository/baseRepository.js";
 import { generateYearlyReferenceNumber } from "../../document/referenceNumberService.js";
-import { findProfileById } from "../../admin/profileService.js";
+import { findProfileById } from "../../admin/profile/profileService.js";
 import { applyInventoryMovement } from "../../inventory/movementService.js";
 import { findUniqueSupplier } from "../supplierService.js";
 import { buildGoodsReceiptDetails, calculateGoodsReceiptTotals, createGoodsReceiptDetailsAndUpdateTotals } from "./goodsReceiptHelpers.js";

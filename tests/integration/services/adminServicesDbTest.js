@@ -56,7 +56,7 @@ const cleanupAdminData = async () => {
     }
   });
   await prisma.user.deleteMany({ where: { id: { in: users.map(({ id }) => id) } } });
-  await prisma.departmentProfile.deleteMany({
+  await prisma.profileRoleDepartment.deleteMany({
     where: {
       OR: [
         { profileId: { in: profiles.map(({ id }) => id) } },
@@ -74,7 +74,7 @@ describeDb('admin services database integration', () => {
     [{ prisma }, services] = await Promise.all([
       import('../../../src/lib/prisma.js'),
       Promise.all([
-        import('../../../src/services/admin/profileService.js'),
+        import('../../../src/services/admin/profile/profileService.js'),
         import('../../../src/services/admin/userService.js')
       ]).then(([profileService, userService]) => ({
         ...profileService,

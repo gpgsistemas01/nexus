@@ -28,7 +28,7 @@ vi.mock('../../../../src/repository/baseRepository.js', () => ({
   })
 }));
 
-vi.mock('../../../../src/services/admin/profileService.js', () => ({
+vi.mock('../../../../src/services/admin/profile/profileService.js', () => ({
   findProfileById
 }));
 
