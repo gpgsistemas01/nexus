@@ -10,14 +10,12 @@ import { buildExcelButton, buildTableExportParams } from "../../ui/tableUI.js";
 import { formatDateTimeDisplay, formatFileName } from "../../utils/formatters.js";
 import { setupTableFilters } from "./utils/filters/tableFilter.js";
 import { DATATABLE_SELECTORS, MODAL_SELECTORS, FORM_SELECTORS } from "../../constants/selectors.js";
+import { GOODS_RECEIPT_STATUS_LABELS } from "../../constants/goodsReceiptStatuses.js";
 
 export let details = [];
 let filters = {
     getValues: () => ({})
 };
-const GOODS_RECEIPT_STATUS_LABELS = Object.freeze({
-    CANCELED: 'Cancelada'
-});
 const selectorProductTable = DATATABLE_SELECTORS.PRODUCT;
 const selectorTable = DATATABLE_SELECTORS.MAIN;
 const table = document.querySelector(selectorProductTable);

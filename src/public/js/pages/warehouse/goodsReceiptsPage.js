@@ -12,9 +12,11 @@ import { handleSubmit, hasValidationErrors, toggleContainerElements, toggleDisab
 import { buildModalTitle, openModal } from "../../ui/modalUI.js";
 import { FORM_SELECTORS, MODAL_SELECTORS } from "../../constants/selectors.js";
 import { FORM_MODES } from "../../constants/formModes.js";
+import { GOODS_RECEIPT_STATUS_LABELS } from "../../constants/goodsReceiptStatuses.js";
 import { roundTo } from "../../utils/formatUtils.js";
 import { notifications } from "../../plugins/swal/swalComponent.js";
 import { GOODS_RECEIPT_CORRECTION_APPLIED_EVENT, initGoodsReceiptCorrection, openGoodsReceiptCorrectionModal } from "./corrections/correctionModal.js";
+import { buildGoodsReceiptModalDetails } from "./goodsReceiptDetails.js";
 
 const modalId = MODAL_SELECTORS.GOODS_RECEIPT;
 const formId = FORM_SELECTORS.GOODS_RECEIPT;
@@ -22,32 +24,12 @@ const INVOICE_VALUES = Object.freeze({
     INVOICE: 'invoice',
     NONE: 'none'
 });
-const GOODS_RECEIPT_STATUS_LABELS = Object.freeze({
-    OPEN: 'Abierta',
-    CONFIRMED: 'Confirmada',
-    CANCELED: 'Cancelada'
-});
-const GOODS_RECEIPT_DETAIL_STATUS = Object.freeze({
-    CANCELED: 'CANCELED'
-});
 const GOODS_RECEIPT_ENTITY_NAME = 'compra';
 createGoodsReceiptDatatable();
 
 let currentGoodsReceipt = null;
 
 initGoodsReceiptCorrection();
-
-const buildGoodsReceiptModalDetails = ({ receipt, includeCanceledDetails = false }) => {
-    const supplierName = receipt.supplierName;
-
-    return receipt.details
-        .filter(detail => includeCanceledDetails || detail.status !== GOODS_RECEIPT_DETAIL_STATUS.CANCELED)
-        .map(detail => ({
-            ...detail,
-            supplierName,
-            goodsReceiptStatusName: receipt.status?.name
-        }));
-};
 
 const setGoodsReceiptViewMode = ({ form, modalElement, receipt }) => {
     form.dataset.mode = FORM_MODES.VIEW;
@@ -186,10 +168,7 @@ export const openGoodsReceiptModal = ({ mode, data = null }) => {
         value = data.isInvoiced ? INVOICE_VALUES.INVOICE : INVOICE_VALUES.NONE;
         form.elements.observations.value = data.observations || '';
         setDateTimePickerValue(form.elements.receptionDate, data.receptionDate);
-        details.push(...buildGoodsReceiptModalDetails({
-            receipt: data,
-            includeCanceledDetails: data.status?.name === GOODS_RECEIPT_STATUS_LABELS.CANCELED
-        }));
+        details.push(...buildGoodsReceiptModalDetails(data));
         setTotals({
             quantity: data.totalQuantity,
             net: data.totalNetPurchaseAmount,
@@ -348,10 +327,7 @@ on(GOODS_RECEIPT_CORRECTION_APPLIED_EVENT, '#goodsReceiptCorrectionModal', (even
     const isCanceledReceipt = currentGoodsReceipt.status?.name === GOODS_RECEIPT_STATUS_LABELS.CANCELED;
 
     details.length = 0;
-    details.push(...buildGoodsReceiptModalDetails({
-        receipt: currentGoodsReceipt,
-        includeCanceledDetails: isCanceledReceipt
-    }));
+    details.push(...buildGoodsReceiptModalDetails(currentGoodsReceipt));
 
     if (isCanceledReceipt) {
         const form = document.querySelector(formId);
