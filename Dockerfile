@@ -39,9 +39,11 @@ COPY --chown=node:node --from=build /app/prisma ./prisma
 COPY --chown=node:node --from=build /app/generated ./generated
 COPY --chown=node:node --from=build /app/prisma.config.ts ./prisma.config.ts
 COPY --chown=node:node --from=build /app/package*.json ./
+COPY --chown=node:node --chmod=755 docker-entrypoint.sh ./docker-entrypoint.sh
 
 USER node
 
 EXPOSE 3000
 
-CMD ["sh", "-c", "echo INICIO && npm start"]
+ENTRYPOINT ["./docker-entrypoint.sh"]
+CMD ["npm", "start"]

@@ -244,10 +244,52 @@ npm test
 
 ## Docker
 
-El repositorio incluye `Dockerfile` y `docker-compose.yml`. Para levantar el entorno con Docker Compose:
+El repositorio incluye `Dockerfile` y `docker-compose.yml`. Al iniciar el contenedor, el entrypoint ejecuta primero `prisma migrate deploy` y solamente arranca la aplicación si las migraciones terminan correctamente. El CLI de Prisma toma `DIRECT_URL` mediante `prisma.config.ts`; la aplicación continúa conectándose con `DATABASE_URL`.
+
+La selección no depende de que ambas URLs tengan nombres o hosts parecidos:
+
+1. El proceso de arranque exige que `DIRECT_URL` esté definida. Si falta, termina con código de error y **no** inicia la aplicación. El despliegue Docker no utiliza las variables de prueba.
+2. El entrypoint fija `NODE_ENV=production` para todo el contenedor y `prisma.config.ts` llama al resolver con `preferDirectUrl: true`; por lo tanto, `prisma migrate deploy` siempre recibe `DIRECT_URL`, aunque el contenedor haya recibido accidentalmente otro valor de `NODE_ENV`.
+3. La aplicación crea su cliente sin esa opción y, como el contenedor permanece en producción, recibe `DATABASE_URL`.
+
+El entrypoint nunca imprime la URL ni sus credenciales. Los logs indican el **nombre de la variable** elegida y confirman el éxito únicamente cuando Prisma devuelve código `0`:
+
+```text
+Iniciando migraciones Prisma con DIRECT_URL (las credenciales no se muestran).
+... salida de prisma migrate deploy ...
+Migraciones Prisma verificadas correctamente.
+```
+
+Define ambas variables en el entorno de despliegue, sin incluirlas como argumentos de build ni guardarlas dentro de la imagen:
+
+```env
+DATABASE_URL="postgresql://usuario:password@pooler.example.com:6543/nexus"
+DIRECT_URL="postgresql://usuario:password@db.example.com:5432/nexus"
+```
+
+Para levantar el entorno con Docker Compose:
 
 ```bash
 docker compose up --build
 ```
 
-Asegúrate de revisar y ajustar las variables de entorno del compose antes de usarlo en ambientes compartidos o productivos.
+Para comprobar el despliegue, revisa los logs y el estado de las migraciones:
+
+```bash
+docker compose logs app
+docker compose exec app ./node_modules/.bin/prisma migrate status
+```
+
+`migrate status` usa igualmente `DIRECT_URL` a través de `prisma.config.ts`. Un despliegue correcto muestra el mensaje `Database schema is up to date!`; además, el proceso `node src/app.js` estará activo. Si la conexión directa o una migración falla, el entrypoint termina antes de ejecutar `npm start` y Docker registra el error de Prisma.
+
+`RUN_MIGRATIONS` acepta únicamente `true` o `false` y su valor predeterminado es `true`. Se puede desactivar cuando la plataforma ejecuta las migraciones en un *release job* separado:
+
+```bash
+docker run --rm \
+  -e DATABASE_URL \
+  -e DIRECT_URL \
+  -e RUN_MIGRATIONS=true \
+  nexus true
+```
+
+En despliegues con varias réplicas se recomienda ejecutar una sola instancia como *release job* con `RUN_MIGRATIONS=true` y configurar las réplicas de la aplicación con `RUN_MIGRATIONS=false`. Nunca publiques el puerto directo de PostgreSQL en Internet; `DIRECT_URL` debe llegar al servidor por la red privada del proveedor.
