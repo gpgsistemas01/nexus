@@ -1,5 +1,5 @@
 import { isEmptyOrNull } from "./baseValidations.js";
-import { validateName, validatePassword, validateNumber, validateUsername, validateTextOptional, validateMeasure, validateDateOptional, validateGoodsReceiptDetailsArray, validateDate, validateText, validateNumberOptional, validateGoodsIssueDetailsArray, validateNonNegativeNumber, validatePositiveNumber, validatePairedOptionalNumber } from "./fieldValidations.js";
+import { validateName, validatePassword, validateNumber, validateUsername, validateTextOptional, validateMeasure, validateDateOptional, validateGoodsReceiptDetailsArray, validateDate, validateText, validateNumberOptional, validateGoodsIssueDetailsArray, validateNonNegativeNumber, validatePositiveNumber, validatePairedOptionalNumber, validateProfileAccessesArray } from "./fieldValidations.js";
 
 export const supplierValidators = {
     legalName: (value) => validateText({ 
@@ -157,15 +157,19 @@ export const profileValidators = {
         fieldName: 'El nombre', 
         regex: /^[\p{L}0-9]+(?:[ '\-.,:;()¿?¡!][\p{L}0-9]+)*[.,:;()¿?¡!]*$/u 
     }),
-    roleId: (value) => isEmptyOrNull(value, 'El rol'),
-    departments: (value) => {
+    accesses: validateProfileAccessesArray,
+}
 
-        if (!Array.isArray(value) || !value.length) return 'Seleccione al menos un departamento';
+export const profileAccessValidators = {
+    departmentId: (value, { accesses = [] } = {}) => {
+        const requiredError = isEmptyOrNull(value, 'El área');
 
-        const hasInvalid = value.some(department => isEmptyOrNull(department));
-
-        if (hasInvalid) return 'Todos los departamentos seleccionados deben ser válidos';
+        if (requiredError) return requiredError;
+        if (accesses.some(access => access.departmentId === value)) {
+            return 'Esta área ya está en la tabla; elimine la relación existente si necesita cambiar su rol';
+        }
 
         return null;
     },
-}
+    roleId: value => isEmptyOrNull(value, 'El rol')
+};

@@ -8,10 +8,13 @@ import {
   isValidInternalClientProjectNumberByDepartment,
   resolveFulfillmentStatus
 } from '../../../../src/services/warehouse/goodsIssues/goodsIssueHelpers.js';
-import { findSupplierProductsSnapshot } from '../../../../src/services/warehouse/products/supplierProductService.js';
+
+const { findSupplierProductsSnapshot } = vi.hoisted(() => ({
+  findSupplierProductsSnapshot: vi.fn()
+}));
 
 vi.mock('../../../../src/services/warehouse/products/supplierProductService.js', () => ({
-  findSupplierProductsSnapshot: vi.fn()
+  findSupplierProductsSnapshot
 }));
 
 describe('goodsIssueHelpers', () => {

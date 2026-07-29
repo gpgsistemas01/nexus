@@ -192,8 +192,7 @@ export const toggleTableErrors = (form, errors, fields = null) => {
         });
 
     } else {
-
-        const key = 'details';
+        const key = form.querySelector('.table-validation-message')?.dataset.errorFor || 'details';
 
         if (fields && !fields.includes(key)) return;
 
