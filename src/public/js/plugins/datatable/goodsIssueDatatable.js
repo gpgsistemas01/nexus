@@ -4,9 +4,9 @@ import { exportGoodsIssueReport } from "../../application/warehouse/report.js";
 import { hasPermission } from "../../utils/permissions.js";
 import { buildExcelButton, buildTableExportParams } from "../../ui/tableUI.js";
 import { formatDateTimeDisplay, formatFileName } from "../../utils/formatters.js";
-import { createDataTable, refreshProductTable, renderActionButtons, resetDataTable } from "./baseDatatable.js";
+import { createDataTable, refreshMaterialTable, renderActionButtons } from "./baseDatatable.js";
 import { buildDetailsColumns, buildDetailsHeader } from "./utils/builderDetailDatatable.js";
-import { handleDelete, renderMaterialName } from "./utils/detailDatatableUtils.js";
+import { handleDelete, renderMaterialName } from "./utils/renderMaterialDatatable.js";
 import { getResponsiveRowData } from "./utils/responsive.js";
 import { setupTableFilters } from "./utils/filters/tableFilter.js";
 import { DATATABLE_SELECTORS } from "../../constants/selectors.js";
@@ -14,13 +14,13 @@ import { FORM_MODES } from "../../constants/formModes.js";
 import { FULFILLMENT_STATUS_NAMES } from "../../constants/fulfillmentStatuses.js";
 
 export let details = [];
-const selectorProductTable = DATATABLE_SELECTORS.PRODUCT;
+const selectorMaterialTable = DATATABLE_SELECTORS.MATERIAL;
 const tableSelector = DATATABLE_SELECTORS.MAIN;
 let filters = {
     getValues: () => ({})
 };
 
-let productTable;
+let materialTable;
 
 export const createGoodsIssueDatatable = async (context) => {
 
@@ -58,8 +58,8 @@ export const createGoodsIssueDatatable = async (context) => {
         {
             data: 'id',
             title: 'Acciones',
-            render: (data, type, row) => renderActionButtons({ 
-                status: row.status?.name, 
+            render: (data, type, row) => renderActionButtons({
+                status: row.status?.name,
                 fulfillmentStatus: row.fulfillmentStatus?.name,
                 context: 'goodsIssue'
             })
@@ -131,7 +131,7 @@ export const initDetailsGoodsIssueTable = (mode, context) => {
 
     resetDataTable(selectorProductTable);
 
-    const table = document.querySelector(selectorProductTable);
+    const table = document.querySelector(selectorMaterialTable);
 
     table.innerHTML = buildDetailsHeader({
         type: 'issue',
@@ -150,8 +150,8 @@ export const initDetailsGoodsIssueTable = (mode, context) => {
         isSystem
     });
 
-    productTable = createDataTable({
-        selector: selectorProductTable,
+    materialTable = createDataTable({
+        selector: selectorMaterialTable,
         options: {
             data: details,
             columns,
@@ -161,7 +161,7 @@ export const initDetailsGoodsIssueTable = (mode, context) => {
     });
 };
 
-$(selectorProductTable).on('click', '.delete-btn', function () {
+$(selectorMaterialTable).on('click', '.delete-btn', function () {
 
     const id = $(this).data('id');
 

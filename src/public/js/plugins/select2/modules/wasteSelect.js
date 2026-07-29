@@ -1,17 +1,17 @@
-import { mapSupplierProductToSelectData } from "../../../utils/productSelectUtils.js";
+import { mapSupplierMaterialToSelectData } from "../../../utils/materialSelectUtils.js";
 import { initReasonSelect, toggleReasonOption } from "../domains/reason.js";
-import { setupSupplierProductSelect, toggleSupplierProductOption } from "../domains/supplierProduct.js";
+import { setupSupplierMaterialSelect, toggleSupplierMaterialOption } from "../domains/supplierMaterial.js";
 import { FORM_SELECTORS } from "../../../constants/selectors.js";
 import { toggleDisabledElement } from "../../../utils/formUtils.js";
 
-const productSelector = FORM_SELECTORS.PRODUCT;
+const materialSelector = FORM_SELECTORS.MATERIAL;
 const reasonSelector = FORM_SELECTORS.REASON;
 
 export const initWasteSelect2 = ({ modalSelector }) => {
 
-    setupSupplierProductSelect({
+    setupSupplierMaterialSelect({
         modalSelector,
-        productSelector
+        materialSelector
     });
 
     initReasonSelect({
@@ -23,9 +23,9 @@ export const initWasteSelect2 = ({ modalSelector }) => {
 
 export const setWasteSelectOptions = ({ modalSelector, data = null }) => {
 
-    toggleSupplierProductOption({
-        selector: `${ modalSelector } ${ productSelector }`,
-        data: data ? mapSupplierProductToSelectData(data) : null,
+    toggleSupplierMaterialOption({
+        selector: `${ modalSelector } ${ materialSelector }`,
+        data: data ? mapSupplierMaterialToSelectData(data) : null,
         modalSelector
     });
 

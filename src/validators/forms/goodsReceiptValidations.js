@@ -9,7 +9,7 @@ const validateOptionalGoodsReceiptDetails = body('details')
 
         details.forEach(detail => {
 
-            if (!detail.productId || !detail.quantity || !detail.costPerUnitType) {
+            if (!detail.materialId || !detail.quantity || !detail.costPerUnitType) {
                 throw new Error(errorMap['details'].INVALID_FORMAT_REQUIRED);
             }
 

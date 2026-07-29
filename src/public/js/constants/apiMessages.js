@@ -10,10 +10,10 @@ export const errorMessages = {
     // SUPPLIER
     SUPPLIER_ID_REQUIRED: 'El proveedor es requerido.',
     SUPPLIER_ID_INVALID_UUID: 'El proveedor no es válido.',
-    PRODUCT_ID_REQUIRED: 'El producto es requerido.',
-    PRODUCT_ID_INVALID_UUID: 'El producto no es válido.',
-    SUPPLIER_PRODUCT_ID_REQUIRED: 'El producto es requerido.',
-    SUPPLIER_PRODUCT_ID_INVALID_UUID: 'El producto no es válido.',
+    MATERIAL_ID_REQUIRED: 'El material es requerido.',
+    MATERIAL_ID_INVALID_UUID: 'El material no es válido.',
+    SUPPLIER_MATERIAL_ID_REQUIRED: 'El material es requerido.',
+    SUPPLIER_MATERIAL_ID_INVALID_UUID: 'El material no es válido.',
     QUANTITY_REQUIRED: 'La cantidad es requerida.',
     QUANTITY_INVALID_NUMBER: 'La cantidad debe ser un número.',
     QUANTITY_TOO_LONG: 'La cantidad es demasiado grande.',
@@ -155,8 +155,8 @@ export const errorMessages = {
     SUPPLIED_INVALID_BOOLEAN: 'El estado surtido debe ser verdadero o falso',
 
     // DETAILS
-    DETAILS_REQUIRED: 'La lista de detalles debe contener al menos un producto.',
-    DETAILS_INVALID_FORMAT_REQUIRED: 'Cada detalle debe contener un producto, una cantidad y un costo por presentación.',
+    DETAILS_REQUIRED: 'La lista de detalles debe contener al menos un material.',
+    DETAILS_INVALID_FORMAT_REQUIRED: 'Cada detalle debe contener un material, una cantidad y un costo por presentación.',
     DETAILS_INVALID_FORMAT_QUANTITY: 'La cantidad de cada detalle debe ser un número mayor a cero.',
     DETAILS_INVALID_FORMAT_SUPPLIER: 'El proveedor de cada detalle es requerido.',
     DETAILS_INVALID_FORMAT_COST_PER_UNIT_TYPE: 'El costo por presentación de cada detalle debe ser un número mayor a cero.',
@@ -197,20 +197,20 @@ export const errorMessages = {
             ? ` y proveedor: ${ meta.supplierName }`
             : '';
 
-        return `Stock insuficiente para corregir la compra con el producto: ${ meta.productName ?? 'Producto desconocido' }${ dimensions }${ supplier }.`;
+        return `Stock insuficiente para corregir la compra con el material: ${ meta.materialName ?? 'Material desconocido' }${ dimensions }${ supplier }.`;
     },
     GOODS_RECEIPT_DETAIL_ALREADY_CANCELED: 'El detalle de la compra ya está cancelado.',
     GOODS_RECEIPT_CORRECTION_REASON_NOT_FOUND: 'Razón de corrección de compra no encontrada.',
-    PRODUCT_NOT_FOUND: 'Producto no encontrado.',
-    PRODUCT_CREATE_DB_ERROR: 'Error de base de datos al crear el producto.',
-    PRODUCT_UPDATE_DB_ERROR: 'Error de base de datos al editar el producto.',
-    PRODUCT_DELETE_DB_ERROR: 'Error de base de datos al eliminar el producto.',
-    PRODUCT_DELETE_RELATION_CONFLICT: 'No se puede eliminar el producto porque está vinculado a una compra, salida u otro movimiento de almacén.',
-    PRODUCT_SNAPSHOT_FIND_DB_ERROR: 'Error de base de datos al buscar los datos históricos del producto.',
-    PRODUCT_STOCK_UPDATE_DB_ERROR: 'Error de base de datos al editar el stock del producto.',
-    PRODUCT_UNIT_COST_UPDATE_DB_ERROR: 'Error de base de datos al editar el costo unitario del producto.',
-    SUPPLIER_PRODUCT_CREATE_DB_ERROR: 'Error de base de datos al relacionar el producto a un proveedor.',
-    SUPPLIER_PRODUCT_DELETE_DB_ERROR: 'Error de base de datos al eliminar la relación entre producto y proveedor.',
+    MATERIAL_NOT_FOUND: 'Material no encontrado.',
+    MATERIAL_CREATE_DB_ERROR: 'Error de base de datos al crear el material.',
+    MATERIAL_UPDATE_DB_ERROR: 'Error de base de datos al editar el material.',
+    MATERIAL_DELETE_DB_ERROR: 'Error de base de datos al eliminar el material.',
+    MATERIAL_DELETE_RELATION_CONFLICT: 'No se puede eliminar el material porque está vinculado a una compra, salida u otro movimiento de almacén.',
+    MATERIAL_SNAPSHOT_FIND_DB_ERROR: 'Error de base de datos al buscar los datos históricos del material.',
+    MATERIAL_STOCK_UPDATE_DB_ERROR: 'Error de base de datos al editar el stock del material.',
+    MATERIAL_UNIT_COST_UPDATE_DB_ERROR: 'Error de base de datos al editar el costo unitario del material.',
+    SUPPLIER_MATERIAL_CREATE_DB_ERROR: 'Error de base de datos al relacionar el material a un proveedor.',
+    SUPPLIER_MATERIAL_DELETE_DB_ERROR: 'Error de base de datos al eliminar la relación entre material y proveedor.',
     GOODS_ISSUE_NOT_FOUND: 'Salida de almacén no encontrada.',
     GOODS_ISSUE_DETAIL_NOT_FOUND: 'Detalle de salida de almacén no encontrado.',
     GOODS_ISSUE_CREATE_DB_ERROR: 'Error de base de datos al crear la salida de almacén.',
@@ -229,7 +229,7 @@ export const errorMessages = {
             ? meta.supplierName
             : '';
 
-        return `Stock inexistente para realizar la salida con el producto: ${ meta.productName }${ dimensions } y proveedor: ${ supplier }.`;
+        return `Stock inexistente para realizar la salida con el material: ${ meta.materialName }${ dimensions } y proveedor: ${ supplier }.`;
     },
     GOODS_ISSUE_INSUFFICIENT_STOCK: (meta) => {
 
@@ -245,7 +245,7 @@ export const errorMessages = {
             ? meta.supplierName
             : '';
 
-        return `Stock insuficiente para realizar la salida con el producto: ${ meta.productName }${ dimensions } y proveedor: ${ supplier }.`;
+        return `Stock insuficiente para realizar la salida con el material: ${ meta.materialName }${ dimensions } y proveedor: ${ supplier }.`;
     },
     GOODS_ISSUE_MISSING_MAX_UNIT_COST: (meta) => {
 
@@ -260,15 +260,15 @@ export const errorMessages = {
         const supplier = meta.supplierName
             ? meta.supplierName
             : '';
-        
-        return `No se puede realizar la salida porque el producto: ${ meta.productName } y proveedor: ${ meta.supplierName } no tiene costo unitario máximo configurado.`
+
+        return `No se puede realizar la salida porque el material: ${ meta.materialName } y proveedor: ${ meta.supplierName } no tiene costo unitario máximo configurado.`
     },
     GOODS_ISSUE_NOT_PENDING_CONFLICT: 'La salida solo puede editarse cuando está pendiente.',
-    GOODS_ISSUE_SUPPLIED_CONFLICT: 'La salida ya tiene productos surtidos y no puede editarse en general.',
+    GOODS_ISSUE_SUPPLIED_CONFLICT: 'La salida ya tiene materiales surtidos y no puede editarse en general.',
     GOODS_ISSUE_SUPPLIED_DETAIL_CONFLICT: 'No se pueden editar o eliminar detalles que ya fueron surtidos.',
     GOODS_ISSUE_INTERNAL_CLIENT_ADVISOR_DEPARTMENT_CONFLICT: 'Para el cliente GPG INTERNO, el asesor debe tener el rol Coordinador.',
     GOODS_ISSUE_INTERNAL_CLIENT_PROJECT_NUMBER_CONFLICT: (meta) => `Para el cliente GPG INTERNO, el número de proyecto ${ meta.projectNumber } no coincide con el área ${ meta.departmentName }.`,
-    MOVEMENT_DETAIL_RELATION_CONFLICT: 'El detalle del movimiento no está asociado a un producto o proveedor.',
+    MOVEMENT_DETAIL_RELATION_CONFLICT: 'El detalle del movimiento no está asociado a un material o proveedor.',
     PURCHASE_REQUISITION_NOT_FOUND: 'Requisición de compra no encontrada.',
     PROJECT_NOT_FOUND: 'Proyecto no encontrado.',
     PURCHASE_REQUISITION_STATUS_NOT_FOUND: 'Estado de requisición no encontrado.',
@@ -288,9 +288,9 @@ const successMessages = {
     SUCCESS_LOGOUT: 'Sesión cerrada exitosamente.',
     CREATED_PROFILE: '¡Perfil creado exitosamente!',
     UPDATED_PROFILE: '¡Perfil actualizado exitosamente!',
-    CREATED_PRODUCT: '¡Producto creado exitosamente!',
-    UPDATED_PRODUCT: '¡Producto actuallizado exitosamente!',
-    DELETED_PRODUCT: '¡Producto eliminado exitosamente!',
+    CREATED_MATERIAL: '¡Material creado exitosamente!',
+    UPDATED_MATERIAL: '¡Material actuallizado exitosamente!',
+    DELETED_MATERIAL: '¡Material eliminado exitosamente!',
     CREATED_SUPPLIER: '¡Proveedor creado exitosamente!',
     UPDATED_SUPPLIER: '¡Proveedor actualizado exitosamente!',
     CREATED_GOODS_RECEIPT: '¡Entrada de mercancía creada exitosamente!',
@@ -324,7 +324,7 @@ export const getErrorMessage = (data = {}) => {
     }
 
     if (code) return errorMessages[code] ?? code;
-    
+
     return null;
 }
 

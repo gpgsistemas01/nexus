@@ -8,7 +8,7 @@ export const getAllMovements = async (req, res) => {
     const startDate = req.query.startDate || '';
     const endDate = req.query.endDate || '';
     const movementType = req.query.movementType || '';
-    const productId = req.query.productId || '';
+    const materialId = req.query.materialId || '';
     const supplierId = req.query.supplierId || '';
     const columns = ['date', 'type', 'referenceNumber', null, null, null, null, null, null, null];
     const hasRequestedOrder = Boolean(req.query.order || req.query['order[0][column]']);
@@ -28,7 +28,7 @@ export const getAllMovements = async (req, res) => {
         startDate,
         endDate,
         movementType,
-        productId,
+        materialId,
         supplierId,
         orderBy,
         orderDir,

@@ -1,12 +1,12 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-const findAllSupplierProducts = vi.fn();
+const findAllSupplierMaterials = vi.fn();
 const findAllGoodsIssues = vi.fn();
 const findAllGoodsReceipts = vi.fn();
 const findAllSuppliers = vi.fn();
 
-vi.mock('../../../src/services/warehouse/products/supplierProductService.js', () => ({
-  findAllSupplierProducts
+vi.mock('../../../src/services/warehouse/materials/supplierMaterialService.js', () => ({
+  findAllSupplierMaterials
 }));
 
 vi.mock('../../../src/services/warehouse/goodsIssues/goodsIssueService.js', () => ({
@@ -33,11 +33,11 @@ describe('warehouse reportService', () => {
     vi.clearAllMocks();
   });
 
-  it('mapea reporte de almacén desde proveedor-producto con números normalizados', async () => {
-    findAllSupplierProducts.mockResolvedValue({
+  it('mapea reporte de almacén desde proveedor-material con números normalizados', async () => {
+    findAllSupplierMaterials.mockResolvedValue({
       data: [{
         supplier: { tradeName: 'Proveedor Uno' },
-        name: 'Producto Uno',
+        name: 'Material Uno',
         base: '2.5',
         height: '3',
         currentStock: '4',
@@ -49,9 +49,9 @@ describe('warehouse reportService', () => {
       }]
     });
 
-    await expect(findWarehouseReportRows({ search: 'Producto', orderBy: 'name', orderDir: 'desc' })).resolves.toEqual([{
+    await expect(findWarehouseReportRows({ search: 'Material', orderBy: 'name', orderDir: 'desc' })).resolves.toEqual([{
       supplier: 'Proveedor Uno',
-      name: 'Producto Uno',
+      name: 'Material Uno',
       base: 2.5,
       height: 3,
       currentStock: 4,
@@ -62,17 +62,17 @@ describe('warehouse reportService', () => {
       maxUnitCost: 12.5
     }]);
 
-    expect(findAllSupplierProducts).toHaveBeenCalledWith({
+    expect(findAllSupplierMaterials).toHaveBeenCalledWith({
       skip: 0,
       take: 100000,
-      search: 'Producto',
+      search: 'Material',
       supplierId: null,
       orderBy: 'name',
       orderDir: 'desc'
     });
   });
 
-  it('mapea reporte de salidas filtrando detalles por proveedor/producto', async () => {
+  it('mapea reporte de salidas filtrando detalles por proveedor/material', async () => {
     const requestDate = new Date('2026-06-18T10:30:00.000Z');
     findAllGoodsIssues.mockResolvedValue({
       data: [{
@@ -85,12 +85,12 @@ describe('warehouse reportService', () => {
         fulfillmentStatus: { name: 'Surtido' },
         details: [
           {
-            productId: 'product-1',
+            materialId: 'material-1',
             supplierId: 'supplier-1',
-            productName: 'Producto Uno',
+            materialName: 'Material Uno',
             supplierName: 'Proveedor Uno',
-            productBase: '2',
-            productHeight: '3',
+            materialBase: '2',
+            materialHeight: '3',
             quantity: '2',
             suppliedQuantity: '2',
             presentationName: 'Caja',
@@ -100,7 +100,7 @@ describe('warehouse reportService', () => {
             convertedQuantityDifference: '2',
             fulfillmentStatus: { name: 'Surtido' }
           },
-          { productId: 'product-2', supplierId: 'supplier-1', productName: 'Filtrado' }
+          { materialId: 'material-2', supplierId: 'supplier-1', materialName: 'Filtrado' }
         ]
       }]
     });
@@ -114,10 +114,10 @@ describe('warehouse reportService', () => {
       requesterName: 'Solicitante',
       clientName: 'Cliente',
       fulfillmentStatusName: 'Surtido',
-      productName: 'Producto Uno',
+      materialName: 'Material Uno',
       supplierName: 'Proveedor Uno',
-      productBase: 2,
-      productHeight: 3,
+      materialBase: 2,
+      materialHeight: 3,
       requestedQuantity: 2,
       suppliedQuantity: 2,
       convertedQuantity: 12,
@@ -139,10 +139,10 @@ describe('warehouse reportService', () => {
         isInvoiced: true,
         invoice: 'F-1',
         details: [{
-          productId: 'product-1',
-          productName: 'Producto Uno',
-          productBase: '2',
-          productHeight: '3',
+          materialId: 'material-1',
+          materialName: 'Material Uno',
+          materialBase: '2',
+          materialHeight: '3',
           quantity: '5',
           presentationName: 'Caja',
           convertedQuantity: '30',
@@ -153,8 +153,8 @@ describe('warehouse reportService', () => {
           grossPurchaseAmount: '52.20',
           status: 'ACTIVE'
         }, {
-          productId: 'product-2',
-          productName: 'Producto cancelado',
+          materialId: 'material-2',
+          materialName: 'Material cancelado',
           status: 'CANCELED'
         }]
       }]
@@ -166,9 +166,9 @@ describe('warehouse reportService', () => {
         receivedByName: 'Receptor',
         supplierName: 'Proveedor Uno',
         invoice: 'F-1',
-        productName: 'Producto Uno',
-        productBase: 2,
-        productHeight: 3,
+        materialName: 'Material Uno',
+        materialBase: 2,
+        materialHeight: 3,
         quantity: 5,
         convertedQuantity: 30,
         unitMeasureName: 'Metro',

@@ -1,24 +1,24 @@
-import { PRODUCT_SELECT_RESULTS_LIMIT } from "../../../application/warehouse/products.js";
-import { setupProductSelect, toggleProductOption } from "../domains/product.js";
+import { MATERIAL_SELECT_RESULTS_LIMIT } from "../../../application/warehouse/materials.js";
+import { setupMaterialSelect, toggleMaterialOption } from "../domains/material.js";
 
 const modalSelector = '#goodsReceiptCorrectionModal';
-const productSelector = '#correctionProductInput';
+const materialSelector = '#correctionMaterialInput';
 const supplierSelector = '#correctionSupplierInput';
 
 export const initGoodsReceiptCorrectionSelect2 = ({ detail }) => {
-    setupProductSelect({
+    setupMaterialSelect({
         modalSelector,
         supplierSelector,
-        productSelector,
+        materialSelector,
         allowCreate: false,
-        resultsLimit: PRODUCT_SELECT_RESULTS_LIMIT
+        resultsLimit: MATERIAL_SELECT_RESULTS_LIMIT
     });
 
-    toggleProductOption({
-        selector: `${ modalSelector } ${ productSelector }`,
+    toggleMaterialOption({
+        selector: `${ modalSelector } ${ materialSelector }`,
         data: {
-            id: detail.productId || detail.product?.id,
-            text: detail.productName || detail.product?.name
+            id: detail.materialId || detail.material?.id,
+            text: detail.materialName || detail.material?.name
         }
     });
 };

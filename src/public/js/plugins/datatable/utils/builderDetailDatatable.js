@@ -157,8 +157,8 @@ export const buildDetailsHeader = ({ type, mode, isWarehouse, isCoordinator, isS
 export const buildDetailsColumns = ({ type, mode, render, isWarehouse, isCoordinator, isSystem }) => {
 
     bindDisabledControlWarning({
-        eventTargetSelector: '#productTable td',
-        eventNamespace: 'productTableDisabledInputWarning',
+        eventTargetSelector: '#materialTable td',
+        eventNamespace: 'materialTableDisabledInputWarning',
         resolveControl: resolveDisabledTableInput
     });
 
@@ -167,8 +167,8 @@ export const buildDetailsColumns = ({ type, mode, render, isWarehouse, isCoordin
             data: null,
             render
         },
-        { data: 'productBase', render: formatDecimal },
-        { data: 'productHeight', render: formatDecimal },
+        { data: 'materialBase', render: formatDecimal },
+        { data: 'materialHeight', render: formatDecimal },
         { data: 'quantity', render: formatDecimal },
         ...(type === 'issue' && ISSUE_DETAIL_RETURN_MODES.includes(mode) ? [
             {
@@ -189,7 +189,7 @@ export const buildDetailsColumns = ({ type, mode, render, isWarehouse, isCoordin
                 data: 'projectConvertedQuantity',
                 render: (value, _, row) => {
 
-                    const detailId = row.id || row.productId;
+                    const detailId = row.id || row.materialId;
                     const isEditableDetail = mode === 'edit-detail' && !row.originalIsSupplied;
                     const isProjectQuantityDisabled = !isEditableDetail || !row.isSupplied;
 
@@ -225,8 +225,8 @@ export const buildDetailsColumns = ({ type, mode, render, isWarehouse, isCoordin
         columns.push({
             data: null,
             render: (_, __, row) => {
-                
-                const detailId = row.id || row.productId;
+
+                const detailId = row.id || row.materialId;
                 const isEditableDetail = mode === 'edit-detail' && !row.originalIsSupplied;
 
                 return `
@@ -322,7 +322,7 @@ export const buildDetailsColumns = ({ type, mode, render, isWarehouse, isCoordin
                     <button
                         type="button"
                         class="btn btn-danger btn-sm delete-btn"
-                        data-id="${ row.productId }"
+                        data-id="${ row.materialId }"
                         ${ isSuppliedDetail ? 'disabled title="El detalle ya fue surtido"' : '' }
                     >
                         <i class="fas fa-trash-alt"></i>
