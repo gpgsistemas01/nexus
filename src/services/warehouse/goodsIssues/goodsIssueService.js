@@ -99,13 +99,13 @@ const resolveGoodsIssueHeaderData = async ({ requesterId, advisorId, departmentI
 
 const GOODS_ISSUE_DETAIL_SELECT = {
     id: true,
-    productId: true,
+    materialId: true,
     quantity: true,
     convertedQuantity: true,
     maxUnitCost: true,
-    productName: true,
-    productBase: true,
-    productHeight: true,
+    materialName: true,
+    materialBase: true,
+    materialHeight: true,
     presentationId: true,
     presentationName: true,
     unitMeasureId: true,
@@ -315,7 +315,7 @@ export const updateGoodsIssue = async ({ id, goodsIssueDto }) => {
                 details: {
                     select: {
                         id: true,
-                        productId: true,
+                        materialId: true,
                         supplierId: true,
                         quantity: true,
                         presentationId: true,
@@ -424,16 +424,16 @@ export const updateGoodsIssueDetails = async ({ id, goodsIssueDto }) => {
                     where: { id: { in: detailIds } },
                     select: {
                         id: true,
-                        productId: true,
+                        materialId: true,
                         supplierId: true,
                         quantity: true,
                         suppliedQuantity: true,
                         returnedQuantity: true,
                         convertedQuantity: true,
                         projectConvertedQuantity: true,
-                        productName: true,
-                        productBase: true,
-                        productHeight: true,
+                        materialName: true,
+                        materialBase: true,
+                        materialHeight: true,
                         supplierName: true
                     }
                 }
@@ -491,7 +491,7 @@ export const updateGoodsIssueDetails = async ({ id, goodsIssueDto }) => {
             if (supplyRequests.length) {
 
                 const detailSupplyMovements = supplyRequests.map(({ current, quantityToSupply }) => ({
-                    productId: current.productId,
+                    materialId: current.materialId,
                     supplierId: current.supplierId,
                     goodsIssueDetailId: current.id,
                     quantity: quantityToSupply
@@ -683,7 +683,7 @@ export const returnGoodsIssueDetail = async ({ id, detailId, returnDto, userId }
                 tx,
                 reference: { goodsIssueId: id },
                 details: [{
-                    productId: detail.productId,
+                    materialId: detail.materialId,
                     supplierId: detail.supplierId,
                     goodsIssueDetailId: detail.id,
                     quantity: requestedReturnQuantity
@@ -740,12 +740,12 @@ export const returnGoodsIssueDetail = async ({ id, detailId, returnDto, userId }
                     goodsIssueDetailId: detail.id,
                     movementDetailId: movement.details[0]?.id || null,
                     returnedById: userId,
-                    productId: detail.productId,
-                    productName: detail.productName,
+                    materialId: detail.materialId,
+                    materialName: detail.materialName,
                     supplierId: detail.supplierId,
                     supplierName: detail.supplierName,
-                    productBase: detail.productBase,
-                    productHeight: detail.productHeight,
+                    materialBase: detail.materialBase,
+                    materialHeight: detail.materialHeight,
                     currentTotalReturnedQuantity: currentTotalReturnedQuantity,
                     newTotalReturnedQuantity: newTotalReturnedQuantity,
                     observations

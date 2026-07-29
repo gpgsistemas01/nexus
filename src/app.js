@@ -6,7 +6,7 @@ import salesReportApiRoutes from './routes/api/sales/reportApiRoute.js';
 
 import authApiRoutes from './routes/api/authApiRoute.js';
 
-import productApiRoutes from './routes/api/warehouse/productApiRoute.js';
+import materialApiRoutes from './routes/api/warehouse/materialApiRoute.js';
 import wasteApiRoutes from './routes/api/warehouse/wasteApiRoute.js';
 import supplierApiRoutes  from './routes/api/warehouse/supplierApiRoute.js';
 import goodsReceiptApiRoutes from './routes/api/warehouse/goodsReceiptApiRoute.js';
@@ -34,7 +34,7 @@ import loginWebRoutes from './routes/web/auth/loginWebRoute.js';
 import logoutWebRoutes from './routes/web/auth/logoutWebRoute.js';
 import refreshWebRoutes from './routes/web/auth/refreshWebRoute.js';
 
-import productWebRoutes from './routes/web/warehouse/productWebRoute.js';
+import materialWebRoutes from './routes/web/warehouse/materialWebRoute.js';
 import wasteWebRoutes from './routes/web/warehouse/wasteWebRoute.js';
 import supplierWebRoutes from './routes/web/warehouse/supplierWebRoute.js';
 import purchaseRequisitionWebRoutes from './routes/web/warehouse/purchaseRequisitionWebRoute.js';
@@ -106,7 +106,7 @@ app.use(rootRoute, homeWebRoutes);
 app.use('/inicio-sesion', loginWebRoutes);
 app.use('/revocar-sesion', refreshWebRoutes);
 app.use('/cerrar-sesion', logoutWebRoutes);
-app.use('/productos', productWebRoutes);
+app.use('/materiales', materialWebRoutes);
 app.use('/mermas', wasteWebRoutes);
 app.use('/requisiciones', purchaseRequisitionWebRoutes);
 app.use('/compras', goodsReceiptWebRoutes);
@@ -121,7 +121,7 @@ app.use('/movimientos', movementWebRoutes);
 app.use(apiRoute + authRoute, authApiRoutes);
 app.use(apiRoute + sales + '/clients', clientApiRoutes);
 app.use(apiRoute + sales + '/reports', salesReportApiRoutes);
-app.use(apiRoute + warehouse + '/products', productApiRoutes);
+app.use(apiRoute + warehouse + '/materials', materialApiRoutes);
 app.use(apiRoute + warehouse + '/wastes', wasteApiRoutes);
 app.use(apiRoute + warehouse + '/suppliers', supplierApiRoutes);
 app.use(apiRoute + warehouse + '/goods-receipts', goodsReceiptApiRoutes);

@@ -1,5 +1,5 @@
 import { openPurchaseRequisitionModal } from "../../pages/warehouse/purchaseRequisitionsPage.js";
-import { createDataTable, refreshProductTable, renderActionButtons } from "./baseDatatable.js";
+import { createDataTable, refreshMaterialTable, renderActionButtons } from "./baseDatatable.js";
 import { PURCHASE_REQUISITIONS_API_ROUTE } from "../../services/warehouse/purchaseRequisitionService.js";
 import { hasPermission } from "../../utils/permissions.js";
 import { getResponsiveRowData } from "./utils/responsive.js";
@@ -8,7 +8,7 @@ import { formatDateTimeDisplay } from "../../utils/formatters.js";
 import { formatDecimal } from "../../utils/formatUtils.js";
 
 export let details = [];
-const selectorProductTable = DATATABLE_SELECTORS.PRODUCT;
+const selectorMaterialTable = DATATABLE_SELECTORS.MATERIAL;
 const selectorTable = DATATABLE_SELECTORS.MAIN;
 
 export const createPurchaseRequisitionDatatable = (context) => {
@@ -98,16 +98,16 @@ export const createPurchaseRequisitionDatatable = (context) => {
 
 export const initDetailsPurchaseRequisitionTable = (mode) => {
 
-    if ($.fn.DataTable.isDataTable(selectorProductTable)) {
-        $(selectorProductTable).DataTable().clear().destroy();
-        $(selectorProductTable).empty();
+    if ($.fn.DataTable.isDataTable(selectorMaterialTable)) {
+        $(selectorMaterialTable).DataTable().clear().destroy();
+        $(selectorMaterialTable).empty();
     }
 
     const columns = [
-        { data: 'name', title: 'Producto' },
+        { data: 'name', title: 'Material' },
         { data: 'quantity', title: 'Cantidad', render: formatDecimal },
-        { 
-            data: 'presentation', 
+        {
+            data: 'presentation',
             title: 'Presentación',
             render: (data) => `PIEZA (${ data })`
         },
@@ -128,7 +128,7 @@ export const initDetailsPurchaseRequisitionTable = (mode) => {
     }
 
     createDataTable({
-        selector: selectorProductTable,
+        selector: selectorMaterialTable,
         options: {
             data: details,
             columns,
@@ -137,11 +137,11 @@ export const initDetailsPurchaseRequisitionTable = (mode) => {
     });
 };
 
-$(selectorProductTable).on('click', '.delete-btn', function() {
+$(selectorMaterialTable).on('click', '.delete-btn', function() {
 
     const index = $(this).data('index');
 
     details.splice(index, 1);
 
-    refreshProductTable(details);
+    refreshMaterialTable(details);
 });

@@ -2,19 +2,19 @@ import { isEmptyOrNull } from "./baseValidations.js";
 import { validateName, validatePassword, validateNumber, validateUsername, validateTextOptional, validateMeasure, validateDateOptional, validateGoodsReceiptDetailsArray, validateDate, validateText, validateNumberOptional, validateGoodsIssueDetailsArray, validateNonNegativeNumber, validatePositiveNumber, validatePairedOptionalNumber } from "./fieldValidations.js";
 
 export const supplierValidators = {
-    legalName: (value) => validateText({ 
-        name: value, 
-        length: 200, 
-        fieldName: 'La razón social' 
+    legalName: (value) => validateText({
+        name: value,
+        length: 200,
+        fieldName: 'La razón social'
     }),
-    tradeName: (value) => validateText({ 
-        name: value, 
-        length: 100, 
-        fieldName: 'El nombre comercial' 
+    tradeName: (value) => validateText({
+        name: value,
+        length: 100,
+        fieldName: 'El nombre comercial'
     }),
 }
 
-export const productValidators = {
+export const materialValidators = {
     name: (value) => validateName(value, 200),
     supplierId: (value) => isEmptyOrNull(value, 'El proveedor'),
     presentationId: (value) => isEmptyOrNull(value, 'La presentación'),
@@ -33,14 +33,14 @@ export const productValidators = {
     }),
 }
 
-export const productStockValidators = {
+export const materialStockValidators = {
     newStock: (value) => validateNumber(value, 'El nuevo stock'),
     reasonId: (value) => isEmptyOrNull(value, 'La razón de ajuste'),
     observations: (value) => validateTextOptional(value, 500, 'Las observaciones'),
 }
 
 export const wasteDataValidators = {
-    supplierProductId: (value) => isEmptyOrNull(value, 'El producto'),
+    supplierMaterialId: (value) => isEmptyOrNull(value, 'El material'),
     base: (value) => validateNumber(value, 'La base de la merma'),
     height: (value) => validateNumber(value, 'La altura de la merma'),
 }
@@ -62,19 +62,19 @@ export const loginValidators = {
     password: validatePassword,
 }
 
-export const validateAddGoodsReceiptProductValidators = {
-    productId: (value) => isEmptyOrNull(value, 'El producto'),
+export const validateAddGoodsReceiptMaterialValidators = {
+    materialId: (value) => isEmptyOrNull(value, 'El material'),
     quantity: (value) => validatePositiveNumber(value, 'La cantidad'),
     costPerUnitType: (value) => validateNumber(value, 'El costo por presentación', { allowZero: false }),
 }
 
-export const validateAddProductValidators = {
-    productId: (value) => isEmptyOrNull(value, 'El producto'),
+export const validateAddMaterialValidators = {
+    materialId: (value) => isEmptyOrNull(value, 'El material'),
     quantity: (value) => validatePositiveNumber(value, 'La cantidad'),
 }
 
-export const validateAddGoodsIssueProductValidators = {
-    productId: (value) => isEmptyOrNull(value, 'El producto'),
+export const validateAddGoodsIssueMaterialValidators = {
+    materialId: (value) => isEmptyOrNull(value, 'El material'),
     supplierId: (value) => isEmptyOrNull(value, 'El proveedor'),
     quantity: (value) => validatePositiveNumber(value, 'La cantidad'),
 }
@@ -94,10 +94,10 @@ export const validateGoodsReceiptCorrectionValidators = {
 
 
 export const validateGoodsIssueValidators = {
-    projectNumber: (value) => validateText({ 
-        name: value, 
-        maxLength: 10, 
-        fieldName: 'El número de proyecto' 
+    projectNumber: (value) => validateText({
+        name: value,
+        maxLength: 10,
+        fieldName: 'El número de proyecto'
     }),
     advisorId: (value) => isEmptyOrNull(value, 'El asesor'),
     clientId: (value) => isEmptyOrNull(value, 'El cliente'),
@@ -126,10 +126,10 @@ export const validatePurchaseRequisitionValidators = {
 };
 
 export const validateClientValidators = {
-    name: (value) => validateText({ 
-        name: value, 
-        length: 100, 
-        fieldName: 'El nombre' 
+    name: (value) => validateText({
+        name: value,
+        length: 100,
+        fieldName: 'El nombre'
     }),
 }
 
@@ -151,11 +151,11 @@ export const userPasswordValidators = {
 };
 
 export const profileValidators = {
-    fullName: (value) => validateText({ 
-        name: value, 
-        length: 100, 
-        fieldName: 'El nombre', 
-        regex: /^[\p{L}0-9]+(?:[ '\-.,:;()¿?¡!][\p{L}0-9]+)*[.,:;()¿?¡!]*$/u 
+    fullName: (value) => validateText({
+        name: value,
+        length: 100,
+        fieldName: 'El nombre',
+        regex: /^[\p{L}0-9]+(?:[ '\-.,:;()¿?¡!][\p{L}0-9]+)*[.,:;()¿?¡!]*$/u
     }),
     departments: (value) => {
 

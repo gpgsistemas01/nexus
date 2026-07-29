@@ -4,7 +4,7 @@ import {
   buildStockKey,
   cleanSearchTerm,
   normalizeDecimal,
-  normalizeProductDimensions,
+  normalizeMaterialDimensions,
   normalizeText,
   parseStockKey,
   roundTo,
@@ -39,15 +39,15 @@ describe('formattersUtils', () => {
     expect(toNumber('12.5')).toBe(12.5);
     expect(toNumber('')).toBeNull();
     expect(toNumber(null)).toBeNull();
-    expect(normalizeProductDimensions({ base: '0', height: '0' })).toEqual({ base: null, height: null });
-    expect(normalizeProductDimensions({ base: '2.5', height: '4' })).toEqual({ base: 2.5, height: 4 });
+    expect(normalizeMaterialDimensions({ base: '0', height: '0' })).toEqual({ base: null, height: null });
+    expect(normalizeMaterialDimensions({ base: '2.5', height: '4' })).toEqual({ base: 2.5, height: 4 });
   });
 
-  it('genera y descompone claves de inventario por producto y proveedor', () => {
-    const key = buildStockKey('product-1', 'supplier-2');
+  it('genera y descompone claves de inventario por material y proveedor', () => {
+    const key = buildStockKey('material-1', 'supplier-2');
 
-    expect(key).toBe('product-1:supplier-2');
-    expect(parseStockKey(key)).toEqual({ productId: 'product-1', supplierId: 'supplier-2' });
+    expect(key).toBe('material-1:supplier-2');
+    expect(parseStockKey(key)).toEqual({ materialId: 'material-1', supplierId: 'supplier-2' });
   });
 
   it('normaliza texto quitando espacios y usando mayúsculas', () => {

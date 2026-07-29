@@ -13,7 +13,7 @@ const createResponse = () => ({
 });
 
 const authCookieSetCases = [
-  { nodeEnv: 'production', secure: true },
+  { nodeEnv: 'materialion', secure: true },
   { nodeEnv: 'development', secure: false }
 ];
 
@@ -43,7 +43,7 @@ describe('cookiesUtils', () => {
   });
 
   it('limpia las cookies de autenticación con opciones consistentes al entorno', () => {
-    vi.stubEnv('NODE_ENV', 'production');
+    vi.stubEnv('NODE_ENV', 'materialion');
     const res = createResponse();
 
     clearAccessCookie(res);

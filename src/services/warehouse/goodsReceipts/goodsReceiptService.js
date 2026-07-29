@@ -15,7 +15,7 @@ import { findProfileById } from "../../admin/profileService.js";
 import { applyInventoryMovement } from "../../inventory/movementService.js";
 import { findUniqueSupplier } from "../supplierService.js";
 import { buildGoodsReceiptDetails, calculateGoodsReceiptTotals, createGoodsReceiptDetailsAndUpdateTotals } from "./goodsReceiptHelpers.js";
-import { updateProductUnitCostIfHigher } from "../products/supplierProductService.js";
+import { updateMaterialUnitCostIfHigher } from "../materials/supplierMaterialService.js";
 import { isAppError } from "../../../errors/AppError.js";
 import { buildDateRangeFilter } from "../../../utils/requestQueryUtils.js";
 import { GOODS_RECEIPT_STATUS_NAMES } from "../../../constants/warehouseStatuses.js";
@@ -85,9 +85,9 @@ export const findAllGoodsReceipts = async ({
             details: {
                 select: {
                     id: true,
-                    productName: true,
-                    productBase: true,
-                    productHeight: true,
+                    materialName: true,
+                    materialBase: true,
+                    materialHeight: true,
                     quantity: true,
                     presentationId: true,
                     presentationName: true,
@@ -99,7 +99,7 @@ export const findAllGoodsReceipts = async ({
                     conversionUnitCost: true,
                     netPurchaseAmount: true,
                     grossPurchaseAmount: true,
-                    productId: true,
+                    materialId: true,
                     status: true,
                 }
             }
@@ -168,7 +168,7 @@ export const createGoodsReceipt = async ({ goodsReceiptDto }) => {
                     details: {
                         select: {
                             id: true,
-                            productId: true,
+                            materialId: true,
                             quantity: true,
                             conversionUnitCost: true
                         }
@@ -180,7 +180,7 @@ export const createGoodsReceipt = async ({ goodsReceiptDto }) => {
                 tx,
                 reference: { goodsReceiptId: goodsReceipt.id },
                 details: goodsReceipt.details.map(detail => ({
-                    productId: detail.productId,
+                    materialId: detail.materialId,
                     goodsReceiptDetailId: detail.id,
                     supplierId: goodsReceipt.supplierId,
                     quantity: detail.quantity
@@ -191,7 +191,7 @@ export const createGoodsReceipt = async ({ goodsReceiptDto }) => {
             return goodsReceipt;
         });
 
-        await updateProductUnitCostIfHigher({
+        await updateMaterialUnitCostIfHigher({
             supplierId: result.supplierId,
             details: result.details
         });
@@ -278,7 +278,7 @@ export const updateGoodsReceipt = async ({ id, goodsReceiptDto }) => {
                 tx,
                 reference: { goodsReceiptId: id },
                 details: createdDetails.map(detail => ({
-                    productId: detail.productId,
+                    materialId: detail.materialId,
                     goodsReceiptDetailId: detail.id,
                     supplierId: updatedHeader.supplierId,
                     quantity: detail.quantity
@@ -292,7 +292,7 @@ export const updateGoodsReceipt = async ({ id, goodsReceiptDto }) => {
         });
 
         if (newDetails.length) {
-            await updateProductUnitCostIfHigher({
+            await updateMaterialUnitCostIfHigher({
                 supplierId: updatedGoodsReceipt.supplierId,
                 details: addedDetails
             });

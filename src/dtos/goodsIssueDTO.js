@@ -8,7 +8,7 @@ const createGoodsIssueDto = (body = {}, { includeDetailId = false } = {}) => ({
     ...(Object.prototype.hasOwnProperty.call(body, 'observations') ? { observations: body.observations.trim() } : {}),
     details: (body.details).map(d => ({
         ...(includeDetailId && d.id ? { id: d.id.trim() } : {}),
-        productId: d.productId.trim(),
+        materialId: d.materialId.trim(),
         supplierId: d.supplierId.trim(),
         ...(d.presentationId ? { presentationId: d.presentationId.trim() } : {}),
         quantity: Number(d.quantity)

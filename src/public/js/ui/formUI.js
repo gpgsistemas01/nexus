@@ -63,8 +63,8 @@ export const resetFormSubmitState = (form) => {
 };
 
 export const initForm = ({
-    form, 
-    mode, 
+    form,
+    mode,
     id = ''
 }) => {
 
@@ -115,7 +115,7 @@ export const toggleInputSelectErrors = (form, errors, fields = null) => {
 
         const key = input.name;
         const value = errors[key];
-        
+
         setInputSelectError(form, key, value);
 
         if ($(input).hasClass('select2-hidden-accessible')) {
@@ -162,11 +162,11 @@ export const toggleTableErrors = (form, errors, fields = null) => {
 
     if (mode === FORM_MODES.EDIT_DETAIL) {
 
-        form.querySelectorAll('#productTable .is-invalid').forEach(input => {
+        form.querySelectorAll('#materialTable .is-invalid').forEach(input => {
             input.classList.remove('is-invalid');
         });
 
-        form.querySelectorAll('#productTable [data-error-for]').forEach(feedback => {
+        form.querySelectorAll('#materialTable [data-error-for]').forEach(feedback => {
             feedback.textContent = '';
             feedback.classList.add('d-none');
         });
@@ -318,7 +318,7 @@ export const setFormDisabled = ({
     fields = 'all',
     isDisabled
 }) => {
-    
+
     const elements = fields === 'all'
         ? form.querySelectorAll('input, select, textarea')
         : fields
@@ -328,7 +328,7 @@ export const setFormDisabled = ({
     elements.forEach(element => toggleDisabledElement({ element, isDisabled }));
 
     if (fields !== 'all') return;
-    
+
     const { mode } = form.dataset;
 
     form.querySelector('#submitBtn').classList.toggle('d-none', mode === FORM_MODES.VIEW);
@@ -339,19 +339,19 @@ export const toggleButtons = ({
     status = 'Cerrada',
     showActions = true,
     withTotal = true,
-    showAddProduct = null
+    showAddMaterial = null
 }) => {
 
     const isView = mode === 'view' || mode === 'edit-detail';
-    const addProductContainer = document.querySelector('.add-product-container');
-    const shouldShowAddProduct = showAddProduct ?? !isView;
+    const addMaterialContainer = document.querySelector('.add-material-container');
+    const shouldShowAddMaterial = showAddMaterial ?? !isView;
 
-    addProductContainer?.classList.toggle('d-none', !shouldShowAddProduct);
+    addMaterialContainer?.classList.toggle('d-none', !shouldShowAddMaterial);
 
-    if (showAddProduct !== null) {
+    if (showAddMaterial !== null) {
         toggleContainerElements({
-            selector: '.add-product-container',
-            isDisabled: !shouldShowAddProduct
+            selector: '.add-material-container',
+            isDisabled: !shouldShowAddMaterial
         });
     }
 
@@ -359,15 +359,15 @@ export const toggleButtons = ({
     const approveContainer = document.querySelector('.approve-container');
 
     if (approveContainer) {
-        
+
         const canApprove = !showActions || !(isView && status === 'Abierta');
         approveContainer.classList.toggle('d-none', canApprove);
     }
 }
 
-export const clearAddedProductInput = () => {
+export const clearAddedMaterialInput = () => {
 
-    $('#productInput').empty().trigger('change');
+    $('#materialInput').empty().trigger('change');
     document.querySelector('#quantityInput').value = '';
     document.querySelector('#presentationDisplayInput').value = '';
     const costInput = document.querySelector('#costPerUnitInput');

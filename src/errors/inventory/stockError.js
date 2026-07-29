@@ -2,7 +2,7 @@ import { AppError } from "../AppError.js";
 
 export class GoodsIssueInsufficientStock extends AppError {
 
-    constructor ({ productName, height, base, supplierName, productId, supplierId, requestedQuantity }) {
+    constructor ({ materialName, height, base, supplierName, materialId, supplierId, requestedQuantity }) {
 
         const hasDimensions =
             base != null &&
@@ -17,18 +17,18 @@ export class GoodsIssueInsufficientStock extends AppError {
             : '';
 
         super(
-            `Stock insuficiente para realizar la salida con el producto: ${ productName } (${ dimensions }) y proveedor: ${ supplier }`, 
-            'GOODS_ISSUE_INSUFFICIENT_STOCK', 
+            `Stock insuficiente para realizar la salida con el material: ${ materialName } (${ dimensions }) y proveedor: ${ supplier }`,
+            'GOODS_ISSUE_INSUFFICIENT_STOCK',
             409
         );
 
-        this.meta = { productName, height, base, supplierName, productId, supplierId, requestedQuantity };
+        this.meta = { materialName, height, base, supplierName, materialId, supplierId, requestedQuantity };
     }
 }
 
 export class GoodsIssueInexistentStock extends AppError {
 
-    constructor ({ productName, height, base, supplierName, productId, supplierId }) {
+    constructor ({ materialName, height, base, supplierName, materialId, supplierId }) {
 
         const hasDimensions =
             base != null &&
@@ -43,17 +43,17 @@ export class GoodsIssueInexistentStock extends AppError {
             : '';
 
         super(
-            `Stock inexistente para realizar la salida del producto: ${ productName }${ dimensions }${ supplier }`,
+            `Stock inexistente para realizar la salida del material: ${ materialName }${ dimensions }${ supplier }`,
             'GOODS_ISSUE_INEXISTENT_STOCK',
             409
         );
 
         this.meta = {
-            productName,
+            materialName,
             height,
             base,
             supplierName,
-            productId,
+            materialId,
             supplierId
         };
     }
@@ -61,13 +61,13 @@ export class GoodsIssueInexistentStock extends AppError {
 
 export class GoodsIssueMissingMaxUnitCost extends AppError {
 
-    constructor ({ productName, height, base, supplierName }) {
+    constructor ({ materialName, height, base, supplierName }) {
         super(
-            `No se puede realizar la salida porque el producto no tiene costo unitario máximo configurado: ${ productName } (${ base } x ${ height }) y proveedor: ${ supplierName }`,
+            `No se puede realizar la salida porque el material no tiene costo unitario máximo configurado: ${ materialName } (${ base } x ${ height }) y proveedor: ${ supplierName }`,
             'GOODS_ISSUE_MISSING_MAX_UNIT_COST',
             409
         );
 
-        this.meta = { productName, height, base, supplierName };
+        this.meta = { materialName, height, base, supplierName };
     }
 }

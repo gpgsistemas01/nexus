@@ -96,7 +96,7 @@ export const findAllPurchaseRequisitions = async ({
             details: {
                 select: {
                     id: true,
-                    product: {
+                    material: {
                         select: {
                             id: true,
                             name: true,
@@ -193,11 +193,11 @@ export const createPurchaseRequisition = async ({
                     },
                     referenceNumber,
                     details: {
-                        create: details.map(({ productId, ...rest }) => ({
+                        create: details.map(({ materialId, ...rest }) => ({
                             ...rest,
-                            product: {
+                            material: {
                                 connect: {
-                                    id: productId
+                                    id: materialId
                                 }
                             }
                         }))
@@ -231,7 +231,7 @@ export const createPurchaseRequisition = async ({
 };
 
 export const updatePurchaseRequisition = async ({
-    purchaseRequisitionDto, 
+    purchaseRequisitionDto,
     id,
     userId
 }) => {
@@ -270,14 +270,14 @@ export const updatePurchaseRequisition = async ({
                 where: { id }
             });
 
-            await tx.detailPurchaseRequisitionProduct.deleteMany({
+            await tx.detailPurchaseRequisitionMaterial.deleteMany({
                 where: {
                     purchaseRequisitionId: id
                 }
             });
 
             if (details.length) {
-                await tx.detailPurchaseRequisitionProduct.createMany({
+                await tx.detailPurchaseRequisitionMaterial.createMany({
                     data: buildPurchaseRequisitionDetailRows({
                         details,
                         purchaseRequisitionId: id
@@ -285,7 +285,7 @@ export const updatePurchaseRequisition = async ({
                 });
             }
 
-            const detailsPurchaseRequisition = await tx.detailPurchaseRequisitionProduct.findMany({
+            const detailsPurchaseRequisition = await tx.detailPurchaseRequisitionMaterial.findMany({
                 where: {
                     purchaseRequisitionId: id
                 }
@@ -403,7 +403,7 @@ const updatePurchaseRequisitionStatus = async ({ id, statusName, userId }) => {
             ...updatedPurchaseRequisition,
             referenceNumber: purchaseRequisition.referenceNumber,
             department: purchaseRequisition.department,
-            totalRequestedProducts: purchaseRequisition.details.length
+            totalRequestedMaterials: purchaseRequisition.details.length
         };
 
         logServiceInfo(serviceLogger, {

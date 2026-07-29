@@ -1,11 +1,11 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { ProductNotFound } from '../../../../src/errors/warehouse/productError.js';
+import { MaterialNotFound } from '../../../../src/errors/warehouse/materialError.js';
 import { buildGoodsReceiptDetails, calculateGoodsReceiptTotals, cancelGoodsReceiptDetailAndTotals, correctGoodsReceiptDetailAndTotals } from '../../../../src/services/warehouse/goodsReceipts/goodsReceiptHelpers.js';
-import { findProductsSnapshot } from '../../../../src/services/warehouse/products/productService.js';
+import { findMaterialsSnapshot } from '../../../../src/services/warehouse/materials/materialService.js';
 
-vi.mock('../../../../src/services/warehouse/products/productService.js', () => ({
-  findProductsSnapshot: vi.fn()
+vi.mock('../../../../src/services/warehouse/materials/materialService.js', () => ({
+  findMaterialsSnapshot: vi.fn()
 }));
 
 describe('goodsReceiptHelpers', () => {
@@ -14,9 +14,9 @@ describe('goodsReceiptHelpers', () => {
   });
 
   it('construye detalles de compra con montos, IVA y conversión usando datos representativos', async () => {
-    findProductsSnapshot.mockResolvedValue([
+    findMaterialsSnapshot.mockResolvedValue([
       {
-        id: 'product-1',
+        id: 'material-1',
         name: 'Lámina PVC',
         base: 1.2,
         height: 2,
@@ -26,19 +26,19 @@ describe('goodsReceiptHelpers', () => {
     ]);
 
     await expect(buildGoodsReceiptDetails([
-      { productId: 'product-1', quantity: 3, costPerUnitType: 125.5 }
+      { materialId: 'material-1', quantity: 3, costPerUnitType: 125.5 }
     ])).resolves.toEqual([
       {
-        productId: 'product-1',
+        materialId: 'material-1',
         quantity: 3,
         convertedQuantity: 7.2,
         costPerUnitType: 125.5,
         conversionUnitCost: 52.29,
         netPurchaseAmount: 376.5,
         grossPurchaseAmount: 436.74,
-        productName: 'Lámina PVC',
-        productBase: 1.2,
-        productHeight: 2,
+        materialName: 'Lámina PVC',
+        materialBase: 1.2,
+        materialHeight: 2,
         presentationId: 'presentation-1',
         presentationName: 'Hoja',
         unitMeasureId: 'unit-1',
@@ -47,7 +47,7 @@ describe('goodsReceiptHelpers', () => {
       }
     ]);
 
-    expect(findProductsSnapshot).toHaveBeenCalledWith({ tx: null, productIds: ['product-1'] });
+    expect(findMaterialsSnapshot).toHaveBeenCalledWith({ tx: null, materialIds: ['material-1'] });
   });
 
   it('calcula totales sólo con detalles activos para mantener visibles los cancelados', () => {
@@ -61,12 +61,12 @@ describe('goodsReceiptHelpers', () => {
     });
   });
 
-  it('lanza ProductNotFound si el producto solicitado no existe en el snapshot', async () => {
-    findProductsSnapshot.mockResolvedValue([]);
+  it('lanza MaterialNotFound si el material solicitado no existe en el snapshot', async () => {
+    findMaterialsSnapshot.mockResolvedValue([]);
 
     await expect(buildGoodsReceiptDetails([
-      { productId: 'missing-product', quantity: 1, costPerUnitType: 10 }
-    ])).rejects.toThrow(ProductNotFound);
+      { materialId: 'missing-material', quantity: 1, costPerUnitType: 10 }
+    ])).rejects.toThrow(MaterialNotFound);
   });
 });
 
