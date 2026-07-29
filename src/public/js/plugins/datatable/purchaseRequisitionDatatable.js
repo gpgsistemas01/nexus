@@ -99,7 +99,7 @@ export const createPurchaseRequisitionDatatable = (context) => {
 
 export const initDetailsPurchaseRequisitionTable = (mode) => {
 
-    resetDataTable(selectorProductTable);
+    resetDataTable(selectorMaterialTable);
 
     const columns = [
         { data: 'name', title: 'Material' },
