@@ -10,6 +10,7 @@ import { profileAccessValidators, profileValidators } from "../../utils/validati
 import { FORM_SELECTORS, MODAL_SELECTORS } from "../../constants/selectors.js";
 import { hasPermission } from "../../utils/permissions.js";
 import { on } from "../../utils/domUtils.js";
+import { clearSelectValue } from "../../plugins/select2/baseSelect.js";
 
 const formId = FORM_SELECTORS.PROFILE_FORM;
 const modalId = MODAL_SELECTORS.PROFILE;
@@ -101,8 +102,8 @@ const addProfileAccess = () => {
 
     profileAccesses.push(access);
     refreshProfileAccessTable();
-    $(department).val(null).trigger('change');
-    $(role).val(null).trigger('change');
+    clearSelectValue(department);
+    clearSelectValue(role);
 };
 
 on('click', '#addProfileAccessBtn', addProfileAccess);
