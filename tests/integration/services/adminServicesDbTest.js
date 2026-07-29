@@ -56,7 +56,7 @@ const cleanupAdminData = async () => {
     }
   });
   await prisma.user.deleteMany({ where: { id: { in: users.map(({ id }) => id) } } });
-  await prisma.departmentProfile.deleteMany({
+  await prisma.profileRoleDepartment.deleteMany({
     where: {
       OR: [
         { profileId: { in: profiles.map(({ id }) => id) } },
@@ -74,7 +74,7 @@ describeDb('admin services database integration', () => {
     [{ prisma }, services] = await Promise.all([
       import('../../../src/lib/prisma.js'),
       Promise.all([
-        import('../../../src/services/admin/profileService.js'),
+        import('../../../src/services/admin/profile/profileService.js'),
         import('../../../src/services/admin/userService.js')
       ]).then(([profileService, userService]) => ({
         ...profileService,
@@ -95,26 +95,34 @@ describeDb('admin services database integration', () => {
     const createdProfile = await services.createProfile({
       profileDto: {
         fullName: names.profile,
+        roleId: role.id,
         departments: [department.id]
       }
     });
 
     expect(createdProfile).toMatchObject({ fullName: names.profile });
-    expect(createdProfile.departments).toEqual([
-      expect.objectContaining({ department: expect.objectContaining({ id: department.id, name: names.department }) })
+    expect(createdProfile.accesses).toEqual([
+      expect.objectContaining({
+        department: expect.objectContaining({ id: department.id, name: names.department }),
+        role: expect.objectContaining({ id: role.id, name: names.role })
+      })
     ]);
 
     const updatedProfile = await services.updateProfile({
       id: createdProfile.id,
       profileDto: {
         fullName: names.updatedProfile,
+        roleId: role.id,
         departments: [updatedDepartment.id]
       }
     });
 
     expect(updatedProfile).toMatchObject({ id: createdProfile.id, fullName: names.updatedProfile });
-    expect(updatedProfile.departments).toEqual([
-      expect.objectContaining({ department: expect.objectContaining({ id: updatedDepartment.id, name: names.updatedDepartment }) })
+    expect(updatedProfile.accesses).toEqual([
+      expect.objectContaining({
+        department: expect.objectContaining({ id: updatedDepartment.id, name: names.updatedDepartment }),
+        role: expect.objectContaining({ id: role.id, name: names.role })
+      })
     ]);
 
     const createdUser = await services.createUser({

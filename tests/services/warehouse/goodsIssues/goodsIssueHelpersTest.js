@@ -5,16 +5,10 @@ import { ProductNotFound } from '../../../../src/errors/warehouse/productError.j
 import {
   buildGoodsIssueDetails,
   isInternalClient,
-  isValidInternalClientAdvisor,
   isValidInternalClientProjectNumberByDepartment,
   resolveFulfillmentStatus
 } from '../../../../src/services/warehouse/goodsIssues/goodsIssueHelpers.js';
-import { profileHasRole } from '../../../../src/services/admin/profileService.js';
 import { findSupplierProductsSnapshot } from '../../../../src/services/warehouse/products/supplierProductService.js';
-
-vi.mock('../../../../src/services/admin/profileService.js', () => ({
-  profileHasRole: vi.fn()
-}));
 
 vi.mock('../../../../src/services/warehouse/products/supplierProductService.js', () => ({
   findSupplierProductsSnapshot: vi.fn()
@@ -30,17 +24,9 @@ describe('goodsIssueHelpers', () => {
     expect(isInternalClient({ name: 'Cliente externo' })).toBe(false);
   });
 
-  it('valida asesor y número de proyecto para salidas internas', () => {
+  it('valida el número de proyecto para salidas internas', () => {
     const client = { name: 'GPG INTERNO' };
-    const advisor = { departments: [] };
 
-    profileHasRole.mockReturnValue(true);
-
-    expect(isValidInternalClientAdvisor({ client, advisor })).toBe(true);
-    expect(profileHasRole).toHaveBeenCalledWith({
-      profile: advisor,
-      roleName: 'Coordinador'
-    });
     expect(isValidInternalClientProjectNumberByDepartment({
       client,
       department: { name: 'DISEÑO' },

@@ -6,24 +6,7 @@ const profileCreate = vi.fn();
 const profileUpdate = vi.fn();
 const profileFindUnique = vi.fn();
 const profileFindMany = vi.fn();
-const profileFindFirst = vi.fn();
 const profileCount = vi.fn();
-const departmentProfileCreateMany = vi.fn();
-const departmentProfileDeleteMany = vi.fn();
-const transaction = vi.fn(async (callback) => callback({
-  profile: {
-    create: profileCreate,
-    update: profileUpdate,
-    findUnique: profileFindUnique,
-    findMany: profileFindMany,
-    findFirst: profileFindFirst,
-    count: profileCount
-  },
-  departmentProfile: {
-    createMany: departmentProfileCreateMany,
-    deleteMany: departmentProfileDeleteMany
-  }
-}));
 
 vi.mock('../../../src/utils/logger.js', () => ({
   createServiceLogger: () => ({}),
@@ -32,11 +15,11 @@ vi.mock('../../../src/utils/logger.js', () => ({
 
 vi.mock('../../../src/repository/baseRepository.js', () => ({
   getDb: () => ({
-    $transaction: transaction,
     profile: {
+      create: profileCreate,
+      update: profileUpdate,
       findUnique: profileFindUnique,
       findMany: profileFindMany,
-      findFirst: profileFindFirst,
       count: profileCount
     }
   })
@@ -45,27 +28,13 @@ vi.mock('../../../src/repository/baseRepository.js', () => ({
 const {
   createProfile,
   findAllProfiles,
-  findProfileByUserId,
+  findProfileById,
   updateProfile
-} = await import('../../../src/services/admin/profileService.js');
+} = await import('../../../src/services/admin/profile/profileService.js');
 
 describe('profileService submit operations', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    transaction.mockImplementation(async (callback) => callback({
-      profile: {
-        create: profileCreate,
-        update: profileUpdate,
-        findUnique: profileFindUnique,
-        findMany: profileFindMany,
-        findFirst: profileFindFirst,
-        count: profileCount
-      },
-      departmentProfile: {
-        createMany: departmentProfileCreateMany,
-        deleteMany: departmentProfileDeleteMany
-      }
-    }));
   });
 
   it('lista perfiles para GET con departamentos normalizados', async () => {
@@ -73,19 +42,29 @@ describe('profileService submit operations', () => {
       {
         id: 'profile-1',
         fullName: 'Perfil Uno',
-        departments: [{ department: { id: 'department-1', name: 'Ventas' } }]
+        accesses: [{
+          department: { id: 'department-1', name: 'Ventas' },
+          role: { id: 'role-1', name: 'Coordinador' }
+        }]
       }
     ]);
     profileCount.mockResolvedValueOnce(5).mockResolvedValueOnce(1);
 
     await expect(findAllProfiles({
       departments: ['Ventas'],
+      roles: ['Coordinador'],
       includeDepartments: true,
       search: 'perfil',
       orderBy: 'fullName',
       orderDir: 'desc'
     })).resolves.toEqual({
-      data: [{ id: 'profile-1', fullName: 'Perfil Uno', departments: [{ id: 'department-1', name: 'Ventas' }] }],
+      data: [{
+        id: 'profile-1',
+        fullName: 'Perfil Uno',
+        departments: [{ id: 'department-1', name: 'Ventas' }],
+        roleId: 'role-1',
+        roleName: 'Coordinador'
+      }],
       recordsTotal: 5,
       recordsFiltered: 1
     });
@@ -93,40 +72,52 @@ describe('profileService submit operations', () => {
     expect(profileFindMany).toHaveBeenCalledWith(expect.objectContaining({
       where: expect.objectContaining({
         isActive: true,
-        fullName: { contains: 'perfil', mode: 'insensitive' }
+        fullName: { contains: 'perfil', mode: 'insensitive' },
+        accesses: {
+          some: {
+            department: { name: { in: ['Ventas'] } },
+            role: { name: { in: ['Coordinador'] } }
+          }
+        }
       }),
       orderBy: { fullName: 'desc' }
     }));
   });
 
-  it('obtiene el perfil activo asociado a un usuario para GET', async () => {
-    profileFindFirst.mockResolvedValue({ id: 'profile-1' });
+  it('incluye accesos solamente cuando se solicitan al buscar por id', async () => {
+    profileFindUnique.mockResolvedValue({ id: 'profile-1' });
 
-    await expect(findProfileByUserId({ userId: 'user-1' })).resolves.toBe('profile-1');
-    expect(profileFindFirst).toHaveBeenCalledWith({
-      where: {
-        isActive: true,
-        users: { some: { id: 'user-1' } }
-      },
-      select: { id: true }
+    await findProfileById({ id: 'profile-1' });
+    await findProfileById({ id: 'profile-1', includeAccesses: true });
+
+    expect(profileFindUnique.mock.calls[0][0].select).toEqual({ id: true, fullName: true });
+    expect(profileFindUnique.mock.calls[1][0].select).toEqual({
+      id: true,
+      fullName: true,
+      accesses: { select: { department: true, role: true } }
     });
   });
 
   it('crea perfiles y relaciona departamentos enviados por submit', async () => {
-    const profileDto = { fullName: 'Perfil Uno', departments: ['department-1', 'department-2'] };
-    const createdProfile = { id: 'profile-1', fullName: 'Perfil Uno' };
-    const profileWithDepartments = { ...createdProfile, departments: [] };
+    const profileDto = { fullName: 'Perfil Uno', roleId: 'role-1', departments: ['department-1', 'department-2'] };
+    const profileWithAccesses = { id: 'profile-1', fullName: 'Perfil Uno', accesses: [] };
 
-    profileCreate.mockResolvedValue(createdProfile);
-    profileFindUnique.mockResolvedValue(profileWithDepartments);
+    profileCreate.mockResolvedValue(profileWithAccesses);
 
-    await expect(createProfile({ profileDto })).resolves.toEqual(profileWithDepartments);
-    expect(profileCreate).toHaveBeenCalledWith({ data: { fullName: 'Perfil Uno' } });
-    expect(departmentProfileCreateMany).toHaveBeenCalledWith({
-      data: [
-        { profileId: 'profile-1', departmentId: 'department-1' },
-        { profileId: 'profile-1', departmentId: 'department-2' }
-      ]
+    await expect(createProfile({ profileDto })).resolves.toEqual(profileWithAccesses);
+    expect(profileCreate).toHaveBeenCalledWith({
+      data: {
+        fullName: 'Perfil Uno',
+        accesses: {
+          createMany: {
+            data: [
+              { roleId: 'role-1', departmentId: 'department-1' },
+              { roleId: 'role-1', departmentId: 'department-2' }
+            ]
+          }
+        }
+      },
+      select: expect.any(Object)
     });
   });
 
@@ -134,39 +125,44 @@ describe('profileService submit operations', () => {
     const createdProfile = { id: 'profile-1', fullName: 'Perfil Uno' };
 
     profileCreate.mockResolvedValue(createdProfile);
-    profileFindUnique.mockResolvedValue(createdProfile);
 
     await expect(createProfile({ profileDto: { fullName: 'Perfil Uno', departments: [] } })).resolves.toEqual(createdProfile);
-    expect(departmentProfileCreateMany).not.toHaveBeenCalled();
+    expect(profileCreate).toHaveBeenCalledWith({
+      data: { fullName: 'Perfil Uno' },
+      select: expect.any(Object)
+    });
   });
 
   it('envuelve errores de creación en ProfileCreateDatabaseError', async () => {
-    transaction.mockRejectedValue(new Error('db failed'));
+    profileCreate.mockRejectedValue(new Error('db failed'));
 
     await expect(createProfile({ profileDto: { fullName: 'Perfil Uno' } })).rejects.toThrow(ProfileCreateDatabaseError);
   });
 
   it('actualiza perfil, limpia relaciones anteriores y crea las nuevas', async () => {
-    const profileDto = { fullName: 'Perfil Editado', departments: ['department-3'] };
-    const updatedProfile = { id: 'profile-1', fullName: 'Perfil Editado', departments: [] };
+    const profileDto = { fullName: 'Perfil Editado', roleId: 'role-2', departments: ['department-3'] };
+    const updatedProfile = { id: 'profile-1', fullName: 'Perfil Editado', accesses: [] };
 
-    profileFindUnique.mockResolvedValueOnce({ id: 'profile-1', fullName: 'Perfil Uno' });
-    profileFindUnique.mockResolvedValueOnce(updatedProfile);
+    profileUpdate.mockResolvedValue(updatedProfile);
 
     await expect(updateProfile({ id: 'profile-1', profileDto })).resolves.toEqual(updatedProfile);
     expect(profileUpdate).toHaveBeenCalledWith({
       where: { id: 'profile-1' },
-      data: { fullName: 'Perfil Editado' }
-    });
-    expect(departmentProfileDeleteMany).toHaveBeenCalledWith({ where: { profileId: 'profile-1' } });
-    expect(departmentProfileCreateMany).toHaveBeenCalledWith({
-      data: [{ profileId: 'profile-1', departmentId: 'department-3' }]
+      data: {
+        fullName: 'Perfil Editado',
+        accesses: {
+          deleteMany: {},
+          createMany: {
+            data: [{ roleId: 'role-2', departmentId: 'department-3' }]
+          }
+        }
+      },
+      select: expect.any(Object)
     });
   });
 
   it('envuelve errores de actualización en ProfileUpdateDatabaseError', async () => {
-    profileFindUnique.mockResolvedValue({ id: 'profile-1', fullName: 'Perfil Uno' });
-    transaction.mockRejectedValue(new Error('db failed'));
+    profileUpdate.mockRejectedValue(new Error('db failed'));
 
     await expect(updateProfile({ id: 'profile-1', profileDto: { fullName: 'Perfil' } })).rejects.toThrow(ProfileUpdateDatabaseError);
   });
