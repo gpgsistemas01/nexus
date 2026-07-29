@@ -144,9 +144,21 @@ export const refreshMaterialTable = (details) => {
 
     const table = $(DATATABLE_SELECTORS.MATERIAL).DataTable();
     table.clear();
-    table.rows.add(details);
+    table.rows.add(data);
     table.draw();
-}
+};
+
+export const resetDataTable = selector => {
+    if (!$.fn.DataTable.isDataTable(selector)) return;
+
+    $(selector).DataTable().clear().destroy();
+    $(selector).empty();
+};
+
+export const refreshProductTable = details => refreshDataTable({
+    selector: DATATABLE_SELECTORS.PRODUCT,
+    data: details
+});
 
 const DOCUMENT_STATUS_LABELS = Object.freeze({
     APPROVED: 'Aprobada',

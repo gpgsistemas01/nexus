@@ -37,7 +37,7 @@ describe('profileService submit operations', () => {
     vi.clearAllMocks();
   });
 
-  it('lista perfiles para GET con departamentos normalizados', async () => {
+  it('lista perfiles con sus accesos', async () => {
     profileFindMany.mockResolvedValue([
       {
         id: 'profile-1',
@@ -53,7 +53,7 @@ describe('profileService submit operations', () => {
     await expect(findAllProfiles({
       departments: ['Ventas'],
       roles: ['Coordinador'],
-      includeDepartments: true,
+      includeAccesses: true,
       search: 'perfil',
       orderBy: 'fullName',
       orderDir: 'desc'
@@ -61,9 +61,10 @@ describe('profileService submit operations', () => {
       data: [{
         id: 'profile-1',
         fullName: 'Perfil Uno',
-        departments: [{ id: 'department-1', name: 'Ventas' }],
-        roleId: 'role-1',
-        roleName: 'Coordinador'
+        accesses: [{
+          department: { id: 'department-1', name: 'Ventas' },
+          role: { id: 'role-1', name: 'Coordinador' }
+        }]
       }],
       recordsTotal: 5,
       recordsFiltered: 1
@@ -99,7 +100,13 @@ describe('profileService submit operations', () => {
   });
 
   it('crea perfiles y relaciona departamentos enviados por submit', async () => {
-    const profileDto = { fullName: 'Perfil Uno', roleId: 'role-1', departments: ['department-1', 'department-2'] };
+    const profileDto = {
+      fullName: 'Perfil Uno',
+      accesses: [
+        { roleId: 'role-1', departmentId: 'department-1' },
+        { roleId: 'role-2', departmentId: 'department-2' }
+      ]
+    };
     const profileWithAccesses = { id: 'profile-1', fullName: 'Perfil Uno', accesses: [] };
 
     profileCreate.mockResolvedValue(profileWithAccesses);
@@ -112,7 +119,7 @@ describe('profileService submit operations', () => {
           createMany: {
             data: [
               { roleId: 'role-1', departmentId: 'department-1' },
-              { roleId: 'role-1', departmentId: 'department-2' }
+              { roleId: 'role-2', departmentId: 'department-2' }
             ]
           }
         }
@@ -126,7 +133,7 @@ describe('profileService submit operations', () => {
 
     profileCreate.mockResolvedValue(createdProfile);
 
-    await expect(createProfile({ profileDto: { fullName: 'Perfil Uno', departments: [] } })).resolves.toEqual(createdProfile);
+    await expect(createProfile({ profileDto: { fullName: 'Perfil Uno', accesses: [] } })).resolves.toEqual(createdProfile);
     expect(profileCreate).toHaveBeenCalledWith({
       data: { fullName: 'Perfil Uno' },
       select: expect.any(Object)
@@ -140,7 +147,10 @@ describe('profileService submit operations', () => {
   });
 
   it('actualiza perfil, limpia relaciones anteriores y crea las nuevas', async () => {
-    const profileDto = { fullName: 'Perfil Editado', roleId: 'role-2', departments: ['department-3'] };
+    const profileDto = {
+      fullName: 'Perfil Editado',
+      accesses: [{ roleId: 'role-2', departmentId: 'department-3' }]
+    };
     const updatedProfile = { id: 'profile-1', fullName: 'Perfil Editado', accesses: [] };
 
     profileUpdate.mockResolvedValue(updatedProfile);

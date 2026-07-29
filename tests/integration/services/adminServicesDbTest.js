@@ -95,8 +95,7 @@ describeDb('admin services database integration', () => {
     const createdProfile = await services.createProfile({
       profileDto: {
         fullName: names.profile,
-        roleId: role.id,
-        departments: [department.id]
+        accesses: [{ roleId: role.id, departmentId: department.id }]
       }
     });
 
@@ -112,8 +111,7 @@ describeDb('admin services database integration', () => {
       id: createdProfile.id,
       profileDto: {
         fullName: names.updatedProfile,
-        roleId: role.id,
-        departments: [updatedDepartment.id]
+        accesses: [{ roleId: role.id, departmentId: updatedDepartment.id }]
       }
     });
 

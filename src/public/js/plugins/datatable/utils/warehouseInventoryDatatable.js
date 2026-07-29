@@ -1,4 +1,4 @@
-import { renderMaterialName } from "./renderMaterialDatatable.js";
+import { renderMaterialName } from "./detailDatatableUtils.js";
 import { formatCurrency, formatDecimal } from "../../../utils/formatUtils.js";
 
 export const renderWarehouseInventoryHeader = ({ tableElement, canSeeCost, canManageItems, stockTitle, costTitle }) => {

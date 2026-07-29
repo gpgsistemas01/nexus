@@ -4,9 +4,9 @@ import { exportGoodsIssueReport } from "../../application/warehouse/report.js";
 import { hasPermission } from "../../utils/permissions.js";
 import { buildExcelButton, buildTableExportParams } from "../../ui/tableUI.js";
 import { formatDateTimeDisplay, formatFileName } from "../../utils/formatters.js";
-import { createDataTable, refreshMaterialTable, renderActionButtons } from "./baseDatatable.js";
+import { createDataTable, refreshProductTable, renderActionButtons, resetDataTable } from "./baseDatatable.js";
 import { buildDetailsColumns, buildDetailsHeader } from "./utils/builderDetailDatatable.js";
-import { handleDelete, renderMaterialName } from "./utils/renderMaterialDatatable.js";
+import { handleDelete, renderMaterialName } from "./utils/detailDatatableUtils.js";
 import { getResponsiveRowData } from "./utils/responsive.js";
 import { setupTableFilters } from "./utils/filters/tableFilter.js";
 import { DATATABLE_SELECTORS } from "../../constants/selectors.js";
@@ -129,10 +129,7 @@ export const initDetailsGoodsIssueTable = (mode, context) => {
 
     const { isWarehouse, isSystem, hasRole } = hasPermission(context);
 
-    if ($.fn.DataTable.isDataTable(selectorMaterialTable)) {
-        $(selectorMaterialTable).DataTable().clear().destroy();
-        $(selectorMaterialTable).empty();
-    }
+    resetDataTable(selectorProductTable);
 
     const table = document.querySelector(selectorMaterialTable);
 

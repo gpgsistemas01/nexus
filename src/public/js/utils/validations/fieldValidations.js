@@ -239,3 +239,11 @@ export const validateGoodsIssueDetailsArray = (details) => {
 
     return null;
 }
+
+export const validateProfileAccessesArray = accesses => {
+    if (!Array.isArray(accesses) || !accesses.length) {
+        return 'Seleccione un área y un rol, y presione Agregar para incluir el acceso en la tabla';
+    }
+
+    return null;
+};
