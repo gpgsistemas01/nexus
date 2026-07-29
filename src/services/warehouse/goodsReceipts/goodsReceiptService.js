@@ -10,7 +10,7 @@ import { createServiceLogger, getModelLogContext, logServiceError, logServiceInf
 const serviceLogger = createServiceLogger('warehouse.goodsReceipts.goodsReceiptService');
 
 import { getDb } from "../../../repository/baseRepository.js";
-import { generateYearlyReferenceNumber } from "../../document/referenceNumberService.js";
+import { generateYearlyReferenceNumber, throwIfReferenceNumberAlreadyExists } from "../../document/referenceNumberService.js";
 import { findProfileById } from "../../admin/profile/profileService.js";
 import { applyInventoryMovement } from "../../inventory/movementService.js";
 import { findUniqueSupplier } from "../supplierService.js";
@@ -118,6 +118,8 @@ export const findAllGoodsReceipts = async ({
 
 export const createGoodsReceipt = async ({ goodsReceiptDto }) => {
 
+    let referenceNumber = null;
+
     try {
 
         const { receivedById, supplierId, details, ...goodsReceiptData } = goodsReceiptDto;
@@ -134,7 +136,7 @@ export const createGoodsReceipt = async ({ goodsReceiptDto }) => {
 
         const result = await getDb().$transaction(async (tx) => {
 
-            const referenceNumber = await generateYearlyReferenceNumber({ type: DOCUMENT_REFERENCE_TYPES.GOODS_RECEIPT, tx });
+            referenceNumber = await generateYearlyReferenceNumber({ type: DOCUMENT_REFERENCE_TYPES.GOODS_RECEIPT, tx });
 
             const goodsReceipt = await tx.goodsReceipt.create({
                 data: {
@@ -215,6 +217,7 @@ export const createGoodsReceipt = async ({ goodsReceiptDto }) => {
         });
 
         if (isAppError(err)) throw err;
+        throwIfReferenceNumberAlreadyExists({ err, referenceNumber });
 
         throw new GoodsReceiptCreateDatabaseError();
     }

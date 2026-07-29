@@ -21,7 +21,7 @@ import { getDb } from "../../../repository/baseRepository.js";
 import { findProfileById } from "../../admin/profile/profileService.js";
 import { isValidInternalClientAdvisor } from "../../admin/profile/profileRules.js";
 import { findDepartmentById } from "../../admin/departmentService.js";
-import { generateYearlyReferenceNumber } from "../../document/referenceNumberService.js";
+import { generateYearlyReferenceNumber, throwIfReferenceNumberAlreadyExists } from "../../document/referenceNumberService.js";
 import { findClientById } from "../../sales/clientService.js";
 import { findFulfillmentStatusIdByName, findFulfillmentStatusIdsByName } from "../fulfillmentStatusService.js";
 import { buildGoodsIssueDetails, isValidInternalClientProjectNumberByDepartment, resolveFulfillmentStatus } from "./goodsIssueHelpers.js";
@@ -231,6 +231,8 @@ export const findAllGoodsIssues = async ({
 
 export const createGoodsIssue = async ({ goodsIssueDto }) => {
 
+    let referenceNumber = null;
+
     try {
 
         const { requesterId, advisorId, departmentId, clientId, details, ...goodsIssueData } = goodsIssueDto;
@@ -251,7 +253,7 @@ export const createGoodsIssue = async ({ goodsIssueDto }) => {
 
         const result = await getDb().$transaction(async (tx) => {
 
-            const referenceNumber = await generateYearlyReferenceNumber({ type: DOCUMENT_REFERENCE_TYPES.GOODS_ISSUE, tx });
+            referenceNumber = await generateYearlyReferenceNumber({ type: DOCUMENT_REFERENCE_TYPES.GOODS_ISSUE, tx });
 
             const goodsIssue = await tx.goodsIssue.create({
                 data: {
@@ -296,6 +298,7 @@ export const createGoodsIssue = async ({ goodsIssueDto }) => {
         });
 
         if (isAppError(err)) throw err;
+        throwIfReferenceNumberAlreadyExists({ err, referenceNumber });
 
         throw new GoodsIssueCreateDatabaseError();
     }
