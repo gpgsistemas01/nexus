@@ -49,8 +49,8 @@ const totalSummary = {
 };
 
 const buttons = {
-    addProductButton: {
-        id: 'addProductBtn',
+    addMaterialButton: {
+        id: 'addMaterialBtn',
         class: 'btn btn-primary w-100',
         content: 'Agregar'
     },
@@ -161,7 +161,7 @@ const modalDialogClass = typeof dialogClass !== 'undefined' ? dialogClass : 'mod
                 <% } %>
 
                 <% if (form.table) { %>
-                    <div class="col-12 mb-3 add-product-container">
+                    <div class="col-12 mb-3 add-material-container">
                         <div class="row mb-3">
                             <div class="col-12">
                                 <%- include('./select', { input: form.table.select }) %>
@@ -180,12 +180,12 @@ const modalDialogClass = typeof dialogClass !== 'undefined' ? dialogClass : 'mod
                             </div>
 
                             <div class="col-12 col-md-2 col-lg-2">
-                                <%- include('./button', { button: buttons.addProductButton }) %>
+                                <%- include('./button', { button: buttons.addMaterialButton }) %>
                             </div>
                         </div>
                     </div>
 
-                    <%- include('./productTable') %>
+                    <%- include('./materialTable') %>
 
                     <div class="col-12 mb-3 total-container">
                         <%- include('./totalsSummary', { totals: totalSummary }) %>

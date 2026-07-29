@@ -1,5 +1,5 @@
 import { initMdbModal, showModal, initMdbWrapperInput, updateMdbWrapperInput } from '../../../plugins/mdb/baseInstance.js';
-import { refreshProductTable } from '../../../plugins/datatable/baseDatatable.js';
+import { refreshMaterialTable } from '../../../plugins/datatable/baseDatatable.js';
 import { clearFormErrors, resetFormSubmitState } from '../../../ui/formUI.js';
 import { setSummaryValues } from '../../../ui/totalsSummaryUI.js';
 import { on } from '../../../utils/domUtils.js';
@@ -66,7 +66,7 @@ export const initGoodsIssueReturnModal = () => {
         const returnedDetail = event.detail.goodsIssueReturn?.detail;
 
         if (!returnedDetail) {
-            refreshProductTable(details);
+            refreshMaterialTable(details);
             return;
         }
 
@@ -80,6 +80,6 @@ export const initGoodsIssueReturnModal = () => {
             details.push(returnedDetail);
         }
 
-        refreshProductTable(details);
+        refreshMaterialTable(details);
     });
 };

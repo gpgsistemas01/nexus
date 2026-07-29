@@ -1,11 +1,11 @@
 import { formatDateLongWithTime, toNumber } from "../../utils/formattersUtils.js";
-import { findAllSupplierProducts } from "./products/supplierProductService.js";
+import { findAllSupplierMaterials } from "./materials/supplierMaterialService.js";
 import { findAllGoodsIssues } from "./goodsIssues/goodsIssueService.js";
 import { findAllGoodsReceipts } from "./goodsReceipts/goodsReceiptService.js";
 import { findAllSuppliers } from "./supplierService.js";
 import { findAllWastes } from "./wasteService.js";
 
-const mapProductRows = (products = []) => products.map((item) => ({
+const mapMaterialRows = (materials = []) => materials.map((item) => ({
     supplier: item.supplier?.tradeName,
     name: item.name,
     base: toNumber(item.base),
@@ -31,7 +31,7 @@ const mapWasteRows = (wastes = []) => wastes.map((item) => ({
     maxUnitCost: toNumber(item.maxUnitCost)
 }));
 
-const mapGoodsIssueDetailRows = (goodsIssues = [], { supplierId = '', productId = '' } = {}) => goodsIssues.flatMap((goodsIssue) => {
+const mapGoodsIssueDetailRows = (goodsIssues = [], { supplierId = '', materialId = '' } = {}) => goodsIssues.flatMap((goodsIssue) => {
 
     const details = (goodsIssue.details || []).filter((detail) => {
         const isCanceledDetail = detail.fulfillmentStatus?.name === 'Cancelado';
@@ -39,7 +39,7 @@ const mapGoodsIssueDetailRows = (goodsIssues = [], { supplierId = '', productId 
         return (
             !isCanceledDetail &&
             (!supplierId || detail.supplierId === supplierId) &&
-            (!productId || detail.productId === productId)
+            (!materialId || detail.materialId === materialId)
         );
     });
 
@@ -51,10 +51,10 @@ const mapGoodsIssueDetailRows = (goodsIssues = [], { supplierId = '', productId 
         clientName: goodsIssue.clientName,
         projectNumber: goodsIssue.projectNumber,
         fulfillmentStatusName: goodsIssue.fulfillmentStatus?.name,
-        productName: detail.productName,
+        materialName: detail.materialName,
         supplierName: detail.supplierName,
-        productBase: toNumber(detail.productBase),
-        productHeight: toNumber(detail.productHeight),
+        materialBase: toNumber(detail.materialBase),
+        materialHeight: toNumber(detail.materialHeight),
         requestedQuantity: toNumber(detail.quantity),
         suppliedQuantity: toNumber(detail.suppliedQuantity),
         presentationName: detail.presentationName,
@@ -66,14 +66,14 @@ const mapGoodsIssueDetailRows = (goodsIssues = [], { supplierId = '', productId 
     }));
 });
 
-const mapGoodsReceiptDetailRows = (goodsReceipts = [], { productId = '' } = {}) => goodsReceipts.flatMap((goodsReceipt) => {
+const mapGoodsReceiptDetailRows = (goodsReceipts = [], { materialId = '' } = {}) => goodsReceipts.flatMap((goodsReceipt) => {
 
     const details = (goodsReceipt.details || []).filter((detail) => {
         const isCanceledDetail = detail.status === 'CANCELED';
 
         return (
             !isCanceledDetail &&
-            (!productId || detail.productId === productId)
+            (!materialId || detail.materialId === materialId)
         );
     });
 
@@ -83,9 +83,9 @@ const mapGoodsReceiptDetailRows = (goodsReceipts = [], { productId = '' } = {}) 
         receivedByName: goodsReceipt.receivedByName,
         supplierName: goodsReceipt.supplierName,
         invoice: goodsReceipt.isInvoiced ? goodsReceipt.invoice : 'Sin factura',
-        productName: detail.productName,
-        productBase: toNumber(detail.productBase),
-        productHeight: toNumber(detail.productHeight),
+        materialName: detail.materialName,
+        materialBase: toNumber(detail.materialBase),
+        materialHeight: toNumber(detail.materialHeight),
         quantity: toNumber(detail.quantity),
         presentationName: detail.presentationName,
         convertedQuantity: toNumber(detail.convertedQuantity),
@@ -103,7 +103,7 @@ export const findWarehouseReportRows = async ({
     orderDir = 'asc'
 } = {}) => {
 
-    const productsResult = await findAllSupplierProducts({
+    const materialsResult = await findAllSupplierMaterials({
         skip: 0,
         take: 100000,
         search,
@@ -112,7 +112,7 @@ export const findWarehouseReportRows = async ({
         orderDir
     });
 
-    return mapProductRows(productsResult.data);
+    return mapMaterialRows(materialsResult.data);
 };
 
 export const findGoodsIssueReportRows = async ({

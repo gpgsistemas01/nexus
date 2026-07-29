@@ -12,13 +12,13 @@ const successMessage = localStorage.getItem('showSuccessToast');
 const errorMessage = localStorage.getItem('showErrorToast');
 
 if (successMessage) {
-    
+
     notifications.showSuccess(successMessage);
     localStorage.removeItem('showSuccessToast');
 }
 
 if (errorMessage) {
-    
+
     notifications.showError(errorMessage);
     localStorage.removeItem('showErrorToast');
 }
@@ -52,13 +52,13 @@ const shouldDisplayRealtimeNotification = (notification) => {
 
     const { entityType, departmentId } = notification;
 
-    if (entityType === 'product-stock-restored') return false;
+    if (entityType === 'material-stock-restored') return false;
 
     if (isSystemAdmin) return true;
 
-    if (isWarehouse) return entityType === 'product-low-stock';
+    if (isWarehouse) return entityType === 'material-low-stock';
 
-    if (entityType === 'product-low-stock') return true;
+    if (entityType === 'material-low-stock') return true;
 
     return departmentId === loggedUserDepartmentId;
 };

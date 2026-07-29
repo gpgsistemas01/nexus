@@ -1,8 +1,8 @@
-const isProduction = () => process.env.NODE_ENV === 'production';
+const isMaterialion = () => process.env.NODE_ENV === 'materialion';
 
 const getAuthCookieOptions = () => ({
   httpOnly: true,
-  secure: isProduction(),
+  secure: isMaterialion(),
   sameSite: 'lax'
 });
 

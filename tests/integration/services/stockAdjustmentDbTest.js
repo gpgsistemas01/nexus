@@ -13,9 +13,9 @@ const names = {
   presentation: `IT Adjustment Presentation ${testSuffix}`,
   unit: `IT Adj Unit ${testSuffix}`,
   unitSymbol: `ia${testSuffix.slice(-4)}`,
-  product: `IT Adjustment Product ${testSuffix}`,
-  createdProduct: `IT Adjustment Product Created ${testSuffix}`,
-  updatedProduct: `IT Adjustment Product Updated ${testSuffix}`,
+  material: `IT Adjustment Material ${testSuffix}`,
+  createdMaterial: `IT Adjustment Material Created ${testSuffix}`,
+  updatedMaterial: `IT Adjustment Material Updated ${testSuffix}`,
   supplierTradeName: `IT Adjustment Supplier ${testSuffix}`,
   supplierLegalName: `IT Adjustment Supplier Legal ${testSuffix}`,
   reason: `IT Adjustment Reason ${testSuffix}`,
@@ -23,17 +23,17 @@ const names = {
 };
 
 let prisma;
-let productService;
+let materialService;
 let adjustmentService;
-let product;
+let material;
 let supplier;
 let reason;
 let initialStockReason;
 let user;
 
 const cleanupStockAdjustmentData = async () => {
-  const products = await prisma.product.findMany({
-    where: { name: { startsWith: 'IT Adjustment Product ' } },
+  const materials = await prisma.material.findMany({
+    where: { name: { startsWith: 'IT Adjustment Material ' } },
     select: { id: true }
   });
   const suppliers = await prisma.supplier.findMany({
@@ -61,7 +61,7 @@ const cleanupStockAdjustmentData = async () => {
       OR: [
         { reasonId: { in: reasons.map(({ id }) => id) } },
         { createdById: { in: users.map(({ id }) => id) } },
-        { details: { some: { productId: { in: products.map(({ id }) => id) } } } },
+        { details: { some: { materialId: { in: materials.map(({ id }) => id) } } } },
         { details: { some: { supplierId: { in: suppliers.map(({ id }) => id) } } } }
       ]
     },
@@ -84,15 +84,15 @@ const cleanupStockAdjustmentData = async () => {
   await prisma.stockAdjustment.deleteMany({
     where: { id: { in: adjustments.map(({ id }) => id) } }
   });
-  await prisma.supplierProduct.deleteMany({
+  await prisma.supplierMaterial.deleteMany({
     where: {
       OR: [
-        { productId: { in: products.map(({ id }) => id) } },
+        { materialId: { in: materials.map(({ id }) => id) } },
         { supplierId: { in: suppliers.map(({ id }) => id) } }
       ]
     }
   });
-  await prisma.product.deleteMany({ where: { id: { in: products.map(({ id }) => id) } } });
+  await prisma.material.deleteMany({ where: { id: { in: materials.map(({ id }) => id) } } });
   await prisma.supplier.deleteMany({ where: { id: { in: suppliers.map(({ id }) => id) } } });
   await prisma.stockAdjustmentReason.deleteMany({ where: { id: { in: reasons.map(({ id }) => id) } } });
   await prisma.user.deleteMany({ where: { id: { in: users.map(({ id }) => id) } } });
@@ -102,9 +102,9 @@ const cleanupStockAdjustmentData = async () => {
 
 describeDb('stock adjustment cross-domain database integration', () => {
   beforeAll(async () => {
-    [{ prisma }, productService, adjustmentService] = await Promise.all([
+    [{ prisma }, materialService, adjustmentService] = await Promise.all([
       import('../../../src/lib/prisma.js'),
-      import('../../../src/services/warehouse/products/productService.js'),
+      import('../../../src/services/warehouse/materials/materialService.js'),
       import('../../../src/services/warehouse/adjustmentService.js')
     ]);
 
@@ -132,10 +132,10 @@ describeDb('stock adjustment cross-domain database integration', () => {
       prisma.unitMeasure.create({ data: { name: names.unit, symbol: names.unitSymbol } })
     ]);
 
-    [product, supplier, reason, user] = await Promise.all([
-      prisma.product.create({
+    [material, supplier, reason, user] = await Promise.all([
+      prisma.material.create({
         data: {
-          name: names.product,
+          name: names.material,
           minStock: 0,
           base: 2,
           height: 3,
@@ -164,9 +164,9 @@ describeDb('stock adjustment cross-domain database integration', () => {
       skipDuplicates: true
     });
 
-    await prisma.supplierProduct.create({
+    await prisma.supplierMaterial.create({
       data: {
-        productId: product.id,
+        materialId: material.id,
         supplierId: supplier.id,
         currentStock: 1,
         convertedQuantity: 6,
@@ -175,27 +175,27 @@ describeDb('stock adjustment cross-domain database integration', () => {
     });
   });
 
-  it('cubre productService -> adjustmentService actualizando stock y movimiento real', async () => {
-    await expect(productService.updateProductStock({
-      id: product.id,
+  it('cubre materialService -> adjustmentService actualizando stock y movimiento real', async () => {
+    await expect(materialService.updateMaterialStock({
+      id: material.id,
       userId: user.id,
-      productDto: {
+      materialDto: {
         supplierId: supplier.id,
         reasonId: reason.id,
         observations: 'Ajuste integración',
         newStock: 4
       }
     })).resolves.toMatchObject({
-      productId: product.id,
+      materialId: material.id,
       supplierId: supplier.id,
       currentStock: expect.anything(),
       convertedQuantity: expect.anything()
     });
 
-    await expect(prisma.supplierProduct.findUnique({
+    await expect(prisma.supplierMaterial.findUnique({
       where: {
-        supplierId_productId: {
-          productId: product.id,
+        supplierId_materialId: {
+          materialId: material.id,
           supplierId: supplier.id
         }
       },
@@ -226,13 +226,13 @@ describeDb('stock adjustment cross-domain database integration', () => {
     expect(adjustment).toMatchObject({
       observations: 'Ajuste integración',
       details: [expect.objectContaining({
-        productId: product.id,
+        materialId: material.id,
         supplierId: supplier.id
       })]
     });
     expect(adjustment?.movement?.details).toEqual([
       expect.objectContaining({
-        productId: product.id,
+        materialId: material.id,
         supplierId: supplier.id
       })
     ]);
@@ -241,14 +241,14 @@ describeDb('stock adjustment cross-domain database integration', () => {
 
   it('cubre adjustmentService.createStockAdjustment directo con movimiento real', async () => {
     await expect(adjustmentService.createStockAdjustment({
-      productId: product.id,
+      materialId: material.id,
       supplierId: supplier.id,
       reasonId: reason.id,
       observations: 'Ajuste directo integración',
       newStock: 6,
       userId: user.id
     })).resolves.toMatchObject({
-      productId: product.id,
+      materialId: material.id,
       supplierId: supplier.id,
       currentStock: expect.anything(),
       convertedQuantity: expect.anything()
@@ -267,22 +267,22 @@ describeDb('stock adjustment cross-domain database integration', () => {
     });
 
     expect(adjustment).toMatchObject({
-      details: [expect.objectContaining({ productId: product.id, supplierId: supplier.id })],
+      details: [expect.objectContaining({ materialId: material.id, supplierId: supplier.id })],
       movement: expect.objectContaining({
-        details: [expect.objectContaining({ productId: product.id, supplierId: supplier.id })]
+        details: [expect.objectContaining({ materialId: material.id, supplierId: supplier.id })]
       })
     });
   });
 
-  it('cubre createProduct/updateProduct con relación proveedor-producto y ajuste inicial en BD', async () => {
-    await expect(productService.createProduct({
-      productDto: {
-        name: names.createdProduct,
+  it('cubre createMaterial/updateMaterial con relación proveedor-material y ajuste inicial en BD', async () => {
+    await expect(materialService.createMaterial({
+      materialDto: {
+        name: names.createdMaterial,
         minStock: 0,
         base: 1,
         height: 2,
-        presentationId: product.presentationId,
-        unitMeasureId: product.unitMeasureId,
+        presentationId: material.presentationId,
+        unitMeasureId: material.unitMeasureId,
         supplierId: supplier.id,
         maxUnitCost: 15
       },
@@ -297,15 +297,15 @@ describeDb('stock adjustment cross-domain database integration', () => {
       convertedQuantity: expect.anything()
     });
 
-    const createdProduct = await prisma.product.findFirst({
-      where: { name: names.createdProduct },
+    const createdMaterial = await prisma.material.findFirst({
+      where: { name: names.createdMaterial },
       select: { id: true, presentationId: true, unitMeasureId: true }
     });
 
-    expect(createdProduct).toEqual({
+    expect(createdMaterial).toEqual({
       id: expect.any(String),
-      presentationId: product.presentationId,
-      unitMeasureId: product.unitMeasureId
+      presentationId: material.presentationId,
+      unitMeasureId: material.unitMeasureId
     });
 
     await expect(prisma.stockAdjustment.findFirst({
@@ -317,25 +317,25 @@ describeDb('stock adjustment cross-domain database integration', () => {
       select: { id: true }
     })).resolves.toEqual(expect.objectContaining({ id: expect.any(String) }));
 
-    await expect(productService.updateProduct({
-      name: names.updatedProduct,
+    await expect(materialService.updateMaterial({
+      name: names.updatedMaterial,
       minStock: 1,
       base: 2,
       height: 2,
-      presentationId: product.presentationId,
-      unitMeasureId: product.unitMeasureId,
+      presentationId: material.presentationId,
+      unitMeasureId: material.unitMeasureId,
       supplierId: supplier.id,
       maxUnitCost: 20
-    }, createdProduct.id)).resolves.toMatchObject({
-      id: createdProduct.id,
-      name: names.updatedProduct,
+    }, createdMaterial.id)).resolves.toMatchObject({
+      id: createdMaterial.id,
+      name: names.updatedMaterial,
       supplier: expect.objectContaining({ id: supplier.id })
     });
 
-    await expect(prisma.supplierProduct.findUnique({
+    await expect(prisma.supplierMaterial.findUnique({
       where: {
-        supplierId_productId: {
-          productId: createdProduct.id,
+        supplierId_materialId: {
+          materialId: createdMaterial.id,
           supplierId: supplier.id
         }
       },

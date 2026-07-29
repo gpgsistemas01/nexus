@@ -1,4 +1,4 @@
-import { ProductNotFound } from "../../../errors/warehouse/productError.js";
+import { MaterialNotFound } from "../../../errors/warehouse/materialError.js";
 import { GoodsIssueMissingMaxUnitCost } from "../../../errors/inventory/stockError.js";
 import { buildStockKey, normalizeText } from "../../../utils/formattersUtils.js";
 import { calculateConvertedQuantity } from "../../inventory/stockHelpers.js";
@@ -28,32 +28,32 @@ export const buildGoodsIssueDetails = async ({
     const pairs = [
         ...new Map(
             details.map(detail => [
-                buildStockKey(detail.productId, detail.supplierId),
+                buildStockKey(detail.materialId, detail.supplierId),
                 {
-                    productId: detail.productId,
+                    materialId: detail.materialId,
                     supplierId: detail.supplierId
                 }
             ])
         ).values()
     ];
 
-    const supplierProducts = await findSupplierProductsSnapshot({ pairs });
+    const supplierMaterials = await findSupplierMaterialsSnapshot({ pairs });
 
     const spMap = new Map(
-        supplierProducts.map(sp => [
+        supplierMaterials.map(sp => [
             buildStockKey(sp.id, sp.supplier.id),
             sp
         ])
     );
 
-    return details.map(({ productId, quantity, supplierId, presentationId }) => {
+    return details.map(({ materialId, quantity, supplierId, presentationId }) => {
 
-        const key = buildStockKey(productId, supplierId);
+        const key = buildStockKey(materialId, supplierId);
         const sp = spMap.get(key);
 
-        if (!sp) throw new ProductNotFound();
+        if (!sp) throw new MaterialNotFound();
 
-        if (presentationId && sp.presentation?.id !== presentationId) throw new ProductNotFound();
+        if (presentationId && sp.presentation?.id !== presentationId) throw new MaterialNotFound();
 
         const { name, base, height, presentation, unitMeasure, maxUnitCost } = sp;
         const convertedQuantity = calculateConvertedQuantity({
@@ -64,7 +64,7 @@ export const buildGoodsIssueDetails = async ({
 
         if (maxUnitCost === null || maxUnitCost === undefined) {
             throw new GoodsIssueMissingMaxUnitCost({
-                productName: name,
+                materialName: name,
                 height,
                 base,
                 supplierName: sp.supplier.tradeName
@@ -72,15 +72,15 @@ export const buildGoodsIssueDetails = async ({
         }
 
         return {
-            productId,
+            materialId,
             supplierId,
             supplierName: sp.supplier.tradeName,
             quantity,
             convertedQuantity,
             maxUnitCost,
-            productName: name,
-            productBase: base,
-            productHeight: height,
+            materialName: name,
+            materialBase: base,
+            materialHeight: height,
             presentationId: presentation.id,
             presentationName: presentation.name,
             unitMeasureId: unitMeasure.id,

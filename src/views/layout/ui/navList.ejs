@@ -18,7 +18,7 @@ const canSeePurchases = hasAccess({
 });
 
 const canSeeAll = isAdmin;
-const canSeeOnlyProducts = !canSeeAll && isSalesOrDesign;
+const canSeeOnlyMaterials = !canSeeAll && isSalesOrDesign;
 
 const shouldShowIcons = typeof showIcons !== 'undefined' ? showIcons : true;
 
@@ -26,8 +26,8 @@ const items = [
     {
         content: 'Almacén',
         icon: 'fa-solid fa-boxes-stacked',
-        href: '/productos',
-        isActive: currentRoute === '/productos',
+        href: '/materiales',
+        isActive: currentRoute === '/materiales',
         isVisible: true
     },
     {
@@ -49,7 +49,7 @@ const items = [
         icon: 'fa-solid fa-truck-ramp-box',
         href: '/salidas-almacen',
         isActive: currentRoute === '/salidas-almacen',
-        isVisible: canSeeAll || !canSeeOnlyProducts
+        isVisible: canSeeAll || !canSeeOnlyMaterials
     },
     {
         content: 'Movimientos',
@@ -88,7 +88,7 @@ const items = [
     }
 ].filter(item => {
     if (canSeeAll) return true;
-    if (canSeeOnlyProducts) return item.href === '/productos';
+    if (canSeeOnlyMaterials) return item.href === '/materiales';
 
     return item.isVisible;
 }).map(item => ({

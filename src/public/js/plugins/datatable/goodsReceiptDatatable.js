@@ -4,7 +4,7 @@ import { getAllGoodsReceipts } from "../../application/warehouse/goodsReceipts.j
 import { exportGoodsReceiptReport } from "../../application/warehouse/report.js";
 import { initMdbWrapperInput, updateMdbWrapperInput } from "../mdb/baseInstance.js";
 import { buildDetailsColumns, buildDetailsHeader } from "./utils/builderDetailDatatable.js";
-import { handleDelete, renderMaterialName } from "./utils/renderProductDatatable.js";
+import { handleDelete, renderMaterialName } from "./utils/renderMaterialDatatable.js";
 import { getResponsiveRowData } from "./utils/responsive.js";
 import { buildExcelButton, buildTableExportParams } from "../../ui/tableUI.js";
 import { formatDateTimeDisplay, formatFileName } from "../../utils/formatters.js";
@@ -16,9 +16,9 @@ export let details = [];
 let filters = {
     getValues: () => ({})
 };
-const selectorProductTable = DATATABLE_SELECTORS.PRODUCT;
+const selectorMaterialTable = DATATABLE_SELECTORS.MATERIAL;
 const selectorTable = DATATABLE_SELECTORS.MAIN;
-const table = document.querySelector(selectorProductTable);
+const table = document.querySelector(selectorMaterialTable);
 table.innerHTML = `
     <thead>
         <tr>
@@ -117,11 +117,11 @@ export const createGoodsReceiptDatatable = async () => {
 
 export const initDetailsGoodsReceiptTable = (mode) => {
 
-    const table = document.querySelector(selectorProductTable);
+    const table = document.querySelector(selectorMaterialTable);
 
-    if ($.fn.DataTable.isDataTable(selectorProductTable)) {
-        $(selectorProductTable).DataTable().clear().destroy();
-        $(selectorProductTable).empty();
+    if ($.fn.DataTable.isDataTable(selectorMaterialTable)) {
+        $(selectorMaterialTable).DataTable().clear().destroy();
+        $(selectorMaterialTable).empty();
     }
 
     table.innerHTML = buildDetailsHeader({
@@ -143,7 +143,7 @@ export const initDetailsGoodsReceiptTable = (mode) => {
     });
 
     createDataTable({
-        selector: selectorProductTable,
+        selector: selectorMaterialTable,
         options: {
             data: details,
             columns,
@@ -153,7 +153,7 @@ export const initDetailsGoodsReceiptTable = (mode) => {
     });
 };
 
-$(selectorProductTable).on('click', '.delete-btn', function () {
+$(selectorMaterialTable).on('click', '.delete-btn', function () {
 
     const id = $(this).data('id');
 

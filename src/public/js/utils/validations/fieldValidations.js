@@ -51,7 +51,7 @@ export const validateUsername = (username) => {
     if (result) return result;
 
     if (!allowedUsername.test(username)) return `${ fieldName } debe tener solo letras, numeros y guiones bajos`;
-    
+
     result = isLengthInRangeMax(username, 50, fieldName);
 
     return result;
@@ -152,9 +152,9 @@ export const validateMeasure = (measure, fieldName) => {
     return result;
 }
 
-export const validateText = ({ 
-    name, 
-    length, 
+export const validateText = ({
+    name,
+    length,
     fieldName,
     regex = /^[^<>\\{}[\]]+$/u
 }) => {
@@ -178,9 +178,9 @@ export const validateTextOptional = (name, length, fieldName) => {
 
     if (!name) return null;
 
-    const result = validateText({ 
-        name, 
-        length, 
+    const result = validateText({
+        name,
+        length,
         fieldName,
         regex: /^[^<>\\{}[\]]+$/u
     });
@@ -188,9 +188,9 @@ export const validateTextOptional = (name, length, fieldName) => {
     return result;
 }
 
-export const validateName = (name, length = 50) => validateText({ 
-    name, 
-    length, 
+export const validateName = (name, length = 50) => validateText({
+    name,
+    length,
     fieldName: 'El nombre',
     regex: /^[^<>\\{}[\]]+$/u
 });
@@ -198,13 +198,13 @@ export const validateName = (name, length = 50) => validateText({
 export const validateGoodsReceiptDetailsArray = (details) => {
 
     if (!Array.isArray(details) || details.length === 0) {
-        return 'La lista de detalles debe contener al menos un producto.';
+        return 'La lista de detalles debe contener al menos un material.';
     }
 
     for (const detail of details) {
 
-        if (!detail.productId || !detail.quantity || !detail.costPerUnitType) {
-            return 'Cada detalle debe contener producto, cantidad y costo por presentación.';
+        if (!detail.materialId || !detail.quantity || !detail.costPerUnitType) {
+            return 'Cada detalle debe contener material, cantidad y costo por presentación.';
         }
 
         if (isNaN(detail.quantity) || parseFloat(detail.quantity) < 1) {
@@ -222,13 +222,13 @@ export const validateGoodsReceiptDetailsArray = (details) => {
 export const validateGoodsIssueDetailsArray = (details) => {
 
     if (!Array.isArray(details) || details.length === 0) {
-        return 'La lista de detalles debe contener al menos un producto.';
+        return 'La lista de detalles debe contener al menos un material.';
     }
 
     for (const detail of details) {
 
-        if (!detail.productId || !detail.supplierId || !detail.quantity) {
-            return 'Cada detalle debe contener producto, proveedor y cantidad.';
+        if (!detail.materialId || !detail.supplierId || !detail.quantity) {
+            return 'Cada detalle debe contener material, proveedor y cantidad.';
         }
 
         if (isNaN(detail.quantity) || parseFloat(detail.quantity) < 1) {
