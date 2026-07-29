@@ -132,6 +132,36 @@ export const mapValueLabelToSelectData = (item) => ({
     text: item.label
 });
 
+export const buildPaginatedSelectParams = (params = {}, {
+    length = 20,
+    additionalParams = {}
+} = {}) => {
+    const page = Number(params.page) || 1;
+
+    return {
+        search: params.term,
+        start: (page - 1) * length,
+        length,
+        ...additionalParams
+    };
+};
+
+export const buildPaginatedSelectResults = (response, params = {}, {
+    length = 20,
+    mapItem = (item) => item
+} = {}) => {
+    const page = Number(params.page) || 1;
+    const list = response.data || response;
+    const recordsFiltered = Number(response.recordsFiltered) || list.length;
+
+    return {
+        results: list.map(mapItem),
+        pagination: {
+            more: page * length < recordsFiltered
+        }
+    };
+};
+
 export const createNewSelectTag = ({
     term,
     label

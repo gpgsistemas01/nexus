@@ -1,5 +1,21 @@
-import { getAllRoles } from '../../../application/admin/roles.js';
-import { initbaseSelect2, toggleSelectOption } from '../baseSelect.js';
+import { getAllRoles, getRoleOptions } from '../../../application/admin/roles.js';
+import { buildPaginatedSelectParams, initbaseSelect2, initFilterSelect2, toggleSelectOption } from '../baseSelect.js';
+import { FILTER_SELECTORS } from '../../../constants/selectors.js';
+
+const roleFilterSelector = FILTER_SELECTORS.ROLE;
+
+export const initRoleFilterSelect = ({ selectedId = null } = {}) => {
+    const length = 20;
+
+    initFilterSelect2({
+        selector: roleFilterSelector,
+        getOptions: getRoleOptions,
+        placeholder: 'Filtrar por rol',
+        selectedId,
+        mapOption: (role) => role,
+        data: (params) => buildPaginatedSelectParams(params, { length })
+    });
+};
 
 export const initRoleSelect = ({
     modalSelector,

@@ -1,0 +1,6 @@
+INSERT INTO "Role" ("id", "name")
+VALUES
+    ('00000000-0000-0000-0000-000000000029', 'Director'),
+    ('00000000-0000-0000-0000-00000000002a', 'Administrador'),
+    ('00000000-0000-0000-0000-00000000002b', 'Contador')
+ON CONFLICT ("name") DO NOTHING;

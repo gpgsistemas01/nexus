@@ -4,11 +4,6 @@ import { FILTER_SELECTORS } from "../../../constants/selectors.js";
 
 const fulfillmentStatusSelector = FILTER_SELECTORS.FULFILLMENT_STATUS;
 
-export const getFulfillmentStatusSelectApi = () => ({
-    getSelect: () => document.querySelector(fulfillmentStatusSelector),
-    getValue: () => document.querySelector(fulfillmentStatusSelector)?.value || ''
-});
-
 export const initFulfillmentStatusFilterSelect = ({
     selectedId = null
 } = {}) => initFilterSelect2({

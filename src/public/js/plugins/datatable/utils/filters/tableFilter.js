@@ -58,8 +58,8 @@ export const setupTableFilters = async ({
 
         const {
             key,
+            selector: filterSelector,
             isSelected = true,
-            getSelectApi,
             getOptions = async () => [],
             initSelect,
             attachHandler,
@@ -75,9 +75,7 @@ export const setupTableFilters = async ({
             continue;
         }
 
-        const { getSelect, getValue } = getSelectApi();
-
-        const select = getSelect();
+        const select = document.querySelector(filterSelector);
 
         if (!select) continue;
 
@@ -101,13 +99,15 @@ export const setupTableFilters = async ({
             : options[0];
 
         initSelect({
-            selectedId: isSelected ? defaultSelectedOption?.value : null
+            selectedId: isSelected
+                ? defaultSelectedOption?.value ?? defaultSelectedOption?.id
+                : null
         });
 
         if (attachHandler) attachHandler({ onChange });
 
         values[key] = () => ({
-            [key]: getValue?.() || ''
+            [key]: select.value || ''
         });
     }
 

@@ -5,11 +5,6 @@ import { FILTER_SELECTORS } from "../../../constants/selectors.js";
 
 const clientFilterSelector = FILTER_SELECTORS.CLIENT;
 
-export const getClientSelectApi = () => ({
-    getSelect: () => document.querySelector(clientFilterSelector),
-    getValue: () => document.querySelector(clientFilterSelector)?.value || ''
-});
-
 export const initClientFilterSelect = ({
     selectedId = null
 } = {}) => initFilterSelect2({

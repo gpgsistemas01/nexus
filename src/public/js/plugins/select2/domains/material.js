@@ -1,16 +1,11 @@
 import { openMaterialModal } from "../../../modules/materials/materialModal.js";
 import { getAllMaterials, getMaterialOptions } from "../../../application/warehouse/materials.js";
-import { initDomainSelect2, initFilterSelect2, runAfterSelect2Close, setMdbWrapperInputValue, toggleSelectOption } from "../baseSelect.js";
+import { buildPaginatedSelectParams, buildPaginatedSelectResults, initDomainSelect2, initFilterSelect2, runAfterSelect2Close, setMdbWrapperInputValue, toggleSelectOption } from "../baseSelect.js";
 import { mapMaterialToSelectData } from "../../../utils/materialSelectUtils.js";
 import { FORM_SELECTORS, FILTER_SELECTORS } from "../../../constants/selectors.js";
 
 const wrapperSelector = FORM_SELECTORS.PRESENTATION_DISPLAY;
 const materialSelector = FILTER_SELECTORS.MATERIAL;
-
-export const getMaterialSelectApi = () => ({
-    getSelect: () => document.querySelector(materialSelector),
-    getValue: () => document.querySelector(materialSelector)?.value || ''
-});
 
 export const initMaterialFilterSelect = ({
     selectedId = null,
@@ -24,39 +19,16 @@ export const initMaterialFilterSelect = ({
         getOptions: getMaterialOptions,
         placeholder: 'Filtrar por material',
         selectedId,
-        data: (params) => {
-
-            let supplierId;
-
-            if (supplierFilterSelector) supplierId = $(`${ baseSelector } ${ supplierFilterSelector }`).val();
-            else supplierId = ''
-
-            const page = Number(params.page) || 1;
-            const length = 20;
-
-            return {
-                search: params.term,
-                supplierId,
-                start: (page - 1) * length,
-                length
-            };
-        },
-        processResults: (data, params) => {
-
-            const page = Number(params.page) || 1;
-            const list = data.data || data;
-            const recordsFiltered = Number(data.recordsFiltered) || list.length;
-            const length = Number(params?.data?.length) || 20;
-
-            return {
-                results: list.map(p => ({
-                    ...p
-                })),
-                pagination: {
-                    more: page * length < recordsFiltered
-                }
-            };
-        }
+        data: (params) => buildPaginatedSelectParams(params, {
+            additionalParams: {
+                supplierId: supplierFilterSelector
+                    ? $(`${ baseSelector } ${ supplierFilterSelector }`).val()
+                    : ''
+            }
+        }),
+        processResults: (data, params) => buildPaginatedSelectResults(data, params, {
+            length: Number(params?.data?.length) || 20
+        })
     });
 };
 
@@ -71,37 +43,30 @@ const initMaterialSelect = ({
     containerSelector: modalSelector,
     get: getAllMaterials,
     placeholder: 'Buscar material...',
-    data: (params) => {
-
-        let supplierId;
-
-        if (supplierSelector) supplierId = $(`${ modalSelector } ${ supplierSelector }`).val();
-        else supplierId = ''
-
-        const page = Number(params.page) || 1;
-
-        return {
-            search: params.term,
-            supplierId,
-            ...(resultsLimit ? {
-                start: (page - 1) * resultsLimit,
-                length: resultsLimit
-            } : {})
-        };
-    },
-    processResults: (data, params) => {
-
-        const page = Number(params.page) || 1;
-        const list = data.data || data;
-        const recordsFiltered = Number(data.recordsFiltered) || list.length;
-        const length = resultsLimit || list.length;
-
-        return {
-            results: list.map(mapMaterialToSelectData),
-            pagination: {
-                more: Boolean(resultsLimit) && page * length < recordsFiltered
+    data: (params) => resultsLimit
+        ? buildPaginatedSelectParams(params, {
+            length: resultsLimit,
+            additionalParams: {
+                supplierId: supplierSelector
+                    ? $(`${ modalSelector } ${ supplierSelector }`).val()
+                    : ''
             }
-        };
+        })
+        : {
+            search: params.term,
+            supplierId: supplierSelector
+                ? $(`${ modalSelector } ${ supplierSelector }`).val()
+                : ''
+        },
+    processResults: (data, params) => {
+        if (resultsLimit) return buildPaginatedSelectResults(data, params, {
+            length: resultsLimit,
+            mapItem: mapMaterialToSelectData
+        });
+
+        const list = data.data || data;
+
+        return { results: list.map(mapMaterialToSelectData) };
     },
     allowCreate,
     newTagLabel: 'Nuevo material'
