@@ -5,7 +5,7 @@ import { profileValidation } from '../../../validators/forms/profileValidations.
 
 const router = express.Router();
 const profileReadPermissions = {
-    roles: [ 'Administrador del sistema', 'Coordinador', 'Auxiliar', 'Operador', 'Instalador', 'Diseñador', 'Almacenista', 'Vendedor', 'Repartidor' ],
+    roles: [ 'Administrador del sistema', 'Coordinador', 'Auxiliar', 'Operador', 'Instalador', 'Diseñador', 'Almacenista', 'Asesor de ventas', 'Repartidor', 'Director', 'Administrador', 'Contador' ],
     departments: [
         'DIRECCIÓN',
         'ACABADOS',

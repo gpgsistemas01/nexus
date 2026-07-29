@@ -1,14 +1,9 @@
 import { getAllProfiles, getProfileOptions } from "../../../application/admin/profiles.js";
 import { initDomainSelect2, initFilterSelect2, toggleSelectOption } from "../baseSelect.js";
 import { FILTER_SELECTORS } from "../../../constants/selectors.js";
-import { getSelectedDepartmentName } from "./department.js";
+import { getSelectedOptionText } from "../../../utils/domUtils.js";
 
 const profileFilterSelector = FILTER_SELECTORS.PROFILE;
-
-export const getProfileSelectApi = () => ({
-    getSelect: () => document.querySelector(profileFilterSelector),
-    getValue: () => document.querySelector(profileFilterSelector)?.value || ''
-});
 
 export const initProfileFilterSelect = ({
     selectedId = null,
@@ -24,7 +19,7 @@ export const initProfileFilterSelect = ({
         if (typeof resolveData === 'function') return resolveData(params);
 
         const departmentName = departmentFilterSelector
-            ? getSelectedDepartmentName(departmentFilterSelector)
+            ? getSelectedOptionText(departmentFilterSelector)
             : '';
 
         return {

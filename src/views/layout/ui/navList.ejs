@@ -17,7 +17,7 @@ const canSeePurchases = hasAccess({
     roles: ['Coordinador', 'Auxiliar']
 });
 
-const canSeeAll = isAdmin;
+const canSeeAll = isAdmin || hasRole('Director') || hasDepartment('DIRECCIÓN');
 const canSeeOnlyMaterials = !canSeeAll && isSalesOrDesign;
 
 const shouldShowIcons = typeof showIcons !== 'undefined' ? showIcons : true;

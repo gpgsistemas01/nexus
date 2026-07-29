@@ -5,11 +5,6 @@ import { FILTER_SELECTORS } from "../../../constants/selectors.js";
 
 const supplierSelector = FILTER_SELECTORS.SUPPLIER;
 
-export const getSupplierSelectApi = () => ({
-    getSelect: () => document.querySelector(supplierSelector),
-    getValue: () => document.querySelector(supplierSelector)?.value || ''
-});
-
 export const initSupplierFilterSelect = ({
     selectedId = null
 }) => initFilterSelect2({

@@ -12,11 +12,13 @@ export const hasPermission = (user) => {
     ));
     const isWarehouse = hasDepartment('ALMACÉN Y PROVEDURÍA');
     const isSystem = hasDepartment('SISTEMAS');
+    const canViewAll = hasRole('Director') || hasDepartment('DIRECCIÓN');
 
     return {
         hasDepartment,
         hasRole,
         hasAccess,
+        canViewAll,
         isAdmin: hasRole('Administrador del sistema'),
         isWarehouse,
         isSystem,
