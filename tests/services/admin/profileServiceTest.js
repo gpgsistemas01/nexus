@@ -100,11 +100,11 @@ describe('profileService submit operations', () => {
 
   it('crea perfiles y relaciona departamentos enviados por submit', async () => {
     const profileDto = { fullName: 'Perfil Uno', roleId: 'role-1', departments: ['department-1', 'department-2'] };
-    const profileWithDepartments = { id: 'profile-1', fullName: 'Perfil Uno', departments: [] };
+    const profileWithAccesses = { id: 'profile-1', fullName: 'Perfil Uno', accesses: [] };
 
-    profileCreate.mockResolvedValue(profileWithDepartments);
+    profileCreate.mockResolvedValue(profileWithAccesses);
 
-    await expect(createProfile({ profileDto })).resolves.toEqual(profileWithDepartments);
+    await expect(createProfile({ profileDto })).resolves.toEqual(profileWithAccesses);
     expect(profileCreate).toHaveBeenCalledWith({
       data: {
         fullName: 'Perfil Uno',
@@ -141,7 +141,7 @@ describe('profileService submit operations', () => {
 
   it('actualiza perfil, limpia relaciones anteriores y crea las nuevas', async () => {
     const profileDto = { fullName: 'Perfil Editado', roleId: 'role-2', departments: ['department-3'] };
-    const updatedProfile = { id: 'profile-1', fullName: 'Perfil Editado', departments: [] };
+    const updatedProfile = { id: 'profile-1', fullName: 'Perfil Editado', accesses: [] };
 
     profileUpdate.mockResolvedValue(updatedProfile);
 
