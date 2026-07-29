@@ -134,7 +134,7 @@ export const exportProfileReport = async (req, res) => {
 
     const { data: rows } = await findAllProfiles({
         departments,
-        includeDepartments: true,
+        includeAccesses: true,
         skip: 0,
         take: 0,
         search: getDataTableSearch(req.query),
@@ -145,12 +145,17 @@ export const exportProfileReport = async (req, res) => {
     const data = [
         [
             'Nombre',
-            'Áreas'
+            'Área',
+            'Rol'
         ],
-        ...rows.map(row => [
-            row.fullName,
-            row.departments?.map(department => department.name).join(', ') || '-'
-        ])
+        ...rows.flatMap(row => row.accesses?.length
+            ? row.accesses.map(access => [
+                row.fullName,
+                access.department.name,
+                access.role.name
+            ])
+            : [[row.fullName, '-', '-']]
+        )
     ];
 
     return sendExcelReport({
