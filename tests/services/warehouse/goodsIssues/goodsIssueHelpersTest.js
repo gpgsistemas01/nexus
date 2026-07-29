@@ -14,7 +14,7 @@ const { findSupplierMaterialsSnapshot } = vi.hoisted(() => ({
 }));
 
 vi.mock('../../../../src/services/warehouse/products/supplierProductService.js', () => ({
-  findSupplierMaterialsSnapshot
+  findSupplierProductsSnapshot: findSupplierMaterialsSnapshot
 }));
 
 describe('goodsIssueHelpers', () => {

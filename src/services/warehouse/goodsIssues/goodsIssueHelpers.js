@@ -2,7 +2,7 @@ import { ProductNotFound } from "../../../errors/warehouse/productError.js";
 import { GoodsIssueMissingMaxUnitCost } from "../../../errors/inventory/stockError.js";
 import { buildStockKey, normalizeText } from "../../../utils/formattersUtils.js";
 import { calculateConvertedQuantity } from "../../inventory/stockHelpers.js";
-import { findSupplierMaterialsSnapshot } from "../products/supplierProductService.js";
+import { findSupplierProductsSnapshot } from "../products/supplierProductService.js";
 import { FULFILLMENT_STATUS_NAMES } from "../../../constants/warehouseStatuses.js";
 import { INTERNAL_CLIENT_NAME, PROJECT_NUMBER_BY_DEPARTMENT } from "../../../constants/goodsIssueRules.js";
 
@@ -37,7 +37,7 @@ export const buildGoodsIssueDetails = async ({
         ).values()
     ];
 
-    const supplierProducts = await findSupplierMaterialsSnapshot({ pairs });
+    const supplierProducts = await findSupplierProductsSnapshot({ pairs });
 
     const spMap = new Map(
         supplierProducts.map(sp => [
