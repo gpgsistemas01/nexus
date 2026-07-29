@@ -36,8 +36,8 @@ export const cancelGoodsReceiptDetailLine = async ({ id, detailId }) => {
             if (!cancellationReason) throw new GoodsReceiptDetailChangeReasonNotFound();
 
             const canceledDetailSnapshot = {
-                productId: currentDetail.productId,
-                productName: currentDetail.productName,
+                materialId: currentDetail.materialId,
+                materialName: currentDetail.materialName,
                 quantity: currentDetail.quantity,
                 costPerUnitType: currentDetail.costPerUnitType,
                 netPurchaseAmount: currentDetail.netPurchaseAmount,

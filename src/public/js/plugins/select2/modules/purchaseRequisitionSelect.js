@@ -5,10 +5,10 @@ import { FORM_SELECTORS, MODAL_SELECTORS } from "../../../constants/selectors.js
 const modalSelector = MODAL_SELECTORS.PURCHASE_REQUISITION;
 const projectSelector = FORM_SELECTORS.PROJECT;
 const requesterSelector = FORM_SELECTORS.REQUESTER;
-const productSelector = FORM_SELECTORS.PRODUCT;
+const materialSelector = FORM_SELECTORS.MATERIAL;
 const projectScopedSelector = `${ modalSelector } ${ projectSelector }`;
 const requesterScopedSelector = `${ modalSelector } ${ requesterSelector }`;
-const productScopedSelector = `${ modalSelector } ${ productSelector }`;
+const materialScopedSelector = `${ modalSelector } ${ materialSelector }`;
 const presentationDisplayScopedSelector = `${ modalSelector } ${ FORM_SELECTORS.PRESENTATION_DISPLAY }`;
 
 export const initPurchaseRequisitionFormSelect2 = async (data = null) => {
@@ -48,27 +48,27 @@ export const initPurchaseRequisitionFormSelect2 = async (data = null) => {
     });
 
     initbaseSelect2({
-        baseSelector: productScopedSelector,
+        baseSelector: materialScopedSelector,
         modalSelector,
-        url: '/api/warehouse/products/',
-        placeholder: 'Buscar producto...',
+        url: '/api/warehouse/materials/',
+        placeholder: 'Buscar material...',
         processResults: (data) => {
 
             const list = data.data || data;
             return {
-                results: list.map(product => ({
-                    id: product.id,
-                    text: product.name,
-                    uom: product.presentation || 'PIEZA'
+                results: list.map(material => ({
+                    id: material.id,
+                    text: material.name,
+                    uom: material.presentation || 'PIEZA'
                 }))
             };
         }
     });
 
-    $(productScopedSelector).on('select2:select', (e) => {
-    
-        const selectedProduct = e.params.data;
-        const value = `PIEZA(${selectedProduct?.presentation || 'PIEZA'})`;
+    $(materialScopedSelector).on('select2:select', (e) => {
+
+        const selectedMaterial = e.params.data;
+        const value = `PIEZA(${selectedMaterial?.presentation || 'PIEZA'})`;
 
         const instance = initMdbWrapperInput({ selector: presentationDisplayScopedSelector, value });
         updateMdbWrapperInput(instance);

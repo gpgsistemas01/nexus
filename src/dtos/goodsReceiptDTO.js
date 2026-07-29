@@ -9,7 +9,7 @@ export const createGoodsReceiptDtoForRegister = (body = {}) => {
         receptionDate: new Date(body.receptionDate),
         ...(Object.prototype.hasOwnProperty.call(body, 'observations') ? { observations: body.observations.trim() } : {}),
         details: (body.details).map(d => ({
-            productId: d.productId.trim(),
+            materialId: d.materialId.trim(),
             quantity: Number(d.quantity),
             costPerUnitType: Number(d.costPerUnitType)
         }))
@@ -27,7 +27,7 @@ export const createGoodsReceiptDtoForEdit = (body = {}) => {
         receptionDate: new Date(body.receptionDate),
         ...(Object.prototype.hasOwnProperty.call(body, 'observations') ? { observations: body.observations.trim() } : {}),
         details: (body.details || []).map(d => ({
-            productId: d.productId.trim(),
+            materialId: d.materialId.trim(),
             quantity: Number(d.quantity),
             costPerUnitType: Number(d.costPerUnitType)
         }))

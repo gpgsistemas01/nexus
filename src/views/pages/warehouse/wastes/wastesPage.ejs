@@ -1,33 +1,33 @@
-<% const selectedProductSummary = {
-    class: 'row g-2 selected-product-summary',
+<% const selectedMaterialSummary = {
+    class: 'row g-2 selected-material-summary',
     items: [
         {
-            id: 'selectedProductSupplierValue',
+            id: 'selectedMaterialSupplierValue',
             label: 'Proveedor',
             value: '-'
         },
         {
-            id: 'selectedProductPresentationValue',
+            id: 'selectedMaterialPresentationValue',
             label: 'Presentación',
             value: '-'
         },
         {
-            id: 'selectedProductUnitMeasureValue',
+            id: 'selectedMaterialUnitMeasureValue',
             label: 'Unidad',
             value: '-'
         },
         {
-            id: 'selectedProductBaseValue',
-            label: 'Base del producto',
+            id: 'selectedMaterialBaseValue',
+            label: 'Base del material',
             value: '-'
         },
         {
-            id: 'selectedProductHeightValue',
-            label: 'Altura del producto',
+            id: 'selectedMaterialHeightValue',
+            label: 'Altura del material',
             value: '-'
         },
         {
-            id: 'selectedProductMaxUnitCostValue',
+            id: 'selectedMaterialMaxUnitCostValue',
             label: 'Costo unitario de conversión',
             value: '-'
         }
@@ -47,9 +47,9 @@ const form = {
                     type: 'selects',
                     items: [
                         {
-                            id: 'productInput',
-                            name: 'supplierProductId',
-                            class: 'product-select',
+                            id: 'materialInput',
+                            name: 'supplierMaterialId',
+                            class: 'material-select',
                             col: 'col-12'
                         }
                     ]
@@ -84,12 +84,12 @@ const form = {
             ]
         },
         {
-            title: 'Datos del producto seleccionado',
-            class: 'selected-product-section',
+            title: 'Datos del material seleccionado',
+            class: 'selected-material-section',
             groups: [
                 {
                     type: 'html',
-                    content: include('../../../shared/totalsSummary', { totals: selectedProductSummary })
+                    content: include('../../../shared/totalsSummary', { totals: selectedMaterialSummary })
                 }
             ]
         },

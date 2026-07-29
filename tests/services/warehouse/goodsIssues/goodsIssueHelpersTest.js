@@ -1,20 +1,17 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { GoodsIssueMissingMaxUnitCost } from '../../../../src/errors/inventory/stockError.js';
-import { ProductNotFound } from '../../../../src/errors/warehouse/productError.js';
+import { MaterialNotFound } from '../../../../src/errors/warehouse/materialError.js';
 import {
   buildGoodsIssueDetails,
   isInternalClient,
   isValidInternalClientProjectNumberByDepartment,
   resolveFulfillmentStatus
 } from '../../../../src/services/warehouse/goodsIssues/goodsIssueHelpers.js';
+import { findSupplierMaterialsSnapshot } from '../../../../src/services/warehouse/materials/supplierMaterialService.js';
 
-const { findSupplierMaterialsSnapshot } = vi.hoisted(() => ({
+vi.mock('../../../../src/services/warehouse/materials/supplierMaterialService.js', () => ({
   findSupplierMaterialsSnapshot: vi.fn()
-}));
-
-vi.mock('../../../../src/services/warehouse/products/supplierProductService.js', () => ({
-  findSupplierProductsSnapshot: findSupplierMaterialsSnapshot
 }));
 
 describe('goodsIssueHelpers', () => {
@@ -61,7 +58,7 @@ describe('goodsIssueHelpers', () => {
   it('construye detalles de salida con snapshot de proveedor y costo máximo', async () => {
     findSupplierMaterialsSnapshot.mockResolvedValue([
       {
-        id: 'product-1',
+        id: 'material-1',
         name: 'Lámina PVC',
         base: 1,
         height: 2,
@@ -73,18 +70,18 @@ describe('goodsIssueHelpers', () => {
     ]);
 
     await expect(buildGoodsIssueDetails({
-      details: [{ productId: 'product-1', supplierId: 'supplier-1', quantity: 4, presentationId: 'presentation-1' }]
+      details: [{ materialId: 'material-1', supplierId: 'supplier-1', quantity: 4, presentationId: 'presentation-1' }]
     })).resolves.toEqual([
       {
-        productId: 'product-1',
+        materialId: 'material-1',
         supplierId: 'supplier-1',
         supplierName: 'Proveedor Uno',
         quantity: 4,
         convertedQuantity: 8,
         maxUnitCost: 80,
-        productName: 'Lámina PVC',
-        productBase: 1,
-        productHeight: 2,
+        materialName: 'Lámina PVC',
+        materialBase: 1,
+        materialHeight: 2,
         presentationId: 'presentation-1',
         presentationName: 'Hoja',
         unitMeasureId: 'unit-1',
@@ -94,16 +91,16 @@ describe('goodsIssueHelpers', () => {
     ]);
   });
 
-  it('falla si el producto proveedor no existe o no tiene costo máximo', async () => {
+  it('falla si el material proveedor no existe o no tiene costo máximo', async () => {
     findSupplierMaterialsSnapshot.mockResolvedValueOnce([]);
 
     await expect(buildGoodsIssueDetails({
-      details: [{ productId: 'missing-product', supplierId: 'supplier-1', quantity: 1 }]
-    })).rejects.toThrow(ProductNotFound);
+      details: [{ materialId: 'missing-material', supplierId: 'supplier-1', quantity: 1 }]
+    })).rejects.toThrow(MaterialNotFound);
 
     findSupplierMaterialsSnapshot.mockResolvedValueOnce([
       {
-        id: 'product-1',
+        id: 'material-1',
         name: 'Lámina PVC',
         base: 1,
         height: 2,
@@ -115,7 +112,7 @@ describe('goodsIssueHelpers', () => {
     ]);
 
     await expect(buildGoodsIssueDetails({
-      details: [{ productId: 'product-1', supplierId: 'supplier-1', quantity: 1 }]
+      details: [{ materialId: 'material-1', supplierId: 'supplier-1', quantity: 1 }]
     })).rejects.toThrow(GoodsIssueMissingMaxUnitCost);
   });
 });

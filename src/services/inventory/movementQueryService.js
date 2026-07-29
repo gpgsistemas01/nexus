@@ -21,12 +21,12 @@ const RETURN_MOVEMENT_TYPE = 'RETURN';
 
 const MOVEMENT_DETAIL_SELECT = {
     id: true,
-    productBase: true,
-    productHeight: true,
+    materialBase: true,
+    materialHeight: true,
     quantity: true,
     previousStock: true,
     newStock: true,
-    product: {
+    material: {
         select: {
             name: true,
             base: true,
@@ -40,22 +40,22 @@ const MOVEMENT_DETAIL_SELECT = {
     },
     goodsReceiptDetail: {
         select: {
-            productBase: true,
-            productHeight: true
+            materialBase: true,
+            materialHeight: true
         }
     },
     goodsIssueDetail: {
         select: {
-            productBase: true,
-            productHeight: true
+            materialBase: true,
+            materialHeight: true
         }
     },
     stockAdjustmentDetail: {
         select: {
-            productName: true,
+            materialName: true,
             supplierName: true,
-            productBase: true,
-            productHeight: true
+            materialBase: true,
+            materialHeight: true
         }
     },
     goodsIssueReturn: {
@@ -112,7 +112,7 @@ const getMovementSearchFilter = (search) => {
     return {
         OR: [
             {
-                product: {
+                material: {
                     name: {
                         contains: search,
                         mode: 'insensitive'
@@ -129,7 +129,7 @@ const getMovementSearchFilter = (search) => {
             },
             {
                 stockAdjustmentDetail: {
-                    productName: {
+                    materialName: {
                         contains: search,
                         mode: 'insensitive'
                     }
@@ -186,25 +186,25 @@ const getMovementSearchFilter = (search) => {
 };
 
 
-const resolveProductBase = (detail) =>
-    detail.productBase ??
-    detail.stockAdjustmentDetail?.productBase ??
-    detail.goodsReceiptDetail?.productBase ??
-    detail.goodsIssueDetail?.productBase ??
-    detail.product?.base ??
+const resolveMaterialBase = (detail) =>
+    detail.materialBase ??
+    detail.stockAdjustmentDetail?.materialBase ??
+    detail.goodsReceiptDetail?.materialBase ??
+    detail.goodsIssueDetail?.materialBase ??
+    detail.material?.base ??
     null;
 
-const resolveProductHeight = (detail) =>
-    detail.productHeight ??
-    detail.stockAdjustmentDetail?.productHeight ??
-    detail.goodsReceiptDetail?.productHeight ??
-    detail.goodsIssueDetail?.productHeight ??
-    detail.product?.height ??
+const resolveMaterialHeight = (detail) =>
+    detail.materialHeight ??
+    detail.stockAdjustmentDetail?.materialHeight ??
+    detail.goodsReceiptDetail?.materialHeight ??
+    detail.goodsIssueDetail?.materialHeight ??
+    detail.material?.height ??
     null;
 
-const resolveProductName = (detail) =>
-    detail.stockAdjustmentDetail?.productName ??
-    detail.product?.name;
+const resolveMaterialName = (detail) =>
+    detail.stockAdjustmentDetail?.materialName ??
+    detail.material?.name;
 
 const resolveSupplierName = (detail) =>
     detail.stockAdjustmentDetail?.supplierName ??
@@ -226,11 +226,11 @@ const mapMovementDetail = (detail) => ({
 
     type: resolveMovementTypeName(detail),
 
-    productName: resolveProductName(detail),
+    materialName: resolveMaterialName(detail),
 
-    productBase: resolveProductBase(detail),
+    materialBase: resolveMaterialBase(detail),
 
-    productHeight: resolveProductHeight(detail),
+    materialHeight: resolveMaterialHeight(detail),
 
     supplierName: resolveSupplierName(detail),
 
@@ -254,7 +254,7 @@ export const findAllMovements = async ({
     endDate = '',
     movementType = '',
     search = '',
-    productId = '',
+    materialId = '',
     supplierId = '',
     goodsIssueId = '',
     goodsReceiptId = '',
@@ -281,8 +281,8 @@ export const findAllMovements = async ({
 
         const where = {
 
-            ...(productId && {
-                productId
+            ...(materialId && {
+                materialId
             }),
 
             ...(supplierId && {

@@ -140,8 +140,9 @@ export const reloadMainTable = ({ resetPaging = false } = {}) => {
     table.ajax.reload(null, resetPaging);
 }
 
-export const refreshDataTable = ({ selector, data }) => {
-    const table = $(selector).DataTable();
+export const refreshMaterialTable = (details) => {
+
+    const table = $(DATATABLE_SELECTORS.MATERIAL).DataTable();
     table.clear();
     table.rows.add(data);
     table.draw();
@@ -165,7 +166,7 @@ const DOCUMENT_STATUS_LABELS = Object.freeze({
     CANCELED: 'Cancelada'
 });
 
-export const renderActionButtons = ({ status, fulfillmentStatus, context, canAdjustStock = false, canDeleteProduct = false }) => {
+export const renderActionButtons = ({ status, fulfillmentStatus, context, canAdjustStock = false, canDeleteMaterial = false }) => {
 
     const actions = [];
     const canEditGoodsIssue = context === 'goodsIssue'
@@ -195,7 +196,7 @@ export const renderActionButtons = ({ status, fulfillmentStatus, context, canAdj
         ariaLabel: 'Editar registro'
     }));
 
-    if ((context === 'product' || context === 'waste') && canAdjustStock) actions.push(buildMdbActionButton({
+    if ((context === 'material' || context === 'waste') && canAdjustStock) actions.push(buildMdbActionButton({
         className: 'btn-adjust-stock',
         colorClass: 'btn-success',
         iconClass: 'fa-solid fa-boxes-stacked',
@@ -203,12 +204,12 @@ export const renderActionButtons = ({ status, fulfillmentStatus, context, canAdj
         ariaLabel: 'Ajustar stock'
     }));
 
-    if (context === 'product' && canDeleteProduct) actions.push(buildMdbActionButton({
-        className: 'btn-delete-product',
+    if (context === 'material' && canDeleteMaterial) actions.push(buildMdbActionButton({
+        className: 'btn-delete-material',
         colorClass: 'btn-danger',
         iconClass: 'fa-solid fa-trash',
-        title: 'Eliminar producto',
-        ariaLabel: 'Eliminar producto'
+        title: 'Eliminar material',
+        ariaLabel: 'Eliminar material'
     }));
 
     if (status === DOCUMENT_STATUS_LABELS.APPROVED && context === 'goodsIssue' && canSupplyGoodsIssue) actions.push(buildMdbActionButton({
@@ -223,8 +224,8 @@ export const renderActionButtons = ({ status, fulfillmentStatus, context, canAdj
         className: 'btn-return-detail',
         colorClass: 'btn-warning',
         iconClass: 'fa-solid fa-rotate-left',
-        title: 'Devolver producto surtido',
-        ariaLabel: 'Devolver producto surtido'
+        title: 'Devolver material surtido',
+        ariaLabel: 'Devolver material surtido'
     }));
 
     return actions.join('');

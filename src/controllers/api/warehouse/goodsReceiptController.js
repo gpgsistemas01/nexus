@@ -10,7 +10,7 @@ import { correctGoodsReceiptDetailLine } from "../../../services/warehouse/goods
 import { getDataTableOrder, getDataTablePaging, getDataTableSearch } from "../../../utils/requestQueryUtils.js";
 import {
     createStockNotification,
-    notifyProductStockStatusChanges,
+    notifyMaterialStockStatusChanges,
 } from "../../../services/warehouse/notificationService.js";
 import { emitStockUpdated } from "../../../utils/socketUtils.js";
 import { sanitizeEmptyStrings } from "../../../utils/formattersUtils.js";

@@ -11,7 +11,7 @@ const nameRegex = /^[\p{L}0-9]+(?:[ '\-.,:;()¿?¡!][\p{L}0-9]+)*[.,:;()¿?¡!]*
 const genericRegex = /^[^<>\\{}[\]]+$/u;
 const uuidV4Regex = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
-export const validateUsername = 
+export const validateUsername =
     body('name')
         .trim()
         .notEmpty().withMessage(errorMap['username'].REQUIRED)
@@ -21,7 +21,7 @@ export const validateUsername =
         .matches(usernameRegex).withMessage(errorMap['username'].INVALID_FORMAT)
 ;
 
-export const validatePassword = 
+export const validatePassword =
     body('password')
         .notEmpty().withMessage(errorMap['password'].REQUIRED)
         .isString().withMessage(errorMap['password'].INVALID_TYPE)
@@ -32,7 +32,7 @@ export const validatePassword =
         .matches(passwordRegex).withMessage(errorMap['password'].INVALID_FORMAT)
 ;
 
-export const validateName = ({ fieldName = 'name', maxLength = 50 }) => 
+export const validateName = ({ fieldName = 'name', maxLength = 50 }) =>
     body(fieldName)
         .trim()
         .notEmpty().withMessage(errorMap['name'].REQUIRED)
@@ -228,7 +228,7 @@ export const validateDetailsArray =
 
             details.forEach(detail => {
 
-                if (!detail.productId || !detail.quantity || !detail.costPerUnitType) {
+                if (!detail.materialId || !detail.quantity || !detail.costPerUnitType) {
                     throw new Error(errorMap['details'].INVALID_FORMAT_REQUIRED);
                 }
 
@@ -264,7 +264,7 @@ export const validateGoodsIssueDetailsArray = ({ allowDetailId = false } = {}) =
                     ids.add(detail.id);
                 }
 
-                if (!detail.productId || !detail.quantity) {
+                if (!detail.materialId || !detail.quantity) {
                     throw new Error(errorMap['details'].INVALID_FORMAT_REQUIRED);
                 }
 
@@ -291,7 +291,7 @@ export const validateGoodsIssueDetailsEdition =
             details.forEach((detail) => {
 
                 const detailId = detail?.id;
-                
+
                 if (!detailId || !uuidV4Regex.test(detailId)) {
 
                     if (!errors[detailId || 'details']) errors[detailId || 'details'] = {};

@@ -22,7 +22,7 @@ Nexus es una plataforma de control operativo para administrar inventario, compra
 
 - Autenticación y manejo de sesión con cookies y JWT.
 - Administración de usuarios, roles, perfiles, departamentos y movimientos.
-- Gestión de almacén: productos, proveedores, entradas de compra, salidas de almacén, requisiciones, mermas, motivos, presentaciones, unidades de medida y estados de cumplimiento.
+- Gestión de almacén: materiales, proveedores, entradas de compra, salidas de almacén, requisiciones, mermas, motivos, presentaciones, unidades de medida y estados de cumplimiento.
 - Gestión de clientes del área de ventas.
 - Reportes administrativos, de almacén e inventario.
 - Notificaciones en tiempo real con Socket.IO.
@@ -183,7 +183,7 @@ npm start
 
 - `/` página de inicio.
 - `/inicio-sesion`, `/revocar-sesion`, `/cerrar-sesion` para autenticación web.
-- `/productos`, `/mermas`, `/requisiciones`, `/compras`, `/salidas-almacen`, `/proveedores` para almacén.
+- `/materiales`, `/mermas`, `/requisiciones`, `/compras`, `/salidas-almacen`, `/proveedores` para almacén.
 - `/usuarios-sistemas`, `/perfiles`, `/movimientos` para administración.
 - `/clientes` para ventas.
 
@@ -193,7 +193,7 @@ Todas las rutas API cuelgan de `/api` y esperan `Content-Type: application/json`
 
 - `/api/auth`
 - `/api/sales/clients`
-- `/api/warehouse/products`
+- `/api/warehouse/materials`
 - `/api/warehouse/wastes`
 - `/api/warehouse/suppliers`
 - `/api/warehouse/goods-receipts`
@@ -249,7 +249,7 @@ El repositorio incluye `Dockerfile` y `docker-compose.yml`. Al iniciar el conten
 La selección no depende de que ambas URLs tengan nombres o hosts parecidos:
 
 1. El proceso de arranque exige que `DIRECT_URL` esté definida. Si falta, termina con código de error y **no** inicia la aplicación. El despliegue Docker no utiliza las variables de prueba.
-2. El entrypoint fija `NODE_ENV=production` para todo el contenedor y `prisma.config.ts` llama al resolver con `preferDirectUrl: true`; por lo tanto, `prisma migrate deploy` siempre recibe `DIRECT_URL`, aunque el contenedor haya recibido accidentalmente otro valor de `NODE_ENV`.
+2. El entrypoint fija `NODE_ENV=materialion` para todo el contenedor y `prisma.config.ts` llama al resolver con `preferDirectUrl: true`; por lo tanto, `prisma migrate deploy` siempre recibe `DIRECT_URL`, aunque el contenedor haya recibido accidentalmente otro valor de `NODE_ENV`.
 3. La aplicación crea su cliente sin esa opción y, como el contenedor permanece en producción, recibe `DATABASE_URL`.
 
 El entrypoint nunca imprime la URL ni sus credenciales. Los logs indican el **nombre de la variable** elegida y confirman el éxito únicamente cuando Prisma devuelve código `0`:

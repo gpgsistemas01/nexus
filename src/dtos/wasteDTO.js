@@ -1,5 +1,5 @@
 const buildWasteBaseDto = (body = {}) => ({
-    supplierProductId: body.supplierProductId,
+    supplierMaterialId: body.supplierMaterialId,
     base: Number(body.base),
     height: Number(body.height)
 });

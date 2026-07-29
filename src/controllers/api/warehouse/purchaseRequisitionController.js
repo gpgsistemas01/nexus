@@ -62,8 +62,8 @@ export const editPurchaseRequisition = async (req, res) => {
     const sanitizedPurchaseRequisitionDto = sanitizeEmptyStrings(purchaseRequisitionDto);
 
     const purchaseRequisition = await updatePurchaseRequisition({
-        purchaseRequisitionDto: sanitizedPurchaseRequisitionDto, 
-        id: req.params.id, 
+        purchaseRequisitionDto: sanitizedPurchaseRequisitionDto,
+        id: req.params.id,
         userId: req.userId
     });
 
@@ -76,10 +76,10 @@ export const editPurchaseRequisition = async (req, res) => {
 export const confirmPurchaseRequisitionStatus = async (req, res) => {
 
     const purchaseRequisition = await confirmPurchaseRequisition({ id: req.params.id, userId: req.userId });
-    // const totalProducts = purchaseRequisition.totalRequestedProducts || 0;
+    // const totalMaterials = purchaseRequisition.totalRequestedMaterials || 0;
     // const notification = await createStockNotification({
     //     title: 'Requisición aprobada',
-    //     message: `Requisición folio ${purchaseRequisition.referenceNumber} aprobada con ${totalProducts} producto(s).`,
+    //     message: `Requisición folio ${purchaseRequisition.referenceNumber} aprobada con ${totalMaterials} material(s).`,
     //     type: 'info',
     //     referenceNumber: purchaseRequisition.referenceNumber,
     //     entityId: purchaseRequisition.id,

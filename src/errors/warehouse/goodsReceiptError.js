@@ -71,7 +71,7 @@ export class GoodsReceiptCorrectionQuantityConflict extends AppError {
 
 export class GoodsReceiptCorrectionInsufficientStock extends AppError {
 
-    constructor ({ productName, height, base, supplierName, productId, supplierId, requestedQuantity } = {}) {
+    constructor ({ materialName, height, base, supplierName, materialId, supplierId, requestedQuantity } = {}) {
 
         const hasDimensions =
             base != null &&
@@ -86,12 +86,12 @@ export class GoodsReceiptCorrectionInsufficientStock extends AppError {
             : '';
 
         super(
-            `Stock insuficiente para corregir la compra con el producto: ${ productName ?? 'Producto desconocido' }${ dimensions }${ supplier }`,
+            `Stock insuficiente para corregir la compra con el material: ${ materialName ?? 'Material desconocido' }${ dimensions }${ supplier }`,
             'GOODS_RECEIPT_CORRECTION_INSUFFICIENT_STOCK',
             409
         );
 
-        this.meta = { productName, height, base, supplierName, productId, supplierId, requestedQuantity };
+        this.meta = { materialName, height, base, supplierName, materialId, supplierId, requestedQuantity };
     }
 }
 

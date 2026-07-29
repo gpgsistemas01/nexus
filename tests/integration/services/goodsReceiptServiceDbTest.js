@@ -11,7 +11,7 @@ const names = {
   presentation: `IT Receipt Presentation ${testSuffix}`,
   unit: `IT REC Unit ${testSuffix}`,
   unitSymbol: `ir${testSuffix.slice(-4)}`,
-  product: `IT Receipt Product ${testSuffix}`,
+  material: `IT Receipt Material ${testSuffix}`,
   supplierTradeName: `IT Receipt Supplier ${testSuffix}`,
   supplierLegalName: `IT Receipt Supplier Legal ${testSuffix}`,
   receivedBy: `IT Receipt Profile ${testSuffix}`,
@@ -20,15 +20,15 @@ const names = {
 
 let prisma;
 let goodsReceiptService;
-let product;
+let material;
 let supplier;
 let receivedBy;
-let supplierProduct;
+let supplierMaterial;
 let presentation;
 let unit;
 
 const cleanupGoodsReceiptData = async () => {
-  const products = await prisma.product.findMany({ where: { name: { startsWith: 'IT Receipt Product ' } }, select: { id: true } });
+  const materials = await prisma.material.findMany({ where: { name: { startsWith: 'IT Receipt Material ' } }, select: { id: true } });
   const suppliers = await prisma.supplier.findMany({ where: { tradeName: { startsWith: 'IT Receipt Supplier ' } }, select: { id: true } });
   const profiles = await prisma.profile.findMany({ where: { fullName: { startsWith: 'IT Receipt Profile ' } }, select: { id: true } });
   const presentations = await prisma.presentation.findMany({ where: { name: { startsWith: 'IT Receipt Presentation ' } }, select: { id: true } });
@@ -49,8 +49,8 @@ const cleanupGoodsReceiptData = async () => {
   await prisma.inventoryMovement.deleteMany({ where: { goodsReceiptId: { in: receipts.map(({ id }) => id) } } });
   await prisma.goodsReceiptDetail.deleteMany({ where: { id: { in: receiptDetails.map(({ id }) => id) } } });
   await prisma.goodsReceipt.deleteMany({ where: { id: { in: receipts.map(({ id }) => id) } } });
-  await prisma.supplierProduct.deleteMany({ where: { OR: [{ productId: { in: products.map(({ id }) => id) } }, { supplierId: { in: suppliers.map(({ id }) => id) } }] } });
-  await prisma.product.deleteMany({ where: { id: { in: products.map(({ id }) => id) } } });
+  await prisma.supplierMaterial.deleteMany({ where: { OR: [{ materialId: { in: materials.map(({ id }) => id) } }, { supplierId: { in: suppliers.map(({ id }) => id) } }] } });
+  await prisma.material.deleteMany({ where: { id: { in: materials.map(({ id }) => id) } } });
   await prisma.supplier.deleteMany({ where: { id: { in: suppliers.map(({ id }) => id) } } });
   await prisma.profile.deleteMany({ where: { id: { in: profiles.map(({ id }) => id) } } });
   await prisma.presentation.deleteMany({ where: { id: { in: presentations.map(({ id }) => id) } } });
@@ -70,9 +70,9 @@ describeDb('goods receipt database integration', () => {
     unit = await prisma.unitMeasure.create({ data: { name: names.unit, symbol: names.unitSymbol } });
     receivedBy = await prisma.profile.create({ data: { fullName: names.receivedBy } });
 
-    product = await prisma.product.create({
+    material = await prisma.material.create({
       data: {
-        name: names.product,
+        name: names.material,
         minStock: 0,
         base: 2,
         height: 3,
@@ -88,9 +88,9 @@ describeDb('goods receipt database integration', () => {
         tradeName: names.supplierTradeName
       }
     });
-    supplierProduct = await prisma.supplierProduct.create({
+    supplierMaterial = await prisma.supplierMaterial.create({
       data: {
-        productId: product.id,
+        materialId: material.id,
         supplierId: supplier.id,
         currentStock: 0,
         convertedQuantity: 0,
@@ -125,7 +125,7 @@ describeDb('goods receipt database integration', () => {
         receptionDate: new Date(),
         observations: 'Compra integración',
         details: [{
-          productId: product.id,
+          materialId: material.id,
           quantity: 2,
           costPerUnitType: 10
         }]
@@ -136,7 +136,7 @@ describeDb('goods receipt database integration', () => {
       supplierId: supplier.id,
       receivedById: receivedBy.id,
       invoice: names.invoice,
-      details: [expect.objectContaining({ productId: product.id, quantity: expect.anything() })]
+      details: [expect.objectContaining({ materialId: material.id, quantity: expect.anything() })]
     });
 
     await expect(prisma.inventoryMovement.findFirst({
@@ -144,14 +144,14 @@ describeDb('goods receipt database integration', () => {
       include: { details: true }
     })).resolves.toMatchObject({
       type: 'ENTRY',
-      details: [expect.objectContaining({ productId: product.id, supplierId: supplier.id })]
+      details: [expect.objectContaining({ materialId: material.id, supplierId: supplier.id })]
     });
 
-    await expect(prisma.supplierProduct.findUnique({
-      where: { supplierId_productId: { supplierId: supplier.id, productId: product.id } },
+    await expect(prisma.supplierMaterial.findUnique({
+      where: { supplierId_materialId: { supplierId: supplier.id, materialId: material.id } },
       select: { id: true, currentStock: true, convertedQuantity: true, maxUnitCost: true }
     })).resolves.toMatchObject({
-      id: supplierProduct.id,
+      id: supplierMaterial.id,
       currentStock: expect.objectContaining({ toString: expect.any(Function) }),
       convertedQuantity: expect.objectContaining({ toString: expect.any(Function) }),
       maxUnitCost: expect.objectContaining({ toString: expect.any(Function) })

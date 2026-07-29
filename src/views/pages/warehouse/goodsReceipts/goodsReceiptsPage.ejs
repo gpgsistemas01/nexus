@@ -58,9 +58,9 @@
     },
     table: {
         select: {
-            id: 'productInput',
-            name: 'productId',
-            class: 'product-select',
+            id: 'materialInput',
+            name: 'materialId',
+            class: 'material-select',
             col: 'col-md-4 col-lg-6'
         },
         inputs: [
@@ -108,13 +108,13 @@
 
 <%- include('../../../shared/modal', { modalId: 'goodsReceiptModal', form }) %>
 
-<%- include('../ui/productModal') %>
+<%- include('../ui/materialModal') %>
 
 <%- include('../ui/supplierModal') %>
 
 <script type="module" src="/js/pages/warehouse/goodsReceiptsPage.js"></script>
-<script type="module" src="/js/modules/products/productModal.js"></script>
-<script type="module" src="/js/modules/products/productForm.js"></script>
+<script type="module" src="/js/modules/materials/materialModal.js"></script>
+<script type="module" src="/js/modules/materials/materialForm.js"></script>
 <script type="module" src="/js/modules/suppliers/supplierModal.js"></script>
 <script type="module" src="/js/modules/suppliers/supplierForm.js"></script>
 

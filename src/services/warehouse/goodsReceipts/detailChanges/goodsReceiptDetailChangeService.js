@@ -4,9 +4,9 @@ import { buildInventoryMovementDetail } from '../../../inventory/movementHelpers
 import { assertSufficientStock, calculateConvertedQuantity } from '../../../inventory/stockHelpers.js';
 import { normalizeDecimal } from '../../../../utils/formattersUtils.js';
 import {
-    adjustSupplierProductStock,
-    findSupplierProductByIds
-} from '../../products/supplierProductService.js';
+    adjustSupplierMaterialStock,
+    findSupplierMaterialByIds
+} from '../../materials/supplierMaterialService.js';
 
 export const GOODS_RECEIPT_DETAIL_STATUS = Object.freeze({
     ACTIVE: 'ACTIVE',
@@ -37,23 +37,23 @@ export const createGoodsReceiptDetailChangeMovementAndUpdateStock = async ({
     if (normalizedQuantityDifference === 0) return null;
 
     const supplierId = currentDetail.goodsReceipt.supplierId;
-    const supplierProduct = await findSupplierProductByIds({
+    const supplierMaterial = await findSupplierMaterialByIds({
         tx,
-        productId: currentDetail.productId,
+        materialId: currentDetail.materialId,
         supplierId
     });
-    const previousStock = normalizeDecimal(supplierProduct.currentStock ?? 0);
-    const previousConvertedQuantity = normalizeDecimal(supplierProduct.convertedQuantity ?? 0);
+    const previousStock = normalizeDecimal(supplierMaterial.currentStock ?? 0);
+    const previousConvertedQuantity = normalizeDecimal(supplierMaterial.convertedQuantity ?? 0);
     const convertedDifference = calculateConvertedQuantity({
         quantity: normalizedQuantityDifference,
-        base: currentDetail.productBase,
-        height: currentDetail.productHeight
+        base: currentDetail.materialBase,
+        height: currentDetail.materialHeight
     });
     const newStock = normalizeDecimal(previousStock + normalizedQuantityDifference);
     const newConvertedQuantity = normalizeDecimal(previousConvertedQuantity + convertedDifference);
 
     assertSufficientStock({
-        product: supplierProduct,
+        material: supplierMaterial,
         newStock,
         newConvertedQuantity,
         requestedQuantity: Math.abs(normalizedQuantityDifference)
@@ -64,20 +64,20 @@ export const createGoodsReceiptDetailChangeMovementAndUpdateStock = async ({
         movementType: INVENTORY_MOVEMENT_TYPES.ADJUSTMENT,
         reference: { goodsReceiptId },
         details: [buildInventoryMovementDetail({
-            productId: currentDetail.productId,
+            materialId: currentDetail.materialId,
             supplierId,
             quantity: normalizedQuantityDifference,
             previousStock,
             newStock,
-            productBase: currentDetail.productBase,
-            productHeight: currentDetail.productHeight,
+            materialBase: currentDetail.materialBase,
+            materialHeight: currentDetail.materialHeight,
             goodsReceiptDetailId
         })]
     });
 
-    await adjustSupplierProductStock({
+    await adjustSupplierMaterialStock({
         tx,
-        productId: currentDetail.productId,
+        materialId: currentDetail.materialId,
         supplierId,
         newStock,
         newConvertedQuantity
@@ -103,20 +103,20 @@ export const createGoodsReceiptDetailChange = async ({
             goodsReceiptDetailId,
             reasonId,
             inventoryMovementId,
-            previousProductId: currentDetail.productId,
-            previousProductName: currentDetail.productName,
+            previousMaterialId: currentDetail.materialId,
+            previousMaterialName: currentDetail.materialName,
             previousQuantity: currentDetail.quantity,
             previousCostPerUnitType: currentDetail.costPerUnitType,
             previousNetPurchaseAmount: currentDetail.netPurchaseAmount,
             previousGrossPurchaseAmount: currentDetail.grossPurchaseAmount,
-            correctedProductId: resultingDetail.productId,
-            correctedProductName: resultingDetail.productName,
+            correctedMaterialId: resultingDetail.materialId,
+            correctedMaterialName: resultingDetail.materialName,
             correctedQuantity: resultingDetail.quantity,
             correctedCostPerUnitType: resultingDetail.costPerUnitType,
             correctedNetPurchaseAmount: resultingDetail.netPurchaseAmount,
             correctedGrossPurchaseAmount: resultingDetail.grossPurchaseAmount,
             changeType,
-            productChanged: false,
+            materialChanged: false,
             quantityDifference,
             costDifference: normalizeDecimal(resultingDetail.costPerUnitType - currentDetail.costPerUnitType)
         },

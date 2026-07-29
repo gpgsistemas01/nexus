@@ -1,27 +1,27 @@
-import { ProductNotFound } from "../../../errors/warehouse/productError.js";
+import { MaterialNotFound } from "../../../errors/warehouse/materialError.js";
 import { roundTo } from "../../../utils/formattersUtils.js";
 import { calculateConvertedQuantity } from "../../inventory/stockHelpers.js";
 import { GOODS_RECEIPT_STATUS_NAMES } from "../../../constants/warehouseStatuses.js";
-import { findProductsSnapshot } from "../products/productService.js";
+import { findMaterialsSnapshot } from "../materials/materialService.js";
 import { GoodsReceiptDetailAlreadyCanceled } from "../../../errors/warehouse/goodsReceiptError.js";
 
 const IVA_RATE = 1.16;
 
 export const buildGoodsReceiptDetails = async (details, { tx = null } = {}) => {
 
-    const productIds = details.map(d => d.productId);
+    const materialIds = details.map(d => d.materialId);
 
-    const products = await findProductsSnapshot({ tx, productIds });
+    const materials = await findMaterialsSnapshot({ tx, materialIds });
 
-    const productMap = new Map(products.map(p => [p.id, p]));
+    const materialMap = new Map(materials.map(p => [p.id, p]));
 
-    return details.map(({ productId, quantity, costPerUnitType }) => {
+    return details.map(({ materialId, quantity, costPerUnitType }) => {
 
-        const product = productMap.get(productId);
+        const material = materialMap.get(materialId);
 
-        if (!product) throw new ProductNotFound();
+        if (!material) throw new MaterialNotFound();
 
-        const { name, base, height, presentation, unitMeasure } = product;
+        const { name, base, height, presentation, unitMeasure } = material;
         const netPurchaseAmount = roundTo(quantity * costPerUnitType);
         const grossPurchaseAmount = roundTo(netPurchaseAmount * IVA_RATE);
         const convertedQuantity = calculateConvertedQuantity({
@@ -34,16 +34,16 @@ export const buildGoodsReceiptDetails = async (details, { tx = null } = {}) => {
         if (convertedQuantity) conversionUnitCost = convertedQuantity > 0 ? roundTo(netPurchaseAmount / convertedQuantity) : 0;
 
         return {
-            productId,
+            materialId,
             quantity,
             convertedQuantity,
             costPerUnitType,
             conversionUnitCost,
             netPurchaseAmount,
             grossPurchaseAmount,
-            productName: name,
-            productBase: base,
-            productHeight: height,
+            materialName: name,
+            materialBase: base,
+            materialHeight: height,
             presentationId: presentation.id,
             presentationName: presentation.name,
             unitMeasureId: unitMeasure.id,

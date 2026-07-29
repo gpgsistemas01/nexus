@@ -1,8 +1,8 @@
-import { getProductOptions } from "../../../../application/warehouse/products.js";
+import { getMaterialOptions } from "../../../../application/warehouse/materials.js";
 import { getSupplierOptions } from "../../../../application/warehouse/suppliers.js";
 import { getFulfillmentStatusOptions } from "../../../../application/warehouse/fulfillmentStatuses.js";
 import { getProfileOptions } from "../../../../application/admin/profiles.js";
-import { getProductSelectApi, initProductFilterSelect } from "../../../select2/domains/product.js";
+import { getMaterialSelectApi, initMaterialFilterSelect } from "../../../select2/domains/material.js";
 import { getSupplierSelectApi, initSupplierFilterSelect } from "../../../select2/domains/supplier.js";
 import { getFulfillmentStatusSelectApi, initFulfillmentStatusFilterSelect } from "../../../select2/domains/fulfillmentStatus.js";
 import { getClientSelectApi, initClientFilterSelect } from "../../../select2/domains/client.js";
@@ -59,13 +59,13 @@ const selectFilterConfigs = {
         getOptions: getSupplierOptions,
         initSelect: initSupplierFilterSelect
     },
-    product: {
-        key: 'productId',
-        selector: FILTER_SELECTORS.PRODUCT,
+    material: {
+        key: 'materialId',
+        selector: FILTER_SELECTORS.MATERIAL,
         isSelected: false,
-        getSelectApi: getProductSelectApi,
-        getOptions: getProductOptions,
-        initSelect: ({ selectedId }) => initProductFilterSelect({ selectedId, supplierFilterSelector: FILTER_SELECTORS.SUPPLIER })
+        getSelectApi: getMaterialSelectApi,
+        getOptions: getMaterialOptions,
+        initSelect: ({ selectedId }) => initMaterialFilterSelect({ selectedId, supplierFilterSelector: FILTER_SELECTORS.SUPPLIER })
     },
     fulfillmentStatus: {
         key: 'fulfillmentStatusId',

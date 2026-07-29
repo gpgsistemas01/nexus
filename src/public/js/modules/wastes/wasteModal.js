@@ -7,7 +7,7 @@ import { FORM_SELECTORS, MODAL_SELECTORS } from "../../constants/selectors.js";
 const wasteModalId = MODAL_SELECTORS.WASTE;
 const formId = FORM_SELECTORS.WASTE_FORM;
 const stockMode = 'edit-stock';
-const wasteDataFields = ['supplierProductId', 'base', 'height'];
+const wasteDataFields = ['supplierMaterialId', 'base', 'height'];
 const wasteInitialStockFields = ['currentStock', 'reasonId', 'observations'];
 const wasteStockAdjustmentFields = ['currentStock', 'reasonId', 'observations'];
 const stockSectionSelector = '.stock-data-section';

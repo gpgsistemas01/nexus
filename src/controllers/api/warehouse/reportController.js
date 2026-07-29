@@ -4,7 +4,7 @@ import { getMexicoMonthDateRange } from "../../../utils/formattersUtils.js";
 import { sendExcelReport } from "../../../utils/reportExcelUtils.js";
 
 const SHEET_NAME = 'Inventario';
-const FILENAME = 'reporte_inventario_productos';
+const FILENAME = 'reporte_inventario_materiales';
 const GOODS_ISSUE_SHEET_NAME = 'Salidas';
 const GOODS_ISSUE_FILENAME = 'reporte_salidas';
 const GOODS_RECEIPT_SHEET_NAME = 'Compras';
@@ -122,10 +122,10 @@ export const exportGoodsIssueReportExcel = async (req, res) => {
             row.clientName,
             row.projectNumber,
             row.fulfillmentStatusName,
-            row.productName,
+            row.materialName,
             row.supplierName,
-            row.productBase,
-            row.productHeight,
+            row.materialBase,
+            row.materialHeight,
             row.requestedQuantity,
             row.suppliedQuantity,
             row.presentationName,
@@ -193,9 +193,9 @@ export const exportGoodsReceiptReportExcel = async (req, res) => {
             row.receivedByName,
             row.supplierName,
             row.invoice,
-            row.productName,
-            row.productBase,
-            row.productHeight,
+            row.materialName,
+            row.materialBase,
+            row.materialHeight,
             row.quantity,
             row.presentationName,
             row.convertedQuantity,

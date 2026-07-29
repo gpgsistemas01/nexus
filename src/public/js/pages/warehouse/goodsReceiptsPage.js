@@ -1,11 +1,11 @@
 import { useForm } from "../../application/form.js";
 import { editGoodsReceiptHeader, registerGoodsReceipt, cancelGoodsReceiptDetail } from "../../application/warehouse/goodsReceipts.js";
 import { handleApiError } from "../../api/errorHandler.js";
-import { validateAddGoodsReceiptProductValidators, validateGoodsReceiptValidators } from "../../utils/validations/validators.js";
-import { refreshProductTable } from "../../plugins/datatable/baseDatatable.js";
+import { validateAddGoodsReceiptMaterialValidators, validateGoodsReceiptValidators } from "../../utils/validations/validators.js";
+import { refreshMaterialTable } from "../../plugins/datatable/baseDatatable.js";
 import { createGoodsReceiptDatatable, details, initDetailsGoodsReceiptTable } from "../../plugins/datatable/goodsReceiptDatatable.js";
 import { GOODS_RECEIPT_SUPPLIER_CHANGED_EVENT, initGoodsReceiptFormSelect2, setGoodsReceiptFormSelectOptions } from "../../plugins/select2/modules/goodsReceiptSelect.js";
-import { setFormDisabled, setTotals, updateTotals, toggleButtons, clearAddedProductInput, toggleInvoiceInput, clearFormErrors, normalizeFormErrors, initForm } from "../../ui/formUI.js";
+import { setFormDisabled, setTotals, updateTotals, toggleButtons, clearAddedMaterialInput, toggleInvoiceInput, clearFormErrors, normalizeFormErrors, initForm } from "../../ui/formUI.js";
 import { on } from "../../utils/domUtils.js";
 import { setDateTimePickerValue } from "../../plugins/flatpickr/dateTimePicker.js";
 import { handleSubmit, hasValidationErrors, toggleContainerElements, toggleDisabledElement, validateFields } from "../../utils/formUtils.js";
@@ -43,14 +43,14 @@ const setGoodsReceiptViewMode = ({ form, modalElement, receipt }) => {
         mode: FORM_MODES.VIEW,
         status: receipt.status?.name || GOODS_RECEIPT_STATUS_LABELS.CONFIRMED,
         showActions: false,
-        showAddProduct: false
+        showAddMaterial: false
     });
 };
 
 document.querySelector(modalId).addEventListener(GOODS_RECEIPT_SUPPLIER_CHANGED_EVENT, () => {
     details.length = 0;
-    refreshProductTable(details);
-    clearAddedProductInput();
+    refreshMaterialTable(details);
+    clearAddedMaterialInput();
 });
 
 const normalizeGoodsReceiptData = ({ form, formData }) => {
@@ -81,7 +81,7 @@ useForm({
     selector: formId,
     normalizeData: normalizeGoodsReceiptData,
     getErrors: ({ form, formData }) => {
-        
+
         const allowedUsername = /^[a-zA-Z0-9\-]+$/;
         let errors = {};
 
@@ -144,7 +144,7 @@ export const openGoodsReceiptModal = ({ mode, data = null }) => {
     setGoodsReceiptFormSelectOptions(data);
 
     if (mode === FORM_MODES.CREATE) {
-        
+
         form.reset();
         value = INVOICE_VALUES.INVOICE;
         modalElement.querySelector('#modalTitle').textContent = 'Registrar compra';
@@ -154,10 +154,10 @@ export const openGoodsReceiptModal = ({ mode, data = null }) => {
             mode,
             status: GOODS_RECEIPT_STATUS_LABELS.OPEN,
             showActions: true,
-            showAddProduct: true
+            showAddMaterial: true
         });
         toggleContainerElements({
-            selector: '.add-product-container',
+            selector: '.add-material-container',
             root: modalElement,
             isDisabled: !form.elements.supplierId.value
         });
@@ -183,7 +183,7 @@ export const openGoodsReceiptModal = ({ mode, data = null }) => {
                 isDisabled: true
             });
             toggleContainerElements({
-                selector: '.add-product-container',
+                selector: '.add-material-container',
                 root: modalElement,
                 isDisabled: false
             });
@@ -191,7 +191,7 @@ export const openGoodsReceiptModal = ({ mode, data = null }) => {
                 mode,
                 status: data.status?.name || GOODS_RECEIPT_STATUS_LABELS.CONFIRMED,
                 showActions: false,
-                showAddProduct: data.status?.name !== GOODS_RECEIPT_STATUS_LABELS.CANCELED
+                showAddMaterial: data.status?.name !== GOODS_RECEIPT_STATUS_LABELS.CANCELED
             });
         }
 
@@ -199,7 +199,7 @@ export const openGoodsReceiptModal = ({ mode, data = null }) => {
             setGoodsReceiptViewMode({ form, modalElement, receipt: data });
         }
     }
-    
+
     form.elements.invoice.value = data?.invoice || '';
     form.elements.isInvoiced.value = value;
     toggleInvoiceInput({ value, mode, form });
@@ -209,20 +209,20 @@ export const openGoodsReceiptModal = ({ mode, data = null }) => {
     openModal(modalElement);
 }
 
-const addProduct = () => {
+const addMaterial = () => {
 
-    const option = document.querySelector(`${ FORM_SELECTORS.PRODUCT } option:checked`);
+    const option = document.querySelector(`${ FORM_SELECTORS.MATERIAL } option:checked`);
 
-    let { productBase, productHeight, presentationName, unitMeasureName, supplierName, productName } = option?.dataset;
-    productHeight = isNaN(Number(productHeight)) ? null : Number(productHeight);
-    productBase = isNaN(Number(productBase)) ? null : Number(productBase);
+    let { materialBase, materialHeight, presentationName, unitMeasureName, supplierName, materialName } = option?.dataset;
+    materialHeight = isNaN(Number(materialHeight)) ? null : Number(materialHeight);
+    materialBase = isNaN(Number(materialBase)) ? null : Number(materialBase);
 
-    const productId = option.value;
+    const materialId = option.value;
 
     const quantity = Number(document.querySelector(FORM_SELECTORS.QUANTITY).value);
     const costPerUnitType = Number(document.querySelector(FORM_SELECTORS.COST_PER_UNIT).value);
-    const errors = validateFields(validateAddGoodsReceiptProductValidators, {
-        productId,
+    const errors = validateFields(validateAddGoodsReceiptMaterialValidators, {
+        materialId,
         quantity,
         costPerUnitType
     });
@@ -236,16 +236,16 @@ const addProduct = () => {
     const netPurchaseAmount = roundTo(quantity * costPerUnitType);
     let convertedQuantity;
 
-    if (!productBase || !productHeight) convertedQuantity = quantity;
-    else convertedQuantity = roundTo(productBase * productHeight * quantity);
+    if (!materialBase || !materialHeight) convertedQuantity = quantity;
+    else convertedQuantity = roundTo(materialBase * materialHeight * quantity);
 
     const conversionUnitCost = roundTo(netPurchaseAmount / convertedQuantity);
     const grossPurchaseAmount = roundTo(netPurchaseAmount * 1.16);
-    const product = {
-        productId,
-        productName,
-        productBase,
-        productHeight,
+    const material = {
+        materialId,
+        materialName,
+        materialBase,
+        materialHeight,
         quantity,
         unitMeasureName,
         presentationName,
@@ -256,10 +256,10 @@ const addProduct = () => {
         convertedQuantity,
         supplierName,
     };
-    details.push(product);
+    details.push(material);
 
-    refreshProductTable(details);
-    clearAddedProductInput();
+    refreshMaterialTable(details);
+    clearAddedMaterialInput();
 
     updateTotals({
         quantity,
@@ -269,9 +269,9 @@ const addProduct = () => {
     });
 }
 
-on('click', '#addProductBtn', addProduct);
+on('click', '#addMaterialBtn', addMaterial);
 
-on('click', '#productTable .correct-detail-btn', (event, button) => {
+on('click', '#materialTable .correct-detail-btn', (event, button) => {
     const detail = details.find(item => item.id === button.dataset.id);
 
     if (!detail || !currentGoodsReceipt) return;
@@ -283,7 +283,7 @@ on('click', '#productTable .correct-detail-btn', (event, button) => {
 });
 
 
-on('click', '#productTable .cancel-receipt-detail-btn', async (event, button) => {
+on('click', '#materialTable .cancel-receipt-detail-btn', async (event, button) => {
     const detail = details.find(item => item.id === button.dataset.id);
 
     if (!detail || !currentGoodsReceipt) return;
@@ -336,7 +336,7 @@ on(GOODS_RECEIPT_CORRECTION_APPLIED_EVENT, '#goodsReceiptCorrectionModal', (even
         setGoodsReceiptViewMode({ form, modalElement, receipt: currentGoodsReceipt });
         initDetailsGoodsReceiptTable(FORM_MODES.VIEW);
     } else {
-        refreshProductTable(details);
+        refreshMaterialTable(details);
     }
 
     setTotals({
