@@ -1,5 +1,5 @@
 import { findMovementReportRows } from "../../../services/inventory/reportService.js";
-import { findAllProfiles } from "../../../services/admin/profileService.js";
+import { findAllProfiles } from "../../../services/admin/profile/profileService.js";
 import { findAllUsers } from "../../../services/admin/userService.js";
 import { getDataTableOrder, getDataTableSearch } from "../../../utils/requestQueryUtils.js";
 import { getMexicoMonthDateRange } from "../../../utils/formattersUtils.js";

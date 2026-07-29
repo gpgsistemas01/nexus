@@ -85,7 +85,7 @@ const cleanupWasteIssueData = async () => {
   await prisma.supplier.deleteMany({ where: { id: { in: suppliers.map(({ id }) => id) } } });
   await prisma.stockAdjustmentReason.deleteMany({ where: { id: { in: reasons.map(({ id }) => id) } } });
   await prisma.client.deleteMany({ where: { id: { in: clients.map(({ id }) => id) } } });
-  await prisma.departmentProfile.deleteMany({ where: { OR: [{ profileId: { in: profiles.map(({ id }) => id) } }, { departmentId: { in: departments.map(({ id }) => id) } }] } });
+  await prisma.profileRoleDepartment.deleteMany({ where: { OR: [{ profileId: { in: profiles.map(({ id }) => id) } }, { departmentId: { in: departments.map(({ id }) => id) } }] } });
   await prisma.profile.deleteMany({ where: { id: { in: profiles.map(({ id }) => id) } } });
   await prisma.department.deleteMany({ where: { id: { in: departments.map(({ id }) => id) } } });
   await prisma.user.deleteMany({ where: { id: { in: users.map(({ id }) => id) } } });

@@ -18,12 +18,13 @@ import { createServiceLogger, getModelLogContext, logServiceError, logServiceInf
 const serviceLogger = createServiceLogger('warehouse.goodsIssues.goodsIssueService');
 
 import { getDb } from "../../../repository/baseRepository.js";
-import { findProfileById, findProfileWithDepartmentsById } from "../../admin/profileService.js";
+import { findProfileById } from "../../admin/profile/profileService.js";
+import { isValidInternalClientAdvisor } from "../../admin/profile/profileRules.js";
 import { findDepartmentById } from "../../admin/departmentService.js";
 import { generateYearlyReferenceNumber } from "../../document/referenceNumberService.js";
 import { findClientById } from "../../sales/clientService.js";
 import { findFulfillmentStatusIdByName, findFulfillmentStatusIdsByName } from "../fulfillmentStatusService.js";
-import { buildGoodsIssueDetails, isValidInternalClientAdvisor, isValidInternalClientProjectNumberByDepartment, resolveFulfillmentStatus } from "./goodsIssueHelpers.js";
+import { buildGoodsIssueDetails, isValidInternalClientProjectNumberByDepartment, resolveFulfillmentStatus } from "./goodsIssueHelpers.js";
 import { applyInventoryMovement } from "../../inventory/movementService.js";
 import { normalizeDecimal } from "../../../utils/formattersUtils.js";
 import { isAppError } from "../../../errors/AppError.js";
@@ -51,7 +52,7 @@ const resolveGoodsIssueHeaderData = async ({ requesterId, advisorId, departmentI
 
     if (!requester) throw new GoodsIssueRequesterProfileNotFound();
 
-    const advisor = await findProfileWithDepartmentsById({ id: advisorId });
+    const advisor = await findProfileById({ id: advisorId, includeAccesses: true });
 
     if (!advisor) throw new GoodsIssueAdvisorProfileNotFound();
 

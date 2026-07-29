@@ -2,26 +2,14 @@ import { MaterialNotFound } from "../../../errors/warehouse/materialError.js";
 import { GoodsIssueMissingMaxUnitCost } from "../../../errors/inventory/stockError.js";
 import { buildStockKey, normalizeText } from "../../../utils/formattersUtils.js";
 import { calculateConvertedQuantity } from "../../inventory/stockHelpers.js";
-import { profileHasRole } from "../../admin/profileService.js";
-import { findSupplierMaterialsSnapshot } from "../materials/supplierMaterialService.js";
+import { findSupplierProductsSnapshot } from "../products/supplierProductService.js";
 import { FULFILLMENT_STATUS_NAMES } from "../../../constants/warehouseStatuses.js";
-import { ROLE_NAMES } from "../../../constants/roles.js";
 import { INTERNAL_CLIENT_NAME, PROJECT_NUMBER_BY_DEPARTMENT } from "../../../constants/goodsIssueRules.js";
 
 const FLOAT_EPSILON = 0.000001;
 export const isInternalClient = (client) => (
     normalizeText(client?.name || '') === normalizeText(INTERNAL_CLIENT_NAME)
 );
-
-export const isValidInternalClientAdvisor = ({ client, advisor }) => {
-
-    if (!isInternalClient(client)) return true;
-
-    return profileHasRole({
-        profile: advisor,
-        roleName: ROLE_NAMES.COORDINATOR
-    });
-};
 
 export const isValidInternalClientProjectNumberByDepartment = ({ client, department, projectNumber = '' }) => {
 

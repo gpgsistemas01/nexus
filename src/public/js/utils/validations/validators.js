@@ -157,6 +157,7 @@ export const profileValidators = {
         fieldName: 'El nombre',
         regex: /^[\p{L}0-9]+(?:[ '\-.,:;()¿?¡!][\p{L}0-9]+)*[.,:;()¿?¡!]*$/u
     }),
+    roleId: (value) => isEmptyOrNull(value, 'El rol'),
     departments: (value) => {
 
         if (!Array.isArray(value) || !value.length) return 'Seleccione al menos un departamento';

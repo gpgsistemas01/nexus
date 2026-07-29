@@ -38,7 +38,7 @@ export default async function teardownTestDatabase() {
     }
   });
   await prisma.user.deleteMany({ where: { id: { in: adminUsers.map(({ id }) => id) } } });
-  await prisma.departmentProfile.deleteMany({
+  await prisma.profileRoleDepartment.deleteMany({
     where: {
       OR: [
         { profileId: { in: adminProfiles.map(({ id }) => id) } },
@@ -126,7 +126,7 @@ export default async function teardownTestDatabase() {
   await prisma.supplier.deleteMany({ where: { id: { in: wasteIssueSuppliers.map(({ id }) => id) } } });
   await prisma.stockAdjustmentReason.deleteMany({ where: { id: { in: wasteIssueReasons.map(({ id }) => id) } } });
   await prisma.client.deleteMany({ where: { id: { in: wasteIssueClients.map(({ id }) => id) } } });
-  await prisma.departmentProfile.deleteMany({ where: { OR: [{ profileId: { in: wasteIssueProfiles.map(({ id }) => id) } }, { departmentId: { in: wasteIssueDepartments.map(({ id }) => id) } }] } });
+  await prisma.profileRoleDepartment.deleteMany({ where: { OR: [{ profileId: { in: wasteIssueProfiles.map(({ id }) => id) } }, { departmentId: { in: wasteIssueDepartments.map(({ id }) => id) } }] } });
   await prisma.profile.deleteMany({ where: { id: { in: wasteIssueProfiles.map(({ id }) => id) } } });
   await prisma.department.deleteMany({ where: { id: { in: wasteIssueDepartments.map(({ id }) => id) } } });
   await prisma.user.deleteMany({ where: { id: { in: wasteIssueUsers.map(({ id }) => id) } } });

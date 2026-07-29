@@ -1,6 +1,6 @@
 import { createProfileDTO } from "../../../dtos/profileDTO.js";
 import { successCodeMessages } from "../../../messages/codeMessages.js";
-import { createProfile, findAllProfiles, updateProfile } from "../../../services/admin/profileService.js";
+import { createProfile, findAllProfiles, updateProfile } from "../../../services/admin/profile/profileService.js";
 import { sanitizeEmptyStrings } from "../../../utils/formattersUtils.js";
 import { getDataTableOrder, getDataTablePaging, getDataTableSearch } from "../../../utils/requestQueryUtils.js";
 

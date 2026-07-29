@@ -8,9 +8,9 @@ datasource db {
 }
 
 model Department {
-  id                   String                @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name                 String                @unique @db.VarChar(50)
-  profiles             DepartmentProfile[]
+  id                   String                  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name                 String                  @unique @db.VarChar(50)
+  profileAccesses      ProfileRoleDepartment[]
   accesses             UserRoleDepartment[]
   purchaseRequisitions PurchaseRequisition[]
   goodsIssues          GoodsIssue[]
@@ -18,9 +18,10 @@ model Department {
 }
 
 model Role {
-  id       String               @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name     String               @unique @db.VarChar(50)
-  accesses UserRoleDepartment[]
+  id              String                  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name            String                  @unique @db.VarChar(50)
+  accesses        UserRoleDepartment[]
+  profileAccesses ProfileRoleDepartment[]
 }
 
 model User {
@@ -50,30 +51,32 @@ model UserRoleDepartment {
 }
 
 model Profile {
-  id                            String                @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  fullName                      String                @db.VarChar(255)
-  isActive                      Boolean               @default(true)
+  id                            String                  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  fullName                      String                  @db.VarChar(255)
+  isActive                      Boolean                 @default(true)
   goodsReceipts                 GoodsReceipt[]
-  departments                   DepartmentProfile[]
+  accesses                      ProfileRoleDepartment[]
   users                         User[]
-  approverPurchaseRequisitions  PurchaseRequisition[] @relation("ApproverRelation")
-  requesterPurchaseRequisitions PurchaseRequisition[] @relation("RequesterRelation")
-  approverGoodsIssues           GoodsIssue[]          @relation("ApproverGoodsIssueRelation")
-  requesterGoodsIssues          GoodsIssue[]          @relation("RequesterGoodsIssueRelation")
-  warehouseStaffGoodsIssues     GoodsIssue[]          @relation("WarehouseStaffGoodsIssueRelation")
-  deliveredPurchaseRequisitions PurchaseRequisition[] @relation("DeliveredByRelation")
+  approverPurchaseRequisitions  PurchaseRequisition[]   @relation("ApproverRelation")
+  requesterPurchaseRequisitions PurchaseRequisition[]   @relation("RequesterRelation")
+  approverGoodsIssues           GoodsIssue[]            @relation("ApproverGoodsIssueRelation")
+  requesterGoodsIssues          GoodsIssue[]            @relation("RequesterGoodsIssueRelation")
+  warehouseStaffGoodsIssues     GoodsIssue[]            @relation("WarehouseStaffGoodsIssueRelation")
+  deliveredPurchaseRequisitions PurchaseRequisition[]   @relation("DeliveredByRelation")
   clients                       Client[]
   goodsIssues                   GoodsIssue[]
 }
 
-model DepartmentProfile {
+model ProfileRoleDepartment {
   departmentId String @db.Uuid
   profileId    String @db.Uuid
+  roleId       String @db.Uuid
 
   department Department @relation(fields: [departmentId], references: [id])
   profile    Profile    @relation(fields: [profileId], references: [id])
+  role       Role       @relation(fields: [roleId], references: [id])
 
-  @@id([departmentId, profileId])
+  @@id([profileId, roleId, departmentId])
 }
 
 model Status {
