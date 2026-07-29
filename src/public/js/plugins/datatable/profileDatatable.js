@@ -8,6 +8,7 @@ import { getResponsiveRowData } from "./utils/responsive.js";
 import { setupTableFilters } from "./utils/filters/tableFilter.js";
 import { getSelectedDepartmentName } from "../select2/domains/department.js";
 import { DATATABLE_SELECTORS } from "../../constants/selectors.js";
+import { buildMdbActionButton } from "../mdb/actionButton.js";
 
 const selector = DATATABLE_SELECTORS.MAIN;
 
@@ -103,11 +104,16 @@ export const initProfileAccessTable = (accesses = []) => {
                 {
                     data: null,
                     title: 'Acciones',
-                    render: (data, type, row, meta) => `
-                        <button type="button" class="btn btn-outline-danger btn-sm delete-btn" data-index="${ meta.row }">
-                            Eliminar
-                        </button>
-                    `
+                    render: (data, type, row, meta) => buildMdbActionButton({
+                        className: 'delete-btn',
+                        colorClass: 'btn-danger',
+                        iconClass: 'fa-solid fa-trash',
+                        title: 'Eliminar acceso',
+                        ariaLabel: `Eliminar acceso de ${ row.departmentName } con rol ${ row.roleName }`,
+                        htmlAttrs: {
+                            'data-index': meta.row
+                        }
+                    })
                 }
             ]
         }

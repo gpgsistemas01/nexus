@@ -1669,30 +1669,46 @@ body section {
   pointer-events: none;
 }
 
-/* refinements for form controls and table actions */
-.add-material-container > div {
-    min-width: 0;
+/* Shared layout for controls placed above modal detail tables */
+.modal-detail-controls {
+  background: rgba(255, 255, 255, 0.78);
+  border: 1px solid rgba(var(--mdb-primary-rgb), 0.12);
+  border-radius: 0.85rem;
+  margin-block: 0.5rem 0.75rem;
+  padding: 1rem;
 }
 
-.add-material-container .form-outline,
-.add-material-container .form-select {
-    width: 100%;
+.modal-detail-controls > .row {
+  justify-content: center;
 }
 
-.add-material-container .btn {
-    width: 100%;
-    min-height: 48px;
+.modal-detail-controls > .row > div {
+  min-width: 0;
 }
 
-.add-material-container .form-outline .form-control,
-.add-material-container .form-outline .form-select {
-    min-height: 48px;
+.modal-detail-controls .form-outline,
+.modal-detail-controls .form-select,
+.modal-detail-controls .select2-container,
+.modal-detail-controls .btn {
+  width: 100%;
+}
+
+.modal-detail-controls .form-control,
+.modal-detail-controls .form-select,
+.modal-detail-controls .select2-selection--single,
+.modal-detail-controls .btn {
+  min-height: 48px;
 }
 
 @media (max-width: 767.98px) {
-    .add-material-container > div {
-        width: 100%;
-    }
+  .modal-detail-controls {
+    border-radius: 0.7rem;
+    padding: 0.75rem;
+  }
+
+  .modal-detail-controls > .row > div {
+    width: 100%;
+  }
 }
 .table.datatable-table td:has(.table-action-btn),
 table.dataTable.datatable-table td:has(.table-action-btn),
