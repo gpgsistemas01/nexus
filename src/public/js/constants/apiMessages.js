@@ -278,6 +278,7 @@ export const errorMessages = {
 
     // Documento / folios
     REFERENCE_NUMBER_UPDATE_DB_ERROR: 'Error de base de datos al actualizar el folio.',
+    REFERENCE_NUMBER_ALREADY_EXISTS: 'El folio generado ya existe. Intenta realizar la operación nuevamente.',
     MOVEMENT_FIND_DATABASE_ERROR: 'Error de base de datos al buscar el movmiento.'
 };
 
