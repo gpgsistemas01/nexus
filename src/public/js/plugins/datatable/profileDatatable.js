@@ -96,7 +96,7 @@ export const initProfileAccessTable = (accesses = []) => {
             data: profileAccesses,
             paging: false,
             searching: false,
-            info: false,
+            dom: 'rtip',
             language: { emptyTable: 'No se han agregado accesos.' },
             columns: [
                 { data: 'departmentName', title: 'Área' },
