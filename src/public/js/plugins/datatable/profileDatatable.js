@@ -22,7 +22,7 @@ export const createProfilesDatatable = async ({ canManageProfiles = false } = {}
             ajax: {
                 get: (data) => getAllProfiles({
                     ...data,
-                    includeDepartments: true,
+                    includeAccesses: true,
                     department: getSelectedDepartmentName(),
                     strictDepartmentFilter: Boolean(filters.getValues().departmentId)
                 })
@@ -30,10 +30,12 @@ export const createProfilesDatatable = async ({ canManageProfiles = false } = {}
             searchPlaceholder: 'Buscar por Nombre',
             columns: [
                 { data: 'fullName', title: 'Nombre' },
-                { 
-                    data: 'departments',
-                    title: 'Áreas',
-                    render: (data) => data.map(d => d.name).join(', ')
+                {
+                    data: 'accesses',
+                    title: 'Accesos (área / rol)',
+                    render: (data) => data.map(access =>
+                        `${ access.department.name } — ${ access.role.name }`
+                    ).join('<br>')
                 },
                 {
                     data: null,
@@ -50,7 +52,7 @@ export const createProfilesDatatable = async ({ canManageProfiles = false } = {}
                     filename: formatFileName('reporte_perfiles'),
                     allowMonthlyReport: false,
                     request: () => exportProfileReport(buildTableExportParams(table, {
-                        includeDepartments: true,
+                        includeAccesses: true,
                         department: getSelectedDepartmentName(),
                         strictDepartmentFilter: Boolean(filters.getValues().departmentId)
                     }))

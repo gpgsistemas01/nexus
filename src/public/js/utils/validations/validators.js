@@ -157,15 +157,22 @@ export const profileValidators = {
         fieldName: 'El nombre', 
         regex: /^[\p{L}0-9]+(?:[ '\-.,:;()¿?¡!][\p{L}0-9]+)*[.,:;()¿?¡!]*$/u 
     }),
-    roleId: (value) => isEmptyOrNull(value, 'El rol'),
-    departments: (value) => {
-
-        if (!Array.isArray(value) || !value.length) return 'Seleccione al menos un departamento';
-
-        const hasInvalid = value.some(department => isEmptyOrNull(department));
-
-        if (hasInvalid) return 'Todos los departamentos seleccionados deben ser válidos';
+    accesses: (value) => {
+        if (!Array.isArray(value) || !value.length) {
+            return 'Seleccione un área y un rol, y presione Agregar para incluir el acceso en la tabla';
+        }
+        if (value.some(access => !access.departmentId || !access.roleId)) {
+            return 'Revise la tabla y complete el área y el rol de cada acceso antes de guardar';
+        }
+        if (new Set(value.map(access => access.departmentId)).size !== value.length) {
+            return 'Elimine el área repetida de la tabla; cada área solo puede tener un rol dentro del perfil';
+        }
 
         return null;
     },
 }
+
+export const profileAccessValidators = {
+    departmentId: value => isEmptyOrNull(value, 'El área'),
+    roleId: value => isEmptyOrNull(value, 'El rol')
+};
