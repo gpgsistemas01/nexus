@@ -161,8 +161,8 @@ const modalDialogClass = typeof dialogClass !== 'undefined' ? dialogClass : 'mod
                 <% } %>
 
                 <% if (form.table) { %>
-                    <div class="col-12 mb-3 <%= form.table.containerClass || 'add-product-container' %>">
-                        <% if (form.table.includeProductControls === false) { %>
+                    <div class="col-12 mb-3 modal-detail-controls <%= form.table.containerClass || 'add-material-container' %>">
+                        <% if (form.table.includeMaterialControls === false) { %>
                             <div class="row g-3 align-items-end">
                                 <%- include('./selectList', { inputs: form.table.selects }) %>
                                 <div class="<%= form.table.button.col || 'col-12' %>">
@@ -188,7 +188,7 @@ const modalDialogClass = typeof dialogClass !== 'undefined' ? dialogClass : 'mod
                                 </div>
 
                                 <div class="col-12 col-md-2 col-lg-2">
-                                    <%- include('./button', { button: buttons.addProductButton }) %>
+                                    <%- include('./button', { button: buttons.addMaterialButton }) %>
                                 </div>
                             </div>
                         <% } %>
