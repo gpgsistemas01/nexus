@@ -1,5 +1,5 @@
 import { openPurchaseRequisitionModal } from "../../pages/warehouse/purchaseRequisitionsPage.js";
-import { createDataTable, refreshProductTable, renderActionButtons } from "./baseDatatable.js";
+import { createDataTable, refreshProductTable, renderActionButtons, resetDataTable } from "./baseDatatable.js";
 import { PURCHASE_REQUISITIONS_API_ROUTE } from "../../services/warehouse/purchaseRequisitionService.js";
 import { hasPermission } from "../../utils/permissions.js";
 import { getResponsiveRowData } from "./utils/responsive.js";
@@ -98,10 +98,7 @@ export const createPurchaseRequisitionDatatable = (context) => {
 
 export const initDetailsPurchaseRequisitionTable = (mode) => {
 
-    if ($.fn.DataTable.isDataTable(selectorProductTable)) {
-        $(selectorProductTable).DataTable().clear().destroy();
-        $(selectorProductTable).empty();
-    }
+    resetDataTable(selectorProductTable);
 
     const columns = [
         { data: 'name', title: 'Producto' },

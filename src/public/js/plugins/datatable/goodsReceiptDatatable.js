@@ -1,10 +1,10 @@
 import { openGoodsReceiptModal } from "../../pages/warehouse/goodsReceiptsPage.js";
-import { createDataTable, renderActionButtons } from "./baseDatatable.js";
+import { createDataTable, renderActionButtons, resetDataTable } from "./baseDatatable.js";
 import { getAllGoodsReceipts } from "../../application/warehouse/goodsReceipts.js";
 import { exportGoodsReceiptReport } from "../../application/warehouse/report.js";
 import { initMdbWrapperInput, updateMdbWrapperInput } from "../mdb/baseInstance.js";
 import { buildDetailsColumns, buildDetailsHeader } from "./utils/builderDetailDatatable.js";
-import { handleDelete, renderMaterialName } from "./utils/renderProductDatatable.js";
+import { handleDelete, renderMaterialName } from "./utils/detailDatatableUtils.js";
 import { getResponsiveRowData } from "./utils/responsive.js";
 import { buildExcelButton, buildTableExportParams } from "../../ui/tableUI.js";
 import { formatDateTimeDisplay, formatFileName } from "../../utils/formatters.js";
@@ -119,10 +119,7 @@ export const initDetailsGoodsReceiptTable = (mode) => {
 
     const table = document.querySelector(selectorProductTable);
 
-    if ($.fn.DataTable.isDataTable(selectorProductTable)) {
-        $(selectorProductTable).DataTable().clear().destroy();
-        $(selectorProductTable).empty();
-    }
+    resetDataTable(selectorProductTable);
 
     table.innerHTML = buildDetailsHeader({
         type: 'receipt',

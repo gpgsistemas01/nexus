@@ -8,7 +8,7 @@ const serviceLogger = createServiceLogger('admin.profileService');
 export const findAllProfiles = async ({
     departments = [],
     roles = [],
-    includeDepartments = false,
+    includeAccesses = false,
     skip = 0,
     take = 10,
     search = '',
@@ -58,7 +58,7 @@ export const findAllProfiles = async ({
             select: {
                 id: true,
                 fullName: true,
-                ...(includeDepartments && {
+                ...(includeAccesses && {
                     accesses: {
                         select: {
                             department: true,
@@ -72,17 +72,8 @@ export const findAllProfiles = async ({
         db.profile.count({ where })
     ]);
 
-    const profiles = includeDepartments ? foundProfiles.map(({ accesses, ...profile }) => ({
-        ...profile,
-        departments: [...new Map(accesses.map(access => (
-            [access.department.id, access.department]
-        ))).values()],
-        roleId: accesses[0]?.role?.id || null,
-        roleName: accesses[0]?.role?.name || null
-    })) : foundProfiles;
-
     return {
-        data: profiles,
+        data: foundProfiles,
         recordsTotal: total,
         recordsFiltered: filtered
     };
@@ -117,9 +108,9 @@ export const findProfileById = ({ tx, id, includeAccesses = false }) => findActi
     select: includeAccesses ? PROFILE_WITH_ACCESSES_SELECT : DEFAULT_PROFILE_SELECT
 });
 
-const buildAccessData = ({ departments = [], roleId }) => departments.map(departmentId => ({
-    roleId,
-    departmentId
+const buildAccessData = ({ accesses = [] }) => accesses.map(({ departmentId, roleId }) => ({
+    departmentId,
+    roleId
 }));
 
 export const createProfile = async ({ profileDto }) => {
