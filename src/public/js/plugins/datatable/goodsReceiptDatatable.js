@@ -119,7 +119,7 @@ export const initDetailsGoodsReceiptTable = (mode) => {
 
     const table = document.querySelector(selectorMaterialTable);
 
-    resetDataTable(selectorProductTable);
+    resetDataTable(selectorMaterialTable);
 
     table.innerHTML = buildDetailsHeader({
         type: 'receipt',

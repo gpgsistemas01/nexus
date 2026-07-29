@@ -129,7 +129,7 @@ export const initDetailsGoodsIssueTable = (mode, context) => {
 
     const { isWarehouse, isSystem, hasRole } = hasPermission(context);
 
-    resetDataTable(selectorProductTable);
+    resetDataTable(selectorMaterialTable);
 
     const table = document.querySelector(selectorMaterialTable);
 
