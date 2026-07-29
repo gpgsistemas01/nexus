@@ -1,7 +1,7 @@
 import { updateTotals } from "../../../ui/formUI.js";
 import { MATERIAL_SELECT_RESULTS_LIMIT } from "../../../application/warehouse/materials.js";
 import { toggleContainerElements } from "../../../utils/formUtils.js";
-import { refreshMaterialTable } from "../../datatable/baseDatatable.js";
+import { refreshMaterialTable } from "../../datatable/utils/renderMaterialDatatable.js";
 import { details } from "../../datatable/goodsReceiptDatatable.js";
 import { initMdbWrapperInput, updateMdbWrapperInput } from "../../mdb/baseInstance.js";
 import { bindDisabledSelectDependency } from "../baseSelect.js";

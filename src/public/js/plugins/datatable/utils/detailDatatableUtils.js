@@ -1,7 +1,8 @@
 import { updateTotals } from "../../../ui/formUI.js";
 import { hasPermission } from "../../../utils/permissions.js";
-import { createDataTable, refreshProductTable } from "../baseDatatable.js";
+import { createDataTable } from "../baseDatatable.js";
 import { buildDetailsColumns, buildDetailsHeader } from "./builderDetailDatatable.js";
+import { refreshMaterialTable } from "./renderMaterialDatatable.js";
 
 export const renderMaterialName = (row, supplierOverride) => {
 
@@ -65,5 +66,5 @@ export const handleDelete = ({ id, details, context }) => {
         });
     }
 
-    refreshProductTable(details);
+    refreshMaterialTable(details);
 };

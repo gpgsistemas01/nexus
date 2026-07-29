@@ -1,7 +1,13 @@
 import { updateTotals } from "../../../ui/formUI.js";
 import { hasPermission } from "../../../utils/permissions.js";
-import { createDataTable, refreshMaterialTable } from "../baseDatatable.js";
+import { DATATABLE_SELECTORS } from "../../../constants/selectors.js";
+import { createDataTable, refreshDataTable } from "../baseDatatable.js";
 import { buildDetailsColumns, buildDetailsHeader } from "./builderDetailDatatable.js";
+
+export const refreshMaterialTable = data => refreshDataTable({
+    selector: DATATABLE_SELECTORS.MATERIAL,
+    data
+});
 
 export const renderMaterialName = (row, supplierOverride) => {
 

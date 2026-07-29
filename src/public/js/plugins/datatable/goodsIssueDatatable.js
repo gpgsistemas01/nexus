@@ -4,7 +4,7 @@ import { exportGoodsIssueReport } from "../../application/warehouse/report.js";
 import { hasPermission } from "../../utils/permissions.js";
 import { buildExcelButton, buildTableExportParams } from "../../ui/tableUI.js";
 import { formatDateTimeDisplay, formatFileName } from "../../utils/formatters.js";
-import { createDataTable, refreshProductTable, renderActionButtons, resetDataTable } from "./baseDatatable.js";
+import { createDataTable, renderActionButtons, resetDataTable } from "./baseDatatable.js";
 import { buildDetailsColumns, buildDetailsHeader } from "./utils/builderDetailDatatable.js";
 import { handleDelete, renderMaterialName } from "./utils/detailDatatableUtils.js";
 import { getResponsiveRowData } from "./utils/responsive.js";

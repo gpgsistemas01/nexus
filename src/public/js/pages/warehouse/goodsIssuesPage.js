@@ -1,7 +1,7 @@
 import { useForm } from "../../application/form.js";
 import { editGoodsIssue, editGoodsIssueDetails, editGoodsIssueHeader, registerGoodsIssue } from "../../application/warehouse/goodsIssues/goodsIssues.js";
 import { validateAddGoodsIssueMaterialValidators, validateGoodsIssueDetailValidators, validateGoodsIssueValidators } from "../../utils/validations/validators.js";
-import { refreshMaterialTable } from "../../plugins/datatable/baseDatatable.js";
+import { refreshMaterialTable } from "../../plugins/datatable/utils/renderMaterialDatatable.js";
 import { createGoodsIssueDatatable, details, initDetailsGoodsIssueTable } from "../../plugins/datatable/goodsIssueDatatable.js";
 import { initGoodsIssueFormSelect2, setGoodsIssueFormSelectOptions, syncGoodsIssueDependentSelectsState } from "../../plugins/select2/modules/goodsIssueSelect.js";
 import { setFormDisabled, toggleButtons, clearAddedMaterialInput, clearFormErrors, normalizeFormErrors, initForm } from "../../ui/formUI.js";

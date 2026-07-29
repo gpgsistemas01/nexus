@@ -1,5 +1,5 @@
 import { initMdbModal, showModal, initMdbWrapperInput, updateMdbWrapperInput } from '../../../plugins/mdb/baseInstance.js';
-import { refreshMaterialTable } from '../../../plugins/datatable/baseDatatable.js';
+import { refreshMaterialTable } from '../../../plugins/datatable/utils/renderMaterialDatatable.js';
 import { clearFormErrors, resetFormSubmitState } from '../../../ui/formUI.js';
 import { setSummaryValues } from '../../../ui/totalsSummaryUI.js';
 import { on } from '../../../utils/domUtils.js';

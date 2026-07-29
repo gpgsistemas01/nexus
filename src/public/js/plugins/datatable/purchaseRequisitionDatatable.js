@@ -1,11 +1,12 @@
 import { openPurchaseRequisitionModal } from "../../pages/warehouse/purchaseRequisitionsPage.js";
-import { createDataTable, refreshProductTable, renderActionButtons, resetDataTable } from "./baseDatatable.js";
+import { createDataTable, renderActionButtons, resetDataTable } from "./baseDatatable.js";
 import { PURCHASE_REQUISITIONS_API_ROUTE } from "../../services/warehouse/purchaseRequisitionService.js";
 import { hasPermission } from "../../utils/permissions.js";
 import { getResponsiveRowData } from "./utils/responsive.js";
 import { DATATABLE_SELECTORS } from "../../constants/selectors.js";
 import { formatDateTimeDisplay } from "../../utils/formatters.js";
 import { formatDecimal } from "../../utils/formatUtils.js";
+import { refreshMaterialTable } from "./utils/renderMaterialDatatable.js";
 
 export let details = [];
 const selectorMaterialTable = DATATABLE_SELECTORS.MATERIAL;
