@@ -173,6 +173,15 @@ export const profileValidators = {
 }
 
 export const profileAccessValidators = {
-    departmentId: value => isEmptyOrNull(value, 'El área'),
+    departmentId: (value, { accesses = [] } = {}) => {
+        const requiredError = isEmptyOrNull(value, 'El área');
+
+        if (requiredError) return requiredError;
+        if (accesses.some(access => access.departmentId === value)) {
+            return 'Esta área ya está en la tabla; elimine la relación existente si necesita cambiar su rol';
+        }
+
+        return null;
+    },
     roleId: value => isEmptyOrNull(value, 'El rol')
 };

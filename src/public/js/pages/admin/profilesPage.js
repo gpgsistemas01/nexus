@@ -85,11 +85,10 @@ const addProfileAccess = () => {
         roleId: role.value,
         roleName: role.options[role.selectedIndex]?.text
     };
-    const errors = validateFields(profileAccessValidators, access);
-
-    if (profileAccesses.some(item => item.departmentId === access.departmentId)) {
-        errors.departmentId = 'Esta área ya está en la tabla; elimine la relación existente si necesita cambiar su rol';
-    }
+    const errors = validateFields(profileAccessValidators, {
+        ...access,
+        accesses: profileAccesses
+    });
 
     normalizeFormErrors({
         form,

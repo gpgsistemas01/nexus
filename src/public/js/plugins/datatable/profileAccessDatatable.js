@@ -1,15 +1,13 @@
-import { createDataTable } from "./baseDatatable.js";
+import { createDataTable, refreshDataTable } from "./baseDatatable.js";
 
 const selector = '#profileAccessesTable';
 
 export const profileAccesses = [];
 
-export const refreshProfileAccessTable = () => {
-    const table = $(selector).DataTable();
-    table.clear();
-    table.rows.add(profileAccesses);
-    table.draw();
-};
+export const refreshProfileAccessTable = () => refreshDataTable({
+    selector,
+    data: profileAccesses
+});
 
 export const initProfileAccessTable = (accesses = []) => {
     profileAccesses.length = 0;

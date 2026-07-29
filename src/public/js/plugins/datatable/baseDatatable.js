@@ -140,13 +140,17 @@ export const reloadMainTable = ({ resetPaging = false } = {}) => {
     table.ajax.reload(null, resetPaging);
 }
 
-export const refreshProductTable = (details) => {
-
-    const table = $(DATATABLE_SELECTORS.PRODUCT).DataTable();
+export const refreshDataTable = ({ selector, data }) => {
+    const table = $(selector).DataTable();
     table.clear();
-    table.rows.add(details);
+    table.rows.add(data);
     table.draw();
-}
+};
+
+export const refreshProductTable = details => refreshDataTable({
+    selector: DATATABLE_SELECTORS.PRODUCT,
+    data: details
+});
 
 const DOCUMENT_STATUS_LABELS = Object.freeze({
     APPROVED: 'Aprobada',
