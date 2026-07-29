@@ -3,6 +3,7 @@ import { on } from "../../../../utils/domUtils.js";
 import { DATATABLE_SELECTORS, FILTER_SELECTORS } from "../../../../constants/selectors.js";
 import { buildTableFilterConfigs } from "./tableFilterConfigs.js";
 import { bindTableFilterDependencies } from "./tableFilterDependencies.js";
+import { SELECT_RESULTS_LIMIT } from "../../../select2/baseSelect.js";
 
 const getDataTable = (selector = DATATABLE_SELECTORS.MAIN) => {
 
@@ -79,7 +80,10 @@ export const setupTableFilters = async ({
 
         if (!select) continue;
 
-        const options = await getOptions();
+        const options = await getOptions({
+            start: 0,
+            length: SELECT_RESULTS_LIMIT
+        });
 
         select.options.length = 0;
 
