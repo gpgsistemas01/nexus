@@ -1,6 +1,6 @@
 import { useForm } from "../../application/form.js";
 import { cancelPurchaseRequisition, confirmPurchaseRequisition, editPurchaseRequisition, registerPurchaseRequisition } from "../../application/warehouse/purchaseRequisitions.js";
-import { refreshMaterialTable } from "../../plugins/datatable/baseDatatable.js";
+import { refreshMaterialTable } from "../../plugins/datatable/utils/renderMaterialDatatable.js";
 import { createPurchaseRequisitionDatatable, details, initDetailsPurchaseRequisitionTable } from "../../plugins/datatable/purchaseRequisitionDatatable.js";
 import { initPurchaseRequisitionFormSelect2 } from "../../plugins/select2/modules/purchaseRequisitionSelect.js";
 import { setFormDisabled, toggleButtons, clearFormErrors, normalizeFormErrors, clearAddedMaterialInput, initForm } from "../../ui/formUI.js";

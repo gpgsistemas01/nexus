@@ -2,7 +2,7 @@ import { useForm } from "../../application/form.js";
 import { editGoodsReceiptHeader, registerGoodsReceipt, cancelGoodsReceiptDetail } from "../../application/warehouse/goodsReceipts.js";
 import { handleApiError } from "../../api/errorHandler.js";
 import { validateAddGoodsReceiptMaterialValidators, validateGoodsReceiptValidators } from "../../utils/validations/validators.js";
-import { refreshMaterialTable } from "../../plugins/datatable/baseDatatable.js";
+import { refreshMaterialTable } from "../../plugins/datatable/utils/renderMaterialDatatable.js";
 import { createGoodsReceiptDatatable, details, initDetailsGoodsReceiptTable } from "../../plugins/datatable/goodsReceiptDatatable.js";
 import { GOODS_RECEIPT_SUPPLIER_CHANGED_EVENT, initGoodsReceiptFormSelect2, setGoodsReceiptFormSelectOptions } from "../../plugins/select2/modules/goodsReceiptSelect.js";
 import { setFormDisabled, setTotals, updateTotals, toggleButtons, clearAddedMaterialInput, toggleInvoiceInput, clearFormErrors, normalizeFormErrors, initForm } from "../../ui/formUI.js";
