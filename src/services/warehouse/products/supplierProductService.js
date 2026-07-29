@@ -272,7 +272,7 @@ export const findSupplierProductById = async ({
     return mapSupplierProduct(supplierProduct);
 };
 
-export const findSupplierProductsSnapshot = async ({
+export const findSupplierMaterialsSnapshot = async ({
     tx,
     pairs
 }) => {

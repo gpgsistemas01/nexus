@@ -39,6 +39,8 @@ export const runAfterSelect2Close = ({ selector, action }) => {
     $select.select2('close');
 };
 
+export const clearSelectValue = selector => $(selector).val(null).trigger('change');
+
 export const initbaseSelect2 = ({ 
     baseSelector, 
     containerSelector,

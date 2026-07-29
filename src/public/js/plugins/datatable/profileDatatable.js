@@ -1,7 +1,7 @@
 import { getAllProfiles } from "../../application/admin/profiles.js";
 import { exportProfileReport } from "../../application/admin/report.js";
 import { openProfileModal } from "../../pages/admin/profilesPage.js";
-import { createDataTable, renderActionButtons } from "./baseDatatable.js";
+import { createDataTable, refreshDataTable, renderActionButtons, resetDataTable } from "./baseDatatable.js";
 import { buildExcelButton, buildTableExportParams } from "../../ui/tableUI.js";
 import { formatFileName } from "../../utils/formatters.js";
 import { getResponsiveRowData } from "./utils/responsive.js";
@@ -22,7 +22,7 @@ export const createProfilesDatatable = async ({ canManageProfiles = false } = {}
             ajax: {
                 get: (data) => getAllProfiles({
                     ...data,
-                    includeDepartments: true,
+                    includeAccesses: true,
                     department: getSelectedDepartmentName(),
                     strictDepartmentFilter: Boolean(filters.getValues().departmentId)
                 })
@@ -30,10 +30,12 @@ export const createProfilesDatatable = async ({ canManageProfiles = false } = {}
             searchPlaceholder: 'Buscar por Nombre',
             columns: [
                 { data: 'fullName', title: 'Nombre' },
-                { 
-                    data: 'departments',
-                    title: 'Áreas',
-                    render: (data) => data.map(d => d.name).join(', ')
+                {
+                    data: 'accesses',
+                    title: 'Accesos (área / rol)',
+                    render: (data) => data.map(access =>
+                        `${ access.department.name } — ${ access.role.name }`
+                    ).join('<br>')
                 },
                 {
                     data: null,
@@ -50,7 +52,7 @@ export const createProfilesDatatable = async ({ canManageProfiles = false } = {}
                     filename: formatFileName('reporte_perfiles'),
                     allowMonthlyReport: false,
                     request: () => exportProfileReport(buildTableExportParams(table, {
-                        includeDepartments: true,
+                        includeAccesses: true,
                         department: getSelectedDepartmentName(),
                         strictDepartmentFilter: Boolean(filters.getValues().departmentId)
                     }))
@@ -66,3 +68,53 @@ export const createProfilesDatatable = async ({ canManageProfiles = false } = {}
         openProfileModal({ mode: 'edit', data });
     });
 }
+
+const profileAccessTableSelector = '#profileAccessesTable';
+
+export const profileAccesses = [];
+
+export const refreshProfileAccessTable = () => refreshDataTable({
+    selector: profileAccessTableSelector,
+    data: profileAccesses
+});
+
+export const initProfileAccessTable = (accesses = []) => {
+    profileAccesses.length = 0;
+    profileAccesses.push(...accesses.map(access => ({
+        departmentId: access.department.id,
+        departmentName: access.department.name,
+        roleId: access.role.id,
+        roleName: access.role.name
+    })));
+
+    resetDataTable(profileAccessTableSelector);
+
+    createDataTable({
+        selector: profileAccessTableSelector,
+        options: {
+            data: profileAccesses,
+            paging: false,
+            searching: false,
+            info: false,
+            language: { emptyTable: 'No se han agregado accesos.' },
+            columns: [
+                { data: 'departmentName', title: 'Área' },
+                { data: 'roleName', title: 'Rol' },
+                {
+                    data: null,
+                    title: 'Acciones',
+                    render: (data, type, row, meta) => `
+                        <button type="button" class="btn btn-outline-danger btn-sm delete-btn" data-index="${ meta.row }">
+                            Eliminar
+                        </button>
+                    `
+                }
+            ]
+        }
+    });
+};
+
+$(profileAccessTableSelector).on('click', '.delete-btn', function() {
+    profileAccesses.splice($(this).data('index'), 1);
+    refreshProfileAccessTable();
+});
