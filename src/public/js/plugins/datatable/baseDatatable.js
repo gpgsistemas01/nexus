@@ -57,6 +57,7 @@ export const createDataTable = ({ selector = DATATABLE_SELECTORS.MAIN, options =
         initComplete,
         drawCallback,
         language = {},
+        dom = "<'datatable-toolbar'Bf>rtip",
         searchPlaceholder = 'Buscar en la tabla',
         responsive = true,
         autoWidth = false,
@@ -89,7 +90,7 @@ export const createDataTable = ({ selector = DATATABLE_SELECTORS.MAIN, options =
                 });
             }
         } : undefined,
-        dom: "<'datatable-toolbar'Bf>rtip",
+        dom,
         language: {
             url: "https://cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json",
             searchPlaceholder: resolvedSearchPlaceholder,
