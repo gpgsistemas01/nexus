@@ -1,5 +1,5 @@
 import { getDb } from "../../repository/baseRepository.js";
-import { generateYearlyReferenceNumber } from "../document/referenceNumberService.js";
+import { generateYearlyReferenceNumber, throwIfReferenceNumberAlreadyExists } from "../document/referenceNumberService.js";
 import { normalizeDecimal, toNumber } from "../../utils/formattersUtils.js";
 import { assertSufficientStock, calculateConvertedQuantity } from "../inventory/stockHelpers.js";
 import { adjustSupplierMaterialStock, findSupplierMaterialByIds } from "./materials/supplierMaterialService.js";
@@ -111,6 +111,8 @@ export const createStockAdjustment = async ({
     returnAdjustment = false
 }) => {
 
+    let referenceNumber = null;
+
     const execute = async (transaction) => {
 
         const material = await findSupplierMaterialByIds({
@@ -119,7 +121,7 @@ export const createStockAdjustment = async ({
             supplierId
         });
 
-        const referenceNumber = await generateYearlyReferenceNumber({ type: DOCUMENT_REFERENCE_TYPES.STOCK_ADJUSTMENT, tx: transaction });
+        referenceNumber = await generateYearlyReferenceNumber({ type: DOCUMENT_REFERENCE_TYPES.STOCK_ADJUSTMENT, tx: transaction });
 
         const materialName = material.name;
         const supplierName = material.supplier?.tradeName || '';
@@ -214,9 +216,14 @@ export const createStockAdjustment = async ({
         return returnAdjustment ? adjustment : updatedSupplierMaterial;
     };
 
-    if (tx) return execute(tx);
+    try {
+        if (tx) return await execute(tx);
 
-    return getDb().$transaction(execute);
+        return await getDb().$transaction(execute);
+    } catch (err) {
+        throwIfReferenceNumberAlreadyExists({ err, referenceNumber });
+        throw err;
+    }
 };
 
 export const createStockAdjustmentByQuantityChange = async ({

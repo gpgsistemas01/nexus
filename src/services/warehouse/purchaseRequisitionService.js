@@ -12,7 +12,7 @@ import { createServiceLogger, getModelLogContext, logServiceError, logServiceInf
 const serviceLogger = createServiceLogger('warehouse.purchaseRequisitionService');
 
 import { getDb } from "../../repository/baseRepository.js";
-import { generateYearlyReferenceNumber } from "../document/referenceNumberService.js";
+import { generateYearlyReferenceNumber, throwIfReferenceNumberAlreadyExists } from "../document/referenceNumberService.js";
 import { ROLE_NAMES } from "../../constants/roles.js";
 import { PURCHASE_REQUISITION_STATUS_NAMES } from "../../constants/warehouseStatuses.js";
 import { DOCUMENT_REFERENCE_TYPES } from "../../constants/documentReferenceTypes.js";
@@ -158,6 +158,8 @@ export const createPurchaseRequisition = async ({
     userId
 }) => {
 
+    let referenceNumber = null;
+
     try {
 
         const { projectId, details, ...purchaseRequisitionData } = purchaseRequisitionDto;
@@ -166,7 +168,7 @@ export const createPurchaseRequisition = async ({
 
         const result = await getDb().$transaction(async (tx) => {
 
-            const referenceNumber = await generateYearlyReferenceNumber({ type: DOCUMENT_REFERENCE_TYPES.PURCHASE_REQUISITION, tx });
+            referenceNumber = await generateYearlyReferenceNumber({ type: DOCUMENT_REFERENCE_TYPES.PURCHASE_REQUISITION, tx });
 
             const purchaseRequisition = await tx.purchaseRequisition.create({
                 data: {
@@ -226,6 +228,7 @@ export const createPurchaseRequisition = async ({
             ...getModelLogContext('purchaseRequisition', { userId, ...purchaseRequisitionDto })
         }, 'Error específico al crear requisición en transacción');
 
+        throwIfReferenceNumberAlreadyExists({ err, referenceNumber });
         throw err;
     }
 };
