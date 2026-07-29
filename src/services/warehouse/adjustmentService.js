@@ -7,6 +7,8 @@ import { INVENTORY_MOVEMENT_TYPES, STOCK_ADJUSTMENT_STATUS_NAMES, STOCK_ADJUSTME
 import { DOCUMENT_REFERENCE_TYPES } from "../../constants/documentReferenceTypes.js";
 import { createInventoryMovement } from "../inventory/movementService.js";
 import { buildInventoryMovementDetail } from "../inventory/movementHelpers.js";
+import { ReferenceNumberAlreadyExists } from "../../errors/document/referenceNumberError.js";
+import { PRISMA_ERROR_CODES } from "../../constants/prisma.js";
 
 const createStockAdjustmentMovement = async ({
     tx,
@@ -214,9 +216,14 @@ export const createStockAdjustment = async ({
         return returnAdjustment ? adjustment : updatedSupplierMaterial;
     };
 
-    if (tx) return execute(tx);
+    try {
+        if (tx) return await execute(tx);
 
-    return getDb().$transaction(execute);
+        return await getDb().$transaction(execute);
+    } catch (err) {
+        if (err.code === PRISMA_ERROR_CODES.RECORD_NOT_UNIQUE) throw new ReferenceNumberAlreadyExists();
+        throw err;
+    }
 };
 
 export const createStockAdjustmentByQuantityChange = async ({
