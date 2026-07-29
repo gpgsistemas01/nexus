@@ -38,24 +38,24 @@
   --datatable-sort-active-shadow: rgba(0, 0, 0, 0.45);
   --datatable-child-sort-inactive-color: rgba(var(--mdb-secondary-rgb), 0.42);
   --datatable-child-sort-active-color: var(--datatable-child-header-color);
-  --product-detail-header: #16875b;
-  --product-detail-header-rgb: 22, 135, 91;
-  --product-detail-header-light: #e7f7ef;
-  --product-detail-header-hover: #0b6843;
-  --product-detail-border: #91d5b4;
-  --product-detail-border-soft: #cfeee0;
-  --product-detail-row-alt: #f0fbf6;
-  --product-detail-row-hover: #daf4e7;
-  --product-detail-selection: #bdebd3;
-  --product-detail-input-enabled-bg: #f8fffb;
-  --product-detail-input-enabled-border: #55b985;
-  --product-detail-input-enabled-color: var(--mdb-secondary);
-  --product-detail-input-disabled-bg: #edf0ef;
-  --product-detail-input-disabled-border: #c8d0cc;
-  --product-detail-input-disabled-color: rgba(var(--mdb-secondary-rgb), 0.58);
-  --product-detail-child-header-bg: #fff3d9;
-  --product-detail-child-header-color: #332D2D;
-  --product-detail-child-header-border: #d88500;
+  --material-detail-header: #16875b;
+  --material-detail-header-rgb: 22, 135, 91;
+  --material-detail-header-light: #e7f7ef;
+  --material-detail-header-hover: #0b6843;
+  --material-detail-border: #91d5b4;
+  --material-detail-border-soft: #cfeee0;
+  --material-detail-row-alt: #f0fbf6;
+  --material-detail-row-hover: #daf4e7;
+  --material-detail-selection: #bdebd3;
+  --material-detail-input-enabled-bg: #f8fffb;
+  --material-detail-input-enabled-border: #55b985;
+  --material-detail-input-enabled-color: var(--mdb-secondary);
+  --material-detail-input-disabled-bg: #edf0ef;
+  --material-detail-input-disabled-border: #c8d0cc;
+  --material-detail-input-disabled-color: rgba(var(--mdb-secondary-rgb), 0.58);
+  --material-detail-child-header-bg: #fff3d9;
+  --material-detail-child-header-color: #332D2D;
+  --material-detail-child-header-border: #d88500;
 
 
   --mdb-secondary: #332D2D;
@@ -931,7 +931,7 @@ table.dataTable > tbody > tr.child td.child {
 .modal-detail-table,
 table.dataTable.modal-detail-table {
   background-color: #ffffff;
-  border: 1px solid var(--product-detail-border) !important;
+  border: 1px solid var(--material-detail-border) !important;
   border-collapse: separate !important;
   border-radius: 0.5rem;
   border-spacing: 0;
@@ -953,8 +953,8 @@ table.dataTable.modal-detail-table {
 
 .modal-detail-table thead th,
 table.dataTable.modal-detail-table thead th {
-  background: var(--product-detail-header);
-  border-bottom: 2px solid var(--product-detail-header-hover) !important;
+  background: var(--material-detail-header);
+  border-bottom: 2px solid var(--material-detail-header-hover) !important;
   border-inline-end: 1px solid rgba(255, 255, 255, 0.28);
   color: var(--mdb-light);
   font-weight: 700;
@@ -968,16 +968,16 @@ table.dataTable.modal-detail-table thead th {
 
 .modal-detail-table thead tr:not(:first-child) th,
 table.dataTable.modal-detail-table thead tr:not(:first-child) th {
-  background: var(--product-detail-child-header-bg);
-  border-bottom-color: var(--product-detail-child-header-border) !important;
-  color: var(--product-detail-child-header-color);
+  background: var(--material-detail-child-header-bg);
+  border-bottom-color: var(--material-detail-child-header-border) !important;
+  color: var(--material-detail-child-header-color);
   font-size: 0.85rem;
 }
 
 .modal-detail-table tbody td,
 table.dataTable.modal-detail-table tbody td {
-  border-block-end: 1px solid var(--product-detail-border-soft);
-  border-inline-end: 1px solid var(--product-detail-border-soft);
+  border-block-end: 1px solid var(--material-detail-border-soft);
+  border-inline-end: 1px solid var(--material-detail-border-soft);
   color: var(--mdb-secondary);
   padding: 0.75rem;
   vertical-align: middle;
@@ -985,18 +985,18 @@ table.dataTable.modal-detail-table tbody td {
 
 .modal-detail-table tbody tr:nth-child(even),
 table.dataTable.modal-detail-table tbody tr:nth-child(even) {
-  background-color: var(--product-detail-row-alt);
+  background-color: var(--material-detail-row-alt);
 }
 
 .modal-detail-table tbody tr:hover,
 table.dataTable.modal-detail-table tbody tr:hover {
-  background-color: var(--product-detail-row-hover);
+  background-color: var(--material-detail-row-hover);
 }
 
 .modal-detail-table tbody tr.selected,
 table.dataTable.modal-detail-table tbody tr.selected,
 table.dataTable.modal-detail-table tbody tr.selected > * {
-  background-color: var(--product-detail-selection) !important;
+  background-color: var(--material-detail-selection) !important;
   color: var(--mdb-secondary) !important;
 }
 
@@ -1019,7 +1019,7 @@ table.dataTable.modal-detail-table .sorting_desc::after {
 .modal-detail-table .form-control,
 .modal-detail-table .form-select {
   background-color: #eefaf4;
-  border: 1px solid var(--product-detail-border);
+  border: 1px solid var(--material-detail-border);
   border-radius: 0.55rem;
   color: var(--mdb-secondary);
   min-height: 2.35rem;
@@ -1375,23 +1375,23 @@ a:hover {
 }
 
 .modal-detail-table .project-converted-quantity-input:not(:disabled) {
-  background-color: var(--product-detail-input-enabled-bg);
-  border-color: var(--product-detail-input-enabled-border);
-  color: var(--product-detail-input-enabled-color);
+  background-color: var(--material-detail-input-enabled-bg);
+  border-color: var(--material-detail-input-enabled-border);
+  color: var(--material-detail-input-enabled-color);
 }
 
 .modal-detail-table .project-converted-quantity-input:disabled {
-  background-color: var(--product-detail-input-disabled-bg);
-  border-color: var(--product-detail-input-disabled-border);
-  color: var(--product-detail-input-disabled-color);
+  background-color: var(--material-detail-input-disabled-bg);
+  border-color: var(--material-detail-input-disabled-border);
+  color: var(--material-detail-input-disabled-color);
   cursor: not-allowed;
   opacity: 1;
 }
 
 .modal-detail-table .project-converted-quantity-input:not(:disabled):focus {
   background-color: #ffffff;
-  border-color: var(--product-detail-header-hover) !important;
-  box-shadow: 0 0 0 0.22rem rgba(var(--product-detail-header-rgb), 0.2) !important;
+  border-color: var(--material-detail-header-hover) !important;
+  box-shadow: 0 0 0 0.22rem rgba(var(--material-detail-header-rgb), 0.2) !important;
 }
 
 .form-check-input:checked {
@@ -1670,27 +1670,27 @@ body section {
 }
 
 /* refinements for form controls and table actions */
-.add-product-container > div {
+.add-material-container > div {
     min-width: 0;
 }
 
-.add-product-container .form-outline,
-.add-product-container .form-select {
+.add-material-container .form-outline,
+.add-material-container .form-select {
     width: 100%;
 }
 
-.add-product-container .btn {
+.add-material-container .btn {
     width: 100%;
     min-height: 48px;
 }
 
-.add-product-container .form-outline .form-control,
-.add-product-container .form-outline .form-select {
+.add-material-container .form-outline .form-control,
+.add-material-container .form-outline .form-select {
     min-height: 48px;
 }
 
 @media (max-width: 767.98px) {
-    .add-product-container > div {
+    .add-material-container > div {
         width: 100%;
     }
 }

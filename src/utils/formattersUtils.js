@@ -98,22 +98,22 @@ export const normalizeDecimal = (value) => {
         : rounded;
 };
 
-export const hasProductDimensions = (product = {}) => (
-    Number(product.base || 0) > 0 &&
-    Number(product.height || 0) > 0
+export const hasMaterialDimensions = (material = {}) => (
+    Number(material.base || 0) > 0 &&
+    Number(material.height || 0) > 0
 );
 
-export const buildStockKey = (productId, supplierId) =>
-    `${productId}:${supplierId}`;
+export const buildStockKey = (materialId, supplierId) =>
+    `${materialId}:${supplierId}`;
 
 export const parseStockKey = (key) => {
-    const [productId, supplierId] = key.split(':');
-    return { productId, supplierId };
+    const [materialId, supplierId] = key.split(':');
+    return { materialId, supplierId };
 };
 
 export const toNumber = value => value == null || value === '' ? null : Number(value);
 
-export const normalizeProductDimensions = ({ base, height } = {}) => {
+export const normalizeMaterialDimensions = ({ base, height } = {}) => {
 
     const parsedBase = toNumber(base);
     const parsedHeight = toNumber(height);

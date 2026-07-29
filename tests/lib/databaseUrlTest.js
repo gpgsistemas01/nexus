@@ -17,7 +17,7 @@ describe('databaseUrl', () => {
 
   it('usa DATABASE_URL cuando NODE_ENV no es test', () => {
     expect(resolveDatabaseUrl({
-      nodeEnv: 'production',
+      nodeEnv: 'materialion',
       databaseUrl: 'postgresql://app-db',
       testDatabaseUrl: 'postgresql://test-db'
     })).toBe('postgresql://app-db');
@@ -25,7 +25,7 @@ describe('databaseUrl', () => {
 
   it('prioriza DIRECT_URL cuando se solicita una conexión directa fuera de pruebas', () => {
     expect(resolveDatabaseUrl({
-      nodeEnv: 'production',
+      nodeEnv: 'materialion',
       databaseUrl: 'postgresql://pooler-db',
       directUrl: 'postgresql://direct-db',
       preferDirectUrl: true
@@ -71,7 +71,7 @@ describe('databaseUrl', () => {
   });
 
   it('lee DATABASE_URL desde process.env fuera de pruebas', () => {
-    vi.stubEnv('NODE_ENV', 'production');
+    vi.stubEnv('NODE_ENV', 'materialion');
     vi.stubEnv('DATABASE_URL', 'postgresql://env-app-db');
     vi.stubEnv('DATABASE_TEST_URL', 'postgresql://env-test-db');
 

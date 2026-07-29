@@ -5,7 +5,7 @@ const router = express.Router();
 router.get(
     '/',
     (req, res) => {
-        if (req.user) return res.redirect('/productos');
+        if (req.user) return res.redirect('/materiales');
 
         return res.redirect('/inicio-sesion');
     }

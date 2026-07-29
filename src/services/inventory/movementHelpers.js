@@ -7,24 +7,24 @@ const resolveValue = (item, resolver) => (
 );
 
 export const buildInventoryMovementDetail = ({
-    productId,
+    materialId,
     supplierId,
     quantity,
     previousStock,
     newStock,
-    productBase,
-    productHeight,
+    materialBase,
+    materialHeight,
     goodsReceiptDetailId = null,
     goodsIssueDetailId = null,
     stockAdjustmentDetailId = null
 }) => ({
-    productId,
+    materialId,
     supplierId,
     quantity,
     previousStock,
     newStock,
-    productBase,
-    productHeight,
+    materialBase,
+    materialHeight,
     ...(goodsReceiptDetailId && { goodsReceiptDetailId }),
     ...(goodsIssueDetailId && { goodsIssueDetailId }),
     ...(stockAdjustmentDetailId && { stockAdjustmentDetailId })
@@ -32,7 +32,7 @@ export const buildInventoryMovementDetail = ({
 
 export const buildStockUpdateSummary = ({
     details,
-    productId = 'productId',
+    materialId = 'materialId',
     supplierId = 'supplierId',
     quantity = 'quantity'
 }) => {
@@ -43,7 +43,7 @@ export const buildStockUpdateSummary = ({
     for (const detail of details) {
 
         const key = buildStockKey(
-            resolveValue(detail, productId),
+            resolveValue(detail, materialId),
             resolveValue(detail, supplierId)
         );
 

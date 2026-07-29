@@ -12,7 +12,7 @@ const names = {
   presentation: `IT WasteIssue Presentation ${testSuffix}`,
   unit: `IT WI Unit ${testSuffix}`,
   unitSymbol: `iw${testSuffix.slice(-4)}`,
-  product: `IT WasteIssue Product ${testSuffix}`,
+  material: `IT WasteIssue Material ${testSuffix}`,
   supplierTradeName: `IT WasteIssue Supplier ${testSuffix}`,
   supplierLegalName: `IT WasteIssue Supplier Legal ${testSuffix}`,
   reason: `IT WasteIssue Reason ${testSuffix}`,
@@ -27,11 +27,11 @@ const names = {
 
 let prisma;
 let services;
-let product;
+let material;
 let supplier;
 let reason;
 let user;
-let supplierProduct;
+let supplierMaterial;
 let requester;
 let advisor;
 let department;
@@ -40,7 +40,7 @@ let presentation;
 let unit;
 
 const cleanupWasteIssueData = async () => {
-  const products = await prisma.product.findMany({ where: { name: { startsWith: 'IT WasteIssue Product ' } }, select: { id: true } });
+  const materials = await prisma.material.findMany({ where: { name: { startsWith: 'IT WasteIssue Material ' } }, select: { id: true } });
   const suppliers = await prisma.supplier.findMany({ where: { tradeName: { startsWith: 'IT WasteIssue Supplier ' } }, select: { id: true } });
   const reasons = await prisma.stockAdjustmentReason.findMany({ where: { name: { startsWith: 'IT WasteIssue Reason ' } }, select: { id: true } });
   const users = await prisma.user.findMany({ where: { name: { startsWith: 'ITWasteIssueUser' } }, select: { id: true } });
@@ -54,7 +54,7 @@ const cleanupWasteIssueData = async () => {
       OR: [
         { reasonId: { in: reasons.map(({ id }) => id) } },
         { createdById: { in: users.map(({ id }) => id) } },
-        { details: { some: { productId: { in: products.map(({ id }) => id) } } } },
+        { details: { some: { materialId: { in: materials.map(({ id }) => id) } } } },
         { details: { some: { supplierId: { in: suppliers.map(({ id }) => id) } } } }
       ]
     },
@@ -75,13 +75,13 @@ const cleanupWasteIssueData = async () => {
 
   await prisma.goodsIssueDetail.deleteMany({ where: { goodsIssueId: { in: goodsIssues.map(({ id }) => id) } } });
   await prisma.goodsIssue.deleteMany({ where: { id: { in: goodsIssues.map(({ id }) => id) } } });
-  await prisma.waste.deleteMany({ where: { supplierProduct: { productId: { in: products.map(({ id }) => id) } } } });
+  await prisma.waste.deleteMany({ where: { supplierMaterial: { materialId: { in: materials.map(({ id }) => id) } } } });
   await prisma.movementDetail.deleteMany({ where: { stockAdjustmentDetailId: { in: adjustmentDetails.map(({ id }) => id) } } });
   await prisma.inventoryMovement.deleteMany({ where: { stockAdjustmentId: { in: adjustments.map(({ id }) => id) } } });
   await prisma.stockAdjustmentDetail.deleteMany({ where: { id: { in: adjustmentDetails.map(({ id }) => id) } } });
   await prisma.stockAdjustment.deleteMany({ where: { id: { in: adjustments.map(({ id }) => id) } } });
-  await prisma.supplierProduct.deleteMany({ where: { OR: [{ productId: { in: products.map(({ id }) => id) } }, { supplierId: { in: suppliers.map(({ id }) => id) } }] } });
-  await prisma.product.deleteMany({ where: { id: { in: products.map(({ id }) => id) } } });
+  await prisma.supplierMaterial.deleteMany({ where: { OR: [{ materialId: { in: materials.map(({ id }) => id) } }, { supplierId: { in: suppliers.map(({ id }) => id) } }] } });
+  await prisma.material.deleteMany({ where: { id: { in: materials.map(({ id }) => id) } } });
   await prisma.supplier.deleteMany({ where: { id: { in: suppliers.map(({ id }) => id) } } });
   await prisma.stockAdjustmentReason.deleteMany({ where: { id: { in: reasons.map(({ id }) => id) } } });
   await prisma.client.deleteMany({ where: { id: { in: clients.map(({ id }) => id) } } });
@@ -116,10 +116,10 @@ describeDb('waste and goods issue database integration', () => {
       prisma.client.create({ data: { name: names.client } })
     ]);
 
-    [product, supplier] = await Promise.all([
-      prisma.product.create({
+    [material, supplier] = await Promise.all([
+      prisma.material.create({
         data: {
-          name: names.product,
+          name: names.material,
           minStock: 0,
           base: 2,
           height: 3,
@@ -137,9 +137,9 @@ describeDb('waste and goods issue database integration', () => {
       })
     ]);
 
-    supplierProduct = await prisma.supplierProduct.create({
+    supplierMaterial = await prisma.supplierMaterial.create({
       data: {
-        productId: product.id,
+        materialId: material.id,
         supplierId: supplier.id,
         currentStock: 10,
         convertedQuantity: 60,
@@ -183,7 +183,7 @@ describeDb('waste and goods issue database integration', () => {
     const waste = await services.createWasteAdjustment({
       userId: user.id,
       wasteDto: {
-        supplierProductId: supplierProduct.id,
+        supplierMaterialId: supplierMaterial.id,
         base: 1,
         height: 1,
         currentStock: 2,
@@ -192,9 +192,9 @@ describeDb('waste and goods issue database integration', () => {
     });
 
     expect(waste).toMatchObject({
-      supplierProductId: supplierProduct.id,
+      supplierMaterialId: supplierMaterial.id,
       stockAdjustmentId: expect.any(String),
-      name: names.product,
+      name: names.material,
       supplier: expect.objectContaining({ id: supplier.id })
     });
 
@@ -206,8 +206,8 @@ describeDb('waste and goods issue database integration', () => {
       select: { id: true }
     })).resolves.toEqual({ id: waste.stockAdjustmentId });
 
-    const stockAfterWasteCreation = await prisma.supplierProduct.findUnique({
-      where: { id: supplierProduct.id },
+    const stockAfterWasteCreation = await prisma.supplierMaterial.findUnique({
+      where: { id: supplierMaterial.id },
       select: { currentStock: true, convertedQuantity: true }
     });
     expect(stockAfterWasteCreation.currentStock.toNumber()).toBe(8);
@@ -216,13 +216,13 @@ describeDb('waste and goods issue database integration', () => {
     await expect(services.updateWaste({
       id: waste.id,
       wasteDto: {
-        supplierProductId: supplierProduct.id,
+        supplierMaterialId: supplierMaterial.id,
         base: 1,
         height: 2
       }
     })).resolves.toMatchObject({
       id: waste.id,
-      supplierProductId: supplierProduct.id
+      supplierMaterialId: supplierMaterial.id
     });
 
     await expect(services.updateWasteStock({
@@ -259,7 +259,7 @@ describeDb('waste and goods issue database integration', () => {
         requestDate: new Date(),
         observations: 'Salida integración',
         details: [{
-          productId: product.id,
+          materialId: material.id,
           supplierId: supplier.id,
           presentationId: presentation.id,
           quantity: 1
@@ -272,7 +272,7 @@ describeDb('waste and goods issue database integration', () => {
       clientId: client.id,
       requesterId: requester.id,
       details: [expect.objectContaining({
-        productId: product.id,
+        materialId: material.id,
         supplierId: supplier.id,
         quantity: expect.anything()
       })]
@@ -289,7 +289,7 @@ describeDb('waste and goods issue database integration', () => {
         requestDate: goodsIssue.requestDate,
         observations: 'Salida integración actualizada',
         details: [{
-          productId: product.id,
+          materialId: material.id,
           supplierId: supplier.id,
           presentationId: presentation.id,
           quantity: 2
@@ -301,7 +301,7 @@ describeDb('waste and goods issue database integration', () => {
       id: goodsIssue.id,
       projectNumber: names.updatedProjectNumber,
       details: [expect.objectContaining({
-        productId: product.id,
+        materialId: material.id,
         supplierId: supplier.id,
         quantity: expect.anything()
       })]
@@ -322,7 +322,7 @@ describeDb('waste and goods issue database integration', () => {
       id: goodsIssue.id,
       fulfillmentStatus: expect.objectContaining({ name: 'Surtido' }),
       details: [expect.objectContaining({
-        productId: product.id,
+        materialId: material.id,
         supplierId: supplier.id,
         isSupplied: true
       })]
@@ -333,7 +333,7 @@ describeDb('waste and goods issue database integration', () => {
       include: { details: true }
     })).resolves.toMatchObject({
       type: 'ISSUE',
-      details: [expect.objectContaining({ productId: product.id, supplierId: supplier.id })]
+      details: [expect.objectContaining({ materialId: material.id, supplierId: supplier.id })]
     });
 
     await expect(services.findAllGoodsIssues({

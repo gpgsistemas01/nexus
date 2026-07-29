@@ -25,7 +25,7 @@ export class GoodsIssueNotPendingConflict extends AppError {
 export class GoodsIssueSuppliedConflict extends AppError {
 
     constructor () {
-        super('La salida ya tiene productos surtidos y no puede editarse en general', 'GOODS_ISSUE_SUPPLIED_CONFLICT', 409);
+        super('La salida ya tiene materiales surtidos y no puede editarse en general', 'GOODS_ISSUE_SUPPLIED_CONFLICT', 409);
     }
 }
 

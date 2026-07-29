@@ -8,7 +8,7 @@ import { formatDateTimeDisplay } from "../../utils/formatters.js";
 import { formatDecimal } from "../../utils/formatUtils.js";
 
 export let details = [];
-const selectorProductTable = DATATABLE_SELECTORS.PRODUCT;
+const selectorMaterialTable = DATATABLE_SELECTORS.MATERIAL;
 const selectorTable = DATATABLE_SELECTORS.MAIN;
 
 export const createPurchaseRequisitionDatatable = (context) => {
@@ -101,10 +101,10 @@ export const initDetailsPurchaseRequisitionTable = (mode) => {
     resetDataTable(selectorProductTable);
 
     const columns = [
-        { data: 'name', title: 'Producto' },
+        { data: 'name', title: 'Material' },
         { data: 'quantity', title: 'Cantidad', render: formatDecimal },
-        { 
-            data: 'presentation', 
+        {
+            data: 'presentation',
             title: 'Presentación',
             render: (data) => `PIEZA (${ data })`
         },
@@ -125,7 +125,7 @@ export const initDetailsPurchaseRequisitionTable = (mode) => {
     }
 
     createDataTable({
-        selector: selectorProductTable,
+        selector: selectorMaterialTable,
         options: {
             data: details,
             columns,
@@ -134,11 +134,11 @@ export const initDetailsPurchaseRequisitionTable = (mode) => {
     });
 };
 
-$(selectorProductTable).on('click', '.delete-btn', function() {
+$(selectorMaterialTable).on('click', '.delete-btn', function() {
 
     const index = $(this).data('index');
 
     details.splice(index, 1);
 
-    refreshProductTable(details);
+    refreshMaterialTable(details);
 });

@@ -6,7 +6,7 @@ export const findMovementReportRows = async ({
     endDate = '',
     search = '',
     movementType = '',
-    productId = '',
+    materialId = '',
     supplierId = '',
     goodsIssueId = '',
     goodsReceiptId = '',
@@ -22,7 +22,7 @@ export const findMovementReportRows = async ({
         endDate,
         movementType,
         search,
-        productId,
+        materialId,
         supplierId,
         goodsIssueId,
         goodsReceiptId,
@@ -38,7 +38,7 @@ export const findMovementReportRows = async ({
         previousStock: toNumber(movement.previousStock),
         quantity: toNumber(movement.quantity),
         newStock: toNumber(movement.newStock),
-        productBase: toNumber(movement.productBase),
-        productHeight: toNumber(movement.productHeight),
+        materialBase: toNumber(movement.materialBase),
+        materialHeight: toNumber(movement.materialHeight),
     }));
 };

@@ -16,9 +16,9 @@ export let details = [];
 let filters = {
     getValues: () => ({})
 };
-const selectorProductTable = DATATABLE_SELECTORS.PRODUCT;
+const selectorMaterialTable = DATATABLE_SELECTORS.MATERIAL;
 const selectorTable = DATATABLE_SELECTORS.MAIN;
-const table = document.querySelector(selectorProductTable);
+const table = document.querySelector(selectorMaterialTable);
 table.innerHTML = `
     <thead>
         <tr>
@@ -117,7 +117,7 @@ export const createGoodsReceiptDatatable = async () => {
 
 export const initDetailsGoodsReceiptTable = (mode) => {
 
-    const table = document.querySelector(selectorProductTable);
+    const table = document.querySelector(selectorMaterialTable);
 
     resetDataTable(selectorProductTable);
 
@@ -140,7 +140,7 @@ export const initDetailsGoodsReceiptTable = (mode) => {
     });
 
     createDataTable({
-        selector: selectorProductTable,
+        selector: selectorMaterialTable,
         options: {
             data: details,
             columns,
@@ -150,7 +150,7 @@ export const initDetailsGoodsReceiptTable = (mode) => {
     });
 };
 
-$(selectorProductTable).on('click', '.delete-btn', function () {
+$(selectorMaterialTable).on('click', '.delete-btn', function () {
 
     const id = $(this).data('id');
 

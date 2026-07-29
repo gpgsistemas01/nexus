@@ -12,7 +12,7 @@ import { createServiceLogger, getModelLogContext, logServiceError, logServiceInf
 const serviceLogger = createServiceLogger('warehouse.purchaseRequisitionService');
 
 import { getDb } from "../../repository/baseRepository.js";
-import { generateYearlyReferenceNumber } from "../document/referenceNumberService.js";
+import { generateYearlyReferenceNumber, throwIfReferenceNumberAlreadyExists } from "../document/referenceNumberService.js";
 import { ROLE_NAMES } from "../../constants/roles.js";
 import { PURCHASE_REQUISITION_STATUS_NAMES } from "../../constants/warehouseStatuses.js";
 import { DOCUMENT_REFERENCE_TYPES } from "../../constants/documentReferenceTypes.js";
@@ -96,7 +96,7 @@ export const findAllPurchaseRequisitions = async ({
             details: {
                 select: {
                     id: true,
-                    product: {
+                    material: {
                         select: {
                             id: true,
                             name: true,
@@ -158,6 +158,8 @@ export const createPurchaseRequisition = async ({
     userId
 }) => {
 
+    let referenceNumber = null;
+
     try {
 
         const { projectId, details, ...purchaseRequisitionData } = purchaseRequisitionDto;
@@ -166,7 +168,7 @@ export const createPurchaseRequisition = async ({
 
         const result = await getDb().$transaction(async (tx) => {
 
-            const referenceNumber = await generateYearlyReferenceNumber({ type: DOCUMENT_REFERENCE_TYPES.PURCHASE_REQUISITION, tx });
+            referenceNumber = await generateYearlyReferenceNumber({ type: DOCUMENT_REFERENCE_TYPES.PURCHASE_REQUISITION, tx });
 
             const purchaseRequisition = await tx.purchaseRequisition.create({
                 data: {
@@ -193,11 +195,11 @@ export const createPurchaseRequisition = async ({
                     },
                     referenceNumber,
                     details: {
-                        create: details.map(({ productId, ...rest }) => ({
+                        create: details.map(({ materialId, ...rest }) => ({
                             ...rest,
-                            product: {
+                            material: {
                                 connect: {
-                                    id: productId
+                                    id: materialId
                                 }
                             }
                         }))
@@ -226,12 +228,13 @@ export const createPurchaseRequisition = async ({
             ...getModelLogContext('purchaseRequisition', { userId, ...purchaseRequisitionDto })
         }, 'Error específico al crear requisición en transacción');
 
+        throwIfReferenceNumberAlreadyExists({ err, referenceNumber });
         throw err;
     }
 };
 
 export const updatePurchaseRequisition = async ({
-    purchaseRequisitionDto, 
+    purchaseRequisitionDto,
     id,
     userId
 }) => {
@@ -270,14 +273,14 @@ export const updatePurchaseRequisition = async ({
                 where: { id }
             });
 
-            await tx.detailPurchaseRequisitionProduct.deleteMany({
+            await tx.detailPurchaseRequisitionMaterial.deleteMany({
                 where: {
                     purchaseRequisitionId: id
                 }
             });
 
             if (details.length) {
-                await tx.detailPurchaseRequisitionProduct.createMany({
+                await tx.detailPurchaseRequisitionMaterial.createMany({
                     data: buildPurchaseRequisitionDetailRows({
                         details,
                         purchaseRequisitionId: id
@@ -285,7 +288,7 @@ export const updatePurchaseRequisition = async ({
                 });
             }
 
-            const detailsPurchaseRequisition = await tx.detailPurchaseRequisitionProduct.findMany({
+            const detailsPurchaseRequisition = await tx.detailPurchaseRequisitionMaterial.findMany({
                 where: {
                     purchaseRequisitionId: id
                 }
@@ -403,7 +406,7 @@ const updatePurchaseRequisitionStatus = async ({ id, statusName, userId }) => {
             ...updatedPurchaseRequisition,
             referenceNumber: purchaseRequisition.referenceNumber,
             department: purchaseRequisition.department,
-            totalRequestedProducts: purchaseRequisition.details.length
+            totalRequestedMaterials: purchaseRequisition.details.length
         };
 
         logServiceInfo(serviceLogger, {

@@ -18,7 +18,7 @@ const createResponse = () => {
 
 describe('contentTypeMiddleware', () => {
   it('permite solicitudes GET sin validar content-type', () => {
-    const req = { method: 'GET', body: { name: 'Producto' }, headers: {} };
+    const req = { method: 'GET', body: { name: 'Material' }, headers: {} };
     const res = createResponse();
     const next = vi.fn();
 
@@ -42,7 +42,7 @@ describe('contentTypeMiddleware', () => {
   it('rechaza JSON con content-type incorrecto', () => {
     const req = {
       method: 'POST',
-      body: { name: 'Producto' },
+      body: { name: 'Material' },
       headers: { 'content-type': 'text/plain' }
     };
     const res = createResponse();
@@ -61,7 +61,7 @@ describe('contentTypeMiddleware', () => {
   it('acepta JSON aunque content-type incluya charset', () => {
     const req = {
       method: 'POST',
-      body: { name: 'Producto' },
+      body: { name: 'Material' },
       headers: { 'content-type': 'application/json; charset=utf-8' }
     };
     const res = createResponse();

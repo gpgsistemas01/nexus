@@ -1,10 +1,10 @@
 import { getSelectedOptionText } from "../../../utils/domUtils.js";
 import { isInternalClientName, resolveAdvisorDepartmentByClientName, resolveProjectNumberByClientAndDepartment } from "../../../application/warehouse/goodsIssues/goodsIssueRules.js";
-import { PRODUCT_SELECT_RESULTS_LIMIT } from "../../../application/warehouse/products.js";
+import { MATERIAL_SELECT_RESULTS_LIMIT } from "../../../application/warehouse/materials.js";
 import { bindDisabledSelectDependency } from "../baseSelect.js";
 import { setupClientSelect, toggleClientOption } from "../domains/client.js";
 import { initDepartmentSelect, toggleDepartmentOption } from "../domains/department.js";
-import { setupProductSelect, toggleProductOption } from "../domains/product.js";
+import { setupMaterialSelect, toggleMaterialOption } from "../domains/material.js";
 import { initProfileSelect, toggleProfileOption } from "../domains/profile.js";
 import { initMdbWrapperInput, updateMdbWrapperInput } from "../../mdb/baseInstance.js";
 import { toggleDisabledElement } from "../../../utils/formUtils.js";
@@ -15,13 +15,13 @@ const requesterSelector = FORM_SELECTORS.REQUESTER;
 const clientSelector = FORM_SELECTORS.CLIENT;
 const departmentSelector = FORM_SELECTORS.DEPARTMENT;
 const advisorSelector = FORM_SELECTORS.ADVISOR;
-const productSelector = FORM_SELECTORS.PRODUCT;
+const materialSelector = FORM_SELECTORS.MATERIAL;
 const projectNumberSelector = FORM_SELECTORS.PROJECT_NUMBER;
 const requesterScopedSelector = `${ modalSelector } ${ requesterSelector }`;
 const clientScopedSelector = `${ modalSelector } ${ clientSelector }`;
 const departmentScopedSelector = `${ modalSelector } ${ departmentSelector }`;
 const advisorScopedSelector = `${ modalSelector } ${ advisorSelector }`;
-const productScopedSelector = `${ modalSelector } ${ productSelector }`;
+const materialScopedSelector = `${ modalSelector } ${ materialSelector }`;
 const enabledHeaderDependentSelectModes = ['create', 'edit', 'edit-header'];
 const dependentSelects = [
     { sourceSelector: departmentScopedSelector, targetSelector: requesterScopedSelector },
@@ -164,11 +164,11 @@ export const initGoodsIssueFormSelect2 = () => {
     //     }
     // });
 
-    setupProductSelect({
+    setupMaterialSelect({
         modalSelector,
-        productSelector,
+        materialSelector,
         allowCreate: false,
-        resultsLimit: PRODUCT_SELECT_RESULTS_LIMIT
+        resultsLimit: MATERIAL_SELECT_RESULTS_LIMIT
     });
 };
 
@@ -198,8 +198,8 @@ export const setGoodsIssueFormSelectOptions = (data = null) => {
         name: data?.requesterName
     });
 
-    toggleProductOption({
-        selector: productScopedSelector,
+    toggleMaterialOption({
+        selector: materialScopedSelector,
         data: {
             id: null,
             text: null,
