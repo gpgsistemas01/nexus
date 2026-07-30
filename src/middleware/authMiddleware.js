@@ -2,14 +2,15 @@ import { verifyAccessToken } from "../services/jwtService.js";
 import { errorMap } from "../messages/codeMessages.js";
 import { clearAccessCookie } from "../utils/cookiesUtils.js";
 import { getLoggedUser } from "../services/admin/userService.js";
-import { requiresInitialStockAdjustmentOnCreate } from "../validators/forms/productValidations.js";
+import { requiresInitialStockAdjustmentOnCreate } from "../validators/forms/materialValidations.js";
+import { hasSystemWideReadAccess } from "../utils/authorizationUtils.js";
 
 const getAuthTokenInfo = ( req, res) => {
 
     const { accessToken } = req.cookies;
 
     if (!accessToken) {
-        
+
         clearAccessCookie(res);
         return null;
     }
@@ -30,14 +31,14 @@ export const verifyCookiesAuthTokenRequired = (req, res, next) => {
     const tokenInfo = getAuthTokenInfo(req, res);
 
     if (!tokenInfo) {
-        
+
         res.cookie('returnTo', req.originalUrl, { httpOnly: true });
 
         return res.redirect('/revocar-sesion');
     }
 
     req.userId = tokenInfo.id;
-    
+
     next();
 }
 
@@ -57,7 +58,9 @@ const createAuthorizeMiddleware = (handler) => (permissions) => async (req, res,
 
     if (!user) return handler(req, res);
 
-    const hasAccess = user.accesses.some(access => 
+    const hasReadAccessToAll = ['GET', 'HEAD'].includes(req.method)
+        && hasSystemWideReadAccess(user);
+    const hasAccess = hasReadAccessToAll || user.accesses.some(access =>
         permissions.departments.includes(access.department) &&
         permissions.roles.includes(access.role)
     );

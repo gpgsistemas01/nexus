@@ -4,7 +4,7 @@ import { getAllDepartments } from '../../../controllers/api/admin/departmentCont
 
 const router = express.Router();
 const departmentReadPermissions = {
-    roles: [ 'Administrador del sistema', 'Coordinador', 'Auxiliar', 'Operador', 'Instalador', 'Diseñador', 'Almacenista', 'Vendedor', 'Repartidor' ],
+    roles: [ 'Administrador del sistema', 'Coordinador', 'Auxiliar', 'Operador', 'Instalador', 'Diseñador', 'Almacenista', 'Asesor de ventas', 'Repartidor', 'Director', 'Administrador', 'Contador' ],
     departments: [
         'DIRECCIÓN',
         'ACABADOS',

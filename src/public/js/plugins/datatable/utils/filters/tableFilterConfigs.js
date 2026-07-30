@@ -1,14 +1,15 @@
-import { getProductOptions } from "../../../../application/warehouse/products.js";
+import { getMaterialOptions } from "../../../../application/warehouse/materials.js";
 import { getSupplierOptions } from "../../../../application/warehouse/suppliers.js";
 import { getFulfillmentStatusOptions } from "../../../../application/warehouse/fulfillmentStatuses.js";
 import { getProfileOptions } from "../../../../application/admin/profiles.js";
-import { getProductSelectApi, initProductFilterSelect } from "../../../select2/domains/product.js";
-import { getSupplierSelectApi, initSupplierFilterSelect } from "../../../select2/domains/supplier.js";
-import { getFulfillmentStatusSelectApi, initFulfillmentStatusFilterSelect } from "../../../select2/domains/fulfillmentStatus.js";
-import { getClientSelectApi, initClientFilterSelect } from "../../../select2/domains/client.js";
-import { getDepartmentSelectApi, initDepartmentFilterSelect } from "../../../select2/domains/department.js";
-import { getProfileSelectApi, initProfileFilterSelect } from "../../../select2/domains/profile.js";
-import { getMovementTypeSelectApi, getMovementTypeData, initMovementTypeFilterSelect } from "../../../select2/domains/movementType.js";
+import { initMaterialFilterSelect } from "../../../select2/domains/material.js";
+import { initSupplierFilterSelect } from "../../../select2/domains/supplier.js";
+import { initFulfillmentStatusFilterSelect } from "../../../select2/domains/fulfillmentStatus.js";
+import { initClientFilterSelect } from "../../../select2/domains/client.js";
+import { initDepartmentFilterSelect } from "../../../select2/domains/department.js";
+import { initRoleFilterSelect } from "../../../select2/domains/role.js";
+import { initProfileFilterSelect } from "../../../select2/domains/profile.js";
+import { getMovementTypeData, initMovementTypeFilterSelect } from "../../../select2/domains/movementType.js";
 import { FILTER_SELECTORS } from "../../../../constants/selectors.js";
 import { buildDateFilterConfig } from "./modules/dateFilter.js";
 import { attachSelectFilterHandler } from "./selectFilterEvents.js";
@@ -55,23 +56,20 @@ const selectFilterConfigs = {
         key: 'supplierId',
         selector: FILTER_SELECTORS.SUPPLIER,
         isSelected: false,
-        getSelectApi: getSupplierSelectApi,
         getOptions: getSupplierOptions,
         initSelect: initSupplierFilterSelect
     },
-    product: {
-        key: 'productId',
-        selector: FILTER_SELECTORS.PRODUCT,
+    material: {
+        key: 'materialId',
+        selector: FILTER_SELECTORS.MATERIAL,
         isSelected: false,
-        getSelectApi: getProductSelectApi,
-        getOptions: getProductOptions,
-        initSelect: ({ selectedId }) => initProductFilterSelect({ selectedId, supplierFilterSelector: FILTER_SELECTORS.SUPPLIER })
+        getOptions: getMaterialOptions,
+        initSelect: ({ selectedId }) => initMaterialFilterSelect({ selectedId, supplierFilterSelector: FILTER_SELECTORS.SUPPLIER })
     },
     fulfillmentStatus: {
         key: 'fulfillmentStatusId',
         selector: FILTER_SELECTORS.FULFILLMENT_STATUS,
         defaultSelectedLabel: 'Pendiente',
-        getSelectApi: getFulfillmentStatusSelectApi,
         getOptions: getFulfillmentStatusOptions,
         initSelect: initFulfillmentStatusFilterSelect
     },
@@ -79,28 +77,30 @@ const selectFilterConfigs = {
         key: 'clientId',
         selector: FILTER_SELECTORS.CLIENT,
         isSelected: false,
-        getSelectApi: getClientSelectApi,
         initSelect: initClientFilterSelect
     },
     department: {
         key: 'departmentId',
         selector: FILTER_SELECTORS.DEPARTMENT,
         isSelected: false,
-        getSelectApi: getDepartmentSelectApi,
         initSelect: initDepartmentFilterSelect
+    },
+    role: {
+        key: 'roleId',
+        selector: FILTER_SELECTORS.ROLE,
+        isSelected: false,
+        initSelect: initRoleFilterSelect
     },
     profile: {
         key: 'profileId',
         selector: FILTER_SELECTORS.PROFILE,
         isSelected: false,
-        getSelectApi: getProfileSelectApi,
         initSelect: initProfileFilterSelect
     },
     warehouseProfile: {
         key: 'profileId',
         selector: FILTER_SELECTORS.PROFILE,
         isSelected: false,
-        getSelectApi: getProfileSelectApi,
         getOptions: () => getProfileOptions(WAREHOUSE_PROFILE_FILTER_PARAMS),
         initSelect: ({ selectedId }) => initProfileFilterSelect({
             selectedId,
@@ -112,7 +112,6 @@ const selectFilterConfigs = {
         key: 'movementType',
         selector: FILTER_SELECTORS.MOVEMENT_TYPE,
         isSelected: false,
-        getSelectApi: getMovementTypeSelectApi,
         getOptions: getMovementTypeData,
         initSelect: initMovementTypeFilterSelect
     },
@@ -139,6 +138,7 @@ const resolveTableFilterConfig = ({
 
     return {
         ...filterConfig,
+        selector,
         attachHandler: () => attachSelectFilterHandler({
             selector,
             onChange

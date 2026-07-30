@@ -1,27 +1,18 @@
-import { initDepartmentSelect, toggleDepartmentOptions } from "../domains/department.js";
+import { initDepartmentSelect } from "../domains/department.js";
+import { initRoleSelect } from "../domains/role.js";
 
-const departmentSelector = '.department-select';
+const departmentSelector = '#profileDepartmentInput';
+const roleSelector = '#profileRoleInput';
 
 export const initProfileFormSelect2 = ({ modalSelector }) => {
-
-    const departmentSelectorScoped = `${ modalSelector } ${ departmentSelector }`;
-
     initDepartmentSelect({
         modalSelector,
         clearOnOpen: false,
-        multiple: true,
-        baseSelector: departmentSelectorScoped,
+        baseSelector: `${ modalSelector } ${ departmentSelector }`,
         allowCreate: false
     });
-}
-
-export const setProfileFormSelectOptions = ({
-    modalSelector,
-    data = null 
-}) => {
-
-    toggleDepartmentOptions({
-        selector: departmentSelector,
-        data: data?.departments ? data.departments : []
+    initRoleSelect({
+        modalSelector,
+        baseSelector: `${ modalSelector } ${ roleSelector }`
     });
-}
+};

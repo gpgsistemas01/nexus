@@ -1,18 +1,19 @@
 export const DATATABLE_SELECTORS = {
     MAIN: '#table',
-    PRODUCT: '#productTable'
+    MATERIAL: '#materialTable'
 };
 
 export const FILTER_SELECTORS = {
     START_DATE: '#startDateInput',
     END_DATE: '#endDateInput',
-    PRODUCT: '#productFilter',
+    MATERIAL: '#materialFilter',
     SUPPLIER: '#supplierFilter',
     FULFILLMENT_STATUS: '#fulfillmentStatusFilter',
     MOVEMENT_TYPE: '#movementTypeFilter',
     OBSERVATIONS: '#observationsFilter',
     CLIENT: '#clientFilter',
     DEPARTMENT: '#departmentFilter',
+    ROLE: '#roleFilter',
     PROFILE: '#profileFilter',
     CLEAR_BUTTON: '#clearFiltersButton',
     APPLY_BUTTON: '#applyFiltersButton'
@@ -22,7 +23,7 @@ export const MODAL_SELECTORS = {
     CLIENT: '#clientModal',
     GOODS_ISSUE: '#goodsIssueModal',
     GOODS_RECEIPT: '#goodsReceiptModal',
-    PRODUCT: '#productModal',
+    MATERIAL: '#materialModal',
     PROFILE: '#profileModal',
     PURCHASE_REQUISITION: '#purchaseRequisitionModal',
     SUPPLIER: '#supplierModal',
@@ -35,7 +36,7 @@ export const FORM_SELECTORS = {
     GOODS_ISSUE: '#goodsIssueForm',
     GOODS_RECEIPT: '#goodsReceiptForm',
     LOGIN: '#loginForm',
-    PRODUCT_FORM: '#productForm',
+    MATERIAL_FORM: '#materialForm',
     PROFILE_FORM: '#profileForm',
     PURCHASE_REQUISITION: '#purchaseRequisitionForm',
     SUPPLIER_FORM: '#supplierForm',
@@ -47,7 +48,7 @@ export const FORM_SELECTORS = {
     DEPARTMENT_ID: '#departmentIdInput',
     ROLE_ID: '#roleIdInput',
     ADVISOR: '#advisorInput',
-    PRODUCT: '#productInput',
+    MATERIAL: '#materialInput',
     PROJECT: '#projectInput',
     PROJECT_NUMBER: '#projectNumberInput',
     QUANTITY: '#quantityInput',
@@ -58,11 +59,11 @@ export const FORM_SELECTORS = {
     REASON: '#reasonInput',
     UNIT_MEASURE: '#unitMeasureInput',
     UNIT_MEASURE_DISPLAY: '#unitMeasureDisplayInput',
-    SELECTED_PRODUCT_SUPPLIER: '#selectedProductSupplierValue',
-    SELECTED_PRODUCT_PRESENTATION: '#selectedProductPresentationValue',
-    SELECTED_PRODUCT_UNIT_MEASURE: '#selectedProductUnitMeasureValue',
-    SELECTED_PRODUCT_BASE: '#selectedProductBaseValue',
-    SELECTED_PRODUCT_HEIGHT: '#selectedProductHeightValue',
-    SELECTED_PRODUCT_MAX_UNIT_COST: '#selectedProductMaxUnitCostValue',
+    SELECTED_MATERIAL_SUPPLIER: '#selectedMaterialSupplierValue',
+    SELECTED_MATERIAL_PRESENTATION: '#selectedMaterialPresentationValue',
+    SELECTED_MATERIAL_UNIT_MEASURE: '#selectedMaterialUnitMeasureValue',
+    SELECTED_MATERIAL_BASE: '#selectedMaterialBaseValue',
+    SELECTED_MATERIAL_HEIGHT: '#selectedMaterialHeightValue',
+    SELECTED_MATERIAL_MAX_UNIT_COST: '#selectedMaterialMaxUnitCostValue',
     SUPPLIER: '.supplier-select'
 };

@@ -8,10 +8,10 @@ const buildGoodsReceiptDetails = vi.fn();
 const correctGoodsReceiptDetailAndTotals = vi.fn();
 const cancelGoodsReceiptDetailAndTotals = vi.fn();
 const createInventoryMovement = vi.fn();
-const findSupplierProductByIds = vi.fn();
-const adjustSupplierProductStock = vi.fn();
+const findSupplierMaterialByIds = vi.fn();
+const adjustSupplierMaterialStock = vi.fn();
 const findGoodsReceiptDetailChangeReason = vi.fn();
-const updateProductUnitCostIfHigher = vi.fn();
+const updateMaterialUnitCostIfHigher = vi.fn();
 
 vi.mock('../../../../../src/utils/logger.js', () => ({
   createServiceLogger: vi.fn(() => ({})),
@@ -29,10 +29,10 @@ vi.mock('../../../../../src/services/inventory/movementService.js', () => ({
   createInventoryMovement
 }));
 
-vi.mock('../../../../../src/services/warehouse/products/supplierProductService.js', () => ({
-  updateProductUnitCostIfHigher,
-  findSupplierProductByIds,
-  adjustSupplierProductStock
+vi.mock('../../../../../src/services/warehouse/materials/supplierMaterialService.js', () => ({
+  updateMaterialUnitCostIfHigher,
+  findSupplierMaterialByIds,
+  adjustSupplierMaterialStock
 }));
 
 vi.mock('../../../../../src/services/warehouse/goodsReceipts/goodsReceiptHelpers.js', () => ({
@@ -63,14 +63,14 @@ describe('goods receipt detail change services', () => {
     }));
 
     goodsReceiptDetailFindFirst.mockResolvedValue({
-      productId: 'product-old',
-      productName: 'Producto anterior',
+      materialId: 'material-old',
+      materialName: 'Material anterior',
       quantity: 5,
       costPerUnitType: 10,
       netPurchaseAmount: 50,
       grossPurchaseAmount: 59.5,
-      productBase: 1,
-      productHeight: 1,
+      materialBase: 1,
+      materialHeight: 1,
       status: 'ACTIVE',
       goodsReceipt: {
         supplierId: 'supplier-1',
@@ -79,8 +79,8 @@ describe('goods receipt detail change services', () => {
     });
 
     buildGoodsReceiptDetails.mockResolvedValue([{
-      productId: 'product-old',
-      productName: 'Producto anterior',
+      materialId: 'material-old',
+      materialName: 'Material anterior',
       quantity: 4,
       costPerUnitType: 10,
       netPurchaseAmount: 40,
@@ -88,16 +88,16 @@ describe('goods receipt detail change services', () => {
     }]);
 
     findGoodsReceiptDetailChangeReason.mockResolvedValue({ id: 'reason-correction' });
-    findSupplierProductByIds.mockResolvedValue({
-      productId: 'product-old',
+    findSupplierMaterialByIds.mockResolvedValue({
+      materialId: 'material-old',
       supplierId: 'supplier-1',
       currentStock: 10,
       convertedQuantity: 10,
-      product: { id: 'product-old', name: 'Producto anterior', base: 1, height: 1 },
+      material: { id: 'material-old', name: 'Material anterior', base: 1, height: 1 },
       supplier: { tradeName: 'Proveedor' }
     });
     createInventoryMovement.mockResolvedValue({ id: 'movement-1' });
-    adjustSupplierProductStock.mockResolvedValue({});
+    adjustSupplierMaterialStock.mockResolvedValue({});
     correctGoodsReceiptDetailAndTotals.mockResolvedValue({
       updatedDetail: { id: 'detail-1' },
       updatedReceipt: { id: 'receipt-1', supplierId: 'supplier-1' }
@@ -107,7 +107,7 @@ describe('goods receipt detail change services', () => {
       updatedReceipt: { id: 'receipt-1', supplierId: 'supplier-1' }
     });
     goodsReceiptDetailChangeCreate.mockResolvedValue({ id: 'change-1', inventoryMovement: { id: 'movement-1' } });
-    updateProductUnitCostIfHigher.mockResolvedValue();
+    updateMaterialUnitCostIfHigher.mockResolvedValue();
   });
 
   it('crea la corrección de recepción de compra', async () => {
@@ -122,7 +122,7 @@ describe('goods receipt detail change services', () => {
     });
 
     expect(buildGoodsReceiptDetails).toHaveBeenCalledWith([{
-      productId: 'product-old',
+      materialId: 'material-old',
       quantity: 4,
       costPerUnitType: 10
     }], expect.objectContaining({ tx: expect.any(Object) }));
@@ -202,17 +202,17 @@ describe('goods receipt detail change services', () => {
       }
     }));
     expect(goodsReceiptDetailChangeFindUnique).not.toHaveBeenCalled();
-    expect(updateProductUnitCostIfHigher).not.toHaveBeenCalled();
+    expect(updateMaterialUnitCostIfHigher).not.toHaveBeenCalled();
     expect(result).not.toHaveProperty('costDifference');
   });
 
   it('rechaza la cancelación antes de crear el movimiento cuando no hay stock suficiente', async () => {
-    findSupplierProductByIds.mockResolvedValueOnce({
-      productId: 'product-old',
+    findSupplierMaterialByIds.mockResolvedValueOnce({
+      materialId: 'material-old',
       supplierId: 'supplier-1',
       currentStock: 2,
       convertedQuantity: 2,
-      product: { id: 'product-old', name: 'Producto anterior', base: 1, height: 1 },
+      material: { id: 'material-old', name: 'Material anterior', base: 1, height: 1 },
       supplier: { tradeName: 'Proveedor' }
     });
 
@@ -225,7 +225,7 @@ describe('goods receipt detail change services', () => {
     });
 
     expect(createInventoryMovement).not.toHaveBeenCalled();
-    expect(adjustSupplierProductStock).not.toHaveBeenCalled();
+    expect(adjustSupplierMaterialStock).not.toHaveBeenCalled();
     expect(cancelGoodsReceiptDetailAndTotals).not.toHaveBeenCalled();
     expect(goodsReceiptDetailChangeCreate).not.toHaveBeenCalled();
   });
@@ -234,8 +234,8 @@ describe('goods receipt detail change services', () => {
 
   it('rechaza cancelar un detalle de compra que ya está cancelado', async () => {
     goodsReceiptDetailFindFirst.mockResolvedValueOnce({
-      productId: 'product-old',
-      productName: 'Producto anterior',
+      materialId: 'material-old',
+      materialName: 'Material anterior',
       quantity: 0,
       costPerUnitType: 0,
       netPurchaseAmount: 0,
@@ -263,8 +263,8 @@ describe('goods receipt detail change services', () => {
 
   it('rechaza correcciones con cantidad cero para usar el flujo explícito de cancelación', async () => {
     buildGoodsReceiptDetails.mockResolvedValueOnce([{
-      productId: 'product-old',
-      productName: 'Producto anterior',
+      materialId: 'material-old',
+      materialName: 'Material anterior',
       quantity: 0,
       costPerUnitType: 10,
       netPurchaseAmount: 0,
@@ -290,8 +290,8 @@ describe('goods receipt detail change services', () => {
 
   it('rechaza correcciones con cantidad mayor a la registrada del detalle', async () => {
     buildGoodsReceiptDetails.mockResolvedValueOnce([{
-      productId: 'product-old',
-      productName: 'Producto anterior',
+      materialId: 'material-old',
+      materialName: 'Material anterior',
       quantity: 6,
       costPerUnitType: 10,
       netPurchaseAmount: 60,

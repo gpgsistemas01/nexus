@@ -1,6 +1,6 @@
 import { createProfileDTO } from "../../../dtos/profileDTO.js";
 import { successCodeMessages } from "../../../messages/codeMessages.js";
-import { createProfile, findAllProfiles, updateProfile } from "../../../services/admin/profileService.js";
+import { createProfile, findAllProfiles, updateProfile } from "../../../services/admin/profile/profileService.js";
 import { sanitizeEmptyStrings } from "../../../utils/formattersUtils.js";
 import { getDataTableOrder, getDataTablePaging, getDataTableSearch } from "../../../utils/requestQueryUtils.js";
 
@@ -15,7 +15,7 @@ export const getAllProfiles = async (req, res) => {
         req.query.role ??
         req.query['role[]'];
     const strictDepartmentFilter = req.query.strictDepartmentFilter === 'true';
-    const includeDepartments = req.query.includeDepartments === 'true';
+    const includeAccesses = req.query.includeAccesses === 'true';
     const { user } = req;
     const { skip, take } = getDataTablePaging(req.query);
     const search = getDataTableSearch(req.query);
@@ -59,7 +59,7 @@ export const getAllProfiles = async (req, res) => {
         search,
         orderBy,
         orderDir,
-        includeDepartments
+        includeAccesses
     });
 
     res.status(200).json(result);

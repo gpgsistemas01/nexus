@@ -28,7 +28,7 @@ vi.mock('../../../../src/repository/baseRepository.js', () => ({
   })
 }));
 
-vi.mock('../../../../src/services/admin/profileService.js', () => ({
+vi.mock('../../../../src/services/admin/profile/profileService.js', () => ({
   findProfileById
 }));
 
@@ -50,8 +50,8 @@ vi.mock('../../../../src/services/warehouse/goodsReceipts/goodsReceiptHelpers.js
   createGoodsReceiptDetailsAndUpdateTotals
 }));
 
-vi.mock('../../../../src/services/warehouse/products/supplierProductService.js', () => ({
-  updateProductUnitCostIfHigher: vi.fn()
+vi.mock('../../../../src/services/warehouse/materials/supplierMaterialService.js', () => ({
+  updateMaterialUnitCostIfHigher: vi.fn()
 }));
 
 const { updateGoodsReceipt } = await import('../../../../src/services/warehouse/goodsReceipts/goodsReceiptService.js');
@@ -71,12 +71,12 @@ describe('goodsReceiptService', () => {
       details: []
     });
     createGoodsReceiptDetailsAndUpdateTotals.mockResolvedValue({
-      createdDetails: [{ id: 'detail-new', productId: 'product-1', quantity: 2 }],
+      createdDetails: [{ id: 'detail-new', materialId: 'material-1', quantity: 2 }],
       updatedReceipt: {
         id: 'receipt-1',
         referenceNumber: 'REC-2026-0001',
         supplierId: 'supplier-1',
-        details: [{ id: 'detail-new', productId: 'product-1', quantity: 2 }]
+        details: [{ id: 'detail-new', materialId: 'material-1', quantity: 2 }]
       }
     });
   });
@@ -124,7 +124,7 @@ describe('goodsReceiptService', () => {
         isInvoiced: false,
         invoice: null,
         receptionDate: new Date('2026-07-09T00:00:00.000Z'),
-        details: [{ productId: 'product-1', quantity: 2, costPerUnitType: 50 }],
+        details: [{ materialId: 'material-1', quantity: 2, costPerUnitType: 50 }],
         userId: 'user-1'
       }
     });
@@ -132,14 +132,14 @@ describe('goodsReceiptService', () => {
     expect(createGoodsReceiptDetailsAndUpdateTotals).toHaveBeenCalledWith({
       tx: expect.any(Object),
       goodsReceiptId: 'receipt-1',
-      details: [{ productId: 'product-1', quantity: 2, costPerUnitType: 50 }]
+      details: [{ materialId: 'material-1', quantity: 2, costPerUnitType: 50 }]
     });
 
     expect(applyInventoryMovement).toHaveBeenCalledWith({
       tx: expect.any(Object),
       reference: { goodsReceiptId: 'receipt-1' },
       details: [{
-        productId: 'product-1',
+        materialId: 'material-1',
         goodsReceiptDetailId: 'detail-new',
         supplierId: 'supplier-1',
         quantity: 2

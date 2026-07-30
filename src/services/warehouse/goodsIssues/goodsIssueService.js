@@ -18,12 +18,13 @@ import { createServiceLogger, getModelLogContext, logServiceError, logServiceInf
 const serviceLogger = createServiceLogger('warehouse.goodsIssues.goodsIssueService');
 
 import { getDb } from "../../../repository/baseRepository.js";
-import { findProfileById, findProfileWithDepartmentsById } from "../../admin/profileService.js";
+import { findProfileById } from "../../admin/profile/profileService.js";
+import { isValidInternalClientAdvisor } from "../../admin/profile/profileRules.js";
 import { findDepartmentById } from "../../admin/departmentService.js";
-import { generateYearlyReferenceNumber } from "../../document/referenceNumberService.js";
+import { generateYearlyReferenceNumber, throwIfReferenceNumberAlreadyExists } from "../../document/referenceNumberService.js";
 import { findClientById } from "../../sales/clientService.js";
 import { findFulfillmentStatusIdByName, findFulfillmentStatusIdsByName } from "../fulfillmentStatusService.js";
-import { buildGoodsIssueDetails, isValidInternalClientAdvisor, isValidInternalClientProjectNumberByDepartment, resolveFulfillmentStatus } from "./goodsIssueHelpers.js";
+import { buildGoodsIssueDetails, isValidInternalClientProjectNumberByDepartment, resolveFulfillmentStatus } from "./goodsIssueHelpers.js";
 import { applyInventoryMovement } from "../../inventory/movementService.js";
 import { normalizeDecimal } from "../../../utils/formattersUtils.js";
 import { isAppError } from "../../../errors/AppError.js";
@@ -51,7 +52,7 @@ const resolveGoodsIssueHeaderData = async ({ requesterId, advisorId, departmentI
 
     if (!requester) throw new GoodsIssueRequesterProfileNotFound();
 
-    const advisor = await findProfileWithDepartmentsById({ id: advisorId });
+    const advisor = await findProfileById({ id: advisorId, includeAccesses: true });
 
     if (!advisor) throw new GoodsIssueAdvisorProfileNotFound();
 
@@ -99,13 +100,13 @@ const resolveGoodsIssueHeaderData = async ({ requesterId, advisorId, departmentI
 
 const GOODS_ISSUE_DETAIL_SELECT = {
     id: true,
-    productId: true,
+    materialId: true,
     quantity: true,
     convertedQuantity: true,
     maxUnitCost: true,
-    productName: true,
-    productBase: true,
-    productHeight: true,
+    materialName: true,
+    materialBase: true,
+    materialHeight: true,
     presentationId: true,
     presentationName: true,
     unitMeasureId: true,
@@ -230,6 +231,8 @@ export const findAllGoodsIssues = async ({
 
 export const createGoodsIssue = async ({ goodsIssueDto }) => {
 
+    let referenceNumber = null;
+
     try {
 
         const { requesterId, advisorId, departmentId, clientId, details, ...goodsIssueData } = goodsIssueDto;
@@ -250,7 +253,7 @@ export const createGoodsIssue = async ({ goodsIssueDto }) => {
 
         const result = await getDb().$transaction(async (tx) => {
 
-            const referenceNumber = await generateYearlyReferenceNumber({ type: DOCUMENT_REFERENCE_TYPES.GOODS_ISSUE, tx });
+            referenceNumber = await generateYearlyReferenceNumber({ type: DOCUMENT_REFERENCE_TYPES.GOODS_ISSUE, tx });
 
             const goodsIssue = await tx.goodsIssue.create({
                 data: {
@@ -295,6 +298,7 @@ export const createGoodsIssue = async ({ goodsIssueDto }) => {
         });
 
         if (isAppError(err)) throw err;
+        throwIfReferenceNumberAlreadyExists({ err, referenceNumber });
 
         throw new GoodsIssueCreateDatabaseError();
     }
@@ -315,7 +319,7 @@ export const updateGoodsIssue = async ({ id, goodsIssueDto }) => {
                 details: {
                     select: {
                         id: true,
-                        productId: true,
+                        materialId: true,
                         supplierId: true,
                         quantity: true,
                         presentationId: true,
@@ -424,16 +428,16 @@ export const updateGoodsIssueDetails = async ({ id, goodsIssueDto }) => {
                     where: { id: { in: detailIds } },
                     select: {
                         id: true,
-                        productId: true,
+                        materialId: true,
                         supplierId: true,
                         quantity: true,
                         suppliedQuantity: true,
                         returnedQuantity: true,
                         convertedQuantity: true,
                         projectConvertedQuantity: true,
-                        productName: true,
-                        productBase: true,
-                        productHeight: true,
+                        materialName: true,
+                        materialBase: true,
+                        materialHeight: true,
                         supplierName: true
                     }
                 }
@@ -491,7 +495,7 @@ export const updateGoodsIssueDetails = async ({ id, goodsIssueDto }) => {
             if (supplyRequests.length) {
 
                 const detailSupplyMovements = supplyRequests.map(({ current, quantityToSupply }) => ({
-                    productId: current.productId,
+                    materialId: current.materialId,
                     supplierId: current.supplierId,
                     goodsIssueDetailId: current.id,
                     quantity: quantityToSupply
@@ -683,7 +687,7 @@ export const returnGoodsIssueDetail = async ({ id, detailId, returnDto, userId }
                 tx,
                 reference: { goodsIssueId: id },
                 details: [{
-                    productId: detail.productId,
+                    materialId: detail.materialId,
                     supplierId: detail.supplierId,
                     goodsIssueDetailId: detail.id,
                     quantity: requestedReturnQuantity
@@ -740,12 +744,12 @@ export const returnGoodsIssueDetail = async ({ id, detailId, returnDto, userId }
                     goodsIssueDetailId: detail.id,
                     movementDetailId: movement.details[0]?.id || null,
                     returnedById: userId,
-                    productId: detail.productId,
-                    productName: detail.productName,
+                    materialId: detail.materialId,
+                    materialName: detail.materialName,
                     supplierId: detail.supplierId,
                     supplierName: detail.supplierName,
-                    productBase: detail.productBase,
-                    productHeight: detail.productHeight,
+                    materialBase: detail.materialBase,
+                    materialHeight: detail.materialHeight,
                     currentTotalReturnedQuantity: currentTotalReturnedQuantity,
                     newTotalReturnedQuantity: newTotalReturnedQuantity,
                     observations

@@ -1,4 +1,4 @@
-import { toggleProductOption } from "../../../select2/domains/product.js";
+import { toggleMaterialOption } from "../../../select2/domains/material.js";
 import { FILTER_SELECTORS } from "../../../../constants/selectors.js";
 import { toggleDisabledElement } from "../../../../utils/formUtils.js";
 import { bindDisabledControlWarning, setDisabledControlWarning } from "../../../../ui/disabledControlWarning.js";
@@ -18,7 +18,7 @@ bindDisabledControlWarning(select2DisabledWarningConfig);
 
 
 const DEPENDENT_FILTER_MESSAGES = {
-    productRequiresSupplier: 'Seleccione un proveedor antes de filtrar por producto.',
+    materialRequiresSupplier: 'Seleccione un proveedor antes de filtrar por material.',
     profileRequiresDepartment: 'Seleccione un área antes de filtrar por perfil.'
 };
 
@@ -74,23 +74,23 @@ const bindDisabledFilterDependency = ({
         });
 };
 
-const bindSupplierProductFilterDependency = () => {
+const bindSupplierMaterialFilterDependency = () => {
 
     bindDisabledFilterDependency({
         sourceSelector: FILTER_SELECTORS.SUPPLIER,
-        targetSelector: FILTER_SELECTORS.PRODUCT,
+        targetSelector: FILTER_SELECTORS.MATERIAL,
         clearTarget: () => {
-            toggleProductOption({
-                selector: FILTER_SELECTORS.PRODUCT,
+            toggleMaterialOption({
+                selector: FILTER_SELECTORS.MATERIAL,
                 data: {
                     id: null,
                     text: null
                 }
             });
 
-            clearSelectFilter(FILTER_SELECTORS.PRODUCT);
+            clearSelectFilter(FILTER_SELECTORS.MATERIAL);
         },
-        disabledMessage: DEPENDENT_FILTER_MESSAGES.productRequiresSupplier
+        disabledMessage: DEPENDENT_FILTER_MESSAGES.materialRequiresSupplier
     });
 };
 
@@ -106,8 +106,8 @@ const bindDepartmentProfileFilterDependency = () => {
 
 export const bindTableFilterDependencies = (fields = []) => {
 
-    if (fields.includes('supplier') && fields.includes('product')) {
-        bindSupplierProductFilterDependency();
+    if (fields.includes('supplier') && fields.includes('material')) {
+        bindSupplierMaterialFilterDependency();
     }
 
     if (fields.includes('department') && fields.includes('profile')) {

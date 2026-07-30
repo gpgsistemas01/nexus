@@ -4,6 +4,38 @@ import { toggleDisabledElement } from "../../utils/formUtils.js";
 import { bindDisabledControlWarning, setDisabledControlWarning } from "../../ui/disabledControlWarning.js";
 
 const wrapperSelector = '#presentationDisplayInput';
+export const SELECT_RESULTS_LIMIT = 20;
+
+export const buildPaginatedSelectParams = (params = {}, {
+    length = SELECT_RESULTS_LIMIT,
+    additionalParams = {}
+} = {}) => {
+    const page = Number(params.page) || 1;
+
+    return {
+        search: params.term,
+        start: (page - 1) * length,
+        length,
+        ...additionalParams
+    };
+};
+
+export const buildPaginatedSelectResults = (response, params = {}, {
+    length = SELECT_RESULTS_LIMIT,
+    mapItem = (item) => item
+} = {}) => {
+    const page = Number(params.page) || 1;
+    const list = response.data || response;
+    const recordsFiltered = Number(response.recordsFiltered) || list.length;
+
+    return {
+        results: list.map(mapItem),
+        pagination: {
+            more: page * length < recordsFiltered
+        }
+    };
+};
+
 const select2DisabledWarningConfig = {
     eventTargetSelector: '.select2-container',
     eventNamespace: 'select2DisabledWarning',
@@ -39,6 +71,8 @@ export const runAfterSelect2Close = ({ selector, action }) => {
     $select.select2('close');
 };
 
+export const clearSelectValue = selector => $(selector).val(null).trigger('change');
+
 export const initbaseSelect2 = ({ 
     baseSelector, 
     containerSelector,
@@ -48,11 +82,7 @@ export const initbaseSelect2 = ({
     searchDelay = 1000,
     placeholder,
     processResults,
-    data = (params) => {
-        return {
-            search: params.term
-        };
-    },
+    data = () => ({}),
     tags = false,
     createTag = (params) => {
 
@@ -65,6 +95,11 @@ export const initbaseSelect2 = ({
 
     if ($(baseSelector).hasClass("select2-hidden-accessible")) $(baseSelector).select2('destroy');
 
+    const resolveRequestData = (params) => ({
+        ...buildPaginatedSelectParams(params),
+        ...data(params)
+    });
+
     $(baseSelector).select2({ 
         language: 'es',
         multiple,
@@ -75,7 +110,7 @@ export const initbaseSelect2 = ({
         ajax: {  
             dataType: 'json', 
             delay: searchDelay, 
-            data, 
+            data: resolveRequestData,
             processResults,
             transport: async (params, success, failure) => {
 
@@ -169,9 +204,7 @@ export const initFilterSelect2 = ({
     getOptions,
     placeholder,
     selectedId = null,
-    data = (params) => ({
-        search: params.term
-    }),
+    data = () => ({}),
     mapOption = mapValueLabelToSelectData,
     processResults = null,
     clearWhenEmpty = true

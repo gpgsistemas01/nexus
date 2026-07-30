@@ -1,10 +1,10 @@
 import { useForm } from "../../application/form.js";
 import { editGoodsIssue, editGoodsIssueDetails, editGoodsIssueHeader, registerGoodsIssue } from "../../application/warehouse/goodsIssues/goodsIssues.js";
-import { validateAddGoodsIssueProductValidators, validateGoodsIssueDetailValidators, validateGoodsIssueValidators } from "../../utils/validations/validators.js";
-import { refreshProductTable } from "../../plugins/datatable/baseDatatable.js";
+import { validateAddGoodsIssueMaterialValidators, validateGoodsIssueDetailValidators, validateGoodsIssueValidators } from "../../utils/validations/validators.js";
+import { refreshMaterialTable } from "../../plugins/datatable/utils/renderMaterialDatatable.js";
 import { createGoodsIssueDatatable, details, initDetailsGoodsIssueTable } from "../../plugins/datatable/goodsIssueDatatable.js";
 import { initGoodsIssueFormSelect2, setGoodsIssueFormSelectOptions, syncGoodsIssueDependentSelectsState } from "../../plugins/select2/modules/goodsIssueSelect.js";
-import { setFormDisabled, toggleButtons, clearAddedProductInput, clearFormErrors, normalizeFormErrors, initForm } from "../../ui/formUI.js";
+import { setFormDisabled, toggleButtons, clearAddedMaterialInput, clearFormErrors, normalizeFormErrors, initForm } from "../../ui/formUI.js";
 import { on } from "../../utils/domUtils.js";
 import { setDateTimePickerValue } from "../../plugins/flatpickr/dateTimePicker.js";
 import { handleSubmit, hasValidationErrors, syncCheckboxControlledInputs, toggleDisabledElement, validateDetailsFields, validateFields } from "../../utils/formUtils.js";
@@ -116,7 +116,7 @@ export const openGoodsIssueModal = ({ mode, data = null }) => {
         status: data?.status?.name,
         showActions: false,
         withTotal: false,
-        showAddProduct: mode === FORM_MODES.CREATE || (mode === FORM_MODES.EDIT && data?.fulfillmentStatus?.name === FULFILLMENT_STATUS_NAMES.PENDING)
+        showAddMaterial: mode === FORM_MODES.CREATE || (mode === FORM_MODES.EDIT && data?.fulfillmentStatus?.name === FULFILLMENT_STATUS_NAMES.PENDING)
     });
     setFormDisabled({ form, isDisabled: false });
     initGoodsIssueFormSelect2();
@@ -145,13 +145,13 @@ export const openGoodsIssueModal = ({ mode, data = null }) => {
         form.querySelector('#projectNumberInput').value = data.projectNumber;
         const modalDetails = data.details.map(detail => ({
             id: detail.id,
-            productId: detail.productId,
+            materialId: detail.materialId,
             supplierId: detail.supplierId,
             presentationId: detail.presentationId,
             unitMeasureId: detail.unitMeasureId,
-            productName: detail.productName,
-            productBase: detail.productBase,
-            productHeight: detail.productHeight,
+            materialName: detail.materialName,
+            materialBase: detail.materialBase,
+            materialHeight: detail.materialHeight,
             quantity: detail.quantity,
             presentationName: detail.presentationName,
             convertedQuantity: detail.convertedQuantity,
@@ -196,7 +196,7 @@ export const openGoodsIssueModal = ({ mode, data = null }) => {
         if (mode === FORM_MODES.RETURN) {
 
             modalElement.querySelector('#modalTitle').textContent = buildModalTitle({
-                action: 'Devolver productos surtidos de la',
+                action: 'Devolver materiales surtidos de la',
                 entityName: GOODS_ISSUE_ENTITY_NAME,
                 referenceNumber: data?.referenceNumber
             });
@@ -221,19 +221,19 @@ export const openGoodsIssueModal = ({ mode, data = null }) => {
     openModal(modalElement);
 };
 
-const addProduct = () => {
+const addMaterial = () => {
 
-    const option = document.querySelector(`${ FORM_SELECTORS.PRODUCT } option:checked`);
+    const option = document.querySelector(`${ FORM_SELECTORS.MATERIAL } option:checked`);
 
-    let { productBase, productHeight, presentationName, unitMeasureName, productName, supplierName, supplierId, maxUnitCost } = option?.dataset || {};
-    productHeight = Number(productHeight);
-    productBase = Number(productBase);
+    let { materialBase, materialHeight, presentationName, unitMeasureName, materialName, supplierName, supplierId, maxUnitCost } = option?.dataset || {};
+    materialHeight = Number(materialHeight);
+    materialBase = Number(materialBase);
 
-    const productId = option?.value;
+    const materialId = option?.value;
     const quantity = Number(document.querySelector(FORM_SELECTORS.QUANTITY).value);
 
-    const errors = validateFields(validateAddGoodsIssueProductValidators, {
-        productId,
+    const errors = validateFields(validateAddGoodsIssueMaterialValidators, {
+        materialId,
         supplierId,
         quantity
     });
@@ -246,22 +246,22 @@ const addProduct = () => {
 
     let convertedQuantity;
 
-    if (!productBase || !productHeight) {
+    if (!materialBase || !materialHeight) {
 
-        productBase = null;
-        productHeight = null;
+        materialBase = null;
+        materialHeight = null;
         convertedQuantity = quantity;
 
     } else {
 
-        convertedQuantity = roundTo(productBase * productHeight * quantity);
+        convertedQuantity = roundTo(materialBase * materialHeight * quantity);
     }
 
-    const product = {
-        productId,
-        productName,
-        productBase,
-        productHeight,
+    const material = {
+        materialId,
+        materialName,
+        materialBase,
+        materialHeight,
         quantity,
         unitMeasureName,
         presentationName,
@@ -271,10 +271,10 @@ const addProduct = () => {
         supplierId,
     };
 
-    details.push(product);
+    details.push(material);
 
-    refreshProductTable(details);
-    clearAddedProductInput();
+    refreshMaterialTable(details);
+    clearAddedMaterialInput();
 };
 
 const findDetailByElement = (element) => {
@@ -286,24 +286,24 @@ const findDetailByElement = (element) => {
 
         if (detail) return detail;
 
-        return details.find(item => item.productId === detailId);
+        return details.find(item => item.materialId === detailId);
     }
 
-    return details.find(detail => detail.productId === element.dataset.id);
+    return details.find(detail => detail.materialId === element.dataset.id);
 };
 
-on('click', '#addProductBtn', addProduct);
+on('click', '#addMaterialBtn', addMaterial);
 on('change', '.supply-checkbox', (e, checkbox) => {
 
-    const product = findDetailByElement(checkbox);
+    const material = findDetailByElement(checkbox);
 
-    if (!product) return;
+    if (!material) return;
 
-    product.isSupplied = checkbox.checked;
+    material.isSupplied = checkbox.checked;
 
     if (!checkbox.checked) {
-        product.projectConvertedQuantity = product.originalProjectConvertedQuantity ?? null;
-        product.convertedQuantityDifference = product.originalConvertedQuantityDifference ?? null;
+        material.projectConvertedQuantity = material.originalProjectConvertedQuantity ?? null;
+        material.convertedQuantityDifference = material.originalConvertedQuantityDifference ?? null;
     }
 
     syncCheckboxControlledInputs({
@@ -316,32 +316,32 @@ on('change', '.supply-checkbox', (e, checkbox) => {
     const projectQuantityInput = document.querySelector(`.project-converted-quantity-input[data-detail-id="${ checkbox.dataset.detailId }"]`);
 
     if (projectQuantityInput && !checkbox.checked) {
-        projectQuantityInput.value = product.projectConvertedQuantity ?? '';
+        projectQuantityInput.value = material.projectConvertedQuantity ?? '';
 
         const currentTd = projectQuantityInput.closest('td');
         const nextTd = currentTd?.nextElementSibling;
 
-        if (nextTd) nextTd.textContent = product.convertedQuantityDifference ?? '';
+        if (nextTd) nextTd.textContent = material.convertedQuantityDifference ?? '';
     }
 });
 on('input', '.project-converted-quantity-input', (e, input) => {
 
     const value = Number(input.value);
-    const product = findDetailByElement(input);
+    const material = findDetailByElement(input);
 
-    if (!product) return;
+    if (!material) return;
 
-    product.projectConvertedQuantity = value;
-    product.convertedQuantityDifference = roundTo(product.convertedQuantity - product.projectConvertedQuantity);
+    material.projectConvertedQuantity = value;
+    material.convertedQuantityDifference = roundTo(material.convertedQuantity - material.projectConvertedQuantity);
 
     const currentTd = input.closest('td');
     const nextTd = currentTd.nextElementSibling;
 
-    if (nextTd) nextTd.textContent = formatDecimal(product.convertedQuantityDifference);
+    if (nextTd) nextTd.textContent = formatDecimal(material.convertedQuantityDifference);
 });
 
 
-on('click', '#productTable .return-issue-detail-btn', (event, button) => {
+on('click', '#materialTable .return-issue-detail-btn', (event, button) => {
     const detail = details.find(item => item.id === button.dataset.id);
 
     if (!detail || !currentGoodsIssue) return;

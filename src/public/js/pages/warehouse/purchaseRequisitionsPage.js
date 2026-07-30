@@ -1,9 +1,9 @@
 import { useForm } from "../../application/form.js";
 import { cancelPurchaseRequisition, confirmPurchaseRequisition, editPurchaseRequisition, registerPurchaseRequisition } from "../../application/warehouse/purchaseRequisitions.js";
-import { refreshProductTable } from "../../plugins/datatable/baseDatatable.js";
+import { refreshMaterialTable } from "../../plugins/datatable/utils/renderMaterialDatatable.js";
 import { createPurchaseRequisitionDatatable, details, initDetailsPurchaseRequisitionTable } from "../../plugins/datatable/purchaseRequisitionDatatable.js";
 import { initPurchaseRequisitionFormSelect2 } from "../../plugins/select2/modules/purchaseRequisitionSelect.js";
-import { setFormDisabled, toggleButtons, clearFormErrors, normalizeFormErrors, clearAddedProductInput, initForm } from "../../ui/formUI.js";
+import { setFormDisabled, toggleButtons, clearFormErrors, normalizeFormErrors, clearAddedMaterialInput, initForm } from "../../ui/formUI.js";
 import { openModal } from "../../ui/modalUI.js";
 import { on } from "../../utils/domUtils.js";
 import { setDateTimePickerValue } from "../../plugins/flatpickr/dateTimePicker.js";
@@ -73,11 +73,11 @@ export const openPurchaseRequisitionModal = async ({ mode, data = null }) => {
         setDateTimePickerValue(form.querySelector('#requestDateInput'), data.requestDate);
         details.push(...data?.details.map(detail => ({
             id: detail.id,
-            name: detail.product.name,
-            productId: detail.product.id,
+            name: detail.material.name,
+            materialId: detail.material.id,
             quantity: detail.quantity,
             description: detail.description,
-            uom: detail.product.presentation || 'PIEZA'
+            uom: detail.material.presentation || 'PIEZA'
         })));
 
         await initPurchaseRequisitionFormSelect2(data);
@@ -101,16 +101,16 @@ export const openPurchaseRequisitionModal = async ({ mode, data = null }) => {
     openModal(modalElement);
 };
 
-const addProduct = () => {
+const addMaterial = () => {
 
-    const option = document.querySelector('#productInput option:checked');
+    const option = document.querySelector('#materialInput option:checked');
 
-    const { productName, presentation } = option?.dataset;
-    const productId = option.value;
+    const { materialName, presentation } = option?.dataset;
+    const materialId = option.value;
     const quantity = document.querySelector('#quantityInput').value;
 
-    const errors = validateFields(validateAddProductValidators, {
-        productId,
+    const errors = validateFields(validateAddMaterialValidators, {
+        materialId,
         quantity
     });
 
@@ -120,14 +120,14 @@ const addProduct = () => {
 
     if (!option) return null;
 
-    const product = { productId, name: productName, quantity, presentation };
-    details.push(product);
+    const material = { materialId, name: materialName, quantity, presentation };
+    details.push(material);
 
-    refreshProductTable(details);
+    refreshMaterialTable(details);
 
-    clearAddedProductInput();
+    clearAddedMaterialInput();
 };
 
-on('click', '#addProductBtn', addProduct);
+on('click', '#addMaterialBtn', addMaterial);
 on('click', '#cancelBtn', async ()=> await handleAction({ action: cancelPurchaseRequisition, formId }));
 on('click', '#confirmBtn', async () => await handleAction({ action: confirmPurchaseRequisition, formId }));

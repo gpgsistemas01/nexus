@@ -1,22 +1,36 @@
 <% const form = {
     id: 'profileForm',
-    inputs: [
-        {
-            id: 'fullNameInput',
-            name: 'fullName',
-            type: 'text',
-            label: 'Nombre completo',
-            col: '12'
-        },
-    ],
-    selects: [
-        {
-            id: 'departmentInput',
-            name: 'departments',
+    inputs: [{
+        id: 'fullNameInput',
+        name: 'fullName',
+        type: 'text',
+        label: 'Nombre completo',
+        col: '12'
+    }],
+    table: {
+        id: 'profileAccessesTable',
+        errorName: 'accesses',
+        includeMaterialControls: false,
+        includeSummary: false,
+        containerClass: 'profile-access-container',
+        selects: [{
+            id: 'profileDepartmentInput',
+            name: 'profileDepartment',
             class: 'department-select',
-            col: 'col-12'
-        },
-    ]
+            col: 'md-5'
+        }, {
+            id: 'profileRoleInput',
+            name: 'profileRole',
+            class: 'role-select',
+            col: 'md-5'
+        }],
+        button: {
+            id: 'addProfileAccessBtn',
+            class: 'btn btn-primary w-100',
+            content: 'Agregar',
+            col: 'col-12 col-md-2'
+        }
+    }
 } %>
 
 <%- include('../../../shared/tableFilters', {
@@ -25,6 +39,11 @@
         {
             id: 'departmentFilter',
             label: 'Área:',
+            col: 'col-12 col-md-6 col-lg-3'
+        },
+        {
+            id: 'roleFilter',
+            label: 'Rol:',
             col: 'col-12 col-md-6 col-lg-3'
         }
     ]

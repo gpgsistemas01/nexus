@@ -1,7 +1,7 @@
 import { validateNumber, validateTextOptional, validateUUID } from '../fields/fieldsValidator.js';
 
 const wasteDataValidation = [
-    validateUUID('supplierProductId'),
+    validateUUID('supplierMaterialId'),
     validateNumber('base'),
     validateNumber('height')
 ];

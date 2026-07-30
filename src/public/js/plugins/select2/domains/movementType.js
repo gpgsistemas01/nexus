@@ -21,11 +21,6 @@ export const getMovementTypeData = () => ([
     }
 ]);
 
-export const getMovementTypeSelectApi = () => ({
-    getSelect: () => document.querySelector(movementTypeSelector),
-    getValue: () => document.querySelector(movementTypeSelector)?.value || ''
-});
-
 export const initMovementTypeFilterSelect = ({
     selectedId = null
 } = {}) => initFilterSelect2({

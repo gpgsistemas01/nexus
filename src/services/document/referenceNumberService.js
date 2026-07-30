@@ -1,3 +1,20 @@
+import { PRISMA_ERROR_CODES } from "../../constants/prisma.js";
+import { ReferenceNumberAlreadyExists } from "../../errors/document/referenceNumberError.js";
+
+export const throwIfReferenceNumberAlreadyExists = ({ err, referenceNumber = null }) => {
+    if (err?.code !== PRISMA_ERROR_CODES.RECORD_NOT_UNIQUE) return;
+
+    const driverConstraint = err.meta?.driverAdapterError?.cause?.constraint;
+    const target = err.meta?.target ?? driverConstraint?.fields ?? driverConstraint?.index;
+    const isReferenceNumberTarget = Array.isArray(target)
+        ? target.includes('referenceNumber')
+        : typeof target === 'string' && target.includes('referenceNumber');
+
+    if (isReferenceNumberTarget) {
+        throw new ReferenceNumberAlreadyExists({ referenceNumber });
+    }
+};
+
 const incrementYearlyReferenceNumberCounter = async ({ type, tx, year }) => {
 
     return tx.referenceNumberCounter.upsert({

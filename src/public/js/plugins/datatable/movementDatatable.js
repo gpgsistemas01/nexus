@@ -21,7 +21,7 @@ export const createMovementDatatable = async () => {
             'date',
             'movementType',
             'supplier',
-            'product'
+            'material'
         ]
     });
 
@@ -39,9 +39,9 @@ export const createMovementDatatable = async () => {
                 { data: 'date', title: 'Fecha' },
                 { data: 'type', title: 'Tipo' },
                 { data: 'referenceNumber', title: 'Folio' },
-                { data: 'productName', title: 'Material' },
-                { data: 'productBase', render: formatDecimal, title: 'Base' },
-                { data: 'productHeight', render: formatDecimal, title: 'Altura' },
+                { data: 'materialName', title: 'Material' },
+                { data: 'materialBase', render: formatDecimal, title: 'Base' },
+                { data: 'materialHeight', render: formatDecimal, title: 'Altura' },
                 { data: 'supplierName', title: 'Proveedor' },
                 { data: 'previousStock', render: formatDecimal, title: 'Stock Anterior' },
                 { data: 'quantity', render: formatDecimal, title: 'Movimiento' },

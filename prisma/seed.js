@@ -46,7 +46,7 @@ async function main() {
             name: true
         }
     });
-    
+
     const countProfile = await prisma.profile.count();
 
     if (countProfile < 1) {
@@ -245,12 +245,12 @@ async function main() {
 
     const filePath2 = path.join(__dirname, 'inventario_BD - PRECIOS.xlsx');
     const workbook2 = XLSX.readFile(filePath2);
-    const productSheet = workbook2.Sheets['PRODUCTOS'];
-    const productRows = XLSX.utils.sheet_to_json(productSheet, {
+    const materialSheet = workbook2.Sheets['MATERIALES'];
+    const materialRows = XLSX.utils.sheet_to_json(materialSheet, {
         defval: null,
     });
 
-    const productParsed = productRows.map(row => {
+    const materialParsed = materialRows.map(row => {
 
         const base = toDecimal(row.base);
         const height = toDecimal(row.height);
@@ -270,13 +270,13 @@ async function main() {
         };
     });
 
-    if(productParsed.some(p => !p.presentationId || !p.unitMeasureId)) {
-        console.log('Error: Algunos productos tienen presentación o unidad de medida no encontrados');
-        console.log(productParsed.filter(p => !p.presentationId || !p.unitMeasureId));
+    if(materialParsed.some(p => !p.presentationId || !p.unitMeasureId)) {
+        console.log('Error: Algunos materiales tienen presentación o unidad de medida no encontrados');
+        console.log(materialParsed.filter(p => !p.presentationId || !p.unitMeasureId));
     }
 
-    await prisma.product.createMany({
-        data: productParsed,
+    await prisma.material.createMany({
+        data: materialParsed,
         skipDuplicates: true
     });
 
@@ -290,7 +290,7 @@ async function main() {
     const supplierParsed = supplierRows.map((row, index) => {
 
         counter = index + 1;
-        
+
         return {
             codeNumber: counter,
             code: row.code,
@@ -316,9 +316,9 @@ async function main() {
         skipDuplicates: true,
     });
 
-    const skus = productParsed.map(p => p.sku);
+    const skus = materialParsed.map(p => p.sku);
 
-    const products = await prisma.product.findMany({
+    const materials = await prisma.material.findMany({
         where: {
             sku: {
                 in: skus
@@ -330,7 +330,7 @@ async function main() {
         }
     });
 
-    const productMap = new Map(products.map(p => [p.sku, p.id]));
+    const materialMap = new Map(materials.map(p => [p.sku, p.id]));
 
     const supplierTradeNames = supplierParsed.map(s => s.tradeName);
 
@@ -348,26 +348,26 @@ async function main() {
 
     const supplierMap = new Map(suppliers.map(s => [s.tradeName, s.id]))
 
-    const relationSupplierProductSheet = workbook2.Sheets['RELACIONES'];
-    const relationSupplierProductRows = XLSX.utils.sheet_to_json(relationSupplierProductSheet, {
+    const relationSupplierMaterialSheet = workbook2.Sheets['RELACIONES'];
+    const relationSupplierMaterialRows = XLSX.utils.sheet_to_json(relationSupplierMaterialSheet, {
         defval: null,
     });
 
-    const relationsSupplierProductParsed = relationSupplierProductRows.map(row => {
+    const relationsSupplierMaterialParsed = relationSupplierMaterialRows.map(row => {
 
-        const productId = productMap.get(row.skuProduct);
+        const materialId = materialMap.get(row.skuMaterial);
         const supplierId = supplierMap.get(row.supplier);
         const currentStock = toDecimal(row.currentStock);
         const convertedQuantity = toDecimal(row.convertedQuantity);
-        const maxUnitCost = toDecimal(row.maxUnitCost); 
+        const maxUnitCost = toDecimal(row.maxUnitCost);
 
-        if (!supplierId || !productId || !maxUnitCost) {
+        if (!supplierId || !materialId || !maxUnitCost) {
             console.log('Error en fila: ',row);
             return null;
         }
 
         return {
-            productId,
+            materialId,
             supplierId,
             currentStock: isNaN(currentStock) ? 0 : currentStock,
             convertedQuantity: isNaN(convertedQuantity) ? 0 : convertedQuantity,
@@ -376,8 +376,8 @@ async function main() {
         }
     }).filter(Boolean);
 
-    await prisma.supplierProduct.createMany({
-        data: relationsSupplierProductParsed,
+    await prisma.supplierMaterial.createMany({
+        data: relationsSupplierMaterialParsed,
         skipDuplicates: true
     });
 }

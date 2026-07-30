@@ -1,6 +1,15 @@
-import { validateArrayOfUUIDs, validateName } from "../fields/fieldsValidator.js";
+import { body } from "express-validator";
+import { validateName } from "../fields/fieldsValidator.js";
 
 export const profileValidation = [
     validateName({ fieldName: 'fullName', maxLength: 255 }),
-    validateArrayOfUUIDs({ fieldName: 'departments' })
+    body('accesses')
+        .isArray({ min: 1 }).withMessage('Seleccione un área y un rol, y agréguelos a la tabla antes de guardar.')
+        .bail()
+        .custom(accesses => new Set(accesses.map(access => access.departmentId)).size === accesses.length)
+        .withMessage('Elimine el área repetida de la tabla; cada área solo puede tener un rol dentro del perfil.'),
+    body('accesses.*.departmentId')
+        .isUUID('4').withMessage('Revise los accesos agregados y vuelva a seleccionar el área que ya no sea válida.'),
+    body('accesses.*.roleId')
+        .isUUID('4').withMessage('Revise los accesos agregados y vuelva a seleccionar el rol que ya no sea válido.')
 ]

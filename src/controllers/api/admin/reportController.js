@@ -1,5 +1,5 @@
 import { findMovementReportRows } from "../../../services/inventory/reportService.js";
-import { findAllProfiles } from "../../../services/admin/profileService.js";
+import { findAllProfiles } from "../../../services/admin/profile/profileService.js";
 import { findAllUsers } from "../../../services/admin/userService.js";
 import { getDataTableOrder, getDataTableSearch } from "../../../utils/requestQueryUtils.js";
 import { getMexicoMonthDateRange } from "../../../utils/formattersUtils.js";
@@ -30,7 +30,7 @@ export const exportMovementReport = async (req, res) => {
         endDate: monthlyReport ? monthDateRange.endDate : req.query.endDate || '',
         search: monthlyReport ? '' : getDataTableSearch(req.query),
         movementType: monthlyReport ? '' : req.query.movementType || '',
-        productId: monthlyReport ? '' : req.query.productId || '',
+        materialId: monthlyReport ? '' : req.query.materialId || '',
         supplierId: monthlyReport ? '' : req.query.supplierId || '',
         goodsIssueId: monthlyReport ? '' : req.query.goodsIssueId || '',
         goodsReceiptId: monthlyReport ? '' : req.query.goodsReceiptId || '',
@@ -59,9 +59,9 @@ export const exportMovementReport = async (req, res) => {
             row.createdAt,
             row.type,
             row.referenceNumber,
-            row.productName,
-            row.productBase,
-            row.productHeight,
+            row.materialName,
+            row.materialBase,
+            row.materialHeight,
             row.supplierName,
             row.previousStock,
             row.quantity,
@@ -134,7 +134,7 @@ export const exportProfileReport = async (req, res) => {
 
     const { data: rows } = await findAllProfiles({
         departments,
-        includeDepartments: true,
+        includeAccesses: true,
         skip: 0,
         take: 0,
         search: getDataTableSearch(req.query),
@@ -145,12 +145,17 @@ export const exportProfileReport = async (req, res) => {
     const data = [
         [
             'Nombre',
-            'Áreas'
+            'Área',
+            'Rol'
         ],
-        ...rows.map(row => [
-            row.fullName,
-            row.departments?.map(department => department.name).join(', ') || '-'
-        ])
+        ...rows.flatMap(row => row.accesses?.length
+            ? row.accesses.map(access => [
+                row.fullName,
+                access.department.name,
+                access.role.name
+            ])
+            : [[row.fullName, '-', '-']]
+        )
     ];
 
     return sendExcelReport({

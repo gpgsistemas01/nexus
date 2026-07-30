@@ -49,8 +49,8 @@ const totalSummary = {
 };
 
 const buttons = {
-    addProductButton: {
-        id: 'addProductBtn',
+    addMaterialButton: {
+        id: 'addMaterialBtn',
         class: 'btn btn-primary w-100',
         content: 'Agregar'
     },
@@ -161,35 +161,46 @@ const modalDialogClass = typeof dialogClass !== 'undefined' ? dialogClass : 'mod
                 <% } %>
 
                 <% if (form.table) { %>
-                    <div class="col-12 mb-3 add-product-container">
-                        <div class="row mb-3">
-                            <div class="col-12">
-                                <%- include('./select', { input: form.table.select }) %>
-                            </div>
-                        </div>
-
-                        <div class="row g-3 align-items-end">
-                            <% form.table.inputs.forEach(input => { %>
-                                <div class="<%= input.col || 'col-12' %>">
-                                    <%- include('./outlineInput', { input }) %>
+                    <div class="col-12 mb-3 modal-detail-controls <%= form.table.containerClass || 'add-material-container' %>">
+                        <% if (form.table.includeMaterialControls === false) { %>
+                            <div class="row g-3 align-items-end">
+                                <%- include('./selectList', { inputs: form.table.selects }) %>
+                                <div class="<%= form.table.button.col || 'col-12' %>">
+                                    <%- include('./button', { button: form.table.button }) %>
                                 </div>
-                            <% }); %>
-
-                            <div class="col-12 col-md-4 col-lg-3">
-                                <%- include('./outlineInput', { input: inputs.presentationDisplayInput }) %>
+                            </div>
+                        <% } else { %>
+                            <div class="row mb-3">
+                                <div class="col-12">
+                                    <%- include('./select', { input: form.table.select }) %>
+                                </div>
                             </div>
 
-                            <div class="col-12 col-md-2 col-lg-2">
-                                <%- include('./button', { button: buttons.addProductButton }) %>
+                            <div class="row g-3 align-items-end">
+                                <% form.table.inputs.forEach(input => { %>
+                                    <div class="<%= input.col || 'col-12' %>">
+                                        <%- include('./outlineInput', { input }) %>
+                                    </div>
+                                <% }); %>
+
+                                <div class="col-12 col-md-4 col-lg-3">
+                                    <%- include('./outlineInput', { input: inputs.presentationDisplayInput }) %>
+                                </div>
+
+                                <div class="col-12 col-md-2 col-lg-2">
+                                    <%- include('./button', { button: buttons.addMaterialButton }) %>
+                                </div>
                             </div>
+                        <% } %>
+                    </div>
+
+                    <%- include('./detailTable', { table: form.table }) %>
+
+                    <% if (form.table.includeSummary !== false) { %>
+                        <div class="col-12 mb-3 total-container">
+                            <%- include('./totalsSummary', { totals: totalSummary }) %>
                         </div>
-                    </div>
-
-                    <%- include('./productTable') %>
-
-                    <div class="col-12 mb-3 total-container">
-                        <%- include('./totalsSummary', { totals: totalSummary }) %>
-                    </div>
+                    <% } %>
                 <% } %>
 
                 <div class="col-12 modal-actions">

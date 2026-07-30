@@ -2,8 +2,8 @@ import { getDb } from "../../repository/baseRepository.js";
 import { ROLE_NAMES } from "../../constants/roles.js";
 import { DEPARTMENT_NAMES } from "../../constants/departments.js";
 
-const ENTITY_PRODUCT_LOW_STOCK = 'product-low-stock';
-const ENTITY_PRODUCT_STOCK_RESTORED = 'product-stock-restored';
+const ENTITY_MATERIAL_LOW_STOCK = 'material-low-stock';
+const ENTITY_MATERIAL_STOCK_RESTORED = 'material-stock-restored';
 const ENTITY_GOODS_RECEIPT = 'goods-receipt';
 
 const getNotificationWhereByUser = async (departments, roles) => {
@@ -25,7 +25,7 @@ const getNotificationWhereByUser = async (departments, roles) => {
     if (canViewAllNotifications) {
         return {
             entityType: {
-                notIn: [ENTITY_GOODS_RECEIPT, ENTITY_PRODUCT_STOCK_RESTORED]
+                notIn: [ENTITY_GOODS_RECEIPT, ENTITY_MATERIAL_STOCK_RESTORED]
             }
         };
     }
@@ -34,7 +34,7 @@ const getNotificationWhereByUser = async (departments, roles) => {
         AND: [
             {
                 entityType: {
-                    not: ENTITY_PRODUCT_STOCK_RESTORED
+                    not: ENTITY_MATERIAL_STOCK_RESTORED
                 }
             },
             {
@@ -43,7 +43,7 @@ const getNotificationWhereByUser = async (departments, roles) => {
                         departmentId: { in: departmentIds }
                     },
                     {
-                        entityType: ENTITY_PRODUCT_LOW_STOCK
+                        entityType: ENTITY_MATERIAL_LOW_STOCK
                     }
                 ]
             }
@@ -51,10 +51,10 @@ const getNotificationWhereByUser = async (departments, roles) => {
     };
 };
 
-export const createStockNotification = async ({ 
-    title, 
-    message, 
-    type = 'warning', 
+export const createStockNotification = async ({
+    title,
+    message,
+    type = 'warning',
     referenceNumber = null,
     entityId = null,
     entityType = null,
@@ -87,15 +87,15 @@ export const createNotifications = async (notifications = []) => {
     return notifications;
 };
 
-export const notifyProductStockStatusChanges = async ({ productIds = [], userId = null }) => {
+export const notifyMaterialStockStatusChanges = async ({ materialIds = [], userId = null }) => {
 
-    if (!productIds.length) return [];
+    if (!materialIds.length) return [];
 
-    const uniqueProductIds = [...new Set(productIds)];
-    const products = await getDb().product.findMany({
+    const uniqueMaterialIds = [...new Set(materialIds)];
+    const materials = await getDb().material.findMany({
         where: {
             id: {
-                in: uniqueProductIds
+                in: uniqueMaterialIds
             }
         },
         select: {
@@ -109,10 +109,10 @@ export const notifyProductStockStatusChanges = async ({ productIds = [], userId 
     const latestNotifications = await getDb().notification.findMany({
         where: {
             entityId: {
-                in: uniqueProductIds
+                in: uniqueMaterialIds
             },
             entityType: {
-                in: [ENTITY_PRODUCT_LOW_STOCK, ENTITY_PRODUCT_STOCK_RESTORED]
+                in: [ENTITY_MATERIAL_LOW_STOCK, ENTITY_MATERIAL_STOCK_RESTORED]
             }
         },
         orderBy: {
@@ -120,42 +120,42 @@ export const notifyProductStockStatusChanges = async ({ productIds = [], userId 
         }
     });
 
-    const latestNotificationByProduct = new Map();
+    const latestNotificationByMaterial = new Map();
 
     for (const notification of latestNotifications) {
-        if (!latestNotificationByProduct.has(notification.entityId)) {
-            latestNotificationByProduct.set(notification.entityId, notification);
+        if (!latestNotificationByMaterial.has(notification.entityId)) {
+            latestNotificationByMaterial.set(notification.entityId, notification);
         }
     }
 
     const notificationsToCreate = [];
 
-    for (const product of products) {
-        const latestStateNotification = latestNotificationByProduct.get(product.id);
+    for (const material of materials) {
+        const latestStateNotification = latestNotificationByMaterial.get(material.id);
 
-        const isLowStock = product.currentStock < product.minStock;
+        const isLowStock = material.currentStock < material.minStock;
         const lastNotificationType = latestStateNotification?.entityType || null;
 
-        if (isLowStock && lastNotificationType !== ENTITY_PRODUCT_LOW_STOCK) {
+        if (isLowStock && lastNotificationType !== ENTITY_MATERIAL_LOW_STOCK) {
             notificationsToCreate.push({
                 title: 'Stock mínimo',
-                message: `El producto ${product.name} se encuentra en stock mínimo.`,
+                message: `El material ${material.name} se encuentra en stock mínimo.`,
                 type: 'warning',
-                entityId: product.id,
-                entityType: ENTITY_PRODUCT_LOW_STOCK,
+                entityId: material.id,
+                entityType: ENTITY_MATERIAL_LOW_STOCK,
                 referenceNumber: null,
                 userId,
                 departmentId: null
             });
         }
 
-        if (!isLowStock && lastNotificationType === ENTITY_PRODUCT_LOW_STOCK) {
+        if (!isLowStock && lastNotificationType === ENTITY_MATERIAL_LOW_STOCK) {
             notificationsToCreate.push({
                 title: 'Stock restaurado',
-                message: `El producto ${product.name} restauró su nivel de stock.`,
+                message: `El material ${material.name} restauró su nivel de stock.`,
                 type: 'info',
-                entityId: product.id,
-                entityType: ENTITY_PRODUCT_STOCK_RESTORED,
+                entityId: material.id,
+                entityType: ENTITY_MATERIAL_STOCK_RESTORED,
                 referenceNumber: null,
                 userId,
                 departmentId: null
@@ -173,7 +173,7 @@ export const notifyProductStockStatusChanges = async ({ productIds = [], userId 
                 in: notificationsToCreate.map(n => n.entityId)
             },
             entityType: {
-                in: [ENTITY_PRODUCT_LOW_STOCK, ENTITY_PRODUCT_STOCK_RESTORED]
+                in: [ENTITY_MATERIAL_LOW_STOCK, ENTITY_MATERIAL_STOCK_RESTORED]
             }
         },
         orderBy: {

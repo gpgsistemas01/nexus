@@ -38,7 +38,7 @@ export default async function teardownTestDatabase() {
     }
   });
   await prisma.user.deleteMany({ where: { id: { in: adminUsers.map(({ id }) => id) } } });
-  await prisma.departmentProfile.deleteMany({
+  await prisma.profileRoleDepartment.deleteMany({
     where: {
       OR: [
         { profileId: { in: adminProfiles.map(({ id }) => id) } },
@@ -50,7 +50,7 @@ export default async function teardownTestDatabase() {
   await prisma.role.deleteMany({ where: { id: { in: adminRoles.map(({ id }) => id) } } });
   await prisma.department.deleteMany({ where: { id: { in: adminDepartments.map(({ id }) => id) } } });
 
-  const receiptProducts = await prisma.product.findMany({ where: { name: { startsWith: 'IT Receipt Product ' } }, select: { id: true } });
+  const receiptMaterials = await prisma.material.findMany({ where: { name: { startsWith: 'IT Receipt Material ' } }, select: { id: true } });
   const receiptSuppliers = await prisma.supplier.findMany({ where: { tradeName: { startsWith: 'IT Receipt Supplier ' } }, select: { id: true } });
   const receiptProfiles = await prisma.profile.findMany({ where: { fullName: { startsWith: 'IT Receipt Profile ' } }, select: { id: true } });
   const receiptPresentations = await prisma.presentation.findMany({ where: { name: { startsWith: 'IT Receipt Presentation ' } }, select: { id: true } });
@@ -71,14 +71,14 @@ export default async function teardownTestDatabase() {
   await prisma.inventoryMovement.deleteMany({ where: { goodsReceiptId: { in: receipts.map(({ id }) => id) } } });
   await prisma.goodsReceiptDetail.deleteMany({ where: { id: { in: receiptDetails.map(({ id }) => id) } } });
   await prisma.goodsReceipt.deleteMany({ where: { id: { in: receipts.map(({ id }) => id) } } });
-  await prisma.supplierProduct.deleteMany({ where: { OR: [{ productId: { in: receiptProducts.map(({ id }) => id) } }, { supplierId: { in: receiptSuppliers.map(({ id }) => id) } }] } });
-  await prisma.product.deleteMany({ where: { id: { in: receiptProducts.map(({ id }) => id) } } });
+  await prisma.supplierMaterial.deleteMany({ where: { OR: [{ materialId: { in: receiptMaterials.map(({ id }) => id) } }, { supplierId: { in: receiptSuppliers.map(({ id }) => id) } }] } });
+  await prisma.material.deleteMany({ where: { id: { in: receiptMaterials.map(({ id }) => id) } } });
   await prisma.supplier.deleteMany({ where: { id: { in: receiptSuppliers.map(({ id }) => id) } } });
   await prisma.profile.deleteMany({ where: { id: { in: receiptProfiles.map(({ id }) => id) } } });
   await prisma.presentation.deleteMany({ where: { id: { in: receiptPresentations.map(({ id }) => id) } } });
   await prisma.unitMeasure.deleteMany({ where: { id: { in: receiptUnits.map(({ id }) => id) } } });
 
-  const wasteIssueProducts = await prisma.product.findMany({ where: { name: { startsWith: 'IT WasteIssue Product ' } }, select: { id: true } });
+  const wasteIssueMaterials = await prisma.material.findMany({ where: { name: { startsWith: 'IT WasteIssue Material ' } }, select: { id: true } });
   const wasteIssueSuppliers = await prisma.supplier.findMany({ where: { tradeName: { startsWith: 'IT WasteIssue Supplier ' } }, select: { id: true } });
   const wasteIssueReasons = await prisma.stockAdjustmentReason.findMany({ where: { name: { startsWith: 'IT WasteIssue Reason ' } }, select: { id: true } });
   const wasteIssueUsers = await prisma.user.findMany({ where: { name: { startsWith: 'ITWasteIssueUser' } }, select: { id: true } });
@@ -92,7 +92,7 @@ export default async function teardownTestDatabase() {
       OR: [
         { reasonId: { in: wasteIssueReasons.map(({ id }) => id) } },
         { createdById: { in: wasteIssueUsers.map(({ id }) => id) } },
-        { details: { some: { productId: { in: wasteIssueProducts.map(({ id }) => id) } } } },
+        { details: { some: { materialId: { in: wasteIssueMaterials.map(({ id }) => id) } } } },
         { details: { some: { supplierId: { in: wasteIssueSuppliers.map(({ id }) => id) } } } }
       ]
     },
@@ -116,25 +116,25 @@ export default async function teardownTestDatabase() {
 
   await prisma.goodsIssueDetail.deleteMany({ where: { goodsIssueId: { in: wasteIssueGoodsIssues.map(({ id }) => id) } } });
   await prisma.goodsIssue.deleteMany({ where: { id: { in: wasteIssueGoodsIssues.map(({ id }) => id) } } });
-  await prisma.waste.deleteMany({ where: { supplierProduct: { productId: { in: wasteIssueProducts.map(({ id }) => id) } } } });
+  await prisma.waste.deleteMany({ where: { supplierMaterial: { materialId: { in: wasteIssueMaterials.map(({ id }) => id) } } } });
   await prisma.movementDetail.deleteMany({ where: { stockAdjustmentDetailId: { in: wasteIssueAdjustmentDetails.map(({ id }) => id) } } });
   await prisma.inventoryMovement.deleteMany({ where: { stockAdjustmentId: { in: wasteIssueAdjustments.map(({ id }) => id) } } });
   await prisma.stockAdjustmentDetail.deleteMany({ where: { id: { in: wasteIssueAdjustmentDetails.map(({ id }) => id) } } });
   await prisma.stockAdjustment.deleteMany({ where: { id: { in: wasteIssueAdjustments.map(({ id }) => id) } } });
-  await prisma.supplierProduct.deleteMany({ where: { OR: [{ productId: { in: wasteIssueProducts.map(({ id }) => id) } }, { supplierId: { in: wasteIssueSuppliers.map(({ id }) => id) } }] } });
-  await prisma.product.deleteMany({ where: { id: { in: wasteIssueProducts.map(({ id }) => id) } } });
+  await prisma.supplierMaterial.deleteMany({ where: { OR: [{ materialId: { in: wasteIssueMaterials.map(({ id }) => id) } }, { supplierId: { in: wasteIssueSuppliers.map(({ id }) => id) } }] } });
+  await prisma.material.deleteMany({ where: { id: { in: wasteIssueMaterials.map(({ id }) => id) } } });
   await prisma.supplier.deleteMany({ where: { id: { in: wasteIssueSuppliers.map(({ id }) => id) } } });
   await prisma.stockAdjustmentReason.deleteMany({ where: { id: { in: wasteIssueReasons.map(({ id }) => id) } } });
   await prisma.client.deleteMany({ where: { id: { in: wasteIssueClients.map(({ id }) => id) } } });
-  await prisma.departmentProfile.deleteMany({ where: { OR: [{ profileId: { in: wasteIssueProfiles.map(({ id }) => id) } }, { departmentId: { in: wasteIssueDepartments.map(({ id }) => id) } }] } });
+  await prisma.profileRoleDepartment.deleteMany({ where: { OR: [{ profileId: { in: wasteIssueProfiles.map(({ id }) => id) } }, { departmentId: { in: wasteIssueDepartments.map(({ id }) => id) } }] } });
   await prisma.profile.deleteMany({ where: { id: { in: wasteIssueProfiles.map(({ id }) => id) } } });
   await prisma.department.deleteMany({ where: { id: { in: wasteIssueDepartments.map(({ id }) => id) } } });
   await prisma.user.deleteMany({ where: { id: { in: wasteIssueUsers.map(({ id }) => id) } } });
   await prisma.presentation.deleteMany({ where: { id: { in: wasteIssuePresentations.map(({ id }) => id) } } });
   await prisma.unitMeasure.deleteMany({ where: { id: { in: wasteIssueUnits.map(({ id }) => id) } } });
 
-  const adjustmentProducts = await prisma.product.findMany({
-    where: { name: { startsWith: 'IT Adjustment Product ' } },
+  const adjustmentMaterials = await prisma.material.findMany({
+    where: { name: { startsWith: 'IT Adjustment Material ' } },
     select: { id: true }
   });
   const adjustmentSuppliers = await prisma.supplier.findMany({
@@ -162,7 +162,7 @@ export default async function teardownTestDatabase() {
       OR: [
         { reasonId: { in: adjustmentReasons.map(({ id }) => id) } },
         { createdById: { in: adjustmentUsers.map(({ id }) => id) } },
-        { details: { some: { productId: { in: adjustmentProducts.map(({ id }) => id) } } } },
+        { details: { some: { materialId: { in: adjustmentMaterials.map(({ id }) => id) } } } },
         { details: { some: { supplierId: { in: adjustmentSuppliers.map(({ id }) => id) } } } }
       ]
     },
@@ -185,15 +185,15 @@ export default async function teardownTestDatabase() {
   await prisma.stockAdjustment.deleteMany({
     where: { id: { in: adjustments.map(({ id }) => id) } }
   });
-  await prisma.supplierProduct.deleteMany({
+  await prisma.supplierMaterial.deleteMany({
     where: {
       OR: [
-        { productId: { in: adjustmentProducts.map(({ id }) => id) } },
+        { materialId: { in: adjustmentMaterials.map(({ id }) => id) } },
         { supplierId: { in: adjustmentSuppliers.map(({ id }) => id) } }
       ]
     }
   });
-  await prisma.product.deleteMany({ where: { id: { in: adjustmentProducts.map(({ id }) => id) } } });
+  await prisma.material.deleteMany({ where: { id: { in: adjustmentMaterials.map(({ id }) => id) } } });
   await prisma.supplier.deleteMany({ where: { id: { in: adjustmentSuppliers.map(({ id }) => id) } } });
   await prisma.stockAdjustmentReason.deleteMany({ where: { id: { in: adjustmentReasons.map(({ id }) => id) } } });
   await prisma.user.deleteMany({ where: { id: { in: adjustmentUsers.map(({ id }) => id) } } });

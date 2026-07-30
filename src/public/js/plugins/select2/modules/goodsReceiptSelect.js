@@ -1,36 +1,36 @@
 import { updateTotals } from "../../../ui/formUI.js";
-import { PRODUCT_SELECT_RESULTS_LIMIT } from "../../../application/warehouse/products.js";
+import { MATERIAL_SELECT_RESULTS_LIMIT } from "../../../application/warehouse/materials.js";
 import { toggleContainerElements } from "../../../utils/formUtils.js";
-import { refreshProductTable } from "../../datatable/baseDatatable.js";
+import { refreshMaterialTable } from "../../datatable/utils/renderMaterialDatatable.js";
 import { details } from "../../datatable/goodsReceiptDatatable.js";
 import { initMdbWrapperInput, updateMdbWrapperInput } from "../../mdb/baseInstance.js";
 import { bindDisabledSelectDependency } from "../baseSelect.js";
-import { setupProductSelect, toggleProductOption } from "../domains/product.js";
+import { setupMaterialSelect, toggleMaterialOption } from "../domains/material.js";
 import { initProfileSelect, toggleProfileOption } from "../domains/profile.js";
 import { setupSupplierSelect, toggleSupplierOption } from "../domains/supplier.js";
 import { FORM_SELECTORS, MODAL_SELECTORS } from "../../../constants/selectors.js";
 
 const modalSelector = MODAL_SELECTORS.GOODS_RECEIPT;
-const productSelector = FORM_SELECTORS.PRODUCT;
+const materialSelector = FORM_SELECTORS.MATERIAL;
 const supplierSelector = FORM_SELECTORS.SUPPLIER;
 const receivedBySelector = FORM_SELECTORS.RECEIVED_BY;
 const supplierScopedSelector = `${ modalSelector } ${ supplierSelector }`;
-const productScopedSelector = `${ modalSelector } ${ productSelector }`;
+const materialScopedSelector = `${ modalSelector } ${ materialSelector }`;
 const receivedByScopedSelector = `${ modalSelector } ${ receivedBySelector }`;
 const presentationDisplayScopedSelector = `${ modalSelector } ${ FORM_SELECTORS.PRESENTATION_DISPLAY }`;
 const supplierChangedEventName = 'goods-receipt:supplier-changed';
 
-const clearProductSelection = () => {
+const clearMaterialSelection = () => {
 
-    toggleProductOption({
-        selector: productScopedSelector,
+    toggleMaterialOption({
+        selector: materialScopedSelector,
         data: {
             id: null,
             text: null
         }
     });
 
-    $(productScopedSelector).val(null).trigger('change');
+    $(materialScopedSelector).val(null).trigger('change');
 };
 
 const clearPresentationDisplay = () => {
@@ -49,15 +49,15 @@ export const initGoodsReceiptFormSelect2 = () => {
 
     bindDisabledSelectDependency({
         sourceSelector: supplierScopedSelector,
-        targetSelector: productScopedSelector,
-        clearTarget: clearProductSelection,
-        disabledMessage: 'Seleccione un proveedor antes de buscar producto.',
+        targetSelector: materialScopedSelector,
+        clearTarget: clearMaterialSelection,
+        disabledMessage: 'Seleccione un proveedor antes de buscar material.',
         onChange: ({ value }) => {
 
             const isDisabled = !value;
 
             toggleContainerElements({
-                selector: '.add-product-container',
+                selector: '.add-material-container',
                 isDisabled,
                 root: modal
             });
@@ -70,7 +70,7 @@ export const initGoodsReceiptFormSelect2 = () => {
                 name: null
             });
 
-            refreshProductTable(details);
+            refreshMaterialTable(details);
 
             updateTotals();
             clearPresentationDisplay();
@@ -85,7 +85,7 @@ export const initGoodsReceiptFormSelect2 = () => {
     });
 
     initProfileSelect({
-        modalSelector, 
+        modalSelector,
         baseSelector: receivedByScopedSelector,
         placeholder: 'Buscar persona que recibe...',
         data: (params) => {
@@ -99,13 +99,13 @@ export const initGoodsReceiptFormSelect2 = () => {
         allowCreate: false,
     });
 
-    setupProductSelect({
+    setupMaterialSelect({
         modalSelector,
         supplierSelector,
-        productSelector,
+        materialSelector,
         includeStockAdjustmentOnCreate: false,
-        productCreationContext: 'goodsReceipt',
-        resultsLimit: PRODUCT_SELECT_RESULTS_LIMIT
+        materialCreationContext: 'goodsReceipt',
+        resultsLimit: MATERIAL_SELECT_RESULTS_LIMIT
     });
 };
 
@@ -126,5 +126,5 @@ export const setGoodsReceiptFormSelectOptions = (data = null) => {
         name: data?.receivedByName,
     });
 
-    clearProductSelection();
+    clearMaterialSelection();
 };

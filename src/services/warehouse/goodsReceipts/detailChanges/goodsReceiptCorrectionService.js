@@ -13,7 +13,7 @@ import {
 import { getDb } from '../../../../repository/baseRepository.js';
 import { createServiceLogger, getModelLogContext, logServiceError } from '../../../../utils/logger.js';
 import { normalizeDecimal } from '../../../../utils/formattersUtils.js';
-import { updateProductUnitCostIfHigher } from '../../products/supplierProductService.js';
+import { updateMaterialUnitCostIfHigher } from '../../materials/supplierMaterialService.js';
 import { buildGoodsReceiptDetails, correctGoodsReceiptDetailAndTotals } from '../goodsReceiptHelpers.js';
 import {
     createGoodsReceiptDetailChange,
@@ -41,7 +41,7 @@ export const correctGoodsReceiptDetailLine = async ({
                 throw new GoodsReceiptDetailAlreadyCanceled();
             }
             const [correctedDetail] = await buildGoodsReceiptDetails([{
-                productId: currentDetail.productId,
+                materialId: currentDetail.materialId,
                 quantity,
                 costPerUnitType
             }], { tx });
@@ -101,7 +101,7 @@ export const correctGoodsReceiptDetailLine = async ({
             };
         });
 
-        await updateProductUnitCostIfHigher({
+        await updateMaterialUnitCostIfHigher({
             supplierId: result.updatedReceipt.supplierId,
             details: [result.updatedDetail]
         });

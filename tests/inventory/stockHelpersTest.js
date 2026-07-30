@@ -26,7 +26,7 @@ describe('stockHelpers', () => {
 
   it('no falla cuando el stock resultante no es negativo', () => {
     expect(() => assertSufficientStock({
-      product: { id: 'p1', name: 'Lámina' },
+      material: { id: 'p1', name: 'Lámina' },
       newStock: 0,
       newConvertedQuantity: 0
     })).not.toThrow();
@@ -34,7 +34,7 @@ describe('stockHelpers', () => {
 
   it('lanza un error de negocio con metadatos cuando el stock es insuficiente', () => {
     expect(() => assertSufficientStock({
-      product: {
+      material: {
         id: 'p1',
         name: 'Lámina',
         supplierId: 's1',
@@ -48,7 +48,7 @@ describe('stockHelpers', () => {
 
     try {
       assertSufficientStock({
-        product: {
+        material: {
           id: 'p1',
           name: 'Lámina',
           supplierId: 's1',
@@ -61,8 +61,8 @@ describe('stockHelpers', () => {
       });
     } catch (error) {
       expect(error.meta).toMatchObject({
-        productName: 'Lámina',
-        productId: 'p1',
+        materialName: 'Lámina',
+        materialId: 'p1',
         supplierId: 's1',
         supplierName: 'Proveedor Uno',
         requestedQuantity: 5
