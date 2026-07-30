@@ -5,7 +5,7 @@ import { getWastesPage } from '../../../controllers/web/warehouse/wasteControlle
 const router = express.Router();
 
 const wastePagePermissions = {
-    roles: ['Almacenista', 'Coordinador', 'Auxiliar', 'Vendedor', 'Administrador del sistema'],
+    roles: ['Almacenista', 'Coordinador', 'Auxiliar', 'Asesor de ventas', 'Administrador del sistema'],
     departments: ['ALMACÉN Y PROVEDURÍA', 'SISTEMAS', 'VENTAS Y PROYECTOS ESPECIALES']
 };
 

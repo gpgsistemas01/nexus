@@ -4,20 +4,6 @@ import { FILTER_SELECTORS } from "../../../constants/selectors.js";
 
 const departmentFilterSelector = FILTER_SELECTORS.DEPARTMENT;
 
-export const getDepartmentSelectApi = () => ({
-    getSelect: () => document.querySelector(departmentFilterSelector),
-    getValue: () => document.querySelector(departmentFilterSelector)?.value || ''
-});
-
-export const getSelectedDepartmentName = (selector = departmentFilterSelector) => {
-
-    const departmentFilter = document.querySelector(selector);
-
-    if (!departmentFilter?.value) return '';
-
-    return departmentFilter.options[departmentFilter.selectedIndex]?.text || '';
-};
-
 export const initDepartmentFilterSelect = ({
     selectedId = null
 } = {}) => initFilterSelect2({

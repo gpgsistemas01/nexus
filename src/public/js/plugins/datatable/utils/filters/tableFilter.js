@@ -3,6 +3,7 @@ import { on } from "../../../../utils/domUtils.js";
 import { DATATABLE_SELECTORS, FILTER_SELECTORS } from "../../../../constants/selectors.js";
 import { buildTableFilterConfigs } from "./tableFilterConfigs.js";
 import { bindTableFilterDependencies } from "./tableFilterDependencies.js";
+import { SELECT_RESULTS_LIMIT } from "../../../select2/baseSelect.js";
 
 const getDataTable = (selector = DATATABLE_SELECTORS.MAIN) => {
 
@@ -58,8 +59,8 @@ export const setupTableFilters = async ({
 
         const {
             key,
+            selector: filterSelector,
             isSelected = true,
-            getSelectApi,
             getOptions = async () => [],
             initSelect,
             attachHandler,
@@ -75,13 +76,14 @@ export const setupTableFilters = async ({
             continue;
         }
 
-        const { getSelect, getValue } = getSelectApi();
-
-        const select = getSelect();
+        const select = document.querySelector(filterSelector);
 
         if (!select) continue;
 
-        const options = await getOptions();
+        const options = await getOptions({
+            start: 0,
+            length: SELECT_RESULTS_LIMIT
+        });
 
         select.options.length = 0;
 
@@ -101,13 +103,15 @@ export const setupTableFilters = async ({
             : options[0];
 
         initSelect({
-            selectedId: isSelected ? defaultSelectedOption?.value : null
+            selectedId: isSelected
+                ? defaultSelectedOption?.value ?? defaultSelectedOption?.id
+                : null
         });
 
         if (attachHandler) attachHandler({ onChange });
 
         values[key] = () => ({
-            [key]: getValue?.() || ''
+            [key]: select.value || ''
         });
     }
 

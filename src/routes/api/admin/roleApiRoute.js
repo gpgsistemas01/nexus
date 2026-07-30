@@ -5,8 +5,8 @@ import { getAllRoles } from '../../../controllers/api/admin/roleController.js';
 const router = express.Router();
 
 const roleReadPermissions = {
-    roles: ['Administrador del sistema'],
-    departments: ['SISTEMAS']
+    roles: ['Administrador del sistema', 'Coordinador', 'Auxiliar', 'Almacenista'],
+    departments: ['ALMACÉN Y PROVEDURÍA', 'SISTEMAS']
 };
 
 router.get(

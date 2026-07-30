@@ -5,7 +5,7 @@ import { authorizeUserWeb, verifyCookiesAuthTokenRequired } from '../../../middl
 const router = express.Router();
 
 const materialPagePermissions = {
-    roles: ['Almacenista', 'Coordinador', 'Auxiliar', 'Operador', 'Instalador', 'Vendedor', 'Administrador del sistema'],
+    roles: ['Almacenista', 'Coordinador', 'Auxiliar', 'Operador', 'Instalador', 'Asesor de ventas', 'Administrador del sistema'],
     departments: ['ALMACÉN Y PROVEDURÍA', 'SISTEMAS', 'VENTAS Y PROYECTOS ESPECIALES']
 };
 

@@ -13,6 +13,7 @@ export const FILTER_SELECTORS = {
     OBSERVATIONS: '#observationsFilter',
     CLIENT: '#clientFilter',
     DEPARTMENT: '#departmentFilter',
+    ROLE: '#roleFilter',
     PROFILE: '#profileFilter',
     CLEAR_BUTTON: '#clearFiltersButton',
     APPLY_BUTTON: '#applyFiltersButton'

@@ -6,8 +6,8 @@ import { buildExcelButton, buildTableExportParams } from "../../ui/tableUI.js";
 import { formatFileName } from "../../utils/formatters.js";
 import { getResponsiveRowData } from "./utils/responsive.js";
 import { setupTableFilters } from "./utils/filters/tableFilter.js";
-import { getSelectedDepartmentName } from "../select2/domains/department.js";
-import { DATATABLE_SELECTORS } from "../../constants/selectors.js";
+import { getSelectedOptionText } from "../../utils/domUtils.js";
+import { DATATABLE_SELECTORS, FILTER_SELECTORS } from "../../constants/selectors.js";
 import { buildMdbActionButton } from "../mdb/actionButton.js";
 
 const selector = DATATABLE_SELECTORS.MAIN;
@@ -15,7 +15,7 @@ const selector = DATATABLE_SELECTORS.MAIN;
 export const createProfilesDatatable = async ({ canManageProfiles = false } = {}) => {
 
     const filters = await setupTableFilters({
-        fields: ['department']
+        fields: ['department', 'role']
     });
 
     const table = createDataTable({
@@ -24,7 +24,8 @@ export const createProfilesDatatable = async ({ canManageProfiles = false } = {}
                 get: (data) => getAllProfiles({
                     ...data,
                     includeAccesses: true,
-                    department: getSelectedDepartmentName(),
+                    department: getSelectedOptionText(FILTER_SELECTORS.DEPARTMENT),
+                    role: getSelectedOptionText(FILTER_SELECTORS.ROLE),
                     strictDepartmentFilter: Boolean(filters.getValues().departmentId)
                 })
             },
@@ -54,7 +55,8 @@ export const createProfilesDatatable = async ({ canManageProfiles = false } = {}
                     allowMonthlyReport: false,
                     request: () => exportProfileReport(buildTableExportParams(table, {
                         includeAccesses: true,
-                        department: getSelectedDepartmentName(),
+                        department: getSelectedOptionText(FILTER_SELECTORS.DEPARTMENT),
+                        role: getSelectedOptionText(FILTER_SELECTORS.ROLE),
                         strictDepartmentFilter: Boolean(filters.getValues().departmentId)
                     }))
                 })] : [])

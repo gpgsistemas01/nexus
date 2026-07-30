@@ -3,6 +3,7 @@ import { errorMap } from "../messages/codeMessages.js";
 import { clearAccessCookie } from "../utils/cookiesUtils.js";
 import { getLoggedUser } from "../services/admin/userService.js";
 import { requiresInitialStockAdjustmentOnCreate } from "../validators/forms/materialValidations.js";
+import { hasSystemWideReadAccess } from "../utils/authorizationUtils.js";
 
 const getAuthTokenInfo = ( req, res) => {
 
@@ -57,7 +58,9 @@ const createAuthorizeMiddleware = (handler) => (permissions) => async (req, res,
 
     if (!user) return handler(req, res);
 
-    const hasAccess = user.accesses.some(access =>
+    const hasReadAccessToAll = ['GET', 'HEAD'].includes(req.method)
+        && hasSystemWideReadAccess(user);
+    const hasAccess = hasReadAccessToAll || user.accesses.some(access =>
         permissions.departments.includes(access.department) &&
         permissions.roles.includes(access.role)
     );

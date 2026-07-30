@@ -7,7 +7,7 @@ import { validate } from '../../../middleware/validatorMiddleware.js';
 const router = express.Router();
 
 const wasteReadPermissions = {
-    roles: ['Almacenista', 'Coordinador', 'Auxiliar', 'Vendedor', 'Administrador del sistema'],
+    roles: ['Almacenista', 'Coordinador', 'Auxiliar', 'Asesor de ventas', 'Administrador del sistema'],
     departments: ['ALMACÉN Y PROVEDURÍA', 'SISTEMAS', 'VENTAS Y PROYECTOS ESPECIALES']
 };
 
