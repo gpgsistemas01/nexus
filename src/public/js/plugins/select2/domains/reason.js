@@ -1,5 +1,5 @@
 import { getAllReasons } from "../../../application/warehouse/reasons.js";
-import { initbaseSelect2, toggleSelectOption } from "../baseSelect.js";
+import { buildPaginatedSelectResults, initbaseSelect2, SELECT_RESULTS_LIMIT, toggleSelectOption } from "../baseSelect.js";
 
 export const initReasonSelect = ({ 
     modalSelector, 
@@ -16,17 +16,13 @@ export const initReasonSelect = ({
         clearOnOpen,
         data,
         placeholder: 'Seleccione una razón...',
-        processResults: (data) => {
-
-            const list = data.data || data;
-
-            return {
-                results: list.map(p => ({
-                    id: p.id,
-                    text: p.name
-                }))
-            };
-        },
+        processResults: (data, params) => buildPaginatedSelectResults(data, params, {
+            length: SELECT_RESULTS_LIMIT,
+            mapItem: (p) => ({
+                id: p.id,
+                text: p.name
+            })
+        }),
         ...(allowCreate && {
             tags: true,
             createTag: (params) => {

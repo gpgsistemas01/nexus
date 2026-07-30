@@ -1,5 +1,5 @@
 import { getAllUnitMeasures } from "../../../application/warehouse/unitMeasures.js";
-import { initbaseSelect2, toggleSelectOption } from "../baseSelect.js";
+import { buildPaginatedSelectResults, initbaseSelect2, SELECT_RESULTS_LIMIT, toggleSelectOption } from "../baseSelect.js";
 
 export const initUnitMeasureSelect = ({ 
     modalSelector, 
@@ -12,17 +12,13 @@ export const initUnitMeasureSelect = ({
         containerSelector: modalSelector,
         get: getAllUnitMeasures,
         placeholder: 'Buscar unidad...',
-        processResults: (data) => {
-
-            const list = data.data || data;
-
-            return {
-                results: list.map(u => ({
-                    id: u.id,
-                    text: `${ u.symbol } - ${ u.name }`,
-                }))
-            };
-        },
+        processResults: (data, params) => buildPaginatedSelectResults(data, params, {
+            length: SELECT_RESULTS_LIMIT,
+            mapItem: (u) => ({
+                id: u.id,
+                text: `${ u.symbol } - ${ u.name }`,
+            })
+        }),
         ...(allowCreate && {
             tags: true,
             createTag: (params) => {

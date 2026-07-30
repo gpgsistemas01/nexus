@@ -207,26 +207,29 @@ export const initFilterSelect2 = ({
     data = () => ({}),
     mapOption = mapValueLabelToSelectData,
     processResults = null,
-    clearWhenEmpty = true
+    clearWhenEmpty = true,
+    paginated = false
 }) => {
 
     initbaseSelect2({
         baseSelector: selector,
         containerSelector: 'body',
-        get: async (params) => ({
-            data: await getOptions(params)
-        }),
+        get: paginated
+            ? getOptions
+            : async (params) => ({ data: await getOptions(params) }),
         clearOnOpen: false,
         placeholder,
         data,
-        processResults: processResults || ((response) => {
+        processResults: processResults || (paginated
+            ? (response, params) => buildPaginatedSelectResults(response, params, { mapItem: mapOption })
+            : (response) => {
 
-            const list = response.data || response;
+                const list = response.data || response;
 
-            return {
-                results: list.map(mapOption)
-            };
-        })
+                return {
+                    results: list.map(mapOption)
+                };
+            })
     });
 
     applySelectedSelectValue({
@@ -248,7 +251,8 @@ export const initDomainSelect2 = ({
     processResults = null,
     data,
     multiple = false,
-    clearOnOpen = true
+    clearOnOpen = true,
+    resultsLimit = SELECT_RESULTS_LIMIT
 }) => {
 
     initbaseSelect2({
@@ -259,14 +263,10 @@ export const initDomainSelect2 = ({
         get,
         placeholder,
         ...(data && { data }),
-        processResults: processResults || ((response) => {
-
-            const list = response.data || response;
-
-            return {
-                results: list.map(mapOption)
-            };
-        }),
+        processResults: processResults || ((response, params) => buildPaginatedSelectResults(response, params, {
+            length: resultsLimit,
+            mapItem: mapOption
+        })),
         ...(allowCreate && {
             tags: true,
             createTag: (params) => createNewSelectTag({

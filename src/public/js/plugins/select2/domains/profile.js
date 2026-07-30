@@ -1,4 +1,4 @@
-import { getAllProfiles, getProfileOptions } from "../../../application/admin/profiles.js";
+import { getAllProfiles } from "../../../application/admin/profiles.js";
 import { initDomainSelect2, initFilterSelect2, toggleSelectOption } from "../baseSelect.js";
 import { FILTER_SELECTORS } from "../../../constants/selectors.js";
 import { getSelectedOptionText } from "../../../utils/domUtils.js";
@@ -11,9 +11,11 @@ export const initProfileFilterSelect = ({
     data: resolveData = null
 } = {}) => initFilterSelect2({
     selector: profileFilterSelector,
-    getOptions: getProfileOptions,
+    getOptions: getAllProfiles,
     placeholder: 'Filtrar por perfil',
     selectedId,
+    paginated: true,
+    mapOption: (profile) => ({ id: profile.id, text: profile.fullName }),
     data: (params) => {
 
         if (typeof resolveData === 'function') return resolveData(params);

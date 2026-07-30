@@ -1,4 +1,4 @@
-import { getAllDepartments, getDepartmentOptions } from "../../../application/admin/departments.js";
+import { getAllDepartments } from "../../../application/admin/departments.js";
 import { initDomainSelect2, initFilterSelect2, toggleSelectOption, toggleSelectOptions } from "../baseSelect.js";
 import { FILTER_SELECTORS } from "../../../constants/selectors.js";
 
@@ -8,9 +8,11 @@ export const initDepartmentFilterSelect = ({
     selectedId = null
 } = {}) => initFilterSelect2({
     selector: departmentFilterSelector,
-    getOptions: getDepartmentOptions,
+    getOptions: getAllDepartments,
     placeholder: 'Filtrar por área',
-    selectedId
+    selectedId,
+    paginated: true,
+    mapOption: (department) => ({ id: department.id, text: department.name })
 });
 
 export const initDepartmentSelect = ({ 
