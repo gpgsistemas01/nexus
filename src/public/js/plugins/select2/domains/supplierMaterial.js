@@ -1,5 +1,6 @@
-import { getSupplierMaterialOptions } from "../../../application/warehouse/materials.js";
-import { initbaseSelect2, toggleSelectOption } from "../baseSelect.js";
+import { getAllMaterials } from "../../../application/warehouse/materials.js";
+import { mapSupplierMaterialToSelectData } from "../../../utils/materialSelectUtils.js";
+import { initDomainSelect2, toggleSelectOption } from "../baseSelect.js";
 import { setSupplierMaterialSummaryValues } from "../../../modules/materials/supplierMaterialSummary.js";
 
 const attachSupplierMaterialDisplayHandler = ({
@@ -35,19 +36,13 @@ const initSupplierMaterialSelect = ({
     placeholder = 'Buscar material...'
 }) => {
 
-    initbaseSelect2({
-        baseSelector,
+    initDomainSelect2({
+        selector: baseSelector,
         containerSelector: modalSelector,
-        get: async (params) => ({
-            data: await getSupplierMaterialOptions(params)
-        }),
+        get: getAllMaterials,
         placeholder,
-        data: (params) => ({
-            search: params.term
-        }),
-        processResults: (data) => ({
-            results: data.data || data
-        })
+        mapOption: mapSupplierMaterialToSelectData,
+        allowCreate: false
     });
 };
 

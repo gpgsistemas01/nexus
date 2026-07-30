@@ -1,5 +1,5 @@
 import { openMaterialModal } from "../../../modules/materials/materialModal.js";
-import { getAllMaterials, getMaterialOptions } from "../../../application/warehouse/materials.js";
+import { getAllMaterials } from "../../../application/warehouse/materials.js";
 import { buildPaginatedSelectParams, buildPaginatedSelectResults, initDomainSelect2, initFilterSelect2, runAfterSelect2Close, SELECT_RESULTS_LIMIT, setMdbWrapperInputValue, toggleSelectOption } from "../baseSelect.js";
 import { mapMaterialToSelectData } from "../../../utils/materialSelectUtils.js";
 import { FORM_SELECTORS, FILTER_SELECTORS } from "../../../constants/selectors.js";
@@ -16,9 +16,11 @@ export const initMaterialFilterSelect = ({
 
     initFilterSelect2({
         selector: materialSelector,
-        getOptions: getMaterialOptions,
+        getOptions: getAllMaterials,
         placeholder: 'Filtrar por material',
         selectedId,
+        paginated: true,
+        mapOption: mapMaterialToSelectData,
         data: (params) => buildPaginatedSelectParams(params, {
             additionalParams: {
                 supplierId: supplierFilterSelector
@@ -27,7 +29,8 @@ export const initMaterialFilterSelect = ({
             }
         }),
         processResults: (data, params) => buildPaginatedSelectResults(data, params, {
-            length: Number(params?.data?.length) || SELECT_RESULTS_LIMIT
+            length: Number(params?.data?.length) || SELECT_RESULTS_LIMIT,
+            mapItem: mapMaterialToSelectData
         })
     });
 };

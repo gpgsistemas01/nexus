@@ -1,5 +1,5 @@
 import { getAllPresentations } from "../../../application/warehouse/presentations.js";
-import { initbaseSelect2, toggleSelectOption } from "../baseSelect.js";
+import { buildPaginatedSelectResults, initbaseSelect2, SELECT_RESULTS_LIMIT, toggleSelectOption } from "../baseSelect.js";
 
 export const initPresentationSelect = ({ 
     modalSelector, 
@@ -12,17 +12,13 @@ export const initPresentationSelect = ({
         containerSelector: modalSelector,
         get: getAllPresentations,
         placeholder: 'Buscar presentación...',
-        processResults: (data) => {
-
-            const list = data.data || data;
-
-            return {
-                results: list.map(p => ({
-                    id: p.id,
-                    text: p.name,
-                }))
-            };
-        },
+        processResults: (data, params) => buildPaginatedSelectResults(data, params, {
+            length: SELECT_RESULTS_LIMIT,
+            mapItem: (p) => ({
+                id: p.id,
+                text: p.name,
+            })
+        }),
         ...(allowCreate && {
             tags: true,
             createTag: (params) => {
