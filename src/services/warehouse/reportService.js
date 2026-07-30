@@ -1,9 +1,10 @@
-import { formatDateLongWithTime, toNumber } from "../../utils/formattersUtils.js";
+import { formatDateLongWithTime, roundTo, toNumber } from "../../utils/formattersUtils.js";
 import { findAllSupplierMaterials } from "./materials/supplierMaterialService.js";
 import { findAllGoodsIssues } from "./goodsIssues/goodsIssueService.js";
 import { findAllGoodsReceipts } from "./goodsReceipts/goodsReceiptService.js";
 import { findAllSuppliers } from "./supplierService.js";
 import { findAllWastes } from "./wasteService.js";
+import { GOODS_RECEIPT_STATUS_NAMES } from "../../constants/warehouseStatuses.js";
 
 const mapMaterialRows = (materials = []) => materials.map((item) => ({
     supplier: item.supplier?.tradeName,
@@ -68,6 +69,8 @@ const mapGoodsIssueDetailRows = (goodsIssues = [], { supplierId = '', materialId
 
 const mapGoodsReceiptDetailRows = (goodsReceipts = [], { materialId = '' } = {}) => goodsReceipts.flatMap((goodsReceipt) => {
 
+    if (goodsReceipt.status?.name === GOODS_RECEIPT_STATUS_NAMES.CANCELED) return [];
+
     const details = (goodsReceipt.details || []).filter((detail) => {
         const isCanceledDetail = detail.status === 'CANCELED';
 
@@ -83,6 +86,7 @@ const mapGoodsReceiptDetailRows = (goodsReceipts = [], { materialId = '' } = {})
         receivedByName: goodsReceipt.receivedByName,
         supplierName: goodsReceipt.supplierName,
         invoice: goodsReceipt.isInvoiced ? goodsReceipt.invoice : 'Sin factura',
+        materialId: detail.materialId,
         materialName: detail.materialName,
         materialBase: toNumber(detail.materialBase),
         materialHeight: toNumber(detail.materialHeight),
@@ -96,6 +100,83 @@ const mapGoodsReceiptDetailRows = (goodsReceipts = [], { materialId = '' } = {})
         grossPurchaseAmount: toNumber(detail.grossPurchaseAmount)
     }));
 });
+
+const sum = (rows, field) => rows.reduce((total, row) => total + toNumber(row[field]), 0);
+const divideOrZero = (dividend, divisor) => divisor ? dividend / divisor : 0;
+const VAT_RATE = 0.16;
+
+/**
+ * Builds the supplier and material breakdowns for the purchase report rows.
+ * Monetary totals use the amounts recorded on each receipt detail so the summary
+ * always reconciles with the detailed table, regardless of the report scope.
+ */
+export const buildMonthlyGoodsReceiptSummary = (rows = []) => {
+    const monthlyNetPurchaseAmount = sum(rows, 'netPurchaseAmount');
+    const suppliers = new Map();
+    const materials = new Map();
+
+    rows.forEach((row) => {
+        const supplierName = row.supplierName || 'Sin proveedor';
+        const supplier = suppliers.get(supplierName) || {
+            supplierName,
+            netPurchaseAmount: 0,
+            monthlyPercentage: 0
+        };
+
+        const netPurchaseAmount = toNumber(row.netPurchaseAmount);
+
+        supplier.netPurchaseAmount += netPurchaseAmount;
+        suppliers.set(supplierName, supplier);
+
+        const materialKey = row.materialId || row.materialName || 'Sin material';
+        const material = materials.get(materialKey) || {
+            materialName: row.materialName || 'Sin material',
+            squareMeters: 0,
+            costPerSquareMeter: 0,
+            netPurchaseAmount: 0,
+            quantity: 0
+        };
+
+        const convertedQuantity = toNumber(row.convertedQuantity);
+
+        material.squareMeters += convertedQuantity;
+        material.netPurchaseAmount += netPurchaseAmount;
+        material.quantity += toNumber(row.quantity);
+        materials.set(materialKey, material);
+    });
+
+    const supplierRows = [...suppliers.values()].map((supplier) => {
+        const vatAmount = roundTo(supplier.netPurchaseAmount * VAT_RATE);
+
+        return {
+            ...supplier,
+            vatAmount,
+            grossPurchaseAmount: roundTo(supplier.netPurchaseAmount + vatAmount),
+            monthlyPercentage: divideOrZero(supplier.netPurchaseAmount * 100, monthlyNetPurchaseAmount)
+        };
+    });
+    const materialRows = [...materials.values()].map((material) => ({
+        ...material,
+        costPerSquareMeter: roundTo(divideOrZero(material.netPurchaseAmount, material.squareMeters))
+    }));
+
+    return {
+        supplierRows,
+        materialRows,
+        supplierTotals: {
+            netPurchaseAmount: monthlyNetPurchaseAmount,
+            vatAmount: sum(supplierRows, 'vatAmount'),
+            grossPurchaseAmount: sum(supplierRows, 'grossPurchaseAmount'),
+            monthlyPercentage: monthlyNetPurchaseAmount ? 100 : 0
+        },
+        materialTotals: {
+            squareMeters: sum(materialRows, 'squareMeters'),
+            costPerSquareMeter: roundTo(sum(materialRows, 'costPerSquareMeter')),
+            netPurchaseAmount: monthlyNetPurchaseAmount,
+            quantity: sum(materialRows, 'quantity')
+        }
+    };
+};
 
 export const findWarehouseReportRows = async ({
     search = '',
@@ -166,6 +247,8 @@ export const findGoodsReceiptReportRows = async ({
         endDate,
         supplierId,
         profileId,
+        excludeCanceled: true,
+        activeDetailsOnly: true,
         orderBy,
         orderDir
     });

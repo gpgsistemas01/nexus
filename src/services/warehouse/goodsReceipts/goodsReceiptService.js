@@ -31,6 +31,8 @@ export const findAllGoodsReceipts = async ({
     endDate = '',
     supplierId = '',
     profileId = '',
+    excludeCanceled = false,
+    activeDetailsOnly = false,
     orderBy = 'referenceNumber',
     orderDir = 'desc'
 }) => {
@@ -38,6 +40,11 @@ export const findAllGoodsReceipts = async ({
     const where = {
         ...(supplierId && { supplierId }),
         ...(profileId && { receivedById: profileId }),
+        ...(excludeCanceled && {
+            status: {
+                isNot: { name: GOODS_RECEIPT_STATUS_NAMES.CANCELED }
+            }
+        }),
         ...buildDateRangeFilter({ field: 'receptionDate', startDate, endDate }),
         ...(search && {
             OR: [
@@ -83,6 +90,7 @@ export const findAllGoodsReceipts = async ({
                 }
             },
             details: {
+                ...(activeDetailsOnly && { where: { status: 'ACTIVE' } }),
                 select: {
                     id: true,
                     materialName: true,

@@ -1,5 +1,5 @@
 import { openSupplierModal } from "../../../modules/suppliers/supplierModal.js";
-import { getAllSuppliers, getSupplierOptions } from "../../../application/warehouse/suppliers.js";
+import { getAllSuppliers } from "../../../application/warehouse/suppliers.js";
 import { initDomainSelect2, initFilterSelect2, runAfterSelect2Close, toggleSelectOption } from "../baseSelect.js";
 import { FILTER_SELECTORS } from "../../../constants/selectors.js";
 
@@ -9,9 +9,11 @@ export const initSupplierFilterSelect = ({
     selectedId = null
 }) => initFilterSelect2({
     selector: supplierSelector,
-    getOptions: getSupplierOptions,
+    getOptions: getAllSuppliers,
     placeholder: 'Filtrar por proveedor',
-    selectedId
+    selectedId,
+    paginated: true,
+    mapOption: (supplier) => ({ id: supplier.id, text: supplier.tradeName })
 });
 
 const initSupplierSelect = ({ 

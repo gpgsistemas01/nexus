@@ -1,5 +1,5 @@
-import { getAllRoles, getRoleOptions } from '../../../application/admin/roles.js';
-import { buildPaginatedSelectParams, initbaseSelect2, initFilterSelect2, SELECT_RESULTS_LIMIT, toggleSelectOption } from '../baseSelect.js';
+import { getAllRoles } from '../../../application/admin/roles.js';
+import { buildPaginatedSelectParams, buildPaginatedSelectResults, initbaseSelect2, initFilterSelect2, SELECT_RESULTS_LIMIT, toggleSelectOption } from '../baseSelect.js';
 import { FILTER_SELECTORS } from '../../../constants/selectors.js';
 
 const roleFilterSelector = FILTER_SELECTORS.ROLE;
@@ -7,10 +7,11 @@ const roleFilterSelector = FILTER_SELECTORS.ROLE;
 export const initRoleFilterSelect = ({ selectedId = null } = {}) => {
     initFilterSelect2({
         selector: roleFilterSelector,
-        getOptions: getRoleOptions,
+        getOptions: getAllRoles,
         placeholder: 'Filtrar por rol',
         selectedId,
-        mapOption: (role) => role,
+        mapOption: (role) => ({ id: role.id, text: role.name }),
+        paginated: true,
         data: (params) => buildPaginatedSelectParams(params, { length: SELECT_RESULTS_LIMIT })
     });
 };
@@ -25,17 +26,13 @@ export const initRoleSelect = ({
         containerSelector: modalSelector,
         get: getAllRoles,
         placeholder: 'Buscar rol...',
-        processResults: (data) => {
-
-            const list = data.data || data;
-
-            return {
-                results: list.map((role) => ({
-                    id: role.id,
-                    text: role.name
-                }))
-            };
-        }
+        processResults: (data, params) => buildPaginatedSelectResults(data, params, {
+            length: SELECT_RESULTS_LIMIT,
+            mapItem: (role) => ({
+                id: role.id,
+                text: role.name
+            })
+        })
     });
 };
 

@@ -1,5 +1,5 @@
 import { openClientModal } from "../../../modules/clients/clientModal.js";
-import { getAllClients, getClientOptions } from "../../../application/sales/clients.js";
+import { getAllClients } from "../../../application/sales/clients.js";
 import { initDomainSelect2, initFilterSelect2, runAfterSelect2Close, toggleSelectOption } from "../baseSelect.js";
 import { FILTER_SELECTORS } from "../../../constants/selectors.js";
 
@@ -9,9 +9,11 @@ export const initClientFilterSelect = ({
     selectedId = null
 } = {}) => initFilterSelect2({
     selector: clientFilterSelector,
-    getOptions: getClientOptions,
+    getOptions: getAllClients,
     placeholder: 'Filtrar por cliente',
-    selectedId
+    selectedId,
+    paginated: true,
+    mapOption: (client) => ({ id: client.id, text: client.name })
 });
 
 export const initClientSelect = ({ 

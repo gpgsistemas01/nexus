@@ -13,5 +13,5 @@ export const getRoleOptions = async (params = {}) => {
 
 export const getAllRoles = async (params = {}) => {
     const response = await getAllRolesRequest({ params });
-    return response.data;
+    return response;
 };

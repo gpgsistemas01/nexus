@@ -1,4 +1,4 @@
-import { findGoodsIssueReportRows, findGoodsReceiptReportRows, findSupplierReportRows, findWarehouseReportRows, findWasteReportRows } from "../../../services/warehouse/reportService.js";
+import { buildMonthlyGoodsReceiptSummary, findGoodsIssueReportRows, findGoodsReceiptReportRows, findSupplierReportRows, findWarehouseReportRows, findWasteReportRows } from "../../../services/warehouse/reportService.js";
 import { getDataTableOrder, getDataTableSearch } from "../../../utils/requestQueryUtils.js";
 import { getMexicoMonthDateRange } from "../../../utils/formattersUtils.js";
 import { sendExcelReport } from "../../../utils/reportExcelUtils.js";
@@ -206,6 +206,46 @@ export const exportGoodsReceiptReportExcel = async (req, res) => {
             row.grossPurchaseAmount
         ])
     ];
+
+    const { supplierRows, materialRows, supplierTotals, materialTotals } = buildMonthlyGoodsReceiptSummary(rows);
+    const summaryScope = monthlyReport ? 'mensual' : 'del reporte';
+
+    data.push(
+        [],
+        [`Resumen ${ summaryScope } por proveedor`],
+        ['Proveedor', 'Subtotal s/ IVA', 'IVA', 'Total c/ IVA', `% del subtotal ${ summaryScope }`],
+        ...supplierRows.map(row => [
+            row.supplierName,
+            row.netPurchaseAmount,
+            row.vatAmount,
+            row.grossPurchaseAmount,
+            row.monthlyPercentage
+        ]),
+        [
+            'Total',
+            supplierTotals.netPurchaseAmount,
+            supplierTotals.vatAmount,
+            supplierTotals.grossPurchaseAmount,
+            supplierTotals.monthlyPercentage
+        ],
+        [],
+        [`Resumen ${ summaryScope } por material`],
+        ['Material', 'Total m² comprados', 'Costo por m²', 'Costo total s/ IVA', 'Cantidad total de material'],
+        ...materialRows.map(row => [
+            row.materialName,
+            row.squareMeters,
+            row.costPerSquareMeter,
+            row.netPurchaseAmount,
+            row.quantity
+        ]),
+        [
+            'Total',
+            materialTotals.squareMeters,
+            materialTotals.costPerSquareMeter,
+            materialTotals.netPurchaseAmount,
+            materialTotals.quantity
+        ]
+    );
 
     return sendExcelReport({
         res,

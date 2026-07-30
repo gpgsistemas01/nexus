@@ -1,5 +1,5 @@
 import { createSuccessResponseFromRequest } from "../../utils/responseUtils.js";
-import { buildMaterialSelectText, mapSupplierMaterialToSelectData } from "../../utils/materialSelectUtils.js";
+import { buildMaterialSelectText } from "../../utils/materialSelectUtils.js";
 import { deleteMaterialRequest, editMaterialRequest, editMaterialStockRequest, getAllMaterialsRequest, registerMaterialRequest } from "../../services/warehouse/materialService.js";
 
 export const MATERIAL_SELECT_RESULTS_LIMIT = 20;
@@ -17,17 +17,6 @@ export const getMaterialOptions = async (params = {}) => {
         }));
 }
 
-
-export const getSupplierMaterialOptions = async (params = {}) => {
-
-    const response = await getAllMaterialsRequest({ params });
-
-    const list = response.data?.data || [];
-
-    return list
-        .filter(material => material?.supplierMaterialId && material?.name)
-        .map(mapSupplierMaterialToSelectData);
-}
 
 export const getAllMaterials = async (params = {}) => {
 
