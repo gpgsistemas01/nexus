@@ -6,14 +6,16 @@ import { refreshMaterialTable } from "./renderMaterialDatatable.js";
 
 export const renderMaterialName = (row, supplierOverride) => {
 
-    const supplierName = supplierOverride || row.supplier?.tradeName || row.supplierName;
-    const productName = row.productName || row.name;
+    const supplierName = supplierOverride || row.supplier?.tradeName || row.supplierName || '';
+    const materialName = row.materialName || row.material?.name || row.name || '';
+    const materialBase = row.materialBase ?? row.material?.base ?? row.base;
+    const materialHeight = row.materialHeight ?? row.material?.height ?? row.height;
 
-    if (!row.productBase || !row.productHeight) {
-        return `${ productName } || ${ supplierName }`;
+    if (!materialBase || !materialHeight) {
+        return `${ materialName } || ${ supplierName }`;
     }
 
-    return `${ productName } (${ row.productBase } x ${ row.productHeight }) || ${ supplierName }`;
+    return `${ materialName } (${ materialBase } x ${ materialHeight }) || ${ supplierName }`;
 };
 
 
@@ -48,20 +50,20 @@ export const initDetailsTable = ({ selector, type, mode, context, data }) => {
 
 export const handleDelete = ({ id, details, context }) => {
 
-    const index = details.findIndex(p => p.productId === id);
+    const index = details.findIndex(material => material.materialId === id);
 
     if (index < 0) return;
 
-    const product = details[index];
+    const material = details[index];
 
     details.splice(index, 1);
 
     if (context === 'receipt') {
 
         updateTotals({
-            quantity: product.quantity,
-            net: product.netPurchaseAmount,
-            gross: product.grossPurchaseAmount,
+            quantity: material.quantity,
+            net: material.netPurchaseAmount,
+            gross: material.grossPurchaseAmount,
             operation: 'subtract'
         });
     }
