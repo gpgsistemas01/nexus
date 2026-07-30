@@ -207,46 +207,45 @@ export const exportGoodsReceiptReportExcel = async (req, res) => {
         ])
     ];
 
-    if (monthlyReport) {
-        const { supplierRows, materialRows, supplierTotals, materialTotals } = buildMonthlyGoodsReceiptSummary(rows);
+    const { supplierRows, materialRows, supplierTotals, materialTotals } = buildMonthlyGoodsReceiptSummary(rows);
+    const summaryScope = monthlyReport ? 'mensual' : 'del reporte';
 
-        data.push(
-            [],
-            ['Resumen mensual por proveedor'],
-            ['Proveedor', 'Subtotal s/ IVA', 'IVA', 'Total c/ IVA', '% del subtotal mensual'],
-            ...supplierRows.map(row => [
-                row.supplierName,
-                row.netPurchaseAmount,
-                row.vatAmount,
-                row.grossPurchaseAmount,
-                row.monthlyPercentage
-            ]),
-            [
-                'Total',
-                supplierTotals.netPurchaseAmount,
-                supplierTotals.vatAmount,
-                supplierTotals.grossPurchaseAmount,
-                supplierTotals.monthlyPercentage
-            ],
-            [],
-            ['Resumen mensual por material'],
-            ['Material', 'Total m² comprados', 'Costo por m²', 'Costo total s/ IVA', 'Cantidad total de material'],
-            ...materialRows.map(row => [
-                row.materialName,
-                row.squareMeters,
-                row.costPerSquareMeter,
-                row.netPurchaseAmount,
-                row.quantity
-            ]),
-            [
-                'Total',
-                materialTotals.squareMeters,
-                materialTotals.costPerSquareMeter,
-                materialTotals.netPurchaseAmount,
-                materialTotals.quantity
-            ]
-        );
-    }
+    data.push(
+        [],
+        [`Resumen ${ summaryScope } por proveedor`],
+        ['Proveedor', 'Subtotal s/ IVA', 'IVA', 'Total c/ IVA', `% del subtotal ${ summaryScope }`],
+        ...supplierRows.map(row => [
+            row.supplierName,
+            row.netPurchaseAmount,
+            row.vatAmount,
+            row.grossPurchaseAmount,
+            row.monthlyPercentage
+        ]),
+        [
+            'Total',
+            supplierTotals.netPurchaseAmount,
+            supplierTotals.vatAmount,
+            supplierTotals.grossPurchaseAmount,
+            supplierTotals.monthlyPercentage
+        ],
+        [],
+        [`Resumen ${ summaryScope } por material`],
+        ['Material', 'Total m² comprados', 'Costo por m²', 'Costo total s/ IVA', 'Cantidad total de material'],
+        ...materialRows.map(row => [
+            row.materialName,
+            row.squareMeters,
+            row.costPerSquareMeter,
+            row.netPurchaseAmount,
+            row.quantity
+        ]),
+        [
+            'Total',
+            materialTotals.squareMeters,
+            materialTotals.costPerSquareMeter,
+            materialTotals.netPurchaseAmount,
+            materialTotals.quantity
+        ]
+    );
 
     return sendExcelReport({
         res,
