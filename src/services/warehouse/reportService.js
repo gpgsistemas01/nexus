@@ -106,9 +106,9 @@ const divideOrZero = (dividend, divisor) => divisor ? dividend / divisor : 0;
 const VAT_RATE = 0.16;
 
 /**
- * Builds the supplier and material breakdowns shown only in the monthly purchase
- * report. Monetary totals use the amounts recorded on each receipt detail so the
- * summary always reconciles with the detailed table.
+ * Builds the supplier and material breakdowns for the purchase report rows.
+ * Monetary totals use the amounts recorded on each receipt detail so the summary
+ * always reconciles with the detailed table, regardless of the report scope.
  */
 export const buildMonthlyGoodsReceiptSummary = (rows = []) => {
     const monthlyNetPurchaseAmount = sum(rows, 'netPurchaseAmount');
