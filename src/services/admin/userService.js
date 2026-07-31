@@ -2,6 +2,8 @@ import { UserCreateDatabaseError, UserFindDatabaseError, UserNotFound, UserUpdat
 import { getDb } from "../../repository/baseRepository.js";
 import { verifyPassword, encryptPassword } from "../../utils/encryptionUtils.js";
 import { createServiceLogger, logServiceError } from "../../utils/logger.js";
+import { getGrantedPermissions } from "../../constants/permissions.js";
+import { hasSystemWideReadAccess } from "../../utils/authorizationUtils.js";
 
 const serviceLogger = createServiceLogger('admin.userService');
 
@@ -90,11 +92,16 @@ export const getUserIdByLogin = async (name, password) => {
         },
         select: {
             id: true,
-            password: true
+            password: true,
+            isActive: true,
+            accesses: {
+                select: { userId: true },
+                take: 1
+            }
         }
     });
 
-    if (!user) return null;
+    if (!user?.isActive || !user.accesses.length) return null;
 
     const isValid = await verifyPassword(password, user.password);
 
@@ -107,7 +114,10 @@ export const getLoggedUser = async (userId) => {
 
     const accesses = await getDb().userRoleDepartment.findMany({
         where: {
-            userId
+            userId,
+            user: {
+                isActive: true
+            }
         },
         select: {
             user: true,
@@ -118,7 +128,7 @@ export const getLoggedUser = async (userId) => {
 
     if (!accesses.length) return null;
 
-    return {
+    const user = {
         id: accesses[0].user.id,
         name: accesses[0].user.name,
         accesses: accesses.map(a => ({
@@ -127,6 +137,23 @@ export const getLoggedUser = async (userId) => {
             departmentId: a.department.id,
             department: a.department.name
         }))
+    };
+    const roles = new Set(user.accesses.map(access => access.role));
+    const departments = new Set(user.accesses.map(access => access.department));
+
+    return {
+        ...user,
+        permissions: getGrantedPermissions(user.accesses),
+        scope: {
+            canReadAll: hasSystemWideReadAccess(user),
+            departmentIds: [...new Set(user.accesses.map(access => access.departmentId))]
+        },
+        organization: {
+            isCoordinator: roles.has('Coordinador'),
+            isWarehouse: departments.has('ALMACÉN Y PROVEDURÍA'),
+            isSystem: departments.has('SISTEMAS'),
+            isSales: departments.has('VENTAS Y PROYECTOS ESPECIALES')
+        }
     };
 }
 

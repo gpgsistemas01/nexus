@@ -63,6 +63,11 @@ export const handleApiError = ({
             window.location.replace('/');
             return;
 
+        case 403:
+            resetFormSubmission(form);
+            notifications.showError(getFallbackMessage(err));
+            return;
+
         case 404:
         case 409: {
             const modalData = data ?? err?.response?.data ?? null;
@@ -93,6 +98,10 @@ export const handleDataTableError = (err, table = null) => {
         case 401:
             localStorage.setItem('showErrorToast', getFallbackMessage(err));
             window.location.replace('/');
+            return [];
+
+        case 403:
+            notifications.showError(getFallbackMessage(err));
             return [];
 
         case 404:

@@ -1,30 +1,14 @@
 import express from 'express';
 import { authorizeUserApi, verifyApiTokenRequired } from "../../../middleware/authMiddleware.js";
 import { getAllDepartments } from '../../../controllers/api/admin/departmentController.js';
+import { PERMISSIONS } from '../../../constants/permissions.js';
 
 const router = express.Router();
-const departmentReadPermissions = {
-    roles: [ 'Administrador del sistema', 'Coordinador', 'Auxiliar', 'Operador', 'Instalador', 'Diseñador', 'Almacenista', 'Asesor de ventas', 'Repartidor', 'Director', 'Administrador', 'Contador' ],
-    departments: [
-        'DIRECCIÓN',
-        'ACABADOS',
-        'ADMINISTRATIVO',
-        'ALMACÉN Y PROVEDURÍA',
-        'DISEÑO',
-        'INSTALACIONES',
-        'IMPRESIÓN',
-        'ROUTER',
-        'PT/TRÁFICO',
-        'SISTEMAS',
-        'TALLER 3D',
-        'VENTAS Y PROYECTOS ESPECIALES'
-    ]
-};
 
 router.get(
     '/',
     verifyApiTokenRequired,
-    authorizeUserApi(departmentReadPermissions),
+    authorizeUserApi(PERMISSIONS.DEPARTMENTS_READ),
     getAllDepartments
 );
 

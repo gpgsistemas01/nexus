@@ -3,28 +3,14 @@ import { authorizeInitialStockAdjustment, authorizeUserApi, verifyApiTokenRequir
 import { editMaterial, editMaterialStock, getAllMaterials, registerMaterial, removeMaterial } from '../../../controllers/api/warehouse/materialController.js';
 import { materialCreateValidation, materialStockValidation, materialValidation } from '../../../validators/forms/materialValidations.js';
 import { validate } from '../../../middleware/validatorMiddleware.js';
+import { PERMISSIONS } from '../../../constants/permissions.js';
 
 const router = express.Router();
-
-const materialReadPermissions = {
-    roles: ['Almacenista', 'Coordinador', 'Auxiliar', 'Operador', 'Instalador', 'Asesor de ventas', 'Administrador del sistema'],
-    departments: ['ALMACÉN Y PROVEDURÍA', 'SISTEMAS', 'VENTAS Y PROYECTOS ESPECIALES']
-};
-
-const materialWritePermissions = {
-    roles: ['Almacenista', 'Coordinador', 'Auxiliar', 'Administrador del sistema'],
-    departments: ['ALMACÉN Y PROVEDURÍA', 'SISTEMAS']
-};
-
-const materialStockWritePermissions = {
-    roles: ['Administrador del sistema'],
-    departments: ['SISTEMAS']
-};
 
 router.get(
     '/',
     verifyApiTokenRequired,
-    authorizeUserApi(materialReadPermissions),
+    authorizeUserApi(PERMISSIONS.MATERIALS_READ),
     getAllMaterials
 );
 
@@ -33,8 +19,8 @@ router.post(
     verifyApiTokenRequired,
     materialCreateValidation,
     validate,
-    authorizeUserApi(materialWritePermissions),
-    authorizeInitialStockAdjustment(materialStockWritePermissions),
+    authorizeUserApi(PERMISSIONS.MATERIALS_WRITE),
+    authorizeInitialStockAdjustment(PERMISSIONS.MATERIALS_ADJUST_STOCK),
     registerMaterial
 );
 
@@ -43,7 +29,7 @@ router.patch(
     verifyApiTokenRequired,
     materialValidation,
     validate,
-    authorizeUserApi(materialWritePermissions),
+    authorizeUserApi(PERMISSIONS.MATERIALS_WRITE),
     editMaterial
 );
 
@@ -51,7 +37,7 @@ router.patch(
 router.delete(
     '/:id',
     verifyApiTokenRequired,
-    authorizeUserApi(materialWritePermissions),
+    authorizeUserApi(PERMISSIONS.MATERIALS_WRITE),
     removeMaterial
 );
 
@@ -60,7 +46,7 @@ router.patch(
     verifyApiTokenRequired,
     materialStockValidation,
     validate,
-    authorizeUserApi(materialStockWritePermissions),
+    authorizeUserApi(PERMISSIONS.MATERIALS_ADJUST_STOCK),
     editMaterialStock
 );
 

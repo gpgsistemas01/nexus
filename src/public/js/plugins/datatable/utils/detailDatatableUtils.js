@@ -1,5 +1,4 @@
 import { updateTotals } from "../../../ui/formUI.js";
-import { hasPermission } from "../../../utils/permissions.js";
 import { createDataTable } from "../baseDatatable.js";
 import { buildDetailsColumns, buildDetailsHeader } from "./builderDetailDatatable.js";
 import { refreshMaterialTable } from "./renderMaterialDatatable.js";
@@ -21,7 +20,7 @@ export const renderMaterialName = (row, supplierOverride) => {
 
 export const initDetailsTable = ({ selector, type, mode, context, data }) => {
 
-    const { isWarehouse, isSystem } = hasPermission(context);
+    const { isWarehouse = false, isSystem = false } = context.organization || {};
 
     const table = document.querySelector(selector);
 
