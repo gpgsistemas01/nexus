@@ -3,6 +3,7 @@ import { buildMaterialSelectText } from "../../utils/materialSelectUtils.js";
 import { deleteMaterialRequest, editMaterialRequest, editMaterialStockRequest, getAllMaterialsRequest, registerMaterialRequest } from "../../services/warehouse/materialService.js";
 
 export const MATERIAL_SELECT_RESULTS_LIMIT = 20;
+const GOODS_RECEIPT_CREATION_CONTEXT = 'goodsReceipt';
 
 export const getMaterialOptions = async (params = {}) => {
 
@@ -25,13 +26,13 @@ export const getAllMaterials = async (params = {}) => {
     return response;
 };
 
-const buildMaterialPayload = (formData) => ({
+const buildMaterialPayload = (formData, { includeMaxUnitCost = true } = {}) => ({
     name: formData.name,
     supplierId: formData.supplierId,
     presentationId: formData.presentationId,
     unitMeasureId: formData.unitMeasureId,
     minStock: formData.minStock,
-    maxUnitCost: formData.maxUnitCost,
+    ...(includeMaxUnitCost ? { maxUnitCost: formData.maxUnitCost } : {}),
     base: formData.base,
     height: formData.height,
     isActive: formData.isActive
@@ -51,7 +52,11 @@ export const registerMaterial = async ({
 }) => {
 
     const payload = {
-        ...buildMaterialPayload(formData),
+        ...buildMaterialPayload(formData, {
+            // In a purchase, the real unit cost comes from its detail line and is
+            // applied to SupplierMaterial when the receipt is confirmed.
+            includeMaxUnitCost: creationContext !== GOODS_RECEIPT_CREATION_CONTEXT
+        }),
         ...(creationContext ? { creationContext } : {}),
         ...(withInitialStockAdjustment ? buildStockPayload(formData, { includeReason: false }) : {})
     };

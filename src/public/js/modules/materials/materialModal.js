@@ -11,7 +11,6 @@ const stockFields = ['newStock', 'reasonId', 'observations'];
 const stockSectionSelector = '.stock-data-section';
 const goodsReceiptCreationContext = 'goodsReceipt';
 const maxUnitCostLabel = 'Costo Máximo';
-const newStockLabel = 'Nueva cantidad';
 const initialStockReasonName = 'Stock inicial';
 
 const setMaterialValues = ({ form, data = null }) => {
@@ -52,22 +51,12 @@ const setMaterialModalFieldVisibility = ({
 
     setFormFieldVisibility({
         form,
-        fieldName: materialDataFields,
+        fieldName: 'maxUnitCost',
         isVisible: creationContext !== goodsReceiptCreationContext,
         clearWhenHidden: true,
         requiredWhenVisible: true,
         enableWhenVisible: true,
         labelContent: maxUnitCostLabel
-    });
-
-    setFormFieldVisibility({
-        form,
-        fieldName: stockFields,
-        isVisible: showStockFields,
-        clearWhenHidden: !showStockFields,
-        requiredWhenVisible: showStockFields,
-        enableWhenVisible: true,
-        labelContent: newStockLabel
     });
 };
 
