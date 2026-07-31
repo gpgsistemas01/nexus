@@ -6,6 +6,7 @@ import { hasPermission } from "../../utils/permissions.js";
 import { deleteMaterial, getAllMaterials } from "../../application/warehouse/materials.js";
 import { configureResponsiveHeaderGroups, getResponsiveRowData } from "./utils/responsive.js";
 import { buildExcelButton, buildTableExportParams } from "../../ui/tableUI.js";
+import { UI_PERMISSIONS } from "../../constants/permissions.js";
 import { exportWarehouseReport } from "../../application/warehouse/report.js";
 import { formatFileName } from "../../utils/formatters.js";
 import { DATATABLE_SELECTORS } from "../../constants/selectors.js";
@@ -30,13 +31,12 @@ const configureStockRealtime = (table) => {
 
 export const createMaterialDatatable = async (context) => {
 
-    const { hasRole, isAdmin, isWarehouse, isSystem, isSales } = hasPermission(context);
-    const isWarehouseMaterialManager = isWarehouse && (hasRole('Almacenista') || hasRole('Coordinador') || hasRole('Auxiliar'));
+    const { can, isWarehouse, isSystem, isSales } = hasPermission(context);
     const canSeeCost = isWarehouse || isSystem || isSales;
-    const canManageMaterials = isAdmin || isWarehouseMaterialManager;
-    const canDeleteMaterials = isSystem || isWarehouse;
-    const canAdjustStock = isSystem && isAdmin;
-    const canCreateMaterialsFromModule = canAdjustStock || isWarehouseMaterialManager;
+    const canManageMaterials = can(UI_PERMISSIONS.MATERIALS_WRITE);
+    const canDeleteMaterials = canManageMaterials;
+    const canAdjustStock = can(UI_PERMISSIONS.MATERIALS_ADJUST_STOCK);
+    const canCreateMaterialsFromModule = canManageMaterials;
 
     renderWarehouseInventoryHeader({
         tableElement,

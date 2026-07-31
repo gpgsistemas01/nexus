@@ -66,6 +66,10 @@ const { can } = hasPermission(window.meta);
 editButton.hidden = !can('materials:write');
 ```
 
+El menú principal y las acciones de perfiles, materiales y mermas ya usan capacidades
+derivadas. Las comprobaciones restantes de rol/área se conservan donde representan
+contexto de columnas, costos o flujo y deben revisarse al granularizar los permisos.
+
 Rol y departamento siguen siendo útiles para etiquetas, filtros y contexto. No deben
 usarse para volver a construir en el navegador la matriz de una acción.
 

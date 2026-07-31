@@ -1,24 +1,8 @@
-<% const accesses = user?.accesses || [];
+<% const permissions = user?.permissions || [];
 
-const hasRole = role => accesses.some(a => a.role === role);
-const hasDepartment = department => accesses.some(a => a.department === department);
-const hasAccess = ({ departments = [], roles = [] }) => accesses.some(access => (
-    departments.includes(access.department) && roles.includes(access.role)
-));
+const can = permission => permissions.includes(permission);
 
-const isAdmin = hasRole('Administrador del sistema');
-const canManageWarehouseProfiles = hasAccess({
-    departments: ['ALMACÉN Y PROVEDURÍA'],
-    roles: ['Coordinador', 'Auxiliar', 'Almacenista']
-});
-const isSalesOrDesign = ['Ventas', 'Diseño'].some(department => hasDepartment(department));
-const canSeePurchases = hasAccess({
-    departments: ['ALMACÉN Y PROVEDURÍA'],
-    roles: ['Coordinador', 'Auxiliar']
-});
-
-const canSeeAll = isAdmin || hasRole('Director') || hasDepartment('DIRECCIÓN');
-const canSeeOnlyMaterials = !canSeeAll && isSalesOrDesign;
+const canSeeAll = user?.scope?.canReadAll || false;
 
 const shouldShowIcons = typeof showIcons !== 'undefined' ? showIcons : true;
 
@@ -28,67 +12,66 @@ const items = [
         icon: 'fa-solid fa-boxes-stacked',
         href: '/materiales',
         isActive: currentRoute === '/materiales',
-        isVisible: true
+        isVisible: can('materials:read')
     },
     {
         content: 'Mermas',
         icon: 'fa-solid fa-recycle',
         href: '/mermas',
         isActive: currentRoute === '/mermas',
-        isVisible: true
+        isVisible: can('wastes:page-view')
     },
     {
         content: 'Compras',
         icon: 'fa-solid fa-cart-shopping',
         href: '/compras',
         isActive: currentRoute === '/compras',
-        isVisible: canSeeAll || canSeePurchases
+        isVisible: can('goods:receipts-page-view')
     },
     {
         content: 'Salidas de almacén',
         icon: 'fa-solid fa-truck-ramp-box',
         href: '/salidas-almacen',
         isActive: currentRoute === '/salidas-almacen',
-        isVisible: canSeeAll || !canSeeOnlyMaterials
+        isVisible: can('goods:issues-page-view')
     },
     {
         content: 'Movimientos',
         icon: 'fa-solid fa-arrow-right-arrow-left',
         href: '/movimientos',
         isActive: currentRoute === '/movimientos',
-        isVisible: isAdmin
+        isVisible: can('movements:read')
     },
     {
         content: 'Usuarios',
         icon: 'fa-solid fa-users-gear',
         href: '/usuarios-sistemas',
         isActive: currentRoute === '/usuarios-sistemas',
-        isVisible: hasDepartment('SISTEMAS') && hasRole('Administrador del sistema')
+        isVisible: can('users:manage')
     },
     {
         content: 'Perfiles',
         icon: 'fa-solid fa-id-badge',
         href: '/perfiles',
         isActive: currentRoute === '/perfiles',
-        isVisible: isAdmin || canManageWarehouseProfiles
+        isVisible: can('profiles:page-view')
     },
     {
         content: 'Clientes',
         icon: 'fa-solid fa-handshake',
         href: '/clientes',
         isActive: currentRoute === '/clientes',
-        isVisible: isAdmin
+        isVisible: can('clients:page-view')
     },
     {
         content: 'Proveedores',
         icon: 'fa-solid fa-warehouse',
         href: '/proveedores',
         isActive: currentRoute === '/proveedores',
-        isVisible: isAdmin
+        isVisible: can('suppliers:page-view')
     }
 ].filter(item => {
     if (canSeeAll) return true;
-    if (canSeeOnlyMaterials) return item.href === '/materiales';
 
     return item.isVisible;
 }).map(item => ({
