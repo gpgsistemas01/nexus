@@ -274,7 +274,7 @@ describeDb('stock adjustment cross-domain database integration', () => {
     });
   });
 
-  it('cubre createMaterial/updateMaterial con relación proveedor-material y ajuste inicial en BD', async () => {
+  it('crea y actualiza un material sin generar un ajuste de stock inicial', async () => {
     await expect(materialService.createMaterial({
       materialDto: {
         name: names.createdMaterial,
@@ -285,14 +285,9 @@ describeDb('stock adjustment cross-domain database integration', () => {
         unitMeasureId: material.unitMeasureId,
         supplierId: supplier.id,
         maxUnitCost: 15
-      },
-      stockDto: {
-        observations: 'Alta inicial integración',
-        newStock: 3
-      },
-      userId: user.id
+      }
     })).resolves.toMatchObject({
-      supplierId: supplier.id,
+      supplier: expect.objectContaining({ id: supplier.id }),
       currentStock: expect.anything(),
       convertedQuantity: expect.anything()
     });
@@ -309,13 +304,21 @@ describeDb('stock adjustment cross-domain database integration', () => {
     });
 
     await expect(prisma.stockAdjustment.findFirst({
-      where: {
-        observations: 'Alta inicial integración',
-        reasonId: initialStockReason.id,
-        createdById: user.id
-      },
+      where: { details: { some: { materialId: createdMaterial.id } } },
       select: { id: true }
-    })).resolves.toEqual(expect.objectContaining({ id: expect.any(String) }));
+    })).resolves.toBeNull();
+
+    const createdSupplierMaterial = await prisma.supplierMaterial.findUnique({
+      where: {
+        supplierId_materialId: {
+          supplierId: supplier.id,
+          materialId: createdMaterial.id
+        }
+      },
+      select: { currentStock: true }
+    });
+
+    expect(Number(createdSupplierMaterial?.currentStock)).toBe(0);
 
     await expect(materialService.updateMaterial({
       name: names.updatedMaterial,

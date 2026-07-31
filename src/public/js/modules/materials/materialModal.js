@@ -1,6 +1,6 @@
 import { openModal } from "../../ui/modalUI.js";
 import { initMaterialFormSelect2, setMaterialFormSelectOptions, setMaterialReasonVisualOption } from "../../plugins/select2/modules/materialSelect.js";
-import { configureStockAdjustmentForm, shouldShowStockAdjustmentFields } from "../stockAdjustmentForm.js";
+import { configureStockAdjustmentForm } from "../stockAdjustmentForm.js";
 import { clearFormErrors, initForm, setFormFieldVisibility, setFormDisabled } from "../../ui/formUI.js";
 import { FORM_SELECTORS, MODAL_SELECTORS } from "../../constants/selectors.js";
 
@@ -11,7 +11,6 @@ const stockFields = ['newStock', 'reasonId', 'observations'];
 const stockSectionSelector = '.stock-data-section';
 const goodsReceiptCreationContext = 'goodsReceipt';
 const maxUnitCostLabel = 'Costo Máximo';
-const initialStockReasonName = 'Stock inicial';
 
 const setMaterialValues = ({ form, data = null }) => {
 
@@ -60,7 +59,7 @@ const setMaterialModalFieldVisibility = ({
     });
 };
 
-const setCreateOrEditMaterialFieldStates = ({ form, hasInitialStockFields }) => {
+const setCreateOrEditMaterialFieldStates = ({ form }) => {
 
     setFormDisabled({
         form,
@@ -68,19 +67,6 @@ const setCreateOrEditMaterialFieldStates = ({ form, hasInitialStockFields }) => 
         isDisabled: false
     });
 
-    setFormDisabled({
-        form,
-        fields: stockFields,
-        isDisabled: false
-    });
-
-    if (!hasInitialStockFields) return;
-
-    setFormDisabled({
-        form,
-        fields: ['reasonId'],
-        isDisabled: true
-    });
 };
 
 const setStockAdjustmentFieldStates = ({ form }) => {
@@ -118,33 +104,22 @@ const setMaterialModalFieldStates = ({
         return;
     }
 
-    setCreateOrEditMaterialFieldStates({
-        form,
-        hasInitialStockFields: showStockFields
-    });
+    setCreateOrEditMaterialFieldStates({ form });
 };
 
 const prepareMaterialModal = ({
     mode,
     data,
     isStockAdjustment,
-    includeStockAdjustmentOnCreate = mode === 'create',
     creationContext = null
 }) => {
 
     const form = document.querySelector(formId);
     const modalElement = document.querySelector(materialModalId);
 
-    const showStockFields = shouldShowStockAdjustmentFields({
-        mode,
-        includeStockAdjustmentOnCreate,
-        isStockAdjustment
-    });
-    const isInitialStockCreation = showStockFields && mode === 'create' && !isStockAdjustment;
-
+    const showStockFields = isStockAdjustment;
     initForm({ form, mode, id: data?.id });
     clearFormErrors(form);
-    form.dataset.includeStockAdjustmentOnCreate = showStockFields && !isStockAdjustment ? 'true' : 'false';
     form.dataset.creationContext = creationContext || '';
     setMaterialModalFieldStates({
         form,
@@ -157,11 +132,7 @@ const prepareMaterialModal = ({
         isStockAdjustment: showStockFields
     });
     setMaterialFormSelectOptions({ modalSelector: materialModalId, data, isStockAdjustment: showStockFields });
-    setMaterialReasonVisualOption({
-        modalSelector: materialModalId,
-        name: isInitialStockCreation ? initialStockReasonName : null,
-        isDisabled: isInitialStockCreation
-    });
+    setMaterialReasonVisualOption({ modalSelector: materialModalId });
 
     return { form, modalElement };
 };
@@ -170,7 +141,6 @@ export const openMaterialModal = ({
     mode = 'create',
     data = null,
     onSave = null,
-    includeStockAdjustmentOnCreate = mode === 'create',
     creationContext = null
 }) => {
 
@@ -178,7 +148,6 @@ export const openMaterialModal = ({
         mode,
         data,
         isStockAdjustment: mode === 'edit-stock',
-        includeStockAdjustmentOnCreate,
         creationContext
     });
 

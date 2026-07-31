@@ -1,7 +1,7 @@
 import express from 'express';
-import { authorizeInitialStockAdjustment, authorizeUserApi, verifyApiTokenRequired } from '../../../middleware/authMiddleware.js';
+import { authorizeUserApi, verifyApiTokenRequired } from '../../../middleware/authMiddleware.js';
 import { editMaterial, editMaterialStock, getAllMaterials, registerMaterial, removeMaterial } from '../../../controllers/api/warehouse/materialController.js';
-import { materialCreateValidation, materialStockValidation, materialValidation } from '../../../validators/forms/materialValidations.js';
+import { materialStockValidation, materialValidation } from '../../../validators/forms/materialValidations.js';
 import { validate } from '../../../middleware/validatorMiddleware.js';
 import { PERMISSIONS } from '../../../constants/permissions.js';
 
@@ -17,10 +17,9 @@ router.get(
 router.post(
     '/',
     verifyApiTokenRequired,
-    materialCreateValidation,
+    materialValidation,
     validate,
     authorizeUserApi(PERMISSIONS.MATERIALS_WRITE),
-    authorizeInitialStockAdjustment(PERMISSIONS.MATERIALS_ADJUST_STOCK),
     registerMaterial
 );
 
