@@ -105,10 +105,7 @@ export const createMaterialDatatable = async (context) => {
             buttons: [
                 ...(canCreateMaterialsFromModule ? [{
                     text: 'Nuevo material',
-                    action: () => openMaterialModal({
-                        mode: 'create',
-                        includeStockAdjustmentOnCreate: canAdjustStock
-                    })
+                    action: () => openMaterialModal({ mode: 'create' })
                 }] : []),
                 buildExcelButton({
                     filename: formatFileName('reporte_inventario_materiales'),

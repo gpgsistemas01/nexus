@@ -1,11 +1,10 @@
-import { MaterialSnapshotFindDatabaseError, MaterialCreateDatabaseError, MaterialInitialStockReasonNotFound, MaterialNotFound, MaterialUpdateDatabaseError, MaterialStockAdjustmentDatabaseError, MaterialDeleteDatabaseError, MaterialDeleteRelationConflict } from "../../../errors/warehouse/materialError.js";
+import { MaterialSnapshotFindDatabaseError, MaterialCreateDatabaseError, MaterialNotFound, MaterialUpdateDatabaseError, MaterialStockAdjustmentDatabaseError, MaterialDeleteDatabaseError, MaterialDeleteRelationConflict } from "../../../errors/warehouse/materialError.js";
 import { getDb } from "../../../repository/baseRepository.js";
 import { findAllSupplierMaterials, findCurrentSupplierMaterialByMaterialId, findSupplierMaterialByIds, recalculateConvertedQuantityByMaterial } from "./supplierMaterialService.js";
 import { prepareMaterialData, withRetry } from "./materialHelpers.js";
 import { syncSupplierMaterial } from "./materialRelations.js";
 import { isAppError } from "../../../errors/AppError.js";
 import { createStockAdjustment } from "../adjustmentService.js";
-import { findInitialStockAdjustmentReason } from "../reasonService.js";
 import { createServiceLogger, getModelLogContext, logServiceError, logServiceInfo } from "../../../utils/logger.js";
 import { PRISMA_ERROR_CODES } from "../../../constants/prisma.js";
 
@@ -26,9 +25,7 @@ const buildMaterialData = ({ rest, relations }) => ({
 
 const createMaterialInTransaction = async ({
     tx,
-    materialDto,
-    stockDto = null,
-    userId = null
+    materialDto
 }) => {
 
     const {
@@ -49,22 +46,6 @@ const createMaterialInTransaction = async ({
         materialId: createdMaterial.id,
         maxUnitCost: relations.maxUnitCost
     });
-
-    if (stockDto) {
-        const initialStockReason = await findInitialStockAdjustmentReason({ tx });
-
-        if (!initialStockReason) throw new MaterialInitialStockReasonNotFound();
-
-        return createStockAdjustment({
-            tx,
-            materialId: createdMaterial.id,
-            supplierId: relations.supplierId,
-            reasonId: initialStockReason.id,
-            observations: stockDto.observations,
-            newStock: stockDto.newStock,
-            userId
-        });
-    }
 
     return findSupplierMaterialByIds({
         tx,
@@ -139,9 +120,7 @@ export const existsMaterial = async ({
 }
 
 export const createMaterial = async ({
-    materialDto,
-    stockDto = null,
-    userId = null
+    materialDto
 }) => {
 
     try {
@@ -149,15 +128,13 @@ export const createMaterial = async ({
         const material = await getDb().$transaction((tx) =>
             createMaterialInTransaction({
                 tx,
-                materialDto,
-                stockDto,
-                userId
+                materialDto
             })
         );
 
         logServiceInfo(serviceLogger, {
             operation: 'warehouse.materials.materialService.createMaterial',
-            ...getModelLogContext('material', { userId, ...materialDto, ...stockDto, id: material?.materialId ?? material?.id })
+            ...getModelLogContext('material', { ...materialDto, id: material?.materialId ?? material?.id })
         }, 'Material creado correctamente');
 
         return material;
@@ -165,7 +142,7 @@ export const createMaterial = async ({
     } catch (err) {
         logServiceError(serviceLogger, err, {
             operation: 'warehouse.materials.materialService.createMaterial',
-            ...getModelLogContext('material', { userId, ...materialDto, ...stockDto })
+            ...getModelLogContext('material', materialDto)
         });
 
         if (isAppError(err)) throw err;

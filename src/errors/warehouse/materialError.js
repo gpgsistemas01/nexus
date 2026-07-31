@@ -64,13 +64,6 @@ export class MaterialDeleteRelationConflict extends AppError {
     }
 }
 
-export class MaterialInitialStockReasonNotFound extends AppError {
-
-    constructor () {
-        super('Razón de stock inicial no encontrada', 'MATERIAL_INITIAL_STOCK_REASON_NOT_FOUND', 404);
-    }
-}
-
 export class MaterialStockAdjustmentDatabaseError extends AppError {
 
     constructor () {

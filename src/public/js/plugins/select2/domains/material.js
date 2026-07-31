@@ -79,7 +79,6 @@ const attachMaterialHandler = ({
     modalSelector,
     baseSelector,
     supplierSelector,
-    includeStockAdjustmentOnCreate = true,
     materialCreationContext = null
 }) => {
 
@@ -103,7 +102,6 @@ const attachMaterialHandler = ({
                             tradeName,
                         }
                     },
-                    includeStockAdjustmentOnCreate,
                     creationContext: materialCreationContext,
                     onSave: (createdMaterial) => {
 
@@ -154,7 +152,6 @@ export const setupMaterialSelect = ({
     supplierSelector = null,
     materialSelector,
     allowCreate = true,
-    includeStockAdjustmentOnCreate = true,
     materialCreationContext = null,
     resultsLimit = null
 }) => {
@@ -173,7 +170,6 @@ export const setupMaterialSelect = ({
         modalSelector,
         baseSelector,
         supplierSelector,
-        includeStockAdjustmentOnCreate,
         materialCreationContext
     });
 };

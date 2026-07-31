@@ -2,7 +2,6 @@ import { verifyAccessToken } from "../services/jwtService.js";
 import { errorMap } from "../messages/codeMessages.js";
 import { clearAccessCookie } from "../utils/cookiesUtils.js";
 import { getLoggedUser } from "../services/admin/userService.js";
-import { requiresInitialStockAdjustmentOnCreate } from "../validators/forms/materialValidations.js";
 import { hasSystemWideReadAccess } from "../utils/authorizationUtils.js";
 import { getAuthorizationPolicy } from "../constants/permissions.js";
 
@@ -85,18 +84,3 @@ export const authorizeUserApi = createAuthorizeMiddleware(
 export const authorizeUserWeb = createAuthorizeMiddleware((req, res) =>
     res.redirect('/error/404')
 );
-
-export const authorizeInitialStockAdjustment = (permission) => (req, res, next) => {
-
-    if (!requiresInitialStockAdjustmentOnCreate(req.body)) return next();
-
-    const policy = getAuthorizationPolicy(permission);
-    const canAdjustStock = req.user?.accesses?.some(access =>
-        policy.departments.includes(access.department) &&
-        policy.roles.includes(access.role)
-    );
-
-    if (!canAdjustStock) return res.status(403).json({ code: errorMap.message.FORBIDDEN });
-
-    next();
-};
