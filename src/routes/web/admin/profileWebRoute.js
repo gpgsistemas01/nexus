@@ -1,18 +1,15 @@
 import express from 'express';
 import { authorizeUserWeb, verifyCookiesAuthTokenRequired } from '../../../middleware/authMiddleware.js';
 import { getProfilePage } from '../../../controllers/web/admin/profileController.js';
+import { PERMISSIONS } from '../../../constants/permissions.js';
 
 const router = express.Router();
 
-const profilePagePermissions = {
-    roles: ['Administrador del sistema', 'Coordinador', 'Auxiliar', 'Almacenista'],
-    departments: ['ALMACÉN Y PROVEDURÍA', 'SISTEMAS']
-};
 
 router.get(
     '/',
     verifyCookiesAuthTokenRequired,
-    authorizeUserWeb(profilePagePermissions),
+    authorizeUserWeb(PERMISSIONS.PROFILES_PAGE_VIEW),
     getProfilePage
 );
 

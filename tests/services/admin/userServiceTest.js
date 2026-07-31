@@ -111,7 +111,12 @@ describe('userService submit operations', () => {
   });
 
   it('resuelve login y usuario autenticado para GET/session', async () => {
-    userFindUnique.mockResolvedValue({ id: 'user-1', password: 'hash' });
+    userFindUnique.mockResolvedValue({
+      id: 'user-1',
+      password: 'hash',
+      isActive: true,
+      accesses: [{ userId: 'user-1' }]
+    });
     userRoleDepartmentFindMany.mockResolvedValue([
       {
         user: { id: 'user-1', name: 'usuario' },
@@ -129,8 +134,25 @@ describe('userService submit operations', () => {
         role: 'Admin',
         departmentId: 'department-1',
         department: 'Ventas'
-      }]
+      }],
+      permissions: [],
+      scope: {
+        canReadAll: false,
+        departmentIds: ['department-1']
+      },
+      organization: {
+        isCoordinator: false,
+        isWarehouse: false,
+        isSystem: false,
+        isSales: false
+      }
     });
+    expect(userRoleDepartmentFindMany).toHaveBeenCalledWith(expect.objectContaining({
+      where: {
+        userId: 'user-1',
+        user: { isActive: true }
+      }
+    }));
   });
 
   it('retorna null cuando login o usuario autenticado no tienen datos', async () => {
