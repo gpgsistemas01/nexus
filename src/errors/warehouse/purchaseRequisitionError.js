@@ -14,10 +14,10 @@ export class ProjectNotFound extends AppError {
     }
 }
 
-export class RequesterProfileNotFound extends AppError {
+export class RequesterPersonNotFound extends AppError {
 
     constructor() {
-        super('Perfil solicitante no encontrado', 'REQUESTER_PROFILE_NOT_FOUND', 404);
+        super('Persona solicitante no encontrada', 'REQUESTER_PERSON_NOT_FOUND', 404);
     }
 }
 
@@ -42,9 +42,9 @@ export class PurchaseRequisitionStatusUpdateDatabaseError extends AppError {
     }
 }
 
-export class PurchaseRequisitionApproverProfileNotFound extends AppError {
+export class PurchaseRequisitionApproverPersonNotFound extends AppError {
 
     constructor() {
-        super('Perfil aprobador activo no encontrado para el usuario', 'PURCHASE_REQUISITION_APPROVER_PROFILE_NOT_FOUND', 404);
+        super('Persona aprobadora activa no encontrada para el usuario', 'PURCHASE_REQUISITION_APPROVER_PERSON_NOT_FOUND', 404);
     }
 }

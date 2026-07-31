@@ -1,5 +1,5 @@
 <% const form = {
-    id: 'profileForm',
+    id: 'personForm',
     inputs: [{
         id: 'fullNameInput',
         name: 'fullName',
@@ -8,24 +8,24 @@
         col: '12'
     }],
     table: {
-        id: 'profileAccessesTable',
+        id: 'personAccessesTable',
         errorName: 'accesses',
         includeMaterialControls: false,
         includeSummary: false,
-        containerClass: 'profile-access-container',
+        containerClass: 'person-access-container',
         selects: [{
-            id: 'profileDepartmentInput',
-            name: 'profileDepartment',
+            id: 'personDepartmentInput',
+            name: 'personDepartment',
             class: 'department-select',
             col: 'md-5'
         }, {
-            id: 'profileRoleInput',
-            name: 'profileRole',
+            id: 'personRoleInput',
+            name: 'personRole',
             class: 'role-select',
             col: 'md-5'
         }],
         button: {
-            id: 'addProfileAccessBtn',
+            id: 'addPersonAccessBtn',
             class: 'btn btn-primary w-100',
             content: 'Agregar',
             col: 'col-12 col-md-2'
@@ -49,13 +49,13 @@
     ]
 }) %>
 
-<%- include('../../../shared/mainTable', { title: 'Perfiles' }) %>
+<%- include('../../../shared/mainTable', { title: 'Personas' }) %>
 
-<%- include('../../../shared/modal', { modalId: 'profileModal', form }) %>
+<%- include('../../../shared/modal', { modalId: 'personModal', form }) %>
 
-<script type="module" src="/js/pages/admin/profilesPage.js"></script>
+<script type="module" src="/js/pages/admin/personsPage.js"></script>
 
 <%- contentFor('title') %>
-Perfiles
+Personas
 <%- contentFor('layoutType') %>
 site

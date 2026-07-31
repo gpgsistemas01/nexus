@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const goodsReceiptFindUnique = vi.fn();
 const goodsReceiptUpdate = vi.fn();
-const findProfileById = vi.fn();
+const findPersonById = vi.fn();
 const applyInventoryMovement = vi.fn();
 const createGoodsReceiptDetailsAndUpdateTotals = vi.fn();
 const dbTransaction = vi.fn(async (callback) => callback({
@@ -28,8 +28,8 @@ vi.mock('../../../../src/repository/baseRepository.js', () => ({
   })
 }));
 
-vi.mock('../../../../src/services/admin/profile/profileService.js', () => ({
-  findProfileById
+vi.mock('../../../../src/services/admin/person/personService.js', () => ({
+  findPersonById
 }));
 
 vi.mock('../../../../src/services/document/referenceNumberService.js', () => ({
@@ -63,7 +63,7 @@ describe('goodsReceiptService', () => {
       id: 'receipt-1',
       status: { name: 'Confirmada' }
     });
-    findProfileById.mockResolvedValue({ id: 'profile-1', fullName: 'Usuario Almacén' });
+    findPersonById.mockResolvedValue({ id: 'person-1', fullName: 'Usuario Almacén' });
     goodsReceiptUpdate.mockResolvedValue({
       id: 'receipt-1',
       referenceNumber: 'REC-2026-0001',
@@ -86,7 +86,7 @@ describe('goodsReceiptService', () => {
       id: 'receipt-1',
       goodsReceiptDto: {
         supplierId: 'supplier-changed',
-        receivedById: 'profile-1',
+        receivedById: 'person-1',
         isInvoiced: true,
         invoice: 'FAC-1',
         receptionDate: new Date('2026-07-09T00:00:00.000Z'),
@@ -104,7 +104,7 @@ describe('goodsReceiptService', () => {
         observations: 'Nota actualizada',
         receivedByName: 'Usuario Almacén',
         receivedBy: {
-          connect: { id: 'profile-1' }
+          connect: { id: 'person-1' }
         }
       }
     }));
@@ -120,7 +120,7 @@ describe('goodsReceiptService', () => {
     await updateGoodsReceipt({
       id: 'receipt-1',
       goodsReceiptDto: {
-        receivedById: 'profile-1',
+        receivedById: 'person-1',
         isInvoiced: false,
         invoice: null,
         receptionDate: new Date('2026-07-09T00:00:00.000Z'),

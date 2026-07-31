@@ -1,12 +1,12 @@
-import { createProfileDTO } from "../../../dtos/profileDTO.js";
+import { createPersonDTO } from "../../../dtos/personDTO.js";
 import { successCodeMessages } from "../../../messages/codeMessages.js";
-import { createProfile, findAllProfiles, updateProfile } from "../../../services/admin/profile/profileService.js";
+import { createPerson, findAllPersons, updatePerson } from "../../../services/admin/person/personService.js";
 import { sanitizeEmptyStrings } from "../../../utils/formattersUtils.js";
 import { getDataTableOrder, getDataTablePaging, getDataTableSearch } from "../../../utils/requestQueryUtils.js";
 
 const allowedDepartments = ['ALMACÉN Y PROVEDURÍA', 'SISTEMAS'];
 
-export const getAllProfiles = async (req, res) => {
+export const getAllPersons = async (req, res) => {
 
     const rawDepartment =
         req.query.department ??
@@ -29,7 +29,7 @@ export const getAllProfiles = async (req, res) => {
     const userDepartments = (user?.accesses || [])
         .map(access => access.department)
         .filter(Boolean);
-    const canViewAllProfiles = userDepartments.some(departmentName =>
+    const canViewAllPersons = userDepartments.some(departmentName =>
         allowedDepartments.includes(departmentName)
     );
 
@@ -49,9 +49,9 @@ export const getAllProfiles = async (req, res) => {
 
     const departments = shouldUseExplicitDepartmentFilters
         ? departmentFilters
-        : (canViewAllProfiles ? [] : userDepartments);
+        : (canViewAllPersons ? [] : userDepartments);
 
-    const result = await findAllProfiles({
+    const result = await findAllPersons({
         departments,
         roles: roleFilters,
         skip,
@@ -65,23 +65,23 @@ export const getAllProfiles = async (req, res) => {
     res.status(200).json(result);
 }
 
-export const registerProfile = async (req, res) => {
+export const registerPerson = async (req, res) => {
 
-    const profileDto = createProfileDTO(req.body);
-    const sanitizedProfileDto = sanitizeEmptyStrings(profileDto);
+    const personDto = createPersonDTO(req.body);
+    const sanitizedPersonDto = sanitizeEmptyStrings(personDto);
 
-    const profile = await createProfile({ profileDto: sanitizedProfileDto });
+    const person = await createPerson({ personDto: sanitizedPersonDto });
 
-    return res.status(201).json({ profile, code: successCodeMessages.CREATED_PROFILE });
+    return res.status(201).json({ person, code: successCodeMessages.CREATED_PERSON });
 }
 
-export const editProfile = async (req, res) => {
+export const editPerson = async (req, res) => {
 
     const { id } = req.params;
-    const profileDto = createProfileDTO(req.body);
-    const sanitizedProfileDto = sanitizeEmptyStrings(profileDto);
+    const personDto = createPersonDTO(req.body);
+    const sanitizedPersonDto = sanitizeEmptyStrings(personDto);
 
-    const profile = await updateProfile({ id, profileDto: sanitizedProfileDto });
+    const person = await updatePerson({ id, personDto: sanitizedPersonDto });
 
-    return res.status(200).json({ profile, code: successCodeMessages.UPDATED_PROFILE });
+    return res.status(200).json({ person, code: successCodeMessages.UPDATED_PERSON });
 }

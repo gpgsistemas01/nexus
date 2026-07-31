@@ -1,11 +1,11 @@
-import { ProfileCreateDatabaseError, ProfileUpdateDatabaseError } from "../../../errors/admin/profileError.js";
+import { PersonCreateDatabaseError, PersonUpdateDatabaseError } from "../../../errors/admin/personError.js";
 import { getDb } from "../../../repository/baseRepository.js";
 import { createServiceLogger, logServiceError } from "../../../utils/logger.js";
 
-const serviceLogger = createServiceLogger('admin.profileService');
+const serviceLogger = createServiceLogger('admin.personService');
 
 
-export const findAllProfiles = async ({
+export const findAllPersons = async ({
     departments = [],
     roles = [],
     includeAccesses = false,
@@ -48,8 +48,8 @@ export const findAllProfiles = async ({
         })
     };
 
-    const [foundProfiles, total, filtered] = await Promise.all([
-        db.profile.findMany({
+    const [foundPersons, total, filtered] = await Promise.all([
+        db.person.findMany({
             ...(take > 0 && { skip, take }),
             where,
             orderBy: {
@@ -68,24 +68,24 @@ export const findAllProfiles = async ({
                 })
             }
         }),
-        db.profile.count(),
-        db.profile.count({ where })
+        db.person.count(),
+        db.person.count({ where })
     ]);
 
     return {
-        data: foundProfiles,
+        data: foundPersons,
         recordsTotal: total,
         recordsFiltered: filtered
     };
 };
 
-const DEFAULT_PROFILE_SELECT = {
+const DEFAULT_PERSON_SELECT = {
     id: true,
     fullName: true
 };
 
-const PROFILE_WITH_ACCESSES_SELECT = {
-    ...DEFAULT_PROFILE_SELECT,
+const PERSON_WITH_ACCESSES_SELECT = {
+    ...DEFAULT_PERSON_SELECT,
     accesses: {
         select: {
             department: true,
@@ -94,7 +94,7 @@ const PROFILE_WITH_ACCESSES_SELECT = {
     }
 };
 
-const findActiveProfileById = ({ tx, id, select }) => getDb(tx).profile.findUnique({
+const findActivePersonById = ({ tx, id, select }) => getDb(tx).person.findUnique({
     where: {
         id,
         isActive: true
@@ -102,10 +102,10 @@ const findActiveProfileById = ({ tx, id, select }) => getDb(tx).profile.findUniq
     select
 });
 
-export const findProfileById = ({ tx, id, includeAccesses = false }) => findActiveProfileById({
+export const findPersonById = ({ tx, id, includeAccesses = false }) => findActivePersonById({
     tx,
     id,
-    select: includeAccesses ? PROFILE_WITH_ACCESSES_SELECT : DEFAULT_PROFILE_SELECT
+    select: includeAccesses ? PERSON_WITH_ACCESSES_SELECT : DEFAULT_PERSON_SELECT
 });
 
 const buildAccessData = ({ accesses = [] }) => accesses.map(({ departmentId, roleId }) => ({
@@ -113,44 +113,44 @@ const buildAccessData = ({ accesses = [] }) => accesses.map(({ departmentId, rol
     roleId
 }));
 
-export const createProfile = async ({ profileDto }) => {
+export const createPerson = async ({ personDto }) => {
 
     const db = getDb();
 
     try {
 
-        const accesses = buildAccessData(profileDto);
+        const accesses = buildAccessData(personDto);
 
-        return await db.profile.create({
+        return await db.person.create({
             data: {
-                fullName: profileDto.fullName,
+                fullName: personDto.fullName,
                 ...(accesses.length && {
                     accesses: {
                         createMany: { data: accesses }
                     }
                 })
             },
-            select: PROFILE_WITH_ACCESSES_SELECT
+            select: PERSON_WITH_ACCESSES_SELECT
         });
 
     } catch (err) {
-        logServiceError(serviceLogger, err, { operation: 'admin.profileService' });
+        logServiceError(serviceLogger, err, { operation: 'admin.personService' });
 
-        throw new ProfileCreateDatabaseError();
+        throw new PersonCreateDatabaseError();
     }
 }
 
-export const updateProfile = async ({ profileDto, id }) => {
+export const updatePerson = async ({ personDto, id }) => {
 
     const db = getDb();
 
     try {
-        const accesses = buildAccessData(profileDto);
+        const accesses = buildAccessData(personDto);
 
-        return await db.profile.update({
+        return await db.person.update({
             where: { id },
             data: {
-                fullName: profileDto.fullName,
+                fullName: personDto.fullName,
                 accesses: {
                     deleteMany: {},
                     ...(accesses.length && {
@@ -158,12 +158,12 @@ export const updateProfile = async ({ profileDto, id }) => {
                     })
                 }
             },
-            select: PROFILE_WITH_ACCESSES_SELECT
+            select: PERSON_WITH_ACCESSES_SELECT
         });
 
     } catch (err) {
-        logServiceError(serviceLogger, err, { operation: 'admin.profileService' });
+        logServiceError(serviceLogger, err, { operation: 'admin.personService' });
 
-        throw new ProfileUpdateDatabaseError();
+        throw new PersonUpdateDatabaseError();
     }
 }

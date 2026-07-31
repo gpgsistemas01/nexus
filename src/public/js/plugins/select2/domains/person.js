@@ -1,21 +1,21 @@
-import { getAllProfiles } from "../../../application/admin/profiles.js";
+import { getAllPersons } from "../../../application/admin/persons.js";
 import { initDomainSelect2, initFilterSelect2, toggleSelectOption } from "../baseSelect.js";
 import { FILTER_SELECTORS } from "../../../constants/selectors.js";
 import { getSelectedOptionText } from "../../../utils/domUtils.js";
 
-const profileFilterSelector = FILTER_SELECTORS.PROFILE;
+const personFilterSelector = FILTER_SELECTORS.PERSON;
 
-export const initProfileFilterSelect = ({
+export const initPersonFilterSelect = ({
     selectedId = null,
     departmentFilterSelector = FILTER_SELECTORS.DEPARTMENT,
     data: resolveData = null
 } = {}) => initFilterSelect2({
-    selector: profileFilterSelector,
-    getOptions: getAllProfiles,
-    placeholder: 'Filtrar por perfil',
+    selector: personFilterSelector,
+    getOptions: getAllPersons,
+    placeholder: 'Filtrar por persona',
     selectedId,
     paginated: true,
-    mapOption: (profile) => ({ id: profile.id, text: profile.fullName }),
+    mapOption: (person) => ({ id: person.id, text: person.fullName }),
     data: (params) => {
 
         if (typeof resolveData === 'function') return resolveData(params);
@@ -34,31 +34,31 @@ export const initProfileFilterSelect = ({
     }
 });
 
-export const initProfileSelect = ({ 
-    modalSelector, 
-    baseSelector, 
-    placeholder, 
+export const initPersonSelect = ({
+    modalSelector,
+    baseSelector,
+    placeholder,
     clearOnOpen = true,
-    data, 
-    allowCreate = true 
+    data,
+    allowCreate = true
 }) => initDomainSelect2({
     selector: baseSelector,
     containerSelector: modalSelector,
-    get: getAllProfiles,
+    get: getAllPersons,
     clearOnOpen,
     data,
     placeholder,
-    mapOption: (profile) => ({
-        id: profile.id,
-        text: profile.fullName
+    mapOption: (person) => ({
+        id: person.id,
+        text: person.fullName
     }),
     allowCreate,
-    newTagLabel: 'Nuevo perfil'
+    newTagLabel: 'Nueva persona'
 });
 
-export const toggleProfileOption = ({ 
-    selector, 
-    id = null, 
+export const togglePersonOption = ({
+    selector,
+    id = null,
     name = null
 }) => toggleSelectOption({
     selector,

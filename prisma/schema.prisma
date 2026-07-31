@@ -8,9 +8,9 @@ datasource db {
 }
 
 model Department {
-  id                   String                  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name                 String                  @unique @db.VarChar(50)
-  profileAccesses      ProfileRoleDepartment[]
+  id                   String                 @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name                 String                 @unique @db.VarChar(50)
+  personAccesses       PersonRoleDepartment[]
   accesses             UserRoleDepartment[]
   purchaseRequisitions PurchaseRequisition[]
   goodsIssues          GoodsIssue[]
@@ -18,19 +18,19 @@ model Department {
 }
 
 model Role {
-  id              String                  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name            String                  @unique @db.VarChar(50)
-  accesses        UserRoleDepartment[]
-  profileAccesses ProfileRoleDepartment[]
+  id             String                 @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name           String                 @unique @db.VarChar(50)
+  accesses       UserRoleDepartment[]
+  personAccesses PersonRoleDepartment[]
 }
 
 model User {
   id                      String               @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  profileId               String?              @db.Uuid
+  personId                String?              @db.Uuid
   name                    String               @unique @db.VarChar(50)
   password                String               @db.VarChar(100)
   isActive                Boolean              @default(true)
-  profile                 Profile?             @relation(fields: [profileId], references: [id])
+  person                  Person?              @relation(fields: [personId], references: [id])
   accesses                UserRoleDepartment[]
   notifications           Notification[]
   createrStockAdjustment  StockAdjustment[]    @relation("CreatedStockAdjustments")
@@ -50,33 +50,37 @@ model UserRoleDepartment {
   @@id([userId, roleId, departmentId])
 }
 
-model Profile {
-  id                            String                  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  fullName                      String                  @db.VarChar(255)
-  isActive                      Boolean                 @default(true)
+/// Persona que participa en los procesos del negocio. `Person` identifica el papel
+/// persistido; la cuenta `User` conserva la trazabilidad del actor que ejecuta acciones.
+/// El UUID y sus claves foráneas mantienen el seguimiento histórico de la persona.
+model Person {
+  id                            String                 @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  fullName                      String                 @db.VarChar(255)
+  isActive                      Boolean                @default(true)
   goodsReceipts                 GoodsReceipt[]
-  accesses                      ProfileRoleDepartment[]
+  accesses                      PersonRoleDepartment[]
   users                         User[]
-  approverPurchaseRequisitions  PurchaseRequisition[]   @relation("ApproverRelation")
-  requesterPurchaseRequisitions PurchaseRequisition[]   @relation("RequesterRelation")
-  approverGoodsIssues           GoodsIssue[]            @relation("ApproverGoodsIssueRelation")
-  requesterGoodsIssues          GoodsIssue[]            @relation("RequesterGoodsIssueRelation")
-  warehouseStaffGoodsIssues     GoodsIssue[]            @relation("WarehouseStaffGoodsIssueRelation")
-  deliveredPurchaseRequisitions PurchaseRequisition[]   @relation("DeliveredByRelation")
+  approverPurchaseRequisitions  PurchaseRequisition[]  @relation("ApproverRelation")
+  requesterPurchaseRequisitions PurchaseRequisition[]  @relation("RequesterRelation")
+  approverGoodsIssues           GoodsIssue[]           @relation("ApproverGoodsIssueRelation")
+  requesterGoodsIssues          GoodsIssue[]           @relation("RequesterGoodsIssueRelation")
+  warehouseStaffGoodsIssues     GoodsIssue[]           @relation("WarehouseStaffGoodsIssueRelation")
+  deliveredPurchaseRequisitions PurchaseRequisition[]  @relation("DeliveredByRelation")
   clients                       Client[]
   goodsIssues                   GoodsIssue[]
 }
 
-model ProfileRoleDepartment {
+/// Accesos por área y rol asignados a una persona del negocio (`Person`).
+model PersonRoleDepartment {
   departmentId String @db.Uuid
-  profileId    String @db.Uuid
+  personId     String @db.Uuid
   roleId       String @db.Uuid
 
   department Department @relation(fields: [departmentId], references: [id])
-  profile    Profile    @relation(fields: [profileId], references: [id])
+  person     Person     @relation(fields: [personId], references: [id])
   role       Role       @relation(fields: [roleId], references: [id])
 
-  @@id([profileId, roleId, departmentId])
+  @@id([personId, roleId, departmentId])
 }
 
 model Status {
@@ -208,7 +212,7 @@ model Client {
   id          String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name        String       @db.VarChar(255)
   advisorId   String?      @db.Uuid
-  advisor     Profile?     @relation(fields: [advisorId], references: [id])
+  advisor     Person?      @relation(fields: [advisorId], references: [id])
   goodsIssues GoodsIssue[]
 }
 
@@ -236,7 +240,7 @@ model GoodsReceipt {
   totalQuantity            Decimal                    @db.Decimal(10, 2)
   totalNetPurchaseAmount   Decimal                    @db.Decimal(10, 2)
   totalGrossPurchaseAmount Decimal                    @db.Decimal(10, 2)
-  receivedBy               Profile                    @relation(fields: [receivedById], references: [id])
+  receivedBy               Person                     @relation(fields: [receivedById], references: [id])
   supplier                 Supplier                   @relation(fields: [supplierId], references: [id])
   status                   Status                     @relation(fields: [statusId], references: [id])
   movements                InventoryMovement[]
@@ -296,9 +300,9 @@ model PurchaseRequisition {
   projectId     String  @db.Uuid
 
   department  Department @relation(fields: [departmentId], references: [id])
-  approver    Profile?   @relation("ApproverRelation", fields: [approverId], references: [id])
-  deliveredBy Profile?   @relation("DeliveredByRelation", fields: [deliveredById], references: [id])
-  requester   Profile    @relation("RequesterRelation", fields: [requesterId], references: [id])
+  approver    Person?    @relation("ApproverRelation", fields: [approverId], references: [id])
+  deliveredBy Person?    @relation("DeliveredByRelation", fields: [deliveredById], references: [id])
+  requester   Person     @relation("RequesterRelation", fields: [requesterId], references: [id])
   status      Status     @relation(fields: [statusId], references: [id])
   project     Project    @relation(fields: [projectId], references: [id])
 
@@ -345,13 +349,13 @@ model GoodsIssue {
   fulfillmentStatusId String? @db.Uuid
 
   department        Department         @relation(fields: [departmentId], references: [id])
-  approver          Profile?           @relation("ApproverGoodsIssueRelation", fields: [approverId], references: [id])
-  requester         Profile            @relation("RequesterGoodsIssueRelation", fields: [requesterId], references: [id])
-  warehouseStaff    Profile?           @relation("WarehouseStaffGoodsIssueRelation", fields: [warehouseStaffId], references: [id])
+  approver          Person?            @relation("ApproverGoodsIssueRelation", fields: [approverId], references: [id])
+  requester         Person             @relation("RequesterGoodsIssueRelation", fields: [requesterId], references: [id])
+  warehouseStaff    Person?            @relation("WarehouseStaffGoodsIssueRelation", fields: [warehouseStaffId], references: [id])
   status            Status             @relation(fields: [statusId], references: [id])
   project           Project?           @relation(fields: [projectId], references: [id])
   client            Client             @relation(fields: [clientId], references: [id])
-  advisor           Profile            @relation(fields: [advisorId], references: [id])
+  advisor           Person             @relation(fields: [advisorId], references: [id])
   fulfillmentStatus FulfillmentStatus? @relation(fields: [fulfillmentStatusId], references: [id])
 
   details   GoodsIssueDetail[]

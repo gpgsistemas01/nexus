@@ -44,7 +44,7 @@ const cleanupWasteIssueData = async () => {
   const suppliers = await prisma.supplier.findMany({ where: { tradeName: { startsWith: 'IT WasteIssue Supplier ' } }, select: { id: true } });
   const reasons = await prisma.stockAdjustmentReason.findMany({ where: { name: { startsWith: 'IT WasteIssue Reason ' } }, select: { id: true } });
   const users = await prisma.user.findMany({ where: { name: { startsWith: 'ITWasteIssueUser' } }, select: { id: true } });
-  const profiles = await prisma.profile.findMany({ where: { fullName: { startsWith: 'IT WasteIssue ' } }, select: { id: true } });
+  const persons = await prisma.person.findMany({ where: { fullName: { startsWith: 'IT WasteIssue ' } }, select: { id: true } });
   const departments = await prisma.department.findMany({ where: { name: { startsWith: 'IT WasteIssue Department ' } }, select: { id: true } });
   const clients = await prisma.client.findMany({ where: { name: { startsWith: 'IT WasteIssue Client ' } }, select: { id: true } });
   const presentations = await prisma.presentation.findMany({ where: { name: { startsWith: 'IT WasteIssue Presentation ' } }, select: { id: true } });
@@ -65,7 +65,7 @@ const cleanupWasteIssueData = async () => {
     where: {
       OR: [
         { clientId: { in: clients.map(({ id }) => id) } },
-        { requesterId: { in: profiles.map(({ id }) => id) } },
+        { requesterId: { in: persons.map(({ id }) => id) } },
         { departmentId: { in: departments.map(({ id }) => id) } },
         { projectNumber: { startsWith: 'IW' } }
       ]
@@ -85,8 +85,8 @@ const cleanupWasteIssueData = async () => {
   await prisma.supplier.deleteMany({ where: { id: { in: suppliers.map(({ id }) => id) } } });
   await prisma.stockAdjustmentReason.deleteMany({ where: { id: { in: reasons.map(({ id }) => id) } } });
   await prisma.client.deleteMany({ where: { id: { in: clients.map(({ id }) => id) } } });
-  await prisma.profileRoleDepartment.deleteMany({ where: { OR: [{ profileId: { in: profiles.map(({ id }) => id) } }, { departmentId: { in: departments.map(({ id }) => id) } }] } });
-  await prisma.profile.deleteMany({ where: { id: { in: profiles.map(({ id }) => id) } } });
+  await prisma.personRoleDepartment.deleteMany({ where: { OR: [{ personId: { in: persons.map(({ id }) => id) } }, { departmentId: { in: departments.map(({ id }) => id) } }] } });
+  await prisma.person.deleteMany({ where: { id: { in: persons.map(({ id }) => id) } } });
   await prisma.department.deleteMany({ where: { id: { in: departments.map(({ id }) => id) } } });
   await prisma.user.deleteMany({ where: { id: { in: users.map(({ id }) => id) } } });
   await prisma.presentation.deleteMany({ where: { id: { in: presentations.map(({ id }) => id) } } });
@@ -110,8 +110,8 @@ describeDb('waste and goods issue database integration', () => {
       prisma.unitMeasure.create({ data: { name: names.unit, symbol: names.unitSymbol } }),
       prisma.stockAdjustmentReason.create({ data: { name: names.reason } }),
       prisma.user.create({ data: { name: names.user, password: 'test-password' } }),
-      prisma.profile.create({ data: { fullName: names.requester } }),
-      prisma.profile.create({ data: { fullName: names.advisor } }),
+      prisma.person.create({ data: { fullName: names.requester } }),
+      prisma.person.create({ data: { fullName: names.advisor } }),
       prisma.department.create({ data: { name: names.department } }),
       prisma.client.create({ data: { name: names.client } })
     ]);

@@ -39,22 +39,22 @@ export const findAllUsers = async ({
             select: {
                 id: true,
                 name: true,
-                profileId: true,
-                profile: { select: { fullName: true } },
+                personId: true,
+                person: { select: { fullName: true } },
                 accesses: {
-                    select: { 
-                        roleId: true, 
-                        departmentId: true, 
-                        role: { 
-                            select: { 
-                                name: true 
-                            } 
-                        }, 
-                        department: { 
-                            select: { 
-                                name: true 
-                            } 
-                        } 
+                    select: {
+                        roleId: true,
+                        departmentId: true,
+                        role: {
+                            select: {
+                                name: true
+                            }
+                        },
+                        department: {
+                            select: {
+                                name: true
+                            }
+                        }
                     },
                     take: 1
                 }
@@ -72,10 +72,10 @@ export const findAllUsers = async ({
             departmentName: user.accesses?.[0]?.department?.name || null
         }));
 
-        return { 
-            data, 
-            recordsTotal: total, 
-            recordsFiltered: filtered 
+        return {
+            data,
+            recordsTotal: total,
+            recordsFiltered: filtered
         };
 
     } catch (err) {
@@ -163,39 +163,39 @@ export const createUser = async ({ userDto }) => {
 
         const db = getDb();
 
-        const { password, profileId, roleId, departmentId, ...userData } = userDto;
+        const { password, personId, roleId, departmentId, ...userData } = userDto;
         const hashedPassword = await encryptPassword(password);
 
         return await db.user.create({
             data: {
                 ...userData,
                 password: hashedPassword,
-                ...(profileId && {
-                    profile: {
+                ...(personId && {
+                    person: {
                         connect: {
-                            id: profileId
+                            id: personId
                         }
                     }
                 }),
                 accesses: {
                     create: {
-                        role: { 
-                            connect: { 
-                                id: roleId 
-                            } 
+                        role: {
+                            connect: {
+                                id: roleId
+                            }
                         },
-                        department: { 
-                            connect: { 
-                                id: departmentId 
-                            } 
+                        department: {
+                            connect: {
+                                id: departmentId
+                            }
                         }
                     }
                 }
             },
-            select: { 
-                id: true, 
-                name: true, 
-                profileId: true 
+            select: {
+                id: true,
+                name: true,
+                personId: true
             }
         });
 
@@ -209,9 +209,9 @@ export const createUser = async ({ userDto }) => {
 const assertUserExists = async ({ id }) => {
 
     const db = getDb();
-    const user = await db.user.findUnique({ 
-        where: { id }, 
-        select: { id: true } 
+    const user = await db.user.findUnique({
+        where: { id },
+        select: { id: true }
     });
 
     if (!user) throw new UserNotFound();
@@ -227,28 +227,28 @@ export const updateUser = async ({ id, userDto }) => {
         return await db.$transaction(async (tx) => {
             const updated = await tx.user.update({
                 where: { id },
-                data: { 
-                    name: userDto.name, 
-                    profileId: userDto.profileId 
+                data: {
+                    name: userDto.name,
+                    personId: userDto.personId
                 },
-                select: { 
-                    id: true, 
-                    name: true, 
-                    profileId: true 
+                select: {
+                    id: true,
+                    name: true,
+                    personId: true
                 }
             });
 
-            await tx.userRoleDepartment.deleteMany({ 
-                where: { 
-                    userId: id 
-                } 
+            await tx.userRoleDepartment.deleteMany({
+                where: {
+                    userId: id
+                }
             });
-            await tx.userRoleDepartment.create({ 
-                data: { 
-                    userId: id, 
-                    roleId: userDto.roleId, 
-                    departmentId: userDto.departmentId 
-                } 
+            await tx.userRoleDepartment.create({
+                data: {
+                    userId: id,
+                    roleId: userDto.roleId,
+                    departmentId: userDto.departmentId
+                }
             });
 
             return updated;

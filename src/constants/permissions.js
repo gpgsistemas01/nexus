@@ -4,10 +4,10 @@ export const PERMISSIONS = Object.freeze({
     MATERIALS_ADJUST_STOCK: 'materials:adjust-stock',
     DEPARTMENTS_READ: 'departments:read',
     MOVEMENTS_READ: 'movements:read',
-    PROFILES_READ: 'profiles:read',
-    PROFILES_WRITE: 'profiles:write',
+    PERSONS_READ: 'persons:read',
+    PERSONS_WRITE: 'persons:write',
     ADMIN_REPORTS_READ: 'admin:reports-read',
-    PROFILE_REPORTS_READ: 'profile:reports-read',
+    PERSON_REPORTS_READ: 'person:reports-read',
     ROLES_READ: 'roles:read',
     USERS_MANAGE: 'users:manage',
     CLIENTS_READ: 'clients:read',
@@ -31,7 +31,7 @@ export const PERMISSIONS = Object.freeze({
     WASTES_READ: 'wastes:read',
     WASTES_WRITE: 'wastes:write',
     WASTES_ADJUST_STOCK: 'wastes:adjust-stock',
-    PROFILES_PAGE_VIEW: 'profiles:page-view',
+    PERSONS_PAGE_VIEW: 'persons:page-view',
     CLIENTS_PAGE_VIEW: 'clients:page-view',
     GOODS_ISSUES_PAGE_VIEW: 'goods:issues-page-view',
     GOODS_RECEIPTS_PAGE_VIEW: 'goods:receipts-page-view',
@@ -96,7 +96,7 @@ export const AUTHORIZATION_POLICIES = Object.freeze({
     roles: [ 'Administrador del sistema' ],
     departments: [ 'SISTEMAS' ]
 }),
-    [PERMISSIONS.PROFILES_READ]: createPolicy({
+    [PERMISSIONS.PERSONS_READ]: createPolicy({
     roles: [ 'Administrador del sistema', 'Coordinador', 'Auxiliar', 'Operador', 'Instalador', 'Diseñador', 'Almacenista', 'Asesor de ventas', 'Repartidor', 'Director', 'Administrador', 'Contador' ],
     departments: [
         'DIRECCIÓN',
@@ -113,7 +113,7 @@ export const AUTHORIZATION_POLICIES = Object.freeze({
         'VENTAS Y PROYECTOS ESPECIALES'
     ]
 }),
-    [PERMISSIONS.PROFILES_WRITE]: createPolicy({
+    [PERMISSIONS.PERSONS_WRITE]: createPolicy({
     roles: ['Administrador del sistema', 'Coordinador', 'Auxiliar', 'Almacenista'],
     departments: ['ALMACÉN Y PROVEDURÍA', 'SISTEMAS']
 }),
@@ -121,7 +121,7 @@ export const AUTHORIZATION_POLICIES = Object.freeze({
     roles: ['Coordinador', 'Auxiliar', 'Administrador del sistema'],
     departments: ['SISTEMAS']
 }),
-    [PERMISSIONS.PROFILE_REPORTS_READ]: createPolicy({
+    [PERMISSIONS.PERSON_REPORTS_READ]: createPolicy({
     roles: ['Coordinador', 'Auxiliar', 'Almacenista', 'Administrador del sistema'],
     departments: ['ALMACÉN Y PROVEDURÍA', 'SISTEMAS']
 }),
@@ -287,7 +287,7 @@ export const AUTHORIZATION_POLICIES = Object.freeze({
     roles: ['Administrador del sistema'],
     departments: ['SISTEMAS']
 }),
-    [PERMISSIONS.PROFILES_PAGE_VIEW]: createPolicy({
+    [PERMISSIONS.PERSONS_PAGE_VIEW]: createPolicy({
     roles: ['Administrador del sistema', 'Coordinador', 'Auxiliar', 'Almacenista'],
     departments: ['ALMACÉN Y PROVEDURÍA', 'SISTEMAS']
 }),

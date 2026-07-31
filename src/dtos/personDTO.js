@@ -1,4 +1,4 @@
-export const createProfileDTO = (body = {}) => ({
+export const createPersonDTO = (body = {}) => ({
 
     fullName: body.fullName,
     accesses: body.accesses

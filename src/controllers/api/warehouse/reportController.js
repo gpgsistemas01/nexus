@@ -85,7 +85,7 @@ export const exportGoodsIssueReportExcel = async (req, res) => {
         observationsSearch: monthlyReport ? '' : req.query.observationsSearch || '',
         clientId: monthlyReport ? '' : req.query.clientId || '',
         departmentId: monthlyReport ? '' : req.query.departmentId || '',
-        profileId: monthlyReport ? '' : req.query.profileId || '',
+        personId: monthlyReport ? '' : req.query.personId || '',
         accesses: req.user?.accesses || [],
         orderBy,
         orderDir
@@ -162,7 +162,7 @@ export const exportGoodsReceiptReportExcel = async (req, res) => {
         startDate: monthlyReport ? monthDateRange.startDate : req.query.startDate || '',
         endDate: monthlyReport ? monthDateRange.endDate : req.query.endDate || '',
         supplierId: monthlyReport ? '' : req.query.supplierId || '',
-        profileId: monthlyReport ? '' : req.query.profileId || '',
+        personId: monthlyReport ? '' : req.query.personId || '',
         orderBy,
         orderDir
     });

@@ -1,5 +1,5 @@
 import { isEmptyOrNull } from "./baseValidations.js";
-import { validateName, validatePassword, validateNumber, validateUsername, validateTextOptional, validateMeasure, validateDateOptional, validateGoodsReceiptDetailsArray, validateDate, validateText, validateNumberOptional, validateGoodsIssueDetailsArray, validateNonNegativeNumber, validatePositiveNumber, validatePairedOptionalNumber, validateProfileAccessesArray } from "./fieldValidations.js";
+import { validateName, validatePassword, validateNumber, validateUsername, validateTextOptional, validateMeasure, validateDateOptional, validateGoodsReceiptDetailsArray, validateDate, validateText, validateNumberOptional, validateGoodsIssueDetailsArray, validateNonNegativeNumber, validatePositiveNumber, validatePairedOptionalNumber, validatePersonAccessesArray } from "./fieldValidations.js";
 
 export const supplierValidators = {
     legalName: (value) => validateText({
@@ -150,17 +150,17 @@ export const userPasswordValidators = {
     password: validatePassword,
 };
 
-export const profileValidators = {
+export const personValidators = {
     fullName: (value) => validateText({
         name: value,
         length: 100,
         fieldName: 'El nombre',
         regex: /^[\p{L}0-9]+(?:[ '\-.,:;()¿?¡!][\p{L}0-9]+)*[.,:;()¿?¡!]*$/u
     }),
-    accesses: validateProfileAccessesArray,
+    accesses: validatePersonAccessesArray,
 }
 
-export const profileAccessValidators = {
+export const personAccessValidators = {
     departmentId: (value, { accesses = [] } = {}) => {
         const requiredError = isEmptyOrNull(value, 'El área');
 

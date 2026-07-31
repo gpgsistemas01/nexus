@@ -19,7 +19,7 @@ bindDisabledControlWarning(select2DisabledWarningConfig);
 
 const DEPENDENT_FILTER_MESSAGES = {
     materialRequiresSupplier: 'Seleccione un proveedor antes de filtrar por material.',
-    profileRequiresDepartment: 'Seleccione un área antes de filtrar por perfil.'
+    personRequiresDepartment: 'Seleccione un área antes de filtrar por persona.'
 };
 
 const clearSelectFilter = (selector) => {
@@ -94,13 +94,13 @@ const bindSupplierMaterialFilterDependency = () => {
     });
 };
 
-const bindDepartmentProfileFilterDependency = () => {
+const bindDepartmentPersonFilterDependency = () => {
 
     bindDisabledFilterDependency({
         sourceSelector: FILTER_SELECTORS.DEPARTMENT,
-        targetSelector: FILTER_SELECTORS.PROFILE,
-        clearTarget: () => clearSelectFilter(FILTER_SELECTORS.PROFILE),
-        disabledMessage: DEPENDENT_FILTER_MESSAGES.profileRequiresDepartment
+        targetSelector: FILTER_SELECTORS.PERSON,
+        clearTarget: () => clearSelectFilter(FILTER_SELECTORS.PERSON),
+        disabledMessage: DEPENDENT_FILTER_MESSAGES.personRequiresDepartment
     });
 };
 
@@ -110,7 +110,7 @@ export const bindTableFilterDependencies = (fields = []) => {
         bindSupplierMaterialFilterDependency();
     }
 
-    if (fields.includes('department') && fields.includes('profile')) {
-        bindDepartmentProfileFilterDependency();
+    if (fields.includes('department') && fields.includes('person')) {
+        bindDepartmentPersonFilterDependency();
     }
 };

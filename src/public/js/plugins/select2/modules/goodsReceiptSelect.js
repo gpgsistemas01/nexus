@@ -6,7 +6,7 @@ import { details } from "../../datatable/goodsReceiptDatatable.js";
 import { initMdbWrapperInput, updateMdbWrapperInput } from "../../mdb/baseInstance.js";
 import { bindDisabledSelectDependency } from "../baseSelect.js";
 import { setupMaterialSelect, toggleMaterialOption } from "../domains/material.js";
-import { initProfileSelect, toggleProfileOption } from "../domains/profile.js";
+import { initPersonSelect, togglePersonOption } from "../domains/person.js";
 import { setupSupplierSelect, toggleSupplierOption } from "../domains/supplier.js";
 import { FORM_SELECTORS, MODAL_SELECTORS } from "../../../constants/selectors.js";
 
@@ -64,7 +64,7 @@ export const initGoodsReceiptFormSelect2 = () => {
 
             details.length = 0;
 
-            toggleProfileOption({
+            togglePersonOption({
                 selector: receivedByScopedSelector,
                 id: null,
                 name: null
@@ -84,7 +84,7 @@ export const initGoodsReceiptFormSelect2 = () => {
         supplierSelector
     });
 
-    initProfileSelect({
+    initPersonSelect({
         modalSelector,
         baseSelector: receivedByScopedSelector,
         placeholder: 'Buscar persona que recibe...',
@@ -119,7 +119,7 @@ export const setGoodsReceiptFormSelectOptions = (data = null) => {
         name: `${ data?.supplierName }`
     });
 
-    toggleProfileOption({
+    togglePersonOption({
         selector: receivedByScopedSelector,
         id: data?.receivedById,
         name: data?.receivedByName,

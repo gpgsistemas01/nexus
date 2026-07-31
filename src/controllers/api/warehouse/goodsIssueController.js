@@ -21,7 +21,7 @@ export const getAllGoodsIssues = async (req, res) => {
     const endDate = req.query.endDate || '';
     const clientId = req.query.clientId || '';
     const departmentId = req.query.departmentId || '';
-    const profileId = req.query.profileId || '';
+    const personId = req.query.personId || '';
 
     const columns = ['referenceNumber', 'requestDate', 'departmentName', 'projectNumber', 'clientName', null, null];
     const { orderBy, orderDir } = getDataTableOrder({
@@ -38,7 +38,7 @@ export const getAllGoodsIssues = async (req, res) => {
         endDate,
         clientId,
         departmentId,
-        profileId,
+        personId,
         fulfillmentStatusId,
         observationsSearch,
         orderBy,
