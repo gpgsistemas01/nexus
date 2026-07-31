@@ -21,10 +21,10 @@ export class GoodsReceiptCreateDatabaseError extends AppError {
     }
 }
 
-export class ProfileReceivedByNotFound extends AppError {
+export class PersonReceivedByNotFound extends AppError {
 
     constructor() {
-        super('Perfil de quien recibe no encontrado', 'PROFILE_RECEIVED_BY_NOT_FOUND', 404);
+        super('Persona que recibe no encontrada', 'PERSON_RECEIVED_BY_NOT_FOUND', 404);
     }
 }
 

@@ -47,37 +47,37 @@ async function main() {
         }
     });
 
-    const countProfile = await prisma.profile.count();
+    const countPerson = await prisma.person.count();
 
-    if (countProfile < 1) {
+    if (countPerson < 1) {
         const relationDepartmentSheet = workbook1.Sheets['RELACIONES_PERFIL'];
-        const relationProfileDepartmentRows = XLSX.utils.sheet_to_json(relationDepartmentSheet, {
+        const relationPersonDepartmentRows = XLSX.utils.sheet_to_json(relationDepartmentSheet, {
             defval: null,
         });
 
-        const profileParsed = relationProfileDepartmentRows.map(row => {
+        const personParsed = relationPersonDepartmentRows.map(row => {
             const fullName = cleanValue(row.fullName);
             if (!fullName) return null;
 
             return { fullName };
         }).filter(Boolean);
 
-        await prisma.profile.createMany({
-            data: profileParsed,
+        await prisma.person.createMany({
+            data: personParsed,
             skipDuplicates: true
         });
 
-        const profiles = await prisma.profile.findMany({
+        const persons = await prisma.person.findMany({
             select: {
                 id: true,
                 fullName: true
             }
         });
-        const profileMap = new Map(profiles.map(p => [cleanValue(p.fullName), p.id]));
+        const personMap = new Map(persons.map(p => [cleanValue(p.fullName), p.id]));
 
         const departmentMap = new Map(departments.map(d => [cleanValue(d.name), d.id]));
 
-        const relationProfileDepartmentParsed = relationProfileDepartmentRows.map(row => {
+        const relationPersonDepartmentParsed = relationPersonDepartmentRows.map(row => {
 
             const fullName = cleanValue(row.fullName);
             const department = cleanValue(row.department);
@@ -87,23 +87,23 @@ async function main() {
                 return null;
             }
 
-            const profileId = profileMap.get(fullName);
+            const personId = personMap.get(fullName);
             const departmentId = departmentMap.get(department);
 
-            if (!profileId || !departmentId) {
+            if (!personId || !departmentId) {
                 console.log('No encontrado en Map: ', { fullName, department });
                 return null;
             }
 
             return {
-                profileId,
+                personId,
                 departmentId
             };
 
         }).filter(Boolean);
 
-        await prisma.departmentProfile.createMany({
-            data: relationProfileDepartmentParsed,
+        await prisma.departmentPerson.createMany({
+            data: relationPersonDepartmentParsed,
             skipDuplicates: true
         });
     }

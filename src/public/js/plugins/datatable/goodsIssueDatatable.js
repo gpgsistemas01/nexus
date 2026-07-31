@@ -66,7 +66,7 @@ export const createGoodsIssueDatatable = async (context) => {
     );
 
     filters = await setupTableFilters({
-        fields: ['date', 'client', 'department', 'independentProfile', 'fulfillmentStatus', 'observations']
+        fields: ['date', 'client', 'department', 'independentPerson', 'fulfillmentStatus', 'observations']
     });
 
     table = createDataTable({

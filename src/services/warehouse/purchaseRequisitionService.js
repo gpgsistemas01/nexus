@@ -4,8 +4,8 @@ import {
     PurchaseRequisitionStatusUpdateDatabaseError,
     PurchaseRequisitionStatusNotFound,
     PurchaseRequisitionUpdateDatabaseError,
-    RequesterProfileNotFound,
-    PurchaseRequisitionApproverProfileNotFound
+    RequesterPersonNotFound,
+    PurchaseRequisitionApproverPersonNotFound
 } from "../../errors/warehouse/purchaseRequisitionError.js";
 import { createServiceLogger, getModelLogContext, logServiceError, logServiceInfo } from "../../utils/logger.js";
 
@@ -140,15 +140,15 @@ const validatePurchaseRequisitionRelations = async ({ projectId, userId }) => {
             id: userId
         },
         include: {
-            profiles: true
+            persons: true
         }
     });
 
-    const requester = user?.profiles[0];
+    const requester = user?.persons[0];
     const departmentId = user?.departmentId;
 
     if (!project) throw new ProjectNotFound();
-    if (!requester) throw new RequesterProfileNotFound();
+    if (!requester) throw new RequesterPersonNotFound();
 
     return { project, requester, departmentId };
 };
@@ -363,7 +363,7 @@ const updatePurchaseRequisitionStatus = async ({ id, statusName, userId }) => {
         };
 
         if (statusName === PURCHASE_REQUISITION_STATUS_NAMES.CONFIRMED) {
-            const approver = await getDb().profile.findFirst({
+            const approver = await getDb().person.findFirst({
                 where: {
                     isActive: true,
                     users: {
@@ -378,7 +378,7 @@ const updatePurchaseRequisitionStatus = async ({ id, statusName, userId }) => {
                 }
             });
 
-            if (!approver) throw new PurchaseRequisitionApproverProfileNotFound();
+            if (!approver) throw new PurchaseRequisitionApproverPersonNotFound();
 
             data.approver = {
                 connect: {

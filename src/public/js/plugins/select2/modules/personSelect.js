@@ -1,10 +1,10 @@
 import { initDepartmentSelect } from "../domains/department.js";
 import { initRoleSelect } from "../domains/role.js";
 
-const departmentSelector = '#profileDepartmentInput';
-const roleSelector = '#profileRoleInput';
+const departmentSelector = '#personDepartmentInput';
+const roleSelector = '#personRoleInput';
 
-export const initProfileFormSelect2 = ({ modalSelector }) => {
+export const initPersonFormSelect2 = ({ modalSelector }) => {
     initDepartmentSelect({
         modalSelector,
         clearOnOpen: false,

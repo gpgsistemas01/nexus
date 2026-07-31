@@ -183,7 +183,7 @@ export const renderActionButtons = ({ status, fulfillmentStatus, context, canAdj
         ariaLabel: 'Ver registro'
     }));
 
-    if ((status === 'Abierta' || canEditGoodsIssue) || canEditGoodsReceipt || context === 'profile' || context === 'client' || context === 'supplier') actions.push(buildMdbActionButton({
+    if ((status === 'Abierta' || canEditGoodsIssue) || canEditGoodsReceipt || context === 'person' || context === 'client' || context === 'supplier') actions.push(buildMdbActionButton({
         className: 'btn-edit',
         colorClass: 'btn-primary',
         iconClass: 'fa-solid fa-pencil',

@@ -22,7 +22,7 @@ Nexus es una plataforma de control operativo para administrar inventario, compra
 ## Características principales
 
 - Autenticación y manejo de sesión con cookies y JWT.
-- Administración de usuarios, roles, perfiles, departamentos y movimientos.
+- Administración de usuarios, roles, personas, departamentos y movimientos.
 - Gestión de almacén: materiales, proveedores, entradas de compra, salidas de almacén, requisiciones, mermas, motivos, presentaciones, unidades de medida y estados de cumplimiento.
 - Gestión de clientes del área de ventas.
 - Reportes administrativos, de almacén e inventario.
@@ -160,13 +160,26 @@ El seed lee archivos XLSX ubicados en `prisma/` para cargar catálogos y datos i
 ## Usuarios, auditoría y permisos
 
 El análisis del modelo actual, las brechas detectadas y la propuesta para distinguir
-identidades de acceso (`User`), participantes del negocio (`Profile`), auditoría de
+identidades de acceso (`User`), personas participantes del negocio (`Person`), auditoría de
 escrituras y privilegios PostgreSQL están documentados en
 [`docs/database-users-and-permissions-analysis.md`](docs/database-users-and-permissions-analysis.md).
 
 La recomendación principal es no agregar un usuario indiscriminadamente a cada tabla:
-se debe conservar el actor `User` en operaciones auditables, mantener `Profile` para
+se debe conservar el actor `User` en operaciones auditables, mantener `Person` para
 los papeles del proceso y centralizar los permisos por acción, rol y departamento.
+
+### Impacto del cambio a «Personas» en la base de datos
+
+El cambio se aplica de forma integral para que «Persona» sea congruente en la interfaz,
+la API, el código y la persistencia. La migración renombra `Profile` a `Person`,
+`ProfileRoleDepartment` a `PersonRoleDepartment` y los campos `profileId` a `personId`.
+Los modelos, servicios, DTO, permisos y payloads utilizan igualmente `Person`/`person`.
+
+Esto **no afecta la trazabilidad de los datos**: cada persona conserva el mismo UUID y
+las operaciones históricas siguen relacionadas mediante sus claves foráneas. La
+trazabilidad de quién ejecutó una acción se mantiene en `User`, mientras que `Person`
+identifica a la persona que desempeñó un papel dentro del flujo. PostgreSQL realiza los
+renombres sobre los mismos objetos, sin copiar ni recrear registros.
 
 En la implementación actual, las **definiciones** de permisos y su matriz se versionan
 en `src/constants/permissions.js`; no existen tablas `Permission` o `RolePermission`
@@ -220,7 +233,7 @@ npm start
 - `/` página de inicio.
 - `/inicio-sesion`, `/revocar-sesion`, `/cerrar-sesion` para autenticación web.
 - `/materiales`, `/mermas`, `/requisiciones`, `/compras`, `/salidas-almacen`, `/proveedores` para almacén.
-- `/usuarios-sistemas`, `/perfiles`, `/movimientos` para administración.
+- `/usuarios-sistemas`, `/personas`, `/movimientos` para administración.
 - `/clientes` para ventas.
 
 ### API REST
@@ -243,7 +256,7 @@ Todas las rutas API cuelgan de `/api` y esperan `Content-Type: application/json`
 - `/api/admin/users`
 - `/api/admin/roles`
 - `/api/admin/departments`
-- `/api/admin/profiles`
+- `/api/admin/persons` (`/api/admin/persons` se conserva como alias de compatibilidad)
 - `/api/admin/movements`
 - `/api/admin/reports`
 

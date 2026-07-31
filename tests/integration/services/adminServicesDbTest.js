@@ -11,8 +11,8 @@ const names = {
   department: `IT Admin Department ${testSuffix}`,
   updatedDepartment: `IT Admin Department Updated ${testSuffix}`,
   role: `IT Admin Role ${testSuffix}`,
-  profile: `Perfil integración ${testSuffix}`,
-  updatedProfile: `Perfil integración actualizado ${testSuffix}`,
+  person: `Persona integración ${testSuffix}`,
+  updatedPerson: `Persona integración actualizado ${testSuffix}`,
   user: `UsuarioIntegracion${testSuffix}`.slice(0, 50),
   updatedUser: `UsuarioEditado${testSuffix}`.slice(0, 50)
 };
@@ -33,8 +33,8 @@ const cleanupAdminData = async () => {
     },
     select: { id: true }
   });
-  const profiles = await prisma.profile.findMany({
-    where: { fullName: { startsWith: 'Perfil integración' } },
+  const persons = await prisma.person.findMany({
+    where: { fullName: { startsWith: 'Persona integración' } },
     select: { id: true }
   });
   const roles = await prisma.role.findMany({
@@ -56,15 +56,15 @@ const cleanupAdminData = async () => {
     }
   });
   await prisma.user.deleteMany({ where: { id: { in: users.map(({ id }) => id) } } });
-  await prisma.profileRoleDepartment.deleteMany({
+  await prisma.personRoleDepartment.deleteMany({
     where: {
       OR: [
-        { profileId: { in: profiles.map(({ id }) => id) } },
+        { personId: { in: persons.map(({ id }) => id) } },
         { departmentId: { in: departments.map(({ id }) => id) } }
       ]
     }
   });
-  await prisma.profile.deleteMany({ where: { id: { in: profiles.map(({ id }) => id) } } });
+  await prisma.person.deleteMany({ where: { id: { in: persons.map(({ id }) => id) } } });
   await prisma.role.deleteMany({ where: { id: { in: roles.map(({ id }) => id) } } });
   await prisma.department.deleteMany({ where: { id: { in: departments.map(({ id }) => id) } } });
 };
@@ -74,10 +74,10 @@ describeDb('admin services database integration', () => {
     [{ prisma }, services] = await Promise.all([
       import('../../../src/lib/prisma.js'),
       Promise.all([
-        import('../../../src/services/admin/profile/profileService.js'),
+        import('../../../src/services/admin/person/personService.js'),
         import('../../../src/services/admin/userService.js')
-      ]).then(([profileService, userService]) => ({
-        ...profileService,
+      ]).then(([personService, userService]) => ({
+        ...personService,
         ...userService
       }))
     ]);
@@ -91,32 +91,32 @@ describeDb('admin services database integration', () => {
     ]);
   });
 
-  it('guarda perfiles y usuarios con sus relaciones en la base de pruebas', async () => {
-    const createdProfile = await services.createProfile({
-      profileDto: {
-        fullName: names.profile,
+  it('guarda personas y usuarios con sus relaciones en la base de pruebas', async () => {
+    const createdPerson = await services.createPerson({
+      personDto: {
+        fullName: names.person,
         accesses: [{ roleId: role.id, departmentId: department.id }]
       }
     });
 
-    expect(createdProfile).toMatchObject({ fullName: names.profile });
-    expect(createdProfile.accesses).toEqual([
+    expect(createdPerson).toMatchObject({ fullName: names.person });
+    expect(createdPerson.accesses).toEqual([
       expect.objectContaining({
         department: expect.objectContaining({ id: department.id, name: names.department }),
         role: expect.objectContaining({ id: role.id, name: names.role })
       })
     ]);
 
-    const updatedProfile = await services.updateProfile({
-      id: createdProfile.id,
-      profileDto: {
-        fullName: names.updatedProfile,
+    const updatedPerson = await services.updatePerson({
+      id: createdPerson.id,
+      personDto: {
+        fullName: names.updatedPerson,
         accesses: [{ roleId: role.id, departmentId: updatedDepartment.id }]
       }
     });
 
-    expect(updatedProfile).toMatchObject({ id: createdProfile.id, fullName: names.updatedProfile });
-    expect(updatedProfile.accesses).toEqual([
+    expect(updatedPerson).toMatchObject({ id: createdPerson.id, fullName: names.updatedPerson });
+    expect(updatedPerson.accesses).toEqual([
       expect.objectContaining({
         department: expect.objectContaining({ id: updatedDepartment.id, name: names.updatedDepartment }),
         role: expect.objectContaining({ id: role.id, name: names.role })
@@ -127,7 +127,7 @@ describeDb('admin services database integration', () => {
       userDto: {
         name: names.user,
         password: 'A%54321',
-        profileId: createdProfile.id,
+        personId: createdPerson.id,
         roleId: role.id,
         departmentId: updatedDepartment.id
       }
@@ -136,7 +136,7 @@ describeDb('admin services database integration', () => {
     expect(createdUser).toEqual({
       id: expect.any(String),
       name: names.user,
-      profileId: createdProfile.id
+      personId: createdPerson.id
     });
 
     await expect(services.findAllUsers({ search: names.user })).resolves.toMatchObject({
@@ -144,7 +144,7 @@ describeDb('admin services database integration', () => {
       data: [expect.objectContaining({
         id: createdUser.id,
         name: names.user,
-        profileId: createdProfile.id,
+        personId: createdPerson.id,
         roleId: role.id,
         departmentId: updatedDepartment.id
       })]
@@ -154,14 +154,14 @@ describeDb('admin services database integration', () => {
       id: createdUser.id,
       userDto: {
         name: names.updatedUser,
-        profileId: createdProfile.id,
+        personId: createdPerson.id,
         roleId: role.id,
         departmentId: department.id
       }
     })).resolves.toMatchObject({
       id: createdUser.id,
       name: names.updatedUser,
-      profileId: createdProfile.id
+      personId: createdPerson.id
     });
 
     await expect(services.updateUserPassword({

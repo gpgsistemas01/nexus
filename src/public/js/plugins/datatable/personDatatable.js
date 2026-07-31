@@ -1,6 +1,6 @@
-import { getAllProfiles } from "../../application/admin/profiles.js";
-import { exportProfileReport } from "../../application/admin/report.js";
-import { openProfileModal } from "../../pages/admin/profilesPage.js";
+import { getAllPersons } from "../../application/admin/persons.js";
+import { exportPersonReport } from "../../application/admin/report.js";
+import { openPersonModal } from "../../pages/admin/personsPage.js";
 import { createDataTable, refreshDataTable, renderActionButtons, resetDataTable } from "./baseDatatable.js";
 import { buildExcelButton, buildTableExportParams } from "../../ui/tableUI.js";
 import { formatFileName } from "../../utils/formatters.js";
@@ -12,7 +12,7 @@ import { buildMdbActionButton } from "../mdb/actionButton.js";
 
 const selector = DATATABLE_SELECTORS.MAIN;
 
-export const createProfilesDatatable = async ({ canManageProfiles = false } = {}) => {
+export const createPersonsDatatable = async ({ canManagePersons = false } = {}) => {
 
     const filters = await setupTableFilters({
         fields: ['department', 'role']
@@ -21,7 +21,7 @@ export const createProfilesDatatable = async ({ canManageProfiles = false } = {}
     const table = createDataTable({
         options: {
             ajax: {
-                get: (data) => getAllProfiles({
+                get: (data) => getAllPersons({
                     ...data,
                     includeAccesses: true,
                     department: getSelectedOptionText(FILTER_SELECTORS.DEPARTMENT),
@@ -42,18 +42,18 @@ export const createProfilesDatatable = async ({ canManageProfiles = false } = {}
                 {
                     data: null,
                     title: 'Acciones',
-                    render: () => canManageProfiles ? renderActionButtons({ context: 'profile' }) : ''
+                    render: () => canManagePersons ? renderActionButtons({ context: 'person' }) : ''
                 }
             ],
             buttons: [
-                ...(canManageProfiles ? [{
-                    text: 'Nuevo perfil',
-                    action: () => openProfileModal({ mode: 'create' })
+                ...(canManagePersons ? [{
+                    text: 'Nueva persona',
+                    action: () => openPersonModal({ mode: 'create' })
                 },
                 buildExcelButton({
-                    filename: formatFileName('reporte_perfiles'),
+                    filename: formatFileName('reporte_personas'),
                     allowMonthlyReport: false,
-                    request: () => exportProfileReport(buildTableExportParams(table, {
+                    request: () => exportPersonReport(buildTableExportParams(table, {
                         includeAccesses: true,
                         department: getSelectedOptionText(FILTER_SELECTORS.DEPARTMENT),
                         role: getSelectedOptionText(FILTER_SELECTORS.ROLE),
@@ -68,34 +68,34 @@ export const createProfilesDatatable = async ({ canManageProfiles = false } = {}
 
         const data = getResponsiveRowData(table, this);
 
-        openProfileModal({ mode: 'edit', data });
+        openPersonModal({ mode: 'edit', data });
     });
 }
 
-const profileAccessTableSelector = '#profileAccessesTable';
+const personAccessTableSelector = '#personAccessesTable';
 
-export const profileAccesses = [];
+export const personAccesses = [];
 
-export const refreshProfileAccessTable = () => refreshDataTable({
-    selector: profileAccessTableSelector,
-    data: profileAccesses
+export const refreshPersonAccessTable = () => refreshDataTable({
+    selector: personAccessTableSelector,
+    data: personAccesses
 });
 
-export const initProfileAccessTable = (accesses = []) => {
-    profileAccesses.length = 0;
-    profileAccesses.push(...accesses.map(access => ({
+export const initPersonAccessTable = (accesses = []) => {
+    personAccesses.length = 0;
+    personAccesses.push(...accesses.map(access => ({
         departmentId: access.department.id,
         departmentName: access.department.name,
         roleId: access.role.id,
         roleName: access.role.name
     })));
 
-    resetDataTable(profileAccessTableSelector);
+    resetDataTable(personAccessTableSelector);
 
     createDataTable({
-        selector: profileAccessTableSelector,
+        selector: personAccessTableSelector,
         options: {
-            data: profileAccesses,
+            data: personAccesses,
             paging: false,
             searching: false,
             dom: 'rtip',
@@ -122,7 +122,7 @@ export const initProfileAccessTable = (accesses = []) => {
     });
 };
 
-$(profileAccessTableSelector).on('click', '.delete-btn', function() {
-    profileAccesses.splice($(this).data('index'), 1);
-    refreshProfileAccessTable();
+$(personAccessTableSelector).on('click', '.delete-btn', function() {
+    personAccesses.splice($(this).data('index'), 1);
+    refreshPersonAccessTable();
 });

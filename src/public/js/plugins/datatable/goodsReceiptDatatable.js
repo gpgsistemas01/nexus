@@ -46,7 +46,7 @@ export const createGoodsReceiptDatatable = async () => {
 
     let table;
     filters = await setupTableFilters({
-        fields: ['date', 'supplier', 'warehouseProfile']
+        fields: ['date', 'supplier', 'warehousePerson']
     });
 
     table = createDataTable({

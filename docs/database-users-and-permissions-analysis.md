@@ -3,7 +3,7 @@
 ## Decisión
 
 - `User` es la cuenta autenticada y el actor de seguridad/auditoría.
-- `Profile` representa a la persona que participa en el negocio: solicitante,
+- `Person` representa a la persona que participa en el negocio: solicitante,
   aprobador, receptor, asesor, etcétera.
 - No se debe agregar `userId` a todas las tablas. Las operaciones críticas deben
   guardar al actor explícito o emitir un evento de auditoría transaccional.
@@ -16,7 +16,7 @@
 La base de datos guarda las asignaciones, no las definiciones de permisos:
 
 - `UserRoleDepartment`: rol/departamento de una cuenta; se usa para autorización.
-- `ProfileRoleDepartment`: clasificación de una persona para búsquedas y procesos del
+- `PersonRoleDepartment`: clasificación de una persona para búsquedas y procesos del
   negocio. Tiene un propósito diferente y no debe sincronizarse con el acceso de la
   cuenta.
 - `PERMISSIONS` y `AUTHORIZATION_POLICIES`: acciones y combinaciones autorizadas,
@@ -63,7 +63,7 @@ El backend entrega `user.permissions`, `user.scope` y `user.organization` en las
 editButton.hidden = !window.meta.permissions?.includes('materials:write');
 ```
 
-El menú principal y las acciones de perfiles, materiales y mermas ya usan capacidades
+El menú principal y las acciones de personas, materiales y mermas ya usan capacidades
 derivadas. `scope` se reserva para el alcance de datos (`departmentIds`, `canReadAll`);
 para columnas, costos o flujo, el frontend consume `user.organization`, calculado también
 por el backend. El navegador ya no interpreta directamente la relación rol/área.
@@ -98,7 +98,7 @@ valores anteriores. Se recomienda:
 
 - Campos de actor `User` cuando forman parte del flujo (`createdById`, `approvedById`,
   `returnedById`, etcétera).
-- `Profile` para participantes documentales (`requesterId`, `receivedById`, etcétera).
+- `Person` para participantes documentales (`requesterId`, `receivedById`, etcétera).
 - Una tabla de auditoría inmutable para altas, ediciones, bajas lógicas y transiciones
   relevantes, con `actorUserId`, acción, entidad, `before`, `after`, `requestId` y fecha.
 - No guardar contraseñas, cookies, tokens ni secretos en la auditoría.
@@ -117,7 +117,7 @@ usuarios/asignaciones y cambios de contraseña o estado.
 | P1 | Reemplazar el bypass global GET de Director/Dirección por lectura explícita por recurso. |
 | P1 | Migrar menús/botones para consultar `user.permissions` en lugar de reglas duplicadas. |
 | P1 | Implementar auditoría persistente de escrituras críticas. |
-| P1 | Definir si `Profile.isActive` condiciona a usuarios humanos y cómo tratar usuarios técnicos. |
+| P1 | Definir si `Person.isActive` condiciona a usuarios humanos y cómo tratar usuarios técnicos. |
 | P1 | Definir protección CSRF explícita para métodos mutables. |
 | P2 | Aprovisionar credenciales PostgreSQL distintas para runtime y migraciones. |
 

@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
-import { isValidInternalClientAdvisor } from '../../../../src/services/admin/profile/profileRules.js';
+import { isValidInternalClientAdvisor } from '../../../../src/services/admin/person/personRules.js';
 
-describe('profileRules', () => {
+describe('personRules', () => {
   it('acepta un asesor interno con acceso de coordinador', () => {
     expect(isValidInternalClientAdvisor({
       client: { name: 'GPG INTERNO' },

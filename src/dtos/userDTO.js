@@ -1,14 +1,14 @@
 export const createUserDtoForRegister = (body) => ({
     name: body.name,
     password: body.password,
-    profileId: body.profileId,
+    personId: body.personId,
     roleId: body.roleId,
     departmentId: body.departmentId,
 });
 
 export const createUserDtoForEdit = (body) => ({
     name: body.name,
-    profileId: body.profileId,
+    personId: body.personId,
     roleId: body.roleId,
     departmentId: body.departmentId,
 });

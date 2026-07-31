@@ -14,7 +14,7 @@ La suite ya cubre:
 - `src/services/sales/clientService.js`: pruebas unitarias de GET/submit y prueba de integración directa con BD para crear, listar, consultar y actualizar clientes.
 - `src/services/warehouse/supplierService.js`: pruebas unitarias de GET/submit y prueba de integración directa con BD para crear, listar, consultar código y actualizar proveedores. Esta integración cubre la transacción de creación que incrementa el contador `PRO` y guarda el proveedor.
 - `src/services/admin/userService.js`: pruebas unitarias de GET/listado/login/sesión y submit de crear/actualizar/cambiar contraseña; además tiene integración directa con BD para crear, listar, actualizar y cambiar contraseña con relaciones reales.
-- `src/services/admin/profileService.js`: pruebas unitarias de GET/listado/perfil por usuario y submit de crear/actualizar; además tiene integración directa con BD para crear y actualizar perfiles con departamentos reales.
+- `src/services/admin/personService.js`: pruebas unitarias de GET/listado/persona por usuario y submit de crear/actualizar; además tiene integración directa con BD para crear y actualizar personas con departamentos reales.
 - `src/services/admin/departmentService.js` y `src/services/admin/roleService.js`: pruebas unitarias de GET/listado, y cobertura de integración directa vía catálogos.
 - `src/services/document/referenceNumberService.js`: pruebas unitarias de incremento y generación de referencias.
 - `src/services/warehouse/materials/materialService.js`: pruebas unitarias de GET/listado/snapshot/existencia y submit de ajuste de stock; además tiene integración directa para `createMaterial`, `updateMaterial` y `updateMaterialStock` atravesando relaciones proveedor-material, `adjustmentService`, `movementService` y `supplierMaterialService` con datos reales.
@@ -42,7 +42,7 @@ Quedan pendientes de integración transaccional completa con BD:
 Cuando un servicio usa otro servicio de otro dominio, no se duplica la misma prueba unitaria en ambos lugares. Esos casos deben cubrirse como integración del flujo completo:
 
 - `materialService.updateMaterialStock` delega en `adjustmentService.createStockAdjustment`; su cobertura se registra en `stockAdjustmentDbTest.js`.
-- `wasteService` y `goodsIssueService` comparten stock, proveedor-material, perfiles, cliente y movimientos; su cobertura cruzada se registra en `wasteGoodsIssueDbTest.js`.
+- `wasteService` y `goodsIssueService` comparten stock, proveedor-material, personas, cliente y movimientos; su cobertura cruzada se registra en `wasteGoodsIssueDbTest.js`.
 - `goodsReceiptService` comparte stock, proveedor-material y movimientos; su cobertura cruzada se registra en `goodsReceiptServiceDbTest.js`.
 - `notificationService` debe probarse como integración cuando el objetivo sea validar datos reales generados por otros servicios; reportes ya tienen unitarias de mapeo y pueden complementarse con integración si se requiere validar datos exportados end-to-end.
 

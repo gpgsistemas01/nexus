@@ -1,23 +1,23 @@
-import { registerProfile, updateProfile } from "../../application/admin/profiles.js";
+import { registerPerson, updatePerson } from "../../application/admin/persons.js";
 import { useForm } from "../../application/form.js";
-import { createProfilesDatatable, initProfileAccessTable, profileAccesses, refreshProfileAccessTable } from "../../plugins/datatable/profileDatatable.js";
-import { initProfileFormSelect2 } from "../../plugins/select2/modules/profileSelect.js";
+import { createPersonsDatatable, initPersonAccessTable, personAccesses, refreshPersonAccessTable } from "../../plugins/datatable/personDatatable.js";
+import { initPersonFormSelect2 } from "../../plugins/select2/modules/personSelect.js";
 import { clearFormErrors, initForm, normalizeFormErrors } from "../../ui/formUI.js";
 import { openModal } from "../../ui/modalUI.js";
 import { handleSubmit, hasValidationErrors, validateFields } from "../../utils/formUtils.js";
-import { profileAccessValidators, profileValidators } from "../../utils/validations/validators.js";
+import { personAccessValidators, personValidators } from "../../utils/validations/validators.js";
 import { FORM_SELECTORS, MODAL_SELECTORS } from "../../constants/selectors.js";
 import { on } from "../../utils/domUtils.js";
 import { clearSelectValue } from "../../plugins/select2/baseSelect.js";
 import { UI_PERMISSIONS } from "../../constants/permissions.js";
 
-const formId = FORM_SELECTORS.PROFILE_FORM;
-const modalId = MODAL_SELECTORS.PROFILE;
+const formId = FORM_SELECTORS.PERSON_FORM;
+const modalId = MODAL_SELECTORS.PERSON;
 
 const context = window.meta || {};
-const canManageProfiles = context.permissions?.includes(UI_PERMISSIONS.PROFILES_WRITE) ?? false;
+const canManagePersons = context.permissions?.includes(UI_PERMISSIONS.PERSONS_WRITE) ?? false;
 
-createProfilesDatatable({ canManageProfiles });
+createPersonsDatatable({ canManagePersons });
 
 useForm({
     selector: formId,
@@ -25,37 +25,37 @@ useForm({
 
         return {
             ...formData,
-            accesses: profileAccesses.map(({ departmentId, roleId }) => ({ departmentId, roleId }))
+            accesses: personAccesses.map(({ departmentId, roleId }) => ({ departmentId, roleId }))
         }
     },
-    getErrors: ({ formData }) => validateFields(profileValidators, formData),
+    getErrors: ({ formData }) => validateFields(personValidators, formData),
     sendRequest: async ({ formData, form }) => {
 
         await handleSubmit({
             form,
             formData,
-            create: registerProfile,
-            update: updateProfile
+            create: registerPerson,
+            update: updatePerson
         });
     }
 });
 
-export const openProfileModal = ({ mode, data = null }) => {
+export const openPersonModal = ({ mode, data = null }) => {
 
-    if (!canManageProfiles) return;
+    if (!canManagePersons) return;
 
     const form = document.querySelector(formId);
     const modalElement = document.querySelector(modalId);
 
     initForm({ form, mode, id: data?.id || '' });
     clearFormErrors(form);
-    initProfileFormSelect2({ modalSelector: modalId });
-    initProfileAccessTable(data?.accesses || []);
+    initPersonFormSelect2({ modalSelector: modalId });
+    initPersonAccessTable(data?.accesses || []);
 
     if (mode === 'create') {
 
         form.reset();
-        modalElement.querySelector('#modalTitle').textContent = 'Registrar perfil';
+        modalElement.querySelector('#modalTitle').textContent = 'Registrar persona';
         form.querySelector('#submitBtn').textContent = 'Guardar';
 
     } 
@@ -63,41 +63,41 @@ export const openProfileModal = ({ mode, data = null }) => {
     if (mode === 'edit') {
 
         form.elements.fullName.value = data.fullName;
-        modalElement.querySelector('#modalTitle').textContent = 'Editar perfil';
+        modalElement.querySelector('#modalTitle').textContent = 'Editar persona';
         form.querySelector('#submitBtn').textContent = 'Actualizar';
     }
 
     openModal(modalElement);
 }
 
-const addProfileAccess = () => {
+const addPersonAccess = () => {
     const form = document.querySelector(formId);
-    const department = form.elements.profileDepartment;
-    const role = form.elements.profileRole;
+    const department = form.elements.personDepartment;
+    const role = form.elements.personRole;
     const access = {
         departmentId: department.value,
         departmentName: department.options[department.selectedIndex]?.text,
         roleId: role.value,
         roleName: role.options[role.selectedIndex]?.text
     };
-    const errors = validateFields(profileAccessValidators, {
+    const errors = validateFields(personAccessValidators, {
         ...access,
-        accesses: profileAccesses
+        accesses: personAccesses
     });
 
     normalizeFormErrors({
         form,
         errors: {
-            profileDepartment: errors.departmentId,
-            profileRole: errors.roleId
+            personDepartment: errors.departmentId,
+            personRole: errors.roleId
         }
     });
     if (hasValidationErrors(errors)) return;
 
-    profileAccesses.push(access);
-    refreshProfileAccessTable();
+    personAccesses.push(access);
+    refreshPersonAccessTable();
     clearSelectValue(department);
     clearSelectValue(role);
 };
 
-on('click', '#addProfileAccessBtn', addProfileAccess);
+on('click', '#addPersonAccessBtn', addPersonAccess);
