@@ -287,7 +287,7 @@ describeDb('stock adjustment cross-domain database integration', () => {
         maxUnitCost: 15
       }
     })).resolves.toMatchObject({
-      supplierId: supplier.id,
+      supplier: expect.objectContaining({ id: supplier.id }),
       currentStock: expect.anything(),
       convertedQuantity: expect.anything()
     });
