@@ -3,18 +3,15 @@ import { authorizeUserApi, verifyApiTokenRequired } from '../../../middleware/au
 import { editUser, editUserPassword, getAllUsers, registerUser } from '../../../controllers/api/admin/userController.js';
 import { userEditValidation, userPasswordValidation, userValidation } from '../../../validators/forms/userValidations.js';
 import { validate } from '../../../middleware/validatorMiddleware.js';
+import { PERMISSIONS } from '../../../constants/permissions.js';
 
 const router = express.Router();
 
-const permissions = {
-    roles: ['Administrador del sistema'],
-    departments: ['SISTEMAS']
-};
 
 router.get(
     '/',
     verifyApiTokenRequired,
-    authorizeUserApi(permissions),
+    authorizeUserApi(PERMISSIONS.USERS_MANAGE),
     getAllUsers
 );
 
@@ -23,7 +20,7 @@ router.post(
     verifyApiTokenRequired,
     userValidation,
     validate,
-    authorizeUserApi(permissions),
+    authorizeUserApi(PERMISSIONS.USERS_MANAGE),
     registerUser
 );
 
@@ -32,7 +29,7 @@ router.patch(
     verifyApiTokenRequired,
     userEditValidation,
     validate,
-    authorizeUserApi(permissions),
+    authorizeUserApi(PERMISSIONS.USERS_MANAGE),
     editUser
 );
 
@@ -41,7 +38,7 @@ router.patch(
     verifyApiTokenRequired,
     userPasswordValidation,
     validate,
-    authorizeUserApi(permissions),
+    authorizeUserApi(PERMISSIONS.USERS_MANAGE),
     editUserPassword
 );
 

@@ -1,18 +1,15 @@
 import express from 'express';
 import { authorizeUserWeb, verifyCookiesAuthTokenRequired } from '../../../middleware/authMiddleware.js';
 import { getWastesPage } from '../../../controllers/web/warehouse/wasteController.js';
+import { PERMISSIONS } from '../../../constants/permissions.js';
 
 const router = express.Router();
 
-const wastePagePermissions = {
-    roles: ['Almacenista', 'Coordinador', 'Auxiliar', 'Asesor de ventas', 'Administrador del sistema'],
-    departments: ['ALMACÉN Y PROVEDURÍA', 'SISTEMAS', 'VENTAS Y PROYECTOS ESPECIALES']
-};
 
 router.get(
     '/', 
     verifyCookiesAuthTokenRequired,
-    authorizeUserWeb(wastePagePermissions),
+    authorizeUserWeb(PERMISSIONS.WASTES_PAGE_VIEW),
     getWastesPage
 );
 

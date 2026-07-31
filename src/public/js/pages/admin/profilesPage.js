@@ -7,19 +7,15 @@ import { openModal } from "../../ui/modalUI.js";
 import { handleSubmit, hasValidationErrors, validateFields } from "../../utils/formUtils.js";
 import { profileAccessValidators, profileValidators } from "../../utils/validations/validators.js";
 import { FORM_SELECTORS, MODAL_SELECTORS } from "../../constants/selectors.js";
-import { hasPermission } from "../../utils/permissions.js";
 import { on } from "../../utils/domUtils.js";
 import { clearSelectValue } from "../../plugins/select2/baseSelect.js";
+import { UI_PERMISSIONS } from "../../constants/permissions.js";
 
 const formId = FORM_SELECTORS.PROFILE_FORM;
 const modalId = MODAL_SELECTORS.PROFILE;
 
 const context = window.meta || {};
-const { hasAccess } = hasPermission(context);
-const canManageProfiles = hasAccess({
-    departments: ['ALMACÉN Y PROVEDURÍA', 'SISTEMAS'],
-    roles: ['Administrador del sistema', 'Coordinador', 'Auxiliar', 'Almacenista']
-});
+const canManageProfiles = context.permissions?.includes(UI_PERMISSIONS.PROFILES_WRITE) ?? false;
 
 createProfilesDatatable({ canManageProfiles });
 

@@ -1,18 +1,15 @@
 import express from 'express';
 import { authorizeUserWeb, verifyCookiesAuthTokenRequired } from '../../../middleware/authMiddleware.js';
 import { getClientPage } from '../../../controllers/web/sales/clientController.js';
+import { PERMISSIONS } from '../../../constants/permissions.js';
 
 const router = express.Router();
 
-const clientPagePermissions = {
-    roles: ['Administrador del sistema'],
-    departments: ['SISTEMAS']
-};
 
 router.get(
     '/',
     verifyCookiesAuthTokenRequired,
-    authorizeUserWeb(clientPagePermissions),
+    authorizeUserWeb(PERMISSIONS.CLIENTS_PAGE_VIEW),
     getClientPage
 );
 

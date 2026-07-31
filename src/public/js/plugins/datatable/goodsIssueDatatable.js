@@ -1,7 +1,6 @@
 import { openGoodsIssueModal } from "../../pages/warehouse/goodsIssuesPage.js";
 import { getAllGoodsIssues } from "../../application/warehouse/goodsIssues/goodsIssues.js";
 import { exportGoodsIssueReport } from "../../application/warehouse/report.js";
-import { hasPermission } from "../../utils/permissions.js";
 import { buildExcelButton, buildTableExportParams } from "../../ui/tableUI.js";
 import { formatDateTimeDisplay, formatFileName } from "../../utils/formatters.js";
 import { createDataTable, renderActionButtons, resetDataTable } from "./baseDatatable.js";
@@ -26,7 +25,7 @@ export const createGoodsIssueDatatable = async (context) => {
 
     let table;
 
-    const { hasRole, isWarehouse, isSystem } = hasPermission(context);
+    const { isWarehouse = false, isSystem = false } = context.scope || {};
 
     const columns = [
         { data: 'referenceNumber', title: 'Folio' },
@@ -127,7 +126,11 @@ export const createGoodsIssueDatatable = async (context) => {
 
 export const initDetailsGoodsIssueTable = (mode, context) => {
 
-    const { isWarehouse, isSystem, hasRole } = hasPermission(context);
+    const {
+        isCoordinator = false,
+        isWarehouse = false,
+        isSystem = false
+    } = context.scope || {};
 
     resetDataTable(selectorMaterialTable);
 
@@ -137,7 +140,7 @@ export const initDetailsGoodsIssueTable = (mode, context) => {
         type: 'issue',
         mode,
         isWarehouse,
-        isCoordinator: hasRole('Coordinador'),
+        isCoordinator,
         isSystem
     });
 
@@ -146,7 +149,7 @@ export const initDetailsGoodsIssueTable = (mode, context) => {
         mode,
         render: (_, __, row) => renderMaterialName(row),
         isWarehouse,
-        isCoordinator: hasRole('Coordinador'),
+        isCoordinator,
         isSystem
     });
 

@@ -9,36 +9,16 @@ import {
     registerPurchaseRequisition
 } from '../../../controllers/api/warehouse/purchaseRequisitionController.js';
 import { purchaseRequisitionValidation } from '../../../validators/forms/purchaseRequisitionValidations.js';
+import { PERMISSIONS } from '../../../constants/permissions.js';
 
 const router = express.Router();
 
-const purchaseRequisitionPermissions = {
-    roles: ['Administrador del sistema', 'Coordinador', 'Auxiliar', 'Operador', 'Instalador', 'Almacenista'],
-    departments: [
-        'DIRECCIÓN',
-        'ACABADOS',
-        'ADMINISTRATIVO',
-        'ALMACÉN Y PROVEDURÍA',
-        'DISEÑO',
-        'INSTALACIONES',
-        'IMPRESIÓN',
-        'ROUTER',
-        'PT/TRÁFICO',
-        'SISTEMAS',
-        'TALLER 3D',
-        'VENTAS Y PROYECTOS ESPECIALES'
-    ]
-};
 
-const purchaseRequisitionWarehousePermissions = {
-    roles: ['Administrador del sistema', 'Coordinador', 'Auxiliar', 'Operador', 'Instalador', 'Almacenista'],
-    departments: ['ALMACÉN Y PROVEDURÍA', 'SISTEMAS']
-};
 
 router.get(
     '/',
     verifyApiTokenRequired,
-    authorizeUserApi(purchaseRequisitionPermissions),
+    authorizeUserApi(PERMISSIONS.PURCHASE_REQUISITIONS_MANAGE),
     getAllPurchaseRequisitions
 );
 
@@ -47,7 +27,7 @@ router.post(
     verifyApiTokenRequired,
     purchaseRequisitionValidation,
     validate,
-    authorizeUserApi(purchaseRequisitionPermissions),
+    authorizeUserApi(PERMISSIONS.PURCHASE_REQUISITIONS_MANAGE),
     registerPurchaseRequisition
 );
 
@@ -56,21 +36,21 @@ router.put(
     verifyApiTokenRequired,
     purchaseRequisitionValidation,
     validate,
-    authorizeUserApi(purchaseRequisitionPermissions),
+    authorizeUserApi(PERMISSIONS.PURCHASE_REQUISITIONS_MANAGE),
     editPurchaseRequisition
 );
 
 router.patch(
     '/:id/confirm',
     verifyApiTokenRequired,
-    authorizeUserApi(purchaseRequisitionWarehousePermissions),
+    authorizeUserApi(PERMISSIONS.PURCHASE_REQUISITIONS_STATUS_MANAGE),
     confirmPurchaseRequisitionStatus
 );
 
 router.patch(
     '/:id/cancel',
     verifyApiTokenRequired,
-    authorizeUserApi(purchaseRequisitionWarehousePermissions),
+    authorizeUserApi(PERMISSIONS.PURCHASE_REQUISITIONS_STATUS_MANAGE),
     cancelPurchaseRequisitionStatus
 );
 
