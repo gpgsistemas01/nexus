@@ -1,10 +1,7 @@
 import { setFormDisabled, toggleFormFields } from "../ui/formUI.js";
 
-export const shouldShowStockAdjustmentFields = ({
-    mode,
-    includeStockAdjustmentOnCreate = false,
-    isStockAdjustment = false
-}) => isStockAdjustment || (mode === 'create' && includeStockAdjustmentOnCreate);
+export const shouldShowStockAdjustmentFields = ({ isStockAdjustment = false }) =>
+    isStockAdjustment;
 
 export const configureStockAdjustmentForm = ({
     form,

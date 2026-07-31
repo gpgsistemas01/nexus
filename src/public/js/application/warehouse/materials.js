@@ -47,7 +47,6 @@ const buildStockPayload = (formData, { includeReason = true } = {}) => ({
 
 export const registerMaterial = async ({
     formData,
-    withInitialStockAdjustment = false,
     creationContext = null
 }) => {
 
@@ -57,19 +56,14 @@ export const registerMaterial = async ({
             // applied to SupplierMaterial when the receipt is confirmed.
             includeMaxUnitCost: creationContext !== GOODS_RECEIPT_CREATION_CONTEXT
         }),
-        ...(creationContext ? { creationContext } : {}),
-        ...(withInitialStockAdjustment ? buildStockPayload(formData, { includeReason: false }) : {})
+        ...(creationContext ? { creationContext } : {})
     };
 
     const response = await registerMaterialRequest({ data: payload });
-    const message = withInitialStockAdjustment
-        ? '¡Material creado y stock registrado exitosamente!'
-        : null;
 
     return createSuccessResponseFromRequest({
         response,
-        dataKey: 'material',
-        message
+        dataKey: 'material'
     });
 }
 

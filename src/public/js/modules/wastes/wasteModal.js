@@ -11,7 +11,6 @@ const wasteDataFields = ['supplierMaterialId', 'base', 'height'];
 const wasteInitialStockFields = ['currentStock', 'reasonId', 'observations'];
 const wasteStockAdjustmentFields = ['currentStock', 'reasonId', 'observations'];
 const stockSectionSelector = '.stock-data-section';
-const initialStockReasonName = 'Stock inicial';
 
 const resetWasteFormFieldStates = (form) => {
 
@@ -69,11 +68,8 @@ const prepareWasteModal = ({
     const form = document.querySelector(formId);
     const modalElement = document.querySelector(wasteModalId);
     const showStockFields = shouldShowStockAdjustmentFields({
-        mode,
-        includeStockAdjustmentOnCreate: true,
         isStockAdjustment
     });
-    const isInitialStockCreation = showStockFields && mode === 'create' && !isStockAdjustment;
 
     initForm({ form, mode, id: mode === 'create' ? '' : data?.id });
     initWasteSelect2({ modalSelector: wasteModalId });
@@ -89,8 +85,8 @@ const prepareWasteModal = ({
     });
     setWasteReasonVisualOption({
         modalSelector: wasteModalId,
-        name: isInitialStockCreation ? initialStockReasonName : null,
-        isDisabled: isInitialStockCreation
+        name: null,
+        isDisabled: false
     });
     clearFormErrors(form);
 

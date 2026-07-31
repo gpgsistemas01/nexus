@@ -107,8 +107,7 @@ export const createMaterialDatatable = async (context) => {
                 ...(canCreateMaterialsFromModule ? [{
                     text: 'Nuevo material',
                     action: () => openMaterialModal({
-                        mode: 'create',
-                        includeStockAdjustmentOnCreate: canAdjustStock
+                        mode: 'create'
                     })
                 }] : []),
                 buildExcelButton({

@@ -11,7 +11,6 @@ const stockFields = ['newStock', 'reasonId', 'observations'];
 const stockSectionSelector = '.stock-data-section';
 const goodsReceiptCreationContext = 'goodsReceipt';
 const maxUnitCostLabel = 'Costo Máximo';
-const initialStockReasonName = 'Stock inicial';
 
 const setMaterialValues = ({ form, data = null }) => {
 
@@ -128,7 +127,6 @@ const prepareMaterialModal = ({
     mode,
     data,
     isStockAdjustment,
-    includeStockAdjustmentOnCreate = mode === 'create',
     creationContext = null
 }) => {
 
@@ -136,15 +134,11 @@ const prepareMaterialModal = ({
     const modalElement = document.querySelector(materialModalId);
 
     const showStockFields = shouldShowStockAdjustmentFields({
-        mode,
-        includeStockAdjustmentOnCreate,
         isStockAdjustment
     });
-    const isInitialStockCreation = showStockFields && mode === 'create' && !isStockAdjustment;
 
     initForm({ form, mode, id: data?.id });
     clearFormErrors(form);
-    form.dataset.includeStockAdjustmentOnCreate = showStockFields && !isStockAdjustment ? 'true' : 'false';
     form.dataset.creationContext = creationContext || '';
     setMaterialModalFieldStates({
         form,
@@ -159,8 +153,8 @@ const prepareMaterialModal = ({
     setMaterialFormSelectOptions({ modalSelector: materialModalId, data, isStockAdjustment: showStockFields });
     setMaterialReasonVisualOption({
         modalSelector: materialModalId,
-        name: isInitialStockCreation ? initialStockReasonName : null,
-        isDisabled: isInitialStockCreation
+        name: null,
+        isDisabled: false
     });
 
     return { form, modalElement };
@@ -170,7 +164,6 @@ export const openMaterialModal = ({
     mode = 'create',
     data = null,
     onSave = null,
-    includeStockAdjustmentOnCreate = mode === 'create',
     creationContext = null
 }) => {
 
@@ -178,7 +171,6 @@ export const openMaterialModal = ({
         mode,
         data,
         isStockAdjustment: mode === 'edit-stock',
-        includeStockAdjustmentOnCreate,
         creationContext
     });
 

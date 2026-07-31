@@ -11,16 +11,6 @@ const stockMode = 'edit-stock';
 const goodsReceiptCreationContext = 'goodsReceipt';
 
 const isStockMode = (form) => form.dataset.mode === stockMode;
-const includesStockAdjustmentOnCreate = (form) => form.dataset.includeStockAdjustmentOnCreate === 'true';
-const shouldValidateStockFields = (form) => isStockMode(form) || includesStockAdjustmentOnCreate(form);
-const getMaterialStockValidators = (form) => {
-
-    if (!includesStockAdjustmentOnCreate(form)) return materialStockValidators;
-
-    const { reasonId, ...initialStockValidators } = materialStockValidators;
-
-    return initialStockValidators;
-};
 const getCreationContext = (form) => form.dataset.creationContext || null;
 const isGoodsReceiptCreation = (form) => getCreationContext(form) === goodsReceiptCreationContext;
 
@@ -40,7 +30,7 @@ useForm({
     selector: formId,
     normalizeData: ({ form, formData }) => {
 
-        if (shouldValidateStockFields(form)) {
+        if (isStockMode(form)) {
             formData.supplierId = document.querySelector(`${ materialModalId } select[name='supplierId']`).value;
         }
 
@@ -54,14 +44,7 @@ useForm({
 
         if (isStockMode(form)) return validateFields(materialStockValidators, formData);
 
-        const errors = validateFields(getMaterialValidators(form), formData);
-
-        if (!includesStockAdjustmentOnCreate(form)) return errors;
-
-        return {
-            ...errors,
-            ...validateFields(getMaterialStockValidators(form), formData)
-        };
+        return validateFields(getMaterialValidators(form), formData);
     },
     sendRequest: async ({ formData, form }) => {
 
@@ -70,7 +53,6 @@ useForm({
             formData,
             create: ({ formData }) => registerMaterial({
                 formData,
-                withInitialStockAdjustment: includesStockAdjustmentOnCreate(form),
                 creationContext: getCreationContext(form)
             }),
             update: isStockMode(form) ? editMaterialStock : editMaterial
