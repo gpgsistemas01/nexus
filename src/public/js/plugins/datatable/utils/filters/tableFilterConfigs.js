@@ -97,6 +97,15 @@ const selectFilterConfigs = {
         isSelected: false,
         initSelect: initProfileFilterSelect
     },
+    independentProfile: {
+        key: 'profileId',
+        selector: FILTER_SELECTORS.PROFILE,
+        isSelected: false,
+        initSelect: ({ selectedId }) => initProfileFilterSelect({
+            selectedId,
+            departmentFilterSelector: null
+        })
+    },
     warehouseProfile: {
         key: 'profileId',
         selector: FILTER_SELECTORS.PROFILE,
