@@ -9,18 +9,15 @@ import {
     cancelGoodsReceiptDetail
 } from '../../../controllers/api/warehouse/goodsReceiptController.js';
 import { goodsReceiptCorrectionValidation, goodsReceiptHeaderValidation, goodsReceiptValidation } from '../../../validators/forms/goodsReceiptValidations.js';
+import { PERMISSIONS } from '../../../constants/permissions.js';
 
 const router = express.Router();
-const goodsReceiptPermissions = {
-    roles: ['Almacenista', 'Coordinador', 'Auxiliar', 'Administrador del sistema'],
-    departments: ['ALMACÉN Y PROVEDURÍA', 'SISTEMAS']
-};
 
 
 router.get(
     '/',
     verifyApiTokenRequired,
-    authorizeUserApi(goodsReceiptPermissions),
+    authorizeUserApi(PERMISSIONS.GOODS_RECEIPTS_MANAGE),
     getAllGoodsReceipts
 );
 
@@ -29,7 +26,7 @@ router.post(
     verifyApiTokenRequired,
     goodsReceiptValidation,
     validate,
-    authorizeUserApi(goodsReceiptPermissions),
+    authorizeUserApi(PERMISSIONS.GOODS_RECEIPTS_MANAGE),
     registerGoodsReceipt
 );
 
@@ -38,7 +35,7 @@ router.patch(
     verifyApiTokenRequired,
     goodsReceiptHeaderValidation,
     validate,
-    authorizeUserApi(goodsReceiptPermissions),
+    authorizeUserApi(PERMISSIONS.GOODS_RECEIPTS_MANAGE),
     editGoodsReceiptHeader
 );
 
@@ -48,14 +45,14 @@ router.patch(
     verifyApiTokenRequired,
     goodsReceiptCorrectionValidation,
     validate,
-    authorizeUserApi(goodsReceiptPermissions),
+    authorizeUserApi(PERMISSIONS.GOODS_RECEIPTS_MANAGE),
     correctGoodsReceiptDetail
 );
 
 router.patch(
     '/:id/details/:detailId/cancel',
     verifyApiTokenRequired,
-    authorizeUserApi(goodsReceiptPermissions),
+    authorizeUserApi(PERMISSIONS.GOODS_RECEIPTS_MANAGE),
     cancelGoodsReceiptDetail
 );
 

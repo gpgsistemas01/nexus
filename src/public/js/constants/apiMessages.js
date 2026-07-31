@@ -3,6 +3,7 @@ export const errorMessages = {
     LOGIN_ERROR: 'Usuario o contraseña incorrectos.',
     VALIDATION_ERROR: 'Errores de validación.',
     INVALID_AUTH: 'Sesión inválida. Inicia sesión nuevamente.',
+    FORBIDDEN: 'No tienes permisos para realizar esta acción.',
     INVALID_LINK: 'Enlace inválido. Solicita uno nuevo.',
     SERVER_ERROR: 'Error del servidor.',
     DETECTED_REUSE: 'Reuso de sesión detectado.',

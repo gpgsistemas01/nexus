@@ -1,6 +1,7 @@
 export const hasPermission = (user) => {
 
     const accesses = user.accesses || [];
+    const permissions = new Set(user.permissions || []);
     const departments = accesses.map(a => a.department);
     const roles = accesses.map(a => a.role);
 
@@ -15,10 +16,11 @@ export const hasPermission = (user) => {
     const canViewAll = hasRole('Director') || hasDepartment('DIRECCIÓN');
 
     return {
+        can: (permission) => permissions.has(permission),
         hasDepartment,
         hasRole,
         hasAccess,
-        canViewAll,
+        canViewAll: user.scope?.canReadAll ?? canViewAll,
         isAdmin: hasRole('Administrador del sistema'),
         isWarehouse,
         isSystem,

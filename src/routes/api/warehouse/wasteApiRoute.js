@@ -3,28 +3,17 @@ import { authorizeUserApi, verifyApiTokenRequired } from '../../../middleware/au
 import { editWaste, editWasteStock, getAllWastes, registerWaste } from '../../../controllers/api/warehouse/wasteController.js';
 import { wasteStockValidation, wasteUpdateValidation, wasteValidation } from '../../../validators/forms/wasteValidations.js';
 import { validate } from '../../../middleware/validatorMiddleware.js';
+import { PERMISSIONS } from '../../../constants/permissions.js';
 
 const router = express.Router();
 
-const wasteReadPermissions = {
-    roles: ['Almacenista', 'Coordinador', 'Auxiliar', 'Asesor de ventas', 'Administrador del sistema'],
-    departments: ['ALMACÉN Y PROVEDURÍA', 'SISTEMAS', 'VENTAS Y PROYECTOS ESPECIALES']
-};
 
-const wasteWritePermissions = {
-    roles: ['Almacenista', 'Coordinador', 'Auxiliar', 'Administrador del sistema'],
-    departments: ['ALMACÉN Y PROVEDURÍA', 'SISTEMAS']
-};
 
-const wasteStockWritePermissions = {
-    roles: ['Administrador del sistema'],
-    departments: ['SISTEMAS']
-};
 
 router.get(
     '/',
     verifyApiTokenRequired,
-    authorizeUserApi(wasteReadPermissions),
+    authorizeUserApi(PERMISSIONS.WASTES_READ),
     getAllWastes
 );
 
@@ -33,7 +22,7 @@ router.post(
     verifyApiTokenRequired,
     wasteValidation,
     validate,
-    authorizeUserApi(wasteWritePermissions),
+    authorizeUserApi(PERMISSIONS.WASTES_WRITE),
     registerWaste
 );
 
@@ -42,7 +31,7 @@ router.patch(
     verifyApiTokenRequired,
     wasteUpdateValidation,
     validate,
-    authorizeUserApi(wasteWritePermissions),
+    authorizeUserApi(PERMISSIONS.WASTES_WRITE),
     editWaste
 );
 
@@ -51,7 +40,7 @@ router.patch(
     verifyApiTokenRequired,
     wasteStockValidation,
     validate,
-    authorizeUserApi(wasteStockWritePermissions),
+    authorizeUserApi(PERMISSIONS.WASTES_ADJUST_STOCK),
     editWasteStock
 );
 

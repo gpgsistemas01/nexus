@@ -2,35 +2,15 @@ import express from 'express';
 import { editProfile, getAllProfiles, registerProfile } from "../../../controllers/api/admin/profileController.js";
 import { authorizeUserApi, verifyApiTokenRequired } from "../../../middleware/authMiddleware.js";
 import { profileValidation } from '../../../validators/forms/profileValidations.js';
+import { PERMISSIONS } from '../../../constants/permissions.js';
 
 const router = express.Router();
-const profileReadPermissions = {
-    roles: [ 'Administrador del sistema', 'Coordinador', 'Auxiliar', 'Operador', 'Instalador', 'Diseñador', 'Almacenista', 'Asesor de ventas', 'Repartidor', 'Director', 'Administrador', 'Contador' ],
-    departments: [
-        'DIRECCIÓN',
-        'ACABADOS',
-        'ADMINISTRATIVO',
-        'ALMACÉN Y PROVEDURÍA',
-        'DISEÑO',
-        'INSTALACIONES',
-        'IMPRESIÓN',
-        'ROUTER',
-        'PT/TRÁFICO',
-        'SISTEMAS',
-        'TALLER 3D',
-        'VENTAS Y PROYECTOS ESPECIALES'
-    ]
-};
 
-const registerProfilePermissions = {
-    roles: ['Administrador del sistema', 'Coordinador', 'Auxiliar', 'Almacenista'],
-    departments: ['ALMACÉN Y PROVEDURÍA', 'SISTEMAS']
-};
 
 router.get(
     '/',
     verifyApiTokenRequired,
-    authorizeUserApi(profileReadPermissions),
+    authorizeUserApi(PERMISSIONS.PROFILES_READ),
     getAllProfiles
 );
 
@@ -38,7 +18,7 @@ router.post(
     '/',
     verifyApiTokenRequired,
     profileValidation,
-    authorizeUserApi(registerProfilePermissions),
+    authorizeUserApi(PERMISSIONS.PROFILES_WRITE),
     registerProfile
 );
 
@@ -46,7 +26,7 @@ router.put(
     '/:id',
     verifyApiTokenRequired,
     profileValidation,
-    authorizeUserApi(registerProfilePermissions),
+    authorizeUserApi(PERMISSIONS.PROFILES_WRITE),
     editProfile
 );
 
