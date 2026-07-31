@@ -4,6 +4,7 @@ import { clearAccessCookie } from "../utils/cookiesUtils.js";
 import { getLoggedUser } from "../services/admin/userService.js";
 import { requiresInitialStockAdjustmentOnCreate } from "../validators/forms/materialValidations.js";
 import { hasSystemWideReadAccess } from "../utils/authorizationUtils.js";
+import { getAuthorizationPolicy } from "../constants/permissions.js";
 
 const getAuthTokenInfo = ( req, res) => {
 
@@ -52,43 +53,50 @@ export const verifyApiTokenRequired = (req, res, next) => {
     next();
 }
 
-const createAuthorizeMiddleware = (handler) => (permissions) => async (req, res, next) => {
+const createAuthorizeMiddleware = (
+    forbiddenHandler,
+    invalidAuthHandler = forbiddenHandler
+) => (permission) => async (req, res, next) => {
 
     const user = await getLoggedUser(req.userId);
 
-    if (!user) return handler(req, res);
+    if (!user) return invalidAuthHandler(req, res);
+
+    const policy = getAuthorizationPolicy(permission);
 
     const hasReadAccessToAll = ['GET', 'HEAD'].includes(req.method)
         && hasSystemWideReadAccess(user);
     const hasAccess = hasReadAccessToAll || user.accesses.some(access =>
-        permissions.departments.includes(access.department) &&
-        permissions.roles.includes(access.role)
+        policy.departments.includes(access.department) &&
+        policy.roles.includes(access.role)
     );
 
-    if (!hasAccess) return handler(req, res);
+    if (!hasAccess) return forbiddenHandler(req, res);
 
     req.user = user;
     next();
 };
 
-export const authorizeUserApi = createAuthorizeMiddleware((req, res) =>
-    res.status(401).json({ code: errorMap.message.INVALID_AUTH })
+export const authorizeUserApi = createAuthorizeMiddleware(
+    (req, res) => res.status(403).json({ code: errorMap.message.FORBIDDEN }),
+    (req, res) => res.status(401).json({ code: errorMap.message.INVALID_AUTH })
 );
 
 export const authorizeUserWeb = createAuthorizeMiddleware((req, res) =>
     res.redirect('/error/404')
 );
 
-export const authorizeInitialStockAdjustment = (permissions) => (req, res, next) => {
+export const authorizeInitialStockAdjustment = (permission) => (req, res, next) => {
 
     if (!requiresInitialStockAdjustmentOnCreate(req.body)) return next();
 
+    const policy = getAuthorizationPolicy(permission);
     const canAdjustStock = req.user?.accesses?.some(access =>
-        permissions.departments.includes(access.department) &&
-        permissions.roles.includes(access.role)
+        policy.departments.includes(access.department) &&
+        policy.roles.includes(access.role)
     );
 
-    if (!canAdjustStock) return res.status(401).json({ code: errorMap.message.INVALID_AUTH });
+    if (!canAdjustStock) return res.status(403).json({ code: errorMap.message.FORBIDDEN });
 
     next();
 };

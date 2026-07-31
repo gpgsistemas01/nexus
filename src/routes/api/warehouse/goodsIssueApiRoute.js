@@ -10,36 +10,16 @@ import {
     returnGoodsIssueDetailLine,
 } from '../../../controllers/api/warehouse/goodsIssueController.js';
 import { goodsIssueDetailsValidation, goodsIssueHeaderValidation, goodsIssueReturnValidation, goodsIssueUpdateValidation, goodsIssueValidation } from '../../../validators/forms/goodsIssueValidations.js';
+import { PERMISSIONS } from '../../../constants/permissions.js';
 
 const router = express.Router();
 
-const goodsIssuePermissions = {
-    roles: ['Administrador del sistema', 'Coordinador', 'Auxiliar', 'Operador', 'Instalador', 'Almacenista'],
-    departments: [
-        'DIRECCIÓN',
-        'ACABADOS',
-        'ADMINISTRATIVO',
-        'ALMACÉN Y PROVEDURÍA',
-        'DISEÑO',
-        'INSTALACIONES',
-        'IMPRESIÓN',
-        'ROUTER',
-        'PT/TRÁFICO',
-        'SISTEMAS',
-        'TALLER 3D',
-        'VENTAS Y PROYECTOS ESPECIALES'
-    ]
-};
 
-const goodsIssueDetailsPermissions = {
-    roles: ['Almacenista', 'Auxiliar', 'Coordinador', 'Administrador del sistema'],
-    departments: ['ALMACÉN Y PROVEDURÍA', 'SISTEMAS']
-};
 
 router.get(
     '/',
     verifyApiTokenRequired,
-    authorizeUserApi(goodsIssuePermissions),
+    authorizeUserApi(PERMISSIONS.GOODS_ISSUES_MANAGE),
     getAllGoodsIssues
 );
 
@@ -48,7 +28,7 @@ router.post(
     verifyApiTokenRequired,
     goodsIssueValidation,
     validate,
-    authorizeUserApi(goodsIssuePermissions),
+    authorizeUserApi(PERMISSIONS.GOODS_ISSUES_MANAGE),
     registerGoodsIssue
 );
 
@@ -57,7 +37,7 @@ router.patch(
     verifyApiTokenRequired,
     goodsIssueUpdateValidation,
     validate,
-    authorizeUserApi(goodsIssuePermissions),
+    authorizeUserApi(PERMISSIONS.GOODS_ISSUES_MANAGE),
     editGoodsIssue
 );
 
@@ -66,7 +46,7 @@ router.patch(
     verifyApiTokenRequired,
     goodsIssueHeaderValidation,
     validate,
-    authorizeUserApi(goodsIssuePermissions),
+    authorizeUserApi(PERMISSIONS.GOODS_ISSUES_MANAGE),
     editGoodsIssueHeader
 );
 
@@ -76,7 +56,7 @@ router.patch(
     verifyApiTokenRequired,
     goodsIssueDetailsValidation,
     validate,
-    authorizeUserApi(goodsIssueDetailsPermissions),
+    authorizeUserApi(PERMISSIONS.GOODS_ISSUE_DETAILS_MANAGE),
     editGoodsIssueDetails
 );
 
@@ -86,7 +66,7 @@ router.patch(
     verifyApiTokenRequired,
     goodsIssueReturnValidation,
     validate,
-    authorizeUserApi(goodsIssueDetailsPermissions),
+    authorizeUserApi(PERMISSIONS.GOODS_ISSUE_DETAILS_MANAGE),
     returnGoodsIssueDetailLine
 );
 
