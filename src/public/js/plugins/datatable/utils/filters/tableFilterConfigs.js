@@ -11,35 +11,6 @@ import { initRoleFilterSelect } from "../../../select2/domains/role.js";
 import { initPersonFilterSelect } from "../../../select2/domains/person.js";
 import { getMovementTypeData, initMovementTypeFilterSelect } from "../../../select2/domains/movementType.js";
 import { FILTER_SELECTORS } from "../../../../constants/selectors.js";
-import { buildDateFilterConfig } from "./modules/dateFilter.js";
-import { attachSelectFilterHandler } from "./selectFilterEvents.js";
-
-
-const attachTextFilterHandler = ({
-    selector,
-    onChange
-}) => {
-
-    $(selector).on('keydown', (event) => {
-        if (event.key !== 'Enter') return;
-
-        event.preventDefault();
-        onChange?.();
-    });
-};
-
-const buildTextFilterConfig = ({
-    key,
-    selector
-}) => ({
-    customGetValues: () => ({
-        [key]: document.querySelector(selector)?.value?.trim() || ''
-    }),
-    attachHandler: ({ onChange }) => attachTextFilterHandler({
-        selector,
-        onChange
-    })
-});
 
 const WAREHOUSE_PERSON_FILTER_PARAMS = {
     department: 'ALMACÉN Y PROVEDURÍA',
@@ -124,40 +95,27 @@ const selectFilterConfigs = {
         getOptions: getMovementTypeData,
         initSelect: initMovementTypeFilterSelect
     },
-    observations: buildTextFilterConfig({
-        key: 'observationsSearch',
-        selector: FILTER_SELECTORS.OBSERVATIONS
-    })
-};
-
-const resolveTableFilterConfig = ({
-    field,
-    onChange
-}) => {
-
-    if (typeof field !== 'string') return field;
-
-    if (field === 'date') return buildDateFilterConfig({ onChange });
-
-    const selectFilterConfig = selectFilterConfigs[field];
-
-    if (!selectFilterConfig) return null;
-
-    const { selector, ...filterConfig } = selectFilterConfig;
-
-    return {
-        ...filterConfig,
-        selector,
-        attachHandler: () => attachSelectFilterHandler({
-            selector,
-            onChange
+    observations: {
+        customGetValues: () => ({
+            observationsSearch: document.querySelector(FILTER_SELECTORS.OBSERVATIONS)?.value?.trim() || ''
         })
-    };
+    }
 };
 
 export const buildTableFilterConfigs = ({
-    fields,
-    onChange
+    fields
 }) => fields
-    .map((field) => resolveTableFilterConfig({ field, onChange }))
+    .map((field) => {
+        if (typeof field !== 'string') return field;
+        if (field === 'date') {
+            return {
+                customGetValues: () => ({
+                    startDate: document.querySelector(FILTER_SELECTORS.START_DATE)?.value || '',
+                    endDate: document.querySelector(FILTER_SELECTORS.END_DATE)?.value || ''
+                })
+            };
+        }
+
+        return selectFilterConfigs[field] || null;
+    })
     .filter(Boolean);

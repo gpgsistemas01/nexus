@@ -15,8 +15,7 @@ export const FILTER_SELECTORS = {
     DEPARTMENT: '#departmentFilter',
     ROLE: '#roleFilter',
     PERSON: '#personFilter',
-    CLEAR_BUTTON: '#clearFiltersButton',
-    APPLY_BUTTON: '#applyFiltersButton'
+    CLEAR_BUTTON: '#clearFiltersButton'
 };
 
 export const MODAL_SELECTORS = {

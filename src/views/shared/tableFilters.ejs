@@ -16,8 +16,7 @@
         }
     ],
     selectInputs: typeof selectInputs !== 'undefined' ? selectInputs : [],
-    textInputs: typeof textInputs !== 'undefined' ? textInputs : [],
-    showApplyButton: typeof showApplyButton !== 'undefined' ? showApplyButton : false
+    textInputs: typeof textInputs !== 'undefined' ? textInputs : []
 } %>
 
 <details class="table-filters-panel">
@@ -29,7 +28,7 @@
         <span class="table-filters-summary-hint">Mostrar / ocultar</span>
     </summary>
 
-    <div class="table-filters-content" aria-label="Filtros de tabla">
+    <form id="tableFiltersForm" class="table-filters-content" aria-label="Filtros de tabla">
         <% if (filterConfig.selectInputs.length) { %>
         <div class="row table-filters">
             <% filterConfig.selectInputs.forEach(filter => { %>
@@ -53,15 +52,14 @@
     <% } %>
 
         <div class="table-filters-actions">
-            <% if (filterConfig.showApplyButton) { %>
-                <%- include('./button', {
-                    button : {
-                        id: 'applyFiltersButton',
-                        class: 'btn table-filter-button',
-                        content: 'Buscar / filtrar'
-                    }
-                }) %>
-            <% } %>
+            <%- include('./button', {
+                button : {
+                    id: 'applyFiltersButton',
+                    type: 'submit',
+                    class: 'btn table-filter-button',
+                    content: 'Buscar / filtrar'
+                }
+            }) %>
 
             <%- include('./button', {
                 button : {
@@ -71,5 +69,5 @@
                 }
             }) %>
         </div>
-    </div>
+    </form>
 </details>
