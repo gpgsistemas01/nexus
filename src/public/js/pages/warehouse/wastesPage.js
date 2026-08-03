@@ -15,6 +15,22 @@ const isStockMode = (form) => form.dataset.mode === stockMode;
 
 useForm({
     selector: formId,
+    normalizeData: ({ form, formData }) => { 
+
+        if (isStockMode(form)) return {
+            currentStock: formData.currentStock,
+            reasonId: formData.reasonId,
+            observations: formData.observations
+        }
+
+        if (form.dataset.mode === 'edit') return {
+            supplierMaterialId: formData.supplierMaterialId,
+            base: formData.base,
+            height: formData.height
+        }
+
+        return formData;
+    },
     getErrors: ({ form, formData }) => {
 
         if (isStockMode(form)) return validateFields(wasteStockValidators, formData);
