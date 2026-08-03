@@ -70,6 +70,15 @@
 
   --mdb-accent: #FCA311;
   --mdb-accent-rgb: 252, 163, 17;
+  /* A restrained navy/neutral palette distinguishes filters from the green
+     record actions and amber warnings while maintaining WCAG AA contrast. */
+  --table-filter-apply: #1f4e79;
+  --table-filter-apply-rgb: 31, 78, 121;
+  --table-filter-apply-hover: #163a5c;
+  --table-filter-apply-active: #0f2a43;
+  --table-filter-clear: #5f6368;
+  --table-filter-clear-rgb: 95, 99, 104;
+  --table-filter-clear-hover: #45494d;
   --mdb-focus: var(--mdb-primary);
   --mdb-focus-rgb: var(--mdb-primary-rgb);
   --mdb-light: #FBFBFB;
@@ -519,33 +528,35 @@ body {
 }
 
 .table-filter-button-apply {
-  background: linear-gradient(180deg, var(--mdb-primary) 0%, var(--mdb-primary-hover) 100%) !important;
-  border: 1px solid var(--mdb-primary) !important;
-  box-shadow: 0 0.35rem 0.75rem rgba(var(--mdb-primary-rgb), 0.2);
+  background: linear-gradient(180deg, var(--table-filter-apply) 0%, var(--table-filter-apply-hover) 100%) !important;
+  border: 1px solid var(--table-filter-apply) !important;
+  box-shadow: 0 0.35rem 0.75rem rgba(var(--table-filter-apply-rgb), 0.2);
   color: var(--mdb-light) !important;
 }
 
 .table-filter-button-apply:hover,
-.table-filter-button-apply:focus {
-  background: linear-gradient(180deg, var(--mdb-primary-hover) 0%, var(--mdb-primary-active) 100%) !important;
-  border-color: var(--mdb-primary-hover) !important;
-  box-shadow: 0 0.45rem 0.9rem rgba(var(--mdb-primary-rgb), 0.3);
+.table-filter-button-apply:focus,
+.table-filter-button-apply:active {
+  background: linear-gradient(180deg, var(--table-filter-apply-hover) 0%, var(--table-filter-apply-active) 100%) !important;
+  border-color: var(--table-filter-apply-hover) !important;
+  box-shadow: 0 0.45rem 0.9rem rgba(var(--table-filter-apply-rgb), 0.3);
   color: var(--mdb-light) !important;
 }
 
 .table-filter-button-clear {
-  background: linear-gradient(180deg, #fff8e8 0%, #ffe2a8 100%) !important;
-  border: 1px solid rgba(var(--mdb-accent-rgb), 0.85) !important;
-  box-shadow: 0 0.35rem 0.75rem rgba(var(--mdb-accent-rgb), 0.18);
-  color: var(--mdb-secondary) !important;
+  background: var(--mdb-light) !important;
+  border: 1px solid var(--table-filter-clear) !important;
+  box-shadow: 0 0.25rem 0.6rem rgba(var(--table-filter-clear-rgb), 0.14);
+  color: var(--table-filter-clear) !important;
 }
 
 .table-filter-button-clear:hover,
-.table-filter-button-clear:focus {
-  background: linear-gradient(180deg, var(--mdb-accent) 0%, #e18d00 100%) !important;
-  border-color: #d88500 !important;
-  box-shadow: 0 0.45rem 0.9rem rgba(var(--mdb-accent-rgb), 0.28);
-  color: var(--mdb-dark) !important;
+.table-filter-button-clear:focus,
+.table-filter-button-clear:active {
+  background: var(--table-filter-clear-hover) !important;
+  border-color: var(--table-filter-clear-hover) !important;
+  box-shadow: 0 0.45rem 0.9rem rgba(var(--table-filter-clear-rgb), 0.24);
+  color: var(--mdb-light) !important;
 }
 
 
