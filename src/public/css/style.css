@@ -506,11 +506,7 @@ body {
 }
 
 .table-filter-button {
-  background: linear-gradient(180deg, #fff3d9 0%, #ffe2a8 100%) !important;
-  border: 1px solid rgba(var(--mdb-accent-rgb), 0.85) !important;
   border-radius: 0.75rem !important;
-  box-shadow: 0 0.35rem 0.75rem rgba(var(--mdb-accent-rgb), 0.18);
-  color: var(--mdb-secondary) !important;
   font-weight: 800;
   letter-spacing: 0.01em;
   min-height: 2.55rem;
@@ -519,11 +515,37 @@ body {
 }
 
 .table-filter-button:hover {
+  transform: translateY(-1px);
+}
+
+.table-filter-button-apply {
+  background: linear-gradient(180deg, var(--mdb-primary) 0%, var(--mdb-primary-hover) 100%) !important;
+  border: 1px solid var(--mdb-primary) !important;
+  box-shadow: 0 0.35rem 0.75rem rgba(var(--mdb-primary-rgb), 0.2);
+  color: var(--mdb-light) !important;
+}
+
+.table-filter-button-apply:hover,
+.table-filter-button-apply:focus {
+  background: linear-gradient(180deg, var(--mdb-primary-hover) 0%, var(--mdb-primary-active) 100%) !important;
+  border-color: var(--mdb-primary-hover) !important;
+  box-shadow: 0 0.45rem 0.9rem rgba(var(--mdb-primary-rgb), 0.3);
+  color: var(--mdb-light) !important;
+}
+
+.table-filter-button-clear {
+  background: linear-gradient(180deg, #fff8e8 0%, #ffe2a8 100%) !important;
+  border: 1px solid rgba(var(--mdb-accent-rgb), 0.85) !important;
+  box-shadow: 0 0.35rem 0.75rem rgba(var(--mdb-accent-rgb), 0.18);
+  color: var(--mdb-secondary) !important;
+}
+
+.table-filter-button-clear:hover,
+.table-filter-button-clear:focus {
   background: linear-gradient(180deg, var(--mdb-accent) 0%, #e18d00 100%) !important;
   border-color: #d88500 !important;
   box-shadow: 0 0.45rem 0.9rem rgba(var(--mdb-accent-rgb), 0.28);
   color: var(--mdb-dark) !important;
-  transform: translateY(-1px);
 }
 
 
