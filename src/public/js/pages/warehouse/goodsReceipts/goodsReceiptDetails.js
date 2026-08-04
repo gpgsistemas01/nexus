@@ -1,4 +1,4 @@
-import { GOODS_RECEIPT_DETAIL_STATUSES, GOODS_RECEIPT_STATUS_LABELS } from "../../constants/goodsReceiptStatuses.js";
+import { GOODS_RECEIPT_DETAIL_STATUSES, GOODS_RECEIPT_STATUS_LABELS } from "../../../constants/goodsReceiptStatuses.js";
 
 export const buildGoodsReceiptModalDetails = (receipt) => {
     const isCanceledReceipt = receipt.status?.name === GOODS_RECEIPT_STATUS_LABELS.CANCELED;
