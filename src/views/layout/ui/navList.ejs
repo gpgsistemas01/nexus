@@ -28,11 +28,24 @@ const items = [
         isVisible: permissions.includes('goods:receipts-page-view')
     },
     {
-        content: 'Salidas de almacén',
-        icon: 'fa-solid fa-truck-ramp-box',
-        href: '/salidas-almacen',
-        isActive: currentRoute === '/salidas-almacen',
-        isVisible: permissions.includes('goods:issues-page-view')
+        content: 'Salidas',
+        icon: 'fa-solid fa-arrow-up-from-bracket',
+        children: [
+            {
+                content: 'Salidas de almacén',
+                icon: 'fa-solid fa-truck-ramp-box',
+                href: '/salidas-almacen',
+                isActive: currentRoute === '/salidas-almacen',
+                isVisible: permissions.includes('goods:issues-page-view')
+            },
+            {
+                content: 'Salidas de merma',
+                icon: 'fa-solid fa-recycle',
+                href: '/salidas-merma',
+                isActive: currentRoute === '/salidas-merma',
+                isVisible: permissions.includes('wastes:page-view')
+            }
+        ]
     },
     {
         content: 'Movimientos',
@@ -69,28 +82,73 @@ const items = [
         isActive: currentRoute === '/proveedores',
         isVisible: permissions.includes('suppliers:page-view')
     }
-].filter(item => {
+].map(item => {
+    const visibleChildren = (item.children || []).filter(child => {
+        if (canSeeAll) return true;
+
+        return child.isVisible;
+    });
+
+    return {
+        ...item,
+        children: visibleChildren,
+        isActive: item.isActive || visibleChildren.some(child => child.isActive),
+        isVisible: item.children ? visibleChildren.length > 0 : item.isVisible
+    };
+}).filter(item => {
     if (canSeeAll) return true;
 
     return item.isVisible;
 }).map(item => ({
     ...item,
-    class: `nav-link ${ shouldShowIcons ? 'app-nav-link--icon' : '' } ${ item.isActive ? 'active' : ''}`
+    class: `nav-link ${ shouldShowIcons ? 'app-nav-link--icon' : '' } ${ item.isActive ? 'active' : ''}`,
+    children: (item.children || []).map(child => ({
+        ...child,
+        class: `nav-link app-nav-link--child ${ shouldShowIcons ? 'app-nav-link--icon' : '' } ${ child.isActive ? 'active' : ''}`
+    }))
 })); %>
 
 <ul class="<%= listClass %>">
     <% items.forEach(item => { %>
         <li class="nav-item py-1">
-            <a class="<%= item.class %>" href="<%= item.href %>"
-                <%= item.isActive ? 'aria-current="page"' : '' %>
-            >
-                <% if (shouldShowIcons && item.icon) { %>
-                    <span class="app-nav-link__icon" aria-hidden="true">
-                        <i class="<%= item.icon %>"></i>
-                    </span>
+            <% if (item.children.length) { %>
+                <span class="<%= item.class %> app-nav-link--section" <%= item.isActive ? 'aria-current="true"' : '' %>>
+                    <% if (shouldShowIcons && item.icon) { %>
+                        <span class="app-nav-link__icon" aria-hidden="true">
+                            <i class="<%= item.icon %>"></i>
+                        </span>
+                    <% } %>
+                    <span><%- item.content %></span>
+                </span>
+
+                <ul class="navbar-nav app-nav-submenu">
+                    <% item.children.forEach(child => { %>
+                        <li class="nav-item py-1">
+                            <a class="<%= child.class %>" href="<%= child.href %>"
+                                <%= child.isActive ? 'aria-current="page"' : '' %>
+                            >
+                                <% if (shouldShowIcons && child.icon) { %>
+                                    <span class="app-nav-link__icon" aria-hidden="true">
+                                        <i class="<%= child.icon %>"></i>
+                                    </span>
+                                <% } %>
+                                <span><%- child.content %></span>
+                            </a>
+                        </li>
+                    <% }); %>
+                </ul>
+            <% } else { %>
+                <a class="<%= item.class %>" href="<%= item.href %>"
+                    <%= item.isActive ? 'aria-current="page"' : '' %>
+                >
+                    <% if (shouldShowIcons && item.icon) { %>
+                        <span class="app-nav-link__icon" aria-hidden="true">
+                            <i class="<%= item.icon %>"></i>
+                        </span>
+                    <% } %>
+                    <span><%- item.content %></span>
+                </a>
                 <% } %>
-                <span><%- item.content %></span>
-            </a>
         </li>
     <% }); %>
 </ul>
