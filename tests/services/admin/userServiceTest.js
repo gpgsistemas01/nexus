@@ -71,8 +71,8 @@ describe('userService submit operations', () => {
       {
         id: 'user-1',
         name: 'usuario',
-        profileId: 'profile-1',
-        profile: { fullName: 'Perfil Uno' },
+        personId: 'person-1',
+        person: { fullName: 'Perfil Uno' },
         accesses: [{
           roleId: 'role-1',
           departmentId: 'department-1',
@@ -87,8 +87,8 @@ describe('userService submit operations', () => {
       data: [{
         id: 'user-1',
         name: 'usuario',
-        profileId: 'profile-1',
-        profile: { fullName: 'Perfil Uno' },
+        personId: 'person-1',
+        person: { fullName: 'Perfil Uno' },
         accesses: [{
           roleId: 'role-1',
           departmentId: 'department-1',
@@ -111,7 +111,12 @@ describe('userService submit operations', () => {
   });
 
   it('resuelve login y usuario autenticado para GET/session', async () => {
-    userFindUnique.mockResolvedValue({ id: 'user-1', password: 'hash' });
+    userFindUnique.mockResolvedValue({
+      id: 'user-1',
+      password: 'hash',
+      isActive: true,
+      accesses: [{ userId: 'user-1' }]
+    });
     userRoleDepartmentFindMany.mockResolvedValue([
       {
         user: { id: 'user-1', name: 'usuario' },
@@ -129,8 +134,25 @@ describe('userService submit operations', () => {
         role: 'Admin',
         departmentId: 'department-1',
         department: 'Ventas'
-      }]
+      }],
+      permissions: [],
+      scope: {
+        canReadAll: false,
+        departmentIds: ['department-1']
+      },
+      organization: {
+        isCoordinator: false,
+        isWarehouse: false,
+        isSystem: false,
+        isSales: false
+      }
     });
+    expect(userRoleDepartmentFindMany).toHaveBeenCalledWith(expect.objectContaining({
+      where: {
+        userId: 'user-1',
+        user: { isActive: true }
+      }
+    }));
   });
 
   it('retorna null cuando login o usuario autenticado no tienen datos', async () => {
@@ -145,11 +167,11 @@ describe('userService submit operations', () => {
     const userDto = {
       name: 'usuario',
       password: 'secret',
-      profileId: 'profile-1',
+      personId: 'person-1',
       roleId: 'role-1',
       departmentId: 'department-1'
     };
-    const createdUser = { id: 'user-1', name: 'usuario', profileId: 'profile-1' };
+    const createdUser = { id: 'user-1', name: 'usuario', personId: 'person-1' };
 
     userCreate.mockResolvedValue(createdUser);
 
@@ -158,7 +180,7 @@ describe('userService submit operations', () => {
       data: {
         name: 'usuario',
         password: 'hashed:secret',
-        profile: { connect: { id: 'profile-1' } },
+        person: { connect: { id: 'person-1' } },
         accesses: {
           create: {
             role: { connect: { id: 'role-1' } },
@@ -169,7 +191,7 @@ describe('userService submit operations', () => {
       select: {
         id: true,
         name: true,
-        profileId: true
+        personId: true
       }
     });
   });
@@ -183,11 +205,11 @@ describe('userService submit operations', () => {
   it('actualiza usuario y reemplaza su acceso en transacción', async () => {
     const userDto = {
       name: 'usuario-editado',
-      profileId: 'profile-2',
+      personId: 'person-2',
       roleId: 'role-2',
       departmentId: 'department-2'
     };
-    const updatedUser = { id: 'user-1', name: 'usuario-editado', profileId: 'profile-2' };
+    const updatedUser = { id: 'user-1', name: 'usuario-editado', personId: 'person-2' };
 
     userFindUnique.mockResolvedValue({ id: 'user-1' });
     txUserUpdate.mockResolvedValue(updatedUser);

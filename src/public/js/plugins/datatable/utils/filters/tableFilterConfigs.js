@@ -1,54 +1,25 @@
 import { getMaterialOptions } from "../../../../application/warehouse/materials.js";
 import { getSupplierOptions } from "../../../../application/warehouse/suppliers.js";
 import { getFulfillmentStatusOptions } from "../../../../application/warehouse/fulfillmentStatuses.js";
-import { getProfileOptions } from "../../../../application/admin/profiles.js";
+import { getPersonOptions } from "../../../../application/admin/persons.js";
 import { initMaterialFilterSelect } from "../../../select2/domains/material.js";
 import { initSupplierFilterSelect } from "../../../select2/domains/supplier.js";
 import { initFulfillmentStatusFilterSelect } from "../../../select2/domains/fulfillmentStatus.js";
 import { initClientFilterSelect } from "../../../select2/domains/client.js";
 import { initDepartmentFilterSelect } from "../../../select2/domains/department.js";
 import { initRoleFilterSelect } from "../../../select2/domains/role.js";
-import { initProfileFilterSelect } from "../../../select2/domains/profile.js";
+import { initPersonFilterSelect } from "../../../select2/domains/person.js";
 import { getMovementTypeData, initMovementTypeFilterSelect } from "../../../select2/domains/movementType.js";
 import { FILTER_SELECTORS } from "../../../../constants/selectors.js";
-import { buildDateFilterConfig } from "./modules/dateFilter.js";
-import { attachSelectFilterHandler } from "./selectFilterEvents.js";
 
-
-const attachTextFilterHandler = ({
-    selector,
-    onChange
-}) => {
-
-    $(selector).on('keydown', (event) => {
-        if (event.key !== 'Enter') return;
-
-        event.preventDefault();
-        onChange?.();
-    });
-};
-
-const buildTextFilterConfig = ({
-    key,
-    selector
-}) => ({
-    customGetValues: () => ({
-        [key]: document.querySelector(selector)?.value?.trim() || ''
-    }),
-    attachHandler: ({ onChange }) => attachTextFilterHandler({
-        selector,
-        onChange
-    })
-});
-
-const WAREHOUSE_PROFILE_FILTER_PARAMS = {
+const WAREHOUSE_PERSON_FILTER_PARAMS = {
     department: 'ALMACÉN Y PROVEDURÍA',
     strictDepartmentFilter: true
 };
 
-const getWarehouseProfileFilterParams = (params = {}) => ({
+const getWarehousePersonFilterParams = (params = {}) => ({
     search: params.term,
-    ...WAREHOUSE_PROFILE_FILTER_PARAMS
+    ...WAREHOUSE_PERSON_FILTER_PARAMS
 });
 
 const selectFilterConfigs = {
@@ -91,21 +62,30 @@ const selectFilterConfigs = {
         isSelected: false,
         initSelect: initRoleFilterSelect
     },
-    profile: {
-        key: 'profileId',
-        selector: FILTER_SELECTORS.PROFILE,
+    person: {
+        key: 'personId',
+        selector: FILTER_SELECTORS.PERSON,
         isSelected: false,
-        initSelect: initProfileFilterSelect
+        initSelect: initPersonFilterSelect
     },
-    warehouseProfile: {
-        key: 'profileId',
-        selector: FILTER_SELECTORS.PROFILE,
+    independentPerson: {
+        key: 'personId',
+        selector: FILTER_SELECTORS.PERSON,
         isSelected: false,
-        getOptions: () => getProfileOptions(WAREHOUSE_PROFILE_FILTER_PARAMS),
-        initSelect: ({ selectedId }) => initProfileFilterSelect({
+        initSelect: ({ selectedId }) => initPersonFilterSelect({
+            selectedId,
+            departmentFilterSelector: null
+        })
+    },
+    warehousePerson: {
+        key: 'personId',
+        selector: FILTER_SELECTORS.PERSON,
+        isSelected: false,
+        getOptions: () => getPersonOptions(WAREHOUSE_PERSON_FILTER_PARAMS),
+        initSelect: ({ selectedId }) => initPersonFilterSelect({
             selectedId,
             departmentFilterSelector: null,
-            data: getWarehouseProfileFilterParams
+            data: getWarehousePersonFilterParams
         })
     },
     movementType: {
@@ -115,40 +95,27 @@ const selectFilterConfigs = {
         getOptions: getMovementTypeData,
         initSelect: initMovementTypeFilterSelect
     },
-    observations: buildTextFilterConfig({
-        key: 'observationsSearch',
-        selector: FILTER_SELECTORS.OBSERVATIONS
-    })
-};
-
-const resolveTableFilterConfig = ({
-    field,
-    onChange
-}) => {
-
-    if (typeof field !== 'string') return field;
-
-    if (field === 'date') return buildDateFilterConfig({ onChange });
-
-    const selectFilterConfig = selectFilterConfigs[field];
-
-    if (!selectFilterConfig) return null;
-
-    const { selector, ...filterConfig } = selectFilterConfig;
-
-    return {
-        ...filterConfig,
-        selector,
-        attachHandler: () => attachSelectFilterHandler({
-            selector,
-            onChange
+    observations: {
+        customGetValues: () => ({
+            observationsSearch: document.querySelector(FILTER_SELECTORS.OBSERVATIONS)?.value?.trim() || ''
         })
-    };
+    }
 };
 
 export const buildTableFilterConfigs = ({
-    fields,
-    onChange
+    fields
 }) => fields
-    .map((field) => resolveTableFilterConfig({ field, onChange }))
+    .map((field) => {
+        if (typeof field !== 'string') return field;
+        if (field === 'date') {
+            return {
+                customGetValues: () => ({
+                    startDate: document.querySelector(FILTER_SELECTORS.START_DATE)?.value || '',
+                    endDate: document.querySelector(FILTER_SELECTORS.END_DATE)?.value || ''
+                })
+            };
+        }
+
+        return selectFilterConfigs[field] || null;
+    })
     .filter(Boolean);

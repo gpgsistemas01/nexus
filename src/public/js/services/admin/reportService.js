@@ -16,9 +16,9 @@ export const exportUserReportRequest = (params) => apiRequest({
     params
 });
 
-export const exportProfileReportRequest = (params) => apiRequest({
+export const exportPersonReportRequest = (params) => apiRequest({
     method: 'get',
-    url: `${ REPORTS_API_ROUTE }/profiles/excel`,
+    url: `${ REPORTS_API_ROUTE }/persons/excel`,
     responseType: 'blob',
     params
 });

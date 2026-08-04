@@ -20,7 +20,7 @@ export const createUserDatatable = () => {
             searchPlaceholder: 'Buscar por Usuario',
             columns: [
                 { data: 'name', title: 'Usuario' },
-                { data: 'profile.fullName', title: 'Perfil', defaultContent: '-' },
+                { data: 'person.fullName', title: 'Persona', defaultContent: '-' },
                 {
                     data: null,
                     title: 'Acciones',

@@ -29,17 +29,17 @@ export class GoodsIssueSuppliedConflict extends AppError {
     }
 }
 
-export class GoodsIssueRequesterProfileNotFound extends AppError {
+export class GoodsIssueRequesterPersonNotFound extends AppError {
 
     constructor () {
-        super('Perfil solicitante no encontrado', 'REQUESTER_PROFILE_NOT_FOUND', 404);
+        super('Persona solicitante no encontrada', 'REQUESTER_PERSON_NOT_FOUND', 404);
     }
 }
 
-export class GoodsIssueAdvisorProfileNotFound extends AppError {
+export class GoodsIssueAdvisorPersonNotFound extends AppError {
 
     constructor () {
-        super('Perfil de asesor no encontrado', 'ADVISOR_PROFILE_NOT_FOUND', 404);
+        super('Persona asesora no encontrada', 'ADVISOR_PERSON_NOT_FOUND', 404);
     }
 }
 

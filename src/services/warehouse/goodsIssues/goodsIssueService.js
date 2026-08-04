@@ -1,8 +1,8 @@
 import {
     GoodsIssueNotFound,
-    GoodsIssueRequesterProfileNotFound,
+    GoodsIssueRequesterPersonNotFound,
     GoodsIssueUpdateDatabaseError,
-    GoodsIssueAdvisorProfileNotFound,
+    GoodsIssueAdvisorPersonNotFound,
     GoodsIssueNotPendingConflict,
     GoodsIssueCreateDatabaseError,
     GoodsIssueInternalClientAdvisorDepartmentConflict,
@@ -18,8 +18,8 @@ import { createServiceLogger, getModelLogContext, logServiceError, logServiceInf
 const serviceLogger = createServiceLogger('warehouse.goodsIssues.goodsIssueService');
 
 import { getDb } from "../../../repository/baseRepository.js";
-import { findProfileById } from "../../admin/profile/profileService.js";
-import { isValidInternalClientAdvisor } from "../../admin/profile/profileRules.js";
+import { findPersonById } from "../../admin/person/personService.js";
+import { isValidInternalClientAdvisor } from "../../admin/person/personRules.js";
 import { findDepartmentById } from "../../admin/departmentService.js";
 import { generateYearlyReferenceNumber, throwIfReferenceNumberAlreadyExists } from "../../document/referenceNumberService.js";
 import { findClientById } from "../../sales/clientService.js";
@@ -48,13 +48,13 @@ const resolveDetailFulfillmentStatusName = (detail = {}) => {
 
 const resolveGoodsIssueHeaderData = async ({ requesterId, advisorId, departmentId, clientId, goodsIssueData }) => {
 
-    const requester = await findProfileById({ id: requesterId });
+    const requester = await findPersonById({ id: requesterId });
 
-    if (!requester) throw new GoodsIssueRequesterProfileNotFound();
+    if (!requester) throw new GoodsIssueRequesterPersonNotFound();
 
-    const advisor = await findProfileById({ id: advisorId, includeAccesses: true });
+    const advisor = await findPersonById({ id: advisorId, includeAccesses: true });
 
-    if (!advisor) throw new GoodsIssueAdvisorProfileNotFound();
+    if (!advisor) throw new GoodsIssueAdvisorPersonNotFound();
 
     const client = await findClientById({ id: clientId });
     const department = await findDepartmentById({ id: departmentId });
@@ -132,7 +132,7 @@ export const findAllGoodsIssues = async ({
     observationsSearch = '',
     clientId = '',
     departmentId = '',
-    profileId = '',
+    personId = '',
     orderBy = 'referenceNumber',
     orderDir = 'desc',
     accesses = []
@@ -152,7 +152,7 @@ export const findAllGoodsIssues = async ({
         ...buildDateRangeFilter({ field: 'requestDate', startDate, endDate }),
         ...(clientId && { clientId }),
         ...(departmentId && { departmentId }),
-        ...(profileId && { requesterId: profileId }),
+        ...(personId && { requesterId: personId }),
         ...(search && {
             OR: [
                 {

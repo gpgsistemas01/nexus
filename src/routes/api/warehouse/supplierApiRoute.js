@@ -3,22 +3,15 @@ import { authorizeUserApi, verifyApiTokenRequired } from '../../../middleware/au
 import { editSupplier, getAllSuppliers, registerSupplier } from '../../../controllers/api/warehouse/supplierController.js';
 import { supplierValidation } from '../../../validators/forms/supplierValidations.js';
 import { validate } from '../../../middleware/validatorMiddleware.js';
+import { PERMISSIONS } from '../../../constants/permissions.js';
 
 const router = express.Router();
-const supplierPermissions = {
-    roles: ['Almacenista', 'Coordinador', 'Auxiliar', 'Administrador del sistema'],
-    departments: ['ALMACÉN Y PROVEDURÍA', 'SISTEMAS']
-};
 
-const supplierEditPermissions = {
-    roles: ['Administrador del sistema'],
-    departments: ['SISTEMAS']
-};
 
 router.get(
     '/',
     verifyApiTokenRequired,
-    authorizeUserApi(supplierPermissions),
+    authorizeUserApi(PERMISSIONS.SUPPLIERS_MANAGE),
     getAllSuppliers
 );
 
@@ -27,7 +20,7 @@ router.post(
     verifyApiTokenRequired,
     supplierValidation,
     validate,
-    authorizeUserApi(supplierPermissions),
+    authorizeUserApi(PERMISSIONS.SUPPLIERS_MANAGE),
     registerSupplier
 );
 
@@ -36,7 +29,7 @@ router.put(
     verifyApiTokenRequired,
     supplierValidation,
     validate,
-    authorizeUserApi(supplierEditPermissions),
+    authorizeUserApi(PERMISSIONS.SUPPLIERS_UPDATE),
     editSupplier
 );
 

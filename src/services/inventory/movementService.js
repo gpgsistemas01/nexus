@@ -19,13 +19,9 @@ export const createInventoryMovement = ({
         data: {
             ...reference,
             type: movementType,
-            details: {
-                create: details
-            }
+            details: { create: details }
         },
-        include: {
-            details: true
-        }
+        include: { details: true }
     });
 };
 

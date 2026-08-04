@@ -33,7 +33,7 @@ export const initPurchaseRequisitionFormSelect2 = async (data = null) => {
     initbaseSelect2({
         baseSelector: requesterScopedSelector,
         modalSelector,
-        url: '/api/admin/profiles/',
+        url: '/api/admin/persons/',
         placeholder: 'Buscar solicitante...',
         processResults: (data) => {
 

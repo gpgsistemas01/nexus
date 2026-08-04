@@ -14,9 +14,8 @@ export const FILTER_SELECTORS = {
     CLIENT: '#clientFilter',
     DEPARTMENT: '#departmentFilter',
     ROLE: '#roleFilter',
-    PROFILE: '#profileFilter',
-    CLEAR_BUTTON: '#clearFiltersButton',
-    APPLY_BUTTON: '#applyFiltersButton'
+    PERSON: '#personFilter',
+    CLEAR_BUTTON: '#clearFiltersButton'
 };
 
 export const MODAL_SELECTORS = {
@@ -24,7 +23,7 @@ export const MODAL_SELECTORS = {
     GOODS_ISSUE: '#goodsIssueModal',
     GOODS_RECEIPT: '#goodsReceiptModal',
     MATERIAL: '#materialModal',
-    PROFILE: '#profileModal',
+    PERSON: '#personModal',
     PURCHASE_REQUISITION: '#purchaseRequisitionModal',
     SUPPLIER: '#supplierModal',
     USER: '#userModal',
@@ -37,7 +36,7 @@ export const FORM_SELECTORS = {
     GOODS_RECEIPT: '#goodsReceiptForm',
     LOGIN: '#loginForm',
     MATERIAL_FORM: '#materialForm',
-    PROFILE_FORM: '#profileForm',
+    PERSON_FORM: '#personForm',
     PURCHASE_REQUISITION: '#purchaseRequisitionForm',
     SUPPLIER_FORM: '#supplierForm',
     USER_FORM: '#userForm',

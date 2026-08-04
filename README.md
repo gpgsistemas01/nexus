@@ -11,6 +11,7 @@ Nexus es una plataforma de control operativo para administrar inventario, compra
 - [Configuración inicial](#configuración-inicial)
 - [Variables de entorno](#variables-de-entorno)
 - [Base de datos y Prisma](#base-de-datos-y-prisma)
+- [Usuarios, auditoría y permisos](#usuarios-auditoría-y-permisos)
 - [Ejecución](#ejecución)
 - [Scripts disponibles](#scripts-disponibles)
 - [Rutas principales](#rutas-principales)
@@ -21,7 +22,7 @@ Nexus es una plataforma de control operativo para administrar inventario, compra
 ## Características principales
 
 - Autenticación y manejo de sesión con cookies y JWT.
-- Administración de usuarios, roles, perfiles, departamentos y movimientos.
+- Administración de usuarios, roles, personas, departamentos y movimientos.
 - Gestión de almacén: materiales, proveedores, entradas de compra, salidas de almacén, requisiciones, mermas, motivos, presentaciones, unidades de medida y estados de cumplimiento.
 - Gestión de clientes del área de ventas.
 - Reportes administrativos, de almacén e inventario.
@@ -111,10 +112,10 @@ PORT=3000
 NODE_ENV=development
 
 # Base de datos
-DATABASE_URL="postgresql://usuario:password@pooler.example.com:6543/nexus"
-DIRECT_URL="postgresql://usuario:password@localhost:5432/nexus"
-DATABASE_TEST_URL="postgresql://usuario:password@pooler.example.com:6543/nexus_test"
-DIRECT_TEST_URL="postgresql://usuario:password@localhost:5432/nexus_test"
+DATABASE_URL="postgresql://nexus_app:password@pooler.example.com:6543/nexus"
+DIRECT_URL="postgresql://nexus_migrator:password@localhost:5432/nexus"
+DATABASE_TEST_URL="postgresql://nexus_test_app:password@pooler.example.com:6543/nexus_test"
+DIRECT_TEST_URL="postgresql://nexus_test_migrator:password@localhost:5432/nexus_test"
 
 # Autenticación / seguridad
 JWT_SECRET_ACCESS="cambiar-en-produccion"
@@ -137,6 +138,14 @@ La conexión se resuelve desde `src/lib/databaseUrl.js`:
 - Prisma CLI usa `DIRECT_TEST_URL` automáticamente en pruebas cuando existe; si no existe, usa `DATABASE_TEST_URL`.
 - Si falta la variable requerida, el resolver falla indicando el `NODE_ENV` activo.
 
+`DATABASE_URL` y `DIRECT_URL` deben usar credenciales distintas para que la separación
+sea efectiva: la primera corresponde a la cuenta DML de ejecución y la segunda a la
+cuenta que aplica DDL durante las migraciones. La guía de aprovisionamiento, propiedad
+de objetos, `GRANT` y verificación está en
+[`docs/postgresql-runtime-and-migration-roles.md`](docs/postgresql-runtime-and-migration-roles.md).
+La creación de roles es un bootstrap administrativo previo y no forma parte de
+`prisma/migrations`; los roles y permisos deben existir antes de ejecutar Prisma.
+
 Comandos útiles:
 
 ```bash
@@ -147,6 +156,46 @@ npx prisma studio            # Abre Prisma Studio para inspección local
 ```
 
 El seed lee archivos XLSX ubicados en `prisma/` para cargar catálogos y datos iniciales. Verifica que los archivos requeridos existan antes de ejecutar `npm exec prisma db seed`.
+
+## Usuarios, auditoría y permisos
+
+El análisis del modelo actual, las brechas detectadas y la propuesta para distinguir
+identidades de acceso (`User`), personas participantes del negocio (`Person`), auditoría de
+escrituras y privilegios PostgreSQL están documentados en
+[`docs/database-users-and-permissions-analysis.md`](docs/database-users-and-permissions-analysis.md).
+
+La recomendación principal es no agregar un usuario indiscriminadamente a cada tabla:
+se debe conservar el actor `User` en operaciones auditables, mantener `Person` para
+los papeles del proceso y centralizar los permisos por acción, rol y departamento.
+
+### Impacto del cambio a «Personas» en la base de datos
+
+El cambio se aplica de forma integral para que «Persona» sea congruente en la interfaz,
+la API, el código y la persistencia. La migración renombra `Profile` a `Person`,
+`ProfileRoleDepartment` a `PersonRoleDepartment` y los campos `profileId` a `personId`.
+Los modelos, servicios, DTO, permisos y payloads utilizan igualmente `Person`/`person`.
+
+Esto **no afecta la trazabilidad de los datos**: cada persona conserva el mismo UUID y
+las operaciones históricas siguen relacionadas mediante sus claves foráneas. La
+trazabilidad de quién ejecutó una acción se mantiene en `User`, mientras que `Person`
+identifica a la persona que desempeñó un papel dentro del flujo. PostgreSQL realiza los
+renombres sobre los mismos objetos, sin copiar ni recrear registros.
+
+En la implementación actual, las **definiciones** de permisos y su matriz se versionan
+en `src/constants/permissions.js`; no existen tablas `Permission` o `RolePermission`
+administrables desde la interfaz. La base de datos conserva las **asignaciones** de
+cada cuenta en `UserRoleDepartment`. El backend cruza esas asignaciones con la matriz,
+autoriza la petición y deriva las capacidades que entrega al frontend. Convertir la
+matriz en configuración administrable requeriría un cambio de modelo, migración,
+pantalla administrativa y auditoría; no es el comportamiento actual.
+
+La concesión efectiva sí es automática en tiempo de ejecución: el administrador solo
+guarda la asignación rol/departamento; en cada login, renovación o carga de sesión el
+backend vuelve a leer `UserRoleDepartment`, cruza esas filas con
+`AUTHORIZATION_POLICIES` y calcula `user.permissions`. No existe un proceso manual para
+copiar permisos al usuario ni se persiste ese arreglo derivado. Si cambia una
+asignación, la siguiente carga autenticada recalcula las capacidades; si cambia la
+matriz en código, el cambio entra en vigor al desplegar la nueva versión.
 
 ## Ejecución
 
@@ -184,7 +233,7 @@ npm start
 - `/` página de inicio.
 - `/inicio-sesion`, `/revocar-sesion`, `/cerrar-sesion` para autenticación web.
 - `/materiales`, `/mermas`, `/requisiciones`, `/compras`, `/salidas-almacen`, `/proveedores` para almacén.
-- `/usuarios-sistemas`, `/perfiles`, `/movimientos` para administración.
+- `/usuarios-sistemas`, `/personas`, `/movimientos` para administración.
 - `/clientes` para ventas.
 
 ### API REST
@@ -207,7 +256,7 @@ Todas las rutas API cuelgan de `/api` y esperan `Content-Type: application/json`
 - `/api/admin/users`
 - `/api/admin/roles`
 - `/api/admin/departments`
-- `/api/admin/profiles`
+- `/api/admin/persons` (`/api/admin/persons` se conserva como alias de compatibilidad)
 - `/api/admin/movements`
 - `/api/admin/reports`
 

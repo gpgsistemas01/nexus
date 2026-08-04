@@ -62,7 +62,7 @@ const form = {
             groups: [
                 {
                     type: 'html',
-                    content: include('../../../shared/totalsSummary', { totals: correctionTotalsSummary })
+                    content: include('../../../../shared/totalsSummary', { totals: correctionTotalsSummary })
                 }
             ]
         }
@@ -86,7 +86,7 @@ const form = {
     ]
 }; %>
 
-<%- include('../../../shared/modal', {
+<%- include('../../../../shared/modal', {
     modalId: 'goodsReceiptCorrectionModal',
     modalTitle: 'Corregir detalle de compra',
     dialogClass: 'modal-lg modal-dialog-scrollable',

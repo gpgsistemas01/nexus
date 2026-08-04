@@ -3,7 +3,7 @@ import {
     GoodsReceiptAlreadyCanceled,
     GoodsReceiptNotFound,
     GoodsReceiptUpdateDatabaseError,
-    ProfileReceivedByNotFound
+    PersonReceivedByNotFound
 } from "../../../errors/warehouse/goodsReceiptError.js";
 import { createServiceLogger, getModelLogContext, logServiceError, logServiceInfo } from "../../../utils/logger.js";
 
@@ -11,7 +11,7 @@ const serviceLogger = createServiceLogger('warehouse.goodsReceipts.goodsReceiptS
 
 import { getDb } from "../../../repository/baseRepository.js";
 import { generateYearlyReferenceNumber, throwIfReferenceNumberAlreadyExists } from "../../document/referenceNumberService.js";
-import { findProfileById } from "../../admin/profile/profileService.js";
+import { findPersonById } from "../../admin/person/personService.js";
 import { applyInventoryMovement } from "../../inventory/movementService.js";
 import { findUniqueSupplier } from "../supplierService.js";
 import { buildGoodsReceiptDetails, calculateGoodsReceiptTotals, createGoodsReceiptDetailsAndUpdateTotals } from "./goodsReceiptHelpers.js";
@@ -30,7 +30,7 @@ export const findAllGoodsReceipts = async ({
     startDate = '',
     endDate = '',
     supplierId = '',
-    profileId = '',
+    personId = '',
     excludeCanceled = false,
     activeDetailsOnly = false,
     orderBy = 'referenceNumber',
@@ -39,7 +39,7 @@ export const findAllGoodsReceipts = async ({
 
     const where = {
         ...(supplierId && { supplierId }),
-        ...(profileId && { receivedById: profileId }),
+        ...(personId && { receivedById: personId }),
         ...(excludeCanceled && {
             status: {
                 isNot: { name: GOODS_RECEIPT_STATUS_NAMES.CANCELED }
@@ -134,9 +134,9 @@ export const createGoodsReceipt = async ({ goodsReceiptDto }) => {
 
         const supplier = await findUniqueSupplier({ id: supplierId });
 
-        const receivedBy = await findProfileById({ id: receivedById });
+        const receivedBy = await findPersonById({ id: receivedById });
 
-        if (!receivedBy) throw new ProfileReceivedByNotFound();
+        if (!receivedBy) throw new PersonReceivedByNotFound();
 
         const processedDetails = await buildGoodsReceiptDetails(details);
 
@@ -248,7 +248,7 @@ export const updateGoodsReceipt = async ({ id, goodsReceiptDto }) => {
                     }
                 }
             }),
-            findProfileById({ id: receivedById })
+            findPersonById({ id: receivedById })
         ]);
 
         if (!goodsReceipt) throw new GoodsReceiptNotFound();
@@ -257,7 +257,7 @@ export const updateGoodsReceipt = async ({ id, goodsReceiptDto }) => {
             throw new GoodsReceiptAlreadyCanceled();
         }
 
-        if (!receivedBy) throw new ProfileReceivedByNotFound();
+        if (!receivedBy) throw new PersonReceivedByNotFound();
 
         let addedDetails = [];
 

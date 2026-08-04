@@ -1,5 +1,5 @@
 import { findMovementReportRows } from "../../../services/inventory/reportService.js";
-import { findAllProfiles } from "../../../services/admin/profile/profileService.js";
+import { findAllPersons } from "../../../services/admin/person/personService.js";
 import { findAllUsers } from "../../../services/admin/userService.js";
 import { getDataTableOrder, getDataTableSearch } from "../../../utils/requestQueryUtils.js";
 import { getMexicoMonthDateRange } from "../../../utils/formattersUtils.js";
@@ -7,10 +7,10 @@ import { sendExcelReport } from "../../../utils/reportExcelUtils.js";
 
 const SHEET_NAME = 'Movimientos';
 const USER_SHEET_NAME = 'Usuarios';
-const PROFILE_SHEET_NAME = 'Perfiles';
+const PERSON_SHEET_NAME = 'Personas';
 const FILENAME = 'informe_movimientos';
 const USER_FILENAME = 'informe_usuarios';
-const PROFILE_FILENAME = 'informe_perfiles';
+const PERSON_FILENAME = 'informe_personas';
 const isMonthlyReportRequest = (query = {}) => query.monthlyReport === 'true' || query.monthlyReport === true;
 
 export const exportMovementReport = async (req, res) => {
@@ -97,13 +97,13 @@ export const exportUserReport = async (req, res) => {
     const data = [
         [
             'Usuario',
-            'Perfil',
+            'Persona',
             'Rol',
             'Área'
         ],
         ...rows.map(row => [
             row.name,
-            row.profile?.fullName || '-',
+            row.person?.fullName || '-',
             row.roleName || '-',
             row.departmentName || '-'
         ])
@@ -118,7 +118,7 @@ export const exportUserReport = async (req, res) => {
     });
 };
 
-export const exportProfileReport = async (req, res) => {
+export const exportPersonReport = async (req, res) => {
 
     const rawDepartment = req.query.department ?? req.query['department[]'];
     const departments = Array.isArray(rawDepartment)
@@ -132,7 +132,7 @@ export const exportProfileReport = async (req, res) => {
         columns
     });
 
-    const { data: rows } = await findAllProfiles({
+    const { data: rows } = await findAllPersons({
         departments,
         includeAccesses: true,
         skip: 0,
@@ -161,8 +161,8 @@ export const exportProfileReport = async (req, res) => {
     return sendExcelReport({
         res,
         data,
-        sheetName: PROFILE_SHEET_NAME,
-        filename: PROFILE_FILENAME,
+        sheetName: PERSON_SHEET_NAME,
+        filename: PERSON_FILENAME,
         filenameOptions: { separator: '-', order: 'year-month' }
     });
 };

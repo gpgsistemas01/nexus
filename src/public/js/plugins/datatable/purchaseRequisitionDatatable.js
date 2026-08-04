@@ -1,7 +1,6 @@
 import { openPurchaseRequisitionModal } from "../../pages/warehouse/purchaseRequisitionsPage.js";
 import { createDataTable, renderActionButtons, resetDataTable } from "./baseDatatable.js";
 import { PURCHASE_REQUISITIONS_API_ROUTE } from "../../services/warehouse/purchaseRequisitionService.js";
-import { hasPermission } from "../../utils/permissions.js";
 import { getResponsiveRowData } from "./utils/responsive.js";
 import { DATATABLE_SELECTORS } from "../../constants/selectors.js";
 import { formatDateTimeDisplay } from "../../utils/formatters.js";
@@ -14,7 +13,7 @@ const selectorTable = DATATABLE_SELECTORS.MAIN;
 
 export const createPurchaseRequisitionDatatable = (context) => {
 
-    const { isWarehouse, isSystem } = hasPermission(context);
+    const { isWarehouse = false, isSystem = false } = context.organization || {};
     const columns = [
         { data: 'referenceNumber', title: 'Folio' },
         {

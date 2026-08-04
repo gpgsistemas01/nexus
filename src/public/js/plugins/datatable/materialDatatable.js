@@ -2,10 +2,10 @@ import { openMaterialModal, openStockAdjustmentModal } from "../../modules/mater
 import { createDataTable, renderActionButtons } from "./baseDatatable.js";
 import { setupTableFilters } from "./utils/filters/tableFilter.js";
 import { notifications } from "../swal/swalComponent.js";
-import { hasPermission } from "../../utils/permissions.js";
 import { deleteMaterial, getAllMaterials } from "../../application/warehouse/materials.js";
 import { configureResponsiveHeaderGroups, getResponsiveRowData } from "./utils/responsive.js";
 import { buildExcelButton, buildTableExportParams } from "../../ui/tableUI.js";
+import { UI_PERMISSIONS } from "../../constants/permissions.js";
 import { exportWarehouseReport } from "../../application/warehouse/report.js";
 import { formatFileName } from "../../utils/formatters.js";
 import { DATATABLE_SELECTORS } from "../../constants/selectors.js";
@@ -30,13 +30,12 @@ const configureStockRealtime = (table) => {
 
 export const createMaterialDatatable = async (context) => {
 
-    const { hasRole, isAdmin, isWarehouse, isSystem, isSales } = hasPermission(context);
-    const isWarehouseMaterialManager = isWarehouse && (hasRole('Almacenista') || hasRole('Coordinador') || hasRole('Auxiliar'));
+    const { isWarehouse = false, isSystem = false, isSales = false } = context.organization || {};
     const canSeeCost = isWarehouse || isSystem || isSales;
-    const canManageMaterials = isAdmin || isWarehouseMaterialManager;
-    const canDeleteMaterials = isSystem || isWarehouse;
-    const canAdjustStock = isSystem && isAdmin;
-    const canCreateMaterialsFromModule = canAdjustStock || isWarehouseMaterialManager;
+    const canManageMaterials = context.permissions?.includes(UI_PERMISSIONS.MATERIALS_WRITE) ?? false;
+    const canDeleteMaterials = canManageMaterials;
+    const canAdjustStock = context.permissions?.includes(UI_PERMISSIONS.MATERIALS_ADJUST_STOCK) ?? false;
+    const canCreateMaterialsFromModule = canManageMaterials;
 
     renderWarehouseInventoryHeader({
         tableElement,
@@ -106,10 +105,7 @@ export const createMaterialDatatable = async (context) => {
             buttons: [
                 ...(canCreateMaterialsFromModule ? [{
                     text: 'Nuevo material',
-                    action: () => openMaterialModal({
-                        mode: 'create',
-                        includeStockAdjustmentOnCreate: canAdjustStock
-                    })
+                    action: () => openMaterialModal({ mode: 'create' })
                 }] : []),
                 buildExcelButton({
                     filename: formatFileName('reporte_inventario_materiales'),

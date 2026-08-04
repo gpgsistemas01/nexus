@@ -3,6 +3,7 @@ export const errorMessages = {
     LOGIN_ERROR: 'Usuario o contraseña incorrectos.',
     VALIDATION_ERROR: 'Errores de validación.',
     INVALID_AUTH: 'Sesión inválida. Inicia sesión nuevamente.',
+    FORBIDDEN: 'No tienes permisos para realizar esta acción.',
     INVALID_LINK: 'Enlace inválido. Solicita uno nuevo.',
     SERVER_ERROR: 'Error del servidor.',
     DETECTED_REUSE: 'Reuso de sesión detectado.',
@@ -28,20 +29,20 @@ export const errorMessages = {
     SUPPLIER_CODE_FIND_DB_ERROR: 'Error de base de datos al buscar el código del proveedor',
 
     // RECEIVED BY
-    RECEIVED_BY_ID_REQUIRED: 'La person que recibe es requerida.',
+    RECEIVED_BY_ID_REQUIRED: 'La persona que recibe es requerida.',
     RECEIVED_BY_ID_INVALID_UUID: 'La persona que recibe no es válida.',
-    PROFILE_RECEIVED_BY_NOT_FOUND: 'Perfil de quien recibe no encontrado.',
+    PERSON_RECEIVED_BY_NOT_FOUND: 'Persona que recibe no encontrada.',
 
     ADVISOR_ID_REQUIRED: 'El asesor es requerido.',
     ADVISOR_ID_INVALID_UUID: 'El asesor no es válido.',
-    ADVISOR_PROFILE_NOT_FOUND: 'Perfil de asesor no encontrado.',
+    ADVISOR_PERSON_NOT_FOUND: 'Persona asesora no encontrada.',
 
     REQUESTER_ID_REQUIRED: 'El solicitante es requerido.',
     REQUESTER_ID_INVALID_UUID: 'El solicitante no es válido.',
-    REQUESTER_PROFILE_NOT_FOUND: 'Perfil solicitante no encontrado.',
+    REQUESTER_PERSON_NOT_FOUND: 'Persona solicitante no encontrada.',
 
-    PROFILE_CREATE_DB_ERROR: 'Error de base de datos al crear el perfil.',
-    PROFILE_UPDATE_DB_ERROR: 'Error de base de datos al editar el perfil.',
+    PERSON_CREATE_DB_ERROR: 'Error de base de datos al crear la persona.',
+    PERSON_UPDATE_DB_ERROR: 'Error de base de datos al editar la persona.',
 
     PROJECT_NUMBER_REQUIRED: 'El número de proyecto es requerido.',
     PROJECT_NUMBER_INVALID_TYPE: 'El número de proyecto debe ser texto.',
@@ -164,16 +165,16 @@ export const errorMessages = {
 
     // Códigos de errores de dominio (/errors)
     // Admin / catálogos
-    PROFILE_NOT_FOUND: 'Perfil no encontrado.',
-    PROFILE_FIND_DB_ERROR: 'Error de base de datos al buscar el perfil.',
+    PERSON_NOT_FOUND: 'Persona no encontrada.',
+    PERSON_FIND_DB_ERROR: 'Error de base de datos al buscar la persona.',
     ROLE_ID_INVALID_UUID: 'El rol no es válido.',
     ROLE_ID_REQUIRED: 'El rol es requerido.',
     USER_UPDATE_DATABASE_ERROR: 'Error de base de datos al actualizar el usuario.',
     USER_FIND_DATABASE_ERROR: 'Error de base de datos al buscar usuarios.',
     USER_CREATE_DATABASE_ERROR: 'Error de base de datos al crear el usuario.',
     USER_NOT_FOUND: 'Usuario no encontrado.',
-    PROFILE_CREATE_DB_ERROR: 'Error de base de datos al crear el perfil.',
-    PROFILE_UPDATE_DB_ERROR: 'Error de base de datos al editar el perfil.',
+    PERSON_CREATE_DB_ERROR: 'Error de base de datos al crear la persona.',
+    PERSON_UPDATE_DB_ERROR: 'Error de base de datos al editar la persona.',
 
     // Warehouse
     EXCEDED_MAX_RETRIES_SKU: 'Excedido el número máximo de intentos para generar un SKU único.',
@@ -274,7 +275,7 @@ export const errorMessages = {
     PURCHASE_REQUISITION_STATUS_NOT_FOUND: 'Estado de requisición no encontrado.',
     PURCHASE_REQUISITION_UPDATE_DB_ERROR: 'Error de base de datos al editar la requisición de compra.',
     PURCHASE_REQUISITION_STATUS_UPDATE_DB_ERROR: 'Error de base de datos al editar el estado de la requisición.',
-    PURCHASE_REQUISITION_APPROVER_PROFILE_NOT_FOUND: 'Perfil aprobador activo no encontrado para el usuario.',
+    PURCHASE_REQUISITION_APPROVER_PERSON_NOT_FOUND: 'Persona aprobadora activa no encontrada para el usuario.',
 
     // Documento / folios
     REFERENCE_NUMBER_UPDATE_DB_ERROR: 'Error de base de datos al actualizar el folio.',
@@ -287,8 +288,8 @@ const successMessages = {
     UPDATED_ACCOUNT: '¡Cuenta actualizada con éxito!',
     SUCCESS_LOGIN: '¡Inicio de sesión exitoso!',
     SUCCESS_LOGOUT: 'Sesión cerrada exitosamente.',
-    CREATED_PROFILE: '¡Perfil creado exitosamente!',
-    UPDATED_PROFILE: '¡Perfil actualizado exitosamente!',
+    CREATED_PERSON: '¡Persona creada exitosamente!',
+    UPDATED_PERSON: '¡Persona actualizada exitosamente!',
     CREATED_MATERIAL: '¡Material creado exitosamente!',
     UPDATED_MATERIAL: '¡Material actuallizado exitosamente!',
     DELETED_MATERIAL: '¡Material eliminado exitosamente!',

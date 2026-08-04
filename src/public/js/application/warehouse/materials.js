@@ -3,6 +3,7 @@ import { buildMaterialSelectText } from "../../utils/materialSelectUtils.js";
 import { deleteMaterialRequest, editMaterialRequest, editMaterialStockRequest, getAllMaterialsRequest, registerMaterialRequest } from "../../services/warehouse/materialService.js";
 
 export const MATERIAL_SELECT_RESULTS_LIMIT = 20;
+const GOODS_RECEIPT_CREATION_CONTEXT = 'goodsReceipt';
 
 export const getMaterialOptions = async (params = {}) => {
 
@@ -25,46 +26,36 @@ export const getAllMaterials = async (params = {}) => {
     return response;
 };
 
-const buildMaterialPayload = (formData) => ({
+const buildMaterialPayload = (formData, { includeMaxUnitCost = true } = {}) => ({
     name: formData.name,
     supplierId: formData.supplierId,
     presentationId: formData.presentationId,
     unitMeasureId: formData.unitMeasureId,
     minStock: formData.minStock,
-    maxUnitCost: formData.maxUnitCost,
+    ...(includeMaxUnitCost ? { maxUnitCost: formData.maxUnitCost } : {}),
     base: formData.base,
     height: formData.height,
     isActive: formData.isActive
 });
 
-const buildStockPayload = (formData, { includeReason = true } = {}) => ({
-    supplierId: formData.supplierId,
-    newStock: formData.newStock,
-    ...(includeReason ? { reasonId: formData.reasonId } : {}),
-    observations: formData.observations
-});
-
 export const registerMaterial = async ({
     formData,
-    withInitialStockAdjustment = false,
     creationContext = null
 }) => {
 
     const payload = {
-        ...buildMaterialPayload(formData),
-        ...(creationContext ? { creationContext } : {}),
-        ...(withInitialStockAdjustment ? buildStockPayload(formData, { includeReason: false }) : {})
+        ...buildMaterialPayload(formData, {
+            // In a purchase, the real unit cost comes from its detail line and is
+            // applied to SupplierMaterial when the receipt is confirmed.
+            includeMaxUnitCost: creationContext !== GOODS_RECEIPT_CREATION_CONTEXT
+        }),
+        ...(creationContext ? { creationContext } : {})
     };
 
     const response = await registerMaterialRequest({ data: payload });
-    const message = withInitialStockAdjustment
-        ? '¡Material creado y stock registrado exitosamente!'
-        : null;
-
     return createSuccessResponseFromRequest({
         response,
-        dataKey: 'material',
-        message
+        dataKey: 'material'
     });
 }
 

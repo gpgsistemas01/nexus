@@ -14,7 +14,7 @@ const names = {
   material: `IT Receipt Material ${testSuffix}`,
   supplierTradeName: `IT Receipt Supplier ${testSuffix}`,
   supplierLegalName: `IT Receipt Supplier Legal ${testSuffix}`,
-  receivedBy: `IT Receipt Profile ${testSuffix}`,
+  receivedBy: `IT Receipt Person ${testSuffix}`,
   invoice: `REC-${testSuffix}`
 };
 
@@ -30,7 +30,7 @@ let unit;
 const cleanupGoodsReceiptData = async () => {
   const materials = await prisma.material.findMany({ where: { name: { startsWith: 'IT Receipt Material ' } }, select: { id: true } });
   const suppliers = await prisma.supplier.findMany({ where: { tradeName: { startsWith: 'IT Receipt Supplier ' } }, select: { id: true } });
-  const profiles = await prisma.profile.findMany({ where: { fullName: { startsWith: 'IT Receipt Profile ' } }, select: { id: true } });
+  const persons = await prisma.person.findMany({ where: { fullName: { startsWith: 'IT Receipt Person ' } }, select: { id: true } });
   const presentations = await prisma.presentation.findMany({ where: { name: { startsWith: 'IT Receipt Presentation ' } }, select: { id: true } });
   const units = await prisma.unitMeasure.findMany({ where: { name: { startsWith: 'IT REC Unit ' } }, select: { id: true } });
   const receipts = await prisma.goodsReceipt.findMany({
@@ -38,7 +38,7 @@ const cleanupGoodsReceiptData = async () => {
       OR: [
         { invoice: { startsWith: 'REC-' } },
         { supplierId: { in: suppliers.map(({ id }) => id) } },
-        { receivedById: { in: profiles.map(({ id }) => id) } }
+        { receivedById: { in: persons.map(({ id }) => id) } }
       ]
     },
     select: { id: true }
@@ -52,7 +52,7 @@ const cleanupGoodsReceiptData = async () => {
   await prisma.supplierMaterial.deleteMany({ where: { OR: [{ materialId: { in: materials.map(({ id }) => id) } }, { supplierId: { in: suppliers.map(({ id }) => id) } }] } });
   await prisma.material.deleteMany({ where: { id: { in: materials.map(({ id }) => id) } } });
   await prisma.supplier.deleteMany({ where: { id: { in: suppliers.map(({ id }) => id) } } });
-  await prisma.profile.deleteMany({ where: { id: { in: profiles.map(({ id }) => id) } } });
+  await prisma.person.deleteMany({ where: { id: { in: persons.map(({ id }) => id) } } });
   await prisma.presentation.deleteMany({ where: { id: { in: presentations.map(({ id }) => id) } } });
   await prisma.unitMeasure.deleteMany({ where: { id: { in: units.map(({ id }) => id) } } });
 };
@@ -68,7 +68,7 @@ describeDb('goods receipt database integration', () => {
 
     presentation = await prisma.presentation.create({ data: { name: names.presentation } });
     unit = await prisma.unitMeasure.create({ data: { name: names.unit, symbol: names.unitSymbol } });
-    receivedBy = await prisma.profile.create({ data: { fullName: names.receivedBy } });
+    receivedBy = await prisma.person.create({ data: { fullName: names.receivedBy } });
 
     material = await prisma.material.create({
       data: {
@@ -160,7 +160,7 @@ describeDb('goods receipt database integration', () => {
     await expect(goodsReceiptService.findAllGoodsReceipts({
       search: goodsReceipt.referenceNumber,
       supplierId: supplier.id,
-      profileId: receivedBy.id
+      personId: receivedBy.id
     })).resolves.toMatchObject({
       recordsFiltered: 1,
       data: [expect.objectContaining({ id: goodsReceipt.id, referenceNumber: goodsReceipt.referenceNumber })]

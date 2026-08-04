@@ -204,7 +204,7 @@ export const findGoodsIssueReportRows = async ({
     observationsSearch = '',
     clientId = '',
     departmentId = '',
-    profileId = '',
+    personId = '',
     accesses = [],
     orderBy = 'referenceNumber',
     orderDir = 'desc'
@@ -220,7 +220,7 @@ export const findGoodsIssueReportRows = async ({
         observationsSearch,
         clientId,
         departmentId,
-        profileId,
+        personId,
         orderBy,
         orderDir,
         accesses
@@ -234,7 +234,7 @@ export const findGoodsReceiptReportRows = async ({
     startDate = '',
     endDate = '',
     supplierId = '',
-    profileId = '',
+    personId = '',
     orderBy = 'referenceNumber',
     orderDir = 'desc'
 } = {}) => {
@@ -246,7 +246,7 @@ export const findGoodsReceiptReportRows = async ({
         startDate,
         endDate,
         supplierId,
-        profileId,
+        personId,
         excludeCanceled: true,
         activeDetailsOnly: true,
         orderBy,

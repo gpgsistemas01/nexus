@@ -64,7 +64,7 @@ const returnForm = {
             groups: [
                 {
                     type: 'html',
-                    content: include('../../../shared/totalsSummary', { totals: returnTotalsSummary })
+                    content: include('../../../../shared/totalsSummary', { totals: returnTotalsSummary })
                 }
             ]
         }
@@ -88,7 +88,7 @@ const returnForm = {
     ]
 }; %>
 
-<%- include('../../../shared/modal', {
+<%- include('../../../../shared/modal', {
     modalId: 'goodsIssueReturnModal',
     modalTitle: 'Devolver detalle de salida',
     dialogClass: 'modal-lg modal-dialog-scrollable',

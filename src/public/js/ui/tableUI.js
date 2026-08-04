@@ -1,9 +1,6 @@
 import { downloadBlob } from "../utils/downloadBlob.js";
 import { notifications } from "../plugins/swal/swalComponent.js";
 
-export let isClearingFilters = false;
-
-
 export const buildTableExportParams = (table, params = {}) => {
 
     const [column = 0, dir = 'asc'] = table?.order?.()?.[0] || [];
@@ -85,8 +82,6 @@ export const buildExcelButton = ({
 
 export const clearTableFilters = (table) => {
 
-    isClearingFilters = true;
-
     const filterElements = document.querySelectorAll(
         '.table-filters select, .table-filters input'
     );
@@ -100,7 +95,5 @@ export const clearTableFilters = (table) => {
         }
     });
 
-    isClearingFilters = false;
-
-    table.ajax.reload();
+    table?.ajax.reload();
 }

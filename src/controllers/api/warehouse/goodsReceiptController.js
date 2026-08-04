@@ -22,7 +22,7 @@ export const getAllGoodsReceipts = async (req, res) => {
     const startDate = req.query.startDate || '';
     const endDate = req.query.endDate || '';
     const supplierId = req.query.supplierId || '';
-    const profileId = req.query.profileId || '';
+    const personId = req.query.personId || '';
 
     const columns = ['referenceNumber', 'receptionDate', 'supplierName', 'invoice', null];
     const { orderBy, orderDir } = getDataTableOrder({
@@ -38,7 +38,7 @@ export const getAllGoodsReceipts = async (req, res) => {
         startDate,
         endDate,
         supplierId,
-        profileId,
+        personId,
         orderBy,
         orderDir
     });

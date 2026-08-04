@@ -20,7 +20,7 @@ import reasonApiRoutes from './routes/api/warehouse/reasonApiRoute.js';
 import fulfillmentStatusApiRoutes from './routes/api/warehouse/fulfillmentStatusApiRoute.js';
 
 import departmentApiRoutes from './routes/api/admin/departmentApiRoute.js';
-import profileApiRoutes from './routes/api/admin/profileApiRoute.js';
+import personApiRoutes from './routes/api/admin/personApiRoute.js';
 import roleApiRoutes from './routes/api/admin/roleApiRoute.js';
 import userApiRoutes from './routes/api/admin/userApiRoute.js';
 import movementApiRoutes from './routes/api/admin/movementApiRoute.js';
@@ -42,7 +42,7 @@ import goodsReceiptWebRoutes from './routes/web/warehouse/goodsReceiptWebRoute.j
 import goodsIssueWebRoutes from './routes/web/warehouse/goodsIssueWebRoute.js';
 
 import userWebRoutes from './routes/web/admin/userWebRoute.js';
-import profileWebRoutes from './routes/web/admin/profileWebRoute.js';
+import personWebRoutes from './routes/web/admin/personWebRoute.js';
 import movementWebRoutes from './routes/web/admin/movementWebRoute.js';
 
 import { checkTypeContentJson, checkTypeContentFile, checkContentTypePlainText } from './middleware/contentTypeMiddleware.js';
@@ -112,7 +112,8 @@ app.use('/requisiciones', purchaseRequisitionWebRoutes);
 app.use('/compras', goodsReceiptWebRoutes);
 app.use('/salidas-almacen', goodsIssueWebRoutes);
 app.use('/usuarios-sistemas', userWebRoutes);
-app.use('/perfiles', profileWebRoutes);
+app.get('/perfiles', (req, res) => res.redirect(308, '/personas'));
+app.use('/personas', personWebRoutes);
 app.use('/clientes', clientWebRoutes);
 app.use('/proveedores', supplierWebRoutes);
 app.use('/movimientos', movementWebRoutes);
@@ -137,7 +138,9 @@ app.use(apiRoute + warehouse + '/fulfillment-statuses', fulfillmentStatusApiRout
 app.use(apiRoute + admin + '/users', userApiRoutes);
 app.use(apiRoute + admin + '/roles', roleApiRoutes);
 app.use(apiRoute + admin + '/departments', departmentApiRoutes);
-app.use(apiRoute + admin + '/profiles', profileApiRoutes);
+app.use(apiRoute + admin + '/persons', personApiRoutes);
+// Compatibility alias for existing integrations; new clients should use /persons.
+app.use(apiRoute + admin + '/profiles', personApiRoutes);
 app.use(apiRoute + admin + '/movements', movementApiRoutes);
 app.use(apiRoute + admin + '/reports', adminReportApiRoutes);
 

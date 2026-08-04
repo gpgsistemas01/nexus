@@ -2,6 +2,8 @@ import { UserCreateDatabaseError, UserFindDatabaseError, UserNotFound, UserUpdat
 import { getDb } from "../../repository/baseRepository.js";
 import { verifyPassword, encryptPassword } from "../../utils/encryptionUtils.js";
 import { createServiceLogger, logServiceError } from "../../utils/logger.js";
+import { getGrantedPermissions } from "../../constants/permissions.js";
+import { hasSystemWideReadAccess } from "../../utils/authorizationUtils.js";
 
 const serviceLogger = createServiceLogger('admin.userService');
 
@@ -37,22 +39,22 @@ export const findAllUsers = async ({
             select: {
                 id: true,
                 name: true,
-                profileId: true,
-                profile: { select: { fullName: true } },
+                personId: true,
+                person: { select: { fullName: true } },
                 accesses: {
-                    select: { 
-                        roleId: true, 
-                        departmentId: true, 
-                        role: { 
-                            select: { 
-                                name: true 
-                            } 
-                        }, 
-                        department: { 
-                            select: { 
-                                name: true 
-                            } 
-                        } 
+                    select: {
+                        roleId: true,
+                        departmentId: true,
+                        role: {
+                            select: {
+                                name: true
+                            }
+                        },
+                        department: {
+                            select: {
+                                name: true
+                            }
+                        }
                     },
                     take: 1
                 }
@@ -70,10 +72,10 @@ export const findAllUsers = async ({
             departmentName: user.accesses?.[0]?.department?.name || null
         }));
 
-        return { 
-            data, 
-            recordsTotal: total, 
-            recordsFiltered: filtered 
+        return {
+            data,
+            recordsTotal: total,
+            recordsFiltered: filtered
         };
 
     } catch (err) {
@@ -90,11 +92,16 @@ export const getUserIdByLogin = async (name, password) => {
         },
         select: {
             id: true,
-            password: true
+            password: true,
+            isActive: true,
+            accesses: {
+                select: { userId: true },
+                take: 1
+            }
         }
     });
 
-    if (!user) return null;
+    if (!user?.isActive || !user.accesses.length) return null;
 
     const isValid = await verifyPassword(password, user.password);
 
@@ -107,7 +114,10 @@ export const getLoggedUser = async (userId) => {
 
     const accesses = await getDb().userRoleDepartment.findMany({
         where: {
-            userId
+            userId,
+            user: {
+                isActive: true
+            }
         },
         select: {
             user: true,
@@ -118,7 +128,7 @@ export const getLoggedUser = async (userId) => {
 
     if (!accesses.length) return null;
 
-    return {
+    const user = {
         id: accesses[0].user.id,
         name: accesses[0].user.name,
         accesses: accesses.map(a => ({
@@ -128,6 +138,23 @@ export const getLoggedUser = async (userId) => {
             department: a.department.name
         }))
     };
+    const roles = new Set(user.accesses.map(access => access.role));
+    const departments = new Set(user.accesses.map(access => access.department));
+
+    return {
+        ...user,
+        permissions: getGrantedPermissions(user.accesses),
+        scope: {
+            canReadAll: hasSystemWideReadAccess(user),
+            departmentIds: [...new Set(user.accesses.map(access => access.departmentId))]
+        },
+        organization: {
+            isCoordinator: roles.has('Coordinador'),
+            isWarehouse: departments.has('ALMACÉN Y PROVEDURÍA'),
+            isSystem: departments.has('SISTEMAS'),
+            isSales: departments.has('VENTAS Y PROYECTOS ESPECIALES')
+        }
+    };
 }
 
 export const createUser = async ({ userDto }) => {
@@ -136,39 +163,39 @@ export const createUser = async ({ userDto }) => {
 
         const db = getDb();
 
-        const { password, profileId, roleId, departmentId, ...userData } = userDto;
+        const { password, personId, roleId, departmentId, ...userData } = userDto;
         const hashedPassword = await encryptPassword(password);
 
         return await db.user.create({
             data: {
                 ...userData,
                 password: hashedPassword,
-                ...(profileId && {
-                    profile: {
+                ...(personId && {
+                    person: {
                         connect: {
-                            id: profileId
+                            id: personId
                         }
                     }
                 }),
                 accesses: {
                     create: {
-                        role: { 
-                            connect: { 
-                                id: roleId 
-                            } 
+                        role: {
+                            connect: {
+                                id: roleId
+                            }
                         },
-                        department: { 
-                            connect: { 
-                                id: departmentId 
-                            } 
+                        department: {
+                            connect: {
+                                id: departmentId
+                            }
                         }
                     }
                 }
             },
-            select: { 
-                id: true, 
-                name: true, 
-                profileId: true 
+            select: {
+                id: true,
+                name: true,
+                personId: true
             }
         });
 
@@ -182,9 +209,9 @@ export const createUser = async ({ userDto }) => {
 const assertUserExists = async ({ id }) => {
 
     const db = getDb();
-    const user = await db.user.findUnique({ 
-        where: { id }, 
-        select: { id: true } 
+    const user = await db.user.findUnique({
+        where: { id },
+        select: { id: true }
     });
 
     if (!user) throw new UserNotFound();
@@ -200,28 +227,28 @@ export const updateUser = async ({ id, userDto }) => {
         return await db.$transaction(async (tx) => {
             const updated = await tx.user.update({
                 where: { id },
-                data: { 
-                    name: userDto.name, 
-                    profileId: userDto.profileId 
+                data: {
+                    name: userDto.name,
+                    personId: userDto.personId
                 },
-                select: { 
-                    id: true, 
-                    name: true, 
-                    profileId: true 
+                select: {
+                    id: true,
+                    name: true,
+                    personId: true
                 }
             });
 
-            await tx.userRoleDepartment.deleteMany({ 
-                where: { 
-                    userId: id 
-                } 
+            await tx.userRoleDepartment.deleteMany({
+                where: {
+                    userId: id
+                }
             });
-            await tx.userRoleDepartment.create({ 
-                data: { 
-                    userId: id, 
-                    roleId: userDto.roleId, 
-                    departmentId: userDto.departmentId 
-                } 
+            await tx.userRoleDepartment.create({
+                data: {
+                    userId: id,
+                    roleId: userDto.roleId,
+                    departmentId: userDto.departmentId
+                }
             });
 
             return updated;

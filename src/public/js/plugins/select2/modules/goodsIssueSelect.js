@@ -5,7 +5,7 @@ import { bindDisabledSelectDependency } from "../baseSelect.js";
 import { setupClientSelect, toggleClientOption } from "../domains/client.js";
 import { initDepartmentSelect, toggleDepartmentOption } from "../domains/department.js";
 import { setupMaterialSelect, toggleMaterialOption } from "../domains/material.js";
-import { initProfileSelect, toggleProfileOption } from "../domains/profile.js";
+import { initPersonSelect, togglePersonOption } from "../domains/person.js";
 import { initMdbWrapperInput, updateMdbWrapperInput } from "../../mdb/baseInstance.js";
 import { toggleDisabledElement } from "../../../utils/formUtils.js";
 import { FORM_SELECTORS, MODAL_SELECTORS } from "../../../constants/selectors.js";
@@ -76,7 +76,7 @@ export const initGoodsIssueFormSelect2 = () => {
         clientSelector,
     });
 
-    initProfileSelect({
+    initPersonSelect({
         modalSelector,
         baseSelector: advisorScopedSelector,
         placeholder: 'Buscar asesor...',
@@ -101,7 +101,7 @@ export const initGoodsIssueFormSelect2 = () => {
         allowCreate: false,
     });
 
-    initProfileSelect({
+    initPersonSelect({
         modalSelector,
         baseSelector: requesterScopedSelector,
         placeholder: 'Buscar solicitante...',
@@ -122,7 +122,7 @@ export const initGoodsIssueFormSelect2 = () => {
         sourceSelector: departmentScopedSelector,
         targetSelector: requesterScopedSelector,
         clearTarget: () => {
-            toggleProfileOption({
+            togglePersonOption({
                 selector: requesterScopedSelector,
                 id: null,
                 name: null
@@ -139,7 +139,7 @@ export const initGoodsIssueFormSelect2 = () => {
         sourceSelector: clientScopedSelector,
         targetSelector: advisorScopedSelector,
         clearTarget: () => {
-            toggleProfileOption({
+            togglePersonOption({
                 selector: advisorScopedSelector,
                 id: null,
                 name: null
@@ -186,13 +186,13 @@ export const setGoodsIssueFormSelectOptions = (data = null) => {
         name: data?.clientName
     });
 
-    toggleProfileOption({
+    togglePersonOption({
         selector: advisorScopedSelector,
         id: data?.advisorId,
         name: data?.advisorName
     });
 
-    toggleProfileOption({
+    togglePersonOption({
         selector: requesterScopedSelector,
         id: data?.requesterId,
         name: data?.requesterName

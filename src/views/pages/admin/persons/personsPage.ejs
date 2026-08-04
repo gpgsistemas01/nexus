@@ -1,0 +1,61 @@
+<% const form = {
+    id: 'personForm',
+    inputs: [{
+        id: 'fullNameInput',
+        name: 'fullName',
+        type: 'text',
+        label: 'Nombre completo',
+        col: '12'
+    }],
+    table: {
+        id: 'personAccessesTable',
+        errorName: 'accesses',
+        includeMaterialControls: false,
+        includeSummary: false,
+        containerClass: 'person-access-container',
+        selects: [{
+            id: 'personDepartmentInput',
+            name: 'personDepartment',
+            class: 'department-select',
+            col: 'md-5'
+        }, {
+            id: 'personRoleInput',
+            name: 'personRole',
+            class: 'role-select',
+            col: 'md-5'
+        }],
+        button: {
+            id: 'addPersonAccessBtn',
+            class: 'btn btn-primary w-100',
+            content: 'Agregar',
+            col: 'col-12 col-md-2'
+        }
+    }
+} %>
+
+<%- include('../../../shared/tableFilters', {
+    dateInputs: [],
+    selectInputs: [
+        {
+            id: 'departmentFilter',
+            label: 'Área:',
+            col: 'col-12 col-md-6 col-lg-3'
+        },
+        {
+            id: 'roleFilter',
+            label: 'Rol:',
+            col: 'col-12 col-md-6 col-lg-3'
+        }
+    ]
+}) %>
+
+<%- include('../../../shared/mainTable', { title: 'Personas' }) %>
+
+<%- include('../../../shared/modal', { modalId: 'personModal', form }) %>
+
+<script type="module" src="/js/pages/admin/personsPage.js"></script>
+
+<%- contentFor('title') %>
+Personas
+<%- contentFor('layoutType') %>
+site
