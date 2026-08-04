@@ -161,7 +161,7 @@ const DOCUMENT_STATUS_LABELS = Object.freeze({
     CANCELED: 'Cancelada'
 });
 
-export const renderActionButtons = ({ status, fulfillmentStatus, context, canAdjustStock = false, canDeleteMaterial = false }) => {
+export const renderActionButtons = ({ status, fulfillmentStatus, context, canAdjustStock = false, canDeleteMaterial = false, canDeleteWaste = false }) => {
 
     const actions = [];
     const canEditGoodsIssue = context === 'goodsIssue'
@@ -205,6 +205,14 @@ export const renderActionButtons = ({ status, fulfillmentStatus, context, canAdj
         iconClass: 'fa-solid fa-trash',
         title: 'Eliminar material',
         ariaLabel: 'Eliminar material'
+    }));
+
+    if (context === 'waste' && canDeleteWaste) actions.push(buildMdbActionButton({
+        className: 'btn-delete-waste',
+        colorClass: 'btn-danger',
+        iconClass: 'fa-solid fa-trash',
+        title: 'Eliminar merma',
+        ariaLabel: 'Eliminar merma'
     }));
 
     if (status === DOCUMENT_STATUS_LABELS.APPROVED && context === 'goodsIssue' && canSupplyGoodsIssue) actions.push(buildMdbActionButton({

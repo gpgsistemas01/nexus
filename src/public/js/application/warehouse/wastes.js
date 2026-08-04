@@ -1,5 +1,5 @@
 import { createSuccessResponseFromRequest } from "../../utils/responseUtils.js";
-import { editWasteRequest, editWasteStockRequest, getAllWastesRequest, registerWasteRequest } from "../../services/warehouse/wasteService.js";
+import { deleteWasteRequest, editWasteRequest, editWasteStockRequest, getAllWastesRequest, registerWasteRequest } from "../../services/warehouse/wasteService.js";
 
 export const getAllWastes = async (params = {}) => {
 
@@ -27,6 +27,14 @@ export const editWaste = async ({ formData, id }) => {
 export const editWasteStock = async ({ formData, id }) => {
 
     const response = await editWasteStockRequest({ data: formData, id });
+
+    return createSuccessResponseFromRequest({ response, dataKey: 'waste' });
+};
+
+
+export const deleteWaste = async (id) => {
+
+    const response = await deleteWasteRequest({ id });
 
     return createSuccessResponseFromRequest({ response, dataKey: 'waste' });
 };

@@ -26,3 +26,9 @@ export const editWasteStockRequest = ({ data, id }) => apiRequest({
     url: `${ WASTES_API_ROUTE }/${ id }/stock`,
     data
 });
+
+
+export const deleteWasteRequest = ({ id }) => apiRequest({
+    method: 'delete',
+    url: `${ WASTES_API_ROUTE }/${ id }`
+});

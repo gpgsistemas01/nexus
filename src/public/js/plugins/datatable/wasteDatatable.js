@@ -1,6 +1,6 @@
 import { createDataTable, renderActionButtons } from "./baseDatatable.js";
 import { setupTableFilters } from "./utils/filters/tableFilter.js";
-import { getAllWastes } from "../../application/warehouse/wastes.js";
+import { deleteWaste, getAllWastes } from "../../application/warehouse/wastes.js";
 import { openWasteModal, openWasteStockAdjustmentModal } from "../../pages/warehouse/wastes/wasteModal.js";
 import { configureResponsiveHeaderGroups, getResponsiveRowData } from "./utils/responsive.js";
 import { UI_PERMISSIONS } from "../../constants/permissions.js";
@@ -9,6 +9,8 @@ import { buildWarehouseInventoryColumns, renderWarehouseInventoryHeader } from "
 import { buildExcelButton, buildTableExportParams } from "../../ui/tableUI.js";
 import { exportWasteReport } from "../../application/warehouse/report.js";
 import { formatFileName } from "../../utils/formatters.js";
+import { notifications } from "../swal/swalComponent.js";
+import { handleApiError } from "../../api/errorHandler.js";
 
 const selectorTable = DATATABLE_SELECTORS.MAIN;
 const tableElement = document.querySelector(selectorTable);
@@ -18,6 +20,7 @@ export const createWasteDatatable = async (context) => {
     const canSeeCost = isWarehouse || isSystem || isSales;
     const canManageWastes = context.permissions?.includes(UI_PERMISSIONS.WASTES_WRITE) ?? false;
     const canAdjustStock = context.permissions?.includes(UI_PERMISSIONS.WASTES_ADJUST_STOCK) ?? false;
+    const canDeleteWastes = canManageWastes;
 
     renderWarehouseInventoryHeader({
         tableElement,
@@ -35,7 +38,12 @@ export const createWasteDatatable = async (context) => {
         canSeeCost,
         canManageItems: canManageWastes,
         costTitle: 'Costo Unitario de Conversión',
-        renderActions: () => renderActionButtons({ status: 'Abierta', context: 'waste', canAdjustStock })
+        renderActions: () => renderActionButtons({
+            status: 'Abierta',
+            context: 'waste',
+            canAdjustStock,
+            canDeleteWaste: canDeleteWastes
+        })
     });
 
     const table = createDataTable({
@@ -76,6 +84,32 @@ export const createWasteDatatable = async (context) => {
         const data = getResponsiveRowData(table, this);
 
         await openWasteStockAdjustmentModal({ mode: 'edit-stock', data });
+    });
+
+
+    $(`${ selectorTable } tbody`).on('click', '.btn-delete-waste', async function() {
+
+        const data = getResponsiveRowData(table, this);
+
+        const result = await notifications.showConfirmation({
+            title: '¿Eliminar merma?',
+            text: 'Se eliminará la merma y sus movimientos de ajuste asociados.',
+            icon: 'warning',
+            confirmButtonText: 'Eliminar',
+            cancelButtonText: 'Cancelar',
+            variant: 'danger'
+        });
+
+        if (!result.isConfirmed) return;
+
+        try {
+            const response = await deleteWaste(data.id);
+
+            notifications.showSuccess(response.message || '¡Merma eliminada exitosamente!');
+            table.ajax.reload(null, false);
+        } catch (err) {
+            handleApiError({ err, rethrow: false });
+        }
     });
 
     return table;

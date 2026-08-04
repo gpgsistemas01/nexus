@@ -21,6 +21,13 @@ export class WasteStockAdjustmentDatabaseError extends AppError {
     }
 }
 
+export class WasteDeleteDatabaseError extends AppError {
+
+    constructor () {
+        super('Error de base de datos al eliminar la merma.', 'WASTE_DELETE_DB_ERROR', 500);
+    }
+}
+
 export class WasteInitialStockReasonNotFound extends AppError {
 
     constructor () {
