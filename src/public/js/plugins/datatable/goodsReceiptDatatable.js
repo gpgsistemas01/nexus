@@ -1,4 +1,4 @@
-import { openGoodsReceiptModal } from "../../pages/warehouse/goodsReceiptsPage.js";
+import { openGoodsReceiptModal } from "../../pages/warehouse/goodsReceipts/goodsReceiptsPage.js";
 import { createDataTable, renderActionButtons, resetDataTable } from "./baseDatatable.js";
 import { getAllGoodsReceipts } from "../../application/warehouse/goodsReceipts.js";
 import { exportGoodsReceiptReport } from "../../application/warehouse/report.js";
