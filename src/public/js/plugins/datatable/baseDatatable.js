@@ -161,75 +161,96 @@ const DOCUMENT_STATUS_LABELS = Object.freeze({
     CANCELED: 'Cancelada'
 });
 
-export const renderActionButtons = ({ status, fulfillmentStatus, context, canAdjustStock = false, canDeleteMaterial = false, canDeleteWaste = false }) => {
-
-    const actions = [];
-    const canEditGoodsIssue = context === 'goodsIssue'
-        && status === DOCUMENT_STATUS_LABELS.APPROVED;
-    const canViewGoodsIssue = context === 'goodsIssue'
-        && status === DOCUMENT_STATUS_LABELS.CANCELED;
-    const canSupplyGoodsIssue = context === 'goodsIssue'
-        && ['Pendiente', 'Surtido parcial'].includes(fulfillmentStatus);
-    const canReturnGoodsIssue = context === 'goodsIssue'
-        && fulfillmentStatus === 'Surtido';
-    const canEditGoodsReceipt = context === 'goodsReceipt' && status !== DOCUMENT_STATUS_LABELS.CANCELED;
-    const canViewGoodsReceipt = context === 'goodsReceipt' && status === DOCUMENT_STATUS_LABELS.CANCELED;
-
-    if (canViewGoodsReceipt || canViewGoodsIssue) actions.push(buildMdbActionButton({
+const EDITABLE_ACTION_CONTEXTS = new Set(['person', 'client', 'supplier']);
+const SUPPLY_FULFILLMENT_STATUSES = new Set(['Pendiente', 'Surtido parcial']);
+const ACTION_BUTTONS = Object.freeze({
+    view: buildMdbActionButton({
         className: 'btn-edit',
         colorClass: 'btn-secondary',
         iconClass: 'fa-solid fa-eye',
         title: 'Ver',
         ariaLabel: 'Ver registro'
-    }));
-
-    if ((status === 'Abierta' || canEditGoodsIssue) || canEditGoodsReceipt || context === 'person' || context === 'client' || context === 'supplier') actions.push(buildMdbActionButton({
+    }),
+    edit: buildMdbActionButton({
         className: 'btn-edit',
         colorClass: 'btn-primary',
         iconClass: 'fa-solid fa-pencil',
         title: 'Editar',
         ariaLabel: 'Editar registro'
-    }));
-
-    if ((context === 'material' || context === 'waste') && canAdjustStock) actions.push(buildMdbActionButton({
+    }),
+    adjustStock: buildMdbActionButton({
         className: 'btn-adjust-stock',
         colorClass: 'btn-success',
         iconClass: 'fa-solid fa-boxes-stacked',
         title: 'Ajustar stock',
         ariaLabel: 'Ajustar stock'
-    }));
-
-    if (context === 'material' && canDeleteMaterial) actions.push(buildMdbActionButton({
+    }),
+    deleteMaterial: buildMdbActionButton({
         className: 'btn-delete-material',
         colorClass: 'btn-danger',
         iconClass: 'fa-solid fa-trash',
         title: 'Eliminar material',
         ariaLabel: 'Eliminar material'
-    }));
-
-    if (context === 'waste' && canDeleteWaste) actions.push(buildMdbActionButton({
+    }),
+    deleteWaste: buildMdbActionButton({
         className: 'btn-delete-waste',
         colorClass: 'btn-danger',
         iconClass: 'fa-solid fa-trash',
         title: 'Eliminar merma',
         ariaLabel: 'Eliminar merma'
-    }));
-
-    if (status === DOCUMENT_STATUS_LABELS.APPROVED && context === 'goodsIssue' && canSupplyGoodsIssue) actions.push(buildMdbActionButton({
+    }),
+    supplyDetail: buildMdbActionButton({
         className: 'btn-edit-detail',
         colorClass: 'btn-info',
         iconClass: 'fa fa-edit',
         title: 'Surtir detalle',
         ariaLabel: 'Surtir detalle'
-    }));
-
-    if (status === DOCUMENT_STATUS_LABELS.APPROVED && context === 'goodsIssue' && canReturnGoodsIssue) actions.push(buildMdbActionButton({
+    }),
+    returnDetail: buildMdbActionButton({
         className: 'btn-return-detail',
         colorClass: 'btn-warning',
         iconClass: 'fa-solid fa-rotate-left',
         title: 'Devolver material surtido',
         ariaLabel: 'Devolver material surtido'
-    }));
+    })
+});
 
-    return actions.join('');
+const normalizeActionButtonOptions = (options = {}) => typeof options === 'string'
+    ? { status: options }
+    : options || {};
+
+export const renderActionButtons = (options = {}) => {
+
+    const {
+        status,
+        fulfillmentStatus,
+        context,
+        canAdjustStock = false,
+        canDeleteMaterial = false,
+        canDeleteWaste = false
+    } = normalizeActionButtonOptions(options);
+    const isGoodsIssue = context === 'goodsIssue';
+    const isGoodsReceipt = context === 'goodsReceipt';
+    const isApproved = status === DOCUMENT_STATUS_LABELS.APPROVED;
+    const isCanceled = status === DOCUMENT_STATUS_LABELS.CANCELED;
+    const isInventoryItem = context === 'material' || context === 'waste';
+
+    return [
+        [(isGoodsIssue || isGoodsReceipt) && isCanceled, ACTION_BUTTONS.view],
+        [
+            status === 'Abierta'
+                || (isGoodsIssue && isApproved)
+                || (isGoodsReceipt && !isCanceled)
+                || EDITABLE_ACTION_CONTEXTS.has(context),
+            ACTION_BUTTONS.edit
+        ],
+        [isInventoryItem && canAdjustStock, ACTION_BUTTONS.adjustStock],
+        [context === 'material' && canDeleteMaterial, ACTION_BUTTONS.deleteMaterial],
+        [context === 'waste' && canDeleteWaste, ACTION_BUTTONS.deleteWaste],
+        [isGoodsIssue && isApproved && SUPPLY_FULFILLMENT_STATUSES.has(fulfillmentStatus), ACTION_BUTTONS.supplyDetail],
+        [isGoodsIssue && isApproved && fulfillmentStatus === 'Surtido', ACTION_BUTTONS.returnDetail]
+    ]
+        .filter(([canRender]) => canRender)
+        .map(([, button]) => button)
+        .join('');
 }
