@@ -93,7 +93,7 @@ export const createWasteDatatable = async (context) => {
 
         const result = await notifications.showConfirmation({
             title: '¿Eliminar merma?',
-            text: 'Se eliminará la merma y sus movimientos de ajuste asociados.',
+            text: 'Se eliminará la merma y sus ajustes de stock asociados solo si no tiene compras ni salidas vinculadas.',
             icon: 'warning',
             confirmButtonText: 'Eliminar',
             cancelButtonText: 'Cancelar',
