@@ -207,6 +207,7 @@ export const errorMessages = {
     MATERIAL_UPDATE_DB_ERROR: 'Error de base de datos al editar el material.',
     MATERIAL_DELETE_DB_ERROR: 'Error de base de datos al eliminar el material.',
     MATERIAL_DELETE_RELATION_CONFLICT: 'No se puede eliminar el material porque está vinculado a una compra, salida u otro movimiento de almacén.',
+    WASTE_DELETE_DB_ERROR: 'Error de base de datos al eliminar la merma.',
     MATERIAL_SNAPSHOT_FIND_DB_ERROR: 'Error de base de datos al buscar los datos históricos del material.',
     MATERIAL_STOCK_UPDATE_DB_ERROR: 'Error de base de datos al editar el stock del material.',
     MATERIAL_UNIT_COST_UPDATE_DB_ERROR: 'Error de base de datos al editar el costo unitario del material.',
@@ -310,6 +311,7 @@ const successMessages = {
     UPDATED_CLIENT: '¡Cliente actualizado exitosamente!',
     CREATED_WASTE: '¡Merma registrada exitosamente!',
     UPDATED_WASTE: '¡Merma actualizada exitosamente!',
+    DELETED_WASTE: '¡Merma eliminada exitosamente!',
 };
 
 export const getErrorMessage = (data = {}) => {

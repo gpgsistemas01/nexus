@@ -1,5 +1,5 @@
 import { isAppError } from '../../errors/AppError.js';
-import { WasteInitialStockReasonNotFound, WasteNotFound, WasteStockAdjustmentDatabaseError, WasteUpdateDatabaseError } from '../../errors/warehouse/wasteError.js';
+import { WasteDeleteDatabaseError, WasteInitialStockReasonNotFound, WasteNotFound, WasteStockAdjustmentDatabaseError, WasteUpdateDatabaseError } from '../../errors/warehouse/wasteError.js';
 import { getDb } from '../../repository/baseRepository.js';
 import { toNumber } from '../../utils/formattersUtils.js';
 import { calculateConvertedQuantity } from '../inventory/stockHelpers.js';
@@ -310,6 +310,58 @@ export const updateWaste = async ({
         handleWasteServiceError({
             err,
             fallbackError: new WasteUpdateDatabaseError()
+        });
+    }
+};
+
+
+export const deleteWaste = async (id) => {
+
+    try {
+
+        const deletedWaste = await getDb().$transaction(async (tx) => {
+
+            await findWasteById({ tx, id });
+
+            const stockAdjustments = await tx.wasteStockAdjustment.findMany({
+                where: { wasteId: id },
+                select: { id: true }
+            });
+            const stockAdjustmentIds = stockAdjustments.map(({ id }) => id);
+
+            await tx.wasteMovementDetail.deleteMany({ where: { wasteId: id } });
+
+            if (stockAdjustmentIds.length) {
+                await tx.wasteMovement.deleteMany({
+                    where: { wasteStockAdjustmentId: { in: stockAdjustmentIds } }
+                });
+                await tx.wasteStockAdjustment.deleteMany({
+                    where: { id: { in: stockAdjustmentIds } }
+                });
+            }
+
+            return tx.waste.delete({
+                where: { id },
+                select: { id: true }
+            });
+        });
+
+        logServiceInfo(serviceLogger, {
+            operation: 'warehouse.wasteService.deleteWaste',
+            ...getModelLogContext('waste', { id })
+        }, 'Merma eliminada correctamente');
+
+        return deletedWaste;
+
+    } catch (err) {
+        logServiceError(serviceLogger, err, {
+            operation: 'warehouse.wasteService.deleteWaste',
+            ...getModelLogContext('waste', { id })
+        });
+
+        handleWasteServiceError({
+            err,
+            fallbackError: new WasteDeleteDatabaseError()
         });
     }
 };

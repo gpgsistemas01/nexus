@@ -1,5 +1,5 @@
 import { successCodeMessages } from '../../../messages/codeMessages.js';
-import { createWasteAdjustment, findAllWastes as findAllWasteItems, updateWaste, updateWasteStock } from '../../../services/warehouse/wasteService.js';
+import { createWasteAdjustment, deleteWaste, findAllWastes as findAllWasteItems, updateWaste, updateWasteStock } from '../../../services/warehouse/wasteService.js';
 import { createWasteDataDto, createWasteDto, createWasteStockDto } from '../../../dtos/wasteDTO.js';
 import { sanitizeEmptyStrings } from '../../../utils/formattersUtils.js';
 import { getDataTableOrder, getDataTablePaging, getDataTableSearch } from '../../../utils/requestQueryUtils.js';
@@ -74,5 +74,16 @@ export const editWasteStock = async (req, res) => {
     return res.status(200).json({
         waste,
         code: successCodeMessages.UPDATED_WASTE
+    });
+};
+
+
+export const removeWaste = async (req, res) => {
+
+    const waste = await deleteWaste(req.params.id);
+
+    return res.status(200).json({
+        waste,
+        code: successCodeMessages.DELETED_WASTE
     });
 };

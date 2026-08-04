@@ -4,19 +4,22 @@ const createWasteAdjustment = vi.fn();
 const findAllWastes = vi.fn();
 const updateWaste = vi.fn();
 const updateWasteStock = vi.fn();
+const deleteWaste = vi.fn();
 
 vi.mock('../../../../src/services/warehouse/wasteService.js', () => ({
   createWasteAdjustment,
   findAllWastes,
   updateWaste,
-  updateWasteStock
+  updateWasteStock,
+  deleteWaste
 }));
 
 const {
   editWaste,
   editWasteStock,
   getAllWastes,
-  registerWaste
+  registerWaste,
+  removeWaste
 } = await import('../../../../src/controllers/api/warehouse/wasteController.js');
 
 const createResponse = () => {
@@ -106,6 +109,19 @@ describe('wasteController', () => {
       wasteDto: { supplierMaterialId: 'supplier-material-1', base: 2, height: 4 }
     });
     expect(res.json).toHaveBeenCalledWith({ waste, code: 'UPDATED_WASTE' });
+  });
+
+  it('elimina la merma por id', async () => {
+    const waste = { id: 'waste-1' };
+    const req = { params: { id: 'waste-1' } };
+    const res = createResponse();
+    deleteWaste.mockResolvedValue(waste);
+
+    await removeWaste(req, res);
+
+    expect(deleteWaste).toHaveBeenCalledWith('waste-1');
+    expect(res.status).toHaveBeenCalledWith(200);
+    expect(res.json).toHaveBeenCalledWith({ waste, code: 'DELETED_WASTE' });
   });
 
   it('ajusta el stock con motivo, observaciones y usuario', async () => {
