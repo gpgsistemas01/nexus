@@ -1,6 +1,6 @@
 import { initWasteSelect2, setWasteSelectOptions } from "../../../plugins/select2/modules/wasteSelect.js";
 import { setReasonVisualOption } from '../../../plugins/select2/domains/reason.js';
-import { clearFormErrors, initForm, setFormDisabled } from "../../../ui/formUI.js";
+import { clearFormErrors, initForm, setFormDisabled, setFormSectionVisibility } from "../../../ui/formUI.js";
 import { openModal } from "../../../ui/modalUI.js";
 import { FORM_SELECTORS, MODAL_SELECTORS } from "../../../constants/selectors.js";
 import { wasteDataFields, wasteStockFields } from './wasteFields.js';
@@ -9,6 +9,7 @@ const wasteModalId = MODAL_SELECTORS.WASTE;
 const formId = FORM_SELECTORS.WASTE_FORM;
 const stockMode = 'edit-stock';
 const initialStockReasonName = 'Stock inicial';
+const stockDataSectionSelector = '.stock-data-section';
 
 const prepareWasteModal = ({
     mode,
@@ -20,6 +21,7 @@ const prepareWasteModal = ({
     const modalElement = document.querySelector(wasteModalId);
     const enableStockFields = isStockAdjustment || mode === 'create';
     const isInitialStockCreation = mode === 'create' && !isStockAdjustment;
+    const showStockDataSection = isStockAdjustment || mode === 'create';
 
     initForm({ form, mode, id: mode === 'create' ? '' : data?.id });
     initWasteSelect2({ modalSelector: wasteModalId });
@@ -30,6 +32,11 @@ const prepareWasteModal = ({
     form.elements.observations.value = '';
 
     setFormDisabled({ form, isDisabled: false });
+    setFormSectionVisibility({
+        form,
+        selector: stockDataSectionSelector,
+        isVisible: showStockDataSection
+    });
     setFormDisabled({ form, fields: wasteDataFields, isDisabled: isStockAdjustment });
     setFormDisabled({ form, fields: wasteStockFields, isDisabled: !enableStockFields });
     setReasonVisualOption({
