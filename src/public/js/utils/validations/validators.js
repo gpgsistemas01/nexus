@@ -24,12 +24,14 @@ export const materialValidators = {
     base: (_, { base, height }) => validatePairedOptionalNumber({
         value: base,
         pairedValue: height,
-        fieldName: 'La base'
+        fieldName: 'La base',
+        allowZero: false
     }),
     height: (_, { base, height }) => validatePairedOptionalNumber({
         value: height,
         pairedValue: base,
-        fieldName: 'La altura'
+        fieldName: 'La altura',
+        allowZero: false
     }),
 }
 
@@ -41,8 +43,18 @@ export const materialStockValidators = {
 
 export const wasteDataValidators = {
     supplierMaterialId: (value) => isEmptyOrNull(value, 'El material'),
-    base: (value) => validateNumber(value, 'La base de la merma'),
-    height: (value) => validateNumber(value, 'La altura de la merma'),
+    base: (_, { base, height }) => validatePairedOptionalNumber({
+        value: base,
+        pairedValue: height,
+        fieldName: 'La base de la merma',
+        allowZero: false
+    }),
+    height: (_, { base, height }) => validatePairedOptionalNumber({
+        value: height,
+        pairedValue: base,
+        fieldName: 'La altura de la merma',
+        allowZero: false
+    }),
 }
 
 export const wasteStockValidators = {

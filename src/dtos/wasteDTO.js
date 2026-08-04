@@ -1,7 +1,8 @@
+import { toNumber } from '../utils/formattersUtils.js';
 const buildWasteBaseDto = (body = {}) => ({
     supplierMaterialId: body.supplierMaterialId,
-    base: Number(body.base),
-    height: Number(body.height)
+    base: toNumber(body.base),
+    height: toNumber(body.height)
 });
 
 const buildWasteStockDto = (body = {}, { includeReason = true } = {}) => ({

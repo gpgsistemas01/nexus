@@ -199,6 +199,20 @@ export const validateNumberOptionalWhen = ({ fieldName, predicate, disableTooLon
     validateOptionalNumberChain({ fieldName, disableTooLong, predicate })
 ;
 
+
+export const validatePositiveNumberOptional = (fieldName, { disableTooLong = false } = {}) => {
+
+    const errors = errorMap[fieldName];
+
+    return body(fieldName)
+        .if((value) => hasValue(value))
+        .isFloat({ gt: 0 }).withMessage(errors.INVALID_NUMBER)
+        .if(() => !disableTooLong)
+        .matches(/^\d{1,7}(\.\d{1,3})?$/).withMessage(errors.TOO_LONG)
+        .toFloat()
+}
+
+
 export const validateDate = (fieldName) => {
 
     const errors = errorMap[fieldName];

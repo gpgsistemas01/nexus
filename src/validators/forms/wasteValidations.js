@@ -1,9 +1,11 @@
-import { validateNumber, validateTextOptional, validateUUID } from '../fields/fieldsValidator.js';
+import { validateNumber, validateNumberRequiredWhenOtherPresent, validatePositiveNumberOptional, validateTextOptional, validateUUID } from '../fields/fieldsValidator.js';
 
 const wasteDataValidation = [
     validateUUID('supplierMaterialId'),
-    validateNumber('base'),
-    validateNumber('height')
+    validateNumberRequiredWhenOtherPresent({ fieldName: 'base', pairedFieldName: 'height' }),
+    validateNumberRequiredWhenOtherPresent({ fieldName: 'height', pairedFieldName: 'base' }),
+    validatePositiveNumberOptional('base'),
+    validatePositiveNumberOptional('height')
 ];
 
 const wasteStockValidationFields = [
