@@ -1,15 +1,13 @@
 import { openModal } from "../../ui/modalUI.js";
 import { initMaterialFormSelect2, setMaterialFormSelectOptions } from "../../plugins/select2/modules/materialSelect.js";
 import { setReasonVisualOption } from '../../plugins/select2/domains/reason.js';
-import { setupStockAdjustmentForm } from "../stockAdjustmentForm.js";
-import { clearFormErrors, initForm, setFormFieldVisibility } from "../../ui/formUI.js";
+import { clearFormErrors, initForm, setFormDisabled, setFormFieldVisibility } from "../../ui/formUI.js";
 import { FORM_SELECTORS, MODAL_SELECTORS } from "../../constants/selectors.js";
 
 const materialModalId = MODAL_SELECTORS.MATERIAL;
 const formId = FORM_SELECTORS.MATERIAL_FORM;
 const materialDataFields = ['name', 'minStock', 'maxUnitCost', 'base', 'height', 'supplierId', 'presentationId', 'unitMeasureId', 'isActive'];
 const stockFields = ['newStock', 'reasonId', 'observations'];
-const stockSectionSelector = '.stock-data-section';
 const goodsReceiptCreationContext = 'goodsReceipt';
 const maxUnitCostLabel = 'Costo Máximo';
 
@@ -26,19 +24,13 @@ const setMaterialValues = ({ form, data = null }) => {
 
 const setupMaterialModalFields = ({
     form,
-    showStockFields,
     isStockAdjustment,
     creationContext
 }) => {
 
-    setupStockAdjustmentForm({
-        form,
-        dataFields: materialDataFields,
-        stockFields,
-        stockSectionSelector,
-        showStockFields,
-        isStockAdjustment
-    });
+    setFormDisabled({ form, isDisabled: false });
+    setFormDisabled({ form, fields: materialDataFields, isDisabled: isStockAdjustment });
+    setFormDisabled({ form, fields: stockFields, isDisabled: !isStockAdjustment });
 
     setFormFieldVisibility({
         form,
@@ -61,21 +53,19 @@ const prepareMaterialModal = ({
     const form = document.querySelector(formId);
     const modalElement = document.querySelector(materialModalId);
 
-    const showStockFields = isStockAdjustment;
     initForm({ form, mode, id: data?.id });
     clearFormErrors(form);
     form.dataset.creationContext = creationContext || '';
     setupMaterialModalFields({
         form,
-        showStockFields,
         isStockAdjustment,
         creationContext
     });
     initMaterialFormSelect2({
         modalSelector: materialModalId,
-        isStockAdjustment: showStockFields
+        isStockAdjustment
     });
-    setMaterialFormSelectOptions({ modalSelector: materialModalId, data, isStockAdjustment: showStockFields });
+    setMaterialFormSelectOptions({ modalSelector: materialModalId, data, isStockAdjustment });
     setReasonVisualOption({ selector: `${ materialModalId } ${ FORM_SELECTORS.REASON }` });
 
     return { form, modalElement };
