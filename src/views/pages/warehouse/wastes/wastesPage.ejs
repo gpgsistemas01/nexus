@@ -1,40 +1,4 @@
-<% const selectedMaterialSummary = {
-    class: 'row g-2 selected-material-summary',
-    items: [
-        {
-            id: 'selectedMaterialSupplierValue',
-            label: 'Proveedor',
-            value: '-'
-        },
-        {
-            id: 'selectedMaterialPresentationValue',
-            label: 'Presentación',
-            value: '-'
-        },
-        {
-            id: 'selectedMaterialUnitMeasureValue',
-            label: 'Unidad',
-            value: '-'
-        },
-        {
-            id: 'selectedMaterialBaseValue',
-            label: 'Base del material',
-            value: '-'
-        },
-        {
-            id: 'selectedMaterialHeightValue',
-            label: 'Altura del material',
-            value: '-'
-        },
-        {
-            id: 'selectedMaterialMaxUnitCostValue',
-            label: 'Costo unitario de conversión',
-            value: '-'
-        }
-    ]
-};
-
-const form = {
+<% const form = {
     id: 'wasteForm',
     canApprove: false,
     invoice: false,
@@ -80,16 +44,6 @@ const form = {
                             col: '6'
                         }
                     ]
-                }
-            ]
-        },
-        {
-            title: 'Datos del material seleccionado',
-            class: 'selected-material-section',
-            groups: [
-                {
-                    type: 'html',
-                    content: include('../../../shared/totalsSummary', { totals: selectedMaterialSummary })
                 }
             ]
         },
