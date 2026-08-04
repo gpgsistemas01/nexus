@@ -257,6 +257,19 @@ const getFormFieldContainer = (form, fieldName) => {
     return field.closest('[class*="col-"]') || field.closest('.form-outline') || field.parentElement;
 };
 
+export const setFormSectionVisibility = ({
+    form,
+    selector,
+    isVisible
+}) => {
+
+    const section = form.querySelector(selector);
+
+    if (!section) return;
+
+    section.classList.toggle('d-none', !isVisible);
+};
+
 export const setFormFieldVisibility = ({
     form,
     fieldName,
