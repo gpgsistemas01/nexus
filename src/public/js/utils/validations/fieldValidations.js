@@ -93,9 +93,9 @@ export const validateNumber = (number, fieldName, { allowZero = true } = {}) => 
     return null;
 }
 
-export const validateNumberOptional = (number, fieldName) => {
+export const validateNumberOptional = (number, fieldName, { allowZero = true } = {}) => {
 
-    if (!number) return null;
+    if (!hasValue(number)) return null;
 
     number = parseFloat(number);
 
@@ -105,16 +105,20 @@ export const validateNumberOptional = (number, fieldName) => {
 
     result = isNegative(number, fieldName);
 
-    return result;
+    if (result) return result;
+
+    if (!allowZero && number === 0) return `${ fieldName } debe ser un número mayor a cero`;
+
+    return null;
 }
 
 const hasValue = (value) => value !== undefined && value !== null && value !== '';
 
-export const validatePairedOptionalNumber = ({ value, pairedValue, fieldName }) => {
+export const validatePairedOptionalNumber = ({ value, pairedValue, fieldName, allowZero = true }) => {
 
     if (!hasValue(value) && hasValue(pairedValue)) return `${ fieldName } es requerida.`;
 
-    return validateNumberOptional(value, fieldName);
+    return validateNumberOptional(value, fieldName, { allowZero });
 }
 
 export const validateDate = (date, fieldName) => {

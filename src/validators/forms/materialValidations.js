@@ -1,4 +1,4 @@
-import { validateBoolean, validateNumberOptional, validateNumberOptionalWhen, validateNumberRequiredWhenOtherPresent, validateNumberWhen, validateText, validateTextOptional, validateUUID, validateUUIDWhen } from "../fields/fieldsValidator.js";
+import { validateBoolean, validateNumberOptional, validateNumberOptionalWhen, validatePositiveNumberOptional, validateNumberRequiredWhenOtherPresent, validateNumberWhen, validateText, validateTextOptional, validateUUID, validateUUIDWhen } from "../fields/fieldsValidator.js";
 
 export const MATERIAL_CREATION_CONTEXT_GOODS_RECEIPT = 'goodsReceipt';
 
@@ -17,8 +17,8 @@ export const materialValidation = [
     validateNumberOptionalWhen({ fieldName: 'maxUnitCost', predicate: isGoodsReceiptMaterialCreation }),
     validateNumberRequiredWhenOtherPresent({ fieldName: 'base', pairedFieldName: 'height' }),
     validateNumberRequiredWhenOtherPresent({ fieldName: 'height', pairedFieldName: 'base' }),
-    validateNumberOptional('base'),
-    validateNumberOptional('height'),
+    validatePositiveNumberOptional('base'),
+    validatePositiveNumberOptional('height'),
     validateBoolean('isActive')
 ]
 
