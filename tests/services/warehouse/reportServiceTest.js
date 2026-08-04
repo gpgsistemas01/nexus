@@ -4,6 +4,7 @@ const findAllSupplierMaterials = vi.fn();
 const findAllGoodsIssues = vi.fn();
 const findAllGoodsReceipts = vi.fn();
 const findAllSuppliers = vi.fn();
+const findAllWastes = vi.fn();
 
 vi.mock('../../../src/services/warehouse/materials/supplierMaterialService.js', () => ({
   findAllSupplierMaterials
@@ -21,10 +22,15 @@ vi.mock('../../../src/services/warehouse/supplierService.js', () => ({
   findAllSuppliers
 }));
 
+vi.mock('../../../src/services/warehouse/wasteService.js', () => ({
+  findAllWastes
+}));
+
 const {
   findGoodsIssueReportRows,
   findGoodsReceiptReportRows,
   findSupplierReportRows,
+  findWasteReportRows,
   findWarehouseReportRows
 } = await import('../../../src/services/warehouse/reportService.js');
 
@@ -180,6 +186,47 @@ describe('warehouse reportService', () => {
     ]);
 
     expect(findAllGoodsReceipts).toHaveBeenCalledWith(expect.objectContaining({ skip: 0, take: 100000, search: 'REC', supplierId: 'supplier-1' }));
+  });
+
+  it('mapea reporte de mermas usando medidas y conversión propias de la merma', async () => {
+    findAllWastes.mockResolvedValue({
+      data: [{
+        supplier: { tradeName: 'Proveedor Uno' },
+        name: 'Merma Uno',
+        wasteBase: '1.5',
+        wasteHeight: '2',
+        materialBase: '10',
+        materialHeight: '20',
+        currentStock: '4',
+        presentation: { name: 'Pieza' },
+        convertedQuantity: '12',
+        unitMeasure: { name: 'Metro cuadrado' },
+        maxUnitCost: '7.50'
+      }]
+    });
+
+    await expect(findWasteReportRows({ search: 'Merma', supplierId: 'supplier-1' })).resolves.toEqual([{
+      supplier: 'Proveedor Uno',
+      name: 'Merma Uno',
+      wasteBase: 1.5,
+      wasteHeight: 2,
+      materialBase: 10,
+      materialHeight: 20,
+      currentStock: 4,
+      presentation: 'Pieza',
+      convertedQuantity: 12,
+      unitMeasure: 'Metro cuadrado',
+      maxUnitCost: 7.5
+    }]);
+
+    expect(findAllWastes).toHaveBeenCalledWith({
+      skip: 0,
+      take: 100000,
+      search: 'Merma',
+      supplierId: 'supplier-1',
+      orderBy: 'name',
+      orderDir: 'asc'
+    });
   });
 
   it('obtiene reporte de proveedores desde el servicio base de proveedores', async () => {

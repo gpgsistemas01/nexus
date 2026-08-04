@@ -23,8 +23,10 @@ const mapMaterialRows = (materials = []) => materials.map((item) => ({
 const mapWasteRows = (wastes = []) => wastes.map((item) => ({
     supplier: item.supplier?.tradeName,
     name: item.name,
-    base: toNumber(item.base),
-    height: toNumber(item.height),
+    wasteBase: toNumber(item.wasteBase ?? item.base),
+    wasteHeight: toNumber(item.wasteHeight ?? item.height),
+    materialBase: toNumber(item.materialBase ?? item.material?.base),
+    materialHeight: toNumber(item.materialHeight ?? item.material?.height),
     currentStock: toNumber(item.currentStock),
     presentation: item.presentation?.name,
     convertedQuantity: toNumber(item.convertedQuantity),
