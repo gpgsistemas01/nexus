@@ -1,5 +1,6 @@
 import { openModal } from "../../ui/modalUI.js";
-import { initMaterialFormSelect2, setMaterialFormSelectOptions, setMaterialReasonVisualOption } from "../../plugins/select2/modules/materialSelect.js";
+import { initMaterialFormSelect2, setMaterialFormSelectOptions } from "../../plugins/select2/modules/materialSelect.js";
+import { setReasonVisualOption } from '../../plugins/select2/domains/reason.js';
 import { configureStockAdjustmentForm } from "../stockAdjustmentForm.js";
 import { clearFormErrors, initForm, setFormFieldVisibility, setFormDisabled } from "../../ui/formUI.js";
 import { FORM_SELECTORS, MODAL_SELECTORS } from "../../constants/selectors.js";
@@ -132,7 +133,7 @@ const prepareMaterialModal = ({
         isStockAdjustment: showStockFields
     });
     setMaterialFormSelectOptions({ modalSelector: materialModalId, data, isStockAdjustment: showStockFields });
-    setMaterialReasonVisualOption({ modalSelector: materialModalId });
+    setReasonVisualOption({ selector: `${ materialModalId } ${ FORM_SELECTORS.REASON }` });
 
     return { form, modalElement };
 };

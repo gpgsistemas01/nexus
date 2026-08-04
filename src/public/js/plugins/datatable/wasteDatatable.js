@@ -1,7 +1,7 @@
 import { createDataTable, renderActionButtons } from "./baseDatatable.js";
 import { setupTableFilters } from "./utils/filters/tableFilter.js";
 import { getAllWastes } from "../../application/warehouse/wastes.js";
-import { openWasteModal, openWasteStockAdjustmentModal } from "../../modules/wastes/wasteModal.js";
+import { openWasteModal, openWasteStockAdjustmentModal } from "../../pages/warehouse/wastes/wasteModal.js";
 import { configureResponsiveHeaderGroups, getResponsiveRowData } from "./utils/responsive.js";
 import { UI_PERMISSIONS } from "../../constants/permissions.js";
 import { DATATABLE_SELECTORS } from "../../constants/selectors.js";

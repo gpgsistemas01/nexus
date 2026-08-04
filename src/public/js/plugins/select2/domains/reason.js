@@ -1,5 +1,6 @@
 import { getAllReasons } from "../../../application/warehouse/reasons.js";
 import { buildPaginatedSelectResults, initbaseSelect2, SELECT_RESULTS_LIMIT, toggleSelectOption } from "../baseSelect.js";
+import { toggleDisabledElement } from '../../../utils/formUtils.js';
 
 export const initReasonSelect = ({ 
     modalSelector, 
@@ -52,3 +53,17 @@ export const toggleReasonOption = ({
         text: name
     }
 });
+
+export const setReasonVisualOption = ({
+    selector,
+    name,
+    isDisabled = false
+}) => {
+
+    if (name) toggleReasonOption({ selector, id: `visual:${ name }`, name });
+
+    toggleDisabledElement({
+        element: document.querySelector(selector),
+        isDisabled
+    });
+};

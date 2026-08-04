@@ -4,15 +4,15 @@ const buildWasteBaseDto = (body = {}) => ({
     height: Number(body.height)
 });
 
-const buildWasteStockDto = (body = {}) => ({
+const buildWasteStockDto = (body = {}, { includeReason = true } = {}) => ({
     currentStock: Number(body.currentStock),
     ...Object.prototype.hasOwnProperty.call(body, 'observations') ? { observations: body.observations ? body.observations.trim() : null } : {},
-    ...Object.prototype.hasOwnProperty.call(body, 'reasonId') ? { reasonId: body.reasonId } : {}
+    ...includeReason && Object.prototype.hasOwnProperty.call(body, 'reasonId') ? { reasonId: body.reasonId } : {}
 });
 
 export const createWasteDto = (body = {}) => ({
     ...buildWasteBaseDto(body),
-    ...buildWasteStockDto(body)
+    ...buildWasteStockDto(body, { includeReason: false })
 });
 
 export const createWasteDataDto = (body = {}) => buildWasteBaseDto(body);

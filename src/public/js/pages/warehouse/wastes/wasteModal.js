@@ -1,64 +1,16 @@
-import { initWasteSelect2, setWasteReasonVisualOption, setWasteSelectOptions } from "../../plugins/select2/modules/wasteSelect.js";
-import { clearFormErrors, initForm, setFormDisabled } from "../../ui/formUI.js";
-import { openModal } from "../../ui/modalUI.js";
-import { configureStockAdjustmentForm, shouldShowStockAdjustmentFields } from "../stockAdjustmentForm.js";
-import { FORM_SELECTORS, MODAL_SELECTORS } from "../../constants/selectors.js";
+import { initWasteSelect2, setWasteSelectOptions } from "../../../plugins/select2/modules/wasteSelect.js";
+import { setReasonVisualOption } from '../../../plugins/select2/domains/reason.js';
+import { clearFormErrors, initForm, setFormDisabled } from "../../../ui/formUI.js";
+import { openModal } from "../../../ui/modalUI.js";
+import { configureStockAdjustmentForm, shouldShowStockAdjustmentFields } from "../../../modules/stockAdjustmentForm.js";
+import { FORM_SELECTORS, MODAL_SELECTORS } from "../../../constants/selectors.js";
+import { wasteDataFields, wasteStockFields } from './wasteFields.js';
 
 const wasteModalId = MODAL_SELECTORS.WASTE;
 const formId = FORM_SELECTORS.WASTE_FORM;
 const stockMode = 'edit-stock';
-const wasteDataFields = ['supplierMaterialId', 'base', 'height'];
-const wasteInitialStockFields = ['currentStock', 'reasonId', 'observations'];
-const wasteStockAdjustmentFields = ['currentStock', 'reasonId', 'observations'];
 const stockSectionSelector = '.stock-data-section';
 const initialStockReasonName = 'Stock inicial';
-
-const resetWasteFormFieldStates = (form) => {
-
-    setFormDisabled({
-        form,
-        isDisabled: false
-    });
-};
-
-const setWasteModalFieldStates = ({
-    form,
-    showStockFields,
-    isStockAdjustment
-}) => {
-
-    resetWasteFormFieldStates(form);
-
-    configureStockAdjustmentForm({
-        form,
-        dataFields: wasteDataFields,
-        stockFields: isStockAdjustment ? wasteStockAdjustmentFields : wasteInitialStockFields,
-        stockSectionSelector,
-        showStockFields,
-        isStockAdjustment,
-        setDataFieldsDisabled: false
-    });
-
-    setFormDisabled({
-        form,
-        fields: wasteDataFields,
-        isDisabled: isStockAdjustment
-    });
-
-    setFormDisabled({
-        form,
-        fields: isStockAdjustment ? wasteStockAdjustmentFields : wasteInitialStockFields,
-        isDisabled: false
-    });
-};
-
-const setWasteValues = ({ form, data = null }) => {
-
-    form.elements.base.value = data?.base || '';
-    form.elements.height.value = data?.height || '';
-    form.elements.currentStock.value = '';
-    form.elements.observations.value = '';
-};
 
 const prepareWasteModal = ({
     mode,
@@ -78,17 +30,24 @@ const prepareWasteModal = ({
     initForm({ form, mode, id: mode === 'create' ? '' : data?.id });
     initWasteSelect2({ modalSelector: wasteModalId });
     setWasteSelectOptions({ modalSelector: wasteModalId, data });
-    setWasteValues({
+    form.elements.base.value = mode === 'create' ? '' : (data?.base ?? '');
+    form.elements.height.value = mode === 'create' ? '' : (data?.height ?? '');
+    form.elements.currentStock.value = '';
+    form.elements.observations.value = '';
+
+    setFormDisabled({ form, isDisabled: false });
+    configureStockAdjustmentForm({
         form,
-        data: mode === 'create' ? null : data
-    });
-    setWasteModalFieldStates({
-        form,
+        dataFields: wasteDataFields,
+        stockFields: wasteStockFields,
+        stockSectionSelector,
         showStockFields,
-        isStockAdjustment
+        isStockAdjustment,
+        setDataFieldsDisabled: false
     });
-    setWasteReasonVisualOption({
-        modalSelector: wasteModalId,
+    setFormDisabled({ form, fields: wasteDataFields, isDisabled: isStockAdjustment });
+    setReasonVisualOption({
+        selector: `${ wasteModalId } ${ FORM_SELECTORS.REASON }`,
         name: isInitialStockCreation ? initialStockReasonName : null,
         isDisabled: isInitialStockCreation
     });

@@ -3,9 +3,9 @@ import { WasteInitialStockReasonNotFound, WasteNotFound, WasteStockAdjustmentDat
 import { getDb } from '../../repository/baseRepository.js';
 import { toNumber } from '../../utils/formattersUtils.js';
 import { calculateConvertedQuantity } from '../inventory/stockHelpers.js';
-import { createStockAdjustmentByQuantityChange } from './adjustmentService.js';
-import { findInitialStockAdjustmentReason } from './reasonService.js';
 import { findSupplierMaterialById } from './materials/supplierMaterialService.js';
+import { findInitialStockAdjustmentReason } from './reasonService.js';
+import { createWasteStockAdjustment } from './wasteStockAdjustmentService.js';
 import { createServiceLogger, getModelLogContext, logServiceError, logServiceInfo } from "../../utils/logger.js";
 import { PRISMA_ERROR_CODES } from "../../constants/prisma.js";
 
@@ -62,7 +62,6 @@ const mapWaste = (waste) => {
     return {
         id: waste.id,
         supplierMaterialId: waste.supplierMaterialId,
-        stockAdjustmentId: waste.stockAdjustmentId,
         supplierMaterial: supplierMaterial ? { ...supplierMaterial } : null,
         materialId: material?.id,
         materialName: material?.name,
@@ -209,37 +208,34 @@ export const createWasteAdjustment = async ({
 
         const waste = await getDb().$transaction(async (tx) => {
 
-            const supplierMaterial = await findSupplierMaterialById({
+            await findSupplierMaterialById({
                 tx,
                 id: wasteDto.supplierMaterialId
             });
 
             const initialStockReason = await findInitialStockAdjustmentReason({ tx });
-
             if (!initialStockReason) throw new WasteInitialStockReasonNotFound();
-
-            const stockAdjustment = await createStockAdjustmentByQuantityChange({
-                tx,
-                materialId: supplierMaterial.id,
-                supplierId: supplierMaterial.supplier?.id,
-                reasonId: initialStockReason.id,
-                observations: wasteDto.observations,
-                quantityChange: -Number(toNumber(wasteDto.currentStock) || 0),
-                userId,
-                base: wasteDto.base,
-                height: wasteDto.height,
-                returnAdjustment: true
-            });
 
             const waste = await tx.waste.create({
                 data: {
                     supplierMaterial: { connect: { id: wasteDto.supplierMaterialId } },
-                    stockAdjustment: { connect: { id: stockAdjustment.id } },
                     base: wasteDto.base,
                     height: wasteDto.height,
                     ...buildWasteStockData(wasteDto)
                 },
                 include: WASTE_INCLUDE
+            });
+
+            await createWasteStockAdjustment({
+                tx,
+                wasteId: waste.id,
+                reasonId: initialStockReason.id,
+                userId,
+                observations: wasteDto.observations,
+                previousStock: 0,
+                newStock: Number(toNumber(waste.currentStock) || 0),
+                previousConvertedQuantity: 0,
+                newConvertedQuantity: Number(toNumber(waste.convertedQuantity) || 0)
             });
 
             return mapWaste(waste);
@@ -329,7 +325,7 @@ export const updateWasteStock = async ({
         const waste = await getDb().$transaction(async (tx) => {
 
             const currentWaste = await findWasteById({ tx, id });
-            const newWasteStock = wasteStockDto.currentStock;
+            const newWasteStock = Number(toNumber(wasteStockDto.currentStock) || 0);
 
             const updatedWaste = await adjustWasteStock({
                 tx,
@@ -337,6 +333,18 @@ export const updateWasteStock = async ({
                 currentStock: newWasteStock,
                 base: currentWaste.base,
                 height: currentWaste.height
+            });
+
+            await createWasteStockAdjustment({
+                tx,
+                wasteId: id,
+                reasonId: wasteStockDto.reasonId,
+                userId,
+                observations: wasteStockDto.observations,
+                previousStock: Number(toNumber(currentWaste.currentStock) || 0),
+                newStock: Number(toNumber(updatedWaste.currentStock) || 0),
+                previousConvertedQuantity: Number(toNumber(currentWaste.convertedQuantity) || 0),
+                newConvertedQuantity: Number(toNumber(updatedWaste.convertedQuantity) || 0)
             });
 
             return mapWaste(updatedWaste);
