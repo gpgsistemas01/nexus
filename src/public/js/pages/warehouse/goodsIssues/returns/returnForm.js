@@ -1,10 +1,10 @@
-import { useForm } from '../../../application/form.js';
-import { returnGoodsIssueDetail } from '../../../application/warehouse/goodsIssues/goodsIssues.js';
-import { initMdbModal } from '../../../plugins/mdb/baseInstance.js';
-import { notifications } from '../../../plugins/swal/swalComponent.js';
-import { resetFormSubmitState } from '../../../ui/formUI.js';
-import { validateFields } from '../../../utils/formUtils.js';
-import { validateGoodsIssueReturnValidators } from '../../../utils/validations/validators.js';
+import { useForm } from '../../../../application/form.js';
+import { returnGoodsIssueDetail } from '../../../../application/warehouse/goodsIssues/goodsIssues.js';
+import { initMdbModal } from '../../../../plugins/mdb/baseInstance.js';
+import { notifications } from '../../../../plugins/swal/swalComponent.js';
+import { resetFormSubmitState } from '../../../../ui/formUI.js';
+import { validateFields } from '../../../../utils/formUtils.js';
+import { validateGoodsIssueReturnValidators } from '../../../../utils/validations/validators.js';
 
 const RETURN_MODAL_SELECTOR = '#goodsIssueReturnModal';
 const RETURN_FORM_SELECTOR = '#goodsIssueReturnForm';

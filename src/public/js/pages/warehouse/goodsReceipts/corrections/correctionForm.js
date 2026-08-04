@@ -1,11 +1,11 @@
-import { useForm } from "../../../application/form.js";
-import { correctGoodsReceiptDetail } from "../../../application/warehouse/goodsReceipts.js";
-import { initMdbModal } from "../../../plugins/mdb/baseInstance.js";
-import { reloadMainTable } from "../../../plugins/datatable/baseDatatable.js";
-import { notifications } from "../../../plugins/swal/swalComponent.js";
-import { resetFormSubmitState } from "../../../ui/formUI.js";
-import { validateFields } from "../../../utils/formUtils.js";
-import { validateGoodsReceiptCorrectionValidators } from "../../../utils/validations/validators.js";
+import { useForm } from "../../../../application/form.js";
+import { correctGoodsReceiptDetail } from "../../../../application/warehouse/goodsReceipts.js";
+import { initMdbModal } from "../../../../plugins/mdb/baseInstance.js";
+import { reloadMainTable } from "../../../../plugins/datatable/baseDatatable.js";
+import { notifications } from "../../../../plugins/swal/swalComponent.js";
+import { resetFormSubmitState } from "../../../../ui/formUI.js";
+import { validateFields } from "../../../../utils/formUtils.js";
+import { validateGoodsReceiptCorrectionValidators } from "../../../../utils/validations/validators.js";
 
 const CORRECTION_MODAL_SELECTOR = '#goodsReceiptCorrectionModal';
 const CORRECTION_FORM_SELECTOR = '#goodsReceiptCorrectionForm';

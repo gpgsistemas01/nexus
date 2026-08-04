@@ -1,4 +1,4 @@
-import { openGoodsIssueModal } from "../../pages/warehouse/goodsIssuesPage.js";
+import { openGoodsIssueModal } from "../../pages/warehouse/goodsIssues/goodsIssuesPage.js";
 import { getAllGoodsIssues } from "../../application/warehouse/goodsIssues/goodsIssues.js";
 import { exportGoodsIssueReport } from "../../application/warehouse/report.js";
 import { hasPermission } from "../../utils/permissions.js";
