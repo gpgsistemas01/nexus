@@ -11,14 +11,34 @@ export const configureStockAdjustmentForm = ({
     dataFields,
     stockFields,
     stockSectionSelector = '.stock-data-section',
-    showStockFields,
-    isStockAdjustment = false,
-    setDataFieldsDisabled = true
+    showStockFields
 }) => {
 
     toggleFormFields({ form, fields: dataFields, isVisible: true });
     toggleFormFields({ form, fields: stockFields, isVisible: showStockFields });
     form.querySelector(stockSectionSelector)?.classList.toggle('d-none', !showStockFields);
+};
 
-    if (setDataFieldsDisabled) setFormDisabled({ form, fields: dataFields, isDisabled: isStockAdjustment });
+export const setupStockAdjustmentForm = ({
+    form,
+    dataFields,
+    stockFields,
+    stockSectionSelector = '.stock-data-section',
+    showStockFields,
+    isStockAdjustment = false
+}) => {
+
+    setFormDisabled({ form, isDisabled: false });
+    configureStockAdjustmentForm({
+        form,
+        dataFields,
+        stockFields,
+        stockSectionSelector,
+        showStockFields
+    });
+
+    if (!isStockAdjustment) return;
+
+    setFormDisabled({ form, fields: dataFields, isDisabled: true });
+    setFormDisabled({ form, fields: stockFields, isDisabled: false });
 };
