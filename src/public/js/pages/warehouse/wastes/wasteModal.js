@@ -1,8 +1,8 @@
 import { initWasteSelect2, setWasteSelectOptions } from "../../../plugins/select2/modules/wasteSelect.js";
 import { setReasonVisualOption } from '../../../plugins/select2/domains/reason.js';
-import { clearFormErrors, initForm, setFormDisabled } from "../../../ui/formUI.js";
+import { clearFormErrors, initForm } from "../../../ui/formUI.js";
 import { openModal } from "../../../ui/modalUI.js";
-import { configureStockAdjustmentForm, shouldShowStockAdjustmentFields } from "../../../modules/stockAdjustmentForm.js";
+import { setupStockAdjustmentForm, shouldShowStockAdjustmentFields } from "../../../modules/stockAdjustmentForm.js";
 import { FORM_SELECTORS, MODAL_SELECTORS } from "../../../constants/selectors.js";
 import { wasteDataFields, wasteStockFields } from './wasteFields.js';
 
@@ -35,8 +35,7 @@ const prepareWasteModal = ({
     form.elements.currentStock.value = '';
     form.elements.observations.value = '';
 
-    setFormDisabled({ form, isDisabled: false });
-    configureStockAdjustmentForm({
+    setupStockAdjustmentForm({
         form,
         dataFields: wasteDataFields,
         stockFields: wasteStockFields,

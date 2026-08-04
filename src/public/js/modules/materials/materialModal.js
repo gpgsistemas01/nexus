@@ -1,8 +1,8 @@
 import { openModal } from "../../ui/modalUI.js";
 import { initMaterialFormSelect2, setMaterialFormSelectOptions } from "../../plugins/select2/modules/materialSelect.js";
 import { setReasonVisualOption } from '../../plugins/select2/domains/reason.js';
-import { configureStockAdjustmentForm } from "../stockAdjustmentForm.js";
-import { clearFormErrors, initForm, setFormFieldVisibility, setFormDisabled } from "../../ui/formUI.js";
+import { setupStockAdjustmentForm } from "../stockAdjustmentForm.js";
+import { clearFormErrors, initForm, setFormFieldVisibility } from "../../ui/formUI.js";
 import { FORM_SELECTORS, MODAL_SELECTORS } from "../../constants/selectors.js";
 
 const materialModalId = MODAL_SELECTORS.MATERIAL;
@@ -24,29 +24,20 @@ const setMaterialValues = ({ form, data = null }) => {
     if (form.elements.isActive) form.elements.isActive.checked = data?.isActive === undefined ? true : Boolean(data.isActive);
 };
 
-const resetMaterialFormFieldStates = (form) => {
-
-    setFormDisabled({
-        form,
-        isDisabled: false
-    });
-};
-
-const setMaterialModalFieldVisibility = ({
+const setupMaterialModalFields = ({
     form,
     showStockFields,
     isStockAdjustment,
     creationContext
 }) => {
 
-    configureStockAdjustmentForm({
+    setupStockAdjustmentForm({
         form,
         dataFields: materialDataFields,
         stockFields,
         stockSectionSelector,
         showStockFields,
-        isStockAdjustment,
-        setDataFieldsDisabled: false
+        isStockAdjustment
     });
 
     setFormFieldVisibility({
@@ -58,54 +49,6 @@ const setMaterialModalFieldVisibility = ({
         enableWhenVisible: true,
         labelContent: maxUnitCostLabel
     });
-};
-
-const setCreateOrEditMaterialFieldStates = ({ form }) => {
-
-    setFormDisabled({
-        form,
-        fields: materialDataFields,
-        isDisabled: false
-    });
-
-};
-
-const setStockAdjustmentFieldStates = ({ form }) => {
-
-    setFormDisabled({
-        form,
-        fields: materialDataFields,
-        isDisabled: true
-    });
-
-    setFormDisabled({
-        form,
-        fields: stockFields,
-        isDisabled: false
-    });
-};
-
-const setMaterialModalFieldStates = ({
-    form,
-    showStockFields,
-    isStockAdjustment,
-    creationContext
-}) => {
-
-    resetMaterialFormFieldStates(form);
-    setMaterialModalFieldVisibility({
-        form,
-        showStockFields,
-        isStockAdjustment,
-        creationContext
-    });
-
-    if (isStockAdjustment) {
-        setStockAdjustmentFieldStates({ form });
-        return;
-    }
-
-    setCreateOrEditMaterialFieldStates({ form });
 };
 
 const prepareMaterialModal = ({
@@ -122,7 +65,7 @@ const prepareMaterialModal = ({
     initForm({ form, mode, id: data?.id });
     clearFormErrors(form);
     form.dataset.creationContext = creationContext || '';
-    setMaterialModalFieldStates({
+    setupMaterialModalFields({
         form,
         showStockFields,
         isStockAdjustment,
