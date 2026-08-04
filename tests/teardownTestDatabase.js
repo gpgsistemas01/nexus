@@ -116,6 +116,7 @@ export default async function teardownTestDatabase() {
 
   await prisma.goodsIssueDetail.deleteMany({ where: { goodsIssueId: { in: wasteIssueGoodsIssues.map(({ id }) => id) } } });
   await prisma.goodsIssue.deleteMany({ where: { id: { in: wasteIssueGoodsIssues.map(({ id }) => id) } } });
+  await prisma.wasteStockAdjustment.deleteMany({ where: { waste: { supplierMaterial: { materialId: { in: wasteIssueMaterials.map(({ id }) => id) } } } } });
   await prisma.waste.deleteMany({ where: { supplierMaterial: { materialId: { in: wasteIssueMaterials.map(({ id }) => id) } } } });
   await prisma.movementDetail.deleteMany({ where: { stockAdjustmentDetailId: { in: wasteIssueAdjustmentDetails.map(({ id }) => id) } } });
   await prisma.inventoryMovement.deleteMany({ where: { stockAdjustmentId: { in: wasteIssueAdjustments.map(({ id }) => id) } } });

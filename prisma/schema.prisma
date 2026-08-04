@@ -25,17 +25,18 @@ model Role {
 }
 
 model User {
-  id                      String               @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  personId                String?              @db.Uuid
-  name                    String               @unique @db.VarChar(50)
-  password                String               @db.VarChar(100)
-  isActive                Boolean              @default(true)
-  person                  Person?              @relation(fields: [personId], references: [id])
+  id                      String                 @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  personId                String?                @db.Uuid
+  name                    String                 @unique @db.VarChar(50)
+  password                String                 @db.VarChar(100)
+  isActive                Boolean                @default(true)
+  person                  Person?                @relation(fields: [personId], references: [id])
   accesses                UserRoleDepartment[]
   notifications           Notification[]
-  createrStockAdjustment  StockAdjustment[]    @relation("CreatedStockAdjustments")
-  approverStockAdjustment StockAdjustment[]    @relation("ApprovedStockAdjustments")
+  createrStockAdjustment  StockAdjustment[]      @relation("CreatedStockAdjustments")
+  approverStockAdjustment StockAdjustment[]      @relation("ApprovedStockAdjustments")
   goodsIssueReturns       GoodsIssueReturn[]
+  wasteStockAdjustments   WasteStockAdjustment[]
 }
 
 model UserRoleDepartment {
@@ -162,24 +163,78 @@ model SupplierMaterial {
 }
 
 model Waste {
-  id                 String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  supplierMaterialId String           @db.Uuid
-  stockAdjustmentId  String?          @unique @db.Uuid
-  isActive           Boolean          @default(true)
-  minStock           Decimal          @default(0) @db.Decimal(10, 2)
-  base               Decimal          @db.Decimal(10, 2)
-  height             Decimal          @db.Decimal(10, 2)
-  currentStock       Decimal          @default(0) @db.Decimal(10, 2)
-  convertedQuantity  Decimal          @default(0) @db.Decimal(10, 2)
-  supplierMaterial   SupplierMaterial @relation(fields: [supplierMaterialId], references: [id])
-  stockAdjustment    StockAdjustment? @relation(fields: [stockAdjustmentId], references: [id], onDelete: SetNull)
+  id                 String                 @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  supplierMaterialId String                 @db.Uuid
+  isActive           Boolean                @default(true)
+  minStock           Decimal                @default(0) @db.Decimal(10, 2)
+  base               Decimal                @db.Decimal(10, 2)
+  height             Decimal                @db.Decimal(10, 2)
+  currentStock       Decimal                @default(0) @db.Decimal(10, 2)
+  convertedQuantity  Decimal                @default(0) @db.Decimal(10, 2)
+  supplierMaterial   SupplierMaterial       @relation(fields: [supplierMaterialId], references: [id])
+  stockAdjustments   WasteStockAdjustment[]
+  movementDetails    WasteMovementDetail[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@unique([supplierMaterialId, base, height])
   @@index([supplierMaterialId])
-  @@index([stockAdjustmentId])
+}
+
+model WasteStockAdjustment {
+  id                        String                @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  wasteId                   String                @db.Uuid
+  reasonId                  String                @db.Uuid
+  createdById               String                @db.Uuid
+  observations              String?               @db.VarChar(500)
+  previousStock             Decimal               @db.Decimal(10, 2)
+  newStock                  Decimal               @db.Decimal(10, 2)
+  difference                Decimal               @db.Decimal(10, 2)
+  previousConvertedQuantity Decimal               @db.Decimal(10, 2)
+  newConvertedQuantity      Decimal               @db.Decimal(10, 2)
+  convertedDifference       Decimal               @db.Decimal(10, 2)
+  waste                     Waste                 @relation(fields: [wasteId], references: [id])
+  reason                    StockAdjustmentReason @relation(fields: [reasonId], references: [id])
+  createdBy                 User                  @relation(fields: [createdById], references: [id])
+  movement                  WasteMovement?
+  movementDetails           WasteMovementDetail[]
+  createdAt                 DateTime              @default(now())
+
+  @@index([wasteId])
+  @@index([reasonId])
+  @@index([createdById])
+}
+
+model WasteMovement {
+  id                     String                @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  referenceNumber        String?               @unique @db.VarChar(50)
+  type                   InventoryMovementType
+  wasteStockAdjustmentId String                @unique @db.Uuid
+  wasteStockAdjustment   WasteStockAdjustment  @relation(fields: [wasteStockAdjustmentId], references: [id], onDelete: Cascade)
+  details                WasteMovementDetail[]
+  date                   DateTime              @default(now())
+  createdAt              DateTime              @default(now())
+  updatedAt              DateTime              @updatedAt
+}
+
+model WasteMovementDetail {
+  id                     String                @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  quantity               Decimal               @db.Decimal(10, 2)
+  newStock               Decimal?              @db.Decimal(10, 2)
+  previousStock          Decimal?              @db.Decimal(10, 2)
+  wasteId                String                @db.Uuid
+  wasteStockAdjustmentId String?               @db.Uuid
+  movementId             String                @db.Uuid
+  waste                  Waste                 @relation(fields: [wasteId], references: [id])
+  wasteStockAdjustment   WasteStockAdjustment? @relation(fields: [wasteStockAdjustmentId], references: [id])
+  movement               WasteMovement         @relation(fields: [movementId], references: [id], onDelete: Cascade)
+  createdAt              DateTime              @default(now())
+  updatedAt              DateTime              @updatedAt
+
+  @@index([wasteId])
+  @@index([wasteStockAdjustmentId])
+  @@index([movementId])
 }
 
 model Notification {
@@ -517,7 +572,6 @@ model StockAdjustment {
   movement InventoryMovement?
 
   details StockAdjustmentDetail[]
-  waste   Waste?
 
   appliedAt DateTime?
 
@@ -632,6 +686,7 @@ model StockAdjustmentReason {
 
   stockAdjustments          StockAdjustment[]
   goodsReceiptDetailChanges GoodsReceiptDetailChange[]
+  wasteStockAdjustments     WasteStockAdjustment[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

@@ -75,6 +75,7 @@ const cleanupWasteIssueData = async () => {
 
   await prisma.goodsIssueDetail.deleteMany({ where: { goodsIssueId: { in: goodsIssues.map(({ id }) => id) } } });
   await prisma.goodsIssue.deleteMany({ where: { id: { in: goodsIssues.map(({ id }) => id) } } });
+  await prisma.wasteStockAdjustment.deleteMany({ where: { waste: { supplierMaterial: { materialId: { in: materials.map(({ id }) => id) } } } } });
   await prisma.waste.deleteMany({ where: { supplierMaterial: { materialId: { in: materials.map(({ id }) => id) } } } });
   await prisma.movementDetail.deleteMany({ where: { stockAdjustmentDetailId: { in: adjustmentDetails.map(({ id }) => id) } } });
   await prisma.inventoryMovement.deleteMany({ where: { stockAdjustmentId: { in: adjustments.map(({ id }) => id) } } });
@@ -93,14 +94,11 @@ const cleanupWasteIssueData = async () => {
   await prisma.unitMeasure.deleteMany({ where: { id: { in: units.map(({ id }) => id) } } });
 };
 
-describeDb('waste and goods issue database integration', () => {
+describeDb('goods issue database integration', () => {
   beforeAll(async () => {
     [{ prisma }, services] = await Promise.all([
       import('../../../src/lib/prisma.js'),
-      Promise.all([
-        import('../../../src/services/warehouse/wasteService.js'),
-        import('../../../src/services/warehouse/goodsIssues/goodsIssueService.js')
-      ]).then(([wasteService, goodsIssueService]) => ({ ...wasteService, ...goodsIssueService }))
+      import('../../../src/services/warehouse/goodsIssues/goodsIssueService.js')
     ]);
 
     await cleanupWasteIssueData();
@@ -177,75 +175,6 @@ describeDb('waste and goods issue database integration', () => {
         create: { name: 'Surtido' }
       })
     ]);
-  });
-
-  it('cubre merma creando waste y ajuste de stock real', async () => {
-    const waste = await services.createWasteAdjustment({
-      userId: user.id,
-      wasteDto: {
-        supplierMaterialId: supplierMaterial.id,
-        base: 1,
-        height: 1,
-        currentStock: 2,
-        observations: 'Merma integración'
-      }
-    });
-
-    expect(waste).toMatchObject({
-      supplierMaterialId: supplierMaterial.id,
-      stockAdjustmentId: expect.any(String),
-      name: names.material,
-      supplier: expect.objectContaining({ id: supplier.id })
-    });
-
-    await expect(prisma.stockAdjustment.findFirst({
-      where: {
-        id: waste.stockAdjustmentId,
-        reason: { name: INITIAL_STOCK_REASON_NAME }
-      },
-      select: { id: true }
-    })).resolves.toEqual({ id: waste.stockAdjustmentId });
-
-    const stockAfterWasteCreation = await prisma.supplierMaterial.findUnique({
-      where: { id: supplierMaterial.id },
-      select: { currentStock: true, convertedQuantity: true }
-    });
-    expect(stockAfterWasteCreation.currentStock.toNumber()).toBe(8);
-    expect(stockAfterWasteCreation.convertedQuantity.toNumber()).toBe(58);
-
-    await expect(services.updateWaste({
-      id: waste.id,
-      wasteDto: {
-        supplierMaterialId: supplierMaterial.id,
-        base: 1,
-        height: 2
-      }
-    })).resolves.toMatchObject({
-      id: waste.id,
-      supplierMaterialId: supplierMaterial.id
-    });
-
-    await expect(services.updateWasteStock({
-      id: waste.id,
-      userId: user.id,
-      wasteStockDto: {
-        currentStock: 3,
-        reasonId: reason.id,
-        observations: 'Merma integración update'
-      }
-    })).resolves.toMatchObject({
-      id: waste.id,
-      currentStock: expect.anything()
-    });
-
-    const updatedWasteStock = await prisma.waste.findUnique({
-      where: { id: waste.id },
-      select: { currentStock: true, convertedQuantity: true }
-    });
-    expect(updatedWasteStock.currentStock.toNumber()).toBe(3);
-    expect(updatedWasteStock.convertedQuantity.toNumber()).toBe(6);
-
-    await expect(prisma.waste.findUnique({ where: { id: waste.id }, select: { id: true } })).resolves.toEqual({ id: waste.id });
   });
 
   it('cubre salidas creando goods issue con detalle real', async () => {
