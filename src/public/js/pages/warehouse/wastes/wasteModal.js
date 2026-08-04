@@ -1,15 +1,13 @@
 import { initWasteSelect2, setWasteSelectOptions } from "../../../plugins/select2/modules/wasteSelect.js";
 import { setReasonVisualOption } from '../../../plugins/select2/domains/reason.js';
-import { clearFormErrors, initForm } from "../../../ui/formUI.js";
+import { clearFormErrors, initForm, setFormDisabled } from "../../../ui/formUI.js";
 import { openModal } from "../../../ui/modalUI.js";
-import { setupStockAdjustmentForm, shouldShowStockAdjustmentFields } from "../../../modules/stockAdjustmentForm.js";
 import { FORM_SELECTORS, MODAL_SELECTORS } from "../../../constants/selectors.js";
 import { wasteDataFields, wasteStockFields } from './wasteFields.js';
 
 const wasteModalId = MODAL_SELECTORS.WASTE;
 const formId = FORM_SELECTORS.WASTE_FORM;
 const stockMode = 'edit-stock';
-const stockSectionSelector = '.stock-data-section';
 const initialStockReasonName = 'Stock inicial';
 
 const prepareWasteModal = ({
@@ -20,12 +18,8 @@ const prepareWasteModal = ({
 
     const form = document.querySelector(formId);
     const modalElement = document.querySelector(wasteModalId);
-    const showStockFields = shouldShowStockAdjustmentFields({
-        mode,
-        includeStockAdjustmentOnCreate: true,
-        isStockAdjustment
-    });
-    const isInitialStockCreation = showStockFields && mode === 'create' && !isStockAdjustment;
+    const enableStockFields = isStockAdjustment || mode === 'create';
+    const isInitialStockCreation = mode === 'create' && !isStockAdjustment;
 
     initForm({ form, mode, id: mode === 'create' ? '' : data?.id });
     initWasteSelect2({ modalSelector: wasteModalId });
@@ -35,14 +29,9 @@ const prepareWasteModal = ({
     form.elements.currentStock.value = '';
     form.elements.observations.value = '';
 
-    setupStockAdjustmentForm({
-        form,
-        dataFields: wasteDataFields,
-        stockFields: wasteStockFields,
-        stockSectionSelector,
-        showStockFields,
-        isStockAdjustment
-    });
+    setFormDisabled({ form, isDisabled: false });
+    setFormDisabled({ form, fields: wasteDataFields, isDisabled: isStockAdjustment });
+    setFormDisabled({ form, fields: wasteStockFields, isDisabled: !enableStockFields });
     setReasonVisualOption({
         selector: `${ wasteModalId } ${ FORM_SELECTORS.REASON }`,
         name: isInitialStockCreation ? initialStockReasonName : null,

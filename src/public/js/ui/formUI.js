@@ -296,22 +296,6 @@ export const setFormFieldVisibility = ({
     if (label && labelContent !== null) label.textContent = labelContent;
 };
 
-export const toggleFormFields = ({
-    form,
-    fields,
-    isVisible
-}) => {
-
-    fields.forEach((fieldName) => {
-
-        setFormFieldVisibility({
-            form,
-            fieldName,
-            isVisible
-        });
-    });
-};
-
 export const setFormDisabled = ({
     form,
     fields = 'all',
