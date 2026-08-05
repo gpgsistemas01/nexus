@@ -5,7 +5,6 @@ const canSeeAll = user?.scope?.canReadAll || false;
 
 const shouldShowIcons = typeof showIcons !== 'undefined' ? showIcons : true;
 const shouldShowLabels = typeof showLabels !== 'undefined' ? showLabels : true;
-const tooltipAttrs = (label) => shouldShowLabels ? '' : `data-mdb-tooltip-init data-mdb-placement="right" title="${ label }" aria-label="${ label }"`;
 
 const createNavLink = ({ content, icon, href, permission }) => ({
     content,
@@ -65,11 +64,9 @@ const items = [
     ...item,
     submenuId: `appNavSubmenu${ index }`,
     class: `nav-link ${ shouldShowIcons ? 'app-nav-link--icon' : '' } ${ !shouldShowLabels ? 'app-nav-link--icon-only' : '' } ${ item.isActive ? 'active' : ''}`,
-    tooltipAttrs: tooltipAttrs(item.content),
     children: (item.children || []).map(child => ({
         ...child,
-        class: `nav-link app-nav-link--child ${ shouldShowIcons ? 'app-nav-link--icon' : '' } ${ !shouldShowLabels ? 'app-nav-link--icon-only' : '' } ${ child.isActive ? 'active' : ''}`,
-        tooltipAttrs: tooltipAttrs(child.content)
+        class: `nav-link app-nav-link--child ${ shouldShowIcons ? 'app-nav-link--icon' : '' } ${ !shouldShowLabels ? 'app-nav-link--icon-only' : '' } ${ child.isActive ? 'active' : ''}`
     }))
 })); %>
 
@@ -85,7 +82,12 @@ const items = [
                     aria-expanded="<%= item.isActive ? 'true' : 'false' %>"
                     aria-controls="<%= item.submenuId %>"
                     <%= item.isActive ? 'aria-current="true"' : '' %>
-                    <%- item.tooltipAttrs %>
+                    <% if (!shouldShowLabels) { %>
+                        data-mdb-tooltip-init
+                        data-mdb-placement="right"
+                        title="<%= item.content %>"
+                        aria-label="<%= item.content %>"
+                    <% } %>
                 >
                     <% if (shouldShowIcons && item.icon) { %>
                         <span class="app-nav-link__icon" aria-hidden="true">
@@ -105,7 +107,12 @@ const items = [
                         <li class="nav-item py-1">
                             <a class="<%= child.class %>" href="<%= child.href %>"
                                 <%= child.isActive ? 'aria-current="page"' : '' %>
-                                <%- child.tooltipAttrs %>
+                                <% if (!shouldShowLabels) { %>
+                                    data-mdb-tooltip-init
+                                    data-mdb-placement="right"
+                                    title="<%= child.content %>"
+                                    aria-label="<%= child.content %>"
+                                <% } %>
                             >
                                 <% if (shouldShowIcons && child.icon) { %>
                                     <span class="app-nav-link__icon" aria-hidden="true">
@@ -122,7 +129,12 @@ const items = [
             <% } else { %>
                 <a class="<%= item.class %>" href="<%= item.href %>"
                     <%= item.isActive ? 'aria-current="page"' : '' %>
-                    <%- item.tooltipAttrs %>
+                    <% if (!shouldShowLabels) { %>
+                        data-mdb-tooltip-init
+                        data-mdb-placement="right"
+                        title="<%= item.content %>"
+                        aria-label="<%= item.content %>"
+                    <% } %>
                 >
                     <% if (shouldShowIcons && item.icon) { %>
                         <span class="app-nav-link__icon" aria-hidden="true">
