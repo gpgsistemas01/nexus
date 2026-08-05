@@ -2323,6 +2323,16 @@ body {
   white-space: nowrap;
 }
 
+.app-logout-form {
+  align-items: center;
+  display: inline-flex;
+  justify-content: center;
+}
+
+.app-logout-form--header {
+  align-self: stretch;
+}
+
 .app-logout-btn {
   align-items: center;
   background: rgba(var(--mdb-primary-rgb), 0.04);
@@ -2330,6 +2340,7 @@ body {
   border-radius: 999rem;
   color: var(--mdb-primary-active) !important;
   display: inline-flex;
+  line-height: 1;
   font-weight: 800;
   gap: 0.45rem;
   justify-content: center;
@@ -2351,6 +2362,11 @@ body {
   display: inline-flex;
   font-size: 0.95rem;
   justify-content: center;
+  line-height: 1;
+}
+
+.app-logout-btn__label {
+  line-height: 1;
 }
 
 .app-logout-btn--mobile {
