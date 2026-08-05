@@ -3,7 +3,7 @@ import { findAllSupplierMaterials } from "./materials/supplierMaterialService.js
 import { findAllGoodsIssues } from "./goodsIssues/goodsIssueService.js";
 import { findAllGoodsReceipts } from "./goodsReceipts/goodsReceiptService.js";
 import { findAllSuppliers } from "./supplierService.js";
-import { findAllWastes } from "./wasteService.js";
+import { findAllWastes } from "./wastes/wasteService.js";
 import { GOODS_RECEIPT_STATUS_NAMES } from "../../constants/warehouseStatuses.js";
 
 const mapMaterialRows = (materials = []) => materials.map((item) => ({

@@ -1,5 +1,5 @@
 import { successCodeMessages } from '../../../messages/codeMessages.js';
-import { createWasteAdjustment, deleteWaste, findAllWastes as findAllWasteItems, updateWaste, updateWasteStock } from '../../../services/warehouse/wasteService.js';
+import { createWasteAdjustment, deleteWaste, findAllWastes as findAllWasteItems, updateWaste, updateWasteStock } from '../../../services/warehouse/wastes/wasteService.js';
 import { createWasteDataDto, createWasteDto, createWasteStockDto } from '../../../dtos/wasteDTO.js';
 import { sanitizeEmptyStrings } from '../../../utils/formattersUtils.js';
 import { getDataTableOrder, getDataTablePaging, getDataTableSearch } from '../../../utils/requestQueryUtils.js';

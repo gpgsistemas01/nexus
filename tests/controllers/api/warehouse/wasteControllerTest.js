@@ -6,7 +6,7 @@ const updateWaste = vi.fn();
 const updateWasteStock = vi.fn();
 const deleteWaste = vi.fn();
 
-vi.mock('../../../../src/services/warehouse/wasteService.js', () => ({
+vi.mock('../../../../src/services/warehouse/wastes/wasteService.js', () => ({
   createWasteAdjustment,
   findAllWastes,
   updateWaste,

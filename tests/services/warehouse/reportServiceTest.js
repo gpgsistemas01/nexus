@@ -22,7 +22,7 @@ vi.mock('../../../src/services/warehouse/supplierService.js', () => ({
   findAllSuppliers
 }));
 
-vi.mock('../../../src/services/warehouse/wasteService.js', () => ({
+vi.mock('../../../src/services/warehouse/wastes/wasteService.js', () => ({
   findAllWastes
 }));
 

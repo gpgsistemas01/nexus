@@ -90,8 +90,7 @@ FOREIGN KEY ("movementId") REFERENCES "WasteMovement"("id") ON DELETE CASCADE ON
 
 INSERT INTO "WasteMovement" ("id", "type", "wasteStockAdjustmentId", "date", "createdAt", "updatedAt")
 SELECT gen_random_uuid(), 'ADJUSTMENT'::"InventoryMovementType", wsa."id", wsa."createdAt", wsa."createdAt", wsa."createdAt"
-FROM "WasteStockAdjustment" wsa
-WHERE wsa."difference" <> 0;
+FROM "WasteStockAdjustment" wsa;
 
 INSERT INTO "WasteMovementDetail" (
     "quantity", "previousStock", "newStock", "wasteId", "wasteStockAdjustmentId", "movementId", "createdAt", "updatedAt"
