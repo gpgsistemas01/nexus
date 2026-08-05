@@ -15,7 +15,7 @@
 
     <%- include('./sidebar/offcanvas') %>
 
-    <aside class="app-sidebar d-none d-md-block p-3" data-mdb-theme="dark">
+    <aside class="app-sidebar app-sidebar--icon-only d-none d-md-block p-3" data-mdb-theme="dark">
         <nav class="navbar navbar-expand-lg p-0">
             <div class="container-fluid flex-column align-items-stretch gap-4">
                 <%- include('./ui/appBrand') %>
@@ -23,6 +23,7 @@
                 <div role="navigation">
                     <%- include('./ui/navList', { 
                         listClass: 'navbar-nav flex-column',
+                        showLabels: false
                     }) %>
                 </div>
             </div>
