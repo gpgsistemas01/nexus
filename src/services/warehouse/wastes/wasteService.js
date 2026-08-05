@@ -1,13 +1,13 @@
-import { isAppError } from '../../errors/AppError.js';
-import { WasteDeleteDatabaseError, WasteInitialStockReasonNotFound, WasteNotFound, WasteStockAdjustmentDatabaseError, WasteUpdateDatabaseError } from '../../errors/warehouse/wasteError.js';
-import { getDb } from '../../repository/baseRepository.js';
-import { toNumber } from '../../utils/formattersUtils.js';
-import { calculateConvertedQuantity } from '../inventory/stockHelpers.js';
-import { findSupplierMaterialById } from './materials/supplierMaterialService.js';
-import { findInitialStockAdjustmentReason } from './reasonService.js';
-import { createWasteStockAdjustment } from './wasteStockAdjustmentService.js';
-import { createServiceLogger, getModelLogContext, logServiceError, logServiceInfo } from "../../utils/logger.js";
-import { PRISMA_ERROR_CODES } from "../../constants/prisma.js";
+import { isAppError } from '../../../errors/AppError.js';
+import { WasteDeleteDatabaseError, WasteInitialStockReasonNotFound, WasteNotFound, WasteStockAdjustmentDatabaseError, WasteUpdateDatabaseError } from '../../../errors/warehouse/wasteError.js';
+import { getDb } from '../../../repository/baseRepository.js';
+import { toNumber } from '../../../utils/formattersUtils.js';
+import { calculateConvertedQuantity } from '../../inventory/stockHelpers.js';
+import { findSupplierMaterialById } from '../materials/supplierMaterialService.js';
+import { findInitialStockAdjustmentReason } from '../reasonService.js';
+import { applyWasteStockAdjustment } from './wasteStockAdjustmentService.js';
+import { createServiceLogger, getModelLogContext, logServiceError, logServiceInfo } from "../../../utils/logger.js";
+import { PRISMA_ERROR_CODES } from "../../../constants/prisma.js";
 
 const serviceLogger = createServiceLogger('warehouse.wasteService');
 
@@ -108,26 +108,7 @@ const buildWasteStockData = ({
     })
 });
 
-const adjustWasteStock = async ({
-    tx,
-    id,
-    currentStock,
-    base,
-    height
-}) => {
 
-    const db = getDb(tx);
-
-    return db.waste.update({
-        where: { id },
-        data: buildWasteStockData({
-            currentStock,
-            base,
-            height
-        }),
-        include: WASTE_INCLUDE
-    });
-};
 
 export const findAllWastes = async ({
     skip = 0,
@@ -224,16 +205,16 @@ export const createWasteAdjustment = async ({
                 include: WASTE_INCLUDE
             });
 
-            await createWasteStockAdjustment({
+            await applyWasteStockAdjustment({
                 tx,
-                wasteId: waste.id,
+                waste,
                 reasonId: initialStockReason.id,
                 userId,
                 observations: wasteDto.observations,
-                previousStock: 0,
                 newStock: Number(toNumber(waste.currentStock) || 0),
+                previousStock: 0,
                 previousConvertedQuantity: 0,
-                newConvertedQuantity: Number(toNumber(waste.convertedQuantity) || 0)
+                updateStock: false
             });
 
             return mapWaste(waste);
@@ -321,18 +302,29 @@ export const deleteWaste = async (id) => {
 
             await findWasteById({ tx, id });
 
-            const stockAdjustments = await tx.wasteStockAdjustment.findMany({
+            const stockAdjustmentDetails = await tx.wasteStockAdjustmentDetail.findMany({
                 where: { wasteId: id },
-                select: { id: true }
+                select: { wasteStockAdjustmentId: true }
             });
-            const stockAdjustmentIds = stockAdjustments.map(({ id }) => id);
+            const stockAdjustmentIds = stockAdjustmentDetails.map(({ wasteStockAdjustmentId }) => wasteStockAdjustmentId);
 
             await tx.wasteMovementDetail.deleteMany({ where: { wasteId: id } });
 
             if (stockAdjustmentIds.length) {
-                await tx.wasteMovement.deleteMany({
-                    where: { wasteStockAdjustmentId: { in: stockAdjustmentIds } }
+                const stockAdjustments = await tx.wasteStockAdjustment.findMany({
+                    where: { id: { in: stockAdjustmentIds } },
+                    select: { wasteMovementId: true }
                 });
+                const wasteMovementIds = stockAdjustments
+                    .map(({ wasteMovementId }) => wasteMovementId)
+                    .filter(Boolean);
+
+                if (wasteMovementIds.length) {
+                    await tx.wasteMovement.deleteMany({
+                        where: { id: { in: wasteMovementIds } }
+                    });
+                }
+
                 await tx.wasteStockAdjustment.deleteMany({
                     where: { id: { in: stockAdjustmentIds } }
                 });
@@ -375,26 +367,15 @@ export const updateWasteStock = async ({
         const waste = await getDb().$transaction(async (tx) => {
 
             const currentWaste = await findWasteById({ tx, id });
-            const newWasteStock = Number(toNumber(wasteStockDto.currentStock) || 0);
 
-            const updatedWaste = await adjustWasteStock({
+            const updatedWaste = await applyWasteStockAdjustment({
                 tx,
-                id,
-                currentStock: newWasteStock,
-                base: currentWaste.base,
-                height: currentWaste.height
-            });
-
-            await createWasteStockAdjustment({
-                tx,
-                wasteId: id,
+                waste: currentWaste,
                 reasonId: wasteStockDto.reasonId,
                 userId,
                 observations: wasteStockDto.observations,
-                previousStock: Number(toNumber(currentWaste.currentStock) || 0),
-                newStock: Number(toNumber(updatedWaste.currentStock) || 0),
-                previousConvertedQuantity: Number(toNumber(currentWaste.convertedQuantity) || 0),
-                newConvertedQuantity: Number(toNumber(updatedWaste.convertedQuantity) || 0)
+                newStock: wasteStockDto.currentStock,
+                include: WASTE_INCLUDE
             });
 
             return mapWaste(updatedWaste);
