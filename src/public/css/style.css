@@ -1925,21 +1925,17 @@ body section {
 
 .app-mobile-menu__footer {
   inline-size: 100%;
-  margin-top: 0.25rem;
-  padding-top: 0;
+  margin-top: auto;
+  padding-top: 1rem;
 }
 
-.app-mobile-menu__footer form {
+.app-mobile-menu__logout-form {
   display: block;
   inline-size: 100%;
 }
 
 .app-mobile-menu__footer .app-logout-btn {
-  display: flex;
-  justify-content: flex-start;
   min-inline-size: 0;
-  padding: var(--mdb-nav-link-padding-y) var(--mdb-nav-link-padding-x);
-  text-align: left;
   white-space: normal;
 }
 
@@ -2324,7 +2320,49 @@ body {
 }
 
 .app-logout-btn {
+  align-items: center;
+  background: linear-gradient(135deg, #fff5f5 0%, #ffe3e3 100%);
+  border: 1px solid rgba(201, 42, 42, 0.28);
+  border-radius: 999rem;
+  color: #a61e4d !important;
+  display: inline-flex;
+  font-weight: 800;
+  gap: 0.45rem;
+  justify-content: center;
   margin-left: 0 !important;
+  min-block-size: 2.35rem;
+  padding-inline: 0.9rem;
+  transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, color 0.2s ease, transform 0.2s ease;
+}
+
+.app-logout-btn:hover,
+.app-logout-btn:focus {
+  background: linear-gradient(135deg, #ffe3e3 0%, #ffc9c9 100%);
+  border-color: rgba(201, 42, 42, 0.45);
+  color: #862e9c !important;
+}
+
+.app-logout-btn__icon {
+  align-items: center;
+  display: inline-flex;
+  font-size: 0.95rem;
+  justify-content: center;
+}
+
+.app-logout-btn--mobile {
+  background: linear-gradient(135deg, #ff6b6b 0%, #c92a2a 100%);
+  border: 0;
+  box-shadow: 0 0.75rem 1.5rem rgba(201, 42, 42, 0.28);
+  color: #fff !important;
+  inline-size: 100%;
+  justify-content: center;
+  min-block-size: 3rem;
+}
+
+.app-logout-btn--mobile:hover,
+.app-logout-btn--mobile:focus {
+  background: linear-gradient(135deg, #fa5252 0%, #a61e1e 100%);
+  color: #fff !important;
 }
 
 .app-notifications-toggle {
