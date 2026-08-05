@@ -5,83 +5,43 @@ const canSeeAll = user?.scope?.canReadAll || false;
 
 const shouldShowIcons = typeof showIcons !== 'undefined' ? showIcons : true;
 
+const createNavLink = ({ content, icon, href, permission }) => ({
+    content,
+    icon,
+    href,
+    isActive: currentRoute === href,
+    isVisible: permissions.includes(permission)
+});
+
+const createNavGroup = ({ content, icon, children }) => ({
+    content,
+    icon,
+    children
+});
+
 const items = [
-    {
+    createNavGroup({
         content: 'Almacén',
         icon: 'fa-solid fa-boxes-stacked',
-        href: '/materiales',
-        isActive: currentRoute === '/materiales',
-        isVisible: permissions.includes('materials:read')
-    },
-    {
-        content: 'Mermas',
-        icon: 'fa-solid fa-recycle',
-        href: '/mermas',
-        isActive: currentRoute === '/mermas',
-        isVisible: permissions.includes('wastes:page-view')
-    },
-    {
-        content: 'Compras',
-        icon: 'fa-solid fa-cart-shopping',
-        href: '/compras',
-        isActive: currentRoute === '/compras',
-        isVisible: permissions.includes('goods:receipts-page-view')
-    },
-    {
+        children: [
+            createNavLink({ content: 'Materiales', icon: 'fa-solid fa-boxes-stacked', href: '/materiales', permission: 'materials:read' }),
+            createNavLink({ content: 'Mermas', icon: 'fa-solid fa-recycle', href: '/mermas', permission: 'wastes:page-view' })
+        ]
+    }),
+    createNavLink({ content: 'Compras', icon: 'fa-solid fa-cart-shopping', href: '/compras', permission: 'goods:receipts-page-view' }),
+    createNavGroup({
         content: 'Salidas',
         icon: 'fa-solid fa-arrow-up-from-bracket',
         children: [
-            {
-                content: 'Salidas de almacén',
-                icon: 'fa-solid fa-truck-ramp-box',
-                href: '/salidas-almacen',
-                isActive: currentRoute === '/salidas-almacen',
-                isVisible: permissions.includes('goods:issues-page-view')
-            },
-            {
-                content: 'Salidas de merma',
-                icon: 'fa-solid fa-recycle',
-                href: '/salidas-merma',
-                isActive: currentRoute === '/salidas-merma',
-                isVisible: permissions.includes('wastes:page-view')
-            }
+            createNavLink({ content: 'Salidas de almacén', icon: 'fa-solid fa-truck-ramp-box', href: '/salidas-almacen', permission: 'goods:issues-page-view' }),
+            createNavLink({ content: 'Salidas de merma', icon: 'fa-solid fa-recycle', href: '/salidas-merma', permission: 'wastes:page-view' })
         ]
-    },
-    {
-        content: 'Movimientos',
-        icon: 'fa-solid fa-arrow-right-arrow-left',
-        href: '/movimientos',
-        isActive: currentRoute === '/movimientos',
-        isVisible: permissions.includes('movements:read')
-    },
-    {
-        content: 'Usuarios',
-        icon: 'fa-solid fa-users-gear',
-        href: '/usuarios-sistemas',
-        isActive: currentRoute === '/usuarios-sistemas',
-        isVisible: permissions.includes('users:manage')
-    },
-    {
-        content: 'Personas',
-        icon: 'fa-solid fa-id-badge',
-        href: '/personas',
-        isActive: currentRoute === '/personas',
-        isVisible: permissions.includes('persons:page-view')
-    },
-    {
-        content: 'Clientes',
-        icon: 'fa-solid fa-handshake',
-        href: '/clientes',
-        isActive: currentRoute === '/clientes',
-        isVisible: permissions.includes('clients:page-view')
-    },
-    {
-        content: 'Proveedores',
-        icon: 'fa-solid fa-warehouse',
-        href: '/proveedores',
-        isActive: currentRoute === '/proveedores',
-        isVisible: permissions.includes('suppliers:page-view')
-    }
+    }),
+    createNavLink({ content: 'Movimientos', icon: 'fa-solid fa-arrow-right-arrow-left', href: '/movimientos', permission: 'movements:read' }),
+    createNavLink({ content: 'Usuarios', icon: 'fa-solid fa-users-gear', href: '/usuarios-sistemas', permission: 'users:manage' }),
+    createNavLink({ content: 'Personas', icon: 'fa-solid fa-id-badge', href: '/personas', permission: 'persons:page-view' }),
+    createNavLink({ content: 'Clientes', icon: 'fa-solid fa-handshake', href: '/clientes', permission: 'clients:page-view' }),
+    createNavLink({ content: 'Proveedores', icon: 'fa-solid fa-warehouse', href: '/proveedores', permission: 'suppliers:page-view' })
 ].map(item => {
     const visibleChildren = (item.children || []).filter(child => {
         if (canSeeAll) return true;
