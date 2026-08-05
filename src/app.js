@@ -57,6 +57,7 @@ import { errorMap } from './messages/codeMessages.js';
 import { initSocket } from './utils/socketUtils.js';
 import { isAppError } from './errors/AppError.js';
 import { appConfig } from './config/appConfig.js';
+import { getAuthTokenInfo } from './middleware/authMiddleware.js';
 
 const app = express();
 const server = http.createServer(app);
@@ -118,7 +119,9 @@ app.use('/clientes', clientWebRoutes);
 app.use('/proveedores', supplierWebRoutes);
 app.use('/movimientos', movementWebRoutes);
 app.get('/error/404', (req, res) => {
-    res.status(404).render('pages/error/404');
+    const homeHref = getAuthTokenInfo(req, res) ? '/materiales' : '/inicio-sesion';
+
+    return res.status(404).render('pages/error/404', { homeHref });
 });
 
 // api routes
@@ -150,7 +153,9 @@ app.use((req, res, next) => {
         return res.status(404).json({ message: 'Ruta no encontrada.' });
     }
 
-    return res.status(404).render('pages/error/404');
+    const homeHref = getAuthTokenInfo(req, res) ? '/materiales' : '/inicio-sesion';
+
+    return res.status(404).render('pages/error/404', { homeHref });
 });
 
 app.use((err, req, res, next) => {

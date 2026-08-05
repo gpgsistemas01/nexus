@@ -1,11 +1,12 @@
 import express from 'express';
+import { getAuthTokenInfo } from '../../middleware/authMiddleware.js';
 
 const router = express.Router();
 
 router.get(
     '/',
     (req, res) => {
-        if (req.user) return res.redirect('/materiales');
+        if (req.user || getAuthTokenInfo(req, res)) return res.redirect('/materiales');
 
         return res.redirect('/inicio-sesion');
     }
