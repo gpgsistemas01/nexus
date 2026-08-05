@@ -1884,6 +1884,7 @@ body section {
 }
 
 .app-mobile-menu__nav {
+  flex: 0 0 auto;
   min-block-size: 0;
 }
 
@@ -1925,8 +1926,10 @@ body section {
 }
 
 .app-mobile-menu__footer {
+  flex: 0 0 auto;
   inline-size: 100%;
-  margin-top: auto;
+  margin-top: 1rem;
+  padding-bottom: max(0.25rem, env(safe-area-inset-bottom));
   padding-top: 1rem;
 }
 
