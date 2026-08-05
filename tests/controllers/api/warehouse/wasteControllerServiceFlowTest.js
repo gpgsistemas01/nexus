@@ -154,7 +154,7 @@ describe('wasteController service flow', () => {
     expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ code: 'CREATED_WASTE' }));
   });
 
-  it('edita datos generales desde controller sin escribir campos de stock', async () => {
+  it('edita datos generales sin cambiar existencias y recalcula el stock convertido', async () => {
     const req = {
       params: { id: 'waste-1' },
       body: {
@@ -173,12 +173,35 @@ describe('wasteController service flow', () => {
       data: {
         supplierMaterial: { connect: { id: 'supplier-material-2' } },
         base: 4,
-        height: 5
+        height: 5,
+        convertedQuantity: 100
       }
     }));
     expect(wasteUpdate.mock.calls[0][0].data).not.toHaveProperty('currentStock');
-    expect(wasteUpdate.mock.calls[0][0].data).not.toHaveProperty('convertedQuantity');
     expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ code: 'UPDATED_WASTE' }));
+  });
+
+  it('usa las existencias como conversión al retirar las dimensiones de la merma', async () => {
+    const req = {
+      params: { id: 'waste-1' },
+      body: {
+        supplierMaterialId: 'supplier-material-1',
+        base: '',
+        height: ''
+      }
+    };
+    const res = createResponse();
+
+    await editWaste(req, res);
+
+    expect(wasteUpdate).toHaveBeenCalledWith(expect.objectContaining({
+      data: expect.objectContaining({
+        base: null,
+        height: null,
+        convertedQuantity: 5
+      })
+    }));
+    expect(wasteUpdate.mock.calls[0][0].data).not.toHaveProperty('currentStock');
   });
 
   it('ajusta stock desde controller calculando el convertido como ajuste de material', async () => {
