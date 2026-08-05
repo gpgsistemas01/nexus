@@ -70,15 +70,17 @@
 
   --mdb-accent: #FCA311;
   --mdb-accent-rgb: 252, 163, 17;
-  --app-submenu-link-color: #d8ecff;
+  --app-submenu-link-color: #fff4de;
   --app-submenu-link-hover-color: #ffffff;
-  --app-submenu-link-hover-bg: rgba(37, 99, 235, 0.28);
+  --app-submenu-link-hover-bg: rgba(var(--mdb-accent-rgb), 0.16);
   --app-submenu-link-active-color: #ffffff;
-  --app-submenu-link-active-bg: #1d4ed8;
-  --app-submenu-accent: #60a5fa;
-  --app-submenu-accent-rgb: 96, 165, 250;
-  --app-submenu-icon-bg: rgba(37, 99, 235, 0.3);
-  --app-submenu-icon-active-bg: #2563eb;
+  --app-submenu-link-active-bg: rgba(var(--mdb-accent-rgb), 0.24);
+  --app-submenu-accent: var(--mdb-accent);
+  --app-submenu-accent-rgb: var(--mdb-accent-rgb);
+  --app-submenu-icon-bg: rgba(255, 255, 255, 0.96);
+  --app-submenu-icon-color: #c2410c;
+  --app-submenu-icon-active-bg: rgba(255, 255, 255, 0.96);
+  --app-submenu-icon-active-color: var(--mdb-accent);
   /* A restrained navy/neutral palette distinguishes filters from the green
      record actions and amber warnings while maintaining WCAG AA contrast. */
   --table-filter-apply: #1f4e79;
@@ -1234,14 +1236,26 @@ nav .nav-link, .offcanvas .nav-link {
 .app-nav-link--child .app-nav-link__icon {
   background: var(--app-submenu-icon-bg);
   box-shadow: 0 0.35rem 0.8rem rgba(var(--mdb-dark-rgb), 0.18);
-  color: var(--app-submenu-link-color);
+  color: var(--app-submenu-icon-color);
+}
+
+.app-nav-submenu .nav-item:nth-child(2n) .app-nav-link__icon {
+  color: #15803d;
+}
+
+.app-nav-submenu .nav-item:nth-child(3n) .app-nav-link__icon {
+  color: #7c3aed;
+}
+
+.app-nav-submenu .nav-item:nth-child(4n) .app-nav-link__icon {
+  color: #be123c;
 }
 
 .app-nav-link--child:hover .app-nav-link__icon,
 .app-nav-link--child:focus .app-nav-link__icon,
 .app-nav-link--child.active .app-nav-link__icon {
   background-color: var(--app-submenu-icon-active-bg);
-  color: var(--app-submenu-link-active-color);
+  color: var(--app-submenu-icon-active-color);
 }
 
 .app-nav-list--icon-only {
