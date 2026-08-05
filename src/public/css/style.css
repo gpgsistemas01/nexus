@@ -1293,6 +1293,12 @@ nav .nav-link, .offcanvas .nav-link {
   gap: 0.35rem;
 }
 
+.app-nav-accordion,
+.app-nav-accordion > .nav-item {
+  inline-size: 100%;
+  min-inline-size: 0;
+}
+
 .app-nav-list--icon-only .nav-item {
   align-items: center;
   display: flex;
@@ -1885,7 +1891,13 @@ body section {
 
 .app-mobile-menu__nav {
   flex: 0 0 auto;
+  inline-size: 100%;
   min-block-size: 0;
+}
+
+.app-mobile-menu__nav .row,
+.app-mobile-menu__nav [class*="col-"] {
+  min-inline-size: 0;
 }
 
 .app-mobile-menu .app-brand--menu,
