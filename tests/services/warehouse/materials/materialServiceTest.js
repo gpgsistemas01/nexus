@@ -15,6 +15,12 @@ const stockAdjustmentDetailCount = vi.fn();
 const wasteCount = vi.fn();
 const supplierMaterialDeleteMany = vi.fn();
 const materialDelete = vi.fn();
+const materialUpdate = vi.fn();
+const prepareMaterialData = vi.fn();
+const syncSupplierMaterial = vi.fn();
+const findCurrentSupplierMaterialByMaterialId = vi.fn();
+const findSupplierMaterialByIds = vi.fn();
+const recalculateConvertedQuantityByMaterial = vi.fn();
 
 vi.mock('../../../../src/utils/logger.js', () => ({
   createServiceLogger: () => ({}),
@@ -46,28 +52,28 @@ vi.mock('../../../../src/services/warehouse/adjustmentService.js', () => ({
 }));
 
 vi.mock('../../../../src/services/warehouse/materials/materialHelpers.js', () => ({
-  prepareMaterialData: vi.fn(),
+  prepareMaterialData,
   withRetry: vi.fn(async (fn) => fn())
 }));
 
 vi.mock('../../../../src/services/warehouse/materials/materialRelations.js', () => ({
-  syncSupplierMaterial: vi.fn()
+  syncSupplierMaterial
 }));
 
 vi.mock('../../../../src/services/warehouse/materials/supplierMaterialService.js', () => ({
   findAllSupplierMaterials,
-  findCurrentSupplierMaterialByMaterialId: vi.fn(),
-  findSupplierMaterialByIds: vi.fn(),
-  recalculateConvertedQuantityByMaterial: vi.fn()
+  findCurrentSupplierMaterialByMaterialId,
+  findSupplierMaterialByIds,
+  recalculateConvertedQuantityByMaterial
 }));
 
-const { deleteMaterial, existsMaterial, findAllMaterials, findMaterialsSnapshot, updateMaterialStock } = await import('../../../../src/services/warehouse/materials/materialService.js');
+const { deleteMaterial, existsMaterial, findAllMaterials, findMaterialsSnapshot, updateMaterial, updateMaterialStock } = await import('../../../../src/services/warehouse/materials/materialService.js');
 
 describe('materialService submit operations', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     transaction.mockImplementation((callback) => callback({
-      material: { findUnique: materialFindUnique, delete: materialDelete },
+      material: { findUnique: materialFindUnique, update: materialUpdate, delete: materialDelete },
       goodsReceiptDetail: { count: goodsReceiptDetailCount },
       goodsIssueDetail: { count: goodsIssueDetailCount },
       purchaseRequisitionDetail: { count: purchaseRequisitionDetailCount },
@@ -123,6 +129,46 @@ describe('materialService submit operations', () => {
     materialFindUnique.mockResolvedValue(null);
 
     await expect(existsMaterial({ id: 'missing-material' })).rejects.toThrow(MaterialNotFound);
+  });
+
+  it('recalcula el stock convertido de todos los proveedores al editar las dimensiones', async () => {
+    const materialDto = {
+      name: 'Lámina actualizada',
+      supplierId: 'supplier-2',
+      base: 4,
+      height: 5,
+      maxUnitCost: 12
+    };
+    const updatedMaterial = { id: 'material-1', name: materialDto.name, base: 4, height: 5 };
+    const fullMaterial = {
+      materialId: 'material-1',
+      supplierId: 'supplier-2',
+      currentStock: 3,
+      convertedQuantity: 60
+    };
+
+    materialFindUnique.mockResolvedValue({ id: 'material-1' });
+    findCurrentSupplierMaterialByMaterialId.mockResolvedValue({ supplierId: 'supplier-1' });
+    prepareMaterialData.mockResolvedValue({
+      rest: { name: materialDto.name, base: 4, height: 5 },
+      relations: { supplierId: 'supplier-2', maxUnitCost: 12 }
+    });
+    materialUpdate.mockResolvedValue(updatedMaterial);
+    findSupplierMaterialByIds.mockResolvedValue(fullMaterial);
+
+    await expect(updateMaterial(materialDto, 'material-1')).resolves.toEqual(fullMaterial);
+
+    expect(recalculateConvertedQuantityByMaterial).toHaveBeenCalledWith({
+      tx: expect.any(Object),
+      materialId: 'material-1',
+      base: 4,
+      height: 5
+    });
+    expect(syncSupplierMaterial).toHaveBeenCalledWith(expect.objectContaining({
+      previousSupplierId: 'supplier-1',
+      supplierId: 'supplier-2',
+      materialId: 'material-1'
+    }));
   });
 
 

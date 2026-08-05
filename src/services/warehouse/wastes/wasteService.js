@@ -238,7 +238,7 @@ export const updateWaste = async ({
 
         const waste = await getDb().$transaction(async (tx) => {
 
-            await findWasteById({ tx, id });
+            const currentWaste = await findWasteById({ tx, id });
 
             await findSupplierMaterialById({
                 tx,
@@ -250,7 +250,12 @@ export const updateWaste = async ({
                 data: {
                     supplierMaterial: { connect: { id: wasteDto.supplierMaterialId } },
                     base: wasteDto.base,
-                    height: wasteDto.height
+                    height: wasteDto.height,
+                    convertedQuantity: calculateConvertedQuantity({
+                        currentStock: currentWaste.currentStock,
+                        base: wasteDto.base,
+                        height: wasteDto.height
+                    })
                 },
                 include: WASTE_INCLUDE
             });
