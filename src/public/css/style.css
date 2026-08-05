@@ -70,6 +70,11 @@
 
   --mdb-accent: #FCA311;
   --mdb-accent-rgb: 252, 163, 17;
+  --app-submenu-link-color: #d8f3e4;
+  --app-submenu-link-hover-color: var(--mdb-dark);
+  --app-submenu-link-hover-bg: #fbd177;
+  --app-submenu-link-active-color: var(--mdb-dark);
+  --app-submenu-link-active-bg: var(--mdb-accent);
   /* A restrained navy/neutral palette distinguishes filters from the green
      record actions and amber warnings while maintaining WCAG AA contrast. */
   --table-filter-apply: #1f4e79;
@@ -1223,16 +1228,16 @@ nav .nav-link, .offcanvas .nav-link {
 }
 
 .app-nav-link--child .app-nav-link__icon {
-  background: rgba(var(--mdb-accent-rgb), 0.16);
-  box-shadow: 0 0.35rem 0.8rem rgba(var(--mdb-accent-rgb), 0.14);
-  color: var(--mdb-accent);
+  background: rgba(var(--mdb-primary-active-rgb), 0.72);
+  box-shadow: 0 0.35rem 0.8rem rgba(var(--mdb-dark-rgb), 0.18);
+  color: var(--mdb-light);
 }
 
 .app-nav-link--child:hover .app-nav-link__icon,
 .app-nav-link--child:focus .app-nav-link__icon,
 .app-nav-link--child.active .app-nav-link__icon {
-  background-color: rgba(var(--mdb-accent-rgb), 0.24);
-  color: var(--mdb-light);
+  background-color: var(--app-submenu-link-active-bg);
+  color: var(--mdb-dark);
 }
 
 .app-nav-list--icon-only {
@@ -1314,7 +1319,20 @@ nav .nav-link, .offcanvas .nav-link {
 }
 
 .app-nav-link--child {
+  border-radius: 0.75rem;
+  color: var(--app-submenu-link-color) !important;
   font-size: 0.95rem;
+}
+
+.app-nav-link--child:hover,
+.app-nav-link--child:focus {
+  background-color: var(--app-submenu-link-hover-bg);
+  color: var(--app-submenu-link-hover-color) !important;
+}
+
+.app-nav-link--child.active {
+  background-color: var(--app-submenu-link-active-bg);
+  color: var(--app-submenu-link-active-color) !important;
 }
 
 nav .nav-link::after, .offcanvas .nav-link::after {
