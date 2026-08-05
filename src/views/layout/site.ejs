@@ -20,12 +20,14 @@
             <div class="container-fluid flex-column align-items-stretch gap-4">
                 <%- include('./ui/appBrand') %>
 
-                <div role="navigation">
-                    <%- include('./ui/navList', { 
-                        listClass: 'navbar-nav flex-column',
-                        showLabels: false,
-                        accordionId: 'appDesktopNavAccordion'
-                    }) %>
+                <div class="row g-0" role="navigation">
+                    <div class="col-12">
+                        <%- include('./ui/navList', {
+                            listClass: 'navbar-nav flex-column',
+                            showLabels: false,
+                            accordionId: 'appDesktopNavAccordion'
+                        }) %>
+                    </div>
                 </div>
             </div>
         </nav>

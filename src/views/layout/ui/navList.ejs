@@ -71,7 +71,7 @@ const items = [
     }))
 })); %>
 
-<ul id="<%= navAccordionId %>" class="<%= listClass %> <%= !shouldShowLabels ? 'app-nav-list--icon-only' : '' %>">
+<ul id="<%= navAccordionId %>" class="<%= listClass %> app-nav-accordion <%= !shouldShowLabels ? 'app-nav-list--icon-only' : '' %>">
     <% items.forEach(item => { %>
         <li class="nav-item py-1">
             <% if (item.children.length) { %>
