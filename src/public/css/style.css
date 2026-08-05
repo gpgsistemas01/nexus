@@ -1350,6 +1350,13 @@ nav .nav-link.active::after, .offcanvas .nav-link.active::after {
   background: var(--mdb-accent);
 }
 
+nav .app-nav-link--child::after,
+.offcanvas .app-nav-link--child::after,
+nav .app-nav-link--child.active::after,
+.offcanvas .app-nav-link--child.active::after {
+  background: var(--app-submenu-accent);
+}
+
 /* tab styles */
 
 .nav-tabs .nav-link {
