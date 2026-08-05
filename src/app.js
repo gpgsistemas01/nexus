@@ -117,6 +117,9 @@ app.use('/personas', personWebRoutes);
 app.use('/clientes', clientWebRoutes);
 app.use('/proveedores', supplierWebRoutes);
 app.use('/movimientos', movementWebRoutes);
+app.get('/error/404', (req, res) => {
+    res.status(404).render('pages/error/404');
+});
 
 // api routes
 app.use(apiRoute + authRoute, authApiRoutes);
@@ -145,7 +148,11 @@ app.use(apiRoute + admin + '/movements', movementApiRoutes);
 app.use(apiRoute + admin + '/reports', adminReportApiRoutes);
 
 app.use((req, res, next) => {
-    res.status(404).json({ message: 'Ruta no encontrada.' });
+    if (req.path.startsWith(apiRoute) || !req.accepts('html')) {
+        return res.status(404).json({ message: 'Ruta no encontrada.' });
+    }
+
+    return res.status(404).render('pages/error/404');
 });
 
 app.use((err, req, res, next) => {
