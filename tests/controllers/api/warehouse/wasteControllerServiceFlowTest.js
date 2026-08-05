@@ -241,4 +241,26 @@ describe('wasteController service flow', () => {
     }));
     expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ code: 'UPDATED_WASTE' }));
   });
+
+  it('informa un conflicto cuando ya existe la misma merma sin dimensiones', async () => {
+    const duplicateError = Object.assign(new Error('Unique constraint failed'), {
+      code: 'P2002'
+    });
+    wasteCreate.mockRejectedValue(duplicateError);
+
+    const req = {
+      body: {
+        supplierMaterialId: 'supplier-material-1',
+        base: '',
+        height: '',
+        currentStock: '0'
+      },
+      user: { id: 'user-1' }
+    };
+
+    await expect(registerWaste(req, createResponse())).rejects.toMatchObject({
+      code: 'WASTE_ALREADY_EXISTS',
+      statusCode: 409
+    });
+  });
 });

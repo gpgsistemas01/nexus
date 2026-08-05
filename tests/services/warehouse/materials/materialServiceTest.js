@@ -107,6 +107,32 @@ describe('materialService submit operations', () => {
     });
   });
 
+  it('informa un conflicto al editar un material con una identidad duplicada', async () => {
+    materialFindUnique.mockResolvedValue({ id: 'material-1' });
+    findCurrentSupplierMaterialByMaterialId.mockResolvedValue({ supplierId: 'supplier-1' });
+    prepareMaterialData.mockResolvedValue({
+      rest: {
+        name: 'Lámina',
+        base: null,
+        height: null
+      },
+      relations: {
+        supplierId: 'supplier-1',
+        presentationId: 'presentation-1',
+        unitMeasureId: 'unit-1',
+        maxUnitCost: 10
+      }
+    });
+    materialUpdate.mockRejectedValue(Object.assign(new Error('Unique constraint failed'), {
+      code: 'P2002'
+    }));
+
+    await expect(updateMaterial({}, 'material-1')).rejects.toMatchObject({
+      code: 'MATERIAL_ALREADY_EXISTS',
+      statusCode: 409
+    });
+  });
+
   it('obtiene snapshots de materiales y valida existencia para GET', async () => {
     const materials = [{ id: 'material-1', name: 'Lámina' }];
 

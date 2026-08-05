@@ -1,7 +1,7 @@
-import { MaterialSnapshotFindDatabaseError, MaterialCreateDatabaseError, MaterialNotFound, MaterialUpdateDatabaseError, MaterialStockAdjustmentDatabaseError, MaterialDeleteDatabaseError, MaterialDeleteRelationConflict } from "../../../errors/warehouse/materialError.js";
+import { MaterialAlreadyExists, MaterialCreateDatabaseError, MaterialNotFound, MaterialUpdateDatabaseError, MaterialStockAdjustmentDatabaseError, MaterialDeleteDatabaseError, MaterialDeleteRelationConflict } from "../../../errors/warehouse/materialError.js";
 import { getDb } from "../../../repository/baseRepository.js";
 import { findAllSupplierMaterials, findCurrentSupplierMaterialByMaterialId, findSupplierMaterialByIds, recalculateConvertedQuantityByMaterial } from "./supplierMaterialService.js";
-import { prepareMaterialData, withRetry } from "./materialHelpers.js";
+import { prepareMaterialData } from "./materialHelpers.js";
 import { syncSupplierMaterial } from "./materialRelations.js";
 import { isAppError } from "../../../errors/AppError.js";
 import { createStockAdjustment } from "../adjustmentService.js";
@@ -11,7 +11,19 @@ import { PRISMA_ERROR_CODES } from "../../../constants/prisma.js";
 const serviceLogger = createServiceLogger('warehouse.materials.materialService');
 
 
-const REFERENCE_MOVEMENT_IN = 'IN';
+const throwMaterialWriteError = ({ err, fallbackError }) => {
+    if (err.code === PRISMA_ERROR_CODES.RECORD_NOT_FOUND) {
+        throw new MaterialNotFound();
+    }
+
+    if (err.code === PRISMA_ERROR_CODES.RECORD_NOT_UNIQUE) {
+        throw new MaterialAlreadyExists();
+    }
+
+    if (isAppError(err)) throw err;
+
+    throw fallbackError;
+};
 
 const buildMaterialData = ({ rest, relations }) => ({
     ...rest,
@@ -145,9 +157,10 @@ export const createMaterial = async ({
             ...getModelLogContext('material', materialDto)
         });
 
-        if (isAppError(err)) throw err;
-
-        throw new MaterialCreateDatabaseError();
+        throwMaterialWriteError({
+            err,
+            fallbackError: new MaterialCreateDatabaseError()
+        });
     };
 };
 
@@ -216,13 +229,10 @@ export const updateMaterial = async (materialDto, id) => {
             ...getModelLogContext('material', { id, ...materialDto })
         });
 
-        if (err.code === PRISMA_ERROR_CODES.RECORD_NOT_FOUND) {
-            throw new MaterialNotFound();
-        }
-
-        if (isAppError(err)) throw err;
-
-        throw new MaterialUpdateDatabaseError();
+        throwMaterialWriteError({
+            err,
+            fallbackError: new MaterialUpdateDatabaseError()
+        });
     };
 };
 

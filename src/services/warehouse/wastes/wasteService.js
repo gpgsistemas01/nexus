@@ -1,5 +1,5 @@
 import { isAppError } from '../../../errors/AppError.js';
-import { WasteDeleteDatabaseError, WasteInitialStockReasonNotFound, WasteNotFound, WasteStockAdjustmentDatabaseError, WasteUpdateDatabaseError } from '../../../errors/warehouse/wasteError.js';
+import { WasteAlreadyExists, WasteDeleteDatabaseError, WasteInitialStockReasonNotFound, WasteNotFound, WasteStockAdjustmentDatabaseError, WasteUpdateDatabaseError } from '../../../errors/warehouse/wasteError.js';
 import { getDb } from '../../../repository/baseRepository.js';
 import { toNumber } from '../../../utils/formattersUtils.js';
 import { calculateConvertedQuantity } from '../../inventory/stockHelpers.js';
@@ -17,6 +17,10 @@ const handleWasteServiceError = ({ err, fallbackError }) => {
 
     if (err.code === PRISMA_ERROR_CODES.RECORD_NOT_FOUND) {
         throw new WasteNotFound();
+    }
+
+    if (err.code === PRISMA_ERROR_CODES.RECORD_NOT_UNIQUE) {
+        throw new WasteAlreadyExists();
     }
 
     if (isAppError(err)) throw err;

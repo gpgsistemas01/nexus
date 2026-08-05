@@ -1,10 +1,20 @@
-import e from "express";
 import { AppError } from "../AppError.js";
 
 export class MaterialNotFound extends AppError {
 
     constructor () {
         super('Material no encontrado', 'MATERIAL_NOT_FOUND', 404);
+    }
+}
+
+export class MaterialAlreadyExists extends AppError {
+
+    constructor () {
+        super(
+            'Ya existe un material con el mismo nombre, presentación, unidad de medida y dimensiones.',
+            'MATERIAL_ALREADY_EXISTS',
+            409
+        );
     }
 }
 
