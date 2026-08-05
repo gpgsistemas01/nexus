@@ -34,7 +34,6 @@ document.querySelectorAll('.dropdown').forEach(dropdown => {
         btn.blur();
     });
 });
-
 const notificationsBellBtn = document.getElementById('notificationsBellBtn');
 const notificationsList = document.getElementById('notificationsList');
 const notificationsUnreadCount = document.getElementById('notificationsUnreadCount');
