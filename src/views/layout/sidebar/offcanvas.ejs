@@ -14,7 +14,7 @@
 <div
     id="mobileMenu"
     tabindex="-1"
-    class="app-mobile-menu offcanvas offcanvas-start w-md-50"
+    class="app-mobile-menu offcanvas offcanvas-start"
     data-mdb-theme="dark"
     aria-labelledby="<%= header.title.id %>"
     aria-hidden="true"
@@ -29,13 +29,13 @@
         <div class="app-mobile-menu__nav flex-grow-1 mb-5">
             <div class="mb-5">
                 <%- include('../ui/navList', { 
-                    listClass: 'navbar-nav',
+                    listClass: 'navbar-nav flex-column app-mobile-menu__list',
                     showIcons: true
                 }) %>
             </div>
         </div>
 
-        <div>
+        <div class="app-mobile-menu__footer mt-auto">
             <%- include('../ui/logoutForm', {
                 buttonClass: 'btn btn-outline-success app-logout-btn w-100'
             }) %>
