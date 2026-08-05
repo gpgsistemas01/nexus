@@ -139,8 +139,6 @@ app.use(apiRoute + admin + '/users', userApiRoutes);
 app.use(apiRoute + admin + '/roles', roleApiRoutes);
 app.use(apiRoute + admin + '/departments', departmentApiRoutes);
 app.use(apiRoute + admin + '/persons', personApiRoutes);
-// Compatibility alias for existing integrations; new clients should use /persons.
-app.use(apiRoute + admin + '/profiles', personApiRoutes);
 app.use(apiRoute + admin + '/movements', movementApiRoutes);
 app.use(apiRoute + admin + '/reports', adminReportApiRoutes);
 
