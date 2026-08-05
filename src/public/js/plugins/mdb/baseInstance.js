@@ -37,3 +37,11 @@ export const initMdbTooltips = (root = document) => {
     });
 }
 
+export const initMdbNavAccordions = (root = document) => {
+
+    if (!root || !globalThis.mdb?.Collapse) return;
+
+    root.querySelectorAll('.app-nav-accordion .app-nav-submenu').forEach((submenu) => {
+        globalThis.mdb.Collapse.getOrCreateInstance(submenu, { toggle: false });
+    });
+}

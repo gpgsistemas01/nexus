@@ -3,10 +3,11 @@ import { handleFlashMessage } from "../handlers/flashMessageHandler.js";
 import { getLatestNotificationsRequest, markAllNotificationsAsReadRequest } from "../services/warehouse/notificationService.js";
 import { formatNotificationDate } from "../utils/formatters.js";
 import { initDateTimePickers } from "../plugins/flatpickr/dateTimePicker.js";
-import { initMdbTooltips } from "../plugins/mdb/baseInstance.js";
+import { initMdbNavAccordions, initMdbTooltips } from "../plugins/mdb/baseInstance.js";
 
 initDateTimePickers();
 initMdbTooltips();
+initMdbNavAccordions();
 
 handleFlashMessage(window.FLASH_MESSAGE || null);
 
