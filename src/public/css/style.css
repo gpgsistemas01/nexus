@@ -1223,11 +1223,32 @@ nav .nav-link, .offcanvas .nav-link {
 }
 
 .app-nav-link--section {
-  cursor: default;
+  background: transparent;
+  border: 0;
+  color: var(--mdb-light);
+  font: inherit;
   font-weight: 700;
+  padding: var(--mdb-nav-link-padding-y) var(--mdb-nav-link-padding-x);
+  text-align: left;
+}
+
+.app-nav-submenu-toggle {
+  cursor: pointer;
+  width: 100%;
+}
+
+.app-nav-submenu-toggle__icon {
+  font-size: 0.75rem;
+  margin-left: auto;
+  transition: transform 0.2s ease;
+}
+
+.app-nav-submenu-toggle[aria-expanded="true"] .app-nav-submenu-toggle__icon {
+  transform: rotate(180deg);
 }
 
 .app-nav-submenu {
+  flex-direction: column;
   margin-left: 1.1rem;
   padding-left: 1.1rem;
   position: relative;

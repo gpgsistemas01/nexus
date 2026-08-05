@@ -99,8 +99,9 @@ const items = [
     if (canSeeAll) return true;
 
     return item.isVisible;
-}).map(item => ({
+}).map((item, index) => ({
     ...item,
+    submenuId: `appNavSubmenu${ index }`,
     class: `nav-link ${ shouldShowIcons ? 'app-nav-link--icon' : '' } ${ item.isActive ? 'active' : ''}`,
     children: (item.children || []).map(child => ({
         ...child,
@@ -112,16 +113,27 @@ const items = [
     <% items.forEach(item => { %>
         <li class="nav-item py-1">
             <% if (item.children.length) { %>
-                <span class="<%= item.class %> app-nav-link--section" <%= item.isActive ? 'aria-current="true"' : '' %>>
+                <button
+                    type="button"
+                    class="<%= item.class %> app-nav-link--section app-nav-submenu-toggle"
+                    data-mdb-collapse-init
+                    data-mdb-target="#<%= item.submenuId %>"
+                    aria-expanded="<%= item.isActive ? 'true' : 'false' %>"
+                    aria-controls="<%= item.submenuId %>"
+                    <%= item.isActive ? 'aria-current="true"' : '' %>
+                >
                     <% if (shouldShowIcons && item.icon) { %>
                         <span class="app-nav-link__icon" aria-hidden="true">
                             <i class="<%= item.icon %>"></i>
                         </span>
                     <% } %>
                     <span class="app-nav-link__label"><%- item.content %></span>
-                </span>
+                    <span class="app-nav-submenu-toggle__icon" aria-hidden="true">
+                        <i class="fa-solid fa-chevron-down"></i>
+                    </span>
+                </button>
 
-                <ul class="navbar-nav app-nav-submenu">
+                <ul id="<%= item.submenuId %>" class="navbar-nav flex-column collapse <%= item.isActive ? 'show' : '' %> app-nav-submenu">
                     <% item.children.forEach(child => { %>
                         <li class="nav-item py-1">
                             <a class="<%= child.class %>" href="<%= child.href %>"
