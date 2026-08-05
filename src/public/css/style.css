@@ -1348,7 +1348,8 @@ nav .nav-link, .offcanvas .nav-link {
   color: var(--app-submenu-accent);
 }
 
-.app-nav-submenu-toggle[aria-expanded="true"] .app-nav-submenu-toggle__icon {
+.app-nav-submenu-toggle[aria-expanded="true"] .app-nav-submenu-toggle__icon,
+.app-nav-submenu-toggle:not(.collapsed) .app-nav-submenu-toggle__icon {
   transform: rotate(180deg);
 }
 
@@ -2321,10 +2322,10 @@ body {
 
 .app-logout-btn {
   align-items: center;
-  background: linear-gradient(135deg, #fff5f5 0%, #ffe3e3 100%);
-  border: 1px solid rgba(201, 42, 42, 0.28);
+  background: rgba(var(--mdb-primary-rgb), 0.04);
+  border: 1px solid rgba(var(--mdb-primary-rgb), 0.35);
   border-radius: 999rem;
-  color: #a61e4d !important;
+  color: var(--mdb-primary-active) !important;
   display: inline-flex;
   font-weight: 800;
   gap: 0.45rem;
@@ -2337,9 +2338,9 @@ body {
 
 .app-logout-btn:hover,
 .app-logout-btn:focus {
-  background: linear-gradient(135deg, #ffe3e3 0%, #ffc9c9 100%);
-  border-color: rgba(201, 42, 42, 0.45);
-  color: #862e9c !important;
+  background: rgba(var(--mdb-primary-rgb), 0.12);
+  border-color: rgba(var(--mdb-primary-rgb), 0.55);
+  color: var(--mdb-primary-hover) !important;
 }
 
 .app-logout-btn__icon {
@@ -2350,10 +2351,10 @@ body {
 }
 
 .app-logout-btn--mobile {
-  background: linear-gradient(135deg, #ff6b6b 0%, #c92a2a 100%);
-  border: 0;
-  box-shadow: 0 0.75rem 1.5rem rgba(201, 42, 42, 0.28);
-  color: #fff !important;
+  background: rgba(var(--mdb-primary-rgb), 0.08);
+  border: 1px solid rgba(var(--mdb-primary-rgb), 0.42);
+  box-shadow: 0 0.75rem 1.5rem rgba(var(--mdb-primary-rgb), 0.18);
+  color: var(--mdb-primary-active) !important;
   inline-size: 100%;
   justify-content: center;
   min-block-size: 3rem;
@@ -2361,8 +2362,9 @@ body {
 
 .app-logout-btn--mobile:hover,
 .app-logout-btn--mobile:focus {
-  background: linear-gradient(135deg, #fa5252 0%, #a61e1e 100%);
-  color: #fff !important;
+  background: rgba(var(--mdb-primary-rgb), 0.14);
+  border-color: rgba(var(--mdb-primary-rgb), 0.6);
+  color: var(--mdb-primary-hover) !important;
 }
 
 .app-notifications-toggle {

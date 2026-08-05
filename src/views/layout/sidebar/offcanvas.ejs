@@ -30,6 +30,7 @@
             <div>
                 <%- include('../ui/navList', { 
                     listClass: 'navbar-nav flex-column app-mobile-menu__list',
+                    accordionId: 'appMobileNavAccordion',
                     showIcons: true
                 }) %>
             </div>
@@ -37,7 +38,7 @@
 
         <div class="app-mobile-menu__footer">
             <%- include('../ui/logoutForm', {
-                buttonClass: 'btn app-logout-btn app-logout-btn--mobile w-100',
+                buttonClass: 'btn btn-outline-primary app-logout-btn app-logout-btn--mobile w-100',
                 className: 'app-mobile-menu__logout-form'
             }) %>
         </div>

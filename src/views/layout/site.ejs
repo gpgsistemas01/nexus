@@ -23,7 +23,8 @@
                 <div role="navigation">
                     <%- include('./ui/navList', { 
                         listClass: 'navbar-nav flex-column',
-                        showLabels: false
+                        showLabels: false,
+                        accordionId: 'appDesktopNavAccordion'
                     }) %>
                 </div>
             </div>
@@ -78,7 +79,7 @@
                 <span class="app-user-name"><%= user.name %></span>
 
                 <%- include('./ui/logoutForm', {
-                    buttonClass: 'btn btn-sm app-header-action app-logout-btn app-logout-btn--header'
+                    buttonClass: 'btn btn-sm btn-outline-primary app-header-action app-logout-btn app-logout-btn--header'
                 }) %>
             </div>
         </header>
