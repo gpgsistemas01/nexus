@@ -22,11 +22,11 @@
     <%- include('../../shared/header', { header }) %>
 
     <div class="px-3 pb-3">
-        <%- include('../ui/appBrand') %>
+        <%- include('../ui/appBrand', { className: 'app-brand--menu' }) %>
     </div>
 
     <div class="offcanvas-body d-flex flex-column">
-        <div class="flex-grow-1 mb-5">
+        <div class="app-mobile-menu__nav flex-grow-1 mb-5">
             <div class="mb-5">
                 <%- include('../ui/navList', { 
                     listClass: 'navbar-nav',

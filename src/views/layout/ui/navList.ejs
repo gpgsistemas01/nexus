@@ -118,7 +118,7 @@ const items = [
                             <i class="<%= item.icon %>"></i>
                         </span>
                     <% } %>
-                    <span><%- item.content %></span>
+                    <span class="app-nav-link__label"><%- item.content %></span>
                 </span>
 
                 <ul class="navbar-nav app-nav-submenu">
@@ -132,7 +132,7 @@ const items = [
                                         <i class="<%= child.icon %>"></i>
                                     </span>
                                 <% } %>
-                                <span><%- child.content %></span>
+                                <span class="app-nav-link__label"><%- child.content %></span>
                             </a>
                         </li>
                     <% }); %>
@@ -146,7 +146,7 @@ const items = [
                             <i class="<%= item.icon %>"></i>
                         </span>
                     <% } %>
-                    <span><%- item.content %></span>
+                    <span class="app-nav-link__label"><%- item.content %></span>
                 </a>
                 <% } %>
         </li>
