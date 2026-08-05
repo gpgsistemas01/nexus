@@ -1167,6 +1167,8 @@ form .dropdown-item {
 
 .app-brand__name {
   line-height: 1;
+  min-inline-size: 0;
+  overflow-wrap: anywhere;
 }
 
 .app-brand--header {
@@ -1187,6 +1189,13 @@ nav .nav-link, .offcanvas .nav-link {
   align-items: center;
   display: inline-flex;
   gap: 0.75rem;
+  max-inline-size: 100%;
+}
+
+.app-nav-link__label {
+  min-inline-size: 0;
+  overflow-wrap: anywhere;
+  white-space: normal;
 }
 
 .app-nav-link__icon {
@@ -1712,6 +1721,73 @@ body section {
 .app-mobile-menu .offcanvas-body {
   background: var(--mdb-dark);
   color: var(--mdb-light);
+}
+
+.app-mobile-menu {
+  max-block-size: 100dvh;
+}
+
+.app-mobile-menu .offcanvas-header,
+.app-mobile-menu .app-brand--menu {
+  flex-shrink: 0;
+}
+
+.app-mobile-menu .offcanvas-body {
+  min-block-size: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.app-mobile-menu__nav {
+  min-block-size: 0;
+}
+
+.app-mobile-menu .app-brand--menu,
+.app-mobile-menu .nav-link,
+.app-mobile-menu .app-nav-link--section {
+  max-inline-size: 100%;
+}
+
+.app-mobile-menu .app-brand--menu {
+  display: flex;
+}
+
+.app-mobile-menu .nav-link,
+.app-mobile-menu .app-nav-link--section {
+  align-items: flex-start;
+  inline-size: 100%;
+  line-height: 1.25;
+  white-space: normal;
+}
+
+.app-mobile-menu .app-nav-link__icon {
+  flex-shrink: 0;
+}
+
+.app-mobile-menu .app-nav-submenu {
+  margin-left: 0.75rem;
+  padding-left: 0.75rem;
+}
+
+@media (max-width: 360px) {
+  .app-mobile-menu .offcanvas-body {
+    padding-inline: 0.75rem;
+  }
+
+  .app-mobile-menu .app-nav-link--icon {
+    gap: 0.5rem;
+  }
+
+  .app-mobile-menu .app-nav-link__icon {
+    flex-basis: 2rem;
+    height: 2rem;
+    width: 2rem;
+  }
+
+  .app-mobile-menu .app-nav-submenu {
+    margin-left: 0.5rem;
+    padding-left: 0.5rem;
+  }
 }
 
 #notificationsMenu {
