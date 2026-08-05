@@ -5,6 +5,7 @@ const canSeeAll = user?.scope?.canReadAll || false;
 
 const shouldShowIcons = typeof showIcons !== 'undefined' ? showIcons : true;
 const shouldShowLabels = typeof showLabels !== 'undefined' ? showLabels : true;
+const navAccordionId = typeof accordionId !== 'undefined' ? accordionId : `appNavAccordion${ shouldShowLabels ? 'Full' : 'Icon' }`;
 
 const createNavLink = ({ content, icon, href, permission }) => ({
     content,
@@ -62,7 +63,7 @@ const items = [
     return item.isVisible;
 }).map((item, index) => ({
     ...item,
-    submenuId: `appNavSubmenu${ index }`,
+    submenuId: `${ navAccordionId }Submenu${ index }`,
     class: `nav-link ${ shouldShowIcons ? 'app-nav-link--icon' : '' } ${ !shouldShowLabels ? 'app-nav-link--icon-only' : '' } ${ item.isActive ? 'active' : ''}`,
     children: (item.children || []).map(child => ({
         ...child,
@@ -70,13 +71,13 @@ const items = [
     }))
 })); %>
 
-<ul class="<%= listClass %> <%= !shouldShowLabels ? 'app-nav-list--icon-only' : '' %>">
+<ul id="<%= navAccordionId %>" class="<%= listClass %> <%= !shouldShowLabels ? 'app-nav-list--icon-only' : '' %>">
     <% items.forEach(item => { %>
         <li class="nav-item py-1">
             <% if (item.children.length) { %>
                 <button
                     type="button"
-                    class="<%= item.class %> app-nav-link--section app-nav-submenu-toggle"
+                    class="<%= item.class %> app-nav-link--section app-nav-submenu-toggle <%= item.isActive ? '' : 'collapsed' %>"
                     data-mdb-collapse-init
                     data-mdb-target="#<%= item.submenuId %>"
                     aria-expanded="<%= item.isActive ? 'true' : 'false' %>"
@@ -97,7 +98,7 @@ const items = [
                     </span>
                 </button>
 
-                <ul id="<%= item.submenuId %>" class="navbar-nav flex-column collapse <%= item.isActive ? 'show' : '' %> app-nav-submenu">
+                <ul id="<%= item.submenuId %>" class="navbar-nav flex-column collapse <%= item.isActive ? 'show' : '' %> app-nav-submenu" data-mdb-parent="#<%= navAccordionId %>">
                     <% item.children.forEach(child => { %>
                         <li class="nav-item py-1">
                             <a class="<%= child.class %>" href="<%= child.href %>"
