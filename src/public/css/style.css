@@ -79,6 +79,8 @@
   --app-submenu-icon-color: #0369a1;
   --app-submenu-icon-active-bg: rgba(var(--app-submenu-accent-rgb), 0.12);
   --app-submenu-icon-active-color: var(--app-submenu-accent);
+  --app-menu-surface: var(--mdb-secondary);
+  --app-menu-surface-rgb: var(--mdb-secondary-rgb);
   /* A restrained navy/neutral palette distinguishes filters from the green
      record actions and amber warnings while maintaining WCAG AA contrast. */
   --table-filter-apply: #1f4e79;
@@ -118,8 +120,49 @@ body {
 /* tooltip styles */
 
 .tooltip {
-  --mdb-tooltip-bg: var(--mdb-secondary);
+  --mdb-tooltip-bg: var(--app-menu-surface);
   --mdb-tooltip-color: var(--mdb-light);
+  --mdb-tooltip-border-radius: 0.9rem;
+  --mdb-tooltip-opacity: 1;
+  --bs-tooltip-bg: var(--mdb-tooltip-bg);
+  --bs-tooltip-color: var(--mdb-tooltip-color);
+  --bs-tooltip-border-radius: var(--mdb-tooltip-border-radius);
+  --bs-tooltip-opacity: var(--mdb-tooltip-opacity);
+}
+
+.tooltip .tooltip-inner {
+  background-color: var(--app-menu-surface);
+  border: 1px solid rgba(var(--mdb-light-rgb), 0.12);
+  border-radius: var(--mdb-tooltip-border-radius);
+  box-shadow: 0 0.7rem 1.5rem rgba(var(--mdb-dark-rgb), 0.22), 0 0.25rem 0.6rem rgba(var(--app-menu-surface-rgb), 0.24);
+  color: var(--mdb-tooltip-color);
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  padding: 0.45rem 0.75rem;
+}
+
+.tooltip .tooltip-arrow::before {
+  border-right-color: var(--app-menu-surface);
+}
+
+.tooltip.bs-tooltip-auto[data-popper-placement^="top"] .tooltip-arrow::before,
+.tooltip.bs-tooltip-top .tooltip-arrow::before {
+  border-top-color: var(--app-menu-surface);
+}
+
+.tooltip.bs-tooltip-auto[data-popper-placement^="bottom"] .tooltip-arrow::before,
+.tooltip.bs-tooltip-bottom .tooltip-arrow::before {
+  border-bottom-color: var(--app-menu-surface);
+}
+
+.tooltip.bs-tooltip-auto[data-popper-placement^="left"] .tooltip-arrow::before,
+.tooltip.bs-tooltip-left .tooltip-arrow::before {
+  border-left-color: var(--app-menu-surface);
+}
+
+.tooltip.bs-tooltip-auto[data-popper-placement^="right"] .tooltip-arrow::before,
+.tooltip.bs-tooltip-right .tooltip-arrow::before {
+  border-right-color: var(--app-menu-surface);
 }
 
 /* button styles */
@@ -1127,7 +1170,7 @@ table.dataTable.modal-detail-table .sorting_desc::after {
 /* dropdown menu styles */
 
 .dropdown-menu {
-  --mdb-dropdown-bg: var(--mdb-secondary);
+  --mdb-dropdown-bg: var(--app-menu-surface);
 }
 
 form .dropdown-item {
