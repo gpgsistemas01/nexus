@@ -1229,7 +1229,9 @@ nav .nav-link, .offcanvas .nav-link {
 }
 
 .app-nav-list--icon-only .nav-item {
+  align-items: center;
   display: flex;
+  flex-direction: column;
   justify-content: center;
   width: 100%;
 }
