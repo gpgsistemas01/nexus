@@ -70,11 +70,15 @@
 
   --mdb-accent: #FCA311;
   --mdb-accent-rgb: 252, 163, 17;
-  --app-submenu-link-color: #d8f3e4;
-  --app-submenu-link-hover-color: var(--mdb-dark);
-  --app-submenu-link-hover-bg: #fbd177;
-  --app-submenu-link-active-color: var(--mdb-dark);
-  --app-submenu-link-active-bg: var(--mdb-accent);
+  --app-submenu-link-color: #d8ecff;
+  --app-submenu-link-hover-color: #ffffff;
+  --app-submenu-link-hover-bg: rgba(37, 99, 235, 0.28);
+  --app-submenu-link-active-color: #ffffff;
+  --app-submenu-link-active-bg: #1d4ed8;
+  --app-submenu-accent: #60a5fa;
+  --app-submenu-accent-rgb: 96, 165, 250;
+  --app-submenu-icon-bg: rgba(37, 99, 235, 0.3);
+  --app-submenu-icon-active-bg: #2563eb;
   /* A restrained navy/neutral palette distinguishes filters from the green
      record actions and amber warnings while maintaining WCAG AA contrast. */
   --table-filter-apply: #1f4e79;
@@ -1228,16 +1232,16 @@ nav .nav-link, .offcanvas .nav-link {
 }
 
 .app-nav-link--child .app-nav-link__icon {
-  background: rgba(var(--mdb-primary-active-rgb), 0.72);
+  background: var(--app-submenu-icon-bg);
   box-shadow: 0 0.35rem 0.8rem rgba(var(--mdb-dark-rgb), 0.18);
-  color: var(--mdb-light);
+  color: var(--app-submenu-link-color);
 }
 
 .app-nav-link--child:hover .app-nav-link__icon,
 .app-nav-link--child:focus .app-nav-link__icon,
 .app-nav-link--child.active .app-nav-link__icon {
-  background-color: var(--app-submenu-link-active-bg);
-  color: var(--mdb-dark);
+  background-color: var(--app-submenu-icon-active-bg);
+  color: var(--app-submenu-link-active-color);
 }
 
 .app-nav-list--icon-only {
@@ -1308,7 +1312,7 @@ nav .nav-link, .offcanvas .nav-link {
 }
 
 .app-nav-submenu::before {
-  background: rgba(var(--mdb-light-rgb), 0.25);
+  background: rgba(var(--app-submenu-accent-rgb), 0.65);
   border-radius: 999rem;
   content: '';
   height: calc(100% - 0.75rem);
@@ -1319,6 +1323,7 @@ nav .nav-link, .offcanvas .nav-link {
 }
 
 .app-nav-link--child {
+  border: 1px solid transparent;
   border-radius: 0.75rem;
   color: var(--app-submenu-link-color) !important;
   font-size: 0.95rem;
@@ -1327,11 +1332,13 @@ nav .nav-link, .offcanvas .nav-link {
 .app-nav-link--child:hover,
 .app-nav-link--child:focus {
   background-color: var(--app-submenu-link-hover-bg);
+  border-color: rgba(var(--app-submenu-accent-rgb), 0.45);
   color: var(--app-submenu-link-hover-color) !important;
 }
 
 .app-nav-link--child.active {
   background-color: var(--app-submenu-link-active-bg);
+  border-color: rgba(var(--app-submenu-accent-rgb), 0.75);
   color: var(--app-submenu-link-active-color) !important;
 }
 
