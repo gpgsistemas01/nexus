@@ -3,12 +3,12 @@ import { createDataTable } from "../baseDatatable.js";
 import { buildDetailsColumns, buildDetailsHeader } from "./builderDetailDatatable.js";
 import { refreshMaterialTable } from "./renderMaterialDatatable.js";
 
-export const renderMaterialName = (row, supplierOverride) => {
+export const renderWarehouseItemName = (row, supplierOverride, { useRowDimensions = false } = {}) => {
 
     const supplierName = supplierOverride || row.supplier?.tradeName || row.supplierName || '';
     const materialName = row.materialName || row.material?.name || row.name || '';
-    const materialBase = row.materialBase ?? row.material?.base ?? row.base;
-    const materialHeight = row.materialHeight ?? row.material?.height ?? row.height;
+    const materialBase = useRowDimensions ? row.base : row.materialBase ?? row.material?.base ?? row.base;
+    const materialHeight = useRowDimensions ? row.height : row.materialHeight ?? row.material?.height ?? row.height;
 
     if (!materialBase || !materialHeight) {
         return `${ materialName } || ${ supplierName }`;

@@ -1,4 +1,4 @@
-import { renderMaterialName } from "./detailDatatableUtils.js";
+import { renderWarehouseItemName } from "./detailDatatableUtils.js";
 import { formatCurrency, formatDecimal } from "../../../utils/formatUtils.js";
 
 export const renderWarehouseInventoryHeader = ({ tableElement, canSeeCost, canManageItems, stockTitle, costTitle }) => {
@@ -31,7 +31,7 @@ export const buildWarehouseInventoryColumns = ({ canSeeCost, canManageItems, cos
         {
             data: null,
             title: 'Material',
-            render: (data, type, row) => renderMaterialName(row)
+            render: (data, type, row) => renderWarehouseItemName(row, null, { useRowDimensions: true })
         },
         { data: 'base', render: formatDecimal, title: 'Base' },
         { data: 'height', render: formatDecimal, title: 'Altura' },

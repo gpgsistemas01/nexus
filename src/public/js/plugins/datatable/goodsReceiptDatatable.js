@@ -4,7 +4,7 @@ import { getAllGoodsReceipts } from "../../application/warehouse/goodsReceipts.j
 import { exportGoodsReceiptReport } from "../../application/warehouse/report.js";
 import { initMdbWrapperInput, updateMdbWrapperInput } from "../mdb/baseInstance.js";
 import { buildDetailsColumns, buildDetailsHeader } from "./utils/builderDetailDatatable.js";
-import { handleDelete, renderMaterialName } from "./utils/detailDatatableUtils.js";
+import { handleDelete, renderWarehouseItemName } from "./utils/detailDatatableUtils.js";
 import { getResponsiveRowData } from "./utils/responsive.js";
 import { buildExcelButton, buildTableExportParams } from "../../ui/tableUI.js";
 import { formatDateTimeDisplay, formatFileName } from "../../utils/formatters.js";
@@ -135,7 +135,7 @@ export const initDetailsGoodsReceiptTable = (mode) => {
             const select = modal?.querySelector(FORM_SELECTORS.SUPPLIER);
             const supplier = select?.options[select.selectedIndex]?.text || '';
 
-            return renderMaterialName(row, supplier);
+            return renderWarehouseItemName(row, supplier);
         }
     });
 

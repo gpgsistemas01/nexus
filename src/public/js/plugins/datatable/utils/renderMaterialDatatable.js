@@ -8,18 +8,6 @@ export const refreshMaterialTable = data => refreshDataTable({
     data
 });
 
-export const renderMaterialName = (row, supplierOverride) => {
-
-    const supplierName = supplierOverride || row.supplier?.tradeName || row.supplierName;
-    const materialName = row.materialName || row.name;
-
-    if (!row.materialBase || !row.materialHeight) {
-        return `${ materialName } || ${ supplierName }`;
-    }
-
-    return `${ materialName } (${ row.materialBase } x ${ row.materialHeight }) || ${ supplierName }`;
-};
-
 
 export const initDetailsTable = ({ selector, type, mode, context, data }) => {
 
