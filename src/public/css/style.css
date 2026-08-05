@@ -1924,9 +1924,9 @@ body section {
 }
 
 .app-mobile-menu__footer {
-  flex-shrink: 0;
   inline-size: 100%;
-  padding-top: 1rem;
+  margin-top: 0.25rem;
+  padding-top: 0;
 }
 
 .app-mobile-menu__footer form {
@@ -1936,8 +1936,10 @@ body section {
 
 .app-mobile-menu__footer .app-logout-btn {
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
   min-inline-size: 0;
+  padding: var(--mdb-nav-link-padding-y) var(--mdb-nav-link-padding-x);
+  text-align: left;
   white-space: normal;
 }
 
