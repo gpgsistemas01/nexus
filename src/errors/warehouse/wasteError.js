@@ -7,6 +7,17 @@ export class WasteNotFound extends AppError {
     }
 }
 
+export class WasteAlreadyExists extends AppError {
+
+    constructor () {
+        super(
+            'Ya existe una merma para el material, proveedor y dimensiones indicados.',
+            'WASTE_ALREADY_EXISTS',
+            409
+        );
+    }
+}
+
 export class WasteUpdateDatabaseError extends AppError {
 
     constructor () {
