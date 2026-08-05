@@ -5,7 +5,7 @@ import { getLoggedUser } from "../services/admin/userService.js";
 import { hasSystemWideReadAccess } from "../utils/authorizationUtils.js";
 import { getAuthorizationPolicy } from "../constants/permissions.js";
 
-const getAuthTokenInfo = ( req, res) => {
+export const getAuthTokenInfo = (req, res) => {
 
     const { accessToken } = req.cookies;
 
