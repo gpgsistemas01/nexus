@@ -5,7 +5,7 @@ import { normalizeDecimal, toNumber } from '../../../utils/formattersUtils.js';
 import { assertSufficientStock, calculateConvertedQuantity } from '../../inventory/stockHelpers.js';
 import { createWasteMovement } from './wasteMovementService.js';
 
-const buildWasteAdjustmentValues = ({
+const calculateWasteStockAdjustmentValues = ({
     waste,
     newStock,
     previousStock = Number(toNumber(waste.currentStock) || 0),
@@ -48,39 +48,36 @@ const buildWasteAdjustmentValues = ({
     };
 };
 
-const updateWasteStock = ({
+export const registerWasteStockAdjustment = async ({
     tx,
-    wasteId,
-    newStock,
-    newConvertedQuantity,
-    include
-}) => tx.waste.update({
-    where: { id: wasteId },
-    data: {
-        currentStock: newStock,
-        convertedQuantity: newConvertedQuantity
-    },
-    include
-});
-
-const createWasteStockAdjustmentRecord = async ({
-    tx,
-    wasteId,
+    waste,
     reasonId,
     userId,
     observations,
-    values
+    newStock,
+    previousStock,
+    previousConvertedQuantity,
+    updateStock = true,
+    include = undefined
 }) => {
     let referenceNumber = null;
 
     try {
+        const values = calculateWasteStockAdjustmentValues({
+            waste,
+            newStock,
+            previousStock,
+            previousConvertedQuantity
+        });
+        const wasteId = waste.id;
+        const adjustmentType = values.difference >= 0
+            ? STOCK_ADJUSTMENT_TYPES.INCREASE
+            : STOCK_ADJUSTMENT_TYPES.DECREASE;
+
         referenceNumber = await generateYearlyReferenceNumber({
             type: DOCUMENT_REFERENCE_TYPES.STOCK_ADJUSTMENT,
             tx
         });
-        const adjustmentType = values.difference >= 0
-            ? STOCK_ADJUSTMENT_TYPES.INCREASE
-            : STOCK_ADJUSTMENT_TYPES.DECREASE;
 
         const adjustment = await tx.wasteStockAdjustment.create({
             data: {
@@ -95,6 +92,12 @@ const createWasteStockAdjustmentRecord = async ({
                 details: {
                     create: {
                         waste: { connect: { id: wasteId } },
+                        materialId: waste.supplierMaterial?.materialId,
+                        supplierId: waste.supplierMaterial?.supplierId,
+                        materialName: waste.supplierMaterial?.material?.name || '',
+                        supplierName: waste.supplierMaterial?.supplier?.tradeName || '',
+                        wasteBase: waste.base,
+                        wasteHeight: waste.height,
                         previousStock: values.previousStock,
                         newStock: values.newStock,
                         difference: values.difference,
@@ -118,52 +121,24 @@ const createWasteStockAdjustmentRecord = async ({
             newStock: values.newStock
         });
 
-        return tx.wasteStockAdjustment.update({
+        await tx.wasteStockAdjustment.update({
             where: { id: adjustment.id },
             data: { movement: { connect: { id: movement.id } } },
             include: { details: true, movement: true }
+        });
+
+        if (!updateStock) return waste;
+
+        return tx.waste.update({
+            where: { id: wasteId },
+            data: {
+                currentStock: values.newStock,
+                convertedQuantity: values.newConvertedQuantity
+            },
+            include
         });
     } catch (err) {
         throwIfReferenceNumberAlreadyExists({ err, referenceNumber });
         throw err;
     }
-};
-
-export const applyWasteStockAdjustment = async ({
-    tx,
-    waste,
-    reasonId,
-    userId,
-    observations,
-    newStock,
-    previousStock,
-    previousConvertedQuantity,
-    updateStock = true,
-    include = undefined
-}) => {
-    const values = buildWasteAdjustmentValues({
-        waste,
-        newStock,
-        previousStock,
-        previousConvertedQuantity
-    });
-
-    await createWasteStockAdjustmentRecord({
-        tx,
-        wasteId: waste.id,
-        reasonId,
-        userId,
-        observations,
-        values
-    });
-
-    if (!updateStock) return waste;
-
-    return updateWasteStock({
-        tx,
-        wasteId: waste.id,
-        newStock: values.newStock,
-        newConvertedQuantity: values.newConvertedQuantity,
-        include
-    });
 };

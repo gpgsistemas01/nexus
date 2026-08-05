@@ -5,7 +5,7 @@ import { toNumber } from '../../../utils/formattersUtils.js';
 import { calculateConvertedQuantity } from '../../inventory/stockHelpers.js';
 import { findSupplierMaterialById } from '../materials/supplierMaterialService.js';
 import { findInitialStockAdjustmentReason } from '../reasonService.js';
-import { applyWasteStockAdjustment } from './wasteStockAdjustmentService.js';
+import { registerWasteStockAdjustment } from './wasteStockAdjustmentService.js';
 import { createServiceLogger, getModelLogContext, logServiceError, logServiceInfo } from "../../../utils/logger.js";
 import { PRISMA_ERROR_CODES } from "../../../constants/prisma.js";
 
@@ -178,7 +178,7 @@ export const findAllWastes = async ({
     };
 };
 
-export const createWasteAdjustment = async ({
+export const createWasteWithInitialStockAdjustment = async ({
     wasteDto,
     userId
 }) => {
@@ -205,7 +205,7 @@ export const createWasteAdjustment = async ({
                 include: WASTE_INCLUDE
             });
 
-            await applyWasteStockAdjustment({
+            await registerWasteStockAdjustment({
                 tx,
                 waste,
                 reasonId: initialStockReason.id,
@@ -221,7 +221,7 @@ export const createWasteAdjustment = async ({
         });
 
         logServiceInfo(serviceLogger, {
-            operation: 'warehouse.wasteService.createWasteAdjustment',
+            operation: 'warehouse.wasteService.createWasteWithInitialStockAdjustment',
             ...getModelLogContext('waste', { userId, ...wasteDto, id: waste.id })
         }, 'Merma registrada correctamente');
 
@@ -229,7 +229,7 @@ export const createWasteAdjustment = async ({
 
     } catch (err) {
         logServiceError(serviceLogger, err, {
-            operation: 'warehouse.wasteService.createWasteAdjustment',
+            operation: 'warehouse.wasteService.createWasteWithInitialStockAdjustment',
             ...getModelLogContext('waste', { userId, ...wasteDto })
         }, 'Error específico al registrar merma en transacción');
 
@@ -368,7 +368,7 @@ export const updateWasteStock = async ({
 
             const currentWaste = await findWasteById({ tx, id });
 
-            const updatedWaste = await applyWasteStockAdjustment({
+            const updatedWaste = await registerWasteStockAdjustment({
                 tx,
                 waste: currentWaste,
                 reasonId: wasteStockDto.reasonId,

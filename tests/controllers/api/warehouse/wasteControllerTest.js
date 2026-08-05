@@ -1,13 +1,13 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-const createWasteAdjustment = vi.fn();
+const createWasteWithInitialStockAdjustment = vi.fn();
 const findAllWastes = vi.fn();
 const updateWaste = vi.fn();
 const updateWasteStock = vi.fn();
 const deleteWaste = vi.fn();
 
 vi.mock('../../../../src/services/warehouse/wastes/wasteService.js', () => ({
-  createWasteAdjustment,
+  createWasteWithInitialStockAdjustment,
   findAllWastes,
   updateWaste,
   updateWasteStock,
@@ -76,11 +76,11 @@ describe('wasteController', () => {
       user: { id: 'user-1' }
     };
     const res = createResponse();
-    createWasteAdjustment.mockResolvedValue(waste);
+    createWasteWithInitialStockAdjustment.mockResolvedValue(waste);
 
     await registerWaste(req, res);
 
-    expect(createWasteAdjustment).toHaveBeenCalledWith({
+    expect(createWasteWithInitialStockAdjustment).toHaveBeenCalledWith({
       wasteDto: {
         supplierMaterialId: 'supplier-material-1',
         base: 1,
