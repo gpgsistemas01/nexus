@@ -1351,7 +1351,7 @@ nav .nav-link, .offcanvas .nav-link {
 }
 
 .app-nav-submenu-toggle[aria-expanded="true"] {
-  color: var(--app-submenu-accent);
+  color: var(--mdb-accent);
 }
 
 .app-nav-submenu-toggle[aria-expanded="true"] .app-nav-submenu-toggle__icon,
