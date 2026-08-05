@@ -94,22 +94,6 @@ const findWasteById = async ({ tx, id }) => {
     return waste;
 };
 
-const buildWasteStockData = ({
-    currentStock,
-    base,
-    height
-}) => ({
-    currentStock,
-    convertedQuantity: calculateConvertedQuantity({
-        currentStock,
-        base,
-        height,
-        fallbackToQuantity: false
-    })
-});
-
-
-
 export const findAllWastes = async ({
     skip = 0,
     take = 10,
@@ -200,7 +184,12 @@ export const createWasteWithInitialStockAdjustment = async ({
                     supplierMaterial: { connect: { id: wasteDto.supplierMaterialId } },
                     base: wasteDto.base,
                     height: wasteDto.height,
-                    ...buildWasteStockData(wasteDto)
+                    currentStock: wasteDto.currentStock,
+                    convertedQuantity: calculateConvertedQuantity({
+                        currentStock: wasteDto.currentStock,
+                        base: wasteDto.base,
+                        height: wasteDto.height
+                    })
                 },
                 include: WASTE_INCLUDE
             });
@@ -249,7 +238,7 @@ export const updateWaste = async ({
 
         const waste = await getDb().$transaction(async (tx) => {
 
-            const currentWaste = await findWasteById({ tx, id });
+            await findWasteById({ tx, id });
 
             await findSupplierMaterialById({
                 tx,
@@ -261,11 +250,7 @@ export const updateWaste = async ({
                 data: {
                     supplierMaterial: { connect: { id: wasteDto.supplierMaterialId } },
                     base: wasteDto.base,
-                    height: wasteDto.height,
-                    ...buildWasteStockData({
-                        ...wasteDto,
-                        currentStock: Number(toNumber(currentWaste.currentStock) || 0)
-                    })
+                    height: wasteDto.height
                 },
                 include: WASTE_INCLUDE
             });

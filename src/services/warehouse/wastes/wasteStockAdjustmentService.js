@@ -18,8 +18,7 @@ const calculateWasteStockAdjustmentValues = ({
     const newConvertedQuantity = normalizeDecimal(calculateConvertedQuantity({
         currentStock: adjustedNewStock,
         base: waste.base,
-        height: waste.height,
-        fallbackToQuantity: false
+        height: waste.height
     }));
     const convertedDifference = normalizeDecimal(newConvertedQuantity - adjustedPreviousConvertedQuantity);
 
