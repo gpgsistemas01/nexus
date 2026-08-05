@@ -27,12 +27,13 @@
 
     <div class="offcanvas-body d-flex flex-column">
         <div class="app-mobile-menu__nav">
-            <div>
-                <%- include('../ui/navList', { 
-                    listClass: 'navbar-nav flex-column app-mobile-menu__list',
-                    accordionId: 'appMobileNavAccordion',
-                    showIcons: true
-                }) %>
+            <div class="row g-0">
+                <div class="col-12">
+                    <%- include('../ui/navList', {
+                        listClass: 'navbar-nav flex-column app-mobile-menu__list',
+                        accordionId: 'appMobileNavAccordion'
+                    }) %>
+                </div>
             </div>
         </div>
 
