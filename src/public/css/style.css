@@ -1222,6 +1222,18 @@ nav .nav-link, .offcanvas .nav-link {
   transform: translateY(-1px);
 }
 
+.app-nav-link--child .app-nav-link__icon {
+  background: rgba(var(--mdb-accent-rgb), 0.16);
+  box-shadow: 0 0.35rem 0.8rem rgba(var(--mdb-accent-rgb), 0.14);
+  color: var(--mdb-accent);
+}
+
+.app-nav-link--child:hover .app-nav-link__icon,
+.app-nav-link--child:focus .app-nav-link__icon,
+.app-nav-link--child.active .app-nav-link__icon {
+  background-color: rgba(var(--mdb-accent-rgb), 0.24);
+  color: var(--mdb-light);
+}
 
 .app-nav-list--icon-only {
   align-items: center;
