@@ -1,5 +1,5 @@
 import { successCodeMessages } from '../../../messages/codeMessages.js';
-import { createWasteAdjustment, deleteWaste, findAllWastes as findAllWasteItems, updateWaste, updateWasteStock } from '../../../services/warehouse/wastes/wasteService.js';
+import { createWasteWithInitialStockAdjustment, deleteWaste, findAllWastes as findAllWasteItems, updateWaste, updateWasteStock } from '../../../services/warehouse/wastes/wasteService.js';
 import { createWasteDataDto, createWasteDto, createWasteStockDto } from '../../../dtos/wasteDTO.js';
 import { sanitizeEmptyStrings } from '../../../utils/formattersUtils.js';
 import { getDataTableOrder, getDataTablePaging, getDataTableSearch } from '../../../utils/requestQueryUtils.js';
@@ -33,7 +33,7 @@ export const registerWaste = async (req, res) => {
     const wasteDto = createWasteDto(req.body);
     const sanitizedWasteDto = sanitizeEmptyStrings(wasteDto);
 
-    const waste = await createWasteAdjustment({
+    const waste = await createWasteWithInitialStockAdjustment({
         wasteDto: sanitizedWasteDto,
         userId: req.user.id
     });
