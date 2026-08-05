@@ -287,8 +287,8 @@ export const exportWasteReportExcel = async (req, res) => {
         ...rows.map(row => [
             row.supplier,
             row.name,
-            row.wasteBase,
-            row.wasteHeight,
+            row.base,
+            row.height,
             row.currentStock,
             row.presentation,
             row.convertedQuantity,

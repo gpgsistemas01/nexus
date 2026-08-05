@@ -5,7 +5,7 @@ import { buildExcelButton, buildTableExportParams } from "../../ui/tableUI.js";
 import { formatDateTimeDisplay, formatFileName } from "../../utils/formatters.js";
 import { createDataTable, renderActionButtons, resetDataTable } from "./baseDatatable.js";
 import { buildDetailsColumns, buildDetailsHeader } from "./utils/builderDetailDatatable.js";
-import { handleDelete, renderMaterialName } from "./utils/detailDatatableUtils.js";
+import { handleDelete, renderWarehouseItemName } from "./utils/detailDatatableUtils.js";
 import { getResponsiveRowData } from "./utils/responsive.js";
 import { setupTableFilters } from "./utils/filters/tableFilter.js";
 import { DATATABLE_SELECTORS } from "../../constants/selectors.js";
@@ -147,7 +147,7 @@ export const initDetailsGoodsIssueTable = (mode, context) => {
     const columns = buildDetailsColumns({
         type: 'issue',
         mode,
-        render: (_, __, row) => renderMaterialName(row),
+        render: (_, __, row) => renderWarehouseItemName(row),
         isWarehouse,
         isCoordinator,
         isSystem
