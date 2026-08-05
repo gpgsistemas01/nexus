@@ -1222,6 +1222,40 @@ nav .nav-link, .offcanvas .nav-link {
   transform: translateY(-1px);
 }
 
+
+.app-nav-list--icon-only {
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.app-nav-list--icon-only .nav-item {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.app-nav-link--icon-only {
+  gap: 0;
+  justify-content: center;
+  min-inline-size: 3rem;
+  padding-inline: 0.35rem;
+}
+
+.app-nav-link--icon-only .app-nav-submenu-toggle__icon {
+  font-size: 0.65rem;
+  margin-left: 0.2rem;
+}
+
+.app-nav-list--icon-only .app-nav-submenu {
+  align-items: center;
+  margin-left: 0;
+  padding-left: 0;
+}
+
+.app-nav-list--icon-only .app-nav-submenu::before {
+  display: none;
+}
+
 .app-nav-link--section {
   background: transparent;
   border: 0;
@@ -1732,6 +1766,10 @@ body section {
   background: var(--mdb-dark);
   color: var(--mdb-light);
   inline-size: 260px;
+}
+
+.app-sidebar--icon-only {
+  inline-size: 5.75rem;
 }
 
 .app-header {
