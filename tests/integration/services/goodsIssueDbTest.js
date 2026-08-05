@@ -75,7 +75,20 @@ const cleanupWasteIssueData = async () => {
 
   await prisma.goodsIssueDetail.deleteMany({ where: { goodsIssueId: { in: goodsIssues.map(({ id }) => id) } } });
   await prisma.goodsIssue.deleteMany({ where: { id: { in: goodsIssues.map(({ id }) => id) } } });
-  await prisma.wasteStockAdjustment.deleteMany({ where: { waste: { supplierMaterial: { materialId: { in: materials.map(({ id }) => id) } } } } });
+  const wasteAdjustmentDetails = await prisma.wasteStockAdjustmentDetail.findMany({
+    where: { waste: { supplierMaterial: { materialId: { in: materials.map(({ id }) => id) } } } },
+    select: { id: true, wasteStockAdjustmentId: true }
+  });
+  const wasteAdjustmentIds = [...new Set(wasteAdjustmentDetails.map(({ wasteStockAdjustmentId }) => wasteStockAdjustmentId))];
+  const wasteAdjustments = await prisma.wasteStockAdjustment.findMany({
+    where: { id: { in: wasteAdjustmentIds } },
+    select: { wasteMovementId: true }
+  });
+  const wasteMovementIds = wasteAdjustments.map(({ wasteMovementId }) => wasteMovementId).filter(Boolean);
+
+  await prisma.wasteMovementDetail.deleteMany({ where: { wasteStockAdjustmentDetailId: { in: wasteAdjustmentDetails.map(({ id }) => id) } } });
+  await prisma.wasteMovement.deleteMany({ where: { id: { in: wasteMovementIds } } });
+  await prisma.wasteStockAdjustment.deleteMany({ where: { id: { in: wasteAdjustmentIds } } });
   await prisma.waste.deleteMany({ where: { supplierMaterial: { materialId: { in: materials.map(({ id }) => id) } } } });
   await prisma.movementDetail.deleteMany({ where: { stockAdjustmentDetailId: { in: adjustmentDetails.map(({ id }) => id) } } });
   await prisma.inventoryMovement.deleteMany({ where: { stockAdjustmentId: { in: adjustments.map(({ id }) => id) } } });
