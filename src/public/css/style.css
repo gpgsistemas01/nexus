@@ -79,6 +79,8 @@
   --app-submenu-icon-color: #0369a1;
   --app-submenu-icon-active-bg: rgba(var(--app-submenu-accent-rgb), 0.12);
   --app-submenu-icon-active-color: var(--app-submenu-accent);
+  --app-submenu-open-bg: rgba(255, 255, 255, 0.06);
+  --app-submenu-open-border: rgba(var(--app-submenu-accent-rgb), 0.42);
   --app-menu-surface: var(--mdb-secondary);
   --app-menu-surface-rgb: var(--mdb-secondary-rgb);
   /* A restrained navy/neutral palette distinguishes filters from the green
@@ -1349,10 +1351,21 @@ nav .nav-link, .offcanvas .nav-link {
 }
 
 .app-nav-submenu {
+  border-inline-start: 2px solid transparent;
   flex-direction: column;
   margin-left: 1.1rem;
+  margin-top: 0.25rem;
+  padding-block: 0.25rem;
   padding-left: 1.1rem;
   position: relative;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.app-nav-submenu.show,
+.app-nav-submenu.collapsing {
+  background: var(--app-submenu-open-bg);
+  border-inline-start-color: var(--app-submenu-open-border);
+  border-radius: 0 0.9rem 0.9rem 0;
 }
 
 .app-nav-link--child {
