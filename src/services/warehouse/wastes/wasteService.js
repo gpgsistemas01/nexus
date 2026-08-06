@@ -84,6 +84,28 @@ const mapWaste = (waste) => {
     };
 };
 
+const findWasteBySupplierMaterialAndDimensions = async ({ tx, supplierMaterialId, base, height, excludeId = null }) => {
+    const db = getDb(tx);
+
+    const where = excludeId
+        ? {
+            supplierMaterialId,
+            base,
+            height,
+            NOT: { id: excludeId }
+        }
+        : {
+            supplierMaterialId,
+            base,
+            height
+        };
+
+    return db.waste.findFirst({
+        where,
+        select: { id: true }
+    });
+};
+
 const findWasteById = async ({ tx, id }) => {
 
     const db = getDb(tx);
@@ -180,6 +202,17 @@ export const createWasteWithInitialStockAdjustment = async ({
                 id: wasteDto.supplierMaterialId
             });
 
+            const existingWaste = await findWasteBySupplierMaterialAndDimensions({
+                tx,
+                supplierMaterialId: wasteDto.supplierMaterialId,
+                base: wasteDto.base,
+                height: wasteDto.height
+            });
+
+            if (existingWaste) {
+                throw new WasteAlreadyExists();
+            }
+
             const initialStockReason = await findInitialStockAdjustmentReason({ tx });
             if (!initialStockReason) throw new WasteInitialStockReasonNotFound();
 
@@ -248,6 +281,18 @@ export const updateWaste = async ({
                 tx,
                 id: wasteDto.supplierMaterialId
             });
+
+            const existingWaste = await findWasteBySupplierMaterialAndDimensions({
+                tx,
+                supplierMaterialId: wasteDto.supplierMaterialId,
+                base: wasteDto.base,
+                height: wasteDto.height,
+                excludeId: id
+            });
+
+            if (existingWaste) {
+                throw new WasteAlreadyExists();
+            }
 
             const updatedWaste = await tx.waste.update({
                 where: { id },
