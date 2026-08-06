@@ -112,7 +112,7 @@ describe('materialService submit operations', () => {
     });
   });
 
-  it('reutiliza la relación proveedor-material cuando ya existe y no crea una nueva', async () => {
+  it('rechaza la creación cuando ya existe un material con la misma identidad', async () => {
     prepareMaterialData.mockResolvedValue({
       rest: { name: 'Lámina', base: null, height: null, minStock: 0 },
       relations: {
@@ -123,10 +123,11 @@ describe('materialService submit operations', () => {
       }
     });
     materialFindFirst.mockResolvedValue({ id: 'material-existing' });
-    supplierMaterialFindUnique.mockResolvedValue({ id: 'supplier-material-existing' });
-    findSupplierMaterialByIds.mockResolvedValue({ id: 'material-existing', supplier: { id: 'supplier-2' } });
 
-    await expect(createMaterial({ materialDto: {} })).resolves.toMatchObject({ id: 'material-existing' });
+    await expect(createMaterial({ materialDto: {} })).rejects.toMatchObject({
+      code: 'MATERIAL_ALREADY_EXISTS',
+      statusCode: 409
+    });
 
     expect(materialCreate).not.toHaveBeenCalled();
     expect(syncSupplierMaterial).not.toHaveBeenCalled();

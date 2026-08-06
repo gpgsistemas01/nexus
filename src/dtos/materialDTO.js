@@ -12,13 +12,7 @@ export const createMaterialDtoForRegister = (body = {}) => ({
 });
 
 export const updateMaterialDtoForEdit = (body = {}) => ({
-    name: body.name.trim(),
-    presentationId: body.presentationId,
-    unitMeasureId: body.unitMeasureId,
-    minStock: Number(body.minStock),
-    maxUnitCost: toNumber(body.maxUnitCost),
-    ...normalizeMaterialDimensions(body),
-    ...(Object.prototype.hasOwnProperty.call(body, 'isActive') ? { isActive: Boolean(body.isActive) } : {})
+    name: body.name.trim()
 });
 
 export const createMaterialDtoForStockUpdate = (body = {}) => ({

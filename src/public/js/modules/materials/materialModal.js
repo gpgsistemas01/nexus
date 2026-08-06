@@ -8,6 +8,7 @@ import { UI_PERMISSIONS } from "../../constants/permissions.js";
 const materialModalId = MODAL_SELECTORS.MATERIAL;
 const formId = FORM_SELECTORS.MATERIAL_FORM;
 const materialDataFields = ['name', 'minStock', 'maxUnitCost', 'base', 'height', 'presentationId', 'unitMeasureId', 'isActive'];
+const editModeDisabledFields = ['minStock', 'maxUnitCost', 'base', 'height', 'presentationId', 'unitMeasureId', 'isActive'];
 const supplierField = 'supplierId';
 const maxUnitCostField = 'maxUnitCost';
 const stockFields = ['newStock', 'reasonId', 'observations'];
@@ -40,11 +41,23 @@ const setupMaterialModalFields = ({
     creationContext
 }) => {
 
+    const isEditMode = form.dataset.mode === 'edit';
+
     setFormDisabled({ form, isDisabled: false });
-    setFormDisabled({ form, fields: materialDataFields, isDisabled: isStockAdjustment });
+    setFormDisabled({ form, fields: ['name'], isDisabled: false });
+
+    if (isEditMode) {
+        setFormDisabled({
+            form,
+            fields: editModeDisabledFields,
+            isDisabled: true
+        });
+    } else {
+        setFormDisabled({ form, fields: materialDataFields, isDisabled: isStockAdjustment });
+    }
+
     setFormDisabled({ form, fields: stockFields, isDisabled: !isStockAdjustment });
 
-    const isEditMode = form.dataset.mode === 'edit';
     setFormDisabled({
         form,
         fields: [supplierField],

@@ -16,6 +16,8 @@ const isGoodsReceiptCreation = (form) => getCreationContext(form) === goodsRecei
 
 const getMaterialValidators = (form) => {
 
+    if (form.dataset.mode === 'edit') return { name: materialValidators.name };
+
     if (!isGoodsReceiptCreation(form)) return materialValidators;
 
     return {
@@ -35,7 +37,7 @@ useForm({
         }
 
         if (!isStockMode(form) && form.dataset.mode === 'edit') {
-            delete formData.supplierId;
+            return { name: formData.name };
         }
 
         if (!isStockMode(form)) {
