@@ -260,56 +260,66 @@ const getFormFieldContainer = (form, fieldName) => {
 export const setFormSectionVisibility = ({
     form,
     selector,
-    isVisible
+    isVisible,
+    fieldNames = [],
+    clearValues = false
 }) => {
 
     const section = form.querySelector(selector);
 
-    if (!section) return;
+    if (section) section.classList.toggle('d-none', !isVisible);
 
-    section.classList.toggle('d-none', !isVisible);
+    fieldNames.forEach(fieldName => {
+        const field = form.elements[fieldName];
+
+        if (!field) return;
+
+        const container = getFormFieldContainer(form, fieldName);
+
+        if (container) container.classList.toggle('d-none', !isVisible);
+
+        if (clearValues && !isVisible) field.value = '';
+
+        field.required = false;
+        field.disabled = !isVisible;
+
+        if (field.tagName === 'SELECT' && typeof window !== 'undefined' && window.$ && window.$(field).hasClass('select2-hidden-accessible')) {
+            window.$(field).prop('disabled', !isVisible).trigger('change.select2');
+        }
+    });
 };
 
-export const setFormFieldVisibility = ({
+export const hideFormSection = ({
     form,
-    fieldName,
-    isVisible,
-    clearWhenHidden = false,
-    requiredWhenVisible = false,
-    enableWhenVisible = true,
-    labelContent = null,
-    preserveStyle = false
+    selector,
+    fieldNames = [],
+    clearValues = false,
+    isHidden = true
 }) => {
 
-    const field = form.elements[fieldName];
+    setFormSectionVisibility({
+        form,
+        selector,
+        isVisible: !isHidden,
+        fieldNames,
+        clearValues
+    });
+};
 
-    if (!field) return;
+export const hideFormFields = ({
+    form,
+    fieldNames = [],
+    clearValues = false,
+    isHidden = true
+}) => {
 
-    const container = getFormFieldContainer(form, fieldName);
-    const label = field.id ? form.querySelector(`label[for="${ field.id }"]`) : null;
-
-    if (container) container.classList.toggle('d-none', !isVisible);
-
-    field.required = isVisible && requiredWhenVisible;
-
-    if (!isVisible) {
-
-        if (clearWhenHidden) field.value = '';
-
-        if (!preserveStyle) {
-            toggleDisabledElement({
-                element: field,
-                isDisabled: true
-            });
-        }
-    } else {
-        toggleDisabledElement({
-            element: field,
-            isDisabled: enableWhenVisible ? field.defaultDisabled : true
-        });
-    }
-
-    if (label && labelContent !== null) label.textContent = labelContent;
+    setFormSectionVisibility({
+        form,
+        selector: null,
+        isVisible: !isHidden,
+        fieldNames,
+        clearValues
+    });
 };
 
 export const setFormDisabled = ({
