@@ -35,6 +35,17 @@ const buildMaterialData = ({ rest, relations }) => ({
     }
 });
 
+const findMaterialByIdentity = ({ tx, rest, relations }) => tx.material.findFirst({
+    where: {
+        name: { equals: rest.name, mode: 'insensitive' },
+        presentationId: relations.presentationId,
+        unitMeasureId: relations.unitMeasureId,
+        base: rest.base ?? null,
+        height: rest.height ?? null
+    },
+    select: { id: true }
+});
+
 const createMaterialInTransaction = async ({
     tx,
     materialDto
@@ -44,6 +55,23 @@ const createMaterialInTransaction = async ({
         rest,
         relations
     } = await prepareMaterialData({ tx, materialDto });
+
+    const existingMaterial = await findMaterialByIdentity({ tx, rest, relations });
+
+    if (existingMaterial) {
+        await syncSupplierMaterial({
+            tx,
+            supplierId: relations.supplierId,
+            materialId: existingMaterial.id,
+            maxUnitCost: relations.maxUnitCost
+        });
+
+        return findSupplierMaterialByIds({
+            tx,
+            materialId: existingMaterial.id,
+            supplierId: relations.supplierId
+        });
+    }
 
     const createdMaterial = await tx.material.create({
         data: buildMaterialData({ rest, relations }),

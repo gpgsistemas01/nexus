@@ -147,4 +147,24 @@ describe('goodsReceiptService', () => {
       movementType: 'ENTRY'
     });
   });
+
+  it('informa conflicto cuando el proveedor ya tiene registrada la factura', async () => {
+    goodsReceiptUpdate.mockRejectedValue(Object.assign(new Error('Unique constraint failed'), {
+      code: 'P2002',
+      meta: { target: ['supplierId', 'invoice'] }
+    }));
+
+    await expect(updateGoodsReceipt({
+      id: 'receipt-1',
+      goodsReceiptDto: {
+        receivedById: 'person-1',
+        isInvoiced: true,
+        invoice: 'FAC-1',
+        receptionDate: new Date('2026-07-09T00:00:00.000Z')
+      }
+    })).rejects.toMatchObject({
+      code: 'GOODS_RECEIPT_INVOICE_ALREADY_EXISTS',
+      statusCode: 409
+    });
+  });
 });

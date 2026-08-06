@@ -11,7 +11,7 @@ const createInventoryMovement = vi.fn();
 const findSupplierMaterialByIds = vi.fn();
 const adjustSupplierMaterialStock = vi.fn();
 const findGoodsReceiptDetailChangeReason = vi.fn();
-const updateMaterialUnitCostIfHigher = vi.fn();
+const recalculateMaterialUnitCosts = vi.fn();
 
 vi.mock('../../../../../src/utils/logger.js', () => ({
   createServiceLogger: vi.fn(() => ({})),
@@ -30,7 +30,7 @@ vi.mock('../../../../../src/services/inventory/movementService.js', () => ({
 }));
 
 vi.mock('../../../../../src/services/warehouse/materials/supplierMaterialService.js', () => ({
-  updateMaterialUnitCostIfHigher,
+  recalculateMaterialUnitCosts,
   findSupplierMaterialByIds,
   adjustSupplierMaterialStock
 }));
@@ -99,15 +99,15 @@ describe('goods receipt detail change services', () => {
     createInventoryMovement.mockResolvedValue({ id: 'movement-1' });
     adjustSupplierMaterialStock.mockResolvedValue({});
     correctGoodsReceiptDetailAndTotals.mockResolvedValue({
-      updatedDetail: { id: 'detail-1' },
+      updatedDetail: { id: 'detail-1', materialId: 'material-old' },
       updatedReceipt: { id: 'receipt-1', supplierId: 'supplier-1' }
     });
     cancelGoodsReceiptDetailAndTotals.mockResolvedValue({
-      updatedDetail: { id: 'detail-1', status: 'CANCELED' },
+      updatedDetail: { id: 'detail-1', materialId: 'material-old', status: 'CANCELED' },
       updatedReceipt: { id: 'receipt-1', supplierId: 'supplier-1' }
     });
     goodsReceiptDetailChangeCreate.mockResolvedValue({ id: 'change-1', inventoryMovement: { id: 'movement-1' } });
-    updateMaterialUnitCostIfHigher.mockResolvedValue();
+    recalculateMaterialUnitCosts.mockResolvedValue();
   });
 
   it('crea la corrección de recepción de compra', async () => {
@@ -148,11 +148,15 @@ describe('goods receipt detail change services', () => {
       correctedDetail: expect.objectContaining({ quantity: 4 })
     }));
     expect(cancelGoodsReceiptDetailAndTotals).not.toHaveBeenCalled();
+    expect(recalculateMaterialUnitCosts).toHaveBeenCalledWith({
+      supplierId: 'supplier-1',
+      materialIds: ['material-old']
+    });
     expect(result.movement).toEqual({ id: 'movement-1' });
     expect(result).not.toHaveProperty('costDifference');
   });
 
-  it('cancela el detalle con un flujo independiente sin actualizar costo unitario', async () => {
+  it('cancela el detalle y recalcula el costo unitario restante', async () => {
     const tx = {
       goodsReceiptDetail: {
         findFirst: goodsReceiptDetailFindFirst
@@ -202,7 +206,10 @@ describe('goods receipt detail change services', () => {
       }
     }));
     expect(goodsReceiptDetailChangeFindUnique).not.toHaveBeenCalled();
-    expect(updateMaterialUnitCostIfHigher).not.toHaveBeenCalled();
+    expect(recalculateMaterialUnitCosts).toHaveBeenCalledWith({
+      supplierId: 'supplier-1',
+      materialIds: ['material-old']
+    });
     expect(result).not.toHaveProperty('costDifference');
   });
 

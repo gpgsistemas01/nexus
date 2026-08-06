@@ -1,3 +1,5 @@
+const normalizeInvoice = (invoice) => invoice.trim().toUpperCase();
+
 export const createGoodsReceiptDtoForRegister = (body = {}) => {
     const isInvoiced = Object.prototype.hasOwnProperty.call(body, 'isInvoiced') ? Boolean(body.isInvoiced) : null;
 
@@ -5,7 +7,7 @@ export const createGoodsReceiptDtoForRegister = (body = {}) => {
         supplierId: body.supplierId.trim(),
         receivedById: body.receivedById.trim(),
         ...(isInvoiced ? { isInvoiced } : {}),
-        ...(isInvoiced ? { invoice: body.invoice.trim() } : {}),
+        ...(isInvoiced ? { invoice: normalizeInvoice(body.invoice) } : {}),
         receptionDate: new Date(body.receptionDate),
         ...(Object.prototype.hasOwnProperty.call(body, 'observations') ? { observations: body.observations.trim() } : {}),
         details: (body.details).map(d => ({
@@ -23,7 +25,7 @@ export const createGoodsReceiptDtoForEdit = (body = {}) => {
     return {
         receivedById: body.receivedById.trim(),
         isInvoiced: Boolean(isInvoiced),
-        ...(isInvoiced ? { invoice: body.invoice.trim() } : { invoice: null }),
+        ...(isInvoiced ? { invoice: normalizeInvoice(body.invoice) } : { invoice: null }),
         receptionDate: new Date(body.receptionDate),
         ...(Object.prototype.hasOwnProperty.call(body, 'observations') ? { observations: body.observations.trim() } : {}),
         details: (body.details || []).map(d => ({
