@@ -21,6 +21,17 @@ export class GoodsReceiptCreateDatabaseError extends AppError {
     }
 }
 
+export class GoodsReceiptInvoiceAlreadyExists extends AppError {
+
+    constructor() {
+        super(
+            'Ya existe una compra con el mismo número de factura para este proveedor',
+            'GOODS_RECEIPT_INVOICE_ALREADY_EXISTS',
+            409
+        );
+    }
+}
+
 export class PersonReceivedByNotFound extends AppError {
 
     constructor() {

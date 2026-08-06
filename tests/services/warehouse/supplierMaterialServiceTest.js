@@ -21,6 +21,7 @@ vi.mock('../../../src/repository/baseRepository.js', () => ({
 
 const {
   recalculateConvertedQuantityByMaterial,
+  recalculateMaterialUnitCosts,
   updateMaterialUnitCostIfHigher,
   updateSupplierMaterialStock
 } = await import('../../../src/services/warehouse/materials/supplierMaterialService.js');
@@ -83,6 +84,26 @@ describe('supplierMaterialService', () => {
     expect(params).toEqual([
       2,
       3,
+      '00000000-0000-0000-0000-000000000101'
+    ]);
+  });
+
+  it('recalcula el costo máximo desde los detalles activos de compra', async () => {
+    await recalculateMaterialUnitCosts({
+      supplierId: '00000000-0000-0000-0000-000000000001',
+      materialIds: [
+        '00000000-0000-0000-0000-000000000101',
+        '00000000-0000-0000-0000-000000000101'
+      ]
+    });
+
+    expect(executeRawUnsafe).toHaveBeenCalledTimes(1);
+    const [query, ...params] = executeRawUnsafe.mock.calls[0];
+
+    expect(query).toContain('MAX(detail."conversionUnitCost")');
+    expect(query).toContain('detail."status" = \'ACTIVE\'');
+    expect(params).toEqual([
+      '00000000-0000-0000-0000-000000000001',
       '00000000-0000-0000-0000-000000000101'
     ]);
   });

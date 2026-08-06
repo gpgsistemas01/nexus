@@ -221,10 +221,10 @@ model WasteStockAdjustmentDetail {
   wasteStockAdjustmentId String @db.Uuid
   wasteId                String @db.Uuid
 
-  materialId   String @db.Uuid
-  supplierId   String @db.Uuid
-  materialName String @db.VarChar(200)
-  supplierName String @db.VarChar(200)
+  materialId   String   @db.Uuid
+  supplierId   String   @db.Uuid
+  materialName String   @db.VarChar(200)
+  supplierName String   @db.VarChar(200)
   wasteBase    Decimal? @db.Decimal(10, 2)
   wasteHeight  Decimal? @db.Decimal(10, 2)
 
@@ -347,6 +347,8 @@ model GoodsReceipt {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@unique([supplierId, invoice])
 }
 
 model GoodsReceiptDetail {

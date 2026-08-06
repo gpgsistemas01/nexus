@@ -19,12 +19,13 @@ import {
     GOODS_RECEIPT_DETAIL_STATUS
 } from './goodsReceiptDetailChangeService.js';
 import { findGoodsReceiptDetailChangeReason } from '../../reasonService.js';
+import { recalculateMaterialUnitCosts } from '../../materials/supplierMaterialService.js';
 
 const serviceLogger = createServiceLogger('warehouse.goodsReceipts.detailChanges.goodsReceiptCancellationService');
 
 export const cancelGoodsReceiptDetailLine = async ({ id, detailId }) => {
     try {
-        return await getDb().$transaction(async (tx) => {
+        const result = await getDb().$transaction(async (tx) => {
             const currentDetail = await findReceiptDetailForChange({ tx, goodsReceiptId: id, detailId });
 
             if (!currentDetail) throw new GoodsReceiptNotFound();
@@ -75,6 +76,13 @@ export const cancelGoodsReceiptDetailLine = async ({ id, detailId }) => {
                 movement
             };
         });
+
+        await recalculateMaterialUnitCosts({
+            supplierId: result.updatedReceipt.supplierId,
+            materialIds: [result.updatedDetail.materialId]
+        });
+
+        return result;
     } catch (err) {
         logServiceError(serviceLogger, err, {
             operation: 'warehouse.goodsReceipts.detailChanges.goodsReceiptCancellationService.cancelGoodsReceiptDetailLine',

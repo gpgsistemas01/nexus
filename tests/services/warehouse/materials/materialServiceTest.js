@@ -6,6 +6,8 @@ const createStockAdjustment = vi.fn();
 const findAllSupplierMaterials = vi.fn();
 const materialFindMany = vi.fn();
 const materialFindUnique = vi.fn();
+const materialFindFirst = vi.fn();
+const materialCreate = vi.fn();
 const transaction = vi.fn();
 const goodsReceiptDetailCount = vi.fn();
 const goodsIssueDetailCount = vi.fn();
@@ -35,6 +37,8 @@ vi.mock('../../../../src/repository/baseRepository.js', () => ({
     material: {
       findMany: materialFindMany,
       findUnique: materialFindUnique,
+      findFirst: materialFindFirst,
+      create: materialCreate,
       delete: materialDelete
     },
     goodsReceiptDetail: { count: goodsReceiptDetailCount },
@@ -67,13 +71,13 @@ vi.mock('../../../../src/services/warehouse/materials/supplierMaterialService.js
   recalculateConvertedQuantityByMaterial
 }));
 
-const { deleteMaterial, existsMaterial, findAllMaterials, findMaterialsSnapshot, updateMaterial, updateMaterialStock } = await import('../../../../src/services/warehouse/materials/materialService.js');
+const { createMaterial, deleteMaterial, existsMaterial, findAllMaterials, findMaterialsSnapshot, updateMaterial, updateMaterialStock } = await import('../../../../src/services/warehouse/materials/materialService.js');
 
 describe('materialService submit operations', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     transaction.mockImplementation((callback) => callback({
-      material: { findUnique: materialFindUnique, update: materialUpdate, delete: materialDelete },
+      material: { findUnique: materialFindUnique, findFirst: materialFindFirst, create: materialCreate, update: materialUpdate, delete: materialDelete },
       goodsReceiptDetail: { count: goodsReceiptDetailCount },
       goodsIssueDetail: { count: goodsIssueDetailCount },
       purchaseRequisitionDetail: { count: purchaseRequisitionDetailCount },
@@ -104,6 +108,30 @@ describe('materialService submit operations', () => {
       supplierId: 'supplier-1',
       orderBy: 'name',
       orderDir: 'desc'
+    });
+  });
+
+  it('reutiliza el id de un material existente y solo agrega la relación del proveedor', async () => {
+    prepareMaterialData.mockResolvedValue({
+      rest: { name: 'Lámina', base: null, height: null, minStock: 0 },
+      relations: {
+        supplierId: 'supplier-2',
+        presentationId: 'presentation-1',
+        unitMeasureId: 'unit-1',
+        maxUnitCost: 12
+      }
+    });
+    materialFindFirst.mockResolvedValue({ id: 'material-existing' });
+    findSupplierMaterialByIds.mockResolvedValue({ id: 'material-existing', supplier: { id: 'supplier-2' } });
+
+    await expect(createMaterial({ materialDto: {} })).resolves.toMatchObject({ id: 'material-existing' });
+
+    expect(materialCreate).not.toHaveBeenCalled();
+    expect(syncSupplierMaterial).toHaveBeenCalledWith({
+      tx: expect.any(Object),
+      supplierId: 'supplier-2',
+      materialId: 'material-existing',
+      maxUnitCost: 12
     });
   });
 

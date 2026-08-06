@@ -397,6 +397,29 @@ export const updateMaterialUnitCostIfHigher = async ({
     return db.$executeRawUnsafe(query, ...params);
 };
 
+export const recalculateMaterialUnitCosts = async ({ supplierId, materialIds }) => {
+    const uniqueMaterialIds = [...new Set(materialIds)];
+
+    if (uniqueMaterialIds.length === 0) return { count: 0 };
+
+    const placeholders = uniqueMaterialIds.map((_, index) => `$${index + 2}::uuid`).join(', ');
+    const query = `
+        UPDATE "SupplierMaterial" AS sp
+        SET "maxUnitCost" = (
+            SELECT MAX(detail."conversionUnitCost")
+            FROM "GoodsReceiptDetail" AS detail
+            INNER JOIN "GoodsReceipt" AS receipt ON receipt."id" = detail."goodsReceiptId"
+            WHERE receipt."supplierId" = sp."supplierId"
+              AND detail."materialId" = sp."materialId"
+              AND detail."status" = 'ACTIVE'
+        )
+        WHERE sp."supplierId" = $1::uuid
+          AND sp."materialId" IN (${placeholders})
+    `;
+
+    return getDb().$executeRawUnsafe(query, supplierId, ...uniqueMaterialIds);
+};
+
 export const updateSupplierMaterialStock = async ({
     tx,
     grouped,

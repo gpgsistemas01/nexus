@@ -1,5 +1,6 @@
 import {
     GoodsReceiptCreateDatabaseError,
+    GoodsReceiptInvoiceAlreadyExists,
     GoodsReceiptAlreadyCanceled,
     GoodsReceiptNotFound,
     GoodsReceiptUpdateDatabaseError,
@@ -21,6 +22,21 @@ import { buildDateRangeFilter } from "../../../utils/requestQueryUtils.js";
 import { GOODS_RECEIPT_STATUS_NAMES } from "../../../constants/warehouseStatuses.js";
 import { INVENTORY_MOVEMENT_TYPES } from "../../../constants/inventory.js";
 import { DOCUMENT_REFERENCE_TYPES } from "../../../constants/documentReferenceTypes.js";
+import { PRISMA_ERROR_CODES } from "../../../constants/prisma.js";
+
+const throwIfInvoiceAlreadyExists = (err) => {
+    if (err?.code !== PRISMA_ERROR_CODES.RECORD_NOT_UNIQUE) return;
+
+    const driverConstraint = err.meta?.driverAdapterError?.cause?.constraint;
+    const target = err.meta?.target ?? driverConstraint?.fields ?? driverConstraint?.index;
+    const isInvoiceTarget = Array.isArray(target)
+        ? target.includes('supplierId') && target.includes('invoice')
+        : typeof target === 'string' && target.includes('supplierId') && target.includes('invoice');
+
+    if (isInvoiceTarget) {
+        throw new GoodsReceiptInvoiceAlreadyExists();
+    }
+};
 
 
 export const findAllGoodsReceipts = async ({
@@ -225,6 +241,7 @@ export const createGoodsReceipt = async ({ goodsReceiptDto }) => {
         });
 
         if (isAppError(err)) throw err;
+        throwIfInvoiceAlreadyExists(err);
         throwIfReferenceNumberAlreadyExists({ err, referenceNumber });
 
         throw new GoodsReceiptCreateDatabaseError();
@@ -327,6 +344,8 @@ export const updateGoodsReceipt = async ({ id, goodsReceiptDto }) => {
         });
 
         if (isAppError(err)) throw err;
+
+        throwIfInvoiceAlreadyExists(err);
 
         throw new GoodsReceiptUpdateDatabaseError();
     }
