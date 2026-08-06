@@ -34,6 +34,10 @@ useForm({
             formData.supplierId = document.querySelector(`${ materialModalId } select[name='supplierId']`).value;
         }
 
+        if (!isStockMode(form) && form.dataset.mode === 'edit') {
+            delete formData.supplierId;
+        }
+
         if (!isStockMode(form)) {
             formData.isActive = document.querySelector(`${ formId } #isActiveInput`).checked;
         }

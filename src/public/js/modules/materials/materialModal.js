@@ -6,7 +6,8 @@ import { FORM_SELECTORS, MODAL_SELECTORS } from "../../constants/selectors.js";
 
 const materialModalId = MODAL_SELECTORS.MATERIAL;
 const formId = FORM_SELECTORS.MATERIAL_FORM;
-const materialDataFields = ['name', 'minStock', 'maxUnitCost', 'base', 'height', 'supplierId', 'presentationId', 'unitMeasureId', 'isActive'];
+const materialDataFields = ['name', 'minStock', 'maxUnitCost', 'base', 'height', 'presentationId', 'unitMeasureId', 'isActive'];
+const supplierField = 'supplierId';
 const stockFields = ['newStock', 'reasonId', 'observations'];
 const goodsReceiptCreationContext = 'goodsReceipt';
 const maxUnitCostLabel = 'Costo Máximo';
@@ -32,6 +33,13 @@ const setupMaterialModalFields = ({
     setFormDisabled({ form, fields: materialDataFields, isDisabled: isStockAdjustment });
     setFormDisabled({ form, fields: stockFields, isDisabled: !isStockAdjustment });
 
+    const isEditMode = form.dataset.mode === 'edit';
+    setFormDisabled({
+        form,
+        fields: [supplierField],
+        isDisabled: isEditMode || isStockAdjustment
+    });
+
     setFormFieldVisibility({
         form,
         fieldName: 'maxUnitCost',
@@ -39,7 +47,18 @@ const setupMaterialModalFields = ({
         clearWhenHidden: true,
         requiredWhenVisible: true,
         enableWhenVisible: true,
-        labelContent: maxUnitCostLabel
+        labelContent: maxUnitCostLabel,
+        preserveStyle: true
+    });
+
+    setFormFieldVisibility({
+        form,
+        fieldName: supplierField,
+        isVisible: true,
+        clearWhenHidden: false,
+        requiredWhenVisible: true,
+        enableWhenVisible: !isEditMode,
+        labelContent: 'Proveedor'
     });
 };
 

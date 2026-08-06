@@ -277,7 +277,8 @@ export const setFormFieldVisibility = ({
     clearWhenHidden = false,
     requiredWhenVisible = false,
     enableWhenVisible = true,
-    labelContent = null
+    labelContent = null,
+    preserveStyle = false
 }) => {
 
     const field = form.elements[fieldName];
@@ -295,10 +296,12 @@ export const setFormFieldVisibility = ({
 
         if (clearWhenHidden) field.value = '';
 
-        toggleDisabledElement({
-            element: field,
-            isDisabled: true
-        });
+        if (!preserveStyle) {
+            toggleDisabledElement({
+                element: field,
+                isDisabled: true
+            });
+        }
     } else {
         toggleDisabledElement({
             element: field,

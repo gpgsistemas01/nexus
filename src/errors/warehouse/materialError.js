@@ -74,6 +74,13 @@ export class MaterialDeleteRelationConflict extends AppError {
     }
 }
 
+export class MaterialSupplierChangeConflict extends AppError {
+
+    constructor () {
+        super('No se puede cambiar el proveedor del material porque ya tiene historial de compras o salidas.', 'MATERIAL_SUPPLIER_CHANGE_CONFLICT', 409);
+    }
+}
+
 export class MaterialStockAdjustmentDatabaseError extends AppError {
 
     constructor () {

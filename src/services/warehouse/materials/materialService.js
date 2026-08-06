@@ -1,4 +1,4 @@
-import { MaterialAlreadyExists, MaterialCreateDatabaseError, MaterialNotFound, MaterialUpdateDatabaseError, MaterialStockAdjustmentDatabaseError, MaterialDeleteDatabaseError, MaterialDeleteRelationConflict } from "../../../errors/warehouse/materialError.js";
+import { MaterialAlreadyExists, MaterialCreateDatabaseError, MaterialNotFound, MaterialUpdateDatabaseError, MaterialStockAdjustmentDatabaseError, MaterialDeleteDatabaseError, MaterialDeleteRelationConflict, MaterialSupplierChangeConflict } from "../../../errors/warehouse/materialError.js";
 import { getDb } from "../../../repository/baseRepository.js";
 import { findAllSupplierMaterials, findCurrentSupplierMaterialByMaterialId, findSupplierMaterialByIds, recalculateConvertedQuantityByMaterial } from "./supplierMaterialService.js";
 import { prepareMaterialData } from "./materialHelpers.js";
@@ -59,12 +59,24 @@ const createMaterialInTransaction = async ({
     const existingMaterial = await findMaterialByIdentity({ tx, rest, relations });
 
     if (existingMaterial) {
-        await syncSupplierMaterial({
-            tx,
-            supplierId: relations.supplierId,
-            materialId: existingMaterial.id,
-            maxUnitCost: relations.maxUnitCost
+        const existingSupplierMaterial = await tx.supplierMaterial.findUnique({
+            where: {
+                supplierId_materialId: {
+                    supplierId: relations.supplierId,
+                    materialId: existingMaterial.id
+                }
+            },
+            select: { id: true }
         });
+
+        if (!existingSupplierMaterial) {
+            await syncSupplierMaterial({
+                tx,
+                supplierId: relations.supplierId,
+                materialId: existingMaterial.id,
+                maxUnitCost: relations.maxUnitCost
+            });
+        }
 
         return findSupplierMaterialByIds({
             tx,
@@ -200,11 +212,6 @@ export const updateMaterial = async (materialDto, id) => {
 
             await existsMaterial({ tx, id });
 
-            const currentSupplierMaterial = await findCurrentSupplierMaterialByMaterialId({
-                tx,
-                materialId: id
-            });
-
             const {
                 rest,
                 relations
@@ -214,6 +221,37 @@ export const updateMaterial = async (materialDto, id) => {
                 materialId: id
             });
 
+            const currentSupplierMaterial = await findCurrentSupplierMaterialByMaterialId({
+                tx,
+                materialId: id
+            });
+
+            if (currentSupplierMaterial?.supplierId && relations.supplierId !== currentSupplierMaterial.supplierId) {
+                const [goodsReceiptCount, goodsIssueCount] = await Promise.all([
+                    tx.goodsReceiptDetail.count({ where: { materialId: id } }),
+                    tx.goodsIssueDetail.count({ where: { materialId: id } })
+                ]);
+
+                if (goodsReceiptCount > 0 || goodsIssueCount > 0) {
+                    throw new MaterialSupplierChangeConflict();
+                }
+            }
+
+            const existingMaterial = await tx.material.findFirst({
+                where: {
+                    name: { equals: rest.name, mode: 'insensitive' },
+                    presentationId: relations.presentationId,
+                    unitMeasureId: relations.unitMeasureId,
+                    base: rest.base ?? null,
+                    height: rest.height ?? null,
+                    NOT: { id }
+                },
+                select: { id: true }
+            });
+
+            if (existingMaterial) {
+                throw new MaterialAlreadyExists();
+            }
 
             const updatedMaterial = await tx.material.update({
                 where: { id },
