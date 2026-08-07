@@ -108,6 +108,17 @@
             class: 'stock-data-section',
             groups: [
                 {
+                    type: 'selects',
+                    items: [
+                        {
+                            id: 'reasonInput',
+                            name: 'reasonId',
+                            class: 'reason-select',
+                            col: 'col-6'
+                        }
+                    ]
+                },
+                {
                     type: 'inputs',
                     items: [
                         {
@@ -119,17 +130,6 @@
                                 'min': '0'
                             },
                             col: '6'
-                        }
-                    ]
-                },
-                {
-                    type: 'selects',
-                    items: [
-                        {
-                            id: 'reasonInput',
-                            name: 'reasonId',
-                            class: 'reason-select',
-                            col: 'col-6'
                         }
                     ]
                 },

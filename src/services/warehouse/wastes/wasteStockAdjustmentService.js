@@ -137,7 +137,9 @@ export const registerWasteStockAdjustment = async ({
             include
         });
     } catch (err) {
+
         throwIfReferenceNumberAlreadyExists({ err, referenceNumber });
+        
         throw err;
     }
 };
