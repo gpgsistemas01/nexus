@@ -41,7 +41,18 @@ export const materialStockValidators = {
     observations: (value) => validateTextOptional(value, 500, 'Las observaciones'),
 }
 
-export const wasteDataValidators = {
+export const wasteSecondaryDataValidators = {
+    minStock: (value) => validateNumberOptional(value, 'El stock mínimo'),
+    isActive: (value) => isEmptyOrNull(value, 'El estado de la merma'),
+}
+
+export const wasteStockValidators = {
+    currentStock: (value) => validateNumber(value, 'El stock de merma'),
+    reasonId: (value) => isEmptyOrNull(value, 'La razón de ajuste'),
+    observations: (value) => validateTextOptional(value, 500, 'Las observaciones'),
+}
+
+export const newWasteValidators = {
     supplierMaterialId: (value) => isEmptyOrNull(value, 'El material'),
     base: (_, { base, height }) => validatePairedOptionalNumber({
         value: base,
@@ -55,16 +66,7 @@ export const wasteDataValidators = {
         fieldName: 'La altura de la merma',
         allowZero: false
     }),
-}
-
-export const wasteStockValidators = {
-    currentStock: (value) => validateNumber(value, 'El stock de merma'),
-    reasonId: (value) => isEmptyOrNull(value, 'La razón de ajuste'),
-    observations: (value) => validateTextOptional(value, 500, 'Las observaciones'),
-}
-
-export const wasteValidators = {
-    ...wasteDataValidators,
+    ...wasteSecondaryDataValidators,
     currentStock: wasteStockValidators.currentStock,
     observations: wasteStockValidators.observations,
 }

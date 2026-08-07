@@ -209,11 +209,10 @@ export const createWasteWithInitialStockAdjustment = async ({
                 height: wasteDto.height
             });
 
-            if (existingWaste) {
-                throw new WasteAlreadyExists();
-            }
+            if (existingWaste) throw new WasteAlreadyExists();
 
             const initialStockReason = await findInitialStockAdjustmentReason({ tx });
+
             if (!initialStockReason) throw new WasteInitialStockReasonNotFound();
 
             const waste = await tx.waste.create({
@@ -227,8 +226,7 @@ export const createWasteWithInitialStockAdjustment = async ({
                         base: wasteDto.base,
                         height: wasteDto.height
                     })
-                },
-                include: WASTE_INCLUDE
+                }
             });
 
             await registerWasteStockAdjustment({
@@ -243,7 +241,7 @@ export const createWasteWithInitialStockAdjustment = async ({
                 updateStock: false
             });
 
-            return mapWaste(waste);
+            return waste;
         });
 
         logServiceInfo(serviceLogger, {
@@ -277,39 +275,13 @@ export const updateWaste = async ({
 
             const currentWaste = await findWasteById({ tx, id });
 
-            await findSupplierMaterialById({
-                tx,
-                id: wasteDto.supplierMaterialId
-            });
-
-            const existingWaste = await findWasteBySupplierMaterialAndDimensions({
-                tx,
-                supplierMaterialId: wasteDto.supplierMaterialId,
-                base: wasteDto.base,
-                height: wasteDto.height,
-                excludeId: id
-            });
-
-            if (existingWaste) {
-                throw new WasteAlreadyExists();
-            }
-
-            const updatedWaste = await tx.waste.update({
+            return await tx.waste.update({
                 where: { id },
                 data: {
-                    supplierMaterial: { connect: { id: wasteDto.supplierMaterialId } },
-                    base: wasteDto.base,
-                    height: wasteDto.height,
-                    convertedQuantity: calculateConvertedQuantity({
-                        currentStock: currentWaste.currentStock,
-                        base: wasteDto.base,
-                        height: wasteDto.height
-                    })
-                },
-                include: WASTE_INCLUDE
+                    isActive: wasteDto.isActive,
+                    minStock: wasteDto.minStock
+                }
             });
-
-            return mapWaste(updatedWaste);
         });
 
         logServiceInfo(serviceLogger, {
@@ -332,69 +304,6 @@ export const updateWaste = async ({
     }
 };
 
-
-export const deleteWaste = async (id) => {
-
-    try {
-
-        const deletedWaste = await getDb().$transaction(async (tx) => {
-
-            await findWasteById({ tx, id });
-
-            const stockAdjustmentDetails = await tx.wasteStockAdjustmentDetail.findMany({
-                where: { wasteId: id },
-                select: { wasteStockAdjustmentId: true }
-            });
-            const stockAdjustmentIds = stockAdjustmentDetails.map(({ wasteStockAdjustmentId }) => wasteStockAdjustmentId);
-
-            await tx.wasteMovementDetail.deleteMany({ where: { wasteId: id } });
-
-            if (stockAdjustmentIds.length) {
-                const stockAdjustments = await tx.wasteStockAdjustment.findMany({
-                    where: { id: { in: stockAdjustmentIds } },
-                    select: { wasteMovementId: true }
-                });
-                const wasteMovementIds = stockAdjustments
-                    .map(({ wasteMovementId }) => wasteMovementId)
-                    .filter(Boolean);
-
-                if (wasteMovementIds.length) {
-                    await tx.wasteMovement.deleteMany({
-                        where: { id: { in: wasteMovementIds } }
-                    });
-                }
-
-                await tx.wasteStockAdjustment.deleteMany({
-                    where: { id: { in: stockAdjustmentIds } }
-                });
-            }
-
-            return tx.waste.delete({
-                where: { id },
-                select: { id: true }
-            });
-        });
-
-        logServiceInfo(serviceLogger, {
-            operation: 'warehouse.wasteService.deleteWaste',
-            ...getModelLogContext('waste', { id })
-        }, 'Merma eliminada correctamente');
-
-        return deletedWaste;
-
-    } catch (err) {
-        logServiceError(serviceLogger, err, {
-            operation: 'warehouse.wasteService.deleteWaste',
-            ...getModelLogContext('waste', { id })
-        });
-
-        handleWasteServiceError({
-            err,
-            fallbackError: new WasteDeleteDatabaseError()
-        });
-    }
-};
-
 export const updateWasteStock = async ({
     id,
     wasteStockDto,
@@ -407,7 +316,7 @@ export const updateWasteStock = async ({
 
             const currentWaste = await findWasteById({ tx, id });
 
-            const updatedWaste = await registerWasteStockAdjustment({
+            await registerWasteStockAdjustment({
                 tx,
                 waste: currentWaste,
                 reasonId: wasteStockDto.reasonId,
@@ -416,8 +325,6 @@ export const updateWasteStock = async ({
                 newStock: wasteStockDto.currentStock,
                 include: WASTE_INCLUDE
             });
-
-            return mapWaste(updatedWaste);
         });
 
         logServiceInfo(serviceLogger, {

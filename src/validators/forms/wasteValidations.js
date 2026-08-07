@@ -1,6 +1,6 @@
-import { validateNumber, validateNumberRequiredWhenOtherPresent, validatePositiveNumberOptional, validateTextOptional, validateUUID } from '../fields/fieldsValidator.js';
+import { validateBoolean, validateNumber, validateNumberOptional, validateNumberRequiredWhenOtherPresent, validatePositiveNumberOptional, validateTextOptional, validateUUID } from '../fields/fieldsValidator.js';
 
-const wasteDataValidation = [
+const newWasteDataValidation = [
     validateUUID('supplierMaterialId'),
     validateNumberRequiredWhenOtherPresent({ fieldName: 'base', pairedFieldName: 'height' }),
     validateNumberRequiredWhenOtherPresent({ fieldName: 'height', pairedFieldName: 'base' }),
@@ -13,16 +13,18 @@ const wasteStockValidationFields = [
     validateTextOptional({ fieldName: 'observations', maxLength: 500 })
 ];
 
-const wasteStockAdjustmentValidationFields = [
+export const wasteStockValidation = [
     ...wasteStockValidationFields,
     validateUUID('reasonId')
 ];
 
-export const wasteValidation = [
-    ...wasteDataValidation,
-    ...wasteStockValidationFields
+export const editedWasteDataValidation = [
+    validateNumberOptional('minStock', { disableTooLong: true }),
+    validateBoolean('isActive')
 ];
 
-export const wasteUpdateValidation = wasteDataValidation;
-
-export const wasteStockValidation = wasteStockAdjustmentValidationFields;
+export const wasteValidation = [
+    ...newWasteDataValidation,
+    ...editedWasteDataValidation,
+    ...wasteStockValidationFields
+];

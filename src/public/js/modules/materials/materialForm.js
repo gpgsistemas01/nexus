@@ -41,6 +41,9 @@ useForm({
         }
 
         if (!isStockMode(form)) {
+
+            if (!formData.minStock) delete formData.minStock;
+            
             formData.isActive = document.querySelector(`${ formId } #isActiveInput`).checked;
         }
 

@@ -1,7 +1,7 @@
 import { createDataTable, renderActionButtons } from "./baseDatatable.js";
 import { setupTableFilters } from "./utils/filters/tableFilter.js";
-import { deleteWaste, getAllWastes } from "../../application/warehouse/wastes.js";
-import { openWasteModal, openWasteStockAdjustmentModal } from "../../pages/warehouse/wastes/wasteModal.js";
+import { getAllWastes } from "../../application/warehouse/wastes.js";
+import { openWasteModal } from "../../pages/warehouse/wastes/wasteModal.js";
 import { configureResponsiveHeaderGroups, getResponsiveRowData } from "./utils/responsive.js";
 import { UI_PERMISSIONS } from "../../constants/permissions.js";
 import { DATATABLE_SELECTORS } from "../../constants/selectors.js";
@@ -20,7 +20,6 @@ export const createWasteDatatable = async (context) => {
     const canSeeCost = isWarehouse || isSystem || isSales;
     const canManageWastes = context.permissions?.includes(UI_PERMISSIONS.WASTES_WRITE) ?? false;
     const canAdjustStock = context.permissions?.includes(UI_PERMISSIONS.WASTES_ADJUST_STOCK) ?? false;
-    const canDeleteWastes = canManageWastes;
 
     renderWarehouseInventoryHeader({
         tableElement,
@@ -41,8 +40,7 @@ export const createWasteDatatable = async (context) => {
         renderActions: () => renderActionButtons({
             status: 'Abierta',
             context: 'waste',
-            canAdjustStock,
-            canDeleteWaste: canDeleteWastes
+            canAdjustStock
         })
     });
 
@@ -83,33 +81,7 @@ export const createWasteDatatable = async (context) => {
 
         const data = getResponsiveRowData(table, this);
 
-        await openWasteStockAdjustmentModal({ mode: 'edit-stock', data });
-    });
-
-
-    $(`${ selectorTable } tbody`).on('click', '.btn-delete-waste', async function() {
-
-        const data = getResponsiveRowData(table, this);
-
-        const result = await notifications.showConfirmation({
-            title: '¿Eliminar merma?',
-            text: 'Se eliminará la merma y sus ajustes de stock asociados solo si no tiene compras ni salidas vinculadas.',
-            icon: 'warning',
-            confirmButtonText: 'Eliminar',
-            cancelButtonText: 'Cancelar',
-            variant: 'danger'
-        });
-
-        if (!result.isConfirmed) return;
-
-        try {
-            const response = await deleteWaste(data.id);
-
-            notifications.showSuccess(response.message || '¡Merma eliminada exitosamente!');
-            table.ajax.reload(null, false);
-        } catch (err) {
-            handleApiError({ err, rethrow: false });
-        }
+        await openWasteModal({ mode: 'edit-stock', data });
     });
 
     return table;

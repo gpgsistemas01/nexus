@@ -1,6 +1,6 @@
 import { successCodeMessages } from '../../../messages/codeMessages.js';
-import { createWasteWithInitialStockAdjustment, deleteWaste, findAllWastes as findAllWasteItems, updateWaste, updateWasteStock } from '../../../services/warehouse/wastes/wasteService.js';
-import { createWasteDataDto, createWasteDto, createWasteStockDto } from '../../../dtos/wasteDTO.js';
+import { createWasteWithInitialStockAdjustment, findAllWastes, updateWaste, updateWasteStock } from '../../../services/warehouse/wastes/wasteService.js';
+import { createEditedWasteDto, createNewWasteDto, createWasteStockDto } from '../../../dtos/wasteDTO.js';
 import { sanitizeEmptyStrings } from '../../../utils/formattersUtils.js';
 import { getDataTableOrder, getDataTablePaging, getDataTableSearch } from '../../../utils/requestQueryUtils.js';
 
@@ -16,7 +16,7 @@ export const getAllWastes = async (req, res) => {
         columns
     });
 
-    const result = await findAllWasteItems({
+    const result = await findAllWastes({
         skip,
         take,
         search,
@@ -30,7 +30,7 @@ export const getAllWastes = async (req, res) => {
 
 export const registerWaste = async (req, res) => {
 
-    const wasteDto = createWasteDto(req.body);
+    const wasteDto = createNewWasteDto(req.body);
     const sanitizedWasteDto = sanitizeEmptyStrings(wasteDto);
 
     const waste = await createWasteWithInitialStockAdjustment({
@@ -46,7 +46,7 @@ export const registerWaste = async (req, res) => {
 
 export const editWaste = async (req, res) => {
 
-    const wasteDto = createWasteDataDto(req.body);
+    const wasteDto = createEditedWasteDto(req.body);
     const sanitizedWasteDto = sanitizeEmptyStrings(wasteDto);
 
     const waste = await updateWaste({
@@ -74,16 +74,5 @@ export const editWasteStock = async (req, res) => {
     return res.status(200).json({
         waste,
         code: successCodeMessages.UPDATED_WASTE
-    });
-};
-
-
-export const removeWaste = async (req, res) => {
-
-    const waste = await deleteWaste(req.params.id);
-
-    return res.status(200).json({
-        waste,
-        code: successCodeMessages.DELETED_WASTE
     });
 };

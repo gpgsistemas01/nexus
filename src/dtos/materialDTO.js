@@ -5,7 +5,7 @@ export const createMaterialDtoForRegister = (body = {}) => ({
     supplierId: body.supplierId,
     presentationId: body.presentationId,
     unitMeasureId: body.unitMeasureId,
-    minStock: Number(body.minStock),
+    ...Object.prototype.hasOwnProperty.call(body, 'minStock') && body.minStock !== null ? { minStock: Number(body.minStock) } : {},
     maxUnitCost: toNumber(body.maxUnitCost),
     ...normalizeMaterialDimensions(body),
     ...(Object.prototype.hasOwnProperty.call(body, 'isActive') ? { isActive: Boolean(body.isActive) } : {})
