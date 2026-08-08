@@ -5,8 +5,6 @@ import { openModal } from "../../../ui/modalUI.js";
 import { FORM_SELECTORS, MODAL_SELECTORS } from "../../../constants/selectors.js";
 import { wasteDataFields, wasteSecondaryDataFields, wasteStockFields } from './wasteFields.js';
 
-const wasteModalId = MODAL_SELECTORS.WASTE;
-const formId = FORM_SELECTORS.WASTE_FORM;
 const stockMode = 'edit-stock';
 const createMode = 'create';
 const initialStockReasonName = 'Stock inicial';
@@ -15,14 +13,13 @@ const stockDataSectionSelector = '.stock-data-section';
 const isEditMode = (mode) => mode === 'edit';
 const isStockMode = (mode) => mode === 'edit-stock';
 
-const prepareWasteModal = ({
-    mode,
-    data
-}) => {
+export const openWasteModal = ({
+    mode = 'create',
+    data = null
+} = {}) => {
 
-    const form = document.querySelector(formId);
-    const modalElement = document.querySelector(wasteModalId);
-    const enableStockFields = mode === stockMode;
+    const form = document.querySelector(FORM_SELECTORS.WASTE_FORM);
+    const modalElement = document.querySelector(MODAL_SELECTORS.WASTE);
     const isCreateMode = mode === createMode;
 
     initForm({ 
@@ -30,12 +27,15 @@ const prepareWasteModal = ({
         mode, 
         id: isCreateMode ? '' : data?.id 
     });
-    initWasteSelect2({ modalSelector: wasteModalId });
-    setWasteSelectOptions({ modalSelector: wasteModalId, data });
-    form.elements.base.value = isCreateMode ? '' : (data?.base ?? '');
-    form.elements.height.value = isCreateMode ? '' : (data?.height ?? '');
-    form.elements.currentStock.value = '';
+    initWasteSelect2({ modalSelector: MODAL_SELECTORS.WASTE });
+    setWasteSelectOptions({ modalSelector: MODAL_SELECTORS.WASTE, data });
+
+    form.elements.minStock.value = data?.minStock ?? '';
+    form.elements.base.value = data?.base ?? '';
+    form.elements.height.value = data?.height ?? '';
+    form.elements.isActive.checked = data?.isActive ?? true;
     form.elements.observations.value = '';
+    form.elements.currentStock.value = '';
 
     setFormDisabled({ 
         form, 
@@ -62,24 +62,11 @@ const prepareWasteModal = ({
         isDisabled: isEditMode(mode)
     });
     setReasonVisualOption({
-        selector: `${ wasteModalId } ${ FORM_SELECTORS.REASON }`,
+        selector: `${ MODAL_SELECTORS.WASTE } ${ FORM_SELECTORS.REASON }`,
         name: !isStockMode(mode) ? initialStockReasonName : null,
         isDisabled: !isStockMode(mode)
     });
     clearFormErrors(form);
-
-    return { form, modalElement };
-};
-
-export const openWasteModal = ({
-    mode = 'create',
-    data = null
-} = {}) => {
-
-    const { form, modalElement } = prepareWasteModal({
-        mode,
-        data
-    });
 
     modalElement.querySelector('#modalTitle').textContent = isEditMode(mode)
         ? 'Editar merma'

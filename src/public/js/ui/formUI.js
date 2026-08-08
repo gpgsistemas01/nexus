@@ -289,39 +289,6 @@ export const setFormSectionVisibility = ({
     });
 };
 
-export const hideFormSection = ({
-    form,
-    selector,
-    fieldNames = [],
-    clearValues = false,
-    isHidden = true
-}) => {
-
-    setFormSectionVisibility({
-        form,
-        selector,
-        isVisible: !isHidden,
-        fieldNames,
-        clearValues
-    });
-};
-
-export const hideFormFields = ({
-    form,
-    fieldNames = [],
-    clearValues = false,
-    isHidden = true
-}) => {
-
-    setFormSectionVisibility({
-        form,
-        selector: null,
-        isVisible: !isHidden,
-        fieldNames,
-        clearValues
-    });
-};
-
 export const setFormDisabled = ({
     form,
     fields = 'all',

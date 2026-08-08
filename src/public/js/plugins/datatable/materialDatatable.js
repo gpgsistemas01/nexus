@@ -1,4 +1,4 @@
-import { openMaterialModal, openStockAdjustmentModal } from "../../modules/materials/materialModal.js";
+import { openMaterialModal } from "../../modules/materials/materialModal.js";
 import { createDataTable, renderActionButtons } from "./baseDatatable.js";
 import { setupTableFilters } from "./utils/filters/tableFilter.js";
 import { notifications } from "../swal/swalComponent.js";
@@ -130,7 +130,7 @@ export const createMaterialDatatable = async (context) => {
 
         const data = getResponsiveRowData(table, this);
 
-        openStockAdjustmentModal({ mode: 'edit-stock', data });
+        openMaterialModal({ mode: 'edit-stock', data });
     });
 
     $(`${ selectorTable } tbody`).on('click', '.btn-delete-material', async function() {

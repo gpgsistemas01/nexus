@@ -10,8 +10,7 @@ const presentationSelector = FORM_SELECTORS.PRESENTATION;
 const reasonSelector = FORM_SELECTORS.REASON;
 
 export const initMaterialFormSelect2 = ({
-    modalSelector,
-    isStockAdjustment = false
+    modalSelector
 }) => {
 
     const supplierScopedSelector = `${ modalSelector } ${ supplierSelector }`;
@@ -35,19 +34,10 @@ export const initMaterialFormSelect2 = ({
         baseSelector: presentationScopedSelector,
         allowCreate: false
     });
-
-    if (!isStockAdjustment) return;
-
-    initReasonSelect({
-        modalSelector,
-        baseSelector: reasonScopedSelector,
-        allowCreate: false
-    });
 };
 
 export const setMaterialFormSelectOptions = ({
     modalSelector,
-    isStockAdjustment = false,
     data = null
 }) => {
 
@@ -72,13 +62,5 @@ export const setMaterialFormSelectOptions = ({
         selector: presentationScopedSelector,
         id: data?.presentation?.id,
         name: data?.presentation?.name
-    });
-
-    if (!isStockAdjustment) return;
-
-    toggleReasonOption({
-        selector: reasonScopedSelector,
-        id: data?.reason?.id,
-        name: data?.reason?.name
     });
 };

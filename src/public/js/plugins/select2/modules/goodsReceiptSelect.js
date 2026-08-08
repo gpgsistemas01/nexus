@@ -103,7 +103,6 @@ export const initGoodsReceiptFormSelect2 = () => {
         modalSelector,
         supplierSelector,
         materialSelector,
-        materialCreationContext: 'goodsReceipt',
         resultsLimit: MATERIAL_SELECT_RESULTS_LIMIT
     });
 };

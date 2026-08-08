@@ -78,8 +78,7 @@ const initMaterialSelect = ({
 const attachMaterialHandler = ({
     modalSelector,
     baseSelector,
-    supplierSelector,
-    materialCreationContext = null
+    supplierSelector
 }) => {
 
     $(baseSelector).off('select2:select').on('select2:select', (e) => {
@@ -101,8 +100,7 @@ const attachMaterialHandler = ({
                             id,
                             tradeName,
                         }
-                    },
-                    creationContext: materialCreationContext,
+                    },           
                     onSave: (createdMaterial) => {
 
                         toggleMaterialOption({
@@ -152,7 +150,6 @@ export const setupMaterialSelect = ({
     supplierSelector = null,
     materialSelector,
     allowCreate = true,
-    materialCreationContext = null,
     resultsLimit = null
 }) => {
 
@@ -169,7 +166,6 @@ export const setupMaterialSelect = ({
     attachMaterialHandler({
         modalSelector,
         baseSelector,
-        supplierSelector,
-        materialCreationContext
+        supplierSelector
     });
 };
