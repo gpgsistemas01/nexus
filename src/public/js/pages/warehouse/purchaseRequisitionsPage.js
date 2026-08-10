@@ -77,7 +77,7 @@ export const openPurchaseRequisitionModal = async ({ mode, data = null }) => {
             materialId: detail.material.id,
             quantity: detail.quantity,
             description: detail.description,
-            uom: detail.material.presentation || 'PIEZA'
+            uom: detail.material.presentation?.name || 'PIEZA'
         })));
 
         await initPurchaseRequisitionFormSelect2(data);

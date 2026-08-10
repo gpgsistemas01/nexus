@@ -89,12 +89,13 @@ export const findCurrentSupplierMaterialByMaterialId = async ({
     return currentSupplierMaterial;
 };
 
-const mapSupplierMaterial = (sp) => {
+export const mapSupplierMaterial = (sp) => {
 
     const { id, material, supplier, maxUnitCost, currentStock, convertedQuantity, canDelete } = sp;
 
     return {
         ...material,
+        materialId: material.id,
         supplierMaterialId: id,
         maxUnitCost,
         currentStock,
