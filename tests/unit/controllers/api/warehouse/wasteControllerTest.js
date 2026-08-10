@@ -5,7 +5,7 @@ const findAllWastes = vi.fn();
 const updateWaste = vi.fn();
 const updateWasteStock = vi.fn();
 
-vi.mock('../../../../src/services/warehouse/wastes/wasteService.js', () => ({
+vi.mock('../../../../../src/services/warehouse/wastes/wasteService.js', () => ({
   createWasteWithInitialStockAdjustment,
   findAllWastes,
   updateWaste,
@@ -17,7 +17,7 @@ const {
   editWasteStock,
   getAllWastes,
   registerWaste
-} = await import('../../../../src/controllers/api/warehouse/wasteController.js');
+} = await import('../../../../../src/controllers/api/warehouse/wasteController.js');
 
 const createResponse = () => {
   const res = {
