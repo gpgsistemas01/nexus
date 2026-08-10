@@ -285,7 +285,16 @@ export const updateGoodsReceipt = async ({ id, goodsReceiptDto }) => {
                     }
                 },
                 include: {
-                    details: true,
+                    details: {
+                        include: {
+                            material: {
+                                include: {
+                                    presentation: true,
+                                    unitMeasure: true
+                                }
+                            }
+                        }
+                    },
                     status: true
                 }
             });

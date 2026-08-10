@@ -167,8 +167,14 @@ export const buildDetailsColumns = ({ type, mode, render, isWarehouse, isCoordin
             data: null,
             render
         },
-        { data: 'materialBase', render: formatDecimal },
-        { data: 'materialHeight', render: formatDecimal },
+        {
+            data: row => row.materialBase ?? row.material?.base ?? null,
+            render: formatDecimal
+        },
+        {
+            data: row => row.materialHeight ?? row.material?.height ?? null,
+            render: formatDecimal
+        },
         { data: 'quantity', render: formatDecimal },
         ...(type === 'issue' && ISSUE_DETAIL_RETURN_MODES.includes(mode) ? [
             {
@@ -177,9 +183,13 @@ export const buildDetailsColumns = ({ type, mode, render, isWarehouse, isCoordin
             },
             { data: 'returnedQuantity', render: formatDecimal }
         ] : []),
-        { data: 'presentationName' },
+        {
+            data: row => row.presentationName ?? row.material?.presentation?.name ?? ''
+        },
         { data: 'convertedQuantity', render: formatDecimal },
-        { data: 'unitMeasureName' },
+        {
+            data: row => row.unitMeasureName ?? row.material?.unitMeasure?.name ?? ''
+        },
     ];
 
     if (shouldShowIssueProjectColumns({ type, mode, isWarehouse, isCoordinator, isSystem })) {

@@ -121,14 +121,6 @@ const getMovementSearchFilter = (search) => {
                 }
             },
             {
-                stockAdjustmentDetail: {
-                    supplierName: {
-                        contains: search,
-                        mode: 'insensitive'
-                    }
-                }
-            },
-            {
                 movement: {
                     referenceNumber: {
                         contains: search,
