@@ -54,6 +54,13 @@ El login y la renovación rechazan usuarios inactivos o sin accesos. Los cambios
 asignación se consultan nuevamente, por lo que no hay que esperar a que expire el
 access token para bloquear las rutas.
 
+Para cuentas humanas, `Person.isActive` también condiciona el acceso: una cuenta
+asociada a una persona inactiva no puede iniciar sesión, renovar su sesión ni superar
+la autorización de una petición. Las cuentas técnicas se representan con
+`User.personId = null`; no requieren una persona ficticia y dependen de
+`User.isActive` y de sus asignaciones. No se permite crear ni actualizar una cuenta
+para asociarla a una persona inactiva.
+
 No existen excepciones globales de lectura por método HTTP, rol o departamento. Cada
 recurso de lectura debe declarar en `AUTHORIZATION_POLICIES` las combinaciones que lo
 pueden consultar, incluidas las de Director o Dirección cuando correspondan.
@@ -120,7 +127,6 @@ usuarios/asignaciones y cambios de contraseña o estado.
 | P1 | Aprobar con negocio la matriz central y dividir permisos `manage`. |
 | P1 | Migrar menús/botones para consultar `user.permissions` en lugar de reglas duplicadas. |
 | P1 | Implementar auditoría persistente de escrituras críticas. |
-| P1 | Definir si `Person.isActive` condiciona a usuarios humanos y cómo tratar usuarios técnicos. |
 | P1 | Definir protección CSRF explícita para métodos mutables. |
 | P2 | Aprovisionar credenciales PostgreSQL distintas para runtime y migraciones. |
 

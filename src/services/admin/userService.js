@@ -4,6 +4,7 @@ import { verifyPassword, encryptPassword } from "../../utils/encryptionUtils.js"
 import { createServiceLogger, logServiceError } from "../../utils/logger.js";
 import { getGrantedPermissions } from "../../constants/permissions.js";
 import { hasSystemWideReadAccess } from "../../utils/authorizationUtils.js";
+import { findPersonById } from "./person/personService.js";
 
 const serviceLogger = createServiceLogger('admin.userService');
 
@@ -94,6 +95,10 @@ export const getUserIdByLogin = async (name, password) => {
             id: true,
             password: true,
             isActive: true,
+            personId: true,
+            person: {
+                select: { isActive: true }
+            },
             accesses: {
                 select: { userId: true },
                 take: 1
@@ -101,7 +106,9 @@ export const getUserIdByLogin = async (name, password) => {
         }
     });
 
-    if (!user?.isActive || !user.accesses.length) return null;
+    const hasInactiveHumanPerson = user?.personId && !user.person?.isActive;
+
+    if (!user?.isActive || hasInactiveHumanPerson || !user.accesses.length) return null;
 
     const isValid = await verifyPassword(password, user.password);
 
@@ -116,7 +123,11 @@ export const getLoggedUser = async (userId) => {
         where: {
             userId,
             user: {
-                isActive: true
+                isActive: true,
+                OR: [
+                    { personId: null },
+                    { person: { is: { isActive: true } } }
+                ]
             }
         },
         select: {
@@ -165,6 +176,12 @@ export const createUser = async ({ userDto }) => {
 
         const { password, personId, roleId, departmentId, ...userData } = userDto;
         const hashedPassword = await encryptPassword(password);
+
+        if (personId) {
+            const person = await findPersonById({ id: personId });
+
+            if (!person) throw new UserCreateDatabaseError();
+        }
 
         return await db.user.create({
             data: {
@@ -225,11 +242,19 @@ export const updateUser = async ({ id, userDto }) => {
         const db = getDb();
 
         return await db.$transaction(async (tx) => {
+            const { name, personId, roleId, departmentId } = userDto;
+
+            if (personId) {
+                const person = await findPersonById({ tx, id: personId });
+
+                if (!person) throw new UserUpdateDatabaseError();
+            }
+
             const updated = await tx.user.update({
                 where: { id },
                 data: {
-                    name: userDto.name,
-                    personId: userDto.personId
+                    name,
+                    personId
                 },
                 select: {
                     id: true,
@@ -246,8 +271,8 @@ export const updateUser = async ({ id, userDto }) => {
             await tx.userRoleDepartment.create({
                 data: {
                     userId: id,
-                    roleId: userDto.roleId,
-                    departmentId: userDto.departmentId
+                    roleId,
+                    departmentId
                 }
             });
 
