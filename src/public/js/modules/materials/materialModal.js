@@ -52,6 +52,12 @@ export const openMaterialModal = ({
         isVisible: !isEditing && !isGoodsReceiptCreation,
         fieldNames: materialStockFields
     });
+    setFormSectionVisibility({
+        form,
+        isVisible: !isGoodsReceiptCreation,
+        fieldNames: ['maxUnitCost']
+    });
+    form.elements.maxUnitCost.required = !isGoodsReceiptCreation;
     setFormDisabled({ 
         form, 
         fields: [...materialDataFields, 'minStock', 'maxUnitCost', 'isActive'],
