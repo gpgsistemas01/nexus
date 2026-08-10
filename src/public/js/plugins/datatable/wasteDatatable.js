@@ -3,7 +3,7 @@ import { setupTableFilters } from "./utils/filters/tableFilter.js";
 import { getAllWastes } from "../../application/warehouse/wastes.js";
 import { openWasteModal } from "../../pages/warehouse/wastes/wasteModal.js";
 import { configureResponsiveHeaderGroups, getResponsiveRowData } from "./utils/responsive.js";
-import { hasPermission, UI_PERMISSIONS } from "../../constants/permissions.js";
+import { UI_PERMISSIONS } from "../../constants/permissions.js";
 import { DATATABLE_SELECTORS } from "../../constants/selectors.js";
 import { buildWarehouseInventoryColumns, renderWarehouseInventoryHeader } from "./utils/warehouseInventoryDatatable.js";
 import { buildExcelButton, buildTableExportParams } from "../../ui/tableUI.js";
@@ -18,8 +18,8 @@ const tableElement = document.querySelector(selectorTable);
 export const createWasteDatatable = async (context) => {
     const { isWarehouse = false, isSystem = false, isSales = false } = context.organization || {};
     const canSeeCost = isWarehouse || isSystem || isSales;
-    const canManageWastes = hasPermission(context, UI_PERMISSIONS.WASTES_WRITE);
-    const canAdjustStock = hasPermission(context, UI_PERMISSIONS.WASTES_ADJUST_STOCK);
+    const canManageWastes = context.permissions?.includes(UI_PERMISSIONS.WASTES_WRITE) ?? false;
+    const canAdjustStock = context.permissions?.includes(UI_PERMISSIONS.WASTES_ADJUST_STOCK) ?? false;
 
     renderWarehouseInventoryHeader({
         tableElement,

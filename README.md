@@ -230,11 +230,11 @@ matriz en código, el cambio entra en vigor al desplegar la nueva versión.
 
 Los menús y botones no vuelven a interpretar roles o departamentos. Las vistas EJS
 filtran cada enlace con `user.permissions` y el JavaScript del navegador consulta el
-mismo arreglo mediante `hasPermission(user, permission)`, exportado junto con
-`UI_PERMISSIONS` desde `src/public/js/constants/permissions.js`. Para agregar una
-acción de interfaz se debe definir su permiso y política en el backend, exponer la
-misma clave en ese módulo y condicionar el elemento visual con ella. Ocultar la
-interfaz mejora la experiencia, pero no sustituye a
+mismo arreglo usando las claves de `UI_PERMISSIONS` definidas en
+`src/public/js/constants/permissions.js`. Para agregar una acción de interfaz se debe
+definir su permiso y política en el backend, exponer la misma clave en ese módulo y
+condicionar el elemento visual con ella. Ocultar la interfaz mejora la experiencia,
+pero no sustituye a
 `authorizeUserWeb` o `authorizeUserApi`, que siguen siendo la barrera de seguridad.
 
 ## Ejecución
