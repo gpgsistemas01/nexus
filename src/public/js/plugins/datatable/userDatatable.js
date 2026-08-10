@@ -30,15 +30,13 @@ export const createUserDatatable = () => {
                             className: 'btn-edit',
                             colorClass: 'btn-primary',
                             iconClass: 'fa-solid fa-pencil',
-                            title: 'Editar',
-                            ariaLabel: 'Editar usuario'
+                            label: 'Editar usuario'
                         }),
                         buildMdbActionButton({
                             className: 'btn-edit-password',
                             colorClass: 'btn-warning',
                             iconClass: 'fa-solid fa-key',
-                            title: 'Cambiar contraseña',
-                            ariaLabel: 'Cambiar contraseña',
+                            label: 'Cambiar contraseña',
                             rippleColor: 'dark'
                         })
                     ].join('')

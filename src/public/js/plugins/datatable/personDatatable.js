@@ -110,8 +110,7 @@ export const initPersonAccessTable = (accesses = []) => {
                         className: 'delete-btn',
                         colorClass: 'btn-danger',
                         iconClass: 'fa-solid fa-trash',
-                        title: 'Eliminar acceso',
-                        ariaLabel: `Eliminar acceso de ${ row.departmentName } con rol ${ row.roleName }`,
+                        label: `Eliminar acceso de ${ row.departmentName } con rol ${ row.roleName }`,
                         htmlAttrs: {
                             'data-index': meta.row
                         }
