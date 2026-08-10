@@ -377,6 +377,8 @@ model GoodsReceiptDetail {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([materialId])
 }
 
 enum GoodsReceiptDetailStatus {
@@ -423,6 +425,8 @@ model PurchaseRequisitionDetail {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([materialId])
 }
 
 model GoodsIssue {
@@ -503,6 +507,8 @@ model GoodsIssueDetail {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([materialId])
 }
 
 model GoodsIssueReturn {
@@ -594,6 +600,8 @@ model MovementDetail {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([materialId])
 }
 
 model StockAdjustment {
@@ -665,6 +673,8 @@ model StockAdjustmentDetail {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([materialId])
 }
 
 enum InventoryMovementType {

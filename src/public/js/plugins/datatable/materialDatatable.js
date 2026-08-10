@@ -53,11 +53,11 @@ export const createMaterialDatatable = async (context) => {
         canSeeCost,
         canManageItems: canManageMaterials,
         costTitle: 'Costo Unitario de Conversión',
-        renderActions: () => renderActionButtons({
+        renderActions: (_, __, row) => renderActionButtons({
             status: 'Abierta',
             context: 'material',
             canAdjustStock,
-            canDeleteMaterial: canDeleteMaterials
+            canDeleteMaterial: canDeleteMaterials && row.canDelete
         })
     });
 

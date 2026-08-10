@@ -91,7 +91,7 @@ export const findCurrentSupplierMaterialByMaterialId = async ({
 
 const mapSupplierMaterial = (sp) => {
 
-    const { id, material, supplier, maxUnitCost, currentStock, convertedQuantity } = sp;
+    const { id, material, supplier, maxUnitCost, currentStock, convertedQuantity, canDelete } = sp;
 
     return {
         ...material,
@@ -99,8 +99,35 @@ const mapSupplierMaterial = (sp) => {
         maxUnitCost,
         currentStock,
         convertedQuantity,
+        ...(canDelete !== undefined && { canDelete }),
         supplier: { ...supplier }
     };
+};
+
+const findDeletableMaterialIds = async ({ db, materialIds }) => {
+
+    if (materialIds.length === 0) return new Set();
+
+    const materials = await db.material.findMany({
+        where: {
+            id: { in: materialIds },
+            goodsReceiptDetails: { none: {} },
+            goodsIssueDetails: { none: {} },
+            purchaseRequisitionsDetails: { none: {} },
+            movementDetails: { none: {} },
+            stockAdjustmentDetails: { none: {} },
+            previousGoodsReceiptDetailChanges: { none: {} },
+            correctedGoodsReceiptDetailChanges: { none: {} },
+            supplierMaterials: {
+                none: {
+                    wastes: { some: {} }
+                }
+            }
+        },
+        select: { id: true }
+    });
+
+    return new Set(materials.map(({ id }) => id));
 };
 
 export const findAllSupplierMaterials = async ({
@@ -129,7 +156,8 @@ export const findAllSupplierMaterials = async ({
 
     if (where.AND.length === 0) delete where.AND;
 
-    const supplierMaterials = await getDb().supplierMaterial.findMany({
+    const db = getDb();
+    const supplierMaterials = await db.supplierMaterial.findMany({
         skip,
         take,
         where,
@@ -175,11 +203,22 @@ export const findAllSupplierMaterials = async ({
         return 0;
     });
 
-    const total = await countTotalSupplierMaterials();
-    const filtered = await countTotalSupplierMaterials({ where });
+    const totalPromise = countTotalSupplierMaterials();
+    const hasFilters = Object.keys(where).length > 0;
+    const [deletableMaterialIds, total, filtered] = await Promise.all([
+        findDeletableMaterialIds({
+            db,
+            materialIds: [...new Set(supplierMaterials.map(({ material }) => material.id))]
+        }),
+        totalPromise,
+        hasFilters ? countTotalSupplierMaterials({ where }) : totalPromise
+    ]);
 
     return {
-        data: sorted.map(mapSupplierMaterial),
+        data: sorted.map(supplierMaterial => mapSupplierMaterial({
+            ...supplierMaterial,
+            canDelete: deletableMaterialIds.has(supplierMaterial.material.id)
+        })),
         recordsTotal: total,
         recordsFiltered: filtered
     };
