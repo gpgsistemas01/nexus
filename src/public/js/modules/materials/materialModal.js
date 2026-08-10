@@ -16,7 +16,7 @@ const isEditMode = (mode) => mode === 'edit';
 const isStockMode = (mode) => mode === 'edit-stock';
 
 const includeStockPermission = () => {
-    const appContext = typeof window !== 'undefined' ? window.APP_CONTEXT || {} : {};
+    const appContext = typeof window !== 'undefined' ? window.meta || {} : {};
     const permissions = appContext.permissions || [];
 
     return Array.isArray(permissions)
