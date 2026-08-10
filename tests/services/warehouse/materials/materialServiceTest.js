@@ -17,7 +17,8 @@ const movementDetailFindFirst = vi.fn();
 const stockAdjustmentDetailFindFirst = vi.fn();
 const goodsReceiptDetailChangeFindFirst = vi.fn();
 const wasteFindFirst = vi.fn();
-const supplierMaterialDeleteMany = vi.fn();
+const supplierMaterialDelete = vi.fn();
+const supplierMaterialCount = vi.fn();
 const supplierMaterialFindUnique = vi.fn();
 const supplierMaterialUpdate = vi.fn();
 const materialDelete = vi.fn();
@@ -51,7 +52,7 @@ vi.mock('../../../../src/repository/baseRepository.js', () => ({
     stockAdjustmentDetail: { findFirst: stockAdjustmentDetailFindFirst },
     goodsReceiptDetailChange: { findFirst: goodsReceiptDetailChangeFindFirst },
     waste: { findFirst: wasteFindFirst },
-    supplierMaterial: { findUnique: supplierMaterialFindUnique, update: supplierMaterialUpdate, deleteMany: supplierMaterialDeleteMany }
+    supplierMaterial: { findUnique: supplierMaterialFindUnique, update: supplierMaterialUpdate, delete: supplierMaterialDelete, count: supplierMaterialCount }
   })
 }));
 
@@ -92,7 +93,7 @@ describe('materialService submit operations', () => {
       stockAdjustmentDetail: { findFirst: stockAdjustmentDetailFindFirst },
       goodsReceiptDetailChange: { findFirst: goodsReceiptDetailChangeFindFirst },
       waste: { findFirst: wasteFindFirst },
-      supplierMaterial: { findUnique: supplierMaterialFindUnique, update: supplierMaterialUpdate, deleteMany: supplierMaterialDeleteMany }
+      supplierMaterial: { findUnique: supplierMaterialFindUnique, update: supplierMaterialUpdate, delete: supplierMaterialDelete, count: supplierMaterialCount }
     }));
   });
 
@@ -225,10 +226,10 @@ describe('materialService submit operations', () => {
     await expect(existsMaterial({ id: 'missing-material' })).rejects.toThrow(MaterialNotFound);
   });
 
-  it('elimina el material y sus relaciones con proveedores cuando no tiene vínculos operativos', async () => {
+  it('elimina solo la relación con el proveedor de la fila cuando existen otras relaciones', async () => {
     const deleted = { id: 'material-1' };
 
-    materialFindUnique.mockResolvedValue({ id: 'material-1' });
+    supplierMaterialFindUnique.mockResolvedValue({ materialId: 'material-1' });
     goodsReceiptDetailFindFirst.mockResolvedValue(null);
     goodsIssueDetailFindFirst.mockResolvedValue(null);
     purchaseRequisitionDetailFindFirst.mockResolvedValue(null);
@@ -236,19 +237,28 @@ describe('materialService submit operations', () => {
     stockAdjustmentDetailFindFirst.mockResolvedValue(null);
     goodsReceiptDetailChangeFindFirst.mockResolvedValue(null);
     wasteFindFirst.mockResolvedValue(null);
-    supplierMaterialDeleteMany.mockResolvedValue({ count: 1 });
+    supplierMaterialDelete.mockResolvedValue({ id: 'supplier-material-1' });
+    supplierMaterialCount.mockResolvedValue(1);
+
+    await expect(deleteMaterial('supplier-material-1')).resolves.toEqual(deleted);
+    expect(supplierMaterialDelete).toHaveBeenCalledWith({ where: { id: 'supplier-material-1' } });
+    expect(supplierMaterialCount).toHaveBeenCalledWith({ where: { materialId: 'material-1' } });
+    expect(materialDelete).not.toHaveBeenCalled();
+  });
+
+  it('elimina también el material cuando se elimina su última relación con proveedor', async () => {
+    const deleted = { id: 'material-1' };
+
+    supplierMaterialFindUnique.mockResolvedValue({ materialId: 'material-1' });
+    supplierMaterialCount.mockResolvedValue(0);
     materialDelete.mockResolvedValue(deleted);
 
-    await expect(deleteMaterial('material-1')).resolves.toEqual(deleted);
-    expect(supplierMaterialDeleteMany).toHaveBeenCalledWith({ where: { materialId: 'material-1' } });
-    expect(materialDelete).toHaveBeenCalledWith({
-      where: { id: 'material-1' },
-      select: { id: true }
-    });
+    await expect(deleteMaterial('supplier-material-1')).resolves.toEqual(deleted);
+    expect(materialDelete).toHaveBeenCalledWith({ where: { id: 'material-1' }, select: { id: true } });
   });
 
   it('bloquea la eliminación si el material tiene compras o salidas relacionadas', async () => {
-    materialFindUnique.mockResolvedValue({ id: 'material-1' });
+    supplierMaterialFindUnique.mockResolvedValue({ materialId: 'material-1' });
     goodsReceiptDetailFindFirst.mockResolvedValue({ id: 'receipt-detail-1' });
     goodsIssueDetailFindFirst.mockResolvedValue(null);
     purchaseRequisitionDetailFindFirst.mockResolvedValue(null);
@@ -257,8 +267,8 @@ describe('materialService submit operations', () => {
     goodsReceiptDetailChangeFindFirst.mockResolvedValue(null);
     wasteFindFirst.mockResolvedValue(null);
 
-    await expect(deleteMaterial('material-1')).rejects.toThrow(MaterialDeleteRelationConflict);
-    expect(supplierMaterialDeleteMany).not.toHaveBeenCalled();
+    await expect(deleteMaterial('supplier-material-1')).rejects.toThrow(new MaterialDeleteRelationConflict());
+    expect(supplierMaterialDelete).not.toHaveBeenCalled();
     expect(materialDelete).not.toHaveBeenCalled();
   });
 

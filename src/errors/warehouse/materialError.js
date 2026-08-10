@@ -70,14 +70,18 @@ export class MaterialUpdateDatabaseError extends AppError {
 export class MaterialDeleteDatabaseError extends AppError {
 
     constructor () {
-        super('Error de base de datos al eliminar el material', 'MATERIAL_DELETE_DB_ERROR', 500);
+        super('Error de base de datos al eliminar la relación entre el material y el proveedor', 'MATERIAL_DELETE_DB_ERROR', 500);
     }
 }
 
 export class MaterialDeleteRelationConflict extends AppError {
 
     constructor () {
-        super('No se puede eliminar el material porque está vinculado a una compra, salida u otro movimiento de almacén.', 'MATERIAL_DELETE_RELATION_CONFLICT', 409);
+        super(
+            'No se puede eliminar la relación entre el material y el proveedor porque el material tiene historial de compras, salidas, requisiciones, mermas, movimientos o ajustes de stock.',
+            'MATERIAL_DELETE_RELATION_CONFLICT',
+            409
+        );
     }
 }
 
