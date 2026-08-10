@@ -18,8 +18,8 @@ const items = [
         content: 'Almacén',
         icon: 'fa-solid fa-warehouse',
         children: [
-            createNavLink({ content: 'Materiales', icon: 'fa-solid fa-boxes-stacked', href: '/materiales', permission: 'materials:read' }),
-            createNavLink({ content: 'Mermas', icon: 'fa-solid fa-recycle', href: '/mermas', permission: 'wastes:page-view' })
+            createNavLink({ content: 'Materiales', icon: 'fa-solid fa-boxes-stacked', href: '/almacen/materiales', permission: 'materials:read' }),
+            createNavLink({ content: 'Mermas', icon: 'fa-solid fa-recycle', href: '/almacen/mermas', permission: 'wastes:page-view' })
         ]
     },
     createNavLink({ content: 'Compras', icon: 'fa-solid fa-file-invoice-dollar', href: '/compras', permission: 'goods:receipts-page-view' }),
@@ -27,7 +27,8 @@ const items = [
         content: 'Salidas',
         icon: 'fa-solid fa-right-from-bracket',
         children: [
-            createNavLink({ content: 'Material', icon: 'fa-solid fa-dolly', href: '/salidas-almacen', permission: 'goods:issues-page-view' })
+            createNavLink({ content: 'Materiales', icon: 'fa-solid fa-dolly', href: '/salidas/materiales', permission: 'goods:issues-page-view' }),
+            createNavLink({ content: 'Mermas', icon: 'fa-solid fa-recycle', href: '/salidas/mermas', permission: 'wastes:page-view' })
         ]
     },
     createNavLink({ content: 'Movimientos', icon: 'fa-solid fa-arrows-rotate', href: '/movimientos', permission: 'movements:read' }),
