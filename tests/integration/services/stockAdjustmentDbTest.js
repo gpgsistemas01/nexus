@@ -109,10 +109,9 @@ describeDb('stock adjustment cross-domain database integration', () => {
 
     await cleanupStockAdjustmentData();
 
-    await prisma.stockAdjustmentReason.upsert({
-      where: { name: initialStockReasonName },
-      update: {},
-      create: { name: initialStockReasonName }
+    await prisma.stockAdjustmentReason.createMany({
+      data: [{ name: initialStockReasonName }],
+      skipDuplicates: true
     });
 
     const [presentation, unit] = await Promise.all([

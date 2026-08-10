@@ -172,10 +172,9 @@ describeDb('goods issue database integration', () => {
         update: {},
         create: { name: 'Aprobada' }
       }),
-      prisma.stockAdjustmentReason.upsert({
-        where: { name: INITIAL_STOCK_REASON_NAME },
-        update: {},
-        create: { name: INITIAL_STOCK_REASON_NAME }
+      prisma.stockAdjustmentReason.createMany({
+        data: [{ name: INITIAL_STOCK_REASON_NAME }],
+        skipDuplicates: true
       }),
       prisma.fulfillmentStatus.upsert({
         where: { name: 'Pendiente' },
