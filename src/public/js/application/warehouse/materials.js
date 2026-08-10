@@ -35,7 +35,9 @@ const buildMaterialPayload = (formData, { includeMaxUnitCost = true } = {}) => (
     ...(includeMaxUnitCost ? { maxUnitCost: formData.maxUnitCost } : {}),
     base: formData.base,
     height: formData.height,
-    isActive: formData.isActive
+    isActive: formData.isActive,
+    ...Object.prototype.hasOwnProperty.call(formData, 'newStock') && { newStock: formData.newStock },
+    ...Object.prototype.hasOwnProperty.call(formData, 'observations') && { observations: formData.observations }
 });
 
 export const registerMaterial = async ({
@@ -45,8 +47,6 @@ export const registerMaterial = async ({
 
     const payload = {
         ...buildMaterialPayload(formData, {
-            // In a purchase, the real unit cost comes from its detail line and is
-            // applied to SupplierMaterial when the receipt is confirmed.
             includeMaxUnitCost: creationContext !== GOODS_RECEIPT_CREATION_CONTEXT
         }),
         ...(creationContext ? { creationContext } : {})

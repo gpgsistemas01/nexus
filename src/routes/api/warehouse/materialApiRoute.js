@@ -1,7 +1,7 @@
 import express from 'express';
 import { authorizeUserApi, verifyApiTokenRequired } from '../../../middleware/authMiddleware.js';
 import { editMaterial, editMaterialStock, getAllMaterials, registerMaterial, removeMaterial } from '../../../controllers/api/warehouse/materialController.js';
-import { materialStockValidation, materialValidation } from '../../../validators/forms/materialValidations.js';
+import { materialEditValidation, materialStockValidation, materialValidation } from '../../../validators/forms/materialValidations.js';
 import { validate } from '../../../middleware/validatorMiddleware.js';
 import { PERMISSIONS } from '../../../constants/permissions.js';
 
@@ -26,7 +26,7 @@ router.post(
 router.patch(
     '/:id',
     verifyApiTokenRequired,
-    materialValidation,
+    materialEditValidation,
     validate,
     authorizeUserApi(PERMISSIONS.MATERIALS_WRITE),
     editMaterial

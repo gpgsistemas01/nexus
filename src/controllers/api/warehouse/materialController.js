@@ -1,4 +1,4 @@
-import { createMaterialDtoForRegister, createMaterialDtoForStockUpdate, updateMaterialDtoForEdit } from "../../../dtos/materialDTO.js";
+import { createMaterialDtoForEdit, createMaterialDtoForRegister, createMaterialDtoForStockUpdate } from "../../../dtos/materialDTO.js";
 import { successCodeMessages } from "../../../messages/codeMessages.js";
 import { findAllMaterials, createMaterial, updateMaterial, updateMaterialStock, deleteMaterial } from "../../../services/warehouse/materials/materialService.js";
 import { sanitizeEmptyStrings } from "../../../utils/formattersUtils.js";
@@ -33,7 +33,8 @@ export const registerMaterial = async (req, res) => {
     const materialDto = createMaterialDtoForRegister(req.body);
     const sanitizedMaterialDto = sanitizeEmptyStrings(materialDto);
     const material = await createMaterial({
-        materialDto: sanitizedMaterialDto
+        materialDto: sanitizedMaterialDto,
+        userId: req.user.id
     });
 
     return res.status(200).json({
@@ -44,7 +45,7 @@ export const registerMaterial = async (req, res) => {
 
 export const editMaterial = async (req, res) => {
 
-    const materialDto = updateMaterialDtoForEdit(req.body);
+    const materialDto = createMaterialDtoForEdit(req.body);
     const sanitizedMaterialDto = sanitizeEmptyStrings(materialDto);
 
     const material = await updateMaterial(sanitizedMaterialDto, req.params.id);

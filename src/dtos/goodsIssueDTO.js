@@ -1,4 +1,4 @@
-const createGoodsIssueDto = (body = {}, { includeDetailId = false } = {}) => ({
+const buildGoodsIssueDto = (body = {}) => ({
     requesterId: body.requesterId.trim(),
     advisorId: body.advisorId.trim(),
     clientId: body.clientId.trim(),
@@ -7,7 +7,6 @@ const createGoodsIssueDto = (body = {}, { includeDetailId = false } = {}) => ({
     requestDate: new Date(body.requestDate),
     ...(Object.prototype.hasOwnProperty.call(body, 'observations') ? { observations: body.observations.trim() } : {}),
     details: (body.details).map(d => ({
-        ...(includeDetailId && d.id ? { id: d.id.trim() } : {}),
         materialId: d.materialId.trim(),
         supplierId: d.supplierId.trim(),
         ...(d.presentationId ? { presentationId: d.presentationId.trim() } : {}),
@@ -15,9 +14,9 @@ const createGoodsIssueDto = (body = {}, { includeDetailId = false } = {}) => ({
     }))
 });
 
-export const createGoodsIssueDtoForRegister = (body = {}) => createGoodsIssueDto(body);
+export const createGoodsIssueDtoForRegister = (body = {}) => buildGoodsIssueDto(body);
 
-export const createGoodsIssueDtoForEdit = (body = {}) => createGoodsIssueDto(body, { includeDetailId: true });
+export const createGoodsIssueDtoForEdit = (body = {}) => buildGoodsIssueDto(body);
 
 export const createGoodsIssueDetailsDtoForEdit = (body = {}) => ({
     details: (body.details).map(d => ({
@@ -39,7 +38,7 @@ export const createGoodsIssueHeaderDtoForEdit = (body = {}) => ({
 });
 
 
-export const createGoodsIssueReturnDto = (body = {}) => ({
+export const createGoodsIssueDtoForReturn = (body = {}) => ({
     returnQuantity: Number(body.returnQuantity),
     ...(Object.prototype.hasOwnProperty.call(body, 'observations') ? { observations: body.observations.trim() } : {})
 });

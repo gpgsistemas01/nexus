@@ -1,4 +1,4 @@
-import { createClientDto } from "../../../dtos/clientDTO.js";
+import { createClientDtoForEdit, createClientDtoForRegister } from "../../../dtos/clientDTO.js";
 import { successCodeMessages } from "../../../messages/codeMessages.js";
 import { createClient, findAllClients, updateClient } from "../../../services/sales/clientService.js";
 import { sanitizeEmptyStrings } from "../../../utils/formattersUtils.js";
@@ -30,7 +30,7 @@ export const getAllClients = async (req, res) => {
 
 export const registerClient = async (req, res) => {
 
-    const clientDto = createClientDto(req.body);
+    const clientDto = createClientDtoForRegister(req.body);
     const sanitizedClientDto = sanitizeEmptyStrings(clientDto);
 
     const client = await createClient({ clientDto: sanitizedClientDto });
@@ -44,7 +44,7 @@ export const registerClient = async (req, res) => {
 export const editClient = async (req, res) => {
 
     const { id } = req.params;
-    const clientDto = createClientDto(req.body);
+    const clientDto = createClientDtoForEdit(req.body);
     const sanitizedClientDto = sanitizeEmptyStrings(clientDto);
 
     const client = await updateClient({
@@ -57,4 +57,3 @@ export const editClient = async (req, res) => {
         code: successCodeMessages.UPDATED_CLIENT
     });
 }
-

@@ -37,7 +37,7 @@ export const createGoodsReceiptDtoForEdit = (body = {}) => {
 };
 
 
-export const createGoodsReceiptCorrectionDto = (body = {}) => ({
+export const createGoodsReceiptDtoForCorrection = (body = {}) => ({
     quantity: Number(body.quantity),
     costPerUnitType: Number(body.costPerUnitType)
 });

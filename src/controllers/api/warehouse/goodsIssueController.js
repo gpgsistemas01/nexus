@@ -1,4 +1,4 @@
-import { createGoodsIssueDetailsDtoForEdit, createGoodsIssueDtoForEdit, createGoodsIssueDtoForRegister, createGoodsIssueHeaderDtoForEdit, createGoodsIssueReturnDto } from "../../../dtos/goodsIssueDTO.js";
+import { createGoodsIssueDetailsDtoForEdit, createGoodsIssueDtoForEdit, createGoodsIssueDtoForRegister, createGoodsIssueDtoForReturn, createGoodsIssueHeaderDtoForEdit } from "../../../dtos/goodsIssueDTO.js";
 import { successCodeMessages } from "../../../messages/codeMessages.js";
 import {
     createGoodsIssue,
@@ -116,7 +116,7 @@ export const editGoodsIssueHeader = async (req, res) => {
 
 export const returnGoodsIssueDetailLine = async (req, res) => {
 
-    const returnDto = createGoodsIssueReturnDto(req.body);
+    const returnDto = createGoodsIssueDtoForReturn(req.body);
     const sanitizedReturnDto = sanitizeEmptyStrings(returnDto);
 
     const goodsIssueReturn = await returnGoodsIssueDetail({

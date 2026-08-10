@@ -1,4 +1,4 @@
-import { createPurchaseRequisitionDtoForRegister } from "../../../dtos/purchaseRequisitionDTO.js";
+import { createPurchaseRequisitionDtoForEdit, createPurchaseRequisitionDtoForRegister } from "../../../dtos/purchaseRequisitionDTO.js";
 import { successCodeMessages } from "../../../messages/codeMessages.js";
 import {
     cancelPurchaseRequisition,
@@ -58,7 +58,7 @@ export const registerPurchaseRequisition = async (req, res) => {
 
 export const editPurchaseRequisition = async (req, res) => {
 
-    const purchaseRequisitionDto = createPurchaseRequisitionDtoForRegister(req.body);
+    const purchaseRequisitionDto = createPurchaseRequisitionDtoForEdit(req.body);
     const sanitizedPurchaseRequisitionDto = sanitizeEmptyStrings(purchaseRequisitionDto);
 
     const purchaseRequisition = await updatePurchaseRequisition({

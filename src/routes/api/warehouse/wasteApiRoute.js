@@ -1,7 +1,7 @@
 import express from 'express';
 import { authorizeUserApi, verifyApiTokenRequired } from '../../../middleware/authMiddleware.js';
 import { editWaste, editWasteStock, getAllWastes, registerWaste } from '../../../controllers/api/warehouse/wasteController.js';
-import { editedWasteDataValidation, wasteStockValidation, wasteValidation } from '../../../validators/forms/wasteValidations.js';
+import { wasteEditValidation, wasteStockValidation, wasteValidation } from '../../../validators/forms/wasteValidations.js';
 import { validate } from '../../../middleware/validatorMiddleware.js';
 import { PERMISSIONS } from '../../../constants/permissions.js';
 
@@ -26,7 +26,7 @@ router.post(
 router.patch(
     '/:id',
     verifyApiTokenRequired,
-    editedWasteDataValidation,
+    wasteEditValidation,
     validate,
     authorizeUserApi(PERMISSIONS.WASTES_WRITE),
     editWaste
