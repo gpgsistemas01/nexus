@@ -78,7 +78,8 @@ const initMaterialSelect = ({
 const attachMaterialHandler = ({
     modalSelector,
     baseSelector,
-    supplierSelector
+    supplierSelector,
+    creationContext
 }) => {
 
     $(baseSelector).off('select2:select').on('select2:select', (e) => {
@@ -94,6 +95,7 @@ const attachMaterialHandler = ({
             runAfterSelect2Close({
                 selector: baseSelector,
                 action: () => openMaterialModal({
+                    creationContext,
                     data: {
                         name,
                         supplier: {
@@ -150,7 +152,8 @@ export const setupMaterialSelect = ({
     supplierSelector = null,
     materialSelector,
     allowCreate = true,
-    resultsLimit = null
+    resultsLimit = null,
+    creationContext = null
 }) => {
 
     const baseSelector = `${ modalSelector } ${ materialSelector }`;
@@ -166,6 +169,7 @@ export const setupMaterialSelect = ({
     attachMaterialHandler({
         modalSelector,
         baseSelector,
-        supplierSelector
+        supplierSelector,
+        creationContext
     });
 };

@@ -1,4 +1,4 @@
-import { createSupplierDtoForRegister } from "../../../dtos/supplierDto.js";
+import { createSupplierDtoForEdit, createSupplierDtoForRegister } from "../../../dtos/supplierDTO.js";
 import { successCodeMessages } from "../../../messages/codeMessages.js";
 import { findAllSuppliers, createSupplier, updateSupplier } from "../../../services/warehouse/supplierService.js";
 import { sanitizeEmptyStrings } from "../../../utils/formattersUtils.js";
@@ -41,7 +41,7 @@ export const registerSupplier = async (req, res) => {
 
 export const editSupplier = async (req, res) => {
 
-    const supplierDto = createSupplierDtoForRegister(req.body);
+    const supplierDto = createSupplierDtoForEdit(req.body);
     const sanitizedSupplierDto = sanitizeEmptyStrings(supplierDto);
 
     const supplier = await updateSupplier(sanitizedSupplierDto, req.params.id);

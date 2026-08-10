@@ -1,12 +1,10 @@
 import { useForm } from '../../../application/form.js';
 import { editWaste, editWasteStock, registerWaste } from '../../../application/warehouse/wastes.js';
 import { FORM_SELECTORS } from '../../../constants/selectors.js';
-import { handleSubmit, validateFields } from '../../../utils/formUtils.js';
+import { handleSubmit, pickFormFields, validateFields } from '../../../utils/formUtils.js';
 import { wasteSecondaryDataValidators, wasteStockValidators, newWasteValidators } from '../../../utils/validations/validators.js';
-import { pickWasteFields, wasteCreateFields, wasteDataFields, wasteSecondaryDataFields, wasteStockFields } from './wasteFields.js';
-
-const isStockMode = (mode) => mode === 'edit-stock';
-const isEditMode = (mode) => mode === 'edit';
+import { wasteCreateFields, wasteSecondaryDataFields, wasteStockFields } from './wasteFields.js';
+import { isEditMode, isStockMode } from '../../../constants/formModes.js';
 
 useForm({
     selector: FORM_SELECTORS.WASTE_FORM,
@@ -23,7 +21,7 @@ useForm({
             formData.isActive = document.querySelector(`${ FORM_SELECTORS.WASTE_FORM } #isActiveInput`).checked;
         }
 
-        return pickWasteFields(formData, fields);
+        return pickFormFields(formData, fields);
     },
     getErrors: ({ form, formData }) => {
 

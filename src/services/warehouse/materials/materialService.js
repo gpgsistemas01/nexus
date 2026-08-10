@@ -1,12 +1,13 @@
-import { MaterialAlreadyExists, MaterialCreateDatabaseError, MaterialNotFound, MaterialUpdateDatabaseError, MaterialStockAdjustmentDatabaseError, MaterialDeleteDatabaseError, MaterialDeleteRelationConflict } from "../../../errors/warehouse/materialError.js";
+import { MaterialAlreadyExists, MaterialCreateDatabaseError, MaterialInitialStockReasonNotFound, MaterialNotFound, MaterialUpdateDatabaseError, MaterialStockAdjustmentDatabaseError, MaterialDeleteDatabaseError, MaterialDeleteRelationConflict } from "../../../errors/warehouse/materialError.js";
 import { getDb } from "../../../repository/baseRepository.js";
-import { findAllSupplierMaterials, findCurrentSupplierMaterialByMaterialId, findSupplierMaterialByIds } from "./supplierMaterialService.js";
+import { findAllSupplierMaterials, findSupplierMaterialByIds } from "./supplierMaterialService.js";
 import { prepareMaterialData } from "./materialHelpers.js";
 import { syncSupplierMaterial } from "./materialRelations.js";
 import { isAppError } from "../../../errors/AppError.js";
 import { createStockAdjustment } from "../adjustmentService.js";
 import { createServiceLogger, getModelLogContext, logServiceError, logServiceInfo } from "../../../utils/logger.js";
 import { PRISMA_ERROR_CODES } from "../../../constants/prisma.js";
+import { findInitialStockAdjustmentReason } from "../reasonService.js";
 
 const serviceLogger = createServiceLogger('warehouse.materials.materialService');
 
@@ -45,43 +46,6 @@ const findMaterialByIdentity = ({ tx, rest, relations }) => tx.material.findFirs
     },
     select: { id: true }
 });
-
-const createMaterialInTransaction = async ({
-    tx,
-    materialDto
-}) => {
-
-    const {
-        rest,
-        relations
-    } = await prepareMaterialData({ tx, materialDto });
-
-    const existingMaterial = await findMaterialByIdentity({ tx, rest, relations });
-
-    if (existingMaterial) {
-        throw new MaterialAlreadyExists();
-    }
-
-    const createdMaterial = await tx.material.create({
-        data: buildMaterialData({ rest, relations }),
-        select: {
-            id: true
-        }
-     });
-
-    await syncSupplierMaterial({
-        tx,
-        supplierId: relations.supplierId,
-        materialId: createdMaterial.id,
-        maxUnitCost: relations.maxUnitCost
-    });
-
-    return findSupplierMaterialByIds({
-        tx,
-        materialId: createdMaterial.id,
-        supplierId: relations.supplierId
-    });
-};
 
 export const findAllMaterials = async ({
     skip = 0,
@@ -149,17 +113,72 @@ export const existsMaterial = async ({
 }
 
 export const createMaterial = async ({
-    materialDto
+    materialDto,
+    userId = null
 }) => {
 
     try {
 
-        const material = await getDb().$transaction((tx) =>
-            createMaterialInTransaction({
+        const material = await getDb().$transaction(async (tx) => {
+            const { newStock, observations, ...materialData } = materialDto;
+            const { rest, relations } = await prepareMaterialData({
                 tx,
-                materialDto
-            })
-        );
+                materialDto: materialData
+            });
+
+            const existingMaterial = await findMaterialByIdentity({ tx, rest, relations });
+            let materialId = existingMaterial?.id;
+
+            if (existingMaterial) {
+                const existingSupplierMaterial = await tx.supplierMaterial.findUnique({
+                    where: {
+                        supplierId_materialId: {
+                            supplierId: relations.supplierId,
+                            materialId
+                        }
+                    },
+                    select: { id: true }
+                });
+
+                if (existingSupplierMaterial) throw new MaterialAlreadyExists();
+            } else {
+                const createdMaterial = await tx.material.create({
+                    data: buildMaterialData({ rest, relations }),
+                    select: { id: true }
+                });
+
+                materialId = createdMaterial.id;
+            }
+
+            await syncSupplierMaterial({
+                tx,
+                supplierId: relations.supplierId,
+                materialId,
+                maxUnitCost: relations.maxUnitCost
+            });
+
+            if (newStock !== undefined) {
+                const initialStockReason = await findInitialStockAdjustmentReason({ tx });
+
+                if (!initialStockReason) throw new MaterialInitialStockReasonNotFound();
+
+                await createStockAdjustment({
+                    tx,
+                    materialId,
+                    supplierId: relations.supplierId,
+                    reasonId: initialStockReason.id,
+                    observations,
+                    newStock,
+                    userId
+                });
+            }
+
+            return findSupplierMaterialByIds({
+                tx,
+                materialId,
+                supplierId: relations.supplierId
+            });
+        });
 
         logServiceInfo(serviceLogger, {
             operation: 'warehouse.materials.materialService.createMaterial',
@@ -188,11 +207,7 @@ export const updateMaterial = async (materialDto, id) => {
         const material = await getDb().$transaction(async (tx) => {
 
             await existsMaterial({ tx, id });
-
-            const currentSupplierMaterial = await findCurrentSupplierMaterialByMaterialId({
-                tx,
-                materialId: id
-            });
+            const { supplierId, maxUnitCost, ...materialData } = materialDto;
 
             const currentMaterial = await tx.material.findUnique({
                 where: { id },
@@ -223,13 +238,23 @@ export const updateMaterial = async (materialDto, id) => {
 
             const updatedMaterial = await tx.material.update({
                 where: { id },
-                data: { name: materialDto.name }
+                data: materialData
+            });
+
+            await tx.supplierMaterial.update({
+                where: {
+                    supplierId_materialId: {
+                        materialId: updatedMaterial.id,
+                        supplierId
+                    }
+                },
+                data: { maxUnitCost }
             });
 
             return findSupplierMaterialByIds({
                 tx,
                 materialId: updatedMaterial.id,
-                supplierId: currentSupplierMaterial?.supplierId
+                supplierId
             });
         });
 

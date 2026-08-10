@@ -4,28 +4,26 @@ import { clearFormErrors, initForm, setFormDisabled, setFormSectionVisibility } 
 import { openModal } from "../../../ui/modalUI.js";
 import { FORM_SELECTORS, MODAL_SELECTORS } from "../../../constants/selectors.js";
 import { wasteDataFields, wasteSecondaryDataFields, wasteStockFields } from './wasteFields.js';
+import { FORM_MODES, isCreateMode, isEditMode, isStockMode } from '../../../constants/formModes.js';
 
-const stockMode = 'edit-stock';
-const createMode = 'create';
 const initialStockReasonName = 'Stock inicial';
 const stockDataSectionSelector = '.stock-data-section';
 
-const isEditMode = (mode) => mode === 'edit';
-const isStockMode = (mode) => mode === 'edit-stock';
-
 export const openWasteModal = ({
-    mode = 'create',
+    mode = FORM_MODES.CREATE,
     data = null
 } = {}) => {
 
     const form = document.querySelector(FORM_SELECTORS.WASTE_FORM);
     const modalElement = document.querySelector(MODAL_SELECTORS.WASTE);
-    const isCreateMode = mode === createMode;
+    const isCreating = isCreateMode(mode);
+    const isEditing = isEditMode(mode);
+    const isAdjustingStock = isStockMode(mode);
 
     initForm({ 
         form, 
         mode, 
-        id: isCreateMode ? '' : data?.id 
+        id: isCreating ? '' : data?.id
     });
     initWasteSelect2({ modalSelector: MODAL_SELECTORS.WASTE });
     setWasteSelectOptions({ modalSelector: MODAL_SELECTORS.WASTE, data });
@@ -35,7 +33,7 @@ export const openWasteModal = ({
     form.elements.height.value = data?.height ?? '';
     form.elements.isActive.checked = data?.isActive ?? true;
     form.elements.observations.value = '';
-    form.elements.currentStock.value = '';
+    form.elements.newStock.value = '';
 
     setFormDisabled({ 
         form, 
@@ -44,38 +42,38 @@ export const openWasteModal = ({
     setFormSectionVisibility({
         form,
         selector: stockDataSectionSelector,
-        isVisible: !isEditMode(mode)
+        isVisible: !isEditing
     });
     setFormDisabled({ 
         form, 
         fields: wasteDataFields, 
-        isDisabled: !isCreateMode
+        isDisabled: !isCreating
     });
     setFormDisabled({
         form,
         fields: wasteSecondaryDataFields,
-        isDisabled: isStockMode(mode)
+        isDisabled: isAdjustingStock
     });
     setFormDisabled({ 
         form, 
         fields: wasteStockFields, 
-        isDisabled: isEditMode(mode)
+        isDisabled: isEditing
     });
     setReasonVisualOption({
         selector: `${ MODAL_SELECTORS.WASTE } ${ FORM_SELECTORS.REASON }`,
-        name: !isStockMode(mode) ? initialStockReasonName : null,
-        isDisabled: !isStockMode(mode)
+        name: !isAdjustingStock ? initialStockReasonName : null,
+        isDisabled: !isAdjustingStock
     });
     clearFormErrors(form);
 
-    modalElement.querySelector('#modalTitle').textContent = isEditMode(mode)
+    modalElement.querySelector('#modalTitle').textContent = isEditing
         ? 'Editar merma'
-        : isStockMode(mode)
+        : isAdjustingStock
             ? 'Ajustar stock de merma'
             : 'Registrar merma';
-    form.querySelector('#submitBtn').textContent = isEditMode(mode)
+    form.querySelector('#submitBtn').textContent = isEditing
         ? 'Actualizar'
-        : isStockMode(mode)
+        : isAdjustingStock
             ? 'Ajustar'
             : 'Guardar';
 

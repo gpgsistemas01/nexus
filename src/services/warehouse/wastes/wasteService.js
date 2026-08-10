@@ -220,9 +220,9 @@ export const createWasteWithInitialStockAdjustment = async ({
                     supplierMaterial: { connect: { id: wasteDto.supplierMaterialId } },
                     base: wasteDto.base,
                     height: wasteDto.height,
-                    currentStock: wasteDto.currentStock,
+                    currentStock: wasteDto.newStock,
                     convertedQuantity: calculateConvertedQuantity({
-                        currentStock: wasteDto.currentStock,
+                        currentStock: wasteDto.newStock,
                         base: wasteDto.base,
                         height: wasteDto.height
                     })
@@ -273,14 +273,11 @@ export const updateWaste = async ({
 
         const waste = await getDb().$transaction(async (tx) => {
 
-            const currentWaste = await findWasteById({ tx, id });
+            await findWasteById({ tx, id });
 
             return await tx.waste.update({
                 where: { id },
-                data: {
-                    isActive: wasteDto.isActive,
-                    minStock: wasteDto.minStock
-                }
+                data: wasteDto
             });
         });
 
@@ -322,7 +319,7 @@ export const updateWasteStock = async ({
                 reasonId: wasteStockDto.reasonId,
                 userId,
                 observations: wasteStockDto.observations,
-                newStock: wasteStockDto.currentStock,
+                newStock: wasteStockDto.newStock,
                 include: WASTE_INCLUDE
             });
         });

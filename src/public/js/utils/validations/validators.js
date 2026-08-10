@@ -47,7 +47,7 @@ export const wasteSecondaryDataValidators = {
 }
 
 export const wasteStockValidators = {
-    currentStock: (value) => validateNumber(value, 'El stock de merma'),
+    newStock: (value) => validateNumber(value, 'El nuevo stock de merma'),
     reasonId: (value) => isEmptyOrNull(value, 'La razón de ajuste'),
     observations: (value) => validateTextOptional(value, 500, 'Las observaciones'),
 }
@@ -67,7 +67,7 @@ export const newWasteValidators = {
         allowZero: false
     }),
     ...wasteSecondaryDataValidators,
-    currentStock: wasteStockValidators.currentStock,
+    newStock: wasteStockValidators.newStock,
     observations: wasteStockValidators.observations,
 }
 

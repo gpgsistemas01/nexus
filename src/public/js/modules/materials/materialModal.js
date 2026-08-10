@@ -3,36 +3,26 @@ import { initMaterialFormSelect2, setMaterialFormSelectOptions } from "../../plu
 import { setReasonVisualOption } from '../../plugins/select2/domains/reason.js';
 import { clearFormErrors, initForm, setFormDisabled, setFormSectionVisibility } from "../../ui/formUI.js";
 import { FORM_SELECTORS, MODAL_SELECTORS } from "../../constants/selectors.js";
-import { UI_PERMISSIONS } from "../../constants/permissions.js";
+import { materialDataFields, materialSecondaryDataFields, materialStockFields } from './materialFields.js';
+import { FORM_MODES, isCreateMode, isEditMode, isStockMode } from '../../constants/formModes.js';
 
-const materialSecondaryDataFields = ['name', 'minStock', 'maxUnitCost', 'isActive'];
-const materialDataFields = [...materialSecondaryDataFields, 'base', 'height', 'supplierId', 'presentationId', 'unitMeasureId'];
-const stockFields = ['newStock', 'reasonId', 'observations'];
-const createMode = 'create';
 const initialStockReasonName = 'Stock inicial';
 const stockDataSectionSelector = '.stock-data-section';
-
-const isEditMode = (mode) => mode === 'edit';
-const isStockMode = (mode) => mode === 'edit-stock';
-
-const includeStockPermission = () => {
-    const appContext = typeof window !== 'undefined' ? window.APP_CONTEXT || {} : {};
-    const permissions = appContext.permissions || [];
-
-    return Array.isArray(permissions)
-        ? permissions.includes(UI_PERMISSIONS.MATERIALS_ADJUST_STOCK)
-        : false;
-};
+const goodsReceiptCreationContext = 'goodsReceipt';
 
 export const openMaterialModal = ({
-    mode = createMode,
+    mode = FORM_MODES.CREATE,
     data = null,
-    onSave = null
+    onSave = null,
+    creationContext = null
 }) => {
 
     const form = document.querySelector(FORM_SELECTORS.MATERIAL_FORM);
     const modalElement = document.querySelector(MODAL_SELECTORS.MATERIAL);
-    const isCreateMode = mode === createMode;
+    const isCreating = isCreateMode(mode);
+    const isEditing = isEditMode(mode);
+    const isAdjustingStock = isStockMode(mode);
+    const isGoodsReceiptCreation = creationContext === goodsReceiptCreationContext;
 
     initForm({ 
         form, 
@@ -41,6 +31,7 @@ export const openMaterialModal = ({
     });
     initMaterialFormSelect2({ modalSelector: MODAL_SELECTORS.MATERIAL });
     setMaterialFormSelectOptions({ modalSelector: MODAL_SELECTORS.MATERIAL, data });
+    form.dataset.creationContext = creationContext || '';
 
     form.elements.name.value = data?.name || '';
     form.elements.minStock.value = data?.minStock || '';
@@ -48,6 +39,8 @@ export const openMaterialModal = ({
     form.elements.base.value = data?.base || '';
     form.elements.height.value = data?.height || '';
     form.elements.isActive.checked = data?.isActive ?? true;
+    form.elements.newStock.value = '';
+    form.elements.observations.value = '';
 
     setFormDisabled({ 
         form, 
@@ -56,32 +49,40 @@ export const openMaterialModal = ({
     setFormSectionVisibility({
         form,
         selector: stockDataSectionSelector,
-        isVisible: includeStockPermission() || isStockMode(mode)
+        isVisible: !isEditing && !isGoodsReceiptCreation,
+        fieldNames: materialStockFields
     });
     setFormDisabled({ 
         form, 
-        fields: materialDataFields, 
-        isDisabled: !isCreateMode
+        fields: [...materialDataFields, 'minStock', 'maxUnitCost', 'isActive'],
+        isDisabled: !isCreating
     });
     setFormDisabled({
         form,
         fields: materialSecondaryDataFields,
-        isDisabled: isStockMode(mode)
+        isDisabled: isAdjustingStock
+    });
+    setFormSectionVisibility({
+        form,
+        selector: null,
+        isVisible: !isGoodsReceiptCreation,
+        fieldNames: ['maxUnitCost']
     });
     setReasonVisualOption({
         selector: `${ MODAL_SELECTORS.MATERIAL } ${ FORM_SELECTORS.REASON }`,
-        name: !isStockMode(mode) ? initialStockReasonName : null,
-        isDisabled: !isStockMode(mode)
+        name: !isAdjustingStock ? initialStockReasonName : null,
+        isDisabled: !isAdjustingStock
     });
+    clearFormErrors(form);
 
-    modalElement.querySelector('#modalTitle').textContent = isEditMode(mode)
+    modalElement.querySelector('#modalTitle').textContent = isEditing
         ? 'Editar material'
-        : isStockMode(mode)
+        : isAdjustingStock
             ? 'Ajustar stock de material'
             : 'Registrar material';
-    form.querySelector('#submitBtn').textContent = isEditMode(mode)
+    form.querySelector('#submitBtn').textContent = isEditing
         ? 'Actualizar'
-        : isStockMode(mode)
+        : isAdjustingStock
             ? 'Ajustar'
             : 'Guardar';
 

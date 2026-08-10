@@ -1,6 +1,6 @@
 import { successCodeMessages } from '../../../messages/codeMessages.js';
 import { createWasteWithInitialStockAdjustment, findAllWastes, updateWaste, updateWasteStock } from '../../../services/warehouse/wastes/wasteService.js';
-import { createEditedWasteDto, createNewWasteDto, createWasteStockDto } from '../../../dtos/wasteDTO.js';
+import { createWasteDtoForEdit, createWasteDtoForRegister, createWasteDtoForStockUpdate } from '../../../dtos/wasteDTO.js';
 import { sanitizeEmptyStrings } from '../../../utils/formattersUtils.js';
 import { getDataTableOrder, getDataTablePaging, getDataTableSearch } from '../../../utils/requestQueryUtils.js';
 
@@ -30,7 +30,7 @@ export const getAllWastes = async (req, res) => {
 
 export const registerWaste = async (req, res) => {
 
-    const wasteDto = createNewWasteDto(req.body);
+    const wasteDto = createWasteDtoForRegister(req.body);
     const sanitizedWasteDto = sanitizeEmptyStrings(wasteDto);
 
     const waste = await createWasteWithInitialStockAdjustment({
@@ -46,7 +46,7 @@ export const registerWaste = async (req, res) => {
 
 export const editWaste = async (req, res) => {
 
-    const wasteDto = createEditedWasteDto(req.body);
+    const wasteDto = createWasteDtoForEdit(req.body);
     const sanitizedWasteDto = sanitizeEmptyStrings(wasteDto);
 
     const waste = await updateWaste({
@@ -62,7 +62,7 @@ export const editWaste = async (req, res) => {
 
 export const editWasteStock = async (req, res) => {
 
-    const wasteStockDto = createWasteStockDto(req.body);
+    const wasteStockDto = createWasteDtoForStockUpdate(req.body);
     const sanitizedWasteStockDto = sanitizeEmptyStrings(wasteStockDto);
 
     const waste = await updateWasteStock({

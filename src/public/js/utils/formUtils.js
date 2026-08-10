@@ -3,6 +3,12 @@ import { reloadMainTable } from "../plugins/datatable/baseDatatable.js";
 import { notifications } from "../plugins/swal/swalComponent.js";
 import { closeModal } from "../ui/modalUI.js";
 
+export const pickFormFields = (data, fields) => Object.fromEntries(
+    fields
+        .filter((field) => Object.prototype.hasOwnProperty.call(data, field))
+        .map((field) => [field, data[field]])
+);
+
 export const handleSubmit = async ({ form, formData, create, update }) => {
     
     const id = form.dataset.id;
