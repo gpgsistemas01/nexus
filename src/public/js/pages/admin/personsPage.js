@@ -9,13 +9,13 @@ import { personAccessValidation, personValidation } from "../../utils/validation
 import { FORM_SELECTORS, MODAL_SELECTORS } from "../../constants/selectors.js";
 import { on } from "../../utils/domUtils.js";
 import { clearSelectValue } from "../../plugins/select2/baseSelect.js";
-import { UI_PERMISSIONS } from "../../constants/permissions.js";
+import { hasPermission, UI_PERMISSIONS } from "../../constants/permissions.js";
 
 const formId = FORM_SELECTORS.PERSON_FORM;
 const modalId = MODAL_SELECTORS.PERSON;
 
 const context = window.meta || {};
-const canManagePersons = context.permissions?.includes(UI_PERMISSIONS.PERSONS_WRITE) ?? false;
+const canManagePersons = hasPermission(context, UI_PERMISSIONS.PERSONS_WRITE);
 
 createPersonsDatatable({ canManagePersons });
 

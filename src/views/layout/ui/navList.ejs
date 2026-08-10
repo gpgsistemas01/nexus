@@ -1,5 +1,4 @@
-<% const permissions = user?.permissions || [];
-const shouldShowIcons = typeof showIcons !== 'undefined' ? showIcons : true;
+<% const shouldShowIcons = typeof showIcons !== 'undefined' ? showIcons : true;
 const shouldShowLabels = typeof showLabels !== 'undefined' ? showLabels : true;
 const navAccordionId = typeof accordionId !== 'undefined' ? accordionId : `appNavAccordion${ shouldShowLabels ? 'Full' : 'Icon' }`;
 
@@ -8,7 +7,7 @@ const createNavLink = ({ content, icon, href, permission }) => ({
     icon,
     href,
     isActive: currentRoute === href,
-    isVisible: permissions.includes(permission)
+    isVisible: hasPermission(user, permission)
 });
 
 const items = [

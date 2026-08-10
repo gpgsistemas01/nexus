@@ -5,7 +5,7 @@ import { notifications } from "../swal/swalComponent.js";
 import { deleteMaterial, getAllMaterials } from "../../application/warehouse/materials.js";
 import { getResponsiveRowData } from "./utils/responsive.js";
 import { buildExcelButton, buildTableExportParams } from "../../ui/tableUI.js";
-import { UI_PERMISSIONS } from "../../constants/permissions.js";
+import { hasPermission, UI_PERMISSIONS } from "../../constants/permissions.js";
 import { exportWarehouseReport } from "../../application/warehouse/report.js";
 import { formatFileName } from "../../utils/formatters.js";
 import { DATATABLE_SELECTORS } from "../../constants/selectors.js";
@@ -37,9 +37,9 @@ export const createMaterialDatatable = async (context) => {
 
     const { isWarehouse = false, isSystem = false, isSales = false } = context.organization || {};
     const canSeeCost = isWarehouse || isSystem || isSales;
-    const canManageMaterials = context.permissions?.includes(UI_PERMISSIONS.MATERIALS_WRITE) ?? false;
+    const canManageMaterials = hasPermission(context, UI_PERMISSIONS.MATERIALS_WRITE);
     const canDeleteMaterials = canManageMaterials;
-    const canAdjustStock = context.permissions?.includes(UI_PERMISSIONS.MATERIALS_ADJUST_STOCK) ?? false;
+    const canAdjustStock = hasPermission(context, UI_PERMISSIONS.MATERIALS_ADJUST_STOCK);
     const canCreateMaterialsFromModule = canManageMaterials;
 
     renderWarehouseInventoryHeader({

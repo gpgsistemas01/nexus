@@ -5,3 +5,8 @@ export const UI_PERMISSIONS = Object.freeze({
     WASTES_WRITE: 'wastes:write',
     WASTES_ADJUST_STOCK: 'wastes:adjust-stock'
 });
+
+export const hasPermission = (user, permission) => (
+    Array.isArray(user?.permissions)
+    && user.permissions.includes(permission)
+);
