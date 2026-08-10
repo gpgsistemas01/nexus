@@ -1,6 +1,7 @@
 import { initMdbWrapperInput, updateMdbWrapperInput } from "../../mdb/baseInstance.js";
 import { initbaseSelect2 } from "../baseSelect.js";
 import { FORM_SELECTORS, MODAL_SELECTORS } from "../../../constants/selectors.js";
+import { getAllMaterials } from "../../../application/warehouse/materials.js";
 
 const modalSelector = MODAL_SELECTORS.PURCHASE_REQUISITION;
 const projectSelector = FORM_SELECTORS.PROJECT;
@@ -50,16 +51,17 @@ export const initPurchaseRequisitionFormSelect2 = async (data = null) => {
     initbaseSelect2({
         baseSelector: materialScopedSelector,
         modalSelector,
-        url: '/api/warehouse/materials/',
+        get: getAllMaterials,
         placeholder: 'Buscar material...',
         processResults: (data) => {
 
             const list = data.data || data;
             return {
                 results: list.map(material => ({
-                    id: material.id,
+                    id: material.materialId,
                     text: material.name,
-                    uom: material.presentation || 'PIEZA'
+                    presentation: material.presentation?.name || 'PIEZA',
+                    uom: material.presentation?.name || 'PIEZA'
                 }))
             };
         }

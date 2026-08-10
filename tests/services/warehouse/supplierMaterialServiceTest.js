@@ -29,6 +29,7 @@ const {
   recalculateConvertedQuantityByMaterial,
   recalculateMaterialUnitCosts,
   findAllSupplierMaterials,
+  mapSupplierMaterial,
   updateMaterialUnitCostIfHigher,
   updateSupplierMaterialStock
 } = await import('../../../src/services/warehouse/materials/supplierMaterialService.js');
@@ -40,6 +41,33 @@ describe('supplierMaterialService', () => {
     supplierMaterialUpdateMany.mockResolvedValue({ count: 1 });
     supplierMaterialUpdate.mockResolvedValue({});
     supplierMaterialCount.mockResolvedValue(2);
+  });
+
+  it('expone un contrato de material estable sin filtrar la estructura de SupplierMaterial', () => {
+    expect(mapSupplierMaterial({
+      id: 'supplier-material-1',
+      currentStock: 5,
+      convertedQuantity: 10,
+      maxUnitCost: 20,
+      material: {
+        id: 'material-1',
+        name: 'Lámina',
+        presentation: { id: 'presentation-1', name: 'Rollo' },
+        unitMeasure: { id: 'unit-1', name: 'Metro' }
+      },
+      supplier: { id: 'supplier-1', tradeName: 'Proveedor' }
+    })).toEqual({
+      id: 'material-1',
+      materialId: 'material-1',
+      supplierMaterialId: 'supplier-material-1',
+      name: 'Lámina',
+      presentation: { id: 'presentation-1', name: 'Rollo' },
+      unitMeasure: { id: 'unit-1', name: 'Metro' },
+      currentStock: 5,
+      convertedQuantity: 10,
+      maxUnitCost: 20,
+      supplier: { id: 'supplier-1', tradeName: 'Proveedor' }
+    });
   });
 
   it('marca como eliminables solo los materiales sin vínculos operativos', async () => {
