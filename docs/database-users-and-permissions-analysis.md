@@ -124,7 +124,6 @@ usuarios/asignaciones y cambios de contraseña o estado.
 | P0 | Persistir, rotar y revocar refresh tokens; hoy logout solo borra la cookie local. |
 | P0 | Activar rate limiting para login y refresh. |
 | P0 | Aplicar autorización por objeto de forma uniforme en filtros y transacciones Prisma. |
-| P1 | Aprobar con negocio la matriz central y dividir permisos `manage`. |
 | P1 | Implementar auditoría persistente de escrituras críticas. |
 | P1 | Definir protección CSRF explícita para métodos mutables. |
 | P2 | Aprovisionar credenciales PostgreSQL distintas para runtime y migraciones. |
