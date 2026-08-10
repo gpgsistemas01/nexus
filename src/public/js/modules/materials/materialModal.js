@@ -62,11 +62,10 @@ export const openMaterialModal = ({
         fields: materialEditableDataFields,
         isDisabled: isAdjustingStock
     });
-    setFormSectionVisibility({
+    setFormDisabled({
         form,
-        selector: null,
-        isVisible: !isGoodsReceiptCreation,
-        fieldNames: ['maxUnitCost']
+        fields: ['maxUnitCost'],
+        isDisabled: isAdjustingStock || isGoodsReceiptCreation
     });
     setReasonVisualOption({
         selector: `${ MODAL_SELECTORS.MATERIAL } ${ FORM_SELECTORS.REASON }`,

@@ -28,7 +28,6 @@ let adjustmentService;
 let material;
 let supplier;
 let reason;
-let initialStockReason;
 let user;
 
 const cleanupStockAdjustmentData = async () => {
@@ -110,22 +109,11 @@ describeDb('stock adjustment cross-domain database integration', () => {
 
     await cleanupStockAdjustmentData();
 
-    initialStockReason = await prisma.stockAdjustmentReason.findFirst({
-      where: {
-        name: {
-          equals: initialStockReasonName,
-          mode: 'insensitive'
-        }
-      },
-      select: { id: true }
+    await prisma.stockAdjustmentReason.upsert({
+      where: { name: initialStockReasonName },
+      update: {},
+      create: { name: initialStockReasonName }
     });
-
-    if (!initialStockReason) {
-      initialStockReason = await prisma.stockAdjustmentReason.create({
-        data: { name: initialStockReasonName },
-        select: { id: true }
-      });
-    }
 
     const [presentation, unit] = await Promise.all([
       prisma.presentation.create({ data: { name: names.presentation } }),
