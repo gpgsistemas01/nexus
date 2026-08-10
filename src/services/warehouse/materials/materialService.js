@@ -278,56 +278,64 @@ export const updateMaterial = async (materialDto, id) => {
     };
 };
 
-export const deleteMaterial = async (id) => {
+export const deleteMaterial = async (supplierMaterialId) => {
 
     try {
 
         const deletedMaterial = await getDb().$transaction(async (tx) => {
 
-            await existsMaterial({ tx, id });
+            const supplierMaterial = await tx.supplierMaterial.findUnique({
+                where: { id: supplierMaterialId },
+                select: { materialId: true }
+            });
+
+            if (!supplierMaterial) throw new MaterialNotFound();
+
+            const { materialId } = supplierMaterial;
 
             const linkedRecords = await Promise.all([
-                tx.goodsReceiptDetail.findFirst({ where: { materialId: id }, select: { id: true } }),
-                tx.goodsIssueDetail.findFirst({ where: { materialId: id }, select: { id: true } }),
-                tx.purchaseRequisitionDetail.findFirst({ where: { materialId: id }, select: { id: true } }),
-                tx.movementDetail.findFirst({ where: { materialId: id }, select: { id: true } }),
-                tx.stockAdjustmentDetail.findFirst({ where: { materialId: id }, select: { id: true } }),
+                tx.goodsReceiptDetail.findFirst({ where: { materialId }, select: { id: true } }),
+                tx.goodsIssueDetail.findFirst({ where: { materialId }, select: { id: true } }),
+                tx.purchaseRequisitionDetail.findFirst({ where: { materialId }, select: { id: true } }),
+                tx.movementDetail.findFirst({ where: { materialId }, select: { id: true } }),
+                tx.stockAdjustmentDetail.findFirst({ where: { materialId }, select: { id: true } }),
                 tx.goodsReceiptDetailChange.findFirst({
                     where: {
                         OR: [
-                            { previousMaterialId: id },
-                            { correctedMaterialId: id }
+                            { previousMaterialId: materialId },
+                            { correctedMaterialId: materialId }
                         ]
                     },
                     select: { id: true }
                 }),
                 tx.waste.findFirst({
-                    where: { supplierMaterial: { materialId: id } },
+                    where: { supplierMaterial: { materialId } },
                     select: { id: true }
                 })
             ]);
 
             if (linkedRecords.some(Boolean)) throw new MaterialDeleteRelationConflict();
 
-            await tx.supplierMaterial.deleteMany({ where: { materialId: id } });
+            await tx.supplierMaterial.delete({ where: { id: supplierMaterialId } });
 
-            return tx.material.delete({
-                where: { id },
-                select: { id: true }
-            });
+            const remainingRelations = await tx.supplierMaterial.count({ where: { materialId } });
+
+            if (remainingRelations > 0) return { id: materialId };
+
+            return tx.material.delete({ where: { id: materialId }, select: { id: true } });
         });
 
         logServiceInfo(serviceLogger, {
             operation: 'warehouse.materials.materialService.deleteMaterial',
-            ...getModelLogContext('material', { id })
-        }, 'Material y relación con proveedor eliminados correctamente');
+            ...getModelLogContext('supplierMaterial', { id: supplierMaterialId })
+        }, 'Relación entre material y proveedor eliminada correctamente');
 
         return deletedMaterial;
 
     } catch (err) {
         logServiceError(serviceLogger, err, {
             operation: 'warehouse.materials.materialService.deleteMaterial',
-            ...getModelLogContext('material', { id })
+            ...getModelLogContext('supplierMaterial', { id: supplierMaterialId })
         });
 
         if (err.code === PRISMA_ERROR_CODES.RECORD_NOT_FOUND) throw new MaterialNotFound();

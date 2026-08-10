@@ -138,8 +138,8 @@ export const createMaterialDatatable = async (context) => {
         const data = getResponsiveRowData(table, this);
 
         const result = await notifications.showConfirmation({
-            title: '¿Eliminar material?',
-            text: 'Se eliminará el material y sus ajustes de stock asociados solo si no tiene compras ni salidas vinculadas. El proveedor no se eliminará.',
+            title: '¿Eliminar material de este proveedor?',
+            text: 'Se eliminará únicamente la relación entre el material y el proveedor mostrada en esta fila. Si es la última relación del material, también se eliminará el material. Esto solo es posible si el material no tiene historial de compras, salidas, requisiciones, mermas, movimientos ni ajustes de stock. El proveedor no se eliminará.',
             icon: 'warning',
             confirmButtonText: 'Eliminar',
             cancelButtonText: 'Cancelar',
@@ -149,9 +149,9 @@ export const createMaterialDatatable = async (context) => {
         if (!result.isConfirmed) return;
 
         try {
-            const response = await deleteMaterial(data.id);
+            const response = await deleteMaterial(data.supplierMaterialId);
 
-            notifications.showSuccess(response.message || '¡Material eliminado exitosamente!');
+            notifications.showSuccess(response.message || '¡Relación entre material y proveedor eliminada exitosamente!');
             table.ajax.reload(null, false);
         } catch (err) {
             handleApiError({ err, rethrow: false });
