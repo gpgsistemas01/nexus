@@ -13,33 +13,33 @@ const generateYearlyReferenceNumber = vi.fn();
 const throwIfReferenceNumberAlreadyExists = vi.fn();
 const createWasteMovement = vi.fn();
 
-vi.mock('../../../../src/utils/logger.js', () => ({
+vi.mock('../../../../../src/utils/logger.js', () => ({
   createServiceLogger: () => ({}),
   getModelLogContext: (_model, data = {}) => data,
   logServiceError: vi.fn(),
   logServiceInfo: vi.fn()
 }));
 
-vi.mock('../../../../src/repository/baseRepository.js', () => ({
+vi.mock('../../../../../src/repository/baseRepository.js', () => ({
   getDb: (tx = null) => tx || ({
     $transaction: transaction
   })
 }));
 
-vi.mock('../../../../src/services/warehouse/materials/supplierMaterialService.js', () => ({
+vi.mock('../../../../../src/services/warehouse/materials/supplierMaterialService.js', () => ({
   findSupplierMaterialById
 }));
 
-vi.mock('../../../../src/services/warehouse/reasonService.js', () => ({
+vi.mock('../../../../../src/services/warehouse/reasonService.js', () => ({
   findInitialStockAdjustmentReason
 }));
 
-vi.mock('../../../../src/services/document/referenceNumberService.js', () => ({
+vi.mock('../../../../../src/services/document/referenceNumberService.js', () => ({
   generateYearlyReferenceNumber,
   throwIfReferenceNumberAlreadyExists
 }));
 
-vi.mock('../../../../src/services/warehouse/wastes/wasteMovementService.js', () => ({
+vi.mock('../../../../../src/services/warehouse/wastes/wasteMovementService.js', () => ({
   createWasteMovement
 }));
 
@@ -47,7 +47,7 @@ const {
   editWaste,
   editWasteStock,
   registerWaste
-} = await import('../../../../src/controllers/api/warehouse/wasteController.js');
+} = await import('../../../../../src/controllers/api/warehouse/wasteController.js');
 
 const createResponse = () => {
   const res = {
@@ -91,7 +91,7 @@ const createWaste = (overrides = {}) => ({
   ...overrides
 });
 
-describe('wasteController service flow', () => {
+describe('wasteController complete flow', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     transaction.mockImplementation((callback) => callback({
