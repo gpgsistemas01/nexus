@@ -1863,6 +1863,20 @@ body section {
   inline-size: 5.75rem;
 }
 
+.app-sidebar--icon-only .app-brand {
+  flex-direction: column;
+  gap: 0.5rem;
+  inline-size: 100%;
+  justify-content: center;
+  padding-inline: 0;
+  text-align: center;
+}
+
+.app-sidebar--icon-only .app-brand__name {
+  font-size: 0.7rem;
+  inline-size: 100%;
+}
+
 .app-header {
   background: var(--mdb-body-bg);
 }
