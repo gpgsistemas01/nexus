@@ -2,7 +2,7 @@ import { useForm } from '../../../application/form.js';
 import { editWaste, editWasteStock, registerWaste } from '../../../application/warehouse/wastes.js';
 import { FORM_SELECTORS } from '../../../constants/selectors.js';
 import { handleSubmit, pickFormFields, validateFields } from '../../../utils/formUtils.js';
-import { wasteSecondaryDataValidators, wasteStockValidators, newWasteValidators } from '../../../utils/validations/validators.js';
+import { wasteEditValidation, wasteStockValidation, wasteValidation } from '../../../utils/validations/validators.js';
 import { wasteCreateFields, wasteSecondaryDataFields, wasteStockFields } from './wasteFields.js';
 import { isEditMode, isStockMode } from '../../../constants/formModes.js';
 
@@ -25,10 +25,10 @@ useForm({
     },
     getErrors: ({ form, formData }) => {
 
-        if (isStockMode(form.dataset.mode)) return validateFields(wasteStockValidators, formData);
-        if (isEditMode(form.dataset.mode)) return validateFields(wasteSecondaryDataValidators, formData);
+        if (isStockMode(form.dataset.mode)) return validateFields(wasteStockValidation, formData);
+        if (isEditMode(form.dataset.mode)) return validateFields(wasteEditValidation, formData);
 
-        return validateFields(newWasteValidators, formData);
+        return validateFields(wasteValidation, formData);
     },
     sendRequest: ({ formData, form }) => handleSubmit({
         form,

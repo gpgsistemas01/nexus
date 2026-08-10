@@ -1,4 +1,3 @@
-
 import { validatePassword, validateUsername } from "../fields/fieldsValidator.js";
 
 export const loginValidation = [

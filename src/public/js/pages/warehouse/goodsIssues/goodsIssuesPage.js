@@ -1,6 +1,6 @@
 import { useForm } from "../../../application/form.js";
 import { editGoodsIssue, editGoodsIssueDetails, editGoodsIssueHeader, registerGoodsIssue } from "../../../application/warehouse/goodsIssues/goodsIssues.js";
-import { validateAddGoodsIssueMaterialValidators, validateGoodsIssueDetailValidators, validateGoodsIssueValidators } from "../../../utils/validations/validators.js";
+import { addGoodsIssueMaterialValidation, goodsIssueDetailsValidation, goodsIssueValidation } from "../../../utils/validations/validators.js";
 import { refreshMaterialTable } from "../../../plugins/datatable/utils/renderMaterialDatatable.js";
 import { createGoodsIssueDatatable, details, initDetailsGoodsIssueTable } from "../../../plugins/datatable/goodsIssueDatatable.js";
 import { initGoodsIssueFormSelect2, setGoodsIssueFormSelectOptions, syncGoodsIssueDependentSelectsState } from "../../../plugins/select2/modules/goodsIssueSelect.js";
@@ -74,9 +74,9 @@ useForm({
 
         const { mode } = form.dataset;
 
-        if (mode === FORM_MODES.EDIT_DETAIL) return validateDetailsFields(validateGoodsIssueDetailValidators, details);
+        if (mode === FORM_MODES.EDIT_DETAIL) return validateDetailsFields(goodsIssueDetailsValidation, details);
 
-        const errors = validateFields(validateGoodsIssueValidators, formData);
+        const errors = validateFields(goodsIssueValidation, formData);
 
         if (mode === FORM_MODES.EDIT_HEADER) errors.details = null;
 
@@ -231,7 +231,7 @@ const addMaterial = () => {
     const materialId = option?.value;
     const quantity = Number(document.querySelector(FORM_SELECTORS.QUANTITY).value);
 
-    const errors = validateFields(validateAddGoodsIssueMaterialValidators, {
+    const errors = validateFields(addGoodsIssueMaterialValidation, {
         materialId,
         supplierId,
         quantity

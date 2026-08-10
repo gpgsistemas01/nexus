@@ -8,7 +8,7 @@ import { openModal } from "../../ui/modalUI.js";
 import { on } from "../../utils/domUtils.js";
 import { setDateTimePickerValue } from "../../plugins/flatpickr/dateTimePicker.js";
 import { handleAction, handleSubmit, hasValidationErrors, validateFields } from "../../utils/formUtils.js";
-import { validatePurchaseRequisitionValidators } from "../../utils/validations/validators.js";
+import { addMaterialValidation, purchaseRequisitionValidation } from "../../utils/validations/validators.js";
 import { FORM_SELECTORS, MODAL_SELECTORS } from "../../constants/selectors.js";
 
 const context = window.meta || {};
@@ -30,7 +30,7 @@ useForm({
 
         let errors = {};
 
-        errors = validateFields(validatePurchaseRequisitionValidators, formData);
+        errors = validateFields(purchaseRequisitionValidation, formData);
 
         return errors;
     },
@@ -109,7 +109,7 @@ const addMaterial = () => {
     const materialId = option.value;
     const quantity = document.querySelector('#quantityInput').value;
 
-    const errors = validateFields(validateAddMaterialValidators, {
+    const errors = validateFields(addMaterialValidation, {
         materialId,
         quantity
     });

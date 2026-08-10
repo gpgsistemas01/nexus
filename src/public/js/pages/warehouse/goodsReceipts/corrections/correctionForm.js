@@ -5,7 +5,7 @@ import { reloadMainTable } from "../../../../plugins/datatable/baseDatatable.js"
 import { notifications } from "../../../../plugins/swal/swalComponent.js";
 import { resetFormSubmitState } from "../../../../ui/formUI.js";
 import { validateFields } from "../../../../utils/formUtils.js";
-import { validateGoodsReceiptCorrectionValidators } from "../../../../utils/validations/validators.js";
+import { goodsReceiptCorrectionValidation } from "../../../../utils/validations/validators.js";
 
 const CORRECTION_MODAL_SELECTOR = '#goodsReceiptCorrectionModal';
 const CORRECTION_FORM_SELECTOR = '#goodsReceiptCorrectionForm';
@@ -17,7 +17,7 @@ export const initGoodsReceiptCorrectionForm = () => {
     useForm({
         selector: CORRECTION_FORM_SELECTOR,
         normalizeData: ({ formData }) => formData,
-        getErrors: ({ formData }) => validateFields(validateGoodsReceiptCorrectionValidators, formData),
+        getErrors: ({ formData }) => validateFields(goodsReceiptCorrectionValidation, formData),
         sendRequest: async ({ formData, form }) => {
             const currentDetail = form.correctionDetail;
             const hasChanges = currentDetail && (

@@ -5,7 +5,7 @@ import { initPersonFormSelect2 } from "../../plugins/select2/modules/personSelec
 import { clearFormErrors, initForm, normalizeFormErrors } from "../../ui/formUI.js";
 import { openModal } from "../../ui/modalUI.js";
 import { handleSubmit, hasValidationErrors, validateFields } from "../../utils/formUtils.js";
-import { personAccessValidators, personValidators } from "../../utils/validations/validators.js";
+import { personAccessValidation, personValidation } from "../../utils/validations/validators.js";
 import { FORM_SELECTORS, MODAL_SELECTORS } from "../../constants/selectors.js";
 import { on } from "../../utils/domUtils.js";
 import { clearSelectValue } from "../../plugins/select2/baseSelect.js";
@@ -28,7 +28,7 @@ useForm({
             accesses: personAccesses.map(({ departmentId, roleId }) => ({ departmentId, roleId }))
         }
     },
-    getErrors: ({ formData }) => validateFields(personValidators, formData),
+    getErrors: ({ formData }) => validateFields(personValidation, formData),
     sendRequest: async ({ formData, form }) => {
 
         await handleSubmit({
@@ -80,7 +80,7 @@ const addPersonAccess = () => {
         roleId: role.value,
         roleName: role.options[role.selectedIndex]?.text
     };
-    const errors = validateFields(personAccessValidators, {
+    const errors = validateFields(personAccessValidation, {
         ...access,
         accesses: personAccesses
     });

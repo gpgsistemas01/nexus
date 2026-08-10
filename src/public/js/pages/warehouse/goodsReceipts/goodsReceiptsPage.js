@@ -1,7 +1,7 @@
 import { useForm } from "../../../application/form.js";
 import { editGoodsReceiptHeader, registerGoodsReceipt, cancelGoodsReceiptDetail } from "../../../application/warehouse/goodsReceipts.js";
 import { handleApiError } from "../../../api/errorHandler.js";
-import { validateAddGoodsReceiptMaterialValidators, validateGoodsReceiptValidators } from "../../../utils/validations/validators.js";
+import { addGoodsReceiptMaterialValidation, goodsReceiptValidation } from "../../../utils/validations/validators.js";
 import { refreshMaterialTable } from "../../../plugins/datatable/utils/renderMaterialDatatable.js";
 import { createGoodsReceiptDatatable, details, initDetailsGoodsReceiptTable } from "../../../plugins/datatable/goodsReceiptDatatable.js";
 import { GOODS_RECEIPT_SUPPLIER_CHANGED_EVENT, initGoodsReceiptFormSelect2, setGoodsReceiptFormSelectOptions } from "../../../plugins/select2/modules/goodsReceiptSelect.js";
@@ -85,12 +85,12 @@ useForm({
         const allowedUsername = /^[a-zA-Z0-9\-]+$/;
         let errors = {};
 
-        let validators = validateGoodsReceiptValidators;
+        let validators = goodsReceiptValidation;
 
         if (form.dataset.mode === FORM_MODES.EDIT) {
-            const { supplierId, details, ...editableValidators } = validateGoodsReceiptValidators;
+            const { supplierId, details, ...editableValidation } = goodsReceiptValidation;
             validators = {
-                ...editableValidators,
+                ...editableValidation,
                 details: (value) => value.length === 0 ? null : details(value)
             };
         }
@@ -221,7 +221,7 @@ const addMaterial = () => {
 
     const quantity = Number(document.querySelector(FORM_SELECTORS.QUANTITY).value);
     const costPerUnitType = Number(document.querySelector(FORM_SELECTORS.COST_PER_UNIT).value);
-    const errors = validateFields(validateAddGoodsReceiptMaterialValidators, {
+    const errors = validateFields(addGoodsReceiptMaterialValidation, {
         materialId,
         quantity,
         costPerUnitType

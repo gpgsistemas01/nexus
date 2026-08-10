@@ -5,7 +5,7 @@ import { initUserFormSelect2, setUserFormSelectOptions } from '../../plugins/sel
 import { clearFormErrors, initForm, setFormDisabled } from '../../ui/formUI.js';
 import { openModal } from '../../ui/modalUI.js';
 import { handleSubmit, validateFields } from '../../utils/formUtils.js';
-import { userEditValidators, userPasswordValidators, userValidators } from '../../utils/validations/validators.js';
+import { userEditValidation, userPasswordValidation, userValidation } from '../../utils/validations/validators.js';
 import { FORM_SELECTORS, MODAL_SELECTORS } from "../../constants/selectors.js";
 
 const formId = FORM_SELECTORS.USER_FORM;
@@ -88,11 +88,11 @@ useForm({
     },
     getErrors: ({ form, formData }) => {
 
-        if (form.dataset.mode === 'edit-password') return validateFields(userPasswordValidators, formData);
+        if (form.dataset.mode === 'edit-password') return validateFields(userPasswordValidation, formData);
 
-        if (form.dataset.mode === 'edit') return validateFields(userEditValidators, formData);
+        if (form.dataset.mode === 'edit') return validateFields(userEditValidation, formData);
 
-        return validateFields(userValidators, formData);
+        return validateFields(userValidation, formData);
     },
     sendRequest: async ({ formData, form }) => {
 

@@ -3,7 +3,7 @@ import { editMaterial, editMaterialStock, registerMaterial } from "../../applica
 import { FORM_SELECTORS, MODAL_SELECTORS } from "../../constants/selectors.js";
 
 import { handleSubmit, pickFormFields, validateFields } from "../../utils/formUtils.js";
-import { materialStockValidators, materialValidators } from "../../utils/validations/validators.js";
+import { materialStockValidation, materialValidation } from "../../utils/validations/validators.js";
 import { materialCreateFields, materialSecondaryDataFields, materialStockFields } from './materialFields.js';
 import { isEditMode, isStockMode } from '../../constants/formModes.js';
 
@@ -14,28 +14,28 @@ const goodsReceiptCreationContext = 'goodsReceipt';
 const getCreationContext = (form) => form.dataset.creationContext || null;
 const isGoodsReceiptCreation = (form) => getCreationContext(form) === goodsReceiptCreationContext;
 
-const materialEditValidators = {
-    name: materialValidators.name,
-    supplierId: materialValidators.supplierId,
-    minStock: materialValidators.minStock,
-    maxUnitCost: materialValidators.maxUnitCost
+const materialEditValidation = {
+    name: materialValidation.name,
+    supplierId: materialValidation.supplierId,
+    minStock: materialValidation.minStock,
+    maxUnitCost: materialValidation.maxUnitCost
 };
 
-const materialCreateValidators = {
-    ...materialValidators,
-    newStock: materialStockValidators.newStock,
-    observations: materialStockValidators.observations
+const materialCreateValidation = {
+    ...materialValidation,
+    newStock: materialStockValidation.newStock,
+    observations: materialStockValidation.observations
 };
 
-const getMaterialValidators = (form) => {
+const getMaterialValidation = (form) => {
 
-    if (isEditMode(form.dataset.mode)) return materialEditValidators;
-    if (!isGoodsReceiptCreation(form)) return materialCreateValidators;
+    if (isEditMode(form.dataset.mode)) return materialEditValidation;
+    if (!isGoodsReceiptCreation(form)) return materialCreateValidation;
 
     return {
-        ...materialValidators,
+        ...materialValidation,
         maxUnitCost: (value) => value
-            ? materialValidators.maxUnitCost(value)
+            ? materialValidation.maxUnitCost(value)
             : null
     };
 };
@@ -67,9 +67,9 @@ useForm({
     },
     getErrors: ({ form, formData }) => {
 
-        if (isStockMode(form.dataset.mode)) return validateFields(materialStockValidators, formData);
+        if (isStockMode(form.dataset.mode)) return validateFields(materialStockValidation, formData);
 
-        return validateFields(getMaterialValidators(form), formData);
+        return validateFields(getMaterialValidation(form), formData);
     },
     sendRequest: async ({ formData, form }) => {
 

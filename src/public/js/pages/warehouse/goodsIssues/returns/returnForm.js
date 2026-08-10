@@ -4,7 +4,7 @@ import { initMdbModal } from '../../../../plugins/mdb/baseInstance.js';
 import { notifications } from '../../../../plugins/swal/swalComponent.js';
 import { resetFormSubmitState } from '../../../../ui/formUI.js';
 import { validateFields } from '../../../../utils/formUtils.js';
-import { validateGoodsIssueReturnValidators } from '../../../../utils/validations/validators.js';
+import { goodsIssueReturnValidation } from '../../../../utils/validations/validators.js';
 
 const RETURN_MODAL_SELECTOR = '#goodsIssueReturnModal';
 const RETURN_FORM_SELECTOR = '#goodsIssueReturnForm';
@@ -20,7 +20,7 @@ export const initGoodsIssueReturnForm = () => {
             returnQuantity: Number(formData.returnQuantity)
         }),
         getErrors: ({ form, formData }) => {
-            const errors = validateFields(validateGoodsIssueReturnValidators, formData);
+            const errors = validateFields(goodsIssueReturnValidation, formData);
             const availableQuantity = Number(form.dataset.availableQuantity || 0);
 
             if (!errors.returnQuantity && formData.returnQuantity > availableQuantity) {

@@ -1,7 +1,7 @@
 import { login } from "../../application/auth/login.js";
 import { useForm } from "../../application/form.js";
 import { validateFields } from "../../utils/formUtils.js";
-import { loginValidators } from "../../utils/validations/validators.js";
+import { loginValidation } from "../../utils/validations/validators.js";
 import { FORM_SELECTORS } from "../../constants/selectors.js";
 
 const formId = FORM_SELECTORS.LOGIN;
@@ -59,7 +59,7 @@ loadRememberedCredentials();
 useForm({
     selector: formId,
     normalizeData: ({ formData }) => formData,
-    getErrors: ({ formData }) => validateFields(loginValidators, formData),
+    getErrors: ({ formData }) => validateFields(loginValidation, formData),
     normalizeErrors: ({ errors }) => {
 
         errors.name = errors.name ? 'Usuario incorrecto' : null;
