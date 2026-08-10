@@ -1,5 +1,6 @@
 import 'dotenv/config.js';
 import { getRequestLogContext, logger, pinoLogger } from './utils/logger.js';
+import { hasPermission } from './public/js/constants/permissions.js';
 
 import clientApiRoutes from './routes/api/sales/clientApiRoute.js';
 import salesReportApiRoutes from './routes/api/sales/reportApiRoute.js';
@@ -99,6 +100,7 @@ app.use(textRoute, checkContentTypePlainText);
 app.use((req, res, next) => {
     res.locals.appName = appConfig.name;
     res.locals.flash = req.cookies.flash || null;
+    res.locals.hasPermission = hasPermission;
     res.clearCookie('flash');
     next();
 });

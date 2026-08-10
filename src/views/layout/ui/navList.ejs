@@ -1,7 +1,4 @@
-<% const permissions = user?.permissions || [];
-const canSeeAll = user?.scope?.canReadAll || false;
-
-const shouldShowIcons = typeof showIcons !== 'undefined' ? showIcons : true;
+<% const shouldShowIcons = typeof showIcons !== 'undefined' ? showIcons : true;
 const shouldShowLabels = typeof showLabels !== 'undefined' ? showLabels : true;
 const navAccordionId = typeof accordionId !== 'undefined' ? accordionId : `appNavAccordion${ shouldShowLabels ? 'Full' : 'Icon' }`;
 
@@ -10,7 +7,7 @@ const createNavLink = ({ content, icon, href, permission }) => ({
     icon,
     href,
     isActive: currentRoute === href,
-    isVisible: permissions.includes(permission)
+    isVisible: hasPermission(user, permission)
 });
 
 const items = [
@@ -37,7 +34,7 @@ const items = [
     createNavLink({ content: 'Clientes', icon: 'fa-solid fa-address-book', href: '/clientes', permission: 'clients:page-view' }),
     createNavLink({ content: 'Proveedores', icon: 'fa-solid fa-truck-fast', href: '/proveedores', permission: 'suppliers:page-view' })
 ].map(item => {
-    const visibleChildren = (item.children || []).filter(child => canSeeAll || child.isVisible);
+    const visibleChildren = (item.children || []).filter(child => child.isVisible);
 
     return {
         ...item,
@@ -45,7 +42,7 @@ const items = [
         isActive: item.isActive || visibleChildren.some(child => child.isActive),
         isVisible: item.children ? visibleChildren.length > 0 : item.isVisible
     };
-}).filter(item => canSeeAll || item.isVisible).map((item, index) => ({
+}).filter(item => item.isVisible).map((item, index) => ({
     ...item,
     submenuId: `${ navAccordionId }Submenu${ index }`,
     class: `nav-link ${ shouldShowIcons ? 'app-nav-link--icon' : '' } ${ !shouldShowLabels ? 'app-nav-link--icon-only' : '' } ${ item.isActive ? 'active' : ''}`,
