@@ -4,6 +4,9 @@ import { GoodsIssueInsufficientStock } from '../../../src/errors/inventory/stock
 const executeRawUnsafe = vi.fn();
 const supplierMaterialUpdateMany = vi.fn();
 const supplierMaterialUpdate = vi.fn();
+const supplierMaterialFindMany = vi.fn();
+const supplierMaterialCount = vi.fn();
+const materialFindMany = vi.fn();
 
 vi.mock('../../../src/services/warehouse/adjustmentService.js', () => ({
   createStockAdjustment: vi.fn()
@@ -13,15 +16,19 @@ vi.mock('../../../src/repository/baseRepository.js', () => ({
   getDb: () => ({
     $executeRawUnsafe: executeRawUnsafe,
     supplierMaterial: {
+      findMany: supplierMaterialFindMany,
+      count: supplierMaterialCount,
       updateMany: supplierMaterialUpdateMany,
       update: supplierMaterialUpdate
-    }
+    },
+    material: { findMany: materialFindMany }
   })
 }));
 
 const {
   recalculateConvertedQuantityByMaterial,
   recalculateMaterialUnitCosts,
+  findAllSupplierMaterials,
   updateMaterialUnitCostIfHigher,
   updateSupplierMaterialStock
 } = await import('../../../src/services/warehouse/materials/supplierMaterialService.js');
@@ -32,6 +39,50 @@ describe('supplierMaterialService', () => {
     executeRawUnsafe.mockResolvedValue(0);
     supplierMaterialUpdateMany.mockResolvedValue({ count: 1 });
     supplierMaterialUpdate.mockResolvedValue({});
+    supplierMaterialCount.mockResolvedValue(2);
+  });
+
+  it('marca como eliminables solo los materiales sin vínculos operativos', async () => {
+    supplierMaterialFindMany.mockResolvedValue([
+      {
+        id: 'supplier-material-1',
+        currentStock: 0,
+        convertedQuantity: 0,
+        maxUnitCost: 10,
+        material: { id: 'material-1', name: 'Sin vínculos', minStock: 0 },
+        supplier: { id: 'supplier-1', tradeName: 'Proveedor' }
+      },
+      {
+        id: 'supplier-material-2',
+        currentStock: 0,
+        convertedQuantity: 0,
+        maxUnitCost: 20,
+        material: { id: 'material-2', name: 'Con compra', minStock: 0 },
+        supplier: { id: 'supplier-1', tradeName: 'Proveedor' }
+      }
+    ]);
+    materialFindMany.mockResolvedValue([{ id: 'material-1' }]);
+
+    const result = await findAllSupplierMaterials({});
+
+    expect(result.data.map(({ id, canDelete }) => ({ id, canDelete }))).toEqual([
+      { id: 'material-1', canDelete: true },
+      { id: 'material-2', canDelete: false }
+    ]);
+    expect(materialFindMany).toHaveBeenCalledWith({
+      where: {
+        id: { in: ['material-1', 'material-2'] },
+        goodsReceiptDetails: { none: {} },
+        goodsIssueDetails: { none: {} },
+        purchaseRequisitionsDetails: { none: {} },
+        movementDetails: { none: {} },
+        stockAdjustmentDetails: { none: {} },
+        previousGoodsReceiptDetailChanges: { none: {} },
+        correctedGoodsReceiptDetailChanges: { none: {} },
+        supplierMaterials: { none: { wastes: { some: {} } } }
+      },
+      select: { id: true }
+    });
   });
 
   it('actualiza costos máximos en una sola consulta para evitar N+1', async () => {
