@@ -54,6 +54,10 @@ El login y la renovación rechazan usuarios inactivos o sin accesos. Los cambios
 asignación se consultan nuevamente, por lo que no hay que esperar a que expire el
 access token para bloquear las rutas.
 
+No existen excepciones globales de lectura por método HTTP, rol o departamento. Cada
+recurso de lectura debe declarar en `AUTHORIZATION_POLICIES` las combinaciones que lo
+pueden consultar, incluidas las de Director o Dirección cuando correspondan.
+
 ## Frontend
 
 El backend entrega `user.permissions`, `user.scope` y `user.organization` en las vistas y mediante
@@ -114,7 +118,6 @@ usuarios/asignaciones y cambios de contraseña o estado.
 | P0 | Activar rate limiting para login y refresh. |
 | P0 | Aplicar autorización por objeto de forma uniforme en filtros y transacciones Prisma. |
 | P1 | Aprobar con negocio la matriz central y dividir permisos `manage`. |
-| P1 | Reemplazar el bypass global GET de Director/Dirección por lectura explícita por recurso. |
 | P1 | Migrar menús/botones para consultar `user.permissions` en lugar de reglas duplicadas. |
 | P1 | Implementar auditoría persistente de escrituras críticas. |
 | P1 | Definir si `Person.isActive` condiciona a usuarios humanos y cómo tratar usuarios técnicos. |
