@@ -12,25 +12,11 @@ jobs:
     name: Test
     runs-on: ubuntu-latest
 
-    services:
-      postgres:
-        image: postgres:16
-        env:
-          POSTGRES_USER: postgres
-          POSTGRES_DB: smyb_test
-          POSTGRES_HOST_AUTH_METHOD: trust
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd="pg_isready -U postgres -d smyb_test"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=5
-
     env:
       # Variables no sensibles para armar las URLs efímeras de la BD de CI
       # en tiempo de ejecución, sin dejar cadenas de conexión completas en YAML.
       CI_POSTGRES_USER: postgres
+      CI_POSTGRES_PASSWORD: postgres
       CI_POSTGRES_HOST: localhost
       CI_POSTGRES_PORT: 5432
       CI_DATABASE_NAME: smyb_ci_do_not_use
@@ -46,10 +32,21 @@ jobs:
           node-version: 24
           cache: npm
 
+      # ubuntu-latest ya incluye PostgreSQL. Usarlo evita que una caída de
+      # Docker Hub impida iniciar el job antes de ejecutar nuestras pruebas.
+      - name: Start PostgreSQL
+        run: |
+          sudo systemctl start postgresql.service
+          sudo -u postgres psql --set=ON_ERROR_STOP=1 <<SQL
+          ALTER USER "${CI_POSTGRES_USER}" WITH PASSWORD '${CI_POSTGRES_PASSWORD}';
+          CREATE DATABASE "${CI_DATABASE_TEST_NAME}";
+          SQL
+          pg_isready --host "${CI_POSTGRES_HOST}" --port "${CI_POSTGRES_PORT}" --username "${CI_POSTGRES_USER}" --dbname "${CI_DATABASE_TEST_NAME}"
+
       - name: Configure database URLs
         run: |
-          DATABASE_URL="postgresql://${CI_POSTGRES_USER}@${CI_POSTGRES_HOST}:${CI_POSTGRES_PORT}/${CI_DATABASE_NAME}?schema=public"
-          DATABASE_TEST_URL="postgresql://${CI_POSTGRES_USER}@${CI_POSTGRES_HOST}:${CI_POSTGRES_PORT}/${CI_DATABASE_TEST_NAME}?schema=public"
+          DATABASE_URL="postgresql://${CI_POSTGRES_USER}:${CI_POSTGRES_PASSWORD}@${CI_POSTGRES_HOST}:${CI_POSTGRES_PORT}/${CI_DATABASE_NAME}?schema=public"
+          DATABASE_TEST_URL="postgresql://${CI_POSTGRES_USER}:${CI_POSTGRES_PASSWORD}@${CI_POSTGRES_HOST}:${CI_POSTGRES_PORT}/${CI_DATABASE_TEST_NAME}?schema=public"
           echo "::add-mask::${DATABASE_URL}"
           echo "::add-mask::${DATABASE_TEST_URL}"
           echo "DATABASE_URL=${DATABASE_URL}" >> "${GITHUB_ENV}"

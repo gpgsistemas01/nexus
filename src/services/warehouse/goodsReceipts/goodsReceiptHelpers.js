@@ -121,7 +121,17 @@ const updateActiveGoodsReceiptDetailAndTotals = async ({ tx, goodsReceiptId, det
             })
         },
         include: {
-            details: true
+            details: {
+                include: {
+                    material: {
+                        include: {
+                            presentation: true,
+                            unitMeasure: true
+                        }
+                    }
+                }
+            },
+            status: true
         }
     });
 
@@ -171,7 +181,16 @@ export const createGoodsReceiptDetailsAndUpdateTotals = async ({ tx, goodsReceip
         where: { id: goodsReceiptId },
         data: calculateGoodsReceiptTotals(receiptDetails),
         include: {
-            details: true,
+            details: {
+                include: {
+                    material: {
+                        include: {
+                            presentation: true,
+                            unitMeasure: true
+                        }
+                    }
+                }
+            },
             status: true
         }
     });
