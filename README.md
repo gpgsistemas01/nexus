@@ -10,6 +10,7 @@ Nexus es una plataforma de control operativo para administrar inventario, compra
 - [Requisitos](#requisitos)
 - [Configuración inicial](#configuración-inicial)
 - [Variables de entorno](#variables-de-entorno)
+- [Alcance y pendientes de documentación](#alcance-y-pendientes-de-documentación)
 - [Base de datos y Prisma](#base-de-datos-y-prisma)
 - [Usuarios, auditoría y permisos](#usuarios-auditoría-y-permisos)
 - [Ejecución](#ejecución)
@@ -63,8 +64,7 @@ src/
 
 prisma/
 ├── schema.prisma           # Modelo de datos
-├── migrations/             # Migraciones versionadas
-└── seed.js                 # Carga inicial desde archivos XLSX
+└── migrations/             # Migraciones versionadas
 
 tests/                      # Pruebas unitarias, integración y helpers
 scripts/                    # Scripts auxiliares de verificación
@@ -87,13 +87,12 @@ La aplicación usa una separación por capas: las rutas delegan en controladores
    ```
 
 2. Crear el archivo `.env` en la raíz del proyecto con las variables necesarias.
+   Este archivo es local, está excluido por `.gitignore` y no debe versionarse.
 
 3. Preparar la base de datos de desarrollo:
 
    ```bash
    npm run db:migrate
-   npx prisma generate
-   npm exec prisma db seed
    ```
 
 4. Iniciar la aplicación:
@@ -104,7 +103,10 @@ La aplicación usa una separación por capas: las rutas delegan en controladores
 
 ## Variables de entorno
 
-La aplicación carga variables con `dotenv/config.js`. Como mínimo se requiere una URL de PostgreSQL para el entorno en ejecución.
+La aplicación carga variables con `dotenv/config.js`. En desarrollo, define la
+configuración en un archivo `.env` local; en despliegues, utiliza el gestor de secretos
+de la plataforma. El archivo `.env` está excluido por `.gitignore` y nunca debe contener
+valores destinados a versionarse.
 
 ```env
 # Aplicación
@@ -128,6 +130,30 @@ LOG_LEVEL="info"
 
 > Ajusta los nombres/secretos según el ambiente real. No subas archivos `.env` con credenciales al repositorio.
 
+| Variable | Obligatoria | Uso |
+| --- | --- | --- |
+| `DATABASE_URL` | Sí, excepto en pruebas | Conexión PostgreSQL del proceso de la aplicación. |
+| `DIRECT_URL` | En Docker con `RUN_MIGRATIONS=true` | Conexión directa del CLI de Prisma para migraciones. |
+| `DATABASE_TEST_URL` | Para pruebas de integración | Base aislada seleccionada cuando `NODE_ENV=test`. Debe ser distinta de `DATABASE_URL`. |
+| `DIRECT_TEST_URL` | No | Conexión directa para migrar la base de pruebas; si falta se usa `DATABASE_TEST_URL`. |
+| `JWT_SECRET_ACCESS` | Sí | Firma tokens de acceso con vigencia de una hora. |
+| `JWT_SECRET_REFRESH` | Sí | Firma tokens de renovación con vigencia de siete días. |
+| `JWT_SECRET_ONE_TIME` | Sí | Firma tokens de un solo uso con vigencia de quince minutos. |
+| `PORT` | No | Puerto HTTP; el valor predeterminado es `3000`. |
+| `NODE_ENV` | No en local | Selecciona la base de pruebas cuando vale `test`; la imagen Docker lo fija en `production`. |
+| `LOG_LEVEL` | No | Nivel de Pino. Acepta `fatal`, `error`, `warn`, `info`, `debug`, `trace` o `silent`; el predeterminado es `warn`. |
+
+## Alcance y pendientes de documentación
+
+Esta revisión contrasta el README con los puntos de entrada, scripts, rutas y variables
+presentes en el repositorio. La documentación operativa de instalación, configuración,
+Prisma, pruebas y Docker se mantiene aquí; las decisiones especializadas se encuentran
+en `docs/`.
+
+Todavía no existe un contrato OpenAPI ni un catálogo exhaustivo de payloads, respuestas
+y códigos de error de cada endpoint. Hasta que ese contrato se incorpore, los archivos
+de `src/routes/api/`, sus validadores y DTO son la fuente de verdad.
+
 ## Base de datos y Prisma
 
 La conexión se resuelve desde `src/lib/databaseUrl.js`:
@@ -150,12 +176,9 @@ Comandos útiles:
 
 ```bash
 npm run db:migrate         # Aplica migraciones pendientes usando DIRECT_URL si está definida
-npx prisma generate          # Genera el cliente Prisma
-npm exec prisma db seed      # Ejecuta prisma/seed.js
+npm run db:generate           # Genera el cliente Prisma
 npx prisma studio            # Abre Prisma Studio para inspección local
 ```
-
-El seed lee archivos XLSX ubicados en `prisma/` para cargar catálogos y datos iniciales. Verifica que los archivos requeridos existan antes de ejecutar `npm exec prisma db seed`.
 
 ## Usuarios, auditoría y permisos
 
@@ -220,11 +243,14 @@ npm start
 | `npm start` | Ejecuta `node src/app.js`. |
 | `npm run dev` | Ejecuta la aplicación con Nodemon. |
 | `npm run db:migrate` | Aplica migraciones pendientes con Prisma; usa `DIRECT_URL` automáticamente cuando está definida. |
-| `npm test` | Ejecuta la suite de Vitest con `vitestConfig.js`. |
+| `npm run db:generate` | Genera el cliente Prisma. |
+| `npm test` | Ejecuta las pruebas unitarias y auxiliares; excluye `tests/integration`. |
+| `npm run test:unit` | Alias explícito de la suite sin integraciones. |
 | `npm run test:watch` | Ejecuta Vitest en modo observación. |
 | `npm run test:db:verify` | Valida que `DATABASE_TEST_URL` exista y no sea igual a `DATABASE_URL`. |
 | `npm run test:db:migrate` | Verifica variables y aplica migraciones en la base de pruebas; usa `DIRECT_TEST_URL` automáticamente cuando está definida. |
-| `npm run test:db` | Verifica variables, migra la base de pruebas y ejecuta pruebas. |
+| `npm run test:integration` | Verifica y migra la base aislada, genera Prisma y ejecuta sólo `tests/integration`. |
+| `npm run test:db` | Alias de `npm run test:integration`. |
 
 ## Rutas principales
 
@@ -236,12 +262,16 @@ npm start
 - `/usuarios-sistemas`, `/personas`, `/movimientos` para administración.
 - `/clientes` para ventas.
 
+Las rutas antiguas `/materiales`, `/mermas`, `/salidas-materiales`, `/salidas-mermas`
+y `/perfiles` responden con una redirección permanente (`308`) hacia sus rutas actuales.
+
 ### API REST
 
 Todas las rutas API cuelgan de `/api` y esperan `Content-Type: application/json` salvo endpoints especializados:
 
 - `/api/auth`
 - `/api/sales/clients`
+- `/api/sales/reports`
 - `/api/warehouse/materials`
 - `/api/warehouse/wastes`
 - `/api/warehouse/suppliers`
@@ -256,9 +286,14 @@ Todas las rutas API cuelgan de `/api` y esperan `Content-Type: application/json`
 - `/api/admin/users`
 - `/api/admin/roles`
 - `/api/admin/departments`
-- `/api/admin/persons` (`/api/admin/persons` se conserva como alias de compatibilidad)
+- `/api/admin/persons`
 - `/api/admin/movements`
 - `/api/admin/reports`
+
+La API de requisiciones existe en `src/routes/api/warehouse/purchaseRequisitionApiRoute.js`,
+pero actualmente **no está montada** en `src/app.js`; la vista `/requisiciones` opera
+mediante los flujos disponibles del proyecto. No debe anunciarse
+`/api/warehouse/purchase-requisitions` como endpoint público hasta habilitar ese montaje.
 
 ## Pruebas automatizadas
 
@@ -266,10 +301,10 @@ Se mantiene un solo punto de creación de cliente Prisma en `src/lib/prisma.js`.
 
 Las pruebas que escriban datos en la base deben ejecutarse dentro de una transacción y forzar rollback al terminar. Para esos casos existe `tests/helpers/rollbackTransaction.js`, que recibe el cliente Prisma y ejecuta el cuerpo de la prueba con el `tx` transaccional, revirtiendo los cambios al finalizar para no persistir datos de prueba.
 
-Flujo recomendado para automatización independiente:
+Flujo recomendado para automatización independiente (el segundo comando ya vuelve a
+verificar y migrar, por lo que normalmente basta con ejecutarlo solo):
 
 ```bash
-npm run test:db:migrate
 npm run test:db
 ```
 
@@ -298,7 +333,7 @@ El repositorio incluye `Dockerfile` y `docker-compose.yml`. Al iniciar el conten
 La selección no depende de que ambas URLs tengan nombres o hosts parecidos:
 
 1. El proceso de arranque exige que `DIRECT_URL` esté definida. Si falta, termina con código de error y **no** inicia la aplicación. El despliegue Docker no utiliza las variables de prueba.
-2. El entrypoint fija `NODE_ENV=materialion` para todo el contenedor y `prisma.config.ts` llama al resolver con `preferDirectUrl: true`; por lo tanto, `prisma migrate deploy` siempre recibe `DIRECT_URL`, aunque el contenedor haya recibido accidentalmente otro valor de `NODE_ENV`.
+2. El entrypoint fija `NODE_ENV=production` para todo el contenedor y `prisma.config.ts` llama al resolver con `preferDirectUrl: true`; por lo tanto, `prisma migrate deploy` siempre recibe `DIRECT_URL`, aunque el contenedor haya recibido accidentalmente otro valor de `NODE_ENV`.
 3. La aplicación crea su cliente sin esa opción y, como el contenedor permanece en producción, recibe `DATABASE_URL`.
 
 El entrypoint nunca imprime la URL ni sus credenciales. Los logs indican el **nombre de la variable** elegida y confirman el éxito únicamente cuando Prisma devuelve código `0`:

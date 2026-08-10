@@ -54,9 +54,6 @@
     "supertest": "^7.2.2",
     "vitest": "^4.1.9"
   },
-  "prisma": {
-    "seed": "node prisma/seed.js"
-  },
   "engines": {
     "node": ">=22 <25"
   }
