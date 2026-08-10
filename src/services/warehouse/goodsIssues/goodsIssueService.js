@@ -105,13 +105,6 @@ const GOODS_ISSUE_DETAIL_SELECT = {
     convertedQuantity: true,
     maxUnitCost: true,
     materialName: true,
-    materialBase: true,
-    materialHeight: true,
-    presentationId: true,
-    presentationName: true,
-    unitMeasureId: true,
-    unitMeasureName: true,
-    unitMeasureSymbol: true,
     projectConvertedQuantity: true,
     convertedQuantityDifference: true,
     suppliedQuantity: true,
@@ -119,7 +112,10 @@ const GOODS_ISSUE_DETAIL_SELECT = {
     isSupplied: true,
     fulfillmentStatus: true,
     supplierId: true,
-    supplierName: true
+    material: {
+        include: { presentation: true, unitMeasure: true }
+    },
+    supplier: true
 };
 
 export const findAllGoodsIssues = async ({
@@ -322,7 +318,6 @@ export const updateGoodsIssue = async ({ id, goodsIssueDto }) => {
                         materialId: true,
                         supplierId: true,
                         quantity: true,
-                        presentationId: true,
                         suppliedQuantity: true,
                         isSupplied: true
                     }
@@ -436,9 +431,6 @@ export const updateGoodsIssueDetails = async ({ id, goodsIssueDto }) => {
                         convertedQuantity: true,
                         projectConvertedQuantity: true,
                         materialName: true,
-                        materialBase: true,
-                        materialHeight: true,
-                        supplierName: true
                     }
                 }
             }
@@ -747,9 +739,6 @@ export const returnGoodsIssueDetail = async ({ id, detailId, returnDto, userId }
                     materialId: detail.materialId,
                     materialName: detail.materialName,
                     supplierId: detail.supplierId,
-                    supplierName: detail.supplierName,
-                    materialBase: detail.materialBase,
-                    materialHeight: detail.materialHeight,
                     currentTotalReturnedQuantity: currentTotalReturnedQuantity,
                     newTotalReturnedQuantity: newTotalReturnedQuantity,
                     observations

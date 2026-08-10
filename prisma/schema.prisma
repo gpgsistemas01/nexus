@@ -119,17 +119,15 @@ model UnitMeasure {
   id                String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name              String             @db.VarChar(20)
   symbol            String             @db.VarChar(10)
-  goodsIssueDetails GoodsIssueDetail[]
   materials         Material[]
 
   @@unique([name, symbol])
 }
 
 model Presentation {
-  id               String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name             String             @unique @db.VarChar(50)
-  goodsIssueDetail GoodsIssueDetail[]
-  materials        Material[]
+  id                String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name              String             @unique @db.VarChar(50)
+  materials         Material[]
 }
 
 model Supplier {
@@ -221,12 +219,7 @@ model WasteStockAdjustmentDetail {
   wasteStockAdjustmentId String @db.Uuid
   wasteId                String @db.Uuid
 
-  materialId   String   @db.Uuid
-  supplierId   String   @db.Uuid
-  materialName String   @db.VarChar(200)
-  supplierName String   @db.VarChar(200)
-  wasteBase    Decimal? @db.Decimal(10, 2)
-  wasteHeight  Decimal? @db.Decimal(10, 2)
+  materialName String @db.VarChar(200)
 
   previousStock Decimal @db.Decimal(10, 2)
   newStock      Decimal @db.Decimal(10, 2)
@@ -245,8 +238,6 @@ model WasteStockAdjustmentDetail {
 
   @@index([wasteStockAdjustmentId])
   @@index([wasteId])
-  @@index([materialId])
-  @@index([supplierId])
 }
 
 model WasteMovement {
@@ -361,14 +352,7 @@ model GoodsReceiptDetail {
   convertedQuantity   Decimal                    @db.Decimal(10, 2)
   netPurchaseAmount   Decimal                    @db.Decimal(10, 2)
   grossPurchaseAmount Decimal                    @db.Decimal(10, 2)
-  presentationId      String                     @db.Uuid
-  presentationName    String                     @db.VarChar(50)
-  unitMeasureId       String                     @db.Uuid
-  unitMeasureName     String                     @db.VarChar(20)
-  unitMeasureSymbol   String                     @db.VarChar(10)
   materialName        String                     @db.VarChar(200)
-  materialBase        Decimal?                   @db.Decimal(10, 2)
-  materialHeight      Decimal?                   @db.Decimal(10, 2)
   status              GoodsReceiptDetailStatus   @default(ACTIVE)
   goodsReceipt        GoodsReceipt               @relation(fields: [goodsReceiptId], references: [id])
   material            Material                   @relation(fields: [materialId], references: [id])
@@ -476,18 +460,10 @@ model GoodsIssueDetail {
   goodsIssueId String @db.Uuid
   supplierId   String @db.Uuid
 
-  presentationId              String   @db.Uuid
-  unitMeasureId               String   @db.Uuid
   materialName                String   @db.VarChar(200)
-  supplierName                String   @db.VarChar(200)
-  materialBase                Decimal? @db.Decimal(10, 2)
-  materialHeight              Decimal? @db.Decimal(10, 2)
   quantity                    Decimal  @db.Decimal(10, 2)
   applyWaste                  Boolean  @default(false)
-  presentationName            String   @db.VarChar(50)
   convertedQuantity           Decimal  @db.Decimal(10, 2)
-  unitMeasureName             String   @db.VarChar(20)
-  unitMeasureSymbol           String   @db.VarChar(10)
   maxUnitCost                 Decimal  @db.Decimal(10, 2)
   projectConvertedQuantity    Decimal? @db.Decimal(10, 2)
   convertedQuantityDifference Decimal? @db.Decimal(10, 2)
@@ -496,8 +472,6 @@ model GoodsIssueDetail {
   isSupplied                  Boolean  @default(false)
   fulfillmentStatusId         String   @db.Uuid
 
-  presentation      Presentation       @relation(fields: [presentationId], references: [id])
-  unitMeasure       UnitMeasure        @relation(fields: [unitMeasureId], references: [id])
   material          Material           @relation(fields: [materialId], references: [id])
   supplier          Supplier           @relation(fields: [supplierId], references: [id])
   goodsIssue        GoodsIssue         @relation(fields: [goodsIssueId], references: [id])
@@ -505,8 +479,8 @@ model GoodsIssueDetail {
   movementDetails   MovementDetail[]
   returns           GoodsIssueReturn[]
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
 
   @@index([materialId])
 }
@@ -519,12 +493,9 @@ model GoodsIssueReturn {
   movementDetailId   String? @unique @db.Uuid
   returnedById       String? @db.Uuid
 
-  materialId     String   @db.Uuid
-  materialName   String   @db.VarChar(200)
-  supplierId     String   @db.Uuid
-  supplierName   String   @db.VarChar(200)
-  materialBase   Decimal? @db.Decimal(10, 2)
-  materialHeight Decimal? @db.Decimal(10, 2)
+  materialId   String @db.Uuid
+  materialName String @db.VarChar(200)
+  supplierId   String @db.Uuid
 
   currentTotalReturnedQuantity Decimal @db.Decimal(10, 2)
   newTotalReturnedQuantity     Decimal @db.Decimal(10, 2)
@@ -581,14 +552,12 @@ model MovementDetail {
   newStock      Decimal? @db.Decimal(10, 2)
   previousStock Decimal? @db.Decimal(10, 2)
 
-  materialId              String   @db.Uuid
-  materialBase            Decimal? @db.Decimal(10, 2)
-  materialHeight          Decimal? @db.Decimal(10, 2)
-  supplierId              String   @db.Uuid
-  goodsReceiptDetailId    String?  @db.Uuid
-  goodsIssueDetailId      String?  @db.Uuid
-  stockAdjustmentDetailId String?  @db.Uuid
-  movementId              String   @db.Uuid
+  materialId              String  @db.Uuid
+  supplierId              String  @db.Uuid
+  goodsReceiptDetailId    String? @db.Uuid
+  goodsIssueDetailId      String? @db.Uuid
+  stockAdjustmentDetailId String? @db.Uuid
+  movementId              String  @db.Uuid
 
   material              Material               @relation(fields: [materialId], references: [id])
   supplier              Supplier               @relation(fields: [supplierId], references: [id])
@@ -651,7 +620,6 @@ model StockAdjustmentDetail {
   materialId   String @db.Uuid
   supplierId   String @db.Uuid
   materialName String @db.VarChar(200)
-  supplierName String @db.VarChar(200)
 
   previousStock Decimal @db.Decimal(10, 2)
   newStock      Decimal @db.Decimal(10, 2)
@@ -660,9 +628,6 @@ model StockAdjustmentDetail {
   previousConvertedQuantity Decimal @db.Decimal(10, 2)
   newConvertedQuantity      Decimal @db.Decimal(10, 2)
   convertedDifference       Decimal @db.Decimal(10, 2)
-
-  materialBase   Decimal? @db.Decimal(10, 2)
-  materialHeight Decimal? @db.Decimal(10, 2)
 
   stockAdjustment StockAdjustment @relation(fields: [stockAdjustmentId], references: [id])
 
