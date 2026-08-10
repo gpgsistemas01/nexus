@@ -1895,6 +1895,12 @@ body section {
   min-block-size: 0;
 }
 
+.app-mobile-menu__brand {
+  flex: 0 0 auto;
+  margin-block-end: 1rem;
+  max-inline-size: 100%;
+}
+
 .app-mobile-menu__nav .row,
 .app-mobile-menu__nav [class*="col-"] {
   min-inline-size: 0;

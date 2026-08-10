@@ -21,11 +21,11 @@
 >
     <%- include('../../shared/header', { header }) %>
 
-    <div class="px-3 pb-3">
-        <%- include('../ui/appBrand', { className: 'app-brand--menu' }) %>
-    </div>
-
     <div class="offcanvas-body d-flex flex-column">
+        <div class="app-mobile-menu__brand">
+            <%- include('../ui/appBrand', { className: 'app-brand--menu' }) %>
+        </div>
+
         <div class="app-mobile-menu__nav">
             <div class="row g-0">
                 <div class="col-12">
