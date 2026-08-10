@@ -7,6 +7,7 @@ Nexus es una plataforma de control operativo para administrar inventario, compra
 - [Características principales](#características-principales)
 - [Stack técnico](#stack-técnico)
 - [Arquitectura del proyecto](#arquitectura-del-proyecto)
+- [Documentación visual](#documentación-visual)
 - [Requisitos](#requisitos)
 - [Configuración inicial](#configuración-inicial)
 - [Variables de entorno](#variables-de-entorno)
@@ -71,6 +72,13 @@ scripts/                    # Scripts auxiliares de verificación
 ```
 
 La aplicación usa una separación por capas: las rutas delegan en controladores, los controladores coordinan validación/entrada y los servicios concentran la lógica de negocio. Prisma se crea desde `src/lib/prisma.js`, usando la URL resuelta por `src/lib/databaseUrl.js`.
+
+## Documentación visual
+
+El [mapa visual de arquitectura y vistas web](docs/architecture-and-web-views.md) incluye
+diagramas Mermaid de contexto, contenedores, secuencia y navegación, además del catálogo
+de pantallas y sus plantillas EJS. Ese documento también registra la evaluación de una
+evolución a Structurizr/C4; por ahora Mermaid en el repositorio es la fuente oficial.
 
 ## Requisitos
 
