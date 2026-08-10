@@ -168,50 +168,43 @@ const ACTION_BUTTONS = Object.freeze({
         className: 'btn-edit',
         colorClass: 'btn-secondary',
         iconClass: 'fa-solid fa-eye',
-        title: 'Ver',
-        ariaLabel: 'Ver registro'
+        label: 'Ver registro'
     }),
     edit: buildMdbActionButton({
         className: 'btn-edit',
         colorClass: 'btn-primary',
         iconClass: 'fa-solid fa-pencil',
-        title: 'Editar',
-        ariaLabel: 'Editar registro'
+        label: 'Editar registro'
     }),
     adjustStock: buildMdbActionButton({
         className: 'btn-adjust-stock',
         colorClass: 'btn-success',
         iconClass: 'fa-solid fa-boxes-stacked',
-        title: 'Ajustar stock',
-        ariaLabel: 'Ajustar stock'
+        label: 'Ajustar stock'
     }),
     deleteMaterial: buildMdbActionButton({
         className: 'btn-delete-material',
         colorClass: 'btn-danger',
         iconClass: 'fa-solid fa-trash',
-        title: 'Eliminar material',
-        ariaLabel: 'Eliminar material'
+        label: 'Eliminar material'
     }),
     deleteWaste: buildMdbActionButton({
         className: 'btn-delete-waste',
         colorClass: 'btn-danger',
         iconClass: 'fa-solid fa-trash',
-        title: 'Eliminar merma',
-        ariaLabel: 'Eliminar merma'
+        label: 'Eliminar merma'
     }),
     supplyDetail: buildMdbActionButton({
         className: 'btn-edit-detail',
         colorClass: 'btn-info',
         iconClass: 'fa fa-edit',
-        title: 'Surtir detalle',
-        ariaLabel: 'Surtir detalle'
+        label: 'Surtir detalle'
     }),
     returnDetail: buildMdbActionButton({
         className: 'btn-return-detail',
         colorClass: 'btn-warning',
         iconClass: 'fa-solid fa-rotate-left',
-        title: 'Devolver material surtido',
-        ariaLabel: 'Devolver material surtido'
+        label: 'Devolver material surtido'
     })
 });
 

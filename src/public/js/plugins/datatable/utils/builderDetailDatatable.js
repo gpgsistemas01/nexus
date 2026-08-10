@@ -259,8 +259,7 @@ export const buildDetailsColumns = ({ type, mode, render, isWarehouse, isCoordin
                     className: 'return-issue-detail-btn',
                     colorClass: 'btn-warning',
                     iconClass: 'fa-solid fa-rotate-left',
-                    title: 'Devolver detalle',
-                    ariaLabel: 'Devolver detalle de salida',
+                    label: 'Devolver detalle de salida',
                     htmlAttrs: {
                         'data-id': row.id,
                         'data-returnable-quantity': returnableQuantity
@@ -289,8 +288,7 @@ export const buildDetailsColumns = ({ type, mode, render, isWarehouse, isCoordin
                         className: 'correct-detail-btn',
                         colorClass: 'btn-info',
                         iconClass: 'fa-solid fa-pen-to-square',
-                        title: 'Corregir detalle',
-                        ariaLabel: 'Corregir detalle de compra',
+                        label: 'Corregir detalle de compra',
                         htmlAttrs: {
                             'data-id': detailId
                         }
@@ -299,8 +297,7 @@ export const buildDetailsColumns = ({ type, mode, render, isWarehouse, isCoordin
                         className: 'cancel-receipt-detail-btn',
                         colorClass: 'btn-danger',
                         iconClass: 'fa-solid fa-ban',
-                        title: 'Cancelar detalle',
-                        ariaLabel: 'Cancelar detalle de compra',
+                        label: 'Cancelar detalle de compra',
                         htmlAttrs: {
                             'data-id': detailId
                         }

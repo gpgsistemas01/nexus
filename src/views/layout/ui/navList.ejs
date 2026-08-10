@@ -27,8 +27,7 @@ const items = [
         content: 'Salidas',
         icon: 'fa-solid fa-right-from-bracket',
         children: [
-            createNavLink({ content: 'Material', icon: 'fa-solid fa-dolly', href: '/salidas-almacen', permission: 'goods:issues-page-view' }),
-            createNavLink({ content: 'Merma', icon: 'fa-solid fa-recycle', href: '/salidas-merma', permission: 'wastes:page-view' })
+            createNavLink({ content: 'Material', icon: 'fa-solid fa-dolly', href: '/salidas-almacen', permission: 'goods:issues-page-view' })
         ]
     },
     createNavLink({ content: 'Movimientos', icon: 'fa-solid fa-arrows-rotate', href: '/movimientos', permission: 'movements:read' }),
@@ -85,7 +84,7 @@ const items = [
                     <% item.children.forEach(child => { %>
                         <li class="nav-item py-1">
                             <a class="<%= child.class %>" href="<%= child.href %>"
-                                <%= child.isActive ? 'aria-current="page"' : '' %>
+                                <% if (child.isActive) { %>aria-current="page"<% } %>
                                 <%- include('./navTooltipAttrs', { enabled: !shouldShowLabels, label: child.content }) %>
                             >
                                 <% if (shouldShowIcons && child.icon) { %>
@@ -102,7 +101,7 @@ const items = [
                 </ul>
             <% } else { %>
                 <a class="<%= item.class %>" href="<%= item.href %>"
-                    <%= item.isActive ? 'aria-current="page"' : '' %>
+                    <% if (item.isActive) { %>aria-current="page"<% } %>
                     <%- include('./navTooltipAttrs', { enabled: !shouldShowLabels, label: item.content }) %>
                 >
                     <% if (shouldShowIcons && item.icon) { %>
