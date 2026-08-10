@@ -15,7 +15,7 @@
 
     <%- include('./sidebar/offcanvas') %>
 
-    <aside class="app-sidebar app-sidebar--icon-only d-none d-md-block p-3" data-mdb-theme="dark">
+    <aside class="app-sidebar app-sidebar--icon-only d-none d-lg-block p-3" data-mdb-theme="dark">
         <nav class="navbar navbar-expand-lg p-0">
             <div class="container-fluid flex-column align-items-stretch gap-4">
                 <%- include('./ui/appBrand') %>
@@ -36,9 +36,9 @@
     <div class="flex-fill d-flex flex-column">
         <header class="app-header navbar shadow-2 px-3 gap-2">
 
-            <%- include('./ui/appBrand', { className: 'app-brand--header d-flex d-md-none' }) %>
+            <%- include('./ui/appBrand', { className: 'app-brand--header d-flex d-lg-none' }) %>
 
-            <div class="d-md-none">
+            <div class="d-lg-none">
                 <%- include('../shared/button', { button: menuButton }) %>
             </div>
 
