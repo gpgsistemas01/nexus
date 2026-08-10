@@ -4,22 +4,19 @@ const createWasteWithInitialStockAdjustment = vi.fn();
 const findAllWastes = vi.fn();
 const updateWaste = vi.fn();
 const updateWasteStock = vi.fn();
-const deleteWaste = vi.fn();
 
 vi.mock('../../../../src/services/warehouse/wastes/wasteService.js', () => ({
   createWasteWithInitialStockAdjustment,
   findAllWastes,
   updateWaste,
-  updateWasteStock,
-  deleteWaste
+  updateWasteStock
 }));
 
 const {
   editWaste,
   editWasteStock,
   getAllWastes,
-  registerWaste,
-  removeWaste
+  registerWaste
 } = await import('../../../../src/controllers/api/warehouse/wasteController.js');
 
 const createResponse = () => {
@@ -94,10 +91,17 @@ describe('wasteController', () => {
   });
 
   it('edita únicamente los datos generales de la merma', async () => {
-    const waste = { id: 'waste-1', base: 2, height: 4 };
+    const waste = { id: 'waste-1', minStock: 2, isActive: false };
     const req = {
       params: { id: 'waste-1' },
-      body: { supplierMaterialId: 'supplier-material-1', base: '2', height: '4', currentStock: '99' }
+      body: {
+        minStock: '2',
+        isActive: false,
+        supplierMaterialId: 'supplier-material-1',
+        base: '2',
+        height: '4',
+        currentStock: '99'
+      }
     };
     const res = createResponse();
     updateWaste.mockResolvedValue(waste);
@@ -106,22 +110,28 @@ describe('wasteController', () => {
 
     expect(updateWaste).toHaveBeenCalledWith({
       id: 'waste-1',
-      wasteDto: { supplierMaterialId: 'supplier-material-1', base: 2, height: 4 }
+      wasteDto: { minStock: 2, isActive: false }
     });
     expect(res.json).toHaveBeenCalledWith({ waste, code: 'UPDATED_WASTE' });
   });
 
-  it('elimina la merma por id', async () => {
-    const waste = { id: 'waste-1' };
-    const req = { params: { id: 'waste-1' } };
+  it('permite cambiar solo el estado de la merma', async () => {
+    const waste = { id: 'waste-1', isActive: true };
+    const req = {
+      params: { id: 'waste-1' },
+      body: { isActive: true }
+    };
     const res = createResponse();
-    deleteWaste.mockResolvedValue(waste);
+    updateWaste.mockResolvedValue(waste);
 
-    await removeWaste(req, res);
+    await editWaste(req, res);
 
-    expect(deleteWaste).toHaveBeenCalledWith('waste-1');
+    expect(updateWaste).toHaveBeenCalledWith({
+      id: 'waste-1',
+      wasteDto: { isActive: true }
+    });
     expect(res.status).toHaveBeenCalledWith(200);
-    expect(res.json).toHaveBeenCalledWith({ waste, code: 'DELETED_WASTE' });
+    expect(res.json).toHaveBeenCalledWith({ waste, code: 'UPDATED_WASTE' });
   });
 
   it('ajusta el stock con motivo, observaciones y usuario', async () => {

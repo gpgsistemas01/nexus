@@ -157,22 +157,33 @@ describe('materialService submit operations', () => {
     });
   });
 
-  it('bloquea cambiar el proveedor si el material ya tiene historial en compras o salidas', async () => {
+  it('limita la edición al nombre y conserva el proveedor actual', async () => {
     const materialDto = { name: 'Lámina', supplierId: 'supplier-2', base: null, height: null, maxUnitCost: 10 };
+    const updatedMaterial = { id: 'material-1', name: materialDto.name };
+    const fullMaterial = { materialId: 'material-1', supplierId: 'supplier-1' };
 
-    materialFindUnique.mockResolvedValue({ id: 'material-1' });
+    materialFindUnique.mockResolvedValue({
+      id: 'material-1',
+      presentationId: 'presentation-1',
+      unitMeasureId: 'unit-1',
+      base: null,
+      height: null
+    });
     findCurrentSupplierMaterialByMaterialId.mockResolvedValue({ supplierId: 'supplier-1' });
-    prepareMaterialData.mockResolvedValue({
-      rest: { name: 'Lámina', base: null, height: null },
-      relations: { supplierId: 'supplier-2', presentationId: 'presentation-1', unitMeasureId: 'unit-1', maxUnitCost: 10 }
-    });
-    goodsReceiptDetailCount.mockResolvedValue(1);
-    goodsIssueDetailCount.mockResolvedValue(0);
+    materialFindFirst.mockResolvedValue(null);
+    materialUpdate.mockResolvedValue(updatedMaterial);
+    findSupplierMaterialByIds.mockResolvedValue(fullMaterial);
 
-    await expect(updateMaterial(materialDto, 'material-1')).rejects.toMatchObject({
-      code: 'MATERIAL_SUPPLIER_CHANGE_CONFLICT',
-      statusCode: 409
+    await expect(updateMaterial(materialDto, 'material-1')).resolves.toEqual(fullMaterial);
+    expect(materialUpdate).toHaveBeenCalledWith({
+      where: { id: 'material-1' },
+      data: { name: 'Lámina' }
     });
+    expect(findSupplierMaterialByIds).toHaveBeenCalledWith(expect.objectContaining({
+      materialId: 'material-1',
+      supplierId: 'supplier-1'
+    }));
+    expect(syncSupplierMaterial).not.toHaveBeenCalled();
   });
 
   it('permite editar el material sobre el mismo registro cuando no hay otro con la misma identidad', async () => {
@@ -223,7 +234,7 @@ describe('materialService submit operations', () => {
     await expect(existsMaterial({ id: 'missing-material' })).rejects.toThrow(MaterialNotFound);
   });
 
-  it('recalcula el stock convertido de todos los proveedores al editar las dimensiones sin cambiar el proveedor', async () => {
+  it('ignora dimensiones y costo enviados al editar un material', async () => {
     const materialDto = {
       name: 'Lámina actualizada',
       supplierId: 'supplier-1',
@@ -250,17 +261,12 @@ describe('materialService submit operations', () => {
 
     await expect(updateMaterial(materialDto, 'material-1')).resolves.toEqual(fullMaterial);
 
-    expect(recalculateConvertedQuantityByMaterial).toHaveBeenCalledWith({
-      tx: expect.any(Object),
-      materialId: 'material-1',
-      base: 4,
-      height: 5
+    expect(materialUpdate).toHaveBeenCalledWith({
+      where: { id: 'material-1' },
+      data: { name: 'Lámina actualizada' }
     });
-    expect(syncSupplierMaterial).toHaveBeenCalledWith(expect.objectContaining({
-      previousSupplierId: 'supplier-1',
-      supplierId: 'supplier-1',
-      materialId: 'material-1'
-    }));
+    expect(recalculateConvertedQuantityByMaterial).not.toHaveBeenCalled();
+    expect(syncSupplierMaterial).not.toHaveBeenCalled();
   });
 
 

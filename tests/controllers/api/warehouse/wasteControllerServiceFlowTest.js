@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const transaction = vi.fn();
 const wasteCreate = vi.fn();
+const wasteFindFirst = vi.fn();
 const wasteFindUnique = vi.fn();
 const wasteUpdate = vi.fn();
 const wasteStockAdjustmentCreate = vi.fn();
@@ -96,6 +97,7 @@ describe('wasteController service flow', () => {
     transaction.mockImplementation((callback) => callback({
       waste: {
         create: wasteCreate,
+        findFirst: wasteFindFirst,
         findUnique: wasteFindUnique,
         update: wasteUpdate
       },
@@ -105,6 +107,7 @@ describe('wasteController service flow', () => {
       }
     }));
     wasteCreate.mockResolvedValue(createWaste());
+    wasteFindFirst.mockResolvedValue(null);
     wasteFindUnique.mockResolvedValue(createWaste());
     wasteUpdate.mockResolvedValue(createWaste({ currentStock: 7, convertedQuantity: 42 }));
     wasteStockAdjustmentCreate.mockResolvedValue({ id: 'adjustment-1', details: [{ id: 'detail-1' }] });
@@ -154,13 +157,12 @@ describe('wasteController service flow', () => {
     expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ code: 'CREATED_WASTE' }));
   });
 
-  it('edita datos generales sin cambiar existencias y recalcula el stock convertido', async () => {
+  it('edita stock mínimo y estado sin cambiar existencias', async () => {
     const req = {
       params: { id: 'waste-1' },
       body: {
-        supplierMaterialId: 'supplier-material-2',
-        base: '4',
-        height: '5',
+        minStock: '4',
+        isActive: false,
         currentStock: '99'
       }
     };
@@ -171,23 +173,22 @@ describe('wasteController service flow', () => {
     expect(wasteUpdate).toHaveBeenCalledWith(expect.objectContaining({
       where: { id: 'waste-1' },
       data: {
-        supplierMaterial: { connect: { id: 'supplier-material-2' } },
-        base: 4,
-        height: 5,
-        convertedQuantity: 100
+        isActive: false,
+        minStock: 4
       }
     }));
     expect(wasteUpdate.mock.calls[0][0].data).not.toHaveProperty('currentStock');
     expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ code: 'UPDATED_WASTE' }));
   });
 
-  it('usa las existencias como conversión al retirar las dimensiones de la merma', async () => {
+  it('ignora dimensiones y proveedor al editar el estado de la merma', async () => {
     const req = {
       params: { id: 'waste-1' },
       body: {
         supplierMaterialId: 'supplier-material-1',
         base: '',
-        height: ''
+        height: '',
+        isActive: true
       }
     };
     const res = createResponse();
@@ -196,11 +197,12 @@ describe('wasteController service flow', () => {
 
     expect(wasteUpdate).toHaveBeenCalledWith(expect.objectContaining({
       data: expect.objectContaining({
-        base: null,
-        height: null,
-        convertedQuantity: 5
+        isActive: true
       })
     }));
+    expect(wasteUpdate.mock.calls[0][0].data).not.toHaveProperty('base');
+    expect(wasteUpdate.mock.calls[0][0].data).not.toHaveProperty('height');
+    expect(wasteUpdate.mock.calls[0][0].data).not.toHaveProperty('supplierMaterial');
     expect(wasteUpdate.mock.calls[0][0].data).not.toHaveProperty('currentStock');
   });
 
@@ -243,10 +245,7 @@ describe('wasteController service flow', () => {
   });
 
   it('informa un conflicto cuando ya existe la misma merma sin dimensiones', async () => {
-    const duplicateError = Object.assign(new Error('Unique constraint failed'), {
-      code: 'P2002'
-    });
-    wasteCreate.mockRejectedValue(duplicateError);
+    wasteFindFirst.mockResolvedValue({ id: 'waste-existing' });
 
     const req = {
       body: {
