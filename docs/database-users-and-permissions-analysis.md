@@ -90,10 +90,10 @@ Los permisos del frontend solo mejoran la experiencia de usuario. Modificar
 `window.meta`, mostrar un botón oculto o llamar directamente a la API no concede
 acceso: el middleware del backend vuelve a autorizar cada petición.
 
-Mientras existan permisos amplios como `GOODS_ISSUES_MANAGE`, algunos componentes
-pueden conservar temporalmente sus condiciones anteriores. Esos permisos deben
-separarse por acción (`read`, `create`, `update`, `approve`, `return`) antes de migrar
-cada botón.
+Las rutas que renderizan componentes asociados a permisos amplios como
+`GOODS_ISSUES_MANAGE` exigen esa capacidad completa. Si el negocio necesita distinguir
+entre crear, editar, aprobar o devolver, primero debe dividirse el permiso en la matriz
+del backend y luego asignar cada nueva capacidad al botón correspondiente.
 
 ## Auditoría de escrituras
 
@@ -118,7 +118,6 @@ usuarios/asignaciones y cambios de contraseña o estado.
 | P0 | Activar rate limiting para login y refresh. |
 | P0 | Aplicar autorización por objeto de forma uniforme en filtros y transacciones Prisma. |
 | P1 | Aprobar con negocio la matriz central y dividir permisos `manage`. |
-| P1 | Migrar menús/botones para consultar `user.permissions` en lugar de reglas duplicadas. |
 | P1 | Implementar auditoría persistente de escrituras críticas. |
 | P1 | Definir si `Person.isActive` condiciona a usuarios humanos y cómo tratar usuarios técnicos. |
 | P1 | Definir protección CSRF explícita para métodos mutables. |
