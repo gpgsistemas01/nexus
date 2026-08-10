@@ -12,8 +12,6 @@ export const buildInventoryMovementDetail = ({
     quantity,
     previousStock,
     newStock,
-    materialBase,
-    materialHeight,
     goodsReceiptDetailId = null,
     goodsIssueDetailId = null,
     stockAdjustmentDetailId = null
@@ -23,8 +21,6 @@ export const buildInventoryMovementDetail = ({
     quantity,
     previousStock,
     newStock,
-    materialBase,
-    materialHeight,
     ...(goodsReceiptDetailId && { goodsReceiptDetailId }),
     ...(goodsIssueDetailId && { goodsIssueDetailId }),
     ...(stockAdjustmentDetailId && { stockAdjustmentDetailId })

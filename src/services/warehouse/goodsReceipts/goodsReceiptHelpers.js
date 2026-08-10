@@ -21,7 +21,7 @@ export const buildGoodsReceiptDetails = async (details, { tx = null } = {}) => {
 
         if (!material) throw new MaterialNotFound();
 
-        const { name, base, height, presentation, unitMeasure } = material;
+        const { name, base, height } = material;
         const netPurchaseAmount = roundTo(quantity * costPerUnitType);
         const grossPurchaseAmount = roundTo(netPurchaseAmount * IVA_RATE);
         const convertedQuantity = calculateConvertedQuantity({
@@ -41,14 +41,7 @@ export const buildGoodsReceiptDetails = async (details, { tx = null } = {}) => {
             conversionUnitCost,
             netPurchaseAmount,
             grossPurchaseAmount,
-            materialName: name,
-            materialBase: base,
-            materialHeight: height,
-            presentationId: presentation.id,
-            presentationName: presentation.name,
-            unitMeasureId: unitMeasure.id,
-            unitMeasureName: unitMeasure.name,
-            unitMeasureSymbol: unitMeasure.symbol
+            materialName: name
         };
     });
 }

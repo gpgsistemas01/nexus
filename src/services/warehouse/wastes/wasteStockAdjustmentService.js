@@ -91,12 +91,7 @@ export const registerWasteStockAdjustment = async ({
                 details: {
                     create: {
                         waste: { connect: { id: wasteId } },
-                        materialId: waste.supplierMaterial?.materialId,
-                        supplierId: waste.supplierMaterial?.supplierId,
                         materialName: waste.supplierMaterial?.material?.name || '',
-                        supplierName: waste.supplierMaterial?.supplier?.tradeName || '',
-                        wasteBase: waste.base,
-                        wasteHeight: waste.height,
                         previousStock: values.previousStock,
                         newStock: values.newStock,
                         difference: values.difference,

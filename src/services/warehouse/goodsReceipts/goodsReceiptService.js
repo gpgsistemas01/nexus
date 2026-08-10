@@ -110,20 +110,16 @@ export const findAllGoodsReceipts = async ({
                 select: {
                     id: true,
                     materialName: true,
-                    materialBase: true,
-                    materialHeight: true,
                     quantity: true,
-                    presentationId: true,
-                    presentationName: true,
                     convertedQuantity: true,
-                    unitMeasureId: true,
-                    unitMeasureName: true,
-                    unitMeasureSymbol: true,
                     costPerUnitType: true,
                     conversionUnitCost: true,
                     netPurchaseAmount: true,
                     grossPurchaseAmount: true,
                     materialId: true,
+                    material: {
+                        include: { presentation: true, unitMeasure: true }
+                    },
                     status: true,
                 }
             }

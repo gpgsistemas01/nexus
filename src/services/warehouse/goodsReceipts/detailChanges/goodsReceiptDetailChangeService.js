@@ -20,7 +20,8 @@ export const findReceiptDetailForChange = ({ tx, goodsReceiptId, detailId }) => 
             goodsReceiptId
         },
         include: {
-            goodsReceipt: true
+            goodsReceipt: true,
+            material: true
         }
     })
 );
@@ -46,8 +47,8 @@ export const createGoodsReceiptDetailChangeMovementAndUpdateStock = async ({
     const previousConvertedQuantity = normalizeDecimal(supplierMaterial.convertedQuantity ?? 0);
     const convertedDifference = calculateConvertedQuantity({
         quantity: normalizedQuantityDifference,
-        base: currentDetail.materialBase,
-        height: currentDetail.materialHeight
+        base: currentDetail.material.base,
+        height: currentDetail.material.height
     });
     const newStock = normalizeDecimal(previousStock + normalizedQuantityDifference);
     const newConvertedQuantity = normalizeDecimal(previousConvertedQuantity + convertedDifference);
@@ -69,8 +70,8 @@ export const createGoodsReceiptDetailChangeMovementAndUpdateStock = async ({
             quantity: normalizedQuantityDifference,
             previousStock,
             newStock,
-            materialBase: currentDetail.materialBase,
-            materialHeight: currentDetail.materialHeight,
+            materialBase: currentDetail.material.base,
+            materialHeight: currentDetail.material.height,
             goodsReceiptDetailId
         })]
     });

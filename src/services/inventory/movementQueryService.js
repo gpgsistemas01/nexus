@@ -21,8 +21,6 @@ const RETURN_MOVEMENT_TYPE = 'RETURN';
 
 const MOVEMENT_DETAIL_SELECT = {
     id: true,
-    materialBase: true,
-    materialHeight: true,
     quantity: true,
     previousStock: true,
     newStock: true,
@@ -38,24 +36,11 @@ const MOVEMENT_DETAIL_SELECT = {
             tradeName: true
         }
     },
-    goodsReceiptDetail: {
-        select: {
-            materialBase: true,
-            materialHeight: true
-        }
-    },
-    goodsIssueDetail: {
-        select: {
-            materialBase: true,
-            materialHeight: true
-        }
-    },
+    goodsReceiptDetail: { select: { materialName: true } },
+    goodsIssueDetail: { select: { materialName: true } },
     stockAdjustmentDetail: {
         select: {
             materialName: true,
-            supplierName: true,
-            materialBase: true,
-            materialHeight: true
         }
     },
     goodsIssueReturn: {
@@ -186,29 +171,17 @@ const getMovementSearchFilter = (search) => {
 };
 
 
-const resolveMaterialBase = (detail) =>
-    detail.materialBase ??
-    detail.stockAdjustmentDetail?.materialBase ??
-    detail.goodsReceiptDetail?.materialBase ??
-    detail.goodsIssueDetail?.materialBase ??
-    detail.material?.base ??
-    null;
+const resolveMaterialBase = (detail) => detail.material?.base ?? null;
 
-const resolveMaterialHeight = (detail) =>
-    detail.materialHeight ??
-    detail.stockAdjustmentDetail?.materialHeight ??
-    detail.goodsReceiptDetail?.materialHeight ??
-    detail.goodsIssueDetail?.materialHeight ??
-    detail.material?.height ??
-    null;
+const resolveMaterialHeight = (detail) => detail.material?.height ?? null;
 
 const resolveMaterialName = (detail) =>
     detail.stockAdjustmentDetail?.materialName ??
+    detail.goodsReceiptDetail?.materialName ??
+    detail.goodsIssueDetail?.materialName ??
     detail.material?.name;
 
-const resolveSupplierName = (detail) =>
-    detail.stockAdjustmentDetail?.supplierName ??
-    detail.supplier?.tradeName;
+const resolveSupplierName = (detail) => detail.supplier?.tradeName;
 
 const resolveMovementTypeName = (detail) => {
 

@@ -35,8 +35,6 @@ const createStockAdjustmentMovement = async ({
             quantity: difference,
             newStock,
             previousStock,
-            materialBase: adjustmentDetail.materialBase,
-            materialHeight: adjustmentDetail.materialHeight,
             materialId,
             supplierId,
             stockAdjustmentDetailId: adjustmentDetail.id,
@@ -124,7 +122,6 @@ export const createStockAdjustment = async ({
         referenceNumber = await generateYearlyReferenceNumber({ type: DOCUMENT_REFERENCE_TYPES.STOCK_ADJUSTMENT, tx: transaction });
 
         const materialName = material.name;
-        const supplierName = material.supplier?.tradeName || '';
 
         const {
             previousStock,
@@ -171,7 +168,6 @@ export const createStockAdjustment = async ({
                         materialId,
                         supplierId,
                         materialName,
-                        supplierName,
 
                         previousStock,
                         newStock: adjustedNewStock,
@@ -179,10 +175,7 @@ export const createStockAdjustment = async ({
 
                         previousConvertedQuantity,
                         newConvertedQuantity,
-                        convertedDifference,
-
-                        materialBase,
-                        materialHeight
+                        convertedDifference
                     }
                 }
             },

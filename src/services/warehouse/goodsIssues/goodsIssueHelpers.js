@@ -55,7 +55,7 @@ export const buildGoodsIssueDetails = async ({
 
         if (presentationId && sp.presentation?.id !== presentationId) throw new MaterialNotFound();
 
-        const { name, base, height, presentation, unitMeasure, maxUnitCost } = sp;
+        const { name, base, height, maxUnitCost } = sp;
         const convertedQuantity = calculateConvertedQuantity({
             quantity,
             base,
@@ -74,18 +74,10 @@ export const buildGoodsIssueDetails = async ({
         return {
             materialId,
             supplierId,
-            supplierName: sp.supplier.tradeName,
             quantity,
             convertedQuantity,
             maxUnitCost,
             materialName: name,
-            materialBase: base,
-            materialHeight: height,
-            presentationId: presentation.id,
-            presentationName: presentation.name,
-            unitMeasureId: unitMeasure.id,
-            unitMeasureName: unitMeasure.name,
-            unitMeasureSymbol: unitMeasure.symbol,
             ...(initialFulfillmentStatusId ? { fulfillmentStatusId: initialFulfillmentStatusId } : {})
         };
     });
