@@ -28,9 +28,11 @@
     "start": "node src/app.js",
     "dev": "nodemon src/app.js",
     "test": "vitest run --config vitestConfig.js",
+    "test:unit": "vitest run --config vitestConfig.js",
     "test:watch": "vitest watch --config vitestConfig.js",
     "test:db:migrate": "npm run test:db:verify && NODE_ENV=test prisma migrate deploy && NODE_ENV=test prisma generate",
-    "test:db": "npm run test:db:verify && NODE_ENV=test prisma migrate deploy && NODE_ENV=test prisma generate && vitest run --config vitestConfig.js",
+    "test:integration": "npm run test:db:verify && NODE_ENV=test prisma migrate deploy && NODE_ENV=test prisma generate && vitest run --config vitestIntegrationConfig.js",
+    "test:db": "npm run test:integration",
     "test:db:verify": "node scripts/verifyTestDatabaseEnv.js",
     "db:migrate": "prisma migrate deploy && prisma generate",
     "db:generate": "prisma generate"
