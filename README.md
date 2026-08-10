@@ -232,7 +232,7 @@ npm start
 
 - `/` página de inicio.
 - `/inicio-sesion`, `/revocar-sesion`, `/cerrar-sesion` para autenticación web.
-- `/materiales`, `/mermas`, `/requisiciones`, `/compras`, `/salidas-almacen`, `/proveedores` para almacén.
+- `/almacen/materiales`, `/almacen/mermas`, `/requisiciones`, `/compras`, `/salidas/materiales`, `/salidas/mermas` y `/proveedores` para almacén y salidas.
 - `/usuarios-sistemas`, `/personas`, `/movimientos` para administración.
 - `/clientes` para ventas.
 

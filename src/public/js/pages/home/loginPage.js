@@ -73,6 +73,6 @@ useForm({
 
         updateRememberedCredentials(formData);
         localStorage.setItem('showSuccessToast', response.message);
-        window.location.replace('/materiales');
+        window.location.replace('/almacen/materiales');
     }
 });

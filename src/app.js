@@ -40,6 +40,7 @@ import supplierWebRoutes from './routes/web/warehouse/supplierWebRoute.js';
 import purchaseRequisitionWebRoutes from './routes/web/warehouse/purchaseRequisitionWebRoute.js';
 import goodsReceiptWebRoutes from './routes/web/warehouse/goodsReceiptWebRoute.js';
 import goodsIssueWebRoutes from './routes/web/warehouse/goodsIssueWebRoute.js';
+import wasteIssueWebRoutes from './routes/web/warehouse/wasteIssueWebRoute.js';
 
 import userWebRoutes from './routes/web/admin/userWebRoute.js';
 import personWebRoutes from './routes/web/admin/personWebRoute.js';
@@ -107,11 +108,12 @@ app.use(rootRoute, homeWebRoutes);
 app.use('/inicio-sesion', loginWebRoutes);
 app.use('/revocar-sesion', refreshWebRoutes);
 app.use('/cerrar-sesion', logoutWebRoutes);
-app.use('/materiales', materialWebRoutes);
-app.use('/mermas', wasteWebRoutes);
+app.use('/almacen/materiales', materialWebRoutes);
+app.use('/almacen/mermas', wasteWebRoutes);
 app.use('/requisiciones', purchaseRequisitionWebRoutes);
 app.use('/compras', goodsReceiptWebRoutes);
-app.use('/salidas-almacen', goodsIssueWebRoutes);
+app.use('/salidas/materiales', goodsIssueWebRoutes);
+app.use('/salidas/mermas', wasteIssueWebRoutes);
 app.use('/usuarios-sistemas', userWebRoutes);
 app.get('/perfiles', (req, res) => res.redirect(308, '/personas'));
 app.use('/personas', personWebRoutes);
@@ -119,7 +121,7 @@ app.use('/clientes', clientWebRoutes);
 app.use('/proveedores', supplierWebRoutes);
 app.use('/movimientos', movementWebRoutes);
 app.get('/error/404', (req, res) => {
-    const homeHref = getAuthTokenInfo(req, res) ? '/materiales' : '/inicio-sesion';
+    const homeHref = getAuthTokenInfo(req, res) ? '/almacen/materiales' : '/inicio-sesion';
 
     return res.status(404).render('pages/error/404', { homeHref });
 });
@@ -153,7 +155,7 @@ app.use((req, res, next) => {
         return res.status(404).json({ message: 'Ruta no encontrada.' });
     }
 
-    const homeHref = getAuthTokenInfo(req, res) ? '/materiales' : '/inicio-sesion';
+    const homeHref = getAuthTokenInfo(req, res) ? '/almacen/materiales' : '/inicio-sesion';
 
     return res.status(404).render('pages/error/404', { homeHref });
 });
