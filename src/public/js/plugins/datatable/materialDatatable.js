@@ -3,7 +3,7 @@ import { createDataTable, renderActionButtons } from "./baseDatatable.js";
 import { setupTableFilters } from "./utils/filters/tableFilter.js";
 import { notifications } from "../swal/swalComponent.js";
 import { deleteMaterial, getAllMaterials } from "../../application/warehouse/materials.js";
-import { configureResponsiveHeaderGroups, getResponsiveRowData } from "./utils/responsive.js";
+import { getResponsiveRowData } from "./utils/responsive.js";
 import { buildExcelButton, buildTableExportParams } from "../../ui/tableUI.js";
 import { UI_PERMISSIONS } from "../../constants/permissions.js";
 import { exportWarehouseReport } from "../../application/warehouse/report.js";
@@ -16,6 +16,8 @@ const selectorTable = DATATABLE_SELECTORS.MAIN;
 const tableElement = document.querySelector(selectorTable);
 let lastLowStockNotification = '';
 let stockSocketConfigured = false;
+let stockReloadTimer = null;
+const STOCK_RELOAD_DEBOUNCE_MS = 150;
 
 const configureStockRealtime = (table) => {
 
@@ -24,7 +26,10 @@ const configureStockRealtime = (table) => {
     stockSocketConfigured = true;
 
     window.addEventListener('stock:updated', () => {
-        table.ajax.reload(null, false);
+        clearTimeout(stockReloadTimer);
+        stockReloadTimer = setTimeout(() => {
+            table.ajax.reload(null, false);
+        }, STOCK_RELOAD_DEBOUNCE_MS);
     });
 };
 
@@ -116,7 +121,6 @@ export const createMaterialDatatable = async (context) => {
         }
     });
 
-    configureResponsiveHeaderGroups(table);
     configureStockRealtime(table);
 
     $(`${ selectorTable } tbody`).on('click', '.btn-edit', function () {
