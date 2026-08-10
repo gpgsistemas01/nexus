@@ -1,5 +1,5 @@
 import { initPresentationSelect, togglePresentationOption } from "../domains/presentation.js";
-import { initReasonSelect, toggleReasonOption } from "../domains/reason.js";
+import { initReasonSelect } from "../domains/reason.js";
 import { setupSupplierSelect, toggleSupplierOption } from "../domains/supplier.js";
 import { initUnitMeasureSelect, toggleUnitMeasureOption } from "../domains/unitMeasure.js";
 import { FORM_SELECTORS } from "../../../constants/selectors.js";
@@ -34,6 +34,12 @@ export const initMaterialFormSelect2 = ({
         baseSelector: presentationScopedSelector,
         allowCreate: false
     });
+
+    initReasonSelect({
+        modalSelector,
+        baseSelector: reasonScopedSelector,
+        allowCreate: false
+    });
 };
 
 export const setMaterialFormSelectOptions = ({
@@ -44,8 +50,6 @@ export const setMaterialFormSelectOptions = ({
     const supplierScopedSelector = `${ modalSelector } ${ supplierSelector }`;
     const unitMeasureScopedSelector = `${ modalSelector } ${ unitMeasureSelector }`;
     const presentationScopedSelector = `${ modalSelector } ${ presentationSelector }`;
-    const reasonScopedSelector = `${ modalSelector } ${ reasonSelector }`;
-
     toggleSupplierOption({
         selector: supplierScopedSelector,
         id: data?.supplier?.id,
