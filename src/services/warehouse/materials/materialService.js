@@ -287,15 +287,27 @@ export const deleteMaterial = async (id) => {
             await existsMaterial({ tx, id });
 
             const linkedRecords = await Promise.all([
-                tx.goodsReceiptDetail.count({ where: { materialId: id } }),
-                tx.goodsIssueDetail.count({ where: { materialId: id } }),
-                tx.purchaseRequisitionDetail.count({ where: { materialId: id } }),
-                tx.movementDetail.count({ where: { materialId: id } }),
-                tx.stockAdjustmentDetail.count({ where: { materialId: id } }),
-                tx.waste.count({ where: { supplierMaterial: { materialId: id } } })
+                tx.goodsReceiptDetail.findFirst({ where: { materialId: id }, select: { id: true } }),
+                tx.goodsIssueDetail.findFirst({ where: { materialId: id }, select: { id: true } }),
+                tx.purchaseRequisitionDetail.findFirst({ where: { materialId: id }, select: { id: true } }),
+                tx.movementDetail.findFirst({ where: { materialId: id }, select: { id: true } }),
+                tx.stockAdjustmentDetail.findFirst({ where: { materialId: id }, select: { id: true } }),
+                tx.goodsReceiptDetailChange.findFirst({
+                    where: {
+                        OR: [
+                            { previousMaterialId: id },
+                            { correctedMaterialId: id }
+                        ]
+                    },
+                    select: { id: true }
+                }),
+                tx.waste.findFirst({
+                    where: { supplierMaterial: { materialId: id } },
+                    select: { id: true }
+                })
             ]);
 
-            if (linkedRecords.some((count) => count > 0)) throw new MaterialDeleteRelationConflict();
+            if (linkedRecords.some(Boolean)) throw new MaterialDeleteRelationConflict();
 
             await tx.supplierMaterial.deleteMany({ where: { materialId: id } });
 

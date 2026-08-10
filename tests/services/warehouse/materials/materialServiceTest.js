@@ -10,12 +10,13 @@ const materialFindUnique = vi.fn();
 const materialFindFirst = vi.fn();
 const materialCreate = vi.fn();
 const transaction = vi.fn();
-const goodsReceiptDetailCount = vi.fn();
-const goodsIssueDetailCount = vi.fn();
-const purchaseRequisitionDetailCount = vi.fn();
-const movementDetailCount = vi.fn();
-const stockAdjustmentDetailCount = vi.fn();
-const wasteCount = vi.fn();
+const goodsReceiptDetailFindFirst = vi.fn();
+const goodsIssueDetailFindFirst = vi.fn();
+const purchaseRequisitionDetailFindFirst = vi.fn();
+const movementDetailFindFirst = vi.fn();
+const stockAdjustmentDetailFindFirst = vi.fn();
+const goodsReceiptDetailChangeFindFirst = vi.fn();
+const wasteFindFirst = vi.fn();
 const supplierMaterialDeleteMany = vi.fn();
 const supplierMaterialFindUnique = vi.fn();
 const supplierMaterialUpdate = vi.fn();
@@ -43,12 +44,13 @@ vi.mock('../../../../src/repository/baseRepository.js', () => ({
       create: materialCreate,
       delete: materialDelete
     },
-    goodsReceiptDetail: { count: goodsReceiptDetailCount },
-    goodsIssueDetail: { count: goodsIssueDetailCount },
-    purchaseRequisitionDetail: { count: purchaseRequisitionDetailCount },
-    movementDetail: { count: movementDetailCount },
-    stockAdjustmentDetail: { count: stockAdjustmentDetailCount },
-    waste: { count: wasteCount },
+    goodsReceiptDetail: { findFirst: goodsReceiptDetailFindFirst },
+    goodsIssueDetail: { findFirst: goodsIssueDetailFindFirst },
+    purchaseRequisitionDetail: { findFirst: purchaseRequisitionDetailFindFirst },
+    movementDetail: { findFirst: movementDetailFindFirst },
+    stockAdjustmentDetail: { findFirst: stockAdjustmentDetailFindFirst },
+    goodsReceiptDetailChange: { findFirst: goodsReceiptDetailChangeFindFirst },
+    waste: { findFirst: wasteFindFirst },
     supplierMaterial: { findUnique: supplierMaterialFindUnique, update: supplierMaterialUpdate, deleteMany: supplierMaterialDeleteMany }
   })
 }));
@@ -83,12 +85,13 @@ describe('materialService submit operations', () => {
     vi.clearAllMocks();
     transaction.mockImplementation((callback) => callback({
       material: { findUnique: materialFindUnique, findFirst: materialFindFirst, create: materialCreate, update: materialUpdate, delete: materialDelete },
-      goodsReceiptDetail: { count: goodsReceiptDetailCount },
-      goodsIssueDetail: { count: goodsIssueDetailCount },
-      purchaseRequisitionDetail: { count: purchaseRequisitionDetailCount },
-      movementDetail: { count: movementDetailCount },
-      stockAdjustmentDetail: { count: stockAdjustmentDetailCount },
-      waste: { count: wasteCount },
+      goodsReceiptDetail: { findFirst: goodsReceiptDetailFindFirst },
+      goodsIssueDetail: { findFirst: goodsIssueDetailFindFirst },
+      purchaseRequisitionDetail: { findFirst: purchaseRequisitionDetailFindFirst },
+      movementDetail: { findFirst: movementDetailFindFirst },
+      stockAdjustmentDetail: { findFirst: stockAdjustmentDetailFindFirst },
+      goodsReceiptDetailChange: { findFirst: goodsReceiptDetailChangeFindFirst },
+      waste: { findFirst: wasteFindFirst },
       supplierMaterial: { findUnique: supplierMaterialFindUnique, update: supplierMaterialUpdate, deleteMany: supplierMaterialDeleteMany }
     }));
   });
@@ -226,12 +229,13 @@ describe('materialService submit operations', () => {
     const deleted = { id: 'material-1' };
 
     materialFindUnique.mockResolvedValue({ id: 'material-1' });
-    goodsReceiptDetailCount.mockResolvedValue(0);
-    goodsIssueDetailCount.mockResolvedValue(0);
-    purchaseRequisitionDetailCount.mockResolvedValue(0);
-    movementDetailCount.mockResolvedValue(0);
-    stockAdjustmentDetailCount.mockResolvedValue(0);
-    wasteCount.mockResolvedValue(0);
+    goodsReceiptDetailFindFirst.mockResolvedValue(null);
+    goodsIssueDetailFindFirst.mockResolvedValue(null);
+    purchaseRequisitionDetailFindFirst.mockResolvedValue(null);
+    movementDetailFindFirst.mockResolvedValue(null);
+    stockAdjustmentDetailFindFirst.mockResolvedValue(null);
+    goodsReceiptDetailChangeFindFirst.mockResolvedValue(null);
+    wasteFindFirst.mockResolvedValue(null);
     supplierMaterialDeleteMany.mockResolvedValue({ count: 1 });
     materialDelete.mockResolvedValue(deleted);
 
@@ -245,18 +249,18 @@ describe('materialService submit operations', () => {
 
   it('bloquea la eliminación si el material tiene compras o salidas relacionadas', async () => {
     materialFindUnique.mockResolvedValue({ id: 'material-1' });
-    goodsReceiptDetailCount.mockResolvedValue(1);
-    goodsIssueDetailCount.mockResolvedValue(0);
-    purchaseRequisitionDetailCount.mockResolvedValue(0);
-    movementDetailCount.mockResolvedValue(0);
-    stockAdjustmentDetailCount.mockResolvedValue(0);
-    wasteCount.mockResolvedValue(0);
+    goodsReceiptDetailFindFirst.mockResolvedValue({ id: 'receipt-detail-1' });
+    goodsIssueDetailFindFirst.mockResolvedValue(null);
+    purchaseRequisitionDetailFindFirst.mockResolvedValue(null);
+    movementDetailFindFirst.mockResolvedValue(null);
+    stockAdjustmentDetailFindFirst.mockResolvedValue(null);
+    goodsReceiptDetailChangeFindFirst.mockResolvedValue(null);
+    wasteFindFirst.mockResolvedValue(null);
 
     await expect(deleteMaterial('material-1')).rejects.toThrow(MaterialDeleteRelationConflict);
     expect(supplierMaterialDeleteMany).not.toHaveBeenCalled();
     expect(materialDelete).not.toHaveBeenCalled();
   });
-
 
   it('delega el submit de ajuste de stock a createStockAdjustment', async () => {
     const materialDto = {
