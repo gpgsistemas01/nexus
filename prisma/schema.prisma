@@ -113,6 +113,8 @@ model PersonRoleDepartment {
   role       Role       @relation(fields: [roleId], references: [id])
 
   @@id([personId, roleId, departmentId])
+  @@index([roleId])
+  @@index([departmentId])
 }
 
 model Status {
@@ -313,6 +315,8 @@ model Notification {
   user            User?       @relation(fields: [userId], references: [id])
   departmentId    String?     @db.Uuid
   department      Department? @relation(fields: [departmentId], references: [id])
+
+  @@index([departmentId])
 }
 
 model Project {
@@ -331,6 +335,8 @@ model Client {
   advisorId   String?      @db.Uuid
   advisor     Person?      @relation(fields: [advisorId], references: [id])
   goodsIssues GoodsIssue[]
+
+  @@index([advisorId])
 }
 
 model ReferenceNumberCounter {
@@ -367,6 +373,10 @@ model GoodsReceipt {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  @@index([supplierId])
+  @@index([statusId])
+  @@index([receivedById])
+
   @@unique([supplierId, invoice])
 }
 
@@ -390,6 +400,7 @@ model GoodsReceiptDetail {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  @@index([goodsReceiptId])
   @@index([materialId])
 }
 
@@ -424,6 +435,8 @@ model PurchaseRequisition {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([departmentId])
 }
 
 model PurchaseRequisitionDetail {
@@ -438,6 +451,7 @@ model PurchaseRequisitionDetail {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  @@index([purchaseRequisitionId])
   @@index([materialId])
 }
 
@@ -480,6 +494,11 @@ model GoodsIssue {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([departmentId])
+  @@index([requesterId])
+  @@index([clientId])
+  @@index([fulfillmentStatusId])
 }
 
 model GoodsIssueDetail {
@@ -511,6 +530,8 @@ model GoodsIssueDetail {
   updatedAt DateTime @updatedAt
 
   @@index([materialId])
+  @@index([supplierId])
+  @@index([goodsIssueId, fulfillmentStatusId])
 }
 
 model GoodsIssueReturn {
@@ -570,6 +591,9 @@ model InventoryMovement {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([goodsReceiptId])
+  @@index([goodsIssueId])
 }
 
 model MovementDetail {
@@ -599,6 +623,8 @@ model MovementDetail {
   updatedAt DateTime @updatedAt
 
   @@index([materialId])
+  @@index([supplierId])
+  @@index([movementId])
 }
 
 model StockAdjustment {
@@ -667,7 +693,9 @@ model StockAdjustmentDetail {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  @@index([stockAdjustmentId])
   @@index([materialId])
+  @@index([supplierId])
 }
 
 enum InventoryMovementType {

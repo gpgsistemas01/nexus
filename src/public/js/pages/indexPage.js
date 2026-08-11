@@ -40,29 +40,6 @@ const notificationsBellBtn = document.getElementById('notificationsBellBtn');
 const notificationsList = document.getElementById('notificationsList');
 const notificationsUnreadCount = document.getElementById('notificationsUnreadCount');
 const markNotificationsReadBtn = document.getElementById('markNotificationsReadBtn');
-const appContext = window.APP_CONTEXT || {};
-const loggedUserRole = appContext.role || '';
-const loggedUserDepartment = appContext.department || '';
-const loggedUserDepartmentId = appContext.departmentId || '';
-const isSystemAdmin = loggedUserRole === 'Administrador del sistema';
-const isWarehouse = loggedUserDepartment === 'Almacén';
-
-const shouldDisplayRealtimeNotification = (notification) => {
-
-    if (!notification) return false;
-
-    const { entityType, departmentId } = notification;
-
-    if (entityType === 'material-stock-restored') return false;
-
-    if (isSystemAdmin) return true;
-
-    if (isWarehouse) return entityType === 'material-low-stock';
-
-    if (entityType === 'material-low-stock') return true;
-
-    return departmentId === loggedUserDepartmentId;
-};
 
 const updateUnreadCount = (count) => {
 
@@ -133,7 +110,7 @@ if (typeof window.io === 'function') {
                 notifications.showWarning(notification.message);
             }
 
-            await loadNotifications();
-        });
-    }
+    socket.on('materials:updated', (data) => {
+        window.dispatchEvent(new CustomEvent('materials:updated', { detail: data }));
+    });
 }

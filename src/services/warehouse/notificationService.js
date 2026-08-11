@@ -76,9 +76,9 @@ export const findLatestNotifications = async ({ take = 10, departments, roles } 
     };
 };
 
-export const markAllNotificationsAsRead = async ({ department, role }) => {
+export const markAllNotificationsAsRead = async ({ departments, roles }) => {
 
-    const where = await getNotificationWhereByUser(department, role);
+    const where = await getNotificationWhereByUser(departments, roles);
 
     await getDb().notification.updateMany({
         where: {
