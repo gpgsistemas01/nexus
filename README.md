@@ -28,7 +28,7 @@ Nexus es una plataforma de control operativo para administrar inventario, compra
 - Gestión de almacén: materiales, proveedores, entradas de compra, salidas de almacén, requisiciones, mermas, motivos, presentaciones, unidades de medida y estados de cumplimiento.
 - Gestión de clientes del área de ventas.
 - Reportes administrativos, de almacén e inventario.
-- Notificaciones en tiempo real con Socket.IO.
+- Actualización de inventario en tiempo real con Socket.IO.
 - Validación de contenido para API JSON, cargas de archivo y texto plano.
 - Pruebas unitarias e integrales con Vitest y Supertest.
 
@@ -294,7 +294,6 @@ Todas las rutas API cuelgan de `/api` y esperan `Content-Type: application/json`
 - `/api/warehouse/suppliers`
 - `/api/warehouse/goods-receipts`
 - `/api/warehouse/goods-issues`
-- `/api/warehouse/notifications`
 - `/api/warehouse/reports`
 - `/api/warehouse/unit-measures`
 - `/api/warehouse/presentations`
