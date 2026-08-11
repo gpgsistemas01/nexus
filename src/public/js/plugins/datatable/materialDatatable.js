@@ -14,21 +14,29 @@ import { handleApiError } from "../../api/errorHandler.js";
 
 const selectorTable = DATATABLE_SELECTORS.MAIN;
 const tableElement = document.querySelector(selectorTable);
+const MATERIALS_RELOAD_DELAY_MS = 100;
 let lastLowStockNotification = '';
-let stockSocketConfigured = false;
+let materialsSocketConfigured = false;
+let materialsReloadTimer = null;
+
+const configureMaterialsRealtime = (table) => {
 let stockReloadTimer = null;
 const STOCK_RELOAD_DEBOUNCE_MS = 150;
 
-const configureStockRealtime = (table) => {
+    if (materialsSocketConfigured) return;
 
-    if (stockSocketConfigured) return;
+    materialsSocketConfigured = true;
 
-    stockSocketConfigured = true;
+    window.addEventListener('materials:updated', () => {
+        clearTimeout(materialsReloadTimer);
 
-    window.addEventListener('stock:updated', () => {
-        clearTimeout(stockReloadTimer);
+        // Una compra o salida puede modificar varios materiales. La recarga completa
+        // conserva la página y vuelve a aplicar filtros, orden y cálculos del servidor.
+        materialsReloadTimer = setTimeout(() => {
+            clearTimeout(stockReloadTimer);
         stockReloadTimer = setTimeout(() => {
             table.ajax.reload(null, false);
+        }, MATERIALS_RELOAD_DELAY_MS);
         }, STOCK_RELOAD_DEBOUNCE_MS);
     });
 };
@@ -121,7 +129,8 @@ export const createMaterialDatatable = async (context) => {
         }
     });
 
-    configureStockRealtime(table);
+    configureResponsiveHeaderGroups(table);
+    configureMaterialsRealtime(table);
 
     $(`${ selectorTable } tbody`).on('click', '.btn-edit', function () {
 
