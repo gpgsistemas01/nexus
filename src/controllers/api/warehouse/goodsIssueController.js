@@ -10,6 +10,7 @@ import {
 } from "../../../services/warehouse/goodsIssues/goodsIssueService.js";
 import { getDataTableOrder, getDataTablePaging, getDataTableSearch } from "../../../utils/requestQueryUtils.js";
 import { sanitizeEmptyStrings } from "../../../utils/formattersUtils.js";
+import { emitMaterialsUpdated } from "../../../utils/socketUtils.js";
 
 export const getAllGoodsIssues = async (req, res) => {
 
@@ -58,6 +59,8 @@ export const registerGoodsIssue = async (req, res) => {
         goodsIssueDto: sanitizedGoodsIssueDto
     });
 
+    emitMaterialsUpdated({ source: 'goods-issue:create' });
+
     return res.status(200).json({
         goodsIssue,
         code: successCodeMessages.CREATED_GOODS_ISSUE
@@ -74,6 +77,8 @@ export const editGoodsIssue = async (req, res) => {
         id: req.params.id
     });
 
+    emitMaterialsUpdated({ source: 'goods-issue:update' });
+
     return res.status(200).json({
         goodsIssue,
         code: successCodeMessages.UPDATED_GOODS_ISSUE
@@ -89,6 +94,8 @@ export const editGoodsIssueDetails = async (req, res) => {
         goodsIssueDto: sanitizedGoodsIssueDto, 
         id: req.params.id
     });
+
+    emitMaterialsUpdated({ source: 'goods-issue:update-details' });
 
     return res.status(200).json({
         goodsIssue,
@@ -125,6 +132,8 @@ export const returnGoodsIssueDetailLine = async (req, res) => {
         returnDto: sanitizedReturnDto,
         userId: req.user.id
     });
+
+    emitMaterialsUpdated({ source: 'goods-issue:return' });
 
     return res.status(200).json({
         goodsIssueReturn,

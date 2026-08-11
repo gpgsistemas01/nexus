@@ -6,13 +6,19 @@ export const initSocket = (io) => {
     return socketInstance;
 };
 
-export const emitStockUpdated = ({ source = 'unknown', notification = null } = {}) => {
+export const emitMaterialsUpdated = ({ source = 'unknown' } = {}) => {
 
     if (!socketInstance) return;
 
-    socketInstance.emit('stock:updated', {
+    socketInstance.emit('materials:updated', {
         source,
-        notification,
         updatedAt: new Date().toISOString()
     });
+};
+
+export const emitNotificationCreated = ({ notification } = {}) => {
+
+    if (!socketInstance || !notification) return;
+
+    socketInstance.emit('notification:created', { notification });
 };
