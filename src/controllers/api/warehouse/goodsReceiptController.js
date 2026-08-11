@@ -8,11 +8,7 @@ import {
 import { cancelGoodsReceiptDetailLine } from "../../../services/warehouse/goodsReceipts/detailChanges/goodsReceiptCancellationService.js";
 import { correctGoodsReceiptDetailLine } from "../../../services/warehouse/goodsReceipts/detailChanges/goodsReceiptCorrectionService.js";
 import { getDataTableOrder, getDataTablePaging, getDataTableSearch } from "../../../utils/requestQueryUtils.js";
-import {
-    createStockNotification,
-    notifyMaterialStockStatusChanges,
-} from "../../../services/warehouse/notificationService.js";
-import { emitStockUpdated } from "../../../utils/socketUtils.js";
+import { emitMaterialsUpdated } from "../../../utils/socketUtils.js";
 import { sanitizeEmptyStrings } from "../../../utils/formattersUtils.js";
 
 export const getAllGoodsReceipts = async (req, res) => {
@@ -54,6 +50,8 @@ export const registerGoodsReceipt = async (req, res) => {
     const goodsReceipt = await createGoodsReceipt({
         goodsReceiptDto: sanitizedGoodsReceiptDto
     });
+
+    emitMaterialsUpdated({ source: 'goods-receipt-created' });
 
     return res.status(200).json({
         goodsReceipt,
