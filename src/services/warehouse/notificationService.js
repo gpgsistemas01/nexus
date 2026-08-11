@@ -2,9 +2,11 @@ import { getDb } from "../../repository/baseRepository.js";
 import { ROLE_NAMES } from "../../constants/roles.js";
 import { DEPARTMENT_NAMES } from "../../constants/departments.js";
 
-const ENTITY_MATERIAL_LOW_STOCK = 'material-low-stock';
-const ENTITY_MATERIAL_STOCK_RESTORED = 'material-stock-restored';
-const ENTITY_GOODS_RECEIPT = 'goods-receipt';
+const OBSOLETE_NOTIFICATION_ENTITY_TYPES = [
+    'goods-receipt',
+    'material-low-stock',
+    'material-stock-restored'
+];
 
 const getNotificationWhereByUser = async (departments, roles) => {
 
@@ -20,34 +22,17 @@ const getNotificationWhereByUser = async (departments, roles) => {
 
     const departmentIds = dbDepartments.map(d => d.id);
 
-   const canViewAllNotifications = roles.includes(ROLE_NAMES.SYSTEM_ADMIN) || departments.includes(DEPARTMENT_NAMES.WAREHOUSE);
+    const canViewAllNotifications = roles.includes(ROLE_NAMES.SYSTEM_ADMIN) || departments.includes(DEPARTMENT_NAMES.WAREHOUSE);
 
     if (canViewAllNotifications) {
         return {
-            entityType: {
-                notIn: [ENTITY_GOODS_RECEIPT, ENTITY_MATERIAL_STOCK_RESTORED]
-            }
+            entityType: { notIn: OBSOLETE_NOTIFICATION_ENTITY_TYPES }
         };
     }
 
     return {
-        AND: [
-            {
-                entityType: {
-                    not: ENTITY_MATERIAL_STOCK_RESTORED
-                }
-            },
-            {
-                OR: [
-                    {
-                        departmentId: { in: departmentIds }
-                    },
-                    {
-                        entityType: ENTITY_MATERIAL_LOW_STOCK
-                    }
-                ]
-            }
-        ]
+        departmentId: { in: departmentIds },
+        entityType: { notIn: OBSOLETE_NOTIFICATION_ENTITY_TYPES }
     };
 };
 

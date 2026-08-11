@@ -3,7 +3,7 @@ import { createDataTable, renderActionButtons } from "./baseDatatable.js";
 import { setupTableFilters } from "./utils/filters/tableFilter.js";
 import { notifications } from "../swal/swalComponent.js";
 import { deleteMaterial, getAllMaterials } from "../../application/warehouse/materials.js";
-import { getResponsiveRowData } from "./utils/responsive.js";
+import { configureResponsiveHeaderGroups, getResponsiveRowData } from "./utils/responsive.js";
 import { buildExcelButton, buildTableExportParams } from "../../ui/tableUI.js";
 import { hasPermission, UI_PERMISSIONS } from "../../constants/permissions.js";
 import { exportWarehouseReport } from "../../application/warehouse/report.js";
@@ -20,8 +20,6 @@ let materialsSocketConfigured = false;
 let materialsReloadTimer = null;
 
 const configureMaterialsRealtime = (table) => {
-let stockReloadTimer = null;
-const STOCK_RELOAD_DEBOUNCE_MS = 150;
 
     if (materialsSocketConfigured) return;
 
@@ -33,11 +31,8 @@ const STOCK_RELOAD_DEBOUNCE_MS = 150;
         // Una compra o salida puede modificar varios materiales. La recarga completa
         // conserva la página y vuelve a aplicar filtros, orden y cálculos del servidor.
         materialsReloadTimer = setTimeout(() => {
-            clearTimeout(stockReloadTimer);
-        stockReloadTimer = setTimeout(() => {
             table.ajax.reload(null, false);
         }, MATERIALS_RELOAD_DELAY_MS);
-        }, STOCK_RELOAD_DEBOUNCE_MS);
     });
 };
 
