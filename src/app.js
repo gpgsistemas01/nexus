@@ -58,6 +58,7 @@ import { initSocket } from './utils/socketUtils.js';
 import { isAppError } from './errors/AppError.js';
 import { appConfig } from './config/appConfig.js';
 import { getAuthTokenInfo } from './middleware/authMiddleware.js';
+import { auditWrites } from './middleware/auditMiddleware.js';
 
 const app = express();
 const server = http.createServer(app);
@@ -89,6 +90,7 @@ app.use(cookieParser());
 // app.use(express.urlencoded({ extended: true }));
 
 app.use(pinoLogger);
+app.use(auditWrites);
 
 //middleware
 app.use(apiRoute, checkTypeContentJson);
