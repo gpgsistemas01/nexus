@@ -23,7 +23,7 @@ import { recalculateMaterialUnitCosts } from '../../materials/supplierMaterialSe
 
 const serviceLogger = createServiceLogger('warehouse.goodsReceipts.detailChanges.goodsReceiptCancellationService');
 
-export const cancelGoodsReceiptDetailLine = async ({ id, detailId }) => {
+export const cancelGoodsReceiptDetailLine = async ({ id, detailId, userId }) => {
     try {
         const result = await getDb().$transaction(async (tx) => {
             const currentDetail = await findReceiptDetailForChange({ tx, goodsReceiptId: id, detailId });
@@ -66,6 +66,7 @@ export const cancelGoodsReceiptDetailLine = async ({ id, detailId }) => {
                 changeType,
                 goodsReceiptId: id,
                 goodsReceiptDetailId: detailId,
+                changedById: userId,
                 quantityDifference
             });
 

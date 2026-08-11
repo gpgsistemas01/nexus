@@ -28,7 +28,8 @@ const serviceLogger = createServiceLogger('warehouse.goodsReceipts.detailChanges
 export const correctGoodsReceiptDetailLine = async ({
     id,
     detailId,
-    correctionDto
+    correctionDto,
+    userId
 }) => {
     const { quantity, costPerUnitType } = correctionDto;
 
@@ -90,7 +91,8 @@ export const correctGoodsReceiptDetailLine = async ({
                 inventoryMovementId: movement?.id || null,
                 changeType,
                 goodsReceiptId: id,
-                goodsReceiptDetailId: detailId
+                goodsReceiptDetailId: detailId,
+                changedById: userId
             });
 
             return {
