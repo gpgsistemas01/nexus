@@ -38,6 +38,35 @@ model User {
   goodsIssueReturns             GoodsIssueReturn[]
   createdWasteStockAdjustments  WasteStockAdjustment[] @relation("CreatedWasteStockAdjustments")
   approvedWasteStockAdjustments WasteStockAdjustment[] @relation("ApprovedWasteStockAdjustments")
+  criticalWriteAudits           CriticalWriteAudit[]
+}
+
+model CriticalWriteAudit {
+  id            String                   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  actorId       String?                  @db.Uuid
+  action        CriticalWriteAuditAction
+  resource      String                   @db.VarChar(100)
+  entityId      String?                  @db.VarChar(100)
+  method        String                   @db.VarChar(10)
+  path          String                   @db.VarChar(500)
+  statusCode    Int
+  changes       Json?
+  requestId     String?                  @db.VarChar(100)
+  ipAddress     String?                  @db.VarChar(45)
+  userAgent     String?                  @db.VarChar(500)
+  createdAt     DateTime                 @default(now())
+
+  actor User? @relation(fields: [actorId], references: [id], onDelete: SetNull)
+
+  @@index([actorId, createdAt])
+  @@index([resource, entityId, createdAt])
+  @@index([createdAt])
+}
+
+enum CriticalWriteAuditAction {
+  CREATE
+  UPDATE
+  DELETE
 }
 
 model UserRoleDepartment {
