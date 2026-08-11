@@ -25,37 +25,37 @@ model Role {
 }
 
 model User {
-  id                            String                 @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  personId                      String?                @db.Uuid
-  name                          String                 @unique @db.VarChar(50)
-  password                      String                 @db.VarChar(100)
-  isActive                      Boolean                @default(true)
-  person                        Person?                @relation(fields: [personId], references: [id])
+  id                            String                     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  personId                      String?                    @db.Uuid
+  name                          String                     @unique @db.VarChar(50)
+  password                      String                     @db.VarChar(100)
+  isActive                      Boolean                    @default(true)
+  person                        Person?                    @relation(fields: [personId], references: [id])
   accesses                      UserRoleDepartment[]
   notifications                 Notification[]
-  createrStockAdjustment        StockAdjustment[]      @relation("CreatedStockAdjustments")
-  approverStockAdjustment       StockAdjustment[]      @relation("ApprovedStockAdjustments")
+  createrStockAdjustment        StockAdjustment[]          @relation("CreatedStockAdjustments")
+  approverStockAdjustment       StockAdjustment[]          @relation("ApprovedStockAdjustments")
   goodsIssueReturns             GoodsIssueReturn[]
   goodsReceiptDetailChanges     GoodsReceiptDetailChange[]
-  createdWasteStockAdjustments  WasteStockAdjustment[] @relation("CreatedWasteStockAdjustments")
-  approvedWasteStockAdjustments WasteStockAdjustment[] @relation("ApprovedWasteStockAdjustments")
+  createdWasteStockAdjustments  WasteStockAdjustment[]     @relation("CreatedWasteStockAdjustments")
+  approvedWasteStockAdjustments WasteStockAdjustment[]     @relation("ApprovedWasteStockAdjustments")
   criticalWriteAudits           CriticalWriteAudit[]
 }
 
 model CriticalWriteAudit {
-  id            String                   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  actorId       String?                  @db.Uuid
-  action        CriticalWriteAuditAction
-  resource      String                   @db.VarChar(100)
-  entityId      String?                  @db.VarChar(100)
-  method        String                   @db.VarChar(10)
-  path          String                   @db.VarChar(500)
-  statusCode    Int
-  changes       Json?
-  requestId     String?                  @db.VarChar(100)
-  ipAddress     String?                  @db.VarChar(45)
-  userAgent     String?                  @db.VarChar(500)
-  createdAt     DateTime                 @default(now())
+  id         String                   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  actorId    String?                  @db.Uuid
+  action     CriticalWriteAuditAction
+  resource   String                   @db.VarChar(100)
+  entityId   String?                  @db.VarChar(100)
+  method     String                   @db.VarChar(10)
+  path       String                   @db.VarChar(500)
+  statusCode Int
+  changes    Json?
+  requestId  String?                  @db.VarChar(100)
+  ipAddress  String?                  @db.VarChar(45)
+  userAgent  String?                  @db.VarChar(500)
+  createdAt  DateTime                 @default(now())
 
   actor User? @relation(fields: [actorId], references: [id], onDelete: SetNull)
 
@@ -113,6 +113,8 @@ model PersonRoleDepartment {
   role       Role       @relation(fields: [roleId], references: [id])
 
   @@id([personId, roleId, departmentId])
+  @@index([roleId])
+  @@index([departmentId])
 }
 
 model Status {
@@ -146,18 +148,18 @@ model Material {
 }
 
 model UnitMeasure {
-  id                String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name              String             @db.VarChar(20)
-  symbol            String             @db.VarChar(10)
-  materials         Material[]
+  id        String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name      String     @db.VarChar(20)
+  symbol    String     @db.VarChar(10)
+  materials Material[]
 
   @@unique([name, symbol])
 }
 
 model Presentation {
-  id                String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name              String             @unique @db.VarChar(50)
-  materials         Material[]
+  id        String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name      String     @unique @db.VarChar(50)
+  materials Material[]
 }
 
 model Supplier {
@@ -187,7 +189,6 @@ model SupplierMaterial {
   wastes            Waste[]
 
   @@unique([supplierId, materialId])
-  @@index([supplierId])
   @@index([materialId])
 }
 
@@ -208,7 +209,6 @@ model Waste {
   updatedAt DateTime @updatedAt
 
   @@unique([supplierMaterialId, base, height])
-  @@index([supplierMaterialId])
 }
 
 model WasteStockAdjustment {
@@ -315,6 +315,8 @@ model Notification {
   user            User?       @relation(fields: [userId], references: [id])
   departmentId    String?     @db.Uuid
   department      Department? @relation(fields: [departmentId], references: [id])
+
+  @@index([departmentId])
 }
 
 model Project {
@@ -333,6 +335,8 @@ model Client {
   advisorId   String?      @db.Uuid
   advisor     Person?      @relation(fields: [advisorId], references: [id])
   goodsIssues GoodsIssue[]
+
+  @@index([advisorId])
 }
 
 model ReferenceNumberCounter {
@@ -370,6 +374,8 @@ model GoodsReceipt {
   updatedAt DateTime @updatedAt
 
   @@unique([supplierId, invoice])
+  @@index([statusId])
+  @@index([receivedById])
 }
 
 model GoodsReceiptDetail {
@@ -392,6 +398,7 @@ model GoodsReceiptDetail {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  @@index([goodsReceiptId])
   @@index([materialId])
 }
 
@@ -426,6 +433,8 @@ model PurchaseRequisition {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([departmentId])
 }
 
 model PurchaseRequisitionDetail {
@@ -440,6 +449,7 @@ model PurchaseRequisitionDetail {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  @@index([purchaseRequisitionId])
   @@index([materialId])
 }
 
@@ -482,6 +492,11 @@ model GoodsIssue {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([departmentId])
+  @@index([requesterId])
+  @@index([clientId])
+  @@index([fulfillmentStatusId])
 }
 
 model GoodsIssueDetail {
@@ -509,10 +524,12 @@ model GoodsIssueDetail {
   movementDetails   MovementDetail[]
   returns           GoodsIssueReturn[]
 
-  createdAt      DateTime      @default(now())
-  updatedAt      DateTime      @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([materialId])
+  @@index([supplierId])
+  @@index([goodsIssueId, fulfillmentStatusId])
 }
 
 model GoodsIssueReturn {
@@ -572,6 +589,9 @@ model InventoryMovement {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([goodsReceiptId])
+  @@index([goodsIssueId])
 }
 
 model MovementDetail {
@@ -601,6 +621,8 @@ model MovementDetail {
   updatedAt DateTime @updatedAt
 
   @@index([materialId])
+  @@index([supplierId])
+  @@index([movementId])
 }
 
 model StockAdjustment {
@@ -669,7 +691,9 @@ model StockAdjustmentDetail {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  @@index([stockAdjustmentId])
   @@index([materialId])
+  @@index([supplierId])
 }
 
 enum InventoryMovementType {

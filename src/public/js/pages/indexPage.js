@@ -118,15 +118,17 @@ if (markNotificationsReadBtn) {
 
 if (notificationsBellBtn) {
     loadNotifications();
+}
 
-    if (typeof window.io === 'function') {
-        const socket = window.io();
+if (typeof window.io === 'function') {
+    const socket = window.io();
 
-        socket.on('stock:updated', async (data) => {
+    socket.on('materials:updated', () => {
+        window.dispatchEvent(new CustomEvent('materials:updated'));
+    });
 
-            const { notification } = data;
-            window.dispatchEvent(new CustomEvent('stock:updated', { detail: { notification } }));
-
+    if (notificationsBellBtn) {
+        socket.on('notification:created', async ({ notification }) => {
             if (shouldDisplayRealtimeNotification(notification)) {
                 notifications.showWarning(notification.message);
             }

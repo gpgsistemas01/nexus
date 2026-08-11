@@ -3,6 +3,7 @@ import { successCodeMessages } from "../../../messages/codeMessages.js";
 import { findAllMaterials, createMaterial, updateMaterial, updateMaterialStock, deleteMaterial } from "../../../services/warehouse/materials/materialService.js";
 import { sanitizeEmptyStrings } from "../../../utils/formattersUtils.js";
 import { getDataTableOrder, getDataTablePaging, getDataTableSearch } from "../../../utils/requestQueryUtils.js";
+import { emitMaterialsUpdated } from "../../../utils/socketUtils.js";
 
 export const getAllMaterials = async (req, res) => {
 
@@ -37,6 +38,8 @@ export const registerMaterial = async (req, res) => {
         userId: req.user.id
     });
 
+    emitMaterialsUpdated({ source: 'material:create' });
+
     return res.status(200).json({
         material,
         code: successCodeMessages.CREATED_MATERIAL
@@ -49,6 +52,8 @@ export const editMaterial = async (req, res) => {
     const sanitizedMaterialDto = sanitizeEmptyStrings(materialDto);
 
     const material = await updateMaterial(sanitizedMaterialDto, req.params.id);
+
+    emitMaterialsUpdated({ source: 'material:update' });
 
     return res.status(200).json({
         material,
@@ -67,6 +72,8 @@ export const editMaterialStock = async (req, res) => {
         id: req.params.id
     });
 
+    emitMaterialsUpdated({ source: 'stock-adjustment' });
+
     return res.status(200).json({
         material,
         code: successCodeMessages.UPDATED_MATERIAL
@@ -76,6 +83,8 @@ export const editMaterialStock = async (req, res) => {
 export const removeMaterial = async (req, res) => {
 
     const material = await deleteMaterial(req.params.id);
+
+    emitMaterialsUpdated({ source: 'material:delete' });
 
     return res.status(200).json({
         material,
