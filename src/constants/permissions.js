@@ -18,7 +18,6 @@ export const PERMISSIONS = Object.freeze({
     GOODS_ISSUES_MANAGE: 'goods:issues-manage',
     GOODS_ISSUE_DETAILS_MANAGE: 'goods:issue-details-manage',
     GOODS_RECEIPTS_MANAGE: 'goods:receipts-manage',
-    NOTIFICATIONS_MANAGE: 'notifications:manage',
     PRESENTATIONS_READ: 'presentations:read',
     PURCHASE_REQUISITIONS_MANAGE: 'purchase:requisitions-manage',
     PURCHASE_REQUISITIONS_STATUS_MANAGE: 'purchase:requisitions-status-manage',
@@ -207,24 +206,6 @@ export const AUTHORIZATION_POLICIES = Object.freeze({
     [PERMISSIONS.GOODS_RECEIPTS_MANAGE]: createPolicy({
     roles: ['Almacenista', 'Coordinador', 'Auxiliar', 'Administrador del sistema'],
     departments: ['ALMACÉN Y PROVEDURÍA', 'SISTEMAS']
-}),
-    [PERMISSIONS.NOTIFICATIONS_MANAGE]: createPolicy({
-    roles: ['Administrador del sistema', 'Coordinador', 'Auxiliar', 'Operador', 'Instalador', 'Almacenista'],
-    departments: [
-        'DIRECCIÓN',
-        'ACABADOS',
-        'ADMINISTRATIVO',
-        'ALMACÉN Y PROVEDURÍA',
-        'DISEÑO',
-        'INSTALACIONES',
-        'IMPRESIÓN',
-        'ROUTER',
-        'PT/TRÁFICO',
-        'SERVICIOS Y VIGILANCIA',
-        'SISTEMAS',
-        'TALLER 3D',
-        'VENTAS Y PROYECTOS ESPECIALES'
-    ]
 }),
     [PERMISSIONS.PRESENTATIONS_READ]: createPolicy({
     roles: ['Almacenista', 'Coordinador', 'Auxiliar', 'Administrador del sistema'],

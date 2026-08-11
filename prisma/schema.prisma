@@ -14,7 +14,6 @@ model Department {
   accesses             UserRoleDepartment[]
   purchaseRequisitions PurchaseRequisition[]
   goodsIssues          GoodsIssue[]
-  notifications        Notification[]
 }
 
 model Role {
@@ -32,7 +31,6 @@ model User {
   isActive                      Boolean                @default(true)
   person                        Person?                @relation(fields: [personId], references: [id])
   accesses                      UserRoleDepartment[]
-  notifications                 Notification[]
   createrStockAdjustment        StockAdjustment[]      @relation("CreatedStockAdjustments")
   approverStockAdjustment       StockAdjustment[]      @relation("ApprovedStockAdjustments")
   goodsIssueReturns             GoodsIssueReturn[]
@@ -301,24 +299,6 @@ model WasteMovementDetail {
   @@index([wasteId])
   @@index([wasteStockAdjustmentDetailId])
   @@index([movementId])
-}
-
-model Notification {
-  id              String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  title           String      @db.VarChar(100)
-  message         String      @db.VarChar(255)
-  type            String      @default("info") @db.VarChar(20)
-  isRead          Boolean     @default(false)
-  createdAt       DateTime    @default(now())
-  entityId        String      @db.Uuid
-  entityType      String      @db.VarChar(50)
-  referenceNumber String?     @db.VarChar(50)
-  userId          String?     @db.Uuid
-  user            User?       @relation(fields: [userId], references: [id])
-  departmentId    String?     @db.Uuid
-  department      Department? @relation(fields: [departmentId], references: [id])
-
-  @@index([departmentId])
 }
 
 model Project {

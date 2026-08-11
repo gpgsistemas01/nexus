@@ -43,40 +43,13 @@
             </div>
 
             <div class="app-userbar d-flex align-items-center gap-2 gap-sm-3 ms-auto">
-                <div class="dropdown">
-                    <button
-                        id="notificationsBellBtn"
-                        type="button"
-                        class="btn btn-link btn-floating app-header-action app-notifications-toggle position-relative"
-                        data-mdb-dropdown-init
-                        data-mdb-ripple-init
-                        aria-expanded="false"
-                        aria-label="Abrir notificaciones"
-                    >
-                        <i class="fas fa-bell fs-5"></i>
-                        <span
-                            id="notificationsUnreadCount"
-                            class="position-absolute top-0 start-100 translate-middle badge rounded-pill app-notifications-badge d-none"
-                        >
-                            0
-                        </span>
-                    </button>
-
-                    <ul
-                        id="notificationsMenu"
-                        class="dropdown-menu dropdown-menu-end p-0 app-notifications-menu"
-                        aria-labelledby="notificationsBellBtn"
-                    >
-                        <li class="app-notifications-header px-3 py-3 d-flex justify-content-between align-items-center">
-                            <div>
-                                <strong>Notificaciones</strong>
-                                <div class="small">Alertas recientes del sistema</div>
-                            </div>
-                            <button id="markNotificationsReadBtn" class="btn btn-sm btn-outline-success">Marcar leídas</button>
-                        </li>
-                        <li id="notificationsList" class="list-group list-group-flush"></li>
-                    </ul>
-                </div>
+                <span
+                    class="btn btn-link btn-floating app-header-action app-notifications-icon"
+                    role="img"
+                    aria-label="Notificaciones"
+                >
+                    <i class="fas fa-bell fs-5"></i>
+                </span>
 
                 <span class="app-user-name"><%= user.name %></span>
 
