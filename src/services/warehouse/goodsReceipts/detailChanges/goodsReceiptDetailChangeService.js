@@ -96,12 +96,14 @@ export const createGoodsReceiptDetailChange = async ({
     changeType,
     goodsReceiptId,
     goodsReceiptDetailId,
+    changedById,
     quantityDifference = normalizeDecimal(resultingDetail.quantity - currentDetail.quantity)
 }) => {
     return tx.goodsReceiptDetailChange.create({
         data: {
             goodsReceiptId,
             goodsReceiptDetailId,
+            changedById,
             reasonId,
             inventoryMovementId,
             previousMaterialId: currentDetail.materialId,
@@ -122,7 +124,14 @@ export const createGoodsReceiptDetailChange = async ({
             costDifference: normalizeDecimal(resultingDetail.costPerUnitType - currentDetail.costPerUnitType)
         },
         include: {
-            inventoryMovement: true
+            inventoryMovement: true,
+            changedBy: {
+                select: {
+                    id: true,
+                    name: true,
+                    personId: true
+                }
+            }
         }
     });
 };
