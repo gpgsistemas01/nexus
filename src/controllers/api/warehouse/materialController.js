@@ -3,6 +3,7 @@ import { successCodeMessages } from "../../../messages/codeMessages.js";
 import { findAllMaterials, createMaterial, updateMaterial, updateMaterialStock, deleteMaterial } from "../../../services/warehouse/materials/materialService.js";
 import { sanitizeEmptyStrings } from "../../../utils/formattersUtils.js";
 import { getDataTableOrder, getDataTablePaging, getDataTableSearch } from "../../../utils/requestQueryUtils.js";
+import { emitMaterialsUpdated } from "../../../utils/socketUtils.js";
 
 export const getAllMaterials = async (req, res) => {
 
@@ -65,6 +66,8 @@ export const editMaterialStock = async (req, res) => {
         userId: req.user.id,
         id: req.params.id
     });
+
+    emitMaterialsUpdated({ source: 'stock-adjustment-created' });
 
     return res.status(200).json({
         material,

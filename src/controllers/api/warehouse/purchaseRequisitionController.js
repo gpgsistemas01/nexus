@@ -8,9 +8,7 @@ import {
     updatePurchaseRequisition
 } from "../../../services/warehouse/purchaseRequisitionService.js";
 import { getDataTableOrder, getDataTablePaging, getDataTableSearch } from "../../../utils/requestQueryUtils.js";
-import { createStockNotification } from "../../../services/warehouse/notificationService.js";
 import { sanitizeEmptyStrings } from "../../../utils/formattersUtils.js";
-import { emitStockUpdated } from "../../../utils/socketUtils.js";
 
 export const getAllPurchaseRequisitions = async (req, res) => {
 
@@ -76,19 +74,6 @@ export const editPurchaseRequisition = async (req, res) => {
 export const confirmPurchaseRequisitionStatus = async (req, res) => {
 
     const purchaseRequisition = await confirmPurchaseRequisition({ id: req.params.id, userId: req.userId });
-    // const totalMaterials = purchaseRequisition.totalRequestedMaterials || 0;
-    // const notification = await createStockNotification({
-    //     title: 'Requisición aprobada',
-    //     message: `Requisición folio ${purchaseRequisition.referenceNumber} aprobada con ${totalMaterials} material(s).`,
-    //     type: 'info',
-    //     referenceNumber: purchaseRequisition.referenceNumber,
-    //     entityId: purchaseRequisition.id,
-    //     entityType: 'purchase-requisition',
-    //     userId: req.userId,
-    //     departmentId: purchaseRequisition.department?.id || null
-    // });
-
-    // emitStockUpdated({ source: 'purchase-requisition-confirm', notification });
 
     return res.status(200).json({
         purchaseRequisition,

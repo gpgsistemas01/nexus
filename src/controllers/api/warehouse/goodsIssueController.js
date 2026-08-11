@@ -10,6 +10,7 @@ import {
 } from "../../../services/warehouse/goodsIssues/goodsIssueService.js";
 import { getDataTableOrder, getDataTablePaging, getDataTableSearch } from "../../../utils/requestQueryUtils.js";
 import { sanitizeEmptyStrings } from "../../../utils/formattersUtils.js";
+import { emitMaterialsUpdated } from "../../../utils/socketUtils.js";
 
 export const getAllGoodsIssues = async (req, res) => {
 
@@ -57,6 +58,8 @@ export const registerGoodsIssue = async (req, res) => {
     const goodsIssue = await createGoodsIssue({
         goodsIssueDto: sanitizedGoodsIssueDto
     });
+
+    emitMaterialsUpdated({ source: 'goods-issue-created' });
 
     return res.status(200).json({
         goodsIssue,
