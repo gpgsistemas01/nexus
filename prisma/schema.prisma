@@ -683,7 +683,7 @@ model GoodsReceiptDetailChange {
   goodsReceiptId              String  @db.Uuid
   goodsReceiptDetailId        String  @db.Uuid
   reasonId                    String  @db.Uuid
-  changedById                 String? @db.Uuid
+  changedById                 String  @db.Uuid
   inventoryMovementId         String? @unique @db.Uuid
   previousMaterialId          String  @db.Uuid
   previousMaterialName        String  @db.VarChar(200)
@@ -707,7 +707,7 @@ model GoodsReceiptDetailChange {
   goodsReceipt       GoodsReceipt          @relation(fields: [goodsReceiptId], references: [id])
   goodsReceiptDetail GoodsReceiptDetail    @relation(fields: [goodsReceiptDetailId], references: [id])
   reason             StockAdjustmentReason @relation(fields: [reasonId], references: [id])
-  changedBy          User?                 @relation(fields: [changedById], references: [id], onDelete: Restrict)
+  changedBy          User                  @relation(fields: [changedById], references: [id], onDelete: Restrict)
   previousMaterial   Material              @relation("PreviousGoodsReceiptDetailChangeMaterial", fields: [previousMaterialId], references: [id])
   correctedMaterial  Material              @relation("CorrectedGoodsReceiptDetailChangeMaterial", fields: [correctedMaterialId], references: [id])
   inventoryMovement  InventoryMovement?    @relation(fields: [inventoryMovementId], references: [id], onDelete: SetNull)

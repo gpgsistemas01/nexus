@@ -103,7 +103,9 @@ export const createGoodsReceiptDetailChange = async ({
         data: {
             goodsReceiptId,
             goodsReceiptDetailId,
-            changedById,
+            changedBy: {
+                connect: { id: changedById }
+            },
             reasonId,
             inventoryMovementId,
             previousMaterialId: currentDetail.materialId,
