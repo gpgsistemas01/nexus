@@ -341,15 +341,32 @@ export const toggleButtons = ({
     }
 }
 
-export const clearAddedMaterialInput = () => {
+export const clearAddedItemInput = ({
+    itemSelector,
+    quantitySelector,
+    presentationSelector,
+    costSelector = null,
+    clearItemOptions = false
+}) => {
+    const itemInput = document.querySelector(itemSelector);
 
-    $('#materialInput').empty().trigger('change');
-    document.querySelector('#quantityInput').value = '';
-    document.querySelector('#presentationDisplayInput').value = '';
-    const costInput = document.querySelector('#costPerUnitInput');
+    if (clearItemOptions) itemInput.replaceChildren();
+    itemInput.value = '';
+    itemInput.dispatchEvent(new Event('change', { bubbles: true }));
+    document.querySelector(quantitySelector).value = '';
+    document.querySelector(presentationSelector).value = '';
+    const costInput = costSelector ? document.querySelector(costSelector) : null;
 
     if (costInput) costInput.value = '';
-}
+};
+
+export const clearAddedMaterialInput = () => clearAddedItemInput({
+    itemSelector: '#materialInput',
+    quantitySelector: '#quantityInput',
+    presentationSelector: '#presentationDisplayInput',
+    costSelector: '#costPerUnitInput',
+    clearItemOptions: true
+});
 
 export const toggleInvoiceInput = ({ value, mode, form }) => {
 
