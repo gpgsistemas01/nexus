@@ -54,14 +54,14 @@ describe('catalog controllers database integration', () => {
 
 
   it('guarda catálogos en DATABASE_TEST_URL y los lee desde sus controllers', async () => {
-    const [department, presentation, unit] = await Promise.all([
-      prisma.department.create({ data: { name: names.department } }),
-      prisma.presentation.create({ data: { name: names.presentation } }),
-      prisma.unitMeasure.create({ data: { name: names.unit, symbol: names.unitSymbol } }),
-      prisma.role.create({ data: { name: names.role } }),
-      prisma.fulfillmentStatus.create({ data: { name: names.status } }),
-      prisma.stockAdjustmentReason.create({ data: { name: names.reason } })
-    ]);
+    const department = await prisma.department.create({ data: { name: names.department } });
+    const presentation = await prisma.presentation.create({ data: { name: names.presentation } });
+    const unit = await prisma.unitMeasure.create({
+      data: { name: names.unit, symbol: names.unitSymbol }
+    });
+    await prisma.role.create({ data: { name: names.role } });
+    await prisma.fulfillmentStatus.create({ data: { name: names.status } });
+    await prisma.stockAdjustmentReason.create({ data: { name: names.reason } });
 
     const cases = [
       ['/departments', names.department, { id: department.id, name: names.department }],

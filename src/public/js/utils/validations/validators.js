@@ -1,5 +1,5 @@
 import { isEmptyOrNull } from "./baseValidations.js";
-import { validateName, validatePassword, validateNumber, validateUsername, validateTextOptional, validateMeasure, validateDateOptional, validateGoodsReceiptDetailsArray, validateDate, validateText, validateNumberOptional, validateGoodsIssueDetailsArray, validateNonNegativeNumber, validatePositiveNumber, validatePairedOptionalNumber, validatePersonAccessesArray } from "./fieldValidations.js";
+import { validateName, validatePassword, validateNumber, validateUsername, validateTextOptional, validateMeasure, validateDateOptional, validateGoodsReceiptDetailsArray, validateDate, validateText, validateNumberOptional, validateGoodsIssueDetailsArray, validateNonNegativeNumber, validatePositiveNumber, validatePairedOptionalNumber, validatePersonAccessesArray, validateWasteIssueDetailsArray } from "./fieldValidations.js";
 
 export const supplierValidation = {
     legalName: (value) => validateText({
@@ -107,30 +107,46 @@ export const goodsReceiptCorrectionValidation = {
 };
 
 
-export const goodsIssueValidation = {
+export const issueHeaderValidation = {
     projectNumber: (value) => validateText({
         name: value,
-        maxLength: 10,
+        length: 10,
         fieldName: 'El número de proyecto'
     }),
     advisorId: (value) => isEmptyOrNull(value, 'El asesor'),
     clientId: (value) => isEmptyOrNull(value, 'El cliente'),
-    departmentId: (value) => isEmptyOrNull(value, 'El cliente'),
+    departmentId: (value) => isEmptyOrNull(value, 'El área'),
     requesterId: (value) => isEmptyOrNull(value, 'El solicitante'),
     observations: (value) => validateTextOptional(value, 500, 'Las observaciones'),
-    requestDate: (value) => validateDate(value, 'La fecha de solicitud'),
+    requestDate: (value) => validateDate(value, 'La fecha de solicitud')
+};
+
+export const goodsIssueValidation = {
+    ...issueHeaderValidation,
     details: validateGoodsIssueDetailsArray
 }
+
+export const wasteIssueValidation = {
+    ...issueHeaderValidation,
+    details: validateWasteIssueDetailsArray
+};
+
+export const addWasteIssueDetailValidation = {
+    wasteId: value => isEmptyOrNull(value, 'La merma'),
+    quantity: value => validatePositiveNumber(value, 'La cantidad')
+};
 
 export const goodsIssueDetailsValidation = {
     projectConvertedQuantity: (value) => validateNumber(value, 'La cantidad')
 }
 
 
-export const goodsIssueReturnValidation = {
+export const issueReturnValidation = {
     returnQuantity: (value) => validatePositiveNumber(value, 'La cantidad a devolver'),
     observations: (value) => validateTextOptional(value, 500, 'Las observaciones')
 };
+
+export const goodsIssueReturnValidation = issueReturnValidation;
 
 export const purchaseRequisitionValidation = {
     projectId: (value) => isEmptyOrNull(value, 'El proyecto'),

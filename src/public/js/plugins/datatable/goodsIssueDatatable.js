@@ -2,8 +2,9 @@ import { openGoodsIssueModal } from "../../pages/warehouse/goodsIssues/goodsIssu
 import { getAllGoodsIssues } from "../../application/warehouse/goodsIssues/goodsIssues.js";
 import { exportGoodsIssueReport } from "../../application/warehouse/report.js";
 import { buildExcelButton, buildTableExportParams } from "../../ui/tableUI.js";
-import { formatDateTimeDisplay, formatFileName } from "../../utils/formatters.js";
-import { createDataTable, renderActionButtons, resetDataTable } from "./baseDatatable.js";
+import { formatFileName } from "../../utils/formatters.js";
+import { createDataTable, renderActionButtons } from "./baseDatatable.js";
+import { createIssueDetailDatatable } from "./issueDetailDatatable.js";
 import { buildDetailsColumns, buildDetailsHeader } from "./utils/builderDetailDatatable.js";
 import { handleDelete, renderWarehouseItemName } from "./utils/detailDatatableUtils.js";
 import { getResponsiveRowData } from "./utils/responsive.js";
@@ -11,6 +12,7 @@ import { setupTableFilters } from "./utils/filters/tableFilter.js";
 import { DATATABLE_SELECTORS } from "../../constants/selectors.js";
 import { FORM_MODES } from "../../constants/formModes.js";
 import { FULFILLMENT_STATUS_NAMES } from "../../constants/fulfillmentStatuses.js";
+import { buildIssueHeaderColumns } from './issueDatatable.js';
 
 export let details = [];
 const selectorMaterialTable = DATATABLE_SELECTORS.MATERIAL;
@@ -25,29 +27,7 @@ export const createGoodsIssueDatatable = async (context) => {
 
     let table;
 
-    const { isWarehouse = false, isSystem = false } = context.organization || {};
-
-    const columns = [
-        { data: 'referenceNumber', title: 'Folio' },
-        {
-            data: null,
-            title: 'Solicitud',
-            render: (data, type, row) => {
-
-                const name = row.requesterName;
-                const date = formatDateTimeDisplay(row.requestDate);
-
-                return `<div>${ name }<br><small>${ date }</small></div>`;
-            }
-        }
-    ];
-
-    if (isWarehouse || isSystem) {
-        columns.push({
-            data: 'departmentName',
-            title: 'Área'
-        });
-    }
+    const columns = buildIssueHeaderColumns({ context });
 
     columns.push(
         { data: 'projectNumber', title: 'Proyecto' },
@@ -132,11 +112,7 @@ export const initDetailsGoodsIssueTable = (mode, context) => {
         isSystem = false
     } = context.organization || {};
 
-    resetDataTable(selectorMaterialTable);
-
-    const table = document.querySelector(selectorMaterialTable);
-
-    table.innerHTML = buildDetailsHeader({
+    const header = buildDetailsHeader({
         type: 'issue',
         mode,
         isWarehouse,
@@ -153,14 +129,11 @@ export const initDetailsGoodsIssueTable = (mode, context) => {
         isSystem
     });
 
-    materialTable = createDataTable({
+    materialTable = createIssueDetailDatatable({
         selector: selectorMaterialTable,
-        options: {
-            data: details,
-            columns,
-            responsive: true,
-            autoWidth: false
-        }
+        data: details,
+        columns,
+        header
     });
 };
 

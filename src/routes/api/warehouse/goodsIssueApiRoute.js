@@ -7,9 +7,15 @@ import {
     editGoodsIssueHeader,
     getAllGoodsIssues,
     registerGoodsIssue,
-    returnGoodsIssueDetailLine,
+    returnGoodsIssueDetail
 } from '../../../controllers/api/warehouse/goodsIssueController.js';
-import { goodsIssueDetailsValidation, goodsIssueHeaderValidation, goodsIssueReturnValidation, goodsIssueUpdateValidation, goodsIssueValidation } from '../../../validators/forms/goodsIssueValidations.js';
+import {
+    goodsIssueDetailsValidation,
+    goodsIssueHeaderValidation,
+    goodsIssueReturnValidation,
+    goodsIssueUpdateValidation,
+    goodsIssueValidation
+} from '../../../validators/forms/goodsIssueValidations.js';
 import { PERMISSIONS } from '../../../constants/permissions.js';
 
 const router = express.Router();
@@ -49,8 +55,6 @@ router.patch(
     authorizeUserApi(PERMISSIONS.GOODS_ISSUES_MANAGE),
     editGoodsIssueHeader
 );
-
-
 router.patch(
     '/:id/details',
     verifyApiTokenRequired,
@@ -67,7 +71,7 @@ router.patch(
     goodsIssueReturnValidation,
     validate,
     authorizeUserApi(PERMISSIONS.GOODS_ISSUE_DETAILS_MANAGE),
-    returnGoodsIssueDetailLine
+    returnGoodsIssueDetail
 );
 
 export default router;

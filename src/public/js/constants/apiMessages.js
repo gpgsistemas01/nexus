@@ -312,6 +312,8 @@ const successMessages = {
     CREATED_WASTE: '¡Merma registrada exitosamente!',
     UPDATED_WASTE: '¡Merma actualizada exitosamente!',
     DELETED_WASTE: '¡Merma eliminada exitosamente!',
+    CREATED_WASTE_ISSUE: '¡Salida de merma registrada exitosamente!',
+    UPDATED_WASTE_ISSUE: '¡Salida de merma surtida exitosamente!',
 };
 
 export const getErrorMessage = (data = {}) => {

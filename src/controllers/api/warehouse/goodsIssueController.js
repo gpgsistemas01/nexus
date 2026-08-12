@@ -1,13 +1,19 @@
-import { createGoodsIssueDetailsDtoForEdit, createGoodsIssueDtoForEdit, createGoodsIssueDtoForRegister, createGoodsIssueDtoForReturn, createGoodsIssueHeaderDtoForEdit } from "../../../dtos/goodsIssueDTO.js";
+import {
+    createGoodsIssueDetailsDtoForEdit,
+    createGoodsIssueDtoForEdit,
+    createGoodsIssueDtoForRegister,
+    createGoodsIssueDtoForReturn,
+    createGoodsIssueHeaderDtoForEdit
+} from "../../../dtos/goodsIssueDTO.js";
 import { successCodeMessages } from "../../../messages/codeMessages.js";
 import {
     createGoodsIssue,
     findAllGoodsIssues,
     updateGoodsIssue,
     updateGoodsIssueDetails,
-    updateGoodsIssueHeader,
-    returnGoodsIssueDetail
+    updateGoodsIssueHeader
 } from "../../../services/warehouse/goodsIssues/goodsIssueService.js";
+import { returnGoodsIssueDetail as returnGoodsIssueDetailService } from '../../../services/warehouse/goodsIssues/goodsIssueReturnService.js';
 import { getDataTableOrder, getDataTablePaging, getDataTableSearch } from "../../../utils/requestQueryUtils.js";
 import { sanitizeEmptyStrings } from "../../../utils/formattersUtils.js";
 import { emitMaterialsUpdated } from "../../../utils/socketUtils.js";
@@ -115,14 +121,12 @@ export const editGoodsIssueHeader = async (req, res) => {
         code: successCodeMessages.UPDATED_GOODS_ISSUE
     });
 };
-
-
-export const returnGoodsIssueDetailLine = async (req, res) => {
+export const returnGoodsIssueDetail = async (req, res) => {
 
     const returnDto = createGoodsIssueDtoForReturn(req.body);
     const sanitizedReturnDto = sanitizeEmptyStrings(returnDto);
 
-    const goodsIssueReturn = await returnGoodsIssueDetail({
+    const goodsIssueReturn = await returnGoodsIssueDetailService({
         id: req.params.id,
         detailId: req.params.detailId,
         returnDto: sanitizedReturnDto,
