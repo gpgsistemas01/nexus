@@ -1,4 +1,4 @@
-import { INTERNAL_CLIENT_NAME } from "../../../constants/goodsIssueRules.js";
+import { INTERNAL_CLIENT_NAME } from "../../../constants/issueHeaderRules.js";
 import { ROLE_NAMES } from "../../../constants/roles.js";
 import { normalizeText } from "../../../utils/formattersUtils.js";
 

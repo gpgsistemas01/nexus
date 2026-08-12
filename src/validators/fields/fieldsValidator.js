@@ -257,42 +257,93 @@ export const validateDetailsArray =
         })
 ;
 
+export const validateIssueDetailsArray = ({
+    allowDetailId = false,
+    exclusiveMinimum = true,
+    itemIdField,
+    minimumQuantity = 0,
+    requireSupplier = false
+}) => body('details')
+    .isArray({ min: 1 }).withMessage(errorMap['details'].REQUIRED)
+    .bail()
+    .custom(details => {
+
+        const ids = new Set();
+
+        details.forEach(detail => {
+
+            if (detail.id) {
+                if (!allowDetailId || !uuidV4Regex.test(detail.id)) {
+                    throw new Error(errorMap['details'].INVALID_FORMAT_ID);
+                }
+
+                if (ids.has(detail.id)) {
+                    throw new Error(errorMap['details'].INVALID_FORMAT_ID);
+                }
+
+                ids.add(detail.id);
+            }
+
+            if (!detail[itemIdField] || !uuidV4Regex.test(detail[itemIdField])) {
+                throw new Error(errorMap['details'].INVALID_FORMAT_REQUIRED);
+            }
+
+            if (requireSupplier && (!detail.supplierId || !uuidV4Regex.test(detail.supplierId))) {
+                throw new Error(errorMap['details'].INVALID_FORMAT_SUPPLIER);
+            }
+
+            const quantity = Number(detail.quantity);
+            const hasInvalidQuantity = exclusiveMinimum
+                ? quantity <= minimumQuantity
+                : quantity < minimumQuantity;
+
+            if (
+                detail.quantity === ''
+                || detail.quantity === null
+                || detail.quantity === undefined
+                || !Number.isFinite(quantity)
+                || hasInvalidQuantity
+                || !/^\d{1,8}(\.\d{1,2})?$/.test(String(detail.quantity))
+            ) {
+                throw new Error(errorMap['details'].INVALID_FORMAT_QUANTITY);
+            }
+        });
+
+        return true;
+    })
+;
+
 export const validateGoodsIssueDetailsArray = ({ allowDetailId = false } = {}) =>
-    body('details')
-        .isArray({ min: 1 }).withMessage(errorMap['details'].REQUIRED)
-        .custom(details => {
+    validateIssueDetailsArray({
+        allowDetailId,
+        exclusiveMinimum: false,
+        itemIdField: 'materialId',
+        minimumQuantity: 1,
+        requireSupplier: true
+    })
+;
 
-            const ids = new Set();
+export const validateIssueDetailsEdition = body('details')
+    .isArray({ min: 1 }).withMessage(errorMap['details'].REQUIRED)
+    .bail()
+    .custom(details => {
 
-            details.forEach(detail => {
+        const ids = new Set();
 
-                if (detail.id) {
-                    if (!allowDetailId || !uuidV4Regex.test(detail.id)) {
-                        throw new Error(errorMap['details'].INVALID_FORMAT_ID);
-                    }
+        details.forEach(detail => {
+            if (!detail.id || !uuidV4Regex.test(detail.id) || ids.has(detail.id)) {
+                throw new Error(errorMap['details'].INVALID_FORMAT_ID);
+            }
 
-                    if (ids.has(detail.id)) {
-                        throw new Error(errorMap['details'].INVALID_FORMAT_ID);
-                    }
+            ids.add(detail.id);
 
-                    ids.add(detail.id);
-                }
+            if (typeof detail.isSupplied !== 'boolean') {
+                throw new Error(errorMap['details'].INVALID_FORMAT_REQUIRED);
+            }
+        });
 
-                if (!detail.materialId || !detail.quantity) {
-                    throw new Error(errorMap['details'].INVALID_FORMAT_REQUIRED);
-                }
-
-                if (!detail.supplierId) {
-                    throw new Error(errorMap['details'].INVALID_FORMAT_SUPPLIER);
-                }
-
-                const qty = Number(detail.quantity);
-
-                if (!Number.isFinite(qty) || qty < 1) throw new Error(errorMap['details'].INVALID_FORMAT_QUANTITY);
-            });
-
-            return true;
-        })
+        return true;
+    })
 ;
 
 export const validateGoodsIssueDetailsEdition =

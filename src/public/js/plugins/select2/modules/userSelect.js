@@ -10,28 +10,15 @@ const departmentScopedSelector = `${ modalSelector } ${ departmentSelector }`;
 const roleScopedSelector = `${ modalSelector } ${ roleSelector }`;
 
 export const initUserFormSelect2 = () => {
-    initDepartmentSelect({
-        modalSelector,
-        baseSelector: departmentScopedSelector,
-        allowCreate: false
-    });
-
-    initRoleSelect({
-        modalSelector,
-        baseSelector: roleScopedSelector
-    });
+    [
+        [initDepartmentSelect, { modalSelector, baseSelector: departmentScopedSelector, allowCreate: false }],
+        [initRoleSelect, { modalSelector, baseSelector: roleScopedSelector }]
+    ].forEach(([initialize, options]) => initialize(options));
 };
 
 export const setUserFormSelectOptions = (data = null) => {
-    toggleDepartmentOption({
-        selector: departmentScopedSelector,
-        id: data?.departmentId,
-        name: data?.departmentName
-    });
-
-    toggleRoleOption({
-        selector: roleScopedSelector,
-        id: data?.roleId,
-        name: data?.roleName
-    });
+    [
+        [toggleDepartmentOption, departmentScopedSelector, data?.departmentId, data?.departmentName],
+        [toggleRoleOption, roleScopedSelector, data?.roleId, data?.roleName]
+    ].forEach(([toggleOption, selector, id, name]) => toggleOption({ selector, id, name }));
 };

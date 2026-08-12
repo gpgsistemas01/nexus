@@ -1,20 +1,21 @@
-<% const returnTotalsSummary = {
+<% const issueReturnPrefix = typeof returnPrefix === 'undefined' ? 'goodsIssue' : returnPrefix;
+const returnTotalsSummary = {
     class: 'row g-2 goods-issue-return-summary',
     items: [
         {
-            id: 'goodsIssueReturnSuppliedQuantity',
+            id: `${ issueReturnPrefix }ReturnSuppliedQuantity`,
             label: 'Cantidad surtida',
             value: '0.00',
             rawValue: 0
         },
         {
-            id: 'goodsIssueReturnReturnedQuantity',
+            id: `${ issueReturnPrefix }ReturnReturnedQuantity`,
             label: 'Cantidad devuelta',
             value: '0.00',
             rawValue: 0
         },
         {
-            id: 'goodsIssueReturnAvailableQuantity',
+            id: `${ issueReturnPrefix }ReturnAvailableQuantity`,
             label: 'Disponible para devolver',
             value: '0.00',
             rawValue: 0
@@ -23,7 +24,7 @@
 };
 
 const returnForm = {
-    id: 'goodsIssueReturnForm',
+    id: `${ issueReturnPrefix }ReturnForm`,
     sections: [
         {
             title: 'Devolución del detalle',
@@ -32,7 +33,7 @@ const returnForm = {
                     type: 'inputs',
                     items: [
                         {
-                            id: 'goodsIssueReturnQuantityInput',
+                            id: `${ issueReturnPrefix }ReturnQuantityInput`,
                             name: 'returnQuantity',
                             type: 'number',
                             label: 'Cantidad a devolver',
@@ -48,7 +49,7 @@ const returnForm = {
                 {
                     type: 'textarea',
                     input: {
-                        id: 'goodsIssueReturnObservationsInput',
+                        id: `${ issueReturnPrefix }ReturnObservationsInput`,
                         name: 'observations',
                         label: 'Observaciones',
                         attrs: {
@@ -64,7 +65,7 @@ const returnForm = {
             groups: [
                 {
                     type: 'html',
-                    content: include('../../../../shared/totalsSummary', { totals: returnTotalsSummary })
+                    content: include('../totalsSummary', { totals: returnTotalsSummary })
                 }
             ]
         }
@@ -88,8 +89,8 @@ const returnForm = {
     ]
 }; %>
 
-<%- include('../../../../shared/modal', {
-    modalId: 'goodsIssueReturnModal',
+<%- include('../modal', {
+    modalId: `${ issueReturnPrefix }ReturnModal`,
     modalTitle: 'Devolver detalle de salida',
     dialogClass: 'modal-lg modal-dialog-scrollable',
     form: returnForm

@@ -1,21 +1,27 @@
-import { useForm } from "../../../application/form.js";
-import { editGoodsIssue, editGoodsIssueDetails, editGoodsIssueHeader, registerGoodsIssue } from "../../../application/warehouse/goodsIssues/goodsIssues.js";
+import {
+    editGoodsIssue,
+    editGoodsIssueDetails,
+    editGoodsIssueHeader,
+    registerGoodsIssue,
+    returnGoodsIssueDetail
+} from "../../../application/warehouse/goodsIssues/goodsIssues.js";
 import { addGoodsIssueMaterialValidation, goodsIssueDetailsValidation, goodsIssueValidation } from "../../../utils/validations/validators.js";
 import { refreshMaterialTable } from "../../../plugins/datatable/utils/renderMaterialDatatable.js";
 import { createGoodsIssueDatatable, details, initDetailsGoodsIssueTable } from "../../../plugins/datatable/goodsIssueDatatable.js";
-import { initGoodsIssueFormSelect2, setGoodsIssueFormSelectOptions, syncGoodsIssueDependentSelectsState } from "../../../plugins/select2/modules/goodsIssueSelect.js";
+import { getGoodsIssueHeaderSelects } from "../../../plugins/select2/modules/goodsIssueSelect.js";
 import { setFormDisabled, toggleButtons, clearAddedMaterialInput, clearFormErrors, normalizeFormErrors, initForm } from "../../../ui/formUI.js";
 import { on } from "../../../utils/domUtils.js";
 import { setDateTimePickerValue } from "../../../plugins/flatpickr/dateTimePicker.js";
-import { handleSubmit, hasValidationErrors, syncCheckboxControlledInputs, toggleDisabledElement, validateDetailsFields, validateFields } from "../../../utils/formUtils.js";
+import { hasValidationErrors, syncCheckboxControlledInputs, validateDetailsFields, validateFields } from "../../../utils/formUtils.js";
 import { buildModalTitle, openModal } from "../../../ui/modalUI.js";
 import { FORM_SELECTORS, MODAL_SELECTORS } from "../../../constants/selectors.js";
 import { FORM_MODES } from "../../../constants/formModes.js";
 import { FULFILLMENT_STATUS_NAMES } from "../../../constants/fulfillmentStatuses.js";
 import { formatDecimal, roundTo } from "../../../utils/formatUtils.js";
-import { initGoodsIssueReturnModal, openGoodsIssueReturnModal } from "./returns/returnModal.js";
+import { createIssueHeaderForm, useIssueForm } from "../../../ui/issues/issueFormUI.js";
+import { createIssueReturn } from "../../../ui/issues/issueReturnUI.js";
+import { mapGoodsIssueDetailDisplay } from "../../../utils/warehouse/issueDisplayUtils.js";
 
-const HEADER_FIELD_NAMES = ['clientId', 'advisorId', 'departmentId', 'requesterId', 'projectNumber', 'requestDate', 'observations'];
 const ENABLED_HEADER_MODES = [FORM_MODES.CREATE, FORM_MODES.EDIT, FORM_MODES.EDIT_HEADER];
 const modalId = MODAL_SELECTORS.GOODS_ISSUE;
 const formId = FORM_SELECTORS.GOODS_ISSUE;
@@ -24,23 +30,17 @@ const GOODS_ISSUE_ENTITY_NAME = 'salida';
 const context = window.meta || {};
 let currentGoodsIssue = null;
 
+const issueHeaderForm = createIssueHeaderForm({
+    formSelector: formId,
+    selects: getGoodsIssueHeaderSelects()
+});
+const goodsIssueReturn = createIssueReturn({
+    prefix: 'goodsIssue',
+    sendReturn: returnGoodsIssueDetail
+});
+
 createGoodsIssueDatatable(context);
-initGoodsIssueReturnModal();
-
-
-const setGoodsIssueHeaderFieldsDisabled = ({ form, isDisabled }) => {
-
-    HEADER_FIELD_NAMES.forEach(fieldName => {
-        const field = form.elements[fieldName];
-
-        if (!field) return;
-
-        toggleDisabledElement({
-            element: field,
-            isDisabled: isDisabled
-        });
-    });
-};
+goodsIssueReturn.initialize();
 
 
 const normalizeGoodsIssueData = ({ form, formData }) => {
@@ -67,7 +67,7 @@ const normalizeGoodsIssueData = ({ form, formData }) => {
     };
 };
 
-useForm({
+useIssueForm({
     selector: formId,
     normalizeData: normalizeGoodsIssueData,
     getErrors: ({ form, formData }) => {
@@ -82,21 +82,10 @@ useForm({
 
         return errors;
     },
-    sendRequest: async ({ formData, form }) => {
-
-        const update = form.dataset.mode === FORM_MODES.EDIT_DETAIL
-            ? editGoodsIssueDetails
-            : form.dataset.mode === FORM_MODES.EDIT_HEADER
-                ? editGoodsIssueHeader
-                : editGoodsIssue;
-
-        await handleSubmit({
-            form,
-            formData,
-            create: registerGoodsIssue,
-            update
-        });
-    },
+    register: registerGoodsIssue,
+    edit: editGoodsIssue,
+    editDetails: editGoodsIssueDetails,
+    editHeader: editGoodsIssueHeader
 });
 
 
@@ -118,20 +107,15 @@ export const openGoodsIssueModal = ({ mode, data = null }) => {
         showAddMaterial: mode === FORM_MODES.CREATE || (mode === FORM_MODES.EDIT && data?.fulfillmentStatus?.name === FULFILLMENT_STATUS_NAMES.PENDING)
     });
     setFormDisabled({ form, isDisabled: false });
-    initGoodsIssueFormSelect2();
-    setGoodsIssueFormSelectOptions(data);
-    setGoodsIssueHeaderFieldsDisabled({
-        form,
+    issueHeaderForm.initialize({
+        data,
         isDisabled: !ENABLED_HEADER_MODES.includes(mode)
     });
-    syncGoodsIssueDependentSelectsState();
 
     details.length = 0;
 
     if (mode === FORM_MODES.CREATE) {
 
-        form.reset();
-        syncGoodsIssueDependentSelectsState();
         modalElement.querySelector('#modalTitle').textContent = 'Registrar salida';
         form.querySelector('#submitBtn').textContent = 'Guardar';
         form.querySelector('#presentationDisplayInput').value = '';
@@ -142,41 +126,41 @@ export const openGoodsIssueModal = ({ mode, data = null }) => {
         form.querySelector('#observationsInput').value = data.observations || '';
         setDateTimePickerValue(form.querySelector('#requestDateInput'), data.requestDate);
         form.querySelector('#projectNumberInput').value = data.projectNumber;
-        const modalDetails = data.details.map(detail => ({
-            id: detail.id,
-            materialId: detail.materialId,
-            supplierId: detail.supplierId,
-            presentationId: detail.presentationId ?? detail.material?.presentation?.id ?? null,
-            unitMeasureId: detail.unitMeasureId ?? detail.material?.unitMeasure?.id ?? null,
-            materialName: detail.materialName,
-            materialBase: detail.materialBase ?? detail.material?.base ?? null,
-            materialHeight: detail.materialHeight ?? detail.material?.height ?? null,
-            quantity: detail.quantity,
-            presentationName: detail.presentationName ?? detail.material?.presentation?.name ?? '',
-            convertedQuantity: detail.convertedQuantity,
-            unitMeasureName: detail.unitMeasureName ?? detail.material?.unitMeasure?.name ?? '',
-            unitMeasureSymbol: detail.unitMeasureSymbol ?? detail.material?.unitMeasure?.symbol ?? '',
-            maxUnitCost: detail.maxUnitCost,
-            projectConvertedQuantity: detail.projectConvertedQuantity,
-            convertedQuantityDifference: detail.convertedQuantityDifference,
-            supplierName: detail.supplierName ?? detail.supplier?.tradeName ?? '',
-            suppliedQuantity: detail.suppliedQuantity,
-            returnedQuantity: detail.returnedQuantity,
-            isSupplied: detail.isSupplied,
-            fulfillmentStatus: detail.fulfillmentStatus,
-            originalIsSupplied: detail.isSupplied,
-            originalProjectConvertedQuantity: detail.projectConvertedQuantity ?? null,
-            originalConvertedQuantityDifference: detail.convertedQuantityDifference ?? null
-        }));
+        const modalDetails = data.details.map(detail => {
+            const display = mapGoodsIssueDetailDisplay(detail);
+
+            return {
+                id: detail.id,
+                materialId: detail.materialId,
+                supplierId: detail.supplierId,
+                presentationId: detail.presentationId ?? detail.material?.presentation?.id ?? null,
+                unitMeasureId: detail.unitMeasureId ?? detail.material?.unitMeasure?.id ?? null,
+                materialName: detail.materialName,
+                materialBase: display.base,
+                materialHeight: display.height,
+                quantity: detail.quantity,
+                presentationName: display.presentationName,
+                convertedQuantity: detail.convertedQuantity,
+                unitMeasureName: display.unitMeasureName,
+                unitMeasureSymbol: display.unitMeasureSymbol,
+                maxUnitCost: detail.maxUnitCost,
+                projectConvertedQuantity: detail.projectConvertedQuantity,
+                convertedQuantityDifference: detail.convertedQuantityDifference,
+                supplierName: display.supplierName,
+                suppliedQuantity: detail.suppliedQuantity,
+                returnedQuantity: detail.returnedQuantity,
+                isSupplied: detail.isSupplied,
+                fulfillmentStatus: detail.fulfillmentStatus,
+                originalIsSupplied: detail.isSupplied,
+                originalProjectConvertedQuantity: detail.projectConvertedQuantity ?? null,
+                originalConvertedQuantityDifference: detail.convertedQuantityDifference ?? null
+            };
+        });
 
         details.push(...modalDetails);
 
         setFormDisabled({ form, isDisabled: mode !== FORM_MODES.EDIT && mode !== FORM_MODES.EDIT_HEADER });
-        setGoodsIssueHeaderFieldsDisabled({
-            form,
-            isDisabled: !ENABLED_HEADER_MODES.includes(mode)
-        });
-        syncGoodsIssueDependentSelectsState();
+        issueHeaderForm.setDisabled(!ENABLED_HEADER_MODES.includes(mode));
 
         if (mode === FORM_MODES.EDIT || mode === FORM_MODES.EDIT_HEADER) {
 
@@ -344,9 +328,5 @@ on('click', '#materialTable .return-issue-detail-btn', (event, button) => {
 
     if (!detail || !currentGoodsIssue) return;
 
-    openGoodsIssueReturnModal({
-        goodsIssue: currentGoodsIssue,
-        detail,
-        issueDetails: details
-    });
+    goodsIssueReturn.open({ issue: currentGoodsIssue, detail });
 });

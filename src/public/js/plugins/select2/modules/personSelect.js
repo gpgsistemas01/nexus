@@ -5,14 +5,16 @@ const departmentSelector = '#personDepartmentInput';
 const roleSelector = '#personRoleInput';
 
 export const initPersonFormSelect2 = ({ modalSelector }) => {
-    initDepartmentSelect({
-        modalSelector,
-        clearOnOpen: false,
-        baseSelector: `${ modalSelector } ${ departmentSelector }`,
-        allowCreate: false
-    });
-    initRoleSelect({
-        modalSelector,
-        baseSelector: `${ modalSelector } ${ roleSelector }`
-    });
+    [
+        [initDepartmentSelect, {
+            modalSelector,
+            clearOnOpen: false,
+            baseSelector: `${ modalSelector } ${ departmentSelector }`,
+            allowCreate: false
+        }],
+        [initRoleSelect, {
+            modalSelector,
+            baseSelector: `${ modalSelector } ${ roleSelector }`
+        }]
+    ].forEach(([initialize, options]) => initialize(options));
 };

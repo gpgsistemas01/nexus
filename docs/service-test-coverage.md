@@ -39,7 +39,8 @@ Las integraciones no usan `describe.skip`: si falta la URL o el cliente Prisma, 
 Se deben incorporar como integraciones desde controller, no restaurar como pruebas directas de servicio:
 
 - personas y usuarios con sus relaciones;
-- salidas de almacén y afectación de stock;
+- salidas de material y afectación de stock (las salidas de merma ya cuentan con
+  integración HTTP, persistencia, movimiento y verificación de rollback);
 - entradas de compra, movimientos y costos;
 - ajustes de material y movimientos de inventario;
 - requisiciones de compra completas.

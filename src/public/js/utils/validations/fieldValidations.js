@@ -244,6 +244,40 @@ export const validateGoodsIssueDetailsArray = (details) => {
     return null;
 }
 
+export const validateWasteIssueDetailsArray = details => {
+
+    if (!Array.isArray(details) || !details.length) {
+        return 'La lista de detalles debe contener al menos una merma.';
+    }
+
+    const wasteIds = new Set();
+
+    for (const detail of details) {
+
+        if (!detail.wasteId || detail.quantity === '' || detail.quantity === null || detail.quantity === undefined) {
+            return 'Cada detalle debe contener merma y cantidad.';
+        }
+
+        if (wasteIds.has(detail.wasteId)) {
+            return 'No se puede repetir la misma merma en una salida.';
+        }
+
+        wasteIds.add(detail.wasteId);
+
+        const quantity = Number(detail.quantity);
+
+        if (
+            !Number.isFinite(quantity)
+            || quantity <= 0
+            || !/^\d{1,8}(\.\d{1,2})?$/.test(String(detail.quantity))
+        ) {
+            return 'La cantidad de cada detalle debe ser un número mayor a cero.';
+        }
+    }
+
+    return null;
+};
+
 export const validatePersonAccessesArray = accesses => {
     if (!Array.isArray(accesses) || !accesses.length) {
         return 'Seleccione un área y un rol, y presione Agregar para incluir el acceso en la tabla';

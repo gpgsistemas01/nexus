@@ -8,7 +8,7 @@ const router = express.Router();
 router.get(
     '/',
     verifyCookiesAuthTokenRequired,
-    authorizeUserWeb(PERMISSIONS.WASTES_PAGE_VIEW),
+    authorizeUserWeb(PERMISSIONS.WASTE_ISSUES_PAGE_VIEW),
     getWasteIssuesPage
 );
 
