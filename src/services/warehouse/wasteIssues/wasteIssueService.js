@@ -81,7 +81,6 @@ const resolveWasteIssueHeaderData = async ({ tx, dto }) => {
 };
 
 const createWasteIssueDetailSnapshot = ({ waste, detail, fulfillmentStatusId }) => ({
-    wasteId: waste.id,
     materialName: waste.supplierMaterial.material.name,
     quantity: detail.quantity,
     convertedQuantity: calculateConvertedQuantity({
@@ -89,6 +88,9 @@ const createWasteIssueDetailSnapshot = ({ waste, detail, fulfillmentStatusId }) 
         base: waste.base,
         height: waste.height
     }),
+    waste: {
+        connect: { id: waste.id }
+    },
     fulfillmentStatus: {
         connect: { id: fulfillmentStatusId }
     }

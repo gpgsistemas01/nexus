@@ -34,10 +34,8 @@ const cleanCreatedRecords = async () => {
 
 describe('waste issue controller database integration', () => {
   beforeAll(async () => {
-    const [prismaModule, controller] = await Promise.all([
-      import('../../../src/lib/prisma.js'),
-      import('../../../src/controllers/api/warehouse/wasteIssueController.js')
-    ]);
+    const prismaModule = await import('../../../src/lib/prisma.js');
+    const controller = await import('../../../src/controllers/api/warehouse/wasteIssueController.js');
     prisma = prismaModule.prisma;
     app = createControllerTestApp({
       registerRoutes: router => {
