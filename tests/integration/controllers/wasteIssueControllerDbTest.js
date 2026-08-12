@@ -51,7 +51,14 @@ describe('waste issue controller database integration', () => {
     });
 
     const statuses = ['Pendiente', 'Surtido parcial', 'Surtido', 'Cancelado'];
-    await Promise.all(statuses.map(name => prisma.fulfillmentStatus.upsert({ where: { name }, update: {}, create: { name } })));
+
+    for (const name of statuses) {
+      await prisma.fulfillmentStatus.upsert({
+        where: { name },
+        update: {},
+        create: { name }
+      });
+    }
     const unit = await prisma.unitMeasure.create({ data: { name: `IT WI Unit ${ suffix }`, symbol: `w${ suffix.slice(0, 4) }` } });
     const presentation = await prisma.presentation.create({ data: { name: `IT WasteIssue Presentation ${ suffix }` } });
     const supplier = await prisma.supplier.create({
@@ -84,15 +91,16 @@ describe('waste issue controller database integration', () => {
       details: [{ wasteId: ids.waste, quantity: 4 }]
     }).expect(201);
 
-    expect(created.body.wasteIssue).toMatchObject({
-      fulfillmentStatus: { name: 'Pendiente' },
-      details: [expect.objectContaining({
-        quantity: '4',
-        materialName: `IT WasteIssue Material ${ suffix }`,
-        convertedQuantity: '4',
-        isSupplied: false,
-        fulfillmentStatus: { name: 'Pendiente' }
-      })]
+    expect(created.body.wasteIssue.fulfillmentStatus).toMatchObject({
+      name: 'Pendiente'
+    });
+    expect(created.body.wasteIssue.details).toHaveLength(1);
+    expect(created.body.wasteIssue.details[0]).toMatchObject({
+      quantity: '4',
+      materialName: `IT WasteIssue Material ${ suffix }`,
+      convertedQuantity: '4',
+      isSupplied: false,
+      fulfillmentStatus: { name: 'Pendiente' }
     });
     const issueId = created.body.wasteIssue.id;
     const edited = await request(app).patch(`/waste-issues/${ issueId }`).send({
@@ -121,11 +129,18 @@ describe('waste issue controller database integration', () => {
     }).expect(409);
     expect(rejectedEdit.body.code).toBe('WASTE_ISSUE_ALREADY_SUPPLIED_CONFLICT');
 
-    const [issue, waste, movement] = await Promise.all([
-      prisma.wasteIssue.findUnique({ where: { id: issueId }, include: { fulfillmentStatus: true, details: { include: { fulfillmentStatus: true } } } }),
-      prisma.waste.findUnique({ where: { id: ids.waste } }),
-      prisma.wasteMovement.findFirst({ where: { wasteIssueId: issueId }, include: { details: true } })
-    ]);
+    const issue = await prisma.wasteIssue.findUnique({
+      where: { id: issueId },
+      include: {
+        fulfillmentStatus: true,
+        details: { include: { fulfillmentStatus: true } }
+      }
+    });
+    const waste = await prisma.waste.findUnique({ where: { id: ids.waste } });
+    const movement = await prisma.wasteMovement.findFirst({
+      where: { wasteIssueId: issueId },
+      include: { details: true }
+    });
     expect(issue.fulfillmentStatus.name).toBe('Surtido');
     expect(issue.observations).toBe('Encabezado editado después del surtido');
     expect(issue.details[0].fulfillmentStatus.name).toBe('Surtido');
@@ -160,11 +175,14 @@ describe('waste issue controller database integration', () => {
     }).expect(409);
 
     expect(response.body.code).toBe('WASTE_ISSUE_STOCK_CONFLICT');
-    const [after, issue, movements] = await Promise.all([
-      prisma.waste.findUnique({ where: { id: ids.waste } }),
-      prisma.wasteIssue.findUnique({ where: { id: issueId }, include: { fulfillmentStatus: true, details: true } }),
-      prisma.wasteMovement.count({ where: { wasteIssueId: issueId } })
-    ]);
+    const after = await prisma.waste.findUnique({ where: { id: ids.waste } });
+    const issue = await prisma.wasteIssue.findUnique({
+      where: { id: issueId },
+      include: { fulfillmentStatus: true, details: true }
+    });
+    const movements = await prisma.wasteMovement.count({
+      where: { wasteIssueId: issueId }
+    });
     expect(Number(after.currentStock)).toBe(Number(before.currentStock));
     expect(issue.fulfillmentStatus.name).toBe('Pendiente');
     expect(Number(issue.details[0].suppliedQuantity)).toBe(0);
