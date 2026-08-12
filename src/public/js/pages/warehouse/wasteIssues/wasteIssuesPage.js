@@ -115,6 +115,9 @@ const openEditModal = (issue) => {
 const loadWastes = async () => {
 
     const response = await getAllWastes({ start: 0, length: 1000, 'search[value]': '' });
+    const $wasteSelect = $(wasteSelect);
+
+    if ($wasteSelect.hasClass('select2-hidden-accessible')) $wasteSelect.select2('destroy');
 
     wasteSelect.innerHTML = '<option value="">Seleccione una merma</option>' + response.data.data
         .filter(waste => waste.isActive)
@@ -124,6 +127,13 @@ const loadWastes = async () => {
         })[0].outerHTML).join('');
 
     wasteSelect._wastes = new Map(response.data.data.map(waste => [waste.id, waste]));
+
+    $wasteSelect.select2({
+        language: 'es',
+        placeholder: 'Seleccione una merma',
+        width: '100%',
+        dropdownParent: $('#wasteIssueModal')
+    });
 };
 
 wasteSelect.addEventListener('change', () => {
@@ -160,7 +170,7 @@ document.querySelector('#addMaterialBtn').addEventListener('click', () => {
 
     renderDraft();
 
-    wasteSelect.value = '';
+    $(wasteSelect).val(null).trigger('change');
     quantityInput.value = '';
 
     setPresentationDisplay('');
