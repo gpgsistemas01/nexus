@@ -1,5 +1,5 @@
-import { isAppError } from '../../../errors/AppError.js';
-import { getModelLogContext, logServiceError } from '../../../utils/logger.js';
+import { isAppError } from '../errors/AppError.js';
+import { getModelLogContext, logServiceError } from '../utils/logger.js';
 
 export const handleServiceError = ({
     logger,
