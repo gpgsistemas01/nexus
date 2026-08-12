@@ -7,17 +7,14 @@ const materialSelector = FORM_SELECTORS.MATERIAL;
 const reasonSelector = FORM_SELECTORS.REASON;
 
 export const initWasteSelect2 = ({ modalSelector }) => {
-
-    setupSupplierMaterialSelect({
-        modalSelector,
-        materialSelector
-    });
-
-    initReasonSelect({
-        modalSelector,
-        baseSelector: `${ modalSelector } ${ reasonSelector }`,
-        allowCreate: false
-    });
+    [
+        [setupSupplierMaterialSelect, { modalSelector, materialSelector }],
+        [initReasonSelect, {
+            modalSelector,
+            baseSelector: `${ modalSelector } ${ reasonSelector }`,
+            allowCreate: false
+        }]
+    ].forEach(([initialize, options]) => initialize(options));
 };
 
 export const setWasteSelectOptions = ({ modalSelector, data = null }) => {

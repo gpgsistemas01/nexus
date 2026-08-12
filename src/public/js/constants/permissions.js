@@ -3,7 +3,8 @@ export const UI_PERMISSIONS = Object.freeze({
     MATERIALS_WRITE: 'materials:write',
     MATERIALS_ADJUST_STOCK: 'materials:adjust-stock',
     WASTES_WRITE: 'wastes:write',
-    WASTES_ADJUST_STOCK: 'wastes:adjust-stock'
+    WASTES_ADJUST_STOCK: 'wastes:adjust-stock',
+    WASTE_ISSUES_SUPPLY: 'waste:issues-supply'
 });
 
 export const hasPermission = (user, permission) => (

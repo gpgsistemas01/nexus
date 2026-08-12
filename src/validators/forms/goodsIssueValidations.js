@@ -1,24 +1,14 @@
-import { validateDate, validateGoodsIssueDetailsArray, validateGoodsIssueDetailsEdition, validatePositiveNumber, validateProjectNumber, validateTextOptional, validateUUID } from "../fields/fieldsValidator.js";
+import { validateGoodsIssueDetailsArray, validateGoodsIssueDetailsEdition } from "../fields/fieldsValidator.js";
+import { issueHeaderValidation } from './issueValidations.js';
+export { issueReturnValidation as goodsIssueReturnValidation } from './issueReturnValidations.js';
 
 export const goodsIssueValidation = [
-    validateUUID('advisorId'),
-    validateUUID('clientId'),
-    validateUUID('departmentId'),
-    validateUUID('requesterId'),
-    validateProjectNumber('projectNumber'),
-    validateDate('requestDate'),
-    validateTextOptional({ fieldName: 'observations', maxLength: 500 }),
+    ...issueHeaderValidation,
     validateGoodsIssueDetailsArray()
 ];
 
 export const goodsIssueUpdateValidation = [
-    validateUUID('advisorId'),
-    validateUUID('clientId'),
-    validateUUID('departmentId'),
-    validateUUID('requesterId'),
-    validateProjectNumber('projectNumber'),
-    validateDate('requestDate'),
-    validateTextOptional({ fieldName: 'observations', maxLength: 500 }),
+    ...issueHeaderValidation,
     validateGoodsIssueDetailsArray({ allowDetailId: true })
 ];
 
@@ -26,18 +16,4 @@ export const goodsIssueDetailsValidation = [
     validateGoodsIssueDetailsEdition
 ];
 
-export const goodsIssueHeaderValidation = [
-    validateUUID('advisorId'),
-    validateUUID('clientId'),
-    validateUUID('departmentId'),
-    validateUUID('requesterId'),
-    validateProjectNumber('projectNumber'),
-    validateDate('requestDate'),
-    validateTextOptional({ fieldName: 'observations', maxLength: 500 })
-];
-
-
-export const goodsIssueReturnValidation = [
-    validatePositiveNumber('returnQuantity'),
-    validateTextOptional({ fieldName: 'observations', maxLength: 500 })
-];
+export const goodsIssueHeaderValidation = issueHeaderValidation;

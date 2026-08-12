@@ -2,6 +2,7 @@ import { buildMdbActionButton } from "../../mdb/actionButton.js";
 import { bindDisabledControlWarning } from "../../../ui/disabledControlWarning.js";
 import { formatCurrency, formatDecimal } from "../../../utils/formatUtils.js";
 import { GOODS_RECEIPT_DETAIL_STATUSES, GOODS_RECEIPT_STATUS_LABELS } from "../../../constants/goodsReceiptStatuses.js";
+import { renderIssueSupplyCheckbox } from "../issueDetailDatatable.js";
 
 const DISABLED_PROJECT_QUANTITY_MESSAGE = 'Marque el detalle como surtido para capturar la cantidad de proyecto.';
 
@@ -239,15 +240,11 @@ export const buildDetailsColumns = ({ type, mode, render, isWarehouse, isCoordin
                 const detailId = row.id || row.materialId;
                 const isEditableDetail = mode === 'edit-detail' && !row.originalIsSupplied;
 
-                return `
-                    <input type="checkbox"
-                        name="isSupplied"
-                        class="form-check-input supply-checkbox"
-                        data-detail-id="${ detailId }"
-                        ${ row.isSupplied ? 'checked' : '' }
-                        ${ isEditableDetail ? '' : 'disabled' }
-                    >
-                `;
+                return renderIssueSupplyCheckbox({
+                    detailId,
+                    isSupplied: row.isSupplied,
+                    isDisabled: !isEditableDetail
+                });
             }
         });
     }

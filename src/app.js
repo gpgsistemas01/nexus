@@ -9,6 +9,7 @@ import authApiRoutes from './routes/api/authApiRoute.js';
 
 import materialApiRoutes from './routes/api/warehouse/materialApiRoute.js';
 import wasteApiRoutes from './routes/api/warehouse/wasteApiRoute.js';
+import wasteIssueApiRoutes from './routes/api/warehouse/wasteIssueApiRoute.js';
 import supplierApiRoutes  from './routes/api/warehouse/supplierApiRoute.js';
 import goodsReceiptApiRoutes from './routes/api/warehouse/goodsReceiptApiRoute.js';
 import goodsIssueApiRoutes from './routes/api/warehouse/goodsIssueApiRoute.js';
@@ -136,6 +137,7 @@ app.use(apiRoute + sales + '/clients', clientApiRoutes);
 app.use(apiRoute + sales + '/reports', salesReportApiRoutes);
 app.use(apiRoute + warehouse + '/materials', materialApiRoutes);
 app.use(apiRoute + warehouse + '/wastes', wasteApiRoutes);
+app.use(apiRoute + warehouse + '/waste-issues', wasteIssueApiRoutes);
 app.use(apiRoute + warehouse + '/suppliers', supplierApiRoutes);
 app.use(apiRoute + warehouse + '/goods-receipts', goodsReceiptApiRoutes);
 app.use(apiRoute + warehouse + '/goods-issues', goodsIssueApiRoutes);

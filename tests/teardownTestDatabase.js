@@ -113,9 +113,23 @@ export default async function teardownTestDatabase() {
     },
     select: { id: true }
   });
+  const wasteIssues = await prisma.wasteIssue.findMany({
+    where: { createdById: { in: wasteIssueUsers.map(({ id }) => id) } },
+    select: { id: true }
+  });
+  const wasteIssueIds = wasteIssues.map(({ id }) => id);
+  const wasteIssueMovements = await prisma.wasteMovement.findMany({
+    where: { wasteIssueId: { in: wasteIssueIds } },
+    select: { id: true }
+  });
+  const wasteIssueMovementIds = wasteIssueMovements.map(({ id }) => id);
 
   await prisma.goodsIssueDetail.deleteMany({ where: { goodsIssueId: { in: wasteIssueGoodsIssues.map(({ id }) => id) } } });
   await prisma.goodsIssue.deleteMany({ where: { id: { in: wasteIssueGoodsIssues.map(({ id }) => id) } } });
+  await prisma.wasteIssueReturn.deleteMany({ where: { wasteIssueId: { in: wasteIssueIds } } });
+  await prisma.wasteMovementDetail.deleteMany({ where: { movementId: { in: wasteIssueMovementIds } } });
+  await prisma.wasteMovement.deleteMany({ where: { id: { in: wasteIssueMovementIds } } });
+  await prisma.wasteIssue.deleteMany({ where: { id: { in: wasteIssueIds } } });
   const wasteAdjustmentDetails = await prisma.wasteStockAdjustmentDetail.findMany({
     where: { waste: { supplierMaterial: { materialId: { in: wasteIssueMaterials.map(({ id }) => id) } } } },
     select: { id: true, wasteStockAdjustmentId: true }
