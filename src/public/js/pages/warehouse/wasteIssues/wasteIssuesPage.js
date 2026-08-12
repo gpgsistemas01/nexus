@@ -1,4 +1,3 @@
-import { getAllWastes } from '../../../application/warehouse/wastes.js';
 import {
     editWasteIssue,
     editWasteIssueDetails,
@@ -16,11 +15,12 @@ import { FORM_MODES } from '../../../constants/formModes.js';
 import { createIssueHeaderSelects } from '../../../plugins/select2/modules/issueHeaderSelect.js';
 import { hasValidationErrors, validateFields } from '../../../utils/formUtils.js';
 import { addWasteIssueDetailValidation, issueHeaderValidation, wasteIssueValidation } from '../../../utils/validations/validators.js';
-import { normalizeFormErrors } from '../../../ui/formUI.js';
+import { clearAddedItemInput, normalizeFormErrors } from '../../../ui/formUI.js';
 import { setMdbWrapperInputValue } from '../../../plugins/select2/baseSelect.js';
 import { createIssueHeaderForm, useIssueForm } from '../../../ui/issues/issueFormUI.js';
-import { formatWasteSelectOption, mapWasteIssueDetailDisplay } from '../../../utils/warehouse/issueDisplayUtils.js';
+import { mapWasteIssueDetailDisplay } from '../../../utils/warehouse/issueDisplayUtils.js';
 import { renderWasteIssueDetails } from '../../../plugins/datatable/wasteIssueDetailDatatable.js';
+import { createWasteIssueSelect } from '../../../plugins/select2/modules/wasteIssueSelect.js';
 
 const form = document.querySelector('#wasteIssueForm');
 const context = window.meta || {};
@@ -44,6 +44,10 @@ const headerSelects = createIssueHeaderSelects({
 const issueHeaderForm = createIssueHeaderForm({
     formSelector: '#wasteIssueForm',
     selects: headerSelects
+});
+const wasteIssueSelect = createWasteIssueSelect({
+    selector: '#wasteIssueWaste',
+    modalSelector: '#wasteIssueModal'
 });
 const wasteIssueReturn = createIssueReturn({
     prefix: 'wasteIssue',
@@ -112,40 +116,16 @@ const openEditModal = (issue) => {
     openModal(modalElement);
 };
 
-const loadWastes = async () => {
-
-    const response = await getAllWastes({ start: 0, length: 1000, 'search[value]': '' });
-    const $wasteSelect = $(wasteSelect);
-
-    if ($wasteSelect.hasClass('select2-hidden-accessible')) $wasteSelect.select2('destroy');
-
-    wasteSelect.innerHTML = '<option value="">Seleccione una merma</option>' + response.data.data
-        .filter(waste => waste.isActive)
-        .map(waste => $('<option>', {
-            value: waste.id,
-            text: formatWasteSelectOption(waste)
-        })[0].outerHTML).join('');
-
-    wasteSelect._wastes = new Map(response.data.data.map(waste => [waste.id, waste]));
-
-    $wasteSelect.select2({
-        language: 'es',
-        placeholder: 'Seleccione una merma',
-        width: '100%',
-        dropdownParent: $('#wasteIssueModal')
-    });
-};
-
 wasteSelect.addEventListener('change', () => {
 
-    const waste = wasteSelect._wastes?.get(wasteSelect.value);
+    const waste = wasteIssueSelect.getSelected();
 
     setPresentationDisplay(waste?.presentation?.name || '');
 });
 
 document.querySelector('#addMaterialBtn').addEventListener('click', () => {
 
-    const waste = wasteSelect._wastes?.get(wasteSelect.value);
+    const waste = wasteIssueSelect.getSelected();
     const quantity = Number(quantityInput.value);
     const errors = validateFields(addWasteIssueDetailValidation, {
         wasteId: waste?.id,
@@ -170,10 +150,11 @@ document.querySelector('#addMaterialBtn').addEventListener('click', () => {
 
     renderDraft();
 
-    $(wasteSelect).val(null).trigger('change');
-    quantityInput.value = '';
-
-    setPresentationDisplay('');
+    clearAddedItemInput({
+        itemSelector: '#wasteIssueWaste',
+        quantitySelector: '#wasteIssueQuantity',
+        presentationSelector: presentationDisplaySelector
+    });
 });
 
 document.querySelector('#wasteIssueDraftTable').addEventListener('click', event => {
@@ -282,7 +263,7 @@ useIssueForm({
     onSaved: async () => {
         draft.clear();
         renderDraft();
-        await loadWastes();
+        await wasteIssueSelect.initialize();
     }
 });
 
@@ -296,4 +277,4 @@ createWasteIssueDatatable({
 
 wasteIssueReturn.initialize();
 setCurrentRequestDate();
-loadWastes().catch(error => handleApiError({ err: error, rethrow: false }));
+wasteIssueSelect.initialize().catch(error => handleApiError({ err: error, rethrow: false }));
