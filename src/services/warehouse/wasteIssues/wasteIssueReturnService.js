@@ -33,7 +33,7 @@ const returnWasteIssueDetailTransaction = ({ id, detailId, returnDto, userId }) 
         throw new WasteIssueReturnQuantityConflict();
     }
 
-    const newReturnedQuantity = returnedQuantity + returnQuantity;
+    const newTotalReturnedQuantity = returnedQuantity + returnQuantity;
     const movement = await applyWasteIssueReturnMovement({
         tx,
         wasteIssueId: id,
@@ -45,11 +45,11 @@ const returnWasteIssueDetailTransaction = ({ id, detailId, returnDto, userId }) 
         }
     });
     const statusIds = await findWasteIssueFulfillmentStatusIds(tx);
-    const isCanceled = newReturnedQuantity >= suppliedQuantity;
+    const isCanceled = newTotalReturnedQuantity >= suppliedQuantity;
     const updatedDetail = await tx.wasteIssueDetail.update({
         where: { id: detail.id },
         data: {
-            returnedQuantity: newReturnedQuantity,
+            returnedQuantity: newTotalReturnedQuantity,
             fulfillmentStatusId: statusIds.get(
                 isCanceled ? FULFILLMENT_STATUS_NAMES.CANCELED : FULFILLMENT_STATUS_NAMES.COMPLETE
             )

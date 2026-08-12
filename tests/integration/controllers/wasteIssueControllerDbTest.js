@@ -152,7 +152,9 @@ describe('waste issue controller database integration', () => {
       .expect(200);
     expect(returned.body.wasteIssueReturn).toMatchObject({
       materialName: `IT WasteIssue Material ${ suffix }`,
-      observations: 'Devolución parcial'
+      observations: 'Devolución parcial',
+      currentTotalReturnedQuantity: '0',
+      newTotalReturnedQuantity: '1'
     });
     const wasteAfterReturn = await prisma.waste.findUnique({ where: { id: ids.waste } });
     expect(Number(wasteAfterReturn.currentStock)).toBe(7);
