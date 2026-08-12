@@ -19,6 +19,7 @@ const isValidProjectNumber = ({ client, department, projectNumber = '' }) => {
 };
 
 export const resolveIssueHeaderData = async ({
+    tx,
     requesterId,
     advisorId,
     departmentId,
@@ -28,16 +29,16 @@ export const resolveIssueHeaderData = async ({
     statusName = null
 }) => {
 
-    const requester = await findPersonById({ id: requesterId });
+    const requester = await findPersonById({ tx, id: requesterId });
 
     if (!requester) throw new errorTypes.RequesterNotFound();
 
-    const advisor = await findPersonById({ id: advisorId, includeAccesses: true });
+    const advisor = await findPersonById({ tx, id: advisorId, includeAccesses: true });
 
     if (!advisor) throw new errorTypes.AdvisorNotFound();
 
-    const client = await findClientById({ id: clientId });
-    const department = await findDepartmentById({ id: departmentId });
+    const client = await findClientById({ tx, id: clientId });
+    const department = await findDepartmentById({ tx, id: departmentId });
 
     if (!isValidInternalClientAdvisor({ client, advisor })) throw new errorTypes.ClientAdvisorConflict();
 

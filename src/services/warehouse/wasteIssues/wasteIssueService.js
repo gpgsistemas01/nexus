@@ -65,11 +65,12 @@ const WASTE_ISSUE_HEADER_ERROR_TYPES = {
     ProjectNumberConflict: WasteIssueProjectNumberConflict
 };
 
-const resolveWasteIssueHeaderData = async dto => {
+const resolveWasteIssueHeaderData = async ({ tx, dto }) => {
 
     const { requesterId, advisorId, departmentId, clientId, ...issueData } = dto;
 
     return resolveIssueHeaderData({
+        tx,
         requesterId,
         advisorId,
         departmentId,
@@ -88,7 +89,9 @@ const createWasteIssueDetailSnapshot = ({ waste, detail, fulfillmentStatusId }) 
         base: waste.base,
         height: waste.height
     }),
-    fulfillmentStatusId
+    fulfillmentStatus: {
+        connect: { id: fulfillmentStatusId }
+    }
 });
 
 const buildWasteIssueDetails = async ({ tx, details, fulfillmentStatusId }) => {
@@ -181,7 +184,7 @@ const createWasteIssueTransaction = async ({ wasteIssueDto, userId }) => getDb()
         details: requestedDetails,
         fulfillmentStatusId: pendingStatusId
     });
-    const headerData = await resolveWasteIssueHeaderData(headerDto);
+    const headerData = await resolveWasteIssueHeaderData({ tx, dto: headerDto });
     const referenceNumber = await generateYearlyReferenceNumber({ type: DOCUMENT_REFERENCE_TYPES.WASTE_ISSUE, tx });
 
     return tx.wasteIssue.create({
@@ -222,14 +225,14 @@ const updateWasteIssueTransaction = async ({ id, wasteIssueDto }) => getDb().$tr
         details: requestedDetails,
         fulfillmentStatusId: pendingStatusId
     });
-    const headerData = await resolveWasteIssueHeaderData(headerDto);
+    const headerData = await resolveWasteIssueHeaderData({ tx, dto: headerDto });
     await tx.wasteIssueDetail.deleteMany({ where: { wasteIssueId: id } });
 
     return tx.wasteIssue.update({
         where: { id },
         data: {
             ...headerData,
-            fulfillmentStatusId: pendingStatusId,
+            fulfillmentStatus: { connect: { id: pendingStatusId } },
             details: { create: details }
         },
         include: WASTE_ISSUE_INCLUDE
@@ -253,7 +256,7 @@ export const updateWasteIssueHeader = async ({ id, wasteIssueDto }) => {
         data: { id, ...wasteIssueDto },
         fallbackError: new WasteIssueUpdateDatabaseError(),
         action: async () => {
-            const headerData = await resolveWasteIssueHeaderData(wasteIssueDto);
+            const headerData = await resolveWasteIssueHeaderData({ dto: wasteIssueDto });
 
             try {
                 return await getDb().wasteIssue.update({
