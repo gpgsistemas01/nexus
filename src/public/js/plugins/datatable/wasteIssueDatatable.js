@@ -4,9 +4,9 @@ import { hasPermission, UI_PERMISSIONS } from '../../constants/permissions.js';
 import {
     bindIssueTableActions,
     buildIssueHeaderColumns,
-    buildIssueTrackingColumns
+    buildIssueTrackingColumns,
+    setupIssueTableFilters
 } from './issueDatatable.js';
-import { setupTableFilters } from './utils/filters/tableFilter.js';
 
 const TABLE_SELECTOR = '#table';
 
@@ -32,9 +32,7 @@ export const createWasteIssueDatatable = async ({ context, onCreate, onEdit, onE
         }
     );
 
-    const filters = await setupTableFilters({
-        fields: ['date', 'client', 'department', 'independentPerson', 'fulfillmentStatus', 'observations']
-    });
+    const filters = await setupIssueTableFilters();
 
     const table = createDataTable({ options: {
         ajax: {

@@ -5,9 +5,8 @@ import { formatFileName } from "../../utils/formatters.js";
 import { createDataTable, renderActionButtons } from "./baseDatatable.js";
 import { createWarehouseIssueDetailsTable } from "./warehouseIssueDetailDatatable.js";
 import { handleDelete } from "./utils/detailDatatableUtils.js";
-import { setupTableFilters } from "./utils/filters/tableFilter.js";
 import { DATATABLE_SELECTORS } from "../../constants/selectors.js";
-import { bindIssueTableActions, buildIssueHeaderColumns, buildIssueTrackingColumns } from './issueDatatable.js';
+import { bindIssueTableActions, buildIssueHeaderColumns, buildIssueTrackingColumns, setupIssueTableFilters } from './issueDatatable.js';
 import { hasPermission, UI_PERMISSIONS } from '../../constants/permissions.js';
 
 export let details = [];
@@ -40,9 +39,7 @@ export const createGoodsIssueDatatable = async ({ context, onCreate, onEdit, onE
         }
     );
 
-    filters = await setupTableFilters({
-        fields: ['date', 'client', 'department', 'independentPerson', 'fulfillmentStatus', 'observations']
-    });
+    filters = await setupIssueTableFilters();
 
     table = createDataTable({
         options: {

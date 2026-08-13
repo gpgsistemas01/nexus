@@ -1,0 +1,58 @@
+<% const form = {
+    id: issue.formId,
+    canApprove: issue.canApprove,
+    selects: [
+        { id: 'clientInput', name: 'clientId', class: 'client-select', col: 'col-6' },
+        { id: 'advisorInput', name: 'advisorId', class: 'advisor-select', col: 'col-6' },
+        { id: 'departmentInput', name: 'departmentId', class: 'department-select', col: 'col-6' },
+        { id: 'requesterInput', name: 'requesterId', class: 'request-select', col: 'col-6' }
+    ],
+    inputs: [
+        {
+            id: 'projectNumberInput',
+            name: 'projectNumber',
+            type: 'text',
+            label: 'Número de proyecto',
+            col: '6'
+        },
+        {
+            id: issue.dateInputId,
+            name: 'requestDate',
+            type: 'text',
+            class: 'js-flatpickr-datetime',
+            label: issue.dateInputLabel,
+            col: '6'
+        }
+    ],
+    textArea: {
+        id: issue.observationsInputId,
+        name: 'observations',
+        label: 'Observaciones'
+    },
+    table: {
+        errorName: issue.detailErrorName,
+        includeSummary: issue.includeSummary,
+        select: {
+            id: issue.itemSelect.id,
+            name: issue.itemSelect.name,
+            class: issue.itemSelect.class,
+            col: issue.itemSelect.col
+        },
+        inputs: [
+            {
+                id: issue.quantityInput.id,
+                name: 'quantity',
+                type: 'number',
+                label: 'Cantidad',
+                attrs: issue.quantityInput.attrs,
+                col: 'col-12 col-md-6 col-lg-7'
+            }
+        ]
+    }
+} %>
+
+<%- include('../../../shared/modal', {
+    modalId: issue.modalId,
+    modalTitle: issue.modalTitle,
+    form
+}) %>
