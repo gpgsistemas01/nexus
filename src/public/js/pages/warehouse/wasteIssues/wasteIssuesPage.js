@@ -7,47 +7,54 @@ import {
 } from '../../../application/warehouse/wasteIssues/wasteIssues.js';
 import { createIssueReturn } from '../../../ui/issues/issueReturnUI.js';
 import { handleApiError } from '../../../api/errorHandler.js';
-import { buildModalTitle, openModal } from '../../../ui/modalUI.js';
+import { openModal } from '../../../ui/modalUI.js';
 import { createWasteIssueDatatable } from '../../../plugins/datatable/wasteIssueDatatable.js';
 import { setDateTimePickerValue } from '../../../plugins/flatpickr/dateTimePicker.js';
 import { FULFILLMENT_STATUS_NAMES } from '../../../constants/fulfillmentStatuses.js';
 import { FORM_MODES } from '../../../constants/formModes.js';
+import { DATATABLE_SELECTORS, FORM_SELECTORS, MODAL_SELECTORS } from '../../../constants/selectors.js';
 import { createIssueHeaderSelects } from '../../../plugins/select2/modules/issueHeaderSelect.js';
 import { hasValidationErrors, validateFields } from '../../../utils/formUtils.js';
-import { addWasteIssueDetailValidation, issueHeaderValidation, wasteIssueValidation } from '../../../utils/validations/validators.js';
+import { addWasteIssueDetailValidation, wasteIssueValidation } from '../../../utils/validations/validators.js';
 import { clearAddedItemInput, normalizeFormErrors } from '../../../ui/formUI.js';
 import { setMdbWrapperInputValue } from '../../../plugins/select2/baseSelect.js';
-import { createIssueHeaderForm, useIssueForm } from '../../../ui/issues/issueFormUI.js';
+import { applyIssueModalMode, createIssueHeaderForm, initializeIssueModal, useIssueForm } from '../../../ui/issues/issueFormUI.js';
 import { mapWasteIssueDetailDisplay } from '../../../utils/warehouse/issueDisplayUtils.js';
-import { renderWasteIssueDetails } from '../../../plugins/datatable/wasteIssueDetailDatatable.js';
 import { createWasteIssueSelect } from '../../../plugins/select2/modules/wasteIssueSelect.js';
+import { createWarehouseIssueDetailsTable } from '../../../plugins/datatable/warehouseIssueDetailDatatable.js';
+import { roundTo } from '../../../utils/formatUtils.js';
+import { on } from '../../../utils/domUtils.js';
 
-const form = document.querySelector('#wasteIssueForm');
+const formId = FORM_SELECTORS.WASTE_ISSUE;
+const modalId = MODAL_SELECTORS.WASTE_ISSUE;
+const WASTE_ISSUE_ENTITY_NAME = 'salida de merma';
+
+const form = document.querySelector(formId);
 const context = window.meta || {};
-const wasteSelect = document.querySelector('#wasteIssueWaste');
-const quantityInput = document.querySelector('#wasteIssueQuantity');
-const draft = new Map();
-const modalElement = document.querySelector('#wasteIssueModal');
-const modalTitle = modalElement.querySelector('#modalTitle');
-const presentationDisplaySelector = '#wasteIssueModal #presentationDisplayInput';
+const wasteSelect = document.querySelector(FORM_SELECTORS.WASTE_ISSUE_WASTE);
+const quantityInput = document.querySelector(FORM_SELECTORS.WASTE_ISSUE_QUANTITY);
+const details = [];
+const modalElement = document.querySelector(modalId);
+const detailTableSelector = DATATABLE_SELECTORS.MATERIAL;
+const presentationDisplaySelector = `${ modalId } ${ FORM_SELECTORS.PRESENTATION_DISPLAY }`;
 const headerSelects = createIssueHeaderSelects({
-    modalSelector: '#wasteIssueModal',
-    formSelector: '#wasteIssueForm',
+    modalSelector: modalId,
+    formSelector: formId,
     selectors: {
-        requester: '#requesterInput',
-        client: '#clientInput',
-        department: '#departmentInput',
-        advisor: '#advisorInput',
-        projectNumber: '#projectNumberInput'
+        requester: FORM_SELECTORS.REQUESTER,
+        client: FORM_SELECTORS.CLIENT,
+        department: FORM_SELECTORS.DEPARTMENT,
+        advisor: FORM_SELECTORS.ADVISOR,
+        projectNumber: FORM_SELECTORS.PROJECT_NUMBER
     }
 });
 const issueHeaderForm = createIssueHeaderForm({
-    formSelector: '#wasteIssueForm',
+    formSelector: formId,
     selects: headerSelects
 });
 const wasteIssueSelect = createWasteIssueSelect({
-    selector: '#wasteIssueWaste',
-    modalSelector: '#wasteIssueModal'
+    selector: FORM_SELECTORS.WASTE_ISSUE_WASTE,
+    modalSelector: modalId
 });
 const wasteIssueReturn = createIssueReturn({
     prefix: 'wasteIssue',
@@ -59,71 +66,67 @@ const setPresentationDisplay = value => setMdbWrapperInputValue({
 });
 
 const setCurrentRequestDate = () => setDateTimePickerValue(
-    document.querySelector('#wasteIssueDate'),
+    document.querySelector(FORM_SELECTORS.WASTE_ISSUE_DATE),
     new Date().toISOString()
 );
 
-const renderDraft = () => renderWasteIssueDetails({
-    data: [...draft.values()],
-    mode: form.dataset.mode
-});
-
-const toggleDetailFields = (visible) => {
-    modalElement.querySelector('.modal-detail-controls')?.classList.toggle('d-none', !visible);
-    modalElement.querySelector('#wasteIssueDraftTable_wrapper')?.classList.toggle('d-none', !visible);
+const renderDraft = () => {
+    return createWarehouseIssueDetailsTable({
+        data: details,
+        mode: form.dataset.mode,
+        context
+    });
 };
 
-const openCreateModal = () => {
-    form.reset();
+const mapWasteIssueDetail = detail => {
+    const display = mapWasteIssueDetailDisplay(detail);
+
+    return {
+        ...display,
+        materialId: detail.wasteId,
+        materialBase: display.base,
+        materialHeight: display.height,
+        originalIsSupplied: detail.isSupplied
+    };
+};
+
+export const openWasteIssueModal = ({ mode, data = null }) => {
+    initializeIssueModal({ form, issueHeaderForm, mode, data });
     setPresentationDisplay('');
-    form.dataset.mode = FORM_MODES.CREATE;
-    delete form.dataset.id;
-    draft.clear();
+    details.length = 0;
+
+    if (mode === FORM_MODES.CREATE) {
+        setCurrentRequestDate();
+    } else {
+        setDateTimePickerValue(document.querySelector(FORM_SELECTORS.WASTE_ISSUE_DATE), data.requestDate);
+        document.querySelector(FORM_SELECTORS.WASTE_ISSUE_OBSERVATIONS).value = data.observations || '';
+        document.querySelector(FORM_SELECTORS.PROJECT_NUMBER).value = data.projectNumber || '';
+
+        details.push(...data.details.map(mapWasteIssueDetail));
+
+    }
+
+    applyIssueModalMode({
+        form,
+        modalElement,
+        mode,
+        entityName: WASTE_ISSUE_ENTITY_NAME,
+        referenceNumber: data?.referenceNumber,
+        createTitle: 'Registrar salida de merma'
+    });
+
     renderDraft();
-    toggleDetailFields(true);
-    issueHeaderForm.initialize();
-    setCurrentRequestDate();
-    modalTitle.textContent = 'Registrar salida de merma';
     openModal(modalElement);
 };
 
-const openEditModal = (issue) => {
-    form.reset();
-    setPresentationDisplay('');
-
-    const canEditDetails = issue.fulfillmentStatus?.name === FULFILLMENT_STATUS_NAMES.PENDING;
-    form.dataset.mode = canEditDetails ? FORM_MODES.EDIT : FORM_MODES.EDIT_HEADER;
-    form.dataset.id = issue.id;
-    setDateTimePickerValue(document.querySelector('#wasteIssueDate'), issue.requestDate);
-    document.querySelector('#wasteIssueObservations').value = issue.observations || '';
-    document.querySelector('#projectNumberInput').value = issue.projectNumber || '';
-    draft.clear();
-    if (canEditDetails) issue.details.map(mapWasteIssueDetailDisplay).forEach(detail => draft.set(detail.wasteId, {
-        wasteId: detail.wasteId,
-        materialName: detail.materialName,
-        supplierName: detail.supplierName,
-        base: detail.base,
-        height: detail.height,
-        presentationName: detail.presentationName,
-        unitMeasureName: detail.unitMeasureName,
-        unitMeasureSymbol: detail.unitMeasureSymbol,
-        quantity: Number(detail.quantity)
-    }));
-    renderDraft();
-    toggleDetailFields(canEditDetails);
-    issueHeaderForm.initialize({ data: issue });
-    modalTitle.textContent = buildModalTitle({ action: 'Editar', entityName: 'salida de merma', referenceNumber: issue.referenceNumber });
-    openModal(modalElement);
-};
-
-wasteSelect.addEventListener('change', () => {
+on('change', FORM_SELECTORS.WASTE_ISSUE_WASTE, () => {
 
     const waste = wasteIssueSelect.getSelected();
 
     setPresentationDisplay(waste?.presentation?.name || '');
 });
 
-document.querySelector('#addMaterialBtn').addEventListener('click', () => {
+const addWaste = () => {
 
     const waste = wasteIssueSelect.getSelected();
     const quantity = Number(quantityInput.value);
@@ -136,76 +139,61 @@ document.querySelector('#addMaterialBtn').addEventListener('click', () => {
 
     if (hasValidationErrors(errors)) return;
 
-    draft.set(waste.id, {
+    const detail = {
         wasteId: waste.id,
+        materialId: waste.id,
         materialName: waste.materialName,
         supplierName: waste.supplier?.tradeName,
-        base: waste.base,
-        height: waste.height,
+        materialBase: waste.base,
+        materialHeight: waste.height,
         presentationName: waste.presentation?.name,
         unitMeasureName: waste.unitMeasure?.name,
         unitMeasureSymbol: waste.unitMeasure?.symbol,
-        quantity
-    });
+        quantity,
+        convertedQuantity: waste.base && waste.height
+            ? roundTo(Number(waste.base) * Number(waste.height) * quantity)
+            : quantity
+    };
+
+    const existingIndex = details.findIndex(item => item.wasteId === waste.id);
+
+    if (existingIndex >= 0) details.splice(existingIndex, 1, detail);
+    else details.push(detail);
 
     renderDraft();
 
     clearAddedItemInput({
-        itemSelector: '#wasteIssueWaste',
-        quantitySelector: '#wasteIssueQuantity',
+        itemSelector: FORM_SELECTORS.WASTE_ISSUE_WASTE,
+        quantitySelector: FORM_SELECTORS.WASTE_ISSUE_QUANTITY,
         presentationSelector: presentationDisplaySelector
     });
-});
-
-document.querySelector('#wasteIssueDraftTable').addEventListener('click', event => {
-    const button = event.target.closest('.js-remove');
-    if (!button) return;
-    draft.delete(button.dataset.id);
-    renderDraft();
-});
-
-const openSupplyModal = issue => {
-    form.reset();
-    form.dataset.mode = FORM_MODES.EDIT_DETAIL;
-    form.dataset.id = issue.id;
-    draft.clear();
-    issue.details.map(mapWasteIssueDetailDisplay).forEach(detail => draft.set(detail.id, {
-        ...detail,
-        originalIsSupplied: detail.isSupplied
-    }));
-    toggleDetailFields(false);
-    modalElement.querySelector('#wasteIssueDraftTable_wrapper')?.classList.remove('d-none');
-    renderDraft();
-    issueHeaderForm.initialize({ data: issue, isDisabled: true });
-    modalTitle.textContent = buildModalTitle({ action: 'Surtir', entityName: 'salida de merma', referenceNumber: issue.referenceNumber });
-    openModal(modalElement);
 };
 
-const openReturnDetailsModal = issue => {
-    form.reset();
-    form.dataset.mode = FORM_MODES.RETURN;
-    form.dataset.id = issue.id;
-    draft.clear();
-    issue.details.map(mapWasteIssueDetailDisplay).forEach(detail => draft.set(detail.id, detail));
-    toggleDetailFields(false);
-    modalElement.querySelector('#wasteIssueDraftTable_wrapper')?.classList.remove('d-none');
-    renderDraft();
-    issueHeaderForm.initialize({ data: issue, isDisabled: true });
-    modalTitle.textContent = buildModalTitle({ action: 'Devolver', entityName: 'salida de merma', referenceNumber: issue.referenceNumber });
-    openModal(modalElement);
-};
+const findDetailByElement = element => details.find(detail => (
+    detail.id === element.dataset.detailId
+    || detail.id === element.dataset.id
+    || detail.wasteId === element.dataset.id
+));
 
-document.querySelector('#wasteIssueDraftTable').addEventListener('change', event => {
-    const checkbox = event.target.closest('.supply-checkbox');
-    if (!checkbox) return;
-    const detail = draft.get(checkbox.dataset.detailId);
+on('click', '#addMaterialBtn', addWaste);
+on('click', `${ detailTableSelector } .delete-btn`, (event, button) => {
+    const index = details.findIndex(detail => detail.wasteId === button.dataset.id);
+
+    if (index < 0) return;
+
+    details.splice(index, 1);
+    renderDraft();
+});
+
+on('change', `${ detailTableSelector } .supply-checkbox`, (event, checkbox) => {
+    const detail = findDetailByElement(checkbox);
+
     if (detail) detail.isSupplied = checkbox.checked;
 });
 
-document.querySelector('#wasteIssueDraftTable').addEventListener('click', event => {
-    const button = event.target.closest('.js-return-detail');
-    if (!button) return;
-    const detail = draft.get(button.dataset.id);
+on('click', `${ detailTableSelector } .return-issue-detail-btn`, (event, button) => {
+    const detail = findDetailByElement(button);
+
     if (detail) wasteIssueReturn.open({ issue: { id: form.dataset.id }, detail });
 });
 
@@ -215,7 +203,7 @@ const normalizeWasteIssueData = ({ form }) => {
 
     if (mode === FORM_MODES.EDIT_DETAIL) {
         return {
-            details: [...draft.values()]
+            details: details
                 .filter(detail => detail.isSupplied && !detail.originalIsSupplied)
                 .map(detail => ({
                     id: detail.id,
@@ -227,7 +215,7 @@ const normalizeWasteIssueData = ({ form }) => {
     const formData = issueHeaderForm.readData();
 
     if (mode !== FORM_MODES.EDIT_HEADER) {
-        formData.details = [...draft.values()].map(({ wasteId, quantity }) => ({
+        formData.details = details.map(({ wasteId, quantity }) => ({
             wasteId,
             quantity
         }));
@@ -237,7 +225,7 @@ const normalizeWasteIssueData = ({ form }) => {
 };
 
 useIssueForm({
-    selector: '#wasteIssueForm',
+    selector: formId,
     normalizeData: normalizeWasteIssueData,
     getErrors: ({ form, formData }) => {
 
@@ -249,10 +237,9 @@ useIssueForm({
             };
         }
 
-        const validation = form.dataset.mode === FORM_MODES.EDIT_HEADER
-            ? issueHeaderValidation
-            : wasteIssueValidation;
-        const errors = validateFields(validation, formData);
+        const errors = validateFields(wasteIssueValidation, formData);
+
+        if (form.dataset.mode === FORM_MODES.EDIT_HEADER) errors.details = null;
 
         return errors;
     },
@@ -261,7 +248,7 @@ useIssueForm({
     editDetails: editWasteIssueDetails,
     editHeader: editWasteIssueHeader,
     onSaved: async () => {
-        draft.clear();
+        details.length = 0;
         renderDraft();
         await wasteIssueSelect.initialize();
     }
@@ -269,10 +256,15 @@ useIssueForm({
 
 createWasteIssueDatatable({
     context,
-    onCreate: openCreateModal,
-    onEdit: openEditModal,
-    onEditDetails: openSupplyModal,
-    onReturnDetails: openReturnDetailsModal
+    onCreate: () => openWasteIssueModal({ mode: FORM_MODES.CREATE }),
+    onEdit: issue => openWasteIssueModal({
+        mode: issue.fulfillmentStatus?.name === FULFILLMENT_STATUS_NAMES.PENDING
+            ? FORM_MODES.EDIT
+            : FORM_MODES.EDIT_HEADER,
+        data: issue
+    }),
+    onEditDetails: issue => openWasteIssueModal({ mode: FORM_MODES.EDIT_DETAIL, data: issue }),
+    onReturnDetails: issue => openWasteIssueModal({ mode: FORM_MODES.RETURN, data: issue })
 });
 
 wasteIssueReturn.initialize();

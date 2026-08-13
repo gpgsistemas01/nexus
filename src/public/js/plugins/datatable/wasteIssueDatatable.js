@@ -27,6 +27,7 @@ const returnButton = buildMdbActionButton({
 });
 
 export const createWasteIssueDatatable = ({ context, onCreate, onEdit, onEditDetails, onReturnDetails }) => {
+    const canManage = hasPermission(context, UI_PERMISSIONS.WASTE_ISSUES_MANAGE);
     const canSupply = hasPermission(context, UI_PERMISSIONS.WASTE_ISSUES_SUPPLY);
     const columns = buildIssueHeaderColumns({ context });
 
@@ -41,7 +42,7 @@ export const createWasteIssueDatatable = ({ context, onCreate, onEdit, onEditDet
             orderable: false,
             render: (_, __, issue) => {
                 const isComplete = issue.fulfillmentStatus?.name === FULFILLMENT_STATUS_NAMES.COMPLETE;
-                return `${ editButton }${ !canSupply ? '' : isComplete ? returnButton : supplyButton }`;
+                return `${ canManage ? editButton : '' }${ !canSupply ? '' : isComplete ? returnButton : supplyButton }`;
             }
         }
     );
@@ -49,7 +50,7 @@ export const createWasteIssueDatatable = ({ context, onCreate, onEdit, onEditDet
     const table = createDataTable({ options: {
         ajax: { get: params => getAllWasteIssues(params) },
         order: [[1, 'desc']],
-        buttons: [{ text: 'Nueva salida', action: onCreate }],
+        buttons: canManage ? [{ text: 'Nueva salida', action: onCreate }] : [],
         columns
     } });
 

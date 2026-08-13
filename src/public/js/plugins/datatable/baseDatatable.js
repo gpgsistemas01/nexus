@@ -218,6 +218,8 @@ export const renderActionButtons = (options = {}) => {
         status,
         fulfillmentStatus,
         context,
+        canManage = true,
+        canSupply = true,
         canAdjustStock = false,
         canDeleteMaterial = false,
         canDeleteWaste = false
@@ -231,17 +233,19 @@ export const renderActionButtons = (options = {}) => {
     return [
         [(isGoodsIssue || isGoodsReceipt) && isCanceled, ACTION_BUTTONS.view],
         [
-            status === 'Abierta'
+            canManage && (
+                status === 'Abierta'
                 || (isGoodsIssue && isApproved)
                 || (isGoodsReceipt && !isCanceled)
-                || EDITABLE_ACTION_CONTEXTS.has(context),
+                || EDITABLE_ACTION_CONTEXTS.has(context)
+            ),
             ACTION_BUTTONS.edit
         ],
         [isInventoryItem && canAdjustStock, ACTION_BUTTONS.adjustStock],
         [context === 'material' && canDeleteMaterial, ACTION_BUTTONS.deleteMaterial],
         [context === 'waste' && canDeleteWaste, ACTION_BUTTONS.deleteWaste],
-        [isGoodsIssue && isApproved && SUPPLY_FULFILLMENT_STATUSES.has(fulfillmentStatus), ACTION_BUTTONS.supplyDetail],
-        [isGoodsIssue && isApproved && fulfillmentStatus === 'Surtido', ACTION_BUTTONS.returnDetail]
+        [canSupply && isGoodsIssue && isApproved && SUPPLY_FULFILLMENT_STATUSES.has(fulfillmentStatus), ACTION_BUTTONS.supplyDetail],
+        [canSupply && isGoodsIssue && isApproved && fulfillmentStatus === 'Surtido', ACTION_BUTTONS.returnDetail]
     ]
         .filter(([canRender]) => canRender)
         .map(([, button]) => button)
