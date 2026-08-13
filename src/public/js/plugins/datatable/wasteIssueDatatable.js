@@ -4,6 +4,7 @@ import { buildMdbActionButton } from '../mdb/actionButton.js';
 import { FULFILLMENT_STATUS_NAMES } from '../../constants/fulfillmentStatuses.js';
 import { hasPermission, UI_PERMISSIONS } from '../../constants/permissions.js';
 import { bindIssueTableAction, buildIssueHeaderColumns } from './issueDatatable.js';
+import { setupTableFilters } from './utils/filters/tableFilter.js';
 
 const TABLE_SELECTOR = '#table';
 
@@ -26,7 +27,7 @@ const returnButton = buildMdbActionButton({
     label: 'Devolver merma surtida'
 });
 
-export const createWasteIssueDatatable = ({ context, onCreate, onEdit, onEditDetails, onReturnDetails }) => {
+export const createWasteIssueDatatable = async ({ context, onCreate, onEdit, onEditDetails, onReturnDetails }) => {
     const canManage = hasPermission(context, UI_PERMISSIONS.WASTE_ISSUES_MANAGE);
     const canSupply = hasPermission(context, UI_PERMISSIONS.WASTE_ISSUES_SUPPLY);
     const columns = buildIssueHeaderColumns({ context });
@@ -47,8 +48,18 @@ export const createWasteIssueDatatable = ({ context, onCreate, onEdit, onEditDet
         }
     );
 
+    const filters = await setupTableFilters({
+        fields: ['date', 'client', 'department', 'independentPerson', 'fulfillmentStatus', 'observations']
+    });
+
     const table = createDataTable({ options: {
-        ajax: { get: params => getAllWasteIssues(params) },
+        ajax: {
+            get: params => getAllWasteIssues({
+                ...params,
+                ...filters.getValues()
+            })
+        },
+        searchPlaceholder: 'Buscar por Folio, Observaciones o Material',
         order: [[1, 'desc']],
         buttons: canManage ? [{ text: 'Nueva salida', action: onCreate }] : [],
         columns

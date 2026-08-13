@@ -47,7 +47,14 @@ describe('wasteIssueController', () => {
         start: '10',
         length: '5',
         search: { value: 'SM-2026' },
-        order: [{ column: '0', dir: 'asc' }]
+        order: [{ column: '0', dir: 'asc' }],
+        startDate: '2026-08-01',
+        endDate: '2026-08-31',
+        clientId: 'client-1',
+        departmentId: 'department-1',
+        personId: 'person-1',
+        fulfillmentStatusId: 'status-1',
+        observationsSearch: 'taller'
       }
     }, response);
 
@@ -55,6 +62,13 @@ describe('wasteIssueController', () => {
       skip: 10,
       take: 5,
       search: 'SM-2026',
+      startDate: '2026-08-01',
+      endDate: '2026-08-31',
+      clientId: 'client-1',
+      departmentId: 'department-1',
+      personId: 'person-1',
+      fulfillmentStatusId: 'status-1',
+      observationsSearch: 'taller',
       orderBy: 'referenceNumber',
       orderDir: 'asc'
     });

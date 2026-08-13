@@ -25,6 +25,7 @@ import { calculateConvertedQuantity } from '../../inventory/stockHelpers.js';
 import { createServiceLogger } from '../../../utils/logger.js';
 import { executeServiceOperation } from '../../serviceErrorHandler.js';
 import { findWasteIssueFulfillmentStatusIds } from './wasteIssueFulfillmentService.js';
+import { buildDateRangeFilter } from '../../../utils/requestQueryUtils.js';
 
 const serviceLogger = createServiceLogger('warehouse.wasteIssues.wasteIssueService');
 
@@ -138,6 +139,13 @@ export const findAllWasteIssues = async ({
     skip = 0,
     take = 10,
     search = '',
+    startDate = '',
+    endDate = '',
+    clientId = '',
+    departmentId = '',
+    personId = '',
+    fulfillmentStatusId = '',
+    observationsSearch = '',
     orderBy = 'requestDate',
     orderDir = 'desc'
 }) => {
@@ -151,15 +159,23 @@ export const findAllWasteIssues = async ({
         'clientName',
         'observations'
     ]);
-    const where = search
-        ? {
+    const where = {
+        ...buildDateRangeFilter({ field: 'requestDate', startDate, endDate }),
+        ...(clientId && { clientId }),
+        ...(departmentId && { departmentId }),
+        ...(personId && { requesterId: personId }),
+        ...(fulfillmentStatusId && { fulfillmentStatusId }),
+        ...(observationsSearch && {
+            observations: { contains: observationsSearch, mode: 'insensitive' }
+        }),
+        ...(search && {
             OR: [
                 { referenceNumber: { contains: search, mode: 'insensitive' } },
                 { observations: { contains: search, mode: 'insensitive' } },
                 { details: { some: { materialName: { contains: search, mode: 'insensitive' } } } }
             ]
-        }
-        : {};
+        })
+    };
 
     const [data, recordsTotal, recordsFiltered] = await Promise.all([
         db.wasteIssue.findMany({
