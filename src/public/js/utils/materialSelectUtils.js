@@ -1,23 +1,45 @@
+export const formatInventorySelectDimensions = item => (
+    item.base == null || item.height == null
+        ? 'Sin dimensiones'
+        : `${ item.base } × ${ item.height }`
+);
+
+export const buildInventorySelectText = (item = {}) => {
+
+    const supplierName = item.supplier?.tradeName || item.supplierName || '';
+    const materialName = item.materialName || item.name || '';
+    const materialBase = item.materialBase ?? item.base;
+    const materialHeight = item.materialHeight ?? item.height;
+
+    return [
+        materialName,
+        supplierName,
+        formatInventorySelectDimensions({ base: materialBase, height: materialHeight })
+    ].join(' · ');
+};
+
+export const resolveMaterialPresentationName = (item = {}) => (
+    item.presentation?.name
+    || item.presentationName
+    || item.material?.presentation?.name
+    || ''
+);
+
 export const buildMaterialSelectText = (material = {}) => {
 
-    const supplierName = material.supplier?.tradeName || material.supplierName || '';
-    const materialName = material.materialName || material.name || '';
-    const materialBase = material.materialBase ?? material.base;
-    const materialHeight = material.materialHeight ?? material.height;
-
-    if (!materialBase || !materialHeight) return `${ materialName } || ${ supplierName }`;
-
-    return `${ materialName } (${ materialBase } x ${ materialHeight }) || ${ supplierName }`;
+    return buildInventorySelectText(material);
 };
 
 export const mapMaterialToSelectData = (material = {}) => ({
     id: material.id,
     text: buildMaterialSelectText(material),
     materialName: material.name,
-    presentationName: material.presentation?.name,
+    presentationName: resolveMaterialPresentationName(material),
     unitMeasureName: material.unitMeasure?.name,
+    unitMeasureSymbol: material.unitMeasure?.symbol,
     materialBase: material.base,
     materialHeight: material.height,
+    currentStock: material.currentStock,
     supplierName: material.supplier?.tradeName,
     supplierId: material.supplier?.id
 });
@@ -36,11 +58,13 @@ export const mapSupplierMaterialToSelectData = (supplierMaterial = {}) => {
             supplier: supplierMaterial.supplier || material.supplier,
             supplierName: supplierMaterial.supplierName
         }),
-        presentationName: material.presentation?.name,
+        presentationName: resolveMaterialPresentationName(supplierMaterial),
         unitMeasureName: material.unitMeasure?.name,
+        unitMeasureSymbol: material.unitMeasure?.symbol,
         supplierName: supplierMaterial.supplierName || supplierMaterial.supplier?.tradeName || material.supplier?.tradeName,
         materialBase: supplierMaterial.materialBase ?? material.base ?? supplierMaterial.base,
         materialHeight: supplierMaterial.materialHeight ?? material.height ?? supplierMaterial.height,
+        currentStock: supplierMaterial.currentStock ?? material.currentStock,
         maxUnitCost: supplierMaterial.maxUnitCost ?? material.maxUnitCost
     };
 };

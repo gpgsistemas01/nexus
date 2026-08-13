@@ -25,6 +25,7 @@ import { roundTo } from '../../../utils/formatUtils.js';
 import { on } from '../../../utils/domUtils.js';
 import { UI_PERMISSIONS } from '../../../constants/permissions.js';
 import { refreshMaterialTable } from '../../../plugins/datatable/utils/renderMaterialDatatable.js';
+import { resolveMaterialPresentationName } from '../../../utils/materialSelectUtils.js';
 
 const formId = FORM_SELECTORS.WASTE_ISSUE;
 const modalId = MODAL_SELECTORS.WASTE_ISSUE;
@@ -124,7 +125,7 @@ on('change', FORM_SELECTORS.WASTE_ISSUE_WASTE, () => {
 
     const waste = wasteIssueSelect.getSelected();
 
-    setPresentationDisplay(waste?.presentation?.name || '');
+    setPresentationDisplay(resolveMaterialPresentationName(waste));
 });
 
 const addWaste = () => {
@@ -142,12 +143,11 @@ const addWaste = () => {
 
     const detail = {
         wasteId: waste.id,
-        materialId: waste.id,
         materialName: waste.materialName,
         supplierName: waste.supplier?.tradeName,
         materialBase: waste.base,
         materialHeight: waste.height,
-        presentationName: waste.presentation?.name,
+        presentationName: resolveMaterialPresentationName(waste),
         unitMeasureName: waste.unitMeasure?.name,
         unitMeasureSymbol: waste.unitMeasure?.symbol,
         quantity,

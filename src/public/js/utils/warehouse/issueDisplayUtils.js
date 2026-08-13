@@ -1,8 +1,4 @@
-export const formatIssueItemDimensions = item => (
-    item.base == null || item.height == null
-        ? 'Sin dimensiones'
-        : `${ item.base } × ${ item.height }`
-);
+import { buildInventorySelectText } from '../materialSelectUtils.js';
 
 const resolveCatalogDisplay = ({ detail, item, supplier, materialId }) => ({
     ...detail,
@@ -39,10 +35,4 @@ export const mapGoodsIssueDetailDisplay = detail => resolveCatalogDisplay({
     materialId: detail.materialId
 });
 
-export const formatWasteSelectOption = waste => [
-    waste.materialName,
-    waste.supplier?.tradeName,
-    formatIssueItemDimensions(waste),
-    waste.presentation?.name || 'Sin presentación',
-    `Stock: ${ waste.currentStock } ${ waste.unitMeasure?.symbol || '' }`
-].join(' · ');
+export const formatWasteSelectOption = waste => buildInventorySelectText(waste);
