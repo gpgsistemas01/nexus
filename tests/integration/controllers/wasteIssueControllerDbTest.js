@@ -36,11 +36,13 @@ describe('waste issue controller database integration', () => {
   beforeAll(async () => {
     const prismaModule = await import('../../../src/lib/prisma.js');
     const controller = await import('../../../src/controllers/api/warehouse/wasteIssueController.js');
+    const movementController = await import('../../../src/controllers/api/admin/movementController.js');
     prisma = prismaModule.prisma;
     app = createControllerTestApp({
       registerRoutes: router => {
         router.use((req, _res, next) => { req.user = { id: ids.user }; next(); });
         router.get('/waste-issues', controller.getAllWasteIssues);
+        router.get('/waste-movements', movementController.getAllWasteMovements);
         router.post('/waste-issues', controller.registerWasteIssue);
         router.patch('/waste-issues/:id', controller.editWasteIssue);
         router.patch('/waste-issues/:id/header', controller.editWasteIssueHeader);
@@ -171,6 +173,19 @@ describe('waste issue controller database integration', () => {
     expect(Number(waste.currentStock)).toBe(6);
     expect(movement).toMatchObject({ type: 'ISSUE', details: [expect.objectContaining({ wasteIssueDetailId: detailId })] });
     expect(Number(movement.details[0].quantity)).toBe(-4);
+
+    const listedMovements = await request(app)
+      .get('/waste-movements')
+      .query({ start: 0, length: 10, materialId: ids.material, movementType: 'ISSUE' })
+      .expect(200);
+    expect(listedMovements.body.data).toContainEqual(expect.objectContaining({
+      id: movement.details[0].id,
+      type: 'Salida',
+      referenceNumber: issue.referenceNumber,
+      materialName: `IT WasteIssue Material ${ suffix }`,
+      supplierName: `IT WasteIssue Supplier ${ suffix }`,
+      quantity: '-4'
+    }));
 
     const returned = await request(app)
       .patch(`/waste-issues/${ issueId }/details/${ detailId }/returns`)

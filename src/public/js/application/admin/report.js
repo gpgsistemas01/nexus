@@ -1,11 +1,11 @@
 import { exportMovementReportRequest, exportPersonReportRequest, exportUserReportRequest } from "../../services/admin/reportService.js";
 
-export const exportMovementReport = async (params = {}) => {
+export const exportMovementReport = async ({ context, params = {} }) => {
 
-    const response = await exportMovementReportRequest(params);
+    const response = await exportMovementReportRequest({ context, params });
 
     return response.data;
-}
+};
 
 export const exportUserReport = async (params = {}) => {
 

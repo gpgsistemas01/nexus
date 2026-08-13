@@ -2,9 +2,9 @@ import { apiRequest } from "../axiosInstanceApi.js";
 
 export const REPORTS_API_ROUTE = '/api/admin/reports';
 
-export const exportMovementReportRequest = (params) => apiRequest({
+export const exportMovementReportRequest = ({ context, params }) => apiRequest({
     method: 'get',
-    url: `${ REPORTS_API_ROUTE }/movements/excel`,
+    url: `${ REPORTS_API_ROUTE }/movements/${ context }/excel`,
     responseType: 'blob',
     params
 });

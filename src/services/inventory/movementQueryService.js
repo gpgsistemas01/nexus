@@ -68,6 +68,36 @@ const MOVEMENT_DETAIL_SELECT = {
     }
 };
 
+const WASTE_MOVEMENT_DETAIL_SELECT = {
+    id: true,
+    quantity: true,
+    previousStock: true,
+    newStock: true,
+    waste: {
+        select: {
+            base: true,
+            height: true,
+            supplierMaterial: {
+                select: {
+                    material: { select: { name: true } },
+                    supplier: { select: { tradeName: true } }
+                }
+            }
+        }
+    },
+    wasteIssueReturn: { select: { id: true } },
+    movement: {
+        select: {
+            type: true,
+            date: true,
+            createdAt: true,
+            referenceNumber: true,
+            wasteIssue: { select: REFERENCE_NUMBER_SELECT },
+            wasteStockAdjustment: { select: REFERENCE_NUMBER_SELECT }
+        }
+    }
+};
+
 const getMovementDateFilter = ({ startDate, endDate }) => {
 
     if (!startDate && !endDate) return {};
@@ -212,7 +242,37 @@ const mapMovementDetail = (detail) => ({
         detail.movement.referenceNumber
 });
 
-export const findAllMovements = async ({
+const mapWasteMovementDetail = (detail) => ({
+    id: detail.id,
+    date: formatDateLongWithTime(detail.movement.date),
+    createdAt: formatDateLongWithTime(detail.movement.createdAt),
+    type: detail.wasteIssueReturn
+        ? MOVEMENT_TYPE_NAMES.RETURN
+        : MOVEMENT_TYPE_NAMES[detail.movement.type] ?? detail.movement.type,
+    referenceNumber:
+        detail.movement.wasteIssue?.referenceNumber ||
+        detail.movement.wasteStockAdjustment?.referenceNumber ||
+        detail.movement.referenceNumber,
+    materialName: detail.waste.supplierMaterial.material.name,
+    materialBase: detail.waste.base,
+    materialHeight: detail.waste.height,
+    supplierName: detail.waste.supplierMaterial.supplier.tradeName,
+    previousStock: detail.previousStock,
+    quantity: detail.quantity,
+    newStock: detail.newStock
+});
+
+const getWasteMovementSearchFilter = (search) => !search ? {} : ({
+    OR: [
+        { waste: { supplierMaterial: { material: { name: { contains: search, mode: 'insensitive' } } } } },
+        { waste: { supplierMaterial: { supplier: { tradeName: { contains: search, mode: 'insensitive' } } } } },
+        { movement: { referenceNumber: { contains: search, mode: 'insensitive' } } },
+        { movement: { wasteIssue: { referenceNumber: { contains: search, mode: 'insensitive' } } } },
+        { movement: { wasteStockAdjustment: { referenceNumber: { contains: search, mode: 'insensitive' } } } }
+    ]
+});
+
+export const findAllMaterialMovements = async ({
     skip = 0,
     take = 10,
     startDate = '',
@@ -295,8 +355,58 @@ export const findAllMovements = async ({
         };
 
     } catch (err) {
-        logServiceError(serviceLogger, err, { operation: 'inventory.movementQueryService' });
+        logServiceError(serviceLogger, err, { operation: 'inventory.findAllMaterialMovements' });
 
         throw new MovementFindDatabaseError();
     }
 }
+
+export const findAllWasteMovements = async ({
+    skip = 0,
+    take = 10,
+    startDate = '',
+    endDate = '',
+    movementType = '',
+    search = '',
+    materialId = '',
+    supplierId = '',
+    orderBy = 'date',
+    orderDir = 'desc'
+} = {}) => {
+    const db = getDb();
+
+    try {
+        const isReturnMovementFilter = movementType === RETURN_MOVEMENT_TYPE;
+        const where = {
+            ...(materialId && { waste: { supplierMaterial: { materialId } } }),
+            ...(supplierId && { waste: { supplierMaterial: { supplierId } } }),
+            ...(isReturnMovementFilter && { wasteIssueReturn: { isNot: null } }),
+            ...(movementType === 'ENTRY' && { wasteIssueReturn: { is: null } }),
+            ...getWasteMovementSearchFilter(search),
+            movement: {
+                ...(movementType && { type: isReturnMovementFilter ? 'ENTRY' : movementType }),
+                ...getMovementDateFilter({ startDate, endDate })
+            }
+        };
+        const [movements, total, filtered] = await Promise.all([
+            db.wasteMovementDetail.findMany({
+                skip,
+                take,
+                orderBy: { movement: { [orderBy]: orderDir } },
+                where,
+                select: WASTE_MOVEMENT_DETAIL_SELECT
+            }),
+            db.wasteMovementDetail.count(),
+            db.wasteMovementDetail.count({ where })
+        ]);
+
+        return {
+            data: movements.map(mapWasteMovementDetail),
+            recordsTotal: total,
+            recordsFiltered: filtered
+        };
+    } catch (err) {
+        logServiceError(serviceLogger, err, { operation: 'inventory.findAllWasteMovements' });
+        throw new MovementFindDatabaseError();
+    }
+};
