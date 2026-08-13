@@ -2,19 +2,13 @@ import { updateTotals } from "../../../ui/formUI.js";
 import { createDataTable } from "../baseDatatable.js";
 import { buildDetailsColumns, buildDetailsHeader } from "./builderDetailDatatable.js";
 import { refreshMaterialTable } from "./renderMaterialDatatable.js";
+import { buildInventorySelectText } from "../../../utils/materialSelectUtils.js";
 
 export const renderWarehouseItemName = (row, supplierOverride, { useRowDimensions = false } = {}) => {
-
-    const supplierName = supplierOverride || row.supplier?.tradeName || row.supplierName || '';
-    const materialName = row.materialName || row.material?.name || row.name || '';
-    const materialBase = useRowDimensions ? row.base : row.materialBase ?? row.material?.base ?? row.base;
-    const materialHeight = useRowDimensions ? row.height : row.materialHeight ?? row.material?.height ?? row.height;
-
-    if (!materialBase || !materialHeight) {
-        return `${ materialName } || ${ supplierName }`;
-    }
-
-    return `${ materialName } (${ materialBase } x ${ materialHeight }) || ${ supplierName }`;
+    return buildInventorySelectText(row, {
+        supplierName: supplierOverride,
+        useRowDimensions
+    });
 };
 
 

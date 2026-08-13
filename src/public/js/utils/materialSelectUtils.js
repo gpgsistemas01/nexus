@@ -1,21 +1,24 @@
 export const formatInventorySelectDimensions = item => (
     item.base == null || item.height == null
-        ? 'Sin dimensiones'
+        ? 'Sin medidas'
         : `${ item.base } × ${ item.height }`
 );
 
-export const buildInventorySelectText = (item = {}) => {
+export const buildInventorySelectText = (item = {}, {
+    supplierName: supplierOverride = null,
+    useRowDimensions = false
+} = {}) => {
 
-    const supplierName = item.supplier?.tradeName || item.supplierName || '';
-    const materialName = item.materialName || item.name || '';
-    const materialBase = item.materialBase ?? item.base;
-    const materialHeight = item.materialHeight ?? item.height;
+    const supplierName = supplierOverride || item.supplier?.tradeName || item.supplierName || '';
+    const materialName = item.materialName || item.material?.name || item.name || '';
+    const materialBase = useRowDimensions ? item.base : item.materialBase ?? item.material?.base ?? item.base;
+    const materialHeight = useRowDimensions ? item.height : item.materialHeight ?? item.material?.height ?? item.height;
+    const dimensions = formatInventorySelectDimensions({ base: materialBase, height: materialHeight });
+    const materialIdentity = `${ materialName } (${ dimensions })`;
 
-    return [
-        materialName,
-        supplierName,
-        formatInventorySelectDimensions({ base: materialBase, height: materialHeight })
-    ].join(' · ');
+    return supplierName
+        ? `${ materialIdentity } · ${ supplierName }`
+        : materialIdentity;
 };
 
 export const resolveMaterialPresentationName = (item = {}) => (
