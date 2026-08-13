@@ -3,6 +3,7 @@ import { bindDisabledControlWarning } from "../../../ui/disabledControlWarning.j
 import { formatCurrency, formatDecimal } from "../../../utils/formatUtils.js";
 import { GOODS_RECEIPT_DETAIL_STATUSES, GOODS_RECEIPT_STATUS_LABELS } from "../../../constants/goodsReceiptStatuses.js";
 import { renderIssueSupplyCheckbox } from "../issueDetailDatatable.js";
+import { FORM_MODES } from '../../../constants/formModes.js';
 
 const DISABLED_PROJECT_QUANTITY_MESSAGE = 'Marque el detalle como surtido para capturar la cantidad de proyecto.';
 
@@ -47,23 +48,28 @@ const resolveDisabledTableInput = (cell, event) => {
 
 const shouldShowReceiptPurchaseColumns = ({ type }) => type === 'receipt';
 
-const ISSUE_DETAIL_RETURN_MODES = ['edit-detail', 'return'];
-const RECEIPT_DETAIL_ACTION_MODES = ['edit'];
+const ISSUE_DETAIL_RETURN_MODES = [FORM_MODES.EDIT_DETAIL, FORM_MODES.RETURN];
+const RECEIPT_DETAIL_ACTION_MODES = [FORM_MODES.EDIT];
 
-const shouldShowIssueProjectColumns = ({ type, mode, isWarehouse, isCoordinator, isSystem }) => (
+const shouldShowIssueProjectColumns = ({ type, mode, canManageProjectQuantity }) => (
     type === 'issue'
-    && ((isWarehouse && isCoordinator) || isSystem)
-    && mode === 'edit-detail'
+    && canManageProjectQuantity
+    && mode === FORM_MODES.EDIT_DETAIL
 );
 
 const shouldShowActionsColumn = ({ type, mode }) => {
-    if (type === 'receipt') return mode === 'create';
+    if (type === 'receipt') return mode === FORM_MODES.CREATE;
 
-    return !['edit-detail', 'edit-header', 'return', 'view'].includes(mode);
+    return ![
+        FORM_MODES.EDIT_DETAIL,
+        FORM_MODES.EDIT_HEADER,
+        FORM_MODES.RETURN,
+        FORM_MODES.VIEW
+    ].includes(mode);
 };
 
 
-const shouldShowIssueReturnActions = ({ type, mode }) => type === 'issue' && mode === 'return';
+const shouldShowIssueReturnActions = ({ type, mode }) => type === 'issue' && mode === FORM_MODES.RETURN;
 
 const shouldShowReceiptDetailActions = ({ type, mode }) => (
     type === 'receipt'
@@ -90,7 +96,7 @@ const isCanceledDetail = (row = {}) => {
 };
 
 const shouldShowDetailActionButtons = ({ row, mode }) => {
-    if (mode === 'create') return true;
+    if (mode === FORM_MODES.CREATE) return true;
 
     return Boolean(row?.id) && !isCanceledDetail(row);
 };
@@ -101,7 +107,7 @@ const resolveIssueSuppliedQuantityForDisplay = (row = {}) => {
     return row.suppliedQuantity;
 };
 
-export const buildDetailsHeader = ({ type, mode, isWarehouse, isCoordinator, isSystem }) => {
+export const buildDetailsHeader = ({ type, mode, canManageProjectQuantity = false }) => {
 
     let extraHeaders = '';
     const issueReturnHeaders = type === 'issue' && ISSUE_DETAIL_RETURN_MODES.includes(mode)
@@ -109,7 +115,7 @@ export const buildDetailsHeader = ({ type, mode, isWarehouse, isCoordinator, isS
         : '';
     const transactionQuantityHeader = `<th rowspan="2">${ type === 'issue' ? 'Salida' : 'Compra' }</th>`;
 
-    if (shouldShowIssueProjectColumns({ type, mode, isWarehouse, isCoordinator, isSystem })) {
+    if (shouldShowIssueProjectColumns({ type, mode, canManageProjectQuantity })) {
         extraHeaders += `
             <th rowspan="2">Costo unitario de Conversión</th>
             <th rowspan="2">Cantidad de proyecto</th>
@@ -126,7 +132,7 @@ export const buildDetailsHeader = ({ type, mode, isWarehouse, isCoordinator, isS
         `;
     }
 
-    if (type === 'issue' && mode === 'edit-detail') {
+    if (type === 'issue' && mode === FORM_MODES.EDIT_DETAIL) {
         extraHeaders += `<th rowspan="2">Surtir</th>`;
     }
 
@@ -155,7 +161,7 @@ export const buildDetailsHeader = ({ type, mode, isWarehouse, isCoordinator, isS
     `;
 };
 
-export const buildDetailsColumns = ({ type, mode, render, isWarehouse, isCoordinator, isSystem }) => {
+export const buildDetailsColumns = ({ type, mode, render, canManageProjectQuantity = false }) => {
 
     bindDisabledControlWarning({
         eventTargetSelector: '#materialTable td',
@@ -193,7 +199,7 @@ export const buildDetailsColumns = ({ type, mode, render, isWarehouse, isCoordin
         },
     ];
 
-    if (shouldShowIssueProjectColumns({ type, mode, isWarehouse, isCoordinator, isSystem })) {
+    if (shouldShowIssueProjectColumns({ type, mode, canManageProjectQuantity })) {
         columns.push(
             { data: 'maxUnitCost', render: formatCurrency },
             {
@@ -201,7 +207,7 @@ export const buildDetailsColumns = ({ type, mode, render, isWarehouse, isCoordin
                 render: (value, _, row) => {
 
                     const detailId = row.id || row.materialId;
-                    const isEditableDetail = mode === 'edit-detail' && !row.originalIsSupplied;
+                    const isEditableDetail = mode === FORM_MODES.EDIT_DETAIL && !row.originalIsSupplied;
                     const isProjectQuantityDisabled = !isEditableDetail || !row.isSupplied;
 
                     return `
@@ -232,13 +238,13 @@ export const buildDetailsColumns = ({ type, mode, render, isWarehouse, isCoordin
     }
 
 
-    if (type === 'issue' && mode === 'edit-detail') {
+    if (type === 'issue' && mode === FORM_MODES.EDIT_DETAIL) {
         columns.push({
             data: null,
             render: (_, __, row) => {
 
                 const detailId = row.id || row.materialId;
-                const isEditableDetail = mode === 'edit-detail' && !row.originalIsSupplied;
+                const isEditableDetail = mode === FORM_MODES.EDIT_DETAIL && !row.originalIsSupplied;
 
                 return renderIssueSupplyCheckbox({
                     detailId,

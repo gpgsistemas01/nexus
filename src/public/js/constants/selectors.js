@@ -27,7 +27,8 @@ export const MODAL_SELECTORS = {
     PURCHASE_REQUISITION: '#purchaseRequisitionModal',
     SUPPLIER: '#supplierModal',
     USER: '#userModal',
-    WASTE: '#wasteModal'
+    WASTE: '#wasteModal',
+    WASTE_ISSUE: '#wasteIssueModal'
 };
 
 export const FORM_SELECTORS = {
@@ -41,6 +42,11 @@ export const FORM_SELECTORS = {
     SUPPLIER_FORM: '#supplierForm',
     USER_FORM: '#userForm',
     WASTE_FORM: '#wasteForm',
+    WASTE_ISSUE: '#wasteIssueForm',
+    WASTE_ISSUE_DATE: '#wasteIssueDate',
+    WASTE_ISSUE_OBSERVATIONS: '#wasteIssueObservations',
+    WASTE_ISSUE_QUANTITY: '#wasteIssueQuantity',
+    WASTE_ISSUE_WASTE: '#wasteIssueWaste',
     REQUESTER: '#requesterInput',
     CLIENT: '#clientInput',
     DEPARTMENT: '#departmentInput',

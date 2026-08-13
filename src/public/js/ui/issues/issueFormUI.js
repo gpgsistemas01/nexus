@@ -1,6 +1,9 @@
 import { useForm } from '../../application/form.js';
-import { FORM_MODES } from '../../constants/formModes.js';
+import { FORM_MODES, ISSUE_HEADER_ENABLED_MODES } from '../../constants/formModes.js';
+import { FULFILLMENT_STATUS_NAMES } from '../../constants/fulfillmentStatuses.js';
 import { handleSubmit, toggleDisabledElement } from '../../utils/formUtils.js';
+import { clearFormErrors, initForm, setFormDisabled, toggleButtons } from '../formUI.js';
+import { buildModalTitle } from '../modalUI.js';
 
 const ISSUE_HEADER_FIELD_NAMES = Object.freeze([
     'clientId',
@@ -17,6 +20,65 @@ const resolveIssueUpdate = ({ mode, edit, editDetails, editHeader }) => {
     if (mode === FORM_MODES.EDIT_HEADER) return editHeader;
 
     return edit;
+};
+
+export const initializeIssueModal = ({ form, issueHeaderForm, mode, data = null }) => {
+    initForm({ form, mode, id: data?.id || '' });
+    form.querySelector('#submitBtn')?.classList.remove('d-none');
+    clearFormErrors(form);
+    toggleButtons({
+        mode,
+        status: data?.status?.name,
+        showActions: false,
+        withTotal: false,
+        showAddMaterial: mode === FORM_MODES.CREATE
+            || (mode === FORM_MODES.EDIT && data?.fulfillmentStatus?.name === FULFILLMENT_STATUS_NAMES.PENDING)
+    });
+    setFormDisabled({ form, isDisabled: false });
+    issueHeaderForm.initialize({
+        data,
+        isDisabled: !ISSUE_HEADER_ENABLED_MODES.includes(mode)
+    });
+
+    if (data) {
+        setFormDisabled({
+            form,
+            isDisabled: mode !== FORM_MODES.EDIT && mode !== FORM_MODES.EDIT_HEADER
+        });
+        issueHeaderForm.setDisabled(!ISSUE_HEADER_ENABLED_MODES.includes(mode));
+    }
+};
+
+export const applyIssueModalMode = ({
+    form,
+    modalElement,
+    mode,
+    entityName,
+    referenceNumber,
+    createTitle,
+    detailAction = 'Surtir',
+    returnAction = 'Devolver'
+}) => {
+    const title = modalElement.querySelector('#modalTitle');
+    const submit = form.querySelector('#submitBtn');
+
+    if (mode === FORM_MODES.CREATE) {
+        title.textContent = createTitle;
+        submit.textContent = 'Guardar';
+    } else if (mode === FORM_MODES.EDIT || mode === FORM_MODES.EDIT_HEADER) {
+        title.textContent = buildModalTitle({ action: 'Editar', entityName, referenceNumber });
+        submit.textContent = 'Editar';
+    } else if (mode === FORM_MODES.EDIT_DETAIL) {
+        title.textContent = buildModalTitle({ action: detailAction, entityName, referenceNumber });
+        submit.textContent = 'Surtir';
+    } else if (mode === FORM_MODES.RETURN) {
+        title.textContent = buildModalTitle({ action: returnAction, entityName, referenceNumber });
+        submit.classList.add('d-none');
+    } else if (mode === FORM_MODES.VIEW) {
+        title.textContent = buildModalTitle({ action: 'Consultar', entityName, referenceNumber });
+        submit.classList.add('d-none');
+        setFormDisabled({ form, isDisabled: true });
+    }
 };
 
 export const createIssueHeaderForm = ({

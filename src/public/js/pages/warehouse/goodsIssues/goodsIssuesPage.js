@@ -9,20 +9,18 @@ import { addGoodsIssueMaterialValidation, goodsIssueDetailsValidation, goodsIssu
 import { refreshMaterialTable } from "../../../plugins/datatable/utils/renderMaterialDatatable.js";
 import { createGoodsIssueDatatable, details, initDetailsGoodsIssueTable } from "../../../plugins/datatable/goodsIssueDatatable.js";
 import { getGoodsIssueHeaderSelects } from "../../../plugins/select2/modules/goodsIssueSelect.js";
-import { setFormDisabled, toggleButtons, clearAddedMaterialInput, clearFormErrors, normalizeFormErrors, initForm } from "../../../ui/formUI.js";
+import { clearAddedMaterialInput, normalizeFormErrors } from "../../../ui/formUI.js";
 import { on } from "../../../utils/domUtils.js";
 import { setDateTimePickerValue } from "../../../plugins/flatpickr/dateTimePicker.js";
 import { hasValidationErrors, syncCheckboxControlledInputs, validateDetailsFields, validateFields } from "../../../utils/formUtils.js";
-import { buildModalTitle, openModal } from "../../../ui/modalUI.js";
+import { openModal } from "../../../ui/modalUI.js";
 import { FORM_SELECTORS, MODAL_SELECTORS } from "../../../constants/selectors.js";
 import { FORM_MODES } from "../../../constants/formModes.js";
-import { FULFILLMENT_STATUS_NAMES } from "../../../constants/fulfillmentStatuses.js";
 import { formatDecimal, roundTo } from "../../../utils/formatUtils.js";
-import { createIssueHeaderForm, useIssueForm } from "../../../ui/issues/issueFormUI.js";
+import { applyIssueModalMode, createIssueHeaderForm, initializeIssueModal, useIssueForm } from "../../../ui/issues/issueFormUI.js";
 import { createIssueReturn } from "../../../ui/issues/issueReturnUI.js";
 import { mapGoodsIssueDetailDisplay } from "../../../utils/warehouse/issueDisplayUtils.js";
 
-const ENABLED_HEADER_MODES = [FORM_MODES.CREATE, FORM_MODES.EDIT, FORM_MODES.EDIT_HEADER];
 const modalId = MODAL_SELECTORS.GOODS_ISSUE;
 const formId = FORM_SELECTORS.GOODS_ISSUE;
 const GOODS_ISSUE_ENTITY_NAME = 'salida';
@@ -96,28 +94,12 @@ export const openGoodsIssueModal = ({ mode, data = null }) => {
 
     currentGoodsIssue = data;
 
-    initForm({ form, mode, id: data?.id || '' });
-    form.querySelector('#submitBtn')?.classList.remove('d-none');
-    clearFormErrors(form);
-    toggleButtons({
-        mode,
-        status: data?.status?.name,
-        showActions: false,
-        withTotal: false,
-        showAddMaterial: mode === FORM_MODES.CREATE || (mode === FORM_MODES.EDIT && data?.fulfillmentStatus?.name === FULFILLMENT_STATUS_NAMES.PENDING)
-    });
-    setFormDisabled({ form, isDisabled: false });
-    issueHeaderForm.initialize({
-        data,
-        isDisabled: !ENABLED_HEADER_MODES.includes(mode)
-    });
+    initializeIssueModal({ form, issueHeaderForm, mode, data });
 
     details.length = 0;
 
     if (mode === FORM_MODES.CREATE) {
 
-        modalElement.querySelector('#modalTitle').textContent = 'Registrar salida';
-        form.querySelector('#submitBtn').textContent = 'Guardar';
         form.querySelector('#presentationDisplayInput').value = '';
     }
 
@@ -159,44 +141,18 @@ export const openGoodsIssueModal = ({ mode, data = null }) => {
 
         details.push(...modalDetails);
 
-        setFormDisabled({ form, isDisabled: mode !== FORM_MODES.EDIT && mode !== FORM_MODES.EDIT_HEADER });
-        issueHeaderForm.setDisabled(!ENABLED_HEADER_MODES.includes(mode));
-
-        if (mode === FORM_MODES.EDIT || mode === FORM_MODES.EDIT_HEADER) {
-
-            modalElement.querySelector('#modalTitle').textContent = buildModalTitle({ action: 'Editar', entityName: GOODS_ISSUE_ENTITY_NAME, referenceNumber: data?.referenceNumber });
-            form.querySelector('#submitBtn').textContent = 'Editar';
-
-        }
-
-        if (mode === FORM_MODES.EDIT_DETAIL) {
-
-            modalElement.querySelector('#modalTitle').textContent = buildModalTitle({ action: 'Editar detalles de la', entityName: GOODS_ISSUE_ENTITY_NAME, referenceNumber: data?.referenceNumber });
-            form.querySelector('#submitBtn').textContent = 'Surtir';
-        }
-
-        if (mode === FORM_MODES.RETURN) {
-
-            modalElement.querySelector('#modalTitle').textContent = buildModalTitle({
-                action: 'Devolver materiales surtidos de la',
-                entityName: GOODS_ISSUE_ENTITY_NAME,
-                referenceNumber: data?.referenceNumber
-            });
-            form.querySelector('#submitBtn').classList.add('d-none');
-        }
-
-        if (mode === FORM_MODES.VIEW) {
-
-            modalElement.querySelector('#modalTitle').textContent = buildModalTitle({
-                action: 'Consultar',
-                entityName: GOODS_ISSUE_ENTITY_NAME,
-                referenceNumber: data?.referenceNumber
-            });
-            form.querySelector('#submitBtn').classList.add('d-none');
-            setFormDisabled({ form, isDisabled: true });
-        }
-
     }
+
+    applyIssueModalMode({
+        form,
+        modalElement,
+        mode,
+        entityName: GOODS_ISSUE_ENTITY_NAME,
+        referenceNumber: data?.referenceNumber,
+        createTitle: 'Registrar salida',
+        detailAction: 'Editar detalles de la',
+        returnAction: 'Devolver materiales surtidos de la'
+    });
 
     initDetailsGoodsIssueTable(mode, context);
 

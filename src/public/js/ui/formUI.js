@@ -331,7 +331,7 @@ export const toggleButtons = ({
         });
     }
 
-    document.querySelector('.total-container').classList.toggle('d-none', !withTotal);
+    document.querySelector('.total-container')?.classList.toggle('d-none', !withTotal);
     const approveContainer = document.querySelector('.approve-container');
 
     if (approveContainer) {

@@ -4,15 +4,15 @@ import { exportGoodsIssueReport } from "../../application/warehouse/report.js";
 import { buildExcelButton, buildTableExportParams } from "../../ui/tableUI.js";
 import { formatFileName } from "../../utils/formatters.js";
 import { createDataTable, renderActionButtons } from "./baseDatatable.js";
-import { createIssueDetailDatatable } from "./issueDetailDatatable.js";
-import { buildDetailsColumns, buildDetailsHeader } from "./utils/builderDetailDatatable.js";
-import { handleDelete, renderWarehouseItemName } from "./utils/detailDatatableUtils.js";
+import { createWarehouseIssueDetailsTable } from "./warehouseIssueDetailDatatable.js";
+import { handleDelete } from "./utils/detailDatatableUtils.js";
 import { getResponsiveRowData } from "./utils/responsive.js";
 import { setupTableFilters } from "./utils/filters/tableFilter.js";
 import { DATATABLE_SELECTORS } from "../../constants/selectors.js";
 import { FORM_MODES } from "../../constants/formModes.js";
 import { FULFILLMENT_STATUS_NAMES } from "../../constants/fulfillmentStatuses.js";
 import { buildIssueHeaderColumns } from './issueDatatable.js';
+import { hasPermission, UI_PERMISSIONS } from '../../constants/permissions.js';
 
 export let details = [];
 const selectorMaterialTable = DATATABLE_SELECTORS.MATERIAL;
@@ -21,11 +21,11 @@ let filters = {
     getValues: () => ({})
 };
 
-let materialTable;
-
 export const createGoodsIssueDatatable = async (context) => {
 
     let table;
+    const canManage = hasPermission(context, UI_PERMISSIONS.GOODS_ISSUES_MANAGE);
+    const canSupply = hasPermission(context, UI_PERMISSIONS.GOODS_ISSUE_DETAILS_MANAGE);
 
     const columns = buildIssueHeaderColumns({ context });
 
@@ -40,7 +40,9 @@ export const createGoodsIssueDatatable = async (context) => {
             render: (data, type, row) => renderActionButtons({
                 status: row.status?.name,
                 fulfillmentStatus: row.fulfillmentStatus?.name,
-                context: 'goodsIssue'
+                context: 'goodsIssue',
+                canManage,
+                canSupply
             })
         }
     );
@@ -61,10 +63,10 @@ export const createGoodsIssueDatatable = async (context) => {
             columns,
             order: [[0, 'desc']],
             buttons: [
-                {
+                ...(canManage ? [{
                     text: 'Nueva salida',
                     action: () => openGoodsIssueModal({ mode: FORM_MODES.CREATE })
-                },
+                }] : []),
                 buildExcelButton({
                     filename: formatFileName('reporte_salidas'),
                     request: ({ monthlyReport = false } = {}) => exportGoodsIssueReport(buildTableExportParams(table, {
@@ -105,35 +107,10 @@ export const createGoodsIssueDatatable = async (context) => {
 };
 
 export const initDetailsGoodsIssueTable = (mode, context) => {
-
-    const {
-        isCoordinator = false,
-        isWarehouse = false,
-        isSystem = false
-    } = context.organization || {};
-
-    const header = buildDetailsHeader({
-        type: 'issue',
-        mode,
-        isWarehouse,
-        isCoordinator,
-        isSystem
-    });
-
-    const columns = buildDetailsColumns({
-        type: 'issue',
-        mode,
-        render: (_, __, row) => renderWarehouseItemName(row),
-        isWarehouse,
-        isCoordinator,
-        isSystem
-    });
-
-    materialTable = createIssueDetailDatatable({
-        selector: selectorMaterialTable,
+    return createWarehouseIssueDetailsTable({
         data: details,
-        columns,
-        header
+        mode,
+        context
     });
 };
 
