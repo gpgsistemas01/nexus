@@ -16,6 +16,7 @@ import { hasValidationErrors, validateDetailsFields, validateFields } from "../.
 import { openModal } from "../../../ui/modalUI.js";
 import { FORM_SELECTORS, MODAL_SELECTORS } from "../../../constants/selectors.js";
 import { FORM_MODES } from "../../../constants/formModes.js";
+import { FULFILLMENT_STATUS_NAMES } from "../../../constants/fulfillmentStatuses.js";
 import { formatDecimal, roundTo } from "../../../utils/formatUtils.js";
 import { applyIssueModalMode, createIssueHeaderForm, initializeIssueModal, syncIssueProjectQuantityInput, useIssueForm } from "../../../ui/issues/issueFormUI.js";
 import { createIssueReturn } from "../../../ui/issues/issueReturnUI.js";
@@ -37,7 +38,6 @@ const goodsIssueReturn = createIssueReturn({
     sendReturn: returnGoodsIssueDetail
 });
 
-createGoodsIssueDatatable(context);
 goodsIssueReturn.initialize();
 
 
@@ -158,6 +158,21 @@ export const openGoodsIssueModal = ({ mode, data = null }) => {
 
     openModal(modalElement);
 };
+
+createGoodsIssueDatatable({
+    context,
+    onCreate: () => openGoodsIssueModal({ mode: FORM_MODES.CREATE }),
+    onEdit: issue => openGoodsIssueModal({
+        mode: issue.status?.name === 'Cancelada'
+            ? FORM_MODES.VIEW
+            : issue.fulfillmentStatus?.name === FULFILLMENT_STATUS_NAMES.PENDING
+                ? FORM_MODES.EDIT
+                : FORM_MODES.EDIT_HEADER,
+        data: issue
+    }),
+    onEditDetails: issue => openGoodsIssueModal({ mode: FORM_MODES.EDIT_DETAIL, data: issue }),
+    onReturnDetails: issue => openGoodsIssueModal({ mode: FORM_MODES.RETURN, data: issue })
+});
 
 const addMaterial = () => {
 

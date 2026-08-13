@@ -33,3 +33,16 @@ export const bindIssueTableAction = ({ table, tableSelector, buttonSelector, cal
         callback(getResponsiveRowData(table, this));
     });
 };
+
+export const bindIssueTableActions = ({ table, tableSelector, onEdit, onEditDetails, onReturnDetails }) => {
+    [
+        ['.btn-edit-detail', onEditDetails],
+        ['.btn-edit', onEdit],
+        ['.btn-return-detail', onReturnDetails]
+    ].forEach(([buttonSelector, callback]) => bindIssueTableAction({
+        table,
+        tableSelector,
+        buttonSelector,
+        callback
+    }));
+};
