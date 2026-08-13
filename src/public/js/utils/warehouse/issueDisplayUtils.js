@@ -17,11 +17,14 @@ const resolveCatalogDisplay = ({ detail, item, supplier }) => ({
 export const mapWasteIssueDetailDisplay = detail => {
     const supplierMaterial = detail.waste?.supplierMaterial;
 
-    return resolveCatalogDisplay({
-        detail,
-        item: supplierMaterial?.material,
-        supplier: supplierMaterial?.supplier
-    });
+    return {
+        ...resolveCatalogDisplay({
+            detail,
+            item: supplierMaterial?.material,
+            supplier: supplierMaterial?.supplier
+        }),
+        maxUnitCost: detail.maxUnitCost ?? supplierMaterial?.maxUnitCost ?? null
+    };
 };
 
 export const mapGoodsIssueDetailDisplay = detail => resolveCatalogDisplay({
