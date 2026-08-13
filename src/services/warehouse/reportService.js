@@ -119,35 +119,32 @@ const mapGoodsIssueDetailRows = (goodsIssues = [], { supplierId = '', materialId
     }));
 });
 
-const mapWasteIssueDetailRows = (wasteIssues = []) => wasteIssues.flatMap((wasteIssue) => (
-    (wasteIssue.details || [])
-        .filter(detail => detail.fulfillmentStatus?.name !== 'Cancelado')
-        .map((detail) => {
-            const material = detail.waste?.supplierMaterial?.material;
+const mapWasteIssueDetailRows = (details = []) => details.map((detail) => {
+    const wasteIssue = detail.wasteIssue;
+    const material = detail.waste?.supplierMaterial?.material;
 
-            return {
-                referenceNumber: wasteIssue.referenceNumber,
-                requestDate: formatDateLongWithTime(wasteIssue.requestDate),
-                departmentName: wasteIssue.departmentName,
-                requesterName: wasteIssue.requesterName,
-                clientName: wasteIssue.clientName,
-                projectNumber: wasteIssue.projectNumber,
-                fulfillmentStatusName: wasteIssue.fulfillmentStatus?.name,
-                materialName: detail.materialName,
-                supplierName: detail.waste?.supplierMaterial?.supplier?.tradeName,
-                wasteBase: toNumber(detail.waste?.base),
-                wasteHeight: toNumber(detail.waste?.height),
-                requestedQuantity: toNumber(detail.quantity),
-                suppliedQuantity: toNumber(detail.suppliedQuantity),
-                presentationName: material?.presentation?.name,
-                convertedQuantity: toNumber(detail.convertedQuantity),
-                convertedUnitMeasureName: material?.unitMeasure?.symbol || material?.unitMeasure?.name,
-                projectConvertedQuantity: toNumber(detail.projectConvertedQuantity),
-                convertedQuantityDifference: toNumber(detail.convertedQuantityDifference),
-                detailFulfillmentStatusName: detail.fulfillmentStatus?.name
-            };
-        })
-));
+    return {
+        referenceNumber: wasteIssue.referenceNumber,
+        requestDate: formatDateLongWithTime(wasteIssue.requestDate),
+        departmentName: wasteIssue.departmentName,
+        requesterName: wasteIssue.requesterName,
+        clientName: wasteIssue.clientName,
+        projectNumber: wasteIssue.projectNumber,
+        fulfillmentStatusName: wasteIssue.fulfillmentStatus?.name,
+        materialName: detail.materialName,
+        supplierName: detail.waste?.supplierMaterial?.supplier?.tradeName,
+        wasteBase: toNumber(detail.waste?.base),
+        wasteHeight: toNumber(detail.waste?.height),
+        requestedQuantity: toNumber(detail.quantity),
+        suppliedQuantity: toNumber(detail.suppliedQuantity),
+        presentationName: material?.presentation?.name,
+        convertedQuantity: toNumber(detail.convertedQuantity),
+        convertedUnitMeasureName: material?.unitMeasure?.symbol || material?.unitMeasure?.name,
+        projectConvertedQuantity: toNumber(detail.projectConvertedQuantity),
+        convertedQuantityDifference: toNumber(detail.convertedQuantityDifference),
+        detailFulfillmentStatusName: detail.fulfillmentStatus?.name
+    };
+});
 
 const mapGoodsReceiptDetailRows = (goodsReceipts = [], { materialId = '' } = {}) => goodsReceipts.flatMap((goodsReceipt) => {
 
@@ -365,7 +362,7 @@ export const findWasteIssueReportRows = async ({
         'clientName',
         'observations'
     ]);
-    const where = {
+    const issueWhere = {
         ...buildDateRangeFilter({ field: 'requestDate', startDate, endDate }),
         ...(clientId && { clientId }),
         ...(departmentId && { departmentId }),
@@ -382,31 +379,38 @@ export const findWasteIssueReportRows = async ({
             ]
         })
     };
-    const wasteIssues = await getDb().wasteIssue.findMany({
-        where,
+    const details = await getDb().wasteIssueDetail.findMany({
+        where: {
+            fulfillmentStatus: { name: { not: 'Cancelado' } },
+            wasteIssue: issueWhere
+        },
         include: {
             fulfillmentStatus: { select: { name: true } },
-            details: {
-                orderBy: { createdAt: 'asc' },
+            wasteIssue: {
+                include: { fulfillmentStatus: { select: { name: true } } }
+            },
+            waste: {
                 include: {
-                    fulfillmentStatus: { select: { name: true } },
-                    waste: {
+                    supplierMaterial: {
                         include: {
-                            supplierMaterial: {
-                                include: {
-                                    material: { include: { presentation: true, unitMeasure: true } },
-                                    supplier: true
-                                }
-                            }
+                            material: { include: { presentation: true, unitMeasure: true } },
+                            supplier: true
                         }
                     }
                 }
             }
         },
-        orderBy: { [sortableFields.has(orderBy) ? orderBy : 'requestDate']: orderDir }
+        orderBy: [
+            {
+                wasteIssue: {
+                    [sortableFields.has(orderBy) ? orderBy : 'requestDate']: orderDir
+                }
+            },
+            { createdAt: 'asc' }
+        ]
     });
 
-    return mapWasteIssueDetailRows(wasteIssues);
+    return mapWasteIssueDetailRows(details);
 };
 
 export const findSupplierReportRows = async ({
