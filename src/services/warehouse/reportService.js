@@ -1,10 +1,10 @@
 import { formatDateLongWithTime, roundTo, toNumber } from "../../utils/formattersUtils.js";
 import { findAllGoodsIssues } from "./goodsIssues/goodsIssueService.js";
 import { findAllGoodsReceipts } from "./goodsReceipts/goodsReceiptService.js";
-import { findAllWasteIssues } from "./wasteIssues/wasteIssueService.js";
 import { findAllSuppliers } from "./supplierService.js";
 import { GOODS_RECEIPT_STATUS_NAMES } from "../../constants/warehouseStatuses.js";
 import { getDb } from "../../repository/baseRepository.js";
+import { buildDateRangeFilter } from "../../utils/requestQueryUtils.js";
 
 const INVENTORY_REPORT_MATERIAL_SELECT = {
     maxUnitCost: true,
@@ -357,22 +357,56 @@ export const findWasteIssueReportRows = async ({
     orderBy = 'requestDate',
     orderDir = 'desc'
 } = {}) => {
-    const wasteIssuesResult = await findAllWasteIssues({
-        skip: 0,
-        take: 100000,
-        search,
-        startDate,
-        endDate,
-        fulfillmentStatusId,
-        observationsSearch,
-        clientId,
-        departmentId,
-        personId,
-        orderBy,
-        orderDir
+    const sortableFields = new Set([
+        'referenceNumber',
+        'requestDate',
+        'departmentName',
+        'projectNumber',
+        'clientName',
+        'observations'
+    ]);
+    const where = {
+        ...buildDateRangeFilter({ field: 'requestDate', startDate, endDate }),
+        ...(clientId && { clientId }),
+        ...(departmentId && { departmentId }),
+        ...(personId && { requesterId: personId }),
+        ...(fulfillmentStatusId && { fulfillmentStatusId }),
+        ...(observationsSearch && {
+            observations: { contains: observationsSearch, mode: 'insensitive' }
+        }),
+        ...(search && {
+            OR: [
+                { referenceNumber: { contains: search, mode: 'insensitive' } },
+                { observations: { contains: search, mode: 'insensitive' } },
+                { details: { some: { materialName: { contains: search, mode: 'insensitive' } } } }
+            ]
+        })
+    };
+    const wasteIssues = await getDb().wasteIssue.findMany({
+        where,
+        include: {
+            fulfillmentStatus: { select: { name: true } },
+            details: {
+                orderBy: { createdAt: 'asc' },
+                include: {
+                    fulfillmentStatus: { select: { name: true } },
+                    waste: {
+                        include: {
+                            supplierMaterial: {
+                                include: {
+                                    material: { include: { presentation: true, unitMeasure: true } },
+                                    supplier: true
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        orderBy: { [sortableFields.has(orderBy) ? orderBy : 'requestDate']: orderDir }
     });
 
-    return mapWasteIssueDetailRows(wasteIssuesResult.data);
+    return mapWasteIssueDetailRows(wasteIssues);
 };
 
 export const findSupplierReportRows = async ({
