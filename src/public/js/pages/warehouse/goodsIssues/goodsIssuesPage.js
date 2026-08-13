@@ -6,27 +6,37 @@ import {
     returnGoodsIssueDetail
 } from "../../../application/warehouse/goodsIssues/goodsIssues.js";
 import { addGoodsIssueMaterialValidation, issueProjectQuantityDetailsValidation, goodsIssueValidation } from "../../../utils/validations/validators.js";
-import { refreshMaterialTable } from "../../../plugins/datatable/utils/renderMaterialDatatable.js";
-import { createGoodsIssueDatatable, details, initDetailsGoodsIssueTable } from "../../../plugins/datatable/goodsIssueDatatable.js";
+import { createGoodsIssueDatatable } from "../../../plugins/datatable/goodsIssueDatatable.js";
 import { getGoodsIssueHeaderSelects } from "../../../plugins/select2/modules/goodsIssueSelect.js";
 import { clearAddedMaterialInput, normalizeFormErrors } from "../../../ui/formUI.js";
 import { on } from "../../../utils/domUtils.js";
 import { setDateTimePickerValue } from "../../../plugins/flatpickr/dateTimePicker.js";
 import { hasValidationErrors, validateDetailsFields, validateFields } from "../../../utils/formUtils.js";
 import { openModal } from "../../../ui/modalUI.js";
-import { FORM_SELECTORS, MODAL_SELECTORS } from "../../../constants/selectors.js";
+import { DATATABLE_SELECTORS, FORM_SELECTORS, MODAL_SELECTORS } from "../../../constants/selectors.js";
 import { FORM_MODES } from "../../../constants/formModes.js";
 import { roundTo } from "../../../utils/formatUtils.js";
-import { applyIssueModalMode, bindIssueProjectQuantityControls, createIssueHeaderForm, createIssueTableActions, initializeIssueModal, mapIssueSupplyDetails, useIssueForm } from "../../../ui/issues/issueFormUI.js";
+import { applyIssueModalMode, bindIssueProjectQuantityControls, createIssueHeaderForm, createIssueTableActions, getPendingIssueSupplyDetails, initializeIssueModal, mapIssueSupplyDetails, useIssueForm } from "../../../ui/issues/issueFormUI.js";
 import { createIssueReturn } from "../../../ui/issues/issueReturnUI.js";
 import { mapGoodsIssueDetailDisplay } from "../../../utils/warehouse/issueDisplayUtils.js";
+import { createWarehouseIssueDetailsTable } from '../../../plugins/datatable/warehouseIssueDetailDatatable.js';
 
 const modalId = MODAL_SELECTORS.GOODS_ISSUE;
 const formId = FORM_SELECTORS.GOODS_ISSUE;
 const GOODS_ISSUE_ENTITY_NAME = 'salida';
 
 const context = window.meta || {};
+const form = document.querySelector(formId);
+const modalElement = document.querySelector(modalId);
+const detailTableSelector = DATATABLE_SELECTORS.MATERIAL;
+const details = [];
 let currentGoodsIssue = null;
+
+const renderIssueDetails = () => createWarehouseIssueDetailsTable({
+    data: details,
+    mode: form.dataset.mode,
+    context
+});
 
 const issueHeaderForm = createIssueHeaderForm({
     formSelector: formId,
@@ -66,7 +76,13 @@ useIssueForm({
 
         const { mode } = form.dataset;
 
-        if (mode === FORM_MODES.EDIT_DETAIL) return validateDetailsFields(issueProjectQuantityDetailsValidation, details);
+        if (mode === FORM_MODES.EDIT_DETAIL) {
+            const detailsToSupply = getPendingIssueSupplyDetails(details);
+
+            return detailsToSupply.length
+                ? validateDetailsFields(issueProjectQuantityDetailsValidation, detailsToSupply)
+                : { details: 'Seleccione al menos un material pendiente por surtir.' };
+        }
 
         const errors = validateFields(goodsIssueValidation, formData);
 
@@ -82,9 +98,6 @@ useIssueForm({
 
 
 export const openGoodsIssueModal = ({ mode, data = null }) => {
-
-    const form = document.querySelector(formId);
-    const modalElement = document.querySelector(modalId);
 
     currentGoodsIssue = data;
 
@@ -148,7 +161,7 @@ export const openGoodsIssueModal = ({ mode, data = null }) => {
         returnAction: 'Devolver materiales surtidos de la'
     });
 
-    initDetailsGoodsIssueTable(mode, context);
+    renderIssueDetails();
 
     openModal(modalElement);
 };
@@ -208,9 +221,14 @@ const addMaterial = () => {
         supplierId,
     };
 
-    details.push(material);
+    const existingIndex = details.findIndex(detail => (
+        detail.materialId === materialId && detail.supplierId === supplierId
+    ));
 
-    refreshMaterialTable(details);
+    if (existingIndex >= 0) details.splice(existingIndex, 1, material);
+    else details.push(material);
+
+    renderIssueDetails();
     clearAddedMaterialInput();
 };
 
@@ -230,9 +248,17 @@ const findDetailByElement = (element) => {
 };
 
 on('click', '#addMaterialBtn', addMaterial);
+on('click', `${ detailTableSelector } .delete-btn`, (event, button) => {
+    const index = details.findIndex(detail => detail.materialId === button.dataset.id);
+
+    if (index < 0) return;
+
+    details.splice(index, 1);
+    renderIssueDetails();
+});
 bindIssueProjectQuantityControls({
-    form: document.querySelector(formId),
-    tableSelector: selectorMaterialTable,
+    form,
+    tableSelector: detailTableSelector,
     findDetail: findDetailByElement
 });
 

@@ -70,14 +70,12 @@ const setCurrentRequestDate = () => setDateTimePickerValue(
     new Date().toISOString()
 );
 
-const renderDraft = () => {
-    return createWarehouseIssueDetailsTable({
-        data: details,
-        mode: form.dataset.mode,
-        context,
-        projectQuantityPermission: UI_PERMISSIONS.WASTE_ISSUES_SUPPLY
-    });
-};
+const renderIssueDetails = () => createWarehouseIssueDetailsTable({
+    data: details,
+    mode: form.dataset.mode,
+    context,
+    projectQuantityPermission: UI_PERMISSIONS.WASTE_ISSUES_SUPPLY
+});
 
 const mapWasteIssueDetail = detail => {
     const display = mapWasteIssueDetailDisplay(detail);
@@ -120,7 +118,7 @@ export const openWasteIssueModal = ({ mode, data = null }) => {
         createTitle: 'Registrar salida de merma'
     });
 
-    renderDraft();
+    renderIssueDetails();
     openModal(modalElement);
 };
 
@@ -165,7 +163,7 @@ const addWaste = () => {
     if (existingIndex >= 0) details.splice(existingIndex, 1, detail);
     else details.push(detail);
 
-    renderDraft();
+    renderIssueDetails();
 
     clearAddedItemInput({
         itemSelector: FORM_SELECTORS.WASTE_ISSUE_WASTE,
@@ -187,7 +185,7 @@ on('click', `${ detailTableSelector } .delete-btn`, (event, button) => {
     if (index < 0) return;
 
     details.splice(index, 1);
-    renderDraft();
+    renderIssueDetails();
 });
 
 bindIssueProjectQuantityControls({
@@ -249,7 +247,7 @@ useIssueForm({
     editHeader: editWasteIssueHeader,
     onSaved: async () => {
         details.length = 0;
-        renderDraft();
+        renderIssueDetails();
         await wasteIssueSelect.initialize();
     }
 });

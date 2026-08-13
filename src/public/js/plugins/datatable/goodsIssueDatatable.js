@@ -2,14 +2,10 @@ import { getAllGoodsIssues } from "../../application/warehouse/goodsIssues/goods
 import { exportGoodsIssueReport } from "../../application/warehouse/report.js";
 import { buildExcelButton, buildTableExportParams } from "../../ui/tableUI.js";
 import { formatFileName } from "../../utils/formatters.js";
-import { createWarehouseIssueDetailsTable } from "./warehouseIssueDetailDatatable.js";
-import { handleDelete } from "./utils/detailDatatableUtils.js";
 import { DATATABLE_SELECTORS } from "../../constants/selectors.js";
 import { createIssueDatatable } from './issueDatatable.js';
 import { hasPermission, UI_PERMISSIONS } from '../../constants/permissions.js';
 
-export let details = [];
-const selectorMaterialTable = DATATABLE_SELECTORS.MATERIAL;
 const tableSelector = DATATABLE_SELECTORS.MAIN;
 let filters = {
     getValues: () => ({})
@@ -49,22 +45,3 @@ export const createGoodsIssueDatatable = async ({ context, onCreate, onEdit, onE
     table = issueDatatable.table;
     filters = issueDatatable.filters;
 };
-
-export const initDetailsGoodsIssueTable = (mode, context) => {
-    return createWarehouseIssueDetailsTable({
-        data: details,
-        mode,
-        context
-    });
-};
-
-$(selectorMaterialTable).on('click', '.delete-btn', function () {
-
-    const id = $(this).data('id');
-
-    handleDelete({
-        id,
-        details,
-        context: 'issue'
-    })
-});
