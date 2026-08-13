@@ -53,8 +53,17 @@ const resolveDisabledTableInput = (cell, event) => {
 
 const shouldShowReceiptPurchaseColumns = ({ type }) => type === 'receipt';
 
-const ISSUE_DETAIL_RETURN_MODES = [FORM_MODES.EDIT_DETAIL, FORM_MODES.RETURN];
 const RECEIPT_DETAIL_ACTION_MODES = [FORM_MODES.EDIT];
+
+const shouldShowIssueSuppliedQuantity = ({ type, mode }) => (
+    type === 'issue'
+    && [FORM_MODES.EDIT_DETAIL, FORM_MODES.RETURN].includes(mode)
+);
+
+const shouldShowIssueReturnedQuantity = ({ type, mode }) => (
+    type === 'issue'
+    && mode === FORM_MODES.RETURN
+);
 
 const shouldShowIssueProjectColumns = ({ type, mode, canManageProjectQuantity }) => (
     type === 'issue'
@@ -115,8 +124,11 @@ const resolveIssueSuppliedQuantityForDisplay = (row = {}) => {
 export const buildDetailsHeader = ({ type, mode, canManageProjectQuantity = false }) => {
 
     let extraHeaders = '';
-    const issueReturnHeaders = type === 'issue' && ISSUE_DETAIL_RETURN_MODES.includes(mode)
-        ? '<th rowspan="2">Cantidad surtida</th><th rowspan="2">Cantidad devuelta</th>'
+    const suppliedQuantityHeader = shouldShowIssueSuppliedQuantity({ type, mode })
+        ? '<th rowspan="2">Cantidad surtida</th>'
+        : '';
+    const returnedQuantityHeader = shouldShowIssueReturnedQuantity({ type, mode })
+        ? '<th rowspan="2">Cantidad devuelta</th>'
         : '';
     const transactionQuantityHeader = `<th rowspan="2">${ type === 'issue' ? 'Salida' : 'Compra' }</th>`;
 
@@ -151,7 +163,8 @@ export const buildDetailsHeader = ({ type, mode, canManageProjectQuantity = fals
                 <th rowspan="2">Material</th>
                 <th colspan="2">Medidas</th>
                 ${ transactionQuantityHeader }
-                ${ issueReturnHeaders }
+                ${ suppliedQuantityHeader }
+                ${ returnedQuantityHeader }
                 <th rowspan="2">Presentación</th>
                 <th colspan="2">Conversión</th>
                 ${ extraHeaders }
@@ -188,11 +201,13 @@ export const buildDetailsColumns = ({ type, mode, render, canManageProjectQuanti
             render: formatDecimal
         },
         { data: 'quantity', render: formatDecimal },
-        ...(type === 'issue' && ISSUE_DETAIL_RETURN_MODES.includes(mode) ? [
+        ...(shouldShowIssueSuppliedQuantity({ type, mode }) ? [
             {
                 data: null,
                 render: (_, __, row) => formatDecimal(resolveIssueSuppliedQuantityForDisplay(row))
-            },
+            }
+        ] : []),
+        ...(shouldShowIssueReturnedQuantity({ type, mode }) ? [
             { data: 'returnedQuantity', render: formatDecimal }
         ] : []),
         {
@@ -246,6 +261,9 @@ export const buildDetailsColumns = ({ type, mode, render, canManageProjectQuanti
     if (type === 'issue' && mode === FORM_MODES.EDIT_DETAIL) {
         columns.push({
             data: null,
+            // El surtido es la acción principal de este modo. Se conserva antes
+            // que las columnas informativas cuando Responsive reduce la tabla.
+            responsivePriority: 1,
             render: (_, __, row) => {
 
                 const detailId = row.id || row.materialId;
