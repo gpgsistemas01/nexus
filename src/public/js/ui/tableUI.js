@@ -51,6 +51,7 @@ export const buildExcelButton = ({
                         </div>
                     `,
                     showCancelButton: true,
+                    reverseButtons: true,
                     confirmButtonText: 'Descargar',
                     cancelButtonText: 'Cancelar',
                     buttonsStyling: false,
