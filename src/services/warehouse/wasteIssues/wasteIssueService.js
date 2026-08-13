@@ -301,8 +301,11 @@ const updateWasteIssueDetailsTransaction = async ({ id, wasteIssueDto }) => getD
     });
 
     if (!issue) throw new WasteIssueNotFound();
-    if (issue.fulfillmentStatus?.name === FULFILLMENT_STATUS_NAMES.COMPLETE) {
-        throw new WasteIssueStateConflict('La salida ya está completamente surtida.');
+    if ([
+        FULFILLMENT_STATUS_NAMES.COMPLETE,
+        FULFILLMENT_STATUS_NAMES.CANCELED
+    ].includes(issue.fulfillmentStatus?.name)) {
+        throw new WasteIssueStateConflict('La salida ya no tiene detalles pendientes por surtir.');
     }
 
     const statusIds = await findWasteIssueFulfillmentStatusIds(tx);

@@ -1,33 +1,14 @@
 import { getAllWasteIssues } from '../../application/warehouse/wasteIssues/wasteIssues.js';
-import { createDataTable } from './baseDatatable.js';
-import {
-    buildMdbEditActionButton,
-    buildMdbReturnActionButton,
-    buildMdbSupplyActionButton
-} from '../mdb/actionButton.js';
-import { FULFILLMENT_STATUS_NAMES } from '../../constants/fulfillmentStatuses.js';
+import { createDataTable, renderActionButtons } from './baseDatatable.js';
 import { hasPermission, UI_PERMISSIONS } from '../../constants/permissions.js';
 import {
-    bindIssueTableAction,
+    bindIssueTableActions,
     buildIssueHeaderColumns,
     buildIssueTrackingColumns
 } from './issueDatatable.js';
 import { setupTableFilters } from './utils/filters/tableFilter.js';
 
 const TABLE_SELECTOR = '#table';
-
-const editButton = buildMdbEditActionButton({
-    className: 'js-edit',
-    label: 'Editar salida'
-});
-const supplyButton = buildMdbSupplyActionButton({
-    className: 'js-edit-details',
-    label: 'Surtir salida'
-});
-const returnButton = buildMdbReturnActionButton({
-    className: 'js-return-details',
-    label: 'Devolver merma surtida'
-});
 
 export const createWasteIssueDatatable = async ({ context, onCreate, onEdit, onEditDetails, onReturnDetails }) => {
     const canManage = hasPermission(context, UI_PERMISSIONS.WASTE_ISSUES_MANAGE);
@@ -41,8 +22,12 @@ export const createWasteIssueDatatable = async ({ context, onCreate, onEdit, onE
             data: null,
             orderable: false,
             render: (_, __, issue) => {
-                const isComplete = issue.fulfillmentStatus?.name === FULFILLMENT_STATUS_NAMES.COMPLETE;
-                return `${ canManage ? editButton : '' }${ !canSupply ? '' : isComplete ? returnButton : supplyButton }`;
+                return renderActionButtons({
+                    context: 'wasteIssue',
+                    fulfillmentStatus: issue.fulfillmentStatus?.name,
+                    canManage,
+                    canSupply
+                });
             }
         }
     );
@@ -64,16 +49,13 @@ export const createWasteIssueDatatable = async ({ context, onCreate, onEdit, onE
         columns
     } });
 
-    [
-        ['.js-edit-details', onEditDetails],
-        ['.js-edit', onEdit],
-        ['.js-return-details', onReturnDetails]
-    ].forEach(([buttonSelector, callback]) => bindIssueTableAction({
+    bindIssueTableActions({
         table,
         tableSelector: TABLE_SELECTOR,
-        buttonSelector,
-        callback
-    }));
+        onEdit,
+        onEditDetails,
+        onReturnDetails
+    });
 
     return table;
 };

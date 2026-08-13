@@ -1,4 +1,3 @@
-import { openGoodsIssueModal } from "../../pages/warehouse/goodsIssues/goodsIssuesPage.js";
 import { getAllGoodsIssues } from "../../application/warehouse/goodsIssues/goodsIssues.js";
 import { exportGoodsIssueReport } from "../../application/warehouse/report.js";
 import { buildExcelButton, buildTableExportParams } from "../../ui/tableUI.js";
@@ -6,12 +5,9 @@ import { formatFileName } from "../../utils/formatters.js";
 import { createDataTable, renderActionButtons } from "./baseDatatable.js";
 import { createWarehouseIssueDetailsTable } from "./warehouseIssueDetailDatatable.js";
 import { handleDelete } from "./utils/detailDatatableUtils.js";
-import { getResponsiveRowData } from "./utils/responsive.js";
 import { setupTableFilters } from "./utils/filters/tableFilter.js";
 import { DATATABLE_SELECTORS } from "../../constants/selectors.js";
-import { FORM_MODES } from "../../constants/formModes.js";
-import { FULFILLMENT_STATUS_NAMES } from "../../constants/fulfillmentStatuses.js";
-import { buildIssueHeaderColumns, buildIssueTrackingColumns } from './issueDatatable.js';
+import { bindIssueTableActions, buildIssueHeaderColumns, buildIssueTrackingColumns } from './issueDatatable.js';
 import { hasPermission, UI_PERMISSIONS } from '../../constants/permissions.js';
 
 export let details = [];
@@ -21,7 +17,7 @@ let filters = {
     getValues: () => ({})
 };
 
-export const createGoodsIssueDatatable = async (context) => {
+export const createGoodsIssueDatatable = async ({ context, onCreate, onEdit, onEditDetails, onReturnDetails }) => {
 
     let table;
     const canManage = hasPermission(context, UI_PERMISSIONS.GOODS_ISSUES_MANAGE);
@@ -62,7 +58,7 @@ export const createGoodsIssueDatatable = async (context) => {
             buttons: [
                 ...(canManage ? [{
                     text: 'Nueva salida',
-                    action: () => openGoodsIssueModal({ mode: FORM_MODES.CREATE })
+                    action: onCreate
                 }] : []),
                 buildExcelButton({
                     filename: formatFileName('reporte_salidas'),
@@ -75,30 +71,12 @@ export const createGoodsIssueDatatable = async (context) => {
         }
     });
 
-    $(`${ tableSelector } tbody`).on('click', '.btn-edit', function () {
-
-        const data = getResponsiveRowData(table, this);
-        const mode = data?.status?.name === 'Cancelada'
-            ? FORM_MODES.VIEW
-            : data?.fulfillmentStatus?.name === FULFILLMENT_STATUS_NAMES.PENDING
-                ? FORM_MODES.EDIT
-                : FORM_MODES.EDIT_HEADER;
-
-        openGoodsIssueModal({ mode, data });
-    })
-
-    $(`${ tableSelector } tbody`).on('click', '.btn-edit-detail', function() {
-
-        const data = getResponsiveRowData(table, this);
-
-        openGoodsIssueModal({ mode: FORM_MODES.EDIT_DETAIL, data });
-    });
-
-    $(`${ tableSelector } tbody`).on('click', '.btn-return-detail', function() {
-
-        const data = getResponsiveRowData(table, this);
-
-        openGoodsIssueModal({ mode: FORM_MODES.RETURN, data });
+    bindIssueTableActions({
+        table,
+        tableSelector,
+        onEdit,
+        onEditDetails,
+        onReturnDetails
     });
 
 };

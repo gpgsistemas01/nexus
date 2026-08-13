@@ -287,7 +287,9 @@ createWasteIssueDatatable({
     context,
     onCreate: () => openWasteIssueModal({ mode: FORM_MODES.CREATE }),
     onEdit: issue => openWasteIssueModal({
-        mode: issue.fulfillmentStatus?.name === FULFILLMENT_STATUS_NAMES.PENDING
+        mode: issue.fulfillmentStatus?.name === FULFILLMENT_STATUS_NAMES.CANCELED
+            ? FORM_MODES.VIEW
+            : issue.fulfillmentStatus?.name === FULFILLMENT_STATUS_NAMES.PENDING
             ? FORM_MODES.EDIT
             : FORM_MODES.EDIT_HEADER,
         data: issue

@@ -160,6 +160,28 @@ describe('waste issue controller database integration', () => {
     });
     const wasteAfterReturn = await prisma.waste.findUnique({ where: { id: ids.waste } });
     expect(Number(wasteAfterReturn.currentStock)).toBe(7);
+
+    await request(app)
+      .patch(`/waste-issues/${ issueId }/details/${ detailId }/returns`)
+      .send({ returnQuantity: 3, observations: 'Devolución total' })
+      .expect(200);
+
+    const canceledIssue = await prisma.wasteIssue.findUnique({
+      where: { id: issueId },
+      include: { fulfillmentStatus: true, details: { include: { fulfillmentStatus: true } } }
+    });
+    const wasteAfterFullReturn = await prisma.waste.findUnique({ where: { id: ids.waste } });
+
+    expect(canceledIssue.fulfillmentStatus.name).toBe('Cancelado');
+    expect(canceledIssue.details[0].fulfillmentStatus.name).toBe('Cancelado');
+    expect(Number(canceledIssue.details[0].returnedQuantity)).toBe(4);
+    expect(Number(wasteAfterFullReturn.currentStock)).toBe(10);
+
+    const rejectedSupply = await request(app).patch(`/waste-issues/${ issueId }/details`).send({
+      details: [{ id: detailId, isSupplied: true, projectConvertedQuantity: 3.5 }]
+    }).expect(409);
+
+    expect(rejectedSupply.body.code).toBe('WASTE_ISSUE_STATE_CONFLICT');
   });
 
   it('rechaza stock insuficiente y revierte toda la transacción', async () => {

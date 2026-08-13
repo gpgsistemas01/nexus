@@ -220,17 +220,21 @@ export const renderActionButtons = (options = {}) => {
         canDeleteWaste = false
     } = normalizeActionButtonOptions(options);
     const isGoodsIssue = context === 'goodsIssue';
+    const isWasteIssue = context === 'wasteIssue';
+    const isIssue = isGoodsIssue || isWasteIssue;
     const isGoodsReceipt = context === 'goodsReceipt';
     const isApproved = status === DOCUMENT_STATUS_LABELS.APPROVED;
     const isCanceled = status === DOCUMENT_STATUS_LABELS.CANCELED;
     const isInventoryItem = context === 'material' || context === 'waste';
 
     return [
-        [(isGoodsIssue || isGoodsReceipt) && isCanceled, ACTION_BUTTONS.view],
+        [((isGoodsIssue || isGoodsReceipt) && isCanceled)
+            || (isWasteIssue && fulfillmentStatus === 'Cancelado'), ACTION_BUTTONS.view],
         [
             canManage && (
                 status === 'Abierta'
                 || (isGoodsIssue && isApproved)
+                || (isWasteIssue && fulfillmentStatus !== 'Cancelado')
                 || (isGoodsReceipt && !isCanceled)
                 || EDITABLE_ACTION_CONTEXTS.has(context)
             ),
@@ -239,8 +243,8 @@ export const renderActionButtons = (options = {}) => {
         [isInventoryItem && canAdjustStock, ACTION_BUTTONS.adjustStock],
         [context === 'material' && canDeleteMaterial, ACTION_BUTTONS.deleteMaterial],
         [context === 'waste' && canDeleteWaste, ACTION_BUTTONS.deleteWaste],
-        [canSupply && isGoodsIssue && isApproved && SUPPLY_FULFILLMENT_STATUSES.has(fulfillmentStatus), ACTION_BUTTONS.supplyDetail],
-        [canSupply && isGoodsIssue && isApproved && fulfillmentStatus === 'Surtido', ACTION_BUTTONS.returnDetail]
+        [canSupply && isIssue && (!isGoodsIssue || isApproved) && SUPPLY_FULFILLMENT_STATUSES.has(fulfillmentStatus), ACTION_BUTTONS.supplyDetail],
+        [canSupply && isIssue && (!isGoodsIssue || isApproved) && fulfillmentStatus === 'Surtido', ACTION_BUTTONS.returnDetail]
     ]
         .filter(([canRender]) => canRender)
         .map(([, button]) => button)
