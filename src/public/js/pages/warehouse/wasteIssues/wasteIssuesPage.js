@@ -10,7 +10,6 @@ import { handleApiError } from '../../../api/errorHandler.js';
 import { openModal } from '../../../ui/modalUI.js';
 import { createWasteIssueDatatable } from '../../../plugins/datatable/wasteIssueDatatable.js';
 import { setDateTimePickerValue } from '../../../plugins/flatpickr/dateTimePicker.js';
-import { FULFILLMENT_STATUS_NAMES } from '../../../constants/fulfillmentStatuses.js';
 import { FORM_MODES } from '../../../constants/formModes.js';
 import { DATATABLE_SELECTORS, FORM_SELECTORS, MODAL_SELECTORS } from '../../../constants/selectors.js';
 import { createIssueHeaderSelects } from '../../../plugins/select2/modules/issueHeaderSelect.js';
@@ -18,11 +17,11 @@ import { hasValidationErrors, validateDetailsFields, validateFields } from '../.
 import { addWasteIssueDetailValidation, issueProjectQuantityDetailsValidation, wasteIssueValidation } from '../../../utils/validations/validators.js';
 import { clearAddedItemInput, normalizeFormErrors } from '../../../ui/formUI.js';
 import { setMdbWrapperInputValue } from '../../../plugins/select2/baseSelect.js';
-import { applyIssueModalMode, createIssueHeaderForm, initializeIssueModal, syncIssueProjectQuantityInput, useIssueForm } from '../../../ui/issues/issueFormUI.js';
+import { applyIssueModalMode, bindIssueProjectQuantityControls, createIssueHeaderForm, createIssueTableActions, getPendingIssueSupplyDetails, initializeIssueModal, mapIssueSupplyDetails, useIssueForm } from '../../../ui/issues/issueFormUI.js';
 import { mapWasteIssueDetailDisplay } from '../../../utils/warehouse/issueDisplayUtils.js';
 import { createWasteIssueSelect } from '../../../plugins/select2/modules/wasteIssueSelect.js';
 import { createWarehouseIssueDetailsTable } from '../../../plugins/datatable/warehouseIssueDetailDatatable.js';
-import { formatDecimal, roundTo } from '../../../utils/formatUtils.js';
+import { roundTo } from '../../../utils/formatUtils.js';
 import { on } from '../../../utils/domUtils.js';
 import { UI_PERMISSIONS } from '../../../constants/permissions.js';
 
@@ -191,32 +190,10 @@ on('click', `${ detailTableSelector } .delete-btn`, (event, button) => {
     renderDraft();
 });
 
-on('change', `${ detailTableSelector } .supply-checkbox`, (event, checkbox) => {
-    const detail = findDetailByElement(checkbox);
-
-    if (!detail) return;
-
-    detail.isSupplied = checkbox.checked;
-
-    if (!checkbox.checked) {
-        detail.projectConvertedQuantity = detail.originalProjectConvertedQuantity ?? null;
-        detail.convertedQuantityDifference = detail.originalConvertedQuantityDifference ?? null;
-    }
-
-    syncIssueProjectQuantityInput({ form, checkbox, detail });
-});
-
-on('input', `${ detailTableSelector } .project-converted-quantity-input`, (event, input) => {
-    const detail = findDetailByElement(input);
-
-    if (!detail) return;
-
-    detail.projectConvertedQuantity = Number(input.value);
-    detail.convertedQuantityDifference = roundTo(detail.convertedQuantity - detail.projectConvertedQuantity);
-
-    const differenceCell = input.closest('td')?.nextElementSibling;
-
-    if (differenceCell) differenceCell.textContent = formatDecimal(detail.convertedQuantityDifference);
+bindIssueProjectQuantityControls({
+    form,
+    tableSelector: detailTableSelector,
+    findDetail: findDetailByElement
 });
 
 on('click', `${ detailTableSelector } .return-issue-detail-btn`, (event, button) => {
@@ -231,13 +208,7 @@ const normalizeWasteIssueData = ({ form }) => {
 
     if (mode === FORM_MODES.EDIT_DETAIL) {
         return {
-            details: details
-                .filter(detail => detail.isSupplied && !detail.originalIsSupplied)
-                .map(detail => ({
-                    id: detail.id,
-                    isSupplied: detail.isSupplied,
-                    projectConvertedQuantity: detail.projectConvertedQuantity
-                }))
+            details: mapIssueSupplyDetails(details)
         };
     }
 
@@ -259,7 +230,7 @@ useIssueForm({
     getErrors: ({ form, formData }) => {
 
         if (form.dataset.mode === FORM_MODES.EDIT_DETAIL) {
-            const detailsToSupply = details.filter(detail => detail.isSupplied && !detail.originalIsSupplied);
+            const detailsToSupply = getPendingIssueSupplyDetails(details);
 
             return detailsToSupply.length
                 ? validateDetailsFields(issueProjectQuantityDetailsValidation, detailsToSupply)
@@ -285,17 +256,7 @@ useIssueForm({
 
 createWasteIssueDatatable({
     context,
-    onCreate: () => openWasteIssueModal({ mode: FORM_MODES.CREATE }),
-    onEdit: issue => openWasteIssueModal({
-        mode: issue.fulfillmentStatus?.name === FULFILLMENT_STATUS_NAMES.CANCELED
-            ? FORM_MODES.VIEW
-            : issue.fulfillmentStatus?.name === FULFILLMENT_STATUS_NAMES.PENDING
-            ? FORM_MODES.EDIT
-            : FORM_MODES.EDIT_HEADER,
-        data: issue
-    }),
-    onEditDetails: issue => openWasteIssueModal({ mode: FORM_MODES.EDIT_DETAIL, data: issue }),
-    onReturnDetails: issue => openWasteIssueModal({ mode: FORM_MODES.RETURN, data: issue })
+    ...createIssueTableActions({ openIssueModal: openWasteIssueModal })
 });
 
 wasteIssueReturn.initialize();

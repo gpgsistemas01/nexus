@@ -29,6 +29,18 @@ import { buildDateRangeFilter } from '../../../utils/requestQueryUtils.js';
 
 const serviceLogger = createServiceLogger('warehouse.wasteIssues.wasteIssueService');
 
+const normalizeWasteIssueDetailResponse = detail => ({
+    ...detail,
+    maxUnitCost: detail.maxUnitCost ?? detail.waste?.supplierMaterial?.maxUnitCost ?? null,
+    projectConvertedQuantity: detail.projectConvertedQuantity ?? null,
+    convertedQuantityDifference: detail.convertedQuantityDifference ?? null
+});
+
+const normalizeWasteIssueResponse = issue => issue && ({
+    ...issue,
+    details: issue.details?.map(normalizeWasteIssueDetailResponse) ?? []
+});
+
 const WASTE_ISSUE_INCLUDE = {
     createdBy: { select: { id: true, name: true } },
     fulfillmentStatus: { select: { id: true, name: true } },
@@ -189,7 +201,11 @@ export const findAllWasteIssues = async ({
         db.wasteIssue.count({ where })
     ]);
 
-    return { data, recordsTotal, recordsFiltered };
+    return {
+        data: data.map(normalizeWasteIssueResponse),
+        recordsTotal,
+        recordsFiltered
+    };
 };
 
 const createWasteIssueTransaction = async ({ wasteIssueDto, userId }) => getDb().$transaction(async tx => {
@@ -205,7 +221,7 @@ const createWasteIssueTransaction = async ({ wasteIssueDto, userId }) => getDb()
     const headerData = await resolveWasteIssueHeaderData({ tx, dto: headerDto });
     const referenceNumber = await generateYearlyReferenceNumber({ type: DOCUMENT_REFERENCE_TYPES.WASTE_ISSUE, tx });
 
-    return tx.wasteIssue.create({
+    const issue = await tx.wasteIssue.create({
         data: {
             ...headerData,
             referenceNumber,
@@ -215,6 +231,8 @@ const createWasteIssueTransaction = async ({ wasteIssueDto, userId }) => getDb()
         },
         include: WASTE_ISSUE_INCLUDE
     });
+
+    return normalizeWasteIssueResponse(issue);
 });
 
 export const createWasteIssue = async ({ wasteIssueDto, userId }) => executeServiceOperation({
@@ -246,7 +264,7 @@ const updateWasteIssueTransaction = async ({ id, wasteIssueDto }) => getDb().$tr
     const headerData = await resolveWasteIssueHeaderData({ tx, dto: headerDto });
     await tx.wasteIssueDetail.deleteMany({ where: { wasteIssueId: id } });
 
-    return tx.wasteIssue.update({
+    const issue = await tx.wasteIssue.update({
         where: { id },
         data: {
             ...headerData,
@@ -255,6 +273,8 @@ const updateWasteIssueTransaction = async ({ id, wasteIssueDto }) => getDb().$tr
         },
         include: WASTE_ISSUE_INCLUDE
     });
+
+    return normalizeWasteIssueResponse(issue);
 });
 
 export const updateWasteIssue = async ({ id, wasteIssueDto }) => executeServiceOperation({
@@ -277,11 +297,13 @@ export const updateWasteIssueHeader = async ({ id, wasteIssueDto }) => {
             const headerData = await resolveWasteIssueHeaderData({ dto: wasteIssueDto });
 
             try {
-                return await getDb().wasteIssue.update({
+                const issue = await getDb().wasteIssue.update({
                     where: { id },
                     data: headerData,
                     include: WASTE_ISSUE_INCLUDE
                 });
+
+                return normalizeWasteIssueResponse(issue);
             } catch (error) {
                 if (error?.code === PRISMA_ERROR_CODES.RECORD_NOT_FOUND) {
                     throw new WasteIssueNotFound();
@@ -366,11 +388,13 @@ const updateWasteIssueDetailsTransaction = async ({ id, wasteIssueDto }) => getD
     const details = await tx.wasteIssueDetail.findMany({ where: { wasteIssueId: id } });
     const statusName = resolveIssueFulfillmentStatus(details);
 
-    return tx.wasteIssue.update({
+    const updatedIssue = await tx.wasteIssue.update({
         where: { id },
         data: { fulfillmentStatus: { connect: { id: statusIds.get(statusName) } } },
         include: WASTE_ISSUE_INCLUDE
     });
+
+    return normalizeWasteIssueResponse(updatedIssue);
 });
 
 export const updateWasteIssueDetails = async ({ id, wasteIssueDto }) => executeServiceOperation({

@@ -40,6 +40,7 @@ describe('waste issue controller database integration', () => {
     app = createControllerTestApp({
       registerRoutes: router => {
         router.use((req, _res, next) => { req.user = { id: ids.user }; next(); });
+        router.get('/waste-issues', controller.getAllWasteIssues);
         router.post('/waste-issues', controller.registerWasteIssue);
         router.patch('/waste-issues/:id', controller.editWasteIssue);
         router.patch('/waste-issues/:id/header', controller.editWasteIssueHeader);
@@ -65,7 +66,9 @@ describe('waste issue controller database integration', () => {
     const material = await prisma.material.create({
       data: { name: `IT WasteIssue Material ${ suffix }`, unitMeasureId: unit.id, presentationId: presentation.id }
     });
-    const supplierMaterial = await prisma.supplierMaterial.create({ data: { materialId: material.id, supplierId: supplier.id } });
+    const supplierMaterial = await prisma.supplierMaterial.create({
+      data: { materialId: material.id, supplierId: supplier.id, maxUnitCost: 25 }
+    });
     const waste = await prisma.waste.create({ data: { supplierMaterialId: supplierMaterial.id, currentStock: 10, convertedQuantity: 10 } });
     const user = await prisma.user.create({ data: { name: `ITWasteIssueUser${ suffix }`, password: 'integration-only' } });
     const department = await prisma.department.create({ data: { name: `IT Waste Issue Area ${ suffix }` } });
@@ -109,9 +112,30 @@ describe('waste issue controller database integration', () => {
     }).expect(200);
     const detailId = edited.body.wasteIssue.details[0].id;
 
-    await request(app).patch(`/waste-issues/${ issueId }/details`).send({
+    expect(edited.body.wasteIssue.details[0]).toMatchObject({
+      maxUnitCost: '25',
+      projectConvertedQuantity: null,
+      convertedQuantityDifference: null
+    });
+
+    const listed = await request(app).get('/waste-issues').query({ start: 0, length: 10 }).expect(200);
+    const listedIssue = listed.body.data.find(issue => issue.id === issueId);
+
+    expect(listedIssue.details[0]).toMatchObject({
+      maxUnitCost: '25',
+      projectConvertedQuantity: null,
+      convertedQuantityDifference: null
+    });
+
+    const supplied = await request(app).patch(`/waste-issues/${ issueId }/details`).send({
       details: [{ id: detailId, isSupplied: true, projectConvertedQuantity: 3.5 }]
     }).expect(200);
+
+    expect(supplied.body.wasteIssue.details[0]).toMatchObject({
+      maxUnitCost: '25',
+      projectConvertedQuantity: '3.5',
+      convertedQuantityDifference: '0.5'
+    });
 
     await request(app).patch(`/waste-issues/${ issueId }/header`).send({
       requesterId: ids.requester, advisorId: ids.advisor, clientId: ids.client, departmentId: ids.department, projectNumber: 'PR-102',

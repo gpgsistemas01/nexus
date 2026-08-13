@@ -16,9 +16,8 @@ import { hasValidationErrors, validateDetailsFields, validateFields } from "../.
 import { openModal } from "../../../ui/modalUI.js";
 import { FORM_SELECTORS, MODAL_SELECTORS } from "../../../constants/selectors.js";
 import { FORM_MODES } from "../../../constants/formModes.js";
-import { FULFILLMENT_STATUS_NAMES } from "../../../constants/fulfillmentStatuses.js";
-import { formatDecimal, roundTo } from "../../../utils/formatUtils.js";
-import { applyIssueModalMode, createIssueHeaderForm, initializeIssueModal, syncIssueProjectQuantityInput, useIssueForm } from "../../../ui/issues/issueFormUI.js";
+import { roundTo } from "../../../utils/formatUtils.js";
+import { applyIssueModalMode, bindIssueProjectQuantityControls, createIssueHeaderForm, createIssueTableActions, initializeIssueModal, mapIssueSupplyDetails, useIssueForm } from "../../../ui/issues/issueFormUI.js";
 import { createIssueReturn } from "../../../ui/issues/issueReturnUI.js";
 import { mapGoodsIssueDetailDisplay } from "../../../utils/warehouse/issueDisplayUtils.js";
 
@@ -48,12 +47,7 @@ const normalizeGoodsIssueData = ({ form, formData }) => {
     if (mode === FORM_MODES.EDIT_DETAIL) {
         return {
             id: form.dataset.id,
-            details: details.filter(detail => detail.isSupplied && !detail.originalIsSupplied)
-                .map(({ id, isSupplied, projectConvertedQuantity }) => ({
-                    id,
-                    isSupplied,
-                    projectConvertedQuantity
-                }))
+            details: mapIssueSupplyDetails(details)
         };
     }
 
@@ -161,17 +155,7 @@ export const openGoodsIssueModal = ({ mode, data = null }) => {
 
 createGoodsIssueDatatable({
     context,
-    onCreate: () => openGoodsIssueModal({ mode: FORM_MODES.CREATE }),
-    onEdit: issue => openGoodsIssueModal({
-        mode: issue.status?.name === 'Cancelada'
-            ? FORM_MODES.VIEW
-            : issue.fulfillmentStatus?.name === FULFILLMENT_STATUS_NAMES.PENDING
-                ? FORM_MODES.EDIT
-                : FORM_MODES.EDIT_HEADER,
-        data: issue
-    }),
-    onEditDetails: issue => openGoodsIssueModal({ mode: FORM_MODES.EDIT_DETAIL, data: issue }),
-    onReturnDetails: issue => openGoodsIssueModal({ mode: FORM_MODES.RETURN, data: issue })
+    ...createIssueTableActions({ openIssueModal: openGoodsIssueModal })
 });
 
 const addMaterial = () => {
@@ -246,39 +230,10 @@ const findDetailByElement = (element) => {
 };
 
 on('click', '#addMaterialBtn', addMaterial);
-on('change', '.supply-checkbox', (e, checkbox) => {
-
-    const material = findDetailByElement(checkbox);
-
-    if (!material) return;
-
-    material.isSupplied = checkbox.checked;
-
-    if (!checkbox.checked) {
-        material.projectConvertedQuantity = material.originalProjectConvertedQuantity ?? null;
-        material.convertedQuantityDifference = material.originalConvertedQuantityDifference ?? null;
-    }
-
-    syncIssueProjectQuantityInput({
-        form: document.querySelector(formId),
-        checkbox,
-        detail: material
-    });
-});
-on('input', '.project-converted-quantity-input', (e, input) => {
-
-    const value = Number(input.value);
-    const material = findDetailByElement(input);
-
-    if (!material) return;
-
-    material.projectConvertedQuantity = value;
-    material.convertedQuantityDifference = roundTo(material.convertedQuantity - material.projectConvertedQuantity);
-
-    const currentTd = input.closest('td');
-    const nextTd = currentTd.nextElementSibling;
-
-    if (nextTd) nextTd.textContent = formatDecimal(material.convertedQuantityDifference);
+bindIssueProjectQuantityControls({
+    form: document.querySelector(formId),
+    tableSelector: selectorMaterialTable,
+    findDetail: findDetailByElement
 });
 
 
