@@ -104,15 +104,17 @@ flowchart LR
     subgraph admin["Administración"]
         users["Usuarios<br/>/usuarios-sistemas"]
         persons["Personas<br/>/personas"]
-        movements["Movimientos<br/>/movimientos"]
+        materialMovements["Movimientos de materiales<br/>/movimientos/materiales"]
+        wasteMovements["Movimientos de merma<br/>/movimientos/mermas"]
     end
 
     materials --> wastes
     materials --> requisitions
     requisitions --> purchases
     purchases --> goodsIssues
-    goodsIssues --> movements
+    goodsIssues --> materialMovements
     wastes --> wasteIssues
+    wasteIssues --> wasteMovements
     suppliers --> purchases
     clients --> goodsIssues
     materials --> clients
@@ -135,7 +137,8 @@ flowchart LR
 | Ventas | Clientes (`/clientes`) | Consultar y administrar clientes. | Crear/editar desde modal. | `src/views/pages/sales/clients/clientsPage.ejs` |
 | Administración | Usuarios (`/usuarios-sistemas`) | Administrar cuentas y asignaciones. | Crear/editar usuario, roles y departamentos. | `src/views/pages/admin/users/usersPage.ejs` |
 | Administración | Personas (`/personas`) | Administrar personas participantes del negocio. | Filtrar y crear/editar datos y asignaciones. | `src/views/pages/admin/persons/personsPage.ejs` |
-| Administración | Movimientos (`/movimientos`) | Auditar movimientos de inventario. | Filtrar y consultar el historial. | `src/views/pages/admin/movements/movementsPage.ejs` |
+| Administración | Movimientos de materiales (`/movimientos/materiales`) | Auditar movimientos del inventario de materiales. | Filtrar, consultar y exportar el historial. | `src/views/pages/admin/movements/movementsPage.ejs` |
+| Administración | Movimientos de merma (`/movimientos/mermas`) | Auditar movimientos del inventario de merma. | Filtrar, consultar y exportar el historial. | `src/views/pages/admin/movements/movementsPage.ejs` |
 | Sistema | No encontrada (`/error/404`) | Recuperar al usuario de una URL inexistente. | Volver al inicio apropiado según la sesión. | `src/views/pages/error/404.ejs` |
 
 ### Redirecciones de compatibilidad

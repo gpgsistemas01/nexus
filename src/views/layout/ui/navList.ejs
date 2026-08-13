@@ -28,7 +28,14 @@ const items = [
             createNavLink({ content: 'Mermas', icon: 'fa-solid fa-recycle', href: '/salidas/mermas', permission: 'waste:issues-page-view' })
         ]
     },
-    createNavLink({ content: 'Movimientos', icon: 'fa-solid fa-arrows-rotate', href: '/movimientos', permission: 'movements:read' }),
+    {
+        content: 'Movimientos',
+        icon: 'fa-solid fa-arrows-rotate',
+        children: [
+            createNavLink({ content: 'Materiales', icon: 'fa-solid fa-boxes-stacked', href: '/movimientos/materiales', permission: 'movements:read' }),
+            createNavLink({ content: 'Mermas', icon: 'fa-solid fa-recycle', href: '/movimientos/mermas', permission: 'movements:read' })
+        ]
+    },
     createNavLink({ content: 'Usuarios', icon: 'fa-solid fa-users-gear', href: '/usuarios-sistemas', permission: 'users:manage' }),
     createNavLink({ content: 'Personas', icon: 'fa-solid fa-id-badge', href: '/personas', permission: 'persons:page-view' }),
     createNavLink({ content: 'Clientes', icon: 'fa-solid fa-address-book', href: '/clientes', permission: 'clients:page-view' }),
