@@ -179,7 +179,6 @@ describe('waste issue controller database integration', () => {
 
     const report = await request(app)
       .get('/waste-issues/excel')
-      .query({ search: issue.referenceNumber })
       .expect('Content-Type', /spreadsheetml/)
       .expect(200);
     const workbook = xlsx.read(report.body, { type: 'buffer' });
