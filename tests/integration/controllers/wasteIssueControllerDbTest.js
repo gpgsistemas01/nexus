@@ -129,6 +129,19 @@ describe('waste issue controller database integration', () => {
       convertedQuantityDifference: null
     });
 
+    const observationsTerm = 'Salida editada antes del surtido';
+    const globalSearch = await request(app)
+      .get('/waste-issues')
+      .query({ start: 0, length: 10, search: { value: observationsTerm } })
+      .expect(200);
+    const observationsFilter = await request(app)
+      .get('/waste-issues')
+      .query({ start: 0, length: 10, observationsSearch: observationsTerm })
+      .expect(200);
+
+    expect(globalSearch.body.data).not.toContainEqual(expect.objectContaining({ id: issueId }));
+    expect(observationsFilter.body.data).toContainEqual(expect.objectContaining({ id: issueId }));
+
     const supplied = await request(app).patch(`/waste-issues/${ issueId }/details`).send({
       details: [{ id: detailId, isSupplied: true, projectConvertedQuantity: 3.5 }]
     }).expect(200);

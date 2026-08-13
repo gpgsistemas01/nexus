@@ -183,7 +183,6 @@ export const findAllWasteIssues = async ({
         ...(search && {
             OR: [
                 { referenceNumber: { contains: search, mode: 'insensitive' } },
-                { observations: { contains: search, mode: 'insensitive' } },
                 { details: { some: { materialName: { contains: search, mode: 'insensitive' } } } }
             ]
         })
