@@ -20,6 +20,7 @@ import { applyIssueModalMode, bindIssueProjectQuantityControls, createIssueHeade
 import { createIssueReturn } from "../../../ui/issues/issueReturnUI.js";
 import { mapGoodsIssueDetailDisplay } from "../../../utils/warehouse/issueDisplayUtils.js";
 import { createWarehouseIssueDetailsTable } from '../../../plugins/datatable/warehouseIssueDetailDatatable.js';
+import { refreshMaterialTable } from '../../../plugins/datatable/utils/renderMaterialDatatable.js';
 
 const modalId = MODAL_SELECTORS.GOODS_ISSUE;
 const formId = FORM_SELECTORS.GOODS_ISSUE;
@@ -228,7 +229,7 @@ const addMaterial = () => {
     if (existingIndex >= 0) details.splice(existingIndex, 1, material);
     else details.push(material);
 
-    renderIssueDetails();
+    refreshMaterialTable(details);
     clearAddedMaterialInput();
 };
 
@@ -254,7 +255,7 @@ on('click', `${ detailTableSelector } .delete-btn`, (event, button) => {
     if (index < 0) return;
 
     details.splice(index, 1);
-    renderIssueDetails();
+    refreshMaterialTable(details);
 });
 bindIssueProjectQuantityControls({
     form,

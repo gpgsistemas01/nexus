@@ -24,6 +24,7 @@ import { createWarehouseIssueDetailsTable } from '../../../plugins/datatable/war
 import { roundTo } from '../../../utils/formatUtils.js';
 import { on } from '../../../utils/domUtils.js';
 import { UI_PERMISSIONS } from '../../../constants/permissions.js';
+import { refreshMaterialTable } from '../../../plugins/datatable/utils/renderMaterialDatatable.js';
 
 const formId = FORM_SELECTORS.WASTE_ISSUE;
 const modalId = MODAL_SELECTORS.WASTE_ISSUE;
@@ -163,7 +164,7 @@ const addWaste = () => {
     if (existingIndex >= 0) details.splice(existingIndex, 1, detail);
     else details.push(detail);
 
-    renderIssueDetails();
+    refreshMaterialTable(details);
 
     clearAddedItemInput({
         itemSelector: FORM_SELECTORS.WASTE_ISSUE_WASTE,
@@ -185,7 +186,7 @@ on('click', `${ detailTableSelector } .delete-btn`, (event, button) => {
     if (index < 0) return;
 
     details.splice(index, 1);
-    renderIssueDetails();
+    refreshMaterialTable(details);
 });
 
 bindIssueProjectQuantityControls({
@@ -247,7 +248,7 @@ useIssueForm({
     editHeader: editWasteIssueHeader,
     onSaved: async () => {
         details.length = 0;
-        renderIssueDetails();
+        refreshMaterialTable(details);
         await wasteIssueSelect.initialize();
     }
 });
