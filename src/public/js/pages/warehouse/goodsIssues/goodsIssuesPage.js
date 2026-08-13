@@ -119,27 +119,7 @@ export const openGoodsIssueModal = ({ mode, data = null }) => {
             const display = mapGoodsIssueDetailDisplay(detail);
 
             return {
-                id: detail.id,
-                materialId: detail.materialId,
-                supplierId: detail.supplierId,
-                presentationId: detail.presentationId ?? detail.material?.presentation?.id ?? null,
-                unitMeasureId: detail.unitMeasureId ?? detail.material?.unitMeasure?.id ?? null,
-                materialName: detail.materialName,
-                materialBase: display.base,
-                materialHeight: display.height,
-                quantity: detail.quantity,
-                presentationName: display.presentationName,
-                convertedQuantity: detail.convertedQuantity,
-                unitMeasureName: display.unitMeasureName,
-                unitMeasureSymbol: display.unitMeasureSymbol,
-                maxUnitCost: detail.maxUnitCost,
-                projectConvertedQuantity: detail.projectConvertedQuantity,
-                convertedQuantityDifference: detail.convertedQuantityDifference,
-                supplierName: display.supplierName,
-                suppliedQuantity: detail.suppliedQuantity,
-                returnedQuantity: detail.returnedQuantity,
-                isSupplied: detail.isSupplied,
-                fulfillmentStatus: detail.fulfillmentStatus,
+                ...display,
                 originalIsSupplied: detail.isSupplied,
                 originalProjectConvertedQuantity: detail.projectConvertedQuantity ?? null,
                 originalConvertedQuantityDifference: detail.convertedQuantityDifference ?? null

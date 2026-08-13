@@ -82,9 +82,6 @@ const mapWasteIssueDetail = detail => {
 
     return {
         ...display,
-        materialId: detail.wasteId,
-        materialBase: display.base,
-        materialHeight: display.height,
         projectConvertedQuantity: detail.projectConvertedQuantity,
         convertedQuantityDifference: detail.convertedQuantityDifference,
         originalProjectConvertedQuantity: detail.projectConvertedQuantity ?? null,
