@@ -942,7 +942,13 @@ table.dataTable > tbody > tr.child td.child {
 .table-action-btn {
   border: 1px solid rgba(255, 255, 255, 0.35) !important;
   box-shadow: 0 0.3rem 0.65rem rgba(var(--mdb-secondary-rgb), 0.16);
+  margin: 0 0.125rem;
   transition: box-shadow 0.2s ease, filter 0.2s ease, transform 0.2s ease;
+  vertical-align: middle;
+}
+
+.table-action-btn i {
+  pointer-events: none;
 }
 
 .table-action-btn:hover {
@@ -2003,16 +2009,6 @@ body section {
 
 }
 
-/* table action button styles */
-.table-action-btn {
-  margin: 0 0.125rem;
-  vertical-align: middle;
-}
-
-.table-action-btn i {
-  pointer-events: none;
-}
-
 /* Shared layout for controls placed above modal detail tables */
 .modal-detail-controls {
   background: rgba(255, 255, 255, 0.78);
@@ -2054,19 +2050,9 @@ body section {
     width: 100%;
   }
 }
-.table.datatable-table td:has(.table-action-btn),
-table.dataTable.datatable-table td:has(.table-action-btn),
-.modal-detail-table td:has(.table-action-btn),
-table.dataTable.modal-detail-table td:has(.table-action-btn) {
+:is(.datatable-table td, .datatable-responsive-detail-value):has(.table-action-btn) {
   text-align: center;
   white-space: nowrap;
-}
-
-.table.datatable-table td:has(.table-action-btn) > *,
-table.dataTable.datatable-table td:has(.table-action-btn) > *,
-.modal-detail-table td:has(.table-action-btn) > *,
-table.dataTable.modal-detail-table td:has(.table-action-btn) > * {
-  vertical-align: middle;
 }
 
 /* login page styles */

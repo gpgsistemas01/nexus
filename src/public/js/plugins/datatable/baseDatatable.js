@@ -1,6 +1,15 @@
 import { DATATABLE_SELECTORS } from "../../constants/selectors.js";
 import { handleDataTableError } from "../../api/errorHandler.js";
-import { buildMdbActionButton } from "../mdb/actionButton.js";
+import {
+    buildMdbAdjustStockActionButton,
+    buildMdbActionButton,
+    buildMdbDeleteActionButton,
+    buildMdbEditActionButton,
+    buildMdbEditDetailActionButton,
+    buildMdbReturnActionButton,
+    buildMdbSupplyActionButton,
+    buildMdbViewActionButton
+} from "../mdb/actionButton.js";
 import { initMdbTooltips } from "../mdb/baseInstance.js";
 import { configureResponsiveHeaderGroups, mergeMainTableColumnDefs, renderResponsiveDetails } from "./utils/responsive.js";
 
@@ -164,46 +173,32 @@ const DOCUMENT_STATUS_LABELS = Object.freeze({
 const EDITABLE_ACTION_CONTEXTS = new Set(['person', 'client', 'supplier']);
 const SUPPLY_FULFILLMENT_STATUSES = new Set(['Pendiente', 'Surtido parcial']);
 const ACTION_BUTTONS = Object.freeze({
-    view: buildMdbActionButton({
+    view: buildMdbViewActionButton({
         className: 'btn-edit',
-        colorClass: 'btn-secondary',
-        iconClass: 'fa-solid fa-eye',
         label: 'Ver registro'
     }),
-    edit: buildMdbActionButton({
+    edit: buildMdbEditActionButton({
         className: 'btn-edit',
-        colorClass: 'btn-primary',
-        iconClass: 'fa-solid fa-pencil',
         label: 'Editar registro'
     }),
-    adjustStock: buildMdbActionButton({
+    adjustStock: buildMdbAdjustStockActionButton({
         className: 'btn-adjust-stock',
-        colorClass: 'btn-success',
-        iconClass: 'fa-solid fa-boxes-stacked',
         label: 'Ajustar stock'
     }),
-    deleteMaterial: buildMdbActionButton({
+    deleteMaterial: buildMdbDeleteActionButton({
         className: 'btn-delete-material',
-        colorClass: 'btn-danger',
-        iconClass: 'fa-solid fa-trash',
         label: 'Eliminar material'
     }),
-    deleteWaste: buildMdbActionButton({
+    deleteWaste: buildMdbDeleteActionButton({
         className: 'btn-delete-waste',
-        colorClass: 'btn-danger',
-        iconClass: 'fa-solid fa-trash',
         label: 'Eliminar merma'
     }),
-    supplyDetail: buildMdbActionButton({
+    supplyDetail: buildMdbSupplyActionButton({
         className: 'btn-edit-detail',
-        colorClass: 'btn-info',
-        iconClass: 'fa fa-edit',
         label: 'Surtir detalle'
     }),
-    returnDetail: buildMdbActionButton({
+    returnDetail: buildMdbReturnActionButton({
         className: 'btn-return-detail',
-        colorClass: 'btn-warning',
-        iconClass: 'fa-solid fa-rotate-left',
         label: 'Devolver material surtido'
     })
 });
