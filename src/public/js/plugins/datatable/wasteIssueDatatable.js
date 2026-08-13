@@ -13,7 +13,7 @@ export const createWasteIssueDatatable = async ({ context, onCreate, onEdit, onE
         actionContext: 'wasteIssue',
         canManage,
         canSupply,
-        searchPlaceholder: 'Buscar por Folio, Observaciones o Material',
+        searchPlaceholder: 'Buscar por Folio o Material',
         order: [[1, 'desc']],
         buttons: canManage ? [{ text: 'Nueva salida', action: onCreate }] : [],
         tableSelector: TABLE_SELECTOR,
