@@ -21,6 +21,13 @@ export const buildIssueHeaderColumns = ({ context }) => {
     return columns;
 };
 
+export const buildIssueTrackingColumns = ({ includeStatus = false } = {}) => [
+    { title: 'Proyecto', data: 'projectNumber' },
+    { title: 'Cliente', data: 'clientName' },
+    ...(includeStatus ? [{ title: 'Estado', data: 'status.name' }] : []),
+    { title: 'Estado surtido', data: 'fulfillmentStatus.name' }
+];
+
 export const bindIssueTableAction = ({ table, tableSelector, buttonSelector, callback }) => {
     $(`${ tableSelector } tbody`).on('click', buttonSelector, function () {
         callback(getResponsiveRowData(table, this));

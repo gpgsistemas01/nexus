@@ -7,7 +7,11 @@ import {
 } from '../mdb/actionButton.js';
 import { FULFILLMENT_STATUS_NAMES } from '../../constants/fulfillmentStatuses.js';
 import { hasPermission, UI_PERMISSIONS } from '../../constants/permissions.js';
-import { bindIssueTableAction, buildIssueHeaderColumns } from './issueDatatable.js';
+import {
+    bindIssueTableAction,
+    buildIssueHeaderColumns,
+    buildIssueTrackingColumns
+} from './issueDatatable.js';
 import { setupTableFilters } from './utils/filters/tableFilter.js';
 
 const TABLE_SELECTOR = '#table';
@@ -31,10 +35,7 @@ export const createWasteIssueDatatable = async ({ context, onCreate, onEdit, onE
     const columns = buildIssueHeaderColumns({ context });
 
     columns.push(
-        { title: 'Proyecto', data: 'projectNumber' },
-        { title: 'Cliente', data: 'clientName' },
-        { title: 'Estado surtido', data: 'fulfillmentStatus.name' },
-        { title: 'Observaciones', data: 'observations', defaultContent: '' },
+        ...buildIssueTrackingColumns(),
         {
             title: 'Acciones',
             data: null,
