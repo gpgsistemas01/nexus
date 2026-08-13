@@ -11,7 +11,7 @@ import { setupTableFilters } from "./utils/filters/tableFilter.js";
 import { DATATABLE_SELECTORS } from "../../constants/selectors.js";
 import { FORM_MODES } from "../../constants/formModes.js";
 import { FULFILLMENT_STATUS_NAMES } from "../../constants/fulfillmentStatuses.js";
-import { buildIssueHeaderColumns } from './issueDatatable.js';
+import { buildIssueHeaderColumns, buildIssueTrackingColumns } from './issueDatatable.js';
 import { hasPermission, UI_PERMISSIONS } from '../../constants/permissions.js';
 
 export let details = [];
@@ -30,10 +30,7 @@ export const createGoodsIssueDatatable = async (context) => {
     const columns = buildIssueHeaderColumns({ context });
 
     columns.push(
-        { data: 'projectNumber', title: 'Proyecto' },
-        { data: 'clientName', title: 'Cliente' },
-        { data: 'status.name', title: 'Estado' },
-        { data: 'fulfillmentStatus.name', title: 'Estado surtido' },
+        ...buildIssueTrackingColumns({ includeStatus: true }),
         {
             data: 'id',
             title: 'Acciones',
