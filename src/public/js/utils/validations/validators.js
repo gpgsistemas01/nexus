@@ -136,7 +136,7 @@ export const addWasteIssueDetailValidation = {
     quantity: value => validatePositiveNumber(value, 'La cantidad')
 };
 
-export const goodsIssueDetailsValidation = {
+export const issueProjectQuantityDetailsValidation = {
     projectConvertedQuantity: (value) => validateNumber(value, 'La cantidad')
 }
 

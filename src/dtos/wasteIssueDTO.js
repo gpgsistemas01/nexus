@@ -12,7 +12,8 @@ export const createWasteIssueHeaderDtoForEdit = (body = {}) => createIssueHeader
 export const createWasteIssueDetailsDtoForEdit = (body = {}) => ({
     details: body.details.map(detail => ({
         id: detail.id,
-        isSupplied: Boolean(detail.isSupplied)
+        isSupplied: Boolean(detail.isSupplied),
+        projectConvertedQuantity: Number(detail.projectConvertedQuantity)
     }))
 });
 

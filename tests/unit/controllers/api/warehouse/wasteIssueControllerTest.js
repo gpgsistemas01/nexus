@@ -120,13 +120,20 @@ describe('wasteIssueController', () => {
 
     await editWasteIssueDetails({
       params: { id: 'issue-1' },
-      body: { details: [{ id: 'detail-1', isSupplied: true, fulfillmentStatusId: 'client-status' }] }
+      body: {
+        details: [{
+          id: 'detail-1',
+          isSupplied: true,
+          projectConvertedQuantity: '2.25',
+          fulfillmentStatusId: 'client-status'
+        }]
+      }
     }, response);
 
     expect(updateWasteIssueDetails).toHaveBeenCalledWith({
       id: 'issue-1',
       wasteIssueDto: {
-        details: [{ id: 'detail-1', isSupplied: true }]
+        details: [{ id: 'detail-1', isSupplied: true, projectConvertedQuantity: 2.25 }]
       }
     });
     expect(response.status).toHaveBeenCalledWith(200);

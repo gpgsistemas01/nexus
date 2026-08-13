@@ -323,30 +323,7 @@ export const validateGoodsIssueDetailsArray = ({ allowDetailId = false } = {}) =
     })
 ;
 
-export const validateIssueDetailsEdition = body('details')
-    .isArray({ min: 1 }).withMessage(errorMap['details'].REQUIRED)
-    .bail()
-    .custom(details => {
-
-        const ids = new Set();
-
-        details.forEach(detail => {
-            if (!detail.id || !uuidV4Regex.test(detail.id) || ids.has(detail.id)) {
-                throw new Error(errorMap['details'].INVALID_FORMAT_ID);
-            }
-
-            ids.add(detail.id);
-
-            if (typeof detail.isSupplied !== 'boolean') {
-                throw new Error(errorMap['details'].INVALID_FORMAT_REQUIRED);
-            }
-        });
-
-        return true;
-    })
-;
-
-export const validateGoodsIssueDetailsEdition =
+export const validateIssueProjectQuantityDetailsEdition =
     body('details')
         .isArray({ min: 1 }).withMessage(errorMap['details'].REQUIRED)
         .custom((details) => {

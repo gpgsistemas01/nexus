@@ -110,7 +110,7 @@ describe('waste issue controller database integration', () => {
     const detailId = edited.body.wasteIssue.details[0].id;
 
     await request(app).patch(`/waste-issues/${ issueId }/details`).send({
-      details: [{ id: detailId, isSupplied: true }]
+      details: [{ id: detailId, isSupplied: true, projectConvertedQuantity: 3.5 }]
     }).expect(200);
 
     await request(app).patch(`/waste-issues/${ issueId }/header`).send({
@@ -142,6 +142,8 @@ describe('waste issue controller database integration', () => {
     expect(issue.fulfillmentStatus.name).toBe('Surtido');
     expect(issue.observations).toBe('Encabezado editado después del surtido');
     expect(issue.details[0].fulfillmentStatus.name).toBe('Surtido');
+    expect(Number(issue.details[0].projectConvertedQuantity)).toBe(3.5);
+    expect(Number(issue.details[0].convertedQuantityDifference)).toBe(0.5);
     expect(Number(waste.currentStock)).toBe(6);
     expect(movement).toMatchObject({ type: 'ISSUE', details: [expect.objectContaining({ wasteIssueDetailId: detailId })] });
     expect(Number(movement.details[0].quantity)).toBe(-4);
@@ -171,7 +173,7 @@ describe('waste issue controller database integration', () => {
     const detailId = created.body.wasteIssue.details[0].id;
 
     const response = await request(app).patch(`/waste-issues/${ issueId }/details`).send({
-      details: [{ id: detailId, isSupplied: true }]
+      details: [{ id: detailId, isSupplied: true, projectConvertedQuantity: 1 }]
     }).expect(409);
 
     expect(response.body.code).toBe('WASTE_ISSUE_STOCK_CONFLICT');
