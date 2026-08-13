@@ -4,11 +4,15 @@ import { buildDetailsColumns, buildDetailsHeader } from './utils/builderDetailDa
 import { renderWarehouseItemName } from './utils/detailDatatableUtils.js';
 import { hasPermission, UI_PERMISSIONS } from '../../constants/permissions.js';
 
-export const buildWarehouseIssueDetailsConfig = ({ mode, context = {} }) => {
+export const buildWarehouseIssueDetailsConfig = ({
+    mode,
+    context = {},
+    projectQuantityPermission = UI_PERMISSIONS.GOODS_ISSUE_DETAILS_MANAGE
+}) => {
     const tableContext = {
         type: 'issue',
         mode,
-        canManageProjectQuantity: hasPermission(context, UI_PERMISSIONS.GOODS_ISSUE_DETAILS_MANAGE)
+        canManageProjectQuantity: hasPermission(context, projectQuantityPermission)
     };
 
     return {
@@ -28,9 +32,14 @@ export const createWarehouseIssueDetailsTable = ({
     data,
     mode,
     context = {},
+    projectQuantityPermission = UI_PERMISSIONS.GOODS_ISSUE_DETAILS_MANAGE,
     selector = DATATABLE_SELECTORS.MATERIAL
 }) => {
-    const { header, columns } = buildWarehouseIssueDetailsConfig({ mode, context });
+    const { header, columns } = buildWarehouseIssueDetailsConfig({
+        mode,
+        context,
+        projectQuantityPermission
+    });
 
     return createIssueDetailDatatable({ selector, data, header, columns });
 };

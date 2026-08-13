@@ -5,19 +5,19 @@ import {
     registerGoodsIssue,
     returnGoodsIssueDetail
 } from "../../../application/warehouse/goodsIssues/goodsIssues.js";
-import { addGoodsIssueMaterialValidation, goodsIssueDetailsValidation, goodsIssueValidation } from "../../../utils/validations/validators.js";
+import { addGoodsIssueMaterialValidation, issueProjectQuantityDetailsValidation, goodsIssueValidation } from "../../../utils/validations/validators.js";
 import { refreshMaterialTable } from "../../../plugins/datatable/utils/renderMaterialDatatable.js";
 import { createGoodsIssueDatatable, details, initDetailsGoodsIssueTable } from "../../../plugins/datatable/goodsIssueDatatable.js";
 import { getGoodsIssueHeaderSelects } from "../../../plugins/select2/modules/goodsIssueSelect.js";
 import { clearAddedMaterialInput, normalizeFormErrors } from "../../../ui/formUI.js";
 import { on } from "../../../utils/domUtils.js";
 import { setDateTimePickerValue } from "../../../plugins/flatpickr/dateTimePicker.js";
-import { hasValidationErrors, syncCheckboxControlledInputs, validateDetailsFields, validateFields } from "../../../utils/formUtils.js";
+import { hasValidationErrors, validateDetailsFields, validateFields } from "../../../utils/formUtils.js";
 import { openModal } from "../../../ui/modalUI.js";
 import { FORM_SELECTORS, MODAL_SELECTORS } from "../../../constants/selectors.js";
 import { FORM_MODES } from "../../../constants/formModes.js";
 import { formatDecimal, roundTo } from "../../../utils/formatUtils.js";
-import { applyIssueModalMode, createIssueHeaderForm, initializeIssueModal, useIssueForm } from "../../../ui/issues/issueFormUI.js";
+import { applyIssueModalMode, createIssueHeaderForm, initializeIssueModal, syncIssueProjectQuantityInput, useIssueForm } from "../../../ui/issues/issueFormUI.js";
 import { createIssueReturn } from "../../../ui/issues/issueReturnUI.js";
 import { mapGoodsIssueDetailDisplay } from "../../../utils/warehouse/issueDisplayUtils.js";
 
@@ -72,7 +72,7 @@ useIssueForm({
 
         const { mode } = form.dataset;
 
-        if (mode === FORM_MODES.EDIT_DETAIL) return validateDetailsFields(goodsIssueDetailsValidation, details);
+        if (mode === FORM_MODES.EDIT_DETAIL) return validateDetailsFields(issueProjectQuantityDetailsValidation, details);
 
         const errors = validateFields(goodsIssueValidation, formData);
 
@@ -244,23 +244,11 @@ on('change', '.supply-checkbox', (e, checkbox) => {
         material.convertedQuantityDifference = material.originalConvertedQuantityDifference ?? null;
     }
 
-    syncCheckboxControlledInputs({
-        root: document.querySelector(formId),
-        inputSelector: '.project-converted-quantity-input',
-        detailId: checkbox.dataset.detailId,
-        isChecked: checkbox.checked
+    syncIssueProjectQuantityInput({
+        form: document.querySelector(formId),
+        checkbox,
+        detail: material
     });
-
-    const projectQuantityInput = document.querySelector(`.project-converted-quantity-input[data-detail-id="${ checkbox.dataset.detailId }"]`);
-
-    if (projectQuantityInput && !checkbox.checked) {
-        projectQuantityInput.value = material.projectConvertedQuantity ?? '';
-
-        const currentTd = projectQuantityInput.closest('td');
-        const nextTd = currentTd?.nextElementSibling;
-
-        if (nextTd) nextTd.textContent = material.convertedQuantityDifference ?? '';
-    }
 });
 on('input', '.project-converted-quantity-input', (e, input) => {
 

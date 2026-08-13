@@ -354,23 +354,25 @@ model WasteIssue {
 }
 
 model WasteIssueDetail {
-  id                  String                @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  wasteIssueId        String                @db.Uuid
-  wasteId             String                @db.Uuid
-  materialName        String                @db.VarChar(200)
-  quantity            Decimal               @db.Decimal(10, 2)
-  convertedQuantity   Decimal               @db.Decimal(10, 2)
-  suppliedQuantity    Decimal               @default(0) @db.Decimal(10, 2)
-  returnedQuantity    Decimal               @default(0) @db.Decimal(10, 2)
-  isSupplied          Boolean               @default(false)
-  fulfillmentStatusId String                @db.Uuid
-  wasteIssue          WasteIssue            @relation(fields: [wasteIssueId], references: [id], onDelete: Cascade)
-  waste               Waste                 @relation(fields: [wasteId], references: [id])
-  fulfillmentStatus   FulfillmentStatus     @relation(fields: [fulfillmentStatusId], references: [id], onDelete: Restrict)
-  movementDetails     WasteMovementDetail[]
-  returns             WasteIssueReturn[]
-  createdAt           DateTime              @default(now())
-  updatedAt           DateTime              @updatedAt
+  id                          String                @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  wasteIssueId                String                @db.Uuid
+  wasteId                     String                @db.Uuid
+  materialName                String                @db.VarChar(200)
+  quantity                    Decimal               @db.Decimal(10, 2)
+  convertedQuantity           Decimal               @db.Decimal(10, 2)
+  projectConvertedQuantity    Decimal?              @db.Decimal(10, 2)
+  convertedQuantityDifference Decimal?              @db.Decimal(10, 2)
+  suppliedQuantity            Decimal               @default(0) @db.Decimal(10, 2)
+  returnedQuantity            Decimal               @default(0) @db.Decimal(10, 2)
+  isSupplied                  Boolean               @default(false)
+  fulfillmentStatusId         String                @db.Uuid
+  wasteIssue                  WasteIssue            @relation(fields: [wasteIssueId], references: [id], onDelete: Cascade)
+  waste                       Waste                 @relation(fields: [wasteId], references: [id])
+  fulfillmentStatus           FulfillmentStatus     @relation(fields: [fulfillmentStatusId], references: [id], onDelete: Restrict)
+  movementDetails             WasteMovementDetail[]
+  returns                     WasteIssueReturn[]
+  createdAt                   DateTime              @default(now())
+  updatedAt                   DateTime              @updatedAt
 
   @@unique([wasteIssueId, wasteId])
   @@index([wasteId])

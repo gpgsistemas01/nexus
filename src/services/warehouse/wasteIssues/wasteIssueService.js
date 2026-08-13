@@ -324,6 +324,8 @@ const updateWasteIssueDetailsTransaction = async ({ id, wasteIssueDto }) => getD
 
         const current = Number(detail.suppliedQuantity);
         const maximum = Number(detail.quantity);
+        const projectConvertedQuantity = requested.get(detail.id).projectConvertedQuantity;
+        const convertedQuantityDifference = Number(detail.convertedQuantity) - projectConvertedQuantity;
 
         if (!requested.get(detail.id).isSupplied || detail.isSupplied) continue;
 
@@ -338,6 +340,8 @@ const updateWasteIssueDetailsTransaction = async ({ id, wasteIssueDto }) => getD
             data: {
                 suppliedQuantity: maximum,
                 isSupplied: true,
+                projectConvertedQuantity,
+                convertedQuantityDifference,
                 fulfillmentStatus: { connect: { id: statusIds.get(detailStatusName) } }
             }
         });

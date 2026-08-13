@@ -1,7 +1,7 @@
 import { useForm } from '../../application/form.js';
 import { FORM_MODES, ISSUE_HEADER_ENABLED_MODES } from '../../constants/formModes.js';
 import { FULFILLMENT_STATUS_NAMES } from '../../constants/fulfillmentStatuses.js';
-import { handleSubmit, toggleDisabledElement } from '../../utils/formUtils.js';
+import { handleSubmit, syncCheckboxControlledInputs, toggleDisabledElement } from '../../utils/formUtils.js';
 import { clearFormErrors, initForm, setFormDisabled, toggleButtons } from '../formUI.js';
 import { buildModalTitle } from '../modalUI.js';
 
@@ -20,6 +20,27 @@ const resolveIssueUpdate = ({ mode, edit, editDetails, editHeader }) => {
     if (mode === FORM_MODES.EDIT_HEADER) return editHeader;
 
     return edit;
+};
+
+export const syncIssueProjectQuantityInput = ({ form, checkbox, detail }) => {
+    syncCheckboxControlledInputs({
+        root: form,
+        inputSelector: '.project-converted-quantity-input',
+        detailId: checkbox.dataset.detailId,
+        isChecked: checkbox.checked
+    });
+
+    const input = form.querySelector(
+        `.project-converted-quantity-input[data-detail-id="${ checkbox.dataset.detailId }"]`
+    );
+
+    if (!input || checkbox.checked) return;
+
+    input.value = detail.projectConvertedQuantity ?? '';
+
+    const differenceCell = input.closest('td')?.nextElementSibling;
+
+    if (differenceCell) differenceCell.textContent = detail.convertedQuantityDifference ?? '';
 };
 
 export const initializeIssueModal = ({ form, issueHeaderForm, mode, data = null }) => {

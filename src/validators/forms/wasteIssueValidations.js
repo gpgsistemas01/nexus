@@ -1,5 +1,5 @@
 import { issueHeaderValidation } from './issueValidations.js';
-import { validateIssueDetailsArray, validateIssueDetailsEdition } from '../fields/fieldsValidator.js';
+import { validateIssueDetailsArray, validateIssueProjectQuantityDetailsEdition } from '../fields/fieldsValidator.js';
 
 const validateWasteIssueDetails = () => validateIssueDetailsArray({
     itemIdField: 'wasteId',
@@ -21,5 +21,5 @@ export const wasteIssueHeaderValidation = [
 ];
 
 export const wasteIssueDetailsValidation = [
-    validateIssueDetailsEdition
+    validateIssueProjectQuantityDetailsEdition
 ];

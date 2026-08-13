@@ -14,16 +14,17 @@ import { FULFILLMENT_STATUS_NAMES } from '../../../constants/fulfillmentStatuses
 import { FORM_MODES } from '../../../constants/formModes.js';
 import { DATATABLE_SELECTORS, FORM_SELECTORS, MODAL_SELECTORS } from '../../../constants/selectors.js';
 import { createIssueHeaderSelects } from '../../../plugins/select2/modules/issueHeaderSelect.js';
-import { hasValidationErrors, validateFields } from '../../../utils/formUtils.js';
-import { addWasteIssueDetailValidation, wasteIssueValidation } from '../../../utils/validations/validators.js';
+import { hasValidationErrors, validateDetailsFields, validateFields } from '../../../utils/formUtils.js';
+import { addWasteIssueDetailValidation, issueProjectQuantityDetailsValidation, wasteIssueValidation } from '../../../utils/validations/validators.js';
 import { clearAddedItemInput, normalizeFormErrors } from '../../../ui/formUI.js';
 import { setMdbWrapperInputValue } from '../../../plugins/select2/baseSelect.js';
-import { applyIssueModalMode, createIssueHeaderForm, initializeIssueModal, useIssueForm } from '../../../ui/issues/issueFormUI.js';
+import { applyIssueModalMode, createIssueHeaderForm, initializeIssueModal, syncIssueProjectQuantityInput, useIssueForm } from '../../../ui/issues/issueFormUI.js';
 import { mapWasteIssueDetailDisplay } from '../../../utils/warehouse/issueDisplayUtils.js';
 import { createWasteIssueSelect } from '../../../plugins/select2/modules/wasteIssueSelect.js';
 import { createWarehouseIssueDetailsTable } from '../../../plugins/datatable/warehouseIssueDetailDatatable.js';
-import { roundTo } from '../../../utils/formatUtils.js';
+import { formatDecimal, roundTo } from '../../../utils/formatUtils.js';
 import { on } from '../../../utils/domUtils.js';
+import { UI_PERMISSIONS } from '../../../constants/permissions.js';
 
 const formId = FORM_SELECTORS.WASTE_ISSUE;
 const modalId = MODAL_SELECTORS.WASTE_ISSUE;
@@ -74,7 +75,8 @@ const renderDraft = () => {
     return createWarehouseIssueDetailsTable({
         data: details,
         mode: form.dataset.mode,
-        context
+        context,
+        projectQuantityPermission: UI_PERMISSIONS.WASTE_ISSUES_SUPPLY
     });
 };
 
@@ -86,6 +88,10 @@ const mapWasteIssueDetail = detail => {
         materialId: detail.wasteId,
         materialBase: display.base,
         materialHeight: display.height,
+        projectConvertedQuantity: detail.projectConvertedQuantity,
+        convertedQuantityDifference: detail.convertedQuantityDifference,
+        originalProjectConvertedQuantity: detail.projectConvertedQuantity ?? null,
+        originalConvertedQuantityDifference: detail.convertedQuantityDifference ?? null,
         originalIsSupplied: detail.isSupplied
     };
 };
@@ -188,7 +194,29 @@ on('click', `${ detailTableSelector } .delete-btn`, (event, button) => {
 on('change', `${ detailTableSelector } .supply-checkbox`, (event, checkbox) => {
     const detail = findDetailByElement(checkbox);
 
-    if (detail) detail.isSupplied = checkbox.checked;
+    if (!detail) return;
+
+    detail.isSupplied = checkbox.checked;
+
+    if (!checkbox.checked) {
+        detail.projectConvertedQuantity = detail.originalProjectConvertedQuantity ?? null;
+        detail.convertedQuantityDifference = detail.originalConvertedQuantityDifference ?? null;
+    }
+
+    syncIssueProjectQuantityInput({ form, checkbox, detail });
+});
+
+on('input', `${ detailTableSelector } .project-converted-quantity-input`, (event, input) => {
+    const detail = findDetailByElement(input);
+
+    if (!detail) return;
+
+    detail.projectConvertedQuantity = Number(input.value);
+    detail.convertedQuantityDifference = roundTo(detail.convertedQuantity - detail.projectConvertedQuantity);
+
+    const differenceCell = input.closest('td')?.nextElementSibling;
+
+    if (differenceCell) differenceCell.textContent = formatDecimal(detail.convertedQuantityDifference);
 });
 
 on('click', `${ detailTableSelector } .return-issue-detail-btn`, (event, button) => {
@@ -207,7 +235,8 @@ const normalizeWasteIssueData = ({ form }) => {
                 .filter(detail => detail.isSupplied && !detail.originalIsSupplied)
                 .map(detail => ({
                     id: detail.id,
-                    isSupplied: detail.isSupplied
+                    isSupplied: detail.isSupplied,
+                    projectConvertedQuantity: detail.projectConvertedQuantity
                 }))
         };
     }
@@ -230,11 +259,11 @@ useIssueForm({
     getErrors: ({ form, formData }) => {
 
         if (form.dataset.mode === FORM_MODES.EDIT_DETAIL) {
-            return {
-                details: formData.details.length
-                    ? null
-                    : 'Seleccione al menos una merma pendiente por surtir.'
-            };
+            const detailsToSupply = details.filter(detail => detail.isSupplied && !detail.originalIsSupplied);
+
+            return detailsToSupply.length
+                ? validateDetailsFields(issueProjectQuantityDetailsValidation, detailsToSupply)
+                : { details: 'Seleccione al menos una merma pendiente por surtir.' };
         }
 
         const errors = validateFields(wasteIssueValidation, formData);

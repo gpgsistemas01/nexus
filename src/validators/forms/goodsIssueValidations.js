@@ -1,4 +1,4 @@
-import { validateGoodsIssueDetailsArray, validateGoodsIssueDetailsEdition } from "../fields/fieldsValidator.js";
+import { validateGoodsIssueDetailsArray, validateIssueProjectQuantityDetailsEdition } from "../fields/fieldsValidator.js";
 import { issueHeaderValidation } from './issueValidations.js';
 export { issueReturnValidation as goodsIssueReturnValidation } from './issueReturnValidations.js';
 
@@ -13,7 +13,7 @@ export const goodsIssueUpdateValidation = [
 ];
 
 export const goodsIssueDetailsValidation = [
-    validateGoodsIssueDetailsEdition
+    validateIssueProjectQuantityDetailsEdition
 ];
 
 export const goodsIssueHeaderValidation = issueHeaderValidation;
