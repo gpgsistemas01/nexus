@@ -24,7 +24,7 @@ const resolveIssueUpdate = ({ mode, edit, editDetails, editHeader }) => {
     return edit;
 };
 
-export const resolveIssueFormMode = ({ status, fulfillmentStatus } = {}) => {
+const resolveIssueFormMode = ({ status, fulfillmentStatus } = {}) => {
     if (status === 'Cancelada' || fulfillmentStatus === FULFILLMENT_STATUS_NAMES.CANCELED) {
         return FORM_MODES.VIEW;
     }
@@ -71,8 +71,8 @@ export const bindIssueProjectQuantityControls = ({
         detail.isSupplied = checkbox.checked;
 
         if (!checkbox.checked) {
-            detail.projectConvertedQuantity = detail.originalProjectConvertedQuantity ?? null;
-            detail.convertedQuantityDifference = detail.originalConvertedQuantityDifference ?? null;
+            detail.projectConvertedQuantity = null;
+            detail.convertedQuantityDifference = 0;
         }
 
         syncIssueProjectQuantityInput({ form, checkbox, detail });
@@ -95,7 +95,7 @@ export const bindIssueProjectQuantityControls = ({
 
 };
 
-export const syncIssueProjectQuantityInput = ({ form, checkbox, detail }) => {
+const syncIssueProjectQuantityInput = ({ form, checkbox, detail }) => {
     syncCheckboxControlledInputs({
         root: form,
         inputSelector: '.project-converted-quantity-input',
