@@ -1,6 +1,7 @@
 import { formatDateTimeDisplay } from '../../utils/formatters.js';
 import { getResponsiveRowData } from './utils/responsive.js';
 import { setupTableFilters } from './utils/filters/tableFilter.js';
+import { createDataTable, renderActionButtons } from './baseDatatable.js';
 
 const ISSUE_FILTER_FIELDS = [
     'date',
@@ -59,4 +60,59 @@ export const bindIssueTableActions = ({ table, tableSelector, onEdit, onEditDeta
         buttonSelector,
         callback
     }));
+};
+
+export const createIssueDatatable = async ({
+    context,
+    getIssues,
+    actionContext,
+    canManage,
+    canSupply,
+    includeStatus = false,
+    searchPlaceholder,
+    order,
+    buttons = [],
+    tableSelector,
+    onEdit,
+    onEditDetails,
+    onReturnDetails
+}) => {
+    const columns = buildIssueHeaderColumns({ context });
+
+    columns.push(
+        ...buildIssueTrackingColumns({ includeStatus }),
+        {
+            title: 'Acciones',
+            data: null,
+            orderable: false,
+            render: (_, __, issue) => renderActionButtons({
+                context: actionContext,
+                status: issue.status?.name,
+                fulfillmentStatus: issue.fulfillmentStatus?.name,
+                canManage,
+                canSupply
+            })
+        }
+    );
+
+    const filters = await setupIssueTableFilters();
+    const table = createDataTable({ options: {
+        ajax: {
+            get: params => getIssues({ ...params, ...filters.getValues() })
+        },
+        searchPlaceholder,
+        order,
+        buttons,
+        columns
+    } });
+
+    bindIssueTableActions({
+        table,
+        tableSelector,
+        onEdit,
+        onEditDetails,
+        onReturnDetails
+    });
+
+    return { table, filters };
 };
