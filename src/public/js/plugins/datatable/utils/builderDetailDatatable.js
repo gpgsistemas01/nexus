@@ -226,7 +226,7 @@ export const buildDetailsColumns = ({ type, mode, render, canManageProjectQuanti
                 data: 'projectConvertedQuantity',
                 render: (value, _, row) => {
 
-                    const detailId = row.id || row.materialId;
+                    const detailId = row.id || row.wasteId || row.materialId;
                     const isEditableDetail = mode === FORM_MODES.EDIT_DETAIL && !row.originalIsSupplied;
                     const isProjectQuantityDisabled = !isEditableDetail || !row.isSupplied;
 
@@ -266,7 +266,7 @@ export const buildDetailsColumns = ({ type, mode, render, canManageProjectQuanti
             responsivePriority: 1,
             render: (_, __, row) => {
 
-                const detailId = row.id || row.materialId;
+                const detailId = row.id || row.wasteId || row.materialId;
                 const isEditableDetail = mode === FORM_MODES.EDIT_DETAIL && !row.originalIsSupplied;
 
                 return renderIssueSupplyCheckbox({
@@ -351,7 +351,7 @@ export const buildDetailsColumns = ({ type, mode, render, canManageProjectQuanti
                     className: 'delete-btn',
                     label: isSuppliedDetail ? 'El detalle ya fue surtido' : 'Eliminar detalle',
                     htmlAttrs: {
-                        'data-id': row.materialId,
+                        'data-id': row.wasteId || row.materialId,
                         disabled: isSuppliedDetail
                     }
                 });
