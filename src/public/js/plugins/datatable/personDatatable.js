@@ -8,7 +8,7 @@ import { getResponsiveRowData } from "./utils/responsive.js";
 import { setupTableFilters } from "./utils/filters/tableFilter.js";
 import { getSelectedOptionText } from "../../utils/domUtils.js";
 import { DATATABLE_SELECTORS, FILTER_SELECTORS } from "../../constants/selectors.js";
-import { buildMdbActionButton } from "../mdb/actionButton.js";
+import { buildMdbDeleteActionButton } from "../mdb/actionButton.js";
 
 const selector = DATATABLE_SELECTORS.MAIN;
 
@@ -106,10 +106,8 @@ export const initPersonAccessTable = (accesses = []) => {
                 {
                     data: null,
                     title: 'Acciones',
-                    render: (data, type, row, meta) => buildMdbActionButton({
+                    render: (data, type, row, meta) => buildMdbDeleteActionButton({
                         className: 'delete-btn',
-                        colorClass: 'btn-danger',
-                        iconClass: 'fa-solid fa-trash',
                         label: `Eliminar acceso de ${ row.departmentName } con rol ${ row.roleName }`,
                         htmlAttrs: {
                             'data-index': meta.row

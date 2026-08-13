@@ -4,7 +4,7 @@ import { createDataTable } from './baseDatatable.js';
 import { exportUserReport } from '../../application/admin/report.js';
 import { buildExcelButton, buildTableExportParams } from '../../ui/tableUI.js';
 import { formatFileName } from '../../utils/formatters.js';
-import { buildMdbActionButton } from '../mdb/actionButton.js';
+import { buildMdbActionButton, buildMdbEditActionButton } from '../mdb/actionButton.js';
 import { getResponsiveRowData } from './utils/responsive.js';
 import { DATATABLE_SELECTORS } from "../../constants/selectors.js";
 
@@ -26,10 +26,8 @@ export const createUserDatatable = () => {
                     title: 'Acciones',
                     orderable: false,
                     render: () => [
-                        buildMdbActionButton({
+                        buildMdbEditActionButton({
                             className: 'btn-edit',
-                            colorClass: 'btn-primary',
-                            iconClass: 'fa-solid fa-pencil',
                             label: 'Editar usuario'
                         }),
                         buildMdbActionButton({

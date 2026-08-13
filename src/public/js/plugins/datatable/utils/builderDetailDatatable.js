@@ -1,4 +1,9 @@
-import { buildMdbActionButton } from "../../mdb/actionButton.js";
+import {
+    buildMdbActionButton,
+    buildMdbDeleteActionButton,
+    buildMdbEditDetailActionButton,
+    buildMdbReturnActionButton
+} from "../../mdb/actionButton.js";
 import { bindDisabledControlWarning } from "../../../ui/disabledControlWarning.js";
 import { formatCurrency, formatDecimal } from "../../../utils/formatUtils.js";
 import { GOODS_RECEIPT_DETAIL_STATUSES, GOODS_RECEIPT_STATUS_LABELS } from "../../../constants/goodsReceiptStatuses.js";
@@ -268,10 +273,8 @@ export const buildDetailsColumns = ({ type, mode, render, canManageProjectQuanti
 
                 if (!row.id || returnableQuantity <= 0) return '';
 
-                return `${ buildMdbActionButton({
+                return `${ buildMdbReturnActionButton({
                     className: 'return-issue-detail-btn',
-                    colorClass: 'btn-warning',
-                    iconClass: 'fa-solid fa-rotate-left',
                     label: 'Devolver detalle de salida',
                     htmlAttrs: {
                         'data-id': row.id,
@@ -297,10 +300,8 @@ export const buildDetailsColumns = ({ type, mode, render, canManageProjectQuanti
                 if (!canManageDetail) return '';
 
                 return `
-                    ${ buildMdbActionButton({
+                    ${ buildMdbEditDetailActionButton({
                         className: 'correct-detail-btn',
-                        colorClass: 'btn-info',
-                        iconClass: 'fa-solid fa-pen-to-square',
                         label: 'Corregir detalle de compra',
                         htmlAttrs: {
                             'data-id': detailId
@@ -328,16 +329,14 @@ export const buildDetailsColumns = ({ type, mode, render, canManageProjectQuanti
 
                 const isSuppliedDetail = type === 'issue' && row.isSupplied;
 
-                return `
-                    <button
-                        type="button"
-                        class="btn btn-danger btn-sm delete-btn"
-                        data-id="${ row.materialId }"
-                        ${ isSuppliedDetail ? 'disabled title="El detalle ya fue surtido"' : '' }
-                    >
-                        <i class="fas fa-trash-alt"></i>
-                    </button>
-                `;
+                return buildMdbDeleteActionButton({
+                    className: 'delete-btn',
+                    label: isSuppliedDetail ? 'El detalle ya fue surtido' : 'Eliminar detalle',
+                    htmlAttrs: {
+                        'data-id': row.materialId,
+                        disabled: isSuppliedDetail
+                    }
+                });
             }
         });
     }

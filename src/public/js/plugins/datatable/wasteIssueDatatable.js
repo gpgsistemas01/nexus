@@ -1,28 +1,26 @@
 import { getAllWasteIssues } from '../../application/warehouse/wasteIssues/wasteIssues.js';
 import { createDataTable } from './baseDatatable.js';
-import { buildMdbActionButton } from '../mdb/actionButton.js';
+import {
+    buildMdbEditActionButton,
+    buildMdbReturnActionButton,
+    buildMdbSupplyActionButton
+} from '../mdb/actionButton.js';
 import { FULFILLMENT_STATUS_NAMES } from '../../constants/fulfillmentStatuses.js';
 import { hasPermission, UI_PERMISSIONS } from '../../constants/permissions.js';
 import { bindIssueTableAction, buildIssueHeaderColumns } from './issueDatatable.js';
 
 const TABLE_SELECTOR = '#table';
 
-const editButton = buildMdbActionButton({
+const editButton = buildMdbEditActionButton({
     className: 'js-edit',
-    colorClass: 'btn-primary',
-    iconClass: 'fa-solid fa-pencil',
     label: 'Editar salida'
 });
-const supplyButton = buildMdbActionButton({
+const supplyButton = buildMdbSupplyActionButton({
     className: 'js-edit-details',
-    colorClass: 'btn-secondary',
-    iconClass: 'fa-solid fa-dolly',
     label: 'Surtir salida'
 });
-const returnButton = buildMdbActionButton({
+const returnButton = buildMdbReturnActionButton({
     className: 'js-return-details',
-    colorClass: 'btn-warning',
-    iconClass: 'fa-solid fa-rotate-left',
     label: 'Devolver merma surtida'
 });
 
