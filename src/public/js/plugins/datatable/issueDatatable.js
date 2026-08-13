@@ -1,5 +1,19 @@
 import { formatDateTimeDisplay } from '../../utils/formatters.js';
 import { getResponsiveRowData } from './utils/responsive.js';
+import { setupTableFilters } from './utils/filters/tableFilter.js';
+
+const ISSUE_FILTER_FIELDS = [
+    'date',
+    'client',
+    'department',
+    'independentPerson',
+    'fulfillmentStatus',
+    'observations'
+];
+
+export const setupIssueTableFilters = () => setupTableFilters({
+    fields: ISSUE_FILTER_FIELDS
+});
 
 export const buildIssueHeaderColumns = ({ context }) => {
     const { isWarehouse = false, isSystem = false } = context.organization || {};
