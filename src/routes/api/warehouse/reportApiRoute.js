@@ -1,6 +1,6 @@
 import express from 'express';
 import { authorizeUserApi, verifyApiTokenRequired } from '../../../middleware/authMiddleware.js';
-import { exportGoodsIssueReportExcel, exportGoodsReceiptReportExcel, exportSupplierReportExcel, exportWarehouseReportExcel, exportWasteReportExcel } from '../../../controllers/api/warehouse/reportController.js';
+import { exportGoodsIssueReportExcel, exportGoodsReceiptReportExcel, exportSupplierReportExcel, exportWarehouseReportExcel, exportWasteIssueReportExcel, exportWasteReportExcel } from '../../../controllers/api/warehouse/reportController.js';
 import { PERMISSIONS } from '../../../constants/permissions.js';
 
 const router = express.Router();
@@ -26,6 +26,13 @@ router.get(
     verifyApiTokenRequired,
     authorizeUserApi(PERMISSIONS.WAREHOUSE_REPORTS_READ),
     exportGoodsReceiptReportExcel
+);
+
+router.get(
+    '/waste-issues/excel',
+    verifyApiTokenRequired,
+    authorizeUserApi(PERMISSIONS.WAREHOUSE_REPORTS_READ),
+    exportWasteIssueReportExcel
 );
 
 router.get(

@@ -1,4 +1,4 @@
-import { exportGoodsIssueReportRequest, exportGoodsReceiptReportRequest, exportSupplierReportRequest, exportWarehouseReportRequest, exportWasteReportRequest } from "../../services/warehouse/reportService.js";
+import { exportGoodsIssueReportRequest, exportGoodsReceiptReportRequest, exportSupplierReportRequest, exportWarehouseReportRequest, exportWasteIssueReportRequest, exportWasteReportRequest } from "../../services/warehouse/reportService.js";
 
 export const exportWarehouseReport = async (params = {}) => {
 
@@ -18,6 +18,12 @@ export const exportGoodsIssueReport = async (params = {}) => {
 export const exportGoodsReceiptReport = async (params = {}) => {
 
     const response = await exportGoodsReceiptReportRequest(params);
+
+    return response.data;
+};
+
+export const exportWasteIssueReport = async (params = {}) => {
+    const response = await exportWasteIssueReportRequest(params);
 
     return response.data;
 };

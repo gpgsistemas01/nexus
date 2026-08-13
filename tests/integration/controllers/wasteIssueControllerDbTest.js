@@ -1,5 +1,6 @@
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import request from 'supertest';
+import xlsx from 'xlsx';
 
 import { createControllerTestApp } from '../../helpers/controllerTestHarness.js';
 
@@ -37,12 +38,14 @@ describe('waste issue controller database integration', () => {
     const prismaModule = await import('../../../src/lib/prisma.js');
     const controller = await import('../../../src/controllers/api/warehouse/wasteIssueController.js');
     const movementController = await import('../../../src/controllers/api/admin/movementController.js');
+    const reportController = await import('../../../src/controllers/api/warehouse/reportController.js');
     prisma = prismaModule.prisma;
     app = createControllerTestApp({
       registerRoutes: router => {
         router.use((req, _res, next) => { req.user = { id: ids.user }; next(); });
         router.get('/waste-issues', controller.getAllWasteIssues);
         router.get('/waste-movements', movementController.getAllWasteMovements);
+        router.get('/waste-issues/excel', reportController.exportWasteIssueReportExcel);
         router.post('/waste-issues', controller.registerWasteIssue);
         router.patch('/waste-issues/:id', controller.editWasteIssue);
         router.patch('/waste-issues/:id/header', controller.editWasteIssueHeader);
@@ -173,6 +176,25 @@ describe('waste issue controller database integration', () => {
     expect(Number(waste.currentStock)).toBe(6);
     expect(movement).toMatchObject({ type: 'ISSUE', details: [expect.objectContaining({ wasteIssueDetailId: detailId })] });
     expect(Number(movement.details[0].quantity)).toBe(-4);
+
+    const report = await request(app)
+      .get('/waste-issues/excel')
+      .query({ search: issue.referenceNumber })
+      .expect('Content-Type', /spreadsheetml/)
+      .expect(200);
+    const workbook = xlsx.read(report.body, { type: 'buffer' });
+    const reportRows = xlsx.utils.sheet_to_json(workbook.Sheets['Salidas de merma']);
+
+    expect(reportRows).toContainEqual(expect.objectContaining({
+      Folio: issue.referenceNumber,
+      Material: `IT WasteIssue Material ${ suffix }`,
+      Proveedor: `IT WasteIssue Supplier ${ suffix }`,
+      'Cantidad solicitada': 4,
+      'Cantidad surtida': 4,
+      'Cantidad de proyecto': 3.5,
+      Diferencia: 0.5,
+      'Estado del detalle': 'Surtido'
+    }));
 
     const listedMovements = await request(app)
       .get('/waste-movements')
