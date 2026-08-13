@@ -113,7 +113,7 @@ const syncIssueProjectQuantityInput = ({ form, checkbox, detail }) => {
 
     const differenceCell = input.closest('td')?.nextElementSibling;
 
-    if (differenceCell) differenceCell.textContent = detail.convertedQuantityDifference ?? '';
+    if (differenceCell) differenceCell.textContent = formatDecimal(detail.convertedQuantityDifference);
 };
 
 export const initializeIssueModal = ({ form, issueHeaderForm, mode, data = null }) => {
