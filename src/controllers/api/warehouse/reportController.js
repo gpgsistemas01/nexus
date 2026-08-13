@@ -317,6 +317,7 @@ export const exportWasteIssueReportExcel = async (req, res) => {
     const monthlyReport = isMonthlyReportRequest(req.query);
     const monthDateRange = monthlyReport ? getMexicoMonthDateRange() : {};
     const rows = await findWasteIssueReportRows({
+        wasteIssueId: req.query.wasteIssueId || '',
         search: monthlyReport ? '' : getDataTableSearch(req.query),
         startDate: monthlyReport ? monthDateRange.startDate : req.query.startDate || '',
         endDate: monthlyReport ? monthDateRange.endDate : req.query.endDate || '',

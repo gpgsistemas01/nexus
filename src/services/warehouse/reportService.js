@@ -343,6 +343,7 @@ export const findGoodsReceiptReportRows = async ({
 };
 
 export const findWasteIssueReportRows = async ({
+    wasteIssueId = '',
     search = '',
     startDate = '',
     endDate = '',
@@ -381,7 +382,7 @@ export const findWasteIssueReportRows = async ({
     };
     const details = await getDb().wasteIssueDetail.findMany({
         where: {
-            fulfillmentStatus: { name: { not: 'Cancelado' } },
+            ...(wasteIssueId && { wasteIssueId }),
             wasteIssue: issueWhere
         },
         include: {
