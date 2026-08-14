@@ -114,7 +114,7 @@ describe('wasteController complete flow', () => {
     wasteStockAdjustmentUpdate.mockResolvedValue({ id: 'adjustment-1', details: [{ id: 'detail-1' }], movement: { id: 'movement-1' } });
     findSupplierMaterialById.mockResolvedValue({ id: 'supplier-material-1' });
     findInitialStockAdjustmentReason.mockResolvedValue({ id: 'initial-reason-1' });
-    generateYearlyReferenceNumber.mockResolvedValue('ADJ-2026-0001');
+    generateYearlyReferenceNumber.mockResolvedValue('AJU-MER-2026-000001');
     createWasteMovement.mockResolvedValue({ id: 'movement-1' });
   });
 
@@ -134,6 +134,10 @@ describe('wasteController complete flow', () => {
 
     await registerWaste(req, res);
 
+    expect(generateYearlyReferenceNumber).toHaveBeenCalledWith({
+      type: 'AJU-MER',
+      tx: expect.any(Object)
+    });
     expect(wasteCreate).toHaveBeenCalledWith(expect.objectContaining({
       data: expect.objectContaining({
         currentStock: 5,
@@ -210,6 +214,10 @@ describe('wasteController complete flow', () => {
 
     await editWasteStock(req, res);
 
+    expect(generateYearlyReferenceNumber).toHaveBeenCalledWith({
+      type: 'AJU-MER',
+      tx: expect.any(Object)
+    });
     expect(wasteStockAdjustmentCreate).toHaveBeenCalledWith(expect.objectContaining({
       data: expect.objectContaining({
         reason: { connect: { id: 'reason-1' } },

@@ -97,6 +97,7 @@ describe('waste issue controller database integration', () => {
       details: [{ wasteId: ids.waste, quantity: 4 }]
     }).expect(201);
 
+    expect(created.body.wasteIssue.referenceNumber).toMatch(/^SAL-MER-\d{4}-\d{6}$/);
     expect(created.body.wasteIssue.fulfillmentStatus).toMatchObject({
       name: 'Pendiente'
     });
