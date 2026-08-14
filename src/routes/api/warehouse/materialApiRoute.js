@@ -32,14 +32,6 @@ router.patch(
     editMaterial
 );
 
-
-router.delete(
-    '/:id',
-    verifyApiTokenRequired,
-    authorizeUserApi(PERMISSIONS.MATERIALS_WRITE),
-    removeMaterial
-);
-
 router.patch(
     '/:id/stock',
     verifyApiTokenRequired,
@@ -47,6 +39,13 @@ router.patch(
     validate,
     authorizeUserApi(PERMISSIONS.MATERIALS_ADJUST_STOCK),
     editMaterialStock
+);
+
+router.delete(
+    '/:id',
+    verifyApiTokenRequired,
+    authorizeUserApi(PERMISSIONS.MATERIALS_WRITE),
+    removeMaterial
 );
 
 export default router;

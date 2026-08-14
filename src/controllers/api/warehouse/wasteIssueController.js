@@ -64,24 +64,6 @@ export const getAllWasteIssues = async (req, res) => {
     return res.status(200).json(result);
 };
 
-export const returnWasteIssueDetail = async (req, res) => {
-
-    const returnDto = sanitizeEmptyStrings(createWasteIssueDtoForReturn(req.body));
-    const wasteIssueReturn = await returnWasteIssueDetailService({
-        id: req.params.id,
-        detailId: req.params.detailId,
-        returnDto,
-        userId: req.user.id
-    });
-
-    emitInventoryUpdated({ context: 'waste', source: 'waste-issue-return-created' });
-
-    return res.status(200).json({
-        wasteIssueReturn,
-        code: successCodeMessages.UPDATED_WASTE_ISSUE
-    });
-};
-
 export const registerWasteIssue = async (req, res) => {
 
     const wasteIssueDto = createWasteIssueDtoForRegister(req.body);
@@ -144,6 +126,24 @@ export const editWasteIssueDetails = async (req, res) => {
 
     return res.status(200).json({
         wasteIssue,
+        code: successCodeMessages.UPDATED_WASTE_ISSUE
+    });
+};
+
+export const returnWasteIssueDetail = async (req, res) => {
+
+    const returnDto = sanitizeEmptyStrings(createWasteIssueDtoForReturn(req.body));
+    const wasteIssueReturn = await returnWasteIssueDetailService({
+        id: req.params.id,
+        detailId: req.params.detailId,
+        returnDto,
+        userId: req.user.id
+    });
+
+    emitInventoryUpdated({ context: 'waste', source: 'waste-issue-return-created' });
+
+    return res.status(200).json({
+        wasteIssueReturn,
         code: successCodeMessages.UPDATED_WASTE_ISSUE
     });
 };

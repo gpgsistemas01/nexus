@@ -48,14 +48,6 @@ router.patch(
 );
 
 router.patch(
-    '/:id/header',
-    verifyApiTokenRequired,
-    goodsIssueHeaderValidation,
-    validate,
-    authorizeUserApi(PERMISSIONS.GOODS_ISSUES_MANAGE),
-    editGoodsIssueHeader
-);
-router.patch(
     '/:id/details',
     verifyApiTokenRequired,
     goodsIssueDetailsValidation,
@@ -64,6 +56,14 @@ router.patch(
     editGoodsIssueDetails
 );
 
+router.patch(
+    '/:id/header',
+    verifyApiTokenRequired,
+    goodsIssueHeaderValidation,
+    validate,
+    authorizeUserApi(PERMISSIONS.GOODS_ISSUES_MANAGE),
+    editGoodsIssueHeader
+);
 
 router.patch(
     '/:id/details/:detailId/returns',

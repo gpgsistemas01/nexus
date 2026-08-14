@@ -1,11 +1,11 @@
-import { useForm } from "../../application/form.js";
-import { editMaterial, editMaterialStock, registerMaterial } from "../../application/warehouse/materials.js";
-import { FORM_SELECTORS, MODAL_SELECTORS } from "../../constants/selectors.js";
+import { useForm } from "../../../application/form.js";
+import { editMaterial, editMaterialStock, registerMaterial } from "../../../application/warehouse/materials.js";
+import { FORM_SELECTORS, MODAL_SELECTORS } from "../../../constants/selectors.js";
 
-import { handleSubmit, pickFormFields, validateFields } from "../../utils/formUtils.js";
-import { materialStockValidation, materialValidation } from "../../utils/validations/validators.js";
+import { handleSubmit, pickFormFields, validateFields } from "../../../utils/formUtils.js";
+import { materialStockValidation, materialValidation } from "../../../utils/validations/validators.js";
 import { materialCreateFields, materialSecondaryDataFields, materialStockFields } from './materialFields.js';
-import { isEditMode, isStockMode } from '../../constants/formModes.js';
+import { isEditMode, isStockMode } from '../../../constants/formModes.js';
 
 const formId = FORM_SELECTORS.MATERIAL_FORM;
 const materialModalId = MODAL_SELECTORS.MATERIAL;

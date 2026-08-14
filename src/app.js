@@ -2,48 +2,8 @@ import 'dotenv/config.js';
 import { getRequestLogContext, logger, pinoLogger } from './utils/logger.js';
 import { hasPermission } from './public/js/constants/permissions.js';
 
-import clientApiRoutes from './routes/api/sales/clientApiRoute.js';
-import salesReportApiRoutes from './routes/api/sales/reportApiRoute.js';
-
-import authApiRoutes from './routes/api/authApiRoute.js';
-
-import materialApiRoutes from './routes/api/warehouse/materialApiRoute.js';
-import wasteApiRoutes from './routes/api/warehouse/wasteApiRoute.js';
-import wasteIssueApiRoutes from './routes/api/warehouse/wasteIssueApiRoute.js';
-import supplierApiRoutes  from './routes/api/warehouse/supplierApiRoute.js';
-import goodsReceiptApiRoutes from './routes/api/warehouse/goodsReceiptApiRoute.js';
-import goodsIssueApiRoutes from './routes/api/warehouse/goodsIssueApiRoute.js';
-import warehouseReportApiRoutes from './routes/api/warehouse/reportApiRoute.js';
-import unitMeasuresApiRoutes from './routes/api/warehouse/unitMeasureApiRoute.js';
-import presentationApiRoutes from './routes/api/warehouse/presentationApiRoute.js';
-import reasonApiRoutes from './routes/api/warehouse/reasonApiRoute.js';
-import fulfillmentStatusApiRoutes from './routes/api/warehouse/fulfillmentStatusApiRoute.js';
-
-import departmentApiRoutes from './routes/api/admin/departmentApiRoute.js';
-import personApiRoutes from './routes/api/admin/personApiRoute.js';
-import roleApiRoutes from './routes/api/admin/roleApiRoute.js';
-import userApiRoutes from './routes/api/admin/userApiRoute.js';
-import movementApiRoutes from './routes/api/admin/movementApiRoute.js';
-import adminReportApiRoutes from './routes/api/admin/reportApiRoute.js';
-
-import homeWebRoutes from './routes/web/homeWebRoute.js';
-
-import clientWebRoutes from './routes/web/sales/clientWebRoute.js';
-
-import loginWebRoutes from './routes/web/auth/loginWebRoute.js';
-import logoutWebRoutes from './routes/web/auth/logoutWebRoute.js';
-import refreshWebRoutes from './routes/web/auth/refreshWebRoute.js';
-
-import materialWebRoutes from './routes/web/warehouse/materialWebRoute.js';
-import wasteWebRoutes from './routes/web/warehouse/wasteWebRoute.js';
-import supplierWebRoutes from './routes/web/warehouse/supplierWebRoute.js';
-import goodsReceiptWebRoutes from './routes/web/warehouse/goodsReceiptWebRoute.js';
-import goodsIssueWebRoutes from './routes/web/warehouse/goodsIssueWebRoute.js';
-import wasteIssueWebRoutes from './routes/web/warehouse/wasteIssueWebRoute.js';
-
-import userWebRoutes from './routes/web/admin/userWebRoute.js';
-import personWebRoutes from './routes/web/admin/personWebRoute.js';
-import movementWebRoutes from './routes/web/admin/movementWebRoute.js';
+import { registerApiRoutes } from './routes/api/index.js';
+import { registerWebRoutes } from './routes/web/index.js';
 
 import { checkTypeContentJson, checkTypeContentFile, checkContentTypePlainText } from './middleware/contentTypeMiddleware.js';
 import cookieParser from 'cookie-parser';
@@ -69,10 +29,6 @@ const rootRoute = '/';
 const apiRoute = '/api';
 const textRoute = '/text';
 const uploadRoute = '/upload';
-const authRoute = '/auth';
-const warehouse = '/warehouse';
-const admin = '/admin';
-const sales = '/sales';
 
 app.set('views', viewsDir);
 app.set('view engine', 'ejs');
@@ -105,54 +61,14 @@ app.use((req, res, next) => {
     next();
 });
 
-// web routes
-app.use(rootRoute, homeWebRoutes);
-app.use('/inicio-sesion', loginWebRoutes);
-app.use('/revocar-sesion', refreshWebRoutes);
-app.use('/cerrar-sesion', logoutWebRoutes);
-app.get('/materiales', (req, res) => res.redirect(308, '/almacen/materiales'));
-app.get('/mermas', (req, res) => res.redirect(308, '/almacen/mermas'));
-app.get('/salidas-materiales', (req, res) => res.redirect(308, '/salidas/materiales'));
-app.get('/salidas-mermas', (req, res) => res.redirect(308, '/salidas/mermas'));
-app.use('/almacen/materiales', materialWebRoutes);
-app.use('/almacen/mermas', wasteWebRoutes);
-app.use('/compras', goodsReceiptWebRoutes);
-app.use('/salidas/materiales', goodsIssueWebRoutes);
-app.use('/salidas/mermas', wasteIssueWebRoutes);
-app.use('/usuarios-sistemas', userWebRoutes);
-app.get('/perfiles', (req, res) => res.redirect(308, '/personas'));
-app.use('/personas', personWebRoutes);
-app.use('/clientes', clientWebRoutes);
-app.use('/proveedores', supplierWebRoutes);
-app.use('/movimientos', movementWebRoutes);
+registerWebRoutes(app);
 app.get('/error/404', (req, res) => {
     const homeHref = getAuthTokenInfo(req, res) ? '/almacen/materiales' : '/inicio-sesion';
 
     return res.status(404).render('pages/error/404', { homeHref });
 });
 
-// api routes
-app.use(apiRoute + authRoute, authApiRoutes);
-app.use(apiRoute + sales + '/clients', clientApiRoutes);
-app.use(apiRoute + sales + '/reports', salesReportApiRoutes);
-app.use(apiRoute + warehouse + '/materials', materialApiRoutes);
-app.use(apiRoute + warehouse + '/wastes', wasteApiRoutes);
-app.use(apiRoute + warehouse + '/waste-issues', wasteIssueApiRoutes);
-app.use(apiRoute + warehouse + '/suppliers', supplierApiRoutes);
-app.use(apiRoute + warehouse + '/goods-receipts', goodsReceiptApiRoutes);
-app.use(apiRoute + warehouse + '/goods-issues', goodsIssueApiRoutes);
-app.use(apiRoute + warehouse + '/reports', warehouseReportApiRoutes);
-app.use(apiRoute + warehouse + '/unit-measures', unitMeasuresApiRoutes);
-app.use(apiRoute + warehouse + '/presentations', presentationApiRoutes);
-app.use(apiRoute + warehouse + '/reasons', reasonApiRoutes);
-app.use(apiRoute + warehouse + '/fulfillment-statuses', fulfillmentStatusApiRoutes);
-
-app.use(apiRoute + admin + '/users', userApiRoutes);
-app.use(apiRoute + admin + '/roles', roleApiRoutes);
-app.use(apiRoute + admin + '/departments', departmentApiRoutes);
-app.use(apiRoute + admin + '/persons', personApiRoutes);
-app.use(apiRoute + admin + '/movements', movementApiRoutes);
-app.use(apiRoute + admin + '/reports', adminReportApiRoutes);
+registerApiRoutes(app, { apiPrefix: apiRoute });
 
 app.use((req, res, next) => {
     if (req.path.startsWith(apiRoute) || !req.accepts('html')) {

@@ -1,6 +1,6 @@
-import { FORM_SELECTORS } from "../../constants/selectors.js";
-import { setTextSummaryValues } from "../../ui/totalsSummaryUI.js";
-import { formatCurrency } from "../../utils/formatUtils.js";
+import { FORM_SELECTORS } from "../../../constants/selectors.js";
+import { setTextSummaryValues } from "../../../ui/totalsSummaryUI.js";
+import { formatCurrency } from "../../../utils/formatUtils.js";
 
 const supplierSummarySelector = FORM_SELECTORS.SELECTED_MATERIAL_SUPPLIER;
 const presentationSummarySelector = FORM_SELECTORS.SELECTED_MATERIAL_PRESENTATION;

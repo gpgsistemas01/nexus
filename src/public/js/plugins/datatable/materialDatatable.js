@@ -1,4 +1,4 @@
-import { openMaterialModal } from "../../modules/materials/materialModal.js";
+import { openMaterialModal } from "../../pages/warehouse/materials/materialModal.js";
 import { configureRealtimeReload, createDataTable, renderActionButtons } from "./baseDatatable.js";
 import { setupTableFilters } from "./utils/filters/tableFilter.js";
 import { notifications } from "../swal/swalComponent.js";

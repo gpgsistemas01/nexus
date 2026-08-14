@@ -1,4 +1,3 @@
-import { createSuccessResponseFromRequest } from '../../../utils/responseUtils.js';
 import {
     editWasteIssueDetailsRequest,
     editWasteIssueHeaderRequest,
@@ -7,35 +6,26 @@ import {
     registerWasteIssueRequest,
     returnWasteIssueDetailRequest
 } from '../../../services/warehouse/wasteIssueService.js';
+import { createIssueApplication } from '../issues/createIssueApplication.js';
 
-export const getAllWasteIssues = async (params = {}) => getAllWasteIssuesRequest({ params });
+const wasteIssueApplication = createIssueApplication({
+    requests: {
+        getAll: getAllWasteIssuesRequest,
+        register: registerWasteIssueRequest,
+        edit: editWasteIssueRequest,
+        editHeader: editWasteIssueHeaderRequest,
+        editDetails: editWasteIssueDetailsRequest,
+        returnDetail: returnWasteIssueDetailRequest
+    },
+    dataKeys: {
+        issue: 'wasteIssue',
+        issueReturn: 'wasteIssueReturn'
+    }
+});
 
-export const registerWasteIssue = async ({ formData }) => {
-    const response = await registerWasteIssueRequest({ data: formData });
-
-    return createSuccessResponseFromRequest({ response, dataKey: 'wasteIssue' });
-};
-
-export const editWasteIssue = async ({ id, formData }) => {
-    const response = await editWasteIssueRequest({ id, data: formData });
-
-    return createSuccessResponseFromRequest({ response, dataKey: 'wasteIssue' });
-};
-
-export const editWasteIssueHeader = async ({ id, formData }) => {
-    const response = await editWasteIssueHeaderRequest({ id, data: formData });
-
-    return createSuccessResponseFromRequest({ response, dataKey: 'wasteIssue' });
-};
-
-export const editWasteIssueDetails = async ({ id, formData }) => {
-    const response = await editWasteIssueDetailsRequest({ id, data: formData });
-
-    return createSuccessResponseFromRequest({ response, dataKey: 'wasteIssue' });
-};
-
-export const returnWasteIssueDetail = async ({ id, detailId, formData }) => {
-    const response = await returnWasteIssueDetailRequest({ id, detailId, data: formData });
-
-    return createSuccessResponseFromRequest({ response, dataKey: 'wasteIssueReturn' });
-};
+export const getAllWasteIssues = wasteIssueApplication.getAll;
+export const registerWasteIssue = wasteIssueApplication.register;
+export const editWasteIssue = wasteIssueApplication.edit;
+export const editWasteIssueHeader = wasteIssueApplication.editHeader;
+export const editWasteIssueDetails = wasteIssueApplication.editDetails;
+export const returnWasteIssueDetail = wasteIssueApplication.returnDetail;

@@ -1,6 +1,6 @@
 import { getAllSuppliers } from "../../application/warehouse/suppliers.js";
 import { exportSupplierReport } from "../../application/warehouse/report.js";
-import { openSupplierModal } from "../../modules/suppliers/supplierModal.js";
+import { openSupplierModal } from "../../pages/warehouse/suppliers/supplierModal.js";
 import { createDataTable, renderActionButtons } from "./baseDatatable.js";
 import { buildExcelButton, buildTableExportParams } from "../../ui/tableUI.js";
 import { getResponsiveRowData } from "./utils/responsive.js";
