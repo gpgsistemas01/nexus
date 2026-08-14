@@ -1607,17 +1607,25 @@ a:hover {
   border-color: #c8d0cc !important;
   box-shadow: none;
   color: rgba(var(--mdb-secondary-rgb), 0.72) !important;
-  cursor: not-allowed;
   opacity: 1;
   -webkit-text-fill-color: rgba(var(--mdb-secondary-rgb), 0.72);
 }
 
-form[data-mode="view"] .form-select:disabled,
-form[data-mode="view"] .select2-container--disabled {
+form[data-mode="view"] :is(.form-control, .form-select):is(:disabled, [readonly]),
+form[data-mode="edit-detail"] :is(.form-control, .form-select):is(:disabled, [readonly]),
+form[data-mode="return"] :is(.form-control, .form-select):is(:disabled, [readonly]),
+form:is(#materialForm, #wasteForm)[data-mode="edit"] :is(.form-control, .form-select):is(:disabled, [readonly]),
+form[data-mode="view"] .select2-container--disabled,
+form[data-mode="edit-detail"] .select2-container--disabled,
+form[data-mode="return"] .select2-container--disabled,
+form:is(#materialForm, #wasteForm)[data-mode="edit"] .select2-container--disabled {
   cursor: not-allowed;
 }
 
-form[data-mode="view"] .select2-container--disabled .select2-selection {
+form[data-mode="view"] .select2-container--disabled .select2-selection,
+form[data-mode="edit-detail"] .select2-container--disabled .select2-selection,
+form[data-mode="return"] .select2-container--disabled .select2-selection,
+form:is(#materialForm, #wasteForm)[data-mode="edit"] .select2-container--disabled .select2-selection {
   cursor: inherit;
   pointer-events: none;
 }
@@ -1631,6 +1639,10 @@ form[data-mode="view"] .select2-container--disabled .select2-selection {
   padding-block: 0.35rem;
 }
 
+.modal-detail-table :is(input, textarea)[data-disabled-warning]:disabled {
+  cursor: not-allowed;
+}
+
 .modal-detail-table .project-converted-quantity-input:not(:disabled) {
   background-color: var(--material-detail-input-enabled-bg);
   border-color: var(--material-detail-input-enabled-border);
@@ -1641,7 +1653,6 @@ form[data-mode="view"] .select2-container--disabled .select2-selection {
   background-color: var(--material-detail-input-disabled-bg);
   border-color: var(--material-detail-input-disabled-border);
   color: var(--material-detail-input-disabled-color);
-  cursor: not-allowed;
   opacity: 1;
 }
 
