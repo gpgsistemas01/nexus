@@ -60,6 +60,9 @@ describe('waste issue controller database integration', () => {
         create: { name }
       });
     }
+    for (const name of ['Aprobada', 'Cancelada']) {
+      await prisma.status.upsert({ where: { name }, update: {}, create: { name } });
+    }
     const unit = await prisma.unitMeasure.create({ data: { name: `IT WI Unit ${ suffix }`, symbol: `w${ suffix.slice(0, 4) }` } });
     const presentation = await prisma.presentation.create({ data: { name: `IT WasteIssue Presentation ${ suffix }` } });
     const supplier = await prisma.supplier.create({
@@ -97,6 +100,7 @@ describe('waste issue controller database integration', () => {
     expect(created.body.wasteIssue.fulfillmentStatus).toMatchObject({
       name: 'Pendiente'
     });
+    expect(created.body.wasteIssue.status).toMatchObject({ name: 'Aprobada' });
     expect(created.body.wasteIssue.details).toHaveLength(1);
     expect(created.body.wasteIssue.details[0]).toMatchObject({
       quantity: '4',
@@ -128,6 +132,7 @@ describe('waste issue controller database integration', () => {
       projectConvertedQuantity: null,
       convertedQuantityDifference: null
     });
+    expect(listedIssue.status).toMatchObject({ name: 'Aprobada' });
 
     const observationsTerm = 'Salida editada antes del surtido';
     const globalSearch = await request(app)
@@ -220,11 +225,12 @@ describe('waste issue controller database integration', () => {
 
     const canceledIssue = await prisma.wasteIssue.findUnique({
       where: { id: issueId },
-      include: { fulfillmentStatus: true, details: { include: { fulfillmentStatus: true } } }
+      include: { status: true, fulfillmentStatus: true, details: { include: { fulfillmentStatus: true } } }
     });
     const wasteAfterFullReturn = await prisma.waste.findUnique({ where: { id: ids.waste } });
 
     expect(canceledIssue.fulfillmentStatus.name).toBe('Cancelado');
+    expect(canceledIssue.status.name).toBe('Cancelada');
     expect(canceledIssue.details[0].fulfillmentStatus.name).toBe('Cancelado');
     expect(Number(canceledIssue.details[0].returnedQuantity)).toBe(4);
     expect(Number(wasteAfterFullReturn.currentStock)).toBe(10);
