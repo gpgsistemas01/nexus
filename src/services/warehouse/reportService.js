@@ -383,7 +383,9 @@ export const findWasteIssueReportRows = async ({
     const details = await getDb().wasteIssueDetail.findMany({
         where: {
             ...(wasteIssueId && { wasteIssueId }),
-            wasteIssue: issueWhere
+            ...(Object.keys(issueWhere).length && {
+                wasteIssue: { is: issueWhere }
+            })
         },
         include: {
             fulfillmentStatus: { select: { name: true } },
