@@ -1601,11 +1601,13 @@ a:hover {
   color: rgba(var(--mdb-secondary-rgb), 0.7);
 }
 
-.form-outline .form-control:disabled {
+.form-outline .form-control:disabled,
+.form-outline .form-control[readonly] {
   background-color: #f6f8f6;
   border-color: #c8d0cc !important;
   box-shadow: none;
   color: rgba(var(--mdb-secondary-rgb), 0.72) !important;
+  cursor: not-allowed;
   opacity: 1;
   -webkit-text-fill-color: rgba(var(--mdb-secondary-rgb), 0.72);
 }
