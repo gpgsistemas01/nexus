@@ -1547,6 +1547,7 @@ a:hover {
   -webkit-text-fill-color: var(--form-field-color);
 }
 
+.table-filters .form-outline .js-flatpickr-date,
 .table-filters .form-outline input[type="search"]#observationsFilter {
   background-color: var(--mdb-light);
   border: 0 !important;
