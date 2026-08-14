@@ -1,4 +1,4 @@
-export const initMdbModal = (el) => mdb.Modal.getOrCreateInstance(el);
+export const initMdbModal = (el) => window.mdb.Modal.getOrCreateInstance(el);
 
 export const showModal = (instance) => {
 
@@ -17,7 +17,7 @@ export const initMdbWrapperInput = ({ selector, value }) => {
 
     const wrapper = inputElement.closest('.form-outline');
     inputElement.value = value || '';
-    return mdb.Input.getOrCreateInstance(wrapper);
+    return window.mdb.Input.getOrCreateInstance(wrapper);
 }
 
 export const updateMdbWrapperInput = (instance) => {
@@ -27,12 +27,36 @@ export const updateMdbWrapperInput = (instance) => {
     instance.update();
 }
 
+const tooltipDismissBoundElements = new WeakSet();
+const submenuDismissBoundRoots = new WeakSet();
 
 export const initMdbTooltips = (root = document) => {
 
-    if (!root || !globalThis.mdb?.Tooltip) return;
+    if (!root || !window.mdb?.Tooltip) return;
 
     root.querySelectorAll('[data-mdb-tooltip-init]').forEach((el) => {
-        globalThis.mdb.Tooltip.getOrCreateInstance(el);
+        const instance = window.mdb.Tooltip.getOrCreateInstance(el);
+
+        if (tooltipDismissBoundElements.has(el)) return;
+
+        el.addEventListener('click', () => instance.hide());
+        tooltipDismissBoundElements.add(el);
     });
+}
+
+export const initMdbDismissibleSubmenus = (root = document) => {
+
+    if (!root || !window.mdb?.Collapse || submenuDismissBoundRoots.has(root)) return;
+
+    root.addEventListener('click', ({ target }) => {
+        root.querySelectorAll('.app-nav-list--flyout .app-nav-submenu.show').forEach((submenu) => {
+            const navItem = submenu.closest('.nav-item');
+
+            if (navItem?.contains(target)) return;
+
+            window.mdb.Collapse.getOrCreateInstance(submenu).hide();
+        });
+    });
+
+    submenuDismissBoundRoots.add(root);
 }
