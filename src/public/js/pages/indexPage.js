@@ -1,9 +1,10 @@
 import { notifications } from "../plugins/swal/swalComponent.js";
 import { handleFlashMessage } from "../handlers/flashMessageHandler.js";
-import { initDateTimePickers } from "../plugins/flatpickr/dateTimePicker.js";
+import { initDatePickers, initDateTimePickers } from "../plugins/flatpickr/dateTimePicker.js";
 import { initMdbTooltips } from "../plugins/mdb/baseInstance.js";
 
 initDateTimePickers();
+initDatePickers();
 initMdbTooltips();
 
 handleFlashMessage(window.FLASH_MESSAGE || null);
