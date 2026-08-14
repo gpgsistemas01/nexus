@@ -8,6 +8,24 @@ on:
   pull_request:
 
 jobs:
+  architecture-docs:
+    name: Architecture docs are current
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      # El generador sólo usa módulos nativos de Node.js, por lo que esta
+      # comprobación no necesita instalar las dependencias de la aplicación.
+      - name: Verify generated architecture documentation
+        run: npm run docs:check
+
   test:
     name: Test
     runs-on: ubuntu-latest

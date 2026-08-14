@@ -34,6 +34,8 @@
     "test:integration": "npm run test:db:verify && NODE_ENV=test prisma migrate deploy && NODE_ENV=test prisma generate && vitest run --config vitestIntegrationConfig.js",
     "test:db": "npm run test:integration",
     "test:db:verify": "node scripts/verifyTestDatabaseEnv.js",
+    "docs:architecture": "node scripts/generateArchitectureDocs.js",
+    "docs:check": "node scripts/generateArchitectureDocs.js --check",
     "db:migrate": "prisma migrate deploy && prisma generate",
     "db:generate": "prisma generate"
   },

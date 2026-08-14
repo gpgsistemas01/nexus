@@ -7,16 +7,14 @@ Nexus es una plataforma de control operativo para administrar inventario, compra
 - [Características principales](#características-principales)
 - [Stack técnico](#stack-técnico)
 - [Arquitectura del proyecto](#arquitectura-del-proyecto)
-- [Documentación visual](#documentación-visual)
+- [Documentación](#documentación)
 - [Requisitos](#requisitos)
 - [Configuración inicial](#configuración-inicial)
 - [Variables de entorno](#variables-de-entorno)
-- [Alcance y pendientes de documentación](#alcance-y-pendientes-de-documentación)
-- [Base de datos y Prisma](#base-de-datos-y-prisma)
-- [Usuarios, auditoría y permisos](#usuarios-auditoría-y-permisos)
+- [Base de datos, usuarios y permisos](#base-de-datos-usuarios-y-permisos)
 - [Ejecución](#ejecución)
 - [Scripts disponibles](#scripts-disponibles)
-- [Rutas principales](#rutas-principales)
+- [Rutas](#rutas)
 - [Pruebas automatizadas](#pruebas-automatizadas)
 - [Convenciones de desarrollo](#convenciones-de-desarrollo)
 - [Docker](#docker)
@@ -79,12 +77,11 @@ con el catálogo de endpoints. Las convenciones equivalentes entre backend y fro
 incluyendo reutilización de componentes y ubicación de pruebas CRUD, se detallan en el
 [mapa visual de arquitectura y vistas web](docs/architecture-and-web-views.md#5-organización-consistente-de-front-y-back).
 
-## Documentación visual
+## Documentación
 
-El [mapa visual de arquitectura y vistas web](docs/architecture-and-web-views.md) incluye
-diagramas Mermaid de contexto, contenedores, secuencia y navegación, además del catálogo
-de pantallas y sus plantillas EJS. Ese documento también registra la evaluación de una
-evolución a Structurizr/C4; por ahora Mermaid en el repositorio es la fuente oficial.
+El [índice de documentación](docs/README.md) enlaza arquitectura, API, pruebas y base de
+datos. El mapa de rutas y dependencias se genera desde el código; los diagramas de diseño
+se mantienen de forma curada. CI comprueba que el contenido generado esté actualizado.
 
 ## Requisitos
 
@@ -157,91 +154,16 @@ LOG_LEVEL="info"
 | `NODE_ENV` | No en local | Selecciona la base de pruebas cuando vale `test`; la imagen Docker lo fija en `production`. |
 | `LOG_LEVEL` | No | Nivel de Pino. Acepta `fatal`, `error`, `warn`, `info`, `debug`, `trace` o `silent`; el predeterminado es `warn`. |
 
-## Alcance y pendientes de documentación
+## Base de datos, usuarios y permisos
 
-Esta revisión contrasta el README con los puntos de entrada, scripts, rutas y variables
-presentes en el repositorio. La documentación operativa de instalación, configuración,
-Prisma, pruebas y Docker se mantiene aquí; las decisiones especializadas se encuentran
-en `docs/`.
+Prisma selecciona la URL según el entorno: `DATABASE_URL` para la aplicación,
+`DATABASE_TEST_URL` para pruebas y las variantes `DIRECT_*` para migraciones cuando
+están definidas. Los comandos de base de datos se encuentran en la tabla de scripts.
 
-Todavía no existe un contrato OpenAPI ni un catálogo exhaustivo de payloads, respuestas
-y códigos de error de cada endpoint. Hasta que ese contrato se incorpore, los archivos
-de `src/routes/api/`, sus validadores y DTO son la fuente de verdad.
+Consulta las guías específicas para evitar duplicar aquí decisiones y procedimientos:
 
-## Base de datos y Prisma
-
-La conexión se resuelve desde `src/lib/databaseUrl.js`:
-
-- Cuando `NODE_ENV` es `test`, se usa `DATABASE_TEST_URL`.
-- La aplicación usa `DATABASE_URL` en cualquier otro entorno.
-- Prisma CLI usa `DIRECT_URL` automáticamente en producción cuando existe, por ejemplo para `migrate deploy`; si no existe, usa `DATABASE_URL`.
-- Prisma CLI usa `DIRECT_TEST_URL` automáticamente en pruebas cuando existe; si no existe, usa `DATABASE_TEST_URL`.
-- Si falta la variable requerida, el resolver falla indicando el `NODE_ENV` activo.
-
-`DATABASE_URL` y `DIRECT_URL` deben usar credenciales distintas para que la separación
-sea efectiva: la primera corresponde a la cuenta DML de ejecución y la segunda a la
-cuenta que aplica DDL durante las migraciones. La guía de aprovisionamiento, propiedad
-de objetos, `GRANT` y verificación está en
-[`docs/postgresql-runtime-and-migration-roles.md`](docs/postgresql-runtime-and-migration-roles.md).
-La creación de roles es un bootstrap administrativo previo y no forma parte de
-`prisma/migrations`; los roles y permisos deben existir antes de ejecutar Prisma.
-
-Comandos útiles:
-
-```bash
-npm run db:migrate         # Aplica migraciones pendientes usando DIRECT_URL si está definida
-npm run db:generate           # Genera el cliente Prisma
-npx prisma studio            # Abre Prisma Studio para inspección local
-```
-
-## Usuarios, auditoría y permisos
-
-El análisis del modelo actual, las brechas detectadas y la propuesta para distinguir
-identidades de acceso (`User`), personas participantes del negocio (`Person`), auditoría de
-escrituras y privilegios PostgreSQL están documentados en
-[`docs/database-users-and-permissions-analysis.md`](docs/database-users-and-permissions-analysis.md).
-
-La recomendación principal es no agregar un usuario indiscriminadamente a cada tabla:
-se debe conservar el actor `User` en operaciones auditables, mantener `Person` para
-los papeles del proceso y centralizar los permisos por acción, rol y departamento.
-
-### Impacto del cambio a «Personas» en la base de datos
-
-El cambio se aplica de forma integral para que «Persona» sea congruente en la interfaz,
-la API, el código y la persistencia. La migración renombra `Profile` a `Person`,
-`ProfileRoleDepartment` a `PersonRoleDepartment` y los campos `profileId` a `personId`.
-Los modelos, servicios, DTO, permisos y payloads utilizan igualmente `Person`/`person`.
-
-Esto **no afecta la trazabilidad de los datos**: cada persona conserva el mismo UUID y
-las operaciones históricas siguen relacionadas mediante sus claves foráneas. La
-trazabilidad de quién ejecutó una acción se mantiene en `User`, mientras que `Person`
-identifica a la persona que desempeñó un papel dentro del flujo. PostgreSQL realiza los
-renombres sobre los mismos objetos, sin copiar ni recrear registros.
-
-En la implementación actual, las **definiciones** de permisos y su matriz se versionan
-en `src/constants/permissions.js`; no existen tablas `Permission` o `RolePermission`
-administrables desde la interfaz. La base de datos conserva las **asignaciones** de
-cada cuenta en `UserRoleDepartment`. El backend cruza esas asignaciones con la matriz,
-autoriza la petición y deriva las capacidades que entrega al frontend. Convertir la
-matriz en configuración administrable requeriría un cambio de modelo, migración,
-pantalla administrativa y auditoría; no es el comportamiento actual.
-
-La concesión efectiva sí es automática en tiempo de ejecución: el administrador solo
-guarda la asignación rol/departamento; en cada login, renovación o carga de sesión el
-backend vuelve a leer `UserRoleDepartment`, cruza esas filas con
-`AUTHORIZATION_POLICIES` y calcula `user.permissions`. No existe un proceso manual para
-copiar permisos al usuario ni se persiste ese arreglo derivado. Si cambia una
-asignación, la siguiente carga autenticada recalcula las capacidades; si cambia la
-matriz en código, el cambio entra en vigor al desplegar la nueva versión.
-
-Los menús y botones no vuelven a interpretar roles o departamentos. Las vistas EJS
-filtran cada enlace con `user.permissions` y el JavaScript del navegador consulta el
-mismo arreglo mediante `hasPermission`, compartido desde
-`src/public/js/constants/permissions.js` junto con las claves de `UI_PERMISSIONS`.
-Para agregar una acción de interfaz se debe definir su permiso y política en el
-backend, exponer la misma clave en ese módulo y condicionar el elemento visual con
-ella. Ocultar la interfaz mejora la experiencia, pero no sustituye a
-`authorizeUserWeb` o `authorizeUserApi`, que siguen siendo la barrera de seguridad.
+- [roles PostgreSQL de ejecución y migración](docs/postgresql-runtime-and-migration-roles.md);
+- [usuarios, personas, auditoría y permisos](docs/database-users-and-permissions-analysis.md).
 
 ## Ejecución
 
@@ -274,46 +196,15 @@ npm start
 | `npm run test:db:migrate` | Verifica variables y aplica migraciones en la base de pruebas; usa `DIRECT_TEST_URL` automáticamente cuando está definida. |
 | `npm run test:integration` | Verifica y migra la base aislada, genera Prisma y ejecuta sólo `tests/integration`. |
 | `npm run test:db` | Alias de `npm run test:integration`. |
+| `npm run docs:architecture` | Regenera el mapa de rutas y dependencias desde `src`. |
+| `npm run docs:check` | Comprueba que el mapa generado esté actualizado. |
 
-## Rutas principales
+## Rutas
 
-### Vistas web
-
-- `/` página de inicio.
-- `/inicio-sesion`, `/revocar-sesion`, `/cerrar-sesion` para autenticación web.
-- `/almacen/materiales`, `/almacen/mermas`, `/requisiciones`, `/compras`, `/salidas/materiales`, `/salidas/mermas` y `/proveedores` para almacén y salidas.
-- `/usuarios-sistemas`, `/personas`, `/movimientos` para administración.
-- `/clientes` para ventas.
-
-Las rutas antiguas `/materiales`, `/mermas`, `/salidas-materiales`, `/salidas-mermas`
-y `/perfiles` responden con una redirección permanente (`308`) hacia sus rutas actuales.
-
-### API REST
-
-Todas las rutas API cuelgan de `/api` y esperan `Content-Type: application/json` salvo endpoints especializados:
-
-- `/api/auth`
-- `/api/sales/clients`
-- `/api/sales/reports`
-- `/api/warehouse/materials`
-- `/api/warehouse/wastes`
-- `/api/warehouse/suppliers`
-- `/api/warehouse/goods-receipts`
-- `/api/warehouse/goods-issues`
-- `/api/warehouse/reports`
-- `/api/warehouse/unit-measures`
-- `/api/warehouse/presentations`
-- `/api/warehouse/reasons`
-- `/api/warehouse/fulfillment-statuses`
-- `/api/admin/users`
-- `/api/admin/roles`
-- `/api/admin/departments`
-- `/api/admin/persons`
-- `/api/admin/movements`
-- `/api/admin/reports`
-
-La API de requisiciones todavía no está implementada ni registrada. No debe anunciarse
-`/api/warehouse/purchase-requisitions` como endpoint público hasta completar ese flujo.
+El [mapa generado](docs/generated/code-map.md) es el catálogo actualizado de métodos y
+rutas web/API. La [guía de arquitectura](docs/architecture-and-web-views.md) explica la
+navegación, las pantallas y las redirecciones. Evitamos repetir aquí listas que pueden
+quedar desactualizadas.
 
 ## Pruebas automatizadas
 
