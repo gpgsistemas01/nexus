@@ -16,6 +16,7 @@ import { returnWasteIssueDetail as returnWasteIssueDetailService } from '../../.
 import { getDataTableOrder, getDataTablePaging, getDataTableSearch } from '../../../utils/requestQueryUtils.js';
 import { sanitizeEmptyStrings } from '../../../utils/formattersUtils.js';
 import { successCodeMessages } from '../../../messages/codeMessages.js';
+import { emitInventoryUpdated } from '../../../utils/socketUtils.js';
 
 const DATATABLE_COLUMNS = [
     'referenceNumber',
@@ -72,6 +73,8 @@ export const returnWasteIssueDetail = async (req, res) => {
         returnDto,
         userId: req.user.id
     });
+
+    emitInventoryUpdated({ context: 'waste', source: 'waste-issue-return-created' });
 
     return res.status(200).json({
         wasteIssueReturn,
@@ -136,6 +139,8 @@ export const editWasteIssueDetails = async (req, res) => {
         id: req.params.id,
         wasteIssueDto: sanitizedWasteIssueDto
     });
+
+    emitInventoryUpdated({ context: 'waste', source: 'waste-issue-supplied' });
 
     return res.status(200).json({
         wasteIssue,

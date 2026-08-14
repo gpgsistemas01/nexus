@@ -1,8 +1,8 @@
-import { createDataTable, renderActionButtons } from "./baseDatatable.js";
+import { configureRealtimeReload, createDataTable, renderActionButtons } from "./baseDatatable.js";
 import { setupTableFilters } from "./utils/filters/tableFilter.js";
 import { getAllWastes } from "../../application/warehouse/wastes.js";
 import { openWasteModal } from "../../pages/warehouse/wastes/wasteModal.js";
-import { configureResponsiveHeaderGroups, getResponsiveRowData } from "./utils/responsive.js";
+import { getResponsiveRowData } from "./utils/responsive.js";
 import { hasPermission, UI_PERMISSIONS } from "../../constants/permissions.js";
 import { DATATABLE_SELECTORS } from "../../constants/selectors.js";
 import { buildWarehouseInventoryColumns, renderWarehouseInventoryHeader } from "./utils/warehouseInventoryDatatable.js";
@@ -68,7 +68,10 @@ export const createWasteDatatable = async (context) => {
         }
     });
 
-    configureResponsiveHeaderGroups(table);
+    configureRealtimeReload({
+        table,
+        eventName: 'wastes:updated'
+    });
 
     $(`${ selectorTable } tbody`).on('click', '.btn-edit', async function() {
 

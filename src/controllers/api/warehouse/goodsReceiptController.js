@@ -8,7 +8,7 @@ import {
 import { cancelGoodsReceiptDetailLine } from "../../../services/warehouse/goodsReceipts/detailChanges/goodsReceiptCancellationService.js";
 import { correctGoodsReceiptDetailLine } from "../../../services/warehouse/goodsReceipts/detailChanges/goodsReceiptCorrectionService.js";
 import { getDataTableOrder, getDataTablePaging, getDataTableSearch } from "../../../utils/requestQueryUtils.js";
-import { emitMaterialsUpdated } from "../../../utils/socketUtils.js";
+import { emitInventoryUpdated } from "../../../utils/socketUtils.js";
 import { sanitizeEmptyStrings } from "../../../utils/formattersUtils.js";
 
 export const getAllGoodsReceipts = async (req, res) => {
@@ -51,7 +51,7 @@ export const registerGoodsReceipt = async (req, res) => {
         goodsReceiptDto: sanitizedGoodsReceiptDto
     });
 
-    emitMaterialsUpdated({ source: 'goods-receipt-created' });
+    emitInventoryUpdated({ context: 'material', source: 'goods-receipt-created' });
 
     return res.status(200).json({
         goodsReceipt,
@@ -92,6 +92,8 @@ export const correctGoodsReceiptDetail = async (req, res) => {
         userId: req.user.id
     });
 
+    emitInventoryUpdated({ context: 'material', source: 'goods-receipt-detail-corrected' });
+
     return res.status(200).json({
         correction,
         code: successCodeMessages.UPDATED_GOODS_RECEIPT
@@ -105,6 +107,8 @@ export const cancelGoodsReceiptDetail = async (req, res) => {
         detailId: req.params.detailId,
         userId: req.user.id
     });
+
+    emitInventoryUpdated({ context: 'material', source: 'goods-receipt-detail-cancelled' });
 
     return res.status(200).json({
         correction,
