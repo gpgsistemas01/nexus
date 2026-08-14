@@ -16,7 +16,7 @@ import {
 import { returnGoodsIssueDetail as returnGoodsIssueDetailService } from '../../../services/warehouse/goodsIssues/goodsIssueReturnService.js';
 import { getDataTableOrder, getDataTablePaging, getDataTableSearch } from "../../../utils/requestQueryUtils.js";
 import { sanitizeEmptyStrings } from "../../../utils/formattersUtils.js";
-import { emitMaterialsUpdated } from "../../../utils/socketUtils.js";
+import { emitInventoryUpdated } from "../../../utils/socketUtils.js";
 
 export const getAllGoodsIssues = async (req, res) => {
 
@@ -65,8 +65,6 @@ export const registerGoodsIssue = async (req, res) => {
         goodsIssueDto: sanitizedGoodsIssueDto
     });
 
-    emitMaterialsUpdated({ source: 'goods-issue-created' });
-
     return res.status(200).json({
         goodsIssue,
         code: successCodeMessages.CREATED_GOODS_ISSUE
@@ -98,6 +96,8 @@ export const editGoodsIssueDetails = async (req, res) => {
         goodsIssueDto: sanitizedGoodsIssueDto, 
         id: req.params.id
     });
+
+    emitInventoryUpdated({ context: 'material', source: 'goods-issue-supplied' });
 
     return res.status(200).json({
         goodsIssue,
@@ -132,6 +132,8 @@ export const returnGoodsIssueDetail = async (req, res) => {
         returnDto: sanitizedReturnDto,
         userId: req.user.id
     });
+
+    emitInventoryUpdated({ context: 'material', source: 'goods-issue-return-created' });
 
     return res.status(200).json({
         goodsIssueReturn,

@@ -39,7 +39,14 @@ document.querySelectorAll('.dropdown').forEach(dropdown => {
 if (typeof window.io === 'function') {
     const socket = window.io();
 
-    socket.on('materials:updated', (data) => {
-        window.dispatchEvent(new CustomEvent('materials:updated', { detail: data }));
+    [
+        'materials:updated',
+        'wastes:updated',
+        'material-movements:updated',
+        'waste-movements:updated'
+    ].forEach((eventName) => {
+        socket.on(eventName, (data) => {
+            window.dispatchEvent(new CustomEvent(eventName, { detail: data }));
+        });
     });
 }

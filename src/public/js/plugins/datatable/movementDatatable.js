@@ -2,7 +2,7 @@ import { getAllMovements } from "../../application/admin/movements.js";
 import { exportMovementReport } from "../../application/admin/report.js";
 import { buildExcelButton, buildTableExportParams } from "../../ui/tableUI.js";
 import { formatFileName } from "../../utils/formatters.js";
-import { createDataTable } from "./baseDatatable.js";
+import { configureRealtimeReload, createDataTable } from "./baseDatatable.js";
 import { formatDecimal } from "../../utils/formatUtils.js";
 
 const movementColumns = [
@@ -19,8 +19,16 @@ const movementColumns = [
 ];
 
 const MOVEMENT_CONTEXTS = Object.freeze({
-    material: { api: 'materials', filename: 'reporte_movimientos' },
-    waste: { api: 'wastes', filename: 'reporte_movimientos_merma' }
+    material: {
+        api: 'materials',
+        filename: 'reporte_movimientos',
+        updateEvent: 'material-movements:updated'
+    },
+    waste: {
+        api: 'wastes',
+        filename: 'reporte_movimientos_merma',
+        updateEvent: 'waste-movements:updated'
+    }
 });
 
 export const createMovementDatatable = ({ context, filters, selector }) => {
@@ -52,6 +60,11 @@ export const createMovementDatatable = ({ context, filters, selector }) => {
                 })
             })]
         }
+    });
+
+    configureRealtimeReload({
+        table,
+        eventName: config.updateEvent
     });
 
     return table;

@@ -3,6 +3,7 @@ import { createWasteWithInitialStockAdjustment, findAllWastes, updateWaste, upda
 import { createWasteDtoForEdit, createWasteDtoForRegister, createWasteDtoForStockUpdate } from '../../../dtos/wasteDTO.js';
 import { sanitizeEmptyStrings } from '../../../utils/formattersUtils.js';
 import { getDataTableOrder, getDataTablePaging, getDataTableSearch } from '../../../utils/requestQueryUtils.js';
+import { emitInventoryUpdated } from '../../../utils/socketUtils.js';
 
 export const getAllWastes = async (req, res) => {
 
@@ -38,6 +39,8 @@ export const registerWaste = async (req, res) => {
         userId: req.user.id
     });
 
+    emitInventoryUpdated({ context: 'waste', source: 'waste-created' });
+
     return res.status(200).json({
         waste,
         code: successCodeMessages.CREATED_WASTE
@@ -70,6 +73,8 @@ export const editWasteStock = async (req, res) => {
         wasteStockDto: sanitizedWasteStockDto,
         userId: req.user.id
     });
+
+    emitInventoryUpdated({ context: 'waste', source: 'waste-stock-adjustment-created' });
 
     return res.status(200).json({
         waste,

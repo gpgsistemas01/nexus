@@ -1,9 +1,9 @@
 import { openMaterialModal } from "../../modules/materials/materialModal.js";
-import { createDataTable, renderActionButtons } from "./baseDatatable.js";
+import { configureRealtimeReload, createDataTable, renderActionButtons } from "./baseDatatable.js";
 import { setupTableFilters } from "./utils/filters/tableFilter.js";
 import { notifications } from "../swal/swalComponent.js";
 import { deleteMaterial, getAllMaterials } from "../../application/warehouse/materials.js";
-import { configureResponsiveHeaderGroups, getResponsiveRowData } from "./utils/responsive.js";
+import { getResponsiveRowData } from "./utils/responsive.js";
 import { buildExcelButton, buildTableExportParams } from "../../ui/tableUI.js";
 import { hasPermission, UI_PERMISSIONS } from "../../constants/permissions.js";
 import { exportWarehouseReport } from "../../application/warehouse/report.js";
@@ -14,10 +14,8 @@ import { handleApiError } from "../../api/errorHandler.js";
 
 const selectorTable = DATATABLE_SELECTORS.MAIN;
 const tableElement = document.querySelector(selectorTable);
-const MATERIALS_RELOAD_DELAY_MS = 100;
 let lastLowStockNotification = '';
 let materialsSocketConfigured = false;
-let materialsReloadTimer = null;
 
 const configureMaterialsRealtime = (table) => {
 
@@ -25,14 +23,9 @@ const configureMaterialsRealtime = (table) => {
 
     materialsSocketConfigured = true;
 
-    window.addEventListener('materials:updated', () => {
-        clearTimeout(materialsReloadTimer);
-
-        // Una compra o salida puede modificar varios materiales. La recarga completa
-        // conserva la página y vuelve a aplicar filtros, orden y cálculos del servidor.
-        materialsReloadTimer = setTimeout(() => {
-            table.ajax.reload(null, false);
-        }, MATERIALS_RELOAD_DELAY_MS);
+    configureRealtimeReload({
+        table,
+        eventName: 'materials:updated'
     });
 };
 
@@ -124,7 +117,6 @@ export const createMaterialDatatable = async (context) => {
         }
     });
 
-    configureResponsiveHeaderGroups(table);
     configureMaterialsRealtime(table);
 
     $(`${ selectorTable } tbody`).on('click', '.btn-edit', function () {
