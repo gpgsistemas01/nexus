@@ -68,7 +68,9 @@ const returnWasteIssueDetailTransaction = ({ id, detailId, returnDto, userId }) 
         await tx.wasteIssue.update({
             where: { id },
             data: {
-                fulfillmentStatusId: statusIds.get(FULFILLMENT_STATUS_NAMES.CANCELED),
+                fulfillmentStatus: {
+                    connect: { id: statusIds.get(FULFILLMENT_STATUS_NAMES.CANCELED) }
+                },
                 status: { connect: { name: GOODS_ISSUE_STATUS_NAMES.CANCELED } }
             }
         });
