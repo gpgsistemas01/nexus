@@ -1326,6 +1326,39 @@ nav .nav-link, .offcanvas .nav-link {
   display: none;
 }
 
+.app-nav-list--flyout > .nav-item {
+  position: relative;
+}
+
+.app-nav-list--flyout .app-nav-submenu {
+  background: var(--app-menu-surface);
+  border: 1px solid rgba(var(--app-submenu-accent-rgb), 0.35);
+  border-inline-start: 0.25rem solid var(--app-submenu-accent);
+  border-radius: 0 0.85rem 0.85rem 0;
+  box-shadow: 0 0.75rem 1.75rem rgba(var(--mdb-dark-rgb), 0.28);
+  inline-size: max-content;
+  left: calc(100% + 1rem);
+  min-inline-size: 13rem;
+  padding: 0.65rem;
+  position: absolute;
+  top: 0;
+  z-index: 1050;
+}
+
+.app-nav-list--flyout .app-nav-submenu .nav-item {
+  align-items: stretch;
+}
+
+.app-nav-list--flyout .app-nav-link--child {
+  inline-size: 100%;
+  padding-inline: 0.5rem 0.85rem;
+}
+
+.app-nav-list--flyout .app-nav-submenu-toggle[aria-expanded="true"] .app-nav-submenu-toggle__icon,
+.app-nav-list--flyout .app-nav-submenu-toggle:not(.collapsed) .app-nav-submenu-toggle__icon {
+  transform: translateX(0.15rem);
+}
+
 .app-nav-link--section {
   background: transparent;
   border: 0;
