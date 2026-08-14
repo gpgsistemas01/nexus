@@ -1,11 +1,12 @@
 import { notifications } from "../plugins/swal/swalComponent.js";
 import { handleFlashMessage } from "../handlers/flashMessageHandler.js";
 import { initDatePickers, initDateTimePickers } from "../plugins/flatpickr/dateTimePicker.js";
-import { initMdbTooltips } from "../plugins/mdb/baseInstance.js";
+import { initMdbDismissibleSubmenus, initMdbTooltips } from "../plugins/mdb/baseInstance.js";
 
 initDateTimePickers();
 initDatePickers();
 initMdbTooltips();
+initMdbDismissibleSubmenus();
 
 handleFlashMessage(window.FLASH_MESSAGE || null);
 
@@ -26,7 +27,7 @@ if (errorMessage) {
 
 document.querySelectorAll('.dropdown').forEach(dropdown => {
     const btn = dropdown.querySelector('button[data-mdb-dropdown-init]');
-    const instance = mdb.Dropdown.getOrCreateInstance(btn);
+    const instance = window.mdb.Dropdown.getOrCreateInstance(btn);
     dropdown.addEventListener('mouseenter', () => {
         instance.show();
     });
