@@ -1,4 +1,4 @@
-import { findMovementReportRows, findWasteMovementReportRows } from "../../../services/inventory/reportService.js";
+import { findMovementReportRows } from "../../../services/inventory/reportService.js";
 import { findAllPersons } from "../../../services/admin/person/personService.js";
 import { findAllUsers } from "../../../services/admin/userService.js";
 import { getDataTableOrder, getDataTableSearch } from "../../../utils/requestQueryUtils.js";
@@ -61,8 +61,9 @@ const getMovementReportParams = (query) => {
     };
 };
 
-const sendMovementReport = async ({ req, res, findRows, sheetName, filename, additionalParams = {} }) => {
-    const rows = await findRows({
+const sendMovementReport = async ({ req, res, context, sheetName, filename, additionalParams = {} }) => {
+    const rows = await findMovementReportRows({
+        context,
         ...getMovementReportParams(req.query),
         ...additionalParams
     });
@@ -82,7 +83,7 @@ export const exportMovementReport = async (req, res) => {
     return sendMovementReport({
         req,
         res,
-        findRows: findMovementReportRows,
+        context: 'materials',
         sheetName: SHEET_NAME,
         filename: FILENAME,
         additionalParams: {
@@ -96,7 +97,7 @@ export const exportMovementReport = async (req, res) => {
 export const exportWasteMovementReport = async (req, res) => sendMovementReport({
     req,
     res,
-    findRows: findWasteMovementReportRows,
+    context: 'wastes',
     sheetName: WASTE_MOVEMENT_SHEET_NAME,
     filename: WASTE_MOVEMENT_FILENAME
 });
