@@ -2550,6 +2550,10 @@ body {
   color: rgba(var(--mdb-secondary-rgb), 0.82);
 }
 
+.swal2-actions {
+  gap: 0.75rem;
+}
+
 .swal2-confirmation-confirm-button,
 .swal2-confirmation-cancel-button {
   border-radius: 0.75rem;
@@ -2575,7 +2579,6 @@ body {
   background-color: #ffffff !important;
   border: 1px solid var(--swal-confirmation-accent) !important;
   color: var(--swal-confirmation-accent) !important;
-  margin-left: 0.5rem;
 }
 
 .swal2-confirmation-cancel-button:hover,
