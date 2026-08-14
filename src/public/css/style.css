@@ -1612,6 +1612,16 @@ a:hover {
   -webkit-text-fill-color: rgba(var(--mdb-secondary-rgb), 0.72);
 }
 
+form[data-mode="view"] .form-select:disabled,
+form[data-mode="view"] .select2-container--disabled {
+  cursor: not-allowed;
+}
+
+form[data-mode="view"] .select2-container--disabled .select2-selection {
+  cursor: inherit;
+  pointer-events: none;
+}
+
 .modal-detail-table .table-input-outline {
   min-width: 6rem;
 }
