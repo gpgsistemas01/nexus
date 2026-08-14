@@ -30,15 +30,18 @@ describe('actualización de detalles durante el CRUD de salidas', () => {
   });
 });
 
-describe('renderActionButtons para salidas de merma', () => {
+describe('renderActionButtons para el CRUD de salidas', () => {
   it.each([
-    ['Pendiente', 'btn-edit-detail', ['btn-return-detail']],
-    ['Surtido parcial', 'btn-edit-detail', ['btn-return-detail']],
-    ['Surtido', 'btn-return-detail', ['btn-edit-detail']],
-    ['Cancelado', 'btn-edit', ['btn-edit-detail', 'btn-return-detail']]
-  ])('aplica la acción del estado %s', (fulfillmentStatus, expectedAction, excludedActions) => {
+    ['goodsIssue', 'Pendiente', 'btn-edit-detail', ['btn-return-detail']],
+    ['goodsIssue', 'Surtido parcial', 'btn-edit-detail', ['btn-return-detail']],
+    ['goodsIssue', 'Surtido', 'btn-return-detail', ['btn-edit-detail']],
+    ['wasteIssue', 'Pendiente', 'btn-edit-detail', ['btn-return-detail']],
+    ['wasteIssue', 'Surtido parcial', 'btn-edit-detail', ['btn-return-detail']],
+    ['wasteIssue', 'Surtido', 'btn-return-detail', ['btn-edit-detail']]
+  ])('aplica a %s la acción del estado de surtido %s', (context, fulfillmentStatus, expectedAction, excludedActions) => {
     const buttons = renderActionButtons({
-      context: 'wasteIssue',
+      context,
+      status: 'Aprobada',
       fulfillmentStatus,
       canManage: true,
       canSupply: true
@@ -47,4 +50,22 @@ describe('renderActionButtons para salidas de merma', () => {
     expect(buttons).toContain(expectedAction);
     excludedActions.forEach(action => expect(buttons).not.toContain(action));
   });
+
+  it.each(['goodsIssue', 'wasteIssue'])(
+    'impide editar, surtir o devolver una %s cancelada',
+    context => {
+      const buttons = renderActionButtons({
+        context,
+        status: 'Cancelada',
+        fulfillmentStatus: 'Surtido',
+        canManage: true,
+        canSupply: true
+      });
+
+      expect(buttons).toContain('Ver registro');
+      expect(buttons).not.toContain('Editar registro');
+      expect(buttons).not.toContain('btn-edit-detail');
+      expect(buttons).not.toContain('btn-return-detail');
+    }
+  );
 });

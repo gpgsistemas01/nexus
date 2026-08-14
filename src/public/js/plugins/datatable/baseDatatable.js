@@ -228,13 +228,11 @@ export const renderActionButtons = (options = {}) => {
     const isInventoryItem = context === 'material' || context === 'waste';
 
     return [
-        [((isGoodsIssue || isGoodsReceipt) && isCanceled)
-            || (isWasteIssue && fulfillmentStatus === 'Cancelado'), ACTION_BUTTONS.view],
+        [((isIssue || isGoodsReceipt) && isCanceled), ACTION_BUTTONS.view],
         [
             canManage && (
                 status === 'Abierta'
-                || (isGoodsIssue && isApproved)
-                || (isWasteIssue && fulfillmentStatus !== 'Cancelado')
+                || (isIssue && isApproved)
                 || (isGoodsReceipt && !isCanceled)
                 || EDITABLE_ACTION_CONTEXTS.has(context)
             ),
@@ -243,8 +241,8 @@ export const renderActionButtons = (options = {}) => {
         [isInventoryItem && canAdjustStock, ACTION_BUTTONS.adjustStock],
         [context === 'material' && canDeleteMaterial, ACTION_BUTTONS.deleteMaterial],
         [context === 'waste' && canDeleteWaste, ACTION_BUTTONS.deleteWaste],
-        [canSupply && isIssue && (!isGoodsIssue || isApproved) && SUPPLY_FULFILLMENT_STATUSES.has(fulfillmentStatus), ACTION_BUTTONS.supplyDetail],
-        [canSupply && isIssue && (!isGoodsIssue || isApproved) && fulfillmentStatus === 'Surtido', ACTION_BUTTONS.returnDetail]
+        [canSupply && isIssue && isApproved && SUPPLY_FULFILLMENT_STATUSES.has(fulfillmentStatus), ACTION_BUTTONS.supplyDetail],
+        [canSupply && isIssue && isApproved && fulfillmentStatus === 'Surtido', ACTION_BUTTONS.returnDetail]
     ]
         .filter(([canRender]) => canRender)
         .map(([, button]) => button)
