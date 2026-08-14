@@ -46,7 +46,7 @@ describe('wasteIssueController', () => {
       query: {
         start: '10',
         length: '5',
-        search: { value: 'SM-2026' },
+        search: { value: 'SAL-MER-2026' },
         order: [{ column: '0', dir: 'asc' }],
         startDate: '2026-08-01',
         endDate: '2026-08-31',
@@ -61,7 +61,7 @@ describe('wasteIssueController', () => {
     expect(findAllWasteIssues).toHaveBeenCalledWith({
       skip: 10,
       take: 5,
-      search: 'SM-2026',
+      search: 'SAL-MER-2026',
       startDate: '2026-08-01',
       endDate: '2026-08-31',
       clientId: 'client-1',

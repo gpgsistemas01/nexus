@@ -74,7 +74,7 @@ export const registerWasteStockAdjustment = async ({
             : STOCK_ADJUSTMENT_TYPES.DECREASE;
 
         referenceNumber = await generateYearlyReferenceNumber({
-            type: DOCUMENT_REFERENCE_TYPES.STOCK_ADJUSTMENT,
+            type: DOCUMENT_REFERENCE_TYPES.WASTE_STOCK_ADJUSTMENT,
             tx
         });
 
