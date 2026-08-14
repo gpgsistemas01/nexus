@@ -18,13 +18,15 @@ no dependen de que alguien recuerde actualizar una tabla a mano.
 | Artefacto | Fuente | Actualización |
 | --- | --- | --- |
 | `docs/generated/code-map.md` | Routers e imports de `src` | Se regenera con `npm run docs:architecture`; CI ejecuta `npm run docs:check` automáticamente y bloquea cambios desactualizados. |
+| `docs/generated/database-schema.md` | Modelos y relaciones de `prisma/schema.prisma` | Se regenera con el mismo comando; se valida en cada pull request. |
 | Diagramas de contexto, contenedores, secuencia y navegación de este documento | Decisiones de arquitectura y experiencia de usuario | Son curados: deben actualizarse cuando cambia el diseño y revisarse en el pull request. |
 | Catálogo de pantallas | Rutas, permisos, controladores, EJS y comportamiento visible | Es curado porque el código por sí solo no puede inferir correctamente propósito, navegación ni estado funcional. |
 
 La separación es intencional: generar relaciones mecánicas evita trabajo repetitivo,
-pero no se presenta como «automática» una explicación que requiere criterio humano. CI
-no escribe commits ni modifica el branch; informa la diferencia para que el mapa
-regenerado se revise y se versione junto con el código que la produjo.
+pero no se presenta como «automática» una explicación que requiere criterio humano. En
+los pull requests CI no modifica el branch: exige revisar los artefactos derivados
+junto con el código que los produjo. Como red de seguridad, un push a `main` regenera
+ambos documentos y crea un commit únicamente si detecta diferencias.
 
 ## 1. Arquitectura del sistema
 

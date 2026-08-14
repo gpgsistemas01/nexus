@@ -1,0 +1,160 @@
+# Especificación de requisitos
+
+## 1. Propósito y alcance
+
+Este documento profundiza el [mapa visual de requisitos](requirements-diagrams.md).
+Define una línea base revisable de capacidades, reglas y atributos de calidad sin
+confundir tres conceptos diferentes:
+
+- **requisito:** comportamiento o restricción que el producto debe cumplir;
+- **evidencia:** código, ruta, modelo o prueba que permite comprobarlo;
+- **estado:** grado en que la evidencia actual satisface el requisito.
+
+El alcance actual comprende autenticación, administración de identidades, catálogos,
+compras, inventario de materiales, inventario de merma, salidas, devoluciones,
+movimientos y reportes. OpenAPI, una interfaz completa de requisiciones y objetivos de
+nivel de servicio permanecen fuera de la línea base implementada.
+
+Este documento no sustituye historias de usuario, diseños de pantalla ni el contrato
+HTTP. El [contrato API](api-contract.md), el
+[mapa generado](generated/code-map.md) y el esquema Prisma aportan esos otros niveles
+de detalle.
+
+## 2. Convenciones
+
+### 2.1 Identificadores
+
+| Prefijo | Tipo |
+| --- | --- |
+| `RF` | Requisito funcional observable por un actor o consumidor. |
+| `RN` | Regla de negocio que restringe varios flujos. |
+| `RC` | Requisito de calidad u operación. |
+
+### 2.2 Estados
+
+| Estado | Interpretación |
+| --- | --- |
+| Implementado | Existe un flujo registrado y evidencia suficiente en el código. |
+| Parcial | Existe parte del flujo, pero falta una operación, interfaz o evidencia relevante. |
+| Modelado | Existen entidades o piezas aisladas, pero no un flujo web/API registrado. |
+| Propuesto | Requiere decisión o implementación futura; no debe anunciarse como disponible. |
+
+El estado describe la evidencia del repositorio, no la aprobación del producto por un
+usuario responsable. Esa aprobación debe registrarse en la historia o incidencia que
+originó el cambio.
+
+## 3. Actores y alcance de acceso
+
+| Actor | Responsabilidad |
+| --- | --- |
+| Personal de almacén | Mantener catálogos operativos y ejecutar entradas, salidas, devoluciones y ajustes autorizados. |
+| Solicitante o aprobador | Participar en documentos operativos de acuerdo con su rol y departamento. |
+| Ventas o asesoría | Mantener clientes y aportar el contexto comercial de las salidas. |
+| Administración | Mantener personas, usuarios y accesos; consultar auditoría y reportes permitidos. |
+| Sistema | Validar, persistir atómicamente, numerar documentos, auditar escrituras críticas y notificar actualizaciones. |
+
+Los nombres de actor expresan responsabilidades, no conceden acceso por sí mismos. La
+autorización efectiva se calcula con las asignaciones de usuario, rol y departamento
+descritas en [usuarios y permisos](database-users-and-permissions-analysis.md).
+
+## 4. Requisitos funcionales
+
+### 4.1 Acceso e identidad
+
+| ID | Requisito y criterio de aceptación | Estado | Evidencia principal |
+| --- | --- | --- | --- |
+| RF-AUT-001 | Una cuenta activa puede iniciar sesión con credenciales válidas; una credencial inválida no crea una sesión autenticada. | Implementado | `src/routes/api/authApiRoute.js`, `src/routes/web/auth/loginWebRoute.js` |
+| RF-AUT-002 | Una sesión puede renovarse y cerrarse mediante los flujos registrados, invalidando o reemplazando las credenciales correspondientes. | Implementado | `src/routes/web/auth/refreshWebRoute.js`, `src/routes/web/auth/logoutWebRoute.js` |
+| RF-IAM-001 | Administración puede listar, crear y actualizar usuarios, incluidas sus asignaciones de rol y departamento; la lectura posterior refleja el cambio. | Implementado | `src/routes/api/admin/userApiRoute.js`, `src/controllers/api/admin/userController.js` |
+| RF-IAM-002 | Administración puede listar, crear y actualizar personas y sus asignaciones; entradas inválidas no deben persistirse. | Implementado | `src/routes/api/admin/personApiRoute.js`, `src/views/pages/admin/persons` |
+| RF-IAM-003 | Roles y departamentos se pueden consultar para componer asignaciones de acceso. | Implementado | `src/routes/api/admin/roleApiRoute.js`, `src/routes/api/admin/departmentApiRoute.js` |
+
+### 4.2 Catálogos operativos y comerciales
+
+| ID | Requisito y criterio de aceptación | Estado | Evidencia principal |
+| --- | --- | --- | --- |
+| RF-CAT-001 | Almacén puede consultar, crear y actualizar materiales con presentación, unidad y límites válidos; el listado refleja la mutación. | Implementado | `src/routes/api/warehouse/materialApiRoute.js`, `src/views/pages/warehouse/materials` |
+| RF-CAT-002 | Almacén puede consultar, crear y actualizar proveedores y sus relaciones con materiales sin duplicar la relación proveedor-material. | Implementado | `src/routes/api/warehouse/supplierApiRoute.js`, modelo `SupplierMaterial` |
+| RF-CAT-003 | Ventas puede consultar, crear y actualizar clientes y su asesor asociado. | Implementado | `src/routes/api/sales/clientApiRoute.js`, `tests/integration/controllers/clientControllerDbTest.js` |
+| RF-CAT-004 | Almacén puede consultar, registrar y actualizar existencias de merma en el contexto de un material y proveedor. | Implementado | `src/routes/api/warehouse/wasteApiRoute.js`, `src/views/pages/warehouse/wastes` |
+| RF-CAT-005 | Presentaciones, unidades, motivos y estados de cumplimiento se exponen como catálogos auxiliares reutilizables por los formularios operativos. | Implementado | routers de catálogo bajo `src/routes/api/warehouse` |
+
+### 4.3 Entradas, salidas e inventario
+
+| ID | Requisito y criterio de aceptación | Estado | Evidencia principal |
+| --- | --- | --- | --- |
+| RF-REC-001 | Almacén puede listar y registrar una entrada de compra con proveedor y detalles; una creación exitosa persiste encabezado, detalles y movimiento asociado. | Implementado | `src/routes/api/warehouse/goodsReceiptApiRoute.js`, modelo `GoodsReceipt` |
+| RF-REC-002 | Una entrada registrada admite correcciones autorizadas conservando actor, valores anteriores/corregidos y el efecto de inventario. | Implementado | `GoodsReceiptDetailChange`, `src/services/warehouse/goodsReceipts/detailChanges` |
+| RF-ISS-001 | Almacén puede listar, registrar y actualizar salidas de material con sus detalles y contexto de cliente, solicitante y departamento. | Implementado | `src/routes/api/warehouse/goodsIssueApiRoute.js`, `src/views/pages/warehouse/goodsIssues` |
+| RF-ISS-002 | La entrega de una salida modifica existencias mediante movimientos trazables y no permite aplicar parcialmente una transacción fallida. | Implementado | servicios de salida e inventario bajo `src/services/warehouse` |
+| RF-ISS-003 | Una devolución de material registra cantidades acumuladas y enlaza el movimiento de reversa con el documento y detalle originales. | Implementado | modelos `GoodsIssueReturn` y `MovementDetail` |
+| RF-WST-001 | Almacén puede listar, crear y actualizar existencias de merma reutilizando el patrón CRUD de los demás catálogos. | Implementado | `src/routes/api/warehouse/wasteApiRoute.js` |
+| RF-WST-002 | Almacén puede registrar y modificar una salida de merma y sus detalles dentro de los estados permitidos. | Implementado | `src/routes/api/warehouse/wasteIssueApiRoute.js` |
+| RF-WST-003 | Entregas y devoluciones de merma actualizan stock, cantidades acumuladas y movimientos como una sola operación observable. | Implementado | `tests/integration/controllers/wasteIssueControllerDbTest.js` |
+| RF-ADJ-001 | Un ajuste de material o merma conserva motivo, tipo, estado, creador y aprobador; al aplicarse genera el movimiento y los valores anterior/nuevo. | Parcial | modelos `StockAdjustment`, `WasteStockAdjustment`; servicios de ajuste |
+
+### 4.4 Consulta, reportes y funciones modeladas
+
+| ID | Requisito y criterio de aceptación | Estado | Evidencia principal |
+| --- | --- | --- | --- |
+| RF-REP-001 | Un usuario autorizado puede consultar movimientos de materiales o mermas con filtros y exportar la información ofrecida por la pantalla. | Implementado | `src/routes/api/admin/movementApiRoute.js`, `src/views/pages/admin/movements` |
+| RF-REP-002 | Los módulos administrativo, comercial y de almacén pueden consultar los reportes registrados para su ámbito. | Implementado | routers `reportApiRoute.js` de cada dominio |
+| RF-REQ-001 | Solicitantes y aprobadores podrán registrar, consultar, aprobar y entregar requisiciones con detalles y proyecto. No se considera disponible hasta registrar rutas web/API y pruebas del flujo. | Modelado | modelos `PurchaseRequisition` y `PurchaseRequisitionDetail` |
+| RF-PRJ-001 | Los proyectos podrán mantenerse y seleccionarse como contexto de requisiciones y salidas. No existe actualmente un CRUD registrado. | Modelado | modelo `Project` |
+
+## 5. Reglas de negocio transversales
+
+| ID | Regla verificable |
+| --- | --- |
+| RN-001 | Toda mutación debe validar autenticación, autorización y entrada en el servidor; ocultar un control en EJS o JavaScript no sustituye esa validación. |
+| RN-002 | Una operación que cambia documento, detalle, stock y movimiento debe ser atómica: se confirman todos los cambios o ninguno. |
+| RN-003 | Las cantidades suministradas o devueltas no pueden producir acumulados incompatibles con la cantidad válida del detalle. |
+| RN-004 | Los documentos y movimientos que requieren referencia deben usar una referencia única y conservar el vínculo con su origen. |
+| RN-005 | Las correcciones y ajustes conservan datos históricos suficientes para explicar el valor anterior, el nuevo, el motivo y el actor. |
+| RN-006 | Los catálogos reutilizan el ciclo listar-crear-actualizar y componentes existentes; una diferencia de contexto no justifica duplicar transporte o coordinación CRUD. |
+| RN-007 | La eliminación física sólo procede cuando el dominio y sus relaciones lo permiten; en los demás casos se usa estado, cancelación o activación. |
+| RN-008 | Las escrituras críticas configuradas deben registrar actor, acción, recurso, resultado y datos de solicitud admitidos por la política de auditoría. |
+
+## 6. Requisitos de calidad
+
+| ID | Requisito y forma de comprobación | Estado |
+| --- | --- | --- |
+| RC-SEG-001 | Las contraseñas y secretos no se almacenan en texto plano ni se versionan; las rutas protegidas rechazan sesiones ausentes o sin permiso. Se comprueba con configuración, middleware y pruebas negativas. | Implementado |
+| RC-DAT-001 | Las migraciones deben poder desplegarse de forma reproducible y las pruebas nunca deben usar la base de desarrollo. CI verifica la URL antes de migrar. | Implementado |
+| RC-PRU-001 | Las unitarias de controllers aplican límites, particiones, decisiones, errores o efectos negativos; las integraciones CRUD atraviesan HTTP y comprueban persistencia con Prisma. | Parcial |
+| RC-MAN-001 | Rutas, capas y pruebas se organizan por dominio; antes de crear un flujo se evalúan las fábricas CRUD y componentes compartidos existentes. | Implementado |
+| RC-DOC-001 | Cambios en rutas, imports o Prisma deben dejar actualizados los documentos generados; `npm run docs:check` debe terminar correctamente. | Implementado |
+| RC-OBS-001 | Fallos operacionales deben quedar en logs estructurados sin exponer secretos al cliente. | Implementado |
+| RC-REN-001 | Tiempos máximos de respuesta, concurrencia y volumen requieren una línea base medida y aprobación del responsable del producto. | Propuesto |
+| RC-DIS-001 | Objetivos de disponibilidad, recuperación y respaldo requieren infraestructura y valores acordados; no se infieren del código. | Propuesto |
+
+No se inventan umbrales de rendimiento o disponibilidad: deben acordarse con quien
+opera el sistema y convertirse en una prueba o monitor reproducible antes de cambiar
+su estado.
+
+## 7. Criterio de terminado y trazabilidad
+
+Un requisito funcional nuevo o modificado se considera listo para revisión cuando:
+
+1. conserva un identificador estable y criterios observables en este documento;
+2. enlaza su ruta, permiso, validadores, controller/DTO, servicio y persistencia;
+3. reutiliza el proceso CRUD o componente aplicable antes de introducir otro flujo;
+4. incluye pruebas relacionadas con el CRUD en la ubicación y con las estrategias de
+   [pruebas](service-test-coverage.md) correspondientes;
+5. actualiza diagramas curados y ejecuta el generador cuando cambia rutas o Prisma;
+6. distingue explícitamente comportamiento implementado, parcial y pendiente.
+
+La evidencia puede enlazarse desde una incidencia hacia el ID del requisito. No se
+añade una matriz duplicada de cada endpoint: el mapa generado ya conserva ese
+inventario y evita que dos listas manuales diverjan.
+
+## 8. Mantenimiento y decisiones pendientes
+
+- El responsable funcional debe validar prioridades y criterios de aceptación; este
+  análisis sólo establece la línea base derivada del repositorio.
+- Al implementar requisiciones o proyectos, primero se debe revisar si el patrón de
+  documentos de salida o el CRUD común puede parametrizarse para el nuevo contexto.
+- OpenAPI debe comenzar con un CRUD completo y reutilizar esquemas compartidos, según
+  la estrategia del contrato API.
+- Las metas de rendimiento, disponibilidad, retención de auditoría y respaldo deben
+  incorporarse sólo con valores medibles, propietario y mecanismo de comprobación.

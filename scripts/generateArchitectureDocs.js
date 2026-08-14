@@ -3,11 +3,20 @@ import path from 'node:path';
 import process from 'node:process';
 
 const ROOT = process.cwd();
-const OUTPUT = path.join(ROOT, 'docs/generated/code-map.md');
+const OUTPUTS = {
+    codeMap: path.join(ROOT, 'docs/generated/code-map.md'),
+    database: path.join(ROOT, 'docs/generated/database-schema.md')
+};
 const CHECK = process.argv.includes('--check');
 const SOURCE_AREAS = [
     'config', 'constants', 'controllers', 'dtos', 'errors', 'lib', 'messages',
     'middleware', 'public', 'repository', 'routes', 'services', 'utils', 'validators', 'views'
+];
+const DATABASE_AREAS = [
+    ['Identidad, acceso y auditoría', ['Department', 'Role', 'User', 'Person', 'UserRoleDepartment', 'PersonRoleDepartment', 'CriticalWriteAudit']],
+    ['Catálogos y relaciones comerciales', ['Status', 'FulfillmentStatus', 'Project', 'Client', 'Supplier', 'Material', 'UnitMeasure', 'Presentation', 'SupplierMaterial', 'ReferenceNumberCounter']],
+    ['Compras, requisiciones e inventario de materiales', ['PurchaseRequisition', 'PurchaseRequisitionDetail', 'GoodsReceipt', 'GoodsReceiptDetail', 'GoodsReceiptDetailChange', 'GoodsIssue', 'GoodsIssueDetail', 'GoodsIssueReturn', 'InventoryMovement', 'MovementDetail', 'StockAdjustment', 'StockAdjustmentDetail', 'StockAdjustmentReason']],
+    ['Mermas e inventario de merma', ['Waste', 'WasteIssue', 'WasteIssueDetail', 'WasteIssueReturn', 'WasteMovement', 'WasteMovementDetail', 'WasteStockAdjustment', 'WasteStockAdjustmentDetail']]
 ];
 
 const toPosix = (value) => value.split(path.sep).join('/');
@@ -81,7 +90,7 @@ const table = (routes) => [
     ...routes.map(({ method, route, file }) => `| \`${method}\` | \`${route}\` | [\`${file}\`](../../${file}) |`)
 ].join('\n');
 
-const generate = async () => {
+const generateCodeMap = async () => {
     const sourceFiles = (await walk(path.join(ROOT, 'src'))).filter((file) => file.endsWith('.js'));
     const [apiRoutes, webRoutes, dependencies] = await Promise.all([
         getRoutes('api'),
@@ -126,16 +135,99 @@ ${table(webRoutes)}
 `;
 };
 
-const content = await generate();
+const parsePrismaModels = (schema) => {
+    const models = new Map();
+    const scalarTypes = new Set(['BigInt', 'Boolean', 'Bytes', 'DateTime', 'Decimal', 'Float', 'Int', 'Json', 'String']);
+    const enumTypes = new Set([...schema.matchAll(/^enum\s+(\w+)\s*\{/gm)].map((match) => match[1]));
+    for (const match of schema.matchAll(/^model\s+(\w+)\s*\{([\s\S]*?)^\}/gm)) {
+        const [, name, body] = match;
+        const fields = [];
+        const relations = [];
+        for (const rawLine of body.split('\n')) {
+            const line = rawLine.trim();
+            if (!line || line.startsWith('//') || line.startsWith('@@')) continue;
+            const field = line.match(/^(\w+)\s+([\w]+)(\[\]|\?)?(.*)$/);
+            if (!field) continue;
+            const [, fieldName, type, modifier = '', attributes] = field;
+            const relation = attributes.match(/@relation\([^)]*fields:\s*\[([^\]]+)\]/);
+            if (relation) {
+                relations.push({ field: fieldName, target: type, optional: modifier === '?', foreignKeys: relation[1].split(',').map((value) => value.trim()) });
+                continue;
+            }
+            if (modifier === '[]' || (!scalarTypes.has(type) && !enumTypes.has(type))) continue;
+            const keys = [attributes.includes('@id') ? 'PK' : '', attributes.includes('@unique') ? 'UK' : ''].filter(Boolean).join(',');
+            fields.push({ name: fieldName, type, keys });
+        }
+        const foreignKeys = new Set(relations.flatMap(({ foreignKeys: keys }) => keys));
+        const compoundPrimaryKeys = new Set((body.match(/@@id\(\[([^\]]+)\]\)/)?.[1] ?? '')
+            .split(',').map((value) => value.trim()).filter(Boolean));
+        fields.forEach((field) => {
+            if (compoundPrimaryKeys.has(field.name)) field.keys = [field.keys, 'PK'].filter(Boolean).join(',');
+            if (foreignKeys.has(field.name)) field.keys = [field.keys, 'FK'].filter(Boolean).join(',');
+        });
+        models.set(name, { fields, relations });
+    }
+    return models;
+};
+
+const renderEntity = (name, model) => [
+    `    ${name} {`,
+    ...model.fields.map(({ name: field, type, keys }) => `        ${type} ${field}${keys ? ` ${keys}` : ''}`),
+    '    }'
+].join('\n');
+
+const generateDatabaseSchema = async () => {
+    const models = parsePrismaModels(await readFile(path.join(ROOT, 'prisma/schema.prisma'), 'utf8'));
+    const documented = new Set(DATABASE_AREAS.flatMap(([, names]) => names));
+    const missing = [...models.keys()].filter((name) => !documented.has(name));
+    if (missing.length) throw new Error(`Modelos Prisma sin área documental: ${missing.join(', ')}`);
+    const diagrams = DATABASE_AREAS.map(([title, names]) => {
+        const selected = new Set(names);
+        const entities = names.map((name) => renderEntity(name, models.get(name))).join('\n');
+        const relations = names.flatMap((source) => models.get(source).relations
+            .filter(({ target }) => selected.has(target))
+            .map(({ field, target, optional }) => `    ${target} ${optional ? 'o|' : '||'}--o{ ${source} : "${field}"`));
+        return `## ${title}\n\n\`\`\`mermaid\nerDiagram\n${entities}\n${relations.join('\n')}\n\`\`\``;
+    }).join('\n\n');
+    return `<!-- Archivo generado por scripts/generateArchitectureDocs.js. No editar manualmente. -->
+# Diagramas de la base de datos
+
+Estos diagramas ER se generan desde los modelos y relaciones de
+\`prisma/schema.prisma\`. Se separan por área para que puedan leerse y revisarse en
+GitHub; las relaciones que cruzan áreas se describen en la sección final.
+
+La marca \`PK\` identifica claves primarias, \`FK\` claves foráneas y \`UK\` campos
+únicos. Los campos compuestos y demás restricciones siguen teniendo como fuente de
+verdad el esquema Prisma y sus migraciones.
+
+${diagrams}
+
+## Relaciones entre áreas
+
+Los modelos de identidad y catálogo son referenciados desde los documentos de compra,
+salida, ajuste y merma. Para evitar repetir entidades y producir diagramas ilegibles,
+cada diagrama detalla las relaciones internas de su área; consulta el esquema Prisma
+para las relaciones transversales y las reglas \`onDelete\`/\`onUpdate\`.
+`;
+};
+
+const contents = new Map([
+    [OUTPUTS.codeMap, await generateCodeMap()],
+    [OUTPUTS.database, await generateDatabaseSchema()]
+]);
 if (CHECK) {
-    const current = await readFile(OUTPUT, 'utf8').catch(() => '');
-    if (current !== content) {
-        console.error('docs/generated/code-map.md está desactualizado. Ejecuta npm run docs:architecture.');
+    const stale = [];
+    for (const [output, content] of contents) {
+        const current = await readFile(output, 'utf8').catch(() => '');
+        if (current !== content) stale.push(toPosix(path.relative(ROOT, output)));
+    }
+    if (stale.length) {
+        console.error(`${stale.join(', ')} está desactualizado. Ejecuta npm run docs:architecture.`);
         process.exitCode = 1;
     } else {
         console.log('La documentación generada está actualizada.');
     }
 } else {
-    await writeFile(OUTPUT, content);
-    console.log(`Documentación generada en ${toPosix(path.relative(ROOT, OUTPUT))}.`);
+    for (const [output, content] of contents) await writeFile(output, content);
+    console.log(`Documentación generada en ${[...contents.keys()].map((output) => toPosix(path.relative(ROOT, output))).join(', ')}.`);
 }
