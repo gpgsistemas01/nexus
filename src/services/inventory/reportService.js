@@ -1,6 +1,11 @@
 import { formatDateLongWithTime, toNumber } from "../../utils/formattersUtils.js";
 import { findAllMaterialMovements, findAllWasteMovements } from "./movementQueryService.js";
 
+const MOVEMENT_REPORT_QUERIES = Object.freeze({
+    materials: findAllMaterialMovements,
+    wastes: findAllWasteMovements
+});
+
 const mapMovementReportRows = (movements) => movements.map((movement) => ({
     ...movement,
     date: formatDateLongWithTime(movement.date),
@@ -13,6 +18,7 @@ const mapMovementReportRows = (movements) => movements.map((movement) => ({
 }));
 
 export const findMovementReportRows = async ({
+    context = 'materials',
     startDate = '',
     endDate = '',
     search = '',
@@ -25,8 +31,10 @@ export const findMovementReportRows = async ({
     orderBy = 'date',
     orderDir = 'desc'
 } = {}) => {
+    const findMovements = MOVEMENT_REPORT_QUERIES[context];
+    if (!findMovements) return [];
 
-    const movementsResult = await findAllMaterialMovements({
+    const movementsResult = await findMovements({
         skip: 0,
         take: 100000,
         startDate,
@@ -40,16 +48,6 @@ export const findMovementReportRows = async ({
         stockAdjustmentId,
         orderBy,
         orderDir,
-    });
-
-    return mapMovementReportRows(movementsResult.data);
-};
-
-export const findWasteMovementReportRows = async (params = {}) => {
-    const movementsResult = await findAllWasteMovements({
-        ...params,
-        skip: 0,
-        take: 100000
     });
 
     return mapMovementReportRows(movementsResult.data);
