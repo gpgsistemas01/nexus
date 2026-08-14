@@ -1,5 +1,14 @@
-import { createSuccessResponseFromRequest } from "../../utils/responseUtils.js";
 import { getAllPersonsRequest, registerPersonRequest, updatePersonRequest } from "../../services/admin/personService.js";
+import { createCrudApplication } from '../createCrudApplication.js';
+
+const personApplication = createCrudApplication({
+    requests: {
+        getAll: getAllPersonsRequest,
+        register: registerPersonRequest,
+        edit: updatePersonRequest
+    },
+    dataKey: 'person'
+});
 
 export const getPersonOptions = async (params = {}) => {
 
@@ -14,23 +23,6 @@ export const getPersonOptions = async (params = {}) => {
         }));
 };
 
-export const getAllPersons = async (params = {}) => {
-
-    const response = await getAllPersonsRequest({ params });
-
-    return response;
-};
-
-export const registerPerson = async ({ formData }) => {
-
-    const response = await registerPersonRequest({ data: formData });
-
-    return createSuccessResponseFromRequest({ response, dataKey: 'person' });
-}
-
-export const updatePerson = async ({ formData, id }) => {
-
-    const response = await updatePersonRequest({ data: formData, id });
-
-    return createSuccessResponseFromRequest({ response, dataKey: 'person' });
-}
+export const getAllPersons = personApplication.getAll;
+export const registerPerson = personApplication.register;
+export const updatePerson = personApplication.edit;

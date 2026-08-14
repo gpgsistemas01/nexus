@@ -1,4 +1,4 @@
-import { openMaterialModal } from "../../../modules/materials/materialModal.js";
+import { openMaterialModal } from "../../../pages/warehouse/materials/materialModal.js";
 import { getAllMaterials } from "../../../application/warehouse/materials.js";
 import { buildPaginatedSelectParams, buildPaginatedSelectResults, initDomainSelect2, initFilterSelect2, runAfterSelect2Close, SELECT_RESULTS_LIMIT, setMdbWrapperInputValue, toggleSelectOption } from "../baseSelect.js";
 import { mapMaterialToSelectData } from "../../../utils/materialSelectUtils.js";

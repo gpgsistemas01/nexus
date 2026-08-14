@@ -1,26 +1,19 @@
 import { createSuccessResponseFromRequest } from "../../utils/responseUtils.js";
 import { editWasteRequest, editWasteStockRequest, getAllWastesRequest, registerWasteRequest } from "../../services/warehouse/wasteService.js";
+import { createCrudApplication } from '../createCrudApplication.js';
 
-export const getAllWastes = async (params = {}) => {
+const wasteApplication = createCrudApplication({
+    requests: {
+        getAll: getAllWastesRequest,
+        register: registerWasteRequest,
+        edit: editWasteRequest
+    },
+    dataKey: 'waste'
+});
 
-    const response = await getAllWastesRequest({ params });
-
-    return response;
-};
-
-export const registerWaste = async ({ formData }) => {
-
-    const response = await registerWasteRequest({ data: formData });
-
-    return createSuccessResponseFromRequest({ response, dataKey: 'waste' });
-};
-
-export const editWaste = async ({ formData, id }) => {
-
-    const response = await editWasteRequest({ data: formData, id });
-
-    return createSuccessResponseFromRequest({ response, dataKey: 'waste' });
-};
+export const getAllWastes = wasteApplication.getAll;
+export const registerWaste = wasteApplication.register;
+export const editWaste = wasteApplication.edit;
 
 export const editWasteStock = async ({ formData, id }) => {
 

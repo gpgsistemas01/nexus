@@ -1,6 +1,6 @@
 import { getAllClients } from "../../application/sales/clients.js";
 import { exportClientReport } from "../../application/sales/report.js";
-import { openClientModal } from "../../modules/clients/clientModal.js";
+import { openClientModal } from "../../pages/sales/clients/clientModal.js";
 import { createDataTable, renderActionButtons } from "./baseDatatable.js";
 import { buildExcelButton, buildTableExportParams } from "../../ui/tableUI.js";
 import { getResponsiveRowData } from "./utils/responsive.js";

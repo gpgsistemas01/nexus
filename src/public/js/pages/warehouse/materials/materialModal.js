@@ -1,10 +1,10 @@
-import { openModal } from "../../ui/modalUI.js";
-import { initMaterialFormSelect2, setMaterialFormSelectOptions } from "../../plugins/select2/modules/materialSelect.js";
-import { setReasonVisualOption } from '../../plugins/select2/domains/reason.js';
-import { clearFormErrors, initForm, setFormDisabled, setFormSectionVisibility } from "../../ui/formUI.js";
-import { FORM_SELECTORS, MODAL_SELECTORS } from "../../constants/selectors.js";
+import { openModal } from "../../../ui/modalUI.js";
+import { initMaterialFormSelect2, setMaterialFormSelectOptions } from "../../../plugins/select2/modules/materialSelect.js";
+import { setReasonVisualOption } from '../../../plugins/select2/domains/reason.js';
+import { clearFormErrors, initForm, setFormDisabled, setFormSectionVisibility } from "../../../ui/formUI.js";
+import { FORM_SELECTORS, MODAL_SELECTORS } from "../../../constants/selectors.js";
 import { materialDataFields, materialEditableDataFields, materialStockFields } from './materialFields.js';
-import { FORM_MODES, isCreateMode, isEditMode, isStockMode } from '../../constants/formModes.js';
+import { FORM_MODES, isCreateMode, isEditMode, isStockMode } from '../../../constants/formModes.js';
 
 const initialStockReasonName = 'Stock inicial';
 const stockDataSectionSelector = '.stock-data-section';

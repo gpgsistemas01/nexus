@@ -73,6 +73,12 @@ scripts/                    # Scripts auxiliares de verificación
 
 La aplicación usa una separación por capas: las rutas delegan en controladores, los controladores coordinan validación/entrada y los servicios concentran la lógica de negocio. Prisma se crea desde `src/lib/prisma.js`, usando la URL resuelta por `src/lib/databaseUrl.js`.
 
+Los registros centrales `src/routes/api/index.js` y `src/routes/web/index.js` componen
+los routers por dominio y evitan que `src/app.js` mezcle el arranque de infraestructura
+con el catálogo de endpoints. Las convenciones equivalentes entre backend y frontend,
+incluyendo reutilización de componentes y ubicación de pruebas CRUD, se detallan en el
+[mapa visual de arquitectura y vistas web](docs/architecture-and-web-views.md#5-organización-consistente-de-front-y-back).
+
 ## Documentación visual
 
 El [mapa visual de arquitectura y vistas web](docs/architecture-and-web-views.md) incluye
@@ -306,10 +312,8 @@ Todas las rutas API cuelgan de `/api` y esperan `Content-Type: application/json`
 - `/api/admin/movements`
 - `/api/admin/reports`
 
-La API de requisiciones existe en `src/routes/api/warehouse/purchaseRequisitionApiRoute.js`,
-pero actualmente **no está montada** en `src/app.js`; la vista `/requisiciones` opera
-mediante los flujos disponibles del proyecto. No debe anunciarse
-`/api/warehouse/purchase-requisitions` como endpoint público hasta habilitar ese montaje.
+La API de requisiciones todavía no está implementada ni registrada. No debe anunciarse
+`/api/warehouse/purchase-requisitions` como endpoint público hasta completar ese flujo.
 
 ## Pruebas automatizadas
 
@@ -339,6 +343,13 @@ npm test
 - Usa `AppError` y errores de dominio para respuestas controladas.
 - Agrega validadores en `src/validators` para nuevas entradas de usuario.
 - Mantén las rutas agrupadas por dominio en `src/routes/web` y `src/routes/api`.
+- Registra cada router nuevo en el `index.js` web o API correspondiente; `src/app.js`
+  sólo debe coordinar infraestructura y los registros principales.
+- Reutiliza componentes y casos de uso existentes cuando un CRUD cambie únicamente de
+  contexto, en vez de duplicar el flujo completo.
+- Conserva el mismo orden CRUD en rutas, controllers, servicios de aplicación y
+  servicios HTTP: lectura, creación, actualización general, actualizaciones
+  especializadas y eliminación o acción terminal.
 - Para nuevas funcionalidades con persistencia, agrega migraciones Prisma y pruebas asociadas.
 - No reutilices la base de desarrollo como base de pruebas.
 

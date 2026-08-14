@@ -22,17 +22,17 @@ router.get(
 );
 
 router.get(
-    '/goods-receipts/excel',
-    verifyApiTokenRequired,
-    authorizeUserApi(PERMISSIONS.WAREHOUSE_REPORTS_READ),
-    exportGoodsReceiptReportExcel
-);
-
-router.get(
     '/waste-issues/excel',
     verifyApiTokenRequired,
     authorizeUserApi(PERMISSIONS.WAREHOUSE_REPORTS_READ),
     exportWasteIssueReportExcel
+);
+
+router.get(
+    '/goods-receipts/excel',
+    verifyApiTokenRequired,
+    authorizeUserApi(PERMISSIONS.WAREHOUSE_REPORTS_READ),
+    exportGoodsReceiptReportExcel
 );
 
 router.get(

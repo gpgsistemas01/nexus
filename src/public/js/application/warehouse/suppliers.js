@@ -1,5 +1,14 @@
-import { createSuccessResponseFromRequest } from "../../utils/responseUtils.js";
 import { editSupplierRequest, getAllSuppliersRequest, registerSupplierRequest } from "../../services/warehouse/supplierService.js";
+import { createCrudApplication } from '../createCrudApplication.js';
+
+const supplierApplication = createCrudApplication({
+    requests: {
+        getAll: getAllSuppliersRequest,
+        register: registerSupplierRequest,
+        edit: editSupplierRequest
+    },
+    dataKeys: { register: 'supplier' }
+});
 
 export const getSupplierOptions = async (params = {}) => {
 
@@ -14,23 +23,6 @@ export const getSupplierOptions = async (params = {}) => {
         }));
 }
 
-export const getAllSuppliers = async (params = {}) => {
-
-    const response = await getAllSuppliersRequest({ params });
-
-    return response;
-};
-
-export const registerSupplier = async ({ formData }) => {
-
-    const response = await registerSupplierRequest({ data: formData });
-
-    return createSuccessResponseFromRequest({ response, dataKey: 'supplier' });
-}
-
-export const editSupplier = async ({ formData, id }) => {
-
-    const response = await editSupplierRequest({ data: formData, id });
-
-    return createSuccessResponseFromRequest({ response });
-}
+export const getAllSuppliers = supplierApplication.getAll;
+export const registerSupplier = supplierApplication.register;
+export const editSupplier = supplierApplication.edit;

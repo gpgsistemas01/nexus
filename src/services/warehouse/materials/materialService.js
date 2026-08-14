@@ -278,6 +278,46 @@ export const updateMaterial = async (materialDto, id) => {
     };
 };
 
+export const updateMaterialStock = async ({
+    materialDto,
+    userId,
+    id
+}) => {
+
+    try {
+
+        const stockAdjustment = await createStockAdjustment({
+            materialId: id,
+            supplierId: materialDto.supplierId,
+            reasonId: materialDto.reasonId,
+            observations: materialDto.observations,
+            newStock: materialDto.newStock,
+            userId
+        });
+
+        logServiceInfo(serviceLogger, {
+            operation: 'warehouse.materials.materialService.updateMaterialStock',
+            ...getModelLogContext('materialStock', { id, userId, ...materialDto })
+        }, 'Stock de material ajustado correctamente');
+
+        return stockAdjustment;
+
+    } catch (err) {
+        logServiceError(serviceLogger, err, {
+            operation: 'warehouse.materials.materialService.updateMaterialStock',
+            ...getModelLogContext('materialStock', { id, userId, ...materialDto })
+        });
+
+        if (err.code === PRISMA_ERROR_CODES.RECORD_NOT_FOUND) {
+            throw new MaterialNotFound();
+        }
+
+        if (isAppError(err)) throw err;
+
+        throw new MaterialStockAdjustmentDatabaseError();
+    }
+};
+
 export const deleteMaterial = async (supplierMaterialId) => {
 
     try {
@@ -343,45 +383,5 @@ export const deleteMaterial = async (supplierMaterialId) => {
         if (isAppError(err)) throw err;
 
         throw new MaterialDeleteDatabaseError();
-    }
-};
-
-export const updateMaterialStock = async ({
-    materialDto,
-    userId,
-    id
-}) => {
-
-    try {
-
-        const stockAdjustment = await createStockAdjustment({
-            materialId: id,
-            supplierId: materialDto.supplierId,
-            reasonId: materialDto.reasonId,
-            observations: materialDto.observations,
-            newStock: materialDto.newStock,
-            userId
-        });
-
-        logServiceInfo(serviceLogger, {
-            operation: 'warehouse.materials.materialService.updateMaterialStock',
-            ...getModelLogContext('materialStock', { id, userId, ...materialDto })
-        }, 'Stock de material ajustado correctamente');
-
-        return stockAdjustment;
-
-    } catch (err) {
-        logServiceError(serviceLogger, err, {
-            operation: 'warehouse.materials.materialService.updateMaterialStock',
-            ...getModelLogContext('materialStock', { id, userId, ...materialDto })
-        });
-
-        if (err.code === PRISMA_ERROR_CODES.RECORD_NOT_FOUND) {
-            throw new MaterialNotFound();
-        }
-
-        if (isAppError(err)) throw err;
-
-        throw new MaterialStockAdjustmentDatabaseError();
     }
 };

@@ -1,8 +1,8 @@
-import { useForm } from "../../application/form.js";
-import { editClient, registerClient } from "../../application/sales/clients.js";
-import { handleSubmit, validateFields } from "../../utils/formUtils.js";
-import { clientValidation } from "../../utils/validations/validators.js";
-import { FORM_SELECTORS } from "../../constants/selectors.js";
+import { useForm } from "../../../application/form.js";
+import { editClient, registerClient } from "../../../application/sales/clients.js";
+import { handleSubmit, validateFields } from "../../../utils/formUtils.js";
+import { clientValidation } from "../../../utils/validations/validators.js";
+import { FORM_SELECTORS } from "../../../constants/selectors.js";
 
 const formId = FORM_SELECTORS.CLIENT_FORM;
 

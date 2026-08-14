@@ -1,46 +1,21 @@
-import { createSuccessResponseFromRequest } from "../../../utils/responseUtils.js";
 import { editGoodsIssueDetailsRequest, editGoodsIssueHeaderRequest, editGoodsIssueRequest, getAllGoodsIssuesRequest, registerGoodsIssueRequest, returnGoodsIssueDetailRequest } from "../../../services/warehouse/goodsIssueService.js";
+import { createIssueApplication } from '../issues/createIssueApplication.js';
 
-export const getAllGoodsIssues = async (params = {}) => {
+const goodsIssueApplication = createIssueApplication({
+    requests: {
+        getAll: getAllGoodsIssuesRequest,
+        register: registerGoodsIssueRequest,
+        edit: editGoodsIssueRequest,
+        editHeader: editGoodsIssueHeaderRequest,
+        editDetails: editGoodsIssueDetailsRequest,
+        returnDetail: returnGoodsIssueDetailRequest
+    },
+    dataKeys: { issueReturn: 'goodsIssueReturn' }
+});
 
-    const response = await getAllGoodsIssuesRequest({ params });
-
-    return response;
-};
-
-export const registerGoodsIssue = async ({ formData }) => {
-
-    const response = await registerGoodsIssueRequest({ data: formData });
-
-    return createSuccessResponseFromRequest({ response });
-};
-
-export const editGoodsIssue = async ({ formData, id }) => {
-
-    const response = await editGoodsIssueRequest({ data: formData, id });
-
-    return createSuccessResponseFromRequest({ response });
-};
-
-export const editGoodsIssueDetails = async ({ formData, id }) => {
-
-    const response = await editGoodsIssueDetailsRequest({ data: formData, id });
-
-    return createSuccessResponseFromRequest({ response });
-};
-
-
-export const editGoodsIssueHeader = async ({ formData, id }) => {
-
-    const response = await editGoodsIssueHeaderRequest({ data: formData, id });
-
-    return createSuccessResponseFromRequest({ response });
-};
-
-
-export const returnGoodsIssueDetail = async ({ formData, id, detailId }) => {
-
-    const response = await returnGoodsIssueDetailRequest({ data: formData, id, detailId });
-
-    return createSuccessResponseFromRequest({ response, dataKey: 'goodsIssueReturn' });
-};
+export const getAllGoodsIssues = goodsIssueApplication.getAll;
+export const registerGoodsIssue = goodsIssueApplication.register;
+export const editGoodsIssue = goodsIssueApplication.edit;
+export const editGoodsIssueHeader = goodsIssueApplication.editHeader;
+export const editGoodsIssueDetails = goodsIssueApplication.editDetails;
+export const returnGoodsIssueDetail = goodsIssueApplication.returnDetail;

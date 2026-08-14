@@ -1,7 +1,7 @@
 import { getAllMaterials } from "../../../application/warehouse/materials.js";
 import { mapSupplierMaterialToSelectData } from "../../../utils/materialSelectUtils.js";
 import { initDomainSelect2, toggleSelectOption } from "../baseSelect.js";
-import { setSupplierMaterialSummaryValues } from "../../../modules/materials/supplierMaterialSummary.js";
+import { setSupplierMaterialSummaryValues } from "../../../pages/warehouse/materials/supplierMaterialSummary.js";
 
 const attachSupplierMaterialDisplayHandler = ({
     modalSelector,

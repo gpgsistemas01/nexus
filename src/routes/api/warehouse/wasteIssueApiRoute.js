@@ -46,15 +46,6 @@ router.patch(
 );
 
 router.patch(
-    '/:id/details/:detailId/returns',
-    verifyApiTokenRequired,
-    issueReturnValidation,
-    validate,
-    authorizeUserApi(PERMISSIONS.WASTE_ISSUES_SUPPLY),
-    returnWasteIssueDetail
-);
-
-router.patch(
     '/:id/header',
     verifyApiTokenRequired,
     wasteIssueHeaderValidation,
@@ -70,6 +61,15 @@ router.patch(
     validate,
     authorizeUserApi(PERMISSIONS.WASTE_ISSUES_SUPPLY),
     editWasteIssueDetails
+);
+
+router.patch(
+    '/:id/details/:detailId/returns',
+    verifyApiTokenRequired,
+    issueReturnValidation,
+    validate,
+    authorizeUserApi(PERMISSIONS.WASTE_ISSUES_SUPPLY),
+    returnWasteIssueDetail
 );
 
 export default router;

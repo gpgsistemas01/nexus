@@ -167,7 +167,81 @@ Al agregar, renombrar o retirar una vista web:
 Los diagramas describen el diseño a nivel de sistema; el código sigue siendo la fuente
 de verdad para los detalles de endpoints, payloads y reglas de autorización.
 
-## 5. Plataforma recomendada para arquitectura
+## 5. Organización consistente de front y back
+
+La unidad de organización es el **dominio funcional** (`admin`, `sales`, `warehouse`),
+no el tipo de operación CRUD. Una funcionalidad debe conservar el mismo dominio y el
+mismo nombre de recurso al recorrer sus capas. Por ejemplo, `warehouse/wastes` enlaza
+la ruta API, el controlador, el servicio del navegador y la página de mermas sin crear
+un flujo paralelo para registrar o editar.
+
+| Responsabilidad | Backend | Frontend |
+| --- | --- | --- |
+| Composición | `src/routes/{api,web}/index.js` registra prefijos y routers | La plantilla de página incluye el único entry point de la pantalla |
+| Transporte | `routes` declara método, permiso y validadores; `controllers` traduce HTTP/DTO | `public/js/services` encapsula HTTP; `application` traduce la respuesta al caso de uso |
+| Negocio | `services/<dominio>` contiene reglas y transacciones reutilizables | `application/<dominio>` coordina casos de uso sin depender de elementos visuales |
+| Presentación | El controlador web entrega el contexto de la vista | `pages/<dominio>/<recurso>` conserva entry point, formulario y modal del contexto; `ui`, `plugins` y `views/shared` reúnen piezas independientes del recurso |
+
+Reglas para extender un CRUD:
+
+1. Añadir el router al registro central correspondiente, manteniendo el dominio tanto
+   en la ruta como en los directorios de sus capas.
+2. Reutilizar DTOs, servicios de dominio, formularios, modales, tablas y selectores
+   existentes antes de crear otro proceso; parametrizar el contexto cuando dos flujos
+   sólo difieran en material/merma u otro recurso.
+3. Mantener autorización y reglas de negocio en el servidor. El cliente únicamente
+   adapta transporte, interacción y presentación.
+4. Reservar `application` para casos de uso y `pages` para composición. Una llamada
+   HTTP no debe implementarse directamente desde una página.
+5. Ordenar las operaciones públicas de cada recurso de forma predecible en todas sus
+   capas: **lectura/listado, creación, actualización general, actualizaciones
+   especializadas y eliminación o acciones terminales**. Los imports se ordenan por
+   dominio y nombre; no se reordena según el momento en que se añadió una función.
+6. Ubicar las pruebas unitarias de controllers en
+   `tests/unit/controllers/<tipo>/<dominio>` y las CRUD con persistencia en
+   `tests/integration/controllers`, siguiendo las estrategias de
+   `docs/service-test-coverage.md`.
+7. Al editar EJS, preservar el cierre final de `contentFor` en su posición; no
+   eliminarlo y volverlo a agregar como efecto secundario de una refactorización.
+
+### Reutilización aplicada en flujos de salidas
+
+Las salidas de material y de merma conservan servicios HTTP separados porque sus
+endpoints y respuestas pertenecen a contextos distintos. En cambio, su capa
+`application` reutiliza `createIssueApplication`, que compone `createCrudApplication`
+para listado, registro y edición, y sólo agrega las mutaciones de encabezado, detalles
+y devolución. La adaptación común de `formData`, identificadores y respuestas exitosas
+vive en `createApplicationMutation`; no hay dos implementaciones del mismo proceso.
+Cada contexto sólo inyecta sus requests y las claves de datos de su respuesta. Las
+páginas y datatables siguen consumiendo nombres de
+dominio (`registerGoodsIssue`, `registerWasteIssue`, etc.), por lo que el componente
+compartido no filtra abstracciones genéricas hacia la UI.
+
+El mismo criterio se aplica a clientes, personas, proveedores y mermas mediante
+`createCrudApplication`: listado, registro y edición comparten la adaptación de
+transporte, mientras cada módulo conserva sus opciones de select y operaciones
+especializadas. No se fuerza esta fábrica sobre materiales, usuarios o compras porque
+sus payloads y mutaciones adicionales requieren coordinación propia.
+
+`application/warehouse/wasteIssues/wasteIssues.js` permanece dentro de una carpeta de
+recurso, en paralelo con `goodsIssues/goodsIssues.js`, porque ambos flujos tienen varias
+mutaciones relacionadas. `wasteForm`, `wasteModal` y `wasteFields` permanecen en
+`pages/warehouse/wastes` porque conocen selectores, validaciones, modos y operaciones
+propias de ese recurso; que el datatable abra ese modal no convierte al modal en un
+componente independiente del contexto. Sólo una abstracción sin conocimiento de merma
+debe moverse a `ui` o a una carpeta compartida. En las salidas, la coordinación
+específica permanece en su archivo de página y las operaciones realmente comunes del
+formulario están en `ui/issues/issueFormUI.js`.
+
+Los formularios y modales de clientes, materiales y proveedores se consumen desde
+varias pantallas, pero siguen perteneciendo a su recurso. Por ello viven en
+`pages/sales/clients`, `pages/warehouse/materials` y `pages/warehouse/suppliers`; los
+flujos externos los importan desde el contexto propietario en vez de crear una carpeta
+intermedia basada sólo en que hay más de un consumidor. `ui` queda reservado para
+comportamiento que recibe su contexto por parámetros y no importa aplicaciones de un
+recurso concreto.
+
+## 6. Plataforma recomendada para arquitectura
 
 ### Decisión actual: Mermaid dentro del repositorio
 
