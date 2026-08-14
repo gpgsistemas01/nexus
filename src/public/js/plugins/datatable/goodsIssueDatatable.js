@@ -32,7 +32,6 @@ export const createGoodsIssueDatatable = async ({ context, onCreate, onEdit, onE
         actionContext: 'goodsIssue',
         canManage,
         canSupply,
-        includeStatus: true,
         searchPlaceholder: 'Buscar por Folio o Proyecto',
         order: [[0, 'desc']],
         buttons,

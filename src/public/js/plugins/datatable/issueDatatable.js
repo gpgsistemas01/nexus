@@ -36,10 +36,10 @@ export const buildIssueHeaderColumns = ({ context }) => {
     return columns;
 };
 
-export const buildIssueTrackingColumns = ({ includeStatus = false } = {}) => [
+export const buildIssueTrackingColumns = () => [
     { title: 'Proyecto', data: 'projectNumber' },
     { title: 'Cliente', data: 'clientName' },
-    ...(includeStatus ? [{ title: 'Estado', data: 'status.name' }] : []),
+    { title: 'Estado', data: 'status.name' },
     { title: 'Estado surtido', data: 'fulfillmentStatus.name' }
 ];
 
@@ -68,7 +68,6 @@ export const createIssueDatatable = async ({
     actionContext,
     canManage,
     canSupply,
-    includeStatus = false,
     searchPlaceholder,
     order,
     buttons = [],
@@ -80,7 +79,7 @@ export const createIssueDatatable = async ({
     const columns = buildIssueHeaderColumns({ context });
 
     columns.push(
-        ...buildIssueTrackingColumns({ includeStatus }),
+        ...buildIssueTrackingColumns(),
         {
             title: 'Acciones',
             data: null,
