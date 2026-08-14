@@ -95,19 +95,28 @@ export const initDatePickers = (root = document) => {
 
     if (typeof window.flatpickr !== 'function') return [];
 
-    return Array.from(root.querySelectorAll(FLATPICKR_DATE_SELECTOR)).map((input) => {
+    return Array.from(root.querySelectorAll(FLATPICKR_DATE_SELECTOR))
+        .filter(input => input.type === 'date' || input._flatpickr)
+        .map((input) => {
 
-        if (input._flatpickr) return input._flatpickr;
+            if (input._flatpickr) {
+                syncFlatpickrAltInputDisabled(input._flatpickr);
+                return input._flatpickr;
+            }
 
-        return window.flatpickr(input, {
-            altInput: true,
-            altFormat: 'd/m/Y',
-            allowInput: true,
-            dateFormat: 'Y-m-d',
-            enableTime: false,
-            locale: getFlatpickrLocale()
+            const instance = window.flatpickr(input, {
+                altInput: true,
+                altFormat: 'd/m/Y',
+                allowInput: true,
+                dateFormat: 'Y-m-d',
+                enableTime: false,
+                locale: getFlatpickrLocale()
+            });
+
+            syncFlatpickrAltInputDisabled(instance);
+
+            return instance;
         });
-    });
 };
 
 export const setDateTimePickerValue = (input, value) => {
