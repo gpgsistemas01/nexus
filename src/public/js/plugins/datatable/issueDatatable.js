@@ -1,7 +1,9 @@
-import { formatDateTimeDisplay } from '../../utils/formatters.js';
+import { formatDateTimeDisplay, formatFileName } from '../../utils/formatters.js';
 import { getResponsiveRowData } from './utils/responsive.js';
 import { setupTableFilters } from './utils/filters/tableFilter.js';
 import { createDataTable, renderActionButtons } from './baseDatatable.js';
+import { buildExcelButton, buildTableExportParams } from '../../ui/tableUI.js';
+import { DATATABLE_SELECTORS } from '../../constants/selectors.js';
 
 const ISSUE_FILTER_FIELDS = [
     'date',
@@ -66,15 +68,11 @@ export const createIssueDatatable = async ({
     context,
     getIssues,
     actionContext,
-    canManage,
-    canSupply,
-    searchPlaceholder,
-    order,
+    permissions: { canManage, canSupply },
+    tableOptions: { searchPlaceholder, order },
     buttons = [],
-    tableSelector,
-    onEdit,
-    onEditDetails,
-    onReturnDetails
+    exportOptions = null,
+    actions = {}
 }) => {
     const columns = buildIssueHeaderColumns({ context });
 
@@ -95,22 +93,32 @@ export const createIssueDatatable = async ({
     );
 
     const filters = await setupIssueTableFilters();
-    const table = createDataTable({ options: {
+    let table;
+    const exportButton = exportOptions?.report && exportOptions?.filename
+        ? buildExcelButton({
+            filename: formatFileName(exportOptions.filename),
+            request: ({ monthlyReport = false } = {}) => exportOptions.report(buildTableExportParams(table, {
+                ...filters.getValues(),
+                monthlyReport
+            }))
+        })
+        : null;
+    const configuredButtons = exportButton ? [...buttons, exportButton] : buttons;
+
+    table = createDataTable({ options: {
         ajax: {
             get: params => getIssues({ ...params, ...filters.getValues() })
         },
         searchPlaceholder,
         order,
-        buttons,
+        buttons: configuredButtons,
         columns
     } });
 
     bindIssueTableActions({
         table,
-        tableSelector,
-        onEdit,
-        onEditDetails,
-        onReturnDetails
+        tableSelector: DATATABLE_SELECTORS.MAIN,
+        ...actions
     });
 
     return { table, filters };
