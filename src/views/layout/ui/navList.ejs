@@ -1,5 +1,6 @@
 <% const shouldShowIcons = typeof showIcons !== 'undefined' ? showIcons : true;
 const shouldShowLabels = typeof showLabels !== 'undefined' ? showLabels : true;
+const shouldUseFlyout = !shouldShowLabels;
 const navAccordionId = typeof accordionId !== 'undefined' ? accordionId : `appNavAccordion${ shouldShowLabels ? 'Full' : 'Icon' }`;
 
 const createNavLink = ({ content, icon, href, permission }) => ({
@@ -55,20 +56,20 @@ const items = [
     class: `nav-link ${ shouldShowIcons ? 'app-nav-link--icon' : '' } ${ !shouldShowLabels ? 'app-nav-link--icon-only' : '' } ${ item.isActive ? 'active' : ''}`,
     children: (item.children || []).map(child => ({
         ...child,
-        class: `nav-link app-nav-link--child ${ shouldShowIcons ? 'app-nav-link--icon' : '' } ${ !shouldShowLabels ? 'app-nav-link--icon-only' : '' } ${ child.isActive ? 'active' : ''}`
+        class: `nav-link app-nav-link--child ${ shouldShowIcons ? 'app-nav-link--icon' : '' } ${ child.isActive ? 'active' : ''}`
     }))
 })); %>
 
-<ul id="<%= navAccordionId %>" class="<%= listClass %> app-nav-accordion <%= !shouldShowLabels ? 'app-nav-list--icon-only' : '' %>">
+<ul id="<%= navAccordionId %>" class="<%= listClass %> app-nav-accordion <%= shouldUseFlyout ? 'app-nav-list--icon-only app-nav-list--flyout' : '' %>">
     <% items.forEach(item => { %>
         <li class="nav-item py-1">
             <% if (item.children.length) { %>
                 <button
                     type="button"
-                    class="<%= item.class %> app-nav-link--section app-nav-submenu-toggle <%= item.isActive ? '' : 'collapsed' %>"
+                    class="<%= item.class %> app-nav-link--section app-nav-submenu-toggle <%= item.isActive && !shouldUseFlyout ? '' : 'collapsed' %>"
                     data-mdb-collapse-init
                     data-mdb-target="#<%= item.submenuId %>"
-                    aria-expanded="<%= item.isActive ? 'true' : 'false' %>"
+                    aria-expanded="<%= item.isActive && !shouldUseFlyout ? 'true' : 'false' %>"
                     aria-controls="<%= item.submenuId %>"
                     <%- include('./navTooltipAttrs', { enabled: !shouldShowLabels, label: item.content }) %>
                 >
@@ -81,23 +82,23 @@ const items = [
                         <span class="app-nav-link__label"><%- item.content %></span>
                     <% } %>
                     <span class="app-nav-submenu-toggle__icon" aria-hidden="true">
-                        <i class="fa-solid fa-chevron-down"></i>
+                        <i class="fa-solid <%= shouldUseFlyout ? 'fa-chevron-right' : 'fa-chevron-down' %>"></i>
                     </span>
                 </button>
 
-                <ul id="<%= item.submenuId %>" class="navbar-nav flex-column collapse <%= item.isActive ? 'show' : '' %> app-nav-submenu" data-mdb-parent="#<%= navAccordionId %>">
+                <ul id="<%= item.submenuId %>" class="navbar-nav flex-column collapse <%= item.isActive && !shouldUseFlyout ? 'show' : '' %> app-nav-submenu" data-mdb-parent="#<%= navAccordionId %>">
                     <% item.children.forEach(child => { %>
                         <li class="nav-item py-1">
                             <a class="<%= child.class %>" href="<%= child.href %>"
                                 <% if (child.isActive) { %>aria-current="page"<% } %>
-                                <%- include('./navTooltipAttrs', { enabled: !shouldShowLabels, label: child.content }) %>
+                                <%- include('./navTooltipAttrs', { enabled: !shouldShowLabels && !shouldUseFlyout, label: child.content }) %>
                             >
                                 <% if (shouldShowIcons && child.icon) { %>
                                     <span class="app-nav-link__icon" aria-hidden="true">
                                         <i class="<%= child.icon %>"></i>
                                     </span>
                                 <% } %>
-                                <% if (shouldShowLabels) { %>
+                                <% if (shouldShowLabels || shouldUseFlyout) { %>
                                     <span class="app-nav-link__label"><%- child.content %></span>
                                 <% } %>
                             </a>
