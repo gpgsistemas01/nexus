@@ -4,6 +4,28 @@ Este documento es el mapa visual, versionado junto con el código, para comprend
 sistema y localizar sus pantallas. Los diagramas usan **Mermaid**, por lo que GitHub los
 renderiza directamente sin guardar imágenes que puedan quedar desactualizadas.
 
+La documentación se divide deliberadamente en dos niveles:
+
+- este documento **curado** explica contexto, decisiones, responsabilidades y flujos;
+- el [mapa generado del código](generated/code-map.md) inventaría endpoints y
+  dependencias reales entre áreas, y puede verificarse con `npm run docs:check`.
+
+Así, un generador no intenta adivinar el porqué del diseño y los inventarios mecánicos
+no dependen de que alguien recuerde actualizar una tabla a mano.
+
+### ¿Qué se actualiza automáticamente?
+
+| Artefacto | Fuente | Actualización |
+| --- | --- | --- |
+| `docs/generated/code-map.md` | Routers e imports de `src` | Se regenera con `npm run docs:architecture`; CI ejecuta `npm run docs:check` automáticamente y bloquea cambios desactualizados. |
+| Diagramas de contexto, contenedores, secuencia y navegación de este documento | Decisiones de arquitectura y experiencia de usuario | Son curados: deben actualizarse cuando cambia el diseño y revisarse en el pull request. |
+| Catálogo de pantallas | Rutas, permisos, controladores, EJS y comportamiento visible | Es curado porque el código por sí solo no puede inferir correctamente propósito, navegación ni estado funcional. |
+
+La separación es intencional: generar relaciones mecánicas evita trabajo repetitivo,
+pero no se presenta como «automática» una explicación que requiere criterio humano. CI
+no escribe commits ni modifica el branch; informa la diferencia para que el mapa
+regenerado se revise y se versione junto con el código que la produjo.
+
 ## 1. Arquitectura del sistema
 
 ### Contexto
@@ -157,12 +179,15 @@ flowchart LR
 Al agregar, renombrar o retirar una vista web:
 
 1. Actualizar el mapa de navegación y el catálogo de este documento.
-2. Actualizar la lista breve de rutas del `README.md`.
+2. Regenerar el catálogo de rutas; no copiarlo al `README.md`.
 3. Verificar que ruta, permiso, controlador, plantilla y JavaScript de página conserven
    nombres coherentes.
 4. Si cambia un límite del sistema o una dependencia externa, actualizar también los
    diagramas de contexto y contenedores.
 5. Revisar los diagramas en la vista previa de Markdown de GitHub antes de fusionar.
+6. Ejecutar `npm run docs:architecture` cuando cambien routers o imports entre áreas y
+   confirmar con `npm run docs:check` antes de enviar el cambio. La misma verificación
+   se ejecuta automáticamente en CI para pull requests y pushes a la rama principal.
 
 Los diagramas describen el diseño a nivel de sistema; el código sigue siendo la fuente
 de verdad para los detalles de endpoints, payloads y reglas de autorización.
@@ -241,34 +266,15 @@ intermedia basada sólo en que hay más de un consumidor. `ui` queda reservado p
 comportamiento que recibe su contexto por parámetros y no importa aplicaciones de un
 recurso concreto.
 
-## 6. Plataforma recomendada para arquitectura
+## 6. Herramientas
 
-### Decisión actual: Mermaid dentro del repositorio
+- **Ahora:** Mermaid para diagramas curados y el generador local para rutas e imports.
+- **Si crece la arquitectura:** Structurizr DSL/C4 para mantener múltiples vistas desde
+  un modelo central.
+- **Si se necesitan reglas de dependencias:** dependency-cruiser o Madge para ciclos y
+  límites entre módulos.
+- **Para la API:** OpenAPI describe el contrato y Swagger UI puede visualizarlo; no
+  reemplazan estos diagramas. Consulta la [decisión sobre el contrato](api-contract.md).
 
-Para el tamaño y madurez actuales de Nexus, **Mermaid en Markdown** es la opción
-recomendada: los diagramas se revisan en el mismo pull request que el código, GitHub
-los representa de forma visual y no se necesita operar otra plataforma. Este documento
-adopta esa opción desde ahora.
-
-### Evolución propuesta: Structurizr con el modelo C4
-
-Cuando sea necesario mantener varios niveles (contexto, contenedores, componentes y
-despliegue), reutilizar un único modelo o publicar un portal navegable, conviene migrar
-a **Structurizr DSL**. Structurizr permite tratar la arquitectura como código y generar
-vistas basadas en el modelo C4. La migración puede hacerse sin perder este catálogo:
-
-1. Crear `workspace.dsl` con personas, sistemas, contenedores y relaciones.
-2. Generar vistas C4 de contexto y contenedores, conservando Mermaid para los flujos de
-   navegación y secuencia que son más cercanos a la interfaz.
-3. Automatizar en CI la validación/exportación del workspace.
-4. Enlazar desde este documento al portal publicado o a los diagramas exportados.
-
-| Alternativa | Ventaja | Limitación | Uso recomendado en Nexus |
-| --- | --- | --- | --- |
-| Mermaid + Markdown | Cero servicio adicional, diff legible y renderizado en GitHub. | No mantiene un modelo arquitectónico único ni un portal navegable. | **Ahora:** arquitectura general, navegación y flujos. |
-| Structurizr DSL + C4 | Modelo central, múltiples vistas y arquitectura como código. | Añade herramienta, DSL y pipeline de publicación/validación. | **Después:** cuando crezcan componentes, integraciones o equipos. |
-| diagrams.net | Edición visual accesible y flexible. | Los cambios XML son difíciles de revisar y el diagrama puede divergir del código. | Bocetos puntuales, no fuente oficial. |
-
-La adopción de Structurizr debe registrarse como una decisión técnica antes de añadir
-la herramienta al pipeline. Hasta entonces, este archivo Markdown es la fuente oficial
-de los diagramas de arquitectura y del inventario de vistas.
+No se añade otra herramienta hasta que exista esa necesidad. Esto mantiene el flujo
+actual simple y evita diagramas duplicados.
