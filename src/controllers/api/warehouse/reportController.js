@@ -1,4 +1,4 @@
-import { buildMonthlyGoodsReceiptSummary, findGoodsIssueReportRows, findGoodsReceiptReportRows, findSupplierReportRows, findWarehouseReportRows, findWasteReportRows } from "../../../services/warehouse/reportService.js";
+import { buildMonthlyGoodsReceiptSummary, findGoodsIssueReportRows, findGoodsReceiptReportRows, findSupplierReportRows, findWarehouseReportRows, findWasteIssueReportRows, findWasteReportRows } from "../../../services/warehouse/reportService.js";
 import { getDataTableOrder, getDataTableSearch } from "../../../utils/requestQueryUtils.js";
 import { getMexicoMonthDateRange } from "../../../utils/formattersUtils.js";
 import { sendExcelReport } from "../../../utils/reportExcelUtils.js";
@@ -7,6 +7,8 @@ const SHEET_NAME = 'Inventario';
 const FILENAME = 'reporte_inventario_materiales';
 const GOODS_ISSUE_SHEET_NAME = 'Salidas';
 const GOODS_ISSUE_FILENAME = 'reporte_salidas';
+const WASTE_ISSUE_SHEET_NAME = 'Salidas de merma';
+const WASTE_ISSUE_FILENAME = 'reporte_salidas_merma';
 const GOODS_RECEIPT_SHEET_NAME = 'Compras';
 const GOODS_RECEIPT_FILENAME = 'reporte_compras';
 const SUPPLIER_SHEET_NAME = 'Proveedores';
@@ -14,6 +16,76 @@ const SUPPLIER_FILENAME = 'reporte_proveedores';
 const WASTE_SHEET_NAME = 'Mermas';
 const WASTE_FILENAME = 'reporte_mermas';
 const isMonthlyReportRequest = (query = {}) => query.monthlyReport === 'true' || query.monthlyReport === true;
+const ISSUE_REPORT_COLUMNS = ['referenceNumber', 'requestDate', 'departmentName', 'projectNumber', 'clientName', null, null];
+const ISSUE_REPORT_HEADERS = [
+    'Folio',
+    'Fecha de solicitud',
+    'Área',
+    'Solicitante',
+    'Cliente',
+    'Proyecto',
+    'Estado de surtido',
+    'Material',
+    'Proveedor',
+    'Base',
+    'Altura',
+    'Cantidad solicitada',
+    'Cantidad surtida',
+    'Presentación',
+    'Cantidad convertida',
+    'Unidad de conversión',
+    'Cantidad de proyecto',
+    'Diferencia',
+    'Estado del detalle'
+];
+
+const buildIssueReportQuery = (req) => {
+    const { orderBy, orderDir } = getDataTableOrder({
+        query: req.query,
+        columns: ISSUE_REPORT_COLUMNS,
+        defaultDirection: 'desc'
+    });
+    const monthlyReport = isMonthlyReportRequest(req.query);
+    const monthDateRange = monthlyReport ? getMexicoMonthDateRange() : {};
+
+    return {
+        search: monthlyReport ? '' : getDataTableSearch(req.query),
+        startDate: monthlyReport ? monthDateRange.startDate : req.query.startDate || '',
+        endDate: monthlyReport ? monthDateRange.endDate : req.query.endDate || '',
+        fulfillmentStatusId: monthlyReport ? '' : req.query.fulfillmentStatusId || '',
+        observationsSearch: monthlyReport ? '' : req.query.observationsSearch || '',
+        clientId: monthlyReport ? '' : req.query.clientId || '',
+        departmentId: monthlyReport ? '' : req.query.departmentId || '',
+        personId: monthlyReport ? '' : req.query.personId || '',
+        orderBy,
+        orderDir
+    };
+};
+
+const buildIssueReportData = (rows, { baseHeader = 'Base', heightHeader = 'Altura' } = {}) => [
+    ISSUE_REPORT_HEADERS.map(header => ({ Base: baseHeader, Altura: heightHeader })[header] || header),
+    ...rows.map(row => [
+        row.referenceNumber,
+        row.requestDate,
+        row.departmentName,
+        row.requesterName,
+        row.clientName,
+        row.projectNumber,
+        row.fulfillmentStatusName,
+        row.materialName,
+        row.supplierName,
+        row.materialBase,
+        row.materialHeight,
+        row.requestedQuantity,
+        row.suppliedQuantity,
+        row.presentationName,
+        row.convertedQuantity,
+        row.convertedUnitMeasureName,
+        row.projectConvertedQuantity,
+        row.convertedQuantityDifference,
+        row.detailFulfillmentStatusName
+    ])
+];
 
 export const exportWarehouseReportExcel = async (req, res) => {
 
@@ -66,82 +138,30 @@ export const exportWarehouseReportExcel = async (req, res) => {
 };
 
 export const exportGoodsIssueReportExcel = async (req, res) => {
-
-    const columns = ['referenceNumber', 'requestDate', 'departmentName', 'projectNumber', 'clientName', null, null];
-    const { orderBy, orderDir } = getDataTableOrder({
-        query: req.query,
-        columns,
-        defaultDirection: 'desc'
-    });
-
-    const monthlyReport = isMonthlyReportRequest(req.query);
-    const monthDateRange = monthlyReport ? getMexicoMonthDateRange() : {};
-
     const rows = await findGoodsIssueReportRows({
-        search: monthlyReport ? '' : getDataTableSearch(req.query),
-        startDate: monthlyReport ? monthDateRange.startDate : req.query.startDate || '',
-        endDate: monthlyReport ? monthDateRange.endDate : req.query.endDate || '',
-        fulfillmentStatusId: monthlyReport ? '' : req.query.fulfillmentStatusId || '',
-        observationsSearch: monthlyReport ? '' : req.query.observationsSearch || '',
-        clientId: monthlyReport ? '' : req.query.clientId || '',
-        departmentId: monthlyReport ? '' : req.query.departmentId || '',
-        personId: monthlyReport ? '' : req.query.personId || '',
+        ...buildIssueReportQuery(req),
         accesses: req.user?.accesses || [],
-        orderBy,
-        orderDir
     });
-
-    const data = [
-        [
-            'Folio',
-            'Fecha de solicitud',
-            'Área',
-            'Solicitante',
-            'Cliente',
-            'Proyecto',
-            'Estado de surtido',
-            'Material',
-            'Proveedor',
-            'Base',
-            'Altura',
-            'Cantidad solicitada',
-            'Cantidad surtida',
-            'Presentación',
-            'Cantidad convertida',
-            'Unidad de conversión',
-            'Cantidad de proyecto',
-            'Diferencia',
-            'Estado del detalle'
-        ],
-
-        ...rows.map(row => [
-            row.referenceNumber,
-            row.requestDate,
-            row.departmentName,
-            row.requesterName,
-            row.clientName,
-            row.projectNumber,
-            row.fulfillmentStatusName,
-            row.materialName,
-            row.supplierName,
-            row.materialBase,
-            row.materialHeight,
-            row.requestedQuantity,
-            row.suppliedQuantity,
-            row.presentationName,
-            row.convertedQuantity,
-            row.convertedUnitMeasureName,
-            row.projectConvertedQuantity,
-            row.convertedQuantityDifference,
-            row.detailFulfillmentStatusName
-        ])
-    ];
 
     return sendExcelReport({
         res,
-        data,
+        data: buildIssueReportData(rows),
         sheetName: GOODS_ISSUE_SHEET_NAME,
         filename: GOODS_ISSUE_FILENAME
+    });
+};
+
+export const exportWasteIssueReportExcel = async (req, res) => {
+    const rows = await findWasteIssueReportRows(buildIssueReportQuery(req));
+
+    return sendExcelReport({
+        res,
+        data: buildIssueReportData(rows, {
+            baseHeader: 'Base de merma',
+            heightHeader: 'Altura de merma'
+        }),
+        sheetName: WASTE_ISSUE_SHEET_NAME,
+        filename: WASTE_ISSUE_FILENAME
     });
 };
 

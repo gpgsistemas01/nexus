@@ -1,6 +1,7 @@
 import { formatDateLongWithTime, roundTo, toNumber } from "../../utils/formattersUtils.js";
 import { findAllGoodsIssues } from "./goodsIssues/goodsIssueService.js";
 import { findAllGoodsReceipts } from "./goodsReceipts/goodsReceiptService.js";
+import { findAllWasteIssues } from "./wasteIssues/wasteIssueService.js";
 import { findAllSuppliers } from "./supplierService.js";
 import { GOODS_RECEIPT_STATUS_NAMES } from "../../constants/warehouseStatuses.js";
 import { getDb } from "../../repository/baseRepository.js";
@@ -83,6 +84,28 @@ const mapInventoryReportWaste = ({ supplierMaterial, ...waste }) => ({
     supplier: supplierMaterial.supplier
 });
 
+const mapIssueDetailRow = ({ issue, detail, material, supplier }) => ({
+    referenceNumber: issue.referenceNumber,
+    requestDate: formatDateLongWithTime(issue.requestDate),
+    departmentName: issue.departmentName,
+    requesterName: issue.requesterName,
+    clientName: issue.clientName,
+    projectNumber: issue.projectNumber,
+    fulfillmentStatusName: issue.fulfillmentStatus?.name,
+    materialName: detail.materialName,
+    supplierName: supplier?.tradeName,
+    materialBase: toNumber(material?.base),
+    materialHeight: toNumber(material?.height),
+    requestedQuantity: toNumber(detail.quantity),
+    suppliedQuantity: toNumber(detail.suppliedQuantity),
+    presentationName: material?.presentation?.name,
+    convertedQuantity: toNumber(detail.convertedQuantity),
+    convertedUnitMeasureName: material?.unitMeasure?.symbol || material?.unitMeasure?.name,
+    projectConvertedQuantity: toNumber(detail.projectConvertedQuantity),
+    convertedQuantityDifference: toNumber(detail.convertedQuantityDifference),
+    detailFulfillmentStatusName: detail.fulfillmentStatus?.name
+});
+
 const mapGoodsIssueDetailRows = (goodsIssues = [], { supplierId = '', materialId = '' } = {}) => goodsIssues.flatMap((goodsIssue) => {
 
     const details = (goodsIssue.details || []).filter((detail) => {
@@ -95,28 +118,28 @@ const mapGoodsIssueDetailRows = (goodsIssues = [], { supplierId = '', materialId
         );
     });
 
-    return details.map((detail) => ({
-        referenceNumber: goodsIssue.referenceNumber,
-        requestDate: formatDateLongWithTime(goodsIssue.requestDate),
-        departmentName: goodsIssue.departmentName,
-        requesterName: goodsIssue.requesterName,
-        clientName: goodsIssue.clientName,
-        projectNumber: goodsIssue.projectNumber,
-        fulfillmentStatusName: goodsIssue.fulfillmentStatus?.name,
-        materialName: detail.materialName,
-        supplierName: detail.supplier?.tradeName,
-        materialBase: toNumber(detail.material?.base),
-        materialHeight: toNumber(detail.material?.height),
-        requestedQuantity: toNumber(detail.quantity),
-        suppliedQuantity: toNumber(detail.suppliedQuantity),
-        presentationName: detail.material?.presentation?.name,
-        convertedQuantity: toNumber(detail.convertedQuantity),
-        convertedUnitMeasureName: detail.material?.unitMeasure?.symbol || detail.material?.unitMeasure?.name,
-        projectConvertedQuantity: toNumber(detail.projectConvertedQuantity),
-        convertedQuantityDifference: toNumber(detail.convertedQuantityDifference),
-        detailFulfillmentStatusName: detail.fulfillmentStatus?.name
+    return details.map(detail => mapIssueDetailRow({
+        issue: goodsIssue,
+        detail,
+        material: detail.material,
+        supplier: detail.supplier
     }));
 });
+
+const mapWasteIssueDetailRows = (wasteIssues = []) => wasteIssues.flatMap((wasteIssue) => (
+    (wasteIssue.details || [])
+        .filter(detail => detail.fulfillmentStatus?.name !== 'Cancelado')
+        .map(detail => mapIssueDetailRow({
+            issue: wasteIssue,
+            detail,
+            material: {
+                ...detail.waste?.supplierMaterial?.material,
+                base: detail.waste?.base,
+                height: detail.waste?.height
+            },
+            supplier: detail.waste?.supplierMaterial?.supplier
+        }))
+));
 
 const mapGoodsReceiptDetailRows = (goodsReceipts = [], { materialId = '' } = {}) => goodsReceipts.flatMap((goodsReceipt) => {
 
@@ -267,7 +290,6 @@ export const findGoodsIssueReportRows = async ({
     orderBy = 'referenceNumber',
     orderDir = 'desc'
 } = {}) => {
-
     const goodsIssuesResult = await findAllGoodsIssues({
         skip: 0,
         take: 100000,
@@ -285,6 +307,36 @@ export const findGoodsIssueReportRows = async ({
     });
 
     return mapGoodsIssueDetailRows(goodsIssuesResult.data);
+};
+
+export const findWasteIssueReportRows = async ({
+    search = '',
+    startDate = '',
+    endDate = '',
+    fulfillmentStatusId = '',
+    observationsSearch = '',
+    clientId = '',
+    departmentId = '',
+    personId = '',
+    orderBy = 'referenceNumber',
+    orderDir = 'desc'
+} = {}) => {
+    const wasteIssuesResult = await findAllWasteIssues({
+        skip: 0,
+        take: 100000,
+        search,
+        startDate,
+        endDate,
+        fulfillmentStatusId,
+        observationsSearch,
+        clientId,
+        departmentId,
+        personId,
+        orderBy,
+        orderDir
+    });
+
+    return mapWasteIssueDetailRows(wasteIssuesResult.data);
 };
 
 export const findGoodsReceiptReportRows = async ({
