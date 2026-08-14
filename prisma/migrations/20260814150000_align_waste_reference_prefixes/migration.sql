@@ -1,21 +1,19 @@
 -- Waste adjustments use their own folio family instead of sharing AJU with
 -- material adjustments. Seed each yearly counter from existing AJU-MER folios
--- produced by the original waste-adjustment backfill.
-INSERT INTO "ReferenceNumberCounter" ("id", "prefix", "year", "counter")
+-- produced by the original waste-adjustment backfill. The counter represents
+-- the last assigned folio (not the next one); 0 is only the initial value when
+-- no folio has been issued, and the generation service increments it before use.
+INSERT INTO "ReferenceNumberCounter" ("prefix", "year", "counter")
 SELECT
-    gen_random_uuid(),
     'AJU-MER',
     parsed."year",
     MAX(parsed."counter")
 FROM (
     SELECT
-        (matches.parts)[1]::INTEGER AS "year",
-        (matches.parts)[2]::INTEGER AS "counter"
+        split_part(adjustment."referenceNumber", '-', 3)::INTEGER AS "year",
+        split_part(adjustment."referenceNumber", '-', 4)::INTEGER AS "counter"
     FROM "WasteStockAdjustment" adjustment
-    CROSS JOIN LATERAL regexp_match(
-        adjustment."referenceNumber",
-        '^AJU-MER-([0-9]{4})-([0-9]{6})$'
-    ) AS matches(parts)
+    WHERE adjustment."referenceNumber" ~ '^AJU-MER-[0-9]{4}-[0-9]{6}$'
 ) parsed
 GROUP BY parsed."year"
 ON CONFLICT ("prefix", "year") DO UPDATE
@@ -31,8 +29,8 @@ SET "referenceNumber" = regexp_replace(
 )
 WHERE "referenceNumber" ~ '^SM-[0-9]{4}-[0-9]{6}$';
 
-INSERT INTO "ReferenceNumberCounter" ("id", "prefix", "year", "counter")
-SELECT gen_random_uuid(), 'SAL-MER', source."year", MAX(source."counter")
+INSERT INTO "ReferenceNumberCounter" ("prefix", "year", "counter")
+SELECT 'SAL-MER', source."year", MAX(source."counter")
 FROM (
     SELECT "year", "counter"
     FROM "ReferenceNumberCounter"
@@ -41,13 +39,10 @@ FROM (
     UNION ALL
 
     SELECT
-        (matches.parts)[1]::INTEGER AS "year",
-        (matches.parts)[2]::INTEGER AS "counter"
+        split_part(issue."referenceNumber", '-', 3)::INTEGER AS "year",
+        split_part(issue."referenceNumber", '-', 4)::INTEGER AS "counter"
     FROM "WasteIssue" issue
-    CROSS JOIN LATERAL regexp_match(
-        issue."referenceNumber",
-        '^SAL-MER-([0-9]{4})-([0-9]{6})$'
-    ) AS matches(parts)
+    WHERE issue."referenceNumber" ~ '^SAL-MER-[0-9]{4}-[0-9]{6}$'
 ) source
 GROUP BY source."year"
 ON CONFLICT ("prefix", "year") DO UPDATE
