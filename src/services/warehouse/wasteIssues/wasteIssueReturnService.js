@@ -1,4 +1,4 @@
-import { FULFILLMENT_STATUS_NAMES } from '../../../constants/warehouseStatuses.js';
+import { FULFILLMENT_STATUS_NAMES, GOODS_ISSUE_STATUS_NAMES } from '../../../constants/warehouseStatuses.js';
 import {
     WasteIssueDetailNotFound,
     WasteIssueReturnDatabaseError,
@@ -67,7 +67,10 @@ const returnWasteIssueDetailTransaction = ({ id, detailId, returnDto, userId }) 
     if (allCanceled) {
         await tx.wasteIssue.update({
             where: { id },
-            data: { fulfillmentStatusId: statusIds.get(FULFILLMENT_STATUS_NAMES.CANCELED) }
+            data: {
+                fulfillmentStatusId: statusIds.get(FULFILLMENT_STATUS_NAMES.CANCELED),
+                status: { connect: { name: GOODS_ISSUE_STATUS_NAMES.CANCELED } }
+            }
         });
     }
 

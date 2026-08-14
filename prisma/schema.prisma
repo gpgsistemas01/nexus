@@ -126,6 +126,7 @@ model Status {
   goodsReceipts        GoodsReceipt[]
   purchaseRequisitions PurchaseRequisition[]
   goodsIssues          GoodsIssue[]
+  wasteIssues          WasteIssue[]
 }
 
 model Material {
@@ -332,12 +333,14 @@ model WasteIssue {
   clientId            String             @db.Uuid
   advisorId           String             @db.Uuid
   fulfillmentStatusId String             @db.Uuid
+  statusId            String             @db.Uuid
   createdBy           User               @relation(fields: [createdById], references: [id])
   department          Department         @relation(fields: [departmentId], references: [id])
   requester           Person             @relation("RequesterWasteIssueRelation", fields: [requesterId], references: [id])
   client              Client             @relation(fields: [clientId], references: [id])
   advisor             Person             @relation("AdvisorWasteIssueRelation", fields: [advisorId], references: [id])
   fulfillmentStatus   FulfillmentStatus  @relation(fields: [fulfillmentStatusId], references: [id], onDelete: Restrict)
+  status              Status             @relation(fields: [statusId], references: [id], onDelete: Restrict)
   details             WasteIssueDetail[]
   movements           WasteMovement[]
   returns             WasteIssueReturn[]
@@ -350,6 +353,7 @@ model WasteIssue {
   @@index([clientId])
   @@index([advisorId])
   @@index([fulfillmentStatusId])
+  @@index([statusId])
   @@index([requestDate])
 }
 

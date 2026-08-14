@@ -1,6 +1,6 @@
 import { DOCUMENT_REFERENCE_TYPES } from '../../../constants/documentReferenceTypes.js';
 import { PRISMA_ERROR_CODES } from '../../../constants/prisma.js';
-import { FULFILLMENT_STATUS_NAMES } from '../../../constants/warehouseStatuses.js';
+import { FULFILLMENT_STATUS_NAMES, GOODS_ISSUE_STATUS_NAMES } from '../../../constants/warehouseStatuses.js';
 import {
     WasteIssueAdvisorNotFound,
     WasteIssueAlreadySuppliedConflict,
@@ -43,6 +43,7 @@ const normalizeWasteIssueResponse = issue => issue && ({
 
 const WASTE_ISSUE_INCLUDE = {
     createdBy: { select: { id: true, name: true } },
+    status: { select: { id: true, name: true } },
     fulfillmentStatus: { select: { id: true, name: true } },
     department: { select: { id: true, name: true } },
     requester: { select: { id: true, fullName: true } },
@@ -89,6 +90,7 @@ const resolveWasteIssueHeaderData = async ({ tx, dto }) => {
         departmentId,
         clientId,
         issueData,
+        statusName: GOODS_ISSUE_STATUS_NAMES.APPROVED,
         errorTypes: WASTE_ISSUE_HEADER_ERROR_TYPES
     });
 };
