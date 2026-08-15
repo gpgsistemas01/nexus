@@ -2,6 +2,10 @@
 
 La suite evita repetir cada operación interna de cada servicio. La cobertura se divide por propósito y se concentra en casos capaces de revelar errores concretos.
 
+El [plan de pruebas](test-plan.md) complementa esta estrategia con alcance, matriz CRUD,
+criterios de entrada/salida, ejecución, responsabilidades y trazabilidad. La estrategia
+define **cómo y dónde** probar; el plan define **qué, cuándo y con qué evidencia**.
+
 ## Pruebas unitarias
 
 Las pruebas unitarias de controllers viven en `tests/unit/controllers`. Sólo se conserva una unitaria cuando aísla una regla que aporta valor diagnóstico y usa al menos una estrategia explícita:

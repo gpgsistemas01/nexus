@@ -19,6 +19,7 @@ no dependen de que alguien recuerde actualizar una tabla a mano.
 | --- | --- | --- |
 | `docs/generated/code-map.md` | Routers e imports de `src` | Se regenera con `npm run docs:architecture`; CI ejecuta `npm run docs:check` automáticamente y bloquea cambios desactualizados. |
 | `docs/generated/database-schema.md` | Modelos y relaciones de `prisma/schema.prisma` | Se regenera con el mismo comando; se valida en cada pull request. |
+| `docs/generated/data-dictionary.md` | Campos, claves, tipos y relaciones propietarias de `prisma/schema.prisma` | Se regenera con el mismo comando; complementa el ER sin duplicarlo manualmente. |
 | Diagramas de contexto, contenedores, secuencia y navegación de este documento | Decisiones de arquitectura y experiencia de usuario | Son curados: deben actualizarse cuando cambia el diseño y revisarse en el pull request. |
 | Catálogo de pantallas | Rutas, permisos, controladores, EJS y comportamiento visible | Es curado porque el código por sí solo no puede inferir correctamente propósito, navegación ni estado funcional. |
 
@@ -192,9 +193,16 @@ Al agregar, renombrar o retirar una vista web:
    se ejecuta automáticamente en CI para pull requests y pushes a la rama principal.
 
 Los diagramas describen el diseño a nivel de sistema; el código sigue siendo la fuente
-de verdad para los detalles de endpoints, payloads y reglas de autorización.
+de verdad para los detalles de endpoints, payloads y reglas de autorización. Las vistas
+nuevas deben seguir las [convenciones y patrones para diagramas](diagram-conventions.md),
+incluida la distinción entre notación visual, patrón documental y patrón con evidencia
+en el código.
 
 ## 5. Organización consistente de front y back
+
+La clasificación completa de factories, composición, pipeline, transacciones, eventos
+y test harness se mantiene en [patrones de diseño y construcción](design-and-construction-patterns.md).
+Esta sección aplica esas decisiones a la organización de capas y recursos.
 
 La unidad de organización es el **dominio funcional** (`admin`, `sales`, `warehouse`),
 no el tipo de operación CRUD. Una funcionalidad debe conservar el mismo dominio y el

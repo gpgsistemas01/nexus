@@ -3,11 +3,15 @@
 
 Estos diagramas ER se generan desde los modelos y relaciones de
 `prisma/schema.prisma`. Se separan por área para que puedan leerse y revisarse en
-GitHub; las relaciones que cruzan áreas se describen en la sección final.
+GitHub; las relaciones que cruzan áreas se describen en la sección final. La semántica
+y el patrón de esta vista se describen en las
+[convenciones de diagramas](../diagram-conventions.md).
 
 La marca `PK` identifica claves primarias, `FK` claves foráneas y `UK` campos
 únicos. Los campos compuestos y demás restricciones siguen teniendo como fuente de
-verdad el esquema Prisma y sus migraciones.
+verdad el esquema Prisma y sus migraciones. Para consultar obligatoriedad, valores
+predeterminados y tipos de cada campo, usa el
+[diccionario técnico](data-dictionary.md).
 
 ## Identidad, acceso y auditoría
 
