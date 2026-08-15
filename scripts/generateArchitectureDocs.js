@@ -5,7 +5,8 @@ import process from 'node:process';
 const ROOT = process.cwd();
 const OUTPUTS = {
     codeMap: path.join(ROOT, 'docs/generated/code-map.md'),
-    database: path.join(ROOT, 'docs/generated/database-schema.md')
+    database: path.join(ROOT, 'docs/generated/database-schema.md'),
+    dataDictionary: path.join(ROOT, 'docs/generated/data-dictionary.md')
 };
 const CHECK = process.argv.includes('--check');
 const SOURCE_AREAS = [
@@ -108,7 +109,8 @@ const generateCodeMap = async () => {
 
 Este inventario se genera **a partir del código fuente**. Ejecuta \`npm run docs:architecture\`
 después de cambiar rutas o dependencias entre capas; \`npm run docs:check\` detecta si esta
-versión quedó desactualizada.
+versión quedó desactualizada. La semántica y el patrón de esta vista se describen en las
+[convenciones de diagramas](../diagram-conventions.md).
 
 ## Dependencias entre áreas
 
@@ -156,7 +158,7 @@ const parsePrismaModels = (schema) => {
             }
             if (modifier === '[]' || (!scalarTypes.has(type) && !enumTypes.has(type))) continue;
             const keys = [attributes.includes('@id') ? 'PK' : '', attributes.includes('@unique') ? 'UK' : ''].filter(Boolean).join(',');
-            fields.push({ name: fieldName, type, keys });
+            fields.push({ name: fieldName, type, modifier, attributes, keys });
         }
         const foreignKeys = new Set(relations.flatMap(({ foreignKeys: keys }) => keys));
         const compoundPrimaryKeys = new Set((body.match(/@@id\(\[([^\]]+)\]\)/)?.[1] ?? '')
@@ -170,11 +172,70 @@ const parsePrismaModels = (schema) => {
     return models;
 };
 
+const parsePrismaEnums = (schema) => [...schema.matchAll(/^enum\s+(\w+)\s*\{([\s\S]*?)^\}/gm)]
+    .map(([, name, body]) => ({
+        name,
+        values: body.split('\n')
+            .map((line) => line.trim())
+            .filter((line) => line && !line.startsWith('//'))
+            .map((line) => line.split(/\s+/)[0])
+    }));
+
 const renderEntity = (name, model) => [
     `    ${name} {`,
     ...model.fields.map(({ name: field, type, keys }) => `        ${type} ${field}${keys ? ` ${keys}` : ''}`),
     '    }'
 ].join('\n');
+
+const markdownValue = (value) => value ? `\`${value.replaceAll('|', '\\|')}\`` : '—';
+
+const getAttributeCall = (attributes, attribute) => {
+    const start = attributes.indexOf(`${attribute}(`);
+    if (start < 0) return '';
+    let depth = 0;
+    let quote = '';
+    for (let index = start + attribute.length; index < attributes.length; index += 1) {
+        const character = attributes[index];
+        if (quote) {
+            if (character === quote && attributes[index - 1] !== '\\') quote = '';
+            continue;
+        }
+        if (character === '"' || character === "'") {
+            quote = character;
+        } else if (character === '(') {
+            depth += 1;
+        } else if (character === ')') {
+            depth -= 1;
+            if (depth === 0) return attributes.slice(start + attribute.length + 1, index);
+        }
+    }
+    return '';
+};
+
+const renderDataDictionaryModel = (name, model) => {
+    const fields = model.fields.map((field) => {
+        const defaultValue = getAttributeCall(field.attributes, '@default');
+        const databaseType = field.attributes.match(/@db\.\w+(?:\([^)]*\))?/)?.[0] ?? '';
+        const rules = [databaseType, field.attributes.includes('@updatedAt') ? '@updatedAt' : ''].filter(Boolean).join(' ');
+        return `| \`${field.name}\` | \`${field.type}${field.modifier}\` | ${field.modifier === '?' ? 'No' : 'Sí'} | ${field.keys || '—'} | ${markdownValue(defaultValue)} | ${markdownValue(rules)} |`;
+    });
+    const relations = model.relations.length
+        ? [
+            '',
+            '| Relación Prisma | Destino | Campos FK | Cardinalidad desde este modelo |',
+            '| --- | --- | --- | --- |',
+            ...model.relations.map(({ field, target, optional, foreignKeys }) => `| \`${field}\` | \`${target}\` | ${foreignKeys.map((key) => `\`${key}\``).join(', ')} | ${optional ? 'Cero o uno' : 'Exactamente uno'} |`)
+        ]
+        : [];
+    return [
+        `### \`${name}\``,
+        '',
+        '| Campo | Tipo Prisma | Obligatorio | Claves | Predeterminado | Reglas Prisma/BD |',
+        '| --- | --- | --- | --- | --- | --- |',
+        ...fields,
+        ...relations
+    ].join('\n');
+};
 
 const generateDatabaseSchema = async () => {
     const models = parsePrismaModels(await readFile(path.join(ROOT, 'prisma/schema.prisma'), 'utf8'));
@@ -194,11 +255,15 @@ const generateDatabaseSchema = async () => {
 
 Estos diagramas ER se generan desde los modelos y relaciones de
 \`prisma/schema.prisma\`. Se separan por área para que puedan leerse y revisarse en
-GitHub; las relaciones que cruzan áreas se describen en la sección final.
+GitHub; las relaciones que cruzan áreas se describen en la sección final. La semántica
+y el patrón de esta vista se describen en las
+[convenciones de diagramas](../diagram-conventions.md).
 
 La marca \`PK\` identifica claves primarias, \`FK\` claves foráneas y \`UK\` campos
 únicos. Los campos compuestos y demás restricciones siguen teniendo como fuente de
-verdad el esquema Prisma y sus migraciones.
+verdad el esquema Prisma y sus migraciones. Para consultar obligatoriedad, valores
+predeterminados y tipos de cada campo, usa el
+[diccionario técnico](data-dictionary.md).
 
 ${diagrams}
 
@@ -211,9 +276,54 @@ para las relaciones transversales y las reglas \`onDelete\`/\`onUpdate\`.
 `;
 };
 
+const generateDataDictionary = async () => {
+    const schema = await readFile(path.join(ROOT, 'prisma/schema.prisma'), 'utf8');
+    const models = parsePrismaModels(schema);
+    const sections = DATABASE_AREAS.map(([title, names]) => (
+        `## ${title}\n\n${names.map((name) => renderDataDictionaryModel(name, models.get(name))).join('\n\n')}`
+    )).join('\n\n');
+    const enums = parsePrismaEnums(schema)
+        .map(({ name, values }) => `| \`${name}\` | ${values.map((value) => `\`${value}\``).join(', ')} |`)
+        .join('\n');
+    return `<!-- Archivo generado por scripts/generateArchitectureDocs.js. No editar manualmente. -->
+# Diccionario técnico de datos
+
+Este inventario se genera desde \`prisma/schema.prisma\` y enumera campos escalares,
+obligatoriedad, claves, valores predeterminados, tipos de base de datos y relaciones
+propietarias. Se aplican las [convenciones de diagramas](../diagram-conventions.md).
+
+El tipo Prisma y el atributo \`@db\` describen la representación técnica. Prisma y las
+migraciones son la fuente de verdad para restricciones completas, índices, acciones
+referenciales y SQL. El propósito de negocio de los agregados se explica en el
+[modelo de dominio y casos de uso](../domain-and-use-cases.md); este generador no inventa
+definiciones de negocio a partir de nombres de tablas. La terminología compartida con
+usuarios y responsables se mantiene en el
+[glosario del negocio](../business-glossary.md).
+
+## Cómo leerlo
+
+- **Obligatorio** indica que el campo escalar no lleva \`?\` en Prisma; no sustituye las
+  validaciones del caso de uso.
+- **PK**, **FK** y **UK** significan clave primaria, foránea y única.
+- Una relación listada es el lado que declara \`fields: [...]\`; las colecciones inversas
+  se consultan en el esquema y en los diagramas ER.
+- Los valores y tipos se presentan literalmente para que cualquier cambio produzca una
+  diferencia revisable y verificable con \`npm run docs:check\`.
+
+${sections}
+
+## Enumeraciones
+
+| Tipo | Valores permitidos por Prisma |
+| --- | --- |
+${enums}
+`;
+};
+
 const contents = new Map([
     [OUTPUTS.codeMap, await generateCodeMap()],
-    [OUTPUTS.database, await generateDatabaseSchema()]
+    [OUTPUTS.database, await generateDatabaseSchema()],
+    [OUTPUTS.dataDictionary, await generateDataDictionary()]
 ]);
 if (CHECK) {
     const stale = [];

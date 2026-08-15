@@ -6,9 +6,16 @@ reglas de negocio se detallan en la
 [especificación de requisitos](requirements-specification.md). Este archivo es un mapa
 para conversación y revisión: las rutas del
 [mapa generado](generated/code-map.md), el esquema Prisma y las pruebas siguen siendo
-las fuentes verificables de implementación.
+las fuentes verificables de implementación. Estas vistas aplican las
+[convenciones y patrones para diagramas](diagram-conventions.md): cada sección conserva
+un propósito, alcance, semántica y fuente de verdad definidos.
 
-## Requisitos funcionales por actor
+## Casos de uso funcionales por actor
+
+Las flechas continuas representan capacidades disponibles; la línea discontinua indica
+un caso modelado cuyo flujo todavía está pendiente. Cada caso se detalla mediante uno o
+más requisitos `RF` en la especificación, sin convertir este mapa en un inventario de
+endpoints.
 
 ```mermaid
 flowchart LR
@@ -26,7 +33,8 @@ flowchart LR
     end
     subgraph governance["Administración y control"]
         people["Gestionar personas,<br/>usuarios y accesos"]
-        clients["Gestionar clientes<br/>y proyectos"]
+        clients["Gestionar clientes"]
+        projects["Gestionar proyectos<br/>(flujo pendiente)"]
         reports["Consultar movimientos<br/>y exportar reportes"]
         audit["Conservar trazabilidad<br/>de escrituras críticas"]
     end
@@ -34,10 +42,11 @@ flowchart LR
     warehouse --> receipts
     warehouse --> issues
     warehouse --> wastes
-    warehouse --> adjustments
+    warehouse -.->|"parcial"| adjustments
     approver -.->|"pendiente"| requisitions
     approver --> issues
     sales --> clients
+    sales -.->|"pendiente"| projects
     sales --> issues
     admin --> people
     admin --> reports

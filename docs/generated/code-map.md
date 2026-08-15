@@ -3,7 +3,8 @@
 
 Este inventario se genera **a partir del código fuente**. Ejecuta `npm run docs:architecture`
 después de cambiar rutas o dependencias entre capas; `npm run docs:check` detecta si esta
-versión quedó desactualizada.
+versión quedó desactualizada. La semántica y el patrón de esta vista se describen en las
+[convenciones de diagramas](../diagram-conventions.md).
 
 ## Dependencias entre áreas
 
