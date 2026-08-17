@@ -41,7 +41,6 @@ export const buildIssueHeaderColumns = ({ context }) => {
 export const buildIssueTrackingColumns = () => [
     { title: 'Proyecto', data: 'projectNumber' },
     { title: 'Cliente', data: 'clientName' },
-    { title: 'Estado', data: 'status.name' },
     { title: 'Estado surtido', data: 'fulfillmentStatus.name' }
 ];
 
