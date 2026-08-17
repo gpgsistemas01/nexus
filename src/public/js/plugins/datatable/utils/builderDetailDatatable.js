@@ -193,11 +193,11 @@ export const buildDetailsColumns = ({ type, mode, render, canManageProjectQuanti
             render
         },
         {
-            data: row => row.materialBase ?? row.material?.base ?? null,
+            data: row => row.waste?.base ?? row.materialBase ?? row.material?.base ?? null,
             render: formatDecimal
         },
         {
-            data: row => row.materialHeight ?? row.material?.height ?? null,
+            data: row => row.waste?.height ?? row.materialHeight ?? row.material?.height ?? null,
             render: formatDecimal
         },
         { data: 'quantity', render: formatDecimal },
