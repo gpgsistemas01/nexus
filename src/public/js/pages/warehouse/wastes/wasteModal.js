@@ -44,6 +44,11 @@ export const openWasteModal = ({
         selector: stockDataSectionSelector,
         isVisible: !isEditing
     });
+    setFormSectionVisibility({
+        form,
+        isVisible: data?.presentation.name === 'ROLLO' ? true : false,
+        fieldNames: ['weight']
+    });
     setFormDisabled({ 
         form, 
         fields: wasteDataFields, 

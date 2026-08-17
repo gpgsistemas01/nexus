@@ -3,7 +3,7 @@ import { initMaterialFormSelect2, setMaterialFormSelectOptions } from "../../../
 import { setReasonVisualOption } from '../../../plugins/select2/domains/reason.js';
 import { clearFormErrors, initForm, setFormDisabled, setFormSectionVisibility } from "../../../ui/formUI.js";
 import { FORM_SELECTORS, MODAL_SELECTORS } from "../../../constants/selectors.js";
-import { materialDataFields, materialEditableDataFields, materialStockFields } from './materialFields.js';
+import { materialDataFields, materialEditableDataFields } from './materialFields.js';
 import { FORM_MODES, isCreateMode, isEditMode, isStockMode } from '../../../constants/formModes.js';
 
 const initialStockReasonName = 'Stock inicial';
@@ -49,8 +49,7 @@ export const openMaterialModal = ({
     setFormSectionVisibility({
         form,
         selector: stockDataSectionSelector,
-        isVisible: !isEditing && !isGoodsReceiptCreation,
-        fieldNames: materialStockFields
+        isVisible: !isEditing && !isGoodsReceiptCreation
     });
     setFormSectionVisibility({
         form,
