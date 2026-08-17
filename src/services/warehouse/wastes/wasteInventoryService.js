@@ -1,4 +1,5 @@
 import { getDb } from '../../../repository/baseRepository.js';
+import { normalizeDecimal } from '../../../utils/formattersUtils.js';
 
 export const applyWasteStockChange = async ({
     tx,
@@ -11,10 +12,10 @@ export const applyWasteStockChange = async ({
         where: { id },
         select: { currentStock: true }
     });
-    const previousStock = Number(waste?.currentStock || 0);
+    const previousStock = normalizeDecimal(waste?.currentStock || 0);
     const isDecrease = quantityChange < 0;
-    const quantity = Math.abs(quantityChange);
-    const convertedQuantity = Math.abs(convertedQuantityChange);
+    const quantity = normalizeDecimal(Math.abs(quantityChange));
+    const convertedQuantity = normalizeDecimal(Math.abs(convertedQuantityChange));
     const updated = await db.waste.updateMany({
         where: {
             id,
@@ -33,6 +34,6 @@ export const applyWasteStockChange = async ({
     return {
         updated: updated.count === 1,
         previousStock,
-        newStock: previousStock + quantityChange
+        newStock: normalizeDecimal(previousStock + quantityChange)
     };
 };

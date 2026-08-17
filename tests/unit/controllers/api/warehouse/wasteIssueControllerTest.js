@@ -92,7 +92,13 @@ describe('wasteIssueController', () => {
         requestDate: '2026-08-11T12:30:00.000Z',
         observations: '  Entrega al taller  ',
         status: 'COMPLETE',
-        details: [{ wasteId: '  waste-1  ', quantity: '2.5', suppliedQuantity: 99 }]
+        details: [{
+          wasteId: '  waste-1  ',
+          quantity: '2.5',
+          suppliedQuantity: 99,
+          convertedQuantity: 400.25,
+          convertedQuantityDifference: 1
+        }]
       }
     }, response);
 

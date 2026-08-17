@@ -25,6 +25,22 @@ export const calculateConvertedQuantity = ({
     );
 };
 
+export const calculateProportionalConvertedQuantity = ({
+    convertedQuantity,
+    partialQuantity,
+    totalQuantity
+}) => {
+    const total = Number(toNumber(totalQuantity) || 0);
+
+    if (total <= 0) return 0;
+
+    return normalizeDecimal(
+        Number(toNumber(convertedQuantity) || 0) *
+        Number(toNumber(partialQuantity) || 0) /
+        total
+    );
+};
+
 const getStockErrorMeta = (material = {}) => ({
     materialName: material.name ?? material.material?.name ?? 'Material desconocido',
     materialId: material.id ?? material.materialId ?? material.material?.id,

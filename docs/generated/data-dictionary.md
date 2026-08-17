@@ -170,9 +170,9 @@ usuarios y responsables se mantiene en el
 | `presentationId` | `String` | Sí | FK | — | `@db.Uuid` |
 | `unitMeasureId` | `String` | Sí | FK | — | `@db.Uuid` |
 | `isActive` | `Boolean` | Sí | — | `true` | — |
-| `minStock` | `Decimal` | Sí | — | `0` | `@db.Decimal(10, 2)` |
-| `base` | `Decimal?` | No | — | — | `@db.Decimal(10, 2)` |
-| `height` | `Decimal?` | No | — | — | `@db.Decimal(10, 2)` |
+| `minStock` | `Decimal` | Sí | — | `0` | `@db.Decimal(18, 6)` |
+| `base` | `Decimal?` | No | — | — | `@db.Decimal(18, 6)` |
+| `height` | `Decimal?` | No | — | — | `@db.Decimal(18, 6)` |
 
 | Relación Prisma | Destino | Campos FK | Cardinalidad desde este modelo |
 | --- | --- | --- | --- |
@@ -199,10 +199,10 @@ usuarios y responsables se mantiene en el
 | Campo | Tipo Prisma | Obligatorio | Claves | Predeterminado | Reglas Prisma/BD |
 | --- | --- | --- | --- | --- | --- |
 | `id` | `String` | Sí | PK | `dbgenerated("gen_random_uuid()")` | `@db.Uuid` |
-| `maxUnitCost` | `Decimal?` | No | — | — | `@db.Decimal(10, 2)` |
+| `maxUnitCost` | `Decimal?` | No | — | — | `@db.Decimal(18, 6)` |
 | `sku` | `String?` | No | — | — | `@db.VarChar(50)` |
-| `currentStock` | `Decimal` | Sí | — | `0` | `@db.Decimal(10, 2)` |
-| `convertedQuantity` | `Decimal` | Sí | — | `0` | `@db.Decimal(10, 2)` |
+| `currentStock` | `Decimal` | Sí | — | `0` | `@db.Decimal(18, 6)` |
+| `convertedQuantity` | `Decimal` | Sí | — | `0` | `@db.Decimal(18, 6)` |
 | `supplierId` | `String` | Sí | FK | — | `@db.Uuid` |
 | `materialId` | `String` | Sí | FK | — | `@db.Uuid` |
 
@@ -257,7 +257,7 @@ usuarios y responsables se mantiene en el
 | `id` | `String` | Sí | PK | `dbgenerated("gen_random_uuid()")` | `@db.Uuid` |
 | `materialId` | `String` | Sí | FK | — | `@db.Uuid` |
 | `purchaseRequisitionId` | `String` | Sí | FK | — | `@db.Uuid` |
-| `quantity` | `Decimal` | Sí | — | — | `@db.Decimal(10, 2)` |
+| `quantity` | `Decimal` | Sí | — | — | `@db.Decimal(18, 6)` |
 | `createdAt` | `DateTime` | Sí | — | `now()` | — |
 | `updatedAt` | `DateTime` | Sí | — | — | `@updatedAt` |
 
@@ -281,9 +281,9 @@ usuarios y responsables se mantiene en el
 | `referenceNumber` | `String` | Sí | UK | — | `@db.VarChar(50)` |
 | `receptionDate` | `DateTime` | Sí | — | — | — |
 | `observations` | `String?` | No | — | — | `@db.VarChar(500)` |
-| `totalQuantity` | `Decimal` | Sí | — | — | `@db.Decimal(10, 2)` |
-| `totalNetPurchaseAmount` | `Decimal` | Sí | — | — | `@db.Decimal(10, 2)` |
-| `totalGrossPurchaseAmount` | `Decimal` | Sí | — | — | `@db.Decimal(10, 2)` |
+| `totalQuantity` | `Decimal` | Sí | — | — | `@db.Decimal(18, 6)` |
+| `totalNetPurchaseAmount` | `Decimal` | Sí | — | — | `@db.Decimal(18, 6)` |
+| `totalGrossPurchaseAmount` | `Decimal` | Sí | — | — | `@db.Decimal(18, 6)` |
 | `createdAt` | `DateTime` | Sí | — | `now()` | — |
 | `updatedAt` | `DateTime` | Sí | — | — | `@updatedAt` |
 
@@ -300,12 +300,12 @@ usuarios y responsables se mantiene en el
 | `id` | `String` | Sí | PK | `dbgenerated("gen_random_uuid()")` | `@db.Uuid` |
 | `materialId` | `String` | Sí | FK | — | `@db.Uuid` |
 | `goodsReceiptId` | `String` | Sí | FK | — | `@db.Uuid` |
-| `quantity` | `Decimal` | Sí | — | — | `@db.Decimal(10, 2)` |
-| `conversionUnitCost` | `Decimal` | Sí | — | — | `@db.Decimal(10, 2)` |
-| `costPerUnitType` | `Decimal` | Sí | — | — | `@db.Decimal(10, 2)` |
-| `convertedQuantity` | `Decimal` | Sí | — | — | `@db.Decimal(10, 2)` |
-| `netPurchaseAmount` | `Decimal` | Sí | — | — | `@db.Decimal(10, 2)` |
-| `grossPurchaseAmount` | `Decimal` | Sí | — | — | `@db.Decimal(10, 2)` |
+| `quantity` | `Decimal` | Sí | — | — | `@db.Decimal(18, 6)` |
+| `conversionUnitCost` | `Decimal` | Sí | — | — | `@db.Decimal(18, 6)` |
+| `costPerUnitType` | `Decimal` | Sí | — | — | `@db.Decimal(18, 6)` |
+| `convertedQuantity` | `Decimal` | Sí | — | — | `@db.Decimal(18, 6)` |
+| `netPurchaseAmount` | `Decimal` | Sí | — | — | `@db.Decimal(18, 6)` |
+| `grossPurchaseAmount` | `Decimal` | Sí | — | — | `@db.Decimal(18, 6)` |
 | `materialName` | `String` | Sí | — | — | `@db.VarChar(200)` |
 | `status` | `GoodsReceiptDetailStatus` | Sí | — | `ACTIVE` | — |
 | `createdAt` | `DateTime` | Sí | — | `now()` | — |
@@ -328,20 +328,20 @@ usuarios y responsables se mantiene en el
 | `inventoryMovementId` | `String?` | No | UK,FK | — | `@db.Uuid` |
 | `previousMaterialId` | `String` | Sí | FK | — | `@db.Uuid` |
 | `previousMaterialName` | `String` | Sí | — | — | `@db.VarChar(200)` |
-| `previousQuantity` | `Decimal` | Sí | — | — | `@db.Decimal(10, 2)` |
-| `previousCostPerUnitType` | `Decimal` | Sí | — | — | `@db.Decimal(10, 2)` |
-| `previousNetPurchaseAmount` | `Decimal` | Sí | — | — | `@db.Decimal(10, 2)` |
-| `previousGrossPurchaseAmount` | `Decimal` | Sí | — | — | `@db.Decimal(10, 2)` |
+| `previousQuantity` | `Decimal` | Sí | — | — | `@db.Decimal(18, 6)` |
+| `previousCostPerUnitType` | `Decimal` | Sí | — | — | `@db.Decimal(18, 6)` |
+| `previousNetPurchaseAmount` | `Decimal` | Sí | — | — | `@db.Decimal(18, 6)` |
+| `previousGrossPurchaseAmount` | `Decimal` | Sí | — | — | `@db.Decimal(18, 6)` |
 | `correctedMaterialId` | `String` | Sí | FK | — | `@db.Uuid` |
 | `correctedMaterialName` | `String` | Sí | — | — | `@db.VarChar(200)` |
-| `correctedQuantity` | `Decimal` | Sí | — | — | `@db.Decimal(10, 2)` |
-| `correctedCostPerUnitType` | `Decimal` | Sí | — | — | `@db.Decimal(10, 2)` |
-| `correctedNetPurchaseAmount` | `Decimal` | Sí | — | — | `@db.Decimal(10, 2)` |
-| `correctedGrossPurchaseAmount` | `Decimal` | Sí | — | — | `@db.Decimal(10, 2)` |
+| `correctedQuantity` | `Decimal` | Sí | — | — | `@db.Decimal(18, 6)` |
+| `correctedCostPerUnitType` | `Decimal` | Sí | — | — | `@db.Decimal(18, 6)` |
+| `correctedNetPurchaseAmount` | `Decimal` | Sí | — | — | `@db.Decimal(18, 6)` |
+| `correctedGrossPurchaseAmount` | `Decimal` | Sí | — | — | `@db.Decimal(18, 6)` |
 | `changeType` | `GoodsReceiptDetailChangeType` | Sí | — | — | — |
 | `materialChanged` | `Boolean` | Sí | — | `false` | — |
-| `quantityDifference` | `Decimal` | Sí | — | — | `@db.Decimal(10, 2)` |
-| `costDifference` | `Decimal` | Sí | — | — | `@db.Decimal(10, 2)` |
+| `quantityDifference` | `Decimal` | Sí | — | — | `@db.Decimal(18, 6)` |
+| `costDifference` | `Decimal` | Sí | — | — | `@db.Decimal(18, 6)` |
 | `createdAt` | `DateTime` | Sí | — | `now()` | — |
 | `updatedAt` | `DateTime` | Sí | — | — | `@updatedAt` |
 
@@ -403,14 +403,14 @@ usuarios y responsables se mantiene en el
 | `goodsIssueId` | `String` | Sí | FK | — | `@db.Uuid` |
 | `supplierId` | `String` | Sí | FK | — | `@db.Uuid` |
 | `materialName` | `String` | Sí | — | — | `@db.VarChar(200)` |
-| `quantity` | `Decimal` | Sí | — | — | `@db.Decimal(10, 2)` |
+| `quantity` | `Decimal` | Sí | — | — | `@db.Decimal(18, 6)` |
 | `applyWaste` | `Boolean` | Sí | — | `false` | — |
-| `convertedQuantity` | `Decimal` | Sí | — | — | `@db.Decimal(10, 2)` |
-| `maxUnitCost` | `Decimal` | Sí | — | — | `@db.Decimal(10, 2)` |
-| `projectConvertedQuantity` | `Decimal?` | No | — | — | `@db.Decimal(10, 2)` |
-| `convertedQuantityDifference` | `Decimal?` | No | — | — | `@db.Decimal(10, 2)` |
-| `suppliedQuantity` | `Decimal?` | No | — | — | `@db.Decimal(10, 2)` |
-| `returnedQuantity` | `Decimal` | Sí | — | `0` | `@db.Decimal(10, 2)` |
+| `convertedQuantity` | `Decimal` | Sí | — | — | `@db.Decimal(18, 6)` |
+| `maxUnitCost` | `Decimal` | Sí | — | — | `@db.Decimal(18, 6)` |
+| `projectConvertedQuantity` | `Decimal?` | No | — | — | `@db.Decimal(18, 6)` |
+| `convertedQuantityDifference` | `Decimal?` | No | — | — | `@db.Decimal(18, 6)` |
+| `suppliedQuantity` | `Decimal?` | No | — | — | `@db.Decimal(18, 6)` |
+| `returnedQuantity` | `Decimal` | Sí | — | `0` | `@db.Decimal(18, 6)` |
 | `isSupplied` | `Boolean` | Sí | — | `false` | — |
 | `fulfillmentStatusId` | `String` | Sí | FK | — | `@db.Uuid` |
 | `createdAt` | `DateTime` | Sí | — | `now()` | — |
@@ -435,8 +435,8 @@ usuarios y responsables se mantiene en el
 | `materialId` | `String` | Sí | — | — | `@db.Uuid` |
 | `materialName` | `String` | Sí | — | — | `@db.VarChar(200)` |
 | `supplierId` | `String` | Sí | — | — | `@db.Uuid` |
-| `currentTotalReturnedQuantity` | `Decimal` | Sí | — | — | `@db.Decimal(10, 2)` |
-| `newTotalReturnedQuantity` | `Decimal` | Sí | — | — | `@db.Decimal(10, 2)` |
+| `currentTotalReturnedQuantity` | `Decimal` | Sí | — | — | `@db.Decimal(18, 6)` |
+| `newTotalReturnedQuantity` | `Decimal` | Sí | — | — | `@db.Decimal(18, 6)` |
 | `observations` | `String?` | No | — | — | `@db.VarChar(500)` |
 | `createdAt` | `DateTime` | Sí | — | `now()` | — |
 | `updatedAt` | `DateTime` | Sí | — | — | `@updatedAt` |
@@ -473,9 +473,9 @@ usuarios y responsables se mantiene en el
 | Campo | Tipo Prisma | Obligatorio | Claves | Predeterminado | Reglas Prisma/BD |
 | --- | --- | --- | --- | --- | --- |
 | `id` | `String` | Sí | PK | `dbgenerated("gen_random_uuid()")` | `@db.Uuid` |
-| `quantity` | `Decimal` | Sí | — | — | `@db.Decimal(10, 2)` |
-| `newStock` | `Decimal?` | No | — | — | `@db.Decimal(10, 2)` |
-| `previousStock` | `Decimal?` | No | — | — | `@db.Decimal(10, 2)` |
+| `quantity` | `Decimal` | Sí | — | — | `@db.Decimal(18, 6)` |
+| `newStock` | `Decimal?` | No | — | — | `@db.Decimal(18, 6)` |
+| `previousStock` | `Decimal?` | No | — | — | `@db.Decimal(18, 6)` |
 | `materialId` | `String` | Sí | FK | — | `@db.Uuid` |
 | `supplierId` | `String` | Sí | FK | — | `@db.Uuid` |
 | `goodsReceiptDetailId` | `String?` | No | FK | — | `@db.Uuid` |
@@ -525,12 +525,12 @@ usuarios y responsables se mantiene en el
 | `materialId` | `String` | Sí | FK | — | `@db.Uuid` |
 | `supplierId` | `String` | Sí | FK | — | `@db.Uuid` |
 | `materialName` | `String` | Sí | — | — | `@db.VarChar(200)` |
-| `previousStock` | `Decimal` | Sí | — | — | `@db.Decimal(10, 2)` |
-| `newStock` | `Decimal` | Sí | — | — | `@db.Decimal(10, 2)` |
-| `difference` | `Decimal` | Sí | — | — | `@db.Decimal(10, 2)` |
-| `previousConvertedQuantity` | `Decimal` | Sí | — | — | `@db.Decimal(10, 2)` |
-| `newConvertedQuantity` | `Decimal` | Sí | — | — | `@db.Decimal(10, 2)` |
-| `convertedDifference` | `Decimal` | Sí | — | — | `@db.Decimal(10, 2)` |
+| `previousStock` | `Decimal` | Sí | — | — | `@db.Decimal(18, 6)` |
+| `newStock` | `Decimal` | Sí | — | — | `@db.Decimal(18, 6)` |
+| `difference` | `Decimal` | Sí | — | — | `@db.Decimal(18, 6)` |
+| `previousConvertedQuantity` | `Decimal` | Sí | — | — | `@db.Decimal(18, 6)` |
+| `newConvertedQuantity` | `Decimal` | Sí | — | — | `@db.Decimal(18, 6)` |
+| `convertedDifference` | `Decimal` | Sí | — | — | `@db.Decimal(18, 6)` |
 | `createdAt` | `DateTime` | Sí | — | `now()` | — |
 | `updatedAt` | `DateTime` | Sí | — | — | `@updatedAt` |
 
@@ -559,11 +559,11 @@ usuarios y responsables se mantiene en el
 | `id` | `String` | Sí | PK | `dbgenerated("gen_random_uuid()")` | `@db.Uuid` |
 | `supplierMaterialId` | `String` | Sí | FK | — | `@db.Uuid` |
 | `isActive` | `Boolean` | Sí | — | `true` | — |
-| `minStock` | `Decimal` | Sí | — | `0` | `@db.Decimal(10, 2)` |
-| `base` | `Decimal?` | No | — | — | `@db.Decimal(10, 2)` |
-| `height` | `Decimal?` | No | — | — | `@db.Decimal(10, 2)` |
-| `currentStock` | `Decimal` | Sí | — | `0` | `@db.Decimal(10, 2)` |
-| `convertedQuantity` | `Decimal` | Sí | — | `0` | `@db.Decimal(10, 2)` |
+| `minStock` | `Decimal` | Sí | — | `0` | `@db.Decimal(18, 6)` |
+| `base` | `Decimal?` | No | — | — | `@db.Decimal(18, 6)` |
+| `height` | `Decimal?` | No | — | — | `@db.Decimal(18, 6)` |
+| `currentStock` | `Decimal` | Sí | — | `0` | `@db.Decimal(18, 6)` |
+| `convertedQuantity` | `Decimal` | Sí | — | `0` | `@db.Decimal(18, 6)` |
 | `createdAt` | `DateTime` | Sí | — | `now()` | — |
 | `updatedAt` | `DateTime` | Sí | — | — | `@updatedAt` |
 
@@ -612,12 +612,12 @@ usuarios y responsables se mantiene en el
 | `wasteIssueId` | `String` | Sí | FK | — | `@db.Uuid` |
 | `wasteId` | `String` | Sí | FK | — | `@db.Uuid` |
 | `materialName` | `String` | Sí | — | — | `@db.VarChar(200)` |
-| `quantity` | `Decimal` | Sí | — | — | `@db.Decimal(10, 2)` |
-| `convertedQuantity` | `Decimal` | Sí | — | — | `@db.Decimal(10, 2)` |
-| `projectConvertedQuantity` | `Decimal?` | No | — | — | `@db.Decimal(10, 2)` |
-| `convertedQuantityDifference` | `Decimal?` | No | — | — | `@db.Decimal(10, 2)` |
-| `suppliedQuantity` | `Decimal` | Sí | — | `0` | `@db.Decimal(10, 2)` |
-| `returnedQuantity` | `Decimal` | Sí | — | `0` | `@db.Decimal(10, 2)` |
+| `quantity` | `Decimal` | Sí | — | — | `@db.Decimal(18, 6)` |
+| `convertedQuantity` | `Decimal` | Sí | — | — | `@db.Decimal(18, 6)` |
+| `projectConvertedQuantity` | `Decimal?` | No | — | — | `@db.Decimal(18, 6)` |
+| `convertedQuantityDifference` | `Decimal?` | No | — | — | `@db.Decimal(18, 6)` |
+| `suppliedQuantity` | `Decimal` | Sí | — | `0` | `@db.Decimal(18, 6)` |
+| `returnedQuantity` | `Decimal` | Sí | — | `0` | `@db.Decimal(18, 6)` |
 | `isSupplied` | `Boolean` | Sí | — | `false` | — |
 | `fulfillmentStatusId` | `String` | Sí | FK | — | `@db.Uuid` |
 | `createdAt` | `DateTime` | Sí | — | `now()` | — |
@@ -640,8 +640,8 @@ usuarios y responsables se mantiene en el
 | `returnedById` | `String?` | No | FK | — | `@db.Uuid` |
 | `wasteId` | `String` | Sí | FK | — | `@db.Uuid` |
 | `materialName` | `String` | Sí | — | — | `@db.VarChar(200)` |
-| `currentTotalReturnedQuantity` | `Decimal` | Sí | — | — | `@db.Decimal(10, 2)` |
-| `newTotalReturnedQuantity` | `Decimal` | Sí | — | — | `@db.Decimal(10, 2)` |
+| `currentTotalReturnedQuantity` | `Decimal` | Sí | — | — | `@db.Decimal(18, 6)` |
+| `newTotalReturnedQuantity` | `Decimal` | Sí | — | — | `@db.Decimal(18, 6)` |
 | `observations` | `String?` | No | — | — | `@db.VarChar(500)` |
 | `createdAt` | `DateTime` | Sí | — | `now()` | — |
 | `updatedAt` | `DateTime` | Sí | — | — | `@updatedAt` |
@@ -675,9 +675,9 @@ usuarios y responsables se mantiene en el
 | Campo | Tipo Prisma | Obligatorio | Claves | Predeterminado | Reglas Prisma/BD |
 | --- | --- | --- | --- | --- | --- |
 | `id` | `String` | Sí | PK | `dbgenerated("gen_random_uuid()")` | `@db.Uuid` |
-| `quantity` | `Decimal` | Sí | — | — | `@db.Decimal(10, 2)` |
-| `newStock` | `Decimal?` | No | — | — | `@db.Decimal(10, 2)` |
-| `previousStock` | `Decimal?` | No | — | — | `@db.Decimal(10, 2)` |
+| `quantity` | `Decimal` | Sí | — | — | `@db.Decimal(18, 6)` |
+| `newStock` | `Decimal?` | No | — | — | `@db.Decimal(18, 6)` |
+| `previousStock` | `Decimal?` | No | — | — | `@db.Decimal(18, 6)` |
 | `wasteId` | `String` | Sí | FK | — | `@db.Uuid` |
 | `wasteStockAdjustmentDetailId` | `String?` | No | FK | — | `@db.Uuid` |
 | `movementId` | `String` | Sí | FK | — | `@db.Uuid` |
@@ -724,12 +724,12 @@ usuarios y responsables se mantiene en el
 | `wasteStockAdjustmentId` | `String` | Sí | FK | — | `@db.Uuid` |
 | `wasteId` | `String` | Sí | FK | — | `@db.Uuid` |
 | `materialName` | `String` | Sí | — | — | `@db.VarChar(200)` |
-| `previousStock` | `Decimal` | Sí | — | — | `@db.Decimal(10, 2)` |
-| `newStock` | `Decimal` | Sí | — | — | `@db.Decimal(10, 2)` |
-| `difference` | `Decimal` | Sí | — | — | `@db.Decimal(10, 2)` |
-| `previousConvertedQuantity` | `Decimal` | Sí | — | — | `@db.Decimal(10, 2)` |
-| `newConvertedQuantity` | `Decimal` | Sí | — | — | `@db.Decimal(10, 2)` |
-| `convertedDifference` | `Decimal` | Sí | — | — | `@db.Decimal(10, 2)` |
+| `previousStock` | `Decimal` | Sí | — | — | `@db.Decimal(18, 6)` |
+| `newStock` | `Decimal` | Sí | — | — | `@db.Decimal(18, 6)` |
+| `difference` | `Decimal` | Sí | — | — | `@db.Decimal(18, 6)` |
+| `previousConvertedQuantity` | `Decimal` | Sí | — | — | `@db.Decimal(18, 6)` |
+| `newConvertedQuantity` | `Decimal` | Sí | — | — | `@db.Decimal(18, 6)` |
+| `convertedDifference` | `Decimal` | Sí | — | — | `@db.Decimal(18, 6)` |
 | `createdAt` | `DateTime` | Sí | — | `now()` | — |
 | `updatedAt` | `DateTime` | Sí | — | — | `@updatedAt` |
 

@@ -13,7 +13,7 @@ import { buildModalTitle, openModal } from "../../../ui/modalUI.js";
 import { FORM_SELECTORS, MODAL_SELECTORS } from "../../../constants/selectors.js";
 import { FORM_MODES } from "../../../constants/formModes.js";
 import { GOODS_RECEIPT_STATUS_LABELS } from "../../../constants/goodsReceiptStatuses.js";
-import { roundTo } from "../../../utils/formatUtils.js";
+import { hasMaterialDimensions, roundTo } from "../../../utils/formatUtils.js";
 import { notifications } from "../../../plugins/swal/swalComponent.js";
 import { GOODS_RECEIPT_CORRECTION_APPLIED_EVENT, initGoodsReceiptCorrection, openGoodsReceiptCorrectionModal } from "./corrections/correctionModal.js";
 import { buildGoodsReceiptModalDetails } from "./goodsReceiptDetails.js";
@@ -53,6 +53,12 @@ document.querySelector(modalId).addEventListener(GOODS_RECEIPT_SUPPLIER_CHANGED_
     clearAddedMaterialInput();
 });
 
+const mapGoodsReceiptDetailOperands = ({ materialId, quantity, costPerUnitType }) => ({
+    materialId,
+    quantity,
+    costPerUnitType
+});
+
 const normalizeGoodsReceiptData = ({ form, formData }) => {
 
     const { mode } = form.dataset;
@@ -63,7 +69,9 @@ const normalizeGoodsReceiptData = ({ form, formData }) => {
 
     if (mode === FORM_MODES.EDIT) {
         const { supplierId, ...editableFormData } = formData;
-        const newDetails = details.filter(detail => !detail.id);
+        const newDetails = details
+            .filter(detail => !detail.id)
+            .map(mapGoodsReceiptDetailOperands);
 
         return {
             ...editableFormData,
@@ -73,7 +81,7 @@ const normalizeGoodsReceiptData = ({ form, formData }) => {
 
     return {
         ...formData,
-        details
+        details: details.map(mapGoodsReceiptDetailOperands)
     };
 };
 
@@ -236,7 +244,7 @@ const addMaterial = () => {
     const netPurchaseAmount = roundTo(quantity * costPerUnitType);
     let convertedQuantity;
 
-    if (!materialBase || !materialHeight) convertedQuantity = quantity;
+    if (!hasMaterialDimensions({ base: materialBase, height: materialHeight })) convertedQuantity = quantity;
     else convertedQuantity = roundTo(materialBase * materialHeight * quantity);
 
     const conversionUnitCost = roundTo(netPurchaseAmount / convertedQuantity);

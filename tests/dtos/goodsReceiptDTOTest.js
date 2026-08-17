@@ -18,4 +18,5 @@ describe('goodsReceiptDTO', () => {
     expect(createGoodsReceiptDtoForRegister({ ...common, supplierId: ' supplier-1 ' }).invoice).toBe('FAC-001');
     expect(createGoodsReceiptDtoForEdit(common).invoice).toBe('FAC-001');
   });
+
 });

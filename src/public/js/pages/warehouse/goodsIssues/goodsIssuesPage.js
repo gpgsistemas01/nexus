@@ -15,7 +15,7 @@ import { hasValidationErrors, validateDetailsFields, validateFields } from "../.
 import { openModal } from "../../../ui/modalUI.js";
 import { DATATABLE_SELECTORS, FORM_SELECTORS, MODAL_SELECTORS } from "../../../constants/selectors.js";
 import { FORM_MODES } from "../../../constants/formModes.js";
-import { roundTo } from "../../../utils/formatUtils.js";
+import { hasMaterialDimensions, roundTo } from "../../../utils/formatUtils.js";
 import { applyIssueModalMode, bindIssueProjectQuantityControls, createIssueHeaderForm, createIssueTableActions, getPendingIssueSupplyDetails, initializeIssueModal, mapIssueSupplyDetails, useIssueForm } from "../../../ui/issues/issueFormUI.js";
 import { createIssueReturn } from "../../../ui/issues/issueReturnUI.js";
 import { mapGoodsIssueDetailDisplay } from "../../../utils/warehouse/issueDisplayUtils.js";
@@ -50,7 +50,6 @@ const goodsIssueReturn = createIssueReturn({
 
 goodsIssueReturn.initialize();
 
-
 const normalizeGoodsIssueData = ({ form, formData }) => {
 
     const { mode } = form.dataset;
@@ -66,7 +65,12 @@ const normalizeGoodsIssueData = ({ form, formData }) => {
 
     return {
         ...formData,
-        details
+        details: details.map(({ materialId, supplierId, presentationId, quantity }) => ({
+            materialId,
+            supplierId,
+            ...(presentationId && { presentationId }),
+            quantity
+        }))
     };
 };
 
@@ -177,7 +181,7 @@ const addMaterial = () => {
 
     let convertedQuantity;
 
-    if (!materialBase || !materialHeight) {
+    if (!hasMaterialDimensions({ base: materialBase, height: materialHeight })) {
 
         materialBase = null;
         materialHeight = null;

@@ -376,7 +376,7 @@ export const recalculateConvertedQuantityByMaterial = async ({
         UPDATE "SupplierMaterial"
         SET "convertedQuantity" = CASE
             WHEN $1::numeric > 0 AND $2::numeric > 0
-                THEN ROUND("currentStock" * $1::numeric * $2::numeric, 2)
+                THEN ROUND("currentStock" * $1::numeric * $2::numeric, 6)
             ELSE "currentStock"
         END
         WHERE "materialId" = $3::uuid

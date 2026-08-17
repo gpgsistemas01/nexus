@@ -45,6 +45,7 @@ Se deben incorporar como integraciones desde controller, no restaurar como prueb
 - personas y usuarios con sus relaciones;
 - salidas de material y afectación de stock (las salidas de merma ya cuentan con
   integración HTTP, persistencia, movimiento y verificación de rollback);
-- entradas de compra, movimientos y costos;
+- cancelación de detalles de entradas de compra y su efecto relacionado (creación y
+  corrección de cantidad/costos ya tienen integración desde controller);
 - ajustes de material y movimientos de inventario;
 - requisiciones de compra completas.

@@ -46,19 +46,27 @@ export const buildGoodsReceiptDetails = async (details, { tx = null } = {}) => {
     });
 }
 
-export const calculateGoodsReceiptTotals = (details = [], { includeCanceled = false } = {}) => details.reduce((acc, detail) => {
-    if (!includeCanceled && detail.status === 'CANCELED') return acc;
+export const calculateGoodsReceiptTotals = (details = [], { includeCanceled = false } = {}) => {
+    const totals = details.reduce((acc, detail) => {
+        if (!includeCanceled && detail.status === 'CANCELED') return acc;
 
-    acc.totalQuantity += Number(detail.quantity || 0);
-    acc.totalNetPurchaseAmount += Number(detail.netPurchaseAmount || 0);
-    acc.totalGrossPurchaseAmount += Number(detail.grossPurchaseAmount || 0);
+        acc.totalQuantity += Number(detail.quantity || 0);
+        acc.totalNetPurchaseAmount += Number(detail.netPurchaseAmount || 0);
+        acc.totalGrossPurchaseAmount += Number(detail.grossPurchaseAmount || 0);
 
-    return acc;
-}, {
-    totalQuantity: 0,
-    totalNetPurchaseAmount: 0,
-    totalGrossPurchaseAmount: 0
-});
+        return acc;
+    }, {
+        totalQuantity: 0,
+        totalNetPurchaseAmount: 0,
+        totalGrossPurchaseAmount: 0
+    });
+
+    return {
+        totalQuantity: roundTo(totals.totalQuantity),
+        totalNetPurchaseAmount: roundTo(totals.totalNetPurchaseAmount),
+        totalGrossPurchaseAmount: roundTo(totals.totalGrossPurchaseAmount)
+    };
+};
 
 const updateActiveGoodsReceiptDetailAndTotals = async ({ tx, goodsReceiptId, detailId, detailData }) => {
     const { count: updatedDetailsCount } = await tx.goodsReceiptDetail.updateMany({

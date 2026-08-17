@@ -6,8 +6,10 @@ import {
     WasteIssueReturnStatusConflict
 } from '../../../errors/warehouse/wasteIssueError.js';
 import { getDb } from '../../../repository/baseRepository.js';
+import { normalizeDecimal } from '../../../utils/formattersUtils.js';
 import { createServiceLogger } from '../../../utils/logger.js';
 import { executeServiceOperation } from '../../serviceErrorHandler.js';
+import { calculateProportionalConvertedQuantity } from '../../inventory/stockHelpers.js';
 import { applyWasteIssueReturnMovement } from '../wastes/wasteMovementService.js';
 import { findWasteIssueFulfillmentStatusIds } from './wasteIssueFulfillmentService.js';
 
@@ -24,16 +26,16 @@ const returnWasteIssueDetailTransaction = ({ id, detailId, returnDto, userId }) 
         throw new WasteIssueReturnStatusConflict();
     }
 
-    const returnedQuantity = Number(detail.returnedQuantity);
-    const suppliedQuantity = Number(detail.suppliedQuantity);
-    const returnQuantity = Number(returnDto.returnQuantity);
-    const availableQuantity = suppliedQuantity - returnedQuantity;
+    const returnedQuantity = normalizeDecimal(detail.returnedQuantity);
+    const suppliedQuantity = normalizeDecimal(detail.suppliedQuantity);
+    const returnQuantity = normalizeDecimal(returnDto.returnQuantity);
+    const availableQuantity = normalizeDecimal(suppliedQuantity - returnedQuantity);
 
     if (returnQuantity <= 0 || returnQuantity > availableQuantity) {
         throw new WasteIssueReturnQuantityConflict();
     }
 
-    const newTotalReturnedQuantity = returnedQuantity + returnQuantity;
+    const newTotalReturnedQuantity = normalizeDecimal(returnedQuantity + returnQuantity);
     const movement = await applyWasteIssueReturnMovement({
         tx,
         wasteIssueId: id,
@@ -41,7 +43,11 @@ const returnWasteIssueDetailTransaction = ({ id, detailId, returnDto, userId }) 
             wasteId: detail.wasteId,
             wasteIssueDetailId: detail.id,
             quantity: returnQuantity,
-            convertedQuantity: Number(detail.convertedQuantity) * returnQuantity / Number(detail.quantity)
+            convertedQuantity: calculateProportionalConvertedQuantity({
+                convertedQuantity: detail.convertedQuantity,
+                partialQuantity: returnQuantity,
+                totalQuantity: detail.quantity
+            })
         }
     });
     const statusIds = await findWasteIssueFulfillmentStatusIds(tx);

@@ -21,7 +21,7 @@ import { applyIssueModalMode, bindIssueProjectQuantityControls, createIssueHeade
 import { mapWasteIssueDetailDisplay } from '../../../utils/warehouse/issueDisplayUtils.js';
 import { createWasteIssueSelect } from '../../../plugins/select2/modules/wasteIssueSelect.js';
 import { createWarehouseIssueDetailsTable } from '../../../plugins/datatable/warehouseIssueDetailDatatable.js';
-import { roundTo } from '../../../utils/formatUtils.js';
+import { hasMaterialDimensions, roundTo } from '../../../utils/formatUtils.js';
 import { on } from '../../../utils/domUtils.js';
 import { UI_PERMISSIONS } from '../../../constants/permissions.js';
 import { refreshMaterialTable } from '../../../plugins/datatable/utils/renderMaterialDatatable.js';
@@ -151,7 +151,7 @@ const addWaste = () => {
         unitMeasureName: waste.unitMeasure?.name,
         unitMeasureSymbol: waste.unitMeasure?.symbol,
         quantity,
-        convertedQuantity: waste.base && waste.height
+        convertedQuantity: hasMaterialDimensions({ base: waste.base, height: waste.height })
             ? roundTo(Number(waste.base) * Number(waste.height) * quantity)
             : quantity
     };

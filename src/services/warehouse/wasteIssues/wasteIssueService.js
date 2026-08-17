@@ -21,7 +21,8 @@ import {
     resolveIssueFulfillmentStatus
 } from '../issues/issueFulfillmentRules.js';
 import { applyWasteIssueMovement } from '../wastes/wasteMovementService.js';
-import { calculateConvertedQuantity } from '../../inventory/stockHelpers.js';
+import { calculateConvertedQuantity, calculateProportionalConvertedQuantity } from '../../inventory/stockHelpers.js';
+import { normalizeDecimal } from '../../../utils/formattersUtils.js';
 import { createServiceLogger } from '../../../utils/logger.js';
 import { executeServiceOperation } from '../../serviceErrorHandler.js';
 import { findWasteIssueFulfillmentStatusIds } from './wasteIssueFulfillmentService.js';
@@ -348,14 +349,16 @@ const updateWasteIssueDetailsTransaction = async ({ id, wasteIssueDto }) => getD
 
         if (!requested.has(detail.id)) continue;
 
-        const current = Number(detail.suppliedQuantity);
-        const maximum = Number(detail.quantity);
+        const current = normalizeDecimal(detail.suppliedQuantity);
+        const maximum = normalizeDecimal(detail.quantity);
         const projectConvertedQuantity = requested.get(detail.id).projectConvertedQuantity;
-        const convertedQuantityDifference = Number(detail.convertedQuantity) - projectConvertedQuantity;
+        const convertedQuantityDifference = normalizeDecimal(
+            Number(detail.convertedQuantity) - projectConvertedQuantity
+        );
 
         if (!requested.get(detail.id).isSupplied || detail.isSupplied) continue;
 
-        const delta = maximum - current;
+        const delta = normalizeDecimal(maximum - current);
 
         const detailStatusName = resolveIssueDetailFulfillmentStatus({
             quantity: maximum,
@@ -376,7 +379,11 @@ const updateWasteIssueDetailsTransaction = async ({ id, wasteIssueDto }) => getD
             wasteIssueDetailId: detail.id,
             materialName: detail.materialName,
             quantity: delta,
-            convertedQuantity: Number(detail.convertedQuantity) * delta / maximum
+            convertedQuantity: calculateProportionalConvertedQuantity({
+                convertedQuantity: detail.convertedQuantity,
+                partialQuantity: delta,
+                totalQuantity: maximum
+            })
         });
     }
 
