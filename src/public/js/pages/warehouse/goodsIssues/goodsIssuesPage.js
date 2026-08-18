@@ -50,7 +50,6 @@ const goodsIssueReturn = createIssueReturn({
 
 goodsIssueReturn.initialize();
 
-
 const normalizeGoodsIssueData = ({ form, formData }) => {
 
     const { mode } = form.dataset;
@@ -96,7 +95,6 @@ useIssueForm({
     editDetails: editGoodsIssueDetails,
     editHeader: editGoodsIssueHeader
 });
-
 
 export const openGoodsIssueModal = ({ mode, data = null }) => {
 
@@ -242,7 +240,6 @@ bindIssueProjectQuantityControls({
     tableSelector: detailTableSelector,
     findDetail: findDetailByElement
 });
-
 
 on('click', '#materialTable .return-issue-detail-btn', (event, button) => {
     const detail = details.find(item => item.id === button.dataset.id);

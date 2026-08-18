@@ -4,42 +4,42 @@ import { setupSupplierSelect, toggleSupplierOption } from "../domains/supplier.j
 import { initUnitMeasureSelect, toggleUnitMeasureOption } from "../domains/unitMeasure.js";
 import { FORM_SELECTORS } from "../../../constants/selectors.js";
 
-const supplierSelector = FORM_SELECTORS.SUPPLIER;
-const unitMeasureSelector = FORM_SELECTORS.UNIT_MEASURE;
-const presentationSelector = FORM_SELECTORS.PRESENTATION;
-const reasonSelector = FORM_SELECTORS.REASON;
+let scoped = null;
+const selectors = {
+    supplier: FORM_SELECTORS.SUPPLIER,
+    unitMeasure: FORM_SELECTORS.UNIT_MEASURE,
+    presentation: FORM_SELECTORS.PRESENTATION,
+    reason: FORM_SELECTORS.REASON
+};
 
 export const initMaterialFormSelect2 = ({
     modalSelector
 }) => {
 
-    const supplierScopedSelector = `${ modalSelector } ${ supplierSelector }`;
-    const unitMeasureScopedSelector = `${ modalSelector } ${ unitMeasureSelector }`;
-    const presentationScopedSelector = `${ modalSelector } ${ presentationSelector }`;
-    const reasonScopedSelector = `${ modalSelector } ${ reasonSelector }`;
+    if (!scoped) scoped = Object.fromEntries(Object.entries(selectors).map(
+        ([name, selector]) => [name, `${ modalSelector } ${ selector }`]
+    ));
 
-    setupSupplierSelect({
-        modalSelector,
-        supplierSelector
-    });
-
-    initUnitMeasureSelect({
-        modalSelector,
-        baseSelector: unitMeasureScopedSelector,
-        allowCreate: false
-    });
-
-    initPresentationSelect({
-        modalSelector,
-        baseSelector: presentationScopedSelector,
-        allowCreate: false
-    });
-
-    initReasonSelect({
-        modalSelector,
-        baseSelector: reasonScopedSelector,
-        allowCreate: false
-    });
+    [
+        [setupSupplierSelect, {
+            modalSelector,
+            supplierSelector: scoped.supplier,
+        }],
+        [initUnitMeasureSelect, {
+            modalSelector,
+            baseSelector: scoped.unitMeasure,
+            allowCreate: false
+        }],
+        [initPresentationSelect, {
+            modalSelector,
+            baseSelector: scoped.presentation,
+            allowCreate: false
+        }],
+        [initReasonSelect, {
+            baseSelector: scoped.reason,
+            allowCreate: false
+        }]
+    ].forEach(([initialize, options]) => initialize(options));
 };
 
 export const setMaterialFormSelectOptions = ({
@@ -47,24 +47,28 @@ export const setMaterialFormSelectOptions = ({
     data = null
 }) => {
 
-    const supplierScopedSelector = `${ modalSelector } ${ supplierSelector }`;
-    const unitMeasureScopedSelector = `${ modalSelector } ${ unitMeasureSelector }`;
-    const presentationScopedSelector = `${ modalSelector } ${ presentationSelector }`;
-    toggleSupplierOption({
-        selector: supplierScopedSelector,
-        id: data?.supplier?.id,
-        name: `${ data?.supplier?.tradeName }`
-    });
-
-    toggleUnitMeasureOption({
-        selector: unitMeasureScopedSelector,
-        id: data?.unitMeasure?.id,
-        name: `${ data?.unitMeasure?.symbol } - ${ data?.unitMeasure?.name }`
-    });
-
-    togglePresentationOption({
-        selector: presentationScopedSelector,
-        id: data?.presentation?.id,
-        name: data?.presentation?.name
-    });
+    [
+        [
+            toggleSupplierOption, 
+            scoped.supplier, 
+            data?.supplier?.id, 
+            `${ data?.supplier?.tradeName }`
+        ],
+        [
+            toggleUnitMeasureOption, 
+            scoped.unitMeasure, 
+            data?.unitMeasure?.id, 
+            `${ data?.unitMeasure?.symbol } - ${ data?.unitMeasure?.name }`
+        ],
+        [
+            togglePresentationOption, 
+            scoped.presentation, 
+            data?.presentation?.id, 
+            data?.presentation?.name
+        ]
+    ].forEach(([toggleOption, selector, id, name]) => toggleOption({
+        selector,
+        id,
+        name
+    }));
 };

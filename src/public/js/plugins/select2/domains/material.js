@@ -1,7 +1,7 @@
 import { openMaterialModal } from "../../../pages/warehouse/materials/materialModal.js";
 import { getAllMaterials } from "../../../application/warehouse/materials.js";
 import { buildPaginatedSelectParams, buildPaginatedSelectResults, initDomainSelect2, initFilterSelect2, runAfterSelect2Close, SELECT_RESULTS_LIMIT, setMdbWrapperInputValue, toggleSelectOption } from "../baseSelect.js";
-import { mapMaterialToSelectData } from "../../../utils/materialSelectUtils.js";
+import { mapSelectData } from "../../../utils/materialSelectUtils.js";
 import { FORM_SELECTORS, FILTER_SELECTORS } from "../../../constants/selectors.js";
 
 const wrapperSelector = FORM_SELECTORS.PRESENTATION_DISPLAY;
@@ -20,17 +20,13 @@ export const initMaterialFilterSelect = ({
         placeholder: 'Filtrar por material',
         selectedId,
         paginated: true,
-        mapOption: mapMaterialToSelectData,
+        mapOption: mapSelectData,
         data: (params) => buildPaginatedSelectParams(params, {
             additionalParams: {
                 supplierId: supplierFilterSelector
                     ? $(`${ baseSelector } ${ supplierFilterSelector }`).val()
                     : ''
             }
-        }),
-        processResults: (data, params) => buildPaginatedSelectResults(data, params, {
-            length: Number(params?.data?.length) || SELECT_RESULTS_LIMIT,
-            mapItem: mapMaterialToSelectData
         })
     });
 };
@@ -39,38 +35,20 @@ const initMaterialSelect = ({
     modalSelector,
     supplierSelector,
     baseSelector,
-    allowCreate = true,
-    resultsLimit = null
+    allowCreate = true
 }) => initDomainSelect2({
     selector: baseSelector,
     containerSelector: modalSelector,
     get: getAllMaterials,
     placeholder: 'Buscar material...',
-    data: (params) => resultsLimit
-        ? buildPaginatedSelectParams(params, {
-            length: resultsLimit,
-            additionalParams: {
-                supplierId: supplierSelector
-                    ? $(`${ modalSelector } ${ supplierSelector }`).val()
-                    : ''
-            }
-        })
-        : {
-            search: params.term,
+    mapOption: mapSelectData,
+    data: (params) => buildPaginatedSelectParams(params, {
+        additionalParams: {
             supplierId: supplierSelector
                 ? $(`${ modalSelector } ${ supplierSelector }`).val()
                 : ''
-        },
-    processResults: (data, params) => {
-        if (resultsLimit) return buildPaginatedSelectResults(data, params, {
-            length: resultsLimit,
-            mapItem: mapMaterialToSelectData
-        });
-
-        const list = data.data || data;
-
-        return { results: list.map(mapMaterialToSelectData) };
-    },
+        }
+    }),
     allowCreate,
     newTagLabel: 'Nuevo material'
 });
@@ -107,7 +85,7 @@ const attachMaterialHandler = ({
 
                         toggleMaterialOption({
                             selector: baseSelector,
-                            data: mapMaterialToSelectData(createdMaterial)
+                            data: mapSelectData(createdMaterial)
                         });
 
                         setMdbWrapperInputValue({
@@ -146,13 +124,11 @@ export const toggleMaterialOption = ({
     data
 });
 
-
 export const setupMaterialSelect = ({
     modalSelector,
     supplierSelector = null,
     materialSelector,
     allowCreate = true,
-    resultsLimit = null,
     creationContext = null
 }) => {
 
@@ -162,8 +138,7 @@ export const setupMaterialSelect = ({
         modalSelector,
         supplierSelector,
         baseSelector,
-        allowCreate,
-        resultsLimit
+        allowCreate
     });
 
     attachMaterialHandler({

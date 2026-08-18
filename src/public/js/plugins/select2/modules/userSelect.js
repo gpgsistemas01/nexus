@@ -2,23 +2,29 @@ import { initDepartmentSelect, toggleDepartmentOption } from "../domains/departm
 import { initRoleSelect, toggleRoleOption } from "../domains/role.js";
 import { FORM_SELECTORS, MODAL_SELECTORS } from "../../../constants/selectors.js";
 
+let scoped = null;
+const selectors = {
+    department: FORM_SELECTORS.DEPARTMENT_ID,
+    role: FORM_SELECTORS.ROLE_ID
+};
 const modalSelector = MODAL_SELECTORS.USER;
-const departmentSelector = FORM_SELECTORS.DEPARTMENT_ID;
-const roleSelector = FORM_SELECTORS.ROLE_ID;
-
-const departmentScopedSelector = `${ modalSelector } ${ departmentSelector }`;
-const roleScopedSelector = `${ modalSelector } ${ roleSelector }`;
 
 export const initUserFormSelect2 = () => {
+
+    if (!scoped) scoped = Object.fromEntries(Object.entries(selectors).map(
+        ([name, selector]) => [name, `${ MODAL_SELECTORS.USER } ${ selector }`]
+    ));
+
     [
-        [initDepartmentSelect, { modalSelector, baseSelector: departmentScopedSelector, allowCreate: false }],
-        [initRoleSelect, { modalSelector, baseSelector: roleScopedSelector }]
+        [initDepartmentSelect, { modalSelector, baseSelector: scoped.department, allowCreate: false }],
+        [initRoleSelect, { modalSelector, baseSelector: scoped.role, allowCreate: false }]
     ].forEach(([initialize, options]) => initialize(options));
 };
 
 export const setUserFormSelectOptions = (data = null) => {
+    
     [
-        [toggleDepartmentOption, departmentScopedSelector, data?.departmentId, data?.departmentName],
-        [toggleRoleOption, roleScopedSelector, data?.roleId, data?.roleName]
+        [toggleDepartmentOption, scoped.department, data?.departmentId, data?.departmentName],
+        [toggleRoleOption, scoped.role, data?.roleId, data?.roleName]
     ].forEach(([toggleOption, selector, id, name]) => toggleOption({ selector, id, name }));
 };

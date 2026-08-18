@@ -33,16 +33,6 @@ const clearMaterialSelection = () => {
     $(materialScopedSelector).val(null).trigger('change');
 };
 
-const clearPresentationDisplay = () => {
-
-    const instance = initMdbWrapperInput({
-        selector: presentationDisplayScopedSelector,
-        value: ''
-    });
-
-    updateMdbWrapperInput(instance);
-};
-
 export const initGoodsReceiptFormSelect2 = () => {
 
     const modal = document.querySelector(modalSelector);
@@ -69,35 +59,39 @@ export const initGoodsReceiptFormSelect2 = () => {
                 id: null,
                 name: null
             });
-
             refreshMaterialTable(details);
-
             updateTotals();
-            clearPresentationDisplay();
+            
+            const instance = initMdbWrapperInput({
+                selector: presentationDisplayScopedSelector,
+                value: ''
+            });
 
+            updateMdbWrapperInput(instance);
             modal?.dispatchEvent(new Event(supplierChangedEventName));
         }
     });
 
-    setupSupplierSelect({
-        modalSelector,
-        supplierSelector
-    });
-
-    initPersonSelect({
-        modalSelector,
-        baseSelector: receivedByScopedSelector,
-        placeholder: 'Buscar persona que recibe...',
-        data: (params) => {
-
-            return {
-                search: params.term,
-                department: 'ALMACÉN Y PROVEDURÍA',
-                strictDepartmentFilter: true
-            };
-        },
-        allowCreate: false,
-    });
+    [
+        [setupSupplierSelect, {
+            modalSelector,
+            supplierSelector
+        }],
+        [initPersonSelect, {
+            modalSelector,
+            baseSelector: receivedByScopedSelector,
+            placeholder: 'Buscar persona que recibe...',
+            data: (params) => {
+                
+                return {
+                    search: params.term,
+                    department: 'ALMACÉN Y PROVEDURÍA',
+                    strictDepartmentFilter: true
+                }
+            },
+            allowCreate: false,
+        }]
+    ].forEach(([initialize, options]) => initialize(options));
 
     setupMaterialSelect({
         modalSelector,
@@ -110,20 +104,16 @@ export const initGoodsReceiptFormSelect2 = () => {
 
 export const GOODS_RECEIPT_SUPPLIER_CHANGED_EVENT = supplierChangedEventName;
 
-
 export const setGoodsReceiptFormSelectOptions = (data = null) => {
 
-    toggleSupplierOption({
-        selector: supplierScopedSelector,
-        id: data?.supplierId,
-        name: `${ data?.supplierName }`
-    });
-
-    togglePersonOption({
-        selector: receivedByScopedSelector,
-        id: data?.receivedById,
-        name: data?.receivedByName,
-    });
+    [
+        [toggleSupplierOption, supplierScopedSelector, data?.supplierId, data?.supplierName],
+        [togglePersonOption, receivedByScopedSelector, data?.receivedById, data?.receivedByName]
+    ].forEach(([toggleOption, selector, id, name]) => toggleOption({
+        selector,
+        id,
+        name
+    }));
 
     clearMaterialSelection();
 };

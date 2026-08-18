@@ -16,26 +16,23 @@ const headerSelects = createIssueHeaderSelects({
     }
 });
 
-export const initGoodsIssueFormSelect2 = () => {
-    headerSelects.init();
-    setupMaterialSelect({
-        modalSelector,
-        materialSelector: FORM_SELECTORS.MATERIAL,
-        allowCreate: false,
-        resultsLimit: MATERIAL_SELECT_RESULTS_LIMIT
-    });
-};
-
 export const getGoodsIssueHeaderSelects = () => ({
-    init: initGoodsIssueFormSelect2,
-    setOptions: setGoodsIssueFormSelectOptions,
+    init: () => {
+
+        headerSelects.init();
+        setupMaterialSelect({
+            modalSelector,
+            materialSelector: FORM_SELECTORS.MATERIAL,
+            allowCreate: false
+        });
+    },
+    setOptions: (data) => {
+
+        headerSelects.setOptions(data);
+        toggleMaterialOption({
+            selector: `${ modalSelector } ${ FORM_SELECTORS.MATERIAL }`,
+            data: { id: null, text: null }
+        });
+    },
     syncState: headerSelects.syncState
 });
-
-export const setGoodsIssueFormSelectOptions = data => {
-    headerSelects.setOptions(data);
-    toggleMaterialOption({
-        selector: `${ modalSelector } ${ FORM_SELECTORS.MATERIAL }`,
-        data: { id: null, text: null }
-    });
-};

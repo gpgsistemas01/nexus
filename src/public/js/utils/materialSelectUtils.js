@@ -1,9 +1,3 @@
-export const formatInventorySelectDimensions = item => (
-    item.base == null || item.height == null
-        ? 'Sin medidas'
-        : `${ item.base } × ${ item.height }`
-);
-
 export const buildInventorySelectText = (item = {}, {
     supplierName: supplierOverride = null,
     useRowDimensions = false
@@ -13,7 +7,9 @@ export const buildInventorySelectText = (item = {}, {
     const materialName = item.materialName || item.material?.name || item.name || '';
     const materialBase = useRowDimensions ? item.base : item.materialBase ?? item.material?.base ?? item.base;
     const materialHeight = useRowDimensions ? item.height : item.materialHeight ?? item.material?.height ?? item.height;
-    const dimensions = formatInventorySelectDimensions({ base: materialBase, height: materialHeight });
+    const dimensions = item.base == null || item.height == null
+        ? 'Sin medidas'
+        : `${ item.base } × ${ item.height }`
     const materialIdentity = `${ materialName } (${ dimensions })`;
 
     return supplierName
@@ -28,14 +24,9 @@ export const resolveMaterialPresentationName = (item = {}) => (
     || ''
 );
 
-export const buildMaterialSelectText = (material = {}) => {
-
-    return buildInventorySelectText(material);
-};
-
-export const mapMaterialToSelectData = (material = {}) => ({
+export const mapSelectData = (material = {}) => ({
     id: material.id,
-    text: buildMaterialSelectText(material),
+    text: buildInventorySelectText(material),
     materialName: material.name,
     presentationName: resolveMaterialPresentationName(material),
     unitMeasureName: material.unitMeasure?.name,
@@ -54,7 +45,7 @@ export const mapSupplierMaterialToSelectData = (supplierMaterial = {}) => {
 
     return {
         id: supplierMaterial.supplierMaterialId,
-        text: buildMaterialSelectText({
+        text: buildInventorySelectText({
             ...material,
             base: supplierMaterial.materialBase ?? material.base ?? supplierMaterial.base,
             height: supplierMaterial.materialHeight ?? material.height ?? supplierMaterial.height,

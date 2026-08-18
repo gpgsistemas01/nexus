@@ -1,9 +1,28 @@
 import { createSuccessResponseFromRequest } from "../../utils/responseUtils.js";
-import { buildMaterialSelectText } from "../../utils/materialSelectUtils.js";
+import { buildInventorySelectText } from "../../utils/materialSelectUtils.js";
 import { deleteMaterialRequest, editMaterialRequest, editMaterialStockRequest, getAllMaterialsRequest, registerMaterialRequest } from "../../services/warehouse/materialService.js";
+import { createCrudApplication } from "../createCrudApplication.js";
 
-export const MATERIAL_SELECT_RESULTS_LIMIT = 20;
 const GOODS_RECEIPT_CREATION_CONTEXT = 'goodsReceipt';
+
+export const materialApplication = createCrudApplication({
+    requests: {
+        getAll: getAllMaterialsRequest,
+        register: async (options) =>  {
+
+            const payload = {
+                ...buildMaterialPayload(options.formData, {
+                    includeMaxUnitCost: options.creationContext !== GOODS_RECEIPT_CREATION_CONTEXT
+                }),
+                ...(options.creationContext ? { creationContext: options.creationContext } : {})
+            };
+
+            return await registerMaterialRequest({ data: payload });
+        },
+        edit: editMaterialRequest
+    },
+    dataKey: 'material'
+});
 
 export const getMaterialOptions = async (params = {}) => {
 
@@ -14,10 +33,9 @@ export const getMaterialOptions = async (params = {}) => {
     return list.filter(material => material?.id && material?.name)
         .map(p => ({
             id: p.id,
-            text: buildMaterialSelectText(p)
+            text: buildInventorySelectText(p)
         }));
 }
-
 
 export const getAllMaterials = async (params = {}) => {
 
@@ -72,7 +90,6 @@ export const editMaterialStock = async ({ formData, id }) => {
 
     return createSuccessResponseFromRequest({ response });
 }
-
 
 export const deleteMaterial = async (id) => {
 

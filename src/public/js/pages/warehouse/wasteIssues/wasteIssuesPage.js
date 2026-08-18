@@ -12,14 +12,13 @@ import { createWasteIssueDatatable } from '../../../plugins/datatable/wasteIssue
 import { setDateTimePickerValue } from '../../../plugins/flatpickr/dateTimePicker.js';
 import { FORM_MODES } from '../../../constants/formModes.js';
 import { DATATABLE_SELECTORS, FORM_SELECTORS, MODAL_SELECTORS } from '../../../constants/selectors.js';
-import { createIssueHeaderSelects } from '../../../plugins/select2/modules/issueHeaderSelect.js';
 import { hasValidationErrors, validateDetailsFields, validateFields } from '../../../utils/formUtils.js';
 import { addWasteIssueDetailValidation, issueProjectQuantityDetailsValidation, wasteIssueValidation } from '../../../utils/validations/validators.js';
 import { clearAddedItemInput, normalizeFormErrors } from '../../../ui/formUI.js';
 import { setMdbWrapperInputValue } from '../../../plugins/select2/baseSelect.js';
 import { applyIssueModalMode, bindIssueProjectQuantityControls, createIssueHeaderForm, createIssueTableActions, getPendingIssueSupplyDetails, initializeIssueModal, mapIssueSupplyDetails, useIssueForm } from '../../../ui/issues/issueFormUI.js';
 import { mapWasteIssueDetailDisplay } from '../../../utils/warehouse/issueDisplayUtils.js';
-import { createWasteIssueSelect } from '../../../plugins/select2/modules/wasteIssueSelect.js';
+import { createWasteIssueSelect, getWasteIssueHeaderSelects } from '../../../plugins/select2/modules/wasteIssueSelect.js';
 import { createWarehouseIssueDetailsTable } from '../../../plugins/datatable/warehouseIssueDetailDatatable.js';
 import { roundTo } from '../../../utils/formatUtils.js';
 import { on } from '../../../utils/domUtils.js';
@@ -34,25 +33,13 @@ const WASTE_ISSUE_ENTITY_NAME = 'salida de merma';
 const form = document.querySelector(formId);
 const context = window.meta || {};
 const wasteSelect = document.querySelector(FORM_SELECTORS.WASTE_ISSUE_WASTE);
-const quantityInput = document.querySelector(FORM_SELECTORS.WASTE_ISSUE_QUANTITY);
 const details = [];
 const modalElement = document.querySelector(modalId);
 const detailTableSelector = DATATABLE_SELECTORS.MATERIAL;
 const presentationDisplaySelector = `${ modalId } ${ FORM_SELECTORS.PRESENTATION_DISPLAY }`;
-const headerSelects = createIssueHeaderSelects({
-    modalSelector: modalId,
-    formSelector: formId,
-    selectors: {
-        requester: FORM_SELECTORS.REQUESTER,
-        client: FORM_SELECTORS.CLIENT,
-        department: FORM_SELECTORS.DEPARTMENT,
-        advisor: FORM_SELECTORS.ADVISOR,
-        projectNumber: FORM_SELECTORS.PROJECT_NUMBER
-    }
-});
 const issueHeaderForm = createIssueHeaderForm({
     formSelector: formId,
-    selects: headerSelects
+    selects: getWasteIssueHeaderSelects()
 });
 const wasteIssueSelect = createWasteIssueSelect({
     selector: FORM_SELECTORS.WASTE_ISSUE_WASTE,
@@ -130,10 +117,17 @@ on('change', FORM_SELECTORS.WASTE_ISSUE_WASTE, () => {
 
 const addWaste = () => {
 
-    const waste = wasteIssueSelect.getSelected();
-    const quantity = Number(quantityInput.value);
+    const option = document.querySelector(`${ FORM_SELECTORS.MATERIAL } option:checked`);
+
+    let { base, height, presentation, unitMeasure, materialName, supplier, maxUnitCost } = option?.dataset || {};
+    height = Number(height);
+    base = Number(base);
+
+    const wasteId = option?.value;
+    const quantity = Number(document.querySelector(FORM_SELECTORS.QUANTITY).value);
+
     const errors = validateFields(addWasteIssueDetailValidation, {
-        wasteId: waste?.id,
+        wasteId,
         quantity: quantityInput.value
     });
 
@@ -141,25 +135,24 @@ const addWaste = () => {
 
     if (hasValidationErrors(errors)) return;
 
-    const detail = {
-        wasteId: waste.id,
-        materialName: waste.materialName,
-        supplierName: waste.supplier?.tradeName,
-        materialBase: waste.base,
-        materialHeight: waste.height,
-        presentationName: resolveMaterialPresentationName(waste),
-        unitMeasureName: waste.unitMeasure?.name,
-        unitMeasureSymbol: waste.unitMeasure?.symbol,
+    const waste = {
+        wasteId,
+        materialName: materialName,
+        supplierName: supplier?.tradeName,
+        materialBase: base,
+        materialHeight: height,
+        presentationName: presentation.name,
+        unitMeasureName: unitMeasure?.name,
         quantity,
-        convertedQuantity: waste.base && waste.height
-            ? roundTo(Number(waste.base) * Number(waste.height) * quantity)
+        convertedQuantity: base && height
+            ? roundTo(Number(base) * Number(height) * quantity)
             : quantity
     };
 
-    const existingIndex = details.findIndex(item => item.wasteId === waste.id);
+    const existingIndex = details.findIndex(item => item.wasteId === wasteId);
 
-    if (existingIndex >= 0) details.splice(existingIndex, 1, detail);
-    else details.push(detail);
+    if (existingIndex >= 0) details.splice(existingIndex, 1, waste);
+    else details.push(waste);
 
     refreshMaterialTable(details);
 
@@ -246,7 +239,6 @@ useIssueForm({
     onSaved: async () => {
         details.length = 0;
         refreshMaterialTable(details);
-        await wasteIssueSelect.initialize();
     }
 });
 
@@ -257,4 +249,3 @@ createWasteIssueDatatable({
 
 wasteIssueReturn.initialize();
 setCurrentRequestDate();
-wasteIssueSelect.initialize().catch(error => handleApiError({ err: error, rethrow: false }));
