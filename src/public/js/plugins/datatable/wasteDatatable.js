@@ -36,7 +36,6 @@ export const createWasteDatatable = async (context) => {
     const columns = buildWarehouseInventoryColumns({
         canSeeCost,
         canManageItems: canManageWastes,
-        costTitle: 'Costo Unitario de Conversión',
         renderActions: () => renderActionButtons({
             status: 'Abierta',
             context: 'waste',

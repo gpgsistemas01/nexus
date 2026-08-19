@@ -34,9 +34,6 @@ export const createMaterialDatatable = async (context) => {
     const { isWarehouse = false, isSystem = false, isSales = false } = context.organization || {};
     const canSeeCost = isWarehouse || isSystem || isSales;
     const canManageMaterials = hasPermission(context, UI_PERMISSIONS.MATERIALS_WRITE);
-    const canDeleteMaterials = canManageMaterials;
-    const canAdjustStock = hasPermission(context, UI_PERMISSIONS.MATERIALS_ADJUST_STOCK);
-    const canCreateMaterialsFromModule = canManageMaterials;
 
     renderWarehouseInventoryHeader({
         tableElement,
@@ -53,12 +50,11 @@ export const createMaterialDatatable = async (context) => {
     const columns = buildWarehouseInventoryColumns({
         canSeeCost,
         canManageItems: canManageMaterials,
-        costTitle: 'Costo Unitario de Conversión',
         renderActions: (_, __, row) => renderActionButtons({
             status: 'Abierta',
             context: 'material',
-            canAdjustStock,
-            canDeleteMaterial: canDeleteMaterials && row.canDelete
+            canAdjustStock: hasPermission(context, UI_PERMISSIONS.MATERIALS_ADJUST_STOCK),
+            canDeleteMaterial: canManageMaterials && row.canDelete
         })
     });
 
@@ -104,7 +100,7 @@ export const createMaterialDatatable = async (context) => {
                 );
             },
             buttons: [
-                ...(canCreateMaterialsFromModule ? [{
+                ...(canManageMaterials ? [{
                     text: 'Nuevo material',
                     action: () => openMaterialModal({ mode: 'create' })
                 }] : []),

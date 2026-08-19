@@ -20,7 +20,7 @@ import { applyIssueModalMode, bindIssueProjectQuantityControls, createIssueHeade
 import { createIssueReturn } from "../../../ui/issues/issueReturnUI.js";
 import { createWarehouseIssueDetailsTable } from '../../../plugins/datatable/warehouseIssueDetailDatatable.js';
 import { refreshMaterialTable } from '../../../plugins/datatable/utils/renderMaterialDatatable.js';
-import { buildInventorySelectText } from "../../../utils/materialSelectUtils.js";
+import { buildInventorySelectText, getMaxUnitCost, getPresentation, getUnitMeasure } from "../../../utils/materialSelectUtils.js";
 
 const modalId = MODAL_SELECTORS.GOODS_ISSUE;
 const formId = FORM_SELECTORS.GOODS_ISSUE;
@@ -111,14 +111,14 @@ export const openGoodsIssueModal = ({ mode, data = null }) => {
         const modalDetails = data.details.map(detail => ({ 
             id: detail.material.id,
             name: buildInventorySelectText(detail),
-            base: roundTo(detail.material.base),
-            height: roundTo(detail.material.height),
+            base: getBase(detail),
+            height: getHeight(detail),
             quantity: detail.quantity,
-            unitMeasure: detail.material.unitMeasure.symbol,
-            presentation: detail.material.presentation.name,
-            convertedQuantity: roundTo(detail.convertedQuantity),
+            unitMeasure: getUnitMeasure(detail),
+            presentation: getPresentation(detail),
+            convertedQuantity: detail.convertedQuantity,
             supplier: detail.supplier.name,
-            maxUnitCost: detail.maxUnitCost,
+            maxUnitCost: getMaxUnitCost(detail),
             supplierId: detail.supplier.id
          }));
 
@@ -174,11 +174,11 @@ const addMaterial = () => {
     const newMaterial = {
         id: material.id,
         name: text,
-        base: material.base,
-        height: material.height,
+        base: getBase(material),
+        height: getHeight(material),
         quantity,
-        unitMeasure: material.unitMeasure.symbol,
-        presentation: material.presentation.name,
+        unitMeasure: getUnitMeasure(material),
+        presentation: getPresentation(material),
         convertedQuantity: (!material.base || !material.height)
             ? quantity
             : roundTo(material.base * material.height * quantity),

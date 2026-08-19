@@ -1,5 +1,5 @@
-import { renderWarehouseItemName } from "./detailDatatableUtils.js";
 import { formatCurrency, formatDecimal } from "../../../utils/formatUtils.js";
+import { buildInventorySelectText, getBase, getCurrentStock, getHeight, getMaxUnitCost, getMinStock, getPresentation, getUnitMeasure } from "../../../utils/materialSelectUtils.js";
 
 export const renderWarehouseInventoryHeader = ({ tableElement, canSeeCost, canManageItems, stockTitle, costTitle }) => {
 
@@ -25,25 +25,45 @@ export const renderWarehouseInventoryHeader = ({ tableElement, canSeeCost, canMa
     `;
 };
 
-export const buildWarehouseInventoryColumns = ({ canSeeCost, canManageItems, costTitle, renderActions }) => {
+export const buildWarehouseInventoryColumns = ({ canSeeCost, canManageItems, renderActions }) => {
 
     const columns = [
         {
             data: null,
-            title: 'Material',
-            render: (data, type, row) => renderWarehouseItemName(row, null, { useRowDimensions: true })
+            render: (data, type, row) => buildInventorySelectText(row)
         },
-        { data: 'base', render: formatDecimal, title: 'Base' },
-        { data: 'height', render: formatDecimal, title: 'Altura' },
-        { data: 'currentStock', render: formatDecimal, title: 'Existencia' },
-        { data: 'minStock', render: formatDecimal, title: 'Stock Mínimo' },
-        { data: 'presentation.name', title: 'Presentación' },
-        { data: 'convertedQuantity', render: formatDecimal, title: 'Cantidad' },
-        { data: 'unitMeasure.name', title: 'Unidad' }
+        { 
+            data: null, 
+            render: (_, __, row) => formatDecimal(getBase(row))
+        },
+        { 
+            data: null, 
+            render: (_, __, row) => formatDecimal(getHeight(row))
+        },
+        { 
+            data: null, 
+            render: (_, __, row) => formatDecimal(getCurrentStock(row))
+        },
+        { 
+            data: null, 
+            render: (_, __, row) => formatDecimal(getMinStock(row))
+        },
+        { 
+            data: null,
+            render: (_, __, row) => getPresentation(row)
+        },
+        { data: 'convertedQuantity', render: formatDecimal },
+        { 
+            data: null,
+            render: (_, __, row) => getUnitMeasure(row)
+        }
     ];
 
     if (canSeeCost) {
-        columns.push({ data: 'maxUnitCost', title: costTitle, render: formatCurrency });
+        columns.push({ 
+            data: null, 
+            render: (_, __, row) => formatCurrency (getMaxUnitCost(row))
+        });
     }
 
     if (canManageItems) {

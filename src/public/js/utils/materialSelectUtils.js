@@ -1,11 +1,17 @@
-export const buildInventorySelectText = (item = {}, {
-    useRowDimensions = false
-} = {}) => {
+export const getBase = (item) => item.base ?? item.material?.base ?? item.supplierMaterial?.material?.base;
+export const getHeight = (item) => item.height ?? item.material?.height ?? item.supplierMaterial?.material?.height;
+export const getPresentation = (item) => item.material?.presentation?.name ?? item.supplierMaterial?.material?.presentation?.name;
+export const getUnitMeasure = (item) => item.material?.unitMeasure?.symbol ?? item.supplierMaterial?.material?.unitMeasure?.symbol;
+export const getMaxUnitCost = (item) => item.maxUnitCost ?? item.supplierMaterial?.maxUnitCost;
+export const getCurrentStock = (item) => item.currentStock ?? item.supplierMaterial?.currentStock;
+export const getMinStock = (item) => item.minStock ?? item.supplierMaterial?.minStock;
+
+export const buildInventorySelectText = (item = {}) => {
 
     const supplierName = item.supplier?.tradeName || item.supplierMaterial?.supplier?.tradeName || '';
     const name = item.material?.name || item.supplierMaterial?.material?.name || '';
-    const base = useRowDimensions ? item.base : item.base ?? item.material?.base ?? item.supplierMaterial?.material?.base;
-    const height = useRowDimensions ? item.height : item.height ?? item.material?.height ?? item.supplierMaterial?.material?.height;
+    const base = getBase(item);
+    const height = getHeight(item);
     const dimensions = base === null || height === null
         ? 'Sin medidas'
         : `${ base } × ${ height }`

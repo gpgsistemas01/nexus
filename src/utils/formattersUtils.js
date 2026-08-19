@@ -87,11 +87,9 @@ export const roundTo = (value, decimals = 2) => {
 
 const FLOAT_EPSILON = 0.000001;
 
-export const round2 = (value) => roundTo(value);
-
 export const normalizeDecimal = (value) => {
 
-    const rounded = round2(value);
+    const rounded = roundTo(value);
 
     return Math.abs(rounded) <= FLOAT_EPSILON
         ? 0

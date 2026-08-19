@@ -23,7 +23,7 @@ import { roundTo } from '../../../utils/formatUtils.js';
 import { on } from '../../../utils/domUtils.js';
 import { UI_PERMISSIONS } from '../../../constants/permissions.js';
 import { refreshMaterialTable } from '../../../plugins/datatable/utils/renderMaterialDatatable.js';
-import { buildInventorySelectText } from '../../../utils/materialSelectUtils.js';
+import { buildInventorySelectText, getMaxUnitCost, getUnitMeasure } from '../../../utils/materialSelectUtils.js';
 
 const formId = FORM_SELECTORS.WASTE_ISSUE;
 const modalId = MODAL_SELECTORS.WASTE_ISSUE;
@@ -65,14 +65,14 @@ export const openWasteIssueModal = ({ mode, data = null }) => {
         details.push(...data.details.map({
             id: detail.material.id,
             name: buildInventorySelectText(detail),
-            base: roundTo(detail.supplierMaterial.material.base),
-            height: roundTo(detail.supplierMaterial.material.height),
+            base: getBase(detail),
+            height: getHeight(detail),
             quantity: detail.quantity,
-            unitMeasure: detail.supplierMaterial.material.unitMeasure.symbol,
-            presentation: detail.supplierMaterial.material.presentation.name,
-            convertedQuantity: roundTo(detail.convertedQuantity),
+            unitMeasure: getUnitMeasure(detail),
+            presentation: getPresentation(detail),
+            convertedQuantity: detail.convertedQuantity,
             supplier: detail.supplierMaterial.supplier.name,
-            maxUnitCost: roundTo(detail.maxUnitCost),
+            maxUnitCost: getMaxUnitCost(detail),
             supplierId: detail.supplierMaterial.supplier.id
         }));
     }
@@ -118,8 +118,8 @@ const addWaste = () => {
         name: text,
         base,
         height,
-        presentation: supplierMaterial.material.presentation.name,
-        unitMeasure: supplierMaterial.material.unitMeasure.symbol,
+        presentation: getPresentation(supplierMaterial),
+        unitMeasure: getUnitMeasure(supplierMaterial),
         quantity,
         convertedQuantity: base && height
             ? roundTo(base * height * quantity)
