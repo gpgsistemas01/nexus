@@ -3,6 +3,7 @@ import { getAllMaterials } from "../../../application/warehouse/materials.js";
 import { buildPaginatedSelectParams, buildPaginatedSelectResults, initDomainSelect2, initFilterSelect2, runAfterSelect2Close, SELECT_RESULTS_LIMIT, setMdbWrapperInputValue, toggleSelectOption } from "../baseSelect.js";
 import { mapSelectMaterialData } from "../../../utils/materialSelectUtils.js";
 import { FORM_SELECTORS, FILTER_SELECTORS } from "../../../constants/selectors.js";
+import { updatePresentationDisplay } from "../../../ui/issues/issueFormUI.js";
 
 const wrapperSelector = FORM_SELECTORS.PRESENTATION_DISPLAY;
 const materialSelector = FILTER_SELECTORS.MATERIAL;
@@ -19,7 +20,6 @@ export const initMaterialFilterSelect = ({
         getOptions: getAllMaterials,
         placeholder: 'Filtrar por material',
         selectedId,
-        paginated: true,
         mapOption: mapSelectMaterialData,
         data: (params) => buildPaginatedSelectParams(params, {
             additionalParams: {
@@ -83,9 +83,11 @@ const attachMaterialHandler = ({
                     },           
                     onSave: (createdMaterial) => {
 
+                        createdMaterial = mapSelectMaterialData(createdMaterial);
+
                         toggleMaterialOption({
                             selector: baseSelector,
-                            data: mapSelectMaterialData(createdMaterial)
+                            data: JSON.parse(createdMaterial.material)
                         });
 
                         setMdbWrapperInputValue({
@@ -99,19 +101,13 @@ const attachMaterialHandler = ({
             return;
         }
 
-        const option = e.target.querySelector('option:checked');
+        const material = JSON.parse(data.material);
 
-        if (!option) return;
-
-        Object.entries(data).forEach(([key, value]) => {
-            option.dataset[key] = value;
-        });
-
-        const value = data.presentationName || '';
-
-        setMdbWrapperInputValue({
-            selector: `${ modalSelector } ${ wrapperSelector }`,
-            value
+        updatePresentationDisplay({
+            modalSelector,
+            data,
+            presentation: material.presentation,
+            option: e.target.querySelector('option:checked')
         });
     });
 };

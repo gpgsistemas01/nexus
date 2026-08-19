@@ -1,10 +1,8 @@
 import { getAllWastes } from "../../../application/warehouse/wastes.js";
 import { FILTER_SELECTORS, FORM_SELECTORS } from "../../../constants/selectors.js";
+import { updatePresentationDisplay } from "../../../ui/issues/issueFormUI.js";
 import { mapSelectWasteData } from "../../../utils/materialSelectUtils.js";
-import { buildPaginatedSelectParams, buildPaginatedSelectResults, initDomainSelect2, initFilterSelect2, setMdbWrapperInputValue, toggleSelectOption } from "../baseSelect.js";
-
-const wrapperSelector = FORM_SELECTORS.PRESENTATION_DISPLAY;
-const materialSelector = '#wasteFilter';
+import { buildPaginatedSelectParams, buildPaginatedSelectResults, initDomainSelect2, toggleSelectOption } from "../baseSelect.js";
 
 const initWasteSelect = ({
     modalSelector,
@@ -38,20 +36,13 @@ const attachWasteHandler = ({
     $(baseSelector).off('select2:select').on('select2:select', (e) => {
 
         const { data } = e.params;
+        const supplierMaterial = JSON.parse(data.supplierMaterial);
 
-        const option = e.target.querySelector('option:checked');
-
-        if (!option) return;
-
-        Object.entries(data).forEach(([key, value]) => {
-            option.dataset[key] = value;
-        });
-
-        const value = data.presentationName || '';
-
-        setMdbWrapperInputValue({
-            selector: `${ modalSelector } ${ wrapperSelector }`,
-            value
+        updatePresentationDisplay({
+            modalSelector,
+            data,
+            presentation: supplierMaterial.material.presentation,
+            option: e.target.querySelector('option:checked')
         });
     });
 };

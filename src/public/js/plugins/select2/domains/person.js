@@ -14,7 +14,6 @@ export const initPersonFilterSelect = ({
     getOptions: getAllPersons,
     placeholder: 'Filtrar por persona',
     selectedId,
-    paginated: true,
     mapOption: (person) => ({ id: person.id, text: person.fullName }),
     data: (params) => {
 

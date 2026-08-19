@@ -11,7 +11,6 @@ export const initRoleFilterSelect = ({ selectedId = null } = {}) => {
         placeholder: 'Filtrar por rol',
         selectedId,
         mapOption: (role) => ({ id: role.id, text: role.name }),
-        paginated: true,
         data: (params) => buildPaginatedSelectParams(params, { length: SELECT_RESULTS_LIMIT })
     });
 };

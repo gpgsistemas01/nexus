@@ -2,11 +2,11 @@ export const buildInventorySelectText = (item = {}, {
     useRowDimensions = false
 } = {}) => {
 
-    const supplierName = item.supplierMaterial?.supplier?.tradeName || item.supplierName || '';
-    const name = item.materialName || item.name || item.supplierMaterial?.material?.name || '';
-    const base = useRowDimensions ? item.base : item.materialBase ?? item.base;
-    const height = useRowDimensions ? item.height : item.materialHeight ?? item.height;
-    const dimensions = base == null || height == null
+    const supplierName = item.supplier?.tradeName || item.supplierMaterial?.supplier?.tradeName || '';
+    const name = item.material?.name || item.supplierMaterial?.material?.name || '';
+    const base = useRowDimensions ? item.base : item.base ?? item.material?.base ?? item.supplierMaterial?.material?.base;
+    const height = useRowDimensions ? item.height : item.height ?? item.material?.height ?? item.supplierMaterial?.material?.height;
+    const dimensions = base === null || height === null
         ? 'Sin medidas'
         : `${ base } × ${ height }`
     const itemIdentity = `${ name } (${ dimensions })`;
@@ -23,19 +23,11 @@ export const resolveMaterialPresentationName = (item = {}) => (
     || ''
 );
 
-export const mapSelectMaterialData = (material = {}) => ({
-    ...material,
-    id: material.id,
-    text: buildInventorySelectText(material),
-    materialName: material.name,
-    presentationName: resolveMaterialPresentationName(material),
-    unitMeasureName: material.unitMeasure?.name,
-    unitMeasureSymbol: material.unitMeasure?.symbol,
-    materialBase: material.base,
-    materialHeight: material.height,
-    currentStock: material.currentStock,
-    supplierName: material.supplier?.tradeName,
-    supplierId: material.supplier?.id
+export const mapSelectMaterialData = (supplierMaterial = {}) => ({
+    ...supplierMaterial,
+    text: buildInventorySelectText(supplierMaterial),
+    material: JSON.stringify(supplierMaterial.material),
+    supplier: JSON.stringify(supplierMaterial.supplier)
 });
 
 export const mapSelectWasteData = (waste = {}) => ({

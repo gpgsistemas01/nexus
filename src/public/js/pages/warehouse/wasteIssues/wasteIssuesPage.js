@@ -17,14 +17,13 @@ import { addWasteIssueDetailValidation, issueProjectQuantityDetailsValidation, w
 import { clearAddedItemInput, normalizeFormErrors } from '../../../ui/formUI.js';
 import { setMdbWrapperInputValue } from '../../../plugins/select2/baseSelect.js';
 import { applyIssueModalMode, bindIssueProjectQuantityControls, createIssueHeaderForm, createIssueTableActions, getPendingIssueSupplyDetails, initializeIssueModal, mapIssueSupplyDetails, useIssueForm } from '../../../ui/issues/issueFormUI.js';
-import { mapWasteIssueDetailDisplay } from '../../../utils/warehouse/issueDisplayUtils.js';
 import { getWasteIssueHeaderSelects } from '../../../plugins/select2/modules/wasteIssueSelect.js';
 import { createWarehouseIssueDetailsTable } from '../../../plugins/datatable/warehouseIssueDetailDatatable.js';
 import { roundTo } from '../../../utils/formatUtils.js';
 import { on } from '../../../utils/domUtils.js';
 import { UI_PERMISSIONS } from '../../../constants/permissions.js';
 import { refreshMaterialTable } from '../../../plugins/datatable/utils/renderMaterialDatatable.js';
-import { resolveMaterialPresentationName } from '../../../utils/materialSelectUtils.js';
+import { buildInventorySelectText } from '../../../utils/materialSelectUtils.js';
 
 const formId = FORM_SELECTORS.WASTE_ISSUE;
 const modalId = MODAL_SELECTORS.WASTE_ISSUE;
@@ -51,20 +50,8 @@ const setCurrentRequestDate = () => setDateTimePickerValue(
     new Date().toISOString()
 );
 
-const mapWasteIssueDetail = detail => {
-    const display = mapWasteIssueDetailDisplay(detail);
-
-    return {
-        ...display,
-        projectConvertedQuantity: detail.projectConvertedQuantity,
-        convertedQuantityDifference: detail.convertedQuantityDifference,
-        originalProjectConvertedQuantity: detail.projectConvertedQuantity ?? null,
-        originalConvertedQuantityDifference: detail.convertedQuantityDifference ?? null,
-        originalIsSupplied: detail.isSupplied
-    };
-};
-
 export const openWasteIssueModal = ({ mode, data = null }) => {
+
     initializeIssueModal({ form, issueHeaderForm, mode, data });
     details.length = 0;
 
@@ -75,7 +62,19 @@ export const openWasteIssueModal = ({ mode, data = null }) => {
         document.querySelector(FORM_SELECTORS.OBSERVATIONS_INPUT).value = data.observations || '';
         document.querySelector(FORM_SELECTORS.PROJECT_NUMBER).value = data.projectNumber || '';
 
-        details.push(...data.details.map(mapWasteIssueDetail));
+        details.push(...data.details.map({
+            id: detail.material.id,
+            name: buildInventorySelectText(detail),
+            base: roundTo(detail.supplierMaterial.material.base),
+            height: roundTo(detail.supplierMaterial.material.height),
+            quantity: detail.quantity,
+            unitMeasure: detail.supplierMaterial.material.unitMeasure.symbol,
+            presentation: detail.supplierMaterial.material.presentation.name,
+            convertedQuantity: roundTo(detail.convertedQuantity),
+            supplier: detail.supplierMaterial.supplier.name,
+            maxUnitCost: roundTo(detail.maxUnitCost),
+            supplierId: detail.supplierMaterial.supplier.id
+        }));
     }
 
     applyIssueModalMode({
@@ -100,14 +99,14 @@ const addWaste = () => {
 
     const option = document.querySelector(`${ FORM_SELECTORS.WASTE_INPUT } option:checked`);
 
-    let { id, text, base, height, supplierMaterial } = option?.dataset;
+    let { id, text, base, height, supplierMaterial } = option.dataset;
     supplierMaterial = JSON.parse(supplierMaterial);
-    const wasteId = option?.value || id;
+    const wasteId = option.value || id;
     const quantity = Number(document.querySelector(FORM_SELECTORS.QUANTITY_INPUT).value);
 
     const errors = validateFields(addWasteIssueDetailValidation, {
         wasteId,
-        quantity: quantityInput.value
+        quantity
     });
 
     normalizeFormErrors({ form, errors });
@@ -115,15 +114,15 @@ const addWaste = () => {
     if (hasValidationErrors(errors)) return;
 
     const waste = {
-        wasteId,
-        materialName: text,
+        id: wasteId,
+        name: text,
         base,
         height,
-        presentation: supplierMaterial?.material?.presentation?.name,
-        unitMeasure: supplierMaterial?.material?.unitMeasure?.symbol,
+        presentation: supplierMaterial.material.presentation.name,
+        unitMeasure: supplierMaterial.material.unitMeasure.symbol,
         quantity,
         convertedQuantity: base && height
-            ? roundTo(Number(base) * Number(height) * quantity)
+            ? roundTo(base * height * quantity)
             : quantity
     };
 
@@ -133,7 +132,6 @@ const addWaste = () => {
     else details.push(waste);
 
     refreshMaterialTable(details);
-
     clearAddedItemInput({
         itemSelector: FORM_SELECTORS.WASTE_INPUT,
         quantitySelector: FORM_SELECTORS.QUANTITY_INPUT,

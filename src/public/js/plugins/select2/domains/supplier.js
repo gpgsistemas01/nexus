@@ -12,7 +12,6 @@ export const initSupplierFilterSelect = ({
     getOptions: getAllSuppliers,
     placeholder: 'Filtrar por proveedor',
     selectedId,
-    paginated: true,
     mapOption: (supplier) => ({ id: supplier.id, text: supplier.tradeName })
 });
 

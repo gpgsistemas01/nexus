@@ -12,7 +12,6 @@ export const initClientFilterSelect = ({
     getOptions: getAllClients,
     placeholder: 'Filtrar por cliente',
     selectedId,
-    paginated: true,
     mapOption: (client) => ({ id: client.id, text: client.name })
 });
 

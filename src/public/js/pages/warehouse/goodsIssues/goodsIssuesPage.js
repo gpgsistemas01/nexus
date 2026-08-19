@@ -18,9 +18,9 @@ import { FORM_MODES } from "../../../constants/formModes.js";
 import { roundTo } from "../../../utils/formatUtils.js";
 import { applyIssueModalMode, bindIssueProjectQuantityControls, createIssueHeaderForm, createIssueTableActions, getPendingIssueSupplyDetails, initializeIssueModal, mapIssueSupplyDetails, useIssueForm } from "../../../ui/issues/issueFormUI.js";
 import { createIssueReturn } from "../../../ui/issues/issueReturnUI.js";
-import { mapGoodsIssueDetailDisplay } from "../../../utils/warehouse/issueDisplayUtils.js";
 import { createWarehouseIssueDetailsTable } from '../../../plugins/datatable/warehouseIssueDetailDatatable.js';
 import { refreshMaterialTable } from '../../../plugins/datatable/utils/renderMaterialDatatable.js';
+import { buildInventorySelectText } from "../../../utils/materialSelectUtils.js";
 
 const modalId = MODAL_SELECTORS.GOODS_ISSUE;
 const formId = FORM_SELECTORS.GOODS_ISSUE;
@@ -32,12 +32,6 @@ const modalElement = document.querySelector(modalId);
 const detailTableSelector = DATATABLE_SELECTORS.MATERIAL;
 const details = [];
 let currentGoodsIssue = null;
-
-const renderIssueDetails = () => createWarehouseIssueDetailsTable({
-    data: details,
-    mode: form.dataset.mode,
-    context
-});
 
 const issueHeaderForm = createIssueHeaderForm({
     formSelector: formId,
@@ -114,19 +108,21 @@ export const openGoodsIssueModal = ({ mode, data = null }) => {
         form.querySelector('#observationsInput').value = data.observations || '';
         setDateTimePickerValue(form.querySelector('#requestDateInput'), data.requestDate);
         form.querySelector('#projectNumberInput').value = data.projectNumber;
-        const modalDetails = data.details.map(detail => {
-            const display = mapGoodsIssueDetailDisplay(detail);
-
-            return {
-                ...display,
-                originalIsSupplied: detail.isSupplied,
-                originalProjectConvertedQuantity: detail.projectConvertedQuantity ?? null,
-                originalConvertedQuantityDifference: detail.convertedQuantityDifference ?? null
-            };
-        });
+        const modalDetails = data.details.map(detail => ({ 
+            id: detail.material.id,
+            name: buildInventorySelectText(detail),
+            base: roundTo(detail.material.base),
+            height: roundTo(detail.material.height),
+            quantity: detail.quantity,
+            unitMeasure: detail.material.unitMeasure.symbol,
+            presentation: detail.material.presentation.name,
+            convertedQuantity: roundTo(detail.convertedQuantity),
+            supplier: detail.supplier.name,
+            maxUnitCost: detail.maxUnitCost,
+            supplierId: detail.supplier.id
+         }));
 
         details.push(...modalDetails);
-
     }
 
     applyIssueModalMode({
@@ -140,7 +136,11 @@ export const openGoodsIssueModal = ({ mode, data = null }) => {
         returnAction: 'Devolver materiales surtidos de la'
     });
 
-    renderIssueDetails();
+    createWarehouseIssueDetailsTable({
+        data: details,
+        mode: form.dataset.mode,
+        context
+    });
 
     openModal(modalElement);
 };
@@ -154,16 +154,14 @@ const addMaterial = () => {
 
     const option = document.querySelector(`${ FORM_SELECTORS.MATERIAL } option:checked`);
 
-    let { materialBase, materialHeight, presentationName, unitMeasureName, materialName, supplierName, supplierId, maxUnitCost } = option?.dataset || {};
-    materialHeight = Number(materialHeight);
-    materialBase = Number(materialBase);
-
-    const materialId = option?.value;
+    let { text, material, supplier, maxUnitCost } = option.dataset || {};
+    material = JSON.parse(material);
+    supplier = JSON.parse(supplier);
     const quantity = Number(document.querySelector(FORM_SELECTORS.QUANTITY_INPUT).value);
 
     const errors = validateFields(addGoodsIssueMaterialValidation, {
-        materialId,
-        supplierId,
+        materialId: material.id,
+        supplierId: supplier.id,
         quantity
     });
 
@@ -173,39 +171,28 @@ const addMaterial = () => {
 
     if (!option) return null;
 
-    let convertedQuantity;
-
-    if (!materialBase || !materialHeight) {
-
-        materialBase = null;
-        materialHeight = null;
-        convertedQuantity = quantity;
-
-    } else {
-
-        convertedQuantity = roundTo(materialBase * materialHeight * quantity);
-    }
-
-    const material = {
-        materialId,
-        materialName,
-        materialBase,
-        materialHeight,
+    const newMaterial = {
+        id: material.id,
+        name: text,
+        base: material.base,
+        height: material.height,
         quantity,
-        unitMeasureName,
-        presentationName,
-        convertedQuantity,
-        supplierName,
+        unitMeasure: material.unitMeasure.symbol,
+        presentation: material.presentation.name,
+        convertedQuantity: (!material.base || !material.height)
+            ? quantity
+            : roundTo(material.base * material.height * quantity),
+        supplier: supplier.name,
         maxUnitCost,
-        supplierId,
+        supplierId: supplier.id
     };
 
     const existingIndex = details.findIndex(detail => (
-        detail.materialId === materialId && detail.supplierId === supplierId
+        detail.id === material.id && detail.supplierId === supplier.id
     ));
 
-    if (existingIndex >= 0) details.splice(existingIndex, 1, material);
-    else details.push(material);
+    if (existingIndex >= 0) details.splice(existingIndex, 1, newMaterial);
+    else details.push(newMaterial);
 
     refreshMaterialTable(details);
     clearAddedMaterialInput();

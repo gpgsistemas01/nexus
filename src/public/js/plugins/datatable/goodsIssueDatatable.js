@@ -23,5 +23,4 @@ export const createGoodsIssueDatatable = async ({ context, onCreate, onEdit, onE
         },
         actions: { onEdit, onEditDetails, onReturnDetails }
     });
-
 };

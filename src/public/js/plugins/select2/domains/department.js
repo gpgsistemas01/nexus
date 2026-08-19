@@ -11,7 +11,6 @@ export const initDepartmentFilterSelect = ({
     getOptions: getAllDepartments,
     placeholder: 'Filtrar por área',
     selectedId,
-    paginated: true,
     mapOption: (department) => ({ id: department.id, text: department.name })
 });
 

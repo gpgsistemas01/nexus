@@ -216,9 +216,9 @@ export const findAllSupplierMaterials = async ({
     ]);
 
     return {
-        data: sorted.map(supplierMaterial => mapSupplierMaterial({
+        data: sorted.map(supplierMaterial => ({
             ...supplierMaterial,
-            canDelete: deletableMaterialIds.has(supplierMaterial.material.id)
+            ...(deletableMaterialIds.has(supplierMaterial.material.id) ? { canDelete: true } : { canDelete: false })
         })),
         recordsTotal: total,
         recordsFiltered: filtered

@@ -82,7 +82,7 @@ export const initbaseSelect2 = ({
     searchDelay = 1000,
     placeholder,
     processResults,
-    data = () => ({}),
+    data = () => null,
     tags = false,
     createTag = (params) => {
 
@@ -159,12 +159,6 @@ export const initbaseSelect2 = ({
     });
 }
 
-
-export const mapValueLabelToSelectData = (item) => ({
-    id: item.value,
-    text: item.label
-});
-
 export const createNewSelectTag = ({
     term,
     label
@@ -204,32 +198,22 @@ export const initFilterSelect2 = ({
     getOptions,
     placeholder,
     selectedId = null,
-    data = () => ({}),
-    mapOption = mapValueLabelToSelectData,
-    processResults = null,
-    clearWhenEmpty = true,
-    paginated = false
+    data = () => null,
+    mapOption = (item) => ({
+        id: item.value,
+        text: item.label
+    }),
+    clearWhenEmpty = true
 }) => {
 
     initbaseSelect2({
         baseSelector: selector,
         containerSelector: 'body',
-        get: paginated
-            ? getOptions
-            : async (params) => ({ data: await getOptions(params) }),
+        get: getOptions,
         clearOnOpen: false,
         placeholder,
         data,
-        processResults: processResults || (paginated
-            ? (response, params) => buildPaginatedSelectResults(response, params, { mapItem: mapOption })
-            : (response) => {
-
-                const list = response.data || response;
-
-                return {
-                    results: list.map(mapOption)
-                };
-            })
+        processResults: (response, params) => buildPaginatedSelectResults(response, params, { mapItem: mapOption })
     });
 
     applySelectedSelectValue({

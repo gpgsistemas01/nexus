@@ -189,15 +189,14 @@ export const buildDetailsColumns = ({ type, mode, render, canManageProjectQuanti
 
     const columns = [
         {
-            data: null,
-            render
+            data: 'name'
         },
         {
             data: row => row.base ?? null,
             render: formatDecimal
         },
         {
-            data: row => row.heights ?? null,
+            data: row => row.height ?? null,
             render: formatDecimal
         },
         { data: 'quantity', render: formatDecimal },
@@ -226,7 +225,7 @@ export const buildDetailsColumns = ({ type, mode, render, canManageProjectQuanti
                 data: 'projectConvertedQuantity',
                 render: (value, _, row) => {
 
-                    const detailId = row.id || row.wasteId || row.materialId;
+                    const detailId = row.id;
                     const isEditableDetail = mode === FORM_MODES.EDIT_DETAIL && !row.originalIsSupplied;
                     const isProjectQuantityDisabled = !isEditableDetail || !row.isSupplied;
 
@@ -266,7 +265,7 @@ export const buildDetailsColumns = ({ type, mode, render, canManageProjectQuanti
             responsivePriority: 1,
             render: (_, __, row) => {
 
-                const detailId = row.id || row.wasteId || row.materialId;
+                const detailId = row.id;
                 const isEditableDetail = mode === FORM_MODES.EDIT_DETAIL && !row.originalIsSupplied;
 
                 return renderIssueSupplyCheckbox({
@@ -351,7 +350,7 @@ export const buildDetailsColumns = ({ type, mode, render, canManageProjectQuanti
                     className: 'delete-btn',
                     label: isSuppliedDetail ? 'El detalle ya fue surtido' : 'Eliminar detalle',
                     htmlAttrs: {
-                        'data-id': row.wasteId || row.materialId,
+                        'data-id': row.id,
                         disabled: isSuppliedDetail
                     }
                 });
