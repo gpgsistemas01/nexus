@@ -193,11 +193,11 @@ export const buildDetailsColumns = ({ type, mode, render, canManageProjectQuanti
             render
         },
         {
-            data: row => row.waste?.base ?? row.materialBase ?? row.material?.base ?? null,
+            data: row => row.base ?? null,
             render: formatDecimal
         },
         {
-            data: row => row.waste?.height ?? row.materialHeight ?? row.material?.height ?? null,
+            data: row => row.heights ?? null,
             render: formatDecimal
         },
         { data: 'quantity', render: formatDecimal },
@@ -211,11 +211,11 @@ export const buildDetailsColumns = ({ type, mode, render, canManageProjectQuanti
             { data: 'returnedQuantity', render: formatDecimal }
         ] : []),
         {
-            data: row => row.presentationName ?? row.material?.presentation?.name ?? ''
+            data: row => row.presentation ?? ''
         },
         { data: 'convertedQuantity', render: formatDecimal },
         {
-            data: row => row.unitMeasureName ?? row.material?.unitMeasure?.name ?? ''
+            data: row => row.unitMeasure ?? ''
         },
     ];
 

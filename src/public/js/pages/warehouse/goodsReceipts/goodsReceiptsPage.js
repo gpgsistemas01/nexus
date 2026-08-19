@@ -219,7 +219,7 @@ const addMaterial = () => {
 
     const materialId = option.value;
 
-    const quantity = Number(document.querySelector(FORM_SELECTORS.QUANTITY).value);
+    const quantity = Number(document.querySelector(FORM_SELECTORS.QUANTITY_INPUT).value);
     const costPerUnitType = Number(document.querySelector(FORM_SELECTORS.COST_PER_UNIT).value);
     const errors = validateFields(addGoodsReceiptMaterialValidation, {
         materialId,

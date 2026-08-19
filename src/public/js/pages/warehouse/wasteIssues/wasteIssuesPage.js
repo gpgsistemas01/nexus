@@ -18,7 +18,7 @@ import { clearAddedItemInput, normalizeFormErrors } from '../../../ui/formUI.js'
 import { setMdbWrapperInputValue } from '../../../plugins/select2/baseSelect.js';
 import { applyIssueModalMode, bindIssueProjectQuantityControls, createIssueHeaderForm, createIssueTableActions, getPendingIssueSupplyDetails, initializeIssueModal, mapIssueSupplyDetails, useIssueForm } from '../../../ui/issues/issueFormUI.js';
 import { mapWasteIssueDetailDisplay } from '../../../utils/warehouse/issueDisplayUtils.js';
-import { createWasteIssueSelect, getWasteIssueHeaderSelects } from '../../../plugins/select2/modules/wasteIssueSelect.js';
+import { getWasteIssueHeaderSelects } from '../../../plugins/select2/modules/wasteIssueSelect.js';
 import { createWarehouseIssueDetailsTable } from '../../../plugins/datatable/warehouseIssueDetailDatatable.js';
 import { roundTo } from '../../../utils/formatUtils.js';
 import { on } from '../../../utils/domUtils.js';
@@ -32,7 +32,7 @@ const WASTE_ISSUE_ENTITY_NAME = 'salida de merma';
 
 const form = document.querySelector(formId);
 const context = window.meta || {};
-const wasteSelect = document.querySelector(FORM_SELECTORS.WASTE_ISSUE_WASTE);
+const wasteSelect = document.querySelector(FORM_SELECTORS.WASTE_INPUT);
 const details = [];
 const modalElement = document.querySelector(modalId);
 const detailTableSelector = DATATABLE_SELECTORS.MATERIAL;
@@ -41,30 +41,15 @@ const issueHeaderForm = createIssueHeaderForm({
     formSelector: formId,
     selects: getWasteIssueHeaderSelects()
 });
-const wasteIssueSelect = createWasteIssueSelect({
-    selector: FORM_SELECTORS.WASTE_ISSUE_WASTE,
-    modalSelector: modalId
-});
 const wasteIssueReturn = createIssueReturn({
     prefix: 'wasteIssue',
     sendReturn: returnWasteIssueDetail
-});
-const setPresentationDisplay = value => setMdbWrapperInputValue({
-    selector: presentationDisplaySelector,
-    value
 });
 
 const setCurrentRequestDate = () => setDateTimePickerValue(
     document.querySelector(FORM_SELECTORS.WASTE_ISSUE_DATE),
     new Date().toISOString()
 );
-
-const renderIssueDetails = () => createWarehouseIssueDetailsTable({
-    data: details,
-    mode: form.dataset.mode,
-    context,
-    projectQuantityPermission: UI_PERMISSIONS.WASTE_ISSUES_SUPPLY
-});
 
 const mapWasteIssueDetail = detail => {
     const display = mapWasteIssueDetailDisplay(detail);
@@ -81,18 +66,16 @@ const mapWasteIssueDetail = detail => {
 
 export const openWasteIssueModal = ({ mode, data = null }) => {
     initializeIssueModal({ form, issueHeaderForm, mode, data });
-    setPresentationDisplay('');
     details.length = 0;
 
     if (mode === FORM_MODES.CREATE) {
         setCurrentRequestDate();
     } else {
         setDateTimePickerValue(document.querySelector(FORM_SELECTORS.WASTE_ISSUE_DATE), data.requestDate);
-        document.querySelector(FORM_SELECTORS.WASTE_ISSUE_OBSERVATIONS).value = data.observations || '';
+        document.querySelector(FORM_SELECTORS.OBSERVATIONS_INPUT).value = data.observations || '';
         document.querySelector(FORM_SELECTORS.PROJECT_NUMBER).value = data.projectNumber || '';
 
         details.push(...data.details.map(mapWasteIssueDetail));
-
     }
 
     applyIssueModalMode({
@@ -104,27 +87,23 @@ export const openWasteIssueModal = ({ mode, data = null }) => {
         createTitle: 'Registrar salida de merma'
     });
 
-    renderIssueDetails();
+    createWarehouseIssueDetailsTable({
+        data: details,
+        mode: form.dataset.mode,
+        context,
+        projectQuantityPermission: UI_PERMISSIONS.WASTE_ISSUES_SUPPLY
+    })
     openModal(modalElement);
 };
 
-on('change', FORM_SELECTORS.WASTE_ISSUE_WASTE, () => {
-
-    const waste = wasteIssueSelect.getSelected();
-
-    setPresentationDisplay(resolveMaterialPresentationName(waste));
-});
-
 const addWaste = () => {
 
-    const option = document.querySelector(`${ FORM_SELECTORS.MATERIAL } option:checked`);
+    const option = document.querySelector(`${ FORM_SELECTORS.WASTE_INPUT } option:checked`);
 
-    let { base, height, presentation, unitMeasure, materialName, supplier, maxUnitCost } = option?.dataset || {};
-    height = Number(height);
-    base = Number(base);
-
-    const wasteId = option?.value;
-    const quantity = Number(document.querySelector(FORM_SELECTORS.QUANTITY).value);
+    let { id, text, base, height, supplierMaterial } = option?.dataset;
+    supplierMaterial = JSON.parse(supplierMaterial);
+    const wasteId = option?.value || id;
+    const quantity = Number(document.querySelector(FORM_SELECTORS.QUANTITY_INPUT).value);
 
     const errors = validateFields(addWasteIssueDetailValidation, {
         wasteId,
@@ -137,12 +116,11 @@ const addWaste = () => {
 
     const waste = {
         wasteId,
-        materialName: materialName,
-        supplierName: supplier?.tradeName,
-        materialBase: base,
-        materialHeight: height,
-        presentationName: presentation.name,
-        unitMeasureName: unitMeasure?.name,
+        materialName: text,
+        base,
+        height,
+        presentation: supplierMaterial?.material?.presentation?.name,
+        unitMeasure: supplierMaterial?.material?.unitMeasure?.symbol,
         quantity,
         convertedQuantity: base && height
             ? roundTo(Number(base) * Number(height) * quantity)
@@ -157,8 +135,8 @@ const addWaste = () => {
     refreshMaterialTable(details);
 
     clearAddedItemInput({
-        itemSelector: FORM_SELECTORS.WASTE_ISSUE_WASTE,
-        quantitySelector: FORM_SELECTORS.WASTE_ISSUE_QUANTITY,
+        itemSelector: FORM_SELECTORS.WASTE_INPUT,
+        quantitySelector: FORM_SELECTORS.QUANTITY_INPUT,
         presentationSelector: presentationDisplaySelector
     });
 };

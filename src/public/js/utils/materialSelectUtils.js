@@ -1,20 +1,19 @@
 export const buildInventorySelectText = (item = {}, {
-    supplierName: supplierOverride = null,
     useRowDimensions = false
 } = {}) => {
 
-    const supplierName = supplierOverride || item.supplier?.tradeName || item.supplierName || '';
-    const materialName = item.materialName || item.material?.name || item.name || '';
-    const materialBase = useRowDimensions ? item.base : item.materialBase ?? item.material?.base ?? item.base;
-    const materialHeight = useRowDimensions ? item.height : item.materialHeight ?? item.material?.height ?? item.height;
-    const dimensions = item.base == null || item.height == null
+    const supplierName = item.supplierMaterial?.supplier?.tradeName || item.supplierName || '';
+    const name = item.materialName || item.name || item.supplierMaterial?.material?.name || '';
+    const base = useRowDimensions ? item.base : item.materialBase ?? item.base;
+    const height = useRowDimensions ? item.height : item.materialHeight ?? item.height;
+    const dimensions = base == null || height == null
         ? 'Sin medidas'
-        : `${ item.base } × ${ item.height }`
-    const materialIdentity = `${ materialName } (${ dimensions })`;
+        : `${ base } × ${ height }`
+    const itemIdentity = `${ name } (${ dimensions })`;
 
     return supplierName
-        ? `${ materialIdentity } · ${ supplierName }`
-        : materialIdentity;
+        ? `${ itemIdentity } · ${ supplierName }`
+        : itemIdentity;
 };
 
 export const resolveMaterialPresentationName = (item = {}) => (
@@ -24,7 +23,8 @@ export const resolveMaterialPresentationName = (item = {}) => (
     || ''
 );
 
-export const mapSelectData = (material = {}) => ({
+export const mapSelectMaterialData = (material = {}) => ({
+    ...material,
     id: material.id,
     text: buildInventorySelectText(material),
     materialName: material.name,
@@ -38,6 +38,11 @@ export const mapSelectData = (material = {}) => ({
     supplierId: material.supplier?.id
 });
 
+export const mapSelectWasteData = (waste = {}) => ({
+    ...waste,
+    text: buildInventorySelectText(waste),
+    supplierMaterial: JSON.stringify(waste.supplierMaterial)
+});
 
 export const mapSupplierMaterialToSelectData = (supplierMaterial = {}) => {
 

@@ -5,13 +5,12 @@ const resolveCatalogDisplay = ({ detail, item, supplier, materialId }) => ({
     materialId,
     materialName: detail.materialName ?? item?.name ?? '',
     supplierName: detail.supplierName ?? supplier?.tradeName ?? '',
-    materialBase: detail.materialBase ?? detail.base ?? item?.base ?? null,
-    materialHeight: detail.materialHeight ?? detail.height ?? item?.height ?? null,
+    base: detail.materialBase ?? detail.base ?? item?.base ?? null,
+    height: detail.materialHeight ?? detail.height ?? item?.height ?? null,
     presentationId: detail.presentationId ?? item?.presentation?.id ?? null,
     unitMeasureId: detail.unitMeasureId ?? item?.unitMeasure?.id ?? null,
-    presentationName: detail.presentationName ?? item?.presentation?.name ?? '',
-    unitMeasureName: detail.unitMeasureName ?? item?.unitMeasure?.name ?? '',
-    unitMeasureSymbol: detail.unitMeasureSymbol ?? item?.unitMeasure?.symbol ?? ''
+    presentation: detail.presentationName ?? item?.presentation?.name ?? '',
+    unitMeasure: detail.unitMeasureSymbol ?? item?.unitMeasure?.symbol ?? ''
 });
 
 export const mapWasteIssueDetailDisplay = detail => {
@@ -34,5 +33,3 @@ export const mapGoodsIssueDetailDisplay = detail => resolveCatalogDisplay({
     supplier: detail.supplier,
     materialId: detail.materialId
 });
-
-export const formatWasteSelectOption = waste => buildInventorySelectText(waste);

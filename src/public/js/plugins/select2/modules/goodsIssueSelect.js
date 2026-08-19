@@ -1,4 +1,3 @@
-import { MATERIAL_SELECT_RESULTS_LIMIT } from '../../../application/warehouse/materials.js';
 import { FORM_SELECTORS, MODAL_SELECTORS } from '../../../constants/selectors.js';
 import { setupMaterialSelect, toggleMaterialOption } from '../domains/material.js';
 import { createIssueHeaderSelects } from './issueHeaderSelect.js';

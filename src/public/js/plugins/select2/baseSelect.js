@@ -25,7 +25,7 @@ export const buildPaginatedSelectResults = (response, params = {}, {
     mapItem = (item) => item
 } = {}) => {
     const page = Number(params.page) || 1;
-    const list = response.data || response;
+    let list = JSON.parse(JSON.stringify(response.data || response));
     const recordsFiltered = Number(response.recordsFiltered) || list.length;
 
     return {

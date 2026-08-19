@@ -159,7 +159,7 @@ const addMaterial = () => {
     materialBase = Number(materialBase);
 
     const materialId = option?.value;
-    const quantity = Number(document.querySelector(FORM_SELECTORS.QUANTITY).value);
+    const quantity = Number(document.querySelector(FORM_SELECTORS.QUANTITY_INPUT).value);
 
     const errors = validateFields(addGoodsIssueMaterialValidation, {
         materialId,

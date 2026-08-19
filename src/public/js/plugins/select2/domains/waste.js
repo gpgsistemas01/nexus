@@ -1,6 +1,6 @@
 import { getAllWastes } from "../../../application/warehouse/wastes.js";
 import { FILTER_SELECTORS, FORM_SELECTORS } from "../../../constants/selectors.js";
-import { mapSelectData } from "../../../utils/materialSelectUtils.js";
+import { mapSelectWasteData } from "../../../utils/materialSelectUtils.js";
 import { buildPaginatedSelectParams, buildPaginatedSelectResults, initDomainSelect2, initFilterSelect2, setMdbWrapperInputValue, toggleSelectOption } from "../baseSelect.js";
 
 const wrapperSelector = FORM_SELECTORS.PRESENTATION_DISPLAY;
@@ -16,7 +16,7 @@ const initWasteSelect = ({
     containerSelector: modalSelector,
     get: getAllWastes,
     placeholder: 'Buscar merma...',
-    mapOption: mapSelectData,
+    mapOption: mapSelectWasteData,
     data: (params) => buildPaginatedSelectParams(params, {
         additionalParams: {
             supplierId: supplierSelector

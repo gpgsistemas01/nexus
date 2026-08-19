@@ -11,8 +11,6 @@ import { PRISMA_ERROR_CODES } from "../../../constants/prisma.js";
 
 const serviceLogger = createServiceLogger('warehouse.wasteService');
 
-
-
 const handleWasteServiceError = ({ err, fallbackError }) => {
 
     if (err.code === PRISMA_ERROR_CODES.RECORD_NOT_FOUND) {
@@ -56,32 +54,6 @@ const WASTE_INCLUDE = {
             }
         }
     }
-};
-
-const mapWaste = (waste) => {
-
-    const { supplierMaterial } = waste;
-    const { material, supplier } = supplierMaterial || {};
-
-    return {
-        id: waste.id,
-        supplierMaterialId: waste.supplierMaterialId,
-        supplierMaterial: supplierMaterial ? { ...supplierMaterial } : null,
-        materialId: material?.id,
-        materialName: material?.name,
-        name: material?.name,
-        isActive: waste.isActive,
-        base: waste.base,
-        height: waste.height,
-        minStock: waste.minStock,
-        currentStock: waste.currentStock,
-        convertedQuantity: waste.convertedQuantity,
-        maxUnitCost: supplierMaterial?.maxUnitCost ?? null,
-        presentation: material?.presentation ?? null,
-        unitMeasure: material?.unitMeasure ?? null,
-        material,
-        supplier
-    };
 };
 
 const findWasteBySupplierMaterialAndDimensions = async ({ tx, supplierMaterialId, base, height, excludeId = null }) => {
@@ -182,7 +154,7 @@ export const findAllWastes = async ({
     const filtered = await db.waste.count({ where });
 
     return {
-        data: wastes.map(mapWaste),
+        data: wastes,
         recordsTotal: total,
         recordsFiltered: filtered
     };

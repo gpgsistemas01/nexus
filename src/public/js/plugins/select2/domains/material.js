@@ -1,7 +1,7 @@
 import { openMaterialModal } from "../../../pages/warehouse/materials/materialModal.js";
 import { getAllMaterials } from "../../../application/warehouse/materials.js";
 import { buildPaginatedSelectParams, buildPaginatedSelectResults, initDomainSelect2, initFilterSelect2, runAfterSelect2Close, SELECT_RESULTS_LIMIT, setMdbWrapperInputValue, toggleSelectOption } from "../baseSelect.js";
-import { mapSelectData } from "../../../utils/materialSelectUtils.js";
+import { mapSelectMaterialData } from "../../../utils/materialSelectUtils.js";
 import { FORM_SELECTORS, FILTER_SELECTORS } from "../../../constants/selectors.js";
 
 const wrapperSelector = FORM_SELECTORS.PRESENTATION_DISPLAY;
@@ -20,7 +20,7 @@ export const initMaterialFilterSelect = ({
         placeholder: 'Filtrar por material',
         selectedId,
         paginated: true,
-        mapOption: mapSelectData,
+        mapOption: mapSelectMaterialData,
         data: (params) => buildPaginatedSelectParams(params, {
             additionalParams: {
                 supplierId: supplierFilterSelector
@@ -41,7 +41,7 @@ const initMaterialSelect = ({
     containerSelector: modalSelector,
     get: getAllMaterials,
     placeholder: 'Buscar material...',
-    mapOption: mapSelectData,
+    mapOption: mapSelectMaterialData,
     data: (params) => buildPaginatedSelectParams(params, {
         additionalParams: {
             supplierId: supplierSelector
@@ -85,7 +85,7 @@ const attachMaterialHandler = ({
 
                         toggleMaterialOption({
                             selector: baseSelector,
-                            data: mapSelectData(createdMaterial)
+                            data: mapSelectMaterialData(createdMaterial)
                         });
 
                         setMdbWrapperInputValue({
