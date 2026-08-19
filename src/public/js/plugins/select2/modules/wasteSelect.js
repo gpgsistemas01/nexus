@@ -58,12 +58,12 @@ export const setWasteSelectOptions = ({ modalSelector, data = null }) => {
 
     [
         [toggleSupplierMaterialOption, {
-            selector: getInputMaterialSelector(modalSelector),
+            selector: scoped.material,
             data: data ? mapSupplierMaterialToSelectData(data) : null,
             modalSelector
         }],
         [toggleReasonOption, {
-            selector: getInputReasonSelector(modalSelector),
+            selector: scoped.reason,
             id: data?.reason?.id,
             name: data?.reason?.name
         }]
