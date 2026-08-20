@@ -1,9 +1,14 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+  getBase,
+  getHeight,
   getMaterialName,
   getPresentation,
+  getPresentationId,
   getSupplierName,
+  getUnitMeasure,
+  getUnitMeasureId,
   mapGoodsIssueDetailsToRequest,
   mapIssueDetailToTable,
   mapSelectMaterialData
@@ -22,6 +27,28 @@ describe('select de material reutilizado por el CRUD de merma', () => {
     expect(getSupplierName(waste)).toBe('Proveedor Norte');
     expect(getMaterialName({ name: 'Lámina' })).toBe('Lámina');
     expect(getSupplierName({ supplier: 'Proveedor capturado' })).toBe('Proveedor capturado');
+  });
+
+  it('centraliza los campos canónicos y las relaciones Prisma del detalle CRUD', () => {
+    const prismaDetail = {
+      material: {
+        base: 2,
+        height: 3,
+        presentation: { id: 'presentation-1', name: 'ROLLO' },
+        unitMeasure: { id: 'unit-1', symbol: 'm²' }
+      },
+      supplier: { tradeName: 'Proveedor Prisma' }
+    };
+
+    expect(getBase(prismaDetail)).toBe(2);
+    expect(getHeight(prismaDetail)).toBe(3);
+    expect(getPresentation(prismaDetail)).toBe('ROLLO');
+    expect(getPresentationId(prismaDetail)).toBe('presentation-1');
+    expect(getUnitMeasure(prismaDetail)).toBe('m²');
+    expect(getUnitMeasureId(prismaDetail)).toBe('unit-1');
+    expect(getSupplierName(prismaDetail)).toBe('Proveedor Prisma');
+    expect(getPresentation({ presentation: 'PIEZA' })).toBe('PIEZA');
+    expect(getUnitMeasure({ unitMeasure: 'pza' })).toBe('pza');
   });
 
   it('conserva el id proveedor-material del listado sin duplicar su presentación', () => {

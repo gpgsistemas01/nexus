@@ -1,7 +1,6 @@
 import { DATATABLE_SELECTORS } from '../../constants/selectors.js';
 import { createIssueDetailDatatable } from './issueDetailDatatable.js';
 import { buildDetailsColumns, buildDetailsHeader } from './utils/builderDetailDatatable.js';
-import { renderWarehouseItemName } from './utils/detailDatatableUtils.js';
 import { hasPermission, UI_PERMISSIONS } from '../../constants/permissions.js';
 
 export const buildWarehouseIssueDetailsConfig = ({
@@ -17,10 +16,7 @@ export const buildWarehouseIssueDetailsConfig = ({
 
     return {
         header: buildDetailsHeader(tableContext),
-        columns: buildDetailsColumns({
-            ...tableContext,
-            render: (_, __, detail) => renderWarehouseItemName(detail)
-        })
+        columns: buildDetailsColumns(tableContext)
     };
 };
 

@@ -179,7 +179,7 @@ export const buildDetailsHeader = ({ type, mode, canManageProjectQuantity = fals
     `;
 };
 
-export const buildDetailsColumns = ({ type, mode, render, canManageProjectQuantity = false }) => {
+export const buildDetailsColumns = ({ type, mode, canManageProjectQuantity = false }) => {
 
     bindDisabledControlWarning({
         eventTargetSelector: '#materialTable td',

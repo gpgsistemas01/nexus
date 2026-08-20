@@ -45,6 +45,14 @@ Se deben incorporar como integraciones desde controller, no restaurar como prueb
 - personas y usuarios con sus relaciones;
 - salidas de material y afectación de stock (las salidas de merma ya cuentan con
   integración HTTP, persistencia, movimiento y verificación de rollback);
-- entradas de compra, movimientos y costos;
+- entradas de compra: el contrato frontend del select compartido, incluida la selección
+  posterior a crear material, se normaliza a la misma fila de detalle usada por salidas;
+  la API entrega cada detalle con todos sus campos persistidos y relaciones, sin construir
+  una representación de tabla en el backend; el mapeo de alta/lectura —incluida la
+  conservación de campos crudos— y el cálculo reutilizado por correcciones tienen cobertura en
+  `tests/unit/public/js/pages/warehouse/goodsReceipts`. Los getters compartidos concentran
+  la fila canónica y las relaciones Prisma, sin alias planos de presentación o unidad, y
+  se cubren en la ubicación existente `tests/utils`; continúa pendiente la integración
+  HTTP de persistencia, movimientos y rollback;
 - ajustes de material y movimientos de inventario;
 - requisiciones de compra completas.

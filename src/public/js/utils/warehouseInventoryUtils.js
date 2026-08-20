@@ -1,13 +1,42 @@
-export const getBase = (item) => item.base ?? item.material?.base ?? item.supplierMaterial?.material?.base;
-export const getHeight = (item) => item.height ?? item.material?.height ?? item.supplierMaterial?.material?.height;
-export const getPresentation = (item) => item.presentation?.name ?? item.material?.presentation?.name ?? item.supplierMaterial?.material?.presentation?.name;
-export const getUnitMeasure = (item) => item.material?.unitMeasure?.symbol ?? item.supplierMaterial?.material?.unitMeasure?.symbol;
+export const getBase = (item = {}) => (
+    item.base ?? item.material?.base ?? item.supplierMaterial?.material?.base ?? null
+);
+export const getHeight = (item = {}) => (
+    item.height ?? item.material?.height ?? item.supplierMaterial?.material?.height ?? null
+);
+export const getPresentation = (item = {}) => (
+    (typeof item.presentation === 'string' ? item.presentation : item.presentation?.name)
+    ?? item.material?.presentation?.name
+    ?? item.supplierMaterial?.material?.presentation?.name
+    ?? ''
+);
+export const getPresentationId = (item = {}) => (
+    item.presentationId
+    ?? item.presentation?.id
+    ?? item.material?.presentation?.id
+    ?? item.supplierMaterial?.material?.presentation?.id
+    ?? null
+);
+export const getUnitMeasure = (item = {}) => (
+    (typeof item.unitMeasure === 'string' ? item.unitMeasure : item.unitMeasure?.symbol)
+    ?? item.material?.unitMeasure?.symbol
+    ?? item.supplierMaterial?.material?.unitMeasure?.symbol
+    ?? ''
+);
+export const getUnitMeasureId = (item = {}) => (
+    item.unitMeasureId
+    ?? item.unitMeasure?.id
+    ?? item.material?.unitMeasure?.id
+    ?? item.supplierMaterial?.material?.unitMeasure?.id
+    ?? null
+);
 export const getMaxUnitCost = (item) => item.maxUnitCost ?? item.supplierMaterial?.maxUnitCost;
 export const getCurrentStock = (item) => item.currentStock ?? item.supplierMaterial?.currentStock;
 export const getMinStock = (item) => item.minStock ?? item.supplierMaterial?.minStock;
 export const getMaterialName = (item = {}) => (
     item.material?.name
     ?? item.supplierMaterial?.material?.name
+    ?? item.materialName
     ?? item.name
     ?? ''
 );
@@ -25,7 +54,7 @@ export const buildInventorySelectText = (item = {}) => {
     const name = getMaterialName(item);
     const base = getBase(item);
     const height = getHeight(item);
-    const dimensions = base === null || height === null
+    const dimensions = base == null || height == null
         ? 'Sin medidas'
         : `${ base } × ${ height }`;
     const itemIdentity = `${ name } (${ dimensions })`;
@@ -80,7 +109,7 @@ export const mapIssueDetailToTable = (detail = {}) => {
             : hasMaterialId ? {
                 materialId,
                 supplierId: detail.supplierId ?? detail.supplier?.id,
-                presentationId: detail.presentationId ?? detail.material?.presentation?.id
+                presentationId: getPresentationId(detail)
             } : {}),
         name: buildInventorySelectText(inventoryItem),
         base: getBase(inventoryItem),

@@ -3,6 +3,7 @@ import { clearFormErrors } from "../../../../ui/formUI.js";
 import { formatCurrency, formatDecimal, roundTo } from "../../../../utils/formatUtils.js";
 import { on } from "../../../../utils/domUtils.js";
 import { GOODS_RECEIPT_CORRECTION_APPLIED_EVENT, initGoodsReceiptCorrectionForm } from "./correctionForm.js";
+import { calculateGoodsReceiptDetailAmounts } from '../goodsReceiptDetails.js';
 
 export { GOODS_RECEIPT_CORRECTION_APPLIED_EVENT };
 
@@ -17,17 +18,18 @@ const CORRECTION_TOTAL_SELECTORS = {
 const getModal = () => document.querySelector(CORRECTION_MODAL_SELECTOR);
 const getForm = () => document.querySelector(CORRECTION_FORM_SELECTOR);
 
-const IVA_RATE = 1.16;
-
 const calculateCorrectionTotals = ({ receipt, currentDetail, formData }) => {
-    const correctedQuantity = Number(formData.quantity || 0);
-    const correctedNetPurchaseAmount = roundTo(correctedQuantity * Number(formData.costPerUnitType || 0));
-    const correctedGrossPurchaseAmount = roundTo(correctedNetPurchaseAmount * IVA_RATE);
+    const corrected = calculateGoodsReceiptDetailAmounts({
+        quantity: formData.quantity || 0,
+        costPerUnitType: formData.costPerUnitType || 0,
+        base: currentDetail.base ?? currentDetail.material?.base,
+        height: currentDetail.height ?? currentDetail.material?.height
+    });
 
     return {
-        totalQuantity: roundTo(Number(receipt?.totalQuantity || 0) - Number(currentDetail.quantity || 0) + correctedQuantity),
-        totalNetPurchaseAmount: roundTo(Number(receipt?.totalNetPurchaseAmount || 0) - Number(currentDetail.netPurchaseAmount || 0) + correctedNetPurchaseAmount),
-        totalGrossPurchaseAmount: roundTo(Number(receipt?.totalGrossPurchaseAmount || 0) - Number(currentDetail.grossPurchaseAmount || 0) + correctedGrossPurchaseAmount)
+        totalQuantity: roundTo(Number(receipt?.totalQuantity || 0) - Number(currentDetail.quantity || 0) + corrected.quantity),
+        totalNetPurchaseAmount: roundTo(Number(receipt?.totalNetPurchaseAmount || 0) - Number(currentDetail.netPurchaseAmount || 0) + corrected.netPurchaseAmount),
+        totalGrossPurchaseAmount: roundTo(Number(receipt?.totalGrossPurchaseAmount || 0) - Number(currentDetail.grossPurchaseAmount || 0) + corrected.grossPurchaseAmount)
     };
 };
 

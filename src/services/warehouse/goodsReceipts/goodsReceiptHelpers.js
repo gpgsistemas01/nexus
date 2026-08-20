@@ -7,6 +7,20 @@ import { GoodsReceiptDetailAlreadyCanceled } from "../../../errors/warehouse/goo
 
 const IVA_RATE = 1.16;
 
+/**
+ * Relation graph for raw purchase details returned to the browser. Scalar
+ * fields are intentionally not selected so Prisma preserves the persisted
+ * detail contract and the frontend owns the table-row mapping.
+ */
+export const GOODS_RECEIPT_DETAIL_INCLUDE = Object.freeze({
+    material: {
+        include: {
+            presentation: true,
+            unitMeasure: true
+        }
+    }
+});
+
 export const buildGoodsReceiptDetails = async (details, { tx = null } = {}) => {
 
     const materialIds = details.map(d => d.materialId);
@@ -122,15 +136,9 @@ const updateActiveGoodsReceiptDetailAndTotals = async ({ tx, goodsReceiptId, det
         },
         include: {
             details: {
-                include: {
-                    material: {
-                        include: {
-                            presentation: true,
-                            unitMeasure: true
-                        }
-                    }
-                }
+                include: GOODS_RECEIPT_DETAIL_INCLUDE
             },
+            supplier: true,
             status: true
         }
     });
@@ -182,15 +190,9 @@ export const createGoodsReceiptDetailsAndUpdateTotals = async ({ tx, goodsReceip
         data: calculateGoodsReceiptTotals(receiptDetails),
         include: {
             details: {
-                include: {
-                    material: {
-                        include: {
-                            presentation: true,
-                            unitMeasure: true
-                        }
-                    }
-                }
+                include: GOODS_RECEIPT_DETAIL_INCLUDE
             },
+            supplier: true,
             status: true
         }
     });
