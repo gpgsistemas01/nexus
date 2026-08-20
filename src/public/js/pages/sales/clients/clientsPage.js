@@ -1,3 +1,3 @@
-import { createClientDatatable } from "../../../plugins/datatable/clientDatatable.js";
+import { createClientDatatable } from "../../../plugins/datatable/sales/clients/clientDatatable.js";
 
 createClientDatatable();

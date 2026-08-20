@@ -6,7 +6,7 @@ import {
     returnGoodsIssueDetail
 } from "../../../application/warehouse/goodsIssues/goodsIssues.js";
 import { addGoodsIssueMaterialValidation, issueProjectQuantityDetailsValidation, goodsIssueValidation } from "../../../utils/validations/validators.js";
-import { createGoodsIssueDatatable } from "../../../plugins/datatable/goodsIssueDatatable.js";
+import { createGoodsIssueDatatable } from "../../../plugins/datatable/warehouse/goodsIssues/goodsIssueDatatable.js";
 import { getGoodsIssueHeaderSelects } from "../../../plugins/select2/modules/goodsIssueSelect.js";
 import { normalizeFormErrors } from "../../../ui/forms/formErrorsUI.js";
 import { clearAddedMaterialInput } from "../../../ui/forms/detailFormUI.js";
@@ -19,9 +19,10 @@ import { FORM_MODES } from "../../../constants/formModes.js";
 import { roundTo } from "../../../utils/formatUtils.js";
 import { applyIssueModalMode, bindIssueProjectQuantityControls, createIssueHeaderForm, createIssueTableActions, initializeIssueModal, useIssueForm } from "../../../ui/issues/issueFormUI.js";
 import { createIssueReturn } from "../../../ui/issues/issueReturnUI.js";
-import { createWarehouseIssueDetailsTable } from '../../../plugins/datatable/warehouseIssueDetailDatatable.js';
-import { refreshMaterialTable } from '../../../plugins/datatable/utils/renderMaterialDatatable.js';
+import { createWarehouseIssueDetailsTable } from '../../../plugins/datatable/shared/issues/warehouseIssueDetailDatatable.js';
+import { refreshMaterialTable } from '../../../plugins/datatable/shared/inventory/renderMaterialDatatable.js';
 import { buildInventorySelectText, getBase, getHeight, getMaxUnitCost, getPresentation, getUnitMeasure, mapGoodsIssueDetailsToRequest, mapIssueDetailsToSupplyRequest, mapIssueDetailToTable } from "../../../utils/warehouseInventoryUtils.js";
+import { removeDetail, upsertDetail } from "../../../utils/detailCollectionUtils.js";
 
 const modalId = MODAL_SELECTORS.GOODS_ISSUE;
 const formId = FORM_SELECTORS.GOODS_ISSUE;
@@ -175,12 +176,11 @@ const addMaterial = () => {
         supplierId: supplier.id
     };
 
-    const existingIndex = details.findIndex(detail => (
-        detail.materialId === material.id && detail.supplierId === supplier.id
-    ));
-
-    if (existingIndex >= 0) details.splice(existingIndex, 1, newMaterial);
-    else details.push(newMaterial);
+    upsertDetail({
+        details,
+        detail: newMaterial,
+        matches: detail => detail.materialId === material.id && detail.supplierId === supplier.id
+    });
 
     refreshMaterialTable(details);
     clearAddedMaterialInput();
@@ -203,11 +203,13 @@ const findDetailByElement = (element) => {
 
 on('click', '#addMaterialBtn', addMaterial);
 on('click', `${ detailTableSelector } .delete-btn`, (event, button) => {
-    const index = details.findIndex(detail => detail.materialId === button.dataset.id);
+    const removedDetail = removeDetail({
+        details,
+        matches: detail => detail.materialId === button.dataset.id
+    });
 
-    if (index < 0) return;
+    if (!removedDetail) return;
 
-    details.splice(index, 1);
     refreshMaterialTable(details);
 });
 bindIssueProjectQuantityControls({

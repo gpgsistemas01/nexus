@@ -8,7 +8,7 @@ import {
 import { createIssueReturn } from '../../../ui/issues/issueReturnUI.js';
 import { handleApiError } from '../../../api/errorHandler.js';
 import { openModal } from '../../../ui/modalUI.js';
-import { createWasteIssueDatatable } from '../../../plugins/datatable/wasteIssueDatatable.js';
+import { createWasteIssueDatatable } from '../../../plugins/datatable/warehouse/wasteIssues/wasteIssueDatatable.js';
 import { setDateTimePickerValue } from '../../../plugins/flatpickr/dateTimePicker.js';
 import { FORM_MODES } from '../../../constants/formModes.js';
 import { DATATABLE_SELECTORS, FORM_SELECTORS, MODAL_SELECTORS } from '../../../constants/selectors.js';
@@ -19,12 +19,13 @@ import { clearAddedItemInput } from '../../../ui/forms/detailFormUI.js';
 import { setMdbWrapperInputValue } from '../../../plugins/select2/baseSelect.js';
 import { applyIssueModalMode, bindIssueProjectQuantityControls, createIssueHeaderForm, createIssueTableActions, initializeIssueModal, useIssueForm } from '../../../ui/issues/issueFormUI.js';
 import { getWasteIssueHeaderSelects } from '../../../plugins/select2/modules/wasteIssueSelect.js';
-import { createWarehouseIssueDetailsTable } from '../../../plugins/datatable/warehouseIssueDetailDatatable.js';
+import { createWarehouseIssueDetailsTable } from '../../../plugins/datatable/shared/issues/warehouseIssueDetailDatatable.js';
 import { roundTo } from '../../../utils/formatUtils.js';
 import { on } from '../../../utils/domUtils.js';
 import { UI_PERMISSIONS } from '../../../constants/permissions.js';
-import { refreshMaterialTable } from '../../../plugins/datatable/utils/renderMaterialDatatable.js';
+import { refreshMaterialTable } from '../../../plugins/datatable/shared/inventory/renderMaterialDatatable.js';
 import { buildInventorySelectText, getBase, getHeight, getPresentation, getUnitMeasure, mapIssueDetailsToSupplyRequest, mapIssueDetailToTable } from '../../../utils/warehouseInventoryUtils.js';
+import { removeDetail, upsertDetail } from '../../../utils/detailCollectionUtils.js';
 
 const formId = FORM_SELECTORS.WASTE_ISSUE;
 const modalId = MODAL_SELECTORS.WASTE_ISSUE;
@@ -114,10 +115,11 @@ const addWaste = () => {
             : quantity
     };
 
-    const existingIndex = details.findIndex(item => item.wasteId === wasteId);
-
-    if (existingIndex >= 0) details.splice(existingIndex, 1, waste);
-    else details.push(waste);
+    upsertDetail({
+        details,
+        detail: waste,
+        matches: item => item.wasteId === wasteId
+    });
 
     refreshMaterialTable(details);
     clearAddedItemInput({
@@ -135,11 +137,13 @@ const findDetailByElement = element => details.find(detail => (
 
 on('click', '#addMaterialBtn', addWaste);
 on('click', `${ detailTableSelector } .delete-btn`, (event, button) => {
-    const index = details.findIndex(detail => detail.wasteId === button.dataset.id);
+    const removedDetail = removeDetail({
+        details,
+        matches: detail => detail.wasteId === button.dataset.id
+    });
 
-    if (index < 0) return;
+    if (!removedDetail) return;
 
-    details.splice(index, 1);
     refreshMaterialTable(details);
 });
 

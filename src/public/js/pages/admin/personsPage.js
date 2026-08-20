@@ -1,6 +1,6 @@
-import { registerPerson, updatePerson } from "../../application/admin/persons.js";
+import { registerPerson, updatePerson } from "../../application/admin/persons/persons.js";
 import { useForm } from "../../application/form.js";
-import { createPersonsDatatable, initPersonAccessTable, personAccesses, refreshPersonAccessTable } from "../../plugins/datatable/personDatatable.js";
+import { createPersonsDatatable, initPersonAccessTable, personAccesses, refreshPersonAccessTable } from "../../plugins/datatable/admin/persons/personDatatable.js";
 import { initPersonFormSelect2 } from "../../plugins/select2/modules/personSelect.js";
 import { clearFormErrors, normalizeFormErrors } from "../../ui/forms/formErrorsUI.js";
 import { initForm } from "../../ui/forms/formStateUI.js";

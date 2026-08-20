@@ -26,9 +26,9 @@ vi.mock('../../../../../src/public/js/services/admin/userService.js', () => mock
 vi.mock('../../../../../src/public/js/services/warehouse/wasteService.js', () => mocks.waste);
 vi.mock('../../../../../src/public/js/services/warehouse/goodsReceiptService.js', () => mocks.goodsReceipt);
 
-const users = await import('../../../../../src/public/js/application/admin/users.js');
-const wastes = await import('../../../../../src/public/js/application/warehouse/wastes.js');
-const goodsReceipts = await import('../../../../../src/public/js/application/warehouse/goodsReceipts.js');
+const users = await import('../../../../../src/public/js/application/admin/users/users.js');
+const wastes = await import('../../../../../src/public/js/application/warehouse/wastes/wastes.js');
+const goodsReceipts = await import('../../../../../src/public/js/application/warehouse/goodsReceipts/goodsReceipts.js');
 
 beforeEach(() => {
   vi.clearAllMocks();

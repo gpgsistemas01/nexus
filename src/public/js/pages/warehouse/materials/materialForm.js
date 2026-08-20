@@ -1,5 +1,5 @@
 import { useForm } from "../../../application/form.js";
-import { editMaterial, editMaterialStock, registerMaterial } from "../../../application/warehouse/materials.js";
+import { editMaterial, editMaterialStock, registerMaterial } from "../../../application/warehouse/materials/materials.js";
 import { FORM_SELECTORS, MODAL_SELECTORS } from "../../../constants/selectors.js";
 
 import { handleSubmit, pickFormFields, validateFields } from "../../../utils/formUtils.js";

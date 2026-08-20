@@ -185,6 +185,49 @@ abstracción «compartida» que todavía depende de un recurso concreto. Al edit
 preserva el cierre final de `contentFor` en su lugar; no se elimina y vuelve a agregar
 como efecto secundario de una refactorización.
 
+### Organización de módulos de una sola responsabilidad
+
+La cantidad de exports o de consumidores no determina por sí sola si un archivo debe
+fusionarse. Un módulo con un único método que encapsula la configuración de un CRUD
+conserva una frontera útil, pero se ubica en la carpeta de su recurso en lugar de quedar
+en la raíz de una infraestructura compartida. Por esta razón, los DataTables se ordenan
+primero en `admin`, `sales` y `warehouse`, y después por recurso (`persons`, `clients`,
+`goodsReceipts`, etc.). `core` contiene el constructor, la adaptación responsive y los
+filtros reutilizables; `shared/issues` e `shared/inventory` contienen únicamente
+composición usada por más de un flujo.
+
+La mutación en memoria de detalles no pertenece al plugin de DataTable: entradas,
+salidas de material y salidas de merma comparten `upsertDetail` y `removeDetail` desde
+`public/js/utils/detailCollectionUtils.js`. Las funciones sólo administran la colección
+y devuelven el detalle anterior o eliminado; cada contexto conserva en su página o
+DataTable los efectos que sí le pertenecen, como totales, limpieza del formulario y
+refresco visual. Así `detailDatatableUtils` deja de duplicar una parte del proceso de
+issues sin trasladar reglas de compras a una utilidad genérica.
+
+El mismo criterio se aplica al resto del proyecto: un archivo consumido una sola vez
+permanece junto a su recurso propietario; sólo se mueve a una carpeta compartida cuando
+hay al menos dos consumidores reales y un contrato independiente del contexto. No se
+fusionan módulos de capas diferentes para reducir el conteo de archivos, ni se crean
+carpetas horizontales para operaciones CRUD aisladas. Al mover un módulo se actualizan
+en la misma modificación todos sus imports, exports, pruebas y referencias generadas.
+
+La revisión de ownership se aplica por capa a todo `src`:
+
+| Área | Responsabilidad y decisión de ubicación |
+| --- | --- |
+| `constants`, `errors`, `messages`, `dtos`, `validators` | Contratos y reglas sin I/O; se subdividen por dominio cuando existe más de un contexto relacionado. Un único archivo de contrato no se mezcla con controller o service. |
+| `routes`, `controllers`, `services` | Mantienen dominio y recurso equivalentes entre capas. Los recursos pequeños pueden ser un archivo dentro del dominio; los casos compuestos usan una carpeta del recurso para helpers y reglas privadas. |
+| `repository`, `lib`, `middleware`, `utils` | Infraestructura transversal. Un módulo de un solo consumidor sólo permanece aquí si su contrato sigue siendo transversal; de lo contrario pertenece al recurso consumidor. |
+| `public/js/services`, `application`, `pages` | Transporte HTTP, caso de uso y composición visual respectivamente. No se fusionan aunque una función tenga un único consumidor porque representan fronteras distintas. `application` y los flujos compuestos se agrupan por dominio y recurso; `report` permanece en el dominio porque sirve a varios recursos. |
+| `public/js/plugins` | Adaptadores de bibliotecas externas. `datatable` replica dominio y recurso; `select2` separa adaptadores de dominio de composiciones de varios selects. |
+| `public/js/ui` y `views/shared` | Componentes visuales reutilizables sin ownership de página. Si sólo una pantalla conoce sus selectores y proceso, el componente permanece con esa página o recurso. |
+| `views/pages` | Entradas EJS por pantalla y partials propietarios. Una reubicación no reescribe ni desplaza el cierre final de `contentFor`. |
+
+Esta revisión prioriza responsabilidad y cohesión, no un mínimo artificial de métodos
+por archivo. Separar es necesario cuando un módulo mezcla transporte, coordinación
+visual o negocio; fusionar sólo es válido dentro de la misma capa, recurso y ciclo de
+cambio.
+
 ### Contrato de los selects en modales
 
 Los módulos de `plugins/select2/domains` reciben un `baseSelector` ya delimitado cuando

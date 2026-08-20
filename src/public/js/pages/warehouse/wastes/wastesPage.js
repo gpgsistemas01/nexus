@@ -1,4 +1,4 @@
-import { createWasteDatatable } from "../../../plugins/datatable/wasteDatatable.js";
+import { createWasteDatatable } from "../../../plugins/datatable/warehouse/wastes/wasteDatatable.js";
 import './wasteForm.js';
 
 const context = window.meta || {};

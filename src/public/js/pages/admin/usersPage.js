@@ -1,6 +1,6 @@
 import { useForm } from '../../application/form.js';
-import { editUser, editUserPassword, registerUser } from '../../application/admin/users.js';
-import { createUserDatatable } from '../../plugins/datatable/userDatatable.js';
+import { editUser, editUserPassword, registerUser } from '../../application/admin/users/users.js';
+import { createUserDatatable } from '../../plugins/datatable/admin/users/userDatatable.js';
 import { initUserFormSelect2, setUserFormSelectOptions } from '../../plugins/select2/modules/userSelect.js';
 import { clearFormErrors } from '../forms/formErrorsUI.js';
 import { initForm, setFormDisabled } from '../forms/formStateUI.js';
