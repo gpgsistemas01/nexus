@@ -200,6 +200,13 @@ Los partials de `src/views/shared` y las piezas independientes del recurso bajo
 reutilizado por varias pantallas puede seguir perteneciendo a su recurso si conoce sus
 selectores, validaciones y operaciones.
 
+Los partials transversales se agrupan por responsabilidad dentro de `shared`: `controls`
+contiene controles de interacción independientes, `forms` reúne campos y composición de
+formularios, `layout` contiene estructuras contenedoras y `tables` reúne tablas, filtros
+y resúmenes. `issues` se conserva separado porque compone esas primitivas para el contexto
+compartido de salidas. Las vistas consumidoras referencian siempre la categoría explícita,
+y la prueba de estructura impide volver a dejar archivos EJS sueltos en la raíz.
+
 Este criterio evita dos extremos: duplicar componentes por contexto y crear una
 abstracción «compartida» que todavía depende de un recurso concreto. Al editar EJS se
 preserva el cierre final de `contentFor` en su lugar; no se elimina y vuelve a agregar

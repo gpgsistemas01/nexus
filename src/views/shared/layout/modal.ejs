@@ -88,13 +88,13 @@ const modalDialogClass = typeof dialogClass !== 'undefined' ? dialogClass : 'mod
                         <div class="col-12 col-md-6 mb-2">
                             <label class="form-label">Tipo de comprobante</label>
 
-                            <%- include('./checkbox', { input: form.invoice.radios[0] }) %>
+                            <%- include('../forms/checkbox', { input: form.invoice.radios[0] }) %>
 
-                            <%- include('./checkbox', { input: form.invoice.radios[1] }) %>
+                            <%- include('../forms/checkbox', { input: form.invoice.radios[1] }) %>
                         </div>
 
                         <div id="invoiceContainer" class="col-12 col-md-6">
-                            <%- include('./outlineInput', { input: form.invoice.input }) %>
+                            <%- include('../forms/outlineInput', { input: form.invoice.input }) %>
                         </div>
                     </div>
                 <% } %>
@@ -112,21 +112,21 @@ const modalDialogClass = typeof dialogClass !== 'undefined' ? dialogClass : 'mod
                             <div class="row g-3">
                                 <% section.groups.forEach(group => { %>
                                     <% if (group.type === 'selects') { %>
-                                        <%- include('./selectList', { inputs: group.items }) %>
+                                        <%- include('../forms/selectList', { inputs: group.items }) %>
                                     <% } %>
 
                                     <% if (group.type === 'inputs') { %>
-                                        <%- include('./outlineInputList', { inputs: group.items }) %>
+                                        <%- include('../forms/outlineInputList', { inputs: group.items }) %>
                                     <% } %>
 
                                     <% if (group.type === 'textarea') { %>
                                         <div class="col-12">
-                                            <%- include('./textarea', { input: group.input }) %>
+                                            <%- include('../forms/textarea', { input: group.input }) %>
                                         </div>
                                     <% } %>
 
                                     <% if (group.type === 'checkboxes') { %>
-                                        <%- include('./checkboxList', { inputs: group.items }) %>
+                                        <%- include('../forms/checkboxList', { inputs: group.items }) %>
                                     <% } %>
 
                                     <% if (group.type === 'html') { %>
@@ -140,23 +140,23 @@ const modalDialogClass = typeof dialogClass !== 'undefined' ? dialogClass : 'mod
                     <% }); %>
                 <% } else { %>
                     <% if (form.stockAdjustment) { %>
-                        <%- include('./selectList', { inputs: form.stockAdjustment.selects }) %>
+                        <%- include('../forms/selectList', { inputs: form.stockAdjustment.selects }) %>
 
-                        <%- include('./outlineInputList', { inputs: form.stockAdjustment.inputs }) %>
+                        <%- include('../forms/outlineInputList', { inputs: form.stockAdjustment.inputs }) %>
                     <% } %>
 
                     <% if (form.selects) { %>
-                        <%- include('./selectList', { inputs: form.selects }) %>
+                        <%- include('../forms/selectList', { inputs: form.selects }) %>
                     <% } %>
 
-                    <%- include('./outlineInputList', { inputs: form.inputs }) %>
+                    <%- include('../forms/outlineInputList', { inputs: form.inputs }) %>
 
                     <% if (form.textArea) { %>
-                        <%- include('./textarea', { input: form.textArea }) %>
+                        <%- include('../forms/textarea', { input: form.textArea }) %>
                     <% } %>
 
                     <% if (form.checkboxes) { %>
-                        <%- include('./checkboxList', { inputs: form.checkboxes }) %>
+                        <%- include('../forms/checkboxList', { inputs: form.checkboxes }) %>
                     <% } %>
                 <% } %>
 
@@ -164,41 +164,41 @@ const modalDialogClass = typeof dialogClass !== 'undefined' ? dialogClass : 'mod
                     <div class="col-12 mb-3 modal-detail-controls <%= form.table.containerClass || 'add-material-container' %>">
                         <% if (form.table.includeMaterialControls === false) { %>
                             <div class="row g-3 align-items-end">
-                                <%- include('./selectList', { inputs: form.table.selects }) %>
+                                <%- include('../forms/selectList', { inputs: form.table.selects }) %>
                                 <div class="<%= form.table.button.col || 'col-12' %>">
-                                    <%- include('./button', { button: form.table.button }) %>
+                                    <%- include('../controls/button', { button: form.table.button }) %>
                                 </div>
                             </div>
                         <% } else { %>
                             <div class="row mb-3">
                                 <div class="col-12">
-                                    <%- include('./select', { input: form.table.select }) %>
+                                    <%- include('../forms/select', { input: form.table.select }) %>
                                 </div>
                             </div>
 
                             <div class="row g-3 align-items-end">
                                 <% form.table.inputs.forEach(input => { %>
                                     <div class="<%= input.col || 'col-12' %>">
-                                        <%- include('./outlineInput', { input }) %>
+                                        <%- include('../forms/outlineInput', { input }) %>
                                     </div>
                                 <% }); %>
 
                                 <div class="col-12 col-md-4 col-lg-3">
-                                    <%- include('./outlineInput', { input: inputs.presentationDisplayInput }) %>
+                                    <%- include('../forms/outlineInput', { input: inputs.presentationDisplayInput }) %>
                                 </div>
 
                                 <div class="col-12 col-md-2 col-lg-2">
-                                    <%- include('./button', { button: buttons.addMaterialButton }) %>
+                                    <%- include('../controls/button', { button: buttons.addMaterialButton }) %>
                                 </div>
                             </div>
                         <% } %>
                     </div>
 
-                    <%- include('./detailTable', { table: form.table }) %>
+                    <%- include('../tables/detailTable', { table: form.table }) %>
 
                     <% if (form.table.includeSummary !== false) { %>
                         <div class="col-12 mb-3 total-container">
-                            <%- include('./totalsSummary', { totals: totalSummary }) %>
+                            <%- include('../tables/totalsSummary', { totals: totalSummary }) %>
                         </div>
                     <% } %>
                 <% } %>
@@ -206,12 +206,12 @@ const modalDialogClass = typeof dialogClass !== 'undefined' ? dialogClass : 'mod
                 <div class="col-12 modal-actions">
                     <% if (form.actions) { %>
                         <% form.actions.forEach(actionButton => { %>
-                            <%- include('./button', { button: actionButton }) %>
+                            <%- include('../controls/button', { button: actionButton }) %>
                         <% }); %>
                     <% } else { %>
-                        <%- include('./button', { button: buttons.backButton }) %>
+                        <%- include('../controls/button', { button: buttons.backButton }) %>
 
-                        <%- include('./submit') %>
+                        <%- include('../forms/submit') %>
                     <% } %>
                 </div>
             </form>

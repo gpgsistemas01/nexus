@@ -44,17 +44,17 @@
     <% } %>
 
     <div class="row table-filters">
-        <%- include('./outlineInputList', { inputs: filterConfig.dateInputs }) %>
+        <%- include('../forms/outlineInputList', { inputs: filterConfig.dateInputs }) %>
     </div>
 
     <% if (filterConfig.textInputs.length) { %>
         <div class="row table-filters">
-            <%- include('./outlineInputList', { inputs: filterConfig.textInputs }) %>
+            <%- include('../forms/outlineInputList', { inputs: filterConfig.textInputs }) %>
         </div>
     <% } %>
 
         <div class="table-filters-actions">
-            <%- include('./button', {
+            <%- include('../controls/button', {
                 button : {
                     id: 'applyFiltersButton',
                     type: 'submit',
@@ -63,7 +63,7 @@
                 }
             }) %>
 
-            <%- include('./button', {
+            <%- include('../controls/button', {
                 button : {
                     id: 'clearFiltersButton',
                     type: 'button',
