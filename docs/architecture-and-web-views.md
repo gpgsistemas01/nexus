@@ -252,11 +252,39 @@ páginas y datatables siguen consumiendo nombres de
 dominio (`registerGoodsIssue`, `registerWasteIssue`, etc.), por lo que el componente
 compartido no filtra abstracciones genéricas hacia la UI.
 
-El mismo criterio se aplica a clientes, personas, proveedores y mermas mediante
-`createCrudApplication`: listado, registro y edición comparten la adaptación de
-transporte, mientras cada módulo conserva sus opciones de select y operaciones
-especializadas. No se fuerza esta fábrica sobre materiales, usuarios o compras porque
-sus payloads y mutaciones adicionales requieren coordinación propia.
+`createIssueApplication` sí es un export porque es una función de construcción usada
+por ambos módulos de salida; no es la instancia de ninguno de ellos. Cada invocación
+produce un objeto inmutable independiente, que queda privado como
+`goodsIssueApplication` o `wasteIssueApplication`. Esta separación permite reutilizar
+la configuración del proceso sin mezclar requests, claves de respuesta o estado entre
+contextos.
+
+Las instancias `personApplication`, `userApplication`, `clientApplication` y sus
+equivalentes de almacén son detalles privados de cada módulo. Exportar directamente
+esas instancias obligaría a páginas, formularios, datatables y selects a conocer
+operaciones genéricas como `getAll` o `edit`, y haría que un cambio en la factory se
+convirtiera en un cambio transversal de la UI. Por ello cada contexto mantiene exports
+nombrados de dominio; éstos son referencias a los métodos construidos y no duplican su
+ejecución.
+
+El mismo criterio se aplica a clientes, personas, usuarios, proveedores, materiales,
+mermas y entradas mediante `createCrudApplication`: listado, registro y edición
+comparten la adaptación de transporte. `additionalMutations` mantiene también ese
+contrato para cambio de contraseña, stock, eliminación, corrección, cancelación y
+operaciones de detalle, pero cada módulo exporta nombres de dominio y claves de
+respuesta propios. En materiales, el contexto de creación atraviesa la adaptación
+común sólo para omitir `maxUnitCost` durante una entrada de compra; el resto del objeto
+ya seleccionado por `materialForm` pasa sin un segundo mapeo y el DTO del servidor
+mantiene la normalización. En entradas y salidas, los identificadores de documento y
+detalle se propagan por el mismo adaptador. De este modo una diferencia de contexto se
+configura y no abre otra ejecución de aplicación.
+
+Los módulos de aplicación tampoco convierten listados a opciones cuando el plugin de
+Select2 ya declara el `mapOption` del dominio. Los filtros de proveedor y material
+inicializan el mismo select remoto sin una consulta o transformación paralela; sólo los
+filtros con selección predeterminada conservan una función de precarga. Asimismo,
+`deleteMaterial` recibe `{ id }`, igual que las mutaciones construidas por la factory,
+y el datatable adapta el identificador de su fila al invocarlo.
 
 `application/warehouse/wasteIssues/wasteIssues.js` permanece dentro de una carpeta de
 recurso, en paralelo con `goodsIssues/goodsIssues.js`, porque ambos flujos tienen varias

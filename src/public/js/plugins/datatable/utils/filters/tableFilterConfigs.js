@@ -1,5 +1,3 @@
-import { getMaterialOptions } from "../../../../application/warehouse/materials.js";
-import { getSupplierOptions } from "../../../../application/warehouse/suppliers.js";
 import { getFulfillmentStatusOptions } from "../../../../application/warehouse/fulfillmentStatuses.js";
 import { getPersonOptions } from "../../../../application/admin/persons.js";
 import { initMaterialFilterSelect } from "../../../select2/domains/material.js";
@@ -27,14 +25,12 @@ const selectFilterConfigs = {
         key: 'supplierId',
         selector: FILTER_SELECTORS.SUPPLIER,
         isSelected: false,
-        getOptions: getSupplierOptions,
         initSelect: initSupplierFilterSelect
     },
     material: {
         key: 'materialId',
         selector: FILTER_SELECTORS.MATERIAL,
         isSelected: false,
-        getOptions: getMaterialOptions,
         initSelect: ({ selectedId }) => initMaterialFilterSelect({ selectedId, supplierFilterSelector: FILTER_SELECTORS.SUPPLIER })
     },
     fulfillmentStatus: {

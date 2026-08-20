@@ -145,7 +145,7 @@ export const createMaterialDatatable = async (context) => {
         if (!result.isConfirmed) return;
 
         try {
-            const response = await deleteMaterial(data.supplierMaterialId);
+            const response = await deleteMaterial({ id: data.supplierMaterialId });
 
             notifications.showSuccess(response.message || '¡Relación entre material y proveedor eliminada exitosamente!');
             table.ajax.reload(null, false);
