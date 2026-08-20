@@ -1,8 +1,4 @@
 import { getAllDepartmentsRequest } from "../../../services/admin/departmentService.js";
+import { createApplicationList } from '../../createCrudApplication.js';
 
-export const getAllDepartments = async (params = {}) => {
-
-    const response = await getAllDepartmentsRequest({ params });
-
-    return response;
-};
+export const getAllDepartments = createApplicationList(getAllDepartmentsRequest);

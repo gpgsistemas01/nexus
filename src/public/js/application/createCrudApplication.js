@@ -1,6 +1,9 @@
 import { createSuccessResponseFromRequest } from '../utils/responseUtils.js';
 import { FORM_MODES } from '../constants/formModes.js';
 
+export const createApplicationList = request =>
+    (params = {}) => request({ params });
+
 export const createApplicationMutation = ({ request, dataKey = null }) => async ({
     formData,
     id,
@@ -31,7 +34,7 @@ export const createCrudApplication = ({
     });
 
     return Object.freeze({
-        getAll: (params = {}) => requests.getAll({ params }),
+        getAll: createApplicationList(requests.getAll),
         register: createMutation('register'),
         [FORM_MODES.EDIT]: createMutation(FORM_MODES.EDIT),
         ...Object.fromEntries(additionalMutations.map(operation => [
