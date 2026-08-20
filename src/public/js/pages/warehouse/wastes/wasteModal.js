@@ -6,6 +6,7 @@ import { openModal } from "../../../ui/modalUI.js";
 import { BUTTON_SELECTORS, FORM_SELECTORS, HEADING_SELECTORS, MODAL_SELECTORS, SELECT_SELECTORS } from "../../../constants/selectors.js";
 import { wasteDataFields, wasteSecondaryDataFields, wasteStockFields } from './wasteFields.js';
 import { FORM_MODES, isCreateMode, isEditMode, isStockMode } from '../../../constants/formModes.js';
+import { getPresentation } from '../../../utils/warehouseInventoryUtils.js';
 
 const initialStockReasonName = 'Stock inicial';
 const stockDataSectionSelector = '.stock-data-section';
@@ -47,7 +48,7 @@ export const openWasteModal = ({
     });
     setFormSectionVisibility({
         form,
-        isVisible: data?.presentation.name === 'ROLLO' ? true : false,
+        isVisible: getPresentation(data ?? {}) === 'ROLLO',
         fieldNames: ['weight']
     });
     setFormDisabled({ 
