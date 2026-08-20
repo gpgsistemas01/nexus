@@ -292,7 +292,7 @@ export const validateWasteIssueDetailsArray = details => {
         if (
             !Number.isFinite(quantity)
             || quantity <= 0
-            || !/^\d{1,8}(\.\d{1,2})?$/.test(String(detail.quantity))
+            || !/^\d{1,8}(\.\d{1,6})?$/.test(String(detail.quantity))
         ) {
             return 'La cantidad de cada detalle debe ser un número mayor a cero.';
         }

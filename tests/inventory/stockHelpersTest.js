@@ -16,7 +16,7 @@ describe('stockHelpers', () => {
 
   it('calcula cantidad convertida con dimensiones y redondeo normalizado', () => {
     expect(calculateConvertedQuantity({ quantity: '3', base: '1.5', height: '2' })).toBe(9);
-    expect(calculateConvertedQuantity({ currentStock: '2.345', base: '1', height: '1' })).toBe(2.35);
+    expect(calculateConvertedQuantity({ currentStock: '2.345', base: '1', height: '1' })).toBe(2.345);
   });
 
   it('usa la cantidad original o cero cuando no hay dimensiones según la configuración', () => {

@@ -126,7 +126,7 @@ export const validateNumber = (fieldName) => {
 
     return requireValue(body(fieldName), errors.REQUIRED)
         .isFloat().withMessage(errors.INVALID_NUMBER)
-        .matches(/^\d{1,8}(\.\d{1,2})?$/).withMessage(errors.TOO_LONG)
+        .matches(/^\d{1,8}(\.\d{1,6})?$/).withMessage(errors.TOO_LONG)
         .toFloat()
 }
 
@@ -136,7 +136,7 @@ export const validateNonNegativeNumber = (fieldName) => {
 
     return requireValue(body(fieldName), errors.REQUIRED)
         .isFloat({ min: 0 }).withMessage(errors.INVALID_NUMBER)
-        .matches(/^\d{1,8}(\.\d{1,2})?$/).withMessage(errors.TOO_LONG)
+        .matches(/^\d{1,8}(\.\d{1,6})?$/).withMessage(errors.TOO_LONG)
         .toFloat()
 }
 
@@ -146,7 +146,7 @@ export const validatePositiveNumber = (fieldName) => {
 
     return requireValue(body(fieldName), errors.REQUIRED)
         .isFloat({ gt: 0 }).withMessage(errors.INVALID_NUMBER)
-        .matches(/^\d{1,8}(\.\d{1,2})?$/).withMessage(errors.TOO_LONG)
+        .matches(/^\d{1,8}(\.\d{1,6})?$/).withMessage(errors.TOO_LONG)
         .toFloat()
 }
 
@@ -159,7 +159,7 @@ export const validateNumberWhen = ({ fieldName, predicate }) => {
         errors.REQUIRED
     )
         .isFloat().withMessage(errors.INVALID_NUMBER).bail()
-        .matches(/^\d{1,8}(\.\d{1,2})?$/).withMessage(errors.TOO_LONG)
+        .matches(/^\d{1,8}(\.\d{1,6})?$/).withMessage(errors.TOO_LONG)
         .toFloat()
 }
 
@@ -183,7 +183,7 @@ const validateOptionalNumberChain = ({ fieldName, disableTooLong = false, predic
         .if((value, { req }) => predicate(req.body, value, req) && hasValue(value))
         .isFloat().withMessage(errors.INVALID_NUMBER)
         .if(() => !disableTooLong)
-        .matches(/^\d{1,7}(\.\d{1,3})?$/).withMessage(errors.TOO_LONG)
+        .matches(/^\d{1,8}(\.\d{1,6})?$/).withMessage(errors.TOO_LONG)
         .toFloat()
 }
 
@@ -204,7 +204,7 @@ export const validatePositiveNumberOptional = (fieldName, { disableTooLong = fal
         .if((value) => hasValue(value))
         .isFloat({ gt: 0 }).withMessage(errors.INVALID_NUMBER)
         .if(() => !disableTooLong)
-        .matches(/^\d{1,7}(\.\d{1,3})?$/).withMessage(errors.TOO_LONG)
+        .matches(/^\d{1,8}(\.\d{1,6})?$/).withMessage(errors.TOO_LONG)
         .toFloat()
 }
 
@@ -298,7 +298,7 @@ export const validateIssueDetailsArray = ({
                 || detail.quantity === undefined
                 || !Number.isFinite(quantity)
                 || hasInvalidQuantity
-                || !/^\d{1,8}(\.\d{1,2})?$/.test(String(detail.quantity))
+                || !/^\d{1,8}(\.\d{1,6})?$/.test(String(detail.quantity))
             ) {
                 throw new Error(errorMap['details'].INVALID_FORMAT_QUANTITY);
             }

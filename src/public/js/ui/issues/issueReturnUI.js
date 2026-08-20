@@ -55,8 +55,8 @@ export const createIssueReturn = ({ sendReturn }) => {
         const form = document.querySelector(formSelector);
         const supplied = Number(detail.suppliedQuantity ?? 0);
         const returned = Number(detail.returnedQuantity ?? 0);
-        // Inventory quantities use two decimal places. Keep the UI boundary aligned
-        // with the persisted value instead of exposing floating-point subtraction.
+        // Keep calculation precision aligned with persistence; formatDecimal rounds only
+        // the read-only summaries shown to the user.
         const available = roundTo(supplied - returned);
 
         setQuantitySummary('#issueReturnSuppliedQuantity', supplied);

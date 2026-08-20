@@ -35,7 +35,7 @@ describe('detalles del CRUD de entradas de compra', () => {
       quantity: 2,
       costPerUnitType: 100,
       convertedQuantity: 12,
-      conversionUnitCost: 16.67,
+      conversionUnitCost: 16.666667,
       netPurchaseAmount: 200,
       grossPurchaseAmount: 232
     });
