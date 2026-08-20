@@ -276,6 +276,14 @@ intermedia basada sólo en que hay más de un consumidor. `ui` queda reservado p
 comportamiento que recibe su contexto por parámetros y no importa aplicaciones de un
 recurso concreto.
 
+Los filtros compartidos de DataTables separan los valores visibles en el formulario de
+los valores que ya fueron aplicados. `tableFilterState` toma una instantánea al enviar
+el formulario o limpiarlo; paginación, búsqueda, actualizaciones en tiempo real y
+exportación reutilizan esa instantánea y no activan cambios que el usuario todavía no
+confirmó con **Buscar / filtrar**. Esta regla se mantiene en el componente compartido
+para que listados de personas, inventario, movimientos, compras y salidas sigan el
+mismo flujo sin implementaciones específicas por CRUD.
+
 ## 6. Herramientas
 
 - **Ahora:** Mermaid para diagramas curados y el generador local para rutas e imports.
