@@ -1,5 +1,5 @@
 import { openSupplierModal } from "../../../pages/warehouse/suppliers/supplierModal.js";
-import { getAllSuppliers } from "../../../application/warehouse/suppliers.js";
+import { getAllSuppliers } from "../../../application/warehouse/suppliers/suppliers.js";
 import { initDomainSelect2, initFilterSelect2, runAfterSelect2Close, toggleSelectOption } from "../baseSelect.js";
 import { FILTER_SELECTORS } from "../../../constants/selectors.js";
 

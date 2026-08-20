@@ -1,5 +1,5 @@
 import { useForm } from '../../../application/form.js';
-import { editWaste, editWasteStock, registerWaste } from '../../../application/warehouse/wastes.js';
+import { editWaste, editWasteStock, registerWaste } from '../../../application/warehouse/wastes/wastes.js';
 import { FORM_SELECTORS } from '../../../constants/selectors.js';
 import { handleSubmit, pickFormFields, validateFields } from '../../../utils/formUtils.js';
 import { wasteEditValidation, wasteStockValidation, wasteValidation } from '../../../utils/validations/validators.js';

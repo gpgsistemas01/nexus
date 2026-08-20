@@ -1,4 +1,4 @@
-import { getAllPersons } from "../../../application/admin/persons.js";
+import { getAllPersons } from "../../../application/admin/persons/persons.js";
 import { initDomainSelect2, initFilterSelect2, toggleSelectOption } from "../baseSelect.js";
 import { FILTER_SELECTORS } from "../../../constants/selectors.js";
 import { getSelectedOptionText } from "../../../utils/domUtils.js";

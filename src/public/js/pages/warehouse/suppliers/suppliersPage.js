@@ -1,3 +1,3 @@
-import { createSupplierDatatable } from "../../../plugins/datatable/supplierDatatable.js";
+import { createSupplierDatatable } from "../../../plugins/datatable/warehouse/suppliers/supplierDatatable.js";
 
 createSupplierDatatable();

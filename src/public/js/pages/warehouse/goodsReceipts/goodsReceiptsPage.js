@@ -1,9 +1,9 @@
 import { useForm } from "../../../application/form.js";
-import { editGoodsReceiptHeader, registerGoodsReceipt, cancelGoodsReceiptDetail } from "../../../application/warehouse/goodsReceipts.js";
+import { editGoodsReceiptHeader, registerGoodsReceipt, cancelGoodsReceiptDetail } from "../../../application/warehouse/goodsReceipts/goodsReceipts.js";
 import { handleApiError } from "../../../api/errorHandler.js";
 import { addGoodsReceiptMaterialValidation, goodsReceiptValidation } from "../../../utils/validations/validators.js";
-import { refreshMaterialTable } from "../../../plugins/datatable/utils/renderMaterialDatatable.js";
-import { createGoodsReceiptDatatable, details, initDetailsGoodsReceiptTable } from "../../../plugins/datatable/goodsReceiptDatatable.js";
+import { refreshMaterialTable } from "../../../plugins/datatable/shared/inventory/renderMaterialDatatable.js";
+import { createGoodsReceiptDatatable, details, initDetailsGoodsReceiptTable } from "../../../plugins/datatable/warehouse/goodsReceipts/goodsReceiptDatatable.js";
 import { GOODS_RECEIPT_SUPPLIER_CHANGED_EVENT, initGoodsReceiptFormSelect2, setGoodsReceiptFormSelectOptions } from "../../../plugins/select2/modules/goodsReceiptSelect.js";
 import { clearFormErrors, normalizeFormErrors } from "../../../ui/forms/formErrorsUI.js";
 import { setFormDisabled, initForm } from "../../../ui/forms/formStateUI.js";
@@ -19,6 +19,7 @@ import { GOODS_RECEIPT_STATUS_LABELS } from "../../../constants/goodsReceiptStat
 import { notifications } from "../../../plugins/swal/swalComponent.js";
 import { GOODS_RECEIPT_CORRECTION_APPLIED_EVENT, initGoodsReceiptCorrection, openGoodsReceiptCorrectionModal } from "./corrections/correctionModal.js";
 import { buildGoodsReceiptModalDetails, mapGoodsReceiptSelectionToDetail } from "./goodsReceiptDetails.js";
+import { upsertDetail } from "../../../utils/detailCollectionUtils.js";
 
 const modalId = MODAL_SELECTORS.GOODS_RECEIPT;
 const formId = FORM_SELECTORS.GOODS_RECEIPT;
@@ -242,19 +243,20 @@ const addMaterial = () => {
         quantity,
         costPerUnitType
     });
-    const existingIndex = details.findIndex(detail => detail.materialId === materialId);
+    const previousDetail = upsertDetail({
+        details,
+        detail: newDetail,
+        matches: detail => detail.materialId === materialId
+    });
 
-    if (existingIndex >= 0) {
-        const previousDetail = details[existingIndex];
-
+    if (previousDetail) {
         updateTotals({
             quantity: previousDetail.quantity,
             net: previousDetail.netPurchaseAmount,
             gross: previousDetail.grossPurchaseAmount,
             operation: 'subtract'
         });
-        details.splice(existingIndex, 1, newDetail);
-    } else details.push(newDetail);
+    }
 
     refreshMaterialTable(details);
     clearAddedMaterialInput();

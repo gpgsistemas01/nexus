@@ -1,7 +1,7 @@
 import { useForm } from "../../../../application/form.js";
-import { correctGoodsReceiptDetail } from "../../../../application/warehouse/goodsReceipts.js";
+import { correctGoodsReceiptDetail } from "../../../../application/warehouse/goodsReceipts/goodsReceipts.js";
 import { initMdbModal } from "../../../../plugins/mdb/baseInstance.js";
-import { reloadMainTable } from "../../../../plugins/datatable/baseDatatable.js";
+import { reloadMainTable } from "../../../../plugins/datatable/core/baseDatatable.js";
 import { notifications } from "../../../../plugins/swal/swalComponent.js";
 import { resetFormSubmitState } from "../../../../ui/forms/formStateUI.js";
 import { validateFields } from "../../../../utils/formUtils.js";

@@ -1,4 +1,4 @@
-import { createMaterialDatatable } from "../../../plugins/datatable/materialDatatable.js";
+import { createMaterialDatatable } from "../../../plugins/datatable/warehouse/materials/materialDatatable.js";
 
 const context = window.meta || {};
 

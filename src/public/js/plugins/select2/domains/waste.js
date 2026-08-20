@@ -1,4 +1,4 @@
-import { getAllWastes } from "../../../application/warehouse/wastes.js";
+import { getAllWastes } from "../../../application/warehouse/wastes/wastes.js";
 import { FILTER_SELECTORS, FORM_SELECTORS } from "../../../constants/selectors.js";
 import { mapSelectWasteData } from "../../../utils/warehouseInventoryUtils.js";
 import { buildPaginatedSelectParams, initDomainSelect2, toggleSelectOption, updatePresentationDisplay } from "../baseSelect.js";

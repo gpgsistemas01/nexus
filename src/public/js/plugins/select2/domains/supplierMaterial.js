@@ -1,4 +1,4 @@
-import { getAllMaterials } from "../../../application/warehouse/materials.js";
+import { getAllMaterials } from "../../../application/warehouse/materials/materials.js";
 import { mapSelectMaterialData } from "../../../utils/warehouseInventoryUtils.js";
 import { initDomainSelect2, toggleSelectOption } from "../baseSelect.js";
 

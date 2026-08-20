@@ -69,6 +69,18 @@ conserva las operaciones CRUD y aplica las claves de respuesta inyectadas.
 Los filtros CRUD se prueban junto a su plugin de datatable: un recurso remoto no debe
 precargar opciones si Select2 ya mapea su listado, salvo que exista una selección
 predeterminada explícita.
+La estructura de las pruebas refleja la del código propietario: las pruebas del núcleo
+de DataTable viven en `tests/unit/public/js/plugins/datatable/core` y sus filtros en la
+subcarpeta `filters`; una prueba específica de recurso debe replicar además dominio y
+recurso. Reubicar un módulo no cambia la estrategia: las pruebas de UI protegen la
+configuración y coordinación del CRUD, mientras la persistencia continúa validándose
+por HTTP y Prisma en `tests/integration/controllers`. No se crea una prueba de traslado
+que duplique el comportamiento CRUD ya cubierto.
+Las utilidades de colección de detalles se prueban en
+`tests/unit/public/js/utils/detailCollectionUtilsTest.js`: agregar, sustituir, eliminar
+y no encontrar representan la coordinación local del detalle CRUD. Totales, inventario
+y persistencia siguen correspondiendo a sus pruebas de contexto y no se simulan dentro
+de la utilidad.
 
 ## 5. Cobertura planificada por capacidad
 
