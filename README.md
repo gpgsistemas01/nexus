@@ -238,6 +238,8 @@ npm test
   sólo debe coordinar infraestructura y los registros principales.
 - Reutiliza componentes y casos de uso existentes cuando un CRUD cambie únicamente de
   contexto, en vez de duplicar el flujo completo.
+- Mantén en `plugins/select2/baseSelect.js` los comportamientos visuales compartidos por
+  selects de distintos CRUD, como la sincronización de la presentación en compras y salidas.
 - Conserva el mismo orden CRUD en rutas, controllers, servicios de aplicación y
   servicios HTTP: lectura, creación, actualización general, actualizaciones
   especializadas y eliminación o acción terminal.

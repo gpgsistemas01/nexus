@@ -6,8 +6,6 @@ import { on } from '../../utils/domUtils.js';
 import { formatDecimal, roundTo } from '../../utils/formatUtils.js';
 import { clearFormErrors, initForm, setFormDisabled, toggleButtons } from '../formUI.js';
 import { buildModalTitle } from '../modalUI.js';
-import { setMdbWrapperInputValue } from '../../plugins/select2/baseSelect.js';
-import { FORM_SELECTORS } from '../../constants/selectors.js';
 
 const ISSUE_HEADER_FIELD_NAMES = Object.freeze([
     'clientId',
@@ -185,19 +183,6 @@ export const createIssueHeaderForm = ({
         initialize,
         readData
     };
-};
-
-export const updatePresentationDisplay = ({ modalSelector, data, presentation, option }) => {
-    if (!option) return;
-
-    Object.entries(data).forEach(([key, value]) => {
-        option.dataset[key] = value;
-    });
-
-    setMdbWrapperInputValue({
-        selector: `${ modalSelector } ${ FORM_SELECTORS.PRESENTATION_DISPLAY }`,
-        value: presentation.name || ''
-    });
 };
 
 export const useIssueForm = ({
