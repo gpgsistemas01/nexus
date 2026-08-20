@@ -3,9 +3,10 @@ import { FORM_MODES } from '../../../../constants/formModes.js';
 import { getAllSuppliers } from "../../../../application/warehouse/suppliers/suppliers.js";
 import { exportSupplierReport } from "../../../../application/warehouse/report.js";
 import { openSupplierModal } from "../../../../pages/warehouse/suppliers/supplierModal.js";
-import { createDataTable, renderActionButtons } from "../../core/baseDatatable.js";
+import { createDataTable } from '../../core/base/createDataTable.js';
+import { renderActionButtons } from '../../core/base/actionButtons.js';
 import { buildExcelButton, buildTableExportParams } from "../../../../ui/tableUI.js";
-import { getResponsiveRowData } from "../../core/responsive.js";
+import { getResponsiveRowData } from '../../core/responsive/rowData.js';
 import { DATATABLE_SELECTORS } from "../../../../constants/selectors.js";
 import { formatFileName } from "../../../../utils/formatters.js";
 

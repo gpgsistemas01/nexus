@@ -238,6 +238,20 @@ primero en `admin`, `sales` y `warehouse`, y después por recurso (`persons`, `c
 filtros reutilizables; `shared/issues` e `shared/inventory` contienen únicamente
 composición usada por más de un flujo.
 
+Dentro de `core`, la implementación se divide por responsabilidad en `base` (creación,
+ciclo de vida, operaciones y botones de acción) y `responsive` (definiciones de
+columnas, filas, cuadrícula y grupos de encabezados, y detalle). Cada consumidor importa
+el contrato desde su módulo propietario; no se mantienen fachadas `baseDatatable.js` o
+`responsive.js` que oculten dependencias y vuelvan a concentrar exports sin aportar una
+abstracción adicional.
+
+La composición de columnas de detalles se organiza de la misma manera en
+`shared/issues/detailBuilder`: encabezados, columnas, inputs y reglas de visibilidad se
+mantienen separados. Es una composición compartida porque entradas, salidas de material
+y salidas de merma reutilizan el mismo contrato con distinto `type`, modo y permisos;
+los DataTables de cada contexto sólo construyen esa configuración y conservan sus
+efectos CRUD propios.
+
 La mutación en memoria de detalles no pertenece al plugin de DataTable: entradas,
 salidas de material y salidas de merma comparten `upsertDetail` y `removeDetail` desde
 `public/js/utils/detailCollectionUtils.js`. Las funciones sólo administran la colección

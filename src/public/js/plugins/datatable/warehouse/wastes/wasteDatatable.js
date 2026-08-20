@@ -1,10 +1,12 @@
 import { DOM_EVENT_NAMES } from '../../../../constants/events.js';
 import { FORM_MODES } from '../../../../constants/formModes.js';
-import { configureRealtimeReload, createDataTable, renderActionButtons } from "../../core/baseDatatable.js";
+import { configureRealtimeReload } from '../../core/base/tableOperations.js';
+import { createDataTable } from '../../core/base/createDataTable.js';
+import { renderActionButtons } from '../../core/base/actionButtons.js';
 import { setupTableFilters } from "../../core/filters/tableFilter.js";
 import { getAllWastes } from "../../../../application/warehouse/wastes/wastes.js";
 import { openWasteModal } from "../../../../pages/warehouse/wastes/wasteModal.js";
-import { getResponsiveRowData } from "../../core/responsive.js";
+import { getResponsiveRowData } from '../../core/responsive/rowData.js';
 import { hasPermission, UI_PERMISSIONS } from "../../../../constants/permissions.js";
 import { DATATABLE_SELECTORS } from "../../../../constants/selectors.js";
 import { buildWarehouseInventoryColumns, renderWarehouseInventoryHeader } from "../../shared/inventory/warehouseInventoryDatatable.js";

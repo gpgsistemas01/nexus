@@ -1,4 +1,5 @@
-import { createDataTable, resetDataTable } from '../../core/baseDatatable.js';
+import { createDataTable } from '../../core/base/createDataTable.js';
+import { resetDataTable } from '../../core/base/tableOperations.js';
 
 /**
  * Initializes the detail table shared by warehouse issue flows.

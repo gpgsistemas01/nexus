@@ -1,5 +1,5 @@
 import { getErrorMessage } from "../constants/apiMessages.js";
-import { reloadMainTable } from "../plugins/datatable/core/baseDatatable.js";
+import { reloadMainTable } from '../plugins/datatable/core/base/tableOperations.js';
 import { notifications } from "../plugins/swal/swalComponent.js";
 import { closeModal } from "../ui/modalUI.js";
 import { FORM_MODES } from "../constants/formModes.js";

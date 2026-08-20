@@ -2,7 +2,7 @@ import { FORM_SELECTORS, MODAL_SELECTORS } from '../../../../constants/selectors
 import { useForm } from "../../../../application/form.js";
 import { correctGoodsReceiptDetail } from "../../../../application/warehouse/goodsReceipts/goodsReceipts.js";
 import { initMdbModal } from "../../../../plugins/mdb/baseInstance.js";
-import { reloadMainTable } from "../../../../plugins/datatable/core/baseDatatable.js";
+import { reloadMainTable } from '../../../../plugins/datatable/core/base/tableOperations.js';
 import { notifications } from "../../../../plugins/swal/swalComponent.js";
 import { resetFormSubmitState } from "../../../../ui/forms/formStateUI.js";
 import { validateFields } from "../../../../utils/formUtils.js";
