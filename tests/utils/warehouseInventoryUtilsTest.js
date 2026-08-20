@@ -10,6 +10,7 @@ import {
   getUnitMeasure,
   getUnitMeasureId,
   mapGoodsIssueDetailsToRequest,
+  mapIssueDetailsToSupplyRequest,
   mapIssueDetailToTable,
   mapSelectMaterialData
 } from '../../src/public/js/utils/warehouseInventoryUtils.js';
@@ -73,6 +74,26 @@ describe('select de material reutilizado por el CRUD de merma', () => {
 });
 
 describe('contrato de detalles de salidas de almacén y merma', () => {
+  it('reduce el surtido a filas nuevas y a los campos aceptados por el contrato', () => {
+    const detailToSupply = {
+      id: 'new',
+      isSupplied: true,
+      originalIsSupplied: false,
+      projectConvertedQuantity: 2,
+      convertedQuantity: 3
+    };
+
+    expect(mapIssueDetailsToSupplyRequest([
+      detailToSupply,
+      { id: 'supplied', isSupplied: true, originalIsSupplied: true },
+      { id: 'unselected', isSupplied: false, originalIsSupplied: false }
+    ])).toEqual([{
+      id: 'new',
+      isSupplied: true,
+      projectConvertedQuantity: 2
+    }]);
+  });
+
   it('mantiene intacta la respuesta de una salida de material y separa ids al formatear la tabla', () => {
     const responseDetail = {
       id: 'goods-detail-1',
