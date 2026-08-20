@@ -207,6 +207,12 @@ y resúmenes. `issues` se conserva separado porque compone esas primitivas para 
 compartido de salidas. Las vistas consumidoras referencian siempre la categoría explícita,
 y la prueba de estructura impide volver a dejar archivos EJS sueltos en la raíz.
 
+Compras y salidas de material reutilizan `shared/forms/materialSelect.ejs`. Este partial
+representa específicamente el campo de material: siempre renderiza `materialInput`,
+`materialId` y `material-select` dentro de `col-12`, sin aceptar datos de otro dominio ni
+permitir que una página redefina el ancho. El modal conserva el select genérico para
+detalles de otros dominios, como merma, y sólo el contexto de material activa el partial.
+
 Este criterio evita dos extremos: duplicar componentes por contexto y crear una
 abstracción «compartida» que todavía depende de un recurso concreto. Al editar EJS se
 preserva el cierre final de `contentFor` en su lugar; no se elimina y vuelve a agregar

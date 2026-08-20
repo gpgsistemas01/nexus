@@ -171,9 +171,13 @@ const modalDialogClass = typeof dialogClass !== 'undefined' ? dialogClass : 'mod
                             </div>
                         <% } else { %>
                             <div class="row mb-3">
-                                <div class="col-12">
-                                    <%- include('../forms/select', { input: form.table.select }) %>
-                                </div>
+                                <% if (form.table.materialSelect) { %>
+                                    <%- include('../forms/materialSelect') %>
+                                <% } else { %>
+                                    <div class="col-12">
+                                        <%- include('../forms/select', { input: form.table.select }) %>
+                                    </div>
+                                <% } %>
                             </div>
 
                             <div class="row g-3 align-items-end">

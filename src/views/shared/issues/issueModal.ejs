@@ -32,12 +32,12 @@
     table: {
         errorName: issue.detailErrorName,
         includeSummary: issue.includeSummary,
-        select: {
+        materialSelect: issue.materialSelect || false,
+        select: issue.itemSelect ? {
             id: issue.itemSelect.id,
             name: issue.itemSelect.name,
-            class: issue.itemSelect.class,
-            col: issue.itemSelect.col
-        },
+            class: issue.itemSelect.class
+        } : null,
         inputs: [
             {
                 id: issue.quantityInput.id,
