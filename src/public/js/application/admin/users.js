@@ -1,30 +1,19 @@
-import { createSuccessResponseFromRequest } from "../../utils/responseUtils.js";
 import { editUserPasswordRequest, editUserRequest, getAllUsersRequest, registerUserRequest } from "../../services/admin/userService.js";
+import { createCrudApplication } from '../createCrudApplication.js';
 
-export const getAllUsers = async (params = {}) => {
+const userApplication = createCrudApplication({
+    requests: {
+        getAll: getAllUsersRequest,
+        register: registerUserRequest,
+        edit: editUserRequest,
+        editPassword: editUserPasswordRequest
+    },
+    dataKey: 'user',
+    dataKeys: { editPassword: null },
+    additionalMutations: ['editPassword']
+});
 
-    const response = await getAllUsersRequest({ params });
-
-    return response;
-};
-
-export const registerUser = async ({ formData }) => {
-
-    const response = await registerUserRequest({ data: formData });
-
-    return createSuccessResponseFromRequest({ response, dataKey: 'user' });
-};
-
-export const editUser = async ({ formData, id }) => {
-
-    const response = await editUserRequest({ data: formData, id });
-
-    return createSuccessResponseFromRequest({ response, dataKey: 'user' });
-};
-
-export const editUserPassword = async ({ formData, id }) => {
-
-    const response = await editUserPasswordRequest({ data: formData, id });
-
-    return createSuccessResponseFromRequest({ response });
-};
+export const getAllUsers = userApplication.getAll;
+export const registerUser = userApplication.register;
+export const editUser = userApplication.edit;
+export const editUserPassword = userApplication.editPassword;

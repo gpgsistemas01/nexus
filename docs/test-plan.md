@@ -60,17 +60,26 @@ Los catálogos que reutilizan una fábrica pueden compartir preparación y casos
 pero cada contexto conserva al menos la integración que demuestra su router,
 configuración, nombre de recurso y persistencia. Los documentos operativos agregan
 pruebas de estado, detalles, movimiento, devolución y rollback según corresponda.
+En la capa de aplicación, las unitarias tabuladas verifican también que el módulo
+publique nombres de dominio y no exponga la instancia genérica de la fábrica; esto
+protege el contrato consumido por páginas, formularios y datatables.
+Las factories especializadas exportables se prueban en la carpeta paralela de su
+contexto y deben demostrar que cada invocación crea una instancia independiente, que
+conserva las operaciones CRUD y aplica las claves de respuesta inyectadas.
+Los filtros CRUD se prueban junto a su plugin de datatable: un recurso remoto no debe
+precargar opciones si Select2 ya mapea su listado, salvo que exista una selección
+predeterminada explícita.
 
 ## 5. Cobertura planificada por capacidad
 
 | Capacidad | Evidencia actual o planeada | Prioridad / siguiente paso |
 | --- | --- | --- |
 | Autenticación y autorización | Unitarias de middleware y casos negativos; flujos registrados. | Mantener casos de sesión ausente, permiso insuficiente y credencial inválida. |
-| Catálogos, clientes y proveedores | Integraciones CRUD existentes para catálogos seleccionados, clientes y proveedores. | Aplicar la matriz al modificar una fábrica o configuración compartida. |
+| Catálogos, clientes y proveedores | Integraciones CRUD existentes para catálogos seleccionados, clientes y proveedores; unitarias de contrato para la factory de aplicación. | Aplicar la matriz y sus casos tabulados de contexto al modificar la factory o una configuración compartida. |
 | Merma y salidas de merma | Unitarias de decisiones y límites; integración HTTP con persistencia, movimiento y rollback. | Mantener paridad CRUD al reutilizar patrones de salidas de material. |
 | Salidas de material | Unitarias existentes; integración completa pendiente. | Agregar HTTP + Prisma para creación/actualización, stock, entrega/devolución y rollback. |
 | Entradas de compra | Helpers/unitarias parciales; integración completa pendiente. | Cubrir creación, corrección, costo, movimiento y atomicidad. |
-| Personas y usuarios | Flujos implementados; integración de relaciones pendiente. | Cubrir asignaciones rol/departamento y rechazo sin escritura parcial. |
+| Personas y usuarios | Flujos implementados y contrato CRUD de aplicación cubierto; integración de relaciones pendiente. | Cubrir asignaciones rol/departamento y rechazo sin escritura parcial. |
 | Ajustes | Modelos/servicios parciales. | No declarar aceptación completa; integrar aprobación, movimiento y rollback al registrar rutas. |
 | Requisiciones y proyectos | Modelados sin CRUD completo. | Crear pruebas sólo con el flujo real; no probar directamente un servicio como sustituto del controller. |
 | Reportes y movimientos | Pruebas focalizadas pendientes. | Cubrir permisos, filtros, estructura y exportación sin duplicar cálculos unitarios. |
