@@ -13,10 +13,9 @@ import { buildModalTitle, openModal } from "../../../ui/modalUI.js";
 import { FORM_SELECTORS, MODAL_SELECTORS } from "../../../constants/selectors.js";
 import { FORM_MODES } from "../../../constants/formModes.js";
 import { GOODS_RECEIPT_STATUS_LABELS } from "../../../constants/goodsReceiptStatuses.js";
-import { roundTo } from "../../../utils/formatUtils.js";
 import { notifications } from "../../../plugins/swal/swalComponent.js";
 import { GOODS_RECEIPT_CORRECTION_APPLIED_EVENT, initGoodsReceiptCorrection, openGoodsReceiptCorrectionModal } from "./corrections/correctionModal.js";
-import { buildGoodsReceiptModalDetails } from "./goodsReceiptDetails.js";
+import { buildGoodsReceiptModalDetails, mapGoodsReceiptSelectionToDetail } from "./goodsReceiptDetails.js";
 
 const modalId = MODAL_SELECTORS.GOODS_RECEIPT;
 const formId = FORM_SELECTORS.GOODS_RECEIPT;
@@ -212,12 +211,11 @@ export const openGoodsReceiptModal = ({ mode, data = null }) => {
 const addMaterial = () => {
 
     const option = document.querySelector(`${ FORM_SELECTORS.MATERIAL } option:checked`);
+    if (!option) return;
 
-    let { materialBase, materialHeight, presentationName, unitMeasureName, supplierName, materialName } = option?.dataset;
-    materialHeight = isNaN(Number(materialHeight)) ? null : Number(materialHeight);
-    materialBase = isNaN(Number(materialBase)) ? null : Number(materialBase);
-
-    const materialId = option.value;
+    const { material, supplier } = option.dataset;
+    const selectedMaterial = material ? JSON.parse(material) : {};
+    const materialId = selectedMaterial.id;
 
     const quantity = Number(document.querySelector(FORM_SELECTORS.QUANTITY_INPUT).value);
     const costPerUnitType = Number(document.querySelector(FORM_SELECTORS.COST_PER_UNIT).value);
@@ -231,40 +229,32 @@ const addMaterial = () => {
 
     if (hasValidationErrors(errors)) return;
 
-    if (!option) return null;
-
-    const netPurchaseAmount = roundTo(quantity * costPerUnitType);
-    let convertedQuantity;
-
-    if (!materialBase || !materialHeight) convertedQuantity = quantity;
-    else convertedQuantity = roundTo(materialBase * materialHeight * quantity);
-
-    const conversionUnitCost = roundTo(netPurchaseAmount / convertedQuantity);
-    const grossPurchaseAmount = roundTo(netPurchaseAmount * 1.16);
-    const material = {
-        materialId,
-        materialName,
-        materialBase,
-        materialHeight,
+    const newDetail = mapGoodsReceiptSelectionToDetail({
+        optionData: { material, supplier },
         quantity,
-        unitMeasureName,
-        presentationName,
-        costPerUnitType,
-        conversionUnitCost,
-        netPurchaseAmount,
-        grossPurchaseAmount,
-        convertedQuantity,
-        supplierName,
-    };
-    details.push(material);
+        costPerUnitType
+    });
+    const existingIndex = details.findIndex(detail => detail.materialId === materialId);
+
+    if (existingIndex >= 0) {
+        const previousDetail = details[existingIndex];
+
+        updateTotals({
+            quantity: previousDetail.quantity,
+            net: previousDetail.netPurchaseAmount,
+            gross: previousDetail.grossPurchaseAmount,
+            operation: 'subtract'
+        });
+        details.splice(existingIndex, 1, newDetail);
+    } else details.push(newDetail);
 
     refreshMaterialTable(details);
     clearAddedMaterialInput();
 
     updateTotals({
         quantity,
-        net: netPurchaseAmount,
-        gross: grossPurchaseAmount,
+        net: newDetail.netPurchaseAmount,
+        gross: newDetail.grossPurchaseAmount,
         operation: 'add'
     });
 }

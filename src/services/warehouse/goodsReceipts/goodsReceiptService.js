@@ -15,7 +15,7 @@ import { generateYearlyReferenceNumber, throwIfReferenceNumberAlreadyExists } fr
 import { findPersonById } from "../../admin/person/personService.js";
 import { applyInventoryMovement } from "../../inventory/movementService.js";
 import { findUniqueSupplier } from "../supplierService.js";
-import { buildGoodsReceiptDetails, calculateGoodsReceiptTotals, createGoodsReceiptDetailsAndUpdateTotals } from "./goodsReceiptHelpers.js";
+import { buildGoodsReceiptDetails, calculateGoodsReceiptTotals, createGoodsReceiptDetailsAndUpdateTotals, GOODS_RECEIPT_DETAIL_INCLUDE } from "./goodsReceiptHelpers.js";
 import { updateMaterialUnitCostIfHigher } from "../materials/supplierMaterialService.js";
 import { isAppError } from "../../../errors/AppError.js";
 import { buildDateRangeFilter } from "../../../utils/requestQueryUtils.js";
@@ -95,6 +95,7 @@ export const findAllGoodsReceipts = async ({
             receivedByName: true,
             supplierId: true,
             supplierName: true,
+            supplier: true,
             totalGrossPurchaseAmount: true,
             totalNetPurchaseAmount: true,
             totalQuantity: true,
@@ -107,21 +108,7 @@ export const findAllGoodsReceipts = async ({
             },
             details: {
                 ...(activeDetailsOnly && { where: { status: 'ACTIVE' } }),
-                select: {
-                    id: true,
-                    materialName: true,
-                    quantity: true,
-                    convertedQuantity: true,
-                    costPerUnitType: true,
-                    conversionUnitCost: true,
-                    netPurchaseAmount: true,
-                    grossPurchaseAmount: true,
-                    materialId: true,
-                    material: {
-                        include: { presentation: true, unitMeasure: true }
-                    },
-                    status: true,
-                }
+                include: GOODS_RECEIPT_DETAIL_INCLUDE
             }
         }
     });
@@ -188,13 +175,10 @@ export const createGoodsReceipt = async ({ goodsReceiptDto }) => {
                 },
                 include: {
                     details: {
-                        select: {
-                            id: true,
-                            materialId: true,
-                            quantity: true,
-                            conversionUnitCost: true
-                        }
-                    }
+                        include: GOODS_RECEIPT_DETAIL_INCLUDE
+                    },
+                    supplier: true,
+                    status: true
                 }
             });
 
@@ -286,15 +270,9 @@ export const updateGoodsReceipt = async ({ id, goodsReceiptDto }) => {
                 },
                 include: {
                     details: {
-                        include: {
-                            material: {
-                                include: {
-                                    presentation: true,
-                                    unitMeasure: true
-                                }
-                            }
-                        }
+                        include: GOODS_RECEIPT_DETAIL_INCLUDE
                     },
+                    supplier: true,
                     status: true
                 }
             });

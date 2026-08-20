@@ -45,6 +45,7 @@ describe('cancelGoodsReceiptDetailAndTotals', () => {
                         }
                     }
                 },
+                supplier: true,
                 status: true
             }
         }));
@@ -82,7 +83,8 @@ describe('cancelGoodsReceiptDetailAndTotals', () => {
                             include: { presentation: true, unitMeasure: true }
                         }
                     }
-                }
+                },
+                supplier: true
             })
         }));
     });

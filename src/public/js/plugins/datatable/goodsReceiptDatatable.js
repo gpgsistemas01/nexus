@@ -4,12 +4,12 @@ import { getAllGoodsReceipts } from "../../application/warehouse/goodsReceipts.j
 import { exportGoodsReceiptReport } from "../../application/warehouse/report.js";
 import { initMdbWrapperInput, updateMdbWrapperInput } from "../mdb/baseInstance.js";
 import { buildDetailsColumns, buildDetailsHeader } from "./utils/builderDetailDatatable.js";
-import { handleDelete, renderWarehouseItemName } from "./utils/detailDatatableUtils.js";
+import { handleDelete } from "./utils/detailDatatableUtils.js";
 import { getResponsiveRowData } from "./utils/responsive.js";
 import { buildExcelButton, buildTableExportParams } from "../../ui/tableUI.js";
 import { formatDateTimeDisplay, formatFileName } from "../../utils/formatters.js";
 import { setupTableFilters } from "./utils/filters/tableFilter.js";
-import { DATATABLE_SELECTORS, MODAL_SELECTORS, FORM_SELECTORS } from "../../constants/selectors.js";
+import { DATATABLE_SELECTORS } from "../../constants/selectors.js";
 import { GOODS_RECEIPT_STATUS_LABELS } from "../../constants/goodsReceiptStatuses.js";
 
 export let details = [];
@@ -128,15 +128,7 @@ export const initDetailsGoodsReceiptTable = (mode) => {
 
     const columns = buildDetailsColumns({
         type: 'receipt',
-        mode,
-        render: (_, __, row) => {
-
-            const modal = document.querySelector(MODAL_SELECTORS.GOODS_RECEIPT);
-            const select = modal?.querySelector(FORM_SELECTORS.SUPPLIER);
-            const supplier = select?.options[select.selectedIndex]?.text || '';
-
-            return renderWarehouseItemName(row, supplier);
-        }
+        mode
     });
 
     createDataTable({

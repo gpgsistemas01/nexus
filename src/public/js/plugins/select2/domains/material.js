@@ -87,7 +87,7 @@ const attachMaterialHandler = ({
 
                         toggleMaterialOption({
                             selector: baseSelector,
-                            data: JSON.parse(createdMaterial.material)
+                            data: createdMaterial
                         });
 
                         setMdbWrapperInputValue({

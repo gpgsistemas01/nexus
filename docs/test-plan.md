@@ -69,7 +69,7 @@ pruebas de estado, detalles, movimiento, devolución y rollback según correspon
 | Catálogos, clientes y proveedores | Integraciones CRUD existentes para catálogos seleccionados, clientes y proveedores. | Aplicar la matriz al modificar una fábrica o configuración compartida. |
 | Merma y salidas de merma | Unitarias de decisiones y límites; integración HTTP con persistencia, movimiento y rollback. | Mantener paridad CRUD al reutilizar patrones de salidas de material. |
 | Salidas de material | Unitarias existentes; integración completa pendiente. | Agregar HTTP + Prisma para creación/actualización, stock, entrega/devolución y rollback. |
-| Entradas de compra | Helpers/unitarias parciales; integración completa pendiente. | Cubrir creación, corrección, costo, movimiento y atomicidad. |
+| Entradas de compra | La API conserva el detalle y relaciones Prisma; el frontend cubre su mapeo de alta/lectura en la ruta paralela y delega la fila canónica a getters compartidos probados en `tests/utils`, igual que salidas. | Cubrir creación y corrección HTTP, persistencia, movimiento y atomicidad. |
 | Personas y usuarios | Flujos implementados; integración de relaciones pendiente. | Cubrir asignaciones rol/departamento y rechazo sin escritura parcial. |
 | Ajustes | Modelos/servicios parciales. | No declarar aceptación completa; integrar aprobación, movimiento y rollback al registrar rutas. |
 | Requisiciones y proyectos | Modelados sin CRUD completo. | Crear pruebas sólo con el flujo real; no probar directamente un servicio como sustituto del controller. |
