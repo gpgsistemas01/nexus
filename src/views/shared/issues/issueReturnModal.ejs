@@ -72,7 +72,7 @@ const returnForm = {
     ],
     actions: [
         {
-            id: 'cancelGoodsIssueReturnBtn',
+            id: `${ issueReturnPrefix }ReturnCancelBtn`,
             class: 'btn btn-link',
             content: 'Regresar',
             attrs: {
@@ -81,7 +81,7 @@ const returnForm = {
             }
         },
         {
-            id: 'confirmGoodsIssueReturnBtn',
+            id: `${ issueReturnPrefix }ReturnConfirmBtn`,
             type: 'submit',
             class: 'btn btn-warning',
             content: 'Devolver'

@@ -3,6 +3,7 @@ import { initMdbModal, showModal, initMdbWrapperInput, updateMdbWrapperInput } f
 import { notifications } from '../../plugins/swal/swalComponent.js';
 import { clearFormErrors, resetFormSubmitState } from '../../ui/formUI.js';
 import { setSummaryValues } from '../../ui/totalsSummaryUI.js';
+import { roundTo } from '../../utils/formatUtils.js';
 import { validateFields } from '../../utils/formUtils.js';
 import { issueReturnValidation } from '../../utils/validations/validators.js';
 
@@ -47,7 +48,9 @@ export const createIssueReturn = ({ prefix, sendReturn }) => {
         const form = document.querySelector(formSelector);
         const supplied = Number(detail.suppliedQuantity ?? 0);
         const returned = Number(detail.returnedQuantity ?? 0);
-        const available = supplied - returned;
+        // Inventory quantities use two decimal places. Keep the UI boundary aligned
+        // with the persisted value instead of exposing floating-point subtraction.
+        const available = roundTo(supplied - returned);
 
         setSummaryValues([
             { selector: `#${ prefix }ReturnSuppliedQuantity`, value: supplied },
