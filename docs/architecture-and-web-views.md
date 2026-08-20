@@ -151,7 +151,7 @@ flowchart LR
 
 | Área | Pantalla y ruta | Propósito visible | Interacciones principales | Implementación EJS |
 | --- | --- | --- | --- | --- |
-| Acceso | Inicio de sesión (`/inicio-sesion`) | Autenticar una cuenta. | Capturar credenciales e iniciar sesión. | `src/views/pages/home/loginPage.ejs` |
+| Acceso | Inicio de sesión (`/inicio-sesion`) | Autenticar una cuenta. | Capturar credenciales e iniciar sesión. | `src/views/pages/home/login/loginPage.ejs` |
 | Almacén | Existencias (`/almacen/materiales`) | Consultar materiales y stock. | Filtrar, paginar y abrir el alta/edición de material. | `src/views/pages/warehouse/materials/materialsPage.ejs` |
 | Almacén | Mermas (`/almacen/mermas`) | Consultar y administrar existencias de merma. | Filtrar, registrar/editar y ajustar stock. | `src/views/pages/warehouse/wastes/wastesPage.ejs` |
 | Almacén | Requisiciones (`/requisiciones`) | Consultar y capturar requisiciones de compra. | Registrar requisición y sus detalles. | `src/views/pages/warehouse/purchaseRequisitions/purchaseRequisitionsPage.ejs` |
@@ -164,7 +164,7 @@ flowchart LR
 | Administración | Personas (`/personas`) | Administrar personas participantes del negocio. | Filtrar y crear/editar datos y asignaciones. | `src/views/pages/admin/persons/personsPage.ejs` |
 | Administración | Movimientos de materiales (`/movimientos/materiales`) | Auditar movimientos del inventario de materiales. | Filtrar, consultar y exportar el historial. | `src/views/pages/admin/movements/movementsPage.ejs` |
 | Administración | Movimientos de merma (`/movimientos/mermas`) | Auditar movimientos del inventario de merma. | Filtrar, consultar y exportar el historial. | `src/views/pages/admin/movements/movementsPage.ejs` |
-| Sistema | No encontrada (`/error/404`) | Recuperar al usuario de una URL inexistente. | Volver al inicio apropiado según la sesión. | `src/views/pages/error/404.ejs` |
+| Sistema | No encontrada (`/error/404`) | Recuperar al usuario de una URL inexistente. | Volver al inicio apropiado según la sesión. | `src/views/pages/error/notFound/notFoundPage.ejs` |
 
 ### Redirecciones de compatibilidad
 
@@ -215,7 +215,7 @@ un flujo paralelo para registrar o editar.
 | Composición | `src/routes/{api,web}/index.js` registra prefijos y routers | La plantilla de página incluye el único entry point de la pantalla |
 | Transporte | `routes` declara método, permiso y validadores; `controllers` traduce HTTP/DTO | `public/js/services` encapsula HTTP; `application` traduce la respuesta al caso de uso |
 | Negocio | `services/<dominio>` contiene reglas y transacciones reutilizables | `application/<dominio>` coordina casos de uso sin depender de elementos visuales |
-| Presentación | El controlador web entrega el contexto de la vista | `pages/<dominio>/<recurso>` conserva entry point, formulario y modal del contexto; `ui`, `plugins` y `views/shared` reúnen piezas independientes del recurso |
+| Presentación | El controlador web entrega el contexto de la vista | `pages/<dominio>/<recurso>` conserva siempre el entry point y, cuando existen, el formulario y modal del contexto; incluso acceso, shell y consultas de movimientos siguen esa jerarquía. `ui`, `plugins` y `views/shared` reúnen piezas independientes del recurso |
 
 Reglas para extender un CRUD:
 
@@ -306,8 +306,15 @@ cuando existe reutilización entre consumidores o cuando constituye un adaptador
 
 Los formularios y modales de clientes, materiales y proveedores se consumen desde
 varias pantallas, pero siguen perteneciendo a su recurso. Por ello viven en
-`pages/sales/clients`, `pages/warehouse/materials` y `pages/warehouse/suppliers`; los
-flujos externos los importan desde el contexto propietario en vez de crear una carpeta
+`pages/admin/persons`, `pages/admin/users`, `pages/sales/clients`,
+`pages/warehouse/materials` y `pages/warehouse/suppliers`. Las pantallas sin CRUD también
+respetan la jerarquía completa, por ejemplo `pages/admin/movements`,
+`pages/home/login` y `pages/home/index`; no quedan entry points sueltos en la raíz de un
+dominio. Las vistas EJS replican `views/pages/<dominio>/<recurso>`; sus partials
+propietarios permanecen junto al recurso y los partials reutilizados por varios recursos
+se ubican en `views/shared`, como los formularios comunes de salidas. El entry point de cada CRUD sólo inicializa la tabla y carga su formulario,
+mientras el formulario y el modal
+conservan sus responsabilidades en módulos hermanos. Los flujos externos los importan desde el contexto propietario en vez de crear una carpeta
 intermedia basada sólo en que hay más de un consumidor. `ui` queda reservado para
 comportamiento que recibe su contexto por parámetros y no importa aplicaciones de un
 recurso concreto.

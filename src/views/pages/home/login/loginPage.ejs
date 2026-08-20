@@ -46,7 +46,7 @@
             <h1 id="loginTitle">Iniciar sesión</h1>
             <p class="login-card__text">Accede con tu usuario y contraseña.</p>
 
-            <%- include('../../shared/form', { form }) %>
+            <%- include('../../../shared/form', { form }) %>
         </div>
     </div>
 </section>
@@ -54,7 +54,7 @@
 <script>
     window.FLASH_MESSAGE = <%- JSON.stringify(flash) %>;
 </script>
-<script type="module" src="/js/pages/home/loginPage.js"></script>
+<script type="module" src="/js/pages/home/login/loginPage.js"></script>
 
 <%- contentFor('title') %>
 Inicio

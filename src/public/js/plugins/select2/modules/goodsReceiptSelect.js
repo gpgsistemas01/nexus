@@ -1,6 +1,5 @@
 import { DOM_EVENT_NAMES } from '../../../constants/events.js';
 import { updateTotals } from "../../../ui/forms/totalsSummaryUI.js";
-import { MATERIAL_SELECT_RESULTS_LIMIT } from "../../../application/warehouse/materials/materials.js";
 import { toggleContainerElements } from "../../../utils/formUtils.js";
 import { refreshMaterialTable } from "../../datatable/shared/inventory/renderMaterialDatatable.js";
 import { details } from "../../datatable/warehouse/goodsReceipts/goodsReceiptDatatable.js";
@@ -98,8 +97,7 @@ export const initGoodsReceiptFormSelect2 = () => {
         modalSelector,
         supplierSelector,
         materialSelector,
-        creationContext: 'goodsReceipt',
-        resultsLimit: MATERIAL_SELECT_RESULTS_LIMIT
+        creationContext: 'goodsReceipt'
     });
 };
 

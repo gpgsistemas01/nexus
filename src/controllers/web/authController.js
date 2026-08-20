@@ -6,7 +6,7 @@ import { getNewRefreshToken } from '../../services/authService.js';
 
 export const login = async (req, res) => {
 
-    return res.render('pages/home/loginPage');
+    return res.render('pages/home/login/loginPage');
 }
 
 export const refreshAuthToken = async (req, res) => {

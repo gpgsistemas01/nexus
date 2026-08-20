@@ -1,8 +1,8 @@
-import { DOM_EVENT_NAMES } from '../constants/events.js';
-import { notifications } from "../plugins/swal/swalComponent.js";
-import { handleFlashMessage } from "../handlers/flashMessageHandler.js";
-import { initDatePickers, initDateTimePickers } from "../plugins/flatpickr/dateTimePicker.js";
-import { initMdbDismissibleSubmenus, initMdbTooltips } from "../plugins/mdb/baseInstance.js";
+import { DOM_EVENT_NAMES } from '../../../constants/events.js';
+import { notifications } from "../../../plugins/swal/swalComponent.js";
+import { handleFlashMessage } from "../../../handlers/flashMessageHandler.js";
+import { initDatePickers, initDateTimePickers } from "../../../plugins/flatpickr/dateTimePicker.js";
+import { initMdbDismissibleSubmenus, initMdbTooltips } from "../../../plugins/mdb/baseInstance.js";
 
 initDateTimePickers();
 initDatePickers();
