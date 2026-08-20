@@ -244,6 +244,12 @@ fusionan módulos de capas diferentes para reducir el conteo de archivos, ni se 
 carpetas horizontales para operaciones CRUD aisladas. Al mover un módulo se actualizan
 en la misma modificación todos sus imports, exports, pruebas y referencias generadas.
 
+Cuando una operación se invoca una sola vez y no introduce una frontera de capa, se
+implementa directamente en su consumidor: la lectura del mensaje flash pertenece al
+entry point de inicio y la creación del enlace de descarga pertenece al botón de
+exportación. No se publican handlers o utilidades de una sola llamada como componentes
+compartidos anticipadamente; se extraen sólo cuando aparece otro consumidor real.
+
 La revisión de ownership se aplica por capa a todo `src`:
 
 | Área | Responsabilidad y decisión de ubicación |

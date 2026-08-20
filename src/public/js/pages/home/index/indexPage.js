@@ -1,6 +1,6 @@
 import { DOM_EVENT_NAMES } from '../../../constants/events.js';
+import { getErrorMessage, getSuccessMessage } from '../../../constants/apiMessages.js';
 import { notifications } from "../../../plugins/swal/swalComponent.js";
-import { handleFlashMessage } from "../../../handlers/flashMessageHandler.js";
 import { initDatePickers, initDateTimePickers } from "../../../plugins/flatpickr/dateTimePicker.js";
 import { initMdbDismissibleSubmenus, initMdbTooltips } from "../../../plugins/mdb/baseInstance.js";
 
@@ -9,7 +9,25 @@ initDatePickers();
 initMdbTooltips();
 initMdbDismissibleSubmenus();
 
-handleFlashMessage(window.FLASH_MESSAGE || null);
+const flashMessage = window.FLASH_MESSAGE;
+
+if (flashMessage) {
+    const { message, type, code } = flashMessage;
+
+    switch (type) {
+        case 'success':
+            notifications.showSuccess(message || getSuccessMessage(code));
+            break;
+        case 'warning':
+            notifications.showWarning(message || getErrorMessage(code));
+            break;
+        case 'error':
+            notifications.showError(message || getErrorMessage(code));
+            break;
+        default:
+            break;
+    }
+}
 
 const successMessage = localStorage.getItem('showSuccessToast');
 const errorMessage = localStorage.getItem('showErrorToast');

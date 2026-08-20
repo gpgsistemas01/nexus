@@ -1,5 +1,4 @@
 import { DOM_EVENT_NAMES } from '../constants/events.js';
-import { downloadBlob } from "../utils/downloadBlob.js";
 import { notifications } from "../plugins/swal/swalComponent.js";
 
 export const buildTableExportParams = (table, params = {}) => {
@@ -72,7 +71,15 @@ export const buildExcelButton = ({
             }
 
             const blob = await request({ monthlyReport: reportType === 'monthly' });
-            downloadBlob({ blob, filename });
+            const url = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+
+            link.href = url;
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            window.URL.revokeObjectURL(url);
 
         } catch (err) {
 
