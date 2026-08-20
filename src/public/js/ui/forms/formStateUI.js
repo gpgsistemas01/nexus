@@ -1,4 +1,4 @@
-import { DOM_EVENT_NAMES, SELECT2_EVENT_NAMES } from '../../constants/events.js';
+import { SELECT2_EVENT_NAMES } from '../../constants/events.js';
 import { BUTTON_SELECTORS } from '../../constants/selectors.js';
 import { FORM_MODES } from '../../constants/formModes.js';
 import { setDateTimePickerValue } from '../../plugins/flatpickr/dateTimePicker.js';
@@ -7,7 +7,7 @@ import { toggleDisabledElement } from '../../utils/formUtils.js';
 export const resetFormSubmitState = (form) => {
     if (!form) return;
     form.dataset.submitting = 'false';
-    form.querySelector('button[type=DOM_EVENT_NAMES.SUBMIT]')?.removeAttribute('disabled');
+    form.querySelector(BUTTON_SELECTORS.SUBMIT)?.removeAttribute('disabled');
 };
 
 export const initForm = ({ form, mode, id = '' }) => {

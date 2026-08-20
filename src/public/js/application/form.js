@@ -1,4 +1,5 @@
 import { DOM_EVENT_NAMES } from '../constants/events.js';
+import { BUTTON_SELECTORS } from '../constants/selectors.js';
 import { handleApiError } from "../api/errorHandler.js";
 import { toggleErrorMessages, normalizeFormErrors, scrollToFirstFormError } from "../ui/forms/formErrorsUI.js";
 import { on } from "../utils/domUtils.js";
@@ -36,7 +37,7 @@ export const useForm = async ({
 
         form.dataset.submitting = 'true';
 
-        const submitButton = form.querySelector('button[type=DOM_EVENT_NAMES.SUBMIT]');
+        const submitButton = form.querySelector(BUTTON_SELECTORS.SUBMIT);
 
         if (submitButton) {
 
