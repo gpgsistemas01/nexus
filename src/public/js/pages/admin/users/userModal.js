@@ -8,8 +8,14 @@ import { openModal } from '../../../ui/modalUI.js';
 const formId = FORM_SELECTORS.USER;
 const userModalId = MODAL_SELECTORS.USER;
 
-const setModeFields = ({ form, mode }) => {
+export const openUserModal = ({ mode = FORM_MODES.CREATE, data = null }) => {
 
+    const form = document.querySelector(formId);
+    const modalElement = document.querySelector(userModalId);
+
+    initForm({ form, mode, id: data?.id });
+    clearFormErrors(form);
+    initUserFormSelect2();
     setFormDisabled({
         form,
         isDisabled: false
@@ -26,17 +32,7 @@ const setModeFields = ({ form, mode }) => {
         fields: ['password'],
         isDisabled: true
     });
-};
 
-export const openUserModal = ({ mode = FORM_MODES.CREATE, data = null }) => {
-
-    const form = document.querySelector(formId);
-    const modalElement = document.querySelector(userModalId);
-
-    initForm({ form, mode, id: data?.id });
-    clearFormErrors(form);
-    initUserFormSelect2();
-    setModeFields({ form, mode });
     setUserFormSelectOptions(data);
 
     form.elements.name.value = data?.name || '';

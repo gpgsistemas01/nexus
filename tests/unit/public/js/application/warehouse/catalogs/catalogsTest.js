@@ -20,7 +20,7 @@ vi.mock('../../../../../../../src/public/js/services/warehouse/unitMeasureServic
   getAllUnitMeasuresRequest: requests.unitMeasures
 }));
 
-const { getFulfillmentStatusOptions } = await import(
+const { getAllFulfillmentStatuses, getFulfillmentStatusOptions } = await import(
   '../../../../../../../src/public/js/application/warehouse/catalogs/fulfillmentStatuses.js'
 );
 const { getAllPresentations } = await import(
@@ -50,6 +50,20 @@ describe('lectura de catálogos de almacén en la capa de aplicación', () => {
     expect(request).toHaveBeenCalledWith({ params: { search: 'acero' } });
   });
 
+  it('conserva la respuesta paginada del catálogo de estados de surtimiento', async () => {
+    const response = {
+      data: {
+        data: [{ id: 'status-1', name: 'Pendiente' }],
+        recordsFiltered: 4,
+        recordsTotal: 4
+      }
+    };
+    requests.fulfillmentStatuses.mockResolvedValue(response);
+
+    await expect(getAllFulfillmentStatuses({ start: 0, length: 1 })).resolves.toBe(response);
+    expect(requests.fulfillmentStatuses).toHaveBeenCalledWith({ params: { start: 0, length: 1 } });
+  });
+
   it('adapta estados válidos a opciones y descarta registros incompletos', async () => {
     requests.fulfillmentStatuses.mockResolvedValue({
       data: {
@@ -65,5 +79,11 @@ describe('lectura de catálogos de almacén en la capa de aplicación', () => {
       { value: 'status-1', label: 'Pendiente' }
     ]);
     expect(requests.fulfillmentStatuses).toHaveBeenCalledWith({ params: { active: true } });
+  });
+
+  it('resuelve una lista vacía cuando el transporte no entrega una respuesta', async () => {
+    requests.fulfillmentStatuses.mockResolvedValue(undefined);
+
+    await expect(getFulfillmentStatusOptions()).resolves.toEqual([]);
   });
 });

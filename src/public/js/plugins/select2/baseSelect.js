@@ -120,7 +120,7 @@ export const initbaseSelect2 = ({
 
                     const response = await get(params.data);
 
-                    return success(response.data);
+                    return success(Array.isArray(response) ? response : response?.data);
 
                 } catch (err) {
 
