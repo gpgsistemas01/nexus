@@ -1,6 +1,6 @@
 import {
-    editWasteIssueDetailsRequest,
     editWasteIssueHeaderRequest,
+    editWasteIssueDetailsRequest,
     editWasteIssueRequest,
     getAllWasteIssuesRequest,
     registerWasteIssueRequest,

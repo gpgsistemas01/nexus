@@ -1,4 +1,4 @@
-import { editGoodsIssueDetailsRequest, editGoodsIssueHeaderRequest, editGoodsIssueRequest, getAllGoodsIssuesRequest, registerGoodsIssueRequest, returnGoodsIssueDetailRequest } from "../../../services/warehouse/goodsIssueService.js";
+import { editGoodsIssueHeaderRequest, editGoodsIssueDetailsRequest, editGoodsIssueRequest, getAllGoodsIssuesRequest, registerGoodsIssueRequest, returnGoodsIssueDetailRequest } from "../../../services/warehouse/goodsIssueService.js";
 import { createIssueApplication } from '../issues/createIssueApplication.js';
 
 const goodsIssueApplication = createIssueApplication({

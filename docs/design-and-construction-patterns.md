@@ -310,7 +310,35 @@ introducir otro flujo de consulta. Las decisiones visuales dependientes de la
 presentación se resuelven con `getPresentation` sobre el material de la opción, sin
 duplicar ese dato como un atributo adicional de Select2.
 
-## 8. Patrones de construcción de pruebas
+## 8. Orden de métodos por comportamiento
+
+Los módulos que representan el mismo tipo de recurso conservan un orden de lectura
+común aunque cambien los nombres del dominio. Para un CRUD, el orden es: **consulta,
+creación, actualización general, actualizaciones especializadas y eliminación**. Las
+actualizaciones especializadas se ordenan desde el alcance más general al más específico;
+en salidas esto significa **encabezado, detalles y devolución de detalle**. Helpers y
+constantes privadas se declaran antes de la primera operación pública que los necesita.
+
+El orden se conserva de extremo a extremo en controller, ruta, servicio de dominio,
+adaptador HTTP del navegador y aplicación. No cambia la prioridad de las rutas ni el
+contrato público: hace predecible la ubicación de una operación y permite comparar dos
+contextos equivalentes sin depender de que usen exactamente el mismo sustantivo. Al
+agregar una operación se actualizan juntos sus imports, exports y la prueba estructural
+del flujo relacionado.
+
+Las salidas de material y de merma son la referencia comprobable: ambas exponen listado,
+registro, edición, edición de encabezado, edición de detalles y devolución en ese orden.
+Sus páginas conservan además la misma secuencia de coordinación: construcción e
+inicialización de componentes, normalización del formulario, `useIssueForm`, apertura
+del modal, creación del DataTable, alta de un detalle, búsqueda del detalle y registro
+de eventos. El nombre concreto puede cambiar entre material y merma; su posición la
+determina la responsabilidad equivalente, no el sustantivo del contexto.
+
+La prueba ubicada junto a las unitarias de sus controllers verifica esta secuencia entre
+las capas y en las páginas; las pruebas de comportamiento y la persistencia CRUD
+permanecen en las ubicaciones definidas por la estrategia de pruebas.
+
+## 9. Patrones de construcción de pruebas
 
 `createControllerTestApp` es una factory de test harness: crea una aplicación Express
 mínima, instala parsing JSON y deja que cada prueba registre las rutas necesarias. Se
@@ -325,6 +353,59 @@ La ubicación sigue indicando el propósito:
 
 Compartir harness o casos tabulados no elimina la integración de cada contexto: ésta
 debe demostrar router, permiso, configuración, persistencia y efectos propios.
+
+## 10. Estándar de codificación legible
+
+La legibilidad forma parte del contrato de mantenimiento. El código se organiza para
+que una persona pueda reconocer primero las dependencias, después el estado y, por
+último, el recorrido principal sin tener que reconstruirlo a partir de funciones
+dispersas. Este estándar se aplica al código nuevo y a los archivos que se modifican;
+no justifica reformatear archivos ajenos al cambio.
+
+### Estructura de los módulos
+
+1. Los imports se colocan al inicio, se agrupan por capa o responsabilidad y usan una
+   sola convención de comillas dentro del archivo. Los imports nombrados extensos se
+   escriben uno por línea. No permanecen imports, exports ni variables sin uso.
+2. Después de los imports se declaran constantes de configuración, referencias al DOM,
+   estado local y componentes construidos, en ese orden. Las constantes se nombran por
+   intención; un comentario no sustituye un nombre descriptivo.
+3. Las funciones se ordenan por comportamiento según la sección anterior. Una función
+   auxiliar se mantiene cerca del flujo que la consume y antes de su primer uso; no se
+   extrae un wrapper que sólo oculte una llamada.
+4. Los bloques de inicialización y registro de eventos se dejan al final. Eventos del
+   mismo componente permanecen juntos y usan los helpers y constantes compartidos.
+5. Imports, exports, rutas y consumidores se actualizan en el mismo cambio. Antes de
+   crear una función o proceso se busca una factory, componente o flujo equivalente que
+   pueda configurarse para el nuevo contexto.
+
+### Formato y control de flujo
+
+- La indentación conserva la convención de su área: cuatro espacios en `src` y dos en
+  las pruebas. Cada sentencia termina en punto y coma. Se evita una línea en blanco
+  inmediatamente después de abrir una función o bloque.
+- Una línea extensa se divide por unidades semánticas: parámetros, imports nombrados o
+  condiciones. No se comprimen varias decisiones en una sola línea para ahorrar espacio.
+- Se prefieren retornos tempranos para errores y casos sin trabajo. El recorrido normal
+  queda con la menor anidación posible y cada función conserva una responsabilidad.
+- Los nombres expresan el efecto (`normalizeWasteIssueData`, `findDetailByElement`) y
+  los booleanos expresan una condición. No se usan abreviaturas nuevas que obliguen a
+  conocer contexto implícito.
+- Los comentarios explican una restricción o una decisión no evidente; no narran lo que
+  ya dice el código. Los literales compartidos se importan desde sus constantes.
+
+### Aplicación y verificación
+
+En las páginas de salidas, este estándar complementa el orden común: configuración,
+estado, construcción de componentes, normalización, `useIssueForm`, modal, DataTable,
+operaciones de detalle y eventos. Las pruebas tabuladas usan datos con nombres de
+dominio y una entrada por línea, de modo que el contrato CRUD sea visible sin leer la
+lógica de la aserción.
+
+La revisión mínima de un cambio incluye la prueba CRUD relacionada, la suite unitaria,
+la validación de documentación y `git diff --check`. Si se toca una vista EJS, se
+preserva en su posición la última línea de `contentFor`; no se elimina y vuelve a
+agregar como consecuencia del formato.
 
 ## Decisión antes de crear otro flujo
 

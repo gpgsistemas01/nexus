@@ -335,6 +335,66 @@ export const updateGoodsIssue = async ({ id, goodsIssueDto }) => {
     }
 };
 
+export const updateGoodsIssueHeader = async ({ id, goodsIssueDto }) => {
+
+    try {
+
+        const { requesterId, advisorId, departmentId, clientId, ...goodsIssueData } = goodsIssueDto;
+
+        const goodsIssue = await getDb().goodsIssue.findUnique({
+            where: { id },
+            select: { id: true }
+        });
+
+        if (!goodsIssue) throw new GoodsIssueNotFound();
+
+        const headerData = await resolveIssueHeaderData({
+            requesterId,
+            advisorId,
+            departmentId,
+            clientId,
+            issueData: goodsIssueData,
+            errorTypes: GOODS_ISSUE_HEADER_ERROR_TYPES,
+            statusName: GOODS_ISSUE_STATUS_NAMES.APPROVED
+        });
+
+        const updatedGoodsIssue = await getDb().goodsIssue.update({
+            where: { id },
+            data: {
+                ...headerData
+            },
+            include: {
+                details: {
+                    select: GOODS_ISSUE_DETAIL_SELECT
+                },
+                status: true,
+                fulfillmentStatus: true
+            }
+        });
+
+        logServiceInfo(serviceLogger, {
+            operation: 'warehouse.goodsIssues.goodsIssueService.updateGoodsIssueHeader',
+            ...getModelLogContext('goodsIssue', {
+                id,
+                ...goodsIssueDto,
+                referenceNumber: updatedGoodsIssue.referenceNumber
+            })
+        }, 'Encabezado de salida actualizado correctamente');
+
+        return updatedGoodsIssue;
+
+    } catch (err) {
+        handleServiceError({
+            logger: serviceLogger,
+            error: err,
+            operation: 'warehouse.goodsIssues.goodsIssueService.updateGoodsIssueHeader',
+            model: 'goodsIssue',
+            data: { id, ...goodsIssueDto },
+            fallbackError: new GoodsIssueUpdateDatabaseError()
+        });
+    }
+};
+
 export const updateGoodsIssueDetails = async ({ id, goodsIssueDto }) => {
 
     const { details = [] } = goodsIssueDto;
@@ -501,67 +561,6 @@ export const updateGoodsIssueDetails = async ({ id, goodsIssueDto }) => {
             operation: 'warehouse.goodsIssues.goodsIssueService.updateGoodsIssueDetails',
             model: 'goodsIssue',
             data: { id, details },
-            fallbackError: new GoodsIssueUpdateDatabaseError()
-        });
-    }
-};
-
-
-export const updateGoodsIssueHeader = async ({ id, goodsIssueDto }) => {
-
-    try {
-
-        const { requesterId, advisorId, departmentId, clientId, ...goodsIssueData } = goodsIssueDto;
-
-        const goodsIssue = await getDb().goodsIssue.findUnique({
-            where: { id },
-            select: { id: true }
-        });
-
-        if (!goodsIssue) throw new GoodsIssueNotFound();
-
-        const headerData = await resolveIssueHeaderData({
-            requesterId,
-            advisorId,
-            departmentId,
-            clientId,
-            issueData: goodsIssueData,
-            errorTypes: GOODS_ISSUE_HEADER_ERROR_TYPES,
-            statusName: GOODS_ISSUE_STATUS_NAMES.APPROVED
-        });
-
-        const updatedGoodsIssue = await getDb().goodsIssue.update({
-            where: { id },
-            data: {
-                ...headerData
-            },
-            include: {
-                details: {
-                    select: GOODS_ISSUE_DETAIL_SELECT
-                },
-                status: true,
-                fulfillmentStatus: true
-            }
-        });
-
-        logServiceInfo(serviceLogger, {
-            operation: 'warehouse.goodsIssues.goodsIssueService.updateGoodsIssueHeader',
-            ...getModelLogContext('goodsIssue', {
-                id,
-                ...goodsIssueDto,
-                referenceNumber: updatedGoodsIssue.referenceNumber
-            })
-        }, 'Encabezado de salida actualizado correctamente');
-
-        return updatedGoodsIssue;
-
-    } catch (err) {
-        handleServiceError({
-            logger: serviceLogger,
-            error: err,
-            operation: 'warehouse.goodsIssues.goodsIssueService.updateGoodsIssueHeader',
-            model: 'goodsIssue',
-            data: { id, ...goodsIssueDto },
             fallbackError: new GoodsIssueUpdateDatabaseError()
         });
     }
