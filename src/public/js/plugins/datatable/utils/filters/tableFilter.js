@@ -4,6 +4,7 @@ import { DATATABLE_SELECTORS, FILTER_SELECTORS } from "../../../../constants/sel
 import { buildTableFilterConfigs } from "./tableFilterConfigs.js";
 import { bindTableFilterDependencies } from "./tableFilterDependencies.js";
 import { SELECT_RESULTS_LIMIT } from "../../../select2/baseSelect.js";
+import { createTableFilterState } from "./tableFilterState.js";
 
 const TABLE_FILTERS_FORM_SELECTOR = '#tableFiltersForm';
 
@@ -11,22 +12,6 @@ export const setupTableFilters = async ({
     fields = [],
     selector = DATATABLE_SELECTORS.MAIN
 } = {}) => {
-
-    on('click', FILTER_SELECTORS.CLEAR_BUTTON, (e) => {
-        const table = $.fn.DataTable.isDataTable(selector) ? $(selector).DataTable() : null;
-
-        clearTableFilters(table);
-
-        e.target.blur();
-    });
-
-    on('submit', TABLE_FILTERS_FORM_SELECTOR, (e) => {
-        const table = $.fn.DataTable.isDataTable(selector) ? $(selector).DataTable() : null;
-
-        e.preventDefault();
-        table?.ajax.reload();
-        e.submitter?.blur?.();
-    });
 
     bindTableFilterDependencies(fields);
 
@@ -91,12 +76,27 @@ export const setupTableFilters = async ({
         });
     }
 
-    return {
-        getValues: () => {
-            return Object.assign(
-                {},
-                ...Object.values(values).map(getter => getter())
-            );
-        }
-    };
+    const filterState = createTableFilterState(values);
+    filterState.apply();
+
+    on('click', FILTER_SELECTORS.CLEAR_BUTTON, (e) => {
+        const table = $.fn.DataTable.isDataTable(selector) ? $(selector).DataTable() : null;
+
+        clearTableFilters();
+        filterState.apply();
+        table?.ajax.reload();
+
+        e.target.blur();
+    });
+
+    on('submit', TABLE_FILTERS_FORM_SELECTOR, (e) => {
+        const table = $.fn.DataTable.isDataTable(selector) ? $(selector).DataTable() : null;
+
+        e.preventDefault();
+        filterState.apply();
+        table?.ajax.reload();
+        e.submitter?.blur?.();
+    });
+
+    return filterState;
 };

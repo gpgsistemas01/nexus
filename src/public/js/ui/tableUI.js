@@ -81,7 +81,7 @@ export const buildExcelButton = ({
     }
 });
 
-export const clearTableFilters = (table) => {
+export const clearTableFilters = () => {
 
     const filterElements = document.querySelectorAll(
         '.table-filters select, .table-filters input'
@@ -95,6 +95,4 @@ export const clearTableFilters = (table) => {
             element.dispatchEvent(new Event('change'));
         }
     });
-
-    table?.ajax.reload();
 }
