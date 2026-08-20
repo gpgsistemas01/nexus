@@ -1,13 +1,14 @@
 import { clearFormErrors } from "../../../ui/forms/formErrorsUI.js";
 import { initForm } from "../../../ui/forms/formStateUI.js";
 import { openModal } from "../../../ui/modalUI.js";
-import { FORM_SELECTORS, MODAL_SELECTORS } from "../../../constants/selectors.js";
+import { BUTTON_SELECTORS, FORM_SELECTORS, HEADING_SELECTORS, MODAL_SELECTORS } from "../../../constants/selectors.js";
+import { FORM_MODES } from "../../../constants/formModes.js";
 
 const clientModalId = MODAL_SELECTORS.CLIENT;
-const formId = FORM_SELECTORS.CLIENT_FORM;
+const formId = FORM_SELECTORS.CLIENT;
 
 export const openClientModal = ({ 
-    mode = 'create', 
+    mode = FORM_MODES.CREATE,
     data = null, 
     onSave = null 
 }) => {
@@ -20,16 +21,16 @@ export const openClientModal = ({
 
     form.elements.name.value = data?.name || '';
 
-    if (mode === 'create') {
+    if (mode === FORM_MODES.CREATE) {
 
-        modalElement.querySelector('#modalTitle').textContent = 'Registrar cliente';
-        form.querySelector('#submitBtn').textContent = 'Guardar';
+        modalElement.querySelector(HEADING_SELECTORS.MODAL_TITLE).textContent = 'Registrar cliente';
+        form.querySelector(BUTTON_SELECTORS.SUBMIT).textContent = 'Guardar';
     }
 
-    if (mode === 'edit') {
+    if (mode === FORM_MODES.EDIT) {
 
-        modalElement.querySelector('#modalTitle').textContent = 'Editar cliente';
-        form.querySelector('#submitBtn').textContent = 'Actualizar';
+        modalElement.querySelector(HEADING_SELECTORS.MODAL_TITLE).textContent = 'Editar cliente';
+        form.querySelector(BUTTON_SELECTORS.SUBMIT).textContent = 'Actualizar';
     }
 
     form.onSave = onSave;

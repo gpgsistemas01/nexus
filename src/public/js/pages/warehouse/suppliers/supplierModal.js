@@ -1,13 +1,14 @@
 import { clearFormErrors } from "../../../ui/forms/formErrorsUI.js";
 import { initForm } from "../../../ui/forms/formStateUI.js";
 import { openModal } from "../../../ui/modalUI.js";
-import { FORM_SELECTORS, MODAL_SELECTORS } from "../../../constants/selectors.js";
+import { BUTTON_SELECTORS, FORM_SELECTORS, HEADING_SELECTORS, MODAL_SELECTORS } from "../../../constants/selectors.js";
+import { FORM_MODES } from "../../../constants/formModes.js";
 
 const modalId = MODAL_SELECTORS.SUPPLIER;
-const formId = FORM_SELECTORS.SUPPLIER_FORM;
+const formId = FORM_SELECTORS.SUPPLIER;
 
 export const openSupplierModal = ({ 
-    mode = 'create', 
+    mode = FORM_MODES.CREATE,
     data = null, 
     onSave = null 
 }) => {
@@ -26,16 +27,16 @@ export const openSupplierModal = ({
     form.elements.legalName.value = data?.legalName || '';
     form.elements.numberphone.value = data?.numberphone || '';
 
-    if (mode === 'create') {
+    if (mode === FORM_MODES.CREATE) {
 
-        modalElement.querySelector('#modalTitle').textContent = 'Registrar proveedor';
-        form.querySelector('#submitBtn').textContent = 'Guardar';
+        modalElement.querySelector(HEADING_SELECTORS.MODAL_TITLE).textContent = 'Registrar proveedor';
+        form.querySelector(BUTTON_SELECTORS.SUBMIT).textContent = 'Guardar';
     }
 
-    if (mode === 'edit') {
+    if (mode === FORM_MODES.EDIT) {
 
-        modalElement.querySelector('#modalTitle').textContent = 'Editar proveedor';
-        form.querySelector('#submitBtn').textContent = 'Actualizar';
+        modalElement.querySelector(HEADING_SELECTORS.MODAL_TITLE).textContent = 'Editar proveedor';
+        form.querySelector(BUTTON_SELECTORS.SUBMIT).textContent = 'Actualizar';
     }
     
     form.onSave = onSave;

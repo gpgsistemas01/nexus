@@ -1,3 +1,5 @@
+import { DOM_EVENT_NAMES, SELECT2_EVENT_NAMES } from '../../constants/events.js';
+import { BUTTON_SELECTORS } from '../../constants/selectors.js';
 import { FORM_MODES } from '../../constants/formModes.js';
 import { setDateTimePickerValue } from '../../plugins/flatpickr/dateTimePicker.js';
 import { toggleDisabledElement } from '../../utils/formUtils.js';
@@ -5,7 +7,7 @@ import { toggleDisabledElement } from '../../utils/formUtils.js';
 export const resetFormSubmitState = (form) => {
     if (!form) return;
     form.dataset.submitting = 'false';
-    form.querySelector('button[type="submit"]')?.removeAttribute('disabled');
+    form.querySelector('button[type=DOM_EVENT_NAMES.SUBMIT]')?.removeAttribute('disabled');
 };
 
 export const initForm = ({ form, mode, id = '' }) => {
@@ -21,7 +23,7 @@ export const setFormDisabled = ({ form, fields = 'all', isDisabled }) => {
         ? form.querySelectorAll('input, select, textarea')
         : fields.map(field => form.querySelector(`[name='${ field }']`)).filter(Boolean);
     elements.forEach(element => toggleDisabledElement({ element, isDisabled }));
-    if (fields === 'all') form.querySelector('#submitBtn').classList.toggle('d-none', form.dataset.mode === FORM_MODES.VIEW);
+    if (fields === 'all') form.querySelector(BUTTON_SELECTORS.SUBMIT).classList.toggle('d-none', form.dataset.mode === FORM_MODES.VIEW);
 };
 
 export const setFormSectionVisibility = ({ form, selector, isVisible, fieldNames = [], clearValues = false }) => {
@@ -35,7 +37,7 @@ export const setFormSectionVisibility = ({ form, selector, isVisible, fieldNames
         field.required = false;
         field.disabled = !isVisible;
         if (field.tagName === 'SELECT' && typeof window !== 'undefined' && window.$ && window.$(field).hasClass('select2-hidden-accessible')) {
-            window.$(field).prop('disabled', !isVisible).trigger('change.select2');
+            window.$(field).prop('disabled', !isVisible).trigger(SELECT2_EVENT_NAMES.CHANGE);
         }
     });
 };

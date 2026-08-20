@@ -4,3 +4,8 @@ export const FULFILLMENT_STATUS_NAMES = Object.freeze({
     COMPLETE: 'Surtido',
     CANCELED: 'Cancelado'
 });
+
+export const GOODS_ISSUE_STATUS_NAMES = Object.freeze({
+    APPROVED: 'Aprobada',
+    CANCELED: 'Cancelada'
+});

@@ -1,3 +1,4 @@
+import { SELECT2_EVENT_NAMES } from '../../../constants/events.js';
 import { getAllWastes } from "../../../application/warehouse/wastes/wastes.js";
 import { FILTER_SELECTORS, FORM_SELECTORS } from "../../../constants/selectors.js";
 import { mapSelectWasteData } from "../../../utils/warehouseInventoryUtils.js";
@@ -32,7 +33,7 @@ const attachWasteHandler = ({
     creationContext
 }) => {
 
-    $(baseSelector).off('select2:select').on('select2:select', (e) => {
+    $(baseSelector).off(SELECT2_EVENT_NAMES.SELECT).on(SELECT2_EVENT_NAMES.SELECT, (e) => {
 
         const { data } = e.params;
         const supplierMaterial = JSON.parse(data.supplierMaterial);

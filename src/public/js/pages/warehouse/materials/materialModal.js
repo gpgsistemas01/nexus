@@ -3,7 +3,7 @@ import { initMaterialFormSelect2, setMaterialFormSelectOptions } from "../../../
 import { setReasonVisualOption } from '../../../plugins/select2/domains/reason.js';
 import { clearFormErrors } from "../../../ui/forms/formErrorsUI.js";
 import { initForm, setFormDisabled, setFormSectionVisibility } from "../../../ui/forms/formStateUI.js";
-import { FORM_SELECTORS, MODAL_SELECTORS } from "../../../constants/selectors.js";
+import { BUTTON_SELECTORS, FORM_SELECTORS, HEADING_SELECTORS, MODAL_SELECTORS, SELECT_SELECTORS } from "../../../constants/selectors.js";
 import { materialDataFields, materialEditableDataFields } from './materialFields.js';
 import { FORM_MODES, isCreateMode, isEditMode, isStockMode } from '../../../constants/formModes.js';
 
@@ -18,7 +18,7 @@ export const openMaterialModal = ({
     creationContext = null
 }) => {
 
-    const form = document.querySelector(FORM_SELECTORS.MATERIAL_FORM);
+    const form = document.querySelector(FORM_SELECTORS.MATERIAL);
     const modalElement = document.querySelector(MODAL_SELECTORS.MATERIAL);
     const isCreating = isCreateMode(mode);
     const isEditing = isEditMode(mode);
@@ -74,18 +74,18 @@ export const openMaterialModal = ({
         isDisabled: isAdjustingStock || isGoodsReceiptCreation
     });
     setReasonVisualOption({
-        selector: `${ MODAL_SELECTORS.MATERIAL } ${ FORM_SELECTORS.REASON }`,
+        selector: `${ MODAL_SELECTORS.MATERIAL } ${ SELECT_SELECTORS.REASON }`,
         name: !isAdjustingStock ? initialStockReasonName : null,
         isDisabled: !isAdjustingStock
     });
     clearFormErrors(form);
 
-    modalElement.querySelector('#modalTitle').textContent = isEditing
+    modalElement.querySelector(HEADING_SELECTORS.MODAL_TITLE).textContent = isEditing
         ? 'Editar material'
         : isAdjustingStock
             ? 'Ajustar stock de material'
             : 'Registrar material';
-    form.querySelector('#submitBtn').textContent = isEditing
+    form.querySelector(BUTTON_SELECTORS.SUBMIT).textContent = isEditing
         ? 'Actualizar'
         : isAdjustingStock
             ? 'Ajustar'

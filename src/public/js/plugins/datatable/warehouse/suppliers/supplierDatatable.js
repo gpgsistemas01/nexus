@@ -1,3 +1,5 @@
+import { DOM_EVENT_NAMES } from '../../../../constants/events.js';
+import { FORM_MODES } from '../../../../constants/formModes.js';
 import { getAllSuppliers } from "../../../../application/warehouse/suppliers/suppliers.js";
 import { exportSupplierReport } from "../../../../application/warehouse/report.js";
 import { openSupplierModal } from "../../../../pages/warehouse/suppliers/supplierModal.js";
@@ -29,7 +31,7 @@ export const createSupplierDatatable = () => {
             buttons: [
                 {
                     text: 'Nuevo proveedor',
-                    action: () => openSupplierModal({ mode: 'create' })
+                    action: () => openSupplierModal({ mode: FORM_MODES.CREATE })
                 },
                 buildExcelButton({
                     filename: formatFileName('reporte_proveedores'),
@@ -40,10 +42,10 @@ export const createSupplierDatatable = () => {
         }
     });
 
-    $(`${ selector } tbody`).on('click', '.btn-edit', function () {
+    $(`${ selector } tbody`).on(DOM_EVENT_NAMES.CLICK, '.btn-edit', function () {
 
         const data = getResponsiveRowData(table, this);
 
-        openSupplierModal({ mode: 'edit', data });
+        openSupplierModal({ mode: FORM_MODES.EDIT, data });
     });
 }

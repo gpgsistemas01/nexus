@@ -1,6 +1,8 @@
+import { DOM_EVENT_NAMES } from '../../constants/events.js';
+import { BUTTON_SELECTORS, HEADING_SELECTORS } from '../../constants/selectors.js';
 import { useForm } from '../../application/form.js';
 import { FORM_MODES, ISSUE_HEADER_ENABLED_MODES } from '../../constants/formModes.js';
-import { FULFILLMENT_STATUS_NAMES } from '../../constants/fulfillmentStatuses.js';
+import { FULFILLMENT_STATUS_NAMES, GOODS_ISSUE_STATUS_NAMES } from '../../constants/fulfillmentStatuses.js';
 import { handleSubmit, syncCheckboxControlledInputs, toggleDisabledElement } from '../../utils/formUtils.js';
 import { on } from '../../utils/domUtils.js';
 import { formatDecimal, roundTo } from '../../utils/formatUtils.js';
@@ -33,7 +35,7 @@ export const createIssueTableActions = ({ openIssueModal }) => ({
         const fulfillmentStatus = issue.fulfillmentStatus?.name;
         let mode = FORM_MODES.EDIT_HEADER;
 
-        if (issue.status?.name === 'Cancelada' || fulfillmentStatus === FULFILLMENT_STATUS_NAMES.CANCELED) {
+        if (issue.status?.name === GOODS_ISSUE_STATUS_NAMES.CANCELED || fulfillmentStatus === FULFILLMENT_STATUS_NAMES.CANCELED) {
             mode = FORM_MODES.VIEW;
         } else if (fulfillmentStatus === FULFILLMENT_STATUS_NAMES.PENDING) {
             mode = FORM_MODES.EDIT;
@@ -50,7 +52,7 @@ export const bindIssueProjectQuantityControls = ({
     tableSelector,
     findDetail
 }) => {
-    on('change', `${ tableSelector } .supply-checkbox`, (_, checkbox) => {
+    on(DOM_EVENT_NAMES.CHANGE, `${ tableSelector } .supply-checkbox`, (_, checkbox) => {
         const detail = findDetail(checkbox);
 
         if (!detail) return;
@@ -82,7 +84,7 @@ export const bindIssueProjectQuantityControls = ({
         if (differenceCell) differenceCell.textContent = formatDecimal(detail.convertedQuantityDifference);
     });
 
-    on('input', `${ tableSelector } .project-converted-quantity-input`, (_, input) => {
+    on(DOM_EVENT_NAMES.INPUT, `${ tableSelector } .project-converted-quantity-input`, (_, input) => {
         const detail = findDetail(input);
 
         if (!detail) return;
@@ -101,7 +103,7 @@ export const bindIssueProjectQuantityControls = ({
 
 export const initializeIssueModal = ({ form, issueHeaderForm, mode, data = null }) => {
     initForm({ form, mode, id: data?.id || '' });
-    form.querySelector('#submitBtn')?.classList.remove('d-none');
+    form.querySelector(BUTTON_SELECTORS.SUBMIT)?.classList.remove('d-none');
     clearFormErrors(form);
     toggleDetailFormActions({
         mode,
@@ -132,8 +134,8 @@ export const applyIssueModalMode = ({
     detailAction = 'Surtir',
     returnAction = 'Devolver'
 }) => {
-    const title = modalElement.querySelector('#modalTitle');
-    const submit = form.querySelector('#submitBtn');
+    const title = modalElement.querySelector(HEADING_SELECTORS.MODAL_TITLE);
+    const submit = form.querySelector(BUTTON_SELECTORS.SUBMIT);
 
     const config = ISSUE_MODAL_MODE_CONFIG[mode];
 

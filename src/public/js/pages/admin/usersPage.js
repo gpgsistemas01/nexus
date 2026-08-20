@@ -7,9 +7,10 @@ import { initForm, setFormDisabled } from '../forms/formStateUI.js';
 import { openModal } from '../../ui/modalUI.js';
 import { handleSubmit, validateFields } from '../../utils/formUtils.js';
 import { userEditValidation, userPasswordValidation, userValidation } from '../../utils/validations/validators.js';
-import { FORM_SELECTORS, MODAL_SELECTORS } from "../../constants/selectors.js";
+import { BUTTON_SELECTORS, FORM_SELECTORS, HEADING_SELECTORS, MODAL_SELECTORS } from "../../constants/selectors.js";
+import { FORM_MODES } from "../../constants/formModes.js";
 
-const formId = FORM_SELECTORS.USER_FORM;
+const formId = FORM_SELECTORS.USER;
 const userModalId = MODAL_SELECTORS.USER;
 
 const setModeFields = ({ form, mode }) => {
@@ -19,20 +20,20 @@ const setModeFields = ({ form, mode }) => {
         isDisabled: false
     });
 
-    if (mode === 'edit-password') setFormDisabled({
+    if (mode === FORM_MODES.EDIT_PASSWORD) setFormDisabled({
         form,
         fields: ['name', 'departmentId', 'roleId'],
         isDisabled: true
     });
 
-    if (mode === 'edit') setFormDisabled({
+    if (mode === FORM_MODES.EDIT) setFormDisabled({
         form,
         fields: ['password'],
         isDisabled: true
     });
 };
 
-export const openUserModal = ({ mode = 'create', data = null }) => {
+export const openUserModal = ({ mode = FORM_MODES.CREATE, data = null }) => {
 
     const form = document.querySelector(formId);
     const modalElement = document.querySelector(userModalId);
@@ -46,23 +47,23 @@ export const openUserModal = ({ mode = 'create', data = null }) => {
     form.elements.name.value = data?.name || '';
     form.elements.password.value = '';
 
-    if (mode === 'create') {
+    if (mode === FORM_MODES.CREATE) {
 
         form.reset();
-        modalElement.querySelector('#modalTitle').textContent = 'Registrar usuario';
-        form.querySelector('#submitBtn').textContent = 'Guardar';
+        modalElement.querySelector(HEADING_SELECTORS.MODAL_TITLE).textContent = 'Registrar usuario';
+        form.querySelector(BUTTON_SELECTORS.SUBMIT).textContent = 'Guardar';
     }
 
-    if (mode === 'edit') {
+    if (mode === FORM_MODES.EDIT) {
 
-        modalElement.querySelector('#modalTitle').textContent = 'Editar usuario';
-        form.querySelector('#submitBtn').textContent = 'Actualizar';
+        modalElement.querySelector(HEADING_SELECTORS.MODAL_TITLE).textContent = 'Editar usuario';
+        form.querySelector(BUTTON_SELECTORS.SUBMIT).textContent = 'Actualizar';
     }
 
-    if (mode === 'edit-password') {
+    if (mode === FORM_MODES.EDIT_PASSWORD) {
 
-        modalElement.querySelector('#modalTitle').textContent = 'Editar contraseña';
-        form.querySelector('#submitBtn').textContent = 'Actualizar contraseña';
+        modalElement.querySelector(HEADING_SELECTORS.MODAL_TITLE).textContent = 'Editar contraseña';
+        form.querySelector(BUTTON_SELECTORS.SUBMIT).textContent = 'Actualizar contraseña';
     }
 
     openModal(modalElement);
@@ -79,25 +80,25 @@ useForm({
             name: formData.name?.trim(),
         };
 
-        if (form.dataset.mode === 'edit-password') return {
+        if (form.dataset.mode === FORM_MODES.EDIT_PASSWORD) return {
             password: formData.password
         };
 
-        if (form.dataset.mode === 'edit') delete normalizedData.password;
+        if (form.dataset.mode === FORM_MODES.EDIT) delete normalizedData.password;
 
         return normalizedData;
     },
     getErrors: ({ form, formData }) => {
 
-        if (form.dataset.mode === 'edit-password') return validateFields(userPasswordValidation, formData);
+        if (form.dataset.mode === FORM_MODES.EDIT_PASSWORD) return validateFields(userPasswordValidation, formData);
 
-        if (form.dataset.mode === 'edit') return validateFields(userEditValidation, formData);
+        if (form.dataset.mode === FORM_MODES.EDIT) return validateFields(userEditValidation, formData);
 
         return validateFields(userValidation, formData);
     },
     sendRequest: async ({ formData, form }) => {
 
-        if (form.dataset.mode === 'edit-password') return handleSubmit({
+        if (form.dataset.mode === FORM_MODES.EDIT_PASSWORD) return handleSubmit({
             form,
             formData,
             update: editUserPassword

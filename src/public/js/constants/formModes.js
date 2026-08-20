@@ -1,6 +1,7 @@
 export const FORM_MODES = Object.freeze({
     CREATE: 'create',
     EDIT: 'edit',
+    EDIT_PASSWORD: 'edit-password',
     EDIT_STOCK: 'edit-stock',
     EDIT_DETAIL: 'edit-detail',
     EDIT_HEADER: 'edit-header',

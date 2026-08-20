@@ -4,7 +4,7 @@ import { handleSubmit, validateFields } from "../../../utils/formUtils.js";
 import { clientValidation } from "../../../utils/validations/validators.js";
 import { FORM_SELECTORS } from "../../../constants/selectors.js";
 
-const formId = FORM_SELECTORS.CLIENT_FORM;
+const formId = FORM_SELECTORS.CLIENT;
 
 useForm({
     selector: formId,

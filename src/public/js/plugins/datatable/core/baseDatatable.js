@@ -12,6 +12,8 @@ import {
 } from "../../mdb/actionButton.js";
 import { initMdbTooltips } from "../../mdb/baseInstance.js";
 import { configureResponsiveHeaderGroups, mergeMainTableColumnDefs, renderResponsiveDetails } from "./responsive.js";
+import { FULFILLMENT_STATUS_NAMES, GOODS_ISSUE_STATUS_NAMES } from '../../../constants/fulfillmentStatuses.js';
+import { GOODS_RECEIPT_STATUS_LABELS } from '../../../constants/goodsReceiptStatuses.js';
 
 const SORT_DIRECTIONS = ['asc', 'desc'];
 const isActionColumn = (column = {}) => column.title === 'Acciones';
@@ -177,14 +179,11 @@ export const resetDataTable = selector => {
     $(selector).empty();
 };
 
-const DOCUMENT_STATUS_LABELS = Object.freeze({
-    APPROVED: 'Aprobada',
-    CONFIRMED: 'Confirmada',
-    CANCELED: 'Cancelada'
-});
-
 const EDITABLE_ACTION_CONTEXTS = new Set(['person', 'client', 'supplier']);
-const SUPPLY_FULFILLMENT_STATUSES = new Set(['Pendiente', 'Surtido parcial']);
+const SUPPLY_FULFILLMENT_STATUSES = new Set([
+    FULFILLMENT_STATUS_NAMES.PENDING,
+    FULFILLMENT_STATUS_NAMES.PARTIAL
+]);
 const ACTION_BUTTONS = Object.freeze({
     view: buildMdbViewActionButton({
         className: 'btn-edit',
@@ -236,15 +235,15 @@ export const renderActionButtons = (options = {}) => {
     const isWasteIssue = context === 'wasteIssue';
     const isIssue = isGoodsIssue || isWasteIssue;
     const isGoodsReceipt = context === 'goodsReceipt';
-    const isApproved = status === DOCUMENT_STATUS_LABELS.APPROVED;
-    const isCanceled = status === DOCUMENT_STATUS_LABELS.CANCELED;
+    const isApproved = status === GOODS_ISSUE_STATUS_NAMES.APPROVED;
+    const isCanceled = status === GOODS_ISSUE_STATUS_NAMES.CANCELED;
     const isInventoryItem = context === 'material' || context === 'waste';
 
     return [
         [((isIssue || isGoodsReceipt) && isCanceled), ACTION_BUTTONS.view],
         [
             canManage && (
-                status === 'Abierta'
+                status === GOODS_RECEIPT_STATUS_LABELS.OPEN
                 || (isIssue && isApproved)
                 || (isGoodsReceipt && !isCanceled)
                 || EDITABLE_ACTION_CONTEXTS.has(context)
@@ -255,7 +254,7 @@ export const renderActionButtons = (options = {}) => {
         [context === 'material' && canDeleteMaterial, ACTION_BUTTONS.deleteMaterial],
         [context === 'waste' && canDeleteWaste, ACTION_BUTTONS.deleteWaste],
         [canSupply && isIssue && isApproved && SUPPLY_FULFILLMENT_STATUSES.has(fulfillmentStatus), ACTION_BUTTONS.supplyDetail],
-        [canSupply && isIssue && isApproved && fulfillmentStatus === 'Surtido', ACTION_BUTTONS.returnDetail]
+        [canSupply && isIssue && isApproved && fulfillmentStatus === FULFILLMENT_STATUS_NAMES.COMPLETE, ACTION_BUTTONS.returnDetail]
     ]
         .filter(([canRender]) => canRender)
         .map(([, button]) => button)

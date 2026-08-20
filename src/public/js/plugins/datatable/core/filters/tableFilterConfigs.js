@@ -9,6 +9,7 @@ import { initRoleFilterSelect } from "../../../select2/domains/role.js";
 import { initPersonFilterSelect } from "../../../select2/domains/person.js";
 import { getMovementTypeData, initMovementTypeFilterSelect } from "../../../select2/domains/movementType.js";
 import { FILTER_SELECTORS } from "../../../../constants/selectors.js";
+import { FULFILLMENT_STATUS_NAMES } from "../../../../constants/fulfillmentStatuses.js";
 
 const WAREHOUSE_PERSON_FILTER_PARAMS = {
     department: 'ALMACÉN Y PROVEDURÍA',
@@ -36,7 +37,7 @@ const selectFilterConfigs = {
     fulfillmentStatus: {
         key: 'fulfillmentStatusId',
         selector: FILTER_SELECTORS.FULFILLMENT_STATUS,
-        defaultSelectedLabel: 'Pendiente',
+        defaultSelectedLabel: FULFILLMENT_STATUS_NAMES.PENDING,
         getOptions: getFulfillmentStatusOptions,
         initSelect: initFulfillmentStatusFilterSelect
     },

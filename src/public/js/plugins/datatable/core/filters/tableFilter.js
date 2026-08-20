@@ -1,3 +1,4 @@
+import { DOM_EVENT_NAMES } from '../../../../constants/events.js';
 import { clearTableFilters } from "../../../../ui/tableUI.js";
 import { on } from "../../../../utils/domUtils.js";
 import { DATATABLE_SELECTORS, FILTER_SELECTORS } from "../../../../constants/selectors.js";
@@ -79,7 +80,7 @@ export const setupTableFilters = async ({
     const filterState = createTableFilterState(values);
     filterState.apply();
 
-    on('click', FILTER_SELECTORS.CLEAR_BUTTON, (e) => {
+    on(DOM_EVENT_NAMES.CLICK, FILTER_SELECTORS.CLEAR_BUTTON, (e) => {
         const table = $.fn.DataTable.isDataTable(selector) ? $(selector).DataTable() : null;
 
         clearTableFilters();
@@ -89,7 +90,7 @@ export const setupTableFilters = async ({
         e.target.blur();
     });
 
-    on('submit', TABLE_FILTERS_FORM_SELECTOR, (e) => {
+    on(DOM_EVENT_NAMES.SUBMIT, TABLE_FILTERS_FORM_SELECTOR, (e) => {
         const table = $.fn.DataTable.isDataTable(selector) ? $(selector).DataTable() : null;
 
         e.preventDefault();

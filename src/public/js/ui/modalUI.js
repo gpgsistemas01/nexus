@@ -1,3 +1,4 @@
+import { MODAL_EVENT_NAMES } from '../constants/events.js';
 import { hideModal, initMdbModal, showModal } from "../plugins/mdb/baseInstance.js";
 
 const adjustModalDataTables = (modalElement) => {
@@ -26,8 +27,8 @@ export const openModal = (modalElement) => {
     const instance = initMdbModal(modalElement);
     const handleShown = () => adjustModalDataTables(modalElement);
 
-    modalElement.addEventListener('shown.mdb.modal', handleShown, { once: true });
-    modalElement.addEventListener('shown.bs.modal', handleShown, { once: true });
+    modalElement.addEventListener(MODAL_EVENT_NAMES.MDB_SHOWN, handleShown, { once: true });
+    modalElement.addEventListener(MODAL_EVENT_NAMES.BOOTSTRAP_SHOWN, handleShown, { once: true });
 
     showModal(instance);
 

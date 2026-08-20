@@ -3,7 +3,7 @@ import { setReasonVisualOption } from '../../../plugins/select2/domains/reason.j
 import { clearFormErrors } from "../../../ui/forms/formErrorsUI.js";
 import { initForm, setFormDisabled, setFormSectionVisibility } from "../../../ui/forms/formStateUI.js";
 import { openModal } from "../../../ui/modalUI.js";
-import { FORM_SELECTORS, MODAL_SELECTORS } from "../../../constants/selectors.js";
+import { BUTTON_SELECTORS, FORM_SELECTORS, HEADING_SELECTORS, MODAL_SELECTORS, SELECT_SELECTORS } from "../../../constants/selectors.js";
 import { wasteDataFields, wasteSecondaryDataFields, wasteStockFields } from './wasteFields.js';
 import { FORM_MODES, isCreateMode, isEditMode, isStockMode } from '../../../constants/formModes.js';
 
@@ -15,7 +15,7 @@ export const openWasteModal = ({
     data = null
 } = {}) => {
 
-    const form = document.querySelector(FORM_SELECTORS.WASTE_FORM);
+    const form = document.querySelector(FORM_SELECTORS.WASTE);
     const modalElement = document.querySelector(MODAL_SELECTORS.WASTE);
     const isCreating = isCreateMode(mode);
     const isEditing = isEditMode(mode);
@@ -66,18 +66,18 @@ export const openWasteModal = ({
         isDisabled: isEditing
     });
     setReasonVisualOption({
-        selector: `${ MODAL_SELECTORS.WASTE } ${ FORM_SELECTORS.REASON }`,
+        selector: `${ MODAL_SELECTORS.WASTE } ${ SELECT_SELECTORS.REASON }`,
         name: !isAdjustingStock ? initialStockReasonName : null,
         isDisabled: !isAdjustingStock
     });
     clearFormErrors(form);
 
-    modalElement.querySelector('#modalTitle').textContent = isEditing
+    modalElement.querySelector(HEADING_SELECTORS.MODAL_TITLE).textContent = isEditing
         ? 'Editar merma'
         : isAdjustingStock
             ? 'Ajustar stock de merma'
             : 'Registrar merma';
-    form.querySelector('#submitBtn').textContent = isEditing
+    form.querySelector(BUTTON_SELECTORS.SUBMIT).textContent = isEditing
         ? 'Actualizar'
         : isAdjustingStock
             ? 'Ajustar'

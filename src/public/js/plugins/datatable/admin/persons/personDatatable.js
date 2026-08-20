@@ -1,3 +1,5 @@
+import { DOM_EVENT_NAMES } from '../../../../constants/events.js';
+import { FORM_MODES } from '../../../../constants/formModes.js';
 import { getAllPersons } from "../../../../application/admin/persons/persons.js";
 import { exportPersonReport } from "../../../../application/admin/report.js";
 import { openPersonModal } from "../../../../pages/admin/personsPage.js";
@@ -48,7 +50,7 @@ export const createPersonsDatatable = async ({ canManagePersons = false } = {}) 
             buttons: [
                 ...(canManagePersons ? [{
                     text: 'Nueva persona',
-                    action: () => openPersonModal({ mode: 'create' })
+                    action: () => openPersonModal({ mode: FORM_MODES.CREATE })
                 },
                 buildExcelButton({
                     filename: formatFileName('reporte_personas'),
@@ -64,11 +66,11 @@ export const createPersonsDatatable = async ({ canManagePersons = false } = {}) 
         }
     });
 
-    $(`${ selector } tbody`).on('click', '.btn-edit', function () {
+    $(`${ selector } tbody`).on(DOM_EVENT_NAMES.CLICK, '.btn-edit', function () {
 
         const data = getResponsiveRowData(table, this);
 
-        openPersonModal({ mode: 'edit', data });
+        openPersonModal({ mode: FORM_MODES.EDIT, data });
     });
 }
 
@@ -119,7 +121,7 @@ export const initPersonAccessTable = (accesses = []) => {
     });
 };
 
-$(personAccessTableSelector).on('click', '.delete-btn', function() {
+$(personAccessTableSelector).on(DOM_EVENT_NAMES.CLICK, '.delete-btn', function() {
     personAccesses.splice($(this).data('index'), 1);
     refreshPersonAccessTable();
 });

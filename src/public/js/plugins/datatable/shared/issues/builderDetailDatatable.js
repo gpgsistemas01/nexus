@@ -9,6 +9,7 @@ import { formatCurrency, formatDecimal } from "../../../../utils/formatUtils.js"
 import { GOODS_RECEIPT_DETAIL_STATUSES, GOODS_RECEIPT_STATUS_LABELS } from "../../../../constants/goodsReceiptStatuses.js";
 import { renderIssueSupplyCheckbox } from "./issueDetailDatatable.js";
 import { FORM_MODES } from '../../../../constants/formModes.js';
+import { FULFILLMENT_STATUS_NAMES } from '../../../../constants/fulfillmentStatuses.js';
 
 const DISABLED_PROJECT_QUANTITY_MESSAGE = 'Marque el detalle como surtido para capturar la cantidad de proyecto.';
 
@@ -104,8 +105,8 @@ const isCanceledDetail = (row = {}) => {
         || row.isCancelled
         || row.canceledAt
         || row.cancelledAt
-        || statusName === 'Cancelado'
-        || statusName === 'Cancelada'
+        || statusName === FULFILLMENT_STATUS_NAMES.CANCELED
+        || statusName === GOODS_RECEIPT_STATUS_LABELS.CANCELED
     );
 };
 

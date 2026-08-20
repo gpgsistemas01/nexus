@@ -1,3 +1,4 @@
+import { DOM_EVENT_NAMES } from '../../../constants/events.js';
 import { useForm } from "../../../application/form.js";
 import { editGoodsReceiptHeader, registerGoodsReceipt, cancelGoodsReceiptDetail } from "../../../application/warehouse/goodsReceipts/goodsReceipts.js";
 import { handleApiError } from "../../../api/errorHandler.js";
@@ -13,7 +14,7 @@ import { on } from "../../../utils/domUtils.js";
 import { setDateTimePickerValue } from "../../../plugins/flatpickr/dateTimePicker.js";
 import { handleSubmit, hasValidationErrors, toggleContainerElements, toggleDisabledElement, validateFields } from "../../../utils/formUtils.js";
 import { buildModalTitle, openModal } from "../../../ui/modalUI.js";
-import { FORM_SELECTORS, MODAL_SELECTORS } from "../../../constants/selectors.js";
+import { BUTTON_SELECTORS, FORM_SELECTORS, HEADING_SELECTORS, INPUT_SELECTORS, MODAL_SELECTORS, SELECT_SELECTORS } from "../../../constants/selectors.js";
 import { FORM_MODES } from "../../../constants/formModes.js";
 import { GOODS_RECEIPT_STATUS_LABELS } from "../../../constants/goodsReceiptStatuses.js";
 import { notifications } from "../../../plugins/swal/swalComponent.js";
@@ -41,7 +42,7 @@ initGoodsReceiptCorrection();
 
 const setGoodsReceiptViewMode = ({ form, modalElement, receipt }) => {
     form.dataset.mode = FORM_MODES.VIEW;
-    modalElement.querySelector('#modalTitle').textContent = buildModalTitle({
+    modalElement.querySelector(HEADING_SELECTORS.MODAL_TITLE).textContent = buildModalTitle({
         action: 'Ver',
         entityName: GOODS_RECEIPT_ENTITY_NAME,
         referenceNumber: receipt.referenceNumber
@@ -142,7 +143,7 @@ export const openGoodsReceiptModal = ({ mode, data = null }) => {
     clearFormErrors(form);
     setFormDisabled({ form, isDisabled: false });
     toggleDisabledElement({
-        element: form.querySelector(FORM_SELECTORS.SUPPLIER),
+        element: form.querySelector(SELECT_SELECTORS.SUPPLIER),
         isDisabled: false
     });
 
@@ -155,9 +156,9 @@ export const openGoodsReceiptModal = ({ mode, data = null }) => {
 
         form.reset();
         value = INVOICE_VALUES.INVOICE;
-        modalElement.querySelector('#modalTitle').textContent = 'Registrar compra';
-        form.querySelector('#submitBtn').textContent = 'Confirmar';
-        form.querySelector('#presentationDisplayInput').value = '';
+        modalElement.querySelector(HEADING_SELECTORS.MODAL_TITLE).textContent = 'Registrar compra';
+        form.querySelector(BUTTON_SELECTORS.SUBMIT).textContent = 'Confirmar';
+        form.querySelector(INPUT_SELECTORS.PRESENTATION_DISPLAY).value = '';
         toggleDetailFormActions({
             mode,
             status: GOODS_RECEIPT_STATUS_LABELS.OPEN,
@@ -184,10 +185,10 @@ export const openGoodsReceiptModal = ({ mode, data = null }) => {
         });
 
         if (mode === FORM_MODES.EDIT) {
-            modalElement.querySelector('#modalTitle').textContent = buildModalTitle({ action: 'Editar', entityName: GOODS_RECEIPT_ENTITY_NAME, referenceNumber: data?.referenceNumber });
-            form.querySelector('#submitBtn').textContent = 'Actualizar';
+            modalElement.querySelector(HEADING_SELECTORS.MODAL_TITLE).textContent = buildModalTitle({ action: 'Editar', entityName: GOODS_RECEIPT_ENTITY_NAME, referenceNumber: data?.referenceNumber });
+            form.querySelector(BUTTON_SELECTORS.SUBMIT).textContent = 'Actualizar';
             toggleDisabledElement({
-                element: form.querySelector(FORM_SELECTORS.SUPPLIER),
+                element: form.querySelector(SELECT_SELECTORS.SUPPLIER),
                 isDisabled: true
             });
             toggleContainerElements({
@@ -219,15 +220,15 @@ export const openGoodsReceiptModal = ({ mode, data = null }) => {
 
 const addMaterial = () => {
 
-    const option = document.querySelector(`${ FORM_SELECTORS.MATERIAL } option:checked`);
+    const option = document.querySelector(`${ SELECT_SELECTORS.MATERIAL } option:checked`);
     if (!option) return;
 
     const { material, supplier } = option.dataset;
     const selectedMaterial = material ? JSON.parse(material) : {};
     const materialId = selectedMaterial.id;
 
-    const quantity = Number(document.querySelector(FORM_SELECTORS.QUANTITY_INPUT).value);
-    const costPerUnitType = Number(document.querySelector(FORM_SELECTORS.COST_PER_UNIT).value);
+    const quantity = Number(document.querySelector(INPUT_SELECTORS.QUANTITY).value);
+    const costPerUnitType = Number(document.querySelector(INPUT_SELECTORS.COST_PER_UNIT).value);
     const errors = validateFields(addGoodsReceiptMaterialValidation, {
         materialId,
         quantity,
@@ -269,9 +270,9 @@ const addMaterial = () => {
     });
 }
 
-on('click', '#addMaterialBtn', addMaterial);
+on(DOM_EVENT_NAMES.CLICK, BUTTON_SELECTORS.ADD_MATERIAL, addMaterial);
 
-on('click', '#materialTable .correct-detail-btn', (event, button) => {
+on(DOM_EVENT_NAMES.CLICK, '#materialTable .correct-detail-btn', (event, button) => {
     const detail = details.find(item => item.id === button.dataset.id);
 
     if (!detail || !currentGoodsReceipt) return;
@@ -283,7 +284,7 @@ on('click', '#materialTable .correct-detail-btn', (event, button) => {
 });
 
 
-on('click', '#materialTable .cancel-receipt-detail-btn', async (event, button) => {
+on(DOM_EVENT_NAMES.CLICK, '#materialTable .cancel-receipt-detail-btn', async (event, button) => {
     const detail = details.find(item => item.id === button.dataset.id);
 
     if (!detail || !currentGoodsReceipt) return;
@@ -303,7 +304,7 @@ on('click', '#materialTable .cancel-receipt-detail-btn', async (event, button) =
         });
 
         notifications.showSuccess(response.message);
-        document.querySelector('#goodsReceiptCorrectionModal').dispatchEvent(new CustomEvent(GOODS_RECEIPT_CORRECTION_APPLIED_EVENT, {
+        document.querySelector(MODAL_SELECTORS.GOODS_RECEIPT_CORRECTION).dispatchEvent(new CustomEvent(GOODS_RECEIPT_CORRECTION_APPLIED_EVENT, {
             bubbles: true,
             detail: response.data
         }));
@@ -315,7 +316,7 @@ on('click', '#materialTable .cancel-receipt-detail-btn', async (event, button) =
     }
 });
 
-on(GOODS_RECEIPT_CORRECTION_APPLIED_EVENT, '#goodsReceiptCorrectionModal', (event) => {
+on(GOODS_RECEIPT_CORRECTION_APPLIED_EVENT, MODAL_SELECTORS.GOODS_RECEIPT_CORRECTION, (event) => {
     const updatedReceipt = event.detail?.updatedReceipt;
 
     if (!updatedReceipt || !currentGoodsReceipt || updatedReceipt.id !== currentGoodsReceipt.id) return;
@@ -350,7 +351,7 @@ const invoiceRadios = document.querySelectorAll('input[name="isInvoiced"]');
 
 invoiceRadios.forEach(radio => {
 
-    radio.addEventListener('change', () => {
+    radio.addEventListener(DOM_EVENT_NAMES.CHANGE, () => {
 
         if (radio.checked) toggleInvoiceInput(radio.value);
     });

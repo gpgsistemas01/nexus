@@ -1,3 +1,5 @@
+import { FORM_MODES } from '../../constants/formModes.js';
+
 const getFirstInvalidControl = (form) => {
     const invalidElement = form.querySelector('.is-invalid, [aria-invalid="true"]');
 
@@ -77,7 +79,7 @@ const toggleInputSelectErrors = (form, errors, fields = null) => {
 };
 
 const toggleTableErrors = (form, errors, fields = null) => {
-    if (form.dataset.mode === 'edit-detail') {
+    if (form.dataset.mode === FORM_MODES.EDIT_DETAIL) {
         form.querySelectorAll('#materialTable .is-invalid').forEach(input => input.classList.remove('is-invalid'));
         form.querySelectorAll('#materialTable [data-error-for]').forEach(feedback => {
             feedback.textContent = '';

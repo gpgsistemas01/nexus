@@ -3,7 +3,7 @@ import { findAllGoodsIssues } from "./goodsIssues/goodsIssueService.js";
 import { findAllGoodsReceipts } from "./goodsReceipts/goodsReceiptService.js";
 import { findAllWasteIssues } from "./wasteIssues/wasteIssueService.js";
 import { findAllSuppliers } from "./supplierService.js";
-import { GOODS_RECEIPT_STATUS_NAMES } from "../../constants/warehouseStatuses.js";
+import { FULFILLMENT_STATUS_NAMES, GOODS_RECEIPT_STATUS_NAMES } from "../../constants/warehouseStatuses.js";
 import { getDb } from "../../repository/baseRepository.js";
 
 const INVENTORY_REPORT_MATERIAL_SELECT = {
@@ -109,7 +109,7 @@ const mapIssueDetailRow = ({ issue, detail, material, supplier }) => ({
 const mapGoodsIssueDetailRows = (goodsIssues = [], { supplierId = '', materialId = '' } = {}) => goodsIssues.flatMap((goodsIssue) => {
 
     const details = (goodsIssue.details || []).filter((detail) => {
-        const isCanceledDetail = detail.fulfillmentStatus?.name === 'Cancelado';
+        const isCanceledDetail = detail.fulfillmentStatus?.name === FULFILLMENT_STATUS_NAMES.CANCELED;
 
         return (
             !isCanceledDetail &&
@@ -128,7 +128,7 @@ const mapGoodsIssueDetailRows = (goodsIssues = [], { supplierId = '', materialId
 
 const mapWasteIssueDetailRows = (wasteIssues = []) => wasteIssues.flatMap((wasteIssue) => (
     (wasteIssue.details || [])
-        .filter(detail => detail.fulfillmentStatus?.name !== 'Cancelado')
+        .filter(detail => detail.fulfillmentStatus?.name !== FULFILLMENT_STATUS_NAMES.CANCELED)
         .map(detail => mapIssueDetailRow({
             issue: wasteIssue,
             detail,
