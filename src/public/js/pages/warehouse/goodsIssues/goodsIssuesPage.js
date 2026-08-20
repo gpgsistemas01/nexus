@@ -16,11 +16,11 @@ import { openModal } from "../../../ui/modalUI.js";
 import { DATATABLE_SELECTORS, FORM_SELECTORS, MODAL_SELECTORS } from "../../../constants/selectors.js";
 import { FORM_MODES } from "../../../constants/formModes.js";
 import { roundTo } from "../../../utils/formatUtils.js";
-import { applyIssueModalMode, bindIssueProjectQuantityControls, createIssueHeaderForm, createIssueTableActions, getPendingIssueSupplyDetails, initializeIssueModal, mapIssueSupplyDetails, useIssueForm } from "../../../ui/issues/issueFormUI.js";
+import { applyIssueModalMode, bindIssueProjectQuantityControls, createIssueHeaderForm, createIssueTableActions, initializeIssueModal, useIssueForm } from "../../../ui/issues/issueFormUI.js";
 import { createIssueReturn } from "../../../ui/issues/issueReturnUI.js";
 import { createWarehouseIssueDetailsTable } from '../../../plugins/datatable/warehouseIssueDetailDatatable.js';
 import { refreshMaterialTable } from '../../../plugins/datatable/utils/renderMaterialDatatable.js';
-import { buildInventorySelectText, getBase, getHeight, getMaxUnitCost, getPresentation, getUnitMeasure, mapGoodsIssueDetailsToRequest, mapIssueDetailToTable } from "../../../utils/warehouseInventoryUtils.js";
+import { buildInventorySelectText, getBase, getHeight, getMaxUnitCost, getPresentation, getUnitMeasure, mapGoodsIssueDetailsToRequest, mapIssueDetailsToSupplyRequest, mapIssueDetailToTable } from "../../../utils/warehouseInventoryUtils.js";
 
 const modalId = MODAL_SELECTORS.GOODS_ISSUE;
 const formId = FORM_SELECTORS.GOODS_ISSUE;
@@ -51,7 +51,7 @@ const normalizeGoodsIssueData = ({ form, formData }) => {
     if (mode === FORM_MODES.EDIT_DETAIL) {
         return {
             id: form.dataset.id,
-            details: mapIssueSupplyDetails(details)
+            details: mapIssueDetailsToSupplyRequest(details)
         };
     }
 
@@ -71,7 +71,7 @@ useIssueForm({
         const { mode } = form.dataset;
 
         if (mode === FORM_MODES.EDIT_DETAIL) {
-            const detailsToSupply = getPendingIssueSupplyDetails(details);
+            const detailsToSupply = mapIssueDetailsToSupplyRequest(details);
 
             return detailsToSupply.length
                 ? validateDetailsFields(issueProjectQuantityDetailsValidation, detailsToSupply)

@@ -16,14 +16,14 @@ import { hasValidationErrors, validateDetailsFields, validateFields } from '../.
 import { addWasteIssueDetailValidation, issueProjectQuantityDetailsValidation, wasteIssueValidation } from '../../../utils/validations/validators.js';
 import { clearAddedItemInput, normalizeFormErrors } from '../../../ui/formUI.js';
 import { setMdbWrapperInputValue } from '../../../plugins/select2/baseSelect.js';
-import { applyIssueModalMode, bindIssueProjectQuantityControls, createIssueHeaderForm, createIssueTableActions, getPendingIssueSupplyDetails, initializeIssueModal, mapIssueSupplyDetails, useIssueForm } from '../../../ui/issues/issueFormUI.js';
+import { applyIssueModalMode, bindIssueProjectQuantityControls, createIssueHeaderForm, createIssueTableActions, initializeIssueModal, useIssueForm } from '../../../ui/issues/issueFormUI.js';
 import { getWasteIssueHeaderSelects } from '../../../plugins/select2/modules/wasteIssueSelect.js';
 import { createWarehouseIssueDetailsTable } from '../../../plugins/datatable/warehouseIssueDetailDatatable.js';
 import { roundTo } from '../../../utils/formatUtils.js';
 import { on } from '../../../utils/domUtils.js';
 import { UI_PERMISSIONS } from '../../../constants/permissions.js';
 import { refreshMaterialTable } from '../../../plugins/datatable/utils/renderMaterialDatatable.js';
-import { buildInventorySelectText, getBase, getHeight, getPresentation, getUnitMeasure, mapIssueDetailToTable } from '../../../utils/warehouseInventoryUtils.js';
+import { buildInventorySelectText, getBase, getHeight, getPresentation, getUnitMeasure, mapIssueDetailsToSupplyRequest, mapIssueDetailToTable } from '../../../utils/warehouseInventoryUtils.js';
 
 const formId = FORM_SELECTORS.WASTE_ISSUE;
 const modalId = MODAL_SELECTORS.WASTE_ISSUE;
@@ -161,7 +161,7 @@ const normalizeWasteIssueData = ({ form }) => {
 
     if (mode === FORM_MODES.EDIT_DETAIL) {
         return {
-            details: mapIssueSupplyDetails(details)
+            details: mapIssueDetailsToSupplyRequest(details)
         };
     }
 
@@ -183,7 +183,7 @@ useIssueForm({
     getErrors: ({ form, formData }) => {
 
         if (form.dataset.mode === FORM_MODES.EDIT_DETAIL) {
-            const detailsToSupply = getPendingIssueSupplyDetails(details);
+            const detailsToSupply = mapIssueDetailsToSupplyRequest(details);
 
             return detailsToSupply.length
                 ? validateDetailsFields(issueProjectQuantityDetailsValidation, detailsToSupply)

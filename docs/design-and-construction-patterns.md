@@ -259,11 +259,14 @@ lectura. Antes de mostrarlas, el adaptador compartido de
 documental y el del material o merma. El primer identificador se usa al surtir o
 devolver; el segundo,
 al crear o reemplazar detalles del CRUD. Los adaptadores de request aplican una
-lista permitida de campos para no reenviar nombres, relaciones, estados ni valores
-calculados recibidos del API. La etiqueta compartida de select y tabla obtiene el
-nombre del material y del proveedor mediante getters que encapsulan las variantes
-del contrato (`material`, `supplierMaterial` o valores ya aplanados), en lugar de
-repetir navegación opcional dentro del formateador.
+lista permitida de campos. Para crear o reemplazar detalles, el navegador conserva el
+adaptador específico del inventario; al surtir, `mapIssueDetailsToSupplyRequest` recorre
+las filas una sola vez y conserva únicamente `id`, `isSupplied` y
+`projectConvertedQuantity` de las nuevas selecciones. Los DTO de salida vuelven a
+aplicar esa lista permitida como frontera del servidor. La etiqueta compartida de
+select y tabla obtiene el nombre del material y del proveedor mediante getters que
+encapsulan las variantes del contrato (`material`, `supplierMaterial` o valores ya
+aplanados), en lugar de repetir navegación opcional dentro del formateador.
 
 #### Vista del contrato de datos de los detalles
 
@@ -271,7 +274,7 @@ Esta vista focalizada responde, para desarrollo y revisión, **qué identidad co
 cada etapa** entre la respuesta HTTP, la tabla y los requests de una salida. Su alcance
 es sólo la adaptación en el navegador; no sustituye el futuro contrato OpenAPI ni el
 diagrama ER. La fuente de verdad son los DTO de salidas y los adaptadores de
-`warehouseInventoryUtils.js` e `issueFormUI.js`.
+`warehouseInventoryUtils.js`; `issueFormUI.js` conserva únicamente coordinación visual.
 
 ```mermaid
 flowchart LR

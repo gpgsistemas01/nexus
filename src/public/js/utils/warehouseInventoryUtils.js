@@ -98,3 +98,15 @@ export const mapGoodsIssueDetailsToRequest = (details = []) => details.map(detai
     quantity: detail.quantity,
     ...(detail.presentationId ? { presentationId: detail.presentationId } : {})
 }));
+
+export const mapIssueDetailsToSupplyRequest = (details = []) => details.reduce((payload, detail) => {
+    if (detail.isSupplied && !detail.originalIsSupplied) {
+        payload.push({
+            id: detail.id,
+            isSupplied: detail.isSupplied,
+            projectConvertedQuantity: detail.projectConvertedQuantity
+        });
+    }
+
+    return payload;
+}, []);

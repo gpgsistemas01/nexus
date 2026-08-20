@@ -295,6 +295,14 @@ componente independiente del contexto. Sólo una abstracción sin conocimiento d
 debe moverse a `ui` o a una carpeta compartida. En las salidas, la coordinación
 específica permanece en su archivo de página y las operaciones realmente comunes del
 formulario están en `ui/issues/issueFormUI.js`.
+La presentación de sus modos se resuelve mediante una configuración única por modo;
+la inicialización calcula una sola vez el estado deshabilitado del formulario y delega
+una sola vez el estado del encabezado. Así, salidas de material y de merma comparten las
+mismas transiciones sin cadenas de ramas ni sincronizaciones visuales repetidas.
+Las decisiones privadas que sólo tenían un consumidor se mantienen en ese flujo: la
+selección de la mutación vive en `useIssueForm`, la resolución del modo en las acciones
+de tabla y la sincronización de cantidad en su evento. Se extrae una función únicamente
+cuando existe reutilización entre consumidores o cuando constituye un adaptador común.
 
 Los formularios y modales de clientes, materiales y proveedores se consumen desde
 varias pantallas, pero siguen perteneciendo a su recurso. Por ello viven en
