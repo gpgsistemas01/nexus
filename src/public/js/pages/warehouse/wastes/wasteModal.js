@@ -1,6 +1,7 @@
 import { initWasteSelect2, setWasteSelectOptions } from "../../../plugins/select2/modules/wasteSelect.js";
 import { setReasonVisualOption } from '../../../plugins/select2/domains/reason.js';
-import { clearFormErrors, initForm, setFormDisabled, setFormSectionVisibility } from "../../../ui/formUI.js";
+import { clearFormErrors } from "../../../ui/forms/formErrorsUI.js";
+import { initForm, setFormDisabled, setFormSectionVisibility } from "../../../ui/forms/formStateUI.js";
 import { openModal } from "../../../ui/modalUI.js";
 import { FORM_SELECTORS, MODAL_SELECTORS } from "../../../constants/selectors.js";
 import { wasteDataFields, wasteSecondaryDataFields, wasteStockFields } from './wasteFields.js';

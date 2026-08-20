@@ -5,7 +5,6 @@ const mocks = vi.hoisted(() => ({
   initMdbModal: vi.fn(() => ({ hide: vi.fn() })),
   initMdbWrapperInput: vi.fn(() => ({})),
   resetFormSubmitState: vi.fn(),
-  setSummaryValues: vi.fn(),
   showModal: vi.fn(),
   updateMdbWrapperInput: vi.fn(),
   useForm: vi.fn(),
@@ -22,13 +21,8 @@ vi.mock('../../../../../../src/public/js/plugins/mdb/baseInstance.js', () => ({
 vi.mock('../../../../../../src/public/js/plugins/swal/swalComponent.js', () => ({
   notifications: { showError: vi.fn(), showSuccess: vi.fn() }
 }));
-vi.mock('../../../../../../src/public/js/ui/formUI.js', () => ({
-  clearFormErrors: mocks.clearFormErrors,
-  resetFormSubmitState: mocks.resetFormSubmitState
-}));
-vi.mock('../../../../../../src/public/js/ui/totalsSummaryUI.js', () => ({
-  setSummaryValues: mocks.setSummaryValues
-}));
+vi.mock('../../../../../../src/public/js/ui/forms/formErrorsUI.js', () => ({ clearFormErrors: mocks.clearFormErrors }));
+vi.mock('../../../../../../src/public/js/ui/forms/formStateUI.js', () => ({ resetFormSubmitState: mocks.resetFormSubmitState }));
 vi.mock('../../../../../../src/public/js/utils/formUtils.js', () => ({
   validateFields: mocks.validateFields
 }));
@@ -42,9 +36,11 @@ describe('UI compartida de devolución del CRUD de salidas', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     form.dataset = {};
-    globalThis.document = {
-      querySelector: vi.fn(selector => selector.endsWith('ReturnForm') ? form : modal)
-    };
+    globalThis.document = { querySelector: vi.fn(selector => {
+      if (selector.endsWith('ReturnForm')) return form;
+      if (selector.endsWith('Modal')) return modal;
+      return { dataset: {}, textContent: '' };
+    }) };
   });
 
   it.each(['salida de material', 'salida de merma'])(
@@ -57,9 +53,9 @@ describe('UI compartida de devolución del CRUD de salidas', () => {
         detail: { id: 'detail-1', suppliedQuantity: 0.3, returnedQuantity: 0.2 }
       });
 
-      expect(mocks.setSummaryValues).toHaveBeenCalledWith(expect.arrayContaining([
-        { selector: '#issueReturnAvailableQuantity', value: 0.1 }
-      ]));
+      const availableSummary = document.querySelector.mock.results
+        .find((_, index) => document.querySelector.mock.calls[index][0] === '#issueReturnAvailableQuantity').value;
+      expect(availableSummary.dataset.value).toBe('0.1');
       expect(form.dataset).toMatchObject({
         id: 'issue-1',
         detailId: 'detail-1',

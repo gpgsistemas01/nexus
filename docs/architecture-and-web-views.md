@@ -312,6 +312,12 @@ intermedia basada sólo en que hay más de un consumidor. `ui` queda reservado p
 comportamiento que recibe su contexto por parámetros y no importa aplicaciones de un
 recurso concreto.
 
+Los comportamientos compartidos de formulario se importan desde módulos enfocados:
+errores (`ui/forms/formErrorsUI.js`), estado y campos (`ui/forms/formStateUI.js`), detalle
+(`ui/forms/detailFormUI.js`) y totales (`ui/forms/totalsSummaryUI.js`). Las operaciones que sólo tienen
+un consumidor no forman parte de esa API: se mantienen privadas dentro del CRUD que
+las necesita.
+
 Los filtros compartidos de DataTables separan los valores visibles en el formulario de
 los valores que ya fueron aplicados. `tableFilterState` toma una instantánea al enviar
 el formulario o limpiarlo; paginación, búsqueda, actualizaciones en tiempo real y

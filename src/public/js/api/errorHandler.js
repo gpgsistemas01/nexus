@@ -1,6 +1,6 @@
 import { getErrorMessage } from "../constants/apiMessages.js";
 import { notifications } from "../plugins/swal/swalComponent.js";
-import { clearFormErrors, normalizeFormErrors, scrollToFirstFormError } from "../ui/formUI.js";
+import { clearFormErrors, normalizeFormErrors, scrollToFirstFormError } from "../ui/forms/formErrorsUI.js";
 import { mapServerErrors } from "../utils/formUtils.js";
 
 const getFallbackMessage = (err) => {

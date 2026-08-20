@@ -1,4 +1,4 @@
-import { updateTotals } from "../../../ui/formUI.js";
+import { updateTotals } from "../../../ui/forms/totalsSummaryUI.js";
 import { refreshMaterialTable } from "./renderMaterialDatatable.js";
 export const handleDelete = ({ id, details, context }) => {
 

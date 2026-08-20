@@ -1,5 +1,5 @@
 import { handleApiError } from "../api/errorHandler.js";
-import { toggleErrorMessages, normalizeFormErrors, scrollToFirstFormError } from "../ui/formUI.js";
+import { toggleErrorMessages, normalizeFormErrors, scrollToFirstFormError } from "../ui/forms/formErrorsUI.js";
 import { on } from "../utils/domUtils.js";
 import { hasValidationErrors } from "../utils/formUtils.js";
 

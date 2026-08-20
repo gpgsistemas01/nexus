@@ -1,4 +1,4 @@
-import { formatCurrency, formatDecimal, roundTo } from "../utils/formatUtils.js";
+import { formatCurrency, formatDecimal, roundTo } from "../../utils/formatUtils.js";
 
 const TOTAL_FIELDS = {
     quantity: '#totalQuantityDisplayValue',
@@ -21,31 +21,6 @@ const setTotalSummaryValue = ({ selector, value, formatter }) => {
     element.dataset.value = String(rawValue);
     element.textContent = formatter(rawValue);
 };
-
-
-
-export const setTextSummaryValue = ({ selector, value, emptyValue = '-' }) => {
-    const element = document.querySelector(selector);
-
-    if (!element) return;
-
-    const displayValue = value || emptyValue;
-
-    element.textContent = displayValue;
-    element.dataset.value = displayValue;
-};
-
-export const setTextSummaryValues = (items = []) => {
-    items.forEach(setTextSummaryValue);
-};
-
-export const setSummaryValues = (items = []) => {
-
-    items.forEach(({ selector, value, formatter = formatDecimal }) => {
-        setTotalSummaryValue({ selector, value, formatter });
-    });
-};
-
 export const updateTotals = ({
     quantity = 0,
     net = 0,

@@ -243,6 +243,18 @@ debe demostrar router, permiso, configuración, persistencia y efectos propios.
 7. **¿Sólo cambia material por merma u otro contexto?** Parametrizar primero; separar
    únicamente reglas, permisos, persistencia o lenguaje que sean realmente distintos.
 
+### Módulos de formulario enfocados
+
+La UI transversal de formularios se divide por responsabilidad y no se concentra en
+un archivo barril: `ui/forms/formErrorsUI.js` presenta y limpia errores, `ui/forms/formStateUI.js`
+inicializa el formulario y controla el estado de sus campos, y `ui/forms/detailFormUI.js`
+coordina los controles repetidos de las tablas de detalle. Los consumidores importan
+directamente `ui/forms/totalsSummaryUI.js` para los acumulados.
+
+Una operación específica de un solo CRUD permanece privada en su flujo. No se exportan
+wrappers de una sola llamada como API compartida, porque no aportan reutilización y
+ocultan el propietario real del comportamiento.
+
 ## Mantenimiento
 
 Un patrón se documenta como aplicado sólo cuando hay al menos una implementación y un

@@ -1,9 +1,9 @@
 import { useForm } from '../../application/form.js';
 import { initMdbModal, showModal, initMdbWrapperInput, updateMdbWrapperInput } from '../../plugins/mdb/baseInstance.js';
 import { notifications } from '../../plugins/swal/swalComponent.js';
-import { clearFormErrors, resetFormSubmitState } from '../../ui/formUI.js';
-import { setSummaryValues } from '../../ui/totalsSummaryUI.js';
-import { roundTo } from '../../utils/formatUtils.js';
+import { clearFormErrors } from '../forms/formErrorsUI.js';
+import { resetFormSubmitState } from '../forms/formStateUI.js';
+import { formatDecimal, roundTo } from '../../utils/formatUtils.js';
 import { validateFields } from '../../utils/formUtils.js';
 import { issueReturnValidation } from '../../utils/validations/validators.js';
 
@@ -11,6 +11,13 @@ export const createIssueReturn = ({ sendReturn }) => {
     const modalSelector = '#issueReturnModal';
     const formSelector = '#issueReturnForm';
     const getModal = () => document.querySelector(modalSelector);
+    const setQuantitySummary = (selector, value) => {
+        const element = document.querySelector(selector);
+        if (!element) return;
+        const rawValue = Number(value) || 0;
+        element.dataset.value = String(rawValue);
+        element.textContent = formatDecimal(rawValue);
+    };
 
     const initialize = () => useForm({
         selector: formSelector,
@@ -52,11 +59,9 @@ export const createIssueReturn = ({ sendReturn }) => {
         // with the persisted value instead of exposing floating-point subtraction.
         const available = roundTo(supplied - returned);
 
-        setSummaryValues([
-            { selector: '#issueReturnSuppliedQuantity', value: supplied },
-            { selector: '#issueReturnReturnedQuantity', value: returned },
-            { selector: '#issueReturnAvailableQuantity', value: available }
-        ]);
+        setQuantitySummary('#issueReturnSuppliedQuantity', supplied);
+        setQuantitySummary('#issueReturnReturnedQuantity', returned);
+        setQuantitySummary('#issueReturnAvailableQuantity', available);
         form.reset();
         clearFormErrors(form);
         resetFormSubmitState(form);

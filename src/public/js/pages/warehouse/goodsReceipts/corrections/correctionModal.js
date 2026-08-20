@@ -1,5 +1,5 @@
 import { initMdbModal } from "../../../../plugins/mdb/baseInstance.js";
-import { clearFormErrors } from "../../../../ui/formUI.js";
+import { clearFormErrors } from "../../../../ui/forms/formErrorsUI.js";
 import { formatCurrency, formatDecimal, roundTo } from "../../../../utils/formatUtils.js";
 import { on } from "../../../../utils/domUtils.js";
 import { GOODS_RECEIPT_CORRECTION_APPLIED_EVENT, initGoodsReceiptCorrectionForm } from "./correctionForm.js";

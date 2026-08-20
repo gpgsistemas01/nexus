@@ -3,7 +3,7 @@ import { correctGoodsReceiptDetail } from "../../../../application/warehouse/goo
 import { initMdbModal } from "../../../../plugins/mdb/baseInstance.js";
 import { reloadMainTable } from "../../../../plugins/datatable/baseDatatable.js";
 import { notifications } from "../../../../plugins/swal/swalComponent.js";
-import { resetFormSubmitState } from "../../../../ui/formUI.js";
+import { resetFormSubmitState } from "../../../../ui/forms/formStateUI.js";
 import { validateFields } from "../../../../utils/formUtils.js";
 import { goodsReceiptCorrectionValidation } from "../../../../utils/validations/validators.js";
 

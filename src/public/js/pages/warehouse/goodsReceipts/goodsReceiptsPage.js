@@ -5,7 +5,10 @@ import { addGoodsReceiptMaterialValidation, goodsReceiptValidation } from "../..
 import { refreshMaterialTable } from "../../../plugins/datatable/utils/renderMaterialDatatable.js";
 import { createGoodsReceiptDatatable, details, initDetailsGoodsReceiptTable } from "../../../plugins/datatable/goodsReceiptDatatable.js";
 import { GOODS_RECEIPT_SUPPLIER_CHANGED_EVENT, initGoodsReceiptFormSelect2, setGoodsReceiptFormSelectOptions } from "../../../plugins/select2/modules/goodsReceiptSelect.js";
-import { setFormDisabled, setTotals, updateTotals, toggleButtons, clearAddedMaterialInput, toggleInvoiceInput, clearFormErrors, normalizeFormErrors, initForm } from "../../../ui/formUI.js";
+import { clearFormErrors, normalizeFormErrors } from "../../../ui/forms/formErrorsUI.js";
+import { setFormDisabled, initForm } from "../../../ui/forms/formStateUI.js";
+import { toggleDetailFormActions, clearAddedMaterialInput } from "../../../ui/forms/detailFormUI.js";
+import { setTotals, updateTotals } from "../../../ui/forms/totalsSummaryUI.js";
 import { on } from "../../../utils/domUtils.js";
 import { setDateTimePickerValue } from "../../../plugins/flatpickr/dateTimePicker.js";
 import { handleSubmit, hasValidationErrors, toggleContainerElements, toggleDisabledElement, validateFields } from "../../../utils/formUtils.js";
@@ -24,6 +27,11 @@ const INVOICE_VALUES = Object.freeze({
     NONE: 'none'
 });
 const GOODS_RECEIPT_ENTITY_NAME = 'compra';
+
+const toggleInvoiceInput = (value) => {
+    const invoiceContainer = document.getElementById('invoiceContainer');
+    invoiceContainer.style.display = value === INVOICE_VALUES.INVOICE ? '' : 'none';
+};
 createGoodsReceiptDatatable();
 
 let currentGoodsReceipt = null;
@@ -38,7 +46,7 @@ const setGoodsReceiptViewMode = ({ form, modalElement, receipt }) => {
         referenceNumber: receipt.referenceNumber
     });
     setFormDisabled({ form, isDisabled: true });
-    toggleButtons({
+    toggleDetailFormActions({
         mode: FORM_MODES.VIEW,
         status: receipt.status?.name || GOODS_RECEIPT_STATUS_LABELS.CONFIRMED,
         showActions: false,
@@ -149,7 +157,7 @@ export const openGoodsReceiptModal = ({ mode, data = null }) => {
         modalElement.querySelector('#modalTitle').textContent = 'Registrar compra';
         form.querySelector('#submitBtn').textContent = 'Confirmar';
         form.querySelector('#presentationDisplayInput').value = '';
-        toggleButtons({
+        toggleDetailFormActions({
             mode,
             status: GOODS_RECEIPT_STATUS_LABELS.OPEN,
             showActions: true,
@@ -186,7 +194,7 @@ export const openGoodsReceiptModal = ({ mode, data = null }) => {
                 root: modalElement,
                 isDisabled: false
             });
-            toggleButtons({
+            toggleDetailFormActions({
                 mode,
                 status: data.status?.name || GOODS_RECEIPT_STATUS_LABELS.CONFIRMED,
                 showActions: false,
@@ -201,7 +209,7 @@ export const openGoodsReceiptModal = ({ mode, data = null }) => {
 
     form.elements.invoice.value = data?.invoice || '';
     form.elements.isInvoiced.value = value;
-    toggleInvoiceInput({ value, mode, form });
+    toggleInvoiceInput(value);
 
     initDetailsGoodsReceiptTable(mode);
 
@@ -342,6 +350,6 @@ invoiceRadios.forEach(radio => {
 
     radio.addEventListener('change', () => {
 
-        if (radio.checked) toggleInvoiceInput({ value: radio.value, mode: 'update', form: document.querySelector(formId) });
+        if (radio.checked) toggleInvoiceInput(radio.value);
     });
 });

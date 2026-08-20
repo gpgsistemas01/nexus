@@ -1,4 +1,4 @@
-import { updateTotals } from "../../../ui/formUI.js";
+import { updateTotals } from "../../../ui/forms/totalsSummaryUI.js";
 import { MATERIAL_SELECT_RESULTS_LIMIT } from "../../../application/warehouse/materials.js";
 import { toggleContainerElements } from "../../../utils/formUtils.js";
 import { refreshMaterialTable } from "../../datatable/utils/renderMaterialDatatable.js";
