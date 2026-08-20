@@ -292,9 +292,12 @@ mutaciones relacionadas. `wasteForm`, `wasteModal` y `wasteFields` permanecen en
 `pages/warehouse/wastes` porque conocen selectores, validaciones, modos y operaciones
 propias de ese recurso; que el datatable abra ese modal no convierte al modal en un
 componente independiente del contexto. Sólo una abstracción sin conocimiento de merma
-debe moverse a `ui` o a una carpeta compartida. En las salidas, la coordinación
-específica permanece en su archivo de página y las operaciones realmente comunes del
-formulario están en `ui/issues/issueFormUI.js`.
+debe moverse a `ui` o a una carpeta compartida. El modal reutiliza los getters de
+inventario para leer la presentación tanto del contrato plano como de la relación
+`supplierMaterial.material` devuelta por Prisma; así no presupone relaciones opcionales
+al alternar los campos dimensionales durante altas, ediciones o ajustes. En las salidas,
+la coordinación específica permanece en su archivo de página y las operaciones realmente
+comunes del formulario están en `ui/issues/issueFormUI.js`.
 La presentación de sus modos se resuelve mediante una configuración única por modo;
 la inicialización calcula una sola vez el estado deshabilitado del formulario y delega
 una sola vez el estado del encabezado. Así, salidas de material y de merma comparten las

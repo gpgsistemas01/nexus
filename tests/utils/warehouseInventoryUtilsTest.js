@@ -52,6 +52,16 @@ describe('select de material reutilizado por el CRUD de merma', () => {
     expect(getUnitMeasure({ unitMeasure: 'pza' })).toBe('pza');
   });
 
+  it('resuelve de forma segura la presentación del listado CRUD de merma', () => {
+    expect(getPresentation({
+      supplierMaterial: {
+        material: { presentation: { name: 'ROLLO' } }
+      }
+    })).toBe('ROLLO');
+    expect(getPresentation({ presentation: undefined })).toBe('');
+    expect(getPresentation()).toBe('');
+  });
+
   it('conserva el id proveedor-material del listado sin duplicar su presentación', () => {
     const option = mapSelectMaterialData({
       id: 'supplier-material-1',
