@@ -1,5 +1,5 @@
 import { createSuccessResponseFromRequest } from "../../utils/responseUtils.js";
-import { buildInventorySelectText } from "../../utils/materialSelectUtils.js";
+import { buildInventorySelectText } from "../../utils/warehouseInventoryUtils.js";
 import { deleteMaterialRequest, editMaterialRequest, editMaterialStockRequest, getAllMaterialsRequest, registerMaterialRequest } from "../../services/warehouse/materialService.js";
 import { createCrudApplication } from "../createCrudApplication.js";
 

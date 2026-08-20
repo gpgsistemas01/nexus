@@ -2,7 +2,7 @@ import { updateTotals } from "../../../ui/formUI.js";
 import { createDataTable } from "../baseDatatable.js";
 import { buildDetailsColumns, buildDetailsHeader } from "./builderDetailDatatable.js";
 import { refreshMaterialTable } from "./renderMaterialDatatable.js";
-import { buildInventorySelectText } from "../../../utils/materialSelectUtils.js";
+import { buildInventorySelectText } from "../../../utils/warehouseInventoryUtils.js";
 
 export const renderWarehouseItemName = (row, supplierOverride, { useRowDimensions = false } = {}) => {
     return buildInventorySelectText(row, {

@@ -1,5 +1,5 @@
 import { getAllMaterials } from "../../../application/warehouse/materials.js";
-import { mapSupplierMaterialToSelectData } from "../../../utils/materialSelectUtils.js";
+import { mapSelectMaterialData } from "../../../utils/warehouseInventoryUtils.js";
 import { initDomainSelect2, toggleSelectOption } from "../baseSelect.js";
 
 export const initSupplierMaterialSelect = ({
@@ -13,7 +13,7 @@ export const initSupplierMaterialSelect = ({
         containerSelector: modalSelector,
         get: getAllMaterials,
         placeholder,
-        mapOption: mapSupplierMaterialToSelectData,
+        mapOption: mapSelectMaterialData,
         allowCreate: false
     });
 };

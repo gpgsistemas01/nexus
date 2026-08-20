@@ -1,5 +1,5 @@
 import { formatCurrency, formatDecimal } from "../../../utils/formatUtils.js";
-import { buildInventorySelectText, getBase, getCurrentStock, getHeight, getMaxUnitCost, getMinStock, getPresentation, getUnitMeasure } from "../../../utils/materialSelectUtils.js";
+import { buildInventorySelectText, getBase, getCurrentStock, getHeight, getMaxUnitCost, getMinStock, getPresentation, getUnitMeasure } from "../../../utils/warehouseInventoryUtils.js";
 
 export const renderWarehouseInventoryHeader = ({ tableElement, canSeeCost, canManageItems, stockTitle, costTitle }) => {
 

@@ -20,7 +20,7 @@ import { applyIssueModalMode, bindIssueProjectQuantityControls, createIssueHeade
 import { createIssueReturn } from "../../../ui/issues/issueReturnUI.js";
 import { createWarehouseIssueDetailsTable } from '../../../plugins/datatable/warehouseIssueDetailDatatable.js';
 import { refreshMaterialTable } from '../../../plugins/datatable/utils/renderMaterialDatatable.js';
-import { buildInventorySelectText, getMaxUnitCost, getPresentation, getUnitMeasure } from "../../../utils/materialSelectUtils.js";
+import { buildInventorySelectText, getMaxUnitCost, getPresentation, getUnitMeasure } from "../../../utils/warehouseInventoryUtils.js";
 
 const modalId = MODAL_SELECTORS.GOODS_ISSUE;
 const formId = FORM_SELECTORS.GOODS_ISSUE;
