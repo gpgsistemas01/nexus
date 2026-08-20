@@ -20,7 +20,7 @@ import { applyIssueModalMode, bindIssueProjectQuantityControls, createIssueHeade
 import { createIssueReturn } from "../../../ui/issues/issueReturnUI.js";
 import { createWarehouseIssueDetailsTable } from '../../../plugins/datatable/warehouseIssueDetailDatatable.js';
 import { refreshMaterialTable } from '../../../plugins/datatable/utils/renderMaterialDatatable.js';
-import { buildInventorySelectText, getMaxUnitCost, getPresentation, getUnitMeasure } from "../../../utils/warehouseInventoryUtils.js";
+import { buildInventorySelectText, getBase, getHeight, getMaxUnitCost, getPresentation, getUnitMeasure, mapGoodsIssueDetailsToRequest, mapIssueDetailToTable } from "../../../utils/warehouseInventoryUtils.js";
 
 const modalId = MODAL_SELECTORS.GOODS_ISSUE;
 const formId = FORM_SELECTORS.GOODS_ISSUE;
@@ -59,7 +59,7 @@ const normalizeGoodsIssueData = ({ form, formData }) => {
 
     return {
         ...formData,
-        details
+        details: mapGoodsIssueDetailsToRequest(details)
     };
 };
 
@@ -108,19 +108,7 @@ export const openGoodsIssueModal = ({ mode, data = null }) => {
         form.querySelector('#observationsInput').value = data.observations || '';
         setDateTimePickerValue(form.querySelector('#requestDateInput'), data.requestDate);
         form.querySelector('#projectNumberInput').value = data.projectNumber;
-        const modalDetails = data.details.map(detail => ({ 
-            id: detail.material.id,
-            name: buildInventorySelectText(detail),
-            base: getBase(detail),
-            height: getHeight(detail),
-            quantity: detail.quantity,
-            unitMeasure: getUnitMeasure(detail),
-            presentation: getPresentation(detail),
-            convertedQuantity: detail.convertedQuantity,
-            supplier: detail.supplier.name,
-            maxUnitCost: getMaxUnitCost(detail),
-            supplierId: detail.supplier.id
-         }));
+        const modalDetails = data.details.map(mapIssueDetailToTable);
 
         details.push(...modalDetails);
     }
@@ -172,7 +160,7 @@ const addMaterial = () => {
     if (!option) return null;
 
     const newMaterial = {
-        id: material.id,
+        materialId: material.id,
         name: text,
         base: getBase(material),
         height: getHeight(material),
@@ -188,7 +176,7 @@ const addMaterial = () => {
     };
 
     const existingIndex = details.findIndex(detail => (
-        detail.id === material.id && detail.supplierId === supplier.id
+        detail.materialId === material.id && detail.supplierId === supplier.id
     ));
 
     if (existingIndex >= 0) details.splice(existingIndex, 1, newMaterial);

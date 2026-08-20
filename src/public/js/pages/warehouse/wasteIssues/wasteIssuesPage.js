@@ -23,7 +23,7 @@ import { roundTo } from '../../../utils/formatUtils.js';
 import { on } from '../../../utils/domUtils.js';
 import { UI_PERMISSIONS } from '../../../constants/permissions.js';
 import { refreshMaterialTable } from '../../../plugins/datatable/utils/renderMaterialDatatable.js';
-import { buildInventorySelectText, getMaxUnitCost, getUnitMeasure } from '../../../utils/warehouseInventoryUtils.js';
+import { buildInventorySelectText, getBase, getHeight, getPresentation, getUnitMeasure, mapIssueDetailToTable } from '../../../utils/warehouseInventoryUtils.js';
 
 const formId = FORM_SELECTORS.WASTE_ISSUE;
 const modalId = MODAL_SELECTORS.WASTE_ISSUE;
@@ -62,19 +62,7 @@ export const openWasteIssueModal = ({ mode, data = null }) => {
         document.querySelector(FORM_SELECTORS.OBSERVATIONS_INPUT).value = data.observations || '';
         document.querySelector(FORM_SELECTORS.PROJECT_NUMBER).value = data.projectNumber || '';
 
-        details.push(...data.details.map({
-            id: detail.material.id,
-            name: buildInventorySelectText(detail),
-            base: getBase(detail),
-            height: getHeight(detail),
-            quantity: detail.quantity,
-            unitMeasure: getUnitMeasure(detail),
-            presentation: getPresentation(detail),
-            convertedQuantity: detail.convertedQuantity,
-            supplier: detail.supplierMaterial.supplier.name,
-            maxUnitCost: getMaxUnitCost(detail),
-            supplierId: detail.supplierMaterial.supplier.id
-        }));
+        details.push(...data.details.map(mapIssueDetailToTable));
     }
 
     applyIssueModalMode({
@@ -114,7 +102,7 @@ const addWaste = () => {
     if (hasValidationErrors(errors)) return;
 
     const waste = {
-        id: wasteId,
+        wasteId,
         name: text,
         base,
         height,
