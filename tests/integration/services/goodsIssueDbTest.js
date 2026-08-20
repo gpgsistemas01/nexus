@@ -96,10 +96,12 @@ const cleanupWasteIssueData = async () => {
 
 describeDb('goods issue database integration', () => {
   beforeAll(async () => {
-    [{ prisma }, services] = await Promise.all([
+    const [{ prisma }, goodsIssueServices, wasteServices] = await Promise.all([
       import('../../../src/lib/prisma.js'),
-      import('../../../src/services/warehouse/goodsIssues/goodsIssueService.js')
+      import('../../../src/services/warehouse/goodsIssues/goodsIssueService.js'),
+      import('../../../src/services/warehouse/wasteService.js')
     ]);
+    services = { ...goodsIssueServices, ...wasteServices };
 
     await cleanupWasteIssueData();
 
@@ -272,5 +274,96 @@ describeDb('goods issue database integration', () => {
       recordsFiltered: 1,
       data: [expect.objectContaining({ id: goodsIssue.id, referenceNumber: goodsIssue.referenceNumber })]
     });
+  });
+
+  it('mantiene el contrato proveedor-material durante el ciclo de registro y ajuste de merma', async () => {
+    const waste = await services.createWasteAdjustment({
+      wasteDto: {
+        supplierMaterialId: supplierMaterial.id,
+        base: 0.5,
+        height: 1,
+        currentStock: 2,
+        observations: 'Alta de merma de integración'
+      },
+      userId: user.id
+    });
+
+    expect(waste).toMatchObject({
+      supplierMaterialId: supplierMaterial.id,
+      materialId: material.id,
+      materialName: names.material,
+      base: expect.anything(),
+      height: expect.anything(),
+      currentStock: expect.anything(),
+      convertedQuantity: expect.anything(),
+      supplier: expect.objectContaining({ id: supplier.id })
+    });
+    expect(Number(waste.currentStock)).toBe(2);
+    expect(Number(waste.convertedQuantity)).toBe(1);
+
+    const updatedWaste = await services.updateWaste({
+      id: waste.id,
+      wasteDto: {
+        supplierMaterialId: supplierMaterial.id,
+        base: 0.25,
+        height: 2
+      }
+    });
+
+    expect(updatedWaste).toMatchObject({
+      id: waste.id,
+      supplierMaterialId: supplierMaterial.id,
+      materialId: material.id
+    });
+    expect(Number(updatedWaste.currentStock)).toBe(2);
+    expect(Number(updatedWaste.convertedQuantity)).toBe(1);
+
+    const adjustedWaste = await services.updateWasteStock({
+      id: waste.id,
+      wasteStockDto: {
+        currentStock: 3,
+        reasonId: reason.id,
+        observations: 'Conteo físico de merma'
+      },
+      userId: user.id
+    });
+
+    expect(Number(adjustedWaste.currentStock)).toBe(3);
+    expect(Number(adjustedWaste.convertedQuantity)).toBe(1.5);
+
+    await expect(services.findAllWastes({
+      search: names.material,
+      supplierId: supplier.id
+    })).resolves.toMatchObject({
+      recordsFiltered: 1,
+      data: [expect.objectContaining({
+        id: waste.id,
+        supplierMaterialId: supplierMaterial.id,
+        materialId: material.id,
+        supplier: expect.objectContaining({ id: supplier.id })
+      })]
+    });
+
+    await expect(prisma.wasteStockAdjustment.findMany({
+      where: { wasteId: waste.id },
+      orderBy: { createdAt: 'asc' }
+    })).resolves.toEqual([
+      expect.objectContaining({
+        reasonId: expect.any(String),
+        createdById: user.id,
+        previousStock: expect.anything(),
+        newStock: expect.anything()
+      }),
+      expect.objectContaining({
+        reasonId: reason.id,
+        createdById: user.id,
+        observations: 'Conteo físico de merma'
+      })
+    ]);
+
+    await expect(prisma.wasteMovement.findMany({
+      where: { details: { some: { wasteId: waste.id } } },
+      include: { details: true }
+    })).resolves.toHaveLength(2);
   });
 });

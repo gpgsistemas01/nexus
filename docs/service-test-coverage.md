@@ -42,7 +42,7 @@ Quedan pendientes de integración transaccional completa con BD:
 Cuando un servicio usa otro servicio de otro dominio, no se duplica la misma prueba unitaria en ambos lugares. Esos casos deben cubrirse como integración del flujo completo:
 
 - `materialService.updateMaterialStock` delega en `adjustmentService.createStockAdjustment`; su cobertura se registra en `stockAdjustmentDbTest.js`.
-- `wasteService` y `goodsIssueService` comparten stock, proveedor-material, personas, cliente y movimientos; su cobertura cruzada se registra en `wasteGoodsIssueDbTest.js`.
+- `wasteService` y `goodsIssueService` comparten stock, proveedor-material, personas, cliente y movimientos; su cobertura cruzada se registra en `goodsIssueDbTest.js`. La integración de merma recorre registro, listado, edición de dimensiones y ajuste de existencias, y comprueba sus ajustes y movimientos persistidos.
 - `goodsReceiptService` comparte stock, proveedor-material y movimientos; su cobertura cruzada se registra en `goodsReceiptServiceDbTest.js`.
 - `notificationService` debe probarse como integración cuando el objetivo sea validar datos reales generados por otros servicios; reportes ya tienen unitarias de mapeo y pueden complementarse con integración si se requiere validar datos exportados end-to-end.
 
