@@ -3,6 +3,8 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 const selectMocks = vi.hoisted(() => ({
   initPresentationSelect: vi.fn(),
   initReasonSelect: vi.fn(),
+  initSupplierMaterialSelect: vi.fn(),
+  toggleSupplierMaterialOption: vi.fn(),
   setupSupplierSelect: vi.fn(),
   initUnitMeasureSelect: vi.fn(),
   setupWasteSelect: vi.fn(),
@@ -26,7 +28,12 @@ vi.mock('../../../../../../src/public/js/plugins/select2/domains/presentation.js
   togglePresentationOption: vi.fn()
 }));
 vi.mock('../../../../../../src/public/js/plugins/select2/domains/reason.js', () => ({
-  initReasonSelect: selectMocks.initReasonSelect
+  initReasonSelect: selectMocks.initReasonSelect,
+  toggleReasonOption: vi.fn()
+}));
+vi.mock('../../../../../../src/public/js/plugins/select2/domains/supplierMaterial.js', () => ({
+  initSupplierMaterialSelect: selectMocks.initSupplierMaterialSelect,
+  toggleSupplierMaterialOption: selectMocks.toggleSupplierMaterialOption
 }));
 vi.mock('../../../../../../src/public/js/plugins/select2/domains/supplier.js', () => ({
   setupSupplierSelect: selectMocks.setupSupplierSelect,
@@ -45,10 +52,18 @@ vi.mock('../../../../../../src/public/js/plugins/select2/modules/issueHeaderSele
 }));
 
 const { initMaterialFormSelect2 } = await import('../../../../../../src/public/js/plugins/select2/modules/materialSelect.js');
+const { initWasteSelect2, setWasteSelectOptions } = await import('../../../../../../src/public/js/plugins/select2/modules/wasteSelect.js');
 const { getWasteIssueHeaderSelects } = await import('../../../../../../src/public/js/plugins/select2/modules/wasteIssueSelect.js');
 
 beforeEach(() => {
   vi.clearAllMocks();
+  const select = {
+    off: vi.fn(),
+    on: vi.fn()
+  };
+  select.off.mockReturnValue(select);
+  select.on.mockReturnValue(select);
+  vi.stubGlobal('$', vi.fn(() => select));
 });
 
 describe('selects reutilizados en el CRUD de materiales', () => {
@@ -90,5 +105,52 @@ describe('selects reutilizados en el CRUD de salidas de merma', () => {
       selector: '#wasteIssueModal #wasteInput',
       data: { id: null, text: null }
     });
+  });
+});
+
+describe('select de material en el CRUD de mermas', () => {
+  it('consulta materiales con el selector delimitado por el modal', () => {
+    initWasteSelect2({ modalSelector: '#wasteModal' });
+
+    expect(selectMocks.initSupplierMaterialSelect).toHaveBeenCalledWith({
+      modalSelector: '#wasteModal',
+      baseSelector: '#wasteModal #materialInput',
+      allowCreate: false
+    });
+  });
+
+  it('recalcula el selector cuando el componente se reutiliza en otro modal', () => {
+    initWasteSelect2({ modalSelector: '#alternateWasteModal' });
+
+    expect(selectMocks.initSupplierMaterialSelect).toHaveBeenCalledWith(expect.objectContaining({
+      baseSelector: '#alternateWasteModal #materialInput'
+    }));
+  });
+
+  it('reutiliza el adaptador de materiales al editar una merma', () => {
+    initWasteSelect2({ modalSelector: '#wasteModal' });
+    setWasteSelectOptions({
+      modalSelector: '#wasteModal',
+      data: {
+        supplierMaterial: {
+          id: 'supplier-material-1',
+          material: {
+            name: 'Lámina',
+            base: 2,
+            height: 3,
+            presentation: { name: 'ROLLO' }
+          },
+          supplier: { tradeName: 'Proveedor Norte' }
+        }
+      }
+    });
+
+    expect(selectMocks.toggleSupplierMaterialOption).toHaveBeenCalledWith(expect.objectContaining({
+      selector: '#wasteModal #materialInput',
+      data: expect.objectContaining({
+        id: 'supplier-material-1',
+        text: 'Lámina (2 × 3) · Proveedor Norte'
+      })
+    }));
   });
 });

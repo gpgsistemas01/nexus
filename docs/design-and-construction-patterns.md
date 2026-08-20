@@ -158,6 +158,17 @@ lo contiene. Las pruebas unitarias de frontend en
 `tests/unit/public/js/plugins/select2` verifican este contrato para materiales y salidas
 de merma sin duplicar el recorrido CRUD persistente de las integraciones.
 
+El CRUD de merma reutiliza `mapSelectMaterialData`, el mismo adaptador del dominio de
+materiales, tanto para los resultados remotos como para restablecer la relación incluida
+al editar. El adaptador, los accesores de material/merma y el texto común viven en
+`public/js/utils/warehouseInventoryUtils.js`: su alcance incluye Select2, DataTables y
+páginas de inventario, por lo que no pertenecen exclusivamente a un plugin de selects.
+De este modo el `id` de Select2 continúa siendo el de proveedor-material y el texto
+conserva material, medidas y proveedor sin mantener un segundo normalizador ni
+introducir otro flujo de consulta. Las decisiones visuales dependientes de la
+presentación se resuelven con `getPresentation` sobre el material de la opción, sin
+duplicar ese dato como un atributo adicional de Select2.
+
 ## 8. Patrones de construcción de pruebas
 
 `createControllerTestApp` es una factory de test harness: crea una aplicación Express

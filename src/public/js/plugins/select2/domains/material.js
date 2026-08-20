@@ -1,7 +1,7 @@
 import { openMaterialModal } from "../../../pages/warehouse/materials/materialModal.js";
 import { getAllMaterials } from "../../../application/warehouse/materials.js";
 import { buildPaginatedSelectParams, buildPaginatedSelectResults, initDomainSelect2, initFilterSelect2, runAfterSelect2Close, SELECT_RESULTS_LIMIT, setMdbWrapperInputValue, toggleSelectOption } from "../baseSelect.js";
-import { mapSelectMaterialData } from "../../../utils/materialSelectUtils.js";
+import { mapSelectMaterialData } from "../../../utils/warehouseInventoryUtils.js";
 import { FORM_SELECTORS, FILTER_SELECTORS } from "../../../constants/selectors.js";
 import { updatePresentationDisplay } from "../../../ui/issues/issueFormUI.js";
 

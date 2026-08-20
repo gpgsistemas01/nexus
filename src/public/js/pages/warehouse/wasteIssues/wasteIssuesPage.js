@@ -23,7 +23,7 @@ import { roundTo } from '../../../utils/formatUtils.js';
 import { on } from '../../../utils/domUtils.js';
 import { UI_PERMISSIONS } from '../../../constants/permissions.js';
 import { refreshMaterialTable } from '../../../plugins/datatable/utils/renderMaterialDatatable.js';
-import { buildInventorySelectText, getMaxUnitCost, getUnitMeasure } from '../../../utils/materialSelectUtils.js';
+import { buildInventorySelectText, getMaxUnitCost, getUnitMeasure } from '../../../utils/warehouseInventoryUtils.js';
 
 const formId = FORM_SELECTORS.WASTE_ISSUE;
 const modalId = MODAL_SELECTORS.WASTE_ISSUE;

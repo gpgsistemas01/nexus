@@ -1,4 +1,4 @@
-import { mapSupplierMaterialToSelectData } from "../../../utils/materialSelectUtils.js";
+import { getPresentation, mapSelectMaterialData } from "../../../utils/warehouseInventoryUtils.js";
 import { initReasonSelect, toggleReasonOption } from "../domains/reason.js";
 import { initSupplierMaterialSelect, toggleSupplierMaterialOption } from "../domains/supplierMaterial.js";
 import { FORM_SELECTORS } from "../../../constants/selectors.js";
@@ -13,7 +13,7 @@ const selectors = {
 
 export const initWasteSelect2 = ({ modalSelector }) => {
 
-    if (!scoped) scoped = Object.fromEntries(Object.entries(selectors).map(
+    scoped = Object.fromEntries(Object.entries(selectors).map(
         ([name, selector]) => [name, `${ modalSelector } ${ selector }`]
     ));
 
@@ -34,9 +34,11 @@ export const initWasteSelect2 = ({ modalSelector }) => {
         .off('.materialInput')
         .on('select2:select.materialInput', ({ params }) => {
 
+            const material = JSON.parse(params?.data?.material || '{}');
+
             setFormSectionVisibility({
                 form: document.querySelector(scoped.wasteForm),
-                isVisible: params?.data?.presentationName === 'ROLLO',
+                isVisible: getPresentation(material) === 'ROLLO',
                 fieldNames: ['weight']
             });
         })
@@ -59,7 +61,7 @@ export const setWasteSelectOptions = ({ modalSelector, data = null }) => {
     [
         [toggleSupplierMaterialOption, {
             selector: scoped.material,
-            data: data ? mapSupplierMaterialToSelectData(data) : null,
+            data: data?.supplierMaterial ? mapSelectMaterialData(data.supplierMaterial) : null,
             modalSelector
         }],
         [toggleReasonOption, {
