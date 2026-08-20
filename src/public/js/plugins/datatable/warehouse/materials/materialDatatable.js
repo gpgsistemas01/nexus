@@ -1,11 +1,13 @@
 import { DOM_EVENT_NAMES } from '../../../../constants/events.js';
 import { FORM_MODES } from '../../../../constants/formModes.js';
 import { openMaterialModal } from "../../../../pages/warehouse/materials/materialModal.js";
-import { configureRealtimeReload, createDataTable, renderActionButtons } from "../../core/baseDatatable.js";
+import { configureRealtimeReload } from '../../core/base/tableOperations.js';
+import { createDataTable } from '../../core/base/createDataTable.js';
+import { renderActionButtons } from '../../core/base/actionButtons.js';
 import { setupTableFilters } from "../../core/filters/tableFilter.js";
 import { notifications } from "../../../swal/swalComponent.js";
 import { deleteMaterial, getAllMaterials } from "../../../../application/warehouse/materials/materials.js";
-import { getResponsiveRowData } from "../../core/responsive.js";
+import { getResponsiveRowData } from '../../core/responsive/rowData.js';
 import { buildExcelButton, buildTableExportParams } from "../../../../ui/tableUI.js";
 import { hasPermission, UI_PERMISSIONS } from "../../../../constants/permissions.js";
 import { exportWarehouseReport } from "../../../../application/warehouse/report.js";

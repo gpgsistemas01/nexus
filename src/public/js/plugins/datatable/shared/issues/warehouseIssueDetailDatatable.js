@@ -1,6 +1,7 @@
 import { DATATABLE_SELECTORS } from '../../../../constants/selectors.js';
 import { createIssueDetailDatatable } from './issueDetailDatatable.js';
-import { buildDetailsColumns, buildDetailsHeader } from './builderDetailDatatable.js';
+import { buildDetailsColumns } from './detailBuilder/detailColumns.js';
+import { buildDetailsHeader } from './detailBuilder/detailHeader.js';
 import { hasPermission, UI_PERMISSIONS } from '../../../../constants/permissions.js';
 
 export const buildWarehouseIssueDetailsConfig = ({

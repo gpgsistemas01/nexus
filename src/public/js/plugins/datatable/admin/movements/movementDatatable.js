@@ -2,7 +2,8 @@ import { getAllMovements } from "../../../../application/admin/movements/movemen
 import { exportMovementReport } from "../../../../application/admin/report.js";
 import { buildExcelButton, buildTableExportParams } from "../../../../ui/tableUI.js";
 import { formatFileName } from "../../../../utils/formatters.js";
-import { configureRealtimeReload, createDataTable } from "../../core/baseDatatable.js";
+import { configureRealtimeReload } from '../../core/base/tableOperations.js';
+import { createDataTable } from '../../core/base/createDataTable.js';
 import { formatDecimal } from "../../../../utils/formatUtils.js";
 
 const movementColumns = [

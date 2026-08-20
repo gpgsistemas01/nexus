@@ -1,8 +1,9 @@
 import { DOM_EVENT_NAMES } from '../../../../constants/events.js';
 import { formatDateTimeDisplay, formatFileName } from '../../../../utils/formatters.js';
-import { getResponsiveRowData } from '../../core/responsive.js';
+import { getResponsiveRowData } from '../../core/responsive/rowData.js';
 import { setupTableFilters } from '../../core/filters/tableFilter.js';
-import { createDataTable, renderActionButtons } from '../../core/baseDatatable.js';
+import { createDataTable } from '../../core/base/createDataTable.js';
+import { renderActionButtons } from '../../core/base/actionButtons.js';
 import { buildExcelButton, buildTableExportParams } from '../../../../ui/tableUI.js';
 import { DATATABLE_SELECTORS } from '../../../../constants/selectors.js';
 
