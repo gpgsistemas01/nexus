@@ -143,6 +143,21 @@ abstracción «compartida» que todavía depende de un recurso concreto. Al edit
 preserva el cierre final de `contentFor` en su lugar; no se elimina y vuelve a agregar
 como efecto secundario de una refactorización.
 
+### Contrato de los selects en modales
+
+Los módulos de `plugins/select2/domains` reciben un `baseSelector` ya delimitado cuando
+inicializan directamente un dominio. Las funciones de composición `setup*Select`, en
+cambio, reciben el selector relativo del control y lo combinan una sola vez con
+`modalSelector`. El contenedor del modal se pasa también a cada inicializador para que
+Select2 inserte el desplegable dentro del contexto visual correcto.
+
+Los módulos de página conservan esta distinción al reutilizar los selects: reconstruyen
+sus selectores delimitados cada vez que se monta el componente, usan el formulario del
+CRUD correspondiente para resolver su modo y limpian el control, no el formulario que
+lo contiene. Las pruebas unitarias de frontend en
+`tests/unit/public/js/plugins/select2` verifican este contrato para materiales y salidas
+de merma sin duplicar el recorrido CRUD persistente de las integraciones.
+
 ## 8. Patrones de construcción de pruebas
 
 `createControllerTestApp` es una factory de test harness: crea una aplicación Express

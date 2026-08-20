@@ -1,12 +1,11 @@
-import { getAllWastes } from '../../../application/warehouse/wastes.js';
-import { FORM_SELECTORS } from '../../../constants/selectors.js';
+import { FORM_SELECTORS, MODAL_SELECTORS } from '../../../constants/selectors.js';
 import { setupWasteSelect, toggleWasteOption } from '../domains/waste.js';
 import { createIssueHeaderSelects } from './issueHeaderSelect.js';
 
-const modalSelector = '#wasteIssueModal';
+const modalSelector = MODAL_SELECTORS.WASTE_ISSUE;
 const headerSelects = createIssueHeaderSelects({
     modalSelector,
-    formSelector: FORM_SELECTORS.GOODS_ISSUE,
+    formSelector: FORM_SELECTORS.WASTE_ISSUE,
     selectors: {
         requester: FORM_SELECTORS.REQUESTER,
         client: FORM_SELECTORS.CLIENT,
@@ -30,7 +29,7 @@ export const getWasteIssueHeaderSelects = () => ({
 
         headerSelects.setOptions(data);
         toggleWasteOption({
-            selector: `${ modalSelector } ${ FORM_SELECTORS.WASTE_FORM }`,
+            selector: `${ modalSelector } ${ FORM_SELECTORS.WASTE_INPUT }`,
             data: { id: null, text: null }
         });
     },
