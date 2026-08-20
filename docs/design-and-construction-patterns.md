@@ -248,6 +248,14 @@ por archivo. Separar es necesario cuando un módulo mezcla transporte, coordinac
 visual o negocio; fusionar sólo es válido dentro de la misma capa, recurso y ciclo de
 cambio.
 
+En `public/js/application`, los casos de sólo lectura que alimentan catálogos se agrupan
+por dominio bajo `catalogs`: administración contiene departamentos y roles; almacén,
+presentaciones, motivos, unidades de medida y estados de surtimiento. Cada catálogo
+conserva su módulo y export de dominio, pero no crea una carpeta de un solo archivo.
+Los CRUD con mutaciones o coordinación propia permanecen en la carpeta de su recurso;
+movimientos también conserva su ownership porque representa una consulta operativa y
+no un catálogo para seleccionar relaciones.
+
 ### Contrato de los selects en modales
 
 Los módulos de `plugins/select2/domains` reciben un `baseSelector` ya delimitado cuando
