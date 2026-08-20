@@ -1,6 +1,4 @@
 import { getAllRolesRequest } from "../../../services/admin/roleService.js";
+import { createApplicationList } from '../../createCrudApplication.js';
 
-export const getAllRoles = async (params = {}) => {
-    const response = await getAllRolesRequest({ params });
-    return response;
-};
+export const getAllRoles = createApplicationList(getAllRolesRequest);

@@ -1,8 +1,4 @@
 import { getAllPresentationsRequest } from "../../../services/warehouse/presentationService.js";
+import { createApplicationList } from '../../createCrudApplication.js';
 
-export const getAllPresentations = async (params = {}) => {
-
-    const response = await getAllPresentationsRequest({ params });
-    
-    return response;
-};
+export const getAllPresentations = createApplicationList(getAllPresentationsRequest);

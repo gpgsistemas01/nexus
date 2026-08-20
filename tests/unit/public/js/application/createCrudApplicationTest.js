@@ -1,11 +1,24 @@
 import { describe, expect, it, vi } from 'vitest';
 
 import {
+  createApplicationList,
   createApplicationMutation,
   createCrudApplication
 } from '../../../../../src/public/js/application/createCrudApplication.js';
 
 describe('fábrica de aplicaciones CRUD', () => {
+  it.each([
+    ['parámetros explícitos', { page: 2 }],
+    ['parámetros predeterminados', undefined]
+  ])('construye listados con %s', async (_case, params) => {
+    const response = { data: { data: [{ id: 'resource-1' }] } };
+    const request = vi.fn().mockResolvedValue(response);
+    const getAll = createApplicationList(request);
+
+    await expect(getAll(params)).resolves.toBe(response);
+    expect(request).toHaveBeenCalledWith({ params: params ?? {} });
+  });
+
   it('mantiene el contrato de listado del request', async () => {
     const response = { data: { data: [{ id: 'resource-1' }] } };
     const requests = {

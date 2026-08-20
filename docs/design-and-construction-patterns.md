@@ -147,6 +147,13 @@ la UI.
 
 ### Listados de catálogos
 
+`createApplicationList` concentra el contrato de lectura de la capa de aplicación:
+recibe un request y produce una operación que siempre lo invoca con `{ params }`. El
+CRUD reutiliza esa operación para `getAll`; los catálogos de departamentos, roles,
+presentaciones, motivos y unidades de medida configuran la misma función sin repetir
+adaptadores equivalentes. Los listados que transforman la respuesta a opciones
+conservan su adaptador de dominio.
+
 `createDataTableListController` construye controllers de lectura configurando función
 de consulta, columnas y orden predeterminado. Roles, departamentos, presentaciones,
 unidades, motivos y estados de cumplimiento reutilizan el mismo parsing de DataTable.
