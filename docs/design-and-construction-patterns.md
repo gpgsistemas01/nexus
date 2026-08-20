@@ -284,6 +284,26 @@ Los CRUD con mutaciones o coordinación propia permanecen en la carpeta de su re
 movimientos también conserva su ownership porque representa una consulta operativa y
 no un catálogo para seleccionar relaciones.
 
+### Estado de surtimiento: tabla de referencia, no enum
+
+`FulfillmentStatus` se conserva como tabla de referencia controlada. Aunque sus nombres
+actuales forman un conjunto cerrado en las reglas de aplicación, el valor persistido no
+pertenece a un único agregado: la misma identidad se relaciona con encabezados y detalles
+de salidas de material y de merma. El filtro compartido necesita además resolver esa
+identidad para consultar por `fulfillmentStatusId`. La tabla mantiene una sola clave
+foránea reutilizable, integridad referencial y el mismo contrato de filtrado para los
+cuatro contextos; convertirla en enum obligaría a migrar esas relaciones y a mantener un
+nuevo contrato de filtro basado en valores en todos los consumidores que hoy intercambian
+identificadores.
+
+Que sea una tabla no la convierte en un catálogo administrable. No se exponen altas,
+ediciones ni bajas: la aplicación controla las transiciones mediante
+`FULFILLMENT_STATUS_NAMES` y el endpoint sólo publica lectura para filtros. Un enum se
+reconsiderará únicamente si desaparecen la resolución por identificador y el catálogo
+remoto, y todos los consumidores almacenan directamente el mismo valor inmutable. Por
+ahora, cambiar el tipo no elimina el proceso del select ni mejora el contrato CRUD; sólo
+traslada el costo a datos, filtros y relaciones existentes.
+
 ### Contrato de los selects en modales
 
 Los módulos de `plugins/select2/domains` reciben un `baseSelector` ya delimitado cuando
@@ -298,6 +318,26 @@ CRUD correspondiente para resolver su modo y limpian el control, no el formulari
 lo contiene. Las pruebas unitarias de frontend en
 `tests/unit/public/js/plugins/select2` verifican este contrato para materiales y salidas
 de merma sin duplicar el recorrido CRUD persistente de las integraciones.
+
+El transporte base de Select2 acepta tanto la respuesta HTTP de los listados CRUD como
+un arreglo de opciones ya resuelto por la capa de aplicación. Esta normalización se
+mantiene en el adaptador compartido: los catálogos con una selección predeterminada
+pueden precargar y reutilizar esas mismas opciones sin envolverlas artificialmente ni
+intentar leer `data` de un valor inexistente.
+
+El filtro de estado de surtimiento conserva dos contratos separados: la precarga mínima
+resuelve la opción `Pendiente`, mientras que las búsquedas de Select2 consumen la
+respuesta paginada completa del catálogo. El adaptador del dominio transforma cada
+registro `{ id, name }` en `{ id, text }` sin descartar `recordsFiltered`; así el cálculo
+de páginas permanece en el componente base, igual que para proveedores, personas y
+otros filtros remotos.
+
+Todos los selects remotos conservan el transporte HTTP compartido y, por tanto, la
+renovación de autenticación no se implementa dentro de cada plugin. Las respuestas `401`
+concurrentes esperan una única solicitud de refresh y después reintentan su petición
+original. La referencia a esa renovación se libera antes de los reintentos, de modo que
+una expiración posterior puede iniciar otro ciclo sin quedar asociada a la promesa o a
+la cola del ciclo anterior.
 
 El CRUD de merma reutiliza `mapSelectMaterialData`, el mismo adaptador del dominio de
 materiales, tanto para los resultados remotos como para restablecer la relación incluida

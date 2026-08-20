@@ -14,7 +14,7 @@ export const getPersonOptions = async (params = {}) => {
 
     const response = await getAllPersonsRequest({ params });
 
-    const list = response.data?.data || [];
+    const list = response?.data?.data || [];
 
     return list.filter(person => person?.id && person?.fullName)
         .map(person => ({

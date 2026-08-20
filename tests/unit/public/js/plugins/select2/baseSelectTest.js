@@ -11,13 +11,24 @@ vi.mock('../../../../../../src/public/js/ui/disabledControlWarning.js', () => ({
   setDisabledControlWarning: vi.fn()
 }));
 
-const { updatePresentationDisplay } = await import(
+const { buildPaginatedSelectResults, updatePresentationDisplay } = await import(
   '../../../../../../src/public/js/plugins/select2/baseSelect.js'
 );
 
 beforeEach(() => {
   vi.clearAllMocks();
   mdbMocks.initMdbWrapperInput.mockReturnValue({ id: 'presentation-wrapper' });
+});
+
+describe('contrato de resultados remotos de Select2', () => {
+  it('consume las opciones ya resueltas por la capa de aplicación', () => {
+    expect(buildPaginatedSelectResults([
+      { value: 'status-1', label: 'Pendiente' }
+    ])).toEqual({
+      results: [{ value: 'status-1', label: 'Pendiente' }],
+      pagination: { more: false }
+    });
+  });
 });
 
 describe('presentación compartida por los selects de los CRUD de compras y salidas', () => {
