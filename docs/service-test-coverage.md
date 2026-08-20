@@ -25,6 +25,12 @@ actualización del detalle. Material y merma reutilizan el mismo modal sin prefi
 cada página aloja una sola devolución; la persistencia y el movimiento permanecen en la
 integración CRUD del controller correspondiente.
 
+El estado de envío de los formularios CRUD se restablece desde el componente compartido
+`ui/forms/formStateUI.js`, usando el selector declarado en `constants/selectors.js` en
+lugar de reconstruir selectores CSS en cada flujo. Su contrato se prueba en la carpeta
+paralela `tests/unit/public/js/ui/forms`; los modales y el manejador de errores reutilizan
+esa función para conservar el mismo comportamiento en altas, ediciones y correcciones.
+
 Las variantes de validación frontend del CRUD de materiales se componen en
 `utils/validations/validators.js`: edición reutiliza las reglas comunes del alta, el alta
 normal agrega los campos de inventario y el alta desde una entrada permite omitir el
