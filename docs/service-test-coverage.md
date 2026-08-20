@@ -21,8 +21,9 @@ No se crean unitarias para repetir consultas felices ya cubiertas desde una inte
 Los componentes frontend compartidos de salidas conservan sus pruebas en
 `tests/unit/public/js/ui/issues`. Para la devolución, los valores límite comprueban que
 la cantidad disponible se calcule con la precisión del inventario antes de validar la
-actualización del detalle; la persistencia y el movimiento permanecen en la integración
-CRUD del controller correspondiente.
+actualización del detalle. Material y merma reutilizan el mismo modal sin prefijos porque
+cada página aloja una sola devolución; la persistencia y el movimiento permanecen en la
+integración CRUD del controller correspondiente.
 
 ## Pruebas de integración
 

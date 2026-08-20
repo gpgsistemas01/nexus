@@ -1,21 +1,20 @@
-<% const issueReturnPrefix = typeof returnPrefix === 'undefined' ? 'goodsIssue' : returnPrefix;
-const returnTotalsSummary = {
+<% const returnTotalsSummary = {
     class: 'row g-2 goods-issue-return-summary',
     items: [
         {
-            id: `${ issueReturnPrefix }ReturnSuppliedQuantity`,
+            id: 'issueReturnSuppliedQuantity',
             label: 'Cantidad surtida',
             value: '0.00',
             rawValue: 0
         },
         {
-            id: `${ issueReturnPrefix }ReturnReturnedQuantity`,
+            id: 'issueReturnReturnedQuantity',
             label: 'Cantidad devuelta',
             value: '0.00',
             rawValue: 0
         },
         {
-            id: `${ issueReturnPrefix }ReturnAvailableQuantity`,
+            id: 'issueReturnAvailableQuantity',
             label: 'Disponible para devolver',
             value: '0.00',
             rawValue: 0
@@ -24,7 +23,7 @@ const returnTotalsSummary = {
 };
 
 const returnForm = {
-    id: `${ issueReturnPrefix }ReturnForm`,
+    id: 'issueReturnForm',
     sections: [
         {
             title: 'Devolución del detalle',
@@ -33,7 +32,7 @@ const returnForm = {
                     type: 'inputs',
                     items: [
                         {
-                            id: `${ issueReturnPrefix }ReturnQuantityInput`,
+                            id: 'issueReturnQuantityInput',
                             name: 'returnQuantity',
                             type: 'number',
                             label: 'Cantidad a devolver',
@@ -49,7 +48,7 @@ const returnForm = {
                 {
                     type: 'textarea',
                     input: {
-                        id: `${ issueReturnPrefix }ReturnObservationsInput`,
+                        id: 'issueReturnObservationsInput',
                         name: 'observations',
                         label: 'Observaciones',
                         attrs: {
@@ -72,7 +71,7 @@ const returnForm = {
     ],
     actions: [
         {
-            id: `${ issueReturnPrefix }ReturnCancelBtn`,
+            id: 'issueReturnCancelBtn',
             class: 'btn btn-link',
             content: 'Regresar',
             attrs: {
@@ -81,7 +80,7 @@ const returnForm = {
             }
         },
         {
-            id: `${ issueReturnPrefix }ReturnConfirmBtn`,
+            id: 'issueReturnConfirmBtn',
             type: 'submit',
             class: 'btn btn-warning',
             content: 'Devolver'
@@ -90,7 +89,7 @@ const returnForm = {
 }; %>
 
 <%- include('../modal', {
-    modalId: `${ issueReturnPrefix }ReturnModal`,
+    modalId: 'issueReturnModal',
     modalTitle: 'Devolver detalle de salida',
     dialogClass: 'modal-lg modal-dialog-scrollable',
     form: returnForm

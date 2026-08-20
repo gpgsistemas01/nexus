@@ -47,30 +47,30 @@ describe('UI compartida de devolución del CRUD de salidas', () => {
     };
   });
 
-  it.each([
-    ['goodsIssue', '#goodsIssueReturnAvailableQuantity'],
-    ['wasteIssue', '#wasteIssueReturnAvailableQuantity']
-  ])('reutiliza el flujo para %s y redondea el límite disponible', (prefix, availableSelector) => {
-    const issueReturn = createIssueReturn({ prefix, sendReturn: vi.fn() });
+  it.each(['salida de material', 'salida de merma'])(
+    'reutiliza el flujo para %s y redondea el límite disponible',
+    () => {
+      const issueReturn = createIssueReturn({ sendReturn: vi.fn() });
 
-    issueReturn.open({
-      issue: { id: 'issue-1' },
-      detail: { id: 'detail-1', suppliedQuantity: 0.3, returnedQuantity: 0.2 }
-    });
+      issueReturn.open({
+        issue: { id: 'issue-1' },
+        detail: { id: 'detail-1', suppliedQuantity: 0.3, returnedQuantity: 0.2 }
+      });
 
-    expect(mocks.setSummaryValues).toHaveBeenCalledWith(expect.arrayContaining([
-      { selector: availableSelector, value: 0.1 }
-    ]));
-    expect(form.dataset).toMatchObject({
-      id: 'issue-1',
-      detailId: 'detail-1',
-      availableQuantity: '0.1'
-    });
-    expect(mocks.showModal).toHaveBeenCalledOnce();
-  });
+      expect(mocks.setSummaryValues).toHaveBeenCalledWith(expect.arrayContaining([
+        { selector: '#issueReturnAvailableQuantity', value: 0.1 }
+      ]));
+      expect(form.dataset).toMatchObject({
+        id: 'issue-1',
+        detailId: 'detail-1',
+        availableQuantity: '0.1'
+      });
+      expect(mocks.showModal).toHaveBeenCalledOnce();
+    }
+  );
 
   it('acepta el valor límite y rechaza el primer valor superior', () => {
-    createIssueReturn({ prefix: 'goodsIssue', sendReturn: vi.fn() }).initialize();
+    createIssueReturn({ sendReturn: vi.fn() }).initialize();
     const configuration = mocks.useForm.mock.calls[0][0];
     const validationForm = { dataset: { availableQuantity: '0.1' } };
 
