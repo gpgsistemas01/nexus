@@ -1,3 +1,4 @@
+import { DOM_EVENT_NAMES } from '../constants/events.js';
 import { notifications } from "../plugins/swal/swalComponent.js";
 import { handleFlashMessage } from "../handlers/flashMessageHandler.js";
 import { initDatePickers, initDateTimePickers } from "../plugins/flatpickr/dateTimePicker.js";
@@ -28,10 +29,10 @@ if (errorMessage) {
 document.querySelectorAll('.dropdown').forEach(dropdown => {
     const btn = dropdown.querySelector('button[data-mdb-dropdown-init]');
     const instance = window.mdb.Dropdown.getOrCreateInstance(btn);
-    dropdown.addEventListener('mouseenter', () => {
+    dropdown.addEventListener(DOM_EVENT_NAMES.MOUSE_ENTER, () => {
         instance.show();
     });
-    dropdown.addEventListener('mouseleave', () => {
+    dropdown.addEventListener(DOM_EVENT_NAMES.MOUSE_LEAVE, () => {
         instance.hide();
         btn.blur();
     });

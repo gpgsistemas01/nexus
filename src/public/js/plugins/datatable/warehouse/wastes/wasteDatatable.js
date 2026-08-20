@@ -1,3 +1,5 @@
+import { DOM_EVENT_NAMES } from '../../../../constants/events.js';
+import { FORM_MODES } from '../../../../constants/formModes.js';
 import { configureRealtimeReload, createDataTable, renderActionButtons } from "../../core/baseDatatable.js";
 import { setupTableFilters } from "../../core/filters/tableFilter.js";
 import { getAllWastes } from "../../../../application/warehouse/wastes/wastes.js";
@@ -56,7 +58,7 @@ export const createWasteDatatable = async (context) => {
             buttons: [
                 ...(canManageWastes ? [{
                     text: 'Nueva merma',
-                    action: () => openWasteModal({ mode: 'create' })
+                    action: () => openWasteModal({ mode: FORM_MODES.CREATE })
                 }] : []),
                 buildExcelButton({
                     filename: formatFileName('reporte_mermas'),
@@ -72,18 +74,18 @@ export const createWasteDatatable = async (context) => {
         eventName: 'wastes:updated'
     });
 
-    $(`${ selectorTable } tbody`).on('click', '.btn-edit', async function() {
+    $(`${ selectorTable } tbody`).on(DOM_EVENT_NAMES.CLICK, '.btn-edit', async function() {
 
         const data = getResponsiveRowData(table, this);
 
-        await openWasteModal({ mode: 'edit', data });
+        await openWasteModal({ mode: FORM_MODES.EDIT, data });
     });
 
-    $(`${ selectorTable } tbody`).on('click', '.btn-adjust-stock', async function() {
+    $(`${ selectorTable } tbody`).on(DOM_EVENT_NAMES.CLICK, '.btn-adjust-stock', async function() {
 
         const data = getResponsiveRowData(table, this);
 
-        await openWasteModal({ mode: 'edit-stock', data });
+        await openWasteModal({ mode: FORM_MODES.EDIT_STOCK, data });
     });
 
     return table;

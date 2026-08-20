@@ -7,7 +7,7 @@ import { materialStockValidation, materialValidation } from "../../../utils/vali
 import { materialCreateFields, materialSecondaryDataFields, materialStockFields } from './materialFields.js';
 import { isEditMode, isStockMode } from '../../../constants/formModes.js';
 
-const formId = FORM_SELECTORS.MATERIAL_FORM;
+const formId = FORM_SELECTORS.MATERIAL;
 const materialModalId = MODAL_SELECTORS.MATERIAL;
 const goodsReceiptCreationContext = 'goodsReceipt';
 

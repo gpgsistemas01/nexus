@@ -1,3 +1,4 @@
+import { SELECT2_EVENT_NAMES } from '../../../constants/events.js';
 import { openClientModal } from "../../../pages/sales/clients/clientModal.js";
 import { getAllClients } from "../../../application/sales/clients/clients.js";
 import { initDomainSelect2, initFilterSelect2, runAfterSelect2Close, toggleSelectOption } from "../baseSelect.js";
@@ -37,7 +38,7 @@ const attachClientHandler = ({
     baseSelector
 }) => {
 
-    $(baseSelector).off('select2:select').on('select2:select', (e) => {
+    $(baseSelector).off(SELECT2_EVENT_NAMES.SELECT).on(SELECT2_EVENT_NAMES.SELECT, (e) => {
 
         const data = e.params.data;
 

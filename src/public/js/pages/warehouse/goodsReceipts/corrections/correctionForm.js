@@ -1,3 +1,4 @@
+import { FORM_SELECTORS, MODAL_SELECTORS } from '../../../../constants/selectors.js';
 import { useForm } from "../../../../application/form.js";
 import { correctGoodsReceiptDetail } from "../../../../application/warehouse/goodsReceipts/goodsReceipts.js";
 import { initMdbModal } from "../../../../plugins/mdb/baseInstance.js";
@@ -7,8 +8,8 @@ import { resetFormSubmitState } from "../../../../ui/forms/formStateUI.js";
 import { validateFields } from "../../../../utils/formUtils.js";
 import { goodsReceiptCorrectionValidation } from "../../../../utils/validations/validators.js";
 
-const CORRECTION_MODAL_SELECTOR = '#goodsReceiptCorrectionModal';
-const CORRECTION_FORM_SELECTOR = '#goodsReceiptCorrectionForm';
+const CORRECTION_MODAL_SELECTOR = MODAL_SELECTORS.GOODS_RECEIPT_CORRECTION;
+const CORRECTION_FORM_SELECTOR = FORM_SELECTORS.GOODS_RECEIPT_CORRECTION;
 export const GOODS_RECEIPT_CORRECTION_APPLIED_EVENT = 'goods-receipt-correction:applied';
 
 const getModal = () => document.querySelector(CORRECTION_MODAL_SELECTOR);

@@ -1,3 +1,4 @@
+import { DOM_EVENT_NAMES } from '../../constants/events.js';
 export const initMdbModal = (el) => window.mdb.Modal.getOrCreateInstance(el);
 
 export const showModal = (instance) => {
@@ -39,7 +40,7 @@ export const initMdbTooltips = (root = document) => {
 
         if (tooltipDismissBoundElements.has(el)) return;
 
-        el.addEventListener('click', () => instance.hide());
+        el.addEventListener(DOM_EVENT_NAMES.CLICK, () => instance.hide());
         tooltipDismissBoundElements.add(el);
     });
 }
@@ -48,7 +49,7 @@ export const initMdbDismissibleSubmenus = (root = document) => {
 
     if (!root || !window.mdb?.Collapse || submenuDismissBoundRoots.has(root)) return;
 
-    root.addEventListener('click', ({ target }) => {
+    root.addEventListener(DOM_EVENT_NAMES.CLICK, ({ target }) => {
         root.querySelectorAll('.app-nav-list--flyout .app-nav-submenu.show').forEach((submenu) => {
             const navItem = submenu.closest('.nav-item');
 

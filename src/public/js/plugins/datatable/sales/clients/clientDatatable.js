@@ -1,3 +1,5 @@
+import { DOM_EVENT_NAMES } from '../../../../constants/events.js';
+import { FORM_MODES } from '../../../../constants/formModes.js';
 import { getAllClients } from "../../../../application/sales/clients/clients.js";
 import { exportClientReport } from "../../../../application/sales/report.js";
 import { openClientModal } from "../../../../pages/sales/clients/clientModal.js";
@@ -28,7 +30,7 @@ export const createClientDatatable = () => {
             buttons: [
                 {
                     text: 'Nuevo cliente',
-                    action: () => openClientModal({ mode: 'create' })
+                    action: () => openClientModal({ mode: FORM_MODES.CREATE })
                 },
                 buildExcelButton({
                     filename: formatFileName('reporte_clientes'),
@@ -39,10 +41,10 @@ export const createClientDatatable = () => {
         }
     });
 
-    $(`${ selector } tbody`).on('click', '.btn-edit', function () {
+    $(`${ selector } tbody`).on(DOM_EVENT_NAMES.CLICK, '.btn-edit', function () {
 
         const data = getResponsiveRowData(table, this);
 
-        openClientModal({ mode: 'edit', data });
+        openClientModal({ mode: FORM_MODES.EDIT, data });
     });
 }

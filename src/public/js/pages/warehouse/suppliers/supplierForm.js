@@ -5,7 +5,7 @@ import { FORM_SELECTORS } from "../../../constants/selectors.js";
 import { handleSubmit, validateFields } from "../../../utils/formUtils.js";
 import { supplierValidation } from "../../../utils/validations/validators.js";
 
-const formId = FORM_SELECTORS.SUPPLIER_FORM;
+const formId = FORM_SELECTORS.SUPPLIER;
 
 useForm({
     selector: formId,

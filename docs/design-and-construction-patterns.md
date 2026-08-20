@@ -23,6 +23,26 @@ reutilizarse antes de construir otro flujo y dónde terminan sus límites.
 | Presentación | Composición de componentes y ownership por recurso | `src/views/shared`, `src/public/js/ui`, `plugins` y componentes que permanecen en la carpeta de su recurso. |
 | Pruebas | Test harness configurable | `createControllerTestApp` registra sólo las rutas necesarias para probar controllers con Supertest. |
 
+Las constantes compartidas forman parte de estas fronteras de construcción: modos de
+formulario, estados, permisos y selectores se importan desde `src/constants` o
+`src/public/js/constants`, según el entorno. Los consumidores no deben volver a
+declarar sus valores literales; al ampliar un conjunto se actualiza su export y todos
+los imports relacionados para conservar una única fuente de verdad.
+
+Los selectores se agrupan por el tipo de elemento que identifican:
+`FORM_SELECTORS`, `MODAL_SELECTORS`, `INPUT_SELECTORS`, `SELECT_SELECTORS`,
+`BUTTON_SELECTORS` y `HEADING_SELECTORS`. Dentro de cada grupo, la clave nombra el
+recurso o propósito (`GOODS_RECEIPT_CORRECTION`, `ADD_MATERIAL`, `MODAL_TITLE`) sin
+repetir el tipo ya expresado por el nombre del grupo. Un selector usado en más de un
+consumidor se incorpora al grupo correspondiente antes de agregar otro literal.
+
+Los nombres de eventos reutilizados siguen la misma separación por integración:
+`DOM_EVENT_NAMES` para eventos nativos, `SELECT2_EVENT_NAMES` para Select2 y
+`MODAL_EVENT_NAMES` para los ciclos de vida de MDB o Bootstrap. Los listeners CRUD
+importan estos nombres en lugar de repetir literales como `click`, `change` o `submit`;
+un evento con namespace exclusivo de un módulo permanece local hasta que exista un
+segundo consumidor real.
+
 ## 1. Monolito modular por dominio y arquitectura por capas
 
 Nexus se despliega como una aplicación, pero organiza responsabilidades por dominio y

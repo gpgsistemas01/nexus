@@ -7,7 +7,7 @@ import { wasteCreateFields, wasteSecondaryDataFields, wasteStockFields } from '.
 import { isEditMode, isStockMode } from '../../../constants/formModes.js';
 
 useForm({
-    selector: FORM_SELECTORS.WASTE_FORM,
+    selector: FORM_SELECTORS.WASTE,
     normalizeData: ({ form, formData }) => {
 
         const fields = isStockMode(form.dataset.mode)
@@ -18,7 +18,7 @@ useForm({
             
             if (!formData.minStock) delete formData.minStock;
             
-            formData.isActive = document.querySelector(`${ FORM_SELECTORS.WASTE_FORM } #isActiveInput`).checked;
+            formData.isActive = document.querySelector(`${ FORM_SELECTORS.WASTE } #isActiveInput`).checked;
         }
 
         return pickFormFields(formData, fields);

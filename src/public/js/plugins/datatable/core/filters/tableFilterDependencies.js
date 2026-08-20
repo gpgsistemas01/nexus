@@ -1,3 +1,4 @@
+import { DOM_EVENT_NAMES } from '../../../../constants/events.js';
 import { toggleMaterialOption } from "../../../select2/domains/material.js";
 import { FILTER_SELECTORS } from "../../../../constants/selectors.js";
 import { toggleDisabledElement } from "../../../../utils/formUtils.js";
@@ -24,7 +25,7 @@ const DEPENDENT_FILTER_MESSAGES = {
 
 const clearSelectFilter = (selector) => {
 
-    $(selector).val(null).trigger('change');
+    $(selector).val(null).trigger(DOM_EVENT_NAMES.CHANGE);
 };
 
 

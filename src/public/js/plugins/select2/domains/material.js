@@ -1,10 +1,11 @@
+import { SELECT2_EVENT_NAMES } from '../../../constants/events.js';
 import { openMaterialModal } from "../../../pages/warehouse/materials/materialModal.js";
 import { getAllMaterials } from "../../../application/warehouse/materials/materials.js";
 import { buildPaginatedSelectParams, initDomainSelect2, initFilterSelect2, runAfterSelect2Close, setMdbWrapperInputValue, toggleSelectOption, updatePresentationDisplay } from "../baseSelect.js";
 import { mapSelectMaterialData } from "../../../utils/warehouseInventoryUtils.js";
-import { FORM_SELECTORS, FILTER_SELECTORS } from "../../../constants/selectors.js";
+import { FILTER_SELECTORS, INPUT_SELECTORS } from "../../../constants/selectors.js";
 
-const wrapperSelector = FORM_SELECTORS.PRESENTATION_DISPLAY;
+const wrapperSelector = INPUT_SELECTORS.PRESENTATION_DISPLAY;
 const materialSelector = FILTER_SELECTORS.MATERIAL;
 
 export const initMaterialFilterSelect = ({
@@ -59,7 +60,7 @@ const attachMaterialHandler = ({
     creationContext
 }) => {
 
-    $(baseSelector).off('select2:select').on('select2:select', (e) => {
+    $(baseSelector).off(SELECT2_EVENT_NAMES.SELECT).on(SELECT2_EVENT_NAMES.SELECT, (e) => {
 
         const { data } = e.params;
 

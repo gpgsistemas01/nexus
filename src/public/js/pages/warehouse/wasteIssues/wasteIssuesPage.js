@@ -1,3 +1,4 @@
+import { DOM_EVENT_NAMES } from '../../../constants/events.js';
 import {
     editWasteIssue,
     editWasteIssueDetails,
@@ -11,7 +12,7 @@ import { openModal } from '../../../ui/modalUI.js';
 import { createWasteIssueDatatable } from '../../../plugins/datatable/warehouse/wasteIssues/wasteIssueDatatable.js';
 import { setDateTimePickerValue } from '../../../plugins/flatpickr/dateTimePicker.js';
 import { FORM_MODES } from '../../../constants/formModes.js';
-import { DATATABLE_SELECTORS, FORM_SELECTORS, MODAL_SELECTORS } from '../../../constants/selectors.js';
+import { BUTTON_SELECTORS, DATATABLE_SELECTORS, FORM_SELECTORS, INPUT_SELECTORS, MODAL_SELECTORS, SELECT_SELECTORS } from '../../../constants/selectors.js';
 import { hasValidationErrors, validateDetailsFields, validateFields } from '../../../utils/formUtils.js';
 import { addWasteIssueDetailValidation, issueProjectQuantityDetailsValidation, wasteIssueValidation } from '../../../utils/validations/validators.js';
 import { normalizeFormErrors } from '../../../ui/forms/formErrorsUI.js';
@@ -33,11 +34,11 @@ const WASTE_ISSUE_ENTITY_NAME = 'salida de merma';
 
 const form = document.querySelector(formId);
 const context = window.meta || {};
-const wasteSelect = document.querySelector(FORM_SELECTORS.WASTE_INPUT);
+const wasteSelect = document.querySelector(SELECT_SELECTORS.WASTE);
 const details = [];
 const modalElement = document.querySelector(modalId);
 const detailTableSelector = DATATABLE_SELECTORS.MATERIAL;
-const presentationDisplaySelector = `${ modalId } ${ FORM_SELECTORS.PRESENTATION_DISPLAY }`;
+const presentationDisplaySelector = `${ modalId } ${ INPUT_SELECTORS.PRESENTATION_DISPLAY }`;
 const issueHeaderForm = createIssueHeaderForm({
     formSelector: formId,
     selects: getWasteIssueHeaderSelects()
@@ -47,7 +48,7 @@ const wasteIssueReturn = createIssueReturn({
 });
 
 const setCurrentRequestDate = () => setDateTimePickerValue(
-    document.querySelector(FORM_SELECTORS.WASTE_ISSUE_DATE),
+    document.querySelector(INPUT_SELECTORS.WASTE_ISSUE_DATE),
     new Date().toISOString()
 );
 
@@ -59,9 +60,9 @@ export const openWasteIssueModal = ({ mode, data = null }) => {
     if (mode === FORM_MODES.CREATE) {
         setCurrentRequestDate();
     } else {
-        setDateTimePickerValue(document.querySelector(FORM_SELECTORS.WASTE_ISSUE_DATE), data.requestDate);
-        document.querySelector(FORM_SELECTORS.OBSERVATIONS_INPUT).value = data.observations || '';
-        document.querySelector(FORM_SELECTORS.PROJECT_NUMBER).value = data.projectNumber || '';
+        setDateTimePickerValue(document.querySelector(INPUT_SELECTORS.WASTE_ISSUE_DATE), data.requestDate);
+        document.querySelector(INPUT_SELECTORS.OBSERVATIONS).value = data.observations || '';
+        document.querySelector(INPUT_SELECTORS.PROJECT_NUMBER).value = data.projectNumber || '';
 
         details.push(...data.details.map(mapIssueDetailToTable));
     }
@@ -86,12 +87,12 @@ export const openWasteIssueModal = ({ mode, data = null }) => {
 
 const addWaste = () => {
 
-    const option = document.querySelector(`${ FORM_SELECTORS.WASTE_INPUT } option:checked`);
+    const option = document.querySelector(`${ SELECT_SELECTORS.WASTE } option:checked`);
 
     let { id, text, base, height, supplierMaterial } = option.dataset;
     supplierMaterial = JSON.parse(supplierMaterial);
     const wasteId = option.value || id;
-    const quantity = Number(document.querySelector(FORM_SELECTORS.QUANTITY_INPUT).value);
+    const quantity = Number(document.querySelector(INPUT_SELECTORS.QUANTITY).value);
 
     const errors = validateFields(addWasteIssueDetailValidation, {
         wasteId,
@@ -123,8 +124,8 @@ const addWaste = () => {
 
     refreshMaterialTable(details);
     clearAddedItemInput({
-        itemSelector: FORM_SELECTORS.WASTE_INPUT,
-        quantitySelector: FORM_SELECTORS.QUANTITY_INPUT,
+        itemSelector: SELECT_SELECTORS.WASTE,
+        quantitySelector: INPUT_SELECTORS.QUANTITY,
         presentationSelector: presentationDisplaySelector
     });
 };
@@ -135,8 +136,8 @@ const findDetailByElement = element => details.find(detail => (
     || detail.wasteId === element.dataset.id
 ));
 
-on('click', '#addMaterialBtn', addWaste);
-on('click', `${ detailTableSelector } .delete-btn`, (event, button) => {
+on(DOM_EVENT_NAMES.CLICK, BUTTON_SELECTORS.ADD_MATERIAL, addWaste);
+on(DOM_EVENT_NAMES.CLICK, `${ detailTableSelector } .delete-btn`, (event, button) => {
     const removedDetail = removeDetail({
         details,
         matches: detail => detail.wasteId === button.dataset.id
@@ -153,7 +154,7 @@ bindIssueProjectQuantityControls({
     findDetail: findDetailByElement
 });
 
-on('click', `${ detailTableSelector } .return-issue-detail-btn`, (event, button) => {
+on(DOM_EVENT_NAMES.CLICK, `${ detailTableSelector } .return-issue-detail-btn`, (event, button) => {
     const detail = findDetailByElement(button);
 
     if (detail) wasteIssueReturn.open({ issue: { id: form.dataset.id }, detail });

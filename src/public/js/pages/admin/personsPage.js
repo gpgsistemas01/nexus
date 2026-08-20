@@ -1,3 +1,4 @@
+import { DOM_EVENT_NAMES } from '../../constants/events.js';
 import { registerPerson, updatePerson } from "../../application/admin/persons/persons.js";
 import { useForm } from "../../application/form.js";
 import { createPersonsDatatable, initPersonAccessTable, personAccesses, refreshPersonAccessTable } from "../../plugins/datatable/admin/persons/personDatatable.js";
@@ -7,12 +8,13 @@ import { initForm } from "../../ui/forms/formStateUI.js";
 import { openModal } from "../../ui/modalUI.js";
 import { handleSubmit, hasValidationErrors, validateFields } from "../../utils/formUtils.js";
 import { personAccessValidation, personValidation } from "../../utils/validations/validators.js";
-import { FORM_SELECTORS, MODAL_SELECTORS } from "../../constants/selectors.js";
+import { BUTTON_SELECTORS, FORM_SELECTORS, HEADING_SELECTORS, MODAL_SELECTORS } from "../../constants/selectors.js";
 import { on } from "../../utils/domUtils.js";
 import { clearSelectValue } from "../../plugins/select2/baseSelect.js";
 import { hasPermission, UI_PERMISSIONS } from "../../constants/permissions.js";
+import { FORM_MODES } from "../../constants/formModes.js";
 
-const formId = FORM_SELECTORS.PERSON_FORM;
+const formId = FORM_SELECTORS.PERSON;
 const modalId = MODAL_SELECTORS.PERSON;
 
 const context = window.meta || {};
@@ -53,19 +55,19 @@ export const openPersonModal = ({ mode, data = null }) => {
     initPersonFormSelect2({ modalSelector: modalId });
     initPersonAccessTable(data?.accesses || []);
 
-    if (mode === 'create') {
+    if (mode === FORM_MODES.CREATE) {
 
         form.reset();
-        modalElement.querySelector('#modalTitle').textContent = 'Registrar persona';
-        form.querySelector('#submitBtn').textContent = 'Guardar';
+        modalElement.querySelector(HEADING_SELECTORS.MODAL_TITLE).textContent = 'Registrar persona';
+        form.querySelector(BUTTON_SELECTORS.SUBMIT).textContent = 'Guardar';
 
     } 
     
-    if (mode === 'edit') {
+    if (mode === FORM_MODES.EDIT) {
 
         form.elements.fullName.value = data.fullName;
-        modalElement.querySelector('#modalTitle').textContent = 'Editar persona';
-        form.querySelector('#submitBtn').textContent = 'Actualizar';
+        modalElement.querySelector(HEADING_SELECTORS.MODAL_TITLE).textContent = 'Editar persona';
+        form.querySelector(BUTTON_SELECTORS.SUBMIT).textContent = 'Actualizar';
     }
 
     openModal(modalElement);
@@ -101,4 +103,4 @@ const addPersonAccess = () => {
     clearSelectValue(role);
 };
 
-on('click', '#addPersonAccessBtn', addPersonAccess);
+on(DOM_EVENT_NAMES.CLICK, '#addPersonAccessBtn', addPersonAccess);

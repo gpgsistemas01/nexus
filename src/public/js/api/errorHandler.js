@@ -1,3 +1,4 @@
+import { DOM_EVENT_NAMES } from '../constants/events.js';
 import { getErrorMessage } from "../constants/apiMessages.js";
 import { notifications } from "../plugins/swal/swalComponent.js";
 import { clearFormErrors, normalizeFormErrors, scrollToFirstFormError } from "../ui/forms/formErrorsUI.js";
@@ -15,7 +16,7 @@ const resetFormSubmission = (form) => {
     if (!form) return;
 
     form.dataset.submitting = 'false';
-    form.querySelector('button[type="submit"]')?.removeAttribute('disabled');
+    form.querySelector('button[type=DOM_EVENT_NAMES.SUBMIT]')?.removeAttribute('disabled');
 };
 
 export const normalizeJqAjaxError = (jqXHR, errorThrown = null) => {

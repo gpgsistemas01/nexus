@@ -1,3 +1,4 @@
+import { DOM_EVENT_NAMES } from '../constants/events.js';
 import { downloadBlob } from "../utils/downloadBlob.js";
 import { notifications } from "../plugins/swal/swalComponent.js";
 
@@ -89,10 +90,10 @@ export const clearTableFilters = () => {
 
     filterElements.forEach(element => {
         if (element.classList.contains('select2-hidden-accessible')) {
-            $(element).val(null).trigger('change');
+            $(element).val(null).trigger(DOM_EVENT_NAMES.CHANGE);
         } else {
             element.value = '';
-            element.dispatchEvent(new Event('change'));
+            element.dispatchEvent(new Event(DOM_EVENT_NAMES.CHANGE));
         }
     });
 }

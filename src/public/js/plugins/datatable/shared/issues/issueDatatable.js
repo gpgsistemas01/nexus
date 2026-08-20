@@ -1,3 +1,4 @@
+import { DOM_EVENT_NAMES } from '../../../../constants/events.js';
 import { formatDateTimeDisplay, formatFileName } from '../../../../utils/formatters.js';
 import { getResponsiveRowData } from '../../core/responsive.js';
 import { setupTableFilters } from '../../core/filters/tableFilter.js';
@@ -45,7 +46,7 @@ export const buildIssueTrackingColumns = () => [
 ];
 
 export const bindIssueTableAction = ({ table, tableSelector, buttonSelector, callback }) => {
-    $(`${ tableSelector } tbody`).on('click', buttonSelector, function () {
+    $(`${ tableSelector } tbody`).on(DOM_EVENT_NAMES.CLICK, buttonSelector, function () {
         callback(getResponsiveRowData(table, this));
     });
 };

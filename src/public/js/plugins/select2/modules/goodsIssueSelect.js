@@ -1,4 +1,4 @@
-import { FORM_SELECTORS, MODAL_SELECTORS } from '../../../constants/selectors.js';
+import { FORM_SELECTORS, INPUT_SELECTORS, MODAL_SELECTORS, SELECT_SELECTORS } from '../../../constants/selectors.js';
 import { setupMaterialSelect, toggleMaterialOption } from '../domains/material.js';
 import { createIssueHeaderSelects } from './issueHeaderSelect.js';
 
@@ -7,11 +7,11 @@ const headerSelects = createIssueHeaderSelects({
     modalSelector,
     formSelector: FORM_SELECTORS.GOODS_ISSUE,
     selectors: {
-        requester: FORM_SELECTORS.REQUESTER,
-        client: FORM_SELECTORS.CLIENT,
-        department: FORM_SELECTORS.DEPARTMENT,
-        advisor: FORM_SELECTORS.ADVISOR,
-        projectNumber: FORM_SELECTORS.PROJECT_NUMBER
+        requester: SELECT_SELECTORS.REQUESTER,
+        client: SELECT_SELECTORS.CLIENT,
+        department: SELECT_SELECTORS.DEPARTMENT,
+        advisor: SELECT_SELECTORS.ADVISOR,
+        projectNumber: INPUT_SELECTORS.PROJECT_NUMBER
     }
 });
 
@@ -21,7 +21,7 @@ export const getGoodsIssueHeaderSelects = () => ({
         headerSelects.init();
         setupMaterialSelect({
             modalSelector,
-            materialSelector: FORM_SELECTORS.MATERIAL,
+            materialSelector: SELECT_SELECTORS.MATERIAL,
             allowCreate: false
         });
     },
@@ -29,7 +29,7 @@ export const getGoodsIssueHeaderSelects = () => ({
 
         headerSelects.setOptions(data);
         toggleMaterialOption({
-            selector: `${ modalSelector } ${ FORM_SELECTORS.MATERIAL }`,
+            selector: `${ modalSelector } ${ SELECT_SELECTORS.MATERIAL }`,
             data: { id: null, text: null }
         });
     },

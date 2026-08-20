@@ -1,3 +1,5 @@
+import { DOM_EVENT_NAMES } from '../../../../constants/events.js';
+import { FORM_MODES } from '../../../../constants/formModes.js';
 import { openGoodsReceiptModal } from "../../../../pages/warehouse/goodsReceipts/goodsReceiptsPage.js";
 import { createDataTable, renderActionButtons, resetDataTable } from "../../core/baseDatatable.js";
 import { getAllGoodsReceipts } from "../../../../application/warehouse/goodsReceipts/goodsReceipts.js";
@@ -93,7 +95,7 @@ export const createGoodsReceiptDatatable = async () => {
             buttons: [
                 {
                     text: 'Nueva compra',
-                    action: () => openGoodsReceiptModal({ mode: 'create' })
+                    action: () => openGoodsReceiptModal({ mode: FORM_MODES.CREATE })
                 },
                 buildExcelButton({
                     filename: formatFileName('reporte_compras'),
@@ -106,12 +108,14 @@ export const createGoodsReceiptDatatable = async () => {
         }
     });
 
-    $(`${ selectorTable } tbody`).on('click', '.btn-edit', function() {
+    $(`${ selectorTable } tbody`).on(DOM_EVENT_NAMES.CLICK, '.btn-edit', function() {
 
         const data = getResponsiveRowData(table, this);
 
         openGoodsReceiptModal({
-            mode: data.status?.name === GOODS_RECEIPT_STATUS_LABELS.CANCELED ? 'view' : 'edit',
+            mode: data.status?.name === GOODS_RECEIPT_STATUS_LABELS.CANCELED
+                ? FORM_MODES.VIEW
+                : FORM_MODES.EDIT,
             data
         });
     });
@@ -144,7 +148,7 @@ export const initDetailsGoodsReceiptTable = (mode) => {
     });
 };
 
-$(selectorMaterialTable).on('click', '.delete-btn', function () {
+$(selectorMaterialTable).on(DOM_EVENT_NAMES.CLICK, '.delete-btn', function () {
 
     const id = $(this).data('id');
 

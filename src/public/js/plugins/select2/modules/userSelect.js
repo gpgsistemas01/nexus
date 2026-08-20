@@ -1,11 +1,11 @@
 import { initDepartmentSelect, toggleDepartmentOption } from "../domains/department.js";
 import { initRoleSelect, toggleRoleOption } from "../domains/role.js";
-import { FORM_SELECTORS, MODAL_SELECTORS } from "../../../constants/selectors.js";
+import { FORM_SELECTORS, MODAL_SELECTORS, SELECT_SELECTORS } from "../../../constants/selectors.js";
 
 let scoped = null;
 const selectors = {
-    department: FORM_SELECTORS.DEPARTMENT_ID,
-    role: FORM_SELECTORS.ROLE_ID
+    department: SELECT_SELECTORS.DEPARTMENT_ID,
+    role: SELECT_SELECTORS.ROLE_ID
 };
 const modalSelector = MODAL_SELECTORS.USER;
 

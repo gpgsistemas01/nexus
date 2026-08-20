@@ -1,3 +1,4 @@
+import { DOM_EVENT_NAMES } from '../../../constants/events.js';
 import { getSelectedOptionText } from '../../../utils/domUtils.js';
 import { isInternalClientName, resolveAdvisorDepartmentByClientName, resolveProjectNumberByClientAndDepartment } from '../../../application/warehouse/issues/issueHeaderRules.js';
 import { bindDisabledSelectDependency } from '../baseSelect.js';
@@ -75,7 +76,7 @@ export const createIssueHeaderSelects = ({ modalSelector, formSelector, selector
         ].forEach(({ source, target }) => bindDisabledSelectDependency({
             sourceSelector: source,
             targetSelector: target,
-            clearTarget: () => $(target).val(null).trigger('change'),
+            clearTarget: () => $(target).val(null).trigger(DOM_EVENT_NAMES.CHANGE),
             isDisabled: value => !canEdit() || !value,
             disabledMessage: source === scoped.department
                 ? 'Seleccione un área antes de buscar solicitante.'

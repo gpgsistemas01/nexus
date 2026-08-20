@@ -1,14 +1,14 @@
 import { getPresentation, mapSelectMaterialData } from "../../../utils/warehouseInventoryUtils.js";
 import { initReasonSelect, toggleReasonOption } from "../domains/reason.js";
 import { initSupplierMaterialSelect, toggleSupplierMaterialOption } from "../domains/supplierMaterial.js";
-import { FORM_SELECTORS } from "../../../constants/selectors.js";
+import { FORM_SELECTORS, SELECT_SELECTORS } from "../../../constants/selectors.js";
 import { setFormSectionVisibility } from "../../../ui/forms/formStateUI.js";
 
 let scoped = null;
 const selectors = {
-    material: FORM_SELECTORS.MATERIAL,
-    reason: FORM_SELECTORS.REASON,
-    wasteForm: FORM_SELECTORS.WASTE_FORM
+    material: SELECT_SELECTORS.MATERIAL,
+    reason: SELECT_SELECTORS.REASON,
+    wasteForm: FORM_SELECTORS.WASTE
 };
 
 export const initWasteSelect2 = ({ modalSelector }) => {

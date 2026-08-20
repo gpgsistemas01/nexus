@@ -2,14 +2,14 @@ import { initPresentationSelect, togglePresentationOption } from "../domains/pre
 import { initReasonSelect } from "../domains/reason.js";
 import { setupSupplierSelect, toggleSupplierOption } from "../domains/supplier.js";
 import { initUnitMeasureSelect, toggleUnitMeasureOption } from "../domains/unitMeasure.js";
-import { FORM_SELECTORS } from "../../../constants/selectors.js";
+import { FORM_SELECTORS, SELECT_SELECTORS } from "../../../constants/selectors.js";
 
 let scoped = null;
 const selectors = {
-    supplier: FORM_SELECTORS.SUPPLIER,
-    unitMeasure: FORM_SELECTORS.UNIT_MEASURE,
-    presentation: FORM_SELECTORS.PRESENTATION,
-    reason: FORM_SELECTORS.REASON
+    supplier: SELECT_SELECTORS.SUPPLIER,
+    unitMeasure: SELECT_SELECTORS.UNIT_MEASURE,
+    presentation: SELECT_SELECTORS.PRESENTATION,
+    reason: SELECT_SELECTORS.REASON
 };
 
 export const initMaterialFormSelect2 = ({

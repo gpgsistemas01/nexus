@@ -1,3 +1,4 @@
+import { DOM_EVENT_NAMES } from '../../../constants/events.js';
 import {
     editGoodsIssue,
     editGoodsIssueDetails,
@@ -14,7 +15,7 @@ import { on } from "../../../utils/domUtils.js";
 import { setDateTimePickerValue } from "../../../plugins/flatpickr/dateTimePicker.js";
 import { hasValidationErrors, validateDetailsFields, validateFields } from "../../../utils/formUtils.js";
 import { openModal } from "../../../ui/modalUI.js";
-import { DATATABLE_SELECTORS, FORM_SELECTORS, MODAL_SELECTORS } from "../../../constants/selectors.js";
+import { BUTTON_SELECTORS, DATATABLE_SELECTORS, FORM_SELECTORS, INPUT_SELECTORS, MODAL_SELECTORS, SELECT_SELECTORS } from "../../../constants/selectors.js";
 import { FORM_MODES } from "../../../constants/formModes.js";
 import { roundTo } from "../../../utils/formatUtils.js";
 import { applyIssueModalMode, bindIssueProjectQuantityControls, createIssueHeaderForm, createIssueTableActions, initializeIssueModal, useIssueForm } from "../../../ui/issues/issueFormUI.js";
@@ -101,14 +102,14 @@ export const openGoodsIssueModal = ({ mode, data = null }) => {
 
     if (mode === FORM_MODES.CREATE) {
 
-        form.querySelector('#presentationDisplayInput').value = '';
+        form.querySelector(INPUT_SELECTORS.PRESENTATION_DISPLAY).value = '';
     }
 
     if ([FORM_MODES.EDIT, FORM_MODES.EDIT_DETAIL, FORM_MODES.EDIT_HEADER, FORM_MODES.RETURN, FORM_MODES.VIEW].includes(mode)) {
 
-        form.querySelector('#observationsInput').value = data.observations || '';
+        form.querySelector(INPUT_SELECTORS.OBSERVATIONS).value = data.observations || '';
         setDateTimePickerValue(form.querySelector('#requestDateInput'), data.requestDate);
-        form.querySelector('#projectNumberInput').value = data.projectNumber;
+        form.querySelector(INPUT_SELECTORS.PROJECT_NUMBER).value = data.projectNumber;
         const modalDetails = data.details.map(mapIssueDetailToTable);
 
         details.push(...modalDetails);
@@ -141,12 +142,12 @@ createGoodsIssueDatatable({
 
 const addMaterial = () => {
 
-    const option = document.querySelector(`${ FORM_SELECTORS.MATERIAL } option:checked`);
+    const option = document.querySelector(`${ SELECT_SELECTORS.MATERIAL } option:checked`);
 
     let { text, material, supplier, maxUnitCost } = option.dataset || {};
     material = JSON.parse(material);
     supplier = JSON.parse(supplier);
-    const quantity = Number(document.querySelector(FORM_SELECTORS.QUANTITY_INPUT).value);
+    const quantity = Number(document.querySelector(INPUT_SELECTORS.QUANTITY).value);
 
     const errors = validateFields(addGoodsIssueMaterialValidation, {
         materialId: material.id,
@@ -201,8 +202,8 @@ const findDetailByElement = (element) => {
     return details.find(detail => detail.materialId === element.dataset.id);
 };
 
-on('click', '#addMaterialBtn', addMaterial);
-on('click', `${ detailTableSelector } .delete-btn`, (event, button) => {
+on(DOM_EVENT_NAMES.CLICK, BUTTON_SELECTORS.ADD_MATERIAL, addMaterial);
+on(DOM_EVENT_NAMES.CLICK, `${ detailTableSelector } .delete-btn`, (event, button) => {
     const removedDetail = removeDetail({
         details,
         matches: detail => detail.materialId === button.dataset.id
@@ -218,7 +219,7 @@ bindIssueProjectQuantityControls({
     findDetail: findDetailByElement
 });
 
-on('click', '#materialTable .return-issue-detail-btn', (event, button) => {
+on(DOM_EVENT_NAMES.CLICK, '#materialTable .return-issue-detail-btn', (event, button) => {
     const detail = details.find(item => item.id === button.dataset.id);
 
     if (!detail || !currentGoodsIssue) return;

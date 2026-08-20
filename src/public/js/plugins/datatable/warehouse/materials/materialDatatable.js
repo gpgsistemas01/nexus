@@ -1,3 +1,5 @@
+import { DOM_EVENT_NAMES } from '../../../../constants/events.js';
+import { FORM_MODES } from '../../../../constants/formModes.js';
 import { openMaterialModal } from "../../../../pages/warehouse/materials/materialModal.js";
 import { configureRealtimeReload, createDataTable, renderActionButtons } from "../../core/baseDatatable.js";
 import { setupTableFilters } from "../../core/filters/tableFilter.js";
@@ -102,7 +104,7 @@ export const createMaterialDatatable = async (context) => {
             buttons: [
                 ...(canManageMaterials ? [{
                     text: 'Nuevo material',
-                    action: () => openMaterialModal({ mode: 'create' })
+                    action: () => openMaterialModal({ mode: FORM_MODES.CREATE })
                 }] : []),
                 buildExcelButton({
                     filename: formatFileName('reporte_inventario_materiales'),
@@ -115,21 +117,21 @@ export const createMaterialDatatable = async (context) => {
 
     configureMaterialsRealtime(table);
 
-    $(`${ selectorTable } tbody`).on('click', '.btn-edit', function () {
+    $(`${ selectorTable } tbody`).on(DOM_EVENT_NAMES.CLICK, '.btn-edit', function () {
 
         const data = getResponsiveRowData(table, this);
 
-        openMaterialModal({ mode: 'edit', data });
+        openMaterialModal({ mode: FORM_MODES.EDIT, data });
     });
 
-    $(`${ selectorTable } tbody`).on('click', '.btn-adjust-stock', function() {
+    $(`${ selectorTable } tbody`).on(DOM_EVENT_NAMES.CLICK, '.btn-adjust-stock', function() {
 
         const data = getResponsiveRowData(table, this);
 
-        openMaterialModal({ mode: 'edit-stock', data });
+        openMaterialModal({ mode: FORM_MODES.EDIT_STOCK, data });
     });
 
-    $(`${ selectorTable } tbody`).on('click', '.btn-delete-material', async function() {
+    $(`${ selectorTable } tbody`).on(DOM_EVENT_NAMES.CLICK, '.btn-delete-material', async function() {
 
         const data = getResponsiveRowData(table, this);
 

@@ -1,3 +1,5 @@
+import { DOM_EVENT_NAMES } from '../../../../constants/events.js';
+import { FORM_SELECTORS, MODAL_SELECTORS } from '../../../../constants/selectors.js';
 import { initMdbModal } from "../../../../plugins/mdb/baseInstance.js";
 import { clearFormErrors } from "../../../../ui/forms/formErrorsUI.js";
 import { formatCurrency, formatDecimal, roundTo } from "../../../../utils/formatUtils.js";
@@ -7,8 +9,8 @@ import { calculateGoodsReceiptDetailAmounts } from '../goodsReceiptDetails.js';
 
 export { GOODS_RECEIPT_CORRECTION_APPLIED_EVENT };
 
-const CORRECTION_MODAL_SELECTOR = '#goodsReceiptCorrectionModal';
-const CORRECTION_FORM_SELECTOR = '#goodsReceiptCorrectionForm';
+const CORRECTION_MODAL_SELECTOR = MODAL_SELECTORS.GOODS_RECEIPT_CORRECTION;
+const CORRECTION_FORM_SELECTOR = FORM_SELECTORS.GOODS_RECEIPT_CORRECTION;
 const CORRECTION_TOTAL_SELECTORS = {
     totalQuantity: '#correctionTotalQuantity',
     totalNetPurchaseAmount: '#correctionTotalNetPurchaseAmount',
@@ -68,7 +70,7 @@ const setCorrectionFormValues = ({ form, receipt, detail }) => {
     form.dataset.submitting = 'false';
     form.correctionDetail = detail;
     form.correctionReceipt = receipt;
-    form.querySelector('button[type="submit"]').disabled = false;
+    form.querySelector('button[type=DOM_EVENT_NAMES.SUBMIT]').disabled = false;
     form.elements.quantity.value = detail.quantity;
     form.elements.costPerUnitType.value = detail.costPerUnitType;
 };
@@ -85,6 +87,6 @@ export const openGoodsReceiptCorrectionModal = ({ receipt, detail }) => {
 export const initGoodsReceiptCorrection = () => {
     initGoodsReceiptCorrectionForm();
 
-    on('input', CORRECTION_FORM_SELECTOR, updateCorrectionTotalsSummary);
-    on('change', CORRECTION_FORM_SELECTOR, updateCorrectionTotalsSummary);
+    on(DOM_EVENT_NAMES.INPUT, CORRECTION_FORM_SELECTOR, updateCorrectionTotalsSummary);
+    on(DOM_EVENT_NAMES.CHANGE, CORRECTION_FORM_SELECTOR, updateCorrectionTotalsSummary);
 };
