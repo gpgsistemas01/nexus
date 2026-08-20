@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 
-vi.mock('../../../../../../../../src/public/js/application/warehouse/fulfillmentStatuses/fulfillmentStatuses.js', () => ({
+vi.mock('../../../../../../../../src/public/js/application/warehouse/catalogs/fulfillmentStatuses.js', () => ({
   getFulfillmentStatusOptions: vi.fn()
 }));
 vi.mock('../../../../../../../../src/public/js/application/admin/persons/persons.js', () => ({

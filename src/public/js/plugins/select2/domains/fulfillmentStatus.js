@@ -1,4 +1,4 @@
-import { getFulfillmentStatusOptions } from "../../../application/warehouse/fulfillmentStatuses/fulfillmentStatuses.js";
+import { getFulfillmentStatusOptions } from "../../../application/warehouse/catalogs/fulfillmentStatuses.js";
 import { initFilterSelect2 } from "../baseSelect.js";
 import { FILTER_SELECTORS } from "../../../constants/selectors.js";
 

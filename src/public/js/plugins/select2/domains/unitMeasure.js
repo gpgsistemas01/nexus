@@ -1,4 +1,4 @@
-import { getAllUnitMeasures } from "../../../application/warehouse/unitMeasures/unitMeasures.js";
+import { getAllUnitMeasures } from "../../../application/warehouse/catalogs/unitMeasures.js";
 import { buildPaginatedSelectResults, initbaseSelect2, SELECT_RESULTS_LIMIT, toggleSelectOption } from "../baseSelect.js";
 
 export const initUnitMeasureSelect = ({ 

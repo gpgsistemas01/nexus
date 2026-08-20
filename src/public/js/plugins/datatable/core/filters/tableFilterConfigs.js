@@ -1,4 +1,4 @@
-import { getFulfillmentStatusOptions } from "../../../../application/warehouse/fulfillmentStatuses/fulfillmentStatuses.js";
+import { getFulfillmentStatusOptions } from "../../../../application/warehouse/catalogs/fulfillmentStatuses.js";
 import { getPersonOptions } from "../../../../application/admin/persons/persons.js";
 import { initMaterialFilterSelect } from "../../../select2/domains/material.js";
 import { initSupplierFilterSelect } from "../../../select2/domains/supplier.js";

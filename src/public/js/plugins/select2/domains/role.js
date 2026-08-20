@@ -1,4 +1,4 @@
-import { getAllRoles } from '../../../application/admin/roles/roles.js';
+import { getAllRoles } from '../../../application/admin/catalogs/roles.js';
 import { buildPaginatedSelectParams, buildPaginatedSelectResults, initbaseSelect2, initFilterSelect2, SELECT_RESULTS_LIMIT, toggleSelectOption } from '../baseSelect.js';
 import { FILTER_SELECTORS } from '../../../constants/selectors.js';
 
