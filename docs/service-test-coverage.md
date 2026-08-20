@@ -25,6 +25,16 @@ actualización del detalle. Material y merma reutilizan el mismo modal sin prefi
 cada página aloja una sola devolución; la persistencia y el movimiento permanecen en la
 integración CRUD del controller correspondiente.
 
+Las variantes de validación frontend del CRUD de materiales se componen en
+`utils/validations/validators.js`: edición reutiliza las reglas comunes del alta, el alta
+normal agrega los campos de inventario y el alta desde una entrada permite omitir el
+costo máximo. Sus pruebas de contrato viven en `tests/unit/public/js/utils/validations`
+y aplican una tabla de decisión por contexto sin repetir la integración CRUD.
+El mismo criterio se aplica a entradas de compra: alta y edición comparten las reglas
+del encabezado, mientras edición omite proveedor y permite no agregar detalles nuevos.
+La factura condicional forma parte del validador compartido en lugar de reconstruirse
+en la página.
+
 ## Pruebas de integración
 
 Las integraciones viven en `tests/integration/controllers`. Cada flujo debe:

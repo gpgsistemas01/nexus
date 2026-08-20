@@ -3,7 +3,7 @@ import { editMaterial, editMaterialStock, registerMaterial } from "../../../appl
 import { FORM_SELECTORS, MODAL_SELECTORS } from "../../../constants/selectors.js";
 
 import { handleSubmit, pickFormFields, validateFields } from "../../../utils/formUtils.js";
-import { materialStockValidation, materialValidation } from "../../../utils/validations/validators.js";
+import { goodsReceiptMaterialCreateValidation, materialCreateValidation, materialEditValidation, materialStockValidation } from "../../../utils/validations/validators.js";
 import { materialCreateFields, materialSecondaryDataFields, materialStockFields } from './materialFields.js';
 import { isEditMode, isStockMode } from '../../../constants/formModes.js';
 
@@ -14,30 +14,12 @@ const goodsReceiptCreationContext = 'goodsReceipt';
 const getCreationContext = (form) => form.dataset.creationContext || null;
 const isGoodsReceiptCreation = (form) => getCreationContext(form) === goodsReceiptCreationContext;
 
-const materialEditValidation = {
-    name: materialValidation.name,
-    supplierId: materialValidation.supplierId,
-    minStock: materialValidation.minStock,
-    maxUnitCost: materialValidation.maxUnitCost
-};
-
-const materialCreateValidation = {
-    ...materialValidation,
-    newStock: materialStockValidation.newStock,
-    observations: materialStockValidation.observations
-};
-
 const getMaterialValidation = (form) => {
 
     if (isEditMode(form.dataset.mode)) return materialEditValidation;
     if (!isGoodsReceiptCreation(form)) return materialCreateValidation;
 
-    return {
-        ...materialValidation,
-        maxUnitCost: (value) => value
-            ? materialValidation.maxUnitCost(value)
-            : null
-    };
+    return goodsReceiptMaterialCreateValidation;
 };
 
 useForm({

@@ -2,7 +2,7 @@ import { DOM_EVENT_NAMES } from '../../../constants/events.js';
 import { useForm } from "../../../application/form.js";
 import { editGoodsReceiptHeader, registerGoodsReceipt, cancelGoodsReceiptDetail } from "../../../application/warehouse/goodsReceipts/goodsReceipts.js";
 import { handleApiError } from "../../../api/errorHandler.js";
-import { addGoodsReceiptMaterialValidation, goodsReceiptValidation } from "../../../utils/validations/validators.js";
+import { addGoodsReceiptMaterialValidation, goodsReceiptEditValidation, goodsReceiptValidation } from "../../../utils/validations/validators.js";
 import { refreshMaterialTable } from "../../../plugins/datatable/shared/inventory/renderMaterialDatatable.js";
 import { createGoodsReceiptDatatable, details, initDetailsGoodsReceiptTable } from "../../../plugins/datatable/warehouse/goodsReceipts/goodsReceiptDatatable.js";
 import { GOODS_RECEIPT_SUPPLIER_CHANGED_EVENT, initGoodsReceiptFormSelect2, setGoodsReceiptFormSelectOptions } from "../../../plugins/select2/modules/goodsReceiptSelect.js";
@@ -91,34 +91,11 @@ useForm({
     normalizeData: normalizeGoodsReceiptData,
     getErrors: ({ form, formData }) => {
 
-        const allowedUsername = /^[a-zA-Z0-9\-]+$/;
-        let errors = {};
+        const validators = form.dataset.mode === FORM_MODES.EDIT
+            ? goodsReceiptEditValidation
+            : goodsReceiptValidation;
 
-        let validators = goodsReceiptValidation;
-
-        if (form.dataset.mode === FORM_MODES.EDIT) {
-            const { supplierId, details, ...editableValidation } = goodsReceiptValidation;
-            validators = {
-                ...editableValidation,
-                details: (value) => value.length === 0 ? null : details(value)
-            };
-        }
-
-        errors = validateFields(validators, formData);
-        if (formData.isInvoiced) {
-
-            if (!formData.invoice) errors.invoice = 'El número de factura es obligatorio';
-            else if (typeof formData.invoice !== 'string') errors.invoice = 'El número de factura no es una cadena de texto';
-            else if (!allowedUsername.test(formData.invoice)) errors.invoice = 'El número de factura debe tener solo letras, números y guiones.';
-            else if (formData.invoice.length > 50) errors.invoice = 'El número de factura no debe exceder los 50 caracteres';
-            else errors.invoice = null;
-
-        } else {
-
-            errors.invoice = null;
-        }
-
-        return errors;
+        return validateFields(validators, formData);
     },
     sendRequest: async ({ formData, form }) => {
 
