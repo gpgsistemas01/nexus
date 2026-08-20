@@ -16,14 +16,14 @@ export const initMaterialFormSelect2 = ({
     modalSelector
 }) => {
 
-    if (!scoped) scoped = Object.fromEntries(Object.entries(selectors).map(
+    scoped = Object.fromEntries(Object.entries(selectors).map(
         ([name, selector]) => [name, `${ modalSelector } ${ selector }`]
     ));
 
     [
         [setupSupplierSelect, {
             modalSelector,
-            supplierSelector: scoped.supplier,
+            supplierSelector: selectors.supplier,
         }],
         [initUnitMeasureSelect, {
             modalSelector,
@@ -36,6 +36,7 @@ export const initMaterialFormSelect2 = ({
             allowCreate: false
         }],
         [initReasonSelect, {
+            modalSelector,
             baseSelector: scoped.reason,
             allowCreate: false
         }]
