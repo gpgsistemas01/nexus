@@ -18,6 +18,13 @@ Las pruebas unitarias de controllers viven en `tests/unit/controllers`. Sólo se
 
 No se crean unitarias para repetir consultas felices ya cubiertas desde una integración. Los casos tabulados comparten preparación y aserciones, de modo que agregar datos específicos no implica duplicar pruebas completas.
 
+Los componentes frontend compartidos de salidas conservan sus pruebas en
+`tests/unit/public/js/ui/issues`. Para la devolución, los valores límite comprueban que
+la cantidad disponible se calcule con la precisión del inventario antes de validar la
+actualización del detalle. Material y merma reutilizan el mismo modal sin prefijos porque
+cada página aloja una sola devolución; la persistencia y el movimiento permanecen en la
+integración CRUD del controller correspondiente.
+
 ## Pruebas de integración
 
 Las integraciones viven en `tests/integration/controllers`. Cada flujo debe:

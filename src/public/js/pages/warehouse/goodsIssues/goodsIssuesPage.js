@@ -38,7 +38,6 @@ const issueHeaderForm = createIssueHeaderForm({
     selects: getGoodsIssueHeaderSelects()
 });
 const goodsIssueReturn = createIssueReturn({
-    prefix: 'goodsIssue',
     sendReturn: returnGoodsIssueDetail
 });
 

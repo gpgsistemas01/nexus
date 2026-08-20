@@ -3,12 +3,13 @@ import { initMdbModal, showModal, initMdbWrapperInput, updateMdbWrapperInput } f
 import { notifications } from '../../plugins/swal/swalComponent.js';
 import { clearFormErrors, resetFormSubmitState } from '../../ui/formUI.js';
 import { setSummaryValues } from '../../ui/totalsSummaryUI.js';
+import { roundTo } from '../../utils/formatUtils.js';
 import { validateFields } from '../../utils/formUtils.js';
 import { issueReturnValidation } from '../../utils/validations/validators.js';
 
-export const createIssueReturn = ({ prefix, sendReturn }) => {
-    const modalSelector = `#${ prefix }ReturnModal`;
-    const formSelector = `#${ prefix }ReturnForm`;
+export const createIssueReturn = ({ sendReturn }) => {
+    const modalSelector = '#issueReturnModal';
+    const formSelector = '#issueReturnForm';
     const getModal = () => document.querySelector(modalSelector);
 
     const initialize = () => useForm({
@@ -47,12 +48,14 @@ export const createIssueReturn = ({ prefix, sendReturn }) => {
         const form = document.querySelector(formSelector);
         const supplied = Number(detail.suppliedQuantity ?? 0);
         const returned = Number(detail.returnedQuantity ?? 0);
-        const available = supplied - returned;
+        // Inventory quantities use two decimal places. Keep the UI boundary aligned
+        // with the persisted value instead of exposing floating-point subtraction.
+        const available = roundTo(supplied - returned);
 
         setSummaryValues([
-            { selector: `#${ prefix }ReturnSuppliedQuantity`, value: supplied },
-            { selector: `#${ prefix }ReturnReturnedQuantity`, value: returned },
-            { selector: `#${ prefix }ReturnAvailableQuantity`, value: available }
+            { selector: '#issueReturnSuppliedQuantity', value: supplied },
+            { selector: '#issueReturnReturnedQuantity', value: returned },
+            { selector: '#issueReturnAvailableQuantity', value: available }
         ]);
         form.reset();
         clearFormErrors(form);
@@ -60,8 +63,8 @@ export const createIssueReturn = ({ prefix, sendReturn }) => {
         form.dataset.id = issue.id;
         form.dataset.detailId = detail.id;
         form.dataset.availableQuantity = String(available);
-        updateMdbWrapperInput(initMdbWrapperInput({ selector: `#${ prefix }ReturnQuantityInput`, value: '' }));
-        updateMdbWrapperInput(initMdbWrapperInput({ selector: `#${ prefix }ReturnObservationsInput`, value: '' }));
+        updateMdbWrapperInput(initMdbWrapperInput({ selector: '#issueReturnQuantityInput', value: '' }));
+        updateMdbWrapperInput(initMdbWrapperInput({ selector: '#issueReturnObservationsInput', value: '' }));
         showModal(initMdbModal(getModal()));
     };
 

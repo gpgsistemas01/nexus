@@ -41,7 +41,6 @@ const issueHeaderForm = createIssueHeaderForm({
     selects: getWasteIssueHeaderSelects()
 });
 const wasteIssueReturn = createIssueReturn({
-    prefix: 'wasteIssue',
     sendReturn: returnWasteIssueDetail
 });
 
