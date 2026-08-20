@@ -57,6 +57,29 @@ export const validateUsername = (username) => {
     return result;
 }
 
+export const validateInvoice = (invoice, { isInvoiced } = {}) => {
+
+    if (!isInvoiced) return null;
+
+    const allowedInvoice = /^[a-zA-Z0-9\-]+$/;
+    const fieldName = 'El número de factura';
+    let result = isEmptyOrNull(invoice, fieldName);
+
+    if (result) return result;
+
+    result = isString(invoice, fieldName);
+
+    if (result) return result;
+
+    result = isLengthInRangeMax(invoice, 50, fieldName);
+
+    if (result) return result;
+
+    if (!allowedInvoice.test(invoice)) return `${ fieldName } debe tener solo letras, números y guiones.`;
+
+    return null;
+}
+
 export const validateNonNegativeNumber = (number, fieldName) => validateNumber(number, fieldName);
 
 export const validatePositiveNumber = (number, fieldName) => {
