@@ -65,7 +65,7 @@ registerWebRoutes(app);
 app.get('/error/404', (req, res) => {
     const homeHref = getAuthTokenInfo(req, res) ? '/almacen/materiales' : '/inicio-sesion';
 
-    return res.status(404).render('pages/error/404', { homeHref });
+    return res.status(404).render('pages/error/notFound/notFoundPage', { homeHref });
 });
 
 registerApiRoutes(app, { apiPrefix: apiRoute });
@@ -77,7 +77,7 @@ app.use((req, res, next) => {
 
     const homeHref = getAuthTokenInfo(req, res) ? '/almacen/materiales' : '/inicio-sesion';
 
-    return res.status(404).render('pages/error/404', { homeHref });
+    return res.status(404).render('pages/error/notFound/notFoundPage', { homeHref });
 });
 
 app.use((err, req, res, next) => {

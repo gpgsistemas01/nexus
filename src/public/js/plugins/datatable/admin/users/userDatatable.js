@@ -1,7 +1,7 @@
 import { DOM_EVENT_NAMES } from '../../../../constants/events.js';
 import { FORM_MODES } from '../../../../constants/formModes.js';
 import { getAllUsers } from '../../../../application/admin/users/users.js';
-import { openUserModal } from '../../../../pages/admin/usersPage.js';
+import { openUserModal } from '../../../../pages/admin/users/userModal.js';
 import { createDataTable } from '../../core/baseDatatable.js';
 import { exportUserReport } from '../../../../application/admin/report.js';
 import { buildExcelButton, buildTableExportParams } from '../../../../ui/tableUI.js';

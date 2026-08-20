@@ -2,7 +2,7 @@ import { DOM_EVENT_NAMES } from '../../../../constants/events.js';
 import { FORM_MODES } from '../../../../constants/formModes.js';
 import { getAllPersons } from "../../../../application/admin/persons/persons.js";
 import { exportPersonReport } from "../../../../application/admin/report.js";
-import { openPersonModal } from "../../../../pages/admin/personsPage.js";
+import { openPersonModal } from "../../../../pages/admin/persons/personModal.js";
 import { createDataTable, refreshDataTable, renderActionButtons, resetDataTable } from "../../core/baseDatatable.js";
 import { buildExcelButton, buildTableExportParams } from "../../../../ui/tableUI.js";
 import { formatFileName } from "../../../../utils/formatters.js";
