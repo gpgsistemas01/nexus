@@ -41,7 +41,9 @@ Los nombres de eventos reutilizados siguen la misma separación por integración
 `MODAL_EVENT_NAMES` para los ciclos de vida de MDB o Bootstrap. Los listeners CRUD
 importan estos nombres en lugar de repetir literales como `click`, `change` o `submit`;
 un evento con namespace exclusivo de un módulo permanece local hasta que exista un
-segundo consumidor real.
+segundo consumidor real. Las utilidades compartidas que disparan eventos de plugins,
+como `toggleDisabledElement` al sincronizar Select2, también importan la constante del
+adaptador correspondiente para evitar dependencias implícitas del ámbito global.
 
 ## 1. Monolito modular por dominio y arquitectura por capas
 
