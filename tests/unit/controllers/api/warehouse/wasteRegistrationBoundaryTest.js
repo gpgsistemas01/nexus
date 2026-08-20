@@ -57,9 +57,9 @@ describe('wasteController registration boundaries', () => {
       .post('/wastes')
       .send({
         ...validBody,
-        base: '9999999.999',
-        height: '9999999.999',
-        newStock: '99999999.99',
+        base: '99999999.999999',
+        height: '99999999.999999',
+        newStock: '99999999.999999',
         observations
       })
       .expect('Content-Type', /json/)
@@ -71,9 +71,9 @@ describe('wasteController registration boundaries', () => {
     });
     expect(createWasteWithInitialStockAdjustment).toHaveBeenCalledWith({
       wasteDto: expect.objectContaining({
-        base: 9999999.999,
-        height: 9999999.999,
-        newStock: 99999999.99,
+        base: 99999999.999999,
+        height: 99999999.999999,
+        newStock: 99999999.999999,
         observations
       }),
       userId
@@ -86,7 +86,7 @@ describe('wasteController registration boundaries', () => {
     ['tabla de decisiones', 'dimensión incompleta', { height: undefined }, 'height'],
     ['partición de equivalencia', 'stock no numérico', { newStock: 'NaN' }, 'newStock'],
     ['valor límite', 'primer entero sobre el máximo', { newStock: '100000000' }, 'newStock'],
-    ['valor límite', 'primer decimal sobre el máximo', { newStock: '1.001' }, 'newStock'],
+    ['valor límite', 'primer decimal sobre el máximo', { newStock: '1.0000001' }, 'newStock'],
     ['valor límite', '501 caracteres de observaciones', { observations: 'a'.repeat(501) }, 'observations']
   ])('%s: rechaza %s antes de intentar registrar', async (_strategy, _case, overrides, errorField) => {
     const response = await request(app)

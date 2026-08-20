@@ -31,8 +31,8 @@ describe('formattersUtils', () => {
 
   it('redondea números y normaliza resultados cercanos a cero', () => {
     expect(roundTo(1.005, 2)).toBe(1.01);
-    expect(normalizeDecimal(0.004)).toBe(0);
-    expect(normalizeDecimal(2.345)).toBe(2.35);
+    expect(normalizeDecimal(0.0000004)).toBe(0);
+    expect(normalizeDecimal(2.3456784)).toBe(2.345678);
   });
 
   it('convierte valores numéricos opcionales y limpia dimensiones nulas', () => {

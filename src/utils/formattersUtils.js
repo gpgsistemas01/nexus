@@ -79,7 +79,7 @@ export const cleanSearchTerm = (search) => {
   return { codeSearch, nameSearch };
 };
 
-export const roundTo = (value, decimals = 2) => {
+export const roundTo = (value, decimals = 6) => {
 
     const factor = 10 ** decimals;
     return Math.round((Number(value) + Number.EPSILON) * factor) / factor;

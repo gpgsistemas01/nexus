@@ -20,7 +20,7 @@ describe('movementHelpers', () => {
       'material-2:supplier-1'
     ]);
     expect([...summary.grouped.entries()]).toEqual([
-      ['material-1:supplier-1', 3.51],
+      ['material-1:supplier-1', 3.505],
       ['material-2:supplier-1', 1]
     ]);
   });
