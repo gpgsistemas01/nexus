@@ -3,6 +3,7 @@ import { reloadMainTable } from "../plugins/datatable/core/baseDatatable.js";
 import { notifications } from "../plugins/swal/swalComponent.js";
 import { closeModal } from "../ui/modalUI.js";
 import { FORM_MODES } from "../constants/formModes.js";
+import { SELECT2_EVENT_NAMES } from "../constants/events.js";
 
 export const pickFormFields = (data, fields) => Object.fromEntries(
     fields
