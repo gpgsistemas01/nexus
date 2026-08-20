@@ -2,7 +2,7 @@ import { getPresentation, mapSelectMaterialData } from "../../../utils/warehouse
 import { initReasonSelect, toggleReasonOption } from "../domains/reason.js";
 import { initSupplierMaterialSelect, toggleSupplierMaterialOption } from "../domains/supplierMaterial.js";
 import { FORM_SELECTORS } from "../../../constants/selectors.js";
-import { setFormSectionVisibility } from "../../../ui/formUI.js";
+import { setFormSectionVisibility } from "../../../ui/forms/formStateUI.js";
 
 let scoped = null;
 const selectors = {

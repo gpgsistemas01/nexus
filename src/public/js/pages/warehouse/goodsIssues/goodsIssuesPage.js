@@ -8,7 +8,8 @@ import {
 import { addGoodsIssueMaterialValidation, issueProjectQuantityDetailsValidation, goodsIssueValidation } from "../../../utils/validations/validators.js";
 import { createGoodsIssueDatatable } from "../../../plugins/datatable/goodsIssueDatatable.js";
 import { getGoodsIssueHeaderSelects } from "../../../plugins/select2/modules/goodsIssueSelect.js";
-import { clearAddedMaterialInput, normalizeFormErrors } from "../../../ui/formUI.js";
+import { normalizeFormErrors } from "../../../ui/forms/formErrorsUI.js";
+import { clearAddedMaterialInput } from "../../../ui/forms/detailFormUI.js";
 import { on } from "../../../utils/domUtils.js";
 import { setDateTimePickerValue } from "../../../plugins/flatpickr/dateTimePicker.js";
 import { hasValidationErrors, validateDetailsFields, validateFields } from "../../../utils/formUtils.js";

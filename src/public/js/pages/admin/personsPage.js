@@ -2,7 +2,8 @@ import { registerPerson, updatePerson } from "../../application/admin/persons.js
 import { useForm } from "../../application/form.js";
 import { createPersonsDatatable, initPersonAccessTable, personAccesses, refreshPersonAccessTable } from "../../plugins/datatable/personDatatable.js";
 import { initPersonFormSelect2 } from "../../plugins/select2/modules/personSelect.js";
-import { clearFormErrors, initForm, normalizeFormErrors } from "../../ui/formUI.js";
+import { clearFormErrors, normalizeFormErrors } from "../../ui/forms/formErrorsUI.js";
+import { initForm } from "../../ui/forms/formStateUI.js";
 import { openModal } from "../../ui/modalUI.js";
 import { handleSubmit, hasValidationErrors, validateFields } from "../../utils/formUtils.js";
 import { personAccessValidation, personValidation } from "../../utils/validations/validators.js";

@@ -4,7 +4,9 @@ import { FULFILLMENT_STATUS_NAMES } from '../../constants/fulfillmentStatuses.js
 import { handleSubmit, syncCheckboxControlledInputs, toggleDisabledElement } from '../../utils/formUtils.js';
 import { on } from '../../utils/domUtils.js';
 import { formatDecimal, roundTo } from '../../utils/formatUtils.js';
-import { clearFormErrors, initForm, setFormDisabled, toggleButtons } from '../formUI.js';
+import { clearFormErrors } from '../forms/formErrorsUI.js';
+import { initForm, setFormDisabled } from '../forms/formStateUI.js';
+import { toggleDetailFormActions } from '../forms/detailFormUI.js';
 import { buildModalTitle } from '../modalUI.js';
 
 const ISSUE_HEADER_FIELD_NAMES = Object.freeze([
@@ -101,7 +103,7 @@ export const initializeIssueModal = ({ form, issueHeaderForm, mode, data = null 
     initForm({ form, mode, id: data?.id || '' });
     form.querySelector('#submitBtn')?.classList.remove('d-none');
     clearFormErrors(form);
-    toggleButtons({
+    toggleDetailFormActions({
         mode,
         status: data?.status?.name,
         showActions: false,

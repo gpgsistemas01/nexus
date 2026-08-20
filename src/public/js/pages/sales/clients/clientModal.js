@@ -1,4 +1,5 @@
-import { clearFormErrors, initForm } from "../../../ui/formUI.js";
+import { clearFormErrors } from "../../../ui/forms/formErrorsUI.js";
+import { initForm } from "../../../ui/forms/formStateUI.js";
 import { openModal } from "../../../ui/modalUI.js";
 import { FORM_SELECTORS, MODAL_SELECTORS } from "../../../constants/selectors.js";
 
