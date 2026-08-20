@@ -1,8 +1,7 @@
 import { getAllWastes } from "../../../application/warehouse/wastes.js";
 import { FILTER_SELECTORS, FORM_SELECTORS } from "../../../constants/selectors.js";
-import { updatePresentationDisplay } from "../../../ui/issues/issueFormUI.js";
 import { mapSelectWasteData } from "../../../utils/warehouseInventoryUtils.js";
-import { buildPaginatedSelectParams, buildPaginatedSelectResults, initDomainSelect2, toggleSelectOption } from "../baseSelect.js";
+import { buildPaginatedSelectParams, initDomainSelect2, toggleSelectOption, updatePresentationDisplay } from "../baseSelect.js";
 
 const initWasteSelect = ({
     modalSelector,

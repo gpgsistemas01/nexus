@@ -309,6 +309,19 @@ export const setMdbWrapperInputValue = ({
     updateMdbWrapperInput(instance);
 }
 
+export const updatePresentationDisplay = ({ modalSelector, data, presentation, option }) => {
+    if (!option) return;
+
+    Object.entries(data).forEach(([key, value]) => {
+        option.dataset[key] = value;
+    });
+
+    setMdbWrapperInputValue({
+        selector: `${ modalSelector } ${ wrapperSelector }`,
+        value: presentation.name || ''
+    });
+};
+
 export const bindDependency = ({
     sourceSelector,
     onChange
