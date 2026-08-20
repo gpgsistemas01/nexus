@@ -1,13 +1,13 @@
 <% const contextKey = movementContext === 'mermas' ? 'waste' : 'material'; %>
 <main id="movementPage" data-movement-context="<%= contextKey %>">
-    <%- include('../../../shared/tableFilters', {
+    <%- include('../../../shared/tables/tableFilters', {
         selectInputs: [
             { id: 'movementTypeFilter', label: 'Tipo de movimiento:', col: 'col-12 col-md-6' },
             { id: 'supplierFilter', label: 'Proveedor:', col: 'col-12 col-md-6' },
             { id: 'materialFilter', label: 'Material:', col: 'col-12 col-md-6' }
         ]
     }) %>
-    <%- include('../../../shared/dataTable', {
+    <%- include('../../../shared/tables/dataTable', {
         id: `${ contextKey }MovementTable`,
         title: movementTitle,
         prefix: 'Historial de'

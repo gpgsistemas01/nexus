@@ -89,7 +89,7 @@
     }
 } %>
 
-<%- include('../../../shared/tableFilters', {
+<%- include('../../../shared/tables/tableFilters', {
     selectInputs: [
         {
             id: 'supplierFilter',
@@ -104,9 +104,9 @@
     ]
 }) %>
 
-<%- include('../../../shared/mainTable', { title: 'Registro de Compras' }) %>
+<%- include('../../../shared/tables/mainTable', { title: 'Registro de Compras' }) %>
 
-<%- include('../../../shared/modal', { modalId: 'goodsReceiptModal', form }) %>
+<%- include('../../../shared/layout/modal', { modalId: 'goodsReceiptModal', form }) %>
 
 <%- include('../materials/materialModal') %>
 

@@ -125,7 +125,7 @@
     ]
 }; %>
 
-<%- include('../../../shared/tableFilters', {
+<%- include('../../../shared/tables/tableFilters', {
     selectInputs: [
         {
             id: 'supplierFilter',
@@ -136,9 +136,9 @@
     dateInputs: []
 }) %>
 
-<%- include('../../../shared/mainTable', { title: 'Mermas' }) %>
+<%- include('../../../shared/tables/mainTable', { title: 'Mermas' }) %>
 
-<%- include('../../../shared/modal', { modalId: 'wasteModal', form }) %>
+<%- include('../../../shared/layout/modal', { modalId: 'wasteModal', form }) %>
 
 <script type="module" src="/js/pages/warehouse/wastes/wastesPage.js"></script>
 

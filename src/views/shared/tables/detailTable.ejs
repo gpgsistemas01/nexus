@@ -3,7 +3,7 @@
     classes: table?.class || 'table table-hover align-middle mb-0 datatable-table modal-detail-table material-detail-table w-100'
 }) %>
 
-<%- include('./validationMessage', {
+<%- include('../forms/validationMessage', {
     name: table?.errorName || 'details',
     errorClass: 'table-validation-message alert alert-danger d-none mt-2'
 }) %>

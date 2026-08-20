@@ -6,6 +6,7 @@ const projectRoot = resolve(import.meta.dirname, '../../../../../');
 const publicPagesRoot = join(projectRoot, 'src/public/js/pages');
 const viewPagesRoot = join(projectRoot, 'src/views/pages');
 const viewsRoot = join(projectRoot, 'src/views');
+const sharedViewsRoot = join(viewsRoot, 'shared');
 
 const collectFiles = (directory, extension) => readdirSync(directory, { withFileTypes: true })
   .flatMap(entry => {
@@ -27,6 +28,14 @@ describe('page structure', () => {
 
   it('ubica cada vista o partial propietario dentro de dominio y recurso', () => {
     expect(findLooseFiles({ root: viewPagesRoot, extension: '.ejs' })).toEqual([]);
+  });
+
+  it('ubica cada partial compartido dentro de una categoría', () => {
+    const looseSharedPartials = readdirSync(sharedViewsRoot, { withFileTypes: true })
+      .filter(entry => entry.isFile() && entry.name.endsWith('.ejs'))
+      .map(entry => entry.name);
+
+    expect(looseSharedPartials).toEqual([]);
   });
 
   it('mantiene válidas las rutas de entry points declaradas por las vistas', () => {
