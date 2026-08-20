@@ -1,8 +1,8 @@
 import express from 'express';
 import {
     editWasteIssue,
-    editWasteIssueDetails,
     editWasteIssueHeader,
+    editWasteIssueDetails,
     getAllWasteIssues,
     registerWasteIssue,
     returnWasteIssueDetail

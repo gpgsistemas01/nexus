@@ -87,25 +87,6 @@ export const editGoodsIssue = async (req, res) => {
     });
 };
 
-export const editGoodsIssueDetails = async (req, res) => {
-
-    const goodsIssueDto = createGoodsIssueDetailsDtoForEdit(req.body);
-    const sanitizedGoodsIssueDto = sanitizeEmptyStrings(goodsIssueDto);
-
-    const goodsIssue = await updateGoodsIssueDetails({
-        goodsIssueDto: sanitizedGoodsIssueDto, 
-        id: req.params.id
-    });
-
-    emitInventoryUpdated({ context: 'material', source: 'goods-issue-supplied' });
-
-    return res.status(200).json({
-        goodsIssue,
-        code: successCodeMessages.UPDATED_GOODS_ISSUE
-    });
-};
-
-
 export const editGoodsIssueHeader = async (req, res) => {
 
     const goodsIssueDto = createGoodsIssueHeaderDtoForEdit(req.body);
@@ -121,6 +102,25 @@ export const editGoodsIssueHeader = async (req, res) => {
         code: successCodeMessages.UPDATED_GOODS_ISSUE
     });
 };
+
+export const editGoodsIssueDetails = async (req, res) => {
+
+    const goodsIssueDto = createGoodsIssueDetailsDtoForEdit(req.body);
+    const sanitizedGoodsIssueDto = sanitizeEmptyStrings(goodsIssueDto);
+
+    const goodsIssue = await updateGoodsIssueDetails({
+        goodsIssueDto: sanitizedGoodsIssueDto,
+        id: req.params.id
+    });
+
+    emitInventoryUpdated({ context: 'material', source: 'goods-issue-supplied' });
+
+    return res.status(200).json({
+        goodsIssue,
+        code: successCodeMessages.UPDATED_GOODS_ISSUE
+    });
+};
+
 export const returnGoodsIssueDetail = async (req, res) => {
 
     const returnDto = createGoodsIssueDtoForReturn(req.body);

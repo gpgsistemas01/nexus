@@ -1,29 +1,56 @@
 import { DOM_EVENT_NAMES } from '../../../constants/events.js';
 import {
     editGoodsIssue,
-    editGoodsIssueDetails,
     editGoodsIssueHeader,
+    editGoodsIssueDetails,
     registerGoodsIssue,
     returnGoodsIssueDetail
-} from "../../../application/warehouse/goodsIssues/goodsIssues.js";
-import { addGoodsIssueMaterialValidation, issueProjectQuantityDetailsValidation, goodsIssueValidation } from "../../../utils/validations/validators.js";
-import { createGoodsIssueDatatable } from "../../../plugins/datatable/warehouse/goodsIssues/goodsIssueDatatable.js";
-import { getGoodsIssueHeaderSelects } from "../../../plugins/select2/modules/goodsIssueSelect.js";
-import { normalizeFormErrors } from "../../../ui/forms/formErrorsUI.js";
-import { clearAddedMaterialInput } from "../../../ui/forms/detailFormUI.js";
-import { on } from "../../../utils/domUtils.js";
-import { setDateTimePickerValue } from "../../../plugins/flatpickr/dateTimePicker.js";
-import { hasValidationErrors, validateDetailsFields, validateFields } from "../../../utils/formUtils.js";
-import { openModal } from "../../../ui/modalUI.js";
-import { BUTTON_SELECTORS, DATATABLE_SELECTORS, FORM_SELECTORS, INPUT_SELECTORS, MODAL_SELECTORS, SELECT_SELECTORS } from "../../../constants/selectors.js";
-import { FORM_MODES } from "../../../constants/formModes.js";
-import { roundTo } from "../../../utils/formatUtils.js";
-import { applyIssueModalMode, bindIssueProjectQuantityControls, createIssueHeaderForm, createIssueTableActions, initializeIssueModal, useIssueForm } from "../../../ui/issues/issueFormUI.js";
-import { createIssueReturn } from "../../../ui/issues/issueReturnUI.js";
+} from '../../../application/warehouse/goodsIssues/goodsIssues.js';
+import { FORM_MODES } from '../../../constants/formModes.js';
+import {
+    BUTTON_SELECTORS,
+    DATATABLE_SELECTORS,
+    FORM_SELECTORS,
+    INPUT_SELECTORS,
+    MODAL_SELECTORS,
+    SELECT_SELECTORS
+} from '../../../constants/selectors.js';
+import { setDateTimePickerValue } from '../../../plugins/flatpickr/dateTimePicker.js';
 import { createWarehouseIssueDetailsTable } from '../../../plugins/datatable/shared/issues/warehouseIssueDetailDatatable.js';
 import { refreshMaterialTable } from '../../../plugins/datatable/shared/inventory/renderMaterialDatatable.js';
-import { buildInventorySelectText, getBase, getHeight, getMaxUnitCost, getPresentation, getUnitMeasure, mapGoodsIssueDetailsToRequest, mapIssueDetailsToSupplyRequest, mapIssueDetailToTable } from "../../../utils/warehouseInventoryUtils.js";
-import { removeDetail, upsertDetail } from "../../../utils/detailCollectionUtils.js";
+import { createGoodsIssueDatatable } from '../../../plugins/datatable/warehouse/goodsIssues/goodsIssueDatatable.js';
+import { getGoodsIssueHeaderSelects } from '../../../plugins/select2/modules/goodsIssueSelect.js';
+import { clearAddedMaterialInput } from '../../../ui/forms/detailFormUI.js';
+import { normalizeFormErrors } from '../../../ui/forms/formErrorsUI.js';
+import {
+    applyIssueModalMode,
+    bindIssueProjectQuantityControls,
+    createIssueHeaderForm,
+    createIssueTableActions,
+    initializeIssueModal,
+    useIssueForm
+} from '../../../ui/issues/issueFormUI.js';
+import { createIssueReturn } from '../../../ui/issues/issueReturnUI.js';
+import { openModal } from '../../../ui/modalUI.js';
+import { removeDetail, upsertDetail } from '../../../utils/detailCollectionUtils.js';
+import { on } from '../../../utils/domUtils.js';
+import { roundTo } from '../../../utils/formatUtils.js';
+import { hasValidationErrors, validateDetailsFields, validateFields } from '../../../utils/formUtils.js';
+import {
+    addGoodsIssueMaterialValidation,
+    goodsIssueValidation,
+    issueProjectQuantityDetailsValidation
+} from '../../../utils/validations/validators.js';
+import {
+    getBase,
+    getHeight,
+    getMaxUnitCost,
+    getPresentation,
+    getUnitMeasure,
+    mapGoodsIssueDetailsToRequest,
+    mapIssueDetailsToSupplyRequest,
+    mapIssueDetailToTable
+} from '../../../utils/warehouseInventoryUtils.js';
 
 const modalId = MODAL_SELECTORS.GOODS_ISSUE;
 const formId = FORM_SELECTORS.GOODS_ISSUE;
@@ -47,7 +74,6 @@ const goodsIssueReturn = createIssueReturn({
 goodsIssueReturn.initialize();
 
 const normalizeGoodsIssueData = ({ form, formData }) => {
-
     const { mode } = form.dataset;
 
     if (mode === FORM_MODES.EDIT_DETAIL) {
@@ -69,7 +95,6 @@ useIssueForm({
     selector: formId,
     normalizeData: normalizeGoodsIssueData,
     getErrors: ({ form, formData }) => {
-
         const { mode } = form.dataset;
 
         if (mode === FORM_MODES.EDIT_DETAIL) {
@@ -88,12 +113,11 @@ useIssueForm({
     },
     register: registerGoodsIssue,
     edit: editGoodsIssue,
-    editDetails: editGoodsIssueDetails,
-    editHeader: editGoodsIssueHeader
+    editHeader: editGoodsIssueHeader,
+    editDetails: editGoodsIssueDetails
 });
 
 export const openGoodsIssueModal = ({ mode, data = null }) => {
-
     currentGoodsIssue = data;
 
     initializeIssueModal({ form, issueHeaderForm, mode, data });
@@ -101,12 +125,10 @@ export const openGoodsIssueModal = ({ mode, data = null }) => {
     details.length = 0;
 
     if (mode === FORM_MODES.CREATE) {
-
         form.querySelector(INPUT_SELECTORS.PRESENTATION_DISPLAY).value = '';
     }
 
     if ([FORM_MODES.EDIT, FORM_MODES.EDIT_DETAIL, FORM_MODES.EDIT_HEADER, FORM_MODES.RETURN, FORM_MODES.VIEW].includes(mode)) {
-
         form.querySelector(INPUT_SELECTORS.OBSERVATIONS).value = data.observations || '';
         setDateTimePickerValue(form.querySelector('#requestDateInput'), data.requestDate);
         form.querySelector(INPUT_SELECTORS.PROJECT_NUMBER).value = data.projectNumber;
@@ -141,7 +163,6 @@ createGoodsIssueDatatable({
 });
 
 const addMaterial = () => {
-
     const option = document.querySelector(`${ SELECT_SELECTORS.MATERIAL } option:checked`);
 
     let { text, material, supplier, maxUnitCost } = option.dataset || {};
@@ -188,7 +209,6 @@ const addMaterial = () => {
 };
 
 const findDetailByElement = (element) => {
-
     const { detailId } = element.dataset;
 
     if (detailId) {

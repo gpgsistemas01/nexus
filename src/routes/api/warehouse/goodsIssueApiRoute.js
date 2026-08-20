@@ -3,8 +3,8 @@ import { authorizeUserApi, verifyApiTokenRequired } from '../../../middleware/au
 import { validate } from '../../../middleware/validatorMiddleware.js';
 import {
     editGoodsIssue,
-    editGoodsIssueDetails,
     editGoodsIssueHeader,
+    editGoodsIssueDetails,
     getAllGoodsIssues,
     registerGoodsIssue,
     returnGoodsIssueDetail
@@ -48,21 +48,21 @@ router.patch(
 );
 
 router.patch(
-    '/:id/details',
-    verifyApiTokenRequired,
-    goodsIssueDetailsValidation,
-    validate,
-    authorizeUserApi(PERMISSIONS.GOODS_ISSUE_DETAILS_MANAGE),
-    editGoodsIssueDetails
-);
-
-router.patch(
     '/:id/header',
     verifyApiTokenRequired,
     goodsIssueHeaderValidation,
     validate,
     authorizeUserApi(PERMISSIONS.GOODS_ISSUES_MANAGE),
     editGoodsIssueHeader
+);
+
+router.patch(
+    '/:id/details',
+    verifyApiTokenRequired,
+    goodsIssueDetailsValidation,
+    validate,
+    authorizeUserApi(PERMISSIONS.GOODS_ISSUE_DETAILS_MANAGE),
+    editGoodsIssueDetails
 );
 
 router.patch(
