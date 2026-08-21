@@ -4,8 +4,8 @@ import {
   assertSufficientStock,
   calculateConvertedQuantity,
   hasDimensions
-} from '../../src/services/inventory/stockHelpers.js';
-import { GoodsIssueInsufficientStock } from '../../src/errors/inventory/stockError.js';
+} from '../../../src/services/inventory/stockHelpers.js';
+import { GoodsIssueInsufficientStock } from '../../../src/errors/inventory/stockError.js';
 
 describe('stockHelpers', () => {
   it('detecta dimensiones válidas solo cuando base y altura son mayores a cero', () => {

@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import {
   createGoodsReceiptDtoForEdit,
   createGoodsReceiptDtoForRegister
-} from '../../src/dtos/goodsReceiptDTO.js';
+} from '../../../src/dtos/goodsReceiptDTO.js';
 
 describe('goodsReceiptDTO', () => {
   it('normaliza la factura al crear y editar para comparar duplicados', () => {

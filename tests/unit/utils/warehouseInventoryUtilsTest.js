@@ -13,7 +13,7 @@ import {
   mapIssueDetailsToSupplyRequest,
   mapIssueDetailToTable,
   mapSelectMaterialData
-} from '../../src/public/js/utils/warehouseInventoryUtils.js';
+} from '../../../src/public/js/utils/warehouseInventoryUtils.js';
 
 describe('select de material reutilizado por el CRUD de merma', () => {
   it('obtiene nombre de material y proveedor desde las formas del contrato', () => {

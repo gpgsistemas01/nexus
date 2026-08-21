@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 
-import { withRollbackTransaction } from './rollbackTransaction.js';
+import { withRollbackTransaction } from '../../helpers/rollbackTransaction.js';
 
 describe('rollbackTransaction', () => {
   it('ejecuta la prueba dentro de una transacción y revierte al finalizar', async () => {

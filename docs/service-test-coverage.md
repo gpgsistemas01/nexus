@@ -1,82 +1,69 @@
 # Estrategia de pruebas
 
-La suite evita repetir cada operación interna de cada servicio. La cobertura se divide por propósito y se concentra en casos capaces de revelar errores concretos.
+La suite automatizada se concentra en operaciones que **registran o consultan datos**.
+Su objetivo es detectar errores en un CRUD, sus reglas de negocio y sus efectos
+persistentes; no certificar detalles de presentación o de implementación.
 
-El [plan de pruebas](test-plan.md) complementa esta estrategia con alcance, matriz CRUD,
-criterios de entrada/salida, ejecución, responsabilidades y trazabilidad. La estrategia
-define **cómo y dónde** probar; el plan define **qué, cuándo y con qué evidencia**.
+## Qué se prueba
+
+- altas, modificaciones, cancelaciones o eliminaciones;
+- consultas, filtros, paginación y representaciones de datos;
+- validaciones y decisiones que permiten o impiden esas operaciones;
+- relaciones, inventario, movimientos y atomicidad derivados de una escritura;
+- serialización y transformación cuando alteran lo que se guarda o devuelve.
+
+No se mantienen pruebas unitarias de constantes, selectores, marcado EJS, estilos,
+apertura de modales, eventos de interfaz, wrappers HTTP ni organización de archivos.
+Esos detalles sólo justifican una prueba cuando cambian el resultado de un registro o
+una consulta y no quedan cubiertos en un nivel más representativo.
 
 ## Pruebas unitarias
 
-Las pruebas unitarias de controllers viven en `tests/unit/controllers`. Sólo se conserva una unitaria cuando aísla una regla que aporta valor diagnóstico y usa al menos una estrategia explícita:
+Las unitarias viven bajo `tests/unit` en una ruta paralela al módulo propietario. Por
+ejemplo, un controller de almacén se prueba en
+`tests/unit/controllers/api/warehouse`; no se crean raíces alternativas por tipo de
+técnica ni carpetas organizadas por servicio.
 
-- **valores límite:** el máximo aceptado y el primer valor rechazado;
-- **particiones de equivalencia:** un representante válido y uno inválido por formato;
-- **tabla de decisiones:** combinaciones de campos dependientes, por ejemplo base y altura;
-- **propagación de errores:** tipo, código y estado de un error operacional;
-- **efectos negativos:** confirmar que una entrada inválida no llama al servicio ni escribe datos.
+Una unitaria debe aislar una regla relevante para escritura o lectura y aplicar al
+menos una estrategia explícita:
 
-No se crean unitarias para repetir consultas felices ya cubiertas desde una integración. Los casos tabulados comparten preparación y aserciones, de modo que agregar datos específicos no implica duplicar pruebas completas.
+- **valores límite:** último valor admitido y primero rechazado;
+- **particiones de equivalencia:** representante válido e inválido;
+- **tabla de decisiones:** combinaciones de condiciones del negocio;
+- **propagación de errores:** error operacional que el CRUD debe comunicar;
+- **efecto negativo:** una entrada inválida no consulta ni escribe.
 
-Los componentes frontend compartidos de salidas conservan sus pruebas en
-`tests/unit/public/js/ui/issues`. Para la devolución, los valores límite comprueban que
-la cantidad disponible se calcule con la precisión del inventario antes de validar la
-actualización del detalle. Material y merma reutilizan el mismo modal sin prefijos porque
-cada página aloja una sola devolución; la persistencia y el movimiento permanecen en la
-integración CRUD del controller correspondiente.
-
-El envío y el restablecimiento de estado de los formularios CRUD se coordinan desde los
-componentes compartidos `ui/forms/formUI.js` y `ui/forms/formStateUI.js`, usando los
-selectores declarados en `constants/selectors.js` en
-lugar de reconstruir selectores CSS en cada flujo. Su contrato se prueba en la carpeta
-paralela `tests/unit/public/js/ui/forms`; los modales y el manejador de errores reutilizan
-esa función para conservar el mismo comportamiento en altas, ediciones y correcciones.
-
-Las variantes de validación frontend del CRUD de materiales se componen en
-`utils/validations/validators.js`: edición reutiliza las reglas comunes del alta, el alta
-normal agrega los campos de inventario y el alta desde una entrada permite omitir el
-costo máximo. Sus pruebas de contrato viven en `tests/unit/public/js/utils/validations`
-y aplican una tabla de decisión por contexto sin repetir la integración CRUD.
-El mismo criterio se aplica a entradas de compra: alta y edición comparten las reglas
-del encabezado, mientras edición omite proveedor y permite no agregar detalles nuevos.
-La factura condicional forma parte del validador compartido en lugar de reconstruirse
-en la página.
+No se repite con mocks el camino feliz que una integración ya demuestra. Las tablas de
+casos y helpers se reutilizan entre contextos cuando conservan la misma regla.
 
 ## Pruebas de integración
 
-Las integraciones viven en `tests/integration/controllers`. Cada flujo debe:
+Las integraciones viven exclusivamente en `tests/integration/controllers` y deben:
 
-1. enviar datos por HTTP al controller con Supertest;
-2. comprobar el código y el cuerpo de la respuesta;
-3. atravesar los servicios reales, sin mocks de repositorio;
-4. consultar con Prisma el registro creado o actualizado para demostrar el cambio en `DATABASE_TEST_URL`;
-5. limpiar exclusivamente sus datos de prueba.
+1. ejecutar la ruta HTTP con Supertest;
+2. comprobar estado y respuesta observables;
+3. usar controller, servicios y Prisma reales;
+4. consultar con Prisma el registro creado o actualizado;
+5. verificar relaciones o efectos derivados relevantes;
+6. limpiar sólo los datos creados por el caso.
 
-Una integración que sólo importe un servicio no debe ubicarse en esta carpeta. Los flujos que todavía no cumplen el contrato se retiraron hasta migrarlos correctamente desde su controller.
+Una prueba que importa directamente un servicio no es una integración de controller.
+Para escrituras compuestas se comprueba también que un error no deje datos parciales.
 
-## Ejecuciones separadas
+## Ejecución
 
-- `npm run test:unit` usa `vitestConfig.js`, excluye `tests/integration` y no necesita base de datos.
-- `npm run test:integration` exige una `DATABASE_TEST_URL` distinta de desarrollo, despliega migraciones, genera Prisma y ejecuta únicamente `vitestIntegrationConfig.js`.
-- `npm run test:db` es un alias de `test:integration`.
+- `npm run test:unit` ejecuta las reglas de registro y consulta sin base de datos.
+- `npm run test:integration` valida `DATABASE_TEST_URL`, aplica migraciones y ejecuta
+  las integraciones sin paralelismo.
+- `npm run test:db` es alias de la ejecución de integración.
 
-Las integraciones no usan `describe.skip`: si falta la URL o el cliente Prisma, la preparación falla antes de ejecutar Vitest. Además, los archivos se ejecutan sin paralelismo y `tests/teardownTestDatabase.js` limpia los datos al finalizar. Que los registros ya no existan después del teardown no significa que no se hayan escrito; la lectura con Prisma dentro de cada caso es la evidencia de persistencia.
+La base de pruebas debe ser distinta de desarrollo. La limpieza global es sólo una red
+de seguridad: la lectura con Prisma dentro del caso constituye la evidencia de
+persistencia.
 
-## Pendientes
+## Criterio para agregar una prueba
 
-Se deben incorporar como integraciones desde controller, no restaurar como pruebas directas de servicio:
-
-- personas y usuarios con sus relaciones;
-- salidas de material y afectación de stock (las salidas de merma ya cuentan con
-  integración HTTP, persistencia, movimiento y verificación de rollback);
-- entradas de compra: el contrato frontend del select compartido, incluida la selección
-  posterior a crear material, se normaliza a la misma fila de detalle usada por salidas;
-  la API entrega cada detalle con todos sus campos persistidos y relaciones, sin construir
-  una representación de tabla en el backend; el mapeo de alta/lectura —incluida la
-  conservación de campos crudos— y el cálculo reutilizado por correcciones tienen cobertura en
-  `tests/unit/public/js/pages/warehouse/goodsReceipts`. Los getters compartidos concentran
-  la fila canónica y las relaciones Prisma, sin alias planos de presentación o unidad, y
-  se cubren en la ubicación existente `tests/utils`; continúa pendiente la integración
-  HTTP de persistencia, movimientos y rollback;
-- ajustes de material y movimientos de inventario;
-- requisiciones de compra completas.
+Antes de crearla se responde afirmativamente: **¿qué fallo observable de registro o
+consulta detecta?** Después se reutiliza el harness, factory o flujo CRUD existente. Si
+la respuesta sólo describe estructura interna o comportamiento visual, no se agrega a
+la suite unitaria.

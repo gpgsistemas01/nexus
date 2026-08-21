@@ -5,7 +5,7 @@ import {
   getDataTableOrder,
   getDataTablePaging,
   getDataTableSearch
-} from '../../src/utils/requestQueryUtils.js';
+} from '../../../src/utils/requestQueryUtils.js';
 
 describe('requestQueryUtils', () => {
   it('obtiene paginación segura para DataTables con valores inválidos o negativos', () => {

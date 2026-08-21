@@ -7,16 +7,19 @@ const updateGoodsIssue = vi.fn();
 const updateGoodsIssueDetails = vi.fn();
 const updateGoodsIssueHeader = vi.fn();
 
-vi.mock('../../../../src/services/warehouse/goodsIssues/goodsIssueService.js', () => ({
+vi.mock('../../../../../src/services/warehouse/goodsIssues/goodsIssueService.js', () => ({
     createGoodsIssue,
     findAllGoodsIssues,
-    returnGoodsIssueDetail,
     updateGoodsIssue,
     updateGoodsIssueDetails,
     updateGoodsIssueHeader
 }));
 
-const { registerGoodsIssueDetailReturn } = await import('../../../../src/controllers/api/warehouse/goodsIssueController.js');
+vi.mock('../../../../../src/services/warehouse/goodsIssues/detailReturns/goodsIssueReturnService.js', () => ({
+    returnGoodsIssueDetail
+}));
+
+const { registerGoodsIssueDetailReturn } = await import('../../../../../src/controllers/api/warehouse/goodsIssueController.js');
 
 const createResponse = () => {
     const res = {
