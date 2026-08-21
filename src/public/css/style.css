@@ -1744,6 +1744,15 @@ textarea ~ div[data-error-for] {
     var(--mdb-light);
 }
 
+.modal-title {
+  color: var(--mdb-light);
+  font-size: clamp(1.35rem, 2vw, 1.75rem);
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  line-height: 1.2;
+  margin: 0;
+}
+
 .modal-body {
   padding: 1.5rem;
 }
