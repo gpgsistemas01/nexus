@@ -520,6 +520,17 @@ inicializa el formulario y controla el estado de sus campos, y `ui/forms/detailF
 coordina los controles repetidos de las tablas de detalle. Los consumidores importan
 directamente `ui/forms/totalsSummaryUI.js` para los acumulados.
 
+El registro transversal del envío vive en `ui/forms/formUI.js`: depende del DOM, muestra
+errores y controla el botón, por lo que es una responsabilidad de presentación y no un
+caso de uso de `application`. Recibe `sendRequest` como colaboración para que los
+formularios de cada recurso sigan delegando la operación de aplicación correspondiente.
+
+Los reportes sí representan casos de uso de aplicación. Como todos adaptan la respuesta
+del request al mismo contrato de archivo, `createReportApplication.js` concentra esa
+traducción y los módulos de reporte por dominio se limitan a configurarla con su servicio
+de transporte. Así se conservan las fronteras y rutas de cada dominio sin duplicar el
+flujo.
+
 Una operación específica de un solo CRUD permanece privada en su flujo. No se exportan
 wrappers de una sola llamada como API compartida, porque no aportan reutilización y
 ocultan el propietario real del comportamiento.

@@ -1,8 +1,4 @@
 import { exportClientReportRequest } from "../../services/sales/reportService.js";
+import { createReportApplication } from "../createReportApplication.js";
 
-export const exportClientReport = async (params = {}) => {
-
-    const response = await exportClientReportRequest(params);
-
-    return response.data;
-};
+export const exportClientReport = createReportApplication(exportClientReportRequest);

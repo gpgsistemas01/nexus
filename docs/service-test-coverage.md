@@ -25,8 +25,9 @@ actualización del detalle. Material y merma reutilizan el mismo modal sin prefi
 cada página aloja una sola devolución; la persistencia y el movimiento permanecen en la
 integración CRUD del controller correspondiente.
 
-El estado de envío de los formularios CRUD se restablece desde el componente compartido
-`ui/forms/formStateUI.js`, usando el selector declarado en `constants/selectors.js` en
+El envío y el restablecimiento de estado de los formularios CRUD se coordinan desde los
+componentes compartidos `ui/forms/formUI.js` y `ui/forms/formStateUI.js`, usando los
+selectores declarados en `constants/selectors.js` en
 lugar de reconstruir selectores CSS en cada flujo. Su contrato se prueba en la carpeta
 paralela `tests/unit/public/js/ui/forms`; los modales y el manejador de errores reutilizan
 esa función para conservar el mismo comportamiento en altas, ediciones y correcciones.

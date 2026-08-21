@@ -1,5 +1,5 @@
 import { editUser, editUserPassword, registerUser } from '../../../application/admin/users/users.js';
-import { useForm } from '../../../application/form.js';
+import { useForm } from '../../../ui/forms/formUI.js';
 import { FORM_MODES } from '../../../constants/formModes.js';
 import { FORM_SELECTORS } from '../../../constants/selectors.js';
 import { handleSubmit, validateFields } from '../../../utils/formUtils.js';

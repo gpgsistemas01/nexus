@@ -1,5 +1,5 @@
 import { FORM_SELECTORS, MODAL_SELECTORS } from '../../../../constants/selectors.js';
-import { useForm } from "../../../../application/form.js";
+import { useForm } from "../../../../ui/forms/formUI.js";
 import { correctGoodsReceiptDetail } from "../../../../application/warehouse/goodsReceipts/goodsReceipts.js";
 import { initMdbModal } from "../../../../plugins/mdb/baseInstance.js";
 import { reloadMainTable } from '../../../../plugins/datatable/core/base/tableOperations.js';

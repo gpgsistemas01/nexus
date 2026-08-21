@@ -1,4 +1,4 @@
-import { useForm } from '../../application/form.js';
+import { useForm } from '../forms/formUI.js';
 import { initMdbModal, showModal, initMdbWrapperInput, updateMdbWrapperInput } from '../../plugins/mdb/baseInstance.js';
 import { notifications } from '../../plugins/swal/swalComponent.js';
 import { clearFormErrors } from '../forms/formErrorsUI.js';
