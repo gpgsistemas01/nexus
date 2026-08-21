@@ -6,6 +6,7 @@ import { GOODS_RECEIPT_DETAIL_STATUSES, GOODS_RECEIPT_STATUS_LABELS } from "../.
 const DISABLED_PROJECT_QUANTITY_MESSAGE = 'Marque el detalle como surtido para capturar la cantidad de proyecto.';
 
 const DISABLED_TABLE_INPUT_SELECTOR = 'input[data-disabled-warning], textarea[data-disabled-warning]';
+const DETAIL_CONTROL_RESPONSIVE_PRIORITY = 1;
 
 const buildDetailTableInput = ({ name, value, className, detailId, disabled = false, disabledWarning, min, step }) => `
     <div class="table-input-outline">
@@ -178,7 +179,11 @@ export const buildDetailsColumns = ({ type, mode, render, isWarehouse, isCoordin
             { data: 'returnedQuantity', render: formatDecimal }
         ] : []),
         { data: 'presentationName' },
-        { data: 'convertedQuantity', render: formatDecimal },
+        {
+            data: 'convertedQuantity',
+            render: formatDecimal,
+            ...(type === 'issue' && { responsivePriority: DETAIL_CONTROL_RESPONSIVE_PRIORITY })
+        },
         { data: 'unitMeasureName' },
     ];
 
@@ -224,6 +229,7 @@ export const buildDetailsColumns = ({ type, mode, render, isWarehouse, isCoordin
     if (type === 'issue' && mode === 'edit-detail') {
         columns.push({
             data: null,
+            responsivePriority: DETAIL_CONTROL_RESPONSIVE_PRIORITY,
             render: (_, __, row) => {
 
                 const detailId = row.id || row.materialId;
@@ -248,6 +254,7 @@ export const buildDetailsColumns = ({ type, mode, render, isWarehouse, isCoordin
             data: null,
             orderable: false,
             searchable: false,
+            responsivePriority: DETAIL_CONTROL_RESPONSIVE_PRIORITY,
             render: (_, __, row) => {
                 const suppliedQuantity = Number(row.suppliedQuantity ?? 0);
                 const returnedQuantity = Number(row.returnedQuantity ?? 0);
@@ -276,6 +283,7 @@ export const buildDetailsColumns = ({ type, mode, render, isWarehouse, isCoordin
             title: 'Acciones',
             orderable: false,
             searchable: false,
+            responsivePriority: DETAIL_CONTROL_RESPONSIVE_PRIORITY,
             render: (_, __, row) => {
                 const detailId = row.id;
                 const isCanceledDetail = row.status === GOODS_RECEIPT_DETAIL_STATUSES.CANCELED;
@@ -313,6 +321,8 @@ export const buildDetailsColumns = ({ type, mode, render, isWarehouse, isCoordin
     if (shouldShowActionsColumn({ type, mode })) {
         columns.push({
             data: null,
+            title: 'Acciones',
+            responsivePriority: DETAIL_CONTROL_RESPONSIVE_PRIORITY,
             render: (_, __, row) => {
                 if (!shouldShowDetailActionButtons({ row, mode })) return '';
 
