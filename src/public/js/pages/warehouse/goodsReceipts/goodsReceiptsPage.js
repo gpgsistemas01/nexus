@@ -6,10 +6,11 @@ import { addGoodsReceiptMaterialValidation, goodsReceiptEditValidation, goodsRec
 import { refreshMaterialTable } from "../../../plugins/datatable/shared/inventory/renderMaterialDatatable.js";
 import { createGoodsReceiptDatatable, details, initDetailsGoodsReceiptTable } from "../../../plugins/datatable/warehouse/goodsReceipts/goodsReceiptDatatable.js";
 import { GOODS_RECEIPT_SUPPLIER_CHANGED_EVENT, initGoodsReceiptFormSelect2, setGoodsReceiptFormSelectOptions } from "../../../plugins/select2/modules/goodsReceiptSelect.js";
-import { clearFormErrors, normalizeFormErrors } from "../../../ui/forms/formErrorsUI.js";
-import { setFormDisabled, initForm } from "../../../ui/forms/formStateUI.js";
+import { normalizeFormErrors } from "../../../ui/forms/formErrorsUI.js";
+import { setFormDisabled } from "../../../ui/forms/formStateUI.js";
 import { toggleDetailFormActions, clearAddedMaterialInput } from "../../../ui/forms/detailFormUI.js";
 import { setTotals, updateTotals } from "../../../ui/forms/totalsSummaryUI.js";
+import { initializeInventoryCrudModal } from "../../../ui/inventory/inventoryCrudModalUI.js";
 import { on } from "../../../utils/domUtils.js";
 import { setDateTimePickerValue } from "../../../plugins/flatpickr/dateTimePicker.js";
 import { handleSubmit, hasValidationErrors, toggleContainerElements, toggleDisabledElement, validateFields } from "../../../utils/formUtils.js";
@@ -115,10 +116,8 @@ export const openGoodsReceiptModal = ({ mode, data = null }) => {
     const modalElement = document.querySelector(modalId);
     let value;
 
-    initForm({ form, mode, id: data?.id || '' });
+    initializeInventoryCrudModal({ form, mode, data });
     currentGoodsReceipt = data;
-    clearFormErrors(form);
-    setFormDisabled({ form, isDisabled: false });
     toggleDisabledElement({
         element: form.querySelector(SELECT_SELECTORS.SUPPLIER),
         isDisabled: false

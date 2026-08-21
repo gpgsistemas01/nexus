@@ -335,6 +335,12 @@ las necesita.
 
 En compras, las filas de detalle reutilizan la identidad visible de inventario
 (`material + medidas + proveedor`) que ya muestran salidas y almacén. Los modales
+principales de compras y salidas se componen mediante `views/shared/inventory/inventoryCrudModal.ejs`;
+cada CRUD declara sus campos y el componente transversal adapta ese contrato al layout
+común. El wrapper de salidas permanece en `shared/issues` porque agrega exclusivamente
+la configuración compartida por salidas de material y merma. En el cliente,
+`ui/inventory/inventoryCrudModalUI.js` prepara el estado CRUD común del formulario antes de
+que compras o salidas apliquen los datos y acciones propios de su contexto. Los modales
 secundarios de devolución de salida y corrección de compra reutilizan el diálogo
 desplazable compartido y el mismo helper de apertura MDB, sin reglas de altura propias
 que interfieran con el cálculo responsivo del componente. La coordinación propietaria

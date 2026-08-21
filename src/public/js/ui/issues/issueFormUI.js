@@ -6,9 +6,9 @@ import { FULFILLMENT_STATUS_NAMES, GOODS_ISSUE_STATUS_NAMES } from '../../consta
 import { handleSubmit, syncCheckboxControlledInputs, toggleDisabledElement } from '../../utils/formUtils.js';
 import { on } from '../../utils/domUtils.js';
 import { formatDecimal, roundTo } from '../../utils/formatUtils.js';
-import { clearFormErrors } from '../forms/formErrorsUI.js';
-import { initForm, setFormDisabled } from '../forms/formStateUI.js';
+import { setFormDisabled } from '../forms/formStateUI.js';
 import { toggleDetailFormActions } from '../forms/detailFormUI.js';
+import { initializeInventoryCrudModal } from '../inventory/inventoryCrudModalUI.js';
 import { buildModalTitle } from '../modalUI.js';
 
 const ISSUE_HEADER_FIELD_NAMES = Object.freeze([
@@ -102,9 +102,12 @@ export const bindIssueProjectQuantityControls = ({
 };
 
 export const initializeIssueModal = ({ form, issueHeaderForm, mode, data = null }) => {
-    initForm({ form, mode, id: data?.id || '' });
+    const isFormDisabled = Boolean(data)
+        && mode !== FORM_MODES.EDIT
+        && mode !== FORM_MODES.EDIT_HEADER;
+
+    initializeInventoryCrudModal({ form, mode, data, isDisabled: isFormDisabled });
     form.querySelector(BUTTON_SELECTORS.SUBMIT)?.classList.remove('d-none');
-    clearFormErrors(form);
     toggleDetailFormActions({
         mode,
         status: data?.status?.name,
@@ -113,11 +116,6 @@ export const initializeIssueModal = ({ form, issueHeaderForm, mode, data = null 
         showAddMaterial: mode === FORM_MODES.CREATE
             || (mode === FORM_MODES.EDIT && data?.fulfillmentStatus?.name === FULFILLMENT_STATUS_NAMES.PENDING)
     });
-    const isFormDisabled = Boolean(data)
-        && mode !== FORM_MODES.EDIT
-        && mode !== FORM_MODES.EDIT_HEADER;
-
-    setFormDisabled({ form, isDisabled: isFormDisabled });
     issueHeaderForm.initialize({
         data,
         isDisabled: !ISSUE_HEADER_ENABLED_MODES.includes(mode)

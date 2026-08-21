@@ -1,5 +1,7 @@
-<% const form = {
-    id: 'goodsReceiptForm',
+<% const modalConfig = {
+    formId: 'goodsReceiptForm',
+    modalId: 'goodsReceiptModal',
+    modalTitle: '',
     canApprove: false,
     invoice: {
         radios: [
@@ -101,7 +103,7 @@
 
 <%- include('../../../shared/tables/mainTable', { title: 'Registro de Compras' }) %>
 
-<%- include('../../../shared/layout/modal', { modalId: 'goodsReceiptModal', form }) %>
+<%- include('../../../shared/inventory/inventoryCrudModal', { modalConfig }) %>
 
 <%- include('../materials/materialModal') %>
 

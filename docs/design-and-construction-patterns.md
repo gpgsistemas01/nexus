@@ -213,7 +213,12 @@ Los partials transversales se agrupan por responsabilidad dentro de `shared`: `c
 contiene controles de interacción independientes, `forms` reúne campos y composición de
 formularios, `layout` contiene estructuras contenedoras y `tables` reúne tablas, filtros
 y resúmenes. `issues` se conserva separado porque compone esas primitivas para el contexto
-compartido de salidas. Las vistas consumidoras referencian siempre la categoría explícita,
+compartido de salidas. `inventory/inventoryCrudModal.ejs` normaliza el contrato del formulario
+y delega el marcado al modal de layout para que compras y salidas reutilicen la misma
+composición sin trasladar reglas particulares de cada CRUD. En JavaScript,
+`ui/inventory/inventoryCrudModalUI.js` comparte la inicialización de modo, identidad, errores
+y estado habilitado; cada CRUD conserva la carga de encabezados, detalles y selects que
+sí depende de su contexto. Las vistas consumidoras referencian siempre la categoría explícita,
 y la prueba de estructura impide volver a dejar archivos EJS sueltos en la raíz.
 
 Compras y salidas de material reutilizan `shared/forms/materialSelect.ejs`. Este partial
