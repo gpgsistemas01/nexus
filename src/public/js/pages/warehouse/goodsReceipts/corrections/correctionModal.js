@@ -1,6 +1,6 @@
 import { DOM_EVENT_NAMES } from '../../../../constants/events.js';
 import { FORM_SELECTORS, MODAL_SELECTORS } from '../../../../constants/selectors.js';
-import { initMdbModal } from "../../../../plugins/mdb/baseInstance.js";
+import { initMdbModal, showModal } from "../../../../plugins/mdb/baseInstance.js";
 import { clearFormErrors } from "../../../../ui/forms/formErrorsUI.js";
 import { resetFormSubmitState } from "../../../../ui/forms/formStateUI.js";
 import { formatCurrency, formatDecimal, roundTo } from "../../../../utils/formatUtils.js";
@@ -12,13 +12,12 @@ export { GOODS_RECEIPT_CORRECTION_APPLIED_EVENT };
 
 const CORRECTION_MODAL_SELECTOR = MODAL_SELECTORS.GOODS_RECEIPT_CORRECTION;
 const CORRECTION_FORM_SELECTOR = FORM_SELECTORS.GOODS_RECEIPT_CORRECTION;
-const CORRECTION_TOTAL_SELECTORS = {
-    totalQuantity: '#correctionTotalQuantity',
-    totalNetPurchaseAmount: '#correctionTotalNetPurchaseAmount',
-    totalGrossPurchaseAmount: '#correctionTotalGrossPurchaseAmount'
+const CORRECTION_TOTAL_FIELDS = {
+    totalQuantity: { selector: '#correctionTotalQuantity', formatter: formatDecimal },
+    totalNetPurchaseAmount: { selector: '#correctionTotalNetPurchaseAmount', formatter: formatCurrency },
+    totalGrossPurchaseAmount: { selector: '#correctionTotalGrossPurchaseAmount', formatter: formatCurrency }
 };
 
-const getModal = () => document.querySelector(CORRECTION_MODAL_SELECTOR);
 const getForm = () => document.querySelector(CORRECTION_FORM_SELECTOR);
 
 const calculateCorrectionTotals = ({ receipt, currentDetail, formData }) => {
@@ -36,34 +35,30 @@ const calculateCorrectionTotals = ({ receipt, currentDetail, formData }) => {
     };
 };
 
-const formatCorrectionTotals = (totals) => ({
-    totalQuantity: formatDecimal(totals.totalQuantity),
-    totalNetPurchaseAmount: formatCurrency(totals.totalNetPurchaseAmount),
-    totalGrossPurchaseAmount: formatCurrency(totals.totalGrossPurchaseAmount)
-});
-
 const updateCorrectionTotalsSummary = () => {
     const form = getForm();
 
     if (!form?.correctionReceipt || !form?.correctionDetail) return;
 
-    const totals = formatCorrectionTotals(calculateCorrectionTotals({
+    const totals = calculateCorrectionTotals({
         receipt: form.correctionReceipt,
         currentDetail: form.correctionDetail,
         formData: {
             quantity: form.elements.quantity.value,
             costPerUnitType: form.elements.costPerUnitType.value
         }
-    }));
+    });
 
-    Object.entries(CORRECTION_TOTAL_SELECTORS).forEach(([key, selector]) => {
+    Object.entries(CORRECTION_TOTAL_FIELDS).forEach(([key, { selector, formatter }]) => {
         const element = document.querySelector(selector);
 
-        if (element) element.textContent = totals[key];
+        if (element) element.textContent = formatter(totals[key]);
     });
 };
 
-const setCorrectionFormValues = ({ form, receipt, detail }) => {
+export const openGoodsReceiptCorrectionModal = ({ receipt, detail }) => {
+    const form = getForm();
+
     form.reset();
     clearFormErrors(form);
     form.dataset.id = receipt.id;
@@ -73,15 +68,8 @@ const setCorrectionFormValues = ({ form, receipt, detail }) => {
     resetFormSubmitState(form);
     form.elements.quantity.value = detail.quantity;
     form.elements.costPerUnitType.value = detail.costPerUnitType;
-};
-
-export const openGoodsReceiptCorrectionModal = ({ receipt, detail }) => {
-    const modal = getModal();
-    const form = getForm();
-
-    setCorrectionFormValues({ form, receipt, detail });
     updateCorrectionTotalsSummary();
-    initMdbModal(modal).show();
+    showModal(initMdbModal(document.querySelector(CORRECTION_MODAL_SELECTOR)));
 };
 
 export const initGoodsReceiptCorrection = () => {

@@ -328,6 +328,14 @@ errores (`ui/forms/formErrorsUI.js`), estado y campos (`ui/forms/formStateUI.js`
 un consumidor no forman parte de esa API: se mantienen privadas dentro del CRUD que
 las necesita.
 
+En compras, las filas de detalle reutilizan la identidad visible de inventario
+(`material + medidas + proveedor`) que ya muestran salidas y almacén. Los modales
+secundarios de devolución de salida y corrección de compra reutilizan el diálogo
+desplazable compartido y el mismo helper de apertura MDB, sin reglas de altura propias
+que interfieran con el cálculo responsivo del componente. La coordinación propietaria
+de corrección mantiene sólo el cálculo de totales que comparte entre la apertura y los
+eventos del formulario; la preparación usada una sola vez permanece en la apertura.
+
 Los filtros compartidos de DataTables separan los valores visibles en el formulario de
 los valores que ya fueron aplicados. `tableFilterState` toma una instantánea al enviar
 el formulario o limpiarlo; paginación, búsqueda, actualizaciones en tiempo real y

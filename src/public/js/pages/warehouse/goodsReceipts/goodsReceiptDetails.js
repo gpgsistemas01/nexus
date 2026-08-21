@@ -1,6 +1,6 @@
 import { GOODS_RECEIPT_DETAIL_STATUSES, GOODS_RECEIPT_STATUS_LABELS } from "../../../constants/goodsReceiptStatuses.js";
 import { roundTo } from '../../../utils/formatUtils.js';
-import { getBase, getHeight, getMaterialName, getPresentation, getPresentationId, getUnitMeasure, getUnitMeasureId } from '../../../utils/warehouseInventoryUtils.js';
+import { buildInventorySelectText, getBase, getHeight, getPresentation, getPresentationId, getUnitMeasure, getUnitMeasureId } from '../../../utils/warehouseInventoryUtils.js';
 
 const IVA_RATE = 1.16;
 
@@ -32,7 +32,7 @@ export const mapGoodsReceiptSelectionToDetail = ({ optionData, quantity, costPer
 
     return {
         materialId: material.id,
-        name: getMaterialName(material),
+        name: buildInventorySelectText({ material, supplier }),
         base,
         height,
         presentation: getPresentation(material),
@@ -51,7 +51,7 @@ export const buildGoodsReceiptModalDetails = (receipt) => {
             : detail.status !== GOODS_RECEIPT_DETAIL_STATUSES.CANCELED)
         .map(detail => ({
             ...detail,
-            name: getMaterialName(detail),
+            name: buildInventorySelectText({ ...detail, supplier: receipt.supplier }),
             base: getBase(detail),
             height: getHeight(detail),
             presentation: getPresentation(detail),

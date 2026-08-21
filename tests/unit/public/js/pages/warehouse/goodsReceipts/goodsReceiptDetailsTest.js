@@ -26,7 +26,7 @@ describe('detalles del CRUD de entradas de compra', () => {
 
     expect(detail).toEqual({
       materialId: 'material-1',
-      name: 'Lámina',
+      name: 'Lámina (2 × 3) · Proveedor Norte',
       base: '2',
       height: '3',
       presentation: 'ROLLO',
@@ -85,7 +85,7 @@ describe('detalles del CRUD de entradas de compra', () => {
       id: 'detail-1',
       goodsReceiptId: 'receipt-1',
       materialId: 'material-1',
-      name: 'Lámina',
+      name: 'Lámina (2 × 3) · Proveedor Norte',
       base: 2,
       height: 3,
       presentation: 'ROLLO',
