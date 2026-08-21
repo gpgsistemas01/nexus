@@ -362,7 +362,10 @@ paralelo con `corrections` de compras; sus servicios de dominio se agrupan en
 que compras o salidas apliquen los datos y acciones propios de su contexto. Los modales
 secundarios de devolución de salida y corrección de compra reutilizan el diálogo
 desplazable compartido y el mismo helper de apertura MDB, sin reglas de altura propias
-que interfieran con el cálculo responsivo del componente. La coordinación propietaria
+que interfieran con el cálculo responsivo del componente. El layout declara
+`data-mdb-backdrop="true"` para que MDB genere consistentemente el fondo oscuro en todos
+los modales que lo reutilizan, sin repetir esa configuración en cada contexto CRUD. La
+coordinación propietaria
 de corrección mantiene sólo el cálculo de totales que comparte entre la apertura y los
 eventos del formulario; la preparación usada una sola vez permanece en la apertura. La
 identidad visible del material seleccionado se presenta mediante el valor informativo

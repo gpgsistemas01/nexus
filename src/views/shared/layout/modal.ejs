@@ -67,7 +67,7 @@ const buttons = {
 const modalDialogClass = typeof dialogClass !== 'undefined' ? dialogClass : 'modal-fullscreen modal-dialog-scrollable';
 %>
 
-<div class="modal fade" id="<%= modalId %>" tabindex="-1" aria-labelledby="<%= header.title.id %>" aria-hidden="true">
+<div class="modal fade" id="<%= modalId %>" tabindex="-1" aria-labelledby="<%= header.title.id %>" aria-hidden="true" data-mdb-backdrop="true">
     <div class="modal-dialog <%= modalDialogClass %>">
         <div class="modal-content">
 

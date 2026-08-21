@@ -31,4 +31,11 @@ describe('corrección de detalles del CRUD de entradas de compra', () => {
       "document.querySelector('#correctionMaterialValue').textContent = detail.name;"
     );
   });
+
+  it('solicita a MDB el fondo oscuro al abrir la corrección', async () => {
+    const html = await ejs.renderFile(viewPath);
+
+    expect(html).toContain('id="goodsReceiptCorrectionModal"');
+    expect(html).toContain('data-mdb-backdrop="true"');
+  });
 });
