@@ -3,18 +3,18 @@ import {
     GoodsIssueReturnDatabaseError,
     GoodsIssueReturnQuantityConflict,
     GoodsIssueReturnStatusConflict
-} from '../../../errors/warehouse/goodsIssueError.js';
-import { FULFILLMENT_STATUS_NAMES, GOODS_ISSUE_STATUS_NAMES } from '../../../constants/warehouseStatuses.js';
-import { INVENTORY_MOVEMENT_TYPES } from '../../../constants/inventory.js';
-import { getDb } from '../../../repository/baseRepository.js';
-import { normalizeDecimal } from '../../../utils/formattersUtils.js';
-import { createServiceLogger } from '../../../utils/logger.js';
-import { handleServiceError } from '../../serviceErrorHandler.js';
-import { applyInventoryMovement } from '../../inventory/movementService.js';
-import { findFulfillmentStatusIdsByName } from '../fulfillmentStatusService.js';
-import { resolveIssueFulfillmentStatus } from '../issues/issueFulfillmentRules.js';
-import { GOODS_ISSUE_DETAIL_SELECT } from './goodsIssueDetailSelect.js';
-import { resolveGoodsIssueDetailFulfillmentStatusName } from './goodsIssueFulfillmentRules.js';
+} from '../../../../errors/warehouse/goodsIssueError.js';
+import { FULFILLMENT_STATUS_NAMES, GOODS_ISSUE_STATUS_NAMES } from '../../../../constants/warehouseStatuses.js';
+import { INVENTORY_MOVEMENT_TYPES } from '../../../../constants/inventory.js';
+import { getDb } from '../../../../repository/baseRepository.js';
+import { normalizeDecimal } from '../../../../utils/formattersUtils.js';
+import { createServiceLogger } from '../../../../utils/logger.js';
+import { handleServiceError } from '../../../serviceErrorHandler.js';
+import { applyInventoryMovement } from '../../../inventory/movementService.js';
+import { findFulfillmentStatusIdsByName } from '../../fulfillmentStatusService.js';
+import { resolveIssueFulfillmentStatus } from '../../issues/issueFulfillmentRules.js';
+import { GOODS_ISSUE_DETAIL_SELECT } from '../goodsIssueDetailSelect.js';
+import { resolveGoodsIssueDetailFulfillmentStatusName } from '../goodsIssueFulfillmentRules.js';
 
 const FLOAT_EPSILON = 0.000001;
 const serviceLogger = createServiceLogger('warehouse.goodsIssues.goodsIssueReturnService');

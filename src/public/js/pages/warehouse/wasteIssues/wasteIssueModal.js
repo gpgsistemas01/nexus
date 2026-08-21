@@ -1,9 +1,6 @@
-import { returnWasteIssueDetail } from '../../../application/warehouse/wasteIssues/wasteIssues.js';
-import { DOM_EVENT_NAMES } from '../../../constants/events.js';
 import { FORM_MODES } from '../../../constants/formModes.js';
 import { UI_PERMISSIONS } from '../../../constants/permissions.js';
 import {
-    DATATABLE_SELECTORS,
     FORM_SELECTORS,
     INPUT_SELECTORS,
     MODAL_SELECTORS
@@ -16,10 +13,9 @@ import {
     createIssueHeaderForm,
     initializeIssueModal
 } from '../../../ui/issues/issueFormUI.js';
-import { createIssueReturn } from '../../../ui/issues/issueReturnUI.js';
 import { openModal } from '../../../ui/modalUI.js';
-import { on } from '../../../utils/domUtils.js';
 import { mapIssueDetailToTable } from '../../../utils/warehouseInventoryUtils.js';
+import { initializeWasteIssueReturns } from './returns/wasteIssueReturn.js';
 
 const modalId = MODAL_SELECTORS.WASTE_ISSUE;
 const formId = FORM_SELECTORS.WASTE_ISSUE;
@@ -28,17 +24,15 @@ const WASTE_ISSUE_ENTITY_NAME = 'salida de merma';
 const context = window.meta || {};
 const form = document.querySelector(formId);
 const modalElement = document.querySelector(modalId);
-const detailTableSelector = DATATABLE_SELECTORS.MATERIAL;
 export const wasteIssueDetails = [];
 export const wasteIssueHeaderForm = createIssueHeaderForm({
     formSelector: formId,
     selects: getWasteIssueHeaderSelects()
 });
-const wasteIssueReturn = createIssueReturn({
-    sendReturn: returnWasteIssueDetail
+initializeWasteIssueReturns({
+    details: wasteIssueDetails,
+    getIssueId: () => form.dataset.id
 });
-
-wasteIssueReturn.initialize();
 
 const setCurrentRequestDate = () => setDateTimePickerValue(
     document.querySelector(INPUT_SELECTORS.WASTE_ISSUE_DATE),
@@ -76,17 +70,5 @@ export const openWasteIssueModal = ({ mode, data = null }) => {
     });
     openModal(modalElement);
 };
-
-const findDetailByElement = element => wasteIssueDetails.find(detail => (
-    detail.id === element.dataset.detailId
-    || detail.id === element.dataset.id
-    || detail.wasteId === element.dataset.id
-));
-
-on(DOM_EVENT_NAMES.CLICK, `${ detailTableSelector } .return-issue-detail-btn`, (event, button) => {
-    const detail = findDetailByElement(button);
-
-    if (detail) wasteIssueReturn.open({ issue: { id: form.dataset.id }, detail });
-});
 
 setCurrentRequestDate();

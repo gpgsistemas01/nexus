@@ -138,6 +138,15 @@ merma inyectan sus requests y claves; no duplican la coordinación. Entradas de 
 replican el mismo criterio directamente con corrección y cancelación de detalle,
 porque sus nombres y reglas de documento son distintos aunque el transporte coincida.
 
+Las mutaciones de detalle especializadas conservan una carpeta explícita dentro de su
+recurso. Compras agrupa sus cambios en `goodsReceipts/detailChanges`; las devoluciones
+de material y merma se ubican en `goodsIssues/detailReturns` y
+`wasteIssues/detailReturns`. En el navegador, cada salida mantiene la coordinación de
+su devolución en `pages/warehouse/<recurso>/returns`, mientras el formulario y el modal
+permanecen en `ui/issues` y `views/shared/issues` porque ambos contextos reutilizan el
+mismo componente. Así la organización no duplica el flujo compartido ni mezcla la
+mutación especializada con el modal principal del CRUD.
+
 Se exporta **la función constructora** `createIssueApplication`, no una aplicación de
 salida ya creada. Es un punto de composición compartido: cada módulo de salida la llama
 con sus propios requests, guarda localmente la instancia resultante y publica sólo sus

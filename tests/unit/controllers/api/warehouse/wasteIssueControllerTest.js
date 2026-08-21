@@ -15,7 +15,7 @@ vi.mock('../../../../../src/services/warehouse/wasteIssues/wasteIssueService.js'
   updateWasteIssueHeader
 }));
 
-vi.mock('../../../../../src/services/warehouse/wasteIssues/wasteIssueReturnService.js', () => ({
+vi.mock('../../../../../src/services/warehouse/wasteIssues/detailReturns/wasteIssueReturnService.js', () => ({
   returnWasteIssueDetail: returnWasteIssueDetailService
 }));
 

@@ -12,7 +12,7 @@ import {
     updateWasteIssueDetails,
     updateWasteIssueHeader
 } from '../../../services/warehouse/wasteIssues/wasteIssueService.js';
-import { returnWasteIssueDetail as returnWasteIssueDetailService } from '../../../services/warehouse/wasteIssues/wasteIssueReturnService.js';
+import { returnWasteIssueDetail as returnWasteIssueDetailService } from '../../../services/warehouse/wasteIssues/detailReturns/wasteIssueReturnService.js';
 import { getDataTableOrder, getDataTablePaging, getDataTableSearch } from '../../../utils/requestQueryUtils.js';
 import { sanitizeEmptyStrings } from '../../../utils/formattersUtils.js';
 import { successCodeMessages } from '../../../messages/codeMessages.js';

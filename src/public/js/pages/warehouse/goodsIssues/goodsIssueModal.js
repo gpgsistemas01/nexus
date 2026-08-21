@@ -1,5 +1,3 @@
-import { DOM_EVENT_NAMES } from '../../../constants/events.js';
-import { returnGoodsIssueDetail } from '../../../application/warehouse/goodsIssues/goodsIssues.js';
 import { FORM_MODES } from '../../../constants/formModes.js';
 import {
     FORM_SELECTORS,
@@ -14,10 +12,9 @@ import {
     createIssueHeaderForm,
     initializeIssueModal
 } from '../../../ui/issues/issueFormUI.js';
-import { createIssueReturn } from '../../../ui/issues/issueReturnUI.js';
 import { openModal } from '../../../ui/modalUI.js';
-import { on } from '../../../utils/domUtils.js';
 import { mapIssueDetailToTable } from '../../../utils/warehouseInventoryUtils.js';
+import { initializeGoodsIssueReturns } from './returns/goodsIssueReturn.js';
 
 const modalId = MODAL_SELECTORS.GOODS_ISSUE;
 const formId = FORM_SELECTORS.GOODS_ISSUE;
@@ -34,11 +31,10 @@ const issueHeaderForm = createIssueHeaderForm({
     formSelector: formId,
     selects: getGoodsIssueHeaderSelects()
 });
-const goodsIssueReturn = createIssueReturn({
-    sendReturn: returnGoodsIssueDetail
+initializeGoodsIssueReturns({
+    details,
+    getCurrentIssue: () => currentGoodsIssue
 });
-
-goodsIssueReturn.initialize();
 
 export const openGoodsIssueModal = ({ mode, data = null }) => {
     currentGoodsIssue = data;
@@ -79,11 +75,3 @@ export const openGoodsIssueModal = ({ mode, data = null }) => {
 
     openModal(modalElement);
 };
-
-on(DOM_EVENT_NAMES.CLICK, '#materialTable .return-issue-detail-btn', (event, button) => {
-    const detail = details.find(item => item.id === button.dataset.id);
-
-    if (!detail || !currentGoodsIssue) return;
-
-    goodsIssueReturn.open({ issue: currentGoodsIssue, detail });
-});

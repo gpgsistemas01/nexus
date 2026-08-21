@@ -127,16 +127,33 @@ const ISSUE_PAGES = [
   {
     file: 'src/public/js/pages/warehouse/goodsIssues/goodsIssueModal.js',
     operations: [
-      'goodsIssueReturn.initialize()',
+      'initializeGoodsIssueReturns({',
       '\nexport const openGoodsIssueModal'
     ]
   },
   {
     file: 'src/public/js/pages/warehouse/wasteIssues/wasteIssueModal.js',
     operations: [
+      'initializeWasteIssueReturns({',
+      '\nexport const openWasteIssueModal'
+    ]
+  },
+  {
+    file: 'src/public/js/pages/warehouse/goodsIssues/returns/goodsIssueReturn.js',
+    operations: [
+      'createIssueReturn({',
+      'export const initializeGoodsIssueReturns',
+      'goodsIssueReturn.initialize()',
+      'on(DOM_EVENT_NAMES.CLICK'
+    ]
+  },
+  {
+    file: 'src/public/js/pages/warehouse/wasteIssues/returns/wasteIssueReturn.js',
+    operations: [
+      'createIssueReturn({',
+      'export const initializeWasteIssueReturns',
       'wasteIssueReturn.initialize()',
-      '\nexport const openWasteIssueModal',
-      'const findDetailByElement'
+      'on(DOM_EVENT_NAMES.CLICK'
     ]
   }
 ];
