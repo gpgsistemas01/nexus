@@ -1,6 +1,6 @@
 import { DOM_EVENT_NAMES } from '../../constants/events.js';
 import { BUTTON_SELECTORS, HEADING_SELECTORS } from '../../constants/selectors.js';
-import { useForm } from '../../application/form.js';
+import { useForm } from '../forms/formUI.js';
 import { FORM_MODES, ISSUE_HEADER_ENABLED_MODES } from '../../constants/formModes.js';
 import { FULFILLMENT_STATUS_NAMES, GOODS_ISSUE_STATUS_NAMES } from '../../constants/fulfillmentStatuses.js';
 import { handleSubmit, syncCheckboxControlledInputs, toggleDisabledElement } from '../../utils/formUtils.js';

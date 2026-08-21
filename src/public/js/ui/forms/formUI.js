@@ -1,9 +1,9 @@
-import { DOM_EVENT_NAMES } from '../constants/events.js';
-import { BUTTON_SELECTORS } from '../constants/selectors.js';
-import { handleApiError } from "../api/errorHandler.js";
-import { toggleErrorMessages, normalizeFormErrors, scrollToFirstFormError } from "../ui/forms/formErrorsUI.js";
-import { on } from "../utils/domUtils.js";
-import { hasValidationErrors } from "../utils/formUtils.js";
+import { handleApiError } from "../../api/errorHandler.js";
+import { DOM_EVENT_NAMES } from '../../constants/events.js';
+import { BUTTON_SELECTORS } from '../../constants/selectors.js';
+import { on } from "../../utils/domUtils.js";
+import { hasValidationErrors } from "../../utils/formUtils.js";
+import { toggleErrorMessages, normalizeFormErrors, scrollToFirstFormError } from "./formErrorsUI.js";
 
 export const useForm = async ({ 
     selector,

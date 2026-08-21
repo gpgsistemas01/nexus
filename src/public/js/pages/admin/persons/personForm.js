@@ -1,5 +1,5 @@
 import { registerPerson, updatePerson } from '../../../application/admin/persons/persons.js';
-import { useForm } from '../../../application/form.js';
+import { useForm } from '../../../ui/forms/formUI.js';
 import { personAccesses } from '../../../plugins/datatable/admin/persons/personDatatable.js';
 import { FORM_SELECTORS } from '../../../constants/selectors.js';
 import { handleSubmit, validateFields } from '../../../utils/formUtils.js';

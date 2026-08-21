@@ -217,6 +217,12 @@ un flujo paralelo para registrar o editar.
 | Negocio | `services/<dominio>` contiene reglas y transacciones reutilizables | `application/<dominio>` coordina casos de uso sin depender de elementos visuales |
 | Presentación | El controlador web entrega el contexto de la vista | `pages/<dominio>/<recurso>` conserva siempre el entry point y, cuando existen, el formulario y modal del contexto; incluso acceso, shell y consultas de movimientos siguen esa jerarquía. `ui`, `plugins` y `views/shared` reúnen piezas independientes del recurso |
 
+Las exportaciones de reportes conservan sus contratos de transporte por dominio, pero
+reutilizan `application/createReportApplication.js` para traducir de forma uniforme la
+respuesta HTTP al archivo consumido por cada DataTable. Los módulos de `application/<dominio>/report.js`
+sólo configuran esa factory con el request propietario y mantienen los nombres públicos
+del contexto.
+
 Reglas para extender un CRUD:
 
 1. Añadir el router al registro central correspondiente, manteniendo el dominio tanto

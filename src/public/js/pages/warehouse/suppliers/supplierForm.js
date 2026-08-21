@@ -1,4 +1,4 @@
-import { useForm } from "../../../application/form.js";
+import { useForm } from "../../../ui/forms/formUI.js";
 import { editSupplier, registerSupplier } from "../../../application/warehouse/suppliers/suppliers.js";
 import { FORM_SELECTORS } from "../../../constants/selectors.js";
 

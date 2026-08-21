@@ -1,4 +1,4 @@
-import { useForm } from '../../../application/form.js';
+import { useForm } from '../../../ui/forms/formUI.js';
 import { editGoodsReceiptHeader, registerGoodsReceipt } from '../../../application/warehouse/goodsReceipts/goodsReceipts.js';
 import { DOM_EVENT_NAMES } from '../../../constants/events.js';
 import { FORM_MODES } from '../../../constants/formModes.js';

@@ -1,5 +1,5 @@
 import { login } from "../../../application/auth/login.js";
-import { useForm } from "../../../application/form.js";
+import { useForm } from "../../../ui/forms/formUI.js";
 import { validateFields } from "../../../utils/formUtils.js";
 import { loginValidation } from "../../../utils/validations/validators.js";
 import { FORM_SELECTORS } from "../../../constants/selectors.js";

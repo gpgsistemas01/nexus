@@ -11,7 +11,7 @@ const mocks = vi.hoisted(() => ({
   validateFields: vi.fn(() => ({}))
 }));
 
-vi.mock('../../../../../../src/public/js/application/form.js', () => ({ useForm: mocks.useForm }));
+vi.mock('../../../../../../src/public/js/ui/forms/formUI.js', () => ({ useForm: mocks.useForm }));
 vi.mock('../../../../../../src/public/js/plugins/mdb/baseInstance.js', () => ({
   initMdbModal: mocks.initMdbModal,
   initMdbWrapperInput: mocks.initMdbWrapperInput,
