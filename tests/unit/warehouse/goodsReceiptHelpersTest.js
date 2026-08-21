@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 
-vi.mock('../../src/services/warehouse/materials/materialService.js', () => ({
+vi.mock('../../../src/services/warehouse/materials/materialService.js', () => ({
     findMaterialsSnapshot: vi.fn(({ tx, materialIds }) => tx.material.findMany({
         where: { id: { in: materialIds } }
     }))
@@ -9,7 +9,7 @@ vi.mock('../../src/services/warehouse/materials/materialService.js', () => ({
 import {
     cancelGoodsReceiptDetailAndTotals,
     createGoodsReceiptDetailsAndUpdateTotals
-} from '../../src/services/warehouse/goodsReceipts/goodsReceiptHelpers.js';
+} from '../../../src/services/warehouse/goodsReceipts/goodsReceiptHelpers.js';
 
 describe('cancelGoodsReceiptDetailAndTotals', () => {
     it('devuelve material y catálogos anidados para refrescar la tabla de compras', async () => {

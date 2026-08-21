@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { buildStockUpdateSummary } from '../../src/services/inventory/movementHelpers.js';
+import { buildStockUpdateSummary } from '../../../src/services/inventory/movementHelpers.js';
 
 describe('movementHelpers', () => {
 
