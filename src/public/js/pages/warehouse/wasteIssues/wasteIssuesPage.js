@@ -43,8 +43,6 @@ import {
     wasteIssueValidation
 } from '../../../utils/validations/validators.js';
 import {
-    getBase,
-    getHeight,
     getPresentation,
     getUnitMeasure,
     mapIssueDetailsToSupplyRequest,

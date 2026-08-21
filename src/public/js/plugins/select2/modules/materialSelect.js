@@ -2,7 +2,7 @@ import { initPresentationSelect, togglePresentationOption } from "../domains/pre
 import { initReasonSelect } from "../domains/reason.js";
 import { setupSupplierSelect, toggleSupplierOption } from "../domains/supplier.js";
 import { initUnitMeasureSelect, toggleUnitMeasureOption } from "../domains/unitMeasure.js";
-import { FORM_SELECTORS, SELECT_SELECTORS } from "../../../constants/selectors.js";
+import { SELECT_SELECTORS } from "../../../constants/selectors.js";
 
 let scoped = null;
 const selectors = {

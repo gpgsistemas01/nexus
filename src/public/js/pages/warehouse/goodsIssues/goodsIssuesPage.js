@@ -44,7 +44,6 @@ import {
 import {
     getBase,
     getHeight,
-    getMaxUnitCost,
     getPresentation,
     getUnitMeasure,
     mapGoodsIssueDetailsToRequest,

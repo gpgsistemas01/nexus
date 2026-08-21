@@ -13,8 +13,6 @@ import { buildWarehouseInventoryColumns, renderWarehouseInventoryHeader } from "
 import { buildExcelButton, buildTableExportParams } from "../../../../ui/tableUI.js";
 import { exportWasteReport } from "../../../../application/warehouse/report.js";
 import { formatFileName } from "../../../../utils/formatters.js";
-import { notifications } from "../../../swal/swalComponent.js";
-import { handleApiError } from "../../../../api/errorHandler.js";
 
 const selectorTable = DATATABLE_SELECTORS.MAIN;
 const tableElement = document.querySelector(selectorTable);
