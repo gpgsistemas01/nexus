@@ -19,7 +19,7 @@ describe('corrección de detalles del CRUD de entradas de compra', () => {
 
     expect(html).toContain('<span id="correctionMaterialValue"');
     expect(html).toContain('Material a corregir');
-    expect(html).toContain('border rounded p-3 h-100 bg-light');
+    expect(html).toContain('border rounded p-2 h-100 bg-light');
     expect(html).toContain('d-block small text-muted mb-1');
     expect(html).not.toContain('name="correctionMaterialDisplay"');
   });
