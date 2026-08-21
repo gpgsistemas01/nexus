@@ -236,6 +236,11 @@ npm start
 - `/usuarios-sistemas`, `/personas`, `/movimientos` para administración.
 - `/clientes` para ventas.
 
+Las tablas de detalle son responsivas. En compras se prioriza la columna de acciones y,
+en salidas, se conservan con la misma prioridad la cantidad convertida y el control para
+surtir; las columnas menos operativas pasan primero al detalle desplegable cuando se
+reduce el ancho disponible.
+
 ### API REST
 
 Todas las rutas API cuelgan de `/api` y esperan `Content-Type: application/json` salvo endpoints especializados:
