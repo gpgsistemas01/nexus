@@ -126,6 +126,7 @@ export const openGoodsReceiptModal = ({ mode, data = null }) => {
 
     details.length = 0;
 
+    initDetailsGoodsReceiptTable(mode);
     initGoodsReceiptFormSelect2();
     setGoodsReceiptFormSelectOptions(data);
 
@@ -190,7 +191,7 @@ export const openGoodsReceiptModal = ({ mode, data = null }) => {
     form.elements.isInvoiced.value = value;
     toggleInvoiceInput(value);
 
-    initDetailsGoodsReceiptTable(mode);
+    refreshMaterialTable(details);
 
     openModal(modalElement);
 }

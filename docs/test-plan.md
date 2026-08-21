@@ -71,7 +71,10 @@ precargar opciones si Select2 ya mapea su listado, salvo que exista una selecci�
 predeterminada explícita.
 La coordinación Select2 del CRUD de entradas de compra verifica que preparar el
 encabezado limpie una sola vez la selección dependiente de material, sin duplicar los
-eventos de cambio ni sus efectos derivados.
+eventos de cambio ni sus efectos derivados. Este contexto inicializa la tabla de
+detalles antes de preparar las opciones del encabezado, porque esa preparación dispara
+la coordinación propia de compras que limpia y redibuja la colección. Los demás módulos
+conservan el ciclo reutilizable de DataTable sin condiciones específicas de compras.
 La estructura de las pruebas refleja la del código propietario: las pruebas del núcleo
 de DataTable viven en `tests/unit/public/js/plugins/datatable/core` y sus filtros en la
 subcarpeta `filters`; una prueba específica de recurso debe replicar además dominio y
