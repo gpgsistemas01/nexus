@@ -15,4 +15,11 @@ describe('devolución compartida de los CRUD de salidas', () => {
     expect(html).toContain('d-block small text-muted mb-1');
     expect(html).not.toContain('name="issueReturnMaterialDisplay"');
   });
+
+  it('solicita a MDB el fondo oscuro al abrir la devolución', async () => {
+    const html = await ejs.renderFile(viewPath);
+
+    expect(html).toContain('id="issueReturnModal"');
+    expect(html).toContain('data-mdb-backdrop="true"');
+  });
 });
