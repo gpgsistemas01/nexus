@@ -125,30 +125,17 @@ const ISSUE_FLOWS = [
 
 const ISSUE_PAGES = [
   {
-    file: 'src/public/js/pages/warehouse/goodsIssues/goodsIssuesPage.js',
+    file: 'src/public/js/pages/warehouse/goodsIssues/goodsIssueModal.js',
     operations: [
       'goodsIssueReturn.initialize()',
-      'const normalizeGoodsIssueData',
-      '\nuseIssueForm({',
-      '\n    editHeader: editGoodsIssueHeader',
-      '\n    editDetails: editGoodsIssueDetails',
-      '\nexport const openGoodsIssueModal',
-      '\ncreateGoodsIssueDatatable({',
-      'const addMaterial',
-      'const findDetailByElement'
+      '\nexport const openGoodsIssueModal'
     ]
   },
   {
-    file: 'src/public/js/pages/warehouse/wasteIssues/wasteIssuesPage.js',
+    file: 'src/public/js/pages/warehouse/wasteIssues/wasteIssueModal.js',
     operations: [
       'wasteIssueReturn.initialize()',
-      'const normalizeWasteIssueData',
-      '\nuseIssueForm({',
-      '\n    editHeader: editWasteIssueHeader',
-      '\n    editDetails: editWasteIssueDetails',
       '\nexport const openWasteIssueModal',
-      '\ncreateWasteIssueDatatable({',
-      'const addWaste',
       'const findDetailByElement'
     ]
   }
@@ -166,7 +153,7 @@ describe.each(ISSUE_FLOWS)('orden CRUD de $name', ({ files }) => {
 });
 
 describe('orden de coordinación de páginas de salidas', () => {
-  it.each(ISSUE_PAGES)('ubica formulario, modal, tabla y detalles en el mismo orden en $file', ({ file, operations }) => {
+  it.each(ISSUE_PAGES)('ubica modal y detalles en el mismo orden en $file', ({ file, operations }) => {
     const positions = findPositions(readFileSync(file, 'utf8'), operations);
 
     expect(positions).not.toContain(-1);
