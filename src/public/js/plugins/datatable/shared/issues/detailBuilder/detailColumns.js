@@ -25,6 +25,8 @@ import {
     resolveIssueSuppliedQuantityForDisplay
 } from './detailRules.js';
 
+const COLLAPSIBLE_CONTROL_PRIORITY = 10001;
+
 export const buildDetailsColumns = ({ type, mode, canManageProjectQuantity = false }) => {
 
     bindDetailInputWarnings();
@@ -65,6 +67,8 @@ export const buildDetailsColumns = ({ type, mode, canManageProjectQuantity = fal
             { data: 'maxUnitCost', render: formatCurrency },
             {
                 data: 'projectConvertedQuantity',
+                title: 'Cantidad de proyecto',
+                responsivePriority: COLLAPSIBLE_CONTROL_PRIORITY,
                 render: (value, _, row) => {
 
                     const detailId = row.id;
@@ -102,9 +106,8 @@ export const buildDetailsColumns = ({ type, mode, canManageProjectQuantity = fal
     if (type === 'issue' && mode === FORM_MODES.EDIT_DETAIL) {
         columns.push({
             data: null,
-            // El surtido es la acción principal de este modo. Se conserva antes
-            // que las columnas informativas cuando Responsive reduce la tabla.
-            responsivePriority: 1,
+            title: 'Surtir',
+            responsivePriority: COLLAPSIBLE_CONTROL_PRIORITY,
             render: (_, __, row) => {
 
                 const detailId = row.id;
@@ -150,6 +153,7 @@ export const buildDetailsColumns = ({ type, mode, canManageProjectQuantity = fal
             title: 'Acciones',
             orderable: false,
             searchable: false,
+            responsivePriority: COLLAPSIBLE_CONTROL_PRIORITY,
             render: (_, __, row) => {
                 const detailId = row.id;
                 const isCanceledDetail = row.status === GOODS_RECEIPT_DETAIL_STATUSES.CANCELED;
@@ -183,6 +187,10 @@ export const buildDetailsColumns = ({ type, mode, canManageProjectQuantity = fal
     if (shouldShowActionsColumn({ type, mode })) {
         columns.push({
             data: null,
+            ...(type === 'receipt' && {
+                title: 'Acciones',
+                responsivePriority: COLLAPSIBLE_CONTROL_PRIORITY
+            }),
             render: (_, __, row) => {
                 if (!shouldShowDetailActionButtons({ row, mode })) return '';
 

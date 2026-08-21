@@ -240,6 +240,8 @@ npm test
   contexto, en vez de duplicar el flujo completo.
 - Mantén en `plugins/select2/baseSelect.js` los comportamientos visuales compartidos por
   selects de distintos CRUD, como la sincronización de la presentación en compras y salidas.
+- En los detalles responsivos, los controles secundarios se trasladan primero al panel
+  desplegable: `Surtir` y `Cantidad de proyecto` en salidas, y `Acciones` en compras.
 - Conserva el mismo orden CRUD en rutas, controllers, servicios de aplicación y
   servicios HTTP: lectura, creación, actualización general, actualizaciones
   especializadas y eliminación o acción terminal.
