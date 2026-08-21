@@ -252,6 +252,11 @@ páginas y datatables siguen consumiendo nombres de
 dominio (`registerGoodsIssue`, `registerWasteIssue`, etc.), por lo que el componente
 compartido no filtra abstracciones genéricas hacia la UI.
 
+El modal compartido de devolución tampoco mantiene un actualizador propio para sus
+cantidades: reutiliza `setSummaryValue` de `totalsSummaryUI`, el mismo helper que
+sincroniza el valor numérico de `data-value` y su representación formateada en los
+resúmenes de formularios.
+
 `createIssueApplication` sí es un export porque es una función de construcción usada
 por ambos módulos de salida; no es la instancia de ninguno de ellos. Cada invocación
 produce un objeto inmutable independiente, que queda privado como

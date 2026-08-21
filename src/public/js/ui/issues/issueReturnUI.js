@@ -3,6 +3,7 @@ import { initMdbModal, showModal, initMdbWrapperInput, updateMdbWrapperInput } f
 import { notifications } from '../../plugins/swal/swalComponent.js';
 import { clearFormErrors } from '../forms/formErrorsUI.js';
 import { resetFormSubmitState } from '../forms/formStateUI.js';
+import { setSummaryValue } from '../forms/totalsSummaryUI.js';
 import { formatDecimal, roundTo } from '../../utils/formatUtils.js';
 import { validateFields } from '../../utils/formUtils.js';
 import { issueReturnValidation } from '../../utils/validations/validators.js';
@@ -11,14 +12,6 @@ export const createIssueReturn = ({ sendReturn }) => {
     const modalSelector = '#issueReturnModal';
     const formSelector = '#issueReturnForm';
     const getModal = () => document.querySelector(modalSelector);
-    const setQuantitySummary = (selector, value) => {
-        const element = document.querySelector(selector);
-        if (!element) return;
-        const rawValue = Number(value) || 0;
-        element.dataset.value = String(rawValue);
-        element.textContent = formatDecimal(rawValue);
-    };
-
     const initialize = () => useForm({
         selector: formSelector,
         normalizeData: ({ formData }) => ({ ...formData, returnQuantity: Number(formData.returnQuantity) }),
@@ -59,9 +52,9 @@ export const createIssueReturn = ({ sendReturn }) => {
         // the read-only summaries shown to the user.
         const available = roundTo(supplied - returned);
 
-        setQuantitySummary('#issueReturnSuppliedQuantity', supplied);
-        setQuantitySummary('#issueReturnReturnedQuantity', returned);
-        setQuantitySummary('#issueReturnAvailableQuantity', available);
+        setSummaryValue({ selector: '#issueReturnSuppliedQuantity', value: supplied, formatter: formatDecimal });
+        setSummaryValue({ selector: '#issueReturnReturnedQuantity', value: returned, formatter: formatDecimal });
+        setSummaryValue({ selector: '#issueReturnAvailableQuantity', value: available, formatter: formatDecimal });
         form.reset();
         clearFormErrors(form);
         resetFormSubmitState(form);

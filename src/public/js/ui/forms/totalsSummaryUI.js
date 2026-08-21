@@ -12,7 +12,7 @@ const getTotalSummaryValue = (selector) => {
     return Number(element?.dataset.value) || 0;
 };
 
-const setTotalSummaryValue = ({ selector, value, formatter }) => {
+export const setSummaryValue = ({ selector, value, formatter }) => {
     const element = document.querySelector(selector);
 
     if (!element) return;
@@ -57,17 +57,17 @@ export const setTotals = ({
     gross = ''
 } = {}) => {
 
-    setTotalSummaryValue({
+    setSummaryValue({
         selector: TOTAL_FIELDS.quantity,
         value: quantity,
         formatter: formatDecimal
     });
-    setTotalSummaryValue({
+    setSummaryValue({
         selector: TOTAL_FIELDS.net,
         value: net,
         formatter: formatCurrency
     });
-    setTotalSummaryValue({
+    setSummaryValue({
         selector: TOTAL_FIELDS.gross,
         value: gross,
         formatter: formatCurrency
