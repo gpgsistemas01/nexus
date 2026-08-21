@@ -13,7 +13,7 @@ import {
     updateGoodsIssueDetails,
     updateGoodsIssueHeader
 } from "../../../services/warehouse/goodsIssues/goodsIssueService.js";
-import { returnGoodsIssueDetail as returnGoodsIssueDetailService } from '../../../services/warehouse/goodsIssues/goodsIssueReturnService.js';
+import { returnGoodsIssueDetail as returnGoodsIssueDetailService } from '../../../services/warehouse/goodsIssues/detailReturns/goodsIssueReturnService.js';
 import { getDataTableOrder, getDataTablePaging, getDataTableSearch } from "../../../utils/requestQueryUtils.js";
 import { sanitizeEmptyStrings } from "../../../utils/formattersUtils.js";
 import { emitInventoryUpdated } from "../../../utils/socketUtils.js";

@@ -348,7 +348,10 @@ En compras, las filas de detalle reutilizan la identidad visible de inventario
 principales de compras y salidas se componen mediante `views/shared/inventory/inventoryCrudModal.ejs`;
 cada CRUD declara sus campos y el componente transversal adapta ese contrato al layout
 común. El wrapper de salidas permanece en `shared/issues` porque agrega exclusivamente
-la configuración compartida por salidas de material y merma. En el cliente,
+la configuración compartida por salidas de material y merma. La coordinación específica
+de las devoluciones se separa en la subcarpeta `returns` de cada página de salida, en
+paralelo con `corrections` de compras; sus servicios de dominio se agrupan en
+`detailReturns`, sin duplicar el modal ni la UI compartida. En el cliente,
 `ui/inventory/inventoryCrudModalUI.js` prepara el estado CRUD común del formulario antes de
 que compras o salidas apliquen los datos y acciones propios de su contexto. Los modales
 secundarios de devolución de salida y corrección de compra reutilizan el diálogo
