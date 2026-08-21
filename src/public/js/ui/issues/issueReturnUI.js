@@ -55,6 +55,7 @@ export const createIssueReturn = ({ sendReturn }) => {
         setSummaryValue({ selector: '#issueReturnSuppliedQuantity', value: supplied, formatter: formatDecimal });
         setSummaryValue({ selector: '#issueReturnReturnedQuantity', value: returned, formatter: formatDecimal });
         setSummaryValue({ selector: '#issueReturnAvailableQuantity', value: available, formatter: formatDecimal });
+        document.querySelector('#issueReturnMaterialValue').textContent = detail.name;
         form.reset();
         clearFormErrors(form);
         resetFormSubmitState(form);

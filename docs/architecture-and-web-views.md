@@ -339,7 +339,14 @@ secundarios de devolución de salida y corrección de compra reutilizan el diál
 desplazable compartido y el mismo helper de apertura MDB, sin reglas de altura propias
 que interfieran con el cálculo responsivo del componente. La coordinación propietaria
 de corrección mantiene sólo el cálculo de totales que comparte entre la apertura y los
-eventos del formulario; la preparación usada una sola vez permanece en la apertura.
+eventos del formulario; la preparación usada una sola vez permanece en la apertura. La
+identidad visible del material seleccionado se presenta mediante el valor informativo
+compartido en las correcciones de compra y devoluciones de salida. No se reutiliza el
+`materialSelect` porque estas operaciones nunca permiten sustituir el material del
+detalle: un texto evita comunicar una selección futura, no participa en el formulario
+enviado y conserva el select para los CRUD donde sí existe esa decisión. Su tarjeta
+reutiliza la misma presentación visual de etiqueta y valor que los costos y totales
+informativos de los documentos.
 
 Los filtros compartidos de DataTables separan los valores visibles en el formulario de
 los valores que ya fueron aplicados. `tableFilterState` toma una instantánea al enviar

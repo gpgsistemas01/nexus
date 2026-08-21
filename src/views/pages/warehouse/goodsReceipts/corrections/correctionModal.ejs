@@ -29,6 +29,15 @@ const form = {
             title: 'Corrección del detalle',
             groups: [
                 {
+                    type: 'html',
+                    content: include('../../../../shared/forms/informativeValue', {
+                        value: {
+                            id: 'correctionMaterialValue',
+                            label: 'Material a corregir'
+                        }
+                    })
+                },
+                {
                     type: 'inputs',
                     items: [
                         {
