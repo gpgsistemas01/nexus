@@ -11,7 +11,7 @@ describe('valor informativo reutilizado por los CRUD operativos', () => {
       value: { id: 'materialValue', label: 'Material a corregir' }
     });
 
-    expect(html).toContain('border rounded p-3 h-100 bg-light');
+    expect(html).toContain('border rounded p-2 h-100 bg-light');
     expect(html).toContain('d-block small text-muted mb-1');
     expect(html).toContain('<span id="materialValue" class="fw-semibold"');
     expect(html).toContain('Material a corregir');

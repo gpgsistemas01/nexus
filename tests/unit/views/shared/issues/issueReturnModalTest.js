@@ -11,7 +11,7 @@ describe('devolución compartida de los CRUD de salidas', () => {
 
     expect(html).toContain('<span id="issueReturnMaterialValue"');
     expect(html).toContain('Material a devolver');
-    expect(html).toContain('border rounded p-3 h-100 bg-light');
+    expect(html).toContain('border rounded p-2 h-100 bg-light');
     expect(html).toContain('d-block small text-muted mb-1');
     expect(html).not.toContain('name="issueReturnMaterialDisplay"');
   });

@@ -352,7 +352,8 @@ compartido en las correcciones de compra y devoluciones de salida. No se reutili
 detalle: un texto evita comunicar una selección futura, no participa en el formulario
 enviado y conserva el select para los CRUD donde sí existe esa decisión. Su tarjeta
 reutiliza la misma presentación visual de etiqueta y valor que los costos y totales
-informativos de los documentos.
+informativos de los documentos, con espaciado interior compacto para mantener el texto
+cerca del borde sin perder legibilidad.
 
 Los filtros compartidos de DataTables separan los valores visibles en el formulario de
 los valores que ya fueron aplicados. `tableFilterState` toma una instantánea al enviar
