@@ -232,6 +232,13 @@ abstracción «compartida» que todavía depende de un recurso concreto. Al edit
 preserva el cierre final de `contentFor` en su lugar; no se elimina y vuelve a agregar
 como efecto secundario de una refactorización.
 
+El encabezado de todos los modales se compone con `shared/layout/header.ejs` y conserva
+la clase semántica `modal-title`. Su estilo transversal se declara una sola vez en
+`public/css/style.css`: color claro para contrastar con el encabezado secundario, peso
+destacado, escala tipográfica adaptable y márgenes normalizados. Los contextos CRUD
+sólo actualizan el contenido del título y no deben agregar estilos en línea ni clases
+visuales particulares.
+
 ### Organización de módulos de una sola responsabilidad
 
 La cantidad de exports o de consumidores no determina por sí sola si un archivo debe
