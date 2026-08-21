@@ -40,7 +40,8 @@ describe('wasteController', () => {
         search: { value: 'lámina' },
         supplierId: 'supplier-1',
         order: [{ column: '0', dir: 'desc' }]
-      }
+      },
+      user: { permissions: [] }
     };
     const res = createResponse();
     findAllWastes.mockResolvedValue(result);
@@ -53,9 +54,32 @@ describe('wasteController', () => {
       search: 'lámina',
       supplierId: 'supplier-1',
       orderBy: 'name',
-      orderDir: 'desc'
+      orderDir: 'desc',
+      canReadCosts: false
     });
     expect(res.status).toHaveBeenCalledWith(200);
+    expect(res.json).toHaveBeenCalledWith(result);
+  });
+
+  it.each([
+    ['asesor sin permiso de costos', [], false],
+    ['personal autorizado', ['inventory:costs-read'], true]
+  ])('solicita los costos al consultar mermas para %s', async (_, permissions, canReadCosts) => {
+    const result = {
+      data: [{
+        id: 'waste-1',
+        supplierMaterial: { id: 'supplier-material-1', maxUnitCost: 18.5 }
+      }],
+      recordsTotal: 1,
+      recordsFiltered: 1
+    };
+    const req = { query: {}, user: { permissions } };
+    const res = createResponse();
+    findAllWastes.mockResolvedValue(result);
+
+    await getAllWastes(req, res);
+
+    expect(findAllWastes).toHaveBeenCalledWith(expect.objectContaining({ canReadCosts }));
     expect(res.json).toHaveBeenCalledWith(result);
   });
 

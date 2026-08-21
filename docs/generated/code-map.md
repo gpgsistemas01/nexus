@@ -14,6 +14,7 @@ cada archivo individual.
 
 ```mermaid
 flowchart LR
+    controllers["controllers (32 módulos)"] --> constants["constants (9 módulos)"]
     controllers["controllers (32 módulos)"] --> dtos["dtos (10 módulos)"]
     controllers["controllers (32 módulos)"] --> messages["messages (2 módulos)"]
     controllers["controllers (32 módulos)"] --> services["services (47 módulos)"]

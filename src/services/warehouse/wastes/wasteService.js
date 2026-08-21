@@ -98,7 +98,8 @@ export const findAllWastes = async ({
     search = '',
     supplierId = null,
     orderBy = 'name',
-    orderDir = 'asc'
+    orderDir = 'asc',
+    canReadCosts = false
 }) => {
 
     const where = { AND: [] };
@@ -147,7 +148,30 @@ export const findAllWastes = async ({
         skip,
         take,
         where,
-        include: WASTE_INCLUDE,
+        select: {
+            id: true,
+            supplierMaterialId: true,
+            base: true,
+            height: true,
+            minStock: true,
+            isActive: true,
+            currentStock: true,
+            convertedQuantity: true,
+            createdAt: true,
+            updatedAt: true,
+            supplierMaterial: {
+                select: {
+                    id: true,
+                    materialId: true,
+                    supplierId: true,
+                    ...(canReadCosts && { maxUnitCost: true }),
+                    currentStock: true,
+                    convertedQuantity: true,
+                    material: WASTE_INCLUDE.supplierMaterial.select.material,
+                    supplier: WASTE_INCLUDE.supplierMaterial.select.supplier
+                }
+            }
+        },
         orderBy: orderMap[orderBy] || orderMap.name
     });
     const total = await db.waste.count();

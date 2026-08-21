@@ -53,7 +53,8 @@ export const findAllMaterials = async ({
     search = '',
     supplierId = null,
     orderBy = 'name',
-    orderDir = 'asc'
+    orderDir = 'asc',
+    canReadCosts = false
 }) => {
 
     return await findAllSupplierMaterials({
@@ -62,7 +63,8 @@ export const findAllMaterials = async ({
         search,
         supplierId,
         orderBy,
-        orderDir
+        orderDir,
+        canReadCosts
     });
 };
 

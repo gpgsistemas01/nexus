@@ -76,8 +76,13 @@ editButton.hidden = !window.meta.permissions?.includes('materials:write');
 
 El menú principal y las acciones de personas, materiales y mermas ya usan capacidades
 derivadas. `scope` se reserva para el alcance de datos (`departmentIds`, `canReadAll`);
-para columnas, costos o flujo, el frontend consume `user.organization`, calculado también
-por el backend. El navegador ya no interpreta directamente la relación rol/área.
+para columnas o flujo, el frontend consume permisos calculados por el backend. En
+particular, `inventory:costs-read` controla las columnas de costo de materiales y
+mermas; las consultas de Prisma sólo seleccionan esos campos cuando el permiso está
+concedido, por lo que un asesor de ventas no puede recuperarlos inspeccionando la
+respuesta HTTP.
+`user.organization` queda disponible como contexto informativo. El navegador ya no
+interpreta directamente la relación rol/área.
 
 `scope` solo es necesario cuando un permiso no implica acceso a todos los registros.
 Por ejemplo, `goods-issues:read` puede permitir leer únicamente el departamento del

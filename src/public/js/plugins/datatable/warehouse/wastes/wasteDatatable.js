@@ -18,8 +18,7 @@ const selectorTable = DATATABLE_SELECTORS.MAIN;
 const tableElement = document.querySelector(selectorTable);
 
 export const createWasteDatatable = async (context) => {
-    const { isWarehouse = false, isSystem = false, isSales = false } = context.organization || {};
-    const canSeeCost = isWarehouse || isSystem || isSales;
+    const canSeeCost = hasPermission(context, UI_PERMISSIONS.INVENTORY_COSTS_READ);
     const canManageWastes = hasPermission(context, UI_PERMISSIONS.WASTES_WRITE);
     const canAdjustStock = hasPermission(context, UI_PERMISSIONS.WASTES_ADJUST_STOCK);
 

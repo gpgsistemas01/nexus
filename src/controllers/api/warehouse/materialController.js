@@ -4,6 +4,7 @@ import { findAllMaterials, createMaterial, updateMaterial, updateMaterialStock, 
 import { sanitizeEmptyStrings } from "../../../utils/formattersUtils.js";
 import { getDataTableOrder, getDataTablePaging, getDataTableSearch } from "../../../utils/requestQueryUtils.js";
 import { emitInventoryUpdated } from "../../../utils/socketUtils.js";
+import { PERMISSIONS } from '../../../constants/permissions.js';
 
 export const getAllMaterials = async (req, res) => {
 
@@ -23,7 +24,8 @@ export const getAllMaterials = async (req, res) => {
         search,
         supplierId,
         orderBy,
-        orderDir
+        orderDir,
+        canReadCosts: req.user.permissions.includes(PERMISSIONS.INVENTORY_COSTS_READ)
     });
 
     return res.status(200).json(result);

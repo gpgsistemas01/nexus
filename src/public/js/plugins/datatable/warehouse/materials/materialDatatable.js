@@ -35,8 +35,7 @@ const configureMaterialsRealtime = (table) => {
 
 export const createMaterialDatatable = async (context) => {
 
-    const { isWarehouse = false, isSystem = false, isSales = false } = context.organization || {};
-    const canSeeCost = isWarehouse || isSystem || isSales;
+    const canSeeCost = hasPermission(context, UI_PERMISSIONS.INVENTORY_COSTS_READ);
     const canManageMaterials = hasPermission(context, UI_PERMISSIONS.MATERIALS_WRITE);
 
     renderWarehouseInventoryHeader({
