@@ -136,7 +136,8 @@ export const findAllSupplierMaterials = async ({
     search = '',
     supplierId = null,
     orderBy = 'id',
-    orderDir = 'asc'
+    orderDir = 'asc',
+    canReadCosts = false
 }) => {
 
     const where = { AND: [] };
@@ -163,7 +164,7 @@ export const findAllSupplierMaterials = async ({
         where,
         select: {
             id: true,
-            maxUnitCost: true,
+            ...(canReadCosts && { maxUnitCost: true }),
             currentStock: true,
             convertedQuantity: true,
             material: {
