@@ -25,7 +25,7 @@ import {
     resolveIssueSuppliedQuantityForDisplay
 } from './detailRules.js';
 
-const COLLAPSIBLE_CONTROL_PRIORITY = 10001;
+const DETAIL_CONTROL_RESPONSIVE_PRIORITY = 1;
 
 export const buildDetailsColumns = ({ type, mode, canManageProjectQuantity = false }) => {
 
@@ -68,7 +68,7 @@ export const buildDetailsColumns = ({ type, mode, canManageProjectQuantity = fal
             {
                 data: 'projectConvertedQuantity',
                 title: 'Cantidad de proyecto',
-                responsivePriority: COLLAPSIBLE_CONTROL_PRIORITY,
+                responsivePriority: DETAIL_CONTROL_RESPONSIVE_PRIORITY,
                 render: (value, _, row) => {
 
                     const detailId = row.id;
@@ -107,7 +107,7 @@ export const buildDetailsColumns = ({ type, mode, canManageProjectQuantity = fal
         columns.push({
             data: null,
             title: 'Surtir',
-            responsivePriority: COLLAPSIBLE_CONTROL_PRIORITY,
+            responsivePriority: DETAIL_CONTROL_RESPONSIVE_PRIORITY,
             render: (_, __, row) => {
 
                 const detailId = row.id;
@@ -153,7 +153,7 @@ export const buildDetailsColumns = ({ type, mode, canManageProjectQuantity = fal
             title: 'Acciones',
             orderable: false,
             searchable: false,
-            responsivePriority: COLLAPSIBLE_CONTROL_PRIORITY,
+            responsivePriority: DETAIL_CONTROL_RESPONSIVE_PRIORITY,
             render: (_, __, row) => {
                 const detailId = row.id;
                 const isCanceledDetail = row.status === GOODS_RECEIPT_DETAIL_STATUSES.CANCELED;
@@ -189,7 +189,7 @@ export const buildDetailsColumns = ({ type, mode, canManageProjectQuantity = fal
             data: null,
             ...(type === 'receipt' && {
                 title: 'Acciones',
-                responsivePriority: COLLAPSIBLE_CONTROL_PRIORITY
+                responsivePriority: DETAIL_CONTROL_RESPONSIVE_PRIORITY
             }),
             render: (_, __, row) => {
                 if (!shouldShowDetailActionButtons({ row, mode })) return '';

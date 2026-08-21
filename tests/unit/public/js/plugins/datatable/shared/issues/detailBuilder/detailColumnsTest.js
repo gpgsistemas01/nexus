@@ -8,7 +8,7 @@ describe('columnas responsivas del detalle compartido de compras y salidas', () 
     globalThis.$ = vi.fn(() => ({ on: vi.fn() }));
   });
 
-  it('oculta primero surtir y cantidad de proyecto al reducir una salida', () => {
+  it('mantiene visibles surtir y cantidad de proyecto al reducir una salida', () => {
     const columns = buildDetailsColumns({
       type: 'issue',
       mode: 'edit-detail',
@@ -17,14 +17,14 @@ describe('columnas responsivas del detalle compartido de compras y salidas', () 
     const projectQuantityColumn = columns.find(column => column.title === 'Cantidad de proyecto');
     const supplyColumn = columns.find(column => column.title === 'Surtir');
 
-    expect(projectQuantityColumn.responsivePriority).toBeGreaterThan(10000);
+    expect(projectQuantityColumn.responsivePriority).toBe(1);
     expect(supplyColumn.responsivePriority).toBe(projectQuantityColumn.responsivePriority);
   });
 
-  it.each(['create', 'edit'])('oculta primero las acciones de compra en modo %s', (mode) => {
+  it.each(['create', 'edit'])('mantiene visibles las acciones de compra en modo %s', (mode) => {
     const columns = buildDetailsColumns({ type: 'receipt', mode });
     const actionsColumn = columns.find(column => column.title === 'Acciones');
 
-    expect(actionsColumn.responsivePriority).toBeGreaterThan(10000);
+    expect(actionsColumn.responsivePriority).toBe(1);
   });
 });
