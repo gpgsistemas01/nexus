@@ -1,6 +1,6 @@
 import { initDepartmentSelect, toggleDepartmentOption } from "../domains/department.js";
 import { initRoleSelect, toggleRoleOption } from "../domains/role.js";
-import { FORM_SELECTORS, MODAL_SELECTORS, SELECT_SELECTORS } from "../../../constants/selectors.js";
+import { MODAL_SELECTORS, SELECT_SELECTORS } from "../../../constants/selectors.js";
 
 let scoped = null;
 const selectors = {

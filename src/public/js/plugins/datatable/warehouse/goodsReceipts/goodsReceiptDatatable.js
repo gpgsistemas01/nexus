@@ -6,7 +6,6 @@ import { renderActionButtons } from '../../core/base/actionButtons.js';
 import { resetDataTable } from '../../core/base/tableOperations.js';
 import { getAllGoodsReceipts } from "../../../../application/warehouse/goodsReceipts/goodsReceipts.js";
 import { exportGoodsReceiptReport } from "../../../../application/warehouse/report.js";
-import { initMdbWrapperInput, updateMdbWrapperInput } from "../../../mdb/baseInstance.js";
 import { buildDetailsColumns } from '../../shared/issues/detailBuilder/detailColumns.js';
 import { buildDetailsHeader } from '../../shared/issues/detailBuilder/detailHeader.js';
 import { removeDetail } from "../../../../utils/detailCollectionUtils.js";
@@ -25,29 +24,6 @@ let filters = {
 };
 const selectorMaterialTable = DATATABLE_SELECTORS.MATERIAL;
 const selectorTable = DATATABLE_SELECTORS.MAIN;
-const table = document.querySelector(selectorMaterialTable);
-table.innerHTML = `
-    <thead>
-        <tr>
-            <th rowspan="2">Material</th>
-            <th colspan="2">Medidas</th>
-            <th rowspan="2">Compra</th>
-            <th rowspan="2">Presentación</th>
-            <th colspan="2">Conversión</th>
-            <th rowspan="2">Costo Unitario de Conversión</th>
-            <th rowspan="2">Costo por Presentación</th>
-            <th rowspan="2">Monto s/ IVA</th>
-            <th rowspan="2">Monto c/ IVA</th>
-            <th rowspan="2">Acciones</th>
-        </tr>
-        <tr>
-            <th>Base</th>
-            <th>Altura</th>
-            <th>Cantidad</th>
-            <th>Unidad</th>
-        </tr>
-    </thead>
-`;
 
 export const createGoodsReceiptDatatable = async () => {
 

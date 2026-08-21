@@ -8,7 +8,7 @@ import { bindDisabledSelectDependency } from "../baseSelect.js";
 import { setupMaterialSelect, toggleMaterialOption } from "../domains/material.js";
 import { initPersonSelect, togglePersonOption } from "../domains/person.js";
 import { setupSupplierSelect, toggleSupplierOption } from "../domains/supplier.js";
-import { FORM_SELECTORS, INPUT_SELECTORS, MODAL_SELECTORS, SELECT_SELECTORS } from "../../../constants/selectors.js";
+import { INPUT_SELECTORS, MODAL_SELECTORS, SELECT_SELECTORS } from "../../../constants/selectors.js";
 
 const modalSelector = MODAL_SELECTORS.GOODS_RECEIPT;
 const materialSelector = SELECT_SELECTORS.MATERIAL;

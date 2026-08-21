@@ -1,9 +1,8 @@
 import { GoodsIssueInexistentStock, GoodsIssueInsufficientStock } from "../../../errors/inventory/stockError.js";
-import { MaterialNotFound, MaterialSnapshotFindDatabaseError, SupplierMaterialCreateDatabaseError, SupplierMaterialDeleteDatabaseError } from "../../../errors/warehouse/materialError.js";
+import { MaterialNotFound } from "../../../errors/warehouse/materialError.js";
 import { getDb } from "../../../repository/baseRepository.js";
 import { buildStockKey, hasMaterialDimensions, normalizeDecimal, parseStockKey } from "../../../utils/formattersUtils.js";
 import { calculateConvertedQuantity } from "../../inventory/stockHelpers.js";
-import { createStockAdjustment } from "../adjustmentService.js";
 import { INVENTORY_MOVEMENT_TYPES } from "../../../constants/inventory.js";
 
 

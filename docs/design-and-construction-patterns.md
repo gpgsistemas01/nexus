@@ -489,6 +489,16 @@ Una operación específica de un solo CRUD permanece privada en su flujo. No se 
 wrappers de una sola llamada como API compartida, porque no aportan reutilización y
 ocultan el propietario real del comportamiento.
 
+### Inicialización y dependencias de DataTable
+
+Las tablas de detalle generan su encabezado y sus columnas en la función de
+inicialización del contexto, mediante los constructores compartidos. No se escribe un
+encabezado provisional al cargar el módulo: esa escritura duplica la configuración,
+puede ejecutarse antes de que exista el elemento y queda reemplazada al iniciar el
+DataTable. Los imports se limitan a las dependencias realmente consumidas; cuando una
+refactorización mueve una responsabilidad a un constructor o componente compartido,
+se retiran también los imports residuales del consumidor.
+
 ## Mantenimiento
 
 Un patrón se documenta como aplicado sólo cuando hay al menos una implementación y un

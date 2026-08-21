@@ -1,5 +1,5 @@
 import { isAppError } from "../../errors/AppError.js";
-import { SupplierCodeFindDatabaseError, SupplierCodeNotFound, SupplierCreateDatabaseError, SupplierNotFound, SupplierUpdateDatabaseError } from "../../errors/warehouse/supplierError.js";
+import { SupplierCodeNotFound, SupplierCreateDatabaseError, SupplierNotFound, SupplierUpdateDatabaseError } from "../../errors/warehouse/supplierError.js";
 import { getDb } from "../../repository/baseRepository.js";
 import { incrementNonYearlyReferenceNumberCounter } from "../document/referenceNumberService.js";
 import { createServiceLogger, getModelLogContext, logServiceError, logServiceInfo } from "../../utils/logger.js";

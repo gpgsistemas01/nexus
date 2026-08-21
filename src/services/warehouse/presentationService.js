@@ -1,4 +1,4 @@
-import { PresentationFindDatabaseError, PresentationNotFound } from "../../errors/warehouse/presentationError.js";
+import { PresentationNotFound } from "../../errors/warehouse/presentationError.js";
 import { getDb } from "../../repository/baseRepository.js";
 
 export const findAllPresentations = async ({

@@ -1,4 +1,4 @@
-import { includeSpace, includeUppercase, isDateTime, isEmptyOrNull, isLengthInRangeMax, isLengthInRangeMin, isNegative, isNumber, isNumberphone, isPositive, isString } from "./baseValidations.js";
+import { includeSpace, includeUppercase, isDateTime, isEmptyOrNull, isLengthInRangeMax, isLengthInRangeMin, isNegative, isNumber, isPositive, isString } from "./baseValidations.js";
 
 export const validatePassword = (password) => {
 
