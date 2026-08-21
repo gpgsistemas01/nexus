@@ -1,5 +1,7 @@
-<% const form = {
-    id: issue.formId,
+<% const modalConfig = {
+    formId: issue.formId,
+    modalId: issue.modalId,
+    modalTitle: issue.modalTitle,
     canApprove: issue.canApprove,
     selects: [
         { id: 'clientInput', name: 'clientId', class: 'client-select', col: 'col-6' },
@@ -51,8 +53,4 @@
     }
 } %>
 
-<%- include('../layout/modal', {
-    modalId: issue.modalId,
-    modalTitle: issue.modalTitle,
-    form
-}) %>
+<%- include('../inventory/inventoryCrudModal', { modalConfig }) %>
