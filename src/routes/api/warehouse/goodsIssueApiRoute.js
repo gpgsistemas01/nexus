@@ -7,7 +7,7 @@ import {
     editGoodsIssueDetails,
     getAllGoodsIssues,
     registerGoodsIssue,
-    returnGoodsIssueDetail
+    registerGoodsIssueDetailReturn,
 } from '../../../controllers/api/warehouse/goodsIssueController.js';
 import {
     goodsIssueDetailsValidation,
@@ -71,7 +71,7 @@ router.patch(
     goodsIssueReturnValidation,
     validate,
     authorizeUserApi(PERMISSIONS.GOODS_ISSUE_DETAILS_MANAGE),
-    returnGoodsIssueDetail
+    registerGoodsIssueDetailReturn
 );
 
 export default router;

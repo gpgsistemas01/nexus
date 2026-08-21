@@ -121,9 +121,9 @@ export const editGoodsIssueDetails = async (req, res) => {
     });
 };
 
-export const returnGoodsIssueDetail = async (req, res) => {
+export const registerGoodsIssueDetailReturn = async (req, res) => {
 
-    const returnDto = createGoodsIssueDtoForReturn(req.body);
+    const returnDto = createGoodsIssueReturnDto(req.body);
     const sanitizedReturnDto = sanitizeEmptyStrings(returnDto);
 
     const goodsIssueReturn = await returnGoodsIssueDetailService({
