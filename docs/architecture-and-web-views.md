@@ -157,7 +157,7 @@ flowchart LR
 | Almacén | Requisiciones (`/requisiciones`) | Consultar y capturar requisiciones de compra. | Registrar requisición y sus detalles. | `src/views/pages/warehouse/purchaseRequisitions/purchaseRequisitionsPage.ejs` |
 | Almacén | Registro de compras (`/compras`) | Consultar y registrar entradas de compra. | Filtrar, registrar compra, materiales/proveedores y corregir detalles. | `src/views/pages/warehouse/goodsReceipts/goodsReceiptsPage.ejs` |
 | Almacén | Salidas de almacén (`/salidas/materiales`) | Consultar y registrar entregas de materiales. | Filtrar, registrar salida, seleccionar cliente y devolver detalles. | `src/views/pages/warehouse/goodsIssues/goodsIssuesPage.ejs` |
-| Almacén | Salidas de mermas (`/salidas/mermas`) | Presentar el punto de acceso a salidas de merma. | La pantalla actual es informativa; el flujo aún no expone formulario ni tabla. | `src/views/pages/warehouse/wasteIssues/wasteIssuesPage.ejs` |
+| Almacén | Salidas de mermas (`/salidas/mermas`) | Consultar y registrar salidas de merma. | Registrar, editar, surtir y devolver detalles de merma. | `src/views/pages/warehouse/wasteIssues/wasteIssuesPage.ejs` |
 | Almacén | Proveedores (`/proveedores`) | Consultar y administrar proveedores. | Crear/editar desde modal. | `src/views/pages/warehouse/suppliers/suppliersPage.ejs` |
 | Ventas | Clientes (`/clientes`) | Consultar y administrar clientes. | Crear/editar desde modal. | `src/views/pages/sales/clients/clientsPage.ejs` |
 | Administración | Usuarios (`/usuarios-sistemas`) | Administrar cuentas y asignaciones. | Crear/editar usuario, roles y departamentos. | `src/views/pages/admin/users/usersPage.ejs` |
@@ -295,14 +295,17 @@ y el datatable adapta el identificador de su fila al invocarlo.
 recurso, en paralelo con `goodsIssues/goodsIssues.js`, porque ambos flujos tienen varias
 mutaciones relacionadas. `wasteForm`, `wasteModal` y `wasteFields` permanecen en
 `pages/warehouse/wastes` porque conocen selectores, validaciones, modos y operaciones
-propias de ese recurso; que el datatable abra ese modal no convierte al modal en un
-componente independiente del contexto. Sólo una abstracción sin conocimiento de merma
+propias de ese recurso. `wasteFields` existe porque formulario y modal comparten los
+grupos por modo, igual que `materialFields`; no implica que cada recurso deba replicar
+un archivo `Fields` sin dos consumidores del mismo contrato. Que el datatable abra ese
+modal no convierte al modal en un componente independiente del contexto. Sólo una abstracción sin conocimiento de merma
 debe moverse a `ui` o a una carpeta compartida. El modal reutiliza los getters de
 inventario para leer la presentación tanto del contrato plano como de la relación
 `supplierMaterial.material` devuelta por Prisma; así no presupone relaciones opcionales
 al alternar los campos dimensionales durante altas, ediciones o ajustes. En las salidas,
-la coordinación específica permanece en su archivo de página y las operaciones realmente
-comunes del formulario están en `ui/issues/issueFormUI.js`.
+la coordinación específica permanece en los módulos hermanos de formulario y modal; el
+archivo `Page` sólo los compone con el DataTable. Las operaciones realmente comunes del
+formulario están en `ui/issues/issueFormUI.js`.
 La presentación de sus modos se resuelve mediante una configuración única por modo;
 la inicialización calcula una sola vez el estado deshabilitado del formulario y delega
 una sola vez el estado del encabezado. Así, salidas de material y de merma comparten las
@@ -318,11 +321,18 @@ varias pantallas, pero siguen perteneciendo a su recurso. Por ello viven en
 `pages/warehouse/materials` y `pages/warehouse/suppliers`. Las pantallas sin CRUD también
 respetan la jerarquía completa, por ejemplo `pages/admin/movements`,
 `pages/home/login` y `pages/home/index`; no quedan entry points sueltos en la raíz de un
-dominio. Las vistas EJS replican `views/pages/<dominio>/<recurso>`; sus partials
+dominio. La vista de acceso carga directamente `loginForm.js`: no mantiene un
+`loginPage.js` de un solo import porque no compone modal, DataTable u otro módulo.
+Recordar credenciales, validar y enviar autenticación son responsabilidades del
+formulario. Las vistas EJS replican `views/pages/<dominio>/<recurso>`; sus partials
 propietarios permanecen junto al recurso y los partials reutilizados por varios recursos
-se ubican en `views/shared`, como los formularios comunes de salidas. El entry point de cada CRUD sólo inicializa la tabla y carga su formulario,
-mientras el formulario y el modal
-conservan sus responsabilidades en módulos hermanos. Los flujos externos los importan desde el contexto propietario en vez de crear una carpeta
+se ubican en `views/shared`, como los formularios comunes de salidas. El entry point de cada CRUD sólo inicializa la tabla y carga su formulario.
+En particular, compras, salidas de material y salidas de merma mantienen
+`goodsReceiptsPage.js`, `goodsIssuesPage.js` y `wasteIssuesPage.js` como entry points
+delgados. Sus módulos `goodsReceiptForm.js`, `goodsIssueForm.js` y `wasteIssueForm.js` coordinan el envío, validación y captura de detalles
+(`addGoodsReceiptMaterial`, `addGoodsIssueMaterial` y `addWaste`), mientras sus módulos
+`goodsReceiptModal.js`, `goodsIssueModal.js` y `wasteIssueModal.js` preparan el modal y sus detalles. Formulario
+y modal conservan así responsabilidades distintas en módulos hermanos. Los flujos externos los importan desde el contexto propietario en vez de crear una carpeta
 intermedia basada sólo en que hay más de un consumidor. `ui` queda reservado para
 comportamiento que recibe su contexto por parámetros y no importa aplicaciones de un
 recurso concreto.

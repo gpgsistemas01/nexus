@@ -1,22 +1,21 @@
 import { DOM_EVENT_NAMES } from '../../../../constants/events.js';
 import { FORM_MODES } from '../../../../constants/formModes.js';
-import { openGoodsReceiptModal } from "../../../../pages/warehouse/goodsReceipts/goodsReceiptsPage.js";
 import { createDataTable } from '../../core/base/createDataTable.js';
 import { renderActionButtons } from '../../core/base/actionButtons.js';
 import { resetDataTable } from '../../core/base/tableOperations.js';
-import { getAllGoodsReceipts } from "../../../../application/warehouse/goodsReceipts/goodsReceipts.js";
-import { exportGoodsReceiptReport } from "../../../../application/warehouse/report.js";
+import { getAllGoodsReceipts } from '../../../../application/warehouse/goodsReceipts/goodsReceipts.js';
+import { exportGoodsReceiptReport } from '../../../../application/warehouse/report.js';
 import { buildDetailsColumns } from '../../shared/issues/detailBuilder/detailColumns.js';
 import { buildDetailsHeader } from '../../shared/issues/detailBuilder/detailHeader.js';
-import { removeDetail } from "../../../../utils/detailCollectionUtils.js";
+import { removeDetail } from '../../../../utils/detailCollectionUtils.js';
 import { getResponsiveRowData } from '../../core/responsive/rowData.js';
-import { buildExcelButton, buildTableExportParams } from "../../../../ui/tableUI.js";
-import { formatDateTimeDisplay, formatFileName } from "../../../../utils/formatters.js";
-import { setupTableFilters } from "../../core/filters/tableFilter.js";
-import { DATATABLE_SELECTORS } from "../../../../constants/selectors.js";
-import { GOODS_RECEIPT_STATUS_LABELS } from "../../../../constants/goodsReceiptStatuses.js";
-import { updateTotals } from "../../../../ui/forms/totalsSummaryUI.js";
-import { refreshMaterialTable } from "../../shared/inventory/renderMaterialDatatable.js";
+import { buildExcelButton, buildTableExportParams } from '../../../../ui/tableUI.js';
+import { formatDateTimeDisplay, formatFileName } from '../../../../utils/formatters.js';
+import { setupTableFilters } from '../../core/filters/tableFilter.js';
+import { DATATABLE_SELECTORS } from '../../../../constants/selectors.js';
+import { GOODS_RECEIPT_STATUS_LABELS } from '../../../../constants/goodsReceiptStatuses.js';
+import { updateTotals } from '../../../../ui/forms/totalsSummaryUI.js';
+import { refreshMaterialTable } from '../../shared/inventory/renderMaterialDatatable.js';
 
 export let details = [];
 let filters = {
@@ -25,7 +24,7 @@ let filters = {
 const selectorMaterialTable = DATATABLE_SELECTORS.MATERIAL;
 const selectorTable = DATATABLE_SELECTORS.MAIN;
 
-export const createGoodsReceiptDatatable = async () => {
+export const createGoodsReceiptDatatable = async ({ openGoodsReceiptModal }) => {
 
     let table;
     filters = await setupTableFilters({

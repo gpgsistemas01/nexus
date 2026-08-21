@@ -241,6 +241,22 @@ visuales particulares.
 
 ### Organización de módulos de una sola responsabilidad
 
+Los archivos con sufijo `Page` son entry points de composición. No registran `useForm`
+ni `useIssueForm`: cargan el módulo de formulario propietario y coordinan únicamente
+componentes de pantalla como tablas. El sufijo no se crea sólo para envolver un import:
+si una vista no tiene composición adicional, puede cargar directamente su módulo
+propietario. Por eso acceso referencia `loginForm.js` sin un `loginPage.js` intermediario.
+Las pantallas sin formulario, como inicio y movimientos, conservan en su entry point los
+efectos propios de la pantalla.
+
+Los módulos con sufijo `Fields` tampoco se replican por convención en cada recurso. Se
+crean cuando dos módulos hermanos del mismo contexto comparten grupos de nombres de
+campo por modo. Actualmente `materialFields.js` y `wasteFields.js` son contratos entre
+sus respectivos formularios y modales para alta, edición y ajuste de stock. Compras,
+salidas de material y salidas de merma conservan sus campos en su módulo propietario:
+no comparten listas de campos entre formulario y modal, y crear un archivo `Fields` para
+cada uno sólo agregaría una frontera sin contrato compartido.
+
 La cantidad de exports o de consumidores no determina por sí sola si un archivo debe
 fusionarse. Un módulo con un único método que encapsula la configuración de un CRUD
 conserva una frontera útil, pero se ubica en la carpeta de su recurso en lugar de quedar
@@ -267,9 +283,14 @@ efectos CRUD propios.
 La mutación en memoria de detalles no pertenece al plugin de DataTable: entradas,
 salidas de material y salidas de merma comparten `upsertDetail` y `removeDetail` desde
 `public/js/utils/detailCollectionUtils.js`. Las funciones sólo administran la colección
-y devuelven el detalle anterior o eliminado; cada contexto conserva en su página o
+y devuelven el detalle anterior o eliminado; cada contexto conserva en su formulario o
 DataTable los efectos que sí le pertenecen, como totales, limpieza del formulario y
-refresco visual. Así `detailDatatableUtils` deja de duplicar una parte del proceso de
+refresco visual. Por ello `addGoodsReceiptMaterial`, `addGoodsIssueMaterial` y `addWaste` no se
+fusionan: la compra valida costo, reemplaza por material y ajusta totales; la salida
+valida proveedor, conserva su costo máximo, convierte cantidades y usa la identidad
+material-proveedor; la salida de merma usa `wasteId` y datos de presentación propios.
+Los tres reutilizan las utilidades de colección, render y limpieza sin
+ocultar esas reglas tras callbacks de contexto. Así `detailDatatableUtils` deja de duplicar una parte del proceso de
 issues sin trasladar reglas de compras a una utilidad genérica.
 
 El mismo criterio se aplica al resto del proyecto: un archivo consumido una sola vez
@@ -394,10 +415,12 @@ del flujo relacionado.
 
 Las salidas de material y de merma son la referencia comprobable: ambas exponen listado,
 registro, edición, edición de encabezado, edición de detalles y devolución en ese orden.
-Sus páginas conservan además la misma secuencia de coordinación: construcción e
-inicialización de componentes, normalización del formulario, `useIssueForm`, apertura
-del modal, creación del DataTable, alta de un detalle, búsqueda del detalle y registro
-de eventos. El nombre concreto puede cambiar entre material y merma; su posición la
+Sus módulos de formulario conservan la normalización, validación, configuración de
+`useIssueForm` y operaciones de captura como `addGoodsIssueMaterial` o `addWaste`. En módulos
+hermanos distintos, los modales conservan la construcción e
+inicialización de componentes, apertura, alta y búsqueda de detalles, y registro de
+eventos. El entry point crea el DataTable e inyecta las acciones que abren el modal, sin
+concentrar nuevamente ninguno de los dos flujos. El nombre concreto puede cambiar entre material y merma; su posición la
 determina la responsabilidad equivalente, no el sustantivo del contexto.
 
 La prueba ubicada junto a las unitarias de sus controllers verifica esta secuencia entre
