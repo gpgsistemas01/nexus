@@ -50,12 +50,20 @@ describe('UI compartida de devolución del CRUD de salidas', () => {
 
       issueReturn.open({
         issue: { id: 'issue-1' },
-        detail: { id: 'detail-1', suppliedQuantity: 0.3, returnedQuantity: 0.2 }
+        detail: {
+          id: 'detail-1',
+          name: 'Lámina (2 × 3) · Proveedor Norte',
+          suppliedQuantity: 0.3,
+          returnedQuantity: 0.2
+        }
       });
 
       const availableSummary = document.querySelector.mock.results
         .find((_, index) => document.querySelector.mock.calls[index][0] === '#issueReturnAvailableQuantity').value;
+      const materialValue = document.querySelector.mock.results
+        .find((_, index) => document.querySelector.mock.calls[index][0] === '#issueReturnMaterialValue').value;
       expect(availableSummary.dataset.value).toBe('0.1');
+      expect(materialValue.textContent).toBe('Lámina (2 × 3) · Proveedor Norte');
       expect(form.dataset).toMatchObject({
         id: 'issue-1',
         detailId: 'detail-1',

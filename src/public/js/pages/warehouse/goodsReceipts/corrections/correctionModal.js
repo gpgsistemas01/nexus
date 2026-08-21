@@ -66,6 +66,7 @@ export const openGoodsReceiptCorrectionModal = ({ receipt, detail }) => {
     form.correctionDetail = detail;
     form.correctionReceipt = receipt;
     resetFormSubmitState(form);
+    document.querySelector('#correctionMaterialValue').textContent = detail.name;
     form.elements.quantity.value = detail.quantity;
     form.elements.costPerUnitType.value = detail.costPerUnitType;
     updateCorrectionTotalsSummary();

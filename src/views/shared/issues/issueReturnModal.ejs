@@ -29,6 +29,15 @@ const returnForm = {
             title: 'Devolución del detalle',
             groups: [
                 {
+                    type: 'html',
+                    content: include('../forms/informativeValue', {
+                        value: {
+                            id: 'issueReturnMaterialValue',
+                            label: 'Material a devolver'
+                        }
+                    })
+                },
+                {
                     type: 'inputs',
                     items: [
                         {
