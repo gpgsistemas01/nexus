@@ -1,4 +1,3 @@
-import { DOM_EVENT_NAMES } from '../../../constants/events.js';
 import { updateTotals } from "../../../ui/forms/totalsSummaryUI.js";
 import { toggleContainerElements } from "../../../utils/formUtils.js";
 import { refreshMaterialTable } from "../../datatable/shared/inventory/renderMaterialDatatable.js";
@@ -29,8 +28,6 @@ const clearMaterialSelection = () => {
             text: null
         }
     });
-
-    $(materialScopedSelector).val(null).trigger(DOM_EVENT_NAMES.CHANGE);
 };
 
 export const initGoodsReceiptFormSelect2 = () => {

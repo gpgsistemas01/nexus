@@ -6,6 +6,11 @@ const selectMocks = vi.hoisted(() => ({
   initSupplierMaterialSelect: vi.fn(),
   toggleSupplierMaterialOption: vi.fn(),
   setupSupplierSelect: vi.fn(),
+  toggleSupplierOption: vi.fn(),
+  setupMaterialSelect: vi.fn(),
+  toggleMaterialOption: vi.fn(),
+  initPersonSelect: vi.fn(),
+  togglePersonOption: vi.fn(),
   initUnitMeasureSelect: vi.fn(),
   setupWasteSelect: vi.fn(),
   toggleWasteOption: vi.fn(),
@@ -37,7 +42,15 @@ vi.mock('../../../../../../src/public/js/plugins/select2/domains/supplierMateria
 }));
 vi.mock('../../../../../../src/public/js/plugins/select2/domains/supplier.js', () => ({
   setupSupplierSelect: selectMocks.setupSupplierSelect,
-  toggleSupplierOption: vi.fn()
+  toggleSupplierOption: selectMocks.toggleSupplierOption
+}));
+vi.mock('../../../../../../src/public/js/plugins/select2/domains/material.js', () => ({
+  setupMaterialSelect: selectMocks.setupMaterialSelect,
+  toggleMaterialOption: selectMocks.toggleMaterialOption
+}));
+vi.mock('../../../../../../src/public/js/plugins/select2/domains/person.js', () => ({
+  initPersonSelect: selectMocks.initPersonSelect,
+  togglePersonOption: selectMocks.togglePersonOption
 }));
 vi.mock('../../../../../../src/public/js/plugins/select2/domains/unitMeasure.js', () => ({
   initUnitMeasureSelect: selectMocks.initUnitMeasureSelect,
@@ -50,8 +63,18 @@ vi.mock('../../../../../../src/public/js/plugins/select2/domains/waste.js', () =
 vi.mock('../../../../../../src/public/js/plugins/select2/modules/issueHeaderSelect.js', () => ({
   createIssueHeaderSelects: selectMocks.createIssueHeaderSelects
 }));
+vi.mock('../../../../../../src/public/js/plugins/select2/baseSelect.js', () => ({
+  bindDisabledSelectDependency: vi.fn()
+}));
+vi.mock('../../../../../../src/public/js/plugins/datatable/shared/inventory/renderMaterialDatatable.js', () => ({
+  refreshMaterialTable: vi.fn()
+}));
+vi.mock('../../../../../../src/public/js/plugins/datatable/warehouse/goodsReceipts/goodsReceiptDatatable.js', () => ({
+  details: []
+}));
 
 const { initMaterialFormSelect2 } = await import('../../../../../../src/public/js/plugins/select2/modules/materialSelect.js');
+const { setGoodsReceiptFormSelectOptions } = await import('../../../../../../src/public/js/plugins/select2/modules/goodsReceiptSelect.js');
 const { initWasteSelect2, setWasteSelectOptions } = await import('../../../../../../src/public/js/plugins/select2/modules/wasteSelect.js');
 const { getWasteIssueHeaderSelects } = await import('../../../../../../src/public/js/plugins/select2/modules/wasteIssueSelect.js');
 
@@ -87,6 +110,33 @@ describe('selects reutilizados en el CRUD de materiales', () => {
     expect(selectMocks.initUnitMeasureSelect).toHaveBeenCalledWith(expect.objectContaining({
       baseSelector: '#alternateMaterialModal #unitMeasureInput'
     }));
+  });
+});
+
+describe('selects del formulario del CRUD de entradas de compra', () => {
+  it('limpia el material una sola vez al preparar las opciones del encabezado', () => {
+    setGoodsReceiptFormSelectOptions({
+      supplierId: 'supplier-1',
+      supplierName: 'Proveedor Norte',
+      receivedById: 'person-1',
+      receivedByName: 'Persona Almacén'
+    });
+
+    expect(selectMocks.toggleSupplierOption).toHaveBeenCalledWith({
+      selector: '#goodsReceiptModal .supplier-select',
+      id: 'supplier-1',
+      name: 'Proveedor Norte'
+    });
+    expect(selectMocks.togglePersonOption).toHaveBeenCalledWith({
+      selector: '#goodsReceiptModal #receivedByInput',
+      id: 'person-1',
+      name: 'Persona Almacén'
+    });
+    expect(selectMocks.toggleMaterialOption).toHaveBeenCalledTimes(1);
+    expect(selectMocks.toggleMaterialOption).toHaveBeenCalledWith({
+      selector: '#goodsReceiptModal #materialInput',
+      data: { id: null, text: null }
+    });
   });
 });
 

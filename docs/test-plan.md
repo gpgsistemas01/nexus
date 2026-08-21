@@ -69,6 +69,9 @@ conserva las operaciones CRUD y aplica las claves de respuesta inyectadas.
 Los filtros CRUD se prueban junto a su plugin de datatable: un recurso remoto no debe
 precargar opciones si Select2 ya mapea su listado, salvo que exista una selección
 predeterminada explícita.
+La coordinación Select2 del CRUD de entradas de compra verifica que preparar el
+encabezado limpie una sola vez la selección dependiente de material, sin duplicar los
+eventos de cambio ni sus efectos derivados.
 La estructura de las pruebas refleja la del código propietario: las pruebas del núcleo
 de DataTable viven en `tests/unit/public/js/plugins/datatable/core` y sus filtros en la
 subcarpeta `filters`; una prueba específica de recurso debe replicar además dominio y
