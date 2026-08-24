@@ -109,11 +109,11 @@ las URL visibles; el acceso efectivo depende de los permisos calculados para la 
 El shell usa en todos los tamaños el mismo control de navegación del encabezado. Para
 que sea inmediatamente reconocible, ocupa la posición inicial convencional, conserva
 el icono de hamburguesa, muestra siempre la etiqueta «Menú principal» y emplea mayor
-contraste que las acciones secundarias. El control abre por encima del contenido un
-único offcanvas adaptable, con etiquetas completas, por lo que no resta anchura a
-tablas y formularios ni redimensiona la página. En anchos menores a `1200px` entra
-desde el lateral y mantiene una columna fácil de recorrer; a partir de ese ancho entra
-desde arriba y distribuye las opciones en tres columnas, o cuatro desde `1600px`, para
+contraste que las acciones secundarias. El control abre desde arriba y por encima del
+contenido un único offcanvas adaptable, con etiquetas completas, por lo que no resta
+anchura a tablas y formularios ni redimensiona la página. En anchos menores a
+`1200px` mantiene una columna fácil de recorrer; a partir de ese ancho distribuye las
+opciones en tres columnas, o cuatro desde `1600px`, para
 aprovechar el espacio horizontal sin estrechar cada opción ni convertir la navegación
 en una barra lateral permanente. Cada acceso de primer nivel forma un bloque visual y
 las categorías conservan sus opciones relacionadas dentro de ese bloque. Se mantiene

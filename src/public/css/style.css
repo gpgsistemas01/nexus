@@ -1992,13 +1992,14 @@ body section {
   background:
     radial-gradient(circle at 15% 0, rgba(var(--mdb-primary-rgb), 0.32), transparent 18rem),
     linear-gradient(160deg, var(--app-menu-panel), var(--mdb-dark) 75%);
-  border-inline-end: 1px solid var(--app-menu-border);
-  inline-size: min(22rem, 100vw);
+  block-size: auto;
+  border-block-end: 1px solid var(--app-menu-border);
+  inline-size: 100%;
   max-block-size: 100dvh;
 }
 
 .app-menu-offcanvas.show {
-  box-shadow: 1.25rem 0 3rem rgba(var(--mdb-dark-rgb), 0.35);
+  box-shadow: 0 1.25rem 3rem rgba(var(--mdb-dark-rgb), 0.35);
 }
 
 .app-menu-offcanvas .offcanvas-header,
@@ -2126,33 +2127,7 @@ body section {
   white-space: normal;
 }
 
-@media (min-width: 768px) {
-  .app-menu-offcanvas {
-    inline-size: min(26rem, 100vw);
-  }
-}
-
 @media (min-width: 1200px) {
-  .app-menu-offcanvas {
-    block-size: auto;
-    border-block-end: 1px solid var(--app-menu-border);
-    border-inline-end: 0;
-    bottom: auto;
-    inline-size: 100%;
-    max-block-size: 100dvh;
-    transform: translateY(-100%);
-  }
-
-  .app-menu-offcanvas.show,
-  .app-menu-offcanvas.showing {
-    box-shadow: 0 1.25rem 3rem rgba(var(--mdb-dark-rgb), 0.35);
-    transform: none;
-  }
-
-  .app-menu-offcanvas.hiding {
-    transform: translateY(-100%);
-  }
-
   .app-menu-offcanvas .offcanvas-body {
     padding-block-start: 0;
   }
