@@ -1992,10 +1992,9 @@ body section {
   background:
     radial-gradient(circle at 15% 0, rgba(var(--mdb-primary-rgb), 0.32), transparent 18rem),
     linear-gradient(160deg, var(--app-menu-panel), var(--mdb-dark) 75%);
-  block-size: auto;
+  block-size: 100dvh;
   border-block-end: 1px solid var(--app-menu-border);
   inline-size: 100%;
-  max-block-size: 100dvh;
 }
 
 .app-menu-offcanvas.show {
