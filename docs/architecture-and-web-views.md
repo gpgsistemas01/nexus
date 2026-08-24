@@ -106,6 +106,23 @@ sequenceDiagram
 Las líneas continuas representan navegación vigente. Las rutas entre paréntesis son
 las URL visibles; el acceso efectivo depende de los permisos calculados para la sesión.
 
+El shell usa en todos los tamaños el mismo control de navegación del encabezado. Para
+que sea inmediatamente reconocible, ocupa la posición inicial convencional, conserva
+el icono de hamburguesa, muestra siempre la etiqueta «Menú principal» y emplea mayor
+contraste que las acciones secundarias. El control abre por encima del contenido un
+único offcanvas con etiquetas completas, por lo que no resta anchura a tablas y
+formularios ni redimensiona la página. La interacción, el estado activo, los permisos
+y los submenús tienen una sola implementación tanto en escritorio como en móvil, y la
+capa superpuesta concentra la atención en la navegación.
+Durante la apertura, el activador sincroniza `aria-expanded` con los eventos de MDB.
+El panel identifica explícitamente su título como «Menú principal», expone la lista
+como navegación principal y conserva dentro del encabezado su control compartido de
+cierre. Así, la señal visual para abrir permanece siempre reconocible y las acciones de
+abrir y cerrar están disponibles en el contexto donde cada una se utiliza.
+La identidad se resuelve con un monograma tipográfico, fondos con profundidad y
+transiciones breves; no depende de una imagen adicional y respeta la preferencia del
+sistema para reducir movimiento.
+
 ```mermaid
 flowchart LR
     root["/ "] -->|"sin sesión"| login["Inicio de sesión<br/>/inicio-sesion"]

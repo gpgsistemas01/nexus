@@ -1,4 +1,4 @@
-import { DOM_EVENT_NAMES } from '../../constants/events.js';
+import { DOM_EVENT_NAMES, OFFCANVAS_EVENT_NAMES } from '../../constants/events.js';
 export const initMdbModal = (el) => window.mdb.Modal.getOrCreateInstance(el);
 
 export const showModal = (instance) => {
@@ -30,6 +30,7 @@ export const updateMdbWrapperInput = (instance) => {
 
 const tooltipDismissBoundElements = new WeakSet();
 const submenuDismissBoundRoots = new WeakSet();
+const offcanvasStateBoundTriggers = new WeakSet();
 
 export const initMdbTooltips = (root = document) => {
 
@@ -60,4 +61,25 @@ export const initMdbDismissibleSubmenus = (root = document) => {
     });
 
     submenuDismissBoundRoots.add(root);
+}
+
+export const initMdbOffcanvasTriggerStates = (root = document) => {
+
+    if (!root) return;
+
+    root.querySelectorAll('[data-mdb-offcanvas-init][aria-controls]').forEach((trigger) => {
+        if (offcanvasStateBoundTriggers.has(trigger)) return;
+
+        const offcanvas = trigger.ownerDocument.getElementById(trigger.getAttribute('aria-controls'));
+
+        if (!offcanvas) return;
+
+        offcanvas.addEventListener(OFFCANVAS_EVENT_NAMES.MDB_SHOW, () => {
+            trigger.setAttribute('aria-expanded', 'true');
+        });
+        offcanvas.addEventListener(OFFCANVAS_EVENT_NAMES.MDB_HIDE, () => {
+            trigger.setAttribute('aria-expanded', 'false');
+        });
+        offcanvasStateBoundTriggers.add(trigger);
+    });
 }
