@@ -481,7 +481,11 @@ no justifica reformatear archivos ajenos al cambio.
 
 - La indentación conserva la convención de su área: cuatro espacios en `src` y dos en
   las pruebas. Cada sentencia termina en punto y coma. Se evita una línea en blanco
-  inmediatamente después de abrir una función o bloque.
+  inmediatamente después de abrir una función o bloque y antes de cerrarlo. Dentro de
+  una función, una línea en blanco separa fases semánticas —preparación, validación,
+  transformación y efecto—, pero no separa una declaración de su uso inmediato ni cada
+  sentencia de un mismo paso. Entre funciones, constantes de nivel de módulo y grupos de
+  imports se usa una sola línea en blanco.
 - Una línea extensa se divide por unidades semánticas: parámetros, imports nombrados o
   condiciones. No se comprimen varias decisiones en una sola línea para ahorrar espacio.
 - Se prefieren retornos tempranos para errores y casos sin trabajo. El recorrido normal

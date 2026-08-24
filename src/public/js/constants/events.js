@@ -17,5 +17,7 @@ export const SELECT2_EVENT_NAMES = Object.freeze({
 
 export const MODAL_EVENT_NAMES = Object.freeze({
     MDB_SHOWN: 'shown.mdb.modal',
-    BOOTSTRAP_SHOWN: 'shown.bs.modal'
+    MDB_HIDDEN: 'hidden.mdb.modal',
+    BOOTSTRAP_SHOWN: 'shown.bs.modal',
+    BOOTSTRAP_HIDDEN: 'hidden.bs.modal'
 });

@@ -1,5 +1,5 @@
 import { useForm } from '../forms/formUI.js';
-import { initMdbModal, showModal, initMdbWrapperInput, updateMdbWrapperInput } from '../../plugins/mdb/baseInstance.js';
+import { initMdbModal, initMdbWrapperInput, updateMdbWrapperInput } from '../../plugins/mdb/baseInstance.js';
 import { notifications } from '../../plugins/swal/swalComponent.js';
 import { clearFormErrors } from '../forms/formErrorsUI.js';
 import { resetFormSubmitState } from '../forms/formStateUI.js';
@@ -7,6 +7,7 @@ import { setSummaryValue } from '../forms/totalsSummaryUI.js';
 import { formatDecimal, roundTo } from '../../utils/formatUtils.js';
 import { validateFields } from '../../utils/formUtils.js';
 import { issueReturnValidation } from '../../utils/validations/validators.js';
+import { openModal } from '../modalUI.js';
 
 export const createIssueReturn = ({ sendReturn }) => {
     const modalSelector = '#issueReturnModal';
@@ -64,7 +65,7 @@ export const createIssueReturn = ({ sendReturn }) => {
         form.dataset.availableQuantity = String(available);
         updateMdbWrapperInput(initMdbWrapperInput({ selector: '#issueReturnQuantityInput', value: '' }));
         updateMdbWrapperInput(initMdbWrapperInput({ selector: '#issueReturnObservationsInput', value: '' }));
-        showModal(initMdbModal(getModal()));
+        openModal(getModal());
     };
 
     return { initialize, open };

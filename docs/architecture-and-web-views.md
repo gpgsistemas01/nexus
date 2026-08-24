@@ -362,10 +362,17 @@ paralelo con `corrections` de compras; sus servicios de dominio se agrupan en
 que compras o salidas apliquen los datos y acciones propios de su contexto. Los modales
 secundarios de devolución de salida y corrección de compra reutilizan el diálogo
 desplazable compartido y el mismo helper de apertura MDB, sin reglas de altura propias
-que interfieran con el cálculo responsivo del componente. El layout declara
-`data-mdb-backdrop="true"` para que MDB genere consistentemente el fondo oscuro en todos
-los modales que lo reutilizan, sin repetir esa configuración en cada contexto CRUD. La
-coordinación propietaria
+que interfieran con el cálculo responsivo del componente. El layout conserva el backdrop
+habilitado de MDB y el diálogo principal a pantalla completa. Devoluciones y correcciones
+deben conservar visible ese contexto principal mientras presentan su diálogo `modal-lg`.
+El único helper `openModal` mantiene una pila para todos los diálogos abiertos: asigna a
+cada modal y a su backdrop el nivel que les corresponde y vuelve inertes todos salvo el
+superior. La misma regla admite dos o más niveles sin crear un flujo especial para cada
+modal secundario; al cerrar uno se recalcula la pila y se conservan abiertos los demás.
+Este apilamiento es una extensión de Nexus, no el flujo recomendado por MDB: la guía del
+componente muestra alternar entre diálogos. Se conserva la alternativa local porque el
+producto requiere mantener visibles varios contextos, y se aísla en `openModal` para no
+depender de detalles de MDB desde cada CRUD. La coordinación propietaria
 de corrección mantiene sólo el cálculo de totales que comparte entre la apertura y los
 eventos del formulario; la preparación usada una sola vez permanece en la apertura. La
 identidad visible del material seleccionado se presenta mediante el valor informativo
