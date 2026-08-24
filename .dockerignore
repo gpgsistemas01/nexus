@@ -21,5 +21,9 @@ vitestConfig.js
 coverage
 .vitest
 
+# Keep documentation in Git while excluding it only from the Docker build context
+README.md
+docs
+
 # Local OS files
 .DS_Store

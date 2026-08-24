@@ -251,7 +251,16 @@ npm test
 
 ## Docker
 
-El repositorio incluye `Dockerfile` y `docker-compose.yml`. Al iniciar el contenedor, el entrypoint ejecuta primero `prisma migrate deploy` y solamente arranca la aplicación si las migraciones terminan correctamente. El CLI de Prisma toma `DIRECT_URL` mediante `prisma.config.ts`; la aplicación continúa conectándose con `DATABASE_URL`.
+El repositorio incluye `Dockerfile` y `docker-compose.yml`. Al iniciar el contenedor,
+el entrypoint ejecuta primero `prisma migrate deploy` y solamente arranca la
+aplicación si las migraciones terminan correctamente. El CLI de Prisma toma
+`DIRECT_URL` mediante `prisma.config.ts`; la aplicación continúa conectándose con
+`DATABASE_URL`.
+
+La documentación (`README.md` y `docs/`) **se conserva y versiona en este
+repositorio**. Las reglas de `.dockerignore` únicamente la excluyen del contexto de
+construcción Docker para que no se envíe al servidor ni se incorpore a la imagen
+desplegada; no afectan los archivos registrados por Git.
 
 La selección no depende de que ambas URLs tengan nombres o hosts parecidos:
 
