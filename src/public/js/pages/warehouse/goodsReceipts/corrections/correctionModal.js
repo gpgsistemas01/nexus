@@ -1,8 +1,8 @@
 import { DOM_EVENT_NAMES } from '../../../../constants/events.js';
 import { FORM_SELECTORS, MODAL_SELECTORS } from '../../../../constants/selectors.js';
-import { initMdbModal, showModal } from "../../../../plugins/mdb/baseInstance.js";
 import { clearFormErrors } from "../../../../ui/forms/formErrorsUI.js";
 import { resetFormSubmitState } from "../../../../ui/forms/formStateUI.js";
+import { openModal } from '../../../../ui/modalUI.js';
 import { formatCurrency, formatDecimal, roundTo } from "../../../../utils/formatUtils.js";
 import { on } from "../../../../utils/domUtils.js";
 import { GOODS_RECEIPT_CORRECTION_APPLIED_EVENT, initGoodsReceiptCorrectionForm } from "./correctionForm.js";
@@ -70,7 +70,7 @@ export const openGoodsReceiptCorrectionModal = ({ receipt, detail }) => {
     form.elements.quantity.value = detail.quantity;
     form.elements.costPerUnitType.value = detail.costPerUnitType;
     updateCorrectionTotalsSummary();
-    showModal(initMdbModal(document.querySelector(CORRECTION_MODAL_SELECTOR)));
+    openModal(document.querySelector(CORRECTION_MODAL_SELECTOR));
 };
 
 export const initGoodsReceiptCorrection = () => {

@@ -1738,6 +1738,15 @@ textarea ~ div[data-error-for] {
   box-shadow: 0 1.25rem 3rem rgba(var(--mdb-secondary-rgb), 0.18);
 }
 
+/* Stack every open CRUD dialog and place each backdrop below its owning modal. */
+.modal {
+  z-index: calc(1055 + var(--app-modal-stack-level, 0) * 10);
+}
+
+.modal-backdrop {
+  z-index: calc(1050 + var(--app-modal-stack-level, 0) * 10);
+}
+
 .modal-fullscreen .modal-content {
   background:
     linear-gradient(180deg, rgba(var(--mdb-primary-rgb), 0.08) 0%, rgba(var(--mdb-primary-rgb), 0) 16rem),
