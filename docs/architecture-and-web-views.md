@@ -369,6 +369,10 @@ El único helper `openModal` mantiene una pila para todos los diálogos abiertos
 cada modal y a su backdrop el nivel que les corresponde y vuelve inertes todos salvo el
 superior. La misma regla admite dos o más niveles sin crear un flujo especial para cada
 modal secundario; al cerrar uno se recalcula la pila y se conservan abiertos los demás.
+El backdrop no pertenece al formulario ni se instancia en cada CRUD: MDB conserva su
+ciclo de vida y `openModal` asocia el elemento que MDB crea antes o durante el evento de
+apertura. Así se reutiliza una sola coordinación y se evita que una diferencia de tiempo
+en la creación del backdrop deje un nivel de la pila sin su profundidad visual.
 Este apilamiento es una extensión de Nexus, no el flujo recomendado por MDB: la guía del
 componente muestra alternar entre diálogos. Se conserva la alternativa local porque el
 producto requiere mantener visibles varios contextos, y se aísla en `openModal` para no
