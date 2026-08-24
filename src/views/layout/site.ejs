@@ -1,46 +1,32 @@
-<% const menuButton = {
-    id: 'mobileMenuOffcanvasBtn',
-    class: 'navbar-toggler p-2 app-header-action',
+<% const menuTriggerAttrs = {
+    'data-mdb-ripple-init': '',
+    'data-mdb-offcanvas-init': '',
+    'data-mdb-target': '#appMenu',
+    'aria-controls': 'appMenu',
+    'aria-expanded': 'false'
+};
+const menuButton = {
+    id: 'appMenuOffcanvasBtn',
+    class: 'navbar-toggler app-menu-trigger app-header-action',
     attrs: {
-        'data-mdb-ripple-init': '',
-        'data-mdb-offcanvas-init': '',
-        'data-mdb-target': '#mobileMenu',
-        'aria-controls': 'mobileMenu',
-        'aria-expanded': 'false'
+        ...menuTriggerAttrs,
+        'aria-label': 'Abrir menú principal'
     },
-    content: '<i class="fas fa-bars me-2"></i>Menú'
+    content: '<span class="app-menu-trigger__icon" aria-hidden="true"><i class="fas fa-bars"></i></span><span>Menú principal</span>'
 }; %>
 
 <div class="app-shell d-flex min-vh-100">
 
     <%- include('./sidebar/offcanvas') %>
 
-    <aside class="app-sidebar app-sidebar--icon-only d-none d-lg-block p-3" data-mdb-theme="dark">
-        <nav class="navbar navbar-expand-lg p-0">
-            <div class="container-fluid flex-column align-items-stretch gap-4">
-                <%- include('./ui/appBrand') %>
-
-                <div class="row g-0" role="navigation">
-                    <div class="col-12">
-                        <%- include('./ui/navList', {
-                            listClass: 'navbar-nav flex-column',
-                            showLabels: false,
-                            accordionId: 'appDesktopNavAccordion'
-                        }) %>
-                    </div>
-                </div>
-            </div>
-        </nav>
-    </aside>
-
     <div class="flex-fill d-flex flex-column">
         <header class="app-header navbar shadow-2 px-3 gap-2">
 
-            <%- include('./ui/appBrand', { className: 'app-brand--header d-flex d-lg-none' }) %>
-
-            <div class="d-lg-none">
+            <div>
                 <%- include('../shared/controls/button', { button: menuButton }) %>
             </div>
+
+            <%- include('./ui/appBrand', { className: 'app-brand--header d-flex' }) %>
 
             <div class="app-userbar d-flex align-items-center gap-2 gap-sm-3 ms-auto">
                 <span

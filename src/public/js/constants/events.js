@@ -19,3 +19,8 @@ export const MODAL_EVENT_NAMES = Object.freeze({
     MDB_SHOWN: 'shown.mdb.modal',
     BOOTSTRAP_SHOWN: 'shown.bs.modal'
 });
+
+export const OFFCANVAS_EVENT_NAMES = Object.freeze({
+    MDB_SHOW: 'show.mdb.offcanvas',
+    MDB_HIDE: 'hide.mdb.offcanvas'
+});
