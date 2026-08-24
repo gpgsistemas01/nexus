@@ -111,9 +111,10 @@ que sea inmediatamente reconocible, ocupa la posición inicial convencional, con
 el icono de hamburguesa, muestra siempre la etiqueta «Menú principal» y emplea mayor
 contraste que las acciones secundarias. El control abre desde arriba y por encima del
 contenido un único offcanvas adaptable, con etiquetas completas, por lo que no resta
-anchura a tablas y formularios ni redimensiona la página. El panel cubre el alto
-dinámico completo de la ventana y mantiene el desplazamiento vertical dentro de su
-cuerpo, de modo que el fondo no queda expuesto aunque aumente el espacio disponible.
+anchura a tablas y formularios ni redimensiona la página. El panel se ancla a los
+cuatro bordes de la ventana, sin depender de una unidad de alto del navegador, y
+mantiene el desplazamiento vertical dentro de su cuerpo; así ocupa toda el área
+visible y el fondo no queda expuesto aunque cambien el tamaño o la orientación.
 En anchos menores a `1200px` mantiene una columna fácil de recorrer; a partir de ese
 ancho distribuye las opciones en tres columnas, o cuatro desde `1600px`, para
 aprovechar el espacio horizontal sin estrechar cada opción ni convertir la navegación
