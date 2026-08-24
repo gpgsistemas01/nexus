@@ -248,6 +248,12 @@ destacado, escala tipográfica adaptable y márgenes normalizados. Los contextos
 sólo actualizan el contenido del título y no deben agregar estilos en línea ni clases
 visuales particulares.
 
+El backdrop también es una responsabilidad transversal del modal, no de cada
+formulario. Los CRUD abren sus diálogos exclusivamente mediante `openModal`; el helper
+común registra el modal en la pila, asocia el backdrop creado por MDB y vuelve a intentar
+la asociación al completarse la apertura para admitir tanto creación síncrona como
+diferida. Ningún formulario debe crear, buscar, elevar o eliminar backdrops por su cuenta.
+
 ### Organización de módulos de una sola responsabilidad
 
 Los archivos con sufijo `Page` son entry points de composición. No registran `useForm`
