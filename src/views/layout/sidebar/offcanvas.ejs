@@ -26,7 +26,15 @@
     </div>
 
     <div class="offcanvas-body d-flex flex-column">
-        <nav class="app-menu-offcanvas__nav" aria-label="Navegación principal">
+        <nav
+            class="app-menu-offcanvas__nav"
+            aria-label="Navegación principal"
+            aria-describedby="appMenuDescription"
+        >
+            <p id="appMenuDescription" class="visually-hidden">
+                Selecciona un área para consultar sus opciones.
+            </p>
+
             <div class="row g-0">
                 <div class="col-12">
                     <%- include('../ui/navList', {

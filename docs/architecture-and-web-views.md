@@ -110,15 +110,25 @@ El shell usa en todos los tamaños el mismo control de navegación del encabezad
 que sea inmediatamente reconocible, ocupa la posición inicial convencional, conserva
 el icono de hamburguesa, muestra siempre la etiqueta «Menú principal» y emplea mayor
 contraste que las acciones secundarias. El control abre por encima del contenido un
-único offcanvas con etiquetas completas, por lo que no resta anchura a tablas y
-formularios ni redimensiona la página. La interacción, el estado activo, los permisos
-y los submenús tienen una sola implementación tanto en escritorio como en móvil, y la
-capa superpuesta concentra la atención en la navegación.
+único offcanvas adaptable, con etiquetas completas, por lo que no resta anchura a
+tablas y formularios ni redimensiona la página. En anchos menores a `1200px` entra
+desde el lateral y mantiene una columna fácil de recorrer; a partir de ese ancho entra
+desde arriba y distribuye las opciones en tres columnas, o cuatro desde `1600px`, para
+aprovechar el espacio horizontal sin estrechar cada opción ni convertir la navegación
+en una barra lateral permanente. Cada acceso de primer nivel forma un bloque visual y
+las categorías conservan sus opciones relacionadas dentro de ese bloque. Se mantiene
+una única lista semántica y el partial compartido `navList`: las columnas son una
+adaptación de presentación, no listas paralelas que puedan divergir en permisos,
+estado activo o destinos. La interacción, el estado activo, los permisos y los
+submenús conservan una sola implementación en todos los tamaños, y la capa superpuesta
+concentra la atención en la navegación.
 Durante la apertura, el activador sincroniza `aria-expanded` con los eventos de MDB.
 El panel identifica explícitamente su título como «Menú principal», expone la lista
-como navegación principal y conserva dentro del encabezado su control compartido de
-cierre. Así, la señal visual para abrir permanece siempre reconocible y las acciones de
-abrir y cerrar están disponibles en el contexto donde cada una se utiliza.
+como navegación principal, aporta una instrucción no visible asociada mediante
+`aria-describedby` y conserva dentro del encabezado su control compartido de cierre.
+Así, la señal visual para abrir permanece siempre reconocible, la interfaz evita texto
+explicativo redundante y las acciones de abrir y cerrar están disponibles en el
+contexto donde cada una se utiliza.
 La identidad se resuelve con un monograma tipográfico, fondos con profundidad y
 transiciones breves; no depende de una imagen adicional y respeta la preferencia del
 sistema para reducir movimiento.
