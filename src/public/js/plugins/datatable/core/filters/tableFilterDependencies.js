@@ -1,24 +1,11 @@
 import { DOM_EVENT_NAMES } from '../../../../constants/events.js';
 import { FILTER_SELECTORS } from "../../../../constants/selectors.js";
-import { toggleDisabledElement } from "../../../../utils/formUtils.js";
-import { bindDisabledControlWarning, setDisabledControlWarning } from "../../../../ui/disabledControlWarning.js";
-
-const dependencyEvent = 'change.tableFilterDependency';
-const select2DisabledWarningConfig = {
-    eventTargetSelector: '.select2-container',
-    eventNamespace: 'select2DisabledWarning',
-    resolveControl: (container) => {
-        const select = container?.previousElementSibling;
-
-        return select?.tagName === 'SELECT' ? select : null;
-    }
-};
-
-bindDisabledControlWarning(select2DisabledWarningConfig);
+import { bindDisabledSelectDependency } from "../../../select2/baseSelect.js";
 
 
 const DEPENDENT_FILTER_MESSAGES = {
     materialRequiresSupplier: 'Seleccione un proveedor antes de filtrar por material.',
+    wasteRequiresSupplier: 'Seleccione un proveedor antes de filtrar por merma.',
     personRequiresDepartment: 'Seleccione un área antes de filtrar por persona.'
 };
 
@@ -28,65 +15,30 @@ const clearSelectFilter = (selector) => {
 };
 
 
-const bindDisabledFilterDependency = ({
-    sourceSelector,
-    targetSelector,
-    clearTarget = () => {},
-    isDisabled = (value) => !value,
-    disabledMessage = null
-}) => {
+const getSupplierInventoryFilterDependency = (filter) => {
 
-    const $source = $(sourceSelector);
-    const targetElement = document.querySelector(targetSelector);
+    if (filter?.dependsOn !== 'supplierId' || !['materialId', 'wasteId'].includes(filter.key)) return null;
 
-    if (!$source.length || !targetElement) return;
-
-    const getDisabledState = (value) => isDisabled(value);
-
-    setDisabledControlWarning({
-        element: targetElement,
-        message: disabledMessage
-    });
-
-    toggleDisabledElement({
-        element: targetElement,
-        isDisabled: getDisabledState($source.val())
-    });
-
-    $source
-        .off(dependencyEvent)
-        .on(dependencyEvent, () => {
-
-            const value = $source.val();
-            const disabled = getDisabledState(value);
-
-            clearTarget({
-                value,
-                source: $source,
-                targetElement,
-                isDisabled: disabled
-            });
-
-            toggleDisabledElement({
-                element: targetElement,
-                isDisabled: disabled
-            });
-        });
+    return {
+        sourceSelector: FILTER_SELECTORS.SUPPLIER,
+        targetSelector: filter.selector,
+        clearTarget: () => clearSelectFilter(filter.selector),
+        disabledMessage: filter.key === 'wasteId'
+            ? DEPENDENT_FILTER_MESSAGES.wasteRequiresSupplier
+            : DEPENDENT_FILTER_MESSAGES.materialRequiresSupplier
+    };
 };
 
-const bindSupplierMaterialFilterDependency = () => {
+const bindSupplierInventoryFilterDependency = (filter) => {
 
-    bindDisabledFilterDependency({
-        sourceSelector: FILTER_SELECTORS.SUPPLIER,
-        targetSelector: FILTER_SELECTORS.MATERIAL,
-        clearTarget: () => clearSelectFilter(FILTER_SELECTORS.MATERIAL),
-        disabledMessage: DEPENDENT_FILTER_MESSAGES.materialRequiresSupplier
-    });
+    const dependency = getSupplierInventoryFilterDependency(filter);
+
+    if (dependency) bindDisabledSelectDependency(dependency);
 };
 
 const bindDepartmentPersonFilterDependency = () => {
 
-    bindDisabledFilterDependency({
+    bindDisabledSelectDependency({
         sourceSelector: FILTER_SELECTORS.DEPARTMENT,
         targetSelector: FILTER_SELECTORS.PERSON,
         clearTarget: () => clearSelectFilter(FILTER_SELECTORS.PERSON),
@@ -96,9 +48,11 @@ const bindDepartmentPersonFilterDependency = () => {
 
 export const bindTableFilterDependencies = (filters = []) => {
 
-    if (filters.some(({ key, dependsOn }) => dependsOn === 'supplierId' && ['materialId', 'wasteId'].includes(key))) {
-        bindSupplierMaterialFilterDependency();
-    }
+    const supplierInventoryFilter = filters.find(({ key, dependsOn }) => (
+        dependsOn === 'supplierId' && ['materialId', 'wasteId'].includes(key)
+    ));
+
+    if (supplierInventoryFilter) bindSupplierInventoryFilterDependency(supplierInventoryFilter);
 
     if (filters.some(({ key, dependsOn }) => key === 'personId' && dependsOn === 'departmentId')) {
         bindDepartmentPersonFilterDependency();
