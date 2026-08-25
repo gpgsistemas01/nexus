@@ -14,8 +14,7 @@ import {
   mapIssueDetailToTable,
   mapSelectMaterialData,
   mapSelectWasteData,
-  mapSelectWasteMaterialTemplateData,
-  normalizeWasteMaterialTemplateOption
+  mapSelectWasteMaterialTemplateData
 } from '../../../src/public/js/utils/warehouseInventoryUtils.js';
 
 describe('select de material reutilizado por el CRUD de merma', () => {
@@ -118,10 +117,7 @@ describe('select de material reutilizado por el CRUD de merma', () => {
       id: 'material-1',
       text: 'Lona (1.52 × 50)'
     }));
-    expect(option).not.toHaveProperty('template');
-    expect(JSON.parse(option.presentation)).toEqual(material.presentation);
-    expect(JSON.parse(option.unitMeasure)).toEqual(material.unitMeasure);
-    expect(normalizeWasteMaterialTemplateOption(option)).toEqual(expect.objectContaining({
+    expect(option).toEqual(expect.objectContaining({
       presentation: material.presentation,
       unitMeasure: material.unitMeasure
     }));

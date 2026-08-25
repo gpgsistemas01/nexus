@@ -81,19 +81,7 @@ export const mapSelectWasteData = (waste = {}) => ({
 
 export const mapSelectWasteMaterialTemplateData = (material = {}) => ({
     ...material,
-    text: buildInventorySelectText(material),
-    presentation: JSON.stringify(material.presentation ?? {}),
-    unitMeasure: JSON.stringify(material.unitMeasure ?? {})
-});
-
-const parseSelectRelation = value => typeof value === 'string'
-    ? JSON.parse(value || '{}')
-    : value ?? {};
-
-export const normalizeWasteMaterialTemplateOption = (data = {}) => ({
-    ...data,
-    presentation: parseSelectRelation(data.presentation),
-    unitMeasure: parseSelectRelation(data.unitMeasure)
+    text: buildInventorySelectText(material)
 });
 
 const mapIssueQuantities = (detail = {}) => ({
