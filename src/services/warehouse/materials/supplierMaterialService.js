@@ -60,15 +60,23 @@ const SUPPLIER_MATERIAL_STOCK_MOVEMENT_SELECT = {
     }
 };
 
-const MATERIAL_USAGE_FILTERS = [
-    { goodsReceiptDetails: { some: {} } },
-    { goodsIssueDetails: { some: {} } },
-    { purchaseRequisitionsDetails: { some: {} } },
-    { movementDetails: { some: {} } },
-    { stockAdjustmentDetails: { some: {} } },
-    { previousGoodsReceiptDetailChanges: { some: {} } },
-    { correctedGoodsReceiptDetailChanges: { some: {} } }
+const MATERIAL_USAGE_RELATIONS = [
+    'goodsReceiptDetails',
+    'goodsIssueDetails',
+    'purchaseRequisitionsDetails',
+    'movementDetails',
+    'stockAdjustmentDetails',
+    'previousGoodsReceiptDetailChanges',
+    'correctedGoodsReceiptDetailChanges'
 ];
+
+const buildMaterialUsageFilters = () => MATERIAL_USAGE_RELATIONS.map(relation => ({
+    [relation]: { some: {} }
+}));
+
+const buildUnusedMaterialFilters = () => MATERIAL_USAGE_RELATIONS.map(relation => ({
+    [relation]: { none: {} }
+}));
 
 export const findSupplierMaterialsForStockMovement = async ({
     tx,
@@ -121,7 +129,7 @@ const findDeletableMaterialIds = async ({ db, materialIds }) => {
     const materials = await db.material.findMany({
         where: {
             id: { in: materialIds },
-            NOT: { OR: MATERIAL_USAGE_FILTERS }
+            AND: buildUnusedMaterialFilters()
         },
         select: { id: true }
     });
@@ -133,7 +141,7 @@ export const existsMaterialUsage = async ({ tx, materialId }) => Boolean(
     await getDb(tx).material.findFirst({
         where: {
             id: materialId,
-            OR: MATERIAL_USAGE_FILTERS
+            OR: buildMaterialUsageFilters()
         },
         select: { id: true }
     })
