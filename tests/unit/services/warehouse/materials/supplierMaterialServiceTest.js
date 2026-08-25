@@ -37,16 +37,15 @@ describe('listado del CRUD de materiales', () => {
     expect(materialFindMany).toHaveBeenCalledWith({
       where: expect.objectContaining({
         id: { in: ['material-1'] },
-        NOT: {
-          OR: expect.arrayContaining([
-            { goodsReceiptDetails: { some: {} } },
-            { correctedGoodsReceiptDetailChanges: { some: {} } }
-          ])
-        }
+        AND: expect.arrayContaining([
+          { goodsReceiptDetails: { none: {} } },
+          { correctedGoodsReceiptDetailChanges: { none: {} } }
+        ])
       }),
       select: { id: true }
     });
     expect(materialFindMany.mock.calls[0][0].where).not.toHaveProperty('supplierMaterials');
+    expect(materialFindMany.mock.calls[0][0].where).not.toHaveProperty('NOT');
     expect(result.data[0].canDelete).toBe(true);
   });
 
