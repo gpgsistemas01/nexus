@@ -8,13 +8,13 @@ import { createWasteMovement } from './wasteMovementService.js';
 const calculateWasteStockAdjustmentValues = ({
     waste,
     newStock,
-    previousStock = Number(toNumber(waste.currentStock) || 0),
-    previousConvertedQuantity = Number(toNumber(waste.convertedQuantity) || 0)
+    previousStock = toNumber(waste.currentStock) || 0,
+    previousConvertedQuantity = toNumber(waste.convertedQuantity) || 0
 }) => {
-    const adjustedPreviousStock = normalizeDecimal(Number(toNumber(previousStock) || 0));
-    const adjustedNewStock = normalizeDecimal(Number(toNumber(newStock) || 0));
+    const adjustedPreviousStock = normalizeDecimal(toNumber(previousStock) || 0);
+    const adjustedNewStock = normalizeDecimal(toNumber(newStock) || 0);
     const difference = normalizeDecimal(adjustedNewStock - adjustedPreviousStock);
-    const adjustedPreviousConvertedQuantity = normalizeDecimal(Number(toNumber(previousConvertedQuantity) || 0));
+    const adjustedPreviousConvertedQuantity = normalizeDecimal(toNumber(previousConvertedQuantity) || 0);
     const newConvertedQuantity = normalizeDecimal(calculateConvertedQuantity({
         currentStock: adjustedNewStock,
         base: waste.base,
@@ -25,10 +25,9 @@ const calculateWasteStockAdjustmentValues = ({
     assertSufficientStock({
         material: {
             id: waste.id,
-            name: waste.supplierMaterial?.material?.name,
-            materialId: waste.supplierMaterial?.materialId,
-            supplierId: waste.supplierMaterial?.supplierId,
-            supplier: waste.supplierMaterial?.supplier,
+            name: waste.name,
+            supplierId: waste.supplierId,
+            supplier: waste.supplier,
             base: waste.base,
             height: waste.height
         },
@@ -91,7 +90,7 @@ export const registerWasteStockAdjustment = async ({
                 details: {
                     create: {
                         waste: { connect: { id: wasteId } },
-                        materialName: waste.supplierMaterial?.material?.name || '',
+                        materialName: waste.name,
                         previousStock: values.previousStock,
                         newStock: values.newStock,
                         difference: values.difference,

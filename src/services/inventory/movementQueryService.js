@@ -75,14 +75,10 @@ const WASTE_MOVEMENT_DETAIL_SELECT = {
     newStock: true,
     waste: {
         select: {
+            name: true,
             base: true,
             height: true,
-            supplierMaterial: {
-                select: {
-                    material: { select: { name: true } },
-                    supplier: { select: { tradeName: true } }
-                }
-            }
+            supplier: { select: { tradeName: true } }
         }
     },
     wasteIssueReturn: { select: { id: true } },
@@ -253,10 +249,10 @@ const mapWasteMovementDetail = (detail) => ({
         detail.movement.wasteIssue?.referenceNumber ||
         detail.movement.wasteStockAdjustment?.referenceNumber ||
         detail.movement.referenceNumber,
-    materialName: detail.waste.supplierMaterial.material.name,
+    materialName: detail.waste.name,
     materialBase: detail.waste.base,
     materialHeight: detail.waste.height,
-    supplierName: detail.waste.supplierMaterial.supplier.tradeName,
+    supplierName: detail.waste.supplier.tradeName,
     previousStock: detail.previousStock,
     quantity: detail.quantity,
     newStock: detail.newStock
@@ -264,8 +260,8 @@ const mapWasteMovementDetail = (detail) => ({
 
 const getWasteMovementSearchFilter = (search) => !search ? {} : ({
     OR: [
-        { waste: { supplierMaterial: { material: { name: { contains: search, mode: 'insensitive' } } } } },
-        { waste: { supplierMaterial: { supplier: { tradeName: { contains: search, mode: 'insensitive' } } } } },
+        { waste: { name: { contains: search, mode: 'insensitive' } } },
+        { waste: { supplier: { tradeName: { contains: search, mode: 'insensitive' } } } },
         { movement: { referenceNumber: { contains: search, mode: 'insensitive' } } },
         { movement: { wasteIssue: { referenceNumber: { contains: search, mode: 'insensitive' } } } },
         { movement: { wasteStockAdjustment: { referenceNumber: { contains: search, mode: 'insensitive' } } } }
@@ -368,7 +364,7 @@ export const findAllWasteMovements = async ({
     endDate = '',
     movementType = '',
     search = '',
-    materialId = '',
+    wasteId = '',
     supplierId = '',
     orderBy = 'date',
     orderDir = 'desc'
@@ -378,8 +374,8 @@ export const findAllWasteMovements = async ({
     try {
         const isReturnMovementFilter = movementType === RETURN_MOVEMENT_TYPE;
         const where = {
-            ...(materialId && { waste: { supplierMaterial: { materialId } } }),
-            ...(supplierId && { waste: { supplierMaterial: { supplierId } } }),
+            ...(wasteId && { wasteId }),
+            ...(supplierId && { waste: { supplierId } }),
             ...(isReturnMovementFilter && { wasteIssueReturn: { isNot: null } }),
             ...(movementType === 'ENTRY' && { wasteIssueReturn: { is: null } }),
             ...getWasteMovementSearchFilter(search),

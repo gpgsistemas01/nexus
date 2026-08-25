@@ -1,13 +1,11 @@
-import { SELECT2_EVENT_NAMES } from '../../../constants/events.js';
 import { getAllWastes } from "../../../application/warehouse/wastes/wastes.js";
 import { mapSelectWasteData } from "../../../utils/warehouseInventoryUtils.js";
-import { buildPaginatedSelectParams, initDomainSelect2, toggleSelectOption, updatePresentationDisplay } from "../baseSelect.js";
+import { buildPaginatedSelectParams, initDomainSelect2, toggleSelectOption } from "../baseSelect.js";
 
 const initWasteSelect = ({
     modalSelector,
     supplierSelector,
-    baseSelector,
-    resultsLimit = null
+    baseSelector
 }) => initDomainSelect2({
     selector: baseSelector,
     containerSelector: modalSelector,
@@ -25,27 +23,6 @@ const initWasteSelect = ({
     newTagLabel: 'Nueva merma'
 });
 
-const attachWasteHandler = ({
-    modalSelector,
-    baseSelector,
-    supplierSelector,
-    creationContext
-}) => {
-
-    $(baseSelector).off(SELECT2_EVENT_NAMES.SELECT).on(SELECT2_EVENT_NAMES.SELECT, (e) => {
-
-        const { data } = e.params;
-        const supplierMaterial = JSON.parse(data.supplierMaterial);
-
-        updatePresentationDisplay({
-            modalSelector,
-            data,
-            presentation: supplierMaterial.material.presentation,
-            option: e.target.querySelector('option:checked')
-        });
-    });
-};
-
 export const toggleWasteOption = ({
     selector,
     data
@@ -57,9 +34,7 @@ export const toggleWasteOption = ({
 export const setupWasteSelect = ({
     modalSelector,
     supplierSelector = null,
-    wasteSelector,
-    allowCreate = true,
-    creationContext = null
+    wasteSelector
 }) => {
 
     const baseSelector = `${ modalSelector } ${ wasteSelector }`;
@@ -67,14 +42,7 @@ export const setupWasteSelect = ({
     initWasteSelect({
         modalSelector,
         supplierSelector,
-        baseSelector,
-        allowCreate
+        baseSelector
     });
 
-    attachWasteHandler({
-        modalSelector,
-        baseSelector,
-        supplierSelector,
-        creationContext
-    });
 };

@@ -21,8 +21,7 @@ export const getWasteIssueHeaderSelects = () => ({
         headerSelects.init();
         setupWasteSelect({
             modalSelector,
-            wasteSelector: SELECT_SELECTORS.WASTE,
-            allowCreate: false
+            wasteSelector: SELECT_SELECTORS.WASTE
         });
     },
     setOptions: (data) => {

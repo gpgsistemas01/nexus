@@ -7,7 +7,7 @@ const wasteFindUnique = vi.fn();
 const wasteUpdate = vi.fn();
 const wasteStockAdjustmentCreate = vi.fn();
 const wasteStockAdjustmentUpdate = vi.fn();
-const findSupplierMaterialById = vi.fn();
+const resolveWasteMaterialSnapshot = vi.fn();
 const findInitialStockAdjustmentReason = vi.fn();
 const generateYearlyReferenceNumber = vi.fn();
 const throwIfReferenceNumberAlreadyExists = vi.fn();
@@ -26,8 +26,8 @@ vi.mock('../../../../../src/repository/baseRepository.js', () => ({
   })
 }));
 
-vi.mock('../../../../../src/services/warehouse/materials/supplierMaterialService.js', () => ({
-  findSupplierMaterialById
+vi.mock('../../../../../src/services/warehouse/wastes/wasteMaterialService.js', () => ({
+  resolveWasteMaterialSnapshot
 }));
 
 vi.mock('../../../../../src/services/warehouse/reasonService.js', () => ({
@@ -61,6 +61,8 @@ const createResponse = () => {
 const createWaste = (overrides = {}) => ({
   id: 'waste-1',
   supplierMaterialId: 'supplier-material-1',
+  supplierId: 'supplier-1',
+  name: 'Lámina',
   base: 2,
   height: 3,
   minStock: 0,
@@ -112,7 +114,13 @@ describe('wasteController complete flow', () => {
     wasteUpdate.mockResolvedValue(createWaste({ currentStock: 7, convertedQuantity: 42 }));
     wasteStockAdjustmentCreate.mockResolvedValue({ id: 'adjustment-1', details: [{ id: 'detail-1' }] });
     wasteStockAdjustmentUpdate.mockResolvedValue({ id: 'adjustment-1', details: [{ id: 'detail-1' }], movement: { id: 'movement-1' } });
-    findSupplierMaterialById.mockResolvedValue({ id: 'supplier-material-1' });
+    resolveWasteMaterialSnapshot.mockResolvedValue({
+      id: 'material-1',
+      name: 'Lámina',
+      presentation: { id: 'presentation-1', name: 'ROLLO' },
+      unitMeasure: { id: 'unit-measure-1', name: 'Metro cuadrado', symbol: 'm²' },
+      maxUnitCost: 18.5
+    });
     findInitialStockAdjustmentReason.mockResolvedValue({ id: 'initial-reason-1' });
     generateYearlyReferenceNumber.mockResolvedValue('AJU-MER-2026-000001');
     createWasteMovement.mockResolvedValue({ id: 'movement-1' });
@@ -121,9 +129,11 @@ describe('wasteController complete flow', () => {
   it('crea merma desde controller calculando stock convertido inicial y registrando ajuste inicial', async () => {
     const req = {
       body: {
-        supplierMaterialId: 'supplier-material-1',
+        materialId: 'material-1',
+        supplierId: 'supplier-1',
         base: '2',
         height: '3',
+        maxUnitCost: '18.5',
         newStock: '5',
         observations: '  Stock inicial  ',
         reasonId: 'client-reason-id'
@@ -141,6 +151,9 @@ describe('wasteController complete flow', () => {
     expect(wasteCreate).toHaveBeenCalledWith(expect.objectContaining({
       data: expect.objectContaining({
         currentStock: 5,
+        maxUnitCost: 18.5,
+        presentation: { connect: { id: 'presentation-1' } },
+        unitMeasure: { connect: { id: 'unit-measure-1' } },
         convertedQuantity: 30
       })
     }));
@@ -166,6 +179,7 @@ describe('wasteController complete flow', () => {
       params: { id: 'waste-1' },
       body: {
         minStock: '4',
+        maxUnitCost: '22.5',
         isActive: false,
         newStock: '99'
       }
@@ -176,7 +190,7 @@ describe('wasteController complete flow', () => {
 
     expect(wasteUpdate).toHaveBeenCalledWith(expect.objectContaining({
       where: { id: 'waste-1' },
-      data: { minStock: 4, isActive: false }
+      data: { minStock: 4, maxUnitCost: 22.5, isActive: false }
     }));
     expect(wasteUpdate.mock.calls[0][0].data).not.toHaveProperty('currentStock');
     expect(wasteUpdate.mock.calls[0][0].data).not.toHaveProperty('newStock');
@@ -247,7 +261,8 @@ describe('wasteController complete flow', () => {
 
     const req = {
       body: {
-        supplierMaterialId: 'supplier-material-1',
+        materialId: 'material-1',
+        supplierId: 'supplier-1',
         base: '',
         height: '',
         newStock: '0'

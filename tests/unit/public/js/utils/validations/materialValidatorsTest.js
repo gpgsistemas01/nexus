@@ -14,6 +14,7 @@ describe('validadores del CRUD de materiales', () => {
       'name',
       'supplierId',
       'minStock',
+      'isActive',
       'maxUnitCost'
     ]);
     expect(materialValidation).toMatchObject(materialEditValidation);

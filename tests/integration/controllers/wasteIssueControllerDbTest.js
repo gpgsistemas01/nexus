@@ -74,7 +74,19 @@ describe('waste issue controller database integration', () => {
     const supplierMaterial = await prisma.supplierMaterial.create({
       data: { materialId: material.id, supplierId: supplier.id, maxUnitCost: 25 }
     });
-    const waste = await prisma.waste.create({ data: { supplierMaterialId: supplierMaterial.id, currentStock: 10, convertedQuantity: 10 } });
+    const waste = await prisma.waste.create({
+      data: {
+        name: material.name,
+        supplierId: supplier.id,
+        presentationId: presentation.id,
+        unitMeasureId: unit.id,
+        base: 1,
+        height: 1,
+        maxUnitCost: 25,
+        currentStock: 10,
+        convertedQuantity: 10
+      }
+    });
     const user = await prisma.user.create({ data: { name: `ITWasteIssueUser${ suffix }`, password: 'integration-only' } });
     const department = await prisma.department.create({ data: { name: `IT Waste Issue Area ${ suffix }` } });
     const requester = await prisma.person.create({ data: { fullName: `IT Waste Issue Requester ${ suffix }` } });
@@ -195,7 +207,7 @@ describe('waste issue controller database integration', () => {
 
     const listedMovements = await request(app)
       .get('/waste-movements')
-      .query({ start: 0, length: 10, materialId: ids.material, movementType: 'ISSUE' })
+      .query({ start: 0, length: 10, wasteId: ids.waste, movementType: 'ISSUE' })
       .expect(200);
     expect(listedMovements.body.data).toContainEqual(expect.objectContaining({
       id: movement.details[0].id,
