@@ -35,15 +35,15 @@ export const resolveWasteMaterialSnapshot = async ({ tx = null, materialId }) =>
             supplierMaterials: { select: { maxUnitCost: true } }
         }
     });
-    const maxUnitCost = matchingMaterials
-        .filter(candidate => getMaterialIdentityWidth(candidate) === identityWidth)
-        .reduce((highest, candidate) => {
-            const candidateCost = getHighestUnitCost(candidate.supplierMaterials);
+    const maxUnitCost = matchingMaterials.reduce((highest, candidate) => {
+        if (getMaterialIdentityWidth(candidate) !== identityWidth) return highest;
 
-            return candidateCost == null
-                ? highest
-                : Math.max(highest ?? candidateCost, candidateCost);
-        }, null);
+        const candidateCost = getHighestUnitCost(candidate.supplierMaterials);
+
+        return candidateCost == null
+            ? highest
+            : Math.max(highest ?? candidateCost, candidateCost);
+    }, null);
 
     return { ...material, maxUnitCost };
 };

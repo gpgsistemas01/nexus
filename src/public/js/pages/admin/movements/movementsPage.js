@@ -9,6 +9,7 @@ if (movementContext) {
         ? {
             key: 'wasteId',
             selector: FILTER_SELECTORS.MATERIAL,
+            dependsOn: 'supplierId',
             isSelected: false,
             initSelect: () => setupWasteSelect({
                 modalSelector: 'body',

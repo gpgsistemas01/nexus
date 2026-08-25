@@ -14,11 +14,11 @@ export const setupTableFilters = async ({
     selector = DATATABLE_SELECTORS.MAIN
 } = {}) => {
 
-    bindTableFilterDependencies(fields);
-
     const filters = buildTableFilterConfigs({
         fields
     });
+
+    bindTableFilterDependencies(filters);
 
     const values = {};
 

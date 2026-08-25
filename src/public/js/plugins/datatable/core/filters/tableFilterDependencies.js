@@ -1,5 +1,4 @@
 import { DOM_EVENT_NAMES } from '../../../../constants/events.js';
-import { toggleMaterialOption } from "../../../select2/domains/material.js";
 import { FILTER_SELECTORS } from "../../../../constants/selectors.js";
 import { toggleDisabledElement } from "../../../../utils/formUtils.js";
 import { bindDisabledControlWarning, setDisabledControlWarning } from "../../../../ui/disabledControlWarning.js";
@@ -80,17 +79,7 @@ const bindSupplierMaterialFilterDependency = () => {
     bindDisabledFilterDependency({
         sourceSelector: FILTER_SELECTORS.SUPPLIER,
         targetSelector: FILTER_SELECTORS.MATERIAL,
-        clearTarget: () => {
-            toggleMaterialOption({
-                selector: FILTER_SELECTORS.MATERIAL,
-                data: {
-                    id: null,
-                    text: null
-                }
-            });
-
-            clearSelectFilter(FILTER_SELECTORS.MATERIAL);
-        },
+        clearTarget: () => clearSelectFilter(FILTER_SELECTORS.MATERIAL),
         disabledMessage: DEPENDENT_FILTER_MESSAGES.materialRequiresSupplier
     });
 };
@@ -105,13 +94,13 @@ const bindDepartmentPersonFilterDependency = () => {
     });
 };
 
-export const bindTableFilterDependencies = (fields = []) => {
+export const bindTableFilterDependencies = (filters = []) => {
 
-    if (fields.includes('supplier') && fields.includes('material')) {
+    if (filters.some(({ key, dependsOn }) => dependsOn === 'supplierId' && ['materialId', 'wasteId'].includes(key))) {
         bindSupplierMaterialFilterDependency();
     }
 
-    if (fields.includes('department') && fields.includes('person')) {
+    if (filters.some(({ key, dependsOn }) => key === 'personId' && dependsOn === 'departmentId')) {
         bindDepartmentPersonFilterDependency();
     }
 };

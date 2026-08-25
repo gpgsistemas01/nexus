@@ -1,11 +1,11 @@
 import { getWasteMaterialTemplates } from '../../../application/warehouse/wastes/wastes.js';
 import { initDomainSelect2, toggleSelectOption } from '../baseSelect.js';
-import { mapSelectWasteMaterialTemplateData } from '../../../utils/warehouseInventoryUtils.js';
+import { mapSelectWasteMaterialTemplateData, normalizeInventorySelectRelations } from '../../../utils/warehouseInventoryUtils.js';
 import { SELECT2_EVENT_NAMES } from '../../../constants/events.js';
 
-const attachWasteMaterialTemplateHandler = ({ baseSelector, onSelect }) => {
+const bindWasteMaterialTemplateSelection = ({ baseSelector, onSelect }) => {
     $(baseSelector).off(SELECT2_EVENT_NAMES.SELECT).on(SELECT2_EVENT_NAMES.SELECT, ({ params }) => {
-        onSelect?.(params.data);
+        onSelect?.(normalizeInventorySelectRelations(params.data));
     });
 };
 
@@ -19,7 +19,7 @@ export const initWasteMaterialTemplateSelect = ({ modalSelector, baseSelector, o
         allowCreate: false
     });
 
-    attachWasteMaterialTemplateHandler({ baseSelector, onSelect });
+    bindWasteMaterialTemplateSelection({ baseSelector, onSelect });
 };
 
 export const toggleWasteMaterialTemplateOption = ({ selector, data }) => {

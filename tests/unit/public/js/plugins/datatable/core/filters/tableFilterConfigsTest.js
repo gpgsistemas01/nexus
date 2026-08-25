@@ -28,6 +28,12 @@ describe('configuración de opciones en filtros CRUD', () => {
     expect(config.initSelect).toEqual(expect.any(Function));
   });
 
+  it('declara el material como filtro dependiente del proveedor', () => {
+    const [config] = buildTableFilterConfigs({ fields: ['material'] });
+
+    expect(config).toMatchObject({ key: 'materialId', dependsOn: 'supplierId' });
+  });
+
   it('conserva la precarga cuando el filtro necesita resolver un valor predeterminado', () => {
     const [config] = buildTableFilterConfigs({ fields: ['fulfillmentStatus'] });
 
