@@ -34,7 +34,7 @@ export const openWasteModal = ({
     form.elements.base.value = data?.base ?? '';
     form.elements.height.value = data?.height ?? '';
     form.elements.maxUnitCost.value = data?.maxUnitCost ?? '';
-    displayWasteMaterialTemplate({ form, template: data });
+    displayWasteMaterialTemplate({ form, template: data ?? {} });
     form.elements.isActive.checked = data?.isActive ?? true;
     form.elements.observations.value = '';
     form.elements.newStock.value = '';
