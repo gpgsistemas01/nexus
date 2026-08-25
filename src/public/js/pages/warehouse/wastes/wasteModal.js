@@ -34,9 +34,6 @@ export const openWasteModal = ({
     form.elements.base.value = data?.base ?? '';
     form.elements.height.value = data?.height ?? '';
     form.elements.maxUnitCost.value = data?.maxUnitCost ?? '';
-    form.elements.maxUnitCost.placeholder = data?.maxUnitCost == null
-        ? 'Capture el costo máximo unitario'
-        : `Costo registrado: ${ data.maxUnitCost }`;
     displayWasteMaterialTemplate({ form, template: data });
     form.elements.isActive.checked = data?.isActive ?? true;
     form.elements.observations.value = '';

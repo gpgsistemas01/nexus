@@ -10,7 +10,7 @@ const createForm = () => {
     presentationDisplay,
     unitMeasureDisplay,
     form: {
-      elements: { base: { value: '' }, maxUnitCost: { value: '', placeholder: '' } },
+      elements: { base: { value: '' }, maxUnitCost: { value: '' } },
       querySelector: selector => selector.includes('Presentation')
         ? presentationDisplay
         : unitMeasureDisplay
@@ -36,7 +36,6 @@ describe('plantilla del formulario CRUD de mermas', () => {
     expect(unitMeasureDisplay.textContent).toBe('m²');
     expect(form.elements.base.value).toBe(1.52);
     expect(form.elements.maxUnitCost.value).toBe(25);
-    expect(form.elements.maxUnitCost.placeholder).toBe('Costo máximo sugerido: 25');
   });
 
   it('completa los snapshots y deja manual el ancho sin sugerencia', () => {
@@ -55,6 +54,5 @@ describe('plantilla del formulario CRUD de mermas', () => {
     expect(unitMeasureDisplay.textContent).toBe('Pieza');
     expect(form.elements.base.value).toBe('');
     expect(form.elements.maxUnitCost.value).toBe('');
-    expect(form.elements.maxUnitCost.placeholder).toBe('Capture el costo máximo unitario');
   });
 });
