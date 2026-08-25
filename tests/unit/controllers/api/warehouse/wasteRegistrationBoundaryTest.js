@@ -45,6 +45,7 @@ const validBody = {
   base: '1',
   height: '1',
   minStock: '0',
+  maxUnitCost: '25',
   newStock: '0',
   isActive: true,
   observations: 'Registro inicial'

@@ -11,4 +11,7 @@ export const applyWasteMaterialTemplate = ({ form, template = {} }) => {
     displayWasteMaterialTemplate({ form, template });
     form.elements.base.value = template.suggestedWidth ?? '';
     form.elements.maxUnitCost.value = template.maxUnitCost ?? '';
+    form.elements.maxUnitCost.placeholder = template.maxUnitCost == null
+        ? 'Capture el costo máximo unitario'
+        : `Costo máximo sugerido: ${ template.maxUnitCost }`;
 };

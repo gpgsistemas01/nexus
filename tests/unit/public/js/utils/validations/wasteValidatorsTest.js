@@ -17,7 +17,7 @@ describe('validadores del CRUD de mermas', () => {
   });
 
   it.each([
-    ['costo vacío', '', null],
+    ['costo vacío', '', expect.any(String)],
     ['costo sugerido', 25.5, null],
     ['costo negativo', -0.01, expect.any(String)]
   ])('%s', (_, value, expected) => {

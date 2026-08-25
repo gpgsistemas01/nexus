@@ -1,4 +1,4 @@
-import { validateNonNegativeNumber, validateNumberOptional, validatePositiveNumber, validateUUID } from '../fields/fieldsValidator.js';
+import { validateNonNegativeNumber, validatePositiveNumber, validateUUID } from '../fields/fieldsValidator.js';
 import { createInventoryObservationsValidation, createInventoryStateValidation } from './inventoryValidations.js';
 
 const wasteStockDataValidation = [
@@ -13,7 +13,7 @@ export const wasteStockValidation = [
 
 export const wasteEditValidation = [
     ...createInventoryStateValidation(),
-    validateNumberOptional('maxUnitCost')
+    validateNonNegativeNumber('maxUnitCost')
 ];
 
 export const wasteValidation = [

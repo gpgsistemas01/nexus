@@ -70,7 +70,7 @@ export const goodsReceiptMaterialCreateValidation = {
 
 export const wasteEditValidation = {
     ...inventoryStateValidation,
-    maxUnitCost: value => validateNumberOptional(value, 'El costo máximo de la merma')
+    maxUnitCost: value => validateNonNegativeNumber(value, 'El costo máximo de la merma')
 };
 
 export const wasteStockValidation = createInventoryStockValidation({
