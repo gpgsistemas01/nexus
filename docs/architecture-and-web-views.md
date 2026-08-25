@@ -328,6 +328,14 @@ filtros con selección predeterminada conservan una función de precarga. Asimis
 `deleteMaterial` recibe `{ id }`, igual que las mutaciones construidas por la factory,
 y el datatable adapta el identificador de su fila al invocarlo.
 
+Los selects de oferta de material y de plantilla para merma reutilizan
+`parseInventorySelectJson` para reconstruir datos serializados antes de actualizar la
+interfaz. Permanecen en módulos de dominio distintos: `material.js` coordina la oferta
+proveedor-material y la creación contextual, mientras `wasteMaterialTemplate.js`
+consulta únicamente materiales de referencia del alta de merma. El enlace privado del
+evento de plantilla pertenece por ello a este último módulo y entrega al formulario una
+opción con presentación y unidad ya normalizadas.
+
 `application/warehouse/wasteIssues/wasteIssues.js` permanece dentro de una carpeta de
 recurso, en paralelo con `goodsIssues/goodsIssues.js`, porque ambos flujos tienen varias
 mutaciones relacionadas. `wasteForm`, `wasteModal` y `wasteFields` permanecen en

@@ -60,6 +60,16 @@ const SUPPLIER_MATERIAL_STOCK_MOVEMENT_SELECT = {
     }
 };
 
+const MATERIAL_USAGE_FILTERS = [
+    { goodsReceiptDetails: { some: {} } },
+    { goodsIssueDetails: { some: {} } },
+    { purchaseRequisitionsDetails: { some: {} } },
+    { movementDetails: { some: {} } },
+    { stockAdjustmentDetails: { some: {} } },
+    { previousGoodsReceiptDetailChanges: { some: {} } },
+    { correctedGoodsReceiptDetailChanges: { some: {} } }
+];
+
 export const findSupplierMaterialsForStockMovement = async ({
     tx,
     where
@@ -111,24 +121,23 @@ const findDeletableMaterialIds = async ({ db, materialIds }) => {
     const materials = await db.material.findMany({
         where: {
             id: { in: materialIds },
-            goodsReceiptDetails: { none: {} },
-            goodsIssueDetails: { none: {} },
-            purchaseRequisitionsDetails: { none: {} },
-            movementDetails: { none: {} },
-            stockAdjustmentDetails: { none: {} },
-            previousGoodsReceiptDetailChanges: { none: {} },
-            correctedGoodsReceiptDetailChanges: { none: {} },
-            supplierMaterials: {
-                none: {
-                    wastes: { some: {} }
-                }
-            }
+            NOT: { OR: MATERIAL_USAGE_FILTERS }
         },
         select: { id: true }
     });
 
     return new Set(materials.map(({ id }) => id));
 };
+
+export const existsMaterialUsage = async ({ tx, materialId }) => Boolean(
+    await getDb(tx).material.findFirst({
+        where: {
+            id: materialId,
+            OR: MATERIAL_USAGE_FILTERS
+        },
+        select: { id: true }
+    })
+);
 
 export const findAllSupplierMaterials = async ({
     skip= 0,

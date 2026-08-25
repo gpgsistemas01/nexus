@@ -55,4 +55,5 @@ describe('plantilla del formulario CRUD de mermas', () => {
     expect(form.elements.base.value).toBe('');
     expect(form.elements.maxUnitCost.value).toBe('');
   });
+
 });

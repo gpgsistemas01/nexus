@@ -1,6 +1,6 @@
 import { MaterialAlreadyExists, MaterialCreateDatabaseError, MaterialInitialStockReasonNotFound, MaterialNotFound, MaterialUpdateDatabaseError, MaterialStockAdjustmentDatabaseError, MaterialDeleteDatabaseError, MaterialDeleteRelationConflict } from "../../../errors/warehouse/materialError.js";
 import { getDb } from "../../../repository/baseRepository.js";
-import { findAllSupplierMaterials, findSupplierMaterialByIds } from "./supplierMaterialService.js";
+import { existsMaterialUsage, findAllSupplierMaterials, findSupplierMaterialByIds } from "./supplierMaterialService.js";
 import { prepareMaterialData } from "./materialHelpers.js";
 import { syncSupplierMaterial } from "./materialRelations.js";
 import { isAppError } from "../../../errors/AppError.js";
@@ -335,28 +335,9 @@ export const deleteMaterial = async (supplierMaterialId) => {
 
             const { materialId } = supplierMaterial;
 
-            const linkedRecords = await Promise.all([
-                tx.goodsReceiptDetail.findFirst({ where: { materialId }, select: { id: true } }),
-                tx.goodsIssueDetail.findFirst({ where: { materialId }, select: { id: true } }),
-                tx.purchaseRequisitionDetail.findFirst({ where: { materialId }, select: { id: true } }),
-                tx.movementDetail.findFirst({ where: { materialId }, select: { id: true } }),
-                tx.stockAdjustmentDetail.findFirst({ where: { materialId }, select: { id: true } }),
-                tx.goodsReceiptDetailChange.findFirst({
-                    where: {
-                        OR: [
-                            { previousMaterialId: materialId },
-                            { correctedMaterialId: materialId }
-                        ]
-                    },
-                    select: { id: true }
-                }),
-                tx.waste.findFirst({
-                    where: { supplierMaterial: { materialId } },
-                    select: { id: true }
-                })
-            ]);
-
-            if (linkedRecords.some(Boolean)) throw new MaterialDeleteRelationConflict();
+            if (await existsMaterialUsage({ tx, materialId })) {
+                throw new MaterialDeleteRelationConflict();
+            }
 
             await tx.supplierMaterial.delete({ where: { id: supplierMaterialId } });
 

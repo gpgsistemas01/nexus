@@ -109,31 +109,33 @@ export const findAllWastes = async ({
 
     const db = getDb();
 
-    const wastes = await db.waste.findMany({
-        skip,
-        take,
-        where,
-        select: {
-            id: true,
-            supplierId: true,
-            name: true,
-            base: true,
-            height: true,
-            ...(canReadCosts && { maxUnitCost: true }),
-            minStock: true,
-            isActive: true,
-            currentStock: true,
-            convertedQuantity: true,
-            createdAt: true,
-            updatedAt: true,
-            supplier: WASTE_INCLUDE.supplier,
-            presentation: WASTE_INCLUDE.presentation,
-            unitMeasure: WASTE_INCLUDE.unitMeasure
-        },
-        orderBy: orderMap[orderBy] || orderMap.name
-    });
-    const total = await db.waste.count();
-    const filtered = await db.waste.count({ where });
+    const [wastes, total, filtered] = await Promise.all([
+        db.waste.findMany({
+            skip,
+            take,
+            where,
+            select: {
+                id: true,
+                supplierId: true,
+                name: true,
+                base: true,
+                height: true,
+                ...(canReadCosts && { maxUnitCost: true }),
+                minStock: true,
+                isActive: true,
+                currentStock: true,
+                convertedQuantity: true,
+                createdAt: true,
+                updatedAt: true,
+                supplier: WASTE_INCLUDE.supplier,
+                presentation: WASTE_INCLUDE.presentation,
+                unitMeasure: WASTE_INCLUDE.unitMeasure
+            },
+            orderBy: orderMap[orderBy] || orderMap.name
+        }),
+        db.waste.count(),
+        db.waste.count({ where })
+    ]);
 
     return {
         data: wastes,

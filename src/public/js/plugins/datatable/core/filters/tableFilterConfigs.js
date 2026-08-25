@@ -31,6 +31,7 @@ const selectFilterConfigs = {
     material: {
         key: 'materialId',
         selector: FILTER_SELECTORS.MATERIAL,
+        dependsOn: 'supplierId',
         isSelected: false,
         initSelect: ({ selectedId }) => initMaterialFilterSelect({ selectedId, supplierFilterSelector: FILTER_SELECTORS.SUPPLIER })
     },
@@ -62,6 +63,7 @@ const selectFilterConfigs = {
     person: {
         key: 'personId',
         selector: FILTER_SELECTORS.PERSON,
+        dependsOn: 'departmentId',
         isSelected: false,
         initSelect: initPersonFilterSelect
     },
