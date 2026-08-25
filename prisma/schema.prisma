@@ -156,6 +156,7 @@ model UnitMeasure {
   name      String     @db.VarChar(20)
   symbol    String     @db.VarChar(10)
   materials Material[]
+  wastes    Waste[]
 
   @@unique([name, symbol])
 }
@@ -164,6 +165,7 @@ model Presentation {
   id        String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name      String     @unique @db.VarChar(50)
   materials Material[]
+  wastes    Waste[]
 }
 
 model Supplier {
@@ -178,6 +180,7 @@ model Supplier {
   materials              SupplierMaterial[]
   movementDetails        MovementDetail[]
   stockAdjustmentDetails StockAdjustmentDetail[]
+  wastes                 Waste[]
 }
 
 model SupplierMaterial {
@@ -190,7 +193,6 @@ model SupplierMaterial {
   materialId        String   @db.Uuid
   supplier          Supplier @relation(fields: [supplierId], references: [id])
   material          Material @relation(fields: [materialId], references: [id])
-  wastes            Waste[]
 
   @@unique([supplierId, materialId])
   @@index([supplierId])
@@ -199,14 +201,20 @@ model SupplierMaterial {
 
 model Waste {
   id                     String                       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  supplierMaterialId     String                       @db.Uuid
+  supplierId             String                       @db.Uuid
+  presentationId         String                       @db.Uuid
+  unitMeasureId          String                       @db.Uuid
+  name                   String                       @db.VarChar(200)
   isActive               Boolean                      @default(true)
   minStock               Decimal                      @default(0) @db.Decimal(18, 6)
   base                   Decimal?                     @db.Decimal(18, 6)
   height                 Decimal?                     @db.Decimal(18, 6)
+  maxUnitCost            Decimal?                     @db.Decimal(18, 6)
   currentStock           Decimal                      @default(0) @db.Decimal(18, 6)
   convertedQuantity      Decimal                      @default(0) @db.Decimal(18, 6)
-  supplierMaterial       SupplierMaterial             @relation(fields: [supplierMaterialId], references: [id])
+  supplier               Supplier                     @relation(fields: [supplierId], references: [id])
+  presentation           Presentation                 @relation(fields: [presentationId], references: [id])
+  unitMeasure            UnitMeasure                  @relation(fields: [unitMeasureId], references: [id])
   stockAdjustmentDetails WasteStockAdjustmentDetail[]
   movementDetails        WasteMovementDetail[]
   wasteIssueDetails      WasteIssueDetail[]
@@ -215,8 +223,10 @@ model Waste {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@unique([supplierMaterialId, base, height])
-  @@index([supplierMaterialId])
+  @@unique([supplierId, name, base, height])
+  @@index([supplierId])
+  @@index([presentationId])
+  @@index([unitMeasureId])
 }
 
 model WasteStockAdjustment {

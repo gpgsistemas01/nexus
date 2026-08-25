@@ -557,11 +557,15 @@ usuarios y responsables se mantiene en el
 | Campo | Tipo Prisma | Obligatorio | Claves | Predeterminado | Reglas Prisma/BD |
 | --- | --- | --- | --- | --- | --- |
 | `id` | `String` | Sí | PK | `dbgenerated("gen_random_uuid()")` | `@db.Uuid` |
-| `supplierMaterialId` | `String` | Sí | FK | — | `@db.Uuid` |
+| `supplierId` | `String` | Sí | FK | — | `@db.Uuid` |
+| `presentationId` | `String` | Sí | FK | — | `@db.Uuid` |
+| `unitMeasureId` | `String` | Sí | FK | — | `@db.Uuid` |
+| `name` | `String` | Sí | — | — | `@db.VarChar(200)` |
 | `isActive` | `Boolean` | Sí | — | `true` | — |
 | `minStock` | `Decimal` | Sí | — | `0` | `@db.Decimal(18, 6)` |
 | `base` | `Decimal?` | No | — | — | `@db.Decimal(18, 6)` |
 | `height` | `Decimal?` | No | — | — | `@db.Decimal(18, 6)` |
+| `maxUnitCost` | `Decimal?` | No | — | — | `@db.Decimal(18, 6)` |
 | `currentStock` | `Decimal` | Sí | — | `0` | `@db.Decimal(18, 6)` |
 | `convertedQuantity` | `Decimal` | Sí | — | `0` | `@db.Decimal(18, 6)` |
 | `createdAt` | `DateTime` | Sí | — | `now()` | — |
@@ -569,7 +573,9 @@ usuarios y responsables se mantiene en el
 
 | Relación Prisma | Destino | Campos FK | Cardinalidad desde este modelo |
 | --- | --- | --- | --- |
-| `supplierMaterial` | `SupplierMaterial` | `supplierMaterialId` | Exactamente uno |
+| `supplier` | `Supplier` | `supplierId` | Exactamente uno |
+| `presentation` | `Presentation` | `presentationId` | Exactamente uno |
+| `unitMeasure` | `UnitMeasure` | `unitMeasureId` | Exactamente uno |
 
 ### `WasteIssue`
 

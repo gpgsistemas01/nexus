@@ -1,5 +1,16 @@
 import { isEmptyOrNull } from "./baseValidations.js";
-import { validateName, validatePassword, validateNumber, validateUsername, validateTextOptional, validateGoodsReceiptDetailsArray, validateDate, validateText, validateNumberOptional, validateGoodsIssueDetailsArray, validatePositiveNumber, validatePairedOptionalNumber, validatePersonAccessesArray, validateWasteIssueDetailsArray, validateInvoice } from "./fieldValidations.js";
+import { validateName, validatePassword, validateNumber, validateUsername, validateTextOptional, validateGoodsReceiptDetailsArray, validateDate, validateText, validateNumberOptional, validateGoodsIssueDetailsArray, validateNonNegativeNumber, validatePairedOptionalNumber, validatePositiveNumber, validatePersonAccessesArray, validateWasteIssueDetailsArray, validateInvoice } from "./fieldValidations.js";
+
+const inventoryStateValidation = {
+    minStock: (value) => validateNumberOptional(value, 'El stock mínimo'),
+    isActive: (value) => isEmptyOrNull(value, 'El estado del inventario')
+};
+
+const createInventoryStockValidation = ({ validateStock, stockFieldName }) => ({
+    newStock: value => validateStock(value, stockFieldName),
+    reasonId: value => isEmptyOrNull(value, 'La razón de ajuste'),
+    observations: value => validateTextOptional(value, 500, 'Las observaciones')
+});
 
 export const supplierValidation = {
     legalName: (value) => validateText({
@@ -17,7 +28,7 @@ export const supplierValidation = {
 export const materialEditValidation = {
     name: (value) => validateName(value, 200),
     supplierId: (value) => isEmptyOrNull(value, 'El proveedor'),
-    minStock: (value) => validateNumberOptional(value, 'El stock mínimo'),
+    ...inventoryStateValidation,
     maxUnitCost: (value) => validateNumber(value, 'El costo máximo'),
 }
 
@@ -39,11 +50,10 @@ export const materialValidation = {
     }),
 }
 
-export const materialStockValidation = {
-    newStock: (value) => validateNumber(value, 'El nuevo stock'),
-    reasonId: (value) => isEmptyOrNull(value, 'La razón de ajuste'),
-    observations: (value) => validateTextOptional(value, 500, 'Las observaciones'),
-}
+export const materialStockValidation = createInventoryStockValidation({
+    validateStock: validateNumber,
+    stockFieldName: 'El nuevo stock'
+});
 
 export const materialCreateValidation = {
     ...materialValidation,
@@ -59,30 +69,20 @@ export const goodsReceiptMaterialCreateValidation = {
 }
 
 export const wasteEditValidation = {
-    minStock: (value) => validateNumberOptional(value, 'El stock mínimo'),
-    isActive: (value) => isEmptyOrNull(value, 'El estado de la merma'),
-}
+    ...inventoryStateValidation,
+    maxUnitCost: value => validateNumberOptional(value, 'El costo máximo de la merma')
+};
 
-export const wasteStockValidation = {
-    newStock: (value) => validateNumber(value, 'El nuevo stock de merma'),
-    reasonId: (value) => isEmptyOrNull(value, 'La razón de ajuste'),
-    observations: (value) => validateTextOptional(value, 500, 'Las observaciones'),
-}
+export const wasteStockValidation = createInventoryStockValidation({
+    validateStock: validateNonNegativeNumber,
+    stockFieldName: 'El nuevo stock de merma'
+});
 
 export const wasteValidation = {
-    supplierMaterialId: (value) => isEmptyOrNull(value, 'El material'),
-    base: (_, { base, height }) => validatePairedOptionalNumber({
-        value: base,
-        pairedValue: height,
-        fieldName: 'La base de la merma',
-        allowZero: false
-    }),
-    height: (_, { base, height }) => validatePairedOptionalNumber({
-        value: height,
-        pairedValue: base,
-        fieldName: 'La altura de la merma',
-        allowZero: false
-    }),
+    materialId: (value) => isEmptyOrNull(value, 'El material'),
+    supplierId: (value) => isEmptyOrNull(value, 'El proveedor'),
+    base: value => validatePositiveNumber(value, 'El ancho de la merma'),
+    height: value => validatePositiveNumber(value, 'El largo de la merma'),
     ...wasteEditValidation,
     newStock: wasteStockValidation.newStock,
     observations: wasteStockValidation.observations,

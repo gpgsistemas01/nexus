@@ -1,12 +1,13 @@
-import { getPresentation, mapSelectMaterialData } from "../../../utils/warehouseInventoryUtils.js";
 import { initReasonSelect, toggleReasonOption } from "../domains/reason.js";
-import { initSupplierMaterialSelect, toggleSupplierMaterialOption } from "../domains/supplierMaterial.js";
+import { setupSupplierSelect, toggleSupplierOption } from "../domains/supplier.js";
+import { initWasteMaterialTemplateSelect, toggleWasteMaterialTemplateOption } from "../domains/wasteMaterialTemplate.js";
 import { FORM_SELECTORS, SELECT_SELECTORS } from "../../../constants/selectors.js";
-import { setFormSectionVisibility } from "../../../ui/forms/formStateUI.js";
+import { applyWasteMaterialTemplate } from '../../../pages/warehouse/wastes/wasteTemplateForm.js';
 
 let scoped = null;
 const selectors = {
     material: SELECT_SELECTORS.MATERIAL,
+    supplier: SELECT_SELECTORS.SUPPLIER,
     reason: SELECT_SELECTORS.REASON,
     wasteForm: FORM_SELECTORS.WASTE
 };
@@ -18,10 +19,18 @@ export const initWasteSelect2 = ({ modalSelector }) => {
     ));
 
     [
-        [initSupplierMaterialSelect, { 
-            modalSelector, 
-            baseSelector: scoped.material, 
-            allowCreate: false 
+        [initWasteMaterialTemplateSelect, {
+            modalSelector,
+            baseSelector: scoped.material,
+            onSelect: template => applyWasteMaterialTemplate({
+                form: document.querySelector(scoped.wasteForm),
+                template
+            })
+        }],
+        [setupSupplierSelect, {
+            modalSelector,
+            supplierSelector: SELECT_SELECTORS.SUPPLIER,
+            allowCreate: false
         }],
         [initReasonSelect, {
             modalSelector,
@@ -30,39 +39,19 @@ export const initWasteSelect2 = ({ modalSelector }) => {
         }]
     ].forEach(([initialize, options]) => initialize(options));
 
-    $(scoped.material)
-        .off('.materialInput')
-        .on('select2:select.materialInput', ({ params }) => {
-
-            const material = JSON.parse(params?.data?.material || '{}');
-
-            setFormSectionVisibility({
-                form: document.querySelector(scoped.wasteForm),
-                isVisible: getPresentation(material) === 'ROLLO',
-                fieldNames: ['weight']
-            });
-        })
-        .on('select2:clear.materialInput change.materialInput', () => {
-
-            const selectedValue = $(scoped.material).val();
-
-            if (selectedValue) return;
-
-            setFormSectionVisibility({
-                form: document.querySelector(scoped.wasteForm),
-                isVisible: false,
-                fieldNames: ['weight']
-            });
-        });
 };
 
 export const setWasteSelectOptions = ({ modalSelector, data = null }) => {
 
     [
-        [toggleSupplierMaterialOption, {
+        [toggleWasteMaterialTemplateOption, {
             selector: scoped.material,
-            data: data?.supplierMaterial ? mapSelectMaterialData(data.supplierMaterial) : null,
-            modalSelector
+            data: data ? { id: data.id, text: data.name } : null
+        }],
+        [toggleSupplierOption, {
+            selector: scoped.supplier,
+            id: data?.supplier?.id,
+            name: data?.supplier?.tradeName
         }],
         [toggleReasonOption, {
             selector: scoped.reason,

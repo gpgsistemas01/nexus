@@ -27,11 +27,7 @@ import {
     issueProjectQuantityDetailsValidation,
     wasteIssueValidation
 } from '../../../utils/validations/validators.js';
-import {
-    getPresentation,
-    getUnitMeasure,
-    mapIssueDetailsToSupplyRequest
-} from '../../../utils/warehouseInventoryUtils.js';
+import { getPresentation, getUnitMeasure, mapIssueDetailsToSupplyRequest } from '../../../utils/warehouseInventoryUtils.js';
 import { wasteIssueDetails as details, wasteIssueHeaderForm } from './wasteIssueModal.js';
 
 const formId = FORM_SELECTORS.WASTE_ISSUE;
@@ -93,8 +89,9 @@ const addWaste = () => {
 
     if (!option) return;
 
-    let { id, text, base, height, supplierMaterial } = option.dataset;
-    supplierMaterial = JSON.parse(supplierMaterial);
+    const { id, text, base, height, presentation, unitMeasure } = option.dataset;
+    const presentationData = JSON.parse(presentation || '{}');
+    const unitMeasureData = JSON.parse(unitMeasure || '{}');
     const wasteId = option.value || id;
     const quantity = Number(document.querySelector(INPUT_SELECTORS.QUANTITY).value);
 
@@ -112,8 +109,8 @@ const addWaste = () => {
         name: text,
         base,
         height,
-        presentation: getPresentation(supplierMaterial),
-        unitMeasure: getUnitMeasure(supplierMaterial),
+        presentation: getPresentation({ presentation: presentationData }),
+        unitMeasure: getUnitMeasure({ unitMeasure: unitMeasureData }),
         quantity,
         convertedQuantity: base && height
             ? roundTo(base * height * quantity)

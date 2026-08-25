@@ -1,14 +1,17 @@
 import { toNumber } from '../utils/formattersUtils.js';
 
 const buildWasteDataDto = (body = {}) => ({
-    supplierMaterialId: body.supplierMaterialId,
+    materialId: body.materialId,
+    supplierId: body.supplierId,
+    ...(Object.prototype.hasOwnProperty.call(body, 'maxUnitCost') ? { maxUnitCost: toNumber(body.maxUnitCost) } : {}),
     base: toNumber(body.base),
     height: toNumber(body.height)
 });
 
 const buildWasteSecondaryDataDto = (body = {}) => ({
     ...Object.prototype.hasOwnProperty.call(body, 'minStock') && body.minStock !== null ? { minStock: Number(body.minStock) } : {},
-    ...(Object.prototype.hasOwnProperty.call(body, 'isActive') ? { isActive: Boolean(body.isActive) } : {})
+    ...(Object.prototype.hasOwnProperty.call(body, 'isActive') ? { isActive: Boolean(body.isActive) } : {}),
+    ...(Object.prototype.hasOwnProperty.call(body, 'maxUnitCost') ? { maxUnitCost: toNumber(body.maxUnitCost) } : {})
 });
 
 const buildWasteStockDto = (body = {}, { includeReason = true } = {}) => ({

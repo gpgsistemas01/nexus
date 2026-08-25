@@ -20,6 +20,7 @@ const getMovementListParams = (req) => {
         endDate: req.query.endDate || '',
         movementType: req.query.movementType || '',
         materialId: req.query.materialId || '',
+        wasteId: req.query.wasteId || '',
         supplierId: req.query.supplierId || '',
         ...(hasRequestedOrder
             ? requestedOrder

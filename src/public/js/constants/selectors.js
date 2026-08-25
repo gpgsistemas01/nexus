@@ -55,6 +55,8 @@ export const INPUT_SELECTORS = {
     COST_PER_UNIT: '#costPerUnitInput',
     PRESENTATION_DISPLAY: '#presentationDisplayInput',
     UNIT_MEASURE_DISPLAY: '#unitMeasureDisplayInput',
+    WASTE_PRESENTATION_DISPLAY: '#wastePresentationDisplayValue',
+    WASTE_UNIT_MEASURE_DISPLAY: '#wasteUnitMeasureDisplayValue',
     SELECTED_MATERIAL_SUPPLIER: '#selectedMaterialSupplierValue',
     SELECTED_MATERIAL_PRESENTATION: '#selectedMaterialPresentationValue',
     SELECTED_MATERIAL_UNIT_MEASURE: '#selectedMaterialUnitMeasureValue',

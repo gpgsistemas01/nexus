@@ -377,11 +377,15 @@ erDiagram
 erDiagram
     Waste {
         String id PK
-        String supplierMaterialId FK
+        String supplierId FK
+        String presentationId FK
+        String unitMeasureId FK
+        String name
         Boolean isActive
         Decimal minStock
         Decimal base
         Decimal height
+        Decimal maxUnitCost
         Decimal currentStock
         Decimal convertedQuantity
         DateTime createdAt

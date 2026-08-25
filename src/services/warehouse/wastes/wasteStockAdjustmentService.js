@@ -25,10 +25,9 @@ const calculateWasteStockAdjustmentValues = ({
     assertSufficientStock({
         material: {
             id: waste.id,
-            name: waste.supplierMaterial?.material?.name,
-            materialId: waste.supplierMaterial?.materialId,
-            supplierId: waste.supplierMaterial?.supplierId,
-            supplier: waste.supplierMaterial?.supplier,
+            name: waste.name,
+            supplierId: waste.supplierId,
+            supplier: waste.supplier,
             base: waste.base,
             height: waste.height
         },
@@ -91,7 +90,7 @@ export const registerWasteStockAdjustment = async ({
                 details: {
                     create: {
                         waste: { connect: { id: wasteId } },
-                        materialName: waste.supplierMaterial?.material?.name || '',
+                        materialName: waste.name,
                         previousStock: values.previousStock,
                         newStock: values.newStock,
                         difference: values.difference,
