@@ -34,7 +34,7 @@ export const isNegative = (value, fieldName) => {
 
 export const isPositive = (value, fieldName) => {
 
-    if (value < 1) return `${ fieldName } debe ser un número mayor a cero`;
+    if (value <= 0) return `${ fieldName } debe ser un número mayor a cero`;
 
     return null;
 }

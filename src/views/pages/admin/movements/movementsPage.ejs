@@ -4,7 +4,7 @@
         selectInputs: [
             { id: 'movementTypeFilter', label: 'Tipo de movimiento:', col: 'col-12 col-md-6' },
             { id: 'supplierFilter', label: 'Proveedor:', col: 'col-12 col-md-6' },
-            { id: 'materialFilter', label: 'Material:', col: 'col-12 col-md-6' }
+            { id: 'materialFilter', label: contextKey === 'waste' ? 'Merma:' : 'Material:', col: 'col-12 col-md-6' }
         ]
     }) %>
     <%- include('../../../shared/tables/dataTable', {

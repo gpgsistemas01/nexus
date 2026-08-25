@@ -24,23 +24,17 @@ const INVENTORY_REPORT_MATERIAL_SELECT = {
 };
 
 const WASTE_REPORT_SELECT = {
+    id: true,
     base: true,
     height: true,
     currentStock: true,
     convertedQuantity: true,
-    supplierMaterial: {
-        select: {
-            maxUnitCost: true,
-            material: {
-                select: {
-                    name: true,
-                    presentation: { select: { name: true } },
-                    unitMeasure: { select: { name: true } }
-                }
-            },
-            supplier: { select: { tradeName: true } }
-        }
-    }
+    maxUnitCost: true,
+    name: true,
+    supplierId: true,
+    supplier: { select: { tradeName: true } },
+    presentation: { select: { name: true } },
+    unitMeasure: { select: { name: true } }
 };
 
 const mapMaterialRows = (materials = []) => materials.map((item) => ({
@@ -58,6 +52,9 @@ const mapMaterialRows = (materials = []) => materials.map((item) => ({
 
 
 const mapWasteRows = (wastes = []) => wastes.map((item) => ({
+    id: item.id,
+    materialId: item.materialId,
+    supplierId: item.supplierId,
     supplier: item.supplier?.tradeName,
     name: item.name,
     base: toNumber(item.base),
@@ -73,15 +70,6 @@ const mapInventoryReportMaterial = ({ material, supplier, ...stock }) => ({
     ...material,
     ...stock,
     supplier
-});
-
-const mapInventoryReportWaste = ({ supplierMaterial, ...waste }) => ({
-    ...waste,
-    name: supplierMaterial.material.name,
-    presentation: supplierMaterial.material.presentation,
-    unitMeasure: supplierMaterial.material.unitMeasure,
-    maxUnitCost: supplierMaterial.maxUnitCost,
-    supplier: supplierMaterial.supplier
 });
 
 const mapIssueDetailRow = ({ issue, detail, material, supplier }) => ({
@@ -133,11 +121,11 @@ const mapWasteIssueDetailRows = (wasteIssues = []) => wasteIssues.flatMap((waste
             issue: wasteIssue,
             detail,
             material: {
-                ...detail.waste?.supplierMaterial?.material,
+                name: detail.waste?.name,
                 base: detail.waste?.base,
                 height: detail.waste?.height
             },
-            supplier: detail.waste?.supplierMaterial?.supplier
+            supplier: detail.waste?.supplier
         }))
 ));
 
@@ -178,6 +166,52 @@ const mapGoodsReceiptDetailRows = (goodsReceipts = [], { materialId = '' } = {})
 const sum = (rows, field) => rows.reduce((total, row) => total + toNumber(row[field]), 0);
 const divideOrZero = (dividend, divisor) => divisor ? dividend / divisor : 0;
 const VAT_RATE = 0.16;
+
+/**
+ * Consolidates waste inventory by material, supplier and width. Waste length
+ * (height in storage) can vary because it comes from rolls with different
+ * original lengths, so it does not identify whether two remnants are related.
+ */
+export const buildWasteReportSummary = (rows = []) => {
+    const groups = new Map();
+
+    rows.forEach((row) => {
+        const width = toNumber(row.base);
+        const key = JSON.stringify([
+            row.materialId || row.name || 'no-material',
+            row.supplierId || row.supplier || 'no-supplier',
+            width
+        ]);
+        const group = groups.get(key) || {
+            supplier: row.supplier || 'Sin proveedor',
+            name: row.name || 'Sin material',
+            width,
+            wasteQuantity: 0,
+            currentStock: 0,
+            squareMeters: 0
+        };
+
+        group.wasteQuantity += 1;
+        group.currentStock += toNumber(row.currentStock) || 0;
+        group.squareMeters += toNumber(row.convertedQuantity) || 0;
+        groups.set(key, group);
+    });
+
+    const summaryRows = [...groups.values()].map(row => ({
+        ...row,
+        currentStock: roundTo(row.currentStock),
+        squareMeters: roundTo(row.squareMeters)
+    }));
+
+    return {
+        rows: summaryRows,
+        totals: {
+            wasteQuantity: sum(summaryRows, 'wasteQuantity'),
+            currentStock: roundTo(sum(summaryRows, 'currentStock')),
+            squareMeters: roundTo(sum(summaryRows, 'squareMeters'))
+        }
+    };
+};
 
 /**
  * Builds the supplier and material breakdowns for the purchase report rows.
@@ -399,15 +433,15 @@ export const findWasteReportRows = async ({
 
     if (search) where.AND.push({
         OR: [
-            { supplierMaterial: { material: { name: { contains: search, mode: 'insensitive' } } } },
-            { supplierMaterial: { supplier: { tradeName: { contains: search, mode: 'insensitive' } } } }
+            { name: { contains: search, mode: 'insensitive' } },
+            { supplier: { tradeName: { contains: search, mode: 'insensitive' } } }
         ]
     });
 
-    if (supplierId) where.AND.push({ supplierMaterial: { supplierId } });
+    if (supplierId) where.AND.push({ supplierId });
 
     const orderMap = {
-        name: { supplierMaterial: { material: { name: orderDir } } },
+        name: { name: orderDir },
         base: { base: orderDir },
         height: { height: orderDir }
     };
@@ -417,5 +451,5 @@ export const findWasteReportRows = async ({
         orderBy: orderMap[orderBy] || orderMap.name
     });
 
-    return mapWasteRows(wastes.map(mapInventoryReportWaste));
+    return mapWasteRows(wastes);
 };

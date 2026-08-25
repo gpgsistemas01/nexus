@@ -1,5 +1,5 @@
-import { editWasteRequest, editWasteStockRequest, getAllWastesRequest, registerWasteRequest } from "../../../services/warehouse/wasteService.js";
-import { createCrudApplication } from '../../createCrudApplication.js';
+import { editWasteRequest, editWasteStockRequest, getAllWastesRequest, getWasteMaterialTemplatesRequest, registerWasteRequest } from "../../../services/warehouse/wasteService.js";
+import { createApplicationList, createCrudApplication } from '../../createCrudApplication.js';
 
 const wasteApplication = createCrudApplication({
     requests: {
@@ -13,6 +13,7 @@ const wasteApplication = createCrudApplication({
 });
 
 export const getAllWastes = wasteApplication.getAll;
+export const getWasteMaterialTemplates = createApplicationList(getWasteMaterialTemplatesRequest);
 export const registerWaste = wasteApplication.register;
 export const editWaste = wasteApplication.edit;
 

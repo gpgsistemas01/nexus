@@ -17,33 +17,33 @@ flowchart LR
     controllers["controllers (32 módulos)"] --> constants["constants (9 módulos)"]
     controllers["controllers (32 módulos)"] --> dtos["dtos (10 módulos)"]
     controllers["controllers (32 módulos)"] --> messages["messages (2 módulos)"]
-    controllers["controllers (32 módulos)"] --> services["services (47 módulos)"]
+    controllers["controllers (32 módulos)"] --> services["services (49 módulos)"]
     controllers["controllers (32 módulos)"] --> utils["utils (10 módulos)"]
     dtos["dtos (10 módulos)"] --> utils["utils (10 módulos)"]
     middleware["middleware (5 módulos)"] --> constants["constants (9 módulos)"]
     middleware["middleware (5 módulos)"] --> messages["messages (2 módulos)"]
-    middleware["middleware (5 módulos)"] --> services["services (47 módulos)"]
+    middleware["middleware (5 módulos)"] --> services["services (49 módulos)"]
     middleware["middleware (5 módulos)"] --> utils["utils (10 módulos)"]
     repository["repository (1 módulos)"] --> lib["lib (2 módulos)"]
     routes["routes (36 módulos)"] --> constants["constants (9 módulos)"]
     routes["routes (36 módulos)"] --> controllers["controllers (32 módulos)"]
     routes["routes (36 módulos)"] --> middleware["middleware (5 módulos)"]
-    routes["routes (36 módulos)"] --> validators["validators (13 módulos)"]
-    services["services (47 módulos)"] --> constants["constants (9 módulos)"]
-    services["services (47 módulos)"] --> dtos["dtos (10 módulos)"]
-    services["services (47 módulos)"] --> errors["errors (17 módulos)"]
-    services["services (47 módulos)"] --> repository["repository (1 módulos)"]
-    services["services (47 módulos)"] --> utils["utils (10 módulos)"]
+    routes["routes (36 módulos)"] --> validators["validators (14 módulos)"]
+    services["services (49 módulos)"] --> constants["constants (9 módulos)"]
+    services["services (49 módulos)"] --> dtos["dtos (10 módulos)"]
+    services["services (49 módulos)"] --> errors["errors (17 módulos)"]
+    services["services (49 módulos)"] --> repository["repository (1 módulos)"]
+    services["services (49 módulos)"] --> utils["utils (10 módulos)"]
     utils["utils (10 módulos)"] --> constants["constants (9 módulos)"]
     utils["utils (10 módulos)"] --> errors["errors (17 módulos)"]
-    validators["validators (13 módulos)"] --> messages["messages (2 módulos)"]
+    validators["validators (14 módulos)"] --> messages["messages (2 módulos)"]
 ```
 
 > Alcance: módulos JavaScript bajo `src/`. Los recursos EJS, CSS y el esquema Prisma se
 > explican en la documentación curada, porque una lista automática no describe sus
 > decisiones de diseño.
 
-## Endpoints API (60)
+## Endpoints API (61)
 
 | Método | Ruta | Definición |
 | --- | --- | --- |
@@ -59,6 +59,7 @@ flowchart LR
 | `PATCH` | `/api/warehouse/materials/:id` | [`src/routes/api/warehouse/materialApiRoute.js`](../../src/routes/api/warehouse/materialApiRoute.js) |
 | `PATCH` | `/api/warehouse/materials/:id/stock` | [`src/routes/api/warehouse/materialApiRoute.js`](../../src/routes/api/warehouse/materialApiRoute.js) |
 | `DELETE` | `/api/warehouse/materials/:id` | [`src/routes/api/warehouse/materialApiRoute.js`](../../src/routes/api/warehouse/materialApiRoute.js) |
+| `GET` | `/api/warehouse/wastes/material-templates` | [`src/routes/api/warehouse/wasteApiRoute.js`](../../src/routes/api/warehouse/wasteApiRoute.js) |
 | `GET` | `/api/warehouse/wastes` | [`src/routes/api/warehouse/wasteApiRoute.js`](../../src/routes/api/warehouse/wasteApiRoute.js) |
 | `POST` | `/api/warehouse/wastes` | [`src/routes/api/warehouse/wasteApiRoute.js`](../../src/routes/api/warehouse/wasteApiRoute.js) |
 | `PATCH` | `/api/warehouse/wastes/:id` | [`src/routes/api/warehouse/wasteApiRoute.js`](../../src/routes/api/warehouse/wasteApiRoute.js) |

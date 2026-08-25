@@ -1,4 +1,4 @@
-import { buildMonthlyGoodsReceiptSummary, findGoodsIssueReportRows, findGoodsReceiptReportRows, findSupplierReportRows, findWarehouseReportRows, findWasteIssueReportRows, findWasteReportRows } from "../../../services/warehouse/reportService.js";
+import { buildMonthlyGoodsReceiptSummary, buildWasteReportSummary, findGoodsIssueReportRows, findGoodsReceiptReportRows, findSupplierReportRows, findWarehouseReportRows, findWasteIssueReportRows, findWasteReportRows } from "../../../services/warehouse/reportService.js";
 import { getDataTableOrder, getDataTableSearch } from "../../../utils/requestQueryUtils.js";
 import { getMexicoMonthDateRange } from "../../../utils/formattersUtils.js";
 import { sendExcelReport } from "../../../utils/reportExcelUtils.js";
@@ -290,31 +290,34 @@ export const exportWasteReportExcel = async (req, res) => {
         orderBy,
         orderDir
     });
+    const { rows: summaryRows, totals } = buildWasteReportSummary(rows);
 
     const data = [
         [
             'Proveedor',
             'Material',
-            'Base de merma',
-            'Altura de merma',
-            'Existencia',
-            'Presentación',
-            'Conversión',
-            'Unidad',
-            'Costo unitario de conversión'
+            'Ancho',
+            'Cantidad de mermas',
+            'Cantidad total',
+            'Total m²'
         ],
 
-        ...rows.map(row => [
+        ...summaryRows.map(row => [
             row.supplier,
             row.name,
-            row.base,
-            row.height,
+            row.width,
+            row.wasteQuantity,
             row.currentStock,
-            row.presentation,
-            row.convertedQuantity,
-            row.unitMeasure,
-            row.maxUnitCost
-        ])
+            row.squareMeters
+        ]),
+        [
+            'Total',
+            '',
+            '',
+            totals.wasteQuantity,
+            totals.currentStock,
+            totals.squareMeters
+        ]
     ];
 
     return sendExcelReport({

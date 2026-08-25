@@ -55,6 +55,7 @@ const getMovementReportParams = (query) => {
         search: monthlyReport ? '' : getDataTableSearch(query),
         movementType: monthlyReport ? '' : query.movementType || '',
         materialId: monthlyReport ? '' : query.materialId || '',
+        wasteId: monthlyReport ? '' : query.wasteId || '',
         supplierId: monthlyReport ? '' : query.supplierId || '',
         orderBy,
         orderDir

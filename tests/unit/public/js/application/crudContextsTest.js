@@ -11,6 +11,7 @@ const mocks = vi.hoisted(() => ({
     editWasteRequest: vi.fn(),
     editWasteStockRequest: vi.fn(),
     getAllWastesRequest: vi.fn(),
+    getWasteMaterialTemplatesRequest: vi.fn(),
     registerWasteRequest: vi.fn()
   },
   goodsReceipt: {
@@ -39,7 +40,7 @@ beforeEach(() => {
 describe('consistencia del CRUD entre contextos de aplicación', () => {
   it.each([
     ['usuarios', users, ['editUser', 'editUserPassword', 'getAllUsers', 'registerUser']],
-    ['mermas', wastes, ['editWaste', 'editWasteStock', 'getAllWastes', 'registerWaste']],
+    ['mermas', wastes, ['editWaste', 'editWasteStock', 'getAllWastes', 'getWasteMaterialTemplates', 'registerWaste']],
     [
       'entradas de compra',
       goodsReceipts,
@@ -62,6 +63,7 @@ describe('consistencia del CRUD entre contextos de aplicación', () => {
   it.each([
     ['usuarios', users.getAllUsers, mocks.user.getAllUsersRequest],
     ['mermas', wastes.getAllWastes, mocks.waste.getAllWastesRequest],
+    ['plantillas de merma', wastes.getWasteMaterialTemplates, mocks.waste.getWasteMaterialTemplatesRequest],
     ['entradas de compra', goodsReceipts.getAllGoodsReceipts, mocks.goodsReceipt.getAllGoodsReceiptsRequest]
   ])('mantiene el contrato de listado en %s', async (_context, getAll, request) => {
     const response = { data: { data: [] } };
