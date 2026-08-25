@@ -410,7 +410,10 @@ De este modo el `id` de Select2 continúa siendo el de proveedor-material y el t
 conserva material, medidas y proveedor sin mantener un segundo normalizador ni
 introducir otro flujo de consulta. Las decisiones visuales dependientes de la
 presentación se resuelven con `getPresentation` sobre el material de la opción, sin
-duplicar ese dato como un atributo adicional de Select2.
+duplicar ese dato como un atributo adicional de Select2. En el alta, `data` es nulo
+porque aún no existe una merma persistida; el modal traduce ese estado a una plantilla
+vacía antes de entregarla a los lectores, en lugar de ampliar su contrato con un valor
+que no representa un material.
 
 ## 8. Orden de métodos por comportamiento
 
