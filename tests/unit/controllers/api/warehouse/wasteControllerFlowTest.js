@@ -173,6 +173,29 @@ describe('wasteController complete flow', () => {
     expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ code: 'CREATED_WASTE' }));
   });
 
+  it('rechaza el alta sin costo manual cuando el material tampoco tiene costo', async () => {
+    resolveWasteMaterialSnapshot.mockResolvedValueOnce({
+      id: 'material-1',
+      name: 'Lámina',
+      presentation: { id: 'presentation-1', name: 'ROLLO' },
+      unitMeasure: { id: 'unit-measure-1', name: 'Metro cuadrado' },
+      maxUnitCost: null
+    });
+    const req = {
+      body: {
+        materialId: 'material-1', supplierId: 'supplier-1',
+        base: '2', height: '3', newStock: '1'
+      },
+      user: { id: 'user-1' }
+    };
+
+    await expect(registerWaste(req, createResponse())).rejects.toMatchObject({
+      code: 'WASTE_MAX_UNIT_COST_REQUIRED',
+      statusCode: 400
+    });
+    expect(wasteCreate).not.toHaveBeenCalled();
+  });
+
   it('edita únicamente los datos secundarios sin cambiar existencias', async () => {
     const req = {
       params: { id: 'waste-1' },

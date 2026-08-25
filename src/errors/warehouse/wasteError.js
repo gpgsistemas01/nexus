@@ -45,3 +45,14 @@ export class WasteInitialStockReasonNotFound extends AppError {
         super('Razón de stock inicial no encontrada para registrar la merma.', 'WASTE_INITIAL_STOCK_REASON_NOT_FOUND', 404);
     }
 }
+
+export class WasteMaxUnitCostRequired extends AppError {
+
+    constructor () {
+        super(
+            'Capture el costo máximo de la merma porque el material seleccionado no tiene un costo disponible.',
+            'WASTE_MAX_UNIT_COST_REQUIRED',
+            400
+        );
+    }
+}

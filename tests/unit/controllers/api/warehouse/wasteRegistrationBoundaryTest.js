@@ -87,6 +87,18 @@ describe('wasteController registration boundaries', () => {
     });
   });
 
+  it('permite costo nulo para que el servicio aplique el costo del material', async () => {
+    await request(app)
+      .post('/wastes')
+      .send({ ...validBody, maxUnitCost: null })
+      .expect(200);
+
+    expect(createWasteWithInitialStockAdjustment).toHaveBeenCalledWith({
+      wasteDto: expect.objectContaining({ maxUnitCost: null }),
+      userId
+    });
+  });
+
   it.each([
     ['partición de equivalencia', 'UUID de material inválido', { materialId: 'not-a-uuid' }, 'materialId'],
     ['partición de equivalencia', 'UUID de proveedor inválido', { supplierId: 'not-a-uuid' }, 'supplierId'],

@@ -1,5 +1,5 @@
 import { isAppError } from '../../../errors/AppError.js';
-import { WasteAlreadyExists, WasteInitialStockReasonNotFound, WasteNotFound, WasteStockAdjustmentDatabaseError, WasteUpdateDatabaseError } from '../../../errors/warehouse/wasteError.js';
+import { WasteAlreadyExists, WasteInitialStockReasonNotFound, WasteMaxUnitCostRequired, WasteNotFound, WasteStockAdjustmentDatabaseError, WasteUpdateDatabaseError } from '../../../errors/warehouse/wasteError.js';
 import { getDb } from '../../../repository/baseRepository.js';
 import { toNumber } from '../../../utils/formattersUtils.js';
 import { calculateConvertedQuantity } from '../../inventory/stockHelpers.js';
@@ -158,6 +158,9 @@ export const createWasteWithInitialStockAdjustment = async ({
 
             if (!material) throw new WasteNotFound();
 
+            const maxUnitCost = wasteDto.maxUnitCost ?? material.maxUnitCost;
+            if (maxUnitCost == null) throw new WasteMaxUnitCostRequired();
+
             const existingWaste = await findWasteByIdentity({
                 tx,
                 supplierId: wasteDto.supplierId,
@@ -178,7 +181,7 @@ export const createWasteWithInitialStockAdjustment = async ({
                     supplier: { connect: { id: wasteDto.supplierId } },
                     presentation: { connect: { id: material.presentation.id } },
                     unitMeasure: { connect: { id: material.unitMeasure.id } },
-                    maxUnitCost: wasteDto.maxUnitCost ?? material.maxUnitCost,
+                    maxUnitCost,
                     base: wasteDto.base,
                     height: wasteDto.height,
                     currentStock: wasteDto.newStock,
