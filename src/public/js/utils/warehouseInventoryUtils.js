@@ -18,7 +18,7 @@ export const getPresentationId = (item = {}) => (
     ?? null
 );
 export const getUnitMeasure = (item = {}) => (
-    (typeof item.unitMeasure === 'string' ? item.unitMeasure : item.unitMeasure?.symbol)
+    (typeof item.unitMeasure === 'string' ? item.unitMeasure : item.unitMeasure?.symbol ?? item.unitMeasure?.name)
     ?? item.material?.unitMeasure?.symbol
     ?? item.supplierMaterial?.material?.unitMeasure?.symbol
     ?? ''
@@ -74,7 +74,26 @@ export const mapSelectMaterialData = (supplierMaterial = {}) => ({
 export const mapSelectWasteData = (waste = {}) => ({
     ...waste,
     text: buildInventorySelectText(waste),
-    supplierMaterial: JSON.stringify(waste.supplierMaterial)
+    supplier: JSON.stringify(waste.supplier),
+    presentation: getPresentation(waste),
+    unitMeasure: getUnitMeasure(waste)
+});
+
+export const mapSelectWasteMaterialTemplateData = (material = {}) => ({
+    ...material,
+    text: buildInventorySelectText(material),
+    presentation: JSON.stringify(material.presentation ?? {}),
+    unitMeasure: JSON.stringify(material.unitMeasure ?? {})
+});
+
+const parseSelectRelation = value => typeof value === 'string'
+    ? JSON.parse(value || '{}')
+    : value ?? {};
+
+export const normalizeWasteMaterialTemplateOption = (data = {}) => ({
+    ...data,
+    presentation: parseSelectRelation(data.presentation),
+    unitMeasure: parseSelectRelation(data.unitMeasure)
 });
 
 const mapIssueQuantities = (detail = {}) => ({

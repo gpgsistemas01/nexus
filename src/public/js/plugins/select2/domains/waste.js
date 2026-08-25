@@ -1,7 +1,7 @@
-import { SELECT2_EVENT_NAMES } from '../../../constants/events.js';
 import { getAllWastes } from "../../../application/warehouse/wastes/wastes.js";
 import { mapSelectWasteData } from "../../../utils/warehouseInventoryUtils.js";
-import { buildPaginatedSelectParams, initDomainSelect2, toggleSelectOption, updatePresentationDisplay } from "../baseSelect.js";
+import { buildPaginatedSelectParams, initDomainSelect2, toggleSelectOption } from "../baseSelect.js";
+import { FILTER_SELECTORS } from '../../../constants/selectors.js';
 
 const initWasteSelect = ({
     modalSelector,
@@ -25,26 +25,11 @@ const initWasteSelect = ({
     newTagLabel: 'Nueva merma'
 });
 
-const attachWasteHandler = ({
-    modalSelector,
-    baseSelector,
-    supplierSelector,
-    creationContext
-}) => {
-
-    $(baseSelector).off(SELECT2_EVENT_NAMES.SELECT).on(SELECT2_EVENT_NAMES.SELECT, (e) => {
-
-        const { data } = e.params;
-        const supplierMaterial = JSON.parse(data.supplierMaterial);
-
-        updatePresentationDisplay({
-            modalSelector,
-            data,
-            presentation: supplierMaterial.material.presentation,
-            option: e.target.querySelector('option:checked')
-        });
-    });
-};
+export const initWasteFilterSelect = () => initWasteSelect({
+    modalSelector: 'body',
+    supplierSelector: FILTER_SELECTORS.SUPPLIER,
+    baseSelector: FILTER_SELECTORS.MATERIAL
+});
 
 export const toggleWasteOption = ({
     selector,
@@ -71,10 +56,4 @@ export const setupWasteSelect = ({
         allowCreate
     });
 
-    attachWasteHandler({
-        modalSelector,
-        baseSelector,
-        supplierSelector,
-        creationContext
-    });
 };

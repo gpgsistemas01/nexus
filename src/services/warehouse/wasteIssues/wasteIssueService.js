@@ -31,7 +31,7 @@ const serviceLogger = createServiceLogger('warehouse.wasteIssues.wasteIssueServi
 
 const normalizeWasteIssueDetailResponse = detail => ({
     ...detail,
-    maxUnitCost: detail.maxUnitCost ?? detail.waste?.supplierMaterial?.maxUnitCost ?? null,
+    maxUnitCost: detail.maxUnitCost ?? detail.waste?.maxUnitCost ?? null,
     projectConvertedQuantity: detail.projectConvertedQuantity ?? null,
     convertedQuantityDifference: detail.convertedQuantityDifference ?? null
 });
@@ -55,17 +55,9 @@ const WASTE_ISSUE_INCLUDE = {
             fulfillmentStatus: { select: { id: true, name: true } },
             waste: {
                 include: {
-                    supplierMaterial: {
-                        include: {
-                            material: {
-                                include: {
-                                    presentation: true,
-                                    unitMeasure: true
-                                }
-                            },
-                            supplier: true
-                        }
-                    }
+                    supplier: true,
+                    presentation: true,
+                    unitMeasure: true
                 }
             }
         }
@@ -96,7 +88,7 @@ const resolveWasteIssueHeaderData = async ({ tx, dto }) => {
 };
 
 const createWasteIssueDetailSnapshot = ({ waste, detail, fulfillmentStatusId }) => ({
-    materialName: waste.supplierMaterial.material.name,
+    materialName: waste.name,
     quantity: detail.quantity,
     convertedQuantity: calculateConvertedQuantity({
         quantity: detail.quantity,
@@ -122,17 +114,9 @@ const buildWasteIssueDetails = async ({ tx, details, fulfillmentStatusId }) => {
     const wastes = await tx.waste.findMany({
         where: { id: { in: [...uniqueIds] }, isActive: true },
         include: {
-            supplierMaterial: {
-                include: {
-                    material: {
-                        include: {
-                            presentation: true,
-                            unitMeasure: true
-                        }
-                    },
-                    supplier: true
-                }
-            }
+            supplier: true,
+            presentation: true,
+            unitMeasure: true
         }
     });
 

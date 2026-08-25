@@ -1,7 +1,8 @@
 import { toNumber } from '../utils/formattersUtils.js';
 
 const buildWasteDataDto = (body = {}) => ({
-    supplierMaterialId: body.supplierMaterialId,
+    materialId: body.materialId,
+    supplierId: body.supplierId,
     base: toNumber(body.base),
     height: toNumber(body.height)
 });

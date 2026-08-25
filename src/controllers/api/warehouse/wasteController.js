@@ -5,6 +5,17 @@ import { sanitizeEmptyStrings } from '../../../utils/formattersUtils.js';
 import { getDataTableOrder, getDataTablePaging, getDataTableSearch } from '../../../utils/requestQueryUtils.js';
 import { emitInventoryUpdated } from '../../../utils/socketUtils.js';
 import { PERMISSIONS } from '../../../constants/permissions.js';
+import { findWasteMaterialTemplates } from '../../../services/warehouse/wastes/wasteMaterialService.js';
+
+export const getWasteMaterialTemplates = async (req, res) => {
+    const { take } = getDataTablePaging(req.query);
+    const result = await findWasteMaterialTemplates({
+        search: getDataTableSearch(req.query),
+        take
+    });
+
+    return res.status(200).json(result);
+};
 
 export const getAllWastes = async (req, res) => {
 

@@ -3,11 +3,11 @@ import { WasteAlreadyExists, WasteInitialStockReasonNotFound, WasteNotFound, Was
 import { getDb } from '../../../repository/baseRepository.js';
 import { toNumber } from '../../../utils/formattersUtils.js';
 import { calculateConvertedQuantity } from '../../inventory/stockHelpers.js';
-import { findSupplierMaterialById } from '../materials/supplierMaterialService.js';
 import { findInitialStockAdjustmentReason } from '../reasonService.js';
 import { registerWasteStockAdjustment } from './wasteStockAdjustmentService.js';
 import { createServiceLogger, getModelLogContext, logServiceError, logServiceInfo } from "../../../utils/logger.js";
 import { PRISMA_ERROR_CODES } from "../../../constants/prisma.js";
+import { resolveWasteMaterialSnapshot } from './wasteMaterialService.js';
 
 const serviceLogger = createServiceLogger('warehouse.wasteService');
 
@@ -27,47 +27,25 @@ const handleWasteServiceError = ({ err, fallbackError }) => {
 };
 
 const WASTE_INCLUDE = {
-    supplierMaterial: {
-        select: {
-            id: true,
-            materialId: true,
-            supplierId: true,
-            maxUnitCost: true,
-            currentStock: true,
-            convertedQuantity: true,
-            material: {
-                select: {
-                    id: true,
-                    name: true,
-                    isActive: true,
-                    base: true,
-                    height: true,
-                    presentation: true,
-                    unitMeasure: true
-                }
-            },
-            supplier: {
-                select: {
-                    id: true,
-                    tradeName: true
-                }
-            }
-        }
-    }
+    supplier: { select: { id: true, tradeName: true } },
+    presentation: { select: { id: true, name: true } },
+    unitMeasure: { select: { id: true, name: true, symbol: true } }
 };
 
-const findWasteBySupplierMaterialAndDimensions = async ({ tx, supplierMaterialId, base, height, excludeId = null }) => {
+const findWasteByIdentity = async ({ tx, supplierId, name, base, height, excludeId = null }) => {
     const db = getDb(tx);
 
     const where = excludeId
         ? {
-            supplierMaterialId,
+            supplierId,
+            name,
             base,
             height,
             NOT: { id: excludeId }
         }
         : {
-            supplierMaterialId,
+            supplierId,
+            name,
             base,
             height
         };
@@ -106,23 +84,12 @@ export const findAllWastes = async ({
 
     if (search) where.AND.push({
         OR: [
+            { name: { contains: search, mode: 'insensitive' } },
             {
-                supplierMaterial: {
-                    material: {
-                        name: {
-                            contains: search,
-                            mode: 'insensitive'
-                        }
-                    }
-                }
-            },
-            {
-                supplierMaterial: {
-                    supplier: {
-                        tradeName: {
-                            contains: search,
-                            mode: 'insensitive'
-                        }
+                supplier: {
+                    tradeName: {
+                        contains: search,
+                        mode: 'insensitive'
                     }
                 }
             }
@@ -130,16 +97,14 @@ export const findAllWastes = async ({
     });
 
     if (supplierId) where.AND.push({
-        supplierMaterial: {
-            supplierId
-        }
+        supplierId
     });
 
     if (where.AND.length === 0) delete where.AND;
 
     const orderMap = {
-        name: { supplierMaterial: { material: { name: orderDir } } },
-        supplier: { supplierMaterial: { supplier: { tradeName: orderDir } } }
+        name: { name: orderDir },
+        supplier: { supplier: { tradeName: orderDir } }
     };
 
     const db = getDb();
@@ -150,27 +115,20 @@ export const findAllWastes = async ({
         where,
         select: {
             id: true,
-            supplierMaterialId: true,
+            supplierId: true,
+            name: true,
             base: true,
             height: true,
+            ...(canReadCosts && { maxUnitCost: true }),
             minStock: true,
             isActive: true,
             currentStock: true,
             convertedQuantity: true,
             createdAt: true,
             updatedAt: true,
-            supplierMaterial: {
-                select: {
-                    id: true,
-                    materialId: true,
-                    supplierId: true,
-                    ...(canReadCosts && { maxUnitCost: true }),
-                    currentStock: true,
-                    convertedQuantity: true,
-                    material: WASTE_INCLUDE.supplierMaterial.select.material,
-                    supplier: WASTE_INCLUDE.supplierMaterial.select.supplier
-                }
-            }
+            supplier: WASTE_INCLUDE.supplier,
+            presentation: WASTE_INCLUDE.presentation,
+            unitMeasure: WASTE_INCLUDE.unitMeasure
         },
         orderBy: orderMap[orderBy] || orderMap.name
     });
@@ -193,14 +151,17 @@ export const createWasteWithInitialStockAdjustment = async ({
 
         const waste = await getDb().$transaction(async (tx) => {
 
-            await findSupplierMaterialById({
+            const material = await resolveWasteMaterialSnapshot({
                 tx,
-                id: wasteDto.supplierMaterialId
+                materialId: wasteDto.materialId
             });
 
-            const existingWaste = await findWasteBySupplierMaterialAndDimensions({
+            if (!material) throw new WasteNotFound();
+
+            const existingWaste = await findWasteByIdentity({
                 tx,
-                supplierMaterialId: wasteDto.supplierMaterialId,
+                supplierId: wasteDto.supplierId,
+                name: material.name,
                 base: wasteDto.base,
                 height: wasteDto.height
             });
@@ -213,7 +174,11 @@ export const createWasteWithInitialStockAdjustment = async ({
 
             const waste = await tx.waste.create({
                 data: {
-                    supplierMaterial: { connect: { id: wasteDto.supplierMaterialId } },
+                    name: material.name,
+                    supplier: { connect: { id: wasteDto.supplierId } },
+                    presentation: { connect: { id: material.presentation.id } },
+                    unitMeasure: { connect: { id: material.unitMeasure.id } },
+                    maxUnitCost: material.maxUnitCost,
                     base: wasteDto.base,
                     height: wasteDto.height,
                     currentStock: wasteDto.newStock,

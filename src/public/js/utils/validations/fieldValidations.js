@@ -80,7 +80,11 @@ export const validateInvoice = (invoice, { isInvoiced } = {}) => {
     return null;
 }
 
-export const validateNonNegativeNumber = (number, fieldName) => validateNumber(number, fieldName);
+export const validateNonNegativeNumber = (number, fieldName) => {
+    const result = validateNumber(number, fieldName);
+
+    return result || isNegative(number, fieldName);
+};
 
 export const validatePositiveNumber = (number, fieldName) => {
 

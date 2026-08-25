@@ -12,7 +12,10 @@ import {
   mapGoodsIssueDetailsToRequest,
   mapIssueDetailsToSupplyRequest,
   mapIssueDetailToTable,
-  mapSelectMaterialData
+  mapSelectMaterialData,
+  mapSelectWasteData,
+  mapSelectWasteMaterialTemplateData,
+  normalizeWasteMaterialTemplateOption
 } from '../../../src/public/js/utils/warehouseInventoryUtils.js';
 
 describe('select de material reutilizado por el CRUD de merma', () => {
@@ -62,6 +65,24 @@ describe('select de material reutilizado por el CRUD de merma', () => {
     expect(getPresentation()).toBe('');
   });
 
+  it('prepara presentación y unidad como valores directos para la salida de merma', () => {
+    const option = mapSelectWasteData({
+      id: 'waste-1',
+      name: 'Recorte',
+      base: 1,
+      height: 2,
+      presentation: { name: 'ROLLO' },
+      unitMeasure: { symbol: 'm²' },
+      supplier: { tradeName: 'Proveedor Norte' }
+    });
+
+    expect(option).toMatchObject({
+      presentation: 'ROLLO',
+      unitMeasure: 'm²'
+    });
+    expect(() => JSON.parse(option.supplier)).not.toThrow();
+  });
+
   it('conserva el id proveedor-material del listado sin duplicar su presentación', () => {
     const option = mapSelectMaterialData({
       id: 'supplier-material-1',
@@ -80,6 +101,30 @@ describe('select de material reutilizado por el CRUD de merma', () => {
     }));
     expect(option).not.toHaveProperty('presentationName');
     expect(getPresentation(JSON.parse(option.material))).toBe('ROLLO');
+  });
+
+  it('mapea la plantilla de merma con el mismo texto de identidad de inventario', () => {
+    const material = {
+      id: 'material-1',
+      name: 'Lona',
+      base: 1.52,
+      height: 50,
+      presentation: { id: 'presentation-1', name: 'ROLLO' },
+      unitMeasure: { id: 'unit-1', symbol: 'm²' }
+    };
+    const option = mapSelectWasteMaterialTemplateData(material);
+
+    expect(option).toEqual(expect.objectContaining({
+      id: 'material-1',
+      text: 'Lona (1.52 × 50)'
+    }));
+    expect(option).not.toHaveProperty('template');
+    expect(JSON.parse(option.presentation)).toEqual(material.presentation);
+    expect(JSON.parse(option.unitMeasure)).toEqual(material.unitMeasure);
+    expect(normalizeWasteMaterialTemplateOption(option)).toEqual(expect.objectContaining({
+      presentation: material.presentation,
+      unitMeasure: material.unitMeasure
+    }));
   });
 });
 

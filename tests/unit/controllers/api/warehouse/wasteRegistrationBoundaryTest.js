@@ -14,9 +14,14 @@ vi.mock('../../../../../src/services/warehouse/wastes/wasteService.js', () => ({
   updateWasteStock: vi.fn()
 }));
 
+vi.mock('../../../../../src/services/warehouse/wastes/wasteMaterialService.js', () => ({
+  findWasteMaterialTemplates: vi.fn()
+}));
+
 const { registerWaste } = await import('../../../../../src/controllers/api/warehouse/wasteController.js');
 
-const supplierMaterialId = '00000000-0000-4000-8000-000000000001';
+const materialId = '00000000-0000-4000-8000-000000000001';
+const supplierId = '00000000-0000-4000-8000-000000000003';
 const userId = '00000000-0000-4000-8000-000000000002';
 
 const app = createControllerTestApp({
@@ -35,7 +40,8 @@ const app = createControllerTestApp({
 });
 
 const validBody = {
-  supplierMaterialId,
+  materialId,
+  supplierId,
   base: '1',
   height: '1',
   minStock: '0',
@@ -81,10 +87,13 @@ describe('wasteController registration boundaries', () => {
   });
 
   it.each([
-    ['partición de equivalencia', 'UUID inválido', { supplierMaterialId: 'not-a-uuid' }, 'supplierMaterialId'],
+    ['partición de equivalencia', 'UUID de material inválido', { materialId: 'not-a-uuid' }, 'materialId'],
+    ['partición de equivalencia', 'UUID de proveedor inválido', { supplierId: 'not-a-uuid' }, 'supplierId'],
     ['valor límite', 'dimensión en cero', { base: '0' }, 'base'],
+    ['tabla de decisiones', 'medidas ausentes', { base: undefined, height: undefined }, 'base'],
     ['tabla de decisiones', 'dimensión incompleta', { height: undefined }, 'height'],
     ['partición de equivalencia', 'stock no numérico', { newStock: 'NaN' }, 'newStock'],
+    ['valor límite', 'stock negativo', { newStock: '-0.000001' }, 'newStock'],
     ['valor límite', 'primer entero sobre el máximo', { newStock: '100000000' }, 'newStock'],
     ['valor límite', 'primer decimal sobre el máximo', { newStock: '1.0000001' }, 'newStock'],
     ['valor límite', '501 caracteres de observaciones', { observations: 'a'.repeat(501) }, 'observations']

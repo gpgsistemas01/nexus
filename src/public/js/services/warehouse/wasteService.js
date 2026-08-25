@@ -8,6 +8,12 @@ export const getAllWastesRequest = ({ params }) => apiRequest({
     params
 });
 
+export const getWasteMaterialTemplatesRequest = ({ params }) => apiRequest({
+    method: 'get',
+    url: `${ WASTES_API_ROUTE }/material-templates`,
+    params
+});
+
 export const registerWasteRequest = ({ data }) => apiRequest({
     method: 'post',
     url: WASTES_API_ROUTE,

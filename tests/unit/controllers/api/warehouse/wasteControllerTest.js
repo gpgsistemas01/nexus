@@ -4,6 +4,7 @@ const createWasteWithInitialStockAdjustment = vi.fn();
 const findAllWastes = vi.fn();
 const updateWaste = vi.fn();
 const updateWasteStock = vi.fn();
+const findWasteMaterialTemplates = vi.fn();
 
 vi.mock('../../../../../src/services/warehouse/wastes/wasteService.js', () => ({
   createWasteWithInitialStockAdjustment,
@@ -12,10 +13,15 @@ vi.mock('../../../../../src/services/warehouse/wastes/wasteService.js', () => ({
   updateWasteStock
 }));
 
+vi.mock('../../../../../src/services/warehouse/wastes/wasteMaterialService.js', () => ({
+  findWasteMaterialTemplates
+}));
+
 const {
   editWaste,
   editWasteStock,
   getAllWastes,
+  getWasteMaterialTemplates,
   registerWaste
 } = await import('../../../../../src/controllers/api/warehouse/wasteController.js');
 
@@ -30,6 +36,18 @@ const createResponse = () => {
 
 describe('wasteController', () => {
   beforeEach(() => vi.clearAllMocks());
+
+  it('obtiene plantillas propias del alta de merma con búsqueda y límite', async () => {
+    const result = { data: [{ id: 'material-1' }], recordsTotal: 1, recordsFiltered: 1 };
+    const req = { query: { length: '20', search: { value: 'lona' } } };
+    const res = createResponse();
+    findWasteMaterialTemplates.mockResolvedValue(result);
+
+    await getWasteMaterialTemplates(req, res);
+
+    expect(findWasteMaterialTemplates).toHaveBeenCalledWith({ search: 'lona', take: 20 });
+    expect(res.json).toHaveBeenCalledWith(result);
+  });
 
   it('obtiene la lista con paginación, búsqueda, proveedor y orden aplicados', async () => {
     const result = { data: [{ id: 'waste-1' }], recordsTotal: 1, recordsFiltered: 1 };
@@ -87,9 +105,11 @@ describe('wasteController', () => {
     const waste = { id: 'waste-1' };
     const req = {
       body: {
-        supplierMaterialId: 'supplier-material-1',
+        materialId: 'material-1',
+        supplierId: 'supplier-1',
         base: '1',
         height: '2',
+        convertedQuantity: '999',
         newStock: '3',
         reasonId: 'client-reason-id',
         observations: '  Registro inicial  '
@@ -103,7 +123,8 @@ describe('wasteController', () => {
 
     expect(createWasteWithInitialStockAdjustment).toHaveBeenCalledWith({
       wasteDto: {
-        supplierMaterialId: 'supplier-material-1',
+        materialId: 'material-1',
+        supplierId: 'supplier-1',
         base: 1,
         height: 2,
         newStock: 3,

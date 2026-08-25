@@ -6,7 +6,7 @@ import { openModal } from "../../../ui/modalUI.js";
 import { BUTTON_SELECTORS, FORM_SELECTORS, HEADING_SELECTORS, MODAL_SELECTORS, SELECT_SELECTORS } from "../../../constants/selectors.js";
 import { wasteDataFields, wasteSecondaryDataFields, wasteStockFields } from './wasteFields.js';
 import { FORM_MODES, isCreateMode, isEditMode, isStockMode } from '../../../constants/formModes.js';
-import { getPresentation } from '../../../utils/warehouseInventoryUtils.js';
+import { displayWasteMaterialTemplate } from './wasteTemplateForm.js';
 
 const initialStockReasonName = 'Stock inicial';
 const stockDataSectionSelector = '.stock-data-section';
@@ -33,6 +33,7 @@ export const openWasteModal = ({
     form.elements.minStock.value = data?.minStock ?? '';
     form.elements.base.value = data?.base ?? '';
     form.elements.height.value = data?.height ?? '';
+    displayWasteMaterialTemplate({ form, template: data });
     form.elements.isActive.checked = data?.isActive ?? true;
     form.elements.observations.value = '';
     form.elements.newStock.value = '';
@@ -45,11 +46,6 @@ export const openWasteModal = ({
         form,
         selector: stockDataSectionSelector,
         isVisible: !isEditing
-    });
-    setFormSectionVisibility({
-        form,
-        isVisible: getPresentation(data ?? {}) === 'ROLLO',
-        fieldNames: ['weight']
     });
     setFormDisabled({ 
         form, 

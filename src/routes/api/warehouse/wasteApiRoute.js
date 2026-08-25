@@ -1,11 +1,18 @@
 import express from 'express';
 import { authorizeUserApi, verifyApiTokenRequired } from '../../../middleware/authMiddleware.js';
-import { editWaste, editWasteStock, getAllWastes, registerWaste } from '../../../controllers/api/warehouse/wasteController.js';
+import { editWaste, editWasteStock, getAllWastes, getWasteMaterialTemplates, registerWaste } from '../../../controllers/api/warehouse/wasteController.js';
 import { wasteEditValidation, wasteStockValidation, wasteValidation } from '../../../validators/forms/wasteValidations.js';
 import { validate } from '../../../middleware/validatorMiddleware.js';
 import { PERMISSIONS } from '../../../constants/permissions.js';
 
 const router = express.Router();
+
+router.get(
+    '/material-templates',
+    verifyApiTokenRequired,
+    authorizeUserApi(PERMISSIONS.WASTES_READ),
+    getWasteMaterialTemplates
+);
 
 router.get(
     '/',
