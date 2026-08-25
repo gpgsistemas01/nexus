@@ -15,7 +15,7 @@ vi.mock('../../../../src/utils/logger.js', () => ({
 const { findAllWasteMovements } = await import('../../../../src/services/inventory/movementQueryService.js');
 
 it('filtra movimientos de merma por el id de Waste seleccionado', async () => {
-  await findAllWasteMovements({ materialId: 'waste-1', supplierId: 'supplier-1' });
+  await findAllWasteMovements({ wasteId: 'waste-1', supplierId: 'supplier-1' });
 
   expect(findMany).toHaveBeenCalledWith(expect.objectContaining({
     where: expect.objectContaining({

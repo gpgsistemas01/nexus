@@ -207,7 +207,7 @@ describe('waste issue controller database integration', () => {
 
     const listedMovements = await request(app)
       .get('/waste-movements')
-      .query({ start: 0, length: 10, materialId: ids.material, movementType: 'ISSUE' })
+      .query({ start: 0, length: 10, wasteId: ids.waste, movementType: 'ISSUE' })
       .expect(200);
     expect(listedMovements.body.data).toContainEqual(expect.objectContaining({
       id: movement.details[0].id,

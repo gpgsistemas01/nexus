@@ -364,7 +364,7 @@ export const findAllWasteMovements = async ({
     endDate = '',
     movementType = '',
     search = '',
-    materialId = '',
+    wasteId = '',
     supplierId = '',
     orderBy = 'date',
     orderDir = 'desc'
@@ -374,7 +374,7 @@ export const findAllWasteMovements = async ({
     try {
         const isReturnMovementFilter = movementType === RETURN_MOVEMENT_TYPE;
         const where = {
-            ...(materialId && { wasteId: materialId }),
+            ...(wasteId && { wasteId }),
             ...(supplierId && { waste: { supplierId } }),
             ...(isReturnMovementFilter && { wasteIssueReturn: { isNot: null } }),
             ...(movementType === 'ENTRY' && { wasteIssueReturn: { is: null } }),

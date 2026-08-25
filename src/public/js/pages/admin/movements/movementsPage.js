@@ -7,7 +7,7 @@ const movementContext = document.querySelector('#movementPage')?.dataset.movemen
 if (movementContext) {
     const inventoryFilter = movementContext === 'waste'
         ? {
-            key: 'materialId',
+            key: 'wasteId',
             selector: FILTER_SELECTORS.MATERIAL,
             isSelected: false,
             initSelect: initWasteFilterSelect
