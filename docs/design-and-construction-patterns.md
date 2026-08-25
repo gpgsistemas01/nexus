@@ -264,6 +264,11 @@ propietario. Por eso acceso referencia `loginForm.js` sin un `loginPage.js` inte
 Las pantallas sin formulario, como inicio y movimientos, conservan en su entry point los
 efectos propios de la pantalla.
 
+Los filtros dependientes de movimientos reutilizan `bindDisabledSelectDependency`, el
+mismo bloqueo transversal de Select2 usado por compras y salidas. La configuración del
+filtro sólo declara el control de origen, el destino y el mensaje de su contexto; no
+debe implementar nuevamente la desactivación, la limpieza ni el aviso visual.
+
 Los módulos con sufijo `Fields` tampoco se replican por convención en cada recurso. Se
 crean cuando dos módulos hermanos del mismo contexto comparten grupos de nombres de
 campo por modo. Actualmente `materialFields.js` y `wasteFields.js` son contratos entre
