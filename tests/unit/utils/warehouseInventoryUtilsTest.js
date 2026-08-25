@@ -52,7 +52,7 @@ describe('select de material reutilizado por el CRUD de merma', () => {
     expect(getUnitMeasure(prismaDetail)).toBe('m²');
     expect(getUnitMeasureId(prismaDetail)).toBe('unit-1');
     expect(getSupplierName(prismaDetail)).toBe('Proveedor Prisma');
-    expect(getPresentation({ presentation: 'PIEZA' })).toBe('PIEZA');
+    expect(getPresentation({ presentation: { name: 'PIEZA' } })).toBe('PIEZA');
     expect(getUnitMeasure({ unitMeasure: 'pza' })).toBe('pza');
   });
 
@@ -62,6 +62,7 @@ describe('select de material reutilizado por el CRUD de merma', () => {
         material: { presentation: { name: 'ROLLO' } }
       }
     })).toBe('ROLLO');
+    expect(getPresentation({ presentation: 'ROLLO' })).toBe('');
     expect(getPresentation({ presentation: undefined })).toBe('');
     expect(getPresentation()).toBe('');
   });

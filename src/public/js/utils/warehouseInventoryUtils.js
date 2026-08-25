@@ -5,7 +5,7 @@ export const getHeight = (item = {}) => (
     item.height ?? item.material?.height ?? item.supplierMaterial?.material?.height ?? null
 );
 export const getPresentation = (item = {}) => (
-    (typeof item.presentation === 'string' ? item.presentation : item.presentation?.name)
+    item.presentation?.name
     ?? item.material?.presentation?.name
     ?? item.supplierMaterial?.material?.presentation?.name
     ?? ''
