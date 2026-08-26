@@ -2,6 +2,8 @@ import { initReasonSelect, toggleReasonOption } from "../domains/reason.js";
 import { setupSupplierSelect, toggleSupplierOption } from "../domains/supplier.js";
 import { initWasteMaterialTemplateSelect, toggleWasteMaterialTemplateOption } from "../domains/wasteMaterialTemplate.js";
 import { SELECT_SELECTORS } from "../../../constants/selectors.js";
+import { bindDisabledSelectDependency } from "../baseSelect.js";
+import { scopeSelectors } from "../../../utils/domUtils.js";
 
 let scoped = null;
 const selectors = {
@@ -12,9 +14,13 @@ const selectors = {
 
 export const initWasteSelect2 = ({ modalSelector }) => {
 
-    scoped = Object.fromEntries(Object.entries(selectors).map(
-        ([name, selector]) => [name, `${ modalSelector } ${ selector }`]
-    ));
+    scoped = scopeSelectors({ scopeSelector: modalSelector, selectors });
+
+    bindDisabledSelectDependency({
+        sourceSelector: scoped.supplier,
+        targetSelector: scoped.material,
+        disabledMessage: 'Seleccione un proveedor antes de buscar material.'
+    });
 
     [
         [initWasteMaterialTemplateSelect, {

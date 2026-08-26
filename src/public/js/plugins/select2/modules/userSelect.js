@@ -1,6 +1,7 @@
 import { initDepartmentSelect, toggleDepartmentOption } from "../domains/department.js";
 import { initRoleSelect, toggleRoleOption } from "../domains/role.js";
 import { MODAL_SELECTORS, SELECT_SELECTORS } from "../../../constants/selectors.js";
+import { scopeSelectors } from "../../../utils/domUtils.js";
 
 let scoped = null;
 const selectors = {
@@ -11,9 +12,10 @@ const modalSelector = MODAL_SELECTORS.USER;
 
 export const initUserFormSelect2 = () => {
 
-    if (!scoped) scoped = Object.fromEntries(Object.entries(selectors).map(
-        ([name, selector]) => [name, `${ MODAL_SELECTORS.USER } ${ selector }`]
-    ));
+    scoped = scopeSelectors({
+        scopeSelector: MODAL_SELECTORS.USER,
+        selectors
+    });
 
     [
         [initDepartmentSelect, { modalSelector, baseSelector: scoped.department, allowCreate: false }],

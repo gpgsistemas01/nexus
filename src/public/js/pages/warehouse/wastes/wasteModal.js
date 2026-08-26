@@ -28,6 +28,10 @@ export const openWasteModal = ({
         mode, 
         id: isCreating ? '' : data?.id
     });
+    setFormDisabled({
+        form,
+        isDisabled: false
+    });
     initWasteSelect2({ modalSelector: MODAL_SELECTORS.WASTE });
     setWasteSelectOptions({ modalSelector: MODAL_SELECTORS.WASTE, data });
 
@@ -40,10 +44,6 @@ export const openWasteModal = ({
     form.elements.observations.value = '';
     form.elements.newStock.value = '';
 
-    setFormDisabled({ 
-        form, 
-        isDisabled: false 
-    });
     setFormSectionVisibility({
         form,
         selector: stockDataSectionSelector,

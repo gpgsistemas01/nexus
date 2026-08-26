@@ -1,5 +1,5 @@
 import { DOM_EVENT_NAMES } from '../../../constants/events.js';
-import { getSelectedOptionText } from '../../../utils/domUtils.js';
+import { getSelectedOptionText, scopeSelectors } from '../../../utils/domUtils.js';
 import { isInternalClientName, resolveAdvisorDepartmentByClientName, resolveProjectNumberByClientAndDepartment } from '../../../application/warehouse/issues/issueHeaderRules.js';
 import { bindDisabledSelectDependency } from '../baseSelect.js';
 import { setupClientSelect, toggleClientOption } from '../domains/client.js';
@@ -13,9 +13,7 @@ const EDITABLE_MODES = [FORM_MODES.CREATE, FORM_MODES.EDIT, FORM_MODES.EDIT_HEAD
 
 export const createIssueHeaderSelects = ({ modalSelector, formSelector, selectors }) => {
 
-    const scoped = Object.fromEntries(Object.entries(selectors).map(
-        ([name, selector]) => [name, `${ modalSelector } ${ selector }`]
-    ));
+    const scoped = scopeSelectors({ scopeSelector: modalSelector, selectors });
     const canEdit = () => EDITABLE_MODES.includes(document.querySelector(formSelector)?.dataset.mode);
 
     const syncState = () => {

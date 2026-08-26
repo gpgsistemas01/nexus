@@ -1,5 +1,6 @@
 import { initDepartmentSelect } from "../domains/department.js";
 import { initRoleSelect } from "../domains/role.js";
+import { scopeSelectors } from "../../../utils/domUtils.js";
 
 let scoped = null;
 const selectors = {
@@ -9,9 +10,7 @@ const selectors = {
 
 export const initPersonFormSelect2 = ({ modalSelector }) => {
 
-    if (!scoped) scoped = Object.fromEntries(Object.entries(selectors).map(
-        ([name, selector]) => [name, `${ modalSelector } ${ selector }`]
-    ));
+    scoped = scopeSelectors({ scopeSelector: modalSelector, selectors });
     
     [
         [initDepartmentSelect, {
