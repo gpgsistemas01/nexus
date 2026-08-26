@@ -392,6 +392,20 @@ mantiene en el adaptador compartido: los catálogos con una selección predeterm
 pueden precargar y reutilizar esas mismas opciones sin envolverlas artificialmente ni
 intentar leer `data` de un valor inexistente.
 
+Los selects que consultan listados CRUD envían `start`, `length` y `search` al mismo
+endpoint paginado que utiliza la tabla. Select2 convierte su número de página a ese
+contrato y conserva `recordsFiltered` para habilitar la carga incremental mientras
+existan opciones. El adaptador base aporta esta transformación por defecto; cada dominio
+sólo define el mapeo visual o filtros adicionales. Los conjuntos cerrados y pequeños,
+como tipos de movimiento, pueden seguir resolviéndose localmente sin una consulta extra.
+
+La paginación base no serializa el resultado completo. Las relaciones que un control
+necesita conservar en los atributos de su opción HTML se convierten a JSON dentro del
+mapper del dominio, donde se conoce cuáles propiedades son objetos. El consumidor las
+normaliza al seleccionarlas. Así se evita convertir datos escalares o imponer el contrato
+de inventario a los demás selects. Los mappers de materiales, mermas y plantillas aplican
+`JSON.stringify` únicamente a las relaciones que después recupera cada consumidor.
+
 El filtro de estado de surtimiento conserva dos contratos separados: la precarga mínima
 resuelve la opción `Pendiente`, mientras que las búsquedas de Select2 consumen la
 respuesta paginada completa del catálogo. El adaptador del dominio transforma cada

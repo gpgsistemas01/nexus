@@ -81,7 +81,9 @@ export const mapSelectWasteData = (waste = {}) => ({
 
 export const mapSelectWasteMaterialTemplateData = (material = {}) => ({
     ...material,
-    text: buildInventorySelectText(material)
+    text: buildInventorySelectText(material),
+    presentation: JSON.stringify(material.presentation ?? {}),
+    unitMeasure: JSON.stringify(material.unitMeasure ?? {})
 });
 
 export const parseInventorySelectJson = (value) => (

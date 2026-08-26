@@ -128,7 +128,7 @@ describe('select de material reutilizado por el CRUD de merma', () => {
     expect(getPresentation(JSON.parse(option.material))).toBe('ROLLO');
   });
 
-  it('mapea la plantilla de merma con el mismo texto de identidad de inventario', () => {
+  it('serializa las relaciones de la plantilla que Select2 conserva en la opción HTML', () => {
     const material = {
       id: 'material-1',
       name: 'Lona',
@@ -143,7 +143,9 @@ describe('select de material reutilizado por el CRUD de merma', () => {
       id: 'material-1',
       text: 'Lona (1.52 × 50)'
     }));
-    expect(option).toEqual(expect.objectContaining({
+    expect(JSON.parse(option.presentation)).toEqual(material.presentation);
+    expect(JSON.parse(option.unitMeasure)).toEqual(material.unitMeasure);
+    expect(normalizeInventorySelectRelations(option)).toEqual(expect.objectContaining({
       presentation: material.presentation,
       unitMeasure: material.unitMeasure
     }));
