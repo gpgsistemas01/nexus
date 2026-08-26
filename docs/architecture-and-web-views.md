@@ -388,6 +388,18 @@ errores (`ui/forms/formErrorsUI.js`), estado y campos (`ui/forms/formStateUI.js`
 un consumidor no forman parte de esa API: se mantienen privadas dentro del CRUD que
 las necesita.
 
+El listado de materiales conserva el contrato anidado proveedor-material que también
+consumen la tabla y Select2. Sus acciones de edición y ajuste adaptan la fila mediante
+`plugins/datatable/warehouse/materials/materialRow.js` antes de abrir el modal. El
+adaptador permanece dentro del plugin propietario del listado y no se presenta como UI
+compartida con merma. El modal recibe así el contrato plano de sus inputs y el
+identificador del material, no el de la relación con el proveedor, y aplica directamente
+sus campos porque esa preparación sólo pertenece a su apertura. El alta normal y el alta
+iniciada desde compras ya entregan ese contrato plano y no atraviesan el adaptador del
+listado. Este flujo pertenece sólo a material: merma mantiene su propio formulario,
+contrato de plantilla y apertura de modal. Ambos recursos reutilizan únicamente los
+controles genéricos de formulario, Select2 y modal que sí coinciden.
+
 En compras, las filas de detalle reutilizan la identidad visible de inventario
 (`material + medidas + proveedor`) que ya muestran salidas y almacén. Los modales
 principales de compras y salidas se componen mediante `views/shared/inventory/inventoryCrudModal.ejs`;

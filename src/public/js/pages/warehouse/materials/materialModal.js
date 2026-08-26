@@ -28,17 +28,17 @@ export const openMaterialModal = ({
     initForm({ 
         form, 
         mode, 
-        id: data?.id 
+        id: data?.id
     });
     initMaterialFormSelect2({ modalSelector: MODAL_SELECTORS.MATERIAL });
     setMaterialFormSelectOptions({ modalSelector: MODAL_SELECTORS.MATERIAL, data });
     form.dataset.creationContext = creationContext || '';
 
-    form.elements.name.value = data?.name || '';
-    form.elements.minStock.value = data?.minStock || '';
+    form.elements.name.value = data?.name ?? '';
+    form.elements.minStock.value = data?.minStock ?? '';
     form.elements.maxUnitCost.value = data?.maxUnitCost ?? '';
-    form.elements.base.value = data?.base || '';
-    form.elements.height.value = data?.height || '';
+    form.elements.base.value = data?.base ?? '';
+    form.elements.height.value = data?.height ?? '';
     form.elements.isActive.checked = data?.isActive ?? true;
     form.elements.newStock.value = '';
     form.elements.observations.value = '';
