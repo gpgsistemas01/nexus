@@ -1,6 +1,6 @@
 const findDetailIndex = ({ details, matches }) => details.findIndex(matches);
 
-export const upsertDetail = ({ details, detail, matches }) => {
+export const upsertDetail = ({ details, detail, matches, preserveKeys = [] }) => {
     const index = findDetailIndex({ details, matches });
 
     if (index < 0) {
@@ -9,7 +9,13 @@ export const upsertDetail = ({ details, detail, matches }) => {
     }
 
     const previousDetail = details[index];
-    details.splice(index, 1, detail);
+    const preservedValues = Object.fromEntries(
+        preserveKeys
+            .filter(key => previousDetail[key] !== undefined)
+            .map(key => [key, previousDetail[key]])
+    );
+
+    details.splice(index, 1, { ...detail, ...preservedValues });
 
     return previousDetail;
 };

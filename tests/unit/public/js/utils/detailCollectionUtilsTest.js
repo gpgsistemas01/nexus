@@ -39,6 +39,21 @@ describe('detailCollectionUtils', () => {
     expect(details).toEqual([detail]);
   });
 
+  it('conserva las claves solicitadas al sustituir un detalle persistido del CRUD', () => {
+    const previousDetail = { id: 'detail-1', wasteId: 'waste-1', quantity: 1 };
+    const details = [previousDetail];
+
+    const replacedDetail = upsertDetail({
+      details,
+      detail: { wasteId: 'waste-1', quantity: 3 },
+      matches: item => item.wasteId === 'waste-1',
+      preserveKeys: ['id']
+    });
+
+    expect(replacedDetail).toBe(previousDetail);
+    expect(details).toEqual([{ id: 'detail-1', wasteId: 'waste-1', quantity: 3 }]);
+  });
+
   it('elimina y devuelve el detalle para coordinar totales o refrescar la tabla', () => {
     const detail = { wasteId: 'waste-1', quantity: 2 };
     const details = [detail, { wasteId: 'waste-2', quantity: 1 }];
