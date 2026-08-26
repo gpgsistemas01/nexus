@@ -307,7 +307,8 @@ los DataTables de cada contexto sólo construyen esa configuración y conservan 
 efectos CRUD propios.
 
 La mutación en memoria de detalles no pertenece al plugin de DataTable: entradas,
-salidas de material y salidas de merma comparten `upsertDetail` y `removeDetail` desde
+salidas de material y salidas de merma comparten `upsertDetail`, `removeDetail` y la
+comparación de la identidad documental o de inventario desde
 `public/js/utils/detailCollectionUtils.js`. Las funciones sólo administran la colección
 y devuelven el detalle anterior o eliminado; cada contexto conserva en su formulario o
 DataTable los efectos que sí le pertenecen, como totales, limpieza del formulario y
