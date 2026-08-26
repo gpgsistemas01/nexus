@@ -129,7 +129,8 @@ const addGoodsIssueMaterial = () => {
     upsertDetail({
         details,
         detail: newMaterial,
-        matches: detail => detail.materialId === material.id && detail.supplierId === supplier.id
+        matches: detail => detail.materialId === material.id && detail.supplierId === supplier.id,
+        preserveKeys: ['id']
     });
 
     refreshMaterialTable(details);

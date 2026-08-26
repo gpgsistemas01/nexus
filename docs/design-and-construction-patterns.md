@@ -316,6 +316,12 @@ refresco visual. Por ello `addGoodsReceiptMaterial`, `addGoodsIssueMaterial` y `
 fusionan: la compra valida costo, reemplaza por material y ajusta totales; la salida
 valida proveedor, conserva su costo máximo, convierte cantidades y usa la identidad
 material-proveedor; la salida de merma usa `wasteId` y datos de presentación propios.
+En edición, si agregar de nuevo el mismo inventario sustituye el detalle persistido,
+`upsertDetail` permite conservar explícitamente su identificador documental mediante
+`preserveKeys`. Las salidas de material y merma aplican esta opción con `id`: la fila
+mantiene la acción de eliminar después de modificar su cantidad y puede retirarse de la
+colección si finalmente ya no se necesita. El mapper de cada formulario continúa
+enviando únicamente los campos aceptados por su contrato de actualización.
 Los tres reutilizan las utilidades de colección, render y limpieza sin
 ocultar esas reglas tras callbacks de contexto. Así `detailDatatableUtils` deja de duplicar una parte del proceso de
 issues sin trasladar reglas de compras a una utilidad genérica.

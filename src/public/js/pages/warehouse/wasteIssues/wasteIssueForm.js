@@ -125,7 +125,8 @@ const addWaste = () => {
     upsertDetail({
         details,
         detail: waste,
-        matches: item => item.wasteId === wasteId
+        matches: item => item.wasteId === wasteId,
+        preserveKeys: ['id']
     });
 
     refreshMaterialTable(details);
