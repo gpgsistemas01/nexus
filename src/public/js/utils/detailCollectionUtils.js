@@ -21,3 +21,7 @@ export const removeDetail = ({ details, matches }) => {
 
     return details.splice(index, 1)[0];
 };
+
+export const matchesDetailIdentifier = ({ detail, identifier, inventoryIdKey }) => (
+    detail.id === identifier || detail[inventoryIdKey] === identifier
+);

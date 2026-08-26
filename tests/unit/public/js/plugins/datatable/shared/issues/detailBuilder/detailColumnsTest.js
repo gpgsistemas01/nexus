@@ -27,4 +27,14 @@ describe('columnas responsivas del detalle compartido de compras y salidas', () 
 
     expect(actionsColumn.responsivePriority).toBe(1);
   });
+
+  it.each([
+    ['edit', { id: 'detail-1', wasteId: 'waste-1' }, 'detail-1'],
+    ['create', { wasteId: 'waste-1' }, 'waste-1']
+  ])('identifica la acción de eliminar en modo %s', (mode, row, identifier) => {
+    const columns = buildDetailsColumns({ type: 'issue', mode });
+    const actionsColumn = columns.at(-1);
+
+    expect(actionsColumn.render(null, null, row)).toContain(`data-id="${ identifier }"`);
+  });
 });

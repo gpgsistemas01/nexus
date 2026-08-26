@@ -18,7 +18,11 @@ import { refreshMaterialTable } from '../../../plugins/datatable/shared/inventor
 import { clearAddedItemInput } from '../../../ui/forms/detailFormUI.js';
 import { normalizeFormErrors } from '../../../ui/forms/formErrorsUI.js';
 import { bindIssueProjectQuantityControls, useIssueForm } from '../../../ui/issues/issueFormUI.js';
-import { removeDetail, upsertDetail } from '../../../utils/detailCollectionUtils.js';
+import {
+    matchesDetailIdentifier,
+    removeDetail,
+    upsertDetail
+} from '../../../utils/detailCollectionUtils.js';
 import { on } from '../../../utils/domUtils.js';
 import { roundTo } from '../../../utils/formatUtils.js';
 import { hasValidationErrors, validateDetailsFields, validateFields } from '../../../utils/formUtils.js';
@@ -142,7 +146,11 @@ on(DOM_EVENT_NAMES.CLICK, BUTTON_SELECTORS.ADD_MATERIAL, addWaste);
 on(DOM_EVENT_NAMES.CLICK, `${ detailTableSelector } .delete-btn`, (event, button) => {
     const removedDetail = removeDetail({
         details,
-        matches: detail => detail.wasteId === button.dataset.id
+        matches: detail => matchesDetailIdentifier({
+            detail,
+            identifier: button.dataset.id,
+            inventoryIdKey: 'wasteId'
+        })
     });
 
     if (!removedDetail) return;

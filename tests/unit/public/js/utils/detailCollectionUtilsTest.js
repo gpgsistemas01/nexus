@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest';
 
-import { removeDetail, upsertDetail } from '../../../../../src/public/js/utils/detailCollectionUtils.js';
+import {
+  matchesDetailIdentifier,
+  removeDetail,
+  upsertDetail
+} from '../../../../../src/public/js/utils/detailCollectionUtils.js';
 
 describe('detailCollectionUtils', () => {
   it('agrega un detalle nuevo sin sustituir otros detalles del CRUD', () => {
@@ -58,5 +62,18 @@ describe('detailCollectionUtils', () => {
 
     expect(removedDetail).toBeNull();
     expect(details).toEqual([{ materialId: 'material-1' }]);
+  });
+
+  it.each([
+    ['identificador documental al editar', 'detail-1'],
+    ['identificador de merma al crear', 'waste-1']
+  ])('reconoce el %s para eliminar un detalle del CRUD', (_, identifier) => {
+    const detail = { id: 'detail-1', wasteId: 'waste-1' };
+
+    expect(matchesDetailIdentifier({
+      detail,
+      identifier,
+      inventoryIdKey: 'wasteId'
+    })).toBe(true);
   });
 });

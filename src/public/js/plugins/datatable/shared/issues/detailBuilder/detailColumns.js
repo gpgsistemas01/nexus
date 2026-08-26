@@ -200,7 +200,7 @@ export const buildDetailsColumns = ({ type, mode, canManageProjectQuantity = fal
                     className: 'delete-btn',
                     label: isSuppliedDetail ? 'El detalle ya fue surtido' : 'Eliminar detalle',
                     htmlAttrs: {
-                        'data-id': row.id,
+                        'data-id': row.id ?? row.wasteId ?? row.materialId,
                         disabled: isSuppliedDetail
                     }
                 });
