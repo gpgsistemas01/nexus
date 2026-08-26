@@ -3,6 +3,7 @@ import { initReasonSelect } from "../domains/reason.js";
 import { setupSupplierSelect, toggleSupplierOption } from "../domains/supplier.js";
 import { initUnitMeasureSelect, toggleUnitMeasureOption } from "../domains/unitMeasure.js";
 import { SELECT_SELECTORS } from "../../../constants/selectors.js";
+import { scopeSelectors } from "../../../utils/domUtils.js";
 
 let scoped = null;
 const selectors = {
@@ -16,9 +17,7 @@ export const initMaterialFormSelect2 = ({
     modalSelector
 }) => {
 
-    scoped = Object.fromEntries(Object.entries(selectors).map(
-        ([name, selector]) => [name, `${ modalSelector } ${ selector }`]
-    ));
+    scoped = scopeSelectors({ scopeSelector: modalSelector, selectors });
 
     [
         [setupSupplierSelect, {

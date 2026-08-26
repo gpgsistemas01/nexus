@@ -269,6 +269,12 @@ mismo bloqueo transversal de Select2 usado por compras y salidas. La configuraci
 filtro sólo declara el control de origen, el destino y el mensaje de su contexto; no
 debe implementar nuevamente la desactivación, la limpieza ni el aviso visual.
 
+Los módulos que componen varios Select2 dentro de un modal reutilizan
+`scopeSelectors` para limitar un mapa de selectores al contenedor. Cada módulo declara
+únicamente sus selectores de dominio y el modal que los contiene; no debe repetir la
+transformación con `Object.entries` y `Object.fromEntries` ni conservar condicionalmente
+un mapa anterior: cada inicialización vuelve a acotarlo al contenedor recibido.
+
 Los módulos con sufijo `Fields` tampoco se replican por convención en cada recurso. Se
 crean cuando dos módulos hermanos del mismo contexto comparten grupos de nombres de
 campo por modo. Actualmente `materialFields.js` y `wasteFields.js` son contratos entre
