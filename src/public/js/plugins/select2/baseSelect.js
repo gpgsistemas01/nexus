@@ -27,7 +27,7 @@ export const buildPaginatedSelectResults = (response, params = {}, {
     mapItem = (item) => item
 } = {}) => {
     const page = Number(params.page) || 1;
-    let list = JSON.parse(JSON.stringify(response.data || response));
+    const list = response.data || response;
     const recordsFiltered = Number(response.recordsFiltered) || list.length;
 
     return {
@@ -83,7 +83,7 @@ export const initbaseSelect2 = ({
     clearOnOpen = true,
     searchDelay = 1000,
     placeholder,
-    processResults,
+    processResults = (response, params) => buildPaginatedSelectResults(response, params),
     data = () => null,
     tags = false,
     createTag = (params) => {
