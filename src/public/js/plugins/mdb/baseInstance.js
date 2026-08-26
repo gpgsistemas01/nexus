@@ -28,6 +28,12 @@ export const updateMdbWrapperInput = (instance) => {
     instance.update();
 }
 
+export const setMdbWrapperInputValue = ({ selector, value }) => {
+    const instance = initMdbWrapperInput({ selector, value });
+
+    updateMdbWrapperInput(instance);
+}
+
 const tooltipDismissBoundElements = new WeakSet();
 const submenuDismissBoundRoots = new WeakSet();
 const offcanvasStateBoundTriggers = new WeakSet();

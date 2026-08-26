@@ -1,16 +1,30 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { applyWasteMaterialTemplate } from '../../../../../../../src/public/js/pages/warehouse/wastes/wasteTemplateForm.js';
 
 const createForm = () => {
   const presentationDisplay = { textContent: '—' };
   const unitMeasureDisplay = { textContent: '—' };
+  const wrapper = {};
+  const baseInput = { value: '', closest: () => wrapper };
+  const update = vi.fn();
+
+  vi.stubGlobal('document', {
+    querySelector: selector => selector === '#baseInput' ? baseInput : null
+  });
+  vi.stubGlobal('window', {
+    mdb: {
+      Input: { getOrCreateInstance: vi.fn(() => ({ update })) }
+    }
+  });
 
   return {
+    baseInput,
     presentationDisplay,
     unitMeasureDisplay,
+    update,
     form: {
-      elements: { base: { value: '' }, maxUnitCost: { value: '' } },
+      elements: { base: baseInput, maxUnitCost: { value: '' } },
       querySelector: selector => selector.includes('Presentation')
         ? presentationDisplay
         : unitMeasureDisplay
@@ -19,8 +33,10 @@ const createForm = () => {
 };
 
 describe('plantilla del formulario CRUD de mermas', () => {
+  afterEach(() => vi.unstubAllGlobals());
+
   it('completa presentación, unidad y ancho sugerido de un rollo', () => {
-    const { form, presentationDisplay, unitMeasureDisplay } = createForm();
+    const { form, presentationDisplay, unitMeasureDisplay, update } = createForm();
 
     applyWasteMaterialTemplate({
       form,
@@ -36,10 +52,11 @@ describe('plantilla del formulario CRUD de mermas', () => {
     expect(unitMeasureDisplay.textContent).toBe('m²');
     expect(form.elements.base.value).toBe(1.52);
     expect(form.elements.maxUnitCost.value).toBe(25);
+    expect(update).toHaveBeenCalledOnce();
   });
 
   it('completa los snapshots y deja manual el ancho sin sugerencia', () => {
-    const { form, presentationDisplay, unitMeasureDisplay } = createForm();
+    const { form, presentationDisplay, unitMeasureDisplay, update } = createForm();
 
     applyWasteMaterialTemplate({
       form,
@@ -54,6 +71,7 @@ describe('plantilla del formulario CRUD de mermas', () => {
     expect(unitMeasureDisplay.textContent).toBe('Pieza');
     expect(form.elements.base.value).toBe('');
     expect(form.elements.maxUnitCost.value).toBe('');
+    expect(update).toHaveBeenCalledOnce();
   });
 
 });

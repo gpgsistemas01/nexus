@@ -48,6 +48,7 @@ export const FORM_SELECTORS = {
 };
 
 export const INPUT_SELECTORS = {
+    WASTE_WIDTH: '#baseInput',
     WASTE_ISSUE_DATE: '#wasteIssueDate',
     OBSERVATIONS: '#observationsInput',
     PROJECT_NUMBER: '#projectNumberInput',

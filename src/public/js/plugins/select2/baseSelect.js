@@ -1,7 +1,7 @@
 import { DOM_EVENT_NAMES, SELECT2_EVENT_NAMES } from '../../constants/events.js';
 import { INPUT_SELECTORS } from '../../constants/selectors.js';
 import { handleApiError } from "../../api/errorHandler.js";
-import { initMdbWrapperInput, updateMdbWrapperInput } from "../mdb/baseInstance.js";
+import { initMdbWrapperInput, setMdbWrapperInputValue, updateMdbWrapperInput } from "../mdb/baseInstance.js";
 import { toggleDisabledElement } from "../../utils/formUtils.js";
 import { bindDisabledControlWarning, setDisabledControlWarning } from "../../ui/disabledControlWarning.js";
 
@@ -296,19 +296,6 @@ export const toggleSelectOptions = ({ selector, data = [] }) => {
     });
 
     $(selector).trigger(DOM_EVENT_NAMES.CHANGE);
-}
-
-export const setMdbWrapperInputValue = ({
-    selector, 
-    value
-}) => {
-
-    const instance = initMdbWrapperInput({
-        selector,
-        value
-    });
-
-    updateMdbWrapperInput(instance);
 }
 
 export const updatePresentationDisplay = ({ modalSelector, data, presentation, option }) => {
