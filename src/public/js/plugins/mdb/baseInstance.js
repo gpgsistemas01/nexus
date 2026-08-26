@@ -17,7 +17,9 @@ export const initMdbWrapperInput = ({ selector, value }) => {
     if (!inputElement) return;
 
     const wrapper = inputElement.closest('.form-outline');
-    inputElement.value = value || '';
+    inputElement.value = value ?? '';
+    inputElement.classList.toggle('active', inputElement.value !== '');
+
     return window.mdb.Input.getOrCreateInstance(wrapper);
 }
 

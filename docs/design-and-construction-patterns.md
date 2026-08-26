@@ -398,6 +398,12 @@ mantiene en el adaptador compartido: los catálogos con una selección predeterm
 pueden precargar y reutilizar esas mismas opciones sin envolverlas artificialmente ni
 intentar leer `data` de un valor inexistente.
 
+Los inputs de texto y número derivados de un select actualizan su valor mediante
+`setMdbWrapperInputValue`. El adaptador compartido sincroniza la clase visual `active`
+del control antes de actualizar la instancia MDB: un valor la activa y un valor vacío la
+retira. Por ello, al deseleccionar el origen no sólo se vacía el dato dependiente, sino que
+su `form-outline` recupera también el estado visual inicial.
+
 Los selects que consultan listados CRUD envían `start`, `length` y `search` al mismo
 endpoint paginado que utiliza la tabla. Select2 convierte su número de página a ese
 contrato y conserva `recordsFiltered` para habilitar la carga incremental mientras
