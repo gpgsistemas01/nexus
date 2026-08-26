@@ -15,6 +15,7 @@ import { formatFileName } from "../../../../utils/formatters.js";
 import { DATATABLE_SELECTORS } from "../../../../constants/selectors.js";
 import { buildWarehouseInventoryColumns, renderWarehouseInventoryHeader } from "../../shared/inventory/warehouseInventoryDatatable.js";
 import { handleApiError } from "../../../../api/errorHandler.js";
+import { mapMaterialRowToFormData } from './materialRow.js';
 
 const selectorTable = DATATABLE_SELECTORS.MAIN;
 const tableElement = document.querySelector(selectorTable);
@@ -122,14 +123,14 @@ export const createMaterialDatatable = async (context) => {
 
         const data = getResponsiveRowData(table, this);
 
-        openMaterialModal({ mode: FORM_MODES.EDIT, data });
+        openMaterialModal({ mode: FORM_MODES.EDIT, data: mapMaterialRowToFormData(data) });
     });
 
     $(`${ selectorTable } tbody`).on(DOM_EVENT_NAMES.CLICK, '.btn-adjust-stock', function() {
 
         const data = getResponsiveRowData(table, this);
 
-        openMaterialModal({ mode: FORM_MODES.EDIT_STOCK, data });
+        openMaterialModal({ mode: FORM_MODES.EDIT_STOCK, data: mapMaterialRowToFormData(data) });
     });
 
     $(`${ selectorTable } tbody`).on(DOM_EVENT_NAMES.CLICK, '.btn-delete-material', async function() {

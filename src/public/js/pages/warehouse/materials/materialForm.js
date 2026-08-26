@@ -1,6 +1,6 @@
 import { useForm } from "../../../ui/forms/formUI.js";
 import { editMaterial, editMaterialStock, registerMaterial } from "../../../application/warehouse/materials/materials.js";
-import { FORM_SELECTORS, MODAL_SELECTORS } from "../../../constants/selectors.js";
+import { FORM_SELECTORS } from "../../../constants/selectors.js";
 
 import { handleSubmit, pickFormFields, validateFields } from "../../../utils/formUtils.js";
 import { goodsReceiptMaterialCreateValidation, materialCreateValidation, materialEditValidation, materialStockValidation } from "../../../utils/validations/validators.js";
@@ -8,7 +8,6 @@ import { materialCreateFields, materialSecondaryDataFields, materialStockFields 
 import { isEditMode, isStockMode } from '../../../constants/formModes.js';
 
 const formId = FORM_SELECTORS.MATERIAL;
-const materialModalId = MODAL_SELECTORS.MATERIAL;
 const goodsReceiptCreationContext = 'goodsReceipt';
 
 const getCreationContext = (form) => form.dataset.creationContext || null;
@@ -30,12 +29,8 @@ useForm({
             ? materialStockFields
             : isEditMode(form.dataset.mode) ? materialSecondaryDataFields : materialCreateFields;
 
-        if (isStockMode(form.dataset.mode)) {
-            formData.supplierId = document.querySelector(`${ materialModalId } select[name='supplierId']`).value;
-        }
-
-        if (isEditMode(form.dataset.mode)) {
-            formData.supplierId = document.querySelector(`${ materialModalId } select[name='supplierId']`).value;
+        if (isStockMode(form.dataset.mode) || isEditMode(form.dataset.mode)) {
+            formData.supplierId = form.elements.supplierId.value;
         }
 
         if (!isStockMode(form.dataset.mode)) {
