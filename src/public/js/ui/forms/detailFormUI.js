@@ -3,6 +3,7 @@ import { INPUT_SELECTORS, SELECT_SELECTORS } from '../../constants/selectors.js'
 import { toggleContainerElements } from '../../utils/formUtils.js';
 import { FORM_MODES } from '../../constants/formModes.js';
 import { GOODS_RECEIPT_STATUS_LABELS } from '../../constants/goodsReceiptStatuses.js';
+import { setMdbWrapperInputValue } from '../../plugins/mdb/baseInstance.js';
 
 export const toggleDetailFormActions = ({ mode, status = 'Cerrada', showActions = true, withTotal = true, showAddMaterial = null }) => {
     const isView = mode === FORM_MODES.VIEW || mode === FORM_MODES.EDIT_DETAIL;
@@ -19,10 +20,9 @@ export const clearAddedItemInput = ({ itemSelector, quantitySelector, presentati
     if (clearItemOptions) itemInput.replaceChildren();
     itemInput.value = '';
     itemInput.dispatchEvent(new Event(DOM_EVENT_NAMES.CHANGE, { bubbles: true }));
-    document.querySelector(quantitySelector).value = '';
-    document.querySelector(presentationSelector).value = '';
-    const costInput = costSelector ? document.querySelector(costSelector) : null;
-    if (costInput) costInput.value = '';
+    setMdbWrapperInputValue({ selector: quantitySelector, value: '' });
+    setMdbWrapperInputValue({ selector: presentationSelector, value: '' });
+    if (costSelector) setMdbWrapperInputValue({ selector: costSelector, value: '' });
 };
 
 export const clearAddedMaterialInput = () => clearAddedItemInput({
