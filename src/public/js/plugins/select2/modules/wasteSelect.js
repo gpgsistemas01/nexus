@@ -1,15 +1,13 @@
 import { initReasonSelect, toggleReasonOption } from "../domains/reason.js";
 import { setupSupplierSelect, toggleSupplierOption } from "../domains/supplier.js";
 import { initWasteMaterialTemplateSelect, toggleWasteMaterialTemplateOption } from "../domains/wasteMaterialTemplate.js";
-import { FORM_SELECTORS, SELECT_SELECTORS } from "../../../constants/selectors.js";
-import { applyWasteMaterialTemplate } from '../../../pages/warehouse/wastes/wasteTemplateForm.js';
+import { SELECT_SELECTORS } from "../../../constants/selectors.js";
 
 let scoped = null;
 const selectors = {
     material: SELECT_SELECTORS.MATERIAL,
     supplier: SELECT_SELECTORS.SUPPLIER,
-    reason: SELECT_SELECTORS.REASON,
-    wasteForm: FORM_SELECTORS.WASTE
+    reason: SELECT_SELECTORS.REASON
 };
 
 export const initWasteSelect2 = ({ modalSelector }) => {
@@ -22,10 +20,8 @@ export const initWasteSelect2 = ({ modalSelector }) => {
         [initWasteMaterialTemplateSelect, {
             modalSelector,
             baseSelector: scoped.material,
-            onSelect: template => applyWasteMaterialTemplate({
-                form: document.querySelector(scoped.wasteForm),
-                template
-            })
+            supplierSelector: scoped.supplier,
+            data: () => ({ supplierId: $(scoped.supplier).val() })
         }],
         [setupSupplierSelect, {
             modalSelector,
@@ -46,7 +42,7 @@ export const setWasteSelectOptions = ({ modalSelector, data = null }) => {
     [
         [toggleWasteMaterialTemplateOption, {
             selector: scoped.material,
-            data: data ? { id: data.id, text: data.name } : null
+            data: null
         }],
         [toggleSupplierOption, {
             selector: scoped.supplier,

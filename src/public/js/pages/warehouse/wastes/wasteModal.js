@@ -6,10 +6,11 @@ import { openModal } from "../../../ui/modalUI.js";
 import { BUTTON_SELECTORS, FORM_SELECTORS, HEADING_SELECTORS, MODAL_SELECTORS, SELECT_SELECTORS } from "../../../constants/selectors.js";
 import { wasteDataFields, wasteSecondaryDataFields, wasteStockFields } from './wasteFields.js';
 import { FORM_MODES, isCreateMode, isEditMode, isStockMode } from '../../../constants/formModes.js';
-import { displayWasteMaterialTemplate } from './wasteTemplateForm.js';
+import { displayWasteMaterialTemplate } from '../../../ui/inventory/inventorySelectUI.js';
 
 const initialStockReasonName = 'Stock inicial';
 const stockDataSectionSelector = '.stock-data-section';
+const materialTemplateFieldSelector = '.waste-material-template-field';
 
 export const openWasteModal = ({
     mode = FORM_MODES.CREATE,
@@ -47,6 +48,12 @@ export const openWasteModal = ({
         form,
         selector: stockDataSectionSelector,
         isVisible: !isEditing
+    });
+    setFormSectionVisibility({
+        form,
+        selector: materialTemplateFieldSelector,
+        isVisible: isCreating,
+        fieldNames: ['materialId']
     });
     setFormDisabled({ 
         form, 

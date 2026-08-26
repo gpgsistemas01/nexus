@@ -48,10 +48,17 @@ export const resolveWasteMaterialSnapshot = async ({ tx = null, materialId }) =>
     return { ...material, maxUnitCost };
 };
 
-export const findWasteMaterialTemplates = async ({ search = '', take = 20 } = {}) => {
-    const where = search ? {
-        name: { contains: search, mode: 'insensitive' }
-    } : {};
+export const findWasteMaterialTemplates = async ({ search = '', take = 20, supplierId = null } = {}) => {
+    if (!supplierId) return {
+        data: [],
+        recordsTotal: 0,
+        recordsFiltered: 0
+    };
+
+    const where = {
+        ...(search && { name: { contains: search, mode: 'insensitive' } }),
+        supplierMaterials: { some: { supplierId } }
+    };
     const materials = await getDb().material.findMany({
         where,
         take: take * 5,
@@ -63,7 +70,10 @@ export const findWasteMaterialTemplates = async ({ search = '', take = 20 } = {}
             height: true,
             presentation: { select: { id: true, name: true } },
             unitMeasure: { select: { id: true, name: true, symbol: true } },
-            supplierMaterials: { select: { maxUnitCost: true } }
+            supplierMaterials: {
+                where: { supplierId },
+                select: { maxUnitCost: true }
+            }
         }
     });
     const uniqueTemplates = new Map();

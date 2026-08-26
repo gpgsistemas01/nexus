@@ -11,18 +11,35 @@
                     type: 'selects',
                     items: [
                         {
-                            id: 'materialInput',
-                            name: 'materialId',
-                            class: 'material-select',
-                            col: 'col-6'
-                        },
-                        {
                             id: 'supplierInput',
                             name: 'supplierId',
                             class: 'supplier-select',
-                            col: 'col-6'
+                            label: 'Proveedor',
+                            col: 'col-12'
                         }
                     ]
+                },
+                {
+                    type: 'selects',
+                    items: [
+                        {
+                            id: 'materialInput',
+                            name: 'materialId',
+                            class: 'material-select',
+                            label: 'Material de referencia del proveedor',
+                            col: 'col-12 waste-material-template-field'
+                        }
+                    ]
+                },
+                {
+                    type: 'html',
+                    col: 'col-12 col-md-6',
+                    content: include('../../../shared/forms/informativeValue', {
+                        value: {
+                            id: 'wasteNameDisplayValue',
+                            label: 'Nombre de la merma'
+                        }
+                    })
                 },
                 {
                     type: 'html',
