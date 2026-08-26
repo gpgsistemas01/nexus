@@ -37,9 +37,9 @@ const createResponse = () => {
 describe('wasteController', () => {
   beforeEach(() => vi.clearAllMocks());
 
-  it('obtiene plantillas propias del alta de merma con búsqueda y límite', async () => {
+  it('obtiene plantillas propias del alta de merma con búsqueda y paginación', async () => {
     const result = { data: [{ id: 'material-1' }], recordsTotal: 1, recordsFiltered: 1 };
-    const req = { query: { length: '20', search: { value: 'lona' }, supplierId: 'supplier-1' } };
+    const req = { query: { start: '20', length: '20', search: { value: 'lona' }, supplierId: 'supplier-1' } };
     const res = createResponse();
     findWasteMaterialTemplates.mockResolvedValue(result);
 
@@ -47,6 +47,7 @@ describe('wasteController', () => {
 
     expect(findWasteMaterialTemplates).toHaveBeenCalledWith({
       search: 'lona',
+      skip: 20,
       take: 20,
       supplierId: 'supplier-1'
     });

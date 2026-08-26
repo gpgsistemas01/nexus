@@ -8,9 +8,10 @@ import { PERMISSIONS } from '../../../constants/permissions.js';
 import { findWasteMaterialTemplates } from '../../../services/warehouse/wastes/wasteMaterialService.js';
 
 export const getWasteMaterialTemplates = async (req, res) => {
-    const { take } = getDataTablePaging(req.query);
+    const { skip, take } = getDataTablePaging(req.query);
     const result = await findWasteMaterialTemplates({
         search: getDataTableSearch(req.query),
+        skip,
         take,
         supplierId: req.query.supplierId || null
     });

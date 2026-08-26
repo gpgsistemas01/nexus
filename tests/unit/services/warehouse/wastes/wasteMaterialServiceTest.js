@@ -37,7 +37,7 @@ describe('plantillas de material para el CRUD de mermas', () => {
         name: { contains: 'lo', mode: 'insensitive' },
         supplierMaterials: { some: { supplierId: 'supplier-1' } }
       },
-      take: 100
+      orderBy: { name: 'asc' }
     }));
     expect(materialFindMany.mock.calls[0][0].select.supplierMaterials).toEqual({
       where: { supplierId: 'supplier-1' },
@@ -48,5 +48,26 @@ describe('plantillas de material para el CRUD de mermas', () => {
       expect.objectContaining({ id: 'material-wide', suggestedWidth: 3.2, maxUnitCost: 30 }),
       expect.objectContaining({ id: 'material-2', suggestedWidth: null, maxUnitCost: null })
     ]);
+    expect(result.recordsFiltered).toBe(3);
+  });
+
+  it('carga la página solicitada sin perder el total de plantillas disponibles', async () => {
+    materialFindMany.mockResolvedValue([
+      { id: 'material-1', name: 'Lona', base: 1, height: 10, presentation: { name: 'ROLLO' }, supplierMaterials: [] },
+      { id: 'material-2', name: 'Malla', base: 2, height: 10, presentation: { name: 'ROLLO' }, supplierMaterials: [] },
+      { id: 'material-3', name: 'Vinil', base: 3, height: 10, presentation: { name: 'ROLLO' }, supplierMaterials: [] }
+    ]);
+
+    const result = await findWasteMaterialTemplates({
+      skip: 1,
+      take: 1,
+      supplierId: 'supplier-1'
+    });
+
+    expect(result).toEqual({
+      data: [expect.objectContaining({ id: 'material-2' })],
+      recordsTotal: 3,
+      recordsFiltered: 3
+    });
   });
 });

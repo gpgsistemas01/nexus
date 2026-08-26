@@ -48,7 +48,7 @@ export const resolveWasteMaterialSnapshot = async ({ tx = null, materialId }) =>
     return { ...material, maxUnitCost };
 };
 
-export const findWasteMaterialTemplates = async ({ search = '', take = 20, supplierId = null } = {}) => {
+export const findWasteMaterialTemplates = async ({ search = '', skip = 0, take = 20, supplierId = null } = {}) => {
     if (!supplierId) return {
         data: [],
         recordsTotal: 0,
@@ -61,7 +61,6 @@ export const findWasteMaterialTemplates = async ({ search = '', take = 20, suppl
     };
     const materials = await getDb().material.findMany({
         where,
-        take: take * 5,
         orderBy: { name: 'asc' },
         select: {
             id: true,
@@ -97,11 +96,12 @@ export const findWasteMaterialTemplates = async ({ search = '', take = 20, suppl
             : Math.max(current.maxUnitCost ?? maxUnitCost, maxUnitCost);
     });
 
-    const data = [...uniqueTemplates.values()].slice(0, take);
+    const templates = [...uniqueTemplates.values()];
+    const data = templates.slice(skip, skip + take);
 
     return {
         data,
-        recordsTotal: data.length,
-        recordsFiltered: data.length
+        recordsTotal: templates.length,
+        recordsFiltered: templates.length
     };
 };

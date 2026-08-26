@@ -398,6 +398,9 @@ contrato y conserva `recordsFiltered` para habilitar la carga incremental mientr
 existan opciones. El adaptador base aporta esta transformación por defecto; cada dominio
 sólo define el mapeo visual o filtros adicionales. Los conjuntos cerrados y pequeños,
 como tipos de movimiento, pueden seguir resolviéndose localmente sin una consulta extra.
+La consulta de plantillas de merma aplica `start` después de consolidar por nombre y
+ancho, y devuelve el total consolidado en `recordsFiltered`; así, el selector puede
+cargar las páginas siguientes sin repetir la primera ni ocultar resultados disponibles.
 
 La paginación base no serializa el resultado completo. Las relaciones que un control
 necesita conservar en los atributos de su opción HTML se convierten a JSON dentro del
