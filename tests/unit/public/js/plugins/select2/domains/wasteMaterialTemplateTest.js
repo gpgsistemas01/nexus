@@ -44,8 +44,8 @@ describe('selección de plantilla del CRUD de mermas', () => {
     presentationDisplay = { textContent: 'ROLLO' };
     unitMeasureDisplay = { textContent: 'm²' };
     const wrapper = {};
-    baseInput = { value: '1.52', closest: () => wrapper };
-    maxUnitCostInput = { value: '25', closest: () => wrapper };
+    baseInput = { value: '1.52', closest: () => wrapper, classList: { toggle: vi.fn() } };
+    maxUnitCostInput = { value: '25', closest: () => wrapper, classList: { toggle: vi.fn() } };
     form = {
       querySelector: selector => ({
         '#wasteNameDisplayValue': nameDisplay,

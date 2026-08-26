@@ -9,8 +9,8 @@ const createForm = () => {
   const presentationDisplay = { textContent: '—' };
   const unitMeasureDisplay = { textContent: '—' };
   const wrapper = {};
-  const baseInput = { value: '', closest: () => wrapper };
-  const maxUnitCostInput = { value: '', closest: () => wrapper };
+  const baseInput = { value: '', closest: () => wrapper, classList: { toggle: vi.fn() } };
+  const maxUnitCostInput = { value: '', closest: () => wrapper, classList: { toggle: vi.fn() } };
   const update = vi.fn();
 
   vi.stubGlobal('document', {
@@ -100,6 +100,8 @@ describe('plantilla del formulario CRUD de mermas', () => {
     expect(unitMeasureDisplay.textContent).toBe('—');
     expect(form.elements.base.value).toBe('');
     expect(form.elements.maxUnitCost.value).toBe('');
+    expect(form.elements.base.classList.toggle).toHaveBeenLastCalledWith('active', false);
+    expect(form.elements.maxUnitCost.classList.toggle).toHaveBeenLastCalledWith('active', false);
     expect(update).toHaveBeenCalledTimes(2);
   });
 
