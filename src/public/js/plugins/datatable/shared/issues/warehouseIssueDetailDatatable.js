@@ -7,6 +7,7 @@ import { hasPermission, UI_PERMISSIONS } from '../../../../constants/permissions
 export const buildWarehouseIssueDetailsConfig = ({
     mode,
     context = {},
+    itemLabel = 'Material',
     projectQuantityPermission = UI_PERMISSIONS.GOODS_ISSUE_DETAILS_MANAGE
 }) => {
     const tableContext = {
@@ -16,7 +17,7 @@ export const buildWarehouseIssueDetailsConfig = ({
     };
 
     return {
-        header: buildDetailsHeader(tableContext),
+        header: buildDetailsHeader({ ...tableContext, itemLabel }),
         columns: buildDetailsColumns(tableContext)
     };
 };
@@ -29,12 +30,14 @@ export const createWarehouseIssueDetailsTable = ({
     data,
     mode,
     context = {},
+    itemLabel = 'Material',
     projectQuantityPermission = UI_PERMISSIONS.GOODS_ISSUE_DETAILS_MANAGE,
     selector = DATATABLE_SELECTORS.MATERIAL
 }) => {
     const { header, columns } = buildWarehouseIssueDetailsConfig({
         mode,
         context,
+        itemLabel,
         projectQuantityPermission
     });
 

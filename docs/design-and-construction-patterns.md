@@ -236,6 +236,13 @@ representa específicamente el campo de material: siempre renderiza `materialInp
 permitir que una página redefina el ancho. El modal conserva el select genérico para
 detalles de otros dominios, como merma, y sólo el contexto de material activa el partial.
 
+La tabla de detalles de salidas también se reutiliza porque material y merma comparten
+el ciclo de vida, las cantidades, la conversión, el surtido y la devolución. La factory
+`createWarehouseIssueDetailsTable` recibe `itemLabel` para presentar el nombre del recurso:
+material conserva el valor predeterminado `Material` y la salida de merma declara `Merma`.
+Esta variación de contexto no justifica tablas separadas; evita duplicar reglas de columnas
+y, a la vez, impide mostrar datos de merma bajo un encabezado de material.
+
 Este criterio evita dos extremos: duplicar componentes por contexto y crear una
 abstracción «compartida» que todavía depende de un recurso concreto. Al editar EJS se
 preserva el cierre final de `contentFor` en su lugar; no se elimina y vuelve a agregar

@@ -36,4 +36,17 @@ describe('encabezado del detalle compartido para los CRUD de entradas y salidas'
     expect(header).toContain('Acciones');
     expect(header).not.toContain('Surtir');
   });
+
+  it('presenta el nombre del recurso del CRUD sin duplicar la tabla compartida', () => {
+    const wasteHeader = buildDetailsHeader({
+      type: 'issue',
+      mode: FORM_MODES.CREATE,
+      itemLabel: 'Merma'
+    });
+    const materialHeader = buildDetailsHeader({ type: 'issue', mode: FORM_MODES.CREATE });
+
+    expect(wasteHeader).toContain('<th rowspan="2">Merma</th>');
+    expect(wasteHeader).not.toContain('<th rowspan="2">Material</th>');
+    expect(materialHeader).toContain('<th rowspan="2">Material</th>');
+  });
 });
