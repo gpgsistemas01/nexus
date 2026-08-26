@@ -66,6 +66,7 @@ export const openWasteIssueModal = ({ mode, data = null }) => {
         data: wasteIssueDetails,
         mode: form.dataset.mode,
         context,
+        detailName: 'Merma',
         projectQuantityPermission: UI_PERMISSIONS.WASTE_ISSUES_SUPPLY
     });
     openModal(modalElement);

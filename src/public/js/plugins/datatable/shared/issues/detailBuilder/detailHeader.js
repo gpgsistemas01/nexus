@@ -7,7 +7,12 @@ import {
     shouldShowReceiptPurchaseColumns
 } from './detailRules.js';
 
-export const buildDetailsHeader = ({ type, mode, canManageProjectQuantity = false }) => {
+export const buildDetailsHeader = ({
+    type,
+    mode,
+    canManageProjectQuantity = false,
+    detailName = 'Material'
+}) => {
     const context = { type, mode, canManageProjectQuantity };
     let extraHeaders = '';
     const suppliedQuantityHeader = shouldShowIssueSuppliedQuantity(context) ? '<th rowspan="2">Cantidad surtida</th>' : '';
@@ -35,7 +40,7 @@ export const buildDetailsHeader = ({ type, mode, canManageProjectQuantity = fals
     return `
         <thead>
             <tr>
-                <th rowspan="2">Material</th>
+                <th rowspan="2">${ detailName }</th>
                 <th colspan="2">Medidas</th>
                 ${ transactionQuantityHeader }
                 ${ suppliedQuantityHeader }

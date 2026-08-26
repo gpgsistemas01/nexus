@@ -36,4 +36,15 @@ describe('encabezado del detalle compartido para los CRUD de entradas y salidas'
     expect(header).toContain('Acciones');
     expect(header).not.toContain('Surtir');
   });
+
+  it('identifica como merma el recurso de una salida de merma', () => {
+    const header = buildDetailsHeader({
+      type: 'issue',
+      mode: FORM_MODES.VIEW,
+      detailName: 'Merma'
+    });
+
+    expect(header).toContain('<th rowspan="2">Merma</th>');
+    expect(header).not.toContain('<th rowspan="2">Material</th>');
+  });
 });
