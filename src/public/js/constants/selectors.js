@@ -49,6 +49,7 @@ export const FORM_SELECTORS = {
 
 export const INPUT_SELECTORS = {
     WASTE_WIDTH: '#baseInput',
+    WASTE_MAX_UNIT_COST: '#maxUnitCostInput',
     WASTE_ISSUE_DATE: '#wasteIssueDate',
     OBSERVATIONS: '#observationsInput',
     PROJECT_NUMBER: '#projectNumberInput',
@@ -57,6 +58,7 @@ export const INPUT_SELECTORS = {
     PRESENTATION_DISPLAY: '#presentationDisplayInput',
     UNIT_MEASURE_DISPLAY: '#unitMeasureDisplayInput',
     WASTE_PRESENTATION_DISPLAY: '#wastePresentationDisplayValue',
+    WASTE_NAME_DISPLAY: '#wasteNameDisplayValue',
     WASTE_UNIT_MEASURE_DISPLAY: '#wasteUnitMeasureDisplayValue',
     SELECTED_MATERIAL_SUPPLIER: '#selectedMaterialSupplierValue',
     SELECTED_MATERIAL_PRESENTATION: '#selectedMaterialPresentationValue',

@@ -39,13 +39,17 @@ describe('wasteController', () => {
 
   it('obtiene plantillas propias del alta de merma con búsqueda y límite', async () => {
     const result = { data: [{ id: 'material-1' }], recordsTotal: 1, recordsFiltered: 1 };
-    const req = { query: { length: '20', search: { value: 'lona' } } };
+    const req = { query: { length: '20', search: { value: 'lona' }, supplierId: 'supplier-1' } };
     const res = createResponse();
     findWasteMaterialTemplates.mockResolvedValue(result);
 
     await getWasteMaterialTemplates(req, res);
 
-    expect(findWasteMaterialTemplates).toHaveBeenCalledWith({ search: 'lona', take: 20 });
+    expect(findWasteMaterialTemplates).toHaveBeenCalledWith({
+      search: 'lona',
+      take: 20,
+      supplierId: 'supplier-1'
+    });
     expect(res.json).toHaveBeenCalledWith(result);
   });
 

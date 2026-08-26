@@ -11,7 +11,8 @@ export const getWasteMaterialTemplates = async (req, res) => {
     const { take } = getDataTablePaging(req.query);
     const result = await findWasteMaterialTemplates({
         search: getDataTableSearch(req.query),
-        take
+        take,
+        supplierId: req.query.supplierId || null
     });
 
     return res.status(200).json(result);
