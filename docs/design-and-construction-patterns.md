@@ -405,6 +405,13 @@ del control antes de actualizar la instancia MDB: un valor la activa y un valor 
 retira. Por ello, al deseleccionar el origen no sólo se vacía el dato dependiente, sino que
 su `form-outline` recupera también el estado visual inicial.
 
+Después de agregar un nuevo detalle de material o merma, `clearAddedItemInput` reutiliza
+ese mismo adaptador para limpiar cantidad, presentación y costo. La limpieza ocurre como
+efecto del clic en agregar, después de actualizar la colección y la tabla, y devuelve
+tanto los valores como sus wrappers `form-outline` al estado visual inicial. Cada flujo
+conserva sus reglas de validación y composición del detalle, sin duplicar la coordinación
+visual compartida.
+
 Los selects que consultan listados CRUD envían `start`, `length` y `search` al mismo
 endpoint paginado que utiliza la tabla. Select2 convierte su número de página a ese
 contrato y conserva `recordsFiltered` para habilitar la carga incremental mientras

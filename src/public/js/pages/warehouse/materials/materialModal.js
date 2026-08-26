@@ -92,6 +92,5 @@ export const openMaterialModal = ({
             : 'Guardar';
 
     form.onSave = onSave;
-
     openModal(modalElement);
 };
