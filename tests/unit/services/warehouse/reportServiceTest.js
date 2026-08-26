@@ -11,26 +11,41 @@ import { buildWasteReportSummary, findWasteReportRows } from '../../../../src/se
 describe('consulta del reporte de mermas', () => {
   beforeEach(() => vi.clearAllMocks());
 
-  it('consolida cantidades y metros cuadrados por material, proveedor y ancho', () => {
+  it('consulta el total de stock y recalcula los metros cuadrados de rollos agrupados por nombre, proveedor y ancho', () => {
     const report = buildWasteReportSummary([
-      { materialId: 'material-1', supplierId: 'supplier-1', name: 'Lona', supplier: 'Proveedor A', base: 1.5, height: 2, currentStock: 2, convertedQuantity: 6 },
-      { materialId: 'material-1', supplierId: 'supplier-1', name: 'Lona', supplier: 'Proveedor A', base: 1.5, height: 5, currentStock: 3, convertedQuantity: 22.5 },
-      { materialId: 'material-1', supplierId: 'supplier-1', name: 'Lona', supplier: 'Proveedor A', base: 2, height: 2, currentStock: 1, convertedQuantity: 4 },
-      { materialId: 'material-1', supplierId: 'supplier-2', name: 'Lona', supplier: 'Proveedor B', base: 1.5, height: 2, currentStock: 1, convertedQuantity: 3 }
+      { supplierId: 'supplier-1', name: 'Lona', supplier: 'Proveedor A', presentation: 'ROLLO', base: 1.5, height: 2, currentStock: 2, convertedQuantity: 999 },
+      { supplierId: 'supplier-1', name: ' lona ', supplier: 'Proveedor A', presentation: 'Rollo', base: 1.5, height: 5, currentStock: 3, convertedQuantity: 999 },
+      { supplierId: 'supplier-1', name: 'Lona', supplier: 'Proveedor A', presentation: 'ROLLO', base: 2, height: 2, currentStock: 1 },
+      { supplierId: 'supplier-2', name: 'Lona', supplier: 'Proveedor B', presentation: 'ROLLO', base: 1.5, height: 2, currentStock: 1 }
     ]);
 
     expect(report.rows).toEqual([
-      { supplier: 'Proveedor A', name: 'Lona', width: 1.5, wasteQuantity: 2, currentStock: 5, squareMeters: 28.5 },
-      { supplier: 'Proveedor A', name: 'Lona', width: 2, wasteQuantity: 1, currentStock: 1, squareMeters: 4 },
-      { supplier: 'Proveedor B', name: 'Lona', width: 1.5, wasteQuantity: 1, currentStock: 1, squareMeters: 3 }
+      { supplier: 'Proveedor A', name: 'Lona', width: 1.5, length: null, wasteQuantity: 5, squareMeters: 28.5 },
+      { supplier: 'Proveedor A', name: 'Lona', width: 2, length: null, wasteQuantity: 1, squareMeters: 4 },
+      { supplier: 'Proveedor B', name: 'Lona', width: 1.5, length: null, wasteQuantity: 1, squareMeters: 3 }
     ]);
-    expect(report.totals).toEqual({ wasteQuantity: 4, currentStock: 7, squareMeters: 35.5 });
+    expect(report.totals).toEqual({ wasteQuantity: 7, squareMeters: 35.5 });
+  });
+
+  it('separa por largo las presentaciones que no son rollo y conserva el grupo sin medidas', () => {
+    const report = buildWasteReportSummary([
+      { supplierId: 'supplier-1', name: 'Retazo', supplier: 'Proveedor A', presentation: 'PIEZA', base: 2, height: 3, currentStock: 2 },
+      { supplierId: 'supplier-1', name: 'Retazo', supplier: 'Proveedor A', presentation: 'PIEZA', base: 2, height: 4, currentStock: 1 },
+      { supplierId: 'supplier-1', name: 'Retazo sin medida', supplier: 'Proveedor A', presentation: 'PIEZA', base: null, height: null, currentStock: 4 }
+    ]);
+
+    expect(report.rows).toEqual([
+      { supplier: 'Proveedor A', name: 'Retazo', width: 2, length: 3, wasteQuantity: 2, squareMeters: 12 },
+      { supplier: 'Proveedor A', name: 'Retazo', width: 2, length: 4, wasteQuantity: 1, squareMeters: 8 },
+      { supplier: 'Proveedor A', name: 'Retazo sin medida', width: null, length: null, wasteQuantity: 4, squareMeters: 0 }
+    ]);
+    expect(report.totals).toEqual({ wasteQuantity: 7, squareMeters: 20 });
   });
 
   it('devuelve totales en cero cuando la consulta no contiene mermas', () => {
     expect(buildWasteReportSummary([])).toEqual({
       rows: [],
-      totals: { wasteQuantity: 0, currentStock: 0, squareMeters: 0 }
+      totals: { wasteQuantity: 0, squareMeters: 0 }
     });
   });
 

@@ -297,8 +297,8 @@ export const exportWasteReportExcel = async (req, res) => {
             'Proveedor',
             'Material',
             'Ancho',
-            'Cantidad de mermas',
-            'Cantidad total',
+            'Largo',
+            'Total de mermas',
             'Total m²'
         ],
 
@@ -306,16 +306,16 @@ export const exportWasteReportExcel = async (req, res) => {
             row.supplier,
             row.name,
             row.width,
+            row.length,
             row.wasteQuantity,
-            row.currentStock,
             row.squareMeters
         ]),
         [
             'Total',
             '',
             '',
+            '',
             totals.wasteQuantity,
-            totals.currentStock,
             totals.squareMeters
         ]
     ];

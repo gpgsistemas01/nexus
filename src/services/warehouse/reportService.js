@@ -167,47 +167,57 @@ const sum = (rows, field) => rows.reduce((total, row) => total + toNumber(row[fi
 const divideOrZero = (dividend, divisor) => divisor ? dividend / divisor : 0;
 const VAT_RATE = 0.16;
 
+const normalizeReportIdentity = value => String(value || '').trim().toLocaleLowerCase('es-MX');
+
 /**
- * Consolidates waste inventory by material, supplier and width. Waste length
- * (height in storage) can vary because it comes from rolls with different
- * original lengths, so it does not identify whether two remnants are related.
+ * Consolidates waste inventory by name, supplier and dimensions. A roll's
+ * length varies per remnant and therefore does not split its group; other
+ * presentations retain their length as part of the inventory identity.
  */
 export const buildWasteReportSummary = (rows = []) => {
     const groups = new Map();
 
     rows.forEach((row) => {
-        const width = toNumber(row.base);
+        const hasWidth = row.base !== null && row.base !== undefined && row.base !== '';
+        const hasLength = row.height !== null && row.height !== undefined && row.height !== '';
+        const width = hasWidth ? toNumber(row.base) : null;
+        const isRoll = normalizeReportIdentity(row.presentation) === 'rollo';
+        const length = !isRoll && hasLength ? toNumber(row.height) : null;
         const key = JSON.stringify([
-            row.materialId || row.name || 'no-material',
-            row.supplierId || row.supplier || 'no-supplier',
-            width
+            normalizeReportIdentity(row.name) || 'no-material',
+            row.supplierId || normalizeReportIdentity(row.supplier) || 'no-supplier',
+            width,
+            length
         ]);
         const group = groups.get(key) || {
             supplier: row.supplier || 'Sin proveedor',
             name: row.name || 'Sin material',
             width,
+            length,
             wasteQuantity: 0,
-            currentStock: 0,
             squareMeters: 0
         };
 
-        group.wasteQuantity += 1;
-        group.currentStock += toNumber(row.currentStock) || 0;
-        group.squareMeters += toNumber(row.convertedQuantity) || 0;
+        const stock = toNumber(row.currentStock) || 0;
+        const squareMeters = hasWidth && hasLength
+            ? stock * toNumber(row.base) * toNumber(row.height)
+            : 0;
+
+        group.wasteQuantity += stock;
+        group.squareMeters += squareMeters;
         groups.set(key, group);
     });
 
     const summaryRows = [...groups.values()].map(row => ({
         ...row,
-        currentStock: roundTo(row.currentStock),
+        wasteQuantity: roundTo(row.wasteQuantity),
         squareMeters: roundTo(row.squareMeters)
     }));
 
     return {
         rows: summaryRows,
         totals: {
-            wasteQuantity: sum(summaryRows, 'wasteQuantity'),
-            currentStock: roundTo(sum(summaryRows, 'currentStock')),
+            wasteQuantity: roundTo(sum(summaryRows, 'wasteQuantity')),
             squareMeters: roundTo(sum(summaryRows, 'squareMeters'))
         }
     };
