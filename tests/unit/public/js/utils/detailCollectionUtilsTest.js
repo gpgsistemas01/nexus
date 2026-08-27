@@ -3,7 +3,8 @@ import { describe, expect, it } from 'vitest';
 import {
   matchesDetailIdentifier,
   removeDetail,
-  upsertDetail
+  upsertDetail,
+  upsertIssueDetail
 } from '../../../../../src/public/js/utils/detailCollectionUtils.js';
 
 describe('detailCollectionUtils', () => {
@@ -24,6 +25,39 @@ describe('detailCollectionUtils', () => {
     ]);
   });
 
+  it.each([
+    ['material', 'materialId', 'material-2', { supplierId: 'supplier-1' }],
+    ['merma', 'wasteId', 'waste-2', {}]
+  ])('agrega y elimina un detalle nuevo de %s durante la edición pendiente', (
+    _,
+    inventoryIdKey,
+    inventoryId,
+    identity
+  ) => {
+    const details = [];
+    const newDetail = { [inventoryIdKey]: inventoryId, ...identity, quantity: 2 };
+
+    upsertIssueDetail({
+      details,
+      detail: newDetail,
+      matches: detail => (
+        detail[inventoryIdKey] === inventoryId
+        && Object.entries(identity).every(([key, value]) => detail[key] === value)
+      )
+    });
+    const removedDetail = removeDetail({
+      details,
+      matches: detail => matchesDetailIdentifier({
+        detail,
+        identifier: inventoryId,
+        inventoryIdKey
+      })
+    });
+
+    expect(removedDetail).toBe(newDetail);
+    expect(details).toEqual([]);
+  });
+
   it('sustituye y devuelve el detalle anterior para aplicar efectos relacionados', () => {
     const previousDetail = { materialId: 'material-1', quantity: 1 };
     const details = [previousDetail];
@@ -39,19 +73,101 @@ describe('detailCollectionUtils', () => {
     expect(details).toEqual([detail]);
   });
 
-  it('conserva las claves solicitadas al sustituir un detalle persistido del CRUD', () => {
-    const previousDetail = { id: 'detail-1', wasteId: 'waste-1', quantity: 1 };
+  it.each([
+    [
+      'material del mismo proveedor',
+      { id: 'detail-1', materialId: 'material-1', supplierId: 'supplier-1', quantity: 1 },
+      { materialId: 'material-1', supplierId: 'supplier-1', quantity: 3 },
+      detail => detail.materialId === 'material-1' && detail.supplierId === 'supplier-1'
+    ],
+    [
+      'merma',
+      { id: 'detail-1', wasteId: 'waste-1', quantity: 1 },
+      { wasteId: 'waste-1', quantity: 3 },
+      detail => detail.wasteId === 'waste-1'
+    ]
+  ])('sustituye durante la edición pendiente %s ya registrado y conserva su id', (
+    _,
+    previousDetail,
+    editedDetail,
+    matches
+  ) => {
     const details = [previousDetail];
 
-    const replacedDetail = upsertDetail({
+    const replacedDetail = upsertIssueDetail({
       details,
-      detail: { wasteId: 'waste-1', quantity: 3 },
-      matches: item => item.wasteId === 'waste-1',
-      preserveKeys: ['id']
+      detail: editedDetail,
+      matches
     });
 
     expect(replacedDetail).toBe(previousDetail);
-    expect(details).toEqual([{ id: 'detail-1', wasteId: 'waste-1', quantity: 3 }]);
+    expect(details).toEqual([{ ...editedDetail, id: 'detail-1' }]);
+  });
+
+  it('agrega otra relación cuando se registra el mismo material con un proveedor diferente', () => {
+    const persistedDetail = {
+      id: 'detail-1',
+      materialId: 'material-1',
+      supplierId: 'supplier-1',
+      quantity: 1
+    };
+    const details = [persistedDetail];
+    const newDetail = {
+      materialId: 'material-1',
+      supplierId: 'supplier-2',
+      quantity: 3
+    };
+
+    const replacedDetail = upsertDetail({
+      details,
+      detail: newDetail,
+      matches: detail => (
+        detail.materialId === newDetail.materialId
+        && detail.supplierId === newDetail.supplierId
+      ),
+      preserveKeys: ['id']
+    });
+
+    expect(replacedDetail).toBeNull();
+    expect(details).toEqual([persistedDetail, newDetail]);
+  });
+
+  it.each([
+    ['material', 'materialId', 'material-1', { supplierId: 'supplier-1' }],
+    ['merma', 'wasteId', 'waste-1', {}]
+  ])('elimina durante la edición pendiente un detalle de %s registrado después de sustituirlo', (
+    _,
+    inventoryIdKey,
+    inventoryId,
+    identity
+  ) => {
+    const persistedDetail = { id: 'detail-1', [inventoryIdKey]: inventoryId, ...identity, quantity: 1 };
+    const details = [persistedDetail];
+
+    upsertIssueDetail({
+      details,
+      detail: { [inventoryIdKey]: inventoryId, ...identity, quantity: 3 },
+      matches: item => (
+        item[inventoryIdKey] === inventoryId
+        && Object.entries(identity).every(([key, value]) => item[key] === value)
+      )
+    });
+    const removedDetail = removeDetail({
+      details,
+      matches: detail => matchesDetailIdentifier({
+        detail,
+        identifier: 'detail-1',
+        inventoryIdKey
+      })
+    });
+
+    expect(removedDetail).toEqual({
+      id: 'detail-1',
+      [inventoryIdKey]: inventoryId,
+      ...identity,
+      quantity: 3
+    });
+    expect(details).toEqual([]);
   });
 
   it('elimina y devuelve el detalle para coordinar totales o refrescar la tabla', () => {

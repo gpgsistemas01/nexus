@@ -16,17 +16,19 @@ import {
 import { refreshMaterialTable } from '../../../plugins/datatable/shared/inventory/renderMaterialDatatable.js';
 import { clearAddedMaterialInput } from '../../../ui/forms/detailFormUI.js';
 import { normalizeFormErrors } from '../../../ui/forms/formErrorsUI.js';
-import { bindIssueProjectQuantityControls } from '../../../ui/issues/issueFormUI.js';
+import {
+    bindIssueProjectQuantityControls,
+    useIssueForm
+} from '../../../ui/issues/issueFormUI.js';
 import {
     matchesDetailIdentifier,
     removeDetail,
-    upsertDetail
+    upsertIssueDetail
 } from '../../../utils/detailCollectionUtils.js';
 import { on } from '../../../utils/domUtils.js';
 import { roundTo } from '../../../utils/formatUtils.js';
 import { hasValidationErrors, validateDetailsFields, validateFields } from '../../../utils/formUtils.js';
 import { goodsIssueDetails } from './goodsIssueModal.js';
-import { useIssueForm } from '../../../ui/issues/issueFormUI.js';
 import {
     addGoodsIssueMaterialValidation,
     goodsIssueValidation,
@@ -126,11 +128,10 @@ const addGoodsIssueMaterial = () => {
         supplierId: supplier.id
     };
 
-    upsertDetail({
+    upsertIssueDetail({
         details,
         detail: newMaterial,
-        matches: detail => detail.materialId === material.id && detail.supplierId === supplier.id,
-        preserveKeys: ['id']
+        matches: detail => detail.materialId === material.id && detail.supplierId === supplier.id
     });
 
     refreshMaterialTable(details);

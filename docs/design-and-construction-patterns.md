@@ -317,11 +317,35 @@ fusionan: la compra valida costo, reemplaza por material y ajusta totales; la sa
 valida proveedor, conserva su costo máximo, convierte cantidades y usa la identidad
 material-proveedor; la salida de merma usa `wasteId` y datos de presentación propios.
 En edición, si agregar de nuevo el mismo inventario sustituye el detalle persistido,
-`upsertDetail` permite conservar explícitamente su identificador documental mediante
-`preserveKeys`. Las salidas de material y merma aplican esta opción con `id`: la fila
+`upsertIssueDetail` reutiliza `upsertDetail` y conserva su identificador documental
+mediante `id`. Las salidas de material y merma aplican el mismo proceso: la fila
 mantiene la acción de eliminar después de modificar su cantidad y puede retirarse de la
 colección si finalmente ya no se necesita. El mapper de cada formulario continúa
 enviando únicamente los campos aceptados por su contrato de actualización.
+Volver a agregar la misma merma, o el mismo material con el mismo proveedor, no crea un
+duplicado: sustituye los datos editables de la fila y conserva su `id` documental. En
+materiales, elegir otro proveedor representa otra relación de inventario y sí agrega un
+detalle independiente.
+El CRUD de la colección sólo está disponible mientras la salida completa permanece
+`Pendiente`. Una salida con surtido parcial o completo abre únicamente la edición del
+encabezado, sin controles para agregar o eliminar materiales o mermas; una salida
+cancelada se abre en consulta. Por tanto, las reglas de sustitución y eliminación que
+siguen corresponden exclusivamente al modo pendiente.
+En ese modo, un detalle recién agregado puede eliminarse con su identidad de inventario.
+Si la selección coincide con un detalle registrado, el nuevo contenido sustituye la
+fila conservando el `id`; eliminarla después retira también el detalle registrado de la
+colección que se enviará al servicio.
+La columna de acciones conserva prioridad responsiva tanto en alta como en edición
+pendiente. El botón `Eliminar detalle` permanece visible y habilitado para la fila nueva,
+la fila registrada y la fila registrada que acaba de ser sustituida.
+La acción prioriza ese `id` documental conservado, por lo que el ciclo registrado,
+editado y finalmente eliminado retira de la colección la misma fila persistida. Al
+guardar una salida todavía pendiente, los servicios de material y merma reemplazan sus
+detalles con la colección enviada y la ausencia de esa fila concreta su eliminación.
+Los detalles agregados por primera vez durante la edición todavía no tienen identidad
+documental. La regla compartida muestra también su acción de eliminar usando la
+identidad de inventario (`materialId` o `wasteId`), mientras oculta la acción para
+detalles cancelados; así pueden retirarse de la lista antes de enviar la actualización.
 Los tres reutilizan las utilidades de colección, render y limpieza sin
 ocultar esas reglas tras callbacks de contexto. Así `detailDatatableUtils` deja de duplicar una parte del proceso de
 issues sin trasladar reglas de compras a una utilidad genérica.

@@ -29,20 +29,24 @@ const ISSUE_MODAL_MODE_CONFIG = Object.freeze({
     [FORM_MODES.VIEW]: { action: 'Consultar', hideSubmit: true, disableForm: true }
 });
 
+export const resolveIssueEditMode = (issue = {}) => {
+    const fulfillmentStatus = issue.fulfillmentStatus?.name;
+
+    if (
+        issue.status?.name === GOODS_ISSUE_STATUS_NAMES.CANCELED
+        || fulfillmentStatus === FULFILLMENT_STATUS_NAMES.CANCELED
+    ) {
+        return FORM_MODES.VIEW;
+    }
+
+    return fulfillmentStatus === FULFILLMENT_STATUS_NAMES.PENDING
+        ? FORM_MODES.EDIT
+        : FORM_MODES.EDIT_HEADER;
+};
+
 export const createIssueTableActions = ({ openIssueModal }) => ({
     onCreate: () => openIssueModal({ mode: FORM_MODES.CREATE }),
-    onEdit: issue => {
-        const fulfillmentStatus = issue.fulfillmentStatus?.name;
-        let mode = FORM_MODES.EDIT_HEADER;
-
-        if (issue.status?.name === GOODS_ISSUE_STATUS_NAMES.CANCELED || fulfillmentStatus === FULFILLMENT_STATUS_NAMES.CANCELED) {
-            mode = FORM_MODES.VIEW;
-        } else if (fulfillmentStatus === FULFILLMENT_STATUS_NAMES.PENDING) {
-            mode = FORM_MODES.EDIT;
-        }
-
-        openIssueModal({ mode, data: issue });
-    },
+    onEdit: issue => openIssueModal({ mode: resolveIssueEditMode(issue), data: issue }),
     onEditDetails: issue => openIssueModal({ mode: FORM_MODES.EDIT_DETAIL, data: issue }),
     onReturnDetails: issue => openIssueModal({ mode: FORM_MODES.RETURN, data: issue })
 });

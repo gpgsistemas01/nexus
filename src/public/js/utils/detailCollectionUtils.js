@@ -20,6 +20,13 @@ export const upsertDetail = ({ details, detail, matches, preserveKeys = [] }) =>
     return previousDetail;
 };
 
+export const upsertIssueDetail = ({ details, detail, matches }) => upsertDetail({
+    details,
+    detail,
+    matches,
+    preserveKeys: ['id']
+});
+
 export const removeDetail = ({ details, matches }) => {
     const index = findDetailIndex({ details, matches });
 
