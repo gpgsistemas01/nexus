@@ -24,6 +24,23 @@ La suite ya cubre:
 
 Las pruebas de integración se ejecutan contra `DATABASE_TEST_URL`, guardan información real y no usan rollback. La limpieza se hace por datos de prueba al iniciar cada integración y con `tests/teardownTestDatabase.js` al finalizar toda la suite. Los servicios marcados arriba como integración directa ya incluyen ese flujo de BD; esta sección sólo documenta la estrategia para evitar repetir el listado de cobertura.
 
+### Ubicación y patrón para pruebas nuevas
+
+- Las unitarias deben replicar la ruta del módulo bajo `tests/` (por ejemplo,
+  `src/services/warehouse/materials/materialService.js` se prueba en
+  `tests/services/warehouse/materials/materialServiceTest.js`).
+- Las integraciones CRUD de servicios deben ubicarse en
+  `tests/integration/services/<dominio>DbTest.js` y usar el sufijo `DbTest.js`.
+- Cada integración CRUD debe verificar, según las operaciones públicas del servicio:
+  creación persistida, consulta por id/listado, actualización, desactivación o borrado
+  cuando exista, relaciones obligatorias y al menos una regla de rechazo relevante.
+- Los datos deben llevar un prefijo o identificador exclusivo de la suite. La limpieza
+  debe apuntar solo a esos datos y respetar el orden de claves foráneas; no se permite
+  vaciar catálogos compartidos.
+- `tests/helpers/rollbackTransaction.js` se reutiliza cuando el código bajo prueba
+  acepta el cliente `tx`. No debe usarse si obliga a mockear o saltar la transacción
+  real que constituye el objeto de la integración.
+
 Para confirmar si una corrida realmente modifica la base de pruebas, hay que revisar estas condiciones antes de interpretar el resultado:
 
 1. Ejecutar `npm run test:db`, no sólo `npm test`. El script de BD valida `DATABASE_TEST_URL`, aplica migraciones con `NODE_ENV=test` y luego corre Vitest; `npm test` puede servir para unitarias, pero las integraciones con BD se saltan si no existe `DATABASE_TEST_URL` o si no está generado `generated/prisma/client.ts`.
@@ -42,7 +59,9 @@ Quedan pendientes de integración transaccional completa con BD:
 Cuando un servicio usa otro servicio de otro dominio, no se duplica la misma prueba unitaria en ambos lugares. Esos casos deben cubrirse como integración del flujo completo:
 
 - `materialService.updateMaterialStock` delega en `adjustmentService.createStockAdjustment`; su cobertura se registra en `stockAdjustmentDbTest.js`.
-- `wasteService` y `goodsIssueService` comparten stock, proveedor-material, personas, cliente y movimientos; su cobertura cruzada se registra en `wasteGoodsIssueDbTest.js`.
+- `wasteService` y `goodsIssueService` comparten stock, proveedor-material, personas,
+  cliente y movimientos; la cobertura actualmente disponible de ese flujo se registra
+  en `goodsIssueDbTest.js`.
 - `goodsReceiptService` comparte stock, proveedor-material y movimientos; su cobertura cruzada se registra en `goodsReceiptServiceDbTest.js`.
 - `notificationService` debe probarse como integración cuando el objetivo sea validar datos reales generados por otros servicios; reportes ya tienen unitarias de mapeo y pueden complementarse con integración si se requiere validar datos exportados end-to-end.
 
