@@ -1,18 +1,27 @@
 import { initDepartmentSelect } from "../domains/department.js";
 import { initRoleSelect } from "../domains/role.js";
+import { scopeSelectors } from "../../../utils/domUtils.js";
 
-const departmentSelector = '#personDepartmentInput';
-const roleSelector = '#personRoleInput';
+let scoped = null;
+const selectors = {
+    department: '#personDepartmentInput',
+    role: '#personRoleInput'
+};
 
 export const initPersonFormSelect2 = ({ modalSelector }) => {
-    initDepartmentSelect({
-        modalSelector,
-        clearOnOpen: false,
-        baseSelector: `${ modalSelector } ${ departmentSelector }`,
-        allowCreate: false
-    });
-    initRoleSelect({
-        modalSelector,
-        baseSelector: `${ modalSelector } ${ roleSelector }`
-    });
+
+    scoped = scopeSelectors({ scopeSelector: modalSelector, selectors });
+    
+    [
+        [initDepartmentSelect, {
+            modalSelector,
+            clearOnOpen: false,
+            baseSelector: scoped.department,
+            allowCreate: false
+        }],
+        [initRoleSelect, {
+            modalSelector,
+            baseSelector: scoped.role
+        }]
+    ].forEach(([initialize, options]) => initialize(options));
 };

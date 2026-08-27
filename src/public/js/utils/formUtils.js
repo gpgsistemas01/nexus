@@ -1,7 +1,15 @@
 import { getErrorMessage } from "../constants/apiMessages.js";
-import { reloadMainTable } from "../plugins/datatable/baseDatatable.js";
+import { reloadMainTable } from '../plugins/datatable/core/base/tableOperations.js';
 import { notifications } from "../plugins/swal/swalComponent.js";
 import { closeModal } from "../ui/modalUI.js";
+import { FORM_MODES } from "../constants/formModes.js";
+import { SELECT2_EVENT_NAMES } from "../constants/events.js";
+
+export const pickFormFields = (data, fields) => Object.fromEntries(
+    fields
+        .filter((field) => Object.prototype.hasOwnProperty.call(data, field))
+        .map((field) => [field, data[field]])
+);
 
 export const handleSubmit = async ({ form, formData, create, update }) => {
     
@@ -9,7 +17,7 @@ export const handleSubmit = async ({ form, formData, create, update }) => {
     const mode = form.dataset.mode;
     let response;
 
-    if (mode === 'create') response = await create({ formData });
+    if (mode === FORM_MODES.CREATE) response = await create({ formData });
     else {
 
         if (!id) {
@@ -24,7 +32,7 @@ export const handleSubmit = async ({ form, formData, create, update }) => {
     notifications.showSuccess(response.message);
     closeModal(form);
     reloadMainTable({
-        resetPaging: mode === 'create'
+        resetPaging: mode === FORM_MODES.CREATE
     });
 
     return response.data;
@@ -80,7 +88,7 @@ export const toggleDisabledElement = ({ element, isDisabled }) => {
     ) {
         window.$(element)
             .prop('disabled', isDisabled)
-            .trigger('change.select2')
+            .trigger(SELECT2_EVENT_NAMES.CHANGE)
             .next('.select2-container')
             .toggleClass('disabled', isDisabled);
     }

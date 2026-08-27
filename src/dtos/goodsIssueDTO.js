@@ -1,23 +1,21 @@
-const createGoodsIssueDto = (body = {}, { includeDetailId = false } = {}) => ({
-    requesterId: body.requesterId.trim(),
-    advisorId: body.advisorId.trim(),
-    clientId: body.clientId.trim(),
-    departmentId: body.departmentId.trim(),
-    projectNumber: body.projectNumber.trim(),
-    requestDate: new Date(body.requestDate),
-    ...(Object.prototype.hasOwnProperty.call(body, 'observations') ? { observations: body.observations.trim() } : {}),
-    details: (body.details).map(d => ({
-        ...(includeDetailId && d.id ? { id: d.id.trim() } : {}),
-        materialId: d.materialId.trim(),
-        supplierId: d.supplierId.trim(),
-        ...(d.presentationId ? { presentationId: d.presentationId.trim() } : {}),
-        quantity: Number(d.quantity)
-    }))
+import { createIssueDetailsDto, createIssueHeaderDto } from './issueDTO.js';
+
+const buildGoodsIssueDto = (body = {}) => ({
+    ...createIssueHeaderDto(body),
+    details: createIssueDetailsDto(body.details, {
+        itemIdField: 'materialId',
+        mapAdditionalFields: detail => ({
+            supplierId: detail.supplierId.trim(),
+            ...(detail.presentationId && {
+                presentationId: detail.presentationId.trim()
+            })
+        })
+    })
 });
 
-export const createGoodsIssueDtoForRegister = (body = {}) => createGoodsIssueDto(body);
+export const createGoodsIssueDtoForRegister = (body = {}) => buildGoodsIssueDto(body);
 
-export const createGoodsIssueDtoForEdit = (body = {}) => createGoodsIssueDto(body, { includeDetailId: true });
+export const createGoodsIssueDtoForEdit = (body = {}) => buildGoodsIssueDto(body);
 
 export const createGoodsIssueDetailsDtoForEdit = (body = {}) => ({
     details: (body.details).map(d => ({
@@ -28,18 +26,10 @@ export const createGoodsIssueDetailsDtoForEdit = (body = {}) => ({
 });
 
 
-export const createGoodsIssueHeaderDtoForEdit = (body = {}) => ({
-    requesterId: body.requesterId.trim(),
-    advisorId: body.advisorId.trim(),
-    clientId: body.clientId.trim(),
-    departmentId: body.departmentId.trim(),
-    projectNumber: body.projectNumber.trim(),
-    requestDate: new Date(body.requestDate),
-    ...(Object.prototype.hasOwnProperty.call(body, 'observations') ? { observations: body.observations.trim() } : {})
-});
+export const createGoodsIssueHeaderDtoForEdit = (body = {}) => createIssueHeaderDto(body);
 
 
-export const createGoodsIssueReturnDto = (body = {}) => ({
+export const createGoodsIssueDtoForReturn = (body = {}) => ({
     returnQuantity: Number(body.returnQuantity),
     ...(Object.prototype.hasOwnProperty.call(body, 'observations') ? { observations: body.observations.trim() } : {})
 });

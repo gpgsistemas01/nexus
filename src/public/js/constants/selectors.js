@@ -26,19 +26,48 @@ export const MODAL_SELECTORS = {
     PERSON: '#personModal',
     SUPPLIER: '#supplierModal',
     USER: '#userModal',
-    WASTE: '#wasteModal'
+    WASTE: '#wasteModal',
+    WASTE_ISSUE: '#wasteIssueModal',
+    GOODS_RECEIPT_CORRECTION: '#goodsReceiptCorrectionModal'
 };
 
 export const FORM_SELECTORS = {
-    CLIENT_FORM: '#clientForm',
+    CLIENT: '#clientForm',
     GOODS_ISSUE: '#goodsIssueForm',
     GOODS_RECEIPT: '#goodsReceiptForm',
     LOGIN: '#loginForm',
-    MATERIAL_FORM: '#materialForm',
-    PERSON_FORM: '#personForm',
-    SUPPLIER_FORM: '#supplierForm',
-    USER_FORM: '#userForm',
-    WASTE_FORM: '#wasteForm',
+    MATERIAL: '#materialForm',
+    PERSON: '#personForm',
+    SUPPLIER: '#supplierForm',
+    USER: '#userForm',
+    WASTE: '#wasteForm',
+    WASTE_ISSUE: '#wasteIssueForm',
+    GOODS_RECEIPT_CORRECTION: '#goodsReceiptCorrectionForm'
+};
+
+export const INPUT_SELECTORS = {
+    REQUEST_DATE: '#requestDateInput',
+    WASTE_WIDTH: '#baseInput',
+    WASTE_MAX_UNIT_COST: '#maxUnitCostInput',
+    OBSERVATIONS: '#observationsInput',
+    PROJECT_NUMBER: '#projectNumberInput',
+    QUANTITY: '#quantityInput',
+    COST_PER_UNIT: '#costPerUnitInput',
+    PRESENTATION_DISPLAY: '#presentationDisplayInput',
+    UNIT_MEASURE_DISPLAY: '#unitMeasureDisplayInput',
+    WASTE_PRESENTATION_DISPLAY: '#wastePresentationDisplayValue',
+    WASTE_NAME_DISPLAY: '#wasteNameDisplayValue',
+    WASTE_UNIT_MEASURE_DISPLAY: '#wasteUnitMeasureDisplayValue',
+    SELECTED_MATERIAL_SUPPLIER: '#selectedMaterialSupplierValue',
+    SELECTED_MATERIAL_PRESENTATION: '#selectedMaterialPresentationValue',
+    SELECTED_MATERIAL_UNIT_MEASURE: '#selectedMaterialUnitMeasureValue',
+    SELECTED_MATERIAL_BASE: '#selectedMaterialBaseValue',
+    SELECTED_MATERIAL_HEIGHT: '#selectedMaterialHeightValue',
+    SELECTED_MATERIAL_MAX_UNIT_COST: '#selectedMaterialMaxUnitCostValue'
+};
+
+export const SELECT_SELECTORS = {
+    WASTE: '#wasteInput',
     REQUESTER: '#requesterInput',
     CLIENT: '#clientInput',
     DEPARTMENT: '#departmentInput',
@@ -47,20 +76,18 @@ export const FORM_SELECTORS = {
     ADVISOR: '#advisorInput',
     MATERIAL: '#materialInput',
     PROJECT: '#projectInput',
-    PROJECT_NUMBER: '#projectNumberInput',
-    QUANTITY: '#quantityInput',
-    COST_PER_UNIT: '#costPerUnitInput',
     RECEIVED_BY: '#receivedByInput',
     PRESENTATION: '#presentationInput',
-    PRESENTATION_DISPLAY: '#presentationDisplayInput',
     REASON: '#reasonInput',
     UNIT_MEASURE: '#unitMeasureInput',
-    UNIT_MEASURE_DISPLAY: '#unitMeasureDisplayInput',
-    SELECTED_MATERIAL_SUPPLIER: '#selectedMaterialSupplierValue',
-    SELECTED_MATERIAL_PRESENTATION: '#selectedMaterialPresentationValue',
-    SELECTED_MATERIAL_UNIT_MEASURE: '#selectedMaterialUnitMeasureValue',
-    SELECTED_MATERIAL_BASE: '#selectedMaterialBaseValue',
-    SELECTED_MATERIAL_HEIGHT: '#selectedMaterialHeightValue',
-    SELECTED_MATERIAL_MAX_UNIT_COST: '#selectedMaterialMaxUnitCostValue',
     SUPPLIER: '.supplier-select'
+};
+
+export const BUTTON_SELECTORS = {
+    SUBMIT: '#submitBtn',
+    ADD_MATERIAL: '#addMaterialBtn'
+};
+
+export const HEADING_SELECTORS = {
+    MODAL_TITLE: '#modalTitle'
 };

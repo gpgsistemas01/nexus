@@ -13,7 +13,7 @@ import {
 import { getDb } from '../../../../repository/baseRepository.js';
 import { createServiceLogger, getModelLogContext, logServiceError } from '../../../../utils/logger.js';
 import { normalizeDecimal } from '../../../../utils/formattersUtils.js';
-import { updateMaterialUnitCostIfHigher } from '../../materials/supplierMaterialService.js';
+import { recalculateMaterialUnitCosts } from '../../materials/supplierMaterialService.js';
 import { buildGoodsReceiptDetails, correctGoodsReceiptDetailAndTotals } from '../goodsReceiptHelpers.js';
 import {
     createGoodsReceiptDetailChange,
@@ -28,7 +28,8 @@ const serviceLogger = createServiceLogger('warehouse.goodsReceipts.detailChanges
 export const correctGoodsReceiptDetailLine = async ({
     id,
     detailId,
-    correctionDto
+    correctionDto,
+    userId
 }) => {
     const { quantity, costPerUnitType } = correctionDto;
 
@@ -90,7 +91,8 @@ export const correctGoodsReceiptDetailLine = async ({
                 inventoryMovementId: movement?.id || null,
                 changeType,
                 goodsReceiptId: id,
-                goodsReceiptDetailId: detailId
+                goodsReceiptDetailId: detailId,
+                changedById: userId
             });
 
             return {
@@ -101,9 +103,9 @@ export const correctGoodsReceiptDetailLine = async ({
             };
         });
 
-        await updateMaterialUnitCostIfHigher({
+        await recalculateMaterialUnitCosts({
             supplierId: result.updatedReceipt.supplierId,
-            details: [result.updatedDetail]
+            materialIds: [result.updatedDetail.materialId]
         });
 
         return result;

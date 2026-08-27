@@ -2,10 +2,9 @@ import { verifyAccessToken } from "../services/jwtService.js";
 import { errorMap } from "../messages/codeMessages.js";
 import { clearAccessCookie } from "../utils/cookiesUtils.js";
 import { getLoggedUser } from "../services/admin/userService.js";
-import { hasSystemWideReadAccess } from "../utils/authorizationUtils.js";
 import { getAuthorizationPolicy } from "../constants/permissions.js";
 
-const getAuthTokenInfo = ( req, res) => {
+export const getAuthTokenInfo = (req, res) => {
 
     const { accessToken } = req.cookies;
 
@@ -63,9 +62,7 @@ const createAuthorizeMiddleware = (
 
     const policy = getAuthorizationPolicy(permission);
 
-    const hasReadAccessToAll = ['GET', 'HEAD'].includes(req.method)
-        && hasSystemWideReadAccess(user);
-    const hasAccess = hasReadAccessToAll || user.accesses.some(access =>
+    const hasAccess = user.accesses.some(access =>
         policy.departments.includes(access.department) &&
         policy.roles.includes(access.role)
     );

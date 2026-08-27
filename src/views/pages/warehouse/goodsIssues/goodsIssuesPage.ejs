@@ -1,125 +1,36 @@
-<% const form = {
-    id: 'goodsIssueForm',
-    canApprove: true,
-    selects: [
-        {
-            id: 'clientInput',
-            name: 'clientId',
-            class: 'client-select',
-            col: 'col-6'
-        },
-        {
-            id: 'advisorInput',
-            name: 'advisorId',
-            class: 'advisor-select',
-            col: 'col-6'
-        },
-        {
-            id: 'departmentInput',
-            name: 'departmentId',
-            class: 'department-select',
-            col: 'col-6'
-        },
-        {
-            id: 'requesterInput',
-            name: 'requesterId',
-            class: 'request-select',
-            col: 'col-6'
-        }
-    ],
-    inputs: [
-        {
-            id: 'projectNumberInput',
-            name: 'projectNumber',
-            type: 'text',
-            label: 'Número de proyecto',
-            col: '6'
-        },
-        {
-            id: 'requestDateInput',
-            name: 'requestDate',
-            type: 'text',
-            class: 'js-flatpickr-datetime',
-            label: 'Fecha y hora de solicitud:',
-            col: '6'
-        },
-    ],
-    textArea: {
-        id: 'observationsInput',
-        name: 'observations',
-        label: 'Observaciones',
-    },
-    table: {
-        select: {
-            id: 'materialInput',
-            name: 'materialId',
-            class: 'material-select',
-            col: 'col-md-6'
-        },
-        inputs: [
-            {
-                id: 'quantityInput',
-                name: 'quantity',
-                type: 'number',
-                label: 'Cantidad',
-                attrs: {
-                    'min': '0'
-                },
-                col: 'col-12 col-md-6 col-lg-7'
-            },
-        ]
-    }
-} %>
+<%- include('../../../shared/issues/issueFilters') %>
 
-<%- include('../../../shared/tableFilters', {
-    selectInputs: [
-        {
-            id: 'clientFilter',
-            label: 'Cliente:',
-            col: 'col-12 col-md-6 col-lg-3'
-        },
-        {
-            id: 'departmentFilter',
-            label: 'Área:',
-            col: 'col-12 col-md-6 col-lg-3'
-        },
-        {
-            id: 'personFilter',
-            label: 'Persona:',
-            col: 'col-12 col-md-6 col-lg-3'
-        },
-        {
-            id: 'fulfillmentStatusFilter',
-            label: 'Estado de surtido:',
-            col: 'col-12 col-md-6 col-lg-3'
+<%- include('../../../shared/tables/mainTable', { title: 'Salidas de almacén' }) %>
+
+<%- include('../../../shared/issues/issueModal', {
+    issue: {
+        formId: 'goodsIssueForm',
+        modalId: 'goodsIssueModal',
+        modalTitle: '',
+        canApprove: true,
+        dateInputId: 'requestDateInput',
+        dateInputLabel: 'Fecha y hora de solicitud:',
+        observationsInputId: 'observationsInput',
+        detailErrorName: 'details',
+        includeSummary: true,
+        materialSelect: true,
+        quantityInput: {
+            id: 'quantityInput',
+            attrs: { min: '0' }
         }
-    ],
-    textInputs: [
-        {
-            id: 'observationsFilter',
-            name: 'observationsSearch',
-            type: 'search',
-            label: 'Observaciones contiene:',
-            value: '',
-            col: 'col-12'
-        }
-    ]
+    }
 }) %>
 
-<%- include('../../../shared/mainTable', { title: 'Salidas de almacén' }) %>
 
-<%- include('../../../shared/modal', { modalId: 'goodsIssueModal', form }) %>
-
-
-<%- include('./returns/goodsIssueReturnModal') %>
+<%- include('../../../shared/issues/issueReturnModal') %>
 
 
 
-<%- include('../../ui/clientModal') %>
+<%- include('../../sales/clients/clientModal') %>
 
 <script type="module" src="/js/pages/warehouse/goodsIssues/goodsIssuesPage.js"></script>
-<script type="module" src="/js/modules/clients/clientModal.js"></script>
-<script type="module" src="/js/modules/clients/clientForm.js"></script>
+<script type="module" src="/js/pages/sales/clients/clientModal.js"></script>
+<script type="module" src="/js/pages/sales/clients/clientForm.js"></script>
 
 <%- contentFor('title') %>
 Salidas del almacén

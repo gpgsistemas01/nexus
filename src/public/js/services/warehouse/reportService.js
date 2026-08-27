@@ -16,6 +16,14 @@ export const exportGoodsIssueReportRequest = async (params = {}) =>
         params
     });
 
+export const exportWasteIssueReportRequest = async (params = {}) =>
+    apiRequest({
+        method: 'get',
+        url: '/api/warehouse/reports/waste-issues/excel',
+        responseType: 'blob',
+        params
+    });
+
 export const exportGoodsReceiptReportRequest = async (params = {}) =>
     apiRequest({
         method: 'get',

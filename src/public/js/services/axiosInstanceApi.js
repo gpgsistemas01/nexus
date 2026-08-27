@@ -5,18 +5,7 @@ const api = axios.create({
     timeout: 5000,
     withCredentials: true,
 });
-let isRefreshing = false;
-let queue = [];
-
-const resolveQueue = () => {
-    queue.forEach(({ resolve, config }) => resolve(api(config)));
-    queue = [];
-}
-
-const rejectQueue = (error) => {
-    queue.forEach(({ reject }) => reject(error));
-    queue = [];
-}
+let refreshRequest = null;
 
 api.interceptors.response.use(
     res => res,
@@ -28,29 +17,22 @@ api.interceptors.response.use(
 
             original._retry = true;
 
-            if (isRefreshing) return new Promise((resolve, reject) => {
-                queue.push({ resolve, reject, config: original });
-            });
-
-            isRefreshing = true;
-
             try {
 
-                await axios.post('/api/auth/refresh', {}, { withCredentials: true });
-                resolveQueue();
+                if (!refreshRequest) refreshRequest = axios
+                    .post('/api/auth/refresh', {}, { withCredentials: true })
+                    .finally(() => {
+                        refreshRequest = null;
+                    });
+
+                await refreshRequest;
 
                 return api(original);
 
             } catch (refreshErr) {
 
-                rejectQueue(refreshErr);
-
                 window.location.href = '/';
                 return Promise.reject(refreshErr);
-
-            } finally {
-
-                isRefreshing = false;
             }
         }
 

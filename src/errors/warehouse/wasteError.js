@@ -7,6 +7,17 @@ export class WasteNotFound extends AppError {
     }
 }
 
+export class WasteAlreadyExists extends AppError {
+
+    constructor () {
+        super(
+            'Ya existe una merma para el material, proveedor y dimensiones indicados.',
+            'WASTE_ALREADY_EXISTS',
+            409
+        );
+    }
+}
+
 export class WasteUpdateDatabaseError extends AppError {
 
     constructor () {
@@ -18,6 +29,13 @@ export class WasteStockAdjustmentDatabaseError extends AppError {
 
     constructor () {
         super('Error de base de datos al editar el stock de la merma.', 'WASTE_STOCK_ADJUSTMENT_DB_ERROR', 500);
+    }
+}
+
+export class WasteDeleteDatabaseError extends AppError {
+
+    constructor () {
+        super('Error de base de datos al eliminar la merma.', 'WASTE_DELETE_DB_ERROR', 500);
     }
 }
 

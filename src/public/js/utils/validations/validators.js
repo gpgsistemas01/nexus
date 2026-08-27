@@ -1,7 +1,18 @@
 import { isEmptyOrNull } from "./baseValidations.js";
-import { validateName, validatePassword, validateNumber, validateUsername, validateTextOptional, validateMeasure, validateDateOptional, validateGoodsReceiptDetailsArray, validateDate, validateText, validateNumberOptional, validateGoodsIssueDetailsArray, validateNonNegativeNumber, validatePositiveNumber, validatePairedOptionalNumber, validatePersonAccessesArray } from "./fieldValidations.js";
+import { validateName, validatePassword, validateNumber, validateUsername, validateTextOptional, validateGoodsReceiptDetailsArray, validateDate, validateText, validateNumberOptional, validateGoodsIssueDetailsArray, validateNonNegativeNumber, validatePairedOptionalNumber, validatePositiveNumber, validatePersonAccessesArray, validateWasteIssueDetailsArray, validateInvoice } from "./fieldValidations.js";
 
-export const supplierValidators = {
+const inventoryStateValidation = {
+    minStock: (value) => validateNumberOptional(value, 'El stock mínimo'),
+    isActive: (value) => isEmptyOrNull(value, 'El estado del inventario')
+};
+
+const createInventoryStockValidation = ({ validateStock, stockFieldName }) => ({
+    newStock: value => validateStock(value, stockFieldName),
+    reasonId: value => isEmptyOrNull(value, 'La razón de ajuste'),
+    observations: value => validateTextOptional(value, 500, 'Las observaciones')
+});
+
+export const supplierValidation = {
     legalName: (value) => validateText({
         name: value,
         length: 200,
@@ -14,111 +25,157 @@ export const supplierValidators = {
     }),
 }
 
-export const materialValidators = {
+export const materialEditValidation = {
     name: (value) => validateName(value, 200),
     supplierId: (value) => isEmptyOrNull(value, 'El proveedor'),
+    ...inventoryStateValidation,
+    maxUnitCost: (value) => validateNumber(value, 'El costo máximo'),
+}
+
+export const materialValidation = {
+    ...materialEditValidation,
     presentationId: (value) => isEmptyOrNull(value, 'La presentación'),
     unitMeasureId: (value) => isEmptyOrNull(value, 'La unidad'),
-    minStock: (value) => validateNumberOptional(value, 'El stock mínimo'),
-    maxUnitCost: (value) => validateNumber(value, 'El costo máximo'),
     base: (_, { base, height }) => validatePairedOptionalNumber({
         value: base,
         pairedValue: height,
-        fieldName: 'La base'
+        fieldName: 'La base',
+        allowZero: false
     }),
     height: (_, { base, height }) => validatePairedOptionalNumber({
         value: height,
         pairedValue: base,
-        fieldName: 'La altura'
+        fieldName: 'La altura',
+        allowZero: false
     }),
 }
 
-export const materialStockValidators = {
-    newStock: (value) => validateNumber(value, 'El nuevo stock'),
-    reasonId: (value) => isEmptyOrNull(value, 'La razón de ajuste'),
-    observations: (value) => validateTextOptional(value, 500, 'Las observaciones'),
+export const materialStockValidation = createInventoryStockValidation({
+    validateStock: validateNumber,
+    stockFieldName: 'El nuevo stock'
+});
+
+export const materialCreateValidation = {
+    ...materialValidation,
+    newStock: materialStockValidation.newStock,
+    observations: materialStockValidation.observations
 }
 
-export const wasteDataValidators = {
-    supplierMaterialId: (value) => isEmptyOrNull(value, 'El material'),
-    base: (value) => validateNumber(value, 'La base de la merma'),
-    height: (value) => validateNumber(value, 'La altura de la merma'),
+export const goodsReceiptMaterialCreateValidation = {
+    ...materialValidation,
+    maxUnitCost: (value) => value
+        ? materialValidation.maxUnitCost(value)
+        : null
 }
 
-export const wasteStockValidators = {
-    currentStock: (value) => validateNumber(value, 'El stock de merma'),
-    reasonId: (value) => isEmptyOrNull(value, 'La razón de ajuste'),
-    observations: (value) => validateTextOptional(value, 500, 'Las observaciones'),
+export const wasteEditValidation = {
+    ...inventoryStateValidation,
+    maxUnitCost: value => validateNonNegativeNumber(value, 'El costo máximo de la merma')
+};
+
+export const wasteStockValidation = createInventoryStockValidation({
+    validateStock: validateNonNegativeNumber,
+    stockFieldName: 'El nuevo stock de merma'
+});
+
+export const wasteValidation = {
+    materialId: (value) => isEmptyOrNull(value, 'El material'),
+    supplierId: (value) => isEmptyOrNull(value, 'El proveedor'),
+    base: value => validatePositiveNumber(value, 'El ancho de la merma'),
+    height: value => validatePositiveNumber(value, 'El largo de la merma'),
+    ...wasteEditValidation,
+    newStock: wasteStockValidation.newStock,
+    observations: wasteStockValidation.observations,
 }
 
-export const wasteValidators = {
-    ...wasteDataValidators,
-    currentStock: wasteStockValidators.currentStock,
-    observations: wasteStockValidators.observations,
-}
-
-export const loginValidators = {
+export const loginValidation = {
     name: validateUsername,
     password: validatePassword,
 }
 
-export const validateAddGoodsReceiptMaterialValidators = {
+export const addGoodsReceiptMaterialValidation = {
     materialId: (value) => isEmptyOrNull(value, 'El material'),
     quantity: (value) => validatePositiveNumber(value, 'La cantidad'),
     costPerUnitType: (value) => validateNumber(value, 'El costo por presentación', { allowZero: false }),
 }
 
-export const validateAddMaterialValidators = {
+export const addMaterialValidation = {
     materialId: (value) => isEmptyOrNull(value, 'El material'),
     quantity: (value) => validatePositiveNumber(value, 'La cantidad'),
 }
 
-export const validateAddGoodsIssueMaterialValidators = {
+export const addGoodsIssueMaterialValidation = {
     materialId: (value) => isEmptyOrNull(value, 'El material'),
     supplierId: (value) => isEmptyOrNull(value, 'El proveedor'),
     quantity: (value) => validatePositiveNumber(value, 'La cantidad'),
 }
 
-export const validateGoodsReceiptValidators = {
+const goodsReceiptHeaderValidation = {
     receivedById: (value) => isEmptyOrNull(value, 'El recibidor'),
-    supplierId: (value) => isEmptyOrNull(value, 'El proveedor'),
     observations: (value) => validateTextOptional(value, 500, 'Las observaciones'),
     receptionDate: (value) => validateDate(value, 'La fecha de recepción'),
+    invoice: validateInvoice
+}
+
+export const goodsReceiptEditValidation = {
+    ...goodsReceiptHeaderValidation,
+    details: (value) => value.length === 0 ? null : validateGoodsReceiptDetailsArray(value)
+}
+
+export const goodsReceiptValidation = {
+    supplierId: (value) => isEmptyOrNull(value, 'El proveedor'),
+    ...goodsReceiptHeaderValidation,
     details: validateGoodsReceiptDetailsArray
 }
 
-export const validateGoodsReceiptCorrectionValidators = {
+export const goodsReceiptCorrectionValidation = {
     quantity: (value) => validatePositiveNumber(value, 'La cantidad correcta'),
     costPerUnitType: (value) => validateNumber(value, 'El costo por presentación correcto', { allowZero: false })
 };
 
 
-export const validateGoodsIssueValidators = {
+export const issueHeaderValidation = {
     projectNumber: (value) => validateText({
         name: value,
-        maxLength: 10,
+        length: 10,
         fieldName: 'El número de proyecto'
     }),
     advisorId: (value) => isEmptyOrNull(value, 'El asesor'),
     clientId: (value) => isEmptyOrNull(value, 'El cliente'),
-    departmentId: (value) => isEmptyOrNull(value, 'El cliente'),
+    departmentId: (value) => isEmptyOrNull(value, 'El área'),
     requesterId: (value) => isEmptyOrNull(value, 'El solicitante'),
     observations: (value) => validateTextOptional(value, 500, 'Las observaciones'),
-    requestDate: (value) => validateDate(value, 'La fecha de solicitud'),
+    requestDate: (value) => validateDate(value, 'La fecha de solicitud')
+};
+
+export const goodsIssueValidation = {
+    ...issueHeaderValidation,
     details: validateGoodsIssueDetailsArray
 }
 
-export const validateGoodsIssueDetailValidators = {
+export const wasteIssueValidation = {
+    ...issueHeaderValidation,
+    details: validateWasteIssueDetailsArray
+};
+
+export const addWasteIssueDetailValidation = {
+    wasteId: value => isEmptyOrNull(value, 'La merma'),
+    quantity: value => validatePositiveNumber(value, 'La cantidad')
+};
+
+export const issueProjectQuantityDetailsValidation = {
     projectConvertedQuantity: (value) => validateNumber(value, 'La cantidad')
 }
 
 
-export const validateGoodsIssueReturnValidators = {
+export const issueReturnValidation = {
     returnQuantity: (value) => validatePositiveNumber(value, 'La cantidad a devolver'),
     observations: (value) => validateTextOptional(value, 500, 'Las observaciones')
 };
 
-export const validateClientValidators = {
+export const goodsIssueReturnValidation = issueReturnValidation;
+
+export const clientValidation = {
     name: (value) => validateText({
         name: value,
         length: 100,
@@ -126,24 +183,24 @@ export const validateClientValidators = {
     }),
 }
 
-export const userValidators = {
+export const userValidation = {
     name: validateUsername,
     password: validatePassword,
     departmentId: (value) => isEmptyOrNull(value, 'El área'),
     roleId: (value) => isEmptyOrNull(value, 'El rol')
 };
 
-export const userEditValidators = {
+export const userEditValidation = {
     name: validateUsername,
     departmentId: (value) => isEmptyOrNull(value, 'El área'),
     roleId: (value) => isEmptyOrNull(value, 'El rol')
 };
 
-export const userPasswordValidators = {
+export const userPasswordValidation = {
     password: validatePassword,
 };
 
-export const personValidators = {
+export const personValidation = {
     fullName: (value) => validateText({
         name: value,
         length: 100,
@@ -153,7 +210,7 @@ export const personValidators = {
     accesses: validatePersonAccessesArray,
 }
 
-export const personAccessValidators = {
+export const personAccessValidation = {
     departmentId: (value, { accesses = [] } = {}) => {
         const requiredError = isEmptyOrNull(value, 'El área');
 

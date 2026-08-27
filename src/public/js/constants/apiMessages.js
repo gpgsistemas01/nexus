@@ -205,8 +205,9 @@ export const errorMessages = {
     MATERIAL_NOT_FOUND: 'Material no encontrado.',
     MATERIAL_CREATE_DB_ERROR: 'Error de base de datos al crear el material.',
     MATERIAL_UPDATE_DB_ERROR: 'Error de base de datos al editar el material.',
-    MATERIAL_DELETE_DB_ERROR: 'Error de base de datos al eliminar el material.',
-    MATERIAL_DELETE_RELATION_CONFLICT: 'No se puede eliminar el material porque está vinculado a una compra, salida u otro movimiento de almacén.',
+    MATERIAL_DELETE_DB_ERROR: 'Error de base de datos al eliminar la relación entre el material y el proveedor.',
+    MATERIAL_DELETE_RELATION_CONFLICT: 'No se puede eliminar la relación entre el material y el proveedor porque el material tiene historial de compras, salidas, mermas, movimientos o ajustes de stock.',
+    WASTE_DELETE_DB_ERROR: 'Error de base de datos al eliminar la merma.',
     MATERIAL_SNAPSHOT_FIND_DB_ERROR: 'Error de base de datos al buscar los datos históricos del material.',
     MATERIAL_STOCK_UPDATE_DB_ERROR: 'Error de base de datos al editar el stock del material.',
     MATERIAL_UNIT_COST_UPDATE_DB_ERROR: 'Error de base de datos al editar el costo unitario del material.',
@@ -286,7 +287,7 @@ const successMessages = {
     UPDATED_PERSON: '¡Persona actualizada exitosamente!',
     CREATED_MATERIAL: '¡Material creado exitosamente!',
     UPDATED_MATERIAL: '¡Material actuallizado exitosamente!',
-    DELETED_MATERIAL: '¡Material eliminado exitosamente!',
+    DELETED_MATERIAL: '¡Relación entre material y proveedor eliminada exitosamente!',
     CREATED_SUPPLIER: '¡Proveedor creado exitosamente!',
     UPDATED_SUPPLIER: '¡Proveedor actualizado exitosamente!',
     CREATED_GOODS_RECEIPT: '¡Entrada de mercancía creada exitosamente!',
@@ -300,6 +301,9 @@ const successMessages = {
     UPDATED_CLIENT: '¡Cliente actualizado exitosamente!',
     CREATED_WASTE: '¡Merma registrada exitosamente!',
     UPDATED_WASTE: '¡Merma actualizada exitosamente!',
+    DELETED_WASTE: '¡Merma eliminada exitosamente!',
+    CREATED_WASTE_ISSUE: '¡Salida de merma registrada exitosamente!',
+    UPDATED_WASTE_ISSUE: '¡Salida de merma surtida exitosamente!',
 };
 
 export const getErrorMessage = (data = {}) => {

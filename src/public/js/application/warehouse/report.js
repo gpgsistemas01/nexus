@@ -1,39 +1,9 @@
-import { exportGoodsIssueReportRequest, exportGoodsReceiptReportRequest, exportSupplierReportRequest, exportWarehouseReportRequest, exportWasteReportRequest } from "../../services/warehouse/reportService.js";
+import { exportGoodsIssueReportRequest, exportGoodsReceiptReportRequest, exportSupplierReportRequest, exportWarehouseReportRequest, exportWasteIssueReportRequest, exportWasteReportRequest } from "../../services/warehouse/reportService.js";
+import { createReportApplication } from "../createReportApplication.js";
 
-export const exportWarehouseReport = async (params = {}) => {
-
-    const response = await exportWarehouseReportRequest(params);
-
-    return response.data;
-};
-
-
-export const exportGoodsIssueReport = async (params = {}) => {
-
-    const response = await exportGoodsIssueReportRequest(params);
-
-    return response.data;
-};
-
-export const exportGoodsReceiptReport = async (params = {}) => {
-
-    const response = await exportGoodsReceiptReportRequest(params);
-
-    return response.data;
-};
-
-
-export const exportWasteReport = async (params = {}) => {
-
-    const response = await exportWasteReportRequest(params);
-
-    return response.data;
-};
-
-
-export const exportSupplierReport = async (params = {}) => {
-
-    const response = await exportSupplierReportRequest(params);
-
-    return response.data;
-};
+export const exportGoodsIssueReport = createReportApplication(exportGoodsIssueReportRequest);
+export const exportGoodsReceiptReport = createReportApplication(exportGoodsReceiptReportRequest);
+export const exportSupplierReport = createReportApplication(exportSupplierReportRequest);
+export const exportWarehouseReport = createReportApplication(exportWarehouseReportRequest);
+export const exportWasteIssueReport = createReportApplication(exportWasteIssueReportRequest);
+export const exportWasteReport = createReportApplication(exportWasteReportRequest);

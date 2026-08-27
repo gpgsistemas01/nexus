@@ -1,0 +1,226 @@
+<% const header = {
+    button: {
+        id: `close${modalId}`,
+        dismissTarget: 'modal'
+    },
+    class: 'modal-header',
+    title: {
+        id: 'modalTitle',
+        class: 'modal-title',
+        content: typeof modalTitle !== 'undefined' ? modalTitle : '',
+    }
+};
+
+const inputs = {
+    presentationDisplayInput: {
+        id: 'presentationDisplayInput',
+        name: 'presentationDisplay',
+        type: 'text',
+        label: 'Presentación',
+        attrs: {
+            readonly: '',
+            tabindex: '-1'
+        }
+    }
+}
+
+const totalSummary = {
+    class: 'row g-2',
+    items: [
+        {
+            id: 'totalQuantityDisplayValue',
+            label: 'Cantidad Total',
+            value: '0.00',
+            rawValue: 0
+        },
+        {
+            id: 'totalNetPurchaseAmountDisplayValue',
+            label: 'Total de Compra s/ IVA',
+            value: '$0.00',
+            rawValue: 0
+        },
+        {
+            id: 'totalGrossPurchaseAmountDisplayValue',
+            label: 'Total de Compra c/ IVA',
+            value: '$0.00',
+            rawValue: 0
+        }
+    ]
+};
+
+const buttons = {
+    addMaterialButton: {
+        id: 'addMaterialBtn',
+        class: 'btn btn-primary w-100',
+        content: 'Agregar'
+    },
+    backButton: {
+        id: `backBtn-${modalId}`,
+        class: 'btn btn-link',
+        content: 'Regresar',
+        attrs: {
+            'data-mdb-dismiss': 'modal'
+        }
+    }
+};
+
+const modalDialogClass = typeof dialogClass !== 'undefined' ? dialogClass : 'modal-fullscreen modal-dialog-scrollable';
+%>
+
+<div class="modal fade" id="<%= modalId %>" tabindex="-1" aria-labelledby="<%= header.title.id %>" aria-hidden="true" data-mdb-backdrop="true">
+    <div class="modal-dialog <%= modalDialogClass %>">
+        <div class="modal-content">
+
+        <%- include('./header', { header }) %>
+
+        <div class="modal-body dark">
+            <form id="<%= form.id %>" class="row g-3" novalidate>
+                <% if (form.notice) { %>
+                    <div class="<%= form.notice.col || 'col-12' %>">
+                        <div class="<%= form.notice.class || 'alert alert-info mb-0' %>">
+                            <%- form.notice.content %>
+                        </div>
+                    </div>
+                <% } %>
+
+                <% if (form.invoice) { %>
+                    <div class="col-12 row g-2">
+                        <div class="col-12 col-md-6 mb-2">
+                            <label class="form-label">Tipo de comprobante</label>
+
+                            <%- include('../forms/checkbox', { input: form.invoice.radios[0] }) %>
+
+                            <%- include('../forms/checkbox', { input: form.invoice.radios[1] }) %>
+                        </div>
+
+                        <div id="invoiceContainer" class="col-12 col-md-6">
+                            <%- include('../forms/outlineInput', { input: form.invoice.input }) %>
+                        </div>
+                    </div>
+                <% } %>
+
+                <% if (form.sections) { %>
+                    <% form.sections.forEach(section => { %>
+                        <section class="col-12 <%= section.class || '' %>">
+                            <div class="border-bottom pb-2 mb-3">
+                                <h5 class="mb-1"><%= section.title %></h5>
+                                <% if (section.description) { %>
+                                    <p class="text-muted mb-0"><%= section.description %></p>
+                                <% } %>
+                            </div>
+
+                            <div class="row g-3">
+                                <% section.groups.forEach(group => { %>
+                                    <% if (group.type === 'selects') { %>
+                                        <%- include('../forms/selectList', { inputs: group.items }) %>
+                                    <% } %>
+
+                                    <% if (group.type === 'inputs') { %>
+                                        <%- include('../forms/outlineInputList', { inputs: group.items }) %>
+                                    <% } %>
+
+                                    <% if (group.type === 'textarea') { %>
+                                        <div class="col-12">
+                                            <%- include('../forms/textarea', { input: group.input }) %>
+                                        </div>
+                                    <% } %>
+
+                                    <% if (group.type === 'checkboxes') { %>
+                                        <%- include('../forms/checkboxList', { inputs: group.items }) %>
+                                    <% } %>
+
+                                    <% if (group.type === 'html') { %>
+                                        <div class="<%= group.col || 'col-12' %>">
+                                            <%- group.content %>
+                                        </div>
+                                    <% } %>
+                                <% }); %>
+                            </div>
+                        </section>
+                    <% }); %>
+                <% } else { %>
+                    <% if (form.stockAdjustment) { %>
+                        <%- include('../forms/selectList', { inputs: form.stockAdjustment.selects }) %>
+
+                        <%- include('../forms/outlineInputList', { inputs: form.stockAdjustment.inputs }) %>
+                    <% } %>
+
+                    <% if (form.selects) { %>
+                        <%- include('../forms/selectList', { inputs: form.selects }) %>
+                    <% } %>
+
+                    <%- include('../forms/outlineInputList', { inputs: form.inputs }) %>
+
+                    <% if (form.textArea) { %>
+                        <%- include('../forms/textarea', { input: form.textArea }) %>
+                    <% } %>
+
+                    <% if (form.checkboxes) { %>
+                        <%- include('../forms/checkboxList', { inputs: form.checkboxes }) %>
+                    <% } %>
+                <% } %>
+
+                <% if (form.table) { %>
+                    <div class="col-12 mb-3 modal-detail-controls <%= form.table.containerClass || 'add-material-container' %>">
+                        <% if (form.table.includeMaterialControls === false) { %>
+                            <div class="row g-3 align-items-end">
+                                <%- include('../forms/selectList', { inputs: form.table.selects }) %>
+                                <div class="<%= form.table.button.col || 'col-12' %>">
+                                    <%- include('../controls/button', { button: form.table.button }) %>
+                                </div>
+                            </div>
+                        <% } else { %>
+                            <div class="row mb-3">
+                                <% if (form.table.materialSelect) { %>
+                                    <%- include('../forms/materialSelect') %>
+                                <% } else { %>
+                                    <div class="col-12">
+                                        <%- include('../forms/select', { input: form.table.select }) %>
+                                    </div>
+                                <% } %>
+                            </div>
+
+                            <div class="row g-3 align-items-end">
+                                <% form.table.inputs.forEach(input => { %>
+                                    <div class="<%= input.col || 'col-12' %>">
+                                        <%- include('../forms/outlineInput', { input }) %>
+                                    </div>
+                                <% }); %>
+
+                                <div class="col-12 col-md-4 col-lg-3">
+                                    <%- include('../forms/outlineInput', { input: inputs.presentationDisplayInput }) %>
+                                </div>
+
+                                <div class="col-12 col-md-2 col-lg-2">
+                                    <%- include('../controls/button', { button: buttons.addMaterialButton }) %>
+                                </div>
+                            </div>
+                        <% } %>
+                    </div>
+
+                    <%- include('../tables/detailTable', { table: form.table }) %>
+
+                    <% if (form.table.includeSummary !== false) { %>
+                        <div class="col-12 mb-3 total-container">
+                            <%- include('../tables/totalsSummary', { totals: totalSummary }) %>
+                        </div>
+                    <% } %>
+                <% } %>
+
+                <div class="col-12 modal-actions">
+                    <% if (form.actions) { %>
+                        <% form.actions.forEach(actionButton => { %>
+                            <%- include('../controls/button', { button: actionButton }) %>
+                        <% }); %>
+                    <% } else { %>
+                        <%- include('../controls/button', { button: buttons.backButton }) %>
+
+                        <%- include('../forms/submit') %>
+                    <% } %>
+                </div>
+            </form>
+        </div>
+
+        </div>
+    </div>
+</div>

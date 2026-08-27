@@ -1,6 +1,6 @@
 import express from 'express';
 import { getCurrentUser, login, refreshAuthToken } from '../../controllers/api/authController.js';
-import { loginValidation } from '../../validators/forms/authValitdations.js';
+import { loginValidation } from '../../validators/forms/authValidations.js';
 import { validateLogin } from '../../middleware/validatorMiddleware.js';
 import { verifyApiTokenRequired } from '../../middleware/authMiddleware.js';
 

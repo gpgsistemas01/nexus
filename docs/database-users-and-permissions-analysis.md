@@ -54,6 +54,17 @@ El login y la renovación rechazan usuarios inactivos o sin accesos. Los cambios
 asignación se consultan nuevamente, por lo que no hay que esperar a que expire el
 access token para bloquear las rutas.
 
+Para cuentas humanas, `Person.isActive` también condiciona el acceso: una cuenta
+asociada a una persona inactiva no puede iniciar sesión, renovar su sesión ni superar
+la autorización de una petición. Las cuentas técnicas se representan con
+`User.personId = null`; no requieren una persona ficticia y dependen de
+`User.isActive` y de sus asignaciones. No se permite crear ni actualizar una cuenta
+para asociarla a una persona inactiva.
+
+No existen excepciones globales de lectura por método HTTP, rol o departamento. Cada
+recurso de lectura debe declarar en `AUTHORIZATION_POLICIES` las combinaciones que lo
+pueden consultar, incluidas las de Director o Dirección cuando correspondan.
+
 ## Frontend
 
 El backend entrega `user.permissions`, `user.scope` y `user.organization` en las vistas y mediante
@@ -65,8 +76,13 @@ editButton.hidden = !window.meta.permissions?.includes('materials:write');
 
 El menú principal y las acciones de personas, materiales y mermas ya usan capacidades
 derivadas. `scope` se reserva para el alcance de datos (`departmentIds`, `canReadAll`);
-para columnas, costos o flujo, el frontend consume `user.organization`, calculado también
-por el backend. El navegador ya no interpreta directamente la relación rol/área.
+para columnas o flujo, el frontend consume permisos calculados por el backend. En
+particular, `inventory:costs-read` controla las columnas de costo de materiales y
+mermas; las consultas de Prisma sólo seleccionan esos campos cuando el permiso está
+concedido, por lo que un asesor de ventas no puede recuperarlos inspeccionando la
+respuesta HTTP.
+`user.organization` queda disponible como contexto informativo. El navegador ya no
+interpreta directamente la relación rol/área.
 
 `scope` solo es necesario cuando un permiso no implica acceso a todos los registros.
 Por ejemplo, `goods-issues:read` puede permitir leer únicamente el departamento del
@@ -86,10 +102,10 @@ Los permisos del frontend solo mejoran la experiencia de usuario. Modificar
 `window.meta`, mostrar un botón oculto o llamar directamente a la API no concede
 acceso: el middleware del backend vuelve a autorizar cada petición.
 
-Mientras existan permisos amplios como `GOODS_ISSUES_MANAGE`, algunos componentes
-pueden conservar temporalmente sus condiciones anteriores. Esos permisos deben
-separarse por acción (`read`, `create`, `update`, `approve`, `return`) antes de migrar
-cada botón.
+Las rutas que renderizan componentes asociados a permisos amplios como
+`GOODS_ISSUES_MANAGE` exigen esa capacidad completa. Si el negocio necesita distinguir
+entre crear, editar, aprobar o devolver, primero debe dividirse el permiso en la matriz
+del backend y luego asignar cada nueva capacidad al botón correspondiente.
 
 ## Auditoría de escrituras
 
@@ -113,11 +129,7 @@ usuarios/asignaciones y cambios de contraseña o estado.
 | P0 | Persistir, rotar y revocar refresh tokens; hoy logout solo borra la cookie local. |
 | P0 | Activar rate limiting para login y refresh. |
 | P0 | Aplicar autorización por objeto de forma uniforme en filtros y transacciones Prisma. |
-| P1 | Aprobar con negocio la matriz central y dividir permisos `manage`. |
-| P1 | Reemplazar el bypass global GET de Director/Dirección por lectura explícita por recurso. |
-| P1 | Migrar menús/botones para consultar `user.permissions` en lugar de reglas duplicadas. |
 | P1 | Implementar auditoría persistente de escrituras críticas. |
-| P1 | Definir si `Person.isActive` condiciona a usuarios humanos y cómo tratar usuarios técnicos. |
 | P1 | Definir protección CSRF explícita para métodos mutables. |
 | P2 | Aprovisionar credenciales PostgreSQL distintas para runtime y migraciones. |
 

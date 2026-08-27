@@ -1,0 +1,105 @@
+<% const returnTotalsSummary = {
+    class: 'row g-2 goods-issue-return-summary',
+    items: [
+        {
+            id: 'issueReturnSuppliedQuantity',
+            label: 'Cantidad surtida',
+            value: '0.00',
+            rawValue: 0
+        },
+        {
+            id: 'issueReturnReturnedQuantity',
+            label: 'Cantidad devuelta',
+            value: '0.00',
+            rawValue: 0
+        },
+        {
+            id: 'issueReturnAvailableQuantity',
+            label: 'Disponible para devolver',
+            value: '0.00',
+            rawValue: 0
+        }
+    ]
+};
+
+const returnForm = {
+    id: 'issueReturnForm',
+    sections: [
+        {
+            title: 'Devolución del detalle',
+            groups: [
+                {
+                    type: 'html',
+                    content: include('../forms/informativeValue', {
+                        value: {
+                            id: 'issueReturnMaterialValue',
+                            label: 'Material a devolver'
+                        }
+                    })
+                },
+                {
+                    type: 'inputs',
+                    items: [
+                        {
+                            id: 'issueReturnQuantityInput',
+                            name: 'returnQuantity',
+                            type: 'number',
+                            label: 'Cantidad a devolver',
+                            col: '12',
+                            attrs: {
+                                min: '0.01',
+                                step: 'any',
+                                required: ''
+                            }
+                        }
+                    ]
+                },
+                {
+                    type: 'textarea',
+                    input: {
+                        id: 'issueReturnObservationsInput',
+                        name: 'observations',
+                        label: 'Observaciones',
+                        attrs: {
+                            rows: '3',
+                            maxlength: '500'
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            title: 'Cantidades del detalle',
+            groups: [
+                {
+                    type: 'html',
+                    content: include('../tables/totalsSummary', { totals: returnTotalsSummary })
+                }
+            ]
+        }
+    ],
+    actions: [
+        {
+            id: 'issueReturnCancelBtn',
+            class: 'btn btn-link',
+            content: 'Regresar',
+            attrs: {
+                'data-mdb-dismiss': 'modal',
+                'data-bs-dismiss': 'modal'
+            }
+        },
+        {
+            id: 'issueReturnConfirmBtn',
+            type: 'submit',
+            class: 'btn btn-warning',
+            content: 'Devolver'
+        }
+    ]
+}; %>
+
+<%- include('../layout/modal', {
+    modalId: 'issueReturnModal',
+    modalTitle: 'Devolver detalle de salida',
+    dialogClass: 'modal-lg modal-dialog-scrollable',
+    form: returnForm
+}) %>

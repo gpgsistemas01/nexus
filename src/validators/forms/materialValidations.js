@@ -1,30 +1,38 @@
-import { validateBoolean, validateNumberOptional, validateNumberOptionalWhen, validateNumberRequiredWhenOtherPresent, validateNumberWhen, validateText, validateTextOptional, validateUUID, validateUUIDWhen } from "../fields/fieldsValidator.js";
+import { validateNumberOptionalWhen, validatePositiveNumberOptional, validateNumberRequiredWhenOtherPresent, validateNumberWhen, validateText, validateUUID, validateUUIDWhen } from "../fields/fieldsValidator.js";
+import { createInventoryObservationsValidation, createInventoryStateValidation } from './inventoryValidations.js';
 
 export const MATERIAL_CREATION_CONTEXT_GOODS_RECEIPT = 'goodsReceipt';
 
 export const isGoodsReceiptMaterialCreation = (body = {}) =>
     body.creationContext === MATERIAL_CREATION_CONTEXT_GOODS_RECEIPT;
 
-const requiresMaxUnitCost = (body = {}) => !isGoodsReceiptMaterialCreation(body);
-
-export const materialValidation = [
+export const materialEditValidation = [
     validateText({ fieldName: 'name', maxLength: 200 }),
     validateUUID('supplierId'),
-    validateUUID('presentationId'),
-    validateUUID('unitMeasureId'),
-    validateNumberOptional('minStock', { disableTooLong: true }),
-    validateNumberWhen({ fieldName: 'maxUnitCost', predicate: requiresMaxUnitCost }),
+    ...createInventoryStateValidation(),
+    validateNumberWhen({ fieldName: 'maxUnitCost', predicate: (body) => !isGoodsReceiptMaterialCreation(body) }),
     validateNumberOptionalWhen({ fieldName: 'maxUnitCost', predicate: isGoodsReceiptMaterialCreation }),
-    validateNumberRequiredWhenOtherPresent({ fieldName: 'base', pairedFieldName: 'height' }),
-    validateNumberRequiredWhenOtherPresent({ fieldName: 'height', pairedFieldName: 'base' }),
-    validateNumberOptional('base'),
-    validateNumberOptional('height'),
-    validateBoolean('isActive')
-]
+];
+
+const materialStockDataValidation = [
+    validateNumberWhen({ fieldName: 'newStock', predicate: (body) => !isGoodsReceiptMaterialCreation(body) }),
+    validateNumberOptionalWhen({ fieldName: 'newStock', predicate: isGoodsReceiptMaterialCreation }),
+    createInventoryObservationsValidation()
+];
 
 export const materialStockValidation = [
     validateUUID('supplierId'),
-    validateNumberWhen({ fieldName: 'newStock', predicate: () => true }),
-    validateTextOptional({ fieldName: 'observations', maxLength: 500 }),
+    ...materialStockDataValidation,
     validateUUIDWhen({ fieldName: 'reasonId', predicate: () => true }),
-]
+];
+
+export const materialValidation = [
+    validateUUID('presentationId'),
+    validateUUID('unitMeasureId'),
+    validateNumberRequiredWhenOtherPresent({ fieldName: 'base', pairedFieldName: 'height' }),
+    validateNumberRequiredWhenOtherPresent({ fieldName: 'height', pairedFieldName: 'base' }),
+    validatePositiveNumberOptional('base'),
+    validatePositiveNumberOptional('height'),
+    ...materialEditValidation,
+    ...materialStockDataValidation
+];

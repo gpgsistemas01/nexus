@@ -1,36 +1,66 @@
-import { mapSupplierMaterialToSelectData } from "../../../utils/materialSelectUtils.js";
 import { initReasonSelect, toggleReasonOption } from "../domains/reason.js";
-import { setupSupplierMaterialSelect, toggleSupplierMaterialOption } from "../domains/supplierMaterial.js";
-import { FORM_SELECTORS } from "../../../constants/selectors.js";
+import { setupSupplierSelect, toggleSupplierOption } from "../domains/supplier.js";
+import { initWasteMaterialTemplateSelect, toggleWasteMaterialTemplateOption } from "../domains/wasteMaterialTemplate.js";
+import { SELECT_SELECTORS } from "../../../constants/selectors.js";
+import { bindDisabledSelectDependency } from "../baseSelect.js";
+import { scopeSelectors } from "../../../utils/domUtils.js";
 
-const materialSelector = FORM_SELECTORS.MATERIAL;
-const reasonSelector = FORM_SELECTORS.REASON;
+let scoped = null;
+const selectors = {
+    material: SELECT_SELECTORS.MATERIAL,
+    supplier: SELECT_SELECTORS.SUPPLIER,
+    reason: SELECT_SELECTORS.REASON
+};
 
 export const initWasteSelect2 = ({ modalSelector }) => {
 
-    setupSupplierMaterialSelect({
-        modalSelector,
-        materialSelector
+    scoped = scopeSelectors({ scopeSelector: modalSelector, selectors });
+
+    bindDisabledSelectDependency({
+        sourceSelector: scoped.supplier,
+        targetSelector: scoped.material,
+        disabledMessage: 'Seleccione un proveedor antes de buscar material.'
     });
 
-    initReasonSelect({
-        modalSelector,
-        baseSelector: `${ modalSelector } ${ reasonSelector }`,
-        allowCreate: false
-    });
+    [
+        [initWasteMaterialTemplateSelect, {
+            modalSelector,
+            baseSelector: scoped.material,
+            supplierSelector: scoped.supplier,
+            data: () => ({ supplierId: $(scoped.supplier).val() })
+        }],
+        [setupSupplierSelect, {
+            modalSelector,
+            supplierSelector: SELECT_SELECTORS.SUPPLIER,
+            allowCreate: false
+        }],
+        [initReasonSelect, {
+            modalSelector,
+            baseSelector: scoped.reason,
+            allowCreate: false
+        }]
+    ].forEach(([initialize, options]) => initialize(options));
+
 };
 
 export const setWasteSelectOptions = ({ modalSelector, data = null }) => {
 
-    toggleSupplierMaterialOption({
-        selector: `${ modalSelector } ${ materialSelector }`,
-        data: data ? mapSupplierMaterialToSelectData(data) : null,
-        modalSelector
-    });
-
-    toggleReasonOption({
-        selector: `${ modalSelector } ${ reasonSelector }`,
-        id: data?.reason?.id,
-        name: data?.reason?.name
-    });
+    [
+        [toggleWasteMaterialTemplateOption, {
+            selector: scoped.material,
+            data: null
+        }],
+        [toggleSupplierOption, {
+            selector: scoped.supplier,
+            id: data?.supplier?.id,
+            name: data?.supplier?.tradeName
+        }],
+        [toggleReasonOption, {
+            selector: scoped.reason,
+            id: data?.reason?.id,
+            name: data?.reason?.name
+        }]
+    ].forEach(([toggleOption, options]) => toggleOption({
+        ...options,
+    }));
 };

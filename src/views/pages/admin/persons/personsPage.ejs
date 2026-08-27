@@ -33,7 +33,7 @@
     }
 } %>
 
-<%- include('../../../shared/tableFilters', {
+<%- include('../../../shared/tables/tableFilters', {
     dateInputs: [],
     selectInputs: [
         {
@@ -49,11 +49,11 @@
     ]
 }) %>
 
-<%- include('../../../shared/mainTable', { title: 'Personas' }) %>
+<%- include('../../../shared/tables/mainTable', { title: 'Personas' }) %>
 
-<%- include('../../../shared/modal', { modalId: 'personModal', form }) %>
+<%- include('../../../shared/layout/modal', { modalId: 'personModal', form }) %>
 
-<script type="module" src="/js/pages/admin/personsPage.js"></script>
+<script type="module" src="/js/pages/admin/persons/personsPage.js"></script>
 
 <%- contentFor('title') %>
 Personas

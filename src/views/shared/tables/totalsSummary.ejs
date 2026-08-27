@@ -1,0 +1,20 @@
+<%
+const totalsConfig = typeof totals !== 'undefined' ? totals : {};
+const summaryClass = totalsConfig.class || 'row g-2';
+const items = totalsConfig.items || [];
+const defaultFormat = (value) => value ?? '0.00';
+%>
+
+<div class="<%= summaryClass %>" aria-live="<%= totalsConfig.ariaLive || 'polite' %>">
+    <% items.forEach(item => { %>
+        <div class="<%= item.col || 'col-12 col-md-4' %>">
+            <%- include('./summaryCard', {
+                item: {
+                    ...item,
+                    rawValue: item.rawValue ?? 0,
+                    value: item.value !== undefined ? item.value : defaultFormat(item.rawValue)
+                }
+            }) %>
+        </div>
+    <% }); %>
+</div>

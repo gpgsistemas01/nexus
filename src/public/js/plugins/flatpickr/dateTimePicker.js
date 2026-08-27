@@ -1,6 +1,7 @@
 import { createBrowserDateFromTimeZone, zonedDateTimeToUtcIso } from "../../utils/timeZone.js";
 
 const FLATPICKR_DATE_TIME_SELECTOR = '.js-flatpickr-datetime';
+const FLATPICKR_DATE_SELECTOR = '.js-flatpickr-date';
 const DISPLAY_DATE_TIME_REGEX = /^(\d{1,2})\/(\d{1,2})\/(\d{4})(?:\s+(\d{1,2}):(\d{2}))?$/;
 
 const getFlatpickrLocale = () => window.flatpickr?.l10ns?.es || 'es';
@@ -88,6 +89,34 @@ export const initDateTimePickers = (root = document) => {
 
         return instance;
     });
+};
+
+export const initDatePickers = (root = document) => {
+
+    if (typeof window.flatpickr !== 'function') return [];
+
+    return Array.from(root.querySelectorAll(FLATPICKR_DATE_SELECTOR))
+        .filter(input => input.type === 'date' || input._flatpickr)
+        .map((input) => {
+
+            if (input._flatpickr) {
+                syncFlatpickrAltInputDisabled(input._flatpickr);
+                return input._flatpickr;
+            }
+
+            const instance = window.flatpickr(input, {
+                altInput: true,
+                altFormat: 'd/m/Y',
+                allowInput: true,
+                dateFormat: 'Y-m-d',
+                enableTime: false,
+                locale: getFlatpickrLocale()
+            });
+
+            syncFlatpickrAltInputDisabled(instance);
+
+            return instance;
+        });
 };
 
 export const setDateTimePickerValue = (input, value) => {

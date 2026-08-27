@@ -6,38 +6,49 @@
     class: 'offcanvas-header',
     title: {
         id: 'menuTitle',
-        content: appName,
+        content: 'Menú principal',
         class: 'offcanvas-title'
     }
 }; %>
 
 <div
-    id="mobileMenu"
+    id="appMenu"
     tabindex="-1"
-    class="app-mobile-menu offcanvas offcanvas-start w-md-50"
+    class="app-menu-offcanvas offcanvas offcanvas-top"
     data-mdb-theme="dark"
     aria-labelledby="<%= header.title.id %>"
     aria-hidden="true"
 >
-    <%- include('../../shared/header', { header }) %>
+    <%- include('../../shared/layout/header', { header }) %>
 
     <div class="px-3 pb-3">
-        <%- include('../ui/appBrand') %>
+        <%- include('../ui/appBrand', { className: 'app-brand--menu' }) %>
     </div>
 
     <div class="offcanvas-body d-flex flex-column">
-        <div class="flex-grow-1 mb-5">
-            <div class="mb-5">
-                <%- include('../ui/navList', { 
-                    listClass: 'navbar-nav',
-                    showIcons: true
-                }) %>
-            </div>
-        </div>
+        <nav
+            class="app-menu-offcanvas__nav"
+            aria-label="Navegación principal"
+            aria-describedby="appMenuDescription"
+        >
+            <p id="appMenuDescription" class="visually-hidden">
+                Selecciona un área para consultar sus opciones.
+            </p>
 
-        <div>
+            <div class="row g-0">
+                <div class="col-12">
+                    <%- include('../ui/navList', {
+                        listClass: 'navbar-nav flex-column app-menu-offcanvas__list',
+                        accordionId: 'appMenuNavAccordion'
+                    }) %>
+                </div>
+            </div>
+        </nav>
+
+        <div class="app-menu-offcanvas__footer">
             <%- include('../ui/logoutForm', {
-                buttonClass: 'btn btn-outline-success app-logout-btn w-100'
+                buttonClass: 'btn btn-outline-primary app-logout-btn app-logout-btn--mobile w-100',
+                className: 'app-menu-offcanvas__logout-form'
             }) %>
         </div>
     </div>

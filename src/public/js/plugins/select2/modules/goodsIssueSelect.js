@@ -1,208 +1,37 @@
-import { getSelectedOptionText } from "../../../utils/domUtils.js";
-import { isInternalClientName, resolveAdvisorDepartmentByClientName, resolveProjectNumberByClientAndDepartment } from "../../../application/warehouse/goodsIssues/goodsIssueRules.js";
-import { MATERIAL_SELECT_RESULTS_LIMIT } from "../../../application/warehouse/materials.js";
-import { bindDisabledSelectDependency } from "../baseSelect.js";
-import { setupClientSelect, toggleClientOption } from "../domains/client.js";
-import { initDepartmentSelect, toggleDepartmentOption } from "../domains/department.js";
-import { setupMaterialSelect, toggleMaterialOption } from "../domains/material.js";
-import { initPersonSelect, togglePersonOption } from "../domains/person.js";
-import { initMdbWrapperInput, updateMdbWrapperInput } from "../../mdb/baseInstance.js";
-import { toggleDisabledElement } from "../../../utils/formUtils.js";
-import { FORM_SELECTORS, MODAL_SELECTORS } from "../../../constants/selectors.js";
+import { FORM_SELECTORS, INPUT_SELECTORS, MODAL_SELECTORS, SELECT_SELECTORS } from '../../../constants/selectors.js';
+import { setupMaterialSelect, toggleMaterialOption } from '../domains/material.js';
+import { createIssueHeaderSelects } from './issueHeaderSelect.js';
 
 const modalSelector = MODAL_SELECTORS.GOODS_ISSUE;
-const requesterSelector = FORM_SELECTORS.REQUESTER;
-const clientSelector = FORM_SELECTORS.CLIENT;
-const departmentSelector = FORM_SELECTORS.DEPARTMENT;
-const advisorSelector = FORM_SELECTORS.ADVISOR;
-const materialSelector = FORM_SELECTORS.MATERIAL;
-const projectNumberSelector = FORM_SELECTORS.PROJECT_NUMBER;
-const requesterScopedSelector = `${ modalSelector } ${ requesterSelector }`;
-const clientScopedSelector = `${ modalSelector } ${ clientSelector }`;
-const departmentScopedSelector = `${ modalSelector } ${ departmentSelector }`;
-const advisorScopedSelector = `${ modalSelector } ${ advisorSelector }`;
-const materialScopedSelector = `${ modalSelector } ${ materialSelector }`;
-const enabledHeaderDependentSelectModes = ['create', 'edit', 'edit-header'];
-const dependentSelects = [
-    { sourceSelector: departmentScopedSelector, targetSelector: requesterScopedSelector },
-    { sourceSelector: clientScopedSelector, targetSelector: advisorScopedSelector }
-];
+const headerSelects = createIssueHeaderSelects({
+    modalSelector,
+    formSelector: FORM_SELECTORS.GOODS_ISSUE,
+    selectors: {
+        requester: SELECT_SELECTORS.REQUESTER,
+        client: SELECT_SELECTORS.CLIENT,
+        department: SELECT_SELECTORS.DEPARTMENT,
+        advisor: SELECT_SELECTORS.ADVISOR,
+        projectNumber: INPUT_SELECTORS.PROJECT_NUMBER
+    }
+});
 
-const canEnableHeaderDependentSelects = () => enabledHeaderDependentSelectModes.includes(
-    document.querySelector(FORM_SELECTORS.GOODS_ISSUE)?.dataset.mode
-);
+export const getGoodsIssueHeaderSelects = () => ({
+    init: () => {
 
-export const syncGoodsIssueDependentSelectsState = () => {
-
-    dependentSelects.forEach(({ sourceSelector, targetSelector }) => {
-        const sourceValue = $(sourceSelector).val();
-
-        toggleDisabledElement({
-            element: document.querySelector(targetSelector),
-            isDisabled: !canEnableHeaderDependentSelects() || !sourceValue
+        headerSelects.init();
+        setupMaterialSelect({
+            modalSelector,
+            materialSelector: SELECT_SELECTORS.MATERIAL,
+            allowCreate: false
         });
-    });
-};
+    },
+    setOptions: (data) => {
 
-export const initGoodsIssueFormSelect2 = () => {
-
-    const modal = document.querySelector(modalSelector);
-    const syncInternalClientProjectNumber = () => {
-        const projectNumberInput = modal?.querySelector(projectNumberSelector);
-        if (!projectNumberInput) return;
-
-        const projectNumber = resolveProjectNumberByClientAndDepartment({
-            clientName: getSelectedOptionText(clientScopedSelector),
-            departmentName: getSelectedOptionText(departmentScopedSelector)
+        headerSelects.setOptions(data);
+        toggleMaterialOption({
+            selector: `${ modalSelector } ${ SELECT_SELECTORS.MATERIAL }`,
+            data: { id: null, text: null }
         });
-
-        projectNumberInput.value = projectNumber || '';
-
-        const projectNumberInputInstance = initMdbWrapperInput({
-            selector: `${ modalSelector } ${ projectNumberSelector }`,
-            value: projectNumber || ''
-        });
-        updateMdbWrapperInput(projectNumberInputInstance);
-    };
-
-    initDepartmentSelect({
-        modalSelector,
-        baseSelector: departmentScopedSelector,
-        allowCreate: false
-    });
-
-    setupClientSelect({
-        modalSelector,
-        clientSelector,
-    });
-
-    initPersonSelect({
-        modalSelector,
-        baseSelector: advisorScopedSelector,
-        placeholder: 'Buscar asesor...',
-        data: (params) => {
-
-            const clientName = getSelectedOptionText(clientScopedSelector);
-
-            const isInternalClient = isInternalClientName(clientName);
-
-            return {
-                search: params.term,
-                ...(isInternalClient
-                    ? { role: 'Coordinador' }
-                    : {
-                        department: resolveAdvisorDepartmentByClientName({
-                            clientName
-                        }),
-                        strictDepartmentFilter: true
-                    })
-            };
-        },
-        allowCreate: false,
-    });
-
-    initPersonSelect({
-        modalSelector,
-        baseSelector: requesterScopedSelector,
-        placeholder: 'Buscar solicitante...',
-        data: (params) => {
-
-            const department = getSelectedOptionText(departmentScopedSelector);
-
-            return {
-                search: params.term,
-                department,
-                strictDepartmentFilter: true
-            };
-        },
-        allowCreate: false,
-    });
-
-    bindDisabledSelectDependency({
-        sourceSelector: departmentScopedSelector,
-        targetSelector: requesterScopedSelector,
-        clearTarget: () => {
-            togglePersonOption({
-                selector: requesterScopedSelector,
-                id: null,
-                name: null
-            });
-
-            $(requesterScopedSelector).val(null).trigger('change');
-        },
-        isDisabled: (value) => !canEnableHeaderDependentSelects() || !value,
-        disabledMessage: 'Seleccione un área antes de buscar solicitante.',
-        onChange: () => syncInternalClientProjectNumber()
-    });
-
-    bindDisabledSelectDependency({
-        sourceSelector: clientScopedSelector,
-        targetSelector: advisorScopedSelector,
-        clearTarget: () => {
-            togglePersonOption({
-                selector: advisorScopedSelector,
-                id: null,
-                name: null
-            });
-
-            $(advisorScopedSelector).val(null).trigger('change');
-        },
-        isDisabled: (value) => !canEnableHeaderDependentSelects() || !value,
-        disabledMessage: 'Seleccione un cliente antes de buscar asesor.',
-        onChange: () => syncInternalClientProjectNumber()
-    });
-
-    // bindChangeResetSelect({
-    //     sourceSelector: `${ modalSelector } ${ advisorSelector }`,
-    //     targetSelector: `${ modalSelector } ${ clientSelector }`,
-    //     reset: () => {
-    //         toggleClientOption({
-    //             selector: clientScopedSelector,
-    //             id: null,
-    //             name: null
-    //         });
-    //     }
-    // });
-
-    setupMaterialSelect({
-        modalSelector,
-        materialSelector,
-        allowCreate: false,
-        resultsLimit: MATERIAL_SELECT_RESULTS_LIMIT
-    });
-};
-
-export const setGoodsIssueFormSelectOptions = (data = null) => {
-
-    toggleDepartmentOption({
-        selector: departmentScopedSelector,
-        id: data?.departmentId,
-        name: data?.departmentName
-    });
-
-    toggleClientOption({
-        selector: clientScopedSelector,
-        id: data?.clientId,
-        name: data?.clientName
-    });
-
-    togglePersonOption({
-        selector: advisorScopedSelector,
-        id: data?.advisorId,
-        name: data?.advisorName
-    });
-
-    togglePersonOption({
-        selector: requesterScopedSelector,
-        id: data?.requesterId,
-        name: data?.requesterName
-    });
-
-    toggleMaterialOption({
-        selector: materialScopedSelector,
-        data: {
-            id: null,
-            text: null,
-        }
-    });
-}
+    },
+    syncState: headerSelects.syncState
+});

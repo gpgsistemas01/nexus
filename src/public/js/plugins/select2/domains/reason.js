@@ -1,4 +1,4 @@
-import { getAllReasons } from "../../../application/warehouse/reasons.js";
+import { getAllReasons } from "../../../application/warehouse/catalogs/reasons.js";
 import { buildPaginatedSelectResults, initbaseSelect2, SELECT_RESULTS_LIMIT, toggleSelectOption } from "../baseSelect.js";
 import { toggleDisabledElement } from '../../../utils/formUtils.js';
 

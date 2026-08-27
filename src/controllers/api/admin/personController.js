@@ -1,4 +1,4 @@
-import { createPersonDTO } from "../../../dtos/personDTO.js";
+import { createPersonDtoForEdit, createPersonDtoForRegister } from "../../../dtos/personDTO.js";
 import { successCodeMessages } from "../../../messages/codeMessages.js";
 import { createPerson, findAllPersons, updatePerson } from "../../../services/admin/person/personService.js";
 import { sanitizeEmptyStrings } from "../../../utils/formattersUtils.js";
@@ -67,7 +67,7 @@ export const getAllPersons = async (req, res) => {
 
 export const registerPerson = async (req, res) => {
 
-    const personDto = createPersonDTO(req.body);
+    const personDto = createPersonDtoForRegister(req.body);
     const sanitizedPersonDto = sanitizeEmptyStrings(personDto);
 
     const person = await createPerson({ personDto: sanitizedPersonDto });
@@ -78,7 +78,7 @@ export const registerPerson = async (req, res) => {
 export const editPerson = async (req, res) => {
 
     const { id } = req.params;
-    const personDto = createPersonDTO(req.body);
+    const personDto = createPersonDtoForEdit(req.body);
     const sanitizedPersonDto = sanitizeEmptyStrings(personDto);
 
     const person = await updatePerson({ id, personDto: sanitizedPersonDto });

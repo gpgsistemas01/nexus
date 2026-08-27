@@ -1,9 +1,11 @@
-import { handleApiError, normalizeJqAjaxError } from "../../api/errorHandler.js";
-import { initMdbWrapperInput, updateMdbWrapperInput } from "../mdb/baseInstance.js";
+import { DOM_EVENT_NAMES, SELECT2_EVENT_NAMES } from '../../constants/events.js';
+import { INPUT_SELECTORS } from '../../constants/selectors.js';
+import { handleApiError } from "../../api/errorHandler.js";
+import { initMdbWrapperInput, setMdbWrapperInputValue, updateMdbWrapperInput } from "../mdb/baseInstance.js";
 import { toggleDisabledElement } from "../../utils/formUtils.js";
 import { bindDisabledControlWarning, setDisabledControlWarning } from "../../ui/disabledControlWarning.js";
 
-const wrapperSelector = '#presentationDisplayInput';
+const wrapperSelector = INPUT_SELECTORS.PRESENTATION_DISPLAY;
 export const SELECT_RESULTS_LIMIT = 20;
 
 export const buildPaginatedSelectParams = (params = {}, {
@@ -67,11 +69,11 @@ export const runAfterSelect2Close = ({ selector, action }) => {
 
     // Wait for Select2's real close event before scheduling the modal. Calling
     // close and merely starting a timer here races Select2's own close handlers.
-    $select.one('select2:close', deferAction);
+    $select.one(SELECT2_EVENT_NAMES.CLOSE, deferAction);
     $select.select2('close');
 };
 
-export const clearSelectValue = selector => $(selector).val(null).trigger('change');
+export const clearSelectValue = selector => $(selector).val(null).trigger(DOM_EVENT_NAMES.CHANGE);
 
 export const initbaseSelect2 = ({ 
     baseSelector, 
@@ -81,8 +83,8 @@ export const initbaseSelect2 = ({
     clearOnOpen = true,
     searchDelay = 1000,
     placeholder,
-    processResults,
-    data = () => ({}),
+    processResults = (response, params) => buildPaginatedSelectResults(response, params),
+    data = () => null,
     tags = false,
     createTag = (params) => {
 
@@ -118,7 +120,7 @@ export const initbaseSelect2 = ({
 
                     const response = await get(params.data);
 
-                    return success(response.data);
+                    return success(Array.isArray(response) ? response : response?.data);
 
                 } catch (err) {
 
@@ -144,11 +146,11 @@ export const initbaseSelect2 = ({
         isDisabled: Boolean(baseElement?.disabled)
     });
 
-    if (clearOnOpen) $(baseSelector).on('select2:open', () => {
+    if (clearOnOpen) $(baseSelector).on(SELECT2_EVENT_NAMES.OPEN, () => {
 
         setTimeout(() => {
 
-            $(baseSelector).val(null).trigger('change');
+            $(baseSelector).val(null).trigger(DOM_EVENT_NAMES.CHANGE);
 
             setMdbWrapperInputValue({
                 selector: `${ containerSelector } ${ wrapperSelector }`,
@@ -158,12 +160,6 @@ export const initbaseSelect2 = ({
         }, 10);
     });
 }
-
-
-export const mapValueLabelToSelectData = (item) => ({
-    id: item.value,
-    text: item.label
-});
 
 export const createNewSelectTag = ({
     term,
@@ -190,13 +186,13 @@ export const applySelectedSelectValue = ({
 
     if (!selectedId) {
 
-        if (clearWhenEmpty) $(selector).val(emptyValue).trigger('change');
+        if (clearWhenEmpty) $(selector).val(emptyValue).trigger(DOM_EVENT_NAMES.CHANGE);
         return;
     }
 
     const currentOption = $(`${ selector } option[value=\"${ selectedId }\"]`);
 
-    if (currentOption.length) $(selector).val(selectedId).trigger('change');
+    if (currentOption.length) $(selector).val(selectedId).trigger(DOM_EVENT_NAMES.CHANGE);
 };
 
 export const initFilterSelect2 = ({
@@ -204,32 +200,22 @@ export const initFilterSelect2 = ({
     getOptions,
     placeholder,
     selectedId = null,
-    data = () => ({}),
-    mapOption = mapValueLabelToSelectData,
-    processResults = null,
-    clearWhenEmpty = true,
-    paginated = false
+    data = () => null,
+    mapOption = (item) => ({
+        id: item.value,
+        text: item.label
+    }),
+    clearWhenEmpty = true
 }) => {
 
     initbaseSelect2({
         baseSelector: selector,
         containerSelector: 'body',
-        get: paginated
-            ? getOptions
-            : async (params) => ({ data: await getOptions(params) }),
+        get: getOptions,
         clearOnOpen: false,
         placeholder,
         data,
-        processResults: processResults || (paginated
-            ? (response, params) => buildPaginatedSelectResults(response, params, { mapItem: mapOption })
-            : (response) => {
-
-                const list = response.data || response;
-
-                return {
-                    results: list.map(mapOption)
-                };
-            })
+        processResults: (response, params) => buildPaginatedSelectResults(response, params, { mapItem: mapOption })
     });
 
     applySelectedSelectValue({
@@ -279,7 +265,7 @@ export const initDomainSelect2 = ({
 
 export const toggleSelectOption = ({ selector, data = null }) => {
     
-    $(selector).val(null).trigger('change');
+    $(selector).val(null).trigger(DOM_EVENT_NAMES.CHANGE);
 
     const { id, text } = data || {};
 
@@ -291,12 +277,12 @@ export const toggleSelectOption = ({ selector, data = null }) => {
         option.dataset[key] = value;
     });
 
-    $(selector).append(option).trigger('change');
+    $(selector).append(option).trigger(DOM_EVENT_NAMES.CHANGE);
 };
 
 export const toggleSelectOptions = ({ selector, data = [] }) => {
 
-    $(selector).val(null).trigger('change');
+    $(selector).val(null).trigger(DOM_EVENT_NAMES.CHANGE);
 
     data.forEach(d => {
 
@@ -309,20 +295,7 @@ export const toggleSelectOptions = ({ selector, data = [] }) => {
         $(selector).append(option);
     });
 
-    $(selector).trigger('change');
-}
-
-export const setMdbWrapperInputValue = ({
-    selector, 
-    value
-}) => {
-
-    const instance = initMdbWrapperInput({
-        selector,
-        value
-    });
-
-    updateMdbWrapperInput(instance);
+    $(selector).trigger(DOM_EVENT_NAMES.CHANGE);
 }
 
 export const bindDependency = ({
@@ -340,7 +313,7 @@ export const bindDependency = ({
 
     source.dataset.bound = 'true';
 
-    $source.on('change', () => {
+    $source.on(DOM_EVENT_NAMES.CHANGE, () => {
 
         onChange?.({
             value: $source.val(),

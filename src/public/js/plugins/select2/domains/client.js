@@ -1,5 +1,6 @@
-import { openClientModal } from "../../../modules/clients/clientModal.js";
-import { getAllClients } from "../../../application/sales/clients.js";
+import { SELECT2_EVENT_NAMES } from '../../../constants/events.js';
+import { openClientModal } from "../../../pages/sales/clients/clientModal.js";
+import { getAllClients } from "../../../application/sales/clients/clients.js";
 import { initDomainSelect2, initFilterSelect2, runAfterSelect2Close, toggleSelectOption } from "../baseSelect.js";
 import { FILTER_SELECTORS } from "../../../constants/selectors.js";
 
@@ -12,7 +13,6 @@ export const initClientFilterSelect = ({
     getOptions: getAllClients,
     placeholder: 'Filtrar por cliente',
     selectedId,
-    paginated: true,
     mapOption: (client) => ({ id: client.id, text: client.name })
 });
 
@@ -38,7 +38,7 @@ const attachClientHandler = ({
     baseSelector
 }) => {
 
-    $(baseSelector).off('select2:select').on('select2:select', (e) => {
+    $(baseSelector).off(SELECT2_EVENT_NAMES.SELECT).on(SELECT2_EVENT_NAMES.SELECT, (e) => {
 
         const data = e.params.data;
 

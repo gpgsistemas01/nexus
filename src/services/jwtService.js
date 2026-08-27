@@ -1,5 +1,4 @@
 import jwt from 'jsonwebtoken';
-import { encryptToken } from '../utils/encryptionUtils.js';
 import { createServiceLogger, logServiceError } from "../utils/logger.js";
 
 const serviceLogger = createServiceLogger('jwtService');

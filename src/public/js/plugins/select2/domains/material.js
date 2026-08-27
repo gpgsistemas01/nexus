@@ -1,10 +1,13 @@
-import { openMaterialModal } from "../../../modules/materials/materialModal.js";
-import { getAllMaterials } from "../../../application/warehouse/materials.js";
-import { buildPaginatedSelectParams, buildPaginatedSelectResults, initDomainSelect2, initFilterSelect2, runAfterSelect2Close, SELECT_RESULTS_LIMIT, setMdbWrapperInputValue, toggleSelectOption } from "../baseSelect.js";
-import { mapMaterialToSelectData } from "../../../utils/materialSelectUtils.js";
-import { FORM_SELECTORS, FILTER_SELECTORS } from "../../../constants/selectors.js";
+import { SELECT2_EVENT_NAMES } from '../../../constants/events.js';
+import { openMaterialModal } from "../../../pages/warehouse/materials/materialModal.js";
+import { getAllMaterials } from "../../../application/warehouse/materials/materials.js";
+import { buildPaginatedSelectParams, initDomainSelect2, initFilterSelect2, runAfterSelect2Close, toggleSelectOption } from "../baseSelect.js";
+import { setMdbWrapperInputValue } from '../../mdb/baseInstance.js';
+import { mapSelectMaterialData, parseInventorySelectJson } from "../../../utils/warehouseInventoryUtils.js";
+import { FILTER_SELECTORS, INPUT_SELECTORS } from "../../../constants/selectors.js";
+import { updatePresentationDisplay } from '../../../ui/inventory/inventorySelectUI.js';
 
-const wrapperSelector = FORM_SELECTORS.PRESENTATION_DISPLAY;
+const wrapperSelector = INPUT_SELECTORS.PRESENTATION_DISPLAY;
 const materialSelector = FILTER_SELECTORS.MATERIAL;
 
 export const initMaterialFilterSelect = ({
@@ -19,18 +22,13 @@ export const initMaterialFilterSelect = ({
         getOptions: getAllMaterials,
         placeholder: 'Filtrar por material',
         selectedId,
-        paginated: true,
-        mapOption: mapMaterialToSelectData,
+        mapOption: mapSelectMaterialData,
         data: (params) => buildPaginatedSelectParams(params, {
             additionalParams: {
                 supplierId: supplierFilterSelector
                     ? $(`${ baseSelector } ${ supplierFilterSelector }`).val()
                     : ''
             }
-        }),
-        processResults: (data, params) => buildPaginatedSelectResults(data, params, {
-            length: Number(params?.data?.length) || SELECT_RESULTS_LIMIT,
-            mapItem: mapMaterialToSelectData
         })
     });
 };
@@ -39,38 +37,20 @@ const initMaterialSelect = ({
     modalSelector,
     supplierSelector,
     baseSelector,
-    allowCreate = true,
-    resultsLimit = null
+    allowCreate = true
 }) => initDomainSelect2({
     selector: baseSelector,
     containerSelector: modalSelector,
     get: getAllMaterials,
     placeholder: 'Buscar material...',
-    data: (params) => resultsLimit
-        ? buildPaginatedSelectParams(params, {
-            length: resultsLimit,
-            additionalParams: {
-                supplierId: supplierSelector
-                    ? $(`${ modalSelector } ${ supplierSelector }`).val()
-                    : ''
-            }
-        })
-        : {
-            search: params.term,
+    mapOption: mapSelectMaterialData,
+    data: (params) => buildPaginatedSelectParams(params, {
+        additionalParams: {
             supplierId: supplierSelector
                 ? $(`${ modalSelector } ${ supplierSelector }`).val()
                 : ''
-        },
-    processResults: (data, params) => {
-        if (resultsLimit) return buildPaginatedSelectResults(data, params, {
-            length: resultsLimit,
-            mapItem: mapMaterialToSelectData
-        });
-
-        const list = data.data || data;
-
-        return { results: list.map(mapMaterialToSelectData) };
-    },
+        }
+    }),
     allowCreate,
     newTagLabel: 'Nuevo material'
 });
@@ -79,10 +59,10 @@ const attachMaterialHandler = ({
     modalSelector,
     baseSelector,
     supplierSelector,
-    materialCreationContext = null
+    creationContext
 }) => {
 
-    $(baseSelector).off('select2:select').on('select2:select', (e) => {
+    $(baseSelector).off(SELECT2_EVENT_NAMES.SELECT).on(SELECT2_EVENT_NAMES.SELECT, (e) => {
 
         const { data } = e.params;
 
@@ -95,19 +75,21 @@ const attachMaterialHandler = ({
             runAfterSelect2Close({
                 selector: baseSelector,
                 action: () => openMaterialModal({
+                    creationContext,
                     data: {
                         name,
                         supplier: {
                             id,
                             tradeName,
                         }
-                    },
-                    creationContext: materialCreationContext,
+                    },           
                     onSave: (createdMaterial) => {
+
+                        createdMaterial = mapSelectMaterialData(createdMaterial);
 
                         toggleMaterialOption({
                             selector: baseSelector,
-                            data: mapMaterialToSelectData(createdMaterial)
+                            data: createdMaterial
                         });
 
                         setMdbWrapperInputValue({
@@ -121,19 +103,13 @@ const attachMaterialHandler = ({
             return;
         }
 
-        const option = e.target.querySelector('option:checked');
+        const material = parseInventorySelectJson(data.material);
 
-        if (!option) return;
-
-        Object.entries(data).forEach(([key, value]) => {
-            option.dataset[key] = value;
-        });
-
-        const value = data.presentationName || '';
-
-        setMdbWrapperInputValue({
-            selector: `${ modalSelector } ${ wrapperSelector }`,
-            value
+        updatePresentationDisplay({
+            modalSelector,
+            data,
+            presentation: material.presentation,
+            option: e.target.querySelector('option:checked')
         });
     });
 };
@@ -146,14 +122,12 @@ export const toggleMaterialOption = ({
     data
 });
 
-
 export const setupMaterialSelect = ({
     modalSelector,
     supplierSelector = null,
     materialSelector,
     allowCreate = true,
-    materialCreationContext = null,
-    resultsLimit = null
+    creationContext = null
 }) => {
 
     const baseSelector = `${ modalSelector } ${ materialSelector }`;
@@ -162,14 +136,13 @@ export const setupMaterialSelect = ({
         modalSelector,
         supplierSelector,
         baseSelector,
-        allowCreate,
-        resultsLimit
+        allowCreate
     });
 
     attachMaterialHandler({
         modalSelector,
         baseSelector,
         supplierSelector,
-        materialCreationContext
+        creationContext
     });
 };

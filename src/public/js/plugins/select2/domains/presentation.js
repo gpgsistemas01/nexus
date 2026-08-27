@@ -1,4 +1,4 @@
-import { getAllPresentations } from "../../../application/warehouse/presentations.js";
+import { getAllPresentations } from "../../../application/warehouse/catalogs/presentations.js";
 import { buildPaginatedSelectResults, initbaseSelect2, SELECT_RESULTS_LIMIT, toggleSelectOption } from "../baseSelect.js";
 
 export const initPresentationSelect = ({ 

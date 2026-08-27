@@ -16,3 +16,10 @@ export const getSelectedOptionText = (selector, root = document) => {
 
     return select?.selectedOptions[0]?.text?.trim() || '';
 };
+
+export const scopeSelectors = ({ scopeSelector, selectors }) => Object.fromEntries(
+    Object.entries(selectors).map(([name, selector]) => [
+        name,
+        `${ scopeSelector } ${ selector }`
+    ])
+);

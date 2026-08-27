@@ -34,11 +34,11 @@
 }; %>
 
 
-<%- include('../../../shared/mainTable', { title: 'Usuarios' }) %>
+<%- include('../../../shared/tables/mainTable', { title: 'Usuarios' }) %>
 
-<%- include('../../../shared/modal', { modalId: 'userModal', form }) %>
+<%- include('../../../shared/layout/modal', { modalId: 'userModal', form }) %>
 
-<script type="module" src="/js/pages/admin/usersPage.js"></script>
+<script type="module" src="/js/pages/admin/users/usersPage.js"></script>
 
 <%- contentFor('title') %>
 Usuarios

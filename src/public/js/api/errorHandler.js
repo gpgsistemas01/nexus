@@ -1,6 +1,7 @@
 import { getErrorMessage } from "../constants/apiMessages.js";
 import { notifications } from "../plugins/swal/swalComponent.js";
-import { clearFormErrors, normalizeFormErrors, scrollToFirstFormError } from "../ui/formUI.js";
+import { clearFormErrors, normalizeFormErrors, scrollToFirstFormError } from "../ui/forms/formErrorsUI.js";
+import { resetFormSubmitState } from "../ui/forms/formStateUI.js";
 import { mapServerErrors } from "../utils/formUtils.js";
 
 const getFallbackMessage = (err) => {
@@ -8,14 +9,6 @@ const getFallbackMessage = (err) => {
     const data = err?.data ?? err?.response?.data ?? null;
 
     return data?.message || getErrorMessage(data) || data?.detail || data?.error || err?.message || 'Ocurrió un error inesperado.';
-};
-
-const resetFormSubmission = (form) => {
-
-    if (!form) return;
-
-    form.dataset.submitting = 'false';
-    form.querySelector('button[type="submit"]')?.removeAttribute('disabled');
 };
 
 export const normalizeJqAjaxError = (jqXHR, errorThrown = null) => {
@@ -49,11 +42,11 @@ export const handleApiError = ({
                 clearFormErrors(form);
                 normalizeServerErrors({ form, errors: serverErrors });
                 scrollToFirstFormError(form);
-                resetFormSubmission(form);
+                resetFormSubmitState(form);
                 return;
             }
 
-            resetFormSubmission(form);
+            resetFormSubmitState(form);
             notifications.showError(message || 'Errores de validación.');
             return;
         }
@@ -64,7 +57,7 @@ export const handleApiError = ({
             return;
 
         case 403:
-            resetFormSubmission(form);
+            resetFormSubmitState(form);
             notifications.showError(getFallbackMessage(err));
             return;
 
@@ -74,7 +67,7 @@ export const handleApiError = ({
             const modalTitle = getErrorMessage(modalData) || 'No se pudo completar la acción';
             const modalMessage = getFallbackMessage(err);
 
-            resetFormSubmission(form);
+            resetFormSubmitState(form);
             notifications.showModal({
                 title: modalTitle,
                 text: modalMessage === modalTitle ? null : modalMessage,

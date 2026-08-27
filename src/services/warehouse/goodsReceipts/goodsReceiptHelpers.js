@@ -7,6 +7,20 @@ import { GoodsReceiptDetailAlreadyCanceled } from "../../../errors/warehouse/goo
 
 const IVA_RATE = 1.16;
 
+/**
+ * Relation graph for raw purchase details returned to the browser. Scalar
+ * fields are intentionally not selected so Prisma preserves the persisted
+ * detail contract and the frontend owns the table-row mapping.
+ */
+export const GOODS_RECEIPT_DETAIL_INCLUDE = Object.freeze({
+    material: {
+        include: {
+            presentation: true,
+            unitMeasure: true
+        }
+    }
+});
+
 export const buildGoodsReceiptDetails = async (details, { tx = null } = {}) => {
 
     const materialIds = details.map(d => d.materialId);
@@ -21,7 +35,7 @@ export const buildGoodsReceiptDetails = async (details, { tx = null } = {}) => {
 
         if (!material) throw new MaterialNotFound();
 
-        const { name, base, height, presentation, unitMeasure } = material;
+        const { name, base, height } = material;
         const netPurchaseAmount = roundTo(quantity * costPerUnitType);
         const grossPurchaseAmount = roundTo(netPurchaseAmount * IVA_RATE);
         const convertedQuantity = calculateConvertedQuantity({
@@ -41,14 +55,7 @@ export const buildGoodsReceiptDetails = async (details, { tx = null } = {}) => {
             conversionUnitCost,
             netPurchaseAmount,
             grossPurchaseAmount,
-            materialName: name,
-            materialBase: base,
-            materialHeight: height,
-            presentationId: presentation.id,
-            presentationName: presentation.name,
-            unitMeasureId: unitMeasure.id,
-            unitMeasureName: unitMeasure.name,
-            unitMeasureSymbol: unitMeasure.symbol
+            materialName: name
         };
     });
 }
@@ -128,7 +135,11 @@ const updateActiveGoodsReceiptDetailAndTotals = async ({ tx, goodsReceiptId, det
             })
         },
         include: {
-            details: true
+            details: {
+                include: GOODS_RECEIPT_DETAIL_INCLUDE
+            },
+            supplier: true,
+            status: true
         }
     });
 
@@ -178,7 +189,10 @@ export const createGoodsReceiptDetailsAndUpdateTotals = async ({ tx, goodsReceip
         where: { id: goodsReceiptId },
         data: calculateGoodsReceiptTotals(receiptDetails),
         include: {
-            details: true,
+            details: {
+                include: GOODS_RECEIPT_DETAIL_INCLUDE
+            },
+            supplier: true,
             status: true
         }
     });

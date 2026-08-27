@@ -1,5 +1,6 @@
 import {
     GoodsReceiptCreateDatabaseError,
+    GoodsReceiptInvoiceAlreadyExists,
     GoodsReceiptAlreadyCanceled,
     GoodsReceiptNotFound,
     GoodsReceiptUpdateDatabaseError,
@@ -14,13 +15,28 @@ import { generateYearlyReferenceNumber, throwIfReferenceNumberAlreadyExists } fr
 import { findPersonById } from "../../admin/person/personService.js";
 import { applyInventoryMovement } from "../../inventory/movementService.js";
 import { findUniqueSupplier } from "../supplierService.js";
-import { buildGoodsReceiptDetails, calculateGoodsReceiptTotals, createGoodsReceiptDetailsAndUpdateTotals } from "./goodsReceiptHelpers.js";
+import { buildGoodsReceiptDetails, calculateGoodsReceiptTotals, createGoodsReceiptDetailsAndUpdateTotals, GOODS_RECEIPT_DETAIL_INCLUDE } from "./goodsReceiptHelpers.js";
 import { updateMaterialUnitCostIfHigher } from "../materials/supplierMaterialService.js";
 import { isAppError } from "../../../errors/AppError.js";
 import { buildDateRangeFilter } from "../../../utils/requestQueryUtils.js";
 import { GOODS_RECEIPT_STATUS_NAMES } from "../../../constants/warehouseStatuses.js";
 import { INVENTORY_MOVEMENT_TYPES } from "../../../constants/inventory.js";
 import { DOCUMENT_REFERENCE_TYPES } from "../../../constants/documentReferenceTypes.js";
+import { PRISMA_ERROR_CODES } from "../../../constants/prisma.js";
+
+const throwIfInvoiceAlreadyExists = (err) => {
+    if (err?.code !== PRISMA_ERROR_CODES.RECORD_NOT_UNIQUE) return;
+
+    const driverConstraint = err.meta?.driverAdapterError?.cause?.constraint;
+    const target = err.meta?.target ?? driverConstraint?.fields ?? driverConstraint?.index;
+    const isInvoiceTarget = Array.isArray(target)
+        ? target.includes('supplierId') && target.includes('invoice')
+        : typeof target === 'string' && target.includes('supplierId') && target.includes('invoice');
+
+    if (isInvoiceTarget) {
+        throw new GoodsReceiptInvoiceAlreadyExists();
+    }
+};
 
 
 export const findAllGoodsReceipts = async ({
@@ -79,6 +95,7 @@ export const findAllGoodsReceipts = async ({
             receivedByName: true,
             supplierId: true,
             supplierName: true,
+            supplier: true,
             totalGrossPurchaseAmount: true,
             totalNetPurchaseAmount: true,
             totalQuantity: true,
@@ -91,25 +108,7 @@ export const findAllGoodsReceipts = async ({
             },
             details: {
                 ...(activeDetailsOnly && { where: { status: 'ACTIVE' } }),
-                select: {
-                    id: true,
-                    materialName: true,
-                    materialBase: true,
-                    materialHeight: true,
-                    quantity: true,
-                    presentationId: true,
-                    presentationName: true,
-                    convertedQuantity: true,
-                    unitMeasureId: true,
-                    unitMeasureName: true,
-                    unitMeasureSymbol: true,
-                    costPerUnitType: true,
-                    conversionUnitCost: true,
-                    netPurchaseAmount: true,
-                    grossPurchaseAmount: true,
-                    materialId: true,
-                    status: true,
-                }
+                include: GOODS_RECEIPT_DETAIL_INCLUDE
             }
         }
     });
@@ -176,13 +175,10 @@ export const createGoodsReceipt = async ({ goodsReceiptDto }) => {
                 },
                 include: {
                     details: {
-                        select: {
-                            id: true,
-                            materialId: true,
-                            quantity: true,
-                            conversionUnitCost: true
-                        }
-                    }
+                        include: GOODS_RECEIPT_DETAIL_INCLUDE
+                    },
+                    supplier: true,
+                    status: true
                 }
             });
 
@@ -225,6 +221,7 @@ export const createGoodsReceipt = async ({ goodsReceiptDto }) => {
         });
 
         if (isAppError(err)) throw err;
+        throwIfInvoiceAlreadyExists(err);
         throwIfReferenceNumberAlreadyExists({ err, referenceNumber });
 
         throw new GoodsReceiptCreateDatabaseError();
@@ -272,7 +269,10 @@ export const updateGoodsReceipt = async ({ id, goodsReceiptDto }) => {
                     }
                 },
                 include: {
-                    details: true,
+                    details: {
+                        include: GOODS_RECEIPT_DETAIL_INCLUDE
+                    },
+                    supplier: true,
                     status: true
                 }
             });
@@ -327,6 +327,8 @@ export const updateGoodsReceipt = async ({ id, goodsReceiptDto }) => {
         });
 
         if (isAppError(err)) throw err;
+
+        throwIfInvoiceAlreadyExists(err);
 
         throw new GoodsReceiptUpdateDatabaseError();
     }

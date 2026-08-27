@@ -8,14 +8,14 @@ Nexus es una plataforma de control operativo para administrar inventario, compra
 - [Visión, alcance y requisitos](#visión-alcance-y-requisitos)
 - [Stack técnico](#stack-técnico)
 - [Arquitectura del proyecto](#arquitectura-del-proyecto)
+- [Documentación](#documentación)
 - [Requisitos](#requisitos)
 - [Configuración inicial](#configuración-inicial)
 - [Variables de entorno](#variables-de-entorno)
-- [Base de datos y Prisma](#base-de-datos-y-prisma)
-- [Usuarios, auditoría y permisos](#usuarios-auditoría-y-permisos)
+- [Base de datos, usuarios y permisos](#base-de-datos-usuarios-y-permisos)
 - [Ejecución](#ejecución)
 - [Scripts disponibles](#scripts-disponibles)
-- [Rutas principales](#rutas-principales)
+- [Rutas](#rutas)
 - [Pruebas automatizadas](#pruebas-automatizadas)
 - [Convenciones de desarrollo](#convenciones-de-desarrollo)
 - [Docker](#docker)
@@ -27,7 +27,7 @@ Nexus es una plataforma de control operativo para administrar inventario, compra
 - Gestión de almacén: materiales, proveedores, entradas de compra, salidas de almacén, mermas, motivos, presentaciones, unidades de medida y estados de cumplimiento.
 - Gestión de clientes del área de ventas.
 - Reportes administrativos, de almacén e inventario.
-- Notificaciones en tiempo real con Socket.IO.
+- Actualización de inventario en tiempo real con Socket.IO.
 - Validación de contenido para API JSON, cargas de archivo y texto plano.
 - Pruebas unitarias e integrales con Vitest y Supertest.
 
@@ -75,14 +75,25 @@ src/
 
 prisma/
 ├── schema.prisma           # Modelo de datos
-├── migrations/             # Migraciones versionadas
-└── seed.js                 # Carga inicial desde archivos XLSX
+└── migrations/             # Migraciones versionadas
 
 tests/                      # Pruebas unitarias, integración y helpers
 scripts/                    # Scripts auxiliares de verificación
 ```
 
 La aplicación usa una separación por capas: las rutas delegan en controladores, los controladores coordinan validación/entrada y los servicios concentran la lógica de negocio. Prisma se crea desde `src/lib/prisma.js`, usando la URL resuelta por `src/lib/databaseUrl.js`.
+
+Los registros centrales `src/routes/api/index.js` y `src/routes/web/index.js` componen
+los routers por dominio y evitan que `src/app.js` mezcle el arranque de infraestructura
+con el catálogo de endpoints. Las convenciones equivalentes entre backend y frontend,
+incluyendo reutilización de componentes y ubicación de pruebas CRUD, se detallan en el
+[mapa visual de arquitectura y vistas web](docs/architecture-and-web-views.md#5-organización-consistente-de-front-y-back).
+
+## Documentación
+
+El [índice de documentación](docs/README.md) enlaza arquitectura, API, pruebas y base de
+datos. El mapa de rutas y dependencias se genera desde el código; los diagramas de diseño
+se mantienen de forma curada. CI comprueba que el contenido generado esté actualizado.
 
 ## Requisitos
 
@@ -99,13 +110,12 @@ La aplicación usa una separación por capas: las rutas delegan en controladores
    ```
 
 2. Crear el archivo `.env` en la raíz del proyecto con las variables necesarias.
+   Este archivo es local, está excluido por `.gitignore` y no debe versionarse.
 
 3. Preparar la base de datos de desarrollo:
 
    ```bash
    npm run db:migrate
-   npx prisma generate
-   npm exec prisma db seed
    ```
 
 4. Iniciar la aplicación:
@@ -116,7 +126,10 @@ La aplicación usa una separación por capas: las rutas delegan en controladores
 
 ## Variables de entorno
 
-La aplicación carga variables con `dotenv/config.js`. Como mínimo se requiere una URL de PostgreSQL para el entorno en ejecución.
+La aplicación carga variables con `dotenv/config.js`. En desarrollo, define la
+configuración en un archivo `.env` local; en despliegues, utiliza el gestor de secretos
+de la plataforma. El archivo `.env` está excluido por `.gitignore` y nunca debe contener
+valores destinados a versionarse.
 
 ```env
 # Aplicación
@@ -140,74 +153,29 @@ LOG_LEVEL="info"
 
 > Ajusta los nombres/secretos según el ambiente real. No subas archivos `.env` con credenciales al repositorio.
 
-## Base de datos y Prisma
+| Variable | Obligatoria | Uso |
+| --- | --- | --- |
+| `DATABASE_URL` | Sí, excepto en pruebas | Conexión PostgreSQL del proceso de la aplicación. |
+| `DIRECT_URL` | En Docker con `RUN_MIGRATIONS=true` | Conexión directa del CLI de Prisma para migraciones. |
+| `DATABASE_TEST_URL` | Para pruebas de integración | Base aislada seleccionada cuando `NODE_ENV=test`. Debe ser distinta de `DATABASE_URL`. |
+| `DIRECT_TEST_URL` | No | Conexión directa para migrar la base de pruebas; si falta se usa `DATABASE_TEST_URL`. |
+| `JWT_SECRET_ACCESS` | Sí | Firma tokens de acceso con vigencia de una hora. |
+| `JWT_SECRET_REFRESH` | Sí | Firma tokens de renovación con vigencia de siete días. |
+| `JWT_SECRET_ONE_TIME` | Sí | Firma tokens de un solo uso con vigencia de quince minutos. |
+| `PORT` | No | Puerto HTTP; el valor predeterminado es `3000`. |
+| `NODE_ENV` | No en local | Selecciona la base de pruebas cuando vale `test`; la imagen Docker lo fija en `production`. |
+| `LOG_LEVEL` | No | Nivel de Pino. Acepta `fatal`, `error`, `warn`, `info`, `debug`, `trace` o `silent`; el predeterminado es `warn`. |
 
-La conexión se resuelve desde `src/lib/databaseUrl.js`:
+## Base de datos, usuarios y permisos
 
-- Cuando `NODE_ENV` es `test`, se usa `DATABASE_TEST_URL`.
-- La aplicación usa `DATABASE_URL` en cualquier otro entorno.
-- Prisma CLI usa `DIRECT_URL` automáticamente en producción cuando existe, por ejemplo para `migrate deploy`; si no existe, usa `DATABASE_URL`.
-- Prisma CLI usa `DIRECT_TEST_URL` automáticamente en pruebas cuando existe; si no existe, usa `DATABASE_TEST_URL`.
-- Si falta la variable requerida, el resolver falla indicando el `NODE_ENV` activo.
+Prisma selecciona la URL según el entorno: `DATABASE_URL` para la aplicación,
+`DATABASE_TEST_URL` para pruebas y las variantes `DIRECT_*` para migraciones cuando
+están definidas. Los comandos de base de datos se encuentran en la tabla de scripts.
 
-`DATABASE_URL` y `DIRECT_URL` deben usar credenciales distintas para que la separación
-sea efectiva: la primera corresponde a la cuenta DML de ejecución y la segunda a la
-cuenta que aplica DDL durante las migraciones. La guía de aprovisionamiento, propiedad
-de objetos, `GRANT` y verificación está en
-[`docs/postgresql-runtime-and-migration-roles.md`](docs/postgresql-runtime-and-migration-roles.md).
-La creación de roles es un bootstrap administrativo previo y no forma parte de
-`prisma/migrations`; los roles y permisos deben existir antes de ejecutar Prisma.
+Consulta las guías específicas para evitar duplicar aquí decisiones y procedimientos:
 
-Comandos útiles:
-
-```bash
-npm run db:migrate         # Aplica migraciones pendientes usando DIRECT_URL si está definida
-npx prisma generate          # Genera el cliente Prisma
-npm exec prisma db seed      # Ejecuta prisma/seed.js
-npx prisma studio            # Abre Prisma Studio para inspección local
-```
-
-El seed lee archivos XLSX ubicados en `prisma/` para cargar catálogos y datos iniciales. Verifica que los archivos requeridos existan antes de ejecutar `npm exec prisma db seed`.
-
-## Usuarios, auditoría y permisos
-
-El análisis del modelo actual, las brechas detectadas y la propuesta para distinguir
-identidades de acceso (`User`), personas participantes del negocio (`Person`), auditoría de
-escrituras y privilegios PostgreSQL están documentados en
-[`docs/database-users-and-permissions-analysis.md`](docs/database-users-and-permissions-analysis.md).
-
-La recomendación principal es no agregar un usuario indiscriminadamente a cada tabla:
-se debe conservar el actor `User` en operaciones auditables, mantener `Person` para
-los papeles del proceso y centralizar los permisos por acción, rol y departamento.
-
-### Impacto del cambio a «Personas» en la base de datos
-
-El cambio se aplica de forma integral para que «Persona» sea congruente en la interfaz,
-la API, el código y la persistencia. La migración renombra `Profile` a `Person`,
-`ProfileRoleDepartment` a `PersonRoleDepartment` y los campos `profileId` a `personId`.
-Los modelos, servicios, DTO, permisos y payloads utilizan igualmente `Person`/`person`.
-
-Esto **no afecta la trazabilidad de los datos**: cada persona conserva el mismo UUID y
-las operaciones históricas siguen relacionadas mediante sus claves foráneas. La
-trazabilidad de quién ejecutó una acción se mantiene en `User`, mientras que `Person`
-identifica a la persona que desempeñó un papel dentro del flujo. PostgreSQL realiza los
-renombres sobre los mismos objetos, sin copiar ni recrear registros.
-
-En la implementación actual, las **definiciones** de permisos y su matriz se versionan
-en `src/constants/permissions.js`; no existen tablas `Permission` o `RolePermission`
-administrables desde la interfaz. La base de datos conserva las **asignaciones** de
-cada cuenta en `UserRoleDepartment`. El backend cruza esas asignaciones con la matriz,
-autoriza la petición y deriva las capacidades que entrega al frontend. Convertir la
-matriz en configuración administrable requeriría un cambio de modelo, migración,
-pantalla administrativa y auditoría; no es el comportamiento actual.
-
-La concesión efectiva sí es automática en tiempo de ejecución: el administrador solo
-guarda la asignación rol/departamento; en cada login, renovación o carga de sesión el
-backend vuelve a leer `UserRoleDepartment`, cruza esas filas con
-`AUTHORIZATION_POLICIES` y calcula `user.permissions`. No existe un proceso manual para
-copiar permisos al usuario ni se persiste ese arreglo derivado. Si cambia una
-asignación, la siguiente carga autenticada recalcula las capacidades; si cambia la
-matriz en código, el cambio entra en vigor al desplegar la nueva versión.
+- [roles PostgreSQL de ejecución y migración](docs/postgresql-runtime-and-migration-roles.md);
+- [usuarios, personas, auditoría y permisos](docs/database-users-and-permissions-analysis.md).
 
 ## Ejecución
 
@@ -232,11 +200,16 @@ npm start
 | `npm start` | Ejecuta `node src/app.js`. |
 | `npm run dev` | Ejecuta la aplicación con Nodemon. |
 | `npm run db:migrate` | Aplica migraciones pendientes con Prisma; usa `DIRECT_URL` automáticamente cuando está definida. |
-| `npm test` | Ejecuta la suite de Vitest con `vitestConfig.js`. |
+| `npm run db:generate` | Genera el cliente Prisma. |
+| `npm test` | Ejecuta las pruebas unitarias y auxiliares; excluye `tests/integration`. |
+| `npm run test:unit` | Alias explícito de la suite sin integraciones. |
 | `npm run test:watch` | Ejecuta Vitest en modo observación. |
 | `npm run test:db:verify` | Valida que `DATABASE_TEST_URL` exista y no sea igual a `DATABASE_URL`. |
 | `npm run test:db:migrate` | Verifica variables y aplica migraciones en la base de pruebas; usa `DIRECT_TEST_URL` automáticamente cuando está definida. |
+| `npm run test:integration` | Verifica variables, migra la base de pruebas, genera el cliente Prisma y ejecuta la suite de integración. |
 | `npm run test:db` | Verifica variables, migra la base de pruebas y ejecuta pruebas. |
+| `npm run docs:architecture` | Regenera el mapa de código, el esquema de base de datos y el diccionario técnico derivados del código y Prisma. |
+| `npm run docs:check` | Comprueba sin modificar archivos que la documentación generada esté actualizada. |
 
 ## Rutas principales
 
@@ -289,10 +262,10 @@ quiere probar, puede reutilizarse `tests/helpers/rollbackTransaction.js` para fo
 rollback. La estrategia y ubicación de cada tipo de prueba están detalladas en
 [`docs/service-test-coverage.md`](docs/service-test-coverage.md).
 
-Flujo recomendado para automatización independiente:
+Flujo recomendado para automatización independiente (el segundo comando ya vuelve a
+verificar y migrar, por lo que normalmente basta con ejecutarlo solo):
 
 ```bash
-npm run test:db:migrate
 npm run test:db
 ```
 
@@ -311,12 +284,33 @@ npm test
 - Usa `AppError` y errores de dominio para respuestas controladas.
 - Agrega validadores en `src/validators` para nuevas entradas de usuario.
 - Mantén las rutas agrupadas por dominio en `src/routes/web` y `src/routes/api`.
+- Registra cada router nuevo en el `index.js` web o API correspondiente; `src/app.js`
+  sólo debe coordinar infraestructura y los registros principales.
+- Reutiliza componentes y casos de uso existentes cuando un CRUD cambie únicamente de
+  contexto, en vez de duplicar el flujo completo.
+- Mantén en `plugins/select2/baseSelect.js` los comportamientos visuales compartidos por
+  selects de distintos CRUD, como la sincronización de la presentación en compras y salidas.
+- En los detalles responsivos se conserva la prioridad operativa de `Surtir` y
+  `Cantidad de proyecto` en salidas, y de `Acciones` en compras, antes que las
+  columnas informativas cuando se reduce el ancho disponible.
+- Conserva el mismo orden CRUD en rutas, controllers, servicios de aplicación y
+  servicios HTTP: lectura, creación, actualización general, actualizaciones
+  especializadas y eliminación o acción terminal.
 - Para nuevas funcionalidades con persistencia, agrega migraciones Prisma y pruebas asociadas.
 - No reutilices la base de desarrollo como base de pruebas.
 
 ## Docker
 
-El repositorio incluye `Dockerfile` y `docker-compose.yml`. Al iniciar el contenedor, el entrypoint ejecuta primero `prisma migrate deploy` y solamente arranca la aplicación si las migraciones terminan correctamente. El CLI de Prisma toma `DIRECT_URL` mediante `prisma.config.ts`; la aplicación continúa conectándose con `DATABASE_URL`.
+El repositorio incluye `Dockerfile` y `docker-compose.yml`. Al iniciar el contenedor,
+el entrypoint ejecuta primero `prisma migrate deploy` y solamente arranca la
+aplicación si las migraciones terminan correctamente. El CLI de Prisma toma
+`DIRECT_URL` mediante `prisma.config.ts`; la aplicación continúa conectándose con
+`DATABASE_URL`.
+
+La documentación (`README.md` y `docs/`) **se conserva y versiona en este
+repositorio**. Las reglas de `.dockerignore` únicamente la excluyen del contexto de
+construcción Docker para que no se envíe al servidor ni se incorpore a la imagen
+desplegada; no afectan los archivos registrados por Git.
 
 La selección no depende de que ambas URLs tengan nombres o hosts parecidos:
 

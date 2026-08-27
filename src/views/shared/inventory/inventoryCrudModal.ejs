@@ -1,0 +1,15 @@
+<% const form = {
+    id: modalConfig.formId,
+    canApprove: modalConfig.canApprove,
+    ...(modalConfig.invoice ? { invoice: modalConfig.invoice } : {}),
+    selects: modalConfig.selects,
+    inputs: modalConfig.inputs,
+    textArea: modalConfig.textArea,
+    table: modalConfig.table
+} %>
+
+<%- include('../layout/modal', {
+    modalId: modalConfig.modalId,
+    modalTitle: modalConfig.modalTitle,
+    form
+}) %>

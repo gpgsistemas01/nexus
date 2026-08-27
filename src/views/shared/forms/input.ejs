@@ -1,0 +1,18 @@
+<input id="<%= input.id %>" type="<%= input.type %>" name="<%= input.name %>" 
+    class="form-control <%= input.class || '' %>" value="<%= input.value %>"
+    aria-describedby="<%= `${ input.id }Error` %>"
+    <% if (input.type === 'number' && input.attrs.step === undefined) { %> step="any" <% } %>
+    <% for (let key in input.attrs) { %> 
+        <%= key %>="<%= input.attrs[key] %>" 
+    <% } %>
+>
+
+<%- include('./labelInput', { 
+    id: input.id, 
+    content: input.label
+}) %>
+
+<%- include('./validationMessage', { 
+    name: input.name, 
+    errorClass: input.errorClass || 'invalid-feedback' 
+}) %>

@@ -57,6 +57,7 @@ export const showConfirmation = ({
     text,
     icon,
     showCancelButton: true,
+    reverseButtons: true,
     confirmButtonText,
     cancelButtonText,
     buttonsStyling: false,

@@ -1,93 +1,82 @@
 import { initWasteSelect2, setWasteSelectOptions } from "../../../plugins/select2/modules/wasteSelect.js";
 import { setReasonVisualOption } from '../../../plugins/select2/domains/reason.js';
-import { clearFormErrors, initForm, setFormDisabled } from "../../../ui/formUI.js";
+import { setFormDisabled, setFormSectionVisibility } from "../../../ui/forms/formStateUI.js";
+import { initializeInventoryCrudModal } from '../../../ui/inventory/inventoryCrudModalUI.js';
 import { openModal } from "../../../ui/modalUI.js";
-import { configureStockAdjustmentForm, shouldShowStockAdjustmentFields } from "../../../modules/stockAdjustmentForm.js";
-import { FORM_SELECTORS, MODAL_SELECTORS } from "../../../constants/selectors.js";
-import { wasteDataFields, wasteStockFields } from './wasteFields.js';
+import { BUTTON_SELECTORS, FORM_SELECTORS, HEADING_SELECTORS, MODAL_SELECTORS, SELECT_SELECTORS } from "../../../constants/selectors.js";
+import { wasteDataFields, wasteSecondaryDataFields, wasteStockFields } from './wasteFields.js';
+import { FORM_MODES, isCreateMode, isEditMode, isStockMode } from '../../../constants/formModes.js';
+import { displayWasteMaterialTemplate } from '../../../ui/inventory/inventorySelectUI.js';
 
-const wasteModalId = MODAL_SELECTORS.WASTE;
-const formId = FORM_SELECTORS.WASTE_FORM;
-const stockMode = 'edit-stock';
-const stockSectionSelector = '.stock-data-section';
 const initialStockReasonName = 'Stock inicial';
-
-const prepareWasteModal = ({
-    mode,
-    data,
-    isStockAdjustment = false
-}) => {
-
-    const form = document.querySelector(formId);
-    const modalElement = document.querySelector(wasteModalId);
-    const showStockFields = shouldShowStockAdjustmentFields({
-        mode,
-        includeStockAdjustmentOnCreate: true,
-        isStockAdjustment
-    });
-    const isInitialStockCreation = showStockFields && mode === 'create' && !isStockAdjustment;
-
-    initForm({ form, mode, id: mode === 'create' ? '' : data?.id });
-    initWasteSelect2({ modalSelector: wasteModalId });
-    setWasteSelectOptions({ modalSelector: wasteModalId, data });
-    form.elements.base.value = mode === 'create' ? '' : (data?.base ?? '');
-    form.elements.height.value = mode === 'create' ? '' : (data?.height ?? '');
-    form.elements.currentStock.value = '';
-    form.elements.observations.value = '';
-
-    setFormDisabled({ form, isDisabled: false });
-    configureStockAdjustmentForm({
-        form,
-        dataFields: wasteDataFields,
-        stockFields: wasteStockFields,
-        stockSectionSelector,
-        showStockFields,
-        isStockAdjustment
-    });
-    setReasonVisualOption({
-        selector: `${ wasteModalId } ${ FORM_SELECTORS.REASON }`,
-        name: isInitialStockCreation ? initialStockReasonName : null,
-        isDisabled: isInitialStockCreation
-    });
-    clearFormErrors(form);
-
-    return { form, modalElement };
-};
+const stockDataSectionSelector = '.stock-data-section';
+const materialTemplateFieldSelector = '.waste-material-template-field';
 
 export const openWasteModal = ({
-    mode = 'create',
+    mode = FORM_MODES.CREATE,
     data = null
 } = {}) => {
 
-    const { form, modalElement } = prepareWasteModal({
-        mode,
-        data,
-        isStockAdjustment: false
-    });
+    const form = document.querySelector(FORM_SELECTORS.WASTE);
+    const modalElement = document.querySelector(MODAL_SELECTORS.WASTE);
+    const isCreating = isCreateMode(mode);
+    const isEditing = isEditMode(mode);
+    const isAdjustingStock = isStockMode(mode);
 
-    modalElement.querySelector('#modalTitle').textContent = mode === 'edit'
+    initializeInventoryCrudModal({ form, mode, data: isCreating ? null : data });
+    initWasteSelect2({ modalSelector: MODAL_SELECTORS.WASTE });
+    setWasteSelectOptions({ modalSelector: MODAL_SELECTORS.WASTE, data });
+
+    form.elements.minStock.value = data?.minStock ?? '';
+    form.elements.base.value = data?.base ?? '';
+    form.elements.height.value = data?.height ?? '';
+    form.elements.maxUnitCost.value = data?.maxUnitCost ?? '';
+    displayWasteMaterialTemplate({ form, template: data ?? {} });
+    form.elements.isActive.checked = data?.isActive ?? true;
+    form.elements.observations.value = '';
+    form.elements.newStock.value = '';
+
+    setFormSectionVisibility({
+        form,
+        selector: stockDataSectionSelector,
+        isVisible: !isEditing
+    });
+    setFormSectionVisibility({
+        form,
+        selector: materialTemplateFieldSelector,
+        isVisible: isCreating,
+        fieldNames: ['materialId']
+    });
+    setFormDisabled({ 
+        form, 
+        fields: wasteDataFields, 
+        isDisabled: !isCreating
+    });
+    setFormDisabled({
+        form,
+        fields: wasteSecondaryDataFields,
+        isDisabled: isAdjustingStock
+    });
+    setFormDisabled({ 
+        form, 
+        fields: wasteStockFields, 
+        isDisabled: isEditing
+    });
+    setReasonVisualOption({
+        selector: `${ MODAL_SELECTORS.WASTE } ${ SELECT_SELECTORS.REASON }`,
+        name: !isAdjustingStock ? initialStockReasonName : null,
+        isDisabled: !isAdjustingStock
+    });
+    modalElement.querySelector(HEADING_SELECTORS.MODAL_TITLE).textContent = isEditing
         ? 'Editar merma'
-        : 'Registrar merma';
-    form.querySelector('#submitBtn').textContent = mode === 'edit'
+        : isAdjustingStock
+            ? 'Ajustar stock de merma'
+            : 'Registrar merma';
+    form.querySelector(BUTTON_SELECTORS.SUBMIT).textContent = isEditing
         ? 'Actualizar'
-        : 'Guardar';
-
-    openModal(modalElement);
-};
-
-export const openWasteStockAdjustmentModal = ({
-    mode = stockMode,
-    data = null
-} = {}) => {
-
-    const { form, modalElement } = prepareWasteModal({
-        mode,
-        data,
-        isStockAdjustment: true
-    });
-
-    modalElement.querySelector('#modalTitle').textContent = 'Editar stock de merma';
-    form.querySelector('#submitBtn').textContent = 'Actualizar';
+        : isAdjustingStock
+            ? 'Ajustar'
+            : 'Guardar';
 
     openModal(modalElement);
 };

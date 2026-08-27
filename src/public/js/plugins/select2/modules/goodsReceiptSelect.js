@@ -1,23 +1,22 @@
-import { updateTotals } from "../../../ui/formUI.js";
-import { MATERIAL_SELECT_RESULTS_LIMIT } from "../../../application/warehouse/materials.js";
+import { updateTotals } from "../../../ui/forms/totalsSummaryUI.js";
 import { toggleContainerElements } from "../../../utils/formUtils.js";
-import { refreshMaterialTable } from "../../datatable/utils/renderMaterialDatatable.js";
-import { details } from "../../datatable/goodsReceiptDatatable.js";
+import { refreshMaterialTable } from "../../datatable/shared/inventory/renderMaterialDatatable.js";
+import { details } from "../../datatable/warehouse/goodsReceipts/goodsReceiptDatatable.js";
 import { initMdbWrapperInput, updateMdbWrapperInput } from "../../mdb/baseInstance.js";
 import { bindDisabledSelectDependency } from "../baseSelect.js";
 import { setupMaterialSelect, toggleMaterialOption } from "../domains/material.js";
 import { initPersonSelect, togglePersonOption } from "../domains/person.js";
 import { setupSupplierSelect, toggleSupplierOption } from "../domains/supplier.js";
-import { FORM_SELECTORS, MODAL_SELECTORS } from "../../../constants/selectors.js";
+import { INPUT_SELECTORS, MODAL_SELECTORS, SELECT_SELECTORS } from "../../../constants/selectors.js";
 
 const modalSelector = MODAL_SELECTORS.GOODS_RECEIPT;
-const materialSelector = FORM_SELECTORS.MATERIAL;
-const supplierSelector = FORM_SELECTORS.SUPPLIER;
-const receivedBySelector = FORM_SELECTORS.RECEIVED_BY;
+const materialSelector = SELECT_SELECTORS.MATERIAL;
+const supplierSelector = SELECT_SELECTORS.SUPPLIER;
+const receivedBySelector = SELECT_SELECTORS.RECEIVED_BY;
 const supplierScopedSelector = `${ modalSelector } ${ supplierSelector }`;
 const materialScopedSelector = `${ modalSelector } ${ materialSelector }`;
 const receivedByScopedSelector = `${ modalSelector } ${ receivedBySelector }`;
-const presentationDisplayScopedSelector = `${ modalSelector } ${ FORM_SELECTORS.PRESENTATION_DISPLAY }`;
+const presentationDisplayScopedSelector = `${ modalSelector } ${ INPUT_SELECTORS.PRESENTATION_DISPLAY }`;
 const supplierChangedEventName = 'goods-receipt:supplier-changed';
 
 const clearMaterialSelection = () => {
@@ -29,18 +28,6 @@ const clearMaterialSelection = () => {
             text: null
         }
     });
-
-    $(materialScopedSelector).val(null).trigger('change');
-};
-
-const clearPresentationDisplay = () => {
-
-    const instance = initMdbWrapperInput({
-        selector: presentationDisplayScopedSelector,
-        value: ''
-    });
-
-    updateMdbWrapperInput(instance);
 };
 
 export const initGoodsReceiptFormSelect2 = () => {
@@ -69,61 +56,60 @@ export const initGoodsReceiptFormSelect2 = () => {
                 id: null,
                 name: null
             });
-
             refreshMaterialTable(details);
-
             updateTotals();
-            clearPresentationDisplay();
+            
+            const instance = initMdbWrapperInput({
+                selector: presentationDisplayScopedSelector,
+                value: ''
+            });
 
+            updateMdbWrapperInput(instance);
             modal?.dispatchEvent(new Event(supplierChangedEventName));
         }
     });
 
-    setupSupplierSelect({
-        modalSelector,
-        supplierSelector
-    });
-
-    initPersonSelect({
-        modalSelector,
-        baseSelector: receivedByScopedSelector,
-        placeholder: 'Buscar persona que recibe...',
-        data: (params) => {
-
-            return {
-                search: params.term,
-                department: 'ALMACÉN Y PROVEDURÍA',
-                strictDepartmentFilter: true
-            };
-        },
-        allowCreate: false,
-    });
+    [
+        [setupSupplierSelect, {
+            modalSelector,
+            supplierSelector
+        }],
+        [initPersonSelect, {
+            modalSelector,
+            baseSelector: receivedByScopedSelector,
+            placeholder: 'Buscar persona que recibe...',
+            data: (params) => {
+                
+                return {
+                    search: params.term,
+                    department: 'ALMACÉN Y PROVEDURÍA',
+                    strictDepartmentFilter: true
+                }
+            },
+            allowCreate: false,
+        }]
+    ].forEach(([initialize, options]) => initialize(options));
 
     setupMaterialSelect({
         modalSelector,
         supplierSelector,
         materialSelector,
-        materialCreationContext: 'goodsReceipt',
-        resultsLimit: MATERIAL_SELECT_RESULTS_LIMIT
+        creationContext: 'goodsReceipt'
     });
 };
 
 export const GOODS_RECEIPT_SUPPLIER_CHANGED_EVENT = supplierChangedEventName;
 
-
 export const setGoodsReceiptFormSelectOptions = (data = null) => {
 
-    toggleSupplierOption({
-        selector: supplierScopedSelector,
-        id: data?.supplierId,
-        name: `${ data?.supplierName }`
-    });
-
-    togglePersonOption({
-        selector: receivedByScopedSelector,
-        id: data?.receivedById,
-        name: data?.receivedByName,
-    });
+    [
+        [toggleSupplierOption, supplierScopedSelector, data?.supplierId, data?.supplierName],
+        [togglePersonOption, receivedByScopedSelector, data?.receivedById, data?.receivedByName]
+    ].forEach(([toggleOption, selector, id, name]) => toggleOption({
+        selector,
+        id,
+        name
+    }));
 
     clearMaterialSelection();
 };

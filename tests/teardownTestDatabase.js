@@ -113,10 +113,37 @@ export default async function teardownTestDatabase() {
     },
     select: { id: true }
   });
+  const wasteIssues = await prisma.wasteIssue.findMany({
+    where: { createdById: { in: wasteIssueUsers.map(({ id }) => id) } },
+    select: { id: true }
+  });
+  const wasteIssueIds = wasteIssues.map(({ id }) => id);
+  const wasteIssueMovements = await prisma.wasteMovement.findMany({
+    where: { wasteIssueId: { in: wasteIssueIds } },
+    select: { id: true }
+  });
+  const wasteIssueMovementIds = wasteIssueMovements.map(({ id }) => id);
 
   await prisma.goodsIssueDetail.deleteMany({ where: { goodsIssueId: { in: wasteIssueGoodsIssues.map(({ id }) => id) } } });
   await prisma.goodsIssue.deleteMany({ where: { id: { in: wasteIssueGoodsIssues.map(({ id }) => id) } } });
-  await prisma.wasteStockAdjustment.deleteMany({ where: { waste: { supplierMaterial: { materialId: { in: wasteIssueMaterials.map(({ id }) => id) } } } } });
+  await prisma.wasteIssueReturn.deleteMany({ where: { wasteIssueId: { in: wasteIssueIds } } });
+  await prisma.wasteMovementDetail.deleteMany({ where: { movementId: { in: wasteIssueMovementIds } } });
+  await prisma.wasteMovement.deleteMany({ where: { id: { in: wasteIssueMovementIds } } });
+  await prisma.wasteIssue.deleteMany({ where: { id: { in: wasteIssueIds } } });
+  const wasteAdjustmentDetails = await prisma.wasteStockAdjustmentDetail.findMany({
+    where: { waste: { supplierMaterial: { materialId: { in: wasteIssueMaterials.map(({ id }) => id) } } } },
+    select: { id: true, wasteStockAdjustmentId: true }
+  });
+  const wasteAdjustmentIds = [...new Set(wasteAdjustmentDetails.map(({ wasteStockAdjustmentId }) => wasteStockAdjustmentId))];
+  const wasteAdjustments = await prisma.wasteStockAdjustment.findMany({
+    where: { id: { in: wasteAdjustmentIds } },
+    select: { wasteMovementId: true }
+  });
+  const wasteMovementIds = wasteAdjustments.map(({ wasteMovementId }) => wasteMovementId).filter(Boolean);
+
+  await prisma.wasteMovementDetail.deleteMany({ where: { wasteStockAdjustmentDetailId: { in: wasteAdjustmentDetails.map(({ id }) => id) } } });
+  await prisma.wasteMovement.deleteMany({ where: { id: { in: wasteMovementIds } } });
+  await prisma.wasteStockAdjustment.deleteMany({ where: { id: { in: wasteAdjustmentIds } } });
   await prisma.waste.deleteMany({ where: { supplierMaterial: { materialId: { in: wasteIssueMaterials.map(({ id }) => id) } } } });
   await prisma.movementDetail.deleteMany({ where: { stockAdjustmentDetailId: { in: wasteIssueAdjustmentDetails.map(({ id }) => id) } } });
   await prisma.inventoryMovement.deleteMany({ where: { stockAdjustmentId: { in: wasteIssueAdjustments.map(({ id }) => id) } } });

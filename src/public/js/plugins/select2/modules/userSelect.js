@@ -1,37 +1,32 @@
 import { initDepartmentSelect, toggleDepartmentOption } from "../domains/department.js";
 import { initRoleSelect, toggleRoleOption } from "../domains/role.js";
-import { FORM_SELECTORS, MODAL_SELECTORS } from "../../../constants/selectors.js";
+import { MODAL_SELECTORS, SELECT_SELECTORS } from "../../../constants/selectors.js";
+import { scopeSelectors } from "../../../utils/domUtils.js";
 
+let scoped = null;
+const selectors = {
+    department: SELECT_SELECTORS.DEPARTMENT_ID,
+    role: SELECT_SELECTORS.ROLE_ID
+};
 const modalSelector = MODAL_SELECTORS.USER;
-const departmentSelector = FORM_SELECTORS.DEPARTMENT_ID;
-const roleSelector = FORM_SELECTORS.ROLE_ID;
-
-const departmentScopedSelector = `${ modalSelector } ${ departmentSelector }`;
-const roleScopedSelector = `${ modalSelector } ${ roleSelector }`;
 
 export const initUserFormSelect2 = () => {
-    initDepartmentSelect({
-        modalSelector,
-        baseSelector: departmentScopedSelector,
-        allowCreate: false
+
+    scoped = scopeSelectors({
+        scopeSelector: MODAL_SELECTORS.USER,
+        selectors
     });
 
-    initRoleSelect({
-        modalSelector,
-        baseSelector: roleScopedSelector
-    });
+    [
+        [initDepartmentSelect, { modalSelector, baseSelector: scoped.department, allowCreate: false }],
+        [initRoleSelect, { modalSelector, baseSelector: scoped.role, allowCreate: false }]
+    ].forEach(([initialize, options]) => initialize(options));
 };
 
 export const setUserFormSelectOptions = (data = null) => {
-    toggleDepartmentOption({
-        selector: departmentScopedSelector,
-        id: data?.departmentId,
-        name: data?.departmentName
-    });
-
-    toggleRoleOption({
-        selector: roleScopedSelector,
-        id: data?.roleId,
-        name: data?.roleName
-    });
+    
+    [
+        [toggleDepartmentOption, scoped.department, data?.departmentId, data?.departmentName],
+        [toggleRoleOption, scoped.role, data?.roleId, data?.roleName]
+    ].forEach(([toggleOption, selector, id, name]) => toggleOption({ selector, id, name }));
 };

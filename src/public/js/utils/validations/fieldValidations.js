@@ -1,4 +1,4 @@
-import { includeSpace, includeUppercase, isDateTime, isEmptyOrNull, isLengthInRangeMax, isLengthInRangeMin, isNegative, isNumber, isNumberphone, isPositive, isString } from "./baseValidations.js";
+import { includeSpace, includeUppercase, isDateTime, isEmptyOrNull, isLengthInRangeMax, isLengthInRangeMin, isNegative, isNumber, isPositive, isString } from "./baseValidations.js";
 
 export const validatePassword = (password) => {
 
@@ -57,7 +57,34 @@ export const validateUsername = (username) => {
     return result;
 }
 
-export const validateNonNegativeNumber = (number, fieldName) => validateNumber(number, fieldName);
+export const validateInvoice = (invoice, { isInvoiced } = {}) => {
+
+    if (!isInvoiced) return null;
+
+    const allowedInvoice = /^[a-zA-Z0-9\-]+$/;
+    const fieldName = 'El número de factura';
+    let result = isEmptyOrNull(invoice, fieldName);
+
+    if (result) return result;
+
+    result = isString(invoice, fieldName);
+
+    if (result) return result;
+
+    result = isLengthInRangeMax(invoice, 50, fieldName);
+
+    if (result) return result;
+
+    if (!allowedInvoice.test(invoice)) return `${ fieldName } debe tener solo letras, números y guiones.`;
+
+    return null;
+}
+
+export const validateNonNegativeNumber = (number, fieldName) => {
+    const result = validateNumber(number, fieldName);
+
+    return result || isNegative(number, fieldName);
+};
 
 export const validatePositiveNumber = (number, fieldName) => {
 
@@ -93,9 +120,9 @@ export const validateNumber = (number, fieldName, { allowZero = true } = {}) => 
     return null;
 }
 
-export const validateNumberOptional = (number, fieldName) => {
+export const validateNumberOptional = (number, fieldName, { allowZero = true } = {}) => {
 
-    if (!number) return null;
+    if (!hasValue(number)) return null;
 
     number = parseFloat(number);
 
@@ -105,16 +132,20 @@ export const validateNumberOptional = (number, fieldName) => {
 
     result = isNegative(number, fieldName);
 
-    return result;
+    if (result) return result;
+
+    if (!allowZero && number === 0) return `${ fieldName } debe ser un número mayor a cero`;
+
+    return null;
 }
 
 const hasValue = (value) => value !== undefined && value !== null && value !== '';
 
-export const validatePairedOptionalNumber = ({ value, pairedValue, fieldName }) => {
+export const validatePairedOptionalNumber = ({ value, pairedValue, fieldName, allowZero = true }) => {
 
     if (!hasValue(value) && hasValue(pairedValue)) return `${ fieldName } es requerida.`;
 
-    return validateNumberOptional(value, fieldName);
+    return validateNumberOptional(value, fieldName, { allowZero });
 }
 
 export const validateDate = (date, fieldName) => {
@@ -239,6 +270,40 @@ export const validateGoodsIssueDetailsArray = (details) => {
 
     return null;
 }
+
+export const validateWasteIssueDetailsArray = details => {
+
+    if (!Array.isArray(details) || !details.length) {
+        return 'La lista de detalles debe contener al menos una merma.';
+    }
+
+    const wasteIds = new Set();
+
+    for (const detail of details) {
+
+        if (!detail.wasteId || detail.quantity === '' || detail.quantity === null || detail.quantity === undefined) {
+            return 'Cada detalle debe contener merma y cantidad.';
+        }
+
+        if (wasteIds.has(detail.wasteId)) {
+            return 'No se puede repetir la misma merma en una salida.';
+        }
+
+        wasteIds.add(detail.wasteId);
+
+        const quantity = Number(detail.quantity);
+
+        if (
+            !Number.isFinite(quantity)
+            || quantity <= 0
+            || !/^\d{1,8}(\.\d{1,6})?$/.test(String(detail.quantity))
+        ) {
+            return 'La cantidad de cada detalle debe ser un número mayor a cero.';
+        }
+    }
+
+    return null;
+};
 
 export const validatePersonAccessesArray = accesses => {
     if (!Array.isArray(accesses) || !accesses.length) {

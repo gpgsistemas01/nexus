@@ -1,8 +1,23 @@
 import { successCodeMessages } from '../../../messages/codeMessages.js';
-import { createWasteAdjustment, findAllWastes as findAllWasteItems, updateWaste, updateWasteStock } from '../../../services/warehouse/wasteService.js';
-import { createWasteDataDto, createWasteDto, createWasteStockDto } from '../../../dtos/wasteDTO.js';
+import { createWasteWithInitialStockAdjustment, findAllWastes, updateWaste, updateWasteStock } from '../../../services/warehouse/wastes/wasteService.js';
+import { createWasteDtoForEdit, createWasteDtoForRegister, createWasteDtoForStockUpdate } from '../../../dtos/wasteDTO.js';
 import { sanitizeEmptyStrings } from '../../../utils/formattersUtils.js';
 import { getDataTableOrder, getDataTablePaging, getDataTableSearch } from '../../../utils/requestQueryUtils.js';
+import { emitInventoryUpdated } from '../../../utils/socketUtils.js';
+import { PERMISSIONS } from '../../../constants/permissions.js';
+import { findWasteMaterialTemplates } from '../../../services/warehouse/wastes/wasteMaterialService.js';
+
+export const getWasteMaterialTemplates = async (req, res) => {
+    const { skip, take } = getDataTablePaging(req.query);
+    const result = await findWasteMaterialTemplates({
+        search: getDataTableSearch(req.query),
+        skip,
+        take,
+        supplierId: req.query.supplierId || null
+    });
+
+    return res.status(200).json(result);
+};
 
 export const getAllWastes = async (req, res) => {
 
@@ -16,13 +31,14 @@ export const getAllWastes = async (req, res) => {
         columns
     });
 
-    const result = await findAllWasteItems({
+    const result = await findAllWastes({
         skip,
         take,
         search,
         supplierId,
         orderBy,
-        orderDir
+        orderDir,
+        canReadCosts: req.user.permissions.includes(PERMISSIONS.INVENTORY_COSTS_READ)
     });
 
     return res.status(200).json(result);
@@ -30,13 +46,15 @@ export const getAllWastes = async (req, res) => {
 
 export const registerWaste = async (req, res) => {
 
-    const wasteDto = createWasteDto(req.body);
+    const wasteDto = createWasteDtoForRegister(req.body);
     const sanitizedWasteDto = sanitizeEmptyStrings(wasteDto);
 
-    const waste = await createWasteAdjustment({
+    const waste = await createWasteWithInitialStockAdjustment({
         wasteDto: sanitizedWasteDto,
         userId: req.user.id
     });
+
+    emitInventoryUpdated({ context: 'waste', source: 'waste-created' });
 
     return res.status(200).json({
         waste,
@@ -46,7 +64,7 @@ export const registerWaste = async (req, res) => {
 
 export const editWaste = async (req, res) => {
 
-    const wasteDto = createWasteDataDto(req.body);
+    const wasteDto = createWasteDtoForEdit(req.body);
     const sanitizedWasteDto = sanitizeEmptyStrings(wasteDto);
 
     const waste = await updateWaste({
@@ -62,7 +80,7 @@ export const editWaste = async (req, res) => {
 
 export const editWasteStock = async (req, res) => {
 
-    const wasteStockDto = createWasteStockDto(req.body);
+    const wasteStockDto = createWasteDtoForStockUpdate(req.body);
     const sanitizedWasteStockDto = sanitizeEmptyStrings(wasteStockDto);
 
     const waste = await updateWasteStock({
@@ -70,6 +88,8 @@ export const editWasteStock = async (req, res) => {
         wasteStockDto: sanitizedWasteStockDto,
         userId: req.user.id
     });
+
+    emitInventoryUpdated({ context: 'waste', source: 'waste-stock-adjustment-created' });
 
     return res.status(200).json({
         waste,

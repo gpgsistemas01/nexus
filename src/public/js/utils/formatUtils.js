@@ -17,7 +17,7 @@ export const formatDecimal = (value) => defaultDecimalFormatter.format(Number(va
 
 // Calculation helper: keeps values numeric before sending them to forms, tables or APIs.
 // Use this instead of formatDecimal/formatCurrency when the result must remain a number.
-export const roundTo = (value, decimals = 2) => {
+export const roundTo = (value, decimals = 6) => {
     const factor = 10 ** decimals;
     return Math.round((Number(value) + Number.EPSILON) * factor) / factor;
 };

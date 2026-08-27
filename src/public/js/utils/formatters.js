@@ -5,15 +5,6 @@ export const formatShortDate = (date) => {
     return new Date(date).toLocaleDateString('es-MX', { ...options, timeZone: MEXICO_TIME_ZONE });
 }
 
-export const formatNotificationDate = (dateValue) => new Date(dateValue).toLocaleString('es-MX', {
-    timeZone: MEXICO_TIME_ZONE,
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit'
-});
-
 export const formatDateLongWithTime = (dateTime) => {
 
     if (!dateTime) return '';

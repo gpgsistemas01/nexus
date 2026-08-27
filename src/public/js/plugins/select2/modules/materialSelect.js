@@ -1,84 +1,74 @@
 import { initPresentationSelect, togglePresentationOption } from "../domains/presentation.js";
-import { initReasonSelect, toggleReasonOption } from "../domains/reason.js";
+import { initReasonSelect } from "../domains/reason.js";
 import { setupSupplierSelect, toggleSupplierOption } from "../domains/supplier.js";
 import { initUnitMeasureSelect, toggleUnitMeasureOption } from "../domains/unitMeasure.js";
-import { FORM_SELECTORS } from "../../../constants/selectors.js";
+import { SELECT_SELECTORS } from "../../../constants/selectors.js";
+import { scopeSelectors } from "../../../utils/domUtils.js";
 
-const supplierSelector = FORM_SELECTORS.SUPPLIER;
-const unitMeasureSelector = FORM_SELECTORS.UNIT_MEASURE;
-const presentationSelector = FORM_SELECTORS.PRESENTATION;
-const reasonSelector = FORM_SELECTORS.REASON;
+let scoped = null;
+const selectors = {
+    supplier: SELECT_SELECTORS.SUPPLIER,
+    unitMeasure: SELECT_SELECTORS.UNIT_MEASURE,
+    presentation: SELECT_SELECTORS.PRESENTATION,
+    reason: SELECT_SELECTORS.REASON
+};
 
 export const initMaterialFormSelect2 = ({
-    modalSelector,
-    isStockAdjustment = false
+    modalSelector
 }) => {
 
-    const supplierScopedSelector = `${ modalSelector } ${ supplierSelector }`;
-    const unitMeasureScopedSelector = `${ modalSelector } ${ unitMeasureSelector }`;
-    const presentationScopedSelector = `${ modalSelector } ${ presentationSelector }`;
-    const reasonScopedSelector = `${ modalSelector } ${ reasonSelector }`;
+    scoped = scopeSelectors({ scopeSelector: modalSelector, selectors });
 
-    setupSupplierSelect({
-        modalSelector,
-        supplierSelector
-    });
-
-    initUnitMeasureSelect({
-        modalSelector,
-        baseSelector: unitMeasureScopedSelector,
-        allowCreate: false
-    });
-
-    initPresentationSelect({
-        modalSelector,
-        baseSelector: presentationScopedSelector,
-        allowCreate: false
-    });
-
-    if (!isStockAdjustment) return;
-
-    initReasonSelect({
-        modalSelector,
-        baseSelector: reasonScopedSelector,
-        allowCreate: false
-    });
+    [
+        [setupSupplierSelect, {
+            modalSelector,
+            supplierSelector: selectors.supplier,
+        }],
+        [initUnitMeasureSelect, {
+            modalSelector,
+            baseSelector: scoped.unitMeasure,
+            allowCreate: false
+        }],
+        [initPresentationSelect, {
+            modalSelector,
+            baseSelector: scoped.presentation,
+            allowCreate: false
+        }],
+        [initReasonSelect, {
+            modalSelector,
+            baseSelector: scoped.reason,
+            allowCreate: false
+        }]
+    ].forEach(([initialize, options]) => initialize(options));
 };
 
 export const setMaterialFormSelectOptions = ({
     modalSelector,
-    isStockAdjustment = false,
     data = null
 }) => {
 
-    const supplierScopedSelector = `${ modalSelector } ${ supplierSelector }`;
-    const unitMeasureScopedSelector = `${ modalSelector } ${ unitMeasureSelector }`;
-    const presentationScopedSelector = `${ modalSelector } ${ presentationSelector }`;
-    const reasonScopedSelector = `${ modalSelector } ${ reasonSelector }`;
-
-    toggleSupplierOption({
-        selector: supplierScopedSelector,
-        id: data?.supplier?.id,
-        name: `${ data?.supplier?.tradeName }`
-    });
-
-    toggleUnitMeasureOption({
-        selector: unitMeasureScopedSelector,
-        id: data?.unitMeasure?.id,
-        name: `${ data?.unitMeasure?.symbol } - ${ data?.unitMeasure?.name }`
-    });
-
-    togglePresentationOption({
-        selector: presentationScopedSelector,
-        id: data?.presentation?.id,
-        name: data?.presentation?.name
-    });
-
-    if (!isStockAdjustment) return;
-
-    toggleReasonOption({
-        selector: reasonScopedSelector,
-        id: data?.reason?.id,
-        name: data?.reason?.name
-    });
+    [
+        [
+            toggleSupplierOption, 
+            scoped.supplier, 
+            data?.supplier?.id, 
+            `${ data?.supplier?.tradeName }`
+        ],
+        [
+            toggleUnitMeasureOption, 
+            scoped.unitMeasure, 
+            data?.unitMeasure?.id, 
+            `${ data?.unitMeasure?.symbol } - ${ data?.unitMeasure?.name }`
+        ],
+        [
+            togglePresentationOption, 
+            scoped.presentation, 
+            data?.presentation?.id, 
+            data?.presentation?.name
+        ]
+    ].forEach(([toggleOption, selector, id, name]) => toggleOption({
+        selector,
+        id,
+        name
+    }));
 };

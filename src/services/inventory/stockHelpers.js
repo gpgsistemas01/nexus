@@ -2,8 +2,8 @@ import { GoodsIssueInsufficientStock } from '../../errors/inventory/stockError.j
 import { normalizeDecimal, toNumber } from '../../utils/formattersUtils.js';
 
 export const hasDimensions = ({ base, height } = {}) => (
-    Number(toNumber(base) || 0) > 0 &&
-    Number(toNumber(height) || 0) > 0
+    (toNumber(base) || 0) > 0 &&
+    (toNumber(height) || 0) > 0
 );
 
 export const calculateConvertedQuantity = ({
@@ -14,14 +14,14 @@ export const calculateConvertedQuantity = ({
     fallbackToQuantity = true
 }) => {
 
-    const stock = Number(toNumber(currentStock ?? quantity) || 0);
+    const stock = toNumber(currentStock ?? quantity) || 0;
 
     if (!hasDimensions({ base, height })) {
         return fallbackToQuantity ? normalizeDecimal(stock) : 0;
     }
 
     return normalizeDecimal(
-        stock * Number(toNumber(base) || 0) * Number(toNumber(height) || 0)
+        stock * (toNumber(base) || 0) * (toNumber(height) || 0)
     );
 };
 

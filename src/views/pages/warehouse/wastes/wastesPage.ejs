@@ -1,40 +1,4 @@
-<% const selectedMaterialSummary = {
-    class: 'row g-2 selected-material-summary',
-    items: [
-        {
-            id: 'selectedMaterialSupplierValue',
-            label: 'Proveedor',
-            value: '-'
-        },
-        {
-            id: 'selectedMaterialPresentationValue',
-            label: 'Presentación',
-            value: '-'
-        },
-        {
-            id: 'selectedMaterialUnitMeasureValue',
-            label: 'Unidad',
-            value: '-'
-        },
-        {
-            id: 'selectedMaterialBaseValue',
-            label: 'Base del material',
-            value: '-'
-        },
-        {
-            id: 'selectedMaterialHeightValue',
-            label: 'Altura del material',
-            value: '-'
-        },
-        {
-            id: 'selectedMaterialMaxUnitCostValue',
-            label: 'Costo unitario de conversión',
-            value: '-'
-        }
-    ]
-};
-
-const form = {
+<% const form = {
     id: 'wasteForm',
     canApprove: false,
     invoice: false,
@@ -47,12 +11,55 @@ const form = {
                     type: 'selects',
                     items: [
                         {
-                            id: 'materialInput',
-                            name: 'supplierMaterialId',
-                            class: 'material-select',
+                            id: 'supplierInput',
+                            name: 'supplierId',
+                            class: 'supplier-select',
+                            label: 'Proveedor',
                             col: 'col-12'
                         }
                     ]
+                },
+                {
+                    type: 'selects',
+                    items: [
+                        {
+                            id: 'materialInput',
+                            name: 'materialId',
+                            class: 'material-select',
+                            label: 'Material de referencia del proveedor',
+                            col: 'col-12 waste-material-template-field'
+                        }
+                    ]
+                },
+                {
+                    type: 'html',
+                    col: 'col-12 col-md-6',
+                    content: include('../../../shared/forms/informativeValue', {
+                        value: {
+                            id: 'wasteNameDisplayValue',
+                            label: 'Nombre de la merma'
+                        }
+                    })
+                },
+                {
+                    type: 'html',
+                    col: 'col-12 col-md-6',
+                    content: include('../../../shared/forms/informativeValue', {
+                        value: {
+                            id: 'wastePresentationDisplayValue',
+                            label: 'Presentación'
+                        }
+                    })
+                },
+                {
+                    type: 'html',
+                    col: 'col-12 col-md-6',
+                    content: include('../../../shared/forms/informativeValue', {
+                        value: {
+                            id: 'wasteUnitMeasureDisplayValue',
+                            label: 'Unidad de medida'
+                        }
+                    })
                 },
                 {
                     type: 'inputs',
@@ -61,10 +68,10 @@ const form = {
                             id: 'baseInput',
                             type: 'number',
                             name: 'base',
-                            label: 'Base de la merma',
+                            label: 'Ancho confirmado de la merma (m)',
                             value: '',
                             attrs: {
-                                min: '0'
+                                min: '0.01'
                             },
                             col: '6'
                         },
@@ -72,24 +79,49 @@ const form = {
                             id: 'heightInput',
                             type: 'number',
                             name: 'height',
-                            label: 'Altura de la merma',
+                            label: 'Largo real de la merma (m)',
                             value: '',
                             attrs: {
-                                min: '0'
+                                min: '0.01'
+                            },
+                            col: '6'
+                        },
+                        {
+                            id: 'minStockInput',
+                            type: 'number',
+                            name: 'minStock',
+                            label: 'Stock mínimo',
+                            value: '',
+                            attrs: {
+                                min: '0.01'
+                            },
+                            col: '6'
+                        },
+                        {
+                            id: 'maxUnitCostInput',
+                            type: 'number',
+                            name: 'maxUnitCost',
+                            label: 'Costo máximo unitario',
+                            value: '',
+                            attrs: {
+                                min: '0',
+                                step: '0.01'
                             },
                             col: '6'
                         }
-                    ]
-                }
-            ]
-        },
-        {
-            title: 'Datos del material seleccionado',
-            class: 'selected-material-section',
-            groups: [
+                    ],
+                },
                 {
-                    type: 'html',
-                    content: include('../../../shared/totalsSummary', { totals: selectedMaterialSummary })
+                    type: 'checkboxes',
+                    items: [
+                        {
+                            id: 'isActiveInput',
+                            type: 'checkbox',
+                            name: 'isActive',
+                            label: 'Activo',
+                            isChecked: true
+                        }
+                    ]
                 }
             ]
         },
@@ -112,10 +144,10 @@ const form = {
                     type: 'inputs',
                     items: [
                         {
-                            id: 'currentStockInput',
+                            id: 'newStockInput',
                             type: 'number',
-                            name: 'currentStock',
-                            label: 'Stock de merma',
+                            name: 'newStock',
+                            label: 'Nuevo stock',
                             value: '',
                             attrs: {
                                 min: '0'
@@ -137,7 +169,7 @@ const form = {
     ]
 }; %>
 
-<%- include('../../../shared/tableFilters', {
+<%- include('../../../shared/tables/tableFilters', {
     selectInputs: [
         {
             id: 'supplierFilter',
@@ -148,9 +180,9 @@ const form = {
     dateInputs: []
 }) %>
 
-<%- include('../../../shared/mainTable', { title: 'Mermas' }) %>
+<%- include('../../../shared/tables/mainTable', { title: 'Mermas' }) %>
 
-<%- include('../../../shared/modal', { modalId: 'wasteModal', form }) %>
+<%- include('../../../shared/layout/modal', { modalId: 'wasteModal', form }) %>
 
 <script type="module" src="/js/pages/warehouse/wastes/wastesPage.js"></script>
 

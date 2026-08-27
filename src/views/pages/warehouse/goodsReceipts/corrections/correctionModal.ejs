@@ -29,6 +29,15 @@ const form = {
             title: 'Corrección del detalle',
             groups: [
                 {
+                    type: 'html',
+                    content: include('../../../../shared/forms/informativeValue', {
+                        value: {
+                            id: 'correctionMaterialValue',
+                            label: 'Material a corregir'
+                        }
+                    })
+                },
+                {
                     type: 'inputs',
                     items: [
                         {
@@ -39,7 +48,7 @@ const form = {
                             col: '6',
                             attrs: {
                                 min: '0.01',
-                                step: '0.01'
+                                step: 'any'
                             }
                         },
                         {
@@ -62,7 +71,7 @@ const form = {
             groups: [
                 {
                     type: 'html',
-                    content: include('../../../../shared/totalsSummary', { totals: correctionTotalsSummary })
+                    content: include('../../../../shared/tables/totalsSummary', { totals: correctionTotalsSummary })
                 }
             ]
         }
@@ -86,7 +95,7 @@ const form = {
     ]
 }; %>
 
-<%- include('../../../../shared/modal', {
+<%- include('../../../../shared/layout/modal', {
     modalId: 'goodsReceiptCorrectionModal',
     modalTitle: 'Corregir detalle de compra',
     dialogClass: 'modal-lg modal-dialog-scrollable',

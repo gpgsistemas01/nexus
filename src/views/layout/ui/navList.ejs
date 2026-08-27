@@ -1,96 +1,125 @@
-<% const permissions = user?.permissions || [];
+<% const shouldShowIcons = typeof showIcons !== 'undefined' ? showIcons : true;
+const shouldShowLabels = typeof showLabels !== 'undefined' ? showLabels : true;
+const shouldUseFlyout = !shouldShowLabels;
+const navAccordionId = typeof accordionId !== 'undefined' ? accordionId : `appNavAccordion${ shouldShowLabels ? 'Full' : 'Icon' }`;
 
-
-const canSeeAll = user?.scope?.canReadAll || false;
-
-const shouldShowIcons = typeof showIcons !== 'undefined' ? showIcons : true;
+const createNavLink = ({ content, icon, href, permission }) => ({
+    content,
+    icon,
+    href,
+    isActive: currentRoute === href,
+    isVisible: hasPermission(user, permission)
+});
 
 const items = [
     {
         content: 'Almacén',
-        icon: 'fa-solid fa-boxes-stacked',
-        href: '/materiales',
-        isActive: currentRoute === '/materiales',
-        isVisible: permissions.includes('materials:read')
+        icon: 'fa-solid fa-warehouse',
+        children: [
+            createNavLink({ content: 'Materiales', icon: 'fa-solid fa-boxes-stacked', href: '/almacen/materiales', permission: 'materials:read' }),
+            createNavLink({ content: 'Mermas', icon: 'fa-solid fa-recycle', href: '/almacen/mermas', permission: 'wastes:page-view' })
+        ]
     },
+    createNavLink({ content: 'Compras', icon: 'fa-solid fa-file-invoice-dollar', href: '/compras', permission: 'goods:receipts-page-view' }),
     {
-        content: 'Mermas',
-        icon: 'fa-solid fa-recycle',
-        href: '/mermas',
-        isActive: currentRoute === '/mermas',
-        isVisible: permissions.includes('wastes:page-view')
-    },
-    {
-        content: 'Compras',
-        icon: 'fa-solid fa-cart-shopping',
-        href: '/compras',
-        isActive: currentRoute === '/compras',
-        isVisible: permissions.includes('goods:receipts-page-view')
-    },
-    {
-        content: 'Salidas de almacén',
-        icon: 'fa-solid fa-truck-ramp-box',
-        href: '/salidas-almacen',
-        isActive: currentRoute === '/salidas-almacen',
-        isVisible: permissions.includes('goods:issues-page-view')
+        content: 'Salidas',
+        icon: 'fa-solid fa-right-from-bracket',
+        children: [
+            createNavLink({ content: 'Materiales', icon: 'fa-solid fa-dolly', href: '/salidas/materiales', permission: 'goods:issues-page-view' }),
+            createNavLink({ content: 'Mermas', icon: 'fa-solid fa-recycle', href: '/salidas/mermas', permission: 'waste:issues-page-view' })
+        ]
     },
     {
         content: 'Movimientos',
-        icon: 'fa-solid fa-arrow-right-arrow-left',
-        href: '/movimientos',
-        isActive: currentRoute === '/movimientos',
-        isVisible: permissions.includes('movements:read')
+        icon: 'fa-solid fa-arrows-rotate',
+        children: [
+            createNavLink({ content: 'Materiales', icon: 'fa-solid fa-boxes-stacked', href: '/movimientos/materiales', permission: 'movements:read' }),
+            createNavLink({ content: 'Mermas', icon: 'fa-solid fa-recycle', href: '/movimientos/mermas', permission: 'movements:read' })
+        ]
     },
-    {
-        content: 'Usuarios',
-        icon: 'fa-solid fa-users-gear',
-        href: '/usuarios-sistemas',
-        isActive: currentRoute === '/usuarios-sistemas',
-        isVisible: permissions.includes('users:manage')
-    },
-    {
-        content: 'Personas',
-        icon: 'fa-solid fa-id-badge',
-        href: '/personas',
-        isActive: currentRoute === '/personas',
-        isVisible: permissions.includes('persons:page-view')
-    },
-    {
-        content: 'Clientes',
-        icon: 'fa-solid fa-handshake',
-        href: '/clientes',
-        isActive: currentRoute === '/clientes',
-        isVisible: permissions.includes('clients:page-view')
-    },
-    {
-        content: 'Proveedores',
-        icon: 'fa-solid fa-warehouse',
-        href: '/proveedores',
-        isActive: currentRoute === '/proveedores',
-        isVisible: permissions.includes('suppliers:page-view')
-    }
-].filter(item => {
-    if (canSeeAll) return true;
+    createNavLink({ content: 'Usuarios', icon: 'fa-solid fa-users-gear', href: '/usuarios-sistemas', permission: 'users:manage' }),
+    createNavLink({ content: 'Personas', icon: 'fa-solid fa-id-badge', href: '/personas', permission: 'persons:page-view' }),
+    createNavLink({ content: 'Clientes', icon: 'fa-solid fa-address-book', href: '/clientes', permission: 'clients:page-view' }),
+    createNavLink({ content: 'Proveedores', icon: 'fa-solid fa-truck-fast', href: '/proveedores', permission: 'suppliers:page-view' })
+].map(item => {
+    const visibleChildren = (item.children || []).filter(child => child.isVisible);
 
-    return item.isVisible;
-}).map(item => ({
+    return {
+        ...item,
+        children: visibleChildren,
+        isActive: item.isActive || visibleChildren.some(child => child.isActive),
+        isVisible: item.children ? visibleChildren.length > 0 : item.isVisible
+    };
+}).filter(item => item.isVisible).map((item, index) => ({
     ...item,
-    class: `nav-link ${ shouldShowIcons ? 'app-nav-link--icon' : '' } ${ item.isActive ? 'active' : ''}`
+    submenuId: `${ navAccordionId }Submenu${ index }`,
+    class: `nav-link ${ shouldShowIcons ? 'app-nav-link--icon' : '' } ${ !shouldShowLabels ? 'app-nav-link--icon-only' : '' } ${ item.isActive ? 'active' : ''}`,
+    children: (item.children || []).map(child => ({
+        ...child,
+        class: `nav-link app-nav-link--child ${ shouldShowIcons ? 'app-nav-link--icon' : '' } ${ child.isActive ? 'active' : ''}`
+    }))
 })); %>
 
-<ul class="<%= listClass %>">
+<ul id="<%= navAccordionId %>" class="<%= listClass %> app-nav-accordion <%= shouldUseFlyout ? 'app-nav-list--icon-only app-nav-list--flyout' : '' %>">
     <% items.forEach(item => { %>
         <li class="nav-item py-1">
-            <a class="<%= item.class %>" href="<%= item.href %>"
-                <%= item.isActive ? 'aria-current="page"' : '' %>
-            >
-                <% if (shouldShowIcons && item.icon) { %>
-                    <span class="app-nav-link__icon" aria-hidden="true">
-                        <i class="<%= item.icon %>"></i>
+            <% if (item.children.length) { %>
+                <button
+                    type="button"
+                    class="<%= item.class %> app-nav-link--section app-nav-submenu-toggle <%= item.isActive && !shouldUseFlyout ? '' : 'collapsed' %>"
+                    data-mdb-collapse-init
+                    data-mdb-target="#<%= item.submenuId %>"
+                    aria-expanded="<%= item.isActive && !shouldUseFlyout ? 'true' : 'false' %>"
+                    aria-controls="<%= item.submenuId %>"
+                    <%- include('./navTooltipAttrs', { enabled: !shouldShowLabels, label: item.content }) %>
+                >
+                    <% if (shouldShowIcons && item.icon) { %>
+                        <span class="app-nav-link__icon" aria-hidden="true">
+                            <i class="<%= item.icon %>"></i>
+                        </span>
+                    <% } %>
+                    <% if (shouldShowLabels) { %>
+                        <span class="app-nav-link__label"><%- item.content %></span>
+                    <% } %>
+                    <span class="app-nav-submenu-toggle__icon" aria-hidden="true">
+                        <i class="fa-solid <%= shouldUseFlyout ? 'fa-chevron-right' : 'fa-chevron-down' %>"></i>
                     </span>
+                </button>
+
+                <ul id="<%= item.submenuId %>" class="navbar-nav flex-column collapse <%= item.isActive && !shouldUseFlyout ? 'show' : '' %> app-nav-submenu" data-mdb-parent="#<%= navAccordionId %>">
+                    <% item.children.forEach(child => { %>
+                        <li class="nav-item py-1">
+                            <a class="<%= child.class %>" href="<%= child.href %>"
+                                <% if (child.isActive) { %>aria-current="page"<% } %>
+                                <%- include('./navTooltipAttrs', { enabled: !shouldShowLabels && !shouldUseFlyout, label: child.content }) %>
+                            >
+                                <% if (shouldShowIcons && child.icon) { %>
+                                    <span class="app-nav-link__icon" aria-hidden="true">
+                                        <i class="<%= child.icon %>"></i>
+                                    </span>
+                                <% } %>
+                                <% if (shouldShowLabels || shouldUseFlyout) { %>
+                                    <span class="app-nav-link__label"><%- child.content %></span>
+                                <% } %>
+                            </a>
+                        </li>
+                    <% }); %>
+                </ul>
+            <% } else { %>
+                <a class="<%= item.class %>" href="<%= item.href %>"
+                    <% if (item.isActive) { %>aria-current="page"<% } %>
+                    <%- include('./navTooltipAttrs', { enabled: !shouldShowLabels, label: item.content }) %>
+                >
+                    <% if (shouldShowIcons && item.icon) { %>
+                        <span class="app-nav-link__icon" aria-hidden="true">
+                            <i class="<%= item.icon %>"></i>
+                        </span>
+                    <% } %>
+                    <% if (shouldShowLabels) { %>
+                        <span class="app-nav-link__label"><%- item.content %></span>
+                    <% } %>
+                </a>
                 <% } %>
-                <span><%- item.content %></span>
-            </a>
         </li>
     <% }); %>
 </ul>

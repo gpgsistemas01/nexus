@@ -1,17 +1,30 @@
-import { MaterialSnapshotFindDatabaseError, MaterialCreateDatabaseError, MaterialNotFound, MaterialUpdateDatabaseError, MaterialStockAdjustmentDatabaseError, MaterialDeleteDatabaseError, MaterialDeleteRelationConflict } from "../../../errors/warehouse/materialError.js";
+import { MaterialAlreadyExists, MaterialCreateDatabaseError, MaterialInitialStockReasonNotFound, MaterialNotFound, MaterialUpdateDatabaseError, MaterialStockAdjustmentDatabaseError, MaterialDeleteDatabaseError, MaterialDeleteRelationConflict } from "../../../errors/warehouse/materialError.js";
 import { getDb } from "../../../repository/baseRepository.js";
-import { findAllSupplierMaterials, findCurrentSupplierMaterialByMaterialId, findSupplierMaterialByIds, recalculateConvertedQuantityByMaterial } from "./supplierMaterialService.js";
-import { prepareMaterialData, withRetry } from "./materialHelpers.js";
+import { existsMaterialUsage, findAllSupplierMaterials, findSupplierMaterialByIds } from "./supplierMaterialService.js";
+import { prepareMaterialData } from "./materialHelpers.js";
 import { syncSupplierMaterial } from "./materialRelations.js";
 import { isAppError } from "../../../errors/AppError.js";
 import { createStockAdjustment } from "../adjustmentService.js";
 import { createServiceLogger, getModelLogContext, logServiceError, logServiceInfo } from "../../../utils/logger.js";
 import { PRISMA_ERROR_CODES } from "../../../constants/prisma.js";
+import { findInitialStockAdjustmentReason } from "../reasonService.js";
 
 const serviceLogger = createServiceLogger('warehouse.materials.materialService');
 
 
-const REFERENCE_MOVEMENT_IN = 'IN';
+const throwMaterialWriteError = ({ err, fallbackError }) => {
+    if (err.code === PRISMA_ERROR_CODES.RECORD_NOT_FOUND) {
+        throw new MaterialNotFound();
+    }
+
+    if (err.code === PRISMA_ERROR_CODES.RECORD_NOT_UNIQUE) {
+        throw new MaterialAlreadyExists();
+    }
+
+    if (isAppError(err)) throw err;
+
+    throw fallbackError;
+};
 
 const buildMaterialData = ({ rest, relations }) => ({
     ...rest,
@@ -23,36 +36,16 @@ const buildMaterialData = ({ rest, relations }) => ({
     }
 });
 
-const createMaterialInTransaction = async ({
-    tx,
-    materialDto
-}) => {
-
-    const {
-        rest,
-        relations
-    } = await prepareMaterialData({ tx, materialDto });
-
-    const createdMaterial = await tx.material.create({
-        data: buildMaterialData({ rest, relations }),
-        select: {
-            id: true
-        }
-     });
-
-    await syncSupplierMaterial({
-        tx,
-        supplierId: relations.supplierId,
-        materialId: createdMaterial.id,
-        maxUnitCost: relations.maxUnitCost
-    });
-
-    return findSupplierMaterialByIds({
-        tx,
-        materialId: createdMaterial.id,
-        supplierId: relations.supplierId
-    });
-};
+const findMaterialByIdentity = ({ tx, rest, relations }) => tx.material.findFirst({
+    where: {
+        name: { equals: rest.name, mode: 'insensitive' },
+        presentationId: relations.presentationId,
+        unitMeasureId: relations.unitMeasureId,
+        base: rest.base ?? null,
+        height: rest.height ?? null
+    },
+    select: { id: true }
+});
 
 export const findAllMaterials = async ({
     skip = 0,
@@ -60,7 +53,8 @@ export const findAllMaterials = async ({
     search = '',
     supplierId = null,
     orderBy = 'name',
-    orderDir = 'asc'
+    orderDir = 'asc',
+    canReadCosts = false
 }) => {
 
     return await findAllSupplierMaterials({
@@ -69,7 +63,8 @@ export const findAllMaterials = async ({
         search,
         supplierId,
         orderBy,
-        orderDir
+        orderDir,
+        canReadCosts
     });
 };
 
@@ -120,17 +115,72 @@ export const existsMaterial = async ({
 }
 
 export const createMaterial = async ({
-    materialDto
+    materialDto,
+    userId = null
 }) => {
 
     try {
 
-        const material = await getDb().$transaction((tx) =>
-            createMaterialInTransaction({
+        const material = await getDb().$transaction(async (tx) => {
+            const { newStock, observations, ...materialData } = materialDto;
+            const { rest, relations } = await prepareMaterialData({
                 tx,
-                materialDto
-            })
-        );
+                materialDto: materialData
+            });
+
+            const existingMaterial = await findMaterialByIdentity({ tx, rest, relations });
+            let materialId = existingMaterial?.id;
+
+            if (existingMaterial) {
+                const existingSupplierMaterial = await tx.supplierMaterial.findUnique({
+                    where: {
+                        supplierId_materialId: {
+                            supplierId: relations.supplierId,
+                            materialId
+                        }
+                    },
+                    select: { id: true }
+                });
+
+                if (existingSupplierMaterial) throw new MaterialAlreadyExists();
+            } else {
+                const createdMaterial = await tx.material.create({
+                    data: buildMaterialData({ rest, relations }),
+                    select: { id: true }
+                });
+
+                materialId = createdMaterial.id;
+            }
+
+            await syncSupplierMaterial({
+                tx,
+                supplierId: relations.supplierId,
+                materialId,
+                maxUnitCost: relations.maxUnitCost
+            });
+
+            if (newStock !== undefined) {
+                const initialStockReason = await findInitialStockAdjustmentReason({ tx });
+
+                if (!initialStockReason) throw new MaterialInitialStockReasonNotFound();
+
+                await createStockAdjustment({
+                    tx,
+                    materialId,
+                    supplierId: relations.supplierId,
+                    reasonId: initialStockReason.id,
+                    observations,
+                    newStock,
+                    userId
+                });
+            }
+
+            return findSupplierMaterialByIds({
+                tx,
+                materialId,
+                supplierId: relations.supplierId
+            });
+        });
 
         logServiceInfo(serviceLogger, {
             operation: 'warehouse.materials.materialService.createMaterial',
@@ -145,9 +195,10 @@ export const createMaterial = async ({
             ...getModelLogContext('material', materialDto)
         });
 
-        if (isAppError(err)) throw err;
-
-        throw new MaterialCreateDatabaseError();
+        throwMaterialWriteError({
+            err,
+            fallbackError: new MaterialCreateDatabaseError()
+        });
     };
 };
 
@@ -158,49 +209,55 @@ export const updateMaterial = async (materialDto, id) => {
         const material = await getDb().$transaction(async (tx) => {
 
             await existsMaterial({ tx, id });
+            const { supplierId, maxUnitCost, ...materialData } = materialDto;
 
-            const currentSupplierMaterial = await findCurrentSupplierMaterialByMaterialId({
-                tx,
-                materialId: id
+            const currentMaterial = await tx.material.findUnique({
+                where: { id },
+                select: {
+                    id: true,
+                    presentationId: true,
+                    unitMeasureId: true,
+                    base: true,
+                    height: true
+                }
             });
 
-            const {
-                rest,
-                relations
-            } = await prepareMaterialData({
-                tx,
-                materialDto,
-                materialId: id
+            const existingMaterial = await tx.material.findFirst({
+                where: {
+                    name: { equals: materialDto.name, mode: 'insensitive' },
+                    presentationId: currentMaterial.presentationId,
+                    unitMeasureId: currentMaterial.unitMeasureId,
+                    base: currentMaterial.base ?? null,
+                    height: currentMaterial.height ?? null,
+                    NOT: { id }
+                },
+                select: { id: true }
             });
 
+            if (existingMaterial) {
+                throw new MaterialAlreadyExists();
+            }
 
             const updatedMaterial = await tx.material.update({
                 where: { id },
-                data: buildMaterialData({ rest, relations })
+                data: materialData
             });
 
-            await syncSupplierMaterial({
-                tx,
-                supplierId: relations.supplierId,
-                previousSupplierId: currentSupplierMaterial?.supplierId,
-                materialId: id,
-                maxUnitCost: relations.maxUnitCost
+            await tx.supplierMaterial.update({
+                where: {
+                    supplierId_materialId: {
+                        materialId: updatedMaterial.id,
+                        supplierId
+                    }
+                },
+                data: { maxUnitCost }
             });
 
-            await recalculateConvertedQuantityByMaterial({
-                tx,
-                materialId: id,
-                base: updatedMaterial.base,
-                height: updatedMaterial.height
-            });
-
-            const fullMaterial = await findSupplierMaterialByIds({
+            return findSupplierMaterialByIds({
                 tx,
                 materialId: updatedMaterial.id,
-                supplierId: relations.supplierId
+                supplierId
             });
-
-            return fullMaterial;
         });
 
         logServiceInfo(serviceLogger, {
@@ -216,61 +273,11 @@ export const updateMaterial = async (materialDto, id) => {
             ...getModelLogContext('material', { id, ...materialDto })
         });
 
-        if (err.code === PRISMA_ERROR_CODES.RECORD_NOT_FOUND) {
-            throw new MaterialNotFound();
-        }
-
-        if (isAppError(err)) throw err;
-
-        throw new MaterialUpdateDatabaseError();
+        throwMaterialWriteError({
+            err,
+            fallbackError: new MaterialUpdateDatabaseError()
+        });
     };
-};
-
-export const deleteMaterial = async (id) => {
-
-    try {
-
-        const deletedMaterial = await getDb().$transaction(async (tx) => {
-
-            await existsMaterial({ tx, id });
-
-            const linkedRecords = await Promise.all([
-                tx.goodsReceiptDetail.count({ where: { materialId: id } }),
-                tx.goodsIssueDetail.count({ where: { materialId: id } }),
-                tx.movementDetail.count({ where: { materialId: id } }),
-                tx.stockAdjustmentDetail.count({ where: { materialId: id } }),
-                tx.waste.count({ where: { supplierMaterial: { materialId: id } } })
-            ]);
-
-            if (linkedRecords.some((count) => count > 0)) throw new MaterialDeleteRelationConflict();
-
-            await tx.supplierMaterial.deleteMany({ where: { materialId: id } });
-
-            return tx.material.delete({
-                where: { id },
-                select: { id: true }
-            });
-        });
-
-        logServiceInfo(serviceLogger, {
-            operation: 'warehouse.materials.materialService.deleteMaterial',
-            ...getModelLogContext('material', { id })
-        }, 'Material y relación con proveedor eliminados correctamente');
-
-        return deletedMaterial;
-
-    } catch (err) {
-        logServiceError(serviceLogger, err, {
-            operation: 'warehouse.materials.materialService.deleteMaterial',
-            ...getModelLogContext('material', { id })
-        });
-
-        if (err.code === PRISMA_ERROR_CODES.RECORD_NOT_FOUND) throw new MaterialNotFound();
-        if (err.code === PRISMA_ERROR_CODES.FOREIGN_KEY_CONSTRAINT) throw new MaterialDeleteRelationConflict();
-        if (isAppError(err)) throw err;
-
-        throw new MaterialDeleteDatabaseError();
-    }
 };
 
 export const updateMaterialStock = async ({
@@ -310,5 +317,54 @@ export const updateMaterialStock = async ({
         if (isAppError(err)) throw err;
 
         throw new MaterialStockAdjustmentDatabaseError();
+    }
+};
+
+export const deleteMaterial = async (supplierMaterialId) => {
+
+    try {
+
+        const deletedMaterial = await getDb().$transaction(async (tx) => {
+
+            const supplierMaterial = await tx.supplierMaterial.findUnique({
+                where: { id: supplierMaterialId },
+                select: { materialId: true }
+            });
+
+            if (!supplierMaterial) throw new MaterialNotFound();
+
+            const { materialId } = supplierMaterial;
+
+            if (await existsMaterialUsage({ tx, materialId })) {
+                throw new MaterialDeleteRelationConflict();
+            }
+
+            await tx.supplierMaterial.delete({ where: { id: supplierMaterialId } });
+
+            const remainingRelations = await tx.supplierMaterial.count({ where: { materialId } });
+
+            if (remainingRelations > 0) return { id: materialId };
+
+            return tx.material.delete({ where: { id: materialId }, select: { id: true } });
+        });
+
+        logServiceInfo(serviceLogger, {
+            operation: 'warehouse.materials.materialService.deleteMaterial',
+            ...getModelLogContext('supplierMaterial', { id: supplierMaterialId })
+        }, 'Relación entre material y proveedor eliminada correctamente');
+
+        return deletedMaterial;
+
+    } catch (err) {
+        logServiceError(serviceLogger, err, {
+            operation: 'warehouse.materials.materialService.deleteMaterial',
+            ...getModelLogContext('supplierMaterial', { id: supplierMaterialId })
+        });
+
+        if (err.code === PRISMA_ERROR_CODES.RECORD_NOT_FOUND) throw new MaterialNotFound();
+        if (err.code === PRISMA_ERROR_CODES.FOREIGN_KEY_CONSTRAINT) throw new MaterialDeleteRelationConflict();
+        if (isAppError(err)) throw err;
+
+        throw new MaterialDeleteDatabaseError();
     }
 };

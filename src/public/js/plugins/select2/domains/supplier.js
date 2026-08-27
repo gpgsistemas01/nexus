@@ -1,5 +1,6 @@
-import { openSupplierModal } from "../../../modules/suppliers/supplierModal.js";
-import { getAllSuppliers } from "../../../application/warehouse/suppliers.js";
+import { SELECT2_EVENT_NAMES } from '../../../constants/events.js';
+import { openSupplierModal } from "../../../pages/warehouse/suppliers/supplierModal.js";
+import { getAllSuppliers } from "../../../application/warehouse/suppliers/suppliers.js";
 import { initDomainSelect2, initFilterSelect2, runAfterSelect2Close, toggleSelectOption } from "../baseSelect.js";
 import { FILTER_SELECTORS } from "../../../constants/selectors.js";
 
@@ -12,7 +13,6 @@ export const initSupplierFilterSelect = ({
     getOptions: getAllSuppliers,
     placeholder: 'Filtrar por proveedor',
     selectedId,
-    paginated: true,
     mapOption: (supplier) => ({ id: supplier.id, text: supplier.tradeName })
 });
 
@@ -35,7 +35,7 @@ const initSupplierSelect = ({
 
 const attachSupplierHandler = ({ supplierSelector }) => {
 
-    $(supplierSelector).off('select2:select').on('select2:select', (e) => {
+    $(supplierSelector).off(SELECT2_EVENT_NAMES.SELECT).on(SELECT2_EVENT_NAMES.SELECT, (e) => {
 
         const selected = e.params.data;
 

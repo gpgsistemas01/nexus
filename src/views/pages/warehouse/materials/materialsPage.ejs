@@ -1,4 +1,4 @@
-<%- include('../../../shared/tableFilters', {
+<%- include('../../../shared/tables/tableFilters', {
     selectInputs: [
         {
             id: 'supplierFilter',
@@ -9,16 +9,16 @@
     dateInputs: []
 }) %>
 
-<%- include('../../../shared/mainTable', { title: 'Existencias' }) %>
+<%- include('../../../shared/tables/mainTable', { title: 'Existencias' }) %>
 
-<%- include('../ui/materialModal') %>
+<%- include('materialModal') %>
 
-<%- include('../ui/supplierModal') %>
+<%- include('../suppliers/supplierModal') %>
 
-<script type="module" src="/js/pages/warehouse/materialsPage.js"></script>
-<script type="module" src="/js/modules/materials/materialModal.js"></script>
-<script type="module" src="/js/modules/materials/materialForm.js"></script>
-<script type="module" src="/js/modules/suppliers/supplierForm.js"></script>
+<script type="module" src="/js/pages/warehouse/materials/materialsPage.js"></script>
+<script type="module" src="/js/pages/warehouse/materials/materialModal.js"></script>
+<script type="module" src="/js/pages/warehouse/materials/materialForm.js"></script>
+<script type="module" src="/js/pages/warehouse/suppliers/supplierForm.js"></script>
 
 <%- contentFor('title') %>
 Materiales

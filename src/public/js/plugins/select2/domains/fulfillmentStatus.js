@@ -1,4 +1,4 @@
-import { getFulfillmentStatusOptions } from "../../../application/warehouse/fulfillmentStatuses.js";
+import { getAllFulfillmentStatuses } from "../../../application/warehouse/catalogs/fulfillmentStatuses.js";
 import { initFilterSelect2 } from "../baseSelect.js";
 import { FILTER_SELECTORS } from "../../../constants/selectors.js";
 
@@ -8,8 +8,9 @@ export const initFulfillmentStatusFilterSelect = ({
     selectedId = null
 } = {}) => initFilterSelect2({
     selector: fulfillmentStatusSelector,
-    getOptions: getFulfillmentStatusOptions,
+    getOptions: getAllFulfillmentStatuses,
     placeholder: 'Filtrar por estado surtido',
     selectedId,
+    mapOption: (status) => ({ id: status.id, text: status.name }),
     clearWhenEmpty: false
 });

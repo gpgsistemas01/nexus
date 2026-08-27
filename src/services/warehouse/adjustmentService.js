@@ -35,8 +35,6 @@ const createStockAdjustmentMovement = async ({
             quantity: difference,
             newStock,
             previousStock,
-            materialBase: adjustmentDetail.materialBase,
-            materialHeight: adjustmentDetail.materialHeight,
             materialId,
             supplierId,
             stockAdjustmentDetailId: adjustmentDetail.id,
@@ -53,9 +51,9 @@ const calculateStockAdjustmentValues = ({
     height = null
 }) => {
 
-    const previousStock = Number(toNumber(material.currentStock) || 0);
+    const previousStock = toNumber(material.currentStock) || 0;
     const difference = normalizeDecimal(newStock - previousStock);
-    const previousConvertedQuantity = Number(toNumber(material.convertedQuantity) || 0);
+    const previousConvertedQuantity = toNumber(material.convertedQuantity) || 0;
     const hasCustomDimensions = base !== null && height !== null;
     const materialBase = hasCustomDimensions ? base : material.base;
     const materialHeight = hasCustomDimensions ? height : material.height;
@@ -124,7 +122,6 @@ export const createStockAdjustment = async ({
         referenceNumber = await generateYearlyReferenceNumber({ type: DOCUMENT_REFERENCE_TYPES.STOCK_ADJUSTMENT, tx: transaction });
 
         const materialName = material.name;
-        const supplierName = material.supplier?.tradeName || '';
 
         const {
             previousStock,
@@ -171,7 +168,6 @@ export const createStockAdjustment = async ({
                         materialId,
                         supplierId,
                         materialName,
-                        supplierName,
 
                         previousStock,
                         newStock: adjustedNewStock,
@@ -179,10 +175,7 @@ export const createStockAdjustment = async ({
 
                         previousConvertedQuantity,
                         newConvertedQuantity,
-                        convertedDifference,
-
-                        materialBase,
-                        materialHeight
+                        convertedDifference
                     }
                 }
             },
@@ -249,7 +242,7 @@ export const createStockAdjustmentByQuantityChange = async ({
             materialId,
             supplierId
         });
-        const newStock = normalizeDecimal(Number(toNumber(material.currentStock) || 0) + Number(quantityChange));
+        const newStock = normalizeDecimal((toNumber(material.currentStock) || 0) + Number(quantityChange));
 
         return createStockAdjustment({
             tx: transaction,

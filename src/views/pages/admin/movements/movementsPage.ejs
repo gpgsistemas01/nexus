@@ -1,26 +1,20 @@
-<%- include('../../../shared/tableFilters', {
-    selectInputs: [
-        {
-            id: 'movementTypeFilter',
-            label: 'Tipo de movimiento:',
-            col: 'col-12 col-md-6'
-        },
-        {
-            id: 'supplierFilter',
-            label: 'Proveedor:',
-            col: 'col-12 col-md-6'
-        },
-        {
-            id: 'materialFilter',
-            label: 'Material:',
-            col: 'col-12 col-md-6'
-        }
-    ]
-}) %>
+<% const contextKey = movementContext === 'mermas' ? 'waste' : 'material'; %>
+<main id="movementPage" data-movement-context="<%= contextKey %>">
+    <%- include('../../../shared/tables/tableFilters', {
+        selectInputs: [
+            { id: 'movementTypeFilter', label: 'Tipo de movimiento:', col: 'col-12 col-md-6' },
+            { id: 'supplierFilter', label: 'Proveedor:', col: 'col-12 col-md-6' },
+            { id: 'materialFilter', label: contextKey === 'waste' ? 'Merma:' : 'Material:', col: 'col-12 col-md-6' }
+        ]
+    }) %>
+    <%- include('../../../shared/tables/dataTable', {
+        id: `${ contextKey }MovementTable`,
+        title: movementTitle,
+        prefix: 'Historial de'
+    }) %>
+</main>
 
-<%- include('../../../shared/mainTable', { title: 'Movmientos' }) %>
-
-<script type="module" src="/js/pages/admin/movementsPage.js"></script>
+<script type="module" src="/js/pages/admin/movements/movementsPage.js"></script>
 
 <%- contentFor('title') %>
 Movimientos

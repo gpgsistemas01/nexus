@@ -1,10 +1,20 @@
-import e from "express";
 import { AppError } from "../AppError.js";
 
 export class MaterialNotFound extends AppError {
 
     constructor () {
         super('Material no encontrado', 'MATERIAL_NOT_FOUND', 404);
+    }
+}
+
+export class MaterialAlreadyExists extends AppError {
+
+    constructor () {
+        super(
+            'Ya existe un material con el mismo nombre, presentación, unidad de medida y dimensiones.',
+            'MATERIAL_ALREADY_EXISTS',
+            409
+        );
     }
 }
 
@@ -43,6 +53,13 @@ export class MaterialCreateDatabaseError extends AppError {
     }
 }
 
+export class MaterialInitialStockReasonNotFound extends AppError {
+
+    constructor () {
+        super('Razón de stock inicial no encontrada para registrar el material.', 'MATERIAL_INITIAL_STOCK_REASON_NOT_FOUND', 404);
+    }
+}
+
 export class MaterialUpdateDatabaseError extends AppError {
 
     constructor () {
@@ -53,14 +70,25 @@ export class MaterialUpdateDatabaseError extends AppError {
 export class MaterialDeleteDatabaseError extends AppError {
 
     constructor () {
-        super('Error de base de datos al eliminar el material', 'MATERIAL_DELETE_DB_ERROR', 500);
+        super('Error de base de datos al eliminar la relación entre el material y el proveedor', 'MATERIAL_DELETE_DB_ERROR', 500);
     }
 }
 
 export class MaterialDeleteRelationConflict extends AppError {
 
     constructor () {
-        super('No se puede eliminar el material porque está vinculado a una compra, salida u otro movimiento de almacén.', 'MATERIAL_DELETE_RELATION_CONFLICT', 409);
+        super(
+            'No se puede eliminar la relación entre el material y el proveedor porque el material tiene historial de compras, salidas, mermas, movimientos o ajustes de stock.',
+            'MATERIAL_DELETE_RELATION_CONFLICT',
+            409
+        );
+    }
+}
+
+export class MaterialSupplierChangeConflict extends AppError {
+
+    constructor () {
+        super('No se puede cambiar el proveedor del material porque ya tiene historial de compras o salidas.', 'MATERIAL_SUPPLIER_CHANGE_CONFLICT', 409);
     }
 }
 

@@ -1,0 +1,34 @@
+<%- include('../../../shared/issues/issueFilters') %>
+
+<%- include('../../../shared/tables/mainTable', { title: 'Salidas de merma' }) %>
+<%- include('../../../shared/issues/issueModal', {
+    issue: {
+        formId: 'wasteIssueForm',
+        modalId: 'wasteIssueModal',
+        modalTitle: 'Registrar salida de merma',
+        canApprove: false,
+        dateInputId: 'requestDateInput',
+        dateInputLabel: 'Fecha y hora de solicitud',
+        observationsInputId: 'observationsInput',
+        detailErrorName: 'details',
+        includeSummary: false,
+        itemSelect: {
+            id: 'wasteInput',
+            name: 'wasteId',
+            class: 'waste-select'
+        },
+        quantityInput: {
+            id: 'quantityInput',
+            attrs: { min: '0.01', step: 'any' }
+        }
+    }
+}) %>
+
+<%- include('../../../shared/issues/issueReturnModal') %>
+
+<script type="module" src="/js/pages/warehouse/wasteIssues/wasteIssuesPage.js"></script>
+
+<%- contentFor('title') %>
+Salidas de mermas
+<%- contentFor('layoutType') %>
+site

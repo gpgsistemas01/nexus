@@ -1,5 +1,7 @@
-<% const form = {
-    id: 'goodsReceiptForm',
+<% const modalConfig = {
+    formId: 'goodsReceiptForm',
+    modalId: 'goodsReceiptModal',
+    modalTitle: '',
     canApprove: false,
     invoice: {
         radios: [
@@ -57,12 +59,7 @@
         label: 'Observaciones',
     },
     table: {
-        select: {
-            id: 'materialInput',
-            name: 'materialId',
-            class: 'material-select',
-            col: 'col-md-4 col-lg-6'
-        },
+        materialSelect: true,
         inputs: [
             {
                 id: 'quantityInput',
@@ -89,7 +86,7 @@
     }
 } %>
 
-<%- include('../../../shared/tableFilters', {
+<%- include('../../../shared/tables/tableFilters', {
     selectInputs: [
         {
             id: 'supplierFilter',
@@ -104,19 +101,19 @@
     ]
 }) %>
 
-<%- include('../../../shared/mainTable', { title: 'Registro de Compras' }) %>
+<%- include('../../../shared/tables/mainTable', { title: 'Registro de Compras' }) %>
 
-<%- include('../../../shared/modal', { modalId: 'goodsReceiptModal', form }) %>
+<%- include('../../../shared/inventory/inventoryCrudModal', { modalConfig }) %>
 
-<%- include('../ui/materialModal') %>
+<%- include('../materials/materialModal') %>
 
-<%- include('../ui/supplierModal') %>
+<%- include('../suppliers/supplierModal') %>
 
 <script type="module" src="/js/pages/warehouse/goodsReceipts/goodsReceiptsPage.js"></script>
-<script type="module" src="/js/modules/materials/materialModal.js"></script>
-<script type="module" src="/js/modules/materials/materialForm.js"></script>
-<script type="module" src="/js/modules/suppliers/supplierModal.js"></script>
-<script type="module" src="/js/modules/suppliers/supplierForm.js"></script>
+<script type="module" src="/js/pages/warehouse/materials/materialModal.js"></script>
+<script type="module" src="/js/pages/warehouse/materials/materialForm.js"></script>
+<script type="module" src="/js/pages/warehouse/suppliers/supplierModal.js"></script>
+<script type="module" src="/js/pages/warehouse/suppliers/supplierForm.js"></script>
 
 <%- include('./corrections/correctionModal') %>
 

@@ -2,6 +2,7 @@ export const PERMISSIONS = Object.freeze({
     MATERIALS_READ: 'materials:read',
     MATERIALS_WRITE: 'materials:write',
     MATERIALS_ADJUST_STOCK: 'materials:adjust-stock',
+    INVENTORY_COSTS_READ: 'inventory:costs-read',
     DEPARTMENTS_READ: 'departments:read',
     MOVEMENTS_READ: 'movements:read',
     PERSONS_READ: 'persons:read',
@@ -18,7 +19,6 @@ export const PERMISSIONS = Object.freeze({
     GOODS_ISSUES_MANAGE: 'goods:issues-manage',
     GOODS_ISSUE_DETAILS_MANAGE: 'goods:issue-details-manage',
     GOODS_RECEIPTS_MANAGE: 'goods:receipts-manage',
-    NOTIFICATIONS_MANAGE: 'notifications:manage',
     PRESENTATIONS_READ: 'presentations:read',
     REASONS_READ: 'reasons:read',
     WAREHOUSE_REPORTS_READ: 'warehouse:reports-read',
@@ -29,6 +29,9 @@ export const PERMISSIONS = Object.freeze({
     WASTES_READ: 'wastes:read',
     WASTES_WRITE: 'wastes:write',
     WASTES_ADJUST_STOCK: 'wastes:adjust-stock',
+    WASTE_ISSUES_MANAGE: 'waste:issues-manage',
+    WASTE_ISSUES_SUPPLY: 'waste:issues-supply',
+    WASTE_ISSUES_PAGE_VIEW: 'waste:issues-page-view',
     PERSONS_PAGE_VIEW: 'persons:page-view',
     CLIENTS_PAGE_VIEW: 'clients:page-view',
     GOODS_ISSUES_PAGE_VIEW: 'goods:issues-page-view',
@@ -71,6 +74,10 @@ export const AUTHORIZATION_POLICIES = Object.freeze({
     [PERMISSIONS.MATERIALS_ADJUST_STOCK]: createPolicy({
         roles: ['Administrador del sistema'],
         departments: ['SISTEMAS']
+    }),
+    [PERMISSIONS.INVENTORY_COSTS_READ]: createPolicy({
+        roles: ['Almacenista', 'Coordinador', 'Auxiliar', 'Administrador del sistema'],
+        departments: ['ALMACÉN Y PROVEDURÍA', 'SISTEMAS']
     }),
     [PERMISSIONS.DEPARTMENTS_READ]: createPolicy({
     roles: [ 'Administrador del sistema', 'Coordinador', 'Auxiliar', 'Operador', 'Instalador', 'Diseñador', 'Almacenista', 'Asesor de ventas', 'Repartidor', 'Director', 'Administrador', 'Contador' ],
@@ -205,24 +212,6 @@ export const AUTHORIZATION_POLICIES = Object.freeze({
     roles: ['Almacenista', 'Coordinador', 'Auxiliar', 'Administrador del sistema'],
     departments: ['ALMACÉN Y PROVEDURÍA', 'SISTEMAS']
 }),
-    [PERMISSIONS.NOTIFICATIONS_MANAGE]: createPolicy({
-    roles: ['Administrador del sistema', 'Coordinador', 'Auxiliar', 'Operador', 'Instalador', 'Almacenista'],
-    departments: [
-        'DIRECCIÓN',
-        'ACABADOS',
-        'ADMINISTRATIVO',
-        'ALMACÉN Y PROVEDURÍA',
-        'DISEÑO',
-        'INSTALACIONES',
-        'IMPRESIÓN',
-        'ROUTER',
-        'PT/TRÁFICO',
-        'SERVICIOS Y VIGILANCIA',
-        'SISTEMAS',
-        'TALLER 3D',
-        'VENTAS Y PROYECTOS ESPECIALES'
-    ]
-}),
     [PERMISSIONS.PRESENTATIONS_READ]: createPolicy({
     roles: ['Almacenista', 'Coordinador', 'Auxiliar', 'Administrador del sistema'],
     departments: ['ALMACÉN Y PROVEDURÍA', 'SISTEMAS']
@@ -262,7 +251,19 @@ export const AUTHORIZATION_POLICIES = Object.freeze({
     [PERMISSIONS.WASTES_ADJUST_STOCK]: createPolicy({
     roles: ['Administrador del sistema'],
     departments: ['SISTEMAS']
-}),
+    }),
+    [PERMISSIONS.WASTE_ISSUES_MANAGE]: createPolicy({
+        roles: ['Almacenista', 'Coordinador', 'Auxiliar', 'Administrador del sistema'],
+        departments: ['ALMACÉN Y PROVEDURÍA', 'SISTEMAS']
+    }),
+    [PERMISSIONS.WASTE_ISSUES_SUPPLY]: createPolicy({
+        roles: ['Almacenista', 'Coordinador', 'Auxiliar', 'Administrador del sistema'],
+        departments: ['ALMACÉN Y PROVEDURÍA', 'SISTEMAS']
+    }),
+    [PERMISSIONS.WASTE_ISSUES_PAGE_VIEW]: createPolicy({
+        roles: ['Almacenista', 'Coordinador', 'Auxiliar', 'Administrador del sistema'],
+        departments: ['ALMACÉN Y PROVEDURÍA', 'SISTEMAS']
+    }),
     [PERMISSIONS.PERSONS_PAGE_VIEW]: createPolicy({
     roles: ['Administrador del sistema', 'Coordinador', 'Auxiliar', 'Almacenista'],
     departments: ['ALMACÉN Y PROVEDURÍA', 'SISTEMAS']

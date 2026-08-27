@@ -1,4 +1,4 @@
-import { downloadBlob } from "../utils/downloadBlob.js";
+import { DOM_EVENT_NAMES } from '../constants/events.js';
 import { notifications } from "../plugins/swal/swalComponent.js";
 
 export const buildTableExportParams = (table, params = {}) => {
@@ -51,6 +51,7 @@ export const buildExcelButton = ({
                         </div>
                     `,
                     showCancelButton: true,
+                    reverseButtons: true,
                     confirmButtonText: 'Descargar',
                     cancelButtonText: 'Cancelar',
                     buttonsStyling: false,
@@ -70,7 +71,15 @@ export const buildExcelButton = ({
             }
 
             const blob = await request({ monthlyReport: reportType === 'monthly' });
-            downloadBlob({ blob, filename });
+            const url = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+
+            link.href = url;
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            window.URL.revokeObjectURL(url);
 
         } catch (err) {
 
@@ -80,7 +89,7 @@ export const buildExcelButton = ({
     }
 });
 
-export const clearTableFilters = (table) => {
+export const clearTableFilters = () => {
 
     const filterElements = document.querySelectorAll(
         '.table-filters select, .table-filters input'
@@ -88,12 +97,10 @@ export const clearTableFilters = (table) => {
 
     filterElements.forEach(element => {
         if (element.classList.contains('select2-hidden-accessible')) {
-            $(element).val(null).trigger('change');
+            $(element).val(null).trigger(DOM_EVENT_NAMES.CHANGE);
         } else {
             element.value = '';
-            element.dispatchEvent(new Event('change'));
+            element.dispatchEvent(new Event(DOM_EVENT_NAMES.CHANGE));
         }
     });
-
-    table?.ajax.reload();
 }

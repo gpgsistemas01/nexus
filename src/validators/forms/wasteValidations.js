@@ -1,26 +1,26 @@
-import { validateNumber, validateTextOptional, validateUUID } from '../fields/fieldsValidator.js';
+import { validateNonNegativeNumber, validatePositiveNumber, validateUUID } from '../fields/fieldsValidator.js';
+import { createInventoryObservationsValidation, createInventoryStateValidation } from './inventoryValidations.js';
 
-const wasteDataValidation = [
-    validateUUID('supplierMaterialId'),
-    validateNumber('base'),
-    validateNumber('height')
+const wasteStockDataValidation = [
+    validateNonNegativeNumber('newStock'),
+    createInventoryObservationsValidation()
 ];
 
-const wasteStockValidationFields = [
-    validateNumber('currentStock'),
-    validateTextOptional({ fieldName: 'observations', maxLength: 500 })
-];
-
-const wasteStockAdjustmentValidationFields = [
-    ...wasteStockValidationFields,
+export const wasteStockValidation = [
+    ...wasteStockDataValidation,
     validateUUID('reasonId')
 ];
 
-export const wasteValidation = [
-    ...wasteDataValidation,
-    ...wasteStockValidationFields
+export const wasteEditValidation = [
+    ...createInventoryStateValidation(),
+    validateNonNegativeNumber('maxUnitCost')
 ];
 
-export const wasteUpdateValidation = wasteDataValidation;
-
-export const wasteStockValidation = wasteStockAdjustmentValidationFields;
+export const wasteValidation = [
+    validateUUID('materialId'),
+    validateUUID('supplierId'),
+    validatePositiveNumber('base'),
+    validatePositiveNumber('height'),
+    ...wasteEditValidation,
+    ...wasteStockDataValidation
+];
