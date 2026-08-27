@@ -9,7 +9,6 @@ const materialFindUnique = vi.fn();
 const transaction = vi.fn();
 const goodsReceiptDetailCount = vi.fn();
 const goodsIssueDetailCount = vi.fn();
-const purchaseRequisitionDetailCount = vi.fn();
 const movementDetailCount = vi.fn();
 const stockAdjustmentDetailCount = vi.fn();
 const wasteCount = vi.fn();
@@ -33,7 +32,6 @@ vi.mock('../../../../src/repository/baseRepository.js', () => ({
     },
     goodsReceiptDetail: { count: goodsReceiptDetailCount },
     goodsIssueDetail: { count: goodsIssueDetailCount },
-    purchaseRequisitionDetail: { count: purchaseRequisitionDetailCount },
     movementDetail: { count: movementDetailCount },
     stockAdjustmentDetail: { count: stockAdjustmentDetailCount },
     waste: { count: wasteCount },
@@ -70,7 +68,6 @@ describe('materialService submit operations', () => {
       material: { findUnique: materialFindUnique, delete: materialDelete },
       goodsReceiptDetail: { count: goodsReceiptDetailCount },
       goodsIssueDetail: { count: goodsIssueDetailCount },
-      purchaseRequisitionDetail: { count: purchaseRequisitionDetailCount },
       movementDetail: { count: movementDetailCount },
       stockAdjustmentDetail: { count: stockAdjustmentDetailCount },
       waste: { count: wasteCount },
@@ -133,7 +130,6 @@ describe('materialService submit operations', () => {
     materialFindUnique.mockResolvedValue({ id: 'material-1' });
     goodsReceiptDetailCount.mockResolvedValue(0);
     goodsIssueDetailCount.mockResolvedValue(0);
-    purchaseRequisitionDetailCount.mockResolvedValue(0);
     movementDetailCount.mockResolvedValue(0);
     stockAdjustmentDetailCount.mockResolvedValue(0);
     wasteCount.mockResolvedValue(0);
@@ -152,7 +148,6 @@ describe('materialService submit operations', () => {
     materialFindUnique.mockResolvedValue({ id: 'material-1' });
     goodsReceiptDetailCount.mockResolvedValue(1);
     goodsIssueDetailCount.mockResolvedValue(0);
-    purchaseRequisitionDetailCount.mockResolvedValue(0);
     movementDetailCount.mockResolvedValue(0);
     stockAdjustmentDetailCount.mockResolvedValue(0);
     wasteCount.mockResolvedValue(0);

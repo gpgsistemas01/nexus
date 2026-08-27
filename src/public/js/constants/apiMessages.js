@@ -270,12 +270,6 @@ export const errorMessages = {
     GOODS_ISSUE_INTERNAL_CLIENT_ADVISOR_DEPARTMENT_CONFLICT: 'Para el cliente GPG INTERNO, el asesor debe tener el rol Coordinador.',
     GOODS_ISSUE_INTERNAL_CLIENT_PROJECT_NUMBER_CONFLICT: (meta) => `Para el cliente GPG INTERNO, el número de proyecto ${ meta.projectNumber } no coincide con el área ${ meta.departmentName }.`,
     MOVEMENT_DETAIL_RELATION_CONFLICT: 'El detalle del movimiento no está asociado a un material o proveedor.',
-    PURCHASE_REQUISITION_NOT_FOUND: 'Requisición de compra no encontrada.',
-    PROJECT_NOT_FOUND: 'Proyecto no encontrado.',
-    PURCHASE_REQUISITION_STATUS_NOT_FOUND: 'Estado de requisición no encontrado.',
-    PURCHASE_REQUISITION_UPDATE_DB_ERROR: 'Error de base de datos al editar la requisición de compra.',
-    PURCHASE_REQUISITION_STATUS_UPDATE_DB_ERROR: 'Error de base de datos al editar el estado de la requisición.',
-    PURCHASE_REQUISITION_APPROVER_PERSON_NOT_FOUND: 'Persona aprobadora activa no encontrada para el usuario.',
 
     // Documento / folios
     REFERENCE_NUMBER_UPDATE_DB_ERROR: 'Error de base de datos al actualizar el folio.',
@@ -299,10 +293,6 @@ const successMessages = {
     UPDATED_GOODS_RECEIPT: '¡Compra actualizada exitosamente!',
     CREATED_GOODS_ISSUE: '¡Salida de almacén creada exitosamente!',
     UPDATED_GOODS_ISSUE: '¡Salida de almacén actualizada exitosamente!',
-    CREATED_PURCHASE_REQUISITION: '¡Requisición de compra creada exitosamente!',
-    UPDATED_PURCHASE_REQUISITION: '¡Requisición de compra actualizada exitosamente!',
-    CONFIRMED_PURCHASE_REQUISITION: '¡Requisición de compra confirmada exitosamente!',
-    CANCELED_PURCHASE_REQUISITION: '¡Requisición de compra cancelada exitosamente!',
     CREATED_CLIENT: '¡Cliente creado exitosamente!',
     CREATED_USER: '¡Usuario creado exitosamente!',
     UPDATED_USER: '¡Usuario actualizado exitosamente!',

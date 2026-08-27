@@ -23,7 +23,7 @@ Nexus es una plataforma de control operativo para administrar inventario, compra
 
 - Autenticación y manejo de sesión con cookies y JWT.
 - Administración de usuarios, roles, personas, departamentos y movimientos.
-- Gestión de almacén: materiales, proveedores, entradas de compra, salidas de almacén, requisiciones, mermas, motivos, presentaciones, unidades de medida y estados de cumplimiento.
+- Gestión de almacén: materiales, proveedores, entradas de compra, salidas de almacén, mermas, motivos, presentaciones, unidades de medida y estados de cumplimiento.
 - Gestión de clientes del área de ventas.
 - Reportes administrativos, de almacén e inventario.
 - Notificaciones en tiempo real con Socket.IO.
@@ -232,7 +232,7 @@ npm start
 
 - `/` página de inicio.
 - `/inicio-sesion`, `/revocar-sesion`, `/cerrar-sesion` para autenticación web.
-- `/materiales`, `/mermas`, `/requisiciones`, `/compras`, `/salidas-almacen`, `/proveedores` para almacén.
+- `/materiales`, `/mermas`, `/compras`, `/salidas-almacen`, `/proveedores` para almacén.
 - `/usuarios-sistemas`, `/personas`, `/movimientos` para administración.
 - `/clientes` para ventas.
 

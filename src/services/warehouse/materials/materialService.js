@@ -237,7 +237,6 @@ export const deleteMaterial = async (id) => {
             const linkedRecords = await Promise.all([
                 tx.goodsReceiptDetail.count({ where: { materialId: id } }),
                 tx.goodsIssueDetail.count({ where: { materialId: id } }),
-                tx.purchaseRequisitionDetail.count({ where: { materialId: id } }),
                 tx.movementDetail.count({ where: { materialId: id } }),
                 tx.stockAdjustmentDetail.count({ where: { materialId: id } }),
                 tx.waste.count({ where: { supplierMaterial: { materialId: id } } })

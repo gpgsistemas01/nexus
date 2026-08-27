@@ -22,7 +22,7 @@ La suite ya cubre:
 
 ## Estrategia de integración con BD
 
-Las pruebas de integración se ejecutan contra `DATABASE_TEST_URL`, guardan información real y no usan rollback. La limpieza se hace por datos de prueba al iniciar cada integración y con `tests/teardownTestDatabase.js` al finalizar toda la suite. Los servicios marcados arriba como integración directa ya incluyen ese flujo de BD; esta sección sólo documenta la estrategia para evitar repetir el listado de cobertura.
+Las pruebas de integración se ejecutan contra `DATABASE_TEST_URL`, guardan información real y no usan rollback. La limpieza se hace por datos de prueba al iniciar cada integración y con `tests/teardownTestDatabase.js` al finalizar toda la suite. Las integraciones que construyen un agregado completo también limpian en `afterAll`, para que una ejecución aislada no deje fixtures; el teardown global sigue siendo la red de seguridad si el proceso se interrumpe. Los servicios marcados arriba como integración directa ya incluyen ese flujo de BD; esta sección sólo documenta la estrategia para evitar repetir el listado de cobertura.
 
 Para confirmar si una corrida realmente modifica la base de pruebas, hay que revisar estas condiciones antes de interpretar el resultado:
 
@@ -33,9 +33,9 @@ Para confirmar si una corrida realmente modifica la base de pruebas, hay que rev
 
 ## Pendientes importantes
 
-Quedan pendientes de integración transaccional completa con BD:
+No quedan servicios CRUD transaccionales identificados sin al menos una integración directa con BD. Al agregar operaciones nuevas, se debe ampliar la suite del dominio existente antes de crear un flujo de pruebas paralelo.
 
-- `purchaseRequisitionService.createPurchaseRequisition` y `purchaseRequisitionService.updatePurchaseRequisition`: requisiciones con proyecto, solicitante, departamento, detalles y cambio de estado.
+El módulo de requisiciones de compra fue retirado del frontend, backend y esquema vigente. La migración de retiro elimina sus tablas y el contador de folios `REQ`; por ello no debe agregarse cobertura nueva ni reutilizarse ese flujo en otros dominios.
 
 ## Dependencias entre dominios
 
