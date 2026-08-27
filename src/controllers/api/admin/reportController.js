@@ -3,7 +3,7 @@ import { findAllPersons } from "../../../services/admin/person/personService.js"
 import { findAllUsers } from "../../../services/admin/userService.js";
 import { getDataTableOrder, getDataTableSearch } from "../../../utils/requestQueryUtils.js";
 import { getMexicoMonthDateRange } from "../../../utils/formattersUtils.js";
-import { sendExcelReport } from "../../../utils/reportExcelUtils.js";
+import { createFormulaCell, sendExcelReport } from "../../../utils/reportExcelUtils.js";
 
 const SHEET_NAME = 'Movimientos';
 const USER_SHEET_NAME = 'Usuarios';
@@ -29,7 +29,7 @@ const MOVEMENT_REPORT_COLUMNS = [
     'Stock Nuevo'
 ];
 
-const mapMovementReportRow = row => [
+const mapMovementReportRow = (row, index) => [
     row.date,
     row.createdAt,
     row.type,
@@ -40,7 +40,7 @@ const mapMovementReportRow = row => [
     row.supplierName,
     row.previousStock,
     row.quantity,
-    row.newStock
+    createFormulaCell(`I${ index + 2 }+J${ index + 2 }`, row.newStock)
 ];
 
 const getMovementReportParams = (query) => {

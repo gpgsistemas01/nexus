@@ -1,7 +1,7 @@
 import { buildMonthlyGoodsReceiptSummary, buildWasteReportSummary, findGoodsIssueReportRows, findGoodsReceiptReportRows, findSupplierReportRows, findWarehouseReportRows, findWasteIssueReportRows, findWasteReportRows } from "../../../services/warehouse/reportService.js";
 import { getDataTableOrder, getDataTableSearch } from "../../../utils/requestQueryUtils.js";
 import { getMexicoMonthDateRange } from "../../../utils/formattersUtils.js";
-import { sendExcelReport } from "../../../utils/reportExcelUtils.js";
+import { createFormulaCell, sendExcelReport } from "../../../utils/reportExcelUtils.js";
 
 const SHEET_NAME = 'Inventario';
 const FILENAME = 'reporte_inventario_materiales';
@@ -16,6 +16,10 @@ const SUPPLIER_FILENAME = 'reporte_proveedores';
 const WASTE_SHEET_NAME = 'Mermas';
 const WASTE_FILENAME = 'reporte_mermas';
 const isMonthlyReportRequest = (query = {}) => query.monthlyReport === 'true' || query.monthlyReport === true;
+const createColumnTotalFormula = (column, firstRow, rowCount, value) => createFormulaCell(
+    rowCount ? `SUM(${ column }${ firstRow }:${ column }${ firstRow + rowCount - 1 })` : '0',
+    value
+);
 const ISSUE_REPORT_COLUMNS = ['referenceNumber', 'requestDate', 'departmentName', 'projectNumber', 'clientName', null, null];
 const ISSUE_REPORT_HEADERS = [
     'Folio',
@@ -64,7 +68,7 @@ const buildIssueReportQuery = (req) => {
 
 const buildIssueReportData = (rows, { baseHeader = 'Base', heightHeader = 'Altura' } = {}) => [
     ISSUE_REPORT_HEADERS.map(header => ({ Base: baseHeader, Altura: heightHeader })[header] || header),
-    ...rows.map(row => [
+    ...rows.map((row, index) => [
         row.referenceNumber,
         row.requestDate,
         row.departmentName,
@@ -82,7 +86,7 @@ const buildIssueReportData = (rows, { baseHeader = 'Base', heightHeader = 'Altur
         row.convertedQuantity,
         row.convertedUnitMeasureName,
         row.projectConvertedQuantity,
-        row.convertedQuantityDifference,
+        createFormulaCell(`O${ index + 2 }-Q${ index + 2 }`, row.convertedQuantityDifference),
         row.detailFulfillmentStatusName
     ])
 ];
@@ -207,61 +211,76 @@ export const exportGoodsReceiptReportExcel = async (req, res) => {
             'Monto c/ IVA'
         ],
 
-        ...rows.map(row => [
-            row.referenceNumber,
-            row.receptionDate,
-            row.receivedByName,
-            row.supplierName,
-            row.invoice,
-            row.materialName,
-            row.materialBase,
-            row.materialHeight,
-            row.quantity,
-            row.presentationName,
-            row.convertedQuantity,
-            row.unitMeasureName,
-            row.conversionUnitCost,
-            row.costPerUnitType,
-            row.netPurchaseAmount,
-            row.grossPurchaseAmount
-        ])
+        ...rows.map((row, index) => {
+            const excelRow = index + 2;
+
+            return [
+                row.referenceNumber,
+                row.receptionDate,
+                row.receivedByName,
+                row.supplierName,
+                row.invoice,
+                row.materialName,
+                row.materialBase,
+                row.materialHeight,
+                row.quantity,
+                row.presentationName,
+                row.convertedQuantity,
+                row.unitMeasureName,
+                createFormulaCell(`IFERROR(O${ excelRow }/K${ excelRow },0)`, row.conversionUnitCost),
+                row.costPerUnitType,
+                createFormulaCell(`I${ excelRow }*N${ excelRow }`, row.netPurchaseAmount),
+                createFormulaCell(`O${ excelRow }*1.16`, row.grossPurchaseAmount)
+            ];
+        })
     ];
 
     const { supplierRows, materialRows, supplierTotals, materialTotals } = buildMonthlyGoodsReceiptSummary(rows);
     const summaryScope = monthlyReport ? 'mensual' : 'del reporte';
+    const supplierFirstRow = data.length + 4;
+    const supplierTotalRow = supplierFirstRow + supplierRows.length;
+    const materialFirstRow = supplierTotalRow + 4;
 
     data.push(
         [],
         [`Resumen ${ summaryScope } por proveedor`],
         ['Proveedor', 'Subtotal s/ IVA', 'IVA', 'Total c/ IVA', `% del subtotal ${ summaryScope }`],
-        ...supplierRows.map(row => [
-            row.supplierName,
-            row.netPurchaseAmount,
-            row.vatAmount,
-            row.grossPurchaseAmount,
-            row.monthlyPercentage
-        ]),
+        ...supplierRows.map((row, index) => {
+            const excelRow = supplierFirstRow + index;
+
+            return [
+                row.supplierName,
+                row.netPurchaseAmount,
+                createFormulaCell(`B${ excelRow }*0.16`, row.vatAmount),
+                createFormulaCell(`B${ excelRow }+C${ excelRow }`, row.grossPurchaseAmount),
+                createFormulaCell(`IFERROR(B${ excelRow }/B${ supplierTotalRow }*100,0)`, row.monthlyPercentage)
+            ];
+        }),
         [
             'Total',
             supplierTotals.netPurchaseAmount,
-            supplierTotals.vatAmount,
-            supplierTotals.grossPurchaseAmount,
-            supplierTotals.monthlyPercentage
+            createColumnTotalFormula('C', supplierFirstRow, supplierRows.length, supplierTotals.vatAmount),
+            createColumnTotalFormula('D', supplierFirstRow, supplierRows.length, supplierTotals.grossPurchaseAmount),
+            createColumnTotalFormula('E', supplierFirstRow, supplierRows.length, supplierTotals.monthlyPercentage)
         ],
         [],
         [`Resumen ${ summaryScope } por material`],
         ['Material', 'Total m² comprados', 'Costo por m²', 'Costo total s/ IVA', 'Cantidad total de material'],
-        ...materialRows.map(row => [
-            row.materialName,
-            row.squareMeters,
-            row.costPerSquareMeter,
-            row.netPurchaseAmount,
-            row.quantity
-        ]),
+        ...materialRows.map((row, index) => {
+            const excelRow = materialFirstRow + index;
+
+            return [
+                row.materialName,
+                row.squareMeters,
+                createFormulaCell(`IFERROR(D${ excelRow }/B${ excelRow },0)`, row.costPerSquareMeter),
+                row.netPurchaseAmount,
+                row.quantity
+            ];
+        }),
         [
             'Total',
             materialTotals.squareMeters,
-            materialTotals.costPerSquareMeter,
+            createColumnTotalFormula('C', materialFirstRow, materialRows.length, materialTotals.costPerSquareMeter),
             materialTotals.netPurchaseAmount,
             materialTotals.quantity
         ]
@@ -315,8 +334,8 @@ export const exportWasteReportExcel = async (req, res) => {
             '',
             '',
             '',
-            totals.wasteQuantity,
-            totals.squareMeters
+            createColumnTotalFormula('E', 2, summaryRows.length, totals.wasteQuantity),
+            createColumnTotalFormula('F', 2, summaryRows.length, totals.squareMeters)
         ]
     ];
 
