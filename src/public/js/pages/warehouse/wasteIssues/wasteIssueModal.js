@@ -35,7 +35,7 @@ initializeWasteIssueReturns({
 });
 
 const setCurrentRequestDate = () => setDateTimePickerValue(
-    document.querySelector(INPUT_SELECTORS.WASTE_ISSUE_DATE),
+    form.querySelector(INPUT_SELECTORS.REQUEST_DATE),
     new Date().toISOString()
 );
 
@@ -46,7 +46,7 @@ export const openWasteIssueModal = ({ mode, data = null }) => {
     if (mode === FORM_MODES.CREATE) {
         setCurrentRequestDate();
     } else {
-        setDateTimePickerValue(document.querySelector(INPUT_SELECTORS.WASTE_ISSUE_DATE), data.requestDate);
+        setDateTimePickerValue(form.querySelector(INPUT_SELECTORS.REQUEST_DATE), data.requestDate);
         document.querySelector(INPUT_SELECTORS.OBSERVATIONS).value = data.observations || '';
         document.querySelector(INPUT_SELECTORS.PROJECT_NUMBER).value = data.projectNumber || '';
 
