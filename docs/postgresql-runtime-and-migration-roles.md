@@ -206,6 +206,38 @@ materiales. Si se necesitan los registros de requisiciones que fueron borrados, 
 restaurarse desde un respaldo antes del segundo paso; la migración correctiva sólo
 recupera la estructura necesaria para completar la cadena.
 
+## Recuperación de la migración de facturas de entradas de compra
+
+La migración `20260806000000_unique_goods_receipt_invoice_per_supplier` normaliza las
+facturas con el mismo criterio de la aplicación y crea la unicidad por proveedor. Al
+normalizar datos legados, valores que antes sólo se diferenciaban por mayúsculas,
+minúsculas o espacios pueden convertirse en el mismo valor. La migración conserva
+todas las entradas: mantiene la primera factura y marca cada conflicto posterior con
+el sufijo determinista `[DUPLICADO:<uuid>]` para que pueda revisarse manualmente. No
+elimina entradas, detalles ni movimientos de inventario.
+
+Si un despliegue anterior dejó esta migración en estado fallido (`P3009`), primero se
+debe respaldar la base. Después, con `DIRECT_URL` apuntando a la misma base y usando la
+cuenta de migraciones, se revierte **sólo el registro fallido**:
+
+```bash
+npx prisma migrate resolve --rolled-back 20260806000000_unique_goods_receipt_invoice_per_supplier
+```
+
+A continuación se vuelve a desplegar la cadena. El `UPDATE` de normalización es
+idempotente, la conciliación preserva los registros en conflicto y el índice único se
+crea cuando ya no quedan claves duplicadas:
+
+```bash
+npm run db:migrate
+```
+
+No se debe usar `migrate resolve --applied`: el índice no fue creado cuando falló el
+intento original y marcarlo como aplicado dejaría la base sin la garantía declarada
+en el esquema Prisma. Tras el despliegue, las facturas que incluyan el marcador
+`[DUPLICADO:` deben compararse con sus documentos fuente y corregirse mediante el
+flujo normal del CRUD de entradas de compra.
+
 ## ¿Es obligatorio hacerlo ahora?
 
 No requiere cambios al esquema Prisma y no bloquea el funcionamiento actual. Es una
