@@ -210,7 +210,6 @@ async function main() {
         data: [
             { prefix: 'REC', year: referenceNumberYear },
             { prefix: 'SAL', year: referenceNumberYear },
-            { prefix: 'REQ', year: referenceNumberYear },
             { prefix: 'AJU', year: referenceNumberYear },
             { prefix: 'PRO', year: 0 },
         ],
