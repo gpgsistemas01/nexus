@@ -49,9 +49,7 @@ El valor esperado es sustituir registros dispersos por flujos consistentes que:
 6. Salidas de almacén con detalle por proveedor, surtido parcial o total,
    devoluciones y movimientos de salida.
 7. Mermas, ajustes de stock, motivos y movimientos independientes de merma.
-8. Requisiciones de compra en el modelo, servicio y vista web; su router API existe
-   pero actualmente no está montado en la aplicación (véase «Brechas conocidas»).
-9. Historial de movimientos, notificaciones en tiempo real y reportes Excel de
+8. Historial de movimientos, notificaciones en tiempo real y reportes Excel de
    inventario, compras, salidas, mermas, proveedores, clientes, personas, usuarios y
    movimientos.
 
@@ -59,6 +57,7 @@ El valor esperado es sustituir registros dispersos por flujos consistentes que:
 
 - Contabilidad, pagos, cobranza, facturación fiscal y conciliación bancaria.
 - Planeación de compras o reabastecimiento automático.
+- Requisiciones de compra; el módulo anterior fue retirado del código y del esquema.
 - Administración dinámica de la matriz de permisos desde la interfaz; la matriz está
   versionada en código.
 - Aplicación móvil nativa, operación sin conexión e integraciones públicas con ERP,
@@ -184,7 +183,7 @@ mismo commit el enunciado, la evidencia y la prueba CRUD correspondiente.
   catálogos indicados por Prisma y SKU de material, cuando existe, deben ser únicos.
 - **RD-02. Precisión.** Cantidades, existencias, dimensiones, costos e importes se
   almacenan como `Decimal(10,2)` y no como punto flotante de JavaScript.
-- **RD-03. Integridad.** Recepciones, salidas, requisiciones y movimientos deben
+- **RD-03. Integridad.** Recepciones, salidas y movimientos deben
   conservar sus relaciones de cabecera-detalle y claves foráneas.
 - **RD-04. Trazabilidad.** Correcciones, cancelaciones, devoluciones y ajustes se
   representan mediante registros relacionados; no deben sobrescribir o eliminar el
@@ -315,23 +314,19 @@ no haya acordado; esas definiciones permanecen como brechas.
 
 ## Brechas conocidas y decisiones pendientes
 
-1. **Requisiciones no expuestas por API.** Existe router, controlador, servicio, vista,
-   permisos y modelos de requisición, pero el montaje del router está comentado en
-   `src/app.js`. Se debe decidir si se reactiva y prueba como CRUD soportado o si se
-   retiran la vista y el código inalcanzable en un cambio planificado.
-2. **Proyectos sin CRUD.** `Project` participa en requisiciones y salidas, pero no tiene
+1. **Proyectos sin CRUD.** `Project` participa en salidas, pero no tiene
    rutas ni servicio de administración. Debe definirse su fuente de datos y responsable.
-3. **Catálogos parcialmente administrables.** Estados, roles, departamentos,
+2. **Catálogos parcialmente administrables.** Estados, roles, departamentos,
    presentaciones, unidades, motivos y estados de surtido se consultan, pero no todos
    tienen mantenimiento desde la aplicación. Debe decidirse cuáles son datos maestros
    administrados y cuáles pertenecen exclusivamente al seed.
-4. **Auditoría incompleta.** Algunos hechos registran `User` creador/aprobador, mientras
+3. **Auditoría incompleta.** Algunos hechos registran `User` creador/aprobador, mientras
    otros solo conservan una `Person` participante o marcas de tiempo. La ampliación de
    auditoría está detallada en `docs/database-users-and-permissions-analysis.md`.
-5. **Criterios de producto.** Faltan propietarios de negocio, metas cuantificables,
+4. **Criterios de producto.** Faltan propietarios de negocio, metas cuantificables,
    SLA, política de retención y recuperación, clasificación de datos y criterios de
    aceptación acordados con usuarios. Este documento no inventa esos compromisos.
-6. **Cobertura.** Persisten servicios sin cobertura CRUD completa; el inventario
+5. **Cobertura.** Persisten servicios sin cobertura CRUD completa; el inventario
    actualizado se mantiene en `docs/service-test-coverage.md`.
 
 ## Criterio para mantener este documento

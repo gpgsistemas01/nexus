@@ -139,7 +139,7 @@ export const createMaterialDatatable = async (context) => {
 
         const result = await notifications.showConfirmation({
             title: '¿Eliminar material de este proveedor?',
-            text: 'Se eliminará únicamente la relación entre el material y el proveedor mostrada en esta fila. Si es la última relación del material, también se eliminará el material. Esto solo es posible si el material no tiene historial de compras, salidas, requisiciones, mermas, movimientos ni ajustes de stock. El proveedor no se eliminará.',
+            text: 'Se eliminará únicamente la relación entre el material y el proveedor mostrada en esta fila. Si es la última relación del material, también se eliminará el material. Esto solo es posible si el material no tiene historial de compras, salidas, mermas, movimientos ni ajustes de stock. El proveedor no se eliminará.',
             icon: 'warning',
             confirmButtonText: 'Eliminar',
             cancelButtonText: 'Cancelar',

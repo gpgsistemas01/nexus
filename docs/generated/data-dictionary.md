@@ -220,51 +220,7 @@ usuarios y responsables se mantiene en el
 | `counter` | `Int` | Sí | — | `0` | — |
 | `year` | `Int` | Sí | — | `0` | — |
 
-## Compras, requisiciones e inventario de materiales
-
-### `PurchaseRequisition`
-
-| Campo | Tipo Prisma | Obligatorio | Claves | Predeterminado | Reglas Prisma/BD |
-| --- | --- | --- | --- | --- | --- |
-| `id` | `String` | Sí | PK | `dbgenerated("gen_random_uuid()")` | `@db.Uuid` |
-| `referenceNumber` | `String` | Sí | UK | — | `@db.VarChar(50)` |
-| `approveDate` | `DateTime?` | No | — | — | — |
-| `requestDate` | `DateTime` | Sí | — | — | — |
-| `deliveryDate` | `DateTime?` | No | — | — | — |
-| `observations` | `String?` | No | — | — | `@db.VarChar(500)` |
-| `statusId` | `String` | Sí | FK | — | `@db.Uuid` |
-| `departmentId` | `String` | Sí | FK | — | `@db.Uuid` |
-| `approverId` | `String?` | No | FK | — | `@db.Uuid` |
-| `deliveredById` | `String?` | No | FK | — | `@db.Uuid` |
-| `requesterId` | `String` | Sí | FK | — | `@db.Uuid` |
-| `projectId` | `String` | Sí | FK | — | `@db.Uuid` |
-| `createdAt` | `DateTime` | Sí | — | `now()` | — |
-| `updatedAt` | `DateTime` | Sí | — | — | `@updatedAt` |
-
-| Relación Prisma | Destino | Campos FK | Cardinalidad desde este modelo |
-| --- | --- | --- | --- |
-| `department` | `Department` | `departmentId` | Exactamente uno |
-| `approver` | `Person` | `approverId` | Cero o uno |
-| `deliveredBy` | `Person` | `deliveredById` | Cero o uno |
-| `requester` | `Person` | `requesterId` | Exactamente uno |
-| `status` | `Status` | `statusId` | Exactamente uno |
-| `project` | `Project` | `projectId` | Exactamente uno |
-
-### `PurchaseRequisitionDetail`
-
-| Campo | Tipo Prisma | Obligatorio | Claves | Predeterminado | Reglas Prisma/BD |
-| --- | --- | --- | --- | --- | --- |
-| `id` | `String` | Sí | PK | `dbgenerated("gen_random_uuid()")` | `@db.Uuid` |
-| `materialId` | `String` | Sí | FK | — | `@db.Uuid` |
-| `purchaseRequisitionId` | `String` | Sí | FK | — | `@db.Uuid` |
-| `quantity` | `Decimal` | Sí | — | — | `@db.Decimal(18, 6)` |
-| `createdAt` | `DateTime` | Sí | — | `now()` | — |
-| `updatedAt` | `DateTime` | Sí | — | — | `@updatedAt` |
-
-| Relación Prisma | Destino | Campos FK | Cardinalidad desde este modelo |
-| --- | --- | --- | --- |
-| `purchaseRequisition` | `PurchaseRequisition` | `purchaseRequisitionId` | Exactamente uno |
-| `material` | `Material` | `materialId` | Exactamente uno |
+## Compras e inventario de materiales
 
 ### `GoodsReceipt`
 

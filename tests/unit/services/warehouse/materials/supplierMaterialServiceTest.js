@@ -46,6 +46,9 @@ describe('listado del CRUD de materiales', () => {
     });
     expect(materialFindMany.mock.calls[0][0].where).not.toHaveProperty('supplierMaterials');
     expect(materialFindMany.mock.calls[0][0].where).not.toHaveProperty('NOT');
+    expect(materialFindMany.mock.calls[0][0].where.AND).not.toContainEqual(
+      { purchaseRequisitionsDetails: { none: {} } }
+    );
     expect(result.data[0].canDelete).toBe(true);
   });
 
@@ -63,5 +66,8 @@ describe('listado del CRUD de materiales', () => {
       },
       select: { id: true }
     });
+    expect(materialFindFirst.mock.calls[0][0].where.OR).not.toContainEqual(
+      { purchaseRequisitionsDetails: { some: {} } }
+    );
   });
 });

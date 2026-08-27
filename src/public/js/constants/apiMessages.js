@@ -206,7 +206,7 @@ export const errorMessages = {
     MATERIAL_CREATE_DB_ERROR: 'Error de base de datos al crear el material.',
     MATERIAL_UPDATE_DB_ERROR: 'Error de base de datos al editar el material.',
     MATERIAL_DELETE_DB_ERROR: 'Error de base de datos al eliminar la relación entre el material y el proveedor.',
-    MATERIAL_DELETE_RELATION_CONFLICT: 'No se puede eliminar la relación entre el material y el proveedor porque el material tiene historial de compras, salidas, requisiciones, mermas, movimientos o ajustes de stock.',
+    MATERIAL_DELETE_RELATION_CONFLICT: 'No se puede eliminar la relación entre el material y el proveedor porque el material tiene historial de compras, salidas, mermas, movimientos o ajustes de stock.',
     WASTE_DELETE_DB_ERROR: 'Error de base de datos al eliminar la merma.',
     MATERIAL_SNAPSHOT_FIND_DB_ERROR: 'Error de base de datos al buscar los datos históricos del material.',
     MATERIAL_STOCK_UPDATE_DB_ERROR: 'Error de base de datos al editar el stock del material.',

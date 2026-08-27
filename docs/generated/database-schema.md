@@ -145,34 +145,10 @@ erDiagram
     Material ||--o{ SupplierMaterial : "material"
 ```
 
-## Compras, requisiciones e inventario de materiales
+## Compras e inventario de materiales
 
 ```mermaid
 erDiagram
-    PurchaseRequisition {
-        String id PK
-        String referenceNumber UK
-        DateTime approveDate
-        DateTime requestDate
-        DateTime deliveryDate
-        String observations
-        String statusId FK
-        String departmentId FK
-        String approverId FK
-        String deliveredById FK
-        String requesterId FK
-        String projectId FK
-        DateTime createdAt
-        DateTime updatedAt
-    }
-    PurchaseRequisitionDetail {
-        String id PK
-        String materialId FK
-        String purchaseRequisitionId FK
-        Decimal quantity
-        DateTime createdAt
-        DateTime updatedAt
-    }
     GoodsReceipt {
         String id PK
         String invoice
@@ -350,7 +326,6 @@ erDiagram
         DateTime createdAt
         DateTime updatedAt
     }
-    PurchaseRequisition ||--o{ PurchaseRequisitionDetail : "purchaseRequisition"
     GoodsReceipt ||--o{ GoodsReceiptDetail : "goodsReceipt"
     GoodsReceipt ||--o{ GoodsReceiptDetailChange : "goodsReceipt"
     GoodsReceiptDetail ||--o{ GoodsReceiptDetailChange : "goodsReceiptDetail"

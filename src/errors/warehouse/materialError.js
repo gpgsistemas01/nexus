@@ -78,7 +78,7 @@ export class MaterialDeleteRelationConflict extends AppError {
 
     constructor () {
         super(
-            'No se puede eliminar la relación entre el material y el proveedor porque el material tiene historial de compras, salidas, requisiciones, mermas, movimientos o ajustes de stock.',
+            'No se puede eliminar la relación entre el material y el proveedor porque el material tiene historial de compras, salidas, mermas, movimientos o ajustes de stock.',
             'MATERIAL_DELETE_RELATION_CONFLICT',
             409
         );

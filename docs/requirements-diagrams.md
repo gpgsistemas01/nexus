@@ -13,7 +13,7 @@ un propósito, alcance, semántica y fuente de verdad definidos.
 ## Casos de uso funcionales por actor
 
 Las flechas continuas representan capacidades disponibles; la línea discontinua indica
-un caso modelado cuyo flujo todavía está pendiente. Cada caso se detalla mediante uno o
+un flujo parcial o todavía pendiente. Cada caso se detalla mediante uno o
 más requisitos `RF` en la especificación, sin convertir este mapa en un inventario de
 endpoints.
 
@@ -22,10 +22,8 @@ flowchart LR
     warehouse["Personal de almacén"]
     sales["Ventas / asesoría"]
     admin["Administración"]
-    approver["Solicitante / aprobador"]
     subgraph inventory["Inventario y abastecimiento"]
         catalogs["Gestionar materiales,<br/>presentaciones y proveedores"]
-        requisitions["Modelar requisiciones<br/>(flujo web/API pendiente)"]
         receipts["Registrar y corregir<br/>entradas de compra"]
         issues["Registrar salidas,<br/>entregas y devoluciones"]
         wastes["Gestionar existencias,<br/>salidas y devoluciones de merma"]
@@ -43,8 +41,6 @@ flowchart LR
     warehouse --> issues
     warehouse --> wastes
     warehouse -.->|"parcial"| adjustments
-    approver -.->|"pendiente"| requisitions
-    approver --> issues
     sales --> clients
     sales -.->|"pendiente"| projects
     sales --> issues

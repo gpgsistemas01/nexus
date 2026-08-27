@@ -40,14 +40,14 @@ alineación sin renombrar silenciosamente contratos existentes.
 | Existencia | Cantidad disponible de un recurso en un contexto identificable. | `stock` es el nombre técnico aceptado; toda modificación debe quedar explicada por un movimiento o ajuste permitido. |
 | Merma | Existencia reutilizable o residual vinculada a una oferta proveedor-material y, cuando aplica, dimensiones propias. | En código aparece como `Waste`; no significa eliminación física ni salida de merma. |
 | Cliente | Organización o contexto comercial receptor de una salida. Puede tener un asesor asociado. | No es lo mismo que proyecto. |
-| Proyecto | Contexto de trabajo identificable que puede relacionar requisiciones y salidas. | Está modelado, pero su CRUD completo permanece pendiente. |
+| Proyecto | Contexto de trabajo identificable que puede relacionarse con salidas. | Está modelado, pero su CRUD completo permanece pendiente. |
 
 ## Documentos y trazabilidad de inventario
 
 | Término canónico | Definición compartida | Alias o distinción importante |
 | --- | --- | --- |
-| Documento operativo | Encabezado y detalles que registran una intención o hecho de inventario con referencia y estado. | Entrada, salida, requisición y ajuste tienen reglas propias; compartir estructura no iguala sus transiciones. |
-| Requisición de compra | Solicitud de materiales asociada con solicitante, departamento, proyecto y eventual aprobación/entrega. | Está modelada; no debe anunciarse como CRUD disponible. |
+| Documento operativo | Encabezado y detalles que registran una intención o hecho de inventario con referencia y estado. | Entrada, salida y ajuste tienen reglas propias; compartir estructura no iguala sus transiciones. |
+| Requisición de compra | Solicitud planificada de materiales con eventual aprobación y entrega. | No forma parte del código ni del esquema vigente; requiere un nuevo alcance antes de reimplementarse. |
 | Entrada de compra | Recepción de materiales de un proveedor que incrementa existencias y genera trazabilidad de movimiento. | En código se denomina `GoodsReceipt`; «compra» en la UI no sustituye la recepción efectiva. |
 | Salida de material | Documento que solicita y suministra materiales a un cliente/proyecto, con posibilidad de devolución. | En código se denomina `GoodsIssue`. |
 | Salida de merma | Documento que solicita y suministra existencias de merma, con posibilidad de devolución. | Reutiliza el patrón de salida, pero conserva stock y movimientos de merma separados. |
@@ -67,7 +67,7 @@ alineación sin renombrar silenciosamente contratos existentes.
 
 | Término canónico | Definición compartida | Regla de uso |
 | --- | --- | --- |
-| Cantidad solicitada | Cantidad registrada como objetivo en un detalle de salida o requisición. | Es la base para validar acumulados de suministro y devolución. |
+| Cantidad solicitada | Cantidad registrada como objetivo en un detalle de salida. | Es la base para validar acumulados de suministro y devolución. |
 | Cantidad suministrada | Acumulado efectivamente entregado para un detalle. | No puede quedar incompatible con cantidad solicitada y devoluciones. |
 | Cantidad devuelta | Acumulado reingresado después de un suministro. | Cada incremento requiere trazabilidad con su movimiento de reversa. |
 | Cantidad convertida | Cantidad expresada mediante la conversión definida por el contexto del material o merma. | Debe nombrarse junto con la unidad o regla de conversión aplicable. |

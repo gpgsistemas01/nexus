@@ -42,7 +42,7 @@ permiso se agrupan. Los valores de permiso son los declarados en
 | Salidas / merma | `L, C, U documento/encabezado → waste:issues-manage`; suministrar detalles y devolver `→ waste:issues-supply`; exportar `→ warehouse:reports-read` | Implementado |
 | Inventario / movimientos | `L material y merma → movements:read`; exportar `→ admin:reports-read` | Implementado sólo consulta |
 | Inventario / ajustes de material y merma | Sin rutas API completas; existen modelos y servicios parciales para crear, aprobar/aplicar y cancelar | Parcial |
-| Abastecimiento / requisiciones | Sin rutas API; existen modelos y permisos `purchase:requisitions-manage` y `purchase:requisitions-status-manage` | Modelado |
+| Abastecimiento / requisiciones | Módulo retirado del código y del esquema vigente; requiere un nuevo alcance antes de reimplementarse | Fuera del alcance actual |
 
 La autenticación es transversal y no se fuerza dentro del CRUD de un módulo: iniciar
 sesión, consultar la sesión y renovar credenciales tienen rutas API; cerrar sesión se
