@@ -16,7 +16,7 @@ const SOURCE_AREAS = [
 const DATABASE_AREAS = [
     ['Identidad, acceso y auditoría', ['Department', 'Role', 'User', 'Person', 'UserRoleDepartment', 'PersonRoleDepartment', 'CriticalWriteAudit']],
     ['Catálogos y relaciones comerciales', ['Status', 'FulfillmentStatus', 'Project', 'Client', 'Supplier', 'Material', 'UnitMeasure', 'Presentation', 'SupplierMaterial', 'ReferenceNumberCounter']],
-    ['Compras, requisiciones e inventario de materiales', ['PurchaseRequisition', 'PurchaseRequisitionDetail', 'GoodsReceipt', 'GoodsReceiptDetail', 'GoodsReceiptDetailChange', 'GoodsIssue', 'GoodsIssueDetail', 'GoodsIssueReturn', 'InventoryMovement', 'MovementDetail', 'StockAdjustment', 'StockAdjustmentDetail', 'StockAdjustmentReason']],
+    ['Compras e inventario de materiales', ['GoodsReceipt', 'GoodsReceiptDetail', 'GoodsReceiptDetailChange', 'GoodsIssue', 'GoodsIssueDetail', 'GoodsIssueReturn', 'InventoryMovement', 'MovementDetail', 'StockAdjustment', 'StockAdjustmentDetail', 'StockAdjustmentReason']],
     ['Mermas e inventario de merma', ['Waste', 'WasteIssue', 'WasteIssueDetail', 'WasteIssueReturn', 'WasteMovement', 'WasteMovementDetail', 'WasteStockAdjustment', 'WasteStockAdjustmentDetail']]
 ];
 
@@ -187,6 +187,17 @@ const renderEntity = (name, model) => [
     '    }'
 ].join('\n');
 
+const validateDatabaseAreas = (models) => {
+    const documented = new Set(DATABASE_AREAS.flatMap(([, names]) => names));
+    const undocumented = [...models.keys()].filter((name) => !documented.has(name));
+    const removed = [...documented].filter((name) => !models.has(name));
+    const errors = [
+        undocumented.length ? `Modelos Prisma sin área documental: ${undocumented.join(', ')}` : '',
+        removed.length ? `Modelos documentales ausentes del esquema Prisma: ${removed.join(', ')}` : ''
+    ].filter(Boolean);
+    if (errors.length) throw new Error(errors.join('. '));
+};
+
 const markdownValue = (value) => value ? `\`${value.replaceAll('|', '\\|')}\`` : '—';
 
 const getAttributeCall = (attributes, attribute) => {
@@ -239,9 +250,7 @@ const renderDataDictionaryModel = (name, model) => {
 
 const generateDatabaseSchema = async () => {
     const models = parsePrismaModels(await readFile(path.join(ROOT, 'prisma/schema.prisma'), 'utf8'));
-    const documented = new Set(DATABASE_AREAS.flatMap(([, names]) => names));
-    const missing = [...models.keys()].filter((name) => !documented.has(name));
-    if (missing.length) throw new Error(`Modelos Prisma sin área documental: ${missing.join(', ')}`);
+    validateDatabaseAreas(models);
     const diagrams = DATABASE_AREAS.map(([title, names]) => {
         const selected = new Set(names);
         const entities = names.map((name) => renderEntity(name, models.get(name))).join('\n');
@@ -279,6 +288,7 @@ para las relaciones transversales y las reglas \`onDelete\`/\`onUpdate\`.
 const generateDataDictionary = async () => {
     const schema = await readFile(path.join(ROOT, 'prisma/schema.prisma'), 'utf8');
     const models = parsePrismaModels(schema);
+    validateDatabaseAreas(models);
     const sections = DATABASE_AREAS.map(([title, names]) => (
         `## ${title}\n\n${names.map((name) => renderDataDictionaryModel(name, models.get(name))).join('\n\n')}`
     )).join('\n\n');
