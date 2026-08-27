@@ -8,6 +8,12 @@ el mes actual de México de forma predeterminada. El parámetro opcional `report
 con formato `AAAA-MM`, permite consultar un mes calendario específico; un valor
 ausente o inválido conserva el comportamiento seguro del mes actual.
 
+La interfaz conserva **Mes actual** como opción explícita porque es el caso de uso
+principal y evita una selección innecesaria. **Otro mes** habilita un selector mensual
+Flatpickr —con valor contractual `AAAA-MM`— y **Personalizado** reutiliza los filtros
+aplicados al listado; así no se mezclan un periodo calendario completo y un reporte
+filtrado.
+
 ## Decisión
 
 **Sí conviene adoptar OpenAPI, pero Swagger no sustituye la documentación de

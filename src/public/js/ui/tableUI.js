@@ -1,5 +1,6 @@
 import { DOM_EVENT_NAMES } from '../constants/events.js';
 import { notifications } from "../plugins/swal/swalComponent.js";
+import { initMonthPickers, setMonthPickerDisabled } from '../plugins/flatpickr/dateTimePicker.js';
 import { getTimeZoneDateTimeParts } from '../utils/timeZone.js';
 
 const getCurrentMexicoMonth = () => {
@@ -55,7 +56,7 @@ export const buildExcelButton = ({
                                 <label class="form-check-label" for="specificMonthReportRadio">
                                     Otro mes
                                 </label>
-                                <input class="form-control mt-2" type="month" id="reportMonth" value="${ getCurrentMexicoMonth() }" disabled>
+                                <input class="form-control mt-2 js-flatpickr-month" type="text" id="reportMonth" value="${ getCurrentMexicoMonth() }" disabled aria-label="Mes del reporte">
                             </div>
                             <div class="form-check report-export-option">
                                 <input class="form-check-input" type="radio" name="reportType" id="customReportRadio" value="custom">
@@ -79,9 +80,10 @@ export const buildExcelButton = ({
                     },
                     didOpen: () => {
                         const monthInput = document.querySelector('#reportMonth');
+                        initMonthPickers();
                         document.querySelectorAll('input[name="reportType"]').forEach(input => {
                             input.addEventListener('change', () => {
-                                monthInput.disabled = input.value !== 'specificMonth' || !input.checked;
+                                setMonthPickerDisabled(monthInput, input.value !== 'specificMonth' || !input.checked);
                             });
                         });
                     },

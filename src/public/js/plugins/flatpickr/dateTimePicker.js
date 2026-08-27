@@ -2,6 +2,7 @@ import { createBrowserDateFromTimeZone, zonedDateTimeToUtcIso } from "../../util
 
 const FLATPICKR_DATE_TIME_SELECTOR = '.js-flatpickr-datetime';
 const FLATPICKR_DATE_SELECTOR = '.js-flatpickr-date';
+const FLATPICKR_MONTH_SELECTOR = '.js-flatpickr-month';
 const DISPLAY_DATE_TIME_REGEX = /^(\d{1,2})\/(\d{1,2})\/(\d{4})(?:\s+(\d{1,2}):(\d{2}))?$/;
 
 const getFlatpickrLocale = () => window.flatpickr?.l10ns?.es || 'es';
@@ -117,6 +118,45 @@ export const initDatePickers = (root = document) => {
 
             return instance;
         });
+};
+
+export const initMonthPickers = (root = document) => {
+
+    if (typeof window.flatpickr !== 'function' || typeof window.monthSelectPlugin !== 'function') return [];
+
+    return Array.from(root.querySelectorAll(FLATPICKR_MONTH_SELECTOR)).map((input) => {
+
+        if (input._flatpickr) {
+            syncFlatpickrAltInputDisabled(input._flatpickr);
+            return input._flatpickr;
+        }
+
+        const instance = window.flatpickr(input, {
+            altInput: true,
+            altFormat: 'F Y',
+            allowInput: false,
+            dateFormat: 'Y-m',
+            locale: getFlatpickrLocale(),
+            plugins: [window.monthSelectPlugin({
+                altFormat: 'F Y',
+                dateFormat: 'Y-m',
+                shorthand: false
+            })]
+        });
+
+        syncFlatpickrAltInputDisabled(instance);
+
+        return instance;
+    });
+};
+
+export const setMonthPickerDisabled = (input, disabled) => {
+
+    if (!input) return;
+
+    input.disabled = disabled;
+
+    if (input._flatpickr) syncFlatpickrAltInputDisabled(input._flatpickr);
 };
 
 export const setDateTimePickerValue = (input, value) => {
