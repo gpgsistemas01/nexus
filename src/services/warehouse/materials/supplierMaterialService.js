@@ -487,8 +487,6 @@ export const updateSupplierMaterialStock = async ({
 
     const psMap = new Map(supplierMaterials.map(ps => [buildStockKey(ps.materialId, ps.supplierId), ps]));
 
-    const operations = [];
-
     for (const [key, quantity] of grouped.entries()) {
 
         const { materialId, supplierId } = parseStockKey(key);
@@ -505,7 +503,8 @@ export const updateSupplierMaterialStock = async ({
 
         if (movementType !== INVENTORY_MOVEMENT_TYPES.ENTRY) {
 
-            const remainingStock = normalizeDecimal(Number(ps.currentStock ?? 0) - quantity);
+            const remainingStock = normalizeDecimal(Number(ps.currentStock ?? 0));
+            const hasDimensions = hasMaterialDimensions(ps.material);
 
             const result = await db.supplierMaterial.updateMany({
                 where: {
@@ -515,8 +514,8 @@ export const updateSupplierMaterialStock = async ({
                 },
                 data: {
                     currentStock: { decrement: quantity },
-                    convertedQuantity: remainingStock === 0
-                        ? 0
+                    convertedQuantity: !hasDimensions || remainingStock === 0
+                        ? remainingStock
                         : { decrement: convertedQuantity }
                 }
             });
