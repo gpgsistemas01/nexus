@@ -5,6 +5,7 @@ Nexus es una plataforma de control operativo para administrar inventario, compra
 ## Tabla de contenido
 
 - [Características principales](#características-principales)
+- [Visión, alcance y requisitos](#visión-alcance-y-requisitos)
 - [Stack técnico](#stack-técnico)
 - [Arquitectura del proyecto](#arquitectura-del-proyecto)
 - [Requisitos](#requisitos)
@@ -29,6 +30,17 @@ Nexus es una plataforma de control operativo para administrar inventario, compra
 - Notificaciones en tiempo real con Socket.IO.
 - Validación de contenido para API JSON, cargas de archivo y texto plano.
 - Pruebas unitarias e integrales con Vitest y Supertest.
+
+## Visión, alcance y requisitos
+
+La visión del producto, sus usuarios, el alcance vigente, los criterios para redactar
+requisitos verificables, los requisitos funcionales y de datos, los atributos de
+calidad y las brechas encontradas al contrastar documentación, código y Prisma se mantienen en
+[`docs/vision-scope-and-requirements.md`](docs/vision-scope-and-requirements.md).
+
+Ese documento describe el comportamiento implementado, no una promesa de funciones
+futuras. En particular, distingue las capacidades expuestas de los modelos o servicios
+que aún no tienen un flujo accesible completo.
 
 ## Stack técnico
 
@@ -247,6 +259,7 @@ Todas las rutas API cuelgan de `/api` y esperan `Content-Type: application/json`
 
 - `/api/auth`
 - `/api/sales/clients`
+- `/api/sales/reports`
 - `/api/warehouse/materials`
 - `/api/warehouse/wastes`
 - `/api/warehouse/suppliers`
@@ -261,7 +274,7 @@ Todas las rutas API cuelgan de `/api` y esperan `Content-Type: application/json`
 - `/api/admin/users`
 - `/api/admin/roles`
 - `/api/admin/departments`
-- `/api/admin/persons` (`/api/admin/persons` se conserva como alias de compatibilidad)
+- `/api/admin/persons` (`/api/admin/profiles` se conserva como alias de compatibilidad)
 - `/api/admin/movements`
 - `/api/admin/reports`
 
@@ -269,7 +282,12 @@ Todas las rutas API cuelgan de `/api` y esperan `Content-Type: application/json`
 
 Se mantiene un solo punto de creación de cliente Prisma en `src/lib/prisma.js`. En pruebas, Vitest ejecuta con `NODE_ENV=test`, por lo que el mismo resolver usa `DATABASE_TEST_URL` sin crear un segundo cliente.
 
-Las pruebas que escriban datos en la base deben ejecutarse dentro de una transacción y forzar rollback al terminar. Para esos casos existe `tests/helpers/rollbackTransaction.js`, que recibe el cliente Prisma y ejecuta el cuerpo de la prueba con el `tx` transaccional, revirtiendo los cambios al finalizar para no persistir datos de prueba.
+Las pruebas que escriben datos usan exclusivamente la base indicada por
+`DATABASE_TEST_URL` y limpian sus registros identificables antes y después de la suite.
+Cuando un flujo acepta el cliente transaccional sin sustituir el comportamiento que se
+quiere probar, puede reutilizarse `tests/helpers/rollbackTransaction.js` para forzar
+rollback. La estrategia y ubicación de cada tipo de prueba están detalladas en
+[`docs/service-test-coverage.md`](docs/service-test-coverage.md).
 
 Flujo recomendado para automatización independiente:
 
@@ -303,7 +321,7 @@ El repositorio incluye `Dockerfile` y `docker-compose.yml`. Al iniciar el conten
 La selección no depende de que ambas URLs tengan nombres o hosts parecidos:
 
 1. El proceso de arranque exige que `DIRECT_URL` esté definida. Si falta, termina con código de error y **no** inicia la aplicación. El despliegue Docker no utiliza las variables de prueba.
-2. El entrypoint fija `NODE_ENV=materialion` para todo el contenedor y `prisma.config.ts` llama al resolver con `preferDirectUrl: true`; por lo tanto, `prisma migrate deploy` siempre recibe `DIRECT_URL`, aunque el contenedor haya recibido accidentalmente otro valor de `NODE_ENV`.
+2. El entrypoint fija `NODE_ENV=production` para todo el contenedor y `prisma.config.ts` llama al resolver con `preferDirectUrl: true`; por lo tanto, `prisma migrate deploy` siempre recibe `DIRECT_URL`, aunque el contenedor haya recibido accidentalmente otro valor de `NODE_ENV`.
 3. La aplicación crea su cliente sin esa opción y, como el contenedor permanece en producción, recibe `DATABASE_URL`.
 
 El entrypoint nunca imprime la URL ni sus credenciales. Los logs indican el **nombre de la variable** elegida y confirman el éxito únicamente cuando Prisma devuelve código `0`:
