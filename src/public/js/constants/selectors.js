@@ -38,7 +38,6 @@ export const FORM_SELECTORS = {
     LOGIN: '#loginForm',
     MATERIAL: '#materialForm',
     PERSON: '#personForm',
-    PURCHASE_REQUISITION: '#purchaseRequisitionForm',
     SUPPLIER: '#supplierForm',
     USER: '#userForm',
     WASTE: '#wasteForm',

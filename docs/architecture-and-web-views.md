@@ -146,7 +146,6 @@ flowchart LR
     subgraph warehouse["Almacén"]
         materials
         wastes["Mermas<br/>/almacen/mermas"]
-        requisitions["Requisiciones<br/>/requisiciones"]
         purchases["Registro de compras<br/>/compras"]
         goodsIssues["Salidas de almacén<br/>/salidas/materiales"]
         wasteIssues["Salidas de mermas<br/>/salidas/mermas"]
@@ -165,8 +164,7 @@ flowchart LR
     end
 
     materials --> wastes
-    materials --> requisitions
-    requisitions --> purchases
+    materials --> purchases
     purchases --> goodsIssues
     goodsIssues --> materialMovements
     wastes --> wasteIssues
@@ -185,7 +183,6 @@ flowchart LR
 | Acceso | Inicio de sesión (`/inicio-sesion`) | Autenticar una cuenta. | Capturar credenciales e iniciar sesión. | `src/views/pages/home/login/loginPage.ejs` |
 | Almacén | Existencias (`/almacen/materiales`) | Consultar materiales y stock. | Filtrar, paginar y abrir el alta/edición de material. | `src/views/pages/warehouse/materials/materialsPage.ejs` |
 | Almacén | Mermas (`/almacen/mermas`) | Consultar y administrar existencias de merma. | Filtrar, registrar/editar y ajustar stock. | `src/views/pages/warehouse/wastes/wastesPage.ejs` |
-| Almacén | Requisiciones (`/requisiciones`) | Consultar y capturar requisiciones de compra. | Registrar requisición y sus detalles. | `src/views/pages/warehouse/purchaseRequisitions/purchaseRequisitionsPage.ejs` |
 | Almacén | Registro de compras (`/compras`) | Consultar y registrar entradas de compra. | Filtrar, registrar compra, materiales/proveedores y corregir detalles. | `src/views/pages/warehouse/goodsReceipts/goodsReceiptsPage.ejs` |
 | Almacén | Salidas de almacén (`/salidas/materiales`) | Consultar y registrar entregas de materiales. | Filtrar, registrar salida, seleccionar cliente y devolver detalles. | `src/views/pages/warehouse/goodsIssues/goodsIssuesPage.ejs` |
 | Almacén | Salidas de mermas (`/salidas/mermas`) | Consultar y registrar salidas de merma. | Registrar, editar, surtir y devolver detalles de merma. | `src/views/pages/warehouse/wasteIssues/wasteIssuesPage.ejs` |

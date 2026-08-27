@@ -175,13 +175,6 @@ export const issueReturnValidation = {
 
 export const goodsIssueReturnValidation = issueReturnValidation;
 
-export const purchaseRequisitionValidation = {
-    projectId: (value) => isEmptyOrNull(value, 'El proyecto'),
-    observations: (value) => validateTextOptional(value, 500, 'Las observaciones'),
-    requestDate: (value) => validateDate(value, 'La fecha de solicitud'),
-    details: validateGoodsReceiptDetailsArray
-};
-
 export const clientValidation = {
     name: (value) => validateText({
         name: value,

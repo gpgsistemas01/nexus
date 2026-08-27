@@ -47,7 +47,6 @@ flowchart LR
     end
 
     subgraph documents["Documentos operativos"]
-        requisition["Requisición de compra<br/>modelada, flujo pendiente"]
         receipt["Entrada de compra"]
         goodsIssue["Salida de material"]
         wasteIssue["Salida de merma"]
@@ -61,8 +60,6 @@ flowchart LR
         reference["Referencia documental"]
     end
 
-    person --> requisition
-    project --> requisition
     supplier --> receipt
     client --> goodsIssue
     person --> goodsIssue

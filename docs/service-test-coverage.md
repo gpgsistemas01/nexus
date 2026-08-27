@@ -4,21 +4,18 @@ Este documento resume qué servicios ya tienen pruebas y qué falta cubrir a niv
 
 ## Servicios con pruebas actuales
 
-La suite ya cubre:
+La cobertura vigente se divide así:
 
-- `src/services/inventory/stockHelpers.js`: pruebas unitarias de cálculos y validaciones de stock.
-- `src/services/warehouse/goodsIssues/goodsIssueHelpers.js`: pruebas unitarias de helpers de salidas.
-- `src/services/warehouse/goodsReceipts/goodsReceiptHelpers.js`: pruebas unitarias de helpers de entradas.
-- `src/services/warehouse/materials/supplierMaterialService.js`: pruebas unitarias de consultas bulk/actualizaciones SQL.
-- `src/services/warehouse/reportService.js` y `src/services/inventory/reportService.js`: pruebas unitarias de mapeo de reportes, normalización numérica y reenvío de filtros hacia servicios base.
-- `src/services/sales/clientService.js`: pruebas unitarias de GET/submit y prueba de integración directa con BD para crear, listar, consultar y actualizar clientes.
-- `src/services/warehouse/supplierService.js`: pruebas unitarias de GET/submit y prueba de integración directa con BD para crear, listar, consultar código y actualizar proveedores. Esta integración cubre la transacción de creación que incrementa el contador `PRO` y guarda el proveedor.
-- `src/services/admin/userService.js`: pruebas unitarias de GET/listado/login/sesión y submit de crear/actualizar/cambiar contraseña; además tiene integración directa con BD para crear, listar, actualizar y cambiar contraseña con relaciones reales.
-- `src/services/admin/personService.js`: pruebas unitarias de GET/listado/persona por usuario y submit de crear/actualizar; además tiene integración directa con BD para crear y actualizar personas con departamentos reales.
-- `src/services/admin/departmentService.js` y `src/services/admin/roleService.js`: pruebas unitarias de GET/listado, y cobertura de integración directa vía catálogos.
-- `src/services/document/referenceNumberService.js`: pruebas unitarias de incremento y generación de referencias.
-- `src/services/warehouse/materials/materialService.js`: pruebas unitarias de GET/listado/snapshot/existencia y submit de ajuste de stock; además tiene integración directa para `createMaterial`, `updateMaterial` y `updateMaterialStock` atravesando relaciones proveedor-material, `adjustmentService`, `movementService` y `supplierMaterialService` con datos reales.
-- `src/services/warehouse/presentationService.js`, `unitMeasureService`, `fulfillmentStatusService` y `reasonService`: pruebas unitarias de GET/listado, y cobertura de integración directa vía catálogos.
+- Las reglas unitarias de servicios están bajo `tests/unit/services`. Incluyen identidad
+  y consulta de movimientos, relaciones proveedor-material, reportes y helpers del
+  dominio de mermas.
+- Los controllers de salidas de material, salidas de merma, materiales, mermas y
+  reportes tienen pruebas unitarias bajo `tests/unit/controllers/api/warehouse`.
+- Las integraciones HTTP con Prisma están bajo `tests/integration/controllers` y
+  cubren catálogos auxiliares, clientes, proveedores y el CRUD de salidas de merma.
+- Los componentes compartidos del CRUD cliente se prueban bajo
+  `tests/unit/public/js`; cada contexto conserva únicamente las pruebas de la
+  configuración o regla que le pertenece.
 
 ## Estrategia de integración con BD
 
@@ -26,11 +23,12 @@ Las pruebas de integración se ejecutan contra `DATABASE_TEST_URL`, guardan info
 
 ### Ubicación y patrón para pruebas nuevas
 
-- Las unitarias deben replicar la ruta del módulo bajo `tests/` (por ejemplo,
+- Las unitarias deben replicar la ruta del módulo bajo `tests/unit/` (por ejemplo,
   `src/services/warehouse/materials/materialService.js` se prueba en
-  `tests/services/warehouse/materials/materialServiceTest.js`).
-- Las integraciones CRUD de servicios deben ubicarse en
-  `tests/integration/services/<dominio>DbTest.js` y usar el sufijo `DbTest.js`.
+  `tests/unit/services/warehouse/materials/materialServiceTest.js`).
+- Las integraciones CRUD HTTP deben ubicarse en
+  `tests/integration/controllers/<dominio>ControllerDbTest.js` y usar el sufijo
+  `DbTest.js`.
 - Cada integración CRUD debe verificar, según las operaciones públicas del servicio:
   creación persistida, consulta por id/listado, actualización, desactivación o borrado
   cuando exista, relaciones obligatorias y al menos una regla de rechazo relevante.
@@ -45,25 +43,27 @@ Para confirmar si una corrida realmente modifica la base de pruebas, hay que rev
 
 1. Ejecutar `npm run test:db`, no sólo `npm test`. El script de BD valida `DATABASE_TEST_URL`, aplica migraciones con `NODE_ENV=test` y luego corre Vitest; `npm test` puede servir para unitarias, pero las integraciones con BD se saltan si no existe `DATABASE_TEST_URL` o si no está generado `generated/prisma/client.ts`.
 2. Definir `DATABASE_TEST_URL` con una base distinta a `DATABASE_URL`. `tests/setupTestDatabaseEnv.js` invoca la validación cuando existe alguna URL de base, y `scripts/verifyTestDatabaseEnv.js` falla si falta la URL de pruebas o si ambas URLs normalizadas apuntan al mismo destino.
-3. Verificar que los archivos `tests/integration/services/*DbTest.js` no aparezcan como `skipped`. Esos archivos usan `describe.skip` cuando falta `DATABASE_TEST_URL` o el cliente generado de Prisma; cuando sí corren, hacen `create`, `update`, `deleteMany` y lecturas reales mediante `src/lib/prisma.js`.
+3. Verificar que los archivos `tests/integration/controllers/*DbTest.js` no aparezcan
+   como `skipped`. Cuando corren, ejercitan HTTP, escrituras y lecturas reales mediante
+   `src/lib/prisma.js`.
 4. Recordar que el cambio puede no quedar visible al final: cada integración limpia sus datos de prueba al iniciar y el teardown global vuelve a borrar registros con prefijos de integración. Que no queden registros persistidos después de la suite no significa que no se hayan escrito durante la prueba.
 
 ## Pendientes importantes
 
-No quedan servicios CRUD transaccionales identificados sin al menos una integración directa con BD. Al agregar operaciones nuevas, se debe ampliar la suite del dominio existente antes de crear un flujo de pruebas paralelo.
+Las integraciones de salidas de material, entradas de compra, materiales, personas y
+usuarios todavía deben incorporarse o recuperarse siguiendo las prioridades de
+`docs/test-plan.md`. Al modificar uno de esos CRUD se debe ampliar la suite de su
+dominio, sin crear un flujo paralelo que duplique el camino feliz.
 
 El módulo de requisiciones de compra fue retirado del frontend, backend y esquema vigente. La migración de retiro elimina sus tablas y el contador de folios `REQ`; por ello no debe agregarse cobertura nueva ni reutilizarse ese flujo en otros dominios.
 
 ## Dependencias entre dominios
 
-Cuando un servicio usa otro servicio de otro dominio, no se duplica la misma prueba unitaria en ambos lugares. Esos casos deben cubrirse como integración del flujo completo:
-
-- `materialService.updateMaterialStock` delega en `adjustmentService.createStockAdjustment`; su cobertura se registra en `stockAdjustmentDbTest.js`.
-- `wasteService` y `goodsIssueService` comparten stock, proveedor-material, personas,
-  cliente y movimientos; la cobertura actualmente disponible de ese flujo se registra
-  en `goodsIssueDbTest.js`.
-- `goodsReceiptService` comparte stock, proveedor-material y movimientos; su cobertura cruzada se registra en `goodsReceiptServiceDbTest.js`.
-- `notificationService` debe probarse como integración cuando el objetivo sea validar datos reales generados por otros servicios; reportes ya tienen unitarias de mapeo y pueden complementarse con integración si se requiere validar datos exportados end-to-end.
+Cuando un servicio usa otro dominio, no se duplica la misma prueba unitaria. El efecto
+se demuestra en la integración HTTP propietaria. Por ejemplo,
+`wasteIssueControllerDbTest.js` comprueba conjuntamente documento, detalles, stock,
+movimientos, devoluciones y rollback de una salida de merma. Los flujos todavía no
+cubiertos deben aplicar el mismo criterio al incorporarse.
 
 ## Implicación para CI
 
