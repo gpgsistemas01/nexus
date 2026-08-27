@@ -1,5 +1,12 @@
 import { DOM_EVENT_NAMES } from '../constants/events.js';
 import { notifications } from "../plugins/swal/swalComponent.js";
+import { getTimeZoneDateTimeParts } from '../utils/timeZone.js';
+
+const getCurrentMexicoMonth = () => {
+    const { year, month } = getTimeZoneDateTimeParts(new Date());
+
+    return `${ year }-${ String(month).padStart(2, '0') }`;
+};
 
 export const buildTableExportParams = (table, params = {}) => {
 
@@ -28,7 +35,8 @@ export const buildExcelButton = ({
 
         try {
 
-            let reportType = 'custom';
+            let reportType = allowMonthlyReport ? 'monthly' : 'custom';
+            let reportMonth = '';
 
             if (allowMonthlyReport) {
                 const result = await Swal.fire({
@@ -37,15 +45,22 @@ export const buildExcelButton = ({
                         <div class="text-start report-export-options">
                             <p class="mb-3">Selecciona el alcance del reporte que deseas descargar.</p>
                             <div class="form-check mb-2 report-export-option">
-                                <input class="form-check-input" type="radio" name="reportType" id="customReportRadio" value="custom" checked>
-                                <label class="form-check-label" for="customReportRadio">
-                                    Personalizado: usar filtros aplicados
+                                <input class="form-check-input" type="radio" name="reportType" id="monthlyReportRadio" value="monthly" checked>
+                                <label class="form-check-label" for="monthlyReportRadio">
+                                    Mes actual
                                 </label>
                             </div>
+                            <div class="form-check mb-2 report-export-option">
+                                <input class="form-check-input" type="radio" name="reportType" id="specificMonthReportRadio" value="specificMonth">
+                                <label class="form-check-label" for="specificMonthReportRadio">
+                                    Otro mes
+                                </label>
+                                <input class="form-control mt-2" type="month" id="reportMonth" value="${ getCurrentMexicoMonth() }" disabled>
+                            </div>
                             <div class="form-check report-export-option">
-                                <input class="form-check-input" type="radio" name="reportType" id="monthlyReportRadio" value="monthly">
-                                <label class="form-check-label" for="monthlyReportRadio">
-                                    Mensual: todos los registros del mes actual
+                                <input class="form-check-input" type="radio" name="reportType" id="customReportRadio" value="custom">
+                                <label class="form-check-label" for="customReportRadio">
+                                    Personalizado: usar filtros aplicados
                                 </label>
                             </div>
                         </div>
@@ -62,15 +77,37 @@ export const buildExcelButton = ({
                         confirmButton: 'btn btn-primary',
                         cancelButton: 'btn btn-outline-primary report-export-cancel-button ms-2'
                     },
-                    preConfirm: () => document.querySelector('input[name="reportType"]:checked')?.value || 'custom'
+                    didOpen: () => {
+                        const monthInput = document.querySelector('#reportMonth');
+                        document.querySelectorAll('input[name="reportType"]').forEach(input => {
+                            input.addEventListener('change', () => {
+                                monthInput.disabled = input.value !== 'specificMonth' || !input.checked;
+                            });
+                        });
+                    },
+                    preConfirm: () => {
+                        const type = document.querySelector('input[name="reportType"]:checked')?.value || 'monthly';
+                        const month = document.querySelector('#reportMonth')?.value || '';
+
+                        if (type === 'specificMonth' && !month) {
+                            Swal.showValidationMessage('Selecciona el mes que deseas exportar.');
+                            return false;
+                        }
+
+                        return { type, month };
+                    }
                 });
 
                 if (!result.isConfirmed) return;
 
-                reportType = result.value;
+                reportType = result.value.type;
+                reportMonth = reportType === 'specificMonth' ? result.value.month : '';
             }
 
-            const blob = await request({ monthlyReport: reportType === 'monthly' });
+            const blob = await request({
+                monthlyReport: reportType === 'monthly' || reportType === 'specificMonth',
+                reportMonth
+            });
             const url = window.URL.createObjectURL(blob);
             const link = document.createElement('a');
 

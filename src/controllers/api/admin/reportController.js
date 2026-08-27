@@ -2,7 +2,7 @@ import { findMovementReportRows } from "../../../services/inventory/reportServic
 import { findAllPersons } from "../../../services/admin/person/personService.js";
 import { findAllUsers } from "../../../services/admin/userService.js";
 import { getDataTableOrder, getDataTableSearch } from "../../../utils/requestQueryUtils.js";
-import { getMexicoMonthDateRange } from "../../../utils/formattersUtils.js";
+import { getReportMonthDateRange } from "../../../utils/formattersUtils.js";
 import { createFormulaCell, sendExcelReport } from "../../../utils/reportExcelUtils.js";
 
 const SHEET_NAME = 'Movimientos';
@@ -47,7 +47,7 @@ const getMovementReportParams = (query) => {
     const columns = ['date', 'type', 'referenceNumber', null, null, null, null, null, null, null];
     const { orderBy, orderDir } = getDataTableOrder({ query, columns, defaultDirection: 'desc' });
     const monthlyReport = isMonthlyReportRequest(query);
-    const monthDateRange = monthlyReport ? getMexicoMonthDateRange() : {};
+    const monthDateRange = monthlyReport ? getReportMonthDateRange(query.reportMonth) : {};
 
     return {
         startDate: monthlyReport ? monthDateRange.startDate : query.startDate || '',

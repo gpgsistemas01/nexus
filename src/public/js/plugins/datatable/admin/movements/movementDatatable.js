@@ -52,11 +52,12 @@ export const createMovementDatatable = ({ context, filters, selector }) => {
             columns: movementColumns,
             buttons: [buildExcelButton({
                 filename: formatFileName(config.filename),
-                request: ({ monthlyReport = false } = {}) => exportMovementReport({
+                request: ({ monthlyReport = false, reportMonth = '' } = {}) => exportMovementReport({
                     context: config.api,
                     params: buildTableExportParams(table, {
                         ...filters.getValues(),
-                        monthlyReport
+                        monthlyReport,
+                        reportMonth
                     })
                 })
             })]
