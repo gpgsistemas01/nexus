@@ -206,6 +206,35 @@ materiales. Si se necesitan los registros de requisiciones que fueron borrados, 
 restaurarse desde un respaldo antes del segundo paso; la migración correctiva sólo
 recupera la estructura necesaria para completar la cadena.
 
+## Recuperación de los índices de relaciones operativas
+
+La migración `20260810183000_index_material_operational_relations` puede encontrarse
+con dos estados válidos producidos por despliegues de ramas anteriores: índices que ya
+existen o la tabla legada `PurchaseRequisitionDetail` ya eliminada. Por eso, todos sus
+índices se crean de forma idempotente y el índice de requisiciones se omite únicamente
+cuando esa tabla ya no existe. Las tablas operativas vigentes no son opcionales: su
+ausencia continúa provocando un error para no ocultar una base incompleta.
+
+Si Prisma reporta `P3009` para esta migración, primero se debe respaldar la base y
+consultar `logs` en `_prisma_migrations` para confirmar la causa del intento fallido.
+Con `DIRECT_URL` apuntando a esa misma base, se marca exclusivamente ese intento como
+revertido:
+
+```bash
+npx prisma migrate resolve --rolled-back 20260810183000_index_material_operational_relations
+```
+
+Después se reintenta la cadena versionada:
+
+```bash
+npm run db:migrate
+```
+
+No se debe usar `migrate resolve --applied`: hacerlo podría registrar la migración sin
+haber creado todos los índices operativos. Si el nuevo intento informa que falta una
+tabla distinta de `PurchaseRequisitionDetail`, se debe corregir ese desvío del esquema
+en vez de omitir el objeto.
+
 ## Recuperación de la migración de facturas de entradas de compra
 
 La migración `20260806000000_unique_goods_receipt_invoice_per_supplier` normaliza las
