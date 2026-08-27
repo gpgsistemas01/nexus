@@ -20,7 +20,7 @@ const cleanCreatedRecords = async () => {
   await prisma.wasteMovementDetail.deleteMany({ where: { movementId: { in: movements.map(({ id }) => id) } } });
   await prisma.wasteMovement.deleteMany({ where: { id: { in: movements.map(({ id }) => id) } } });
   await prisma.wasteIssue.deleteMany({ where: { id: { in: issueIds } } });
-  await prisma.waste.deleteMany({ where: { id: ids.waste } });
+  await prisma.waste.deleteMany({ where: { id: { in: [ids.waste, ids.secondWaste].filter(Boolean) } } });
   await prisma.supplierMaterial.deleteMany({ where: { id: ids.supplierMaterial } });
   await prisma.material.deleteMany({ where: { id: ids.material } });
   await prisma.supplier.deleteMany({ where: { id: ids.supplier } });
@@ -87,6 +87,19 @@ describe('waste issue controller database integration', () => {
         convertedQuantity: 10
       }
     });
+    const secondWaste = await prisma.waste.create({
+      data: {
+        name: `${ material.name } secundario`,
+        supplierId: supplier.id,
+        presentationId: presentation.id,
+        unitMeasureId: unit.id,
+        base: 1,
+        height: 1,
+        maxUnitCost: 25,
+        currentStock: 10,
+        convertedQuantity: 10
+      }
+    });
     const user = await prisma.user.create({ data: { name: `ITWasteIssueUser${ suffix }`, password: 'integration-only' } });
     const department = await prisma.department.create({ data: { name: `IT Waste Issue Area ${ suffix }` } });
     const requester = await prisma.person.create({ data: { fullName: `IT Waste Issue Requester ${ suffix }` } });
@@ -94,7 +107,7 @@ describe('waste issue controller database integration', () => {
     const client = await prisma.client.create({ data: { name: `IT Waste Issue Client ${ suffix }`, advisorId: advisor.id } });
     Object.assign(ids, {
       unit: unit.id, presentation: presentation.id, supplier: supplier.id, material: material.id,
-      supplierMaterial: supplierMaterial.id, waste: waste.id, user: user.id,
+      supplierMaterial: supplierMaterial.id, waste: waste.id, secondWaste: secondWaste.id, user: user.id,
       department: department.id, requester: requester.id, advisor: advisor.id, client: client.id
     });
   });
@@ -253,6 +266,47 @@ describe('waste issue controller database integration', () => {
     }).expect(409);
 
     expect(rejectedSupply.body.code).toBe('WASTE_ISSUE_STATE_CONFLICT');
+  });
+
+  it('elimina al guardar el detalle registrado que fue retirado durante la edición pendiente', async () => {
+    const created = await request(app).post('/waste-issues').send({
+      requesterId: ids.requester,
+      advisorId: ids.advisor,
+      clientId: ids.client,
+      departmentId: ids.department,
+      projectNumber: 'PR-DELETE',
+      requestDate: '2026-08-11T12:30:00.000Z',
+      observations: 'Eliminar detalle registrado pendiente',
+      details: [
+        { wasteId: ids.waste, quantity: 2 },
+        { wasteId: ids.secondWaste, quantity: 1 }
+      ]
+    }).expect(201);
+    const issueId = created.body.wasteIssue.id;
+    const removedDetail = created.body.wasteIssue.details.find(detail => detail.wasteId === ids.waste);
+
+    const edited = await request(app).patch(`/waste-issues/${ issueId }`).send({
+      requesterId: ids.requester,
+      advisorId: ids.advisor,
+      clientId: ids.client,
+      departmentId: ids.department,
+      projectNumber: 'PR-DELETE',
+      requestDate: '2026-08-11T12:45:00.000Z',
+      observations: 'Detalle registrado retirado',
+      details: [{ wasteId: ids.secondWaste, quantity: 3 }]
+    }).expect(200);
+
+    expect(edited.body.wasteIssue.details).toHaveLength(1);
+    expect(edited.body.wasteIssue.details[0]).toMatchObject({
+      wasteId: ids.secondWaste,
+      quantity: '3'
+    });
+    expect(await prisma.wasteIssueDetail.findUnique({
+      where: { id: removedDetail.id }
+    })).toBeNull();
+    expect(await prisma.wasteIssueDetail.count({
+      where: { wasteIssueId: issueId }
+    })).toBe(1);
   });
 
   it('rechaza stock insuficiente y revierte toda la transacción', async () => {

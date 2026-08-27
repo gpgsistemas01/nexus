@@ -40,8 +40,15 @@ export const isCanceledDetail = (row = {}) => {
     );
 };
 
+export const resolveDetailActionIdentifier = (row = {}) => (
+    row.id ?? row.wasteId ?? row.materialId
+);
+
 export const shouldShowDetailActionButtons = ({ row, mode }) => (
-    mode === FORM_MODES.CREATE || (Boolean(row?.id) && !isCanceledDetail(row))
+    !isCanceledDetail(row) && (
+        mode === FORM_MODES.CREATE
+        || Boolean(resolveDetailActionIdentifier(row))
+    )
 );
 
 export const resolveIssueSuppliedQuantityForDisplay = (row = {}) => (

@@ -22,6 +22,7 @@ import {
     shouldShowIssueSuppliedQuantity,
     shouldShowReceiptDetailActions,
     shouldShowReceiptPurchaseColumns,
+    resolveDetailActionIdentifier,
     resolveIssueSuppliedQuantityForDisplay
 } from './detailRules.js';
 
@@ -187,9 +188,9 @@ export const buildDetailsColumns = ({ type, mode, canManageProjectQuantity = fal
     if (shouldShowActionsColumn({ type, mode })) {
         columns.push({
             data: null,
+            responsivePriority: DETAIL_CONTROL_RESPONSIVE_PRIORITY,
             ...(type === 'receipt' && {
-                title: 'Acciones',
-                responsivePriority: DETAIL_CONTROL_RESPONSIVE_PRIORITY
+                title: 'Acciones'
             }),
             render: (_, __, row) => {
                 if (!shouldShowDetailActionButtons({ row, mode })) return '';
@@ -200,7 +201,7 @@ export const buildDetailsColumns = ({ type, mode, canManageProjectQuantity = fal
                     className: 'delete-btn',
                     label: isSuppliedDetail ? 'El detalle ya fue surtido' : 'Eliminar detalle',
                     htmlAttrs: {
-                        'data-id': row.id ?? row.wasteId ?? row.materialId,
+                        'data-id': resolveDetailActionIdentifier(row),
                         disabled: isSuppliedDetail
                     }
                 });
