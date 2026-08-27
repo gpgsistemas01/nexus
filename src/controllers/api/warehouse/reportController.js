@@ -1,6 +1,6 @@
 import { buildMonthlyGoodsReceiptSummary, buildWasteReportSummary, findGoodsIssueReportRows, findGoodsReceiptReportRows, findSupplierReportRows, findWarehouseReportRows, findWasteIssueReportRows, findWasteReportRows } from "../../../services/warehouse/reportService.js";
 import { getDataTableOrder, getDataTableSearch } from "../../../utils/requestQueryUtils.js";
-import { getMexicoMonthDateRange } from "../../../utils/formattersUtils.js";
+import { getReportMonthDateRange } from "../../../utils/formattersUtils.js";
 import { createFormulaCell, sendExcelReport } from "../../../utils/reportExcelUtils.js";
 
 const SHEET_NAME = 'Inventario';
@@ -50,7 +50,7 @@ const buildIssueReportQuery = (req) => {
         defaultDirection: 'desc'
     });
     const monthlyReport = isMonthlyReportRequest(req.query);
-    const monthDateRange = monthlyReport ? getMexicoMonthDateRange() : {};
+    const monthDateRange = monthlyReport ? getReportMonthDateRange(req.query.reportMonth) : {};
 
     return {
         search: monthlyReport ? '' : getDataTableSearch(req.query),
@@ -179,7 +179,7 @@ export const exportGoodsReceiptReportExcel = async (req, res) => {
     });
 
     const monthlyReport = isMonthlyReportRequest(req.query);
-    const monthDateRange = monthlyReport ? getMexicoMonthDateRange() : {};
+    const monthDateRange = monthlyReport ? getReportMonthDateRange(req.query.reportMonth) : {};
 
     const rows = await findGoodsReceiptReportRows({
         search: monthlyReport ? '' : getDataTableSearch(req.query),

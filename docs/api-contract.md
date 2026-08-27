@@ -1,5 +1,13 @@
 # Contrato de la API
 
+## Exportación mensual de reportes
+
+Los endpoints de exportación de compras, salidas y movimientos aceptan
+`monthlyReport=true`. En ese modo ignoran los filtros aplicados al listado y consultan
+el mes actual de México de forma predeterminada. El parámetro opcional `reportMonth`,
+con formato `AAAA-MM`, permite consultar un mes calendario específico; un valor
+ausente o inválido conserva el comportamiento seguro del mes actual.
+
 ## Decisión
 
 **Sí conviene adoptar OpenAPI, pero Swagger no sustituye la documentación de

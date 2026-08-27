@@ -77,9 +77,10 @@ export const createGoodsReceiptDatatable = async ({ openGoodsReceiptModal }) => 
                 },
                 buildExcelButton({
                     filename: formatFileName('reporte_compras'),
-                    request: ({ monthlyReport = false } = {}) => exportGoodsReceiptReport(buildTableExportParams(table, {
+                    request: ({ monthlyReport = false, reportMonth = '' } = {}) => exportGoodsReceiptReport(buildTableExportParams(table, {
                         ...filters.getValues(),
-                        monthlyReport
+                        monthlyReport,
+                        reportMonth
                     }))
                 })
             ]

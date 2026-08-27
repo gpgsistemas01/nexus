@@ -7,7 +7,8 @@ const {
   findWasteReportRows,
   buildWasteReportSummary,
   createFormulaCell,
-  sendExcelReport
+  sendExcelReport,
+  getReportMonthDateRange
 } = vi.hoisted(() => ({
   buildMonthlyGoodsReceiptSummary: vi.fn(),
   findGoodsIssueReportRows: vi.fn(),
@@ -15,7 +16,8 @@ const {
   findWasteReportRows: vi.fn(),
   buildWasteReportSummary: vi.fn(),
   createFormulaCell: vi.fn((formula, value) => ({ f: formula, t: 'n', v: value })),
-  sendExcelReport: vi.fn()
+  sendExcelReport: vi.fn(),
+  getReportMonthDateRange: vi.fn()
 }));
 
 vi.mock('../../../../../src/services/warehouse/reportService.js', () => ({
@@ -35,7 +37,7 @@ vi.mock('../../../../../src/utils/requestQueryUtils.js', () => ({
 }));
 
 vi.mock('../../../../../src/utils/formattersUtils.js', () => ({
-  getMexicoMonthDateRange: vi.fn()
+  getReportMonthDateRange
 }));
 
 vi.mock('../../../../../src/utils/reportExcelUtils.js', () => ({ createFormulaCell, sendExcelReport }));
@@ -146,5 +148,32 @@ describe('fórmulas de datos dependientes en reportes operativos', () => {
       { f: 'IFERROR(B6/B7*100,0)', t: 'n', v: 100 }
     ]);
     expect(data[10][2]).toEqual({ f: 'IFERROR(D11/B11,0)', t: 'n', v: 25 });
+  });
+});
+
+describe('consulta mensual de reportes operativos', () => {
+  beforeEach(() => vi.clearAllMocks());
+
+  it('consulta la salida del mes específico sin conservar los filtros del CRUD', async () => {
+    getReportMonthDateRange.mockReturnValue({ startDate: '2025-02-01', endDate: '2025-02-28' });
+    findGoodsIssueReportRows.mockResolvedValue([]);
+
+    await exportGoodsIssueReportExcel({
+      query: {
+        monthlyReport: 'true',
+        reportMonth: '2025-02',
+        clientId: 'client-1',
+        startDate: '2024-01-01'
+      },
+      user: { accesses: [] }
+    }, {});
+
+    expect(getReportMonthDateRange).toHaveBeenCalledWith('2025-02');
+    expect(findGoodsIssueReportRows).toHaveBeenCalledWith(expect.objectContaining({
+      startDate: '2025-02-01',
+      endDate: '2025-02-28',
+      clientId: '',
+      search: ''
+    }));
   });
 });
