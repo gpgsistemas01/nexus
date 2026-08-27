@@ -8,6 +8,16 @@ export const buildReportFilename = ({ filename, separator = '_', order = 'month-
     return [filename, dateParts.join(separator)].join('_');
 };
 
+/**
+ * Creates a numeric spreadsheet cell whose stored value keeps previews and
+ * non-calculating readers useful while Excel recalculates the supplied formula.
+ */
+export const createFormulaCell = (formula, value = 0) => ({
+    f: formula,
+    t: 'n',
+    v: Number(value) || 0
+});
+
 export const createWorkbookBuffer = ({ sheetName, data }) => {
     const workbook = xlsx.utils.book_new();
     const worksheet = xlsx.utils.aoa_to_sheet(data);
