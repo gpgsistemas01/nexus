@@ -226,8 +226,9 @@ compartido de salidas. `inventory/inventoryCrudModal.ejs` normaliza el contrato 
 y delega el marcado al modal de layout para que compras y salidas reutilicen la misma
 composición sin trasladar reglas particulares de cada CRUD. En JavaScript,
 `ui/inventory/inventoryCrudModalUI.js` comparte la inicialización de modo, identidad, errores
-y estado habilitado; cada CRUD conserva la carga de encabezados, detalles y selects que
-sí depende de su contexto. Las vistas consumidoras referencian siempre la categoría explícita,
+y estado habilitado entre compras, salidas, materiales y mermas; cada CRUD conserva la carga
+de campos, encabezados, detalles y selects que sí depende de su contexto. Las vistas
+consumidoras referencian siempre la categoría explícita,
 y la prueba de estructura impide volver a dejar archivos EJS sueltos en la raíz.
 
 Compras y salidas de material reutilizan `shared/forms/materialSelect.ejs`. Este partial

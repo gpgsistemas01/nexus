@@ -1,7 +1,7 @@
 import { initWasteSelect2, setWasteSelectOptions } from "../../../plugins/select2/modules/wasteSelect.js";
 import { setReasonVisualOption } from '../../../plugins/select2/domains/reason.js';
-import { clearFormErrors } from "../../../ui/forms/formErrorsUI.js";
-import { initForm, setFormDisabled, setFormSectionVisibility } from "../../../ui/forms/formStateUI.js";
+import { setFormDisabled, setFormSectionVisibility } from "../../../ui/forms/formStateUI.js";
+import { initializeInventoryCrudModal } from '../../../ui/inventory/inventoryCrudModalUI.js';
 import { openModal } from "../../../ui/modalUI.js";
 import { BUTTON_SELECTORS, FORM_SELECTORS, HEADING_SELECTORS, MODAL_SELECTORS, SELECT_SELECTORS } from "../../../constants/selectors.js";
 import { wasteDataFields, wasteSecondaryDataFields, wasteStockFields } from './wasteFields.js';
@@ -23,15 +23,7 @@ export const openWasteModal = ({
     const isEditing = isEditMode(mode);
     const isAdjustingStock = isStockMode(mode);
 
-    initForm({ 
-        form, 
-        mode, 
-        id: isCreating ? '' : data?.id
-    });
-    setFormDisabled({
-        form,
-        isDisabled: false
-    });
+    initializeInventoryCrudModal({ form, mode, data: isCreating ? null : data });
     initWasteSelect2({ modalSelector: MODAL_SELECTORS.WASTE });
     setWasteSelectOptions({ modalSelector: MODAL_SELECTORS.WASTE, data });
 
@@ -75,8 +67,6 @@ export const openWasteModal = ({
         name: !isAdjustingStock ? initialStockReasonName : null,
         isDisabled: !isAdjustingStock
     });
-    clearFormErrors(form);
-
     modalElement.querySelector(HEADING_SELECTORS.MODAL_TITLE).textContent = isEditing
         ? 'Editar merma'
         : isAdjustingStock
