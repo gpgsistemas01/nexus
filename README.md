@@ -5,6 +5,7 @@ Nexus es una plataforma de control operativo para administrar inventario, compra
 ## Tabla de contenido
 
 - [Características principales](#características-principales)
+- [Visión, alcance y requisitos](#visión-alcance-y-requisitos)
 - [Stack técnico](#stack-técnico)
 - [Arquitectura del proyecto](#arquitectura-del-proyecto)
 - [Documentación](#documentación)
@@ -23,12 +24,23 @@ Nexus es una plataforma de control operativo para administrar inventario, compra
 
 - Autenticación y manejo de sesión con cookies y JWT.
 - Administración de usuarios, roles, personas, departamentos y movimientos.
-- Gestión de almacén: materiales, proveedores, entradas de compra, salidas de almacén, requisiciones, mermas, motivos, presentaciones, unidades de medida y estados de cumplimiento.
+- Gestión de almacén: materiales, proveedores, entradas de compra, salidas de almacén, mermas, motivos, presentaciones, unidades de medida y estados de cumplimiento.
 - Gestión de clientes del área de ventas.
 - Reportes administrativos, de almacén e inventario.
 - Actualización de inventario en tiempo real con Socket.IO.
 - Validación de contenido para API JSON, cargas de archivo y texto plano.
 - Pruebas unitarias e integrales con Vitest y Supertest.
+
+## Visión, alcance y requisitos
+
+La visión del producto, sus usuarios, el alcance vigente, los criterios para redactar
+requisitos verificables, los requisitos funcionales y de datos, los atributos de
+calidad y las brechas encontradas al contrastar documentación, código y Prisma se mantienen en
+[`docs/vision-scope-and-requirements.md`](docs/vision-scope-and-requirements.md).
+
+Ese documento describe el comportamiento implementado, no una promesa de funciones
+futuras. En particular, distingue las capacidades expuestas de los modelos o servicios
+que aún no tienen un flujo accesible completo.
 
 ## Stack técnico
 
@@ -194,23 +206,58 @@ npm start
 | `npm run test:watch` | Ejecuta Vitest en modo observación. |
 | `npm run test:db:verify` | Valida que `DATABASE_TEST_URL` exista y no sea igual a `DATABASE_URL`. |
 | `npm run test:db:migrate` | Verifica variables y aplica migraciones en la base de pruebas; usa `DIRECT_TEST_URL` automáticamente cuando está definida. |
-| `npm run test:integration` | Verifica y migra la base aislada, genera Prisma y ejecuta sólo `tests/integration`. |
-| `npm run test:db` | Alias de `npm run test:integration`. |
-| `npm run docs:architecture` | Regenera el mapa de rutas y dependencias desde `src`. |
-| `npm run docs:check` | Comprueba que el mapa generado esté actualizado. |
+| `npm run test:db` | Verifica variables, migra la base de pruebas y ejecuta pruebas. |
 
-## Rutas
+## Rutas principales
 
-El [mapa generado](docs/generated/code-map.md) es el catálogo actualizado de métodos y
-rutas web/API. La [guía de arquitectura](docs/architecture-and-web-views.md) explica la
-navegación, las pantallas y las redirecciones. Evitamos repetir aquí listas que pueden
-quedar desactualizadas.
+### Vistas web
+
+- `/` página de inicio.
+- `/inicio-sesion`, `/revocar-sesion`, `/cerrar-sesion` para autenticación web.
+- `/materiales`, `/mermas`, `/compras`, `/salidas-almacen`, `/proveedores` para almacén.
+- `/usuarios-sistemas`, `/personas`, `/movimientos` para administración.
+- `/clientes` para ventas.
+
+Las tablas de detalle son responsivas. En compras se prioriza la columna de acciones y,
+en salidas, se conservan con la misma prioridad la cantidad convertida y el control para
+surtir; las columnas menos operativas pasan primero al detalle desplegable cuando se
+reduce el ancho disponible.
+
+### API REST
+
+Todas las rutas API cuelgan de `/api` y esperan `Content-Type: application/json` salvo endpoints especializados:
+
+- `/api/auth`
+- `/api/sales/clients`
+- `/api/sales/reports`
+- `/api/warehouse/materials`
+- `/api/warehouse/wastes`
+- `/api/warehouse/suppliers`
+- `/api/warehouse/goods-receipts`
+- `/api/warehouse/goods-issues`
+- `/api/warehouse/notifications`
+- `/api/warehouse/reports`
+- `/api/warehouse/unit-measures`
+- `/api/warehouse/presentations`
+- `/api/warehouse/reasons`
+- `/api/warehouse/fulfillment-statuses`
+- `/api/admin/users`
+- `/api/admin/roles`
+- `/api/admin/departments`
+- `/api/admin/persons` (`/api/admin/profiles` se conserva como alias de compatibilidad)
+- `/api/admin/movements`
+- `/api/admin/reports`
 
 ## Pruebas automatizadas
 
 Se mantiene un solo punto de creación de cliente Prisma en `src/lib/prisma.js`. En pruebas, Vitest ejecuta con `NODE_ENV=test`, por lo que el mismo resolver usa `DATABASE_TEST_URL` sin crear un segundo cliente.
 
-Las pruebas que escriban datos en la base deben ejecutarse dentro de una transacción y forzar rollback al terminar. Para esos casos existe `tests/helpers/rollbackTransaction.js`, que recibe el cliente Prisma y ejecuta el cuerpo de la prueba con el `tx` transaccional, revirtiendo los cambios al finalizar para no persistir datos de prueba.
+Las pruebas que escriben datos usan exclusivamente la base indicada por
+`DATABASE_TEST_URL` y limpian sus registros identificables antes y después de la suite.
+Cuando un flujo acepta el cliente transaccional sin sustituir el comportamiento que se
+quiere probar, puede reutilizarse `tests/helpers/rollbackTransaction.js` para forzar
+rollback. La estrategia y ubicación de cada tipo de prueba están detalladas en
+[`docs/service-test-coverage.md`](docs/service-test-coverage.md).
 
 Flujo recomendado para automatización independiente (el segundo comando ya vuelve a
 verificar y migrar, por lo que normalmente basta con ejecutarlo solo):

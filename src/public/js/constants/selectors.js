@@ -24,7 +24,6 @@ export const MODAL_SELECTORS = {
     GOODS_RECEIPT: '#goodsReceiptModal',
     MATERIAL: '#materialModal',
     PERSON: '#personModal',
-    PURCHASE_REQUISITION: '#purchaseRequisitionModal',
     SUPPLIER: '#supplierModal',
     USER: '#userModal',
     WASTE: '#wasteModal',
