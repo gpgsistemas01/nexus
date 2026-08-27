@@ -258,6 +258,11 @@ Reglas para extender un CRUD:
 
 1. Añadir el router al registro central correspondiente, manteniendo el dominio tanto
    en la ruta como en los directorios de sus capas.
+   Los routers web sólo exponen la navegación que renderiza cada pantalla; el CRUD y
+   sus acciones especializadas se conservan en el router API del mismo dominio. Por
+   ejemplo, `GET /salidas/mermas` renderiza la pantalla mediante
+   `wasteIssueWebRoute.js`, mientras que listado, registro, ediciones y devoluciones
+   se exponen bajo `/api/warehouse/waste-issues` mediante `wasteIssueApiRoute.js`.
 2. Reutilizar DTOs, servicios de dominio, formularios, modales, tablas y selectores
    existentes antes de crear otro proceso; parametrizar el contexto cuando dos flujos
    sólo difieran en material/merma u otro recurso.
