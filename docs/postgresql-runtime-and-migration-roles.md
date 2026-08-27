@@ -166,6 +166,46 @@ los comportamientos completos:
    `nexus_app`; esto confirma que `ALTER DEFAULT PRIVILEGES` se configuró para el rol
    que realmente crea los objetos.
 
+## Recuperación de una migración fallida por una tabla legada ausente
+
+La migración `20260805232000_merge_duplicate_materials` todavía consolida referencias
+históricas de `PurchaseRequisitionDetail`. Por eso, la tabla legada debe existir cuando
+esa migración se ejecuta, aunque el módulo de requisiciones ya no forme parte del
+esquema Prisma ni de la aplicación. La eliminación está fechada como
+`20260827000000_remove_purchase_requisitions`, después de las migraciones
+`20260805232000_merge_duplicate_materials`,
+`20260810183000_index_material_operational_relations`,
+`20260811000000_add_foreign_key_indexes` y
+`20260820000000_preserve_decimal_precision`, que todavía utilizan esas tablas.
+
+Si Prisma reporta `P3009` para esa migración porque `PurchaseRequisitionDetail` no
+existe, la base objetivo recibió una eliminación anticipada desde otra rama. La
+migración `20260805231500_restore_purchase_requisitions_for_pending_migrations`,
+ubicada inmediatamente antes del intento fallido, vuelve a crear de forma idempotente
+la estructura requerida. No recupera registros eliminados: esos datos sólo pueden
+volver desde un respaldo. Tampoco elimina por sí sola el registro fallido de
+`_prisma_migrations`.
+
+1. Respaldar la base y marcar exclusivamente el intento fallido como revertido para
+   desbloquear la cadena:
+
+   ```bash
+   npx prisma migrate resolve --rolled-back 20260805232000_merge_duplicate_materials
+   ```
+
+2. Aplicar nuevamente la cadena versionada. Prisma ejecutará primero la restauración
+   `20260805231500`, reintentará `20260805232000` con las tablas disponibles y sólo las
+   eliminará al llegar a `20260827000000`:
+
+   ```bash
+   npm run db:migrate
+   ```
+
+`migrate resolve --applied` no corresponde en este caso: omitiría la consolidación de
+materiales. Si se necesitan los registros de requisiciones que fueron borrados, deben
+restaurarse desde un respaldo antes del segundo paso; la migración correctiva sólo
+recupera la estructura necesaria para completar la cadena.
+
 ## ¿Es obligatorio hacerlo ahora?
 
 No requiere cambios al esquema Prisma y no bloquea el funcionamiento actual. Es una

@@ -55,7 +55,14 @@ usuarios todavía deben incorporarse o recuperarse siguiendo las prioridades de
 `docs/test-plan.md`. Al modificar uno de esos CRUD se debe ampliar la suite de su
 dominio, sin crear un flujo paralelo que duplique el camino feliz.
 
-El módulo de requisiciones de compra fue retirado del frontend, backend y esquema vigente. La migración de retiro elimina sus tablas y el contador de folios `REQ`; por ello no debe agregarse cobertura nueva ni reutilizarse ese flujo en otros dominios.
+El módulo de requisiciones de compra fue retirado del frontend, backend y esquema
+vigente; por ello no debe agregarse cobertura nueva ni reutilizarse ese flujo en otros
+dominios. La migración `20260827000000_remove_purchase_requisitions` elimina sus tablas
+y el contador `REQ` únicamente después de las migraciones que todavía procesan sus
+datos históricos. La restauración idempotente `20260805231500` permite continuar en
+bases donde otra rama las eliminó anticipadamente; después se ejecutan
+`20260805232000_merge_duplicate_materials` y
+`20260820000000_preserve_decimal_precision`.
 
 ## Dependencias entre dominios
 
