@@ -1,4 +1,5 @@
 import { AppError } from "../AppError.js";
+import { buildGoodsReceiptInvoiceAlreadyExistsMessage } from "../../public/js/constants/goodsReceiptMessages.js";
 
 export class GoodsReceiptNotFound extends AppError {
 
@@ -23,12 +24,21 @@ export class GoodsReceiptCreateDatabaseError extends AppError {
 
 export class GoodsReceiptInvoiceAlreadyExists extends AppError {
 
-    constructor() {
+    constructor(existingGoodsReceipt = null) {
         super(
-            'Ya existe una compra con el mismo número de factura para este proveedor',
+            buildGoodsReceiptInvoiceAlreadyExistsMessage({
+                existingReferenceNumber: existingGoodsReceipt?.referenceNumber
+            }),
             'GOODS_RECEIPT_INVOICE_ALREADY_EXISTS',
             409
         );
+
+        this.meta = existingGoodsReceipt
+            ? {
+                existingGoodsReceiptId: existingGoodsReceipt.id,
+                existingReferenceNumber: existingGoodsReceipt.referenceNumber
+            }
+            : undefined;
     }
 }
 

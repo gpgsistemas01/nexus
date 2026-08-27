@@ -1,3 +1,5 @@
+import { buildGoodsReceiptInvoiceAlreadyExistsMessage } from './goodsReceiptMessages.js';
+
 export const errorMessages = {
     // 🔐 AUTH / GENERALES
     LOGIN_ERROR: 'Usuario o contraseña incorrectos.',
@@ -179,6 +181,7 @@ export const errorMessages = {
     // Warehouse
     EXCEDED_MAX_RETRIES_SKU: 'Excedido el número máximo de intentos para generar un SKU único.',
     GOODS_RECEIPT_NOT_FOUND: 'Recibo de mercancía no encontrado.',
+    GOODS_RECEIPT_INVOICE_ALREADY_EXISTS: buildGoodsReceiptInvoiceAlreadyExistsMessage,
     GOODS_RECEIPT_CREATE_DB_ERROR: 'Error de base de datos al crear la compra.',
     GOODS_RECEIPT_UPDATE_DB_ERROR: 'Error de base de datos al actualizar la compra.',
     GOODS_RECEIPT_SUPPLIER_CHANGE_CONFLICT: 'No se puede cambiar el proveedor de una compra confirmada porque sus movimientos de inventario ya están asociados al proveedor original.',
@@ -309,17 +312,11 @@ const successMessages = {
 export const getErrorMessage = (data = {}) => {
 
     const { code, meta } = data ?? {};
+    const message = errorMessages[code];
 
-    if (meta) {
+    if (typeof message === 'function') return message(meta ?? {});
 
-        const fn = errorMessages[code];
-
-        if (typeof fn === 'function') return fn(meta);
-
-        return fn ?? code;
-    }
-
-    if (code) return errorMessages[code] ?? code;
+    if (code) return message ?? code;
 
     return null;
 }

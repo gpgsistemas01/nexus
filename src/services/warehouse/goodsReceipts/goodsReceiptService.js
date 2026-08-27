@@ -23,6 +23,7 @@ import { GOODS_RECEIPT_STATUS_NAMES } from "../../../constants/warehouseStatuses
 import { INVENTORY_MOVEMENT_TYPES } from "../../../constants/inventory.js";
 import { DOCUMENT_REFERENCE_TYPES } from "../../../constants/documentReferenceTypes.js";
 import { PRISMA_ERROR_CODES } from "../../../constants/prisma.js";
+import { assertGoodsReceiptInvoiceAvailable } from "./goodsReceiptInvoiceService.js";
 
 const throwIfInvoiceAlreadyExists = (err) => {
     if (err?.code !== PRISMA_ERROR_CODES.RECORD_NOT_UNIQUE) return;
@@ -133,6 +134,11 @@ export const createGoodsReceipt = async ({ goodsReceiptDto }) => {
 
         const supplier = await findUniqueSupplier({ id: supplierId });
 
+        await assertGoodsReceiptInvoiceAvailable({
+            supplierId,
+            invoice: goodsReceiptData.invoice
+        });
+
         const receivedBy = await findPersonById({ id: receivedById });
 
         if (!receivedBy) throw new PersonReceivedByNotFound();
@@ -240,6 +246,7 @@ export const updateGoodsReceipt = async ({ id, goodsReceiptDto }) => {
                 where: { id },
                 select: {
                     id: true,
+                    supplierId: true,
                     status: {
                         select: { name: true }
                     }
@@ -255,6 +262,12 @@ export const updateGoodsReceipt = async ({ id, goodsReceiptDto }) => {
         }
 
         if (!receivedBy) throw new PersonReceivedByNotFound();
+
+        await assertGoodsReceiptInvoiceAvailable({
+            supplierId: goodsReceipt.supplierId,
+            invoice: goodsReceiptData.invoice,
+            excludeGoodsReceiptId: id
+        });
 
         let addedDetails = [];
 
