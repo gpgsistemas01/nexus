@@ -410,7 +410,8 @@ de las devoluciones se separa en la subcarpeta `returns` de cada página de sali
 paralelo con `corrections` de compras; sus servicios de dominio se agrupan en
 `detailReturns`, sin duplicar el modal ni la UI compartida. En el cliente,
 `ui/inventory/inventoryCrudModalUI.js` prepara el estado CRUD común del formulario antes de
-que compras o salidas apliquen los datos y acciones propios de su contexto. Los modales
+que compras, salidas, materiales o mermas apliquen los datos y acciones propios de su
+contexto. Los modales
 secundarios de devolución de salida y corrección de compra reutilizan el diálogo
 desplazable compartido y el mismo helper de apertura MDB, sin reglas de altura propias
 que interfieran con el cálculo responsivo del componente. El layout conserva el backdrop

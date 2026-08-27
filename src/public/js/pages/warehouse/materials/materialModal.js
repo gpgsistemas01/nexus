@@ -1,8 +1,8 @@
 import { openModal } from "../../../ui/modalUI.js";
 import { initMaterialFormSelect2, setMaterialFormSelectOptions } from "../../../plugins/select2/modules/materialSelect.js";
 import { setReasonVisualOption } from '../../../plugins/select2/domains/reason.js';
-import { clearFormErrors } from "../../../ui/forms/formErrorsUI.js";
-import { initForm, setFormDisabled, setFormSectionVisibility } from "../../../ui/forms/formStateUI.js";
+import { setFormDisabled, setFormSectionVisibility } from "../../../ui/forms/formStateUI.js";
+import { initializeInventoryCrudModal } from '../../../ui/inventory/inventoryCrudModalUI.js';
 import { BUTTON_SELECTORS, FORM_SELECTORS, HEADING_SELECTORS, MODAL_SELECTORS, SELECT_SELECTORS } from "../../../constants/selectors.js";
 import { materialDataFields, materialEditableDataFields } from './materialFields.js';
 import { FORM_MODES, isCreateMode, isEditMode, isStockMode } from '../../../constants/formModes.js';
@@ -25,11 +25,7 @@ export const openMaterialModal = ({
     const isAdjustingStock = isStockMode(mode);
     const isGoodsReceiptCreation = creationContext === goodsReceiptCreationContext;
 
-    initForm({ 
-        form, 
-        mode, 
-        id: data?.id
-    });
+    initializeInventoryCrudModal({ form, mode, data });
     initMaterialFormSelect2({ modalSelector: MODAL_SELECTORS.MATERIAL });
     setMaterialFormSelectOptions({ modalSelector: MODAL_SELECTORS.MATERIAL, data });
     form.dataset.creationContext = creationContext || '';
@@ -43,10 +39,6 @@ export const openMaterialModal = ({
     form.elements.newStock.value = '';
     form.elements.observations.value = '';
 
-    setFormDisabled({ 
-        form, 
-        isDisabled: false 
-    });
     setFormSectionVisibility({
         form,
         selector: stockDataSectionSelector,
@@ -78,8 +70,6 @@ export const openMaterialModal = ({
         name: !isAdjustingStock ? initialStockReasonName : null,
         isDisabled: !isAdjustingStock
     });
-    clearFormErrors(form);
-
     modalElement.querySelector(HEADING_SELECTORS.MODAL_TITLE).textContent = isEditing
         ? 'Editar material'
         : isAdjustingStock
