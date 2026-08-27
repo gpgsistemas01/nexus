@@ -48,9 +48,9 @@ export const FORM_SELECTORS = {
 };
 
 export const INPUT_SELECTORS = {
+    REQUEST_DATE: '#requestDateInput',
     WASTE_WIDTH: '#baseInput',
     WASTE_MAX_UNIT_COST: '#maxUnitCostInput',
-    WASTE_ISSUE_DATE: '#wasteIssueDate',
     OBSERVATIONS: '#observationsInput',
     PROJECT_NUMBER: '#projectNumberInput',
     QUANTITY: '#quantityInput',

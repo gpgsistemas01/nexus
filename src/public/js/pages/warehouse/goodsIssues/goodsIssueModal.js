@@ -49,7 +49,7 @@ export const openGoodsIssueModal = ({ mode, data = null }) => {
 
     if ([FORM_MODES.EDIT, FORM_MODES.EDIT_DETAIL, FORM_MODES.EDIT_HEADER, FORM_MODES.RETURN, FORM_MODES.VIEW].includes(mode)) {
         form.querySelector(INPUT_SELECTORS.OBSERVATIONS).value = data.observations || '';
-        setDateTimePickerValue(form.querySelector('#requestDateInput'), data.requestDate);
+        setDateTimePickerValue(form.querySelector(INPUT_SELECTORS.REQUEST_DATE), data.requestDate);
         form.querySelector(INPUT_SELECTORS.PROJECT_NUMBER).value = data.projectNumber;
         const modalDetails = data.details.map(mapIssueDetailToTable);
 
