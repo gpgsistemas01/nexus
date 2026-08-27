@@ -206,7 +206,10 @@ npm start
 | `npm run test:watch` | Ejecuta Vitest en modo observación. |
 | `npm run test:db:verify` | Valida que `DATABASE_TEST_URL` exista y no sea igual a `DATABASE_URL`. |
 | `npm run test:db:migrate` | Verifica variables y aplica migraciones en la base de pruebas; usa `DIRECT_TEST_URL` automáticamente cuando está definida. |
+| `npm run test:integration` | Verifica variables, migra la base de pruebas, genera el cliente Prisma y ejecuta la suite de integración. |
 | `npm run test:db` | Verifica variables, migra la base de pruebas y ejecuta pruebas. |
+| `npm run docs:architecture` | Regenera el mapa de código, el esquema de base de datos y el diccionario técnico derivados del código y Prisma. |
+| `npm run docs:check` | Comprueba sin modificar archivos que la documentación generada esté actualizada. |
 
 ## Rutas principales
 
