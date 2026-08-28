@@ -20,7 +20,7 @@ no dependen de que alguien recuerde actualizar una tabla a mano.
 | `docs/generated/code-map.md` | Routers e imports de `src` | Se regenera con `npm run docs:architecture`; CI ejecuta `npm run docs:check` automáticamente y bloquea cambios desactualizados. |
 | `docs/generated/database-schema.md` | Modelos y relaciones de `prisma/schema.prisma` | Se regenera con el mismo comando; se valida en cada pull request. |
 | `docs/generated/data-dictionary.md` | Campos, claves, tipos y relaciones propietarias de `prisma/schema.prisma` | Se regenera con el mismo comando; complementa el ER sin duplicarlo manualmente. |
-| Diagramas de contexto, contenedores, secuencia y navegación de este documento | Decisiones de arquitectura y experiencia de usuario | Son curados: deben actualizarse cuando cambia el diseño y revisarse en el pull request. |
+| Diagramas de contexto, contenedores, despliegue, secuencia y navegación de este documento | Decisiones de arquitectura, configuración versionada y experiencia de usuario | Son curados: deben actualizarse cuando cambia el diseño o la configuración de ejecución y revisarse en el pull request. |
 | Catálogo de pantallas | Rutas, permisos, controladores, EJS y comportamiento visible | Es curado porque el código por sí solo no puede inferir correctamente propósito, navegación ni estado funcional. |
 
 La separación es intencional: generar relaciones mecánicas evita trabajo repetitivo,
@@ -31,19 +31,33 @@ ambos documentos y crea un commit únicamente si detecta diferencias.
 
 ## 1. Arquitectura del sistema
 
-### Contexto
+### Diagrama de contexto del sistema
+
+Esta vista responde **quién utiliza Nexus y para qué se relaciona con él**. Su límite
+es el sistema completo: las personas se muestran fuera y Nexus como una única caja;
+el navegador, Express y Prisma son detalles internos y, por tanto, no forman parte de
+este nivel. Supabase sí aparece porque es un sistema externo administrado del que
+Nexus depende para persistir sus datos. Las flechas expresan interacción, no permisos
+individuales ni una secuencia técnica.
 
 ```mermaid
 flowchart LR
-    user["Personal de almacén,<br/>ventas y administración"]
-    browser["Navegador web"]
-    nexus["Nexus<br/>plataforma de control operativo"]
-    postgres[("PostgreSQL")]
+    warehouse["Personal de almacén y proveeduría<br/>Actor operativo"]
+    administration["Administración del sistema<br/>Actor administrativo"]
+    management["Coordinación y dirección<br/>Parte interesada de supervisión"]
+    nexus["Nexus<br/>Sistema de control operativo"]
+    supabase[("Supabase<br/>Servicio externo de PostgreSQL")]
 
-    user --> browser
-    browser -->|"HTTPS · HTML / JSON / Socket.IO"| nexus
-    nexus -->|"Prisma / SQL"| postgres
+    warehouse -->|"Registra y consulta la operación<br/>de inventario"| nexus
+    administration -->|"Administra accesos, personas,<br/>catálogos y ajustes protegidos"| nexus
+    management -->|"Consulta trazabilidad,<br/>reportes e indicadores"| nexus
+    nexus -->|"Persiste y consulta<br/>datos operativos"| supabase
 ```
+
+Supabase es una dependencia de infraestructura, no una integración funcional pública
+como ERP, CRM o transportistas, que permanecen fuera del alcance. Render se muestra en
+la vista de despliegue y no aquí porque aloja Nexus sin ser un sistema con el que los
+actores intercambien información de negocio.
 
 ### Contenedores y capas
 
@@ -78,6 +92,124 @@ flowchart TB
     prisma <-->|"SQL"| database
 ```
 
+### Despliegue actual: Render y Supabase
+
+La instancia vigente aloja la aplicación en Render y utiliza PostgreSQL administrado
+por Supabase. Esa asignación es una decisión operativa curada; el contenido del
+contenedor y su arranque sí se verifican en `Dockerfile` y `docker-entrypoint.sh`. Los
+rectángulos anidados son nodos o entornos de ejecución; el cilindro representa la base
+de datos y las flechas indican comunicación o secuencia de arranque. Las credenciales
+se inyectan como variables de entorno en Render y no forman parte de la imagen.
+
+```mermaid
+flowchart TB
+    browser["Navegador del usuario"]
+
+    subgraph render["Render · servicio web administrado"]
+        publicEndpoint["Endpoint público de Render"]
+        subgraph appContainer["Contenedor app · imagen Nexus"]
+            entrypoint["docker-entrypoint.sh<br/>NODE_ENV=production"]
+            migrations["Prisma CLI<br/>migrate deploy"]
+            nodeApp["Node.js / Express / Socket.IO<br/>puerto 3000"]
+
+            entrypoint -->|"RUN_MIGRATIONS=true"| migrations
+            migrations -->|"migración correcta"| nodeApp
+            entrypoint -->|"RUN_MIGRATIONS=false"| nodeApp
+        end
+
+        publicEndpoint --> nodeApp
+    end
+
+    subgraph supabase["Supabase · servicio administrado"]
+        runtimeEndpoint["Endpoint de ejecución<br/>DATABASE_URL · directo o pooler"]
+        database[("PostgreSQL<br/>base Nexus")]
+        runtimeEndpoint --> database
+    end
+
+    browser -->|"HTTPS"| publicEndpoint
+    nodeApp -->|"consultas de aplicación"| runtimeEndpoint
+    migrations -->|"conexión directa · DIRECT_URL"| database
+```
+
+La aplicación usa `DATABASE_URL` durante la ejecución y Prisma CLI usa `DIRECT_URL`
+durante las migraciones. Si las migraciones están activadas, un fallo o la ausencia de
+la URL directa detiene el contenedor antes de iniciar Node.js. `docker-compose.yml`
+conserva el mismo contenedor como alternativa reproducible para ejecución en un host,
+pero no describe el entorno de producción actual ni levanta PostgreSQL localmente.
+
+### Despliegue objetivo: aplicación en un VPS
+
+La dirección prevista es trasladar el contenedor de la aplicación desde Render a un
+VPS. Esta es una vista objetivo, no implementada: las líneas discontinuas distinguen
+la intención de la topología actual. Antes de considerarla vigente deben versionarse
+la terminación TLS, el proxy inverso, la automatización del despliegue, respaldos y
+monitoreo. También queda por decidir si la persistencia continuará en Supabase o se
+operará PostgreSQL en infraestructura propia.
+
+```mermaid
+flowchart LR
+    browserTarget["Navegador del usuario"]
+
+    subgraph vps["VPS · objetivo"]
+        ingress["Proxy inverso y TLS<br/>por definir"]
+        nexusContainer["Contenedor Nexus<br/>Node.js · puerto interno 3000"]
+        ingress -.-> nexusContainer
+    end
+
+    targetDatabase[("Persistencia objetivo<br/>Supabase o PostgreSQL propio<br/>decisión pendiente")]
+
+    browserTarget -.->|"HTTPS"| ingress
+    nexusContainer -.->|"DATABASE_URL / DIRECT_URL"| targetDatabase
+```
+
+### Componentes de aplicación
+
+Esta vista UML de componentes complementa los contenedores: muestra contratos y
+dependencias de diseño, no cada import concreto. El detalle mecánico permanece en el
+[mapa generado](generated/code-map.md).
+
+```mermaid
+classDiagram
+    class Rutas {
+        <<component>>
+        +autorizar()
+        +validar()
+    }
+    class Controladores {
+        <<component>>
+        +traducirHTTP()
+    }
+    class DTO {
+        <<component>>
+        +normalizarEntrada()
+        +normalizarSalida()
+    }
+    class ServiciosDominio {
+        <<component>>
+        +ejecutarCasoDeUso()
+    }
+    class RepositorioPrisma {
+        <<component>>
+        +consultar()
+        +persistir()
+    }
+    class AplicacionCliente {
+        <<component>>
+        +coordinarCRUD()
+    }
+    class ComponentesUI {
+        <<component>>
+        +presentarEstado()
+    }
+
+    Rutas --> Controladores
+    Controladores --> DTO
+    Controladores --> ServiciosDominio
+    ServiciosDominio --> RepositorioPrisma
+    AplicacionCliente --> Rutas : HTTP
+    ComponentesUI --> AplicacionCliente
+```
+
 ### Recorrido de una interacción
 
 ```mermaid
@@ -103,8 +235,13 @@ sequenceDiagram
 
 ## 2. Mapa visual de navegación
 
-Las líneas continuas representan navegación vigente. Las rutas entre paréntesis son
-las URL visibles; el acceso efectivo depende de los permisos calculados para la sesión.
+La navegación se documenta con dos vistas para no confundir estados de sesión con la
+jerarquía del menú. La primera usa la notación de máquina de estados de Mermaid,
+inspirada en UML, porque sus flechas sí representan transiciones. La segunda es un
+mapa de sitio dirigido: una flecha significa que el destino se ofrece desde el menú,
+no que exista una secuencia obligatoria entre pantallas. Las rutas entre paréntesis
+son las URL registradas; el acceso efectivo y la visibilidad de cada opción dependen
+de los permisos calculados para la sesión.
 
 El shell usa en todos los tamaños el mismo control de navegación del encabezado. Para
 que sea inmediatamente reconocible, ocupa la posición inicial convencional, conserva
@@ -137,44 +274,68 @@ La identidad se resuelve con un monograma tipográfico, fondos con profundidad y
 transiciones breves; no depende de una imagen adicional y respeta la preferencia del
 sistema para reducir movimiento.
 
+### Estados de acceso y sesión
+
+Esta máquina cubre las rutas web que no son destinos del menú: raíz, autenticación,
+renovación, cierre de sesión y recuperación ante una ruta no encontrada. El estado
+«Área autenticada» agrupa las pantallas protegidas inventariadas en el mapa de sitio
+siguiente; no representa una pantalla adicional.
+
 ```mermaid
-flowchart LR
-    root["/ "] -->|"sin sesión"| login["Inicio de sesión<br/>/inicio-sesion"]
-    root -->|"con sesión"| materials["Existencias<br/>/almacen/materiales"]
-    login -->|"credenciales válidas"| materials
+stateDiagram-v2
+    [*] --> Root
+    state "Raíz (/)" as Root
+    state "Inicio de sesión<br/>/inicio-sesion" as Login
+    state "Área autenticada" as Authenticated
+    state "Renovar sesión<br/>/revocar-sesion" as Refresh
+    state "No encontrada<br/>/error/404" as NotFound
 
-    subgraph warehouse["Almacén"]
-        materials
-        wastes["Mermas<br/>/almacen/mermas"]
-        purchases["Registro de compras<br/>/compras"]
-        goodsIssues["Salidas de almacén<br/>/salidas/materiales"]
-        wasteIssues["Salidas de mermas<br/>/salidas/mermas"]
-        suppliers["Proveedores<br/>/proveedores"]
-    end
-
-    subgraph sales["Ventas"]
-        clients["Clientes<br/>/clientes"]
-    end
-
-    subgraph admin["Administración"]
-        users["Usuarios<br/>/usuarios-sistemas"]
-        persons["Personas<br/>/personas"]
-        materialMovements["Movimientos de materiales<br/>/movimientos/materiales"]
-        wasteMovements["Movimientos de merma<br/>/movimientos/mermas"]
-    end
-
-    materials --> wastes
-    materials --> purchases
-    purchases --> goodsIssues
-    goodsIssues --> materialMovements
-    wastes --> wasteIssues
-    wasteIssues --> wasteMovements
-    suppliers --> purchases
-    clients --> goodsIssues
-    materials --> clients
-    materials --> users
-    users --> persons
+    Root --> Login: sin sesión
+    Root --> Authenticated: con sesión
+    Login --> Authenticated: credenciales válidas
+    Authenticated --> Refresh: token de acceso vencido
+    Refresh --> Authenticated: renovación válida
+    Refresh --> Login: renovación inválida
+    Authenticated --> Login: cerrar sesión (POST /cerrar-sesion)
+    Authenticated --> NotFound: URL web inexistente o acceso web denegado
+    NotFound --> Root: volver al inicio
 ```
+
+### Mapa de sitio del menú principal
+
+El nodo raíz representa el partial compartido `navList`. Los nodos de categoría son
+controles que despliegan opciones y no URL; los rectángulos terminales son todas las
+pantallas ofrecidas por el menú vigente. Abrir o cerrar el offcanvas no cambia de
+pantalla y, por ello, no se modela como transición.
+
+```mermaid
+flowchart TB
+    menu(["Menú principal"])
+
+    menu --> warehouse(["Almacén"])
+    warehouse --> materials["Materiales<br/>/almacen/materiales"]
+    warehouse --> wastes["Mermas<br/>/almacen/mermas"]
+
+    menu --> purchases["Compras<br/>/compras"]
+
+    menu --> issues(["Salidas"])
+    issues --> goodsIssues["Materiales<br/>/salidas/materiales"]
+    issues --> wasteIssues["Mermas<br/>/salidas/mermas"]
+
+    menu --> movements(["Movimientos"])
+    movements --> materialMovements["Materiales<br/>/movimientos/materiales"]
+    movements --> wasteMovements["Mermas<br/>/movimientos/mermas"]
+
+    menu --> users["Usuarios<br/>/usuarios-sistemas"]
+    menu --> persons["Personas<br/>/personas"]
+    menu --> clients["Clientes<br/>/clientes"]
+    menu --> suppliers["Proveedores<br/>/proveedores"]
+```
+
+La ruta `/movimientos` redirige a `/movimientos/materiales`; los alias históricos se
+documentan en [Redirecciones de compatibilidad](#redirecciones-de-compatibilidad). No
+se dibujan los modales CRUD como páginas porque reutilizan el contexto de su pantalla
+propietaria y no registran rutas web independientes.
 
 ## 3. Catálogo de pantallas
 
@@ -187,7 +348,7 @@ flowchart LR
 | Almacén | Salidas de almacén (`/salidas/materiales`) | Consultar y registrar entregas de materiales. | Filtrar, registrar salida, seleccionar cliente y devolver detalles. | `src/views/pages/warehouse/goodsIssues/goodsIssuesPage.ejs` |
 | Almacén | Salidas de mermas (`/salidas/mermas`) | Consultar y registrar salidas de merma. | Registrar, editar, surtir y devolver detalles de merma. | `src/views/pages/warehouse/wasteIssues/wasteIssuesPage.ejs` |
 | Almacén | Proveedores (`/proveedores`) | Consultar y administrar proveedores. | Crear/editar desde modal. | `src/views/pages/warehouse/suppliers/suppliersPage.ejs` |
-| Ventas | Clientes (`/clientes`) | Consultar y administrar clientes. | Crear/editar desde modal. | `src/views/pages/sales/clients/clientsPage.ejs` |
+| Administración | Clientes (`/clientes`) | Consultar y administrar clientes. | Crear/editar desde modal. | `src/views/pages/sales/clients/clientsPage.ejs` |
 | Administración | Usuarios (`/usuarios-sistemas`) | Administrar cuentas y asignaciones. | Crear/editar usuario, roles y departamentos. | `src/views/pages/admin/users/usersPage.ejs` |
 | Administración | Personas (`/personas`) | Administrar personas participantes del negocio. | Filtrar y crear/editar datos y asignaciones. | `src/views/pages/admin/persons/personsPage.ejs` |
 | Administración | Movimientos de materiales (`/movimientos/materiales`) | Auditar movimientos del inventario de materiales. | Filtrar, consultar y exportar el historial. | `src/views/pages/admin/movements/movementsPage.ejs` |

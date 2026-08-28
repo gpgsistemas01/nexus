@@ -48,6 +48,7 @@ módulo y los contextos reutilizan ese contrato.
 | Salidas de material | Incorporar integración HTTP de registro, entrega/devolución, stock y rollback. |
 | Entradas de compra | Incorporar integración HTTP de registro, corrección, costo, movimiento y rollback. |
 | Personas y usuarios | Incorporar persistencia de relaciones de rol y departamento. |
+| Autorización por contexto | Mantener casos unitarios positivos y negativos por combinación rol/departamento; ventas permanece sin permisos del sistema. |
 | Ajustes, requisiciones y proyectos | Probar únicamente cuando exista el CRUD accesible desde controller. |
 | Reportes y movimientos | Cubrir consultas, permisos, filtros y datos exportados. |
 

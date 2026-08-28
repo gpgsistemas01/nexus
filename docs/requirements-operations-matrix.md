@@ -28,8 +28,8 @@ permiso se agrupan. Los valores de permiso son los declarados en
 | Administración / usuarios | `L, C, U, cambiar contraseña/accesos → users:manage`; exportar `→ admin:reports-read` | Implementado |
 | Administración / roles | `L → roles:read` | Implementado sólo lectura |
 | Administración / departamentos | `L → departments:read` | Implementado sólo lectura |
-| Ventas / clientes | `L → clients:read`; `C → clients:create`; `U → clients:update`; exportar `→ client:reports-read` | Implementado |
-| Ventas / proyectos | Sin rutas API CRUD ni permiso registrado | Modelado |
+| Administración / clientes | `L → clients:read`; `C → clients:create`; `U → clients:update`; exportar `→ client:reports-read` | Implementado |
+| Contexto pendiente / proyectos | Sin rutas API CRUD ni permiso registrado | Modelado |
 | Almacén / materiales | `L → materials:read`; costo en la consulta `→ inventory:costs-read`; `C, U, D → materials:write`; ajustar existencia `→ materials:adjust-stock`; exportar inventario `→ warehouse:reports-read` | Implementado |
 | Almacén / merma | `L → wastes:read`; costo en la consulta `→ inventory:costs-read`; `C, U → wastes:write`; ajustar existencia `→ wastes:adjust-stock`; exportar `→ warehouse:reports-read` | Implementado |
 | Almacén / proveedores | `L, C → suppliers:manage`; `U → suppliers:update`; exportar `→ supplier:reports-read` | Implementado |
@@ -48,6 +48,29 @@ La autenticación es transversal y no se fuerza dentro del CRUD de un módulo: i
 sesión, consultar la sesión y renovar credenciales tienen rutas API; cerrar sesión se
 realiza mediante el flujo web. Todas las filas implementadas requieren además una sesión
 válida.
+
+## Modos, precondiciones y datos modificados
+
+Esta tabla documenta el contrato funcional de las acciones; no convierte surtir o
+devolver en actualizaciones CRUD genéricas. «Modo» es la configuración de pantalla y
+«estado requerido» es la precondición persistida.
+
+| Contexto / acción | Modo y estado requerido | Datos que pueden cambiar | Efectos que no deben confundirse con edición |
+| --- | --- | --- | --- |
+| Material o merma / crear | `create`; no existe registro | identidad editable, relaciones obligatorias, mínimos, estado y existencia inicial admitida | crea existencia y, cuando corresponde, movimiento inicial |
+| Material o merma / editar | `edit`; registro existente y no protegido por la regla específica | nombre o datos secundarios autorizados, mínimo, costo permitido y estado | no cambia existencia; el stock usa `adjust` |
+| Material o merma / ajustar | `adjust`; registro existente y actor autorizado | cantidad física, cantidad convertida derivada, motivo y observaciones | crea ajuste y movimiento; no cambia identidad |
+| Entrada / crear | `create`; documento nuevo | proveedor, factura, fechas, receptor y detalles nuevos | incrementa existencias y crea movimientos en una transacción |
+| Entrada / editar | `edit`; entrada no cancelada | encabezado permitido y detalles **nuevos**; proveedor original inmutable | una partida persistida se cambia mediante `correct`, no sobrescribiéndola |
+| Entrada / corregir o cancelar detalle | `correct`; detalle persistido y documento habilitado | cantidad/costo corregidos, motivo, valores anterior y nuevo | ajusta stock y movimiento conservando historia |
+| Salida / crear | `create`; documento nuevo | encabezado contextual y detalles solicitados | no descuenta stock mientras el detalle no se surta |
+| Salida / editar | `edit`; no cancelada y con detalle editable | encabezado permitido, detalles nuevos o cantidades aún no surtidas según servicio | no reescribe cantidades ya surtidas o devueltas |
+| Salida / surtir | `supply`; detalle pendiente o parcial | cantidad surtida acumulada, estado de detalle y encabezado | reduce existencia y crea movimiento atómicamente |
+| Salida / devolver | `return`; detalle con cantidad surtida disponible | cantidad devuelta acumulada y estados derivados | incrementa existencia y crea movimiento inverso; no elimina el detalle |
+
+Los campos HTTP exactos pertenecen al [contrato API](api-contract.md); las reglas
+observables pertenecen a la [especificación](requirements-specification.md). Esta matriz
+sólo mantiene la diferencia contextual que el operador necesita conocer.
 
 ## Límites de interpretación
 

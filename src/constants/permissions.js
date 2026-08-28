@@ -53,13 +53,11 @@ export const AUTHORIZATION_POLICIES = Object.freeze({
             'Auxiliar',
             'Operador',
             'Instalador',
-            'Asesor de ventas',
             'Administrador del sistema'
         ],
         departments: [
             'ALMACÉN Y PROVEDURÍA',
-            'SISTEMAS',
-            'VENTAS Y PROYECTOS ESPECIALES'
+            'SISTEMAS'
         ]
     }),
     [PERMISSIONS.MATERIALS_WRITE]: createPolicy({
@@ -80,7 +78,7 @@ export const AUTHORIZATION_POLICIES = Object.freeze({
         departments: ['ALMACÉN Y PROVEDURÍA', 'SISTEMAS']
     }),
     [PERMISSIONS.DEPARTMENTS_READ]: createPolicy({
-    roles: [ 'Administrador del sistema', 'Coordinador', 'Auxiliar', 'Operador', 'Instalador', 'Diseñador', 'Almacenista', 'Asesor de ventas', 'Repartidor', 'Director', 'Administrador', 'Contador' ],
+    roles: [ 'Administrador del sistema', 'Coordinador', 'Auxiliar', 'Operador', 'Instalador', 'Diseñador', 'Almacenista', 'Repartidor', 'Director', 'Administrador', 'Contador' ],
     departments: [
         'DIRECCIÓN',
         'ACABADOS',
@@ -92,8 +90,7 @@ export const AUTHORIZATION_POLICIES = Object.freeze({
         'ROUTER',
         'PT/TRÁFICO',
         'SISTEMAS',
-        'TALLER 3D',
-        'VENTAS Y PROYECTOS ESPECIALES'
+        'TALLER 3D'
     ]
 }),
     [PERMISSIONS.MOVEMENTS_READ]: createPolicy({
@@ -101,7 +98,7 @@ export const AUTHORIZATION_POLICIES = Object.freeze({
     departments: [ 'SISTEMAS' ]
 }),
     [PERMISSIONS.PERSONS_READ]: createPolicy({
-    roles: [ 'Administrador del sistema', 'Coordinador', 'Auxiliar', 'Operador', 'Instalador', 'Diseñador', 'Almacenista', 'Asesor de ventas', 'Repartidor', 'Director', 'Administrador', 'Contador' ],
+    roles: [ 'Administrador del sistema', 'Coordinador', 'Auxiliar', 'Operador', 'Instalador', 'Diseñador', 'Almacenista', 'Repartidor', 'Director', 'Administrador', 'Contador' ],
     departments: [
         'DIRECCIÓN',
         'ACABADOS',
@@ -113,8 +110,7 @@ export const AUTHORIZATION_POLICIES = Object.freeze({
         'ROUTER',
         'PT/TRÁFICO',
         'SISTEMAS',
-        'TALLER 3D',
-        'VENTAS Y PROYECTOS ESPECIALES'
+        'TALLER 3D'
     ]
 }),
     [PERMISSIONS.PERSONS_WRITE]: createPolicy({
@@ -150,8 +146,7 @@ export const AUTHORIZATION_POLICIES = Object.freeze({
         'ROUTER',
         'PT/TRÁFICO',
         'SISTEMAS',
-        'TALLER 3D',
-        'VENTAS Y PROYECTOS ESPECIALES'
+        'TALLER 3D'
     ]
 }),
     [PERMISSIONS.CLIENTS_CREATE]: createPolicy({
@@ -183,8 +178,7 @@ export const AUTHORIZATION_POLICIES = Object.freeze({
         'ROUTER',
         'PT/TRÁFICO',
         'SISTEMAS',
-        'TALLER 3D',
-        'VENTAS Y PROYECTOS ESPECIALES'
+        'TALLER 3D'
     ]
 }),
     [PERMISSIONS.GOODS_ISSUES_MANAGE]: createPolicy({
@@ -200,8 +194,7 @@ export const AUTHORIZATION_POLICIES = Object.freeze({
         'ROUTER',
         'PT/TRÁFICO',
         'SISTEMAS',
-        'TALLER 3D',
-        'VENTAS Y PROYECTOS ESPECIALES'
+        'TALLER 3D'
     ]
 }),
     [PERMISSIONS.GOODS_ISSUE_DETAILS_MANAGE]: createPolicy({
@@ -241,8 +234,8 @@ export const AUTHORIZATION_POLICIES = Object.freeze({
     departments: ['ALMACÉN Y PROVEDURÍA', 'SISTEMAS']
 }),
     [PERMISSIONS.WASTES_READ]: createPolicy({
-    roles: ['Almacenista', 'Coordinador', 'Auxiliar', 'Asesor de ventas', 'Administrador del sistema'],
-    departments: ['ALMACÉN Y PROVEDURÍA', 'SISTEMAS', 'VENTAS Y PROYECTOS ESPECIALES']
+    roles: ['Almacenista', 'Coordinador', 'Auxiliar', 'Administrador del sistema'],
+    departments: ['ALMACÉN Y PROVEDURÍA', 'SISTEMAS']
 }),
     [PERMISSIONS.WASTES_WRITE]: createPolicy({
     roles: ['Almacenista', 'Coordinador', 'Auxiliar', 'Administrador del sistema'],
@@ -285,8 +278,8 @@ export const AUTHORIZATION_POLICIES = Object.freeze({
     departments: ['SISTEMAS']
 }),
     [PERMISSIONS.WASTES_PAGE_VIEW]: createPolicy({
-    roles: ['Almacenista', 'Coordinador', 'Auxiliar', 'Asesor de ventas', 'Administrador del sistema'],
-    departments: ['ALMACÉN Y PROVEDURÍA', 'SISTEMAS', 'VENTAS Y PROYECTOS ESPECIALES']
+    roles: ['Almacenista', 'Coordinador', 'Auxiliar', 'Administrador del sistema'],
+    departments: ['ALMACÉN Y PROVEDURÍA', 'SISTEMAS']
 })
 });
 

@@ -25,7 +25,7 @@ Nexus es una plataforma de control operativo para administrar inventario, compra
 - Autenticación y manejo de sesión con cookies y JWT.
 - Administración de usuarios, roles, personas, departamentos y movimientos.
 - Gestión de almacén: materiales, proveedores, entradas de compra, salidas de almacén, mermas, motivos, presentaciones, unidades de medida y estados de cumplimiento.
-- Gestión de clientes del área de ventas.
+- Gestión administrativa de clientes como catálogo contextual.
 - Reportes administrativos, de almacén e inventario.
 - Actualización de inventario en tiempo real con Socket.IO.
 - Validación de contenido para API JSON, cargas de archivo y texto plano.
@@ -219,7 +219,7 @@ npm start
 - `/inicio-sesion`, `/revocar-sesion`, `/cerrar-sesion` para autenticación web.
 - `/materiales`, `/mermas`, `/compras`, `/salidas-almacen`, `/proveedores` para almacén.
 - `/usuarios-sistemas`, `/personas`, `/movimientos` para administración.
-- `/clientes` para ventas.
+- `/clientes` como catálogo contextual administrado por sistemas.
 
 Las tablas de detalle son responsivas. En compras se prioriza la columna de acciones y,
 en salidas, se conservan con la misma prioridad la cantidad convertida y el control para
@@ -306,6 +306,21 @@ el entrypoint ejecuta primero `prisma migrate deploy` y solamente arranca la
 aplicación si las migraciones terminan correctamente. El CLI de Prisma toma
 `DIRECT_URL` mediante `prisma.config.ts`; la aplicación continúa conectándose con
 `DATABASE_URL`.
+
+### Entorno vigente y evolución prevista
+
+Actualmente el contenedor de la aplicación se ejecuta como servicio web en **Render**
+y la base de datos PostgreSQL es administrada por **Supabase**. Render recibe `DATABASE_URL`
+para las consultas de ejecución y `DIRECT_URL` para las migraciones sin incorporar
+ninguna credencial a la imagen. `docker-compose.yml` permite reproducir el contenedor
+en un host, pero no representa por sí mismo el entorno de producción ni crea un
+servicio PostgreSQL.
+
+El objetivo es mover la aplicación a un **VPS**. Hasta definir y versionar el proxy
+inverso, TLS, automatización, respaldos y monitoreo, esa topología permanece propuesta.
+También debe decidirse expresamente si el VPS conservará Supabase como base de datos
+administrada o alojará una instancia propia de PostgreSQL. Consulta la
+[vista de despliegue actual y objetivo](docs/architecture-and-web-views.md#despliegue-actual-render-y-supabase).
 
 La documentación (`README.md` y `docs/`) **se conserva y versiona en este
 repositorio**. Las reglas de `.dockerignore` únicamente la excluyen del contexto de
