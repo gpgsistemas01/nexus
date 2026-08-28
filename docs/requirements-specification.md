@@ -22,6 +22,11 @@ de detalle. Su estructura adopta selectivamente las prácticas de ingeniería de
 requisitos descritas en el [criterio sobre normas documentales](documentation-standards.md),
 sin declarar conformidad o certificación ISO.
 
+Los objetivos de actor, con precondiciones, flujo, alternativas y resultado, se
+describen por familias en el [catálogo de casos de uso](use-case-descriptions.md). Los
+requisitos de este archivo conservan los criterios verificables y la evidencia sin
+duplicar allí la narrativa de interacción.
+
 ## 2. Convenciones
 
 ### 2.1 Identificadores

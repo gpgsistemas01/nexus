@@ -57,11 +57,18 @@ esta vista vigente hasta definir su flujo.
 
 ## Casos de uso vigentes
 
-El diagrama se mantiene en Mermaid para que GitHub lo genere correctamente. Los límites
-rectangulares representan el sistema; los actores quedan fuera. Las asociaciones
+El diagrama se mantiene en Mermaid para que GitHub lo represente correctamente. Es una
+**aproximación visual a un diagrama UML de casos de uso**, no UML estricto: Mermaid no
+ofrece ese tipo de diagrama y se emplean nodos de `flowchart` con la semántica que se
+explica a continuación. Los límites rectangulares representan el sistema; los actores
+quedan fuera. Las asociaciones
 muestran quién inicia un objetivo y no equivalen a permisos individuales. Ventas no es
 actor: el área no tiene acceso. Tampoco se asignan salidas a otras áreas solicitantes;
 su participación futura queda pendiente de definición.
+
+Las precondiciones, flujo principal, alternativas y resultados de cada objetivo se
+detallan por tema en el [catálogo de descripciones de casos de uso](use-case-descriptions.md).
+El diagrama conserva únicamente la vista visual para no duplicar esas descripciones.
 
 ```mermaid
 flowchart LR

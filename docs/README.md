@@ -11,13 +11,14 @@ raíz se limita a instalación y operación básica.
 | Modelo de datos y relaciones por área | [Diagramas de base de datos](generated/database-schema.md) | Generado desde Prisma; verificado en PR y regenerado al entrar a `main`. |
 | Campos, claves, tipos y relaciones persistentes | [Diccionario técnico de datos](generated/data-dictionary.md) | Generado desde Prisma con `npm run docs:architecture`; verificado por CI. |
 | Conceptos de negocio, casos de uso y relación entre vistas | [Dominio y casos de uso](domain-and-use-cases.md) | Curado al cambiar objetivos de actores o significado del dominio. |
+| Descripciones de casos de uso agrupadas por tema | [Catálogo de casos de uso](use-case-descriptions.md) | Curado junto con el diagrama, los requisitos y las pruebas del flujo. |
 | Terminología común de usuarios y responsables | [Glosario del negocio](business-glossary.md) | Validar al definir o cambiar un requisito. |
 | Visión, alcance, actores y atributos de calidad | [Visión, alcance y requisitos](vision-scope-and-requirements.md) | Curado al cambiar el alcance del producto, sus actores o restricciones de calidad. |
 | Requisitos funcionales, reglas y criterios de aceptación | [Especificación de requisitos](requirements-specification.md) | Fuente curada de alcance y estado funcional. |
 | Operaciones permitidas por módulo y contexto | [Matriz de operaciones](requirements-operations-matrix.md) | Curada junto con rutas, permisos, requisitos y pruebas CRUD. |
 | Vista visual de requisitos y trazabilidad | [Diagramas de requisitos](requirements-diagrams.md) | Curado junto con la especificación. |
 | Patrones, semántica y generación de diagramas | [Convenciones de diagramas](diagram-conventions.md) | Aplicar al crear o modificar una vista curada o generada. |
-| Normas y convenciones documentales | [Criterio sobre normas](documentation-standards.md) | Reevaluar ante exigencias contractuales, regulatorias o de auditoría. |
+| Normas, títulos y vocabulario documental | [Normas y criterios para la documentación](documentation-standards.md) | Reevaluar ante exigencias contractuales, regulatorias o de auditoría. |
 | Contrato de la API y evaluación de Swagger/OpenAPI | [Contrato API](api-contract.md) | Actualizar al cambiar la estrategia de la API. |
 | Estrategia y ubicación de pruebas | [Estrategia de pruebas](service-test-coverage.md) | Curado al cambiar la estrategia. |
 | Alcance, matriz CRUD y criterios de pruebas | [Plan de pruebas](test-plan.md) | Revisar en cada cambio funcional y antes de una liberación. |

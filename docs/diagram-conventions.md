@@ -53,6 +53,29 @@ conceptos habituales de UML, pero se documenta sólo la semántica realmente emp
 ISO/IEC/IEEE 42010 orienta la separación entre preocupaciones, puntos de vista y vistas;
 no obliga a utilizar UML, C4, Mermaid ni una herramienta concreta.
 
+## Inventario de notación UML
+
+La revisión de las vistas vigentes evita llamar UML a cualquier bloque Mermaid. No
+faltan diagramas para describir el alcance actual, pero sí es necesario distinguir los
+que usan notación UML de los que sólo adoptan una semántica parecida:
+
+| Vista | Clasificación vigente | ¿Falta notación UML? |
+| --- | --- | --- |
+| Modelo conceptual del dominio | UML de clases (`classDiagram`), con multiplicidades, asociaciones y composiciones. | No. |
+| Componentes de la aplicación | Aproximación UML de componentes mediante clases con el estereotipo `<<component>>`; Mermaid no ofrece un diagrama de componentes nativo. | Parcial; migrar a una herramienta UML sólo si se necesitan puertos e interfaces formales. |
+| Recorrido de una interacción | UML de secuencia (`sequenceDiagram`), con actor, participantes y mensajes. | No. |
+| Estados de acceso y estados de las salidas | UML de máquina de estados (`stateDiagram-v2`). | No. |
+| Casos de uso | Aproximación UML mediante `flowchart`: actores externos, límite del sistema, objetivos y asociaciones. | Parcial; Mermaid no ofrece casos de uso UML nativos. |
+| Despliegue actual y objetivo | Grafo inspirado en despliegue UML; sus subgrafos representan entornos y nodos, pero no artefactos UML formales. | Parcial; la semántica actual es suficiente mientras no se documenten artefactos instalados. |
+| Contexto, contenedores, capas, navegación, requisitos, trazabilidad y ciclo CRUD | C4 inspirado o grafos dirigidos con semántica local. | No aplica: convertirlos a UML cambiaría la pregunta que responden. |
+| Esquema persistente | Entidad-relación (`erDiagram`), no UML. | No aplica: Prisma y las migraciones son la fuente técnica adecuada. |
+
+Por tanto, las únicas brechas de notación son **componentes, casos de uso y
+despliegue**, y están declaradas como aproximaciones deliberadas. No se agrega otro
+diagrama que duplique su contenido sólo para obtener una etiqueta UML. Si una entrega
+contractual exige UML estricto, esas tres vistas deben migrarse juntas a una herramienta
+que soporte la notación y conservar los mismos límites y fuentes de verdad.
+
 ## Patrones de implementación que deben verse en los diagramas
 
 Los diagramas de arquitectura muestran soluciones que sí tienen evidencia en el
