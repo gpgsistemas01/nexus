@@ -35,7 +35,7 @@ ambos documentos y crea un commit únicamente si detecta diferencias.
 
 ```mermaid
 flowchart LR
-    user["Personal de almacén,<br/>ventas y administración"]
+    user["Personal de almacén y<br/>administración del sistema"]
     browser["Navegador web"]
     nexus["Nexus<br/>plataforma de control operativo"]
     postgres[("PostgreSQL")]
@@ -76,6 +76,54 @@ flowchart TB
     scripts <-->|"JSON"| apiRoutes
     scripts <-->|"eventos"| realtime
     prisma <-->|"SQL"| database
+```
+
+### Componentes de aplicación
+
+Esta vista UML de componentes complementa los contenedores: muestra contratos y
+dependencias de diseño, no cada import concreto. El detalle mecánico permanece en el
+[mapa generado](generated/code-map.md).
+
+```mermaid
+classDiagram
+    class Rutas {
+        <<component>>
+        +autorizar()
+        +validar()
+    }
+    class Controladores {
+        <<component>>
+        +traducirHTTP()
+    }
+    class DTO {
+        <<component>>
+        +normalizarEntrada()
+        +normalizarSalida()
+    }
+    class ServiciosDominio {
+        <<component>>
+        +ejecutarCasoDeUso()
+    }
+    class RepositorioPrisma {
+        <<component>>
+        +consultar()
+        +persistir()
+    }
+    class AplicacionCliente {
+        <<component>>
+        +coordinarCRUD()
+    }
+    class ComponentesUI {
+        <<component>>
+        +presentarEstado()
+    }
+
+    Rutas --> Controladores
+    Controladores --> DTO
+    Controladores --> ServiciosDominio
+    ServiciosDominio --> RepositorioPrisma
+    AplicacionCliente --> Rutas : HTTP
+    ComponentesUI --> AplicacionCliente
 ```
 
 ### Recorrido de una interacción
@@ -152,7 +200,7 @@ flowchart LR
         suppliers["Proveedores<br/>/proveedores"]
     end
 
-    subgraph sales["Ventas"]
+    subgraph contextual["Catálogos contextuales"]
         clients["Clientes<br/>/clientes"]
     end
 
@@ -187,7 +235,7 @@ flowchart LR
 | Almacén | Salidas de almacén (`/salidas/materiales`) | Consultar y registrar entregas de materiales. | Filtrar, registrar salida, seleccionar cliente y devolver detalles. | `src/views/pages/warehouse/goodsIssues/goodsIssuesPage.ejs` |
 | Almacén | Salidas de mermas (`/salidas/mermas`) | Consultar y registrar salidas de merma. | Registrar, editar, surtir y devolver detalles de merma. | `src/views/pages/warehouse/wasteIssues/wasteIssuesPage.ejs` |
 | Almacén | Proveedores (`/proveedores`) | Consultar y administrar proveedores. | Crear/editar desde modal. | `src/views/pages/warehouse/suppliers/suppliersPage.ejs` |
-| Ventas | Clientes (`/clientes`) | Consultar y administrar clientes. | Crear/editar desde modal. | `src/views/pages/sales/clients/clientsPage.ejs` |
+| Administración | Clientes (`/clientes`) | Consultar y administrar clientes. | Crear/editar desde modal. | `src/views/pages/sales/clients/clientsPage.ejs` |
 | Administración | Usuarios (`/usuarios-sistemas`) | Administrar cuentas y asignaciones. | Crear/editar usuario, roles y departamentos. | `src/views/pages/admin/users/usersPage.ejs` |
 | Administración | Personas (`/personas`) | Administrar personas participantes del negocio. | Filtrar y crear/editar datos y asignaciones. | `src/views/pages/admin/persons/personsPage.ejs` |
 | Administración | Movimientos de materiales (`/movimientos/materiales`) | Auditar movimientos del inventario de materiales. | Filtrar, consultar y exportar el historial. | `src/views/pages/admin/movements/movementsPage.ejs` |

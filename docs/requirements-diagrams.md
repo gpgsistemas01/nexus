@@ -10,44 +10,40 @@ las fuentes verificables de implementación. Estas vistas aplican las
 [convenciones y patrones para diagramas](diagram-conventions.md): cada sección conserva
 un propósito, alcance, semántica y fuente de verdad definidos.
 
-## Casos de uso funcionales por actor
+## Vista de requisitos y dependencias
 
-Las flechas continuas representan capacidades disponibles; la línea discontinua indica
-un flujo parcial o todavía pendiente. Cada caso se detalla mediante uno o
-más requisitos `RF` en la especificación, sin convertir este mapa en un inventario de
-endpoints.
+Esta vista contiene **requisitos**, no actores ni casos de uso. Las operaciones del
+usuario se muestran exclusivamente en el [diagrama de casos de uso](domain-and-use-cases.md#casos-de-uso-vigentes). Una flecha `A --> B` significa que el cumplimiento de `A`
+depende de `B`; no representa navegación, permiso ni interacción humana.
 
 ```mermaid
 flowchart LR
-    warehouse["Personal de almacén"]
-    sales["Ventas / asesoría"]
-    admin["Administración"]
-    subgraph inventory["Inventario y abastecimiento"]
-        catalogs["Gestionar materiales,<br/>proveedores y catálogos editables"]
-        receipts["Registrar entradas con partidas independientes<br/>y corregir partidas persistidas"]
-        issues["Registrar salidas de material,<br/>surtir y devolver"]
-        wastes["Nombrar y gestionar existencias de merma,<br/>registrar salidas, surtir y devolver"]
-        adjustments["Solicitar y aplicar<br/>ajustes de stock"]
-    end
-    subgraph governance["Administración y control"]
-        people["Gestionar personas,<br/>usuarios y accesos"]
-        clients["Gestionar clientes"]
-        projects["Gestionar proyectos<br/>(flujo pendiente)"]
-        reports["Consultar movimientos<br/>y exportar reportes"]
-        audit["Conservar trazabilidad<br/>de escrituras críticas"]
-    end
-    warehouse --> catalogs
-    warehouse --> receipts
-    warehouse --> issues
-    warehouse --> wastes
-    warehouse -.->|"parcial"| adjustments
-    sales --> clients
-    sales -.->|"pendiente"| projects
-    sales --> issues
-    admin --> people
-    admin --> reports
-    admin --> audit
+    auth["RC-SEG-001\nAutenticación y autorización"]
+    atomic["RN-002\nAtomicidad documental"]
+    quantities["RN-003\nConsistencia de cantidades"]
+    trace["RN-005 y RN-008\nHistoria y auditoría"]
+    catalogs["RF-CAT-001 a RF-CAT-005\nCatálogos operativos"]
+    receipts["RF-REC-001 a RF-REC-003\nEntradas y correcciones"]
+    issues["RF-ISS-001 a RF-ISS-004\nSalidas y devoluciones"]
+    inventory["RF-INV-001 a RF-INV-003\nExistencias y movimientos"]
+
+    receipts --> auth
+    receipts --> catalogs
+    receipts --> atomic
+    receipts --> trace
+    issues --> auth
+    issues --> catalogs
+    issues --> atomic
+    issues --> quantities
+    issues --> trace
+    receipts --> inventory
+    issues --> inventory
 ```
+
+El texto verificable y el estado de cada identificador se mantienen una sola vez en la
+[especificación](requirements-specification.md#4-requisitos-funcionales). La
+[matriz de operaciones](requirements-operations-matrix.md#matriz-vigente) documenta los
+permisos, y el mapa generado documenta las rutas; repetirlos aquí mezclaría vistas.
 
 ## Ciclo vigente de los requisitos CRUD
 
