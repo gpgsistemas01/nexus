@@ -63,6 +63,10 @@ muestran quién inicia un objetivo y no equivalen a permisos individuales. Venta
 actor: el área no tiene acceso. Tampoco se asignan salidas a otras áreas solicitantes;
 su participación futura queda pendiente de definición.
 
+Las precondiciones, flujo principal, alternativas y resultados de cada objetivo se
+detallan por tema en el [catálogo de descripciones de casos de uso](use-case-descriptions.md).
+El diagrama conserva únicamente la vista visual para no duplicar esas descripciones.
+
 ```mermaid
 flowchart LR
     warehouse["Personal de almacén"]

@@ -11,6 +11,7 @@ raíz se limita a instalación y operación básica.
 | Modelo de datos y relaciones por área | [Diagramas de base de datos](generated/database-schema.md) | Generado desde Prisma; verificado en PR y regenerado al entrar a `main`. |
 | Campos, claves, tipos y relaciones persistentes | [Diccionario técnico de datos](generated/data-dictionary.md) | Generado desde Prisma con `npm run docs:architecture`; verificado por CI. |
 | Conceptos de negocio, casos de uso y relación entre vistas | [Dominio y casos de uso](domain-and-use-cases.md) | Curado al cambiar objetivos de actores o significado del dominio. |
+| Descripciones de casos de uso agrupadas por tema | [Catálogo de casos de uso](use-case-descriptions.md) | Curado junto con el diagrama, los requisitos y las pruebas del flujo. |
 | Terminología común de usuarios y responsables | [Glosario del negocio](business-glossary.md) | Validar al definir o cambiar un requisito. |
 | Visión, alcance, actores y atributos de calidad | [Visión, alcance y requisitos](vision-scope-and-requirements.md) | Curado al cambiar el alcance del producto, sus actores o restricciones de calidad. |
 | Requisitos funcionales, reglas y criterios de aceptación | [Especificación de requisitos](requirements-specification.md) | Fuente curada de alcance y estado funcional. |
