@@ -62,7 +62,7 @@ efectiva continúa determinada por los permisos del servidor, no por la matriz.
 | --- | --- |
 | Personal de almacén | Mantener catálogos operativos y ejecutar entradas, salidas, devoluciones y ajustes autorizados. |
 | Solicitante o aprobador | Participar en documentos operativos de acuerdo con su rol y departamento. |
-| Ventas o asesoría | Mantener clientes y aportar el contexto comercial de las salidas. |
+| Administración del sistema | Mantener clientes como catálogo contextual; ventas no accede al sistema. |
 | Administración | Mantener personas, usuarios y accesos; consultar auditoría y reportes permitidos. |
 | Sistema | Validar, persistir atómicamente, numerar documentos, auditar escrituras críticas y notificar actualizaciones. |
 
@@ -88,7 +88,7 @@ descritas en [usuarios y permisos](database-users-and-permissions-analysis.md).
 | --- | --- | --- | --- |
 | RF-CAT-001 | Almacén puede consultar, crear, actualizar y eliminar materiales con presentación, unidad y límites válidos; el listado refleja la mutación. Una oferta proveedor-material sólo se presenta como eliminable si el material no participa en entradas, salidas, movimientos, ajustes o correcciones históricas. El listado y la eliminación reutilizan una sola definición de esas relaciones: el listado exige explícitamente que cada relación esté vacía y la mutación comprueba si alguna tiene registros mediante una consulta de material. La merma conserva un snapshot independiente y no se consulta como relación de `SupplierMaterial`. | Implementado | `src/routes/api/warehouse/materialApiRoute.js`, `src/views/pages/warehouse/materials`, `src/services/warehouse/materials/supplierMaterialService.js` |
 | RF-CAT-002 | Almacén puede consultar, crear y actualizar proveedores y sus relaciones con materiales sin duplicar la relación proveedor-material. | Implementado | `src/routes/api/warehouse/supplierApiRoute.js`, modelo `SupplierMaterial` |
-| RF-CAT-003 | Ventas puede consultar, crear y actualizar clientes y su asesor asociado. | Implementado | `src/routes/api/sales/clientApiRoute.js`, `tests/integration/controllers/clientControllerDbTest.js` |
+| RF-CAT-003 | Administración del sistema puede consultar, crear y actualizar clientes y su asesor asociado como dato contextual. | Implementado | `src/routes/api/sales/clientApiRoute.js`, `tests/integration/controllers/clientControllerDbTest.js` |
 | RF-CAT-004 | Almacén puede consultar, registrar y actualizar existencias de merma en el contexto de un material y proveedor. | Implementado | `src/routes/api/warehouse/wasteApiRoute.js`, `src/views/pages/warehouse/wastes` |
 | RF-CAT-005 | Presentaciones, unidades, motivos y estados de cumplimiento se exponen como catálogos auxiliares reutilizables por los formularios operativos. | Implementado | routers de catálogo bajo `src/routes/api/warehouse` |
 

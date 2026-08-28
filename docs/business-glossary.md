@@ -25,7 +25,7 @@ alineación sin renombrar silenciosamente contratos existentes.
 | Departamento | Área organizacional que aporta contexto y alcance a una asignación. | En documentos operativos puede conservarse también su nombre histórico. |
 | Solicitante | Persona que origina o solicita un documento operativo. | Puede ser diferente del usuario que captura la operación. |
 | Aprobador | Persona que autoriza una transición cuando el flujo lo requiere. | Que un modelo permita `approver` no implica que el flujo de aprobación esté disponible. |
-| Asesor | Persona asociada al contexto comercial de un cliente o salida. | No debe inferirse a partir del usuario autenticado. |
+| Asesor | Persona asociada como dato del contexto comercial de un cliente o salida. | No es actor ni usuario del sistema y no debe inferirse a partir del usuario autenticado. |
 | Actor de auditoría | Usuario al que se atribuye una escritura o cambio crítico. | Puede conservarse como nulo únicamente en los casos técnicos previstos por la auditoría. |
 
 ## Catálogo, existencias y relaciones comerciales

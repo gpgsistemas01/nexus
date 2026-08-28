@@ -28,8 +28,7 @@ El valor esperado es sustituir registros dispersos por flujos consistentes que:
 
 - **Almacén y proveeduría:** registra recepciones, proveedores, materiales, mermas,
   surtidos, devoluciones y consulta existencias.
-- **Áreas solicitantes y ventas:** solicitan o consultan materiales vinculados con
-  departamentos, clientes, asesores y proyectos.
+- **Áreas solicitantes futuras:** su participación en salidas permanece pendiente de definir; ventas no tiene acceso al sistema.
 - **Administración del sistema:** administra cuentas, personas y asignaciones de
   rol/departamento, además de ajustes de stock protegidos.
 - **Coordinación y dirección:** consulta trazabilidad, reportes e indicadores para

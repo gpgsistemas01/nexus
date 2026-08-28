@@ -16,6 +16,11 @@ La cobertura vigente se divide así:
 - Los componentes compartidos del CRUD cliente se prueban bajo
   `tests/unit/public/js`; cada contexto conserva únicamente las pruebas de la
   configuración o regla que le pertenece.
+- Las políticas se prueban como decisiones funcionales bajo
+  `tests/unit/constants`: una combinación de rol y departamento debe conceder sólo
+  las operaciones vigentes. En particular, la suite verifica el acceso positivo de
+  almacén y el rechazo total del área de ventas, en vez de fijar la forma interna del
+  objeto de configuración.
 
 ## Estrategia de integración con BD
 

@@ -1,153 +1,129 @@
 # Modelo de dominio, casos de uso y relación entre vistas
 
-## Alcance y decisión
+## Alcance de las vistas
 
-La documentación anterior ya contenía diagramas ER y un mapa de capacidades por actor,
-pero faltaban dos vistas explícitas:
-
-1. un **modelo de dominio conceptual**, independiente de tablas y detalles de Prisma;
-2. una **vista de casos de uso**, que separe lo disponible de lo solamente modelado.
-
-Se agregan como vistas curadas porque el código no puede inferir por sí solo el lenguaje
-del negocio, el propósito de una relación ni la intención de un actor. Los diagramas ER
-y el diccionario técnico continúan generándose desde Prisma.
+Este documento contiene dos vistas curadas diferentes: el modelo conceptual explica
+el vocabulario del negocio y el diagrama de casos de uso muestra objetivos de actores.
+Los campos SQL y cardinalidades físicas están en el
+[ER generado](generated/database-schema.md), y los criterios verificables en la
+[especificación de requisitos](requirements-specification.md). No se repiten aquí.
 
 ## Modelo de dominio conceptual
 
-Este diagrama muestra conceptos y relaciones del negocio, no clases JavaScript,
-cardinalidades SQL ni todos los campos persistidos. Un concepto puede materializarse en
-varios modelos Prisma o coordinarse mediante funciones de servicio. Sus nombres siguen
-el [glosario del negocio](business-glossary.md).
+Se usa `classDiagram`, notación UML soportada por Mermaid. Las clases no representan
+clases JavaScript ni copian tablas: son conceptos del negocio. La multiplicidad indica
+la relación conceptual vigente; una relación pendiente se omite para no presentar una
+intención como parte del dominio operativo.
+
+```mermaid
+classDiagram
+    class Usuario
+    class Persona
+    class AsignacionAcceso
+    class Cliente
+    class Proveedor
+    class Material
+    class Merma
+    class OfertaProveedorMaterial
+    class EntradaCompra
+    class SalidaMaterial
+    class SalidaMerma
+    class DetalleDocumento
+    class Movimiento
+    class Existencia
+
+    Usuario "1" --> "0..*" AsignacionAcceso : posee
+    Persona "1" --> "0..*" AsignacionAcceso : desempeña
+    Proveedor "1" --> "0..*" OfertaProveedorMaterial : ofrece
+    Material "1" --> "0..*" OfertaProveedorMaterial : cotizado como
+    Material "1" --> "0..*" Merma : origina
+    Proveedor "1" --> "0..*" EntradaCompra : abastece
+    EntradaCompra "1" *-- "1..*" DetalleDocumento : contiene
+    SalidaMaterial "1" *-- "1..*" DetalleDocumento : contiene
+    SalidaMerma "1" *-- "1..*" DetalleDocumento : contiene
+    Cliente "0..1" --> "0..*" SalidaMaterial : contextualiza
+    Material "1" --> "0..*" SalidaMaterial : se entrega en
+    Merma "1" --> "0..*" SalidaMerma : se entrega en
+    EntradaCompra "1" --> "0..*" Movimiento : produce
+    SalidaMaterial "1" --> "0..*" Movimiento : produce
+    SalidaMerma "1" --> "0..*" Movimiento : produce
+    Movimiento "0..*" --> "1" Existencia : modifica
+```
+
+`Persona` puede ser solicitante, receptor o referencia comercial sin que eso convierta
+a esa persona en usuario. En particular, **asesor** es un dato del contexto comercial,
+no un actor con acceso. Los proyectos siguen modelados técnicamente, pero se excluyen de
+esta vista vigente hasta definir su flujo.
+
+## Casos de uso vigentes
+
+El diagrama se mantiene en Mermaid para que GitHub lo genere correctamente. Los límites
+rectangulares representan el sistema; los actores quedan fuera. Las asociaciones
+muestran quién inicia un objetivo y no equivalen a permisos individuales. Ventas no es
+actor: el área no tiene acceso. Tampoco se asignan salidas a otras áreas solicitantes;
+su participación futura queda pendiente de definición.
 
 ```mermaid
 flowchart LR
-    subgraph identity["Identidad y acceso"]
-        user["Usuario"]
-        person["Persona"]
-        access["Asignación de rol y departamento"]
-        audit["Auditoría crítica"]
-        user --> access
-        person --> access
-        user --> audit
+    warehouse["Personal de almacén"]
+    admin["Administración del sistema"]
+
+    subgraph nexus["Nexus"]
+        ucCatalogs(["Mantener catálogos de almacén"])
+        ucReceipts(["Registrar y corregir entradas"])
+        ucIssues(["Crear y editar salidas"])
+        ucSupply(["Surtir detalles"])
+        ucReturn(["Devolver detalles surtidos"])
+        ucMovements(["Consultar movimientos y reportes"])
+        ucIdentity(["Administrar personas, usuarios y accesos"])
+        ucClients(["Mantener clientes como catálogo contextual"])
     end
 
-    subgraph commercial["Contexto comercial"]
-        client["Cliente"]
-        project["Proyecto"]
-        supplier["Proveedor"]
-    end
-
-    subgraph catalog["Catálogo de inventario"]
-        material["Material"]
-        waste["Existencia de merma"]
-        supplierMaterial["Oferta proveedor-material"]
-        supplier --> supplierMaterial
-        material --> supplierMaterial
-        material --> waste
-    end
-
-    subgraph documents["Documentos operativos"]
-        receipt["Entrada de compra"]
-        goodsIssue["Salida de material"]
-        wasteIssue["Salida de merma"]
-        adjustment["Ajuste de stock"]
-        return["Devolución o corrección"]
-    end
-
-    subgraph ledger["Trazabilidad de inventario"]
-        movement["Movimiento"]
-        stock["Existencia"]
-        reference["Referencia documental"]
-    end
-
-    supplier --> receipt
-    client --> goodsIssue
-    person --> goodsIssue
-    person --> wasteIssue
-    material --> receipt
-    material --> goodsIssue
-    waste --> wasteIssue
-    receipt --> movement
-    goodsIssue --> movement
-    wasteIssue --> movement
-    adjustment --> movement
-    return --> movement
-    movement --> stock
-    reference --> receipt
-    reference --> goodsIssue
-    reference --> wasteIssue
+    warehouse --- ucCatalogs
+    warehouse --- ucReceipts
+    warehouse --- ucIssues
+    warehouse --- ucSupply
+    warehouse --- ucReturn
+    warehouse --- ucMovements
+    admin --- ucIdentity
+    admin --- ucClients
+    admin --- ucMovements
+    ucSupply -.->|incluye existencia y movimiento| ucMovements
+    ucReturn -.->|incluye reversión y movimiento| ucMovements
 ```
 
-Las flechas significan «participa en» o «produce/afecta» según la etiqueta del concepto;
-no expresan una clave foránea concreta. Para cardinalidades y propiedad de relaciones se
-consulta el [diagrama ER](generated/database-schema.md); para campos y restricciones
-técnicas, el [diccionario de datos](generated/data-dictionary.md).
+No se dibujan operaciones pendientes como asociaciones. Las áreas que eventualmente
+soliciten o registren salidas, y el mantenimiento de proyectos, deben definirse primero
+como alcance, permisos y criterios de aceptación.
 
-## Casos de uso por actor
+## Estados y datos modificados por acción
 
-El mapa funcional existente se adopta como la vista canónica de casos de uso y se
-renombra explícitamente en [diagramas de requisitos](requirements-diagrams.md). Agrupa
-objetivos por actor, enlaza la especificación y diferencia capacidades vigentes de las
-pendientes; no se crea aquí un segundo diagrama que pueda divergir.
-
-Un caso de uso representa un objetivo observable y puede atravesar varias rutas y
-servicios. El inventario de endpoints permanece en el mapa generado, mientras el estado
-y el criterio de aceptación permanecen en la especificación de requisitos.
-
-## ¿Hace falta un diagrama de clases?
-
-No se agrega un diagrama de clases global en el estado actual. La aplicación se
-implementa principalmente con módulos y funciones JavaScript, factories configurables,
-objetos Prisma generados y plantillas EJS; representar cada módulo como una «clase»
-produciría una vista engañosa y duplicaría el mapa de dependencias.
-
-La necesidad se cubre mejor con:
-
-- el diagrama de capas y la secuencia para responsabilidades en ejecución;
-- el mapa generado de imports para dependencias de código;
-- el modelo de dominio para conceptos de negocio;
-- el ER y el diccionario para estructura persistente.
-
-Se añadirá un diagrama de clases **focalizado**, no global, cuando exista una jerarquía o
-colaboración real de clases cuyo contrato no se entienda mejor mediante esas vistas. En
-ese caso mostrará únicamente clases existentes, responsabilidades, herencia/composición
-y el caso de uso que justifica la vista.
-
-## Relación y trazabilidad entre diagramas
-
-Cada vista responde una pregunta distinta y se conecta mediante identificadores o
-nombres estables; ninguna sustituye a las demás.
+Los modos de formulario (`crear`, `editar`, `surtir`, `devolver`) no son estados del
+documento. El siguiente UML de estados muestra las precondiciones de negocio comunes a
+salidas de material y merma; las diferencias específicas se consultan en la
+[matriz de operaciones](requirements-operations-matrix.md#modos-precondiciones-y-datos-modificados).
 
 ```mermaid
-flowchart LR
-    useCase["Caso de uso<br/>objetivo del actor"] --> requirement["RF / RN / RC<br/>criterio verificable"]
-    requirement --> domain["Concepto de dominio<br/>lenguaje del negocio"]
-    domain --> data["ER + diccionario<br/>persistencia"]
-    requirement --> architecture["Arquitectura / secuencia<br/>responsabilidades"]
-    architecture --> code["Ruta · controller · servicio<br/>Prisma · UI compartida"]
-    data --> code
-    requirement --> test["Plan y prueba<br/>evidencia"]
-    code --> test
+stateDiagram-v2
+    [*] --> Borrador: crear encabezado y detalles
+    Borrador --> Borrador: editar encabezado o detalles
+    Borrador --> Parcial: surtir parte de una cantidad
+    Borrador --> Surtida: surtir todas las cantidades
+    Parcial --> Parcial: surtir otra parte o devolver parte
+    Parcial --> Surtida: completar surtimiento
+    Surtida --> Parcial: devolver parte
+    Surtida --> Devuelta: devolver todo lo surtido
+    Borrador --> Cancelada: cancelar cuando el flujo lo permita
+    Parcial --> Cancelada: cancelar sólo con regla autorizada
+    Devuelta --> [*]
+    Cancelada --> [*]
 ```
 
-| Cambio | Vistas que se revisan |
-| --- | --- |
-| Nuevo objetivo de actor | Caso de uso, requisito y plan de pruebas; después dominio, arquitectura y datos afectados. |
-| Nueva regla o estado | Requisito y diagrama de estados; servicio y pruebas de decisión/límite correspondientes. |
-| Nuevo concepto de negocio | Modelo de dominio; sólo después modelos Prisma, ER y diccionario si requiere persistencia. |
-| Cambio de modelo Prisma | ER y diccionario generados; dominio únicamente si cambia el significado del negocio. |
-| Nueva dependencia externa o límite de ejecución | Contexto, contenedores y, cuando exista infraestructura verificable, despliegue. |
-| Nuevo CRUD en otro contexto | Revisar primero fábrica, componentes y ciclo CRUD existentes; documentar sólo la diferencia real. |
+## Vistas de diseño del sistema
 
-## Otras vistas evaluadas
-
-- **Datos:** el ER existente cubre relaciones y cardinalidades; se complementa con el
-  nuevo diccionario técnico generado. No se crea un segundo ER manual.
-- **Despliegue:** queda pendiente hasta que exista una topología verificable de ambientes,
-  nodos, redes y servicios administrados. El diagrama de contenedores no debe inventarla.
-- **Estados:** se mantiene el ciclo CRUD transversal y se agregan diagramas focalizados
-  sólo para documentos con transiciones de negocio propias.
-- **Componentes:** la vista de capas y el mapa de imports cubren el nivel actual. Se crea
-  una vista por componente únicamente si una decisión no puede explicarse allí.
-
-Todas estas vistas aplican las [convenciones de diagramas](diagram-conventions.md).
+El diseño no se duplica en este archivo. Consulta la
+[arquitectura del sistema](architecture-and-web-views.md#1-arquitectura-del-sistema)
+para contexto, contenedores, componentes y secuencia; el
+[mapa generado](generated/code-map.md) para imports y rutas; y el
+[ER](generated/database-schema.md) para diseño físico de datos. Una vista de despliegue
+permanece pendiente hasta contar con topología verificable de ambientes, nodos y redes.
