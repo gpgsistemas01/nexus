@@ -42,9 +42,7 @@ export const createMaterialDatatable = async (context) => {
     renderWarehouseInventoryHeader({
         tableElement,
         canSeeCost,
-        canManageItems: canManageMaterials,
-        stockTitle: 'Compra',
-        costTitle: 'Costo Unitario'
+        canManageItems: canManageMaterials
     });
 
     const filters = await setupTableFilters({
