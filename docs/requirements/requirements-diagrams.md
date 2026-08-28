@@ -5,9 +5,9 @@ capacidades y atributos de calidad. La definición, estado, criterios de aceptac
 reglas de negocio se detallan en la
 [especificación de requisitos](requirements-specification.md). Este archivo es un mapa
 para conversación y revisión: las rutas del
-[mapa generado](generated/code-map.md), el esquema Prisma y las pruebas siguen siendo
+[mapa generado](../generated/code-map.md), el esquema Prisma y las pruebas siguen siendo
 las fuentes verificables de implementación. Estas vistas aplican las
-[convenciones y patrones para diagramas](diagram-conventions.md): cada sección conserva
+[convenciones y patrones para diagramas](../architecture/diagram-conventions.md): cada sección conserva
 un propósito, alcance, semántica y fuente de verdad definidos.
 
 ## Vista de requisitos y dependencias
@@ -111,4 +111,4 @@ flowchart LR
 
 Al modificar un requisito se revisan su ruta, autorización, validación, persistencia y
 pruebas relacionadas. La ubicación y estrategia de estas últimas se detalla en
-[Estrategia y cobertura de pruebas](service-test-coverage.md).
+[Estrategia y cobertura de pruebas](../testing/service-test-coverage.md).

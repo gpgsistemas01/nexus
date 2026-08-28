@@ -282,7 +282,7 @@ no haya acordado; esas definiciones permanecen como brechas.
   comportamiento requiere uno nuevo.
 - **RNF-PRU-01.** Dado un cambio CRUD, las pruebas deben replicar bajo `tests/` la
   ubicación del código y cubrir las operaciones públicas afectadas según
-  `docs/service-test-coverage.md`. **Medida:** creación, consulta, actualización y
+  `docs/testing/service-test-coverage.md`. **Medida:** creación, consulta, actualización y
   desactivación/eliminación aplicable tienen una aserción observable.
 - **RNF-PRU-02.** Dada una prueba con persistencia real, debe usar
   `DATABASE_TEST_URL`, datos identificables y limpieza acotada; puede usar rollback si
@@ -323,12 +323,12 @@ no haya acordado; esas definiciones permanecen como brechas.
    administrados y cuáles pertenecen exclusivamente al seed.
 3. **Auditoría incompleta.** Algunos hechos registran `User` creador/aprobador, mientras
    otros solo conservan una `Person` participante o marcas de tiempo. La ampliación de
-   auditoría está detallada en `docs/database-users-and-permissions-analysis.md`.
+   auditoría está detallada en `docs/data/database-users-and-permissions-analysis.md`.
 4. **Criterios de producto.** Faltan propietarios de negocio, metas cuantificables,
    SLA, política de retención y recuperación, clasificación de datos y criterios de
    aceptación acordados con usuarios. Este documento no inventa esos compromisos.
 5. **Cobertura.** Persisten servicios sin cobertura CRUD completa; el inventario
-   actualizado se mantiene en `docs/service-test-coverage.md`.
+   actualizado se mantiene en `docs/testing/service-test-coverage.md`.
 
 ## Criterio para mantener este documento
 

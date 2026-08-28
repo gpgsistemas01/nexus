@@ -5,7 +5,7 @@
 Este glosario forma parte de la línea base de requisitos. Define el vocabulario que
 usuarios, responsables funcionales, desarrollo y pruebas deben interpretar de la misma
 forma. No es un inventario de columnas: el
-[diccionario técnico de datos](generated/data-dictionary.md) describe nombres, tipos y
+[diccionario técnico de datos](../generated/data-dictionary.md) describe nombres, tipos y
 restricciones de Prisma, mientras este documento describe significado, alcance y
 sinónimos aceptados en el negocio.
 
