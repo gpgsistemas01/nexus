@@ -12,7 +12,9 @@ La interfaz conserva **Mes actual** como opción explícita porque es el caso de
 principal y evita una selección innecesaria. **Otro mes** habilita un selector mensual
 Flatpickr —con valor contractual `AAAA-MM`— y **Personalizado** reutiliza los filtros
 aplicados al listado; así no se mezclan un periodo calendario completo y un reporte
-filtrado.
+filtrado. El selector reutiliza los mismos tokens visuales y estados habilitado, enfocado
+y deshabilitado de los campos de formulario; así el periodo permanece legible dentro
+del modal sin introducir una variante de estilo exclusiva para la exportación.
 
 ## Decisión
 
