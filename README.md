@@ -307,6 +307,21 @@ aplicación si las migraciones terminan correctamente. El CLI de Prisma toma
 `DIRECT_URL` mediante `prisma.config.ts`; la aplicación continúa conectándose con
 `DATABASE_URL`.
 
+### Entorno vigente y evolución prevista
+
+Actualmente el contenedor de la aplicación se ejecuta como servicio web en **Render**
+y la base de datos PostgreSQL es administrada por **Supabase**. Render recibe `DATABASE_URL`
+para las consultas de ejecución y `DIRECT_URL` para las migraciones sin incorporar
+ninguna credencial a la imagen. `docker-compose.yml` permite reproducir el contenedor
+en un host, pero no representa por sí mismo el entorno de producción ni crea un
+servicio PostgreSQL.
+
+El objetivo es mover la aplicación a un **VPS**. Hasta definir y versionar el proxy
+inverso, TLS, automatización, respaldos y monitoreo, esa topología permanece propuesta.
+También debe decidirse expresamente si el VPS conservará Supabase como base de datos
+administrada o alojará una instancia propia de PostgreSQL. Consulta la
+[vista de despliegue actual y objetivo](docs/architecture-and-web-views.md#despliegue-actual-render-y-supabase).
+
 La documentación (`README.md` y `docs/`) **se conserva y versiona en este
 repositorio**. Las reglas de `.dockerignore` únicamente la excluyen del contexto de
 construcción Docker para que no se envíe al servidor ni se incorpore a la imagen
