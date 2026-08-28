@@ -7,13 +7,13 @@ renderiza directamente sin guardar imágenes que puedan quedar desactualizadas.
 Esta familia documental se divide deliberadamente en dos niveles:
 
 - este documento **curado** explica contexto, decisiones, responsabilidades y flujos;
-- el [mapa generado del código](generated/code-map.md), que pertenece a la familia de
+- el [mapa generado del código](../generated/code-map.md), que pertenece a la familia de
   arquitectura, mantiene un inventario de rutas y dependencias reales entre áreas.
 
 Los otros dos artefactos generados no son anexos de este documento: el
-[esquema de base de datos](generated/database-schema.md) y el
-[diccionario técnico](generated/data-dictionary.md) pertenecen a la familia de datos y
-se derivan de Prisma. El [índice documental](README.md#organización-de-los-artefactos)
+[esquema de base de datos](../generated/database-schema.md) y el
+[diccionario técnico](../generated/data-dictionary.md) pertenecen a la familia de datos y
+se derivan de Prisma. El [índice documental](../README.md#organización-de-los-artefactos)
 expone la jerarquía completa. Los tres se verifican con `npm run docs:check`.
 
 Así, un generador no intenta adivinar el porqué del diseño y los inventarios mecánicos
@@ -173,7 +173,7 @@ flowchart LR
 
 Esta vista UML de componentes complementa los contenedores: muestra contratos y
 dependencias de diseño, no cada import concreto. El detalle mecánico permanece en el
-[mapa generado](generated/code-map.md).
+[mapa generado](../generated/code-map.md).
 
 ```mermaid
 classDiagram
@@ -442,7 +442,7 @@ Reglas para extender un CRUD:
 6. Ubicar las pruebas unitarias de controllers en
    `tests/unit/controllers/<tipo>/<dominio>` y las CRUD con persistencia en
    `tests/integration/controllers`, siguiendo las estrategias de
-   `docs/service-test-coverage.md`.
+   `docs/testing/service-test-coverage.md`.
 7. Al editar EJS, preservar el cierre final de `contentFor` en su posición; no
    eliminarlo y volverlo a agregar como efecto secundario de una refactorización.
 
@@ -628,7 +628,7 @@ mismo flujo sin implementaciones específicas por CRUD.
 - **Inventarios verificables:** el generador local para rutas, importaciones y el
   esquema de datos.
 - **Para la API:** OpenAPI describe el contrato y Swagger UI puede visualizarlo; no
-  reemplazan estos diagramas. Consulta la [decisión sobre el contrato](api-contract.md).
+  reemplazan estos diagramas. Consulta la [decisión sobre el contrato](../data/api-contract.md).
 
 No se propone otra herramienta sin una necesidad aprobada y verificable. Esto mantiene
 el flujo actual simple y evita diagramas duplicados.

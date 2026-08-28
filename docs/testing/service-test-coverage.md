@@ -57,7 +57,7 @@ Para confirmar si una corrida realmente modifica la base de pruebas, hay que rev
 
 Las integraciones de salidas de material, entradas de compra, materiales, personas y
 usuarios todavía deben incorporarse o recuperarse siguiendo las prioridades de
-`docs/test-plan.md`. Al modificar uno de esos CRUD se debe ampliar la suite de su
+`docs/testing/test-plan.md`. Al modificar uno de esos CRUD se debe ampliar la suite de su
 dominio, sin crear un flujo paralelo que duplique el camino feliz.
 
 El módulo de requisiciones de compra fue retirado del frontend, backend y esquema

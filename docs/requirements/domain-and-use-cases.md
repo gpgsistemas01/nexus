@@ -5,7 +5,7 @@
 Este documento contiene dos vistas curadas diferentes: el modelo conceptual explica
 el vocabulario del negocio y el diagrama de casos de uso muestra objetivos de actores.
 Los campos SQL y cardinalidades físicas están en el
-[ER generado](generated/database-schema.md), y los criterios verificables en la
+[ER generado](../generated/database-schema.md), y los criterios verificables en la
 [especificación de requisitos](requirements-specification.md). No se repiten aquí.
 
 ## Modelo de dominio conceptual
@@ -129,10 +129,10 @@ stateDiagram-v2
 ## Vistas de diseño del sistema
 
 El diseño no se duplica en este archivo. Consulta la
-[arquitectura del sistema](architecture-and-web-views.md#1-arquitectura-del-sistema)
+[arquitectura del sistema](../architecture/architecture-and-web-views.md#1-arquitectura-del-sistema)
 para contexto, contenedores, despliegue, componentes y secuencia; el
-[mapa generado](generated/code-map.md) para imports y rutas; y el
-[ER](generated/database-schema.md) para diseño físico de datos. La vista de despliegue
+[mapa generado](../generated/code-map.md) para imports y rutas; y el
+[ER](../generated/database-schema.md) para diseño físico de datos. La vista de despliegue
 distingue el entorno vigente en Render y Supabase del objetivo de trasladar la
 aplicación a un VPS; los detalles todavía no decididos se presentan como propuesta y
 no como infraestructura implementada.

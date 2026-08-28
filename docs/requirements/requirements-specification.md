@@ -16,10 +16,10 @@ movimientos y reportes. OpenAPI, una interfaz completa de requisiciones y objeti
 nivel de servicio permanecen fuera de la línea base implementada.
 
 Este documento no sustituye historias de usuario, diseños de pantalla ni el contrato
-HTTP. El [contrato API](api-contract.md), el
-[mapa generado](generated/code-map.md) y el esquema Prisma aportan esos otros niveles
+HTTP. El [contrato API](../data/api-contract.md), el
+[mapa generado](../generated/code-map.md) y el esquema Prisma aportan esos otros niveles
 de detalle. Su estructura adopta selectivamente las prácticas de ingeniería de
-requisitos descritas en el [criterio sobre normas documentales](documentation-standards.md),
+requisitos descritas en el [criterio sobre normas documentales](../governance/documentation-standards.md),
 sin declarar conformidad o certificación ISO.
 
 Los objetivos de actor, con precondiciones, flujo, alternativas y resultado, se
@@ -54,7 +54,7 @@ originó el cambio.
 
 Los requisitos usan los términos canónicos del
 [glosario del negocio](business-glossary.md). El glosario define significado compartido
-para usuarios y responsables; el [diccionario técnico](generated/data-dictionary.md)
+para usuarios y responsables; el [diccionario técnico](../generated/data-dictionary.md)
 documenta cómo se representan los datos persistentes. Ninguno debe sustituir al otro.
 
 La [matriz de operaciones](requirements-operations-matrix.md) resume las capacidades
@@ -73,7 +73,7 @@ efectiva continúa determinada por los permisos del servidor, no por la matriz.
 
 Los nombres de actor expresan responsabilidades, no conceden acceso por sí mismos. La
 autorización efectiva se calcula con las asignaciones de usuario, rol y departamento
-descritas en [usuarios y permisos](database-users-and-permissions-analysis.md).
+descritas en [usuarios y permisos](../data/database-users-and-permissions-analysis.md).
 
 ## 4. Requisitos funcionales
 
@@ -165,10 +165,10 @@ Un requisito funcional nuevo o modificado se considera listo para revisión cuan
 2. usa la terminología canónica o actualiza el glosario con validación funcional;
 3. enlaza su ruta, permiso, validadores, controller/DTO, servicio y persistencia;
 4. reutiliza el proceso CRUD o componente aplicable antes de introducir otro flujo,
-   consultando los [patrones aplicados](design-and-construction-patterns.md);
+   consultando los [patrones aplicados](../architecture/design-and-construction-patterns.md);
 5. incluye pruebas relacionadas con el CRUD en la ubicación y con las estrategias de
-   [pruebas](service-test-coverage.md) correspondientes, y actualiza la matriz del
-   [plan de pruebas](test-plan.md) cuando cambia el alcance;
+   [pruebas](../testing/service-test-coverage.md) correspondientes, y actualiza la matriz del
+   [plan de pruebas](../testing/test-plan.md) cuando cambia el alcance;
 6. actualiza la matriz de operaciones y los diagramas curados afectados, y ejecuta el
    generador cuando cambia rutas o Prisma;
 7. distingue explícitamente comportamiento implementado, parcial y pendiente.

@@ -10,13 +10,26 @@ que define la intención o la regla vigente, y artefactos complementarios, que a
 vista concreta sin sustituirlo. Los artefactos generados son evidencia técnica de una
 fuente versionada; pertenecen a una familia, pero no contienen decisiones curadas.
 
+Cada familia tiene una carpeta propia para que su ubicación también comunique su
+responsabilidad:
+
+```text
+docs/
+├── architecture/  # Arquitectura, construcción y convenciones técnicas
+├── data/          # Datos, acceso, permisos y contrato HTTP
+├── governance/    # Criterios para mantener la documentación
+├── requirements/  # Dominio, alcance, requisitos y casos de uso
+├── testing/       # Estrategia, cobertura y plan de pruebas CRUD
+└── generated/     # Inventarios derivados; no se editan manualmente
+```
+
 | Familia | Artefacto principal | Artefactos complementarios | Evidencia generada |
 | --- | --- | --- | --- |
-| Arquitectura y construcción | [Arquitectura y vistas web](architecture-and-web-views.md) | [Patrones aplicados](design-and-construction-patterns.md), [convenciones de controladores](controller-naming-and-imports.md) y [convenciones de diagramas](diagram-conventions.md) | [Mapa del código](generated/code-map.md), derivado de rutas e importaciones de `src` |
-| Dominio y requisitos | [Especificación de requisitos](requirements-specification.md) | [Visión y alcance](vision-scope-and-requirements.md), [dominio y casos de uso](domain-and-use-cases.md), [catálogo de casos de uso](use-case-descriptions.md), [matriz de operaciones](requirements-operations-matrix.md), [diagramas de requisitos](requirements-diagrams.md) y [glosario](business-glossary.md) | No aplica; el estado funcional requiere revisión humana |
-| Datos, acceso y operación | [Análisis de usuarios y permisos](database-users-and-permissions-analysis.md) | [Roles PostgreSQL](postgresql-runtime-and-migration-roles.md) y [contrato API](api-contract.md) | [Esquema de base de datos](generated/database-schema.md) y [diccionario técnico](generated/data-dictionary.md), derivados de `prisma/schema.prisma` |
-| Pruebas | [Estrategia de pruebas](service-test-coverage.md) | [Plan de pruebas](test-plan.md), que concreta alcance, matriz CRUD y criterios de ejecución | No aplica; la evidencia ejecutable vive en `tests` |
-| Gobierno documental | [Normas y criterios](documentation-standards.md) | [Convenciones de diagramas](diagram-conventions.md), compartidas también con arquitectura | No aplica |
+| Arquitectura y construcción | [Arquitectura y vistas web](architecture/architecture-and-web-views.md) | [Patrones aplicados](architecture/design-and-construction-patterns.md), [convenciones de controladores](architecture/controller-naming-and-imports.md) y [convenciones de diagramas](architecture/diagram-conventions.md) | [Mapa del código](generated/code-map.md), derivado de rutas e importaciones de `src` |
+| Dominio y requisitos | [Especificación de requisitos](requirements/requirements-specification.md) | [Visión y alcance](requirements/vision-scope-and-requirements.md), [dominio y casos de uso](requirements/domain-and-use-cases.md), [catálogo de casos de uso](requirements/use-case-descriptions.md), [matriz de operaciones](requirements/requirements-operations-matrix.md), [diagramas de requisitos](requirements/requirements-diagrams.md) y [glosario](requirements/business-glossary.md) | No aplica; el estado funcional requiere revisión humana |
+| Datos, acceso y operación | [Análisis de usuarios y permisos](data/database-users-and-permissions-analysis.md) | [Roles PostgreSQL](data/postgresql-runtime-and-migration-roles.md) y [contrato API](data/api-contract.md) | [Esquema de base de datos](generated/database-schema.md) y [diccionario técnico](generated/data-dictionary.md), derivados de `prisma/schema.prisma` |
+| Pruebas | [Estrategia de pruebas](testing/service-test-coverage.md) | [Plan de pruebas](testing/test-plan.md), que concreta alcance, matriz CRUD y criterios de ejecución | No aplica; la evidencia ejecutable vive en `tests` |
+| Gobierno documental | [Normas y criterios](governance/documentation-standards.md) | [Convenciones de diagramas](architecture/diagram-conventions.md), compartidas también con arquitectura | No aplica |
 
 Un artefacto puede apoyar más de una familia, pero conserva una sola responsabilidad. Por
 ejemplo, las convenciones de diagramas gobiernan la notación y no reemplazan los diagramas
@@ -28,7 +41,7 @@ técnica de modelos, campos y relaciones.
 
 | Tipo | Ubicación | Fuente de verdad | Forma de actualización |
 | --- | --- | --- | --- |
-| Curado | `docs/*.md` | Decisiones, requisitos y comportamiento revisado | Se edita junto con el cambio que altera su contenido. |
+| Curado | `docs/{architecture,data,governance,requirements,testing}/*.md` | Decisiones, requisitos y comportamiento revisado | Se edita junto con el cambio que altera su contenido. |
 | Generado | `docs/generated/*.md` | `src` o `prisma/schema.prisma`, según la familia indicada arriba | `npm run docs:architecture`; no se edita manualmente. |
 | Ejecutable | `tests` | Casos automatizados y datos de prueba | Sigue la ubicación y las estrategias definidas por la familia de pruebas. |
 | Operativo | `README.md`, configuración y scripts | Código y configuración versionados | Se actualiza cuando cambia la instalación, ejecución o automatización. |

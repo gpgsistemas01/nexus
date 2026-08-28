@@ -36,7 +36,7 @@ Nexus es una plataforma de control operativo para administrar inventario, compra
 La visión del producto, sus usuarios, el alcance vigente, los criterios para redactar
 requisitos verificables, los requisitos funcionales y de datos, los atributos de
 calidad y las brechas encontradas al contrastar documentación, código y Prisma se mantienen en
-[`docs/vision-scope-and-requirements.md`](docs/vision-scope-and-requirements.md).
+[`docs/requirements/vision-scope-and-requirements.md`](docs/requirements/vision-scope-and-requirements.md).
 
 Ese documento describe el comportamiento implementado, no una promesa de funciones
 futuras. En particular, distingue las capacidades expuestas de los modelos o servicios
@@ -87,7 +87,7 @@ Los registros centrales `src/routes/api/index.js` y `src/routes/web/index.js` co
 los routers por dominio y evitan que `src/app.js` mezcle el arranque de infraestructura
 con el catálogo de endpoints. Las convenciones equivalentes entre backend y frontend,
 incluyendo reutilización de componentes y ubicación de pruebas CRUD, se detallan en el
-[mapa visual de arquitectura y vistas web](docs/architecture-and-web-views.md#5-organización-consistente-de-front-y-back).
+[mapa visual de arquitectura y vistas web](docs/architecture/architecture-and-web-views.md#5-organización-consistente-de-front-y-back).
 
 ## Documentación
 
@@ -176,8 +176,8 @@ están definidas. Los comandos de base de datos se encuentran en la tabla de scr
 
 Consulta las guías específicas para evitar duplicar aquí decisiones y procedimientos:
 
-- [roles PostgreSQL de ejecución y migración](docs/postgresql-runtime-and-migration-roles.md);
-- [usuarios, personas, auditoría y permisos](docs/database-users-and-permissions-analysis.md).
+- [roles PostgreSQL de ejecución y migración](docs/data/postgresql-runtime-and-migration-roles.md);
+- [usuarios, personas, auditoría y permisos](docs/data/database-users-and-permissions-analysis.md).
 
 ## Ejecución
 
@@ -262,7 +262,7 @@ Las pruebas que escriben datos usan exclusivamente la base indicada por
 Cuando un flujo acepta el cliente transaccional sin sustituir el comportamiento que se
 quiere probar, puede reutilizarse `tests/helpers/rollbackTransaction.js` para forzar
 rollback. La estrategia y ubicación de cada tipo de prueba están detalladas en
-[`docs/service-test-coverage.md`](docs/service-test-coverage.md).
+[`docs/testing/service-test-coverage.md`](docs/testing/service-test-coverage.md).
 
 Flujo recomendado para automatización independiente (el segundo comando ya vuelve a
 verificar y migrar, por lo que normalmente basta con ejecutarlo solo):
@@ -322,7 +322,7 @@ El objetivo es mover la aplicación a un **VPS**. Hasta definir y versionar el p
 inverso, TLS, automatización, respaldos y monitoreo, esa topología permanece propuesta.
 También debe decidirse expresamente si el VPS conservará Supabase como base de datos
 administrada o alojará una instancia propia de PostgreSQL. Consulta la
-[vista de despliegue actual y objetivo](docs/architecture-and-web-views.md#despliegue-actual-render-y-supabase).
+[vista de despliegue actual y objetivo](docs/architecture/architecture-and-web-views.md#despliegue-actual-render-y-supabase).
 
 La documentación (`README.md` y `docs/`) **se conserva y versiona en este
 repositorio**. Las reglas de `.dockerignore` únicamente la excluyen del contexto de
