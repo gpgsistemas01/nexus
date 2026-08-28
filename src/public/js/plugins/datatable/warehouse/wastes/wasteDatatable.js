@@ -25,9 +25,7 @@ export const createWasteDatatable = async (context) => {
     renderWarehouseInventoryHeader({
         tableElement,
         canSeeCost,
-        canManageItems: canManageWastes,
-        stockTitle: 'Existencia',
-        costTitle: 'Costo Unitario de Conversión'
+        canManageItems: canManageWastes
     });
 
     const filters = await setupTableFilters({

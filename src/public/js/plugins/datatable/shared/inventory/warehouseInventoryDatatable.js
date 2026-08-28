@@ -1,18 +1,18 @@
 import { formatCurrency, formatDecimal } from "../../../../utils/formatUtils.js";
 import { buildInventorySelectText, getBase, getCurrentStock, getHeight, getMaxUnitCost, getMinStock, getPresentation, getUnitMeasure } from "../../../../utils/warehouseInventoryUtils.js";
 
-export const renderWarehouseInventoryHeader = ({ tableElement, canSeeCost, canManageItems, stockTitle, costTitle }) => {
+export const renderWarehouseInventoryHeader = ({ tableElement, canSeeCost, canManageItems }) => {
 
     tableElement.innerHTML = `
         <thead>
             <tr>
                 <th rowspan="2">Material</th>
                 <th colspan="2" data-responsive-group="measures">Medidas</th>
-                <th rowspan="2">${ stockTitle }</th>
+                <th rowspan="2">Existencia</th>
                 <th rowspan="2">Stock Mínimo</th>
                 <th rowspan="2">Presentación</th>
                 <th colspan="2" data-responsive-group="conversion">Conversión</th>
-                ${ canSeeCost ? `<th rowspan="2">${ costTitle }</th>` : '' }
+                ${ canSeeCost ? '<th rowspan="2">Costo Unitario de Conversión</th>' : '' }
                 ${ canManageItems ? '<th rowspan="2">Acciones</th>' : '' }
             </tr>
             <tr>
