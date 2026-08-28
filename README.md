@@ -91,9 +91,11 @@ incluyendo reutilización de componentes y ubicación de pruebas CRUD, se detall
 
 ## Documentación
 
-El [índice de documentación](docs/README.md) enlaza arquitectura, API, pruebas y base de
-datos. El mapa de rutas y dependencias se genera desde el código; los diagramas de diseño
-se mantienen de forma curada. CI comprueba que el contenido generado esté actualizado.
+El [índice de documentación](docs/README.md#organización-de-los-artefactos) agrupa cada
+artefacto por familia, distingue su documento principal de los complementos y declara su
+fuente de verdad. El mapa de rutas y dependencias se genera desde el código; el esquema y
+el diccionario técnico se derivan de Prisma; los diagramas de diseño se mantienen de
+forma curada. CI comprueba que el contenido generado esté actualizado.
 
 ## Requisitos
 
