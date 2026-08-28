@@ -242,6 +242,15 @@ abstracción «compartida» que todavía depende de un recurso concreto. Al edit
 preserva el cierre final de `contentFor` en su lugar; no se elimina y vuelve a agregar
 como efecto secundario de una refactorización.
 
+Las alertas SweetAlert siguen el mismo criterio de composición. El adaptador
+`plugins/swal/baseSwal.js` concentra apariencia, variantes y botones de todos los
+diálogos; los consumidores no llaman `Swal.fire` ni redefinen `customClass`. Cuando un
+diálogo necesita contenido interactivo, un componente de `public/js/ui` construye y
+expone el nodo HTML reutilizable junto con su ciclo de apertura. Por ejemplo,
+`reportExportDialog.js` encapsula las opciones y validación de exportación, mientras
+`tableUI.js` conserva únicamente la coordinación de la descarga. Los toast mantienen
+su presentación compacta, pero usan el mismo adaptador público `swalComponent.js`.
+
 El encabezado de todos los modales se compone con `shared/layout/header.ejs` y conserva
 la clase semántica `modal-title`. Su estilo transversal se declara una sola vez en
 `public/css/style.css`: color claro para contrastar con el encabezado secundario, peso

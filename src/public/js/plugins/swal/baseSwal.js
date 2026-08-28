@@ -11,6 +11,18 @@ const confirmationClassByVariant = {
     warning: 'swal2-confirmation-warning'
 };
 
+const getModalClasses = (variant = 'primary', popupClass = '') => ({
+    popup: [
+        'swal2-app-modal',
+        confirmationClassByVariant[variant] ?? confirmationClassByVariant.primary,
+        popupClass
+    ].filter(Boolean).join(' '),
+    title: 'swal2-app-modal-title',
+    htmlContainer: 'swal2-app-modal-content',
+    confirmButton: 'swal2-app-modal-confirm-button',
+    cancelButton: 'swal2-app-modal-cancel-button'
+});
+
 export const showToast = ({ 
     title, 
     text = null, 
@@ -29,7 +41,7 @@ export const showToast = ({
         showConfirmButton: false,
         timer: 3000
     });
-}
+};
 
 export const showModal = ({ 
     title = 'Error del servidor', 
@@ -37,13 +49,33 @@ export const showModal = ({
     icon = 'error' 
 } = {}) => {
 
-    Swal.fire({
+    return Swal.fire({
         title,
         text,
         icon,
-        confirmButtonText: 'Aceptar'
+        confirmButtonText: 'Aceptar',
+        buttonsStyling: false,
+        customClass: getModalClasses(icon === 'error' ? 'danger' : icon === 'warning' ? 'warning' : 'primary')
     });
-}
+};
+
+export const showDialog = ({
+    variant = 'primary',
+    popupClass = '',
+    showCancelButton = true,
+    reverseButtons = true,
+    confirmButtonText = 'Confirmar',
+    cancelButtonText = 'Cancelar',
+    ...options
+}) => Swal.fire({
+    ...options,
+    showCancelButton,
+    reverseButtons,
+    confirmButtonText,
+    cancelButtonText,
+    buttonsStyling: false,
+    customClass: getModalClasses(variant, popupClass)
+});
 
 export const showConfirmation = ({
     title,
@@ -52,7 +84,7 @@ export const showConfirmation = ({
     confirmButtonText = 'Confirmar',
     cancelButtonText = 'Cancelar',
     variant = 'primary'
-}) => Swal.fire({
+}) => showDialog({
     title,
     text,
     icon,
@@ -60,12 +92,5 @@ export const showConfirmation = ({
     reverseButtons: true,
     confirmButtonText,
     cancelButtonText,
-    buttonsStyling: false,
-    customClass: {
-        popup: `swal2-confirmation-modal ${confirmationClassByVariant[variant] ?? confirmationClassByVariant.primary}`,
-        title: 'swal2-confirmation-title',
-        htmlContainer: 'swal2-confirmation-content',
-        confirmButton: 'swal2-confirmation-confirm-button',
-        cancelButton: 'swal2-confirmation-cancel-button'
-    }
+    variant
 });

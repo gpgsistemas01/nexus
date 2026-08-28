@@ -1,4 +1,4 @@
-import { showConfirmation, showModal, showToast } from "./baseSwal.js";
+import { showConfirmation, showDialog, showModal, showToast } from './baseSwal.js';
 
 export const notifications = {
     showSuccess: (title) => showToast({ title, icon: 'success' }),
@@ -6,5 +6,6 @@ export const notifications = {
     showError: (title) => showToast({ title, icon: 'error' }),
     showInfo: (title) => showToast({ title }),
     showModal: ({ title, text, icon = 'info' }) => showModal({ title, text, icon }),
-    showConfirmation: (options) => showConfirmation(options)
-}
+    showConfirmation: (options) => showConfirmation(options),
+    showDialog: (options) => showDialog(options)
+};
