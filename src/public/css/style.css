@@ -1577,7 +1577,8 @@ a:hover {
 
 .form-outline .form-control,
 .form-outline .form-select,
-.form-outline textarea.form-control {
+.form-outline textarea.form-control,
+.report-export-option .js-flatpickr-month {
   background-color: var(--form-field-bg);
   border-color: var(--form-field-border) !important;
   color: var(--form-field-color) !important;
@@ -1592,7 +1593,8 @@ a:hover {
 
 .form-outline .form-control:focus,
 .form-outline .form-select:focus,
-.form-outline textarea.form-control:focus {
+.form-outline textarea.form-control:focus,
+.report-export-option .js-flatpickr-month:focus {
   background-color: var(--form-field-bg);
   border-color: var(--form-field-border-focus) !important;
   box-shadow: 0 0 0 0.2rem rgba(var(--mdb-primary-rgb), 0.16);
@@ -1655,7 +1657,8 @@ a:hover {
 }
 
 .form-outline .form-control:disabled,
-.form-outline .form-control[readonly] {
+.form-outline .form-control[readonly],
+.report-export-option .js-flatpickr-month:disabled {
   background-color: #f6f8f6;
   border-color: #c8d0cc !important;
   box-shadow: none;
