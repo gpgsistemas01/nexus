@@ -123,7 +123,9 @@ stateDiagram-v2
 
 El diseño no se duplica en este archivo. Consulta la
 [arquitectura del sistema](architecture-and-web-views.md#1-arquitectura-del-sistema)
-para contexto, contenedores, componentes y secuencia; el
+para contexto, contenedores, despliegue, componentes y secuencia; el
 [mapa generado](generated/code-map.md) para imports y rutas; y el
-[ER](generated/database-schema.md) para diseño físico de datos. Una vista de despliegue
-permanece pendiente hasta contar con topología verificable de ambientes, nodos y redes.
+[ER](generated/database-schema.md) para diseño físico de datos. La vista de despliegue
+distingue el entorno vigente en Render y Supabase del objetivo de trasladar la
+aplicación a un VPS; los detalles todavía no decididos se presentan como propuesta y
+no como infraestructura implementada.
