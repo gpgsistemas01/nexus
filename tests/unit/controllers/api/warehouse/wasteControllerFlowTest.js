@@ -129,6 +129,7 @@ describe('wasteController complete flow', () => {
   it('crea merma desde controller calculando stock convertido inicial y registrando ajuste inicial', async () => {
     const req = {
       body: {
+        name: 'Recorte confirmado',
         materialId: 'material-1',
         supplierId: 'supplier-1',
         base: '2',
@@ -150,6 +151,7 @@ describe('wasteController complete flow', () => {
     });
     expect(wasteCreate).toHaveBeenCalledWith(expect.objectContaining({
       data: expect.objectContaining({
+        name: 'Recorte confirmado',
         currentStock: 5,
         maxUnitCost: 18.5,
         presentation: { connect: { id: 'presentation-1' } },
@@ -174,10 +176,15 @@ describe('wasteController complete flow', () => {
     expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ code: 'CREATED_WASTE' }));
   });
 
-  it('edita únicamente los datos secundarios sin cambiar existencias', async () => {
+  it('permite corregir el nombre sin cambiar los demás campos de identidad ni las existencias', async () => {
     const req = {
       params: { id: 'waste-1' },
       body: {
+        name: 'Nombre alterado',
+        materialId: 'material-2',
+        supplierId: 'supplier-2',
+        base: '8',
+        height: '9',
         minStock: '4',
         maxUnitCost: '22.5',
         isActive: false,
@@ -190,11 +197,44 @@ describe('wasteController complete flow', () => {
 
     expect(wasteUpdate).toHaveBeenCalledWith(expect.objectContaining({
       where: { id: 'waste-1' },
-      data: { minStock: 4, maxUnitCost: 22.5, isActive: false }
+      data: { name: 'Nombre alterado', minStock: 4, maxUnitCost: 22.5, isActive: false }
     }));
+    expect(wasteFindFirst).toHaveBeenCalledWith({
+      where: {
+        supplierId: 'supplier-1',
+        name: 'Nombre alterado',
+        base: 2,
+        height: 3,
+        NOT: { id: 'waste-1' }
+      },
+      select: { id: true }
+    });
     expect(wasteUpdate.mock.calls[0][0].data).not.toHaveProperty('currentStock');
     expect(wasteUpdate.mock.calls[0][0].data).not.toHaveProperty('newStock');
+    expect(wasteUpdate.mock.calls[0][0].data).not.toHaveProperty('materialId');
+    expect(wasteUpdate.mock.calls[0][0].data).not.toHaveProperty('supplierId');
+    expect(wasteUpdate.mock.calls[0][0].data).not.toHaveProperty('base');
+    expect(wasteUpdate.mock.calls[0][0].data).not.toHaveProperty('height');
     expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ code: 'UPDATED_WASTE' }));
+  });
+
+  it('rechaza corregir el nombre cuando repetiría la identidad de otra merma', async () => {
+    wasteFindFirst.mockResolvedValueOnce({ id: 'waste-2' });
+
+    await expect(editWaste({
+      params: { id: 'waste-1' },
+      body: {
+        name: 'Merma repetida',
+        minStock: '4',
+        maxUnitCost: '22.5',
+        isActive: true
+      }
+    }, createResponse())).rejects.toMatchObject({
+      code: 'WASTE_ALREADY_EXISTS',
+      statusCode: 409
+    });
+
+    expect(wasteUpdate).not.toHaveBeenCalled();
   });
 
   it('permite editar el estado sin enviar stock mínimo', async () => {
@@ -261,6 +301,7 @@ describe('wasteController complete flow', () => {
 
     const req = {
       body: {
+        name: 'Lámina',
         materialId: 'material-1',
         supplierId: 'supplier-1',
         base: '',

@@ -134,8 +134,10 @@ mismo commit el enunciado, la evidencia y la prueba CRUD correspondiente.
   del proveedor, costo unitario máximo, stock actual y cantidad convertida.
 - **RF-CAT-05.** El sistema debe exponer para consulta unidades de medida,
   presentaciones, motivos de ajuste y estados de surtido.
-- **RF-CAT-06.** El sistema debe registrar y editar mermas asociadas a una relación
-  material-proveedor y dimensiones; debe permitir ajustes autorizados de su stock.
+- **RF-CAT-06.** El sistema debe registrar mermas tomando un material y proveedor como
+  plantilla, conservar proveedor, presentación, unidad y dimensiones como identidad
+  ineditable, permitir correcciones del nombre y de sus datos secundarios, y realizar
+  ajustes autorizados de stock mediante el flujo específico.
 
 ### Operación de inventario
 

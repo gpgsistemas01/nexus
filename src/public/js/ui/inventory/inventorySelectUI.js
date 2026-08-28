@@ -17,7 +17,7 @@ export const updatePresentationDisplay = ({ modalSelector, data, presentation, o
 };
 
 export const displayWasteMaterialTemplate = ({ form, template = {} }) => {
-    form.querySelector(INPUT_SELECTORS.WASTE_NAME_DISPLAY).textContent = getMaterialName(template) || EMPTY_DISPLAY_VALUE;
+    form.querySelector(INPUT_SELECTORS.WASTE_NAME_DISPLAY).value = getMaterialName(template) || '';
     form.querySelector(INPUT_SELECTORS.WASTE_PRESENTATION_DISPLAY).textContent = getPresentation(template) || EMPTY_DISPLAY_VALUE;
     form.querySelector(INPUT_SELECTORS.WASTE_UNIT_MEASURE_DISPLAY).textContent = getUnitMeasure(template) || EMPTY_DISPLAY_VALUE;
 };
