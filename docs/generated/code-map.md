@@ -20,7 +20,7 @@ flowchart LR
     controllers["controllers (32 módulos)"] --> services["services (50 módulos)"]
     controllers["controllers (32 módulos)"] --> utils["utils (10 módulos)"]
     dtos["dtos (10 módulos)"] --> utils["utils (10 módulos)"]
-    errors["errors (17 módulos)"] --> public["public (178 módulos)"]
+    errors["errors (17 módulos)"] --> public["public (179 módulos)"]
     middleware["middleware (5 módulos)"] --> constants["constants (9 módulos)"]
     middleware["middleware (5 módulos)"] --> messages["messages (2 módulos)"]
     middleware["middleware (5 módulos)"] --> services["services (50 módulos)"]

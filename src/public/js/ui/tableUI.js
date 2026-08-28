@@ -1,7 +1,7 @@
 import { DOM_EVENT_NAMES } from '../constants/events.js';
 import { notifications } from "../plugins/swal/swalComponent.js";
-import { initMonthPickers, setMonthPickerDisabled } from '../plugins/flatpickr/dateTimePicker.js';
 import { getTimeZoneDateTimeParts } from '../utils/timeZone.js';
+import { showReportExportDialog } from './reportExportDialog.js';
 
 const getCurrentMexicoMonth = () => {
     const { year, month } = getTimeZoneDateTimeParts(new Date());
@@ -40,65 +40,7 @@ export const buildExcelButton = ({
             let reportMonth = '';
 
             if (allowMonthlyReport) {
-                const result = await Swal.fire({
-                    title: 'Exportar reporte',
-                    html: `
-                        <div class="text-start report-export-options">
-                            <p class="mb-3">Selecciona el alcance del reporte que deseas descargar.</p>
-                            <div class="form-check mb-2 report-export-option">
-                                <input class="form-check-input" type="radio" name="reportType" id="monthlyReportRadio" value="monthly" checked>
-                                <label class="form-check-label" for="monthlyReportRadio">
-                                    Mes actual
-                                </label>
-                            </div>
-                            <div class="form-check mb-2 report-export-option">
-                                <input class="form-check-input" type="radio" name="reportType" id="specificMonthReportRadio" value="specificMonth">
-                                <label class="form-check-label" for="specificMonthReportRadio">
-                                    Otro mes
-                                </label>
-                                <input class="form-control mt-2 js-flatpickr-month" type="text" id="reportMonth" value="${ getCurrentMexicoMonth() }" disabled aria-label="Mes del reporte">
-                            </div>
-                            <div class="form-check report-export-option">
-                                <input class="form-check-input" type="radio" name="reportType" id="customReportRadio" value="custom">
-                                <label class="form-check-label" for="customReportRadio">
-                                    Personalizado: usar filtros aplicados
-                                </label>
-                            </div>
-                        </div>
-                    `,
-                    showCancelButton: true,
-                    reverseButtons: true,
-                    confirmButtonText: 'Descargar',
-                    cancelButtonText: 'Cancelar',
-                    buttonsStyling: false,
-                    customClass: {
-                        popup: 'report-export-modal',
-                        title: 'report-export-title',
-                        htmlContainer: 'report-export-content',
-                        confirmButton: 'btn btn-primary',
-                        cancelButton: 'btn btn-outline-primary report-export-cancel-button ms-2'
-                    },
-                    didOpen: () => {
-                        const monthInput = document.querySelector('#reportMonth');
-                        initMonthPickers();
-                        document.querySelectorAll('input[name="reportType"]').forEach(input => {
-                            input.addEventListener('change', () => {
-                                setMonthPickerDisabled(monthInput, input.value !== 'specificMonth' || !input.checked);
-                            });
-                        });
-                    },
-                    preConfirm: () => {
-                        const type = document.querySelector('input[name="reportType"]:checked')?.value || 'monthly';
-                        const month = document.querySelector('#reportMonth')?.value || '';
-
-                        if (type === 'specificMonth' && !month) {
-                            Swal.showValidationMessage('Selecciona el mes que deseas exportar.');
-                            return false;
-                        }
-
-                        return { type, month };
-                    }
-                });
+                const result = await showReportExportDialog(getCurrentMexicoMonth());
 
                 if (!result.isConfirmed) return;
 
