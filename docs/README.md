@@ -18,7 +18,7 @@ raíz se limita a instalación y operación básica.
 | Operaciones permitidas por módulo y contexto | [Matriz de operaciones](requirements-operations-matrix.md) | Curada junto con rutas, permisos, requisitos y pruebas CRUD. |
 | Vista visual de requisitos y trazabilidad | [Diagramas de requisitos](requirements-diagrams.md) | Curado junto con la especificación. |
 | Patrones, semántica y generación de diagramas | [Convenciones de diagramas](diagram-conventions.md) | Aplicar al crear o modificar una vista curada o generada. |
-| Normas y convenciones documentales | [Criterio sobre normas](documentation-standards.md) | Reevaluar ante exigencias contractuales, regulatorias o de auditoría. |
+| Normas, títulos y vocabulario documental | [Normas y criterios para la documentación](documentation-standards.md) | Reevaluar ante exigencias contractuales, regulatorias o de auditoría. |
 | Contrato de la API y evaluación de Swagger/OpenAPI | [Contrato API](api-contract.md) | Actualizar al cambiar la estrategia de la API. |
 | Estrategia y ubicación de pruebas | [Estrategia de pruebas](service-test-coverage.md) | Curado al cambiar la estrategia. |
 | Alcance, matriz CRUD y criterios de pruebas | [Plan de pruebas](test-plan.md) | Revisar en cada cambio funcional y antes de una liberación. |

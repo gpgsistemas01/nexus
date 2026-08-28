@@ -1,4 +1,4 @@
-# Convenciones de nombres e imports en controladores
+# Convenciones de nombres e importaciones en controladores
 
 Los controladores deben importar cada función con el nombre que exporta su módulo de origen. No se deben usar alias para adaptar el nombre de un servicio al contexto del controlador, porque el alias oculta el contrato real entre capas y dificulta encontrar sus usos.
 

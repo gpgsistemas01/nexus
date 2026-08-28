@@ -1,4 +1,4 @@
-# Criterio sobre normas para la documentación
+# Normas y criterios para la documentación
 
 ## Decisión
 
@@ -47,6 +47,22 @@ repositorio debe:
    variante por contexto;
 7. mantener los documentos curados junto con el cambio y regenerar los inventarios
    derivados del código con `npm run docs:architecture` cuando corresponda.
+
+### Títulos y vocabulario técnico
+
+Cada documento conserva un único título de nivel 1, específico y coherente con el
+nombre mostrado en el índice. Las secciones usan niveles consecutivos y no repiten el
+título del documento. Los nombres literales del código, rutas, variables, bibliotecas y
+patrones reconocidos permanecen en inglés y entre comillas invertidas cuando procede;
+la explicación se redacta en español.
+
+Se prefieren **importación**, **exportación**, **controlador**, **servicio**, **ruta de
+la API**, **interfaz**, **existencias**, **registros**, **rama** y **solicitud de cambio**
+en lugar de mezclar *import*, *export*, *controller*, *service*, *endpoint*, *UI*,
+*stock*, *logs*, *branch* y *pull request* dentro de una oración en español. Se permite
+el término original cuando identifica una carpeta, una función, un permiso, una opción
+de una herramienta o un concepto sin traducción inequívoca; no se traducen los
+identificadores del código.
 
 ## Cuándo reevaluar
 

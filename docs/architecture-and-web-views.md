@@ -1,4 +1,4 @@
-# Arquitectura y catálogo visual de vistas web
+# Arquitectura y catálogo de vistas web
 
 Este documento es el mapa visual, versionado junto con el código, para comprender el
 sistema y localizar sus pantallas. Los diagramas usan **Mermaid**, por lo que GitHub los
@@ -7,7 +7,7 @@ renderiza directamente sin guardar imágenes que puedan quedar desactualizadas.
 La documentación se divide deliberadamente en dos niveles:
 
 - este documento **curado** explica contexto, decisiones, responsabilidades y flujos;
-- el [mapa generado del código](generated/code-map.md) inventaría endpoints y
+- el [mapa generado del código](generated/code-map.md) mantiene un inventario de rutas y
   dependencias reales entre áreas, y puede verificarse con `npm run docs:check`.
 
 Así, un generador no intenta adivinar el porqué del diseño y los inventarios mecánicos
@@ -25,9 +25,10 @@ no dependen de que alguien recuerde actualizar una tabla a mano.
 
 La separación es intencional: generar relaciones mecánicas evita trabajo repetitivo,
 pero no se presenta como «automática» una explicación que requiere criterio humano. En
-los pull requests CI no modifica el branch: exige revisar los artefactos derivados
-junto con el código que los produjo. Como red de seguridad, un push a `main` regenera
-ambos documentos y crea un commit únicamente si detecta diferencias.
+las solicitudes de cambio, CI no modifica la rama: exige revisar los artefactos derivados
+junto con el código que los produjo. Como red de seguridad, un envío a
+`main` regenera ambos documentos y crea una confirmación únicamente si detecta
+diferencias.
 
 ## 1. Arquitectura del sistema
 
@@ -528,22 +529,26 @@ varias pantallas, pero siguen perteneciendo a su recurso. Por ello viven en
 `pages/admin/persons`, `pages/admin/users`, `pages/sales/clients`,
 `pages/warehouse/materials` y `pages/warehouse/suppliers`. Las pantallas sin CRUD también
 respetan la jerarquía completa, por ejemplo `pages/admin/movements`,
-`pages/home/login` y `pages/home/index`; no quedan entry points sueltos en la raíz de un
-dominio. La vista de acceso carga directamente `loginForm.js`: no mantiene un
-`loginPage.js` de un solo import porque no compone modal, DataTable u otro módulo.
+`pages/home/login` y `pages/home/index`; no quedan puntos de entrada sueltos en la raíz
+de un dominio. La vista de acceso carga directamente `loginForm.js`: no mantiene un
+`loginPage.js` con una única importación porque no compone modal, DataTable u otro módulo.
 Recordar credenciales, validar y enviar autenticación son responsabilidades del
-formulario. Las vistas EJS replican `views/pages/<dominio>/<recurso>`; sus partials
-propietarios permanecen junto al recurso y los partials reutilizados por varios recursos
-se ubican en `views/shared`, como los formularios comunes de salidas. El entry point de cada CRUD sólo inicializa la tabla y carga su formulario.
+formulario. Las vistas EJS replican `views/pages/<dominio>/<recurso>`; sus plantillas
+parciales propias permanecen junto al recurso y las reutilizadas por varios recursos se
+ubican en `views/shared`, como los formularios comunes de salidas. El punto de entrada de
+cada CRUD sólo inicializa la tabla y carga su formulario.
 En particular, compras, salidas de material y salidas de merma mantienen
-`goodsReceiptsPage.js`, `goodsIssuesPage.js` y `wasteIssuesPage.js` como entry points
-delgados. Sus módulos `goodsReceiptForm.js`, `goodsIssueForm.js` y `wasteIssueForm.js` coordinan el envío, validación y captura de detalles
+`goodsReceiptsPage.js`, `goodsIssuesPage.js` y `wasteIssuesPage.js` como puntos de entrada
+que delegan el comportamiento de cada operación. Sus módulos `goodsReceiptForm.js`,
+`goodsIssueForm.js` y `wasteIssueForm.js` coordinan el envío, la validación y la captura
+de detalles
 (`addGoodsReceiptMaterial`, `addGoodsIssueMaterial` y `addWaste`), mientras sus módulos
-`goodsReceiptModal.js`, `goodsIssueModal.js` y `wasteIssueModal.js` preparan el modal y sus detalles. Formulario
-y modal conservan así responsabilidades distintas en módulos hermanos. Los flujos externos los importan desde el contexto propietario en vez de crear una carpeta
-intermedia basada sólo en que hay más de un consumidor. `ui` queda reservado para
-comportamiento que recibe su contexto por parámetros y no importa aplicaciones de un
-recurso concreto.
+`goodsReceiptModal.js`, `goodsIssueModal.js` y `wasteIssueModal.js` preparan el modal y
+sus detalles. Formulario y modal conservan así responsabilidades distintas en módulos
+hermanos. Los flujos externos los importan desde el contexto propietario en vez de crear
+una carpeta intermedia basada sólo en que hay más de un consumidor. `ui` queda reservado
+para comportamiento que recibe su contexto por parámetros y no importa aplicaciones de
+un recurso concreto.
 
 Los comportamientos compartidos de formulario se importan desde módulos enfocados:
 errores (`ui/forms/formErrorsUI.js`), estado y campos (`ui/forms/formStateUI.js`), detalle
@@ -613,13 +618,11 @@ mismo flujo sin implementaciones específicas por CRUD.
 
 ## 6. Herramientas
 
-- **Ahora:** Mermaid para diagramas curados y el generador local para rutas e imports.
-- **Si crece la arquitectura:** Structurizr DSL/C4 para mantener múltiples vistas desde
-  un modelo central.
-- **Si se necesitan reglas de dependencias:** dependency-cruiser o Madge para ciclos y
-  límites entre módulos.
+- **Diagramas curados:** Mermaid, representado directamente por GitHub.
+- **Inventarios verificables:** el generador local para rutas, importaciones y el
+  esquema de datos.
 - **Para la API:** OpenAPI describe el contrato y Swagger UI puede visualizarlo; no
   reemplazan estos diagramas. Consulta la [decisión sobre el contrato](api-contract.md).
 
-No se añade otra herramienta hasta que exista esa necesidad. Esto mantiene el flujo
-actual simple y evita diagramas duplicados.
+No se propone otra herramienta sin una necesidad aprobada y verificable. Esto mantiene
+el flujo actual simple y evita diagramas duplicados.
