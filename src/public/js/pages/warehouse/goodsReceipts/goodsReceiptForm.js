@@ -8,7 +8,7 @@ import { GOODS_RECEIPT_SUPPLIER_CHANGED_EVENT } from '../../../plugins/select2/m
 import { clearAddedMaterialInput } from '../../../ui/forms/detailFormUI.js';
 import { normalizeFormErrors } from '../../../ui/forms/formErrorsUI.js';
 import { updateTotals } from '../../../ui/forms/totalsSummaryUI.js';
-import { upsertDetail } from '../../../utils/detailCollectionUtils.js';
+import { getNewDetails } from '../../../utils/detailCollectionUtils.js';
 import { on } from '../../../utils/domUtils.js';
 import { handleSubmit, hasValidationErrors, validateFields } from '../../../utils/formUtils.js';
 import { addGoodsReceiptMaterialValidation, goodsReceiptEditValidation, goodsReceiptValidation } from '../../../utils/validations/validators.js';
@@ -26,18 +26,14 @@ const normalizeGoodsReceiptData = ({ form, formData }) => {
     if (!formData.isInvoiced) delete formData.invoice;
 
     if (mode === FORM_MODES.EDIT) {
-        const { supplierId, ...editableFormData } = formData;
-        const newDetails = details.filter(detail => !detail.id);
-
-        return {
-            ...editableFormData,
-            details: newDetails
-        };
+        formData.supplierId = form.elements.supplierId.value;
     }
 
     return {
         ...formData,
-        details
+        details: mode === FORM_MODES.EDIT
+            ? getNewDetails(details)
+            : details
     };
 };
 
@@ -88,25 +84,16 @@ const addGoodsReceiptMaterial = () => {
 
     if (hasValidationErrors(errors)) return;
 
-    const newDetail = mapGoodsReceiptSelectionToDetail({
-        optionData: { material, supplier },
-        quantity,
-        costPerUnitType
-    });
-    const previousDetail = upsertDetail({
-        details,
-        detail: newDetail,
-        matches: detail => detail.materialId === materialId
-    });
+    const newDetail = {
+        ...mapGoodsReceiptSelectionToDetail({
+            optionData: { material, supplier },
+            quantity,
+            costPerUnitType
+        }),
+        clientId: crypto.randomUUID()
+    };
 
-    if (previousDetail) {
-        updateTotals({
-            quantity: previousDetail.quantity,
-            net: previousDetail.netPurchaseAmount,
-            gross: previousDetail.grossPurchaseAmount,
-            operation: 'subtract'
-        });
-    }
+    details.push(newDetail);
 
     refreshMaterialTable(details);
     clearAddedMaterialInput();

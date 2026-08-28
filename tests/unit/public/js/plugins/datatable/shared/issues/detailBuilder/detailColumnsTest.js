@@ -29,6 +29,18 @@ describe('columnas responsivas del detalle compartido de compras y salidas', () 
     expect(actionsColumn.responsivePriority).toBe(1);
   });
 
+  it('permite eliminar por separado un detalle repetido agregado al editar una compra', () => {
+    const columns = buildDetailsColumns({ type: 'receipt', mode: 'edit' });
+    const actionsColumn = columns.find(column => column.title === 'Acciones');
+    const action = actionsColumn.render(null, null, {
+      clientId: 'pending-detail-2',
+      materialId: 'material-1'
+    });
+
+    expect(action).toContain('delete-btn');
+    expect(action).toContain('data-id="pending-detail-2"');
+  });
+
   it.each(['create', 'edit'])('mantiene visible la acción de eliminar de salidas en modo %s', (mode) => {
     const columns = buildDetailsColumns({ type: 'issue', mode });
     const actionsColumn = columns.at(-1);

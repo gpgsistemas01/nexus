@@ -305,7 +305,11 @@ La composición de columnas de detalles se organiza de la misma manera en
 mantienen separados. Es una composición compartida porque entradas, salidas de material
 y salidas de merma reutilizan el mismo contrato con distinto `type`, modo y permisos;
 los DataTables de cada contexto sólo construyen esa configuración y conservan sus
-efectos CRUD propios.
+efectos CRUD propios. Los detalles nuevos de compra reciben un `clientId` efímero para
+que varios renglones del mismo material —por ejemplo, con precios o lotes
+distintos— permanezcan independientes hasta que el backend les asigne su identidad
+documental. Una marca que cambie la identidad operativa corresponde a otro material de
+catálogo; no se infiere ni se guarda como atributo del detalle.
 
 La mutación en memoria de detalles no pertenece al plugin de DataTable: entradas,
 salidas de material y salidas de merma comparten `upsertDetail`, `removeDetail` y la
@@ -314,7 +318,7 @@ comparación de la identidad documental o de inventario desde
 y devuelven el detalle anterior o eliminado; cada contexto conserva en su formulario o
 DataTable los efectos que sí le pertenecen, como totales, limpieza del formulario y
 refresco visual. Por ello `addGoodsReceiptMaterial`, `addGoodsIssueMaterial` y `addWaste` no se
-fusionan: la compra valida costo, reemplaza por material y ajusta totales; la salida
+fusionan: la compra valida costo, agrega cada renglón como una partida independiente y ajusta totales; la salida
 valida proveedor, conserva su costo máximo, convierte cantidades y usa la identidad
 material-proveedor; la salida de merma usa `wasteId` y datos de presentación propios.
 En edición, si agregar de nuevo el mismo inventario sustituye el detalle persistido,

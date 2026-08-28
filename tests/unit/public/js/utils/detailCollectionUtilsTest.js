@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+  getNewDetails,
   matchesDetailIdentifier,
   removeDetail,
   upsertDetail,
@@ -8,6 +9,33 @@ import {
 } from '../../../../../src/public/js/utils/detailCollectionUtils.js';
 
 describe('detailCollectionUtils', () => {
+  it('separa los detalles nuevos para un payload incremental de actualización CRUD', () => {
+    expect(getNewDetails([
+      { id: 'detail-1', materialId: 'material-1' },
+      { materialId: 'material-2' }
+    ])).toEqual([{ materialId: 'material-2' }]);
+  });
+
+  it('distingue renglones pendientes del mismo material por su identificador de cliente', () => {
+    const details = [
+      { clientId: 'pending-1', materialId: 'material-1', costPerUnitType: 10 },
+      { clientId: 'pending-2', materialId: 'material-1', costPerUnitType: 20 }
+    ];
+    const removedDetail = removeDetail({
+      details,
+      matches: detail => matchesDetailIdentifier({
+        detail,
+        identifier: 'pending-2',
+        inventoryIdKey: 'clientId'
+      })
+    });
+
+    expect(removedDetail.costPerUnitType).toBe(20);
+    expect(details).toEqual([
+      { clientId: 'pending-1', materialId: 'material-1', costPerUnitType: 10 }
+    ]);
+  });
+
   it('agrega un detalle nuevo sin sustituir otros detalles del CRUD', () => {
     const details = [{ materialId: 'material-1', quantity: 1 }];
     const detail = { materialId: 'material-2', quantity: 2 };
