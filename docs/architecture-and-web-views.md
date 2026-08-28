@@ -4,31 +4,37 @@ Este documento es el mapa visual, versionado junto con el código, para comprend
 sistema y localizar sus pantallas. Los diagramas usan **Mermaid**, por lo que GitHub los
 renderiza directamente sin guardar imágenes que puedan quedar desactualizadas.
 
-La documentación se divide deliberadamente en dos niveles:
+Esta familia documental se divide deliberadamente en dos niveles:
 
 - este documento **curado** explica contexto, decisiones, responsabilidades y flujos;
-- el [mapa generado del código](generated/code-map.md) mantiene un inventario de rutas y
-  dependencias reales entre áreas, y puede verificarse con `npm run docs:check`.
+- el [mapa generado del código](generated/code-map.md), que pertenece a la familia de
+  arquitectura, mantiene un inventario de rutas y dependencias reales entre áreas.
+
+Los otros dos artefactos generados no son anexos de este documento: el
+[esquema de base de datos](generated/database-schema.md) y el
+[diccionario técnico](generated/data-dictionary.md) pertenecen a la familia de datos y
+se derivan de Prisma. El [índice documental](README.md#organización-de-los-artefactos)
+expone la jerarquía completa. Los tres se verifican con `npm run docs:check`.
 
 Así, un generador no intenta adivinar el porqué del diseño y los inventarios mecánicos
 no dependen de que alguien recuerde actualizar una tabla a mano.
 
 ### ¿Qué se actualiza automáticamente?
 
-| Artefacto | Fuente | Actualización |
-| --- | --- | --- |
-| `docs/generated/code-map.md` | Routers e imports de `src` | Se regenera con `npm run docs:architecture`; CI ejecuta `npm run docs:check` automáticamente y bloquea cambios desactualizados. |
-| `docs/generated/database-schema.md` | Modelos y relaciones de `prisma/schema.prisma` | Se regenera con el mismo comando; se valida en cada pull request. |
-| `docs/generated/data-dictionary.md` | Campos, claves, tipos y relaciones propietarias de `prisma/schema.prisma` | Se regenera con el mismo comando; complementa el ER sin duplicarlo manualmente. |
-| Diagramas de contexto, contenedores, despliegue, secuencia y navegación de este documento | Decisiones de arquitectura, configuración versionada y experiencia de usuario | Son curados: deben actualizarse cuando cambia el diseño o la configuración de ejecución y revisarse en el pull request. |
-| Catálogo de pantallas | Rutas, permisos, controladores, EJS y comportamiento visible | Es curado porque el código por sí solo no puede inferir correctamente propósito, navegación ni estado funcional. |
+| Artefacto | Pertenece a | Fuente | Actualización |
+| --- | --- | --- | --- |
+| `docs/generated/code-map.md` | Arquitectura y construcción | Routers e importaciones de `src` | Se regenera con `npm run docs:architecture`; CI ejecuta `npm run docs:check` y bloquea cambios desactualizados. |
+| `docs/generated/database-schema.md` | Datos, acceso y operación | Modelos y relaciones de `prisma/schema.prisma` | Se regenera con el mismo comando; se valida en cada solicitud de cambio. |
+| `docs/generated/data-dictionary.md` | Datos, acceso y operación | Campos, claves, tipos y relaciones propietarias de `prisma/schema.prisma` | Se regenera con el mismo comando; complementa el esquema sin duplicarlo manualmente. |
+| Diagramas de contexto, contenedores, despliegue, secuencia y navegación de este documento | Arquitectura y construcción | Decisiones de arquitectura, configuración versionada y experiencia de usuario | Son curados y se revisan cuando cambia el diseño o la configuración de ejecución. |
+| Catálogo de pantallas de este documento | Arquitectura y construcción | Rutas, permisos, controladores, EJS y comportamiento visible | Es curado porque el código no puede inferir propósito, navegación ni estado funcional. |
 
 La separación es intencional: generar relaciones mecánicas evita trabajo repetitivo,
 pero no se presenta como «automática» una explicación que requiere criterio humano. En
 las solicitudes de cambio, CI no modifica la rama: exige revisar los artefactos derivados
 junto con el código que los produjo. Como red de seguridad, un envío a
-`main` regenera ambos documentos y crea una confirmación únicamente si detecta
-diferencias.
+`main` regenera los tres artefactos (`code-map.md`, `database-schema.md` y
+`data-dictionary.md`) y crea una confirmación únicamente si detecta diferencias.
 
 ## 1. Arquitectura del sistema
 
