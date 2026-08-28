@@ -51,7 +51,7 @@ Los catálogos reutilizan un mismo ciclo de interacción, con autorización y va
 particulares según el recurso. La eliminación física sólo aparece cuando las relaciones
 del dominio la permiten; en los demás casos el ciclo usa activación, desactivación o
 cancelación. Los documentos operativos reutilizan listado y formulario, pero agregan
-acciones de detalle, stock y movimiento sin presentarlas como un CRUD idéntico.
+acciones de detalle, existencias y movimientos sin presentarlas como un CRUD idéntico.
 
 ```mermaid
 flowchart LR
@@ -67,11 +67,11 @@ flowchart LR
     refresh --> list
 
     list --> document["Documento operativo<br/>encabezado y detalles"]
-    document --> transaction["Acción atómica<br/>detalle · stock · movimiento"]
+    document --> transaction["Acción atómica<br/>detalle · existencias · movimiento"]
     transaction --> list
 ```
 
-Las flechas representan transiciones observables del usuario, no endpoints concretos.
+Las flechas representan transiciones observables del usuario, no rutas concretas de la API.
 La bifurcación de eliminación aplica `RN-007`; el límite atómico aplica `RN-002`. La
 matriz de operaciones define cuál de estas ramas existe realmente para cada módulo.
 
@@ -85,7 +85,7 @@ flowchart TB
     traceability["Trazabilidad<br/>referencias, movimientos y auditoría<br/>del actor"]
     usability["Usabilidad<br/>flujos consistentes, componentes<br/>reutilizables y retroalimentación"]
     maintainability["Mantenibilidad<br/>capas por dominio, pruebas CRUD<br/>y documentación verificable"]
-    operability["Operabilidad<br/>migraciones reproducibles, logs<br/>y comprobaciones de CI"]
+    operability["Operabilidad<br/>migraciones reproducibles, registros<br/>y comprobaciones de CI"]
     nexus --> security
     nexus --> integrity
     nexus --> traceability
@@ -100,10 +100,10 @@ flowchart TB
 flowchart LR
     requirement["Requisito"] --> route["Ruta web / API"]
     route --> validation["Permiso y validadores"]
-    validation --> controller["Controller / DTO"]
+    validation --> controller["Controlador / DTO"]
     controller --> service["Servicio de dominio"]
     service --> schema["Prisma / migración"]
-    validation --> unit["Pruebas unitarias en ruta paralela<br/>validators · DTO · controller · service · UI CRUD"]
+    validation --> unit["Pruebas unitarias en ubicación paralela<br/>validadores · DTO · controlador · servicio · interfaz CRUD"]
     route --> integration["Integración CRUD HTTP + Prisma<br/>tests/integration/controllers/*DbTest.js"]
     schema --> integration
     route --> generated["Mapa generado y<br/>comprobación de CI"]
