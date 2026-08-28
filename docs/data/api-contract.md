@@ -24,7 +24,7 @@ respuestas, errores y autenticación—; Swagger UI sería sólo una interfaz pa
 y probar ese contrato.
 
 Nexus todavía no publica un contrato OpenAPI. El
-[mapa generado](generated/code-map.md) inventaría los métodos y rutas reales, pero no
+[mapa generado](../generated/code-map.md) inventaría los métodos y rutas reales, pero no
 pretende inferir esquemas desde `express-validator`, DTO, controllers y servicios. Una
 especificación que sólo liste endpoints daría una falsa sensación de cobertura.
 
@@ -35,7 +35,7 @@ especificación que sólo liste endpoints daría una falsa sensación de cobertu
 2. Reutilizar componentes de esquema para paginación, errores, identificadores y
    respuestas comunes. No copiar el mismo payload entre operaciones o dominios.
 3. Validar el contrato en CI y agregar pruebas de integración relacionadas con el CRUD
-   documentado, siguiendo [la estrategia de pruebas](service-test-coverage.md).
+   documentado, siguiendo [la estrategia de pruebas](../testing/service-test-coverage.md).
 4. Publicar Swagger UI sólo como visualizador del contrato. En producción debe quedar
    deshabilitado o protegido si revela operaciones internas.
 5. Migrar el siguiente recurso únicamente cuando el anterior describa solicitudes,
@@ -59,7 +59,7 @@ generarlo automáticamente desde rutas que no contienen toda la semántica.
 
 Hasta adoptar OpenAPI, se consulta en este orden:
 
-1. [mapa generado](generated/code-map.md) para métodos y rutas;
+1. [mapa generado](../generated/code-map.md) para métodos y rutas;
 2. `src/routes/api/` para middleware, permisos y validadores;
 3. `src/validators/`, `src/dtos/` y controllers para entradas y respuestas;
 4. pruebas de integración para comportamiento observable y persistencia.

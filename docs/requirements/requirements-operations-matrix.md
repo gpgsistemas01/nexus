@@ -68,7 +68,7 @@ devolver en actualizaciones CRUD genéricas. «Modo» es la configuración de pa
 | Salida / surtir | `supply`; detalle pendiente o parcial | cantidad surtida acumulada, estado de detalle y encabezado | reduce existencia y crea movimiento atómicamente |
 | Salida / devolver | `return`; detalle con cantidad surtida disponible | cantidad devuelta acumulada y estados derivados | incrementa existencia y crea movimiento inverso; no elimina el detalle |
 
-Los campos HTTP exactos pertenecen al [contrato API](api-contract.md); las reglas
+Los campos HTTP exactos pertenecen al [contrato API](../data/api-contract.md); las reglas
 observables pertenecen a la [especificación](requirements-specification.md). Esta matriz
 sólo mantiene la diferencia contextual que el operador necesita conocer.
 
@@ -76,7 +76,7 @@ sólo mantiene la diferencia contextual que el operador necesita conocer.
 
 1. La tabla describe capacidades del producto, no personas autorizadas. La política de
    roles y departamentos se consulta en
-   [usuarios y permisos](database-users-and-permissions-analysis.md).
+   [usuarios y permisos](../data/database-users-and-permissions-analysis.md).
 2. Los permisos de visualización de página son distintos de los permisos API y se
    comprueban en las rutas web; no se mezclan aquí con operaciones sobre datos.
 3. «Modelado» o «Parcial» no significa permitido. Un modelo, permiso declarado o
@@ -91,9 +91,9 @@ sólo mantiene la diferencia contextual que el operador necesita conocer.
 - **Disponibilidad:** rutas registradas bajo `src/routes/api` y estado de los requisitos.
 - **Permisos:** `src/constants/permissions.js`; esta matriz conserva el valor público del
   permiso y no duplica sus listas de roles/departamentos.
-- **Método y URL exactos:** [mapa generado](generated/code-map.md).
+- **Método y URL exactos:** [mapa generado](../generated/code-map.md).
 - **Criterio funcional:** [especificación de requisitos](requirements-specification.md).
-- **Cobertura:** matriz CRUD del [plan de pruebas](test-plan.md).
+- **Cobertura:** matriz CRUD del [plan de pruebas](../testing/test-plan.md).
 
 Al agregar o retirar una operación se actualizan ruta, permiso, requisito y prueba;
 después se modifica una sola fila de esta matriz y se ejecuta

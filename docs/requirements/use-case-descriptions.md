@@ -160,7 +160,7 @@ efectos negativos específicos.
 | Consulta y exportación | `CU-REP-01` y listados de los demás casos | Filtros, paginación, dependencias entre selects y utilidades Excel. | Columnas, agrupaciones, fórmulas y permiso de cada reporte. |
 
 Reutilizar no significa fusionar reglas de negocio. Antes de crear otro flujo se revisan
-los [patrones de diseño y construcción](design-and-construction-patterns.md), se replica
+los [patrones de diseño y construcción](../architecture/design-and-construction-patterns.md), se replica
 el proceso existente sólo cuando cambia el contexto, y se mantienen explícitas sus
 validaciones, transacciones y pruebas CRUD.
 
@@ -172,7 +172,7 @@ validaciones, transacciones y pruebas CRUD.
    operaciones y el plan de pruebas.
 3. Las pruebas unitarias conservan la ruta paralela al código; las integraciones CRUD
    atraviesan HTTP y Prisma en `tests/integration/controllers/*DbTest.js`, conforme a
-   la [estrategia de pruebas](service-test-coverage.md).
+   la [estrategia de pruebas](../testing/service-test-coverage.md).
 4. Un caso nuevo debe describir actor, objetivo, precondiciones, flujo, alternativas,
    resultado y requisitos relacionados antes de considerarse documentado.
 5. Proyectos, requisiciones y ajustes sin flujo HTTP completo permanecen en la

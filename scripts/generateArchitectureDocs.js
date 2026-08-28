@@ -110,7 +110,7 @@ const generateCodeMap = async () => {
 Este inventario se genera **a partir del código fuente**. Ejecuta \`npm run docs:architecture\`
 después de cambiar rutas o dependencias entre capas; \`npm run docs:check\` detecta si esta
 versión quedó desactualizada. La semántica y el patrón de esta vista se describen en las
-[convenciones de diagramas](../diagram-conventions.md).
+[convenciones de diagramas](../architecture/diagram-conventions.md).
 
 ## Dependencias entre áreas
 
@@ -266,7 +266,7 @@ Estos diagramas ER se generan desde los modelos y relaciones de
 \`prisma/schema.prisma\`. Se separan por área para que puedan leerse y revisarse en
 GitHub; las relaciones que cruzan áreas se describen en la sección final. La semántica
 y el patrón de esta vista se describen en las
-[convenciones de diagramas](../diagram-conventions.md).
+[convenciones de diagramas](../architecture/diagram-conventions.md).
 
 La marca \`PK\` identifica claves primarias, \`FK\` claves foráneas y \`UK\` campos
 únicos. Los campos compuestos y demás restricciones siguen teniendo como fuente de
@@ -300,15 +300,16 @@ const generateDataDictionary = async () => {
 
 Este inventario se genera desde \`prisma/schema.prisma\` y enumera campos escalares,
 obligatoriedad, claves, valores predeterminados, tipos de base de datos y relaciones
-propietarias. Se aplican las [convenciones de diagramas](../diagram-conventions.md).
+propietarias. Se aplican las
+[convenciones de diagramas](../architecture/diagram-conventions.md).
 
 El tipo Prisma y el atributo \`@db\` describen la representación técnica. Prisma y las
 migraciones son la fuente de verdad para restricciones completas, índices, acciones
 referenciales y SQL. El propósito de negocio de los agregados se explica en el
-[modelo de dominio y casos de uso](../domain-and-use-cases.md); este generador no inventa
+[modelo de dominio y casos de uso](../requirements/domain-and-use-cases.md); este generador no inventa
 definiciones de negocio a partir de nombres de tablas. La terminología compartida con
 usuarios y responsables se mantiene en el
-[glosario del negocio](../business-glossary.md).
+[glosario del negocio](../requirements/business-glossary.md).
 
 ## Cómo leerlo
 

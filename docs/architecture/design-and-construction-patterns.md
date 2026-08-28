@@ -407,9 +407,9 @@ no un catálogo para seleccionar relaciones.
 `FulfillmentStatus` es una referencia interna de sólo lectura usada por encabezados,
 detalles y filtros. No es un CRUD administrable. Sus transiciones funcionales y los
 datos afectados se documentan en la
-[matriz de operaciones](requirements-operations-matrix.md#modos-precondiciones-y-datos-modificados);
+[matriz de operaciones](../requirements/requirements-operations-matrix.md#modos-precondiciones-y-datos-modificados);
 su representación física se consulta en el
-[diccionario generado](generated/data-dictionary.md). Se evita justificar aquí la
+[diccionario generado](../generated/data-dictionary.md). Se evita justificar aquí la
 elección de tabla frente a enum porque ese detalle de persistencia no cambia el caso de
 uso y repetir relaciones técnicas vuelve redundante esta guía de construcción.
 
