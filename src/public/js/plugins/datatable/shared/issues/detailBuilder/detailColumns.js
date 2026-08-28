@@ -157,9 +157,20 @@ export const buildDetailsColumns = ({ type, mode, canManageProjectQuantity = fal
             responsivePriority: DETAIL_CONTROL_RESPONSIVE_PRIORITY,
             render: (_, __, row) => {
                 const detailId = row.id;
+                const clientId = row.clientId;
                 const isCanceledDetail = row.status === GOODS_RECEIPT_DETAIL_STATUSES.CANCELED;
                 const isCanceledReceipt = row.goodsReceiptStatusName === GOODS_RECEIPT_STATUS_LABELS.CANCELED;
                 const canManageDetail = Boolean(detailId) && !isCanceledDetail && !isCanceledReceipt;
+
+                if (!detailId && clientId) {
+                    return buildMdbDeleteActionButton({
+                        className: 'delete-btn',
+                        label: 'Eliminar detalle',
+                        htmlAttrs: {
+                            'data-id': clientId
+                        }
+                    });
+                }
 
                 if (!canManageDetail) return '';
 

@@ -163,7 +163,7 @@ export const createWasteWithInitialStockAdjustment = async ({
             const existingWaste = await findWasteByIdentity({
                 tx,
                 supplierId: wasteDto.supplierId,
-                name: material.name,
+                name: wasteDto.name,
                 base: wasteDto.base,
                 height: wasteDto.height
             });
@@ -176,7 +176,7 @@ export const createWasteWithInitialStockAdjustment = async ({
 
             const waste = await tx.waste.create({
                 data: {
-                    name: material.name,
+                    name: wasteDto.name,
                     supplier: { connect: { id: wasteDto.supplierId } },
                     presentation: { connect: { id: material.presentation.id } },
                     unitMeasure: { connect: { id: material.unitMeasure.id } },
@@ -236,7 +236,20 @@ export const updateWaste = async ({
 
         const waste = await getDb().$transaction(async (tx) => {
 
-            await findWasteById({ tx, id });
+            const currentWaste = await findWasteById({ tx, id });
+
+            if (wasteDto.name && wasteDto.name !== currentWaste.name) {
+                const existingWaste = await findWasteByIdentity({
+                    tx,
+                    supplierId: currentWaste.supplierId,
+                    name: wasteDto.name,
+                    base: currentWaste.base,
+                    height: currentWaste.height,
+                    excludeId: id
+                });
+
+                if (existingWaste) throw new WasteAlreadyExists();
+            }
 
             return await tx.waste.update({
                 where: { id },

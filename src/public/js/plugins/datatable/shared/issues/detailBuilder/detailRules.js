@@ -41,7 +41,7 @@ export const isCanceledDetail = (row = {}) => {
 };
 
 export const resolveDetailActionIdentifier = (row = {}) => (
-    row.id ?? row.wasteId ?? row.materialId
+    row.id ?? row.clientId ?? row.wasteId ?? row.materialId
 );
 
 export const shouldShowDetailActionButtons = ({ row, mode }) => (

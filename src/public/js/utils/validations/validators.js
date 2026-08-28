@@ -68,9 +68,14 @@ export const goodsReceiptMaterialCreateValidation = {
         : null
 }
 
-export const wasteEditValidation = {
+const wasteSecondaryDataValidation = {
     ...inventoryStateValidation,
     maxUnitCost: value => validateNonNegativeNumber(value, 'El costo máximo de la merma')
+};
+
+export const wasteEditValidation = {
+    name: value => validateName(value, 200),
+    ...wasteSecondaryDataValidation
 };
 
 export const wasteStockValidation = createInventoryStockValidation({
@@ -79,11 +84,12 @@ export const wasteStockValidation = createInventoryStockValidation({
 });
 
 export const wasteValidation = {
+    name: value => validateName(value, 200),
     materialId: (value) => isEmptyOrNull(value, 'El material'),
     supplierId: (value) => isEmptyOrNull(value, 'El proveedor'),
     base: value => validatePositiveNumber(value, 'El ancho de la merma'),
     height: value => validatePositiveNumber(value, 'El largo de la merma'),
-    ...wasteEditValidation,
+    ...wasteSecondaryDataValidation,
     newStock: wasteStockValidation.newStock,
     observations: wasteStockValidation.observations,
 }

@@ -59,7 +59,7 @@ describe('plantilla del formulario CRUD de mermas', () => {
       }
     });
 
-    expect(nameDisplay.textContent).toBe('Lona Front');
+    expect(nameDisplay.value).toBe('Lona Front');
     expect(presentationDisplay.textContent).toBe('ROLLO');
     expect(unitMeasureDisplay.textContent).toBe('m²');
     expect(form.elements.base.value).toBe(1.52);
@@ -80,7 +80,7 @@ describe('plantilla del formulario CRUD de mermas', () => {
       }
     });
 
-    expect(nameDisplay.textContent).toBe('Coroplast');
+    expect(nameDisplay.value).toBe('Coroplast');
     expect(presentationDisplay.textContent).toBe('PIEZA');
     expect(unitMeasureDisplay.textContent).toBe('Pieza');
     expect(form.elements.base.value).toBe('');
@@ -95,7 +95,7 @@ describe('plantilla del formulario CRUD de mermas', () => {
 
     applyWasteMaterialTemplate({ form });
 
-    expect(nameDisplay.textContent).toBe('—');
+    expect(nameDisplay.value).toBe('');
     expect(presentationDisplay.textContent).toBe('—');
     expect(unitMeasureDisplay.textContent).toBe('—');
     expect(form.elements.base.value).toBe('');

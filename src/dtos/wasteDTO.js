@@ -1,11 +1,15 @@
 import { toNumber } from '../utils/formattersUtils.js';
 
-const buildWasteDataDto = (body = {}) => ({
+const buildWasteRegistrationDataDto = (body = {}) => ({
     materialId: body.materialId,
     supplierId: body.supplierId,
     ...(Object.prototype.hasOwnProperty.call(body, 'maxUnitCost') ? { maxUnitCost: toNumber(body.maxUnitCost) } : {}),
     base: toNumber(body.base),
     height: toNumber(body.height)
+});
+
+const buildWasteIdentityDto = (body = {}) => ({
+    ...(Object.prototype.hasOwnProperty.call(body, 'name') ? { name: body.name.trim() } : {})
 });
 
 const buildWasteSecondaryDataDto = (body = {}) => ({
@@ -21,11 +25,15 @@ const buildWasteStockDto = (body = {}, { includeReason = true } = {}) => ({
 });
 
 export const createWasteDtoForRegister = (body = {}) => ({
-    ...buildWasteDataDto(body),
+    ...buildWasteRegistrationDataDto(body),
+    ...buildWasteIdentityDto(body),
     ...buildWasteSecondaryDataDto(body),
     ...buildWasteStockDto(body, { includeReason: false })
 });
 
-export const createWasteDtoForEdit = (body = {}) => buildWasteSecondaryDataDto(body);
+export const createWasteDtoForEdit = (body = {}) => ({
+    ...buildWasteIdentityDto(body),
+    ...buildWasteSecondaryDataDto(body)
+});
 
 export const createWasteDtoForStockUpdate = (body = {}) => buildWasteStockDto(body);

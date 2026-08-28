@@ -73,6 +73,8 @@ export const editGoodsReceiptHeader = async (req, res) => {
         }
     });
 
+    emitInventoryUpdated({ context: 'material', source: 'goods-receipt-updated' });
+
     return res.status(200).json({
         goodsReceipt,
         code: successCodeMessages.UPDATED_GOODS_RECEIPT

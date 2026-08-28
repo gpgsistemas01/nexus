@@ -1,5 +1,19 @@
 # Contrato de la API
 
+## Exportación mensual de reportes
+
+Los endpoints de exportación de compras, salidas y movimientos aceptan
+`monthlyReport=true`. En ese modo ignoran los filtros aplicados al listado y consultan
+el mes actual de México de forma predeterminada. El parámetro opcional `reportMonth`,
+con formato `AAAA-MM`, permite consultar un mes calendario específico; un valor
+ausente o inválido conserva el comportamiento seguro del mes actual.
+
+La interfaz conserva **Mes actual** como opción explícita porque es el caso de uso
+principal y evita una selección innecesaria. **Otro mes** habilita un selector mensual
+Flatpickr —con valor contractual `AAAA-MM`— y **Personalizado** reutiliza los filtros
+aplicados al listado; así no se mezclan un periodo calendario completo y un reporte
+filtrado.
+
 ## Decisión
 
 **Sí conviene adoptar OpenAPI, pero Swagger no sustituye la documentación de
@@ -66,3 +80,12 @@ Los datos de inventario consumidos por los formularios y listados CRUD conservan
 relaciones `presentation` y `unitMeasure` como objetos. Cuando Select2 las transporta
 en atributos HTML, el cliente debe deserializarlas antes de leer `name`, `symbol` o
 `id`; una cadena con el nombre de la presentación no forma parte de este contrato.
+
+## Presentación de conflictos en el cliente web
+
+Las respuestas HTTP `409` conservan un código de error estable en `code` y una
+descripción legible en `message`. El cliente muestra ambos valores en el modal de
+advertencia: el código identifica el conflicto en el título y el mensaje explica la
+causa en el texto normal. Si la respuesta no incluye `code`, el título usa
+**Conflicto**; si no incluye `message`, el texto reutiliza el mensaje asociado al
+código o el fallback general del manejador de errores.

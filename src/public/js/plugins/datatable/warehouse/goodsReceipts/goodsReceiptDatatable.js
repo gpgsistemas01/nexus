@@ -7,7 +7,7 @@ import { getAllGoodsReceipts } from '../../../../application/warehouse/goodsRece
 import { exportGoodsReceiptReport } from '../../../../application/warehouse/report.js';
 import { buildDetailsColumns } from '../../shared/issues/detailBuilder/detailColumns.js';
 import { buildDetailsHeader } from '../../shared/issues/detailBuilder/detailHeader.js';
-import { removeDetail } from '../../../../utils/detailCollectionUtils.js';
+import { matchesDetailIdentifier, removeDetail } from '../../../../utils/detailCollectionUtils.js';
 import { getResponsiveRowData } from '../../core/responsive/rowData.js';
 import { buildExcelButton, buildTableExportParams } from '../../../../ui/tableUI.js';
 import { formatDateTimeDisplay, formatFileName } from '../../../../utils/formatters.js';
@@ -77,9 +77,10 @@ export const createGoodsReceiptDatatable = async ({ openGoodsReceiptModal }) => 
                 },
                 buildExcelButton({
                     filename: formatFileName('reporte_compras'),
-                    request: ({ monthlyReport = false } = {}) => exportGoodsReceiptReport(buildTableExportParams(table, {
+                    request: ({ monthlyReport = false, reportMonth = '' } = {}) => exportGoodsReceiptReport(buildTableExportParams(table, {
                         ...filters.getValues(),
-                        monthlyReport
+                        monthlyReport,
+                        reportMonth
                     }))
                 })
             ]
@@ -132,7 +133,11 @@ $(selectorMaterialTable).on(DOM_EVENT_NAMES.CLICK, '.delete-btn', function () {
 
     const material = removeDetail({
         details,
-        matches: detail => detail.materialId === id
+        matches: detail => matchesDetailIdentifier({
+            detail,
+            identifier: id,
+            inventoryIdKey: 'clientId'
+        })
     });
 
     if (!material) return;

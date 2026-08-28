@@ -63,6 +63,22 @@ export const getMexicoMonthDateRange = (dateTime = new Date()) => {
     };
 };
 
+export const getReportMonthDateRange = (reportMonth = '') => {
+    const match = /^(\d{4})-(0[1-9]|1[0-2])$/.exec(reportMonth);
+
+    if (!match) return getMexicoMonthDateRange();
+
+    const [, year, month] = match;
+    const lastDay = new Date(Number(year), Number(month), 0).getDate();
+
+    return {
+        startDate: `${ year }-${ month }-01`,
+        endDate: `${ year }-${ month }-${ String(lastDay).padStart(2, '0') }`,
+        month,
+        year
+    };
+};
+
 export const cleanSearchTerm = (search) => {
 
   const cleaned = search.trim();

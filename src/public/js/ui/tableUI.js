@@ -1,5 +1,13 @@
 import { DOM_EVENT_NAMES } from '../constants/events.js';
 import { notifications } from "../plugins/swal/swalComponent.js";
+import { getTimeZoneDateTimeParts } from '../utils/timeZone.js';
+import { showReportExportDialog } from './reportExportDialog.js';
+
+const getCurrentMexicoMonth = () => {
+    const { year, month } = getTimeZoneDateTimeParts(new Date());
+
+    return `${ year }-${ String(month).padStart(2, '0') }`;
+};
 
 export const buildTableExportParams = (table, params = {}) => {
 
@@ -28,49 +36,22 @@ export const buildExcelButton = ({
 
         try {
 
-            let reportType = 'custom';
+            let reportType = allowMonthlyReport ? 'monthly' : 'custom';
+            let reportMonth = '';
 
             if (allowMonthlyReport) {
-                const result = await Swal.fire({
-                    title: 'Exportar reporte',
-                    html: `
-                        <div class="text-start report-export-options">
-                            <p class="mb-3">Selecciona el alcance del reporte que deseas descargar.</p>
-                            <div class="form-check mb-2 report-export-option">
-                                <input class="form-check-input" type="radio" name="reportType" id="customReportRadio" value="custom" checked>
-                                <label class="form-check-label" for="customReportRadio">
-                                    Personalizado: usar filtros aplicados
-                                </label>
-                            </div>
-                            <div class="form-check report-export-option">
-                                <input class="form-check-input" type="radio" name="reportType" id="monthlyReportRadio" value="monthly">
-                                <label class="form-check-label" for="monthlyReportRadio">
-                                    Mensual: todos los registros del mes actual
-                                </label>
-                            </div>
-                        </div>
-                    `,
-                    showCancelButton: true,
-                    reverseButtons: true,
-                    confirmButtonText: 'Descargar',
-                    cancelButtonText: 'Cancelar',
-                    buttonsStyling: false,
-                    customClass: {
-                        popup: 'report-export-modal',
-                        title: 'report-export-title',
-                        htmlContainer: 'report-export-content',
-                        confirmButton: 'btn btn-primary',
-                        cancelButton: 'btn btn-outline-primary report-export-cancel-button ms-2'
-                    },
-                    preConfirm: () => document.querySelector('input[name="reportType"]:checked')?.value || 'custom'
-                });
+                const result = await showReportExportDialog(getCurrentMexicoMonth());
 
                 if (!result.isConfirmed) return;
 
-                reportType = result.value;
+                reportType = result.value.type;
+                reportMonth = reportType === 'specificMonth' ? result.value.month : '';
             }
 
-            const blob = await request({ monthlyReport: reportType === 'monthly' });
+            const blob = await request({
+                monthlyReport: reportType === 'monthly' || reportType === 'specificMonth',
+                reportMonth
+            });
             const url = window.URL.createObjectURL(blob);
             const link = document.createElement('a');
 

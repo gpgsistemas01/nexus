@@ -98,9 +98,10 @@ export const createIssueDatatable = async ({
     const exportButton = exportOptions?.report && exportOptions?.filename
         ? buildExcelButton({
             filename: formatFileName(exportOptions.filename),
-            request: ({ monthlyReport = false } = {}) => exportOptions.report(buildTableExportParams(table, {
+            request: ({ monthlyReport = false, reportMonth = '' } = {}) => exportOptions.report(buildTableExportParams(table, {
                 ...filters.getValues(),
-                monthlyReport
+                monthlyReport,
+                reportMonth
             }))
         })
         : null;

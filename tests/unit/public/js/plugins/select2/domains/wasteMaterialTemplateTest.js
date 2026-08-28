@@ -76,7 +76,7 @@ describe('selección de plantilla del CRUD de mermas', () => {
     handlers.get('change.wasteMaterialTemplate')();
 
     expect(initDomainSelect2).toHaveBeenCalledWith(expect.objectContaining({ data }));
-    expect(nameDisplay.textContent).toBe('—');
+    expect(nameDisplay.value).toBe('');
     expect(presentationDisplay.textContent).toBe('—');
     expect(unitMeasureDisplay.textContent).toBe('—');
     expect(baseInput.value).toBe('');

@@ -61,8 +61,7 @@ export const handleApiError = ({
             notifications.showError(getFallbackMessage(err));
             return;
 
-        case 404:
-        case 409: {
+        case 404: {
             const modalData = data ?? err?.response?.data ?? null;
             const modalTitle = getErrorMessage(modalData) || 'No se pudo completar la acción';
             const modalMessage = getFallbackMessage(err);
@@ -71,6 +70,18 @@ export const handleApiError = ({
             notifications.showModal({
                 title: modalTitle,
                 text: modalMessage === modalTitle ? null : modalMessage,
+                icon: 'warning'
+            });
+            return;
+        }
+
+        case 409: {
+            const modalData = data ?? err?.response?.data ?? null;
+
+            resetFormSubmitState(form);
+            notifications.showModal({
+                title: modalData?.code || 'Conflicto',
+                text: getFallbackMessage(err),
                 icon: 'warning'
             });
             return;

@@ -110,6 +110,7 @@ describe('wasteController', () => {
     const waste = { id: 'waste-1' };
     const req = {
       body: {
+        name: 'Recorte confirmado',
         materialId: 'material-1',
         supplierId: 'supplier-1',
         base: '1',
@@ -128,6 +129,7 @@ describe('wasteController', () => {
 
     expect(createWasteWithInitialStockAdjustment).toHaveBeenCalledWith({
       wasteDto: {
+        name: 'Recorte confirmado',
         materialId: 'material-1',
         supplierId: 'supplier-1',
         base: 1,
