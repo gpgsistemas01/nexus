@@ -35,6 +35,7 @@ export const goodsReceiptValidation = [
 
 
 export const goodsReceiptHeaderValidation = [
+    validateUUID('supplierId'),
     validateUUID('receivedById'),
     validateBoolean('isInvoiced'),
     validateInvoice(),

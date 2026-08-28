@@ -3,6 +3,7 @@ import {
     GoodsReceiptInvoiceAlreadyExists,
     GoodsReceiptAlreadyCanceled,
     GoodsReceiptNotFound,
+    GoodsReceiptSupplierChangeConflict,
     GoodsReceiptUpdateDatabaseError,
     PersonReceivedByNotFound
 } from "../../../errors/warehouse/goodsReceiptError.js";
@@ -238,7 +239,7 @@ export const updateGoodsReceipt = async ({ id, goodsReceiptDto }) => {
 
     try {
 
-        const { receivedById, supplierId: _ignoredSupplierId, details = [], userId, ...goodsReceiptData } = goodsReceiptDto;
+        const { receivedById, supplierId, details = [], userId, ...goodsReceiptData } = goodsReceiptDto;
         const newDetails = details.filter(detail => !detail.id);
 
         const [goodsReceipt, receivedBy] = await Promise.all([
@@ -259,6 +260,10 @@ export const updateGoodsReceipt = async ({ id, goodsReceiptDto }) => {
 
         if (goodsReceipt.status.name === GOODS_RECEIPT_STATUS_NAMES.CANCELED) {
             throw new GoodsReceiptAlreadyCanceled();
+        }
+
+        if (supplierId !== goodsReceipt.supplierId) {
+            throw new GoodsReceiptSupplierChangeConflict();
         }
 
         if (!receivedBy) throw new PersonReceivedByNotFound();

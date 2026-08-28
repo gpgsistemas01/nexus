@@ -1,5 +1,7 @@
 const findDetailIndex = ({ details, matches }) => details.findIndex(matches);
 
+export const getNewDetails = (details = []) => details.filter(detail => !detail.id);
+
 export const upsertDetail = ({ details, detail, matches, preserveKeys = [] }) => {
     const index = findDetailIndex({ details, matches });
 
