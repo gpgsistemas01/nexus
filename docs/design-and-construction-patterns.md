@@ -402,25 +402,16 @@ Los CRUD con mutaciones o coordinación propia permanecen en la carpeta de su re
 movimientos también conserva su ownership porque representa una consulta operativa y
 no un catálogo para seleccionar relaciones.
 
-### Estado de surtimiento: tabla de referencia, no enum
+### Estado de surtimiento
 
-`FulfillmentStatus` se conserva como tabla de referencia controlada. Aunque sus nombres
-actuales forman un conjunto cerrado en las reglas de aplicación, el valor persistido no
-pertenece a un único agregado: la misma identidad se relaciona con encabezados y detalles
-de salidas de material y de merma. El filtro compartido necesita además resolver esa
-identidad para consultar por `fulfillmentStatusId`. La tabla mantiene una sola clave
-foránea reutilizable, integridad referencial y el mismo contrato de filtrado para los
-cuatro contextos; convertirla en enum obligaría a migrar esas relaciones y a mantener un
-nuevo contrato de filtro basado en valores en todos los consumidores que hoy intercambian
-identificadores.
-
-Que sea una tabla no la convierte en un catálogo administrable. No se exponen altas,
-ediciones ni bajas: la aplicación controla las transiciones mediante
-`FULFILLMENT_STATUS_NAMES` y el endpoint sólo publica lectura para filtros. Un enum se
-reconsiderará únicamente si desaparecen la resolución por identificador y el catálogo
-remoto, y todos los consumidores almacenan directamente el mismo valor inmutable. Por
-ahora, cambiar el tipo no elimina el proceso del select ni mejora el contrato CRUD; sólo
-traslada el costo a datos, filtros y relaciones existentes.
+`FulfillmentStatus` es una referencia interna de sólo lectura usada por encabezados,
+detalles y filtros. No es un CRUD administrable. Sus transiciones funcionales y los
+datos afectados se documentan en la
+[matriz de operaciones](requirements-operations-matrix.md#modos-precondiciones-y-datos-modificados);
+su representación física se consulta en el
+[diccionario generado](generated/data-dictionary.md). Se evita justificar aquí la
+elección de tabla frente a enum porque ese detalle de persistencia no cambia el caso de
+uso y repetir relaciones técnicas vuelve redundante esta guía de construcción.
 
 ### Contrato de los selects en modales
 
