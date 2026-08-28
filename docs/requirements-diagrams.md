@@ -23,10 +23,10 @@ flowchart LR
     sales["Ventas / asesoría"]
     admin["Administración"]
     subgraph inventory["Inventario y abastecimiento"]
-        catalogs["Gestionar materiales,<br/>presentaciones y proveedores"]
-        receipts["Registrar y corregir<br/>entradas de compra"]
-        issues["Registrar salidas,<br/>entregas y devoluciones"]
-        wastes["Gestionar existencias,<br/>salidas y devoluciones de merma"]
+        catalogs["Gestionar materiales,<br/>proveedores y catálogos editables"]
+        receipts["Registrar entradas con partidas independientes<br/>y corregir partidas persistidas"]
+        issues["Registrar salidas de material,<br/>surtir y devolver"]
+        wastes["Nombrar y gestionar existencias de merma,<br/>registrar salidas, surtir y devolver"]
         adjustments["Solicitar y aplicar<br/>ajustes de stock"]
     end
     subgraph governance["Administración y control"]
@@ -49,23 +49,35 @@ flowchart LR
     admin --> audit
 ```
 
-## Ciclo de los requisitos CRUD
+## Ciclo vigente de los requisitos CRUD
 
-Los catálogos reutilizan un mismo ciclo de interacción, con autorización, validación y
-reglas particulares según el recurso. Los documentos operativos agregan estados y
-acciones de negocio sin duplicar el CRUD base.
+Los catálogos reutilizan un mismo ciclo de interacción, con autorización y validación
+particulares según el recurso. La eliminación física sólo aparece cuando las relaciones
+del dominio la permiten; en los demás casos el ciclo usa activación, desactivación o
+cancelación. Los documentos operativos reutilizan listado y formulario, pero agregan
+acciones de detalle, stock y movimiento sin presentarlas como un CRUD idéntico.
 
 ```mermaid
-stateDiagram-v2
-    [*] --> Listado: consultar con filtros y paginación
-    Listado --> Alta: crear
-    Alta --> Listado: guardar y refrescar
-    Listado --> Edición: seleccionar
-    Edición --> Listado: guardar y refrescar
-    Listado --> CambioEstado: activar / desactivar o cancelar
-    CambioEstado --> Listado: confirmar y refrescar
-    Listado --> [*]
+flowchart LR
+    list["Consultar listado<br/>filtros y paginación"] --> create["Crear<br/>validar identidad y relaciones"]
+    create --> refresh["Persistir y refrescar listado"]
+    list --> edit["Actualizar<br/>conservar campos inmutables"]
+    edit --> refresh
+    list --> removal{"¿El dominio permite<br/>eliminación física?"}
+    removal -->|"sí y sin relaciones protegidas"| delete["Eliminar"]
+    removal -->|"no"| status["Activar, desactivar<br/>o cancelar"]
+    delete --> refresh
+    status --> refresh
+    refresh --> list
+
+    list --> document["Documento operativo<br/>encabezado y detalles"]
+    document --> transaction["Acción atómica<br/>detalle · stock · movimiento"]
+    transaction --> list
 ```
+
+Las flechas representan transiciones observables del usuario, no endpoints concretos.
+La bifurcación de eliminación aplica `RN-007`; el límite atómico aplica `RN-002`. La
+matriz de operaciones define cuál de estas ramas existe realmente para cada módulo.
 
 ## Requisitos de calidad y restricciones
 
@@ -95,8 +107,9 @@ flowchart LR
     validation --> controller["Controller / DTO"]
     controller --> service["Servicio de dominio"]
     service --> schema["Prisma / migración"]
-    controller --> unit["Prueba unitaria<br/>tests/unit/controllers"]
-    service --> integration["Prueba CRUD con BD<br/>tests/integration/controllers"]
+    validation --> unit["Pruebas unitarias en ruta paralela<br/>validators · DTO · controller · service · UI CRUD"]
+    route --> integration["Integración CRUD HTTP + Prisma<br/>tests/integration/controllers/*DbTest.js"]
+    schema --> integration
     route --> generated["Mapa generado y<br/>comprobación de CI"]
 ```
 
