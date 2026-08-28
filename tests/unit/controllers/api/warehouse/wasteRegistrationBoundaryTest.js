@@ -40,6 +40,7 @@ const app = createControllerTestApp({
 });
 
 const validBody = {
+  name: 'Recorte de prueba',
   materialId,
   supplierId,
   base: '1',
@@ -88,6 +89,7 @@ describe('wasteController registration boundaries', () => {
   });
 
   it.each([
+    ['partición de equivalencia', 'nombre vacío', { name: '' }, 'name'],
     ['partición de equivalencia', 'UUID de material inválido', { materialId: 'not-a-uuid' }, 'materialId'],
     ['partición de equivalencia', 'UUID de proveedor inválido', { supplierId: 'not-a-uuid' }, 'supplierId'],
     ['valor límite', 'dimensión en cero', { base: '0' }, 'base'],

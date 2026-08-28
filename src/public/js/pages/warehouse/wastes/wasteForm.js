@@ -3,7 +3,7 @@ import { editWaste, editWasteStock, registerWaste } from '../../../application/w
 import { FORM_SELECTORS } from '../../../constants/selectors.js';
 import { handleSubmit, pickFormFields, validateFields } from '../../../utils/formUtils.js';
 import { wasteEditValidation, wasteStockValidation, wasteValidation } from '../../../utils/validations/validators.js';
-import { wasteCreateFields, wasteSecondaryDataFields, wasteStockFields } from './wasteFields.js';
+import { wasteCreateFields, wasteEditFields, wasteStockFields } from './wasteFields.js';
 import { isEditMode, isStockMode } from '../../../constants/formModes.js';
 
 useForm({
@@ -12,7 +12,7 @@ useForm({
 
         const fields = isStockMode(form.dataset.mode)
             ? wasteStockFields
-            : isEditMode(form.dataset.mode) ? wasteSecondaryDataFields : wasteCreateFields;
+            : isEditMode(form.dataset.mode) ? wasteEditFields : wasteCreateFields;
 
         if (!isStockMode(form.dataset.mode)) {
             

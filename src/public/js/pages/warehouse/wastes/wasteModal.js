@@ -57,6 +57,11 @@ export const openWasteModal = ({
         fields: wasteSecondaryDataFields,
         isDisabled: isAdjustingStock
     });
+    setFormDisabled({
+        form,
+        fields: ['name'],
+        isDisabled: isAdjustingStock
+    });
     setFormDisabled({ 
         form, 
         fields: wasteStockFields, 

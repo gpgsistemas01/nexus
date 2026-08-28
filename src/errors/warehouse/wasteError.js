@@ -11,7 +11,7 @@ export class WasteAlreadyExists extends AppError {
 
     constructor () {
         super(
-            'Ya existe una merma para el material, proveedor y dimensiones indicados.',
+            'Ya existe una merma con el nombre, proveedor y dimensiones indicados.',
             'WASTE_ALREADY_EXISTS',
             409
         );
