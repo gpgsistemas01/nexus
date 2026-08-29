@@ -25,7 +25,7 @@ const {
   editWasteIssueHeader,
   getAllWasteIssues,
   registerWasteIssue,
-  returnWasteIssueDetail
+  registerWasteIssueDetailReturn
 } = await import('../../../../../src/controllers/api/warehouse/wasteIssueController.js');
 
 const createResponse = () => {
@@ -208,7 +208,7 @@ describe('wasteIssueController', () => {
     const response = createResponse();
     returnWasteIssueDetailService.mockResolvedValue({ id: 'return-1' });
 
-    await returnWasteIssueDetail({
+    await registerWasteIssueDetailReturn({
       params: { id: 'issue-1', detailId: 'detail-1' },
       user: { id: 'user-1' },
       body: { returnQuantity: '1.5', observations: ' Devolución parcial ' }

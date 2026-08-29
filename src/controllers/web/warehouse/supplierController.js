@@ -1,4 +1,4 @@
-export const getSuppliers = async (req, res) => {
+export const getSuppliersPage = async (req, res) => {
 
     const { user } = req;
 

@@ -13,7 +13,7 @@ import {
     updateGoodsIssueDetails,
     updateGoodsIssueHeader
 } from "../../../services/warehouse/goodsIssues/goodsIssueService.js";
-import { returnGoodsIssueDetail as returnGoodsIssueDetailService } from '../../../services/warehouse/goodsIssues/detailReturns/goodsIssueReturnService.js';
+import { returnGoodsIssueDetail } from '../../../services/warehouse/goodsIssues/detailReturns/goodsIssueReturnService.js';
 import { getDataTableOrder, getDataTablePaging, getDataTableSearch } from "../../../utils/requestQueryUtils.js";
 import { sanitizeEmptyStrings } from "../../../utils/formattersUtils.js";
 import { emitInventoryUpdated } from "../../../utils/socketUtils.js";
@@ -126,7 +126,7 @@ export const registerGoodsIssueDetailReturn = async (req, res) => {
     const returnDto = createGoodsIssueDtoForReturn(req.body);
     const sanitizedReturnDto = sanitizeEmptyStrings(returnDto);
 
-    const goodsIssueReturn = await returnGoodsIssueDetailService({
+    const goodsIssueReturn = await returnGoodsIssueDetail({
         id: req.params.id,
         detailId: req.params.detailId,
         returnDto: sanitizedReturnDto,

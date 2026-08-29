@@ -123,7 +123,7 @@ departamento antes de inicializar el filtro.
 
 El objeto construido permanece privado dentro del módulo de contexto. La frontera
 pública son exports nombrados en lenguaje de dominio (`registerUser`,
-`editGoodsReceiptHeader`, `returnWasteIssueDetail`, etc.), no un export del objeto
+`editGoodsReceiptHeader`, `registerWasteIssueDetailReturn`, etc.), no un export del objeto
 genérico. Así los consumidores no dependen de claves como `register`, `edit` o de la
 forma interna de la factory; además pueden importar sólo la capacidad que utilizan.
 Las referencias exportadas conservan también el formato de entrada de la factory:
@@ -537,63 +537,6 @@ La ubicación sigue indicando el propósito:
 
 Compartir harness o casos tabulados no elimina la integración de cada contexto: ésta
 debe demostrar router, permiso, configuración, persistencia y efectos propios.
-
-## 10. Estándar de codificación legible
-
-La legibilidad forma parte del contrato de mantenimiento. El código se organiza para
-que una persona pueda reconocer primero las dependencias, después el estado y, por
-último, el recorrido principal sin tener que reconstruirlo a partir de funciones
-dispersas. Este estándar se aplica al código nuevo y a los archivos que se modifican;
-no justifica reformatear archivos ajenos al cambio.
-
-### Estructura de los módulos
-
-1. Los imports se colocan al inicio, se agrupan por capa o responsabilidad y usan una
-   sola convención de comillas dentro del archivo. Los imports nombrados extensos se
-   escriben uno por línea. No permanecen imports, exports ni variables sin uso.
-2. Después de los imports se declaran constantes de configuración, referencias al DOM,
-   estado local y componentes construidos, en ese orden. Las constantes se nombran por
-   intención; un comentario no sustituye un nombre descriptivo.
-3. Las funciones se ordenan por comportamiento según la sección anterior. Una función
-   auxiliar se mantiene cerca del flujo que la consume y antes de su primer uso; no se
-   extrae un wrapper que sólo oculte una llamada.
-4. Los bloques de inicialización y registro de eventos se dejan al final. Eventos del
-   mismo componente permanecen juntos y usan los helpers y constantes compartidos.
-5. Imports, exports, rutas y consumidores se actualizan en el mismo cambio. Antes de
-   crear una función o proceso se busca una factory, componente o flujo equivalente que
-   pueda configurarse para el nuevo contexto.
-
-### Formato y control de flujo
-
-- La indentación conserva la convención de su área: cuatro espacios en `src` y dos en
-  las pruebas. Cada sentencia termina en punto y coma. Se evita una línea en blanco
-  inmediatamente después de abrir una función o bloque y antes de cerrarlo. Dentro de
-  una función, una línea en blanco separa fases semánticas —preparación, validación,
-  transformación y efecto—, pero no separa una declaración de su uso inmediato ni cada
-  sentencia de un mismo paso. Entre funciones, constantes de nivel de módulo y grupos de
-  imports se usa una sola línea en blanco.
-- Una línea extensa se divide por unidades semánticas: parámetros, imports nombrados o
-  condiciones. No se comprimen varias decisiones en una sola línea para ahorrar espacio.
-- Se prefieren retornos tempranos para errores y casos sin trabajo. El recorrido normal
-  queda con la menor anidación posible y cada función conserva una responsabilidad.
-- Los nombres expresan el efecto (`normalizeWasteIssueData`, `findDetailByElement`) y
-  los booleanos expresan una condición. No se usan abreviaturas nuevas que obliguen a
-  conocer contexto implícito.
-- Los comentarios explican una restricción o una decisión no evidente; no narran lo que
-  ya dice el código. Los literales compartidos se importan desde sus constantes.
-
-### Aplicación y verificación
-
-En las páginas de salidas, este estándar complementa el orden común: configuración,
-estado, construcción de componentes, normalización, `useIssueForm`, modal, DataTable,
-operaciones de detalle y eventos. Las pruebas tabuladas usan datos con nombres de
-dominio y una entrada por línea, de modo que el contrato CRUD sea visible sin leer la
-lógica de la aserción.
-
-La revisión mínima de un cambio incluye la prueba CRUD relacionada, la suite unitaria,
-la validación de documentación y `git diff --check`. Si se toca una vista EJS, se
-preserva en su posición la última línea de `contentFor`; no se elimina y vuelve a
-agregar como consecuencia del formato.
 
 ## Decisión antes de crear otro flujo
 

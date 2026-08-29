@@ -5,7 +5,7 @@ import {
     editWasteIssueDetails,
     getAllWasteIssues,
     registerWasteIssue,
-    returnWasteIssueDetail
+    registerWasteIssueDetailReturn
 } from '../../../controllers/api/warehouse/wasteIssueController.js';
 import { PERMISSIONS } from '../../../constants/permissions.js';
 import { authorizeUserApi, verifyApiTokenRequired } from '../../../middleware/authMiddleware.js';
@@ -69,7 +69,7 @@ router.patch(
     issueReturnValidation,
     validate,
     authorizeUserApi(PERMISSIONS.WASTE_ISSUES_SUPPLY),
-    returnWasteIssueDetail
+    registerWasteIssueDetailReturn
 );
 
 export default router;
