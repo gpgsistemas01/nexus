@@ -16,7 +16,7 @@ const registerWasteIssue = vi.fn();
 const editWasteIssue = vi.fn();
 const editWasteIssueHeader = vi.fn();
 const editWasteIssueDetails = vi.fn();
-const returnWasteIssueDetail = vi.fn();
+const registerWasteIssueDetailReturn = vi.fn();
 
 vi.mock('express', () => ({
   default: {
@@ -48,7 +48,7 @@ vi.mock('../../../../../src/controllers/api/warehouse/wasteIssueController.js', 
   editWasteIssueHeader,
   getAllWasteIssues,
   registerWasteIssue,
-  returnWasteIssueDetail
+  registerWasteIssueDetailReturn
 }));
 
 const { PERMISSIONS } = await import('../../../../../src/constants/permissions.js');
@@ -101,7 +101,7 @@ describe('wasteIssueApiRoute', () => {
       issueReturnValidation,
       validate,
       `authorize:${PERMISSIONS.WASTE_ISSUES_SUPPLY}`,
-      returnWasteIssueDetail
+      registerWasteIssueDetailReturn
     );
   });
 });
