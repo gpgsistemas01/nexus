@@ -435,16 +435,9 @@ Reglas para extender un CRUD:
    adapta transporte, interacción y presentación.
 4. Reservar `application` para casos de uso y `pages` para composición. Una llamada
    HTTP no debe implementarse directamente desde una página.
-5. Ordenar las operaciones públicas de cada recurso de forma predecible en todas sus
-   capas: **lectura/listado, creación, actualización general, actualizaciones
-   especializadas y eliminación o acciones terminales**. Los imports se ordenan por
-   dominio y nombre; no se reordena según el momento en que se añadió una función.
-6. Ubicar las pruebas unitarias de controllers en
-   `tests/unit/controllers/<tipo>/<dominio>` y las CRUD con persistencia en
-   `tests/integration/controllers`, siguiendo las estrategias de
-   `docs/testing/service-test-coverage.md`.
-7. Al editar EJS, preservar el cierre final de `contentFor` en su posición; no
-   eliminarlo y volverlo a agregar como efecto secundario de una refactorización.
+5. Aplicar el [estándar de codificación](coding-standards.md), que concentra el
+   orden de operaciones, nombres e importaciones de controladores, sincronización de
+   consumidores, ubicación de pruebas y preservación del cierre final de EJS.
 
 ### Reutilización aplicada en flujos de salidas
 

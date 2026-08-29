@@ -47,7 +47,7 @@ describe('waste issue controller database integration', () => {
         router.patch('/waste-issues/:id', controller.editWasteIssue);
         router.patch('/waste-issues/:id/header', controller.editWasteIssueHeader);
         router.patch('/waste-issues/:id/details', controller.editWasteIssueDetails);
-        router.patch('/waste-issues/:id/details/:detailId/returns', controller.returnWasteIssueDetail);
+        router.patch('/waste-issues/:id/details/:detailId/returns', controller.registerWasteIssueDetailReturn);
       }
     });
 

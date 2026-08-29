@@ -12,7 +12,7 @@ import {
     updateWasteIssueDetails,
     updateWasteIssueHeader
 } from '../../../services/warehouse/wasteIssues/wasteIssueService.js';
-import { returnWasteIssueDetail as returnWasteIssueDetailService } from '../../../services/warehouse/wasteIssues/detailReturns/wasteIssueReturnService.js';
+import { returnWasteIssueDetail } from '../../../services/warehouse/wasteIssues/detailReturns/wasteIssueReturnService.js';
 import { getDataTableOrder, getDataTablePaging, getDataTableSearch } from '../../../utils/requestQueryUtils.js';
 import { sanitizeEmptyStrings } from '../../../utils/formattersUtils.js';
 import { successCodeMessages } from '../../../messages/codeMessages.js';
@@ -130,10 +130,10 @@ export const editWasteIssueDetails = async (req, res) => {
     });
 };
 
-export const returnWasteIssueDetail = async (req, res) => {
+export const registerWasteIssueDetailReturn = async (req, res) => {
 
     const returnDto = sanitizeEmptyStrings(createWasteIssueDtoForReturn(req.body));
-    const wasteIssueReturn = await returnWasteIssueDetailService({
+    const wasteIssueReturn = await returnWasteIssueDetail({
         id: req.params.id,
         detailId: req.params.detailId,
         returnDto,

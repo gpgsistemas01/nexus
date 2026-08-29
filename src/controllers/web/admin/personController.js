@@ -1,4 +1,4 @@
-export const getPersonPage = async (req, res) => {
+export const getPersonsPage = async (req, res) => {
 
     const { user } = req;
 

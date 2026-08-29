@@ -1,4 +1,4 @@
-export const getClientPage = async (req, res) => {
+export const getClientsPage = async (req, res) => {
 
     const { user } = req;
 
