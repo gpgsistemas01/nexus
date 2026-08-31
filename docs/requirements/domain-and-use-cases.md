@@ -78,28 +78,38 @@ flowchart LR
     catalogOperator["Personal autorizado del catálogo"]
 
     subgraph nexus["Nexus"]
+      subgraph identityPackage["Paquete: Identidad y acceso"]
         ucIdentityQuery(["CU-IAM-01 Consultar identidades y accesos"])
         ucPersonCreate(["CU-IAM-02 Crear persona"])
         ucPersonEdit(["CU-IAM-03 Editar persona"])
         ucUserCreate(["CU-IAM-04 Crear usuario y asignar acceso"])
         ucUserEdit(["CU-IAM-05 Editar usuario o cambiar contraseña"])
+      end
+      subgraph catalogPackage["Paquete: Catálogos"]
         ucCatalogQuery(["CU-CAT-01 Consultar catálogos"])
         ucCatalogCreate(["CU-CAT-02 Crear registro de catálogo"])
         ucCatalogEdit(["CU-CAT-03 Editar registro de catálogo"])
         ucCatalogRemove(["CU-CAT-04 Eliminar o cambiar estado de registro"])
+      end
+      subgraph receiptPackage["Paquete: Entradas"]
         ucReceiptQuery(["CU-REC-01 Consultar entradas"])
         ucReceiptCreate(["CU-REC-02 Registrar entrada"])
         ucReceiptEdit(["CU-REC-03 Editar entrada"])
         ucReceiptCorrect(["CU-REC-04 Corregir detalle de entrada"])
         ucReceiptCancel(["CU-REC-05 Cancelar detalle de entrada"])
+      end
+      subgraph issuePackage["Paquete: Salidas"]
         ucIssueQuery(["CU-ISS-01 Consultar salidas"])
         ucIssueCreate(["CU-ISS-02 Crear salida"])
         ucIssueHeader(["CU-ISS-03 Editar encabezado de salida"])
         ucIssueDetails(["CU-ISS-04 Ajustar detalles de salida"])
         ucSupply(["CU-ISS-05 Surtir detalle"])
         ucReturn(["CU-ISS-06 Devolver detalle surtido"])
+      end
+      subgraph reportPackage["Paquete: Consulta y reportes"]
         ucMovements(["CU-REP-01 Consultar movimientos e inventario"])
         ucReports(["CU-REP-02 Generar reporte"])
+      end
     end
 
     catalogOperator --- ucCatalogQuery
@@ -134,6 +144,14 @@ Los identificadores `CU-*` son los mismos del catálogo operativo y permiten pas
 objetivo visual a su descripción y a su diagrama de flujo específico en
 [Diagramas de requisitos](requirements-diagrams.md#flujos-de-cada-caso-de-uso). No se
 usa «administrar» o «mantener» como objetivo: cada óvalo expresa una operación observable.
+
+Los paquetes son límites de lectura, no permisos. Administración del sistema conserva el
+alcance que conceden las políticas vigentes; almacén sólo opera entradas, inventario y
+salidas autorizadas. Las demás áreas aparecen únicamente cuando una política de lectura o
+el encabezado de una salida lo permite. Consultar un catálogo desde un `combobox` es una
+capacidad auxiliar de lectura y no un caso de uso independiente: debe autorizarse en el
+servidor, pero no se asocia como si el actor mantuviera el catálogo. Dirección no se dibuja
+con acceso total porque esa regla aún no existe de manera uniforme en las políticas.
 
 Los casos de uso son objetivos del actor, no módulos de código. Por ello **no se requiere
 crear una carpeta `useCases` ni renombrar los dominios existentes**. La trazabilidad se

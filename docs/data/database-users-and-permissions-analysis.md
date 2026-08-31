@@ -129,9 +129,12 @@ usuarios/asignaciones y cambios de contraseña o estado.
 | P0 | Persistir, rotar y revocar refresh tokens; hoy logout solo borra la cookie local. |
 | P0 | Activar rate limiting para login y refresh. |
 | P0 | Aplicar autorización por objeto de forma uniforme en filtros y transacciones Prisma. |
-| P1 | Implementar auditoría persistente de escrituras críticas. |
+| P1 | Completar la cobertura de `CriticalWriteAudit`: la tabla y varias escrituras críticas ya existen, pero usuarios, asignaciones y cambios de contraseña/estado aún requieren una matriz verificada de eventos, actor y valores anterior/resultante. |
 | P1 | Definir protección CSRF explícita para métodos mutables. |
 | P2 | Aprovisionar credenciales PostgreSQL distintas para runtime y migraciones. |
+| P2 | Documentar y automatizar la retención, respaldo, restauración y revisión de auditoría sin almacenar secretos. |
 
 El manejo actual es una base válida, pero el cierre de seguridad requiere priorizar
-sesiones refresh, rate limiting, alcance por objeto y auditoría.
+sesiones refresh, rate limiting, alcance por objeto y cobertura completa de auditoría. La
+presencia del modelo `CriticalWriteAudit` no cierra por sí sola la brecha: su aceptación
+requiere pruebas por cada operación incluida en la matriz de escrituras críticas.

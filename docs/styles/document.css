@@ -1,0 +1,7 @@
+body { font-family: Arial, sans-serif; line-height: 1.5; color: #20242a; max-width: 1050px; margin: auto; }
+h1, h2, h3 { color: #17365d; page-break-after: avoid; }
+table { border-collapse: collapse; width: 100%; }
+th, td { border: 1px solid #9aa4b2; padding: 0.4rem; vertical-align: top; }
+th { background: #dce6f1; }
+img { max-width: 100%; height: auto; }
+@media print { h1 { page-break-before: always; } h1:first-of-type { page-break-before: avoid; } }
