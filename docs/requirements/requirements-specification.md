@@ -36,6 +36,7 @@ duplicar allí la narrativa de interacción.
 | --- | --- |
 | `RF` | Requisito funcional observable por un actor o consumidor. |
 | `RN` | Regla de negocio que restringe varios flujos. |
+| `RD` | Requisito sobre persistencia o representación de datos. |
 | `RC` | Requisito de calidad u operación. |
 | `CA` | Criterio de aceptación numerado dentro de un requisito cuando se necesitan varios escenarios verificables. |
 
@@ -43,6 +44,19 @@ Un requisito conserva una obligación principal. Si requiere varios ejemplos o
 escenarios, se redactan criterios `CA-<ID>-<n>` en lugar de construir una sola oración
 con decisiones de interfaz, implementación y excepciones. La evidencia técnica se
 mantiene en su columna y no sustituye el resultado observable.
+
+ISO/IEC/IEEE 29148 no obliga a crear una fila independiente para cada verbo CRUD ni
+define la numeración concreta de Nexus. Sí orienta a que los requisitos sean singulares,
+inequívocos y verificables. El proyecto aplica esos criterios separando operaciones que
+pueden autorizarse, fallar y probarse por separado; mantiene juntos únicamente los
+atributos y escenarios que describen una misma obligación observable.
+
+Por tanto, no se dejan juntas obligaciones independientes ni se fragmenta cada campo en
+un requisito. La singularidad aplica a requisitos funcionales (`RF-*`), de datos
+(`RD-*`), reglas de negocio (`RN-*`) y calidad (`RC-*`): se crea otro identificador
+cuando cambia el resultado, la restricción, la aprobación o la prueba que decide su
+cumplimiento. Los criterios `CA-*` conservan variantes inseparables de una misma
+obligación.
 
 ### 2.2 Estados
 
@@ -82,94 +96,205 @@ Los nombres de actor expresan responsabilidades, no conceden acceso por sí mism
 autorización efectiva se calcula con las asignaciones de usuario, rol y departamento
 descritas en [usuarios y permisos](../data/database-users-and-permissions-analysis.md).
 
-## 4. Requisitos funcionales
+## 4. Catálogo unificado por ámbito
+
+La especificación se organiza por el ámbito al que pertenece la obligación, no por el
+tipo de identificador. Los prefijos `RF`, `RN`, `RD` y `RC` permiten clasificar y
+trazar cada enunciado, pero no crean especificaciones paralelas. Así, una revisión de
+acceso, inventario o plataforma encuentra juntas las obligaciones relacionadas de ese
+ámbito.
 
 ### 4.1 Acceso e identidad
 
+La descomposición conserva `RF-AUT-001`, `RF-AUT-002` y `RF-IAM-001` a `RF-IAM-003`
+para la primera obligación observable de su alcance original. Cerrar sesión y las
+mutaciones antes agrupadas reciben identificadores nuevos; ningún ID se reasigna a otro
+recurso.
+
 | ID | Requisito y criterio de aceptación | Estado | Evidencia principal |
 | --- | --- | --- | --- |
-| RF-AUT-001 | Una cuenta activa puede iniciar sesión con credenciales válidas; una credencial inválida no crea una sesión autenticada. | Implementado | `src/routes/api/authApiRoute.js`, `src/routes/web/auth/loginWebRoute.js` |
-| RF-AUT-002 | Una sesión puede renovarse y cerrarse mediante los flujos registrados, invalidando o reemplazando las credenciales correspondientes. | Implementado | `src/routes/web/auth/refreshWebRoute.js`, `src/routes/web/auth/logoutWebRoute.js` |
-| RF-IAM-001 | Administración puede listar, crear y actualizar usuarios, incluidas sus asignaciones de rol y departamento; la lectura posterior refleja el cambio. | Implementado | `src/routes/api/admin/userApiRoute.js`, `src/controllers/api/admin/userController.js` |
-| RF-IAM-002 | Administración puede listar, crear y actualizar personas y sus asignaciones; entradas inválidas no deben persistirse. | Implementado | `src/routes/api/admin/personApiRoute.js`, `src/views/pages/admin/persons` |
-| RF-IAM-003 | Roles y departamentos se pueden consultar para componer asignaciones de acceso. | Implementado | `src/routes/api/admin/roleApiRoute.js`, `src/routes/api/admin/departmentApiRoute.js` |
+| RF-AUT-001 | Una cuenta activa debe poder iniciar sesión con credenciales válidas; una credencial inválida no debe crear una sesión autenticada. | Implementado | `src/routes/api/authApiRoute.js`, `src/routes/web/auth/loginWebRoute.js` |
+| RF-AUT-002 | Una sesión vigente debe poder renovarse reemplazando las credenciales correspondientes. | Implementado | `src/routes/web/auth/refreshWebRoute.js` |
+| RF-AUT-003 | Una sesión autenticada debe poder cerrarse invalidando las credenciales correspondientes. | Implementado | `src/routes/web/auth/logoutWebRoute.js` |
+| RF-IAM-001 | Administración debe poder consultar usuarios y sus asignaciones de rol y departamento sin exponer contraseñas. | Implementado | `src/routes/api/admin/userApiRoute.js`, `src/controllers/api/admin/userController.js` |
+| RF-IAM-002 | Administración debe poder consultar personas y sus asignaciones sin concederles acceso implícito. | Implementado | `src/routes/api/admin/personApiRoute.js`, `src/views/pages/admin/persons` |
+| RF-IAM-003 | Administración debe poder consultar roles y departamentos para componer asignaciones de acceso. | Implementado | `src/routes/api/admin/roleApiRoute.js`, `src/routes/api/admin/departmentApiRoute.js` |
+| RF-IAM-004 | Administración debe poder crear un usuario con una cuenta única y una asignación válida de rol y departamento; la persona asociada es opcional. | Implementado | `src/routes/api/admin/userApiRoute.js`, `src/controllers/api/admin/userController.js` |
+| RF-IAM-005 | Administración debe poder actualizar los datos admitidos y reemplazar atómicamente la asignación de acceso de un usuario. | Implementado | `src/routes/api/admin/userApiRoute.js`, `src/services/admin/userService.js` |
+| RF-IAM-006 | Administración debe poder cambiar la contraseña de un usuario almacenando únicamente su representación cifrada. | Implementado | `src/routes/api/admin/userApiRoute.js`, `src/services/admin/userService.js` |
+| RF-IAM-007 | Administración debe poder crear una persona con identidad y asignaciones válidas, sin crear por ello una cuenta de acceso. | Implementado | `src/routes/api/admin/personApiRoute.js`, `src/views/pages/admin/persons` |
+| RF-IAM-008 | Administración debe poder actualizar los datos y asignaciones admitidos de una persona existente. | Implementado | `src/routes/api/admin/personApiRoute.js`, `src/views/pages/admin/persons` |
 
 ### 4.2 Catálogos operativos y comerciales
 
+La separación siguiente aplica la singularidad adoptada por el proyecto: consultar,
+crear, actualizar, retirar y ajustar son obligaciones independientes porque tienen
+permisos, validaciones y resultados comprobables distintos. Los atributos que describen
+la identidad de un mismo recurso permanecen como criterios de esa obligación y no se
+convierten artificialmente en un requisito por campo.
+
+Para conservar trazabilidad, `RF-CAT-001` a `RF-CAT-005` mantienen el recurso de la
+obligación original y se acotan a su consulta; las operaciones separadas reciben los
+nuevos identificadores `RF-CAT-006` a `RF-CAT-018`. No se reasigna un identificador
+existente a otro recurso.
+
 | ID | Requisito y criterio de aceptación | Estado | Evidencia principal |
 | --- | --- | --- | --- |
-| RF-CAT-001 | Almacén puede consultar, crear, actualizar y eliminar materiales con presentación, unidad y límites válidos; el listado refleja la mutación. Una oferta proveedor-material sólo se presenta como eliminable si el material no participa en entradas, salidas, movimientos, ajustes o correcciones históricas. El listado y la eliminación reutilizan una sola definición de esas relaciones: el listado exige explícitamente que cada relación esté vacía y la mutación comprueba si alguna tiene registros mediante una consulta de material. La merma conserva un snapshot independiente y no se consulta como relación de `SupplierMaterial`. | Implementado | `src/routes/api/warehouse/materialApiRoute.js`, `src/views/pages/warehouse/materials`, `src/services/warehouse/materials/supplierMaterialService.js` |
-| RF-CAT-002 | Almacén puede consultar, crear y actualizar proveedores y sus relaciones con materiales sin duplicar la relación proveedor-material. | Implementado | `src/routes/api/warehouse/supplierApiRoute.js`, modelo `SupplierMaterial` |
-| RF-CAT-003 | Administración del sistema puede consultar, crear y actualizar clientes y su asesor asociado como dato contextual. | Implementado | `src/routes/api/sales/clientApiRoute.js`, `tests/integration/controllers/clientControllerDbTest.js` |
-| RF-CAT-004 | Almacén puede consultar, registrar y actualizar existencias de merma en el contexto de un material y proveedor. | Implementado | `src/routes/api/warehouse/wasteApiRoute.js`, `src/views/pages/warehouse/wastes` |
-| RF-CAT-005 | Presentaciones, unidades, motivos y estados de cumplimiento se exponen como catálogos auxiliares reutilizables por los formularios operativos. | Implementado | routers de catálogo bajo `src/routes/api/warehouse` |
+| RF-CAT-001 | Almacén debe poder consultar materiales y sus ofertas de proveedor sin modificar existencias. | Implementado | `src/routes/api/warehouse/materialApiRoute.js`, `src/views/pages/warehouse/materials` |
+| RF-CAT-002 | Almacén debe poder consultar proveedores autorizados sin modificar sus datos. | Implementado | `src/routes/api/warehouse/supplierApiRoute.js` |
+| RF-CAT-003 | Administración del sistema debe poder consultar clientes autorizados sin modificar sus datos. | Implementado | `src/routes/api/sales/clientApiRoute.js`, `tests/integration/controllers/clientControllerDbTest.js` |
+| RF-CAT-004 | Almacén debe poder consultar existencias de merma sin modificar sus datos ni existencias. | Implementado | `src/routes/api/warehouse/wasteApiRoute.js`, `src/views/pages/warehouse/wastes` |
+| RF-CAT-005 | El sistema debe permitir consultar presentaciones, unidades de medida, motivos de ajuste y estados de cumplimiento como catálogos auxiliares, sin ofrecer su mantenimiento en este alcance. | Implementado | routers de catálogo bajo `src/routes/api/warehouse` |
+| RF-CAT-006 | Almacén debe poder crear un material con presentación y unidad de medida; si captura SKU, éste debe ser único, y los límites y dimensiones deben ser válidos. | Implementado | `src/routes/api/warehouse/materialApiRoute.js`, `src/services/warehouse/materials/materialService.js` |
+| RF-CAT-007 | Almacén debe poder actualizar únicamente los datos generales admitidos de un material existente, sin sustituir el flujo de ajuste de existencias. | Implementado | `src/routes/api/warehouse/materialApiRoute.js`, `src/services/warehouse/materials/materialService.js` |
+| RF-CAT-008 | Almacén debe poder retirar un material sólo cuando no participe en entradas, salidas, movimientos, ajustes o correcciones históricas.<br><br>`CA-RF-CAT-008-1`: el listado y la eliminación deben reutilizar la misma definición de relaciones protegidas.<br>`CA-RF-CAT-008-2`: la merma conserva un snapshot independiente y no se considera una relación `SupplierMaterial`. | Implementado | `src/services/warehouse/materials/supplierMaterialService.js` |
+| RF-CAT-009 | Almacén debe poder ajustar las existencias de un material únicamente mediante el flujo autorizado de ajuste, conservando su resultado trazable. | Implementado | `src/routes/api/warehouse/materialApiRoute.js`, `src/controllers/api/warehouse/materialController.js`, modelo `StockAdjustment` |
+| RF-CAT-010 | Almacén debe poder crear un proveedor con código único, razón social, nombre comercial y estado válido. | Implementado | `src/routes/api/warehouse/supplierApiRoute.js`, modelo `Supplier` |
+| RF-CAT-011 | Almacén debe poder actualizar los datos admitidos y el estado de un proveedor existente. | Implementado | `src/routes/api/warehouse/supplierApiRoute.js` |
+| RF-CAT-012 | El sistema debe rechazar una relación material-proveedor duplicada y conservar en cada relación su SKU de proveedor, costo unitario máximo, existencia y cantidad convertida. | Implementado | modelo `SupplierMaterial`, `src/services/warehouse/materials/supplierMaterialService.js` |
+| RF-CAT-013 | Administración del sistema debe poder crear un cliente; cuando indique un asesor, éste debe corresponder a una persona registrada. | Implementado | `src/routes/api/sales/clientApiRoute.js`, `tests/integration/controllers/clientControllerDbTest.js` |
+| RF-CAT-014 | Administración del sistema debe poder actualizar los datos admitidos de un cliente y agregar, reemplazar o retirar su asesor opcional. | Implementado | `src/routes/api/sales/clientApiRoute.js`, `tests/integration/controllers/clientControllerDbTest.js` |
+| RF-CAT-015 | Almacén debe poder crear una merma a partir de un material y proveedor usados como plantilla; la merma resultante debe conservar snapshots propios. | Implementado | `src/routes/api/warehouse/wasteApiRoute.js`, `src/services/warehouse/wastes/wasteService.js` |
+| RF-CAT-016 | El sistema debe impedir que una edición de merma cambie su proveedor, presentación, unidad de medida o dimensiones, para conservar su identidad física. | Implementado | `src/dtos/wasteDTO.js`, `src/services/warehouse/wastes/wasteService.js` |
+| RF-CAT-017 | Almacén debe poder actualizar el nombre y los datos secundarios admitidos de una merma sin alterar directamente sus existencias. | Implementado | `src/routes/api/warehouse/wasteApiRoute.js`, `src/views/pages/warehouse/wastes` |
+| RF-CAT-018 | Almacén debe poder ajustar las existencias de una merma únicamente mediante el flujo autorizado de ajuste. | Implementado | `src/routes/api/warehouse/wasteApiRoute.js`, `src/controllers/api/warehouse/wasteController.js`, modelo `WasteStockAdjustment` |
 
 ### 4.3 Entradas, salidas e inventario
 
+Los identificadores existentes conservan la operación principal más cercana de su
+alcance original. Las operaciones antes agrupadas reciben `RF-REC-007` y
+`RF-REC-008`, `RF-ISS-004` a `RF-ISS-006`, `RF-WST-004` a `RF-WST-007` y
+`RF-ADJ-002`, sin renumerar requisitos previos.
+
 | ID | Requisito y criterio de aceptación | Estado | Evidencia principal |
 | --- | --- | --- | --- |
-| RF-REC-001 | Almacén debe poder consultar y registrar una entrada de compra con proveedor y uno o más detalles válidos.<br><br>`CA-RF-REC-001-1`: al consultar, el sistema muestra encabezado, detalles y estado sin modificar inventario.<br>`CA-RF-REC-001-2`: al registrar correctamente, encabezado, detalles, incremento de existencias y movimientos quedan confirmados como una sola operación.<br>`CA-RF-REC-001-3`: si falla una escritura, ninguno de esos efectos queda persistido. | Implementado | `src/routes/api/warehouse/goodsReceiptApiRoute.js`, `src/dtos/goodsReceiptDTO.js`, `src/services/warehouse/goodsReceipts/goodsReceiptService.js`, modelo `GoodsReceipt` |
-| RF-REC-002 | Una entrada registrada admite correcciones autorizadas conservando actor, valores anteriores/corregidos y el efecto de inventario. | Implementado | `GoodsReceiptDetailChange`, `src/services/warehouse/goodsReceipts/detailChanges` |
-| RF-REC-003 | Una factura sólo puede pertenecer a una entrada por proveedor. Un intento duplicado responde con conflicto e identifica la entrada existente; frontend y backend reutilizan el mismo mensaje para orientar que, si faltan materiales, se agreguen editando esa entrada, mientras que otra factura o recepción se registra como una entrada nueva. | Implementado | `src/services/warehouse/goodsReceipts/goodsReceiptInvoiceService.js`, `src/public/js/constants/goodsReceiptMessages.js`, restricción `GoodsReceipt(supplierId, invoice)` |
-| RF-REC-004 | Una entrada debe admitir varios detalles del mismo material cuando representan precios o lotes diferentes.<br><br>`CA-RF-REC-004-1`: cada detalle pendiente conserva identidad independiente y eliminar uno no elimina sus pares.<br>`CA-RF-REC-004-2`: al retirar un detalle pendiente, el resumen visible resta únicamente sus cantidades e importes. | Implementado | `src/public/js/pages/warehouse/goodsReceipts/goodsReceiptForm.js`, `src/public/js/plugins/datatable/warehouse/goodsReceipts/goodsReceiptDatatable.js` |
-| RF-REC-005 | Almacén debe poder editar una entrada no cancelada sin reescribir detalles ya persistidos ni cambiar su proveedor.<br><br>`CA-RF-REC-005-1`: la edición acepta campos modificables del encabezado y detalles nuevos.<br>`CA-RF-REC-005-2`: el servidor descarta defensivamente filas persistidas recibidas como nuevas y rechaza un proveedor distinto.<br>`CA-RF-REC-005-3`: una edición válida recalcula totales, registra movimientos de los detalles nuevos y notifica la actualización del inventario. | Implementado | `src/public/js/pages/warehouse/goodsReceipts/goodsReceiptForm.js`, `src/services/warehouse/goodsReceipts/goodsReceiptService.js` |
-| RF-REC-006 | Cuando una marca distingue físicamente un material para la operación, almacén debe registrarla como otra identidad del catálogo; el detalle de entrada no mantiene una marca independiente. | Implementado | `src/services/warehouse/materials/materialService.js`, modelo `GoodsReceiptDetail` |
-| RF-ISS-001 | Almacén puede listar, registrar y actualizar salidas de material con sus detalles y contexto de cliente, solicitante y departamento. | Implementado | `src/routes/api/warehouse/goodsIssueApiRoute.js`, `src/views/pages/warehouse/goodsIssues` |
-| RF-ISS-002 | La entrega de una salida modifica existencias mediante movimientos trazables y no permite aplicar parcialmente una transacción fallida. Para materiales sin dimensiones, surtidos como piezas, la cantidad convertida conserva el mismo valor que la existencia resultante; al surtir la última pieza ambas quedan en cero y nunca se registra una cantidad convertida negativa. | Implementado | `src/services/inventory/movementService.js`, `src/services/warehouse/materials/supplierMaterialService.js`, `tests/unit/services/warehouse/materials/supplierMaterialServiceTest.js` |
-| RF-ISS-003 | Una devolución de material registra cantidades acumuladas y enlaza el movimiento de reversa con el documento y detalle originales. | Implementado | modelos `GoodsIssueReturn` y `MovementDetail` |
-| RF-WST-001 | Almacén puede listar, crear y actualizar existencias de merma reutilizando el patrón CRUD de los demás catálogos. | Implementado | `src/routes/api/warehouse/wasteApiRoute.js` |
-| RF-WST-002 | Almacén puede registrar y modificar una salida de merma y sus detalles dentro de los estados permitidos. Al editar, consultar, surtir o devolver, el modal recupera la fecha de solicitud mediante el mismo selector de encabezado que la salida de material. La tabla identifica el recurso de cada detalle como «Merma». Al seleccionar una merma, el dominio Select2 replica el flujo de material: conserva en la opción sus snapshots serializados y actualiza el input informativo de presentación mediante el componente compartido de inventario. | Implementado | `src/routes/api/warehouse/wasteIssueApiRoute.js`, `src/public/js/pages/warehouse/wasteIssues/wasteIssueModal.js`, `src/public/js/pages/warehouse/goodsIssues/goodsIssueModal.js`, `src/public/js/constants/selectors.js`, `src/public/js/plugins/select2/domains/waste.js`, `src/public/js/ui/inventory/inventorySelectUI.js` |
-| RF-WST-003 | Entregas y devoluciones de merma actualizan stock, cantidades acumuladas y movimientos como una sola operación observable. | Implementado | `tests/integration/controllers/wasteIssueControllerDbTest.js` |
-| RF-ADJ-001 | Un ajuste de material o merma conserva motivo, tipo, estado, creador y aprobador; al aplicarse genera el movimiento y los valores anterior/nuevo. | Parcial | modelos `StockAdjustment`, `WasteStockAdjustment`; servicios de ajuste |
+| RF-REC-001 | Almacén debe poder consultar entradas, encabezados, detalles y estados sin modificar inventario. | Implementado | `src/routes/api/warehouse/goodsReceiptApiRoute.js`, modelo `GoodsReceipt` |
+| RF-REC-002 | Almacén debe poder corregir un detalle activo conservando actor, motivo, valores anteriores y corregidos, e impacto de inventario. | Implementado | `GoodsReceiptDetailChange`, `src/services/warehouse/goodsReceipts/detailChanges` |
+| RF-REC-003 | El sistema debe impedir que una factura pertenezca a más de una entrada del mismo proveedor e identificar la entrada existente ante un conflicto. | Implementado | `src/services/warehouse/goodsReceipts/goodsReceiptInvoiceService.js`, restricción `GoodsReceipt(supplierId, invoice)` |
+| RF-REC-004 | Una entrada debe admitir detalles independientes del mismo material cuando representan precios o lotes diferentes. | Implementado | `src/public/js/pages/warehouse/goodsReceipts/goodsReceiptForm.js`, `src/public/js/plugins/datatable/warehouse/goodsReceipts/goodsReceiptDatatable.js` |
+| RF-REC-005 | Almacén debe poder editar los campos admitidos de una entrada no cancelada y agregar detalles nuevos, sin cambiar el proveedor ni reescribir detalles persistidos. | Implementado | `src/public/js/pages/warehouse/goodsReceipts/goodsReceiptForm.js`, `src/services/warehouse/goodsReceipts/goodsReceiptService.js` |
+| RF-REC-006 | Cuando una marca distingue físicamente un material, almacén debe registrarla como otra identidad del catálogo en lugar de capturarla en el detalle. | Implementado | `src/services/warehouse/materials/materialService.js`, modelo `GoodsReceiptDetail` |
+| RF-REC-007 | Almacén debe poder registrar una entrada con proveedor y detalles válidos; encabezado, detalles, incremento de existencias y movimientos deben confirmarse como una sola operación. | Implementado | `src/routes/api/warehouse/goodsReceiptApiRoute.js`, `src/dtos/goodsReceiptDTO.js`, `src/services/warehouse/goodsReceipts/goodsReceiptService.js` |
+| RF-REC-008 | Almacén debe poder cancelar un detalle activo revirtiendo su efecto de inventario y conservando su historia; un fallo no debe dejar una reversión parcial. | Implementado | `src/services/warehouse/goodsReceipts/detailChanges` |
+| RF-ISS-001 | Almacén debe poder consultar salidas de material, sus detalles y contexto sin modificar existencias. | Implementado | `src/routes/api/warehouse/goodsIssueApiRoute.js`, `src/views/pages/warehouse/goodsIssues` |
+| RF-ISS-002 | Almacén debe poder surtir total o parcialmente un detalle con existencia suficiente; documento, acumulados, existencias, estados y movimiento deben actualizarse atómicamente. | Implementado | `src/services/inventory/movementService.js`, `src/services/warehouse/materials/supplierMaterialService.js` |
+| RF-ISS-003 | Almacén debe poder devolver una cantidad surtida todavía retornable y enlazar el movimiento inverso con el documento y detalle originales. | Implementado | modelos `GoodsIssueReturn` y `MovementDetail` |
+| RF-ISS-004 | Almacén debe poder crear una salida de material con encabezado, contexto y detalles válidos, pendiente y sin descontar existencias. | Implementado | `src/routes/api/warehouse/goodsIssueApiRoute.js`, `src/views/pages/warehouse/goodsIssues` |
+| RF-ISS-005 | Almacén debe poder actualizar únicamente los campos admitidos del encabezado de una salida cuyo estado permita edición. | Implementado | `src/routes/api/warehouse/goodsIssueApiRoute.js`, `src/views/pages/warehouse/goodsIssues` |
+| RF-ISS-006 | Almacén debe poder agregar o actualizar detalles todavía modificables sin reescribir cantidades surtidas o devueltas. | Implementado | `src/routes/api/warehouse/goodsIssueApiRoute.js`, `src/views/pages/warehouse/goodsIssues` |
+| RF-WST-001 | Almacén debe poder consultar existencias de merma reutilizando el patrón de consulta de inventario. | Implementado | `src/routes/api/warehouse/wasteApiRoute.js` |
+| RF-WST-002 | Almacén debe poder crear una salida de merma con encabezado y detalles válidos dentro del estado inicial permitido. | Implementado | `src/routes/api/warehouse/wasteIssueApiRoute.js`, `src/public/js/pages/warehouse/wasteIssues/wasteIssueModal.js` |
+| RF-WST-003 | Almacén debe poder surtir total o parcialmente un detalle de merma actualizando existencia, acumulados, estados y movimiento como una sola operación. | Implementado | `tests/integration/controllers/wasteIssueControllerDbTest.js` |
+| RF-WST-004 | Almacén debe poder actualizar únicamente los campos admitidos del encabezado de una salida de merma cuyo estado permita edición. | Implementado | `src/routes/api/warehouse/wasteIssueApiRoute.js`, `src/public/js/pages/warehouse/wasteIssues/wasteIssueModal.js` |
+| RF-WST-005 | Almacén debe poder agregar o actualizar detalles de merma todavía modificables sin reescribir cantidades surtidas o devueltas. | Implementado | `src/routes/api/warehouse/wasteIssueApiRoute.js`, `src/public/js/pages/warehouse/wasteIssues/wasteIssueModal.js` |
+| RF-WST-006 | Almacén debe poder devolver una cantidad de merma todavía retornable actualizando existencia, acumulados, estados y movimiento inverso como una sola operación. | Implementado | `tests/integration/controllers/wasteIssueControllerDbTest.js` |
+| RF-WST-007 | Almacén debe poder consultar salidas de merma, sus detalles y contexto sin modificar existencias. | Implementado | `src/routes/api/warehouse/wasteIssueApiRoute.js`, `src/public/js/pages/warehouse/wasteIssues/wasteIssueModal.js` |
+| RF-ADJ-001 | Almacén debe poder registrar un ajuste de material o merma con motivo, tipo, estado y creador. | Parcial | modelos `StockAdjustment`, `WasteStockAdjustment`; servicios de ajuste |
+| RF-ADJ-002 | Un ajuste aprobado debe poder aplicarse generando atómicamente el movimiento y los valores anterior y nuevo. | Parcial | modelos `StockAdjustment`, `WasteStockAdjustment`; servicios de ajuste |
 
 ### 4.4 Consulta, reportes y funciones modeladas
 
 | ID | Requisito y criterio de aceptación | Estado | Evidencia principal |
 | --- | --- | --- | --- |
-| RF-REP-001 | Un usuario autorizado puede consultar movimientos de materiales o mermas con filtros y exportar la información ofrecida por la pantalla. En ambos contextos, el filtro de inventario (`materialId` o `wasteId`) permanece bloqueado hasta seleccionar un proveedor; cambiar o limpiar el proveedor limpia también esa selección antes de aplicar la consulta. | Implementado | `src/routes/api/admin/movementApiRoute.js`, `src/views/pages/admin/movements`, `src/public/js/plugins/datatable/core/filters/tableFilterDependencies.js` |
+| RF-REP-001 | Un usuario autorizado debe poder consultar movimientos de materiales o mermas con filtros; el filtro de inventario permanece bloqueado hasta elegir proveedor y se limpia cuando éste cambia. | Implementado | `src/routes/api/admin/movementApiRoute.js`, `src/views/pages/admin/movements`, `src/public/js/plugins/datatable/core/filters/tableFilterDependencies.js` |
 | RF-REP-002 | Los módulos administrativo, comercial y de almacén pueden consultar los reportes registrados para su ámbito. | Implementado | routers `reportApiRoute.js` de cada dominio |
 | RF-REP-003 | El reporte de mermas consolida existencias con el mismo nombre, proveedor y ancho. El total de mermas es la suma del stock agrupado y los metros cuadrados se recalculan por cada existencia como stock × ancho × largo antes de sumarse. En presentación `ROLLO`, el largo variable no separa el grupo; para las demás presentaciones, incluida `HOJA`, el largo sí forma parte de la agrupación. Las existencias sin una medida se agrupan conservando su ausencia y aportan cero metros cuadrados. Todos los grupos y el total general se exportan juntos en una sola hoja de cálculo denominada `Mermas`; no se crea una hoja de Excel por grupo ni por tipo de presentación. | Implementado | `src/controllers/api/warehouse/reportController.js`, `src/services/warehouse/reportService.js` |
 | RF-REP-004 | Los archivos Excel conservan el valor calculado por el dominio como resultado disponible y colocan fórmulas en los datos que dependen directamente de otras celdas del reporte: diferencias de salidas, importes y resúmenes de compras, nuevo stock de movimientos y totales de merma. Así, un editor de hojas de cálculo compatible puede actualizar las dependencias al modificar manualmente los datos base, sin sustituir las reglas de negocio usadas al generar el reporte. | Implementado | `src/utils/reportExcelUtils.js`, `src/controllers/api/warehouse/reportController.js`, `src/controllers/api/admin/reportController.js` |
-| RF-MER-001 | El alta de una merma exige elegir primero un proveedor según el criterio operativo. Mientras no exista proveedor, el selector de material permanece deshabilitado y al intentar usarlo muestra la misma advertencia que el flujo de compras; al elegir o cambiar proveedor, consulta únicamente los materiales relacionados mediante `SupplierMaterial` y limpia cualquier plantilla anterior. La selección de un material funciona únicamente como plantilla: el servicio devuelve identidades distintas por nombre y ancho dentro del proveedor, muestra nombre y ambas medidas nominales y normaliza como ancho sugerido la menor medida positiva. El operador confirma o corrige el ancho y captura el largo real. `Waste` conserva nombre, proveedor, presentación, unidad, costo y medidas como snapshots propios, pero no `materialId` ni una relación con `Material`, porque el origen físico de la merma no siempre es trazable. | Implementado | `prisma/schema.prisma`, `src/views/pages/warehouse/wastes/wastesPage.ejs`, `src/services/warehouse/wastes/wasteMaterialService.js`, `src/services/warehouse/wastes/wasteService.js` |
-| RF-MER-002 | Al registrar una merma, el formulario propone como costo unitario máximo el mayor `maxUnitCost` disponible entre las ofertas del proveedor seleccionado para los materiales que comparten el mismo nombre y ancho normalizados que la plantilla. La normalización considera como ancho la menor dimensión positiva aunque base y altura estén invertidas. El costo máximo es obligatorio: al cambiar la selección del material, el handler del dominio aplica inmediatamente la plantilla al formulario. El frontend completa el valor desde la plantilla, pero el request debe enviarlo: Express Validator rechaza valores nulos, ausentes, negativos o inválidos antes de ejecutar el controlador y el servicio. El operador puede corregirlo durante el alta y la edición. El valor guardado es un snapshot independiente y no cambia si posteriormente se modifican los costos del catálogo; cuando el proveedor no tiene un costo registrado, debe capturarse manualmente. | Implementado | `prisma/schema.prisma`, `src/services/inventory/materialIdentity.js`, `src/services/warehouse/wastes/wasteMaterialService.js`, `src/services/warehouse/wastes/wasteService.js` |
-| RF-MER-003 | El material de referencia se selecciona en un control propio durante el alta y no se presenta como identidad persistente al editar una merma. La selección completa el nombre de la merma y muestra, mediante el componente compartido `informativeValue`, la presentación y la unidad de medida que el servidor copiará. El nombre se renderiza siempre con el mismo componente `input`, tanto al crear como al editar. La plantilla propone el nombre durante el alta, pero el operador puede confirmarlo o corregirlo antes de guardar; al editar puede volver a corregirlo sin obligar a crear otra existencia. Sólo el ajuste de stock lo mantiene deshabilitado. En el DTO se modela por separado como parte de la identidad editable y no se mezcla con stock mínimo, costo máximo o estado; altas y ediciones envían el nombre validado. Proveedor, presentación, unidad y medidas permanecen ineditables para no cambiar el significado físico del inventario ni de su historial; el DTO de actualización descarta esos campos aun si un cliente los envía. La identidad única se valida inevitablemente tanto al registrar como al corregir el nombre: no pueden coexistir dos mermas con el mismo nombre, proveedor, ancho y largo. El servicio consulta el conflicto antes de actualizar para responder con el error de duplicado del dominio y la restricción única de base de datos conserva la garantía ante escrituras concurrentes. La edición admite nombre, stock mínimo, costo máximo unitario y estado; el stock usa el flujo separado de ajustes. El dominio `wasteMaterialTemplate` concentra todos los eventos de los que depende este select: selección, limpieza, cambio a vacío y cambio del proveedor. Sus handlers delegan en el componente compartido `inventorySelectUI`, que reúne en un solo archivo las actualizaciones de presentación e inputs derivadas de selects de inventario; cambiar proveedor limpia la opción y reutiliza el evento resultante, sin ejecutar una segunda limpieza. El módulo `wasteSelect` sólo compone selectores y opciones de inicialización, y el modal reutiliza el componente UI para presentar los snapshots persistidos al abrirse. También completa el costo máximo unitario y, al deseleccionar la plantilla tanto mediante el evento de limpieza como mediante el cambio a un valor vacío, limpia el nombre, los `span` informativos, el ancho sugerido y el costo para evitar conservar datos de otro material. El ancho y largo reales son obligatorios. Sólo para presentación `ROLLO` el servicio determina y el formulario completa automáticamente el ancho con la menor dimensión nominal positiva, sin esperar una captura manual; al asignar ancho o costo actualiza también el contenedor visual MDB del input, igual que los campos de presentación que reciben valores programáticos. Para otras presentaciones ambas medidas se registran manualmente. La cantidad convertida nunca se captura: se calcula como existencia × ancho × largo en altas, ajustes y salidas de merma. No se deduce un largo sin una medida física o un dato adicional de área, peso y gramaje. | Implementado | `prisma/schema.prisma`, `src/views/shared/forms/informativeValue.ejs`, `src/views/pages/warehouse/wastes/wastesPage.ejs`, `src/public/js/ui/inventory/inventorySelectUI.js`, `src/public/js/plugins/select2/domains/wasteMaterialTemplate.js`, `src/public/js/plugins/select2/modules/wasteSelect.js`, `src/public/js/pages/warehouse/wastes/wasteModal.js`, `src/dtos/wasteDTO.js`, `src/services/warehouse/wastes/wasteService.js`, `src/services/warehouse/wastes/wasteMaterialService.js`, `src/services/inventory/stockHelpers.js` |
-| RF-MER-004 | El alta valida en cliente y servidor material, proveedor, ancho y largo positivos, estado y existencia no negativa. La ruta de alta aplica `wasteValidation`, la edición general aplica `wasteEditValidation` —que incluye el nombre— y el endpoint separado de ajustes aplica `wasteStockValidation`; cada escritura ejecuta después el middleware común `validate` y exige su permiso específico. El frontend envía nombre, `materialId`, `supplierId`, medidas, stock mínimo, estado, existencia inicial y observaciones; el servidor conserva el nombre confirmado y deriva presentación, unidad, costo máximo y cantidad convertida. Materiales y mermas reutilizan las reglas comunes de estado de inventario y observaciones de ajuste, conservando separadas sólo sus reglas dimensionales y de stock específicas. El alta resuelve en un solo servicio del dominio de mermas el snapshot de material y su costo máximo; consulta el material seleccionado y después sus equivalentes con ofertas incluidas, recorre una sola vez esos equivalentes y evita una tercera agregación separada. El listado, los movimientos y el reporte consultan directamente los identificadores y snapshots de merma; los filtros de movimientos usan `wasteId` y no el identificador de la plantilla Material, con costo sujeto a permiso y sin reconstruir una relación con `SupplierMaterial`. La consulta especializada de plantillas pertenece al dominio de mermas y atraviesa su ruta, controlador, servicio, factory de lista de aplicación y dominio Select2; cada opción reutiliza el mapper común de identidad de inventario. Igual que en el flujo de material, el dominio Select2 reconstruye primero los objetos serializados de presentación y unidad y sólo después entrega la plantilla normalizada al formulario; los lectores de etiquetas no mezclan presentación con parseo de JSON. Para el select de salidas, presentación y unidad se serializan en los atributos de la opción y se reconstruyen al agregar la merma; sólo el identificador se envía al servidor. Los valores informativos vacíos reutilizan una constante visual compartida. | Implementado | `src/routes/api/warehouse/wasteApiRoute.js`, `src/dtos/wasteDTO.js`, `src/validators/forms/inventoryValidations.js`, `src/validators/forms/wasteValidations.js`, `src/public/js/utils/validations/validators.js`, `src/services/warehouse/wastes/wasteService.js` |
-| RF-REQ-001 | Una eventual reimplementación de requisiciones deberá definir nuevamente alcance, rutas, persistencia y pruebas CRUD; el módulo anterior y su persistencia fueron retirados después de procesar los datos históricos. Una migración correctiva restaura temporalmente la estructura si otra rama la eliminó antes de completar ese procesamiento. | Fuera del alcance actual | `prisma/migrations/20260805231500_restore_purchase_requisitions_for_pending_migrations/migration.sql`, `prisma/migrations/20260827000000_remove_purchase_requisitions/migration.sql` |
-| RF-PRJ-001 | Los proyectos podrán mantenerse y seleccionarse como contexto de salidas. No existe actualmente un CRUD registrado. | Modelado | modelo `Project` |
+| RF-REP-005 | Un usuario autorizado debe poder exportar los movimientos ofrecidos por la consulta conservando su ámbito y filtros aplicables. | Implementado | `src/routes/api/admin/movementApiRoute.js`, `src/views/pages/admin/movements` |
+| RF-MER-001 | Durante el alta de una merma, almacén debe elegir un proveedor antes del material usado como plantilla; cambiar el proveedor debe limpiar la plantilla anterior. | Implementado | `src/views/pages/warehouse/wastes/wastesPage.ejs`, `src/services/warehouse/wastes/wasteMaterialService.js` |
+| RF-MER-002 | Al seleccionar una plantilla, el sistema debe proponer el mayor costo unitario máximo aplicable; almacén puede corregirlo y el valor guardado permanece como snapshot. | Implementado | `src/services/inventory/materialIdentity.js`, `src/services/warehouse/wastes/wasteMaterialService.js` |
+| RF-MER-003 | Almacén debe poder actualizar el nombre, stock mínimo, costo unitario máximo y estado de una merma sin usar la edición general para cambiar existencias. | Implementado | `src/dtos/wasteDTO.js`, `src/services/warehouse/wastes/wasteService.js` |
+| RF-MER-004 | El alta de una merma debe validar material, proveedor, nombre, estado, existencia no negativa y dimensiones positivas en cliente y servidor. | Implementado | `src/routes/api/warehouse/wasteApiRoute.js`, `src/validators/forms/wasteValidations.js`, `src/public/js/utils/validations/validators.js` |
+| RF-MER-005 | Una edición de merma debe conservar proveedor, presentación, unidad y dimensiones como identidad física inmutable. | Implementado | `src/dtos/wasteDTO.js`, `src/services/warehouse/wastes/wasteService.js` |
+| RF-MER-006 | El sistema debe impedir dos mermas con la misma combinación normalizada de nombre, proveedor, ancho y largo. | Implementado | `prisma/schema.prisma`, `src/services/warehouse/wastes/wasteService.js` |
+| RF-MER-007 | Para presentación `ROLLO`, el sistema debe proponer como ancho la menor dimensión nominal positiva; para otras presentaciones, almacén debe capturar las dimensiones requeridas. | Implementado | `src/services/inventory/materialIdentity.js`, `src/public/js/pages/warehouse/wastes/wasteModal.js` |
+| RF-MER-008 | El sistema debe calcular la cantidad convertida de una merma como existencia × ancho × largo en altas, ajustes y salidas, sin solicitar su captura manual. | Implementado | `src/services/inventory/stockHelpers.js`, `src/services/warehouse/wastes/wasteService.js` |
+| RF-MER-009 | El material seleccionado debe funcionar sólo como plantilla: la merma conserva snapshots propios y no una relación persistente con `Material` o `SupplierMaterial`. | Implementado | `prisma/schema.prisma`, `src/services/warehouse/wastes/wasteService.js` |
+| RF-REQ-001 | Una reimplementación de requisiciones debe permanecer fuera del alcance vigente hasta definir y aprobar nuevamente su comportamiento, autorización, persistencia y pruebas. | Fuera del alcance actual | `prisma/migrations/20260827000000_remove_purchase_requisitions/migration.sql` |
+| RF-PRJ-001 | Administración debe poder mantener proyectos cuando se registre un CRUD autorizado para esa capacidad. | Modelado | modelo `Project` |
+| RF-PRJ-002 | Almacén debe poder seleccionar un proyecto como contexto de salida cuando se defina el flujo funcional correspondiente. | Modelado | modelo `Project` |
 
-## 5. Reglas de negocio transversales
+### 4.5 Políticas transversales del negocio
 
-| ID | Regla verificable |
-| --- | --- |
-| RN-001 | Toda mutación debe validar autenticación, autorización y entrada en el servidor; ocultar un control en EJS o JavaScript no sustituye esa validación. |
-| RN-002 | Una operación que cambia documento, detalle, stock y movimiento debe ser atómica: se confirman todos los cambios o ninguno. |
-| RN-003 | Las cantidades suministradas o devueltas no pueden producir acumulados incompatibles con la cantidad válida del detalle. |
-| RN-004 | Los documentos y movimientos que requieren referencia deben usar una referencia única y conservar el vínculo con su origen. |
-| RN-005 | Las correcciones y ajustes conservan datos históricos suficientes para explicar el valor anterior, el nuevo, el motivo y el actor. |
-| RN-006 | Los catálogos reutilizan el ciclo listar-crear-actualizar y componentes existentes; una diferencia de contexto no justifica duplicar transporte o coordinación CRUD. |
-| RN-007 | La eliminación física sólo procede cuando el dominio y sus relaciones lo permiten; en los demás casos se usa estado, cancelación o activación. |
-| RN-008 | Las escrituras críticas configuradas deben registrar actor, acción, recurso, resultado y datos de solicitud admitidos por la política de auditoría. |
+Las reglas también aplican singularidad: cada `RN-*` expresa una restricción que puede
+incumplirse y comprobarse de manera independiente.
 
-## 6. Requisitos de calidad
+| ID | Regla verificable | Estado | Evidencia principal |
+| --- | --- | --- | --- |
+| RN-001 | Toda operación protegida debe comprobar autenticación válida en el servidor antes de acceder a datos. | Implementado | `src/middleware/authMiddleware.js` |
+| RN-002 | Una operación que cambia documento, detalle, stock y movimiento debe ser atómica: se confirman todos los cambios o ninguno. | Implementado | servicios transaccionales bajo `src/services/warehouse` |
+| RN-003 | La cantidad acumulada surtida de un detalle no debe superar su cantidad solicitada vigente. | Implementado | `src/services/warehouse/issues/issueFulfillmentRules.js` |
+| RN-004 | Cada documento o movimiento que requiera referencia debe tener una referencia única. | Implementado | `src/services/document/referenceNumberService.js` |
+| RN-005 | Las correcciones y ajustes deben conservar datos históricos suficientes para explicar el valor anterior, el nuevo, el motivo y el actor. | Implementado | modelos de cambios y ajustes en `prisma/schema.prisma` |
+| RN-006 | Un catálogo debe reutilizar el ciclo listar-crear-actualizar y sus componentes existentes cuando no cambien sus reglas, permisos ni persistencia. | Implementado | fábricas CRUD y servicios de catálogo compartidos |
+| RN-007 | La eliminación física sólo debe proceder cuando el recurso no tenga relaciones históricas protegidas; en otro caso se debe conservar mediante estado o cancelación. | Implementado | `src/services/warehouse/materials/supplierMaterialService.js` |
+| RN-008 | Cada escritura crítica configurada debe registrar actor, acción, recurso, resultado y los datos de solicitud admitidos por la política de auditoría. | Implementado | middleware y modelo de auditoría |
+| RN-009 | Toda operación protegida debe comprobar en el servidor el permiso requerido antes de ejecutar el caso de uso. | Implementado | middleware de autorización y `src/constants/permissions.js` |
+| RN-010 | Toda mutación debe validar en el servidor la entrada admitida antes de persistir cambios. | Implementado | `src/middleware/validatorMiddleware.js`, `src/validators` |
+| RN-011 | Cada movimiento debe conservar el vínculo con el único documento, devolución o ajuste que lo originó. | Implementado | `src/services/inventory/movementService.js`, modelo `MovementDetail` |
+| RN-012 | Una disminución de inventario debe rechazarse cuando la existencia vigente no alcance para cubrir la cantidad solicitada. | Implementado | `src/services/inventory/stockHelpers.js`, `src/services/warehouse/wastes/wasteInventoryService.js` |
+| RN-013 | Una cantidad operativa de entrada, salida, devolución, corrección o ajuste debe ser mayor que cero antes de afectar inventario. | Implementado | `src/validators/fields/fieldsValidator.js` y DTO de almacén |
+| RN-014 | La cantidad devuelta acumulada de un detalle no debe superar la cantidad que ya fue surtida y permanece retornable. | Implementado | `src/services/warehouse/goodsIssues/detailReturns/goodsIssueReturnService.js`, `src/services/warehouse/wasteIssues/detailReturns/wasteIssueReturnService.js` |
+| RN-015 | El estado de un detalle debe ser pendiente sin surtimiento, parcial con surtimiento menor que lo solicitado y completo al alcanzar la cantidad solicitada. | Implementado | `src/services/warehouse/issues/issueFulfillmentRules.js` |
+| RN-016 | El estado de una salida debe ser completo si todos sus detalles están completos, parcial si alguno tiene surtimiento y pendiente en otro caso. | Implementado | `src/services/warehouse/issues/issueFulfillmentRules.js` |
+| RN-017 | Un detalle cancelado de entrada no debe volver a cancelarse ni participar en los totales activos del documento. | Implementado | `src/services/warehouse/goodsReceipts/goodsReceiptHelpers.js` |
+| RN-018 | Una factura informada sólo puede identificar una entrada por proveedor; un conflicto debe señalar la entrada ya registrada. | Implementado | `src/services/warehouse/goodsReceipts/goodsReceiptInvoiceService.js` |
+| RN-019 | Una salida para el cliente interno `GPG INTERNO` sólo debe admitir como asesor a una persona con acceso de coordinador. | Implementado | `src/services/admin/person/personRules.js`, `src/constants/issueHeaderRules.js` |
+| RN-020 | El stock convertido de una merma debe calcularse a partir de existencia, ancho y largo con la misma fórmula en altas, ajustes y movimientos. | Implementado | `src/services/inventory/stockHelpers.js` |
+| RN-021 | Dos mermas no deben compartir simultáneamente la misma identidad normalizada de nombre, proveedor, ancho y largo. | Implementado | `src/services/warehouse/wastes/wasteService.js`, `prisma/schema.prisma` |
+| RN-022 | El alta de una merma debe usar un material-proveedor sólo como plantilla y conservar proveedor, presentación, unidad, dimensiones y costo como snapshots propios. | Implementado | `src/services/warehouse/wastes/wasteService.js`, `prisma/schema.prisma` |
+
+### 4.6 Persistencia e integridad de información
 
 | ID | Requisito y forma de comprobación | Estado |
 | --- | --- | --- |
-| RC-SEG-001 | Las contraseñas y secretos no se almacenan en texto plano ni se versionan; las rutas protegidas rechazan sesiones ausentes o sin permiso. Se comprueba con configuración, middleware y pruebas negativas. | Implementado |
-| RC-DAT-001 | Las migraciones deben poder desplegarse de forma reproducible y las pruebas nunca deben usar la base de desarrollo. CI verifica la URL antes de migrar. | Implementado |
-| RC-PRU-001 | Las unitarias de controllers aplican límites, particiones, decisiones, errores o efectos negativos; las integraciones CRUD atraviesan HTTP y comprueban persistencia con Prisma. | Parcial |
-| RC-MAN-001 | Rutas, capas y pruebas se organizan por dominio; antes de crear un flujo se evalúan las fábricas CRUD y componentes compartidos existentes. | Implementado |
-| RC-DOC-001 | Cambios en rutas, imports o Prisma deben dejar actualizados los documentos generados; `npm run docs:check` debe terminar correctamente. | Implementado |
-| RC-OBS-001 | Fallos operacionales deben quedar en logs estructurados sin exponer secretos al cliente. | Implementado |
-| RC-REN-001 | Tiempos máximos de respuesta, concurrencia y volumen requieren una línea base medida y aprobación del responsable del producto. | Propuesto |
-| RC-DIS-001 | Objetivos de disponibilidad, recuperación y respaldo requieren infraestructura y valores acordados; no se infieren del código. | Propuesto |
+| RD-001 | Las entidades persistentes deben usar UUID como identificador técnico cuando así lo define el modelo común. | Implementado |
+| RD-002 | Cantidades, existencias, dimensiones, costos e importes deben persistirse con `Decimal(10,2)`. | Implementado |
+| RD-003 | Recepciones, salidas y movimientos deben conservar mediante claves foráneas sus relaciones de encabezado y detalle. | Implementado |
+| RD-004 | Correcciones, cancelaciones, devoluciones y ajustes deben representarse con registros relacionados, sin sobrescribir el hecho histórico. | Implementado |
+| RD-005 | Los modelos que declaran auditoría temporal deben conservar `createdAt` y `updatedAt`. | Implementado |
+| RD-006 | Los catálogos maestros que declaran `isActive` deben retirarse mediante estado cuando la eliminación física no esté permitida. | Implementado |
+| RD-007 | `Person` debe representar participantes del negocio y `User` la cuenta autenticada; una identidad no sustituye a la otra. | Implementado |
+| RD-008 | Las referencias documentales y las identidades de catálogo marcadas como únicas no deben duplicarse. | Implementado |
+| RD-009 | Las fechas del negocio deben conservarse separadas de las marcas técnicas de creación y actualización. | Implementado |
+| RD-010 | Los documentos y detalles deben persistir estados explícitos del proceso en lugar de inferirlos desde marcas temporales. | Implementado |
+
+### 4.7 Operación y calidad del producto
+
+| ID | Requisito y forma de comprobación | Estado |
+| --- | --- | --- |
+| RC-SEG-001 | Las contraseñas deben almacenarse mediante hash y nunca como texto plano. | Implementado |
+| RC-SEG-002 | Las rutas protegidas deben rechazar una sesión ausente o un permiso insuficiente antes de ejecutar el controlador. | Implementado |
+| RC-SEG-003 | Una ruta con cuerpo debe rechazar un tipo de contenido distinto del declarado antes de procesarlo. | Implementado |
+| RC-SEG-004 | Los secretos y URLs con credenciales deben proceder de variables de entorno y no exponerse en logs. | Implementado |
+| RC-DAT-001 | Las migraciones deben poder desplegarse de forma reproducible. | Implementado |
+| RC-DAT-002 | Las pruebas con persistencia real deben usar `DATABASE_TEST_URL` y nunca la base de desarrollo. | Implementado |
+| RC-PRU-001 | Las pruebas unitarias deben cubrir límites, decisiones, errores y efectos negativos del artefacto modificado. | Parcial |
+| RC-PRU-002 | Las integraciones CRUD deben atravesar HTTP y comprobar la persistencia real con Prisma. | Parcial |
+| RC-MAN-001 | Rutas, capas y pruebas deben organizarse por dominio. | Implementado |
+| RC-MAN-002 | Antes de crear un flujo debe evaluarse la reutilización de fábricas CRUD y componentes compartidos. | Implementado |
+| RC-DOC-001 | Los cambios en rutas, imports o Prisma deben dejar actualizados los documentos generados y superar `npm run docs:check`. | Implementado |
+| RC-OBS-001 | Los fallos operacionales deben registrarse mediante logs estructurados. | Implementado |
+| RC-OBS-002 | Los errores y logs expuestos al cliente no deben revelar secretos. | Implementado |
+| RC-DES-001 | Si falta `DIRECT_URL` o falla una migración requerida, el contenedor debe terminar antes de iniciar la aplicación. | Implementado |
+| RC-DES-002 | La aplicación debe usar `DATABASE_URL` y Prisma CLI debe preferir `DIRECT_URL` para migraciones. | Implementado |
+| RC-COM-001 | La aplicación debe instalarse y ejecutarse en Node.js `>=22 <25`. | Implementado |
+| RC-COM-002 | La API debe intercambiar JSON salvo rutas declaradas para archivos o texto plano. | Implementado |
+| RC-USA-001 | Una tabla en pantalla angosta debe conservar accesibles las acciones y datos prioritarios. | Implementado |
+| RC-USA-002 | La interfaz debe presentar los errores de validación sin perder el contexto del formulario. | Implementado |
+| RC-REN-001 | Los listados deben aplicar paginación y filtros en la consulta de datos cuando el servicio los declara. | Parcial |
+| RC-REN-002 | Los tiempos máximos de respuesta requieren línea base, umbral y aprobación del responsable del producto. | Propuesto |
+| RC-REN-003 | Los límites de concurrencia y volumen requieren línea base, umbral y aprobación del responsable del producto. | Propuesto |
+| RC-DIS-001 | El objetivo de disponibilidad requiere infraestructura, medida y aprobación explícitas. | Propuesto |
+| RC-DIS-002 | Los objetivos de recuperación y respaldo requieren RTO, RPO, infraestructura y aprobación explícitos. | Propuesto |
 
 No se inventan umbrales de rendimiento o disponibilidad: deben acordarse con quien
 opera el sistema y convertirse en una prueba o monitor reproducible antes de cambiar
 su estado.
 
-## 7. Criterio de terminado y trazabilidad
+## 5. Criterio de terminado y trazabilidad
 
-Un requisito funcional nuevo o modificado se considera listo para revisión cuando:
+Cualquier requisito o regla nuevo o modificado se considera listo para revisión cuando:
 
 1. conserva un identificador estable y criterios observables en este documento;
 2. usa la terminología canónica o actualiza el glosario con validación funcional;
@@ -187,7 +312,7 @@ La evidencia puede enlazarse desde una incidencia hacia el ID del requisito. No 
 añade una matriz duplicada de cada endpoint: el mapa generado ya conserva ese
 inventario y evita que dos listas manuales diverjan.
 
-## 8. Mantenimiento y decisiones pendientes
+## 6. Mantenimiento y decisiones pendientes
 
 - El responsable funcional debe validar prioridades y criterios de aceptación; este
   análisis sólo establece la línea base derivada del repositorio.

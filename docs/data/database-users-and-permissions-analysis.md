@@ -1,5 +1,9 @@
 # Usuarios, escrituras y permisos
 
+Este documento contiene una **decisión de diseño de acceso**, no la definición de los
+requisitos ni el inventario de tablas. El recorrido hacia requisitos, modelo y evidencia
+se mantiene en el [mapa de datos, persistencia y acceso](index.md).
+
 ## Decisión
 
 - `User` es la cuenta autenticada y el actor de seguridad/auditoría.

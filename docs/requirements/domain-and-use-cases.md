@@ -78,35 +78,35 @@ flowchart LR
     catalogOperator["Personal autorizado del catálogo"]
 
     subgraph nexus["Nexus"]
-      subgraph identityPackage["Paquete: Identidad y acceso"]
-        ucIdentityQuery(["CU-IAM-01 Consultar identidades y accesos"])
-        ucPersonCreate(["CU-IAM-02 Crear persona"])
-        ucPersonEdit(["CU-IAM-03 Editar persona"])
-        ucUserCreate(["CU-IAM-04 Crear usuario y asignar acceso"])
-        ucUserEdit(["CU-IAM-05 Editar usuario o cambiar contraseña"])
+      subgraph identityPackage["Paquete IDA: Identidad y acceso"]
+        ucIdentityQuery(["CU-IDA-01 Consultar identidades y accesos"])
+        ucPersonCreate(["CU-IDA-02 Crear persona"])
+        ucPersonEdit(["CU-IDA-03 Editar persona"])
+        ucUserCreate(["CU-IDA-04 Crear usuario y asignar acceso"])
+        ucUserEdit(["CU-IDA-05 Editar usuario o cambiar contraseña"])
       end
-      subgraph catalogPackage["Paquete: Catálogos"]
+      subgraph catalogPackage["Paquete CAT: Catálogos"]
         ucCatalogQuery(["CU-CAT-01 Consultar catálogos"])
         ucCatalogCreate(["CU-CAT-02 Crear registro de catálogo"])
         ucCatalogEdit(["CU-CAT-03 Editar registro de catálogo"])
         ucCatalogRemove(["CU-CAT-04 Eliminar o cambiar estado de registro"])
       end
-      subgraph receiptPackage["Paquete: Entradas"]
-        ucReceiptQuery(["CU-REC-01 Consultar entradas"])
-        ucReceiptCreate(["CU-REC-02 Registrar entrada"])
-        ucReceiptEdit(["CU-REC-03 Editar entrada"])
-        ucReceiptCorrect(["CU-REC-04 Corregir detalle de entrada"])
-        ucReceiptCancel(["CU-REC-05 Cancelar detalle de entrada"])
+      subgraph receiptPackage["Paquete ENT: Entradas"]
+        ucReceiptQuery(["CU-ENT-01 Consultar entradas"])
+        ucReceiptCreate(["CU-ENT-02 Registrar entrada"])
+        ucReceiptEdit(["CU-ENT-03 Editar entrada"])
+        ucReceiptCorrect(["CU-ENT-04 Corregir detalle de entrada"])
+        ucReceiptCancel(["CU-ENT-05 Cancelar detalle de entrada"])
       end
-      subgraph issuePackage["Paquete: Salidas"]
-        ucIssueQuery(["CU-ISS-01 Consultar salidas"])
-        ucIssueCreate(["CU-ISS-02 Crear salida"])
-        ucIssueHeader(["CU-ISS-03 Editar encabezado de salida"])
-        ucIssueDetails(["CU-ISS-04 Ajustar detalles de salida"])
-        ucSupply(["CU-ISS-05 Surtir detalle"])
-        ucReturn(["CU-ISS-06 Devolver detalle surtido"])
+      subgraph issuePackage["Paquete SAL: Salidas"]
+        ucIssueQuery(["CU-SAL-01 Consultar salidas"])
+        ucIssueCreate(["CU-SAL-02 Crear salida"])
+        ucIssueHeader(["CU-SAL-03 Editar encabezado de salida"])
+        ucIssueDetails(["CU-SAL-04 Ajustar detalles de salida"])
+        ucSupply(["CU-SAL-05 Surtir detalle"])
+        ucReturn(["CU-SAL-06 Devolver detalle surtido"])
       end
-      subgraph reportPackage["Paquete: Consulta y reportes"]
+      subgraph reportPackage["Paquete REP: Consultas y reportes"]
         ucMovements(["CU-REP-01 Consultar movimientos e inventario"])
         ucReports(["CU-REP-02 Generar reporte"])
       end
@@ -140,8 +140,9 @@ flowchart LR
     ucReturn -.->|incluye reversión y movimiento| ucMovements
 ```
 
-Los identificadores `CU-*` son los mismos del catálogo operativo y permiten pasar de cada
-objetivo visual a su descripción y a su diagrama de flujo específico en
+Cada paquete conserva el código definido en el catálogo y cada caso usa el formato
+`CU-<PAQUETE>-<SECUENCIA>`. Los identificadores son los mismos del catálogo operativo y
+permiten pasar de cada objetivo visual a su descripción y a su diagrama de flujo específico en
 [Diagramas de requisitos](requirements-diagrams.md#flujos-de-cada-caso-de-uso). No se
 usa «administrar» o «mantener» como objetivo: cada óvalo expresa una operación observable.
 

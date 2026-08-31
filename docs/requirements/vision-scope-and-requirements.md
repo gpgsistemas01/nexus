@@ -97,207 +97,57 @@ pueden tener uno de estos estados:
 - **Propuesto:** requiere validación del propietario de negocio y no se presenta como
   capacidad vigente.
 
-Los requisitos siguientes son implementados salvo que indiquen expresamente otro
-estado. Sus criterios de aceptación se obtienen de las validaciones, permisos y pruebas
-referenciadas en la matriz de trazabilidad. Una modificación debe actualizar en el
-mismo commit el enunciado, la evidencia y la prueba CRUD correspondiente.
+El alcance siguiente incluye capacidades implementadas, parciales, modeladas o fuera
+del alcance vigente. Su estado, criterios y evidencia se consultan en la especificación;
+una modificación debe actualizar en el mismo cambio el enunciado, la trazabilidad y la
+prueba correspondiente.
 
-## Requisitos funcionales implementados
+## Alcance funcional por paquete
 
-### Acceso y administración
+La visión no mantiene una segunda lista de enunciados `RF-*`: hacerlo produjo niveles de
+detalle distintos entre acceso, catálogos y operación. La
+[especificación normativa](requirements-specification.md#4-requisitos-funcionales) es la
+única fuente de cada obligación, criterio, estado y evidencia. Esta vista se limita a
+mostrar el alcance y los rangos que deben revisarse juntos.
 
-- **RF-AUT-01.** El sistema debe autenticar con nombre de usuario y contraseña, emitir
-  tokens de acceso y renovación, renovar la sesión y devolver el usuario actual.
-- **RF-AUT-02.** Toda ruta protegida debe validar el token y el permiso requerido; los
-  permisos efectivos se calculan con las asignaciones `UserRoleDepartment` y la matriz
-  de rol/departamento definida en código.
-- **RF-AUT-03.** El sistema debe permitir consultar, crear, activar/desactivar y editar
-  cuentas, y cambiar su contraseña. Una cuenta puede vincularse opcionalmente con una
-  persona.
-- **RF-AUT-04.** El sistema debe permitir consultar, crear y editar personas y sus
-  asignaciones de rol/departamento, preservando `Person` para participantes del proceso
-  y `User` para identidad de acceso/auditoría.
-- **RF-AUT-05.** Roles y departamentos deben poder consultarse para formar las
-  asignaciones; su mantenimiento no forma parte del API actual.
+| Área de alcance | Requisitos normativos | Resultado incluido en la visión |
+| --- | --- | --- |
+| Autenticación | `RF-AUT-001` a `RF-AUT-003` | Iniciar, renovar y cerrar sesión como obligaciones independientes. |
+| Identidades y acceso | `RF-IAM-001` a `RF-IAM-008` | Consultar, crear y actualizar usuarios o personas, cambiar contraseña y consultar catálogos de acceso. |
+| Catálogos | `RF-CAT-001` a `RF-CAT-018` | Consultar, crear, actualizar, retirar o ajustar cada recurso según su política. |
+| Entradas | `RF-REC-001` a `RF-REC-008` | Consultar, registrar, editar, corregir y cancelar entradas o detalles. |
+| Salidas de material | `RF-ISS-001` a `RF-ISS-006` | Consultar, crear, editar encabezado, ajustar detalles, surtir y devolver. |
+| Merma y sus salidas | `RF-WST-001` a `RF-WST-007`; `RF-MER-001` a `RF-MER-009` | Operar inventario y salidas de merma conservando snapshots y reglas dimensionales. |
+| Ajustes | `RF-ADJ-001`, `RF-ADJ-002` | Registrar y aplicar ajustes; su estado permanece parcial. |
+| Movimientos y reportes | `RF-REP-001` a `RF-REP-005` | Consultar y exportar información autorizada con reglas propias por reporte. |
+| Capacidades no vigentes | `RF-REQ-001`, `RF-PRJ-001`, `RF-PRJ-002` | Requisiciones fuera de alcance y proyectos modelados sin CRUD registrado. |
 
-### Catálogos comerciales y de almacén
+La misma regla de granularidad aplica a todos los paquetes: otra operación recibe otro
+`RF-*` cuando cambia el resultado observable, permiso, validación principal o prueba de
+cumplimiento. Los atributos de una misma identidad y las variantes del mismo resultado
+permanecen como condiciones o criterios `CA-*`; no se crea un requisito por campo.
 
-- **RF-CAT-01.** El sistema debe consultar, crear y editar clientes, con un asesor
-  opcional que sea una persona registrada.
-- **RF-CAT-02.** El sistema debe consultar, crear y editar proveedores; cada proveedor
-  conserva código único, razón social, nombre comercial y estado activo.
-- **RF-CAT-03.** El sistema debe consultar, crear, editar, desactivar/eliminar según las
-  reglas del servicio y ajustar el stock de materiales. Cada material requiere
-  presentación y unidad de medida, admite SKU único, stock mínimo y dimensiones.
-- **RF-CAT-04.** El sistema debe mantener la relación única material-proveedor con SKU
-  del proveedor, costo unitario máximo, stock actual y cantidad convertida.
-- **RF-CAT-05.** El sistema debe exponer para consulta unidades de medida,
-  presentaciones, motivos de ajuste y estados de surtido.
-- **RF-CAT-06.** El sistema debe registrar mermas tomando un material y proveedor como
-  plantilla, conservar proveedor, presentación, unidad y dimensiones como identidad
-  ineditable, permitir correcciones del nombre y de sus datos secundarios, y realizar
-  ajustes autorizados de stock mediante el flujo específico.
+## Alcance de datos y calidad
 
-### Operación de inventario
+La visión tampoco duplica los enunciados de datos o calidad. Los ámbitos de
+[persistencia e integridad](requirements-specification.md#46-persistencia-e-integridad-de-información)
+y de [operación y calidad](requirements-specification.md#47-operación-y-calidad-del-producto)
+son sus fuentes normativas.
 
-- **RF-INV-01.** Cada recepción debe tener referencia única, proveedor, receptor,
-  estado, fecha, totales, detalles de material y datos de factura opcionales.
-- **RF-INV-02.** Confirmar una recepción debe generar entradas de inventario y
-  actualizar existencias por material-proveedor de forma transaccional.
-- **RF-INV-03.** Una línea de recepción debe poder corregirse o cancelarse conservando
-  valores anteriores y corregidos, motivo, diferencias e impacto en movimientos; no se
-  debe borrar su historia.
-- **RF-INV-04.** Cada salida debe tener referencia única, departamento, solicitante,
-  cliente, asesor, proyecto o número de proyecto, estado y líneas por material y
-  proveedor.
-- **RF-INV-05.** Las líneas de salida deben admitir surtido, surtido parcial y
-  devolución, registrar cantidades entregadas/devueltas y actualizar el estado de
-  cumplimiento del detalle y del documento.
-- **RF-INV-06.** Una salida o devolución debe afectar existencias y crear movimientos
-  con stock anterior y nuevo; una salida no debe dejar stock inválido.
-- **RF-INV-07.** El sistema debe conservar movimientos de tipo entrada, salida o ajuste,
-  con referencia, fecha y detalles vinculados al documento que los originó.
-- **RF-INV-08.** Los ajustes de materiales deben registrar tipo incremento/decremento,
-  motivo, creador, aprobador, estado, diferencias físicas y convertidas, y el movimiento
-  resultante. Los ajustes de merma deben registrar el actor y las mismas diferencias.
-- **RF-INV-09.** Las referencias documentales deben generarse con un contador único por
-  prefijo y año.
-- **RF-INV-10.** El sistema debe conservar instantáneas descriptivas en documentos y
-  movimientos (nombres, dimensiones, unidad, presentación, cliente o responsable)
-  para que cambios futuros de catálogo no destruyan la lectura histórica.
+| Área | Requisitos normativos | Alcance resumido |
+| --- | --- | --- |
+| Identidad e integridad de datos | `RD-001` a `RD-010` | Identificadores, precisión, relaciones, historia, temporalidad, estados y separación `Person`/`User`. |
+| Seguridad | `RC-SEG-001` a `RC-SEG-004` | Credenciales, rutas protegidas, tipos de contenido y secretos. |
+| Datos y pruebas | `RC-DAT-001`, `RC-DAT-002`, `RC-PRU-001`, `RC-PRU-002` | Migraciones reproducibles, base de pruebas aislada y cobertura por nivel. |
+| Mantenibilidad y documentación | `RC-MAN-001`, `RC-MAN-002`, `RC-DOC-001` | Organización por dominio, reutilización y documentación sincronizada. |
+| Observabilidad y despliegue | `RC-OBS-001`, `RC-OBS-002`, `RC-DES-001`, `RC-DES-002` | Logs estructurados, confidencialidad y separación runtime/migraciones. |
+| Compatibilidad y usabilidad | `RC-COM-001`, `RC-COM-002`, `RC-USA-001`, `RC-USA-002` | Runtime soportado, contrato de contenido y respuesta visible de la interfaz. |
+| Rendimiento y disponibilidad | `RC-REN-001` a `RC-REN-003`; `RC-DIS-001`, `RC-DIS-002` | Paginación vigente y objetivos medibles todavía pendientes. |
 
-### Seguimiento y salida de información
-
-- **RF-SEG-01.** El sistema debe generar notificaciones relacionadas con una entidad y
-  opcionalmente dirigirlas a un usuario o departamento; debe permitir consultar las
-  recientes y marcarlas como leídas.
-- **RF-SEG-02.** Las actualizaciones operativas deben poder emitirse a clientes web en
-  tiempo real mediante Socket.IO.
-- **RF-REP-01.** Los usuarios autorizados deben poder exportar Excel de inventario,
-  recepciones, salidas, mermas, proveedores, clientes, personas, usuarios y movimientos.
-- **RF-REP-02.** Los listados deben admitir los filtros y paginación implementados por
-  cada servicio, sin eludir la autorización del dominio.
-
-## Requisitos de datos
-
-- **RD-01. Identidad.** Las entidades usan UUID; referencias documentales, nombres de
-  catálogos indicados por Prisma y SKU de material, cuando existe, deben ser únicos.
-- **RD-02. Precisión.** Cantidades, existencias, dimensiones, costos e importes se
-  almacenan como `Decimal(10,2)` y no como punto flotante de JavaScript.
-- **RD-03. Integridad.** Recepciones, salidas y movimientos deben
-  conservar sus relaciones de cabecera-detalle y claves foráneas.
-- **RD-04. Trazabilidad.** Correcciones, cancelaciones, devoluciones y ajustes se
-  representan mediante registros relacionados; no deben sobrescribir o eliminar el
-  hecho histórico que explica una variación de stock.
-- **RD-05. Temporalidad.** Los modelos operativos que lo declaran deben mantener
-  `createdAt` y `updatedAt`; fechas del negocio (solicitud, aprobación, entrega,
-  recepción, aplicación) no se sustituyen por esas marcas técnicas.
-- **RD-06. Estado.** Los catálogos maestros que incluyen `isActive` usan desactivación
-  lógica. Los documentos y detalles usan estados explícitos como confirmada,
-  cancelada, pendiente, aplicada o surtida.
-- **RD-07. Separación de identidades.** `Person` representa participantes (solicitante,
-  aprobador, receptor, asesor o almacenista); `User` representa la cuenta autenticada
-  que crea, aprueba o devuelve cuando el modelo exige auditoría.
-
-## Atributos de calidad y requisitos no funcionales
-
-Los atributos se expresan como escenarios verificables: fuente, estímulo, ambiente,
-respuesta y medida. No se inventan SLA o umbrales de rendimiento que el proyecto aún
-no haya acordado; esas definiciones permanecen como brechas.
-
-### Seguridad
-
-- **RNF-SEG-01.** Dada una credencial almacenada, cuando se consulte `User`, el valor de
-  `password` debe ser un hash generado por bcrypt y no la contraseña en texto claro.
-  **Medida:** ninguna operación de alta o cambio de contraseña persiste el texto
-  recibido. **Evidencia:** `src/utils/encryptionUtils.js` y `userService.js`.
-- **RNF-SEG-02.** Dada una petición a una ruta protegida, cuando falte un token válido o
-  el usuario no tenga el permiso exigido, la API debe rechazarla antes de ejecutar el
-  controlador. **Medida:** respuesta HTTP de autenticación/autorización y cero
-  escrituras del controlador. **Evidencia:** `authMiddleware.js` y rutas API.
-- **RNF-SEG-03.** Dada una petición API con cuerpo, cuando su tipo de contenido no sea
-  el declarado para la ruta, el sistema debe rechazarla antes de procesar el cuerpo.
-  **Medida:** respuesta de tipo de contenido no soportado. **Evidencia:**
-  `contentTypeMiddleware.js`.
-- **RNF-SEG-04.** En cualquier ambiente, los secretos JWT y las URLs con credenciales
-  deben proceder de variables de entorno y no deben escribirse en los logs.
-  **Medida:** los archivos versionados no contienen secretos operativos y el arranque
-  solo informa el nombre de la variable seleccionada.
-
-### Integridad y confiabilidad
-
-- **RNF-CON-01.** Dada una operación que modifica un documento, existencias y
-  movimientos, cuando falle cualquiera de sus pasos, la transacción debe revertir
-  todos los cambios. **Medida:** después del error no existe modificación parcial en
-  ninguna tabla participante. **Evidencia:** transacciones de los servicios de
-  recepciones, salidas y ajustes.
-- **RNF-CON-02.** Dado un valor monetario, dimensional o de inventario, cuando se
-  persista, debe conservar una precisión decimal máxima de dos posiciones conforme a
-  `Decimal(10,2)`. **Medida:** Prisma/PostgreSQL rechaza valores fuera de capacidad y
-  las lecturas no dependen de aritmética binaria de punto flotante.
-- **RNF-CON-03.** Dada una corrección, cancelación, devolución o ajuste aplicado,
-  cuando finalice la operación, debe existir un registro histórico relacionado con el
-  documento y el movimiento que explica el cambio. **Medida:** la variación puede
-  reconstruirse mediante claves foráneas sin depender de logs de aplicación.
-
-### Disponibilidad y desplegabilidad
-
-- **RNF-DES-01.** Dado un arranque de contenedor con migraciones habilitadas, cuando
-  `DIRECT_URL` falte o `prisma migrate deploy` falle, el proceso debe terminar con
-  código distinto de cero antes de iniciar Node.js. **Medida:** no existe proceso de
-  aplicación después del fallo. **Evidencia:** `docker-entrypoint.sh`.
-- **RNF-DES-02.** Dado un despliegue correcto, la aplicación debe utilizar
-  `DATABASE_URL` para ejecución y Prisma CLI debe preferir `DIRECT_URL` para
-  migraciones. **Medida:** cada proceso selecciona el nombre de variable documentado
-  sin imprimir su valor.
-
-### Compatibilidad e interoperabilidad
-
-- **RNF-COM-01.** La aplicación debe instalarse y ejecutarse en versiones de Node.js
-  `>=22 <25`. **Medida:** `package.json#engines` declara ese intervalo y la instalación
-  fuera de él se considera no soportada.
-- **RNF-COM-02.** La API debe intercambiar JSON salvo los endpoints declarados para
-  archivos o texto plano. **Medida:** el middleware acepta únicamente el tipo asignado
-  a cada prefijo de ruta.
-
-### Usabilidad
-
-- **RNF-USA-01.** Dada una tabla operativa en una pantalla angosta, cuando no quepan
-  todas sus columnas, debe mantener visibles las acciones y datos prioritarios y mover
-  los secundarios al detalle desplegable. **Medida:** compras conserva acciones y
-  salidas conserva cantidad convertida y control de surtido.
-- **RNF-USA-02.** Dado un error de validación de formulario, cuando la API lo devuelva,
-  la interfaz debe presentar el mensaje asociado sin perder el contexto del formulario.
-  **Medida:** el usuario identifica el campo o la causa que impide completar el CRUD.
-
-### Mantenibilidad y capacidad de prueba
-
-- **RNF-MAN-01.** Dado un cambio CRUD, la lógica de negocio debe residir en servicios,
-  la validación en validadores y la normalización en DTO cuando exista ese patrón en el
-  dominio. **Medida:** los controladores coordinan la petición y no duplican reglas del
-  servicio.
-- **RNF-MAN-02.** Antes de crear un flujo, componente o helper, se debe revisar si un
-  patrón existente puede reutilizarse o parametrizarse para el nuevo contexto.
-  **Medida:** la revisión identifica el componente reutilizado o justifica por qué el
-  comportamiento requiere uno nuevo.
-- **RNF-PRU-01.** Dado un cambio CRUD, las pruebas deben replicar bajo `tests/` la
-  ubicación del código y cubrir las operaciones públicas afectadas según
-  `docs/testing/service-test-coverage.md`. **Medida:** creación, consulta, actualización y
-  desactivación/eliminación aplicable tienen una aserción observable.
-- **RNF-PRU-02.** Dada una prueba con persistencia real, debe usar
-  `DATABASE_TEST_URL`, datos identificables y limpieza acotada; puede usar rollback si
-  el servicio acepta el cliente transaccional. **Medida:** nunca modifica
-  `DATABASE_URL` ni elimina catálogos compartidos.
-
-### Eficiencia de desempeño
-
-- **RNF-REN-01 (parcial).** Dado un listado, el servicio debe aplicar paginación y
-  filtros en la consulta de datos en lugar de cargar el conjunto completo para
-  paginarlo en memoria. **Medida actual:** la respuesta conserva total, total filtrado
-  y página solicitada cuando el servicio implementa listado paginado.
-- **RNF-REN-02 (propuesto).** Deben acordarse percentiles de latencia, concurrencia,
-  volumen de datos y tamaño máximo de exportación antes de afirmar un objetivo de
-  rendimiento. Hasta entonces no existe un SLA verificable de desempeño.
+La regla de singularidad se aplica igualmente a `RD-*`, `RN-*` y `RC-*`: una restricción
+o atributo recibe otro identificador cuando puede incumplirse, aprobarse o comprobarse
+independientemente. Varias propiedades inseparables de una misma garantía pueden
+permanecer en un solo requisito.
 
 ## Matriz de trazabilidad resumida
 
@@ -334,7 +184,7 @@ no haya acordado; esas definiciones permanecen como brechas.
 
 Un cambio está documentalmente completo cuando: (1) el requisito afectado conserva su
 identificador o registra su reemplazo; (2) alcance, rutas y modelo no se contradicen;
-(3) una brecha resuelta se mueve a requisitos implementados; (4) las pruebas cubren
+(3) una brecha resuelta actualiza su estado en la especificación; (4) las pruebas cubren
 el caso CRUD y sus invariantes de datos, autorización y aislamiento; y (5) cada
 requisito nuevo supera todas las condiciones de redacción y, si expresa un atributo de
 calidad, incluye fuente, estímulo, ambiente, respuesta y medida verificable.
