@@ -28,7 +28,10 @@ El valor esperado es sustituir registros dispersos por flujos consistentes que:
 
 - **Almacén y proveeduría:** registra recepciones, proveedores, materiales, mermas,
   surtidos, devoluciones y consulta existencias.
-- **Áreas solicitantes futuras:** su participación en salidas permanece pendiente de definir; ventas no tiene acceso al sistema.
+- **Áreas solicitantes futuras:** su participación en salidas permanece pendiente de
+  definir; ventas no tiene acceso al sistema. Cuando se habilite, las solicitudes creadas
+  por otras áreas y sus cambios de disponibilidad deben coordinarse con almacén mediante
+  la bandeja propuesta de notificaciones.
 - **Administración del sistema:** administra cuentas, personas y asignaciones de
   rol/departamento, además de ajustes de stock protegidos.
 - **Coordinación y dirección:** consulta trazabilidad, reportes e indicadores para
@@ -168,9 +171,13 @@ mismo commit el enunciado, la evidencia y la prueba CRUD correspondiente.
 
 ### Seguimiento y salida de información
 
-- **RF-SEG-01.** El sistema debe generar notificaciones relacionadas con una entidad y
-  opcionalmente dirigirlas a un usuario o departamento; debe permitir consultar las
-  recientes y marcarlas como leídas.
+- **RF-SEG-01 (propuesto, no implementado).** El sistema debe generar notificaciones
+  relacionadas con una entidad y opcionalmente dirigirlas a un usuario o departamento;
+  debe avisar a almacén de las salidas solicitadas por otras áreas, comunicar la falta de
+  existencia y volver a avisar cuando el stock resulte suficiente para un detalle
+  pendiente. También debe permitir consultar las recientes y marcarlas como leídas. Su
+  alcance y las decisiones pendientes se detallan en el
+  [análisis de la campana de notificaciones](notification-bell-analysis.md).
 - **RF-SEG-02.** Las actualizaciones operativas deben poder emitirse a clientes web en
   tiempo real mediante Socket.IO.
 - **RF-REP-01.** Los usuarios autorizados deben poder exportar Excel de inventario,

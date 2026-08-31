@@ -240,7 +240,6 @@ Todas las rutas API cuelgan de `/api` y esperan `Content-Type: application/json`
 - `/api/warehouse/suppliers`
 - `/api/warehouse/goods-receipts`
 - `/api/warehouse/goods-issues`
-- `/api/warehouse/notifications`
 - `/api/warehouse/reports`
 - `/api/warehouse/unit-measures`
 - `/api/warehouse/presentations`
