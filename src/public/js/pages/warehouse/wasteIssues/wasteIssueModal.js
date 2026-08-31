@@ -24,13 +24,13 @@ const WASTE_ISSUE_ENTITY_NAME = 'salida de merma';
 const context = window.meta || {};
 const form = document.querySelector(formId);
 const modalElement = document.querySelector(modalId);
-export const wasteIssueDetails = [];
+export const details = [];
 export const wasteIssueHeaderForm = createIssueHeaderForm({
     formSelector: formId,
     selects: getWasteIssueHeaderSelects()
 });
 initializeWasteIssueReturns({
-    details: wasteIssueDetails,
+    details,
     getIssueId: () => form.dataset.id
 });
 
@@ -41,7 +41,7 @@ const setCurrentRequestDate = () => setDateTimePickerValue(
 
 export const openWasteIssueModal = ({ mode, data = null }) => {
     initializeIssueModal({ form, issueHeaderForm: wasteIssueHeaderForm, mode, data });
-    wasteIssueDetails.length = 0;
+    details.length = 0;
 
     if (mode === FORM_MODES.CREATE) {
         setCurrentRequestDate();
@@ -50,7 +50,7 @@ export const openWasteIssueModal = ({ mode, data = null }) => {
         document.querySelector(INPUT_SELECTORS.OBSERVATIONS).value = data.observations || '';
         document.querySelector(INPUT_SELECTORS.PROJECT_NUMBER).value = data.projectNumber || '';
 
-        wasteIssueDetails.push(...data.details.map(mapIssueDetailToTable));
+        details.push(...data.details.map(mapIssueDetailToTable));
     }
 
     applyIssueModalMode({
@@ -63,7 +63,7 @@ export const openWasteIssueModal = ({ mode, data = null }) => {
     });
 
     createWarehouseIssueDetailsTable({
-        data: wasteIssueDetails,
+        data: details,
         mode: form.dataset.mode,
         context,
         detailName: 'Merma',

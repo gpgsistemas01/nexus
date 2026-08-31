@@ -67,6 +67,27 @@ Si dos reglas parecen competir, se aplica esta prioridad:
   única operación y no expresa una regla reutilizable.
 - No se concatenan fragmentos cuando un template literal hace explícita la intención.
 
+### 2.4 Ejemplo de formato
+
+El ejemplo conserva cuatro espacios en código de aplicación, divide una condición por
+unidades semánticas y separa la guarda del recorrido normal:
+
+```js
+const findActiveMaterial = async ({ materialId, warehouseId }) => {
+    if (!materialId || !warehouseId) return null;
+
+    const material = await findMaterial({
+        materialId,
+        warehouseId
+    });
+
+    return material?.isActive ? material : null;
+};
+```
+
+No se alinea `warehouseId` con espacios variables ni se reemplaza la guarda por un
+bloque anidado. En una prueba equivalente se usan dos espacios por nivel.
+
 ## 3. Nomenclatura
 
 ### 3.1 Reglas generales
@@ -144,8 +165,11 @@ Si dos reglas parecen competir, se aplica esta prioridad:
   responsabilidad propia.
 - Imports, exports, rutas, consumidores, pruebas y referencias documentales se actualizan
   en el mismo cambio.
-- No se renombra un export al importarlo para adaptarlo al consumidor. Si existe una
-  colisión real, se corrigen los nombres de los contratos propietarios.
+- No se renombra un export al importarlo sólo por preferencia del consumidor. Se admite
+  un alias cuando el módulo se integra con un flujo compartido cuyo contrato canónico
+  exige otro nombre, o cuando resuelve una colisión real. El alias debe conservar el
+  término del contrato de destino y hacer explícita la adaptación en el import; no debe
+  ocultar diferencias de reglas, permisos o persistencia.
 
 ### 4.3 Límites entre capas
 
@@ -161,6 +185,50 @@ Si dos reglas parecen competir, se aplica esta prioridad:
 - Antes de agregar un proceso se revisan factories, componentes y flujos equivalentes.
   Si sólo cambia material por merma u otro contexto, se parametriza el proceso común y
   se mantienen separadas únicamente reglas, permisos, persistencia o lenguaje propios.
+
+### 4.4 Ejemplo de contrato entre módulos
+
+El consumidor mantiene el nombre del contrato propietario y pasa dependencias
+transaccionales explícitamente:
+
+```js
+import { updateMaterialStock } from './materialStockService.js';
+
+export const receiveMaterial = async ({ materialId, quantity, tx }) => {
+    return updateMaterialStock({ materialId, quantity, tx });
+};
+```
+
+No se importa `updateMaterialStock as applyStock`, ni se crea un wrapper llamado
+`applyStock` que sólo reenvíe argumentos. Si dos contextos comparten el algoritmo y sólo
+cambia el inventario, se extrae una factory parametrizada; no se copian ambos flujos.
+
+Antes de aplicar la excepción se revisa el módulo propietario. Si todos los consumidores
+usan el mismo contrato compartido, el export debe adoptar directamente su nombre
+canónico. Por ejemplo, los componentes de formularios de documentos reciben la
+colección como `details`, por lo que el modal y la página usan ese nombre sin alias:
+
+```js
+// wasteIssueModal.js
+export const details = [];
+
+// wasteIssueForm.js
+import { details, wasteIssueHeaderForm } from './wasteIssueModal.js';
+
+upsertIssueDetail({
+    details,
+    detail: waste,
+    matches: item => item.wasteId === waste.wasteId
+});
+```
+
+Aquí `details` no es un nombre arbitrario: es el término común utilizado por
+`useIssueForm`, `upsertIssueDetail` y la carga enviada al API. La ruta del módulo ya
+aporta el contexto de salida de merma, de modo que repetirlo en `wasteIssueDetails`
+obligaría a adaptar todos los consumidores sin aportar precisión. El alias queda
+reservado para contratos externos o colisiones que el módulo propietario no pueda
+resolver sin perjudicar a otros consumidores. La excepción no aplica a controllers y
+servicios, cuyos contratos de dominio conservan el nombre exportado según la sección 5.
 
 ## 5. Convenciones de controladores y rutas
 
@@ -256,6 +324,22 @@ central existente; no se construye un formato de error paralelo por controlador.
 - Una refactorización no reindenta toda la vista si sólo cambia un bloque. Esto reduce
   ruido y permite revisar que las etiquetas continúen balanceadas.
 
+### 8.1 Ejemplo de reutilización y preservación EJS
+
+Una página configura un parcial existente en lugar de repetir el modal:
+
+```ejs
+<%- include('../../../shared/layout/modal', { modalId: 'materialModal', form }) %>
+
+<%- contentFor('layoutType') %>
+site
+```
+
+Si el cambio afecta el include, las dos últimas líneas permanecen exactamente en esa
+posición: no se eliminan para volver a agregarlas al final. Un nuevo parcial sólo se
+justifica si requiere un contrato visual reutilizable que el parcial vigente no puede
+expresar mediante configuración.
+
 ## 9. Errores, seguridad, auditoría y logging
 
 - Se reutilizan `AppError` y los errores de dominio existentes. No se arrojan strings ni
@@ -309,6 +393,44 @@ imports, nombres privados ni estructura incidental sólo para comprobar este est
 - No se agregan pruebas de HTML, selectores o implementación interna cuando el plan de
   pruebas declara que ese nivel no aporta evidencia CRUD.
 
+### 11.1 Ejemplos de ubicación y evidencia CRUD
+
+La ruta de la prueba reproduce la del módulo, sin crear una carpeta alternativa por
+funcionalidad:
+
+```text
+src/services/warehouse/materials/materialService.js
+tests/unit/services/warehouse/materials/materialServiceTest.js
+
+src/controllers/api/warehouse/materialController.js
+tests/unit/controllers/api/warehouse/materialControllerTest.js
+tests/integration/controllers/materialControllerDbTest.js
+```
+
+Una integración de actualización no termina al comprobar el código HTTP. Persiste,
+consulta nuevamente y afirma el resultado observable:
+
+```js
+it('actualiza el material y conserva sus relaciones', async () => {
+  const response = await request(app)
+    .put(`/api/warehouse/materials/${ material.id }`)
+    .send({ name: 'Material actualizado' });
+
+  const persistedMaterial = await prisma.material.findUnique({
+    where: { id: material.id },
+    include: { suppliers: true }
+  });
+
+  expect(response.status).toBe(200);
+  expect(persistedMaterial.name).toBe('Material actualizado');
+  expect(persistedMaterial.suppliers).toHaveLength(1);
+});
+```
+
+Para crear, consultar, actualizar y desactivar se reutiliza el mismo harness de la
+suite. Los casos negativos verifican rechazo y ausencia de escritura parcial, no la
+cantidad de llamadas internas a helpers o el orden de imports.
+
 ## 12. Lista de revisión
 
 Antes de confirmar un cambio se verifica:
@@ -316,8 +438,8 @@ Antes de confirmar un cambio se verifica:
 1. ¿Se reutilizó un flujo, factory, helper, parcial o componente existente antes de crear
    otro?
 2. ¿Nombres, archivos y orden de operaciones expresan el dominio y la capa?
-3. ¿Imports y exports están completos, directos, sin alias adaptativos ni símbolos sin
-   uso?
+3. ¿Imports y exports están completos, directos y sin símbolos sin uso, y cada alias
+   responde a un contrato compartido o una colisión documentable?
 4. ¿Indentación, saltos de línea, espacios, comillas y fin de archivo respetan el área
    modificada?
 5. ¿La escritura compuesta conserva transacción, autorización, auditoría y errores?
