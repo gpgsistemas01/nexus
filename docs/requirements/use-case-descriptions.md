@@ -13,10 +13,12 @@ permisos; la [especificación de requisitos](requirements-specification.md) cont
 criterios verificables, reglas y evidencia técnica. Una capacidad parcial, modelada o
 fuera de alcance no se incorpora como caso vigente.
 
-## Estructura de cada caso
+## Estructura de las descripciones compartidas
 
-Cada caso emplea las mismas secciones para que el recorrido y sus condiciones puedan
-revisarse sin interpretar una narración compacta:
+Cada familia emplea las mismas secciones para documentar una sola vez las condiciones
+que comparten sus casos específicos. El catálogo operativo separa los objetivos y los
+diagramas separan sus recorridos; esta descripción aporta el contexto común sin volver a
+fusionarlos bajo un verbo genérico:
 
 - **Resumen:** actor principal, objetivo y disparador que inicia el caso.
 - **Participantes e intereses:** otros interesados y el resultado que esperan.
@@ -33,9 +35,113 @@ Los casos de catálogos siguen listar-crear-actualizar y sólo incluyen eliminar
 desactivar o ajustar cuando el contexto lo permite. Los documentos comparten encabezado
 y detalles, pero surtir, devolver y corregir mantienen reglas y efectos propios.
 
+## Catálogo operativo y granularidad
+
+Un caso de uso expresa **un objetivo observable iniciado por un actor**. Verbos amplios
+como «administrar» o «mantener» se conservan únicamente como títulos de familia para
+compartir participantes, precondiciones y reglas; no reciben identificador `CU-*`. Los
+identificadores se asignan a operaciones concretas que pueden autorizarse, probarse y
+trazarse por separado.
+
+ISO/IEC/IEEE 29148 orienta la ingeniería y calidad de requisitos, pero no prescribe una
+plantilla UML obligatoria para redactar casos de uso. Por ello este catálogo no declara
+una conformidad formal con esa norma: adopta criterios compatibles de identificación
+única, necesidad, claridad, consistencia, factibilidad y verificabilidad. Cada ficha
+contesta, con vocabulario de negocio, **quién inicia**, **qué lo dispara**, **qué debe
+existir antes**, **qué recorrido exitoso sigue**, **qué resultado deja** y **cómo termina
+si una regla falla**. Los detalles técnicos se conservan como evidencia, no como pasos que
+el actor deba comprender.
+
+| Familia | Identificador | Caso de uso específico | Evidencia ejecutable principal |
+| --- | --- | --- | --- |
+| Identidades y acceso | `CU-IAM-01` | Consultar identidades y accesos | Listados de personas y usuarios. |
+| Identidades y acceso | `CU-IAM-02` | Crear persona | `personController` → `personService`. |
+| Identidades y acceso | `CU-IAM-03` | Editar persona | `personController` → `personService`. |
+| Identidades y acceso | `CU-IAM-04` | Crear usuario y asignar acceso | `userController` → `userService`. |
+| Identidades y acceso | `CU-IAM-05` | Editar usuario o cambiar contraseña | Actualización de cuenta, acceso o credencial. |
+| Catálogos | `CU-CAT-01` | Consultar catálogos | Listados parametrizados por recurso. |
+| Catálogos | `CU-CAT-02` | Crear registro de catálogo | Creación de cliente, proveedor, material o merma. |
+| Catálogos | `CU-CAT-03` | Editar registro de catálogo | Actualización del recurso. |
+| Catálogos | `CU-CAT-04` | Eliminar o cambiar estado de registro | Política permitida por cada recurso. |
+| Entradas | `CU-REC-01` | Consultar entradas | Listado de entradas. |
+| Entradas | `CU-REC-02` | Registrar entrada | Creación transaccional de entrada. |
+| Entradas | `CU-REC-03` | Editar entrada | Actualización de encabezado y detalles admitidos. |
+| Entradas | `CU-REC-04` | Corregir detalle de entrada | Corrección con stock, movimiento e historial. |
+| Entradas | `CU-REC-05` | Cancelar detalle de entrada | Reversión del efecto de inventario. |
+| Salidas | `CU-ISS-01` | Consultar salidas | Listados de material o merma. |
+| Salidas | `CU-ISS-02` | Crear salida | Creación en el contexto elegido. |
+| Salidas | `CU-ISS-03` | Editar encabezado de salida | Actualización de campos admitidos. |
+| Salidas | `CU-ISS-04` | Ajustar detalles de salida | Cambio de detalles todavía modificables. |
+| Salidas | `CU-ISS-05` | Surtir detalle | Descuento de stock y movimiento. |
+| Salidas | `CU-ISS-06` | Devolver detalle surtido | Reintegro de stock y movimiento inverso. |
+| Consulta | `CU-REP-01` | Consultar movimientos e inventario | Consulta paginada y filtrada. |
+| Consulta | `CU-REP-02` | Generar reporte | Consulta de reporte y exportación. |
+
+La evidencia orienta la búsqueda, pero no impone una organización por casos de uso
+dentro de `src`: la aplicación está organizada por capas y dominio. Las pruebas
+unitarias siguen la ubicación paralela al artefacto y las integraciones CRUD permanecen
+bajo `tests/integration/controllers`.
+
+## Fichas específicas de los casos de uso
+
+Las fichas siguientes son la descripción normativa de cada `CU-*`. Las secciones por
+familia que aparecen después amplían intereses, reglas compartidas y variantes sin
+fusionar otra vez los objetivos.
+
+### Identidades y accesos
+
+| Caso | Actor y disparador | Precondiciones | Flujo exitoso resumido | Resultado y fallo protegido |
+| --- | --- | --- | --- | --- |
+| `CU-IAM-01` Consultar identidades y accesos | Administración necesita localizar personas, cuentas o asignaciones. | Sesión y permiso de consulta vigentes. | Elegir listado; aplicar filtros; revisar resultados paginados. | Muestra únicamente datos autorizados; un filtro inválido no modifica información. |
+| `CU-IAM-02` Crear persona | Administración necesita registrar a una persona que participa en la operación. | La identidad no está duplicada y los datos obligatorios están disponibles. | Capturar datos; validar identidad; confirmar creación. | La persona queda disponible para relacionarse; ante datos inválidos no se crea. |
+| `CU-IAM-03` Editar persona | Administración necesita corregir datos de una persona existente. | La persona existe y los campos son modificables. | Localizar persona; editar campos admitidos; validar y confirmar. | Se actualizan sólo los campos admitidos; un conflicto conserva los valores anteriores. |
+| `CU-IAM-04` Crear usuario y asignar acceso | Administración necesita otorgar acceso a una persona. | Persona, rol y área existen; la cuenta no está duplicada. | Capturar cuenta; seleccionar persona, rol y área; validar; crear. | La cuenta y su asignación quedan vinculadas; cualquier fallo evita una asignación parcial. |
+| `CU-IAM-05` Editar usuario o cambiar contraseña | Administración necesita corregir la cuenta, reemplazar su asignación o renovar su credencial. | El usuario existe; persona, rol y departamento son válidos cuando se cambia la asignación. | Localizar usuario; editar cuenta y acceso o capturar otra contraseña; validar; confirmar. | La edición de cuenta y acceso es atómica, y la contraseña se almacena cifrada; un rechazo conserva los valores anteriores. |
+
+### Catálogos
+
+El actor es el personal que posee el permiso del recurso elegido: almacén para sus
+catálogos operativos y administración cuando corresponda al catálogo contextual. Esta
+formulación evita atribuir todos los catálogos a un área que no los opera.
+
+| Caso | Disparador | Precondiciones | Flujo exitoso resumido | Resultado y fallo protegido |
+| --- | --- | --- | --- | --- |
+| `CU-CAT-01` Consultar catálogos | El actor necesita localizar un registro para usarlo o revisarlo. | Sesión, permiso y catálogo vigentes. | Elegir catálogo; filtrar; ordenar o paginar; revisar resultados. | Presenta registros autorizados sin modificar el catálogo. |
+| `CU-CAT-02` Crear registro de catálogo | El actor necesita incorporar un cliente, proveedor, material o merma. | Relaciones requeridas existentes e identidad no duplicada. | Elegir recurso; capturar datos; validar; crear; refrescar listado. | El registro queda disponible; una validación fallida no escribe datos parciales. |
+| `CU-CAT-03` Editar registro de catálogo | El actor necesita corregir datos de un registro existente. | Registro existente, permiso vigente y campos modificables. | Localizar; editar; validar identidad y relaciones; confirmar. | Actualiza sólo datos admitidos; un conflicto conserva la versión anterior. |
+| `CU-CAT-04` Eliminar o cambiar estado de registro | El actor necesita retirar un registro del uso operativo. | Registro existente y política del recurso conocida. | Solicitar retiro; comprobar relaciones; eliminar o cambiar estado según la política. | El recurso deja de estar disponible de la forma permitida; relaciones protegidas impiden eliminación física. |
+
+### Entradas
+
+| Caso | Actor y disparador | Precondiciones | Flujo exitoso resumido | Resultado y fallo protegido |
+| --- | --- | --- | --- | --- |
+| `CU-REC-01` Consultar entradas | Almacén necesita localizar una recepción o revisar sus detalles. | Sesión y permiso de consulta vigentes. | Aplicar filtros; abrir entrada; revisar encabezado, detalles e historia. | Presenta la recepción sin alterar inventario. |
+| `CU-REC-02` Registrar entrada | Almacén recibe materiales de un proveedor. | Proveedor y materiales existen; factura y cantidades son válidas. | Capturar encabezado y detalles; validar; confirmar la transacción. | Entrada, stock y movimientos quedan conciliados; un fallo revierte todo. |
+| `CU-REC-03` Editar entrada | Almacén necesita corregir el encabezado o agregar detalles admitidos. | Entrada existente, no cancelada y campos modificables. | Abrir entrada; modificar encabezado o agregar detalle; validar; confirmar. | Conserva proveedor y datos inmutables; un rechazo mantiene la entrada anterior. |
+| `CU-REC-04` Corregir detalle de entrada | Almacén detecta diferencia de cantidad o costo en un detalle persistido. | Detalle activo, motivo existente y stock suficiente si la corrección lo reduce. | Capturar valores corregidos; calcular diferencia; ajustar stock, movimiento y totales; registrar historia. | Conserva valores anterior y resultante; cualquier fallo produce rollback. |
+| `CU-REC-05` Cancelar detalle de entrada | Almacén determina que un detalle recibido debe anularse. | Detalle activo, motivo de cancelación existente y reversión de stock posible. | Confirmar cancelación; revertir inventario; actualizar totales; registrar movimiento e historia. | El detalle queda cancelado sin borrarse; un fallo no deja reversión parcial. |
+
+### Salidas
+
+| Caso | Actor y disparador | Precondiciones | Flujo exitoso resumido | Resultado y fallo protegido |
+| --- | --- | --- | --- | --- |
+| `CU-ISS-01` Consultar salidas | Almacén necesita localizar una salida de material o merma. | Sesión y permiso del contexto vigentes. | Elegir contexto; filtrar listado; abrir encabezado y detalles. | Presenta cantidades y estados sin modificar stock. |
+| `CU-ISS-02` Crear salida | Almacén recibe una solicitud de material o merma. | Catálogos y relaciones del contexto existen. | Elegir contexto; capturar encabezado y detalles; validar; confirmar. | Crea una salida pendiente sin descontar stock; un fallo no crea documento parcial. |
+| `CU-ISS-03` Editar encabezado de salida | Almacén necesita corregir datos contextuales de una salida. | Salida existente y estado que admite edición. | Abrir salida; editar campos permitidos; validar; confirmar. | Actualiza el encabezado sin reescribir cantidades históricas. |
+| `CU-ISS-04` Ajustar detalles de salida | Almacén necesita agregar o cambiar cantidades todavía modificables. | Salida existente y detalles no consolidados por surtimiento o devolución. | Editar o agregar detalle; validar recurso y cantidad; recalcular estado; confirmar. | Detalles pendientes quedan consistentes; cantidades surtidas o devueltas permanecen inmutables. |
+| `CU-ISS-05` Surtir detalle | Almacén entrega total o parcialmente un detalle pendiente. | Cantidad pendiente positiva y existencia suficiente. | Indicar cantidad; validar; descontar stock; acumular surtido; derivar estados; crear movimiento. | Documento, detalle, stock y movimiento coinciden; un fallo revierte todo. |
+| `CU-ISS-06` Devolver detalle surtido | Almacén recibe una devolución asociada a una salida. | Existe cantidad surtida todavía retornable. | Indicar cantidad; validar; reintegrar stock; acumular devolución; derivar estados; crear movimiento inverso. | Conserva surtimiento y devolución trazables; un fallo no modifica acumulados. |
+
+### Consultas y reportes
+
+| Caso | Actor y disparador | Precondiciones | Flujo exitoso resumido | Resultado y fallo protegido |
+| --- | --- | --- | --- | --- |
+| `CU-REP-01` Consultar movimientos e inventario | Personal autorizado necesita conocer existencias o rastrear movimientos. | Sesión, permiso y filtros dentro de su alcance. | Elegir consulta; capturar filtros; validar; revisar página y totales. | Presenta información autorizada sin cambiar datos operativos. |
+| `CU-REP-02` Generar reporte | Personal autorizado necesita analizar o entregar información consolidada. | Reporte disponible y permiso de sus datos. | Elegir reporte y parámetros; consultar; revisar vista o solicitar archivo. | Produce vista o archivo con columnas autorizadas; parámetros inválidos no generan resultados engañosos. |
+
 ## 1. Acceso e identidades
 
-### CU-IAM-01 — Administrar personas, usuarios y accesos
+### Familia IAM — Personas, usuarios y accesos
 
 #### Resumen
 
@@ -101,7 +207,7 @@ pero una persona no obtiene acceso por el solo hecho de participar en un documen
 
 ## 2. Catálogos operativos y contextuales
 
-### CU-CAT-01 — Mantener catálogos de almacén
+### Familia CAT-A — Catálogos de almacén
 
 #### Resumen
 
@@ -163,7 +269,7 @@ pero una persona no obtiene acceso por el solo hecho de participar en un documen
 `RF-CAT-001`, `RF-CAT-002`, `RF-CAT-004`, `RF-CAT-005`, `RF-WST-001`,
 `RF-MER-001` a `RF-MER-004`, `RN-006`, `RN-007`.
 
-### CU-CAT-02 — Mantener clientes como catálogo contextual
+### Familia CAT-B — Clientes como catálogo contextual
 
 #### Resumen
 
@@ -221,7 +327,7 @@ inventario.
 
 ## 3. Entradas y correcciones
 
-### CU-REC-01 — Registrar y corregir entradas
+### Familia REC — Entradas y correcciones
 
 #### Resumen
 
@@ -283,11 +389,11 @@ inventario.
 
 #### Reglas y requisitos relacionados
 
-`RF-REC-001`, `RF-REC-002`, `RF-REC-003`, `RN-002`, `RN-004`, `RN-005`.
+`RF-REC-001` a `RF-REC-006`, `RN-002`, `RN-004`, `RN-005`.
 
 ## 4. Salidas, surtido y devolución
 
-### CU-ISS-01 — Crear y editar salidas
+### Familia ISS-A — Creación y edición de salidas
 
 #### Resumen
 
@@ -344,7 +450,7 @@ inventario.
 
 `RF-ISS-001`, `RF-WST-002`, `RN-001`, `RN-003`, `RN-006`.
 
-### CU-ISS-02 — Surtir detalles
+### Familia ISS-B — Surtimiento de detalles
 
 #### Resumen
 
@@ -401,7 +507,7 @@ inventario.
 
 `RF-ISS-002`, `RF-WST-003`, `RN-002`, `RN-003`, `RN-004`.
 
-### CU-ISS-03 — Devolver detalles surtidos
+### Familia ISS-C — Devolución de detalles surtidos
 
 #### Resumen
 
@@ -465,7 +571,7 @@ como una edición CRUD y permite exigir pruebas de transacción y efectos negati
 
 ## 5. Consulta y salida de información
 
-### CU-REP-01 — Consultar movimientos y reportes
+### Familia REP — Movimientos y reportes
 
 #### Resumen
 
@@ -527,10 +633,10 @@ como una edición CRUD y permite exigir pruebas de transacción y efectos negati
 
 | Tema compartido | Casos | Elementos reutilizables que deben evaluarse primero | Diferencia que debe conservarse |
 | --- | --- | --- | --- |
-| CRUD de catálogos | `CU-IAM-01`, `CU-CAT-01`, `CU-CAT-02` | Fábricas CRUD, listados, formularios, validación y refresco de tabla. | Permisos, identidad del recurso, relaciones y política de eliminación. |
-| Documentos con detalles | `CU-REC-01`, `CU-ISS-01` | Encabezado, modal/formulario, tabla de detalles, DTO y transacción coordinadora. | La entrada incrementa stock al confirmarse; la salida no lo descuenta hasta surtir. |
-| Operación de salidas | `CU-ISS-01`, `CU-ISS-02`, `CU-ISS-03` | Proceso de material replicable para merma, componentes informativos y coordinación de movimientos. | Inventario, conversión, permisos, estados y cantidades acumuladas del contexto. |
-| Consulta y exportación | `CU-REP-01` y listados de los demás casos | Filtros, paginación, dependencias entre selects y utilidades Excel. | Columnas, agrupaciones, fórmulas y permiso de cada reporte. |
+| CRUD de identidades y catálogos | `CU-IAM-01` a `CU-IAM-05`; `CU-CAT-01` a `CU-CAT-04` | Fábricas CRUD, listados, formularios, validación y refresco de tabla. | Permisos, identidad del recurso, relaciones y política de eliminación. |
+| Documentos con detalles | `CU-REC-02`, `CU-REC-03`, `CU-ISS-02` a `CU-ISS-04` | Encabezado, modal/formulario, tabla de detalles, DTO y transacción coordinadora. | La entrada incrementa stock al confirmarse; la salida no lo descuenta hasta surtir. |
+| Operación de salidas | `CU-ISS-02` a `CU-ISS-06` | Proceso de material replicable para merma, componentes informativos y coordinación de movimientos. | Inventario, conversión, permisos, estados y cantidades acumuladas del contexto. |
+| Consulta y exportación | `CU-REP-01`, `CU-REP-02` y casos de consulta de cada familia | Filtros, paginación, dependencias entre selects y utilidades Excel. | Columnas, agrupaciones, fórmulas y permiso de cada reporte. |
 
 Reutilizar no significa fusionar reglas de negocio. Antes de crear otro flujo se revisan
 los [patrones de diseño y construcción](../architecture/design-and-construction-patterns.md), se replica

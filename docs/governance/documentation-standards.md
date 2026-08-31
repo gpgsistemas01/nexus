@@ -12,6 +12,10 @@ La referencia principal para la especificación actual es
 ingeniería de requisitos. Las demás referencias se aplican sólo al documento o a la
 decisión que corresponde.
 
+La aplicación concreta, las evidencias revisadas y las brechas se registran en
+[Aplicación de normas en Nexus](standards-application.md). Este documento decide **qué
+criterio se adopta**; el registro indica **dónde se aplica y cómo se comprueba**.
+
 ## Aplicación por tipo de documento
 
 | Referencia | Uso recomendado en Nexus | Alcance actual |
