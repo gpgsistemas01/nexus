@@ -10,6 +10,23 @@ Cada prueba nueva debe identificar el requisito o regla, la operación CRUD y el
 efecto observable. No se agrega cobertura sólo para aumentar conteos ni para fijar
 detalles de HTML, estilos, selectores, eventos o estructura de archivos.
 
+Como marco selectivo se usa **ISO/IEC/IEEE 29119-2** para separar planificación,
+diseño, ejecución, reporte y cierre, e **ISO/IEC/IEEE 29119-3** para recordar la
+información mínima de los artefactos. Nexus no declara conformidad: adopta un vocabulario
+comprensible y conserva la evidencia ejecutable en el repositorio.
+
+| Actividad inspirada en ISO 29119 | Aplicación sencilla en Nexus | Evidencia |
+| --- | --- | --- |
+| Planificar | Delimitar requisito, riesgo, nivel, ambiente y criterio de salida. | Incidencia y este plan. |
+| Diseñar | Preparar precondiciones, datos, pasos y resultados esperados, incluidos alternos y errores. | Prueba o caso manual trazado a `RF-*`, `RN-*` o `CU-*`. |
+| Ejecutar | Registrar comando, versión/commit, ambiente y resultado real. | Salida de Vitest/CI y consultas Prisma. |
+| Informar | Distinguir aprobado, fallido, bloqueado y no ejecutado. | Resumen de solicitud de cambio. |
+| Cerrar | Confirmar criterios, defectos pendientes y evidencia conservada. | Revisión de la entrega. |
+
+Una prueba se redacta como **Dado / Cuando / Entonces** cuando mejora la lectura, sin
+forzar una biblioteca BDD. Alternativas y excepciones se mantienen como casos separados
+para que un fallo señale una causa concreta.
+
 ## Cobertura CRUD mínima
 
 Sólo se cubren operaciones disponibles en el producto. Una eliminación puede ser una
