@@ -16,11 +16,21 @@ La aplicación concreta, las evidencias revisadas y las brechas se registran en
 [Aplicación de normas en Nexus](standards-application.md). Este documento decide **qué
 criterio se adopta**; el registro indica **dónde se aplica y cómo se comprueba**.
 
+## Límite frente al estándar de codificación
+
+Este documento gobierna artefactos documentales: fuente de verdad, trazabilidad,
+estado, relación entre vistas y uso selectivo de normas. No define formato de código,
+nombres de símbolos, imports, exports, estructura de módulos ni patrones CRUD; esas
+reglas pertenecen exclusivamente al
+[estándar de codificación](../architecture/coding-standards.md). Cuando una evidencia
+técnica aparece aquí, sirve para localizar la comprobación de una afirmación, no para
+establecer cómo debe implementarse.
+
 ## Aplicación por tipo de documento
 
 | Referencia | Uso recomendado en Nexus | Alcance actual |
 | --- | --- | --- |
-| [ISO/IEC/IEEE 29148:2018](https://www.iso.org/standard/72089.html) | Mantener requisitos identificables, necesarios, verificables, trazables y separados de su evidencia de implementación. | Aplica a `requirements-specification.md` y `requirements-diagrams.md`. Es la guía principal, no una declaración de conformidad. |
+| [ISO/IEC/IEEE 29148:2018](https://www.iso.org/standard/72089.html) | Mantener requisitos identificables, necesarios, verificables, trazables y separados de su evidencia de implementación. | Aplica a `requirements-specification.md`, `use-case-descriptions.md` y `requirements-diagrams.md`. Es la guía principal, no una declaración de conformidad. |
 | [ISO/IEC/IEEE 42010:2022](https://www.iso.org/standard/74393.html) | Explicar interesados, preocupaciones, puntos de vista, vistas y decisiones arquitectónicas cuando esa información sea útil. | Aplica de forma ligera a `architecture-and-web-views.md` y a las [convenciones de diagramas](../architecture/diagram-conventions.md); no exige reemplazar Mermaid ni adoptar una herramienta nueva. |
 | [ISO/IEC 25010:2023](https://www.iso.org/standard/78176.html) | Usar un vocabulario consistente para características de calidad y convertir sólo objetivos acordados en requisitos medibles. | Sirve para revisar la sección de calidad; no autoriza inventar umbrales de rendimiento, disponibilidad o seguridad. |
 | [ISO/IEC/IEEE 15289:2019](https://www.iso.org/standard/74909.html) | Orientar el contenido y ciclo de vida de los elementos de información sin imponer un formato único. | Útil si el conjunto documental crece o necesita entregables contractuales; por ahora basta el índice y la regla de actualización existentes. |
@@ -37,20 +47,23 @@ criterio y debe registrarse explícitamente.
 Sin declarar conformidad total con las normas anteriores, la documentación del
 repositorio debe:
 
-1. mantener identificadores estables para requisitos y distinguir requisito, evidencia
-   y estado;
-2. redactar criterios observables y verificables, evitando términos ambiguos o metas no
-   cuantificadas;
-3. enlazar cada cambio funcional con ruta, autorización, validación, servicio,
-   persistencia y pruebas relacionadas con el CRUD;
-4. conservar trazabilidad en ambos sentidos: del requisito a la evidencia y de una
-   prueba o cambio al requisito que justifica;
-5. identificar fuente, responsable de validación, estado y decisiones pendientes sin
-   presentar como implementado lo que sólo está propuesto o modelado;
-6. reutilizar el proceso CRUD, componentes y documentos existentes antes de crear una
-   variante por contexto;
-7. mantener los documentos curados junto con el cambio y regenerar los inventarios
-   derivados del código con `npm run docs:architecture` cuando corresponda.
+1. declarar un artefacto propietario para cada decisión y distinguir contenido
+   normativo, vista complementaria y evidencia generada;
+2. mantener identificadores estables y trazabilidad desde requisitos y casos de uso
+   hacia la evidencia, sin copiar la misma regla normativa en varios documentos;
+3. redactar criterios observables y verificables, diferenciando requisito, evidencia,
+   estado y decisión pendiente;
+4. presentar como implementado sólo aquello que tenga evidencia suficiente y conservar
+   el responsable de la validación funcional fuera del estado técnico;
+5. actualizar las vistas curadas afectadas y regenerar los inventarios derivados con
+   `npm run docs:architecture` cuando cambie su fuente;
+6. agrupar los casos de uso por paquete de capacidad y conservar identificadores con el
+   formato `CU-<PAQUETE>-<SECUENCIA>` en el catálogo y en todos sus diagramas.
+
+La convención de paquetes e identificadores pertenece a la documentación normativa de
+requisitos, porque define trazabilidad y estructura del modelo. No se duplica en
+`AGENTS.md`: ese archivo contiene instrucciones operativas para quienes modifican el
+repositorio y ya exige mantener sincronizados los documentos relacionados.
 
 ### Títulos y vocabulario técnico
 

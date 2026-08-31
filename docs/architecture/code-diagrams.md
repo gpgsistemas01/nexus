@@ -150,9 +150,9 @@ El código confirma varias coordinaciones que no se entienden sólo con el diagr
 
 | Operación | Evidencia del código | Vista que explica el comportamiento |
 | --- | --- | --- |
-| Crear/editar usuario, acceso o contraseña | `src/services/admin/userService.js`, cifrado y asignaciones `UserRoleDepartment`. | [Secuencia de identidad y acceso](../requirements/requirements-diagrams.md#crear-o-editar-usuario-y-acceso--cu-iam-04-cu-iam-05). |
+| Crear/editar usuario, acceso o contraseña | `src/services/admin/userService.js`, cifrado y asignaciones `UserRoleDepartment`. | [Secuencia de identidad y acceso](../requirements/requirements-diagrams.md#crear-o-editar-usuario-y-acceso--cu-ida-04-cu-ida-05). |
 | Eliminar material o relación de proveedor | `materialService.deleteMaterial` y relaciones de uso en `supplierMaterialService.js`. | [Decisión de eliminación](../requirements/requirements-diagrams.md#eliminar-material-o-relación-de-proveedor--cu-cat-04). |
-| Registrar una entrada | `goodsReceiptService.createGoodsReceipt`, referencias y servicios de inventario/costo. | [Secuencia de registro](../requirements/requirements-diagrams.md#registrar-entrada--cu-rec-02). |
+| Registrar una entrada | `goodsReceiptService.createGoodsReceipt`, referencias y servicios de inventario/costo. | [Secuencia de registro](../requirements/requirements-diagrams.md#registrar-entrada--cu-ent-02). |
 | Corregir o cancelar detalle de entrada | `src/services/warehouse/goodsReceipts/detailChanges` y servicios de inventario. | [Secuencia atómica](../requirements/requirements-diagrams.md#coordinación-atómica-de-correcciones-de-entrada). |
 | Surtir o devolver detalle de salida | Servicios de salidas de material/merma, reglas de cumplimiento y movimientos. | [Máquina de estados](../requirements/requirements-diagrams.md#estados-de-surtimiento-y-devolución). |
 | Generar reporte Excel | Controllers de reporte, servicios de consulta y `reportExcelUtils.js`. | [Canal de generación](../requirements/requirements-diagrams.md#generar-reporte--cu-rep-02). |
