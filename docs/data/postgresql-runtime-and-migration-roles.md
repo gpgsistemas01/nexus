@@ -1,5 +1,9 @@
 # Separación de cuentas PostgreSQL para migraciones y aplicación
 
+Este documento contiene una **decisión operativa de infraestructura**. No define los
+permisos funcionales de Nexus ni la estructura del modelo persistente; esas fuentes y su
+relación se localizan desde el [mapa de datos, persistencia y acceso](index.md).
+
 ## ¿Ya está resuelto?
 
 Está resuelto **el enrutamiento de las conexiones**, pero no la creación ni los

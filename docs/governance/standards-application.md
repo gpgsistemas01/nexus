@@ -60,12 +60,12 @@ necesidades justificadas:
 
 | Tema usado en Nexus | Requisitos actuales | Comprobación o decisión pendiente |
 | --- | --- | --- |
-| Seguridad | `RC-SEG-001` | Middleware, almacenamiento de secretos y pruebas negativas. |
-| Fiabilidad e integridad de datos | `RC-DAT-001`, `RN-002` a `RN-005` | Migraciones reproducibles, transacciones y trazabilidad de movimientos. |
-| Mantenibilidad | `RC-MAN-001`, `RC-DOC-001` | Capas por dominio, reutilización y `npm run docs:check`. |
+| Seguridad | `RC-SEG-001` a `RC-SEG-004`; `RN-001`, `RN-009`, `RN-010` | Credenciales, secretos, middleware y pruebas negativas. |
+| Fiabilidad e integridad de datos | `RD-001` a `RD-010`; `RC-DAT-001`, `RC-DAT-002`; `RN-002` a `RN-005`, `RN-011` a `RN-018`, `RN-020` a `RN-022` | Persistencia, migraciones, transacciones y trazabilidad de movimientos. |
+| Mantenibilidad | `RC-MAN-001`, `RC-MAN-002`, `RC-DOC-001` | Capas por dominio, reutilización y `npm run docs:check`. |
 | Capacidad de interacción | Requisitos funcionales de formularios y retroalimentación | Criterios observables del flujo; faltan métricas de usabilidad acordadas. |
-| Eficiencia de desempeño | `RC-REN-001` | Propuesto hasta medir línea base, volumen y umbral aprobado. |
-| Disponibilidad y recuperación | `RC-DIS-001` | Propuesto hasta definir infraestructura, RTO, RPO y responsable. |
+| Eficiencia de desempeño | `RC-REN-001` a `RC-REN-003` | Paginación parcial; tiempos, concurrencia y volumen propuestos hasta acordar métricas. |
+| Disponibilidad y recuperación | `RC-DIS-001`, `RC-DIS-002` | Propuestos hasta definir infraestructura, disponibilidad, RTO, RPO y responsable. |
 
 Una característica sin necesidad, umbral, propietario o método de comprobación queda
 como decisión pendiente; no se presenta como requisito cumplido.
@@ -77,10 +77,23 @@ La revisión documental encontró y trató estas brechas:
 | Hallazgo | Tratamiento vigente | Seguimiento |
 | --- | --- | --- |
 | Casos con verbos amplios («administrar», «mantener»). | Se separaron en objetivos `CU-*` observables; las familias sólo comparten contexto. | Verificar igualdad de IDs entre catálogo y diagramas al cambiar casos. |
-| Requisitos extensos que mezclan obligación, diseño y numerosos escenarios. | Se adoptó una estructura de obligación breve más criterios `CA-*`; la primera aplicación se realizó en entradas. | Migrar los requisitos de merma y reportes cuando sean modificados, sin cambiar su significado funcional. |
+| Requisitos extensos que mezclan obligación, diseño y numerosos escenarios. | Se adoptó una obligación por operación observable en todos los paquetes; los criterios `CA-*` conservan variantes del mismo resultado. | Revisar la granularidad con la misma regla cuando cambie cualquier requisito, sin crear una obligación por campo. |
 | Evidencia mezclada con la formulación normativa. | La evidencia permanece en columna propia y el mapa generado conserva rutas/importaciones. | Rechazar nuevas filas que describan archivos dentro de la obligación. |
 | Calidad sin valores medidos. | Rendimiento y disponibilidad permanecen propuestos. | Definir propietario, línea base, umbral y prueba antes de marcarlos implementados. |
 | Ausencia de responsable formal de aprobación. | El estado refleja evidencia técnica, no aceptación funcional. | Registrar responsable y aprobación en la incidencia o solicitud de cambio. |
+
+### Auditoría de granularidad por tipo
+
+| Tipo | Decisión aplicada | Ejemplos de separación |
+| --- | --- | --- |
+| `RF-*` funcional | Una operación o resultado observable por requisito. | Iniciar/renovar/cerrar sesión; consultar/crear/editar; surtir/devolver. |
+| `RD-*` datos | Una garantía persistente que puede comprobarse de forma independiente. | UUID, precisión decimal, relaciones, historia, fechas y estados. |
+| `RN-*` negocio | Una restricción transversal por posible incumplimiento. | Autenticación, autorización y validación de entrada tienen IDs distintos. |
+| `RC-*` calidad | Un atributo y mecanismo de comprobación por requisito. | Hash, rutas protegidas, aislamiento de pruebas, logs, runtime y despliegue. |
+
+La revisión no divide listas de atributos inseparables de una misma identidad ni los
+participantes de una misma transacción atómica. Esos detalles permanecen como condición
+o criterio de aceptación del requisito propietario.
 
 ## Mantenimiento y evidencia de revisión
 

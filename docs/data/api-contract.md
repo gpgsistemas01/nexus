@@ -1,5 +1,9 @@
 # Contrato de la API
 
+Este documento es propietario del contrato HTTP y no de las reglas de negocio ni del
+esquema persistente. La relación con requisitos, diseño y evidencia se consulta en el
+[mapa de datos, persistencia y acceso](index.md).
+
 ## Exportación mensual de reportes
 
 Los endpoints de exportación de compras, salidas y movimientos aceptan
