@@ -39,7 +39,7 @@ import {
     getUnitMeasure,
     mapIssueDetailsToSupplyRequest
 } from '../../../utils/warehouseInventoryUtils.js';
-import { wasteIssueDetails as details, wasteIssueHeaderForm } from './wasteIssueModal.js';
+import { details, wasteIssueHeaderForm } from './wasteIssueModal.js';
 
 const formId = FORM_SELECTORS.WASTE_ISSUE;
 const form = document.querySelector(formId);
