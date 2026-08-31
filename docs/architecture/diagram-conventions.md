@@ -32,6 +32,26 @@ Los identificadores Mermaid deben ser estables y descriptivos (`apiRoutes`,
 por tipo: `LR` para recorridos y dependencias, `TB` para capas o descomposición. Los
 subgrafos representan un límite real y no se usan sólo como decoración.
 
+### Organización por Viewpoint/View y revelado progresivo
+
+La familia de arquitectura aplica un patrón documental **Viewpoint/View**: cada punto de
+vista fija pregunta, lectores y reglas de representación; cada vista responde esa
+pregunta para Nexus. Se combina con revelado progresivo para navegar de lo general a lo
+particular sin producir un diagrama único e ilegible:
+
+1. **contexto:** actores, Nexus y sistemas externos;
+2. **contenedores y despliegue:** lugares de ejecución y comunicación;
+3. **estructura interna:** superficie HTTP, dominios, capas y componentes;
+4. **dinámica:** petición representativa y transacciones de atención alta;
+5. **reutilización:** fábricas, composición y componentes compartidos;
+6. **detalle mecánico:** rutas, imports y modelos en artefactos generados.
+
+No es un patrón GoF ni altera el código. Organiza vistas y hace visibles patrones que sí
+existen en la implementación: monolito modular, capas, pipeline de middleware, DTO,
+Transaction Script, fábricas configurables, composición y publicación de eventos. La
+vista canónica de cada nivel se enlaza en vez de copiarse, aplicando una única fuente de
+verdad documental.
+
 ## Vistas reutilizadas
 
 | Vista | Patrón o notación | Pregunta que responde | Fuente y actualización |
@@ -47,6 +67,46 @@ subgrafos representan un límite real y no se usan sólo como decoración.
 | Dominio conceptual | Conceptos y relaciones del negocio | ¿Qué lenguaje comparten actores y desarrollo sin introducir tablas o clases técnicas? | Curada con validación funcional; se enlaza con requisitos y persistencia. |
 | Casos de uso | Objetivos agrupados por actor | ¿Qué quiere lograr un actor y qué capacidades están disponibles o pendientes? | Curada desde requisitos; no equivale a un inventario de endpoints. |
 | Dependencias | Grafo dirigido generado | ¿Qué áreas importan otras áreas? | Generada desde imports relativos bajo `src`; no equivale a una dependencia en ejecución. |
+
+## Diagramas derivados de casos de uso y de código
+
+La revisión separa dos preguntas que no deben resolverse con la misma fuente. Los casos
+de uso explican **por qué y para quién** ocurre una operación; el código permite afirmar
+**qué está registrado o conectado**. «Generado» significa que el contenido puede
+reconstruirse de manera determinista, no que una herramienta deba inventar semántica de
+negocio.
+
+| Origen | Diagrama necesario | Estado y ubicación | Razón para generarlo o mantenerlo curado |
+| --- | --- | --- | --- |
+| Casos `CU-*` | Casos de uso por actor y límite de Nexus | Curado en `domain-and-use-cases.md`. | Actores, objetivos y asociaciones requieren decisión funcional; no se infieren de una ruta. |
+| Casos `CU-*` | Flujo de actividad de cada objetivo | Curado por familia y carril en `requirements-diagrams.md`. | Representa escenario exitoso, decisiones y resultado; comparte patrón CRUD sin fusionar objetivos. |
+| Casos con estados | Máquina de estados de salidas, surtimientos y devoluciones | Curada en requisitos. | Los nombres y transiciones combinan reglas y cantidades; el código es evidencia, no única fuente normativa. |
+| Casos transaccionales | Secuencia representativa de corrección/cancelación | Curada en requisitos y enlazada al servicio. | Explica límite atómico y rollback sin producir una secuencia por endpoint. |
+| Código de routers | Superficie API/Web por área y método | Curada en `code-diagrams.md` y comprobada contra el mapa de rutas. | Montajes y métodos son verificables, pero la vista se actualiza explícitamente junto al cambio para conservar agrupaciones comprensibles. |
+| Código JavaScript | Dependencias entre áreas | Generada en `generated/code-map.md`. | Los `import` relativos permiten reconstruir aristas deterministas. |
+| Prisma | Entidad-relación por área | Generada en `generated/database-schema.md`. | Modelos, claves y relaciones pertenecen al esquema versionado. |
+| Código + `CU-*` | Trazabilidad de cada caso hacia endpoint, permiso, servicio y prueba | Matriz curada, no diagrama automático por ahora. | Asociar una ruta con un objetivo exige interpretación; coincidir por verbo o nombre produciría falsos vínculos. |
+
+### Diagramas descartados en la revisión
+
+- **Un diagrama de secuencia por cada `CU-*`:** repetiría la misma cadena de capas para
+  consultas y CRUD simples; sólo se crea cuando el orden, rollback o participantes
+  aportan una decisión que el flujo no muestra.
+- **Un diagrama de clases generado desde JavaScript:** la aplicación no declara clases de
+  dominio equivalentes al modelo conceptual; los imports no permiten inferirlas.
+- **Casos de uso generados desde endpoints:** `POST`, `PATCH` o `GET` no revelan actor,
+  intención, precondición ni resultado esperado.
+- **Permisos inferidos desde vistas o nombres de carpeta:** la autorización efectiva
+  depende de middleware y configuración; debe verificarse en la matriz de operaciones.
+- **Un grafo con los 61 endpoints como nodos:** el inventario tabular conserva el detalle
+  de forma más legible; el diagrama curado agrupa la superficie por área y operación.
+
+Al agregar un caso se actualizan las vistas curadas y su trazabilidad. Al cambiar un
+router también se revisa manualmente `code-diagrams.md`; al cambiar rutas, imports o
+Prisma se ejecuta además `npm run docs:architecture` para comprobar los inventarios. Si
+una asociación caso-código llega a tener una fuente declarativa versionada, podrá
+generarse entonces; hasta ese momento permanece curada para no presentar heurísticas
+como hechos.
 
 Contexto y contenedores pueden inspirarse en C4, y secuencias o estados pueden usar
 conceptos habituales de UML, pero se documenta sólo la semántica realmente empleada.

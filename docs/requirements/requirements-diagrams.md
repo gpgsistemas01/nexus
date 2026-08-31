@@ -23,7 +23,7 @@ flowchart LR
     quantities["RN-003\nConsistencia de cantidades"]
     trace["RN-005 y RN-008\nHistoria y auditoría"]
     catalogs["RF-CAT-001 a RF-CAT-005\nCatálogos operativos"]
-    receipts["RF-REC-001 a RF-REC-003\nEntradas y correcciones"]
+    receipts["RF-REC-001 a RF-REC-006\nEntradas y correcciones"]
     issues["RF-ISS-001 a RF-ISS-004\nSalidas y devoluciones"]
     inventory["RF-INV-001 a RF-INV-003\nExistencias y movimientos"]
 
@@ -74,6 +74,295 @@ flowchart LR
 Las flechas representan transiciones observables del usuario, no rutas concretas de la API.
 La bifurcación de eliminación aplica `RN-007`; el límite atómico aplica `RN-002`. La
 matriz de operaciones define cuál de estas ramas existe realmente para cada módulo.
+
+## Revisión de flujos y nivel de detalle
+
+La revisión del catálogo de casos de uso y de los servicios coordinadores distingue los
+flujos que pueden reutilizar el ciclo CRUD anterior de aquellos cuya consistencia depende
+de varias cantidades, estados o escrituras. Cada caso tiene una vista propia para poder
+seguirlo de principio a fin; la reutilización consiste en conservar la misma estructura
+y señalar sus diferencias, no en omitir el caso.
+
+| Área revisada | Complejidad observada | Decisión visual |
+| --- | --- | --- |
+| Personas, usuarios y catálogos | Validación y política de eliminación propias, pero transición CRUD común. | Crear una vista por caso reutilizando la estructura **seleccionar operación → validar → persistir → refrescar**. |
+| Creación y edición de documentos | Encabezado y detalles varían por contexto, pero siguen el límite transaccional ya representado. | Crear una vista por caso y hacer explícito cuándo cambia el inventario. |
+| Corrección o cancelación de una entrada | Debe conciliar snapshot, diferencia de cantidad, stock, movimiento, totales e historial en una sola transacción. | Agregar una secuencia de coordinación atómica. |
+| Surtimiento y devolución de una salida | La cantidad solicitada, surtida y devuelta determina estados de detalle y documento; una devolución crea además un movimiento inverso. | Agregar una máquina de estados con invariantes cuantitativas. |
+| Material frente a merma | El proceso es equivalente, aunque cambian inventario, conversión y reglas contextuales. | Un mismo caso muestra la bifurcación de contexto y el proceso compartido. |
+| Consultas, filtros y exportación | No modifica estados y combina filtros, paginación y formatos de salida. | Crear una vista propia de consulta sin presentarla como escritura CRUD. |
+
+Esta clasificación se revisa cuando un caso de uso incorpora una bifurcación, una
+transacción con un nuevo efecto persistente o una transición de estado. Los diagramas
+por caso reutilizan nodos y semántica cuando el proceso es equivalente, mientras los
+diagramas de secuencia o estados se reservan para explicar coordinación adicional.
+
+## Flujos de cada caso de uso
+
+Cada carril comienza con un identificador `CU-*` y representa exclusivamente ese
+objetivo. Las familias sólo reúnen carriles que reutilizan validación o persistencia; no
+son casos de uso. Las flechas son pasos observables, no endpoints. La fuente curada es el
+[catálogo operativo](use-case-descriptions.md#catálogo-operativo-y-granularidad).
+
+### Identidades y accesos
+
+```mermaid
+flowchart LR
+    iam01["CU-IAM-01 Consultar"] --> iam01q["Aplicar filtros y mostrar identidades y accesos"]
+    iam02["CU-IAM-02 Crear persona"] --> iam02v["Validar identidad"] --> iam02p["Persistir persona"]
+    iam03["CU-IAM-03 Editar persona"] --> iam03v["Validar campos modificables"] --> iam03p["Actualizar persona"]
+    iam04["CU-IAM-04 Crear usuario"] --> iam04v["Validar cuenta, persona, rol y área"] --> iam04p["Crear usuario y asignar acceso"]
+    iam05["CU-IAM-05 Editar usuario o contraseña"] --> iam05v["Validar cuenta, acceso o credencial"] --> iam05p["Actualizar asignación o contraseña cifrada"]
+```
+
+### Catálogos operativos y contextuales
+
+```mermaid
+flowchart LR
+    cat01["CU-CAT-01 Consultar"] --> cat01q["Elegir recurso, filtrar y listar"]
+    cat02["CU-CAT-02 Crear registro"] --> cat02v["Validar identidad y relaciones"] --> cat02p["Persistir y refrescar"]
+    cat03["CU-CAT-03 Editar registro"] --> cat03v["Validar campos modificables"] --> cat03p["Actualizar y refrescar"]
+    cat04["CU-CAT-04 Eliminar o cambiar estado"] --> cat04d{"¿El recurso admite eliminación?"}
+    cat04d -->|sí, sin relaciones protegidas| cat04x["Eliminar"]
+    cat04d -->|no| cat04s["Activar o desactivar cuando corresponda"]
+```
+
+`CU-CAT-02` y `CU-CAT-03` reutilizan fábrica CRUD, formulario y refresco cuando el
+recurso lo permite. Cliente, proveedor, material y merma conservan sus validaciones y
+política de eliminación o estado como configuración contextual.
+
+### Entradas y correcciones
+
+```mermaid
+flowchart LR
+    rec01["CU-REC-01 Consultar"] --> rec01q["Filtrar y mostrar entradas"]
+    rec02["CU-REC-02 Registrar"] --> rec02v["Validar proveedor, factura y detalles"] --> rec02t["Crear entrada, incrementar stock y registrar movimientos"]
+    rec03["CU-REC-03 Editar"] --> rec03v["Validar encabezado y detalles nuevos admitidos"] --> rec03t["Actualizar entrada en transacción"]
+    rec04["CU-REC-04 Corregir detalle"] --> rec04v["Validar cantidad, costo, stock y motivo"] --> rec04t["Ajustar stock, totales, movimiento e historial"]
+    rec05["CU-REC-05 Cancelar detalle"] --> rec05v["Validar estado, stock y motivo"] --> rec05t["Revertir stock y registrar cancelación"]
+```
+
+### Salidas, ajuste, surtimiento y devolución
+
+```mermaid
+flowchart LR
+    iss01["CU-ISS-01 Consultar"] --> iss01q["Elegir material o merma, filtrar y listar"]
+    iss02["CU-ISS-02 Crear"] --> iss02v["Validar encabezado y detalles del contexto"] --> iss02p["Persistir pendiente sin descontar stock"]
+    iss03["CU-ISS-03 Editar encabezado"] --> iss03v["Validar estado y campos admitidos"] --> iss03p["Actualizar encabezado"]
+    iss04["CU-ISS-04 Ajustar detalles"] --> iss04v["Validar cantidades todavía modificables"] --> iss04p["Agregar o actualizar detalles y estado"]
+    iss05["CU-ISS-05 Surtir detalle"] --> iss05v["Validar pendiente y existencia"] --> iss05t["Descontar stock, acumular surtido y crear movimiento"]
+    iss06["CU-ISS-06 Devolver detalle"] --> iss06v["Validar cantidad retornable"] --> iss06t["Reintegrar stock, acumular devolución y crear movimiento inverso"]
+```
+
+Los seis carriles se aplican a material o merma cuando la operación existe. Se replica
+el proceso y cambia el adaptador de inventario, conversión y validación; no se inventa un
+segundo caso únicamente por el contexto.
+
+### Consultas y reportes
+
+```mermaid
+flowchart LR
+    rep01["CU-REP-01 Consultar movimientos e inventario"] --> rep01f["Validar permiso y aplicar filtros"] --> rep01q["Mostrar página y totales"]
+    rep02["CU-REP-02 Generar reporte"] --> rep02f["Elegir reporte y parámetros"] --> rep02q["Consultar datos autorizados"] --> rep02o{"¿Vista o archivo?"}
+    rep02o -->|vista| rep02v["Mostrar resultado"]
+    rep02o -->|archivo| rep02x["Exportar columnas autorizadas"]
+```
+
+Los veintidós identificadores coinciden con los objetivos del diagrama general. Una
+operación nueva requiere un identificador y carril propios; una variante técnica interna
+no se convierte por sí sola en caso de uso.
+
+## Casos que requieren atención visual adicional
+
+La necesidad de otra vista se evaluó con cuatro señales: **cantidad de decisiones de
+negocio**, **escrituras coordinadas**, **cambio de estado o acumulados** y **efecto que
+debe revertirse ante un fallo**. La prioridad no mide importancia del módulo; indica
+cuánto contexto se perdería si sólo se conservara el carril resumido.
+
+| Atención | Casos revisados | Motivo | Vista adicional |
+| --- | --- | --- | --- |
+| Alta | `CU-IAM-04`, `CU-IAM-05` | Contraseña cifrada, persona opcional y asignación rol/departamento; al editar se reemplaza la asignación dentro de una transacción. | Secuencia de identidad y acceso incluida abajo. |
+| Alta | `CU-CAT-04` para material | La historia operativa impide eliminar; si quedan otros proveedores sólo se retira la relación proveedor-material. | Decisión de eliminación incluida abajo. |
+| Alta | `CU-REC-02` | Referencia, documento, detalles, stock y movimientos se confirman juntos; el costo se revisa después del commit. | Secuencia de registro incluida abajo. |
+| Alta | `CU-REC-04`, `CU-REC-05` | Corrección/cancelación altera historia, totales, stock y movimiento. | Secuencia atómica ya incluida en este documento. |
+| Alta | `CU-ISS-05`, `CU-ISS-06` | Acumulados, estados, existencias y movimientos dependen de cantidades previas. | Máquina de estados ya incluida en este documento. |
+| Alta | `CU-REP-02` | Filtros, variantes mensual/detallada, fórmulas, totales y archivo deben conservar el mismo resultado de dominio. | Canal de generación de reportes incluido abajo. |
+| Media | `CU-CAT-02`, `CU-CAT-03`, `CU-REC-03`, `CU-ISS-02` a `CU-ISS-04` | Coordinan relaciones o detalles, pero el carril específico y el patrón CRUD/documental muestran la decisión vigente. | Reutilizar flujo por caso; crear secuencia sólo si aparece otro efecto o participante. |
+| Baja | `CU-IAM-01` a `CU-IAM-03`, `CU-CAT-01`, `CU-REC-01`, `CU-ISS-01`, `CU-REP-01` | Consulta o mutación directa sin estados coordinados adicionales. | El carril por caso es suficiente. |
+
+### Crear o editar usuario y acceso — `CU-IAM-04`, `CU-IAM-05`
+
+```mermaid
+sequenceDiagram
+    actor Admin as Administración
+    participant Controller as userController
+    participant Service as userService
+    participant Person as personService
+    participant Db as Prisma
+
+    Admin->>Controller: enviar cuenta, persona, rol y departamento
+    Controller->>Service: crear o editar DTO validado
+    Service->>Person: comprobar persona cuando fue indicada
+    alt crear usuario
+        Service->>Service: cifrar contraseña
+        Service->>Db: crear cuenta y asignación anidada
+    else editar cuenta y acceso
+        Service->>Db: iniciar transacción
+        Service->>Db: actualizar cuenta y persona
+        Service->>Db: eliminar asignación anterior
+        Service->>Db: crear asignación rol/departamento
+        Db-->>Service: commit
+    else cambiar contraseña
+        Service->>Service: cifrar contraseña nueva
+        Service->>Db: actualizar credencial
+    end
+    Service-->>Controller: usuario actualizado sin exponer contraseña
+```
+
+La edición de cuenta no representa activación o desactivación: el router vigente ofrece
+actualización general y cambio separado de contraseña. Si se incorpora un endpoint de
+estado, deberá agregarse como caso o alternativa verificable antes de dibujar esa
+transición.
+
+### Eliminar material o relación de proveedor — `CU-CAT-04`
+
+```mermaid
+flowchart TB
+    materialRequest["Solicitar eliminación de SupplierMaterial"] --> materialExists{"¿Existe la relación?"}
+    materialExists -->|no| materialNotFound["Responder material no encontrado"]
+    materialExists -->|sí| materialHistory{"¿El material participa en entradas,<br/>salidas, movimientos, ajustes o correcciones?"}
+    materialHistory -->|sí| materialConflict["Rechazar para conservar historia"]
+    materialHistory -->|no| materialDeleteRelation["Eliminar relación proveedor-material"]
+    materialDeleteRelation --> materialRemaining{"¿Quedan otros proveedores?"}
+    materialRemaining -->|sí| materialKeep["Conservar material"]
+    materialRemaining -->|no| materialDelete["Eliminar material"]
+```
+
+La comprobación y ambas eliminaciones pertenecen a una sola transacción. El listado
+reutiliza las mismas relaciones de uso para mostrar `canDelete`; no mantiene una segunda
+definición de qué significa «sin historia».
+
+### Registrar entrada — `CU-REC-02`
+
+```mermaid
+sequenceDiagram
+    actor Warehouse as Almacén
+    participant Service as goodsReceiptService
+    participant Rules as Proveedor · factura · receptor · detalles
+    participant Tx as Transacción Prisma
+    participant Inventory as movementService
+    participant Cost as supplierMaterialService
+
+    Warehouse->>Service: confirmar entrada validada
+    Service->>Rules: validar relaciones y factura única
+    Service->>Rules: normalizar detalles y calcular totales
+    Service->>Tx: iniciar transacción
+    Tx->>Tx: generar referencia anual
+    Tx->>Tx: crear encabezado y detalles
+    Tx->>Inventory: incrementar existencias y crear movimientos
+    Inventory-->>Tx: efectos conciliados
+    Tx-->>Service: commit de entrada
+    Service->>Cost: actualizar costo sólo si el nuevo es mayor
+    Service-->>Warehouse: entrada confirmada
+```
+
+El ajuste posterior del costo no se presenta como parte del límite atómico de documento,
+stock y movimiento. Esta diferencia debe permanecer visible en pruebas y documentación.
+
+### Generar reporte — `CU-REP-02`
+
+```mermaid
+flowchart LR
+    reportRequest["Elegir reporte y parámetros"] --> reportMode{"¿Mensual o filtrado?"}
+    reportMode -->|mensual| reportRange["Derivar rango del mes y neutralizar filtros incompatibles"]
+    reportMode -->|filtrado| reportFilters["Normalizar búsqueda, fechas, relaciones y orden"]
+    reportRange --> reportQuery["Consultar filas autorizadas en servicio de reportes"]
+    reportFilters --> reportQuery
+    reportQuery --> reportTransform["Construir encabezados, filas, agrupaciones y totales"]
+    reportTransform --> reportFormula["Agregar fórmulas conservando valores calculados"]
+    reportFormula --> reportExcel["Crear una hoja con nombre y columnas del reporte"]
+    reportExcel --> reportResponse["Enviar archivo Excel"]
+```
+
+Los reportes concretos reutilizan el canal consulta → transformación → Excel, pero
+mantienen columnas, agrupación, fórmulas, permiso y nombre de hoja propios. Una nueva
+variante replica ese proceso con configuración contextual antes de crear otro canal.
+
+## Coordinación atómica de correcciones de entrada
+
+Esta secuencia ayuda a desarrollo y pruebas a localizar el límite de `CU-REC-04` y `CU-REC-05`. Su alcance comienza después de autorizar y validar la petición y termina con la
+respuesta del servicio. Los mensajes dentro del bloque **Transacción Prisma** son una
+unidad: cualquier excepción revierte todos sus efectos. La actualización del costo
+unitario ocurre después del commit y no forma parte de esa unidad.
+
+```mermaid
+sequenceDiagram
+    participant C as Controller
+    participant S as Servicio de corrección/cancelación
+    participant T as Transacción Prisma
+    participant I as Inventario y movimientos
+    participant D as Entrada, detalle e historial
+    participant U as Costo unitario
+
+    C->>S: corregir o cancelar detalle validado
+    S->>T: iniciar transacción
+    T->>D: obtener detalle y comprobar estado
+    D-->>T: snapshot vigente
+    T->>T: calcular diferencia y tipo de cambio
+    alt corrección o cancelación válida
+        T->>I: aplicar diferencia de inventario y movimiento
+        I-->>T: movimiento trazable
+        T->>D: actualizar detalle y totales
+        T->>D: registrar valores anterior/resultante, motivo y actor
+        T-->>S: commit con resultado coordinado
+        S->>U: recalcular costo del material/proveedor
+        S-->>C: detalle, entrada, cambio y movimiento
+    else estado, cantidad, stock o motivo inválido
+        T-->>S: rollback sin cambios parciales
+        S-->>C: error de dominio
+    end
+```
+
+Las flechas son llamadas coordinadas, no endpoints. La fuente verificable son
+`goodsReceiptCorrectionService.js`, `goodsReceiptCancellationService.js` y sus ayudas de
+inventario; el detalle contractual permanece en `CU-REC-04` y `CU-REC-05`. Si cambia el orden de las
+escrituras, el límite transaccional o el recálculo posterior, deben actualizarse esta
+vista y las pruebas unitarias ubicadas en la ruta paralela del servicio. El CRUD HTTP de
+entradas conserva su cobertura de integración en `tests/integration/controllers`.
+
+## Estados de surtimiento y devolución
+
+Esta máquina responde qué transición admite un detalle de `CU-ISS-05` y `CU-ISS-06`.
+Aplica al proceso compartido de salidas de material y merma; el adaptador de cada
+contexto resuelve inventario y conversión sin cambiar las invariantes. Una flecha es una
+operación de negocio confirmada, no navegación ni una asignación directa del usuario.
+
+```mermaid
+stateDiagram-v2
+    [*] --> Pendiente: crear detalle\nsolicitada > 0
+    Pendiente --> Parcial: surtir 0 < cantidad < pendiente
+    Pendiente --> Surtido: surtir cantidad pendiente
+    Parcial --> Parcial: surtir menos que la diferencia
+    Parcial --> Surtido: completar diferencia pendiente
+    Surtido --> Surtido: devolución parcial\ndevuelta < surtida
+    Surtido --> Cancelado: devolver todo lo surtido
+    Cancelado --> [*]
+```
+
+En cada surtimiento se cumple `0 < cantidad ≤ solicitada − surtida`, se descuenta stock
+y se crea un movimiento de salida. En cada devolución se cumple
+`0 < cantidad ≤ surtida − devuelta`, se reintegra stock y se conserva el movimiento
+original mediante un movimiento de entrada trazable. Después de cada transición se
+deriva nuevamente el estado agregado del documento; si todos sus detalles quedan
+cancelados, también se cancela el documento.
+
+La fuente de verdad de los nombres y derivación de estados está en
+`warehouseStatuses.js`, `issueFulfillmentRules.js` y las reglas específicas de cada
+contexto; las transacciones de surtimiento y devolución son la evidencia de sus efectos.
+Al modificar una fórmula, estado o regla de agregación se actualizan esta vista,
+`CU-ISS-05`, `CU-ISS-06` y las pruebas paralelas de reglas y servicios. Las pruebas de
+integración CRUD continúan en `tests/integration/controllers/*DbTest.js`, conforme a la
+estrategia documentada, en vez de trasladarse junto al diagrama.
 
 ## Requisitos de calidad y restricciones
 

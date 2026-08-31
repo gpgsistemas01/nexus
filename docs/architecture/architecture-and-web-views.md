@@ -4,9 +4,12 @@ Este documento es el mapa visual, versionado junto con el código, para comprend
 sistema y localizar sus pantallas. Los diagramas usan **Mermaid**, por lo que GitHub los
 renderiza directamente sin guardar imágenes que puedan quedar desactualizadas.
 
-Esta familia documental se divide deliberadamente en dos niveles:
+Esta familia documental se divide deliberadamente en tres niveles:
 
 - este documento **curado** explica contexto, decisiones, responsabilidades y flujos;
+- los [diagramas vigentes del código](code-diagrams.md) profundizan de forma ordenada en
+  superficie HTTP, dominios, dinámica y reutilización sin repetir contexto ni
+  contenedores;
 - el [mapa generado del código](../generated/code-map.md), que pertenece a la familia de
   arquitectura, mantiene un inventario de rutas y dependencias reales entre áreas.
 
@@ -19,6 +22,12 @@ expone la jerarquía completa. Los tres se verifican con `npm run docs:check`.
 Así, un generador no intenta adivinar el porqué del diseño y los inventarios mecánicos
 no dependen de que alguien recuerde actualizar una tabla a mano.
 
+La navegación entre vistas sigue **Viewpoint/View con revelado progresivo**: este
+documento conserva contexto y contenedores; los diagramas del código continúan con
+estructura, dinámica y reutilización; el mapa generado aporta el inventario mecánico.
+Cada pregunta arquitectónica tiene una vista canónica y los demás documentos la enlazan
+en lugar de redibujarla.
+
 ### ¿Qué se actualiza automáticamente?
 
 | Artefacto | Pertenece a | Fuente | Actualización |
@@ -27,6 +36,7 @@ no dependen de que alguien recuerde actualizar una tabla a mano.
 | `docs/generated/database-schema.md` | Datos, acceso y operación | Modelos y relaciones de `prisma/schema.prisma` | Se regenera con el mismo comando; se valida en cada solicitud de cambio. |
 | `docs/generated/data-dictionary.md` | Datos, acceso y operación | Campos, claves, tipos y relaciones propietarias de `prisma/schema.prisma` | Se regenera con el mismo comando; complementa el esquema sin duplicarlo manualmente. |
 | Diagramas de contexto, contenedores, despliegue, secuencia y navegación de este documento | Arquitectura y construcción | Decisiones de arquitectura, configuración versionada y experiencia de usuario | Son curados y se revisan cuando cambia el diseño o la configuración de ejecución. |
+| `docs/architecture/code-diagrams.md` | Arquitectura y construcción | Routers, capas, servicios y componentes reutilizables | Es curado; se revisa manualmente al cambiar estructura, colaboración, flujo o patrón aplicado. |
 | Catálogo de pantallas de este documento | Arquitectura y construcción | Rutas, permisos, controladores, EJS y comportamiento visible | Es curado porque el código no puede inferir propósito, navegación ni estado funcional. |
 
 La separación es intencional: generar relaciones mecánicas evita trabajo repetitivo,
