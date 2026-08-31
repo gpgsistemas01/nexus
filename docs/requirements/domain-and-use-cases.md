@@ -75,30 +75,71 @@ El diagrama conserva únicamente la vista visual para no duplicar esas descripci
 flowchart LR
     warehouse["Personal de almacén"]
     admin["Administración del sistema"]
+    catalogOperator["Personal autorizado del catálogo"]
 
     subgraph nexus["Nexus"]
-        ucCatalogs(["Mantener catálogos de almacén"])
-        ucReceipts(["Registrar y corregir entradas"])
-        ucIssues(["Crear y editar salidas"])
-        ucSupply(["Surtir detalles"])
-        ucReturn(["Devolver detalles surtidos"])
-        ucMovements(["Consultar movimientos y reportes"])
-        ucIdentity(["Administrar personas, usuarios y accesos"])
-        ucClients(["Mantener clientes como catálogo contextual"])
+        ucIdentityQuery(["CU-IAM-01 Consultar identidades y accesos"])
+        ucPersonCreate(["CU-IAM-02 Crear persona"])
+        ucPersonEdit(["CU-IAM-03 Editar persona"])
+        ucUserCreate(["CU-IAM-04 Crear usuario y asignar acceso"])
+        ucUserEdit(["CU-IAM-05 Editar usuario o cambiar contraseña"])
+        ucCatalogQuery(["CU-CAT-01 Consultar catálogos"])
+        ucCatalogCreate(["CU-CAT-02 Crear registro de catálogo"])
+        ucCatalogEdit(["CU-CAT-03 Editar registro de catálogo"])
+        ucCatalogRemove(["CU-CAT-04 Eliminar o cambiar estado de registro"])
+        ucReceiptQuery(["CU-REC-01 Consultar entradas"])
+        ucReceiptCreate(["CU-REC-02 Registrar entrada"])
+        ucReceiptEdit(["CU-REC-03 Editar entrada"])
+        ucReceiptCorrect(["CU-REC-04 Corregir detalle de entrada"])
+        ucReceiptCancel(["CU-REC-05 Cancelar detalle de entrada"])
+        ucIssueQuery(["CU-ISS-01 Consultar salidas"])
+        ucIssueCreate(["CU-ISS-02 Crear salida"])
+        ucIssueHeader(["CU-ISS-03 Editar encabezado de salida"])
+        ucIssueDetails(["CU-ISS-04 Ajustar detalles de salida"])
+        ucSupply(["CU-ISS-05 Surtir detalle"])
+        ucReturn(["CU-ISS-06 Devolver detalle surtido"])
+        ucMovements(["CU-REP-01 Consultar movimientos e inventario"])
+        ucReports(["CU-REP-02 Generar reporte"])
     end
 
-    warehouse --- ucCatalogs
-    warehouse --- ucReceipts
-    warehouse --- ucIssues
+    catalogOperator --- ucCatalogQuery
+    catalogOperator --- ucCatalogCreate
+    catalogOperator --- ucCatalogEdit
+    catalogOperator --- ucCatalogRemove
+    warehouse --- ucReceiptQuery
+    warehouse --- ucReceiptCreate
+    warehouse --- ucReceiptEdit
+    warehouse --- ucReceiptCorrect
+    warehouse --- ucReceiptCancel
+    warehouse --- ucIssueQuery
+    warehouse --- ucIssueCreate
+    warehouse --- ucIssueHeader
+    warehouse --- ucIssueDetails
     warehouse --- ucSupply
     warehouse --- ucReturn
     warehouse --- ucMovements
-    admin --- ucIdentity
-    admin --- ucClients
+    warehouse --- ucReports
+    admin --- ucIdentityQuery
+    admin --- ucPersonCreate
+    admin --- ucPersonEdit
+    admin --- ucUserCreate
+    admin --- ucUserEdit
     admin --- ucMovements
+    admin --- ucReports
     ucSupply -.->|incluye existencia y movimiento| ucMovements
     ucReturn -.->|incluye reversión y movimiento| ucMovements
 ```
+
+Los identificadores `CU-*` son los mismos del catálogo operativo y permiten pasar de cada
+objetivo visual a su descripción y a su diagrama de flujo específico en
+[Diagramas de requisitos](requirements-diagrams.md#flujos-de-cada-caso-de-uso). No se
+usa «administrar» o «mantener» como objetivo: cada óvalo expresa una operación observable.
+
+Los casos de uso son objetivos del actor, no módulos de código. Por ello **no se requiere
+crear una carpeta `useCases` ni renombrar los dominios existentes**. La trazabilidad se
+mantiene desde el identificador hacia rutas, controllers, DTO, servicios y pruebas; una
+operación puede coordinar varios de esos artefactos y un servicio puede apoyar más de un
+caso sin que ambos deban compartir nombre.
 
 No se dibujan operaciones pendientes como asociaciones. Las áreas que eventualmente
 soliciten o registren salidas, y el mantenimiento de proyectos, deben definirse primero
