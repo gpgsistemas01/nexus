@@ -20,7 +20,7 @@ opción no se debe resolver compartiendo credenciales.
 3. Compruebe que se muestre la página autorizada para su cuenta.
 
 La captura se incorpora después de ejecutar `npm run docs:screenshots` en un entorno de prueba.
-Su ruta esperada es `docs/manual-usuario/images/acceso/01-login.png`; no se versiona una imagen
+Su ruta esperada es `docs/user-manual/images/acceso/01-login.png`; no se versiona una imagen
 de relleno. El archivo Markdown sólo debe referenciarla cuando exista una captura real y
 revisada, para no bloquear la exportación ni introducir binarios ficticios.
 

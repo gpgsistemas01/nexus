@@ -5,7 +5,7 @@ import process from 'node:process';
 const { chromium } = await import('playwright');
 const baseURL = process.env.DOCS_BASE_URL ?? 'http://127.0.0.1:3000';
 const storageState = process.env.DOCS_STORAGE_STATE;
-const outputRoot = path.resolve('docs/manual-usuario/images');
+const outputRoot = path.resolve('docs/user-manual/images');
 const pages = [
     { module: 'acceso', name: '01-login.png', route: '/login', ready: 'form' },
     { module: 'entradas', name: '01-listado.png', route: '/goods-receipts', ready: 'table' },
