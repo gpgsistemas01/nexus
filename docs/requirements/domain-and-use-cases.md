@@ -60,99 +60,164 @@ esta vista vigente hasta definir su flujo.
 El diagrama se mantiene en Mermaid para que GitHub lo represente correctamente. Es una
 **aproximación visual a un diagrama UML de casos de uso**, no UML estricto: Mermaid no
 ofrece ese tipo de diagrama y se emplean nodos de `flowchart` con la semántica que se
-explica a continuación. Los límites rectangulares representan el sistema; los actores
-quedan fuera. Las asociaciones
-muestran quién inicia un objetivo y no equivalen a permisos individuales. Ventas no es
+explica a continuación. Los límites rectangulares representan el sistema. Cada actor se
+muestra fuera de esos límites como un clasificador con el estereotipo UML `«actor»`; se
+usa esta notación alternativa a la figura humana porque Mermaid no incorpora actores en
+`flowchart`. Las asociaciones muestran quién inicia un objetivo y no equivalen a
+permisos individuales. Ventas no es
 actor: el área no tiene acceso. Tampoco se asignan salidas a otras áreas solicitantes;
 su participación futura queda pendiente de definición.
 
 Los participantes, precondiciones, garantías, pasos, alternativas y excepciones de cada
 objetivo se detallan por tema en el
 [catálogo de descripciones de casos de uso](use-case-descriptions.md).
-El diagrama conserva únicamente la vista visual para no duplicar esas descripciones.
+La vista se divide en bloques por grupo funcional para mantenerla legible. Estos bloques
+no son paquetes UML ni paquetes documentales: el único límite de sistema es Nexus. Cada
+bloque conserva los actores fuera del sistema y muestra una sola vez los casos que le
+pertenecen; juntos forman el diagrama de casos de uso.
+
+### Grupo funcional IDA — Identidad y acceso
 
 ```mermaid
 flowchart LR
-    warehouse["Personal de almacén"]
-    admin["Administración del sistema"]
-    catalogOperator["Personal autorizado del catálogo"]
+    admin["«actor»<br/>Administrador del sistema (área Sistemas)"]
 
-    subgraph nexus["Nexus"]
-      subgraph identityPackage["Paquete IDA: Identidad y acceso"]
+    subgraph identityPackage["Nexus · Grupo funcional IDA: Identidad y acceso"]
         ucIdentityQuery(["CU-IDA-01 Consultar identidades y accesos"])
         ucPersonCreate(["CU-IDA-02 Crear persona"])
         ucPersonEdit(["CU-IDA-03 Editar persona"])
         ucUserCreate(["CU-IDA-04 Crear usuario y asignar acceso"])
         ucUserEdit(["CU-IDA-05 Editar usuario o cambiar contraseña"])
-      end
-      subgraph catalogPackage["Paquete CAT: Catálogos"]
+    end
+
+    admin --- ucIdentityQuery
+    admin --- ucPersonCreate
+    admin --- ucPersonEdit
+    admin --- ucUserCreate
+    admin --- ucUserEdit
+```
+
+### Grupo funcional CAT — Catálogos
+
+```mermaid
+flowchart LR
+    warehouse["«actor»<br/>Personal de almacén (área Almacén y proveduría)"]
+    admin["«actor»<br/>Administrador del sistema (área Sistemas)"]
+
+    subgraph catalogPackage["Nexus · Grupo funcional CAT: Catálogos"]
         ucCatalogQuery(["CU-CAT-01 Consultar catálogos"])
         ucCatalogCreate(["CU-CAT-02 Crear registro de catálogo"])
         ucCatalogEdit(["CU-CAT-03 Editar registro de catálogo"])
         ucCatalogRemove(["CU-CAT-04 Eliminar o cambiar estado de registro"])
-      end
-      subgraph receiptPackage["Paquete ENT: Entradas"]
+    end
+
+    warehouse ---|catálogo operativo| ucCatalogQuery
+    warehouse ---|catálogo operativo| ucCatalogCreate
+    warehouse ---|catálogo operativo| ucCatalogEdit
+    warehouse ---|catálogo operativo| ucCatalogRemove
+    admin ---|catálogo contextual| ucCatalogQuery
+    admin ---|catálogo contextual| ucCatalogCreate
+    admin ---|catálogo contextual| ucCatalogEdit
+    admin ---|catálogo contextual| ucCatalogRemove
+```
+
+### Grupo funcional ENT — Entradas
+
+```mermaid
+flowchart LR
+    warehouse["«actor»<br/>Personal de almacén (área Almacén y proveduría)"]
+
+    subgraph receiptPackage["Nexus · Grupo funcional ENT: Entradas"]
         ucReceiptQuery(["CU-ENT-01 Consultar entradas"])
         ucReceiptCreate(["CU-ENT-02 Registrar entrada"])
         ucReceiptEdit(["CU-ENT-03 Editar entrada"])
         ucReceiptCorrect(["CU-ENT-04 Corregir detalle de entrada"])
         ucReceiptCancel(["CU-ENT-05 Cancelar detalle de entrada"])
-      end
-      subgraph issuePackage["Paquete SAL: Salidas"]
+    end
+
+    warehouse --- ucReceiptQuery
+    warehouse --- ucReceiptCreate
+    warehouse --- ucReceiptEdit
+    warehouse --- ucReceiptCorrect
+    warehouse --- ucReceiptCancel
+```
+
+### Grupo funcional SAL — Salidas
+
+```mermaid
+flowchart LR
+    warehouse["«actor»<br/>Personal de almacén (área Almacén y proveduría)"]
+
+    subgraph issuePackage["Nexus · Grupo funcional SAL: Salidas"]
         ucIssueQuery(["CU-SAL-01 Consultar salidas"])
         ucIssueCreate(["CU-SAL-02 Crear salida"])
         ucIssueHeader(["CU-SAL-03 Editar encabezado de salida"])
         ucIssueDetails(["CU-SAL-04 Ajustar detalles de salida"])
         ucSupply(["CU-SAL-05 Surtir detalle"])
         ucReturn(["CU-SAL-06 Devolver detalle surtido"])
-      end
-      subgraph reportPackage["Paquete REP: Consultas y reportes"]
-        ucMovements(["CU-REP-01 Consultar movimientos e inventario"])
-        ucReports(["CU-REP-02 Generar reporte"])
-      end
     end
 
-    catalogOperator --- ucCatalogQuery
-    catalogOperator --- ucCatalogCreate
-    catalogOperator --- ucCatalogEdit
-    catalogOperator --- ucCatalogRemove
-    warehouse --- ucReceiptQuery
-    warehouse --- ucReceiptCreate
-    warehouse --- ucReceiptEdit
-    warehouse --- ucReceiptCorrect
-    warehouse --- ucReceiptCancel
     warehouse --- ucIssueQuery
     warehouse --- ucIssueCreate
     warehouse --- ucIssueHeader
     warehouse --- ucIssueDetails
     warehouse --- ucSupply
     warehouse --- ucReturn
-    warehouse --- ucMovements
-    warehouse --- ucReports
-    admin --- ucIdentityQuery
-    admin --- ucPersonCreate
-    admin --- ucPersonEdit
-    admin --- ucUserCreate
-    admin --- ucUserEdit
-    admin --- ucMovements
-    admin --- ucReports
-    ucSupply -.->|incluye existencia y movimiento| ucMovements
-    ucReturn -.->|incluye reversión y movimiento| ucMovements
 ```
 
-Cada paquete conserva el código definido en el catálogo y cada caso usa el formato
-`CU-<PAQUETE>-<SECUENCIA>`. Los identificadores son los mismos del catálogo operativo y
-permiten pasar de cada objetivo visual a su descripción y a su diagrama de flujo específico en
-[Diagramas de requisitos](requirements-diagrams.md#flujos-de-cada-caso-de-uso). No se
-usa «administrar» o «mantener» como objetivo: cada óvalo expresa una operación observable.
+### Grupo funcional REP — Consultas y reportes
 
-Los paquetes son límites de lectura, no permisos. Administración del sistema conserva el
-alcance que conceden las políticas vigentes; almacén sólo opera entradas, inventario y
-salidas autorizadas. Las demás áreas aparecen únicamente cuando una política de lectura o
-el encabezado de una salida lo permite. Consultar un catálogo desde un `combobox` es una
-capacidad auxiliar de lectura y no un caso de uso independiente: debe autorizarse en el
-servidor, pero no se asocia como si el actor mantuviera el catálogo. Dirección no se dibuja
-con acceso total porque esa regla aún no existe de manera uniforme en las políticas.
+```mermaid
+flowchart LR
+    warehouse["«actor»<br/>Personal de almacén (área Almacén y proveduría)"]
+    admin["«actor»<br/>Administrador del sistema (área Sistemas)"]
+    management["«actor»<br/>Director (área Dirección)"]
+
+    subgraph reportPackage["Nexus · Grupo funcional REP: Consultas y reportes"]
+        ucMovements(["CU-REP-01 Consultar movimientos e inventario"])
+        ucReports(["CU-REP-02 Generar reporte"])
+    end
+
+    warehouse --- ucMovements
+    warehouse --- ucReports
+    admin --- ucMovements
+    admin --- ucReports
+    management --- ucMovements
+    management --- ucReports
+```
+
+`CU-SAL-05` actualiza la existencia y registra el movimiento como parte de su propio
+flujo; `CU-SAL-06` registra la reversión y el movimiento inverso. No existe una relación
+`«include»` con `CU-REP-01`: consultar movimientos es otro objetivo iniciado por un
+actor, mientras registrar un movimiento es una responsabilidad interna de Nexus. Por la
+misma razón, compartir servicios entre grupos no se representa como salto, inclusión o
+extensión entre casos de uso.
+
+Los actores vigentes son **Personal de almacén** del área Almacén y proveduría,
+**Administrador del sistema** del área Sistemas, y **Director** del área Dirección. En
+`CAT`, almacén inicia operaciones sobre catálogos operativos y administración sobre los
+contextuales; en `REP`, cada actor consulta sólo el alcance autorizado. Solicitantes,
+aprobadores, asesores y proveedores participan como roles o entidades del negocio, pero
+no se dibujan como actores porque no inician estos casos mediante acceso a Nexus.
+
+Cada caso pertenece a un único grupo funcional; no quedan casos sueltos dentro del
+límite de Nexus. Cada grupo conserva el código definido en el catálogo y cada caso usa
+el formato `CU-<GRUPO>-<SECUENCIA>`. Los identificadores son los mismos del catálogo
+operativo y permiten pasar de cada objetivo visual a su descripción y a su diagrama de
+flujo específico en
+[Diagramas de requisitos](requirements-diagrams.md#flujos-de-cada-caso-de-uso).
+No se usa «administrar» o «mantener» como objetivo: cada óvalo expresa una operación
+observable.
+
+Los grupos son ayudas de lectura, no límites del sistema ni permisos. El Administrador
+del sistema del área Sistemas conserva el alcance que conceden las políticas
+vigentes; el Personal de almacén sólo opera entradas, inventario y salidas autorizadas.
+Las demás áreas aparecen
+únicamente cuando una política de lectura o el encabezado de una salida lo permite.
+Consultar un catálogo desde un `combobox` es una capacidad auxiliar de lectura y no un
+caso de uso independiente: debe autorizarse en el servidor, pero no se asocia como si el
+actor mantuviera el catálogo. Dirección no se dibuja con acceso total porque esa regla
+aún no existe de manera uniforme en las políticas.
 
 Los casos de uso son objetivos del actor, no módulos de código. Por ello **no se requiere
 crear una carpeta `useCases` ni renombrar los dominios existentes**. La trazabilidad se

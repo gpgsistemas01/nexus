@@ -59,7 +59,7 @@ individuales ni una secuencia técnica.
 
 ```mermaid
 flowchart LR
-    warehouse["Personal de almacén y proveeduría<br/>Actor operativo"]
+    warehouse["Personal de almacén y proveduría<br/>Actor operativo"]
     administration["Administración del sistema<br/>Actor administrativo"]
     management["Coordinación y dirección<br/>Parte interesada de supervisión"]
     nexus["Nexus<br/>Sistema de control operativo"]

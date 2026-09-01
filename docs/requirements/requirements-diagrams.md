@@ -99,13 +99,13 @@ diagramas de secuencia o estados se reservan para explicar coordinación adicion
 
 ## Flujos de cada caso de uso
 
-Cada carril comienza con un identificador `CU-<PAQUETE>-<SECUENCIA>` y representa
-exclusivamente ese objetivo. Los encabezados conservan los mismos paquetes y códigos del
+Cada carril comienza con un identificador `CU-<GRUPO>-<SECUENCIA>` y representa
+exclusivamente ese objetivo. Los encabezados conservan los mismos grupos funcionales y códigos del
 catálogo; las familias sólo reúnen carriles que reutilizan validación o persistencia y
 no son casos de uso. Las flechas son pasos observables, no endpoints. La fuente curada es el
 [catálogo operativo](use-case-descriptions.md#catálogo-operativo-y-granularidad).
 
-### Paquete IDA — Identidad y acceso
+### Grupo funcional IDA — Identidad y acceso
 
 ```mermaid
 flowchart LR
@@ -116,7 +116,7 @@ flowchart LR
     iam05["CU-IDA-05 Editar usuario o contraseña"] --> iam05v["Validar cuenta, acceso o credencial"] --> iam05p["Actualizar asignación o contraseña cifrada"]
 ```
 
-### Paquete CAT — Catálogos operativos y contextuales
+### Grupo funcional CAT — Catálogos
 
 ```mermaid
 flowchart LR
@@ -132,7 +132,7 @@ flowchart LR
 recurso lo permite. Cliente, proveedor, material y merma conservan sus validaciones y
 política de eliminación o estado como configuración contextual.
 
-### Paquete ENT — Entradas y correcciones
+### Grupo funcional ENT — Entradas
 
 ```mermaid
 flowchart LR
@@ -143,7 +143,7 @@ flowchart LR
     rec05["CU-ENT-05 Cancelar detalle"] --> rec05v["Validar estado, stock y motivo"] --> rec05t["Revertir stock y registrar cancelación"]
 ```
 
-### Paquete SAL — Salidas, ajuste, surtimiento y devolución
+### Grupo funcional SAL — Salidas
 
 ```mermaid
 flowchart LR
@@ -159,7 +159,7 @@ Los seis carriles se aplican a material o merma cuando la operación existe. Se 
 el proceso y cambia el adaptador de inventario, conversión y validación; no se inventa un
 segundo caso únicamente por el contexto.
 
-### Paquete REP — Consultas y reportes
+### Grupo funcional REP — Consultas y reportes
 
 ```mermaid
 flowchart LR
