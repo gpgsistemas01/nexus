@@ -337,23 +337,291 @@ uno dispone de un diagrama independiente. Una operación nueva requiere un ident
 y una vista propios; una variante técnica interna
 no se convierte por sí sola en caso de uso.
 
-## Casos que requieren atención visual adicional
+## Casos con vistas adicionales y nivel de coordinación
 
 La necesidad de otra vista se evaluó con cuatro señales: **cantidad de decisiones de
 negocio**, **escrituras coordinadas**, **cambio de estado o acumulados** y **efecto que
-debe revertirse ante un fallo**. La prioridad no mide importancia del módulo; indica
-cuánto contexto se perdería si sólo se conservara la actividad individual resumida.
+debe revertirse ante un fallo**. Como todos los casos ya tienen un flujo funcional y una
+vista técnica, **no se asigna una prioridad visual**: la cobertura no depende de atender
+primero un caso. El nivel sólo clasifica la coordinación que debe conservar cada vista y
+ayuda a elegir entre actividad, secuencia, decisión o máquina de estados cuando cambie
+el código.
 
-| Atención | Casos revisados | Motivo | Vista aplicada |
+| Nivel de coordinación | Casos revisados | Motivo | Vista aplicada |
 | --- | --- | --- | --- |
-| Alta | `CU-IDA-04`, `CU-IDA-05` | Contraseña cifrada, persona opcional y asignación rol/departamento; al editar se reemplaza la asignación dentro de una transacción. | Secuencia de identidad y acceso incluida abajo. |
-| Alta | `CU-CAT-04` para material | La historia operativa impide eliminar; si quedan otros proveedores sólo se retira la relación proveedor-material. | Decisión de eliminación incluida abajo. |
-| Alta | `CU-ENT-02` | Referencia, documento, detalles, stock y movimientos se confirman juntos; el costo se revisa después del commit. | Secuencia de registro incluida abajo. |
-| Alta | `CU-ENT-04`, `CU-ENT-05` | Corrección/cancelación altera historia, totales, stock y movimiento. | Secuencia atómica ya incluida en este documento. |
-| Alta | `CU-SAL-05`, `CU-SAL-06` | Acumulados, estados, existencias y movimientos dependen de cantidades previas. | Máquina de estados ya incluida en este documento. |
-| Alta | `CU-REP-02` | Filtros, variantes mensual/detallada, fórmulas, totales y archivo deben conservar el mismo resultado de dominio. | Canal de generación de reportes incluido abajo. |
-| Media | `CU-CAT-02`, `CU-CAT-03`, `CU-ENT-03`, `CU-SAL-02` a `CU-SAL-04` | Coordinan relaciones o detalles, pero no agregan participantes o estados que justifiquen una secuencia. | Diagrama de actividad independiente para cada caso incluido en su grupo funcional. |
-| Baja | `CU-IDA-01` a `CU-IDA-03`, `CU-CAT-01`, `CU-ENT-01`, `CU-SAL-01`, `CU-REP-01` | Consulta o mutación directa sin estados coordinados adicionales. | Diagrama de actividad independiente para cada caso incluido en su grupo funcional. |
+| Compleja | `CU-IDA-04`, `CU-IDA-05` | Contraseña cifrada, persona opcional y asignación rol/departamento; al editar se reemplaza la asignación dentro de una transacción. | Secuencia de identidad y acceso incluida abajo. |
+| Compleja | `CU-CAT-04` para material | La historia operativa impide eliminar; si quedan otros proveedores sólo se retira la relación proveedor-material. | Decisión de eliminación incluida abajo. |
+| Compleja | `CU-ENT-02` | Referencia, documento, detalles, stock y movimientos se confirman juntos; el costo se revisa después del commit. | Secuencia de registro incluida abajo. |
+| Compleja | `CU-ENT-04`, `CU-ENT-05` | Corrección/cancelación altera historia, totales, stock y movimiento. | Secuencia atómica ya incluida en este documento. |
+| Compleja | `CU-SAL-05`, `CU-SAL-06` | Acumulados, estados, existencias y movimientos dependen de cantidades previas. | Máquina de estados ya incluida en este documento. |
+| Compleja | `CU-REP-02` | Filtros, variantes mensual/detallada, fórmulas, totales y archivo deben conservar el mismo resultado de dominio. | Canal de generación de reportes incluido abajo. |
+| Intermedia | `CU-CAT-02`, `CU-CAT-03`, `CU-ENT-03`, `CU-SAL-02` a `CU-SAL-04` | Coordinan relaciones o detalles, pero no agregan participantes o estados que justifiquen una secuencia transaccional. | Flujo funcional en su grupo y vista técnica complementaria incluida abajo. |
+| Directa | `CU-IDA-01` a `CU-IDA-03`, `CU-CAT-01`, `CU-ENT-01`, `CU-SAL-01`, `CU-REP-01` | Consulta o mutación directa sin estados coordinados adicionales. | Flujo funcional en su grupo y vista técnica complementaria incluida abajo. |
+
+Las vistas siguientes completan los casos de coordinación intermedia y directa con el
+mismo criterio aplicado a los casos de coordinación compleja: muestran la ejecución
+entre capas y nombran el punto que el flujo funcional resumido no alcanza a representar.
+No sustituyen los diagramas individuales anteriores; los complementan con una lectura
+orientada al código.
+
+### Consultar identidades y accesos — `CU-IDA-01`
+
+```mermaid
+sequenceDiagram
+    actor Admin as Administración
+    participant Route as personApiRoute / userApiRoute
+    participant Auth as Autenticación y permiso
+    participant Controller as personController / userController
+    participant Service as personService / userService
+    participant Db as Prisma
+
+    Admin->>Route: solicitar listado con filtros
+    Route->>Auth: verificar token y permiso del recurso
+    Auth->>Controller: petición autorizada
+    Controller->>Service: consulta normalizada
+    Service->>Db: buscar y contar registros
+    Db-->>Service: página y total
+    Service-->>Controller: resultado autorizado
+    Controller-->>Admin: respuesta paginada
+```
+
+Personas y usuarios son consultas separadas y conservan permisos, filtros y forma de
+respuesta propios. La vista omite el montaje completo de la URL, que permanece en el
+mapa generado, y no implica que una consulta entregue credenciales.
+
+### Crear persona — `CU-IDA-02`
+
+```mermaid
+sequenceDiagram
+    actor Admin as Administración
+    participant Route as personApiRoute
+    participant Validation as personValidation
+    participant Controller as personController
+    participant Service as personService
+    participant Db as Prisma
+
+    Admin->>Route: POST con datos de persona
+    Route->>Validation: validar campos e identidad
+    Validation->>Controller: datos admitidos
+    Controller->>Service: registrar persona
+    Service->>Db: comprobar identidad y crear
+    Db-->>Service: persona creada
+    Service-->>Controller: resultado de dominio
+    Controller-->>Admin: confirmación
+```
+
+La validación de transporte ocurre antes del controller y la regla de identidad se
+conserva en el servicio. El refresco del listado del diagrama funcional sucede en el
+navegador después de esta respuesta y no es otra escritura.
+
+### Editar persona — `CU-IDA-03`
+
+```mermaid
+sequenceDiagram
+    actor Admin as Administración
+    participant Route as personApiRoute
+    participant Validation as personValidation
+    participant Controller as personController
+    participant Service as personService
+    participant Db as Prisma
+
+    Admin->>Route: PUT /:id con cambios
+    Route->>Validation: validar campos editables
+    Validation->>Controller: petición válida
+    Controller->>Service: editar persona identificada
+    Service->>Db: comprobar existencia e identidad
+    Service->>Db: actualizar campos admitidos
+    Db-->>Service: persona actualizada
+    Service-->>Controller: resultado de dominio
+    Controller-->>Admin: confirmación
+```
+
+La secuencia hace visible que la existencia y la identidad no se confían al formulario.
+No muestra componentes EJS ni refresco de DataTable porque pertenecen a la presentación,
+no a la actualización de dominio.
+
+### Consultar catálogos — `CU-CAT-01`
+
+```mermaid
+flowchart LR
+    catalogRoute["Router del catálogo<br/>GET y permiso"] --> catalogController["Controller de listado<br/>configuración del recurso"]
+    catalogController --> listFactory["createDataTableListController<br/>normalizar paginación y filtros"]
+    listFactory --> catalogService["Servicio del catálogo<br/>buscar y contar"]
+    catalogService --> catalogDb[("Prisma")]
+    catalogDb --> catalogResponse["Página del recurso"]
+```
+
+La fábrica de listado se reutiliza cuando el recurso la configura; el diagrama no afirma
+que todos los catálogos compartan filtros o permisos. Los routers y servicios concretos
+siguen siendo las fuentes verificables de cada variante.
+
+### Crear registro de catálogo — `CU-CAT-02`
+
+```mermaid
+flowchart LR
+    catalogCreateRoute["POST del recurso<br/>validación y permiso"] --> catalogCreateController["Controller<br/>adaptar cuerpo"]
+    catalogCreateController --> catalogCreateService["Servicio del recurso<br/>validar identidad y relaciones"]
+    catalogCreateService --> catalogCreateDb[("Prisma<br/>crear registro")]
+    catalogCreateDb --> catalogCreateUi["Respuesta y refresco CRUD"]
+```
+
+Cliente, proveedor, material, merma y catálogos auxiliares recorren capas equivalentes,
+pero sus relaciones y reglas no se trasladan a una fábrica común. El refresco final es
+una reacción de `createCrudApplication`, no parte de la transacción de persistencia.
+
+### Editar registro de catálogo — `CU-CAT-03`
+
+```mermaid
+flowchart LR
+    catalogEditRoute["PUT o PATCH del recurso<br/>validación y permiso"] --> catalogEditController["Controller<br/>identificador y cambios"]
+    catalogEditController --> catalogEditService["Servicio del recurso<br/>existencia · identidad · relaciones"]
+    catalogEditService --> catalogEditDb[("Prisma<br/>actualizar")]
+    catalogEditDb --> catalogEditUi["Respuesta y refresco CRUD"]
+```
+
+El método HTTP y los campos editables dependen del router concreto. La vista sólo
+reutiliza la cadena estable de capas y no supone que crear y editar tengan exactamente
+las mismas validaciones.
+
+### Consultar entradas — `CU-ENT-01`
+
+```mermaid
+sequenceDiagram
+    actor Warehouse as Almacén
+    participant Route as goodsReceiptApiRoute
+    participant Controller as goodsReceiptController
+    participant Service as goodsReceiptService
+    participant Db as Prisma
+
+    Warehouse->>Route: GET con búsqueda, fechas y relaciones
+    Route->>Route: verificar token y permiso
+    Route->>Controller: consulta autorizada
+    Controller->>Service: filtros y paginación
+    Service->>Db: consultar entradas y total
+    Db-->>Service: página con relaciones
+    Service-->>Controller: resultado de consulta
+    Controller-->>Warehouse: resultado serializado
+```
+
+La consulta no abre la transacción documental ni recalcula inventario. Los totales y
+relaciones devueltos son proyecciones de lectura; el dibujo funcional los agrupa bajo
+«mostrar página».
+
+### Editar entrada — `CU-ENT-03`
+
+```mermaid
+sequenceDiagram
+    actor Warehouse as Almacén
+    participant Route as goodsReceiptApiRoute
+    participant Validation as goodsReceiptHeaderValidation
+    participant Controller as goodsReceiptController
+    participant Service as goodsReceiptService
+    participant Db as Prisma
+
+    Warehouse->>Route: PATCH /:id con encabezado
+    Route->>Validation: validar campos admitidos
+    Validation->>Controller: petición válida y autorizada
+    Controller->>Service: actualizar encabezado
+    Service->>Db: comprobar entrada y persistir cambios
+    Db-->>Service: entrada actualizada
+    Service-->>Controller: resultado de dominio
+    Controller-->>Warehouse: confirmación
+```
+
+La ruta vigente edita el encabezado y no vuelve a aplicar el stock de detalles ya
+registrados. Agregar o corregir detalles usa operaciones distintas, por lo que no se
+representan como efectos implícitos de esta secuencia.
+
+### Consultar salidas — `CU-SAL-01`
+
+```mermaid
+flowchart LR
+    issueContext{"¿Material o merma?"}
+    issueContext --> goodsIssueRoute["goodsIssueApiRoute<br/>GET y permiso"]
+    issueContext --> wasteIssueRoute["wasteIssueApiRoute<br/>GET y permiso"]
+    goodsIssueRoute --> goodsIssueService["goodsIssueService<br/>filtros y estados"]
+    wasteIssueRoute --> wasteIssueService["wasteIssueService<br/>filtros y estados"]
+    goodsIssueService --> issuePage["Página de salidas"]
+    wasteIssueService --> issuePage
+```
+
+La bifurcación es técnica además de funcional: cada contexto conserva router, permiso,
+servicio e inventario propios. Compartir el resultado visual no significa consultar una
+tabla o conversión única.
+
+### Crear salida — `CU-SAL-02`
+
+```mermaid
+sequenceDiagram
+    actor Warehouse as Almacén
+    participant Route as Router de salida del contexto
+    participant Validation as Validador de material o merma
+    participant Controller as Controller del contexto
+    participant Service as Servicio de salida
+    participant Db as Prisma
+
+    Warehouse->>Route: POST con encabezado y detalles
+    Route->>Validation: validar relaciones y cantidades
+    Validation->>Controller: DTO admitido y autorizado
+    Controller->>Service: registrar salida
+    Service->>Db: crear documento y detalles pendientes
+    Db-->>Service: salida creada
+    Service-->>Controller: resultado de dominio
+    Controller-->>Warehouse: confirmación sin movimiento
+```
+
+Crear la salida no descuenta inventario ni registra el movimiento de surtimiento. Esos
+efectos comienzan al confirmar detalles en `CU-SAL-05`, aunque la interfaz presente ambos
+pasos dentro del mismo módulo.
+
+### Editar encabezado de salida — `CU-SAL-03`
+
+```mermaid
+flowchart LR
+    issueHeaderRoute["PATCH /:id/header<br/>validación y permiso"] --> issueHeaderController["Controller del contexto"]
+    issueHeaderController --> issueHeaderContext["goodsIssueService o wasteIssueService"]
+    issueHeaderContext --> issueHeaderRules["issueHeaderService<br/>resolver campos admitidos"]
+    issueHeaderRules --> issueHeaderDb[("Prisma<br/>actualizar encabezado")]
+    issueHeaderDb --> issueHeaderResult["Respuesta sin efecto de inventario"]
+```
+
+`issueHeaderService` concentra la resolución compartida del encabezado y cada servicio
+contextual conserva sus relaciones. La ruta general `PATCH /:id` es otra entrada del
+contrato y no convierte esta edición en surtimiento.
+
+### Ajustar detalles de salida — `CU-SAL-04`
+
+```mermaid
+flowchart LR
+    issueDetailRoute["PATCH /:id/details<br/>permiso de detalles"] --> issueDetailValidation["Validar cantidades y estado"]
+    issueDetailValidation --> issueDetailService["Servicio contextual<br/>comparar detalles vigentes"]
+    issueDetailService --> issueDetailDecision{"¿Sólo ajustar o<br/>confirmar surtimiento?"}
+    issueDetailDecision -->|ajustar| issueDetailDb[("Actualizar detalles")]
+    issueDetailDecision -->|confirmar| issueSupply["Aplicar reglas de CU-SAL-05"]
+    issueDetailDb --> issueDetailStatus["Derivar estado del documento"]
+    issueSupply --> issueDetailStatus
+```
+
+No existe una URL `/supply`: en material, la misma entrada de detalles puede confirmar
+el surtimiento según el estado y los datos recibidos. La rama de confirmación continúa
+en la máquina de estados y en la transacción de `CU-SAL-05`; no se duplica aquí.
+
+### Consultar movimientos e inventario — `CU-REP-01`
+
+```mermaid
+flowchart TB
+    reportReadContext{"¿Movimientos o inventario?"}
+    reportReadContext --> movementRoute["movementApiRoute<br/>permiso administrativo"]
+    reportReadContext --> inventoryController["Consulta de inventario<br/>permiso de almacén"]
+    movementRoute --> movementQuery["movementQueryService<br/>material o merma"]
+    inventoryController --> inventoryQuery["reportService de inventario<br/>existencias y relaciones"]
+    movementQuery --> reportReadResult["Página, filtros y total"]
+    inventoryQuery --> reportReadResult
+```
+
+Movimientos e inventario son modelos de lectura diferentes y sólo comparten el objetivo
+de consulta. Esta vista no incluye Excel: la exportación agrega transformación, columnas
+y fórmulas y pertenece a `CU-REP-02`.
 
 ### Crear o editar usuario y acceso — `CU-IDA-04`, `CU-IDA-05`
 

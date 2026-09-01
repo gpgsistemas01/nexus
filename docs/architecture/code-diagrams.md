@@ -157,8 +157,35 @@ El código confirma varias coordinaciones que no se entienden sólo con el diagr
 | Surtir o devolver detalle de salida | Servicios de salidas de material/merma, reglas de cumplimiento y movimientos. | [Máquina de estados](../requirements/requirements-diagrams.md#estados-de-surtimiento-y-devolución). |
 | Generar reporte Excel | Controllers de reporte, servicios de consulta y `reportExcelUtils.js`. | [Canal de generación](../requirements/requirements-diagrams.md#generar-reporte--cu-rep-02). |
 
-No se duplican aquí esas vistas: combinan reglas de casos de atención alta con evidencia
+No se duplican aquí esas vistas: combinan reglas de coordinación compleja con evidencia
 del código, por lo que su fuente normativa sigue siendo la documentación de requisitos.
+
+### 4.3 Resultado de la revisión de trazabilidad diagrama–código
+
+La revisión del código no justifica crear otra familia de diagramas: contexto,
+estructura, interacción, reutilización, casos de uso, actividades, secuencias, estados y
+datos ya tienen una vista canónica. Sí requiere conservar los siguientes enlaces y
+aclaraciones técnicas para que una etiqueta funcional no se confunda con una ruta, una
+función o un estado persistido:
+
+| Vista o casos | Entrada HTTP verificable | Coordinación que sustenta el diagrama | Aclaración técnica |
+| --- | --- | --- | --- |
+| `CU-IDA-01` a `CU-IDA-05` | `src/routes/api/admin/personApiRoute.js`, `userApiRoute.js`, `roleApiRoute.js` y `departmentApiRoute.js` | `src/services/admin/person/personService.js` y `src/services/admin/userService.js` | Crear/editar acceso y cambiar contraseña son variantes del objetivo de identidad; la transacción y el cifrado pertenecen al servicio, no al actor del diagrama. |
+| `CU-CAT-01` a `CU-CAT-04` | Routers de cliente bajo `sales` y de proveedor, material, merma y catálogos de sólo lectura bajo `warehouse` | Servicios homónimos y `src/services/warehouse/materials/supplierMaterialService.js` | El grupo funcional reúne recursos con el patrón CRUD, pero no implica que todos admitan `DELETE` o cambio de estado. |
+| `CU-ENT-01` a `CU-ENT-05` | `src/routes/api/warehouse/goodsReceiptApiRoute.js` | `goodsReceiptService.js` y `goodsReceipts/detailChanges/*Service.js` | Corrección y cancelación son rutas `PATCH` distintas; el recálculo de costo posterior al commit queda fuera de la transacción mostrada. |
+| `CU-SAL-01` a `CU-SAL-06` | `goodsIssueApiRoute.js` y `wasteIssueApiRoute.js` | Servicios de `goodsIssues`, `wasteIssues`, sus `detailReturns` y `issueFulfillmentRules.js` | **Surtir no tiene un endpoint `/supply`:** se confirma mediante `PATCH /:id/details`; devolver usa `PATCH /:id/details/:detailId/returns`. La acción funcional y la URL no deben igualarse por nombre. |
+| Estados de salidas | Las mismas rutas de detalle y devolución | `src/constants/warehouseStatuses.js`, `issueFulfillmentRules.js` y reglas específicas | Los valores persistidos son `Pendiente`, `Surtido parcial`, `Surtido` y `Cancelado`; crear/editar/surtir/devolver son operaciones, no estados. |
+| `CU-REP-01` y `CU-REP-02` | Routers de reporte de `admin`, `sales` y `warehouse` | Servicios de reporte y `src/utils/reportExcelUtils.js` | Consultar y exportar reutilizan filtros, pero cada reporte conserva permiso, columnas y transformación propios. |
+| Entidades y cardinalidades | No aplica a una ruta individual | `prisma/schema.prisma` | El ER y el diccionario son generados; una relación Prisma no prueba que exista un flujo HTTP completo. |
+
+Para seguir una fila hasta método y URL exactos se usa el
+[mapa generado](../generated/code-map.md); para seguirla hasta permiso y estado de
+implementación se usa la
+[matriz de operaciones](../requirements/requirements-operations-matrix.md). Las pruebas
+no se inventan a partir del dibujo: la cobertura existente y sus faltantes se mantienen
+en el [plan de pruebas](../testing/test-plan.md). Así, cada enlace tiene una sola fuente
+de verdad y una brecha de cobertura permanece visible en vez de presentarse como
+evidencia inexistente.
 
 ## 5. Vista de reutilización: CRUD e interfaz
 
