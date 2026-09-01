@@ -82,15 +82,15 @@ La [matriz de operaciones](requirements-operations-matrix.md) resume las capacid
 permitidas por módulo y contexto, incluidas las parciales o modeladas. La autorización
 efectiva continúa determinada por los permisos del servidor, no por la matriz.
 
-## 3. Actores y alcance de acceso
+## 3. Actores y responsabilidad del sistema
 
-| Actor | Responsabilidad |
+| Participante | Responsabilidad |
 | --- | --- |
-| Personal de almacén | Mantener catálogos operativos y ejecutar entradas, salidas, devoluciones y ajustes autorizados. |
+| Personal de almacén (área Almacén y proveduría) | Mantener catálogos operativos y ejecutar entradas, salidas, devoluciones y ajustes autorizados. |
 | Solicitante o aprobador | Participar en documentos operativos de acuerdo con su rol y departamento. |
-| Administración del sistema | Mantener clientes como catálogo contextual; ventas no accede al sistema. |
-| Administración | Mantener personas, usuarios y accesos; consultar auditoría y reportes permitidos. |
-| Sistema | Validar, persistir atómicamente, numerar documentos, auditar escrituras críticas y notificar actualizaciones. |
+| Administrador del sistema (área Sistemas) | Mantener clientes como catálogo contextual, personas, usuarios y accesos; consultar auditoría y reportes permitidos. Ventas no accede al sistema. |
+| Director (área Dirección) | Consultar trazabilidad, inventario, reportes e indicadores dentro del alcance autorizado. |
+| Nexus (sistema) | Validar, persistir atómicamente, numerar documentos, auditar escrituras críticas y notificar actualizaciones; es participante interno, no actor externo. |
 
 Los nombres de actor expresan responsabilidades, no conceden acceso por sí mismos. La
 autorización efectiva se calcula con las asignaciones de usuario, rol y departamento
