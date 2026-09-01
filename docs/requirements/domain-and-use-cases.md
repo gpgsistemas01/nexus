@@ -74,7 +74,8 @@ objetivo se detallan por tema en el
 La vista se divide en bloques por grupo funcional para mantenerla legible. Estos bloques
 no son paquetes UML ni paquetes documentales: el único límite de sistema es Nexus. Cada
 bloque conserva los actores fuera del sistema y muestra una sola vez los casos que le
-pertenecen; juntos forman el diagrama de casos de uso.
+pertenecen; juntos forman el diagrama de casos de uso. Los actores concretos se
+generalizan mediante un actor abstracto cuando comparten las mismas asociaciones.
 
 Se conservan los cinco grupos funcionales porque representan capacidades estables del
 negocio y coinciden con la trazabilidad normativa existente: identidad y acceso,
@@ -111,14 +112,14 @@ flowchart LR
     end
 
     admin --- ucPersonQuery
-    admin --- ucPersonCreate
-    admin --- ucPersonEdit
     admin --- ucUserQuery
-    admin --- ucUserCreate
-    admin --- ucUserEdit
-    admin --- ucPasswordEdit
     admin --- ucRoleQuery
     admin --- ucDepartmentQuery
+    ucPersonQuery --- ucPersonCreate
+    ucPersonQuery --- ucPersonEdit
+    ucUserQuery --- ucUserCreate
+    ucUserQuery --- ucUserEdit
+    ucUserQuery --- ucPasswordEdit
 ```
 
 ### Grupo funcional CAT — Catálogos
@@ -163,25 +164,25 @@ flowchart LR
     end
 
     warehouse --- ucMaterialQuery
-    warehouse --- ucMaterialCreate
-    warehouse --- ucMaterialEdit
-    warehouse --- ucMaterialRemove
-    warehouse --- ucMaterialStock
     warehouse --- ucSupplierQuery
-    warehouse --- ucSupplierCreate
-    warehouse --- ucSupplierEdit
     warehouse --- ucWasteQuery
-    warehouse --- ucWasteCreate
-    warehouse --- ucWasteEdit
-    warehouse --- ucWasteStock
     warehouse --- ucPresentationQuery
     warehouse --- ucUnitQuery
     warehouse --- ucAdjustmentReasonQuery
     warehouse --- ucFulfillmentStatusQuery
-    warehouse --- ucSupplierStatus
     admin --- ucClientQuery
-    admin --- ucClientCreate
-    admin --- ucClientEdit
+    ucMaterialQuery --- ucMaterialCreate
+    ucMaterialQuery --- ucMaterialEdit
+    ucMaterialQuery --- ucMaterialRemove
+    ucMaterialQuery --- ucMaterialStock
+    ucSupplierQuery --- ucSupplierCreate
+    ucSupplierQuery --- ucSupplierEdit
+    ucSupplierQuery --- ucSupplierStatus
+    ucClientQuery --- ucClientCreate
+    ucClientQuery --- ucClientEdit
+    ucWasteQuery --- ucWasteCreate
+    ucWasteQuery --- ucWasteEdit
+    ucWasteQuery --- ucWasteStock
 ```
 
 ### Grupo funcional ENT — Compras de material
@@ -199,10 +200,10 @@ flowchart LR
     end
 
     warehouse --- ucReceiptQuery
-    warehouse --- ucReceiptCreate
-    warehouse --- ucReceiptEdit
-    warehouse --- ucReceiptCorrect
-    warehouse --- ucReceiptCancel
+    ucReceiptQuery --- ucReceiptCreate
+    ucReceiptQuery --- ucReceiptEdit
+    ucReceiptQuery --- ucReceiptCorrect
+    ucReceiptQuery --- ucReceiptCancel
 ```
 
 ### Grupo funcional SAL — Salidas de material y de merma
@@ -231,26 +232,30 @@ flowchart LR
     end
 
     warehouse --- ucMaterialIssueQuery
-    warehouse --- ucMaterialIssueCreate
-    warehouse --- ucMaterialIssueHeader
-    warehouse --- ucMaterialIssueDetails
-    warehouse --- ucMaterialSupply
-    warehouse --- ucMaterialReturn
     warehouse --- ucWasteIssueQuery
-    warehouse --- ucWasteIssueCreate
-    warehouse --- ucWasteIssueHeader
-    warehouse --- ucWasteIssueDetails
-    warehouse --- ucWasteSupply
-    warehouse --- ucWasteReturn
+    ucMaterialIssueQuery --- ucMaterialIssueCreate
+    ucMaterialIssueQuery --- ucMaterialIssueHeader
+    ucMaterialIssueQuery --- ucMaterialIssueDetails
+    ucMaterialIssueQuery --- ucMaterialSupply
+    ucMaterialIssueQuery --- ucMaterialReturn
+    ucWasteIssueQuery --- ucWasteIssueCreate
+    ucWasteIssueQuery --- ucWasteIssueHeader
+    ucWasteIssueQuery --- ucWasteIssueDetails
+    ucWasteIssueQuery --- ucWasteSupply
+    ucWasteIssueQuery --- ucWasteReturn
 ```
 
 ### Grupo funcional REP — Consultas y reportes
 
 ```mermaid
 flowchart LR
-    warehouse["«actor»<br/>Personal de almacén (área Almacén y proveduría)"]
-    admin["«actor»<br/>Administrador del sistema (área Sistemas)"]
-    management["«actor»<br/>Director (área Dirección)"]
+    authorized["«actor abstracto»<br/>Usuario autorizado de consulta y reporte"]
+    warehouse["«actor»<br/>Personal de almacén"]
+    admin["«actor»<br/>Administrador del sistema"]
+    management["«actor»<br/>Director"]
+    warehouse -- "generaliza" --> authorized
+    admin -- "generaliza" --> authorized
+    management -- "generaliza" --> authorized
 
     subgraph reportPackage["Nexus · Grupo funcional REP: Consultas y reportes"]
         direction TB
@@ -283,51 +288,21 @@ flowchart LR
         end
     end
 
-    warehouse --- ucMaterialInventory
-    warehouse --- ucWasteInventory
-    warehouse --- ucMaterialMovements
-    warehouse --- ucWasteMovements
-    warehouse --- ucMaterialInventoryReport
-    warehouse --- ucMaterialIssueReport
-    warehouse --- ucWasteIssueReport
-    warehouse --- ucPurchaseReport
-    warehouse --- ucWasteReport
-    warehouse --- ucSupplierReport
-    warehouse --- ucClientReport
-    warehouse --- ucPersonReport
-    warehouse --- ucUserReport
-    warehouse --- ucMaterialMovementReport
-    warehouse --- ucWasteMovementReport
-    admin --- ucMaterialInventory
-    admin --- ucWasteInventory
-    admin --- ucMaterialMovements
-    admin --- ucWasteMovements
-    admin --- ucMaterialInventoryReport
-    admin --- ucMaterialIssueReport
-    admin --- ucWasteIssueReport
-    admin --- ucPurchaseReport
-    admin --- ucWasteReport
-    admin --- ucSupplierReport
-    admin --- ucClientReport
-    admin --- ucPersonReport
-    admin --- ucUserReport
-    admin --- ucMaterialMovementReport
-    admin --- ucWasteMovementReport
-    management --- ucMaterialInventory
-    management --- ucWasteInventory
-    management --- ucMaterialMovements
-    management --- ucWasteMovements
-    management --- ucMaterialInventoryReport
-    management --- ucMaterialIssueReport
-    management --- ucWasteIssueReport
-    management --- ucPurchaseReport
-    management --- ucWasteReport
-    management --- ucSupplierReport
-    management --- ucClientReport
-    management --- ucPersonReport
-    management --- ucUserReport
-    management --- ucMaterialMovementReport
-    management --- ucWasteMovementReport
+    authorized --- ucMaterialInventory
+    authorized --- ucWasteInventory
+    authorized --- ucMaterialMovements
+    authorized --- ucWasteMovements
+    authorized --- ucMaterialInventoryReport
+    authorized --- ucMaterialIssueReport
+    authorized --- ucWasteIssueReport
+    authorized --- ucPurchaseReport
+    authorized --- ucWasteReport
+    authorized --- ucSupplierReport
+    authorized --- ucClientReport
+    authorized --- ucPersonReport
+    authorized --- ucUserReport
+    authorized --- ucMaterialMovementReport
+    authorized --- ucWasteMovementReport
 ```
 
 `CU-SAL-05` y `CU-SAL-11` actualizan la existencia y registra el movimiento como parte de su propio
@@ -353,14 +328,16 @@ flujo específico en
 No se usa «administrar» o «mantener» como objetivo: cada óvalo expresa una operación
 observable.
 
-Dentro de cada grupo, la lectura se organiza por recurso: primero su consulta, después
-las operaciones CRUD disponibles y finalmente las operaciones específicas asociadas a
-ese mismo CRUD. Corregir, cancelar, ajustar, cambiar estado, surtir o devolver permanecen
+Dentro de cada grupo, la lectura se organiza por recurso: desde su consulta se trazan
+asociaciones simples, sin etiqueta, hacia las operaciones CRUD y específicas que le
+corresponden. Sólo las relaciones con semántica `«include»` o `«extend»` deben indicarla
+explícitamente. Corregir, cancelar, ajustar, cambiar estado, surtir o devolver permanecen
 junto al recurso que modifican y reciben la secuencia correspondiente a esa posición.
 Cuando el orden cambia, catálogo, fichas, diagramas y referencias técnicas se renumeran
-en conjunto para conservar la trazabilidad. Este orden expresa asociación funcional;
-sólo una flecha estereotipada explícita representa `«include»`, `«extend»` o
-generalización.
+en conjunto para conservar la trazabilidad. Una asociación simple no implica inclusión,
+extensión ni dependencia de ejecución; una relación `«include»` o `«extend»` sólo existe
+cuando aparece etiquetada explícitamente.
+La generalización de actores también se identifica de forma expresa.
 
 Los grupos son ayudas de lectura, no límites del sistema ni permisos. El Administrador
 del sistema del área Sistemas conserva el alcance que conceden las políticas
