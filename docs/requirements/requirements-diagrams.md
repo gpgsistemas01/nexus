@@ -99,7 +99,7 @@ diagramas de secuencia o estados se reservan para explicar coordinación adicion
 
 ## Organización visual de los casos
 
-Los flujos conservan los cinco grupos funcionales del catálogo y se leen dentro de las
+Los flujos conservan los seis grupos funcionales del catálogo y se leen dentro de las
 familias por entidad definidas en el
 [criterio de agrupación vigente](use-case-descriptions.md#criterio-de-agrupación-vigente).
 La familia sólo permite localizar casos relacionados: cada encabezado y cada diagrama
@@ -119,6 +119,24 @@ controller y servicio se conserva en la sección
 [inferencia de pasos desde la implementación](use-case-descriptions.md#inferencia-de-pasos-desde-la-implementación),
 y la fuente curada de cada ficha es el
 [catálogo operativo](use-case-descriptions.md#catálogo-operativo-y-granularidad).
+
+### Grupo funcional AUT — Autenticación
+
+#### `CU-AUT-01` — Iniciar sesión
+
+```mermaid
+flowchart LR
+    request["Usuario captura credenciales y solicita iniciar sesión"] --> validate["Nexus valida cuenta activa y credenciales"]
+    validate --> result["Nexus crea la sesión y presenta las opciones autorizadas"]
+```
+
+#### `CU-AUT-02` — Cerrar sesión
+
+```mermaid
+flowchart LR
+    request["Usuario solicita cerrar sesión"] --> clear["Nexus elimina las credenciales del navegador"]
+    clear --> result["Nexus dirige fuera del área protegida y confirma el cierre"]
+```
 
 ### Grupo funcional IDA — Identidad y acceso
 
