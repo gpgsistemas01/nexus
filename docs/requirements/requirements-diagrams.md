@@ -260,7 +260,15 @@ flowchart LR
     validate --> result["Nexus responde: Actualización de datos admitidos."]
 ```
 
-#### `CU-CAT-09` — Consultar clientes
+#### `CU-CAT-09` — Cambiar estado de proveedor
+
+```mermaid
+flowchart LR
+    request["Actor solicita cambiar estado de proveedor"] --> validate["Nexus valida permiso, datos y relaciones"]
+    validate --> result["Nexus responde: Activación o desactivación del proveedor."]
+```
+
+#### `CU-CAT-10` — Consultar clientes
 
 ```mermaid
 flowchart LR
@@ -268,7 +276,7 @@ flowchart LR
     validate --> result["Nexus responde: Listado de clientes autorizados."]
 ```
 
-#### `CU-CAT-10` — Crear cliente
+#### `CU-CAT-11` — Crear cliente
 
 ```mermaid
 flowchart LR
@@ -276,7 +284,7 @@ flowchart LR
     validate --> result["Nexus responde: Alta con asesor opcional válido."]
 ```
 
-#### `CU-CAT-11` — Editar cliente
+#### `CU-CAT-12` — Editar cliente
 
 ```mermaid
 flowchart LR
@@ -284,7 +292,7 @@ flowchart LR
     validate --> result["Nexus responde: Actualización de datos y asesor opcional."]
 ```
 
-#### `CU-CAT-12` — Consultar mermas
+#### `CU-CAT-13` — Consultar mermas
 
 ```mermaid
 flowchart LR
@@ -292,7 +300,7 @@ flowchart LR
     validate --> result["Nexus responde: Listado de existencias de merma."]
 ```
 
-#### `CU-CAT-13` — Registrar merma
+#### `CU-CAT-14` — Registrar merma
 
 ```mermaid
 flowchart LR
@@ -300,7 +308,7 @@ flowchart LR
     validate --> result["Nexus responde: Alta desde una plantilla material-proveedor."]
 ```
 
-#### `CU-CAT-14` — Editar merma
+#### `CU-CAT-15` — Editar merma
 
 ```mermaid
 flowchart LR
@@ -308,7 +316,7 @@ flowchart LR
     validate --> result["Nexus responde: Actualización sin alterar su identidad física."]
 ```
 
-#### `CU-CAT-15` — Ajustar existencia de merma
+#### `CU-CAT-16` — Ajustar existencia de merma
 
 ```mermaid
 flowchart LR
@@ -316,7 +324,7 @@ flowchart LR
     validate --> result["Nexus responde: Ajuste trazable de inventario de merma."]
 ```
 
-#### `CU-CAT-16` — Consultar presentaciones
+#### `CU-CAT-17` — Consultar presentaciones
 
 ```mermaid
 flowchart LR
@@ -324,7 +332,7 @@ flowchart LR
     validate --> result["Nexus responde: Catálogo auxiliar de sólo lectura."]
 ```
 
-#### `CU-CAT-17` — Consultar unidades de medida
+#### `CU-CAT-18` — Consultar unidades de medida
 
 ```mermaid
 flowchart LR
@@ -332,7 +340,7 @@ flowchart LR
     validate --> result["Nexus responde: Catálogo auxiliar de sólo lectura."]
 ```
 
-#### `CU-CAT-18` — Consultar motivos de ajuste
+#### `CU-CAT-19` — Consultar motivos de ajuste
 
 ```mermaid
 flowchart LR
@@ -340,20 +348,12 @@ flowchart LR
     validate --> result["Nexus responde: Catálogo auxiliar de sólo lectura."]
 ```
 
-#### `CU-CAT-19` — Consultar estados de cumplimiento
+#### `CU-CAT-20` — Consultar estados de cumplimiento
 
 ```mermaid
 flowchart LR
     request["Actor solicita consultar estados de cumplimiento"] --> validate["Nexus valida permiso, datos y relaciones"]
     validate --> result["Nexus responde: Catálogo auxiliar de sólo lectura."]
-```
-
-#### `CU-CAT-20` — Cambiar estado de proveedor
-
-```mermaid
-flowchart LR
-    request["Actor solicita cambiar estado de proveedor"] --> validate["Nexus valida permiso, datos y relaciones"]
-    validate --> result["Nexus responde: Activación o desactivación del proveedor."]
 ```
 
 ### Grupo funcional ENT — Compras de material
@@ -636,8 +636,8 @@ el código.
 | Compleja | `CU-ENT-04`, `CU-ENT-05` | Corrección/cancelación altera historia, totales, stock y movimiento. | Secuencia atómica ya incluida en este documento. |
 | Compleja | `CU-SAL-05`, `CU-SAL-06`, `CU-SAL-11`, `CU-SAL-12` | Acumulados, estados, existencias y movimientos dependen de cantidades previas. | Máquina de estados ya incluida en este documento. |
 | Compleja | `CU-REP-05` a `CU-REP-15` | Filtros, variantes mensual/detallada, fórmulas, totales y archivo deben conservar el mismo resultado de dominio. | Canal de generación de reportes incluido abajo. |
-| Intermedia | `CU-CAT-02`, `CU-CAT-03`, `CU-CAT-07`, `CU-CAT-08`, `CU-CAT-10`, `CU-CAT-11`, `CU-CAT-13`, `CU-CAT-14`, `CU-ENT-03`, `CU-SAL-02` a `CU-SAL-04` y `CU-SAL-08` a `CU-SAL-10` | Coordinan relaciones o detalles, pero no agregan participantes o estados que justifiquen una secuencia transaccional. | Flujo funcional en su grupo y vista técnica complementaria incluida abajo. |
-| Directa | `CU-IDA-01` a `CU-IDA-03`, `CU-CAT-01`, `CU-CAT-06`, `CU-CAT-09`, `CU-CAT-12`, `CU-CAT-16` a `CU-CAT-19`, `CU-ENT-01`, `CU-SAL-01`, `CU-SAL-07`, `CU-REP-01` a `CU-REP-04` | Consulta o mutación directa sin estados coordinados adicionales. | Flujo funcional en su grupo y vista técnica complementaria incluida abajo. |
+| Intermedia | `CU-CAT-02`, `CU-CAT-03`, `CU-CAT-07`, `CU-CAT-08`, `CU-CAT-11`, `CU-CAT-12`, `CU-CAT-14`, `CU-CAT-15`, `CU-ENT-03`, `CU-SAL-02` a `CU-SAL-04` y `CU-SAL-08` a `CU-SAL-10` | Coordinan relaciones o detalles, pero no agregan participantes o estados que justifiquen una secuencia transaccional. | Flujo funcional en su grupo y vista técnica complementaria incluida abajo. |
+| Directa | `CU-IDA-01` a `CU-IDA-03`, `CU-CAT-01`, `CU-CAT-06`, `CU-CAT-10`, `CU-CAT-13`, `CU-CAT-17` a `CU-CAT-20`, `CU-ENT-01`, `CU-SAL-01`, `CU-SAL-07`, `CU-REP-01` a `CU-REP-04` | Consulta o mutación directa sin estados coordinados adicionales. | Flujo funcional en su grupo y vista técnica complementaria incluida abajo. |
 
 Las vistas siguientes completan los casos de coordinación intermedia y directa con el
 mismo criterio aplicado a los casos de coordinación compleja: muestran la ejecución
@@ -721,7 +721,7 @@ La secuencia hace visible que la existencia y la identidad no se confían al for
 No muestra componentes EJS ni refresco de DataTable porque pertenecen a la presentación,
 no a la actualización de dominio.
 
-### Patrón de consulta de catálogos — `CU-CAT-01`, `CU-CAT-06`, `CU-CAT-09`, `CU-CAT-12` y `CU-CAT-16` a `CU-CAT-19`
+### Patrón de consulta de catálogos — `CU-CAT-01`, `CU-CAT-06`, `CU-CAT-10`, `CU-CAT-13` y `CU-CAT-17` a `CU-CAT-20`
 
 ```mermaid
 flowchart LR
@@ -736,7 +736,7 @@ La fábrica de listado se reutiliza cuando el recurso la configura; el diagrama 
 que todos los catálogos compartan filtros o permisos. Los routers y servicios concretos
 siguen siendo las fuentes verificables de cada variante.
 
-### Patrón de alta de catálogos — `CU-CAT-02`, `CU-CAT-07`, `CU-CAT-10` y `CU-CAT-13`
+### Patrón de alta de catálogos — `CU-CAT-02`, `CU-CAT-07`, `CU-CAT-11` y `CU-CAT-14`
 
 ```mermaid
 flowchart LR
@@ -750,7 +750,7 @@ Cliente, proveedor, material, merma y catálogos auxiliares recorren capas equiv
 pero sus relaciones y reglas no se trasladan a una fábrica común. El refresco final es
 una reacción de `createCrudApplication`, no parte de la transacción de persistencia.
 
-### Patrón de edición de catálogos — `CU-CAT-03`, `CU-CAT-08`, `CU-CAT-11` y `CU-CAT-14`
+### Patrón de edición de catálogos — `CU-CAT-03`, `CU-CAT-08`, `CU-CAT-12` y `CU-CAT-15`
 
 ```mermaid
 flowchart LR
