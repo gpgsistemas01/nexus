@@ -99,33 +99,101 @@ diagramas de secuencia o estados se reservan para explicar coordinación adicion
 
 ## Flujos de cada caso de uso
 
-Cada carril comienza con un identificador `CU-<GRUPO>-<SECUENCIA>` y representa
+Cada vista comienza con un identificador `CU-<GRUPO>-<SECUENCIA>` y representa
 exclusivamente ese objetivo. Los encabezados conservan los mismos grupos funcionales y códigos del
-catálogo; las familias sólo reúnen carriles que reutilizan validación o persistencia y
-no son casos de uso. Las flechas son pasos observables, no endpoints. La fuente curada es el
+catálogo; los diagramas reutilizan la misma semántica cuando el proceso es equivalente,
+pero no agrupan objetivos distintos en una sola vista. Las flechas son pasos observables,
+no endpoints. La fuente curada es el
 [catálogo operativo](use-case-descriptions.md#catálogo-operativo-y-granularidad).
 
 ### Grupo funcional IDA — Identidad y acceso
 
+#### `CU-IDA-01` — Consultar identidades y accesos
+
 ```mermaid
 flowchart LR
-    iam01["CU-IDA-01 Consultar"] --> iam01q["Aplicar filtros y mostrar identidades y accesos"]
-    iam02["CU-IDA-02 Crear persona"] --> iam02v["Validar identidad"] --> iam02p["Persistir persona"]
-    iam03["CU-IDA-03 Editar persona"] --> iam03v["Validar campos modificables"] --> iam03p["Actualizar persona"]
-    iam04["CU-IDA-04 Crear usuario"] --> iam04v["Validar cuenta, persona, rol y área"] --> iam04p["Crear usuario y asignar acceso"]
-    iam05["CU-IDA-05 Editar usuario o contraseña"] --> iam05v["Validar cuenta, acceso o credencial"] --> iam05p["Actualizar asignación o contraseña cifrada"]
+    iam01Request["Elegir personas o usuarios"] --> iam01Filters["Aplicar búsqueda, filtros y paginación"]
+    iam01Filters --> iam01Result["Mostrar identidades y accesos autorizados"]
+```
+
+#### `CU-IDA-02` — Crear persona
+
+```mermaid
+flowchart LR
+    iam02Request["Capturar datos de persona"] --> iam02Validate["Validar identidad y campos obligatorios"]
+    iam02Validate --> iam02Persist["Crear persona"] --> iam02Refresh["Confirmar y refrescar listado"]
+```
+
+#### `CU-IDA-03` — Editar persona
+
+```mermaid
+flowchart LR
+    iam03Select["Seleccionar persona"] --> iam03Edit["Modificar campos admitidos"]
+    iam03Edit --> iam03Validate["Validar identidad y cambios"] --> iam03Persist["Actualizar persona"]
+    iam03Persist --> iam03Refresh["Confirmar y refrescar listado"]
+```
+
+#### `CU-IDA-04` — Crear usuario y asignar acceso
+
+```mermaid
+flowchart LR
+    iam04Request["Capturar cuenta, persona, rol y departamento"] --> iam04Validate["Validar cuenta, persona opcional y acceso"]
+    iam04Validate --> iam04Password["Cifrar contraseña"] --> iam04Persist["Crear usuario y asignación"]
+    iam04Persist --> iam04Result["Responder sin exponer la credencial"]
+```
+
+#### `CU-IDA-05` — Editar usuario o cambiar contraseña
+
+```mermaid
+flowchart TB
+    iam05Select["Seleccionar usuario"] --> iam05Action{"¿Cuenta/acceso o contraseña?"}
+    iam05Action -->|cuenta o acceso| iam05Access["Validar campos, rol y departamento"]
+    iam05Access --> iam05Persist["Actualizar cuenta y reemplazar asignación en transacción"]
+    iam05Action -->|contraseña| iam05Password["Validar y cifrar contraseña nueva"]
+    iam05Password --> iam05Credential["Actualizar credencial"]
+    iam05Persist --> iam05Result["Responder sin exponer la credencial"]
+    iam05Credential --> iam05Result
 ```
 
 ### Grupo funcional CAT — Catálogos
 
+#### `CU-CAT-01` — Consultar catálogos
+
 ```mermaid
 flowchart LR
-    cat01["CU-CAT-01 Consultar"] --> cat01q["Elegir recurso, filtrar y listar"]
-    cat02["CU-CAT-02 Crear registro"] --> cat02v["Validar identidad y relaciones"] --> cat02p["Persistir y refrescar"]
-    cat03["CU-CAT-03 Editar registro"] --> cat03v["Validar campos modificables"] --> cat03p["Actualizar y refrescar"]
-    cat04["CU-CAT-04 Eliminar o cambiar estado"] --> cat04d{"¿El recurso admite eliminación?"}
-    cat04d -->|sí, sin relaciones protegidas| cat04x["Eliminar"]
-    cat04d -->|no| cat04s["Activar o desactivar cuando corresponda"]
+    cat01Resource["Elegir recurso"] --> cat01Filters["Aplicar búsqueda, filtros y paginación"]
+    cat01Filters --> cat01Result["Mostrar registros autorizados"]
+```
+
+#### `CU-CAT-02` — Crear registro de catálogo
+
+```mermaid
+flowchart LR
+    cat02Resource["Elegir recurso"] --> cat02Form["Capturar datos y relaciones"]
+    cat02Form --> cat02Validate["Validar identidad y relaciones del recurso"]
+    cat02Validate --> cat02Persist["Crear registro"] --> cat02Refresh["Confirmar y refrescar listado"]
+```
+
+#### `CU-CAT-03` — Editar registro de catálogo
+
+```mermaid
+flowchart LR
+    cat03Select["Seleccionar registro"] --> cat03Edit["Modificar campos admitidos"]
+    cat03Edit --> cat03Validate["Validar identidad y relaciones"]
+    cat03Validate --> cat03Persist["Actualizar registro"] --> cat03Refresh["Confirmar y refrescar listado"]
+```
+
+#### `CU-CAT-04` — Eliminar o cambiar estado de registro
+
+```mermaid
+flowchart TB
+    cat04Select["Seleccionar registro"] --> cat04Policy{"¿Qué permite el recurso?"}
+    cat04Policy -->|eliminación| cat04Relations{"¿Existen relaciones protegidas?"}
+    cat04Relations -->|sí| cat04Reject["Rechazar y conservar historia"]
+    cat04Relations -->|no| cat04Delete["Eliminar registro"]
+    cat04Policy -->|cambio de estado| cat04Status["Activar o desactivar"]
+    cat04Delete --> cat04Refresh["Refrescar listado"]
+    cat04Status --> cat04Refresh
 ```
 
 `CU-CAT-02` y `CU-CAT-03` reutilizan fábrica CRUD, formulario y refresco cuando el
@@ -134,43 +202,139 @@ política de eliminación o estado como configuración contextual.
 
 ### Grupo funcional ENT — Entradas
 
+#### `CU-ENT-01` — Consultar entradas
+
 ```mermaid
 flowchart LR
-    rec01["CU-ENT-01 Consultar"] --> rec01q["Filtrar y mostrar entradas"]
-    rec02["CU-ENT-02 Registrar"] --> rec02v["Validar proveedor, factura y detalles"] --> rec02t["Crear entrada, incrementar stock y registrar movimientos"]
-    rec03["CU-ENT-03 Editar"] --> rec03v["Validar encabezado y detalles nuevos admitidos"] --> rec03t["Actualizar entrada en transacción"]
-    rec04["CU-ENT-04 Corregir detalle"] --> rec04v["Validar cantidad, costo, stock y motivo"] --> rec04t["Ajustar stock, totales, movimiento e historial"]
-    rec05["CU-ENT-05 Cancelar detalle"] --> rec05v["Validar estado, stock y motivo"] --> rec05t["Revertir stock y registrar cancelación"]
+    rec01Request["Abrir consulta de entradas"] --> rec01Filters["Aplicar búsqueda, fechas y relaciones"]
+    rec01Filters --> rec01Page["Mostrar página y totales autorizados"]
+```
+
+#### `CU-ENT-02` — Registrar entrada
+
+```mermaid
+flowchart LR
+    rec02Header["Capturar proveedor, factura y receptor"] --> rec02Details["Agregar detalles"]
+    rec02Details --> rec02Validate["Validar relaciones, cantidades y factura única"]
+    rec02Validate --> rec02Transaction["Crear entrada y detalles<br/>incrementar stock y registrar movimientos"]
+    rec02Transaction --> rec02Result["Confirmar entrada"]
+```
+
+#### `CU-ENT-03` — Editar entrada
+
+```mermaid
+flowchart LR
+    rec03Select["Seleccionar entrada"] --> rec03Edit["Modificar encabezado o agregar detalles admitidos"]
+    rec03Edit --> rec03Validate["Validar estado, relaciones y detalles nuevos"]
+    rec03Validate --> rec03Transaction["Actualizar en transacción<br/>sin reaplicar stock existente"]
+    rec03Transaction --> rec03Result["Confirmar entrada actualizada"]
+```
+
+#### `CU-ENT-04` — Corregir detalle de entrada
+
+```mermaid
+flowchart LR
+    rec04Select["Seleccionar detalle"] --> rec04Input["Indicar cantidad, costo y motivo"]
+    rec04Input --> rec04Validate["Validar estado, diferencia y stock"]
+    rec04Validate --> rec04Transaction["Ajustar stock, totales y movimiento<br/>registrar valores e historial"]
+    rec04Transaction --> rec04Result["Confirmar corrección"]
+```
+
+#### `CU-ENT-05` — Cancelar detalle de entrada
+
+```mermaid
+flowchart LR
+    rec05Select["Seleccionar detalle"] --> rec05Reason["Indicar motivo de cancelación"]
+    rec05Reason --> rec05Validate["Validar estado y stock reversible"]
+    rec05Validate --> rec05Transaction["Revertir stock y totales<br/>registrar movimiento e historial"]
+    rec05Transaction --> rec05Result["Confirmar cancelación"]
 ```
 
 ### Grupo funcional SAL — Salidas
 
+#### `CU-SAL-01` — Consultar salidas
+
 ```mermaid
 flowchart LR
-    iss01["CU-SAL-01 Consultar"] --> iss01q["Elegir material o merma, filtrar y listar"]
-    iss02["CU-SAL-02 Crear"] --> iss02v["Validar encabezado y detalles del contexto"] --> iss02p["Persistir pendiente sin descontar stock"]
-    iss03["CU-SAL-03 Editar encabezado"] --> iss03v["Validar estado y campos admitidos"] --> iss03p["Actualizar encabezado"]
-    iss04["CU-SAL-04 Ajustar detalles"] --> iss04v["Validar cantidades todavía modificables"] --> iss04p["Agregar o actualizar detalles y estado"]
-    iss05["CU-SAL-05 Surtir detalle"] --> iss05v["Validar pendiente y existencia"] --> iss05t["Descontar stock, acumular surtido y crear movimiento"]
-    iss06["CU-SAL-06 Devolver detalle"] --> iss06v["Validar cantidad retornable"] --> iss06t["Reintegrar stock, acumular devolución y crear movimiento inverso"]
+    iss01Context["Elegir material o merma"] --> iss01Filters["Aplicar búsqueda, fechas y relaciones"]
+    iss01Filters --> iss01Page["Mostrar salidas y estados autorizados"]
 ```
 
-Los seis carriles se aplican a material o merma cuando la operación existe. Se replica
+#### `CU-SAL-02` — Crear salida
+
+```mermaid
+flowchart LR
+    iss02Context["Elegir material o merma"] --> iss02Header["Capturar encabezado y detalles"]
+    iss02Header --> iss02Validate["Validar relaciones y cantidades del contexto"]
+    iss02Validate --> iss02Persist["Crear salida pendiente<br/>sin descontar inventario"]
+    iss02Persist --> iss02Result["Confirmar salida"]
+```
+
+#### `CU-SAL-03` — Editar encabezado de salida
+
+```mermaid
+flowchart LR
+    iss03Select["Seleccionar salida"] --> iss03Validate["Comprobar estado y campos admitidos"]
+    iss03Validate --> iss03Persist["Actualizar encabezado<br/>sin modificar inventario"]
+    iss03Persist --> iss03Result["Confirmar actualización"]
+```
+
+#### `CU-SAL-04` — Ajustar detalles de salida
+
+```mermaid
+flowchart LR
+    iss04Select["Seleccionar salida y detalle"] --> iss04Change["Agregar o modificar cantidad"]
+    iss04Change --> iss04Validate["Validar estado y cantidad todavía modificable"]
+    iss04Validate --> iss04Persist["Actualizar detalles y derivar estado<br/>sin descontar inventario"]
+    iss04Persist --> iss04Result["Confirmar ajuste"]
+```
+
+#### `CU-SAL-05` — Surtir detalle
+
+```mermaid
+flowchart LR
+    iss05Select["Seleccionar detalle pendiente"] --> iss05Quantity["Indicar cantidad a surtir"]
+    iss05Quantity --> iss05Validate["Validar pendiente y existencia"]
+    iss05Validate --> iss05Transaction["Descontar stock y crear movimiento<br/>acumular surtido y derivar estados"]
+    iss05Transaction --> iss05Result["Confirmar surtimiento"]
+```
+
+#### `CU-SAL-06` — Devolver detalle surtido
+
+```mermaid
+flowchart LR
+    iss06Select["Seleccionar detalle surtido"] --> iss06Quantity["Indicar cantidad a devolver"]
+    iss06Quantity --> iss06Validate["Validar cantidad retornable"]
+    iss06Validate --> iss06Transaction["Reintegrar stock y crear movimiento inverso<br/>acumular devolución y derivar estados"]
+    iss06Transaction --> iss06Result["Confirmar devolución"]
+```
+
+Los seis diagramas se aplican a material o merma cuando la operación existe. Se replica
 el proceso y cambia el adaptador de inventario, conversión y validación; no se inventa un
 segundo caso únicamente por el contexto.
 
 ### Grupo funcional REP — Consultas y reportes
 
+#### `CU-REP-01` — Consultar movimientos e inventario
+
 ```mermaid
 flowchart LR
-    rep01["CU-REP-01 Consultar movimientos e inventario"] --> rep01f["Validar permiso y aplicar filtros"] --> rep01q["Mostrar página y totales"]
-    rep02["CU-REP-02 Generar reporte"] --> rep02f["Elegir reporte y parámetros"] --> rep02q["Consultar datos autorizados"] --> rep02o{"¿Vista o archivo?"}
-    rep02o -->|vista| rep02v["Mostrar resultado"]
-    rep02o -->|archivo| rep02x["Exportar columnas autorizadas"]
+    rep01Context["Elegir movimientos o inventario"] --> rep01Filters["Validar permiso y aplicar filtros"]
+    rep01Filters --> rep01Query["Consultar datos autorizados"] --> rep01Result["Mostrar página y totales"]
 ```
 
-Los veintidós identificadores coinciden con los objetivos del diagrama general. Una
-operación nueva requiere un identificador y carril propios; una variante técnica interna
+#### `CU-REP-02` — Generar reporte
+
+```mermaid
+flowchart LR
+    rep02Select["Elegir reporte y parámetros"] --> rep02Filters["Normalizar filtros del reporte"]
+    rep02Filters --> rep02Query["Consultar datos autorizados"] --> rep02Build["Construir filas, agrupaciones y totales"]
+    rep02Build --> rep02Export["Generar archivo con columnas autorizadas"]
+```
+
+Los veintidós identificadores coinciden con los objetivos del diagrama general y cada
+uno dispone de un diagrama independiente. Una operación nueva requiere un identificador
+y una vista propios; una variante técnica interna
 no se convierte por sí sola en caso de uso.
 
 ## Casos que requieren atención visual adicional
@@ -178,9 +342,9 @@ no se convierte por sí sola en caso de uso.
 La necesidad de otra vista se evaluó con cuatro señales: **cantidad de decisiones de
 negocio**, **escrituras coordinadas**, **cambio de estado o acumulados** y **efecto que
 debe revertirse ante un fallo**. La prioridad no mide importancia del módulo; indica
-cuánto contexto se perdería si sólo se conservara el carril resumido.
+cuánto contexto se perdería si sólo se conservara la actividad individual resumida.
 
-| Atención | Casos revisados | Motivo | Vista adicional |
+| Atención | Casos revisados | Motivo | Vista aplicada |
 | --- | --- | --- | --- |
 | Alta | `CU-IDA-04`, `CU-IDA-05` | Contraseña cifrada, persona opcional y asignación rol/departamento; al editar se reemplaza la asignación dentro de una transacción. | Secuencia de identidad y acceso incluida abajo. |
 | Alta | `CU-CAT-04` para material | La historia operativa impide eliminar; si quedan otros proveedores sólo se retira la relación proveedor-material. | Decisión de eliminación incluida abajo. |
@@ -188,8 +352,8 @@ cuánto contexto se perdería si sólo se conservara el carril resumido.
 | Alta | `CU-ENT-04`, `CU-ENT-05` | Corrección/cancelación altera historia, totales, stock y movimiento. | Secuencia atómica ya incluida en este documento. |
 | Alta | `CU-SAL-05`, `CU-SAL-06` | Acumulados, estados, existencias y movimientos dependen de cantidades previas. | Máquina de estados ya incluida en este documento. |
 | Alta | `CU-REP-02` | Filtros, variantes mensual/detallada, fórmulas, totales y archivo deben conservar el mismo resultado de dominio. | Canal de generación de reportes incluido abajo. |
-| Media | `CU-CAT-02`, `CU-CAT-03`, `CU-ENT-03`, `CU-SAL-02` a `CU-SAL-04` | Coordinan relaciones o detalles, pero el carril específico y el patrón CRUD/documental muestran la decisión vigente. | Reutilizar flujo por caso; crear secuencia sólo si aparece otro efecto o participante. |
-| Baja | `CU-IDA-01` a `CU-IDA-03`, `CU-CAT-01`, `CU-ENT-01`, `CU-SAL-01`, `CU-REP-01` | Consulta o mutación directa sin estados coordinados adicionales. | El carril por caso es suficiente. |
+| Media | `CU-CAT-02`, `CU-CAT-03`, `CU-ENT-03`, `CU-SAL-02` a `CU-SAL-04` | Coordinan relaciones o detalles, pero no agregan participantes o estados que justifiquen una secuencia. | Diagrama de actividad independiente para cada caso incluido en su grupo funcional. |
+| Baja | `CU-IDA-01` a `CU-IDA-03`, `CU-CAT-01`, `CU-ENT-01`, `CU-SAL-01`, `CU-REP-01` | Consulta o mutación directa sin estados coordinados adicionales. | Diagrama de actividad independiente para cada caso incluido en su grupo funcional. |
 
 ### Crear o editar usuario y acceso — `CU-IDA-04`, `CU-IDA-05`
 
