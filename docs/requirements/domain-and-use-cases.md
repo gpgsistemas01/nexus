@@ -75,7 +75,9 @@ La vista se divide en bloques por grupo funcional para mantenerla legible. Estos
 no son paquetes UML ni paquetes documentales: el único límite de sistema es Nexus. Cada
 bloque conserva los actores fuera del sistema y muestra una sola vez los casos que le
 pertenecen; juntos forman el diagrama de casos de uso. Los actores concretos se
-generalizan mediante un actor abstracto cuando comparten las mismas asociaciones.
+generalizan mediante un actor común cuando comparten asociaciones y la distinción entre
+ellos aporta información al grupo. Si todos participan de la misma forma, el actor común
+los representa sin enumerar cada rol o área.
 
 Se conservan seis grupos funcionales porque representan capacidades estables del
 negocio y coinciden con la trazabilidad normativa existente: autenticación, identidad y acceso,
@@ -92,8 +94,6 @@ La decisión y las familias resultantes se resumen en el
 ```mermaid
 flowchart LR
     user["«actor»<br/>Usuario registrado"]
-    admin["«actor»<br/>Administrador del sistema (área Sistemas)"]
-    admin -- "generaliza" --> user
 
     subgraph authPackage["Nexus · Grupo funcional AUT: Autenticación"]
         ucLogin(["CU-AUT-01 Iniciar sesión"])
@@ -364,10 +364,11 @@ extensión entre casos de uso.
 
 Los actores vigentes son **Personal de almacén** del área Almacén y proveduría y
 **Administrador del sistema** del área Sistemas. El Administrador del sistema se muestra
-como especialización de los demás actores aplicables porque las políticas vigentes le
-conceden todas las operaciones representadas; en `CAT` conserva además la asociación
-directa con clientes. Esta generalización expresa disponibilidad funcional, no omite las
-comprobaciones de permiso del servidor. Solicitantes,
+como especialización en los grupos operativos donde su acceso heredado debe distinguirse
+del correspondiente al Personal de almacén; en `CAT` conserva además la asociación
+directa con clientes. En `AUT`, **Usuario registrado** representa a ambos porque no varían
+los casos de inicio y cierre de sesión. Esta generalización expresa disponibilidad
+funcional, no omite las comprobaciones de permiso del servidor. Solicitantes,
 aprobadores, asesores y proveedores participan como roles o entidades del negocio, pero
 no se dibujan como actores porque no inician estos casos mediante acceso a Nexus.
 
