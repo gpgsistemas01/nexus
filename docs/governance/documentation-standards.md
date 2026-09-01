@@ -57,10 +57,11 @@ repositorio debe:
    el responsable de la validación funcional fuera del estado técnico;
 5. actualizar las vistas curadas afectadas y regenerar los inventarios derivados con
    `npm run docs:architecture` cuando cambie su fuente;
-6. agrupar los casos de uso por paquete de capacidad y conservar identificadores con el
-   formato `CU-<PAQUETE>-<SECUENCIA>` en el catálogo y en todos sus diagramas.
+6. agrupar los casos de uso por capacidad funcional y conservar identificadores con el
+   formato `CU-<GRUPO>-<SECUENCIA>` en el catálogo y en todos sus diagramas; estos grupos
+   no se confunden con los paquetes documentales de publicación.
 
-La convención de paquetes e identificadores pertenece a la documentación normativa de
+La convención de grupos e identificadores pertenece a la documentación normativa de
 requisitos, porque define trazabilidad y estructura del modelo. No se duplica en
 `AGENTS.md`: ese archivo contiene instrucciones operativas para quienes modifican el
 repositorio y ya exige mantener sincronizados los documentos relacionados.

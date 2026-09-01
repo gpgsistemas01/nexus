@@ -24,14 +24,51 @@ El valor esperado es sustituir registros dispersos por flujos consistentes que:
 - restrinjan cada operación según rol, departamento y permiso; y
 - faciliten la consulta operativa mediante vistas, notificaciones y exportaciones.
 
+## Descripción del producto
+
+Nexus es una aplicación web autenticada de control operativo. Combina páginas
+renderizadas en servidor y una API REST para registrar catálogos, entradas, salidas,
+existencias, mermas y movimientos; aplica autorización por rol, área y permiso, y
+mantiene trazabilidad mediante referencias, historiales y auditoría. También ofrece
+consultas, reportes Excel y actualizaciones en tiempo real para apoyar la operación y la
+supervisión.
+
+El producto centraliza el inventario y sus documentos relacionados; no es un ERP, un
+sistema contable ni una plataforma general de gestión de proyectos. Las personas,
+clientes, proyectos y áreas aportan identidad y contexto a la operación, pero sólo las
+capacidades declaradas como vigentes forman parte del producto disponible.
+
+## Áreas del contexto organizacional
+
+Las áreas siguientes forman el catálogo organizacional utilizado por permisos,
+personas, proyectos o encabezados de salida. Su presencia no concede acceso ni implica
+que todas inicien casos de uso; la autorización efectiva depende de la combinación de
+rol, área y permiso.
+
+| Área | Participación vigente en el contexto de Nexus |
+| --- | --- |
+| Dirección | Supervisión y consulta autorizada mediante el actor Director. |
+| Acabados | Contexto organizacional de personas, proyectos y salidas. |
+| Administrativo | Contexto organizacional y de catálogos autorizados. |
+| Almacén y proveduría | Operación de catálogos, entradas, inventario, salidas y mermas. |
+| Diseño | Contexto organizacional de personas, proyectos y salidas. |
+| Instalaciones | Contexto organizacional de personas, proyectos y salidas. |
+| Impresión | Contexto organizacional de personas, proyectos y salidas. |
+| Router | Contexto organizacional de personas, proyectos y salidas. |
+| PT/Tráfico | Contexto organizacional de personas, proyectos y salidas. |
+| Servicios y vigilancia | Contexto de proyectos y salidas; no se le atribuye acceso por aparecer en el catálogo. |
+| Sistemas | Administración de cuentas, accesos, catálogos contextuales y operaciones protegidas. |
+| Taller 3D | Contexto organizacional de personas, proyectos y salidas. |
+| Ventas y proyectos especiales | Contexto comercial y de proyectos; ventas no tiene acceso vigente al sistema. |
+
 ## Usuarios y partes interesadas
 
-- **Almacén y proveeduría:** registra recepciones, proveedores, materiales, mermas,
+- **Almacén y proveduría:** registra recepciones, proveedores, materiales, mermas,
   surtidos, devoluciones y consulta existencias.
 - **Áreas solicitantes futuras:** su participación en salidas permanece pendiente de definir; ventas no tiene acceso al sistema.
 - **Administración del sistema:** administra cuentas, personas y asignaciones de
   rol/departamento, además de ajustes de stock protegidos.
-- **Coordinación y dirección:** consulta trazabilidad, reportes e indicadores para
+- **Dirección:** consulta trazabilidad, reportes e indicadores para
   supervisar la operación.
 
 ## Alcance actual
@@ -102,7 +139,7 @@ del alcance vigente. Su estado, criterios y evidencia se consultan en la especif
 una modificación debe actualizar en el mismo cambio el enunciado, la trazabilidad y la
 prueba correspondiente.
 
-## Alcance funcional por paquete
+## Alcance funcional por grupo
 
 La visión no mantiene una segunda lista de enunciados `RF-*`: hacerlo produjo niveles de
 detalle distintos entre acceso, catálogos y operación. La
@@ -122,7 +159,7 @@ mostrar el alcance y los rangos que deben revisarse juntos.
 | Movimientos y reportes | `RF-REP-001` a `RF-REP-005` | Consultar y exportar información autorizada con reglas propias por reporte. |
 | Capacidades no vigentes | `RF-REQ-001`, `RF-PRJ-001`, `RF-PRJ-002` | Requisiciones fuera de alcance y proyectos modelados sin CRUD registrado. |
 
-La misma regla de granularidad aplica a todos los paquetes: otra operación recibe otro
+La misma regla de granularidad aplica a todos los grupos: otra operación recibe otro
 `RF-*` cuando cambia el resultado observable, permiso, validación principal o prueba de
 cumplimiento. Los atributos de una misma identidad y las variantes del mismo resultado
 permanecen como condiciones o criterios `CA-*`; no se crea un requisito por campo.
