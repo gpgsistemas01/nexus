@@ -337,28 +337,32 @@ uno dispone de un diagrama independiente. Una operación nueva requiere un ident
 y una vista propios; una variante técnica interna
 no se convierte por sí sola en caso de uso.
 
-## Casos que requieren atención visual adicional
+## Casos con vistas adicionales y nivel de coordinación
 
 La necesidad de otra vista se evaluó con cuatro señales: **cantidad de decisiones de
 negocio**, **escrituras coordinadas**, **cambio de estado o acumulados** y **efecto que
-debe revertirse ante un fallo**. La prioridad no mide importancia del módulo; indica
-cuánto contexto se perdería si sólo se conservara la actividad individual resumida.
+debe revertirse ante un fallo**. Como todos los casos ya tienen un flujo funcional y una
+vista técnica, **no se asigna una prioridad visual**: la cobertura no depende de atender
+primero un caso. El nivel sólo clasifica la coordinación que debe conservar cada vista y
+ayuda a elegir entre actividad, secuencia, decisión o máquina de estados cuando cambie
+el código.
 
-| Atención | Casos revisados | Motivo | Vista aplicada |
+| Nivel de coordinación | Casos revisados | Motivo | Vista aplicada |
 | --- | --- | --- | --- |
-| Alta | `CU-IDA-04`, `CU-IDA-05` | Contraseña cifrada, persona opcional y asignación rol/departamento; al editar se reemplaza la asignación dentro de una transacción. | Secuencia de identidad y acceso incluida abajo. |
-| Alta | `CU-CAT-04` para material | La historia operativa impide eliminar; si quedan otros proveedores sólo se retira la relación proveedor-material. | Decisión de eliminación incluida abajo. |
-| Alta | `CU-ENT-02` | Referencia, documento, detalles, stock y movimientos se confirman juntos; el costo se revisa después del commit. | Secuencia de registro incluida abajo. |
-| Alta | `CU-ENT-04`, `CU-ENT-05` | Corrección/cancelación altera historia, totales, stock y movimiento. | Secuencia atómica ya incluida en este documento. |
-| Alta | `CU-SAL-05`, `CU-SAL-06` | Acumulados, estados, existencias y movimientos dependen de cantidades previas. | Máquina de estados ya incluida en este documento. |
-| Alta | `CU-REP-02` | Filtros, variantes mensual/detallada, fórmulas, totales y archivo deben conservar el mismo resultado de dominio. | Canal de generación de reportes incluido abajo. |
-| Media | `CU-CAT-02`, `CU-CAT-03`, `CU-ENT-03`, `CU-SAL-02` a `CU-SAL-04` | Coordinan relaciones o detalles, pero no agregan participantes o estados que justifiquen una secuencia transaccional. | Flujo funcional en su grupo y vista técnica complementaria incluida abajo. |
-| Baja | `CU-IDA-01` a `CU-IDA-03`, `CU-CAT-01`, `CU-ENT-01`, `CU-SAL-01`, `CU-REP-01` | Consulta o mutación directa sin estados coordinados adicionales. | Flujo funcional en su grupo y vista técnica complementaria incluida abajo. |
+| Compleja | `CU-IDA-04`, `CU-IDA-05` | Contraseña cifrada, persona opcional y asignación rol/departamento; al editar se reemplaza la asignación dentro de una transacción. | Secuencia de identidad y acceso incluida abajo. |
+| Compleja | `CU-CAT-04` para material | La historia operativa impide eliminar; si quedan otros proveedores sólo se retira la relación proveedor-material. | Decisión de eliminación incluida abajo. |
+| Compleja | `CU-ENT-02` | Referencia, documento, detalles, stock y movimientos se confirman juntos; el costo se revisa después del commit. | Secuencia de registro incluida abajo. |
+| Compleja | `CU-ENT-04`, `CU-ENT-05` | Corrección/cancelación altera historia, totales, stock y movimiento. | Secuencia atómica ya incluida en este documento. |
+| Compleja | `CU-SAL-05`, `CU-SAL-06` | Acumulados, estados, existencias y movimientos dependen de cantidades previas. | Máquina de estados ya incluida en este documento. |
+| Compleja | `CU-REP-02` | Filtros, variantes mensual/detallada, fórmulas, totales y archivo deben conservar el mismo resultado de dominio. | Canal de generación de reportes incluido abajo. |
+| Intermedia | `CU-CAT-02`, `CU-CAT-03`, `CU-ENT-03`, `CU-SAL-02` a `CU-SAL-04` | Coordinan relaciones o detalles, pero no agregan participantes o estados que justifiquen una secuencia transaccional. | Flujo funcional en su grupo y vista técnica complementaria incluida abajo. |
+| Directa | `CU-IDA-01` a `CU-IDA-03`, `CU-CAT-01`, `CU-ENT-01`, `CU-SAL-01`, `CU-REP-01` | Consulta o mutación directa sin estados coordinados adicionales. | Flujo funcional en su grupo y vista técnica complementaria incluida abajo. |
 
-Las vistas siguientes completan los casos de atención media y baja con el mismo criterio
-aplicado a los casos de atención alta: muestran la ejecución entre capas y nombran el
-punto que el flujo funcional resumido no alcanza a representar. No sustituyen los
-diagramas individuales anteriores; los complementan con una lectura orientada al código.
+Las vistas siguientes completan los casos de coordinación intermedia y directa con el
+mismo criterio aplicado a los casos de coordinación compleja: muestran la ejecución
+entre capas y nombran el punto que el flujo funcional resumido no alcanza a representar.
+No sustituyen los diagramas individuales anteriores; los complementan con una lectura
+orientada al código.
 
 ### Consultar identidades y accesos — `CU-IDA-01`
 

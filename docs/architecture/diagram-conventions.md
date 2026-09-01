@@ -42,7 +42,7 @@ particular sin producir un diagrama único e ilegible:
 1. **contexto:** actores, Nexus y sistemas externos;
 2. **contenedores y despliegue:** lugares de ejecución y comunicación;
 3. **estructura interna:** superficie HTTP, dominios, capas y componentes;
-4. **dinámica:** petición representativa y transacciones de atención alta;
+4. **dinámica:** petición representativa y coordinaciones complejas;
 5. **reutilización:** fábricas, composición y componentes compartidos;
 6. **detalle mecánico:** rutas, imports y modelos en artefactos generados.
 
