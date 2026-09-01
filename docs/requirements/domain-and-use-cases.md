@@ -232,25 +232,38 @@ como alcance, permisos y criterios de aceptación.
 ## Estados y datos modificados por acción
 
 Los modos de formulario (`crear`, `editar`, `surtir`, `devolver`) no son estados del
-documento. El siguiente UML de estados muestra las precondiciones de negocio comunes a
-salidas de material y merma; las diferencias específicas se consultan en la
-[matriz de operaciones](requirements-operations-matrix.md#modos-precondiciones-y-datos-modificados).
+documento. El siguiente UML usa exclusivamente los nombres persistidos que resuelve el
+código (`Pendiente`, `Surtido parcial`, `Surtido` y `Cancelado`); por tanto, no presenta
+`Borrador` o `Devuelta` como estados aunque esas palabras puedan describir una acción o
+una condición funcional. La máquina resume el **cumplimiento agregado** común a salidas
+de material y merma. El estado de cada detalle y el del encabezado se derivan después de
+la operación, no se asignan desde el formulario.
+
+Las diferencias de permisos, campos y efectos se consultan en la
+[matriz de operaciones](requirements-operations-matrix.md#modos-precondiciones-y-datos-modificados),
+y las reglas verificables están en `src/constants/warehouseStatuses.js`,
+`src/services/warehouse/issues/issueFulfillmentRules.js` y los servicios específicos de
+salidas de material y merma.
 
 ```mermaid
 stateDiagram-v2
-    [*] --> Borrador: crear encabezado y detalles
-    Borrador --> Borrador: editar encabezado o detalles
-    Borrador --> Parcial: surtir parte de una cantidad
-    Borrador --> Surtida: surtir todas las cantidades
-    Parcial --> Parcial: surtir otra parte o devolver parte
-    Parcial --> Surtida: completar surtimiento
-    Surtida --> Parcial: devolver parte
-    Surtida --> Devuelta: devolver todo lo surtido
-    Borrador --> Cancelada: cancelar cuando el flujo lo permita
-    Parcial --> Cancelada: cancelar sólo con regla autorizada
-    Devuelta --> [*]
+    [*] --> Pendiente: crear encabezado y detalles
+    Pendiente --> Pendiente: editar encabezado o detalles admitidos
+    Pendiente --> Parcial: surtir parte de al menos un detalle
+    Pendiente --> Surtida: surtir todos los detalles
+    Parcial --> Parcial: surtir sin completar el documento
+    Parcial --> Surtida: completar todos los detalles
+    Surtida --> Surtida: devolución parcial de un detalle
+    Surtida --> Cancelada: devolver todo lo surtido de todos los detalles
+    Parcial --> Cancelada: devolver todo lo surtido de todos los detalles
     Cancelada --> [*]
 ```
+
+`Parcial` es la etiqueta abreviada de `Surtido parcial` y `Surtida` representa el valor
+persistido `Surtido`. La devolución parcial no crea un estado `Devuelta`: conserva el
+detalle como surtido mientras aún exista cantidad neta entregada. Sólo cuando todos los
+detalles resultan cancelados se deriva `Cancelado` para el encabezado. Esta aclaración
+evita interpretar el diagrama como un catálogo adicional de estados.
 
 ## Vistas de diseño del sistema
 
