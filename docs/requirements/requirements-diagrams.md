@@ -97,245 +97,526 @@ transacción con un nuevo efecto persistente o una transición de estado. Los di
 por caso reutilizan nodos y semántica cuando el proceso es equivalente, mientras los
 diagramas de secuencia o estados se reservan para explicar coordinación adicional.
 
+## Organización visual de los casos
+
+Los flujos conservan los cinco grupos funcionales del catálogo y se leen dentro de las
+familias por entidad definidas en el
+[criterio de agrupación vigente](use-case-descriptions.md#criterio-de-agrupación-vigente).
+La familia sólo permite localizar casos relacionados: cada encabezado y cada diagrama
+siguiente sigue representando una acción sobre una entidad concreta. El primer nodo
+nombra al actor como iniciador y corresponde al disparador de la ficha; los nodos
+siguientes identifican las respuestas de Nexus.
+
+
 ## Flujos de cada caso de uso
 
 Cada vista comienza con un identificador `CU-<GRUPO>-<SECUENCIA>` y representa
 exclusivamente ese objetivo. Los encabezados conservan los mismos grupos funcionales y códigos del
 catálogo; los diagramas reutilizan la misma semántica cuando el proceso es equivalente,
-pero no agrupan objetivos distintos en una sola vista. Las flechas son pasos observables,
-no endpoints. La fuente curada es el
+pero no agrupan objetivos distintos en una sola vista. Las flechas resumen los pasos
+observables y no representan endpoints. El recorrido contrastado contra vista, router,
+controller y servicio se conserva en la sección
+[inferencia de pasos desde la implementación](use-case-descriptions.md#inferencia-de-pasos-desde-la-implementación),
+y la fuente curada de cada ficha es el
 [catálogo operativo](use-case-descriptions.md#catálogo-operativo-y-granularidad).
 
 ### Grupo funcional IDA — Identidad y acceso
 
-#### `CU-IDA-01` — Consultar identidades y accesos
+#### `CU-IDA-01` — Consultar personas
 
 ```mermaid
 flowchart LR
-    iam01Request["Elegir personas o usuarios"] --> iam01Filters["Aplicar búsqueda, filtros y paginación"]
-    iam01Filters --> iam01Result["Mostrar identidades y accesos autorizados"]
+    request["Actor solicita consultar personas"] --> validate["Nexus valida permiso, datos y relaciones"]
+    validate --> result["Nexus responde: Listado de personas y asignaciones."]
 ```
 
 #### `CU-IDA-02` — Crear persona
 
 ```mermaid
 flowchart LR
-    iam02Request["Capturar datos de persona"] --> iam02Validate["Validar identidad y campos obligatorios"]
-    iam02Validate --> iam02Persist["Crear persona"] --> iam02Refresh["Confirmar y refrescar listado"]
+    request["Actor solicita crear persona"] --> validate["Nexus valida permiso, datos y relaciones"]
+    validate --> result["Nexus responde: Alta de persona sin crear cuenta."]
 ```
 
 #### `CU-IDA-03` — Editar persona
 
 ```mermaid
 flowchart LR
-    iam03Select["Seleccionar persona"] --> iam03Edit["Modificar campos admitidos"]
-    iam03Edit --> iam03Validate["Validar identidad y cambios"] --> iam03Persist["Actualizar persona"]
-    iam03Persist --> iam03Refresh["Confirmar y refrescar listado"]
+    request["Actor solicita editar persona"] --> validate["Nexus valida permiso, datos y relaciones"]
+    validate --> result["Nexus responde: Actualización de datos y asignaciones de persona."]
 ```
 
-#### `CU-IDA-04` — Crear usuario y asignar acceso
+#### `CU-IDA-04` — Consultar usuarios
 
 ```mermaid
 flowchart LR
-    iam04Request["Capturar cuenta, persona, rol y departamento"] --> iam04Validate["Validar cuenta, persona opcional y acceso"]
-    iam04Validate --> iam04Password["Cifrar contraseña"] --> iam04Persist["Crear usuario y asignación"]
-    iam04Persist --> iam04Result["Responder sin exponer la credencial"]
+    request["Actor solicita consultar usuarios"] --> validate["Nexus valida permiso, datos y relaciones"]
+    validate --> result["Nexus responde: Listado de cuentas y accesos."]
 ```
 
-#### `CU-IDA-05` — Editar usuario o cambiar contraseña
+#### `CU-IDA-05` — Crear usuario y asignar acceso
 
 ```mermaid
-flowchart TB
-    iam05Select["Seleccionar usuario"] --> iam05Action{"¿Cuenta/acceso o contraseña?"}
-    iam05Action -->|cuenta o acceso| iam05Access["Validar campos, rol y departamento"]
-    iam05Access --> iam05Persist["Actualizar cuenta y reemplazar asignación en transacción"]
-    iam05Action -->|contraseña| iam05Password["Validar y cifrar contraseña nueva"]
-    iam05Password --> iam05Credential["Actualizar credencial"]
-    iam05Persist --> iam05Result["Responder sin exponer la credencial"]
-    iam05Credential --> iam05Result
+flowchart LR
+    request["Actor solicita crear usuario y asignar acceso"] --> validate["Nexus valida permiso, datos y relaciones"]
+    validate --> result["Nexus responde: Alta transaccional de cuenta y asignación."]
+```
+
+#### `CU-IDA-06` — Editar usuario y acceso
+
+```mermaid
+flowchart LR
+    request["Actor solicita editar usuario y acceso"] --> validate["Nexus valida permiso, datos y relaciones"]
+    validate --> result["Nexus responde: Actualización transaccional de cuenta y asignación."]
+```
+
+#### `CU-IDA-07` — Cambiar contraseña de usuario
+
+```mermaid
+flowchart LR
+    request["Actor solicita cambiar contraseña de usuario"] --> validate["Nexus valida permiso, datos y relaciones"]
+    validate --> result["Nexus responde: Actualización cifrada de la credencial."]
+```
+
+#### `CU-IDA-08` — Consultar roles
+
+```mermaid
+flowchart LR
+    request["Actor solicita consultar roles"] --> validate["Nexus valida permiso, datos y relaciones"]
+    validate --> result["Nexus responde: Catálogo de acceso de sólo lectura."]
+```
+
+#### `CU-IDA-09` — Consultar departamentos
+
+```mermaid
+flowchart LR
+    request["Actor solicita consultar departamentos"] --> validate["Nexus valida permiso, datos y relaciones"]
+    validate --> result["Nexus responde: Catálogo de acceso de sólo lectura."]
 ```
 
 ### Grupo funcional CAT — Catálogos
 
-#### `CU-CAT-01` — Consultar catálogos
+#### `CU-CAT-01` — Consultar materiales
 
 ```mermaid
 flowchart LR
-    cat01Resource["Elegir recurso"] --> cat01Filters["Aplicar búsqueda, filtros y paginación"]
-    cat01Filters --> cat01Result["Mostrar registros autorizados"]
+    request["Actor solicita consultar materiales"] --> validate["Nexus valida permiso, datos y relaciones"]
+    validate --> result["Nexus responde: Listado de materiales y ofertas de proveedor."]
 ```
 
-#### `CU-CAT-02` — Crear registro de catálogo
+#### `CU-CAT-02` — Crear material
 
 ```mermaid
 flowchart LR
-    cat02Resource["Elegir recurso"] --> cat02Form["Capturar datos y relaciones"]
-    cat02Form --> cat02Validate["Validar identidad y relaciones del recurso"]
-    cat02Validate --> cat02Persist["Crear registro"] --> cat02Refresh["Confirmar y refrescar listado"]
+    request["Actor solicita crear material"] --> validate["Nexus valida permiso, datos y relaciones"]
+    validate --> result["Nexus responde: Alta con presentación, unidad y relaciones válidas."]
 ```
 
-#### `CU-CAT-03` — Editar registro de catálogo
+#### `CU-CAT-03` — Editar material
 
 ```mermaid
 flowchart LR
-    cat03Select["Seleccionar registro"] --> cat03Edit["Modificar campos admitidos"]
-    cat03Edit --> cat03Validate["Validar identidad y relaciones"]
-    cat03Validate --> cat03Persist["Actualizar registro"] --> cat03Refresh["Confirmar y refrescar listado"]
+    request["Actor solicita editar material"] --> validate["Nexus valida permiso, datos y relaciones"]
+    validate --> result["Nexus responde: Actualización de datos generales admitidos."]
 ```
 
-#### `CU-CAT-04` — Eliminar o cambiar estado de registro
-
-```mermaid
-flowchart TB
-    cat04Select["Seleccionar registro"] --> cat04Policy{"¿Qué permite el recurso?"}
-    cat04Policy -->|eliminación| cat04Relations{"¿Existen relaciones protegidas?"}
-    cat04Relations -->|sí| cat04Reject["Rechazar y conservar historia"]
-    cat04Relations -->|no| cat04Delete["Eliminar registro"]
-    cat04Policy -->|cambio de estado| cat04Status["Activar o desactivar"]
-    cat04Delete --> cat04Refresh["Refrescar listado"]
-    cat04Status --> cat04Refresh
-```
-
-`CU-CAT-02` y `CU-CAT-03` reutilizan fábrica CRUD, formulario y refresco cuando el
-recurso lo permite. Cliente, proveedor, material y merma conservan sus validaciones y
-política de eliminación o estado como configuración contextual.
-
-### Grupo funcional ENT — Entradas
-
-#### `CU-ENT-01` — Consultar entradas
+#### `CU-CAT-04` — Retirar material
 
 ```mermaid
 flowchart LR
-    rec01Request["Abrir consulta de entradas"] --> rec01Filters["Aplicar búsqueda, fechas y relaciones"]
-    rec01Filters --> rec01Page["Mostrar página y totales autorizados"]
+    request["Actor solicita retirar material"] --> validate["Nexus valida permiso, datos y relaciones"]
+    validate --> result["Nexus responde: Retiro condicionado por la historia operativa."]
 ```
 
-#### `CU-ENT-02` — Registrar entrada
+#### `CU-CAT-05` — Ajustar existencia de material
 
 ```mermaid
 flowchart LR
-    rec02Header["Capturar proveedor, factura y receptor"] --> rec02Details["Agregar detalles"]
-    rec02Details --> rec02Validate["Validar relaciones, cantidades y factura única"]
-    rec02Validate --> rec02Transaction["Crear entrada y detalles<br/>incrementar stock y registrar movimientos"]
-    rec02Transaction --> rec02Result["Confirmar entrada"]
+    request["Actor solicita ajustar existencia de material"] --> validate["Nexus valida permiso, datos y relaciones"]
+    validate --> result["Nexus responde: Ajuste trazable de inventario."]
 ```
 
-#### `CU-ENT-03` — Editar entrada
+#### `CU-CAT-06` — Consultar proveedores
 
 ```mermaid
 flowchart LR
-    rec03Select["Seleccionar entrada"] --> rec03Edit["Modificar encabezado o agregar detalles admitidos"]
-    rec03Edit --> rec03Validate["Validar estado, relaciones y detalles nuevos"]
-    rec03Validate --> rec03Transaction["Actualizar en transacción<br/>sin reaplicar stock existente"]
-    rec03Transaction --> rec03Result["Confirmar entrada actualizada"]
+    request["Actor solicita consultar proveedores"] --> validate["Nexus valida permiso, datos y relaciones"]
+    validate --> result["Nexus responde: Listado de proveedores autorizados."]
 ```
 
-#### `CU-ENT-04` — Corregir detalle de entrada
+#### `CU-CAT-07` — Crear proveedor
 
 ```mermaid
 flowchart LR
-    rec04Select["Seleccionar detalle"] --> rec04Input["Indicar cantidad, costo y motivo"]
-    rec04Input --> rec04Validate["Validar estado, diferencia y stock"]
-    rec04Validate --> rec04Transaction["Ajustar stock, totales y movimiento<br/>registrar valores e historial"]
-    rec04Transaction --> rec04Result["Confirmar corrección"]
+    request["Actor solicita crear proveedor"] --> validate["Nexus valida permiso, datos y relaciones"]
+    validate --> result["Nexus responde: Alta con código e identidad válidos."]
 ```
 
-#### `CU-ENT-05` — Cancelar detalle de entrada
+#### `CU-CAT-08` — Editar proveedor
 
 ```mermaid
 flowchart LR
-    rec05Select["Seleccionar detalle"] --> rec05Reason["Indicar motivo de cancelación"]
-    rec05Reason --> rec05Validate["Validar estado y stock reversible"]
-    rec05Validate --> rec05Transaction["Revertir stock y totales<br/>registrar movimiento e historial"]
-    rec05Transaction --> rec05Result["Confirmar cancelación"]
+    request["Actor solicita editar proveedor"] --> validate["Nexus valida permiso, datos y relaciones"]
+    validate --> result["Nexus responde: Actualización de datos admitidos."]
 ```
 
-### Grupo funcional SAL — Salidas
-
-#### `CU-SAL-01` — Consultar salidas
+#### `CU-CAT-09` — Consultar clientes
 
 ```mermaid
 flowchart LR
-    iss01Context["Elegir material o merma"] --> iss01Filters["Aplicar búsqueda, fechas y relaciones"]
-    iss01Filters --> iss01Page["Mostrar salidas y estados autorizados"]
+    request["Actor solicita consultar clientes"] --> validate["Nexus valida permiso, datos y relaciones"]
+    validate --> result["Nexus responde: Listado de clientes autorizados."]
 ```
 
-#### `CU-SAL-02` — Crear salida
+#### `CU-CAT-10` — Crear cliente
 
 ```mermaid
 flowchart LR
-    iss02Context["Elegir material o merma"] --> iss02Header["Capturar encabezado y detalles"]
-    iss02Header --> iss02Validate["Validar relaciones y cantidades del contexto"]
-    iss02Validate --> iss02Persist["Crear salida pendiente<br/>sin descontar inventario"]
-    iss02Persist --> iss02Result["Confirmar salida"]
+    request["Actor solicita crear cliente"] --> validate["Nexus valida permiso, datos y relaciones"]
+    validate --> result["Nexus responde: Alta con asesor opcional válido."]
 ```
 
-#### `CU-SAL-03` — Editar encabezado de salida
+#### `CU-CAT-11` — Editar cliente
 
 ```mermaid
 flowchart LR
-    iss03Select["Seleccionar salida"] --> iss03Validate["Comprobar estado y campos admitidos"]
-    iss03Validate --> iss03Persist["Actualizar encabezado<br/>sin modificar inventario"]
-    iss03Persist --> iss03Result["Confirmar actualización"]
+    request["Actor solicita editar cliente"] --> validate["Nexus valida permiso, datos y relaciones"]
+    validate --> result["Nexus responde: Actualización de datos y asesor opcional."]
 ```
 
-#### `CU-SAL-04` — Ajustar detalles de salida
+#### `CU-CAT-12` — Consultar mermas
 
 ```mermaid
 flowchart LR
-    iss04Select["Seleccionar salida y detalle"] --> iss04Change["Agregar o modificar cantidad"]
-    iss04Change --> iss04Validate["Validar estado y cantidad todavía modificable"]
-    iss04Validate --> iss04Persist["Actualizar detalles y derivar estado<br/>sin descontar inventario"]
-    iss04Persist --> iss04Result["Confirmar ajuste"]
+    request["Actor solicita consultar mermas"] --> validate["Nexus valida permiso, datos y relaciones"]
+    validate --> result["Nexus responde: Listado de existencias de merma."]
 ```
 
-#### `CU-SAL-05` — Surtir detalle
+#### `CU-CAT-13` — Registrar merma
 
 ```mermaid
 flowchart LR
-    iss05Select["Seleccionar detalle pendiente"] --> iss05Quantity["Indicar cantidad a surtir"]
-    iss05Quantity --> iss05Validate["Validar pendiente y existencia"]
-    iss05Validate --> iss05Transaction["Descontar stock y crear movimiento<br/>acumular surtido y derivar estados"]
-    iss05Transaction --> iss05Result["Confirmar surtimiento"]
+    request["Actor solicita registrar merma"] --> validate["Nexus valida permiso, datos y relaciones"]
+    validate --> result["Nexus responde: Alta desde una plantilla material-proveedor."]
 ```
 
-#### `CU-SAL-06` — Devolver detalle surtido
+#### `CU-CAT-14` — Editar merma
 
 ```mermaid
 flowchart LR
-    iss06Select["Seleccionar detalle surtido"] --> iss06Quantity["Indicar cantidad a devolver"]
-    iss06Quantity --> iss06Validate["Validar cantidad retornable"]
-    iss06Validate --> iss06Transaction["Reintegrar stock y crear movimiento inverso<br/>acumular devolución y derivar estados"]
-    iss06Transaction --> iss06Result["Confirmar devolución"]
+    request["Actor solicita editar merma"] --> validate["Nexus valida permiso, datos y relaciones"]
+    validate --> result["Nexus responde: Actualización sin alterar su identidad física."]
 ```
 
-Los seis diagramas se aplican a material o merma cuando la operación existe. Se replica
-el proceso y cambia el adaptador de inventario, conversión y validación; no se inventa un
-segundo caso únicamente por el contexto.
+#### `CU-CAT-15` — Ajustar existencia de merma
+
+```mermaid
+flowchart LR
+    request["Actor solicita ajustar existencia de merma"] --> validate["Nexus valida permiso, datos y relaciones"]
+    validate --> result["Nexus responde: Ajuste trazable de inventario de merma."]
+```
+
+#### `CU-CAT-16` — Consultar presentaciones
+
+```mermaid
+flowchart LR
+    request["Actor solicita consultar presentaciones"] --> validate["Nexus valida permiso, datos y relaciones"]
+    validate --> result["Nexus responde: Catálogo auxiliar de sólo lectura."]
+```
+
+#### `CU-CAT-17` — Consultar unidades de medida
+
+```mermaid
+flowchart LR
+    request["Actor solicita consultar unidades de medida"] --> validate["Nexus valida permiso, datos y relaciones"]
+    validate --> result["Nexus responde: Catálogo auxiliar de sólo lectura."]
+```
+
+#### `CU-CAT-18` — Consultar motivos de ajuste
+
+```mermaid
+flowchart LR
+    request["Actor solicita consultar motivos de ajuste"] --> validate["Nexus valida permiso, datos y relaciones"]
+    validate --> result["Nexus responde: Catálogo auxiliar de sólo lectura."]
+```
+
+#### `CU-CAT-19` — Consultar estados de cumplimiento
+
+```mermaid
+flowchart LR
+    request["Actor solicita consultar estados de cumplimiento"] --> validate["Nexus valida permiso, datos y relaciones"]
+    validate --> result["Nexus responde: Catálogo auxiliar de sólo lectura."]
+```
+
+#### `CU-CAT-20` — Cambiar estado de proveedor
+
+```mermaid
+flowchart LR
+    request["Actor solicita cambiar estado de proveedor"] --> validate["Nexus valida permiso, datos y relaciones"]
+    validate --> result["Nexus responde: Activación o desactivación del proveedor."]
+```
+
+### Grupo funcional ENT — Compras de material
+
+#### `CU-ENT-01` — Consultar compras de material
+
+```mermaid
+flowchart LR
+    request["Actor solicita consultar compras de material"] --> validate["Nexus valida permiso, datos y relaciones"]
+    validate --> result["Nexus responde: Listado y detalle sin modificar inventario."]
+```
+
+#### `CU-ENT-02` — Crear compra de material
+
+```mermaid
+flowchart LR
+    request["Actor solicita crear compra de material"] --> validate["Nexus valida permiso, datos y relaciones"]
+    validate --> result["Nexus responde: Compra, detalles, existencias y movimientos transaccionales."]
+```
+
+#### `CU-ENT-03` — Editar compra de material
+
+```mermaid
+flowchart LR
+    request["Actor solicita editar compra de material"] --> validate["Nexus valida permiso, datos y relaciones"]
+    validate --> result["Nexus responde: Edición de encabezado y detalles admitidos."]
+```
+
+#### `CU-ENT-04` — Corregir material de una compra
+
+```mermaid
+flowchart LR
+    request["Actor solicita corregir material de una compra"] --> validate["Nexus valida permiso, datos y relaciones"]
+    validate --> result["Nexus responde: Corrección de cantidad o costo con historial."]
+```
+
+#### `CU-ENT-05` — Cancelar material de una compra
+
+```mermaid
+flowchart LR
+    request["Actor solicita cancelar material de una compra"] --> validate["Nexus valida permiso, datos y relaciones"]
+    validate --> result["Nexus responde: Cancelación del detalle y reversión de inventario."]
+```
+
+### Grupo funcional SAL — Salidas de material y de merma
+
+#### `CU-SAL-01` — Consultar salidas de material
+
+```mermaid
+flowchart LR
+    request["Actor solicita consultar salidas de material"] --> validate["Nexus valida permiso, datos y relaciones"]
+    validate --> result["Nexus responde: Consulta sin modificar existencias."]
+```
+
+#### `CU-SAL-02` — Crear salida de material
+
+```mermaid
+flowchart LR
+    request["Actor solicita crear salida de material"] --> validate["Nexus valida permiso, datos y relaciones"]
+    validate --> result["Nexus responde: Creación pendiente sin descontar existencias."]
+```
+
+#### `CU-SAL-03` — Editar encabezado de salida de material
+
+```mermaid
+flowchart LR
+    request["Actor solicita editar encabezado de salida de material"] --> validate["Nexus valida permiso, datos y relaciones"]
+    validate --> result["Nexus responde: Edición de los campos admitidos."]
+```
+
+#### `CU-SAL-04` — Ajustar materiales de una salida
+
+```mermaid
+flowchart LR
+    request["Actor solicita ajustar materiales de una salida"] --> validate["Nexus valida permiso, datos y relaciones"]
+    validate --> result["Nexus responde: Actualización de detalles todavía modificables."]
+```
+
+#### `CU-SAL-05` — Surtir material
+
+```mermaid
+flowchart LR
+    request["Actor solicita surtir material"] --> validate["Nexus valida permiso, datos y relaciones"]
+    validate --> result["Nexus responde: Descuento de existencia y registro de movimiento."]
+```
+
+#### `CU-SAL-06` — Devolver material surtido
+
+```mermaid
+flowchart LR
+    request["Actor solicita devolver material surtido"] --> validate["Nexus valida permiso, datos y relaciones"]
+    validate --> result["Nexus responde: Reintegro de existencia y movimiento inverso."]
+```
+
+#### `CU-SAL-07` — Consultar salidas de merma
+
+```mermaid
+flowchart LR
+    request["Actor solicita consultar salidas de merma"] --> validate["Nexus valida permiso, datos y relaciones"]
+    validate --> result["Nexus responde: Consulta sin modificar existencias."]
+```
+
+#### `CU-SAL-08` — Crear salida de merma
+
+```mermaid
+flowchart LR
+    request["Actor solicita crear salida de merma"] --> validate["Nexus valida permiso, datos y relaciones"]
+    validate --> result["Nexus responde: Creación pendiente sin descontar existencias."]
+```
+
+#### `CU-SAL-09` — Editar encabezado de salida de merma
+
+```mermaid
+flowchart LR
+    request["Actor solicita editar encabezado de salida de merma"] --> validate["Nexus valida permiso, datos y relaciones"]
+    validate --> result["Nexus responde: Edición de los campos admitidos."]
+```
+
+#### `CU-SAL-10` — Ajustar mermas de una salida
+
+```mermaid
+flowchart LR
+    request["Actor solicita ajustar mermas de una salida"] --> validate["Nexus valida permiso, datos y relaciones"]
+    validate --> result["Nexus responde: Actualización de detalles todavía modificables."]
+```
+
+#### `CU-SAL-11` — Surtir merma
+
+```mermaid
+flowchart LR
+    request["Actor solicita surtir merma"] --> validate["Nexus valida permiso, datos y relaciones"]
+    validate --> result["Nexus responde: Descuento de existencia y registro de movimiento."]
+```
+
+#### `CU-SAL-12` — Devolver merma surtida
+
+```mermaid
+flowchart LR
+    request["Actor solicita devolver merma surtido"] --> validate["Nexus valida permiso, datos y relaciones"]
+    validate --> result["Nexus responde: Reintegro de existencia y movimiento inverso."]
+```
 
 ### Grupo funcional REP — Consultas y reportes
 
-#### `CU-REP-01` — Consultar movimientos e inventario
+#### `CU-REP-01` — Consultar inventario de materiales
 
 ```mermaid
 flowchart LR
-    rep01Context["Elegir movimientos o inventario"] --> rep01Filters["Validar permiso y aplicar filtros"]
-    rep01Filters --> rep01Query["Consultar datos autorizados"] --> rep01Result["Mostrar página y totales"]
+    request["Actor solicita consultar inventario de materiales"] --> validate["Nexus valida permiso, datos y relaciones"]
+    validate --> result["Nexus responde: Consulta autorizada sin modificar datos."]
 ```
 
-#### `CU-REP-02` — Generar reporte
+#### `CU-REP-02` — Consultar inventario de mermas
 
 ```mermaid
 flowchart LR
-    rep02Select["Elegir reporte y parámetros"] --> rep02Filters["Normalizar filtros del reporte"]
-    rep02Filters --> rep02Query["Consultar datos autorizados"] --> rep02Build["Construir filas, agrupaciones y totales"]
-    rep02Build --> rep02Export["Generar archivo con columnas autorizadas"]
+    request["Actor solicita consultar inventario de mermas"] --> validate["Nexus valida permiso, datos y relaciones"]
+    validate --> result["Nexus responde: Consulta autorizada sin modificar datos."]
 ```
 
-Los veintidós identificadores coinciden con los objetivos del diagrama general y cada
-uno dispone de un diagrama independiente. Una operación nueva requiere un identificador
-y una vista propios; una variante técnica interna
-no se convierte por sí sola en caso de uso.
+#### `CU-REP-03` — Consultar movimientos de materiales
+
+```mermaid
+flowchart LR
+    request["Actor solicita consultar movimientos de materiales"] --> validate["Nexus valida permiso, datos y relaciones"]
+    validate --> result["Nexus responde: Consulta autorizada sin modificar datos."]
+```
+
+#### `CU-REP-04` — Consultar movimientos de mermas
+
+```mermaid
+flowchart LR
+    request["Actor solicita consultar movimientos de mermas"] --> validate["Nexus valida permiso, datos y relaciones"]
+    validate --> result["Nexus responde: Consulta autorizada sin modificar datos."]
+```
+
+#### `CU-REP-05` — Generar reporte de inventario de materiales
+
+```mermaid
+flowchart LR
+    request["Actor solicita generar reporte de inventario de materiales"] --> validate["Nexus valida permiso, datos y relaciones"]
+    validate --> result["Nexus responde: Archivo Excel con filtros, columnas y cálculos propios del reporte."]
+```
+
+#### `CU-REP-06` — Generar reporte de salidas de material
+
+```mermaid
+flowchart LR
+    request["Actor solicita generar reporte de salidas de material"] --> validate["Nexus valida permiso, datos y relaciones"]
+    validate --> result["Nexus responde: Archivo Excel con filtros, columnas y cálculos propios del reporte."]
+```
+
+#### `CU-REP-07` — Generar reporte de salidas de merma
+
+```mermaid
+flowchart LR
+    request["Actor solicita generar reporte de salidas de merma"] --> validate["Nexus valida permiso, datos y relaciones"]
+    validate --> result["Nexus responde: Archivo Excel con filtros, columnas y cálculos propios del reporte."]
+```
+
+#### `CU-REP-08` — Generar reporte de compras de material
+
+```mermaid
+flowchart LR
+    request["Actor solicita generar reporte de compras de material"] --> validate["Nexus valida permiso, datos y relaciones"]
+    validate --> result["Nexus responde: Archivo Excel con filtros, columnas y cálculos propios del reporte."]
+```
+
+#### `CU-REP-09` — Generar reporte de mermas
+
+```mermaid
+flowchart LR
+    request["Actor solicita generar reporte de mermas"] --> validate["Nexus valida permiso, datos y relaciones"]
+    validate --> result["Nexus responde: Archivo Excel con filtros, columnas y cálculos propios del reporte."]
+```
+
+#### `CU-REP-10` — Generar reporte de proveedores
+
+```mermaid
+flowchart LR
+    request["Actor solicita generar reporte de proveedores"] --> validate["Nexus valida permiso, datos y relaciones"]
+    validate --> result["Nexus responde: Archivo Excel con filtros, columnas y cálculos propios del reporte."]
+```
+
+#### `CU-REP-11` — Generar reporte de clientes
+
+```mermaid
+flowchart LR
+    request["Actor solicita generar reporte de clientes"] --> validate["Nexus valida permiso, datos y relaciones"]
+    validate --> result["Nexus responde: Archivo Excel con filtros, columnas y cálculos propios del reporte."]
+```
+
+#### `CU-REP-12` — Generar reporte de personas
+
+```mermaid
+flowchart LR
+    request["Actor solicita generar reporte de personas"] --> validate["Nexus valida permiso, datos y relaciones"]
+    validate --> result["Nexus responde: Archivo Excel con filtros, columnas y cálculos propios del reporte."]
+```
+
+#### `CU-REP-13` — Generar reporte de usuarios
+
+```mermaid
+flowchart LR
+    request["Actor solicita generar reporte de usuarios"] --> validate["Nexus valida permiso, datos y relaciones"]
+    validate --> result["Nexus responde: Archivo Excel con filtros, columnas y cálculos propios del reporte."]
+```
+
+#### `CU-REP-14` — Generar reporte de movimientos de materiales
+
+```mermaid
+flowchart LR
+    request["Actor solicita generar reporte de movimientos de materiales"] --> validate["Nexus valida permiso, datos y relaciones"]
+    validate --> result["Nexus responde: Archivo Excel con filtros, columnas y cálculos propios del reporte."]
+```
+
+#### `CU-REP-15` — Generar reporte de movimientos de mermas
+
+```mermaid
+flowchart LR
+    request["Actor solicita generar reporte de movimientos de mermas"] --> validate["Nexus valida permiso, datos y relaciones"]
+    validate --> result["Nexus responde: Archivo Excel con filtros, columnas y cálculos propios del reporte."]
+```
 
 ## Casos con vistas adicionales y nivel de coordinación
 
@@ -349,14 +630,14 @@ el código.
 
 | Nivel de coordinación | Casos revisados | Motivo | Vista aplicada |
 | --- | --- | --- | --- |
-| Compleja | `CU-IDA-04`, `CU-IDA-05` | Contraseña cifrada, persona opcional y asignación rol/departamento; al editar se reemplaza la asignación dentro de una transacción. | Secuencia de identidad y acceso incluida abajo. |
-| Compleja | `CU-CAT-04` para material | La historia operativa impide eliminar; si quedan otros proveedores sólo se retira la relación proveedor-material. | Decisión de eliminación incluida abajo. |
+| Compleja | `CU-IDA-05`, `CU-IDA-06`, `CU-IDA-07` | Contraseña cifrada, persona opcional y asignación rol/departamento; al editar se reemplaza la asignación dentro de una transacción. | Secuencia de identidad y acceso incluida abajo. |
+| Compleja | `CU-CAT-04` | La historia operativa impide eliminar; si quedan otros proveedores sólo se retira la relación proveedor-material. | Decisión de eliminación incluida abajo. |
 | Compleja | `CU-ENT-02` | Referencia, documento, detalles, stock y movimientos se confirman juntos; el costo se revisa después del commit. | Secuencia de registro incluida abajo. |
 | Compleja | `CU-ENT-04`, `CU-ENT-05` | Corrección/cancelación altera historia, totales, stock y movimiento. | Secuencia atómica ya incluida en este documento. |
-| Compleja | `CU-SAL-05`, `CU-SAL-06` | Acumulados, estados, existencias y movimientos dependen de cantidades previas. | Máquina de estados ya incluida en este documento. |
-| Compleja | `CU-REP-02` | Filtros, variantes mensual/detallada, fórmulas, totales y archivo deben conservar el mismo resultado de dominio. | Canal de generación de reportes incluido abajo. |
-| Intermedia | `CU-CAT-02`, `CU-CAT-03`, `CU-ENT-03`, `CU-SAL-02` a `CU-SAL-04` | Coordinan relaciones o detalles, pero no agregan participantes o estados que justifiquen una secuencia transaccional. | Flujo funcional en su grupo y vista técnica complementaria incluida abajo. |
-| Directa | `CU-IDA-01` a `CU-IDA-03`, `CU-CAT-01`, `CU-ENT-01`, `CU-SAL-01`, `CU-REP-01` | Consulta o mutación directa sin estados coordinados adicionales. | Flujo funcional en su grupo y vista técnica complementaria incluida abajo. |
+| Compleja | `CU-SAL-05`, `CU-SAL-06`, `CU-SAL-11`, `CU-SAL-12` | Acumulados, estados, existencias y movimientos dependen de cantidades previas. | Máquina de estados ya incluida en este documento. |
+| Compleja | `CU-REP-05` a `CU-REP-15` | Filtros, variantes mensual/detallada, fórmulas, totales y archivo deben conservar el mismo resultado de dominio. | Canal de generación de reportes incluido abajo. |
+| Intermedia | `CU-CAT-02`, `CU-CAT-03`, `CU-CAT-07`, `CU-CAT-08`, `CU-CAT-10`, `CU-CAT-11`, `CU-CAT-13`, `CU-CAT-14`, `CU-ENT-03`, `CU-SAL-02` a `CU-SAL-04` y `CU-SAL-08` a `CU-SAL-10` | Coordinan relaciones o detalles, pero no agregan participantes o estados que justifiquen una secuencia transaccional. | Flujo funcional en su grupo y vista técnica complementaria incluida abajo. |
+| Directa | `CU-IDA-01` a `CU-IDA-03`, `CU-CAT-01`, `CU-CAT-06`, `CU-CAT-09`, `CU-CAT-12`, `CU-CAT-16` a `CU-CAT-19`, `CU-ENT-01`, `CU-SAL-01`, `CU-SAL-07`, `CU-REP-01` a `CU-REP-04` | Consulta o mutación directa sin estados coordinados adicionales. | Flujo funcional en su grupo y vista técnica complementaria incluida abajo. |
 
 Las vistas siguientes completan los casos de coordinación intermedia y directa con el
 mismo criterio aplicado a los casos de coordinación compleja: muestran la ejecución
@@ -364,7 +645,7 @@ entre capas y nombran el punto que el flujo funcional resumido no alcanza a repr
 No sustituyen los diagramas individuales anteriores; los complementan con una lectura
 orientada al código.
 
-### Consultar identidades y accesos — `CU-IDA-01`
+### Consultar personas y usuarios — `CU-IDA-01` y `CU-IDA-04`
 
 ```mermaid
 sequenceDiagram
@@ -440,7 +721,7 @@ La secuencia hace visible que la existencia y la identidad no se confían al for
 No muestra componentes EJS ni refresco de DataTable porque pertenecen a la presentación,
 no a la actualización de dominio.
 
-### Consultar catálogos — `CU-CAT-01`
+### Patrón de consulta de catálogos — `CU-CAT-01`, `CU-CAT-06`, `CU-CAT-09`, `CU-CAT-12` y `CU-CAT-16` a `CU-CAT-19`
 
 ```mermaid
 flowchart LR
@@ -455,7 +736,7 @@ La fábrica de listado se reutiliza cuando el recurso la configura; el diagrama 
 que todos los catálogos compartan filtros o permisos. Los routers y servicios concretos
 siguen siendo las fuentes verificables de cada variante.
 
-### Crear registro de catálogo — `CU-CAT-02`
+### Patrón de alta de catálogos — `CU-CAT-02`, `CU-CAT-07`, `CU-CAT-10` y `CU-CAT-13`
 
 ```mermaid
 flowchart LR
@@ -469,7 +750,7 @@ Cliente, proveedor, material, merma y catálogos auxiliares recorren capas equiv
 pero sus relaciones y reglas no se trasladan a una fábrica común. El refresco final es
 una reacción de `createCrudApplication`, no parte de la transacción de persistencia.
 
-### Editar registro de catálogo — `CU-CAT-03`
+### Patrón de edición de catálogos — `CU-CAT-03`, `CU-CAT-08`, `CU-CAT-11` y `CU-CAT-14`
 
 ```mermaid
 flowchart LR
@@ -483,7 +764,7 @@ El método HTTP y los campos editables dependen del router concreto. La vista s�
 reutiliza la cadena estable de capas y no supone que crear y editar tengan exactamente
 las mismas validaciones.
 
-### Consultar entradas — `CU-ENT-01`
+### Consultar compras de material — `CU-ENT-01`
 
 ```mermaid
 sequenceDiagram
@@ -507,7 +788,7 @@ La consulta no abre la transacción documental ni recalcula inventario. Los tota
 relaciones devueltos son proyecciones de lectura; el dibujo funcional los agrupa bajo
 «mostrar página».
 
-### Editar entrada — `CU-ENT-03`
+### Editar compra de material — `CU-ENT-03`
 
 ```mermaid
 sequenceDiagram
@@ -532,7 +813,7 @@ La ruta vigente edita el encabezado y no vuelve a aplicar el stock de detalles y
 registrados. Agregar o corregir detalles usa operaciones distintas, por lo que no se
 representan como efectos implícitos de esta secuencia.
 
-### Consultar salidas — `CU-SAL-01`
+### Consultar salidas de material o de merma — `CU-SAL-01` y `CU-SAL-07`
 
 ```mermaid
 flowchart LR
@@ -549,7 +830,7 @@ La bifurcación es técnica además de funcional: cada contexto conserva router,
 servicio e inventario propios. Compartir el resultado visual no significa consultar una
 tabla o conversión única.
 
-### Crear salida — `CU-SAL-02`
+### Crear salida de material o de merma — `CU-SAL-02` y `CU-SAL-08`
 
 ```mermaid
 sequenceDiagram
@@ -574,7 +855,7 @@ Crear la salida no descuenta inventario ni registra el movimiento de surtimiento
 efectos comienzan al confirmar detalles en `CU-SAL-05`, aunque la interfaz presente ambos
 pasos dentro del mismo módulo.
 
-### Editar encabezado de salida — `CU-SAL-03`
+### Editar encabezado de salida de material o de merma — `CU-SAL-03` y `CU-SAL-09`
 
 ```mermaid
 flowchart LR
@@ -589,7 +870,7 @@ flowchart LR
 contextual conserva sus relaciones. La ruta general `PATCH /:id` es otra entrada del
 contrato y no convierte esta edición en surtimiento.
 
-### Ajustar detalles de salida — `CU-SAL-04`
+### Ajustar materiales o mermas de una salida — `CU-SAL-04` y `CU-SAL-10`
 
 ```mermaid
 flowchart LR
@@ -597,16 +878,16 @@ flowchart LR
     issueDetailValidation --> issueDetailService["Servicio contextual<br/>comparar detalles vigentes"]
     issueDetailService --> issueDetailDecision{"¿Sólo ajustar o<br/>confirmar surtimiento?"}
     issueDetailDecision -->|ajustar| issueDetailDb[("Actualizar detalles")]
-    issueDetailDecision -->|confirmar| issueSupply["Aplicar reglas de CU-SAL-05"]
+    issueDetailDecision -->|confirmar| issueSupply["Aplicar reglas de CU-SAL-05 o CU-SAL-11"]
     issueDetailDb --> issueDetailStatus["Derivar estado del documento"]
     issueSupply --> issueDetailStatus
 ```
 
 No existe una URL `/supply`: en material, la misma entrada de detalles puede confirmar
 el surtimiento según el estado y los datos recibidos. La rama de confirmación continúa
-en la máquina de estados y en la transacción de `CU-SAL-05`; no se duplica aquí.
+en la máquina de estados y en la transacción de `CU-SAL-05` o `CU-SAL-11`; no se duplica aquí.
 
-### Consultar movimientos e inventario — `CU-REP-01`
+### Consultar inventarios y movimientos — `CU-REP-01` a `CU-REP-04`
 
 ```mermaid
 flowchart TB
@@ -621,9 +902,9 @@ flowchart TB
 
 Movimientos e inventario son modelos de lectura diferentes y sólo comparten el objetivo
 de consulta. Esta vista no incluye Excel: la exportación agrega transformación, columnas
-y fórmulas y pertenece a `CU-REP-02`.
+y fórmulas y pertenece a `CU-REP-05` a `CU-REP-15`.
 
-### Crear o editar usuario y acceso — `CU-IDA-04`, `CU-IDA-05`
+### Crear o editar usuario y acceso — `CU-IDA-05`, `CU-IDA-06`, `CU-IDA-07`
 
 ```mermaid
 sequenceDiagram
@@ -675,7 +956,7 @@ La comprobación y ambas eliminaciones pertenecen a una sola transacción. El li
 reutiliza las mismas relaciones de uso para mostrar `canDelete`; no mantiene una segunda
 definición de qué significa «sin historia».
 
-### Registrar entrada — `CU-ENT-02`
+### Crear compra de material — `CU-ENT-02`
 
 ```mermaid
 sequenceDiagram
@@ -702,7 +983,7 @@ sequenceDiagram
 El ajuste posterior del costo no se presenta como parte del límite atómico de documento,
 stock y movimiento. Esta diferencia debe permanecer visible en pruebas y documentación.
 
-### Generar reporte — `CU-REP-02`
+### Generar reportes específicos — `CU-REP-05` a `CU-REP-15`
 
 ```mermaid
 flowchart LR
@@ -793,7 +1074,7 @@ La fuente de verdad de los nombres y derivación de estados está en
 `warehouseStatuses.js`, `issueFulfillmentRules.js` y las reglas específicas de cada
 contexto; las transacciones de surtimiento y devolución son la evidencia de sus efectos.
 Al modificar una fórmula, estado o regla de agregación se actualizan esta vista,
-`CU-SAL-05`, `CU-SAL-06` y las pruebas paralelas de reglas y servicios. Las pruebas de
+`CU-SAL-05`, `CU-SAL-06`, `CU-SAL-11`, `CU-SAL-12` y las pruebas paralelas de reglas y servicios. Las pruebas de
 integración CRUD continúan en `tests/integration/controllers/*DbTest.js`, conforme a la
 estrategia documentada, en vez de trasladarse junto al diagrama.
 

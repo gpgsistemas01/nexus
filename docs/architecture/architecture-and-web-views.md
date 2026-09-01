@@ -539,10 +539,7 @@ varias pantallas, pero siguen perteneciendo a su recurso. Por ello viven en
 `pages/warehouse/materials` y `pages/warehouse/suppliers`. Las pantallas sin CRUD también
 respetan la jerarquía completa, por ejemplo `pages/admin/movements`,
 `pages/home/login` y `pages/home/index`; no quedan puntos de entrada sueltos en la raíz
-de un dominio. La vista de acceso carga directamente `loginForm.js`: no mantiene un
-`loginPage.js` con una única importación porque no compone modal, DataTable u otro módulo.
-Recordar credenciales, validar y enviar autenticación son responsabilidades del
-formulario. Las vistas EJS replican `views/pages/<dominio>/<recurso>`; sus plantillas
+de un dominio. Las vistas EJS replican `views/pages/<dominio>/<recurso>`; sus plantillas
 parciales propias permanecen junto al recurso y las reutilizadas por varios recursos se
 ubican en `views/shared`, como los formularios comunes de salidas. El punto de entrada de
 cada CRUD sólo inicializa la tabla y carga su formulario.
