@@ -51,6 +51,8 @@ principal** cuando retorna dentro del mismo caso, o **termina el caso de uso** c
 quedan más interacciones. No se usa «volver» o «continuar» sin indicar el paso. Si el
 destino fuera otro caso de uso, no se redactaría como un salto de control informal:
 
+- Una asociación simple enlaza objetivos relacionados y se dibuja sin texto; no implica
+  por sí misma inclusión, extensión ni una llamada entre casos.
 - `«include»` identifica un caso requerido que el caso base incorpora siempre; al
   concluir, la interacción continúa en el paso siguiente a la inclusión.
 - `«extend»` identifica comportamiento opcional que se inserta en un punto de extensión
@@ -139,9 +141,9 @@ módulos de código. Un caso conserva un único identificador y una única entid
 implementación reutilice validaciones, formularios, servicios o exportadores.
 
 El orden anterior también determina la secuencia numérica: no se conserva al final del
-grupo una operación especial que pertenece a un CRUD anterior. La proximidad y la
-secuencia expresan asociación funcional, pero no crean por sí solas una relación UML
-`«include»` o `«extend»`.
+grupo una operación especial que pertenece a un CRUD anterior. Las asociaciones simples
+se dibujan sin etiqueta; sólo una relación `«include»` o `«extend»` debe indicar su
+semántica explícitamente.
 
 Los prefijos anteriores sustituyen `IAM`, `REC` e `ISS`, que mezclaban abreviaturas en
 inglés con nombres de grupos en español. Las referencias normativas se actualizan en
