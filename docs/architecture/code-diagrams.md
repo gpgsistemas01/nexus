@@ -157,7 +157,7 @@ El código confirma varias coordinaciones que no se entienden sólo con el diagr
 | Surtir o devolver detalle de salida | Servicios de salidas de material/merma, reglas de cumplimiento y movimientos. | [Máquina de estados](../requirements/requirements-diagrams.md#estados-de-surtimiento-y-devolución). |
 | Generar reporte Excel | Controllers de reporte, servicios de consulta y `reportExcelUtils.js`. | [Canal de generación](../requirements/requirements-diagrams.md#generar-reporte--cu-rep-02). |
 
-No se duplican aquí esas vistas: combinan reglas de casos de atención alta con evidencia
+No se duplican aquí esas vistas: combinan reglas de coordinación compleja con evidencia
 del código, por lo que su fuente normativa sigue siendo la documentación de requisitos.
 
 ### 4.3 Resultado de la revisión de trazabilidad diagrama–código
