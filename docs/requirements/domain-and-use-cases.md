@@ -64,7 +64,9 @@ explica a continuación. Los límites rectangulares representan el sistema. Cada
 muestra fuera de esos límites como un clasificador con el estereotipo UML `«actor»`; se
 usa esta notación alternativa a la figura humana porque Mermaid no incorpora actores en
 `flowchart`. Las asociaciones muestran quién inicia un objetivo y no equivalen a
-permisos individuales. Ventas no es
+permisos individuales. Cuando una acción opcional nace dentro de una consulta, se usa
+`«extend»` hacia el caso base; la asociación directa con el actor sigue indicando quién
+puede iniciar la acción. Ventas no es
 actor: el área no tiene acceso. Tampoco se asignan salidas a otras áreas solicitantes;
 su participación futura queda pendiente de definición.
 
@@ -189,10 +191,12 @@ flowchart LR
     warehouse --- ucFulfillmentStatusQuery
     admin -- "generaliza" --> warehouse
     admin --- ucClientQuery
+    admin --- ucMaterialStock
+    admin --- ucWasteStock
     ucMaterialQuery --- ucMaterialCreate
     ucMaterialQuery --- ucMaterialEdit
     ucMaterialQuery --- ucMaterialRemove
-    ucMaterialQuery --- ucMaterialStock
+    ucMaterialStock -. "«extend»" .-> ucMaterialQuery
     ucSupplierQuery --- ucSupplierCreate
     ucSupplierQuery --- ucSupplierEdit
     ucSupplierQuery --- ucSupplierStatus
@@ -200,8 +204,14 @@ flowchart LR
     ucClientQuery --- ucClientEdit
     ucWasteQuery --- ucWasteCreate
     ucWasteQuery --- ucWasteEdit
-    ucWasteQuery --- ucWasteStock
+    ucWasteStock -. "«extend»" .-> ucWasteQuery
 ```
+
+Los ajustes se muestran como extensiones porque el administrador los abre como una
+acción opcional desde la consulta de materiales o mermas; consultar el inventario no
+obliga a ejecutar un ajuste. La asociación exclusiva con el administrador refleja los
+permisos `materials:adjust-stock` y `wastes:adjust-stock`. El personal de almacén puede
+consultar ambos listados, pero no hereda esas dos asociaciones restringidas.
 
 ### Grupo funcional ENT — Compras de material
 

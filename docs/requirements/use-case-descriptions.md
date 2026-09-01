@@ -534,9 +534,9 @@ Cada ficha representa una sola acción sobre una sola entidad. Los elementos com
 | --- | --- |
 | Identificador | `CU-CAT-05` |
 | Nombre | Ajustar existencia de material. |
-| Actor y disparador | **Actor:** Personal de almacén. **Disparador:** detecta o autoriza una diferencia de existencia de material y abre el ajuste de stock. |
+| Actor y disparador | **Actor:** Administrador del sistema. **Disparador:** detecta o autoriza una diferencia de existencia de material y abre el ajuste de stock desde la consulta de materiales. |
 | Participación de actor y sistema | **Actor:** selecciona el inventario, captura el ajuste y confirma.<br>**Nexus:** muestra la existencia, valida, registra el ajuste y actualiza inventario. |
-| Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de ajuste.<br>3. El recurso cuya existencia se ajustará existe. |
+| Precondiciones | 1. El actor inició sesión como administrador del sistema.<br>2. El actor cuenta con el permiso `materials:adjust-stock`.<br>3. El recurso cuya existencia se ajustará existe. |
 | Inferencia desde código | **Directa.** `materialApiRoute.js` PATCH `/:id/stock` → `updateMaterialStock` → evento de inventario. |
 | Flujo principal | 1. **Actor:** selecciona el material y abre «Ajustar existencia».<br>2. **Nexus:** muestra la existencia actual y los campos de tipo, cantidad y motivo.<br>3. **Actor:** captura el ajuste y lo confirma.<br>4. **Nexus:** valida la autorización, el motivo y la cantidad y registra el ajuste junto con la nueva existencia.<br>5. **Nexus:** actualiza las vistas de inventario y confirma el resultado. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** La existencia del material refleja el ajuste autorizado.<br>2. **Éxito:** El ajuste queda registrado con su motivo y trazabilidad.<br>3. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
@@ -691,9 +691,9 @@ Cada ficha representa una sola acción sobre una sola entidad. Los elementos com
 | --- | --- |
 | Identificador | `CU-CAT-16` |
 | Nombre | Ajustar existencia de merma. |
-| Actor y disparador | **Actor:** Personal de almacén. **Disparador:** detecta o autoriza una diferencia de existencia de merma y abre el ajuste de stock. |
+| Actor y disparador | **Actor:** Administrador del sistema. **Disparador:** detecta o autoriza una diferencia de existencia de merma y abre el ajuste de stock desde la consulta de mermas. |
 | Participación de actor y sistema | **Actor:** selecciona el inventario, captura el ajuste y confirma.<br>**Nexus:** muestra la existencia, valida, registra el ajuste y actualiza inventario. |
-| Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de ajuste.<br>3. El recurso cuya existencia se ajustará existe. |
+| Precondiciones | 1. El actor inició sesión como administrador del sistema.<br>2. El actor cuenta con el permiso `wastes:adjust-stock`.<br>3. El recurso cuya existencia se ajustará existe. |
 | Inferencia desde código | **Directa.** `wasteApiRoute.js` PATCH `/:id/stock` → `updateWasteStock` → evento de inventario. |
 | Flujo principal | 1. **Actor:** selecciona el registro de merma y abre «Ajustar existencia».<br>2. **Nexus:** muestra la existencia actual y los campos de tipo, cantidad y motivo.<br>3. **Actor:** captura el ajuste y lo confirma.<br>4. **Nexus:** valida la autorización, el motivo y la cantidad y registra el ajuste junto con la nueva existencia.<br>5. **Nexus:** actualiza las vistas de inventario y confirma el resultado. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** La existencia de la merma refleja el ajuste autorizado.<br>2. **Éxito:** El ajuste queda registrado con su motivo y trazabilidad.<br>3. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
