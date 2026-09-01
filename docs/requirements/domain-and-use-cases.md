@@ -76,6 +76,16 @@ no son paquetes UML ni paquetes documentales: el único límite de sistema es Ne
 bloque conserva los actores fuera del sistema y muestra una sola vez los casos que le
 pertenecen; juntos forman el diagrama de casos de uso.
 
+Se conservan los cinco grupos funcionales porque representan capacidades estables del
+negocio y coinciden con la trazabilidad normativa existente: identidad y acceso,
+catálogos, compras de material, salidas, y consultas y reportes. Dividirlos otra vez en
+nuevos grupos por cada entidad fragmentaría procesos que comparten actor, reglas y ciclo
+operativo; agruparlos sólo por acción mezclaría entidades con validaciones distintas.
+Dentro de cada grupo se usa por ello un **segundo nivel visual por entidad o documento**.
+Este nivel mejora la lectura, pero no cambia identificadores ni fusiona casos de uso.
+La decisión y las familias resultantes se resumen en el
+[criterio de agrupación vigente](use-case-descriptions.md#criterio-de-agrupación-vigente).
+
 ### Grupo funcional IDA — Identidad y acceso
 
 ```mermaid
@@ -83,18 +93,32 @@ flowchart LR
     admin["«actor»<br/>Administrador del sistema (área Sistemas)"]
 
     subgraph identityPackage["Nexus · Grupo funcional IDA: Identidad y acceso"]
-        ucIdentityQuery(["CU-IDA-01 Consultar identidades y accesos"])
-        ucPersonCreate(["CU-IDA-02 Crear persona"])
-        ucPersonEdit(["CU-IDA-03 Editar persona"])
-        ucUserCreate(["CU-IDA-04 Crear usuario y asignar acceso"])
-        ucUserEdit(["CU-IDA-05 Editar usuario o cambiar contraseña"])
+        subgraph personFamily["Personas"]
+            ucPersonQuery(["CU-IDA-01 Consultar personas"])
+            ucPersonCreate(["CU-IDA-02 Crear persona"])
+            ucPersonEdit(["CU-IDA-03 Editar persona"])
+        end
+        subgraph userFamily["Usuarios y credenciales"]
+            ucUserQuery(["CU-IDA-04 Consultar usuarios"])
+            ucUserCreate(["CU-IDA-05 Crear usuario y asignar acceso"])
+            ucUserEdit(["CU-IDA-06 Editar usuario y acceso"])
+            ucPasswordEdit(["CU-IDA-07 Cambiar contraseña de usuario"])
+        end
+        subgraph accessCatalogFamily["Catálogos de acceso"]
+            ucRoleQuery(["CU-IDA-08 Consultar roles"])
+            ucDepartmentQuery(["CU-IDA-09 Consultar departamentos"])
+        end
     end
 
-    admin --- ucIdentityQuery
+    admin --- ucPersonQuery
     admin --- ucPersonCreate
     admin --- ucPersonEdit
+    admin --- ucUserQuery
     admin --- ucUserCreate
     admin --- ucUserEdit
+    admin --- ucPasswordEdit
+    admin --- ucRoleQuery
+    admin --- ucDepartmentQuery
 ```
 
 ### Grupo funcional CAT — Catálogos
@@ -105,34 +129,73 @@ flowchart LR
     admin["«actor»<br/>Administrador del sistema (área Sistemas)"]
 
     subgraph catalogPackage["Nexus · Grupo funcional CAT: Catálogos"]
-        ucCatalogQuery(["CU-CAT-01 Consultar catálogos"])
-        ucCatalogCreate(["CU-CAT-02 Crear registro de catálogo"])
-        ucCatalogEdit(["CU-CAT-03 Editar registro de catálogo"])
-        ucCatalogRemove(["CU-CAT-04 Eliminar o cambiar estado de registro"])
+        direction TB
+        subgraph materialCatalogFamily["Materiales"]
+            ucMaterialQuery(["CU-CAT-01 Consultar materiales"])
+            ucMaterialCreate(["CU-CAT-02 Crear material"])
+            ucMaterialEdit(["CU-CAT-03 Editar material"])
+            ucMaterialRemove(["CU-CAT-04 Retirar material"])
+            ucMaterialStock(["CU-CAT-05 Ajustar existencia de material"])
+        end
+        subgraph supplierCatalogFamily["Proveedores"]
+            ucSupplierQuery(["CU-CAT-06 Consultar proveedores"])
+            ucSupplierCreate(["CU-CAT-07 Crear proveedor"])
+            ucSupplierEdit(["CU-CAT-08 Editar proveedor"])
+            ucSupplierStatus(["CU-CAT-20 Cambiar estado de proveedor"])
+        end
+        subgraph clientCatalogFamily["Clientes"]
+            ucClientQuery(["CU-CAT-09 Consultar clientes"])
+            ucClientCreate(["CU-CAT-10 Crear cliente"])
+            ucClientEdit(["CU-CAT-11 Editar cliente"])
+        end
+        subgraph wasteCatalogFamily["Mermas"]
+            ucWasteQuery(["CU-CAT-12 Consultar mermas"])
+            ucWasteCreate(["CU-CAT-13 Registrar merma"])
+            ucWasteEdit(["CU-CAT-14 Editar merma"])
+            ucWasteStock(["CU-CAT-15 Ajustar existencia de merma"])
+        end
+        subgraph auxiliaryCatalogFamily["Catálogos auxiliares de sólo lectura"]
+            ucPresentationQuery(["CU-CAT-16 Consultar presentaciones"])
+            ucUnitQuery(["CU-CAT-17 Consultar unidades de medida"])
+            ucAdjustmentReasonQuery(["CU-CAT-18 Consultar motivos de ajuste"])
+            ucFulfillmentStatusQuery(["CU-CAT-19 Consultar estados de cumplimiento"])
+        end
     end
 
-    warehouse ---|catálogo operativo| ucCatalogQuery
-    warehouse ---|catálogo operativo| ucCatalogCreate
-    warehouse ---|catálogo operativo| ucCatalogEdit
-    warehouse ---|catálogo operativo| ucCatalogRemove
-    admin ---|catálogo contextual| ucCatalogQuery
-    admin ---|catálogo contextual| ucCatalogCreate
-    admin ---|catálogo contextual| ucCatalogEdit
-    admin ---|catálogo contextual| ucCatalogRemove
+    warehouse --- ucMaterialQuery
+    warehouse --- ucMaterialCreate
+    warehouse --- ucMaterialEdit
+    warehouse --- ucMaterialRemove
+    warehouse --- ucMaterialStock
+    warehouse --- ucSupplierQuery
+    warehouse --- ucSupplierCreate
+    warehouse --- ucSupplierEdit
+    warehouse --- ucWasteQuery
+    warehouse --- ucWasteCreate
+    warehouse --- ucWasteEdit
+    warehouse --- ucWasteStock
+    warehouse --- ucPresentationQuery
+    warehouse --- ucUnitQuery
+    warehouse --- ucAdjustmentReasonQuery
+    warehouse --- ucFulfillmentStatusQuery
+    warehouse --- ucSupplierStatus
+    admin --- ucClientQuery
+    admin --- ucClientCreate
+    admin --- ucClientEdit
 ```
 
-### Grupo funcional ENT — Entradas
+### Grupo funcional ENT — Compras de material
 
 ```mermaid
 flowchart LR
     warehouse["«actor»<br/>Personal de almacén (área Almacén y proveduría)"]
 
-    subgraph receiptPackage["Nexus · Grupo funcional ENT: Entradas"]
-        ucReceiptQuery(["CU-ENT-01 Consultar entradas"])
-        ucReceiptCreate(["CU-ENT-02 Registrar entrada"])
-        ucReceiptEdit(["CU-ENT-03 Editar entrada"])
-        ucReceiptCorrect(["CU-ENT-04 Corregir detalle de entrada"])
-        ucReceiptCancel(["CU-ENT-05 Cancelar detalle de entrada"])
+    subgraph receiptPackage["Nexus · Grupo funcional ENT: Compras de material"]
+        ucReceiptQuery(["CU-ENT-01 Consultar compras de material"])
+        ucReceiptCreate(["CU-ENT-02 Crear compra de material"])
+        ucReceiptEdit(["CU-ENT-03 Editar compra de material"])
+        ucReceiptCorrect(["CU-ENT-04 Corregir material de una compra"])
+        ucReceiptCancel(["CU-ENT-05 Cancelar material de una compra"])
     end
 
     warehouse --- ucReceiptQuery
@@ -142,27 +205,43 @@ flowchart LR
     warehouse --- ucReceiptCancel
 ```
 
-### Grupo funcional SAL — Salidas
+### Grupo funcional SAL — Salidas de material y de merma
 
 ```mermaid
 flowchart LR
     warehouse["«actor»<br/>Personal de almacén (área Almacén y proveduría)"]
 
     subgraph issuePackage["Nexus · Grupo funcional SAL: Salidas"]
-        ucIssueQuery(["CU-SAL-01 Consultar salidas"])
-        ucIssueCreate(["CU-SAL-02 Crear salida"])
-        ucIssueHeader(["CU-SAL-03 Editar encabezado de salida"])
-        ucIssueDetails(["CU-SAL-04 Ajustar detalles de salida"])
-        ucSupply(["CU-SAL-05 Surtir detalle"])
-        ucReturn(["CU-SAL-06 Devolver detalle surtido"])
+        subgraph materialIssueFamily["Salidas de material"]
+            ucMaterialIssueQuery(["CU-SAL-01 Consultar salidas de material"])
+            ucMaterialIssueCreate(["CU-SAL-02 Crear salida de material"])
+            ucMaterialIssueHeader(["CU-SAL-03 Editar encabezado de salida de material"])
+            ucMaterialIssueDetails(["CU-SAL-04 Ajustar materiales de una salida"])
+            ucMaterialSupply(["CU-SAL-05 Surtir material"])
+            ucMaterialReturn(["CU-SAL-06 Devolver material surtido"])
+        end
+        subgraph wasteIssueFamily["Salidas de merma"]
+            ucWasteIssueQuery(["CU-SAL-07 Consultar salidas de merma"])
+            ucWasteIssueCreate(["CU-SAL-08 Crear salida de merma"])
+            ucWasteIssueHeader(["CU-SAL-09 Editar encabezado de salida de merma"])
+            ucWasteIssueDetails(["CU-SAL-10 Ajustar mermas de una salida"])
+            ucWasteSupply(["CU-SAL-11 Surtir merma"])
+            ucWasteReturn(["CU-SAL-12 Devolver merma surtida"])
+        end
     end
 
-    warehouse --- ucIssueQuery
-    warehouse --- ucIssueCreate
-    warehouse --- ucIssueHeader
-    warehouse --- ucIssueDetails
-    warehouse --- ucSupply
-    warehouse --- ucReturn
+    warehouse --- ucMaterialIssueQuery
+    warehouse --- ucMaterialIssueCreate
+    warehouse --- ucMaterialIssueHeader
+    warehouse --- ucMaterialIssueDetails
+    warehouse --- ucMaterialSupply
+    warehouse --- ucMaterialReturn
+    warehouse --- ucWasteIssueQuery
+    warehouse --- ucWasteIssueCreate
+    warehouse --- ucWasteIssueHeader
+    warehouse --- ucWasteIssueDetails
+    warehouse --- ucWasteSupply
+    warehouse --- ucWasteReturn
 ```
 
 ### Grupo funcional REP — Consultas y reportes
@@ -174,21 +253,86 @@ flowchart LR
     management["«actor»<br/>Director (área Dirección)"]
 
     subgraph reportPackage["Nexus · Grupo funcional REP: Consultas y reportes"]
-        ucMovements(["CU-REP-01 Consultar movimientos e inventario"])
-        ucReports(["CU-REP-02 Generar reporte"])
+        direction TB
+        subgraph reportMaterialFamily["Materiales"]
+            ucMaterialInventory(["CU-REP-01 Consultar inventario de materiales"])
+            ucMaterialMovements(["CU-REP-03 Consultar movimientos de materiales"])
+            ucMaterialInventoryReport(["CU-REP-05 Generar reporte de inventario de materiales"])
+            ucMaterialIssueReport(["CU-REP-06 Generar reporte de salidas de material"])
+            ucMaterialMovementReport(["CU-REP-14 Generar reporte de movimientos de materiales"])
+        end
+        subgraph reportWasteFamily["Mermas"]
+            ucWasteInventory(["CU-REP-02 Consultar inventario de mermas"])
+            ucWasteMovements(["CU-REP-04 Consultar movimientos de mermas"])
+            ucWasteIssueReport(["CU-REP-07 Generar reporte de salidas de merma"])
+            ucWasteReport(["CU-REP-09 Generar reporte de mermas"])
+            ucWasteMovementReport(["CU-REP-15 Generar reporte de movimientos de mermas"])
+        end
+        subgraph reportPurchaseFamily["Compras de material"]
+            ucPurchaseReport(["CU-REP-08 Generar reporte de compras de material"])
+        end
+        subgraph reportSupplierFamily["Proveedores"]
+            ucSupplierReport(["CU-REP-10 Generar reporte de proveedores"])
+        end
+        subgraph reportClientFamily["Clientes"]
+            ucClientReport(["CU-REP-11 Generar reporte de clientes"])
+        end
+        subgraph reportIdentityFamily["Identidad"]
+            ucPersonReport(["CU-REP-12 Generar reporte de personas"])
+            ucUserReport(["CU-REP-13 Generar reporte de usuarios"])
+        end
     end
 
-    warehouse --- ucMovements
-    warehouse --- ucReports
-    admin --- ucMovements
-    admin --- ucReports
-    management --- ucMovements
-    management --- ucReports
+    warehouse --- ucMaterialInventory
+    warehouse --- ucWasteInventory
+    warehouse --- ucMaterialMovements
+    warehouse --- ucWasteMovements
+    warehouse --- ucMaterialInventoryReport
+    warehouse --- ucMaterialIssueReport
+    warehouse --- ucWasteIssueReport
+    warehouse --- ucPurchaseReport
+    warehouse --- ucWasteReport
+    warehouse --- ucSupplierReport
+    warehouse --- ucClientReport
+    warehouse --- ucPersonReport
+    warehouse --- ucUserReport
+    warehouse --- ucMaterialMovementReport
+    warehouse --- ucWasteMovementReport
+    admin --- ucMaterialInventory
+    admin --- ucWasteInventory
+    admin --- ucMaterialMovements
+    admin --- ucWasteMovements
+    admin --- ucMaterialInventoryReport
+    admin --- ucMaterialIssueReport
+    admin --- ucWasteIssueReport
+    admin --- ucPurchaseReport
+    admin --- ucWasteReport
+    admin --- ucSupplierReport
+    admin --- ucClientReport
+    admin --- ucPersonReport
+    admin --- ucUserReport
+    admin --- ucMaterialMovementReport
+    admin --- ucWasteMovementReport
+    management --- ucMaterialInventory
+    management --- ucWasteInventory
+    management --- ucMaterialMovements
+    management --- ucWasteMovements
+    management --- ucMaterialInventoryReport
+    management --- ucMaterialIssueReport
+    management --- ucWasteIssueReport
+    management --- ucPurchaseReport
+    management --- ucWasteReport
+    management --- ucSupplierReport
+    management --- ucClientReport
+    management --- ucPersonReport
+    management --- ucUserReport
+    management --- ucMaterialMovementReport
+    management --- ucWasteMovementReport
 ```
 
-`CU-SAL-05` actualiza la existencia y registra el movimiento como parte de su propio
-flujo; `CU-SAL-06` registra la reversión y el movimiento inverso. No existe una relación
-`«include»` con `CU-REP-01`: consultar movimientos es otro objetivo iniciado por un
+`CU-SAL-05` y `CU-SAL-11` actualizan la existencia y registra el movimiento como parte de su propio
+flujo; `CU-SAL-06` y `CU-SAL-12` registran la reversión y el movimiento inverso. No existe una relación
+`«include»` con `CU-REP-03` y `CU-REP-04`: consultar movimientos es otro objetivo iniciado por un
 actor, mientras registrar un movimiento es una responsabilidad interna de Nexus. Por la
 misma razón, compartir servicios entre grupos no se representa como salto, inclusión o
 extensión entre casos de uso.

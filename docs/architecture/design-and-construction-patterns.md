@@ -268,9 +268,7 @@ diferida. Ningún formulario debe crear, buscar, elevar o eliminar backdrops por
 
 Los archivos con sufijo `Page` son entry points de composición. No registran `useForm`
 ni `useIssueForm`: cargan el módulo de formulario propietario y coordinan únicamente
-componentes de pantalla como tablas. El sufijo no se crea sólo para envolver un import:
-si una vista no tiene composición adicional, puede cargar directamente su módulo
-propietario. Por eso acceso referencia `loginForm.js` sin un `loginPage.js` intermediario.
+componentes de pantalla como tablas.
 Las pantallas sin formulario, como inicio y movimientos, conservan en su entry point los
 efectos propios de la pantalla.
 
