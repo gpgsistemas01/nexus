@@ -47,7 +47,7 @@ rol, área y permiso.
 
 | Área | Participación vigente en el contexto de Nexus |
 | --- | --- |
-| Dirección | Supervisión y consulta autorizada mediante el actor Director. |
+| Dirección | Parte interesada de supervisión; su acceso y casos de uso permanecen pendientes de definición. |
 | Acabados | Contexto organizacional de personas, proyectos y salidas. |
 | Administrativo | Contexto organizacional y de catálogos autorizados. |
 | Almacén y proveduría | Operación de catálogos, entradas, inventario, salidas y mermas. |
@@ -67,9 +67,10 @@ rol, área y permiso.
   surtidos, devoluciones y consulta existencias.
 - **Áreas solicitantes futuras:** su participación en salidas permanece pendiente de definir; ventas no tiene acceso al sistema.
 - **Administración del sistema:** administra cuentas, personas y asignaciones de
-  rol/departamento, además de ajustes de stock protegidos.
-- **Dirección:** consulta trazabilidad, reportes e indicadores para
-  supervisar la operación.
+  rol/departamento y puede ejecutar todas las capacidades vigentes, siempre sujeto a la
+  autorización del servidor.
+- **Dirección:** necesita supervisar la operación, pero sus consultas, reportes e
+  indicadores autorizados permanecen pendientes de definición.
 
 ## Alcance actual
 

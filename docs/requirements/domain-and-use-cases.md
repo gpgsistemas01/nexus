@@ -77,8 +77,8 @@ bloque conserva los actores fuera del sistema y muestra una sola vez los casos q
 pertenecen; juntos forman el diagrama de casos de uso. Los actores concretos se
 generalizan mediante un actor abstracto cuando comparten las mismas asociaciones.
 
-Se conservan los cinco grupos funcionales porque representan capacidades estables del
-negocio y coinciden con la trazabilidad normativa existente: identidad y acceso,
+Se conservan seis grupos funcionales porque representan capacidades estables del
+negocio y coinciden con la trazabilidad normativa existente: autenticación, identidad y acceso,
 catálogos, compras de material, salidas, y consultas y reportes. Dividirlos otra vez en
 nuevos grupos por cada entidad fragmentaría procesos que comparten actor, reglas y ciclo
 operativo; agruparlos sólo por acción mezclaría entidades con validaciones distintas.
@@ -86,6 +86,23 @@ Dentro de cada grupo se usa por ello un **segundo nivel visual por entidad o doc
 Este nivel mejora la lectura, pero no cambia identificadores ni fusiona casos de uso.
 La decisión y las familias resultantes se resumen en el
 [criterio de agrupación vigente](use-case-descriptions.md#criterio-de-agrupación-vigente).
+
+### Grupo funcional AUT — Autenticación
+
+```mermaid
+flowchart LR
+    user["«actor»<br/>Usuario registrado"]
+    admin["«actor»<br/>Administrador del sistema (área Sistemas)"]
+    admin -- "generaliza" --> user
+
+    subgraph authPackage["Nexus · Grupo funcional AUT: Autenticación"]
+        ucLogin(["CU-AUT-01 Iniciar sesión"])
+        ucLogout(["CU-AUT-02 Cerrar sesión"])
+    end
+
+    user --- ucLogin
+    user --- ucLogout
+```
 
 ### Grupo funcional IDA — Identidad y acceso
 
@@ -170,6 +187,7 @@ flowchart LR
     warehouse --- ucUnitQuery
     warehouse --- ucAdjustmentReasonQuery
     warehouse --- ucFulfillmentStatusQuery
+    admin -- "generaliza" --> warehouse
     admin --- ucClientQuery
     ucMaterialQuery --- ucMaterialCreate
     ucMaterialQuery --- ucMaterialEdit
@@ -190,6 +208,8 @@ flowchart LR
 ```mermaid
 flowchart LR
     warehouse["«actor»<br/>Personal de almacén (área Almacén y proveduría)"]
+    admin["«actor»<br/>Administrador del sistema (área Sistemas)"]
+    admin -- "generaliza" --> warehouse
 
     subgraph receiptPackage["Nexus · Grupo funcional ENT: Compras de material"]
         ucReceiptQuery(["CU-ENT-01 Consultar compras de material"])
@@ -211,6 +231,8 @@ flowchart LR
 ```mermaid
 flowchart LR
     warehouse["«actor»<br/>Personal de almacén (área Almacén y proveduría)"]
+    admin["«actor»<br/>Administrador del sistema (área Sistemas)"]
+    admin -- "generaliza" --> warehouse
 
     subgraph issuePackage["Nexus · Grupo funcional SAL: Salidas"]
         subgraph materialIssueFamily["Salidas de material"]
@@ -252,10 +274,8 @@ flowchart LR
     authorized["«actor abstracto»<br/>Usuario autorizado de consulta y reporte"]
     warehouse["«actor»<br/>Personal de almacén"]
     admin["«actor»<br/>Administrador del sistema"]
-    management["«actor»<br/>Director"]
     warehouse -- "generaliza" --> authorized
     admin -- "generaliza" --> authorized
-    management -- "generaliza" --> authorized
 
     subgraph reportPackage["Nexus · Grupo funcional REP: Consultas y reportes"]
         direction TB
@@ -305,6 +325,36 @@ flowchart LR
     authorized --- ucWasteMovementReport
 ```
 
+### Criterio de inclusión, exclusión y relaciones entre casos
+
+La revisión de las capacidades transversales detectó que **iniciar sesión** y **cerrar
+sesión** estaban implementados y especificados, pero no se visualizaban como objetivos
+del usuario. Se incorporan porque cada uno tiene disparador, interacción y resultado
+observable: obtener acceso a las capacidades autorizadas o terminar ese acceso. Su
+visibilidad permite entender el impacto de Nexus sobre el control de acceso al negocio,
+aunque no pertenezcan a un CRUD operativo.
+
+La revisión aplica estas decisiones de forma explícita:
+
+| Situación revisada | Decisión de modelado | Motivo |
+| --- | --- | --- |
+| El actor persigue un resultado observable y Nexus ofrece una interacción completa para lograrlo. | Incluir como caso de uso. | Expone una capacidad y su impacto en el trabajo o control del negocio. |
+| El comportamiento siempre forma parte del objetivo base y tiene un objetivo reutilizable propio. | Modelar `«include»`, sólo si ambos casos y el retorno al caso base están definidos. | La ejecución obligatoria no debe confundirse con una asociación temática. |
+| El comportamiento es opcional, se inserta bajo una condición y tiene sentido como objetivo separado. | Modelar `«extend»`, sólo si existe un punto de extensión explícito. | Una alternativa interna no crea por sí sola otro caso. |
+| La acción es validación, persistencia, auditoría, cálculo, movimiento o coordinación interna. | Excluir como caso independiente y describirla dentro del flujo que apoya. | Nexus participa internamente; no existe otro objetivo iniciado por el actor. |
+| Una consulta sólo llena un selector dentro de otro objetivo y no ofrece una opción independiente. | Excluir de la asociación del actor para ese contexto. | Es una capacidad auxiliar, no mantenimiento del catálogo. |
+| Existe sólo modelo, servicio parcial, permiso, ruta técnica sin interacción definida o intención futura. | Excluir del diagrama vigente y conservar su estado como modelado, parcial o fuera de alcance. | No debe presentarse una capacidad aún no disponible para el negocio. |
+
+Con este criterio, **renovar credenciales** y **consultar la sesión actual** no se
+incorporan como casos de uso: son mecanismos técnicos que Nexus ejecuta para conservar
+o reconstruir una sesión, no objetivos que el usuario seleccione. Tampoco se crea
+`«include»` desde cada caso protegido hacia `CU-AUT-01`: una sesión iniciada es una
+precondición, y el inicio de sesión no se ejecuta obligatoriamente dentro de cada
+consulta o mutación. `CU-AUT-02` es independiente porque el usuario sí decide terminar
+su acceso. La revisión no encontró otra capacidad implementada con actor, disparador y
+resultado de negocio que permanezca oculta; proyectos, ajustes parciales y requisiciones
+continúan fuera del diagrama por su estado no vigente.
+
 `CU-SAL-05` y `CU-SAL-11` actualizan la existencia y registra el movimiento como parte de su propio
 flujo; `CU-SAL-06` y `CU-SAL-12` registran la reversión y el movimiento inverso. No existe una relación
 `«include»` con `CU-REP-03` y `CU-REP-04`: consultar movimientos es otro objetivo iniciado por un
@@ -312,10 +362,12 @@ actor, mientras registrar un movimiento es una responsabilidad interna de Nexus.
 misma razón, compartir servicios entre grupos no se representa como salto, inclusión o
 extensión entre casos de uso.
 
-Los actores vigentes son **Personal de almacén** del área Almacén y proveduría,
-**Administrador del sistema** del área Sistemas, y **Director** del área Dirección. En
-`CAT`, almacén inicia operaciones sobre catálogos operativos y administración sobre los
-contextuales; en `REP`, cada actor consulta sólo el alcance autorizado. Solicitantes,
+Los actores vigentes son **Personal de almacén** del área Almacén y proveduría y
+**Administrador del sistema** del área Sistemas. El Administrador del sistema se muestra
+como especialización de los demás actores aplicables porque las políticas vigentes le
+conceden todas las operaciones representadas; en `CAT` conserva además la asociación
+directa con clientes. Esta generalización expresa disponibilidad funcional, no omite las
+comprobaciones de permiso del servidor. Solicitantes,
 aprobadores, asesores y proveedores participan como roles o entidades del negocio, pero
 no se dibujan como actores porque no inician estos casos mediante acceso a Nexus.
 
@@ -340,14 +392,17 @@ cuando aparece etiquetada explícitamente.
 La generalización de actores también se identifica de forma expresa.
 
 Los grupos son ayudas de lectura, no límites del sistema ni permisos. El Administrador
-del sistema del área Sistemas conserva el alcance que conceden las políticas
-vigentes; el Personal de almacén sólo opera entradas, inventario y salidas autorizadas.
+del sistema del área Sistemas tiene acceso vigente a todos los casos visualizados, pero
+cada petición conserva la comprobación de su política; el Personal de almacén sólo
+opera entradas, inventario y salidas autorizadas.
 Las demás áreas aparecen
 únicamente cuando una política de lectura o el encabezado de una salida lo permite.
 Consultar un catálogo desde un `combobox` es una capacidad auxiliar de lectura y no un
 caso de uso independiente: debe autorizarse en el servidor, pero no se asocia como si el
-actor mantuviera el catálogo. Dirección no se dibuja con acceso total porque esa regla
-aún no existe de manera uniforme en las políticas.
+actor mantuviera el catálogo. Dirección no se dibuja como actor vigente: su
+participación y alcance permanecen por definir y las políticas actuales no justifican
+atribuirle el conjunto de consultas y reportes. Cuando esa decisión se apruebe, deberán actualizarse conjuntamente políticas,
+requisitos, fichas y asociaciones, sin inferir acceso por el nombre del área o del rol.
 
 Los casos de uso son objetivos del actor, no módulos de código. Por ello **no se requiere
 crear una carpeta `useCases` ni renombrar los dominios existentes**. La trazabilidad se
