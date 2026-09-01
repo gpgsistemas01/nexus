@@ -5,7 +5,7 @@ import process from 'node:process';
 
 const ROOT = process.cwd();
 const MANIFESTS = Object.freeze({
-    'manual-usuario': ['docs/manual-usuario/index.md'],
+    'manual-usuario': ['docs/user-manual/index.md'],
     requisitos: [
         'docs/requirements/index.md',
         'docs/requirements/vision-scope-and-requirements.md',
