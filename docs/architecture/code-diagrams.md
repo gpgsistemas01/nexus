@@ -170,6 +170,7 @@ función o un estado persistido:
 
 | Vista o casos | Entrada HTTP verificable | Coordinación que sustenta el diagrama | Aclaración técnica |
 | --- | --- | --- | --- |
+| `CU-AUT-01` a `CU-AUT-02` | `src/routes/api/authApiRoute.js` y `src/routes/web/auth/logoutWebRoute.js` | `src/services/authService.js` y utilidades de cookies | Iniciar y cerrar sesión son objetivos visibles; consultar o renovar la sesión son mecanismos técnicos y no casos independientes. |
 | `CU-IDA-01` a `CU-IDA-09` | `src/routes/api/admin/personApiRoute.js`, `userApiRoute.js`, `roleApiRoute.js` y `departmentApiRoute.js` | `src/services/admin/person/personService.js` y `src/services/admin/userService.js` | Crear usuario, editar acceso y cambiar contraseña son casos de uso independientes; la transacción y el cifrado pertenecen al servicio, no al actor del diagrama. |
 | `CU-CAT-01` a `CU-CAT-20` | Routers de cliente bajo `sales` y de proveedor, material, merma y catálogos de sólo lectura bajo `warehouse` | Servicios homónimos y `src/services/warehouse/materials/supplierMaterialService.js` | El grupo funcional reúne recursos con el patrón CRUD, pero no implica que todos admitan `DELETE` o cambio de estado. |
 | `CU-ENT-01` a `CU-ENT-05` | `src/routes/api/warehouse/goodsReceiptApiRoute.js` | `goodsReceiptService.js` y `goodsReceipts/detailChanges/*Service.js` | Corrección y cancelación son rutas `PATCH` distintas; el recálculo de costo posterior al commit queda fuera de la transacción mostrada. |

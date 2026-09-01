@@ -52,7 +52,10 @@ quedan más interacciones. No se usa «volver» o «continuar» sin indicar el p
 destino fuera otro caso de uso, no se redactaría como un salto de control informal:
 
 - Una asociación simple enlaza objetivos relacionados y se dibuja sin texto; no implica
-  por sí misma inclusión, extensión ni una llamada entre casos.
+  por sí misma inclusión, extensión ni una llamada entre casos. Cuando una consulta
+  presenta una acción asociada, su ficha puede indicar que el actor **termina la
+  consulta** y luego **inicia** el caso seleccionado; esa continuación conserva dos
+  objetivos independientes y vuelve a comprobar sus precondiciones y autorización.
 - `«include»` identifica un caso requerido que el caso base incorpora siempre; al
   concluir, la interacción continúa en el paso siguiente a la inclusión.
 - `«extend»` identifica comportamiento opcional que se inserta en un punto de extensión
@@ -67,6 +70,10 @@ inventario, persistencia o consulta no crea por sí solo una relación UML.
 El actor principal inicia el objetivo, pero no obtiene autorización por aparecer aquí.
 En cada ficha, **Nexus** identifica al sistema como participante interno; no se modela
 como actor externo ni inicia el caso por sí mismo.
+El **Administrador del sistema** puede iniciar todos los casos vigentes mediante la
+generalización mostrada en el diagrama; las fichas conservan al actor operativo primario
+para explicar el objetivo sin repetir esa herencia. **Dirección** no se atribuye como
+actor mientras no se definan y autoricen sus objetivos concretos.
 Los casos de catálogos siguen listar-crear-actualizar y sólo incluyen eliminar, activar,
 desactivar o ajustar cuando el contexto lo permite. Los documentos comparten encabezado
 y detalles, pero surtir, devolver y corregir mantienen reglas y efectos propios.
@@ -110,6 +117,7 @@ identificador retirado no se reasigna a un objetivo distinto.
 
 | Código | Grupo funcional | Alcance |
 | --- | --- | --- |
+| `AUT` | Autenticación | Inicio y cierre observable de la sesión del usuario. |
 | `IDA` | Identidad y acceso | Personas, cuentas, credenciales y asignaciones de acceso. |
 | `CAT` | Catálogos | Recursos operativos y contextuales reutilizados por documentos. |
 | `ENT` | Compras de material | Consulta, registro, edición, corrección y cancelación de compras recibidas. |
@@ -130,6 +138,7 @@ como listas planas difíciles de revisar.
 
 | Grupo | Familias internas de lectura | Casos |
 | --- | --- | --- |
+| `AUT` | Sesión. | `CU-AUT-01` a `CU-AUT-02` |
 | `IDA` | Personas; usuarios y credenciales; catálogos de acceso. | `CU-IDA-01` a `CU-IDA-09` |
 | `CAT` | Materiales; proveedores; clientes; mermas; catálogos auxiliares de sólo lectura. | `CU-CAT-01` a `CU-CAT-20` |
 | `ENT` | Compras de material. | `CU-ENT-01` a `CU-ENT-05` |
@@ -148,6 +157,13 @@ semántica explícitamente.
 Los prefijos anteriores sustituyen `IAM`, `REC` e `ISS`, que mezclaban abreviaturas en
 inglés con nombres de grupos en español. Las referencias normativas se actualizan en
 conjunto; el cambio de identificador no modifica el alcance funcional del caso.
+
+### Grupo funcional AUT — Autenticación
+
+| Identificador | Caso de uso específico | Evidencia funcional |
+| --- | --- | --- |
+| `CU-AUT-01` | Iniciar sesión | Creación de una sesión para una cuenta activa con credenciales válidas. |
+| `CU-AUT-02` | Cerrar sesión | Invalidación de las credenciales de la sesión en el navegador. |
 
 ### Grupo funcional IDA — Identidad y acceso
 
@@ -285,6 +301,40 @@ usa dos columnas: **Sección** identifica el dato descrito e **Información rele
 contiene su valor para ese caso. El contexto compartido se declara una sola vez al inicio
 del grupo; flujos, excepciones y reglas permanecen dentro del caso al que aplican.
 
+### Grupo funcional AUT — Autenticación
+
+Estos casos muestran el control de acceso observable. La renovación de credenciales y
+la consulta de la sesión actual permanecen como responsabilidades internas de Nexus.
+
+#### `CU-AUT-01` — Iniciar sesión
+
+| Sección | Información relevante |
+| --- | --- |
+| Identificador | `CU-AUT-01` |
+| Nombre | Iniciar sesión. |
+| Actor y disparador | **Actor:** Usuario registrado. **Disparador:** necesita acceder a las capacidades de Nexus para realizar su trabajo autorizado. |
+| Participación de actor y sistema | **Actor:** abre el acceso, captura sus credenciales y confirma.<br>**Nexus:** valida la cuenta, crea la sesión y dirige al usuario al alcance disponible. |
+| Precondiciones | 1. La cuenta existe y está activa.<br>2. El actor no dispone de una sesión autenticada vigente. |
+| Inferencia desde código | **Directa.** `authApiRoute.js` POST `/login` → `loginValidation` → `login` → `loginUser`. |
+| Flujo principal | 1. **Actor:** abre la página de acceso.<br>2. **Nexus:** muestra el formulario de credenciales.<br>3. **Actor:** captura usuario y contraseña y selecciona «Iniciar sesión».<br>4. **Nexus:** valida los datos y comprueba que correspondan a una cuenta activa.<br>5. **Nexus:** establece las credenciales de sesión y presenta la página inicial con las opciones autorizadas. |
+| Excepciones | **E1, desde el paso 4:** si las credenciales son inválidas o la cuenta no admite acceso, Nexus rechaza la solicitud, no crea la sesión y comunica el error; termina el caso de uso. |
+| Postcondiciones (éxito y fallo) | 1. **Éxito:** Existe una sesión autenticada atribuida a la cuenta y el usuario puede acceder únicamente a las capacidades autorizadas.<br>2. **Fallo:** No se crean credenciales de sesión ni se expone información protegida. |
+| Requisitos relacionados | `RF-AUT-001`, `RN-001`. |
+
+#### `CU-AUT-02` — Cerrar sesión
+
+| Sección | Información relevante |
+| --- | --- |
+| Identificador | `CU-AUT-02` |
+| Nombre | Cerrar sesión. |
+| Actor y disparador | **Actor:** Usuario registrado con sesión autenticada. **Disparador:** decide terminar su acceso a Nexus. |
+| Participación de actor y sistema | **Actor:** selecciona la opción de cierre.<br>**Nexus:** elimina las credenciales del navegador y confirma la terminación de la sesión. |
+| Precondiciones | 1. El actor dispone de una sesión autenticada. |
+| Inferencia desde código | **Directa.** `logoutWebRoute.js` POST `/` → `logout` → `clearAuthCookies`. |
+| Flujo principal | 1. **Actor:** selecciona «Cerrar sesión».<br>2. **Nexus:** elimina las credenciales y el destino de retorno conservados en el navegador.<br>3. **Nexus:** dirige al actor fuera del área protegida y confirma el cierre. |
+| Postcondiciones (éxito y fallo) | 1. **Éxito:** El navegador deja de conservar las credenciales de acceso de la sesión.<br>2. **Fallo:** El sistema no debe presentar contenido protegido sin volver a comprobar una sesión válida. |
+| Requisitos relacionados | `RF-AUT-003`, `RN-001`. |
+
 ### Grupo funcional IDA — Identidad y acceso
 
 Cada ficha representa una sola acción sobre una sola entidad. Los elementos compartidos se reutilizan en la implementación, pero no fusionan objetivos del actor.
@@ -300,6 +350,7 @@ Cada ficha representa una sola acción sobre una sola entidad. Los elementos com
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de consulta o reporte correspondiente. |
 | Inferencia desde código | **Directa.** `personApiRoute.js` GET → `getAllPersons` → `personService`. |
 | Flujo principal | 1. **Actor:** abre la opción para consultar personas.<br>2. **Nexus:** comprueba su autorización y muestra la tabla con búsqueda, filtros y paginación disponibles.<br>3. **Actor:** captura los criterios que necesita y solicita aplicarlos.<br>4. **Nexus:** actualiza la tabla y el total con la información autorizada, sin modificar datos.<br>5. **Actor:** selecciona un registro cuando necesita revisar su información.<br>6. **Nexus:** muestra el detalle y las acciones que el actor puede ejecutar. |
+| Continuaciones asociadas | Después de presentar las acciones disponibles, el actor puede terminar `CU-IDA-01` e iniciar, si cuenta con autorización, `CU-IDA-02` Crear persona o, después de seleccionar una persona, `CU-IDA-03` Editar persona. La selección no constituye `«include»` ni `«extend»`; el caso elegido comprueba nuevamente sus precondiciones. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** Listado de personas y asignaciones.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
 | Requisitos relacionados | `RF-IAM-002`. |
 
@@ -342,6 +393,7 @@ Cada ficha representa una sola acción sobre una sola entidad. Los elementos com
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de consulta o reporte correspondiente. |
 | Inferencia desde código | **Directa.** `userApiRoute.js` GET → `getAllUsers` → `userService`. |
 | Flujo principal | 1. **Actor:** abre la opción para consultar usuarios.<br>2. **Nexus:** comprueba su autorización y muestra la tabla con búsqueda, filtros y paginación disponibles.<br>3. **Actor:** captura los criterios que necesita y solicita aplicarlos.<br>4. **Nexus:** actualiza la tabla y el total con la información autorizada, sin modificar datos.<br>5. **Actor:** selecciona un registro cuando necesita revisar su información.<br>6. **Nexus:** muestra el detalle y las acciones que el actor puede ejecutar. |
+| Continuaciones asociadas | Después de presentar las acciones disponibles, el actor puede terminar `CU-IDA-04` e iniciar, si cuenta con autorización, `CU-IDA-05` Crear usuario y asignar acceso o, después de seleccionar una cuenta, `CU-IDA-06` Editar usuario y acceso o `CU-IDA-07` Cambiar contraseña de usuario. La selección no constituye `«include»` ni `«extend»`; el caso elegido comprueba nuevamente sus precondiciones. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** Listado de cuentas y accesos.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
 | Requisitos relacionados | `RF-IAM-001`. |
 
@@ -430,6 +482,7 @@ Cada ficha representa una sola acción sobre una sola entidad. Los elementos com
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de consulta o reporte correspondiente. |
 | Inferencia desde código | **Directa.** `materialApiRoute.js` GET → `getAllMaterials` → `findAllMaterials`. |
 | Flujo principal | 1. **Actor:** abre la opción para consultar materiales.<br>2. **Nexus:** comprueba su autorización y muestra la tabla con búsqueda, filtros y paginación disponibles.<br>3. **Actor:** captura los criterios que necesita y solicita aplicarlos.<br>4. **Nexus:** actualiza la tabla y el total con la información autorizada, sin modificar datos.<br>5. **Actor:** selecciona un registro cuando necesita revisar su información.<br>6. **Nexus:** muestra el detalle y las acciones que el actor puede ejecutar. |
+| Continuaciones asociadas | Después de presentar las acciones disponibles, el actor puede terminar `CU-CAT-01` e iniciar, si cuenta con autorización, `CU-CAT-02` Crear material o, después de seleccionar un material, `CU-CAT-03` Editar material, `CU-CAT-04` Retirar material o `CU-CAT-05` Ajustar existencia de material. La selección no constituye `«include»` ni `«extend»`; el caso elegido comprueba nuevamente sus precondiciones. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** Listado de materiales y ofertas de proveedor.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
 | Requisitos relacionados | `RF-CAT-001`. |
 
@@ -500,6 +553,7 @@ Cada ficha representa una sola acción sobre una sola entidad. Los elementos com
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de consulta o reporte correspondiente. |
 | Inferencia desde código | **Directa.** `supplierApiRoute.js` GET → `getAllSuppliers`. |
 | Flujo principal | 1. **Actor:** abre la opción para consultar proveedores.<br>2. **Nexus:** comprueba su autorización y muestra la tabla con búsqueda, filtros y paginación disponibles.<br>3. **Actor:** captura los criterios que necesita y solicita aplicarlos.<br>4. **Nexus:** actualiza la tabla y el total con la información autorizada, sin modificar datos.<br>5. **Actor:** selecciona un registro cuando necesita revisar su información.<br>6. **Nexus:** muestra el detalle y las acciones que el actor puede ejecutar. |
+| Continuaciones asociadas | Después de presentar las acciones disponibles, el actor puede terminar `CU-CAT-06` e iniciar, si cuenta con autorización, `CU-CAT-07` Crear proveedor o, después de seleccionar un proveedor, `CU-CAT-08` Editar proveedor o `CU-CAT-09` Cambiar estado de proveedor. La selección no constituye `«include»` ni `«extend»`; el caso elegido comprueba nuevamente sus precondiciones. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** Listado de proveedores autorizados.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
 | Requisitos relacionados | `RF-CAT-002`. |
 
@@ -556,6 +610,7 @@ Cada ficha representa una sola acción sobre una sola entidad. Los elementos com
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de consulta o reporte correspondiente. |
 | Inferencia desde código | **Directa.** `clientApiRoute.js` GET → `getAllClients`. |
 | Flujo principal | 1. **Actor:** abre la opción para consultar clientes.<br>2. **Nexus:** comprueba su autorización y muestra la tabla con búsqueda, filtros y paginación disponibles.<br>3. **Actor:** captura los criterios que necesita y solicita aplicarlos.<br>4. **Nexus:** actualiza la tabla y el total con la información autorizada, sin modificar datos.<br>5. **Actor:** selecciona un registro cuando necesita revisar su información.<br>6. **Nexus:** muestra el detalle y las acciones que el actor puede ejecutar. |
+| Continuaciones asociadas | Después de presentar las acciones disponibles, el actor puede terminar `CU-CAT-10` e iniciar, si cuenta con autorización, `CU-CAT-11` Crear cliente o, después de seleccionar un cliente, `CU-CAT-12` Editar cliente. La selección no constituye `«include»` ni `«extend»`; el caso elegido comprueba nuevamente sus precondiciones. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** Listado de clientes autorizados.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
 | Requisitos relacionados | `RF-CAT-003`. |
 
@@ -598,6 +653,7 @@ Cada ficha representa una sola acción sobre una sola entidad. Los elementos com
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de consulta o reporte correspondiente. |
 | Inferencia desde código | **Directa.** `wasteApiRoute.js` GET → `getAllWastes` → `findAllWastes`. |
 | Flujo principal | 1. **Actor:** abre la opción para consultar mermas.<br>2. **Nexus:** comprueba su autorización y muestra la tabla con búsqueda, filtros y paginación disponibles.<br>3. **Actor:** captura los criterios que necesita y solicita aplicarlos.<br>4. **Nexus:** actualiza la tabla y el total con la información autorizada, sin modificar datos.<br>5. **Actor:** selecciona un registro cuando necesita revisar su información.<br>6. **Nexus:** muestra el detalle y las acciones que el actor puede ejecutar. |
+| Continuaciones asociadas | Después de presentar las acciones disponibles, el actor puede terminar `CU-CAT-13` e iniciar, si cuenta con autorización, `CU-CAT-14` Registrar merma o, después de seleccionar una merma, `CU-CAT-15` Editar merma o `CU-CAT-16` Ajustar existencia de merma. La selección no constituye `«include»` ni `«extend»`; el caso elegido comprueba nuevamente sus precondiciones. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** Listado de existencias de merma.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
 | Requisitos relacionados | `RF-CAT-004`. |
 
@@ -714,6 +770,7 @@ Cada ficha representa una sola acción sobre una sola entidad. Los elementos com
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de consulta o reporte correspondiente. |
 | Inferencia desde código | **Directa.** `goodsReceiptApiRoute.js` GET → normalización de filtros/paginación → `findAllGoodsReceipts`. |
 | Flujo principal | 1. **Actor:** abre la opción para consultar compras de material.<br>2. **Nexus:** comprueba su autorización y muestra la tabla con búsqueda, filtros y paginación disponibles.<br>3. **Actor:** captura los criterios que necesita y solicita aplicarlos.<br>4. **Nexus:** actualiza la tabla y el total con la información autorizada, sin modificar datos.<br>5. **Actor:** selecciona un registro cuando necesita revisar su información.<br>6. **Nexus:** muestra el detalle y las acciones que el actor puede ejecutar. |
+| Continuaciones asociadas | Después de presentar las acciones disponibles, el actor puede terminar `CU-ENT-01` e iniciar, si cuenta con autorización, `CU-ENT-02` Crear compra de material o, después de seleccionar una compra o detalle, `CU-ENT-03` Editar compra de material, `CU-ENT-04` Corregir material de una compra o `CU-ENT-05` Cancelar material de una compra. La selección no constituye `«include»` ni `«extend»`; el caso elegido comprueba nuevamente sus precondiciones. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** Listado y detalle sin modificar inventario.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
 | Requisitos relacionados | `RF-REC-001`. |
 
@@ -788,6 +845,7 @@ Cada ficha representa una sola acción sobre una sola entidad. Los elementos com
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de consulta o reporte correspondiente. |
 | Inferencia desde código | **Directa.** `goodsIssueApiRoute.js` GET → filtros/paginación → `findAllGoodsIssues`. |
 | Flujo principal | 1. **Actor:** abre la opción para consultar salidas de material.<br>2. **Nexus:** comprueba su autorización y muestra la tabla con búsqueda, filtros y paginación disponibles.<br>3. **Actor:** captura los criterios que necesita y solicita aplicarlos.<br>4. **Nexus:** actualiza la tabla y el total con la información autorizada, sin modificar datos.<br>5. **Actor:** selecciona un registro cuando necesita revisar su información.<br>6. **Nexus:** muestra el detalle y las acciones que el actor puede ejecutar. |
+| Continuaciones asociadas | Después de presentar las acciones disponibles, el actor puede terminar `CU-SAL-01` e iniciar, si cuenta con autorización, `CU-SAL-02` Crear salida de material o, después de seleccionar una salida o detalle, `CU-SAL-03` Editar encabezado, `CU-SAL-04` Ajustar materiales, `CU-SAL-05` Surtir material o `CU-SAL-06` Devolver material surtido. La selección no constituye `«include»` ni `«extend»`; el caso elegido comprueba nuevamente sus precondiciones. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** Consulta sin modificar existencias.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
 | Requisitos relacionados | `RF-ISS-001`. |
 
@@ -872,6 +930,7 @@ Cada ficha representa una sola acción sobre una sola entidad. Los elementos com
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de consulta o reporte correspondiente. |
 | Inferencia desde código | **Directa.** `wasteIssueApiRoute.js` GET → filtros/paginación → `findAllWasteIssues`. |
 | Flujo principal | 1. **Actor:** abre la opción para consultar salidas de merma.<br>2. **Nexus:** comprueba su autorización y muestra la tabla con búsqueda, filtros y paginación disponibles.<br>3. **Actor:** captura los criterios que necesita y solicita aplicarlos.<br>4. **Nexus:** actualiza la tabla y el total con la información autorizada, sin modificar datos.<br>5. **Actor:** selecciona un registro cuando necesita revisar su información.<br>6. **Nexus:** muestra el detalle y las acciones que el actor puede ejecutar. |
+| Continuaciones asociadas | Después de presentar las acciones disponibles, el actor puede terminar `CU-SAL-07` e iniciar, si cuenta con autorización, `CU-SAL-08` Crear salida de merma o, después de seleccionar una salida o detalle, `CU-SAL-09` Editar encabezado, `CU-SAL-10` Ajustar mermas, `CU-SAL-11` Surtir merma o `CU-SAL-12` Devolver merma surtida. La selección no constituye `«include»` ni `«extend»`; el caso elegido comprueba nuevamente sus precondiciones. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** Consulta sin modificar existencias.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
 | Requisitos relacionados | `RF-WST-001`. |
 
