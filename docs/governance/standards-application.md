@@ -18,6 +18,23 @@ cumplimiento formal.
 | ISO/IEC/IEEE 42010:2022 | Sólo arquitectura. | Interesados, preocupaciones, alcance y semántica de las vistas arquitectónicas. | No gobierna la redacción de requisitos ni convierte Mermaid en UML o C4 formal. |
 | ISO/IEC 27001 e ISO 9001 | No aplicables como sistema de gestión por decisión del repositorio. | Sus temas pueden originar requisitos concretos si existe una obligación organizacional. | Nexus no declara un SGSI, un sistema de gestión de calidad ni certificación. |
 
+### Plantilla adoptada para casos de uso
+
+ISO/IEC/IEEE 29148 aporta los criterios con los que se revisa la información —identidad,
+necesidad, claridad, consistencia, verificabilidad y trazabilidad—, pero no se usa como
+fuente de una plantilla literal. Nexus define una ficha de dos columnas que **incluye**
+identificador y nombre, actor y disparador, participación, precondiciones, flujo
+principal, alternativas y excepciones cuando existan, postcondiciones, inferencia desde
+código y requisitos relacionados. Las precondiciones y postcondiciones se enumeran de
+forma individual: una ficha conserva tantas como exija su estado inicial y sus efectos,
+sin comprimir varias garantías en una sola oración ni completar una cantidad fija.
+
+La plantilla **excluye** secciones vacías para alternativas o excepciones inexistentes,
+la descripción exhaustiva de la interfaz y detalles internos de rutas, controladores o
+servicios como si fueran acciones del actor. Tampoco exige UML formal ni una ficha
+separada por módulo. Estas inclusiones y exclusiones son decisiones de organización del
+catálogo, no requisitos atribuidos a la norma.
+
 ## Aplicación de ISO/IEC/IEEE 29148 a la especificación
 
 La revisión usa preguntas binarias en lugar de una puntuación subjetiva. Un requisito se
