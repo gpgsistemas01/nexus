@@ -79,7 +79,7 @@ negocio.
 | Origen | Diagrama necesario | Estado y ubicación | Razón para generarlo o mantenerlo curado |
 | --- | --- | --- | --- |
 | Casos `CU-*` | Casos de uso por actor y límite de Nexus | Curado en `domain-and-use-cases.md`. | Actores, objetivos y asociaciones requieren decisión funcional; no se infieren de una ruta. |
-| Casos `CU-*` | Flujo de actividad de cada objetivo | Curado por familia y carril en `requirements-diagrams.md`. | Representa escenario exitoso, decisiones y resultado; comparte patrón CRUD sin fusionar objetivos. |
+| Casos `CU-*` | Flujo de actividad y vista técnica complementaria de cada objetivo | Curado por familia en `requirements-diagrams.md`. | El primero representa escenario exitoso, decisiones y resultado; la segunda hace visible su ejecución entre capas o la bifurcación que el flujo omite, sin fusionar objetivos. |
 | Casos con estados | Máquina de estados de salidas, surtimientos y devoluciones | Curada en requisitos. | Los nombres y transiciones combinan reglas y cantidades; el código es evidencia, no única fuente normativa. |
 | Casos transaccionales | Secuencia representativa de corrección/cancelación | Curada en requisitos y enlazada al servicio. | Explica límite atómico y rollback sin producir una secuencia por endpoint. |
 | Código de routers | Superficie API/Web por área y método | Curada en `code-diagrams.md` y comprobada contra el mapa de rutas. | Montajes y métodos son verificables, pero la vista se actualiza explícitamente junto al cambio para conservar agrupaciones comprensibles. |
@@ -89,9 +89,10 @@ negocio.
 
 ### Diagramas descartados en la revisión
 
-- **Un diagrama de secuencia por cada `CU-*`:** repetiría la misma cadena de capas para
-  consultas y CRUD simples; sólo se crea cuando el orden, rollback o participantes
-  aportan una decisión que el flujo no muestra.
+- **La misma secuencia de capas copiada para cada `CU-*`:** ocultaría las diferencias
+  entre consulta, CRUD, bifurcación y coordinación. Cada caso conserva una vista técnica,
+  pero elige secuencia o actividad y nombra sólo participantes, reutilización u omisiones
+  que aportan información propia de ese objetivo.
 - **Un diagrama de clases generado desde JavaScript:** la aplicación no declara clases de
   dominio equivalentes al modelo conceptual; los imports no permiten inferirlas.
 - **Casos de uso generados desde endpoints:** `POST`, `PATCH` o `GET` no revelan actor,
