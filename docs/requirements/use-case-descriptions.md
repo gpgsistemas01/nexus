@@ -30,21 +30,27 @@ información que permite recorrer su objetivo sin consultar una segunda descripc
   presentar el resultado se separan cuando ocurren en momentos distintos. Se nombran el botón, enlace o acción que dispara cada transición; el formulario,
   diálogo o tabla que abre Nexus; los mensajes de confirmación o error; y la validación
   y escritura en base de datos cuando forman parte del caso. Expresiones pasivas como
-  «revisa» o «verifica el resultado» no sustituyen una interacción observable.
+  «revisa» o «verifica el resultado» no sustituyen una interacción observable. El paso
+  desde el que se desprende una variante o un rechazo incluye entre paréntesis
+  **(ver A1)** o **(ver E1)**, según el identificador correspondiente.
 - **Flujos alternativos:** secuencia propia por variante, con numeración reiniciada, la
-  interacción actor–Nexus y un destino explícito.
-- **Excepciones:** punto de rechazo o fallo y efecto protegido.
+  interacción actor–Nexus y un destino explícito. La secuencia comienza con el
+  participante que debe actuar después del paso referenciado: si ese paso corresponde
+  a Nexus, comienza el actor; si corresponde al actor, comienza Nexus.
+- **Excepciones:** punto de rechazo o fallo y efecto protegido. Su secuencia respeta la
+  misma alternancia de participantes definida para los flujos alternativos.
 - **Postcondiciones (éxito y fallo):** lista numerada de estados finales observables;
   separa los efectos garantizados al terminar correctamente de las garantías que se
   conservan si el caso se rechaza o falla.
 - **Reglas y requisitos relacionados:** referencias a criterios normativos que no se
   duplican dentro de la ficha.
 
-Cada flujo alternativo indica el paso del flujo principal desde el que se inicia y cada
-excepción identifica el paso o flujo alternativo en el que puede ocurrir. Así, la
-variante o el rechazo puede localizarse sin inferir su punto de extensión a partir de
-otra sección. Los párrafos de grupo sólo declaran contexto realmente compartido y no
-mantienen una segunda versión de los flujos.
+Cada flujo alternativo indica el paso del flujo principal después del cual se inicia y
+cada excepción identifica el paso o flujo alternativo después del cual puede ocurrir.
+El primer paso de esa secuencia no repite la acción referenciada, sino que continúa con
+el otro participante. Así, la variante o el rechazo puede localizarse sin inferir su
+punto de extensión a partir de otra sección. Los párrafos de grupo sólo declaran
+contexto realmente compartido y no mantienen una segunda versión de los flujos.
 
 El último paso de cada alternativa declara su destino: **continúa en el paso N del flujo
 principal** cuando retorna dentro del mismo caso, o **termina el caso de uso** cuando no
@@ -316,8 +322,8 @@ la consulta de la sesión actual permanecen como responsabilidades internas de N
 | Participación de actor y sistema | **Actor:** abre el acceso, captura sus credenciales y confirma.<br>**Nexus:** valida la cuenta, crea la sesión y dirige al usuario al alcance disponible. |
 | Precondiciones | 1. La cuenta existe y está activa.<br>2. El actor no dispone de una sesión autenticada vigente. |
 | Inferencia desde código | **Directa.** `authApiRoute.js` POST `/login` → `loginValidation` → `login` → `loginUser`. |
-| Flujo principal | 1. **Actor:** abre la página de acceso.<br>2. **Nexus:** muestra el formulario de credenciales.<br>3. **Actor:** captura usuario y contraseña y selecciona «Iniciar sesión».<br>4. **Nexus:** valida los datos y comprueba que correspondan a una cuenta activa.<br>5. **Nexus:** establece las credenciales de sesión y presenta la página inicial con las opciones autorizadas. |
-| Excepciones | **E1, desde el paso 4:** si las credenciales son inválidas o la cuenta no admite acceso, Nexus rechaza la solicitud, no crea la sesión y comunica el error; termina el caso de uso. |
+| Flujo principal | 1. **Actor:** abre la página de acceso.<br>2. **Nexus:** muestra el formulario de credenciales.<br>3. **Actor:** captura usuario y contraseña y selecciona «Iniciar sesión» **(ver E1)**.<br>4. **Nexus:** valida los datos y comprueba que correspondan a una cuenta activa.<br>5. **Nexus:** establece las credenciales de sesión y presenta la página inicial con las opciones autorizadas. |
+| Excepciones | **E1, después del paso 3:** **Nexus** determina que las credenciales son inválidas o que la cuenta no admite acceso, rechaza la solicitud, no crea la sesión y comunica el error; termina el caso de uso. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** Existe una sesión autenticada atribuida a la cuenta y el usuario puede acceder únicamente a las capacidades autorizadas.<br>2. **Fallo:** No se crean credenciales de sesión ni se expone información protegida. |
 | Requisitos relacionados | `RF-AUT-001`, `RN-001`. |
 
@@ -331,7 +337,8 @@ la consulta de la sesión actual permanecen como responsabilidades internas de N
 | Participación de actor y sistema | **Actor:** selecciona la opción de cierre.<br>**Nexus:** elimina las credenciales del navegador y confirma la terminación de la sesión. |
 | Precondiciones | 1. El actor dispone de una sesión autenticada. |
 | Inferencia desde código | **Directa.** `logoutWebRoute.js` POST `/` → `logout` → `clearAuthCookies`. |
-| Flujo principal | 1. **Actor:** selecciona «Cerrar sesión».<br>2. **Nexus:** elimina las credenciales y el destino de retorno conservados en el navegador.<br>3. **Nexus:** dirige al actor fuera del área protegida y confirma el cierre. |
+| Flujo principal | 1. **Actor:** selecciona «Cerrar sesión» **(ver E1)**.<br>2. **Nexus:** elimina las credenciales y el destino de retorno conservados en el navegador.<br>3. **Nexus:** dirige al actor fuera del área protegida y confirma el cierre. |
+| Excepciones | **E1, después del paso 1:** **Nexus** determina que no se cumple alguna precondición o autorización requerida, rechaza la solicitud sin modificar ni exponer información y comunica el motivo; termina el caso de uso. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** El navegador deja de conservar las credenciales de acceso de la sesión.<br>2. **Fallo:** El sistema no debe presentar contenido protegido sin volver a comprobar una sesión válida. |
 | Requisitos relacionados | `RF-AUT-003`, `RN-001`. |
 
@@ -349,8 +356,9 @@ Cada ficha representa una sola acción sobre una sola entidad. Los elementos com
 | Participación de actor y sistema | **Actor:** abre la consulta, define criterios y selecciona registros.<br>**Nexus:** autoriza, presenta filtros y devuelve sólo la información permitida. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de consulta o reporte correspondiente. |
 | Inferencia desde código | **Directa.** `personApiRoute.js` GET → `getAllPersons` → `personService`. |
-| Flujo principal | 1. **Actor:** abre la opción para consultar personas.<br>2. **Nexus:** comprueba su autorización y muestra la tabla con búsqueda, filtros y paginación disponibles.<br>3. **Actor:** captura los criterios que necesita y solicita aplicarlos.<br>4. **Nexus:** actualiza la tabla y el total con la información autorizada, sin modificar datos.<br>5. **Actor:** selecciona un registro cuando necesita revisar su información.<br>6. **Nexus:** muestra el detalle y las acciones que el actor puede ejecutar. |
+| Flujo principal | 1. **Actor:** abre la opción para consultar personas **(ver E1)**.<br>2. **Nexus:** comprueba su autorización y muestra la tabla con búsqueda, filtros y paginación disponibles.<br>3. **Actor:** captura los criterios que necesita y solicita aplicarlos.<br>4. **Nexus:** actualiza la tabla y el total con la información autorizada, sin modificar datos.<br>5. **Actor:** selecciona un registro cuando necesita revisar su información.<br>6. **Nexus:** muestra el detalle y las acciones que el actor puede ejecutar. |
 | Continuaciones asociadas | Después de presentar las acciones disponibles, el actor puede terminar `CU-IDA-01` e iniciar, si cuenta con autorización, `CU-IDA-02` Crear persona o, después de seleccionar una persona, `CU-IDA-03` Editar persona. La selección no constituye `«include»` ni `«extend»`; el caso elegido comprueba nuevamente sus precondiciones. |
+| Excepciones | **E1, después del paso 1:** **Nexus** determina que no se cumple alguna precondición o autorización requerida, rechaza la solicitud sin modificar ni exponer información y comunica el motivo; termina el caso de uso. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** Listado de personas y asignaciones.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
 | Requisitos relacionados | `RF-IAM-002`. |
 
@@ -364,7 +372,8 @@ Cada ficha representa una sola acción sobre una sola entidad. Los elementos com
 | Participación de actor y sistema | **Actor:** abre el alta, captura datos y confirma.<br>**Nexus:** carga opciones, valida, registra y comunica el resultado. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de alta.<br>3. Existen los datos relacionados requeridos para completar el registro. |
 | Inferencia desde código | **Directa.** `personApiRoute.js` POST → `personValidation` → `registerPerson` → `personService`. |
-| Flujo principal | 1. **Actor:** abre la opción para crear persona.<br>2. **Nexus:** muestra el formulario y carga las opciones relacionadas que puede utilizar.<br>3. **Actor:** captura los datos y relaciones requeridos y confirma.<br>4. **Nexus:** valida autorización, obligatoriedad, formato, identidad y relaciones.<br>5. **Nexus:** registra persona, actualiza el listado y muestra la confirmación. |
+| Flujo principal | 1. **Actor:** abre la opción para crear persona **(ver E1)**.<br>2. **Nexus:** muestra el formulario y carga las opciones relacionadas que puede utilizar.<br>3. **Actor:** captura los datos y relaciones requeridos y confirma.<br>4. **Nexus:** valida autorización, obligatoriedad, formato, identidad y relaciones.<br>5. **Nexus:** registra persona, actualiza el listado y muestra la confirmación. |
+| Excepciones | **E1, después del paso 1:** **Nexus** determina que no se cumple alguna precondición o autorización requerida, rechaza la solicitud sin modificar ni exponer información y comunica el motivo; termina el caso de uso. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** Alta de persona sin crear cuenta.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
 | Requisitos relacionados | `RF-IAM-007`. |
 
@@ -378,7 +387,8 @@ Cada ficha representa una sola acción sobre una sola entidad. Los elementos com
 | Participación de actor y sistema | **Actor:** selecciona el registro, modifica datos y confirma.<br>**Nexus:** presenta valores vigentes, valida, actualiza y comunica el resultado. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de edición.<br>3. El registro objetivo existe.<br>4. El registro se encuentra en un estado que admite los cambios solicitados. |
 | Inferencia desde código | **Directa.** `personApiRoute.js` PUT `/:id` → `personValidation` → `editPerson` → `personService`. |
-| Flujo principal | 1. **Actor:** selecciona persona y abre la edición.<br>2. **Nexus:** muestra los valores actuales y habilita sólo los campos permitidos.<br>3. **Actor:** modifica los datos admitidos y confirma.<br>4. **Nexus:** valida autorización, formato, identidad y relaciones.<br>5. **Nexus:** guarda los cambios, actualiza el listado y muestra la confirmación. |
+| Flujo principal | 1. **Actor:** selecciona persona y abre la edición **(ver E1)**.<br>2. **Nexus:** muestra los valores actuales y habilita sólo los campos permitidos.<br>3. **Actor:** modifica los datos admitidos y confirma.<br>4. **Nexus:** valida autorización, formato, identidad y relaciones.<br>5. **Nexus:** guarda los cambios, actualiza el listado y muestra la confirmación. |
+| Excepciones | **E1, después del paso 1:** **Nexus** determina que no se cumple alguna precondición o autorización requerida, rechaza la solicitud sin modificar ni exponer información y comunica el motivo; termina el caso de uso. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** Actualización de datos y asignaciones de persona.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
 | Requisitos relacionados | `RF-IAM-008`. |
 
@@ -392,8 +402,9 @@ Cada ficha representa una sola acción sobre una sola entidad. Los elementos com
 | Participación de actor y sistema | **Actor:** abre la consulta, define criterios y selecciona registros.<br>**Nexus:** autoriza, presenta filtros y devuelve sólo la información permitida. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de consulta o reporte correspondiente. |
 | Inferencia desde código | **Directa.** `userApiRoute.js` GET → `getAllUsers` → `userService`. |
-| Flujo principal | 1. **Actor:** abre la opción para consultar usuarios.<br>2. **Nexus:** comprueba su autorización y muestra la tabla con búsqueda, filtros y paginación disponibles.<br>3. **Actor:** captura los criterios que necesita y solicita aplicarlos.<br>4. **Nexus:** actualiza la tabla y el total con la información autorizada, sin modificar datos.<br>5. **Actor:** selecciona un registro cuando necesita revisar su información.<br>6. **Nexus:** muestra el detalle y las acciones que el actor puede ejecutar. |
+| Flujo principal | 1. **Actor:** abre la opción para consultar usuarios **(ver E1)**.<br>2. **Nexus:** comprueba su autorización y muestra la tabla con búsqueda, filtros y paginación disponibles.<br>3. **Actor:** captura los criterios que necesita y solicita aplicarlos.<br>4. **Nexus:** actualiza la tabla y el total con la información autorizada, sin modificar datos.<br>5. **Actor:** selecciona un registro cuando necesita revisar su información.<br>6. **Nexus:** muestra el detalle y las acciones que el actor puede ejecutar. |
 | Continuaciones asociadas | Después de presentar las acciones disponibles, el actor puede terminar `CU-IDA-04` e iniciar, si cuenta con autorización, `CU-IDA-05` Crear usuario y asignar acceso o, después de seleccionar una cuenta, `CU-IDA-06` Editar usuario y acceso o `CU-IDA-07` Cambiar contraseña de usuario. La selección no constituye `«include»` ni `«extend»`; el caso elegido comprueba nuevamente sus precondiciones. |
+| Excepciones | **E1, después del paso 1:** **Nexus** determina que no se cumple alguna precondición o autorización requerida, rechaza la solicitud sin modificar ni exponer información y comunica el motivo; termina el caso de uso. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** Listado de cuentas y accesos.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
 | Requisitos relacionados | `RF-IAM-001`. |
 
@@ -407,7 +418,8 @@ Cada ficha representa una sola acción sobre una sola entidad. Los elementos com
 | Participación de actor y sistema | **Actor:** abre el alta, captura datos y confirma.<br>**Nexus:** carga opciones, valida, registra y comunica el resultado. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de alta.<br>3. Existen los datos relacionados requeridos para completar el registro. |
 | Inferencia desde código | **Directa.** `userApiRoute.js` POST → `userValidation` → `registerUser` → `userService`. |
-| Flujo principal | 1. **Actor:** abre la opción para crear usuario y asignar acceso.<br>2. **Nexus:** muestra el formulario y carga las opciones relacionadas que puede utilizar.<br>3. **Actor:** captura los datos y relaciones requeridos y confirma.<br>4. **Nexus:** valida autorización, obligatoriedad, formato, identidad y relaciones.<br>5. **Nexus:** registra usuario y asignar acceso, actualiza el listado y muestra la confirmación. |
+| Flujo principal | 1. **Actor:** abre la opción para crear usuario y asignar acceso **(ver E1)**.<br>2. **Nexus:** muestra el formulario y carga las opciones relacionadas que puede utilizar.<br>3. **Actor:** captura los datos y relaciones requeridos y confirma.<br>4. **Nexus:** valida autorización, obligatoriedad, formato, identidad y relaciones.<br>5. **Nexus:** registra usuario y asignar acceso, actualiza el listado y muestra la confirmación. |
+| Excepciones | **E1, después del paso 1:** **Nexus** determina que no se cumple alguna precondición o autorización requerida, rechaza la solicitud sin modificar ni exponer información y comunica el motivo; termina el caso de uso. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** Alta transaccional de cuenta y asignación.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
 | Requisitos relacionados | `RF-IAM-004`. |
 
@@ -421,7 +433,8 @@ Cada ficha representa una sola acción sobre una sola entidad. Los elementos com
 | Participación de actor y sistema | **Actor:** selecciona el registro, modifica datos y confirma.<br>**Nexus:** presenta valores vigentes, valida, actualiza y comunica el resultado. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de edición.<br>3. El registro objetivo existe.<br>4. El registro se encuentra en un estado que admite los cambios solicitados. |
 | Inferencia desde código | **Directa.** `userApiRoute.js` PATCH `/:id` → `userEditValidation` → `editUser` → `userService`. |
-| Flujo principal | 1. **Actor:** selecciona usuario y acceso y abre la edición.<br>2. **Nexus:** muestra los valores actuales y habilita sólo los campos permitidos.<br>3. **Actor:** modifica los datos admitidos y confirma.<br>4. **Nexus:** valida autorización, formato, identidad y relaciones.<br>5. **Nexus:** guarda los cambios, actualiza el listado y muestra la confirmación. |
+| Flujo principal | 1. **Actor:** selecciona usuario y acceso y abre la edición **(ver E1)**.<br>2. **Nexus:** muestra los valores actuales y habilita sólo los campos permitidos.<br>3. **Actor:** modifica los datos admitidos y confirma.<br>4. **Nexus:** valida autorización, formato, identidad y relaciones.<br>5. **Nexus:** guarda los cambios, actualiza el listado y muestra la confirmación. |
+| Excepciones | **E1, después del paso 1:** **Nexus** determina que no se cumple alguna precondición o autorización requerida, rechaza la solicitud sin modificar ni exponer información y comunica el motivo; termina el caso de uso. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** Actualización transaccional de cuenta y asignación.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
 | Requisitos relacionados | `RF-IAM-005`. |
 
@@ -435,7 +448,8 @@ Cada ficha representa una sola acción sobre una sola entidad. Los elementos com
 | Participación de actor y sistema | **Actor:** selecciona el registro, modifica datos y confirma.<br>**Nexus:** presenta valores vigentes, valida, actualiza y comunica el resultado. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de cambio de credencial.<br>3. La cuenta objetivo existe. |
 | Inferencia desde código | **Directa.** `userApiRoute.js` PATCH `/:id/password` → `userPasswordValidation` → `editUserPassword` → `userService`. |
-| Flujo principal | 1. **Actor:** selecciona un usuario y abre «Editar contraseña».<br>2. **Nexus:** muestra el formulario de nueva contraseña sin exponer la credencial actual.<br>3. **Actor:** captura y confirma la nueva contraseña.<br>4. **Nexus:** valida la credencial, la cifra y reemplaza el valor anterior.<br>5. **Nexus:** cierra el formulario y confirma la actualización. |
+| Flujo principal | 1. **Actor:** selecciona un usuario y abre «Editar contraseña» **(ver E1)**.<br>2. **Nexus:** muestra el formulario de nueva contraseña sin exponer la credencial actual.<br>3. **Actor:** captura y confirma la nueva contraseña.<br>4. **Nexus:** valida la credencial, la cifra y reemplaza el valor anterior.<br>5. **Nexus:** cierra el formulario y confirma la actualización. |
+| Excepciones | **E1, después del paso 1:** **Nexus** determina que no se cumple alguna precondición o autorización requerida, rechaza la solicitud sin modificar ni exponer información y comunica el motivo; termina el caso de uso. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** Actualización cifrada de la credencial.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
 | Requisitos relacionados | `RF-IAM-006`. |
 
@@ -449,7 +463,8 @@ Cada ficha representa una sola acción sobre una sola entidad. Los elementos com
 | Participación de actor y sistema | **Actor:** abre la consulta, define criterios y selecciona registros.<br>**Nexus:** autoriza, presenta filtros y devuelve sólo la información permitida. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de consulta o reporte correspondiente. |
 | Inferencia desde código | **Directa.** `roleApiRoute.js` GET → `getAllRoles`. |
-| Flujo principal | 1. **Actor:** abre el formulario del proceso que requiere roles.<br>2. **Nexus:** comprueba su autorización y carga roles vigentes.<br>3. **Actor:** consulta o selecciona una opción de roles.<br>4. **Nexus:** conserva la selección para continuar el proceso principal sin modificar el catálogo. |
+| Flujo principal | 1. **Actor:** abre el formulario del proceso que requiere roles **(ver E1)**.<br>2. **Nexus:** comprueba su autorización y carga roles vigentes.<br>3. **Actor:** consulta o selecciona una opción de roles.<br>4. **Nexus:** conserva la selección para continuar el proceso principal sin modificar el catálogo. |
+| Excepciones | **E1, después del paso 1:** **Nexus** determina que no se cumple alguna precondición o autorización requerida, rechaza la solicitud sin modificar ni exponer información y comunica el motivo; termina el caso de uso. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** Catálogo de acceso de sólo lectura.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
 | Requisitos relacionados | `RF-IAM-003`. |
 
@@ -463,7 +478,8 @@ Cada ficha representa una sola acción sobre una sola entidad. Los elementos com
 | Participación de actor y sistema | **Actor:** abre la consulta, define criterios y selecciona registros.<br>**Nexus:** autoriza, presenta filtros y devuelve sólo la información permitida. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de consulta o reporte correspondiente. |
 | Inferencia desde código | **Directa.** `departmentApiRoute.js` GET → `getAllDepartments`. |
-| Flujo principal | 1. **Actor:** abre el formulario del proceso que requiere departamentos.<br>2. **Nexus:** comprueba su autorización y carga departamentos vigentes.<br>3. **Actor:** consulta o selecciona una opción de departamentos.<br>4. **Nexus:** conserva la selección para continuar el proceso principal sin modificar el catálogo. |
+| Flujo principal | 1. **Actor:** abre el formulario del proceso que requiere departamentos **(ver E1)**.<br>2. **Nexus:** comprueba su autorización y carga departamentos vigentes.<br>3. **Actor:** consulta o selecciona una opción de departamentos.<br>4. **Nexus:** conserva la selección para continuar el proceso principal sin modificar el catálogo. |
+| Excepciones | **E1, después del paso 1:** **Nexus** determina que no se cumple alguna precondición o autorización requerida, rechaza la solicitud sin modificar ni exponer información y comunica el motivo; termina el caso de uso. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** Catálogo de acceso de sólo lectura.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
 | Requisitos relacionados | `RF-IAM-003`. |
 
@@ -481,8 +497,9 @@ Cada ficha representa una sola acción sobre una sola entidad. Los elementos com
 | Participación de actor y sistema | **Actor:** abre la consulta, define criterios y selecciona registros.<br>**Nexus:** autoriza, presenta filtros y devuelve sólo la información permitida. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de consulta o reporte correspondiente. |
 | Inferencia desde código | **Directa.** `materialApiRoute.js` GET → `getAllMaterials` → `findAllMaterials`. |
-| Flujo principal | 1. **Actor:** abre la opción para consultar materiales.<br>2. **Nexus:** comprueba su autorización y muestra la tabla con búsqueda, filtros y paginación disponibles.<br>3. **Actor:** captura los criterios que necesita y solicita aplicarlos.<br>4. **Nexus:** actualiza la tabla y el total con la información autorizada, sin modificar datos.<br>5. **Actor:** selecciona un registro cuando necesita revisar su información.<br>6. **Nexus:** muestra el detalle y las acciones que el actor puede ejecutar. |
+| Flujo principal | 1. **Actor:** abre la opción para consultar materiales **(ver E1)**.<br>2. **Nexus:** comprueba su autorización y muestra la tabla con búsqueda, filtros y paginación disponibles.<br>3. **Actor:** captura los criterios que necesita y solicita aplicarlos.<br>4. **Nexus:** actualiza la tabla y el total con la información autorizada, sin modificar datos.<br>5. **Actor:** selecciona un registro cuando necesita revisar su información.<br>6. **Nexus:** muestra el detalle y las acciones que el actor puede ejecutar. |
 | Continuaciones asociadas | Después de presentar las acciones disponibles, el actor puede terminar `CU-CAT-01` e iniciar, si cuenta con autorización, `CU-CAT-02` Crear material o, después de seleccionar un material, `CU-CAT-03` Editar material, `CU-CAT-04` Retirar material o `CU-CAT-05` Ajustar existencia de material. La selección no constituye `«include»` ni `«extend»`; el caso elegido comprueba nuevamente sus precondiciones. |
+| Excepciones | **E1, después del paso 1:** **Nexus** determina que no se cumple alguna precondición o autorización requerida, rechaza la solicitud sin modificar ni exponer información y comunica el motivo; termina el caso de uso. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** Listado de materiales y ofertas de proveedor.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
 | Requisitos relacionados | `RF-CAT-001`. |
 
@@ -496,7 +513,8 @@ Cada ficha representa una sola acción sobre una sola entidad. Los elementos com
 | Participación de actor y sistema | **Actor:** abre el alta, captura datos y confirma.<br>**Nexus:** carga opciones, valida, registra y comunica el resultado. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de alta.<br>3. Existen los datos relacionados requeridos para completar el registro. |
 | Inferencia desde código | **Directa.** `materialApiRoute.js` POST → validación → DTO → `createMaterial`. |
-| Flujo principal | 1. **Actor:** abre la opción para crear material.<br>2. **Nexus:** muestra el formulario y carga las opciones relacionadas que puede utilizar.<br>3. **Actor:** captura los datos y relaciones requeridos y confirma.<br>4. **Nexus:** valida autorización, obligatoriedad, formato, identidad y relaciones.<br>5. **Nexus:** registra material, actualiza el listado y muestra la confirmación. |
+| Flujo principal | 1. **Actor:** abre la opción para crear material **(ver E1)**.<br>2. **Nexus:** muestra el formulario y carga las opciones relacionadas que puede utilizar.<br>3. **Actor:** captura los datos y relaciones requeridos y confirma.<br>4. **Nexus:** valida autorización, obligatoriedad, formato, identidad y relaciones.<br>5. **Nexus:** registra material, actualiza el listado y muestra la confirmación. |
+| Excepciones | **E1, después del paso 1:** **Nexus** determina que no se cumple alguna precondición o autorización requerida, rechaza la solicitud sin modificar ni exponer información y comunica el motivo; termina el caso de uso. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** Alta con presentación, unidad y relaciones válidas.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
 | Requisitos relacionados | `RF-CAT-006`. |
 
@@ -510,7 +528,8 @@ Cada ficha representa una sola acción sobre una sola entidad. Los elementos com
 | Participación de actor y sistema | **Actor:** selecciona el registro, modifica datos y confirma.<br>**Nexus:** presenta valores vigentes, valida, actualiza y comunica el resultado. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de edición.<br>3. El registro objetivo existe.<br>4. El registro se encuentra en un estado que admite los cambios solicitados. |
 | Inferencia desde código | **Directa.** `materialApiRoute.js` PATCH `/:id` → validación → DTO → `updateMaterial`. |
-| Flujo principal | 1. **Actor:** selecciona material y abre la edición.<br>2. **Nexus:** muestra los valores actuales y habilita sólo los campos permitidos.<br>3. **Actor:** modifica los datos admitidos y confirma.<br>4. **Nexus:** valida autorización, formato, identidad y relaciones.<br>5. **Nexus:** guarda los cambios, actualiza el listado y muestra la confirmación. |
+| Flujo principal | 1. **Actor:** selecciona material y abre la edición **(ver E1)**.<br>2. **Nexus:** muestra los valores actuales y habilita sólo los campos permitidos.<br>3. **Actor:** modifica los datos admitidos y confirma.<br>4. **Nexus:** valida autorización, formato, identidad y relaciones.<br>5. **Nexus:** guarda los cambios, actualiza el listado y muestra la confirmación. |
+| Excepciones | **E1, después del paso 1:** **Nexus** determina que no se cumple alguna precondición o autorización requerida, rechaza la solicitud sin modificar ni exponer información y comunica el motivo; termina el caso de uso. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** Actualización de datos generales admitidos.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
 | Requisitos relacionados | `RF-CAT-007`. |
 
@@ -524,7 +543,8 @@ Cada ficha representa una sola acción sobre una sola entidad. Los elementos com
 | Participación de actor y sistema | **Actor:** solicita y confirma el retiro.<br>**Nexus:** comprueba historia y relaciones, ejecuta sólo el retiro permitido e informa el resultado. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de retiro.<br>3. El recurso objetivo existe.<br>4. El recurso se encuentra en un estado que permite retirarlo. |
 | Inferencia desde código | **Directa.** `materialApiRoute.js` DELETE `/:id` → `removeMaterial` → `deleteMaterial`. |
-| Flujo principal | 1. **Actor:** selecciona un material y solicita retirarlo.<br>2. **Nexus:** identifica el material y solicita confirmar la eliminación.<br>3. **Actor:** confirma que desea retirarlo.<br>4. **Nexus:** comprueba si el material tiene historia protegida o relaciones con proveedores.<br>5. **Nexus:** retira la relación o el material cuando está permitido; en otro caso conserva los datos e informa el conflicto. |
+| Flujo principal | 1. **Actor:** selecciona un material y solicita retirarlo **(ver E1)**.<br>2. **Nexus:** identifica el material y solicita confirmar la eliminación.<br>3. **Actor:** confirma que desea retirarlo.<br>4. **Nexus:** comprueba si el material tiene historia protegida o relaciones con proveedores.<br>5. **Nexus:** retira la relación o el material cuando está permitido; en otro caso conserva los datos e informa el conflicto. |
+| Excepciones | **E1, después del paso 1:** **Nexus** determina que no se cumple alguna precondición o autorización requerida, rechaza la solicitud sin modificar ni exponer información y comunica el motivo; termina el caso de uso. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** Retiro condicionado por la historia operativa.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
 | Requisitos relacionados | `RF-CAT-008`. |
 
@@ -538,7 +558,8 @@ Cada ficha representa una sola acción sobre una sola entidad. Los elementos com
 | Participación de actor y sistema | **Actor:** selecciona el inventario, captura el ajuste y confirma.<br>**Nexus:** muestra la existencia, valida, registra el ajuste y actualiza inventario. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de ajuste.<br>3. El recurso cuya existencia se ajustará existe. |
 | Inferencia desde código | **Directa.** `materialApiRoute.js` PATCH `/:id/stock` → `updateMaterialStock` → evento de inventario. |
-| Flujo principal | 1. **Actor:** selecciona el material y abre «Ajustar existencia».<br>2. **Nexus:** muestra la existencia actual y los campos de tipo, cantidad y motivo.<br>3. **Actor:** captura el ajuste y lo confirma.<br>4. **Nexus:** valida la autorización, el motivo y la cantidad y registra el ajuste junto con la nueva existencia.<br>5. **Nexus:** actualiza las vistas de inventario y confirma el resultado. |
+| Flujo principal | 1. **Actor:** selecciona el material y abre «Ajustar existencia» **(ver E1)**.<br>2. **Nexus:** muestra la existencia actual y los campos de tipo, cantidad y motivo.<br>3. **Actor:** captura el ajuste y lo confirma.<br>4. **Nexus:** valida la autorización, el motivo y la cantidad y registra el ajuste junto con la nueva existencia.<br>5. **Nexus:** actualiza las vistas de inventario y confirma el resultado. |
+| Excepciones | **E1, después del paso 1:** **Nexus** determina que no se cumple alguna precondición o autorización requerida, rechaza la solicitud sin modificar ni exponer información y comunica el motivo; termina el caso de uso. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** La existencia del material refleja el ajuste autorizado.<br>2. **Éxito:** El ajuste queda registrado con su motivo y trazabilidad.<br>3. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
 | Requisitos relacionados | `RF-CAT-009`. |
 
@@ -552,8 +573,9 @@ Cada ficha representa una sola acción sobre una sola entidad. Los elementos com
 | Participación de actor y sistema | **Actor:** abre la consulta, define criterios y selecciona registros.<br>**Nexus:** autoriza, presenta filtros y devuelve sólo la información permitida. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de consulta o reporte correspondiente. |
 | Inferencia desde código | **Directa.** `supplierApiRoute.js` GET → `getAllSuppliers`. |
-| Flujo principal | 1. **Actor:** abre la opción para consultar proveedores.<br>2. **Nexus:** comprueba su autorización y muestra la tabla con búsqueda, filtros y paginación disponibles.<br>3. **Actor:** captura los criterios que necesita y solicita aplicarlos.<br>4. **Nexus:** actualiza la tabla y el total con la información autorizada, sin modificar datos.<br>5. **Actor:** selecciona un registro cuando necesita revisar su información.<br>6. **Nexus:** muestra el detalle y las acciones que el actor puede ejecutar. |
+| Flujo principal | 1. **Actor:** abre la opción para consultar proveedores **(ver E1)**.<br>2. **Nexus:** comprueba su autorización y muestra la tabla con búsqueda, filtros y paginación disponibles.<br>3. **Actor:** captura los criterios que necesita y solicita aplicarlos.<br>4. **Nexus:** actualiza la tabla y el total con la información autorizada, sin modificar datos.<br>5. **Actor:** selecciona un registro cuando necesita revisar su información.<br>6. **Nexus:** muestra el detalle y las acciones que el actor puede ejecutar. |
 | Continuaciones asociadas | Después de presentar las acciones disponibles, el actor puede terminar `CU-CAT-06` e iniciar, si cuenta con autorización, `CU-CAT-07` Crear proveedor o, después de seleccionar un proveedor, `CU-CAT-08` Editar proveedor o `CU-CAT-09` Cambiar estado de proveedor. La selección no constituye `«include»` ni `«extend»`; el caso elegido comprueba nuevamente sus precondiciones. |
+| Excepciones | **E1, después del paso 1:** **Nexus** determina que no se cumple alguna precondición o autorización requerida, rechaza la solicitud sin modificar ni exponer información y comunica el motivo; termina el caso de uso. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** Listado de proveedores autorizados.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
 | Requisitos relacionados | `RF-CAT-002`. |
 
@@ -567,7 +589,8 @@ Cada ficha representa una sola acción sobre una sola entidad. Los elementos com
 | Participación de actor y sistema | **Actor:** abre el alta, captura datos y confirma.<br>**Nexus:** carga opciones, valida, registra y comunica el resultado. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de alta.<br>3. Existen los datos relacionados requeridos para completar el registro. |
 | Inferencia desde código | **Directa.** `supplierApiRoute.js` POST → `supplierValidation` → `registerSupplier`. |
-| Flujo principal | 1. **Actor:** abre la opción para crear proveedor.<br>2. **Nexus:** muestra el formulario y carga las opciones relacionadas que puede utilizar.<br>3. **Actor:** captura los datos y relaciones requeridos y confirma.<br>4. **Nexus:** valida autorización, obligatoriedad, formato, identidad y relaciones.<br>5. **Nexus:** registra proveedor, actualiza el listado y muestra la confirmación. |
+| Flujo principal | 1. **Actor:** abre la opción para crear proveedor **(ver E1)**.<br>2. **Nexus:** muestra el formulario y carga las opciones relacionadas que puede utilizar.<br>3. **Actor:** captura los datos y relaciones requeridos y confirma.<br>4. **Nexus:** valida autorización, obligatoriedad, formato, identidad y relaciones.<br>5. **Nexus:** registra proveedor, actualiza el listado y muestra la confirmación. |
+| Excepciones | **E1, después del paso 1:** **Nexus** determina que no se cumple alguna precondición o autorización requerida, rechaza la solicitud sin modificar ni exponer información y comunica el motivo; termina el caso de uso. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** Alta con código e identidad válidos.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
 | Requisitos relacionados | `RF-CAT-010`. |
 
@@ -581,7 +604,8 @@ Cada ficha representa una sola acción sobre una sola entidad. Los elementos com
 | Participación de actor y sistema | **Actor:** selecciona el registro, modifica datos y confirma.<br>**Nexus:** presenta valores vigentes, valida, actualiza y comunica el resultado. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de edición.<br>3. El registro objetivo existe.<br>4. El registro se encuentra en un estado que admite los cambios solicitados. |
 | Inferencia desde código | **Directa.** `supplierApiRoute.js` PUT `/:id` → `supplierValidation` → `editSupplier`. |
-| Flujo principal | 1. **Actor:** selecciona proveedor y abre la edición.<br>2. **Nexus:** muestra los valores actuales y habilita sólo los campos permitidos.<br>3. **Actor:** modifica los datos admitidos y confirma.<br>4. **Nexus:** valida autorización, formato, identidad y relaciones.<br>5. **Nexus:** guarda los cambios, actualiza el listado y muestra la confirmación. |
+| Flujo principal | 1. **Actor:** selecciona proveedor y abre la edición **(ver E1)**.<br>2. **Nexus:** muestra los valores actuales y habilita sólo los campos permitidos.<br>3. **Actor:** modifica los datos admitidos y confirma.<br>4. **Nexus:** valida autorización, formato, identidad y relaciones.<br>5. **Nexus:** guarda los cambios, actualiza el listado y muestra la confirmación. |
+| Excepciones | **E1, después del paso 1:** **Nexus** determina que no se cumple alguna precondición o autorización requerida, rechaza la solicitud sin modificar ni exponer información y comunica el motivo; termina el caso de uso. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** Actualización de datos admitidos.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
 | Requisitos relacionados | `RF-CAT-011`. |
 
@@ -595,7 +619,8 @@ Cada ficha representa una sola acción sobre una sola entidad. Los elementos com
 | Participación de actor y sistema | **Actor:** selecciona el registro, modifica datos y confirma.<br>**Nexus:** presenta valores vigentes, valida, actualiza y comunica el resultado. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de edición.<br>3. El proveedor objetivo existe. |
 | Inferencia desde código | **Subflujo.** el estado viaja por `supplierApiRoute.js` PUT `/:id`; no existe una ruta independiente de estado. |
-| Flujo principal | 1. **Actor:** selecciona un proveedor y abre su edición.<br>2. **Nexus:** muestra los datos actuales, incluido el estado.<br>3. **Actor:** elige el nuevo estado y confirma.<br>4. **Nexus:** valida los datos y actualiza el proveedor como parte de la edición.<br>5. **Nexus:** refresca el listado y confirma el cambio de estado. |
+| Flujo principal | 1. **Actor:** selecciona un proveedor y abre su edición **(ver E1)**.<br>2. **Nexus:** muestra los datos actuales, incluido el estado.<br>3. **Actor:** elige el nuevo estado y confirma.<br>4. **Nexus:** valida los datos y actualiza el proveedor como parte de la edición.<br>5. **Nexus:** refresca el listado y confirma el cambio de estado. |
+| Excepciones | **E1, después del paso 1:** **Nexus** determina que no se cumple alguna precondición o autorización requerida, rechaza la solicitud sin modificar ni exponer información y comunica el motivo; termina el caso de uso. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** Activación o desactivación del proveedor.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
 | Requisitos relacionados | `RF-CAT-011`. |
 
@@ -609,8 +634,9 @@ Cada ficha representa una sola acción sobre una sola entidad. Los elementos com
 | Participación de actor y sistema | **Actor:** abre la consulta, define criterios y selecciona registros.<br>**Nexus:** autoriza, presenta filtros y devuelve sólo la información permitida. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de consulta o reporte correspondiente. |
 | Inferencia desde código | **Directa.** `clientApiRoute.js` GET → `getAllClients`. |
-| Flujo principal | 1. **Actor:** abre la opción para consultar clientes.<br>2. **Nexus:** comprueba su autorización y muestra la tabla con búsqueda, filtros y paginación disponibles.<br>3. **Actor:** captura los criterios que necesita y solicita aplicarlos.<br>4. **Nexus:** actualiza la tabla y el total con la información autorizada, sin modificar datos.<br>5. **Actor:** selecciona un registro cuando necesita revisar su información.<br>6. **Nexus:** muestra el detalle y las acciones que el actor puede ejecutar. |
+| Flujo principal | 1. **Actor:** abre la opción para consultar clientes **(ver E1)**.<br>2. **Nexus:** comprueba su autorización y muestra la tabla con búsqueda, filtros y paginación disponibles.<br>3. **Actor:** captura los criterios que necesita y solicita aplicarlos.<br>4. **Nexus:** actualiza la tabla y el total con la información autorizada, sin modificar datos.<br>5. **Actor:** selecciona un registro cuando necesita revisar su información.<br>6. **Nexus:** muestra el detalle y las acciones que el actor puede ejecutar. |
 | Continuaciones asociadas | Después de presentar las acciones disponibles, el actor puede terminar `CU-CAT-10` e iniciar, si cuenta con autorización, `CU-CAT-11` Crear cliente o, después de seleccionar un cliente, `CU-CAT-12` Editar cliente. La selección no constituye `«include»` ni `«extend»`; el caso elegido comprueba nuevamente sus precondiciones. |
+| Excepciones | **E1, después del paso 1:** **Nexus** determina que no se cumple alguna precondición o autorización requerida, rechaza la solicitud sin modificar ni exponer información y comunica el motivo; termina el caso de uso. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** Listado de clientes autorizados.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
 | Requisitos relacionados | `RF-CAT-003`. |
 
@@ -624,7 +650,8 @@ Cada ficha representa una sola acción sobre una sola entidad. Los elementos com
 | Participación de actor y sistema | **Actor:** abre el alta, captura datos y confirma.<br>**Nexus:** carga opciones, valida, registra y comunica el resultado. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de alta.<br>3. Existen los datos relacionados requeridos para completar el registro. |
 | Inferencia desde código | **Directa.** `clientApiRoute.js` POST → `registerClient`. |
-| Flujo principal | 1. **Actor:** abre la opción para crear cliente.<br>2. **Nexus:** muestra el formulario y carga las opciones relacionadas que puede utilizar.<br>3. **Actor:** captura los datos y relaciones requeridos y confirma.<br>4. **Nexus:** valida autorización, obligatoriedad, formato, identidad y relaciones.<br>5. **Nexus:** registra cliente, actualiza el listado y muestra la confirmación. |
+| Flujo principal | 1. **Actor:** abre la opción para crear cliente **(ver E1)**.<br>2. **Nexus:** muestra el formulario y carga las opciones relacionadas que puede utilizar.<br>3. **Actor:** captura los datos y relaciones requeridos y confirma.<br>4. **Nexus:** valida autorización, obligatoriedad, formato, identidad y relaciones.<br>5. **Nexus:** registra cliente, actualiza el listado y muestra la confirmación. |
+| Excepciones | **E1, después del paso 1:** **Nexus** determina que no se cumple alguna precondición o autorización requerida, rechaza la solicitud sin modificar ni exponer información y comunica el motivo; termina el caso de uso. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** Alta con asesor opcional válido.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
 | Requisitos relacionados | `RF-CAT-013`. |
 
@@ -638,7 +665,8 @@ Cada ficha representa una sola acción sobre una sola entidad. Los elementos com
 | Participación de actor y sistema | **Actor:** selecciona el registro, modifica datos y confirma.<br>**Nexus:** presenta valores vigentes, valida, actualiza y comunica el resultado. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de edición.<br>3. El registro objetivo existe.<br>4. El registro se encuentra en un estado que admite los cambios solicitados. |
 | Inferencia desde código | **Directa.** `clientApiRoute.js` PUT `/:id` → `editClient`. |
-| Flujo principal | 1. **Actor:** selecciona cliente y abre la edición.<br>2. **Nexus:** muestra los valores actuales y habilita sólo los campos permitidos.<br>3. **Actor:** modifica los datos admitidos y confirma.<br>4. **Nexus:** valida autorización, formato, identidad y relaciones.<br>5. **Nexus:** guarda los cambios, actualiza el listado y muestra la confirmación. |
+| Flujo principal | 1. **Actor:** selecciona cliente y abre la edición **(ver E1)**.<br>2. **Nexus:** muestra los valores actuales y habilita sólo los campos permitidos.<br>3. **Actor:** modifica los datos admitidos y confirma.<br>4. **Nexus:** valida autorización, formato, identidad y relaciones.<br>5. **Nexus:** guarda los cambios, actualiza el listado y muestra la confirmación. |
+| Excepciones | **E1, después del paso 1:** **Nexus** determina que no se cumple alguna precondición o autorización requerida, rechaza la solicitud sin modificar ni exponer información y comunica el motivo; termina el caso de uso. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** Actualización de datos y asesor opcional.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
 | Requisitos relacionados | `RF-CAT-014`. |
 
@@ -652,8 +680,9 @@ Cada ficha representa una sola acción sobre una sola entidad. Los elementos com
 | Participación de actor y sistema | **Actor:** abre la consulta, define criterios y selecciona registros.<br>**Nexus:** autoriza, presenta filtros y devuelve sólo la información permitida. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de consulta o reporte correspondiente. |
 | Inferencia desde código | **Directa.** `wasteApiRoute.js` GET → `getAllWastes` → `findAllWastes`. |
-| Flujo principal | 1. **Actor:** abre la opción para consultar mermas.<br>2. **Nexus:** comprueba su autorización y muestra la tabla con búsqueda, filtros y paginación disponibles.<br>3. **Actor:** captura los criterios que necesita y solicita aplicarlos.<br>4. **Nexus:** actualiza la tabla y el total con la información autorizada, sin modificar datos.<br>5. **Actor:** selecciona un registro cuando necesita revisar su información.<br>6. **Nexus:** muestra el detalle y las acciones que el actor puede ejecutar. |
+| Flujo principal | 1. **Actor:** abre la opción para consultar mermas **(ver E1)**.<br>2. **Nexus:** comprueba su autorización y muestra la tabla con búsqueda, filtros y paginación disponibles.<br>3. **Actor:** captura los criterios que necesita y solicita aplicarlos.<br>4. **Nexus:** actualiza la tabla y el total con la información autorizada, sin modificar datos.<br>5. **Actor:** selecciona un registro cuando necesita revisar su información.<br>6. **Nexus:** muestra el detalle y las acciones que el actor puede ejecutar. |
 | Continuaciones asociadas | Después de presentar las acciones disponibles, el actor puede terminar `CU-CAT-13` e iniciar, si cuenta con autorización, `CU-CAT-14` Registrar merma o, después de seleccionar una merma, `CU-CAT-15` Editar merma o `CU-CAT-16` Ajustar existencia de merma. La selección no constituye `«include»` ni `«extend»`; el caso elegido comprueba nuevamente sus precondiciones. |
+| Excepciones | **E1, después del paso 1:** **Nexus** determina que no se cumple alguna precondición o autorización requerida, rechaza la solicitud sin modificar ni exponer información y comunica el motivo; termina el caso de uso. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** Listado de existencias de merma.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
 | Requisitos relacionados | `RF-CAT-004`. |
 
@@ -667,7 +696,8 @@ Cada ficha representa una sola acción sobre una sola entidad. Los elementos com
 | Participación de actor y sistema | **Actor:** abre el alta, captura datos y confirma.<br>**Nexus:** carga opciones, valida, registra y comunica el resultado. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de alta.<br>3. Existen los datos relacionados requeridos para completar el registro. |
 | Inferencia desde código | **Compuesta.** GET `/material-templates` → POST de merma → DTO → alta con ajuste inicial → evento de inventario. |
-| Flujo principal | 1. **Actor:** abre «Agregar merma» y selecciona primero un proveedor.<br>2. **Nexus:** carga los materiales de ese proveedor que pueden utilizarse como plantilla.<br>3. **Actor:** elige el material, completa los datos propios de la merma y confirma.<br>4. **Nexus:** valida identidad, dimensiones, existencia y datos relacionados.<br>5. **Nexus:** crea la merma con sus propios datos históricos, registra su existencia inicial y confirma el alta. |
+| Flujo principal | 1. **Actor:** abre «Agregar merma» y selecciona primero un proveedor **(ver E1)**.<br>2. **Nexus:** carga los materiales de ese proveedor que pueden utilizarse como plantilla.<br>3. **Actor:** elige el material, completa los datos propios de la merma y confirma.<br>4. **Nexus:** valida identidad, dimensiones, existencia y datos relacionados.<br>5. **Nexus:** crea la merma con sus propios datos históricos, registra su existencia inicial y confirma el alta. |
+| Excepciones | **E1, después del paso 1:** **Nexus** determina que no se cumple alguna precondición o autorización requerida, rechaza la solicitud sin modificar ni exponer información y comunica el motivo; termina el caso de uso. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** Alta desde una plantilla material-proveedor.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
 | Requisitos relacionados | `RF-CAT-015`. |
 
@@ -681,7 +711,8 @@ Cada ficha representa una sola acción sobre una sola entidad. Los elementos com
 | Participación de actor y sistema | **Actor:** selecciona el registro, modifica datos y confirma.<br>**Nexus:** presenta valores vigentes, valida, actualiza y comunica el resultado. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de edición.<br>3. El registro objetivo existe.<br>4. El registro se encuentra en un estado que admite los cambios solicitados. |
 | Inferencia desde código | **Directa.** `wasteApiRoute.js` PATCH `/:id` → validación → DTO → `updateWaste`. |
-| Flujo principal | 1. **Actor:** selecciona merma y abre la edición.<br>2. **Nexus:** muestra los valores actuales y habilita sólo los campos permitidos.<br>3. **Actor:** modifica los datos admitidos y confirma.<br>4. **Nexus:** valida autorización, formato, identidad y relaciones.<br>5. **Nexus:** guarda los cambios, actualiza el listado y muestra la confirmación. |
+| Flujo principal | 1. **Actor:** selecciona merma y abre la edición **(ver E1)**.<br>2. **Nexus:** muestra los valores actuales y habilita sólo los campos permitidos.<br>3. **Actor:** modifica los datos admitidos y confirma.<br>4. **Nexus:** valida autorización, formato, identidad y relaciones.<br>5. **Nexus:** guarda los cambios, actualiza el listado y muestra la confirmación. |
+| Excepciones | **E1, después del paso 1:** **Nexus** determina que no se cumple alguna precondición o autorización requerida, rechaza la solicitud sin modificar ni exponer información y comunica el motivo; termina el caso de uso. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** Actualización sin alterar su identidad física.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
 | Requisitos relacionados | `RF-CAT-016`, `RF-CAT-017`. |
 
@@ -695,7 +726,8 @@ Cada ficha representa una sola acción sobre una sola entidad. Los elementos com
 | Participación de actor y sistema | **Actor:** selecciona el inventario, captura el ajuste y confirma.<br>**Nexus:** muestra la existencia, valida, registra el ajuste y actualiza inventario. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de ajuste.<br>3. El recurso cuya existencia se ajustará existe. |
 | Inferencia desde código | **Directa.** `wasteApiRoute.js` PATCH `/:id/stock` → `updateWasteStock` → evento de inventario. |
-| Flujo principal | 1. **Actor:** selecciona el registro de merma y abre «Ajustar existencia».<br>2. **Nexus:** muestra la existencia actual y los campos de tipo, cantidad y motivo.<br>3. **Actor:** captura el ajuste y lo confirma.<br>4. **Nexus:** valida la autorización, el motivo y la cantidad y registra el ajuste junto con la nueva existencia.<br>5. **Nexus:** actualiza las vistas de inventario y confirma el resultado. |
+| Flujo principal | 1. **Actor:** selecciona el registro de merma y abre «Ajustar existencia» **(ver E1)**.<br>2. **Nexus:** muestra la existencia actual y los campos de tipo, cantidad y motivo.<br>3. **Actor:** captura el ajuste y lo confirma.<br>4. **Nexus:** valida la autorización, el motivo y la cantidad y registra el ajuste junto con la nueva existencia.<br>5. **Nexus:** actualiza las vistas de inventario y confirma el resultado. |
+| Excepciones | **E1, después del paso 1:** **Nexus** determina que no se cumple alguna precondición o autorización requerida, rechaza la solicitud sin modificar ni exponer información y comunica el motivo; termina el caso de uso. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** La existencia de la merma refleja el ajuste autorizado.<br>2. **Éxito:** El ajuste queda registrado con su motivo y trazabilidad.<br>3. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
 | Requisitos relacionados | `RF-CAT-018`. |
 
@@ -709,7 +741,8 @@ Cada ficha representa una sola acción sobre una sola entidad. Los elementos com
 | Participación de actor y sistema | **Actor:** abre la consulta, define criterios y selecciona registros.<br>**Nexus:** autoriza, presenta filtros y devuelve sólo la información permitida. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de consulta o reporte correspondiente. |
 | Inferencia desde código | **Directa.** `presentationApiRoute.js` GET → `getAllPresentations`. |
-| Flujo principal | 1. **Actor:** abre el formulario del proceso que requiere presentaciones.<br>2. **Nexus:** comprueba su autorización y carga presentaciones vigentes.<br>3. **Actor:** consulta o selecciona una opción de presentaciones.<br>4. **Nexus:** conserva la selección para continuar el proceso principal sin modificar el catálogo. |
+| Flujo principal | 1. **Actor:** abre el formulario del proceso que requiere presentaciones **(ver E1)**.<br>2. **Nexus:** comprueba su autorización y carga presentaciones vigentes.<br>3. **Actor:** consulta o selecciona una opción de presentaciones.<br>4. **Nexus:** conserva la selección para continuar el proceso principal sin modificar el catálogo. |
+| Excepciones | **E1, después del paso 1:** **Nexus** determina que no se cumple alguna precondición o autorización requerida, rechaza la solicitud sin modificar ni exponer información y comunica el motivo; termina el caso de uso. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** Catálogo auxiliar de sólo lectura.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
 | Requisitos relacionados | `RF-CAT-005`. |
 
@@ -723,7 +756,8 @@ Cada ficha representa una sola acción sobre una sola entidad. Los elementos com
 | Participación de actor y sistema | **Actor:** abre la consulta, define criterios y selecciona registros.<br>**Nexus:** autoriza, presenta filtros y devuelve sólo la información permitida. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de consulta o reporte correspondiente. |
 | Inferencia desde código | **Directa.** `unitMeasureApiRoute.js` GET → `getAllUnitMeasures`. |
-| Flujo principal | 1. **Actor:** abre el formulario del proceso que requiere unidades de medida.<br>2. **Nexus:** comprueba su autorización y carga unidades de medida vigentes.<br>3. **Actor:** consulta o selecciona una opción de unidades de medida.<br>4. **Nexus:** conserva la selección para continuar el proceso principal sin modificar el catálogo. |
+| Flujo principal | 1. **Actor:** abre el formulario del proceso que requiere unidades de medida **(ver E1)**.<br>2. **Nexus:** comprueba su autorización y carga unidades de medida vigentes.<br>3. **Actor:** consulta o selecciona una opción de unidades de medida.<br>4. **Nexus:** conserva la selección para continuar el proceso principal sin modificar el catálogo. |
+| Excepciones | **E1, después del paso 1:** **Nexus** determina que no se cumple alguna precondición o autorización requerida, rechaza la solicitud sin modificar ni exponer información y comunica el motivo; termina el caso de uso. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** Catálogo auxiliar de sólo lectura.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
 | Requisitos relacionados | `RF-CAT-005`. |
 
@@ -737,7 +771,8 @@ Cada ficha representa una sola acción sobre una sola entidad. Los elementos com
 | Participación de actor y sistema | **Actor:** abre la consulta, define criterios y selecciona registros.<br>**Nexus:** autoriza, presenta filtros y devuelve sólo la información permitida. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de consulta o reporte correspondiente. |
 | Inferencia desde código | **Directa.** `reasonApiRoute.js` GET → `getAllReasons`. |
-| Flujo principal | 1. **Actor:** abre el formulario del proceso que requiere motivos de ajuste.<br>2. **Nexus:** comprueba su autorización y carga motivos de ajuste vigentes.<br>3. **Actor:** consulta o selecciona una opción de motivos de ajuste.<br>4. **Nexus:** conserva la selección para continuar el proceso principal sin modificar el catálogo. |
+| Flujo principal | 1. **Actor:** abre el formulario del proceso que requiere motivos de ajuste **(ver E1)**.<br>2. **Nexus:** comprueba su autorización y carga motivos de ajuste vigentes.<br>3. **Actor:** consulta o selecciona una opción de motivos de ajuste.<br>4. **Nexus:** conserva la selección para continuar el proceso principal sin modificar el catálogo. |
+| Excepciones | **E1, después del paso 1:** **Nexus** determina que no se cumple alguna precondición o autorización requerida, rechaza la solicitud sin modificar ni exponer información y comunica el motivo; termina el caso de uso. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** Catálogo auxiliar de sólo lectura.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
 | Requisitos relacionados | `RF-CAT-005`. |
 
@@ -751,7 +786,8 @@ Cada ficha representa una sola acción sobre una sola entidad. Los elementos com
 | Participación de actor y sistema | **Actor:** abre la consulta, define criterios y selecciona registros.<br>**Nexus:** autoriza, presenta filtros y devuelve sólo la información permitida. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de consulta o reporte correspondiente. |
 | Inferencia desde código | **Directa.** `fulfillmentStatusApiRoute.js` GET → `getAllFulfillmentStatuses`. |
-| Flujo principal | 1. **Actor:** abre el formulario del proceso que requiere estados de cumplimiento.<br>2. **Nexus:** comprueba su autorización y carga estados de cumplimiento vigentes.<br>3. **Actor:** consulta o selecciona una opción de estados de cumplimiento.<br>4. **Nexus:** conserva la selección para continuar el proceso principal sin modificar el catálogo. |
+| Flujo principal | 1. **Actor:** abre el formulario del proceso que requiere estados de cumplimiento **(ver E1)**.<br>2. **Nexus:** comprueba su autorización y carga estados de cumplimiento vigentes.<br>3. **Actor:** consulta o selecciona una opción de estados de cumplimiento.<br>4. **Nexus:** conserva la selección para continuar el proceso principal sin modificar el catálogo. |
+| Excepciones | **E1, después del paso 1:** **Nexus** determina que no se cumple alguna precondición o autorización requerida, rechaza la solicitud sin modificar ni exponer información y comunica el motivo; termina el caso de uso. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** Catálogo auxiliar de sólo lectura.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
 | Requisitos relacionados | `RF-CAT-005`. |
 
@@ -769,8 +805,9 @@ Cada ficha representa una sola acción sobre una sola entidad. Los elementos com
 | Participación de actor y sistema | **Actor:** abre la consulta, define criterios y selecciona registros.<br>**Nexus:** autoriza, presenta filtros y devuelve sólo la información permitida. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de consulta o reporte correspondiente. |
 | Inferencia desde código | **Directa.** `goodsReceiptApiRoute.js` GET → normalización de filtros/paginación → `findAllGoodsReceipts`. |
-| Flujo principal | 1. **Actor:** abre la opción para consultar compras de material.<br>2. **Nexus:** comprueba su autorización y muestra la tabla con búsqueda, filtros y paginación disponibles.<br>3. **Actor:** captura los criterios que necesita y solicita aplicarlos.<br>4. **Nexus:** actualiza la tabla y el total con la información autorizada, sin modificar datos.<br>5. **Actor:** selecciona un registro cuando necesita revisar su información.<br>6. **Nexus:** muestra el detalle y las acciones que el actor puede ejecutar. |
+| Flujo principal | 1. **Actor:** abre la opción para consultar compras de material **(ver E1)**.<br>2. **Nexus:** comprueba su autorización y muestra la tabla con búsqueda, filtros y paginación disponibles.<br>3. **Actor:** captura los criterios que necesita y solicita aplicarlos.<br>4. **Nexus:** actualiza la tabla y el total con la información autorizada, sin modificar datos.<br>5. **Actor:** selecciona un registro cuando necesita revisar su información.<br>6. **Nexus:** muestra el detalle y las acciones que el actor puede ejecutar. |
 | Continuaciones asociadas | Después de presentar las acciones disponibles, el actor puede terminar `CU-ENT-01` e iniciar, si cuenta con autorización, `CU-ENT-02` Crear compra de material o, después de seleccionar una compra o detalle, `CU-ENT-03` Editar compra de material, `CU-ENT-04` Corregir material de una compra o `CU-ENT-05` Cancelar material de una compra. La selección no constituye `«include»` ni `«extend»`; el caso elegido comprueba nuevamente sus precondiciones. |
+| Excepciones | **E1, después del paso 1:** **Nexus** determina que no se cumple alguna precondición o autorización requerida, rechaza la solicitud sin modificar ni exponer información y comunica el motivo; termina el caso de uso. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** Listado y detalle sin modificar inventario.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
 | Requisitos relacionados | `RF-REC-001`. |
 
@@ -784,7 +821,8 @@ Cada ficha representa una sola acción sobre una sola entidad. Los elementos com
 | Participación de actor y sistema | **Actor:** abre el alta, captura datos y confirma.<br>**Nexus:** carga opciones, valida, registra y comunica el resultado. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de alta.<br>3. Existen los datos relacionados requeridos para completar el registro. |
 | Inferencia desde código | **Compuesta.** POST → validación → DTO → `createGoodsReceipt` → evento de inventario. |
-| Flujo principal | 1. **Actor:** abre «Agregar compra».<br>2. **Nexus:** muestra el formulario y carga proveedores, receptores y materiales disponibles.<br>3. **Actor:** captura factura y encabezado, agrega materiales con cantidad y precio y confirma.<br>4. **Nexus:** valida factura, relaciones, cantidades y precios y muestra los totales calculados.<br>5. **Nexus:** registra compra y detalles, incrementa existencias y conserva los movimientos como una sola operación.<br>6. **Nexus:** actualiza la tabla y confirma el registro. |
+| Flujo principal | 1. **Actor:** abre «Agregar compra» **(ver E1)**.<br>2. **Nexus:** muestra el formulario y carga proveedores, receptores y materiales disponibles.<br>3. **Actor:** captura factura y encabezado, agrega materiales con cantidad y precio y confirma.<br>4. **Nexus:** valida factura, relaciones, cantidades y precios y muestra los totales calculados.<br>5. **Nexus:** registra compra y detalles, incrementa existencias y conserva los movimientos como una sola operación.<br>6. **Nexus:** actualiza la tabla y confirma el registro. |
+| Excepciones | **E1, después del paso 1:** **Nexus** determina que no se cumple alguna precondición o autorización requerida, rechaza la solicitud sin modificar ni exponer información y comunica el motivo; termina el caso de uso. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** La compra y sus detalles quedan registrados.<br>2. **Éxito:** Las existencias incorporan las cantidades recibidas.<br>3. **Éxito:** Los movimientos de entrada quedan registrados.<br>4. **Éxito:** La compra, las existencias y los movimientos se conservan como una sola operación transaccional.<br>5. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
 | Requisitos relacionados | `RF-REC-003`, `RF-REC-004`, `RF-REC-007`. |
 
@@ -798,7 +836,8 @@ Cada ficha representa una sola acción sobre una sola entidad. Los elementos com
 | Participación de actor y sistema | **Actor:** selecciona el registro, modifica datos y confirma.<br>**Nexus:** presenta valores vigentes, valida, actualiza y comunica el resultado. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de edición.<br>3. El registro objetivo existe.<br>4. El registro se encuentra en un estado que admite los cambios solicitados. |
 | Inferencia desde código | **Directa.** PATCH `/:id` → validación de encabezado → `updateGoodsReceipt` → evento de inventario. |
-| Flujo principal | 1. **Actor:** selecciona una compra y abre su edición.<br>2. **Nexus:** muestra el encabezado y los detalles actuales y habilita sólo los campos permitidos.<br>3. **Actor:** modifica el encabezado o agrega detalles admitidos y confirma.<br>4. **Nexus:** valida el estado, la factura y los cambios solicitados.<br>5. **Nexus:** guarda los cambios sin volver a aplicar la existencia de detalles anteriores y confirma la actualización. |
+| Flujo principal | 1. **Actor:** selecciona una compra y abre su edición **(ver E1)**.<br>2. **Nexus:** muestra el encabezado y los detalles actuales y habilita sólo los campos permitidos.<br>3. **Actor:** modifica el encabezado o agrega detalles admitidos y confirma.<br>4. **Nexus:** valida el estado, la factura y los cambios solicitados.<br>5. **Nexus:** guarda los cambios sin volver a aplicar la existencia de detalles anteriores y confirma la actualización. |
+| Excepciones | **E1, después del paso 1:** **Nexus** determina que no se cumple alguna precondición o autorización requerida, rechaza la solicitud sin modificar ni exponer información y comunica el motivo; termina el caso de uso. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** El encabezado y los detalles admitidos reflejan los cambios confirmados.<br>2. **Éxito:** Las existencias de los detalles anteriores no vuelven a aplicarse.<br>3. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
 | Requisitos relacionados | `RF-REC-005`. |
 
@@ -812,7 +851,8 @@ Cada ficha representa una sola acción sobre una sola entidad. Los elementos com
 | Participación de actor y sistema | **Actor:** selecciona el detalle, captura la corrección y confirma.<br>**Nexus:** valida y coordina detalle, existencia, movimiento, totales e historial. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso operativo.<br>3. La compra y el detalle existen.<br>4. El detalle se encuentra en un estado que admite corrección. |
 | Inferencia desde código | **Compuesta.** PATCH `/:id/details/:detailId/corrections` → DTO → `correctGoodsReceiptDetailLine` → evento. |
-| Flujo principal | 1. **Actor:** selecciona un material de la compra y abre «Corregir detalle».<br>2. **Nexus:** muestra los valores actuales y solicita cantidad o costo corregido y motivo.<br>3. **Actor:** captura la corrección y la confirma.<br>4. **Nexus:** valida el estado, el motivo, la diferencia y la existencia disponible.<br>5. **Nexus:** actualiza detalle, existencia, movimiento, totales e historial como una sola operación y confirma. |
+| Flujo principal | 1. **Actor:** selecciona un material de la compra y abre «Corregir detalle» **(ver E1)**.<br>2. **Nexus:** muestra los valores actuales y solicita cantidad o costo corregido y motivo.<br>3. **Actor:** captura la corrección y la confirma.<br>4. **Nexus:** valida el estado, el motivo, la diferencia y la existencia disponible.<br>5. **Nexus:** actualiza detalle, existencia, movimiento, totales e historial como una sola operación y confirma. |
+| Excepciones | **E1, después del paso 1:** **Nexus** determina que no se cumple alguna precondición o autorización requerida, rechaza la solicitud sin modificar ni exponer información y comunica el motivo; termina el caso de uso. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** El detalle conserva la cantidad o el costo corregido.<br>2. **Éxito:** La existencia refleja la diferencia autorizada.<br>3. **Éxito:** El movimiento y los totales reflejan la corrección.<br>4. **Éxito:** El historial conserva el motivo y el actor de la corrección.<br>5. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
 | Requisitos relacionados | `RF-REC-002`. |
 
@@ -826,7 +866,8 @@ Cada ficha representa una sola acción sobre una sola entidad. Los elementos com
 | Participación de actor y sistema | **Actor:** selecciona el detalle y confirma la cancelación.<br>**Nexus:** valida y coordina la cancelación, la existencia, el movimiento y los totales. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso operativo.<br>3. La compra y el detalle activo existen.<br>4. El detalle se encuentra en un estado que admite cancelación. |
 | Inferencia desde código | **Compuesta.** PATCH `/:id/details/:detailId/cancel` → `cancelGoodsReceiptDetailLine` → evento. |
-| Flujo principal | 1. **Actor:** selecciona un detalle activo y solicita cancelarlo.<br>2. **Nexus:** identifica el detalle y solicita confirmación.<br>3. **Actor:** confirma la cancelación.<br>4. **Nexus:** valida que el detalle pueda cancelarse y que la existencia pueda revertirse.<br>5. **Nexus:** cancela el detalle, revierte existencia, movimiento y totales y confirma el resultado. |
+| Flujo principal | 1. **Actor:** selecciona un detalle activo y solicita cancelarlo **(ver E1)**.<br>2. **Nexus:** identifica el detalle y solicita confirmación.<br>3. **Actor:** confirma la cancelación.<br>4. **Nexus:** valida que el detalle pueda cancelarse y que la existencia pueda revertirse.<br>5. **Nexus:** cancela el detalle, revierte existencia, movimiento y totales y confirma el resultado. |
+| Excepciones | **E1, después del paso 1:** **Nexus** determina que no se cumple alguna precondición o autorización requerida, rechaza la solicitud sin modificar ni exponer información y comunica el motivo; termina el caso de uso. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** El detalle queda cancelado.<br>2. **Éxito:** La existencia recibida por el detalle queda revertida.<br>3. **Éxito:** El movimiento y los totales reflejan la cancelación.<br>4. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
 | Requisitos relacionados | `RF-REC-008`. |
 
@@ -844,8 +885,9 @@ Cada ficha representa una sola acción sobre una sola entidad. Los elementos com
 | Participación de actor y sistema | **Actor:** abre la consulta, define criterios y selecciona registros.<br>**Nexus:** autoriza, presenta filtros y devuelve sólo la información permitida. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de consulta o reporte correspondiente. |
 | Inferencia desde código | **Directa.** `goodsIssueApiRoute.js` GET → filtros/paginación → `findAllGoodsIssues`. |
-| Flujo principal | 1. **Actor:** abre la opción para consultar salidas de material.<br>2. **Nexus:** comprueba su autorización y muestra la tabla con búsqueda, filtros y paginación disponibles.<br>3. **Actor:** captura los criterios que necesita y solicita aplicarlos.<br>4. **Nexus:** actualiza la tabla y el total con la información autorizada, sin modificar datos.<br>5. **Actor:** selecciona un registro cuando necesita revisar su información.<br>6. **Nexus:** muestra el detalle y las acciones que el actor puede ejecutar. |
+| Flujo principal | 1. **Actor:** abre la opción para consultar salidas de material **(ver E1)**.<br>2. **Nexus:** comprueba su autorización y muestra la tabla con búsqueda, filtros y paginación disponibles.<br>3. **Actor:** captura los criterios que necesita y solicita aplicarlos.<br>4. **Nexus:** actualiza la tabla y el total con la información autorizada, sin modificar datos.<br>5. **Actor:** selecciona un registro cuando necesita revisar su información.<br>6. **Nexus:** muestra el detalle y las acciones que el actor puede ejecutar. |
 | Continuaciones asociadas | Después de presentar las acciones disponibles, el actor puede terminar `CU-SAL-01` e iniciar, si cuenta con autorización, `CU-SAL-02` Crear salida de material o, después de seleccionar una salida o detalle, `CU-SAL-03` Editar encabezado, `CU-SAL-04` Ajustar materiales, `CU-SAL-05` Surtir material o `CU-SAL-06` Devolver material surtido. La selección no constituye `«include»` ni `«extend»`; el caso elegido comprueba nuevamente sus precondiciones. |
+| Excepciones | **E1, después del paso 1:** **Nexus** determina que no se cumple alguna precondición o autorización requerida, rechaza la solicitud sin modificar ni exponer información y comunica el motivo; termina el caso de uso. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** Consulta sin modificar existencias.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
 | Requisitos relacionados | `RF-ISS-001`. |
 
@@ -859,7 +901,8 @@ Cada ficha representa una sola acción sobre una sola entidad. Los elementos com
 | Participación de actor y sistema | **Actor:** abre el alta, captura datos y confirma.<br>**Nexus:** carga opciones, valida, registra y comunica el resultado. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de alta.<br>3. Existen los datos relacionados requeridos para completar el registro. |
 | Inferencia desde código | **Directa.** POST → validación → DTO → `createGoodsIssue`. |
-| Flujo principal | 1. **Actor:** abre «Agregar salida de material».<br>2. **Nexus:** muestra el formulario y carga clientes, proyectos, solicitantes y recursos autorizados.<br>3. **Actor:** captura el encabezado, agrega materiales y cantidades y confirma.<br>4. **Nexus:** valida participantes, relaciones, recursos y cantidades.<br>5. **Nexus:** crea la salida pendiente sin descontar existencias, actualiza la tabla y confirma. |
+| Flujo principal | 1. **Actor:** abre «Agregar salida de material» **(ver E1)**.<br>2. **Nexus:** muestra el formulario y carga clientes, proyectos, solicitantes y recursos autorizados.<br>3. **Actor:** captura el encabezado, agrega materiales y cantidades y confirma.<br>4. **Nexus:** valida participantes, relaciones, recursos y cantidades.<br>5. **Nexus:** crea la salida pendiente sin descontar existencias, actualiza la tabla y confirma. |
+| Excepciones | **E1, después del paso 1:** **Nexus** determina que no se cumple alguna precondición o autorización requerida, rechaza la solicitud sin modificar ni exponer información y comunica el motivo; termina el caso de uso. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** La salida de material queda registrada en estado pendiente.<br>2. **Éxito:** Las existencias permanecen sin cambios hasta el surtimiento.<br>3. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
 | Requisitos relacionados | `RF-ISS-004`. |
 
@@ -873,7 +916,8 @@ Cada ficha representa una sola acción sobre una sola entidad. Los elementos com
 | Participación de actor y sistema | **Actor:** selecciona el registro, modifica datos y confirma.<br>**Nexus:** presenta valores vigentes, valida, actualiza y comunica el resultado. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de edición.<br>3. El registro objetivo existe.<br>4. El registro se encuentra en un estado que admite los cambios solicitados. |
 | Inferencia desde código | **Directa.** PATCH `/:id/header` → validación → DTO → `updateGoodsIssueHeader`. |
-| Flujo principal | 1. **Actor:** selecciona una salida de material y abre la edición de encabezado.<br>2. **Nexus:** muestra los datos actuales y habilita sólo los campos permitidos por su estado.<br>3. **Actor:** modifica los datos contextuales y confirma.<br>4. **Nexus:** valida el estado, los participantes y las relaciones y actualiza el encabezado.<br>5. **Nexus:** conserva intactas las cantidades y existencias y confirma la actualización. |
+| Flujo principal | 1. **Actor:** selecciona una salida de material y abre la edición de encabezado **(ver E1)**.<br>2. **Nexus:** muestra los datos actuales y habilita sólo los campos permitidos por su estado.<br>3. **Actor:** modifica los datos contextuales y confirma.<br>4. **Nexus:** valida el estado, los participantes y las relaciones y actualiza el encabezado.<br>5. **Nexus:** conserva intactas las cantidades y existencias y confirma la actualización. |
+| Excepciones | **E1, después del paso 1:** **Nexus** determina que no se cumple alguna precondición o autorización requerida, rechaza la solicitud sin modificar ni exponer información y comunica el motivo; termina el caso de uso. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** El encabezado conserva los cambios admitidos.<br>2. **Éxito:** Los detalles, las cantidades y las existencias permanecen sin cambios.<br>3. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
 | Requisitos relacionados | `RF-ISS-005`. |
 
@@ -887,7 +931,8 @@ Cada ficha representa una sola acción sobre una sola entidad. Los elementos com
 | Participación de actor y sistema | **Actor:** selecciona la salida o detalle, captura la acción y confirma.<br>**Nexus:** presenta cantidades y acciones permitidas, valida y actualiza documento, inventario y movimientos cuando corresponde. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de edición.<br>3. La salida existe.<br>4. La salida se encuentra en un estado que admite modificar sus detalles. |
 | Inferencia desde código | **Compartida.** PATCH `/:id/details` → validación → DTO → `updateGoodsIssueDetails`. |
-| Flujo principal | 1. **Actor:** abre los detalles de una salida todavía modificable.<br>2. **Nexus:** muestra los materiales actuales, cantidades y acciones permitidas.<br>3. **Actor:** agrega o modifica materiales y confirma los cambios.<br>4. **Nexus:** valida estado, recursos, cantidades pendientes y acumulados.<br>5. **Nexus:** actualiza los detalles sin descontar existencias y confirma el resultado. |
+| Flujo principal | 1. **Actor:** abre los detalles de una salida todavía modificable **(ver E1)**.<br>2. **Nexus:** muestra los materiales actuales, cantidades y acciones permitidas.<br>3. **Actor:** agrega o modifica materiales y confirma los cambios.<br>4. **Nexus:** valida estado, recursos, cantidades pendientes y acumulados.<br>5. **Nexus:** actualiza los detalles sin descontar existencias y confirma el resultado. |
+| Excepciones | **E1, después del paso 1:** **Nexus** determina que no se cumple alguna precondición o autorización requerida, rechaza la solicitud sin modificar ni exponer información y comunica el motivo; termina el caso de uso. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** Los detalles conservan los materiales y cantidades confirmados.<br>2. **Éxito:** Las existencias permanecen sin cambios hasta el surtimiento.<br>3. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
 | Requisitos relacionados | `RF-ISS-006`. |
 
@@ -901,7 +946,8 @@ Cada ficha representa una sola acción sobre una sola entidad. Los elementos com
 | Participación de actor y sistema | **Actor:** selecciona la salida o detalle, captura la acción y confirma.<br>**Nexus:** presenta cantidades y acciones permitidas, valida y actualiza documento, inventario y movimientos cuando corresponde. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso operativo.<br>3. La salida y el detalle existen.<br>4. El detalle conserva cantidad pendiente.<br>5. Hay existencia suficiente para surtir la cantidad solicitada. |
 | Inferencia desde código | **Subflujo.** la confirmación de surtido usa PATCH `/:id/details` y `updateGoodsIssueDetails`; no hay ruta `/supply`. |
-| Flujo principal | 1. **Actor:** abre los detalles de la salida de material y selecciona un renglón pendiente.<br>2. **Nexus:** muestra la cantidad pendiente y la existencia disponible.<br>3. **Actor:** captura la cantidad que va a surtir y confirma.<br>4. **Nexus:** valida estado, cantidad pendiente y existencia suficiente.<br>5. **Nexus:** descuenta existencia, acumula lo surtido, actualiza estados, registra el movimiento y confirma. |
+| Flujo principal | 1. **Actor:** abre los detalles de la salida de material y selecciona un renglón pendiente **(ver E1)**.<br>2. **Nexus:** muestra la cantidad pendiente y la existencia disponible.<br>3. **Actor:** captura la cantidad que va a surtir y confirma.<br>4. **Nexus:** valida estado, cantidad pendiente y existencia suficiente.<br>5. **Nexus:** descuenta existencia, acumula lo surtido, actualiza estados, registra el movimiento y confirma. |
+| Excepciones | **E1, después del paso 1:** **Nexus** determina que no se cumple alguna precondición o autorización requerida, rechaza la solicitud sin modificar ni exponer información y comunica el motivo; termina el caso de uso. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** La existencia disminuye en la cantidad surtida.<br>2. **Éxito:** El detalle acumula la cantidad surtida.<br>3. **Éxito:** Los estados de cumplimiento quedan actualizados.<br>4. **Éxito:** El movimiento de salida queda registrado.<br>5. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
 | Requisitos relacionados | `RF-ISS-002`. |
 
@@ -915,7 +961,8 @@ Cada ficha representa una sola acción sobre una sola entidad. Los elementos com
 | Participación de actor y sistema | **Actor:** selecciona la salida o detalle, captura la acción y confirma.<br>**Nexus:** presenta cantidades y acciones permitidas, valida y actualiza documento, inventario y movimientos cuando corresponde. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso operativo.<br>3. La salida y el detalle existen.<br>4. El detalle conserva una cantidad surtida todavía retornable. |
 | Inferencia desde código | **Directa.** PATCH `/:id/details/:detailId/returns` → DTO → `returnGoodsIssueDetail` → evento. |
-| Flujo principal | 1. **Actor:** abre una salida de material y selecciona un detalle surtido para devolverlo.<br>2. **Nexus:** muestra la cantidad que todavía puede devolverse.<br>3. **Actor:** captura la cantidad recibida de vuelta y confirma.<br>4. **Nexus:** valida la cantidad retornable.<br>5. **Nexus:** reintegra existencia, acumula la devolución, actualiza estados, registra el movimiento inverso y confirma. |
+| Flujo principal | 1. **Actor:** abre una salida de material y selecciona un detalle surtido para devolverlo **(ver E1)**.<br>2. **Nexus:** muestra la cantidad que todavía puede devolverse.<br>3. **Actor:** captura la cantidad recibida de vuelta y confirma.<br>4. **Nexus:** valida la cantidad retornable.<br>5. **Nexus:** reintegra existencia, acumula la devolución, actualiza estados, registra el movimiento inverso y confirma. |
+| Excepciones | **E1, después del paso 1:** **Nexus** determina que no se cumple alguna precondición o autorización requerida, rechaza la solicitud sin modificar ni exponer información y comunica el motivo; termina el caso de uso. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** La existencia aumenta en la cantidad devuelta.<br>2. **Éxito:** El detalle acumula la devolución.<br>3. **Éxito:** Los estados de cumplimiento quedan actualizados.<br>4. **Éxito:** El movimiento inverso queda registrado.<br>5. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
 | Requisitos relacionados | `RF-ISS-003`. |
 
@@ -929,8 +976,9 @@ Cada ficha representa una sola acción sobre una sola entidad. Los elementos com
 | Participación de actor y sistema | **Actor:** abre la consulta, define criterios y selecciona registros.<br>**Nexus:** autoriza, presenta filtros y devuelve sólo la información permitida. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de consulta o reporte correspondiente. |
 | Inferencia desde código | **Directa.** `wasteIssueApiRoute.js` GET → filtros/paginación → `findAllWasteIssues`. |
-| Flujo principal | 1. **Actor:** abre la opción para consultar salidas de merma.<br>2. **Nexus:** comprueba su autorización y muestra la tabla con búsqueda, filtros y paginación disponibles.<br>3. **Actor:** captura los criterios que necesita y solicita aplicarlos.<br>4. **Nexus:** actualiza la tabla y el total con la información autorizada, sin modificar datos.<br>5. **Actor:** selecciona un registro cuando necesita revisar su información.<br>6. **Nexus:** muestra el detalle y las acciones que el actor puede ejecutar. |
+| Flujo principal | 1. **Actor:** abre la opción para consultar salidas de merma **(ver E1)**.<br>2. **Nexus:** comprueba su autorización y muestra la tabla con búsqueda, filtros y paginación disponibles.<br>3. **Actor:** captura los criterios que necesita y solicita aplicarlos.<br>4. **Nexus:** actualiza la tabla y el total con la información autorizada, sin modificar datos.<br>5. **Actor:** selecciona un registro cuando necesita revisar su información.<br>6. **Nexus:** muestra el detalle y las acciones que el actor puede ejecutar. |
 | Continuaciones asociadas | Después de presentar las acciones disponibles, el actor puede terminar `CU-SAL-07` e iniciar, si cuenta con autorización, `CU-SAL-08` Crear salida de merma o, después de seleccionar una salida o detalle, `CU-SAL-09` Editar encabezado, `CU-SAL-10` Ajustar mermas, `CU-SAL-11` Surtir merma o `CU-SAL-12` Devolver merma surtida. La selección no constituye `«include»` ni `«extend»`; el caso elegido comprueba nuevamente sus precondiciones. |
+| Excepciones | **E1, después del paso 1:** **Nexus** determina que no se cumple alguna precondición o autorización requerida, rechaza la solicitud sin modificar ni exponer información y comunica el motivo; termina el caso de uso. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** Consulta sin modificar existencias.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
 | Requisitos relacionados | `RF-WST-001`. |
 
@@ -944,7 +992,8 @@ Cada ficha representa una sola acción sobre una sola entidad. Los elementos com
 | Participación de actor y sistema | **Actor:** abre el alta, captura datos y confirma.<br>**Nexus:** carga opciones, valida, registra y comunica el resultado. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de alta.<br>3. Existen los datos relacionados requeridos para completar el registro. |
 | Inferencia desde código | **Directa.** POST → validación → DTO → `createWasteIssue`. |
-| Flujo principal | 1. **Actor:** abre «Agregar salida de merma».<br>2. **Nexus:** muestra el formulario y carga clientes, proyectos, solicitantes y recursos autorizados.<br>3. **Actor:** captura el encabezado, agrega mermas con sus cantidades y confirma.<br>4. **Nexus:** valida participantes, relaciones, recursos y cantidades.<br>5. **Nexus:** crea la salida pendiente sin descontar existencias, actualiza la tabla y confirma. |
+| Flujo principal | 1. **Actor:** abre «Agregar salida de merma» **(ver E1)**.<br>2. **Nexus:** muestra el formulario y carga clientes, proyectos, solicitantes y recursos autorizados.<br>3. **Actor:** captura el encabezado, agrega mermas con sus cantidades y confirma.<br>4. **Nexus:** valida participantes, relaciones, recursos y cantidades.<br>5. **Nexus:** crea la salida pendiente sin descontar existencias, actualiza la tabla y confirma. |
+| Excepciones | **E1, después del paso 1:** **Nexus** determina que no se cumple alguna precondición o autorización requerida, rechaza la solicitud sin modificar ni exponer información y comunica el motivo; termina el caso de uso. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** La salida de merma queda registrada en estado pendiente.<br>2. **Éxito:** Las existencias permanecen sin cambios hasta el surtimiento.<br>3. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
 | Requisitos relacionados | `RF-WST-004`. |
 
@@ -958,7 +1007,8 @@ Cada ficha representa una sola acción sobre una sola entidad. Los elementos com
 | Participación de actor y sistema | **Actor:** selecciona el registro, modifica datos y confirma.<br>**Nexus:** presenta valores vigentes, valida, actualiza y comunica el resultado. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de edición.<br>3. El registro objetivo existe.<br>4. El registro se encuentra en un estado que admite los cambios solicitados. |
 | Inferencia desde código | **Directa.** PATCH `/:id/header` → validación → DTO → `updateWasteIssueHeader`. |
-| Flujo principal | 1. **Actor:** selecciona una salida de merma y abre la edición de encabezado.<br>2. **Nexus:** muestra los datos actuales y habilita sólo los campos permitidos por su estado.<br>3. **Actor:** modifica los datos contextuales y confirma.<br>4. **Nexus:** valida el estado, los participantes y las relaciones y actualiza el encabezado.<br>5. **Nexus:** conserva intactas las cantidades y existencias y confirma la actualización. |
+| Flujo principal | 1. **Actor:** selecciona una salida de merma y abre la edición de encabezado **(ver E1)**.<br>2. **Nexus:** muestra los datos actuales y habilita sólo los campos permitidos por su estado.<br>3. **Actor:** modifica los datos contextuales y confirma.<br>4. **Nexus:** valida el estado, los participantes y las relaciones y actualiza el encabezado.<br>5. **Nexus:** conserva intactas las cantidades y existencias y confirma la actualización. |
+| Excepciones | **E1, después del paso 1:** **Nexus** determina que no se cumple alguna precondición o autorización requerida, rechaza la solicitud sin modificar ni exponer información y comunica el motivo; termina el caso de uso. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** El encabezado conserva los cambios admitidos.<br>2. **Éxito:** Los detalles, las cantidades y las existencias permanecen sin cambios.<br>3. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
 | Requisitos relacionados | `RF-WST-005`. |
 
@@ -972,7 +1022,8 @@ Cada ficha representa una sola acción sobre una sola entidad. Los elementos com
 | Participación de actor y sistema | **Actor:** selecciona la salida o detalle, captura la acción y confirma.<br>**Nexus:** presenta cantidades y acciones permitidas, valida y actualiza documento, inventario y movimientos cuando corresponde. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de edición.<br>3. La salida existe.<br>4. La salida se encuentra en un estado que admite modificar sus detalles. |
 | Inferencia desde código | **Compartida.** PATCH `/:id/details` → validación → DTO → `updateWasteIssueDetails`. |
-| Flujo principal | 1. **Actor:** abre los detalles de una salida todavía modificable.<br>2. **Nexus:** muestra las mermas actuales, cantidades y acciones permitidas.<br>3. **Actor:** agrega o modifica mermas y confirma los cambios.<br>4. **Nexus:** valida estado, recursos, cantidades pendientes y acumulados.<br>5. **Nexus:** actualiza los detalles sin descontar existencias y confirma el resultado. |
+| Flujo principal | 1. **Actor:** abre los detalles de una salida todavía modificable **(ver E1)**.<br>2. **Nexus:** muestra las mermas actuales, cantidades y acciones permitidas.<br>3. **Actor:** agrega o modifica mermas y confirma los cambios.<br>4. **Nexus:** valida estado, recursos, cantidades pendientes y acumulados.<br>5. **Nexus:** actualiza los detalles sin descontar existencias y confirma el resultado. |
+| Excepciones | **E1, después del paso 1:** **Nexus** determina que no se cumple alguna precondición o autorización requerida, rechaza la solicitud sin modificar ni exponer información y comunica el motivo; termina el caso de uso. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** Los detalles conservan las mermas y cantidades confirmadas.<br>2. **Éxito:** Las existencias permanecen sin cambios hasta el surtimiento.<br>3. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
 | Requisitos relacionados | `RF-WST-006`. |
 
@@ -986,7 +1037,8 @@ Cada ficha representa una sola acción sobre una sola entidad. Los elementos com
 | Participación de actor y sistema | **Actor:** selecciona la salida o detalle, captura la acción y confirma.<br>**Nexus:** presenta cantidades y acciones permitidas, valida y actualiza documento, inventario y movimientos cuando corresponde. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso operativo.<br>3. La salida y el detalle existen.<br>4. El detalle conserva cantidad pendiente.<br>5. Hay existencia suficiente para surtir la cantidad solicitada. |
 | Inferencia desde código | **Subflujo.** la confirmación de surtido usa PATCH `/:id/details` y `updateWasteIssueDetails`; no hay ruta `/supply`. |
-| Flujo principal | 1. **Actor:** abre los detalles de la salida de merma y selecciona un renglón pendiente.<br>2. **Nexus:** muestra la cantidad pendiente y la existencia disponible.<br>3. **Actor:** captura la cantidad que va a surtir y confirma.<br>4. **Nexus:** valida estado, cantidad pendiente y existencia suficiente.<br>5. **Nexus:** descuenta existencia, acumula lo surtido, actualiza estados, registra el movimiento y confirma. |
+| Flujo principal | 1. **Actor:** abre los detalles de la salida de merma y selecciona un renglón pendiente **(ver E1)**.<br>2. **Nexus:** muestra la cantidad pendiente y la existencia disponible.<br>3. **Actor:** captura la cantidad que va a surtir y confirma.<br>4. **Nexus:** valida estado, cantidad pendiente y existencia suficiente.<br>5. **Nexus:** descuenta existencia, acumula lo surtido, actualiza estados, registra el movimiento y confirma. |
+| Excepciones | **E1, después del paso 1:** **Nexus** determina que no se cumple alguna precondición o autorización requerida, rechaza la solicitud sin modificar ni exponer información y comunica el motivo; termina el caso de uso. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** La existencia disminuye en la cantidad surtida.<br>2. **Éxito:** El detalle acumula la cantidad surtida.<br>3. **Éxito:** Los estados de cumplimiento quedan actualizados.<br>4. **Éxito:** El movimiento de salida queda registrado.<br>5. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
 | Requisitos relacionados | `RF-WST-002`. |
 
@@ -1000,7 +1052,8 @@ Cada ficha representa una sola acción sobre una sola entidad. Los elementos com
 | Participación de actor y sistema | **Actor:** selecciona la salida o detalle, captura la acción y confirma.<br>**Nexus:** presenta cantidades y acciones permitidas, valida y actualiza documento, inventario y movimientos cuando corresponde. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso operativo.<br>3. La salida y el detalle existen.<br>4. El detalle conserva una cantidad surtida todavía retornable. |
 | Inferencia desde código | **Directa.** PATCH `/:id/details/:detailId/returns` → DTO → `returnWasteIssueDetail` → evento. |
-| Flujo principal | 1. **Actor:** abre una salida de merma y selecciona un detalle surtido para devolverlo.<br>2. **Nexus:** muestra la cantidad que todavía puede devolverse.<br>3. **Actor:** captura la cantidad recibida de vuelta y confirma.<br>4. **Nexus:** valida la cantidad retornable.<br>5. **Nexus:** reintegra existencia, acumula la devolución, actualiza estados, registra el movimiento inverso y confirma. |
+| Flujo principal | 1. **Actor:** abre una salida de merma y selecciona un detalle surtido para devolverlo **(ver E1)**.<br>2. **Nexus:** muestra la cantidad que todavía puede devolverse.<br>3. **Actor:** captura la cantidad recibida de vuelta y confirma.<br>4. **Nexus:** valida la cantidad retornable.<br>5. **Nexus:** reintegra existencia, acumula la devolución, actualiza estados, registra el movimiento inverso y confirma. |
+| Excepciones | **E1, después del paso 1:** **Nexus** determina que no se cumple alguna precondición o autorización requerida, rechaza la solicitud sin modificar ni exponer información y comunica el motivo; termina el caso de uso. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** La existencia aumenta en la cantidad devuelta.<br>2. **Éxito:** El detalle acumula la devolución.<br>3. **Éxito:** Los estados de cumplimiento quedan actualizados.<br>4. **Éxito:** El movimiento inverso queda registrado.<br>5. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
 | Requisitos relacionados | `RF-WST-003`. |
 
@@ -1018,7 +1071,8 @@ Cada ficha representa una sola acción sobre una sola entidad. Los elementos com
 | Participación de actor y sistema | **Actor:** abre la consulta, define criterios y selecciona registros.<br>**Nexus:** autoriza, presenta filtros y devuelve sólo la información permitida. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de consulta o reporte correspondiente. |
 | Inferencia desde código | **Compartida.** reutiliza GET de `materialApiRoute.js`; el código no expone otra consulta de inventario. |
-| Flujo principal | 1. **Actor:** abre la opción para consultar inventario de materiales.<br>2. **Nexus:** comprueba su autorización y muestra la tabla con búsqueda, filtros y paginación disponibles.<br>3. **Actor:** captura los criterios que necesita y solicita aplicarlos.<br>4. **Nexus:** actualiza la tabla y el total con la información autorizada, sin modificar datos.<br>5. **Actor:** selecciona un registro cuando necesita revisar su información.<br>6. **Nexus:** muestra el detalle y las acciones que el actor puede ejecutar. |
+| Flujo principal | 1. **Actor:** abre la opción para consultar inventario de materiales **(ver E1)**.<br>2. **Nexus:** comprueba su autorización y muestra la tabla con búsqueda, filtros y paginación disponibles.<br>3. **Actor:** captura los criterios que necesita y solicita aplicarlos.<br>4. **Nexus:** actualiza la tabla y el total con la información autorizada, sin modificar datos.<br>5. **Actor:** selecciona un registro cuando necesita revisar su información.<br>6. **Nexus:** muestra el detalle y las acciones que el actor puede ejecutar. |
+| Excepciones | **E1, después del paso 1:** **Nexus** determina que no se cumple alguna precondición o autorización requerida, rechaza la solicitud sin modificar ni exponer información y comunica el motivo; termina el caso de uso. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** Consulta autorizada sin modificar datos.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
 | Requisitos relacionados | `RF-REP-001`. |
 
@@ -1032,7 +1086,8 @@ Cada ficha representa una sola acción sobre una sola entidad. Los elementos com
 | Participación de actor y sistema | **Actor:** abre la consulta, define criterios y selecciona registros.<br>**Nexus:** autoriza, presenta filtros y devuelve sólo la información permitida. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de consulta o reporte correspondiente. |
 | Inferencia desde código | **Compartida.** reutiliza GET de `wasteApiRoute.js`; el código no expone otra consulta de inventario. |
-| Flujo principal | 1. **Actor:** abre la opción para consultar inventario de mermas.<br>2. **Nexus:** comprueba su autorización y muestra la tabla con búsqueda, filtros y paginación disponibles.<br>3. **Actor:** captura los criterios que necesita y solicita aplicarlos.<br>4. **Nexus:** actualiza la tabla y el total con la información autorizada, sin modificar datos.<br>5. **Actor:** selecciona un registro cuando necesita revisar su información.<br>6. **Nexus:** muestra el detalle y las acciones que el actor puede ejecutar. |
+| Flujo principal | 1. **Actor:** abre la opción para consultar inventario de mermas **(ver E1)**.<br>2. **Nexus:** comprueba su autorización y muestra la tabla con búsqueda, filtros y paginación disponibles.<br>3. **Actor:** captura los criterios que necesita y solicita aplicarlos.<br>4. **Nexus:** actualiza la tabla y el total con la información autorizada, sin modificar datos.<br>5. **Actor:** selecciona un registro cuando necesita revisar su información.<br>6. **Nexus:** muestra el detalle y las acciones que el actor puede ejecutar. |
+| Excepciones | **E1, después del paso 1:** **Nexus** determina que no se cumple alguna precondición o autorización requerida, rechaza la solicitud sin modificar ni exponer información y comunica el motivo; termina el caso de uso. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** Consulta autorizada sin modificar datos.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
 | Requisitos relacionados | `RF-REP-001`. |
 
@@ -1046,7 +1101,8 @@ Cada ficha representa una sola acción sobre una sola entidad. Los elementos com
 | Participación de actor y sistema | **Actor:** abre la consulta, define criterios y selecciona registros.<br>**Nexus:** autoriza, presenta filtros y devuelve sólo la información permitida. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de consulta o reporte correspondiente. |
 | Inferencia desde código | **Directa.** `movementApiRoute.js` GET `/materials` → `getAllMaterialMovements`. |
-| Flujo principal | 1. **Actor:** abre la opción para consultar movimientos de materiales.<br>2. **Nexus:** comprueba su autorización y muestra la tabla con búsqueda, filtros y paginación disponibles.<br>3. **Actor:** captura los criterios que necesita y solicita aplicarlos.<br>4. **Nexus:** actualiza la tabla y el total con la información autorizada, sin modificar datos.<br>5. **Actor:** selecciona un registro cuando necesita revisar su información.<br>6. **Nexus:** muestra el detalle y las acciones que el actor puede ejecutar. |
+| Flujo principal | 1. **Actor:** abre la opción para consultar movimientos de materiales **(ver E1)**.<br>2. **Nexus:** comprueba su autorización y muestra la tabla con búsqueda, filtros y paginación disponibles.<br>3. **Actor:** captura los criterios que necesita y solicita aplicarlos.<br>4. **Nexus:** actualiza la tabla y el total con la información autorizada, sin modificar datos.<br>5. **Actor:** selecciona un registro cuando necesita revisar su información.<br>6. **Nexus:** muestra el detalle y las acciones que el actor puede ejecutar. |
+| Excepciones | **E1, después del paso 1:** **Nexus** determina que no se cumple alguna precondición o autorización requerida, rechaza la solicitud sin modificar ni exponer información y comunica el motivo; termina el caso de uso. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** Consulta autorizada sin modificar datos.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
 | Requisitos relacionados | `RF-REP-001`. |
 
@@ -1060,7 +1116,8 @@ Cada ficha representa una sola acción sobre una sola entidad. Los elementos com
 | Participación de actor y sistema | **Actor:** abre la consulta, define criterios y selecciona registros.<br>**Nexus:** autoriza, presenta filtros y devuelve sólo la información permitida. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de consulta o reporte correspondiente. |
 | Inferencia desde código | **Directa.** `movementApiRoute.js` GET `/wastes` → `getAllWasteMovements`. |
-| Flujo principal | 1. **Actor:** abre la opción para consultar movimientos de mermas.<br>2. **Nexus:** comprueba su autorización y muestra la tabla con búsqueda, filtros y paginación disponibles.<br>3. **Actor:** captura los criterios que necesita y solicita aplicarlos.<br>4. **Nexus:** actualiza la tabla y el total con la información autorizada, sin modificar datos.<br>5. **Actor:** selecciona un registro cuando necesita revisar su información.<br>6. **Nexus:** muestra el detalle y las acciones que el actor puede ejecutar. |
+| Flujo principal | 1. **Actor:** abre la opción para consultar movimientos de mermas **(ver E1)**.<br>2. **Nexus:** comprueba su autorización y muestra la tabla con búsqueda, filtros y paginación disponibles.<br>3. **Actor:** captura los criterios que necesita y solicita aplicarlos.<br>4. **Nexus:** actualiza la tabla y el total con la información autorizada, sin modificar datos.<br>5. **Actor:** selecciona un registro cuando necesita revisar su información.<br>6. **Nexus:** muestra el detalle y las acciones que el actor puede ejecutar. |
+| Excepciones | **E1, después del paso 1:** **Nexus** determina que no se cumple alguna precondición o autorización requerida, rechaza la solicitud sin modificar ni exponer información y comunica el motivo; termina el caso de uso. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** Consulta autorizada sin modificar datos.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
 | Requisitos relacionados | `RF-REP-001`. |
 
@@ -1074,7 +1131,8 @@ Cada ficha representa una sola acción sobre una sola entidad. Los elementos com
 | Participación de actor y sistema | **Actor:** define filtros y solicita la exportación.<br>**Nexus:** autoriza, consolida la información y entrega el archivo. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de consulta o reporte correspondiente. |
 | Inferencia desde código | **Directa.** `reportApiRoute.js` GET `/inventory/excel` → `exportWarehouseReportExcel` → `sendExcelReport`. |
-| Flujo principal | 1. **Actor:** abre la consulta de inventario de materiales y define los filtros del reporte.<br>2. **Nexus:** muestra la información autorizada que corresponde a esos filtros.<br>3. **Actor:** selecciona «Exportar Excel», elige las opciones disponibles y confirma.<br>4. **Nexus:** vuelve a comprobar autorización y parámetros y prepara las filas, agrupaciones y totales.<br>5. **Nexus:** genera el archivo de Excel e inicia su descarga; si no hay datos, informa que el resultado está vacío. |
+| Flujo principal | 1. **Actor:** abre la consulta de inventario de materiales y define los filtros del reporte **(ver E1)**.<br>2. **Nexus:** muestra la información autorizada que corresponde a esos filtros.<br>3. **Actor:** selecciona «Exportar Excel», elige las opciones disponibles y confirma.<br>4. **Nexus:** vuelve a comprobar autorización y parámetros y prepara las filas, agrupaciones y totales.<br>5. **Nexus:** genera el archivo de Excel e inicia su descarga; si no hay datos, informa que el resultado está vacío. |
+| Excepciones | **E1, después del paso 1:** **Nexus** determina que no se cumple alguna precondición o autorización requerida, rechaza la solicitud sin modificar ni exponer información y comunica el motivo; termina el caso de uso. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** Archivo Excel con filtros, columnas y cálculos propios del reporte.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
 | Requisitos relacionados | `RF-REP-002` a `RF-REP-005`. |
 
@@ -1088,7 +1146,8 @@ Cada ficha representa una sola acción sobre una sola entidad. Los elementos com
 | Participación de actor y sistema | **Actor:** define filtros y solicita la exportación.<br>**Nexus:** autoriza, consolida la información y entrega el archivo. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de consulta o reporte correspondiente. |
 | Inferencia desde código | **Directa.** `reportApiRoute.js` GET `/goods-issues/excel` → `exportGoodsIssueReportExcel` → `sendExcelReport`. |
-| Flujo principal | 1. **Actor:** abre la consulta de salidas de material y define los filtros del reporte.<br>2. **Nexus:** muestra la información autorizada que corresponde a esos filtros.<br>3. **Actor:** selecciona «Exportar Excel», elige las opciones disponibles y confirma.<br>4. **Nexus:** vuelve a comprobar autorización y parámetros y prepara las filas, agrupaciones y totales.<br>5. **Nexus:** genera el archivo de Excel e inicia su descarga; si no hay datos, informa que el resultado está vacío. |
+| Flujo principal | 1. **Actor:** abre la consulta de salidas de material y define los filtros del reporte **(ver E1)**.<br>2. **Nexus:** muestra la información autorizada que corresponde a esos filtros.<br>3. **Actor:** selecciona «Exportar Excel», elige las opciones disponibles y confirma.<br>4. **Nexus:** vuelve a comprobar autorización y parámetros y prepara las filas, agrupaciones y totales.<br>5. **Nexus:** genera el archivo de Excel e inicia su descarga; si no hay datos, informa que el resultado está vacío. |
+| Excepciones | **E1, después del paso 1:** **Nexus** determina que no se cumple alguna precondición o autorización requerida, rechaza la solicitud sin modificar ni exponer información y comunica el motivo; termina el caso de uso. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** Archivo Excel con filtros, columnas y cálculos propios del reporte.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
 | Requisitos relacionados | `RF-REP-002` a `RF-REP-005`. |
 
@@ -1102,7 +1161,8 @@ Cada ficha representa una sola acción sobre una sola entidad. Los elementos com
 | Participación de actor y sistema | **Actor:** define filtros y solicita la exportación.<br>**Nexus:** autoriza, consolida la información y entrega el archivo. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de consulta o reporte correspondiente. |
 | Inferencia desde código | **Directa.** `reportApiRoute.js` GET `/waste-issues/excel` → `exportWasteIssueReportExcel` → `sendExcelReport`. |
-| Flujo principal | 1. **Actor:** abre la consulta de salidas de merma y define los filtros del reporte.<br>2. **Nexus:** muestra la información autorizada que corresponde a esos filtros.<br>3. **Actor:** selecciona «Exportar Excel», elige las opciones disponibles y confirma.<br>4. **Nexus:** vuelve a comprobar autorización y parámetros y prepara las filas, agrupaciones y totales.<br>5. **Nexus:** genera el archivo de Excel e inicia su descarga; si no hay datos, informa que el resultado está vacío. |
+| Flujo principal | 1. **Actor:** abre la consulta de salidas de merma y define los filtros del reporte **(ver E1)**.<br>2. **Nexus:** muestra la información autorizada que corresponde a esos filtros.<br>3. **Actor:** selecciona «Exportar Excel», elige las opciones disponibles y confirma.<br>4. **Nexus:** vuelve a comprobar autorización y parámetros y prepara las filas, agrupaciones y totales.<br>5. **Nexus:** genera el archivo de Excel e inicia su descarga; si no hay datos, informa que el resultado está vacío. |
+| Excepciones | **E1, después del paso 1:** **Nexus** determina que no se cumple alguna precondición o autorización requerida, rechaza la solicitud sin modificar ni exponer información y comunica el motivo; termina el caso de uso. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** Archivo Excel con filtros, columnas y cálculos propios del reporte.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
 | Requisitos relacionados | `RF-REP-002` a `RF-REP-005`. |
 
@@ -1116,7 +1176,8 @@ Cada ficha representa una sola acción sobre una sola entidad. Los elementos com
 | Participación de actor y sistema | **Actor:** define filtros y solicita la exportación.<br>**Nexus:** autoriza, consolida la información y entrega el archivo. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de consulta o reporte correspondiente. |
 | Inferencia desde código | **Directa.** `reportApiRoute.js` GET `/goods-receipts/excel` → `exportGoodsReceiptReportExcel` → `sendExcelReport`. |
-| Flujo principal | 1. **Actor:** abre la consulta de compras de material y define los filtros del reporte.<br>2. **Nexus:** muestra la información autorizada que corresponde a esos filtros.<br>3. **Actor:** selecciona «Exportar Excel», elige las opciones disponibles y confirma.<br>4. **Nexus:** vuelve a comprobar autorización y parámetros y prepara las filas, agrupaciones y totales.<br>5. **Nexus:** genera el archivo de Excel e inicia su descarga; si no hay datos, informa que el resultado está vacío. |
+| Flujo principal | 1. **Actor:** abre la consulta de compras de material y define los filtros del reporte **(ver E1)**.<br>2. **Nexus:** muestra la información autorizada que corresponde a esos filtros.<br>3. **Actor:** selecciona «Exportar Excel», elige las opciones disponibles y confirma.<br>4. **Nexus:** vuelve a comprobar autorización y parámetros y prepara las filas, agrupaciones y totales.<br>5. **Nexus:** genera el archivo de Excel e inicia su descarga; si no hay datos, informa que el resultado está vacío. |
+| Excepciones | **E1, después del paso 1:** **Nexus** determina que no se cumple alguna precondición o autorización requerida, rechaza la solicitud sin modificar ni exponer información y comunica el motivo; termina el caso de uso. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** Archivo Excel con filtros, columnas y cálculos propios del reporte.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
 | Requisitos relacionados | `RF-REP-002` a `RF-REP-005`. |
 
@@ -1130,7 +1191,8 @@ Cada ficha representa una sola acción sobre una sola entidad. Los elementos com
 | Participación de actor y sistema | **Actor:** define filtros y solicita la exportación.<br>**Nexus:** autoriza, consolida la información y entrega el archivo. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de consulta o reporte correspondiente. |
 | Inferencia desde código | **Directa.** `reportApiRoute.js` GET `/wastes/excel` → `exportWasteReportExcel` → `sendExcelReport`. |
-| Flujo principal | 1. **Actor:** abre la consulta de mermas y define los filtros del reporte.<br>2. **Nexus:** muestra la información autorizada que corresponde a esos filtros.<br>3. **Actor:** selecciona «Exportar Excel», elige las opciones disponibles y confirma.<br>4. **Nexus:** vuelve a comprobar autorización y parámetros y prepara las filas, agrupaciones y totales.<br>5. **Nexus:** genera el archivo de Excel e inicia su descarga; si no hay datos, informa que el resultado está vacío. |
+| Flujo principal | 1. **Actor:** abre la consulta de mermas y define los filtros del reporte **(ver E1)**.<br>2. **Nexus:** muestra la información autorizada que corresponde a esos filtros.<br>3. **Actor:** selecciona «Exportar Excel», elige las opciones disponibles y confirma.<br>4. **Nexus:** vuelve a comprobar autorización y parámetros y prepara las filas, agrupaciones y totales.<br>5. **Nexus:** genera el archivo de Excel e inicia su descarga; si no hay datos, informa que el resultado está vacío. |
+| Excepciones | **E1, después del paso 1:** **Nexus** determina que no se cumple alguna precondición o autorización requerida, rechaza la solicitud sin modificar ni exponer información y comunica el motivo; termina el caso de uso. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** Archivo Excel con filtros, columnas y cálculos propios del reporte.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
 | Requisitos relacionados | `RF-REP-002` a `RF-REP-005`. |
 
@@ -1144,7 +1206,8 @@ Cada ficha representa una sola acción sobre una sola entidad. Los elementos com
 | Participación de actor y sistema | **Actor:** define filtros y solicita la exportación.<br>**Nexus:** autoriza, consolida la información y entrega el archivo. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de consulta o reporte correspondiente. |
 | Inferencia desde código | **Directa.** `reportApiRoute.js` GET `/suppliers/excel` → `exportSupplierReportExcel` → `sendExcelReport`. |
-| Flujo principal | 1. **Actor:** abre la consulta de proveedores y define los filtros del reporte.<br>2. **Nexus:** muestra la información autorizada que corresponde a esos filtros.<br>3. **Actor:** selecciona «Exportar Excel», elige las opciones disponibles y confirma.<br>4. **Nexus:** vuelve a comprobar autorización y parámetros y prepara las filas, agrupaciones y totales.<br>5. **Nexus:** genera el archivo de Excel e inicia su descarga; si no hay datos, informa que el resultado está vacío. |
+| Flujo principal | 1. **Actor:** abre la consulta de proveedores y define los filtros del reporte **(ver E1)**.<br>2. **Nexus:** muestra la información autorizada que corresponde a esos filtros.<br>3. **Actor:** selecciona «Exportar Excel», elige las opciones disponibles y confirma.<br>4. **Nexus:** vuelve a comprobar autorización y parámetros y prepara las filas, agrupaciones y totales.<br>5. **Nexus:** genera el archivo de Excel e inicia su descarga; si no hay datos, informa que el resultado está vacío. |
+| Excepciones | **E1, después del paso 1:** **Nexus** determina que no se cumple alguna precondición o autorización requerida, rechaza la solicitud sin modificar ni exponer información y comunica el motivo; termina el caso de uso. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** Archivo Excel con filtros, columnas y cálculos propios del reporte.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
 | Requisitos relacionados | `RF-REP-002` a `RF-REP-005`. |
 
@@ -1158,7 +1221,8 @@ Cada ficha representa una sola acción sobre una sola entidad. Los elementos com
 | Participación de actor y sistema | **Actor:** define filtros y solicita la exportación.<br>**Nexus:** autoriza, consolida la información y entrega el archivo. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de consulta o reporte correspondiente. |
 | Inferencia desde código | **Directa.** `sales/reportApiRoute.js` GET `/clients/excel` → `exportClientReport` → `sendExcelReport`. |
-| Flujo principal | 1. **Actor:** abre la consulta de clientes y define los filtros del reporte.<br>2. **Nexus:** muestra la información autorizada que corresponde a esos filtros.<br>3. **Actor:** selecciona «Exportar Excel», elige las opciones disponibles y confirma.<br>4. **Nexus:** vuelve a comprobar autorización y parámetros y prepara las filas, agrupaciones y totales.<br>5. **Nexus:** genera el archivo de Excel e inicia su descarga; si no hay datos, informa que el resultado está vacío. |
+| Flujo principal | 1. **Actor:** abre la consulta de clientes y define los filtros del reporte **(ver E1)**.<br>2. **Nexus:** muestra la información autorizada que corresponde a esos filtros.<br>3. **Actor:** selecciona «Exportar Excel», elige las opciones disponibles y confirma.<br>4. **Nexus:** vuelve a comprobar autorización y parámetros y prepara las filas, agrupaciones y totales.<br>5. **Nexus:** genera el archivo de Excel e inicia su descarga; si no hay datos, informa que el resultado está vacío. |
+| Excepciones | **E1, después del paso 1:** **Nexus** determina que no se cumple alguna precondición o autorización requerida, rechaza la solicitud sin modificar ni exponer información y comunica el motivo; termina el caso de uso. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** Archivo Excel con filtros, columnas y cálculos propios del reporte.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
 | Requisitos relacionados | `RF-REP-002` a `RF-REP-005`. |
 
@@ -1172,7 +1236,8 @@ Cada ficha representa una sola acción sobre una sola entidad. Los elementos com
 | Participación de actor y sistema | **Actor:** define filtros y solicita la exportación.<br>**Nexus:** autoriza, consolida la información y entrega el archivo. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de consulta o reporte correspondiente. |
 | Inferencia desde código | **Directa.** `admin/reportApiRoute.js` GET `/persons/excel` → `exportPersonReport` → `sendExcelReport`. |
-| Flujo principal | 1. **Actor:** abre la consulta de personas y define los filtros del reporte.<br>2. **Nexus:** muestra la información autorizada que corresponde a esos filtros.<br>3. **Actor:** selecciona «Exportar Excel», elige las opciones disponibles y confirma.<br>4. **Nexus:** vuelve a comprobar autorización y parámetros y prepara las filas, agrupaciones y totales.<br>5. **Nexus:** genera el archivo de Excel e inicia su descarga; si no hay datos, informa que el resultado está vacío. |
+| Flujo principal | 1. **Actor:** abre la consulta de personas y define los filtros del reporte **(ver E1)**.<br>2. **Nexus:** muestra la información autorizada que corresponde a esos filtros.<br>3. **Actor:** selecciona «Exportar Excel», elige las opciones disponibles y confirma.<br>4. **Nexus:** vuelve a comprobar autorización y parámetros y prepara las filas, agrupaciones y totales.<br>5. **Nexus:** genera el archivo de Excel e inicia su descarga; si no hay datos, informa que el resultado está vacío. |
+| Excepciones | **E1, después del paso 1:** **Nexus** determina que no se cumple alguna precondición o autorización requerida, rechaza la solicitud sin modificar ni exponer información y comunica el motivo; termina el caso de uso. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** Archivo Excel con filtros, columnas y cálculos propios del reporte.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
 | Requisitos relacionados | `RF-REP-002` a `RF-REP-005`. |
 
@@ -1186,7 +1251,8 @@ Cada ficha representa una sola acción sobre una sola entidad. Los elementos com
 | Participación de actor y sistema | **Actor:** define filtros y solicita la exportación.<br>**Nexus:** autoriza, consolida la información y entrega el archivo. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de consulta o reporte correspondiente. |
 | Inferencia desde código | **Directa.** `admin/reportApiRoute.js` GET `/users/excel` → `exportUserReport` → `sendExcelReport`. |
-| Flujo principal | 1. **Actor:** abre la consulta de usuarios y define los filtros del reporte.<br>2. **Nexus:** muestra la información autorizada que corresponde a esos filtros.<br>3. **Actor:** selecciona «Exportar Excel», elige las opciones disponibles y confirma.<br>4. **Nexus:** vuelve a comprobar autorización y parámetros y prepara las filas, agrupaciones y totales.<br>5. **Nexus:** genera el archivo de Excel e inicia su descarga; si no hay datos, informa que el resultado está vacío. |
+| Flujo principal | 1. **Actor:** abre la consulta de usuarios y define los filtros del reporte **(ver E1)**.<br>2. **Nexus:** muestra la información autorizada que corresponde a esos filtros.<br>3. **Actor:** selecciona «Exportar Excel», elige las opciones disponibles y confirma.<br>4. **Nexus:** vuelve a comprobar autorización y parámetros y prepara las filas, agrupaciones y totales.<br>5. **Nexus:** genera el archivo de Excel e inicia su descarga; si no hay datos, informa que el resultado está vacío. |
+| Excepciones | **E1, después del paso 1:** **Nexus** determina que no se cumple alguna precondición o autorización requerida, rechaza la solicitud sin modificar ni exponer información y comunica el motivo; termina el caso de uso. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** Archivo Excel con filtros, columnas y cálculos propios del reporte.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
 | Requisitos relacionados | `RF-REP-002` a `RF-REP-005`. |
 
@@ -1200,7 +1266,8 @@ Cada ficha representa una sola acción sobre una sola entidad. Los elementos com
 | Participación de actor y sistema | **Actor:** define filtros y solicita la exportación.<br>**Nexus:** autoriza, consolida la información y entrega el archivo. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de consulta o reporte correspondiente. |
 | Inferencia desde código | **Directa.** `admin/reportApiRoute.js` GET `/movements/materials/excel` → `exportMovementReport` → `sendExcelReport`. |
-| Flujo principal | 1. **Actor:** abre la consulta de movimientos de materiales y define los filtros del reporte.<br>2. **Nexus:** muestra la información autorizada que corresponde a esos filtros.<br>3. **Actor:** selecciona «Exportar Excel», elige las opciones disponibles y confirma.<br>4. **Nexus:** vuelve a comprobar autorización y parámetros y prepara las filas, agrupaciones y totales.<br>5. **Nexus:** genera el archivo de Excel e inicia su descarga; si no hay datos, informa que el resultado está vacío. |
+| Flujo principal | 1. **Actor:** abre la consulta de movimientos de materiales y define los filtros del reporte **(ver E1)**.<br>2. **Nexus:** muestra la información autorizada que corresponde a esos filtros.<br>3. **Actor:** selecciona «Exportar Excel», elige las opciones disponibles y confirma.<br>4. **Nexus:** vuelve a comprobar autorización y parámetros y prepara las filas, agrupaciones y totales.<br>5. **Nexus:** genera el archivo de Excel e inicia su descarga; si no hay datos, informa que el resultado está vacío. |
+| Excepciones | **E1, después del paso 1:** **Nexus** determina que no se cumple alguna precondición o autorización requerida, rechaza la solicitud sin modificar ni exponer información y comunica el motivo; termina el caso de uso. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** Archivo Excel con filtros, columnas y cálculos propios del reporte.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
 | Requisitos relacionados | `RF-REP-002` a `RF-REP-005`. |
 
@@ -1214,7 +1281,8 @@ Cada ficha representa una sola acción sobre una sola entidad. Los elementos com
 | Participación de actor y sistema | **Actor:** define filtros y solicita la exportación.<br>**Nexus:** autoriza, consolida la información y entrega el archivo. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de consulta o reporte correspondiente. |
 | Inferencia desde código | **Directa.** `admin/reportApiRoute.js` GET `/movements/wastes/excel` → `exportWasteMovementReport` → `sendExcelReport`. |
-| Flujo principal | 1. **Actor:** abre la consulta de movimientos de mermas y define los filtros del reporte.<br>2. **Nexus:** muestra la información autorizada que corresponde a esos filtros.<br>3. **Actor:** selecciona «Exportar Excel», elige las opciones disponibles y confirma.<br>4. **Nexus:** vuelve a comprobar autorización y parámetros y prepara las filas, agrupaciones y totales.<br>5. **Nexus:** genera el archivo de Excel e inicia su descarga; si no hay datos, informa que el resultado está vacío. |
+| Flujo principal | 1. **Actor:** abre la consulta de movimientos de mermas y define los filtros del reporte **(ver E1)**.<br>2. **Nexus:** muestra la información autorizada que corresponde a esos filtros.<br>3. **Actor:** selecciona «Exportar Excel», elige las opciones disponibles y confirma.<br>4. **Nexus:** vuelve a comprobar autorización y parámetros y prepara las filas, agrupaciones y totales.<br>5. **Nexus:** genera el archivo de Excel e inicia su descarga; si no hay datos, informa que el resultado está vacío. |
+| Excepciones | **E1, después del paso 1:** **Nexus** determina que no se cumple alguna precondición o autorización requerida, rechaza la solicitud sin modificar ni exponer información y comunica el motivo; termina el caso de uso. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** Archivo Excel con filtros, columnas y cálculos propios del reporte.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
 | Requisitos relacionados | `RF-REP-002` a `RF-REP-005`. |
 
