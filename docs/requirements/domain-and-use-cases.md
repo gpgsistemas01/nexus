@@ -141,24 +141,24 @@ flowchart LR
             ucSupplierQuery(["CU-CAT-06 Consultar proveedores"])
             ucSupplierCreate(["CU-CAT-07 Crear proveedor"])
             ucSupplierEdit(["CU-CAT-08 Editar proveedor"])
-            ucSupplierStatus(["CU-CAT-20 Cambiar estado de proveedor"])
+            ucSupplierStatus(["CU-CAT-09 Cambiar estado de proveedor"])
         end
         subgraph clientCatalogFamily["Clientes"]
-            ucClientQuery(["CU-CAT-09 Consultar clientes"])
-            ucClientCreate(["CU-CAT-10 Crear cliente"])
-            ucClientEdit(["CU-CAT-11 Editar cliente"])
+            ucClientQuery(["CU-CAT-10 Consultar clientes"])
+            ucClientCreate(["CU-CAT-11 Crear cliente"])
+            ucClientEdit(["CU-CAT-12 Editar cliente"])
         end
         subgraph wasteCatalogFamily["Mermas"]
-            ucWasteQuery(["CU-CAT-12 Consultar mermas"])
-            ucWasteCreate(["CU-CAT-13 Registrar merma"])
-            ucWasteEdit(["CU-CAT-14 Editar merma"])
-            ucWasteStock(["CU-CAT-15 Ajustar existencia de merma"])
+            ucWasteQuery(["CU-CAT-13 Consultar mermas"])
+            ucWasteCreate(["CU-CAT-14 Registrar merma"])
+            ucWasteEdit(["CU-CAT-15 Editar merma"])
+            ucWasteStock(["CU-CAT-16 Ajustar existencia de merma"])
         end
         subgraph auxiliaryCatalogFamily["Catálogos auxiliares de sólo lectura"]
-            ucPresentationQuery(["CU-CAT-16 Consultar presentaciones"])
-            ucUnitQuery(["CU-CAT-17 Consultar unidades de medida"])
-            ucAdjustmentReasonQuery(["CU-CAT-18 Consultar motivos de ajuste"])
-            ucFulfillmentStatusQuery(["CU-CAT-19 Consultar estados de cumplimiento"])
+            ucPresentationQuery(["CU-CAT-17 Consultar presentaciones"])
+            ucUnitQuery(["CU-CAT-18 Consultar unidades de medida"])
+            ucAdjustmentReasonQuery(["CU-CAT-19 Consultar motivos de ajuste"])
+            ucFulfillmentStatusQuery(["CU-CAT-20 Consultar estados de cumplimiento"])
         end
     end
 
@@ -352,6 +352,15 @@ flujo específico en
 [Diagramas de requisitos](requirements-diagrams.md#flujos-de-cada-caso-de-uso).
 No se usa «administrar» o «mantener» como objetivo: cada óvalo expresa una operación
 observable.
+
+Dentro de cada grupo, la lectura se organiza por recurso: primero su consulta, después
+las operaciones CRUD disponibles y finalmente las operaciones específicas asociadas a
+ese mismo CRUD. Corregir, cancelar, ajustar, cambiar estado, surtir o devolver permanecen
+junto al recurso que modifican y reciben la secuencia correspondiente a esa posición.
+Cuando el orden cambia, catálogo, fichas, diagramas y referencias técnicas se renumeran
+en conjunto para conservar la trazabilidad. Este orden expresa asociación funcional;
+sólo una flecha estereotipada explícita representa `«include»`, `«extend»` o
+generalización.
 
 Los grupos son ayudas de lectura, no límites del sistema ni permisos. El Administrador
 del sistema del área Sistemas conserva el alcance que conceden las políticas

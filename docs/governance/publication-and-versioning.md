@@ -50,7 +50,7 @@ el orden narrativo, no la identidad del requisito. Toda imagen debe tener texto 
 referencia desde el contenido y resolución legible; no debe contener credenciales ni datos
 personales reales. Requisitos, arquitectura y pruebas usan sus propias carpetas.
 
-El manual usa `docs/manual-usuario/images/`. `scripts/captureManualScreenshots.js` automatiza
+El manual usa `docs/user-manual/images/`. `scripts/captureManualScreenshots.js` automatiza
 capturas con Playwright a partir de un estado de autenticación de prueba. El script recorre un
 inventario explícito de módulos, espera un elemento estable y sólo después captura. Los modales
 requieren una acción propia; no se debe usar una demora arbitraria. La automatización es

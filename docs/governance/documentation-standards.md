@@ -12,6 +12,13 @@ La referencia principal para la especificación actual es
 ingeniería de requisitos. Las demás referencias se aplican sólo al documento o a la
 decisión que corresponde.
 
+En particular, ISO/IEC/IEEE 29148 no se adopta como una plantilla de casos de uso. La
+norma orienta la calidad y el contenido de los requisitos, mientras que la estructura
+de dos columnas, sus secciones y el nivel de detalle de cada ficha son una convención
+documental de Nexus. La [estructura de las fichas](../requirements/use-case-descriptions.md#estructura-de-las-fichas)
+define la plantilla vigente y permite distinguir qué información se registra y cuál se
+mantiene en otros artefactos.
+
 La aplicación concreta, las evidencias revisadas y las brechas se registran en
 [Aplicación de normas en Nexus](standards-application.md). Este documento decide **qué
 criterio se adopta**; el registro indica **dónde se aplica y cómo se comprueba**.

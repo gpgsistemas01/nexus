@@ -11,14 +11,16 @@ vista concreta sin sustituirlo. Los artefactos generados son evidencia técnica 
 fuente versionada; pertenecen a una familia, pero no contienen decisiones curadas.
 
 Cada familia tiene una carpeta propia para que su ubicación también comunique su
-responsabilidad:
+responsabilidad. Como rutas técnicas del repositorio, los nombres de estas carpetas se
+mantienen en inglés; los títulos, el contenido y los nombres de los paquetes exportables se
+presentan en español:
 
 ```text
 docs/
 ├── architecture/  # Arquitectura, construcción y convenciones técnicas
 ├── data/          # Datos, acceso, permisos y contrato HTTP
 ├── governance/    # Criterios para mantener la documentación
-├── manual-usuario/# Entrada, capítulos e imágenes del manual
+├── user-manual/   # Entrada, capítulos e imágenes del manual
 ├── requirements/  # Entrada, requisitos, casos de uso e imágenes
 ├── styles/        # Estilos y plantillas de publicación
 ├── testing/       # Estrategia, cobertura y plan de pruebas CRUD
@@ -36,7 +38,7 @@ docs/
 La [guía de publicación y versionado](governance/publication-and-versioning.md) define
 portadas, formatos, idioma, capturas, paquetes exportables y la relación entre las
 versiones del sistema y del documento. `requirements/index.md` y
-`manual-usuario/index.md` son las entradas de sus paquetes; fijan el orden de exportación
+`user-manual/index.md` son las entradas de sus paquetes; fijan el orden de exportación
 sin separar la portada de la familia documental a la que pertenece.
 
 Un artefacto puede apoyar más de una familia, pero conserva una sola responsabilidad. Por
@@ -105,7 +107,7 @@ docs/
 │   └── images/componentes/
 ├── testing/
 │   └── images/evidencias/
-└── manual-usuario/
+└── user-manual/
     ├── index.md
     └── images/entradas/
 ```
