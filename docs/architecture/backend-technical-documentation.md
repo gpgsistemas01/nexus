@@ -89,7 +89,9 @@ Una tabla y un bloque breve son suficientes para un CRUD que sólo adapta y dele
 agrega una secuencia o actividad específica si el controlador coordina varios servicios,
 si existen bifurcaciones relevantes, si la transacción atraviesa colaboradores o si un
 efecto ocurre deliberadamente después del commit. El diagrama usa nombres exportados
-reales y declara el evento que obliga a actualizarlo.
+reales, se vincula con un solo `CU-*` y declara el evento que obliga a actualizarlo. La
+reutilización de helpers o reglas no autoriza a fusionar casos: si dos operaciones
+requieren vista técnica, cada una muestra sus participantes, modelos, errores y endpoint.
 
 No se genera automáticamente esa semántica desde imports: el inventario puede comprobar
 que `controller` y `service` existen, pero no puede determinar de forma segura quién es
@@ -132,7 +134,7 @@ un ejemplo en la documentación de todo el backend.
 | Salidas de mermas: `wasteIssueController.js`, `wasteIssues/wasteIssueService.js`, `wasteIssueFulfillmentService.js` y reglas compartidas de `issues` | Lista, alta, edición, encabezado y detalles retornan documento actualizado. | Reutiliza reglas de encabezado/cumplimiento, aplica movimiento de merma y conserva documento, detalle e inventario en un `tx`. | **Secuencia + actividad** para surtimiento; estados desde requisitos. |
 | Devolución de merma: `wasteIssueController.registerWasteIssueDetailReturn` y `detailReturns/wasteIssueReturnService.js` | Identificadores y cantidad retornan la salida de merma actualizada. | Valida devolución, revierte inventario de merma y recalcula cumplimiento de manera atómica. | **Secuencia específica**, paralela conceptualmente a material pero con participantes de merma explícitos. |
 | Inventario compartido: `inventory/movementService.js`, `movementHelpers.js`, `stockHelpers.js`, `materialIdentity.js` | Recibe referencia, tipo, detalles y `tx`; devuelve movimiento/resumen o valida cantidades. | `applyInventoryMovement` actualiza existencias y crea movimiento; helpers convierten cantidades y rechazan insuficiencia. Participa en la transacción llamadora. | Participante en secuencias de entrada/salida/ajuste; **actividad** para conversión o suficiencia si cambia el algoritmo. |
-| Movimientos y reportes: `movementController.js`, `movementQueryService.js`, `inventory/reportService.js`, controladores/servicios `report` de admin, ventas y almacén | Consultas y filtros producen filas paginadas o archivo Excel con cabeceras HTTP. | Sólo lectura; los reportes reutilizan consultas y transforman resultados sin modificar inventario. | **Flujo de datos**; secuencia de descarga sólo si se necesita diagnosticar transporte. |
+| Movimientos y exportaciones contextuales: `movementController.js`, `movementQueryService.js`, `inventory/reportService.js`, controladores/servicios `report` de admin, ventas y almacén | La consulta del módulo aporta filtros y produce filas paginadas; su acción de exportar devuelve el Excel correspondiente con cabeceras HTTP. | Sólo lectura; cada reporte reutiliza la consulta de su contexto y transforma resultados sin modificar inventario. No existe un dominio funcional independiente de “reportes”. | **Flujo de datos del caso propietario**; no se crea una secuencia transversal que sustituya las exportaciones específicas. |
 | Numeración documental: `document/referenceNumberService.js` | Año/ámbito y cliente opcional producen o validan una referencia. | Comprueba duplicados e incrementa contadores usando el `tx` recibido cuando forma parte de creación documental. | Participante de secuencias de alta; **actividad** si cambia la estrategia anual/no anual. |
 
 El [mapa generado de servicios](../generated/code-map.md#símbolos-exportados-por-servicios)
@@ -140,12 +142,87 @@ completa, símbolo por símbolo, las constantes y helpers de cada módulo de la 
 nueva exportación debe pertenecer a una de estas fichas o crear una capacidad nueva; no
 puede quedar documentada sólo como “otro ejemplo”.
 
+## Aplicación de todos los casos al código backend
+
+La siguiente matriz parte de las rutas registradas y baja hasta el controller y servicio
+que ejecutan cada caso. No deduce comportamiento desde el nombre del requisito: cuando
+un catálogo sólo es consumido por otros formularios se documenta su lectura real, y
+cuando una consulta comparte endpoint con un catálogo se declara esa reutilización.
+La misma cobertura se representa visualmente, caso por caso, en los
+[diagramas backend aplicados al código](backend-use-case-diagrams.md).
+
+| Caso | Entrada HTTP y controller | Servicio, persistencia o efecto aplicado |
+| --- | --- | --- |
+| `CU-AUT-01` | `POST /api/auth/login` → `authController.login`. | `authService.loginUser`, `userService.getUserIdByLogin`, JWT y cookies. |
+| `CU-AUT-02` | `GET /cerrar-sesion` → `controllers/web/authController.logout`. | Elimina cookies de autenticación y redirige a login; no persiste dominio. |
+| `CU-IDA-01` | `GET /api/admin/persons` → `getAllPersons`. | `personService.findAllPersons` consulta `Person` y asignaciones. |
+| `CU-IDA-02` | `POST /api/admin/persons` → `registerPerson`. | `personService.createPerson` valida y crea persona/asignaciones. |
+| `CU-IDA-03` | `PUT /api/admin/persons/:id` → `editPerson`. | `personService.updatePerson` actualiza persona/asignaciones. |
+| `CU-IDA-04` | `GET /api/admin/users` → `getAllUsers`. | `userService.findAllUsers` consulta cuentas y accesos. |
+| `CU-IDA-05` | `POST /api/admin/users` → `registerUser`. | `userService.createUser` crea cuenta, contraseña cifrada y acceso. |
+| `CU-IDA-06` | `PATCH /api/admin/users/:id` → `editUser`. | `userService.updateUser` actualiza cuenta y asignación autorizada. |
+| `CU-IDA-07` | `PATCH /api/admin/users/:id/password` → `editUserPassword`. | `userService.updateUserPassword` cifra y sustituye la contraseña. |
+| `CU-IDA-08` | `GET /api/admin/roles` → `roleController.getAllRoles`. | `roleService.findAllRoles` lee `Role`; no existe mutación publicada. |
+| `CU-IDA-09` | `GET /api/admin/departments` → `departmentController.getAllDepartments`. | `departmentService.findAllDepartments` lee `Department`. |
+| `CU-CAT-01` | `GET /api/warehouse/materials` → `getAllMaterials`. | `materialService.findAllMaterials` consulta material, proveedor y existencia. |
+| `CU-CAT-02` | `POST /api/warehouse/materials` → `registerMaterial`. | `materialService.createMaterial` crea identidad y relación de proveedor. |
+| `CU-CAT-03` | `PATCH /api/warehouse/materials/:id` → `editMaterial`. | `materialService.updateMaterial` sincroniza datos y relación. |
+| `CU-CAT-04` | `DELETE /api/warehouse/materials/:id` → `removeMaterial`. | `materialService.deleteMaterial` protege referencias antes de eliminar relación. |
+| `CU-CAT-05` | `PATCH /api/warehouse/materials/:id/stock` → `editMaterialStock`. | `materialService.updateMaterialStock` usa `adjustmentService` y movimiento. |
+| `CU-CAT-06` | `GET /api/warehouse/suppliers` → `getAllSuppliers`. | `supplierService.findAllSuppliers` consulta proveedores. |
+| `CU-CAT-07` | `POST /api/warehouse/suppliers` → `registerSupplier`. | `supplierService.createSupplier` persiste el proveedor. |
+| `CU-CAT-08` | `PUT /api/warehouse/suppliers/:id` → `editSupplier`. | `supplierService.updateSupplier` actualiza datos del proveedor. |
+| `CU-CAT-09` | `PUT /api/warehouse/suppliers/:id` → `editSupplier`. | `supplierService.updateSupplier` aplica el estado incluido en el DTO; no hay endpoint separado. |
+| `CU-CAT-10` | `GET /api/sales/clients` → `getAllClients`. | `clientService.findAllClients` consulta `Client`. |
+| `CU-CAT-11` | `POST /api/sales/clients` → `registerClient`. | `clientService.createClient` persiste `Client`. |
+| `CU-CAT-12` | `PUT /api/sales/clients/:id` → `editClient`. | `clientService.updateClient` actualiza `Client`. |
+| `CU-CAT-13` | `GET /api/warehouse/wastes` → `getAllWastes`. | `wasteService.findAllWastes` consulta merma e inventario. |
+| `CU-CAT-14` | `GET /api/warehouse/wastes/material-templates` y `POST /api/warehouse/wastes` → `getWasteMaterialTemplates`/`registerWaste`. | `findWasteMaterialTemplates` alimenta la selección y `createWasteWithInitialStockAdjustment` crea merma, ajuste y movimiento inicial. |
+| `CU-CAT-15` | `PATCH /api/warehouse/wastes/:id` → `editWaste`. | `wasteService.updateWaste` actualiza datos sin tratar stock como edición. |
+| `CU-CAT-16` | `PATCH /api/warehouse/wastes/:id/stock` → `editWasteStock`. | `wasteService.updateWasteStock` y `registerWasteStockAdjustment` aplican ajuste/movimiento. |
+| `CU-CAT-17` | `GET /api/warehouse/presentations` → `getAllPresentations`. | `presentationService.findAllPresentations` sirve el catálogo de sólo lectura. |
+| `CU-CAT-18` | `GET /api/warehouse/unit-measures` → `getAllUnitMeasures`. | `unitMeasureService.findAllUnitMeasures` sirve el catálogo de sólo lectura. |
+| `CU-CAT-19` | `GET /api/warehouse/reasons` → `getAllReasons`. | `reasonService.findAllReasons` sirve motivos; helpers resuelven motivos internos. |
+| `CU-CAT-20` | `GET /api/warehouse/fulfillment-statuses` → `getAllFulfillmentStatuses`. | `fulfillmentStatusService.findAllFulfillmentStatuses` sirve estados de sólo lectura. |
+| `CU-ENT-01` | `GET /api/warehouse/goods-receipts` → `getAllGoodsReceipts`. | `goodsReceiptService.findAllGoodsReceipts` consulta entradas y totales. |
+| `CU-ENT-02` | `POST /api/warehouse/goods-receipts` → `registerGoodsReceipt`. | `goodsReceiptService.createGoodsReceipt` crea documento, detalles, existencias y movimiento en transacción. |
+| `CU-ENT-03` | `PATCH /api/warehouse/goods-receipts/:id` → `editGoodsReceiptHeader`. | `goodsReceiptService.updateGoodsReceipt` conserva detalles persistidos y actualiza encabezado permitido. |
+| `CU-ENT-04` | `PATCH /api/warehouse/goods-receipts/:id/details/:detailId/corrections` → `correctGoodsReceiptDetail`. | `correctGoodsReceiptDetailLine` registra diferencia, movimiento, stock e historial atómicamente. |
+| `CU-ENT-05` | `PATCH /api/warehouse/goods-receipts/:id/details/:detailId/cancel` → `cancelGoodsReceiptDetail`. | `cancelGoodsReceiptDetailLine` revierte stock/movimiento y conserva historial. |
+| `CU-SAL-01` | `GET /api/warehouse/goods-issues` → `getAllGoodsIssues`. | `goodsIssueService.findAllGoodsIssues` consulta documentos y estados. |
+| `CU-SAL-02` | `POST /api/warehouse/goods-issues` → `registerGoodsIssue`. | `goodsIssueService.createGoodsIssue` crea encabezado y detalles solicitados. |
+| `CU-SAL-03` | `PATCH /api/warehouse/goods-issues/:id/header` → `editGoodsIssueHeader`. | `goodsIssueService.updateGoodsIssueHeader` aplica reglas del encabezado. |
+| `CU-SAL-04` | `PATCH /api/warehouse/goods-issues/:id/details` → `editGoodsIssueDetails`. | `goodsIssueService.updateGoodsIssueDetails` modifica cantidades todavía editables. |
+| `CU-SAL-05` | `PATCH /api/warehouse/goods-issues/:id/details` → `editGoodsIssueDetails`. | `updateGoodsIssueDetails` llama `applyInventoryMovement(ISSUE)` y recalcula cumplimiento con `tx`. |
+| `CU-SAL-06` | `PATCH /api/warehouse/goods-issues/:id/details/:detailId/returns` → `registerGoodsIssueDetailReturn`. | `returnGoodsIssueDetail` crea `GoodsIssueReturn`, movimiento `ENTRY` y estados en transacción. |
+| `CU-SAL-07` | `GET /api/warehouse/waste-issues` → `getAllWasteIssues`. | `wasteIssueService.findAllWasteIssues` consulta salidas de merma. |
+| `CU-SAL-08` | `POST /api/warehouse/waste-issues` → `registerWasteIssue`. | `wasteIssueService.createWasteIssue` crea encabezado y detalles de merma. |
+| `CU-SAL-09` | `PATCH /api/warehouse/waste-issues/:id/header` → `editWasteIssueHeader`. | `wasteIssueService.updateWasteIssueHeader` aplica reglas del encabezado. |
+| `CU-SAL-10` | `PATCH /api/warehouse/waste-issues/:id/details` → `editWasteIssueDetails`. | `wasteIssueService.updateWasteIssueDetails` modifica cantidades editables. |
+| `CU-SAL-11` | `PATCH /api/warehouse/waste-issues/:id/details` → `editWasteIssueDetails`. | `updateWasteIssueDetails` llama `applyWasteIssueMovement` y recalcula cumplimiento con `tx`. |
+| `CU-SAL-12` | `PATCH /api/warehouse/waste-issues/:id/details/:detailId/returns` → `registerWasteIssueDetailReturn`. | `returnWasteIssueDetail` crea `WasteIssueReturn`, movimiento inverso y estados en transacción. |
+| `CU-REP-01` | `GET /api/warehouse/materials` → `getAllMaterials`. | Reutiliza `findAllMaterials` con filtros; sólo lectura. |
+| `CU-REP-02` | `GET /api/admin/movements/materials` → `getAllMaterialMovements`. | `movementQueryService.findAllMaterialMovements`; sólo lectura. |
+| `CU-REP-03` | `GET /api/warehouse/reports/inventory/excel` → `exportWarehouseReportExcel`. | `reportService.findWarehouseReportRows` y `sendExcelReport`. |
+| `CU-REP-04` | `GET /api/warehouse/reports/goods-issues/excel` → `exportGoodsIssueReportExcel`. | `reportService.findGoodsIssueReportRows` y `sendExcelReport`. |
+| `CU-REP-05` | `GET /api/admin/reports/movements/materials/excel` → `exportMovementReport`. | `inventory/reportService.findMovementReportRows` y respuesta Excel. |
+| `CU-REP-06` | `GET /api/warehouse/wastes` → `getAllWastes`. | Reutiliza `wasteService.findAllWastes` con filtros; sólo lectura. |
+| `CU-REP-07` | `GET /api/admin/movements/wastes` → `getAllWasteMovements`. | `movementQueryService.findAllWasteMovements`; sólo lectura. |
+| `CU-REP-08` | `GET /api/warehouse/reports/waste-issues/excel` → `exportWasteIssueReportExcel`. | `reportService.findWasteIssueReportRows` y `sendExcelReport`. |
+| `CU-REP-09` | `GET /api/warehouse/reports/wastes/excel` → `exportWasteReportExcel`. | `reportService.findWasteReportRows` y `sendExcelReport`. |
+| `CU-REP-10` | `GET /api/admin/reports/movements/wastes/excel` → `exportWasteMovementReport`. | `inventory/reportService.findMovementReportRows` en contexto merma y respuesta Excel. |
+| `CU-REP-11` | `GET /api/warehouse/reports/goods-receipts/excel` → `exportGoodsReceiptReportExcel`. | `reportService.findGoodsReceiptReportRows` y `sendExcelReport`. |
+| `CU-REP-12` | `GET /api/warehouse/reports/suppliers/excel` → `exportSupplierReportExcel`. | `reportService.findSupplierReportRows` y `sendExcelReport`. |
+| `CU-REP-13` | `GET /api/sales/reports/clients/excel` → `exportClientReport`. | `clientService.findAllClients` prepara filas y el controller llama `sendExcelReport`. |
+| `CU-REP-14` | `GET /api/admin/reports/persons/excel` → `exportPersonReport`. | `personService.findAllPersons` prepara filas y el controller llama `sendExcelReport`. |
+| `CU-REP-15` | `GET /api/admin/reports/users/excel` → `exportUserReport`. | `userService.findAllUsers` prepara filas y el controller llama `sendExcelReport`. |
+
 ## Matriz de diagramas por caso backend
 
 | Caso de implementación | Vista que aplica | Actualización obligatoria | Vista que no debe duplicarse |
 | --- | --- | --- | --- |
 | Adaptación HTTP que delega una sola operación | Recorrido HTTP común. | Ruta, controlador, servicio y contrato API. | Secuencia idéntica por endpoint. |
-| CRUD homogéneo | Ciclo CRUD/fábrica de listado. | Ficha de capacidad y mapa generado. | Actividad por verbo CRUD. |
+| CRUD homogéneo | Ficha tabular y referencia a la fábrica; diagrama sólo si un caso tiene coordinación propia. | Ficha de capacidad y mapa generado. | Diagrama general que sustituya los casos. |
 | Controlador coordina varios servicios o efecto post-commit | Secuencia. | Participantes, orden, respuesta y efecto externo. | Diagrama entidad-relación. |
 | Servicio contiene decisiones relevantes | Actividad. | Condiciones, errores y salida de cada rama. | Secuencia que oculte las decisiones. |
 | Escritura en varios modelos con `tx` | Secuencia con límite transaccional; actividad complementaria si hay ramas. | Inicio/commit/rollback y efectos fuera de la transacción. | Afirmar atomicidad desde imports. |
@@ -298,19 +375,19 @@ flowchart TB
     history --> commit["Commit y devolver entrada actualizada"]
 ```
 
-### Secuencia de devolución de material o merma
+### Secuencia de devolución de material surtido
 
-**Identificador:** `DIA-BE-SEQ-005`. **Casos:** `CU-SAL-06` y `CU-SAL-12`. La forma
-transaccional es compartida, pero cada implementación usa sus modelos, errores y tipo de
-movimiento; el diagrama señala los puntos de variación en vez de ocultarlos.
+**Identificador:** `DIA-BE-SEQ-005`. **Caso:** `CU-SAL-06`. Esta vista documenta sólo
+la devolución de `GoodsIssueDetail`; sus participantes y persistencia no se usan como
+marcadores sustituibles para la devolución de merma.
 
 ```mermaid
 sequenceDiagram
-    participant Controller as register*IssueDetailReturn
-    participant Service as return*IssueDetail
-    participant Rules as Reglas de cantidad retornable
-    participant Inventory as Movimiento material o merma
-    participant Status as Recalcular cumplimiento
+    participant Controller as registerGoodsIssueDetailReturn
+    participant Service as returnGoodsIssueDetail
+    participant Rules as Validaciones de returnGoodsIssueDetail
+    participant Inventory as applyInventoryMovement / ENTRY
+    participant Status as resolveIssueFulfillmentStatus
     participant Prisma as Prisma / PostgreSQL
     participant Socket as emitInventoryUpdated
 
@@ -323,10 +400,43 @@ sequenceDiagram
         Service-->>Controller: rollback y error
     else Cantidad válida
         Service->>Inventory: incrementar existencia y crear movimiento inverso con tx
-        Service->>Prisma: crear GoodsIssueReturn o WasteIssueReturn
+        Service->>Prisma: crear GoodsIssueReturn
         Service->>Status: recalcular detalle y encabezado con tx
         Prisma-->>Service: salida actualizada y commit
         Service-->>Controller: salida y devolución
+        Controller->>Socket: publicar después del commit
+    end
+```
+
+### Secuencia de devolución de merma surtida
+
+**Identificador:** `DIA-BE-SEQ-007`. **Caso:** `CU-SAL-12`. Aunque reutiliza reglas de
+devolución, la vista nombra el servicio, el modelo y el recálculo propios de una
+`WasteIssue`; no generaliza esos elementos con los del caso de materiales.
+
+```mermaid
+sequenceDiagram
+    participant Controller as registerWasteIssueDetailReturn
+    participant Service as returnWasteIssueDetail
+    participant Rules as Validaciones de returnWasteIssueDetail
+    participant Inventory as applyWasteIssueReturnMovement
+    participant Status as findWasteIssueFulfillmentStatusIds
+    participant Prisma as Prisma / PostgreSQL
+    participant Socket as emitInventoryUpdated
+
+    Controller->>Service: { id, detailId, returnDto, userId }
+    Service->>Prisma: iniciar $transaction
+    Service->>Prisma: cargar WasteIssue y WasteIssueDetail surtido
+    Service->>Rules: validar estado, cantidad surtida y devoluciones previas
+    alt Cantidad de merma no retornable
+        Rules-->>Service: error de dominio
+        Service-->>Controller: rollback y error
+    else Cantidad válida
+        Service->>Inventory: devolver existencia de merma con tx
+        Service->>Prisma: crear WasteIssueReturn
+        Service->>Status: recalcular detalle y encabezado con tx
+        Prisma-->>Service: salida de merma actualizada y commit
+        Service-->>Controller: wasteIssueReturn
         Controller->>Socket: publicar después del commit
     end
 ```
@@ -363,15 +473,12 @@ sequenceDiagram
     end
 ```
 
-### Secuencia representativa de mutaciones transaccionales de inventario
+### Secuencia de surtimiento de una salida de materiales
 
-Esta secuencia se aplica a la ficha de salidas porque muestra coordinación, transacción
-y un efecto deliberadamente posterior al commit. **Identificador:** `DIA-BE-SEQ-001`.
-Es canónica también para surtir merma, devolver material o merma, registrar una entrada,
-corregir/cancelar un detalle y aplicar un ajuste (`CU-SAL-05`, `CU-SAL-06`, `CU-SAL-11`,
-`CU-SAL-12`, `CU-ENT-02`, `CU-ENT-04`, `CU-ENT-05`, `CU-CAT-05` y `CU-CAT-16`), siempre
-que se reemplacen participantes y tipo de movimiento conforme al caso. No se generaliza
-a CRUD simples ni afirma que todos esos servicios tengan exactamente las mismas ramas.
+**Identificador:** `DIA-BE-SEQ-001`. **Caso:** `CU-SAL-05`. Esta secuencia muestra la
+coordinación, transacción y publicación posterior al commit de
+`updateGoodsIssueDetails`. No se declara canónica para otras mutaciones de inventario:
+cada una conserva su propio servicio, reglas, modelos y tipo de movimiento.
 
 `Navegador` es un **participante técnico**, no un actor humano: esta vista comienza en
 el límite HTTP y la intención/rol ya está definido por el `CU-*`. Si la secuencia incluyera
@@ -413,13 +520,11 @@ sequenceDiagram
 La emisión Socket queda fuera de la atomicidad. Se revisa si cambian estados, cantidades,
 el límite transaccional o el orden movimiento → detalles → encabezado.
 
-### Actividad representativa de decisión y surtimiento
+### Actividad de decisión y surtimiento de materiales
 
-**Identificador:** `DIA-BE-ACT-001`. Esta actividad complementa `DIA-BE-SEQ-001` y se
-reutiliza para material y merma cuando conservan las mismas decisiones de existencia y
-estado. Corrección, cancelación, devolución y ajuste requieren su actividad propia sólo
-si sus alternativas no quedan explicadas por las vistas de requisitos; no se cambia el
-texto de los nodos para fingir una generalización.
+**Identificador:** `DIA-BE-ACT-001`. **Caso:** `CU-SAL-05`. Esta actividad complementa
+`DIA-BE-SEQ-001` exclusivamente para `GoodsIssue`: hace visibles sus errores y sus
+decisiones de estado sin presentarlas como equivalentes a las de `WasteIssue`.
 
 ```mermaid
 flowchart TB

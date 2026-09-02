@@ -11,7 +11,7 @@ cada `CU-*` dentro del rango identifica un diagrama individual.
 El **tipo semántico** prevalece sobre la directiva Mermaid. Un `flowchart` puede
 representar contexto, actividad, dependencia, navegación o trazabilidad; no se etiqueta
 como “diagrama de flujo” genérico si las flechas tienen otra semántica. El inventario
-registra **133 diagramas vigentes**: 128 curados y 5 generados.
+registra **260 diagramas vigentes**: 255 curados y 5 generados.
 
 ## Catálogo por familia y tipo
 
@@ -25,10 +25,12 @@ registra **133 diagramas vigentes**: 128 curados y 5 generados.
 | `DIA-ARQ-EST-001` | Estados de acceso | `architecture-and-web-views.md#estados-de-acceso-y-sesión` | 1 | Sesión y rutas; curado. |
 | `DIA-ARQ-NAV-001..002` | Navegación y redirecciones | Mapa de sitio y redirecciones de `architecture-and-web-views.md` | 2 | Rutas web y menú; curado. |
 | `DIA-BE-CMP-001..002` | Capas y registro de rutas | “Relación entre ambas capas” y “Registro de rutas” del backend | 2 | Código backend; curado. |
-| `DIA-BE-SEQ-001..006` | Secuencias de surtimiento, autenticación, entrada, corrección, devolución y auditoría | Backend, “Vistas técnicas aplicadas” | 6 | Controllers, servicios, transacciones y efectos posteriores; curado. |
+| `DIA-BE-SEQ-001..007` | Secuencias de surtimiento, autenticación, entrada, corrección, devoluciones de material y merma, y auditoría | Backend, “Vistas técnicas aplicadas” | 7 | Controllers, servicios, transacciones y efectos posteriores; curado por caso. |
 | `DIA-BE-ACT-001..002` | Actividades de surtimiento y cancelación | Backend, “Vistas técnicas aplicadas” | 2 | Decisiones y errores de servicios; curado. |
-| `DIA-FE-SEQ-001..005` | Secuencias de ajuste, login, corrección, devolución y reportes | Frontend, “Vistas técnicas aplicadas por flujo” | 5 | Página, aplicación, UI y transporte; curado. |
+| `DIA-FE-SEQ-001..004`, `DIA-FE-SEQ-006` | Secuencias de ajuste, login, corrección y devoluciones de material y merma | Frontend, “Vistas técnicas aplicadas por flujo” | 5 | Página, aplicación, UI y transporte; curado por caso. `DIA-FE-SEQ-005` se retiró porque separaba la exportación de su módulo propietario. |
 | `DIA-FE-ACT-001` | Actividad de alta de merma desde plantilla | Frontend, “Alta de merma…” | 1 | Dependencias y validación del navegador; curado. |
+| `DIA-FE-CU-AUT-01..REP-15` | Aplicación frontend individual de cada caso | `frontend-use-case-diagrams.md` | 63 | Página/interacción, aplicación, request y resultado concretos; curado desde la matriz frontend. |
+| `DIA-BE-CU-AUT-01..REP-15` | Aplicación backend individual de cada caso | `backend-use-case-diagrams.md` | 63 | Ruta/controller, servicio, persistencia o efecto concretos; curado desde la matriz backend. |
 | `DIA-COD-ORG-001`, `DIA-COD-EST-001..002`, `DIA-COD-DIN-001`, `DIA-COD-REU-001` | Organización, estructura, dinámica y reutilización | `code-diagrams.md`, secciones 1 a 5 | 5 | Código e imports; curado. |
 | `DIA-PAT-DAT-001`, `DIA-PAT-RES-001` | Contrato de detalle y resumen de patrones | `design-and-construction-patterns.md` y `diagram-conventions.md` | 2 | Patrones confirmados; curado. |
 | `DIA-DOC-FLU-001` | Actividad documental | `technical-code-documentation.md#recorrido-para-incorporar-documentación` | 1 | Gobierno técnico; curado. |
@@ -39,8 +41,8 @@ registra **133 diagramas vigentes**: 128 curados y 5 generados.
 | `DIA-REQ-CU-GRP-AUT..REP` | Casos de uso por seis grupos | `domain-and-use-cases.md#casos-de-uso-vigentes` | 6 | Catálogo `CU-*`; curado. |
 | `DIA-REQ-EST-001` | Estados/datos por acción | `domain-and-use-cases.md#estados-y-datos-modificados-por-acción` | 1 | Reglas de dominio; curado. |
 | `DIA-REQ-TRA-001`, `DIA-REQ-CRUD-001` | Dependencias y ciclo CRUD | Primeras dos vistas de `requirements-diagrams.md` | 2 | Requisitos; curado. |
-| `DIA-REQ-CU-AUT-01..CU-REP-15` | Flujo individual de cada caso vigente | `requirements-diagrams.md#flujos-de-cada-caso-de-uso` | 58 | Una vista por cada `CU-*`; curado. |
-| `DIA-REQ-ESP-001..015` | Vistas adicionales agrupadas | `requirements-diagrams.md#casos-con-vistas-adicionales-y-nivel-de-coordinación` | 15 | Casos con coordinación o patrón común; curado. |
+| `DIA-REQ-CU-AUT-01..CU-REP-15` | Flujo individual de cada caso vigente | `requirements-diagrams.md#flujos-de-cada-caso-de-uso` | 63 | Una vista curada por cada `CU-*`. |
+| `DIA-REQ-ESP-001..017` | Vistas adicionales agrupadas | `requirements-diagrams.md#casos-con-vistas-adicionales-y-nivel-de-coordinación` | 17 | Casos con coordinación o patrón común; curado. |
 | `DIA-REQ-SEQ-ATM-001` | Secuencia atómica de corrección/cancelación | `requirements-diagrams.md#coordinación-atómica-de-correcciones-de-entrada` | 1 | Servicios transaccionales; curado. |
 | `DIA-REQ-EST-002` | Estados de surtimiento/devolución | `requirements-diagrams.md#estados-de-surtimiento-y-devolución` | 1 | Reglas normativas; curado. |
 | `DIA-REQ-CAL-001` | Requisitos de calidad | `requirements-diagrams.md#requisitos-de-calidad-y-restricciones` | 1 | Requisitos `RC-*`; curado. |
@@ -48,7 +50,7 @@ registra **133 diagramas vigentes**: 128 curados y 5 generados.
 
 ## Control de completitud y coherencia
 
-El total se obtiene de cada bloque Mermaid de `docs`: arquitectura (33), datos
+El total se obtiene de cada bloque Mermaid de `docs`: arquitectura (160), datos
 (1), generados (5) y requisitos (94). Al agregar, retirar o mover un bloque se actualiza
 su fila, cantidad y enlace en el mismo cambio. Los diagramas generados nunca se editan a
 mano. Los de caso individual conservan el `CU-*`; una vista agrupada enumera los casos a

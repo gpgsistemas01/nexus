@@ -23,7 +23,7 @@ suficiente. Los archivos exactos de rutas y exports se localizan en el mapa gene
 | `RF-REC-001..008`, `CU-ENT-01..05` | Entrada, detalle y modales de corrección/cancelación | `goodsReceiptService`, `detailChanges`, movimientos y transacción | Alta y corrección en requisitos; patrón `DIA-BE-SEQ-001` | Unitarias de controller/DTO/helpers; falta integración HTTP de compra. |
 | `RF-ISS-001..006`, `CU-SAL-01..06` | `createIssueApplication`, formulario y devolución de material | Servicio de salida/devolución, movimiento y estados | `DIA-BE-SEQ-001`, `DIA-BE-ACT-001`, máquina `DIA-REQ-EST-002` | Controller unitario; falta integración HTTP con rollback. |
 | `RF-WST-001..007`, `CU-SAL-07..12` | Misma fábrica de salidas con adaptadores de merma | Servicios de salida/devolución y movimientos de merma | Mismos patrones, con participantes de merma; máquina compartida | Integración `wasteIssueControllerDbTest.js` cubre documento, stock, movimientos, devolución y rollback. |
-| `RF-REP-001..005`, `CU-REP-01..15` | Tablas, filtros y `createReportApplication` | Queries, controllers y generación Excel | Flujo de consulta/reportes; sin secuencia repetida por descarga | Unitarias de queries, controllers y utilidades; ampliar integración según reporte modificado. |
+| `RF-REP-001..005`, `CU-REP-01..15` | Tabla, filtros y acción de exportar dentro de cada módulo propietario; `createReportApplication` es infraestructura compartida | Query, controller y generación Excel específicos del contexto consultado | Cada flujo `DIA-REQ-CU-REP-*`; sin diagrama transversal que interrumpa el recorrido del módulo | Unitarias de queries, controllers y utilidades; ampliar integración según reporte modificado. |
 | `RN-008`, `RD-005` y políticas de trazabilidad | Sin responsabilidad de seguridad; sólo origina request | `auditWrites`, `auditService`, `CriticalWriteAudit` | ER `DIA-GEN-ER-001`; pipeline `DIA-API-SEQ-001` | No hay suite dedicada; probar sanitizado, escrituras exitosas/fallidas y política best effort. |
 
 ## Obligación al cambiar una capacidad
@@ -32,6 +32,7 @@ suficiente. Los archivos exactos de rutas y exports se localizan en el mapa gene
 2. actualizar la ficha frontend si cambian interacción, payload o endpoint;
 3. actualizar contrato y ficha backend si cambian middleware, DTO, regla o transacción;
 4. regenerar ER/mapa si cambian Prisma, rutas o imports;
-5. elegir la vista dinámica desde las matrices, sin duplicar una representativa;
+5. elegir la vista dinámica desde las matrices; si representa un caso, debe identificar
+   un único `CU-*` y sus participantes concretos;
 6. registrar prueba unitaria para la regla aislada y de integración para contrato,
    persistencia o rollback; actualizar la fila si se cierra una brecha.

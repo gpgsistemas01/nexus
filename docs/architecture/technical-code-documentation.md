@@ -63,6 +63,15 @@ HTTP y reglas de servidor con interacción del navegador:
   servicios HTTP del cliente, aplicaciones, páginas, formularios, UI compartida,
   plugins y composición EJS.
 
+Ambas referencias incluyen una matriz de aplicación al código con una fila para cada
+`CU-*`. Esa matriz es la cobertura completa; los diagramas dinámicos se reservan para
+los casos cuya coordinación necesita una secuencia o actividad y no sustituyen la
+documentación de los casos directos.
+Las colecciones completas están en los [diagramas frontend aplicados al
+código](frontend-use-case-diagrams.md) y los [diagramas backend aplicados al
+código](backend-use-case-diagrams.md); ambas conservan una vista independiente para
+cada uno de los 63 casos, incluso cuando la forma de la colaboración se repite.
+
 Un flujo completo enlaza ambos documentos mediante la ruta API; no repite en frontend
 las reglas propietarias del servidor ni describe en backend detalles visuales del DOM.
 
@@ -140,9 +149,11 @@ Ejemplos vigentes que deben enlazarse antes de crear otra vista:
 - flujos funcionales y estados en los
   [diagramas de requisitos](../requirements/requirements-diagrams.md).
 
-No se crea un diagrama por endpoint, tabla o función. Tampoco se presenta una propuesta
-como arquitectura vigente: una vista futura identifica explícitamente su estado y no se
-mezcla con el recorrido implementado.
+No se crea un diagrama por endpoint, tabla o función. Cuando un caso sí requiere una
+vista dinámica, ésta se limita a ese `CU-*` y no se generaliza para representar otros
+casos mediante nombres alternativos o participantes sustituibles. Tampoco se presenta
+una propuesta como arquitectura vigente: una vista futura identifica explícitamente su
+estado y no se mezcla con el recorrido implementado.
 
 ## Lista de revisión del cambio
 

@@ -516,6 +516,11 @@ flowchart LR
 
 ### Grupo funcional REP — Consultas y reportes
 
+`REP` agrupa requisitos para identificarlos y trazar permisos, filtros y resultados; no
+afirma que exista un módulo de reportes en la interfaz. En el manual y en las vistas
+técnicas, cada consulta o exportación permanece dentro del contexto que la inicia
+(materiales, mermas, compras, salidas, terceros, identidad o movimientos).
+
 #### `CU-REP-01` — Consultar inventario de materiales
 
 ```mermaid
