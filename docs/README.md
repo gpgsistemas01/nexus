@@ -32,7 +32,7 @@ docs/
 | Arquitectura y construcción | [Arquitectura y vistas web](architecture/architecture-and-web-views.md) | [Guía técnica común](architecture/technical-code-documentation.md), referencias de [backend](architecture/backend-technical-documentation.md) y [frontend](architecture/frontend-technical-documentation.md), [diagramas vigentes del código](architecture/code-diagrams.md), [inventario de diagramas](architecture/diagram-inventory.md), [trazabilidad técnica](architecture/traceability-matrix.md), [patrones aplicados](architecture/design-and-construction-patterns.md), [estándar de codificación](architecture/coding-standards.md) y [convenciones de diagramas](architecture/diagram-conventions.md) | [Mapa del código](generated/code-map.md), derivado de rutas e importaciones de `src` |
 | Dominio y requisitos | [Índice y portada del paquete](requirements/index.md); la [especificación](requirements/requirements-specification.md) es la fuente normativa | [Visión y alcance](requirements/vision-scope-and-requirements.md), [dominio y casos de uso](requirements/domain-and-use-cases.md), [catálogo de casos de uso](requirements/use-case-descriptions.md), [matriz de operaciones](requirements/requirements-operations-matrix.md), [diagramas de requisitos](requirements/requirements-diagrams.md) y [glosario](requirements/business-glossary.md) | No aplica; el estado funcional requiere revisión humana |
 | Datos, acceso y operación | [Mapa de datos, persistencia y acceso](data/index.md) | [Análisis de usuarios y permisos](data/database-users-and-permissions-analysis.md), [roles PostgreSQL](data/postgresql-runtime-and-migration-roles.md) y [contrato API](data/api-contract.md) | [Esquema de base de datos](generated/database-schema.md) y [diccionario técnico](generated/data-dictionary.md), derivados de `prisma/schema.prisma` |
-| Pruebas | [Estrategia de pruebas](testing/service-test-coverage.md) | [Plan de pruebas](testing/test-plan.md), que concreta alcance, matriz CRUD y criterios de ejecución | No aplica; la evidencia ejecutable vive en `tests` |
+| Pruebas | [Estrategia de pruebas](testing/service-test-coverage.md) | [Plan de pruebas](testing/test-plan.md), [ambiente, estrategia y catálogo unitario](testing/unit-test-catalog.md), y [resultados unitarios](testing/unit-test-results.md) de la última ejecución verificada | La evidencia ejecutable vive en `tests`; el catálogo y el resumen versionado complementan la salida de Vitest/CI |
 | Gobierno documental | [Normas y criterios](governance/documentation-standards.md) | [Registro de aplicación de normas](governance/standards-application.md) y [convenciones de diagramas](architecture/diagram-conventions.md), compartidas también con arquitectura | No aplica |
 
 La [guía de publicación y versionado](governance/publication-and-versioning.md) define
@@ -131,8 +131,10 @@ por un Markdown de su misma familia.
 
 ### Comandos
 
-Los paquetes admitidos son `manual-usuario`, `requisitos`, `arquitectura` y `pruebas`.
-Los formatos admitidos son `html`, `docx` y `pdf`.
+Los paquetes admitidos son `manual-usuario`, `manual-administrador`, `manual-almacen`,
+`manual-reportes`, `requisitos`, `arquitectura` y `pruebas`. Los tres paquetes de actor reutilizan
+los grupos de casos del manual general y omiten los grupos ajenos a sus responsabilidades. Los
+formatos admitidos son `html`, `docx` y `pdf`.
 
 ```bash
 # Sólo valida fuentes e imágenes; no necesita Pandoc.
@@ -140,6 +142,9 @@ npm run docs:export -- requisitos html --check
 
 # Genera build/docs/manual-usuario.html.
 npm run docs:export -- manual-usuario html
+
+# Genera un manual con el recorrido del personal de almacén.
+npm run docs:export -- manual-almacen html
 
 # Genera un DOCX con una plantilla opcional.
 DOCS_REFERENCE_DOC=/ruta/reference.docx npm run docs:export -- arquitectura docx

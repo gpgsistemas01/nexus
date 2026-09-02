@@ -56,6 +56,9 @@ No se crea un nivel unitario para componentes visuales o infraestructura inciden
 Si un helper compartido coordina datos CRUD, se prueba una vez en la ruta paralela a su
 módulo y los contextos reutilizan ese contrato.
 
+El runtime, el aislamiento, las técnicas y las suites incluidas en el nivel unitario se
+detallan en el [ambiente, estrategia y catálogo unitario](unit-test-catalog.md).
+
 ## Registro de aplicación de pruebas unitarias
 
 Además del código, esta tabla registra **cómo** se aplica el nivel unitario. La fuente
@@ -74,8 +77,10 @@ sin copiar cada `it`. La trazabilidad funcional se mantiene en la
 
 Cada incorporación registra en el nombre `describe/it` la regla o `RF/RN/CU` cuando
 resulte útil, conserva preparación–ejecución–aserción y evita probar imports o detalles
-privados. La salida de Vitest en CI/PR registra comando, commit, ambiente y resultado;
-este documento no se marca como “aprobado” sólo porque exista el archivo.
+privados. La salida de Vitest en CI/PR registra comando, commit, ambiente y resultado; el
+[registro de resultados unitarios](unit-test-results.md) conserva además el último
+resumen verificado dentro del paquete documental. Este documento no se marca como
+“aprobado” sólo porque exista el archivo.
 
 ## Cobertura prioritaria
 

@@ -19,17 +19,18 @@ opción no se debe resolver compartiendo credenciales.
 2. Capture sus credenciales y seleccione **Iniciar sesión**.
 3. Compruebe que se muestre la página autorizada para su cuenta.
 
-La captura se incorpora después de ejecutar `npm run docs:screenshots` en un entorno de prueba.
-Su ruta esperada es `docs/user-manual/images/acceso/01-inicio-sesion.png`; no se versiona una imagen
-de relleno. El archivo Markdown sólo debe referenciarla cuando exista una captura real y
-revisada, para no bloquear la exportación ni introducir binarios ficticios.
+La captura se genera al ejecutar `npm run docs:screenshots` en un entorno de prueba. El script
+elimina primero el directorio de imágenes y vuelve a crear el juego completo, por lo que una
+exportación nunca debe mezclar capturas de ejecuciones distintas.
 
 ## Módulos
 
 Las secciones de entradas, salidas, inventario, materiales, mermas, clientes, proveedores,
-personas y usuarios se documentarán con la secuencia **propósito → precondiciones → recorrido
-principal → alternativas → errores → resultado**. Cada acción debe referenciar una captura
-estable y advertir si modifica existencias o genera un archivo.
+personas y usuarios se presentan en los [procedimientos y casos](procedures.md), siguiendo la
+secuencia **propósito → precondiciones → recorrido principal → alternativas → errores →
+resultado**. Cada paso muestra la captura estable correspondiente y advierte si modifica
+existencias o genera un archivo. Esa entrada divide el recorrido por grupo funcional y ofrece
+guías específicas para administrador, almacén y usuarios de consultas y reportes.
 
 Los identificadores, nombres, orden, casos de uso cubiertos y datos de prueba necesarios se
 definen en el [inventario de capturas](screenshot-inventory.md). El inventario sigue el recorrido
