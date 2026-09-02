@@ -13,10 +13,12 @@ Cada procedimiento identifica sus casos de uso, controles, errores posibles y ca
 
 **Errores posibles:** [Reportes](../error-messages.md#errores-reportes).
 
-**Controles que debe usar:** Buscador **Buscar por Material, Proveedor o Folio**; filtros de fecha, **Tipo de movimiento**, **Proveedor** y **Material**; botones **Buscar / filtrar**, **Limpiar filtros** y **Exportar Excel**.
+**Controles que debe usar:** Buscador **Buscar por Material, Proveedor o Folio**; filtros **Fecha de inicio:**, **Fecha de fin:**, **Tipo de movimiento:**, **Proveedor:** y **Material:**; botones **Buscar / filtrar**, **Limpiar filtros** y **Exportar Excel**.
 
-1. Revise el listado y use sus filtros o acciones disponibles.
-2. Compruebe que la pantalla coincida con la captura antes de continuar.
+1. Escriba un término en **Buscar por Material, Proveedor o Folio** o complete **Fecha de inicio:**, **Fecha de fin:**, **Tipo de movimiento:**, **Proveedor:** y **Material:**.
+2. Seleccione **Buscar / filtrar** para actualizar el historial; use **Limpiar filtros** para restablecerlo.
+3. Seleccione **Exportar Excel** si necesita descargar la consulta.
+4. Compruebe que la pantalla coincida con la captura antes de continuar.
 
 ![CAP-REP-MOV-MAT-01-LIST: historial y filtros](../images/movimientos-material/01-historial-y-filtros.png)
 
@@ -29,8 +31,10 @@ Cada procedimiento identifica sus casos de uso, controles, errores posibles y ca
 
 **Controles que debe usar:** Botón **Exportar Excel**; opciones **Mes actual**, **Otro mes** o **Personalizado: usar filtros aplicados**; campo **Mes del reporte** y botón **Descargar**.
 
-1. Abra la exportación, seleccione el alcance o periodo y genere el archivo.
-2. Compruebe que la pantalla coincida con la captura antes de continuar.
+1. Seleccione **Exportar Excel** para abrir el diálogo de alcance.
+2. Elija **Mes actual**, **Otro mes** o **Personalizado: usar filtros aplicados** y complete **Mes del reporte** cuando corresponda.
+3. Seleccione **Descargar** para generar el archivo.
+4. Compruebe que la pantalla coincida con la captura antes de continuar.
 
 ![CAP-REP-MOV-MAT-02-EXPORT: exportar reporte](../images/movimientos-material/02-exportar-reporte.png)
 
@@ -45,10 +49,12 @@ Cada procedimiento identifica sus casos de uso, controles, errores posibles y ca
 
 **Errores posibles:** [Reportes](../error-messages.md#errores-reportes).
 
-**Controles que debe usar:** Buscador **Buscar por Material, Proveedor o Folio**; filtros de fecha, **Tipo de movimiento**, **Proveedor** y **Merma**; botones **Buscar / filtrar**, **Limpiar filtros** y **Exportar Excel**.
+**Controles que debe usar:** Buscador **Buscar por Material, Proveedor o Folio**; filtros **Fecha de inicio:**, **Fecha de fin:**, **Tipo de movimiento:**, **Proveedor:** y **Merma:**; botones **Buscar / filtrar**, **Limpiar filtros** y **Exportar Excel**.
 
-1. Revise el listado y use sus filtros o acciones disponibles.
-2. Compruebe que la pantalla coincida con la captura antes de continuar.
+1. Escriba un término en **Buscar por Material, Proveedor o Folio** o complete **Fecha de inicio:**, **Fecha de fin:**, **Tipo de movimiento:**, **Proveedor:** y **Merma:**.
+2. Seleccione **Buscar / filtrar** para actualizar el historial; use **Limpiar filtros** para restablecerlo.
+3. Seleccione **Exportar Excel** si necesita descargar la consulta.
+4. Compruebe que la pantalla coincida con la captura antes de continuar.
 
 ![CAP-REP-MOV-WAS-01-LIST: historial y filtros](../images/movimientos-merma/01-historial-y-filtros.png)
 
@@ -61,7 +67,9 @@ Cada procedimiento identifica sus casos de uso, controles, errores posibles y ca
 
 **Controles que debe usar:** Botón **Exportar Excel**; opciones **Mes actual**, **Otro mes** o **Personalizado: usar filtros aplicados**; campo **Mes del reporte** y botón **Descargar**.
 
-1. Abra la exportación, seleccione el alcance o periodo y genere el archivo.
-2. Compruebe que la pantalla coincida con la captura antes de continuar.
+1. Seleccione **Exportar Excel** para abrir el diálogo de alcance.
+2. Elija **Mes actual**, **Otro mes** o **Personalizado: usar filtros aplicados** y complete **Mes del reporte** cuando corresponda.
+3. Seleccione **Descargar** para generar el archivo.
+4. Compruebe que la pantalla coincida con la captura antes de continuar.
 
 ![CAP-REP-MOV-WAS-02-EXPORT: exportar reporte](../images/movimientos-merma/02-exportar-reporte.png)

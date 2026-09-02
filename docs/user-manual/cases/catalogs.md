@@ -15,8 +15,10 @@ Cada procedimiento identifica sus casos de uso, controles, errores posibles y ca
 
 **Controles que debe usar:** Buscador **Buscar por Material**, filtro **Proveedor**, botones **Buscar / filtrar**, **Limpiar filtros**, **Exportar Excel** y **Nuevo material**, además de las acciones de cada fila.
 
-1. Revise el listado y use sus filtros o acciones disponibles.
-2. Compruebe que la pantalla coincida con la captura antes de continuar.
+1. Escriba un término en el buscador **Buscar por Material** o elija una opción en el filtro **Proveedor**.
+2. Seleccione el botón **Buscar / filtrar** para actualizar la tabla; use **Limpiar filtros** para restablecerla.
+3. En la tabla, seleccione **Nuevo material**, **Exportar Excel**, **Editar registro** o **Ajustar stock**, según la operación requerida.
+4. Compruebe que la pantalla coincida con la captura antes de continuar.
 
 ![CAP-CAT-MAT-01-LIST: listado inventario](../images/materiales/01-listado-inventario.png)
 
@@ -27,10 +29,12 @@ Cada procedimiento identifica sus casos de uso, controles, errores posibles y ca
 
 **Errores posibles:** [Validación de formularios](../error-messages.md#errores-validacion), [Catálogos e inventario](../error-messages.md#errores-catalogos).
 
-**Controles que debe usar:** Botón **Nuevo material**; campos **Nombre**, **Proveedor**, **Presentación**, **Unidad de medida**, **Stock Mínimo**, **Costo Máximo**, **Base** y **Altura**; selector **Activo** y botón **Guardar**.
+**Controles que debe usar:** Botón **Nuevo material**; campo **Nombre**; selectores **Buscar proveedor...**, **Buscar presentación...** y **Buscar unidad...**; campos **Stock Mínimo**, **Costo Máximo**, **Base** y **Altura**; casilla **Activo** y botón **Guardar**.
 
-1. Abra la acción de alta, capture los campos requeridos y confirme.
-2. Compruebe que la pantalla coincida con la captura antes de continuar.
+1. Seleccione el botón **Nuevo material** para abrir el formulario de alta.
+2. Complete **Nombre**; elija opciones en **Buscar proveedor...**, **Buscar presentación...** y **Buscar unidad...**; capture **Stock Mínimo**, **Costo Máximo**, **Base** y **Altura**, y revise la casilla **Activo**.
+3. Seleccione el botón **Guardar** para registrar el material.
+4. Compruebe que la pantalla coincida con la captura antes de continuar.
 
 ![CAP-CAT-MAT-02-CREATE: formulario alta](../images/materiales/02-formulario-alta.png)
 
@@ -41,10 +45,12 @@ Cada procedimiento identifica sus casos de uso, controles, errores posibles y ca
 
 **Errores posibles:** [Validación de formularios](../error-messages.md#errores-validacion), [Catálogos e inventario](../error-messages.md#errores-catalogos).
 
-**Controles que debe usar:** Acción **Editar registro** de la fila; los mismos campos de identidad del material, selector **Activo** y botón **Actualizar**.
+**Controles que debe usar:** Acción **Editar registro** de la fila; campo **Nombre**; selectores **Buscar proveedor...**, **Buscar presentación...** y **Buscar unidad...**; campos **Stock Mínimo**, **Costo Máximo**, **Base** y **Altura**; casilla **Activo** y botón **Actualizar**.
 
-1. Seleccione un registro editable, revise los datos y confirme únicamente los cambios necesarios.
-2. Compruebe que la pantalla coincida con la captura antes de continuar.
+1. En la fila del material, seleccione la acción **Editar registro** para abrir el formulario.
+2. Modifique **Nombre**, **Buscar proveedor...**, **Buscar presentación...**, **Buscar unidad...**, **Stock Mínimo**, **Costo Máximo**, **Base** o **Altura** según corresponda, y revise la casilla **Activo**.
+3. Seleccione el botón **Actualizar** para guardar los cambios.
+4. Compruebe que la pantalla coincida con la captura antes de continuar.
 
 ![CAP-CAT-MAT-03-EDIT: formulario edicion](../images/materiales/03-formulario-edicion.png)
 
@@ -55,10 +61,12 @@ Cada procedimiento identifica sus casos de uso, controles, errores posibles y ca
 
 **Errores posibles:** [Validación de formularios](../error-messages.md#errores-validacion), [Catálogos e inventario](../error-messages.md#errores-catalogos).
 
-**Controles que debe usar:** Acción **Ajustar stock**; selector **Razón**, campo **Nueva cantidad**, campo **Observaciones** y botón **Ajustar**.
+**Controles que debe usar:** Acción **Ajustar stock**; selector **Seleccione una razón...**, campos **Nueva cantidad** y **Observaciones**, y botón **Ajustar**.
 
-1. Abra el ajuste, capture la existencia autorizada y confirme después de comprobar su efecto.
-2. Compruebe que la pantalla coincida con la captura antes de continuar.
+1. En la fila del material, seleccione la acción **Ajustar stock**.
+2. Elija una opción en **Seleccione una razón...** y complete los campos **Nueva cantidad** y **Observaciones**.
+3. Revise el efecto sobre la existencia y seleccione el botón **Ajustar**.
+4. Compruebe que la pantalla coincida con la captura antes de continuar.
 
 ![CAP-CAT-MAT-04-STOCK: ajuste existencia](../images/materiales/04-ajuste-existencia.png)
 
@@ -75,8 +83,9 @@ Cada procedimiento identifica sus casos de uso, controles, errores posibles y ca
 
 **Controles que debe usar:** Buscador **Buscar por Nombre comercial o Razón social**, botones **Exportar Excel** y **Nuevo proveedor**, y acción **Editar registro** de cada fila.
 
-1. Revise el listado y use sus filtros o acciones disponibles.
-2. Compruebe que la pantalla coincida con la captura antes de continuar.
+1. Escriba un término en el buscador **Buscar por Nombre comercial o Razón social** para localizar un proveedor.
+2. En la tabla, seleccione **Nuevo proveedor**, **Exportar Excel** o la acción **Editar registro** de una fila.
+3. Compruebe que la pantalla coincida con la captura antes de continuar.
 
 ![CAP-CAT-SUP-01-LIST: listado](../images/proveedores/01-listado.png)
 
@@ -87,10 +96,12 @@ Cada procedimiento identifica sus casos de uso, controles, errores posibles y ca
 
 **Errores posibles:** [Validación de formularios](../error-messages.md#errores-validacion), [Catálogos e inventario](../error-messages.md#errores-catalogos).
 
-**Controles que debe usar:** Botón **Nuevo proveedor**; campos **Razón social**, **Nombre comercial** y **Teléfono**; selector **Activo** y botón **Guardar**.
+**Controles que debe usar:** Botón **Nuevo proveedor**; campos **Razón social**, **Nombre comercial** y **Teléfono**; casilla **Activo** y botón **Guardar**.
 
-1. Abra la acción de alta, capture los campos requeridos y confirme.
-2. Compruebe que la pantalla coincida con la captura antes de continuar.
+1. Seleccione el botón **Nuevo proveedor** para abrir el formulario de alta.
+2. Complete los campos **Razón social**, **Nombre comercial** y **Teléfono**, y revise la casilla **Activo**.
+3. Seleccione el botón **Guardar** para registrar el proveedor.
+4. Compruebe que la pantalla coincida con la captura antes de continuar.
 
 ![CAP-CAT-SUP-02-CREATE: formulario alta](../images/proveedores/02-formulario-alta.png)
 
@@ -101,10 +112,12 @@ Cada procedimiento identifica sus casos de uso, controles, errores posibles y ca
 
 **Errores posibles:** [Validación de formularios](../error-messages.md#errores-validacion), [Catálogos e inventario](../error-messages.md#errores-catalogos).
 
-**Controles que debe usar:** Acción **Editar registro**; campos **Razón social**, **Nombre comercial** y **Teléfono**; selector **Activo** y botón **Actualizar**.
+**Controles que debe usar:** Acción **Editar registro**; campos **Razón social**, **Nombre comercial** y **Teléfono**; casilla **Activo** y botón **Actualizar**.
 
-1. Seleccione un registro editable, revise los datos y confirme únicamente los cambios necesarios.
-2. Compruebe que la pantalla coincida con la captura antes de continuar.
+1. En la fila del proveedor, seleccione la acción **Editar registro**.
+2. Modifique los campos **Razón social**, **Nombre comercial** o **Teléfono** necesarios y revise la casilla **Activo**.
+3. Seleccione el botón **Actualizar** para guardar los cambios.
+4. Compruebe que la pantalla coincida con la captura antes de continuar.
 
 ![CAP-CAT-SUP-03-EDIT: formulario edicion y estado](../images/proveedores/03-formulario-edicion-y-estado.png)
 
@@ -121,8 +134,9 @@ Cada procedimiento identifica sus casos de uso, controles, errores posibles y ca
 
 **Controles que debe usar:** Buscador **Buscar por Nombre**, botones **Exportar Excel** y **Nuevo cliente**, y acción **Editar registro** de cada fila.
 
-1. Revise el listado y use sus filtros o acciones disponibles.
-2. Compruebe que la pantalla coincida con la captura antes de continuar.
+1. Escriba un término en el buscador **Buscar por Nombre** para localizar un cliente.
+2. En la tabla, seleccione **Nuevo cliente**, **Exportar Excel** o la acción **Editar registro** de una fila.
+3. Compruebe que la pantalla coincida con la captura antes de continuar.
 
 ![CAP-CAT-CLI-01-LIST: listado](../images/clientes/01-listado.png)
 
@@ -135,8 +149,9 @@ Cada procedimiento identifica sus casos de uso, controles, errores posibles y ca
 
 **Controles que debe usar:** Botón **Nuevo cliente**, campo **Nombre** y botón **Guardar**.
 
-1. Abra la acción de alta, capture los campos requeridos y confirme.
-2. Compruebe que la pantalla coincida con la captura antes de continuar.
+1. Seleccione el botón **Nuevo cliente** para abrir el formulario de alta.
+2. Complete el campo **Nombre** y seleccione el botón **Guardar**.
+3. Compruebe que la pantalla coincida con la captura antes de continuar.
 
 ![CAP-CAT-CLI-02-CREATE: formulario alta](../images/clientes/02-formulario-alta.png)
 
@@ -149,8 +164,9 @@ Cada procedimiento identifica sus casos de uso, controles, errores posibles y ca
 
 **Controles que debe usar:** Acción **Editar registro**, campo **Nombre** y botón **Actualizar**.
 
-1. Seleccione un registro editable, revise los datos y confirme únicamente los cambios necesarios.
-2. Compruebe que la pantalla coincida con la captura antes de continuar.
+1. En la fila del cliente, seleccione la acción **Editar registro**.
+2. Modifique el campo **Nombre** y seleccione el botón **Actualizar**.
+3. Compruebe que la pantalla coincida con la captura antes de continuar.
 
 ![CAP-CAT-CLI-03-EDIT: formulario edicion](../images/clientes/03-formulario-edicion.png)
 
@@ -167,8 +183,10 @@ Cada procedimiento identifica sus casos de uso, controles, errores posibles y ca
 
 **Controles que debe usar:** Buscador **Buscar por Material o Proveedor**, filtro **Proveedor**, botones **Buscar / filtrar**, **Limpiar filtros**, **Exportar Excel** y **Nueva merma**, además de las acciones por fila.
 
-1. Revise el listado y use sus filtros o acciones disponibles.
-2. Compruebe que la pantalla coincida con la captura antes de continuar.
+1. Escriba un término en el buscador **Buscar por Material o Proveedor** o elija una opción en el filtro **Proveedor**.
+2. Seleccione el botón **Buscar / filtrar** para actualizar la tabla; use **Limpiar filtros** para restablecerla.
+3. En la tabla, seleccione **Nueva merma**, **Exportar Excel**, **Editar registro** o **Ajustar stock**, según la operación requerida.
+4. Compruebe que la pantalla coincida con la captura antes de continuar.
 
 ![CAP-CAT-WAS-01-LIST: listado inventario](../images/mermas/01-listado-inventario.png)
 
@@ -179,10 +197,12 @@ Cada procedimiento identifica sus casos de uso, controles, errores posibles y ca
 
 **Errores posibles:** [Validación de formularios](../error-messages.md#errores-validacion), [Catálogos e inventario](../error-messages.md#errores-catalogos).
 
-**Controles que debe usar:** Botón **Nueva merma**; selectores **Proveedor** y **Material de referencia del proveedor**; campos **Ancho confirmado**, **Largo real**, **Stock mínimo** y **Costo máximo unitario**; selector **Activo** y botón **Guardar**.
+**Controles que debe usar:** Botón **Nueva merma**; selectores **Buscar proveedor...** y **Buscar material de referencia...**; campos **Ancho confirmado de la merma (m)**, **Largo real de la merma (m)**, **Stock mínimo** y **Costo máximo unitario**; casilla **Activo** y botón **Guardar**.
 
-1. Abra la acción de alta, capture los campos requeridos y confirme.
-2. Compruebe que la pantalla coincida con la captura antes de continuar.
+1. Seleccione el botón **Nueva merma** para abrir el formulario de registro.
+2. Elija opciones en **Buscar proveedor...** y **Buscar material de referencia...**; complete **Ancho confirmado de la merma (m)**, **Largo real de la merma (m)**, **Stock mínimo** y **Costo máximo unitario**, y revise la casilla **Activo**.
+3. Seleccione el botón **Guardar** para registrar la merma.
+4. Compruebe que la pantalla coincida con la captura antes de continuar.
 
 ![CAP-CAT-WAS-02-CREATE: formulario registro](../images/mermas/02-formulario-registro.png)
 
@@ -193,10 +213,12 @@ Cada procedimiento identifica sus casos de uso, controles, errores posibles y ca
 
 **Errores posibles:** [Validación de formularios](../error-messages.md#errores-validacion), [Catálogos e inventario](../error-messages.md#errores-catalogos).
 
-**Controles que debe usar:** Acción **Editar registro**; controles de proveedor, material de referencia, dimensiones, stock mínimo, costo máximo y estado **Activo**; botón **Actualizar**.
+**Controles que debe usar:** Acción **Editar registro**; selectores **Buscar proveedor...** y **Buscar material de referencia...**; campos **Ancho confirmado de la merma (m)**, **Largo real de la merma (m)**, **Stock mínimo** y **Costo máximo unitario**; casilla **Activo** y botón **Actualizar**.
 
-1. Seleccione un registro editable, revise los datos y confirme únicamente los cambios necesarios.
-2. Compruebe que la pantalla coincida con la captura antes de continuar.
+1. En la fila de la merma, seleccione la acción **Editar registro**.
+2. Modifique únicamente los selectores o campos indicados y revise la casilla **Activo**.
+3. Seleccione el botón **Actualizar** para guardar los cambios.
+4. Compruebe que la pantalla coincida con la captura antes de continuar.
 
 ![CAP-CAT-WAS-03-EDIT: formulario edicion](../images/mermas/03-formulario-edicion.png)
 
@@ -207,10 +229,12 @@ Cada procedimiento identifica sus casos de uso, controles, errores posibles y ca
 
 **Errores posibles:** [Validación de formularios](../error-messages.md#errores-validacion), [Catálogos e inventario](../error-messages.md#errores-catalogos).
 
-**Controles que debe usar:** Acción **Ajustar stock**; selector **Razón**, campo **Nuevo stock**, campo **Observaciones** y botón **Ajustar**.
+**Controles que debe usar:** Acción **Ajustar stock**; selector **Seleccione una razón...**, campos **Nuevo stock** y **Observaciones**, y botón **Ajustar**.
 
-1. Abra el ajuste, capture la existencia autorizada y confirme después de comprobar su efecto.
-2. Compruebe que la pantalla coincida con la captura antes de continuar.
+1. En la fila de la merma, seleccione la acción **Ajustar stock**.
+2. Elija una opción en **Seleccione una razón...** y complete los campos **Nuevo stock** y **Observaciones**.
+3. Revise el efecto sobre la existencia y seleccione el botón **Ajustar**.
+4. Compruebe que la pantalla coincida con la captura antes de continuar.
 
 ![CAP-CAT-WAS-04-STOCK: ajuste existencia](../images/mermas/04-ajuste-existencia.png)
 
@@ -223,7 +247,9 @@ Cada procedimiento identifica sus casos de uso, controles, errores posibles y ca
 
 **Controles que debe usar:** Botón **Exportar Excel**; opciones **Mes actual**, **Otro mes** o **Personalizado: usar filtros aplicados**; campo **Mes del reporte** cuando corresponda y botón **Descargar**.
 
-1. Abra la exportación, seleccione el alcance o periodo y genere el archivo.
-2. Compruebe que la pantalla coincida con la captura antes de continuar.
+1. Seleccione el botón **Exportar Excel** para abrir el diálogo de alcance.
+2. Elija **Mes actual**, **Otro mes** o **Personalizado: usar filtros aplicados** y, cuando corresponda, complete **Mes del reporte**.
+3. Seleccione el botón **Descargar** para generar el archivo.
+4. Compruebe que la pantalla coincida con la captura antes de continuar.
 
 ![CAP-REP-WAS-05-EXPORT: exportar reporte](../images/mermas/05-exportar-reporte.png)
