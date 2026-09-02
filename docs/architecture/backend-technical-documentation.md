@@ -123,7 +123,7 @@ un ejemplo en la documentación de todo el backend.
 | Catálogos: `departmentController/Service`, `roleController/Service`, `presentationController/Service`, `reasonController/Service`, `unitMeasureController/Service`, `fulfillmentStatusController/Service` | `GET` sin cuerpo; la fábrica `createDataTableListController` adapta paginación cuando corresponde y devuelve colecciones JSON. | Lecturas Prisma; búsquedas por id/nombre son colaboradores de otros servicios y propagan ausencia según su contrato. | **Ninguno específico**; fábrica de listado y recorrido HTTP común. |
 | Personas: `personController.js`, `personService.js`, `personRules.js` | Lista recibe consulta de tabla; alta/edición reciben DTO saneado y retornan persona. | Valida tipo y asesor interno, relaciones y unicidad antes de crear/actualizar `Person`; errores se centralizan. | **CRUD compartido**; actividad sólo si cambia la regla de asesor interno. |
 | Usuarios: `userController.js`, `userService.js`, `roleService.js` | Lista, alta, edición y cambio de contraseña toman parámetros/cuerpo y retornan usuario sin convertir el controlador en dueño de credenciales. | Resuelve persona, rol y contraseña; escribe `User` y propaga conflictos/no encontrados. | **CRUD** y **secuencia específica** para contraseña únicamente si se agregan pasos o efectos. |
-| Clientes: `sales/clientController.js`, `clientService.js` | Lista, alta y edición (`GET`, `POST`, `PUT`) adaptan DTO y retornan cliente. | Lee y escribe `Client` mediante `getDb(tx)` y traduce ausencia o fallos de persistencia a errores del dominio. | **CRUD compartido**; sin diagrama propio. |
+| Clientes: `sales/clientController.js`, `clientService.js` | Lista, alta y edición (`GET`, `POST`, `PUT`) adaptan DTO y retornan cliente. | Lee y escribe `Client` mediante `getDb(tx)` y traduce ausencia o fallos de persistencia a errores del dominio. | **CRUD compartido**; cada operación conserva su vista aplicada `DIA-BE-CU-*`, sin añadir una secuencia dinámica repetida. |
 | Proveedores: `supplierController.js`, `supplierService.js` | Lista, alta y edición adaptan filtros/DTO y retornan proveedor. | Persiste proveedor y relaciones; sus materiales se sincronizan mediante servicios propietarios de materiales. | **CRUD compartido**; componentes si cambia la colaboración entre dominios. |
 | Materiales: `materialController.js`, `materials/materialService.js`, `materialHelpers.js`, `materialRelations.js`, `supplierMaterialService.js`, `adjustmentService.js` | Lista, alta, edición, ajuste y eliminación reciben `id`/DTO y retornan material o confirmación. | Prepara identidad, sincroniza proveedor, protege referencias y usa ajuste/movimiento para cambiar existencias; las escrituras relacionadas comparten `tx`. | **CRUD** para mantenimiento; **secuencia + actividad** para ajuste o eliminación con dependencias. |
 | Mermas: `wasteController.js`, `wastes/wasteService.js`, `wasteMaterialService.js`, `wasteInventoryService.js`, `wasteMovementService.js`, `wasteStockAdjustmentService.js` | Lista, plantillas, alta, edición y ajuste reciben identificadores/DTO y retornan merma. | Coordina material origen, cantidades, inventario y movimientos; valida existencia y suficiencia antes de escrituras atómicas. | **Secuencia** para alta desde material y ajuste; **actividad** para decisiones de cantidad. |
@@ -152,88 +152,98 @@ La misma cobertura se representa visualmente, caso por caso, en los
 [diagramas backend aplicados al código](backend-use-case-diagrams.md). Sus perspectivas
 complementarias muestran componentes, secuencia del pipeline y estados técnicos de
 lectura/transacción; las vistas por caso conservan ruta, servicio y efecto concretos.
+La última columna enlaza la vista `DIA-BE-CU-*` que aplica a cada fila. Para leer cómo
+se especializa, la flecha del diagrama toma como origen la entrada HTTP y controller de
+la segunda columna y como destino el servicio, persistencia o efecto de la tercera; así
+una estructura compartida no oculta los participantes propios del caso.
 
-| Caso | Entrada HTTP y controller | Servicio, persistencia o efecto aplicado |
-| --- | --- | --- |
-| `CU-AUT-01` | `POST /api/auth/login` → `authController.login`. | `authService.loginUser`, `userService.getUserIdByLogin`, JWT y cookies. |
-| `CU-AUT-02` | `GET /cerrar-sesion` → `controllers/web/authController.logout`. | Elimina cookies de autenticación y redirige a login; no persiste dominio. |
-| `CU-IDA-01` | `GET /api/admin/persons` → `getAllPersons`. | `personService.findAllPersons` consulta `Person` y asignaciones. |
-| `CU-IDA-02` | `POST /api/admin/persons` → `registerPerson`. | `personService.createPerson` valida y crea persona/asignaciones. |
-| `CU-IDA-03` | `PUT /api/admin/persons/:id` → `editPerson`. | `personService.updatePerson` actualiza persona/asignaciones. |
-| `CU-IDA-04` | `GET /api/admin/users` → `getAllUsers`. | `userService.findAllUsers` consulta cuentas y accesos. |
-| `CU-IDA-05` | `POST /api/admin/users` → `registerUser`. | `userService.createUser` crea cuenta, contraseña cifrada y acceso. |
-| `CU-IDA-06` | `PATCH /api/admin/users/:id` → `editUser`. | `userService.updateUser` actualiza cuenta y asignación autorizada. |
-| `CU-IDA-07` | `PATCH /api/admin/users/:id/password` → `editUserPassword`. | `userService.updateUserPassword` cifra y sustituye la contraseña. |
-| `CU-IDA-08` | `GET /api/admin/roles` → `roleController.getAllRoles`. | `roleService.findAllRoles` lee `Role`; no existe mutación publicada. |
-| `CU-IDA-09` | `GET /api/admin/departments` → `departmentController.getAllDepartments`. | `departmentService.findAllDepartments` lee `Department`. |
-| `CU-CAT-01` | `GET /api/warehouse/materials` → `getAllMaterials`. | `materialService.findAllMaterials` consulta material, proveedor y existencia. |
-| `CU-CAT-02` | `POST /api/warehouse/materials` → `registerMaterial`. | `materialService.createMaterial` crea identidad y relación de proveedor. |
-| `CU-CAT-03` | `PATCH /api/warehouse/materials/:id` → `editMaterial`. | `materialService.updateMaterial` sincroniza datos y relación. |
-| `CU-CAT-04` | `DELETE /api/warehouse/materials/:id` → `removeMaterial`. | `materialService.deleteMaterial` protege referencias antes de eliminar relación. |
-| `CU-CAT-05` | `PATCH /api/warehouse/materials/:id/stock` → `editMaterialStock`. | `materialService.updateMaterialStock` usa `adjustmentService` y movimiento. |
-| `CU-CAT-06` | `GET /api/warehouse/suppliers` → `getAllSuppliers`. | `supplierService.findAllSuppliers` consulta proveedores. |
-| `CU-CAT-07` | `POST /api/warehouse/suppliers` → `registerSupplier`. | `supplierService.createSupplier` persiste el proveedor. |
-| `CU-CAT-08` | `PUT /api/warehouse/suppliers/:id` → `editSupplier`. | `supplierService.updateSupplier` actualiza datos del proveedor. |
-| `CU-CAT-09` | `PUT /api/warehouse/suppliers/:id` → `editSupplier`. | `supplierService.updateSupplier` aplica el estado incluido en el DTO; no hay endpoint separado. |
-| `CU-CAT-10` | `GET /api/sales/clients` → `getAllClients`. | `clientService.findAllClients` consulta `Client`. |
-| `CU-CAT-11` | `POST /api/sales/clients` → `registerClient`. | `clientService.createClient` persiste `Client`. |
-| `CU-CAT-12` | `PUT /api/sales/clients/:id` → `editClient`. | `clientService.updateClient` actualiza `Client`. |
-| `CU-CAT-13` | `GET /api/warehouse/wastes` → `getAllWastes`. | `wasteService.findAllWastes` consulta merma e inventario. |
-| `CU-CAT-14` | `GET /api/warehouse/wastes/material-templates` y `POST /api/warehouse/wastes` → `getWasteMaterialTemplates`/`registerWaste`. | `findWasteMaterialTemplates` alimenta la selección y `createWasteWithInitialStockAdjustment` crea merma, ajuste y movimiento inicial. |
-| `CU-CAT-15` | `PATCH /api/warehouse/wastes/:id` → `editWaste`. | `wasteService.updateWaste` actualiza datos sin tratar stock como edición. |
-| `CU-CAT-16` | `PATCH /api/warehouse/wastes/:id/stock` → `editWasteStock`. | `wasteService.updateWasteStock` y `registerWasteStockAdjustment` aplican ajuste/movimiento. |
-| `CU-CAT-17` | `GET /api/warehouse/presentations` → `getAllPresentations`. | `presentationService.findAllPresentations` sirve el catálogo de sólo lectura. |
-| `CU-CAT-18` | `GET /api/warehouse/unit-measures` → `getAllUnitMeasures`. | `unitMeasureService.findAllUnitMeasures` sirve el catálogo de sólo lectura. |
-| `CU-CAT-19` | `GET /api/warehouse/reasons` → `getAllReasons`. | `reasonService.findAllReasons` sirve motivos; helpers resuelven motivos internos. |
-| `CU-CAT-20` | `GET /api/warehouse/fulfillment-statuses` → `getAllFulfillmentStatuses`. | `fulfillmentStatusService.findAllFulfillmentStatuses` sirve estados de sólo lectura. |
-| `CU-ENT-01` | `GET /api/warehouse/goods-receipts` → `getAllGoodsReceipts`. | `goodsReceiptService.findAllGoodsReceipts` consulta entradas y totales. |
-| `CU-ENT-02` | `POST /api/warehouse/goods-receipts` → `registerGoodsReceipt`. | `goodsReceiptService.createGoodsReceipt` crea documento, detalles, existencias y movimiento en transacción. |
-| `CU-ENT-03` | `PATCH /api/warehouse/goods-receipts/:id` → `editGoodsReceiptHeader`. | `goodsReceiptService.updateGoodsReceipt` conserva detalles persistidos y actualiza encabezado permitido. |
-| `CU-ENT-04` | `PATCH /api/warehouse/goods-receipts/:id/details/:detailId/corrections` → `correctGoodsReceiptDetail`. | `correctGoodsReceiptDetailLine` registra diferencia, movimiento, stock e historial atómicamente. |
-| `CU-ENT-05` | `PATCH /api/warehouse/goods-receipts/:id/details/:detailId/cancel` → `cancelGoodsReceiptDetail`. | `cancelGoodsReceiptDetailLine` revierte stock/movimiento y conserva historial. |
-| `CU-SAL-01` | `GET /api/warehouse/goods-issues` → `getAllGoodsIssues`. | `goodsIssueService.findAllGoodsIssues` consulta documentos y estados. |
-| `CU-SAL-02` | `POST /api/warehouse/goods-issues` → `registerGoodsIssue`. | `goodsIssueService.createGoodsIssue` crea encabezado y detalles solicitados. |
-| `CU-SAL-03` | `PATCH /api/warehouse/goods-issues/:id/header` → `editGoodsIssueHeader`. | `goodsIssueService.updateGoodsIssueHeader` aplica reglas del encabezado. |
-| `CU-SAL-04` | `PATCH /api/warehouse/goods-issues/:id/details` → `editGoodsIssueDetails`. | `goodsIssueService.updateGoodsIssueDetails` modifica cantidades todavía editables. |
-| `CU-SAL-05` | `PATCH /api/warehouse/goods-issues/:id/details` → `editGoodsIssueDetails`. | `updateGoodsIssueDetails` llama `applyInventoryMovement(ISSUE)` y recalcula cumplimiento con `tx`. |
-| `CU-SAL-06` | `PATCH /api/warehouse/goods-issues/:id/details/:detailId/returns` → `registerGoodsIssueDetailReturn`. | `returnGoodsIssueDetail` crea `GoodsIssueReturn`, movimiento `ENTRY` y estados en transacción. |
-| `CU-SAL-07` | `GET /api/warehouse/waste-issues` → `getAllWasteIssues`. | `wasteIssueService.findAllWasteIssues` consulta salidas de merma. |
-| `CU-SAL-08` | `POST /api/warehouse/waste-issues` → `registerWasteIssue`. | `wasteIssueService.createWasteIssue` crea encabezado y detalles de merma. |
-| `CU-SAL-09` | `PATCH /api/warehouse/waste-issues/:id/header` → `editWasteIssueHeader`. | `wasteIssueService.updateWasteIssueHeader` aplica reglas del encabezado. |
-| `CU-SAL-10` | `PATCH /api/warehouse/waste-issues/:id/details` → `editWasteIssueDetails`. | `wasteIssueService.updateWasteIssueDetails` modifica cantidades editables. |
-| `CU-SAL-11` | `PATCH /api/warehouse/waste-issues/:id/details` → `editWasteIssueDetails`. | `updateWasteIssueDetails` llama `applyWasteIssueMovement` y recalcula cumplimiento con `tx`. |
-| `CU-SAL-12` | `PATCH /api/warehouse/waste-issues/:id/details/:detailId/returns` → `registerWasteIssueDetailReturn`. | `returnWasteIssueDetail` crea `WasteIssueReturn`, movimiento inverso y estados en transacción. |
-| `CU-REP-01` | `GET /api/warehouse/materials` → `getAllMaterials`. | Reutiliza `findAllMaterials` con filtros; sólo lectura. |
-| `CU-REP-02` | `GET /api/admin/movements/materials` → `getAllMaterialMovements`. | `movementQueryService.findAllMaterialMovements`; sólo lectura. |
-| `CU-REP-03` | `GET /api/warehouse/reports/inventory/excel` → `exportWarehouseReportExcel`. | `reportService.findWarehouseReportRows` y `sendExcelReport`. |
-| `CU-REP-04` | `GET /api/warehouse/reports/goods-issues/excel` → `exportGoodsIssueReportExcel`. | `reportService.findGoodsIssueReportRows` y `sendExcelReport`. |
-| `CU-REP-05` | `GET /api/admin/reports/movements/materials/excel` → `exportMovementReport`. | `inventory/reportService.findMovementReportRows` y respuesta Excel. |
-| `CU-REP-06` | `GET /api/warehouse/wastes` → `getAllWastes`. | Reutiliza `wasteService.findAllWastes` con filtros; sólo lectura. |
-| `CU-REP-07` | `GET /api/admin/movements/wastes` → `getAllWasteMovements`. | `movementQueryService.findAllWasteMovements`; sólo lectura. |
-| `CU-REP-08` | `GET /api/warehouse/reports/waste-issues/excel` → `exportWasteIssueReportExcel`. | `reportService.findWasteIssueReportRows` y `sendExcelReport`. |
-| `CU-REP-09` | `GET /api/warehouse/reports/wastes/excel` → `exportWasteReportExcel`. | `reportService.findWasteReportRows` y `sendExcelReport`. |
-| `CU-REP-10` | `GET /api/admin/reports/movements/wastes/excel` → `exportWasteMovementReport`. | `inventory/reportService.findMovementReportRows` en contexto merma y respuesta Excel. |
-| `CU-REP-11` | `GET /api/warehouse/reports/goods-receipts/excel` → `exportGoodsReceiptReportExcel`. | `reportService.findGoodsReceiptReportRows` y `sendExcelReport`. |
-| `CU-REP-12` | `GET /api/warehouse/reports/suppliers/excel` → `exportSupplierReportExcel`. | `reportService.findSupplierReportRows` y `sendExcelReport`. |
-| `CU-REP-13` | `GET /api/sales/reports/clients/excel` → `exportClientReport`. | `clientService.findAllClients` prepara filas y el controller llama `sendExcelReport`. |
-| `CU-REP-14` | `GET /api/admin/reports/persons/excel` → `exportPersonReport`. | `personService.findAllPersons` prepara filas y el controller llama `sendExcelReport`. |
-| `CU-REP-15` | `GET /api/admin/reports/users/excel` → `exportUserReport`. | `userService.findAllUsers` prepara filas y el controller llama `sendExcelReport`. |
+| Caso | Entrada HTTP y controller | Servicio, persistencia o efecto aplicado | Diagrama aplicado |
+| --- | --- | --- | --- |
+| `CU-AUT-01` | `POST /api/auth/login` → `authController.login`. | `authService.loginUser`, `userService.getUserIdByLogin`, JWT y cookies. | [`DIA-BE-CU-AUT-01`](backend-use-case-diagrams.md#cu-aut-01) |
+| `CU-AUT-02` | `GET /cerrar-sesion` → `controllers/web/authController.logout`. | Elimina cookies de autenticación y redirige a login; no persiste dominio. | [`DIA-BE-CU-AUT-02`](backend-use-case-diagrams.md#cu-aut-02) |
+| `CU-IDA-01` | `GET /api/admin/persons` → `getAllPersons`. | `personService.findAllPersons` consulta `Person` y asignaciones. | [`DIA-BE-CU-IDA-01`](backend-use-case-diagrams.md#cu-ida-01) |
+| `CU-IDA-02` | `POST /api/admin/persons` → `registerPerson`. | `personService.createPerson` valida y crea persona/asignaciones. | [`DIA-BE-CU-IDA-02`](backend-use-case-diagrams.md#cu-ida-02) |
+| `CU-IDA-03` | `PUT /api/admin/persons/:id` → `editPerson`. | `personService.updatePerson` actualiza persona/asignaciones. | [`DIA-BE-CU-IDA-03`](backend-use-case-diagrams.md#cu-ida-03) |
+| `CU-IDA-04` | `GET /api/admin/users` → `getAllUsers`. | `userService.findAllUsers` consulta cuentas y accesos. | [`DIA-BE-CU-IDA-04`](backend-use-case-diagrams.md#cu-ida-04) |
+| `CU-IDA-05` | `POST /api/admin/users` → `registerUser`. | `userService.createUser` crea cuenta, contraseña cifrada y acceso. | [`DIA-BE-CU-IDA-05`](backend-use-case-diagrams.md#cu-ida-05) |
+| `CU-IDA-06` | `PATCH /api/admin/users/:id` → `editUser`. | `userService.updateUser` actualiza cuenta y asignación autorizada. | [`DIA-BE-CU-IDA-06`](backend-use-case-diagrams.md#cu-ida-06) |
+| `CU-IDA-07` | `PATCH /api/admin/users/:id/password` → `editUserPassword`. | `userService.updateUserPassword` cifra y sustituye la contraseña. | [`DIA-BE-CU-IDA-07`](backend-use-case-diagrams.md#cu-ida-07) |
+| `CU-IDA-08` | `GET /api/admin/roles` → `roleController.getAllRoles`. | `roleService.findAllRoles` lee `Role`; no existe mutación publicada. | [`DIA-BE-CU-IDA-08`](backend-use-case-diagrams.md#cu-ida-08) |
+| `CU-IDA-09` | `GET /api/admin/departments` → `departmentController.getAllDepartments`. | `departmentService.findAllDepartments` lee `Department`. | [`DIA-BE-CU-IDA-09`](backend-use-case-diagrams.md#cu-ida-09) |
+| `CU-CAT-01` | `GET /api/warehouse/materials` → `getAllMaterials`. | `materialService.findAllMaterials` consulta material, proveedor y existencia. | [`DIA-BE-CU-CAT-01`](backend-use-case-diagrams.md#cu-cat-01) |
+| `CU-CAT-02` | `POST /api/warehouse/materials` → `registerMaterial`. | `materialService.createMaterial` crea identidad y relación de proveedor. | [`DIA-BE-CU-CAT-02`](backend-use-case-diagrams.md#cu-cat-02) |
+| `CU-CAT-03` | `PATCH /api/warehouse/materials/:id` → `editMaterial`. | `materialService.updateMaterial` sincroniza datos y relación. | [`DIA-BE-CU-CAT-03`](backend-use-case-diagrams.md#cu-cat-03) |
+| `CU-CAT-04` | `DELETE /api/warehouse/materials/:id` → `removeMaterial`. | `materialService.deleteMaterial` protege referencias antes de eliminar relación. | [`DIA-BE-CU-CAT-04`](backend-use-case-diagrams.md#cu-cat-04) |
+| `CU-CAT-05` | `PATCH /api/warehouse/materials/:id/stock` → `editMaterialStock`. | `materialService.updateMaterialStock` usa `adjustmentService` y movimiento. | [`DIA-BE-CU-CAT-05`](backend-use-case-diagrams.md#cu-cat-05) |
+| `CU-CAT-06` | `GET /api/warehouse/suppliers` → `getAllSuppliers`. | `supplierService.findAllSuppliers` consulta proveedores. | [`DIA-BE-CU-CAT-06`](backend-use-case-diagrams.md#cu-cat-06) |
+| `CU-CAT-07` | `POST /api/warehouse/suppliers` → `registerSupplier`. | `supplierService.createSupplier` persiste el proveedor. | [`DIA-BE-CU-CAT-07`](backend-use-case-diagrams.md#cu-cat-07) |
+| `CU-CAT-08` | `PUT /api/warehouse/suppliers/:id` → `editSupplier`. | `supplierService.updateSupplier` actualiza datos del proveedor. | [`DIA-BE-CU-CAT-08`](backend-use-case-diagrams.md#cu-cat-08) |
+| `CU-CAT-09` | `PUT /api/warehouse/suppliers/:id` → `editSupplier`. | `supplierService.updateSupplier` aplica el estado incluido en el DTO; no hay endpoint separado. | [`DIA-BE-CU-CAT-09`](backend-use-case-diagrams.md#cu-cat-09) |
+| `CU-CAT-10` | `GET /api/sales/clients` → `getAllClients`. | `clientService.findAllClients` consulta `Client`. | [`DIA-BE-CU-CAT-10`](backend-use-case-diagrams.md#cu-cat-10) |
+| `CU-CAT-11` | `POST /api/sales/clients` → `registerClient`. | `clientService.createClient` persiste `Client`. | [`DIA-BE-CU-CAT-11`](backend-use-case-diagrams.md#cu-cat-11) |
+| `CU-CAT-12` | `PUT /api/sales/clients/:id` → `editClient`. | `clientService.updateClient` actualiza `Client`. | [`DIA-BE-CU-CAT-12`](backend-use-case-diagrams.md#cu-cat-12) |
+| `CU-CAT-13` | `GET /api/warehouse/wastes` → `getAllWastes`. | `wasteService.findAllWastes` consulta merma e inventario. | [`DIA-BE-CU-CAT-13`](backend-use-case-diagrams.md#cu-cat-13) |
+| `CU-CAT-14` | `GET /api/warehouse/wastes/material-templates` y `POST /api/warehouse/wastes` → `getWasteMaterialTemplates`/`registerWaste`. | `findWasteMaterialTemplates` alimenta la selección y `createWasteWithInitialStockAdjustment` crea merma, ajuste y movimiento inicial. | [`DIA-BE-CU-CAT-14`](backend-use-case-diagrams.md#cu-cat-14) |
+| `CU-CAT-15` | `PATCH /api/warehouse/wastes/:id` → `editWaste`. | `wasteService.updateWaste` actualiza datos sin tratar stock como edición. | [`DIA-BE-CU-CAT-15`](backend-use-case-diagrams.md#cu-cat-15) |
+| `CU-CAT-16` | `PATCH /api/warehouse/wastes/:id/stock` → `editWasteStock`. | `wasteService.updateWasteStock` y `registerWasteStockAdjustment` aplican ajuste/movimiento. | [`DIA-BE-CU-CAT-16`](backend-use-case-diagrams.md#cu-cat-16) |
+| `CU-CAT-17` | `GET /api/warehouse/presentations` → `getAllPresentations`. | `presentationService.findAllPresentations` sirve el catálogo de sólo lectura. | [`DIA-BE-CU-CAT-17`](backend-use-case-diagrams.md#cu-cat-17) |
+| `CU-CAT-18` | `GET /api/warehouse/unit-measures` → `getAllUnitMeasures`. | `unitMeasureService.findAllUnitMeasures` sirve el catálogo de sólo lectura. | [`DIA-BE-CU-CAT-18`](backend-use-case-diagrams.md#cu-cat-18) |
+| `CU-CAT-19` | `GET /api/warehouse/reasons` → `getAllReasons`. | `reasonService.findAllReasons` sirve motivos; helpers resuelven motivos internos. | [`DIA-BE-CU-CAT-19`](backend-use-case-diagrams.md#cu-cat-19) |
+| `CU-CAT-20` | `GET /api/warehouse/fulfillment-statuses` → `getAllFulfillmentStatuses`. | `fulfillmentStatusService.findAllFulfillmentStatuses` sirve estados de sólo lectura. | [`DIA-BE-CU-CAT-20`](backend-use-case-diagrams.md#cu-cat-20) |
+| `CU-ENT-01` | `GET /api/warehouse/goods-receipts` → `getAllGoodsReceipts`. | `goodsReceiptService.findAllGoodsReceipts` consulta entradas y totales. | [`DIA-BE-CU-ENT-01`](backend-use-case-diagrams.md#cu-ent-01) |
+| `CU-ENT-02` | `POST /api/warehouse/goods-receipts` → `registerGoodsReceipt`. | `goodsReceiptService.createGoodsReceipt` crea documento, detalles, existencias y movimiento en transacción. | [`DIA-BE-CU-ENT-02`](backend-use-case-diagrams.md#cu-ent-02) |
+| `CU-ENT-03` | `PATCH /api/warehouse/goods-receipts/:id` → `editGoodsReceiptHeader`. | `goodsReceiptService.updateGoodsReceipt` conserva detalles persistidos y actualiza encabezado permitido. | [`DIA-BE-CU-ENT-03`](backend-use-case-diagrams.md#cu-ent-03) |
+| `CU-ENT-04` | `PATCH /api/warehouse/goods-receipts/:id/details/:detailId/corrections` → `correctGoodsReceiptDetail`. | `correctGoodsReceiptDetailLine` registra diferencia, movimiento, stock e historial atómicamente. | [`DIA-BE-CU-ENT-04`](backend-use-case-diagrams.md#cu-ent-04) |
+| `CU-ENT-05` | `PATCH /api/warehouse/goods-receipts/:id/details/:detailId/cancel` → `cancelGoodsReceiptDetail`. | `cancelGoodsReceiptDetailLine` revierte stock/movimiento y conserva historial. | [`DIA-BE-CU-ENT-05`](backend-use-case-diagrams.md#cu-ent-05) |
+| `CU-SAL-01` | `GET /api/warehouse/goods-issues` → `getAllGoodsIssues`. | `goodsIssueService.findAllGoodsIssues` consulta documentos y estados. | [`DIA-BE-CU-SAL-01`](backend-use-case-diagrams.md#cu-sal-01) |
+| `CU-SAL-02` | `POST /api/warehouse/goods-issues` → `registerGoodsIssue`. | `goodsIssueService.createGoodsIssue` crea encabezado y detalles solicitados. | [`DIA-BE-CU-SAL-02`](backend-use-case-diagrams.md#cu-sal-02) |
+| `CU-SAL-03` | `PATCH /api/warehouse/goods-issues/:id/header` → `editGoodsIssueHeader`. | `goodsIssueService.updateGoodsIssueHeader` aplica reglas del encabezado. | [`DIA-BE-CU-SAL-03`](backend-use-case-diagrams.md#cu-sal-03) |
+| `CU-SAL-04` | `PATCH /api/warehouse/goods-issues/:id/details` → `editGoodsIssueDetails`. | `goodsIssueService.updateGoodsIssueDetails` modifica cantidades todavía editables. | [`DIA-BE-CU-SAL-04`](backend-use-case-diagrams.md#cu-sal-04) |
+| `CU-SAL-05` | `PATCH /api/warehouse/goods-issues/:id/details` → `editGoodsIssueDetails`. | `updateGoodsIssueDetails` llama `applyInventoryMovement(ISSUE)` y recalcula cumplimiento con `tx`. | [`DIA-BE-CU-SAL-05`](backend-use-case-diagrams.md#cu-sal-05) |
+| `CU-SAL-06` | `PATCH /api/warehouse/goods-issues/:id/details/:detailId/returns` → `registerGoodsIssueDetailReturn`. | `returnGoodsIssueDetail` crea `GoodsIssueReturn`, movimiento `ENTRY` y estados en transacción. | [`DIA-BE-CU-SAL-06`](backend-use-case-diagrams.md#cu-sal-06) |
+| `CU-SAL-07` | `GET /api/warehouse/waste-issues` → `getAllWasteIssues`. | `wasteIssueService.findAllWasteIssues` consulta salidas de merma. | [`DIA-BE-CU-SAL-07`](backend-use-case-diagrams.md#cu-sal-07) |
+| `CU-SAL-08` | `POST /api/warehouse/waste-issues` → `registerWasteIssue`. | `wasteIssueService.createWasteIssue` crea encabezado y detalles de merma. | [`DIA-BE-CU-SAL-08`](backend-use-case-diagrams.md#cu-sal-08) |
+| `CU-SAL-09` | `PATCH /api/warehouse/waste-issues/:id/header` → `editWasteIssueHeader`. | `wasteIssueService.updateWasteIssueHeader` aplica reglas del encabezado. | [`DIA-BE-CU-SAL-09`](backend-use-case-diagrams.md#cu-sal-09) |
+| `CU-SAL-10` | `PATCH /api/warehouse/waste-issues/:id/details` → `editWasteIssueDetails`. | `wasteIssueService.updateWasteIssueDetails` modifica cantidades editables. | [`DIA-BE-CU-SAL-10`](backend-use-case-diagrams.md#cu-sal-10) |
+| `CU-SAL-11` | `PATCH /api/warehouse/waste-issues/:id/details` → `editWasteIssueDetails`. | `updateWasteIssueDetails` llama `applyWasteIssueMovement` y recalcula cumplimiento con `tx`. | [`DIA-BE-CU-SAL-11`](backend-use-case-diagrams.md#cu-sal-11) |
+| `CU-SAL-12` | `PATCH /api/warehouse/waste-issues/:id/details/:detailId/returns` → `registerWasteIssueDetailReturn`. | `returnWasteIssueDetail` crea `WasteIssueReturn`, movimiento inverso y estados en transacción. | [`DIA-BE-CU-SAL-12`](backend-use-case-diagrams.md#cu-sal-12) |
+| `CU-REP-01` | `GET /api/warehouse/materials` → `getAllMaterials`. | Reutiliza `findAllMaterials` con filtros; sólo lectura. | [`DIA-BE-CU-REP-01`](backend-use-case-diagrams.md#cu-rep-01) |
+| `CU-REP-02` | `GET /api/admin/movements/materials` → `getAllMaterialMovements`. | `movementQueryService.findAllMaterialMovements`; sólo lectura. | [`DIA-BE-CU-REP-02`](backend-use-case-diagrams.md#cu-rep-02) |
+| `CU-REP-03` | `GET /api/warehouse/reports/inventory/excel` → `exportWarehouseReportExcel`. | `reportService.findWarehouseReportRows` y `sendExcelReport`. | [`DIA-BE-CU-REP-03`](backend-use-case-diagrams.md#cu-rep-03) |
+| `CU-REP-04` | `GET /api/warehouse/reports/goods-issues/excel` → `exportGoodsIssueReportExcel`. | `reportService.findGoodsIssueReportRows` y `sendExcelReport`. | [`DIA-BE-CU-REP-04`](backend-use-case-diagrams.md#cu-rep-04) |
+| `CU-REP-05` | `GET /api/admin/reports/movements/materials/excel` → `exportMovementReport`. | `inventory/reportService.findMovementReportRows` y respuesta Excel. | [`DIA-BE-CU-REP-05`](backend-use-case-diagrams.md#cu-rep-05) |
+| `CU-REP-06` | `GET /api/warehouse/wastes` → `getAllWastes`. | Reutiliza `wasteService.findAllWastes` con filtros; sólo lectura. | [`DIA-BE-CU-REP-06`](backend-use-case-diagrams.md#cu-rep-06) |
+| `CU-REP-07` | `GET /api/admin/movements/wastes` → `getAllWasteMovements`. | `movementQueryService.findAllWasteMovements`; sólo lectura. | [`DIA-BE-CU-REP-07`](backend-use-case-diagrams.md#cu-rep-07) |
+| `CU-REP-08` | `GET /api/warehouse/reports/waste-issues/excel` → `exportWasteIssueReportExcel`. | `reportService.findWasteIssueReportRows` y `sendExcelReport`. | [`DIA-BE-CU-REP-08`](backend-use-case-diagrams.md#cu-rep-08) |
+| `CU-REP-09` | `GET /api/warehouse/reports/wastes/excel` → `exportWasteReportExcel`. | `reportService.findWasteReportRows` y `sendExcelReport`. | [`DIA-BE-CU-REP-09`](backend-use-case-diagrams.md#cu-rep-09) |
+| `CU-REP-10` | `GET /api/admin/reports/movements/wastes/excel` → `exportWasteMovementReport`. | `inventory/reportService.findMovementReportRows` en contexto merma y respuesta Excel. | [`DIA-BE-CU-REP-10`](backend-use-case-diagrams.md#cu-rep-10) |
+| `CU-REP-11` | `GET /api/warehouse/reports/goods-receipts/excel` → `exportGoodsReceiptReportExcel`. | `reportService.findGoodsReceiptReportRows` y `sendExcelReport`. | [`DIA-BE-CU-REP-11`](backend-use-case-diagrams.md#cu-rep-11) |
+| `CU-REP-12` | `GET /api/warehouse/reports/suppliers/excel` → `exportSupplierReportExcel`. | `reportService.findSupplierReportRows` y `sendExcelReport`. | [`DIA-BE-CU-REP-12`](backend-use-case-diagrams.md#cu-rep-12) |
+| `CU-REP-13` | `GET /api/sales/reports/clients/excel` → `exportClientReport`. | `clientService.findAllClients` prepara filas y el controller llama `sendExcelReport`. | [`DIA-BE-CU-REP-13`](backend-use-case-diagrams.md#cu-rep-13) |
+| `CU-REP-14` | `GET /api/admin/reports/persons/excel` → `exportPersonReport`. | `personService.findAllPersons` prepara filas y el controller llama `sendExcelReport`. | [`DIA-BE-CU-REP-14`](backend-use-case-diagrams.md#cu-rep-14) |
+| `CU-REP-15` | `GET /api/admin/reports/users/excel` → `exportUserReport`. | `userService.findAllUsers` prepara filas y el controller llama `sendExcelReport`. | [`DIA-BE-CU-REP-15`](backend-use-case-diagrams.md#cu-rep-15) |
 
 ## Matriz de diagramas por caso backend
 
 | Caso de implementación | Vista que aplica | Actualización obligatoria | Vista que no debe duplicarse |
 | --- | --- | --- | --- |
 | Adaptación HTTP que delega una sola operación | Recorrido HTTP común. | Ruta, controlador, servicio y contrato API. | Secuencia idéntica por endpoint. |
-| CRUD homogéneo | Ficha tabular y referencia a la fábrica; diagrama sólo si un caso tiene coordinación propia. | Ficha de capacidad y mapa generado. | Diagrama general que sustituya los casos. |
+| CRUD homogéneo | Vista aplicada `DIA-BE-CU-*` para el recorrido concreto; secuencia dinámica sólo si existe coordinación propia. | Ficha de capacidad, mapa generado y vista por caso. | Diagrama general que sustituya los casos. |
 | Controlador coordina varios servicios o efecto post-commit | Secuencia. | Participantes, orden, respuesta y efecto externo. | Diagrama entidad-relación. |
 | Servicio contiene decisiones relevantes | Actividad. | Condiciones, errores y salida de cada rama. | Secuencia que oculte las decisiones. |
 | Escritura en varios modelos con `tx` | Secuencia con límite transaccional; actividad complementaria si hay ramas. | Inicio/commit/rollback y efectos fuera de la transacción. | Afirmar atomicidad desde imports. |
 | Cambio de estados persistentes | Máquina de estados normativa en requisitos y secuencia técnica que la referencia. | Transiciones, reglas y trazabilidad. | Segunda máquina de estados “técnica”. |
 | Modelos y relaciones Prisma | Entidad-relación generada. | `prisma/schema.prisma` y `npm run docs:architecture`. | ER manual dentro de la ficha. |
 | Dependencias entre capas o dominios | Componentes/dependencias del código. | `code-diagrams.md` y mapa generado. | Grafo por cada función. |
-| Consulta, catálogo o reporte de sólo lectura | Flujo de datos o ninguna vista propia. | Entradas, filtros, retorno y evidencia. | Transacción o secuencia trivial. |
+| Consulta, catálogo o reporte de sólo lectura | Vista aplicada `DIA-BE-CU-*`; flujo de datos adicional sólo cuando aporta decisiones. | Entradas, filtros, retorno y evidencia. | Transacción o secuencia trivial. |
 
 ## Vistas técnicas aplicadas
+
+La cobertura completa no se limita a las perspectivas seleccionadas a continuación: la
+columna **Diagrama aplicado** de la matriz anterior enlaza los 63 recorridos
+`DIA-BE-CU-*`. Esta sección profundiza sólo en los flujos que necesitan mostrar orden,
+decisiones o transacciones; los demás conservan su recorrido individual entre ruta,
+controller, servicio y efecto aunque reutilicen el pipeline común.
 
 ### Registro de rutas
 
