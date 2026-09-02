@@ -39,6 +39,40 @@ colaboradores realmente usados.
 Así una extracción o parametrización futura puede revisarse en la vista canónica,
 mientras cada caso sigue demostrando su ruta, servicio y efecto propios.
 
+### Índice rápido de patrones por caso
+
+Cada caso conserva una línea **Patrones** con códigos de este índice. La tabla concentra
+la explicación y evita repetirla 63 veces; la línea local permite identificar de
+inmediato qué soluciones aplica el caso. Los patrones se apoyan en el
+[catálogo canónico](design-and-construction-patterns.md#resumen-de-patrones-confirmados).
+
+| Código | Patrón aplicado | Elementos que permiten reconocerlo |
+| --- | --- | --- |
+| `BE-P01` | Capas, pipeline y DTO funcional | Ruta/middleware → controller/DTO → servicio → Prisma; el DTO sólo aparece cuando hay entrada. |
+| `BE-P02` | Factory de catálogo | `createDataTableListController` parametriza consulta, columnas y orden. |
+| `BE-P03` | Transaction Script y `tx` explícito | El servicio propietario abre `$transaction` y propaga `tx` a las escrituras relacionadas. |
+| `BE-P04` | Composición de servicios | El servicio del caso coordina reglas, referencias, inventario o cumplimiento reutilizados. |
+| `BE-P05` | Publicación posterior al commit | El controller llama `emitInventoryUpdated` después del resultado del servicio. |
+| `BE-P06` | Query Service | Controller de listado + consulta contextual de sólo lectura. |
+| `BE-P07` | Composición de reporte | Consulta de dominio + `sendExcelReport`, sin modificar inventario. |
+| `BE-P08` | Sesión web | Autenticación, JWT/cookies, cierre o redirección en la frontera web. |
+
+### Cobertura de casos backend
+
+La comparación con el catálogo de casos y la matriz técnica confirma que no faltan
+vistas backend. Cada identificador del rango aparece una vez y contiene un bloque
+Mermaid; la agrupación permite localizar rápidamente el tramo correspondiente.
+
+| Grupo | Rango cubierto | Diagramas | Estado |
+| --- | --- | ---: | --- |
+| Autenticación | `CU-AUT-01..02` | 2 | Completo |
+| Identidad y acceso | `CU-IDA-01..09` | 9 | Completo |
+| Catálogos | `CU-CAT-01..20` | 20 | Completo |
+| Entradas | `CU-ENT-01..05` | 5 | Completo |
+| Salidas | `CU-SAL-01..12` | 12 | Completo |
+| Consultas y reportes | `CU-REP-01..15` | 15 | Completo |
+| **Total** | `CU-AUT-01..CU-REP-15` | **63** | **63 de 63** |
+
 ## Perspectivas complementarias del backend
 
 La vista por caso responde **qué código lo aplica**. Las siguientes perspectivas
@@ -150,6 +184,8 @@ stateDiagram-v2
 
 **Identificador:** `DIA-BE-CU-AUT-01`. **Fuente:** fila `CU-AUT-01` de la matriz de aplicación al código backend. **Reutilización:** `DIA-BE-REU-001` · `middleware/cookies de autenticación`.
 
+**Patrones:** `BE-P01`, `BE-P08`.
+
 ```mermaid
 flowchart LR
     reuse["DIA-BE-REU-001<br/>middleware/cookies de autenticación"] -.-> source
@@ -159,6 +195,8 @@ flowchart LR
 ## `CU-AUT-02`
 
 **Identificador:** `DIA-BE-CU-AUT-02`. **Fuente:** fila `CU-AUT-02` de la matriz de aplicación al código backend. **Reutilización:** `DIA-BE-REU-001` · `middleware/cookies de autenticación`.
+
+**Patrones:** `BE-P08`.
 
 ```mermaid
 flowchart LR
@@ -170,6 +208,8 @@ flowchart LR
 
 **Identificador:** `DIA-BE-CU-IDA-01`. **Fuente:** fila `CU-IDA-01` de la matriz de aplicación al código backend. **Reutilización:** `DIA-BE-REU-001` · `pipeline de middleware, controller y getDb`.
 
+**Patrones:** `BE-P01`.
+
 ```mermaid
 flowchart LR
     reuse["DIA-BE-REU-001<br/>pipeline de middleware, controller y getDb"] -.-> source
@@ -179,6 +219,8 @@ flowchart LR
 ## `CU-IDA-02`
 
 **Identificador:** `DIA-BE-CU-IDA-02`. **Fuente:** fila `CU-IDA-02` de la matriz de aplicación al código backend. **Reutilización:** `DIA-BE-REU-001` · `pipeline de middleware, controller y getDb`.
+
+**Patrones:** `BE-P01`, `BE-P03`, `BE-P04`.
 
 ```mermaid
 flowchart LR
@@ -190,6 +232,8 @@ flowchart LR
 
 **Identificador:** `DIA-BE-CU-IDA-03`. **Fuente:** fila `CU-IDA-03` de la matriz de aplicación al código backend. **Reutilización:** `DIA-BE-REU-001` · `pipeline de middleware, controller y getDb`.
 
+**Patrones:** `BE-P01`, `BE-P03`, `BE-P04`.
+
 ```mermaid
 flowchart LR
     reuse["DIA-BE-REU-001<br/>pipeline de middleware, controller y getDb"] -.-> source
@@ -199,6 +243,8 @@ flowchart LR
 ## `CU-IDA-04`
 
 **Identificador:** `DIA-BE-CU-IDA-04`. **Fuente:** fila `CU-IDA-04` de la matriz de aplicación al código backend. **Reutilización:** `DIA-BE-REU-001` · `pipeline de middleware, controller y getDb`.
+
+**Patrones:** `BE-P01`.
 
 ```mermaid
 flowchart LR
@@ -210,6 +256,8 @@ flowchart LR
 
 **Identificador:** `DIA-BE-CU-IDA-05`. **Fuente:** fila `CU-IDA-05` de la matriz de aplicación al código backend. **Reutilización:** `DIA-BE-REU-001` · `pipeline de middleware, controller y getDb`.
 
+**Patrones:** `BE-P01`, `BE-P03`, `BE-P04`.
+
 ```mermaid
 flowchart LR
     reuse["DIA-BE-REU-001<br/>pipeline de middleware, controller y getDb"] -.-> source
@@ -219,6 +267,8 @@ flowchart LR
 ## `CU-IDA-06`
 
 **Identificador:** `DIA-BE-CU-IDA-06`. **Fuente:** fila `CU-IDA-06` de la matriz de aplicación al código backend. **Reutilización:** `DIA-BE-REU-001` · `pipeline de middleware, controller y getDb`.
+
+**Patrones:** `BE-P01`, `BE-P03`, `BE-P04`.
 
 ```mermaid
 flowchart LR
@@ -230,6 +280,8 @@ flowchart LR
 
 **Identificador:** `DIA-BE-CU-IDA-07`. **Fuente:** fila `CU-IDA-07` de la matriz de aplicación al código backend. **Reutilización:** `DIA-BE-REU-001` · `pipeline de middleware, controller y getDb`.
 
+**Patrones:** `BE-P01`.
+
 ```mermaid
 flowchart LR
     reuse["DIA-BE-REU-001<br/>pipeline de middleware, controller y getDb"] -.-> source
@@ -239,6 +291,8 @@ flowchart LR
 ## `CU-IDA-08`
 
 **Identificador:** `DIA-BE-CU-IDA-08`. **Fuente:** fila `CU-IDA-08` de la matriz de aplicación al código backend. **Reutilización:** `DIA-BE-REU-001` · `createDataTableListController y servicios de catálogo`.
+
+**Patrones:** `BE-P02`.
 
 ```mermaid
 flowchart LR
@@ -250,6 +304,8 @@ flowchart LR
 
 **Identificador:** `DIA-BE-CU-IDA-09`. **Fuente:** fila `CU-IDA-09` de la matriz de aplicación al código backend. **Reutilización:** `DIA-BE-REU-001` · `createDataTableListController y servicios de catálogo`.
 
+**Patrones:** `BE-P02`.
+
 ```mermaid
 flowchart LR
     reuse["DIA-BE-REU-001<br/>createDataTableListController y servicios de catálogo"] -.-> source
@@ -259,6 +315,8 @@ flowchart LR
 ## `CU-CAT-01`
 
 **Identificador:** `DIA-BE-CU-CAT-01`. **Fuente:** fila `CU-CAT-01` de la matriz de aplicación al código backend. **Reutilización:** `DIA-BE-REU-001` · `pipeline de middleware, controller y getDb`.
+
+**Patrones:** `BE-P01`.
 
 ```mermaid
 flowchart LR
@@ -270,6 +328,8 @@ flowchart LR
 
 **Identificador:** `DIA-BE-CU-CAT-02`. **Fuente:** fila `CU-CAT-02` de la matriz de aplicación al código backend. **Reutilización:** `DIA-BE-REU-001` · `pipeline de middleware, controller y getDb`.
 
+**Patrones:** `BE-P01`, `BE-P03`, `BE-P04`.
+
 ```mermaid
 flowchart LR
     reuse["DIA-BE-REU-001<br/>pipeline de middleware, controller y getDb"] -.-> source
@@ -279,6 +339,8 @@ flowchart LR
 ## `CU-CAT-03`
 
 **Identificador:** `DIA-BE-CU-CAT-03`. **Fuente:** fila `CU-CAT-03` de la matriz de aplicación al código backend. **Reutilización:** `DIA-BE-REU-001` · `pipeline de middleware, controller y getDb`.
+
+**Patrones:** `BE-P01`, `BE-P03`, `BE-P04`.
 
 ```mermaid
 flowchart LR
@@ -290,6 +352,8 @@ flowchart LR
 
 **Identificador:** `DIA-BE-CU-CAT-04`. **Fuente:** fila `CU-CAT-04` de la matriz de aplicación al código backend. **Reutilización:** `DIA-BE-REU-001` · `pipeline de middleware, controller y getDb`.
 
+**Patrones:** `BE-P01`, `BE-P03`, `BE-P04`.
+
 ```mermaid
 flowchart LR
     reuse["DIA-BE-REU-001<br/>pipeline de middleware, controller y getDb"] -.-> source
@@ -299,6 +363,8 @@ flowchart LR
 ## `CU-CAT-05`
 
 **Identificador:** `DIA-BE-CU-CAT-05`. **Fuente:** fila `CU-CAT-05` de la matriz de aplicación al código backend. **Reutilización:** `DIA-BE-REU-001` · `pipeline de middleware, controller y getDb`.
+
+**Patrones:** `BE-P01`, `BE-P03`, `BE-P04`, `BE-P05`.
 
 ```mermaid
 flowchart LR
@@ -310,6 +376,8 @@ flowchart LR
 
 **Identificador:** `DIA-BE-CU-CAT-06`. **Fuente:** fila `CU-CAT-06` de la matriz de aplicación al código backend. **Reutilización:** `DIA-BE-REU-001` · `pipeline de middleware, controller y getDb`.
 
+**Patrones:** `BE-P01`.
+
 ```mermaid
 flowchart LR
     reuse["DIA-BE-REU-001<br/>pipeline de middleware, controller y getDb"] -.-> source
@@ -319,6 +387,8 @@ flowchart LR
 ## `CU-CAT-07`
 
 **Identificador:** `DIA-BE-CU-CAT-07`. **Fuente:** fila `CU-CAT-07` de la matriz de aplicación al código backend. **Reutilización:** `DIA-BE-REU-001` · `pipeline de middleware, controller y getDb`.
+
+**Patrones:** `BE-P01`.
 
 ```mermaid
 flowchart LR
@@ -330,6 +400,8 @@ flowchart LR
 
 **Identificador:** `DIA-BE-CU-CAT-08`. **Fuente:** fila `CU-CAT-08` de la matriz de aplicación al código backend. **Reutilización:** `DIA-BE-REU-001` · `pipeline de middleware, controller y getDb`.
 
+**Patrones:** `BE-P01`.
+
 ```mermaid
 flowchart LR
     reuse["DIA-BE-REU-001<br/>pipeline de middleware, controller y getDb"] -.-> source
@@ -339,6 +411,8 @@ flowchart LR
 ## `CU-CAT-09`
 
 **Identificador:** `DIA-BE-CU-CAT-09`. **Fuente:** fila `CU-CAT-09` de la matriz de aplicación al código backend. **Reutilización:** `DIA-BE-REU-001` · `pipeline de middleware, controller y getDb`.
+
+**Patrones:** `BE-P01`.
 
 ```mermaid
 flowchart LR
@@ -350,6 +424,8 @@ flowchart LR
 
 **Identificador:** `DIA-BE-CU-CAT-10`. **Fuente:** fila `CU-CAT-10` de la matriz de aplicación al código backend. **Reutilización:** `DIA-BE-REU-001` · `pipeline de middleware, controller y getDb`.
 
+**Patrones:** `BE-P01`.
+
 ```mermaid
 flowchart LR
     reuse["DIA-BE-REU-001<br/>pipeline de middleware, controller y getDb"] -.-> source
@@ -359,6 +435,8 @@ flowchart LR
 ## `CU-CAT-11`
 
 **Identificador:** `DIA-BE-CU-CAT-11`. **Fuente:** fila `CU-CAT-11` de la matriz de aplicación al código backend. **Reutilización:** `DIA-BE-REU-001` · `pipeline de middleware, controller y getDb`.
+
+**Patrones:** `BE-P01`.
 
 ```mermaid
 flowchart LR
@@ -370,6 +448,8 @@ flowchart LR
 
 **Identificador:** `DIA-BE-CU-CAT-12`. **Fuente:** fila `CU-CAT-12` de la matriz de aplicación al código backend. **Reutilización:** `DIA-BE-REU-001` · `pipeline de middleware, controller y getDb`.
 
+**Patrones:** `BE-P01`.
+
 ```mermaid
 flowchart LR
     reuse["DIA-BE-REU-001<br/>pipeline de middleware, controller y getDb"] -.-> source
@@ -379,6 +459,8 @@ flowchart LR
 ## `CU-CAT-13`
 
 **Identificador:** `DIA-BE-CU-CAT-13`. **Fuente:** fila `CU-CAT-13` de la matriz de aplicación al código backend. **Reutilización:** `DIA-BE-REU-001` · `pipeline de middleware, controller y getDb`.
+
+**Patrones:** `BE-P01`.
 
 ```mermaid
 flowchart LR
@@ -390,6 +472,8 @@ flowchart LR
 
 **Identificador:** `DIA-BE-CU-CAT-14`. **Fuente:** fila `CU-CAT-14` de la matriz de aplicación al código backend. **Reutilización:** `DIA-BE-REU-001` · `pipeline de middleware, controller y getDb`.
 
+**Patrones:** `BE-P01`, `BE-P03`, `BE-P04`, `BE-P05`.
+
 ```mermaid
 flowchart LR
     reuse["DIA-BE-REU-001<br/>pipeline de middleware, controller y getDb"] -.-> source
@@ -399,6 +483,8 @@ flowchart LR
 ## `CU-CAT-15`
 
 **Identificador:** `DIA-BE-CU-CAT-15`. **Fuente:** fila `CU-CAT-15` de la matriz de aplicación al código backend. **Reutilización:** `DIA-BE-REU-001` · `pipeline de middleware, controller y getDb`.
+
+**Patrones:** `BE-P01`.
 
 ```mermaid
 flowchart LR
@@ -410,6 +496,8 @@ flowchart LR
 
 **Identificador:** `DIA-BE-CU-CAT-16`. **Fuente:** fila `CU-CAT-16` de la matriz de aplicación al código backend. **Reutilización:** `DIA-BE-REU-001` · `pipeline de middleware, controller y getDb`.
 
+**Patrones:** `BE-P01`, `BE-P03`, `BE-P04`, `BE-P05`.
+
 ```mermaid
 flowchart LR
     reuse["DIA-BE-REU-001<br/>pipeline de middleware, controller y getDb"] -.-> source
@@ -419,6 +507,8 @@ flowchart LR
 ## `CU-CAT-17`
 
 **Identificador:** `DIA-BE-CU-CAT-17`. **Fuente:** fila `CU-CAT-17` de la matriz de aplicación al código backend. **Reutilización:** `DIA-BE-REU-001` · `createDataTableListController y servicios de catálogo`.
+
+**Patrones:** `BE-P02`.
 
 ```mermaid
 flowchart LR
@@ -430,6 +520,8 @@ flowchart LR
 
 **Identificador:** `DIA-BE-CU-CAT-18`. **Fuente:** fila `CU-CAT-18` de la matriz de aplicación al código backend. **Reutilización:** `DIA-BE-REU-001` · `createDataTableListController y servicios de catálogo`.
 
+**Patrones:** `BE-P02`.
+
 ```mermaid
 flowchart LR
     reuse["DIA-BE-REU-001<br/>createDataTableListController y servicios de catálogo"] -.-> source
@@ -439,6 +531,8 @@ flowchart LR
 ## `CU-CAT-19`
 
 **Identificador:** `DIA-BE-CU-CAT-19`. **Fuente:** fila `CU-CAT-19` de la matriz de aplicación al código backend. **Reutilización:** `DIA-BE-REU-001` · `createDataTableListController y servicios de catálogo`.
+
+**Patrones:** `BE-P02`.
 
 ```mermaid
 flowchart LR
@@ -450,6 +544,8 @@ flowchart LR
 
 **Identificador:** `DIA-BE-CU-CAT-20`. **Fuente:** fila `CU-CAT-20` de la matriz de aplicación al código backend. **Reutilización:** `DIA-BE-REU-001` · `createDataTableListController y servicios de catálogo`.
 
+**Patrones:** `BE-P02`.
+
 ```mermaid
 flowchart LR
     reuse["DIA-BE-REU-001<br/>createDataTableListController y servicios de catálogo"] -.-> source
@@ -459,6 +555,8 @@ flowchart LR
 ## `CU-ENT-01`
 
 **Identificador:** `DIA-BE-CU-ENT-01`. **Fuente:** fila `CU-ENT-01` de la matriz de aplicación al código backend. **Reutilización:** `DIA-BE-REU-001` · `getDb(tx), inventario y manejo central de errores`.
+
+**Patrones:** `BE-P01`.
 
 ```mermaid
 flowchart LR
@@ -470,6 +568,8 @@ flowchart LR
 
 **Identificador:** `DIA-BE-CU-ENT-02`. **Fuente:** fila `CU-ENT-02` de la matriz de aplicación al código backend. **Reutilización:** `DIA-BE-REU-001` · `getDb(tx), inventario y manejo central de errores`.
 
+**Patrones:** `BE-P01`, `BE-P03`, `BE-P04`, `BE-P05`.
+
 ```mermaid
 flowchart LR
     reuse["DIA-BE-REU-001<br/>getDb(tx), inventario y manejo central de errores"] -.-> source
@@ -479,6 +579,8 @@ flowchart LR
 ## `CU-ENT-03`
 
 **Identificador:** `DIA-BE-CU-ENT-03`. **Fuente:** fila `CU-ENT-03` de la matriz de aplicación al código backend. **Reutilización:** `DIA-BE-REU-001` · `getDb(tx), inventario y manejo central de errores`.
+
+**Patrones:** `BE-P01`, `BE-P03`, `BE-P04`, `BE-P05`.
 
 ```mermaid
 flowchart LR
@@ -490,6 +592,8 @@ flowchart LR
 
 **Identificador:** `DIA-BE-CU-ENT-04`. **Fuente:** fila `CU-ENT-04` de la matriz de aplicación al código backend. **Reutilización:** `DIA-BE-REU-001` · `getDb(tx), inventario y manejo central de errores`.
 
+**Patrones:** `BE-P01`, `BE-P03`, `BE-P04`, `BE-P05`.
+
 ```mermaid
 flowchart LR
     reuse["DIA-BE-REU-001<br/>getDb(tx), inventario y manejo central de errores"] -.-> source
@@ -499,6 +603,8 @@ flowchart LR
 ## `CU-ENT-05`
 
 **Identificador:** `DIA-BE-CU-ENT-05`. **Fuente:** fila `CU-ENT-05` de la matriz de aplicación al código backend. **Reutilización:** `DIA-BE-REU-001` · `getDb(tx), inventario y manejo central de errores`.
+
+**Patrones:** `BE-P01`, `BE-P03`, `BE-P04`, `BE-P05`.
 
 ```mermaid
 flowchart LR
@@ -510,6 +616,8 @@ flowchart LR
 
 **Identificador:** `DIA-BE-CU-SAL-01`. **Fuente:** fila `CU-SAL-01` de la matriz de aplicación al código backend. **Reutilización:** `DIA-BE-REU-001` · `getDb(tx), reglas de cumplimiento e inventario compartido`.
 
+**Patrones:** `BE-P01`.
+
 ```mermaid
 flowchart LR
     reuse["DIA-BE-REU-001<br/>getDb(tx), reglas de cumplimiento e inventario compartido"] -.-> source
@@ -519,6 +627,8 @@ flowchart LR
 ## `CU-SAL-02`
 
 **Identificador:** `DIA-BE-CU-SAL-02`. **Fuente:** fila `CU-SAL-02` de la matriz de aplicación al código backend. **Reutilización:** `DIA-BE-REU-001` · `getDb(tx), reglas de cumplimiento e inventario compartido`.
+
+**Patrones:** `BE-P01`, `BE-P03`, `BE-P04`.
 
 ```mermaid
 flowchart LR
@@ -530,6 +640,8 @@ flowchart LR
 
 **Identificador:** `DIA-BE-CU-SAL-03`. **Fuente:** fila `CU-SAL-03` de la matriz de aplicación al código backend. **Reutilización:** `DIA-BE-REU-001` · `getDb(tx), reglas de cumplimiento e inventario compartido`.
 
+**Patrones:** `BE-P01`, `BE-P04`.
+
 ```mermaid
 flowchart LR
     reuse["DIA-BE-REU-001<br/>getDb(tx), reglas de cumplimiento e inventario compartido"] -.-> source
@@ -539,6 +651,8 @@ flowchart LR
 ## `CU-SAL-04`
 
 **Identificador:** `DIA-BE-CU-SAL-04`. **Fuente:** fila `CU-SAL-04` de la matriz de aplicación al código backend. **Reutilización:** `DIA-BE-REU-001` · `getDb(tx), reglas de cumplimiento e inventario compartido`.
+
+**Patrones:** `BE-P01`, `BE-P03`, `BE-P04`, `BE-P05`.
 
 ```mermaid
 flowchart LR
@@ -550,6 +664,8 @@ flowchart LR
 
 **Identificador:** `DIA-BE-CU-SAL-05`. **Fuente:** fila `CU-SAL-05` de la matriz de aplicación al código backend. **Reutilización:** `DIA-BE-REU-001` · `getDb(tx), reglas de cumplimiento e inventario compartido`.
 
+**Patrones:** `BE-P01`, `BE-P03`, `BE-P04`, `BE-P05`.
+
 ```mermaid
 flowchart LR
     reuse["DIA-BE-REU-001<br/>getDb(tx), reglas de cumplimiento e inventario compartido"] -.-> source
@@ -559,6 +675,8 @@ flowchart LR
 ## `CU-SAL-06`
 
 **Identificador:** `DIA-BE-CU-SAL-06`. **Fuente:** fila `CU-SAL-06` de la matriz de aplicación al código backend. **Reutilización:** `DIA-BE-REU-001` · `getDb(tx), reglas de cumplimiento e inventario compartido`.
+
+**Patrones:** `BE-P01`, `BE-P03`, `BE-P04`, `BE-P05`.
 
 ```mermaid
 flowchart LR
@@ -570,6 +688,8 @@ flowchart LR
 
 **Identificador:** `DIA-BE-CU-SAL-07`. **Fuente:** fila `CU-SAL-07` de la matriz de aplicación al código backend. **Reutilización:** `DIA-BE-REU-001` · `getDb(tx), reglas de cumplimiento e inventario compartido`.
 
+**Patrones:** `BE-P01`.
+
 ```mermaid
 flowchart LR
     reuse["DIA-BE-REU-001<br/>getDb(tx), reglas de cumplimiento e inventario compartido"] -.-> source
@@ -579,6 +699,8 @@ flowchart LR
 ## `CU-SAL-08`
 
 **Identificador:** `DIA-BE-CU-SAL-08`. **Fuente:** fila `CU-SAL-08` de la matriz de aplicación al código backend. **Reutilización:** `DIA-BE-REU-001` · `getDb(tx), reglas de cumplimiento e inventario compartido`.
+
+**Patrones:** `BE-P01`, `BE-P03`, `BE-P04`.
 
 ```mermaid
 flowchart LR
@@ -590,6 +712,8 @@ flowchart LR
 
 **Identificador:** `DIA-BE-CU-SAL-09`. **Fuente:** fila `CU-SAL-09` de la matriz de aplicación al código backend. **Reutilización:** `DIA-BE-REU-001` · `getDb(tx), reglas de cumplimiento e inventario compartido`.
 
+**Patrones:** `BE-P01`, `BE-P04`.
+
 ```mermaid
 flowchart LR
     reuse["DIA-BE-REU-001<br/>getDb(tx), reglas de cumplimiento e inventario compartido"] -.-> source
@@ -599,6 +723,8 @@ flowchart LR
 ## `CU-SAL-10`
 
 **Identificador:** `DIA-BE-CU-SAL-10`. **Fuente:** fila `CU-SAL-10` de la matriz de aplicación al código backend. **Reutilización:** `DIA-BE-REU-001` · `getDb(tx), reglas de cumplimiento e inventario compartido`.
+
+**Patrones:** `BE-P01`, `BE-P03`, `BE-P04`, `BE-P05`.
 
 ```mermaid
 flowchart LR
@@ -610,6 +736,8 @@ flowchart LR
 
 **Identificador:** `DIA-BE-CU-SAL-11`. **Fuente:** fila `CU-SAL-11` de la matriz de aplicación al código backend. **Reutilización:** `DIA-BE-REU-001` · `getDb(tx), reglas de cumplimiento e inventario compartido`.
 
+**Patrones:** `BE-P01`, `BE-P03`, `BE-P04`, `BE-P05`.
+
 ```mermaid
 flowchart LR
     reuse["DIA-BE-REU-001<br/>getDb(tx), reglas de cumplimiento e inventario compartido"] -.-> source
@@ -619,6 +747,8 @@ flowchart LR
 ## `CU-SAL-12`
 
 **Identificador:** `DIA-BE-CU-SAL-12`. **Fuente:** fila `CU-SAL-12` de la matriz de aplicación al código backend. **Reutilización:** `DIA-BE-REU-001` · `getDb(tx), reglas de cumplimiento e inventario compartido`.
+
+**Patrones:** `BE-P01`, `BE-P03`, `BE-P04`, `BE-P05`.
 
 ```mermaid
 flowchart LR
@@ -630,6 +760,8 @@ flowchart LR
 
 **Identificador:** `DIA-BE-CU-REP-01`. **Fuente:** fila `CU-REP-01` de la matriz de aplicación al código backend. **Reutilización:** `DIA-BE-REU-001` · `controller de listado y query reutilizable`.
 
+**Patrones:** `BE-P06`.
+
 ```mermaid
 flowchart LR
     reuse["DIA-BE-REU-001<br/>controller de listado y query reutilizable"] -.-> source
@@ -639,6 +771,8 @@ flowchart LR
 ## `CU-REP-02`
 
 **Identificador:** `DIA-BE-CU-REP-02`. **Fuente:** fila `CU-REP-02` de la matriz de aplicación al código backend. **Reutilización:** `DIA-BE-REU-001` · `controller de listado y query reutilizable`.
+
+**Patrones:** `BE-P06`.
 
 ```mermaid
 flowchart LR
@@ -650,6 +784,8 @@ flowchart LR
 
 **Identificador:** `DIA-BE-CU-REP-03`. **Fuente:** fila `CU-REP-03` de la matriz de aplicación al código backend. **Reutilización:** `DIA-BE-REU-001` · `sendExcelReport y consultas de dominio reutilizadas`.
 
+**Patrones:** `BE-P07`.
+
 ```mermaid
 flowchart LR
     reuse["DIA-BE-REU-001<br/>sendExcelReport y consultas de dominio reutilizadas"] -.-> source
@@ -659,6 +795,8 @@ flowchart LR
 ## `CU-REP-04`
 
 **Identificador:** `DIA-BE-CU-REP-04`. **Fuente:** fila `CU-REP-04` de la matriz de aplicación al código backend. **Reutilización:** `DIA-BE-REU-001` · `sendExcelReport y consultas de dominio reutilizadas`.
+
+**Patrones:** `BE-P07`.
 
 ```mermaid
 flowchart LR
@@ -670,6 +808,8 @@ flowchart LR
 
 **Identificador:** `DIA-BE-CU-REP-05`. **Fuente:** fila `CU-REP-05` de la matriz de aplicación al código backend. **Reutilización:** `DIA-BE-REU-001` · `sendExcelReport y consultas de dominio reutilizadas`.
 
+**Patrones:** `BE-P07`.
+
 ```mermaid
 flowchart LR
     reuse["DIA-BE-REU-001<br/>sendExcelReport y consultas de dominio reutilizadas"] -.-> source
@@ -679,6 +819,8 @@ flowchart LR
 ## `CU-REP-06`
 
 **Identificador:** `DIA-BE-CU-REP-06`. **Fuente:** fila `CU-REP-06` de la matriz de aplicación al código backend. **Reutilización:** `DIA-BE-REU-001` · `controller de listado y query reutilizable`.
+
+**Patrones:** `BE-P06`.
 
 ```mermaid
 flowchart LR
@@ -690,6 +832,8 @@ flowchart LR
 
 **Identificador:** `DIA-BE-CU-REP-07`. **Fuente:** fila `CU-REP-07` de la matriz de aplicación al código backend. **Reutilización:** `DIA-BE-REU-001` · `controller de listado y query reutilizable`.
 
+**Patrones:** `BE-P06`.
+
 ```mermaid
 flowchart LR
     reuse["DIA-BE-REU-001<br/>controller de listado y query reutilizable"] -.-> source
@@ -699,6 +843,8 @@ flowchart LR
 ## `CU-REP-08`
 
 **Identificador:** `DIA-BE-CU-REP-08`. **Fuente:** fila `CU-REP-08` de la matriz de aplicación al código backend. **Reutilización:** `DIA-BE-REU-001` · `sendExcelReport y consultas de dominio reutilizadas`.
+
+**Patrones:** `BE-P07`.
 
 ```mermaid
 flowchart LR
@@ -710,6 +856,8 @@ flowchart LR
 
 **Identificador:** `DIA-BE-CU-REP-09`. **Fuente:** fila `CU-REP-09` de la matriz de aplicación al código backend. **Reutilización:** `DIA-BE-REU-001` · `sendExcelReport y consultas de dominio reutilizadas`.
 
+**Patrones:** `BE-P07`.
+
 ```mermaid
 flowchart LR
     reuse["DIA-BE-REU-001<br/>sendExcelReport y consultas de dominio reutilizadas"] -.-> source
@@ -719,6 +867,8 @@ flowchart LR
 ## `CU-REP-10`
 
 **Identificador:** `DIA-BE-CU-REP-10`. **Fuente:** fila `CU-REP-10` de la matriz de aplicación al código backend. **Reutilización:** `DIA-BE-REU-001` · `sendExcelReport y consultas de dominio reutilizadas`.
+
+**Patrones:** `BE-P07`.
 
 ```mermaid
 flowchart LR
@@ -730,6 +880,8 @@ flowchart LR
 
 **Identificador:** `DIA-BE-CU-REP-11`. **Fuente:** fila `CU-REP-11` de la matriz de aplicación al código backend. **Reutilización:** `DIA-BE-REU-001` · `sendExcelReport y consultas de dominio reutilizadas`.
 
+**Patrones:** `BE-P07`.
+
 ```mermaid
 flowchart LR
     reuse["DIA-BE-REU-001<br/>sendExcelReport y consultas de dominio reutilizadas"] -.-> source
@@ -739,6 +891,8 @@ flowchart LR
 ## `CU-REP-12`
 
 **Identificador:** `DIA-BE-CU-REP-12`. **Fuente:** fila `CU-REP-12` de la matriz de aplicación al código backend. **Reutilización:** `DIA-BE-REU-001` · `sendExcelReport y consultas de dominio reutilizadas`.
+
+**Patrones:** `BE-P07`.
 
 ```mermaid
 flowchart LR
@@ -750,6 +904,8 @@ flowchart LR
 
 **Identificador:** `DIA-BE-CU-REP-13`. **Fuente:** fila `CU-REP-13` de la matriz de aplicación al código backend. **Reutilización:** `DIA-BE-REU-001` · `sendExcelReport y consultas de dominio reutilizadas`.
 
+**Patrones:** `BE-P07`.
+
 ```mermaid
 flowchart LR
     reuse["DIA-BE-REU-001<br/>sendExcelReport y consultas de dominio reutilizadas"] -.-> source
@@ -760,6 +916,8 @@ flowchart LR
 
 **Identificador:** `DIA-BE-CU-REP-14`. **Fuente:** fila `CU-REP-14` de la matriz de aplicación al código backend. **Reutilización:** `DIA-BE-REU-001` · `sendExcelReport y consultas de dominio reutilizadas`.
 
+**Patrones:** `BE-P07`.
+
 ```mermaid
 flowchart LR
     reuse["DIA-BE-REU-001<br/>sendExcelReport y consultas de dominio reutilizadas"] -.-> source
@@ -769,6 +927,8 @@ flowchart LR
 ## `CU-REP-15`
 
 **Identificador:** `DIA-BE-CU-REP-15`. **Fuente:** fila `CU-REP-15` de la matriz de aplicación al código backend. **Reutilización:** `DIA-BE-REU-001` · `sendExcelReport y consultas de dominio reutilizadas`.
+
+**Patrones:** `BE-P07`.
 
 ```mermaid
 flowchart LR

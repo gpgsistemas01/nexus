@@ -377,6 +377,109 @@ flowchart TB
     history --> commit["Commit y devolver entrada actualizada"]
 ```
 
+### Secuencia de ajuste de existencia de material
+
+**Identificador:** `DIA-BE-SEQ-008`. **Caso:** `CU-CAT-05`. El ajuste no actualiza la
+existencia como una edición directa: crea el documento trazable, su detalle y el
+movimiento antes de actualizar la relación proveedor-material. Todos esos efectos usan
+la transacción abierta por `createStockAdjustment`; el evento se publica después del
+commit.
+
+```mermaid
+sequenceDiagram
+    participant Controller as editMaterialStock
+    participant Service as updateMaterialStock
+    participant Adjustment as createStockAdjustment
+    participant Reference as generateYearlyReferenceNumber
+    participant Stock as stockHelpers
+    participant Movement as createInventoryMovement
+    participant SupplierMaterial as adjustSupplierMaterialStock
+    participant Prisma as Prisma / PostgreSQL
+    participant Socket as emitInventoryUpdated
+
+    Controller->>Service: { id, materialDto, userId }
+    Service->>Adjustment: material, proveedor, motivo y nueva existencia
+    Adjustment->>Prisma: iniciar $transaction
+    Adjustment->>SupplierMaterial: localizar relación con tx
+    Adjustment->>Reference: generar referencia anual con tx
+    Adjustment->>Stock: calcular diferencias y validar existencia
+    Adjustment->>Prisma: crear StockAdjustment y detalle
+    Adjustment->>Movement: crear movimiento ADJUSTMENT con tx
+    Adjustment->>SupplierMaterial: actualizar stock y cantidad convertida con tx
+    Prisma-->>Adjustment: relación actualizada y commit
+    Adjustment-->>Service: supplierMaterial actualizado
+    Service-->>Controller: material
+    Controller->>Socket: publicar después del commit
+```
+
+### Secuencia de ajuste de existencia de merma
+
+**Identificador:** `DIA-BE-SEQ-009`. **Caso:** `CU-CAT-16`. Aunque comparte la regla
+conceptual de ajuste con materiales, la merma tiene modelos y movimiento propios. La
+vista mantiene esa diferencia y muestra que el documento de ajuste se enlaza con el
+movimiento dentro del mismo límite transaccional.
+
+```mermaid
+sequenceDiagram
+    participant Controller as editWasteStock
+    participant Service as updateWasteStock
+    participant Adjustment as registerWasteStockAdjustment
+    participant Reference as generateYearlyReferenceNumber
+    participant Stock as stockHelpers
+    participant Movement as createWasteMovement
+    participant Prisma as Prisma / PostgreSQL
+    participant Socket as emitInventoryUpdated
+
+    Controller->>Service: { id, wasteStockDto, userId }
+    Service->>Prisma: iniciar $transaction
+    Service->>Prisma: cargar Waste vigente
+    Service->>Adjustment: merma, motivo y nueva existencia con tx
+    Adjustment->>Stock: calcular diferencias y validar existencia
+    Adjustment->>Reference: generar referencia anual con tx
+    Adjustment->>Prisma: crear WasteStockAdjustment y detalle
+    Adjustment->>Movement: crear WasteMovement ADJUSTMENT con tx
+    Adjustment->>Prisma: enlazar movimiento y actualizar Waste
+    Prisma-->>Service: merma actualizada y commit
+    Service-->>Controller: waste
+    Controller->>Socket: publicar después del commit
+```
+
+### Secuencia de surtimiento de una salida de merma
+
+**Identificador:** `DIA-BE-SEQ-010`. **Caso:** `CU-SAL-11`. El endpoint de detalles
+también confirma el surtimiento, pero esta vista muestra sólo la rama seleccionada por
+`isSupplied`. Cada detalle confirmado se surte por su cantidad pendiente completa; la
+cantidad convertida del proyecto se conserva como dato de seguimiento, no como cantidad
+descontada de la existencia.
+
+```mermaid
+sequenceDiagram
+    participant Controller as editWasteIssueDetails
+    participant Service as updateWasteIssueDetails
+    participant Rules as issueFulfillmentRules
+    participant Movement as applyWasteIssueMovement
+    participant Stock as applyWasteStockChange
+    participant Status as findWasteIssueFulfillmentStatusIds
+    participant Prisma as Prisma / PostgreSQL
+    participant Socket as emitInventoryUpdated
+
+    Controller->>Service: { id, wasteIssueDto.details }
+    Service->>Prisma: iniciar $transaction y cargar salida/detalles
+    Service->>Service: validar estado, ids únicos y detalles vigentes
+    Service->>Status: resolver ids de cumplimiento con tx
+    loop Cada detalle nuevo con isSupplied
+        Service->>Rules: derivar estado completo del detalle
+        Service->>Prisma: guardar surtido total y cantidades de proyecto
+        Service->>Movement: agregar cantidad pendiente al movimiento
+        Movement->>Stock: descontar existencia y cantidad convertida con tx
+    end
+    Movement->>Prisma: crear WasteMovement ISSUE si hubo surtimiento
+    Service->>Rules: derivar cumplimiento del encabezado
+    Service->>Prisma: actualizar WasteIssue y commit
+    Service-->>Controller: wasteIssue actualizado
+    Controller->>Socket: publicar después del commit
+```
+
 ### Secuencia de devolución de material surtido
 
 **Identificador:** `DIA-BE-SEQ-005`. **Caso:** `CU-SAL-06`. Esta vista documenta sólo

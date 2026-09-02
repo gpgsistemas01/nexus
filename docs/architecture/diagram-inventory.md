@@ -11,7 +11,7 @@ cada `CU-*` dentro del rango identifica un diagrama individual.
 El **tipo semántico** prevalece sobre la directiva Mermaid. Un `flowchart` puede
 representar contexto, actividad, dependencia, navegación o trazabilidad; no se etiqueta
 como “diagrama de flujo” genérico si las flechas tienen otra semántica. El inventario
-registra **273 diagramas vigentes**: 268 curados y 5 generados.
+registra **276 diagramas vigentes**: 271 curados y 5 generados.
 
 ## Catálogo por familia y tipo
 
@@ -25,7 +25,7 @@ registra **273 diagramas vigentes**: 268 curados y 5 generados.
 | `DIA-ARQ-EST-001` | Estados de acceso | `architecture-and-web-views.md#estados-de-acceso-y-sesión` | 1 | Sesión y rutas; curado. |
 | `DIA-ARQ-NAV-001..002` | Navegación y redirecciones | Mapa de sitio y redirecciones de `architecture-and-web-views.md` | 2 | Rutas web y menú; curado. |
 | `DIA-BE-CMP-001..002` | Capas y registro de rutas | “Relación entre ambas capas” y “Registro de rutas” del backend | 2 | Código backend; curado. |
-| `DIA-BE-SEQ-001..007` | Secuencias de surtimiento, autenticación, entrada, corrección, devoluciones de material y merma, y auditoría | Backend, “Vistas técnicas aplicadas” | 7 | Controllers, servicios, transacciones y efectos posteriores; curado por caso. |
+| `DIA-BE-SEQ-001..010` | Secuencias de surtimiento, autenticación, entrada, corrección, devoluciones, auditoría y ajustes de existencia | Backend, “Vistas técnicas aplicadas” | 10 | Controllers, servicios, transacciones y efectos posteriores; curado por caso. |
 | `DIA-BE-ACT-001..002` | Actividades de surtimiento y cancelación | Backend, “Vistas técnicas aplicadas” | 2 | Decisiones y errores de servicios; curado. |
 | `DIA-FE-SEQ-001..004`, `DIA-FE-SEQ-006` | Secuencias de ajuste, login, corrección y devoluciones de material y merma | Frontend, “Vistas técnicas aplicadas por flujo” | 5 | Página, aplicación, UI y transporte; curado por caso. `DIA-FE-SEQ-005` se retiró porque separaba la exportación de su módulo propietario. |
 | `DIA-FE-ACT-001` | Actividad de alta de merma desde plantilla | Frontend, “Alta de merma…” | 1 | Dependencias y validación del navegador; curado. |
@@ -54,7 +54,7 @@ registra **273 diagramas vigentes**: 268 curados y 5 generados.
 
 ## Control de completitud y coherencia
 
-El total se obtiene de cada bloque Mermaid de `docs`: arquitectura (173), datos
+El total se obtiene de cada bloque Mermaid de `docs`: arquitectura (176), datos
 (1), generados (5) y requisitos (94). Al agregar, retirar o mover un bloque se actualiza
 su fila, cantidad y enlace en el mismo cambio. Los diagramas generados nunca se editan a
 mano. Los de caso individual conservan el `CU-*`; una vista agrupada enumera los casos a
