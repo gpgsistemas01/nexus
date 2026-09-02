@@ -8,6 +8,7 @@ const outputRoot = path.resolve('docs/user-manual/images');
 
 const click = (selector, ready) => ({ selector, ready });
 const reportDialog = click('.datatable-export-button', '.report-export-modal');
+const formatCoverage = (useCases) => useCases.length ? useCases.join(', ') : 'Transversal';
 
 // El orden de este inventario es el orden narrativo del manual. Los identificadores son
 // estables; el número del archivo sólo ordena las imágenes dentro de cada módulo.
@@ -65,7 +66,9 @@ const captures = [
     { id: 'CAP-REP-MOV-MAT-01-LIST', module: 'movimientos-material', name: '01-historial-y-filtros.png', route: '/movimientos/materiales', ready: '#materialMovementTable', useCases: ['CU-REP-02'] },
     { id: 'CAP-REP-MOV-MAT-02-EXPORT', module: 'movimientos-material', name: '02-exportar-reporte.png', route: '/movimientos/materiales', ready: '#materialMovementTable', action: reportDialog, useCases: ['CU-REP-05'] },
     { id: 'CAP-REP-MOV-WAS-01-LIST', module: 'movimientos-merma', name: '01-historial-y-filtros.png', route: '/movimientos/mermas', ready: '#wasteMovementTable', useCases: ['CU-REP-07'] },
-    { id: 'CAP-REP-MOV-WAS-02-EXPORT', module: 'movimientos-merma', name: '02-exportar-reporte.png', route: '/movimientos/mermas', ready: '#wasteMovementTable', action: reportDialog, useCases: ['CU-REP-10'] }
+    { id: 'CAP-REP-MOV-WAS-02-EXPORT', module: 'movimientos-merma', name: '02-exportar-reporte.png', route: '/movimientos/mermas', ready: '#wasteMovementTable', action: reportDialog, useCases: ['CU-REP-10'] },
+
+    { id: 'CAP-ERR-404-NOT-FOUND', module: 'errores', name: '01-pagina-no-encontrada.png', route: '/pagina-no-existente-manual', ready: '.error-card', public: true, useCases: [] }
 ];
 
 const validateInventory = () => {
@@ -100,7 +103,7 @@ const capturePage = async (page, capture) => {
     }
 
     await page.screenshot({ path: path.join(directory, capture.name), fullPage: true });
-    console.log(`${ capture.id } -> ${ path.join(capture.module, capture.name) } [${ capture.useCases.join(', ') }]`);
+    console.log(`${ capture.id } -> ${ path.join(capture.module, capture.name) } [${ formatCoverage(capture.useCases) }]`);
 };
 
 validateInventory();
@@ -109,7 +112,10 @@ if (process.argv.includes('--list')) {
     console.log('| Orden | ID | Ruta | Casos de uso |');
     console.log('|---:|---|---|---|');
     captures.forEach((capture, index) => {
-        console.log(`| ${ index + 1 } | \`${ capture.id }\` | \`docs/user-manual/images/${ capture.module }/${ capture.name }\` | ${ capture.useCases.map(id => `\`${ id }\``).join(', ')} |`);
+        const coverage = capture.useCases.length
+            ? capture.useCases.map(id => `\`${ id }\``).join(', ')
+            : 'Transversal';
+        console.log(`| ${ index + 1 } | \`${ capture.id }\` | \`docs/user-manual/images/${ capture.module }/${ capture.name }\` | ${ coverage } |`);
     });
     process.exit(0);
 }

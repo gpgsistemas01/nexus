@@ -38,6 +38,9 @@ sin incorporarlas también a esa secuencia.
 
 ## Solución de problemas
 
+Consulte el [catálogo de mensajes de error](error-messages.md) para identificar cómo se presenta
+cada tipo de fallo, qué información conservar y cuándo debe intentarse nuevamente la operación.
+
 - Si una opción no aparece, solicite validar rol, departamento y permiso; no intente otra cuenta.
 - Si una operación falla, conserve el mensaje y la referencia mostrada, y evite repetir una
   escritura hasta confirmar su estado.
