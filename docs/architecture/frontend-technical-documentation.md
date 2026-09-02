@@ -61,48 +61,67 @@ escuchados, estado interno y dependencia externa encapsulada. También indica qu
 conocimiento **no** puede incorporar: un módulo compartido no importa la aplicación de
 un recurso concreto ni decide permisos del servidor.
 
-## Referencia implementada: materiales
+## Catálogo completo de fichas frontend
 
-El flujo de materiales muestra la separación desde EJS hasta la API sin duplicar la
-regla de existencias del backend.
+La unidad de documentación es el **flujo funcional**, no un archivo aislado. Cada fila
+cubre todos sus módulos propietarios de servicio, aplicación, página y EJS; los símbolos
+compartidos aparecen después en una ficha transversal. De este modo no se presenta
+materiales como si fuera el único flujo documentado ni se repite una ficha idéntica por
+cada operación CRUD. Las rutas concretas se verifican en el [contrato API](../data/api-contract.md)
+y las páginas publicadas en el [mapa generado](../generated/code-map.md#rutas-web-16).
 
-| Archivo y símbolo | Tipo | Responsabilidad observable |
-| --- | --- | --- |
-| [`materialsPage.ejs`](../../src/views/pages/warehouse/materials/materialsPage.ejs) | Vista | Incluye tabla, modales y los módulos de página, modal y formulario. |
-| [`materialsPage.js`](../../src/public/js/pages/warehouse/materials/materialsPage.js) | Entrada de página | Lee `window.meta` e inicializa `createMaterialDatatable(context)`. |
-| [`materialForm.js`](../../src/public/js/pages/warehouse/materials/materialForm.js), `useForm(...)` | Formulario | Selecciona campos y validación según alta, edición o ajuste; delega la mutación elegida. |
-| [`materials.js`](../../src/public/js/application/warehouse/materials/materials.js), `materialApplication` | Aplicación privada | Configura `createCrudApplication` con requests, clave de respuesta y mutaciones adicionales. |
-| [`materials.js`](../../src/public/js/application/warehouse/materials/materials.js), exports de dominio | API del módulo | Expone `getAllMaterials`, `registerMaterial`, `editMaterial`, `editMaterialStock` y `deleteMaterial`. |
-| [`materialService.js`](../../src/public/js/services/warehouse/materialService.js), `MATERIALS_API_ROUTE` | Transporte | Conserva el prefijo `/api/warehouse/materials` usado por las cinco peticiones. |
-| [`axiosInstanceApi.js`](../../src/public/js/services/axiosInstanceApi.js), `apiRequest` | Cliente común | Ejecuta la petición y centraliza el tratamiento de la sesión y errores HTTP. |
+### Fichas de flujos funcionales
 
-La aplicación configura la fábrica existente en lugar de volver a implementar cada
-mutación:
+| Flujo | Vista y composición | Aplicación y transporte | Contrato y comportamiento propio | Diagrama aplicable |
+| --- | --- | --- | --- | --- |
+| Inicio de sesión | `loginPage.ejs` y `loginForm.js` recopilan credenciales; `indexPage.js` prepara la portada autenticada. | `application/auth/login.js` coordina `services/authService.js`; sus exports `registerRequest` y `resetPasswordRequest` no tienen consumidor ni ruta vigente y se registran como brecha, no como funcionalidad publicada. | `POST /api/auth/login`; normaliza la respuesta de éxito y deja cookies, tokens y permisos efectivos al servidor. | **Secuencia**, porque cruza formulario, API y establecimiento de sesión; reutilizar el recorrido HTTP de `code-diagrams.md` para las capas servidoras. |
+| Personas | `personsPage.ejs`, `personsPage.js`, `personModal.js` y `personForm.js` componen listado, alta y edición. | `application/admin/persons/persons.js` usa `services/admin/personService.js`; consulta departamentos mediante su catálogo. | `GET`, `POST` y `PUT /api/admin/persons`; adapta la persona devuelta y refresca el listado. | **Ciclo CRUD compartido**; no requiere secuencia propia mientras no cambie la coordinación. |
+| Usuarios | `usersPage.ejs`, `usersPage.js`, `userModal.js` y `userForm.js` separan alta, edición y cambio de contraseña. | `application/admin/users/users.js` usa `userService.js` y consume los catálogos de roles y departamentos. | `GET`, `POST`, `PATCH /api/admin/users/:id` y `PATCH .../:id/password`; el modo decide campos y mutación. | **Actividad o secuencia específica** sólo para cambio de contraseña si se agregan pasos asíncronos; el CRUD usa la vista común. |
+| Clientes | `clientsPage.ejs`, `clientModal.ejs`, `clientsPage.js`, `clientModal.js` y `clientForm.js`. | `application/sales/clients/clients.js` usa `services/sales/clientService.js`; `application/sales/report.js` usa el servicio de reporte. | CRUD de `/api/sales/clients` y exportación `/api/sales/reports/clients/excel`. | **Ciclo CRUD** para mantenimiento y **secuencia corta de descarga** sólo si se necesita explicar la exportación. |
+| Proveedores | `suppliersPage.ejs`, `supplierModal.ejs`, `suppliersPage.js`, `supplierModal.js` y `supplierForm.js`. | `application/warehouse/suppliers/suppliers.js` usa `supplierService.js`; el reporte usa la fábrica común. | CRUD de `/api/warehouse/suppliers` y reporte de proveedores. | **Ciclo CRUD compartido**; sin diagrama exclusivo. |
+| Materiales | `materialsPage.ejs`, `materialModal.ejs`, `materialsPage.js`, `materialModal.js`, `materialForm.js` y `materialFields.js`. | `application/warehouse/materials/materials.js` configura `createCrudApplication` sobre `materialService.js`. | CRUD de `/api/warehouse/materials`; `goodsReceipt` omite `maxUnitCost` al crear y el ajuste usa `PATCH /:id/stock`. | **Secuencia** para ajuste de existencias por su mutación adicional y **ciclo CRUD** para el resto. |
+| Mermas | `wastesPage.ejs`, `wastesPage.js`, `wasteModal.js`, `wasteForm.js` y `wasteFields.js`. | `application/warehouse/wastes/wastes.js` configura la fábrica CRUD sobre `wasteService.js`. | CRUD de `/api/warehouse/wastes`, plantillas de material y ajuste `PATCH /:id/stock`. | **Secuencia** sólo para creación desde plantilla o ajuste si se documenta esa bifurcación; CRUD común para las demás operaciones. |
+| Entradas de almacén | `goodsReceiptsPage.ejs`, `goodsReceiptsPage.js`, formulario, modal y detalles componen el documento; `correctionForm.js` y `correctionModal.js` aíslan corrección/cancelación. | `application/warehouse/goodsReceipts/goodsReceipts.js` usa `goodsReceiptService.js` y catálogos; el reporte usa `createReportApplication`. | Lista, alta, edición de encabezado, corrección y cancelación bajo `/api/warehouse/goods-receipts`. | **Secuencia** para alta y **actividad/secuencia** para corrección y cancelación, pues tienen decisiones y efectos de inventario distintos. |
+| Salidas de materiales | `goodsIssuesPage.ejs`, página, modal y formulario coordinan encabezado y detalles; `returns/goodsIssueReturn.js` gestiona devoluciones. | `application/warehouse/goodsIssues/goodsIssues.js` adapta `createIssueApplication` sobre `goodsIssueService.js`. | Lista, alta, edición, encabezado, surtimiento y devolución bajo `/api/warehouse/goods-issues`. | **Secuencia** para surtimiento y devolución; **máquina de estados** se referencia desde requisitos, no se redibuja en frontend. |
+| Salidas de mermas | `wasteIssuesPage.ejs`, página, modal, formulario y `returns/wasteIssueReturn.js`. | `application/warehouse/wasteIssues/wasteIssues.js` reutiliza `createIssueApplication` sobre `wasteIssueService.js`. | Mismas clases de operación bajo `/api/warehouse/waste-issues`, con selección y cantidades propias de merma. | **Secuencia** para surtimiento y devolución; compartir la vista de estados normativa. |
+| Movimientos | `movementsPage.ejs` y `movementsPage.js` eligen inventario de materiales o mermas según contexto de la vista. | `application/admin/movements/movements.js` usa `movementService.js`; `application/admin/report.js` coordina exportaciones. | Lecturas `/api/admin/movements/{materials,wastes}` y reportes correspondientes. | **Flujo de datos/listado**; no secuencia propia mientras sólo consulte y descargue. |
+| Catálogos | No poseen página: alimentan Select2 y formularios consumidores. | `catalogs/{departments,roles,fulfillmentStatuses,presentations,reasons,unitMeasures}.js` adaptan sus servicios homólogos. | Operaciones `GET` de sólo lectura; entregan colecciones normalizadas a personas, usuarios, materiales y documentos. | **Sin diagrama propio**; se muestran como participantes sólo en el flujo consumidor. |
+| Reportes | Los botones pertenecen a las páginas de clientes, proveedores, almacén y movimientos. | `createReportApplication.js` centraliza descarga; `application/{admin,sales,warehouse}/report.js` configura cada `reportService.js`. | Solicitudes `GET .../reports/.../excel` y descarga del archivo; no decide filtros ni permisos del servidor. | **Secuencia corta** únicamente si interesa el intercambio navegador–descarga; no se replica por cada reporte. |
 
-```js
-const materialApplication = createCrudApplication({
-    requests: {
-        getAll: getAllMaterialsRequest,
-        register: ({ data, creationContext = null }) => registerMaterialRequest({
-            data: creationContext === GOODS_RECEIPT_CREATION_CONTEXT
-                ? omitMaxUnitCost(data)
-                : data
-        }),
-        edit: editMaterialRequest,
-        editStock: editMaterialStockRequest,
-        remove: deleteMaterialRequest
-    },
-    dataKeys: { register: 'material' },
-    additionalMutations: ['editStock', 'remove']
-});
-```
+### Fichas de infraestructura compartida
 
-El fragmento procede de
-[`application/warehouse/materials/materials.js`](../../src/public/js/application/warehouse/materials/materials.js).
-La excepción `goodsReceipt` sólo omite `maxUnitCost` antes del alta iniciada desde una
-entrada; las demás adaptaciones continúan en `createCrudApplication`.
+| Pieza | Contrato documentado | Consumidores y límite | Diagrama aplicable |
+| --- | --- | --- | --- |
+| `createCrudApplication.js` | Configura lecturas y mutaciones, extrae claves de respuesta y permite mutaciones adicionales. | Personas, usuarios, clientes, proveedores, materiales y mermas; no conoce DOM ni reglas de dominio. | Diagrama canónico de **fábrica CRUD** en `code-diagrams.md`. |
+| `createIssueApplication.js` e `issueHeaderRules.js` | Especializan el ciclo de documentos con encabezado, detalles y reglas de edición visibles. | Salidas de materiales y mermas; las transiciones definitivas siguen en backend. | **Actividad** para bifurcaciones del encabezado y **secuencia** para coordinación asíncrona. |
+| `createReportApplication.js` | Convierte una petición configurada en descarga y nombre de archivo. | Reportes de admin, ventas y almacén. | Normalmente ninguno; secuencia sólo al investigar descarga o error. |
+| `axiosInstanceApi.js` / `apiRequest` | Cliente HTTP común, tratamiento de sesión y propagación normalizada de errores. | Todos los servicios del navegador. | Participante único en secuencias; nunca un diagrama por llamada. |
+| `ui/forms`, `ui/inventory`, `ui/issues` | Reciben elementos y callbacks; controlan interacción visual y emiten resultados al propietario. | Formularios CRUD, selectores de inventario y documentos de salida. | **Componentes** si cambia la reutilización; **secuencia** si coordina eventos asíncronos. |
+| `plugins/datatable`, `plugins/select2`, `plugins/mdb`, `plugins/flatpickr`, `plugins/swal` | Encapsulan bibliotecas externas y su configuración común. | Páginas, modales, fechas, confirmaciones y catálogos. | Sin vista por adaptador; aparecen en el diagrama de componentes compartidos. |
+| `utils` y `constants` | Transformaciones, validaciones auxiliares, formatos y valores sin estado visual. | Todas las capas del navegador que los importan. | Sin diagrama salvo que una transformación tenga decisiones de negocio, caso en que debe moverse o documentarse en su flujo propietario. |
+| `views/shared` | Parciales configurables para formularios, tablas, modales y estructura común. | Vistas EJS propietarias. | Diagrama de **componentes/composición**, no secuencia por inclusión. |
 
-## Secuencia frontend de un ajuste de existencias
+## Matriz de decisión de diagramas frontend
+
+La columna de cada ficha anterior es una decisión explícita, no una invitación a crear
+todos los diagramas posibles. Se aplica esta matriz al cambiar el flujo:
+
+| Caso observable | Vista que aplica | Vista que no aporta | Fuente que debe enlazarse |
+| --- | --- | --- | --- |
+| Alta, consulta, edición o baja sin coordinación adicional | Ciclo CRUD compartido. | Una secuencia repetida por recurso. | Contrato API y patrón de fábrica. |
+| Formulario/modal con llamadas encadenadas o evento posterior | Secuencia. | Entidad-relación. | Módulos de página, aplicación y servicio HTTP. |
+| Validación visual con alternativas que cambian el recorrido | Actividad. | Máquina de estados si no existen estados persistentes. | Reglas de formulario y caso de uso. |
+| Documento con estados persistentes | Referencia a máquina de estados de requisitos. | Copia frontend de las transiciones. | `requirements-diagrams.md`. |
+| Reutilización de parciales, UI, plugins o fábricas | Componentes o dependencias. | Secuencia por cada consumidor. | `code-diagrams.md` y patrón aplicado. |
+| Una petición HTTP directa o un catálogo de lectura | Ninguno propio. | Secuencia de una sola llamada. | Ficha funcional y contrato API. |
+
+Cada diagrama declara el límite del navegador. Si atraviesa la API, termina en el método
+y URL y enlaza backend; no dibuja Prisma ni atribuye seguridad a la validación visual.
+
+## Secuencia aplicable: ajuste de existencias de material
+
+Esta vista se conserva porque la ficha de materiales identifica una mutación adicional
+que sí cambia el flujo CRUD común.
 
 ```mermaid
 sequenceDiagram
@@ -127,30 +146,21 @@ sequenceDiagram
     Form->>Form: form.onSave?.(material)
 ```
 
-La secuencia termina en el límite HTTP. La autorización, validación definitiva,
-transacción, auditoría y emisión de inventario pertenecen al backend y se consultan en
-la [ficha de la ruta](../data/api-contract.md#ejemplo-aplicado-ajuste-de-existencias-de-material).
-
-## Cuándo agregar un diagrama frontend
-
-Se agrega una vista específica si hay coordinación entre página, formulario, modal y
-aplicación; si una fábrica cambia la forma del flujo; si intervienen eventos asíncronos;
-o si varios componentes comparten estado. Un servicio HTTP de una sola llamada no
-necesita su propio diagrama: basta la ficha de la ruta y el nombre exportado.
-
-Cada diagrama declara su límite en el navegador. Si atraviesa la API, enlaza la ficha de
-backend o contrato en vez de redibujar Prisma y reglas de dominio como si fueran parte
-del frontend.
+La autorización, validación definitiva, transacción, auditoría y movimiento pertenecen
+al backend y se consultan en el [contrato de la ruta](../data/api-contract.md#ejemplo-aplicado-ajuste-de-existencias-de-material).
 
 ## Lista de revisión frontend
 
-1. Confirmar que la vista EJS carga los scripts propietarios y conserva su última línea
+1. Confirmar que toda carpeta nueva de `services`, `application` o `pages` queda incluida
+   en una ficha funcional o transversal del catálogo.
+2. Confirmar que la vista EJS carga los scripts propietarios y conserva su última línea
    y llamadas `contentFor`.
-2. Revisar imports, exports, selectores, eventos y consumidores del símbolo documentado.
-3. Comprobar que `pages` compone, `application` coordina, `services` transporta y `ui`
+3. Revisar imports, exports, selectores, eventos y consumidores del símbolo documentado.
+4. Comprobar que `pages` compone, `application` coordina, `services` transporta y `ui`
    permanece independiente del recurso.
-4. Enlazar el contrato API y no presentar la validación del navegador como control de
+5. Enlazar el contrato API y no presentar la validación del navegador como control de
    seguridad.
-5. Localizar las pruebas bajo `tests/unit/public` o registrar la brecha existente sin
+6. Aplicar la matriz de diagramas y actualizar sólo la vista cuya semántica cambió.
+7. Localizar las pruebas bajo `tests/unit/public` o registrar la brecha existente sin
    afirmar cobertura.
-6. Ejecutar `npm run docs:check` y validar el paquete de arquitectura.
+8. Ejecutar `npm run docs:check` y validar el paquete de arquitectura.

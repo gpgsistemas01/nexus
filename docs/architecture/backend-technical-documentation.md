@@ -95,35 +95,68 @@ No se genera automáticamente esa semántica desde imports: el inventario puede 
 que `controller` y `service` existen, pero no puede determinar de forma segura quién es
 propietario de una regla, qué error es contractual ni dónde debe ocurrir un efecto.
 
-## Referencia técnica del código implementado
+## Catálogo completo de fichas backend
 
-### Arranque y registro de rutas
+La ficha se mantiene por **capacidad cohesiva**: agrupa las rutas, controladores y
+servicios que implementan el mismo contrato, pero nombra todos los módulos cubiertos.
+El inventario literal de cada export permanece en el
+[mapa generado](../generated/code-map.md#símbolos-exportados-por-controladores); estas
+fichas agregan entrada, salida, reglas, persistencia y criterio de diagrama sin convertir
+un ejemplo en la documentación de todo el backend.
 
-Éstos son los nombres que permiten seguir desde el proceso Node.js hasta un router de
-dominio. La tabla describe contratos observables en el código, no nombres conceptuales
-inventados para el documento.
+### Arranque, transporte web y middleware
 
-| Archivo y nombre | Tipo | Responsabilidad |
-| --- | --- | --- |
-| [`src/app.js`](../../src/app.js), `app` | Instancia Express | Configura vistas, analizadores de cuerpo, archivos públicos, logging, auditoría, rutas y manejadores finales de error. |
-| [`src/app.js`](../../src/app.js), `server` | Servidor HTTP | Envuelve `app`, comparte el servidor con Socket.IO y escucha en `PORT`. |
-| [`src/routes/web/index.js`](../../src/routes/web/index.js), `registerWebRoutes(app)` | Función exportada | Monta las rutas HTML antes del manejador 404 y de las rutas API. |
-| [`src/routes/api/index.js`](../../src/routes/api/index.js), `API_ROUTES` | Configuración privada | Relaciona el prefijo de cada dominio con su instancia de `router`. |
-| [`src/routes/api/index.js`](../../src/routes/api/index.js), `registerApiRoutes(app, options)` | Función exportada | Recorre `API_ROUTES` y monta cada router bajo `/api` o el `apiPrefix` recibido. |
-| [`src/app.js`](../../src/app.js), middleware final de error | Middleware Express | Convierte `AppError` en su respuesta conocida y registra errores no controlados antes de responder `500`. |
+| Capacidad | Entrada, adaptación y salida | Colaboradores, efectos y persistencia | Diagrama aplicable |
+| --- | --- | --- | --- |
+| Arranque Express | `src/app.js` crea `app` y `server`, configura EJS, cuerpo, estáticos, rutas, 404 y error final. `registerWebRoutes` y `registerApiRoutes` montan sus registros. | Logging, auditoría y Socket.IO rodean el transporte; el manejador final traduce `AppError` y registra fallos desconocidos. | **Contenedores/flujo de registro** cuando cambia orden o montaje; **secuencia HTTP común** para una petición. |
+| Autenticación y autorización | Rutas web y API pasan por token requerido y permiso; `authController.js` adapta login, usuario actual y renovación. | `authService.js`, `jwtService.js`, cookies y tokens; no persiste dominio salvo la lectura del usuario. | **Secuencia** para login/renovación; **actividad** si cambia una bifurcación de acceso. |
+| Validación y errores | Validadores de formularios escriben errores de `express-validator`; `validate` corta la cadena antes del controlador. | `serviceErrorHandler.js` y clases de `src/errors` conservan errores de dominio; no abren transacciones. | Participantes de la **secuencia HTTP común**; no un diagrama por validador. |
+| Auditoría | `auditService.js` identifica escrituras y persiste la evidencia producida por middleware. | Usa los datos de solicitud/respuesta definidos por el middleware y Prisma fuera del servicio funcional. | **Secuencia** sólo si cambia el momento de persistencia respecto de la respuesta o transacción. |
+| Páginas web | Los controladores bajo `controllers/web` resuelven inicio/login y las páginas de personas, usuarios, clientes, proveedores, materiales, mermas, entradas, salidas y movimientos. | Preparan `res.render`, metadatos y permisos para EJS; no ejecutan CRUD de dominio. | **Navegación/composición**, no secuencia por cada `render`. |
 
-El bloque central que evita repetir llamadas a `app.use` por dominio es:
+### Fichas de capacidades API y dominio
 
-```js
-export const registerApiRoutes = (app, { apiPrefix = '/api' } = {}) => {
-    API_ROUTES.forEach(([path, router]) => app.use(`${apiPrefix}${path}`, router));
-};
-```
+| Capacidad y módulos propietarios | Entrada y retorno | Reglas, errores y persistencia | Diagrama aplicable |
+| --- | --- | --- | --- |
+| Catálogos: `departmentController/Service`, `roleController/Service`, `presentationController/Service`, `reasonController/Service`, `unitMeasureController/Service`, `fulfillmentStatusController/Service` | `GET` sin cuerpo; la fábrica `createDataTableListController` adapta paginación cuando corresponde y devuelve colecciones JSON. | Lecturas Prisma; búsquedas por id/nombre son colaboradores de otros servicios y propagan ausencia según su contrato. | **Ninguno específico**; fábrica de listado y recorrido HTTP común. |
+| Personas: `personController.js`, `personService.js`, `personRules.js` | Lista recibe consulta de tabla; alta/edición reciben DTO saneado y retornan persona. | Valida tipo y asesor interno, relaciones y unicidad antes de crear/actualizar `Person`; errores se centralizan. | **CRUD compartido**; actividad sólo si cambia la regla de asesor interno. |
+| Usuarios: `userController.js`, `userService.js`, `roleService.js` | Lista, alta, edición y cambio de contraseña toman parámetros/cuerpo y retornan usuario sin convertir el controlador en dueño de credenciales. | Resuelve persona, rol y contraseña; escribe `User` y propaga conflictos/no encontrados. | **CRUD** y **secuencia específica** para contraseña únicamente si se agregan pasos o efectos. |
+| Clientes: `sales/clientController.js`, `clientService.js` | Lista, alta y edición (`GET`, `POST`, `PUT`) adaptan DTO y retornan cliente. | Lee y escribe `Client` mediante `getDb(tx)` y traduce ausencia o fallos de persistencia a errores del dominio. | **CRUD compartido**; sin diagrama propio. |
+| Proveedores: `supplierController.js`, `supplierService.js` | Lista, alta y edición adaptan filtros/DTO y retornan proveedor. | Persiste proveedor y relaciones; sus materiales se sincronizan mediante servicios propietarios de materiales. | **CRUD compartido**; componentes si cambia la colaboración entre dominios. |
+| Materiales: `materialController.js`, `materials/materialService.js`, `materialHelpers.js`, `materialRelations.js`, `supplierMaterialService.js`, `adjustmentService.js` | Lista, alta, edición, ajuste y eliminación reciben `id`/DTO y retornan material o confirmación. | Prepara identidad, sincroniza proveedor, protege referencias y usa ajuste/movimiento para cambiar existencias; las escrituras relacionadas comparten `tx`. | **CRUD** para mantenimiento; **secuencia + actividad** para ajuste o eliminación con dependencias. |
+| Mermas: `wasteController.js`, `wastes/wasteService.js`, `wasteMaterialService.js`, `wasteInventoryService.js`, `wasteMovementService.js`, `wasteStockAdjustmentService.js` | Lista, plantillas, alta, edición y ajuste reciben identificadores/DTO y retornan merma. | Coordina material origen, cantidades, inventario y movimientos; valida existencia y suficiencia antes de escrituras atómicas. | **Secuencia** para alta desde material y ajuste; **actividad** para decisiones de cantidad. |
+| Entradas: `goodsReceiptController.js`, `goodsReceiptService.js`, `goodsReceiptHelpers.js`, `goodsReceiptInvoiceService.js` | Lista, alta y edición de encabezado adaptan DTO; retornan documento con detalles/totales. | Valida factura/referencia, construye detalles, actualiza existencias y totales dentro del límite transaccional. | **Secuencia** para alta por coordinación multmodelo; **actividad** para validaciones alternativas. |
+| Corrección/cancelación de entrada: controladores homónimos y `detailChanges/{goodsReceiptCorrectionService,goodsReceiptCancellationService,goodsReceiptDetailChangeService}.js` | `detailId` y cambio solicitado producen entrada actualizada. | Localiza detalle editable, registra cambio, revierte/aplica movimiento y recalcula existencias/totales en una transacción; los conflictos impiden escritura parcial. | **Dos secuencias o actividades diferenciadas**: corrección y cancelación no se fusionan. |
+| Salidas de materiales: `goodsIssueController.js`, `goodsIssues/goodsIssueService.js`, helpers, select y reglas de cumplimiento | Lista, alta, edición, encabezado y detalles adaptan `id`/DTO; retornan salida actualizada. | Resuelve encabezado, cantidades y estados; el surtimiento aplica movimiento `ISSUE` y actualiza detalles/encabezado en el mismo `tx`. | **Secuencia + actividad** para surtimiento; **máquina de estados** normativa enlazada desde requisitos. |
+| Devolución de material: `goodsIssueController.registerGoodsIssueDetailReturn` y `detailReturns/goodsIssueReturnService.js` | `id`, `detailId` y cantidad de devolución retornan salida/detalle actualizado. | Comprueba cantidades y estado, devuelve inventario, registra movimiento y recalcula cumplimiento atómicamente. | **Secuencia específica** porque invierte inventario y estado después de una salida. |
+| Salidas de mermas: `wasteIssueController.js`, `wasteIssues/wasteIssueService.js`, `wasteIssueFulfillmentService.js` y reglas compartidas de `issues` | Lista, alta, edición, encabezado y detalles retornan documento actualizado. | Reutiliza reglas de encabezado/cumplimiento, aplica movimiento de merma y conserva documento, detalle e inventario en un `tx`. | **Secuencia + actividad** para surtimiento; estados desde requisitos. |
+| Devolución de merma: `wasteIssueController.registerWasteIssueDetailReturn` y `detailReturns/wasteIssueReturnService.js` | Identificadores y cantidad retornan la salida de merma actualizada. | Valida devolución, revierte inventario de merma y recalcula cumplimiento de manera atómica. | **Secuencia específica**, paralela conceptualmente a material pero con participantes de merma explícitos. |
+| Inventario compartido: `inventory/movementService.js`, `movementHelpers.js`, `stockHelpers.js`, `materialIdentity.js` | Recibe referencia, tipo, detalles y `tx`; devuelve movimiento/resumen o valida cantidades. | `applyInventoryMovement` actualiza existencias y crea movimiento; helpers convierten cantidades y rechazan insuficiencia. Participa en la transacción llamadora. | Participante en secuencias de entrada/salida/ajuste; **actividad** para conversión o suficiencia si cambia el algoritmo. |
+| Movimientos y reportes: `movementController.js`, `movementQueryService.js`, `inventory/reportService.js`, controladores/servicios `report` de admin, ventas y almacén | Consultas y filtros producen filas paginadas o archivo Excel con cabeceras HTTP. | Sólo lectura; los reportes reutilizan consultas y transforman resultados sin modificar inventario. | **Flujo de datos**; secuencia de descarga sólo si se necesita diagnosticar transporte. |
+| Numeración documental: `document/referenceNumberService.js` | Año/ámbito y cliente opcional producen o validan una referencia. | Comprueba duplicados e incrementa contadores usando el `tx` recibido cuando forma parte de creación documental. | Participante de secuencias de alta; **actividad** si cambia la estrategia anual/no anual. |
 
-Este fragmento procede de [`src/routes/api/index.js`](../../src/routes/api/index.js).
-La lista completa y regenerable de métodos y URLs se consulta en el
-[mapa generado del código](../generated/code-map.md); no se duplica aquí porque la
-cantidad de endpoints forma parte de su título y puede cambiar.
+El [mapa generado de servicios](../generated/code-map.md#símbolos-exportados-por-servicios)
+completa, símbolo por símbolo, las constantes y helpers de cada módulo de la tabla. Una
+nueva exportación debe pertenecer a una de estas fichas o crear una capacidad nueva; no
+puede quedar documentada sólo como “otro ejemplo”.
+
+## Matriz de diagramas por caso backend
+
+| Caso de implementación | Vista que aplica | Actualización obligatoria | Vista que no debe duplicarse |
+| --- | --- | --- | --- |
+| Adaptación HTTP que delega una sola operación | Recorrido HTTP común. | Ruta, controlador, servicio y contrato API. | Secuencia idéntica por endpoint. |
+| CRUD homogéneo | Ciclo CRUD/fábrica de listado. | Ficha de capacidad y mapa generado. | Actividad por verbo CRUD. |
+| Controlador coordina varios servicios o efecto post-commit | Secuencia. | Participantes, orden, respuesta y efecto externo. | Diagrama entidad-relación. |
+| Servicio contiene decisiones relevantes | Actividad. | Condiciones, errores y salida de cada rama. | Secuencia que oculte las decisiones. |
+| Escritura en varios modelos con `tx` | Secuencia con límite transaccional; actividad complementaria si hay ramas. | Inicio/commit/rollback y efectos fuera de la transacción. | Afirmar atomicidad desde imports. |
+| Cambio de estados persistentes | Máquina de estados normativa en requisitos y secuencia técnica que la referencia. | Transiciones, reglas y trazabilidad. | Segunda máquina de estados “técnica”. |
+| Modelos y relaciones Prisma | Entidad-relación generada. | `prisma/schema.prisma` y `npm run docs:architecture`. | ER manual dentro de la ficha. |
+| Dependencias entre capas o dominios | Componentes/dependencias del código. | `code-diagrams.md` y mapa generado. | Grafo por cada función. |
+| Consulta, catálogo o reporte de sólo lectura | Flujo de datos o ninguna vista propia. | Entradas, filtros, retorno y evidencia. | Transacción o secuencia trivial. |
+
+## Vistas técnicas aplicadas
+
+### Registro de rutas
 
 ```mermaid
 flowchart LR
@@ -139,69 +172,13 @@ flowchart LR
     app --> errors["Middleware final de error"]
 ```
 
-Las flechas expresan registro durante el arranque, no una llamada por cada petición. El
-diagrama se revisa si cambia el orden de montaje en `src/app.js`, el contrato de
-`registerApiRoutes` o las áreas de primer nivel de `API_ROUTES`.
+Se revisa si cambia el orden de montaje en `src/app.js`, el contrato de
+`registerApiRoutes` o las áreas de `API_ROUTES`.
 
-### Ejemplo de dominio: salidas de almacén
+### Secuencia de surtimiento de una salida de material
 
-El router [`goodsIssueApiRoute.js`](../../src/routes/api/warehouse/goodsIssueApiRoute.js)
-expone seis operaciones. Sus nombres permiten localizar de forma inequívoca el método
-que adapta HTTP y el método que aplica las reglas principales.
-
-| Método y ruta completa | Middleware específico después de autenticar | Controlador | Servicio principal |
-| --- | --- | --- | --- |
-| `GET /api/warehouse/goods-issues` | permiso `GOODS_ISSUES_MANAGE` | `getAllGoodsIssues` | `findAllGoodsIssues` |
-| `POST /api/warehouse/goods-issues` | `goodsIssueValidation` → `validate` → permiso `GOODS_ISSUES_MANAGE` | `registerGoodsIssue` | `createGoodsIssue` |
-| `PATCH /api/warehouse/goods-issues/:id` | `goodsIssueUpdateValidation` → `validate` → permiso `GOODS_ISSUES_MANAGE` | `editGoodsIssue` | `updateGoodsIssue` |
-| `PATCH /api/warehouse/goods-issues/:id/header` | `goodsIssueHeaderValidation` → `validate` → permiso `GOODS_ISSUES_MANAGE` | `editGoodsIssueHeader` | `updateGoodsIssueHeader` |
-| `PATCH /api/warehouse/goods-issues/:id/details` | `goodsIssueDetailsValidation` → `validate` → permiso `GOODS_ISSUE_DETAILS_MANAGE` | `editGoodsIssueDetails` | `updateGoodsIssueDetails` |
-| `PATCH /api/warehouse/goods-issues/:id/details/:detailId/returns` | `goodsIssueReturnValidation` → `validate` → permiso `GOODS_ISSUE_DETAILS_MANAGE` | `registerGoodsIssueDetailReturn` | `returnGoodsIssueDetail` |
-
-Todas comienzan con `verifyApiTokenRequired`. Los validadores viven en
-[`goodsIssueValidations.js`](../../src/validators/forms/goodsIssueValidations.js), los
-adaptadores HTTP en
-[`goodsIssueController.js`](../../src/controllers/api/warehouse/goodsIssueController.js)
-y las operaciones principales en
-[`goodsIssueService.js`](../../src/services/warehouse/goodsIssues/goodsIssueService.js).
-La devolución tiene su responsabilidad separada en
-[`goodsIssueReturnService.js`](../../src/services/warehouse/goodsIssues/detailReturns/goodsIssueReturnService.js).
-
-### Qué hace cada función del flujo de surtimiento
-
-La operación de detalles es representativa porque no sólo actualiza filas: puede
-descontar inventario y recalcula estados dentro de una transacción.
-
-| Función | Entrada y salida | Efecto o decisión principal |
-| --- | --- | --- |
-| `goodsIssueDetailsValidation` | `req.body` → errores de `express-validator` | Declara la forma mínima de los detalles antes de entrar al controlador. |
-| `validate` | resultado de validación → `next()` o respuesta de error | Interrumpe la cadena cuando la petición no cumple las reglas declaradas. |
-| `editGoodsIssueDetails(req, res)` | petición HTTP → JSON `200` | Construye el DTO, normaliza strings vacíos, llama al servicio y emite `inventory-updated` sólo después de que el servicio termina. |
-| `createGoodsIssueDetailsDtoForEdit(body)` | cuerpo externo → `{ details }` | Limita los campos que pasan desde transporte hacia el servicio. |
-| `updateGoodsIssueDetails({ id, goodsIssueDto })` | identificador y DTO → salida actualizada | Verifica documento, estado y detalles; calcula pendientes; coordina movimiento, actualización y estado global. |
-| `applyInventoryMovement({ tx, reference, details, movementType })` | cliente transaccional y cantidades → movimiento | Aplica el movimiento `ISSUE` usando la misma transacción recibida por el servicio. |
-| `resolveGoodsIssueDetailFulfillmentStatusName(detail)` | cantidades del detalle → nombre de estado | Decide el estado de cumplimiento de cada detalle actualizado. |
-| `resolveIssueFulfillmentStatus(details)` | resumen de detalles → nombre de estado | Decide el estado de cumplimiento del encabezado después de releer sus detalles. |
-| `getDb(tx)` | cliente opcional → `tx` o Prisma global | Permite que helpers y servicios participen en la transacción existente sin crear otra conexión. |
-
-El controlador conserva la adaptación HTTP y no replica la regla de surtimiento:
-
-```js
-const goodsIssueDto = createGoodsIssueDetailsDtoForEdit(req.body);
-const sanitizedGoodsIssueDto = sanitizeEmptyStrings(goodsIssueDto);
-
-const goodsIssue = await updateGoodsIssueDetails({
-    goodsIssueDto: sanitizedGoodsIssueDto,
-    id: req.params.id
-});
-```
-
-Este bloque se mantiene en
-[`editGoodsIssueDetails`](../../src/controllers/api/warehouse/goodsIssueController.js).
-La regla transaccional permanece en el servicio; moverla al controlador rompería la
-separación vigente entre transporte y dominio.
-
-### Secuencia específica de `updateGoodsIssueDetails`
+Esta secuencia se aplica a la ficha de salidas porque muestra coordinación, transacción
+y un efecto deliberadamente posterior al commit; no se generaliza a los CRUD simples.
 
 ```mermaid
 sequenceDiagram
@@ -221,28 +198,24 @@ sequenceDiagram
     Controller->>DTO: req.body
     DTO-->>Controller: { details }
     Controller->>Service: { id, goodsIssueDto }
-    Service->>Prisma: findUnique(id, detailIds)
-    Prisma-->>Service: encabezado y detalles actuales
+    Service->>Prisma: cargar salida y detalles
     Service->>Service: validar estado y calcular pendientes
     Service->>Prisma: iniciar $transaction
     opt Hay detalles por surtir
         Service->>Inventory: applyInventoryMovement({ tx, ISSUE, details })
         Inventory->>Prisma: descontar existencias y registrar movimiento
     end
-    Service->>Prisma: actualizar detalles
-    Service->>Prisma: releer detalles y actualizar estado del encabezado
-    Prisma-->>Service: salida actualizada
+    Service->>Prisma: actualizar detalles y estado del encabezado
+    Prisma-->>Service: salida actualizada y commit
     Service-->>Controller: goodsIssue
     Controller->>Socket: emitInventoryUpdated(...)
     Controller-->>Browser: 200 { goodsIssue, code }
 ```
 
-La transacción incluye el movimiento, los detalles y el estado del encabezado. La
-emisión Socket ocurre después de resolverla y no forma parte de la atomicidad en base de
-datos. Si no hay un detalle marcado para surtir, el bloque opcional se omite, pero se
-conservan las actualizaciones de conversión solicitadas.
+La emisión Socket queda fuera de la atomicidad. Se revisa si cambian estados, cantidades,
+el límite transaccional o el orden movimiento → detalles → encabezado.
 
-### Bloques de decisión dentro de la transacción
+### Actividad de la misma operación
 
 ```mermaid
 flowchart TB
@@ -255,22 +228,28 @@ flowchart TB
     transaction --> supply{"¿Hay cantidades por surtir?"}
     supply -->|Sí| movement["applyInventoryMovement<br/>tipo ISSUE"]
     supply -->|No| update["Actualizar detalles"]
-    movement --> detailStatus["Calcular estado de cada detalle"]
-    detailStatus --> update
-    update --> refresh["Releer todos los detalles"]
+    movement --> update
+    update --> refresh["Releer detalles"]
     refresh --> headerStatus["resolveIssueFulfillmentStatus"]
     headerStatus --> result["Actualizar y devolver encabezado"]
 ```
 
-Este diagrama es específico del algoritmo observable de
-`updateGoodsIssueDetails`; no reemplaza el diagrama funcional de requisitos. Debe
-revisarse si cambian los estados admitidos, el cálculo de cantidades, el límite
-transaccional o el orden movimiento → detalles → encabezado.
+La actividad complementa la secuencia porque hace visibles errores y bifurcaciones. La
+evidencia del adaptador está en
+[`goodsIssueControllerTest.js`](../../tests/unit/controllers/api/warehouse/goodsIssueControllerTest.js);
+la cobertura y brechas de servicios permanecen en el [plan de pruebas](../testing/test-plan.md).
 
-### Evidencia ejecutable localizada
+## Lista de revisión backend
 
-Las pruebas unitarias del adaptador HTTP viven en
-[`tests/unit/controllers/api/warehouse/goodsIssueControllerTest.js`](../../tests/unit/controllers/api/warehouse/goodsIssueControllerTest.js).
-La cobertura global y cualquier brecha del servicio se declaran en el
-[plan de pruebas](../testing/test-plan.md); la existencia de este diagrama no se toma
-como prueba de atomicidad ni de comportamiento.
+1. Comparar las carpetas de `controllers` y `services` con ambas secciones del mapa
+   generado y asignar cada módulo nuevo a una ficha.
+2. Comprobar método, URL, middleware, DTO, argumentos, retorno y código HTTP contra la
+   ruta y el contrato API.
+3. Verificar errores, modelos afectados, propagación de `tx` y efectos posteriores sin
+   atribuirlos a la capa incorrecta.
+4. Aplicar la matriz: actualizar secuencia, actividad, estados, ER o dependencias sólo
+   cuando el caso lo requiere.
+5. Revisar imports, exports y referencias después de renombrar o mover símbolos.
+6. Localizar pruebas unitarias/de base de datos sin afirmar cobertura no ejecutada.
+7. Ejecutar `npm run docs:check`; si cambió código fuente del inventario, ejecutar antes
+   `npm run docs:architecture`.
