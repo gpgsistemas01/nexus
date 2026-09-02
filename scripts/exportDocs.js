@@ -18,6 +18,9 @@ const MANIFESTS = Object.freeze({
     ],
     arquitectura: [
         'docs/architecture/architecture-and-web-views.md',
+        'docs/architecture/technical-code-documentation.md',
+        'docs/architecture/backend-technical-documentation.md',
+        'docs/architecture/frontend-technical-documentation.md',
         'docs/architecture/design-and-construction-patterns.md',
         'docs/architecture/code-diagrams.md'
     ],
