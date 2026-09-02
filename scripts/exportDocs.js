@@ -4,8 +4,52 @@ import path from 'node:path';
 import process from 'node:process';
 
 const ROOT = process.cwd();
+const manualCases = [
+    'docs/user-manual/cases/authentication.md',
+    'docs/user-manual/cases/identity-access.md',
+    'docs/user-manual/cases/catalogs.md',
+    'docs/user-manual/cases/purchases.md',
+    'docs/user-manual/cases/issues.md',
+    'docs/user-manual/cases/reports.md'
+];
+const [authenticationCases, identityCases, catalogCases, purchaseCases, issueCases, reportCases] = manualCases;
+const manualCommon = [
+    'docs/user-manual/index.md',
+    'docs/user-manual/procedures.md'
+];
+const manualErrorCatalog = 'docs/user-manual/error-messages.md';
+const manualReferences = [
+    manualErrorCatalog,
+    'docs/user-manual/screenshot-inventory.md'
+];
 const MANIFESTS = Object.freeze({
-    'manual-usuario': ['docs/user-manual/index.md'],
+    'manual-usuario': [...manualCommon, ...manualCases, ...manualReferences],
+    'manual-administrador': [
+        'docs/user-manual/actors/administrator.md',
+        authenticationCases,
+        identityCases,
+        catalogCases,
+        reportCases,
+        manualErrorCatalog
+    ],
+    'manual-almacen': [
+        'docs/user-manual/actors/warehouse.md',
+        authenticationCases,
+        catalogCases,
+        purchaseCases,
+        issueCases,
+        reportCases,
+        manualErrorCatalog
+    ],
+    'manual-reportes': [
+        'docs/user-manual/actors/reporting.md',
+        authenticationCases,
+        catalogCases,
+        purchaseCases,
+        issueCases,
+        reportCases,
+        manualErrorCatalog
+    ],
     requisitos: [
         'docs/requirements/index.md',
         'docs/requirements/vision-scope-and-requirements.md',
@@ -31,7 +75,7 @@ const checkOnly = process.argv.includes('--check');
 const formats = new Set(['html', 'docx', 'pdf']);
 
 if (!MANIFESTS[publication] || !formats.has(requestedFormat)) {
-    console.error('Uso: npm run docs:export -- <manual-usuario|requisitos|arquitectura|pruebas> <html|docx|pdf> [--check]');
+    console.error('Uso: npm run docs:export -- <manual-usuario|manual-administrador|manual-almacen|manual-reportes|requisitos|arquitectura|pruebas> <html|docx|pdf> [--check]');
     process.exit(1);
 }
 
@@ -62,7 +106,7 @@ if (pandoc.error || pandoc.status !== 0) {
 const outputDirectory = path.join(ROOT, 'build/docs');
 await mkdir(outputDirectory, { recursive: true });
 const output = path.join(outputDirectory, `${publication}.${requestedFormat}`);
-const args = [...sources, '--from=gfm', '--standalone', '--toc', `--output=${output}`, '--resource-path=.:docs'];
+const args = [...sources, '--from=gfm', '--file-scope', '--standalone', '--toc', `--output=${output}`, '--resource-path=.:docs'];
 if (requestedFormat === 'html') args.push('--css=../../docs/styles/document.css');
 if (requestedFormat === 'docx' && process.env.DOCS_REFERENCE_DOC) args.push(`--reference-doc=${process.env.DOCS_REFERENCE_DOC}`);
 if (requestedFormat === 'pdf' && process.env.DOCS_PDF_ENGINE) args.push(`--pdf-engine=${process.env.DOCS_PDF_ENGINE}`);

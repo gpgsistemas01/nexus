@@ -4,7 +4,10 @@
 
 Cada captura tiene un identificador estable `CAP-<grupo>-<ámbito>-<paso>-<estado>`. El
 identificador permite relacionarla con uno o más casos de uso sin depender del nombre del
-archivo. La ruta conserva el patrón `images/<módulo>/NN-descripcion.png`: `NN` expresa el orden
+archivo. Ese mismo identificador se publica como ancla junto a la imagen en los
+[procedimientos del manual](procedures.md), de modo que puede citarse como, por ejemplo,
+`cases/catalogs.md#CAP-CAT-MAT-02-CREATE`. La ruta conserva el patrón
+`images/<módulo>/NN-descripcion.png`: `NN` expresa el orden
 en que el lector recorre el módulo, desde el listado hacia la captura de datos, la edición, las
 operaciones que modifican existencias y, al final, la exportación.
 
@@ -106,6 +109,10 @@ incompleta o incoherente. `DOCS_STORAGE_STATE` es obligatorio para las vistas pr
 pantalla de inicio de sesión se toma en un contexto separado y sin autenticación.
 
 ## Revisión antes de publicar
+
+Cada ejecución elimina por completo `docs/user-manual/images/` después de validar la
+configuración y antes de abrir el navegador. Así se retiran archivos obsoletos, incluso si ya no
+figuran en el inventario. La opción `--list` es sólo de consulta y no elimina archivos.
 
 Después de ejecutar `npm run docs:screenshots`, se debe comprobar que los datos sean ficticios,
 que no aparezcan contraseñas, cookies ni datos personales, que los textos sean legibles y que el
