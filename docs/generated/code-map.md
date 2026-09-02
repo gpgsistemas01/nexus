@@ -130,3 +130,106 @@ flowchart LR
 | `GET` | `/movimientos/materiales` | [`src/routes/web/admin/movementWebRoute.js`](../../src/routes/web/admin/movementWebRoute.js) |
 | `GET` | `/movimientos/mermas` | [`src/routes/web/admin/movementWebRoute.js`](../../src/routes/web/admin/movementWebRoute.js) |
 | `GET` | `/movimientos` | [`src/routes/web/admin/movementWebRoute.js`](../../src/routes/web/admin/movementWebRoute.js) |
+
+## Símbolos exportados por controladores
+
+Este inventario enumera los nombres públicos declarados por los módulos bajo
+`src/controllers`. Permite localizar el adaptador HTTP o web sin inferir su propósito
+desde el nombre. La responsabilidad, entrada, salida y servicio coordinado se explican
+en la [documentación técnica del backend](../architecture/backend-technical-documentation.md)
+cuando el flujo necesita una vista curada.
+
+| Módulo | Símbolos exportados |
+| --- | --- |
+| [`src/controllers/api/admin/departmentController.js`](../../src/controllers/api/admin/departmentController.js) | `getAllDepartments` |
+| [`src/controllers/api/admin/movementController.js`](../../src/controllers/api/admin/movementController.js) | `getAllMaterialMovements`, `getAllWasteMovements` |
+| [`src/controllers/api/admin/personController.js`](../../src/controllers/api/admin/personController.js) | `editPerson`, `getAllPersons`, `registerPerson` |
+| [`src/controllers/api/admin/reportController.js`](../../src/controllers/api/admin/reportController.js) | `exportMovementReport`, `exportPersonReport`, `exportUserReport`, `exportWasteMovementReport` |
+| [`src/controllers/api/admin/roleController.js`](../../src/controllers/api/admin/roleController.js) | `getAllRoles` |
+| [`src/controllers/api/admin/userController.js`](../../src/controllers/api/admin/userController.js) | `editUser`, `editUserPassword`, `getAllUsers`, `registerUser` |
+| [`src/controllers/api/authController.js`](../../src/controllers/api/authController.js) | `getCurrentUser`, `login`, `refreshAuthToken` |
+| [`src/controllers/api/createDataTableListController.js`](../../src/controllers/api/createDataTableListController.js) | `createDataTableListController` |
+| [`src/controllers/api/sales/clientController.js`](../../src/controllers/api/sales/clientController.js) | `editClient`, `getAllClients`, `registerClient` |
+| [`src/controllers/api/sales/reportController.js`](../../src/controllers/api/sales/reportController.js) | `exportClientReport` |
+| [`src/controllers/api/warehouse/fulfillmentStatusController.js`](../../src/controllers/api/warehouse/fulfillmentStatusController.js) | `getAllFulfillmentStatuses` |
+| [`src/controllers/api/warehouse/goodsIssueController.js`](../../src/controllers/api/warehouse/goodsIssueController.js) | `editGoodsIssue`, `editGoodsIssueDetails`, `editGoodsIssueHeader`, `getAllGoodsIssues`, `registerGoodsIssue`, `registerGoodsIssueDetailReturn` |
+| [`src/controllers/api/warehouse/goodsReceiptController.js`](../../src/controllers/api/warehouse/goodsReceiptController.js) | `cancelGoodsReceiptDetail`, `correctGoodsReceiptDetail`, `editGoodsReceiptHeader`, `getAllGoodsReceipts`, `registerGoodsReceipt` |
+| [`src/controllers/api/warehouse/materialController.js`](../../src/controllers/api/warehouse/materialController.js) | `editMaterial`, `editMaterialStock`, `getAllMaterials`, `registerMaterial`, `removeMaterial` |
+| [`src/controllers/api/warehouse/presentationController.js`](../../src/controllers/api/warehouse/presentationController.js) | `getAllPresentations` |
+| [`src/controllers/api/warehouse/reasonController.js`](../../src/controllers/api/warehouse/reasonController.js) | `getAllReasons` |
+| [`src/controllers/api/warehouse/reportController.js`](../../src/controllers/api/warehouse/reportController.js) | `exportGoodsIssueReportExcel`, `exportGoodsReceiptReportExcel`, `exportSupplierReportExcel`, `exportWarehouseReportExcel`, `exportWasteIssueReportExcel`, `exportWasteReportExcel` |
+| [`src/controllers/api/warehouse/supplierController.js`](../../src/controllers/api/warehouse/supplierController.js) | `editSupplier`, `getAllSuppliers`, `registerSupplier` |
+| [`src/controllers/api/warehouse/unitMeasureController.js`](../../src/controllers/api/warehouse/unitMeasureController.js) | `getAllUnitMeasures` |
+| [`src/controllers/api/warehouse/wasteController.js`](../../src/controllers/api/warehouse/wasteController.js) | `editWaste`, `editWasteStock`, `getAllWastes`, `getWasteMaterialTemplates`, `registerWaste` |
+| [`src/controllers/api/warehouse/wasteIssueController.js`](../../src/controllers/api/warehouse/wasteIssueController.js) | `editWasteIssue`, `editWasteIssueDetails`, `editWasteIssueHeader`, `getAllWasteIssues`, `registerWasteIssue`, `registerWasteIssueDetailReturn` |
+| [`src/controllers/web/admin/movementController.js`](../../src/controllers/web/admin/movementController.js) | `getMaterialMovementPage`, `getWasteMovementPage` |
+| [`src/controllers/web/admin/personController.js`](../../src/controllers/web/admin/personController.js) | `getPersonsPage` |
+| [`src/controllers/web/admin/userController.js`](../../src/controllers/web/admin/userController.js) | `getUsersPage` |
+| [`src/controllers/web/authController.js`](../../src/controllers/web/authController.js) | `login`, `logout`, `refreshAuthToken` |
+| [`src/controllers/web/sales/clientController.js`](../../src/controllers/web/sales/clientController.js) | `getClientsPage` |
+| [`src/controllers/web/warehouse/goodsIssueController.js`](../../src/controllers/web/warehouse/goodsIssueController.js) | `getGoodsIssuesPage` |
+| [`src/controllers/web/warehouse/goodsReceiptController.js`](../../src/controllers/web/warehouse/goodsReceiptController.js) | `getGoodsReceiptsPage` |
+| [`src/controllers/web/warehouse/materialController.js`](../../src/controllers/web/warehouse/materialController.js) | `getMaterialsPage` |
+| [`src/controllers/web/warehouse/supplierController.js`](../../src/controllers/web/warehouse/supplierController.js) | `getSuppliersPage` |
+| [`src/controllers/web/warehouse/wasteController.js`](../../src/controllers/web/warehouse/wasteController.js) | `getWastesPage` |
+| [`src/controllers/web/warehouse/wasteIssueController.js`](../../src/controllers/web/warehouse/wasteIssueController.js) | `getWasteIssuesPage` |
+
+## Símbolos exportados por servicios
+
+Este inventario enumera los nombres públicos declarados por los módulos bajo
+`src/services`. No presenta cada export como regla de negocio ni sustituye el contrato
+de la función: los parámetros, efectos, transacciones, errores y pruebas se documentan
+sólo cuando aportan información que el código no expresa por sí mismo.
+
+| Módulo | Símbolos exportados |
+| --- | --- |
+| [`src/services/admin/departmentService.js`](../../src/services/admin/departmentService.js) | `findAllDepartments`, `findDepartmentById` |
+| [`src/services/admin/person/personRules.js`](../../src/services/admin/person/personRules.js) | `isValidInternalClientAdvisor` |
+| [`src/services/admin/person/personService.js`](../../src/services/admin/person/personService.js) | `createPerson`, `findAllPersons`, `findPersonById`, `updatePerson` |
+| [`src/services/admin/roleService.js`](../../src/services/admin/roleService.js) | `findAllRoles` |
+| [`src/services/admin/userService.js`](../../src/services/admin/userService.js) | `createUser`, `findAllUsers`, `getLoggedUser`, `getUserIdByLogin`, `updateUser`, `updateUserPassword` |
+| [`src/services/audit/auditService.js`](../../src/services/audit/auditService.js) | `isAuditWriteRequest`, `persistWriteAudit` |
+| [`src/services/authService.js`](../../src/services/authService.js) | `getNewRefreshToken`, `loginUser` |
+| [`src/services/document/referenceNumberService.js`](../../src/services/document/referenceNumberService.js) | `generateYearlyReferenceNumber`, `incrementNonYearlyReferenceNumberCounter`, `throwIfReferenceNumberAlreadyExists` |
+| [`src/services/inventory/materialIdentity.js`](../../src/services/inventory/materialIdentity.js) | `getMaterialIdentityWidth` |
+| [`src/services/inventory/movementHelpers.js`](../../src/services/inventory/movementHelpers.js) | `buildInventoryMovementDetail`, `buildStockUpdateSummary` |
+| [`src/services/inventory/movementQueryService.js`](../../src/services/inventory/movementQueryService.js) | `findAllMaterialMovements`, `findAllWasteMovements` |
+| [`src/services/inventory/movementService.js`](../../src/services/inventory/movementService.js) | `applyInventoryMovement`, `createInventoryMovement` |
+| [`src/services/inventory/reportService.js`](../../src/services/inventory/reportService.js) | `findMovementReportRows` |
+| [`src/services/inventory/stockHelpers.js`](../../src/services/inventory/stockHelpers.js) | `assertSufficientStock`, `calculateConvertedQuantity`, `hasDimensions` |
+| [`src/services/jwtService.js`](../../src/services/jwtService.js) | `generateAccessToken`, `generateOneTimeToken`, `generateRefreshToken`, `verifyAccessToken`, `verifyOneTimeToken`, `verifyRefreshToken`, `verifyToken` |
+| [`src/services/roleService.js`](../../src/services/roleService.js) | `getRoleNameById` |
+| [`src/services/sales/clientService.js`](../../src/services/sales/clientService.js) | `createClient`, `findAllClients`, `findClientById`, `updateClient` |
+| [`src/services/serviceErrorHandler.js`](../../src/services/serviceErrorHandler.js) | `executeServiceOperation`, `handleServiceError` |
+| [`src/services/warehouse/adjustmentService.js`](../../src/services/warehouse/adjustmentService.js) | `createStockAdjustment`, `createStockAdjustmentByQuantityChange` |
+| [`src/services/warehouse/fulfillmentStatusService.js`](../../src/services/warehouse/fulfillmentStatusService.js) | `findAllFulfillmentStatuses`, `findFulfillmentStatusIdByName`, `findFulfillmentStatusIdsByName` |
+| [`src/services/warehouse/goodsIssues/detailReturns/goodsIssueReturnService.js`](../../src/services/warehouse/goodsIssues/detailReturns/goodsIssueReturnService.js) | `returnGoodsIssueDetail` |
+| [`src/services/warehouse/goodsIssues/goodsIssueDetailSelect.js`](../../src/services/warehouse/goodsIssues/goodsIssueDetailSelect.js) | `GOODS_ISSUE_DETAIL_SELECT` |
+| [`src/services/warehouse/goodsIssues/goodsIssueFulfillmentRules.js`](../../src/services/warehouse/goodsIssues/goodsIssueFulfillmentRules.js) | `resolveGoodsIssueDetailFulfillmentStatusName` |
+| [`src/services/warehouse/goodsIssues/goodsIssueHelpers.js`](../../src/services/warehouse/goodsIssues/goodsIssueHelpers.js) | `buildGoodsIssueDetails` |
+| [`src/services/warehouse/goodsIssues/goodsIssueService.js`](../../src/services/warehouse/goodsIssues/goodsIssueService.js) | `createGoodsIssue`, `findAllGoodsIssues`, `updateGoodsIssue`, `updateGoodsIssueDetails`, `updateGoodsIssueHeader` |
+| [`src/services/warehouse/goodsReceipts/detailChanges/goodsReceiptCancellationService.js`](../../src/services/warehouse/goodsReceipts/detailChanges/goodsReceiptCancellationService.js) | `cancelGoodsReceiptDetailLine` |
+| [`src/services/warehouse/goodsReceipts/detailChanges/goodsReceiptCorrectionService.js`](../../src/services/warehouse/goodsReceipts/detailChanges/goodsReceiptCorrectionService.js) | `correctGoodsReceiptDetailLine` |
+| [`src/services/warehouse/goodsReceipts/detailChanges/goodsReceiptDetailChangeService.js`](../../src/services/warehouse/goodsReceipts/detailChanges/goodsReceiptDetailChangeService.js) | `GOODS_RECEIPT_DETAIL_STATUS`, `createGoodsReceiptDetailChange`, `createGoodsReceiptDetailChangeMovementAndUpdateStock`, `findReceiptDetailForChange` |
+| [`src/services/warehouse/goodsReceipts/goodsReceiptHelpers.js`](../../src/services/warehouse/goodsReceipts/goodsReceiptHelpers.js) | `GOODS_RECEIPT_DETAIL_INCLUDE`, `buildGoodsReceiptDetails`, `calculateGoodsReceiptTotals`, `cancelGoodsReceiptDetailAndTotals`, `correctGoodsReceiptDetailAndTotals`, `createGoodsReceiptDetailsAndUpdateTotals` |
+| [`src/services/warehouse/goodsReceipts/goodsReceiptInvoiceService.js`](../../src/services/warehouse/goodsReceipts/goodsReceiptInvoiceService.js) | `assertGoodsReceiptInvoiceAvailable` |
+| [`src/services/warehouse/goodsReceipts/goodsReceiptService.js`](../../src/services/warehouse/goodsReceipts/goodsReceiptService.js) | `createGoodsReceipt`, `findAllGoodsReceipts`, `updateGoodsReceipt` |
+| [`src/services/warehouse/issues/issueFulfillmentRules.js`](../../src/services/warehouse/issues/issueFulfillmentRules.js) | `resolveIssueDetailFulfillmentStatus`, `resolveIssueFulfillmentStatus` |
+| [`src/services/warehouse/issues/issueHeaderService.js`](../../src/services/warehouse/issues/issueHeaderService.js) | `resolveIssueHeaderData` |
+| [`src/services/warehouse/materials/materialHelpers.js`](../../src/services/warehouse/materials/materialHelpers.js) | `prepareMaterialData`, `withRetry` |
+| [`src/services/warehouse/materials/materialRelations.js`](../../src/services/warehouse/materials/materialRelations.js) | `syncSupplierMaterial` |
+| [`src/services/warehouse/materials/materialService.js`](../../src/services/warehouse/materials/materialService.js) | `createMaterial`, `deleteMaterial`, `existsMaterial`, `findAllMaterials`, `findMaterialsSnapshot`, `updateMaterial`, `updateMaterialStock` |
+| [`src/services/warehouse/materials/supplierMaterialService.js`](../../src/services/warehouse/materials/supplierMaterialService.js) | `adjustSupplierMaterialStock`, `countTotalSupplierMaterials`, `deleteSupplierMaterial`, `existsMaterialUsage`, `findAllSupplierMaterials`, `findCurrentSupplierMaterialByMaterialId`, `findSupplierMaterialById`, `findSupplierMaterialByIds`, `findSupplierMaterialsForStockMovement`, `findSupplierMaterialsSnapshot`, `mapSupplierMaterial`, `recalculateConvertedQuantityByMaterial`, `recalculateMaterialUnitCosts`, `saveSupplierMaterial`, `updateMaterialUnitCostIfHigher`, `updateSupplierMaterialStock` |
+| [`src/services/warehouse/presentationService.js`](../../src/services/warehouse/presentationService.js) | `findAllPresentations`, `findUniquePresentation` |
+| [`src/services/warehouse/reasonService.js`](../../src/services/warehouse/reasonService.js) | `INITIAL_STOCK_REASON_NAME`, `findAllReasons`, `findGoodsReceiptDetailChangeReason`, `findInitialStockAdjustmentReason` |
+| [`src/services/warehouse/reportService.js`](../../src/services/warehouse/reportService.js) | `buildMonthlyGoodsReceiptSummary`, `buildWasteReportSummary`, `findGoodsIssueReportRows`, `findGoodsReceiptReportRows`, `findSupplierReportRows`, `findWarehouseReportRows`, `findWasteIssueReportRows`, `findWasteReportRows` |
+| [`src/services/warehouse/supplierService.js`](../../src/services/warehouse/supplierService.js) | `createSupplier`, `findAllSuppliers`, `findUniqueSupplier`, `findUniqueSupplierCode`, `updateSupplier` |
+| [`src/services/warehouse/unitMeasureService.js`](../../src/services/warehouse/unitMeasureService.js) | `findAllUnitMeasures`, `findUniqueUnitMeasure` |
+| [`src/services/warehouse/wasteIssues/detailReturns/wasteIssueReturnService.js`](../../src/services/warehouse/wasteIssues/detailReturns/wasteIssueReturnService.js) | `returnWasteIssueDetail` |
+| [`src/services/warehouse/wasteIssues/wasteIssueFulfillmentService.js`](../../src/services/warehouse/wasteIssues/wasteIssueFulfillmentService.js) | `findWasteIssueFulfillmentStatusIds` |
+| [`src/services/warehouse/wasteIssues/wasteIssueService.js`](../../src/services/warehouse/wasteIssues/wasteIssueService.js) | `createWasteIssue`, `findAllWasteIssues`, `updateWasteIssue`, `updateWasteIssueDetails`, `updateWasteIssueHeader` |
+| [`src/services/warehouse/wastes/wasteInventoryService.js`](../../src/services/warehouse/wastes/wasteInventoryService.js) | `applyWasteStockChange` |
+| [`src/services/warehouse/wastes/wasteMaterialService.js`](../../src/services/warehouse/wastes/wasteMaterialService.js) | `findWasteMaterialTemplates`, `resolveWasteMaterialSnapshot` |
+| [`src/services/warehouse/wastes/wasteMovementService.js`](../../src/services/warehouse/wastes/wasteMovementService.js) | `applyWasteIssueMovement`, `applyWasteIssueReturnMovement`, `createWasteMovement` |
+| [`src/services/warehouse/wastes/wasteService.js`](../../src/services/warehouse/wastes/wasteService.js) | `createWasteWithInitialStockAdjustment`, `findAllWastes`, `updateWaste`, `updateWasteStock` |
+| [`src/services/warehouse/wastes/wasteStockAdjustmentService.js`](../../src/services/warehouse/wastes/wasteStockAdjustmentService.js) | `registerWasteStockAdjustment` |

@@ -91,12 +91,40 @@ const table = (routes) => [
     ...routes.map(({ method, route, file }) => `| \`${method}\` | \`${route}\` | [\`${file}\`](../../${file}) |`)
 ].join('\n');
 
+const getNamedExports = (source) => [...source.matchAll(
+    /export\s+(?:const|function|class)\s+(\w+)/g
+)].map((match) => match[1]).sort();
+
+const getModuleExports = async (sourceFiles, area) => {
+    const areaRoot = path.join(ROOT, 'src', area);
+    const modules = [];
+    for (const file of sourceFiles.filter((sourceFile) => sourceFile.startsWith(`${areaRoot}${path.sep}`))) {
+        const exports = getNamedExports(await readFile(file, 'utf8'));
+        if (!exports.length) continue;
+        modules.push({
+            file: toPosix(path.relative(ROOT, file)),
+            exports
+        });
+    }
+    return modules;
+};
+
+const moduleExportsTable = (modules) => [
+    '| Módulo | Símbolos exportados |',
+    '| --- | --- |',
+    ...modules.map(({ file, exports }) => (
+        `| [\`${file}\`](../../${file}) | ${exports.map((name) => `\`${name}\``).join(', ')} |`
+    ))
+].join('\n');
+
 const generateCodeMap = async () => {
     const sourceFiles = (await walk(path.join(ROOT, 'src'))).filter((file) => file.endsWith('.js'));
-    const [apiRoutes, webRoutes, dependencies] = await Promise.all([
+    const [apiRoutes, webRoutes, dependencies, controllerModules, serviceModules] = await Promise.all([
         getRoutes('api'),
         getRoutes('web'),
-        getLayerDependencies(sourceFiles)
+        getLayerDependencies(sourceFiles),
+        getModuleExports(sourceFiles, 'controllers'),
+        getModuleExports(sourceFiles, 'services')
     ]);
     const counts = new Map(SOURCE_AREAS.map((area) => [area, 0]));
     sourceFiles.forEach((file) => {
@@ -134,6 +162,25 @@ ${table(apiRoutes)}
 ## Rutas web (${webRoutes.length})
 
 ${table(webRoutes)}
+
+## Símbolos exportados por controladores
+
+Este inventario enumera los nombres públicos declarados por los módulos bajo
+\`src/controllers\`. Permite localizar el adaptador HTTP o web sin inferir su propósito
+desde el nombre. La responsabilidad, entrada, salida y servicio coordinado se explican
+en la [documentación técnica del backend](../architecture/backend-technical-documentation.md)
+cuando el flujo necesita una vista curada.
+
+${moduleExportsTable(controllerModules)}
+
+## Símbolos exportados por servicios
+
+Este inventario enumera los nombres públicos declarados por los módulos bajo
+\`src/services\`. No presenta cada export como regla de negocio ni sustituye el contrato
+de la función: los parámetros, efectos, transacciones, errores y pruebas se documentan
+sólo cuando aportan información que el código no expresa por sí mismo.
+
+${moduleExportsTable(serviceModules)}
 `;
 };
 
