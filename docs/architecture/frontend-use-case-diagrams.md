@@ -43,6 +43,42 @@ indican cuál de sus piezas usa el caso. La cadena demuestra reutilización exis
 recorrido continuo conserva la especialización concreta y permite evaluar una
 refactorización sin afirmar que dos casos son idénticos.
 
+### Índice rápido de patrones por caso
+
+Cada caso conserva una línea **Patrones** con códigos de este índice. La tabla concentra
+la explicación y evita repetirla 63 veces; la línea local permite identificar de
+inmediato qué construcción configura el caso. Los patrones se apoyan en el
+[catálogo canónico](design-and-construction-patterns.md#resumen-de-patrones-confirmados).
+
+| Código | Patrón aplicado | Elementos que permiten reconocerlo |
+| --- | --- | --- |
+| `FE-P01` | Capas del navegador | Página/UI → aplicación → servicio HTTP → endpoint. |
+| `FE-P02` | Factory CRUD | `createCrudApplication` configurada con requests y claves del recurso. |
+| `FE-P03` | Factory/adaptador de catálogo | `createApplicationList` + request y transformación de opciones. |
+| `FE-P04` | Mutación por composición | Operación adicional incorporada al CRUD sin herencia. |
+| `FE-P05` | Composición de salidas | `createIssueApplication` configurada para material o merma. |
+| `FE-P06` | UI de devolución compartida | `issueReturnUI` parametrizada por el contexto de la salida. |
+| `FE-P07` | Consulta tabular | DataTable + filtros + aplicación de lectura contextual. |
+| `FE-P08` | Factory de reporte | `createReportApplication` + `buildExcelButton` y request de descarga. |
+| `FE-P09` | Navegación compuesta | Formulario o layout común coordina navegación/sesión sin duplicar el endpoint. |
+
+### Cobertura de casos frontend
+
+La comparación con el catálogo de casos y la matriz técnica confirma que no faltan
+vistas frontend. Cada identificador del rango aparece una vez y contiene un bloque
+Mermaid; cuando no existe una pantalla independiente, la vista señala el componente
+consumidor real en lugar de inventar una interfaz.
+
+| Grupo | Rango cubierto | Diagramas | Estado |
+| --- | --- | ---: | --- |
+| Autenticación | `CU-AUT-01..02` | 2 | Completo |
+| Identidad y acceso | `CU-IDA-01..09` | 9 | Completo |
+| Catálogos | `CU-CAT-01..20` | 20 | Completo |
+| Entradas | `CU-ENT-01..05` | 5 | Completo |
+| Salidas | `CU-SAL-01..12` | 12 | Completo |
+| Consultas y reportes | `CU-REP-01..15` | 15 | Completo |
+| **Total** | `CU-AUT-01..CU-REP-15` | **63** | **63 de 63** |
+
 ## Perspectivas complementarias del frontend
 
 La vista por caso responde **qué interacción y transporte lo aplican**. Estas
@@ -154,6 +190,8 @@ stateDiagram-v2
 
 **Identificador:** `DIA-FE-CU-AUT-01`. **Fuente:** fila `CU-AUT-01` de la matriz de aplicación al código frontend. **Reutilización:** `DIA-FE-REU-001` · `apiRequest y composición de navegación`.
 
+**Patrones:** `FE-P01`, `FE-P09`.
+
 ```mermaid
 flowchart LR
     reuse["DIA-FE-REU-001<br/>apiRequest y composición de navegación"] -.-> source
@@ -163,6 +201,8 @@ flowchart LR
 ## `CU-AUT-02`
 
 **Identificador:** `DIA-FE-CU-AUT-02`. **Fuente:** fila `CU-AUT-02` de la matriz de aplicación al código frontend. **Reutilización:** `DIA-FE-REU-001` · `composición de navegación compartida`.
+
+**Patrones:** `FE-P09`.
 
 ```mermaid
 flowchart LR
@@ -174,6 +214,8 @@ flowchart LR
 
 **Identificador:** `DIA-FE-CU-IDA-01`. **Fuente:** fila `CU-IDA-01` de la matriz de aplicación al código frontend. **Reutilización:** `DIA-FE-REU-001` · `createCrudApplication y UI/formularios compartidos`.
 
+**Patrones:** `FE-P02`.
+
 ```mermaid
 flowchart LR
     reuse["DIA-FE-REU-001<br/>createCrudApplication y UI/formularios compartidos"] -.-> source
@@ -183,6 +225,8 @@ flowchart LR
 ## `CU-IDA-02`
 
 **Identificador:** `DIA-FE-CU-IDA-02`. **Fuente:** fila `CU-IDA-02` de la matriz de aplicación al código frontend. **Reutilización:** `DIA-FE-REU-001` · `createCrudApplication y UI/formularios compartidos`.
+
+**Patrones:** `FE-P02`.
 
 ```mermaid
 flowchart LR
@@ -194,6 +238,8 @@ flowchart LR
 
 **Identificador:** `DIA-FE-CU-IDA-03`. **Fuente:** fila `CU-IDA-03` de la matriz de aplicación al código frontend. **Reutilización:** `DIA-FE-REU-001` · `createCrudApplication y UI/formularios compartidos`.
 
+**Patrones:** `FE-P02`.
+
 ```mermaid
 flowchart LR
     reuse["DIA-FE-REU-001<br/>createCrudApplication y UI/formularios compartidos"] -.-> source
@@ -203,6 +249,8 @@ flowchart LR
 ## `CU-IDA-04`
 
 **Identificador:** `DIA-FE-CU-IDA-04`. **Fuente:** fila `CU-IDA-04` de la matriz de aplicación al código frontend. **Reutilización:** `DIA-FE-REU-001` · `createCrudApplication y UI/formularios compartidos`.
+
+**Patrones:** `FE-P02`.
 
 ```mermaid
 flowchart LR
@@ -214,6 +262,8 @@ flowchart LR
 
 **Identificador:** `DIA-FE-CU-IDA-05`. **Fuente:** fila `CU-IDA-05` de la matriz de aplicación al código frontend. **Reutilización:** `DIA-FE-REU-001` · `createCrudApplication y UI/formularios compartidos`.
 
+**Patrones:** `FE-P02`.
+
 ```mermaid
 flowchart LR
     reuse["DIA-FE-REU-001<br/>createCrudApplication y UI/formularios compartidos"] -.-> source
@@ -223,6 +273,8 @@ flowchart LR
 ## `CU-IDA-06`
 
 **Identificador:** `DIA-FE-CU-IDA-06`. **Fuente:** fila `CU-IDA-06` de la matriz de aplicación al código frontend. **Reutilización:** `DIA-FE-REU-001` · `createCrudApplication y UI/formularios compartidos`.
+
+**Patrones:** `FE-P02`.
 
 ```mermaid
 flowchart LR
@@ -234,6 +286,8 @@ flowchart LR
 
 **Identificador:** `DIA-FE-CU-IDA-07`. **Fuente:** fila `CU-IDA-07` de la matriz de aplicación al código frontend. **Reutilización:** `DIA-FE-REU-001` · `createCrudApplication y UI/formularios compartidos`.
 
+**Patrones:** `FE-P02`.
+
 ```mermaid
 flowchart LR
     reuse["DIA-FE-REU-001<br/>createCrudApplication y UI/formularios compartidos"] -.-> source
@@ -243,6 +297,8 @@ flowchart LR
 ## `CU-IDA-08`
 
 **Identificador:** `DIA-FE-CU-IDA-08`. **Fuente:** fila `CU-IDA-08` de la matriz de aplicación al código frontend. **Reutilización:** `DIA-FE-REU-001` · `createApplicationList y catálogos compartidos`.
+
+**Patrones:** `FE-P03`.
 
 ```mermaid
 flowchart LR
@@ -254,6 +310,8 @@ flowchart LR
 
 **Identificador:** `DIA-FE-CU-IDA-09`. **Fuente:** fila `CU-IDA-09` de la matriz de aplicación al código frontend. **Reutilización:** `DIA-FE-REU-001` · `createApplicationList y catálogos compartidos`.
 
+**Patrones:** `FE-P03`.
+
 ```mermaid
 flowchart LR
     reuse["DIA-FE-REU-001<br/>createApplicationList y catálogos compartidos"] -.-> source
@@ -263,6 +321,8 @@ flowchart LR
 ## `CU-CAT-01`
 
 **Identificador:** `DIA-FE-CU-CAT-01`. **Fuente:** fila `CU-CAT-01` de la matriz de aplicación al código frontend. **Reutilización:** `DIA-FE-REU-001` · `createCrudApplication y UI/formularios compartidos`.
+
+**Patrones:** `FE-P02`.
 
 ```mermaid
 flowchart LR
@@ -274,6 +334,8 @@ flowchart LR
 
 **Identificador:** `DIA-FE-CU-CAT-02`. **Fuente:** fila `CU-CAT-02` de la matriz de aplicación al código frontend. **Reutilización:** `DIA-FE-REU-001` · `createCrudApplication y UI/formularios compartidos`.
 
+**Patrones:** `FE-P02`.
+
 ```mermaid
 flowchart LR
     reuse["DIA-FE-REU-001<br/>createCrudApplication y UI/formularios compartidos"] -.-> source
@@ -283,6 +345,8 @@ flowchart LR
 ## `CU-CAT-03`
 
 **Identificador:** `DIA-FE-CU-CAT-03`. **Fuente:** fila `CU-CAT-03` de la matriz de aplicación al código frontend. **Reutilización:** `DIA-FE-REU-001` · `createCrudApplication y UI/formularios compartidos`.
+
+**Patrones:** `FE-P02`.
 
 ```mermaid
 flowchart LR
@@ -294,6 +358,8 @@ flowchart LR
 
 **Identificador:** `DIA-FE-CU-CAT-04`. **Fuente:** fila `CU-CAT-04` de la matriz de aplicación al código frontend. **Reutilización:** `DIA-FE-REU-001` · `createCrudApplication y UI/formularios compartidos`.
 
+**Patrones:** `FE-P02`.
+
 ```mermaid
 flowchart LR
     reuse["DIA-FE-REU-001<br/>createCrudApplication y UI/formularios compartidos"] -.-> source
@@ -303,6 +369,8 @@ flowchart LR
 ## `CU-CAT-05`
 
 **Identificador:** `DIA-FE-CU-CAT-05`. **Fuente:** fila `CU-CAT-05` de la matriz de aplicación al código frontend. **Reutilización:** `DIA-FE-REU-001` · `createCrudApplication y UI/formularios compartidos`.
+
+**Patrones:** `FE-P02`.
 
 ```mermaid
 flowchart LR
@@ -314,6 +382,8 @@ flowchart LR
 
 **Identificador:** `DIA-FE-CU-CAT-06`. **Fuente:** fila `CU-CAT-06` de la matriz de aplicación al código frontend. **Reutilización:** `DIA-FE-REU-001` · `createCrudApplication y UI/formularios compartidos`.
 
+**Patrones:** `FE-P02`.
+
 ```mermaid
 flowchart LR
     reuse["DIA-FE-REU-001<br/>createCrudApplication y UI/formularios compartidos"] -.-> source
@@ -323,6 +393,8 @@ flowchart LR
 ## `CU-CAT-07`
 
 **Identificador:** `DIA-FE-CU-CAT-07`. **Fuente:** fila `CU-CAT-07` de la matriz de aplicación al código frontend. **Reutilización:** `DIA-FE-REU-001` · `createCrudApplication y UI/formularios compartidos`.
+
+**Patrones:** `FE-P02`.
 
 ```mermaid
 flowchart LR
@@ -334,6 +406,8 @@ flowchart LR
 
 **Identificador:** `DIA-FE-CU-CAT-08`. **Fuente:** fila `CU-CAT-08` de la matriz de aplicación al código frontend. **Reutilización:** `DIA-FE-REU-001` · `createCrudApplication y UI/formularios compartidos`.
 
+**Patrones:** `FE-P02`.
+
 ```mermaid
 flowchart LR
     reuse["DIA-FE-REU-001<br/>createCrudApplication y UI/formularios compartidos"] -.-> source
@@ -343,6 +417,8 @@ flowchart LR
 ## `CU-CAT-09`
 
 **Identificador:** `DIA-FE-CU-CAT-09`. **Fuente:** fila `CU-CAT-09` de la matriz de aplicación al código frontend. **Reutilización:** `DIA-FE-REU-001` · `createCrudApplication y UI/formularios compartidos`.
+
+**Patrones:** `FE-P02`.
 
 ```mermaid
 flowchart LR
@@ -354,6 +430,8 @@ flowchart LR
 
 **Identificador:** `DIA-FE-CU-CAT-10`. **Fuente:** fila `CU-CAT-10` de la matriz de aplicación al código frontend. **Reutilización:** `DIA-FE-REU-001` · `createCrudApplication y UI/formularios compartidos`.
 
+**Patrones:** `FE-P02`.
+
 ```mermaid
 flowchart LR
     reuse["DIA-FE-REU-001<br/>createCrudApplication y UI/formularios compartidos"] -.-> source
@@ -363,6 +441,8 @@ flowchart LR
 ## `CU-CAT-11`
 
 **Identificador:** `DIA-FE-CU-CAT-11`. **Fuente:** fila `CU-CAT-11` de la matriz de aplicación al código frontend. **Reutilización:** `DIA-FE-REU-001` · `createCrudApplication y UI/formularios compartidos`.
+
+**Patrones:** `FE-P02`.
 
 ```mermaid
 flowchart LR
@@ -374,6 +454,8 @@ flowchart LR
 
 **Identificador:** `DIA-FE-CU-CAT-12`. **Fuente:** fila `CU-CAT-12` de la matriz de aplicación al código frontend. **Reutilización:** `DIA-FE-REU-001` · `createCrudApplication y UI/formularios compartidos`.
 
+**Patrones:** `FE-P02`.
+
 ```mermaid
 flowchart LR
     reuse["DIA-FE-REU-001<br/>createCrudApplication y UI/formularios compartidos"] -.-> source
@@ -383,6 +465,8 @@ flowchart LR
 ## `CU-CAT-13`
 
 **Identificador:** `DIA-FE-CU-CAT-13`. **Fuente:** fila `CU-CAT-13` de la matriz de aplicación al código frontend. **Reutilización:** `DIA-FE-REU-001` · `createCrudApplication y UI/formularios compartidos`.
+
+**Patrones:** `FE-P02`.
 
 ```mermaid
 flowchart LR
@@ -394,6 +478,8 @@ flowchart LR
 
 **Identificador:** `DIA-FE-CU-CAT-14`. **Fuente:** fila `CU-CAT-14` de la matriz de aplicación al código frontend. **Reutilización:** `DIA-FE-REU-001` · `createCrudApplication y UI/formularios compartidos`.
 
+**Patrones:** `FE-P02`.
+
 ```mermaid
 flowchart LR
     reuse["DIA-FE-REU-001<br/>createCrudApplication y UI/formularios compartidos"] -.-> source
@@ -403,6 +489,8 @@ flowchart LR
 ## `CU-CAT-15`
 
 **Identificador:** `DIA-FE-CU-CAT-15`. **Fuente:** fila `CU-CAT-15` de la matriz de aplicación al código frontend. **Reutilización:** `DIA-FE-REU-001` · `createCrudApplication y UI/formularios compartidos`.
+
+**Patrones:** `FE-P02`.
 
 ```mermaid
 flowchart LR
@@ -414,6 +502,8 @@ flowchart LR
 
 **Identificador:** `DIA-FE-CU-CAT-16`. **Fuente:** fila `CU-CAT-16` de la matriz de aplicación al código frontend. **Reutilización:** `DIA-FE-REU-001` · `createCrudApplication y UI/formularios compartidos`.
 
+**Patrones:** `FE-P02`.
+
 ```mermaid
 flowchart LR
     reuse["DIA-FE-REU-001<br/>createCrudApplication y UI/formularios compartidos"] -.-> source
@@ -423,6 +513,8 @@ flowchart LR
 ## `CU-CAT-17`
 
 **Identificador:** `DIA-FE-CU-CAT-17`. **Fuente:** fila `CU-CAT-17` de la matriz de aplicación al código frontend. **Reutilización:** `DIA-FE-REU-001` · `createApplicationList y catálogos compartidos`.
+
+**Patrones:** `FE-P03`.
 
 ```mermaid
 flowchart LR
@@ -434,6 +526,8 @@ flowchart LR
 
 **Identificador:** `DIA-FE-CU-CAT-18`. **Fuente:** fila `CU-CAT-18` de la matriz de aplicación al código frontend. **Reutilización:** `DIA-FE-REU-001` · `createApplicationList y catálogos compartidos`.
 
+**Patrones:** `FE-P03`.
+
 ```mermaid
 flowchart LR
     reuse["DIA-FE-REU-001<br/>createApplicationList y catálogos compartidos"] -.-> source
@@ -443,6 +537,8 @@ flowchart LR
 ## `CU-CAT-19`
 
 **Identificador:** `DIA-FE-CU-CAT-19`. **Fuente:** fila `CU-CAT-19` de la matriz de aplicación al código frontend. **Reutilización:** `DIA-FE-REU-001` · `createApplicationList y catálogos compartidos`.
+
+**Patrones:** `FE-P03`.
 
 ```mermaid
 flowchart LR
@@ -454,6 +550,8 @@ flowchart LR
 
 **Identificador:** `DIA-FE-CU-CAT-20`. **Fuente:** fila `CU-CAT-20` de la matriz de aplicación al código frontend. **Reutilización:** `DIA-FE-REU-001` · `createApplicationList y catálogos compartidos`.
 
+**Patrones:** `FE-P03`.
+
 ```mermaid
 flowchart LR
     reuse["DIA-FE-REU-001<br/>createApplicationList y catálogos compartidos"] -.-> source
@@ -463,6 +561,8 @@ flowchart LR
 ## `CU-ENT-01`
 
 **Identificador:** `DIA-FE-CU-ENT-01`. **Fuente:** fila `CU-ENT-01` de la matriz de aplicación al código frontend. **Reutilización:** `DIA-FE-REU-001` · `createCrudApplication con mutaciones adicionales`.
+
+**Patrones:** `FE-P02`, `FE-P04`.
 
 ```mermaid
 flowchart LR
@@ -474,6 +574,8 @@ flowchart LR
 
 **Identificador:** `DIA-FE-CU-ENT-02`. **Fuente:** fila `CU-ENT-02` de la matriz de aplicación al código frontend. **Reutilización:** `DIA-FE-REU-001` · `createCrudApplication con mutaciones adicionales`.
 
+**Patrones:** `FE-P02`, `FE-P04`.
+
 ```mermaid
 flowchart LR
     reuse["DIA-FE-REU-001<br/>createCrudApplication con mutaciones adicionales"] -.-> source
@@ -483,6 +585,8 @@ flowchart LR
 ## `CU-ENT-03`
 
 **Identificador:** `DIA-FE-CU-ENT-03`. **Fuente:** fila `CU-ENT-03` de la matriz de aplicación al código frontend. **Reutilización:** `DIA-FE-REU-001` · `createCrudApplication con mutaciones adicionales`.
+
+**Patrones:** `FE-P02`, `FE-P04`.
 
 ```mermaid
 flowchart LR
@@ -494,6 +598,8 @@ flowchart LR
 
 **Identificador:** `DIA-FE-CU-ENT-04`. **Fuente:** fila `CU-ENT-04` de la matriz de aplicación al código frontend. **Reutilización:** `DIA-FE-REU-001` · `createCrudApplication con mutaciones adicionales`.
 
+**Patrones:** `FE-P02`, `FE-P04`.
+
 ```mermaid
 flowchart LR
     reuse["DIA-FE-REU-001<br/>createCrudApplication con mutaciones adicionales"] -.-> source
@@ -503,6 +609,8 @@ flowchart LR
 ## `CU-ENT-05`
 
 **Identificador:** `DIA-FE-CU-ENT-05`. **Fuente:** fila `CU-ENT-05` de la matriz de aplicación al código frontend. **Reutilización:** `DIA-FE-REU-001` · `createCrudApplication con mutaciones adicionales`.
+
+**Patrones:** `FE-P02`, `FE-P04`.
 
 ```mermaid
 flowchart LR
@@ -514,6 +622,8 @@ flowchart LR
 
 **Identificador:** `DIA-FE-CU-SAL-01`. **Fuente:** fila `CU-SAL-01` de la matriz de aplicación al código frontend. **Reutilización:** `DIA-FE-REU-001` · `createIssueApplication; issueReturnUI en devoluciones`.
 
+**Patrones:** `FE-P05`.
+
 ```mermaid
 flowchart LR
     reuse["DIA-FE-REU-001<br/>createIssueApplication; issueReturnUI en devoluciones"] -.-> source
@@ -523,6 +633,8 @@ flowchart LR
 ## `CU-SAL-02`
 
 **Identificador:** `DIA-FE-CU-SAL-02`. **Fuente:** fila `CU-SAL-02` de la matriz de aplicación al código frontend. **Reutilización:** `DIA-FE-REU-001` · `createIssueApplication; issueReturnUI en devoluciones`.
+
+**Patrones:** `FE-P05`.
 
 ```mermaid
 flowchart LR
@@ -534,6 +646,8 @@ flowchart LR
 
 **Identificador:** `DIA-FE-CU-SAL-03`. **Fuente:** fila `CU-SAL-03` de la matriz de aplicación al código frontend. **Reutilización:** `DIA-FE-REU-001` · `createIssueApplication; issueReturnUI en devoluciones`.
 
+**Patrones:** `FE-P05`.
+
 ```mermaid
 flowchart LR
     reuse["DIA-FE-REU-001<br/>createIssueApplication; issueReturnUI en devoluciones"] -.-> source
@@ -543,6 +657,8 @@ flowchart LR
 ## `CU-SAL-04`
 
 **Identificador:** `DIA-FE-CU-SAL-04`. **Fuente:** fila `CU-SAL-04` de la matriz de aplicación al código frontend. **Reutilización:** `DIA-FE-REU-001` · `createIssueApplication; issueReturnUI en devoluciones`.
+
+**Patrones:** `FE-P05`.
 
 ```mermaid
 flowchart LR
@@ -554,6 +670,8 @@ flowchart LR
 
 **Identificador:** `DIA-FE-CU-SAL-05`. **Fuente:** fila `CU-SAL-05` de la matriz de aplicación al código frontend. **Reutilización:** `DIA-FE-REU-001` · `createIssueApplication; issueReturnUI en devoluciones`.
 
+**Patrones:** `FE-P05`.
+
 ```mermaid
 flowchart LR
     reuse["DIA-FE-REU-001<br/>createIssueApplication; issueReturnUI en devoluciones"] -.-> source
@@ -563,6 +681,8 @@ flowchart LR
 ## `CU-SAL-06`
 
 **Identificador:** `DIA-FE-CU-SAL-06`. **Fuente:** fila `CU-SAL-06` de la matriz de aplicación al código frontend. **Reutilización:** `DIA-FE-REU-001` · `createIssueApplication; issueReturnUI en devoluciones`.
+
+**Patrones:** `FE-P05`, `FE-P06`.
 
 ```mermaid
 flowchart LR
@@ -574,6 +694,8 @@ flowchart LR
 
 **Identificador:** `DIA-FE-CU-SAL-07`. **Fuente:** fila `CU-SAL-07` de la matriz de aplicación al código frontend. **Reutilización:** `DIA-FE-REU-001` · `createIssueApplication; issueReturnUI en devoluciones`.
 
+**Patrones:** `FE-P05`.
+
 ```mermaid
 flowchart LR
     reuse["DIA-FE-REU-001<br/>createIssueApplication; issueReturnUI en devoluciones"] -.-> source
@@ -583,6 +705,8 @@ flowchart LR
 ## `CU-SAL-08`
 
 **Identificador:** `DIA-FE-CU-SAL-08`. **Fuente:** fila `CU-SAL-08` de la matriz de aplicación al código frontend. **Reutilización:** `DIA-FE-REU-001` · `createIssueApplication; issueReturnUI en devoluciones`.
+
+**Patrones:** `FE-P05`.
 
 ```mermaid
 flowchart LR
@@ -594,6 +718,8 @@ flowchart LR
 
 **Identificador:** `DIA-FE-CU-SAL-09`. **Fuente:** fila `CU-SAL-09` de la matriz de aplicación al código frontend. **Reutilización:** `DIA-FE-REU-001` · `createIssueApplication; issueReturnUI en devoluciones`.
 
+**Patrones:** `FE-P05`.
+
 ```mermaid
 flowchart LR
     reuse["DIA-FE-REU-001<br/>createIssueApplication; issueReturnUI en devoluciones"] -.-> source
@@ -603,6 +729,8 @@ flowchart LR
 ## `CU-SAL-10`
 
 **Identificador:** `DIA-FE-CU-SAL-10`. **Fuente:** fila `CU-SAL-10` de la matriz de aplicación al código frontend. **Reutilización:** `DIA-FE-REU-001` · `createIssueApplication; issueReturnUI en devoluciones`.
+
+**Patrones:** `FE-P05`.
 
 ```mermaid
 flowchart LR
@@ -614,6 +742,8 @@ flowchart LR
 
 **Identificador:** `DIA-FE-CU-SAL-11`. **Fuente:** fila `CU-SAL-11` de la matriz de aplicación al código frontend. **Reutilización:** `DIA-FE-REU-001` · `createIssueApplication; issueReturnUI en devoluciones`.
 
+**Patrones:** `FE-P05`.
+
 ```mermaid
 flowchart LR
     reuse["DIA-FE-REU-001<br/>createIssueApplication; issueReturnUI en devoluciones"] -.-> source
@@ -623,6 +753,8 @@ flowchart LR
 ## `CU-SAL-12`
 
 **Identificador:** `DIA-FE-CU-SAL-12`. **Fuente:** fila `CU-SAL-12` de la matriz de aplicación al código frontend. **Reutilización:** `DIA-FE-REU-001` · `createIssueApplication; issueReturnUI en devoluciones`.
+
+**Patrones:** `FE-P05`, `FE-P06`.
 
 ```mermaid
 flowchart LR
@@ -634,6 +766,8 @@ flowchart LR
 
 **Identificador:** `DIA-FE-CU-REP-01`. **Fuente:** fila `CU-REP-01` de la matriz de aplicación al código frontend. **Reutilización:** `DIA-FE-REU-001` · `DataTable, filtros y aplicación de consulta compartidos`.
 
+**Patrones:** `FE-P07`.
+
 ```mermaid
 flowchart LR
     reuse["DIA-FE-REU-001<br/>DataTable, filtros y aplicación de consulta compartidos"] -.-> source
@@ -643,6 +777,8 @@ flowchart LR
 ## `CU-REP-02`
 
 **Identificador:** `DIA-FE-CU-REP-02`. **Fuente:** fila `CU-REP-02` de la matriz de aplicación al código frontend. **Reutilización:** `DIA-FE-REU-001` · `DataTable, filtros y aplicación de consulta compartidos`.
+
+**Patrones:** `FE-P07`.
 
 ```mermaid
 flowchart LR
@@ -654,6 +790,8 @@ flowchart LR
 
 **Identificador:** `DIA-FE-CU-REP-03`. **Fuente:** fila `CU-REP-03` de la matriz de aplicación al código frontend. **Reutilización:** `DIA-FE-REU-001` · `createReportApplication y buildExcelButton`.
 
+**Patrones:** `FE-P08`.
+
 ```mermaid
 flowchart LR
     reuse["DIA-FE-REU-001<br/>createReportApplication y buildExcelButton"] -.-> source
@@ -663,6 +801,8 @@ flowchart LR
 ## `CU-REP-04`
 
 **Identificador:** `DIA-FE-CU-REP-04`. **Fuente:** fila `CU-REP-04` de la matriz de aplicación al código frontend. **Reutilización:** `DIA-FE-REU-001` · `createReportApplication y buildExcelButton`.
+
+**Patrones:** `FE-P08`.
 
 ```mermaid
 flowchart LR
@@ -674,6 +814,8 @@ flowchart LR
 
 **Identificador:** `DIA-FE-CU-REP-05`. **Fuente:** fila `CU-REP-05` de la matriz de aplicación al código frontend. **Reutilización:** `DIA-FE-REU-001` · `createReportApplication y buildExcelButton`.
 
+**Patrones:** `FE-P08`.
+
 ```mermaid
 flowchart LR
     reuse["DIA-FE-REU-001<br/>createReportApplication y buildExcelButton"] -.-> source
@@ -683,6 +825,8 @@ flowchart LR
 ## `CU-REP-06`
 
 **Identificador:** `DIA-FE-CU-REP-06`. **Fuente:** fila `CU-REP-06` de la matriz de aplicación al código frontend. **Reutilización:** `DIA-FE-REU-001` · `DataTable, filtros y aplicación de consulta compartidos`.
+
+**Patrones:** `FE-P07`.
 
 ```mermaid
 flowchart LR
@@ -694,6 +838,8 @@ flowchart LR
 
 **Identificador:** `DIA-FE-CU-REP-07`. **Fuente:** fila `CU-REP-07` de la matriz de aplicación al código frontend. **Reutilización:** `DIA-FE-REU-001` · `DataTable, filtros y aplicación de consulta compartidos`.
 
+**Patrones:** `FE-P07`.
+
 ```mermaid
 flowchart LR
     reuse["DIA-FE-REU-001<br/>DataTable, filtros y aplicación de consulta compartidos"] -.-> source
@@ -703,6 +849,8 @@ flowchart LR
 ## `CU-REP-08`
 
 **Identificador:** `DIA-FE-CU-REP-08`. **Fuente:** fila `CU-REP-08` de la matriz de aplicación al código frontend. **Reutilización:** `DIA-FE-REU-001` · `createReportApplication y buildExcelButton`.
+
+**Patrones:** `FE-P08`.
 
 ```mermaid
 flowchart LR
@@ -714,6 +862,8 @@ flowchart LR
 
 **Identificador:** `DIA-FE-CU-REP-09`. **Fuente:** fila `CU-REP-09` de la matriz de aplicación al código frontend. **Reutilización:** `DIA-FE-REU-001` · `createReportApplication y buildExcelButton`.
 
+**Patrones:** `FE-P08`.
+
 ```mermaid
 flowchart LR
     reuse["DIA-FE-REU-001<br/>createReportApplication y buildExcelButton"] -.-> source
@@ -723,6 +873,8 @@ flowchart LR
 ## `CU-REP-10`
 
 **Identificador:** `DIA-FE-CU-REP-10`. **Fuente:** fila `CU-REP-10` de la matriz de aplicación al código frontend. **Reutilización:** `DIA-FE-REU-001` · `createReportApplication y buildExcelButton`.
+
+**Patrones:** `FE-P08`.
 
 ```mermaid
 flowchart LR
@@ -734,6 +886,8 @@ flowchart LR
 
 **Identificador:** `DIA-FE-CU-REP-11`. **Fuente:** fila `CU-REP-11` de la matriz de aplicación al código frontend. **Reutilización:** `DIA-FE-REU-001` · `createReportApplication y buildExcelButton`.
 
+**Patrones:** `FE-P08`.
+
 ```mermaid
 flowchart LR
     reuse["DIA-FE-REU-001<br/>createReportApplication y buildExcelButton"] -.-> source
@@ -743,6 +897,8 @@ flowchart LR
 ## `CU-REP-12`
 
 **Identificador:** `DIA-FE-CU-REP-12`. **Fuente:** fila `CU-REP-12` de la matriz de aplicación al código frontend. **Reutilización:** `DIA-FE-REU-001` · `createReportApplication y buildExcelButton`.
+
+**Patrones:** `FE-P08`.
 
 ```mermaid
 flowchart LR
@@ -754,6 +910,8 @@ flowchart LR
 
 **Identificador:** `DIA-FE-CU-REP-13`. **Fuente:** fila `CU-REP-13` de la matriz de aplicación al código frontend. **Reutilización:** `DIA-FE-REU-001` · `createReportApplication y buildExcelButton`.
 
+**Patrones:** `FE-P08`.
+
 ```mermaid
 flowchart LR
     reuse["DIA-FE-REU-001<br/>createReportApplication y buildExcelButton"] -.-> source
@@ -764,6 +922,8 @@ flowchart LR
 
 **Identificador:** `DIA-FE-CU-REP-14`. **Fuente:** fila `CU-REP-14` de la matriz de aplicación al código frontend. **Reutilización:** `DIA-FE-REU-001` · `createReportApplication y buildExcelButton`.
 
+**Patrones:** `FE-P08`.
+
 ```mermaid
 flowchart LR
     reuse["DIA-FE-REU-001<br/>createReportApplication y buildExcelButton"] -.-> source
@@ -773,6 +933,8 @@ flowchart LR
 ## `CU-REP-15`
 
 **Identificador:** `DIA-FE-CU-REP-15`. **Fuente:** fila `CU-REP-15` de la matriz de aplicación al código frontend. **Reutilización:** `DIA-FE-REU-001` · `createReportApplication y buildExcelButton`.
+
+**Patrones:** `FE-P08`.
 
 ```mermaid
 flowchart LR

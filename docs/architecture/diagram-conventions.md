@@ -176,6 +176,21 @@ diagrama que duplique su contenido sólo para obtener una etiqueta UML. Si una e
 contractual exige UML estricto, esas tres vistas deben migrarse juntas a una herramienta
 que soporte la notación y conservar los mismos límites y fuentes de verdad.
 
+### Decisión sobre los diagramas de componentes
+
+Se conserva `DIA-ARQ-CMP-001` porque responde la pregunta estructural de arquitectura:
+qué componentes principales existen y de cuáles dependen. Las perspectivas
+`DIA-BE-PER-CMP-001` y `DIA-FE-PER-CMP-001` también se conservan porque descienden,
+respectivamente, al pipeline servidor y a la composición del navegador. No son tres
+versiones intercambiables: la primera orienta el sistema completo y las otras dos
+permiten ubicar los elementos técnicos nombrados por los casos.
+
+No se necesita un diagrama de componentes por `CU-*`. Un caso referencia la perspectiva
+canónica de su lado y utiliza su diagrama individual para mostrar sólo la ruta concreta
+hacia la implementación. Se añadirá otra vista de componentes únicamente si aparece
+una frontera estable que ninguna de las tres vistas vigentes pueda localizar; agregar
+otra por cantidad de casos o por repetir imports produciría documentación duplicada.
+
 ## Patrones de implementación que deben verse en los diagramas
 
 Los diagramas de arquitectura muestran soluciones que sí tienen evidencia en el
