@@ -149,7 +149,9 @@ que ejecutan cada caso. No deduce comportamiento desde el nombre del requisito: 
 un catálogo sólo es consumido por otros formularios se documenta su lectura real, y
 cuando una consulta comparte endpoint con un catálogo se declara esa reutilización.
 La misma cobertura se representa visualmente, caso por caso, en los
-[diagramas backend aplicados al código](backend-use-case-diagrams.md).
+[diagramas backend aplicados al código](backend-use-case-diagrams.md). Sus perspectivas
+complementarias muestran componentes, secuencia del pipeline y estados técnicos de
+lectura/transacción; las vistas por caso conservan ruta, servicio y efecto concretos.
 
 | Caso | Entrada HTTP y controller | Servicio, persistencia o efecto aplicado |
 | --- | --- | --- |

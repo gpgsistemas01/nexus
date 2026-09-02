@@ -20,6 +20,8 @@ flowchart TB
     patterns -.-> list
     patterns -.-> issue
     patterns -.-> report
+    perspectives["DIA-FE-PER-CMP/SEQ/EST-001<br/>Composición · orden · modos"] -.-> resourceApps
+    perspectives -.-> concrete
     crud["createCrudApplication"] -.-> resourceApps["Aplicaciones CRUD configuradas por recurso"]
     list["createApplicationList"] -.-> catalogs["Catálogos de sólo lectura"]
     issue["createIssueApplication"] -.-> issueApps["Salidas de material y merma"]
@@ -34,10 +36,119 @@ flowchart TB
     reportApps --> concrete
 ```
 
-Esta vista parte de `DIA-PAT-CON-001`; los diagramas `DIA-FE-CU-*` la referencian e
+Esta vista parte de `DIA-PAT-CON-001` y enlaza las perspectivas
+`DIA-FE-PER-CMP-001`, `DIA-FE-PER-SEQ-001` y `DIA-FE-PER-EST-001`; los diagramas
+`DIA-FE-CU-*` la referencian e
 indican cuál de sus piezas usa el caso. La cadena demuestra reutilización existente; el
 recorrido continuo conserva la especialización concreta y permite evaluar una
 refactorización sin afirmar que dos casos son idénticos.
+
+## Perspectivas complementarias del frontend
+
+La vista por caso responde **qué interacción y transporte lo aplican**. Estas
+perspectivas canónicas explican composición, orden asíncrono y estado visual; cada
+`DIA-FE-CU-*` las alcanza mediante `DIA-FE-REU-001` sin perder sus módulos concretos.
+
+### Componentes y dependencias del navegador
+
+**Identificador:** `DIA-FE-PER-CMP-001`. **Perspectiva:** estructura estática de las
+piezas que una página compone.
+
+```mermaid
+classDiagram
+    class EjsPage {
+        <<component>>
+        +renderizarParciales()
+    }
+    class PageModule {
+        <<component>>
+        +inicializarPagina()
+    }
+    class FormOrModal {
+        <<component>>
+        +capturarInteraccion()
+    }
+    class Application {
+        <<component>>
+        +coordinarCaso()
+    }
+    class HttpService {
+        <<component>>
+        +apiRequest()
+    }
+    class SharedUi {
+        <<component>>
+        +forms()
+        +datatable()
+        +select2()
+    }
+    EjsPage --> PageModule
+    EjsPage --> SharedUi
+    PageModule --> FormOrModal
+    FormOrModal --> SharedUi
+    FormOrModal --> Application
+    Application --> HttpService
+```
+
+### Secuencia de interacción y request
+
+**Identificador:** `DIA-FE-PER-SEQ-001`. **Perspectiva:** orden de interacción desde la
+página hasta el endpoint; cada caso sustituye los participantes por sus símbolos reales.
+
+```mermaid
+sequenceDiagram
+    actor User as Actor del CU
+    participant Page as Página / DataTable
+    participant UI as Formulario, modal o diálogo
+    participant App as Aplicación del recurso
+    participant Service as Servicio HTTP
+    participant API as Endpoint específico
+
+    User->>Page: selecciona acción
+    Page->>UI: abre o prepara contexto
+    User->>UI: captura, filtra o confirma
+    UI->>UI: valida interacción
+    UI->>App: operación con datos del caso
+    App->>Service: request configurado
+    Service->>API: método, URL y payload
+    API-->>Service: respuesta normalizada
+    Service-->>App: resultado
+    App-->>UI: refrescar, cerrar o descargar
+```
+
+### Estados de formularios y modales
+
+**Identificador:** `DIA-FE-PER-EST-001`. **Perspectiva:** modos implementados por
+`FORM_MODES`; no representa estados persistentes de entradas o salidas.
+
+```mermaid
+stateDiagram-v2
+    [*] --> Cerrado
+    Cerrado --> Create: openModal(CREATE)
+    Cerrado --> Edit: openModal(EDIT)
+    Cerrado --> EditPassword: openModal(EDIT_PASSWORD)
+    Cerrado --> EditStock: openModal(EDIT_STOCK)
+    Cerrado --> EditHeader: openModal(EDIT_HEADER)
+    Cerrado --> EditDetail: openModal(EDIT_DETAIL)
+    Cerrado --> Return: openModal(RETURN)
+    Cerrado --> View: openModal(VIEW)
+    Create --> Enviando: submit
+    Edit --> Enviando: submit
+    EditPassword --> Enviando: submit
+    EditStock --> Enviando: submit
+    EditHeader --> Enviando: submit
+    EditDetail --> Enviando: submit
+    Return --> Enviando: submit
+    Enviando --> Cerrado: respuesta exitosa
+    Enviando --> Create: error de alta
+    Enviando --> Edit: error de edición
+    Enviando --> EditPassword: error de contraseña
+    Enviando --> EditStock: error de ajuste
+    Enviando --> EditHeader: error de encabezado
+    Enviando --> EditDetail: error de detalle
+    Enviando --> Return: error de devolución
+    View --> Cerrado: cerrar
+```
 
 ## `CU-AUT-01`
 

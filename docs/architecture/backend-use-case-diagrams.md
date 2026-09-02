@@ -19,6 +19,8 @@ flowchart TB
     structure["DIA-PAT-EST-001 / DIA-PAT-FRO-001<br/>Capas, frontera y pipeline"] -.-> middleware
     dynamics["DIA-PAT-DIN-001<br/>Transacción, eventos y auditoría"] -.-> db
     dynamics -.-> inventory
+    perspectives["DIA-BE-PER-CMP/SEQ/EST-001<br/>Componentes · orden · ciclo técnico"] -.-> controller
+    perspectives -.-> service
     middleware["Autenticación · autorización · validate"] -.-> controller["Controller específico"]
     session["JWT / cookies de autenticación"] -.-> controller
     listFactory["createDataTableListController"] -.-> controller
@@ -30,10 +32,119 @@ flowchart TB
     service --> prisma["Prisma / PostgreSQL"]
 ```
 
-Esta vista parte de `DIA-PAT-EST-001`, `DIA-PAT-FRO-001` y `DIA-PAT-DIN-001`. Los
-diagramas `DIA-BE-CU-*` la referencian y nombran los colaboradores realmente usados.
+Esta vista parte de `DIA-PAT-EST-001`, `DIA-PAT-FRO-001` y `DIA-PAT-DIN-001`, y enlaza
+las perspectivas `DIA-BE-PER-CMP-001`, `DIA-BE-PER-SEQ-001` y
+`DIA-BE-PER-EST-001`. Los diagramas `DIA-BE-CU-*` la referencian y nombran los
+colaboradores realmente usados.
 Así una extracción o parametrización futura puede revisarse en la vista canónica,
 mientras cada caso sigue demostrando su ruta, servicio y efecto propios.
+
+## Perspectivas complementarias del backend
+
+La vista por caso responde **qué código lo aplica**. Las siguientes perspectivas
+canónicas responden preguntas diferentes sobre ese mismo código; cada `DIA-BE-CU-*`
+las alcanza mediante `DIA-BE-REU-001` y no necesita convertir todos los casos en el
+mismo tipo de diagrama.
+
+### Componentes y dependencias de backend
+
+**Identificador:** `DIA-BE-PER-CMP-001`. **Perspectiva:** estructura estática de las
+fronteras y componentes implementados.
+
+```mermaid
+classDiagram
+    class ApiRoute {
+        <<component>>
+        +middleware[]
+        +controller()
+    }
+    class Controller {
+        <<component>>
+        +adaptarRequest()
+        +responderHTTP()
+    }
+    class DTO {
+        <<component>>
+        +seleccionarCampos()
+    }
+    class DomainService {
+        <<component>>
+        +ejecutarCaso()
+    }
+    class SharedService {
+        <<component>>
+        +inventario()
+        +referencias()
+        +reportes()
+    }
+    class PrismaContext {
+        <<component>>
+        +getDb(tx)
+    }
+    ApiRoute --> Controller
+    Controller --> DTO
+    Controller --> DomainService
+    DomainService --> SharedService
+    DomainService --> PrismaContext
+    SharedService --> PrismaContext
+```
+
+### Secuencia del pipeline y servicio
+
+**Identificador:** `DIA-BE-PER-SEQ-001`. **Perspectiva:** orden de una petición; los
+pasos opcionales sólo aparecen en el caso específico cuando el router o servicio los usa.
+
+```mermaid
+sequenceDiagram
+    participant Client as Cliente HTTP
+    participant Route as Router + middleware
+    participant Controller as Controller
+    participant DTO as DTO opcional
+    participant Service as Servicio del caso
+    participant Shared as Colaborador compartido
+    participant Prisma as getDb / Prisma
+
+    Client->>Route: método y URL del CU
+    Route->>Route: autenticar, validar y autorizar
+    Route->>Controller: request validado
+    opt El contrato usa DTO
+        Controller->>DTO: normalizar entrada
+        DTO-->>Controller: datos permitidos
+    end
+    Controller->>Service: operación de dominio
+    opt El caso coordina colaboradores
+        Service->>Shared: inventario, referencia o reporte
+    end
+    Service->>Prisma: consultar o persistir con tx cuando aplica
+    Prisma-->>Service: resultado
+    Service-->>Controller: resultado o error de dominio
+    Controller-->>Client: respuesta HTTP
+```
+
+### Estados técnicos de una petición backend
+
+**Identificador:** `DIA-BE-PER-EST-001`. **Perspectiva:** ciclo técnico de autorización,
+lectura o transacción; no sustituye los estados persistentes del dominio.
+
+```mermaid
+stateDiagram-v2
+    [*] --> Recibida
+    Recibida --> Rechazada: sesión, permiso o validación inválida
+    Recibida --> Autorizada: middleware completo
+    Autorizada --> Lectura: consulta sin escritura coordinada
+    Autorizada --> TransaccionAbierta: escritura compuesta
+    Lectura --> Respondida: resultado o error controlado
+    TransaccionAbierta --> Rollback: error
+    TransaccionAbierta --> Commit: escritura completa
+    Rollback --> Respondida
+    Commit --> Respondida
+    Respondida --> Publicada: mutación con evento Socket.IO
+    Respondida --> Auditada: escritura API exitosa
+    Rechazada --> [*]
+    Respondida --> [*]
+    Publicada --> [*]
+    Auditada --> [*]
+```
 
 ## `CU-AUT-01`
 

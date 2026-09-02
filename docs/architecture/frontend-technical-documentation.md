@@ -108,7 +108,9 @@ fila puede señalar que no existe pantalla independiente: en ese caso identifica
 componente consumidor real en vez de inventar un flujo frontend. Las factories se
 reutilizan, pero cada fila conserva la página, aplicación o request de su contexto.
 La misma cobertura se representa visualmente, caso por caso, en los
-[diagramas frontend aplicados al código](frontend-use-case-diagrams.md).
+[diagramas frontend aplicados al código](frontend-use-case-diagrams.md). Sus perspectivas
+complementarias muestran componentes del navegador, secuencia asíncrona y estados de
+`FORM_MODES`; las vistas por caso conservan la interacción y endpoint concretos.
 
 | Caso | Página o interacción concreta | Aplicación, servicio y resultado observable |
 | --- | --- | --- |

@@ -54,6 +54,10 @@ después en cada consumidor, sin copiar la implementación compartida como si fu
 La referencia completa sigue `DIA-PAT-*` → `DIA-FE/BE-REU-*` → `DIA-FE/BE-CU-*`:
 el primer nivel demuestra el patrón mediante símbolos y consumidores; el segundo
 identifica el punto común por entorno; el tercero conserva la ruta y efecto del caso.
+Entre reutilización y caso pueden enlazarse perspectivas `PER-CMP`, `PER-SEQ` y
+`PER-EST`: componentes responde estructura, secuencia responde orden y estados responde
+ciclo de vida. No se reemplazan entre sí ni se usa `flowchart` para fingir esas tres
+semánticas.
 
 En secuencias, `actor` se reserva para una persona, rol o sistema externo autónomo que
 inicia o recibe una interacción. Navegador, EJS, router, controller, servicio y base de

@@ -73,6 +73,10 @@ código](backend-use-case-diagrams.md); ambas conservan una vista independiente 
 cada uno de los 63 casos, incluso cuando la forma de la colaboración se repite.
 Antes de esos casos, `DIA-FE-REU-001` y `DIA-BE-REU-001` muestran los puntos comunes;
 cada vista específica los referencia y mantiene separado el tramo especializado.
+Cada colección incorpora además perspectivas de **componentes**, **secuencia** y
+**estados técnicos**. Se consultan desde la vista de reutilización para leer el mismo
+código por estructura, orden de mensajes o ciclo de vida, en lugar de reducir toda la
+explicación a diagramas `flowchart`.
 
 Un flujo completo enlaza ambos documentos mediante la ruta API; no repite en frontend
 las reglas propietarias del servidor ni describe en backend detalles visuales del DOM.
