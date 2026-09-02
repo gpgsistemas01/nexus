@@ -21,8 +21,11 @@ const MANIFESTS = Object.freeze({
         'docs/architecture/technical-code-documentation.md',
         'docs/architecture/backend-technical-documentation.md',
         'docs/architecture/frontend-technical-documentation.md',
+        'docs/architecture/traceability-matrix.md',
         'docs/architecture/design-and-construction-patterns.md',
-        'docs/architecture/code-diagrams.md'
+        'docs/architecture/code-diagrams.md',
+        'docs/architecture/diagram-conventions.md',
+        'docs/architecture/diagram-inventory.md'
     ],
     pruebas: ['docs/testing/test-plan.md', 'docs/testing/service-test-coverage.md']
 });

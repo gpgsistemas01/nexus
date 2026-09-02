@@ -56,6 +56,27 @@ No se crea un nivel unitario para componentes visuales o infraestructura inciden
 Si un helper compartido coordina datos CRUD, se prueba una vez en la ruta paralela a su
 módulo y los contextos reutilizan ese contrato.
 
+## Registro de aplicación de pruebas unitarias
+
+Además del código, esta tabla registra **cómo** se aplica el nivel unitario. La fuente
+ejecutable continúa en `tests/unit`; la tabla explica intención, aislamiento y evidencia
+sin copiar cada `it`. La trazabilidad funcional se mantiene en la
+[matriz técnica](../architecture/traceability-matrix.md).
+
+| Unidad / ubicación | Técnica aplicada | Resultado que se observa | Ejemplos vigentes |
+| --- | --- | --- | --- |
+| Servicios de dominio | Colaboradores Prisma/servicios sustituidos; entradas límite y errores por caso | Regla, argumentos, retorno y ausencia de colaboración inválida | identidad de material, consulta de movimientos, relaciones proveedor-material, reportes y mermas. |
+| Controllers API | Harness Express/Supertest con servicio simulado | status/body, DTO y efecto posterior como evento de inventario | entradas, salidas, materiales, mermas y reportes de almacén. |
+| Rutas y políticas | Router aislado y combinaciones tabuladas | orden/acceso positivo y rechazo antes del controller | rutas de merma y permisos rol–departamento. |
+| DTO, validadores y helpers | Funciones puras con clases de equivalencia y fronteras decimales | selección, normalización, precisión, totales o error | DTO de entrada/merma, validaciones y helpers de inventario. |
+| Aplicación del navegador | Requests simulados e inyección de configuración | adaptación del payload/respuesta y reutilización sin DOM | fábricas CRUD, salida y reporte; contextos y catálogos. |
+| UI, plugins y utilidades del navegador | DOM mínimo o doubles de plugin; eventos observables | estado visual contractual, callback y transformación | formularios, DataTable, Select2, MDB, Flatpickr y utilidades. |
+
+Cada incorporación registra en el nombre `describe/it` la regla o `RF/RN/CU` cuando
+resulte útil, conserva preparación–ejecución–aserción y evita probar imports o detalles
+privados. La salida de Vitest en CI/PR registra comando, commit, ambiente y resultado;
+este documento no se marca como “aprobado” sólo porque exista el archivo.
+
 ## Cobertura prioritaria
 
 | Capacidad | Estado / siguiente paso |
@@ -66,6 +87,7 @@ módulo y los contextos reutilizan ese contrato.
 | Entradas de compra | Incorporar integración HTTP de registro, corrección, costo, movimiento y rollback. |
 | Personas y usuarios | Incorporar persistencia de relaciones de rol y departamento. |
 | Autorización por contexto | Mantener casos unitarios positivos y negativos por combinación rol/departamento; ventas permanece sin permisos del sistema. |
+| Auditoría de escrituras | Incorporar unitarias de clasificación/sanitizado y middleware, más integración que distinga respuesta exitosa, fallida y persistencia best effort. |
 | Ajustes, requisiciones y proyectos | Probar únicamente cuando exista el CRUD accesible desde controller. |
 | Reportes y movimientos | Cubrir consultas, permisos, filtros y datos exportados. |
 

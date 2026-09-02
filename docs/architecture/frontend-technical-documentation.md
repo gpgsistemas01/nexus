@@ -118,10 +118,159 @@ todos los diagramas posibles. Se aplica esta matriz al cambiar el flujo:
 Cada diagrama declara el límite del navegador. Si atraviesa la API, termina en el método
 y URL y enlaza backend; no dibuja Prisma ni atribuye seguridad a la validación visual.
 
-## Secuencia aplicable: ajuste de existencias de material
+## Vistas técnicas aplicadas por flujo frontend
+
+Estas vistas no son diagramas de casos de uso: comienzan dentro del navegador y muestran
+la composición EJS/JavaScript, eventos, factories y transporte que implementan el caso.
+Cada una responde una pregunta técnica distinta; los CRUD homogéneos continúan usando
+la vista compartida para evitar una copia por recurso.
+
+### Inicio de sesión y establecimiento de la navegación autenticada
+
+**Identificador:** `DIA-FE-SEQ-002`. **Casos:** `CU-AUT-01`. Explica qué módulos del
+navegador recopilan credenciales y entregan el control al servidor; no describe la
+validación del token, que pertenece al backend.
+
+```mermaid
+sequenceDiagram
+    actor User as Usuario
+    participant EJS as loginPage.ejs
+    participant Form as loginForm / useForm
+    participant App as login
+    participant Request as loginRequest / apiRequest
+    participant API as POST /api/auth/login
+    participant Browser as Navegador
+
+    EJS->>Form: carga el módulo del formulario
+    User->>Form: captura y envía credenciales
+    Form->>Form: valida campos requeridos
+    Form->>App: { formData }
+    App->>Request: { data: formData }
+    Request->>API: petición JSON
+    API-->>Request: respuesta y cookies de sesión
+    Request-->>App: respuesta normalizada
+    App-->>Form: resultado exitoso
+    Form->>Browser: navega a la portada autenticada
+```
+
+### Alta de merma desde una plantilla de material
+
+**Identificador:** `DIA-FE-ACT-001`. **Caso:** `CU-CAT-14`. Esta actividad hace visible
+la dependencia proveedor → material y la preparación de snapshots; no representa las
+decisiones de persistencia del servicio.
+
+```mermaid
+flowchart TB
+    open["Abrir wasteModal en modo crear"] --> supplier["Seleccionar proveedor"]
+    supplier --> clear["Limpiar plantilla de material anterior"]
+    clear --> load["wasteMaterialService consulta materiales del proveedor"]
+    load --> choose{"¿Se seleccionó una plantilla?"}
+    choose -->|No| blocked["Mantener material y envío sin completar"]
+    choose -->|Sí| map["wasteMaterialTemplate adapta nombre, medidas y costo propuesto"]
+    map --> editable["Usuario completa campos editables"]
+    editable --> validate{"¿Validación del navegador correcta?"}
+    validate -->|No| errors["Mostrar errores sin llamar la API"]
+    validate -->|Sí| register["registerWaste → POST /api/warehouse/wastes"]
+```
+
+### Corrección de un detalle de entrada
+
+**Identificador:** `DIA-FE-SEQ-003`. **Caso:** `CU-ENT-04`. La vista se concentra en el
+modal secundario y en el evento que sincroniza el documento principal después de una
+respuesta exitosa.
+
+```mermaid
+sequenceDiagram
+    actor Warehouse as Almacén
+    participant Main as goodsReceiptModal
+    participant Correction as correctionModal / correctionForm
+    participant App as correctGoodsReceiptDetail
+    participant Request as correctGoodsReceiptDetailRequest
+    participant API as POST /goods-receipts/:id/details/:detailId/corrections
+
+    Warehouse->>Main: selecciona Corregir detalle
+    Main->>Correction: openGoodsReceiptCorrectionModal({ receipt, detail })
+    Correction->>Correction: precarga detalle y recalcula totales previstos
+    Warehouse->>Correction: confirma datos corregidos
+    Correction->>Correction: valida cantidad, costo y motivo
+    Correction->>App: { id, detailId, formData }
+    App->>Request: mutación configurada
+    Request->>API: petición JSON
+    API-->>Correction: { correction, code }
+    Correction->>Main: emite goods-receipt-correction:applied
+    Main->>Main: reemplaza documento y refresca detalles/totales
+```
+
+### Devolución de un detalle surtido
+
+**Identificador:** `DIA-FE-SEQ-004`. **Casos:** `CU-SAL-06` y `CU-SAL-12`. Material y
+merma reutilizan el componente de devolución, pero inyectan su operación de aplicación
+y su forma de obtener el documento actual.
+
+```mermaid
+sequenceDiagram
+    actor Warehouse as Almacén
+    participant Issue as goodsIssueModal o wasteIssueModal
+    participant Return as issueReturn UI
+    participant Domain as initializeGoodsIssueReturns o initializeWasteIssueReturns
+    participant App as returnGoodsIssueDetail o returnWasteIssueDetail
+    participant API as POST /issues/:id/details/:detailId/returns
+
+    Warehouse->>Issue: selecciona Devolver en un detalle
+    Issue->>Domain: entrega detalles y documento actual
+    Domain->>Return: abre devolución con cantidad retornable
+    Warehouse->>Return: captura cantidad y confirma
+    Return->>Return: valida límite retornable
+    Return->>App: { id, detailId, formData }
+    App->>API: request del contexto material o merma
+    API-->>App: salida actualizada
+    App-->>Return: respuesta exitosa
+    Return->>Issue: recarga la página y consulta el estado actualizado
+```
+
+### Descarga de reportes con filtros aplicados
+
+**Identificador:** `DIA-FE-SEQ-005`. **Casos:** `CU-REP-03` a `CU-REP-05` y
+`CU-REP-08` a `CU-REP-15`. Una sola vista cubre los reportes que configuran la misma
+factory; no afirma que todos tengan iguales filtros o endpoint.
+
+```mermaid
+sequenceDiagram
+    actor User as Usuario autorizado
+    participant Table as DataTable / buildExcelButton
+    participant App as createReportApplication
+    participant Request as reportService del dominio
+    participant API as GET /api/.../reports/.../excel
+    participant Browser as Descarga del navegador
+
+    User->>Table: solicita exportar
+    Table->>Table: toma snapshot de filtros aplicados
+    Table->>App: exportReport({ params, context })
+    App->>Request: request configurado
+    Request->>API: GET con filtros
+    API-->>Request: archivo y cabeceras
+    Request-->>App: respuesta binaria
+    App-->>Table: Blob del archivo
+    Table->>Browser: crea URL temporal, enlace y nombre de archivo
+    Browser-->>User: ofrece el archivo
+```
+
+### Ajuste de existencias desde el navegador
 
 Esta vista se conserva porque la ficha de materiales identifica una mutación adicional
-que sí cambia el flujo CRUD común.
+que sí cambia el flujo CRUD común. Es una **instancia representativa**, no una regla
+exclusiva de materiales: el mismo patrón de interacción aplica a `CU-CAT-16` (ajuste de
+merma), al surtimiento y devolución de `CU-SAL-05`, `CU-SAL-06`, `CU-SAL-11` y
+`CU-SAL-12`, y a corrección/cancelación de `CU-ENT-04` y `CU-ENT-05`. Cada caso sustituye
+formulario, aplicación, request y URL por los de su dominio; no se copia la secuencia
+mientras conserve el mismo orden. Las altas documentales con varias consultas, como
+`CU-ENT-02`, `CU-SAL-02` y `CU-SAL-08`, usan las secuencias específicas de requisitos.
+
+**Identificador:** `DIA-FE-SEQ-001`. **Tipo:** secuencia Mermaid con semántica UML.
+**Actor:** `Usuario` representa el rol humano que confirma la operación. En una vista
+ligada a un único caso puede sustituirse por el actor canónico de requisitos
+(`Almacén` o `Administrador del sistema`); los participantes técnicos se nombran por
+responsabilidad o módulo y nunca se declaran como actores.
 
 ```mermaid
 sequenceDiagram
@@ -148,6 +297,8 @@ sequenceDiagram
 
 La autorización, validación definitiva, transacción, auditoría y movimiento pertenecen
 al backend y se consultan en el [contrato de la ruta](../data/api-contract.md#ejemplo-aplicado-ajuste-de-existencias-de-material).
+La correspondencia completa requisito–frontend–backend–prueba está en la
+[matriz de trazabilidad técnica](traceability-matrix.md).
 
 ## Lista de revisión frontend
 

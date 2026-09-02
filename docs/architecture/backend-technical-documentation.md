@@ -175,15 +175,213 @@ flowchart LR
 Se revisa si cambia el orden de montaje en `src/app.js`, el contrato de
 `registerApiRoutes` o las áreas de `API_ROUTES`.
 
-### Secuencia de surtimiento de una salida de material
+### Secuencia de autenticación y creación de sesión
+
+**Identificador:** `DIA-BE-SEQ-002`. **Caso:** `CU-AUT-01`. A diferencia del flujo de
+requisitos, esta vista muestra adaptación HTTP, servicio, cifrado y credenciales de
+sesión; el navegador es el límite consumidor y no el actor.
+
+```mermaid
+sequenceDiagram
+    participant Browser as Navegador
+    participant Router as authApiRoute
+    participant Controller as authController
+    participant Service as authService
+    participant User as userService / getUserIdByLogin
+    participant Prisma as Prisma / PostgreSQL
+    participant Token as jwtService / cookies
+
+    Browser->>Router: POST /api/auth/login { name, password }
+    Router->>Router: validar tipo y campos
+    Router->>Controller: petición validada
+    Controller->>Service: loginUser({ name, password })
+    Service->>User: getUserIdByLogin(name, password)
+    User->>Prisma: buscar cuenta, persona y un acceso
+    Prisma-->>User: usuario o ausencia
+    User->>User: comprobar actividad, acceso y contraseña cifrada
+    User-->>Service: userId o null
+    alt Credenciales inválidas o cuenta inactiva
+        Service-->>Controller: error de autenticación
+        Controller-->>Browser: respuesta de error sin sesión
+    else Credenciales válidas
+        Service->>Token: generar access token y refresh token con userId
+        Token-->>Service: credenciales firmadas
+        Service-->>Controller: access token y refresh token
+        Controller->>Token: establecer cookies de autenticación
+        Controller-->>Browser: éxito y cookies protegidas
+    end
+```
+
+### Secuencia de registro de una entrada de material
+
+**Identificador:** `DIA-BE-SEQ-003`. **Caso:** `CU-ENT-02`. La perspectiva backend
+muestra numeración, factura, construcción de detalles y movimiento dentro de un único
+límite transaccional; no repite los pasos de captura del actor.
+
+```mermaid
+sequenceDiagram
+    participant Browser as Navegador
+    participant Router as goodsReceiptApiRoute
+    participant Controller as registerGoodsReceipt
+    participant DTO as createGoodsReceiptDto
+    participant Service as createGoodsReceipt
+    participant Reference as referenceNumberService
+    participant Details as buildGoodsReceiptDetails
+    participant Inventory as applyInventoryMovement
+    participant Prisma as Prisma / PostgreSQL
+    participant Socket as emitInventoryUpdated
+
+    Browser->>Router: POST /api/warehouse/goods-receipts
+    Router->>Router: autenticar, validar y autorizar
+    Router->>Controller: req, res
+    Controller->>DTO: req.body
+    DTO-->>Controller: goodsReceiptDto
+    Controller->>Service: { goodsReceiptDto }
+    Service->>Prisma: validar proveedor, factura y persona receptora
+    Service->>Details: construir detalles y calcular totales
+    Service->>Prisma: iniciar $transaction
+    Service->>Reference: generar referencia anual con tx
+    Service->>Prisma: crear encabezado, detalles y totales
+    Service->>Inventory: applyInventoryMovement({ tx, RECEIPT, details })
+    Inventory->>Prisma: incrementar existencias y crear movimiento
+    Prisma-->>Service: entrada confirmada y commit
+    Service-->>Controller: goodsReceipt
+    Controller->>Socket: emitInventoryUpdated(...)
+    Controller-->>Browser: 200 { goodsReceipt, code }
+```
+
+### Secuencia de corrección de un detalle de entrada
+
+**Identificador:** `DIA-BE-SEQ-004`. **Caso:** `CU-ENT-04`. La corrección conserva los
+valores anterior/corregido y puede revertir y aplicar inventario; por eso no comparte el
+diagrama de cancelación.
+
+```mermaid
+sequenceDiagram
+    participant Controller as correctGoodsReceiptDetail
+    participant Service as correctGoodsReceiptDetailLine
+    participant Change as goodsReceiptDetailChangeService
+    participant Reason as reasonService
+    participant Inventory as movementService
+    participant Prisma as Prisma / PostgreSQL
+    participant Socket as emitInventoryUpdated
+
+    Controller->>Service: { id, detailId, correctionDto, userId }
+    Service->>Prisma: iniciar $transaction
+    Service->>Change: localizar detalle activo con tx
+    Service->>Reason: obtener motivo de corrección con tx
+    Service->>Change: calcular diferencia y actualizar detalle/totales
+    Change->>Inventory: crear movimiento y actualizar stock con tx
+    Service->>Change: guardar historia anterior/corregida y actor
+    Prisma-->>Service: entrada corregida y commit
+    Service-->>Controller: goodsReceipt y correction
+    Controller->>Socket: publicar después del commit
+```
+
+### Actividad de cancelación de un detalle de entrada
+
+**Identificador:** `DIA-BE-ACT-002`. **Caso:** `CU-ENT-05`. Esta vista enfatiza las
+decisiones exclusivas de cancelación y la ausencia de una segunda identidad corregida.
+
+```mermaid
+flowchart TB
+    request["cancelGoodsReceiptDetailLine({ id, detailId, userId })"] --> transaction["Abrir $transaction"]
+    transaction --> find{"¿Entrada y detalle activo existen?"}
+    find -->|No| notFound["Propagar error sin cambios"]
+    find -->|Sí| reason{"¿Existe motivo de cancelación?"}
+    reason -->|No| reasonError["GoodsReceiptDetailChangeReasonNotFound"]
+    reason -->|Sí| reverse{"¿Puede revertirse la existencia recibida?"}
+    reverse -->|No| stockError["Conflicto; rollback"]
+    reverse -->|Sí| movement["Crear movimiento inverso y actualizar stock"]
+    movement --> cancel["Marcar detalle cancelado y recalcular totales"]
+    cancel --> history["Guardar cambio, motivo y actor"]
+    history --> commit["Commit y devolver entrada actualizada"]
+```
+
+### Secuencia de devolución de material o merma
+
+**Identificador:** `DIA-BE-SEQ-005`. **Casos:** `CU-SAL-06` y `CU-SAL-12`. La forma
+transaccional es compartida, pero cada implementación usa sus modelos, errores y tipo de
+movimiento; el diagrama señala los puntos de variación en vez de ocultarlos.
+
+```mermaid
+sequenceDiagram
+    participant Controller as register*IssueDetailReturn
+    participant Service as return*IssueDetail
+    participant Rules as Reglas de cantidad retornable
+    participant Inventory as Movimiento material o merma
+    participant Status as Recalcular cumplimiento
+    participant Prisma as Prisma / PostgreSQL
+    participant Socket as emitInventoryUpdated
+
+    Controller->>Service: { id, detailId, returnDto, userId }
+    Service->>Prisma: iniciar $transaction
+    Service->>Prisma: cargar salida y detalle surtido
+    Service->>Rules: validar estado, cantidad surtida y devoluciones previas
+    alt Cantidad no retornable
+        Rules-->>Service: error de dominio
+        Service-->>Controller: rollback y error
+    else Cantidad válida
+        Service->>Inventory: incrementar existencia y crear movimiento inverso con tx
+        Service->>Prisma: crear GoodsIssueReturn o WasteIssueReturn
+        Service->>Status: recalcular detalle y encabezado con tx
+        Prisma-->>Service: salida actualizada y commit
+        Service-->>Controller: salida y devolución
+        Controller->>Socket: publicar después del commit
+    end
+```
+
+### Secuencia transversal de auditoría de escrituras
+
+**Identificador:** `DIA-BE-SEQ-006`. **Requisito:** `RN-008`. La auditoría observa la
+respuesta HTTP y no forma parte de la transacción funcional actual; este diagrama hace
+explícita esa garantía *best effort*.
+
+```mermaid
+sequenceDiagram
+    participant Browser as Cliente HTTP autenticado
+    participant Audit as auditWrites
+    participant Route as Ruta/controller/servicio
+    participant Response as Respuesta Express
+    participant AuditService as persistWriteAudit
+    participant Prisma as CriticalWriteAudit
+    participant Logger as logger
+
+    Browser->>Audit: POST/PUT/PATCH/DELETE bajo /api
+    Audit->>Response: registrar listener once(finish)
+    Audit->>Route: next()
+    Route-->>Response: completar operación y status
+    Response-->>Audit: finish
+    alt status >= 400 o actor ausente
+        Audit-->>Audit: no persistir auditoría
+    else escritura exitosa con actor
+        Audit->>AuditService: request y status para construir datos saneados
+        AuditService->>Prisma: create audit trail
+        alt falla la persistencia de auditoría
+            AuditService-->>Logger: registrar error sin revertir operación
+        end
+    end
+```
+
+### Secuencia representativa de mutaciones transaccionales de inventario
 
 Esta secuencia se aplica a la ficha de salidas porque muestra coordinación, transacción
-y un efecto deliberadamente posterior al commit; no se generaliza a los CRUD simples.
+y un efecto deliberadamente posterior al commit. **Identificador:** `DIA-BE-SEQ-001`.
+Es canónica también para surtir merma, devolver material o merma, registrar una entrada,
+corregir/cancelar un detalle y aplicar un ajuste (`CU-SAL-05`, `CU-SAL-06`, `CU-SAL-11`,
+`CU-SAL-12`, `CU-ENT-02`, `CU-ENT-04`, `CU-ENT-05`, `CU-CAT-05` y `CU-CAT-16`), siempre
+que se reemplacen participantes y tipo de movimiento conforme al caso. No se generaliza
+a CRUD simples ni afirma que todos esos servicios tengan exactamente las mismas ramas.
+
+`Navegador` es un **participante técnico**, no un actor humano: esta vista comienza en
+el límite HTTP y la intención/rol ya está definido por el `CU-*`. Si la secuencia incluyera
+una decisión humana se agregaría `actor Almacén` o `actor Administrador`; no se debe usar
+`actor Browser`, `actor Router` ni el nombre de un archivo.
 
 ```mermaid
 sequenceDiagram
     autonumber
-    actor Browser as Navegador
+    participant Browser as Navegador
     participant Router as goodsIssueApiRoute
     participant Controller as editGoodsIssueDetails
     participant DTO as createGoodsIssueDetailsDtoForEdit
@@ -215,7 +413,13 @@ sequenceDiagram
 La emisión Socket queda fuera de la atomicidad. Se revisa si cambian estados, cantidades,
 el límite transaccional o el orden movimiento → detalles → encabezado.
 
-### Actividad de la misma operación
+### Actividad representativa de decisión y surtimiento
+
+**Identificador:** `DIA-BE-ACT-001`. Esta actividad complementa `DIA-BE-SEQ-001` y se
+reutiliza para material y merma cuando conservan las mismas decisiones de existencia y
+estado. Corrección, cancelación, devolución y ajuste requieren su actividad propia sólo
+si sus alternativas no quedan explicadas por las vistas de requisitos; no se cambia el
+texto de los nodos para fingir una generalización.
 
 ```mermaid
 flowchart TB
@@ -238,6 +442,9 @@ La actividad complementa la secuencia porque hace visibles errores y bifurcacion
 evidencia del adaptador está en
 [`goodsIssueControllerTest.js`](../../tests/unit/controllers/api/warehouse/goodsIssueControllerTest.js);
 la cobertura y brechas de servicios permanecen en el [plan de pruebas](../testing/test-plan.md).
+La aplicación por caso y su evidencia se consulta en la
+[matriz de trazabilidad técnica](traceability-matrix.md), y todos los identificadores
+gráficos están en el [inventario de diagramas](diagram-inventory.md).
 
 ## Lista de revisión backend
 

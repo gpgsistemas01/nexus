@@ -27,6 +27,20 @@ pregunta. Si se necesita uno nuevo, debe quedar claro —en el título o texto i
 6. **mantenimiento:** evento que obliga a editarlo o regenerarlo y comprobación
    aplicable.
 
+Todo diagrama curado tiene un identificador estable registrado en el
+[inventario de diagramas](diagram-inventory.md). Los diagramas de un caso de uso usan
+`DIA-REQ-CU-<identificador CU>`; las demás vistas usan
+`DIA-<familia>-<tipo>-<número>`. El título indica su semántica (contexto, contenedores,
+componentes, secuencia, actividad, estados, ER, navegación o flujo), porque `flowchart`
+es sólo la sintaxis Mermaid y no convierte todas esas vistas en el mismo tipo.
+
+En secuencias, `actor` se reserva para una persona, rol o sistema externo autónomo que
+inicia o recibe una interacción. Navegador, EJS, router, controller, servicio y base de
+datos son `participant`. Una secuencia técnica puede omitir al actor humano cuando su
+límite empieza en HTTP y enlaza el `CU-*` que ya lo identifica; una secuencia de
+experiencia completa sí debe mostrar el actor canónico del caso. No se cambia el actor
+por «Usuario» si el requisito distingue Almacén de Administración.
+
 Los identificadores Mermaid deben ser estables y descriptivos (`apiRoutes`,
 `goodsIssues`), mientras la etiqueta puede estar en español. La orientación se conserva
 por tipo: `LR` para recorridos y dependencias, `TB` para capas o descomposición. Los

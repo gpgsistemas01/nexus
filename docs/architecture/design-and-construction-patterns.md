@@ -20,6 +20,7 @@ reutilizarse antes de construir otro flujo y dónde terminan sus límites.
 | Persistencia | Propagación explícita del contexto transaccional | `getDb(tx)` selecciona la transacción recibida o el cliente Prisma compartido. |
 | Consistencia | Límite transaccional para un caso de uso | Servicios que ejecutan documento, detalle, existencia y movimiento dentro de `$transaction`. |
 | Integración | Publicación de eventos de actualización | `emitInventoryUpdated` traduce un contexto de inventario en eventos Socket.IO. |
+| Auditoría | Audit Trail transversal posterior a la respuesta | `auditWrites`, `persistWriteAudit` y `CriticalWriteAudit` registran escrituras API exitosas y sanitizan campos sensibles. |
 | Presentación | Composición de componentes y ownership por recurso | `src/views/shared`, `src/public/js/ui`, `plugins` y componentes que permanecen en la carpeta de su recurso. |
 | Pruebas | Test harness configurable | `createControllerTestApp` registra sólo las rutas necesarias para probar controllers con Supertest. |
 
@@ -58,6 +59,13 @@ En el navegador, `services` encapsula HTTP, `application` expresa operaciones de
 de uso y `pages` compone comportamiento visual. Esto se parece a MVC en algunos puntos,
 pero no se declara un MVC estricto: los servicios de dominio, DTO, JavaScript del
 navegador y eventos no encajan en tres componentes únicos.
+
+La correspondencia MVC útil es parcial: EJS y los módulos de UI son la **Vista**;
+routers/controllers Express cumplen la entrada del **Controlador**; Prisma y los
+servicios administran estado y reglas que, en conjunto, se aproximan al **Modelo**.
+Nexus aplica por ello un **MVC web extendido dentro de una arquitectura por capas**, no
+un segundo patrón arquitectónico que sustituya al monolito modular. No falta crear una
+clase `Model` ni trasladar reglas a controllers para «completar» MVC.
 
 **Regla de construcción:** un recurso nuevo conserva el mismo dominio y nombre a través
 de sus capas. No se crea una carpeta horizontal nueva sólo para una operación CRUD.
@@ -211,7 +219,33 @@ la transacción. Una nueva notificación de inventario debe reutilizar este publ
 otro tipo de evento sólo se incorpora aquí si comparte el mismo contrato y ciclo de
 vida.
 
-## 7. Composición y propiedad de componentes visuales
+Los modelos `InventoryMovement`, `WasteMovement`, ajustes, devoluciones y cambios de
+detalle conservan historia operativa, pero **no implementan Event Sourcing**: el estado
+actual de existencias y documentos se actualiza y consulta directamente, no se
+reconstruye reproduciendo una secuencia inmutable de eventos; tampoco existe event
+store, versión de agregado, proyección ni consumidor durable. Nombrar movimientos o
+eventos Socket.IO como Event Sourcing sería incorrecto. No se recomienda introducirlo
+sin un requisito de reconstrucción temporal, integración durable o múltiples
+proyecciones que justifique la complejidad; la trazabilidad vigente usa historial de
+dominio más Audit Trail.
+
+## 7. Audit Trail transversal
+
+`auditWrites` implementa el patrón **Audit Trail** como middleware transversal. Filtra
+`POST`, `PUT`, `PATCH` y `DELETE` bajo `/api`, espera el evento `finish`, descarta
+respuestas fallidas o sin actor y delega a `persistWriteAudit`. El servicio deriva
+acción, recurso e identidad, limita longitudes y elimina contraseña, token, secreto,
+autorización y cookie antes de persistir `CriticalWriteAudit`.
+
+Es auditoría de responsabilidad (*accountability*) y no Event Sourcing ni log de
+dominio. Actualmente es **best effort y posterior al commit**: una falla se registra en
+el logger pero no revierte la escritura. La brecha debe resolverse sólo si un requisito
+exige garantía atómica o entrega durable; en ese caso se recomienda **Transactional
+Outbox** o incluir un registro de auditoría específico en la misma transacción, no
+convertir todos los agregados a Event Sourcing. También faltan pruebas dedicadas del
+sanitizado, clasificación y política de fallo, brecha registrada en el plan de pruebas.
+
+## 8. Composición y propiedad de componentes visuales
 
 Los partials de `src/views/shared` y las piezas independientes del recurso bajo
 `public/js/ui` o `plugins` se componen desde páginas específicas. Un formulario o modal
@@ -490,7 +524,7 @@ porque aún no existe una merma persistida; el modal traduce ese estado a una pl
 vacía antes de entregarla a los lectores, en lugar de ampliar su contrato con un valor
 que no representa un material.
 
-## 8. Orden de métodos por comportamiento
+## 9. Orden de métodos por comportamiento
 
 Los módulos que representan el mismo tipo de recurso conservan un orden de lectura
 común aunque cambien los nombres del dominio. Para un CRUD, el orden es: **consulta,
@@ -520,7 +554,7 @@ La prueba ubicada junto a las unitarias de sus controllers verifica esta secuenc
 las capas y en las páginas; las pruebas de comportamiento y la persistencia CRUD
 permanecen en las ubicaciones definidas por la estrategia de pruebas.
 
-## 9. Patrones de construcción de pruebas
+## 10. Patrones de construcción de pruebas
 
 `createControllerTestApp` es una factory de test harness: crea una aplicación Express
 mínima, instala parsing JSON y deja que cada prueba registre las rutas necesarias. Se
