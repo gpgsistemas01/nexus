@@ -135,9 +135,12 @@ Las vistas canónicas de reutilización
 [`DIA-FE-REU-001`](frontend-use-case-diagrams.md#vista-canónica-de-reutilización-frontend)
 y [`DIA-BE-REU-001`](backend-use-case-diagrams.md#vista-canónica-de-reutilización-backend)
 parten de este catálogo. A su vez, cada diagrama específico referencia su vista de
-reutilización. La cadena de lectura es **patrón aplicado → punto común frontend/backend
-→ especialización del caso**; así una refactorización cambia primero el contrato común
-y permite localizar después todos los casos afectados. `DIA-PAT-TST-001` representa
+reutilización y declara una línea **Patrones** con los códigos resueltos por el índice
+rápido de frontend o backend. Así se identifica la solución aplicada sin repetir su
+explicación en los 63 casos de cada perspectiva. La cadena de lectura es
+**patrón aplicado → punto común frontend/backend → especialización del caso**; así una
+refactorización cambia primero el contrato común y permite localizar después todos los
+casos afectados. `DIA-PAT-TST-001` representa
 por separado la reutilización del montaje de pruebas, porque no participa en el flujo
 de ejecución de un caso en producción.
 
