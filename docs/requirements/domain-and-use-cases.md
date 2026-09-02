@@ -249,7 +249,7 @@ flowchart LR
             ucMaterialIssueQuery(["CU-SAL-01 Consultar salidas de material"])
             ucMaterialIssueCreate(["CU-SAL-02 Crear salida de material"])
             ucMaterialIssueHeader(["CU-SAL-03 Editar encabezado de salida de material"])
-            ucMaterialIssueDetails(["CU-SAL-04 Ajustar materiales de una salida"])
+            ucMaterialIssueDetails(["CU-SAL-04 Editar detalles de material de una salida"])
             ucMaterialSupply(["CU-SAL-05 Surtir material"])
             ucMaterialReturn(["CU-SAL-06 Devolver material surtido"])
         end
@@ -257,7 +257,7 @@ flowchart LR
             ucWasteIssueQuery(["CU-SAL-07 Consultar salidas de merma"])
             ucWasteIssueCreate(["CU-SAL-08 Crear salida de merma"])
             ucWasteIssueHeader(["CU-SAL-09 Editar encabezado de salida de merma"])
-            ucWasteIssueDetails(["CU-SAL-10 Ajustar mermas de una salida"])
+            ucWasteIssueDetails(["CU-SAL-10 Editar detalles de merma de una salida"])
             ucWasteSupply(["CU-SAL-11 Surtir merma"])
             ucWasteReturn(["CU-SAL-12 Devolver merma surtida"])
         end
@@ -291,30 +291,30 @@ flowchart LR
         direction TB
         subgraph reportMaterialFamily["Materiales"]
             ucMaterialInventory(["CU-REP-01 Consultar inventario de materiales"])
-            ucMaterialMovements(["CU-REP-03 Consultar movimientos de materiales"])
-            ucMaterialInventoryReport(["CU-REP-05 Generar reporte de inventario de materiales"])
-            ucMaterialIssueReport(["CU-REP-06 Generar reporte de salidas de material"])
-            ucMaterialMovementReport(["CU-REP-14 Generar reporte de movimientos de materiales"])
+            ucMaterialMovements(["CU-REP-02 Consultar movimientos de materiales"])
+            ucMaterialInventoryReport(["CU-REP-03 Generar reporte de inventario de materiales"])
+            ucMaterialIssueReport(["CU-REP-04 Generar reporte de salidas de material"])
+            ucMaterialMovementReport(["CU-REP-05 Generar reporte de movimientos de materiales"])
         end
         subgraph reportWasteFamily["Mermas"]
-            ucWasteInventory(["CU-REP-02 Consultar inventario de mermas"])
-            ucWasteMovements(["CU-REP-04 Consultar movimientos de mermas"])
-            ucWasteIssueReport(["CU-REP-07 Generar reporte de salidas de merma"])
+            ucWasteInventory(["CU-REP-06 Consultar inventario de mermas"])
+            ucWasteMovements(["CU-REP-07 Consultar movimientos de mermas"])
+            ucWasteIssueReport(["CU-REP-08 Generar reporte de salidas de merma"])
             ucWasteReport(["CU-REP-09 Generar reporte de mermas"])
-            ucWasteMovementReport(["CU-REP-15 Generar reporte de movimientos de mermas"])
+            ucWasteMovementReport(["CU-REP-10 Generar reporte de movimientos de mermas"])
         end
         subgraph reportPurchaseFamily["Compras de material"]
-            ucPurchaseReport(["CU-REP-08 Generar reporte de compras de material"])
+            ucPurchaseReport(["CU-REP-11 Generar reporte de compras de material"])
         end
         subgraph reportSupplierFamily["Proveedores"]
-            ucSupplierReport(["CU-REP-10 Generar reporte de proveedores"])
+            ucSupplierReport(["CU-REP-12 Generar reporte de proveedores"])
         end
         subgraph reportClientFamily["Clientes"]
-            ucClientReport(["CU-REP-11 Generar reporte de clientes"])
+            ucClientReport(["CU-REP-13 Generar reporte de clientes"])
         end
         subgraph reportIdentityFamily["Identidad"]
-            ucPersonReport(["CU-REP-12 Generar reporte de personas"])
-            ucUserReport(["CU-REP-13 Generar reporte de usuarios"])
+            ucPersonReport(["CU-REP-14 Generar reporte de personas"])
+            ucUserReport(["CU-REP-15 Generar reporte de usuarios"])
         end
     end
 
@@ -367,7 +367,7 @@ continúan fuera del diagrama por su estado no vigente.
 
 `CU-SAL-05` y `CU-SAL-11` actualizan la existencia y registra el movimiento como parte de su propio
 flujo; `CU-SAL-06` y `CU-SAL-12` registran la reversión y el movimiento inverso. No existe una relación
-`«include»` con `CU-REP-03` y `CU-REP-04`: consultar movimientos es otro objetivo iniciado por un
+`«include»` con `CU-REP-02` y `CU-REP-07`: consultar movimientos es otro objetivo iniciado por un
 actor, mientras registrar un movimiento es una responsabilidad interna de Nexus. Por la
 misma razón, compartir servicios entre grupos no se representa como salto, inclusión o
 extensión entre casos de uso.

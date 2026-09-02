@@ -41,7 +41,7 @@ flowchart LR
 ```
 
 El texto verificable y el estado de cada identificador se mantienen una sola vez en la
-[especificación](requirements-specification.md#4-requisitos-funcionales). La
+[especificación](requirements-specification.md#4-catálogo-unificado-por-ámbito). La
 [matriz de operaciones](requirements-operations-matrix.md#matriz-vigente) documenta los
 permisos, y el mapa generado documenta las rutas; repetirlos aquí mezclaría vistas.
 
@@ -442,11 +442,11 @@ flowchart LR
     validate --> result["Nexus responde: Edición de los campos admitidos."]
 ```
 
-#### `CU-SAL-04` — Ajustar materiales de una salida
+#### `CU-SAL-04` — Editar detalles de material de una salida
 
 ```mermaid
 flowchart LR
-    request["Actor solicita ajustar materiales de una salida"] --> validate["Nexus valida permiso, datos y relaciones"]
+    request["Actor solicita editar detalles de material de una salida"] --> validate["Nexus valida permiso, datos y relaciones"]
     validate --> result["Nexus responde: Actualización de detalles todavía modificables."]
 ```
 
@@ -490,11 +490,11 @@ flowchart LR
     validate --> result["Nexus responde: Edición de los campos admitidos."]
 ```
 
-#### `CU-SAL-10` — Ajustar mermas de una salida
+#### `CU-SAL-10` — Editar detalles de merma de una salida
 
 ```mermaid
 flowchart LR
-    request["Actor solicita ajustar mermas de una salida"] --> validate["Nexus valida permiso, datos y relaciones"]
+    request["Actor solicita editar detalles de merma de una salida"] --> validate["Nexus valida permiso, datos y relaciones"]
     validate --> result["Nexus responde: Actualización de detalles todavía modificables."]
 ```
 
@@ -524,15 +524,7 @@ flowchart LR
     validate --> result["Nexus responde: Consulta autorizada sin modificar datos."]
 ```
 
-#### `CU-REP-02` — Consultar inventario de mermas
-
-```mermaid
-flowchart LR
-    request["Actor solicita consultar inventario de mermas"] --> validate["Nexus valida permiso, datos y relaciones"]
-    validate --> result["Nexus responde: Consulta autorizada sin modificar datos."]
-```
-
-#### `CU-REP-03` — Consultar movimientos de materiales
+#### `CU-REP-02` — Consultar movimientos de materiales
 
 ```mermaid
 flowchart LR
@@ -540,15 +532,7 @@ flowchart LR
     validate --> result["Nexus responde: Consulta autorizada sin modificar datos."]
 ```
 
-#### `CU-REP-04` — Consultar movimientos de mermas
-
-```mermaid
-flowchart LR
-    request["Actor solicita consultar movimientos de mermas"] --> validate["Nexus valida permiso, datos y relaciones"]
-    validate --> result["Nexus responde: Consulta autorizada sin modificar datos."]
-```
-
-#### `CU-REP-05` — Generar reporte de inventario de materiales
+#### `CU-REP-03` — Generar reporte de inventario de materiales
 
 ```mermaid
 flowchart LR
@@ -556,7 +540,7 @@ flowchart LR
     validate --> result["Nexus responde: Archivo Excel con filtros, columnas y cálculos propios del reporte."]
 ```
 
-#### `CU-REP-06` — Generar reporte de salidas de material
+#### `CU-REP-04` — Generar reporte de salidas de material
 
 ```mermaid
 flowchart LR
@@ -564,19 +548,35 @@ flowchart LR
     validate --> result["Nexus responde: Archivo Excel con filtros, columnas y cálculos propios del reporte."]
 ```
 
-#### `CU-REP-07` — Generar reporte de salidas de merma
+#### `CU-REP-05` — Generar reporte de movimientos de materiales
+
+```mermaid
+flowchart LR
+    request["Actor solicita generar reporte de movimientos de materiales"] --> validate["Nexus valida permiso, datos y relaciones"]
+    validate --> result["Nexus responde: Archivo Excel con filtros, columnas y cálculos propios del reporte."]
+```
+
+#### `CU-REP-06` — Consultar inventario de mermas
+
+```mermaid
+flowchart LR
+    request["Actor solicita consultar inventario de mermas"] --> validate["Nexus valida permiso, datos y relaciones"]
+    validate --> result["Nexus responde: Consulta autorizada sin modificar datos."]
+```
+
+#### `CU-REP-07` — Consultar movimientos de mermas
+
+```mermaid
+flowchart LR
+    request["Actor solicita consultar movimientos de mermas"] --> validate["Nexus valida permiso, datos y relaciones"]
+    validate --> result["Nexus responde: Consulta autorizada sin modificar datos."]
+```
+
+#### `CU-REP-08` — Generar reporte de salidas de merma
 
 ```mermaid
 flowchart LR
     request["Actor solicita generar reporte de salidas de merma"] --> validate["Nexus valida permiso, datos y relaciones"]
-    validate --> result["Nexus responde: Archivo Excel con filtros, columnas y cálculos propios del reporte."]
-```
-
-#### `CU-REP-08` — Generar reporte de compras de material
-
-```mermaid
-flowchart LR
-    request["Actor solicita generar reporte de compras de material"] --> validate["Nexus valida permiso, datos y relaciones"]
     validate --> result["Nexus responde: Archivo Excel con filtros, columnas y cálculos propios del reporte."]
 ```
 
@@ -588,7 +588,23 @@ flowchart LR
     validate --> result["Nexus responde: Archivo Excel con filtros, columnas y cálculos propios del reporte."]
 ```
 
-#### `CU-REP-10` — Generar reporte de proveedores
+#### `CU-REP-10` — Generar reporte de movimientos de mermas
+
+```mermaid
+flowchart LR
+    request["Actor solicita generar reporte de movimientos de mermas"] --> validate["Nexus valida permiso, datos y relaciones"]
+    validate --> result["Nexus responde: Archivo Excel con filtros, columnas y cálculos propios del reporte."]
+```
+
+#### `CU-REP-11` — Generar reporte de compras de material
+
+```mermaid
+flowchart LR
+    request["Actor solicita generar reporte de compras de material"] --> validate["Nexus valida permiso, datos y relaciones"]
+    validate --> result["Nexus responde: Archivo Excel con filtros, columnas y cálculos propios del reporte."]
+```
+
+#### `CU-REP-12` — Generar reporte de proveedores
 
 ```mermaid
 flowchart LR
@@ -596,7 +612,7 @@ flowchart LR
     validate --> result["Nexus responde: Archivo Excel con filtros, columnas y cálculos propios del reporte."]
 ```
 
-#### `CU-REP-11` — Generar reporte de clientes
+#### `CU-REP-13` — Generar reporte de clientes
 
 ```mermaid
 flowchart LR
@@ -604,7 +620,7 @@ flowchart LR
     validate --> result["Nexus responde: Archivo Excel con filtros, columnas y cálculos propios del reporte."]
 ```
 
-#### `CU-REP-12` — Generar reporte de personas
+#### `CU-REP-14` — Generar reporte de personas
 
 ```mermaid
 flowchart LR
@@ -612,27 +628,11 @@ flowchart LR
     validate --> result["Nexus responde: Archivo Excel con filtros, columnas y cálculos propios del reporte."]
 ```
 
-#### `CU-REP-13` — Generar reporte de usuarios
+#### `CU-REP-15` — Generar reporte de usuarios
 
 ```mermaid
 flowchart LR
     request["Actor solicita generar reporte de usuarios"] --> validate["Nexus valida permiso, datos y relaciones"]
-    validate --> result["Nexus responde: Archivo Excel con filtros, columnas y cálculos propios del reporte."]
-```
-
-#### `CU-REP-14` — Generar reporte de movimientos de materiales
-
-```mermaid
-flowchart LR
-    request["Actor solicita generar reporte de movimientos de materiales"] --> validate["Nexus valida permiso, datos y relaciones"]
-    validate --> result["Nexus responde: Archivo Excel con filtros, columnas y cálculos propios del reporte."]
-```
-
-#### `CU-REP-15` — Generar reporte de movimientos de mermas
-
-```mermaid
-flowchart LR
-    request["Actor solicita generar reporte de movimientos de mermas"] --> validate["Nexus valida permiso, datos y relaciones"]
     validate --> result["Nexus responde: Archivo Excel con filtros, columnas y cálculos propios del reporte."]
 ```
 
@@ -653,9 +653,9 @@ el código.
 | Compleja | `CU-ENT-02` | Referencia, documento, detalles, stock y movimientos se confirman juntos; el costo se revisa después del commit. | Secuencia de registro incluida abajo. |
 | Compleja | `CU-ENT-04`, `CU-ENT-05` | Corrección/cancelación altera historia, totales, stock y movimiento. | Secuencia atómica ya incluida en este documento. |
 | Compleja | `CU-SAL-05`, `CU-SAL-06`, `CU-SAL-11`, `CU-SAL-12` | Acumulados, estados, existencias y movimientos dependen de cantidades previas. | Máquina de estados ya incluida en este documento. |
-| Compleja | `CU-REP-05` a `CU-REP-15` | Filtros, variantes mensual/detallada, fórmulas, totales y archivo deben conservar el mismo resultado de dominio. | Canal de generación de reportes incluido abajo. |
+| Compleja | `CU-REP-03` a `CU-REP-05` y `CU-REP-08` a `CU-REP-15` | Filtros, variantes mensual/detallada, fórmulas, totales y archivo deben conservar el mismo resultado de dominio. | Canal de generación de reportes incluido abajo. |
 | Intermedia | `CU-CAT-02`, `CU-CAT-03`, `CU-CAT-07`, `CU-CAT-08`, `CU-CAT-11`, `CU-CAT-12`, `CU-CAT-14`, `CU-CAT-15`, `CU-ENT-03`, `CU-SAL-02` a `CU-SAL-04` y `CU-SAL-08` a `CU-SAL-10` | Coordinan relaciones o detalles, pero no agregan participantes o estados que justifiquen una secuencia transaccional. | Flujo funcional en su grupo y vista técnica complementaria incluida abajo. |
-| Directa | `CU-IDA-01` a `CU-IDA-03`, `CU-CAT-01`, `CU-CAT-06`, `CU-CAT-10`, `CU-CAT-13`, `CU-CAT-17` a `CU-CAT-20`, `CU-ENT-01`, `CU-SAL-01`, `CU-SAL-07`, `CU-REP-01` a `CU-REP-04` | Consulta o mutación directa sin estados coordinados adicionales. | Flujo funcional en su grupo y vista técnica complementaria incluida abajo. |
+| Directa | `CU-IDA-01` a `CU-IDA-03`, `CU-CAT-01`, `CU-CAT-06`, `CU-CAT-10`, `CU-CAT-13`, `CU-CAT-17` a `CU-CAT-20`, `CU-ENT-01`, `CU-SAL-01`, `CU-SAL-07`, `CU-REP-01`, `CU-REP-02`, `CU-REP-06` y `CU-REP-07` | Consulta o mutación directa sin estados coordinados adicionales. | Flujo funcional en su grupo y vista técnica complementaria incluida abajo. |
 
 Las vistas siguientes completan los casos de coordinación intermedia y directa con el
 mismo criterio aplicado a los casos de coordinación compleja: muestran la ejecución
@@ -888,14 +888,14 @@ flowchart LR
 contextual conserva sus relaciones. La ruta general `PATCH /:id` es otra entrada del
 contrato y no convierte esta edición en surtimiento.
 
-### Ajustar materiales o mermas de una salida — `CU-SAL-04` y `CU-SAL-10`
+### Editar detalles de material o merma de una salida — `CU-SAL-04` y `CU-SAL-10`
 
 ```mermaid
 flowchart LR
     issueDetailRoute["PATCH /:id/details<br/>permiso de detalles"] --> issueDetailValidation["Validar cantidades y estado"]
     issueDetailValidation --> issueDetailService["Servicio contextual<br/>comparar detalles vigentes"]
-    issueDetailService --> issueDetailDecision{"¿Sólo ajustar o<br/>confirmar surtimiento?"}
-    issueDetailDecision -->|ajustar| issueDetailDb[("Actualizar detalles")]
+    issueDetailService --> issueDetailDecision{"¿Sólo editar o<br/>confirmar surtimiento?"}
+    issueDetailDecision -->|editar| issueDetailDb[("Actualizar detalles")]
     issueDetailDecision -->|confirmar| issueSupply["Aplicar reglas de CU-SAL-05 o CU-SAL-11"]
     issueDetailDb --> issueDetailStatus["Derivar estado del documento"]
     issueSupply --> issueDetailStatus
@@ -905,7 +905,7 @@ No existe una URL `/supply`: en material, la misma entrada de detalles puede con
 el surtimiento según el estado y los datos recibidos. La rama de confirmación continúa
 en la máquina de estados y en la transacción de `CU-SAL-05` o `CU-SAL-11`; no se duplica aquí.
 
-### Consultar inventarios y movimientos — `CU-REP-01` a `CU-REP-04`
+### Consultar inventarios y movimientos — `CU-REP-01`, `CU-REP-02`, `CU-REP-06` y `CU-REP-07`
 
 ```mermaid
 flowchart TB
@@ -920,7 +920,7 @@ flowchart TB
 
 Movimientos e inventario son modelos de lectura diferentes y sólo comparten el objetivo
 de consulta. Esta vista no incluye Excel: la exportación agrega transformación, columnas
-y fórmulas y pertenece a `CU-REP-05` a `CU-REP-15`.
+y fórmulas y pertenece a `CU-REP-03` a `CU-REP-05` y `CU-REP-08` a `CU-REP-15`.
 
 ### Crear o editar usuario y acceso — `CU-IDA-05`, `CU-IDA-06`, `CU-IDA-07`
 
@@ -1001,7 +1001,7 @@ sequenceDiagram
 El ajuste posterior del costo no se presenta como parte del límite atómico de documento,
 stock y movimiento. Esta diferencia debe permanecer visible en pruebas y documentación.
 
-### Generar reportes específicos — `CU-REP-05` a `CU-REP-15`
+### Generar reportes específicos — `CU-REP-03` a `CU-REP-05` y `CU-REP-08` a `CU-REP-15`
 
 ```mermaid
 flowchart LR
