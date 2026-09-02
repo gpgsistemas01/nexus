@@ -77,6 +77,11 @@ Cada colección incorpora además perspectivas de **componentes**, **secuencia**
 **estados técnicos**. Se consultan desde la vista de reutilización para leer el mismo
 código por estructura, orden de mensajes o ciclo de vida, en lugar de reducir toda la
 explicación a diagramas `flowchart`.
+Esta cobertura no es opcional ni se limita a los casos con coordinación compleja: cada
+fila vigente del catálogo debe existir en ambas matrices y debe tener exactamente un
+bloque Mermaid identificado en cada colección. `npm run docs:check` compara esos cuatro
+artefactos con el catálogo para impedir que un caso nuevo quede documentado sólo en
+frontend o sólo en backend.
 
 Un flujo completo enlaza ambos documentos mediante la ruta API; no repite en frontend
 las reglas propietarias del servidor ni describe en backend detalles visuales del DOM.
