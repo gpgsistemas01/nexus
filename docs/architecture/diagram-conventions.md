@@ -33,6 +33,31 @@ Todo diagrama curado tiene un identificador estable registrado en el
 `DIA-<familia>-<tipo>-<número>`. El título indica su semántica (contexto, contenedores,
 componentes, secuencia, actividad, estados, ER, navegación o flujo), porque `flowchart`
 es sólo la sintaxis Mermaid y no convierte todas esas vistas en el mismo tipo.
+Las vistas técnicas que aplican código a todos los casos conservan directamente el
+identificador funcional como `DIA-FE-CU-<grupo>-<secuencia>` o
+`DIA-BE-CU-<grupo>-<secuencia>`; así frontend y backend pueden localizar el mismo caso
+sin depender del orden físico de los bloques.
+
+Las secuencias y actividades técnicas de frontend o backend que implementan casos de
+uso se asocian con **un único `CU-*`**. No se permiten participantes alternativos con
+“o”, comodines, URLs elípticas ni rangos de casos para convertir un flujo en plantilla.
+Los elementos reutilizados se documentan como dependencias o componentes compartidos;
+cuando dos casos necesitan vista dinámica, cada diagrama conserva nombres y decisiones
+específicos de su implementación.
+
+Cada colección de aplicación al código comienza con una vista canónica `DIA-*-REU-*`
+que muestra factories, componentes, infraestructura y colaboradores realmente
+compartidos. El diagrama específico referencia esa vista mediante una flecha
+discontinua y nombra la pieza utilizada; su recorrido continuo muestra la
+especialización del caso. Así una refactorización se revisa primero en el punto común y
+después en cada consumidor, sin copiar la implementación compartida como si fuera local.
+La referencia completa sigue `DIA-PAT-*` → `DIA-FE/BE-REU-*` → `DIA-FE/BE-CU-*`:
+el primer nivel demuestra el patrón mediante símbolos y consumidores; el segundo
+identifica el punto común por entorno; el tercero conserva la ruta y efecto del caso.
+Entre reutilización y caso pueden enlazarse perspectivas `PER-CMP`, `PER-SEQ` y
+`PER-EST`: componentes responde estructura, secuencia responde orden y estados responde
+ciclo de vida. No se reemplazan entre sí ni se usa `flowchart` para fingir esas tres
+semánticas.
 
 En secuencias, `actor` se reserva para una persona, rol o sistema externo autónomo que
 inicia o recibe una interacción. Navegador, EJS, router, controller, servicio y base de
@@ -73,7 +98,7 @@ verdad documental.
 | Contexto | Inspirada en C4, sin afirmar conformidad C4 | ¿Quién usa Nexus y con qué sistemas se comunica? | Decisión curada; cambia al agregar actores o dependencias externas. |
 | Contenedores y capas | Capas y separación de responsabilidades | ¿Dónde se ejecuta cada responsabilidad principal? | Arquitectura curada y registro real de capas. |
 | Despliegue | Grafo de nodos y entornos de ejecución inspirado en UML | ¿En qué entorno se ejecutan los artefactos y con qué dependencias se comunican? | Decisión operativa, `Dockerfile`, Compose y entrypoint; separa con línea discontinua la topología objetivo aún no versionada. |
-| Secuencia | `sequenceDiagram` de Mermaid | ¿Cómo atraviesa las capas una interacción representativa? | Flujo curado; no inventaría todos los endpoints. |
+| Secuencia | `sequenceDiagram` de Mermaid | ¿Cómo atraviesa las capas un caso concreto? | Flujo curado y asociado con un solo `CU-*`; no se crea si una ficha tabular basta. |
 | Navegación | Máquina de estados inspirada en UML para acceso y mapa de sitio dirigido para el menú | ¿Qué transición cambia el estado de acceso y qué destinos ofrece la navegación principal? | Rutas web y `navList`; cambia al modificar sesión, destinos, categorías o permisos. |
 | Trazabilidad | Grafo dirigido | ¿Desde dónde se llega a una evidencia? | Requisitos y referencias; la leyenda define el significado de cada enlace. |
 | Ciclo CRUD o estados | Máquina de estados | ¿Qué transiciones admite el proceso? | Reglas de negocio; una flecha expresa una transición, no una llamada de código. |
@@ -95,7 +120,7 @@ negocio.
 | Casos `CU-*` | Casos de uso por actor y límite de Nexus | Curado en `domain-and-use-cases.md`. | Actores, objetivos y asociaciones requieren decisión funcional; no se infieren de una ruta. |
 | Casos `CU-*` | Flujo de actividad y vista técnica complementaria de cada objetivo | Curado por familia en `requirements-diagrams.md`. | El primero representa escenario exitoso, decisiones y resultado; la segunda hace visible su ejecución entre capas o la bifurcación que el flujo omite, sin fusionar objetivos. |
 | Casos con estados | Máquina de estados de salidas, surtimientos y devoluciones | Curada en requisitos. | Los nombres y transiciones combinan reglas y cantidades; el código es evidencia, no única fuente normativa. |
-| Casos transaccionales | Secuencia representativa de corrección/cancelación | Curada en requisitos y enlazada al servicio. | Explica límite atómico y rollback sin producir una secuencia por endpoint. |
+| Casos transaccionales | Secuencia específica cuando la coordinación técnica aporta información adicional | Curada en requisitos o en la referencia técnica correspondiente y enlazada al servicio. | Explica el límite atómico y rollback del caso sin fusionarlo con otra operación. |
 | Código de routers | Superficie API/Web por área y método | Curada en `code-diagrams.md` y comprobada contra el mapa de rutas. | Montajes y métodos son verificables, pero la vista se actualiza explícitamente junto al cambio para conservar agrupaciones comprensibles. |
 | Código JavaScript | Dependencias entre áreas | Generada en `generated/code-map.md`. | Los `import` relativos permiten reconstruir aristas deterministas. |
 | Prisma | Entidad-relación por área | Generada en `generated/database-schema.md`. | Modelos, claves y relaciones pertenecen al esquema versionado. |
@@ -103,10 +128,10 @@ negocio.
 
 ### Diagramas descartados en la revisión
 
-- **La misma secuencia de capas copiada para cada `CU-*`:** ocultaría las diferencias
-  entre consulta, CRUD, bifurcación y coordinación. Cada caso conserva una vista técnica,
-  pero elige secuencia o actividad y nombra sólo participantes, reutilización u omisiones
-  que aportan información propia de ese objetivo.
+- **Una secuencia genérica aplicada a varios `CU-*`:** ocultaría diferencias de endpoint,
+  participantes, modelos y errores. Sólo los casos cuya coordinación aporta información
+  necesitan vista técnica; cuando existe, ésta nombra exclusivamente los elementos del
+  objetivo documentado y la reutilización queda en la ficha o vista estructural.
 - **Un diagrama de clases generado desde JavaScript:** la aplicación no declara clases de
   dominio equivalentes al modelo conceptual; los imports no permiten inferirlas.
 - **Casos de uso generados desde endpoints:** `POST`, `PATCH` o `GET` no revelan actor,

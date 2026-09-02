@@ -37,6 +37,25 @@ definen en el [inventario de capturas](screenshot-inventory.md). El inventario s
 real de las vistas y es la fuente para la automatización; no se deben agregar imágenes aisladas
 sin incorporarlas también a esa secuencia.
 
+### Continuidad de consultas y exportaciones
+
+Los reportes **no se documentan como un módulo independiente del manual**, porque la
+interfaz no ofrece un recorrido general de reportes. Cada exportación se explica como el
+último paso del módulo donde el usuario consultó y filtró la información:
+
+- materiales y su reporte de inventario;
+- proveedores y clientes con su exportación desde el listado;
+- mermas y su reporte de inventario;
+- compras y su reporte mensual;
+- salidas de material o merma y el reporte del mismo contexto;
+- personas y usuarios con su exportación desde el listado;
+- movimientos de material o merma y su reporte correspondiente.
+
+Así se conserva la continuidad **abrir módulo → consultar → filtrar → exportar → recibir
+archivo** sin obligar al lector a saltar a una sección artificial de reportes. El grupo
+`REP` de requisitos sigue siendo válido para trazabilidad normativa, pero no define la
+navegación ni la estructura del manual.
+
 ## Solución de problemas
 
 Consulte el [catálogo de mensajes de error](error-messages.md) para identificar cómo se presenta
