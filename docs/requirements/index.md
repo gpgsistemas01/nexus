@@ -21,6 +21,11 @@ normativa; este índice organiza su lectura sin duplicarla.
 6. [Matriz de requisitos y operaciones](requirements-operations-matrix.md).
 7. [Glosario del negocio](business-glossary.md).
 
+La especificación y los casos se conectan con frontend, API, backend, persistencia y
+pruebas mediante la [matriz de trazabilidad técnica](../architecture/traceability-matrix.md);
+el [inventario de diagramas](../architecture/diagram-inventory.md) asigna identificadores
+estables a todas sus vistas.
+
 `scripts/exportDocs.js` conserva este mismo orden al generar el paquete `requisitos`.
 Las imágenes que se incorporen a estas secciones pertenecen a
 `docs/requirements/images/<sección>/`.
