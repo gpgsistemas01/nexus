@@ -1,4 +1,4 @@
-import { mkdir } from 'node:fs/promises';
+import { mkdir, rm } from 'node:fs/promises';
 import path from 'node:path';
 import process from 'node:process';
 
@@ -124,6 +124,10 @@ const protectedCaptures = captures.filter(item => !item.public);
 if (protectedCaptures.length && !storageState) {
     throw new Error('DOCS_STORAGE_STATE es obligatorio para generar las capturas de páginas protegidas.');
 }
+
+// La salida representa una ejecución completa. Se elimina sólo después de validar la
+// configuración para no mezclar capturas anteriores con el inventario actual.
+await rm(outputRoot, { recursive: true, force: true });
 
 const { chromium } = await import('playwright');
 const browser = await chromium.launch();

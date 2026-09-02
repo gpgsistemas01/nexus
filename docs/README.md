@@ -131,8 +131,10 @@ por un Markdown de su misma familia.
 
 ### Comandos
 
-Los paquetes admitidos son `manual-usuario`, `requisitos`, `arquitectura` y `pruebas`.
-Los formatos admitidos son `html`, `docx` y `pdf`.
+Los paquetes admitidos son `manual-usuario`, `manual-administrador`, `manual-almacen`,
+`manual-reportes`, `requisitos`, `arquitectura` y `pruebas`. Los tres paquetes de actor reutilizan
+los grupos de casos del manual general y omiten los grupos ajenos a sus responsabilidades. Los
+formatos admitidos son `html`, `docx` y `pdf`.
 
 ```bash
 # Sólo valida fuentes e imágenes; no necesita Pandoc.
@@ -140,6 +142,9 @@ npm run docs:export -- requisitos html --check
 
 # Genera build/docs/manual-usuario.html.
 npm run docs:export -- manual-usuario html
+
+# Genera un manual con el recorrido del personal de almacén.
+npm run docs:export -- manual-almacen html
 
 # Genera un DOCX con una plantilla opcional.
 DOCS_REFERENCE_DOC=/ruta/reference.docx npm run docs:export -- arquitectura docx

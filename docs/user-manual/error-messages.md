@@ -1,5 +1,6 @@
 # Mensajes de error y recuperación
 
+<a id="errores-generales"></a>
 ## Cómo presenta Nexus un error
 
 Nexus conserva el formulario abierto cuando detecta datos inválidos y marca el campo que debe
@@ -20,6 +21,7 @@ la existencia cambiaron.
 Los textos pueden incluir el nombre de un material, proveedor, área, proyecto o folio ficticio del
 registro involucrado. Esos valores dan contexto al mensaje y no representan otro tipo de error.
 
+<a id="errores-acceso"></a>
 ## Acceso y autorización
 
 | Mensaje visible | Motivo habitual | Qué hacer |
@@ -30,6 +32,7 @@ registro involucrado. Esos valores dan contexto al mensaje y no representan otro
 | **Reuso de sesión detectado.** | Nexus detectó que una sesión o token se intentó reutilizar. | Cierre las ventanas abiertas, vuelva a iniciar sesión y reporte el evento si se repite. |
 | **Enlace inválido. Solicita uno nuevo.** | El enlace ya no es válido o no corresponde al flujo actual. | Solicite un enlace nuevo. |
 
+<a id="errores-validacion"></a>
 ## Validación de formularios
 
 Nexus puede combinar varios mensajes en un mismo intento. Los más frecuentes son:
@@ -57,6 +60,7 @@ Nexus puede combinar varios mensajes en un mismo intento. Los más frecuentes so
 Los errores de formato no registran cambios. Se deben corregir los campos indicados en el mismo
 formulario, sin abrir otra cuenta ni crear un registro duplicado.
 
+<a id="errores-catalogos"></a>
 ## Catálogos e inventario
 
 | Mensaje visible | Recuperación |
@@ -68,6 +72,7 @@ formulario, sin abrir otra cuenta ni crear un registro duplicado.
 | **No se puede cambiar el proveedor del material porque ya tiene historial de compras o salidas.** | Conserve la relación histórica y registre la identidad correcta conforme al flujo de materiales. |
 | **No se puede eliminar la relación entre el material y el proveedor porque el material tiene historial de compras, salidas, mermas, movimientos o ajustes de stock.** | Retire o desactive el registro cuando el flujo lo permita; no intente borrar su historia. |
 
+<a id="errores-compras"></a>
 ## Compras
 
 | Mensaje visible | Recuperación |
@@ -82,6 +87,7 @@ formulario, sin abrir otra cuenta ni crear un registro duplicado.
 | **El detalle de la compra ya está cancelado.** | Actualice la compra y no repita la cancelación. |
 | **Razón para modificar el detalle de compra no encontrada.** | Solicite revisar el catálogo de motivos antes de continuar. |
 
+<a id="errores-salidas-material"></a>
 ## Salidas de material
 
 | Mensaje visible | Recuperación |
@@ -98,6 +104,7 @@ formulario, sin abrir otra cuenta ni crear un registro duplicado.
 | **Para el cliente GPG INTERNO, el asesor debe tener el rol Coordinador.** | Seleccione una persona con el rol requerido. |
 | **Para el cliente GPG INTERNO, el número de proyecto _X_ no coincide con el área _Y_.** | Corrija el proyecto o el área de acuerdo con la solicitud autorizada. |
 
+<a id="errores-salidas-merma"></a>
 ## Salidas de merma
 
 | Mensaje visible | Recuperación |
@@ -112,6 +119,7 @@ formulario, sin abrir otra cuenta ni crear un registro duplicado.
 | **La cantidad a devolver no es válida.** | Capture una cantidad positiva que no exceda la cantidad retornable. |
 | **Solo se pueden devolver detalles de una salida surtida.** | Revise el estado de la salida antes de devolver. |
 
+<a id="errores-reportes"></a>
 ## Reportes
 
 | Mensaje visible | Recuperación |
@@ -120,6 +128,7 @@ formulario, sin abrir otra cuenta ni crear un registro duplicado.
 | **No se pudo exportar el archivo. Verifica tu conexión e inténtalo de nuevo.** | Verifique la conexión. Si persiste, conserve el módulo, los filtros y el periodo seleccionados para soporte. |
 | Un mensaje específico devuelto por el servidor durante la descarga. | No se genera un archivo válido. Conserve el texto y los filtros; no publique un archivo parcial. |
 
+<a id="error-404"></a>
 ## Error 404 — Página no encontrada
 
 Nexus muestra una página con **Error 404** y el texto **La página que estás buscando no existe.**
