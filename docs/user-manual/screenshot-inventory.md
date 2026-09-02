@@ -86,6 +86,9 @@ Los reportes de inventario, proveedores, clientes, personas y usuarios descargan
 forma directa. Para esos casos, el listado es la evidencia visual correcta; el archivo generado
 se valida por pruebas y no se trata como captura de interfaz. Los reportes mensuales de compras,
 salidas y movimientos sí abren un diálogo y por eso tienen una imagen posterior específica.
+En ambos casos la captura permanece inmediatamente después de la consulta de su módulo; no se
+reagrupa bajo una secuencia independiente de reportes, porque eso rompería la continuidad del
+recorrido real del usuario.
 
 ## Datos de prueba requeridos
 

@@ -46,6 +46,101 @@ segundo consumidor real. Las utilidades compartidas que disparan eventos de plug
 como `toggleDisabledElement` al sincronizar Select2, también importan la constante del
 adaptador correspondiente para evitar dependencias implícitas del ámbito global.
 
+## Catálogo visual de patrones aplicados
+
+Estas vistas representan únicamente patrones con implementación y consumidores
+verificables. Una caja nombra el patrón o estrategia; el nodo siguiente identifica el
+símbolo o carpeta que lo implementa y el último nodo muestra consumidores reales. Las
+flechas no significan herencia salvo que se indique expresamente.
+
+### Estructura por dominio, capas y fronteras
+
+**Identificador:** `DIA-PAT-EST-001`. **Pregunta:** ¿cómo se separan dominio,
+transporte y reglas sin declarar un MVC estricto?
+
+```mermaid
+flowchart LR
+    modular["Monolito modular<br/>admin · sales · warehouse"] --> routes["routes / controllers"]
+    routes --> dto["DTO funcional<br/>src/dtos"]
+    dto --> services["services de dominio"]
+    services --> db["getDb / Prisma"]
+    browser["Capas del navegador"] --> clientService["public/js/services"]
+    clientService --> application["public/js/application"]
+    application --> pages["public/js/pages y EJS"]
+```
+
+### Pipeline, DTO y políticas declarativas
+
+**Identificador:** `DIA-PAT-FRO-001`. **Pregunta:** ¿qué mecanismos reutiliza una ruta
+antes de entregar datos normalizados al caso de uso?
+
+```mermaid
+flowchart LR
+    request["Petición"] --> token["verifyApiTokenRequired"]
+    token --> validator["Validadores de formulario"]
+    validator --> validate["validate"]
+    validate --> policy["authorizeUserApi<br/>PERMISSIONS + AUTHORIZATION_POLICIES"]
+    policy --> controller["Controller"]
+    controller --> dto["DTO funcional cuando aplica"]
+    dto --> service["Servicio del caso"]
+```
+
+### Factories y composición sobre herencia
+
+**Identificador:** `DIA-PAT-CON-001`. **Pregunta:** ¿qué se configura para crear una
+variante sin duplicar el flujo común?
+
+```mermaid
+flowchart TB
+    crud["createCrudApplication"] -. configuración .-> apps["Aplicaciones de personas, usuarios,<br/>clientes, proveedores, materiales,<br/>mermas y entradas"]
+    issue["createIssueApplication"] -. compone .-> crud
+    issue -. configuración .-> issueApps["goodsIssues / wasteIssues"]
+    list["createApplicationList"] -. configuración .-> catalogs["roles · departamentos · presentaciones<br/>unidades · motivos · cumplimiento"]
+    listController["createDataTableListController"] -. configuración .-> catalogControllers["Controllers de catálogos"]
+    report["createReportApplication"] -. configuración .-> reports["Reportes admin · sales · warehouse"]
+    shared["views/shared · public/js/ui · plugins"] -. composición .-> pages["Páginas y formularios consumidores"]
+```
+
+### Transacción, eventos y auditoría
+
+**Identificador:** `DIA-PAT-DIN-001`. **Pregunta:** ¿cómo colaboran consistencia
+atómica, publicación y trazabilidad sin confundir sus límites?
+
+```mermaid
+flowchart LR
+    service["Transaction Script<br/>servicio del caso"] --> tx["Prisma $transaction"]
+    tx --> context["getDb(tx)"]
+    context --> writes["Documento · detalle<br/>existencia · movimiento"]
+    tx --> commit["commit"]
+    commit --> event["emitInventoryUpdated<br/>Publish/Subscribe no durable"]
+    response["finish de respuesta exitosa"] -.-> audit["auditWrites → persistWriteAudit"]
+    audit --> trail["CriticalWriteAudit<br/>Audit Trail best effort"]
+```
+
+### Test harness configurable
+
+**Identificador:** `DIA-PAT-TST-001`. **Pregunta:** ¿cómo reutilizan las pruebas el
+montaje HTTP sin ocultar las rutas y efectos propios de cada contexto?
+
+```mermaid
+flowchart LR
+    harness["createControllerTestApp"] -. configuración .-> register["registerRoutes del contexto"]
+    register --> app["Express mínimo + JSON"]
+    app --> unit["Pruebas unitarias de borde"]
+    app --> integration["Integraciones de cliente, proveedor,<br/>catálogos y salida de merma"]
+    integration --> evidence["Router · permiso · persistencia · rollback"]
+```
+
+Las vistas canónicas de reutilización
+[`DIA-FE-REU-001`](frontend-use-case-diagrams.md#vista-canónica-de-reutilización-frontend)
+y [`DIA-BE-REU-001`](backend-use-case-diagrams.md#vista-canónica-de-reutilización-backend)
+parten de este catálogo. A su vez, cada diagrama específico referencia su vista de
+reutilización. La cadena de lectura es **patrón aplicado → punto común frontend/backend
+→ especialización del caso**; así una refactorización cambia primero el contrato común
+y permite localizar después todos los casos afectados. `DIA-PAT-TST-001` representa
+por separado la reutilización del montaje de pruebas, porque no participa en el flujo
+de ejecución de un caso en producción.
+
 ## 1. Monolito modular por dominio y arquitectura por capas
 
 Nexus se despliega como una aplicación, pero organiza responsabilidades por dominio y
