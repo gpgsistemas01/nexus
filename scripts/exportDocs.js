@@ -71,7 +71,12 @@ const MANIFESTS = Object.freeze({
         'docs/architecture/diagram-conventions.md',
         'docs/architecture/diagram-inventory.md'
     ],
-    pruebas: ['docs/testing/test-plan.md', 'docs/testing/service-test-coverage.md']
+    pruebas: [
+        'docs/testing/test-plan.md',
+        'docs/testing/service-test-coverage.md',
+        'docs/testing/unit-test-catalog.md',
+        'docs/testing/unit-test-results.md'
+    ]
 });
 const [publication, requestedFormat = 'html'] = process.argv.slice(2).filter((argument) => argument !== '--check');
 const checkOnly = process.argv.includes('--check');
