@@ -11,7 +11,7 @@ cada `CU-*` dentro del rango identifica un diagrama individual.
 El **tipo semántico** prevalece sobre la directiva Mermaid. Un `flowchart` puede
 representar contexto, actividad, dependencia, navegación o trazabilidad; no se etiqueta
 como “diagrama de flujo” genérico si las flechas tienen otra semántica. El inventario
-registra **262 diagramas vigentes**: 257 curados y 5 generados.
+registra **267 diagramas vigentes**: 262 curados y 5 generados.
 
 ## Catálogo por familia y tipo
 
@@ -34,6 +34,7 @@ registra **262 diagramas vigentes**: 257 curados y 5 generados.
 | `DIA-FE-REU-001`, `DIA-BE-REU-001` | Reutilización canónica frontend y backend | Primeras vistas de los diagramas por caso | 2 | Fábricas, componentes e infraestructura compartidos referenciados desde cada caso específico. |
 | `DIA-COD-ORG-001`, `DIA-COD-EST-001..002`, `DIA-COD-DIN-001`, `DIA-COD-REU-001` | Organización, estructura, dinámica y reutilización | `code-diagrams.md`, secciones 1 a 5 | 5 | Código e imports; curado. |
 | `DIA-PAT-DAT-001`, `DIA-PAT-RES-001` | Contrato de detalle y resumen de patrones | `design-and-construction-patterns.md` y `diagram-conventions.md` | 2 | Patrones confirmados; curado. |
+| `DIA-PAT-EST-001`, `DIA-PAT-FRO-001`, `DIA-PAT-CON-001`, `DIA-PAT-DIN-001`, `DIA-PAT-TST-001` | Estructura, frontera, construcción, dinámica y pruebas de patrones aplicados | `design-and-construction-patterns.md#catálogo-visual-de-patrones-aplicados` | 5 | Símbolos y consumidores comprobables; los patrones de producción se referencian desde las vistas canónicas frontend/backend. |
 | `DIA-DOC-FLU-001` | Actividad documental | `technical-code-documentation.md#recorrido-para-incorporar-documentación` | 1 | Gobierno técnico; curado. |
 | `DIA-API-SEQ-001` | Secuencia de middleware | `api-contract.md#prefijo-montaje-y-orden-de-middleware` | 1 | Registro Express; curado. |
 | `DIA-GEN-COD-001` | Dependencias generadas | `generated/code-map.md#dependencias-entre-áreas` | 1 | `src`; regenerar. |
@@ -51,7 +52,7 @@ registra **262 diagramas vigentes**: 257 curados y 5 generados.
 
 ## Control de completitud y coherencia
 
-El total se obtiene de cada bloque Mermaid de `docs`: arquitectura (162), datos
+El total se obtiene de cada bloque Mermaid de `docs`: arquitectura (167), datos
 (1), generados (5) y requisitos (94). Al agregar, retirar o mover un bloque se actualiza
 su fila, cantidad y enlace en el mismo cambio. Los diagramas generados nunca se editan a
 mano. Los de caso individual conservan el `CU-*`; una vista agrupada enumera los casos a

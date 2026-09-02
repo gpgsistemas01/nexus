@@ -16,6 +16,9 @@ consultas y exportaciones.
 
 ```mermaid
 flowchart TB
+    structure["DIA-PAT-EST-001 / DIA-PAT-FRO-001<br/>Capas, frontera y pipeline"] -.-> middleware
+    dynamics["DIA-PAT-DIN-001<br/>Transacción, eventos y auditoría"] -.-> db
+    dynamics -.-> inventory
     middleware["Autenticación · autorización · validate"] -.-> controller["Controller específico"]
     session["JWT / cookies de autenticación"] -.-> controller
     listFactory["createDataTableListController"] -.-> controller
@@ -27,7 +30,10 @@ flowchart TB
     service --> prisma["Prisma / PostgreSQL"]
 ```
 
-Los diagramas `DIA-BE-CU-*` referencian esta vista y nombran los colaboradores realmente usados. Así una extracción o parametrización futura puede revisarse en la vista canónica, mientras cada caso sigue demostrando su ruta, servicio y efecto propios.
+Esta vista parte de `DIA-PAT-EST-001`, `DIA-PAT-FRO-001` y `DIA-PAT-DIN-001`. Los
+diagramas `DIA-BE-CU-*` la referencian y nombran los colaboradores realmente usados.
+Así una extracción o parametrización futura puede revisarse en la vista canónica,
+mientras cada caso sigue demostrando su ruta, servicio y efecto propios.
 
 ## `CU-AUT-01`
 

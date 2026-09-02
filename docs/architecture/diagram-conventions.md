@@ -51,6 +51,9 @@ compartidos. El diagrama específico referencia esa vista mediante una flecha
 discontinua y nombra la pieza utilizada; su recorrido continuo muestra la
 especialización del caso. Así una refactorización se revisa primero en el punto común y
 después en cada consumidor, sin copiar la implementación compartida como si fuera local.
+La referencia completa sigue `DIA-PAT-*` → `DIA-FE/BE-REU-*` → `DIA-FE/BE-CU-*`:
+el primer nivel demuestra el patrón mediante símbolos y consumidores; el segundo
+identifica el punto común por entorno; el tercero conserva la ruta y efecto del caso.
 
 En secuencias, `actor` se reserva para una persona, rol o sistema externo autónomo que
 inicia o recibe una interacción. Navegador, EJS, router, controller, servicio y base de

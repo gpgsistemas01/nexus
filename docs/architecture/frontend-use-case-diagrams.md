@@ -16,6 +16,10 @@ módulo desde el que se exporta.
 
 ```mermaid
 flowchart TB
+    patterns["DIA-PAT-CON-001<br/>Factories y composición"] -.-> crud
+    patterns -.-> list
+    patterns -.-> issue
+    patterns -.-> report
     crud["createCrudApplication"] -.-> resourceApps["Aplicaciones CRUD configuradas por recurso"]
     list["createApplicationList"] -.-> catalogs["Catálogos de sólo lectura"]
     issue["createIssueApplication"] -.-> issueApps["Salidas de material y merma"]
@@ -30,7 +34,10 @@ flowchart TB
     reportApps --> concrete
 ```
 
-Los diagramas `DIA-FE-CU-*` referencian esta vista e indican cuál de estas piezas usa el caso. La referencia demuestra reutilización existente; el recorrido continuo conserva la especialización concreta y permite evaluar una refactorización sin afirmar que dos casos son idénticos.
+Esta vista parte de `DIA-PAT-CON-001`; los diagramas `DIA-FE-CU-*` la referencian e
+indican cuál de sus piezas usa el caso. La cadena demuestra reutilización existente; el
+recorrido continuo conserva la especialización concreta y permite evaluar una
+refactorización sin afirmar que dos casos son idénticos.
 
 ## `CU-AUT-01`
 
