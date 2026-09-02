@@ -19,6 +19,13 @@ const DATABASE_AREAS = [
     ['Compras e inventario de materiales', ['GoodsReceipt', 'GoodsReceiptDetail', 'GoodsReceiptDetailChange', 'GoodsIssue', 'GoodsIssueDetail', 'GoodsIssueReturn', 'InventoryMovement', 'MovementDetail', 'StockAdjustment', 'StockAdjustmentDetail', 'StockAdjustmentReason']],
     ['Mermas e inventario de merma', ['Waste', 'WasteIssue', 'WasteIssueDetail', 'WasteIssueReturn', 'WasteMovement', 'WasteMovementDetail', 'WasteStockAdjustment', 'WasteStockAdjustmentDetail']]
 ];
+const USE_CASE_DOCUMENTS = {
+    catalog: path.join(ROOT, 'docs/requirements/use-case-descriptions.md'),
+    backendMatrix: path.join(ROOT, 'docs/architecture/backend-technical-documentation.md'),
+    backendDiagrams: path.join(ROOT, 'docs/architecture/backend-use-case-diagrams.md'),
+    frontendMatrix: path.join(ROOT, 'docs/architecture/frontend-technical-documentation.md'),
+    frontendDiagrams: path.join(ROOT, 'docs/architecture/frontend-use-case-diagrams.md')
+};
 
 const toPosix = (value) => value.split(path.sep).join('/');
 
@@ -29,6 +36,60 @@ const walk = async (directory) => {
         return entry.isDirectory() ? walk(entryPath) : [entryPath];
     }));
     return nested.flat().sort();
+};
+
+const getUseCaseTableIds = (source) => [...source.matchAll(/^\| `(CU-[A-Z]+-\d+)` \|/gm)]
+    .map((match) => match[1]);
+
+const validateUseCaseDiagramCoverage = async () => {
+    const sources = new Map(await Promise.all(
+        Object.entries(USE_CASE_DOCUMENTS).map(async ([name, file]) => [name, await readFile(file, 'utf8')])
+    ));
+    const expectedIds = getUseCaseTableIds(sources.get('catalog'));
+    const failures = [];
+
+    if (!expectedIds.length) failures.push('catálogo: no contiene casos de uso');
+    const catalogDuplicates = expectedIds.filter((id, index) => expectedIds.indexOf(id) !== index);
+    if (catalogDuplicates.length) {
+        failures.push(`catálogo: identificadores duplicados (${[...new Set(catalogDuplicates)].join(', ')})`);
+    }
+
+    const validateIds = (name, actualIds) => {
+        const duplicates = actualIds.filter((id, index) => actualIds.indexOf(id) !== index);
+        if (duplicates.length) failures.push(`${name}: identificadores duplicados (${[...new Set(duplicates)].join(', ')})`);
+        if (actualIds.join('|') !== expectedIds.join('|')) {
+            failures.push(`${name}: la cobertura o el orden no coincide con el catálogo de casos de uso`);
+        }
+    };
+
+    for (const side of ['backend', 'frontend']) {
+        const matrix = sources.get(`${side}Matrix`);
+        const prefix = side === 'backend' ? 'BE' : 'FE';
+        validateIds(`matriz ${side}`, getUseCaseTableIds(matrix));
+        for (const id of expectedIds) {
+            const diagramReference = `[\`DIA-${prefix}-${id}\`](${side}-use-case-diagrams.md#${id.toLowerCase()})`;
+            if (!matrix.includes(diagramReference)) {
+                failures.push(`matriz ${side}: ${id} no enlaza su diagrama aplicado`);
+            }
+        }
+    }
+
+    for (const side of ['backend', 'frontend']) {
+        const source = sources.get(`${side}Diagrams`);
+        const sections = [...source.matchAll(/^## `(CU-[A-Z]+-\d+)`\n([\s\S]*?)(?=^## `CU-|(?![\s\S]))/gm)];
+        validateIds(`diagramas ${side}`, sections.map((match) => match[1]));
+        for (const [, id, body] of sections) {
+            const prefix = side === 'backend' ? 'BE' : 'FE';
+            if (!body.includes(`**Identificador:** \`DIA-${prefix}-${id}\``)) {
+                failures.push(`diagramas ${side}: ${id} no conserva su identificador técnico`);
+            }
+            if ((body.match(/^```mermaid$/gm) ?? []).length !== 1) {
+                failures.push(`diagramas ${side}: ${id} debe contener exactamente un bloque Mermaid`);
+            }
+        }
+    }
+
+    if (failures.length) throw new Error(`Cobertura de casos de uso inválida:\n- ${failures.join('\n- ')}`);
 };
 
 const parseMounts = async (kind) => {
@@ -377,6 +438,8 @@ ${sections}
 ${enums}
 `;
 };
+
+await validateUseCaseDiagramCoverage();
 
 const contents = new Map([
     [OUTPUTS.codeMap, await generateCodeMap()],
