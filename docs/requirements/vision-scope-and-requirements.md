@@ -144,7 +144,7 @@ prueba correspondiente.
 
 La visión no mantiene una segunda lista de enunciados `RF-*`: hacerlo produjo niveles de
 detalle distintos entre acceso, catálogos y operación. La
-[especificación normativa](requirements-specification.md#4-requisitos-funcionales) es la
+[especificación normativa](requirements-specification.md#4-catálogo-unificado-por-ámbito) es la
 única fuente de cada obligación, criterio, estado y evidencia. Esta vista se limita a
 mostrar el alcance y los rangos que deben revisarse juntos.
 
@@ -154,7 +154,7 @@ mostrar el alcance y los rangos que deben revisarse juntos.
 | Identidades y acceso | `RF-IAM-001` a `RF-IAM-008` | Consultar, crear y actualizar usuarios o personas, cambiar contraseña y consultar catálogos de acceso. |
 | Catálogos | `RF-CAT-001` a `RF-CAT-018` | Consultar, crear, actualizar, retirar o ajustar cada recurso según su política. |
 | Entradas | `RF-REC-001` a `RF-REC-008` | Consultar, registrar, editar, corregir y cancelar entradas o detalles. |
-| Salidas de material | `RF-ISS-001` a `RF-ISS-006` | Consultar, crear, editar encabezado, ajustar detalles, surtir y devolver. |
+| Salidas de material | `RF-ISS-001` a `RF-ISS-006` | Consultar, crear, editar encabezado, editar detalles, surtir y devolver. |
 | Merma y sus salidas | `RF-WST-001` a `RF-WST-007`; `RF-MER-001` a `RF-MER-009` | Operar inventario y salidas de merma conservando snapshots y reglas dimensionales. |
 | Ajustes | `RF-ADJ-001`, `RF-ADJ-002` | Registrar y aplicar ajustes; su estado permanece parcial. |
 | Movimientos y reportes | `RF-REP-001` a `RF-REP-005` | Consultar y exportar información autorizada con reglas propias por reporte. |
