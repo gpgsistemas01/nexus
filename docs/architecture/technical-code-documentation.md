@@ -71,6 +71,8 @@ Las colecciones completas están en los [diagramas frontend aplicados al
 código](frontend-use-case-diagrams.md) y los [diagramas backend aplicados al
 código](backend-use-case-diagrams.md); ambas conservan una vista independiente para
 cada uno de los 63 casos, incluso cuando la forma de la colaboración se repite.
+Antes de esos casos, `DIA-FE-REU-001` y `DIA-BE-REU-001` muestran los puntos comunes;
+cada vista específica los referencia y mantiene separado el tramo especializado.
 
 Un flujo completo enlaza ambos documentos mediante la ruta API; no repite en frontend
 las reglas propietarias del servidor ni describe en backend detalles visuales del DOM.

@@ -218,6 +218,14 @@ dominio. Antes de agregar otra aplicación o componente se revisan
 `src/controllers/api/createDataTableListController.js`, `src/views/shared`,
 `src/public/js/ui` y `src/public/js/plugins`.
 
+Esta vista resume la decisión arquitectónica. Las vistas canónicas
+[`DIA-FE-REU-001`](frontend-use-case-diagrams.md#vista-canónica-de-reutilización-frontend)
+y [`DIA-BE-REU-001`](backend-use-case-diagrams.md#vista-canónica-de-reutilización-backend)
+la concretan con los símbolos vigentes; cada diagrama `DIA-FE-CU-*` o `DIA-BE-CU-*`
+incluye una referencia discontinua al punto compartido que consume. Cuando una
+refactorización extrae, sustituye o elimina una pieza común, se actualiza primero la
+vista canónica y luego los casos que la referencian.
+
 ## 6. Lista de revisión manual
 
 Al cambiar el código, Codex o cualquier contribuidor debe actualizar estas vistas cuando:

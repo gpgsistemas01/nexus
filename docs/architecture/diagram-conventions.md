@@ -45,6 +45,13 @@ Los elementos reutilizados se documentan como dependencias o componentes compart
 cuando dos casos necesitan vista dinámica, cada diagrama conserva nombres y decisiones
 específicos de su implementación.
 
+Cada colección de aplicación al código comienza con una vista canónica `DIA-*-REU-*`
+que muestra factories, componentes, infraestructura y colaboradores realmente
+compartidos. El diagrama específico referencia esa vista mediante una flecha
+discontinua y nombra la pieza utilizada; su recorrido continuo muestra la
+especialización del caso. Así una refactorización se revisa primero en el punto común y
+después en cada consumidor, sin copiar la implementación compartida como si fuera local.
+
 En secuencias, `actor` se reserva para una persona, rol o sistema externo autónomo que
 inicia o recibe una interacción. Navegador, EJS, router, controller, servicio y base de
 datos son `participant`. Una secuencia técnica puede omitir al actor humano cuando su
