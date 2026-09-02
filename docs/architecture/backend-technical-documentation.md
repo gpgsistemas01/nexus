@@ -305,7 +305,7 @@ sequenceDiagram
     participant DTO as createGoodsReceiptDto
     participant Service as createGoodsReceipt
     participant Reference as referenceNumberService
-    participant Details as buildGoodsReceiptDetails
+    participant DetailBuilder as buildGoodsReceiptDetails
     participant Inventory as applyInventoryMovement
     participant Prisma as Prisma / PostgreSQL
     participant Socket as emitInventoryUpdated
@@ -317,7 +317,7 @@ sequenceDiagram
     DTO-->>Controller: goodsReceiptDto
     Controller->>Service: { goodsReceiptDto }
     Service->>Prisma: validar proveedor, factura y persona receptora
-    Service->>Details: construir detalles y calcular totales
+    Service->>DetailBuilder: construir detalles y calcular totales
     Service->>Prisma: iniciar $transaction
     Service->>Reference: generar referencia anual con tx
     Service->>Prisma: crear encabezado, detalles y totales
