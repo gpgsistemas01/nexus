@@ -22,6 +22,35 @@ La cobertura vigente se divide así:
   almacén y el rechazo total del área de ventas, en vez de fijar la forma interna del
   objeto de configuración.
 
+## Ejecución de pruebas unitarias
+
+La suite unitaria se ejecuta desde la raíz del repositorio con:
+
+```bash
+npm run test:unit
+```
+
+`npm test` es un alias equivalente. Ambos comandos ejecutan Vitest una sola vez con
+`vitestConfig.js`: incluyen los archivos `tests/**/*Test.js` y excluyen por completo
+`tests/integration/**`, por lo que no migran ni usan la base de datos de integración.
+
+Durante el desarrollo se puede ejecutar un archivo o directorio concreto pasando su
+ruta después de `--`:
+
+```bash
+npm run test:unit -- tests/unit/services/warehouse/wastes/wasteMaterialServiceTest.js
+```
+
+Para volver a ejecutar las pruebas afectadas mientras se modifica código, se usa:
+
+```bash
+npm run test:watch
+```
+
+La ejecución se considera aprobada cuando Vitest termina con código de salida `0` y no
+reporta archivos ni casos fallidos. El resumen de la entrega debe registrar el comando
+real ejecutado; si se filtró por ruta, ese filtro también forma parte de la evidencia.
+
 ## Estrategia de integración con BD
 
 Las pruebas de integración se ejecutan contra `DATABASE_TEST_URL`, guardan información real y no usan rollback. La limpieza se hace por datos de prueba al iniciar cada integración y con `tests/teardownTestDatabase.js` al finalizar toda la suite. Las integraciones que construyen un agregado completo también limpian en `afterAll`, para que una ejecución aislada no deje fixtures; el teardown global sigue siendo la red de seguridad si el proceso se interrumpe. Los servicios marcados arriba como integración directa ya incluyen ese flujo de BD; esta sección sólo documenta la estrategia para evitar repetir el listado de cobertura.
