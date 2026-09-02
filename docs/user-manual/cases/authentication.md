@@ -13,10 +13,11 @@ Cada procedimiento identifica sus casos de uso, controles, errores posibles y ca
 
 **Errores posibles:** [Acceso y autorización](../error-messages.md#errores-acceso).
 
-**Controles que debe usar:** Campos **Nombre de usuario** y **Contraseña**, casilla **Recordar credenciales** y botón **Iniciar sesión**.
+**Controles que debe usar:** Campos **Nombre de usuario** y **Contraseña**, casilla **Recordar credenciales** y botón **Ingresar**.
 
-1. Capture las credenciales asignadas y seleccione **Iniciar sesión**.
-2. Compruebe que la pantalla coincida con la captura antes de continuar.
+1. Escriba la cuenta asignada en el campo **Nombre de usuario** y la clave en **Contraseña**.
+2. Si corresponde, marque la casilla **Recordar credenciales** y seleccione el botón **Ingresar**.
+3. Compruebe que la pantalla coincida con la captura antes de continuar.
 
 ![CAP-AUT-01-LOGIN: inicio sesion](../images/acceso/01-inicio-sesion.png)
 
@@ -33,7 +34,7 @@ Cada procedimiento identifica sus casos de uso, controles, errores posibles y ca
 
 **Controles que debe usar:** Botón **Volver**; no capture datos ni modifique manualmente la dirección para buscar una opción restringida.
 
-1. Conserve la dirección y regrese mediante la navegación de Nexus.
+1. En la página de error, seleccione el botón **Volver** para regresar mediante la navegación de Nexus.
 2. Compruebe que la pantalla coincida con la captura antes de continuar.
 
 ![CAP-ERR-404-NOT-FOUND: pagina no encontrada](../images/errores/01-pagina-no-encontrada.png)
