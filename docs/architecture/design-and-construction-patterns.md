@@ -49,9 +49,14 @@ adaptador correspondiente para evitar dependencias implícitas del ámbito globa
 ## Catálogo visual de patrones aplicados
 
 Estas vistas representan únicamente patrones con implementación y consumidores
-verificables. Una caja nombra el patrón o estrategia; el nodo siguiente identifica el
-símbolo o carpeta que lo implementa y el último nodo muestra consumidores reales. Las
-flechas no significan herencia salvo que se indique expresamente.
+verificables. En las vistas estructurales, una caja nombra el patrón o estrategia, el
+nodo siguiente identifica el símbolo o carpeta que lo implementa y el último nodo
+muestra consumidores reales. Las flechas de esas vistas no significan herencia salvo
+que se indique expresamente.
+Los diagramas estructurales localizan implementaciones y consumidores; las secuencias
+de frontera y dinámica muestran orden, alternativas y límites temporales. Así el
+catálogo representa tanto la forma del patrón como su colaboración sin cargar los
+diagramas de cada caso con infraestructura repetida.
 
 ### Estructura por dominio, capas y fronteras
 
@@ -75,14 +80,39 @@ flowchart LR
 antes de entregar datos normalizados al caso de uso?
 
 ```mermaid
-flowchart LR
-    request["Petición"] --> token["verifyApiTokenRequired"]
-    token --> validator["Validadores de formulario"]
-    validator --> validate["validate"]
-    validate --> policy["authorizeUserApi<br/>PERMISSIONS + AUTHORIZATION_POLICIES"]
-    policy --> controller["Controller"]
-    controller --> dto["DTO funcional cuando aplica"]
-    dto --> service["Servicio del caso"]
+sequenceDiagram
+    participant Client as Cliente HTTP
+    participant Route as Router Express
+    participant Auth as Autenticación y autorización
+    participant Validation as Validadores y validate
+    participant Controller as Controller y DTO
+    participant Service as Servicio del caso
+
+    Client->>Route: enviar petición
+    Route->>Auth: verifyApiTokenRequired
+    alt token inválido o ausente
+        Auth-->>Client: responder rechazo de autenticación
+    else sesión autenticada
+        Auth->>Validation: continuar pipeline
+        Validation->>Validation: validar y consolidar errores
+        alt entrada inválida
+            Validation-->>Client: responder error de validación
+        else entrada aceptada
+            Validation->>Auth: authorizeUserApi
+            Auth->>Auth: evaluar PERMISSIONS y AUTHORIZATION_POLICIES
+            alt permiso denegado
+                Auth-->>Client: responder rechazo de autorización
+            else permiso concedido
+                Auth->>Controller: entregar request validado
+                opt el endpoint acepta un DTO
+                    Controller->>Controller: seleccionar y normalizar campos
+                end
+                Controller->>Service: ejecutar caso de uso
+                Service-->>Controller: devolver resultado o error de dominio
+                Controller-->>Client: emitir respuesta HTTP
+            end
+        end
+    end
 ```
 
 ### Factories y composición sobre herencia
@@ -107,14 +137,34 @@ flowchart TB
 atómica, publicación y trazabilidad sin confundir sus límites?
 
 ```mermaid
-flowchart LR
-    service["Transaction Script<br/>servicio del caso"] --> tx["Prisma $transaction"]
-    tx --> context["getDb(tx)"]
-    context --> writes["Documento · detalle<br/>existencia · movimiento"]
-    tx --> commit["commit"]
-    commit --> event["emitInventoryUpdated<br/>Publish/Subscribe no durable"]
-    response["finish de respuesta exitosa"] -.-> audit["auditWrites → persistWriteAudit"]
-    audit --> trail["CriticalWriteAudit<br/>Audit Trail best effort"]
+sequenceDiagram
+    participant Controller as Controller
+    participant Service as Transaction Script
+    participant Prisma as Prisma $transaction
+    participant Writes as Servicios con getDb(tx)
+    participant Events as emitInventoryUpdated
+    participant Audit as auditWrites
+
+    Controller->>Service: solicitar mutación del caso
+    Service->>Prisma: abrir una transacción
+    rect rgb(245, 248, 255)
+        Prisma->>Writes: propagar tx
+        Writes->>Writes: escribir documento, detalle, existencia y movimiento
+        alt falla una escritura
+            Writes-->>Prisma: propagar error
+            Prisma-->>Service: rollback
+            Service-->>Controller: propagar error sin publicar
+        else todas las escrituras terminan
+            Writes-->>Prisma: resultado
+            Prisma-->>Service: commit
+            Service-->>Controller: devolver resultado confirmado
+            opt mutación de inventario
+                Controller->>Events: publicar actualización no durable
+            end
+            Controller-->>Audit: finalizar respuesta HTTP exitosa
+            Audit->>Audit: sanitizar y persistir CriticalWriteAudit best effort
+        end
+    end
 ```
 
 ### Test harness configurable
