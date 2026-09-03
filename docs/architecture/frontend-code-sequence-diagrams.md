@@ -9,8 +9,10 @@ diagramas funcionales de casos de uso](../requirements/domain-and-use-cases.md#c
 La [matriz técnica de frontend](frontend-technical-documentation.md#aplicación-de-todos-los-casos-al-código-frontend)
 es el índice único de trazabilidad: relaciona caso, interacción, implementación y
 diagrama. Esta colección no vuelve a copiar esa relación en cada sección. Los
-participantes identifican archivo, objeto y símbolo; la frontera API incorpora el
-controller backend que recibe cada request sin abrir otra línea de vida. Así, la vista
+participantes identifican archivo, objeto y símbolo. `«object»` marca los módulos UI y de
+aplicación, mientras `«controller»` marca la frontera API y el controller backend que
+recibe cada request sin abrir otra línea de vida. El archivo y el método exactos se
+mantienen debajo del estereotipo. Así, la vista
 mantiene normalmente cuatro responsabilidades bien separadas —navegador, objeto UI,
 objetos de aplicación/request y frontera API/controller— en lugar de representar cada
 archivo auxiliar como otra entidad. Los mensajes conservan métodos y requests en orden y
@@ -72,11 +74,11 @@ aparece una vez, conserva su referencia de patrones y contiene un bloque Mermaid
 sequenceDiagram
     Note over User,App: Variables de frontera: name, password y cookies
     actor User as Usuario
-    participant EJS as src/views/pages/home/login/loginPage.ejs + src/public/js/pages/home/login/loginForm.js<br/>loginPage.ejs / loginForm.js
+    participant EJS as «object»<br/>src/views/pages/home/login/loginPage.ejs + src/public/js/pages/home/login/loginForm.js<br/>loginPage.ejs / loginForm.js
     participant Form as loginForm / useForm
-    participant App as Objetos de aplicación y request<br/>src/public/js/application/auth/login.js + src/public/js/services/authService.js<br/>login → loginRequest
+    participant App as «object»<br/>Objetos de aplicación y request<br/>src/public/js/application/auth/login.js + src/public/js/services/authService.js<br/>login → loginRequest
     participant Request as loginRequest / apiRequest
-    participant API as Frontera API y controlador<br/>POST /api/auth/login<br/>src/controllers/api/authController.js<br/>authController.login
+    participant API as «controller»<br/>Frontera API y controlador<br/>POST /api/auth/login<br/>src/controllers/api/authController.js<br/>authController.login
     participant Browser as Navegador
 
     EJS->>Form: carga el módulo del formulario
@@ -98,9 +100,9 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant Browser as Navegador
-    participant View as Objeto UI<br/>src/views/layout/ui/logoutForm.ejs<br/>formulario Cerrar sesión
+    participant View as «object»<br/>Objeto UI<br/>src/views/layout/ui/logoutForm.ejs<br/>formulario Cerrar sesión
     participant Route as src/routes/web/auth/logoutWebRoute.js<br/>POST /cerrar-sesion
-    participant Controller as src/controllers/web/authController.js<br/>logout
+    participant Controller as «controller»<br/>src/controllers/web/authController.js<br/>logout
     Note over View,Controller: Variables de frontera: sin variables de frontera adicionales
 
     Browser->>View: activar botón Salir
@@ -116,13 +118,13 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant Browser as Navegador
-    participant View as Objeto UI<br/>src/views/pages/admin/persons/personsPage.ejs + src/public/js/pages/admin/persons/personsPage.js<br/>personsPage.ejs / personsPage.js
-    participant Application as Objetos de aplicación y request<br/>src/public/js/application/admin/persons/persons.js + src/public/js/services/admin/personService.js<br/>getAllPersons → getAllPersonsRequest
-    participant Transport as Frontera API y controlador<br/>src/routes/api/admin/personApiRoute.js<br/>GET /api/admin/persons<br/>src/controllers/api/admin/personController.js<br/>getAllPersons
+    participant View as «object»<br/>Objeto UI<br/>src/views/pages/admin/persons/personsPage.ejs + src/public/js/pages/admin/persons/personsPage.js<br/>personsPage.ejs / personsPage.js
+    participant Application as «object»<br/>Objetos de aplicación y request<br/>src/public/js/application/admin/persons/persons.js + src/public/js/services/admin/personService.js<br/>getAllPersons → getAllPersonsRequest
+    participant Transport as «controller»<br/>Frontera API y controlador<br/>src/routes/api/admin/personApiRoute.js<br/>GET /api/admin/persons<br/>src/controllers/api/admin/personController.js<br/>getAllPersons
     Note over Application,Transport: Variables de frontera: params/filtros
 
     Browser->>View: personsPage.ejs y personsPage.js cargan la tabla
-    View->>Application: getAllPersons → getAllPersonsRequest
+    View->>Application: getAllPersons({ params }) → getAllPersonsRequest({ params })
     Application->>Transport: consulta GET /api/admin/persons
     Transport-->>Application: devolver respuesta normalizada
     Application-->>View: presentar resultado observable
@@ -135,13 +137,13 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant Browser as Navegador
-    participant View as Objeto UI<br/>src/public/js/pages/admin/persons/personModal.js + src/public/js/pages/admin/persons/personForm.js<br/>personModal.js / personForm.js
-    participant Application as Objetos de aplicación y request<br/>src/public/js/application/admin/persons/persons.js + src/public/js/services/admin/personService.js<br/>registerPerson → registerPersonRequest
-    participant Transport as Frontera API y controlador<br/>src/routes/api/admin/personApiRoute.js<br/>POST /api/admin/persons<br/>src/controllers/api/admin/personController.js<br/>registerPerson
+    participant View as «object»<br/>Objeto UI<br/>src/public/js/pages/admin/persons/personModal.js + src/public/js/pages/admin/persons/personForm.js<br/>personModal.js / personForm.js
+    participant Application as «object»<br/>Objetos de aplicación y request<br/>src/public/js/application/admin/persons/persons.js + src/public/js/services/admin/personService.js<br/>registerPerson → registerPersonRequest
+    participant Transport as «controller»<br/>Frontera API y controlador<br/>src/routes/api/admin/personApiRoute.js<br/>POST /api/admin/persons<br/>src/controllers/api/admin/personController.js<br/>registerPerson
     Note over Application,Transport: Variables de frontera: formData/payload
 
     Browser->>View: personModal.js abre personForm.js en modo alta
-    View->>Application: registerPerson → registerPersonRequest
+    View->>Application: registerPerson({ formData }) → registerPersonRequest({ formData })
     Application->>Transport: envía POST /api/admin/persons
     Transport-->>Application: devolver respuesta normalizada
     Application-->>View: presentar resultado observable
@@ -154,13 +156,13 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant Browser as Navegador
-    participant View as Objeto UI<br/>src/public/js/pages/admin/persons/personModal.js<br/>personModal.js
-    participant Application as Objetos de aplicación y request<br/>src/public/js/application/admin/persons/persons.js + src/public/js/services/admin/personService.js<br/>updatePerson → updatePersonRequest
-    participant Transport as Frontera API y controlador<br/>src/routes/api/admin/personApiRoute.js<br/>PUT /api/admin/persons/:id<br/>src/controllers/api/admin/personController.js<br/>editPerson
+    participant View as «object»<br/>Objeto UI<br/>src/public/js/pages/admin/persons/personModal.js<br/>personModal.js
+    participant Application as «object»<br/>Objetos de aplicación y request<br/>src/public/js/application/admin/persons/persons.js + src/public/js/services/admin/personService.js<br/>updatePerson → updatePersonRequest
+    participant Transport as «controller»<br/>Frontera API y controlador<br/>src/routes/api/admin/personApiRoute.js<br/>PUT /api/admin/persons/:id<br/>src/controllers/api/admin/personController.js<br/>editPerson
     Note over Application,Transport: Variables de frontera: id, formData/payload
 
     Browser->>View: personModal.js precarga la persona seleccionada
-    View->>Application: updatePerson → updatePersonRequest
+    View->>Application: updatePerson({ id, formData }) → updatePersonRequest({ id, formData })
     Application->>Transport: envía PUT /api/admin/persons/:id
     Transport-->>Application: devolver respuesta normalizada
     Application-->>View: presentar resultado observable
@@ -173,13 +175,13 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant Browser as Navegador
-    participant View as Objeto UI<br/>src/views/pages/admin/users/usersPage.ejs + src/public/js/pages/admin/users/usersPage.js<br/>usersPage.ejs / usersPage.js
-    participant Application as Objetos de aplicación y request<br/>src/public/js/application/admin/users/users.js + src/public/js/services/admin/userService.js<br/>getAllUsers → getAllUsersRequest
-    participant Transport as Frontera API y controlador<br/>src/routes/api/admin/userApiRoute.js<br/>GET /api/admin/users<br/>src/controllers/api/admin/userController.js<br/>getAllUsers
+    participant View as «object»<br/>Objeto UI<br/>src/views/pages/admin/users/usersPage.ejs + src/public/js/pages/admin/users/usersPage.js<br/>usersPage.ejs / usersPage.js
+    participant Application as «object»<br/>Objetos de aplicación y request<br/>src/public/js/application/admin/users/users.js + src/public/js/services/admin/userService.js<br/>getAllUsers → getAllUsersRequest
+    participant Transport as «controller»<br/>Frontera API y controlador<br/>src/routes/api/admin/userApiRoute.js<br/>GET /api/admin/users<br/>src/controllers/api/admin/userController.js<br/>getAllUsers
     Note over Application,Transport: Variables de frontera: params/filtros
 
     Browser->>View: usersPage.ejs y usersPage.js cargan la tabla
-    View->>Application: getAllUsers → getAllUsersRequest
+    View->>Application: getAllUsers({ params }) → getAllUsersRequest({ params })
     Application->>Transport: consulta GET /api/admin/users
     Transport-->>Application: devolver respuesta normalizada
     Application-->>View: presentar resultado observable
@@ -192,13 +194,13 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant Browser as Navegador
-    participant View as Objeto UI<br/>src/public/js/pages/admin/users/userModal.js + src/public/js/pages/admin/users/userForm.js<br/>userModal.js / userForm.js
-    participant Application as Objetos de aplicación y request<br/>src/public/js/application/admin/users/users.js + src/public/js/services/admin/userService.js<br/>registerUser → registerUserRequest
-    participant Transport as Frontera API y controlador<br/>src/routes/api/admin/userApiRoute.js<br/>POST /api/admin/users<br/>src/controllers/api/admin/userController.js<br/>registerUser
+    participant View as «object»<br/>Objeto UI<br/>src/public/js/pages/admin/users/userModal.js + src/public/js/pages/admin/users/userForm.js<br/>userModal.js / userForm.js
+    participant Application as «object»<br/>Objetos de aplicación y request<br/>src/public/js/application/admin/users/users.js + src/public/js/services/admin/userService.js<br/>registerUser → registerUserRequest
+    participant Transport as «controller»<br/>Frontera API y controlador<br/>src/routes/api/admin/userApiRoute.js<br/>POST /api/admin/users<br/>src/controllers/api/admin/userController.js<br/>registerUser
     Note over Application,Transport: Variables de frontera: formData/payload
 
     Browser->>View: userModal.js abre userForm.js para una cuenta nueva
-    View->>Application: registerUser → registerUserRequest
+    View->>Application: registerUser({ formData }) → registerUserRequest({ formData })
     Application->>Transport: envía POST /api/admin/users
     Transport-->>Application: devolver respuesta normalizada
     Application-->>View: presentar resultado observable
@@ -211,13 +213,13 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant Browser as Navegador
-    participant View as Objeto UI<br/>src/public/js/pages/admin/users/userModal.js<br/>userModal.js
-    participant Application as Objetos de aplicación y request<br/>src/public/js/application/admin/users/users.js + src/public/js/services/admin/userService.js<br/>editUser → editUserRequest
-    participant Transport as Frontera API y controlador<br/>src/routes/api/admin/userApiRoute.js<br/>PATCH /api/admin/users/:id<br/>src/controllers/api/admin/userController.js<br/>editUser
+    participant View as «object»<br/>Objeto UI<br/>src/public/js/pages/admin/users/userModal.js<br/>userModal.js
+    participant Application as «object»<br/>Objetos de aplicación y request<br/>src/public/js/application/admin/users/users.js + src/public/js/services/admin/userService.js<br/>editUser → editUserRequest
+    participant Transport as «controller»<br/>Frontera API y controlador<br/>src/routes/api/admin/userApiRoute.js<br/>PATCH /api/admin/users/:id<br/>src/controllers/api/admin/userController.js<br/>editUser
     Note over Application,Transport: Variables de frontera: id, formData/payload
 
     Browser->>View: userModal.js abre la cuenta y acceso existentes
-    View->>Application: editUser → editUserRequest
+    View->>Application: editUser({ id, formData }) → editUserRequest({ id, formData })
     Application->>Transport: envía PATCH /api/admin/users/:id
     Transport-->>Application: devolver respuesta normalizada
     Application-->>View: presentar resultado observable
@@ -230,13 +232,13 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant Browser as Navegador
-    participant View as Objeto UI<br/>src/public/js/pages/admin/users/userForm.js<br/>userForm.js
-    participant Application as Objetos de aplicación y request<br/>src/public/js/application/admin/users/users.js + src/public/js/services/admin/userService.js<br/>editUserPassword → editUserPasswordRequest
-    participant Transport as Frontera API y controlador<br/>src/routes/api/admin/userApiRoute.js<br/>PATCH /api/admin/users/:id/password<br/>src/controllers/api/admin/userController.js<br/>editUserPassword
+    participant View as «object»<br/>Objeto UI<br/>src/public/js/pages/admin/users/userForm.js<br/>userForm.js
+    participant Application as «object»<br/>Objetos de aplicación y request<br/>src/public/js/application/admin/users/users.js + src/public/js/services/admin/userService.js<br/>editUserPassword → editUserPasswordRequest
+    participant Transport as «controller»<br/>Frontera API y controlador<br/>src/routes/api/admin/userApiRoute.js<br/>PATCH /api/admin/users/:id/password<br/>src/controllers/api/admin/userController.js<br/>editUserPassword
     Note over Application,Transport: Variables de frontera: id, formData/payload
 
     Browser->>View: userForm.js selecciona el modo de contraseña
-    View->>Application: editUserPassword → editUserPasswordRequest
+    View->>Application: editUserPassword({ id, formData }) → editUserPasswordRequest({ id, formData })
     Application->>Transport: envía PATCH /api/admin/users/:id/password
     Transport-->>Application: devolver respuesta normalizada
     Application-->>View: presentar resultado observable
@@ -249,13 +251,13 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant Browser as Navegador
-    participant View as Objeto UI<br/>Select de rol dentro de formularios de personas y usuarios
-    participant Application as Objetos de aplicación y request<br/>src/public/js/application/admin/catalogs/roles.js + src/public/js/services/admin/roleService.js<br/>getAllRoles → getAllRolesRequest
-    participant Transport as Frontera API y controlador<br/>src/routes/api/admin/roleApiRoute.js<br/>GET /api/admin/roles<br/>src/controllers/api/admin/roleController.js<br/>roleController.getAllRoles
+    participant View as «object»<br/>Objeto UI<br/>Select de rol dentro de formularios de personas y usuarios
+    participant Application as «object»<br/>Objetos de aplicación y request<br/>src/public/js/application/admin/catalogs/roles.js + src/public/js/services/admin/roleService.js<br/>getAllRoles → getAllRolesRequest
+    participant Transport as «controller»<br/>Frontera API y controlador<br/>src/routes/api/admin/roleApiRoute.js<br/>GET /api/admin/roles<br/>src/controllers/api/admin/roleController.js<br/>roleController.getAllRoles
     Note over Application,Transport: Variables de frontera: params/filtros
 
     Browser->>View: Select de rol dentro de formularios de personas y usuarios
-    View->>Application: getAllRoles → getAllRolesRequest
+    View->>Application: getAllRoles({ params }) → getAllRolesRequest({ params })
     Application->>Transport: consume GET /api/admin/roles
     Transport-->>Application: devolver respuesta normalizada
     Application-->>View: presentar resultado observable
@@ -268,13 +270,13 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant Browser as Navegador
-    participant View as Objeto UI<br/>Select de departamento dentro de formularios de personas y usuarios
-    participant Application as Objetos de aplicación y request<br/>src/public/js/application/admin/catalogs/departments.js + src/public/js/services/admin/departmentService.js<br/>getAllDepartments → getAllDepartmentsRequest
-    participant Transport as Frontera API y controlador<br/>src/routes/api/admin/departmentApiRoute.js<br/>GET /api/admin/departments<br/>src/controllers/api/admin/departmentController.js<br/>departmentController.getAllDepartments
+    participant View as «object»<br/>Objeto UI<br/>Select de departamento dentro de formularios de personas y usuarios
+    participant Application as «object»<br/>Objetos de aplicación y request<br/>src/public/js/application/admin/catalogs/departments.js + src/public/js/services/admin/departmentService.js<br/>getAllDepartments → getAllDepartmentsRequest
+    participant Transport as «controller»<br/>Frontera API y controlador<br/>src/routes/api/admin/departmentApiRoute.js<br/>GET /api/admin/departments<br/>src/controllers/api/admin/departmentController.js<br/>departmentController.getAllDepartments
     Note over Application,Transport: Variables de frontera: params/filtros
 
     Browser->>View: Select de departamento dentro de formularios de personas y usuarios
-    View->>Application: getAllDepartments → getAllDepartmentsRequest
+    View->>Application: getAllDepartments({ params }) → getAllDepartmentsRequest({ params })
     Application->>Transport: consume GET /api/admin/departments
     Transport-->>Application: devolver respuesta normalizada
     Application-->>View: presentar resultado observable
@@ -287,13 +289,13 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant Browser as Navegador
-    participant View as Objeto UI<br/>src/views/pages/warehouse/materials/materialsPage.ejs + src/public/js/pages/warehouse/materials/materialsPage.js<br/>materialsPage.ejs / materialsPage.js
-    participant Application as Objetos de aplicación y request<br/>src/public/js/application/warehouse/materials/materials.js + src/public/js/services/warehouse/materialService.js<br/>getAllMaterials → getAllMaterialsRequest
-    participant Transport as Frontera API y controlador<br/>src/routes/api/warehouse/materialApiRoute.js<br/>GET /api/warehouse/materials<br/>src/controllers/api/warehouse/materialController.js<br/>getAllMaterials
+    participant View as «object»<br/>Objeto UI<br/>src/views/pages/warehouse/materials/materialsPage.ejs + src/public/js/pages/warehouse/materials/materialsPage.js<br/>materialsPage.ejs / materialsPage.js
+    participant Application as «object»<br/>Objetos de aplicación y request<br/>src/public/js/application/warehouse/materials/materials.js + src/public/js/services/warehouse/materialService.js<br/>getAllMaterials → getAllMaterialsRequest
+    participant Transport as «controller»<br/>Frontera API y controlador<br/>src/routes/api/warehouse/materialApiRoute.js<br/>GET /api/warehouse/materials<br/>src/controllers/api/warehouse/materialController.js<br/>getAllMaterials
     Note over Application,Transport: Variables de frontera: params/filtros
 
     Browser->>View: materialsPage.ejs y materialsPage.js cargan inventario
-    View->>Application: getAllMaterials → getAllMaterialsRequest
+    View->>Application: getAllMaterials({ params }) → getAllMaterialsRequest({ params })
     Application->>Transport: consulta GET /api/warehouse/materials
     Transport-->>Application: devolver respuesta normalizada
     Application-->>View: presentar resultado observable
@@ -306,13 +308,13 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant Browser as Navegador
-    participant View as Objeto UI<br/>src/public/js/pages/warehouse/materials/materialModal.js + src/public/js/pages/warehouse/materials/materialForm.js<br/>materialModal.js / materialForm.js
-    participant Application as Objetos de aplicación y request<br/>src/public/js/application/warehouse/materials/materials.js + src/public/js/services/warehouse/materialService.js<br/>registerMaterial → registerMaterialRequest
-    participant Transport as Frontera API y controlador<br/>src/routes/api/warehouse/materialApiRoute.js<br/>POST /api/warehouse/materials<br/>src/controllers/api/warehouse/materialController.js<br/>registerMaterial
+    participant View as «object»<br/>Objeto UI<br/>src/public/js/pages/warehouse/materials/materialModal.js + src/public/js/pages/warehouse/materials/materialForm.js<br/>materialModal.js / materialForm.js
+    participant Application as «object»<br/>Objetos de aplicación y request<br/>src/public/js/application/warehouse/materials/materials.js + src/public/js/services/warehouse/materialService.js<br/>registerMaterial → registerMaterialRequest
+    participant Transport as «controller»<br/>Frontera API y controlador<br/>src/routes/api/warehouse/materialApiRoute.js<br/>POST /api/warehouse/materials<br/>src/controllers/api/warehouse/materialController.js<br/>registerMaterial
     Note over Application,Transport: Variables de frontera: formData/payload
 
     Browser->>View: materialModal.js abre materialForm.js en modo alta
-    View->>Application: registerMaterial → registerMaterialRequest
+    View->>Application: registerMaterial({ formData }) → registerMaterialRequest({ formData })
     Application->>Transport: envía POST /api/warehouse/materials
     Transport-->>Application: devolver respuesta normalizada
     Application-->>View: presentar resultado observable
@@ -325,13 +327,13 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant Browser as Navegador
-    participant View as Objeto UI<br/>src/public/js/pages/warehouse/materials/materialModal.js<br/>materialModal.js
-    participant Application as Objetos de aplicación y request<br/>src/public/js/application/warehouse/materials/materials.js + src/public/js/services/warehouse/materialService.js<br/>editMaterial → editMaterialRequest
-    participant Transport as Frontera API y controlador<br/>src/routes/api/warehouse/materialApiRoute.js<br/>PATCH /api/warehouse/materials/:id<br/>src/controllers/api/warehouse/materialController.js<br/>editMaterial
+    participant View as «object»<br/>Objeto UI<br/>src/public/js/pages/warehouse/materials/materialModal.js<br/>materialModal.js
+    participant Application as «object»<br/>Objetos de aplicación y request<br/>src/public/js/application/warehouse/materials/materials.js + src/public/js/services/warehouse/materialService.js<br/>editMaterial → editMaterialRequest
+    participant Transport as «controller»<br/>Frontera API y controlador<br/>src/routes/api/warehouse/materialApiRoute.js<br/>PATCH /api/warehouse/materials/:id<br/>src/controllers/api/warehouse/materialController.js<br/>editMaterial
     Note over Application,Transport: Variables de frontera: id, formData/payload
 
     Browser->>View: materialModal.js precarga material y relación con proveedor
-    View->>Application: editMaterial → editMaterialRequest
+    View->>Application: editMaterial({ id, formData }) → editMaterialRequest({ id, formData })
     Application->>Transport: envía PATCH /api/warehouse/materials/:id
     Transport-->>Application: devolver respuesta normalizada
     Application-->>View: presentar resultado observable
@@ -344,13 +346,13 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant Browser as Navegador
-    participant View as Objeto UI<br/>src/public/js/plugins/datatable/warehouse/materials/materialDatatable.js<br/>materialDatatable.js
-    participant Application as Objetos de aplicación y request<br/>src/public/js/application/warehouse/materials/materials.js + src/public/js/services/warehouse/materialService.js<br/>deleteMaterial → deleteMaterialRequest
-    participant Transport as Frontera API y controlador<br/>src/routes/api/warehouse/materialApiRoute.js<br/>DELETE /api/warehouse/materials/:id<br/>src/controllers/api/warehouse/materialController.js<br/>removeMaterial
+    participant View as «object»<br/>Objeto UI<br/>src/public/js/plugins/datatable/warehouse/materials/materialDatatable.js<br/>materialDatatable.js
+    participant Application as «object»<br/>Objetos de aplicación y request<br/>src/public/js/application/warehouse/materials/materials.js + src/public/js/services/warehouse/materialService.js<br/>deleteMaterial → deleteMaterialRequest
+    participant Transport as «controller»<br/>Frontera API y controlador<br/>src/routes/api/warehouse/materialApiRoute.js<br/>DELETE /api/warehouse/materials/:id<br/>src/controllers/api/warehouse/materialController.js<br/>removeMaterial
     Note over Application,Transport: Variables de frontera: id, formData/payload
 
     Browser->>View: Acción de retiro en materialDatatable.js
-    View->>Application: deleteMaterial → deleteMaterialRequest
+    View->>Application: deleteMaterial({ id, formData }) → deleteMaterialRequest({ id, formData })
     Application->>Transport: envía DELETE /api/warehouse/materials/:id
     Transport-->>Application: devolver respuesta normalizada
     Application-->>View: presentar resultado observable
@@ -364,12 +366,12 @@ sequenceDiagram
 sequenceDiagram
     Note over User,App: Variables de frontera: id, DTO de ajuste y userId
     actor User as Administrador del sistema
-    participant EJS as src/public/js/pages/warehouse/materials/materialForm.js<br/>materialForm.js
+    participant EJS as «object»<br/>src/public/js/pages/warehouse/materials/materialForm.js<br/>materialForm.js
     participant Form as materialForm / useForm
-    participant App as Objetos de aplicación y request<br/>src/public/js/application/warehouse/materials/materials.js + src/public/js/services/warehouse/materialService.js<br/>editMaterialStock → editMaterialStockRequest
+    participant App as «object»<br/>Objetos de aplicación y request<br/>src/public/js/application/warehouse/materials/materials.js + src/public/js/services/warehouse/materialService.js<br/>editMaterialStock → editMaterialStockRequest
     participant Factory as createApplicationMutation
     participant Request as editMaterialStockRequest
-    participant API as Frontera API y controlador<br/>PATCH /api/warehouse/materials/:id/stock<br/>src/controllers/api/warehouse/materialController.js<br/>editMaterialStock
+    participant API as «controller»<br/>Frontera API y controlador<br/>PATCH /api/warehouse/materials/:id/stock<br/>src/controllers/api/warehouse/materialController.js<br/>editMaterialStock
 
     EJS->>Form: carga módulo y formulario
     User->>Form: confirma ajuste
@@ -391,13 +393,13 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant Browser as Navegador
-    participant View as Objeto UI<br/>src/views/pages/warehouse/suppliers/suppliersPage.ejs + src/public/js/pages/warehouse/suppliers/suppliersPage.js<br/>suppliersPage.ejs / suppliersPage.js
-    participant Application as Objetos de aplicación y request<br/>src/public/js/application/warehouse/suppliers/suppliers.js + src/public/js/services/warehouse/supplierService.js<br/>getAllSuppliers → getAllSuppliersRequest
-    participant Transport as Frontera API y controlador<br/>src/routes/api/warehouse/supplierApiRoute.js<br/>GET /api/warehouse/suppliers<br/>src/controllers/api/warehouse/supplierController.js<br/>getAllSuppliers
+    participant View as «object»<br/>Objeto UI<br/>src/views/pages/warehouse/suppliers/suppliersPage.ejs + src/public/js/pages/warehouse/suppliers/suppliersPage.js<br/>suppliersPage.ejs / suppliersPage.js
+    participant Application as «object»<br/>Objetos de aplicación y request<br/>src/public/js/application/warehouse/suppliers/suppliers.js + src/public/js/services/warehouse/supplierService.js<br/>getAllSuppliers → getAllSuppliersRequest
+    participant Transport as «controller»<br/>Frontera API y controlador<br/>src/routes/api/warehouse/supplierApiRoute.js<br/>GET /api/warehouse/suppliers<br/>src/controllers/api/warehouse/supplierController.js<br/>getAllSuppliers
     Note over Application,Transport: Variables de frontera: params/filtros
 
     Browser->>View: suppliersPage.ejs y suppliersPage.js cargan proveedores
-    View->>Application: getAllSuppliers → getAllSuppliersRequest
+    View->>Application: getAllSuppliers({ params }) → getAllSuppliersRequest({ params })
     Application->>Transport: consulta GET /api/warehouse/suppliers
     Transport-->>Application: devolver respuesta normalizada
     Application-->>View: presentar resultado observable
@@ -410,13 +412,13 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant Browser as Navegador
-    participant View as Objeto UI<br/>src/public/js/pages/warehouse/suppliers/supplierModal.js + src/public/js/pages/warehouse/suppliers/supplierForm.js<br/>supplierModal.js / supplierForm.js
-    participant Application as Objetos de aplicación y request<br/>src/public/js/application/warehouse/suppliers/suppliers.js + src/public/js/services/warehouse/supplierService.js<br/>registerSupplier → registerSupplierRequest
-    participant Transport as Frontera API y controlador<br/>src/routes/api/warehouse/supplierApiRoute.js<br/>POST /api/warehouse/suppliers<br/>src/controllers/api/warehouse/supplierController.js<br/>registerSupplier
+    participant View as «object»<br/>Objeto UI<br/>src/public/js/pages/warehouse/suppliers/supplierModal.js + src/public/js/pages/warehouse/suppliers/supplierForm.js<br/>supplierModal.js / supplierForm.js
+    participant Application as «object»<br/>Objetos de aplicación y request<br/>src/public/js/application/warehouse/suppliers/suppliers.js + src/public/js/services/warehouse/supplierService.js<br/>registerSupplier → registerSupplierRequest
+    participant Transport as «controller»<br/>Frontera API y controlador<br/>src/routes/api/warehouse/supplierApiRoute.js<br/>POST /api/warehouse/suppliers<br/>src/controllers/api/warehouse/supplierController.js<br/>registerSupplier
     Note over Application,Transport: Variables de frontera: formData/payload
 
     Browser->>View: supplierModal.js abre supplierForm.js en alta
-    View->>Application: registerSupplier → registerSupplierRequest
+    View->>Application: registerSupplier({ formData }) → registerSupplierRequest({ formData })
     Application->>Transport: envía POST /api/warehouse/suppliers
     Transport-->>Application: devolver respuesta normalizada
     Application-->>View: presentar resultado observable
@@ -429,13 +431,13 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant Browser as Navegador
-    participant View as Objeto UI<br/>src/public/js/pages/warehouse/suppliers/supplierModal.js<br/>supplierModal.js
-    participant Application as Objetos de aplicación y request<br/>src/public/js/application/warehouse/suppliers/suppliers.js + src/public/js/services/warehouse/supplierService.js<br/>editSupplier → editSupplierRequest
-    participant Transport as Frontera API y controlador<br/>src/routes/api/warehouse/supplierApiRoute.js<br/>PUT /api/warehouse/suppliers/:id<br/>src/controllers/api/warehouse/supplierController.js<br/>editSupplier
+    participant View as «object»<br/>Objeto UI<br/>src/public/js/pages/warehouse/suppliers/supplierModal.js<br/>supplierModal.js
+    participant Application as «object»<br/>Objetos de aplicación y request<br/>src/public/js/application/warehouse/suppliers/suppliers.js + src/public/js/services/warehouse/supplierService.js<br/>editSupplier → editSupplierRequest
+    participant Transport as «controller»<br/>Frontera API y controlador<br/>src/routes/api/warehouse/supplierApiRoute.js<br/>PUT /api/warehouse/suppliers/:id<br/>src/controllers/api/warehouse/supplierController.js<br/>editSupplier
     Note over Application,Transport: Variables de frontera: id, formData/payload
 
     Browser->>View: supplierModal.js precarga el proveedor
-    View->>Application: editSupplier → editSupplierRequest
+    View->>Application: editSupplier({ id, formData }) → editSupplierRequest({ id, formData })
     Application->>Transport: envía PUT /api/warehouse/suppliers/:id
     Transport-->>Application: devolver respuesta normalizada
     Application-->>View: presentar resultado observable
@@ -448,9 +450,9 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant Browser as Navegador
-    participant View as Objeto UI<br/>src/public/js/pages/warehouse/suppliers/supplierForm.js<br/>supplierForm.js
-    participant Application as Objetos de aplicación y request<br/>src/public/js/application/warehouse/suppliers/suppliers.js<br/>editSupplier
-    participant Transport as Frontera API y controlador<br/>src/routes/api/warehouse/supplierApiRoute.js<br/>PUT /api/warehouse/suppliers/:id<br/>src/controllers/api/warehouse/supplierController.js<br/>editSupplier
+    participant View as «object»<br/>Objeto UI<br/>src/public/js/pages/warehouse/suppliers/supplierForm.js<br/>supplierForm.js
+    participant Application as «object»<br/>Objetos de aplicación y request<br/>src/public/js/application/warehouse/suppliers/suppliers.js<br/>editSupplier
+    participant Transport as «controller»<br/>Frontera API y controlador<br/>src/routes/api/warehouse/supplierApiRoute.js<br/>PUT /api/warehouse/suppliers/:id<br/>src/controllers/api/warehouse/supplierController.js<br/>editSupplier
     Note over Application,Transport: Variables de frontera: id, formData/payload
 
     Browser->>View: El estado se edita en supplierForm.js, no hay pantalla separada
@@ -467,13 +469,13 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant Browser as Navegador
-    participant View as Objeto UI<br/>src/views/pages/sales/clients/clientsPage.ejs + src/public/js/pages/sales/clients/clientsPage.js<br/>clientsPage.ejs / clientsPage.js
-    participant Application as Objetos de aplicación y request<br/>src/public/js/application/sales/clients/clients.js + src/public/js/services/sales/clientService.js<br/>getAllClients → getAllClientsRequest
-    participant Transport as Frontera API y controlador<br/>src/routes/api/sales/clientApiRoute.js<br/>GET /api/sales/clients<br/>src/controllers/api/sales/clientController.js<br/>getAllClients
+    participant View as «object»<br/>Objeto UI<br/>src/views/pages/sales/clients/clientsPage.ejs + src/public/js/pages/sales/clients/clientsPage.js<br/>clientsPage.ejs / clientsPage.js
+    participant Application as «object»<br/>Objetos de aplicación y request<br/>src/public/js/application/sales/clients/clients.js + src/public/js/services/sales/clientService.js<br/>getAllClients → getAllClientsRequest
+    participant Transport as «controller»<br/>Frontera API y controlador<br/>src/routes/api/sales/clientApiRoute.js<br/>GET /api/sales/clients<br/>src/controllers/api/sales/clientController.js<br/>getAllClients
     Note over Application,Transport: Variables de frontera: params/filtros
 
     Browser->>View: clientsPage.ejs y clientsPage.js cargan clientes
-    View->>Application: getAllClients → getAllClientsRequest
+    View->>Application: getAllClients({ params }) → getAllClientsRequest({ params })
     Application->>Transport: consulta GET /api/sales/clients
     Transport-->>Application: devolver respuesta normalizada
     Application-->>View: presentar resultado observable
@@ -486,13 +488,13 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant Browser as Navegador
-    participant View as Objeto UI<br/>src/public/js/pages/sales/clients/clientModal.js + src/public/js/pages/sales/clients/clientForm.js<br/>clientModal.js / clientForm.js
-    participant Application as Objetos de aplicación y request<br/>src/public/js/application/sales/clients/clients.js + src/public/js/services/sales/clientService.js<br/>registerClient → createClientRequest
-    participant Transport as Frontera API y controlador<br/>src/routes/api/sales/clientApiRoute.js<br/>POST /api/sales/clients<br/>src/controllers/api/sales/clientController.js<br/>registerClient
+    participant View as «object»<br/>Objeto UI<br/>src/public/js/pages/sales/clients/clientModal.js + src/public/js/pages/sales/clients/clientForm.js<br/>clientModal.js / clientForm.js
+    participant Application as «object»<br/>Objetos de aplicación y request<br/>src/public/js/application/sales/clients/clients.js + src/public/js/services/sales/clientService.js<br/>registerClient → createClientRequest
+    participant Transport as «controller»<br/>Frontera API y controlador<br/>src/routes/api/sales/clientApiRoute.js<br/>POST /api/sales/clients<br/>src/controllers/api/sales/clientController.js<br/>registerClient
     Note over Application,Transport: Variables de frontera: formData/payload
 
     Browser->>View: clientModal.js abre clientForm.js en alta
-    View->>Application: registerClient → createClientRequest
+    View->>Application: registerClient({ formData }) → createClientRequest({ formData })
     Application->>Transport: envía POST /api/sales/clients
     Transport-->>Application: devolver respuesta normalizada
     Application-->>View: presentar resultado observable
@@ -505,13 +507,13 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant Browser as Navegador
-    participant View as Objeto UI<br/>src/public/js/pages/sales/clients/clientModal.js<br/>clientModal.js
-    participant Application as Objetos de aplicación y request<br/>src/public/js/application/sales/clients/clients.js + src/public/js/services/sales/clientService.js<br/>editClient → editClientRequest
-    participant Transport as Frontera API y controlador<br/>src/routes/api/sales/clientApiRoute.js<br/>PUT /api/sales/clients/:id<br/>src/controllers/api/sales/clientController.js<br/>editClient
+    participant View as «object»<br/>Objeto UI<br/>src/public/js/pages/sales/clients/clientModal.js<br/>clientModal.js
+    participant Application as «object»<br/>Objetos de aplicación y request<br/>src/public/js/application/sales/clients/clients.js + src/public/js/services/sales/clientService.js<br/>editClient → editClientRequest
+    participant Transport as «controller»<br/>Frontera API y controlador<br/>src/routes/api/sales/clientApiRoute.js<br/>PUT /api/sales/clients/:id<br/>src/controllers/api/sales/clientController.js<br/>editClient
     Note over Application,Transport: Variables de frontera: id, formData/payload
 
     Browser->>View: clientModal.js precarga el cliente
-    View->>Application: editClient → editClientRequest
+    View->>Application: editClient({ id, formData }) → editClientRequest({ id, formData })
     Application->>Transport: envía PUT /api/sales/clients/:id
     Transport-->>Application: devolver respuesta normalizada
     Application-->>View: presentar resultado observable
@@ -524,13 +526,13 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant Browser as Navegador
-    participant View as Objeto UI<br/>src/views/pages/warehouse/wastes/wastesPage.ejs + src/public/js/pages/warehouse/wastes/wastesPage.js<br/>wastesPage.ejs / wastesPage.js
-    participant Application as Objetos de aplicación y request<br/>src/public/js/application/warehouse/wastes/wastes.js + src/public/js/services/warehouse/wasteService.js<br/>getAllWastes → getAllWastesRequest
-    participant Transport as Frontera API y controlador<br/>src/routes/api/warehouse/wasteApiRoute.js<br/>GET /api/warehouse/wastes<br/>src/controllers/api/warehouse/wasteController.js<br/>getAllWastes
+    participant View as «object»<br/>Objeto UI<br/>src/views/pages/warehouse/wastes/wastesPage.ejs + src/public/js/pages/warehouse/wastes/wastesPage.js<br/>wastesPage.ejs / wastesPage.js
+    participant Application as «object»<br/>Objetos de aplicación y request<br/>src/public/js/application/warehouse/wastes/wastes.js + src/public/js/services/warehouse/wasteService.js<br/>getAllWastes → getAllWastesRequest
+    participant Transport as «controller»<br/>Frontera API y controlador<br/>src/routes/api/warehouse/wasteApiRoute.js<br/>GET /api/warehouse/wastes<br/>src/controllers/api/warehouse/wasteController.js<br/>getAllWastes
     Note over Application,Transport: Variables de frontera: params/filtros
 
     Browser->>View: wastesPage.ejs y wastesPage.js cargan mermas
-    View->>Application: getAllWastes → getAllWastesRequest
+    View->>Application: getAllWastes({ params }) → getAllWastesRequest({ params })
     Application->>Transport: consulta GET /api/warehouse/wastes
     Transport-->>Application: devolver respuesta normalizada
     Application-->>View: presentar resultado observable
@@ -543,9 +545,9 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant Browser as Navegador
-    participant View as Objeto UI<br/>src/public/js/pages/warehouse/wastes/wasteModal.js + src/public/js/pages/warehouse/wastes/wasteForm.js<br/>wasteModal.js / wasteForm.js
-    participant Application as Objetos de aplicación y request<br/>src/public/js/application/warehouse/wastes/wastes.js<br/>getWasteMaterialTemplates
-    participant Transport as Frontera API y controlador<br/>src/routes/api/warehouse/wasteApiRoute.js<br/>POST /api/warehouse/wastes<br/>src/controllers/api/warehouse/wasteController.js<br/>getWasteMaterialTemplates / registerWaste
+    participant View as «object»<br/>Objeto UI<br/>src/public/js/pages/warehouse/wastes/wasteModal.js + src/public/js/pages/warehouse/wastes/wasteForm.js<br/>wasteModal.js / wasteForm.js
+    participant Application as «object»<br/>Objetos de aplicación y request<br/>src/public/js/application/warehouse/wastes/wastes.js<br/>getWasteMaterialTemplates
+    participant Transport as «controller»<br/>Frontera API y controlador<br/>src/routes/api/warehouse/wasteApiRoute.js<br/>POST /api/warehouse/wastes<br/>src/controllers/api/warehouse/wasteController.js<br/>getWasteMaterialTemplates / registerWaste
     Note over Application,Transport: Variables de frontera: formData/payload
 
     Browser->>View: wasteModal.js y wasteForm.js seleccionan una plantilla de material
@@ -562,13 +564,13 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant Browser as Navegador
-    participant View as Objeto UI<br/>src/public/js/pages/warehouse/wastes/wasteModal.js<br/>wasteModal.js
-    participant Application as Objetos de aplicación y request<br/>src/public/js/application/warehouse/wastes/wastes.js + src/public/js/services/warehouse/wasteService.js<br/>editWaste → editWasteRequest
-    participant Transport as Frontera API y controlador<br/>src/routes/api/warehouse/wasteApiRoute.js<br/>PATCH /api/warehouse/wastes/:id<br/>src/controllers/api/warehouse/wasteController.js<br/>editWaste
+    participant View as «object»<br/>Objeto UI<br/>src/public/js/pages/warehouse/wastes/wasteModal.js<br/>wasteModal.js
+    participant Application as «object»<br/>Objetos de aplicación y request<br/>src/public/js/application/warehouse/wastes/wastes.js + src/public/js/services/warehouse/wasteService.js<br/>editWaste → editWasteRequest
+    participant Transport as «controller»<br/>Frontera API y controlador<br/>src/routes/api/warehouse/wasteApiRoute.js<br/>PATCH /api/warehouse/wastes/:id<br/>src/controllers/api/warehouse/wasteController.js<br/>editWaste
     Note over Application,Transport: Variables de frontera: id, formData/payload
 
     Browser->>View: wasteModal.js precarga la merma
-    View->>Application: editWaste → editWasteRequest
+    View->>Application: editWaste({ id, formData }) → editWasteRequest({ id, formData })
     Application->>Transport: envía PATCH /api/warehouse/wastes/:id
     Transport-->>Application: devolver respuesta normalizada
     Application-->>View: presentar resultado observable
@@ -581,13 +583,13 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant Browser as Navegador
-    participant View as Objeto UI<br/>src/public/js/pages/warehouse/wastes/wasteForm.js<br/>wasteForm.js
-    participant Application as Objetos de aplicación y request<br/>src/public/js/application/warehouse/wastes/wastes.js + src/public/js/services/warehouse/wasteService.js<br/>editWasteStock → editWasteStockRequest
-    participant Transport as Frontera API y controlador<br/>src/routes/api/warehouse/wasteApiRoute.js<br/>PATCH /api/warehouse/wastes/:id/stock<br/>src/controllers/api/warehouse/wasteController.js<br/>editWasteStock
+    participant View as «object»<br/>Objeto UI<br/>src/public/js/pages/warehouse/wastes/wasteForm.js<br/>wasteForm.js
+    participant Application as «object»<br/>Objetos de aplicación y request<br/>src/public/js/application/warehouse/wastes/wastes.js + src/public/js/services/warehouse/wasteService.js<br/>editWasteStock → editWasteStockRequest
+    participant Transport as «controller»<br/>Frontera API y controlador<br/>src/routes/api/warehouse/wasteApiRoute.js<br/>PATCH /api/warehouse/wastes/:id/stock<br/>src/controllers/api/warehouse/wasteController.js<br/>editWasteStock
     Note over Application,Transport: Variables de frontera: id, formData/payload
 
     Browser->>View: wasteForm.js usa el modo de ajuste
-    View->>Application: editWasteStock → editWasteStockRequest
+    View->>Application: editWasteStock({ id, formData }) → editWasteStockRequest({ id, formData })
     Application->>Transport: envía PATCH /api/warehouse/wastes/:id/stock
     Transport-->>Application: devolver respuesta normalizada
     Application-->>View: presentar resultado observable
@@ -600,13 +602,13 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant Browser as Navegador
-    participant View as Objeto UI<br/>src/public/js/pages/warehouse/materials/materialFields.js + src/public/js/pages/warehouse/wastes/wasteFields.js<br/>materialFields.js / wasteFields.js
-    participant Application as Objetos de aplicación y request<br/>src/public/js/application/warehouse/catalogs/presentations.js + src/public/js/services/warehouse/presentationService.js<br/>getAllPresentations → getAllPresentationsRequest
-    participant Transport as Frontera API y controlador<br/>src/routes/api/warehouse/presentationApiRoute.js<br/>GET /api/warehouse/presentations<br/>src/controllers/api/warehouse/presentationController.js<br/>getAllPresentations
+    participant View as «object»<br/>Objeto UI<br/>src/public/js/pages/warehouse/materials/materialFields.js + src/public/js/pages/warehouse/wastes/wasteFields.js<br/>materialFields.js / wasteFields.js
+    participant Application as «object»<br/>Objetos de aplicación y request<br/>src/public/js/application/warehouse/catalogs/presentations.js + src/public/js/services/warehouse/presentationService.js<br/>getAllPresentations → getAllPresentationsRequest
+    participant Transport as «controller»<br/>Frontera API y controlador<br/>src/routes/api/warehouse/presentationApiRoute.js<br/>GET /api/warehouse/presentations<br/>src/controllers/api/warehouse/presentationController.js<br/>getAllPresentations
     Note over Application,Transport: Variables de frontera: params/filtros
 
     Browser->>View: Select de presentación en materialFields.js y wasteFields.js
-    View->>Application: getAllPresentations → getAllPresentationsRequest
+    View->>Application: getAllPresentations({ params }) → getAllPresentationsRequest({ params })
     Application->>Transport: consume GET /api/warehouse/presentations
     Transport-->>Application: devolver respuesta normalizada
     Application-->>View: presentar resultado observable
@@ -619,13 +621,13 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant Browser as Navegador
-    participant View as Objeto UI<br/>Select de unidad en formularios de material y merma
-    participant Application as Objetos de aplicación y request<br/>src/public/js/application/warehouse/catalogs/unitMeasures.js + src/public/js/services/warehouse/unitMeasureService.js<br/>getAllUnitMeasures → getAllUnitMeasuresRequest
-    participant Transport as Frontera API y controlador<br/>src/routes/api/warehouse/unitMeasureApiRoute.js<br/>GET /api/warehouse/unit-measures<br/>src/controllers/api/warehouse/unitMeasureController.js<br/>getAllUnitMeasures
+    participant View as «object»<br/>Objeto UI<br/>Select de unidad en formularios de material y merma
+    participant Application as «object»<br/>Objetos de aplicación y request<br/>src/public/js/application/warehouse/catalogs/unitMeasures.js + src/public/js/services/warehouse/unitMeasureService.js<br/>getAllUnitMeasures → getAllUnitMeasuresRequest
+    participant Transport as «controller»<br/>Frontera API y controlador<br/>src/routes/api/warehouse/unitMeasureApiRoute.js<br/>GET /api/warehouse/unit-measures<br/>src/controllers/api/warehouse/unitMeasureController.js<br/>getAllUnitMeasures
     Note over Application,Transport: Variables de frontera: params/filtros
 
     Browser->>View: Select de unidad en formularios de material y merma
-    View->>Application: getAllUnitMeasures → getAllUnitMeasuresRequest
+    View->>Application: getAllUnitMeasures({ params }) → getAllUnitMeasuresRequest({ params })
     Application->>Transport: consume GET /api/warehouse/unit-measures
     Transport-->>Application: devolver respuesta normalizada
     Application-->>View: presentar resultado observable
@@ -638,13 +640,13 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant Browser as Navegador
-    participant View as Objeto UI<br/>Select de motivo en los modos de ajuste
-    participant Application as Objetos de aplicación y request<br/>src/public/js/application/warehouse/catalogs/reasons.js + src/public/js/services/warehouse/reasonService.js<br/>getAllReasons → getAllReasonsRequest
-    participant Transport as Frontera API y controlador<br/>src/routes/api/warehouse/reasonApiRoute.js<br/>GET /api/warehouse/reasons<br/>src/controllers/api/warehouse/reasonController.js<br/>getAllReasons
+    participant View as «object»<br/>Objeto UI<br/>Select de motivo en los modos de ajuste
+    participant Application as «object»<br/>Objetos de aplicación y request<br/>src/public/js/application/warehouse/catalogs/reasons.js + src/public/js/services/warehouse/reasonService.js<br/>getAllReasons → getAllReasonsRequest
+    participant Transport as «controller»<br/>Frontera API y controlador<br/>src/routes/api/warehouse/reasonApiRoute.js<br/>GET /api/warehouse/reasons<br/>src/controllers/api/warehouse/reasonController.js<br/>getAllReasons
     Note over Application,Transport: Variables de frontera: params/filtros
 
     Browser->>View: Select de motivo en los modos de ajuste
-    View->>Application: getAllReasons → getAllReasonsRequest
+    View->>Application: getAllReasons({ params }) → getAllReasonsRequest({ params })
     Application->>Transport: consume GET /api/warehouse/reasons
     Transport-->>Application: devolver respuesta normalizada
     Application-->>View: presentar resultado observable
@@ -657,13 +659,13 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant Browser as Navegador
-    participant View as Objeto UI<br/>Estado visible en tablas y formularios de salidas
-    participant Application as Objetos de aplicación y request<br/>src/public/js/application/warehouse/catalogs/fulfillmentStatuses.js<br/>getAllFulfillmentStatuses
-    participant Transport as Frontera API y controlador<br/>src/routes/api/warehouse/fulfillmentStatusApiRoute.js<br/>GET /api/warehouse/fulfillment-statuses<br/>src/controllers/api/warehouse/fulfillmentStatusController.js<br/>getAllFulfillmentStatuses
+    participant View as «object»<br/>Objeto UI<br/>Estado visible en tablas y formularios de salidas
+    participant Application as «object»<br/>Objetos de aplicación y request<br/>src/public/js/application/warehouse/catalogs/fulfillmentStatuses.js<br/>getAllFulfillmentStatuses
+    participant Transport as «controller»<br/>Frontera API y controlador<br/>src/routes/api/warehouse/fulfillmentStatusApiRoute.js<br/>GET /api/warehouse/fulfillment-statuses<br/>src/controllers/api/warehouse/fulfillmentStatusController.js<br/>getAllFulfillmentStatuses
     Note over Application,Transport: Variables de frontera: params/filtros
 
     Browser->>View: Estado visible en tablas y formularios de salidas
-    View->>Application: getAllFulfillmentStatuses → request homólogo
+    View->>Application: getAllFulfillmentStatuses({ params }) → getAllFulfillmentStatusesRequest({ params })
     Application->>Transport: consume GET /api/warehouse/fulfillment-statuses
     Transport-->>Application: devolver respuesta normalizada
     Application-->>View: presentar resultado observable
@@ -676,13 +678,13 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant Browser as Navegador
-    participant View as Objeto UI<br/>src/views/pages/warehouse/goodsReceipts/goodsReceiptsPage.ejs<br/>goodsReceiptsPage.ejs
-    participant Application as Objetos de aplicación y request<br/>src/public/js/application/warehouse/goodsReceipts/goodsReceipts.js<br/>getAllGoodsReceipts
-    participant Transport as Frontera API y controlador<br/>src/routes/api/warehouse/goodsReceiptApiRoute.js<br/>GET /api/warehouse/goods-receipts<br/>src/controllers/api/warehouse/goodsReceiptController.js<br/>getAllGoodsReceipts
+    participant View as «object»<br/>Objeto UI<br/>src/views/pages/warehouse/goodsReceipts/goodsReceiptsPage.ejs<br/>goodsReceiptsPage.ejs
+    participant Application as «object»<br/>Objetos de aplicación y request<br/>src/public/js/application/warehouse/goodsReceipts/goodsReceipts.js<br/>getAllGoodsReceipts
+    participant Transport as «controller»<br/>Frontera API y controlador<br/>src/routes/api/warehouse/goodsReceiptApiRoute.js<br/>GET /api/warehouse/goods-receipts<br/>src/controllers/api/warehouse/goodsReceiptController.js<br/>getAllGoodsReceipts
     Note over Application,Transport: Variables de frontera: params/filtros
 
     Browser->>View: goodsReceiptsPage.ejs y su DataTable cargan compras
-    View->>Application: getAllGoodsReceipts → request homólogo
+    View->>Application: getAllGoodsReceipts({ params }) → getAllGoodsReceiptsRequest({ params })
     Application->>Transport: consulta GET /api/warehouse/goods-receipts
     Transport-->>Application: devolver respuesta normalizada
     Application-->>View: presentar resultado observable
@@ -695,12 +697,12 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     actor Warehouse as Personal de almacén
-    participant Modal as src/public/js/pages/warehouse/goodsReceipts/goodsReceiptModal.js<br/>openGoodsReceiptModal
+    participant Modal as «object»<br/>src/public/js/pages/warehouse/goodsReceipts/goodsReceiptModal.js<br/>openGoodsReceiptModal
     participant Form as src/public/js/pages/warehouse/goodsReceipts/goodsReceiptForm.js<br/>useForm / normalizeGoodsReceiptData
     participant DetailUI as Objeto de detalles<br/>goodsReceiptDetails.js + goodsReceiptDatatable.js<br/>details / mapGoodsReceiptSelectionToDetail
-    participant App as Objetos de aplicación y request<br/>src/public/js/application/warehouse/goodsReceipts/goodsReceipts.js<br/>registerGoodsReceipt
+    participant App as «object»<br/>Objetos de aplicación y request<br/>src/public/js/application/warehouse/goodsReceipts/goodsReceipts.js<br/>registerGoodsReceipt
     participant Request as src/public/js/services/warehouse/goodsReceiptService.js<br/>registerGoodsReceiptRequest
-    participant API as Frontera API y controlador<br/>POST /api/warehouse/goods-receipts<br/>src/controllers/api/warehouse/goodsReceiptController.js<br/>registerGoodsReceipt
+    participant API as «controller»<br/>Frontera API y controlador<br/>POST /api/warehouse/goods-receipts<br/>src/controllers/api/warehouse/goodsReceiptController.js<br/>registerGoodsReceipt
     Note over Form,Request: Variables de frontera: isInvoiced, invoice, supplierId, receivedById, receptionDate, observations y details
 
     Warehouse->>Modal: abrir «Nueva compra»
@@ -729,13 +731,13 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant Browser as Navegador
-    participant View as Objeto UI<br/>src/public/js/pages/warehouse/goodsReceipts/goodsReceiptModal.js<br/>goodsReceiptModal.js
-    participant Application as Objetos de aplicación y request<br/>src/public/js/application/warehouse/goodsReceipts/goodsReceipts.js<br/>editGoodsReceiptHeader
-    participant Transport as Frontera API y controlador<br/>src/routes/api/warehouse/goodsReceiptApiRoute.js<br/>PATCH /api/warehouse/goods-receipts/:id<br/>src/controllers/api/warehouse/goodsReceiptController.js<br/>editGoodsReceiptHeader
+    participant View as «object»<br/>Objeto UI<br/>src/public/js/pages/warehouse/goodsReceipts/goodsReceiptModal.js<br/>goodsReceiptModal.js
+    participant Application as «object»<br/>Objetos de aplicación y request<br/>src/public/js/application/warehouse/goodsReceipts/goodsReceipts.js<br/>editGoodsReceiptHeader
+    participant Transport as «controller»<br/>Frontera API y controlador<br/>src/routes/api/warehouse/goodsReceiptApiRoute.js<br/>PATCH /api/warehouse/goods-receipts/:id<br/>src/controllers/api/warehouse/goodsReceiptController.js<br/>editGoodsReceiptHeader
     Note over Application,Transport: Variables de frontera: id, formData/payload
 
     Browser->>View: goodsReceiptModal.js abre una compra existente
-    View->>Application: editGoodsReceiptHeader → request homólogo
+    View->>Application: editGoodsReceiptHeader({ id, formData }) → editGoodsReceiptHeaderRequest({ id, formData })
     Application->>Transport: envía PATCH /api/warehouse/goods-receipts/:id
     Transport-->>Application: devolver respuesta normalizada
     Application-->>View: presentar resultado observable
@@ -748,13 +750,13 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant Browser as Navegador
-    participant View as Objeto UI<br/>src/public/js/pages/warehouse/goodsReceipts/corrections/correctionModal.js + src/public/js/pages/warehouse/goodsReceipts/corrections/correctionForm.js<br/>correctionModal.js / correctionForm.js
-    participant Application as Objetos de aplicación y request<br/>src/public/js/application/warehouse/goodsReceipts/goodsReceipts.js<br/>correctGoodsReceiptDetail
-    participant Transport as Frontera API y controlador<br/>src/routes/api/warehouse/goodsReceiptApiRoute.js<br/>PATCH /api/warehouse/goods-receipts/:id/details/:detailId/corrections<br/>src/controllers/api/warehouse/goodsReceiptController.js<br/>correctGoodsReceiptDetail
+    participant View as «object»<br/>Objeto UI<br/>src/public/js/pages/warehouse/goodsReceipts/corrections/correctionModal.js + src/public/js/pages/warehouse/goodsReceipts/corrections/correctionForm.js<br/>correctionModal.js / correctionForm.js
+    participant Application as «object»<br/>Objetos de aplicación y request<br/>src/public/js/application/warehouse/goodsReceipts/goodsReceipts.js<br/>correctGoodsReceiptDetail
+    participant Transport as «controller»<br/>Frontera API y controlador<br/>src/routes/api/warehouse/goodsReceiptApiRoute.js<br/>PATCH /api/warehouse/goods-receipts/:id/details/:detailId/corrections<br/>src/controllers/api/warehouse/goodsReceiptController.js<br/>correctGoodsReceiptDetail
     Note over Application,Transport: Variables de frontera: id, detailId, formData/payload
 
     Browser->>View: correctionModal.js y correctionForm.js aíslan la corrección
-    View->>Application: correctGoodsReceiptDetail → request homólogo
+    View->>Application: correctGoodsReceiptDetail({ id, detailId, formData }) → correctGoodsReceiptDetailRequest({ id, detailId, formData })
     Application->>Transport: envía PATCH /api/warehouse/goods-receipts/:id/details/:detailId/corrections
     Transport-->>Application: devolver respuesta normalizada
     Application-->>View: presentar resultado observable
@@ -767,13 +769,13 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant Browser as Navegador
-    participant View as Objeto UI<br/>Acción Cancelar del detalle en el modal de compra
-    participant Application as Objetos de aplicación y request<br/>src/public/js/application/warehouse/goodsReceipts/goodsReceipts.js<br/>cancelGoodsReceiptDetail
-    participant Transport as Frontera API y controlador<br/>src/routes/api/warehouse/goodsReceiptApiRoute.js<br/>PATCH /api/warehouse/goods-receipts/:id/details/:detailId/cancel<br/>src/controllers/api/warehouse/goodsReceiptController.js<br/>cancelGoodsReceiptDetail
+    participant View as «object»<br/>Objeto UI<br/>Acción Cancelar del detalle en el modal de compra
+    participant Application as «object»<br/>Objetos de aplicación y request<br/>src/public/js/application/warehouse/goodsReceipts/goodsReceipts.js<br/>cancelGoodsReceiptDetail
+    participant Transport as «controller»<br/>Frontera API y controlador<br/>src/routes/api/warehouse/goodsReceiptApiRoute.js<br/>PATCH /api/warehouse/goods-receipts/:id/details/:detailId/cancel<br/>src/controllers/api/warehouse/goodsReceiptController.js<br/>cancelGoodsReceiptDetail
     Note over Application,Transport: Variables de frontera: id, detailId, formData/payload
 
     Browser->>View: Acción Cancelar del detalle en el modal de compra
-    View->>Application: cancelGoodsReceiptDetail → request homólogo
+    View->>Application: cancelGoodsReceiptDetail({ id, detailId, formData }) → cancelGoodsReceiptDetailRequest({ id, detailId, formData })
     Application->>Transport: envía PATCH /api/warehouse/goods-receipts/:id/details/:detailId/cancel
     Transport-->>Application: devolver respuesta normalizada
     Application-->>View: presentar resultado observable
@@ -786,13 +788,13 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant Browser as Navegador
-    participant View as Objeto UI<br/>src/views/pages/warehouse/goodsIssues/goodsIssuesPage.ejs<br/>goodsIssuesPage.ejs
-    participant Application as Objetos de aplicación y request<br/>src/public/js/application/warehouse/goodsIssues/goodsIssues.js<br/>getAllGoodsIssues
-    participant Transport as Frontera API y controlador<br/>src/routes/api/warehouse/goodsIssueApiRoute.js<br/>GET /api/warehouse/goods-issues<br/>src/controllers/api/warehouse/goodsIssueController.js<br/>getAllGoodsIssues
+    participant View as «object»<br/>Objeto UI<br/>src/views/pages/warehouse/goodsIssues/goodsIssuesPage.ejs<br/>goodsIssuesPage.ejs
+    participant Application as «object»<br/>Objetos de aplicación y request<br/>src/public/js/application/warehouse/goodsIssues/goodsIssues.js<br/>getAllGoodsIssues
+    participant Transport as «controller»<br/>Frontera API y controlador<br/>src/routes/api/warehouse/goodsIssueApiRoute.js<br/>GET /api/warehouse/goods-issues<br/>src/controllers/api/warehouse/goodsIssueController.js<br/>getAllGoodsIssues
     Note over Application,Transport: Variables de frontera: params/filtros
 
     Browser->>View: goodsIssuesPage.ejs y su DataTable cargan salidas
-    View->>Application: getAllGoodsIssues → request homólogo
+    View->>Application: getAllGoodsIssues({ params }) → getAllGoodsIssuesRequest({ params })
     Application->>Transport: consulta GET /api/warehouse/goods-issues
     Transport-->>Application: devolver respuesta normalizada
     Application-->>View: presentar resultado observable
@@ -805,13 +807,13 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant Browser as Navegador
-    participant View as Objeto UI<br/>src/public/js/pages/warehouse/goodsIssues/goodsIssueModal.js<br/>goodsIssueModal.js
-    participant Application as Objetos de aplicación y request<br/>src/public/js/application/warehouse/goodsIssues/goodsIssues.js<br/>registerGoodsIssue
-    participant Transport as Frontera API y controlador<br/>src/routes/api/warehouse/goodsIssueApiRoute.js<br/>POST /api/warehouse/goods-issues<br/>src/controllers/api/warehouse/goodsIssueController.js<br/>registerGoodsIssue
+    participant View as «object»<br/>Objeto UI<br/>src/public/js/pages/warehouse/goodsIssues/goodsIssueModal.js<br/>goodsIssueModal.js
+    participant Application as «object»<br/>Objetos de aplicación y request<br/>src/public/js/application/warehouse/goodsIssues/goodsIssues.js<br/>registerGoodsIssue
+    participant Transport as «controller»<br/>Frontera API y controlador<br/>src/routes/api/warehouse/goodsIssueApiRoute.js<br/>POST /api/warehouse/goods-issues<br/>src/controllers/api/warehouse/goodsIssueController.js<br/>registerGoodsIssue
     Note over Application,Transport: Variables de frontera: formData/payload
 
     Browser->>View: goodsIssueModal.js captura documento y materiales
-    View->>Application: registerGoodsIssue → request homólogo
+    View->>Application: registerGoodsIssue({ formData }) → registerGoodsIssueRequest({ formData })
     Application->>Transport: envía POST /api/warehouse/goods-issues
     Transport-->>Application: devolver respuesta normalizada
     Application-->>View: presentar resultado observable
@@ -824,13 +826,13 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant Browser as Navegador
-    participant View as Objeto UI<br/>src/public/js/pages/warehouse/goodsIssues/goodsIssueModal.js<br/>goodsIssueModal.js
-    participant Application as Objetos de aplicación y request<br/>src/public/js/application/warehouse/goodsIssues/goodsIssues.js<br/>editGoodsIssueHeader
-    participant Transport as Frontera API y controlador<br/>src/routes/api/warehouse/goodsIssueApiRoute.js<br/>PATCH /api/warehouse/goods-issues/:id/header<br/>src/controllers/api/warehouse/goodsIssueController.js<br/>editGoodsIssueHeader
+    participant View as «object»<br/>Objeto UI<br/>src/public/js/pages/warehouse/goodsIssues/goodsIssueModal.js<br/>goodsIssueModal.js
+    participant Application as «object»<br/>Objetos de aplicación y request<br/>src/public/js/application/warehouse/goodsIssues/goodsIssues.js<br/>editGoodsIssueHeader
+    participant Transport as «controller»<br/>Frontera API y controlador<br/>src/routes/api/warehouse/goodsIssueApiRoute.js<br/>PATCH /api/warehouse/goods-issues/:id/header<br/>src/controllers/api/warehouse/goodsIssueController.js<br/>editGoodsIssueHeader
     Note over Application,Transport: Variables de frontera: id, formData/payload
 
     Browser->>View: Modo encabezado de goodsIssueModal.js
-    View->>Application: editGoodsIssueHeader → request homólogo
+    View->>Application: editGoodsIssueHeader({ id, formData }) → editGoodsIssueHeaderRequest({ id, formData })
     Application->>Transport: envía PATCH /api/warehouse/goods-issues/:id/header
     Transport-->>Application: devolver respuesta normalizada
     Application-->>View: presentar resultado observable
@@ -843,13 +845,13 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant Browser as Navegador
-    participant View as Objeto UI<br/>src/public/js/pages/warehouse/goodsIssues/goodsIssueModal.js<br/>goodsIssueModal.js
-    participant Application as Objetos de aplicación y request<br/>src/public/js/application/warehouse/goodsIssues/goodsIssues.js<br/>editGoodsIssueDetails
-    participant Transport as Frontera API y controlador<br/>src/routes/api/warehouse/goodsIssueApiRoute.js<br/>PATCH /api/warehouse/goods-issues/:id/details<br/>src/controllers/api/warehouse/goodsIssueController.js<br/>editGoodsIssueDetails
+    participant View as «object»<br/>Objeto UI<br/>src/public/js/pages/warehouse/goodsIssues/goodsIssueModal.js<br/>goodsIssueModal.js
+    participant Application as «object»<br/>Objetos de aplicación y request<br/>src/public/js/application/warehouse/goodsIssues/goodsIssues.js<br/>editGoodsIssueDetails
+    participant Transport as «controller»<br/>Frontera API y controlador<br/>src/routes/api/warehouse/goodsIssueApiRoute.js<br/>PATCH /api/warehouse/goods-issues/:id/details<br/>src/controllers/api/warehouse/goodsIssueController.js<br/>editGoodsIssueDetails
     Note over Application,Transport: Variables de frontera: id, formData/payload
 
     Browser->>View: Modo detalles de goodsIssueModal.js
-    View->>Application: editGoodsIssueDetails → request homólogo
+    View->>Application: editGoodsIssueDetails({ id, formData }) → editGoodsIssueDetailsRequest({ id, formData })
     Application->>Transport: envía PATCH /api/warehouse/goods-issues/:id/details
     Transport-->>Application: devolver respuesta normalizada
     Application-->>View: presentar resultado observable
@@ -862,9 +864,9 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant Browser as Navegador
-    participant View as Objeto UI<br/>Acción Surtir dentro de los detalles de salida
-    participant Application as Objetos de aplicación y request<br/>src/public/js/application/warehouse/goodsIssues/goodsIssues.js<br/>editGoodsIssueDetails
-    participant Transport as Frontera API y controlador<br/>src/routes/api/warehouse/goodsIssueApiRoute.js<br/>PATCH /api/warehouse/goods-issues/:id/details<br/>src/controllers/api/warehouse/goodsIssueController.js<br/>editGoodsIssueDetails
+    participant View as «object»<br/>Objeto UI<br/>Acción Surtir dentro de los detalles de salida
+    participant Application as «object»<br/>Objetos de aplicación y request<br/>src/public/js/application/warehouse/goodsIssues/goodsIssues.js<br/>editGoodsIssueDetails
+    participant Transport as «controller»<br/>Frontera API y controlador<br/>src/routes/api/warehouse/goodsIssueApiRoute.js<br/>PATCH /api/warehouse/goods-issues/:id/details<br/>src/controllers/api/warehouse/goodsIssueController.js<br/>editGoodsIssueDetails
     Note over Application,Transport: Variables de frontera: id, formData/payload
 
     Browser->>View: Acción Surtir dentro de los detalles de salida
@@ -882,11 +884,11 @@ sequenceDiagram
 sequenceDiagram
     Note over Warehouse,App: Variables de frontera: id, detailId, returnDto, userId y tx
     actor Warehouse as Almacén
-    participant Issue as src/public/js/pages/warehouse/goodsIssues/returns/goodsIssueReturn.js<br/>returns/goodsIssueReturn.js
+    participant Issue as «object»<br/>src/public/js/pages/warehouse/goodsIssues/returns/goodsIssueReturn.js<br/>returns/goodsIssueReturn.js
     participant Return as issueReturn UI
     participant Domain as initializeGoodsIssueReturns
-    participant App as Objetos de aplicación y request<br/>src/public/js/application/warehouse/goodsIssues/goodsIssues.js<br/>returnGoodsIssueDetail
-    participant API as Frontera API y controlador<br/>PATCH /api/warehouse/goods-issues/:id/details/:detailId/returns<br/>src/controllers/api/warehouse/goodsIssueController.js<br/>registerGoodsIssueDetailReturn
+    participant App as «object»<br/>Objetos de aplicación y request<br/>src/public/js/application/warehouse/goodsIssues/goodsIssues.js<br/>returnGoodsIssueDetail
+    participant API as «controller»<br/>Frontera API y controlador<br/>PATCH /api/warehouse/goods-issues/:id/details/:detailId/returns<br/>src/controllers/api/warehouse/goodsIssueController.js<br/>registerGoodsIssueDetailReturn
 
     Warehouse->>Issue: selecciona Devolver en un detalle
     Issue->>Domain: entrega detalles y documento actual
@@ -907,13 +909,13 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant Browser as Navegador
-    participant View as Objeto UI<br/>src/views/pages/warehouse/wasteIssues/wasteIssuesPage.ejs<br/>wasteIssuesPage.ejs
-    participant Application as Objetos de aplicación y request<br/>src/public/js/application/warehouse/wasteIssues/wasteIssues.js<br/>getAllWasteIssues
-    participant Transport as Frontera API y controlador<br/>src/routes/api/warehouse/wasteIssueApiRoute.js<br/>GET /api/warehouse/waste-issues<br/>src/controllers/api/warehouse/wasteIssueController.js<br/>getAllWasteIssues
+    participant View as «object»<br/>Objeto UI<br/>src/views/pages/warehouse/wasteIssues/wasteIssuesPage.ejs<br/>wasteIssuesPage.ejs
+    participant Application as «object»<br/>Objetos de aplicación y request<br/>src/public/js/application/warehouse/wasteIssues/wasteIssues.js<br/>getAllWasteIssues
+    participant Transport as «controller»<br/>Frontera API y controlador<br/>src/routes/api/warehouse/wasteIssueApiRoute.js<br/>GET /api/warehouse/waste-issues<br/>src/controllers/api/warehouse/wasteIssueController.js<br/>getAllWasteIssues
     Note over Application,Transport: Variables de frontera: params/filtros
 
     Browser->>View: wasteIssuesPage.ejs y su DataTable cargan salidas de merma
-    View->>Application: getAllWasteIssues → request homólogo
+    View->>Application: getAllWasteIssues({ params }) → getAllWasteIssuesRequest({ params })
     Application->>Transport: consulta GET /api/warehouse/waste-issues
     Transport-->>Application: devolver respuesta normalizada
     Application-->>View: presentar resultado observable
@@ -926,13 +928,13 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant Browser as Navegador
-    participant View as Objeto UI<br/>src/public/js/pages/warehouse/wasteIssues/wasteIssueModal.js<br/>wasteIssueModal.js
-    participant Application as Objetos de aplicación y request<br/>src/public/js/application/warehouse/wasteIssues/wasteIssues.js<br/>registerWasteIssue
-    participant Transport as Frontera API y controlador<br/>src/routes/api/warehouse/wasteIssueApiRoute.js<br/>POST /api/warehouse/waste-issues<br/>src/controllers/api/warehouse/wasteIssueController.js<br/>registerWasteIssue
+    participant View as «object»<br/>Objeto UI<br/>src/public/js/pages/warehouse/wasteIssues/wasteIssueModal.js<br/>wasteIssueModal.js
+    participant Application as «object»<br/>Objetos de aplicación y request<br/>src/public/js/application/warehouse/wasteIssues/wasteIssues.js<br/>registerWasteIssue
+    participant Transport as «controller»<br/>Frontera API y controlador<br/>src/routes/api/warehouse/wasteIssueApiRoute.js<br/>POST /api/warehouse/waste-issues<br/>src/controllers/api/warehouse/wasteIssueController.js<br/>registerWasteIssue
     Note over Application,Transport: Variables de frontera: formData/payload
 
     Browser->>View: wasteIssueModal.js captura documento y mermas
-    View->>Application: registerWasteIssue → request homólogo
+    View->>Application: registerWasteIssue({ formData }) → registerWasteIssueRequest({ formData })
     Application->>Transport: envía POST /api/warehouse/waste-issues
     Transport-->>Application: devolver respuesta normalizada
     Application-->>View: presentar resultado observable
@@ -945,13 +947,13 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant Browser as Navegador
-    participant View as Objeto UI<br/>src/public/js/pages/warehouse/wasteIssues/wasteIssueModal.js<br/>wasteIssueModal.js
-    participant Application as Objetos de aplicación y request<br/>src/public/js/application/warehouse/wasteIssues/wasteIssues.js<br/>editWasteIssueHeader
-    participant Transport as Frontera API y controlador<br/>src/routes/api/warehouse/wasteIssueApiRoute.js<br/>PATCH /api/warehouse/waste-issues/:id/header<br/>src/controllers/api/warehouse/wasteIssueController.js<br/>editWasteIssueHeader
+    participant View as «object»<br/>Objeto UI<br/>src/public/js/pages/warehouse/wasteIssues/wasteIssueModal.js<br/>wasteIssueModal.js
+    participant Application as «object»<br/>Objetos de aplicación y request<br/>src/public/js/application/warehouse/wasteIssues/wasteIssues.js<br/>editWasteIssueHeader
+    participant Transport as «controller»<br/>Frontera API y controlador<br/>src/routes/api/warehouse/wasteIssueApiRoute.js<br/>PATCH /api/warehouse/waste-issues/:id/header<br/>src/controllers/api/warehouse/wasteIssueController.js<br/>editWasteIssueHeader
     Note over Application,Transport: Variables de frontera: id, formData/payload
 
     Browser->>View: Modo encabezado de wasteIssueModal.js
-    View->>Application: editWasteIssueHeader → request homólogo
+    View->>Application: editWasteIssueHeader({ id, formData }) → editWasteIssueHeaderRequest({ id, formData })
     Application->>Transport: envía PATCH /api/warehouse/waste-issues/:id/header
     Transport-->>Application: devolver respuesta normalizada
     Application-->>View: presentar resultado observable
@@ -964,13 +966,13 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant Browser as Navegador
-    participant View as Objeto UI<br/>src/public/js/pages/warehouse/wasteIssues/wasteIssueModal.js<br/>wasteIssueModal.js
-    participant Application as Objetos de aplicación y request<br/>src/public/js/application/warehouse/wasteIssues/wasteIssues.js<br/>editWasteIssueDetails
-    participant Transport as Frontera API y controlador<br/>src/routes/api/warehouse/wasteIssueApiRoute.js<br/>PATCH /api/warehouse/waste-issues/:id/details<br/>src/controllers/api/warehouse/wasteIssueController.js<br/>editWasteIssueDetails
+    participant View as «object»<br/>Objeto UI<br/>src/public/js/pages/warehouse/wasteIssues/wasteIssueModal.js<br/>wasteIssueModal.js
+    participant Application as «object»<br/>Objetos de aplicación y request<br/>src/public/js/application/warehouse/wasteIssues/wasteIssues.js<br/>editWasteIssueDetails
+    participant Transport as «controller»<br/>Frontera API y controlador<br/>src/routes/api/warehouse/wasteIssueApiRoute.js<br/>PATCH /api/warehouse/waste-issues/:id/details<br/>src/controllers/api/warehouse/wasteIssueController.js<br/>editWasteIssueDetails
     Note over Application,Transport: Variables de frontera: id, formData/payload
 
     Browser->>View: Modo detalles de wasteIssueModal.js
-    View->>Application: editWasteIssueDetails → request homólogo
+    View->>Application: editWasteIssueDetails({ id, formData }) → editWasteIssueDetailsRequest({ id, formData })
     Application->>Transport: envía PATCH /api/warehouse/waste-issues/:id/details
     Transport-->>Application: devolver respuesta normalizada
     Application-->>View: presentar resultado observable
@@ -983,9 +985,9 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant Browser as Navegador
-    participant View as Objeto UI<br/>Acción Surtir dentro de los detalles de merma
-    participant Application as Objetos de aplicación y request<br/>src/public/js/application/warehouse/wasteIssues/wasteIssues.js<br/>editWasteIssueDetails
-    participant Transport as Frontera API y controlador<br/>src/routes/api/warehouse/wasteIssueApiRoute.js<br/>PATCH /api/warehouse/waste-issues/:id/details<br/>src/controllers/api/warehouse/wasteIssueController.js<br/>editWasteIssueDetails
+    participant View as «object»<br/>Objeto UI<br/>Acción Surtir dentro de los detalles de merma
+    participant Application as «object»<br/>Objetos de aplicación y request<br/>src/public/js/application/warehouse/wasteIssues/wasteIssues.js<br/>editWasteIssueDetails
+    participant Transport as «controller»<br/>Frontera API y controlador<br/>src/routes/api/warehouse/wasteIssueApiRoute.js<br/>PATCH /api/warehouse/waste-issues/:id/details<br/>src/controllers/api/warehouse/wasteIssueController.js<br/>editWasteIssueDetails
     Note over Application,Transport: Variables de frontera: id, formData/payload
 
     Browser->>View: Acción Surtir dentro de los detalles de merma
@@ -1003,11 +1005,11 @@ sequenceDiagram
 sequenceDiagram
     Note over Warehouse,App: Variables de frontera: id, detailId, returnDto, userId y tx
     actor Warehouse as Almacén
-    participant Issue as src/public/js/pages/warehouse/wasteIssues/returns/wasteIssueReturn.js<br/>returns/wasteIssueReturn.js
+    participant Issue as «object»<br/>src/public/js/pages/warehouse/wasteIssues/returns/wasteIssueReturn.js<br/>returns/wasteIssueReturn.js
     participant Return as issueReturn UI
     participant Domain as initializeWasteIssueReturns
-    participant App as Objetos de aplicación y request<br/>src/public/js/application/warehouse/wasteIssues/wasteIssues.js<br/>returnWasteIssueDetail
-    participant API as Frontera API y controlador<br/>PATCH /api/warehouse/waste-issues/:id/details/:detailId/returns<br/>src/controllers/api/warehouse/wasteIssueController.js<br/>registerWasteIssueDetailReturn
+    participant App as «object»<br/>Objetos de aplicación y request<br/>src/public/js/application/warehouse/wasteIssues/wasteIssues.js<br/>returnWasteIssueDetail
+    participant API as «controller»<br/>Frontera API y controlador<br/>PATCH /api/warehouse/waste-issues/:id/details/:detailId/returns<br/>src/controllers/api/warehouse/wasteIssueController.js<br/>registerWasteIssueDetailReturn
 
     Warehouse->>Issue: selecciona Devolver en un detalle de merma
     Issue->>Domain: entrega detalle y salida de merma actual
@@ -1028,9 +1030,9 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant Browser as Navegador
-    participant View as Objeto UI<br/>src/public/js/pages/warehouse/materials/materialsPage.js<br/>materialsPage.js
-    participant Application as Objetos de aplicación y request<br/>src/public/js/services/warehouse/materialService.js<br/>reutilizar getAllMaterialsRequest con los filtros
-    participant Transport as Frontera API y controlador<br/>src/routes/api/warehouse/materialApiRoute.js<br/>GET /api/warehouse/materials<br/>src/controllers/api/warehouse/materialController.js<br/>getAllMaterials
+    participant View as «object»<br/>Objeto UI<br/>src/public/js/pages/warehouse/materials/materialsPage.js<br/>materialsPage.js
+    participant Application as «object»<br/>Objetos de aplicación y request<br/>src/public/js/services/warehouse/materialService.js<br/>reutilizar getAllMaterialsRequest con los filtros
+    participant Transport as «controller»<br/>Frontera API y controlador<br/>src/routes/api/warehouse/materialApiRoute.js<br/>GET /api/warehouse/materials<br/>src/controllers/api/warehouse/materialController.js<br/>getAllMaterials
     Note over Application,Transport: Variables de frontera: params/filtros
 
     Browser->>View: La consulta es el listado de materialsPage.js, no hay página de reporte
@@ -1047,9 +1049,9 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant Browser as Navegador
-    participant View as Objeto UI<br/>src/public/js/pages/admin/movements/movementsPage.js<br/>movementsPage.js
-    participant Application as Objetos de aplicación y request<br/>src/public/js/application/admin/movements/movements.js<br/>getAllMovements con contexto materials
-    participant Transport as Frontera API y controlador<br/>src/routes/api/admin/movementApiRoute.js<br/>GET /api/admin/movements/materials<br/>src/controllers/api/admin/movementController.js<br/>getAllMaterialMovements
+    participant View as «object»<br/>Objeto UI<br/>src/public/js/pages/admin/movements/movementsPage.js<br/>movementsPage.js
+    participant Application as «object»<br/>Objetos de aplicación y request<br/>src/public/js/application/admin/movements/movements.js<br/>getAllMovements con contexto materials
+    participant Transport as «controller»<br/>Frontera API y controlador<br/>src/routes/api/admin/movementApiRoute.js<br/>GET /api/admin/movements/materials<br/>src/controllers/api/admin/movementController.js<br/>getAllMaterialMovements
     Note over Application,Transport: Variables de frontera: params/filtros
 
     Browser->>View: movementsPage.js selecciona el contexto material
@@ -1066,13 +1068,13 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant Browser as Navegador
-    participant View as Objeto UI<br/>src/public/js/plugins/datatable/warehouse/materials/materialDatatable.js<br/>materialDatatable.js
-    participant Application as Objetos de aplicación y request<br/>src/public/js/application/warehouse/report.js + src/public/js/services/warehouse/reportService.js<br/>exportWarehouseReport → exportWarehouseReportRequest
-    participant Transport as Frontera API y controlador<br/>src/routes/api/warehouse/reportApiRoute.js<br/>descarga /api/warehouse/reports/inventory/excel<br/>src/controllers/api/warehouse/reportController.js<br/>exportWarehouseReportExcel
+    participant View as «object»<br/>Objeto UI<br/>src/public/js/plugins/datatable/warehouse/materials/materialDatatable.js<br/>materialDatatable.js
+    participant Application as «object»<br/>Objetos de aplicación y request<br/>src/public/js/application/warehouse/report.js + src/public/js/services/warehouse/reportService.js<br/>exportWarehouseReport → exportWarehouseReportRequest
+    participant Transport as «controller»<br/>Frontera API y controlador<br/>src/routes/api/warehouse/reportApiRoute.js<br/>descarga /api/warehouse/reports/inventory/excel<br/>src/controllers/api/warehouse/reportController.js<br/>exportWarehouseReportExcel
     Note over Application,Transport: Variables de frontera: params/filtros
 
     Browser->>View: Botón Excel de materialDatatable.js
-    View->>Application: exportWarehouseReport → exportWarehouseReportRequest
+    View->>Application: exportWarehouseReport({ params }) → exportWarehouseReportRequest({ params })
     Application->>Transport: descarga /api/warehouse/reports/inventory/excel
     Transport-->>Application: devolver respuesta normalizada
     Application-->>View: presentar resultado observable
@@ -1085,13 +1087,13 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant Browser as Navegador
-    participant View as Objeto UI<br/>Botón Excel del listado de salidas de material
-    participant Application as Objetos de aplicación y request<br/>src/public/js/application/warehouse/report.js<br/>exportGoodsIssueReport
-    participant Transport as Frontera API y controlador<br/>src/routes/api/warehouse/reportApiRoute.js<br/>descarga /api/warehouse/reports/goods-issues/excel<br/>src/controllers/api/warehouse/reportController.js<br/>exportGoodsIssueReportExcel
+    participant View as «object»<br/>Objeto UI<br/>Botón Excel del listado de salidas de material
+    participant Application as «object»<br/>Objetos de aplicación y request<br/>src/public/js/application/warehouse/report.js<br/>exportGoodsIssueReport
+    participant Transport as «controller»<br/>Frontera API y controlador<br/>src/routes/api/warehouse/reportApiRoute.js<br/>descarga /api/warehouse/reports/goods-issues/excel<br/>src/controllers/api/warehouse/reportController.js<br/>exportGoodsIssueReportExcel
     Note over Application,Transport: Variables de frontera: params/filtros
 
     Browser->>View: Botón Excel del listado de salidas de material
-    View->>Application: exportGoodsIssueReport → request homólogo
+    View->>Application: exportGoodsIssueReport({ params }) → exportGoodsIssueReportRequest({ params })
     Application->>Transport: descarga /api/warehouse/reports/goods-issues/excel
     Transport-->>Application: devolver respuesta normalizada
     Application-->>View: presentar resultado observable
@@ -1104,13 +1106,13 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant Browser as Navegador
-    participant View as Objeto UI<br/>Botón Excel de movimientos en contexto material
-    participant Application as Objetos de aplicación y request<br/>src/public/js/application/admin/report.js<br/>exportMovementReport → request con materials
-    participant Transport as Frontera API y controlador<br/>src/routes/api/admin/reportApiRoute.js<br/>descarga /api/admin/reports/movements/materials/excel<br/>src/controllers/api/admin/reportController.js<br/>exportMovementReport
+    participant View as «object»<br/>Objeto UI<br/>Botón Excel de movimientos en contexto material
+    participant Application as «object»<br/>Objetos de aplicación y request<br/>src/public/js/application/admin/report.js<br/>exportMovementReport → request con materials
+    participant Transport as «controller»<br/>Frontera API y controlador<br/>src/routes/api/admin/reportApiRoute.js<br/>descarga /api/admin/reports/movements/materials/excel<br/>src/controllers/api/admin/reportController.js<br/>exportMovementReport
     Note over Application,Transport: Variables de frontera: params/filtros
 
     Browser->>View: Botón Excel de movimientos en contexto material
-    View->>Application: exportMovementReport → request con materials
+    View->>Application: exportMovementReport({ params, type: materials }) → exportMovementReportRequest({ params, type: materials })
     Application->>Transport: descarga /api/admin/reports/movements/materials/excel
     Transport-->>Application: devolver respuesta normalizada
     Application-->>View: presentar resultado observable
@@ -1123,9 +1125,9 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant Browser as Navegador
-    participant View as Objeto UI<br/>src/public/js/pages/warehouse/wastes/wastesPage.js<br/>wastesPage.js
-    participant Application as Objetos de aplicación y request<br/>src/public/js/services/warehouse/wasteService.js<br/>reutilizar getAllWastesRequest con los filtros
-    participant Transport as Frontera API y controlador<br/>src/routes/api/warehouse/wasteApiRoute.js<br/>GET /api/warehouse/wastes<br/>src/controllers/api/warehouse/wasteController.js<br/>getAllWastes
+    participant View as «object»<br/>Objeto UI<br/>src/public/js/pages/warehouse/wastes/wastesPage.js<br/>wastesPage.js
+    participant Application as «object»<br/>Objetos de aplicación y request<br/>src/public/js/services/warehouse/wasteService.js<br/>reutilizar getAllWastesRequest con los filtros
+    participant Transport as «controller»<br/>Frontera API y controlador<br/>src/routes/api/warehouse/wasteApiRoute.js<br/>GET /api/warehouse/wastes<br/>src/controllers/api/warehouse/wasteController.js<br/>getAllWastes
     Note over Application,Transport: Variables de frontera: params/filtros
 
     Browser->>View: La consulta es el listado de wastesPage.js, no hay página de reporte
@@ -1142,9 +1144,9 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant Browser as Navegador
-    participant View as Objeto UI<br/>src/public/js/pages/admin/movements/movementsPage.js<br/>movementsPage.js
-    participant Application as Objetos de aplicación y request<br/>src/public/js/application/admin/movements/movements.js<br/>getAllMovements con contexto wastes
-    participant Transport as Frontera API y controlador<br/>src/routes/api/admin/movementApiRoute.js<br/>GET /api/admin/movements/wastes<br/>src/controllers/api/admin/movementController.js<br/>getAllWasteMovements
+    participant View as «object»<br/>Objeto UI<br/>src/public/js/pages/admin/movements/movementsPage.js<br/>movementsPage.js
+    participant Application as «object»<br/>Objetos de aplicación y request<br/>src/public/js/application/admin/movements/movements.js<br/>getAllMovements con contexto wastes
+    participant Transport as «controller»<br/>Frontera API y controlador<br/>src/routes/api/admin/movementApiRoute.js<br/>GET /api/admin/movements/wastes<br/>src/controllers/api/admin/movementController.js<br/>getAllWasteMovements
     Note over Application,Transport: Variables de frontera: params/filtros
 
     Browser->>View: movementsPage.js selecciona el contexto merma
@@ -1161,13 +1163,13 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant Browser as Navegador
-    participant View as Objeto UI<br/>Botón Excel del listado de salidas de merma
-    participant Application as Objetos de aplicación y request<br/>src/public/js/application/warehouse/report.js<br/>exportWasteIssueReport
-    participant Transport as Frontera API y controlador<br/>src/routes/api/warehouse/reportApiRoute.js<br/>descarga /api/warehouse/reports/waste-issues/excel<br/>src/controllers/api/warehouse/reportController.js<br/>exportWasteIssueReportExcel
+    participant View as «object»<br/>Objeto UI<br/>Botón Excel del listado de salidas de merma
+    participant Application as «object»<br/>Objetos de aplicación y request<br/>src/public/js/application/warehouse/report.js<br/>exportWasteIssueReport
+    participant Transport as «controller»<br/>Frontera API y controlador<br/>src/routes/api/warehouse/reportApiRoute.js<br/>descarga /api/warehouse/reports/waste-issues/excel<br/>src/controllers/api/warehouse/reportController.js<br/>exportWasteIssueReportExcel
     Note over Application,Transport: Variables de frontera: params/filtros
 
     Browser->>View: Botón Excel del listado de salidas de merma
-    View->>Application: exportWasteIssueReport → request homólogo
+    View->>Application: exportWasteIssueReport({ params }) → exportWasteIssueReportRequest({ params })
     Application->>Transport: descarga /api/warehouse/reports/waste-issues/excel
     Transport-->>Application: devolver respuesta normalizada
     Application-->>View: presentar resultado observable
@@ -1180,13 +1182,13 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant Browser as Navegador
-    participant View as Objeto UI<br/>src/public/js/plugins/datatable/warehouse/wastes/wasteDatatable.js<br/>wasteDatatable.js
-    participant Application as Objetos de aplicación y request<br/>src/public/js/application/warehouse/report.js<br/>exportWasteReport
-    participant Transport as Frontera API y controlador<br/>src/routes/api/warehouse/reportApiRoute.js<br/>descarga /api/warehouse/reports/wastes/excel<br/>src/controllers/api/warehouse/reportController.js<br/>exportWasteReportExcel
+    participant View as «object»<br/>Objeto UI<br/>src/public/js/plugins/datatable/warehouse/wastes/wasteDatatable.js<br/>wasteDatatable.js
+    participant Application as «object»<br/>Objetos de aplicación y request<br/>src/public/js/application/warehouse/report.js<br/>exportWasteReport
+    participant Transport as «controller»<br/>Frontera API y controlador<br/>src/routes/api/warehouse/reportApiRoute.js<br/>descarga /api/warehouse/reports/wastes/excel<br/>src/controllers/api/warehouse/reportController.js<br/>exportWasteReportExcel
     Note over Application,Transport: Variables de frontera: params/filtros
 
     Browser->>View: Botón Excel de wasteDatatable.js
-    View->>Application: exportWasteReport → request homólogo
+    View->>Application: exportWasteReport({ params }) → exportWasteReportRequest({ params })
     Application->>Transport: descarga /api/warehouse/reports/wastes/excel
     Transport-->>Application: devolver respuesta normalizada
     Application-->>View: presentar resultado observable
@@ -1199,13 +1201,13 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant Browser as Navegador
-    participant View as Objeto UI<br/>Botón Excel de movimientos en contexto merma
-    participant Application as Objetos de aplicación y request<br/>src/public/js/application/admin/report.js<br/>exportMovementReport → request con wastes
-    participant Transport as Frontera API y controlador<br/>src/routes/api/admin/reportApiRoute.js<br/>descarga /api/admin/reports/movements/wastes/excel<br/>src/controllers/api/admin/reportController.js<br/>exportWasteMovementReport
+    participant View as «object»<br/>Objeto UI<br/>Botón Excel de movimientos en contexto merma
+    participant Application as «object»<br/>Objetos de aplicación y request<br/>src/public/js/application/admin/report.js<br/>exportMovementReport → request con wastes
+    participant Transport as «controller»<br/>Frontera API y controlador<br/>src/routes/api/admin/reportApiRoute.js<br/>descarga /api/admin/reports/movements/wastes/excel<br/>src/controllers/api/admin/reportController.js<br/>exportWasteMovementReport
     Note over Application,Transport: Variables de frontera: params/filtros
 
     Browser->>View: Botón Excel de movimientos en contexto merma
-    View->>Application: exportMovementReport → request con wastes
+    View->>Application: exportMovementReport({ params, type: wastes }) → exportMovementReportRequest({ params, type: wastes })
     Application->>Transport: descarga /api/admin/reports/movements/wastes/excel
     Transport-->>Application: devolver respuesta normalizada
     Application-->>View: presentar resultado observable
@@ -1218,13 +1220,13 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant Browser as Navegador
-    participant View as Objeto UI<br/>src/public/js/plugins/datatable/warehouse/goodsReceipts/goodsReceiptDatatable.js<br/>goodsReceiptDatatable.js
-    participant Application as Objetos de aplicación y request<br/>src/public/js/application/warehouse/report.js<br/>exportGoodsReceiptReport
-    participant Transport as Frontera API y controlador<br/>src/routes/api/warehouse/reportApiRoute.js<br/>descarga /api/warehouse/reports/goods-receipts/excel<br/>src/controllers/api/warehouse/reportController.js<br/>exportGoodsReceiptReportExcel
+    participant View as «object»<br/>Objeto UI<br/>src/public/js/plugins/datatable/warehouse/goodsReceipts/goodsReceiptDatatable.js<br/>goodsReceiptDatatable.js
+    participant Application as «object»<br/>Objetos de aplicación y request<br/>src/public/js/application/warehouse/report.js<br/>exportGoodsReceiptReport
+    participant Transport as «controller»<br/>Frontera API y controlador<br/>src/routes/api/warehouse/reportApiRoute.js<br/>descarga /api/warehouse/reports/goods-receipts/excel<br/>src/controllers/api/warehouse/reportController.js<br/>exportGoodsReceiptReportExcel
     Note over Application,Transport: Variables de frontera: params/filtros
 
     Browser->>View: Botón Excel de goodsReceiptDatatable.js
-    View->>Application: exportGoodsReceiptReport → request homólogo
+    View->>Application: exportGoodsReceiptReport({ params }) → exportGoodsReceiptReportRequest({ params })
     Application->>Transport: descarga /api/warehouse/reports/goods-receipts/excel
     Transport-->>Application: devolver respuesta normalizada
     Application-->>View: presentar resultado observable
@@ -1237,13 +1239,13 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant Browser as Navegador
-    participant View as Objeto UI<br/>src/public/js/plugins/datatable/warehouse/suppliers/supplierDatatable.js<br/>supplierDatatable.js
-    participant Application as Objetos de aplicación y request<br/>src/public/js/application/warehouse/report.js<br/>exportSupplierReport
-    participant Transport as Frontera API y controlador<br/>src/routes/api/warehouse/reportApiRoute.js<br/>descarga /api/warehouse/reports/suppliers/excel<br/>src/controllers/api/warehouse/reportController.js<br/>exportSupplierReportExcel
+    participant View as «object»<br/>Objeto UI<br/>src/public/js/plugins/datatable/warehouse/suppliers/supplierDatatable.js<br/>supplierDatatable.js
+    participant Application as «object»<br/>Objetos de aplicación y request<br/>src/public/js/application/warehouse/report.js<br/>exportSupplierReport
+    participant Transport as «controller»<br/>Frontera API y controlador<br/>src/routes/api/warehouse/reportApiRoute.js<br/>descarga /api/warehouse/reports/suppliers/excel<br/>src/controllers/api/warehouse/reportController.js<br/>exportSupplierReportExcel
     Note over Application,Transport: Variables de frontera: params/filtros
 
     Browser->>View: Botón Excel de supplierDatatable.js
-    View->>Application: exportSupplierReport → request homólogo
+    View->>Application: exportSupplierReport({ params }) → exportSupplierReportRequest({ params })
     Application->>Transport: descarga /api/warehouse/reports/suppliers/excel
     Transport-->>Application: devolver respuesta normalizada
     Application-->>View: presentar resultado observable
@@ -1256,13 +1258,13 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant Browser as Navegador
-    participant View as Objeto UI<br/>src/public/js/plugins/datatable/sales/clients/clientDatatable.js<br/>clientDatatable.js
-    participant Application as Objetos de aplicación y request<br/>src/public/js/application/sales/report.js<br/>exportClientReport
-    participant Transport as Frontera API y controlador<br/>src/routes/api/sales/reportApiRoute.js<br/>descarga /api/sales/reports/clients/excel<br/>src/controllers/api/sales/reportController.js<br/>exportClientReport
+    participant View as «object»<br/>Objeto UI<br/>src/public/js/plugins/datatable/sales/clients/clientDatatable.js<br/>clientDatatable.js
+    participant Application as «object»<br/>Objetos de aplicación y request<br/>src/public/js/application/sales/report.js<br/>exportClientReport
+    participant Transport as «controller»<br/>Frontera API y controlador<br/>src/routes/api/sales/reportApiRoute.js<br/>descarga /api/sales/reports/clients/excel<br/>src/controllers/api/sales/reportController.js<br/>exportClientReport
     Note over Application,Transport: Variables de frontera: params/filtros
 
     Browser->>View: Botón Excel de clientDatatable.js
-    View->>Application: exportClientReport → request homólogo
+    View->>Application: exportClientReport({ params }) → exportClientReportRequest({ params })
     Application->>Transport: descarga /api/sales/reports/clients/excel
     Transport-->>Application: devolver respuesta normalizada
     Application-->>View: presentar resultado observable
@@ -1275,13 +1277,13 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant Browser as Navegador
-    participant View as Objeto UI<br/>src/public/js/plugins/datatable/admin/persons/personDatatable.js<br/>personDatatable.js
-    participant Application as Objetos de aplicación y request<br/>src/public/js/application/admin/report.js<br/>exportPersonReport
-    participant Transport as Frontera API y controlador<br/>descarga /api/admin/reports/persons/excel<br/>src/controllers/api/admin/reportController.js<br/>exportPersonReport
+    participant View as «object»<br/>Objeto UI<br/>src/public/js/plugins/datatable/admin/persons/personDatatable.js<br/>personDatatable.js
+    participant Application as «object»<br/>Objetos de aplicación y request<br/>src/public/js/application/admin/report.js<br/>exportPersonReport
+    participant Transport as «controller»<br/>Frontera API y controlador<br/>descarga /api/admin/reports/persons/excel<br/>src/controllers/api/admin/reportController.js<br/>exportPersonReport
     Note over Application,Transport: Variables de frontera: params/filtros
 
     Browser->>View: Botón Excel de personDatatable.js
-    View->>Application: exportPersonReport → request homólogo
+    View->>Application: exportPersonReport({ params }) → exportPersonReportRequest({ params })
     Application->>Transport: descarga /api/admin/reports/persons/excel
     Transport-->>Application: devolver respuesta normalizada
     Application-->>View: presentar resultado observable
@@ -1294,13 +1296,13 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant Browser as Navegador
-    participant View as Objeto UI<br/>src/public/js/plugins/datatable/admin/users/userDatatable.js<br/>userDatatable.js
-    participant Application as Objetos de aplicación y request<br/>src/public/js/application/admin/report.js<br/>exportUserReport
-    participant Transport as Frontera API y controlador<br/>src/routes/api/admin/reportApiRoute.js<br/>descarga /api/admin/reports/users/excel<br/>src/controllers/api/admin/reportController.js<br/>exportUserReport
+    participant View as «object»<br/>Objeto UI<br/>src/public/js/plugins/datatable/admin/users/userDatatable.js<br/>userDatatable.js
+    participant Application as «object»<br/>Objetos de aplicación y request<br/>src/public/js/application/admin/report.js<br/>exportUserReport
+    participant Transport as «controller»<br/>Frontera API y controlador<br/>src/routes/api/admin/reportApiRoute.js<br/>descarga /api/admin/reports/users/excel<br/>src/controllers/api/admin/reportController.js<br/>exportUserReport
     Note over Application,Transport: Variables de frontera: params/filtros
 
     Browser->>View: Botón Excel de userDatatable.js
-    View->>Application: exportUserReport → request homólogo
+    View->>Application: exportUserReport({ params }) → exportUserReportRequest({ params })
     Application->>Transport: descarga /api/admin/reports/users/excel
     Transport-->>Application: devolver respuesta normalizada
     Application-->>View: presentar resultado observable
