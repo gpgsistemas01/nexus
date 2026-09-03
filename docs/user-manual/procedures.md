@@ -10,6 +10,11 @@ la trazabilidad. Antes de exportar, ejecute `npm run docs:screenshots` y revise 
 - **Alternativas y errores:** si una acción no aparece, no cambie de cuenta; valide permisos y
   estado del registro. Si una validación impide continuar, corrija el dato señalado sin repetir
   una operación cuyo resultado sea incierto.
+- **Capturas:** consulte cada imagen inmediatamente después de que aparezca la pantalla que
+  representa y antes de capturar datos o ejecutar la siguiente acción. En listados y páginas
+  iniciales, la referencia es el primer paso; en formularios y diálogos, sigue a la acción que
+  los abre. La captura no se coloca después de guardar, descargar o regresar porque no muestra
+  el resultado de esas acciones.
 - **Resultado:** confirme el mensaje y el estado visible. Las acciones de existencia, surtido,
   devolución y corrección modifican inventario; las de exportación generan un archivo.
 
