@@ -11,7 +11,7 @@ cada `CU-*` dentro del rango identifica un diagrama individual.
 El **tipo semántico** prevalece sobre la directiva Mermaid. Un `flowchart` puede
 representar contexto, actividad, dependencia, navegación o trazabilidad; no se etiqueta
 como “diagrama de flujo” genérico si las flechas tienen otra semántica. El inventario
-registra **397 diagramas vigentes**: 392 curados y 5 generados.
+registra **271 diagramas vigentes**: 266 curados y 5 generados.
 
 ## Catálogo por familia y tipo
 
@@ -31,8 +31,6 @@ registra **397 diagramas vigentes**: 392 curados y 5 generados.
 | `DIA-FE-ACT-001` | Actividad de alta de merma desde plantilla | Frontend, “Alta de merma…” | 1 | Dependencias y validación del navegador; curado. |
 | `DIA-FE-CU-AUT-01..REP-15` | Aplicación frontend individual de cada caso | `frontend-use-case-diagrams.md` | 63 | Página/interacción, aplicación, request y resultado concretos; curado desde la matriz frontend. |
 | `DIA-BE-CU-AUT-01..REP-15` | Aplicación backend individual de cada caso | `backend-use-case-diagrams.md` | 63 | Ruta/controller, servicio, persistencia o efecto concretos; curado desde la matriz backend. |
-| `DIA-FE-TEC-CU-AUT-01..REP-15` | Contexto técnico frontend por caso | Frontend, “Vistas técnicas aplicadas por flujo” | 63 | Interacción, módulos del navegador y transporte concreto; curado desde la matriz frontend. |
-| `DIA-BE-TEC-CU-AUT-01..REP-15` | Contexto técnico backend por caso | Backend, “Vistas técnicas aplicadas” | 63 | Frontera web/HTTP, controller y aplicación o dominio concreto; curado desde la matriz backend. |
 | `DIA-BE-TEC-EST-CU-ENT-04`, `DIA-FE-TEC-EST-CU-IDA-07`, `DIA-FE-TEC-EST-CU-CAT-05` | Estados técnicos complementarios | Secciones técnicas del caso correspondiente | 3 | Transacción backend y modos de formulario frontend; no duplican estados normativos. |
 | `DIA-COD-ORG-001`, `DIA-COD-EST-001..002`, `DIA-COD-DIN-001`, `DIA-COD-REU-001` | Organización, estructura, dinámica y reutilización | `code-diagrams.md`, secciones 1 a 5 | 5 | Código e imports; curado. |
 | `DIA-PAT-DAT-001`, `DIA-PAT-RES-001` | Contrato de detalle y resumen de patrones | `design-and-construction-patterns.md` y `diagram-conventions.md` | 2 | Patrones confirmados; curado. |

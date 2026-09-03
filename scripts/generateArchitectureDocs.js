@@ -89,36 +89,27 @@ const validateUseCaseDiagramCoverage = async () => {
             if ((body.match(/^```mermaid$/gm) ?? []).length !== 1) {
                 failures.push(`diagramas ${side}: ${id} debe contener exactamente un bloque Mermaid`);
             }
+            if (!body.includes('**Patrones:**')) {
+                failures.push(`diagramas ${side}: ${id} no referencia sus patrones aplicados`);
+            }
+            if ((body.match(/^sequenceDiagram$/gm) ?? []).length !== 1) {
+                failures.push(`diagramas ${side}: ${id} debe contener exactamente una secuencia de código`);
+            }
+            if (!body.includes('Variables de frontera:')) {
+                failures.push(`diagramas ${side}: ${id} no identifica sus variables de frontera`);
+            }
         }
     }
 
     for (const side of ['backend', 'frontend']) {
         const source = sources.get(`${side}Matrix`);
-        const prefix = side === 'backend' ? 'BE' : 'FE';
-        const technicalSection = source.match(
-            /### Recorridos técnicos con contexto de código para todos los casos\n([\s\S]*?)\n## Lista de revisión/
-        )?.[1] ?? '';
-        const sections = [...technicalSection.matchAll(/^#### `(CU-[A-Z]+-\d+)`\n([\s\S]*?)(?=^#### `CU-|(?![\s\S]))/gm)];
-        validateIds(`vistas técnicas ${side}`, sections.map((match) => match[1]));
-        for (const [, id, body] of sections) {
-            if (!body.includes(`**Identificador:** \`DIA-${prefix}-TEC-${id}\``)) {
-                failures.push(`vistas técnicas ${side}: ${id} no conserva su identificador técnico contextual`);
-            }
-            if (!body.includes('**Patrones:**')) {
-                failures.push(`vistas técnicas ${side}: ${id} no referencia sus patrones aplicados`);
-            }
-            if ((body.match(/^sequenceDiagram$/gm) ?? []).length !== 1) {
-                failures.push(`vistas técnicas ${side}: ${id} debe contener exactamente una secuencia de código`);
-            }
-        }
-
         const contextualIds = [...source.matchAll(/\*\*Caso:\*\* `(CU-[A-Z]+-\d+)`/g)]
             .map((match) => match[1]);
         const expectedOrder = new Map(expectedIds.map((id, index) => [id, index]));
         if (contextualIds.some((id, index) => (
             index > 0 && expectedOrder.get(id) < expectedOrder.get(contextualIds[index - 1])
         ))) {
-            failures.push(`vistas técnicas ${side}: los diagramas no siguen el orden del catálogo de casos de uso`);
+            failures.push(`vistas dinámicas ${side}: los diagramas no siguen el orden del catálogo de casos de uso`);
         }
     }
 
