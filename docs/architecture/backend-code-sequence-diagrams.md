@@ -7,12 +7,24 @@ servicios, efectos y variables de frontera. Para comprender el objetivo con leng
 negocio se consulta primero el [modelo y los diagramas funcionales de casos de uso](../requirements/domain-and-use-cases.md#casos-de-uso-vigentes).
 
 La [matriz técnica de backend](backend-technical-documentation.md#aplicación-de-todos-los-casos-al-código-backend)
-localiza la evidencia concreta. Los participantes identifican ruta de archivo y símbolo,
+es el índice único de trazabilidad: relaciona caso, entrada HTTP, implementación y
+diagrama. Esta colección no vuelve a copiar esa relación en cada sección. Los
+participantes identifican ruta de archivo y símbolo,
 los mensajes conservan las llamadas en orden y las notas nombran datos que cruzan la
 frontera (`req.params`, `req.body`/DTO, parámetros de consulta y `tx`). Las variables
 locales mecánicas permanecen en el código para no convertir el diagrama en una
 transcripción ilegible. Cada caso mantiene una secuencia específica aunque reutilice un
 patrón, porque cambian módulos, firmas, rutas, datos o efectos.
+
+### Regla de identificación y lectura
+
+El encabezado `CU-<grupo>-<número>` enlaza directamente la ficha funcional del mismo
+identificador. El diagrama de esa sección se identifica de forma determinista como
+`DIA-BE-CU-<grupo>-<número>`; por ejemplo, la sección `CU-ENT-02` contiene
+`DIA-BE-CU-ENT-02`. La matriz técnica mantiene el enlace navegable y la evidencia de
+código. Aquí se conserva solamente la información propia de la vista: patrones,
+participantes, llamadas, datos de frontera, decisiones y efectos. El objetivo, actor y
+flujo de negocio no se repiten porque pertenecen a la ficha del caso de uso.
 
 ## Índice rápido de patrones por caso
 
@@ -50,28 +62,41 @@ aparece una vez, conserva su referencia de patrones y contiene un bloque Mermaid
 
 ## `CU-AUT-01`
 
-**Identificador:** `DIA-BE-CU-AUT-01`. **Fuente:** fila `CU-AUT-01` de la matriz de aplicación al código backend.
-
 **Patrones:** `BE-P01`, `BE-P08`.
 
 ```mermaid
 sequenceDiagram
-    participant Client as Cliente HTTP / web
-    participant Route as src/routes/api/authApiRoute.js<br/>POST /api/auth/login
+    Note over Router,Controller: Variables de frontera: name, password y cookies
+    participant Browser as Navegador
+    participant Router as src/routes/api/authApiRoute.js<br/>POST /api/auth/login
     participant Controller as src/controllers/api/authController.js<br/>authController.login
-    participant Domain as src/services/authService.js + src/services/admin/userService.js<br/>authService.loginUser / userService.getUserIdByLogin
-    Note over Controller,Domain: Variables de frontera: req.body/DTO
+    participant Service as authService
+    participant User as userService / getUserIdByLogin
+    participant Prisma as Prisma / PostgreSQL
+    participant Token as jwtService / cookies
 
-    Client->>Route: POST /api/auth/login
-    Route->>Controller: invocar authController.login
-    Controller->>Domain: authService.loginUser, userService.getUserIdByLogin, JWT y cookies
-    Domain-->>Controller: devolver resultado o error del caso
-    Controller-->>Client: emitir respuesta observable
+    Browser->>Router: POST /api/auth/login { name, password }
+    Router->>Router: validar tipo y campos
+    Router->>Controller: petición validada
+    Controller->>Service: loginUser({ name, password })
+    Service->>User: getUserIdByLogin(name, password)
+    User->>Prisma: buscar cuenta, persona y un acceso
+    Prisma-->>User: usuario o ausencia
+    User->>User: comprobar actividad, acceso y contraseña cifrada
+    User-->>Service: userId o null
+    alt Credenciales inválidas o cuenta inactiva
+        Service-->>Controller: error de autenticación
+        Controller-->>Browser: respuesta de error sin sesión
+    else Credenciales válidas
+        Service->>Token: generar access token y refresh token con userId
+        Token-->>Service: credenciales firmadas
+        Service-->>Controller: access token y refresh token
+        Controller->>Token: establecer cookies de autenticación
+        Controller-->>Browser: éxito y cookies protegidas
+    end
 ```
 
 ## `CU-AUT-02`
-
-**Identificador:** `DIA-BE-CU-AUT-02`. **Fuente:** fila `CU-AUT-02` de la matriz de aplicación al código backend.
 
 **Patrones:** `BE-P08`.
 
@@ -92,8 +117,6 @@ sequenceDiagram
 
 ## `CU-IDA-01`
 
-**Identificador:** `DIA-BE-CU-IDA-01`. **Fuente:** fila `CU-IDA-01` de la matriz de aplicación al código backend.
-
 **Patrones:** `BE-P01`.
 
 ```mermaid
@@ -112,8 +135,6 @@ sequenceDiagram
 ```
 
 ## `CU-IDA-02`
-
-**Identificador:** `DIA-BE-CU-IDA-02`. **Fuente:** fila `CU-IDA-02` de la matriz de aplicación al código backend.
 
 **Patrones:** `BE-P01`, `BE-P03`, `BE-P04`.
 
@@ -134,8 +155,6 @@ sequenceDiagram
 
 ## `CU-IDA-03`
 
-**Identificador:** `DIA-BE-CU-IDA-03`. **Fuente:** fila `CU-IDA-03` de la matriz de aplicación al código backend.
-
 **Patrones:** `BE-P01`, `BE-P03`, `BE-P04`.
 
 ```mermaid
@@ -154,8 +173,6 @@ sequenceDiagram
 ```
 
 ## `CU-IDA-04`
-
-**Identificador:** `DIA-BE-CU-IDA-04`. **Fuente:** fila `CU-IDA-04` de la matriz de aplicación al código backend.
 
 **Patrones:** `BE-P01`.
 
@@ -176,8 +193,6 @@ sequenceDiagram
 
 ## `CU-IDA-05`
 
-**Identificador:** `DIA-BE-CU-IDA-05`. **Fuente:** fila `CU-IDA-05` de la matriz de aplicación al código backend.
-
 **Patrones:** `BE-P01`, `BE-P03`, `BE-P04`.
 
 ```mermaid
@@ -196,8 +211,6 @@ sequenceDiagram
 ```
 
 ## `CU-IDA-06`
-
-**Identificador:** `DIA-BE-CU-IDA-06`. **Fuente:** fila `CU-IDA-06` de la matriz de aplicación al código backend.
 
 **Patrones:** `BE-P01`, `BE-P03`, `BE-P04`.
 
@@ -218,8 +231,6 @@ sequenceDiagram
 
 ## `CU-IDA-07`
 
-**Identificador:** `DIA-BE-CU-IDA-07`. **Fuente:** fila `CU-IDA-07` de la matriz de aplicación al código backend.
-
 **Patrones:** `BE-P01`.
 
 ```mermaid
@@ -238,8 +249,6 @@ sequenceDiagram
 ```
 
 ## `CU-IDA-08`
-
-**Identificador:** `DIA-BE-CU-IDA-08`. **Fuente:** fila `CU-IDA-08` de la matriz de aplicación al código backend.
 
 **Patrones:** `BE-P02`.
 
@@ -260,8 +269,6 @@ sequenceDiagram
 
 ## `CU-IDA-09`
 
-**Identificador:** `DIA-BE-CU-IDA-09`. **Fuente:** fila `CU-IDA-09` de la matriz de aplicación al código backend.
-
 **Patrones:** `BE-P02`.
 
 ```mermaid
@@ -280,8 +287,6 @@ sequenceDiagram
 ```
 
 ## `CU-CAT-01`
-
-**Identificador:** `DIA-BE-CU-CAT-01`. **Fuente:** fila `CU-CAT-01` de la matriz de aplicación al código backend.
 
 **Patrones:** `BE-P01`.
 
@@ -302,8 +307,6 @@ sequenceDiagram
 
 ## `CU-CAT-02`
 
-**Identificador:** `DIA-BE-CU-CAT-02`. **Fuente:** fila `CU-CAT-02` de la matriz de aplicación al código backend.
-
 **Patrones:** `BE-P01`, `BE-P03`, `BE-P04`.
 
 ```mermaid
@@ -322,8 +325,6 @@ sequenceDiagram
 ```
 
 ## `CU-CAT-03`
-
-**Identificador:** `DIA-BE-CU-CAT-03`. **Fuente:** fila `CU-CAT-03` de la matriz de aplicación al código backend.
 
 **Patrones:** `BE-P01`, `BE-P03`, `BE-P04`.
 
@@ -344,8 +345,6 @@ sequenceDiagram
 
 ## `CU-CAT-04`
 
-**Identificador:** `DIA-BE-CU-CAT-04`. **Fuente:** fila `CU-CAT-04` de la matriz de aplicación al código backend.
-
 **Patrones:** `BE-P01`, `BE-P03`, `BE-P04`.
 
 ```mermaid
@@ -365,28 +364,39 @@ sequenceDiagram
 
 ## `CU-CAT-05`
 
-**Identificador:** `DIA-BE-CU-CAT-05`. **Fuente:** fila `CU-CAT-05` de la matriz de aplicación al código backend.
-
 **Patrones:** `BE-P01`, `BE-P03`, `BE-P04`, `BE-P05`.
 
 ```mermaid
 sequenceDiagram
-    participant Client as Cliente HTTP / web
-    participant Route as src/routes/api/warehouse/materialApiRoute.js<br/>PATCH /api/warehouse/materials/:id/stock
+    Note over Router,Controller: Variables de frontera: id, DTO de ajuste y userId
+    participant Router as src/routes/api/warehouse/materialApiRoute.js<br/>PATCH /api/warehouse/materials/:id/stock
     participant Controller as src/controllers/api/warehouse/materialController.js<br/>editMaterialStock
-    participant Domain as src/services/warehouse/materials/materialService.js<br/>materialService.updateMaterialStock
-    Note over Controller,Domain: Variables de frontera: req.params.id, req.body/DTO, tx
+    participant Service as updateMaterialStock
+    participant Adjustment as createStockAdjustment
+    participant Reference as generateYearlyReferenceNumber
+    participant Stock as stockHelpers
+    participant Movement as createInventoryMovement
+    participant SupplierMaterial as adjustSupplierMaterialStock
+    participant Prisma as Prisma / PostgreSQL
+    participant Socket as emitInventoryUpdated
 
-    Client->>Route: PATCH /api/warehouse/materials/:id/stock
-    Route->>Controller: invocar editMaterialStock
-    Controller->>Domain: materialService.updateMaterialStock usa adjustmentService y movimiento
-    Domain-->>Controller: devolver resultado o error del caso
-    Controller-->>Client: emitir respuesta observable
+    Router->>Controller: autenticar, autorizar e invocar controller
+    Controller->>Service: { id, materialDto, userId }
+    Service->>Adjustment: material, proveedor, motivo y nueva existencia
+    Adjustment->>Prisma: iniciar $transaction
+    Adjustment->>SupplierMaterial: localizar relación con tx
+    Adjustment->>Reference: generar referencia anual con tx
+    Adjustment->>Stock: calcular diferencias y validar existencia
+    Adjustment->>Prisma: crear StockAdjustment y detalle
+    Adjustment->>Movement: crear movimiento ADJUSTMENT con tx
+    Adjustment->>SupplierMaterial: actualizar stock y cantidad convertida con tx
+    Prisma-->>Adjustment: relación actualizada y commit
+    Adjustment-->>Service: supplierMaterial actualizado
+    Service-->>Controller: material
+    Controller->>Socket: publicar después del commit
 ```
 
 ## `CU-CAT-06`
-
-**Identificador:** `DIA-BE-CU-CAT-06`. **Fuente:** fila `CU-CAT-06` de la matriz de aplicación al código backend.
 
 **Patrones:** `BE-P01`.
 
@@ -407,8 +417,6 @@ sequenceDiagram
 
 ## `CU-CAT-07`
 
-**Identificador:** `DIA-BE-CU-CAT-07`. **Fuente:** fila `CU-CAT-07` de la matriz de aplicación al código backend.
-
 **Patrones:** `BE-P01`.
 
 ```mermaid
@@ -427,8 +435,6 @@ sequenceDiagram
 ```
 
 ## `CU-CAT-08`
-
-**Identificador:** `DIA-BE-CU-CAT-08`. **Fuente:** fila `CU-CAT-08` de la matriz de aplicación al código backend.
 
 **Patrones:** `BE-P01`.
 
@@ -449,8 +455,6 @@ sequenceDiagram
 
 ## `CU-CAT-09`
 
-**Identificador:** `DIA-BE-CU-CAT-09`. **Fuente:** fila `CU-CAT-09` de la matriz de aplicación al código backend.
-
 **Patrones:** `BE-P01`.
 
 ```mermaid
@@ -469,8 +473,6 @@ sequenceDiagram
 ```
 
 ## `CU-CAT-10`
-
-**Identificador:** `DIA-BE-CU-CAT-10`. **Fuente:** fila `CU-CAT-10` de la matriz de aplicación al código backend.
 
 **Patrones:** `BE-P01`.
 
@@ -491,8 +493,6 @@ sequenceDiagram
 
 ## `CU-CAT-11`
 
-**Identificador:** `DIA-BE-CU-CAT-11`. **Fuente:** fila `CU-CAT-11` de la matriz de aplicación al código backend.
-
 **Patrones:** `BE-P01`.
 
 ```mermaid
@@ -511,8 +511,6 @@ sequenceDiagram
 ```
 
 ## `CU-CAT-12`
-
-**Identificador:** `DIA-BE-CU-CAT-12`. **Fuente:** fila `CU-CAT-12` de la matriz de aplicación al código backend.
 
 **Patrones:** `BE-P01`.
 
@@ -533,8 +531,6 @@ sequenceDiagram
 
 ## `CU-CAT-13`
 
-**Identificador:** `DIA-BE-CU-CAT-13`. **Fuente:** fila `CU-CAT-13` de la matriz de aplicación al código backend.
-
 **Patrones:** `BE-P01`.
 
 ```mermaid
@@ -553,8 +549,6 @@ sequenceDiagram
 ```
 
 ## `CU-CAT-14`
-
-**Identificador:** `DIA-BE-CU-CAT-14`. **Fuente:** fila `CU-CAT-14` de la matriz de aplicación al código backend.
 
 **Patrones:** `BE-P01`, `BE-P03`, `BE-P04`, `BE-P05`.
 
@@ -575,8 +569,6 @@ sequenceDiagram
 
 ## `CU-CAT-15`
 
-**Identificador:** `DIA-BE-CU-CAT-15`. **Fuente:** fila `CU-CAT-15` de la matriz de aplicación al código backend.
-
 **Patrones:** `BE-P01`.
 
 ```mermaid
@@ -596,28 +588,37 @@ sequenceDiagram
 
 ## `CU-CAT-16`
 
-**Identificador:** `DIA-BE-CU-CAT-16`. **Fuente:** fila `CU-CAT-16` de la matriz de aplicación al código backend.
-
 **Patrones:** `BE-P01`, `BE-P03`, `BE-P04`, `BE-P05`.
 
 ```mermaid
 sequenceDiagram
-    participant Client as Cliente HTTP / web
-    participant Route as src/routes/api/warehouse/wasteApiRoute.js<br/>PATCH /api/warehouse/wastes/:id/stock
+    Note over Router,Controller: Variables de frontera: id, DTO de ajuste y userId
+    participant Router as src/routes/api/warehouse/wasteApiRoute.js<br/>PATCH /api/warehouse/wastes/:id/stock
     participant Controller as src/controllers/api/warehouse/wasteController.js<br/>editWasteStock
-    participant Domain as src/services/warehouse/wastes/wasteService.js + src/services/warehouse/wastes/wasteStockAdjustmentService.js<br/>wasteService.updateWasteStock / registerWasteStockAdjustment
-    Note over Controller,Domain: Variables de frontera: req.params.id, req.body/DTO, tx
+    participant Service as updateWasteStock
+    participant Adjustment as registerWasteStockAdjustment
+    participant Reference as generateYearlyReferenceNumber
+    participant Stock as stockHelpers
+    participant Movement as createWasteMovement
+    participant Prisma as Prisma / PostgreSQL
+    participant Socket as emitInventoryUpdated
 
-    Client->>Route: PATCH /api/warehouse/wastes/:id/stock
-    Route->>Controller: invocar editWasteStock
-    Controller->>Domain: wasteService.updateWasteStock y registerWasteStockAdjustment aplican ajuste/movimiento
-    Domain-->>Controller: devolver resultado o error del caso
-    Controller-->>Client: emitir respuesta observable
+    Router->>Controller: autenticar, autorizar e invocar controller
+    Controller->>Service: { id, wasteStockDto, userId }
+    Service->>Prisma: iniciar $transaction
+    Service->>Prisma: cargar Waste vigente
+    Service->>Adjustment: merma, motivo y nueva existencia con tx
+    Adjustment->>Stock: calcular diferencias y validar existencia
+    Adjustment->>Reference: generar referencia anual con tx
+    Adjustment->>Prisma: crear WasteStockAdjustment y detalle
+    Adjustment->>Movement: crear WasteMovement ADJUSTMENT con tx
+    Adjustment->>Prisma: enlazar movimiento y actualizar Waste
+    Prisma-->>Service: merma actualizada y commit
+    Service-->>Controller: waste
+    Controller->>Socket: publicar después del commit
 ```
 
 ## `CU-CAT-17`
-
-**Identificador:** `DIA-BE-CU-CAT-17`. **Fuente:** fila `CU-CAT-17` de la matriz de aplicación al código backend.
 
 **Patrones:** `BE-P02`.
 
@@ -638,8 +639,6 @@ sequenceDiagram
 
 ## `CU-CAT-18`
 
-**Identificador:** `DIA-BE-CU-CAT-18`. **Fuente:** fila `CU-CAT-18` de la matriz de aplicación al código backend.
-
 **Patrones:** `BE-P02`.
 
 ```mermaid
@@ -658,8 +657,6 @@ sequenceDiagram
 ```
 
 ## `CU-CAT-19`
-
-**Identificador:** `DIA-BE-CU-CAT-19`. **Fuente:** fila `CU-CAT-19` de la matriz de aplicación al código backend.
 
 **Patrones:** `BE-P02`.
 
@@ -680,8 +677,6 @@ sequenceDiagram
 
 ## `CU-CAT-20`
 
-**Identificador:** `DIA-BE-CU-CAT-20`. **Fuente:** fila `CU-CAT-20` de la matriz de aplicación al código backend.
-
 **Patrones:** `BE-P02`.
 
 ```mermaid
@@ -700,8 +695,6 @@ sequenceDiagram
 ```
 
 ## `CU-ENT-01`
-
-**Identificador:** `DIA-BE-CU-ENT-01`. **Fuente:** fila `CU-ENT-01` de la matriz de aplicación al código backend.
 
 **Patrones:** `BE-P01`.
 
@@ -722,28 +715,42 @@ sequenceDiagram
 
 ## `CU-ENT-02`
 
-**Identificador:** `DIA-BE-CU-ENT-02`. **Fuente:** fila `CU-ENT-02` de la matriz de aplicación al código backend.
-
 **Patrones:** `BE-P01`, `BE-P03`, `BE-P04`, `BE-P05`.
 
 ```mermaid
 sequenceDiagram
-    participant Client as Cliente HTTP / web
-    participant Route as src/routes/api/warehouse/goodsReceiptApiRoute.js<br/>POST /api/warehouse/goods-receipts
+    Note over Router,Controller: Variables de frontera: goodsReceiptDto y tx
+    participant Browser as Navegador
+    participant Router as src/routes/api/warehouse/goodsReceiptApiRoute.js<br/>POST /api/warehouse/goods-receipts
     participant Controller as src/controllers/api/warehouse/goodsReceiptController.js<br/>registerGoodsReceipt
-    participant Domain as src/services/warehouse/goodsReceipts/goodsReceiptService.js<br/>goodsReceiptService.createGoodsReceipt
-    Note over Controller,Domain: Variables de frontera: req.body/DTO, tx
+    participant DTO as createGoodsReceiptDtoForRegister
+    participant Service as createGoodsReceipt
+    participant Reference as referenceNumberService
+    participant DetailBuilder as buildGoodsReceiptDetails
+    participant Inventory as applyInventoryMovement
+    participant Prisma as Prisma / PostgreSQL
+    participant Socket as emitInventoryUpdated
 
-    Client->>Route: POST /api/warehouse/goods-receipts
-    Route->>Controller: invocar registerGoodsReceipt
-    Controller->>Domain: goodsReceiptService.createGoodsReceipt crea documento, detalles, existencias y movimiento en transacción
-    Domain-->>Controller: devolver resultado o error del caso
-    Controller-->>Client: emitir respuesta observable
+    Browser->>Router: POST /api/warehouse/goods-receipts
+    Router->>Router: autenticar, validar y autorizar
+    Router->>Controller: req, res
+    Controller->>DTO: req.body
+    DTO-->>Controller: goodsReceiptDto
+    Controller->>Service: { goodsReceiptDto }
+    Service->>Prisma: validar proveedor, factura y persona receptora
+    Service->>DetailBuilder: construir detalles y calcular totales
+    Service->>Prisma: iniciar $transaction
+    Service->>Reference: generar referencia anual con tx
+    Service->>Prisma: crear encabezado, detalles y totales
+    Service->>Inventory: applyInventoryMovement({ tx, ENTRY, details })
+    Inventory->>Prisma: incrementar existencias y crear movimiento
+    Prisma-->>Service: entrada confirmada y commit
+    Service-->>Controller: goodsReceipt
+    Controller->>Socket: emitInventoryUpdated(...)
+    Controller-->>Browser: 200 { goodsReceipt, code }
 ```
 
 ## `CU-ENT-03`
-
-**Identificador:** `DIA-BE-CU-ENT-03`. **Fuente:** fila `CU-ENT-03` de la matriz de aplicación al código backend.
 
 **Patrones:** `BE-P01`, `BE-P03`, `BE-P04`, `BE-P05`.
 
@@ -764,28 +771,34 @@ sequenceDiagram
 
 ## `CU-ENT-04`
 
-**Identificador:** `DIA-BE-CU-ENT-04`. **Fuente:** fila `CU-ENT-04` de la matriz de aplicación al código backend.
-
 **Patrones:** `BE-P01`, `BE-P03`, `BE-P04`, `BE-P05`.
 
 ```mermaid
 sequenceDiagram
-    participant Client as Cliente HTTP / web
-    participant Route as src/routes/api/warehouse/goodsReceiptApiRoute.js<br/>PATCH /api/warehouse/goods-receipts/:id/details/:detailId/corrections
+    Note over Router,Controller: Variables de frontera: id, detailId, correctionDto, userId y tx
+    participant Router as src/routes/api/warehouse/goodsReceiptApiRoute.js<br/>PATCH /api/warehouse/goods-receipts/:id/details/:detailId/corrections
     participant Controller as src/controllers/api/warehouse/goodsReceiptController.js<br/>correctGoodsReceiptDetail
-    participant Domain as src/services/warehouse/goodsReceipts/detailChanges/goodsReceiptCorrectionService.js<br/>correctGoodsReceiptDetailLine
-    Note over Controller,Domain: Variables de frontera: req.params.id, req.params.detailId, req.body/DTO, tx
+    participant Service as correctGoodsReceiptDetailLine
+    participant Change as goodsReceiptDetailChangeService
+    participant Reason as reasonService
+    participant Inventory as movementService
+    participant Prisma as Prisma / PostgreSQL
+    participant Socket as emitInventoryUpdated
 
-    Client->>Route: PATCH /api/warehouse/goods-receipts/:id/details/:detailId/corrections
-    Route->>Controller: invocar correctGoodsReceiptDetail
-    Controller->>Domain: correctGoodsReceiptDetailLine registra diferencia, movimiento, stock e historial atómicamente
-    Domain-->>Controller: devolver resultado o error del caso
-    Controller-->>Client: emitir respuesta observable
+    Router->>Controller: autenticar, autorizar e invocar controller
+    Controller->>Service: { id, detailId, correctionDto, userId }
+    Service->>Prisma: iniciar $transaction
+    Service->>Change: localizar detalle activo con tx
+    Service->>Reason: obtener motivo de corrección con tx
+    Service->>Change: calcular diferencia y actualizar detalle/totales
+    Change->>Inventory: crear movimiento y actualizar stock con tx
+    Service->>Change: guardar historia anterior/corregida y actor
+    Prisma-->>Service: entrada corregida y commit
+    Service-->>Controller: goodsReceipt y correction
+    Controller->>Socket: publicar después del commit
 ```
 
 ## `CU-ENT-05`
-
-**Identificador:** `DIA-BE-CU-ENT-05`. **Fuente:** fila `CU-ENT-05` de la matriz de aplicación al código backend.
 
 **Patrones:** `BE-P01`, `BE-P03`, `BE-P04`, `BE-P05`.
 
@@ -806,8 +819,6 @@ sequenceDiagram
 
 ## `CU-SAL-01`
 
-**Identificador:** `DIA-BE-CU-SAL-01`. **Fuente:** fila `CU-SAL-01` de la matriz de aplicación al código backend.
-
 **Patrones:** `BE-P01`.
 
 ```mermaid
@@ -826,8 +837,6 @@ sequenceDiagram
 ```
 
 ## `CU-SAL-02`
-
-**Identificador:** `DIA-BE-CU-SAL-02`. **Fuente:** fila `CU-SAL-02` de la matriz de aplicación al código backend.
 
 **Patrones:** `BE-P01`, `BE-P03`, `BE-P04`.
 
@@ -848,8 +857,6 @@ sequenceDiagram
 
 ## `CU-SAL-03`
 
-**Identificador:** `DIA-BE-CU-SAL-03`. **Fuente:** fila `CU-SAL-03` de la matriz de aplicación al código backend.
-
 **Patrones:** `BE-P01`, `BE-P04`.
 
 ```mermaid
@@ -868,8 +875,6 @@ sequenceDiagram
 ```
 
 ## `CU-SAL-04`
-
-**Identificador:** `DIA-BE-CU-SAL-04`. **Fuente:** fila `CU-SAL-04` de la matriz de aplicación al código backend.
 
 **Patrones:** `BE-P01`, `BE-P03`, `BE-P04`, `BE-P05`.
 
@@ -890,49 +895,80 @@ sequenceDiagram
 
 ## `CU-SAL-05`
 
-**Identificador:** `DIA-BE-CU-SAL-05`. **Fuente:** fila `CU-SAL-05` de la matriz de aplicación al código backend.
-
 **Patrones:** `BE-P01`, `BE-P03`, `BE-P04`, `BE-P05`.
 
 ```mermaid
 sequenceDiagram
-    participant Client as Cliente HTTP / web
-    participant Route as src/routes/api/warehouse/goodsIssueApiRoute.js<br/>PATCH /api/warehouse/goods-issues/:id/details
+    autonumber
+    Note over Router,Controller: Variables de frontera: id, details, goodsIssueDto, userId y tx
+    participant Browser as Navegador
+    participant Router as src/routes/api/warehouse/goodsIssueApiRoute.js<br/>PATCH /api/warehouse/goods-issues/:id/details
     participant Controller as src/controllers/api/warehouse/goodsIssueController.js<br/>editGoodsIssueDetails
-    participant Domain as src/services/warehouse/goodsIssues/goodsIssueService.js + src/services/inventory/movementService.js<br/>updateGoodsIssueDetails / applyInventoryMovement
-    Note over Controller,Domain: Variables de frontera: req.params.id, req.body/DTO, tx
+    participant DTO as createGoodsIssueDetailsDtoForEdit
+    participant Service as updateGoodsIssueDetails
+    participant Inventory as applyInventoryMovement
+    participant Prisma as Prisma / PostgreSQL
+    participant Socket as emitInventoryUpdated
 
-    Client->>Route: PATCH /api/warehouse/goods-issues/:id/details
-    Route->>Controller: invocar editGoodsIssueDetails
-    Controller->>Domain: updateGoodsIssueDetails llama applyInventoryMovement(ISSUE) y recalcula cumplimiento con tx
-    Domain-->>Controller: devolver resultado o error del caso
-    Controller-->>Client: emitir respuesta observable
+    Browser->>Router: PATCH /:id/details
+    Router->>Router: autenticar, validar y autorizar
+    Router->>Controller: req, res
+    Controller->>DTO: req.body
+    DTO-->>Controller: { details }
+    Controller->>Service: { id, goodsIssueDto }
+    Service->>Prisma: cargar salida y detalles
+    Service->>Service: validar estado y calcular pendientes
+    Service->>Prisma: iniciar $transaction
+    opt Hay detalles por surtir
+        Service->>Inventory: applyInventoryMovement({ tx, ISSUE, details })
+        Inventory->>Prisma: descontar existencias y registrar movimiento
+    end
+    Service->>Prisma: actualizar detalles y estado del encabezado
+    Prisma-->>Service: salida actualizada y commit
+    Service-->>Controller: goodsIssue
+    Controller->>Socket: emitInventoryUpdated(...)
+    Controller-->>Browser: 200 { goodsIssue, code }
 ```
 
 ## `CU-SAL-06`
 
-**Identificador:** `DIA-BE-CU-SAL-06`. **Fuente:** fila `CU-SAL-06` de la matriz de aplicación al código backend.
-
 **Patrones:** `BE-P01`, `BE-P03`, `BE-P04`, `BE-P05`.
 
 ```mermaid
 sequenceDiagram
-    participant Client as Cliente HTTP / web
-    participant Route as src/routes/api/warehouse/goodsIssueApiRoute.js<br/>PATCH /api/warehouse/goods-issues/:id/details/:detailId/returns
+    Note over Router,Controller: Variables de frontera: id, detailId, returnDto, userId y tx
+    participant Browser as Navegador
+    participant Router as src/routes/api/warehouse/goodsIssueApiRoute.js<br/>PATCH /api/warehouse/goods-issues/:id/details/:detailId/returns
     participant Controller as src/controllers/api/warehouse/goodsIssueController.js<br/>registerGoodsIssueDetailReturn
-    participant Domain as src/services/warehouse/goodsIssues/detailReturns/goodsIssueReturnService.js<br/>returnGoodsIssueDetail
-    Note over Controller,Domain: Variables de frontera: req.params.id, req.params.detailId, req.body/DTO, tx
+    participant Service as returnGoodsIssueDetail
+    participant Rules as Validaciones de returnGoodsIssueDetail
+    participant Inventory as applyInventoryMovement / ENTRY
+    participant Status as resolveIssueFulfillmentStatus
+    participant Prisma as Prisma / PostgreSQL
+    participant Socket as emitInventoryUpdated
 
-    Client->>Route: PATCH /api/warehouse/goods-issues/:id/details/:detailId/returns
-    Route->>Controller: invocar registerGoodsIssueDetailReturn
-    Controller->>Domain: returnGoodsIssueDetail crea GoodsIssueReturn, movimiento ENTRY y estados en transacción
-    Domain-->>Controller: devolver resultado o error del caso
-    Controller-->>Client: emitir respuesta observable
+    Browser->>Router: PATCH /:id/details/:detailId/returns
+    Router->>Router: autenticar, validar y autorizar
+    Router->>Controller: req, res
+    Controller->>Service: { id, detailId, returnDto, userId }
+    Service->>Prisma: iniciar $transaction
+    Service->>Prisma: cargar salida y detalle surtido
+    Service->>Rules: validar estado, cantidad surtida y devoluciones previas
+    alt Cantidad no retornable
+        Rules-->>Service: error de dominio
+        Service-->>Controller: rollback y error
+    else Cantidad válida
+        Service->>Inventory: incrementar existencia y crear movimiento inverso con tx
+        Service->>Prisma: crear GoodsIssueReturn
+        Service->>Status: recalcular detalle y encabezado con tx
+        Prisma-->>Service: salida actualizada y commit
+        Service-->>Controller: salida y devolución
+        Controller->>Socket: publicar después del commit
+        Controller-->>Browser: 200 { goodsIssueReturn, code }
+    end
 ```
 
 ## `CU-SAL-07`
-
-**Identificador:** `DIA-BE-CU-SAL-07`. **Fuente:** fila `CU-SAL-07` de la matriz de aplicación al código backend.
 
 **Patrones:** `BE-P01`.
 
@@ -953,8 +989,6 @@ sequenceDiagram
 
 ## `CU-SAL-08`
 
-**Identificador:** `DIA-BE-CU-SAL-08`. **Fuente:** fila `CU-SAL-08` de la matriz de aplicación al código backend.
-
 **Patrones:** `BE-P01`, `BE-P03`, `BE-P04`.
 
 ```mermaid
@@ -973,8 +1007,6 @@ sequenceDiagram
 ```
 
 ## `CU-SAL-09`
-
-**Identificador:** `DIA-BE-CU-SAL-09`. **Fuente:** fila `CU-SAL-09` de la matriz de aplicación al código backend.
 
 **Patrones:** `BE-P01`, `BE-P04`.
 
@@ -995,8 +1027,6 @@ sequenceDiagram
 
 ## `CU-SAL-10`
 
-**Identificador:** `DIA-BE-CU-SAL-10`. **Fuente:** fila `CU-SAL-10` de la matriz de aplicación al código backend.
-
 **Patrones:** `BE-P01`, `BE-P03`, `BE-P04`, `BE-P05`.
 
 ```mermaid
@@ -1016,49 +1046,74 @@ sequenceDiagram
 
 ## `CU-SAL-11`
 
-**Identificador:** `DIA-BE-CU-SAL-11`. **Fuente:** fila `CU-SAL-11` de la matriz de aplicación al código backend.
-
 **Patrones:** `BE-P01`, `BE-P03`, `BE-P04`, `BE-P05`.
 
 ```mermaid
 sequenceDiagram
-    participant Client as Cliente HTTP / web
-    participant Route as src/routes/api/warehouse/wasteIssueApiRoute.js<br/>PATCH /api/warehouse/waste-issues/:id/details
+    Note over Router,Controller: Variables de frontera: id, details, isSupplied y tx
+    participant Router as src/routes/api/warehouse/wasteIssueApiRoute.js<br/>PATCH /api/warehouse/waste-issues/:id/details
     participant Controller as src/controllers/api/warehouse/wasteIssueController.js<br/>editWasteIssueDetails
-    participant Domain as src/services/warehouse/wasteIssues/wasteIssueService.js + src/services/warehouse/wastes/wasteMovementService.js<br/>updateWasteIssueDetails / applyWasteIssueMovement
-    Note over Controller,Domain: Variables de frontera: req.params.id, req.body/DTO, tx
+    participant Service as updateWasteIssueDetails
+    participant Rules as issueFulfillmentRules
+    participant Movement as applyWasteIssueMovement
+    participant Stock as applyWasteStockChange
+    participant Status as findWasteIssueFulfillmentStatusIds
+    participant Prisma as Prisma / PostgreSQL
+    participant Socket as emitInventoryUpdated
 
-    Client->>Route: PATCH /api/warehouse/waste-issues/:id/details
-    Route->>Controller: invocar editWasteIssueDetails
-    Controller->>Domain: updateWasteIssueDetails llama applyWasteIssueMovement y recalcula cumplimiento con tx
-    Domain-->>Controller: devolver resultado o error del caso
-    Controller-->>Client: emitir respuesta observable
+    Router->>Controller: autenticar, autorizar e invocar controller
+    Controller->>Service: { id, wasteIssueDto.details }
+    Service->>Prisma: iniciar $transaction y cargar salida/detalles
+    Service->>Service: validar estado, ids únicos y detalles vigentes
+    Service->>Status: resolver ids de cumplimiento con tx
+    loop Cada detalle nuevo con isSupplied
+        Service->>Rules: derivar estado completo del detalle
+        Service->>Prisma: guardar surtido total y cantidades de proyecto
+        Service->>Movement: agregar cantidad pendiente al movimiento
+        Movement->>Stock: descontar existencia y cantidad convertida con tx
+    end
+    Movement->>Prisma: crear WasteMovement ISSUE si hubo surtimiento
+    Service->>Rules: derivar cumplimiento del encabezado
+    Service->>Prisma: actualizar WasteIssue y commit
+    Service-->>Controller: wasteIssue actualizado
+    Controller->>Socket: publicar después del commit
 ```
 
 ## `CU-SAL-12`
 
-**Identificador:** `DIA-BE-CU-SAL-12`. **Fuente:** fila `CU-SAL-12` de la matriz de aplicación al código backend.
-
 **Patrones:** `BE-P01`, `BE-P03`, `BE-P04`, `BE-P05`.
 
 ```mermaid
 sequenceDiagram
-    participant Client as Cliente HTTP / web
-    participant Route as src/routes/api/warehouse/wasteIssueApiRoute.js<br/>PATCH /api/warehouse/waste-issues/:id/details/:detailId/returns
+    Note over Router,Controller: Variables de frontera: id, detailId, returnDto, userId y tx
+    participant Router as src/routes/api/warehouse/wasteIssueApiRoute.js<br/>PATCH /api/warehouse/waste-issues/:id/details/:detailId/returns
     participant Controller as src/controllers/api/warehouse/wasteIssueController.js<br/>registerWasteIssueDetailReturn
-    participant Domain as src/services/warehouse/wasteIssues/detailReturns/wasteIssueReturnService.js<br/>returnWasteIssueDetail
-    Note over Controller,Domain: Variables de frontera: req.params.id, req.params.detailId, req.body/DTO, tx
+    participant Service as returnWasteIssueDetail
+    participant Rules as Validaciones de returnWasteIssueDetail
+    participant Inventory as applyWasteIssueReturnMovement
+    participant Status as findWasteIssueFulfillmentStatusIds
+    participant Prisma as Prisma / PostgreSQL
+    participant Socket as emitInventoryUpdated
 
-    Client->>Route: PATCH /api/warehouse/waste-issues/:id/details/:detailId/returns
-    Route->>Controller: invocar registerWasteIssueDetailReturn
-    Controller->>Domain: returnWasteIssueDetail crea WasteIssueReturn, movimiento inverso y estados en transacción
-    Domain-->>Controller: devolver resultado o error del caso
-    Controller-->>Client: emitir respuesta observable
+    Router->>Controller: autenticar, autorizar e invocar controller
+    Controller->>Service: { id, detailId, returnDto, userId }
+    Service->>Prisma: iniciar $transaction
+    Service->>Prisma: cargar WasteIssue y WasteIssueDetail surtido
+    Service->>Rules: validar estado, cantidad surtida y devoluciones previas
+    alt Cantidad de merma no retornable
+        Rules-->>Service: error de dominio
+        Service-->>Controller: rollback y error
+    else Cantidad válida
+        Service->>Inventory: devolver existencia de merma con tx
+        Service->>Prisma: crear WasteIssueReturn
+        Service->>Status: recalcular detalle y encabezado con tx
+        Prisma-->>Service: salida de merma actualizada y commit
+        Service-->>Controller: wasteIssueReturn
+        Controller->>Socket: publicar después del commit
+    end
 ```
 
 ## `CU-REP-01`
-
-**Identificador:** `DIA-BE-CU-REP-01`. **Fuente:** fila `CU-REP-01` de la matriz de aplicación al código backend.
 
 **Patrones:** `BE-P06`.
 
@@ -1079,8 +1134,6 @@ sequenceDiagram
 
 ## `CU-REP-02`
 
-**Identificador:** `DIA-BE-CU-REP-02`. **Fuente:** fila `CU-REP-02` de la matriz de aplicación al código backend.
-
 **Patrones:** `BE-P06`.
 
 ```mermaid
@@ -1099,8 +1152,6 @@ sequenceDiagram
 ```
 
 ## `CU-REP-03`
-
-**Identificador:** `DIA-BE-CU-REP-03`. **Fuente:** fila `CU-REP-03` de la matriz de aplicación al código backend.
 
 **Patrones:** `BE-P07`.
 
@@ -1121,8 +1172,6 @@ sequenceDiagram
 
 ## `CU-REP-04`
 
-**Identificador:** `DIA-BE-CU-REP-04`. **Fuente:** fila `CU-REP-04` de la matriz de aplicación al código backend.
-
 **Patrones:** `BE-P07`.
 
 ```mermaid
@@ -1141,8 +1190,6 @@ sequenceDiagram
 ```
 
 ## `CU-REP-05`
-
-**Identificador:** `DIA-BE-CU-REP-05`. **Fuente:** fila `CU-REP-05` de la matriz de aplicación al código backend.
 
 **Patrones:** `BE-P07`.
 
@@ -1163,8 +1210,6 @@ sequenceDiagram
 
 ## `CU-REP-06`
 
-**Identificador:** `DIA-BE-CU-REP-06`. **Fuente:** fila `CU-REP-06` de la matriz de aplicación al código backend.
-
 **Patrones:** `BE-P06`.
 
 ```mermaid
@@ -1183,8 +1228,6 @@ sequenceDiagram
 ```
 
 ## `CU-REP-07`
-
-**Identificador:** `DIA-BE-CU-REP-07`. **Fuente:** fila `CU-REP-07` de la matriz de aplicación al código backend.
 
 **Patrones:** `BE-P06`.
 
@@ -1205,8 +1248,6 @@ sequenceDiagram
 
 ## `CU-REP-08`
 
-**Identificador:** `DIA-BE-CU-REP-08`. **Fuente:** fila `CU-REP-08` de la matriz de aplicación al código backend.
-
 **Patrones:** `BE-P07`.
 
 ```mermaid
@@ -1225,8 +1266,6 @@ sequenceDiagram
 ```
 
 ## `CU-REP-09`
-
-**Identificador:** `DIA-BE-CU-REP-09`. **Fuente:** fila `CU-REP-09` de la matriz de aplicación al código backend.
 
 **Patrones:** `BE-P07`.
 
@@ -1247,8 +1286,6 @@ sequenceDiagram
 
 ## `CU-REP-10`
 
-**Identificador:** `DIA-BE-CU-REP-10`. **Fuente:** fila `CU-REP-10` de la matriz de aplicación al código backend.
-
 **Patrones:** `BE-P07`.
 
 ```mermaid
@@ -1267,8 +1304,6 @@ sequenceDiagram
 ```
 
 ## `CU-REP-11`
-
-**Identificador:** `DIA-BE-CU-REP-11`. **Fuente:** fila `CU-REP-11` de la matriz de aplicación al código backend.
 
 **Patrones:** `BE-P07`.
 
@@ -1289,8 +1324,6 @@ sequenceDiagram
 
 ## `CU-REP-12`
 
-**Identificador:** `DIA-BE-CU-REP-12`. **Fuente:** fila `CU-REP-12` de la matriz de aplicación al código backend.
-
 **Patrones:** `BE-P07`.
 
 ```mermaid
@@ -1309,8 +1342,6 @@ sequenceDiagram
 ```
 
 ## `CU-REP-13`
-
-**Identificador:** `DIA-BE-CU-REP-13`. **Fuente:** fila `CU-REP-13` de la matriz de aplicación al código backend.
 
 **Patrones:** `BE-P07`.
 
@@ -1331,8 +1362,6 @@ sequenceDiagram
 
 ## `CU-REP-14`
 
-**Identificador:** `DIA-BE-CU-REP-14`. **Fuente:** fila `CU-REP-14` de la matriz de aplicación al código backend.
-
 **Patrones:** `BE-P07`.
 
 ```mermaid
@@ -1351,8 +1380,6 @@ sequenceDiagram
 ```
 
 ## `CU-REP-15`
-
-**Identificador:** `DIA-BE-CU-REP-15`. **Fuente:** fila `CU-REP-15` de la matriz de aplicación al código backend.
 
 **Patrones:** `BE-P07`.
 
