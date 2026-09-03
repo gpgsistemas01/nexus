@@ -218,13 +218,11 @@ dominio. Antes de agregar otra aplicación o componente se revisan
 `src/controllers/api/createDataTableListController.js`, `src/views/shared`,
 `src/public/js/ui` y `src/public/js/plugins`.
 
-Esta vista resume la decisión arquitectónica. Las vistas canónicas
-[`DIA-FE-REU-001`](frontend-use-case-diagrams.md#vista-canónica-de-reutilización-frontend)
-y [`DIA-BE-REU-001`](backend-use-case-diagrams.md#vista-canónica-de-reutilización-backend)
-la concretan con los símbolos vigentes; cada diagrama `DIA-FE-CU-*` o `DIA-BE-CU-*`
-incluye una referencia discontinua al punto compartido que consume. Cuando una
-refactorización extrae, sustituye o elimina una pieza común, se actualiza primero la
-vista canónica y luego los casos que la referencian.
+Esta vista resume la decisión arquitectónica. Cada diagrama `DIA-FE-CU-*` o
+`DIA-BE-CU-*` indica mediante su línea **Patrones** qué pieza compartida consume y
+reserva el bloque Mermaid para el recorrido concreto. Cuando una refactorización
+extrae, sustituye o elimina una pieza común, se actualizan primero esta vista y el
+catálogo de patrones, y luego se revisan los casos localizados por esos códigos.
 
 ## 6. Lista de revisión manual
 
