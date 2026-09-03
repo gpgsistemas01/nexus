@@ -160,7 +160,7 @@ una estructura compartida no oculta los participantes propios del caso.
 | Caso | Entrada HTTP y controller | Servicio, persistencia o efecto aplicado | Diagrama aplicado |
 | --- | --- | --- | --- |
 | `CU-AUT-01` | `POST /api/auth/login` → `authController.login`. | `authService.loginUser`, `userService.getUserIdByLogin`, JWT y cookies. | [`DIA-BE-CU-AUT-01`](backend-use-case-diagrams.md#cu-aut-01) |
-| `CU-AUT-02` | `GET /cerrar-sesion` → `controllers/web/authController.logout`. | Elimina cookies de autenticación y redirige a login; no persiste dominio. | [`DIA-BE-CU-AUT-02`](backend-use-case-diagrams.md#cu-aut-02) |
+| `CU-AUT-02` | `POST /cerrar-sesion` → `controllers/web/authController.logout`. | Elimina cookies de autenticación y redirige a login; no persiste dominio. | [`DIA-BE-CU-AUT-02`](backend-use-case-diagrams.md#cu-aut-02) |
 | `CU-IDA-01` | `GET /api/admin/persons` → `getAllPersons`. | `personService.findAllPersons` consulta `Person` y asignaciones. | [`DIA-BE-CU-IDA-01`](backend-use-case-diagrams.md#cu-ida-01) |
 | `CU-IDA-02` | `POST /api/admin/persons` → `registerPerson`. | `personService.createPerson` valida y crea persona/asignaciones. | [`DIA-BE-CU-IDA-02`](backend-use-case-diagrams.md#cu-ida-02) |
 | `CU-IDA-03` | `PUT /api/admin/persons/:id` → `editPerson`. | `personService.updatePerson` actualiza persona/asignaciones. | [`DIA-BE-CU-IDA-03`](backend-use-case-diagrams.md#cu-ida-03) |
