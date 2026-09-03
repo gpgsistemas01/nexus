@@ -42,6 +42,11 @@ Cada recorrido contextual usa una secuencia para hacer visible el orden del cód
 actividad `flowchart` se conserva sólo cuando existen decisiones que cambian el camino;
 una vista de estados se agrega cuando el caso tiene un ciclo técnico relevante. No se
 mantiene un `flowchart` lineal si comunica menos que la secuencia equivalente.
+En cada documento de arquitectura, los diagramas asociados con `CU-*` siguen el orden
+del catálogo de casos de uso; si un caso necesita más de una vista, permanecen juntas,
+y las vistas transversales sin caso se ubican después. En mensajes y etiquetas de
+`sequenceDiagram` se evita el punto y coma, porque GitHub puede interpretarlo como un
+separador de sentencias; se usa una coma o una oración nueva.
 
 Las secuencias y actividades técnicas de frontend o backend que implementan casos de
 uso se asocian con **un único `CU-*`**. No se permiten participantes alternativos con
