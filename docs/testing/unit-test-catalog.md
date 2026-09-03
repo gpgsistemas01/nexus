@@ -97,3 +97,80 @@ declaran expresamente.
 La suite contiene **70 archivos de prueba**. El número de casos puede cambiar cuando se
 amplían tablas parametrizadas; el conteo efectivo y su estado se toman siempre de la
 ejecución de Vitest registrada, no de una suma manual de llamadas a `it`.
+
+## Aplicación del formato documental a los casos vigentes
+
+Los grupos anteriores constituyen los registros de diseño de la suite. Para hacer
+explícita su correspondencia con el formato del [plan de pruebas](test-plan.md), cada
+grupo recibe un ID `DP-UNIT-GNN`; sus casos son los `it` y las filas de `it.each` de los
+archivos indicados, identificados documentalmente como `CP-UNIT-GNN-*`. El asterisco no
+es un caso genérico: remite al nombre completo que Vitest materializa como evidencia
+ejecutable y evita mantener una segunda copia de los 280 nombres.
+
+Todos los casos comparten las precondiciones, el ambiente y la limpieza de la ficha
+`SU-UNIT-001`. La siguiente tabla agrega los datos variables y el resultado esperado de
+cada diseño. Si un caso deja de corresponder a esta fila, se actualiza el grupo o se crea
+otro antes de registrar su ejecución.
+
+| Diseño / casos | Condición que se debe probar | Datos de prueba vigentes | Resultado esperado del grupo |
+| --- | --- | --- | --- |
+| `DP-UNIT-G01` / `CP-UNIT-G01-*` | Decisión de acceso por rol, departamento y operación. | Combinaciones tabuladas de administrador, almacén y asesor; permisos CRUD de salidas. | Cada combinación devuelve exactamente permitido o denegado y un asesor no obtiene acceso operativo. |
+| `DP-UNIT-G02` / `CP-UNIT-G02-*` | Contrato HTTP aislado de controllers de almacén en caminos exitosos, límites y fallos. | Requests con filtros, DTO válidos o manipulados, valores máximos, IDs existentes/inexistentes y errores de servicios simulados. | Status/body y argumentos enviados al servicio coinciden con el contrato; campos no permitidos se descartan y los efectos posteriores sólo ocurren tras el éxito. |
+| `DP-UNIT-G03` / `CP-UNIT-G03-*` | Normalización y conservación de identidad en DTO de entradas y mermas. | Facturas con variantes de formato, nombres, IDs, detalles repetidos, opcionales y decimales. | El DTO produce el payload normalizado esperado sin fusionar ni perder identidades o partidas válidas. |
+| `DP-UNIT-G04` / `CP-UNIT-G04-*` | Cálculo de stock/movimientos y frontera transaccional ante éxito o error. | Cantidades con/sin dimensiones, cero, decimales, stock suficiente/insuficiente y callbacks que resuelven o lanzan error. | Cálculos y agrupaciones conservan los detalles; la transacción revierte siempre y propaga el error original cuando corresponde. |
+| `DP-UNIT-G05` / `CP-UNIT-G05-*` | Reutilización del contrato CRUD/reporte por cada contexto de aplicación cliente. | Configuraciones de catálogo, materiales, salidas y reportes; respuestas presentes/ausentes, IDs y payloads por contexto. | Cada instancia conserva aislamiento, adapta sólo las claves configuradas y envía el request/callback esperado sin duplicar el contrato común. |
+| `DP-UNIT-G06` / `CP-UNIT-G06-*` | Contrato público de mensajes y selectores consumidos por la interfaz. | Contextos y claves exportadas de recepción y selectores. | Las claves resuelven el mensaje o selector contractual esperado para cada consumidor. |
+| `DP-UNIT-G07` / `CP-UNIT-G07-*` | Transiciones de modo en páginas de detalle y modal. | Detalles de recepción y apertura/cierre del modal de merma con DOM simulado. | La edición actualiza el detalle correcto y el modal restaura el estado observable al cambiar de modo. |
+| `DP-UNIT-G08` / `CP-UNIT-G08-*` | Decisiones de columnas, acciones, filtros y filas en DataTable. | Modos crear/editar/devolver, estados pendiente/surtido/cancelado, permisos, filas vacías/activas y filtros dependientes. | Sólo aparecen acciones y columnas permitidas; filtros, dependencias, estado y transformaciones producen los valores esperados sin mutación accidental. |
+| `DP-UNIT-G09` / `CP-UNIT-G09-*` | Inicialización, reutilización y sincronización de plugins de fecha, MDB y Select2. | Instancia existente/ausente, selección con/sin valor, inputs de texto/número y estado habilitado/deshabilitado. | Se crea o reutiliza una sola instancia y el valor/estado se refleja en el input y wrapper correspondientes. |
+| `DP-UNIT-G10` / `CP-UNIT-G10-*` | Estado contractual de formularios, resumen e inventario según modo y estado documental. | Alta/edición, documento pendiente/cancelado, selección presente/ausente y detalles nuevos/existentes. | Identidad, campos, totales, permisos y callbacks quedan habilitados, bloqueados, completados o limpiados según la regla. |
+| `DP-UNIT-G11` / `CP-UNIT-G11-*` | Colecciones, DOM y validaciones de entradas, materiales y mermas. | Colecciones vacías o repetidas, IDs de cliente/documento, campos ausentes/válidos y valores de frontera. | Se agrega, sustituye o elimina el renglón correcto sin afectar otros; selectores y validadores devuelven la configuración o error esperado. |
+| `DP-UNIT-G12` / `CP-UNIT-G12-*` | Orden de middleware, autorización y enlace de handlers en rutas de merma. | Requests por rol/departamento y spies de middleware/controller para rutas API y web. | El acceso autorizado alcanza el handler en el orden previsto y el no autorizado se rechaza antes del controller. |
+| `DP-UNIT-G13` / `CP-UNIT-G13-*` | Reglas y consultas de servicios con persistencia sustituida. | Identidades completas/incompletas, filtros, snapshots, relaciones, facturas duplicadas/no duplicadas y errores Prisma simulados. | Retorno y argumentos Prisma respetan filtros y relaciones; entradas inválidas o fallos no disparan colaboraciones posteriores. |
+| `DP-UNIT-G14` / `CP-UNIT-G14-*` | Transformación compartida de formatos, Excel, queries e identidad de inventario. | Mes válido/inválido o bisiesto, paginación negativa, rangos, fórmulas, relaciones serializadas y colecciones vacías. | Fechas, filtros, filas, fórmulas y representación canónica coinciden con el contrato y usan defaults seguros. |
+| `DP-UNIT-G15` / `CP-UNIT-G15-*` | Clases de equivalencia y fronteras de validadores del servidor. | Campo ausente/nulo/válido, cantidad positiva/no positiva y decimales dentro/fuera de precisión. | Cada valor válido se acepta; cada clase inválida devuelve el código correspondiente sin aceptar datos fuera del límite. |
+
+La acción reproducible de cada `CP-UNIT-*` es la invocación descrita por su nombre
+`it`; el detalle de fixtures permanece junto a esa invocación. El registro de ejecución
+vigente es `SU-UNIT-001` en `unit-test-results.md`, que conserva revisión, ambiente,
+fecha, conteos, resultado real y observaciones.
+
+## Diagrama de identificación de lo probado
+
+Sí se justifica un diagrama para esta suite porque permite localizar rápidamente las
+familias de comportamiento y sus fronteras. No representa pasos de ejecución ni sustituye
+los datos y resultados esperados de la tabla anterior. Cada nodo terminal referencia un
+diseño vigente; por tanto, un área sin nodo se considera fuera del alcance unitario hasta
+que se incorpore y catalogue una prueba.
+
+```mermaid
+flowchart TB
+    SU[SU-UNIT-001<br/>Suite unitaria]
+    SU --> BE[Servidor]
+    SU --> FE[Navegador simulado]
+    SU --> CT[Contratos transversales]
+
+    BE --> G02[G02 Controllers HTTP]
+    BE --> G03[G03 DTO]
+    BE --> G04[G04 Inventario y transacción]
+    BE --> G12[G12 Rutas]
+    BE --> G13[G13 Servicios]
+    BE --> G14[G14 Utilidades]
+    BE --> G15[G15 Validadores]
+
+    FE --> G05[G05 Aplicaciones CRUD]
+    FE --> G07[G07 Páginas]
+    FE --> G08[G08 DataTable]
+    FE --> G09[G09 Plugins]
+    FE --> G10[G10 Interfaz]
+    FE --> G11[G11 Utilidades y validadores]
+
+    CT --> G01[G01 Permisos]
+    CT --> G06[G06 Mensajes y selectores]
+```
+
+**Propósito:** identificar qué debe comprobar la suite y ubicar su ficha de diseño.
+**Alcance:** los 15 grupos y 70 archivos seleccionados por `vitestConfig.js`.
+**Fuente:** tabla de grupos, archivos `tests/unit/**/*Test.js` y configuración de
+Vitest. **Límite:** muestra cobertura estructural documentada, no porcentaje de código,
+persistencia real, navegador real ni integración entre capas.
