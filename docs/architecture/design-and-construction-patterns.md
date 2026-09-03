@@ -54,9 +54,12 @@ nodo siguiente identifica el símbolo o carpeta que lo implementa y el último n
 muestra consumidores reales. Las flechas de esas vistas no significan herencia salvo
 que se indique expresamente.
 Los diagramas estructurales localizan implementaciones y consumidores; las secuencias
-de frontera y dinámica muestran orden, alternativas y límites temporales. Así el
-catálogo representa tanto la forma del patrón como su colaboración sin cargar los
-diagramas de cada caso con infraestructura repetida.
+de frontera y dinámica muestran orden, alternativas y límites temporales. En estas
+últimas, los participantes nombran el archivo o símbolo ejecutable y los mensajes
+conservan las llamadas y datos que pueden seguirse en el código. El código del patrón
+en la línea **Patrones** sirve sólo como índice: no sustituye esta traza de construcción.
+Así el catálogo representa tanto la forma del patrón como su colaboración sin cargar
+los diagramas de cada caso con infraestructura repetida.
 
 ### Estructura por dominio, capas y fronteras
 
@@ -82,19 +85,19 @@ antes de entregar datos normalizados al caso de uso?
 ```mermaid
 sequenceDiagram
     participant Client as Cliente HTTP
-    participant Route as Router Express
-    participant Auth as Autenticación y autorización
-    participant Validation as Validadores y validate
-    participant Controller as Controller y DTO
-    participant Service as Servicio del caso
+    participant Route as routes/api/*ApiRoute.js
+    participant Auth as middleware/authMiddleware.js
+    participant Validation as validators/forms/* + validatorMiddleware.validate
+    participant Controller as controllers/api/*Controller.js + dtos/*DTO.js
+    participant Service as services/*Service.js
 
     Client->>Route: enviar petición
-    Route->>Auth: verifyApiTokenRequired
+    Route->>Auth: verifyApiTokenRequired(req, res, next)
     alt token inválido o ausente
         Auth-->>Client: responder rechazo de autenticación
     else sesión autenticada
-        Auth->>Validation: continuar pipeline
-        Validation->>Validation: validar y consolidar errores
+        Auth->>Validation: ejecutar validaciones declaradas por la ruta
+        Validation->>Validation: validate(req, res, next) consolida errores
         alt entrada inválida
             Validation-->>Client: responder error de validación
         else entrada aceptada
@@ -103,11 +106,11 @@ sequenceDiagram
             alt permiso denegado
                 Auth-->>Client: responder rechazo de autorización
             else permiso concedido
-                Auth->>Controller: entregar request validado
+                Auth->>Controller: controller(req, res) con req.user
                 opt el endpoint acepta un DTO
-                    Controller->>Controller: seleccionar y normalizar campos
+                    Controller->>Controller: create*Dto(req.body)
                 end
-                Controller->>Service: ejecutar caso de uso
+                Controller->>Service: invocar función importada con DTO, params y userId
                 Service-->>Controller: devolver resultado o error de dominio
                 Controller-->>Client: emitir respuesta HTTP
             end
@@ -115,21 +118,51 @@ sequenceDiagram
     end
 ```
 
+La construcción se comprueba desde la declaración ordenada de middleware en
+[`src/routes/api`](../../src/routes/api), las funciones de
+[`authMiddleware.js`](../../src/middleware/authMiddleware.js) y
+[`validatorMiddleware.js`](../../src/middleware/validatorMiddleware.js), y la adaptación
+de entrada en [`src/controllers/api`](../../src/controllers/api) y
+[`src/dtos`](../../src/dtos). Las etiquetas genéricas `*` agrupan archivos equivalentes;
+el diagrama de cada caso las reemplaza por su ruta, controller, DTO y servicio concretos.
+
 ### Factories y composición sobre herencia
 
 **Identificador:** `DIA-PAT-CON-001`. **Pregunta:** ¿qué se configura para crear una
 variante sin duplicar el flujo común?
 
 ```mermaid
-flowchart TB
-    crud["createCrudApplication"] -. configuración .-> apps["Aplicaciones de personas, usuarios,<br/>clientes, proveedores, materiales,<br/>mermas y entradas"]
-    issue["createIssueApplication"] -. compone .-> crud
-    issue -. configuración .-> issueApps["goodsIssues / wasteIssues"]
-    list["createApplicationList"] -. configuración .-> catalogs["roles · departamentos · presentaciones<br/>unidades · motivos · cumplimiento"]
-    listController["createDataTableListController"] -. configuración .-> catalogControllers["Controllers de catálogos"]
-    report["createReportApplication"] -. configuración .-> reports["Reportes admin · sales · warehouse"]
-    shared["views/shared · public/js/ui · plugins"] -. composición .-> pages["Páginas y formularios consumidores"]
+sequenceDiagram
+    participant Module as application/warehouse/materials/materials.js
+    participant Factory as application/createCrudApplication.js
+    participant Mutation as createApplicationMutation
+    participant Request as services/warehouse/materialService.js
+    participant Page as pages/warehouse/materials/materialForm.js
+
+    Module->>Factory: createCrudApplication({ requests, dataKeys, additionalMutations })
+    Factory->>Factory: createApplicationList(requests.getAll)
+    loop register, edit, editStock y remove
+        Factory->>Mutation: createMutation(operation)
+        Mutation-->>Factory: closure que adapta formData, id y opciones
+    end
+    Factory-->>Module: Object.freeze({ getAll, register, edit, editStock, remove })
+    Module->>Module: exportar referencias con nombres de dominio
+    Page->>Module: registerMaterial({ formData, creationContext })
+    Module->>Mutation: materialApplication.register(...)
+    Mutation->>Request: registerMaterialRequest({ data })
+    Request-->>Mutation: response
+    Mutation-->>Page: createSuccessResponseFromRequest({ response, dataKey })
 ```
+
+Esta secuencia muestra la construcción en dos momentos que el resumen del patrón no
+expresa: al evaluar el módulo se inyectan requests y se crean *closures* inmutables; al
+interactuar la página se usa una referencia de dominio que conserva esa configuración.
+El ejemplo se puede recorrer en
+[`createCrudApplication.js`](../../src/public/js/application/createCrudApplication.js),
+[`materials.js`](../../src/public/js/application/warehouse/materials/materials.js),
+[`materialService.js`](../../src/public/js/services/warehouse/materialService.js) y
+[`materialForm.js`](../../src/public/js/pages/warehouse/materials/materialForm.js). Los
+demás consumidores reutilizan la misma construcción con su propia tabla `requests`.
 
 ### Transacción, eventos y auditoría
 
@@ -138,17 +171,17 @@ atómica, publicación y trazabilidad sin confundir sus límites?
 
 ```mermaid
 sequenceDiagram
-    participant Controller as Controller
-    participant Service as Transaction Script
-    participant Prisma as Prisma $transaction
-    participant Writes as Servicios con getDb(tx)
-    participant Events as emitInventoryUpdated
-    participant Audit as auditWrites
+    participant Controller as controllers/api/*Controller.js
+    participant Service as services/*Service.js (Transaction Script)
+    participant Prisma as lib/prisma.js $transaction
+    participant Writes as services auxiliares + repository/getDb(tx)
+    participant Events as utils/socketUtils.emitInventoryUpdated
+    participant Audit as middleware/auditMiddleware.auditWrites
 
-    Controller->>Service: solicitar mutación del caso
-    Service->>Prisma: abrir una transacción
+    Controller->>Service: función importada({ DTO, id, userId })
+    Service->>Prisma: prisma.$transaction(async tx => ...)
     rect rgb(245, 248, 255)
-        Prisma->>Writes: propagar tx
+        Prisma->>Writes: helper({ ..., tx }) usa getDb(tx)
         Writes->>Writes: escribir documento, detalle, existencia y movimiento
         alt falla una escritura
             Writes-->>Prisma: propagar error
@@ -166,6 +199,13 @@ sequenceDiagram
         end
     end
 ```
+
+La traza parte del controller propietario y permite distinguir código ejecutado dentro
+del callback de Prisma de efectos posteriores. `getDb(tx)` está implementado en
+[`baseRepository.js`](../../src/repository/baseRepository.js), el publicador en
+[`socketUtils.js`](../../src/utils/socketUtils.js) y la auditoría transversal en
+[`auditMiddleware.js`](../../src/middleware/auditMiddleware.js). Los diagramas técnicos
+de cada mutación sustituyen los comodines por los servicios y escrituras exactos.
 
 ### Test harness configurable
 
