@@ -44,6 +44,12 @@ const getUseCaseTableIds = (source) => [...source.matchAll(/^\| `(CU-[A-Z]+-\d+)
 const getMermaidBlocks = (source) => [...source.matchAll(/^```mermaid\n([\s\S]*?)^```$/gm)]
     .map((match) => match[1]);
 
+// Mermaid treats these sequence keywords case-insensitively, so they cannot be aliases.
+const RESERVED_SEQUENCE_ALIASES = new Set([
+    'actor', 'alt', 'and', 'autonumber', 'break', 'critical', 'details', 'else', 'end',
+    'loop', 'note', 'opt', 'option', 'par', 'participant', 'rect'
+]);
+
 const validateUseCaseDiagramCoverage = async () => {
     const sources = new Map(await Promise.all(
         Object.entries(USE_CASE_DOCUMENTS).map(async ([name, file]) => [name, await readFile(file, 'utf8')])
@@ -102,6 +108,12 @@ const validateUseCaseDiagramCoverage = async () => {
             }
             if (new RegExp(`(?:BE|FE)-P\\d{2}`).test(sequence)) {
                 failures.push(`diagramas ${side}: ${id} repite el índice de patrones dentro de Mermaid`);
+            }
+            const aliases = [...sequence.matchAll(/^\s*(?:actor|participant)\s+(\S+)\s+as\s+/gm)]
+                .map((match) => match[1].toLowerCase());
+            const reservedAliases = aliases.filter((alias) => RESERVED_SEQUENCE_ALIASES.has(alias));
+            if (reservedAliases.length) {
+                failures.push(`diagramas ${side}: ${id} usa alias reservados de Mermaid (${reservedAliases.join(', ')})`);
             }
         }
     }
