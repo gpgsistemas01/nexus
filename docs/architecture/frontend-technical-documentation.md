@@ -316,13 +316,13 @@ sequenceDiagram
     participant Correction as correctionModal / correctionForm
     participant App as correctGoodsReceiptDetail
     participant Request as correctGoodsReceiptDetailRequest
-    participant API as POST /goods-receipts/:id/details/:detailId/corrections
+    participant API as PATCH /api/warehouse/goods-receipts/:id/details/:detailId/corrections
 
     Warehouse->>Main: selecciona Corregir detalle
     Main->>Correction: openGoodsReceiptCorrectionModal({ receipt, detail })
     Correction->>Correction: precarga detalle y recalcula totales previstos
     Warehouse->>Correction: confirma datos corregidos
-    Correction->>Correction: valida cantidad, costo y motivo
+    Correction->>Correction: valida cantidad y costo
     Correction->>App: { id, detailId, formData }
     App->>Request: mutación configurada
     Request->>API: petición JSON

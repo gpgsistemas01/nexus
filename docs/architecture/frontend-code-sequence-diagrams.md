@@ -7,11 +7,23 @@ objetivo y la interacción con lenguaje de negocio se consulta primero el [model
 diagramas funcionales de casos de uso](../requirements/domain-and-use-cases.md#casos-de-uso-vigentes).
 
 La [matriz técnica de frontend](frontend-technical-documentation.md#aplicación-de-todos-los-casos-al-código-frontend)
-localiza la evidencia concreta. Los participantes identifican archivo y símbolo, los
+es el índice único de trazabilidad: relaciona caso, interacción, implementación y
+diagrama. Esta colección no vuelve a copiar esa relación en cada sección. Los
+participantes identifican archivo y símbolo, los
 mensajes conservan métodos y requests en orden y las notas nombran los datos de frontera
 (`id`, `detailId`, `formData`/payload, parámetros y filtros). Los temporales mecánicos
 permanecen en el código. Cada caso mantiene una secuencia específica aunque reutilice
 una factory o componente, porque cambian módulos, firmas, rutas, datos o efectos.
+
+### Regla de identificación y lectura
+
+El encabezado `CU-<grupo>-<número>` enlaza directamente la ficha funcional del mismo
+identificador. El diagrama de esa sección se identifica de forma determinista como
+`DIA-FE-CU-<grupo>-<número>`; por ejemplo, la sección `CU-ENT-02` contiene
+`DIA-FE-CU-ENT-02`. La matriz técnica mantiene el enlace navegable y la evidencia de
+código. Aquí se conserva solamente la información propia de la vista: patrones,
+participantes, eventos, payload, requests y resultado visible. El objetivo, actor y
+flujo de negocio no se repiten porque pertenecen a la ficha del caso de uso.
 
 ## Índice rápido de patrones por caso
 
@@ -50,28 +62,32 @@ aparece una vez, conserva su referencia de patrones y contiene un bloque Mermaid
 
 ## `CU-AUT-01`
 
-**Identificador:** `DIA-FE-CU-AUT-01`. **Fuente:** fila `CU-AUT-01` de la matriz de aplicación al código frontend.
-
 **Patrones:** `FE-P01`, `FE-P09`.
 
 ```mermaid
 sequenceDiagram
+    Note over User,App: Variables de frontera: name, password y cookies
+    actor User as Usuario
+    participant EJS as src/views/pages/home/login/loginPage.ejs + src/public/js/pages/home/login/loginForm.js<br/>loginPage.ejs / loginForm.js
+    participant Form as loginForm / useForm
+    participant App as src/public/js/application/auth/login.js + src/public/js/services/authService.js<br/>login → loginRequest
+    participant Request as loginRequest / apiRequest
+    participant API as POST /api/auth/login
     participant Browser as Navegador
-    participant View as src/views/pages/home/login/loginPage.ejs + src/public/js/pages/home/login/loginForm.js<br/>loginPage.ejs / loginForm.js
-    participant Application as src/public/js/application/auth/login.js + src/public/js/services/authService.js<br/>login → loginRequest
-    participant Transport as src/routes/api/authApiRoute.js<br/>POST /api/auth/login
-    Note over Application,Transport: Variables de frontera: formData/payload
 
-    Browser->>View: loginPage.ejs → loginForm.js
-    View->>Application: login → loginRequest
-    Application->>Transport: envía POST /api/auth/login y navega al inicio
-    Transport-->>Application: devolver respuesta normalizada
-    Application-->>View: presentar resultado observable
+    EJS->>Form: carga el módulo del formulario
+    User->>Form: captura y envía credenciales
+    Form->>Form: valida campos requeridos
+    Form->>App: { formData }
+    App->>Request: { data: formData }
+    Request->>API: petición JSON
+    API-->>Request: respuesta y cookies de sesión
+    Request-->>App: respuesta normalizada
+    App-->>Form: resultado exitoso
+    Form->>Browser: navega a la portada autenticada
 ```
 
 ## `CU-AUT-02`
-
-**Identificador:** `DIA-FE-CU-AUT-02`. **Fuente:** fila `CU-AUT-02` de la matriz de aplicación al código frontend.
 
 **Patrones:** `FE-P09`.
 
@@ -90,8 +106,6 @@ sequenceDiagram
 ```
 
 ## `CU-IDA-01`
-
-**Identificador:** `DIA-FE-CU-IDA-01`. **Fuente:** fila `CU-IDA-01` de la matriz de aplicación al código frontend.
 
 **Patrones:** `FE-P02`.
 
@@ -112,8 +126,6 @@ sequenceDiagram
 
 ## `CU-IDA-02`
 
-**Identificador:** `DIA-FE-CU-IDA-02`. **Fuente:** fila `CU-IDA-02` de la matriz de aplicación al código frontend.
-
 **Patrones:** `FE-P02`.
 
 ```mermaid
@@ -132,8 +144,6 @@ sequenceDiagram
 ```
 
 ## `CU-IDA-03`
-
-**Identificador:** `DIA-FE-CU-IDA-03`. **Fuente:** fila `CU-IDA-03` de la matriz de aplicación al código frontend.
 
 **Patrones:** `FE-P02`.
 
@@ -154,8 +164,6 @@ sequenceDiagram
 
 ## `CU-IDA-04`
 
-**Identificador:** `DIA-FE-CU-IDA-04`. **Fuente:** fila `CU-IDA-04` de la matriz de aplicación al código frontend.
-
 **Patrones:** `FE-P02`.
 
 ```mermaid
@@ -174,8 +182,6 @@ sequenceDiagram
 ```
 
 ## `CU-IDA-05`
-
-**Identificador:** `DIA-FE-CU-IDA-05`. **Fuente:** fila `CU-IDA-05` de la matriz de aplicación al código frontend.
 
 **Patrones:** `FE-P02`.
 
@@ -196,8 +202,6 @@ sequenceDiagram
 
 ## `CU-IDA-06`
 
-**Identificador:** `DIA-FE-CU-IDA-06`. **Fuente:** fila `CU-IDA-06` de la matriz de aplicación al código frontend.
-
 **Patrones:** `FE-P02`.
 
 ```mermaid
@@ -216,8 +220,6 @@ sequenceDiagram
 ```
 
 ## `CU-IDA-07`
-
-**Identificador:** `DIA-FE-CU-IDA-07`. **Fuente:** fila `CU-IDA-07` de la matriz de aplicación al código frontend.
 
 **Patrones:** `FE-P02`.
 
@@ -238,8 +240,6 @@ sequenceDiagram
 
 ## `CU-IDA-08`
 
-**Identificador:** `DIA-FE-CU-IDA-08`. **Fuente:** fila `CU-IDA-08` de la matriz de aplicación al código frontend.
-
 **Patrones:** `FE-P03`.
 
 ```mermaid
@@ -258,8 +258,6 @@ sequenceDiagram
 ```
 
 ## `CU-IDA-09`
-
-**Identificador:** `DIA-FE-CU-IDA-09`. **Fuente:** fila `CU-IDA-09` de la matriz de aplicación al código frontend.
 
 **Patrones:** `FE-P03`.
 
@@ -280,8 +278,6 @@ sequenceDiagram
 
 ## `CU-CAT-01`
 
-**Identificador:** `DIA-FE-CU-CAT-01`. **Fuente:** fila `CU-CAT-01` de la matriz de aplicación al código frontend.
-
 **Patrones:** `FE-P02`.
 
 ```mermaid
@@ -300,8 +296,6 @@ sequenceDiagram
 ```
 
 ## `CU-CAT-02`
-
-**Identificador:** `DIA-FE-CU-CAT-02`. **Fuente:** fila `CU-CAT-02` de la matriz de aplicación al código frontend.
 
 **Patrones:** `FE-P02`.
 
@@ -322,8 +316,6 @@ sequenceDiagram
 
 ## `CU-CAT-03`
 
-**Identificador:** `DIA-FE-CU-CAT-03`. **Fuente:** fila `CU-CAT-03` de la matriz de aplicación al código frontend.
-
 **Patrones:** `FE-P02`.
 
 ```mermaid
@@ -342,8 +334,6 @@ sequenceDiagram
 ```
 
 ## `CU-CAT-04`
-
-**Identificador:** `DIA-FE-CU-CAT-04`. **Fuente:** fila `CU-CAT-04` de la matriz de aplicación al código frontend.
 
 **Patrones:** `FE-P02`.
 
@@ -364,28 +354,33 @@ sequenceDiagram
 
 ## `CU-CAT-05`
 
-**Identificador:** `DIA-FE-CU-CAT-05`. **Fuente:** fila `CU-CAT-05` de la matriz de aplicación al código frontend.
-
 **Patrones:** `FE-P02`.
 
 ```mermaid
 sequenceDiagram
-    participant Browser as Navegador
-    participant View as src/public/js/pages/warehouse/materials/materialForm.js<br/>materialForm.js
-    participant Application as src/public/js/application/warehouse/materials/materials.js + src/public/js/services/warehouse/materialService.js<br/>editMaterialStock → editMaterialStockRequest
-    participant Transport as src/routes/api/warehouse/materialApiRoute.js<br/>PATCH /api/warehouse/materials/:id/stock
-    Note over Application,Transport: Variables de frontera: id, formData/payload
+    Note over User,App: Variables de frontera: id, DTO de ajuste y userId
+    actor User as Administrador del sistema
+    participant EJS as src/public/js/pages/warehouse/materials/materialForm.js<br/>materialForm.js
+    participant Form as materialForm / useForm
+    participant App as src/public/js/application/warehouse/materials/materials.js + src/public/js/services/warehouse/materialService.js<br/>editMaterialStock → editMaterialStockRequest
+    participant Factory as createApplicationMutation
+    participant Request as editMaterialStockRequest
+    participant API as PATCH /api/warehouse/materials/:id/stock
 
-    Browser->>View: materialForm.js usa el modo de ajuste de existencia
-    View->>Application: editMaterialStock → editMaterialStockRequest
-    Application->>Transport: envía PATCH /api/warehouse/materials/:id/stock
-    Transport-->>Application: devolver respuesta normalizada
-    Application-->>View: presentar resultado observable
+    EJS->>Form: carga módulo y formulario
+    User->>Form: confirma ajuste
+    Form->>Form: selecciona campos y valida
+    Form->>App: { formData, id }
+    App->>Factory: mutación configurada editStock
+    Factory->>Request: { data: formData, id }
+    Request->>API: apiRequest({ method: patch, url, data })
+    API-->>Request: { material, code }
+    Request-->>Factory: response
+    Factory-->>Form: material
+    Form->>Form: form.onSave?.(material)
 ```
 
 ## `CU-CAT-06`
-
-**Identificador:** `DIA-FE-CU-CAT-06`. **Fuente:** fila `CU-CAT-06` de la matriz de aplicación al código frontend.
 
 **Patrones:** `FE-P02`.
 
@@ -406,8 +401,6 @@ sequenceDiagram
 
 ## `CU-CAT-07`
 
-**Identificador:** `DIA-FE-CU-CAT-07`. **Fuente:** fila `CU-CAT-07` de la matriz de aplicación al código frontend.
-
 **Patrones:** `FE-P02`.
 
 ```mermaid
@@ -426,8 +419,6 @@ sequenceDiagram
 ```
 
 ## `CU-CAT-08`
-
-**Identificador:** `DIA-FE-CU-CAT-08`. **Fuente:** fila `CU-CAT-08` de la matriz de aplicación al código frontend.
 
 **Patrones:** `FE-P02`.
 
@@ -448,8 +439,6 @@ sequenceDiagram
 
 ## `CU-CAT-09`
 
-**Identificador:** `DIA-FE-CU-CAT-09`. **Fuente:** fila `CU-CAT-09` de la matriz de aplicación al código frontend.
-
 **Patrones:** `FE-P02`.
 
 ```mermaid
@@ -468,8 +457,6 @@ sequenceDiagram
 ```
 
 ## `CU-CAT-10`
-
-**Identificador:** `DIA-FE-CU-CAT-10`. **Fuente:** fila `CU-CAT-10` de la matriz de aplicación al código frontend.
 
 **Patrones:** `FE-P02`.
 
@@ -490,8 +477,6 @@ sequenceDiagram
 
 ## `CU-CAT-11`
 
-**Identificador:** `DIA-FE-CU-CAT-11`. **Fuente:** fila `CU-CAT-11` de la matriz de aplicación al código frontend.
-
 **Patrones:** `FE-P02`.
 
 ```mermaid
@@ -510,8 +495,6 @@ sequenceDiagram
 ```
 
 ## `CU-CAT-12`
-
-**Identificador:** `DIA-FE-CU-CAT-12`. **Fuente:** fila `CU-CAT-12` de la matriz de aplicación al código frontend.
 
 **Patrones:** `FE-P02`.
 
@@ -532,8 +515,6 @@ sequenceDiagram
 
 ## `CU-CAT-13`
 
-**Identificador:** `DIA-FE-CU-CAT-13`. **Fuente:** fila `CU-CAT-13` de la matriz de aplicación al código frontend.
-
 **Patrones:** `FE-P02`.
 
 ```mermaid
@@ -552,8 +533,6 @@ sequenceDiagram
 ```
 
 ## `CU-CAT-14`
-
-**Identificador:** `DIA-FE-CU-CAT-14`. **Fuente:** fila `CU-CAT-14` de la matriz de aplicación al código frontend.
 
 **Patrones:** `FE-P02`.
 
@@ -574,8 +553,6 @@ sequenceDiagram
 
 ## `CU-CAT-15`
 
-**Identificador:** `DIA-FE-CU-CAT-15`. **Fuente:** fila `CU-CAT-15` de la matriz de aplicación al código frontend.
-
 **Patrones:** `FE-P02`.
 
 ```mermaid
@@ -594,8 +571,6 @@ sequenceDiagram
 ```
 
 ## `CU-CAT-16`
-
-**Identificador:** `DIA-FE-CU-CAT-16`. **Fuente:** fila `CU-CAT-16` de la matriz de aplicación al código frontend.
 
 **Patrones:** `FE-P02`.
 
@@ -616,8 +591,6 @@ sequenceDiagram
 
 ## `CU-CAT-17`
 
-**Identificador:** `DIA-FE-CU-CAT-17`. **Fuente:** fila `CU-CAT-17` de la matriz de aplicación al código frontend.
-
 **Patrones:** `FE-P03`.
 
 ```mermaid
@@ -636,8 +609,6 @@ sequenceDiagram
 ```
 
 ## `CU-CAT-18`
-
-**Identificador:** `DIA-FE-CU-CAT-18`. **Fuente:** fila `CU-CAT-18` de la matriz de aplicación al código frontend.
 
 **Patrones:** `FE-P03`.
 
@@ -658,8 +629,6 @@ sequenceDiagram
 
 ## `CU-CAT-19`
 
-**Identificador:** `DIA-FE-CU-CAT-19`. **Fuente:** fila `CU-CAT-19` de la matriz de aplicación al código frontend.
-
 **Patrones:** `FE-P03`.
 
 ```mermaid
@@ -678,8 +647,6 @@ sequenceDiagram
 ```
 
 ## `CU-CAT-20`
-
-**Identificador:** `DIA-FE-CU-CAT-20`. **Fuente:** fila `CU-CAT-20` de la matriz de aplicación al código frontend.
 
 **Patrones:** `FE-P03`.
 
@@ -700,8 +667,6 @@ sequenceDiagram
 
 ## `CU-ENT-01`
 
-**Identificador:** `DIA-FE-CU-ENT-01`. **Fuente:** fila `CU-ENT-01` de la matriz de aplicación al código frontend.
-
 **Patrones:** `FE-P02`, `FE-P04`.
 
 ```mermaid
@@ -721,28 +686,39 @@ sequenceDiagram
 
 ## `CU-ENT-02`
 
-**Identificador:** `DIA-FE-CU-ENT-02`. **Fuente:** fila `CU-ENT-02` de la matriz de aplicación al código frontend.
-
 **Patrones:** `FE-P02`, `FE-P04`.
 
 ```mermaid
 sequenceDiagram
-    participant Browser as Navegador
-    participant View as src/public/js/pages/warehouse/goodsReceipts/goodsReceiptModal.js<br/>goodsReceiptModal.js
-    participant Application as src/public/js/application/warehouse/goodsReceipts/goodsReceipts.js + src/public/js/services/warehouse/goodsReceiptService.js<br/>registerGoodsReceipt → registerGoodsReceiptRequest
-    participant Transport as src/routes/api/warehouse/goodsReceiptApiRoute.js<br/>POST /api/warehouse/goods-receipts
-    Note over Application,Transport: Variables de frontera: formData/payload
+    actor Warehouse as Personal de almacén
+    participant Modal as src/public/js/pages/warehouse/goodsReceipts/goodsReceiptModal.js<br/>openGoodsReceiptModal
+    participant Form as src/public/js/pages/warehouse/goodsReceipts/goodsReceiptForm.js<br/>useForm / normalizeGoodsReceiptData
+    participant Details as goodsReceiptDetails.js + goodsReceiptDatatable.js<br/>details / mapGoodsReceiptSelectionToDetail
+    participant App as src/public/js/application/warehouse/goodsReceipts/goodsReceipts.js<br/>registerGoodsReceipt
+    participant Request as src/public/js/services/warehouse/goodsReceiptService.js<br/>registerGoodsReceiptRequest
+    participant API as POST /api/warehouse/goods-receipts
+    Note over Form,Request: Variables de frontera: isInvoiced, invoice, supplierId, receivedById, receptionDate, observations y details
 
-    Browser->>View: goodsReceiptModal.js captura encabezado y detalles
-    View->>Application: registerGoodsReceipt → registerGoodsReceiptRequest
-    Application->>Transport: envía POST /api/warehouse/goods-receipts
-    Transport-->>Application: devolver respuesta normalizada
-    Application-->>View: presentar resultado observable
+    Warehouse->>Modal: abrir «Nueva compra»
+    Modal->>Modal: resetear formulario, inicializar selectores y ocultar/mostrar factura
+    Warehouse->>Details: seleccionar material, cantidad y costo por presentación
+    Details->>Details: validar y agregar detalle, recalcular tabla y totales
+    Warehouse->>Form: confirmar compra
+    Form->>Form: normalizar comprobante y adjuntar details
+    Form->>Form: validateFields(goodsReceiptValidation, formData)
+    alt Hay errores de captura
+        Form-->>Warehouse: mostrar campos inválidos sin enviar request
+    else Captura válida
+        Form->>App: registerGoodsReceipt({ formData })
+        App->>Request: createCrudApplication.register({ data })
+        Request->>API: apiRequest({ method: post, url, data })
+        API-->>Request: { goodsReceipt, code }
+        Request-->>Form: respuesta normalizada
+        Form-->>Warehouse: cerrar modal, notificar y actualizar listado
+    end
 ```
 
 ## `CU-ENT-03`
-
-**Identificador:** `DIA-FE-CU-ENT-03`. **Fuente:** fila `CU-ENT-03` de la matriz de aplicación al código frontend.
 
 **Patrones:** `FE-P02`, `FE-P04`.
 
@@ -763,8 +739,6 @@ sequenceDiagram
 
 ## `CU-ENT-04`
 
-**Identificador:** `DIA-FE-CU-ENT-04`. **Fuente:** fila `CU-ENT-04` de la matriz de aplicación al código frontend.
-
 **Patrones:** `FE-P02`, `FE-P04`.
 
 ```mermaid
@@ -783,8 +757,6 @@ sequenceDiagram
 ```
 
 ## `CU-ENT-05`
-
-**Identificador:** `DIA-FE-CU-ENT-05`. **Fuente:** fila `CU-ENT-05` de la matriz de aplicación al código frontend.
 
 **Patrones:** `FE-P02`, `FE-P04`.
 
@@ -805,8 +777,6 @@ sequenceDiagram
 
 ## `CU-SAL-01`
 
-**Identificador:** `DIA-FE-CU-SAL-01`. **Fuente:** fila `CU-SAL-01` de la matriz de aplicación al código frontend.
-
 **Patrones:** `FE-P05`.
 
 ```mermaid
@@ -825,8 +795,6 @@ sequenceDiagram
 ```
 
 ## `CU-SAL-02`
-
-**Identificador:** `DIA-FE-CU-SAL-02`. **Fuente:** fila `CU-SAL-02` de la matriz de aplicación al código frontend.
 
 **Patrones:** `FE-P05`.
 
@@ -847,8 +815,6 @@ sequenceDiagram
 
 ## `CU-SAL-03`
 
-**Identificador:** `DIA-FE-CU-SAL-03`. **Fuente:** fila `CU-SAL-03` de la matriz de aplicación al código frontend.
-
 **Patrones:** `FE-P05`.
 
 ```mermaid
@@ -867,8 +833,6 @@ sequenceDiagram
 ```
 
 ## `CU-SAL-04`
-
-**Identificador:** `DIA-FE-CU-SAL-04`. **Fuente:** fila `CU-SAL-04` de la matriz de aplicación al código frontend.
 
 **Patrones:** `FE-P05`.
 
@@ -889,8 +853,6 @@ sequenceDiagram
 
 ## `CU-SAL-05`
 
-**Identificador:** `DIA-FE-CU-SAL-05`. **Fuente:** fila `CU-SAL-05` de la matriz de aplicación al código frontend.
-
 **Patrones:** `FE-P05`.
 
 ```mermaid
@@ -910,28 +872,31 @@ sequenceDiagram
 
 ## `CU-SAL-06`
 
-**Identificador:** `DIA-FE-CU-SAL-06`. **Fuente:** fila `CU-SAL-06` de la matriz de aplicación al código frontend.
-
 **Patrones:** `FE-P05`, `FE-P06`.
 
 ```mermaid
 sequenceDiagram
-    participant Browser as Navegador
-    participant View as src/public/js/pages/warehouse/goodsIssues/returns/goodsIssueReturn.js<br/>returns/goodsIssueReturn.js
-    participant Application as src/public/js/application/warehouse/goodsIssues/goodsIssues.js<br/>returnGoodsIssueDetail
-    participant Transport as src/routes/api/warehouse/goodsIssueApiRoute.js<br/>PATCH /api/warehouse/goods-issues/:id/details/:detailId/returns
-    Note over Application,Transport: Variables de frontera: id, detailId, formData/payload, cantidadRetornable
+    Note over Warehouse,App: Variables de frontera: id, detailId, returnDto, userId y tx
+    actor Warehouse as Almacén
+    participant Issue as src/public/js/pages/warehouse/goodsIssues/returns/goodsIssueReturn.js<br/>returns/goodsIssueReturn.js
+    participant Return as issueReturn UI
+    participant Domain as initializeGoodsIssueReturns
+    participant App as src/public/js/application/warehouse/goodsIssues/goodsIssues.js<br/>returnGoodsIssueDetail
+    participant API as PATCH /api/warehouse/goods-issues/:id/details/:detailId/returns
 
-    Browser->>View: returns/goodsIssueReturn.js configura issueReturnUI
-    View->>Application: returnGoodsIssueDetail → request homólogo
-    Application->>Transport: envía PATCH /api/warehouse/goods-issues/:id/details/:detailId/returns
-    Transport-->>Application: devolver respuesta normalizada
-    Application-->>View: presentar resultado observable
+    Warehouse->>Issue: selecciona Devolver en un detalle
+    Issue->>Domain: entrega detalles y documento actual
+    Domain->>Return: abre devolución con cantidad retornable
+    Warehouse->>Return: captura cantidad y confirma
+    Return->>Return: valida límite retornable
+    Return->>App: { id, detailId, formData }
+    App->>API: returnGoodsIssueDetailRequest
+    API-->>App: salida actualizada
+    App-->>Return: respuesta exitosa
+    Return->>Issue: recarga la página y consulta el estado actualizado
 ```
 
 ## `CU-SAL-07`
-
-**Identificador:** `DIA-FE-CU-SAL-07`. **Fuente:** fila `CU-SAL-07` de la matriz de aplicación al código frontend.
 
 **Patrones:** `FE-P05`.
 
@@ -952,8 +917,6 @@ sequenceDiagram
 
 ## `CU-SAL-08`
 
-**Identificador:** `DIA-FE-CU-SAL-08`. **Fuente:** fila `CU-SAL-08` de la matriz de aplicación al código frontend.
-
 **Patrones:** `FE-P05`.
 
 ```mermaid
@@ -972,8 +935,6 @@ sequenceDiagram
 ```
 
 ## `CU-SAL-09`
-
-**Identificador:** `DIA-FE-CU-SAL-09`. **Fuente:** fila `CU-SAL-09` de la matriz de aplicación al código frontend.
 
 **Patrones:** `FE-P05`.
 
@@ -994,8 +955,6 @@ sequenceDiagram
 
 ## `CU-SAL-10`
 
-**Identificador:** `DIA-FE-CU-SAL-10`. **Fuente:** fila `CU-SAL-10` de la matriz de aplicación al código frontend.
-
 **Patrones:** `FE-P05`.
 
 ```mermaid
@@ -1014,8 +973,6 @@ sequenceDiagram
 ```
 
 ## `CU-SAL-11`
-
-**Identificador:** `DIA-FE-CU-SAL-11`. **Fuente:** fila `CU-SAL-11` de la matriz de aplicación al código frontend.
 
 **Patrones:** `FE-P05`.
 
@@ -1036,28 +993,31 @@ sequenceDiagram
 
 ## `CU-SAL-12`
 
-**Identificador:** `DIA-FE-CU-SAL-12`. **Fuente:** fila `CU-SAL-12` de la matriz de aplicación al código frontend.
-
 **Patrones:** `FE-P05`, `FE-P06`.
 
 ```mermaid
 sequenceDiagram
-    participant Browser as Navegador
-    participant View as src/public/js/pages/warehouse/wasteIssues/returns/wasteIssueReturn.js<br/>returns/wasteIssueReturn.js
-    participant Application as src/public/js/application/warehouse/wasteIssues/wasteIssues.js<br/>returnWasteIssueDetail
-    participant Transport as src/routes/api/warehouse/wasteIssueApiRoute.js<br/>PATCH /api/warehouse/waste-issues/:id/details/:detailId/returns
-    Note over Application,Transport: Variables de frontera: id, detailId, formData/payload, cantidadRetornable
+    Note over Warehouse,App: Variables de frontera: id, detailId, returnDto, userId y tx
+    actor Warehouse as Almacén
+    participant Issue as src/public/js/pages/warehouse/wasteIssues/returns/wasteIssueReturn.js<br/>returns/wasteIssueReturn.js
+    participant Return as issueReturn UI
+    participant Domain as initializeWasteIssueReturns
+    participant App as src/public/js/application/warehouse/wasteIssues/wasteIssues.js<br/>returnWasteIssueDetail
+    participant API as PATCH /api/warehouse/waste-issues/:id/details/:detailId/returns
 
-    Browser->>View: returns/wasteIssueReturn.js configura issueReturnUI
-    View->>Application: returnWasteIssueDetail → request homólogo
-    Application->>Transport: envía PATCH /api/warehouse/waste-issues/:id/details/:detailId/returns
-    Transport-->>Application: devolver respuesta normalizada
-    Application-->>View: presentar resultado observable
+    Warehouse->>Issue: selecciona Devolver en un detalle de merma
+    Issue->>Domain: entrega detalle y salida de merma actual
+    Domain->>Return: abre devolución con cantidad retornable
+    Warehouse->>Return: captura cantidad y confirma
+    Return->>Return: valida límite retornable
+    Return->>App: { id, detailId, formData }
+    App->>API: returnWasteIssueDetailRequest
+    API-->>App: wasteIssueReturn
+    App-->>Return: respuesta exitosa
+    Return->>Issue: recarga la página y consulta la salida actualizada
 ```
 
 ## `CU-REP-01`
-
-**Identificador:** `DIA-FE-CU-REP-01`. **Fuente:** fila `CU-REP-01` de la matriz de aplicación al código frontend.
 
 **Patrones:** `FE-P07`.
 
@@ -1078,8 +1038,6 @@ sequenceDiagram
 
 ## `CU-REP-02`
 
-**Identificador:** `DIA-FE-CU-REP-02`. **Fuente:** fila `CU-REP-02` de la matriz de aplicación al código frontend.
-
 **Patrones:** `FE-P07`.
 
 ```mermaid
@@ -1098,8 +1056,6 @@ sequenceDiagram
 ```
 
 ## `CU-REP-03`
-
-**Identificador:** `DIA-FE-CU-REP-03`. **Fuente:** fila `CU-REP-03` de la matriz de aplicación al código frontend.
 
 **Patrones:** `FE-P08`.
 
@@ -1120,8 +1076,6 @@ sequenceDiagram
 
 ## `CU-REP-04`
 
-**Identificador:** `DIA-FE-CU-REP-04`. **Fuente:** fila `CU-REP-04` de la matriz de aplicación al código frontend.
-
 **Patrones:** `FE-P08`.
 
 ```mermaid
@@ -1140,8 +1094,6 @@ sequenceDiagram
 ```
 
 ## `CU-REP-05`
-
-**Identificador:** `DIA-FE-CU-REP-05`. **Fuente:** fila `CU-REP-05` de la matriz de aplicación al código frontend.
 
 **Patrones:** `FE-P08`.
 
@@ -1162,8 +1114,6 @@ sequenceDiagram
 
 ## `CU-REP-06`
 
-**Identificador:** `DIA-FE-CU-REP-06`. **Fuente:** fila `CU-REP-06` de la matriz de aplicación al código frontend.
-
 **Patrones:** `FE-P07`.
 
 ```mermaid
@@ -1182,8 +1132,6 @@ sequenceDiagram
 ```
 
 ## `CU-REP-07`
-
-**Identificador:** `DIA-FE-CU-REP-07`. **Fuente:** fila `CU-REP-07` de la matriz de aplicación al código frontend.
 
 **Patrones:** `FE-P07`.
 
@@ -1204,8 +1152,6 @@ sequenceDiagram
 
 ## `CU-REP-08`
 
-**Identificador:** `DIA-FE-CU-REP-08`. **Fuente:** fila `CU-REP-08` de la matriz de aplicación al código frontend.
-
 **Patrones:** `FE-P08`.
 
 ```mermaid
@@ -1224,8 +1170,6 @@ sequenceDiagram
 ```
 
 ## `CU-REP-09`
-
-**Identificador:** `DIA-FE-CU-REP-09`. **Fuente:** fila `CU-REP-09` de la matriz de aplicación al código frontend.
 
 **Patrones:** `FE-P08`.
 
@@ -1246,8 +1190,6 @@ sequenceDiagram
 
 ## `CU-REP-10`
 
-**Identificador:** `DIA-FE-CU-REP-10`. **Fuente:** fila `CU-REP-10` de la matriz de aplicación al código frontend.
-
 **Patrones:** `FE-P08`.
 
 ```mermaid
@@ -1266,8 +1208,6 @@ sequenceDiagram
 ```
 
 ## `CU-REP-11`
-
-**Identificador:** `DIA-FE-CU-REP-11`. **Fuente:** fila `CU-REP-11` de la matriz de aplicación al código frontend.
 
 **Patrones:** `FE-P08`.
 
@@ -1288,8 +1228,6 @@ sequenceDiagram
 
 ## `CU-REP-12`
 
-**Identificador:** `DIA-FE-CU-REP-12`. **Fuente:** fila `CU-REP-12` de la matriz de aplicación al código frontend.
-
 **Patrones:** `FE-P08`.
 
 ```mermaid
@@ -1308,8 +1246,6 @@ sequenceDiagram
 ```
 
 ## `CU-REP-13`
-
-**Identificador:** `DIA-FE-CU-REP-13`. **Fuente:** fila `CU-REP-13` de la matriz de aplicación al código frontend.
 
 **Patrones:** `FE-P08`.
 
@@ -1330,8 +1266,6 @@ sequenceDiagram
 
 ## `CU-REP-14`
 
-**Identificador:** `DIA-FE-CU-REP-14`. **Fuente:** fila `CU-REP-14` de la matriz de aplicación al código frontend.
-
 **Patrones:** `FE-P08`.
 
 ```mermaid
@@ -1350,8 +1284,6 @@ sequenceDiagram
 ```
 
 ## `CU-REP-15`
-
-**Identificador:** `DIA-FE-CU-REP-15`. **Fuente:** fila `CU-REP-15` de la matriz de aplicación al código frontend.
 
 **Patrones:** `FE-P08`.
 
