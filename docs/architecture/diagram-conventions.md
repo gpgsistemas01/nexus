@@ -63,12 +63,14 @@ cuando dos casos necesitan vista dinámica, cada diagrama conserva nombres y dec
 específicos de su implementación.
 
 Cada colección de aplicación al código incluye un índice breve de patrones. El diagrama
-de cada caso declara los códigos que aplica y conserva únicamente su recorrido concreto;
-una nota breve dentro de la secuencia nombra el símbolo o las capas que materializan esos
-patrones en el código. La explicación y la colaboración completa permanecen en el
-catálogo de patrones. Así una refactorización se revisa primero en `DIA-PAT-*` y sus
-implementaciones, y los casos afectados se localizan por su línea **Patrones** y por la
-nota del diagrama, sin insertar participantes ficticios que compliquen la lectura.
+de cada caso declara los códigos que aplica, pero esa línea funciona sólo como índice y
+no como explicación de la construcción. La secuencia conserva el recorrido concreto:
+participantes con archivos o símbolos ejecutables, mensajes con llamadas ordenadas y
+datos de frontera, y notas sólo para límites que no caben en un mensaje. La explicación
+reutilizable y su secuencia canónica permanecen en el catálogo de patrones. Así una
+refactorización se revisa primero en `DIA-PAT-*` y sus implementaciones, y los casos
+afectados se localizan por su línea **Patrones**, sin insertar participantes ficticios
+ni presentar el resumen del patrón como evidencia suficiente.
 
 En secuencias, `actor` se reserva para una persona, rol o sistema externo autónomo que
 inicia o recibe una interacción. Navegador, EJS, router, controller, servicio y base de

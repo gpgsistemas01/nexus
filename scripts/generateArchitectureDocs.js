@@ -98,6 +98,14 @@ const validateUseCaseDiagramCoverage = async () => {
             if (!body.includes('Variables de frontera:')) {
                 failures.push(`diagramas ${side}: ${id} no identifica sus variables de frontera`);
             }
+            const sequence = getMermaidBlocks(body)[0] ?? '';
+            const tracedParticipants = sequence.match(/participant .* as .*src\//g) ?? [];
+            if (tracedParticipants.length < 2) {
+                failures.push(`diagramas ${side}: ${id} no traza al menos dos participantes a archivos src/`);
+            }
+            if (new RegExp(`(?:BE|FE)-P\\d{2}`).test(sequence)) {
+                failures.push(`diagramas ${side}: ${id} repite el índice de patrones dentro de Mermaid`);
+            }
         }
     }
 
