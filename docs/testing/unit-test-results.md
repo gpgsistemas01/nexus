@@ -17,13 +17,13 @@ la cobertura de versiones posteriores.
 
 | Campo | Evidencia |
 | --- | --- |
-| Fecha (UTC) | 2026-09-02 |
-| Revisión evaluada | `a36a483d` (código ejecutable sin cambios en la actualización documental posterior) |
+| Fecha (UTC) | 2026-09-03 |
+| Revisión evaluada | `1853ac8c` más la actualización documental del catálogo; el código ejecutable no fue modificado |
 | Suite ejecutada | `SU-UNIT-001` — Suite unitaria de Nexus, definida en `unit-test-catalog.md` |
 | Comando | `npm run test:unit` |
 | Ambiente | Linux; Node.js `v20.20.2`; Vitest `v4.1.9` |
 | Resultado | **Aprobado**: 70 archivos y 280 pruebas aprobadas; 0 fallidas |
-| Duración informada por Vitest | 21.92 s |
+| Duración informada por Vitest | 20.75 s |
 | Alcance | Archivos `tests/**/*Test.js`, excluyendo `tests/integration/**`, según `vitestConfig.js` |
 | Observaciones | La ejecución mostró la advertencia de npm sobre la configuración de entorno `http-proxy`. Además, Node.js `v20.20.2` no corresponde al rango `>=22 <25` declarado por el proyecto; aunque la suite finalizó correctamente, debe repetirse con una versión admitida en CI o antes de la entrega. |
 
