@@ -41,6 +41,9 @@ const walk = async (directory) => {
 const getUseCaseTableIds = (source) => [...source.matchAll(/^\| `(CU-[A-Z]+-\d+)` \|/gm)]
     .map((match) => match[1]);
 
+const getMermaidBlocks = (source) => [...source.matchAll(/^```mermaid\n([\s\S]*?)^```$/gm)]
+    .map((match) => match[1]);
+
 const validateUseCaseDiagramCoverage = async () => {
     const sources = new Map(await Promise.all(
         Object.entries(USE_CASE_DOCUMENTS).map(async ([name, file]) => [name, await readFile(file, 'utf8')])
@@ -106,6 +109,23 @@ const validateUseCaseDiagramCoverage = async () => {
             }
             if ((body.match(/^sequenceDiagram$/gm) ?? []).length !== 1) {
                 failures.push(`vistas técnicas ${side}: ${id} debe contener exactamente una secuencia de código`);
+            }
+        }
+
+        const contextualIds = [...source.matchAll(/\*\*Caso:\*\* `(CU-[A-Z]+-\d+)`/g)]
+            .map((match) => match[1]);
+        const expectedOrder = new Map(expectedIds.map((id, index) => [id, index]));
+        if (contextualIds.some((id, index) => (
+            index > 0 && expectedOrder.get(id) < expectedOrder.get(contextualIds[index - 1])
+        ))) {
+            failures.push(`vistas técnicas ${side}: los diagramas no siguen el orden del catálogo de casos de uso`);
+        }
+    }
+
+    for (const [name, source] of sources) {
+        for (const block of getMermaidBlocks(source).filter((body) => body.startsWith('sequenceDiagram\n'))) {
+            if (block.split('\n').some((line) => line.includes(';'))) {
+                failures.push(`${name}: una secuencia Mermaid contiene un punto y coma no compatible con GitHub`);
             }
         }
     }
