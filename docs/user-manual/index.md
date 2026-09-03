@@ -28,9 +28,9 @@ exportación nunca debe mezclar capturas de ejecuciones distintas.
 Las secciones de entradas, salidas, inventario, materiales, mermas, clientes, proveedores,
 personas y usuarios se presentan en los [procedimientos y casos](procedures.md), siguiendo la
 secuencia **propósito → precondiciones → recorrido principal → alternativas → errores →
-resultado**. Cada paso muestra la captura estable correspondiente y advierte si modifica
-existencias o genera un archivo. Esa entrada divide el recorrido por grupo funcional y ofrece
-guías específicas para administrador, almacén y usuarios de consultas y reportes.
+resultado**. Cada procedimiento muestra la captura estable al aparecer la pantalla que representa
+y advierte si modifica existencias o genera un archivo. Esa entrada divide el recorrido por grupo
+funcional y ofrece guías específicas para administrador, almacén y usuarios de consultas y reportes.
 
 Los identificadores, nombres, orden, casos de uso cubiertos y datos de prueba necesarios se
 definen en el [inventario de capturas](screenshot-inventory.md). El inventario sigue el recorrido
