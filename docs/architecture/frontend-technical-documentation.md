@@ -242,6 +242,47 @@ sequenceDiagram
     Form->>Browser: navega a la portada autenticada
 ```
 
+### Ajuste de existencias desde el navegador
+
+Esta vista se conserva porque la ficha de materiales identifica una mutación adicional
+que sí cambia el flujo CRUD común. Documenta exclusivamente `CU-CAT-05`; el ajuste de
+merma, surtimientos, devoluciones y cambios de entradas no sustituyen nombres dentro de
+esta secuencia y requieren una vista propia cuando su coordinación de frontend deba
+explicarse.
+
+**Identificador:** `DIA-FE-SEQ-001`. **Caso:** `CU-CAT-05`. **Tipo:** secuencia Mermaid
+con semántica UML. **Actor:** `Administrador del sistema` es el actor canónico del caso;
+los participantes técnicos se nombran por responsabilidad o módulo y nunca se declaran
+como actores.
+
+```mermaid
+sequenceDiagram
+    actor User as Administrador del sistema
+    participant EJS as materialsPage.ejs
+    participant Form as materialForm / useForm
+    participant App as editMaterialStock
+    participant Factory as createApplicationMutation
+    participant Request as editMaterialStockRequest
+    participant API as PATCH /api/warehouse/materials/:id/stock
+
+    EJS->>Form: carga módulo y formulario
+    User->>Form: confirma ajuste
+    Form->>Form: selecciona campos y valida
+    Form->>App: { formData, id }
+    App->>Factory: mutación configurada editStock
+    Factory->>Request: { data: formData, id }
+    Request->>API: apiRequest({ method: patch, url, data })
+    API-->>Request: { material, code }
+    Request-->>Factory: response
+    Factory-->>Form: material
+    Form->>Form: form.onSave?.(material)
+```
+
+La autorización, validación definitiva, transacción, auditoría y movimiento pertenecen
+al backend y se consultan en el [contrato de la ruta](../data/api-contract.md#ejemplo-aplicado-ajuste-de-existencias-de-material).
+La correspondencia completa requisito–frontend–backend–prueba está en la
+[matriz de trazabilidad técnica](traceability-matrix.md).
+
 ### Alta de merma desde una plantilla de material
 
 **Identificador:** `DIA-FE-ACT-001`. **Caso:** `CU-CAT-14`. Esta actividad hace visible
@@ -342,47 +383,6 @@ sequenceDiagram
     App-->>Return: respuesta exitosa
     Return->>Issue: recarga la página y consulta la salida actualizada
 ```
-
-### Ajuste de existencias desde el navegador
-
-Esta vista se conserva porque la ficha de materiales identifica una mutación adicional
-que sí cambia el flujo CRUD común. Documenta exclusivamente `CU-CAT-05`; el ajuste de
-merma, surtimientos, devoluciones y cambios de entradas no sustituyen nombres dentro de
-esta secuencia y requieren una vista propia cuando su coordinación de frontend deba
-explicarse.
-
-**Identificador:** `DIA-FE-SEQ-001`. **Caso:** `CU-CAT-05`. **Tipo:** secuencia Mermaid
-con semántica UML. **Actor:** `Administrador del sistema` es el actor canónico del caso;
-los participantes técnicos se nombran por responsabilidad o módulo y nunca se declaran
-como actores.
-
-```mermaid
-sequenceDiagram
-    actor User as Administrador del sistema
-    participant EJS as materialsPage.ejs
-    participant Form as materialForm / useForm
-    participant App as editMaterialStock
-    participant Factory as createApplicationMutation
-    participant Request as editMaterialStockRequest
-    participant API as PATCH /api/warehouse/materials/:id/stock
-
-    EJS->>Form: carga módulo y formulario
-    User->>Form: confirma ajuste
-    Form->>Form: selecciona campos y valida
-    Form->>App: { formData, id }
-    App->>Factory: mutación configurada editStock
-    Factory->>Request: { data: formData, id }
-    Request->>API: apiRequest({ method: patch, url, data })
-    API-->>Request: { material, code }
-    Request-->>Factory: response
-    Factory-->>Form: material
-    Form->>Form: form.onSave?.(material)
-```
-
-La autorización, validación definitiva, transacción, auditoría y movimiento pertenecen
-al backend y se consultan en el [contrato de la ruta](../data/api-contract.md#ejemplo-aplicado-ajuste-de-existencias-de-material).
-La correspondencia completa requisito–frontend–backend–prueba está en la
-[matriz de trazabilidad técnica](traceability-matrix.md).
 
 ### Recorridos técnicos con contexto de código para todos los casos
 
@@ -771,7 +771,7 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant Browser as Navegador
-    participant View as El estado se edita en supplierForm.js; no hay pantalla separada
+    participant View as El estado se edita en supplierForm.js, no hay pantalla separada
     participant Application as editSupplier conserva el contexto y usa PUT /api/warehouse/suppliers/:id
     participant Transport as Transporte / destino
 
@@ -1293,7 +1293,7 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant Browser as Navegador
-    participant View as La consulta es el listado de materialsPage.js; no hay página de reporte
+    participant View as La consulta es el listado de materialsPage.js, no hay página de reporte
     participant Application as Reutiliza getAllMaterialsRequest y sus filtros, sin mutación
     participant Transport as Transporte / destino
 
@@ -1383,7 +1383,7 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant Browser as Navegador
-    participant View as La consulta es el listado de wastesPage.js; no hay página de reporte
+    participant View as La consulta es el listado de wastesPage.js, no hay página de reporte
     participant Application as Reutiliza getAllWastesRequest y sus filtros, sin mutación
     participant Transport as Transporte / destino
 
