@@ -95,12 +95,23 @@ límite empieza en HTTP y enlaza el `CU-*` que ya lo identifica; una secuencia d
 experiencia completa sí debe mostrar el actor canónico del caso. No se cambia el actor
 por «Usuario» si el requisito distingue Almacén de Administración.
 
+Los participantes de las secuencias técnicas aplican además los estereotipos UML que
+corresponden a su responsabilidad: `«controller»` identifica el adaptador que recibe la
+interacción (controller HTTP o frontera API que lo contiene) y `«object»` identifica la
+instancia o módulo que ejecuta comportamiento de aplicación, UI o dominio. El
+estereotipo no sustituye el nombre: debajo se conservan el archivo y el símbolo exactos.
+Una etiqueta genérica como «servicio» u «objeto de dominio» sin esa evidencia no cumple
+la convención.
+
 Para que una secuencia sea detallada sin mezclar niveles, se aplican estas reglas:
 
 - cada alias de participante representa una responsabilidad estable y su etiqueta nombra
   el archivo, función, endpoint o servicio concreto del caso, no una oración sobre el
   resultado;
 - los mensajes nombran una acción concreta y mantienen el orden comprobable;
+- las llamadas se escriben como `objeto.metodo(variable)` o `funcion(variable)`, no como
+  una descripción sin firma; cuando un participante agrupa ruta y controller, su etiqueta
+  nombra ambos archivos y el símbolo del controller;
 - las variables de frontera que condicionan la llamada (`id`, `detailId`, payload,
   filtros, DTO o `tx`) se nombran en el diagrama; los temporales internos que no cambian
   la colaboración se consultan en el código enlazado;

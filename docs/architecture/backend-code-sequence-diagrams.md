@@ -9,7 +9,9 @@ negocio se consulta primero el [modelo y los diagramas funcionales de casos de u
 La [matriz técnica de backend](backend-technical-documentation.md#aplicación-de-todos-los-casos-al-código-backend)
 es el índice único de trazabilidad: relaciona caso, entrada HTTP, implementación y
 diagrama. Esta colección no vuelve a copiar esa relación en cada sección. Los
-participantes identifican ruta de archivo, objeto y símbolo. En el recorrido común se
+participantes identifican ruta de archivo, objeto y símbolo. `«controller»` marca el
+adaptador HTTP y `«object»` el módulo que ejecuta comportamiento de dominio; debajo del
+estereotipo siempre se conserva el archivo y el símbolo concreto. En el recorrido común se
 separan cliente, ruta, controller y objeto de dominio; sólo las coordinaciones atómicas
 despliegan objetos colaboradores, persistencia o publicación como participantes
 adicionales. De este modo se conservan pocas entidades sin ocultar el controller ni el
@@ -72,8 +74,8 @@ sequenceDiagram
     Note over Router,Controller: Variables de frontera: name, password y cookies
     participant Browser as Navegador
     participant Router as src/routes/api/authApiRoute.js<br/>POST /api/auth/login
-    participant Controller as Controlador<br/>src/controllers/api/authController.js<br/>authController.login
-    participant Service as authService
+    participant Controller as «controller»<br/>Controlador<br/>src/controllers/api/authController.js<br/>authController.login
+    participant Service as «object»<br/>src/services/authService.js<br/>authService
     participant User as userService / getUserIdByLogin
     participant Prisma as Prisma / PostgreSQL
     participant Token as jwtService / cookies
@@ -107,13 +109,13 @@ sequenceDiagram
 sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route as src/routes/web/auth/logoutWebRoute.js<br/>POST /cerrar-sesion
-    participant Controller as Controlador<br/>src/controllers/web/authController.js<br/>controllers/web/authController.logout
-    participant Domain as cookies / redirect
+    participant Controller as «controller»<br/>Controlador<br/>src/controllers/web/authController.js<br/>controllers/web/authController.logout
+    participant Domain as «object»<br/>cookies / redirect
     Note over Controller,Domain: Variables de frontera: sin variables adicionales
 
     Client->>Route: POST /cerrar-sesion
-    Route->>Controller: invocar controllers/web/authController.logout
-    Controller->>Domain: Elimina cookies de autenticación y redirige a login, no persiste dominio
+    Route->>Controller: controllers/web/authController.logout(req, res)
+    Controller->>Domain: clearCookie(name, options) y res.redirect(path)
     Domain-->>Controller: devolver resultado o error del caso
     Controller-->>Client: emitir respuesta observable
 ```
@@ -126,13 +128,13 @@ sequenceDiagram
 sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route as src/routes/api/admin/personApiRoute.js<br/>GET /api/admin/persons
-    participant Controller as Controlador<br/>src/controllers/api/admin/personController.js<br/>getAllPersons
-    participant Domain as Objeto de dominio<br/>src/services/admin/person/personService.js<br/>personService.findAllPersons
+    participant Controller as «controller»<br/>Controlador<br/>src/controllers/api/admin/personController.js<br/>getAllPersons
+    participant Domain as «object»<br/>Objeto de dominio<br/>src/services/admin/person/personService.js<br/>personService.findAllPersons
     Note over Controller,Domain: Variables de frontera: req.query/params
 
     Client->>Route: GET /api/admin/persons
-    Route->>Controller: invocar getAllPersons
-    Controller->>Domain: personService.findAllPersons consulta Person y asignaciones
+    Route->>Controller: getAllPersons(req, res)
+    Controller->>Domain: personService.findAllPersons({ query: req.query }) consulta Person y asignaciones
     Domain-->>Controller: devolver resultado o error del caso
     Controller-->>Client: emitir respuesta observable
 ```
@@ -145,13 +147,13 @@ sequenceDiagram
 sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route as src/routes/api/admin/personApiRoute.js<br/>POST /api/admin/persons
-    participant Controller as Controlador<br/>src/controllers/api/admin/personController.js<br/>registerPerson
-    participant Domain as Objeto de dominio<br/>src/services/admin/person/personService.js<br/>personService.createPerson
+    participant Controller as «controller»<br/>Controlador<br/>src/controllers/api/admin/personController.js<br/>registerPerson
+    participant Domain as «object»<br/>Objeto de dominio<br/>src/services/admin/person/personService.js<br/>personService.createPerson
     Note over Controller,Domain: Variables de frontera: req.body/DTO, tx
 
     Client->>Route: POST /api/admin/persons
-    Route->>Controller: invocar registerPerson
-    Controller->>Domain: personService.createPerson valida y crea persona/asignaciones
+    Route->>Controller: registerPerson(req, res)
+    Controller->>Domain: personService.createPerson({ dto: req.body }) valida y crea persona/asignaciones
     Domain-->>Controller: devolver resultado o error del caso
     Controller-->>Client: emitir respuesta observable
 ```
@@ -164,13 +166,13 @@ sequenceDiagram
 sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route as src/routes/api/admin/personApiRoute.js<br/>PUT /api/admin/persons/:id
-    participant Controller as Controlador<br/>src/controllers/api/admin/personController.js<br/>editPerson
-    participant Domain as Objeto de dominio<br/>src/services/admin/person/personService.js<br/>personService.updatePerson
+    participant Controller as «controller»<br/>Controlador<br/>src/controllers/api/admin/personController.js<br/>editPerson
+    participant Domain as «object»<br/>Objeto de dominio<br/>src/services/admin/person/personService.js<br/>personService.updatePerson
     Note over Controller,Domain: Variables de frontera: req.params.id, req.body/DTO, tx
 
     Client->>Route: PUT /api/admin/persons/:id
-    Route->>Controller: invocar editPerson
-    Controller->>Domain: personService.updatePerson actualiza persona/asignaciones
+    Route->>Controller: editPerson(req, res)
+    Controller->>Domain: personService.updatePerson({ id: req.params.id, dto: req.body }) actualiza persona/asignaciones
     Domain-->>Controller: devolver resultado o error del caso
     Controller-->>Client: emitir respuesta observable
 ```
@@ -183,13 +185,13 @@ sequenceDiagram
 sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route as src/routes/api/admin/userApiRoute.js<br/>GET /api/admin/users
-    participant Controller as Controlador<br/>src/controllers/api/admin/userController.js<br/>getAllUsers
-    participant Domain as Objeto de dominio<br/>src/services/admin/userService.js<br/>userService.findAllUsers
+    participant Controller as «controller»<br/>Controlador<br/>src/controllers/api/admin/userController.js<br/>getAllUsers
+    participant Domain as «object»<br/>Objeto de dominio<br/>src/services/admin/userService.js<br/>userService.findAllUsers
     Note over Controller,Domain: Variables de frontera: req.query/params
 
     Client->>Route: GET /api/admin/users
-    Route->>Controller: invocar getAllUsers
-    Controller->>Domain: userService.findAllUsers consulta cuentas y accesos
+    Route->>Controller: getAllUsers(req, res)
+    Controller->>Domain: userService.findAllUsers({ query: req.query }) consulta cuentas y accesos
     Domain-->>Controller: devolver resultado o error del caso
     Controller-->>Client: emitir respuesta observable
 ```
@@ -202,13 +204,13 @@ sequenceDiagram
 sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route as src/routes/api/admin/userApiRoute.js<br/>POST /api/admin/users
-    participant Controller as Controlador<br/>src/controllers/api/admin/userController.js<br/>registerUser
-    participant Domain as Objeto de dominio<br/>src/services/admin/userService.js<br/>userService.createUser
+    participant Controller as «controller»<br/>Controlador<br/>src/controllers/api/admin/userController.js<br/>registerUser
+    participant Domain as «object»<br/>Objeto de dominio<br/>src/services/admin/userService.js<br/>userService.createUser
     Note over Controller,Domain: Variables de frontera: req.body/DTO, tx
 
     Client->>Route: POST /api/admin/users
-    Route->>Controller: invocar registerUser
-    Controller->>Domain: userService.createUser crea cuenta, contraseña cifrada y acceso
+    Route->>Controller: registerUser(req, res)
+    Controller->>Domain: userService.createUser({ dto: req.body }) crea cuenta, contraseña cifrada y acceso
     Domain-->>Controller: devolver resultado o error del caso
     Controller-->>Client: emitir respuesta observable
 ```
@@ -221,13 +223,13 @@ sequenceDiagram
 sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route as src/routes/api/admin/userApiRoute.js<br/>PATCH /api/admin/users/:id
-    participant Controller as Controlador<br/>src/controllers/api/admin/userController.js<br/>editUser
-    participant Domain as Objeto de dominio<br/>src/services/admin/userService.js<br/>userService.updateUser
+    participant Controller as «controller»<br/>Controlador<br/>src/controllers/api/admin/userController.js<br/>editUser
+    participant Domain as «object»<br/>Objeto de dominio<br/>src/services/admin/userService.js<br/>userService.updateUser
     Note over Controller,Domain: Variables de frontera: req.params.id, req.body/DTO, tx
 
     Client->>Route: PATCH /api/admin/users/:id
-    Route->>Controller: invocar editUser
-    Controller->>Domain: userService.updateUser actualiza cuenta y asignación autorizada
+    Route->>Controller: editUser(req, res)
+    Controller->>Domain: userService.updateUser({ id: req.params.id, dto: req.body }) actualiza cuenta y asignación autorizada
     Domain-->>Controller: devolver resultado o error del caso
     Controller-->>Client: emitir respuesta observable
 ```
@@ -240,13 +242,13 @@ sequenceDiagram
 sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route as src/routes/api/admin/userApiRoute.js<br/>PATCH /api/admin/users/:id/password
-    participant Controller as Controlador<br/>src/controllers/api/admin/userController.js<br/>editUserPassword
-    participant Domain as Objeto de dominio<br/>src/services/admin/userService.js<br/>userService.updateUserPassword
+    participant Controller as «controller»<br/>Controlador<br/>src/controllers/api/admin/userController.js<br/>editUserPassword
+    participant Domain as «object»<br/>Objeto de dominio<br/>src/services/admin/userService.js<br/>userService.updateUserPassword
     Note over Controller,Domain: Variables de frontera: req.params.id, req.body/DTO
 
     Client->>Route: PATCH /api/admin/users/:id/password
-    Route->>Controller: invocar editUserPassword
-    Controller->>Domain: userService.updateUserPassword cifra y sustituye la contraseña
+    Route->>Controller: editUserPassword(req, res)
+    Controller->>Domain: userService.updateUserPassword({ id: req.params.id, dto: req.body }) cifra y sustituye la contraseña
     Domain-->>Controller: devolver resultado o error del caso
     Controller-->>Client: emitir respuesta observable
 ```
@@ -259,13 +261,13 @@ sequenceDiagram
 sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route as src/routes/api/admin/roleApiRoute.js<br/>GET /api/admin/roles
-    participant Controller as Controlador<br/>src/controllers/api/admin/roleController.js<br/>roleController.getAllRoles
-    participant Domain as Objeto de dominio<br/>src/services/admin/roleService.js<br/>roleService.findAllRoles
+    participant Controller as «controller»<br/>Controlador<br/>src/controllers/api/admin/roleController.js<br/>roleController.getAllRoles
+    participant Domain as «object»<br/>Objeto de dominio<br/>src/services/admin/roleService.js<br/>roleService.findAllRoles
     Note over Controller,Domain: Variables de frontera: req.query/params
 
     Client->>Route: GET /api/admin/roles
-    Route->>Controller: invocar roleController.getAllRoles
-    Controller->>Domain: roleService.findAllRoles lee Role, no existe mutación publicada
+    Route->>Controller: roleController.getAllRoles(req, res)
+    Controller->>Domain: roleService.findAllRoles({ query: req.query }) lee Role, no existe mutación publicada
     Domain-->>Controller: devolver resultado o error del caso
     Controller-->>Client: emitir respuesta observable
 ```
@@ -278,13 +280,13 @@ sequenceDiagram
 sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route as src/routes/api/admin/departmentApiRoute.js<br/>GET /api/admin/departments
-    participant Controller as Controlador<br/>src/controllers/api/admin/departmentController.js<br/>departmentController.getAllDepartments
-    participant Domain as Objeto de dominio<br/>src/services/admin/departmentService.js<br/>departmentService.findAllDepartments
+    participant Controller as «controller»<br/>Controlador<br/>src/controllers/api/admin/departmentController.js<br/>departmentController.getAllDepartments
+    participant Domain as «object»<br/>Objeto de dominio<br/>src/services/admin/departmentService.js<br/>departmentService.findAllDepartments
     Note over Controller,Domain: Variables de frontera: req.query/params
 
     Client->>Route: GET /api/admin/departments
-    Route->>Controller: invocar departmentController.getAllDepartments
-    Controller->>Domain: departmentService.findAllDepartments lee Department
+    Route->>Controller: departmentController.getAllDepartments(req, res)
+    Controller->>Domain: departmentService.findAllDepartments({ query: req.query }) lee Department
     Domain-->>Controller: devolver resultado o error del caso
     Controller-->>Client: emitir respuesta observable
 ```
@@ -297,13 +299,13 @@ sequenceDiagram
 sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route as src/routes/api/warehouse/materialApiRoute.js<br/>GET /api/warehouse/materials
-    participant Controller as Controlador<br/>src/controllers/api/warehouse/materialController.js<br/>getAllMaterials
-    participant Domain as Objeto de dominio<br/>src/services/warehouse/materials/materialService.js<br/>materialService.findAllMaterials
+    participant Controller as «controller»<br/>Controlador<br/>src/controllers/api/warehouse/materialController.js<br/>getAllMaterials
+    participant Domain as «object»<br/>Objeto de dominio<br/>src/services/warehouse/materials/materialService.js<br/>materialService.findAllMaterials
     Note over Controller,Domain: Variables de frontera: req.query/params
 
     Client->>Route: GET /api/warehouse/materials
-    Route->>Controller: invocar getAllMaterials
-    Controller->>Domain: materialService.findAllMaterials consulta material, proveedor y existencia
+    Route->>Controller: getAllMaterials(req, res)
+    Controller->>Domain: materialService.findAllMaterials({ query: req.query }) consulta material, proveedor y existencia
     Domain-->>Controller: devolver resultado o error del caso
     Controller-->>Client: emitir respuesta observable
 ```
@@ -316,13 +318,13 @@ sequenceDiagram
 sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route as src/routes/api/warehouse/materialApiRoute.js<br/>POST /api/warehouse/materials
-    participant Controller as Controlador<br/>src/controllers/api/warehouse/materialController.js<br/>registerMaterial
-    participant Domain as Objeto de dominio<br/>src/services/warehouse/materials/materialService.js<br/>materialService.createMaterial
+    participant Controller as «controller»<br/>Controlador<br/>src/controllers/api/warehouse/materialController.js<br/>registerMaterial
+    participant Domain as «object»<br/>Objeto de dominio<br/>src/services/warehouse/materials/materialService.js<br/>materialService.createMaterial
     Note over Controller,Domain: Variables de frontera: req.body/DTO, tx
 
     Client->>Route: POST /api/warehouse/materials
-    Route->>Controller: invocar registerMaterial
-    Controller->>Domain: materialService.createMaterial crea identidad y relación de proveedor
+    Route->>Controller: registerMaterial(req, res)
+    Controller->>Domain: materialService.createMaterial({ dto: req.body }) crea identidad y relación de proveedor
     Domain-->>Controller: devolver resultado o error del caso
     Controller-->>Client: emitir respuesta observable
 ```
@@ -335,13 +337,13 @@ sequenceDiagram
 sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route as src/routes/api/warehouse/materialApiRoute.js<br/>PATCH /api/warehouse/materials/:id
-    participant Controller as Controlador<br/>src/controllers/api/warehouse/materialController.js<br/>editMaterial
-    participant Domain as Objeto de dominio<br/>src/services/warehouse/materials/materialService.js<br/>materialService.updateMaterial
+    participant Controller as «controller»<br/>Controlador<br/>src/controllers/api/warehouse/materialController.js<br/>editMaterial
+    participant Domain as «object»<br/>Objeto de dominio<br/>src/services/warehouse/materials/materialService.js<br/>materialService.updateMaterial
     Note over Controller,Domain: Variables de frontera: req.params.id, req.body/DTO, tx
 
     Client->>Route: PATCH /api/warehouse/materials/:id
-    Route->>Controller: invocar editMaterial
-    Controller->>Domain: materialService.updateMaterial sincroniza datos y relación
+    Route->>Controller: editMaterial(req, res)
+    Controller->>Domain: materialService.updateMaterial({ id: req.params.id, dto: req.body }) sincroniza datos y relación
     Domain-->>Controller: devolver resultado o error del caso
     Controller-->>Client: emitir respuesta observable
 ```
@@ -354,13 +356,13 @@ sequenceDiagram
 sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route as src/routes/api/warehouse/materialApiRoute.js<br/>DELETE /api/warehouse/materials/:id
-    participant Controller as Controlador<br/>src/controllers/api/warehouse/materialController.js<br/>removeMaterial
-    participant Domain as Objeto de dominio<br/>src/services/warehouse/materials/materialService.js<br/>materialService.deleteMaterial
+    participant Controller as «controller»<br/>Controlador<br/>src/controllers/api/warehouse/materialController.js<br/>removeMaterial
+    participant Domain as «object»<br/>Objeto de dominio<br/>src/services/warehouse/materials/materialService.js<br/>materialService.deleteMaterial
     Note over Controller,Domain: Variables de frontera: req.params.id, req.body/DTO, tx
 
     Client->>Route: DELETE /api/warehouse/materials/:id
-    Route->>Controller: invocar removeMaterial
-    Controller->>Domain: materialService.deleteMaterial protege referencias antes de eliminar relación
+    Route->>Controller: removeMaterial(req, res)
+    Controller->>Domain: materialService.deleteMaterial({ id: req.params.id, dto: req.body }) protege referencias antes de eliminar relación
     Domain-->>Controller: devolver resultado o error del caso
     Controller-->>Client: emitir respuesta observable
 ```
@@ -373,8 +375,8 @@ sequenceDiagram
 sequenceDiagram
     Note over Router,Controller: Variables de frontera: id, DTO de ajuste y userId
     participant Router as src/routes/api/warehouse/materialApiRoute.js<br/>PATCH /api/warehouse/materials/:id/stock
-    participant Controller as Controlador<br/>src/controllers/api/warehouse/materialController.js<br/>editMaterialStock
-    participant Service as updateMaterialStock
+    participant Controller as «controller»<br/>Controlador<br/>src/controllers/api/warehouse/materialController.js<br/>editMaterialStock
+    participant Service as «object»<br/>src/services/warehouse/materials/materialService.js<br/>updateMaterialStock
     participant Adjustment as createStockAdjustment
     participant Reference as generateYearlyReferenceNumber
     participant Stock as stockHelpers
@@ -383,8 +385,8 @@ sequenceDiagram
     participant Prisma as Prisma / PostgreSQL
     participant Socket as emitInventoryUpdated
 
-    Router->>Controller: autenticar, autorizar e invocar controller
-    Controller->>Service: { id, materialDto, userId }
+    Router->>Controller: editMaterialStock(req, res)
+    Controller->>Service: updateMaterialStock({ id, materialDto, userId })
     Service->>Adjustment: material, proveedor, motivo y nueva existencia
     Adjustment->>Prisma: iniciar $transaction
     Adjustment->>SupplierMaterial: localizar relación con tx
@@ -407,13 +409,13 @@ sequenceDiagram
 sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route as src/routes/api/warehouse/supplierApiRoute.js<br/>GET /api/warehouse/suppliers
-    participant Controller as Controlador<br/>src/controllers/api/warehouse/supplierController.js<br/>getAllSuppliers
-    participant Domain as Objeto de dominio<br/>src/services/warehouse/supplierService.js<br/>supplierService.findAllSuppliers
+    participant Controller as «controller»<br/>Controlador<br/>src/controllers/api/warehouse/supplierController.js<br/>getAllSuppliers
+    participant Domain as «object»<br/>Objeto de dominio<br/>src/services/warehouse/supplierService.js<br/>supplierService.findAllSuppliers
     Note over Controller,Domain: Variables de frontera: req.query/params
 
     Client->>Route: GET /api/warehouse/suppliers
-    Route->>Controller: invocar getAllSuppliers
-    Controller->>Domain: supplierService.findAllSuppliers consulta proveedores
+    Route->>Controller: getAllSuppliers(req, res)
+    Controller->>Domain: supplierService.findAllSuppliers({ query: req.query }) consulta proveedores
     Domain-->>Controller: devolver resultado o error del caso
     Controller-->>Client: emitir respuesta observable
 ```
@@ -426,13 +428,13 @@ sequenceDiagram
 sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route as src/routes/api/warehouse/supplierApiRoute.js<br/>POST /api/warehouse/suppliers
-    participant Controller as Controlador<br/>src/controllers/api/warehouse/supplierController.js<br/>registerSupplier
-    participant Domain as Objeto de dominio<br/>src/services/warehouse/supplierService.js<br/>supplierService.createSupplier
+    participant Controller as «controller»<br/>Controlador<br/>src/controllers/api/warehouse/supplierController.js<br/>registerSupplier
+    participant Domain as «object»<br/>Objeto de dominio<br/>src/services/warehouse/supplierService.js<br/>supplierService.createSupplier
     Note over Controller,Domain: Variables de frontera: req.body/DTO
 
     Client->>Route: POST /api/warehouse/suppliers
-    Route->>Controller: invocar registerSupplier
-    Controller->>Domain: supplierService.createSupplier persiste el proveedor
+    Route->>Controller: registerSupplier(req, res)
+    Controller->>Domain: supplierService.createSupplier({ dto: req.body }) persiste el proveedor
     Domain-->>Controller: devolver resultado o error del caso
     Controller-->>Client: emitir respuesta observable
 ```
@@ -445,13 +447,13 @@ sequenceDiagram
 sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route as src/routes/api/warehouse/supplierApiRoute.js<br/>PUT /api/warehouse/suppliers/:id
-    participant Controller as Controlador<br/>src/controllers/api/warehouse/supplierController.js<br/>editSupplier
-    participant Domain as Objeto de dominio<br/>src/services/warehouse/supplierService.js<br/>supplierService.updateSupplier
+    participant Controller as «controller»<br/>Controlador<br/>src/controllers/api/warehouse/supplierController.js<br/>editSupplier
+    participant Domain as «object»<br/>Objeto de dominio<br/>src/services/warehouse/supplierService.js<br/>supplierService.updateSupplier
     Note over Controller,Domain: Variables de frontera: req.params.id, req.body/DTO
 
     Client->>Route: PUT /api/warehouse/suppliers/:id
-    Route->>Controller: invocar editSupplier
-    Controller->>Domain: supplierService.updateSupplier actualiza datos del proveedor
+    Route->>Controller: editSupplier(req, res)
+    Controller->>Domain: supplierService.updateSupplier({ id: req.params.id, dto: req.body }) actualiza datos del proveedor
     Domain-->>Controller: devolver resultado o error del caso
     Controller-->>Client: emitir respuesta observable
 ```
@@ -464,13 +466,13 @@ sequenceDiagram
 sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route as src/routes/api/warehouse/supplierApiRoute.js<br/>PUT /api/warehouse/suppliers/:id
-    participant Controller as Controlador<br/>src/controllers/api/warehouse/supplierController.js<br/>editSupplier
-    participant Domain as Objeto de dominio<br/>src/services/warehouse/supplierService.js<br/>supplierService.updateSupplier
+    participant Controller as «controller»<br/>Controlador<br/>src/controllers/api/warehouse/supplierController.js<br/>editSupplier
+    participant Domain as «object»<br/>Objeto de dominio<br/>src/services/warehouse/supplierService.js<br/>supplierService.updateSupplier
     Note over Controller,Domain: Variables de frontera: req.params.id, req.body/DTO
 
     Client->>Route: PUT /api/warehouse/suppliers/:id
-    Route->>Controller: invocar editSupplier
-    Controller->>Domain: supplierService.updateSupplier aplica el estado incluido en el DTO, no hay endpoint separado
+    Route->>Controller: editSupplier(req, res)
+    Controller->>Domain: supplierService.updateSupplier({ id: req.params.id, dto: req.body }) aplica el estado incluido en el DTO, no hay endpoint separado
     Domain-->>Controller: devolver resultado o error del caso
     Controller-->>Client: emitir respuesta observable
 ```
@@ -483,13 +485,13 @@ sequenceDiagram
 sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route as src/routes/api/sales/clientApiRoute.js<br/>GET /api/sales/clients
-    participant Controller as Controlador<br/>src/controllers/api/sales/clientController.js<br/>getAllClients
-    participant Domain as Objeto de dominio<br/>src/services/sales/clientService.js<br/>clientService.findAllClients
+    participant Controller as «controller»<br/>Controlador<br/>src/controllers/api/sales/clientController.js<br/>getAllClients
+    participant Domain as «object»<br/>Objeto de dominio<br/>src/services/sales/clientService.js<br/>clientService.findAllClients
     Note over Controller,Domain: Variables de frontera: req.query/params
 
     Client->>Route: GET /api/sales/clients
-    Route->>Controller: invocar getAllClients
-    Controller->>Domain: clientService.findAllClients consulta Client
+    Route->>Controller: getAllClients(req, res)
+    Controller->>Domain: clientService.findAllClients({ query: req.query }) consulta Client
     Domain-->>Controller: devolver resultado o error del caso
     Controller-->>Client: emitir respuesta observable
 ```
@@ -502,13 +504,13 @@ sequenceDiagram
 sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route as src/routes/api/sales/clientApiRoute.js<br/>POST /api/sales/clients
-    participant Controller as Controlador<br/>src/controllers/api/sales/clientController.js<br/>registerClient
-    participant Domain as Objeto de dominio<br/>src/services/sales/clientService.js<br/>clientService.createClient
+    participant Controller as «controller»<br/>Controlador<br/>src/controllers/api/sales/clientController.js<br/>registerClient
+    participant Domain as «object»<br/>Objeto de dominio<br/>src/services/sales/clientService.js<br/>clientService.createClient
     Note over Controller,Domain: Variables de frontera: req.body/DTO
 
     Client->>Route: POST /api/sales/clients
-    Route->>Controller: invocar registerClient
-    Controller->>Domain: clientService.createClient persiste Client
+    Route->>Controller: registerClient(req, res)
+    Controller->>Domain: clientService.createClient({ dto: req.body }) persiste Client
     Domain-->>Controller: devolver resultado o error del caso
     Controller-->>Client: emitir respuesta observable
 ```
@@ -521,13 +523,13 @@ sequenceDiagram
 sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route as src/routes/api/sales/clientApiRoute.js<br/>PUT /api/sales/clients/:id
-    participant Controller as Controlador<br/>src/controllers/api/sales/clientController.js<br/>editClient
-    participant Domain as Objeto de dominio<br/>src/services/sales/clientService.js<br/>clientService.updateClient
+    participant Controller as «controller»<br/>Controlador<br/>src/controllers/api/sales/clientController.js<br/>editClient
+    participant Domain as «object»<br/>Objeto de dominio<br/>src/services/sales/clientService.js<br/>clientService.updateClient
     Note over Controller,Domain: Variables de frontera: req.params.id, req.body/DTO
 
     Client->>Route: PUT /api/sales/clients/:id
-    Route->>Controller: invocar editClient
-    Controller->>Domain: clientService.updateClient actualiza Client
+    Route->>Controller: editClient(req, res)
+    Controller->>Domain: clientService.updateClient({ id: req.params.id, dto: req.body }) actualiza Client
     Domain-->>Controller: devolver resultado o error del caso
     Controller-->>Client: emitir respuesta observable
 ```
@@ -540,13 +542,13 @@ sequenceDiagram
 sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route as src/routes/api/warehouse/wasteApiRoute.js<br/>GET /api/warehouse/wastes
-    participant Controller as Controlador<br/>src/controllers/api/warehouse/wasteController.js<br/>getAllWastes
-    participant Domain as Objeto de dominio<br/>src/services/warehouse/wastes/wasteService.js<br/>wasteService.findAllWastes
+    participant Controller as «controller»<br/>Controlador<br/>src/controllers/api/warehouse/wasteController.js<br/>getAllWastes
+    participant Domain as «object»<br/>Objeto de dominio<br/>src/services/warehouse/wastes/wasteService.js<br/>wasteService.findAllWastes
     Note over Controller,Domain: Variables de frontera: req.query/params
 
     Client->>Route: GET /api/warehouse/wastes
-    Route->>Controller: invocar getAllWastes
-    Controller->>Domain: wasteService.findAllWastes consulta merma e inventario
+    Route->>Controller: getAllWastes(req, res)
+    Controller->>Domain: wasteService.findAllWastes({ query: req.query }) consulta merma e inventario
     Domain-->>Controller: devolver resultado o error del caso
     Controller-->>Client: emitir respuesta observable
 ```
@@ -559,13 +561,13 @@ sequenceDiagram
 sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route as src/routes/api/warehouse/wasteApiRoute.js<br/>GET material-templates / POST wastes
-    participant Controller as Controlador<br/>src/controllers/api/warehouse/wasteController.js<br/>getWasteMaterialTemplates / registerWaste
-    participant Domain as Objeto de dominio<br/>src/services/warehouse/wastes/wasteMaterialService.js + src/services/warehouse/wastes/wasteService.js<br/>findWasteMaterialTemplates / createWasteWithInitialStockAdjustment
+    participant Controller as «controller»<br/>Controlador<br/>src/controllers/api/warehouse/wasteController.js<br/>getWasteMaterialTemplates / registerWaste
+    participant Domain as «object»<br/>Objeto de dominio<br/>src/services/warehouse/wastes/wasteMaterialService.js + src/services/warehouse/wastes/wasteService.js<br/>findWasteMaterialTemplates / createWasteWithInitialStockAdjustment
     Note over Controller,Domain: Variables de frontera: req.body/DTO, req.query/params, tx
 
     Client->>Route: GET /api/warehouse/wastes/material-templates y POST /api/warehouse/wastes
-    Route->>Controller: invocar getWasteMaterialTemplates/registerWaste
-    Controller->>Domain: findWasteMaterialTemplates alimenta la selección y createWasteWithInitialStockAdjustment crea merma, ajuste y movimiento inicial
+    Route->>Controller: getWasteMaterialTemplates(req, res)/registerWaste
+    Controller->>Domain: findWasteMaterialTemplates({ dto: req.body }) alimenta la selección y createWasteWithInitialStockAdjustment crea merma, ajuste y movimiento inicial
     Domain-->>Controller: devolver resultado o error del caso
     Controller-->>Client: emitir respuesta observable
 ```
@@ -578,13 +580,13 @@ sequenceDiagram
 sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route as src/routes/api/warehouse/wasteApiRoute.js<br/>PATCH /api/warehouse/wastes/:id
-    participant Controller as Controlador<br/>src/controllers/api/warehouse/wasteController.js<br/>editWaste
-    participant Domain as Objeto de dominio<br/>src/services/warehouse/wastes/wasteService.js<br/>wasteService.updateWaste
+    participant Controller as «controller»<br/>Controlador<br/>src/controllers/api/warehouse/wasteController.js<br/>editWaste
+    participant Domain as «object»<br/>Objeto de dominio<br/>src/services/warehouse/wastes/wasteService.js<br/>wasteService.updateWaste
     Note over Controller,Domain: Variables de frontera: req.params.id, req.body/DTO
 
     Client->>Route: PATCH /api/warehouse/wastes/:id
-    Route->>Controller: invocar editWaste
-    Controller->>Domain: wasteService.updateWaste actualiza datos sin tratar stock como edición
+    Route->>Controller: editWaste(req, res)
+    Controller->>Domain: wasteService.updateWaste({ id: req.params.id, dto: req.body }) actualiza datos sin tratar stock como edición
     Domain-->>Controller: devolver resultado o error del caso
     Controller-->>Client: emitir respuesta observable
 ```
@@ -597,8 +599,8 @@ sequenceDiagram
 sequenceDiagram
     Note over Router,Controller: Variables de frontera: id, DTO de ajuste y userId
     participant Router as src/routes/api/warehouse/wasteApiRoute.js<br/>PATCH /api/warehouse/wastes/:id/stock
-    participant Controller as Controlador<br/>src/controllers/api/warehouse/wasteController.js<br/>editWasteStock
-    participant Service as updateWasteStock
+    participant Controller as «controller»<br/>Controlador<br/>src/controllers/api/warehouse/wasteController.js<br/>editWasteStock
+    participant Service as «object»<br/>src/services/warehouse/wastes/wasteService.js<br/>updateWasteStock
     participant Adjustment as registerWasteStockAdjustment
     participant Reference as generateYearlyReferenceNumber
     participant Stock as stockHelpers
@@ -606,8 +608,8 @@ sequenceDiagram
     participant Prisma as Prisma / PostgreSQL
     participant Socket as emitInventoryUpdated
 
-    Router->>Controller: autenticar, autorizar e invocar controller
-    Controller->>Service: { id, wasteStockDto, userId }
+    Router->>Controller: editWasteStock(req, res)
+    Controller->>Service: updateWasteStock({ id, wasteStockDto, userId })
     Service->>Prisma: iniciar $transaction
     Service->>Prisma: cargar Waste vigente
     Service->>Adjustment: merma, motivo y nueva existencia con tx
@@ -629,13 +631,13 @@ sequenceDiagram
 sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route as src/routes/api/warehouse/presentationApiRoute.js<br/>GET /api/warehouse/presentations
-    participant Controller as Controlador<br/>src/controllers/api/warehouse/presentationController.js<br/>getAllPresentations
-    participant Domain as Objeto de dominio<br/>src/services/warehouse/presentationService.js<br/>presentationService.findAllPresentations
+    participant Controller as «controller»<br/>Controlador<br/>src/controllers/api/warehouse/presentationController.js<br/>getAllPresentations
+    participant Domain as «object»<br/>Objeto de dominio<br/>src/services/warehouse/presentationService.js<br/>presentationService.findAllPresentations
     Note over Controller,Domain: Variables de frontera: req.query/params
 
     Client->>Route: GET /api/warehouse/presentations
-    Route->>Controller: invocar getAllPresentations
-    Controller->>Domain: presentationService.findAllPresentations sirve el catálogo de sólo lectura
+    Route->>Controller: getAllPresentations(req, res)
+    Controller->>Domain: presentationService.findAllPresentations({ query: req.query }) sirve el catálogo de sólo lectura
     Domain-->>Controller: devolver resultado o error del caso
     Controller-->>Client: emitir respuesta observable
 ```
@@ -648,13 +650,13 @@ sequenceDiagram
 sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route as src/routes/api/warehouse/unitMeasureApiRoute.js<br/>GET /api/warehouse/unit-measures
-    participant Controller as Controlador<br/>src/controllers/api/warehouse/unitMeasureController.js<br/>getAllUnitMeasures
-    participant Domain as Objeto de dominio<br/>src/services/warehouse/unitMeasureService.js<br/>unitMeasureService.findAllUnitMeasures
+    participant Controller as «controller»<br/>Controlador<br/>src/controllers/api/warehouse/unitMeasureController.js<br/>getAllUnitMeasures
+    participant Domain as «object»<br/>Objeto de dominio<br/>src/services/warehouse/unitMeasureService.js<br/>unitMeasureService.findAllUnitMeasures
     Note over Controller,Domain: Variables de frontera: req.query/params
 
     Client->>Route: GET /api/warehouse/unit-measures
-    Route->>Controller: invocar getAllUnitMeasures
-    Controller->>Domain: unitMeasureService.findAllUnitMeasures sirve el catálogo de sólo lectura
+    Route->>Controller: getAllUnitMeasures(req, res)
+    Controller->>Domain: unitMeasureService.findAllUnitMeasures({ query: req.query }) sirve el catálogo de sólo lectura
     Domain-->>Controller: devolver resultado o error del caso
     Controller-->>Client: emitir respuesta observable
 ```
@@ -667,13 +669,13 @@ sequenceDiagram
 sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route as src/routes/api/warehouse/reasonApiRoute.js<br/>GET /api/warehouse/reasons
-    participant Controller as Controlador<br/>src/controllers/api/warehouse/reasonController.js<br/>getAllReasons
-    participant Domain as Objeto de dominio<br/>src/services/warehouse/reasonService.js<br/>reasonService.findAllReasons
+    participant Controller as «controller»<br/>Controlador<br/>src/controllers/api/warehouse/reasonController.js<br/>getAllReasons
+    participant Domain as «object»<br/>Objeto de dominio<br/>src/services/warehouse/reasonService.js<br/>reasonService.findAllReasons
     Note over Controller,Domain: Variables de frontera: req.query/params
 
     Client->>Route: GET /api/warehouse/reasons
-    Route->>Controller: invocar getAllReasons
-    Controller->>Domain: reasonService.findAllReasons sirve motivos, helpers resuelven motivos internos
+    Route->>Controller: getAllReasons(req, res)
+    Controller->>Domain: reasonService.findAllReasons({ query: req.query }) sirve motivos, helpers resuelven motivos internos
     Domain-->>Controller: devolver resultado o error del caso
     Controller-->>Client: emitir respuesta observable
 ```
@@ -686,13 +688,13 @@ sequenceDiagram
 sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route as src/routes/api/warehouse/fulfillmentStatusApiRoute.js<br/>GET /api/warehouse/fulfillment-statuses
-    participant Controller as Controlador<br/>src/controllers/api/warehouse/fulfillmentStatusController.js<br/>getAllFulfillmentStatuses
-    participant Domain as Objeto de dominio<br/>src/services/warehouse/fulfillmentStatusService.js<br/>fulfillmentStatusService.findAllFulfillmentStatuses
+    participant Controller as «controller»<br/>Controlador<br/>src/controllers/api/warehouse/fulfillmentStatusController.js<br/>getAllFulfillmentStatuses
+    participant Domain as «object»<br/>Objeto de dominio<br/>src/services/warehouse/fulfillmentStatusService.js<br/>fulfillmentStatusService.findAllFulfillmentStatuses
     Note over Controller,Domain: Variables de frontera: req.query/params
 
     Client->>Route: GET /api/warehouse/fulfillment-statuses
-    Route->>Controller: invocar getAllFulfillmentStatuses
-    Controller->>Domain: fulfillmentStatusService.findAllFulfillmentStatuses sirve estados de sólo lectura
+    Route->>Controller: getAllFulfillmentStatuses(req, res)
+    Controller->>Domain: fulfillmentStatusService.findAllFulfillmentStatuses({ query: req.query }) sirve estados de sólo lectura
     Domain-->>Controller: devolver resultado o error del caso
     Controller-->>Client: emitir respuesta observable
 ```
@@ -705,13 +707,13 @@ sequenceDiagram
 sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route as src/routes/api/warehouse/goodsReceiptApiRoute.js<br/>GET /api/warehouse/goods-receipts
-    participant Controller as Controlador<br/>src/controllers/api/warehouse/goodsReceiptController.js<br/>getAllGoodsReceipts
-    participant Domain as Objeto de dominio<br/>src/services/warehouse/goodsReceipts/goodsReceiptService.js<br/>goodsReceiptService.findAllGoodsReceipts
+    participant Controller as «controller»<br/>Controlador<br/>src/controllers/api/warehouse/goodsReceiptController.js<br/>getAllGoodsReceipts
+    participant Domain as «object»<br/>Objeto de dominio<br/>src/services/warehouse/goodsReceipts/goodsReceiptService.js<br/>goodsReceiptService.findAllGoodsReceipts
     Note over Controller,Domain: Variables de frontera: req.query/params
 
     Client->>Route: GET /api/warehouse/goods-receipts
-    Route->>Controller: invocar getAllGoodsReceipts
-    Controller->>Domain: goodsReceiptService.findAllGoodsReceipts consulta entradas y totales
+    Route->>Controller: getAllGoodsReceipts(req, res)
+    Controller->>Domain: goodsReceiptService.findAllGoodsReceipts({ query: req.query }) consulta entradas y totales
     Domain-->>Controller: devolver resultado o error del caso
     Controller-->>Client: emitir respuesta observable
 ```
@@ -725,9 +727,9 @@ sequenceDiagram
     Note over Router,Controller: Variables de frontera: goodsReceiptDto y tx
     participant Browser as Navegador
     participant Router as src/routes/api/warehouse/goodsReceiptApiRoute.js<br/>POST /api/warehouse/goods-receipts
-    participant Controller as Controlador<br/>src/controllers/api/warehouse/goodsReceiptController.js<br/>registerGoodsReceipt
+    participant Controller as «controller»<br/>Controlador<br/>src/controllers/api/warehouse/goodsReceiptController.js<br/>registerGoodsReceipt
     participant DTO as createGoodsReceiptDtoForRegister
-    participant Service as createGoodsReceipt
+    participant Service as «object»<br/>src/services/warehouse/goodsReceipts/goodsReceiptService.js<br/>createGoodsReceipt
     participant Reference as referenceNumberService
     participant DetailBuilder as buildGoodsReceiptDetails
     participant Inventory as applyInventoryMovement
@@ -761,13 +763,13 @@ sequenceDiagram
 sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route as src/routes/api/warehouse/goodsReceiptApiRoute.js<br/>PATCH /api/warehouse/goods-receipts/:id
-    participant Controller as Controlador<br/>src/controllers/api/warehouse/goodsReceiptController.js<br/>editGoodsReceiptHeader
-    participant Domain as Objeto de dominio<br/>src/services/warehouse/goodsReceipts/goodsReceiptService.js<br/>goodsReceiptService.updateGoodsReceipt
+    participant Controller as «controller»<br/>Controlador<br/>src/controllers/api/warehouse/goodsReceiptController.js<br/>editGoodsReceiptHeader
+    participant Domain as «object»<br/>Objeto de dominio<br/>src/services/warehouse/goodsReceipts/goodsReceiptService.js<br/>goodsReceiptService.updateGoodsReceipt
     Note over Controller,Domain: Variables de frontera: req.params.id, req.body/DTO, tx
 
     Client->>Route: PATCH /api/warehouse/goods-receipts/:id
-    Route->>Controller: invocar editGoodsReceiptHeader
-    Controller->>Domain: goodsReceiptService.updateGoodsReceipt conserva detalles persistidos y actualiza encabezado permitido
+    Route->>Controller: editGoodsReceiptHeader(req, res)
+    Controller->>Domain: goodsReceiptService.updateGoodsReceipt({ id: req.params.id, dto: req.body }) conserva detalles persistidos y actualiza encabezado permitido
     Domain-->>Controller: devolver resultado o error del caso
     Controller-->>Client: emitir respuesta observable
 ```
@@ -780,16 +782,16 @@ sequenceDiagram
 sequenceDiagram
     Note over Router,Controller: Variables de frontera: id, detailId, correctionDto, userId y tx
     participant Router as src/routes/api/warehouse/goodsReceiptApiRoute.js<br/>PATCH /api/warehouse/goods-receipts/:id/details/:detailId/corrections
-    participant Controller as Controlador<br/>src/controllers/api/warehouse/goodsReceiptController.js<br/>correctGoodsReceiptDetail
-    participant Service as correctGoodsReceiptDetailLine
+    participant Controller as «controller»<br/>Controlador<br/>src/controllers/api/warehouse/goodsReceiptController.js<br/>correctGoodsReceiptDetail
+    participant Service as «object»<br/>src/services/warehouse/goodsReceipts/detailChanges/goodsReceiptCorrectionService.js<br/>correctGoodsReceiptDetailLine
     participant Change as goodsReceiptDetailChangeService
     participant Reason as reasonService
     participant Inventory as movementService
     participant Prisma as Prisma / PostgreSQL
     participant Socket as emitInventoryUpdated
 
-    Router->>Controller: autenticar, autorizar e invocar controller
-    Controller->>Service: { id, detailId, correctionDto, userId }
+    Router->>Controller: correctGoodsReceiptDetail(req, res)
+    Controller->>Service: correctGoodsReceiptDetailLine({ id, detailId, correctionDto, userId })
     Service->>Prisma: iniciar $transaction
     Service->>Change: localizar detalle activo con tx
     Service->>Reason: obtener motivo de corrección con tx
@@ -809,13 +811,13 @@ sequenceDiagram
 sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route as src/routes/api/warehouse/goodsReceiptApiRoute.js<br/>PATCH /api/warehouse/goods-receipts/:id/details/:detailId/cancel
-    participant Controller as Controlador<br/>src/controllers/api/warehouse/goodsReceiptController.js<br/>cancelGoodsReceiptDetail
-    participant Domain as Objeto de dominio<br/>src/services/warehouse/goodsReceipts/detailChanges/goodsReceiptCancellationService.js<br/>cancelGoodsReceiptDetailLine
+    participant Controller as «controller»<br/>Controlador<br/>src/controllers/api/warehouse/goodsReceiptController.js<br/>cancelGoodsReceiptDetail
+    participant Domain as «object»<br/>Objeto de dominio<br/>src/services/warehouse/goodsReceipts/detailChanges/goodsReceiptCancellationService.js<br/>cancelGoodsReceiptDetailLine
     Note over Controller,Domain: Variables de frontera: req.params.id, req.params.detailId, req.body/DTO, tx
 
     Client->>Route: PATCH /api/warehouse/goods-receipts/:id/details/:detailId/cancel
-    Route->>Controller: invocar cancelGoodsReceiptDetail
-    Controller->>Domain: cancelGoodsReceiptDetailLine revierte stock/movimiento y conserva historial
+    Route->>Controller: cancelGoodsReceiptDetail(req, res)
+    Controller->>Domain: cancelGoodsReceiptDetailLine({ id: req.params.id, detailId: req.params.detailId, dto: req.body }) revierte stock/movimiento y conserva historial
     Domain-->>Controller: devolver resultado o error del caso
     Controller-->>Client: emitir respuesta observable
 ```
@@ -828,13 +830,13 @@ sequenceDiagram
 sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route as src/routes/api/warehouse/goodsIssueApiRoute.js<br/>GET /api/warehouse/goods-issues
-    participant Controller as Controlador<br/>src/controllers/api/warehouse/goodsIssueController.js<br/>getAllGoodsIssues
-    participant Domain as Objeto de dominio<br/>src/services/warehouse/goodsIssues/goodsIssueService.js<br/>goodsIssueService.findAllGoodsIssues
+    participant Controller as «controller»<br/>Controlador<br/>src/controllers/api/warehouse/goodsIssueController.js<br/>getAllGoodsIssues
+    participant Domain as «object»<br/>Objeto de dominio<br/>src/services/warehouse/goodsIssues/goodsIssueService.js<br/>goodsIssueService.findAllGoodsIssues
     Note over Controller,Domain: Variables de frontera: req.query/params
 
     Client->>Route: GET /api/warehouse/goods-issues
-    Route->>Controller: invocar getAllGoodsIssues
-    Controller->>Domain: goodsIssueService.findAllGoodsIssues consulta documentos y estados
+    Route->>Controller: getAllGoodsIssues(req, res)
+    Controller->>Domain: goodsIssueService.findAllGoodsIssues({ query: req.query }) consulta documentos y estados
     Domain-->>Controller: devolver resultado o error del caso
     Controller-->>Client: emitir respuesta observable
 ```
@@ -847,13 +849,13 @@ sequenceDiagram
 sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route as src/routes/api/warehouse/goodsIssueApiRoute.js<br/>POST /api/warehouse/goods-issues
-    participant Controller as Controlador<br/>src/controllers/api/warehouse/goodsIssueController.js<br/>registerGoodsIssue
-    participant Domain as Objeto de dominio<br/>src/services/warehouse/goodsIssues/goodsIssueService.js<br/>goodsIssueService.createGoodsIssue
+    participant Controller as «controller»<br/>Controlador<br/>src/controllers/api/warehouse/goodsIssueController.js<br/>registerGoodsIssue
+    participant Domain as «object»<br/>Objeto de dominio<br/>src/services/warehouse/goodsIssues/goodsIssueService.js<br/>goodsIssueService.createGoodsIssue
     Note over Controller,Domain: Variables de frontera: req.body/DTO, tx
 
     Client->>Route: POST /api/warehouse/goods-issues
-    Route->>Controller: invocar registerGoodsIssue
-    Controller->>Domain: goodsIssueService.createGoodsIssue crea encabezado y detalles solicitados
+    Route->>Controller: registerGoodsIssue(req, res)
+    Controller->>Domain: goodsIssueService.createGoodsIssue({ dto: req.body }) crea encabezado y detalles solicitados
     Domain-->>Controller: devolver resultado o error del caso
     Controller-->>Client: emitir respuesta observable
 ```
@@ -866,13 +868,13 @@ sequenceDiagram
 sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route as src/routes/api/warehouse/goodsIssueApiRoute.js<br/>PATCH /api/warehouse/goods-issues/:id/header
-    participant Controller as Controlador<br/>src/controllers/api/warehouse/goodsIssueController.js<br/>editGoodsIssueHeader
-    participant Domain as Objeto de dominio<br/>src/services/warehouse/goodsIssues/goodsIssueService.js<br/>goodsIssueService.updateGoodsIssueHeader
+    participant Controller as «controller»<br/>Controlador<br/>src/controllers/api/warehouse/goodsIssueController.js<br/>editGoodsIssueHeader
+    participant Domain as «object»<br/>Objeto de dominio<br/>src/services/warehouse/goodsIssues/goodsIssueService.js<br/>goodsIssueService.updateGoodsIssueHeader
     Note over Controller,Domain: Variables de frontera: req.params.id, req.body/DTO
 
     Client->>Route: PATCH /api/warehouse/goods-issues/:id/header
-    Route->>Controller: invocar editGoodsIssueHeader
-    Controller->>Domain: goodsIssueService.updateGoodsIssueHeader aplica reglas del encabezado
+    Route->>Controller: editGoodsIssueHeader(req, res)
+    Controller->>Domain: goodsIssueService.updateGoodsIssueHeader({ id: req.params.id, dto: req.body }) aplica reglas del encabezado
     Domain-->>Controller: devolver resultado o error del caso
     Controller-->>Client: emitir respuesta observable
 ```
@@ -885,13 +887,13 @@ sequenceDiagram
 sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route as src/routes/api/warehouse/goodsIssueApiRoute.js<br/>PATCH /api/warehouse/goods-issues/:id/details
-    participant Controller as Controlador<br/>src/controllers/api/warehouse/goodsIssueController.js<br/>editGoodsIssueDetails
-    participant Domain as Objeto de dominio<br/>src/services/warehouse/goodsIssues/goodsIssueService.js<br/>goodsIssueService.updateGoodsIssueDetails
+    participant Controller as «controller»<br/>Controlador<br/>src/controllers/api/warehouse/goodsIssueController.js<br/>editGoodsIssueDetails
+    participant Domain as «object»<br/>Objeto de dominio<br/>src/services/warehouse/goodsIssues/goodsIssueService.js<br/>goodsIssueService.updateGoodsIssueDetails
     Note over Controller,Domain: Variables de frontera: req.params.id, req.body/DTO, tx
 
     Client->>Route: PATCH /api/warehouse/goods-issues/:id/details
-    Route->>Controller: invocar editGoodsIssueDetails
-    Controller->>Domain: goodsIssueService.updateGoodsIssueDetails modifica cantidades todavía editables
+    Route->>Controller: editGoodsIssueDetails(req, res)
+    Controller->>Domain: goodsIssueService.updateGoodsIssueDetails({ id: req.params.id, dto: req.body }) modifica cantidades todavía editables
     Domain-->>Controller: devolver resultado o error del caso
     Controller-->>Client: emitir respuesta observable
 ```
@@ -906,9 +908,9 @@ sequenceDiagram
     Note over Router,Controller: Variables de frontera: id, details, goodsIssueDto, userId y tx
     participant Browser as Navegador
     participant Router as src/routes/api/warehouse/goodsIssueApiRoute.js<br/>PATCH /api/warehouse/goods-issues/:id/details
-    participant Controller as Controlador<br/>src/controllers/api/warehouse/goodsIssueController.js<br/>editGoodsIssueDetails
+    participant Controller as «controller»<br/>Controlador<br/>src/controllers/api/warehouse/goodsIssueController.js<br/>editGoodsIssueDetails
     participant DTO as createGoodsIssueDetailsDtoForEdit
-    participant Service as updateGoodsIssueDetails
+    participant Service as «object»<br/>src/services/warehouse/goodsIssues/goodsIssueService.js<br/>updateGoodsIssueDetails
     participant Inventory as applyInventoryMovement
     participant Prisma as Prisma / PostgreSQL
     participant Socket as emitInventoryUpdated
@@ -942,8 +944,8 @@ sequenceDiagram
     Note over Router,Controller: Variables de frontera: id, detailId, returnDto, userId y tx
     participant Browser as Navegador
     participant Router as src/routes/api/warehouse/goodsIssueApiRoute.js<br/>PATCH /api/warehouse/goods-issues/:id/details/:detailId/returns
-    participant Controller as Controlador<br/>src/controllers/api/warehouse/goodsIssueController.js<br/>registerGoodsIssueDetailReturn
-    participant Service as returnGoodsIssueDetail
+    participant Controller as «controller»<br/>Controlador<br/>src/controllers/api/warehouse/goodsIssueController.js<br/>registerGoodsIssueDetailReturn
+    participant Service as «object»<br/>src/services/warehouse/goodsIssues/detailReturns/goodsIssueReturnService.js<br/>returnGoodsIssueDetail
     participant Rules as Validaciones de returnGoodsIssueDetail
     participant Inventory as applyInventoryMovement / ENTRY
     participant Status as resolveIssueFulfillmentStatus
@@ -979,13 +981,13 @@ sequenceDiagram
 sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route as src/routes/api/warehouse/wasteIssueApiRoute.js<br/>GET /api/warehouse/waste-issues
-    participant Controller as Controlador<br/>src/controllers/api/warehouse/wasteIssueController.js<br/>getAllWasteIssues
-    participant Domain as Objeto de dominio<br/>src/services/warehouse/wasteIssues/wasteIssueService.js<br/>wasteIssueService.findAllWasteIssues
+    participant Controller as «controller»<br/>Controlador<br/>src/controllers/api/warehouse/wasteIssueController.js<br/>getAllWasteIssues
+    participant Domain as «object»<br/>Objeto de dominio<br/>src/services/warehouse/wasteIssues/wasteIssueService.js<br/>wasteIssueService.findAllWasteIssues
     Note over Controller,Domain: Variables de frontera: req.query/params
 
     Client->>Route: GET /api/warehouse/waste-issues
-    Route->>Controller: invocar getAllWasteIssues
-    Controller->>Domain: wasteIssueService.findAllWasteIssues consulta salidas de merma
+    Route->>Controller: getAllWasteIssues(req, res)
+    Controller->>Domain: wasteIssueService.findAllWasteIssues({ query: req.query }) consulta salidas de merma
     Domain-->>Controller: devolver resultado o error del caso
     Controller-->>Client: emitir respuesta observable
 ```
@@ -998,13 +1000,13 @@ sequenceDiagram
 sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route as src/routes/api/warehouse/wasteIssueApiRoute.js<br/>POST /api/warehouse/waste-issues
-    participant Controller as Controlador<br/>src/controllers/api/warehouse/wasteIssueController.js<br/>registerWasteIssue
-    participant Domain as Objeto de dominio<br/>src/services/warehouse/wasteIssues/wasteIssueService.js<br/>wasteIssueService.createWasteIssue
+    participant Controller as «controller»<br/>Controlador<br/>src/controllers/api/warehouse/wasteIssueController.js<br/>registerWasteIssue
+    participant Domain as «object»<br/>Objeto de dominio<br/>src/services/warehouse/wasteIssues/wasteIssueService.js<br/>wasteIssueService.createWasteIssue
     Note over Controller,Domain: Variables de frontera: req.body/DTO, tx
 
     Client->>Route: POST /api/warehouse/waste-issues
-    Route->>Controller: invocar registerWasteIssue
-    Controller->>Domain: wasteIssueService.createWasteIssue crea encabezado y detalles de merma
+    Route->>Controller: registerWasteIssue(req, res)
+    Controller->>Domain: wasteIssueService.createWasteIssue({ dto: req.body }) crea encabezado y detalles de merma
     Domain-->>Controller: devolver resultado o error del caso
     Controller-->>Client: emitir respuesta observable
 ```
@@ -1017,13 +1019,13 @@ sequenceDiagram
 sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route as src/routes/api/warehouse/wasteIssueApiRoute.js<br/>PATCH /api/warehouse/waste-issues/:id/header
-    participant Controller as Controlador<br/>src/controllers/api/warehouse/wasteIssueController.js<br/>editWasteIssueHeader
-    participant Domain as Objeto de dominio<br/>src/services/warehouse/wasteIssues/wasteIssueService.js<br/>wasteIssueService.updateWasteIssueHeader
+    participant Controller as «controller»<br/>Controlador<br/>src/controllers/api/warehouse/wasteIssueController.js<br/>editWasteIssueHeader
+    participant Domain as «object»<br/>Objeto de dominio<br/>src/services/warehouse/wasteIssues/wasteIssueService.js<br/>wasteIssueService.updateWasteIssueHeader
     Note over Controller,Domain: Variables de frontera: req.params.id, req.body/DTO
 
     Client->>Route: PATCH /api/warehouse/waste-issues/:id/header
-    Route->>Controller: invocar editWasteIssueHeader
-    Controller->>Domain: wasteIssueService.updateWasteIssueHeader aplica reglas del encabezado
+    Route->>Controller: editWasteIssueHeader(req, res)
+    Controller->>Domain: wasteIssueService.updateWasteIssueHeader({ id: req.params.id, dto: req.body }) aplica reglas del encabezado
     Domain-->>Controller: devolver resultado o error del caso
     Controller-->>Client: emitir respuesta observable
 ```
@@ -1036,13 +1038,13 @@ sequenceDiagram
 sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route as src/routes/api/warehouse/wasteIssueApiRoute.js<br/>PATCH /api/warehouse/waste-issues/:id/details
-    participant Controller as Controlador<br/>src/controllers/api/warehouse/wasteIssueController.js<br/>editWasteIssueDetails
-    participant Domain as Objeto de dominio<br/>src/services/warehouse/wasteIssues/wasteIssueService.js<br/>wasteIssueService.updateWasteIssueDetails
+    participant Controller as «controller»<br/>Controlador<br/>src/controllers/api/warehouse/wasteIssueController.js<br/>editWasteIssueDetails
+    participant Domain as «object»<br/>Objeto de dominio<br/>src/services/warehouse/wasteIssues/wasteIssueService.js<br/>wasteIssueService.updateWasteIssueDetails
     Note over Controller,Domain: Variables de frontera: req.params.id, req.body/DTO, tx
 
     Client->>Route: PATCH /api/warehouse/waste-issues/:id/details
-    Route->>Controller: invocar editWasteIssueDetails
-    Controller->>Domain: wasteIssueService.updateWasteIssueDetails modifica cantidades editables
+    Route->>Controller: editWasteIssueDetails(req, res)
+    Controller->>Domain: wasteIssueService.updateWasteIssueDetails({ id: req.params.id, dto: req.body }) modifica cantidades editables
     Domain-->>Controller: devolver resultado o error del caso
     Controller-->>Client: emitir respuesta observable
 ```
@@ -1055,8 +1057,8 @@ sequenceDiagram
 sequenceDiagram
     Note over Router,Controller: Variables de frontera: id, details, isSupplied y tx
     participant Router as src/routes/api/warehouse/wasteIssueApiRoute.js<br/>PATCH /api/warehouse/waste-issues/:id/details
-    participant Controller as Controlador<br/>src/controllers/api/warehouse/wasteIssueController.js<br/>editWasteIssueDetails
-    participant Service as updateWasteIssueDetails
+    participant Controller as «controller»<br/>Controlador<br/>src/controllers/api/warehouse/wasteIssueController.js<br/>editWasteIssueDetails
+    participant Service as «object»<br/>src/services/warehouse/wasteIssues/wasteIssueService.js<br/>updateWasteIssueDetails
     participant Rules as issueFulfillmentRules
     participant Movement as applyWasteIssueMovement
     participant Stock as applyWasteStockChange
@@ -1064,8 +1066,8 @@ sequenceDiagram
     participant Prisma as Prisma / PostgreSQL
     participant Socket as emitInventoryUpdated
 
-    Router->>Controller: autenticar, autorizar e invocar controller
-    Controller->>Service: { id, wasteIssueDto.details }
+    Router->>Controller: editWasteIssueDetails(req, res)
+    Controller->>Service: updateWasteIssueDetails({ id, details: wasteIssueDto.details })
     Service->>Prisma: iniciar $transaction y cargar salida/detalles
     Service->>Service: validar estado, ids únicos y detalles vigentes
     Service->>Status: resolver ids de cumplimiento con tx
@@ -1090,16 +1092,16 @@ sequenceDiagram
 sequenceDiagram
     Note over Router,Controller: Variables de frontera: id, detailId, returnDto, userId y tx
     participant Router as src/routes/api/warehouse/wasteIssueApiRoute.js<br/>PATCH /api/warehouse/waste-issues/:id/details/:detailId/returns
-    participant Controller as Controlador<br/>src/controllers/api/warehouse/wasteIssueController.js<br/>registerWasteIssueDetailReturn
-    participant Service as returnWasteIssueDetail
+    participant Controller as «controller»<br/>Controlador<br/>src/controllers/api/warehouse/wasteIssueController.js<br/>registerWasteIssueDetailReturn
+    participant Service as «object»<br/>src/services/warehouse/wasteIssues/detailReturns/wasteIssueReturnService.js<br/>returnWasteIssueDetail
     participant Rules as Validaciones de returnWasteIssueDetail
     participant Inventory as applyWasteIssueReturnMovement
     participant Status as findWasteIssueFulfillmentStatusIds
     participant Prisma as Prisma / PostgreSQL
     participant Socket as emitInventoryUpdated
 
-    Router->>Controller: autenticar, autorizar e invocar controller
-    Controller->>Service: { id, detailId, returnDto, userId }
+    Router->>Controller: registerWasteIssueDetailReturn(req, res)
+    Controller->>Service: returnWasteIssueDetail({ id, detailId, returnDto, userId })
     Service->>Prisma: iniciar $transaction
     Service->>Prisma: cargar WasteIssue y WasteIssueDetail surtido
     Service->>Rules: validar estado, cantidad surtida y devoluciones previas
@@ -1124,13 +1126,13 @@ sequenceDiagram
 sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route as src/routes/api/warehouse/materialApiRoute.js<br/>GET /api/warehouse/materials
-    participant Controller as Controlador<br/>src/controllers/api/warehouse/materialController.js<br/>getAllMaterials
-    participant Domain as Objeto de dominio<br/>src/services/warehouse/materials/materialService.js<br/>findAllMaterials
+    participant Controller as «controller»<br/>Controlador<br/>src/controllers/api/warehouse/materialController.js<br/>getAllMaterials
+    participant Domain as «object»<br/>Objeto de dominio<br/>src/services/warehouse/materials/materialService.js<br/>findAllMaterials
     Note over Controller,Domain: Variables de frontera: req.query/params
 
     Client->>Route: GET /api/warehouse/materials
-    Route->>Controller: invocar getAllMaterials
-    Controller->>Domain: Reutiliza findAllMaterials con filtros, sólo lectura
+    Route->>Controller: getAllMaterials(req, res)
+    Controller->>Domain: findAllMaterials({ query: req.query })
     Domain-->>Controller: devolver resultado o error del caso
     Controller-->>Client: emitir respuesta observable
 ```
@@ -1143,12 +1145,12 @@ sequenceDiagram
 sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route as src/routes/api/admin/movementApiRoute.js<br/>GET /api/admin/movements/materials
-    participant Controller as Controlador<br/>src/controllers/api/admin/movementController.js<br/>getAllMaterialMovements
-    participant Domain as Objeto de dominio<br/>src/services/inventory/movementQueryService.js<br/>movementQueryService.findAllMaterialMovements
+    participant Controller as «controller»<br/>Controlador<br/>src/controllers/api/admin/movementController.js<br/>getAllMaterialMovements
+    participant Domain as «object»<br/>Objeto de dominio<br/>src/services/inventory/movementQueryService.js<br/>movementQueryService.findAllMaterialMovements
     Note over Controller,Domain: Variables de frontera: req.query/params
 
     Client->>Route: GET /api/admin/movements/materials
-    Route->>Controller: invocar getAllMaterialMovements
+    Route->>Controller: getAllMaterialMovements(req, res)
     Controller->>Domain: movementQueryService.findAllMaterialMovements, sólo lectura
     Domain-->>Controller: devolver resultado o error del caso
     Controller-->>Client: emitir respuesta observable
@@ -1162,13 +1164,13 @@ sequenceDiagram
 sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route as src/routes/api/warehouse/reportApiRoute.js<br/>GET /api/warehouse/reports/inventory/excel
-    participant Controller as Controlador<br/>src/controllers/api/warehouse/reportController.js<br/>exportWarehouseReportExcel
-    participant Domain as Objeto de dominio<br/>src/services/warehouse/reportService.js + src/utils/reportExcelUtils.js<br/>reportService.findWarehouseReportRows / sendExcelReport
+    participant Controller as «controller»<br/>Controlador<br/>src/controllers/api/warehouse/reportController.js<br/>exportWarehouseReportExcel
+    participant Domain as «object»<br/>Objeto de dominio<br/>src/services/warehouse/reportService.js + src/utils/reportExcelUtils.js<br/>reportService.findWarehouseReportRows / sendExcelReport
     Note over Controller,Domain: Variables de frontera: req.query/params
 
     Client->>Route: GET /api/warehouse/reports/inventory/excel
-    Route->>Controller: invocar exportWarehouseReportExcel
-    Controller->>Domain: reportService.findWarehouseReportRows y sendExcelReport
+    Route->>Controller: exportWarehouseReportExcel(req, res)
+    Controller->>Domain: reportService.findWarehouseReportRows({ query: req.query }) y sendExcelReport
     Domain-->>Controller: devolver resultado o error del caso
     Controller-->>Client: emitir respuesta observable
 ```
@@ -1181,13 +1183,13 @@ sequenceDiagram
 sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route as src/routes/api/warehouse/reportApiRoute.js<br/>GET /api/warehouse/reports/goods-issues/excel
-    participant Controller as Controlador<br/>src/controllers/api/warehouse/reportController.js<br/>exportGoodsIssueReportExcel
-    participant Domain as Objeto de dominio<br/>src/services/warehouse/reportService.js + src/utils/reportExcelUtils.js<br/>reportService.findGoodsIssueReportRows / sendExcelReport
+    participant Controller as «controller»<br/>Controlador<br/>src/controllers/api/warehouse/reportController.js<br/>exportGoodsIssueReportExcel
+    participant Domain as «object»<br/>Objeto de dominio<br/>src/services/warehouse/reportService.js + src/utils/reportExcelUtils.js<br/>reportService.findGoodsIssueReportRows / sendExcelReport
     Note over Controller,Domain: Variables de frontera: req.query/params
 
     Client->>Route: GET /api/warehouse/reports/goods-issues/excel
-    Route->>Controller: invocar exportGoodsIssueReportExcel
-    Controller->>Domain: reportService.findGoodsIssueReportRows y sendExcelReport
+    Route->>Controller: exportGoodsIssueReportExcel(req, res)
+    Controller->>Domain: reportService.findGoodsIssueReportRows({ query: req.query }) y sendExcelReport
     Domain-->>Controller: devolver resultado o error del caso
     Controller-->>Client: emitir respuesta observable
 ```
@@ -1200,12 +1202,12 @@ sequenceDiagram
 sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route as src/routes/api/admin/reportApiRoute.js<br/>GET /api/admin/reports/movements/materials/excel
-    participant Controller as Controlador<br/>src/controllers/api/admin/reportController.js<br/>exportMovementReport
-    participant Domain as Objeto de dominio<br/>src/services/inventory/reportService.js<br/>inventory/reportService.findMovementReportRows
+    participant Controller as «controller»<br/>Controlador<br/>src/controllers/api/admin/reportController.js<br/>exportMovementReport
+    participant Domain as «object»<br/>Objeto de dominio<br/>src/services/inventory/reportService.js<br/>inventory/reportService.findMovementReportRows
     Note over Controller,Domain: Variables de frontera: req.query/params
 
     Client->>Route: GET /api/admin/reports/movements/materials/excel
-    Route->>Controller: invocar exportMovementReport
+    Route->>Controller: exportMovementReport(req, res)
     Controller->>Domain: inventory/reportService.findMovementReportRows y respuesta Excel
     Domain-->>Controller: devolver resultado o error del caso
     Controller-->>Client: emitir respuesta observable
@@ -1219,13 +1221,13 @@ sequenceDiagram
 sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route as src/routes/api/warehouse/wasteApiRoute.js<br/>GET /api/warehouse/wastes
-    participant Controller as Controlador<br/>src/controllers/api/warehouse/wasteController.js<br/>getAllWastes
-    participant Domain as Objeto de dominio<br/>src/services/warehouse/wastes/wasteService.js<br/>wasteService.findAllWastes
+    participant Controller as «controller»<br/>Controlador<br/>src/controllers/api/warehouse/wasteController.js<br/>getAllWastes
+    participant Domain as «object»<br/>Objeto de dominio<br/>src/services/warehouse/wastes/wasteService.js<br/>wasteService.findAllWastes
     Note over Controller,Domain: Variables de frontera: req.query/params
 
     Client->>Route: GET /api/warehouse/wastes
-    Route->>Controller: invocar getAllWastes
-    Controller->>Domain: Reutiliza wasteService.findAllWastes con filtros, sólo lectura
+    Route->>Controller: getAllWastes(req, res)
+    Controller->>Domain: wasteService.findAllWastes({ query: req.query })
     Domain-->>Controller: devolver resultado o error del caso
     Controller-->>Client: emitir respuesta observable
 ```
@@ -1238,12 +1240,12 @@ sequenceDiagram
 sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route as src/routes/api/admin/movementApiRoute.js<br/>GET /api/admin/movements/wastes
-    participant Controller as Controlador<br/>src/controllers/api/admin/movementController.js<br/>getAllWasteMovements
-    participant Domain as Objeto de dominio<br/>src/services/inventory/movementQueryService.js<br/>movementQueryService.findAllWasteMovements
+    participant Controller as «controller»<br/>Controlador<br/>src/controllers/api/admin/movementController.js<br/>getAllWasteMovements
+    participant Domain as «object»<br/>Objeto de dominio<br/>src/services/inventory/movementQueryService.js<br/>movementQueryService.findAllWasteMovements
     Note over Controller,Domain: Variables de frontera: req.query/params
 
     Client->>Route: GET /api/admin/movements/wastes
-    Route->>Controller: invocar getAllWasteMovements
+    Route->>Controller: getAllWasteMovements(req, res)
     Controller->>Domain: movementQueryService.findAllWasteMovements, sólo lectura
     Domain-->>Controller: devolver resultado o error del caso
     Controller-->>Client: emitir respuesta observable
@@ -1257,13 +1259,13 @@ sequenceDiagram
 sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route as src/routes/api/warehouse/reportApiRoute.js<br/>GET /api/warehouse/reports/waste-issues/excel
-    participant Controller as Controlador<br/>src/controllers/api/warehouse/reportController.js<br/>exportWasteIssueReportExcel
-    participant Domain as Objeto de dominio<br/>src/services/warehouse/reportService.js + src/utils/reportExcelUtils.js<br/>reportService.findWasteIssueReportRows / sendExcelReport
+    participant Controller as «controller»<br/>Controlador<br/>src/controllers/api/warehouse/reportController.js<br/>exportWasteIssueReportExcel
+    participant Domain as «object»<br/>Objeto de dominio<br/>src/services/warehouse/reportService.js + src/utils/reportExcelUtils.js<br/>reportService.findWasteIssueReportRows / sendExcelReport
     Note over Controller,Domain: Variables de frontera: req.query/params
 
     Client->>Route: GET /api/warehouse/reports/waste-issues/excel
-    Route->>Controller: invocar exportWasteIssueReportExcel
-    Controller->>Domain: reportService.findWasteIssueReportRows y sendExcelReport
+    Route->>Controller: exportWasteIssueReportExcel(req, res)
+    Controller->>Domain: reportService.findWasteIssueReportRows({ query: req.query }) y sendExcelReport
     Domain-->>Controller: devolver resultado o error del caso
     Controller-->>Client: emitir respuesta observable
 ```
@@ -1276,13 +1278,13 @@ sequenceDiagram
 sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route as src/routes/api/warehouse/reportApiRoute.js<br/>GET /api/warehouse/reports/wastes/excel
-    participant Controller as Controlador<br/>src/controllers/api/warehouse/reportController.js<br/>exportWasteReportExcel
-    participant Domain as Objeto de dominio<br/>src/services/warehouse/reportService.js + src/utils/reportExcelUtils.js<br/>reportService.findWasteReportRows / sendExcelReport
+    participant Controller as «controller»<br/>Controlador<br/>src/controllers/api/warehouse/reportController.js<br/>exportWasteReportExcel
+    participant Domain as «object»<br/>Objeto de dominio<br/>src/services/warehouse/reportService.js + src/utils/reportExcelUtils.js<br/>reportService.findWasteReportRows / sendExcelReport
     Note over Controller,Domain: Variables de frontera: req.query/params
 
     Client->>Route: GET /api/warehouse/reports/wastes/excel
-    Route->>Controller: invocar exportWasteReportExcel
-    Controller->>Domain: reportService.findWasteReportRows y sendExcelReport
+    Route->>Controller: exportWasteReportExcel(req, res)
+    Controller->>Domain: reportService.findWasteReportRows({ query: req.query }) y sendExcelReport
     Domain-->>Controller: devolver resultado o error del caso
     Controller-->>Client: emitir respuesta observable
 ```
@@ -1295,12 +1297,12 @@ sequenceDiagram
 sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route as src/routes/api/admin/reportApiRoute.js<br/>GET /api/admin/reports/movements/wastes/excel
-    participant Controller as Controlador<br/>src/controllers/api/admin/reportController.js<br/>exportWasteMovementReport
-    participant Domain as Objeto de dominio<br/>src/services/inventory/reportService.js<br/>inventory/reportService.findMovementReportRows
+    participant Controller as «controller»<br/>Controlador<br/>src/controllers/api/admin/reportController.js<br/>exportWasteMovementReport
+    participant Domain as «object»<br/>Objeto de dominio<br/>src/services/inventory/reportService.js<br/>inventory/reportService.findMovementReportRows
     Note over Controller,Domain: Variables de frontera: req.query/params
 
     Client->>Route: GET /api/admin/reports/movements/wastes/excel
-    Route->>Controller: invocar exportWasteMovementReport
+    Route->>Controller: exportWasteMovementReport(req, res)
     Controller->>Domain: inventory/reportService.findMovementReportRows en contexto merma y respuesta Excel
     Domain-->>Controller: devolver resultado o error del caso
     Controller-->>Client: emitir respuesta observable
@@ -1314,13 +1316,13 @@ sequenceDiagram
 sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route as src/routes/api/warehouse/reportApiRoute.js<br/>GET /api/warehouse/reports/goods-receipts/excel
-    participant Controller as Controlador<br/>src/controllers/api/warehouse/reportController.js<br/>exportGoodsReceiptReportExcel
-    participant Domain as Objeto de dominio<br/>src/services/warehouse/reportService.js + src/utils/reportExcelUtils.js<br/>reportService.findGoodsReceiptReportRows / sendExcelReport
+    participant Controller as «controller»<br/>Controlador<br/>src/controllers/api/warehouse/reportController.js<br/>exportGoodsReceiptReportExcel
+    participant Domain as «object»<br/>Objeto de dominio<br/>src/services/warehouse/reportService.js + src/utils/reportExcelUtils.js<br/>reportService.findGoodsReceiptReportRows / sendExcelReport
     Note over Controller,Domain: Variables de frontera: req.query/params
 
     Client->>Route: GET /api/warehouse/reports/goods-receipts/excel
-    Route->>Controller: invocar exportGoodsReceiptReportExcel
-    Controller->>Domain: reportService.findGoodsReceiptReportRows y sendExcelReport
+    Route->>Controller: exportGoodsReceiptReportExcel(req, res)
+    Controller->>Domain: reportService.findGoodsReceiptReportRows({ query: req.query }) y sendExcelReport
     Domain-->>Controller: devolver resultado o error del caso
     Controller-->>Client: emitir respuesta observable
 ```
@@ -1333,13 +1335,13 @@ sequenceDiagram
 sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route as src/routes/api/warehouse/reportApiRoute.js<br/>GET /api/warehouse/reports/suppliers/excel
-    participant Controller as Controlador<br/>src/controllers/api/warehouse/reportController.js<br/>exportSupplierReportExcel
-    participant Domain as Objeto de dominio<br/>src/services/warehouse/reportService.js + src/utils/reportExcelUtils.js<br/>reportService.findSupplierReportRows / sendExcelReport
+    participant Controller as «controller»<br/>Controlador<br/>src/controllers/api/warehouse/reportController.js<br/>exportSupplierReportExcel
+    participant Domain as «object»<br/>Objeto de dominio<br/>src/services/warehouse/reportService.js + src/utils/reportExcelUtils.js<br/>reportService.findSupplierReportRows / sendExcelReport
     Note over Controller,Domain: Variables de frontera: req.query/params
 
     Client->>Route: GET /api/warehouse/reports/suppliers/excel
-    Route->>Controller: invocar exportSupplierReportExcel
-    Controller->>Domain: reportService.findSupplierReportRows y sendExcelReport
+    Route->>Controller: exportSupplierReportExcel(req, res)
+    Controller->>Domain: reportService.findSupplierReportRows({ query: req.query }) y sendExcelReport
     Domain-->>Controller: devolver resultado o error del caso
     Controller-->>Client: emitir respuesta observable
 ```
@@ -1352,13 +1354,13 @@ sequenceDiagram
 sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route as src/routes/api/sales/reportApiRoute.js<br/>GET /api/sales/reports/clients/excel
-    participant Controller as Controlador<br/>src/controllers/api/sales/reportController.js<br/>exportClientReport
-    participant Domain as Objeto de dominio<br/>src/services/sales/clientService.js + src/utils/reportExcelUtils.js<br/>clientService.findAllClients / sendExcelReport
+    participant Controller as «controller»<br/>Controlador<br/>src/controllers/api/sales/reportController.js<br/>exportClientReport
+    participant Domain as «object»<br/>Objeto de dominio<br/>src/services/sales/clientService.js + src/utils/reportExcelUtils.js<br/>clientService.findAllClients / sendExcelReport
     Note over Controller,Domain: Variables de frontera: req.query/params
 
     Client->>Route: GET /api/sales/reports/clients/excel
-    Route->>Controller: invocar exportClientReport
-    Controller->>Domain: clientService.findAllClients prepara filas y el controller llama sendExcelReport
+    Route->>Controller: exportClientReport(req, res)
+    Controller->>Domain: clientService.findAllClients({ query: req.query }) prepara filas y el controller llama sendExcelReport
     Domain-->>Controller: devolver resultado o error del caso
     Controller-->>Client: emitir respuesta observable
 ```
@@ -1371,13 +1373,13 @@ sequenceDiagram
 sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route as src/routes/api/admin/reportApiRoute.js<br/>GET /api/admin/reports/persons/excel
-    participant Controller as Controlador<br/>src/controllers/api/admin/reportController.js<br/>exportPersonReport
-    participant Domain as Objeto de dominio<br/>src/services/admin/person/personService.js + src/utils/reportExcelUtils.js<br/>personService.findAllPersons / sendExcelReport
+    participant Controller as «controller»<br/>Controlador<br/>src/controllers/api/admin/reportController.js<br/>exportPersonReport
+    participant Domain as «object»<br/>Objeto de dominio<br/>src/services/admin/person/personService.js + src/utils/reportExcelUtils.js<br/>personService.findAllPersons / sendExcelReport
     Note over Controller,Domain: Variables de frontera: req.query/params
 
     Client->>Route: GET /api/admin/reports/persons/excel
-    Route->>Controller: invocar exportPersonReport
-    Controller->>Domain: personService.findAllPersons prepara filas y el controller llama sendExcelReport
+    Route->>Controller: exportPersonReport(req, res)
+    Controller->>Domain: personService.findAllPersons({ query: req.query }) prepara filas y el controller llama sendExcelReport
     Domain-->>Controller: devolver resultado o error del caso
     Controller-->>Client: emitir respuesta observable
 ```
@@ -1390,13 +1392,13 @@ sequenceDiagram
 sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route as src/routes/api/admin/reportApiRoute.js<br/>GET /api/admin/reports/users/excel
-    participant Controller as Controlador<br/>src/controllers/api/admin/reportController.js<br/>exportUserReport
-    participant Domain as Objeto de dominio<br/>src/services/admin/userService.js + src/utils/reportExcelUtils.js<br/>userService.findAllUsers / sendExcelReport
+    participant Controller as «controller»<br/>Controlador<br/>src/controllers/api/admin/reportController.js<br/>exportUserReport
+    participant Domain as «object»<br/>Objeto de dominio<br/>src/services/admin/userService.js + src/utils/reportExcelUtils.js<br/>userService.findAllUsers / sendExcelReport
     Note over Controller,Domain: Variables de frontera: req.query/params
 
     Client->>Route: GET /api/admin/reports/users/excel
-    Route->>Controller: invocar exportUserReport
-    Controller->>Domain: userService.findAllUsers prepara filas y el controller llama sendExcelReport
+    Route->>Controller: exportUserReport(req, res)
+    Controller->>Domain: userService.findAllUsers({ query: req.query }) prepara filas y el controller llama sendExcelReport
     Domain-->>Controller: devolver resultado o error del caso
     Controller-->>Client: emitir respuesta observable
 ```
