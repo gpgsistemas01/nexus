@@ -33,10 +33,15 @@ Todo diagrama curado tiene un identificador estable registrado en el
 `DIA-<familia>-<tipo>-<número>`. El título indica su semántica (contexto, contenedores,
 componentes, secuencia, actividad, estados, ER, navegación o flujo), porque `flowchart`
 es sólo la sintaxis Mermaid y no convierte todas esas vistas en el mismo tipo.
-Las vistas técnicas que aplican código a todos los casos conservan directamente el
-identificador funcional como `DIA-FE-CU-<grupo>-<secuencia>` o
-`DIA-BE-CU-<grupo>-<secuencia>`; así frontend y backend pueden localizar el mismo caso
-sin depender del orden físico de los bloques.
+Las colecciones generales que aplican código a todos los casos usan
+`DIA-FE-CU-<grupo>-<secuencia>` o `DIA-BE-CU-<grupo>-<secuencia>`. Las vistas insertadas
+en las secciones técnicas añaden el segmento `TEC`:
+`DIA-FE-TEC-CU-<grupo>-<secuencia>` y `DIA-BE-TEC-CU-<grupo>-<secuencia>`. Así se puede
+localizar el mismo caso y distinguir el recorrido general de su contexto por capas.
+Cada recorrido contextual usa una secuencia para hacer visible el orden del código. Una
+actividad `flowchart` se conserva sólo cuando existen decisiones que cambian el camino;
+una vista de estados se agrega cuando el caso tiene un ciclo técnico relevante. No se
+mantiene un `flowchart` lineal si comunica menos que la secuencia equivalente.
 
 Las secuencias y actividades técnicas de frontend o backend que implementan casos de
 uso se asocian con **un único `CU-*`**. No se permiten participantes alternativos con
@@ -45,19 +50,12 @@ Los elementos reutilizados se documentan como dependencias o componentes compart
 cuando dos casos necesitan vista dinámica, cada diagrama conserva nombres y decisiones
 específicos de su implementación.
 
-Cada colección de aplicación al código comienza con una vista canónica `DIA-*-REU-*`
-que muestra factories, componentes, infraestructura y colaboradores realmente
-compartidos. El diagrama específico referencia esa vista mediante una flecha
-discontinua y nombra la pieza utilizada; su recorrido continuo muestra la
-especialización del caso. Así una refactorización se revisa primero en el punto común y
-después en cada consumidor, sin copiar la implementación compartida como si fuera local.
-La referencia completa sigue `DIA-PAT-*` → `DIA-FE/BE-REU-*` → `DIA-FE/BE-CU-*`:
-el primer nivel demuestra el patrón mediante símbolos y consumidores; el segundo
-identifica el punto común por entorno; el tercero conserva la ruta y efecto del caso.
-Entre reutilización y caso pueden enlazarse perspectivas `PER-CMP`, `PER-SEQ` y
-`PER-EST`: componentes responde estructura, secuencia responde orden y estados responde
-ciclo de vida. No se reemplazan entre sí ni se usa `flowchart` para fingir esas tres
-semánticas.
+Cada colección de aplicación al código incluye un índice breve de patrones. El diagrama
+de cada caso declara los códigos que aplica y conserva únicamente su recorrido concreto;
+la explicación y los puntos compartidos permanecen en el catálogo de patrones. Así una
+refactorización se revisa primero en `DIA-PAT-*` y sus implementaciones, y los casos
+afectados se localizan por su línea **Patrones**, sin insertar una capa gráfica
+intermedia que complique la lectura.
 
 En secuencias, `actor` se reserva para una persona, rol o sistema externo autónomo que
 inicia o recibe una interacción. Navegador, EJS, router, controller, servicio y base de
@@ -179,16 +177,14 @@ que soporte la notación y conservar los mismos límites y fuentes de verdad.
 ### Decisión sobre los diagramas de componentes
 
 Se conserva `DIA-ARQ-CMP-001` porque responde la pregunta estructural de arquitectura:
-qué componentes principales existen y de cuáles dependen. Las perspectivas
-`DIA-BE-PER-CMP-001` y `DIA-FE-PER-CMP-001` también se conservan porque descienden,
-respectivamente, al pipeline servidor y a la composición del navegador. No son tres
-versiones intercambiables: la primera orienta el sistema completo y las otras dos
-permiten ubicar los elementos técnicos nombrados por los casos.
+qué componentes principales existen y de cuáles dependen. Las vistas de patrones y las
+vistas técnicas aplicadas de backend y frontend descienden después a los elementos que
+participan en cada recorrido sin duplicar ese diagrama estructural.
 
-No se necesita un diagrama de componentes por `CU-*`. Un caso referencia la perspectiva
-canónica de su lado y utiliza su diagrama individual para mostrar sólo la ruta concreta
+No se necesita un diagrama de componentes por `CU-*`. Cada caso referencia los patrones
+aplicados y utiliza su diagrama individual para mostrar sólo la ruta concreta
 hacia la implementación. Se añadirá otra vista de componentes únicamente si aparece
-una frontera estable que ninguna de las tres vistas vigentes pueda localizar; agregar
+una frontera estable que ninguna vista vigente pueda localizar; agregar
 otra por cantidad de casos o por repetir imports produciría documentación duplicada.
 
 ## Patrones de implementación que deben verse en los diagramas

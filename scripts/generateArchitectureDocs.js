@@ -89,6 +89,27 @@ const validateUseCaseDiagramCoverage = async () => {
         }
     }
 
+    for (const side of ['backend', 'frontend']) {
+        const source = sources.get(`${side}Matrix`);
+        const prefix = side === 'backend' ? 'BE' : 'FE';
+        const technicalSection = source.match(
+            /### Recorridos técnicos con contexto de código para todos los casos\n([\s\S]*?)\n## Lista de revisión/
+        )?.[1] ?? '';
+        const sections = [...technicalSection.matchAll(/^#### `(CU-[A-Z]+-\d+)`\n([\s\S]*?)(?=^#### `CU-|(?![\s\S]))/gm)];
+        validateIds(`vistas técnicas ${side}`, sections.map((match) => match[1]));
+        for (const [, id, body] of sections) {
+            if (!body.includes(`**Identificador:** \`DIA-${prefix}-TEC-${id}\``)) {
+                failures.push(`vistas técnicas ${side}: ${id} no conserva su identificador técnico contextual`);
+            }
+            if (!body.includes('**Patrones:**')) {
+                failures.push(`vistas técnicas ${side}: ${id} no referencia sus patrones aplicados`);
+            }
+            if ((body.match(/^sequenceDiagram$/gm) ?? []).length !== 1) {
+                failures.push(`vistas técnicas ${side}: ${id} debe contener exactamente una secuencia de código`);
+            }
+        }
+    }
+
     if (failures.length) throw new Error(`Cobertura de casos de uso inválida:\n- ${failures.join('\n- ')}`);
 };
 

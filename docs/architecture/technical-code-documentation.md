@@ -71,12 +71,11 @@ Las colecciones completas están en los [diagramas frontend aplicados al
 código](frontend-use-case-diagrams.md) y los [diagramas backend aplicados al
 código](backend-use-case-diagrams.md); ambas conservan una vista independiente para
 cada uno de los 63 casos, incluso cuando la forma de la colaboración se repite.
-Antes de esos casos, `DIA-FE-REU-001` y `DIA-BE-REU-001` muestran los puntos comunes;
-cada vista específica los referencia y mantiene separado el tramo especializado.
-Cada colección incorpora además perspectivas de **componentes**, **secuencia** y
-**estados técnicos**. Se consultan desde la vista de reutilización para leer el mismo
-código por estructura, orden de mensajes o ciclo de vida, en lugar de reducir toda la
-explicación a diagramas `flowchart`.
+Cada vista específica declara únicamente los códigos de los patrones aplicados y deja
+su explicación en el catálogo canónico; el bloque Mermaid muestra directamente el
+recorrido particular. Las secuencias y actividades que necesitan mayor profundidad se
+mantienen en **Vistas técnicas aplicadas** del backend y **Vistas técnicas aplicadas por
+flujo frontend**, sin convertir la infraestructura compartida en otro salto de lectura.
 Esta cobertura no es opcional ni se limita a los casos con coordinación compleja: cada
 fila vigente del catálogo debe existir en ambas matrices y debe tener exactamente un
 bloque Mermaid identificado en cada colección. `npm run docs:check` compara esos cuatro
