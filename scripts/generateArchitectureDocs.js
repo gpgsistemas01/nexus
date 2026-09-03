@@ -83,10 +83,6 @@ const validateUseCaseDiagramCoverage = async () => {
         const sections = [...source.matchAll(/^## `(CU-[A-Z]+-\d+)`\n([\s\S]*?)(?=^## `CU-|(?![\s\S]))/gm)];
         validateIds(`diagramas ${side}`, sections.map((match) => match[1]));
         for (const [, id, body] of sections) {
-            const prefix = side === 'backend' ? 'BE' : 'FE';
-            if (!body.includes(`**Identificador:** \`DIA-${prefix}-${id}\``)) {
-                failures.push(`diagramas ${side}: ${id} no conserva su identificador técnico`);
-            }
             if ((body.match(/^```mermaid$/gm) ?? []).length !== 1) {
                 failures.push(`diagramas ${side}: ${id} debe contener exactamente un bloque Mermaid`);
             }

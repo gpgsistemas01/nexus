@@ -379,7 +379,7 @@ sequenceDiagram
     participant Browser as Navegador
     participant Router as goodsReceiptApiRoute
     participant Controller as registerGoodsReceipt
-    participant DTO as createGoodsReceiptDto
+    participant DTO as createGoodsReceiptDtoForRegister
     participant Service as createGoodsReceipt
     participant Reference as referenceNumberService
     participant DetailBuilder as buildGoodsReceiptDetails
@@ -398,7 +398,7 @@ sequenceDiagram
     Service->>Prisma: iniciar $transaction
     Service->>Reference: generar referencia anual con tx
     Service->>Prisma: crear encabezado, detalles y totales
-    Service->>Inventory: applyInventoryMovement({ tx, RECEIPT, details })
+    Service->>Inventory: applyInventoryMovement({ tx, ENTRY, details })
     Inventory->>Prisma: incrementar existencias y crear movimiento
     Prisma-->>Service: entrada confirmada y commit
     Service-->>Controller: goodsReceipt
