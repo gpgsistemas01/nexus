@@ -2,10 +2,13 @@
 
 Cada bloque representa un solo caso de uso con los elementos concretos documentados en
 la [matriz técnica de frontend](frontend-technical-documentation.md#aplicación-de-todos-los-casos-al-código-frontend).
-La flecha significa **Interacción o composición → Aplicación, request y resultado**; no
-representa una regla compartida ni permite sustituir participantes de otro caso. Se
-conserva una vista por caso incluso cuando la estructura se repite, porque cambian
-módulos, símbolos, rutas o efectos.
+Cada secuencia muestra la vista o UI, los métodos de aplicación y request, y el endpoint
+que participan en el caso. Sus notas hacen visibles los métodos compartidos de los
+patrones y las variables que cruzan la frontera (`id`, `detailId`, `formData`/payload,
+parámetros y filtros); las variables locales puramente mecánicas permanecen en el código
+para no convertir el diagrama en una transcripción ilegible. Se conserva una vista por
+caso incluso cuando la estructura se repite, porque cambian módulos, símbolos, rutas,
+variables o efectos.
 El orden sigue los identificadores del catálogo para facilitar la revisión técnica; no
 convierte `REP` en una sección independiente del manual ni altera el recorrido del
 módulo desde el que se exporta.
@@ -14,9 +17,9 @@ módulo desde el que se exporta.
 
 Cada caso conserva una línea **Patrones** con códigos de este índice y enlaza el
 [catálogo canónico](design-and-construction-patterns.md#resumen-de-patrones-confirmados).
-La referencia identifica las soluciones aplicadas sin insertar infraestructura común
-en el diagrama ni repetir su explicación. El bloque Mermaid queda dedicado al recorrido
-concreto del caso.
+La referencia identifica las soluciones aplicadas y la nota del bloque Mermaid nombra
+su implementación en el recorrido concreto, sin repetir la explicación completa del
+catálogo.
 
 | Código | Patrón aplicado | Elementos que permiten reconocerlo |
 | --- | --- | --- |
@@ -52,8 +55,19 @@ aparece una vez, conserva su referencia de patrones y contiene un bloque Mermaid
 **Patrones:** `FE-P01`, `FE-P09`.
 
 ```mermaid
-flowchart LR
-    source["loginPage.ejs → loginForm.js"] --> target["login → loginRequest; envía POST /api/auth/login y navega al inicio"]
+sequenceDiagram
+    participant Browser as Navegador
+    participant View as loginPage.ejs / loginForm.js
+    participant Application as login → loginRequest
+    participant Transport as POST /api/auth/login
+    Note over View,Transport: FE-P01 pages/UI → application → services HTTP<br/>FE-P09 formulario o layout compartido de navegación
+    Note over Application,Transport: Variables de frontera: formData/payload
+
+    Browser->>View: loginPage.ejs → loginForm.js
+    View->>Application: login → loginRequest
+    Application->>Transport: envía POST /api/auth/login y navega al inicio
+    Transport-->>Application: devolver respuesta normalizada
+    Application-->>View: presentar resultado observable
 ```
 
 ## `CU-AUT-02`
@@ -63,8 +77,19 @@ flowchart LR
 **Patrones:** `FE-P09`.
 
 ```mermaid
-flowchart LR
-    source["Opción Cerrar sesión de la navegación compartida"] --> target["Navega a /cerrar-sesion; el cierre es web y no usa una mutación de authService.js"]
+sequenceDiagram
+    participant Browser as Navegador
+    participant View as Opción Cerrar sesión de la navegación compartida
+    participant Application as Navega a /cerrar-sesion
+    participant Transport as el cierre es web y no usa una mutación de authService.js
+    Note over View,Transport: FE-P09 formulario o layout compartido de navegación
+    Note over Application,Transport: Variables de frontera: sin variables de frontera adicionales
+
+    Browser->>View: Opción Cerrar sesión de la navegación compartida
+    View->>Application: Navega a /cerrar-sesion
+    Application->>Transport: el cierre es web y no usa una mutación de authService.js
+    Transport-->>Application: devolver respuesta normalizada
+    Application-->>View: presentar resultado observable
 ```
 
 ## `CU-IDA-01`
@@ -74,8 +99,19 @@ flowchart LR
 **Patrones:** `FE-P02`.
 
 ```mermaid
-flowchart LR
-    source["personsPage.ejs y personsPage.js cargan la tabla"] --> target["getAllPersons → getAllPersonsRequest; consulta GET /api/admin/persons"]
+sequenceDiagram
+    participant Browser as Navegador
+    participant View as personsPage.ejs / personsPage.js
+    participant Application as getAllPersons → getAllPersonsRequest
+    participant Transport as GET /api/admin/persons
+    Note over View,Transport: FE-P02 createCrudApplication
+    Note over Application,Transport: Variables de frontera: params/filtros
+
+    Browser->>View: personsPage.ejs y personsPage.js cargan la tabla
+    View->>Application: getAllPersons → getAllPersonsRequest
+    Application->>Transport: consulta GET /api/admin/persons
+    Transport-->>Application: devolver respuesta normalizada
+    Application-->>View: presentar resultado observable
 ```
 
 ## `CU-IDA-02`
@@ -85,8 +121,19 @@ flowchart LR
 **Patrones:** `FE-P02`.
 
 ```mermaid
-flowchart LR
-    source["personModal.js abre personForm.js en modo alta"] --> target["registerPerson → registerPersonRequest; envía POST /api/admin/persons"]
+sequenceDiagram
+    participant Browser as Navegador
+    participant View as personModal.js / personForm.js
+    participant Application as registerPerson → registerPersonRequest
+    participant Transport as POST /api/admin/persons
+    Note over View,Transport: FE-P02 createCrudApplication
+    Note over Application,Transport: Variables de frontera: formData/payload
+
+    Browser->>View: personModal.js abre personForm.js en modo alta
+    View->>Application: registerPerson → registerPersonRequest
+    Application->>Transport: envía POST /api/admin/persons
+    Transport-->>Application: devolver respuesta normalizada
+    Application-->>View: presentar resultado observable
 ```
 
 ## `CU-IDA-03`
@@ -96,8 +143,19 @@ flowchart LR
 **Patrones:** `FE-P02`.
 
 ```mermaid
-flowchart LR
-    source["personModal.js precarga la persona seleccionada"] --> target["updatePerson → updatePersonRequest; envía PUT /api/admin/persons/:id"]
+sequenceDiagram
+    participant Browser as Navegador
+    participant View as personModal.js
+    participant Application as updatePerson → updatePersonRequest
+    participant Transport as PUT /api/admin/persons/:id
+    Note over View,Transport: FE-P02 createCrudApplication
+    Note over Application,Transport: Variables de frontera: id, formData/payload
+
+    Browser->>View: personModal.js precarga la persona seleccionada
+    View->>Application: updatePerson → updatePersonRequest
+    Application->>Transport: envía PUT /api/admin/persons/:id
+    Transport-->>Application: devolver respuesta normalizada
+    Application-->>View: presentar resultado observable
 ```
 
 ## `CU-IDA-04`
@@ -107,8 +165,19 @@ flowchart LR
 **Patrones:** `FE-P02`.
 
 ```mermaid
-flowchart LR
-    source["usersPage.ejs y usersPage.js cargan la tabla"] --> target["getAllUsers → getAllUsersRequest; consulta GET /api/admin/users"]
+sequenceDiagram
+    participant Browser as Navegador
+    participant View as usersPage.ejs / usersPage.js
+    participant Application as getAllUsers → getAllUsersRequest
+    participant Transport as GET /api/admin/users
+    Note over View,Transport: FE-P02 createCrudApplication
+    Note over Application,Transport: Variables de frontera: params/filtros
+
+    Browser->>View: usersPage.ejs y usersPage.js cargan la tabla
+    View->>Application: getAllUsers → getAllUsersRequest
+    Application->>Transport: consulta GET /api/admin/users
+    Transport-->>Application: devolver respuesta normalizada
+    Application-->>View: presentar resultado observable
 ```
 
 ## `CU-IDA-05`
@@ -118,8 +187,19 @@ flowchart LR
 **Patrones:** `FE-P02`.
 
 ```mermaid
-flowchart LR
-    source["userModal.js abre userForm.js para una cuenta nueva"] --> target["registerUser → registerUserRequest; envía POST /api/admin/users"]
+sequenceDiagram
+    participant Browser as Navegador
+    participant View as userModal.js / userForm.js
+    participant Application as registerUser → registerUserRequest
+    participant Transport as POST /api/admin/users
+    Note over View,Transport: FE-P02 createCrudApplication
+    Note over Application,Transport: Variables de frontera: formData/payload
+
+    Browser->>View: userModal.js abre userForm.js para una cuenta nueva
+    View->>Application: registerUser → registerUserRequest
+    Application->>Transport: envía POST /api/admin/users
+    Transport-->>Application: devolver respuesta normalizada
+    Application-->>View: presentar resultado observable
 ```
 
 ## `CU-IDA-06`
@@ -129,8 +209,19 @@ flowchart LR
 **Patrones:** `FE-P02`.
 
 ```mermaid
-flowchart LR
-    source["userModal.js abre la cuenta y acceso existentes"] --> target["editUser → editUserRequest; envía PATCH /api/admin/users/:id"]
+sequenceDiagram
+    participant Browser as Navegador
+    participant View as userModal.js
+    participant Application as editUser → editUserRequest
+    participant Transport as PATCH /api/admin/users/:id
+    Note over View,Transport: FE-P02 createCrudApplication
+    Note over Application,Transport: Variables de frontera: id, formData/payload
+
+    Browser->>View: userModal.js abre la cuenta y acceso existentes
+    View->>Application: editUser → editUserRequest
+    Application->>Transport: envía PATCH /api/admin/users/:id
+    Transport-->>Application: devolver respuesta normalizada
+    Application-->>View: presentar resultado observable
 ```
 
 ## `CU-IDA-07`
@@ -140,8 +231,19 @@ flowchart LR
 **Patrones:** `FE-P02`.
 
 ```mermaid
-flowchart LR
-    source["userForm.js selecciona el modo de contraseña"] --> target["editUserPassword → editUserPasswordRequest; envía PATCH /api/admin/users/:id/password"]
+sequenceDiagram
+    participant Browser as Navegador
+    participant View as userForm.js
+    participant Application as editUserPassword → editUserPasswordRequest
+    participant Transport as PATCH /api/admin/users/:id/password
+    Note over View,Transport: FE-P02 createCrudApplication
+    Note over Application,Transport: Variables de frontera: id, formData/payload
+
+    Browser->>View: userForm.js selecciona el modo de contraseña
+    View->>Application: editUserPassword → editUserPasswordRequest
+    Application->>Transport: envía PATCH /api/admin/users/:id/password
+    Transport-->>Application: devolver respuesta normalizada
+    Application-->>View: presentar resultado observable
 ```
 
 ## `CU-IDA-08`
@@ -151,8 +253,19 @@ flowchart LR
 **Patrones:** `FE-P03`.
 
 ```mermaid
-flowchart LR
-    source["Select de rol dentro de formularios de personas y usuarios"] --> target["getAllRoles → getAllRolesRequest; consume GET /api/admin/roles"]
+sequenceDiagram
+    participant Browser as Navegador
+    participant View as Select de rol dentro de formularios de personas y usuarios
+    participant Application as getAllRoles → getAllRolesRequest
+    participant Transport as GET /api/admin/roles
+    Note over View,Transport: FE-P03 createApplicationList + adaptador de opciones
+    Note over Application,Transport: Variables de frontera: params/filtros
+
+    Browser->>View: Select de rol dentro de formularios de personas y usuarios
+    View->>Application: getAllRoles → getAllRolesRequest
+    Application->>Transport: consume GET /api/admin/roles
+    Transport-->>Application: devolver respuesta normalizada
+    Application-->>View: presentar resultado observable
 ```
 
 ## `CU-IDA-09`
@@ -162,8 +275,19 @@ flowchart LR
 **Patrones:** `FE-P03`.
 
 ```mermaid
-flowchart LR
-    source["Select de departamento dentro de formularios de personas y usuarios"] --> target["getAllDepartments → getAllDepartmentsRequest; consume GET /api/admin/departments"]
+sequenceDiagram
+    participant Browser as Navegador
+    participant View as Select de departamento dentro de formularios de personas y usuarios
+    participant Application as getAllDepartments → getAllDepartmentsRequest
+    participant Transport as GET /api/admin/departments
+    Note over View,Transport: FE-P03 createApplicationList + adaptador de opciones
+    Note over Application,Transport: Variables de frontera: params/filtros
+
+    Browser->>View: Select de departamento dentro de formularios de personas y usuarios
+    View->>Application: getAllDepartments → getAllDepartmentsRequest
+    Application->>Transport: consume GET /api/admin/departments
+    Transport-->>Application: devolver respuesta normalizada
+    Application-->>View: presentar resultado observable
 ```
 
 ## `CU-CAT-01`
@@ -173,8 +297,19 @@ flowchart LR
 **Patrones:** `FE-P02`.
 
 ```mermaid
-flowchart LR
-    source["materialsPage.ejs y materialsPage.js cargan inventario"] --> target["getAllMaterials → getAllMaterialsRequest; consulta GET /api/warehouse/materials"]
+sequenceDiagram
+    participant Browser as Navegador
+    participant View as materialsPage.ejs / materialsPage.js
+    participant Application as getAllMaterials → getAllMaterialsRequest
+    participant Transport as GET /api/warehouse/materials
+    Note over View,Transport: FE-P02 createCrudApplication
+    Note over Application,Transport: Variables de frontera: params/filtros
+
+    Browser->>View: materialsPage.ejs y materialsPage.js cargan inventario
+    View->>Application: getAllMaterials → getAllMaterialsRequest
+    Application->>Transport: consulta GET /api/warehouse/materials
+    Transport-->>Application: devolver respuesta normalizada
+    Application-->>View: presentar resultado observable
 ```
 
 ## `CU-CAT-02`
@@ -184,8 +319,19 @@ flowchart LR
 **Patrones:** `FE-P02`.
 
 ```mermaid
-flowchart LR
-    source["materialModal.js abre materialForm.js en modo alta"] --> target["registerMaterial → registerMaterialRequest; envía POST /api/warehouse/materials"]
+sequenceDiagram
+    participant Browser as Navegador
+    participant View as materialModal.js / materialForm.js
+    participant Application as registerMaterial → registerMaterialRequest
+    participant Transport as POST /api/warehouse/materials
+    Note over View,Transport: FE-P02 createCrudApplication
+    Note over Application,Transport: Variables de frontera: formData/payload
+
+    Browser->>View: materialModal.js abre materialForm.js en modo alta
+    View->>Application: registerMaterial → registerMaterialRequest
+    Application->>Transport: envía POST /api/warehouse/materials
+    Transport-->>Application: devolver respuesta normalizada
+    Application-->>View: presentar resultado observable
 ```
 
 ## `CU-CAT-03`
@@ -195,8 +341,19 @@ flowchart LR
 **Patrones:** `FE-P02`.
 
 ```mermaid
-flowchart LR
-    source["materialModal.js precarga material y relación con proveedor"] --> target["editMaterial → editMaterialRequest; envía PATCH /api/warehouse/materials/:id"]
+sequenceDiagram
+    participant Browser as Navegador
+    participant View as materialModal.js
+    participant Application as editMaterial → editMaterialRequest
+    participant Transport as PATCH /api/warehouse/materials/:id
+    Note over View,Transport: FE-P02 createCrudApplication
+    Note over Application,Transport: Variables de frontera: id, formData/payload
+
+    Browser->>View: materialModal.js precarga material y relación con proveedor
+    View->>Application: editMaterial → editMaterialRequest
+    Application->>Transport: envía PATCH /api/warehouse/materials/:id
+    Transport-->>Application: devolver respuesta normalizada
+    Application-->>View: presentar resultado observable
 ```
 
 ## `CU-CAT-04`
@@ -206,8 +363,19 @@ flowchart LR
 **Patrones:** `FE-P02`.
 
 ```mermaid
-flowchart LR
-    source["Acción de retiro en materialDatatable.js"] --> target["deleteMaterial → deleteMaterialRequest; envía DELETE /api/warehouse/materials/:id"]
+sequenceDiagram
+    participant Browser as Navegador
+    participant View as materialDatatable.js
+    participant Application as deleteMaterial → deleteMaterialRequest
+    participant Transport as DELETE /api/warehouse/materials/:id
+    Note over View,Transport: FE-P02 createCrudApplication
+    Note over Application,Transport: Variables de frontera: id, formData/payload
+
+    Browser->>View: Acción de retiro en materialDatatable.js
+    View->>Application: deleteMaterial → deleteMaterialRequest
+    Application->>Transport: envía DELETE /api/warehouse/materials/:id
+    Transport-->>Application: devolver respuesta normalizada
+    Application-->>View: presentar resultado observable
 ```
 
 ## `CU-CAT-05`
@@ -217,8 +385,19 @@ flowchart LR
 **Patrones:** `FE-P02`.
 
 ```mermaid
-flowchart LR
-    source["materialForm.js usa el modo de ajuste de existencia"] --> target["editMaterialStock → editMaterialStockRequest; envía PATCH /api/warehouse/materials/:id/stock"]
+sequenceDiagram
+    participant Browser as Navegador
+    participant View as materialForm.js
+    participant Application as editMaterialStock → editMaterialStockRequest
+    participant Transport as PATCH /api/warehouse/materials/:id/stock
+    Note over View,Transport: FE-P02 createCrudApplication
+    Note over Application,Transport: Variables de frontera: id, formData/payload
+
+    Browser->>View: materialForm.js usa el modo de ajuste de existencia
+    View->>Application: editMaterialStock → editMaterialStockRequest
+    Application->>Transport: envía PATCH /api/warehouse/materials/:id/stock
+    Transport-->>Application: devolver respuesta normalizada
+    Application-->>View: presentar resultado observable
 ```
 
 ## `CU-CAT-06`
@@ -228,8 +407,19 @@ flowchart LR
 **Patrones:** `FE-P02`.
 
 ```mermaid
-flowchart LR
-    source["suppliersPage.ejs y suppliersPage.js cargan proveedores"] --> target["getAllSuppliers → getAllSuppliersRequest; consulta GET /api/warehouse/suppliers"]
+sequenceDiagram
+    participant Browser as Navegador
+    participant View as suppliersPage.ejs / suppliersPage.js
+    participant Application as getAllSuppliers → getAllSuppliersRequest
+    participant Transport as GET /api/warehouse/suppliers
+    Note over View,Transport: FE-P02 createCrudApplication
+    Note over Application,Transport: Variables de frontera: params/filtros
+
+    Browser->>View: suppliersPage.ejs y suppliersPage.js cargan proveedores
+    View->>Application: getAllSuppliers → getAllSuppliersRequest
+    Application->>Transport: consulta GET /api/warehouse/suppliers
+    Transport-->>Application: devolver respuesta normalizada
+    Application-->>View: presentar resultado observable
 ```
 
 ## `CU-CAT-07`
@@ -239,8 +429,19 @@ flowchart LR
 **Patrones:** `FE-P02`.
 
 ```mermaid
-flowchart LR
-    source["supplierModal.js abre supplierForm.js en alta"] --> target["registerSupplier → registerSupplierRequest; envía POST /api/warehouse/suppliers"]
+sequenceDiagram
+    participant Browser as Navegador
+    participant View as supplierModal.js / supplierForm.js
+    participant Application as registerSupplier → registerSupplierRequest
+    participant Transport as POST /api/warehouse/suppliers
+    Note over View,Transport: FE-P02 createCrudApplication
+    Note over Application,Transport: Variables de frontera: formData/payload
+
+    Browser->>View: supplierModal.js abre supplierForm.js en alta
+    View->>Application: registerSupplier → registerSupplierRequest
+    Application->>Transport: envía POST /api/warehouse/suppliers
+    Transport-->>Application: devolver respuesta normalizada
+    Application-->>View: presentar resultado observable
 ```
 
 ## `CU-CAT-08`
@@ -250,8 +451,19 @@ flowchart LR
 **Patrones:** `FE-P02`.
 
 ```mermaid
-flowchart LR
-    source["supplierModal.js precarga el proveedor"] --> target["editSupplier → editSupplierRequest; envía PUT /api/warehouse/suppliers/:id"]
+sequenceDiagram
+    participant Browser as Navegador
+    participant View as supplierModal.js
+    participant Application as editSupplier → editSupplierRequest
+    participant Transport as PUT /api/warehouse/suppliers/:id
+    Note over View,Transport: FE-P02 createCrudApplication
+    Note over Application,Transport: Variables de frontera: id, formData/payload
+
+    Browser->>View: supplierModal.js precarga el proveedor
+    View->>Application: editSupplier → editSupplierRequest
+    Application->>Transport: envía PUT /api/warehouse/suppliers/:id
+    Transport-->>Application: devolver respuesta normalizada
+    Application-->>View: presentar resultado observable
 ```
 
 ## `CU-CAT-09`
@@ -261,8 +473,19 @@ flowchart LR
 **Patrones:** `FE-P02`.
 
 ```mermaid
-flowchart LR
-    source["El estado se edita en supplierForm.js; no hay pantalla separada"] --> target["editSupplier conserva el contexto y usa PUT /api/warehouse/suppliers/:id"]
+sequenceDiagram
+    participant Browser as Navegador
+    participant View as supplierForm.js
+    participant Application as editSupplier
+    participant Transport as PUT /api/warehouse/suppliers/:id
+    Note over View,Transport: FE-P02 createCrudApplication
+    Note over Application,Transport: Variables de frontera: id, formData/payload
+
+    Browser->>View: El estado se edita en supplierForm.js, no hay pantalla separada
+    View->>Application: editSupplier conserva el contexto seleccionado
+    Application->>Transport: enviar PUT /api/warehouse/suppliers/:id
+    Transport-->>Application: devolver respuesta normalizada
+    Application-->>View: presentar resultado observable
 ```
 
 ## `CU-CAT-10`
@@ -272,8 +495,19 @@ flowchart LR
 **Patrones:** `FE-P02`.
 
 ```mermaid
-flowchart LR
-    source["clientsPage.ejs y clientsPage.js cargan clientes"] --> target["getAllClients → getAllClientsRequest; consulta GET /api/sales/clients"]
+sequenceDiagram
+    participant Browser as Navegador
+    participant View as clientsPage.ejs / clientsPage.js
+    participant Application as getAllClients → getAllClientsRequest
+    participant Transport as GET /api/sales/clients
+    Note over View,Transport: FE-P02 createCrudApplication
+    Note over Application,Transport: Variables de frontera: params/filtros
+
+    Browser->>View: clientsPage.ejs y clientsPage.js cargan clientes
+    View->>Application: getAllClients → getAllClientsRequest
+    Application->>Transport: consulta GET /api/sales/clients
+    Transport-->>Application: devolver respuesta normalizada
+    Application-->>View: presentar resultado observable
 ```
 
 ## `CU-CAT-11`
@@ -283,8 +517,19 @@ flowchart LR
 **Patrones:** `FE-P02`.
 
 ```mermaid
-flowchart LR
-    source["clientModal.js abre clientForm.js en alta"] --> target["registerClient → createClientRequest; envía POST /api/sales/clients"]
+sequenceDiagram
+    participant Browser as Navegador
+    participant View as clientModal.js / clientForm.js
+    participant Application as registerClient → createClientRequest
+    participant Transport as POST /api/sales/clients
+    Note over View,Transport: FE-P02 createCrudApplication
+    Note over Application,Transport: Variables de frontera: formData/payload
+
+    Browser->>View: clientModal.js abre clientForm.js en alta
+    View->>Application: registerClient → createClientRequest
+    Application->>Transport: envía POST /api/sales/clients
+    Transport-->>Application: devolver respuesta normalizada
+    Application-->>View: presentar resultado observable
 ```
 
 ## `CU-CAT-12`
@@ -294,8 +539,19 @@ flowchart LR
 **Patrones:** `FE-P02`.
 
 ```mermaid
-flowchart LR
-    source["clientModal.js precarga el cliente"] --> target["editClient → editClientRequest; envía PUT /api/sales/clients/:id"]
+sequenceDiagram
+    participant Browser as Navegador
+    participant View as clientModal.js
+    participant Application as editClient → editClientRequest
+    participant Transport as PUT /api/sales/clients/:id
+    Note over View,Transport: FE-P02 createCrudApplication
+    Note over Application,Transport: Variables de frontera: id, formData/payload
+
+    Browser->>View: clientModal.js precarga el cliente
+    View->>Application: editClient → editClientRequest
+    Application->>Transport: envía PUT /api/sales/clients/:id
+    Transport-->>Application: devolver respuesta normalizada
+    Application-->>View: presentar resultado observable
 ```
 
 ## `CU-CAT-13`
@@ -305,8 +561,19 @@ flowchart LR
 **Patrones:** `FE-P02`.
 
 ```mermaid
-flowchart LR
-    source["wastesPage.ejs y wastesPage.js cargan mermas"] --> target["getAllWastes → getAllWastesRequest; consulta GET /api/warehouse/wastes"]
+sequenceDiagram
+    participant Browser as Navegador
+    participant View as wastesPage.ejs / wastesPage.js
+    participant Application as getAllWastes → getAllWastesRequest
+    participant Transport as GET /api/warehouse/wastes
+    Note over View,Transport: FE-P02 createCrudApplication
+    Note over Application,Transport: Variables de frontera: params/filtros
+
+    Browser->>View: wastesPage.ejs y wastesPage.js cargan mermas
+    View->>Application: getAllWastes → getAllWastesRequest
+    Application->>Transport: consulta GET /api/warehouse/wastes
+    Transport-->>Application: devolver respuesta normalizada
+    Application-->>View: presentar resultado observable
 ```
 
 ## `CU-CAT-14`
@@ -316,8 +583,19 @@ flowchart LR
 **Patrones:** `FE-P02`.
 
 ```mermaid
-flowchart LR
-    source["wasteModal.js y wasteForm.js seleccionan una plantilla de material"] --> target["getWasteMaterialTemplates prepara datos y registerWaste envía POST /api/warehouse/wastes"]
+sequenceDiagram
+    participant Browser as Navegador
+    participant View as wasteModal.js / wasteForm.js
+    participant Application as getWasteMaterialTemplates
+    participant Transport as POST /api/warehouse/wastes
+    Note over View,Transport: FE-P02 createCrudApplication
+    Note over Application,Transport: Variables de frontera: formData/payload
+
+    Browser->>View: wasteModal.js y wasteForm.js seleccionan una plantilla de material
+    View->>Application: getWasteMaterialTemplates prepara datos y registerWaste registra
+    Application->>Transport: enviar POST /api/warehouse/wastes
+    Transport-->>Application: devolver respuesta normalizada
+    Application-->>View: presentar resultado observable
 ```
 
 ## `CU-CAT-15`
@@ -327,8 +605,19 @@ flowchart LR
 **Patrones:** `FE-P02`.
 
 ```mermaid
-flowchart LR
-    source["wasteModal.js precarga la merma"] --> target["editWaste → editWasteRequest; envía PATCH /api/warehouse/wastes/:id"]
+sequenceDiagram
+    participant Browser as Navegador
+    participant View as wasteModal.js
+    participant Application as editWaste → editWasteRequest
+    participant Transport as PATCH /api/warehouse/wastes/:id
+    Note over View,Transport: FE-P02 createCrudApplication
+    Note over Application,Transport: Variables de frontera: id, formData/payload
+
+    Browser->>View: wasteModal.js precarga la merma
+    View->>Application: editWaste → editWasteRequest
+    Application->>Transport: envía PATCH /api/warehouse/wastes/:id
+    Transport-->>Application: devolver respuesta normalizada
+    Application-->>View: presentar resultado observable
 ```
 
 ## `CU-CAT-16`
@@ -338,8 +627,19 @@ flowchart LR
 **Patrones:** `FE-P02`.
 
 ```mermaid
-flowchart LR
-    source["wasteForm.js usa el modo de ajuste"] --> target["editWasteStock → editWasteStockRequest; envía PATCH /api/warehouse/wastes/:id/stock"]
+sequenceDiagram
+    participant Browser as Navegador
+    participant View as wasteForm.js
+    participant Application as editWasteStock → editWasteStockRequest
+    participant Transport as PATCH /api/warehouse/wastes/:id/stock
+    Note over View,Transport: FE-P02 createCrudApplication
+    Note over Application,Transport: Variables de frontera: id, formData/payload
+
+    Browser->>View: wasteForm.js usa el modo de ajuste
+    View->>Application: editWasteStock → editWasteStockRequest
+    Application->>Transport: envía PATCH /api/warehouse/wastes/:id/stock
+    Transport-->>Application: devolver respuesta normalizada
+    Application-->>View: presentar resultado observable
 ```
 
 ## `CU-CAT-17`
@@ -349,8 +649,19 @@ flowchart LR
 **Patrones:** `FE-P03`.
 
 ```mermaid
-flowchart LR
-    source["Select de presentación en materialFields.js y wasteFields.js"] --> target["getAllPresentations → getAllPresentationsRequest; consume GET /api/warehouse/presentations"]
+sequenceDiagram
+    participant Browser as Navegador
+    participant View as materialFields.js / wasteFields.js
+    participant Application as getAllPresentations → getAllPresentationsRequest
+    participant Transport as GET /api/warehouse/presentations
+    Note over View,Transport: FE-P03 createApplicationList + adaptador de opciones
+    Note over Application,Transport: Variables de frontera: params/filtros
+
+    Browser->>View: Select de presentación en materialFields.js y wasteFields.js
+    View->>Application: getAllPresentations → getAllPresentationsRequest
+    Application->>Transport: consume GET /api/warehouse/presentations
+    Transport-->>Application: devolver respuesta normalizada
+    Application-->>View: presentar resultado observable
 ```
 
 ## `CU-CAT-18`
@@ -360,8 +671,19 @@ flowchart LR
 **Patrones:** `FE-P03`.
 
 ```mermaid
-flowchart LR
-    source["Select de unidad en formularios de material y merma"] --> target["getAllUnitMeasures → getAllUnitMeasuresRequest; consume GET /api/warehouse/unit-measures"]
+sequenceDiagram
+    participant Browser as Navegador
+    participant View as Select de unidad en formularios de material y merma
+    participant Application as getAllUnitMeasures → getAllUnitMeasuresRequest
+    participant Transport as GET /api/warehouse/unit-measures
+    Note over View,Transport: FE-P03 createApplicationList + adaptador de opciones
+    Note over Application,Transport: Variables de frontera: params/filtros
+
+    Browser->>View: Select de unidad en formularios de material y merma
+    View->>Application: getAllUnitMeasures → getAllUnitMeasuresRequest
+    Application->>Transport: consume GET /api/warehouse/unit-measures
+    Transport-->>Application: devolver respuesta normalizada
+    Application-->>View: presentar resultado observable
 ```
 
 ## `CU-CAT-19`
@@ -371,8 +693,19 @@ flowchart LR
 **Patrones:** `FE-P03`.
 
 ```mermaid
-flowchart LR
-    source["Select de motivo en los modos de ajuste"] --> target["getAllReasons → getAllReasonsRequest; consume GET /api/warehouse/reasons"]
+sequenceDiagram
+    participant Browser as Navegador
+    participant View as Select de motivo en los modos de ajuste
+    participant Application as getAllReasons → getAllReasonsRequest
+    participant Transport as GET /api/warehouse/reasons
+    Note over View,Transport: FE-P03 createApplicationList + adaptador de opciones
+    Note over Application,Transport: Variables de frontera: params/filtros
+
+    Browser->>View: Select de motivo en los modos de ajuste
+    View->>Application: getAllReasons → getAllReasonsRequest
+    Application->>Transport: consume GET /api/warehouse/reasons
+    Transport-->>Application: devolver respuesta normalizada
+    Application-->>View: presentar resultado observable
 ```
 
 ## `CU-CAT-20`
@@ -382,8 +715,19 @@ flowchart LR
 **Patrones:** `FE-P03`.
 
 ```mermaid
-flowchart LR
-    source["Estado visible en tablas y formularios de salidas"] --> target["getAllFulfillmentStatuses → request homólogo; consume GET /api/warehouse/fulfillment-statuses"]
+sequenceDiagram
+    participant Browser as Navegador
+    participant View as Estado visible en tablas y formularios de salidas
+    participant Application as getAllFulfillmentStatuses
+    participant Transport as GET /api/warehouse/fulfillment-statuses
+    Note over View,Transport: FE-P03 createApplicationList + adaptador de opciones
+    Note over Application,Transport: Variables de frontera: params/filtros
+
+    Browser->>View: Estado visible en tablas y formularios de salidas
+    View->>Application: getAllFulfillmentStatuses → request homólogo
+    Application->>Transport: consume GET /api/warehouse/fulfillment-statuses
+    Transport-->>Application: devolver respuesta normalizada
+    Application-->>View: presentar resultado observable
 ```
 
 ## `CU-ENT-01`
@@ -393,8 +737,19 @@ flowchart LR
 **Patrones:** `FE-P02`, `FE-P04`.
 
 ```mermaid
-flowchart LR
-    source["goodsReceiptsPage.ejs y su DataTable cargan compras"] --> target["getAllGoodsReceipts → request homólogo; consulta GET /api/warehouse/goods-receipts"]
+sequenceDiagram
+    participant Browser as Navegador
+    participant View as goodsReceiptsPage.ejs
+    participant Application as getAllGoodsReceipts
+    participant Transport as GET /api/warehouse/goods-receipts
+    Note over View,Transport: FE-P02 createCrudApplication<br/>FE-P04 additionalMutations de createCrudApplication
+    Note over Application,Transport: Variables de frontera: params/filtros
+
+    Browser->>View: goodsReceiptsPage.ejs y su DataTable cargan compras
+    View->>Application: getAllGoodsReceipts → request homólogo
+    Application->>Transport: consulta GET /api/warehouse/goods-receipts
+    Transport-->>Application: devolver respuesta normalizada
+    Application-->>View: presentar resultado observable
 ```
 
 ## `CU-ENT-02`
@@ -404,8 +759,19 @@ flowchart LR
 **Patrones:** `FE-P02`, `FE-P04`.
 
 ```mermaid
-flowchart LR
-    source["goodsReceiptModal.js captura encabezado y detalles"] --> target["registerGoodsReceipt → registerGoodsReceiptRequest; envía POST /api/warehouse/goods-receipts"]
+sequenceDiagram
+    participant Browser as Navegador
+    participant View as goodsReceiptModal.js
+    participant Application as registerGoodsReceipt → registerGoodsReceiptRequest
+    participant Transport as POST /api/warehouse/goods-receipts
+    Note over View,Transport: FE-P02 createCrudApplication<br/>FE-P04 additionalMutations de createCrudApplication
+    Note over Application,Transport: Variables de frontera: formData/payload
+
+    Browser->>View: goodsReceiptModal.js captura encabezado y detalles
+    View->>Application: registerGoodsReceipt → registerGoodsReceiptRequest
+    Application->>Transport: envía POST /api/warehouse/goods-receipts
+    Transport-->>Application: devolver respuesta normalizada
+    Application-->>View: presentar resultado observable
 ```
 
 ## `CU-ENT-03`
@@ -415,8 +781,19 @@ flowchart LR
 **Patrones:** `FE-P02`, `FE-P04`.
 
 ```mermaid
-flowchart LR
-    source["goodsReceiptModal.js abre una compra existente"] --> target["editGoodsReceiptHeader → request homólogo; envía PATCH /api/warehouse/goods-receipts/:id"]
+sequenceDiagram
+    participant Browser as Navegador
+    participant View as goodsReceiptModal.js
+    participant Application as editGoodsReceiptHeader
+    participant Transport as PATCH /api/warehouse/goods-receipts/:id
+    Note over View,Transport: FE-P02 createCrudApplication<br/>FE-P04 additionalMutations de createCrudApplication
+    Note over Application,Transport: Variables de frontera: id, formData/payload
+
+    Browser->>View: goodsReceiptModal.js abre una compra existente
+    View->>Application: editGoodsReceiptHeader → request homólogo
+    Application->>Transport: envía PATCH /api/warehouse/goods-receipts/:id
+    Transport-->>Application: devolver respuesta normalizada
+    Application-->>View: presentar resultado observable
 ```
 
 ## `CU-ENT-04`
@@ -426,8 +803,19 @@ flowchart LR
 **Patrones:** `FE-P02`, `FE-P04`.
 
 ```mermaid
-flowchart LR
-    source["correctionModal.js y correctionForm.js aíslan la corrección"] --> target["correctGoodsReceiptDetail → request homólogo; envía PATCH /api/warehouse/goods-receipts/:id/details/:detailId/corrections"]
+sequenceDiagram
+    participant Browser as Navegador
+    participant View as correctionModal.js / correctionForm.js
+    participant Application as correctGoodsReceiptDetail
+    participant Transport as PATCH /api/warehouse/goods-receipts/:id/details/:detailId/corrections
+    Note over View,Transport: FE-P02 createCrudApplication<br/>FE-P04 additionalMutations de createCrudApplication
+    Note over Application,Transport: Variables de frontera: id, detailId, formData/payload
+
+    Browser->>View: correctionModal.js y correctionForm.js aíslan la corrección
+    View->>Application: correctGoodsReceiptDetail → request homólogo
+    Application->>Transport: envía PATCH /api/warehouse/goods-receipts/:id/details/:detailId/corrections
+    Transport-->>Application: devolver respuesta normalizada
+    Application-->>View: presentar resultado observable
 ```
 
 ## `CU-ENT-05`
@@ -437,8 +825,19 @@ flowchart LR
 **Patrones:** `FE-P02`, `FE-P04`.
 
 ```mermaid
-flowchart LR
-    source["Acción Cancelar del detalle en el modal de compra"] --> target["cancelGoodsReceiptDetail → request homólogo; envía PATCH /api/warehouse/goods-receipts/:id/details/:detailId/cancel"]
+sequenceDiagram
+    participant Browser as Navegador
+    participant View as Acción Cancelar del detalle en el modal de compra
+    participant Application as cancelGoodsReceiptDetail
+    participant Transport as PATCH /api/warehouse/goods-receipts/:id/details/:detailId/cancel
+    Note over View,Transport: FE-P02 createCrudApplication<br/>FE-P04 additionalMutations de createCrudApplication
+    Note over Application,Transport: Variables de frontera: id, detailId, formData/payload
+
+    Browser->>View: Acción Cancelar del detalle en el modal de compra
+    View->>Application: cancelGoodsReceiptDetail → request homólogo
+    Application->>Transport: envía PATCH /api/warehouse/goods-receipts/:id/details/:detailId/cancel
+    Transport-->>Application: devolver respuesta normalizada
+    Application-->>View: presentar resultado observable
 ```
 
 ## `CU-SAL-01`
@@ -448,8 +847,19 @@ flowchart LR
 **Patrones:** `FE-P05`.
 
 ```mermaid
-flowchart LR
-    source["goodsIssuesPage.ejs y su DataTable cargan salidas"] --> target["getAllGoodsIssues → request homólogo; consulta GET /api/warehouse/goods-issues"]
+sequenceDiagram
+    participant Browser as Navegador
+    participant View as goodsIssuesPage.ejs
+    participant Application as getAllGoodsIssues
+    participant Transport as GET /api/warehouse/goods-issues
+    Note over View,Transport: FE-P05 createIssueApplication
+    Note over Application,Transport: Variables de frontera: params/filtros
+
+    Browser->>View: goodsIssuesPage.ejs y su DataTable cargan salidas
+    View->>Application: getAllGoodsIssues → request homólogo
+    Application->>Transport: consulta GET /api/warehouse/goods-issues
+    Transport-->>Application: devolver respuesta normalizada
+    Application-->>View: presentar resultado observable
 ```
 
 ## `CU-SAL-02`
@@ -459,8 +869,19 @@ flowchart LR
 **Patrones:** `FE-P05`.
 
 ```mermaid
-flowchart LR
-    source["goodsIssueModal.js captura documento y materiales"] --> target["registerGoodsIssue → request homólogo; envía POST /api/warehouse/goods-issues"]
+sequenceDiagram
+    participant Browser as Navegador
+    participant View as goodsIssueModal.js
+    participant Application as registerGoodsIssue
+    participant Transport as POST /api/warehouse/goods-issues
+    Note over View,Transport: FE-P05 createIssueApplication
+    Note over Application,Transport: Variables de frontera: formData/payload
+
+    Browser->>View: goodsIssueModal.js captura documento y materiales
+    View->>Application: registerGoodsIssue → request homólogo
+    Application->>Transport: envía POST /api/warehouse/goods-issues
+    Transport-->>Application: devolver respuesta normalizada
+    Application-->>View: presentar resultado observable
 ```
 
 ## `CU-SAL-03`
@@ -470,8 +891,19 @@ flowchart LR
 **Patrones:** `FE-P05`.
 
 ```mermaid
-flowchart LR
-    source["Modo encabezado de goodsIssueModal.js"] --> target["editGoodsIssueHeader → request homólogo; envía PATCH /api/warehouse/goods-issues/:id/header"]
+sequenceDiagram
+    participant Browser as Navegador
+    participant View as goodsIssueModal.js
+    participant Application as editGoodsIssueHeader
+    participant Transport as PATCH /api/warehouse/goods-issues/:id/header
+    Note over View,Transport: FE-P05 createIssueApplication
+    Note over Application,Transport: Variables de frontera: id, formData/payload
+
+    Browser->>View: Modo encabezado de goodsIssueModal.js
+    View->>Application: editGoodsIssueHeader → request homólogo
+    Application->>Transport: envía PATCH /api/warehouse/goods-issues/:id/header
+    Transport-->>Application: devolver respuesta normalizada
+    Application-->>View: presentar resultado observable
 ```
 
 ## `CU-SAL-04`
@@ -481,8 +913,19 @@ flowchart LR
 **Patrones:** `FE-P05`.
 
 ```mermaid
-flowchart LR
-    source["Modo detalles de goodsIssueModal.js"] --> target["editGoodsIssueDetails → request homólogo; envía PATCH /api/warehouse/goods-issues/:id/details"]
+sequenceDiagram
+    participant Browser as Navegador
+    participant View as goodsIssueModal.js
+    participant Application as editGoodsIssueDetails
+    participant Transport as PATCH /api/warehouse/goods-issues/:id/details
+    Note over View,Transport: FE-P05 createIssueApplication
+    Note over Application,Transport: Variables de frontera: id, formData/payload
+
+    Browser->>View: Modo detalles de goodsIssueModal.js
+    View->>Application: editGoodsIssueDetails → request homólogo
+    Application->>Transport: envía PATCH /api/warehouse/goods-issues/:id/details
+    Transport-->>Application: devolver respuesta normalizada
+    Application-->>View: presentar resultado observable
 ```
 
 ## `CU-SAL-05`
@@ -492,8 +935,19 @@ flowchart LR
 **Patrones:** `FE-P05`.
 
 ```mermaid
-flowchart LR
-    source["Acción Surtir dentro de los detalles de salida"] --> target["editGoodsIssueDetails envía cantidades a PATCH /api/warehouse/goods-issues/:id/details y refresca el documento"]
+sequenceDiagram
+    participant Browser as Navegador
+    participant View as Acción Surtir dentro de los detalles de salida
+    participant Application as editGoodsIssueDetails
+    participant Transport as PATCH /api/warehouse/goods-issues/:id/details
+    Note over View,Transport: FE-P05 createIssueApplication
+    Note over Application,Transport: Variables de frontera: id, formData/payload
+
+    Browser->>View: Acción Surtir dentro de los detalles de salida
+    View->>Application: editGoodsIssueDetails entrega las cantidades capturadas
+    Application->>Transport: enviar PATCH /api/warehouse/goods-issues/:id/details
+    Transport-->>Application: devolver respuesta normalizada
+    Application-->>View: presentar resultado observable
 ```
 
 ## `CU-SAL-06`
@@ -503,8 +957,19 @@ flowchart LR
 **Patrones:** `FE-P05`, `FE-P06`.
 
 ```mermaid
-flowchart LR
-    source["returns/goodsIssueReturn.js configura issueReturnUI"] --> target["returnGoodsIssueDetail → request homólogo; envía PATCH /api/warehouse/goods-issues/:id/details/:detailId/returns"]
+sequenceDiagram
+    participant Browser as Navegador
+    participant View as returns/goodsIssueReturn.js
+    participant Application as returnGoodsIssueDetail
+    participant Transport as PATCH /api/warehouse/goods-issues/:id/details/:detailId/returns
+    Note over View,Transport: FE-P05 createIssueApplication<br/>FE-P06 issueReturnUI
+    Note over Application,Transport: Variables de frontera: id, detailId, formData/payload, cantidadRetornable
+
+    Browser->>View: returns/goodsIssueReturn.js configura issueReturnUI
+    View->>Application: returnGoodsIssueDetail → request homólogo
+    Application->>Transport: envía PATCH /api/warehouse/goods-issues/:id/details/:detailId/returns
+    Transport-->>Application: devolver respuesta normalizada
+    Application-->>View: presentar resultado observable
 ```
 
 ## `CU-SAL-07`
@@ -514,8 +979,19 @@ flowchart LR
 **Patrones:** `FE-P05`.
 
 ```mermaid
-flowchart LR
-    source["wasteIssuesPage.ejs y su DataTable cargan salidas de merma"] --> target["getAllWasteIssues → request homólogo; consulta GET /api/warehouse/waste-issues"]
+sequenceDiagram
+    participant Browser as Navegador
+    participant View as wasteIssuesPage.ejs
+    participant Application as getAllWasteIssues
+    participant Transport as GET /api/warehouse/waste-issues
+    Note over View,Transport: FE-P05 createIssueApplication
+    Note over Application,Transport: Variables de frontera: params/filtros
+
+    Browser->>View: wasteIssuesPage.ejs y su DataTable cargan salidas de merma
+    View->>Application: getAllWasteIssues → request homólogo
+    Application->>Transport: consulta GET /api/warehouse/waste-issues
+    Transport-->>Application: devolver respuesta normalizada
+    Application-->>View: presentar resultado observable
 ```
 
 ## `CU-SAL-08`
@@ -525,8 +1001,19 @@ flowchart LR
 **Patrones:** `FE-P05`.
 
 ```mermaid
-flowchart LR
-    source["wasteIssueModal.js captura documento y mermas"] --> target["registerWasteIssue → request homólogo; envía POST /api/warehouse/waste-issues"]
+sequenceDiagram
+    participant Browser as Navegador
+    participant View as wasteIssueModal.js
+    participant Application as registerWasteIssue
+    participant Transport as POST /api/warehouse/waste-issues
+    Note over View,Transport: FE-P05 createIssueApplication
+    Note over Application,Transport: Variables de frontera: formData/payload
+
+    Browser->>View: wasteIssueModal.js captura documento y mermas
+    View->>Application: registerWasteIssue → request homólogo
+    Application->>Transport: envía POST /api/warehouse/waste-issues
+    Transport-->>Application: devolver respuesta normalizada
+    Application-->>View: presentar resultado observable
 ```
 
 ## `CU-SAL-09`
@@ -536,8 +1023,19 @@ flowchart LR
 **Patrones:** `FE-P05`.
 
 ```mermaid
-flowchart LR
-    source["Modo encabezado de wasteIssueModal.js"] --> target["editWasteIssueHeader → request homólogo; envía PATCH /api/warehouse/waste-issues/:id/header"]
+sequenceDiagram
+    participant Browser as Navegador
+    participant View as wasteIssueModal.js
+    participant Application as editWasteIssueHeader
+    participant Transport as PATCH /api/warehouse/waste-issues/:id/header
+    Note over View,Transport: FE-P05 createIssueApplication
+    Note over Application,Transport: Variables de frontera: id, formData/payload
+
+    Browser->>View: Modo encabezado de wasteIssueModal.js
+    View->>Application: editWasteIssueHeader → request homólogo
+    Application->>Transport: envía PATCH /api/warehouse/waste-issues/:id/header
+    Transport-->>Application: devolver respuesta normalizada
+    Application-->>View: presentar resultado observable
 ```
 
 ## `CU-SAL-10`
@@ -547,8 +1045,19 @@ flowchart LR
 **Patrones:** `FE-P05`.
 
 ```mermaid
-flowchart LR
-    source["Modo detalles de wasteIssueModal.js"] --> target["editWasteIssueDetails → request homólogo; envía PATCH /api/warehouse/waste-issues/:id/details"]
+sequenceDiagram
+    participant Browser as Navegador
+    participant View as wasteIssueModal.js
+    participant Application as editWasteIssueDetails
+    participant Transport as PATCH /api/warehouse/waste-issues/:id/details
+    Note over View,Transport: FE-P05 createIssueApplication
+    Note over Application,Transport: Variables de frontera: id, formData/payload
+
+    Browser->>View: Modo detalles de wasteIssueModal.js
+    View->>Application: editWasteIssueDetails → request homólogo
+    Application->>Transport: envía PATCH /api/warehouse/waste-issues/:id/details
+    Transport-->>Application: devolver respuesta normalizada
+    Application-->>View: presentar resultado observable
 ```
 
 ## `CU-SAL-11`
@@ -558,8 +1067,19 @@ flowchart LR
 **Patrones:** `FE-P05`.
 
 ```mermaid
-flowchart LR
-    source["Acción Surtir dentro de los detalles de merma"] --> target["editWasteIssueDetails envía cantidades a PATCH /api/warehouse/waste-issues/:id/details y refresca el documento"]
+sequenceDiagram
+    participant Browser as Navegador
+    participant View as Acción Surtir dentro de los detalles de merma
+    participant Application as editWasteIssueDetails
+    participant Transport as PATCH /api/warehouse/waste-issues/:id/details
+    Note over View,Transport: FE-P05 createIssueApplication
+    Note over Application,Transport: Variables de frontera: id, formData/payload
+
+    Browser->>View: Acción Surtir dentro de los detalles de merma
+    View->>Application: editWasteIssueDetails entrega las cantidades capturadas
+    Application->>Transport: enviar PATCH /api/warehouse/waste-issues/:id/details
+    Transport-->>Application: devolver respuesta normalizada
+    Application-->>View: presentar resultado observable
 ```
 
 ## `CU-SAL-12`
@@ -569,8 +1089,19 @@ flowchart LR
 **Patrones:** `FE-P05`, `FE-P06`.
 
 ```mermaid
-flowchart LR
-    source["returns/wasteIssueReturn.js configura issueReturnUI"] --> target["returnWasteIssueDetail → request homólogo; envía PATCH /api/warehouse/waste-issues/:id/details/:detailId/returns"]
+sequenceDiagram
+    participant Browser as Navegador
+    participant View as returns/wasteIssueReturn.js
+    participant Application as returnWasteIssueDetail
+    participant Transport as PATCH /api/warehouse/waste-issues/:id/details/:detailId/returns
+    Note over View,Transport: FE-P05 createIssueApplication<br/>FE-P06 issueReturnUI
+    Note over Application,Transport: Variables de frontera: id, detailId, formData/payload, cantidadRetornable
+
+    Browser->>View: returns/wasteIssueReturn.js configura issueReturnUI
+    View->>Application: returnWasteIssueDetail → request homólogo
+    Application->>Transport: envía PATCH /api/warehouse/waste-issues/:id/details/:detailId/returns
+    Transport-->>Application: devolver respuesta normalizada
+    Application-->>View: presentar resultado observable
 ```
 
 ## `CU-REP-01`
@@ -580,8 +1111,19 @@ flowchart LR
 **Patrones:** `FE-P07`.
 
 ```mermaid
-flowchart LR
-    source["La consulta es el listado de materialsPage.js; no hay página de reporte"] --> target["Reutiliza getAllMaterialsRequest y sus filtros, sin mutación"]
+sequenceDiagram
+    participant Browser as Navegador
+    participant View as materialsPage.js
+    participant Application as reutilizar getAllMaterialsRequest con los filtros
+    participant Transport as GET /api/warehouse/materials
+    Note over View,Transport: FE-P07 DataTable + filtros + aplicación de consulta
+    Note over Application,Transport: Variables de frontera: params/filtros
+
+    Browser->>View: La consulta es el listado de materialsPage.js, no hay página de reporte
+    View->>Application: reutilizar getAllMaterialsRequest con los filtros
+    Application->>Transport: consultar GET /api/warehouse/materials sin mutación
+    Transport-->>Application: devolver respuesta normalizada
+    Application-->>View: presentar resultado observable
 ```
 
 ## `CU-REP-02`
@@ -591,8 +1133,19 @@ flowchart LR
 **Patrones:** `FE-P07`.
 
 ```mermaid
-flowchart LR
-    source["movementsPage.js selecciona el contexto material"] --> target["getAllMovements({ context: 'materials' }) consulta /api/admin/movements/materials"]
+sequenceDiagram
+    participant Browser as Navegador
+    participant View as movementsPage.js
+    participant Application as getAllMovements con contexto materials
+    participant Transport as GET /api/admin/movements/materials
+    Note over View,Transport: FE-P07 DataTable + filtros + aplicación de consulta
+    Note over Application,Transport: Variables de frontera: params/filtros
+
+    Browser->>View: movementsPage.js selecciona el contexto material
+    View->>Application: getAllMovements con contexto materials
+    Application->>Transport: consultar GET /api/admin/movements/materials
+    Transport-->>Application: devolver respuesta normalizada
+    Application-->>View: presentar resultado observable
 ```
 
 ## `CU-REP-03`
@@ -602,8 +1155,19 @@ flowchart LR
 **Patrones:** `FE-P08`.
 
 ```mermaid
-flowchart LR
-    source["Botón Excel de materialDatatable.js"] --> target["exportWarehouseReport → exportWarehouseReportRequest; descarga /api/warehouse/reports/inventory/excel"]
+sequenceDiagram
+    participant Browser as Navegador
+    participant View as materialDatatable.js
+    participant Application as exportWarehouseReport → exportWarehouseReportRequest
+    participant Transport as descarga /api/warehouse/reports/inventory/excel
+    Note over View,Transport: FE-P08 createReportApplication + buildExcelButton
+    Note over Application,Transport: Variables de frontera: params/filtros
+
+    Browser->>View: Botón Excel de materialDatatable.js
+    View->>Application: exportWarehouseReport → exportWarehouseReportRequest
+    Application->>Transport: descarga /api/warehouse/reports/inventory/excel
+    Transport-->>Application: devolver respuesta normalizada
+    Application-->>View: presentar resultado observable
 ```
 
 ## `CU-REP-04`
@@ -613,8 +1177,19 @@ flowchart LR
 **Patrones:** `FE-P08`.
 
 ```mermaid
-flowchart LR
-    source["Botón Excel del listado de salidas de material"] --> target["exportGoodsIssueReport → request homólogo; descarga /api/warehouse/reports/goods-issues/excel"]
+sequenceDiagram
+    participant Browser as Navegador
+    participant View as Botón Excel del listado de salidas de material
+    participant Application as exportGoodsIssueReport
+    participant Transport as descarga /api/warehouse/reports/goods-issues/excel
+    Note over View,Transport: FE-P08 createReportApplication + buildExcelButton
+    Note over Application,Transport: Variables de frontera: params/filtros
+
+    Browser->>View: Botón Excel del listado de salidas de material
+    View->>Application: exportGoodsIssueReport → request homólogo
+    Application->>Transport: descarga /api/warehouse/reports/goods-issues/excel
+    Transport-->>Application: devolver respuesta normalizada
+    Application-->>View: presentar resultado observable
 ```
 
 ## `CU-REP-05`
@@ -624,8 +1199,19 @@ flowchart LR
 **Patrones:** `FE-P08`.
 
 ```mermaid
-flowchart LR
-    source["Botón Excel de movimientos en contexto material"] --> target["exportMovementReport → request con materials; descarga /api/admin/reports/movements/materials/excel"]
+sequenceDiagram
+    participant Browser as Navegador
+    participant View as Botón Excel de movimientos en contexto material
+    participant Application as exportMovementReport → request con materials
+    participant Transport as descarga /api/admin/reports/movements/materials/excel
+    Note over View,Transport: FE-P08 createReportApplication + buildExcelButton
+    Note over Application,Transport: Variables de frontera: params/filtros
+
+    Browser->>View: Botón Excel de movimientos en contexto material
+    View->>Application: exportMovementReport → request con materials
+    Application->>Transport: descarga /api/admin/reports/movements/materials/excel
+    Transport-->>Application: devolver respuesta normalizada
+    Application-->>View: presentar resultado observable
 ```
 
 ## `CU-REP-06`
@@ -635,8 +1221,19 @@ flowchart LR
 **Patrones:** `FE-P07`.
 
 ```mermaid
-flowchart LR
-    source["La consulta es el listado de wastesPage.js; no hay página de reporte"] --> target["Reutiliza getAllWastesRequest y sus filtros, sin mutación"]
+sequenceDiagram
+    participant Browser as Navegador
+    participant View as wastesPage.js
+    participant Application as reutilizar getAllWastesRequest con los filtros
+    participant Transport as GET /api/warehouse/wastes
+    Note over View,Transport: FE-P07 DataTable + filtros + aplicación de consulta
+    Note over Application,Transport: Variables de frontera: params/filtros
+
+    Browser->>View: La consulta es el listado de wastesPage.js, no hay página de reporte
+    View->>Application: reutilizar getAllWastesRequest con los filtros
+    Application->>Transport: consultar GET /api/warehouse/wastes sin mutación
+    Transport-->>Application: devolver respuesta normalizada
+    Application-->>View: presentar resultado observable
 ```
 
 ## `CU-REP-07`
@@ -646,8 +1243,19 @@ flowchart LR
 **Patrones:** `FE-P07`.
 
 ```mermaid
-flowchart LR
-    source["movementsPage.js selecciona el contexto merma"] --> target["getAllMovements({ context: 'wastes' }) consulta /api/admin/movements/wastes"]
+sequenceDiagram
+    participant Browser as Navegador
+    participant View as movementsPage.js
+    participant Application as getAllMovements con contexto wastes
+    participant Transport as GET /api/admin/movements/wastes
+    Note over View,Transport: FE-P07 DataTable + filtros + aplicación de consulta
+    Note over Application,Transport: Variables de frontera: params/filtros
+
+    Browser->>View: movementsPage.js selecciona el contexto merma
+    View->>Application: getAllMovements con contexto wastes
+    Application->>Transport: consultar GET /api/admin/movements/wastes
+    Transport-->>Application: devolver respuesta normalizada
+    Application-->>View: presentar resultado observable
 ```
 
 ## `CU-REP-08`
@@ -657,8 +1265,19 @@ flowchart LR
 **Patrones:** `FE-P08`.
 
 ```mermaid
-flowchart LR
-    source["Botón Excel del listado de salidas de merma"] --> target["exportWasteIssueReport → request homólogo; descarga /api/warehouse/reports/waste-issues/excel"]
+sequenceDiagram
+    participant Browser as Navegador
+    participant View as Botón Excel del listado de salidas de merma
+    participant Application as exportWasteIssueReport
+    participant Transport as descarga /api/warehouse/reports/waste-issues/excel
+    Note over View,Transport: FE-P08 createReportApplication + buildExcelButton
+    Note over Application,Transport: Variables de frontera: params/filtros
+
+    Browser->>View: Botón Excel del listado de salidas de merma
+    View->>Application: exportWasteIssueReport → request homólogo
+    Application->>Transport: descarga /api/warehouse/reports/waste-issues/excel
+    Transport-->>Application: devolver respuesta normalizada
+    Application-->>View: presentar resultado observable
 ```
 
 ## `CU-REP-09`
@@ -668,8 +1287,19 @@ flowchart LR
 **Patrones:** `FE-P08`.
 
 ```mermaid
-flowchart LR
-    source["Botón Excel de wasteDatatable.js"] --> target["exportWasteReport → request homólogo; descarga /api/warehouse/reports/wastes/excel"]
+sequenceDiagram
+    participant Browser as Navegador
+    participant View as wasteDatatable.js
+    participant Application as exportWasteReport
+    participant Transport as descarga /api/warehouse/reports/wastes/excel
+    Note over View,Transport: FE-P08 createReportApplication + buildExcelButton
+    Note over Application,Transport: Variables de frontera: params/filtros
+
+    Browser->>View: Botón Excel de wasteDatatable.js
+    View->>Application: exportWasteReport → request homólogo
+    Application->>Transport: descarga /api/warehouse/reports/wastes/excel
+    Transport-->>Application: devolver respuesta normalizada
+    Application-->>View: presentar resultado observable
 ```
 
 ## `CU-REP-10`
@@ -679,8 +1309,19 @@ flowchart LR
 **Patrones:** `FE-P08`.
 
 ```mermaid
-flowchart LR
-    source["Botón Excel de movimientos en contexto merma"] --> target["exportMovementReport → request con wastes; descarga /api/admin/reports/movements/wastes/excel"]
+sequenceDiagram
+    participant Browser as Navegador
+    participant View as Botón Excel de movimientos en contexto merma
+    participant Application as exportMovementReport → request con wastes
+    participant Transport as descarga /api/admin/reports/movements/wastes/excel
+    Note over View,Transport: FE-P08 createReportApplication + buildExcelButton
+    Note over Application,Transport: Variables de frontera: params/filtros
+
+    Browser->>View: Botón Excel de movimientos en contexto merma
+    View->>Application: exportMovementReport → request con wastes
+    Application->>Transport: descarga /api/admin/reports/movements/wastes/excel
+    Transport-->>Application: devolver respuesta normalizada
+    Application-->>View: presentar resultado observable
 ```
 
 ## `CU-REP-11`
@@ -690,8 +1331,19 @@ flowchart LR
 **Patrones:** `FE-P08`.
 
 ```mermaid
-flowchart LR
-    source["Botón Excel de goodsReceiptDatatable.js"] --> target["exportGoodsReceiptReport → request homólogo; descarga /api/warehouse/reports/goods-receipts/excel"]
+sequenceDiagram
+    participant Browser as Navegador
+    participant View as goodsReceiptDatatable.js
+    participant Application as exportGoodsReceiptReport
+    participant Transport as descarga /api/warehouse/reports/goods-receipts/excel
+    Note over View,Transport: FE-P08 createReportApplication + buildExcelButton
+    Note over Application,Transport: Variables de frontera: params/filtros
+
+    Browser->>View: Botón Excel de goodsReceiptDatatable.js
+    View->>Application: exportGoodsReceiptReport → request homólogo
+    Application->>Transport: descarga /api/warehouse/reports/goods-receipts/excel
+    Transport-->>Application: devolver respuesta normalizada
+    Application-->>View: presentar resultado observable
 ```
 
 ## `CU-REP-12`
@@ -701,8 +1353,19 @@ flowchart LR
 **Patrones:** `FE-P08`.
 
 ```mermaid
-flowchart LR
-    source["Botón Excel de supplierDatatable.js"] --> target["exportSupplierReport → request homólogo; descarga /api/warehouse/reports/suppliers/excel"]
+sequenceDiagram
+    participant Browser as Navegador
+    participant View as supplierDatatable.js
+    participant Application as exportSupplierReport
+    participant Transport as descarga /api/warehouse/reports/suppliers/excel
+    Note over View,Transport: FE-P08 createReportApplication + buildExcelButton
+    Note over Application,Transport: Variables de frontera: params/filtros
+
+    Browser->>View: Botón Excel de supplierDatatable.js
+    View->>Application: exportSupplierReport → request homólogo
+    Application->>Transport: descarga /api/warehouse/reports/suppliers/excel
+    Transport-->>Application: devolver respuesta normalizada
+    Application-->>View: presentar resultado observable
 ```
 
 ## `CU-REP-13`
@@ -712,8 +1375,19 @@ flowchart LR
 **Patrones:** `FE-P08`.
 
 ```mermaid
-flowchart LR
-    source["Botón Excel de clientDatatable.js"] --> target["exportClientReport → request homólogo; descarga /api/sales/reports/clients/excel"]
+sequenceDiagram
+    participant Browser as Navegador
+    participant View as clientDatatable.js
+    participant Application as exportClientReport
+    participant Transport as descarga /api/sales/reports/clients/excel
+    Note over View,Transport: FE-P08 createReportApplication + buildExcelButton
+    Note over Application,Transport: Variables de frontera: params/filtros
+
+    Browser->>View: Botón Excel de clientDatatable.js
+    View->>Application: exportClientReport → request homólogo
+    Application->>Transport: descarga /api/sales/reports/clients/excel
+    Transport-->>Application: devolver respuesta normalizada
+    Application-->>View: presentar resultado observable
 ```
 
 ## `CU-REP-14`
@@ -723,8 +1397,19 @@ flowchart LR
 **Patrones:** `FE-P08`.
 
 ```mermaid
-flowchart LR
-    source["Botón Excel de personDatatable.js"] --> target["exportPersonReport → request homólogo; descarga /api/admin/reports/persons/excel"]
+sequenceDiagram
+    participant Browser as Navegador
+    participant View as personDatatable.js
+    participant Application as exportPersonReport
+    participant Transport as descarga /api/admin/reports/persons/excel
+    Note over View,Transport: FE-P08 createReportApplication + buildExcelButton
+    Note over Application,Transport: Variables de frontera: params/filtros
+
+    Browser->>View: Botón Excel de personDatatable.js
+    View->>Application: exportPersonReport → request homólogo
+    Application->>Transport: descarga /api/admin/reports/persons/excel
+    Transport-->>Application: devolver respuesta normalizada
+    Application-->>View: presentar resultado observable
 ```
 
 ## `CU-REP-15`
@@ -734,6 +1419,17 @@ flowchart LR
 **Patrones:** `FE-P08`.
 
 ```mermaid
-flowchart LR
-    source["Botón Excel de userDatatable.js"] --> target["exportUserReport → request homólogo; descarga /api/admin/reports/users/excel"]
+sequenceDiagram
+    participant Browser as Navegador
+    participant View as userDatatable.js
+    participant Application as exportUserReport
+    participant Transport as descarga /api/admin/reports/users/excel
+    Note over View,Transport: FE-P08 createReportApplication + buildExcelButton
+    Note over Application,Transport: Variables de frontera: params/filtros
+
+    Browser->>View: Botón Excel de userDatatable.js
+    View->>Application: exportUserReport → request homólogo
+    Application->>Transport: descarga /api/admin/reports/users/excel
+    Transport-->>Application: devolver respuesta normalizada
+    Application-->>View: presentar resultado observable
 ```

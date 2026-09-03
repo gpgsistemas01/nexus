@@ -33,15 +33,22 @@ Todo diagrama curado tiene un identificador estable registrado en el
 `DIA-<familia>-<tipo>-<número>`. El título indica su semántica (contexto, contenedores,
 componentes, secuencia, actividad, estados, ER, navegación o flujo), porque `flowchart`
 es sólo la sintaxis Mermaid y no convierte todas esas vistas en el mismo tipo.
-Las colecciones generales que aplican código a todos los casos usan
-`DIA-FE-CU-<grupo>-<secuencia>` o `DIA-BE-CU-<grupo>-<secuencia>`. Las vistas insertadas
-en las secciones técnicas añaden el segmento `TEC`:
-`DIA-FE-TEC-CU-<grupo>-<secuencia>` y `DIA-BE-TEC-CU-<grupo>-<secuencia>`. Así se puede
-localizar el mismo caso y distinguir el recorrido general de su contexto por capas.
+Las colecciones canónicas que aplican código a todos los casos usan
+`DIA-FE-CU-<grupo>-<secuencia>` o `DIA-BE-CU-<grupo>-<secuencia>`. La documentación
+técnica enlaza esas vistas en vez de mantener una segunda secuencia por caso. El
+segmento `TEC` se reserva para una vista complementaria que responda otra pregunta,
+como un ciclo de estados, y no para duplicar el mismo recorrido por capas.
 Cada recorrido contextual usa una secuencia para hacer visible el orden del código. Una
 actividad `flowchart` se conserva sólo cuando existen decisiones que cambian el camino;
 una vista de estados se agrega cuando el caso tiene un ciclo técnico relevante. No se
 mantiene un `flowchart` lineal si comunica menos que la secuencia equivalente.
+El detalle de una secuencia se incorpora de forma progresiva: primero se identifican
+los participantes y el camino exitoso, después se añaden únicamente las validaciones,
+alternativas, transacciones o efectos que cambian la interpretación del caso. Los
+nombres de archivos y símbolos van en participantes o mensajes, no en párrafos dentro
+de una sola etiqueta. Si para explicar una colaboración reutilizada hiciera falta
+repetirla en varios casos, se enlaza su vista `DIA-PAT-*` y la secuencia del caso conserva
+sólo la invocación y el resultado observable.
 En cada documento de arquitectura, los diagramas asociados con `CU-*` siguen el orden
 del catálogo de casos de uso; si un caso necesita más de una vista, permanecen juntas,
 y las vistas transversales sin caso se ubican después. En mensajes y etiquetas de
@@ -57,10 +64,11 @@ específicos de su implementación.
 
 Cada colección de aplicación al código incluye un índice breve de patrones. El diagrama
 de cada caso declara los códigos que aplica y conserva únicamente su recorrido concreto;
-la explicación y los puntos compartidos permanecen en el catálogo de patrones. Así una
-refactorización se revisa primero en `DIA-PAT-*` y sus implementaciones, y los casos
-afectados se localizan por su línea **Patrones**, sin insertar una capa gráfica
-intermedia que complique la lectura.
+una nota breve dentro de la secuencia nombra el símbolo o las capas que materializan esos
+patrones en el código. La explicación y la colaboración completa permanecen en el
+catálogo de patrones. Así una refactorización se revisa primero en `DIA-PAT-*` y sus
+implementaciones, y los casos afectados se localizan por su línea **Patrones** y por la
+nota del diagrama, sin insertar participantes ficticios que compliquen la lectura.
 
 En secuencias, `actor` se reserva para una persona, rol o sistema externo autónomo que
 inicia o recibe una interacción. Navegador, EJS, router, controller, servicio y base de
@@ -68,6 +76,23 @@ datos son `participant`. Una secuencia técnica puede omitir al actor humano cua
 límite empieza en HTTP y enlaza el `CU-*` que ya lo identifica; una secuencia de
 experiencia completa sí debe mostrar el actor canónico del caso. No se cambia el actor
 por «Usuario» si el requisito distingue Almacén de Administración.
+
+Para que una secuencia sea detallada sin mezclar niveles, se aplican estas reglas:
+
+- cada alias de participante representa una responsabilidad estable y su etiqueta nombra
+  el archivo, función, endpoint o servicio concreto del caso, no una oración sobre el
+  resultado;
+- los mensajes nombran una acción concreta y mantienen el orden comprobable;
+- las variables de frontera que condicionan la llamada (`id`, `detailId`, payload,
+  filtros, DTO o `tx`) se nombran en el diagrama; los temporales internos que no cambian
+  la colaboración se consultan en el código enlazado;
+- `alt`/`opt` se usa sólo para una decisión que cambia el recorrido y `rect` sólo para
+  señalar un límite relevante, como una transacción;
+- las respuestas discontinuas muestran resultados o errores observables, no repiten la
+  llamada anterior;
+- una vista que exceda aproximadamente siete participantes se divide por responsabilidad
+  o se complementa con una vista estructural, en lugar de reducir su legibilidad;
+- el detalle mecánico que no altera coordinación permanece en texto, tablas o código.
 
 Los identificadores Mermaid deben ser estables y descriptivos (`apiRoutes`,
 `goodsIssues`), mientras la etiqueta puede estar en español. La orientación se conserva
@@ -187,7 +212,7 @@ vistas técnicas aplicadas de backend y frontend descienden después a los eleme
 participan en cada recorrido sin duplicar ese diagrama estructural.
 
 No se necesita un diagrama de componentes por `CU-*`. Cada caso referencia los patrones
-aplicados y utiliza su diagrama individual para mostrar sólo la ruta concreta
+aplicados y utiliza su diagrama canónico frontend o backend para mostrar la ruta concreta
 hacia la implementación. Se añadirá otra vista de componentes únicamente si aparece
 una frontera estable que ninguna vista vigente pueda localizar; agregar
 otra por cantidad de casos o por repetir imports produciría documentación duplicada.
