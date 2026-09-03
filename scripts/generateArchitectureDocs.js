@@ -22,9 +22,9 @@ const DATABASE_AREAS = [
 const USE_CASE_DOCUMENTS = {
     catalog: path.join(ROOT, 'docs/requirements/use-case-descriptions.md'),
     backendMatrix: path.join(ROOT, 'docs/architecture/backend-technical-documentation.md'),
-    backendDiagrams: path.join(ROOT, 'docs/architecture/backend-use-case-diagrams.md'),
+    backendDiagrams: path.join(ROOT, 'docs/architecture/backend-code-sequence-diagrams.md'),
     frontendMatrix: path.join(ROOT, 'docs/architecture/frontend-technical-documentation.md'),
-    frontendDiagrams: path.join(ROOT, 'docs/architecture/frontend-use-case-diagrams.md')
+    frontendDiagrams: path.join(ROOT, 'docs/architecture/frontend-code-sequence-diagrams.md')
 };
 
 const toPosix = (value) => value.split(path.sep).join('/');
@@ -70,7 +70,8 @@ const validateUseCaseDiagramCoverage = async () => {
         const prefix = side === 'backend' ? 'BE' : 'FE';
         validateIds(`matriz ${side}`, getUseCaseTableIds(matrix));
         for (const id of expectedIds) {
-            const diagramReference = `[\`DIA-${prefix}-${id}\`](${side}-use-case-diagrams.md#${id.toLowerCase()})`;
+            const diagramFile = `${side}-code-sequence-diagrams.md`;
+            const diagramReference = `[\`DIA-${prefix}-${id}\`](${diagramFile}#${id.toLowerCase()})`;
             if (!matrix.includes(diagramReference)) {
                 failures.push(`matriz ${side}: ${id} no enlaza su diagrama aplicado`);
             }

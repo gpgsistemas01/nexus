@@ -1,19 +1,17 @@
-# Diagramas de casos aplicados al código frontend
+# Diagramas de secuencia del código frontend
 
-Cada bloque representa un solo caso de uso con los elementos concretos documentados en
-la [matriz técnica de frontend](frontend-technical-documentation.md#aplicación-de-todos-los-casos-al-código-frontend).
-Cada secuencia muestra la vista o UI, los métodos de aplicación y request, y el endpoint
-que participan en el caso. La línea **Patrones** es únicamente un índice; la construcción
-se lee en los participantes —que identifican la ruta de archivo y el símbolo— y en los
-mensajes del bloque. Sus notas conservan las variables que cruzan la frontera (`id`,
-`detailId`, `formData`/payload,
-parámetros y filtros); las variables locales puramente mecánicas permanecen en el código
-para no convertir el diagrama en una transcripción ilegible. Se conserva una vista por
-caso incluso cuando la estructura se repite, porque cambian módulos, símbolos, rutas,
-variables o efectos.
-El orden sigue los identificadores del catálogo para facilitar la revisión técnica; no
-convierte `REP` en una sección independiente del manual ni altera el recorrido del
-módulo desde el que se exporta.
+Esta colección **no es un catálogo de diagramas de casos de uso**. Es la lectura técnica
+complementaria del catálogo funcional: cada `CU-*` aporta trazabilidad, mientras Mermaid
+muestra la ejecución entre vista/UI, aplicación, request y endpoint. Para entender el
+objetivo y la interacción con lenguaje de negocio se consulta primero el [modelo y los
+diagramas funcionales de casos de uso](../requirements/domain-and-use-cases.md#casos-de-uso-vigentes).
+
+La [matriz técnica de frontend](frontend-technical-documentation.md#aplicación-de-todos-los-casos-al-código-frontend)
+localiza la evidencia concreta. Los participantes identifican archivo y símbolo, los
+mensajes conservan métodos y requests en orden y las notas nombran los datos de frontera
+(`id`, `detailId`, `formData`/payload, parámetros y filtros). Los temporales mecánicos
+permanecen en el código. Cada caso mantiene una secuencia específica aunque reutilice
+una factory o componente, porque cambian módulos, firmas, rutas, datos o efectos.
 
 ## Índice rápido de patrones por caso
 

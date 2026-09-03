@@ -1,19 +1,18 @@
-# Diagramas de casos aplicados al código backend
+# Diagramas de secuencia del código backend
 
-Cada bloque representa un solo caso de uso con los elementos concretos documentados en
-la [matriz técnica de backend](backend-technical-documentation.md#aplicación-de-todos-los-casos-al-código-backend).
-Cada secuencia muestra el endpoint, controller y métodos de servicio o efecto que
-participan en el caso. La línea **Patrones** es únicamente un índice; la construcción se
-lee en los participantes —que identifican la ruta de archivo y el símbolo— y en los
-mensajes del bloque. Sus notas conservan las variables que cruzan la frontera
-(`req.params`, `req.body`/DTO, parámetros de
-consulta y `tx`); las variables locales puramente mecánicas permanecen en el código para
-no convertir el diagrama en una transcripción ilegible. Se conserva una vista por caso
-incluso cuando la estructura se repite, porque cambian módulos, símbolos, rutas,
-variables o efectos.
-El orden sigue los identificadores del catálogo para facilitar la revisión técnica; no
-convierte `REP` en un dominio backend independiente de los módulos que proporcionan las
-consultas y exportaciones.
+Esta colección **no es un catálogo de diagramas de casos de uso**. Es la lectura técnica
+complementaria del catálogo funcional: cada `CU-*` sirve como vínculo de trazabilidad,
+pero el bloque Mermaid describe cómo se ejecuta el código mediante endpoint, controller,
+servicios, efectos y variables de frontera. Para comprender el objetivo con lenguaje de
+negocio se consulta primero el [modelo y los diagramas funcionales de casos de uso](../requirements/domain-and-use-cases.md#casos-de-uso-vigentes).
+
+La [matriz técnica de backend](backend-technical-documentation.md#aplicación-de-todos-los-casos-al-código-backend)
+localiza la evidencia concreta. Los participantes identifican ruta de archivo y símbolo,
+los mensajes conservan las llamadas en orden y las notas nombran datos que cruzan la
+frontera (`req.params`, `req.body`/DTO, parámetros de consulta y `tx`). Las variables
+locales mecánicas permanecen en el código para no convertir el diagrama en una
+transcripción ilegible. Cada caso mantiene una secuencia específica aunque reutilice un
+patrón, porque cambian módulos, firmas, rutas, datos o efectos.
 
 ## Índice rápido de patrones por caso
 
