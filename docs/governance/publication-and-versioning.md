@@ -33,6 +33,14 @@ imágenes; no se exporta toda la carpeta `docs` como un único documento.
 - PDF es la entrega no editable. Pandoc requiere un motor PDF instalado; la organización debe
   elegir y fijar uno antes de declarar reproducibilidad.
 
+La portada se genera desde `title`, `subtitle`, `author` y `date` del bloque YAML del
+primer archivo del manifiesto. En HTML adopta `#title-block-header` y los estilos de
+`document.css`; en DOCX adopta los estilos del documento de referencia cuando se
+proporciona. No se mantiene una portada como captura: así sus versiones, estado, fecha y
+responsable permanecen revisables como texto. Markdown aporta títulos, énfasis, listas,
+tablas, citas y bloques de código; CSS da formato a HTML y `DOCS_REFERENCE_DOC` permite
+controlar tipografías, márgenes, encabezados, tablas y numeración de DOCX.
+
 `scripts/exportDocs.js` ensambla los manifiestos cuyos archivos de entrada viven en la familia
 correspondiente, comprueba imágenes y delega la conversión a Pandoc. Es herramienta **de desarrollo/CI**, no dependencia ni proceso
 del servidor en producción. El estilo HTML vive en `docs/styles/document.css`; el estilo DOCX
@@ -63,6 +71,13 @@ en producción. Se configuran `DOCS_BASE_URL` y, para páginas protegidas,
 principales; cada modal o paso nuevo agrega al mismo script una acción localizada y otra captura
 numerada. El acceso puede capturarse sin sesión; el resto debe fallar si la cuenta no posee el
 permiso que el manual pretende demostrar.
+
+Playwright **no se ejecuta junto con Pandoc**. Primero, y sólo cuando cambian las pantallas,
+`docs:screenshots` abre la aplicación y actualiza las imágenes; después `docs:export`
+lee esas imágenes ya existentes. Pandoc por sí solo genera HTML y DOCX sin Playwright,
+LibreOffice ni Microsoft Word. Para PDF siempre delega la composición final a un motor
+adicional (`DOCS_PDF_ENGINE`); esa dependencia no puede eliminarse sin escoger otro
+conversor o publicar HTML/DOCX en su lugar.
 
 ## Versionado
 

@@ -140,11 +140,11 @@ const validateUseCaseDiagramCoverage = async () => {
             if (new RegExp(`(?:BE|FE)-P\\d{2}`).test(sequence)) {
                 failures.push(`diagramas ${side}: ${id} repite el índice de patrones dentro de Mermaid`);
             }
-            if (!sequence.includes('«controller»')) {
-                failures.push(`diagramas ${side}: ${id} no aplica el estereotipo UML «controller»`);
+            if (/^\s*participant\s+.*«controller»/m.test(sequence)) {
+                failures.push(`diagramas ${side}: ${id} repite el estereotipo «controller» además de la figura de control`);
             }
-            if (!/^\s*participant\s+\S+@\{\s*"type"\s*:\s*"control"\s*\}\s+as\s+«controller»<br\/>/m.test(sequence)) {
-                failures.push(`diagramas ${side}: ${id} no representa «controller» con una figura Mermaid de tipo control`);
+            if (!/^\s*participant\s+\S+@\{\s*"type"\s*:\s*"control"\s*\}\s+as\s+(?!«controller»)/m.test(sequence)) {
+                failures.push(`diagramas ${side}: ${id} no representa el controller con una figura Mermaid de tipo control`);
             }
             const aliases = [...sequence.matchAll(/^\s*(?:actor|participant)\s+([^\s@]+)(?:@\{[^}]+\})?\s+as\s+/gm)]
                 .map((match) => match[1].toLowerCase());
