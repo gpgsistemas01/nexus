@@ -17,7 +17,10 @@ mantiene normalmente cuatro responsabilidades bien separadas —navegador, objet
 objetos de aplicación/request y frontera API/controller— en lugar de representar cada
 archivo auxiliar como otra entidad. Los mensajes conservan métodos y requests en orden y
 las notas nombran los datos de frontera
-(`id`, `detailId`, `formData`/payload, parámetros y filtros). Los temporales mecánicos
+(`id`, `detailId`, `formData`/payload, parámetros y filtros). Todos los recorridos
+explicitan recolección/validación de entrada, request, respuesta exitosa, error normalizado
+y efecto visible; las coordinaciones complejas añaden sus módulos especializados.
+Los temporales mecánicos
 permanecen en el código. Cada caso mantiene una secuencia específica aunque reutilice
 una factory o componente, porque cambian módulos, firmas, rutas, datos o efectos.
 
@@ -106,9 +109,16 @@ sequenceDiagram
     Note over View,Controller: Variables de frontera: sin variables de frontera adicionales
 
     Browser->>View: activar botón Salir
-    View->>Route: enviar formulario POST
+    View->>View: construir el POST sin payload adicional
+    View->>Route: enviar formulario POST /cerrar-sesion
+    activate Route
     Route->>Controller: logout(req, res)
-    Controller-->>Browser: eliminar cookies y redirigir a /inicio-sesion
+    activate Controller
+    Controller->>Controller: clearAuthCookies(res)
+    Controller-->>Browser: responder redirect a /inicio-sesion
+    Browser->>Browser: seguir redirección y renderizar inicio de sesión
+    deactivate Controller
+    deactivate Route
 ```
 
 ## `CU-IDA-01`
@@ -124,10 +134,19 @@ sequenceDiagram
     Note over Application,Transport: Variables de frontera: params/filtros
 
     Browser->>View: personsPage.ejs y personsPage.js cargan la tabla
+    View->>View: recopilar y validar las variables de frontera indicadas
     View->>Application: getAllPersons({ params }) → getAllPersonsRequest({ params })
+    activate Application
     Application->>Transport: consulta GET /api/admin/persons
-    Transport-->>Application: devolver respuesta normalizada
-    Application-->>View: presentar resultado observable
+    Transport-->>Application: status HTTP y payload del endpoint
+    alt Respuesta exitosa
+        Application-->>View: entidad, colección o archivo normalizado
+        View-->>Browser: actualizar la vista con el resultado
+    else Respuesta rechazada
+        Application-->>View: error normalizado por apiRequest
+        View-->>Browser: conservar contexto y mostrar el mensaje
+    end
+    deactivate Application
 ```
 
 ## `CU-IDA-02`
@@ -143,10 +162,19 @@ sequenceDiagram
     Note over Application,Transport: Variables de frontera: formData/payload
 
     Browser->>View: personModal.js abre personForm.js en modo alta
+    View->>View: recopilar y validar las variables de frontera indicadas
     View->>Application: registerPerson({ formData }) → registerPersonRequest({ formData })
+    activate Application
     Application->>Transport: envía POST /api/admin/persons
-    Transport-->>Application: devolver respuesta normalizada
-    Application-->>View: presentar resultado observable
+    Transport-->>Application: status HTTP y payload del endpoint
+    alt Respuesta exitosa
+        Application-->>View: entidad, colección o archivo normalizado
+        View-->>Browser: actualizar la vista con el resultado
+    else Respuesta rechazada
+        Application-->>View: error normalizado por apiRequest
+        View-->>Browser: conservar contexto y mostrar el mensaje
+    end
+    deactivate Application
 ```
 
 ## `CU-IDA-03`
@@ -162,10 +190,19 @@ sequenceDiagram
     Note over Application,Transport: Variables de frontera: id, formData/payload
 
     Browser->>View: personModal.js precarga la persona seleccionada
+    View->>View: recopilar y validar las variables de frontera indicadas
     View->>Application: updatePerson({ id, formData }) → updatePersonRequest({ id, formData })
+    activate Application
     Application->>Transport: envía PUT /api/admin/persons/:id
-    Transport-->>Application: devolver respuesta normalizada
-    Application-->>View: presentar resultado observable
+    Transport-->>Application: status HTTP y payload del endpoint
+    alt Respuesta exitosa
+        Application-->>View: entidad, colección o archivo normalizado
+        View-->>Browser: actualizar la vista con el resultado
+    else Respuesta rechazada
+        Application-->>View: error normalizado por apiRequest
+        View-->>Browser: conservar contexto y mostrar el mensaje
+    end
+    deactivate Application
 ```
 
 ## `CU-IDA-04`
@@ -181,10 +218,19 @@ sequenceDiagram
     Note over Application,Transport: Variables de frontera: params/filtros
 
     Browser->>View: usersPage.ejs y usersPage.js cargan la tabla
+    View->>View: recopilar y validar las variables de frontera indicadas
     View->>Application: getAllUsers({ params }) → getAllUsersRequest({ params })
+    activate Application
     Application->>Transport: consulta GET /api/admin/users
-    Transport-->>Application: devolver respuesta normalizada
-    Application-->>View: presentar resultado observable
+    Transport-->>Application: status HTTP y payload del endpoint
+    alt Respuesta exitosa
+        Application-->>View: entidad, colección o archivo normalizado
+        View-->>Browser: actualizar la vista con el resultado
+    else Respuesta rechazada
+        Application-->>View: error normalizado por apiRequest
+        View-->>Browser: conservar contexto y mostrar el mensaje
+    end
+    deactivate Application
 ```
 
 ## `CU-IDA-05`
@@ -200,10 +246,19 @@ sequenceDiagram
     Note over Application,Transport: Variables de frontera: formData/payload
 
     Browser->>View: userModal.js abre userForm.js para una cuenta nueva
+    View->>View: recopilar y validar las variables de frontera indicadas
     View->>Application: registerUser({ formData }) → registerUserRequest({ formData })
+    activate Application
     Application->>Transport: envía POST /api/admin/users
-    Transport-->>Application: devolver respuesta normalizada
-    Application-->>View: presentar resultado observable
+    Transport-->>Application: status HTTP y payload del endpoint
+    alt Respuesta exitosa
+        Application-->>View: entidad, colección o archivo normalizado
+        View-->>Browser: actualizar la vista con el resultado
+    else Respuesta rechazada
+        Application-->>View: error normalizado por apiRequest
+        View-->>Browser: conservar contexto y mostrar el mensaje
+    end
+    deactivate Application
 ```
 
 ## `CU-IDA-06`
@@ -219,10 +274,19 @@ sequenceDiagram
     Note over Application,Transport: Variables de frontera: id, formData/payload
 
     Browser->>View: userModal.js abre la cuenta y acceso existentes
+    View->>View: recopilar y validar las variables de frontera indicadas
     View->>Application: editUser({ id, formData }) → editUserRequest({ id, formData })
+    activate Application
     Application->>Transport: envía PATCH /api/admin/users/:id
-    Transport-->>Application: devolver respuesta normalizada
-    Application-->>View: presentar resultado observable
+    Transport-->>Application: status HTTP y payload del endpoint
+    alt Respuesta exitosa
+        Application-->>View: entidad, colección o archivo normalizado
+        View-->>Browser: actualizar la vista con el resultado
+    else Respuesta rechazada
+        Application-->>View: error normalizado por apiRequest
+        View-->>Browser: conservar contexto y mostrar el mensaje
+    end
+    deactivate Application
 ```
 
 ## `CU-IDA-07`
@@ -238,10 +302,19 @@ sequenceDiagram
     Note over Application,Transport: Variables de frontera: id, formData/payload
 
     Browser->>View: userForm.js selecciona el modo de contraseña
+    View->>View: recopilar y validar las variables de frontera indicadas
     View->>Application: editUserPassword({ id, formData }) → editUserPasswordRequest({ id, formData })
+    activate Application
     Application->>Transport: envía PATCH /api/admin/users/:id/password
-    Transport-->>Application: devolver respuesta normalizada
-    Application-->>View: presentar resultado observable
+    Transport-->>Application: status HTTP y payload del endpoint
+    alt Respuesta exitosa
+        Application-->>View: entidad, colección o archivo normalizado
+        View-->>Browser: actualizar la vista con el resultado
+    else Respuesta rechazada
+        Application-->>View: error normalizado por apiRequest
+        View-->>Browser: conservar contexto y mostrar el mensaje
+    end
+    deactivate Application
 ```
 
 ## `CU-IDA-08`
@@ -257,10 +330,19 @@ sequenceDiagram
     Note over Application,Transport: Variables de frontera: params/filtros
 
     Browser->>View: Select de rol dentro de formularios de personas y usuarios
+    View->>View: recopilar y validar las variables de frontera indicadas
     View->>Application: getAllRoles({ params }) → getAllRolesRequest({ params })
+    activate Application
     Application->>Transport: consume GET /api/admin/roles
-    Transport-->>Application: devolver respuesta normalizada
-    Application-->>View: presentar resultado observable
+    Transport-->>Application: status HTTP y payload del endpoint
+    alt Respuesta exitosa
+        Application-->>View: entidad, colección o archivo normalizado
+        View-->>Browser: actualizar la vista con el resultado
+    else Respuesta rechazada
+        Application-->>View: error normalizado por apiRequest
+        View-->>Browser: conservar contexto y mostrar el mensaje
+    end
+    deactivate Application
 ```
 
 ## `CU-IDA-09`
@@ -276,10 +358,19 @@ sequenceDiagram
     Note over Application,Transport: Variables de frontera: params/filtros
 
     Browser->>View: Select de departamento dentro de formularios de personas y usuarios
+    View->>View: recopilar y validar las variables de frontera indicadas
     View->>Application: getAllDepartments({ params }) → getAllDepartmentsRequest({ params })
+    activate Application
     Application->>Transport: consume GET /api/admin/departments
-    Transport-->>Application: devolver respuesta normalizada
-    Application-->>View: presentar resultado observable
+    Transport-->>Application: status HTTP y payload del endpoint
+    alt Respuesta exitosa
+        Application-->>View: entidad, colección o archivo normalizado
+        View-->>Browser: actualizar la vista con el resultado
+    else Respuesta rechazada
+        Application-->>View: error normalizado por apiRequest
+        View-->>Browser: conservar contexto y mostrar el mensaje
+    end
+    deactivate Application
 ```
 
 ## `CU-CAT-01`
@@ -295,10 +386,19 @@ sequenceDiagram
     Note over Application,Transport: Variables de frontera: params/filtros
 
     Browser->>View: materialsPage.ejs y materialsPage.js cargan inventario
+    View->>View: recopilar y validar las variables de frontera indicadas
     View->>Application: getAllMaterials({ params }) → getAllMaterialsRequest({ params })
+    activate Application
     Application->>Transport: consulta GET /api/warehouse/materials
-    Transport-->>Application: devolver respuesta normalizada
-    Application-->>View: presentar resultado observable
+    Transport-->>Application: status HTTP y payload del endpoint
+    alt Respuesta exitosa
+        Application-->>View: entidad, colección o archivo normalizado
+        View-->>Browser: actualizar la vista con el resultado
+    else Respuesta rechazada
+        Application-->>View: error normalizado por apiRequest
+        View-->>Browser: conservar contexto y mostrar el mensaje
+    end
+    deactivate Application
 ```
 
 ## `CU-CAT-02`
@@ -314,10 +414,19 @@ sequenceDiagram
     Note over Application,Transport: Variables de frontera: formData/payload
 
     Browser->>View: materialModal.js abre materialForm.js en modo alta
+    View->>View: recopilar y validar las variables de frontera indicadas
     View->>Application: registerMaterial({ formData }) → registerMaterialRequest({ formData })
+    activate Application
     Application->>Transport: envía POST /api/warehouse/materials
-    Transport-->>Application: devolver respuesta normalizada
-    Application-->>View: presentar resultado observable
+    Transport-->>Application: status HTTP y payload del endpoint
+    alt Respuesta exitosa
+        Application-->>View: entidad, colección o archivo normalizado
+        View-->>Browser: actualizar la vista con el resultado
+    else Respuesta rechazada
+        Application-->>View: error normalizado por apiRequest
+        View-->>Browser: conservar contexto y mostrar el mensaje
+    end
+    deactivate Application
 ```
 
 ## `CU-CAT-03`
@@ -333,10 +442,19 @@ sequenceDiagram
     Note over Application,Transport: Variables de frontera: id, formData/payload
 
     Browser->>View: materialModal.js precarga material y relación con proveedor
+    View->>View: recopilar y validar las variables de frontera indicadas
     View->>Application: editMaterial({ id, formData }) → editMaterialRequest({ id, formData })
+    activate Application
     Application->>Transport: envía PATCH /api/warehouse/materials/:id
-    Transport-->>Application: devolver respuesta normalizada
-    Application-->>View: presentar resultado observable
+    Transport-->>Application: status HTTP y payload del endpoint
+    alt Respuesta exitosa
+        Application-->>View: entidad, colección o archivo normalizado
+        View-->>Browser: actualizar la vista con el resultado
+    else Respuesta rechazada
+        Application-->>View: error normalizado por apiRequest
+        View-->>Browser: conservar contexto y mostrar el mensaje
+    end
+    deactivate Application
 ```
 
 ## `CU-CAT-04`
@@ -352,10 +470,19 @@ sequenceDiagram
     Note over Application,Transport: Variables de frontera: id, formData/payload
 
     Browser->>View: Acción de retiro en materialDatatable.js
+    View->>View: recopilar y validar las variables de frontera indicadas
     View->>Application: deleteMaterial({ id, formData }) → deleteMaterialRequest({ id, formData })
+    activate Application
     Application->>Transport: envía DELETE /api/warehouse/materials/:id
-    Transport-->>Application: devolver respuesta normalizada
-    Application-->>View: presentar resultado observable
+    Transport-->>Application: status HTTP y payload del endpoint
+    alt Respuesta exitosa
+        Application-->>View: entidad, colección o archivo normalizado
+        View-->>Browser: actualizar la vista con el resultado
+    else Respuesta rechazada
+        Application-->>View: error normalizado por apiRequest
+        View-->>Browser: conservar contexto y mostrar el mensaje
+    end
+    deactivate Application
 ```
 
 ## `CU-CAT-05`
@@ -399,10 +526,19 @@ sequenceDiagram
     Note over Application,Transport: Variables de frontera: params/filtros
 
     Browser->>View: suppliersPage.ejs y suppliersPage.js cargan proveedores
+    View->>View: recopilar y validar las variables de frontera indicadas
     View->>Application: getAllSuppliers({ params }) → getAllSuppliersRequest({ params })
+    activate Application
     Application->>Transport: consulta GET /api/warehouse/suppliers
-    Transport-->>Application: devolver respuesta normalizada
-    Application-->>View: presentar resultado observable
+    Transport-->>Application: status HTTP y payload del endpoint
+    alt Respuesta exitosa
+        Application-->>View: entidad, colección o archivo normalizado
+        View-->>Browser: actualizar la vista con el resultado
+    else Respuesta rechazada
+        Application-->>View: error normalizado por apiRequest
+        View-->>Browser: conservar contexto y mostrar el mensaje
+    end
+    deactivate Application
 ```
 
 ## `CU-CAT-07`
@@ -418,10 +554,19 @@ sequenceDiagram
     Note over Application,Transport: Variables de frontera: formData/payload
 
     Browser->>View: supplierModal.js abre supplierForm.js en alta
+    View->>View: recopilar y validar las variables de frontera indicadas
     View->>Application: registerSupplier({ formData }) → registerSupplierRequest({ formData })
+    activate Application
     Application->>Transport: envía POST /api/warehouse/suppliers
-    Transport-->>Application: devolver respuesta normalizada
-    Application-->>View: presentar resultado observable
+    Transport-->>Application: status HTTP y payload del endpoint
+    alt Respuesta exitosa
+        Application-->>View: entidad, colección o archivo normalizado
+        View-->>Browser: actualizar la vista con el resultado
+    else Respuesta rechazada
+        Application-->>View: error normalizado por apiRequest
+        View-->>Browser: conservar contexto y mostrar el mensaje
+    end
+    deactivate Application
 ```
 
 ## `CU-CAT-08`
@@ -437,10 +582,19 @@ sequenceDiagram
     Note over Application,Transport: Variables de frontera: id, formData/payload
 
     Browser->>View: supplierModal.js precarga el proveedor
+    View->>View: recopilar y validar las variables de frontera indicadas
     View->>Application: editSupplier({ id, formData }) → editSupplierRequest({ id, formData })
+    activate Application
     Application->>Transport: envía PUT /api/warehouse/suppliers/:id
-    Transport-->>Application: devolver respuesta normalizada
-    Application-->>View: presentar resultado observable
+    Transport-->>Application: status HTTP y payload del endpoint
+    alt Respuesta exitosa
+        Application-->>View: entidad, colección o archivo normalizado
+        View-->>Browser: actualizar la vista con el resultado
+    else Respuesta rechazada
+        Application-->>View: error normalizado por apiRequest
+        View-->>Browser: conservar contexto y mostrar el mensaje
+    end
+    deactivate Application
 ```
 
 ## `CU-CAT-09`
@@ -456,10 +610,19 @@ sequenceDiagram
     Note over Application,Transport: Variables de frontera: id, formData/payload
 
     Browser->>View: El estado se edita en supplierForm.js, no hay pantalla separada
+    View->>View: recopilar y validar las variables de frontera indicadas
     View->>Application: editSupplier conserva el contexto seleccionado
+    activate Application
     Application->>Transport: enviar PUT /api/warehouse/suppliers/:id
-    Transport-->>Application: devolver respuesta normalizada
-    Application-->>View: presentar resultado observable
+    Transport-->>Application: status HTTP y payload del endpoint
+    alt Respuesta exitosa
+        Application-->>View: entidad, colección o archivo normalizado
+        View-->>Browser: actualizar la vista con el resultado
+    else Respuesta rechazada
+        Application-->>View: error normalizado por apiRequest
+        View-->>Browser: conservar contexto y mostrar el mensaje
+    end
+    deactivate Application
 ```
 
 ## `CU-CAT-10`
@@ -475,10 +638,19 @@ sequenceDiagram
     Note over Application,Transport: Variables de frontera: params/filtros
 
     Browser->>View: clientsPage.ejs y clientsPage.js cargan clientes
+    View->>View: recopilar y validar las variables de frontera indicadas
     View->>Application: getAllClients({ params }) → getAllClientsRequest({ params })
+    activate Application
     Application->>Transport: consulta GET /api/sales/clients
-    Transport-->>Application: devolver respuesta normalizada
-    Application-->>View: presentar resultado observable
+    Transport-->>Application: status HTTP y payload del endpoint
+    alt Respuesta exitosa
+        Application-->>View: entidad, colección o archivo normalizado
+        View-->>Browser: actualizar la vista con el resultado
+    else Respuesta rechazada
+        Application-->>View: error normalizado por apiRequest
+        View-->>Browser: conservar contexto y mostrar el mensaje
+    end
+    deactivate Application
 ```
 
 ## `CU-CAT-11`
@@ -494,10 +666,19 @@ sequenceDiagram
     Note over Application,Transport: Variables de frontera: formData/payload
 
     Browser->>View: clientModal.js abre clientForm.js en alta
+    View->>View: recopilar y validar las variables de frontera indicadas
     View->>Application: registerClient({ formData }) → createClientRequest({ formData })
+    activate Application
     Application->>Transport: envía POST /api/sales/clients
-    Transport-->>Application: devolver respuesta normalizada
-    Application-->>View: presentar resultado observable
+    Transport-->>Application: status HTTP y payload del endpoint
+    alt Respuesta exitosa
+        Application-->>View: entidad, colección o archivo normalizado
+        View-->>Browser: actualizar la vista con el resultado
+    else Respuesta rechazada
+        Application-->>View: error normalizado por apiRequest
+        View-->>Browser: conservar contexto y mostrar el mensaje
+    end
+    deactivate Application
 ```
 
 ## `CU-CAT-12`
@@ -513,10 +694,19 @@ sequenceDiagram
     Note over Application,Transport: Variables de frontera: id, formData/payload
 
     Browser->>View: clientModal.js precarga el cliente
+    View->>View: recopilar y validar las variables de frontera indicadas
     View->>Application: editClient({ id, formData }) → editClientRequest({ id, formData })
+    activate Application
     Application->>Transport: envía PUT /api/sales/clients/:id
-    Transport-->>Application: devolver respuesta normalizada
-    Application-->>View: presentar resultado observable
+    Transport-->>Application: status HTTP y payload del endpoint
+    alt Respuesta exitosa
+        Application-->>View: entidad, colección o archivo normalizado
+        View-->>Browser: actualizar la vista con el resultado
+    else Respuesta rechazada
+        Application-->>View: error normalizado por apiRequest
+        View-->>Browser: conservar contexto y mostrar el mensaje
+    end
+    deactivate Application
 ```
 
 ## `CU-CAT-13`
@@ -532,10 +722,19 @@ sequenceDiagram
     Note over Application,Transport: Variables de frontera: params/filtros
 
     Browser->>View: wastesPage.ejs y wastesPage.js cargan mermas
+    View->>View: recopilar y validar las variables de frontera indicadas
     View->>Application: getAllWastes({ params }) → getAllWastesRequest({ params })
+    activate Application
     Application->>Transport: consulta GET /api/warehouse/wastes
-    Transport-->>Application: devolver respuesta normalizada
-    Application-->>View: presentar resultado observable
+    Transport-->>Application: status HTTP y payload del endpoint
+    alt Respuesta exitosa
+        Application-->>View: entidad, colección o archivo normalizado
+        View-->>Browser: actualizar la vista con el resultado
+    else Respuesta rechazada
+        Application-->>View: error normalizado por apiRequest
+        View-->>Browser: conservar contexto y mostrar el mensaje
+    end
+    deactivate Application
 ```
 
 ## `CU-CAT-14`
@@ -551,10 +750,19 @@ sequenceDiagram
     Note over Application,Transport: Variables de frontera: formData/payload
 
     Browser->>View: wasteModal.js y wasteForm.js seleccionan una plantilla de material
+    View->>View: recopilar y validar las variables de frontera indicadas
     View->>Application: getWasteMaterialTemplates prepara datos y registerWaste registra
+    activate Application
     Application->>Transport: enviar POST /api/warehouse/wastes
-    Transport-->>Application: devolver respuesta normalizada
-    Application-->>View: presentar resultado observable
+    Transport-->>Application: status HTTP y payload del endpoint
+    alt Respuesta exitosa
+        Application-->>View: entidad, colección o archivo normalizado
+        View-->>Browser: actualizar la vista con el resultado
+    else Respuesta rechazada
+        Application-->>View: error normalizado por apiRequest
+        View-->>Browser: conservar contexto y mostrar el mensaje
+    end
+    deactivate Application
 ```
 
 ## `CU-CAT-15`
@@ -570,10 +778,19 @@ sequenceDiagram
     Note over Application,Transport: Variables de frontera: id, formData/payload
 
     Browser->>View: wasteModal.js precarga la merma
+    View->>View: recopilar y validar las variables de frontera indicadas
     View->>Application: editWaste({ id, formData }) → editWasteRequest({ id, formData })
+    activate Application
     Application->>Transport: envía PATCH /api/warehouse/wastes/:id
-    Transport-->>Application: devolver respuesta normalizada
-    Application-->>View: presentar resultado observable
+    Transport-->>Application: status HTTP y payload del endpoint
+    alt Respuesta exitosa
+        Application-->>View: entidad, colección o archivo normalizado
+        View-->>Browser: actualizar la vista con el resultado
+    else Respuesta rechazada
+        Application-->>View: error normalizado por apiRequest
+        View-->>Browser: conservar contexto y mostrar el mensaje
+    end
+    deactivate Application
 ```
 
 ## `CU-CAT-16`
@@ -589,10 +806,19 @@ sequenceDiagram
     Note over Application,Transport: Variables de frontera: id, formData/payload
 
     Browser->>View: wasteForm.js usa el modo de ajuste
+    View->>View: recopilar y validar las variables de frontera indicadas
     View->>Application: editWasteStock({ id, formData }) → editWasteStockRequest({ id, formData })
+    activate Application
     Application->>Transport: envía PATCH /api/warehouse/wastes/:id/stock
-    Transport-->>Application: devolver respuesta normalizada
-    Application-->>View: presentar resultado observable
+    Transport-->>Application: status HTTP y payload del endpoint
+    alt Respuesta exitosa
+        Application-->>View: entidad, colección o archivo normalizado
+        View-->>Browser: actualizar la vista con el resultado
+    else Respuesta rechazada
+        Application-->>View: error normalizado por apiRequest
+        View-->>Browser: conservar contexto y mostrar el mensaje
+    end
+    deactivate Application
 ```
 
 ## `CU-CAT-17`
@@ -608,10 +834,19 @@ sequenceDiagram
     Note over Application,Transport: Variables de frontera: params/filtros
 
     Browser->>View: Select de presentación en materialFields.js y wasteFields.js
+    View->>View: recopilar y validar las variables de frontera indicadas
     View->>Application: getAllPresentations({ params }) → getAllPresentationsRequest({ params })
+    activate Application
     Application->>Transport: consume GET /api/warehouse/presentations
-    Transport-->>Application: devolver respuesta normalizada
-    Application-->>View: presentar resultado observable
+    Transport-->>Application: status HTTP y payload del endpoint
+    alt Respuesta exitosa
+        Application-->>View: entidad, colección o archivo normalizado
+        View-->>Browser: actualizar la vista con el resultado
+    else Respuesta rechazada
+        Application-->>View: error normalizado por apiRequest
+        View-->>Browser: conservar contexto y mostrar el mensaje
+    end
+    deactivate Application
 ```
 
 ## `CU-CAT-18`
@@ -627,10 +862,19 @@ sequenceDiagram
     Note over Application,Transport: Variables de frontera: params/filtros
 
     Browser->>View: Select de unidad en formularios de material y merma
+    View->>View: recopilar y validar las variables de frontera indicadas
     View->>Application: getAllUnitMeasures({ params }) → getAllUnitMeasuresRequest({ params })
+    activate Application
     Application->>Transport: consume GET /api/warehouse/unit-measures
-    Transport-->>Application: devolver respuesta normalizada
-    Application-->>View: presentar resultado observable
+    Transport-->>Application: status HTTP y payload del endpoint
+    alt Respuesta exitosa
+        Application-->>View: entidad, colección o archivo normalizado
+        View-->>Browser: actualizar la vista con el resultado
+    else Respuesta rechazada
+        Application-->>View: error normalizado por apiRequest
+        View-->>Browser: conservar contexto y mostrar el mensaje
+    end
+    deactivate Application
 ```
 
 ## `CU-CAT-19`
@@ -646,10 +890,19 @@ sequenceDiagram
     Note over Application,Transport: Variables de frontera: params/filtros
 
     Browser->>View: Select de motivo en los modos de ajuste
+    View->>View: recopilar y validar las variables de frontera indicadas
     View->>Application: getAllReasons({ params }) → getAllReasonsRequest({ params })
+    activate Application
     Application->>Transport: consume GET /api/warehouse/reasons
-    Transport-->>Application: devolver respuesta normalizada
-    Application-->>View: presentar resultado observable
+    Transport-->>Application: status HTTP y payload del endpoint
+    alt Respuesta exitosa
+        Application-->>View: entidad, colección o archivo normalizado
+        View-->>Browser: actualizar la vista con el resultado
+    else Respuesta rechazada
+        Application-->>View: error normalizado por apiRequest
+        View-->>Browser: conservar contexto y mostrar el mensaje
+    end
+    deactivate Application
 ```
 
 ## `CU-CAT-20`
@@ -665,10 +918,19 @@ sequenceDiagram
     Note over Application,Transport: Variables de frontera: params/filtros
 
     Browser->>View: Estado visible en tablas y formularios de salidas
+    View->>View: recopilar y validar las variables de frontera indicadas
     View->>Application: getAllFulfillmentStatuses({ params }) → getAllFulfillmentStatusesRequest({ params })
+    activate Application
     Application->>Transport: consume GET /api/warehouse/fulfillment-statuses
-    Transport-->>Application: devolver respuesta normalizada
-    Application-->>View: presentar resultado observable
+    Transport-->>Application: status HTTP y payload del endpoint
+    alt Respuesta exitosa
+        Application-->>View: entidad, colección o archivo normalizado
+        View-->>Browser: actualizar la vista con el resultado
+    else Respuesta rechazada
+        Application-->>View: error normalizado por apiRequest
+        View-->>Browser: conservar contexto y mostrar el mensaje
+    end
+    deactivate Application
 ```
 
 ## `CU-ENT-01`
@@ -684,10 +946,19 @@ sequenceDiagram
     Note over Application,Transport: Variables de frontera: params/filtros
 
     Browser->>View: goodsReceiptsPage.ejs y su DataTable cargan compras
+    View->>View: recopilar y validar las variables de frontera indicadas
     View->>Application: getAllGoodsReceipts({ params }) → getAllGoodsReceiptsRequest({ params })
+    activate Application
     Application->>Transport: consulta GET /api/warehouse/goods-receipts
-    Transport-->>Application: devolver respuesta normalizada
-    Application-->>View: presentar resultado observable
+    Transport-->>Application: status HTTP y payload del endpoint
+    alt Respuesta exitosa
+        Application-->>View: entidad, colección o archivo normalizado
+        View-->>Browser: actualizar la vista con el resultado
+    else Respuesta rechazada
+        Application-->>View: error normalizado por apiRequest
+        View-->>Browser: conservar contexto y mostrar el mensaje
+    end
+    deactivate Application
 ```
 
 ## `CU-ENT-02`
@@ -737,10 +1008,19 @@ sequenceDiagram
     Note over Application,Transport: Variables de frontera: id, formData/payload
 
     Browser->>View: goodsReceiptModal.js abre una compra existente
+    View->>View: recopilar y validar las variables de frontera indicadas
     View->>Application: editGoodsReceiptHeader({ id, formData }) → editGoodsReceiptHeaderRequest({ id, formData })
+    activate Application
     Application->>Transport: envía PATCH /api/warehouse/goods-receipts/:id
-    Transport-->>Application: devolver respuesta normalizada
-    Application-->>View: presentar resultado observable
+    Transport-->>Application: status HTTP y payload del endpoint
+    alt Respuesta exitosa
+        Application-->>View: entidad, colección o archivo normalizado
+        View-->>Browser: actualizar la vista con el resultado
+    else Respuesta rechazada
+        Application-->>View: error normalizado por apiRequest
+        View-->>Browser: conservar contexto y mostrar el mensaje
+    end
+    deactivate Application
 ```
 
 ## `CU-ENT-04`
@@ -756,10 +1036,19 @@ sequenceDiagram
     Note over Application,Transport: Variables de frontera: id, detailId, formData/payload
 
     Browser->>View: correctionModal.js y correctionForm.js aíslan la corrección
+    View->>View: recopilar y validar las variables de frontera indicadas
     View->>Application: correctGoodsReceiptDetail({ id, detailId, formData }) → correctGoodsReceiptDetailRequest({ id, detailId, formData })
+    activate Application
     Application->>Transport: envía PATCH /api/warehouse/goods-receipts/:id/details/:detailId/corrections
-    Transport-->>Application: devolver respuesta normalizada
-    Application-->>View: presentar resultado observable
+    Transport-->>Application: status HTTP y payload del endpoint
+    alt Respuesta exitosa
+        Application-->>View: entidad, colección o archivo normalizado
+        View-->>Browser: actualizar la vista con el resultado
+    else Respuesta rechazada
+        Application-->>View: error normalizado por apiRequest
+        View-->>Browser: conservar contexto y mostrar el mensaje
+    end
+    deactivate Application
 ```
 
 ## `CU-ENT-05`
@@ -775,10 +1064,19 @@ sequenceDiagram
     Note over Application,Transport: Variables de frontera: id, detailId, formData/payload
 
     Browser->>View: Acción Cancelar del detalle en el modal de compra
+    View->>View: recopilar y validar las variables de frontera indicadas
     View->>Application: cancelGoodsReceiptDetail({ id, detailId, formData }) → cancelGoodsReceiptDetailRequest({ id, detailId, formData })
+    activate Application
     Application->>Transport: envía PATCH /api/warehouse/goods-receipts/:id/details/:detailId/cancel
-    Transport-->>Application: devolver respuesta normalizada
-    Application-->>View: presentar resultado observable
+    Transport-->>Application: status HTTP y payload del endpoint
+    alt Respuesta exitosa
+        Application-->>View: entidad, colección o archivo normalizado
+        View-->>Browser: actualizar la vista con el resultado
+    else Respuesta rechazada
+        Application-->>View: error normalizado por apiRequest
+        View-->>Browser: conservar contexto y mostrar el mensaje
+    end
+    deactivate Application
 ```
 
 ## `CU-SAL-01`
@@ -794,10 +1092,19 @@ sequenceDiagram
     Note over Application,Transport: Variables de frontera: params/filtros
 
     Browser->>View: goodsIssuesPage.ejs y su DataTable cargan salidas
+    View->>View: recopilar y validar las variables de frontera indicadas
     View->>Application: getAllGoodsIssues({ params }) → getAllGoodsIssuesRequest({ params })
+    activate Application
     Application->>Transport: consulta GET /api/warehouse/goods-issues
-    Transport-->>Application: devolver respuesta normalizada
-    Application-->>View: presentar resultado observable
+    Transport-->>Application: status HTTP y payload del endpoint
+    alt Respuesta exitosa
+        Application-->>View: entidad, colección o archivo normalizado
+        View-->>Browser: actualizar la vista con el resultado
+    else Respuesta rechazada
+        Application-->>View: error normalizado por apiRequest
+        View-->>Browser: conservar contexto y mostrar el mensaje
+    end
+    deactivate Application
 ```
 
 ## `CU-SAL-02`
@@ -813,10 +1120,19 @@ sequenceDiagram
     Note over Application,Transport: Variables de frontera: formData/payload
 
     Browser->>View: goodsIssueModal.js captura documento y materiales
+    View->>View: recopilar y validar las variables de frontera indicadas
     View->>Application: registerGoodsIssue({ formData }) → registerGoodsIssueRequest({ formData })
+    activate Application
     Application->>Transport: envía POST /api/warehouse/goods-issues
-    Transport-->>Application: devolver respuesta normalizada
-    Application-->>View: presentar resultado observable
+    Transport-->>Application: status HTTP y payload del endpoint
+    alt Respuesta exitosa
+        Application-->>View: entidad, colección o archivo normalizado
+        View-->>Browser: actualizar la vista con el resultado
+    else Respuesta rechazada
+        Application-->>View: error normalizado por apiRequest
+        View-->>Browser: conservar contexto y mostrar el mensaje
+    end
+    deactivate Application
 ```
 
 ## `CU-SAL-03`
@@ -832,10 +1148,19 @@ sequenceDiagram
     Note over Application,Transport: Variables de frontera: id, formData/payload
 
     Browser->>View: Modo encabezado de goodsIssueModal.js
+    View->>View: recopilar y validar las variables de frontera indicadas
     View->>Application: editGoodsIssueHeader({ id, formData }) → editGoodsIssueHeaderRequest({ id, formData })
+    activate Application
     Application->>Transport: envía PATCH /api/warehouse/goods-issues/:id/header
-    Transport-->>Application: devolver respuesta normalizada
-    Application-->>View: presentar resultado observable
+    Transport-->>Application: status HTTP y payload del endpoint
+    alt Respuesta exitosa
+        Application-->>View: entidad, colección o archivo normalizado
+        View-->>Browser: actualizar la vista con el resultado
+    else Respuesta rechazada
+        Application-->>View: error normalizado por apiRequest
+        View-->>Browser: conservar contexto y mostrar el mensaje
+    end
+    deactivate Application
 ```
 
 ## `CU-SAL-04`
@@ -851,10 +1176,19 @@ sequenceDiagram
     Note over Application,Transport: Variables de frontera: id, formData/payload
 
     Browser->>View: Modo detalles de goodsIssueModal.js
+    View->>View: recopilar y validar las variables de frontera indicadas
     View->>Application: editGoodsIssueDetails({ id, formData }) → editGoodsIssueDetailsRequest({ id, formData })
+    activate Application
     Application->>Transport: envía PATCH /api/warehouse/goods-issues/:id/details
-    Transport-->>Application: devolver respuesta normalizada
-    Application-->>View: presentar resultado observable
+    Transport-->>Application: status HTTP y payload del endpoint
+    alt Respuesta exitosa
+        Application-->>View: entidad, colección o archivo normalizado
+        View-->>Browser: actualizar la vista con el resultado
+    else Respuesta rechazada
+        Application-->>View: error normalizado por apiRequest
+        View-->>Browser: conservar contexto y mostrar el mensaje
+    end
+    deactivate Application
 ```
 
 ## `CU-SAL-05`
@@ -870,10 +1204,19 @@ sequenceDiagram
     Note over Application,Transport: Variables de frontera: id, formData/payload
 
     Browser->>View: Acción Surtir dentro de los detalles de salida
+    View->>View: recopilar y validar las variables de frontera indicadas
     View->>Application: editGoodsIssueDetails entrega las cantidades capturadas
+    activate Application
     Application->>Transport: enviar PATCH /api/warehouse/goods-issues/:id/details
-    Transport-->>Application: devolver respuesta normalizada
-    Application-->>View: presentar resultado observable
+    Transport-->>Application: status HTTP y payload del endpoint
+    alt Respuesta exitosa
+        Application-->>View: entidad, colección o archivo normalizado
+        View-->>Browser: actualizar la vista con el resultado
+    else Respuesta rechazada
+        Application-->>View: error normalizado por apiRequest
+        View-->>Browser: conservar contexto y mostrar el mensaje
+    end
+    deactivate Application
 ```
 
 ## `CU-SAL-06`
@@ -915,10 +1258,19 @@ sequenceDiagram
     Note over Application,Transport: Variables de frontera: params/filtros
 
     Browser->>View: wasteIssuesPage.ejs y su DataTable cargan salidas de merma
+    View->>View: recopilar y validar las variables de frontera indicadas
     View->>Application: getAllWasteIssues({ params }) → getAllWasteIssuesRequest({ params })
+    activate Application
     Application->>Transport: consulta GET /api/warehouse/waste-issues
-    Transport-->>Application: devolver respuesta normalizada
-    Application-->>View: presentar resultado observable
+    Transport-->>Application: status HTTP y payload del endpoint
+    alt Respuesta exitosa
+        Application-->>View: entidad, colección o archivo normalizado
+        View-->>Browser: actualizar la vista con el resultado
+    else Respuesta rechazada
+        Application-->>View: error normalizado por apiRequest
+        View-->>Browser: conservar contexto y mostrar el mensaje
+    end
+    deactivate Application
 ```
 
 ## `CU-SAL-08`
@@ -934,10 +1286,19 @@ sequenceDiagram
     Note over Application,Transport: Variables de frontera: formData/payload
 
     Browser->>View: wasteIssueModal.js captura documento y mermas
+    View->>View: recopilar y validar las variables de frontera indicadas
     View->>Application: registerWasteIssue({ formData }) → registerWasteIssueRequest({ formData })
+    activate Application
     Application->>Transport: envía POST /api/warehouse/waste-issues
-    Transport-->>Application: devolver respuesta normalizada
-    Application-->>View: presentar resultado observable
+    Transport-->>Application: status HTTP y payload del endpoint
+    alt Respuesta exitosa
+        Application-->>View: entidad, colección o archivo normalizado
+        View-->>Browser: actualizar la vista con el resultado
+    else Respuesta rechazada
+        Application-->>View: error normalizado por apiRequest
+        View-->>Browser: conservar contexto y mostrar el mensaje
+    end
+    deactivate Application
 ```
 
 ## `CU-SAL-09`
@@ -953,10 +1314,19 @@ sequenceDiagram
     Note over Application,Transport: Variables de frontera: id, formData/payload
 
     Browser->>View: Modo encabezado de wasteIssueModal.js
+    View->>View: recopilar y validar las variables de frontera indicadas
     View->>Application: editWasteIssueHeader({ id, formData }) → editWasteIssueHeaderRequest({ id, formData })
+    activate Application
     Application->>Transport: envía PATCH /api/warehouse/waste-issues/:id/header
-    Transport-->>Application: devolver respuesta normalizada
-    Application-->>View: presentar resultado observable
+    Transport-->>Application: status HTTP y payload del endpoint
+    alt Respuesta exitosa
+        Application-->>View: entidad, colección o archivo normalizado
+        View-->>Browser: actualizar la vista con el resultado
+    else Respuesta rechazada
+        Application-->>View: error normalizado por apiRequest
+        View-->>Browser: conservar contexto y mostrar el mensaje
+    end
+    deactivate Application
 ```
 
 ## `CU-SAL-10`
@@ -972,10 +1342,19 @@ sequenceDiagram
     Note over Application,Transport: Variables de frontera: id, formData/payload
 
     Browser->>View: Modo detalles de wasteIssueModal.js
+    View->>View: recopilar y validar las variables de frontera indicadas
     View->>Application: editWasteIssueDetails({ id, formData }) → editWasteIssueDetailsRequest({ id, formData })
+    activate Application
     Application->>Transport: envía PATCH /api/warehouse/waste-issues/:id/details
-    Transport-->>Application: devolver respuesta normalizada
-    Application-->>View: presentar resultado observable
+    Transport-->>Application: status HTTP y payload del endpoint
+    alt Respuesta exitosa
+        Application-->>View: entidad, colección o archivo normalizado
+        View-->>Browser: actualizar la vista con el resultado
+    else Respuesta rechazada
+        Application-->>View: error normalizado por apiRequest
+        View-->>Browser: conservar contexto y mostrar el mensaje
+    end
+    deactivate Application
 ```
 
 ## `CU-SAL-11`
@@ -991,10 +1370,19 @@ sequenceDiagram
     Note over Application,Transport: Variables de frontera: id, formData/payload
 
     Browser->>View: Acción Surtir dentro de los detalles de merma
+    View->>View: recopilar y validar las variables de frontera indicadas
     View->>Application: editWasteIssueDetails entrega las cantidades capturadas
+    activate Application
     Application->>Transport: enviar PATCH /api/warehouse/waste-issues/:id/details
-    Transport-->>Application: devolver respuesta normalizada
-    Application-->>View: presentar resultado observable
+    Transport-->>Application: status HTTP y payload del endpoint
+    alt Respuesta exitosa
+        Application-->>View: entidad, colección o archivo normalizado
+        View-->>Browser: actualizar la vista con el resultado
+    else Respuesta rechazada
+        Application-->>View: error normalizado por apiRequest
+        View-->>Browser: conservar contexto y mostrar el mensaje
+    end
+    deactivate Application
 ```
 
 ## `CU-SAL-12`
@@ -1036,10 +1424,19 @@ sequenceDiagram
     Note over Application,Transport: Variables de frontera: params/filtros
 
     Browser->>View: La consulta es el listado de materialsPage.js, no hay página de reporte
+    View->>View: recopilar y validar las variables de frontera indicadas
     View->>Application: reutilizar getAllMaterialsRequest con los filtros
+    activate Application
     Application->>Transport: consultar GET /api/warehouse/materials sin mutación
-    Transport-->>Application: devolver respuesta normalizada
-    Application-->>View: presentar resultado observable
+    Transport-->>Application: status HTTP y payload del endpoint
+    alt Respuesta exitosa
+        Application-->>View: entidad, colección o archivo normalizado
+        View-->>Browser: actualizar la vista con el resultado
+    else Respuesta rechazada
+        Application-->>View: error normalizado por apiRequest
+        View-->>Browser: conservar contexto y mostrar el mensaje
+    end
+    deactivate Application
 ```
 
 ## `CU-REP-02`
@@ -1055,10 +1452,19 @@ sequenceDiagram
     Note over Application,Transport: Variables de frontera: params/filtros
 
     Browser->>View: movementsPage.js selecciona el contexto material
+    View->>View: recopilar y validar las variables de frontera indicadas
     View->>Application: getAllMovements con contexto materials
+    activate Application
     Application->>Transport: consultar GET /api/admin/movements/materials
-    Transport-->>Application: devolver respuesta normalizada
-    Application-->>View: presentar resultado observable
+    Transport-->>Application: status HTTP y payload del endpoint
+    alt Respuesta exitosa
+        Application-->>View: entidad, colección o archivo normalizado
+        View-->>Browser: actualizar la vista con el resultado
+    else Respuesta rechazada
+        Application-->>View: error normalizado por apiRequest
+        View-->>Browser: conservar contexto y mostrar el mensaje
+    end
+    deactivate Application
 ```
 
 ## `CU-REP-03`
@@ -1074,10 +1480,19 @@ sequenceDiagram
     Note over Application,Transport: Variables de frontera: params/filtros
 
     Browser->>View: Botón Excel de materialDatatable.js
+    View->>View: recopilar y validar las variables de frontera indicadas
     View->>Application: exportWarehouseReport({ params }) → exportWarehouseReportRequest({ params })
+    activate Application
     Application->>Transport: descarga /api/warehouse/reports/inventory/excel
-    Transport-->>Application: devolver respuesta normalizada
-    Application-->>View: presentar resultado observable
+    Transport-->>Application: status HTTP y payload del endpoint
+    alt Respuesta exitosa
+        Application-->>View: entidad, colección o archivo normalizado
+        View-->>Browser: actualizar la vista con el resultado
+    else Respuesta rechazada
+        Application-->>View: error normalizado por apiRequest
+        View-->>Browser: conservar contexto y mostrar el mensaje
+    end
+    deactivate Application
 ```
 
 ## `CU-REP-04`
@@ -1093,10 +1508,19 @@ sequenceDiagram
     Note over Application,Transport: Variables de frontera: params/filtros
 
     Browser->>View: Botón Excel del listado de salidas de material
+    View->>View: recopilar y validar las variables de frontera indicadas
     View->>Application: exportGoodsIssueReport({ params }) → exportGoodsIssueReportRequest({ params })
+    activate Application
     Application->>Transport: descarga /api/warehouse/reports/goods-issues/excel
-    Transport-->>Application: devolver respuesta normalizada
-    Application-->>View: presentar resultado observable
+    Transport-->>Application: status HTTP y payload del endpoint
+    alt Respuesta exitosa
+        Application-->>View: entidad, colección o archivo normalizado
+        View-->>Browser: actualizar la vista con el resultado
+    else Respuesta rechazada
+        Application-->>View: error normalizado por apiRequest
+        View-->>Browser: conservar contexto y mostrar el mensaje
+    end
+    deactivate Application
 ```
 
 ## `CU-REP-05`
@@ -1112,10 +1536,19 @@ sequenceDiagram
     Note over Application,Transport: Variables de frontera: params/filtros
 
     Browser->>View: Botón Excel de movimientos en contexto material
+    View->>View: recopilar y validar las variables de frontera indicadas
     View->>Application: exportMovementReport({ params, type: materials }) → exportMovementReportRequest({ params, type: materials })
+    activate Application
     Application->>Transport: descarga /api/admin/reports/movements/materials/excel
-    Transport-->>Application: devolver respuesta normalizada
-    Application-->>View: presentar resultado observable
+    Transport-->>Application: status HTTP y payload del endpoint
+    alt Respuesta exitosa
+        Application-->>View: entidad, colección o archivo normalizado
+        View-->>Browser: actualizar la vista con el resultado
+    else Respuesta rechazada
+        Application-->>View: error normalizado por apiRequest
+        View-->>Browser: conservar contexto y mostrar el mensaje
+    end
+    deactivate Application
 ```
 
 ## `CU-REP-06`
@@ -1131,10 +1564,19 @@ sequenceDiagram
     Note over Application,Transport: Variables de frontera: params/filtros
 
     Browser->>View: La consulta es el listado de wastesPage.js, no hay página de reporte
+    View->>View: recopilar y validar las variables de frontera indicadas
     View->>Application: reutilizar getAllWastesRequest con los filtros
+    activate Application
     Application->>Transport: consultar GET /api/warehouse/wastes sin mutación
-    Transport-->>Application: devolver respuesta normalizada
-    Application-->>View: presentar resultado observable
+    Transport-->>Application: status HTTP y payload del endpoint
+    alt Respuesta exitosa
+        Application-->>View: entidad, colección o archivo normalizado
+        View-->>Browser: actualizar la vista con el resultado
+    else Respuesta rechazada
+        Application-->>View: error normalizado por apiRequest
+        View-->>Browser: conservar contexto y mostrar el mensaje
+    end
+    deactivate Application
 ```
 
 ## `CU-REP-07`
@@ -1150,10 +1592,19 @@ sequenceDiagram
     Note over Application,Transport: Variables de frontera: params/filtros
 
     Browser->>View: movementsPage.js selecciona el contexto merma
+    View->>View: recopilar y validar las variables de frontera indicadas
     View->>Application: getAllMovements con contexto wastes
+    activate Application
     Application->>Transport: consultar GET /api/admin/movements/wastes
-    Transport-->>Application: devolver respuesta normalizada
-    Application-->>View: presentar resultado observable
+    Transport-->>Application: status HTTP y payload del endpoint
+    alt Respuesta exitosa
+        Application-->>View: entidad, colección o archivo normalizado
+        View-->>Browser: actualizar la vista con el resultado
+    else Respuesta rechazada
+        Application-->>View: error normalizado por apiRequest
+        View-->>Browser: conservar contexto y mostrar el mensaje
+    end
+    deactivate Application
 ```
 
 ## `CU-REP-08`
@@ -1169,10 +1620,19 @@ sequenceDiagram
     Note over Application,Transport: Variables de frontera: params/filtros
 
     Browser->>View: Botón Excel del listado de salidas de merma
+    View->>View: recopilar y validar las variables de frontera indicadas
     View->>Application: exportWasteIssueReport({ params }) → exportWasteIssueReportRequest({ params })
+    activate Application
     Application->>Transport: descarga /api/warehouse/reports/waste-issues/excel
-    Transport-->>Application: devolver respuesta normalizada
-    Application-->>View: presentar resultado observable
+    Transport-->>Application: status HTTP y payload del endpoint
+    alt Respuesta exitosa
+        Application-->>View: entidad, colección o archivo normalizado
+        View-->>Browser: actualizar la vista con el resultado
+    else Respuesta rechazada
+        Application-->>View: error normalizado por apiRequest
+        View-->>Browser: conservar contexto y mostrar el mensaje
+    end
+    deactivate Application
 ```
 
 ## `CU-REP-09`
@@ -1188,10 +1648,19 @@ sequenceDiagram
     Note over Application,Transport: Variables de frontera: params/filtros
 
     Browser->>View: Botón Excel de wasteDatatable.js
+    View->>View: recopilar y validar las variables de frontera indicadas
     View->>Application: exportWasteReport({ params }) → exportWasteReportRequest({ params })
+    activate Application
     Application->>Transport: descarga /api/warehouse/reports/wastes/excel
-    Transport-->>Application: devolver respuesta normalizada
-    Application-->>View: presentar resultado observable
+    Transport-->>Application: status HTTP y payload del endpoint
+    alt Respuesta exitosa
+        Application-->>View: entidad, colección o archivo normalizado
+        View-->>Browser: actualizar la vista con el resultado
+    else Respuesta rechazada
+        Application-->>View: error normalizado por apiRequest
+        View-->>Browser: conservar contexto y mostrar el mensaje
+    end
+    deactivate Application
 ```
 
 ## `CU-REP-10`
@@ -1207,10 +1676,19 @@ sequenceDiagram
     Note over Application,Transport: Variables de frontera: params/filtros
 
     Browser->>View: Botón Excel de movimientos en contexto merma
+    View->>View: recopilar y validar las variables de frontera indicadas
     View->>Application: exportMovementReport({ params, type: wastes }) → exportMovementReportRequest({ params, type: wastes })
+    activate Application
     Application->>Transport: descarga /api/admin/reports/movements/wastes/excel
-    Transport-->>Application: devolver respuesta normalizada
-    Application-->>View: presentar resultado observable
+    Transport-->>Application: status HTTP y payload del endpoint
+    alt Respuesta exitosa
+        Application-->>View: entidad, colección o archivo normalizado
+        View-->>Browser: actualizar la vista con el resultado
+    else Respuesta rechazada
+        Application-->>View: error normalizado por apiRequest
+        View-->>Browser: conservar contexto y mostrar el mensaje
+    end
+    deactivate Application
 ```
 
 ## `CU-REP-11`
@@ -1226,10 +1704,19 @@ sequenceDiagram
     Note over Application,Transport: Variables de frontera: params/filtros
 
     Browser->>View: Botón Excel de goodsReceiptDatatable.js
+    View->>View: recopilar y validar las variables de frontera indicadas
     View->>Application: exportGoodsReceiptReport({ params }) → exportGoodsReceiptReportRequest({ params })
+    activate Application
     Application->>Transport: descarga /api/warehouse/reports/goods-receipts/excel
-    Transport-->>Application: devolver respuesta normalizada
-    Application-->>View: presentar resultado observable
+    Transport-->>Application: status HTTP y payload del endpoint
+    alt Respuesta exitosa
+        Application-->>View: entidad, colección o archivo normalizado
+        View-->>Browser: actualizar la vista con el resultado
+    else Respuesta rechazada
+        Application-->>View: error normalizado por apiRequest
+        View-->>Browser: conservar contexto y mostrar el mensaje
+    end
+    deactivate Application
 ```
 
 ## `CU-REP-12`
@@ -1245,10 +1732,19 @@ sequenceDiagram
     Note over Application,Transport: Variables de frontera: params/filtros
 
     Browser->>View: Botón Excel de supplierDatatable.js
+    View->>View: recopilar y validar las variables de frontera indicadas
     View->>Application: exportSupplierReport({ params }) → exportSupplierReportRequest({ params })
+    activate Application
     Application->>Transport: descarga /api/warehouse/reports/suppliers/excel
-    Transport-->>Application: devolver respuesta normalizada
-    Application-->>View: presentar resultado observable
+    Transport-->>Application: status HTTP y payload del endpoint
+    alt Respuesta exitosa
+        Application-->>View: entidad, colección o archivo normalizado
+        View-->>Browser: actualizar la vista con el resultado
+    else Respuesta rechazada
+        Application-->>View: error normalizado por apiRequest
+        View-->>Browser: conservar contexto y mostrar el mensaje
+    end
+    deactivate Application
 ```
 
 ## `CU-REP-13`
@@ -1264,10 +1760,19 @@ sequenceDiagram
     Note over Application,Transport: Variables de frontera: params/filtros
 
     Browser->>View: Botón Excel de clientDatatable.js
+    View->>View: recopilar y validar las variables de frontera indicadas
     View->>Application: exportClientReport({ params }) → exportClientReportRequest({ params })
+    activate Application
     Application->>Transport: descarga /api/sales/reports/clients/excel
-    Transport-->>Application: devolver respuesta normalizada
-    Application-->>View: presentar resultado observable
+    Transport-->>Application: status HTTP y payload del endpoint
+    alt Respuesta exitosa
+        Application-->>View: entidad, colección o archivo normalizado
+        View-->>Browser: actualizar la vista con el resultado
+    else Respuesta rechazada
+        Application-->>View: error normalizado por apiRequest
+        View-->>Browser: conservar contexto y mostrar el mensaje
+    end
+    deactivate Application
 ```
 
 ## `CU-REP-14`
@@ -1283,10 +1788,19 @@ sequenceDiagram
     Note over Application,Transport: Variables de frontera: params/filtros
 
     Browser->>View: Botón Excel de personDatatable.js
+    View->>View: recopilar y validar las variables de frontera indicadas
     View->>Application: exportPersonReport({ params }) → exportPersonReportRequest({ params })
+    activate Application
     Application->>Transport: descarga /api/admin/reports/persons/excel
-    Transport-->>Application: devolver respuesta normalizada
-    Application-->>View: presentar resultado observable
+    Transport-->>Application: status HTTP y payload del endpoint
+    alt Respuesta exitosa
+        Application-->>View: entidad, colección o archivo normalizado
+        View-->>Browser: actualizar la vista con el resultado
+    else Respuesta rechazada
+        Application-->>View: error normalizado por apiRequest
+        View-->>Browser: conservar contexto y mostrar el mensaje
+    end
+    deactivate Application
 ```
 
 ## `CU-REP-15`
@@ -1302,8 +1816,17 @@ sequenceDiagram
     Note over Application,Transport: Variables de frontera: params/filtros
 
     Browser->>View: Botón Excel de userDatatable.js
+    View->>View: recopilar y validar las variables de frontera indicadas
     View->>Application: exportUserReport({ params }) → exportUserReportRequest({ params })
+    activate Application
     Application->>Transport: descarga /api/admin/reports/users/excel
-    Transport-->>Application: devolver respuesta normalizada
-    Application-->>View: presentar resultado observable
+    Transport-->>Application: status HTTP y payload del endpoint
+    alt Respuesta exitosa
+        Application-->>View: entidad, colección o archivo normalizado
+        View-->>Browser: actualizar la vista con el resultado
+    else Respuesta rechazada
+        Application-->>View: error normalizado por apiRequest
+        View-->>Browser: conservar contexto y mostrar el mensaje
+    end
+    deactivate Application
 ```

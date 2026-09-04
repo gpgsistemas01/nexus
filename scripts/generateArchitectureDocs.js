@@ -49,6 +49,13 @@ const RESERVED_SEQUENCE_ALIASES = new Set([
     'actor', 'alt', 'and', 'autonumber', 'break', 'critical', 'details', 'else', 'end',
     'loop', 'note', 'opt', 'option', 'par', 'participant', 'rect'
 ]);
+const MIN_SEQUENCE_MESSAGES = 7;
+const GENERIC_SEQUENCE_MESSAGES = [
+    'devolver resultado o error del caso',
+    'emitir respuesta observable',
+    'devolver respuesta normalizada',
+    'presentar resultado observable'
+];
 
 const validateUseCaseDiagramCoverage = async () => {
     const sources = new Map(await Promise.all(
@@ -102,6 +109,14 @@ const validateUseCaseDiagramCoverage = async () => {
                 failures.push(`diagramas ${side}: ${id} no identifica sus variables de frontera`);
             }
             const sequence = getMermaidBlocks(body)[0] ?? '';
+            const messages = sequence.split('\n').filter((line) => line.includes('->>'));
+            if (messages.length < MIN_SEQUENCE_MESSAGES) {
+                failures.push(`diagramas ${side}: ${id} no alcanza el detalle mínimo de ${MIN_SEQUENCE_MESSAGES} mensajes ordenados`);
+            }
+            const foundGenericMessages = GENERIC_SEQUENCE_MESSAGES.filter((message) => sequence.includes(message));
+            if (foundGenericMessages.length) {
+                failures.push(`diagramas ${side}: ${id} conserva mensajes genéricos sin resultado ni responsabilidad (${foundGenericMessages.join(', ')})`);
+            }
             const tracedParticipants = sequence.match(/participant .* as .*src\//g) ?? [];
             if (tracedParticipants.length < 2) {
                 failures.push(`diagramas ${side}: ${id} no traza al menos dos participantes a archivos src/`);
@@ -136,10 +151,22 @@ const validateUseCaseDiagramCoverage = async () => {
         }
     }
 
-    for (const [name, source] of sources) {
+    const documentationFiles = (await walk(path.join(ROOT, 'docs')))
+        .filter((file) => file.endsWith('.md'));
+    for (const file of documentationFiles) {
+        const name = toPosix(path.relative(ROOT, file));
+        const source = await readFile(file, 'utf8');
         for (const block of getMermaidBlocks(source).filter((body) => body.startsWith('sequenceDiagram\n'))) {
             if (block.split('\n').some((line) => line.includes(';'))) {
                 failures.push(`${name}: una secuencia Mermaid contiene un punto y coma no compatible con GitHub`);
+            }
+            const messages = block.split('\n').filter((line) => line.includes('->>'));
+            if (messages.length < MIN_SEQUENCE_MESSAGES) {
+                failures.push(`${name}: una secuencia no alcanza el detalle mínimo de ${MIN_SEQUENCE_MESSAGES} mensajes ordenados`);
+            }
+            const foundGenericMessages = GENERIC_SEQUENCE_MESSAGES.filter((message) => block.includes(message));
+            if (foundGenericMessages.length) {
+                failures.push(`${name}: una secuencia conserva mensajes genéricos sin resultado ni responsabilidad (${foundGenericMessages.join(', ')})`);
             }
         }
     }
