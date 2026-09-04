@@ -50,12 +50,20 @@ const RESERVED_SEQUENCE_ALIASES = new Set([
     'loop', 'note', 'opt', 'option', 'par', 'participant', 'rect'
 ]);
 const MIN_SEQUENCE_MESSAGES = 7;
+const MIN_SEQUENCE_CALLS = 2;
 const GENERIC_SEQUENCE_MESSAGES = [
     'devolver resultado o error del caso',
     'emitir respuesta observable',
     'devolver respuesta normalizada',
     'presentar resultado observable'
 ];
+const EXTERNAL_SEQUENCE_PARTICIPANTS = new Set([
+    'Cliente HTTP / web',
+    'Navegador',
+    'Prisma / PostgreSQL',
+    'Respuesta Express'
+]);
+const SOURCE_PATH_PATTERN = /src\/[A-Za-z0-9_./-]+\.(?:ejs|js)/g;
 
 const validateUseCaseDiagramCoverage = async () => {
     const sources = new Map(await Promise.all(
@@ -63,6 +71,8 @@ const validateUseCaseDiagramCoverage = async () => {
     ));
     const expectedIds = getUseCaseTableIds(sources.get('catalog'));
     const failures = [];
+    const sourceFiles = new Set((await walk(path.join(ROOT, 'src')))
+        .map((file) => toPosix(path.relative(ROOT, file))));
 
     if (!expectedIds.length) failures.push('catálogo: no contiene casos de uso');
     const catalogDuplicates = expectedIds.filter((id, index) => expectedIds.indexOf(id) !== index);
@@ -113,6 +123,12 @@ const validateUseCaseDiagramCoverage = async () => {
             if (messages.length < MIN_SEQUENCE_MESSAGES) {
                 failures.push(`diagramas ${side}: ${id} no alcanza el detalle mínimo de ${MIN_SEQUENCE_MESSAGES} mensajes ordenados`);
             }
+            const calls = messages.flatMap((line) => (
+                line.match(/\b[A-Za-z_$][\w$]*(?:\.[A-Za-z_$][\w$]*)?\(/g) ?? []
+            ));
+            if (calls.length < MIN_SEQUENCE_CALLS) {
+                failures.push(`diagramas ${side}: ${id} no identifica al menos ${MIN_SEQUENCE_CALLS} métodos o funciones con sus variables`);
+            }
             const foundGenericMessages = GENERIC_SEQUENCE_MESSAGES.filter((message) => sequence.includes(message));
             if (foundGenericMessages.length) {
                 failures.push(`diagramas ${side}: ${id} conserva mensajes genéricos sin resultado ni responsabilidad (${foundGenericMessages.join(', ')})`);
@@ -135,6 +151,18 @@ const validateUseCaseDiagramCoverage = async () => {
             const reservedAliases = aliases.filter((alias) => RESERVED_SEQUENCE_ALIASES.has(alias));
             if (reservedAliases.length) {
                 failures.push(`diagramas ${side}: ${id} usa alias reservados de Mermaid (${reservedAliases.join(', ')})`);
+            }
+            const participants = [...sequence.matchAll(/^\s*participant\s+(\S+)\s+as\s+(.+)$/gm)];
+            for (const [, alias, label] of participants) {
+                const paths = label.match(SOURCE_PATH_PATTERN) ?? [];
+                if (!paths.length && !EXTERNAL_SEQUENCE_PARTICIPANTS.has(label)) {
+                    failures.push(`diagramas ${side}: ${id} identifica ${alias} sin archivo src/ ni límite externo reconocido (${label})`);
+                }
+                for (const sourcePath of paths) {
+                    if (!sourceFiles.has(sourcePath)) {
+                        failures.push(`diagramas ${side}: ${id} referencia un archivo inexistente en ${alias} (${sourcePath})`);
+                    }
+                }
             }
         }
     }

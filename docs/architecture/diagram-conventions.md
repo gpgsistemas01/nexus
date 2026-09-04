@@ -127,9 +127,41 @@ Para que una secuencia sea detallada sin mezclar niveles, se aplican estas regla
 - el detalle mecánico que no altera coordinación permanece en texto, tablas o código.
 
 Los identificadores Mermaid deben ser estables y descriptivos (`apiRoutes`,
-`goodsIssues`), mientras la etiqueta puede estar en español. La orientación se conserva
-por tipo: `LR` para recorridos y dependencias, `TB` para capas o descomposición. Los
-subgrafos representan un límite real y no se usan sólo como decoración.
+`goodsIssues`), mientras la etiqueta puede estar en español.
+
+#### Nomenclatura verificable de participantes
+
+En las colecciones `DIA-BE-CU-*` y `DIA-FE-CU-*`, cada `participant` que representa
+código del repositorio muestra la ruta completa `src/.../<archivo>.js` o `.ejs`. La ruta
+conserva exactamente el `camelCase`, directorio y sufijo de capa presentes en el código
+(`ApiRoute`, `Controller`, `Service`, `DTO`, `UI`, etc.); no se reemplaza con traducciones
+como “Servicio de inventario” o con el nombre aislado de una función. Si una
+responsabilidad requiere dos archivos, ambos se enumeran en la misma etiqueta sólo
+cuando actúan como un único participante y el mensaje permite reconocer qué símbolo se
+ejecuta.
+
+Los alias Mermaid usan `PascalCase` descriptivo (`Controller`, `Inventory`, `Request`) y
+son identificadores locales del diagrama, no nombres nuevos del código. `actor` conserva
+el rol humano canónico. Los límites externos que no corresponden a un archivo del
+repositorio —`Navegador`, `Cliente HTTP / web`, `Prisma / PostgreSQL` y la respuesta de
+Express— pueden mostrarse sin ruta; no deben usarse para ocultar un módulo interno.
+`npm run docs:check` valida que cada ruta declarada exista y que ningún otro participante
+interno quede identificado sólo por una etiqueta genérica.
+
+Los mensajes entre participantes internos nombran el símbolo ejecutado con su firma
+observable y las variables que cruzan la llamada, por ejemplo
+`loginUser({ name, password })` o `editMaterialStockRequest({ data: formData, id })`.
+Las escrituras muestran `tx` cuando se propaga y las respuestas nombran el resultado o
+error observable. No se inventa una función para describir una regla interna: si la regla
+no tiene símbolo propio, se expresa como una auto-llamada del archivo propietario con los
+datos que evalúa. Los mensajes iniciados por un actor o dirigidos a un límite externo
+pueden conservar lenguaje de interacción, pero no sustituyen las llamadas ejecutables.
+Cada secuencia contiene al menos dos firmas de código comprobables; `npm run docs:check`
+rechaza recorridos compuestos únicamente por descripciones genéricas.
+
+La orientación se conserva por tipo: `LR` para recorridos y dependencias, `TB` para capas
+o descomposición. Los subgrafos representan un límite real y no se usan sólo como
+decoración.
 
 ### Organización por Viewpoint/View y revelado progresivo
 
