@@ -68,8 +68,8 @@ Ambas referencias incluyen una matriz de aplicación al código con una fila par
 los casos cuya coordinación necesita una secuencia o actividad y no sustituyen la
 documentación de los casos directos.
 Las colecciones completas están en los [diagramas frontend aplicados al
-código](frontend-code-sequence-diagrams.md) y los [diagramas backend aplicados al
-código](backend-code-sequence-diagrams.md); ambas conservan una vista independiente para
+código](frontend-code-sequences/index.md) y los [diagramas backend aplicados al
+código](backend-code-sequences/index.md); ambas conservan una vista independiente para
 cada uno de los 63 casos, incluso cuando la forma de la colaboración se repite.
 Cada vista específica declara únicamente los códigos de los patrones aplicados y deja
 su explicación en el catálogo canónico; el bloque Mermaid muestra directamente el
