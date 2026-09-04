@@ -154,6 +154,13 @@ const validateUseCaseDiagramCoverage = async () => {
             if (tracedParticipants.length < 2) {
                 failures.push(`diagramas ${side}: ${id} no traza al menos dos participantes a archivos src/`);
             }
+            if (side === 'frontend' && sequence.includes('/api/')
+                && !sequence.includes('participant HTTP as src/public/js/services/axiosInstanceApi.js')) {
+                failures.push(`diagramas frontend: ${id} no identifica el cliente HTTP compartido axiosInstanceApi.js`);
+            }
+            if (side === 'frontend' && /^\s*participant .*src\/public\/js\/application\/.*<br\/>src\/public\/js\/services\//m.test(sequence)) {
+                failures.push(`diagramas frontend: ${id} agrupa aplicación y request sin identificar sus archivos como participantes separados`);
+            }
             if (new RegExp(`(?:BE|FE)-P\\d{2}`).test(sequence)) {
                 failures.push(`diagramas ${side}: ${id} repite el índice de patrones dentro de Mermaid`);
             }
