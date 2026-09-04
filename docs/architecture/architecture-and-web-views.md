@@ -1,10 +1,10 @@
-# Arquitectura y catálogo de vistas web
+# Descripción de arquitectura y construcción
 
-Este documento es el mapa visual, versionado junto con el código, para comprender el
-sistema y localizar sus pantallas. Los diagramas usan **Mermaid**, por lo que GitHub los
+Este documento describe las vistas arquitectónicas del sistema y las decisiones de
+organización del código. Los diagramas usan **Mermaid**, por lo que GitHub los
 renderiza directamente sin guardar imágenes que puedan quedar desactualizadas.
 
-Esta familia documental se divide deliberadamente en tres niveles:
+Dentro de la familia, esta descripción se relaciona con tres niveles de detalle:
 
 - este documento **curado** explica contexto, decisiones, responsabilidades y flujos;
 - los [diagramas vigentes del código](code-diagrams.md) profundizan de forma ordenada en
@@ -28,6 +28,8 @@ estructura, dinámica y reutilización; el mapa generado aporta el inventario me
 Cada pregunta arquitectónica tiene una vista canónica y los demás documentos la enlazan
 en lugar de redibujarla.
 
+## Mantenimiento y fuentes
+
 ### ¿Qué se actualiza automáticamente?
 
 | Artefacto | Pertenece a | Fuente | Actualización |
@@ -35,9 +37,9 @@ en lugar de redibujarla.
 | `docs/generated/code-map.md` | Arquitectura y construcción | Routers e importaciones de `src` | Se regenera con `npm run docs:architecture`; CI ejecuta `npm run docs:check` y bloquea cambios desactualizados. |
 | `docs/generated/database-schema.md` | Datos, acceso y operación | Modelos y relaciones de `prisma/schema.prisma` | Se regenera con el mismo comando; se valida en cada solicitud de cambio. |
 | `docs/generated/data-dictionary.md` | Datos, acceso y operación | Campos, claves, tipos y relaciones propietarias de `prisma/schema.prisma` | Se regenera con el mismo comando; complementa el esquema sin duplicarlo manualmente. |
-| Diagramas de contexto, contenedores, despliegue, secuencia y navegación de este documento | Arquitectura y construcción | Decisiones de arquitectura, configuración versionada y experiencia de usuario | Son curados y se revisan cuando cambia el diseño o la configuración de ejecución. |
+| Diagramas de contexto, contenedores, despliegue y secuencia de este documento | Arquitectura y construcción | Decisiones de arquitectura, configuración versionada y experiencia de usuario | Son curados y se revisan cuando cambia el diseño o la configuración de ejecución. |
 | `docs/architecture/code-diagrams.md` | Arquitectura y construcción | Routers, capas, servicios y componentes reutilizables | Es curado; se revisa manualmente al cambiar estructura, colaboración, flujo o patrón aplicado. |
-| Catálogo de pantallas de este documento | Arquitectura y construcción | Rutas, permisos, controladores, EJS y comportamiento visible | Es curado porque el código no puede inferir propósito, navegación ni estado funcional. |
+| `docs/architecture/web-navigation-and-screen-catalog.md` | Arquitectura y construcción | Rutas, permisos, controladores, EJS y comportamiento visible | Es curado porque el código no puede inferir propósito, navegación ni estado funcional. |
 
 La separación es intencional: generar relaciones mecánicas evita trabajo repetitivo,
 pero no se presenta como «automática» una explicación que requiere criterio humano. En
@@ -250,161 +252,14 @@ sequenceDiagram
     V-->>U: actualiza la interfaz
 ```
 
-## 2. Mapa visual de navegación
+## 2. Vistas web relacionadas
 
-La navegación se documenta con dos vistas para no confundir estados de sesión con la
-jerarquía del menú. La primera usa la notación de máquina de estados de Mermaid,
-inspirada en UML, porque sus flechas sí representan transiciones. La segunda es un
-mapa de sitio dirigido: una flecha significa que el destino se ofrece desde el menú,
-no que exista una secuencia obligatoria entre pantallas. Las rutas entre paréntesis
-son las URL registradas; el acceso efectivo y la visibilidad de cada opción dependen
-de los permisos calculados para la sesión.
+Los estados de acceso, el mapa de navegación, el catálogo de pantallas y las
+redirecciones se mantienen en [Navegación y catálogo de pantallas web](web-navigation-and-screen-catalog.md).
+La separación evita mezclar decisiones de arquitectura del sistema con el inventario de
+la experiencia web.
 
-El shell usa en todos los tamaños el mismo control de navegación del encabezado. Para
-que sea inmediatamente reconocible, ocupa la posición inicial convencional, conserva
-el icono de hamburguesa, muestra siempre la etiqueta «Menú principal» y emplea mayor
-contraste que las acciones secundarias. El control abre desde arriba y por encima del
-contenido un único offcanvas adaptable, con etiquetas completas, por lo que no resta
-anchura a tablas y formularios ni redimensiona la página. El panel se ancla a los
-cuatro bordes de la ventana y sobrescribe las variables de tamaño del componente de
-MDB con el `100%` de su bloque contenedor fijo. También mantiene el desplazamiento
-vertical dentro de su cuerpo; así ocupa toda el área visible sin que el alto
-predeterminado del offcanvas vuelva a recortarlo al cambiar el tamaño o la orientación.
-En anchos menores a `1200px` mantiene una columna fácil de recorrer; a partir de ese
-ancho distribuye las opciones en tres columnas, o cuatro desde `1600px`, para
-aprovechar el espacio horizontal sin estrechar cada opción ni convertir la navegación
-en una barra lateral permanente. Cada acceso de primer nivel forma un bloque visual y
-las categorías conservan sus opciones relacionadas dentro de ese bloque. Se mantiene
-una única lista semántica y el partial compartido `navList`: las columnas son una
-adaptación de presentación, no listas paralelas que puedan divergir en permisos,
-estado activo o destinos. La interacción, el estado activo, los permisos y los
-submenús conservan una sola implementación en todos los tamaños, y la capa superpuesta
-concentra la atención en la navegación.
-Durante la apertura, el activador sincroniza `aria-expanded` con los eventos de MDB.
-El panel identifica explícitamente su título como «Menú principal», expone la lista
-como navegación principal, aporta una instrucción no visible asociada mediante
-`aria-describedby` y conserva dentro del encabezado su control compartido de cierre.
-Así, la señal visual para abrir permanece siempre reconocible, la interfaz evita texto
-explicativo redundante y las acciones de abrir y cerrar están disponibles en el
-contexto donde cada una se utiliza.
-La identidad se resuelve con un monograma tipográfico, fondos con profundidad y
-transiciones breves; no depende de una imagen adicional y respeta la preferencia del
-sistema para reducir movimiento.
-
-### Estados de acceso y sesión
-
-Esta máquina cubre las rutas web que no son destinos del menú: raíz, autenticación,
-renovación, cierre de sesión y recuperación ante una ruta no encontrada. El estado
-«Área autenticada» agrupa las pantallas protegidas inventariadas en el mapa de sitio
-siguiente; no representa una pantalla adicional.
-
-```mermaid
-stateDiagram-v2
-    [*] --> Root
-    state "Raíz (/)" as Root
-    state "Inicio de sesión<br/>/inicio-sesion" as Login
-    state "Área autenticada" as Authenticated
-    state "Renovar sesión<br/>/revocar-sesion" as Refresh
-    state "No encontrada<br/>/error/404" as NotFound
-
-    Root --> Login: sin sesión
-    Root --> Authenticated: con sesión
-    Login --> Authenticated: credenciales válidas
-    Authenticated --> Refresh: token de acceso vencido
-    Refresh --> Authenticated: renovación válida
-    Refresh --> Login: renovación inválida
-    Authenticated --> Login: cerrar sesión (POST /cerrar-sesion)
-    Authenticated --> NotFound: URL web inexistente o acceso web denegado
-    NotFound --> Root: volver al inicio
-```
-
-### Mapa de sitio del menú principal
-
-El nodo raíz representa el partial compartido `navList`. Los nodos de categoría son
-controles que despliegan opciones y no URL; los rectángulos terminales son todas las
-pantallas ofrecidas por el menú vigente. Abrir o cerrar el offcanvas no cambia de
-pantalla y, por ello, no se modela como transición.
-
-```mermaid
-flowchart TB
-    menu(["Menú principal"])
-
-    menu --> warehouse(["Almacén"])
-    warehouse --> materials["Materiales<br/>/almacen/materiales"]
-    warehouse --> wastes["Mermas<br/>/almacen/mermas"]
-
-    menu --> purchases["Compras<br/>/compras"]
-
-    menu --> issues(["Salidas"])
-    issues --> goodsIssues["Materiales<br/>/salidas/materiales"]
-    issues --> wasteIssues["Mermas<br/>/salidas/mermas"]
-
-    menu --> movements(["Movimientos"])
-    movements --> materialMovements["Materiales<br/>/movimientos/materiales"]
-    movements --> wasteMovements["Mermas<br/>/movimientos/mermas"]
-
-    menu --> users["Usuarios<br/>/usuarios-sistemas"]
-    menu --> persons["Personas<br/>/personas"]
-    menu --> clients["Clientes<br/>/clientes"]
-    menu --> suppliers["Proveedores<br/>/proveedores"]
-```
-
-La ruta `/movimientos` redirige a `/movimientos/materiales`; los alias históricos se
-documentan en [Redirecciones de compatibilidad](#redirecciones-de-compatibilidad). No
-se dibujan los modales CRUD como páginas porque reutilizan el contexto de su pantalla
-propietaria y no registran rutas web independientes.
-
-## 3. Catálogo de pantallas
-
-| Área | Pantalla y ruta | Propósito visible | Interacciones principales | Implementación EJS |
-| --- | --- | --- | --- | --- |
-| Acceso | Inicio de sesión (`/inicio-sesion`) | Autenticar una cuenta. | Capturar credenciales e iniciar sesión. | `src/views/pages/home/login/loginPage.ejs` |
-| Almacén | Existencias (`/almacen/materiales`) | Consultar materiales y stock; las columnas `Existencia` y `Costo Unitario de Conversión` mantienen los mismos títulos que en Mermas, y todas las celdas de cada fila, incluido el nombre, se muestran centradas. | Filtrar, paginar y abrir el alta/edición de material. | `src/views/pages/warehouse/materials/materialsPage.ejs` |
-| Almacén | Mermas (`/almacen/mermas`) | Consultar y administrar existencias de merma con todas las celdas de cada fila centradas, incluido el nombre. | Filtrar, registrar/editar y ajustar stock. | `src/views/pages/warehouse/wastes/wastesPage.ejs` |
-| Almacén | Registro de compras (`/compras`) | Consultar y registrar entradas de compra. | Filtrar, registrar compra, materiales/proveedores y corregir detalles. | `src/views/pages/warehouse/goodsReceipts/goodsReceiptsPage.ejs` |
-| Almacén | Salidas de almacén (`/salidas/materiales`) | Consultar y registrar entregas de materiales. | Filtrar, registrar salida, seleccionar cliente y devolver detalles. | `src/views/pages/warehouse/goodsIssues/goodsIssuesPage.ejs` |
-| Almacén | Salidas de mermas (`/salidas/mermas`) | Consultar y registrar salidas de merma. | Registrar, editar, surtir y devolver detalles de merma. | `src/views/pages/warehouse/wasteIssues/wasteIssuesPage.ejs` |
-| Almacén | Proveedores (`/proveedores`) | Consultar y administrar proveedores. | Crear/editar desde modal. | `src/views/pages/warehouse/suppliers/suppliersPage.ejs` |
-| Administración | Clientes (`/clientes`) | Consultar y administrar clientes. | Crear/editar desde modal. | `src/views/pages/sales/clients/clientsPage.ejs` |
-| Administración | Usuarios (`/usuarios-sistemas`) | Administrar cuentas y asignaciones. | Crear/editar usuario, roles y departamentos. | `src/views/pages/admin/users/usersPage.ejs` |
-| Administración | Personas (`/personas`) | Administrar personas participantes del negocio. | Filtrar y crear/editar datos y asignaciones. | `src/views/pages/admin/persons/personsPage.ejs` |
-| Administración | Movimientos de materiales (`/movimientos/materiales`) | Auditar movimientos del inventario de materiales. | Filtrar, consultar y exportar el historial. | `src/views/pages/admin/movements/movementsPage.ejs` |
-| Administración | Movimientos de merma (`/movimientos/mermas`) | Auditar movimientos del inventario de merma. | Filtrar, consultar y exportar el historial. | `src/views/pages/admin/movements/movementsPage.ejs` |
-| Sistema | No encontrada (`/error/404`) | Recuperar al usuario de una URL inexistente. | Volver al inicio apropiado según la sesión. | `src/views/pages/error/notFound/notFoundPage.ejs` |
-
-### Redirecciones de compatibilidad
-
-```mermaid
-flowchart LR
-    oldMaterials["/materiales"] -->|"308"| newMaterials["/almacen/materiales"]
-    oldWastes["/mermas"] -->|"308"| newWastes["/almacen/mermas"]
-    oldGoods["/salidas-materiales"] -->|"308"| newGoods["/salidas/materiales"]
-    oldWasteIssues["/salidas-mermas"] -->|"308"| newWasteIssues["/salidas/mermas"]
-    oldProfiles["/perfiles"] -->|"308"| newPersons["/personas"]
-```
-
-## 4. Cómo mantener la documentación visual
-
-Al agregar, renombrar o retirar una vista web:
-
-1. Actualizar el mapa de navegación y el catálogo de este documento.
-2. Regenerar el catálogo de rutas; no copiarlo al `README.md`.
-3. Verificar que ruta, permiso, controlador, plantilla y JavaScript de página conserven
-   nombres coherentes.
-4. Si cambia un límite del sistema o una dependencia externa, actualizar también los
-   diagramas de contexto y contenedores.
-5. Revisar los diagramas en la vista previa de Markdown de GitHub antes de fusionar.
-6. Ejecutar `npm run docs:architecture` cuando cambien routers o imports entre áreas y
-   confirmar con `npm run docs:check` antes de enviar el cambio. La misma verificación
-   se ejecuta automáticamente en CI para pull requests y pushes a la rama principal.
-
-Los diagramas describen el diseño a nivel de sistema; el código sigue siendo la fuente
-de verdad para los detalles de endpoints, payloads y reglas de autorización. Las vistas
-nuevas deben seguir las [convenciones y patrones para diagramas](diagram-conventions.md),
-incluida la distinción entre notación visual, patrón documental y patrón con evidencia
-en el código.
-
-## 5. Organización consistente de front y back
+## 3. Organización consistente de front y back
 
 La clasificación completa de factories, composición, pipeline, transacciones, eventos
 y test harness se mantiene en [patrones de diseño y construcción](design-and-construction-patterns.md).
@@ -622,7 +477,7 @@ confirmó con **Buscar / filtrar**. Esta regla se mantiene en el componente comp
 para que listados de personas, inventario, movimientos, compras y salidas sigan el
 mismo flujo sin implementaciones específicas por CRUD.
 
-## 6. Modelo de vistas de arquitectura aplicado
+## 4. Modelo de vistas de arquitectura aplicado
 
 Nexus usa un modelo **Viewpoint/View inspirado en ISO/IEC/IEEE 42010**, organizado como
 una adaptación práctica de **4+1** y apoyado por los niveles contexto/contenedor de C4.
@@ -646,7 +501,7 @@ mantiene únicamente el tramo dinámico de su responsabilidad. El
 [matriz de trazabilidad](traceability-matrix.md) recorre requisito, implementación y
 prueba.
 
-## 7. Herramientas
+## 5. Herramientas
 
 - **Diagramas curados:** Mermaid, representado directamente por GitHub.
 - **Inventarios verificables:** el generador local para rutas, importaciones y el

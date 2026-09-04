@@ -103,6 +103,23 @@ const validateUseCaseDiagramCoverage = async () => {
 
     for (const side of ['backend', 'frontend']) {
         const source = sources.get(`${side}Diagrams`);
+        const patternPrefix = side === 'backend' ? 'BE' : 'FE';
+        const appliedPatterns = new Set(
+            [...source.matchAll(new RegExp(`\\b${patternPrefix}-P\\d{2}\\b`, 'g'))]
+                .map((match) => match[0])
+        );
+        const linkedPatterns = new Set(
+            [...source.matchAll(new RegExp(
+                '^\\| `(' + patternPrefix + '-P\\d{2})` \\|[^\\n]+\\[`DIA-PAT-[A-Z]+-\\d{3}`\\]',
+                'gm'
+            ))]
+                .map((match) => match[1])
+        );
+        for (const pattern of appliedPatterns) {
+            if (!linkedPatterns.has(pattern)) {
+                failures.push(`diagramas ${side}: ${pattern} no enlaza una vista canónica DIA-PAT-* desde el índice rápido`);
+            }
+        }
         const sections = [...source.matchAll(/^## `(CU-[A-Z]+-\d+)`\n([\s\S]*?)(?=^## `CU-|(?![\s\S]))/gm)];
         validateIds(`diagramas ${side}`, sections.map((match) => match[1]));
         for (const [, id, body] of sections) {
