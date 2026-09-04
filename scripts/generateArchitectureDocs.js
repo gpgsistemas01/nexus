@@ -143,14 +143,20 @@ const validateUseCaseDiagramCoverage = async () => {
             if (!sequence.includes('«controller»')) {
                 failures.push(`diagramas ${side}: ${id} no aplica el estereotipo UML «controller»`);
             }
-            const aliases = [...sequence.matchAll(/^\s*(?:actor|participant)\s+(\S+)\s+as\s+/gm)]
+            if (!/^\s*participant\s+\S+@\{\s*"type"\s*:\s*"control"\s*\}\s+as\s+«controller»<br\/>/m.test(sequence)) {
+                failures.push(`diagramas ${side}: ${id} no representa «controller» con una figura Mermaid de tipo control`);
+            }
+            const aliases = [...sequence.matchAll(/^\s*(?:actor|participant)\s+([^\s@]+)(?:@\{[^}]+\})?\s+as\s+/gm)]
                 .map((match) => match[1].toLowerCase());
             const reservedAliases = aliases.filter((alias) => RESERVED_SEQUENCE_ALIASES.has(alias));
             if (reservedAliases.length) {
                 failures.push(`diagramas ${side}: ${id} usa alias reservados de Mermaid (${reservedAliases.join(', ')})`);
             }
-            const participants = [...sequence.matchAll(/^\s*participant\s+(\S+)\s+as\s+(.+)$/gm)];
+            const participants = [...sequence.matchAll(/^\s*participant\s+([^\s@]+)(?:@\{[^}]+\})?\s+as\s+(.+)$/gm)];
             for (const [, alias, label] of participants) {
+                if (label.includes('«object»') && !label.startsWith('«object»<br/>')) {
+                    failures.push(`diagramas ${side}: ${id} no muestra «object» en la cabecera de ${alias}`);
+                }
                 const paths = label.match(SOURCE_PATH_PATTERN) ?? [];
                 if (label.includes('«object»') && (
                     !label.includes('src/dtos/')
