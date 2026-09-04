@@ -61,8 +61,8 @@ mantiene un `flowchart` lineal si comunica menos que la secuencia equivalente.
 El detalle de una secuencia se incorpora de forma progresiva: primero se identifican
 los participantes y el camino exitoso, después se añaden únicamente las validaciones,
 alternativas, transacciones o efectos que cambian la interpretación del caso. Los
-nombres de archivos y símbolos van en participantes o mensajes, no en párrafos dentro
-de una sola etiqueta. Si para explicar una colaboración reutilizada hiciera falta
+nombres de archivos van en participantes y los símbolos ejecutados en mensajes, no
+en párrafos dentro de una sola etiqueta. Si para explicar una colaboración reutilizada hiciera falta
 repetirla en varios casos, se enlaza su vista `DIA-PAT-*` y la secuencia del caso conserva
 sólo la invocación y el resultado observable.
 En cada documento de arquitectura, los diagramas asociados con `CU-*` siguen el orden
@@ -99,19 +99,22 @@ Los participantes de las secuencias técnicas aplican además los estereotipos U
 corresponden a su responsabilidad: `«controller»` identifica el adaptador que recibe la
 interacción (controller HTTP o frontera API que lo contiene) y `«object»` identifica la
 instancia o módulo que ejecuta comportamiento de aplicación, UI o dominio. El
-estereotipo no sustituye el nombre: debajo se conservan el archivo y el símbolo exactos.
+estereotipo no sustituye el nombre: debajo se conservan los archivos concretos, mientras
+que el símbolo exacto se muestra en el mensaje que representa su ejecución.
+El estereotipo ocupa la primera línea de la entidad como identificador visual; no se
+repite debajo con etiquetas genéricas como «Controlador» u «Objeto de dominio».
 Una etiqueta genérica como «servicio» u «objeto de dominio» sin esa evidencia no cumple
 la convención.
 
 Para que una secuencia sea detallada sin mezclar niveles, se aplican estas reglas:
 
 - cada alias de participante representa una responsabilidad estable y su etiqueta nombra
-  el archivo, función, endpoint o servicio concreto del caso, no una oración sobre el
+  el archivo u objeto concreto del caso, no una función, endpoint ni oración sobre el
   resultado;
 - los mensajes nombran una acción concreta y mantienen el orden comprobable;
 - las llamadas se escriben como `objeto.metodo(variable)` o `funcion(variable)`, no como
   una descripción sin firma; cuando un participante agrupa ruta y controller, su etiqueta
-  nombra ambos archivos y el símbolo del controller;
+  nombra ambos archivos y el mensaje nombra el símbolo del controller;
 - las variables de frontera que condicionan la llamada (`id`, `detailId`, payload,
   filtros, DTO o `tx`) se nombran en el diagrama; los temporales internos que no cambian
   la colaboración se consultan en el código enlazado;
