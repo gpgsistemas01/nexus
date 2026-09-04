@@ -1,11 +1,18 @@
 ---
 title: Manual de usuario de Nexus
-document-version: 0.1
+subtitle: "Versión documental 0.2 · Sistema 1.0.0 · Estado: En revisión"
+author: Equipo Nexus
+date: 2026-09-04
+document-version: 0.2
 system-version: 1.0.0
-status: Borrador
+status: En revisión
 ---
 
 # Manual de usuario
+
+Los metadatos anteriores generan la portada al exportar con Pandoc; el título Markdown
+se conserva como encabezado de la versión navegable en el repositorio. La portada no es
+una imagen ni depende de Playwright.
 
 ## Antes de comenzar
 

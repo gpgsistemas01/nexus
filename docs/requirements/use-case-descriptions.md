@@ -13,6 +13,16 @@ permisos; la [especificación de requisitos](requirements-specification.md) cont
 criterios verificables, reglas y evidencia técnica. Una capacidad parcial, modelada o
 fuera de alcance no se incorpora como caso vigente.
 
+Las descripciones **sí nombran el objeto de negocio** cuando permite distinguir el
+objetivo —material, proveedor, compra, salida, detalle o reporte— y nombran el control
+visible sólo cuando el actor debe reconocerlo para actuar —botón, formulario, tabla o
+diálogo—. No enumeran DTO, controller, servicio, tabla, variable ni objeto interno con
+el que el actor no interactúa directamente. Así, “selecciona la compra y confirma
+Cancelar detalle” es verificable; “envía `goodsReceiptDTO` al controller” pertenece a la
+secuencia técnica. Todos los casos usan la misma plantilla y el nivel de detalle se mide
+por las interacciones y decisiones aplicables, no por exigir el mismo número de pasos a
+objetivos de distinta complejidad.
+
 ## Estructura de las fichas
 
 Cada caso emplea la misma tabla de dos columnas y conserva dentro de ella toda la

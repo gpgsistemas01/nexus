@@ -1,3 +1,10 @@
+---
+title: Manual del personal de almacén
+subtitle: "Nexus · Versión documental 0.2 · Sistema 1.0.0 · Estado: En revisión"
+author: Equipo Nexus
+date: 2026-09-04
+---
+
 # Manual del personal de almacén
 
 Esta guía corresponde al actor **Personal de almacén (área Almacén y proveeduría)**. Debe confirmar el estado del documento y la existencia disponible antes de una operación que afecte inventario.
