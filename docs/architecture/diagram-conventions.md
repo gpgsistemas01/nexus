@@ -381,6 +381,20 @@ número de participantes ni mensajes. Ambas deben identificar archivos reales, v
 de frontera, al menos dos firmas comprobables y un recorrido ordenado con un mínimo de
 siete mensajes. `npm run docs:check` aplica ese piso común a frontend y backend.
 
+Esto no significa que el frontend deba copiar el detalle interno del backend. La revisión
+busca una profundidad equivalente dentro de los límites de cada perspectiva:
+
+| Evidencia revisada | Frontend | Backend |
+| --- | --- | --- |
+| Inicio del recorrido | Evento de navegador, vista o módulo UI. | Petición HTTP y ruta registrada. |
+| Coordinación propia | Validación visual, aplicación, servicio de request y cliente HTTP, cada uno con su archivo. | Middleware, controller/DTO y servicio de dominio. |
+| Frontera compartida | Método, endpoint, payload o parámetros enviados. | Método, endpoint y datos recibidos desde `req`. |
+| Resultado | Respuesta normalizada, error y efecto visible. | Persistencia o efecto, respuesta HTTP y propagación de error. |
+
+Una fila ausente indica una brecha de detalle en su perspectiva; que sólo aparezca en la
+otra colección no obliga a duplicarla. Por ejemplo, una transacción pertenece al backend
+y el cambio de modo de un formulario pertenece al frontend.
+
 El contenido se detiene en la responsabilidad de cada perspectiva:
 
 - frontend muestra interacción, recolección o validación, aplicación, servicio HTTP,
