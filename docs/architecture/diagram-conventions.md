@@ -108,6 +108,16 @@ mensaje que representa su ejecución. Cuando corresponde un estereotipo, ocupa l
 línea de la entidad y no se repite debajo con una etiqueta genérica. Una etiqueta como
 «servicio» u «objeto de dominio» sin evidencia concreta no cumple la convención.
 
+La distinción visual combina los tipos de participante de Mermaid con la notación UML de
+estereotipos. Un controller se declara como
+`participant Controller@{ "type": "control" }` para obtener la figura de control y
+mantiene `«controller»` en la cabecera. Un objeto conserva la figura rectangular estándar
+de `participant` y muestra `«object»`: `object` no es un tipo de participante nativo y no
+debe sustituirse por `entity`, que expresa una entidad de dominio y no cualquier objeto o
+DTO. Tampoco se usa `actor` para simular otra figura, pues representa una persona, rol o
+sistema externo autónomo. De este modo la forma aporta una diferencia visible cuando la
+notación la ofrece y el estereotipo conserva la clasificación UML precisa.
+
 Para que una secuencia sea detallada sin mezclar niveles, se aplican estas reglas:
 
 - cada alias de participante representa una responsabilidad estable y su etiqueta nombra

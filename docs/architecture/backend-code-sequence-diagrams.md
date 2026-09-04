@@ -91,7 +91,7 @@ sequenceDiagram
     Note over Router,Controller: Variables de frontera: name, password y cookies
     participant Browser as Navegador
     participant Router as src/routes/api/authApiRoute.js
-    participant Controller as «controller»<br/>src/controllers/api/authController.js
+    participant Controller@{ "type": "control" } as «controller»<br/>src/controllers/api/authController.js
     participant Service as src/services/authService.js
     participant User as src/services/admin/userService.js
     participant Prisma as Prisma / PostgreSQL
@@ -127,7 +127,7 @@ sequenceDiagram
 sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route as src/routes/web/auth/logoutWebRoute.js
-    participant Controller as «controller»<br/>src/controllers/web/authController.js
+    participant Controller@{ "type": "control" } as «controller»<br/>src/controllers/web/authController.js
     participant Response as Respuesta Express
     Note over Controller,Response: Variables de frontera: sin variables adicionales
 
@@ -156,7 +156,7 @@ sequenceDiagram
 sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route as src/routes/api/admin/personApiRoute.js
-    participant Controller as «controller»<br/>src/controllers/api/admin/personController.js
+    participant Controller@{ "type": "control" } as «controller»<br/>src/controllers/api/admin/personController.js
     participant Domain as src/services/admin/person/personService.js
     Note over Controller,Domain: Variables de frontera: req.query/params
 
@@ -185,7 +185,7 @@ sequenceDiagram
 sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route as src/routes/api/admin/personApiRoute.js
-    participant Controller as «controller»<br/>src/controllers/api/admin/personController.js
+    participant Controller@{ "type": "control" } as «controller»<br/>src/controllers/api/admin/personController.js
     participant PersonDto as «object»<br/>personDto<br/>src/dtos/personDTO.js
     participant Domain as src/services/admin/person/personService.js
     Note over Controller,Domain: Variables de frontera: req.body/DTO, tx
@@ -217,7 +217,7 @@ sequenceDiagram
 sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route as src/routes/api/admin/personApiRoute.js
-    participant Controller as «controller»<br/>src/controllers/api/admin/personController.js
+    participant Controller@{ "type": "control" } as «controller»<br/>src/controllers/api/admin/personController.js
     participant PersonDto as «object»<br/>personDto<br/>src/dtos/personDTO.js
     participant Domain as src/services/admin/person/personService.js
     Note over Controller,Domain: Variables de frontera: req.params.id, req.body/DTO, tx
@@ -249,7 +249,7 @@ sequenceDiagram
 sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route as src/routes/api/admin/userApiRoute.js
-    participant Controller as «controller»<br/>src/controllers/api/admin/userController.js
+    participant Controller@{ "type": "control" } as «controller»<br/>src/controllers/api/admin/userController.js
     participant Domain as src/services/admin/userService.js
     Note over Controller,Domain: Variables de frontera: req.query/params
 
@@ -278,7 +278,7 @@ sequenceDiagram
 sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route as src/routes/api/admin/userApiRoute.js
-    participant Controller as «controller»<br/>src/controllers/api/admin/userController.js
+    participant Controller@{ "type": "control" } as «controller»<br/>src/controllers/api/admin/userController.js
     participant UserDto as «object»<br/>userDto<br/>src/dtos/userDTO.js
     participant Domain as src/services/admin/userService.js
     Note over Controller,Domain: Variables de frontera: req.body/DTO, tx
@@ -310,7 +310,7 @@ sequenceDiagram
 sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route as src/routes/api/admin/userApiRoute.js
-    participant Controller as «controller»<br/>src/controllers/api/admin/userController.js
+    participant Controller@{ "type": "control" } as «controller»<br/>src/controllers/api/admin/userController.js
     participant UserDto as «object»<br/>userDto<br/>src/dtos/userDTO.js
     participant Domain as src/services/admin/userService.js
     Note over Controller,Domain: Variables de frontera: req.params.id, req.body/DTO, tx
@@ -342,7 +342,7 @@ sequenceDiagram
 sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route as src/routes/api/admin/userApiRoute.js
-    participant Controller as «controller»<br/>src/controllers/api/admin/userController.js
+    participant Controller@{ "type": "control" } as «controller»<br/>src/controllers/api/admin/userController.js
     participant PasswordDto as «object»<br/>userPasswordDto<br/>src/dtos/userDTO.js
     participant Domain as src/services/admin/userService.js
     Note over Controller,Domain: Variables de frontera: req.params.id, req.body/DTO
@@ -374,7 +374,7 @@ sequenceDiagram
 sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route as src/routes/api/admin/roleApiRoute.js
-    participant Controller as «controller»<br/>src/controllers/api/admin/roleController.js
+    participant Controller@{ "type": "control" } as «controller»<br/>src/controllers/api/admin/roleController.js
     participant Domain as src/services/admin/roleService.js
     Note over Controller,Domain: Variables de frontera: req.query/params
 
@@ -403,7 +403,7 @@ sequenceDiagram
 sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route as src/routes/api/admin/departmentApiRoute.js
-    participant Controller as «controller»<br/>src/controllers/api/admin/departmentController.js
+    participant Controller@{ "type": "control" } as «controller»<br/>src/controllers/api/admin/departmentController.js
     participant Domain as src/services/admin/departmentService.js
     Note over Controller,Domain: Variables de frontera: req.query/params
 
@@ -432,7 +432,7 @@ sequenceDiagram
 sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route as src/routes/api/warehouse/materialApiRoute.js
-    participant Controller as «controller»<br/>src/controllers/api/warehouse/materialController.js
+    participant Controller@{ "type": "control" } as «controller»<br/>src/controllers/api/warehouse/materialController.js
     participant Domain as src/services/warehouse/materials/materialService.js
     Note over Controller,Domain: Variables de frontera: req.query/params
 
@@ -461,7 +461,7 @@ sequenceDiagram
 sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route as src/routes/api/warehouse/materialApiRoute.js
-    participant Controller as «controller»<br/>src/controllers/api/warehouse/materialController.js
+    participant Controller@{ "type": "control" } as «controller»<br/>src/controllers/api/warehouse/materialController.js
     participant MaterialDto as «object»<br/>materialDto<br/>src/dtos/materialDTO.js
     participant Domain as src/services/warehouse/materials/materialService.js
     Note over Controller,Domain: Variables de frontera: req.body/DTO, tx
@@ -493,7 +493,7 @@ sequenceDiagram
 sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route as src/routes/api/warehouse/materialApiRoute.js
-    participant Controller as «controller»<br/>src/controllers/api/warehouse/materialController.js
+    participant Controller@{ "type": "control" } as «controller»<br/>src/controllers/api/warehouse/materialController.js
     participant MaterialDto as «object»<br/>materialDto<br/>src/dtos/materialDTO.js
     participant Domain as src/services/warehouse/materials/materialService.js
     Note over Controller,Domain: Variables de frontera: req.params.id, req.body/DTO, tx
@@ -525,7 +525,7 @@ sequenceDiagram
 sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route as src/routes/api/warehouse/materialApiRoute.js
-    participant Controller as «controller»<br/>src/controllers/api/warehouse/materialController.js
+    participant Controller@{ "type": "control" } as «controller»<br/>src/controllers/api/warehouse/materialController.js
     participant Domain as src/services/warehouse/materials/materialService.js
     Note over Controller,Domain: Variables de frontera: req.params.id
 
@@ -554,7 +554,7 @@ sequenceDiagram
 sequenceDiagram
     Note over Router,Controller: Variables de frontera: id, DTO de ajuste y userId
     participant Router as src/routes/api/warehouse/materialApiRoute.js
-    participant Controller as «controller»<br/>src/controllers/api/warehouse/materialController.js
+    participant Controller@{ "type": "control" } as «controller»<br/>src/controllers/api/warehouse/materialController.js
     participant StockDto as «object»<br/>materialDto<br/>src/dtos/materialDTO.js
     participant Service as src/services/warehouse/materials/materialService.js
     participant Adjustment as src/services/warehouse/adjustmentService.js
@@ -591,7 +591,7 @@ sequenceDiagram
 sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route as src/routes/api/warehouse/supplierApiRoute.js
-    participant Controller as «controller»<br/>src/controllers/api/warehouse/supplierController.js
+    participant Controller@{ "type": "control" } as «controller»<br/>src/controllers/api/warehouse/supplierController.js
     participant Domain as src/services/warehouse/supplierService.js
     Note over Controller,Domain: Variables de frontera: req.query/params
 
@@ -620,7 +620,7 @@ sequenceDiagram
 sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route as src/routes/api/warehouse/supplierApiRoute.js
-    participant Controller as «controller»<br/>src/controllers/api/warehouse/supplierController.js
+    participant Controller@{ "type": "control" } as «controller»<br/>src/controllers/api/warehouse/supplierController.js
     participant SupplierDto as «object»<br/>supplierDto<br/>src/dtos/supplierDTO.js
     participant Domain as src/services/warehouse/supplierService.js
     Note over Controller,Domain: Variables de frontera: req.body/DTO
@@ -652,7 +652,7 @@ sequenceDiagram
 sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route as src/routes/api/warehouse/supplierApiRoute.js
-    participant Controller as «controller»<br/>src/controllers/api/warehouse/supplierController.js
+    participant Controller@{ "type": "control" } as «controller»<br/>src/controllers/api/warehouse/supplierController.js
     participant SupplierDto as «object»<br/>supplierDto<br/>src/dtos/supplierDTO.js
     participant Domain as src/services/warehouse/supplierService.js
     Note over Controller,Domain: Variables de frontera: req.params.id, req.body/DTO
@@ -684,7 +684,7 @@ sequenceDiagram
 sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route as src/routes/api/warehouse/supplierApiRoute.js
-    participant Controller as «controller»<br/>src/controllers/api/warehouse/supplierController.js
+    participant Controller@{ "type": "control" } as «controller»<br/>src/controllers/api/warehouse/supplierController.js
     participant SupplierDto as «object»<br/>supplierDto<br/>src/dtos/supplierDTO.js
     participant Domain as src/services/warehouse/supplierService.js
     Note over Controller,Domain: Variables de frontera: req.params.id, req.body/DTO
@@ -716,7 +716,7 @@ sequenceDiagram
 sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route as src/routes/api/sales/clientApiRoute.js
-    participant Controller as «controller»<br/>src/controllers/api/sales/clientController.js
+    participant Controller@{ "type": "control" } as «controller»<br/>src/controllers/api/sales/clientController.js
     participant Domain as src/services/sales/clientService.js
     Note over Controller,Domain: Variables de frontera: req.query/params
 
@@ -745,7 +745,7 @@ sequenceDiagram
 sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route as src/routes/api/sales/clientApiRoute.js
-    participant Controller as «controller»<br/>src/controllers/api/sales/clientController.js
+    participant Controller@{ "type": "control" } as «controller»<br/>src/controllers/api/sales/clientController.js
     participant ClientDto as «object»<br/>clientDto<br/>src/dtos/clientDTO.js
     participant Domain as src/services/sales/clientService.js
     Note over Controller,Domain: Variables de frontera: req.body/DTO
@@ -777,7 +777,7 @@ sequenceDiagram
 sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route as src/routes/api/sales/clientApiRoute.js
-    participant Controller as «controller»<br/>src/controllers/api/sales/clientController.js
+    participant Controller@{ "type": "control" } as «controller»<br/>src/controllers/api/sales/clientController.js
     participant ClientDto as «object»<br/>clientDto<br/>src/dtos/clientDTO.js
     participant Domain as src/services/sales/clientService.js
     Note over Controller,Domain: Variables de frontera: req.params.id, req.body/DTO
@@ -809,7 +809,7 @@ sequenceDiagram
 sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route as src/routes/api/warehouse/wasteApiRoute.js
-    participant Controller as «controller»<br/>src/controllers/api/warehouse/wasteController.js
+    participant Controller@{ "type": "control" } as «controller»<br/>src/controllers/api/warehouse/wasteController.js
     participant Domain as src/services/warehouse/wastes/wasteService.js
     Note over Controller,Domain: Variables de frontera: req.query/params
 
@@ -838,7 +838,7 @@ sequenceDiagram
 sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route as src/routes/api/warehouse/wasteApiRoute.js
-    participant Controller as «controller»<br/>src/controllers/api/warehouse/wasteController.js
+    participant Controller@{ "type": "control" } as «controller»<br/>src/controllers/api/warehouse/wasteController.js
     participant WasteDto as «object»<br/>wasteDto<br/>src/dtos/wasteDTO.js
     participant Domain as src/services/warehouse/wastes/wasteMaterialService.js<br/>src/services/warehouse/wastes/wasteService.js
     Note over Controller,Domain: Variables de frontera: req.body/DTO, req.query/params, tx
@@ -870,7 +870,7 @@ sequenceDiagram
 sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route as src/routes/api/warehouse/wasteApiRoute.js
-    participant Controller as «controller»<br/>src/controllers/api/warehouse/wasteController.js
+    participant Controller@{ "type": "control" } as «controller»<br/>src/controllers/api/warehouse/wasteController.js
     participant WasteDto as «object»<br/>wasteDto<br/>src/dtos/wasteDTO.js
     participant Domain as src/services/warehouse/wastes/wasteService.js
     Note over Controller,Domain: Variables de frontera: req.params.id, req.body/DTO
@@ -902,7 +902,7 @@ sequenceDiagram
 sequenceDiagram
     Note over Router,Controller: Variables de frontera: id, DTO de ajuste y userId
     participant Router as src/routes/api/warehouse/wasteApiRoute.js
-    participant Controller as «controller»<br/>src/controllers/api/warehouse/wasteController.js
+    participant Controller@{ "type": "control" } as «controller»<br/>src/controllers/api/warehouse/wasteController.js
     participant StockDto as «object»<br/>wasteStockDto<br/>src/dtos/wasteDTO.js
     participant Service as src/services/warehouse/wastes/wasteService.js
     participant Adjustment as src/services/warehouse/wastes/wasteStockAdjustmentService.js
@@ -937,7 +937,7 @@ sequenceDiagram
 sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route as src/routes/api/warehouse/presentationApiRoute.js
-    participant Controller as «controller»<br/>src/controllers/api/warehouse/presentationController.js
+    participant Controller@{ "type": "control" } as «controller»<br/>src/controllers/api/warehouse/presentationController.js
     participant Domain as src/services/warehouse/presentationService.js
     Note over Controller,Domain: Variables de frontera: req.query/params
 
@@ -966,7 +966,7 @@ sequenceDiagram
 sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route as src/routes/api/warehouse/unitMeasureApiRoute.js
-    participant Controller as «controller»<br/>src/controllers/api/warehouse/unitMeasureController.js
+    participant Controller@{ "type": "control" } as «controller»<br/>src/controllers/api/warehouse/unitMeasureController.js
     participant Domain as src/services/warehouse/unitMeasureService.js
     Note over Controller,Domain: Variables de frontera: req.query/params
 
@@ -995,7 +995,7 @@ sequenceDiagram
 sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route as src/routes/api/warehouse/reasonApiRoute.js
-    participant Controller as «controller»<br/>src/controllers/api/warehouse/reasonController.js
+    participant Controller@{ "type": "control" } as «controller»<br/>src/controllers/api/warehouse/reasonController.js
     participant Domain as src/services/warehouse/reasonService.js
     Note over Controller,Domain: Variables de frontera: req.query/params
 
@@ -1024,7 +1024,7 @@ sequenceDiagram
 sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route as src/routes/api/warehouse/fulfillmentStatusApiRoute.js
-    participant Controller as «controller»<br/>src/controllers/api/warehouse/fulfillmentStatusController.js
+    participant Controller@{ "type": "control" } as «controller»<br/>src/controllers/api/warehouse/fulfillmentStatusController.js
     participant Domain as src/services/warehouse/fulfillmentStatusService.js
     Note over Controller,Domain: Variables de frontera: req.query/params
 
@@ -1053,7 +1053,7 @@ sequenceDiagram
 sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route as src/routes/api/warehouse/goodsReceiptApiRoute.js
-    participant Controller as «controller»<br/>src/controllers/api/warehouse/goodsReceiptController.js
+    participant Controller@{ "type": "control" } as «controller»<br/>src/controllers/api/warehouse/goodsReceiptController.js
     participant Domain as src/services/warehouse/goodsReceipts/goodsReceiptService.js
     Note over Controller,Domain: Variables de frontera: req.query/params
 
@@ -1083,7 +1083,7 @@ sequenceDiagram
     Note over Router,Controller: Variables de frontera: goodsReceiptDto y tx
     participant Browser as Navegador
     participant Router as src/routes/api/warehouse/goodsReceiptApiRoute.js
-    participant Controller as «controller»<br/>src/controllers/api/warehouse/goodsReceiptController.js
+    participant Controller@{ "type": "control" } as «controller»<br/>src/controllers/api/warehouse/goodsReceiptController.js
     participant ReceiptDto as «object»<br/>goodsReceiptDto<br/>src/dtos/goodsReceiptDTO.js
     participant Service as src/services/warehouse/goodsReceipts/goodsReceiptService.js
     participant Reference as src/services/document/referenceNumberService.js
@@ -1119,7 +1119,7 @@ sequenceDiagram
 sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route as src/routes/api/warehouse/goodsReceiptApiRoute.js
-    participant Controller as «controller»<br/>src/controllers/api/warehouse/goodsReceiptController.js
+    participant Controller@{ "type": "control" } as «controller»<br/>src/controllers/api/warehouse/goodsReceiptController.js
     participant ReceiptDto as «object»<br/>goodsReceiptDto<br/>src/dtos/goodsReceiptDTO.js
     participant Domain as src/services/warehouse/goodsReceipts/goodsReceiptService.js
     Note over Controller,Domain: Variables de frontera: req.params.id, req.body/DTO, tx
@@ -1151,7 +1151,7 @@ sequenceDiagram
 sequenceDiagram
     Note over Router,Controller: Variables de frontera: id, detailId, correctionDto, userId y tx
     participant Router as src/routes/api/warehouse/goodsReceiptApiRoute.js
-    participant Controller as «controller»<br/>src/controllers/api/warehouse/goodsReceiptController.js
+    participant Controller@{ "type": "control" } as «controller»<br/>src/controllers/api/warehouse/goodsReceiptController.js
     participant CorrectionDto as «object»<br/>correctionDto<br/>src/dtos/goodsReceiptDTO.js
     participant Service as src/services/warehouse/goodsReceipts/detailChanges/goodsReceiptCorrectionService.js
     participant Change as src/services/warehouse/goodsReceipts/detailChanges/goodsReceiptDetailChangeService.js
@@ -1183,7 +1183,7 @@ sequenceDiagram
 sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route as src/routes/api/warehouse/goodsReceiptApiRoute.js
-    participant Controller as «controller»<br/>src/controllers/api/warehouse/goodsReceiptController.js
+    participant Controller@{ "type": "control" } as «controller»<br/>src/controllers/api/warehouse/goodsReceiptController.js
     participant Domain as src/services/warehouse/goodsReceipts/detailChanges/goodsReceiptCancellationService.js
     Note over Controller,Domain: Variables de frontera: req.params.id, req.params.detailId, req.user.id y tx
 
@@ -1212,7 +1212,7 @@ sequenceDiagram
 sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route as src/routes/api/warehouse/goodsIssueApiRoute.js
-    participant Controller as «controller»<br/>src/controllers/api/warehouse/goodsIssueController.js
+    participant Controller@{ "type": "control" } as «controller»<br/>src/controllers/api/warehouse/goodsIssueController.js
     participant Domain as src/services/warehouse/goodsIssues/goodsIssueService.js
     Note over Controller,Domain: Variables de frontera: req.query/params
 
@@ -1241,7 +1241,7 @@ sequenceDiagram
 sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route as src/routes/api/warehouse/goodsIssueApiRoute.js
-    participant Controller as «controller»<br/>src/controllers/api/warehouse/goodsIssueController.js
+    participant Controller@{ "type": "control" } as «controller»<br/>src/controllers/api/warehouse/goodsIssueController.js
     participant IssueDto as «object»<br/>goodsIssueDto<br/>src/dtos/goodsIssueDTO.js
     participant Domain as src/services/warehouse/goodsIssues/goodsIssueService.js
     Note over Controller,Domain: Variables de frontera: req.body/DTO, tx
@@ -1273,7 +1273,7 @@ sequenceDiagram
 sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route as src/routes/api/warehouse/goodsIssueApiRoute.js
-    participant Controller as «controller»<br/>src/controllers/api/warehouse/goodsIssueController.js
+    participant Controller@{ "type": "control" } as «controller»<br/>src/controllers/api/warehouse/goodsIssueController.js
     participant IssueDto as «object»<br/>goodsIssueDto<br/>src/dtos/goodsIssueDTO.js
     participant Domain as src/services/warehouse/goodsIssues/goodsIssueService.js
     Note over Controller,Domain: Variables de frontera: req.params.id, req.body/DTO
@@ -1305,7 +1305,7 @@ sequenceDiagram
 sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route as src/routes/api/warehouse/goodsIssueApiRoute.js
-    participant Controller as «controller»<br/>src/controllers/api/warehouse/goodsIssueController.js
+    participant Controller@{ "type": "control" } as «controller»<br/>src/controllers/api/warehouse/goodsIssueController.js
     participant IssueDto as «object»<br/>goodsIssueDto<br/>src/dtos/goodsIssueDTO.js
     participant Domain as src/services/warehouse/goodsIssues/goodsIssueService.js
     Note over Controller,Domain: Variables de frontera: req.params.id, req.body/DTO, tx
@@ -1339,7 +1339,7 @@ sequenceDiagram
     Note over Router,Controller: Variables de frontera: id, details, goodsIssueDto, userId y tx
     participant Browser as Navegador
     participant Router as src/routes/api/warehouse/goodsIssueApiRoute.js
-    participant Controller as «controller»<br/>src/controllers/api/warehouse/goodsIssueController.js
+    participant Controller@{ "type": "control" } as «controller»<br/>src/controllers/api/warehouse/goodsIssueController.js
     participant IssueDto as «object»<br/>goodsIssueDto<br/>src/dtos/goodsIssueDTO.js
     participant Service as src/services/warehouse/goodsIssues/goodsIssueService.js
     participant Inventory as src/services/inventory/movementService.js
@@ -1375,7 +1375,7 @@ sequenceDiagram
     Note over Router,Controller: Variables de frontera: id, detailId, returnDto, userId y tx
     participant Browser as Navegador
     participant Router as src/routes/api/warehouse/goodsIssueApiRoute.js
-    participant Controller as «controller»<br/>src/controllers/api/warehouse/goodsIssueController.js
+    participant Controller@{ "type": "control" } as «controller»<br/>src/controllers/api/warehouse/goodsIssueController.js
     participant ReturnDto as «object»<br/>returnDto<br/>src/dtos/goodsIssueDTO.js
     participant Service as src/services/warehouse/goodsIssues/detailReturns/goodsIssueReturnService.js
     participant Inventory as src/services/inventory/movementService.js
@@ -1414,7 +1414,7 @@ sequenceDiagram
 sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route as src/routes/api/warehouse/wasteIssueApiRoute.js
-    participant Controller as «controller»<br/>src/controllers/api/warehouse/wasteIssueController.js
+    participant Controller@{ "type": "control" } as «controller»<br/>src/controllers/api/warehouse/wasteIssueController.js
     participant Domain as src/services/warehouse/wasteIssues/wasteIssueService.js
     Note over Controller,Domain: Variables de frontera: req.query/params
 
@@ -1443,7 +1443,7 @@ sequenceDiagram
 sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route as src/routes/api/warehouse/wasteIssueApiRoute.js
-    participant Controller as «controller»<br/>src/controllers/api/warehouse/wasteIssueController.js
+    participant Controller@{ "type": "control" } as «controller»<br/>src/controllers/api/warehouse/wasteIssueController.js
     participant IssueDto as «object»<br/>wasteIssueDto<br/>src/dtos/wasteIssueDTO.js
     participant Domain as src/services/warehouse/wasteIssues/wasteIssueService.js
     Note over Controller,Domain: Variables de frontera: req.body/DTO, tx
@@ -1475,7 +1475,7 @@ sequenceDiagram
 sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route as src/routes/api/warehouse/wasteIssueApiRoute.js
-    participant Controller as «controller»<br/>src/controllers/api/warehouse/wasteIssueController.js
+    participant Controller@{ "type": "control" } as «controller»<br/>src/controllers/api/warehouse/wasteIssueController.js
     participant IssueDto as «object»<br/>wasteIssueDto<br/>src/dtos/wasteIssueDTO.js
     participant Domain as src/services/warehouse/wasteIssues/wasteIssueService.js
     Note over Controller,Domain: Variables de frontera: req.params.id, req.body/DTO
@@ -1507,7 +1507,7 @@ sequenceDiagram
 sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route as src/routes/api/warehouse/wasteIssueApiRoute.js
-    participant Controller as «controller»<br/>src/controllers/api/warehouse/wasteIssueController.js
+    participant Controller@{ "type": "control" } as «controller»<br/>src/controllers/api/warehouse/wasteIssueController.js
     participant IssueDto as «object»<br/>wasteIssueDto<br/>src/dtos/wasteIssueDTO.js
     participant Domain as src/services/warehouse/wasteIssues/wasteIssueService.js
     Note over Controller,Domain: Variables de frontera: req.params.id, req.body/DTO, tx
@@ -1539,7 +1539,7 @@ sequenceDiagram
 sequenceDiagram
     Note over Router,Controller: Variables de frontera: id, details, isSupplied y tx
     participant Router as src/routes/api/warehouse/wasteIssueApiRoute.js
-    participant Controller as «controller»<br/>src/controllers/api/warehouse/wasteIssueController.js
+    participant Controller@{ "type": "control" } as «controller»<br/>src/controllers/api/warehouse/wasteIssueController.js
     participant IssueDto as «object»<br/>wasteIssueDto<br/>src/dtos/wasteIssueDTO.js
     participant Service as src/services/warehouse/wasteIssues/wasteIssueService.js
     participant Rules as src/services/warehouse/issues/issueFulfillmentRules.js
@@ -1577,7 +1577,7 @@ sequenceDiagram
 sequenceDiagram
     Note over Router,Controller: Variables de frontera: id, detailId, returnDto, userId y tx
     participant Router as src/routes/api/warehouse/wasteIssueApiRoute.js
-    participant Controller as «controller»<br/>src/controllers/api/warehouse/wasteIssueController.js
+    participant Controller@{ "type": "control" } as «controller»<br/>src/controllers/api/warehouse/wasteIssueController.js
     participant ReturnDto as «object»<br/>returnDto<br/>src/dtos/wasteIssueDTO.js
     participant Service as src/services/warehouse/wasteIssues/detailReturns/wasteIssueReturnService.js
     participant Status as src/services/warehouse/wasteIssues/wasteIssueFulfillmentService.js
@@ -1612,7 +1612,7 @@ sequenceDiagram
 sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route as src/routes/api/warehouse/materialApiRoute.js
-    participant Controller as «controller»<br/>src/controllers/api/warehouse/materialController.js
+    participant Controller@{ "type": "control" } as «controller»<br/>src/controllers/api/warehouse/materialController.js
     participant Domain as src/services/warehouse/materials/materialService.js
     Note over Controller,Domain: Variables de frontera: req.query/params
 
@@ -1641,7 +1641,7 @@ sequenceDiagram
 sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route as src/routes/api/admin/movementApiRoute.js
-    participant Controller as «controller»<br/>src/controllers/api/admin/movementController.js
+    participant Controller@{ "type": "control" } as «controller»<br/>src/controllers/api/admin/movementController.js
     participant Domain as src/services/inventory/movementQueryService.js
     Note over Controller,Domain: Variables de frontera: req.query/params
 
@@ -1670,7 +1670,7 @@ sequenceDiagram
 sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route as src/routes/api/warehouse/reportApiRoute.js
-    participant Controller as «controller»<br/>src/controllers/api/warehouse/reportController.js
+    participant Controller@{ "type": "control" } as «controller»<br/>src/controllers/api/warehouse/reportController.js
     participant Domain as src/services/warehouse/reportService.js<br/>src/utils/reportExcelUtils.js
     Note over Controller,Domain: Variables de frontera: req.query/params
 
@@ -1699,7 +1699,7 @@ sequenceDiagram
 sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route as src/routes/api/warehouse/reportApiRoute.js
-    participant Controller as «controller»<br/>src/controllers/api/warehouse/reportController.js
+    participant Controller@{ "type": "control" } as «controller»<br/>src/controllers/api/warehouse/reportController.js
     participant Domain as src/services/warehouse/reportService.js<br/>src/utils/reportExcelUtils.js
     Note over Controller,Domain: Variables de frontera: req.query/params
 
@@ -1728,7 +1728,7 @@ sequenceDiagram
 sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route as src/routes/api/admin/reportApiRoute.js
-    participant Controller as «controller»<br/>src/controllers/api/admin/reportController.js
+    participant Controller@{ "type": "control" } as «controller»<br/>src/controllers/api/admin/reportController.js
     participant Domain as src/services/inventory/reportService.js
     Note over Controller,Domain: Variables de frontera: req.query/params
 
@@ -1757,7 +1757,7 @@ sequenceDiagram
 sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route as src/routes/api/warehouse/wasteApiRoute.js
-    participant Controller as «controller»<br/>src/controllers/api/warehouse/wasteController.js
+    participant Controller@{ "type": "control" } as «controller»<br/>src/controllers/api/warehouse/wasteController.js
     participant Domain as src/services/warehouse/wastes/wasteService.js
     Note over Controller,Domain: Variables de frontera: req.query/params
 
@@ -1786,7 +1786,7 @@ sequenceDiagram
 sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route as src/routes/api/admin/movementApiRoute.js
-    participant Controller as «controller»<br/>src/controllers/api/admin/movementController.js
+    participant Controller@{ "type": "control" } as «controller»<br/>src/controllers/api/admin/movementController.js
     participant Domain as src/services/inventory/movementQueryService.js
     Note over Controller,Domain: Variables de frontera: req.query/params
 
@@ -1815,7 +1815,7 @@ sequenceDiagram
 sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route as src/routes/api/warehouse/reportApiRoute.js
-    participant Controller as «controller»<br/>src/controllers/api/warehouse/reportController.js
+    participant Controller@{ "type": "control" } as «controller»<br/>src/controllers/api/warehouse/reportController.js
     participant Domain as src/services/warehouse/reportService.js<br/>src/utils/reportExcelUtils.js
     Note over Controller,Domain: Variables de frontera: req.query/params
 
@@ -1844,7 +1844,7 @@ sequenceDiagram
 sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route as src/routes/api/warehouse/reportApiRoute.js
-    participant Controller as «controller»<br/>src/controllers/api/warehouse/reportController.js
+    participant Controller@{ "type": "control" } as «controller»<br/>src/controllers/api/warehouse/reportController.js
     participant Domain as src/services/warehouse/reportService.js<br/>src/utils/reportExcelUtils.js
     Note over Controller,Domain: Variables de frontera: req.query/params
 
@@ -1873,7 +1873,7 @@ sequenceDiagram
 sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route as src/routes/api/admin/reportApiRoute.js
-    participant Controller as «controller»<br/>src/controllers/api/admin/reportController.js
+    participant Controller@{ "type": "control" } as «controller»<br/>src/controllers/api/admin/reportController.js
     participant Domain as src/services/inventory/reportService.js
     Note over Controller,Domain: Variables de frontera: req.query/params
 
@@ -1902,7 +1902,7 @@ sequenceDiagram
 sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route as src/routes/api/warehouse/reportApiRoute.js
-    participant Controller as «controller»<br/>src/controllers/api/warehouse/reportController.js
+    participant Controller@{ "type": "control" } as «controller»<br/>src/controllers/api/warehouse/reportController.js
     participant Domain as src/services/warehouse/reportService.js<br/>src/utils/reportExcelUtils.js
     Note over Controller,Domain: Variables de frontera: req.query/params
 
@@ -1931,7 +1931,7 @@ sequenceDiagram
 sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route as src/routes/api/warehouse/reportApiRoute.js
-    participant Controller as «controller»<br/>src/controllers/api/warehouse/reportController.js
+    participant Controller@{ "type": "control" } as «controller»<br/>src/controllers/api/warehouse/reportController.js
     participant Domain as src/services/warehouse/reportService.js<br/>src/utils/reportExcelUtils.js
     Note over Controller,Domain: Variables de frontera: req.query/params
 
@@ -1960,7 +1960,7 @@ sequenceDiagram
 sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route as src/routes/api/sales/reportApiRoute.js
-    participant Controller as «controller»<br/>src/controllers/api/sales/reportController.js
+    participant Controller@{ "type": "control" } as «controller»<br/>src/controllers/api/sales/reportController.js
     participant Domain as src/services/sales/clientService.js<br/>src/utils/reportExcelUtils.js
     Note over Controller,Domain: Variables de frontera: req.query/params
 
@@ -1989,7 +1989,7 @@ sequenceDiagram
 sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route as src/routes/api/admin/reportApiRoute.js
-    participant Controller as «controller»<br/>src/controllers/api/admin/reportController.js
+    participant Controller@{ "type": "control" } as «controller»<br/>src/controllers/api/admin/reportController.js
     participant Domain as src/services/admin/person/personService.js<br/>src/utils/reportExcelUtils.js
     Note over Controller,Domain: Variables de frontera: req.query/params
 
@@ -2018,7 +2018,7 @@ sequenceDiagram
 sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route as src/routes/api/admin/reportApiRoute.js
-    participant Controller as «controller»<br/>src/controllers/api/admin/reportController.js
+    participant Controller@{ "type": "control" } as «controller»<br/>src/controllers/api/admin/reportController.js
     participant Domain as src/services/admin/userService.js<br/>src/utils/reportExcelUtils.js
     Note over Controller,Domain: Variables de frontera: req.query/params
 
