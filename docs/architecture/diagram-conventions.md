@@ -95,16 +95,18 @@ límite empieza en HTTP y enlaza el `CU-*` que ya lo identifica; una secuencia d
 experiencia completa sí debe mostrar el actor canónico del caso. No se cambia el actor
 por «Usuario» si el requisito distingue Almacén de Administración.
 
-Los participantes de las secuencias técnicas aplican además los estereotipos UML que
-corresponden a su responsabilidad: `«controller»` identifica el adaptador que recibe la
-interacción (controller HTTP o frontera API que lo contiene) y `«object»` identifica la
-instancia o módulo que ejecuta comportamiento de aplicación, UI o dominio. El
-estereotipo no sustituye el nombre: debajo se conservan los archivos concretos, mientras
-que el símbolo exacto se muestra en el mensaje que representa su ejecución.
-El estereotipo ocupa la primera línea de la entidad como identificador visual; no se
-repite debajo con etiquetas genéricas como «Controlador» u «Objeto de dominio».
-Una etiqueta genérica como «servicio» u «objeto de dominio» sin esa evidencia no cumple
-la convención.
+Los participantes de las secuencias técnicas aplican estereotipos sólo cuando su
+semántica corresponde al elemento representado. `«controller»` identifica el adaptador
+que recibe la interacción (controller HTTP o frontera API que lo contiene).
+`«object»` se reserva para un objeto JSON o una instancia de clase que forme parte del
+modelo de dominio; no identifica archivos, módulos, servicios, vistas, helpers ni
+funciones. Cuando un controller crea un DTO JSON que interviene en el recorrido, la
+secuencia lo incorpora como participante `«object»`, nombra la variable concreta y
+mantiene el archivo `src/dtos/` que prueba su construcción. Los demás participantes
+ejecutables se identifican sólo por sus archivos y el símbolo exacto se muestra en el
+mensaje que representa su ejecución. Cuando corresponde un estereotipo, ocupa la primera
+línea de la entidad y no se repite debajo con una etiqueta genérica. Una etiqueta como
+«servicio» u «objeto de dominio» sin evidencia concreta no cumple la convención.
 
 Para que una secuencia sea detallada sin mezclar niveles, se aplican estas reglas:
 
