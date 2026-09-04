@@ -143,9 +143,6 @@ const validateUseCaseDiagramCoverage = async () => {
             if (!sequence.includes('«controller»')) {
                 failures.push(`diagramas ${side}: ${id} no aplica el estereotipo UML «controller»`);
             }
-            if (!sequence.includes('«object»')) {
-                failures.push(`diagramas ${side}: ${id} no aplica el estereotipo UML «object»`);
-            }
             const aliases = [...sequence.matchAll(/^\s*(?:actor|participant)\s+(\S+)\s+as\s+/gm)]
                 .map((match) => match[1].toLowerCase());
             const reservedAliases = aliases.filter((alias) => RESERVED_SEQUENCE_ALIASES.has(alias));
@@ -155,6 +152,12 @@ const validateUseCaseDiagramCoverage = async () => {
             const participants = [...sequence.matchAll(/^\s*participant\s+(\S+)\s+as\s+(.+)$/gm)];
             for (const [, alias, label] of participants) {
                 const paths = label.match(SOURCE_PATH_PATTERN) ?? [];
+                if (label.includes('«object»') && (
+                    !label.includes('src/dtos/')
+                    || !/«object»<br\/>[A-Za-z_$][\w$]*Dto<br\/>/.test(label)
+                )) {
+                    failures.push(`diagramas ${side}: ${id} identifica ${alias} como «object» sin un DTO JSON concreto y su archivo src/dtos/`);
+                }
                 if (!paths.length && !EXTERNAL_SEQUENCE_PARTICIPANTS.has(label)) {
                     failures.push(`diagramas ${side}: ${id} identifica ${alias} sin archivo src/ ni límite externo reconocido (${label})`);
                 }
