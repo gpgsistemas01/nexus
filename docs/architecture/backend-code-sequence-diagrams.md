@@ -16,7 +16,10 @@ separan cliente, ruta, controller y objeto de dominio; sólo las coordinaciones 
 despliegan objetos colaboradores, persistencia o publicación como participantes
 adicionales. De este modo se conservan pocas entidades sin ocultar el controller ni el
 objeto responsable. Los mensajes conservan las llamadas en orden y las notas nombran datos que cruzan la
-frontera (`req.params`, `req.body`/DTO, parámetros de consulta y `tx`). Las variables
+frontera (`req.params`, `req.body`/DTO, parámetros de consulta y `tx`). Todos los recorridos
+explicitan middleware, activación de responsabilidades, resultado HTTP y propagación de
+error; las coordinaciones complejas agregan sus colaboradores y límites transaccionales.
+Las variables
 locales mecánicas permanecen en el código para no convertir el diagrama en una
 transcripción ilegible. Cada caso mantiene una secuencia específica aunque reutilice un
 patrón, porque cambian módulos, firmas, rutas, datos o efectos.
@@ -114,10 +117,20 @@ sequenceDiagram
     Note over Controller,Domain: Variables de frontera: sin variables adicionales
 
     Client->>Route: POST /cerrar-sesion
+    Route->>Route: ejecutar en orden el middleware configurado para la ruta
     Route->>Controller: controllers/web/authController.logout(req, res)
+    activate Controller
     Controller->>Domain: clearCookie(name, options) y res.redirect(path)
-    Domain-->>Controller: devolver resultado o error del caso
-    Controller-->>Client: emitir respuesta observable
+    activate Domain
+    Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
+    Domain-->>Controller: resultado del servicio o error de dominio tipado
+    deactivate Domain
+    alt El servicio devuelve el resultado
+        Controller-->>Client: status HTTP y cuerpo concretos del controller
+    else El servicio propaga un error de dominio
+        Controller-->>Client: error entregado al middleware final para su respuesta HTTP
+    end
+    deactivate Controller
 ```
 
 ## `CU-IDA-01`
@@ -133,10 +146,20 @@ sequenceDiagram
     Note over Controller,Domain: Variables de frontera: req.query/params
 
     Client->>Route: GET /api/admin/persons
+    Route->>Route: ejecutar en orden el middleware configurado para la ruta
     Route->>Controller: getAllPersons(req, res)
+    activate Controller
     Controller->>Domain: personService.findAllPersons({ query: req.query }) consulta Person y asignaciones
-    Domain-->>Controller: devolver resultado o error del caso
-    Controller-->>Client: emitir respuesta observable
+    activate Domain
+    Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
+    Domain-->>Controller: resultado del servicio o error de dominio tipado
+    deactivate Domain
+    alt El servicio devuelve el resultado
+        Controller-->>Client: status HTTP y cuerpo concretos del controller
+    else El servicio propaga un error de dominio
+        Controller-->>Client: error entregado al middleware final para su respuesta HTTP
+    end
+    deactivate Controller
 ```
 
 ## `CU-IDA-02`
@@ -152,10 +175,20 @@ sequenceDiagram
     Note over Controller,Domain: Variables de frontera: req.body/DTO, tx
 
     Client->>Route: POST /api/admin/persons
+    Route->>Route: ejecutar en orden el middleware configurado para la ruta
     Route->>Controller: registerPerson(req, res)
+    activate Controller
     Controller->>Domain: personService.createPerson({ dto: req.body }) valida y crea persona/asignaciones
-    Domain-->>Controller: devolver resultado o error del caso
-    Controller-->>Client: emitir respuesta observable
+    activate Domain
+    Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
+    Domain-->>Controller: resultado del servicio o error de dominio tipado
+    deactivate Domain
+    alt El servicio devuelve el resultado
+        Controller-->>Client: status HTTP y cuerpo concretos del controller
+    else El servicio propaga un error de dominio
+        Controller-->>Client: error entregado al middleware final para su respuesta HTTP
+    end
+    deactivate Controller
 ```
 
 ## `CU-IDA-03`
@@ -171,10 +204,20 @@ sequenceDiagram
     Note over Controller,Domain: Variables de frontera: req.params.id, req.body/DTO, tx
 
     Client->>Route: PUT /api/admin/persons/:id
+    Route->>Route: ejecutar en orden el middleware configurado para la ruta
     Route->>Controller: editPerson(req, res)
+    activate Controller
     Controller->>Domain: personService.updatePerson({ id: req.params.id, dto: req.body }) actualiza persona/asignaciones
-    Domain-->>Controller: devolver resultado o error del caso
-    Controller-->>Client: emitir respuesta observable
+    activate Domain
+    Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
+    Domain-->>Controller: resultado del servicio o error de dominio tipado
+    deactivate Domain
+    alt El servicio devuelve el resultado
+        Controller-->>Client: status HTTP y cuerpo concretos del controller
+    else El servicio propaga un error de dominio
+        Controller-->>Client: error entregado al middleware final para su respuesta HTTP
+    end
+    deactivate Controller
 ```
 
 ## `CU-IDA-04`
@@ -190,10 +233,20 @@ sequenceDiagram
     Note over Controller,Domain: Variables de frontera: req.query/params
 
     Client->>Route: GET /api/admin/users
+    Route->>Route: ejecutar en orden el middleware configurado para la ruta
     Route->>Controller: getAllUsers(req, res)
+    activate Controller
     Controller->>Domain: userService.findAllUsers({ query: req.query }) consulta cuentas y accesos
-    Domain-->>Controller: devolver resultado o error del caso
-    Controller-->>Client: emitir respuesta observable
+    activate Domain
+    Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
+    Domain-->>Controller: resultado del servicio o error de dominio tipado
+    deactivate Domain
+    alt El servicio devuelve el resultado
+        Controller-->>Client: status HTTP y cuerpo concretos del controller
+    else El servicio propaga un error de dominio
+        Controller-->>Client: error entregado al middleware final para su respuesta HTTP
+    end
+    deactivate Controller
 ```
 
 ## `CU-IDA-05`
@@ -209,10 +262,20 @@ sequenceDiagram
     Note over Controller,Domain: Variables de frontera: req.body/DTO, tx
 
     Client->>Route: POST /api/admin/users
+    Route->>Route: ejecutar en orden el middleware configurado para la ruta
     Route->>Controller: registerUser(req, res)
+    activate Controller
     Controller->>Domain: userService.createUser({ dto: req.body }) crea cuenta, contraseña cifrada y acceso
-    Domain-->>Controller: devolver resultado o error del caso
-    Controller-->>Client: emitir respuesta observable
+    activate Domain
+    Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
+    Domain-->>Controller: resultado del servicio o error de dominio tipado
+    deactivate Domain
+    alt El servicio devuelve el resultado
+        Controller-->>Client: status HTTP y cuerpo concretos del controller
+    else El servicio propaga un error de dominio
+        Controller-->>Client: error entregado al middleware final para su respuesta HTTP
+    end
+    deactivate Controller
 ```
 
 ## `CU-IDA-06`
@@ -228,10 +291,20 @@ sequenceDiagram
     Note over Controller,Domain: Variables de frontera: req.params.id, req.body/DTO, tx
 
     Client->>Route: PATCH /api/admin/users/:id
+    Route->>Route: ejecutar en orden el middleware configurado para la ruta
     Route->>Controller: editUser(req, res)
+    activate Controller
     Controller->>Domain: userService.updateUser({ id: req.params.id, dto: req.body }) actualiza cuenta y asignación autorizada
-    Domain-->>Controller: devolver resultado o error del caso
-    Controller-->>Client: emitir respuesta observable
+    activate Domain
+    Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
+    Domain-->>Controller: resultado del servicio o error de dominio tipado
+    deactivate Domain
+    alt El servicio devuelve el resultado
+        Controller-->>Client: status HTTP y cuerpo concretos del controller
+    else El servicio propaga un error de dominio
+        Controller-->>Client: error entregado al middleware final para su respuesta HTTP
+    end
+    deactivate Controller
 ```
 
 ## `CU-IDA-07`
@@ -247,10 +320,20 @@ sequenceDiagram
     Note over Controller,Domain: Variables de frontera: req.params.id, req.body/DTO
 
     Client->>Route: PATCH /api/admin/users/:id/password
+    Route->>Route: ejecutar en orden el middleware configurado para la ruta
     Route->>Controller: editUserPassword(req, res)
+    activate Controller
     Controller->>Domain: userService.updateUserPassword({ id: req.params.id, dto: req.body }) cifra y sustituye la contraseña
-    Domain-->>Controller: devolver resultado o error del caso
-    Controller-->>Client: emitir respuesta observable
+    activate Domain
+    Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
+    Domain-->>Controller: resultado del servicio o error de dominio tipado
+    deactivate Domain
+    alt El servicio devuelve el resultado
+        Controller-->>Client: status HTTP y cuerpo concretos del controller
+    else El servicio propaga un error de dominio
+        Controller-->>Client: error entregado al middleware final para su respuesta HTTP
+    end
+    deactivate Controller
 ```
 
 ## `CU-IDA-08`
@@ -266,10 +349,20 @@ sequenceDiagram
     Note over Controller,Domain: Variables de frontera: req.query/params
 
     Client->>Route: GET /api/admin/roles
+    Route->>Route: ejecutar en orden el middleware configurado para la ruta
     Route->>Controller: roleController.getAllRoles(req, res)
+    activate Controller
     Controller->>Domain: roleService.findAllRoles({ query: req.query }) lee Role, no existe mutación publicada
-    Domain-->>Controller: devolver resultado o error del caso
-    Controller-->>Client: emitir respuesta observable
+    activate Domain
+    Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
+    Domain-->>Controller: resultado del servicio o error de dominio tipado
+    deactivate Domain
+    alt El servicio devuelve el resultado
+        Controller-->>Client: status HTTP y cuerpo concretos del controller
+    else El servicio propaga un error de dominio
+        Controller-->>Client: error entregado al middleware final para su respuesta HTTP
+    end
+    deactivate Controller
 ```
 
 ## `CU-IDA-09`
@@ -285,10 +378,20 @@ sequenceDiagram
     Note over Controller,Domain: Variables de frontera: req.query/params
 
     Client->>Route: GET /api/admin/departments
+    Route->>Route: ejecutar en orden el middleware configurado para la ruta
     Route->>Controller: departmentController.getAllDepartments(req, res)
+    activate Controller
     Controller->>Domain: departmentService.findAllDepartments({ query: req.query }) lee Department
-    Domain-->>Controller: devolver resultado o error del caso
-    Controller-->>Client: emitir respuesta observable
+    activate Domain
+    Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
+    Domain-->>Controller: resultado del servicio o error de dominio tipado
+    deactivate Domain
+    alt El servicio devuelve el resultado
+        Controller-->>Client: status HTTP y cuerpo concretos del controller
+    else El servicio propaga un error de dominio
+        Controller-->>Client: error entregado al middleware final para su respuesta HTTP
+    end
+    deactivate Controller
 ```
 
 ## `CU-CAT-01`
@@ -304,10 +407,20 @@ sequenceDiagram
     Note over Controller,Domain: Variables de frontera: req.query/params
 
     Client->>Route: GET /api/warehouse/materials
+    Route->>Route: ejecutar en orden el middleware configurado para la ruta
     Route->>Controller: getAllMaterials(req, res)
+    activate Controller
     Controller->>Domain: materialService.findAllMaterials({ query: req.query }) consulta material, proveedor y existencia
-    Domain-->>Controller: devolver resultado o error del caso
-    Controller-->>Client: emitir respuesta observable
+    activate Domain
+    Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
+    Domain-->>Controller: resultado del servicio o error de dominio tipado
+    deactivate Domain
+    alt El servicio devuelve el resultado
+        Controller-->>Client: status HTTP y cuerpo concretos del controller
+    else El servicio propaga un error de dominio
+        Controller-->>Client: error entregado al middleware final para su respuesta HTTP
+    end
+    deactivate Controller
 ```
 
 ## `CU-CAT-02`
@@ -323,10 +436,20 @@ sequenceDiagram
     Note over Controller,Domain: Variables de frontera: req.body/DTO, tx
 
     Client->>Route: POST /api/warehouse/materials
+    Route->>Route: ejecutar en orden el middleware configurado para la ruta
     Route->>Controller: registerMaterial(req, res)
+    activate Controller
     Controller->>Domain: materialService.createMaterial({ dto: req.body }) crea identidad y relación de proveedor
-    Domain-->>Controller: devolver resultado o error del caso
-    Controller-->>Client: emitir respuesta observable
+    activate Domain
+    Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
+    Domain-->>Controller: resultado del servicio o error de dominio tipado
+    deactivate Domain
+    alt El servicio devuelve el resultado
+        Controller-->>Client: status HTTP y cuerpo concretos del controller
+    else El servicio propaga un error de dominio
+        Controller-->>Client: error entregado al middleware final para su respuesta HTTP
+    end
+    deactivate Controller
 ```
 
 ## `CU-CAT-03`
@@ -342,10 +465,20 @@ sequenceDiagram
     Note over Controller,Domain: Variables de frontera: req.params.id, req.body/DTO, tx
 
     Client->>Route: PATCH /api/warehouse/materials/:id
+    Route->>Route: ejecutar en orden el middleware configurado para la ruta
     Route->>Controller: editMaterial(req, res)
+    activate Controller
     Controller->>Domain: materialService.updateMaterial({ id: req.params.id, dto: req.body }) sincroniza datos y relación
-    Domain-->>Controller: devolver resultado o error del caso
-    Controller-->>Client: emitir respuesta observable
+    activate Domain
+    Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
+    Domain-->>Controller: resultado del servicio o error de dominio tipado
+    deactivate Domain
+    alt El servicio devuelve el resultado
+        Controller-->>Client: status HTTP y cuerpo concretos del controller
+    else El servicio propaga un error de dominio
+        Controller-->>Client: error entregado al middleware final para su respuesta HTTP
+    end
+    deactivate Controller
 ```
 
 ## `CU-CAT-04`
@@ -361,10 +494,20 @@ sequenceDiagram
     Note over Controller,Domain: Variables de frontera: req.params.id, req.body/DTO, tx
 
     Client->>Route: DELETE /api/warehouse/materials/:id
+    Route->>Route: ejecutar en orden el middleware configurado para la ruta
     Route->>Controller: removeMaterial(req, res)
+    activate Controller
     Controller->>Domain: materialService.deleteMaterial({ id: req.params.id, dto: req.body }) protege referencias antes de eliminar relación
-    Domain-->>Controller: devolver resultado o error del caso
-    Controller-->>Client: emitir respuesta observable
+    activate Domain
+    Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
+    Domain-->>Controller: resultado del servicio o error de dominio tipado
+    deactivate Domain
+    alt El servicio devuelve el resultado
+        Controller-->>Client: status HTTP y cuerpo concretos del controller
+    else El servicio propaga un error de dominio
+        Controller-->>Client: error entregado al middleware final para su respuesta HTTP
+    end
+    deactivate Controller
 ```
 
 ## `CU-CAT-05`
@@ -414,10 +557,20 @@ sequenceDiagram
     Note over Controller,Domain: Variables de frontera: req.query/params
 
     Client->>Route: GET /api/warehouse/suppliers
+    Route->>Route: ejecutar en orden el middleware configurado para la ruta
     Route->>Controller: getAllSuppliers(req, res)
+    activate Controller
     Controller->>Domain: supplierService.findAllSuppliers({ query: req.query }) consulta proveedores
-    Domain-->>Controller: devolver resultado o error del caso
-    Controller-->>Client: emitir respuesta observable
+    activate Domain
+    Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
+    Domain-->>Controller: resultado del servicio o error de dominio tipado
+    deactivate Domain
+    alt El servicio devuelve el resultado
+        Controller-->>Client: status HTTP y cuerpo concretos del controller
+    else El servicio propaga un error de dominio
+        Controller-->>Client: error entregado al middleware final para su respuesta HTTP
+    end
+    deactivate Controller
 ```
 
 ## `CU-CAT-07`
@@ -433,10 +586,20 @@ sequenceDiagram
     Note over Controller,Domain: Variables de frontera: req.body/DTO
 
     Client->>Route: POST /api/warehouse/suppliers
+    Route->>Route: ejecutar en orden el middleware configurado para la ruta
     Route->>Controller: registerSupplier(req, res)
+    activate Controller
     Controller->>Domain: supplierService.createSupplier({ dto: req.body }) persiste el proveedor
-    Domain-->>Controller: devolver resultado o error del caso
-    Controller-->>Client: emitir respuesta observable
+    activate Domain
+    Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
+    Domain-->>Controller: resultado del servicio o error de dominio tipado
+    deactivate Domain
+    alt El servicio devuelve el resultado
+        Controller-->>Client: status HTTP y cuerpo concretos del controller
+    else El servicio propaga un error de dominio
+        Controller-->>Client: error entregado al middleware final para su respuesta HTTP
+    end
+    deactivate Controller
 ```
 
 ## `CU-CAT-08`
@@ -452,10 +615,20 @@ sequenceDiagram
     Note over Controller,Domain: Variables de frontera: req.params.id, req.body/DTO
 
     Client->>Route: PUT /api/warehouse/suppliers/:id
+    Route->>Route: ejecutar en orden el middleware configurado para la ruta
     Route->>Controller: editSupplier(req, res)
+    activate Controller
     Controller->>Domain: supplierService.updateSupplier({ id: req.params.id, dto: req.body }) actualiza datos del proveedor
-    Domain-->>Controller: devolver resultado o error del caso
-    Controller-->>Client: emitir respuesta observable
+    activate Domain
+    Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
+    Domain-->>Controller: resultado del servicio o error de dominio tipado
+    deactivate Domain
+    alt El servicio devuelve el resultado
+        Controller-->>Client: status HTTP y cuerpo concretos del controller
+    else El servicio propaga un error de dominio
+        Controller-->>Client: error entregado al middleware final para su respuesta HTTP
+    end
+    deactivate Controller
 ```
 
 ## `CU-CAT-09`
@@ -471,10 +644,20 @@ sequenceDiagram
     Note over Controller,Domain: Variables de frontera: req.params.id, req.body/DTO
 
     Client->>Route: PUT /api/warehouse/suppliers/:id
+    Route->>Route: ejecutar en orden el middleware configurado para la ruta
     Route->>Controller: editSupplier(req, res)
+    activate Controller
     Controller->>Domain: supplierService.updateSupplier({ id: req.params.id, dto: req.body }) aplica el estado incluido en el DTO, no hay endpoint separado
-    Domain-->>Controller: devolver resultado o error del caso
-    Controller-->>Client: emitir respuesta observable
+    activate Domain
+    Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
+    Domain-->>Controller: resultado del servicio o error de dominio tipado
+    deactivate Domain
+    alt El servicio devuelve el resultado
+        Controller-->>Client: status HTTP y cuerpo concretos del controller
+    else El servicio propaga un error de dominio
+        Controller-->>Client: error entregado al middleware final para su respuesta HTTP
+    end
+    deactivate Controller
 ```
 
 ## `CU-CAT-10`
@@ -490,10 +673,20 @@ sequenceDiagram
     Note over Controller,Domain: Variables de frontera: req.query/params
 
     Client->>Route: GET /api/sales/clients
+    Route->>Route: ejecutar en orden el middleware configurado para la ruta
     Route->>Controller: getAllClients(req, res)
+    activate Controller
     Controller->>Domain: clientService.findAllClients({ query: req.query }) consulta Client
-    Domain-->>Controller: devolver resultado o error del caso
-    Controller-->>Client: emitir respuesta observable
+    activate Domain
+    Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
+    Domain-->>Controller: resultado del servicio o error de dominio tipado
+    deactivate Domain
+    alt El servicio devuelve el resultado
+        Controller-->>Client: status HTTP y cuerpo concretos del controller
+    else El servicio propaga un error de dominio
+        Controller-->>Client: error entregado al middleware final para su respuesta HTTP
+    end
+    deactivate Controller
 ```
 
 ## `CU-CAT-11`
@@ -509,10 +702,20 @@ sequenceDiagram
     Note over Controller,Domain: Variables de frontera: req.body/DTO
 
     Client->>Route: POST /api/sales/clients
+    Route->>Route: ejecutar en orden el middleware configurado para la ruta
     Route->>Controller: registerClient(req, res)
+    activate Controller
     Controller->>Domain: clientService.createClient({ dto: req.body }) persiste Client
-    Domain-->>Controller: devolver resultado o error del caso
-    Controller-->>Client: emitir respuesta observable
+    activate Domain
+    Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
+    Domain-->>Controller: resultado del servicio o error de dominio tipado
+    deactivate Domain
+    alt El servicio devuelve el resultado
+        Controller-->>Client: status HTTP y cuerpo concretos del controller
+    else El servicio propaga un error de dominio
+        Controller-->>Client: error entregado al middleware final para su respuesta HTTP
+    end
+    deactivate Controller
 ```
 
 ## `CU-CAT-12`
@@ -528,10 +731,20 @@ sequenceDiagram
     Note over Controller,Domain: Variables de frontera: req.params.id, req.body/DTO
 
     Client->>Route: PUT /api/sales/clients/:id
+    Route->>Route: ejecutar en orden el middleware configurado para la ruta
     Route->>Controller: editClient(req, res)
+    activate Controller
     Controller->>Domain: clientService.updateClient({ id: req.params.id, dto: req.body }) actualiza Client
-    Domain-->>Controller: devolver resultado o error del caso
-    Controller-->>Client: emitir respuesta observable
+    activate Domain
+    Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
+    Domain-->>Controller: resultado del servicio o error de dominio tipado
+    deactivate Domain
+    alt El servicio devuelve el resultado
+        Controller-->>Client: status HTTP y cuerpo concretos del controller
+    else El servicio propaga un error de dominio
+        Controller-->>Client: error entregado al middleware final para su respuesta HTTP
+    end
+    deactivate Controller
 ```
 
 ## `CU-CAT-13`
@@ -547,10 +760,20 @@ sequenceDiagram
     Note over Controller,Domain: Variables de frontera: req.query/params
 
     Client->>Route: GET /api/warehouse/wastes
+    Route->>Route: ejecutar en orden el middleware configurado para la ruta
     Route->>Controller: getAllWastes(req, res)
+    activate Controller
     Controller->>Domain: wasteService.findAllWastes({ query: req.query }) consulta merma e inventario
-    Domain-->>Controller: devolver resultado o error del caso
-    Controller-->>Client: emitir respuesta observable
+    activate Domain
+    Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
+    Domain-->>Controller: resultado del servicio o error de dominio tipado
+    deactivate Domain
+    alt El servicio devuelve el resultado
+        Controller-->>Client: status HTTP y cuerpo concretos del controller
+    else El servicio propaga un error de dominio
+        Controller-->>Client: error entregado al middleware final para su respuesta HTTP
+    end
+    deactivate Controller
 ```
 
 ## `CU-CAT-14`
@@ -566,10 +789,20 @@ sequenceDiagram
     Note over Controller,Domain: Variables de frontera: req.body/DTO, req.query/params, tx
 
     Client->>Route: GET /api/warehouse/wastes/material-templates y POST /api/warehouse/wastes
+    Route->>Route: ejecutar en orden el middleware configurado para la ruta
     Route->>Controller: getWasteMaterialTemplates(req, res)/registerWaste
+    activate Controller
     Controller->>Domain: findWasteMaterialTemplates({ dto: req.body }) alimenta la selección y createWasteWithInitialStockAdjustment crea merma, ajuste y movimiento inicial
-    Domain-->>Controller: devolver resultado o error del caso
-    Controller-->>Client: emitir respuesta observable
+    activate Domain
+    Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
+    Domain-->>Controller: resultado del servicio o error de dominio tipado
+    deactivate Domain
+    alt El servicio devuelve el resultado
+        Controller-->>Client: status HTTP y cuerpo concretos del controller
+    else El servicio propaga un error de dominio
+        Controller-->>Client: error entregado al middleware final para su respuesta HTTP
+    end
+    deactivate Controller
 ```
 
 ## `CU-CAT-15`
@@ -585,10 +818,20 @@ sequenceDiagram
     Note over Controller,Domain: Variables de frontera: req.params.id, req.body/DTO
 
     Client->>Route: PATCH /api/warehouse/wastes/:id
+    Route->>Route: ejecutar en orden el middleware configurado para la ruta
     Route->>Controller: editWaste(req, res)
+    activate Controller
     Controller->>Domain: wasteService.updateWaste({ id: req.params.id, dto: req.body }) actualiza datos sin tratar stock como edición
-    Domain-->>Controller: devolver resultado o error del caso
-    Controller-->>Client: emitir respuesta observable
+    activate Domain
+    Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
+    Domain-->>Controller: resultado del servicio o error de dominio tipado
+    deactivate Domain
+    alt El servicio devuelve el resultado
+        Controller-->>Client: status HTTP y cuerpo concretos del controller
+    else El servicio propaga un error de dominio
+        Controller-->>Client: error entregado al middleware final para su respuesta HTTP
+    end
+    deactivate Controller
 ```
 
 ## `CU-CAT-16`
@@ -636,10 +879,20 @@ sequenceDiagram
     Note over Controller,Domain: Variables de frontera: req.query/params
 
     Client->>Route: GET /api/warehouse/presentations
+    Route->>Route: ejecutar en orden el middleware configurado para la ruta
     Route->>Controller: getAllPresentations(req, res)
+    activate Controller
     Controller->>Domain: presentationService.findAllPresentations({ query: req.query }) sirve el catálogo de sólo lectura
-    Domain-->>Controller: devolver resultado o error del caso
-    Controller-->>Client: emitir respuesta observable
+    activate Domain
+    Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
+    Domain-->>Controller: resultado del servicio o error de dominio tipado
+    deactivate Domain
+    alt El servicio devuelve el resultado
+        Controller-->>Client: status HTTP y cuerpo concretos del controller
+    else El servicio propaga un error de dominio
+        Controller-->>Client: error entregado al middleware final para su respuesta HTTP
+    end
+    deactivate Controller
 ```
 
 ## `CU-CAT-18`
@@ -655,10 +908,20 @@ sequenceDiagram
     Note over Controller,Domain: Variables de frontera: req.query/params
 
     Client->>Route: GET /api/warehouse/unit-measures
+    Route->>Route: ejecutar en orden el middleware configurado para la ruta
     Route->>Controller: getAllUnitMeasures(req, res)
+    activate Controller
     Controller->>Domain: unitMeasureService.findAllUnitMeasures({ query: req.query }) sirve el catálogo de sólo lectura
-    Domain-->>Controller: devolver resultado o error del caso
-    Controller-->>Client: emitir respuesta observable
+    activate Domain
+    Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
+    Domain-->>Controller: resultado del servicio o error de dominio tipado
+    deactivate Domain
+    alt El servicio devuelve el resultado
+        Controller-->>Client: status HTTP y cuerpo concretos del controller
+    else El servicio propaga un error de dominio
+        Controller-->>Client: error entregado al middleware final para su respuesta HTTP
+    end
+    deactivate Controller
 ```
 
 ## `CU-CAT-19`
@@ -674,10 +937,20 @@ sequenceDiagram
     Note over Controller,Domain: Variables de frontera: req.query/params
 
     Client->>Route: GET /api/warehouse/reasons
+    Route->>Route: ejecutar en orden el middleware configurado para la ruta
     Route->>Controller: getAllReasons(req, res)
+    activate Controller
     Controller->>Domain: reasonService.findAllReasons({ query: req.query }) sirve motivos, helpers resuelven motivos internos
-    Domain-->>Controller: devolver resultado o error del caso
-    Controller-->>Client: emitir respuesta observable
+    activate Domain
+    Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
+    Domain-->>Controller: resultado del servicio o error de dominio tipado
+    deactivate Domain
+    alt El servicio devuelve el resultado
+        Controller-->>Client: status HTTP y cuerpo concretos del controller
+    else El servicio propaga un error de dominio
+        Controller-->>Client: error entregado al middleware final para su respuesta HTTP
+    end
+    deactivate Controller
 ```
 
 ## `CU-CAT-20`
@@ -693,10 +966,20 @@ sequenceDiagram
     Note over Controller,Domain: Variables de frontera: req.query/params
 
     Client->>Route: GET /api/warehouse/fulfillment-statuses
+    Route->>Route: ejecutar en orden el middleware configurado para la ruta
     Route->>Controller: getAllFulfillmentStatuses(req, res)
+    activate Controller
     Controller->>Domain: fulfillmentStatusService.findAllFulfillmentStatuses({ query: req.query }) sirve estados de sólo lectura
-    Domain-->>Controller: devolver resultado o error del caso
-    Controller-->>Client: emitir respuesta observable
+    activate Domain
+    Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
+    Domain-->>Controller: resultado del servicio o error de dominio tipado
+    deactivate Domain
+    alt El servicio devuelve el resultado
+        Controller-->>Client: status HTTP y cuerpo concretos del controller
+    else El servicio propaga un error de dominio
+        Controller-->>Client: error entregado al middleware final para su respuesta HTTP
+    end
+    deactivate Controller
 ```
 
 ## `CU-ENT-01`
@@ -712,10 +995,20 @@ sequenceDiagram
     Note over Controller,Domain: Variables de frontera: req.query/params
 
     Client->>Route: GET /api/warehouse/goods-receipts
+    Route->>Route: ejecutar en orden el middleware configurado para la ruta
     Route->>Controller: getAllGoodsReceipts(req, res)
+    activate Controller
     Controller->>Domain: goodsReceiptService.findAllGoodsReceipts({ query: req.query }) consulta entradas y totales
-    Domain-->>Controller: devolver resultado o error del caso
-    Controller-->>Client: emitir respuesta observable
+    activate Domain
+    Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
+    Domain-->>Controller: resultado del servicio o error de dominio tipado
+    deactivate Domain
+    alt El servicio devuelve el resultado
+        Controller-->>Client: status HTTP y cuerpo concretos del controller
+    else El servicio propaga un error de dominio
+        Controller-->>Client: error entregado al middleware final para su respuesta HTTP
+    end
+    deactivate Controller
 ```
 
 ## `CU-ENT-02`
@@ -768,10 +1061,20 @@ sequenceDiagram
     Note over Controller,Domain: Variables de frontera: req.params.id, req.body/DTO, tx
 
     Client->>Route: PATCH /api/warehouse/goods-receipts/:id
+    Route->>Route: ejecutar en orden el middleware configurado para la ruta
     Route->>Controller: editGoodsReceiptHeader(req, res)
+    activate Controller
     Controller->>Domain: goodsReceiptService.updateGoodsReceipt({ id: req.params.id, dto: req.body }) conserva detalles persistidos y actualiza encabezado permitido
-    Domain-->>Controller: devolver resultado o error del caso
-    Controller-->>Client: emitir respuesta observable
+    activate Domain
+    Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
+    Domain-->>Controller: resultado del servicio o error de dominio tipado
+    deactivate Domain
+    alt El servicio devuelve el resultado
+        Controller-->>Client: status HTTP y cuerpo concretos del controller
+    else El servicio propaga un error de dominio
+        Controller-->>Client: error entregado al middleware final para su respuesta HTTP
+    end
+    deactivate Controller
 ```
 
 ## `CU-ENT-04`
@@ -816,10 +1119,20 @@ sequenceDiagram
     Note over Controller,Domain: Variables de frontera: req.params.id, req.params.detailId, req.body/DTO, tx
 
     Client->>Route: PATCH /api/warehouse/goods-receipts/:id/details/:detailId/cancel
+    Route->>Route: ejecutar en orden el middleware configurado para la ruta
     Route->>Controller: cancelGoodsReceiptDetail(req, res)
+    activate Controller
     Controller->>Domain: cancelGoodsReceiptDetailLine({ id: req.params.id, detailId: req.params.detailId, dto: req.body }) revierte stock/movimiento y conserva historial
-    Domain-->>Controller: devolver resultado o error del caso
-    Controller-->>Client: emitir respuesta observable
+    activate Domain
+    Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
+    Domain-->>Controller: resultado del servicio o error de dominio tipado
+    deactivate Domain
+    alt El servicio devuelve el resultado
+        Controller-->>Client: status HTTP y cuerpo concretos del controller
+    else El servicio propaga un error de dominio
+        Controller-->>Client: error entregado al middleware final para su respuesta HTTP
+    end
+    deactivate Controller
 ```
 
 ## `CU-SAL-01`
@@ -835,10 +1148,20 @@ sequenceDiagram
     Note over Controller,Domain: Variables de frontera: req.query/params
 
     Client->>Route: GET /api/warehouse/goods-issues
+    Route->>Route: ejecutar en orden el middleware configurado para la ruta
     Route->>Controller: getAllGoodsIssues(req, res)
+    activate Controller
     Controller->>Domain: goodsIssueService.findAllGoodsIssues({ query: req.query }) consulta documentos y estados
-    Domain-->>Controller: devolver resultado o error del caso
-    Controller-->>Client: emitir respuesta observable
+    activate Domain
+    Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
+    Domain-->>Controller: resultado del servicio o error de dominio tipado
+    deactivate Domain
+    alt El servicio devuelve el resultado
+        Controller-->>Client: status HTTP y cuerpo concretos del controller
+    else El servicio propaga un error de dominio
+        Controller-->>Client: error entregado al middleware final para su respuesta HTTP
+    end
+    deactivate Controller
 ```
 
 ## `CU-SAL-02`
@@ -854,10 +1177,20 @@ sequenceDiagram
     Note over Controller,Domain: Variables de frontera: req.body/DTO, tx
 
     Client->>Route: POST /api/warehouse/goods-issues
+    Route->>Route: ejecutar en orden el middleware configurado para la ruta
     Route->>Controller: registerGoodsIssue(req, res)
+    activate Controller
     Controller->>Domain: goodsIssueService.createGoodsIssue({ dto: req.body }) crea encabezado y detalles solicitados
-    Domain-->>Controller: devolver resultado o error del caso
-    Controller-->>Client: emitir respuesta observable
+    activate Domain
+    Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
+    Domain-->>Controller: resultado del servicio o error de dominio tipado
+    deactivate Domain
+    alt El servicio devuelve el resultado
+        Controller-->>Client: status HTTP y cuerpo concretos del controller
+    else El servicio propaga un error de dominio
+        Controller-->>Client: error entregado al middleware final para su respuesta HTTP
+    end
+    deactivate Controller
 ```
 
 ## `CU-SAL-03`
@@ -873,10 +1206,20 @@ sequenceDiagram
     Note over Controller,Domain: Variables de frontera: req.params.id, req.body/DTO
 
     Client->>Route: PATCH /api/warehouse/goods-issues/:id/header
+    Route->>Route: ejecutar en orden el middleware configurado para la ruta
     Route->>Controller: editGoodsIssueHeader(req, res)
+    activate Controller
     Controller->>Domain: goodsIssueService.updateGoodsIssueHeader({ id: req.params.id, dto: req.body }) aplica reglas del encabezado
-    Domain-->>Controller: devolver resultado o error del caso
-    Controller-->>Client: emitir respuesta observable
+    activate Domain
+    Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
+    Domain-->>Controller: resultado del servicio o error de dominio tipado
+    deactivate Domain
+    alt El servicio devuelve el resultado
+        Controller-->>Client: status HTTP y cuerpo concretos del controller
+    else El servicio propaga un error de dominio
+        Controller-->>Client: error entregado al middleware final para su respuesta HTTP
+    end
+    deactivate Controller
 ```
 
 ## `CU-SAL-04`
@@ -892,10 +1235,20 @@ sequenceDiagram
     Note over Controller,Domain: Variables de frontera: req.params.id, req.body/DTO, tx
 
     Client->>Route: PATCH /api/warehouse/goods-issues/:id/details
+    Route->>Route: ejecutar en orden el middleware configurado para la ruta
     Route->>Controller: editGoodsIssueDetails(req, res)
+    activate Controller
     Controller->>Domain: goodsIssueService.updateGoodsIssueDetails({ id: req.params.id, dto: req.body }) modifica cantidades todavía editables
-    Domain-->>Controller: devolver resultado o error del caso
-    Controller-->>Client: emitir respuesta observable
+    activate Domain
+    Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
+    Domain-->>Controller: resultado del servicio o error de dominio tipado
+    deactivate Domain
+    alt El servicio devuelve el resultado
+        Controller-->>Client: status HTTP y cuerpo concretos del controller
+    else El servicio propaga un error de dominio
+        Controller-->>Client: error entregado al middleware final para su respuesta HTTP
+    end
+    deactivate Controller
 ```
 
 ## `CU-SAL-05`
@@ -986,10 +1339,20 @@ sequenceDiagram
     Note over Controller,Domain: Variables de frontera: req.query/params
 
     Client->>Route: GET /api/warehouse/waste-issues
+    Route->>Route: ejecutar en orden el middleware configurado para la ruta
     Route->>Controller: getAllWasteIssues(req, res)
+    activate Controller
     Controller->>Domain: wasteIssueService.findAllWasteIssues({ query: req.query }) consulta salidas de merma
-    Domain-->>Controller: devolver resultado o error del caso
-    Controller-->>Client: emitir respuesta observable
+    activate Domain
+    Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
+    Domain-->>Controller: resultado del servicio o error de dominio tipado
+    deactivate Domain
+    alt El servicio devuelve el resultado
+        Controller-->>Client: status HTTP y cuerpo concretos del controller
+    else El servicio propaga un error de dominio
+        Controller-->>Client: error entregado al middleware final para su respuesta HTTP
+    end
+    deactivate Controller
 ```
 
 ## `CU-SAL-08`
@@ -1005,10 +1368,20 @@ sequenceDiagram
     Note over Controller,Domain: Variables de frontera: req.body/DTO, tx
 
     Client->>Route: POST /api/warehouse/waste-issues
+    Route->>Route: ejecutar en orden el middleware configurado para la ruta
     Route->>Controller: registerWasteIssue(req, res)
+    activate Controller
     Controller->>Domain: wasteIssueService.createWasteIssue({ dto: req.body }) crea encabezado y detalles de merma
-    Domain-->>Controller: devolver resultado o error del caso
-    Controller-->>Client: emitir respuesta observable
+    activate Domain
+    Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
+    Domain-->>Controller: resultado del servicio o error de dominio tipado
+    deactivate Domain
+    alt El servicio devuelve el resultado
+        Controller-->>Client: status HTTP y cuerpo concretos del controller
+    else El servicio propaga un error de dominio
+        Controller-->>Client: error entregado al middleware final para su respuesta HTTP
+    end
+    deactivate Controller
 ```
 
 ## `CU-SAL-09`
@@ -1024,10 +1397,20 @@ sequenceDiagram
     Note over Controller,Domain: Variables de frontera: req.params.id, req.body/DTO
 
     Client->>Route: PATCH /api/warehouse/waste-issues/:id/header
+    Route->>Route: ejecutar en orden el middleware configurado para la ruta
     Route->>Controller: editWasteIssueHeader(req, res)
+    activate Controller
     Controller->>Domain: wasteIssueService.updateWasteIssueHeader({ id: req.params.id, dto: req.body }) aplica reglas del encabezado
-    Domain-->>Controller: devolver resultado o error del caso
-    Controller-->>Client: emitir respuesta observable
+    activate Domain
+    Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
+    Domain-->>Controller: resultado del servicio o error de dominio tipado
+    deactivate Domain
+    alt El servicio devuelve el resultado
+        Controller-->>Client: status HTTP y cuerpo concretos del controller
+    else El servicio propaga un error de dominio
+        Controller-->>Client: error entregado al middleware final para su respuesta HTTP
+    end
+    deactivate Controller
 ```
 
 ## `CU-SAL-10`
@@ -1043,10 +1426,20 @@ sequenceDiagram
     Note over Controller,Domain: Variables de frontera: req.params.id, req.body/DTO, tx
 
     Client->>Route: PATCH /api/warehouse/waste-issues/:id/details
+    Route->>Route: ejecutar en orden el middleware configurado para la ruta
     Route->>Controller: editWasteIssueDetails(req, res)
+    activate Controller
     Controller->>Domain: wasteIssueService.updateWasteIssueDetails({ id: req.params.id, dto: req.body }) modifica cantidades editables
-    Domain-->>Controller: devolver resultado o error del caso
-    Controller-->>Client: emitir respuesta observable
+    activate Domain
+    Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
+    Domain-->>Controller: resultado del servicio o error de dominio tipado
+    deactivate Domain
+    alt El servicio devuelve el resultado
+        Controller-->>Client: status HTTP y cuerpo concretos del controller
+    else El servicio propaga un error de dominio
+        Controller-->>Client: error entregado al middleware final para su respuesta HTTP
+    end
+    deactivate Controller
 ```
 
 ## `CU-SAL-11`
@@ -1131,10 +1524,20 @@ sequenceDiagram
     Note over Controller,Domain: Variables de frontera: req.query/params
 
     Client->>Route: GET /api/warehouse/materials
+    Route->>Route: ejecutar en orden el middleware configurado para la ruta
     Route->>Controller: getAllMaterials(req, res)
+    activate Controller
     Controller->>Domain: findAllMaterials({ query: req.query })
-    Domain-->>Controller: devolver resultado o error del caso
-    Controller-->>Client: emitir respuesta observable
+    activate Domain
+    Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
+    Domain-->>Controller: resultado del servicio o error de dominio tipado
+    deactivate Domain
+    alt El servicio devuelve el resultado
+        Controller-->>Client: status HTTP y cuerpo concretos del controller
+    else El servicio propaga un error de dominio
+        Controller-->>Client: error entregado al middleware final para su respuesta HTTP
+    end
+    deactivate Controller
 ```
 
 ## `CU-REP-02`
@@ -1150,10 +1553,20 @@ sequenceDiagram
     Note over Controller,Domain: Variables de frontera: req.query/params
 
     Client->>Route: GET /api/admin/movements/materials
+    Route->>Route: ejecutar en orden el middleware configurado para la ruta
     Route->>Controller: getAllMaterialMovements(req, res)
+    activate Controller
     Controller->>Domain: movementQueryService.findAllMaterialMovements, sólo lectura
-    Domain-->>Controller: devolver resultado o error del caso
-    Controller-->>Client: emitir respuesta observable
+    activate Domain
+    Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
+    Domain-->>Controller: resultado del servicio o error de dominio tipado
+    deactivate Domain
+    alt El servicio devuelve el resultado
+        Controller-->>Client: status HTTP y cuerpo concretos del controller
+    else El servicio propaga un error de dominio
+        Controller-->>Client: error entregado al middleware final para su respuesta HTTP
+    end
+    deactivate Controller
 ```
 
 ## `CU-REP-03`
@@ -1169,10 +1582,20 @@ sequenceDiagram
     Note over Controller,Domain: Variables de frontera: req.query/params
 
     Client->>Route: GET /api/warehouse/reports/inventory/excel
+    Route->>Route: ejecutar en orden el middleware configurado para la ruta
     Route->>Controller: exportWarehouseReportExcel(req, res)
+    activate Controller
     Controller->>Domain: reportService.findWarehouseReportRows({ query: req.query }) y sendExcelReport
-    Domain-->>Controller: devolver resultado o error del caso
-    Controller-->>Client: emitir respuesta observable
+    activate Domain
+    Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
+    Domain-->>Controller: resultado del servicio o error de dominio tipado
+    deactivate Domain
+    alt El servicio devuelve el resultado
+        Controller-->>Client: status HTTP y cuerpo concretos del controller
+    else El servicio propaga un error de dominio
+        Controller-->>Client: error entregado al middleware final para su respuesta HTTP
+    end
+    deactivate Controller
 ```
 
 ## `CU-REP-04`
@@ -1188,10 +1611,20 @@ sequenceDiagram
     Note over Controller,Domain: Variables de frontera: req.query/params
 
     Client->>Route: GET /api/warehouse/reports/goods-issues/excel
+    Route->>Route: ejecutar en orden el middleware configurado para la ruta
     Route->>Controller: exportGoodsIssueReportExcel(req, res)
+    activate Controller
     Controller->>Domain: reportService.findGoodsIssueReportRows({ query: req.query }) y sendExcelReport
-    Domain-->>Controller: devolver resultado o error del caso
-    Controller-->>Client: emitir respuesta observable
+    activate Domain
+    Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
+    Domain-->>Controller: resultado del servicio o error de dominio tipado
+    deactivate Domain
+    alt El servicio devuelve el resultado
+        Controller-->>Client: status HTTP y cuerpo concretos del controller
+    else El servicio propaga un error de dominio
+        Controller-->>Client: error entregado al middleware final para su respuesta HTTP
+    end
+    deactivate Controller
 ```
 
 ## `CU-REP-05`
@@ -1207,10 +1640,20 @@ sequenceDiagram
     Note over Controller,Domain: Variables de frontera: req.query/params
 
     Client->>Route: GET /api/admin/reports/movements/materials/excel
+    Route->>Route: ejecutar en orden el middleware configurado para la ruta
     Route->>Controller: exportMovementReport(req, res)
+    activate Controller
     Controller->>Domain: inventory/reportService.findMovementReportRows y respuesta Excel
-    Domain-->>Controller: devolver resultado o error del caso
-    Controller-->>Client: emitir respuesta observable
+    activate Domain
+    Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
+    Domain-->>Controller: resultado del servicio o error de dominio tipado
+    deactivate Domain
+    alt El servicio devuelve el resultado
+        Controller-->>Client: status HTTP y cuerpo concretos del controller
+    else El servicio propaga un error de dominio
+        Controller-->>Client: error entregado al middleware final para su respuesta HTTP
+    end
+    deactivate Controller
 ```
 
 ## `CU-REP-06`
@@ -1226,10 +1669,20 @@ sequenceDiagram
     Note over Controller,Domain: Variables de frontera: req.query/params
 
     Client->>Route: GET /api/warehouse/wastes
+    Route->>Route: ejecutar en orden el middleware configurado para la ruta
     Route->>Controller: getAllWastes(req, res)
+    activate Controller
     Controller->>Domain: wasteService.findAllWastes({ query: req.query })
-    Domain-->>Controller: devolver resultado o error del caso
-    Controller-->>Client: emitir respuesta observable
+    activate Domain
+    Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
+    Domain-->>Controller: resultado del servicio o error de dominio tipado
+    deactivate Domain
+    alt El servicio devuelve el resultado
+        Controller-->>Client: status HTTP y cuerpo concretos del controller
+    else El servicio propaga un error de dominio
+        Controller-->>Client: error entregado al middleware final para su respuesta HTTP
+    end
+    deactivate Controller
 ```
 
 ## `CU-REP-07`
@@ -1245,10 +1698,20 @@ sequenceDiagram
     Note over Controller,Domain: Variables de frontera: req.query/params
 
     Client->>Route: GET /api/admin/movements/wastes
+    Route->>Route: ejecutar en orden el middleware configurado para la ruta
     Route->>Controller: getAllWasteMovements(req, res)
+    activate Controller
     Controller->>Domain: movementQueryService.findAllWasteMovements, sólo lectura
-    Domain-->>Controller: devolver resultado o error del caso
-    Controller-->>Client: emitir respuesta observable
+    activate Domain
+    Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
+    Domain-->>Controller: resultado del servicio o error de dominio tipado
+    deactivate Domain
+    alt El servicio devuelve el resultado
+        Controller-->>Client: status HTTP y cuerpo concretos del controller
+    else El servicio propaga un error de dominio
+        Controller-->>Client: error entregado al middleware final para su respuesta HTTP
+    end
+    deactivate Controller
 ```
 
 ## `CU-REP-08`
@@ -1264,10 +1727,20 @@ sequenceDiagram
     Note over Controller,Domain: Variables de frontera: req.query/params
 
     Client->>Route: GET /api/warehouse/reports/waste-issues/excel
+    Route->>Route: ejecutar en orden el middleware configurado para la ruta
     Route->>Controller: exportWasteIssueReportExcel(req, res)
+    activate Controller
     Controller->>Domain: reportService.findWasteIssueReportRows({ query: req.query }) y sendExcelReport
-    Domain-->>Controller: devolver resultado o error del caso
-    Controller-->>Client: emitir respuesta observable
+    activate Domain
+    Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
+    Domain-->>Controller: resultado del servicio o error de dominio tipado
+    deactivate Domain
+    alt El servicio devuelve el resultado
+        Controller-->>Client: status HTTP y cuerpo concretos del controller
+    else El servicio propaga un error de dominio
+        Controller-->>Client: error entregado al middleware final para su respuesta HTTP
+    end
+    deactivate Controller
 ```
 
 ## `CU-REP-09`
@@ -1283,10 +1756,20 @@ sequenceDiagram
     Note over Controller,Domain: Variables de frontera: req.query/params
 
     Client->>Route: GET /api/warehouse/reports/wastes/excel
+    Route->>Route: ejecutar en orden el middleware configurado para la ruta
     Route->>Controller: exportWasteReportExcel(req, res)
+    activate Controller
     Controller->>Domain: reportService.findWasteReportRows({ query: req.query }) y sendExcelReport
-    Domain-->>Controller: devolver resultado o error del caso
-    Controller-->>Client: emitir respuesta observable
+    activate Domain
+    Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
+    Domain-->>Controller: resultado del servicio o error de dominio tipado
+    deactivate Domain
+    alt El servicio devuelve el resultado
+        Controller-->>Client: status HTTP y cuerpo concretos del controller
+    else El servicio propaga un error de dominio
+        Controller-->>Client: error entregado al middleware final para su respuesta HTTP
+    end
+    deactivate Controller
 ```
 
 ## `CU-REP-10`
@@ -1302,10 +1785,20 @@ sequenceDiagram
     Note over Controller,Domain: Variables de frontera: req.query/params
 
     Client->>Route: GET /api/admin/reports/movements/wastes/excel
+    Route->>Route: ejecutar en orden el middleware configurado para la ruta
     Route->>Controller: exportWasteMovementReport(req, res)
+    activate Controller
     Controller->>Domain: inventory/reportService.findMovementReportRows en contexto merma y respuesta Excel
-    Domain-->>Controller: devolver resultado o error del caso
-    Controller-->>Client: emitir respuesta observable
+    activate Domain
+    Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
+    Domain-->>Controller: resultado del servicio o error de dominio tipado
+    deactivate Domain
+    alt El servicio devuelve el resultado
+        Controller-->>Client: status HTTP y cuerpo concretos del controller
+    else El servicio propaga un error de dominio
+        Controller-->>Client: error entregado al middleware final para su respuesta HTTP
+    end
+    deactivate Controller
 ```
 
 ## `CU-REP-11`
@@ -1321,10 +1814,20 @@ sequenceDiagram
     Note over Controller,Domain: Variables de frontera: req.query/params
 
     Client->>Route: GET /api/warehouse/reports/goods-receipts/excel
+    Route->>Route: ejecutar en orden el middleware configurado para la ruta
     Route->>Controller: exportGoodsReceiptReportExcel(req, res)
+    activate Controller
     Controller->>Domain: reportService.findGoodsReceiptReportRows({ query: req.query }) y sendExcelReport
-    Domain-->>Controller: devolver resultado o error del caso
-    Controller-->>Client: emitir respuesta observable
+    activate Domain
+    Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
+    Domain-->>Controller: resultado del servicio o error de dominio tipado
+    deactivate Domain
+    alt El servicio devuelve el resultado
+        Controller-->>Client: status HTTP y cuerpo concretos del controller
+    else El servicio propaga un error de dominio
+        Controller-->>Client: error entregado al middleware final para su respuesta HTTP
+    end
+    deactivate Controller
 ```
 
 ## `CU-REP-12`
@@ -1340,10 +1843,20 @@ sequenceDiagram
     Note over Controller,Domain: Variables de frontera: req.query/params
 
     Client->>Route: GET /api/warehouse/reports/suppliers/excel
+    Route->>Route: ejecutar en orden el middleware configurado para la ruta
     Route->>Controller: exportSupplierReportExcel(req, res)
+    activate Controller
     Controller->>Domain: reportService.findSupplierReportRows({ query: req.query }) y sendExcelReport
-    Domain-->>Controller: devolver resultado o error del caso
-    Controller-->>Client: emitir respuesta observable
+    activate Domain
+    Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
+    Domain-->>Controller: resultado del servicio o error de dominio tipado
+    deactivate Domain
+    alt El servicio devuelve el resultado
+        Controller-->>Client: status HTTP y cuerpo concretos del controller
+    else El servicio propaga un error de dominio
+        Controller-->>Client: error entregado al middleware final para su respuesta HTTP
+    end
+    deactivate Controller
 ```
 
 ## `CU-REP-13`
@@ -1359,10 +1872,20 @@ sequenceDiagram
     Note over Controller,Domain: Variables de frontera: req.query/params
 
     Client->>Route: GET /api/sales/reports/clients/excel
+    Route->>Route: ejecutar en orden el middleware configurado para la ruta
     Route->>Controller: exportClientReport(req, res)
+    activate Controller
     Controller->>Domain: clientService.findAllClients({ query: req.query }) prepara filas y el controller llama sendExcelReport
-    Domain-->>Controller: devolver resultado o error del caso
-    Controller-->>Client: emitir respuesta observable
+    activate Domain
+    Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
+    Domain-->>Controller: resultado del servicio o error de dominio tipado
+    deactivate Domain
+    alt El servicio devuelve el resultado
+        Controller-->>Client: status HTTP y cuerpo concretos del controller
+    else El servicio propaga un error de dominio
+        Controller-->>Client: error entregado al middleware final para su respuesta HTTP
+    end
+    deactivate Controller
 ```
 
 ## `CU-REP-14`
@@ -1378,10 +1901,20 @@ sequenceDiagram
     Note over Controller,Domain: Variables de frontera: req.query/params
 
     Client->>Route: GET /api/admin/reports/persons/excel
+    Route->>Route: ejecutar en orden el middleware configurado para la ruta
     Route->>Controller: exportPersonReport(req, res)
+    activate Controller
     Controller->>Domain: personService.findAllPersons({ query: req.query }) prepara filas y el controller llama sendExcelReport
-    Domain-->>Controller: devolver resultado o error del caso
-    Controller-->>Client: emitir respuesta observable
+    activate Domain
+    Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
+    Domain-->>Controller: resultado del servicio o error de dominio tipado
+    deactivate Domain
+    alt El servicio devuelve el resultado
+        Controller-->>Client: status HTTP y cuerpo concretos del controller
+    else El servicio propaga un error de dominio
+        Controller-->>Client: error entregado al middleware final para su respuesta HTTP
+    end
+    deactivate Controller
 ```
 
 ## `CU-REP-15`
@@ -1397,8 +1930,18 @@ sequenceDiagram
     Note over Controller,Domain: Variables de frontera: req.query/params
 
     Client->>Route: GET /api/admin/reports/users/excel
+    Route->>Route: ejecutar en orden el middleware configurado para la ruta
     Route->>Controller: exportUserReport(req, res)
+    activate Controller
     Controller->>Domain: userService.findAllUsers({ query: req.query }) prepara filas y el controller llama sendExcelReport
-    Domain-->>Controller: devolver resultado o error del caso
-    Controller-->>Client: emitir respuesta observable
+    activate Domain
+    Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
+    Domain-->>Controller: resultado del servicio o error de dominio tipado
+    deactivate Domain
+    alt El servicio devuelve el resultado
+        Controller-->>Client: status HTTP y cuerpo concretos del controller
+    else El servicio propaga un error de dominio
+        Controller-->>Client: error entregado al middleware final para su respuesta HTTP
+    end
+    deactivate Controller
 ```
