@@ -9,9 +9,11 @@ negocio se consulta primero el [modelo y los diagramas funcionales de casos de u
 La [matriz técnica de backend](backend-technical-documentation.md#aplicación-de-todos-los-casos-al-código-backend)
 es el índice único de trazabilidad: relaciona caso, entrada HTTP, implementación y
 diagrama. Esta colección no vuelve a copiar esa relación en cada sección. Los
-participantes identifican ruta de archivo, objeto y símbolo. `«controller»` marca el
+participantes identifican ruta de archivo y objeto; los métodos y la URL HTTP se indican
+en los mensajes que ejecutan cada proceso para no repetirlos en las entidades.
+`«controller»` marca el
 adaptador HTTP y `«object»` el módulo que ejecuta comportamiento de dominio; debajo del
-estereotipo siempre se conserva el archivo y el símbolo concreto. En el recorrido común se
+estereotipo siempre se conserva el archivo concreto. En el recorrido común se
 separan cliente, ruta, controller y objeto de dominio; sólo las coordinaciones atómicas
 despliegan objetos colaboradores, persistencia o publicación como participantes
 adicionales. De este modo se conservan pocas entidades sin ocultar el controller ni el
@@ -76,10 +78,10 @@ aparece una vez, conserva su referencia de patrones y contiene un bloque Mermaid
 sequenceDiagram
     Note over Router,Controller: Variables de frontera: name, password y cookies
     participant Browser as Navegador
-    participant Router as src/routes/api/authApiRoute.js<br/>POST /api/auth/login
-    participant Controller as «controller»<br/>Controlador<br/>src/controllers/api/authController.js<br/>authController.login
-    participant Service as «object»<br/>src/services/authService.js<br/>authService
-    participant User as userService / getUserIdByLogin
+    participant Router as src/routes/api/authApiRoute.js
+    participant Controller as «controller»<br/>src/controllers/api/authController.js
+    participant Service as «object»<br/>src/services/authService.js
+    participant User as userService
     participant Prisma as Prisma / PostgreSQL
     participant Token as jwtService / cookies
 
@@ -111,8 +113,8 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant Client as Cliente HTTP / web
-    participant Route as src/routes/web/auth/logoutWebRoute.js<br/>POST /cerrar-sesion
-    participant Controller as «controller»<br/>Controlador<br/>src/controllers/web/authController.js<br/>controllers/web/authController.logout
+    participant Route as src/routes/web/auth/logoutWebRoute.js
+    participant Controller as «controller»<br/>src/controllers/web/authController.js
     participant Domain as «object»<br/>cookies / redirect
     Note over Controller,Domain: Variables de frontera: sin variables adicionales
 
@@ -140,9 +142,9 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant Client as Cliente HTTP / web
-    participant Route as src/routes/api/admin/personApiRoute.js<br/>GET /api/admin/persons
-    participant Controller as «controller»<br/>Controlador<br/>src/controllers/api/admin/personController.js<br/>getAllPersons
-    participant Domain as «object»<br/>Objeto de dominio<br/>src/services/admin/person/personService.js<br/>personService.findAllPersons
+    participant Route as src/routes/api/admin/personApiRoute.js
+    participant Controller as «controller»<br/>src/controllers/api/admin/personController.js
+    participant Domain as «object»<br/>src/services/admin/person/personService.js
     Note over Controller,Domain: Variables de frontera: req.query/params
 
     Client->>Route: GET /api/admin/persons
@@ -169,9 +171,9 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant Client as Cliente HTTP / web
-    participant Route as src/routes/api/admin/personApiRoute.js<br/>POST /api/admin/persons
-    participant Controller as «controller»<br/>Controlador<br/>src/controllers/api/admin/personController.js<br/>registerPerson
-    participant Domain as «object»<br/>Objeto de dominio<br/>src/services/admin/person/personService.js<br/>personService.createPerson
+    participant Route as src/routes/api/admin/personApiRoute.js
+    participant Controller as «controller»<br/>src/controllers/api/admin/personController.js
+    participant Domain as «object»<br/>src/services/admin/person/personService.js
     Note over Controller,Domain: Variables de frontera: req.body/DTO, tx
 
     Client->>Route: POST /api/admin/persons
@@ -198,9 +200,9 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant Client as Cliente HTTP / web
-    participant Route as src/routes/api/admin/personApiRoute.js<br/>PUT /api/admin/persons/:id
-    participant Controller as «controller»<br/>Controlador<br/>src/controllers/api/admin/personController.js<br/>editPerson
-    participant Domain as «object»<br/>Objeto de dominio<br/>src/services/admin/person/personService.js<br/>personService.updatePerson
+    participant Route as src/routes/api/admin/personApiRoute.js
+    participant Controller as «controller»<br/>src/controllers/api/admin/personController.js
+    participant Domain as «object»<br/>src/services/admin/person/personService.js
     Note over Controller,Domain: Variables de frontera: req.params.id, req.body/DTO, tx
 
     Client->>Route: PUT /api/admin/persons/:id
@@ -227,9 +229,9 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant Client as Cliente HTTP / web
-    participant Route as src/routes/api/admin/userApiRoute.js<br/>GET /api/admin/users
-    participant Controller as «controller»<br/>Controlador<br/>src/controllers/api/admin/userController.js<br/>getAllUsers
-    participant Domain as «object»<br/>Objeto de dominio<br/>src/services/admin/userService.js<br/>userService.findAllUsers
+    participant Route as src/routes/api/admin/userApiRoute.js
+    participant Controller as «controller»<br/>src/controllers/api/admin/userController.js
+    participant Domain as «object»<br/>src/services/admin/userService.js
     Note over Controller,Domain: Variables de frontera: req.query/params
 
     Client->>Route: GET /api/admin/users
@@ -256,9 +258,9 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant Client as Cliente HTTP / web
-    participant Route as src/routes/api/admin/userApiRoute.js<br/>POST /api/admin/users
-    participant Controller as «controller»<br/>Controlador<br/>src/controllers/api/admin/userController.js<br/>registerUser
-    participant Domain as «object»<br/>Objeto de dominio<br/>src/services/admin/userService.js<br/>userService.createUser
+    participant Route as src/routes/api/admin/userApiRoute.js
+    participant Controller as «controller»<br/>src/controllers/api/admin/userController.js
+    participant Domain as «object»<br/>src/services/admin/userService.js
     Note over Controller,Domain: Variables de frontera: req.body/DTO, tx
 
     Client->>Route: POST /api/admin/users
@@ -285,9 +287,9 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant Client as Cliente HTTP / web
-    participant Route as src/routes/api/admin/userApiRoute.js<br/>PATCH /api/admin/users/:id
-    participant Controller as «controller»<br/>Controlador<br/>src/controllers/api/admin/userController.js<br/>editUser
-    participant Domain as «object»<br/>Objeto de dominio<br/>src/services/admin/userService.js<br/>userService.updateUser
+    participant Route as src/routes/api/admin/userApiRoute.js
+    participant Controller as «controller»<br/>src/controllers/api/admin/userController.js
+    participant Domain as «object»<br/>src/services/admin/userService.js
     Note over Controller,Domain: Variables de frontera: req.params.id, req.body/DTO, tx
 
     Client->>Route: PATCH /api/admin/users/:id
@@ -314,9 +316,9 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant Client as Cliente HTTP / web
-    participant Route as src/routes/api/admin/userApiRoute.js<br/>PATCH /api/admin/users/:id/password
-    participant Controller as «controller»<br/>Controlador<br/>src/controllers/api/admin/userController.js<br/>editUserPassword
-    participant Domain as «object»<br/>Objeto de dominio<br/>src/services/admin/userService.js<br/>userService.updateUserPassword
+    participant Route as src/routes/api/admin/userApiRoute.js
+    participant Controller as «controller»<br/>src/controllers/api/admin/userController.js
+    participant Domain as «object»<br/>src/services/admin/userService.js
     Note over Controller,Domain: Variables de frontera: req.params.id, req.body/DTO
 
     Client->>Route: PATCH /api/admin/users/:id/password
@@ -343,9 +345,9 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant Client as Cliente HTTP / web
-    participant Route as src/routes/api/admin/roleApiRoute.js<br/>GET /api/admin/roles
-    participant Controller as «controller»<br/>Controlador<br/>src/controllers/api/admin/roleController.js<br/>roleController.getAllRoles
-    participant Domain as «object»<br/>Objeto de dominio<br/>src/services/admin/roleService.js<br/>roleService.findAllRoles
+    participant Route as src/routes/api/admin/roleApiRoute.js
+    participant Controller as «controller»<br/>src/controllers/api/admin/roleController.js
+    participant Domain as «object»<br/>src/services/admin/roleService.js
     Note over Controller,Domain: Variables de frontera: req.query/params
 
     Client->>Route: GET /api/admin/roles
@@ -372,9 +374,9 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant Client as Cliente HTTP / web
-    participant Route as src/routes/api/admin/departmentApiRoute.js<br/>GET /api/admin/departments
-    participant Controller as «controller»<br/>Controlador<br/>src/controllers/api/admin/departmentController.js<br/>departmentController.getAllDepartments
-    participant Domain as «object»<br/>Objeto de dominio<br/>src/services/admin/departmentService.js<br/>departmentService.findAllDepartments
+    participant Route as src/routes/api/admin/departmentApiRoute.js
+    participant Controller as «controller»<br/>src/controllers/api/admin/departmentController.js
+    participant Domain as «object»<br/>src/services/admin/departmentService.js
     Note over Controller,Domain: Variables de frontera: req.query/params
 
     Client->>Route: GET /api/admin/departments
@@ -401,9 +403,9 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant Client as Cliente HTTP / web
-    participant Route as src/routes/api/warehouse/materialApiRoute.js<br/>GET /api/warehouse/materials
-    participant Controller as «controller»<br/>Controlador<br/>src/controllers/api/warehouse/materialController.js<br/>getAllMaterials
-    participant Domain as «object»<br/>Objeto de dominio<br/>src/services/warehouse/materials/materialService.js<br/>materialService.findAllMaterials
+    participant Route as src/routes/api/warehouse/materialApiRoute.js
+    participant Controller as «controller»<br/>src/controllers/api/warehouse/materialController.js
+    participant Domain as «object»<br/>src/services/warehouse/materials/materialService.js
     Note over Controller,Domain: Variables de frontera: req.query/params
 
     Client->>Route: GET /api/warehouse/materials
@@ -430,9 +432,9 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant Client as Cliente HTTP / web
-    participant Route as src/routes/api/warehouse/materialApiRoute.js<br/>POST /api/warehouse/materials
-    participant Controller as «controller»<br/>Controlador<br/>src/controllers/api/warehouse/materialController.js<br/>registerMaterial
-    participant Domain as «object»<br/>Objeto de dominio<br/>src/services/warehouse/materials/materialService.js<br/>materialService.createMaterial
+    participant Route as src/routes/api/warehouse/materialApiRoute.js
+    participant Controller as «controller»<br/>src/controllers/api/warehouse/materialController.js
+    participant Domain as «object»<br/>src/services/warehouse/materials/materialService.js
     Note over Controller,Domain: Variables de frontera: req.body/DTO, tx
 
     Client->>Route: POST /api/warehouse/materials
@@ -459,9 +461,9 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant Client as Cliente HTTP / web
-    participant Route as src/routes/api/warehouse/materialApiRoute.js<br/>PATCH /api/warehouse/materials/:id
-    participant Controller as «controller»<br/>Controlador<br/>src/controllers/api/warehouse/materialController.js<br/>editMaterial
-    participant Domain as «object»<br/>Objeto de dominio<br/>src/services/warehouse/materials/materialService.js<br/>materialService.updateMaterial
+    participant Route as src/routes/api/warehouse/materialApiRoute.js
+    participant Controller as «controller»<br/>src/controllers/api/warehouse/materialController.js
+    participant Domain as «object»<br/>src/services/warehouse/materials/materialService.js
     Note over Controller,Domain: Variables de frontera: req.params.id, req.body/DTO, tx
 
     Client->>Route: PATCH /api/warehouse/materials/:id
@@ -488,9 +490,9 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant Client as Cliente HTTP / web
-    participant Route as src/routes/api/warehouse/materialApiRoute.js<br/>DELETE /api/warehouse/materials/:id
-    participant Controller as «controller»<br/>Controlador<br/>src/controllers/api/warehouse/materialController.js<br/>removeMaterial
-    participant Domain as «object»<br/>Objeto de dominio<br/>src/services/warehouse/materials/materialService.js<br/>materialService.deleteMaterial
+    participant Route as src/routes/api/warehouse/materialApiRoute.js
+    participant Controller as «controller»<br/>src/controllers/api/warehouse/materialController.js
+    participant Domain as «object»<br/>src/services/warehouse/materials/materialService.js
     Note over Controller,Domain: Variables de frontera: req.params.id, req.body/DTO, tx
 
     Client->>Route: DELETE /api/warehouse/materials/:id
@@ -517,16 +519,16 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     Note over Router,Controller: Variables de frontera: id, DTO de ajuste y userId
-    participant Router as src/routes/api/warehouse/materialApiRoute.js<br/>PATCH /api/warehouse/materials/:id/stock
-    participant Controller as «controller»<br/>Controlador<br/>src/controllers/api/warehouse/materialController.js<br/>editMaterialStock
-    participant Service as «object»<br/>src/services/warehouse/materials/materialService.js<br/>updateMaterialStock
-    participant Adjustment as createStockAdjustment
-    participant Reference as generateYearlyReferenceNumber
+    participant Router as src/routes/api/warehouse/materialApiRoute.js
+    participant Controller as «controller»<br/>src/controllers/api/warehouse/materialController.js
+    participant Service as «object»<br/>src/services/warehouse/materials/materialService.js
+    participant Adjustment as Ajustes de existencias
+    participant Reference as Referencias anuales
     participant Stock as stockHelpers
-    participant Movement as createInventoryMovement
-    participant SupplierMaterial as adjustSupplierMaterialStock
+    participant Movement as Movimientos de inventario
+    participant SupplierMaterial as Existencias por proveedor
     participant Prisma as Prisma / PostgreSQL
-    participant Socket as emitInventoryUpdated
+    participant Socket as Eventos de inventario
 
     Router->>Controller: editMaterialStock(req, res)
     Controller->>Service: updateMaterialStock({ id, materialDto, userId })
@@ -551,9 +553,9 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant Client as Cliente HTTP / web
-    participant Route as src/routes/api/warehouse/supplierApiRoute.js<br/>GET /api/warehouse/suppliers
-    participant Controller as «controller»<br/>Controlador<br/>src/controllers/api/warehouse/supplierController.js<br/>getAllSuppliers
-    participant Domain as «object»<br/>Objeto de dominio<br/>src/services/warehouse/supplierService.js<br/>supplierService.findAllSuppliers
+    participant Route as src/routes/api/warehouse/supplierApiRoute.js
+    participant Controller as «controller»<br/>src/controllers/api/warehouse/supplierController.js
+    participant Domain as «object»<br/>src/services/warehouse/supplierService.js
     Note over Controller,Domain: Variables de frontera: req.query/params
 
     Client->>Route: GET /api/warehouse/suppliers
@@ -580,9 +582,9 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant Client as Cliente HTTP / web
-    participant Route as src/routes/api/warehouse/supplierApiRoute.js<br/>POST /api/warehouse/suppliers
-    participant Controller as «controller»<br/>Controlador<br/>src/controllers/api/warehouse/supplierController.js<br/>registerSupplier
-    participant Domain as «object»<br/>Objeto de dominio<br/>src/services/warehouse/supplierService.js<br/>supplierService.createSupplier
+    participant Route as src/routes/api/warehouse/supplierApiRoute.js
+    participant Controller as «controller»<br/>src/controllers/api/warehouse/supplierController.js
+    participant Domain as «object»<br/>src/services/warehouse/supplierService.js
     Note over Controller,Domain: Variables de frontera: req.body/DTO
 
     Client->>Route: POST /api/warehouse/suppliers
@@ -609,9 +611,9 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant Client as Cliente HTTP / web
-    participant Route as src/routes/api/warehouse/supplierApiRoute.js<br/>PUT /api/warehouse/suppliers/:id
-    participant Controller as «controller»<br/>Controlador<br/>src/controllers/api/warehouse/supplierController.js<br/>editSupplier
-    participant Domain as «object»<br/>Objeto de dominio<br/>src/services/warehouse/supplierService.js<br/>supplierService.updateSupplier
+    participant Route as src/routes/api/warehouse/supplierApiRoute.js
+    participant Controller as «controller»<br/>src/controllers/api/warehouse/supplierController.js
+    participant Domain as «object»<br/>src/services/warehouse/supplierService.js
     Note over Controller,Domain: Variables de frontera: req.params.id, req.body/DTO
 
     Client->>Route: PUT /api/warehouse/suppliers/:id
@@ -638,9 +640,9 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant Client as Cliente HTTP / web
-    participant Route as src/routes/api/warehouse/supplierApiRoute.js<br/>PUT /api/warehouse/suppliers/:id
-    participant Controller as «controller»<br/>Controlador<br/>src/controllers/api/warehouse/supplierController.js<br/>editSupplier
-    participant Domain as «object»<br/>Objeto de dominio<br/>src/services/warehouse/supplierService.js<br/>supplierService.updateSupplier
+    participant Route as src/routes/api/warehouse/supplierApiRoute.js
+    participant Controller as «controller»<br/>src/controllers/api/warehouse/supplierController.js
+    participant Domain as «object»<br/>src/services/warehouse/supplierService.js
     Note over Controller,Domain: Variables de frontera: req.params.id, req.body/DTO
 
     Client->>Route: PUT /api/warehouse/suppliers/:id
@@ -667,9 +669,9 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant Client as Cliente HTTP / web
-    participant Route as src/routes/api/sales/clientApiRoute.js<br/>GET /api/sales/clients
-    participant Controller as «controller»<br/>Controlador<br/>src/controllers/api/sales/clientController.js<br/>getAllClients
-    participant Domain as «object»<br/>Objeto de dominio<br/>src/services/sales/clientService.js<br/>clientService.findAllClients
+    participant Route as src/routes/api/sales/clientApiRoute.js
+    participant Controller as «controller»<br/>src/controllers/api/sales/clientController.js
+    participant Domain as «object»<br/>src/services/sales/clientService.js
     Note over Controller,Domain: Variables de frontera: req.query/params
 
     Client->>Route: GET /api/sales/clients
@@ -696,9 +698,9 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant Client as Cliente HTTP / web
-    participant Route as src/routes/api/sales/clientApiRoute.js<br/>POST /api/sales/clients
-    participant Controller as «controller»<br/>Controlador<br/>src/controllers/api/sales/clientController.js<br/>registerClient
-    participant Domain as «object»<br/>Objeto de dominio<br/>src/services/sales/clientService.js<br/>clientService.createClient
+    participant Route as src/routes/api/sales/clientApiRoute.js
+    participant Controller as «controller»<br/>src/controllers/api/sales/clientController.js
+    participant Domain as «object»<br/>src/services/sales/clientService.js
     Note over Controller,Domain: Variables de frontera: req.body/DTO
 
     Client->>Route: POST /api/sales/clients
@@ -725,9 +727,9 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant Client as Cliente HTTP / web
-    participant Route as src/routes/api/sales/clientApiRoute.js<br/>PUT /api/sales/clients/:id
-    participant Controller as «controller»<br/>Controlador<br/>src/controllers/api/sales/clientController.js<br/>editClient
-    participant Domain as «object»<br/>Objeto de dominio<br/>src/services/sales/clientService.js<br/>clientService.updateClient
+    participant Route as src/routes/api/sales/clientApiRoute.js
+    participant Controller as «controller»<br/>src/controllers/api/sales/clientController.js
+    participant Domain as «object»<br/>src/services/sales/clientService.js
     Note over Controller,Domain: Variables de frontera: req.params.id, req.body/DTO
 
     Client->>Route: PUT /api/sales/clients/:id
@@ -754,9 +756,9 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant Client as Cliente HTTP / web
-    participant Route as src/routes/api/warehouse/wasteApiRoute.js<br/>GET /api/warehouse/wastes
-    participant Controller as «controller»<br/>Controlador<br/>src/controllers/api/warehouse/wasteController.js<br/>getAllWastes
-    participant Domain as «object»<br/>Objeto de dominio<br/>src/services/warehouse/wastes/wasteService.js<br/>wasteService.findAllWastes
+    participant Route as src/routes/api/warehouse/wasteApiRoute.js
+    participant Controller as «controller»<br/>src/controllers/api/warehouse/wasteController.js
+    participant Domain as «object»<br/>src/services/warehouse/wastes/wasteService.js
     Note over Controller,Domain: Variables de frontera: req.query/params
 
     Client->>Route: GET /api/warehouse/wastes
@@ -783,9 +785,9 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant Client as Cliente HTTP / web
-    participant Route as src/routes/api/warehouse/wasteApiRoute.js<br/>GET material-templates / POST wastes
-    participant Controller as «controller»<br/>Controlador<br/>src/controllers/api/warehouse/wasteController.js<br/>getWasteMaterialTemplates / registerWaste
-    participant Domain as «object»<br/>Objeto de dominio<br/>src/services/warehouse/wastes/wasteMaterialService.js + src/services/warehouse/wastes/wasteService.js<br/>findWasteMaterialTemplates / createWasteWithInitialStockAdjustment
+    participant Route as src/routes/api/warehouse/wasteApiRoute.js
+    participant Controller as «controller»<br/>src/controllers/api/warehouse/wasteController.js
+    participant Domain as «object»<br/>src/services/warehouse/wastes/wasteMaterialService.js + src/services/warehouse/wastes/wasteService.js
     Note over Controller,Domain: Variables de frontera: req.body/DTO, req.query/params, tx
 
     Client->>Route: GET /api/warehouse/wastes/material-templates y POST /api/warehouse/wastes
@@ -812,9 +814,9 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant Client as Cliente HTTP / web
-    participant Route as src/routes/api/warehouse/wasteApiRoute.js<br/>PATCH /api/warehouse/wastes/:id
-    participant Controller as «controller»<br/>Controlador<br/>src/controllers/api/warehouse/wasteController.js<br/>editWaste
-    participant Domain as «object»<br/>Objeto de dominio<br/>src/services/warehouse/wastes/wasteService.js<br/>wasteService.updateWaste
+    participant Route as src/routes/api/warehouse/wasteApiRoute.js
+    participant Controller as «controller»<br/>src/controllers/api/warehouse/wasteController.js
+    participant Domain as «object»<br/>src/services/warehouse/wastes/wasteService.js
     Note over Controller,Domain: Variables de frontera: req.params.id, req.body/DTO
 
     Client->>Route: PATCH /api/warehouse/wastes/:id
@@ -841,15 +843,15 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     Note over Router,Controller: Variables de frontera: id, DTO de ajuste y userId
-    participant Router as src/routes/api/warehouse/wasteApiRoute.js<br/>PATCH /api/warehouse/wastes/:id/stock
-    participant Controller as «controller»<br/>Controlador<br/>src/controllers/api/warehouse/wasteController.js<br/>editWasteStock
-    participant Service as «object»<br/>src/services/warehouse/wastes/wasteService.js<br/>updateWasteStock
-    participant Adjustment as registerWasteStockAdjustment
-    participant Reference as generateYearlyReferenceNumber
+    participant Router as src/routes/api/warehouse/wasteApiRoute.js
+    participant Controller as «controller»<br/>src/controllers/api/warehouse/wasteController.js
+    participant Service as «object»<br/>src/services/warehouse/wastes/wasteService.js
+    participant Adjustment as Ajustes de merma
+    participant Reference as Referencias anuales
     participant Stock as stockHelpers
-    participant Movement as createWasteMovement
+    participant Movement as Movimientos de merma
     participant Prisma as Prisma / PostgreSQL
-    participant Socket as emitInventoryUpdated
+    participant Socket as Eventos de inventario
 
     Router->>Controller: editWasteStock(req, res)
     Controller->>Service: updateWasteStock({ id, wasteStockDto, userId })
@@ -873,9 +875,9 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant Client as Cliente HTTP / web
-    participant Route as src/routes/api/warehouse/presentationApiRoute.js<br/>GET /api/warehouse/presentations
-    participant Controller as «controller»<br/>Controlador<br/>src/controllers/api/warehouse/presentationController.js<br/>getAllPresentations
-    participant Domain as «object»<br/>Objeto de dominio<br/>src/services/warehouse/presentationService.js<br/>presentationService.findAllPresentations
+    participant Route as src/routes/api/warehouse/presentationApiRoute.js
+    participant Controller as «controller»<br/>src/controllers/api/warehouse/presentationController.js
+    participant Domain as «object»<br/>src/services/warehouse/presentationService.js
     Note over Controller,Domain: Variables de frontera: req.query/params
 
     Client->>Route: GET /api/warehouse/presentations
@@ -902,9 +904,9 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant Client as Cliente HTTP / web
-    participant Route as src/routes/api/warehouse/unitMeasureApiRoute.js<br/>GET /api/warehouse/unit-measures
-    participant Controller as «controller»<br/>Controlador<br/>src/controllers/api/warehouse/unitMeasureController.js<br/>getAllUnitMeasures
-    participant Domain as «object»<br/>Objeto de dominio<br/>src/services/warehouse/unitMeasureService.js<br/>unitMeasureService.findAllUnitMeasures
+    participant Route as src/routes/api/warehouse/unitMeasureApiRoute.js
+    participant Controller as «controller»<br/>src/controllers/api/warehouse/unitMeasureController.js
+    participant Domain as «object»<br/>src/services/warehouse/unitMeasureService.js
     Note over Controller,Domain: Variables de frontera: req.query/params
 
     Client->>Route: GET /api/warehouse/unit-measures
@@ -931,9 +933,9 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant Client as Cliente HTTP / web
-    participant Route as src/routes/api/warehouse/reasonApiRoute.js<br/>GET /api/warehouse/reasons
-    participant Controller as «controller»<br/>Controlador<br/>src/controllers/api/warehouse/reasonController.js<br/>getAllReasons
-    participant Domain as «object»<br/>Objeto de dominio<br/>src/services/warehouse/reasonService.js<br/>reasonService.findAllReasons
+    participant Route as src/routes/api/warehouse/reasonApiRoute.js
+    participant Controller as «controller»<br/>src/controllers/api/warehouse/reasonController.js
+    participant Domain as «object»<br/>src/services/warehouse/reasonService.js
     Note over Controller,Domain: Variables de frontera: req.query/params
 
     Client->>Route: GET /api/warehouse/reasons
@@ -960,9 +962,9 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant Client as Cliente HTTP / web
-    participant Route as src/routes/api/warehouse/fulfillmentStatusApiRoute.js<br/>GET /api/warehouse/fulfillment-statuses
-    participant Controller as «controller»<br/>Controlador<br/>src/controllers/api/warehouse/fulfillmentStatusController.js<br/>getAllFulfillmentStatuses
-    participant Domain as «object»<br/>Objeto de dominio<br/>src/services/warehouse/fulfillmentStatusService.js<br/>fulfillmentStatusService.findAllFulfillmentStatuses
+    participant Route as src/routes/api/warehouse/fulfillmentStatusApiRoute.js
+    participant Controller as «controller»<br/>src/controllers/api/warehouse/fulfillmentStatusController.js
+    participant Domain as «object»<br/>src/services/warehouse/fulfillmentStatusService.js
     Note over Controller,Domain: Variables de frontera: req.query/params
 
     Client->>Route: GET /api/warehouse/fulfillment-statuses
@@ -989,9 +991,9 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant Client as Cliente HTTP / web
-    participant Route as src/routes/api/warehouse/goodsReceiptApiRoute.js<br/>GET /api/warehouse/goods-receipts
-    participant Controller as «controller»<br/>Controlador<br/>src/controllers/api/warehouse/goodsReceiptController.js<br/>getAllGoodsReceipts
-    participant Domain as «object»<br/>Objeto de dominio<br/>src/services/warehouse/goodsReceipts/goodsReceiptService.js<br/>goodsReceiptService.findAllGoodsReceipts
+    participant Route as src/routes/api/warehouse/goodsReceiptApiRoute.js
+    participant Controller as «controller»<br/>src/controllers/api/warehouse/goodsReceiptController.js
+    participant Domain as «object»<br/>src/services/warehouse/goodsReceipts/goodsReceiptService.js
     Note over Controller,Domain: Variables de frontera: req.query/params
 
     Client->>Route: GET /api/warehouse/goods-receipts
@@ -1019,15 +1021,15 @@ sequenceDiagram
 sequenceDiagram
     Note over Router,Controller: Variables de frontera: goodsReceiptDto y tx
     participant Browser as Navegador
-    participant Router as src/routes/api/warehouse/goodsReceiptApiRoute.js<br/>POST /api/warehouse/goods-receipts
-    participant Controller as «controller»<br/>Controlador<br/>src/controllers/api/warehouse/goodsReceiptController.js<br/>registerGoodsReceipt
-    participant DTO as createGoodsReceiptDtoForRegister
-    participant Service as «object»<br/>src/services/warehouse/goodsReceipts/goodsReceiptService.js<br/>createGoodsReceipt
+    participant Router as src/routes/api/warehouse/goodsReceiptApiRoute.js
+    participant Controller as «controller»<br/>src/controllers/api/warehouse/goodsReceiptController.js
+    participant DTO as DTO de entrada
+    participant Service as «object»<br/>src/services/warehouse/goodsReceipts/goodsReceiptService.js
     participant Reference as referenceNumberService
-    participant DetailBuilder as buildGoodsReceiptDetails
-    participant Inventory as applyInventoryMovement
+    participant DetailBuilder as Constructor de detalles
+    participant Inventory as Inventario de materiales
     participant Prisma as Prisma / PostgreSQL
-    participant Socket as emitInventoryUpdated
+    participant Socket as Eventos de inventario
 
     Browser->>Router: POST /api/warehouse/goods-receipts
     Router->>Router: autenticar, validar y autorizar
@@ -1055,9 +1057,9 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant Client as Cliente HTTP / web
-    participant Route as src/routes/api/warehouse/goodsReceiptApiRoute.js<br/>PATCH /api/warehouse/goods-receipts/:id
-    participant Controller as «controller»<br/>Controlador<br/>src/controllers/api/warehouse/goodsReceiptController.js<br/>editGoodsReceiptHeader
-    participant Domain as «object»<br/>Objeto de dominio<br/>src/services/warehouse/goodsReceipts/goodsReceiptService.js<br/>goodsReceiptService.updateGoodsReceipt
+    participant Route as src/routes/api/warehouse/goodsReceiptApiRoute.js
+    participant Controller as «controller»<br/>src/controllers/api/warehouse/goodsReceiptController.js
+    participant Domain as «object»<br/>src/services/warehouse/goodsReceipts/goodsReceiptService.js
     Note over Controller,Domain: Variables de frontera: req.params.id, req.body/DTO, tx
 
     Client->>Route: PATCH /api/warehouse/goods-receipts/:id
@@ -1084,14 +1086,14 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     Note over Router,Controller: Variables de frontera: id, detailId, correctionDto, userId y tx
-    participant Router as src/routes/api/warehouse/goodsReceiptApiRoute.js<br/>PATCH /api/warehouse/goods-receipts/:id/details/:detailId/corrections
-    participant Controller as «controller»<br/>Controlador<br/>src/controllers/api/warehouse/goodsReceiptController.js<br/>correctGoodsReceiptDetail
-    participant Service as «object»<br/>src/services/warehouse/goodsReceipts/detailChanges/goodsReceiptCorrectionService.js<br/>correctGoodsReceiptDetailLine
+    participant Router as src/routes/api/warehouse/goodsReceiptApiRoute.js
+    participant Controller as «controller»<br/>src/controllers/api/warehouse/goodsReceiptController.js
+    participant Service as «object»<br/>src/services/warehouse/goodsReceipts/detailChanges/goodsReceiptCorrectionService.js
     participant Change as goodsReceiptDetailChangeService
     participant Reason as reasonService
     participant Inventory as movementService
     participant Prisma as Prisma / PostgreSQL
-    participant Socket as emitInventoryUpdated
+    participant Socket as Eventos de inventario
 
     Router->>Controller: correctGoodsReceiptDetail(req, res)
     Controller->>Service: correctGoodsReceiptDetailLine({ id, detailId, correctionDto, userId })
@@ -1113,9 +1115,9 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant Client as Cliente HTTP / web
-    participant Route as src/routes/api/warehouse/goodsReceiptApiRoute.js<br/>PATCH /api/warehouse/goods-receipts/:id/details/:detailId/cancel
-    participant Controller as «controller»<br/>Controlador<br/>src/controllers/api/warehouse/goodsReceiptController.js<br/>cancelGoodsReceiptDetail
-    participant Domain as «object»<br/>Objeto de dominio<br/>src/services/warehouse/goodsReceipts/detailChanges/goodsReceiptCancellationService.js<br/>cancelGoodsReceiptDetailLine
+    participant Route as src/routes/api/warehouse/goodsReceiptApiRoute.js
+    participant Controller as «controller»<br/>src/controllers/api/warehouse/goodsReceiptController.js
+    participant Domain as «object»<br/>src/services/warehouse/goodsReceipts/detailChanges/goodsReceiptCancellationService.js
     Note over Controller,Domain: Variables de frontera: req.params.id, req.params.detailId, req.body/DTO, tx
 
     Client->>Route: PATCH /api/warehouse/goods-receipts/:id/details/:detailId/cancel
@@ -1142,9 +1144,9 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant Client as Cliente HTTP / web
-    participant Route as src/routes/api/warehouse/goodsIssueApiRoute.js<br/>GET /api/warehouse/goods-issues
-    participant Controller as «controller»<br/>Controlador<br/>src/controllers/api/warehouse/goodsIssueController.js<br/>getAllGoodsIssues
-    participant Domain as «object»<br/>Objeto de dominio<br/>src/services/warehouse/goodsIssues/goodsIssueService.js<br/>goodsIssueService.findAllGoodsIssues
+    participant Route as src/routes/api/warehouse/goodsIssueApiRoute.js
+    participant Controller as «controller»<br/>src/controllers/api/warehouse/goodsIssueController.js
+    participant Domain as «object»<br/>src/services/warehouse/goodsIssues/goodsIssueService.js
     Note over Controller,Domain: Variables de frontera: req.query/params
 
     Client->>Route: GET /api/warehouse/goods-issues
@@ -1171,9 +1173,9 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant Client as Cliente HTTP / web
-    participant Route as src/routes/api/warehouse/goodsIssueApiRoute.js<br/>POST /api/warehouse/goods-issues
-    participant Controller as «controller»<br/>Controlador<br/>src/controllers/api/warehouse/goodsIssueController.js<br/>registerGoodsIssue
-    participant Domain as «object»<br/>Objeto de dominio<br/>src/services/warehouse/goodsIssues/goodsIssueService.js<br/>goodsIssueService.createGoodsIssue
+    participant Route as src/routes/api/warehouse/goodsIssueApiRoute.js
+    participant Controller as «controller»<br/>src/controllers/api/warehouse/goodsIssueController.js
+    participant Domain as «object»<br/>src/services/warehouse/goodsIssues/goodsIssueService.js
     Note over Controller,Domain: Variables de frontera: req.body/DTO, tx
 
     Client->>Route: POST /api/warehouse/goods-issues
@@ -1200,9 +1202,9 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant Client as Cliente HTTP / web
-    participant Route as src/routes/api/warehouse/goodsIssueApiRoute.js<br/>PATCH /api/warehouse/goods-issues/:id/header
-    participant Controller as «controller»<br/>Controlador<br/>src/controllers/api/warehouse/goodsIssueController.js<br/>editGoodsIssueHeader
-    participant Domain as «object»<br/>Objeto de dominio<br/>src/services/warehouse/goodsIssues/goodsIssueService.js<br/>goodsIssueService.updateGoodsIssueHeader
+    participant Route as src/routes/api/warehouse/goodsIssueApiRoute.js
+    participant Controller as «controller»<br/>src/controllers/api/warehouse/goodsIssueController.js
+    participant Domain as «object»<br/>src/services/warehouse/goodsIssues/goodsIssueService.js
     Note over Controller,Domain: Variables de frontera: req.params.id, req.body/DTO
 
     Client->>Route: PATCH /api/warehouse/goods-issues/:id/header
@@ -1229,9 +1231,9 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant Client as Cliente HTTP / web
-    participant Route as src/routes/api/warehouse/goodsIssueApiRoute.js<br/>PATCH /api/warehouse/goods-issues/:id/details
-    participant Controller as «controller»<br/>Controlador<br/>src/controllers/api/warehouse/goodsIssueController.js<br/>editGoodsIssueDetails
-    participant Domain as «object»<br/>Objeto de dominio<br/>src/services/warehouse/goodsIssues/goodsIssueService.js<br/>goodsIssueService.updateGoodsIssueDetails
+    participant Route as src/routes/api/warehouse/goodsIssueApiRoute.js
+    participant Controller as «controller»<br/>src/controllers/api/warehouse/goodsIssueController.js
+    participant Domain as «object»<br/>src/services/warehouse/goodsIssues/goodsIssueService.js
     Note over Controller,Domain: Variables de frontera: req.params.id, req.body/DTO, tx
 
     Client->>Route: PATCH /api/warehouse/goods-issues/:id/details
@@ -1260,13 +1262,13 @@ sequenceDiagram
     autonumber
     Note over Router,Controller: Variables de frontera: id, details, goodsIssueDto, userId y tx
     participant Browser as Navegador
-    participant Router as src/routes/api/warehouse/goodsIssueApiRoute.js<br/>PATCH /api/warehouse/goods-issues/:id/details
-    participant Controller as «controller»<br/>Controlador<br/>src/controllers/api/warehouse/goodsIssueController.js<br/>editGoodsIssueDetails
-    participant DTO as createGoodsIssueDetailsDtoForEdit
-    participant Service as «object»<br/>src/services/warehouse/goodsIssues/goodsIssueService.js<br/>updateGoodsIssueDetails
-    participant Inventory as applyInventoryMovement
+    participant Router as src/routes/api/warehouse/goodsIssueApiRoute.js
+    participant Controller as «controller»<br/>src/controllers/api/warehouse/goodsIssueController.js
+    participant DTO as DTO de detalles de salida
+    participant Service as «object»<br/>src/services/warehouse/goodsIssues/goodsIssueService.js
+    participant Inventory as Inventario de materiales
     participant Prisma as Prisma / PostgreSQL
-    participant Socket as emitInventoryUpdated
+    participant Socket as Eventos de inventario
 
     Browser->>Router: PATCH /:id/details
     Router->>Router: autenticar, validar y autorizar
@@ -1296,14 +1298,14 @@ sequenceDiagram
 sequenceDiagram
     Note over Router,Controller: Variables de frontera: id, detailId, returnDto, userId y tx
     participant Browser as Navegador
-    participant Router as src/routes/api/warehouse/goodsIssueApiRoute.js<br/>PATCH /api/warehouse/goods-issues/:id/details/:detailId/returns
-    participant Controller as «controller»<br/>Controlador<br/>src/controllers/api/warehouse/goodsIssueController.js<br/>registerGoodsIssueDetailReturn
-    participant Service as «object»<br/>src/services/warehouse/goodsIssues/detailReturns/goodsIssueReturnService.js<br/>returnGoodsIssueDetail
-    participant Rules as Validaciones de returnGoodsIssueDetail
-    participant Inventory as applyInventoryMovement / ENTRY
-    participant Status as resolveIssueFulfillmentStatus
+    participant Router as src/routes/api/warehouse/goodsIssueApiRoute.js
+    participant Controller as «controller»<br/>src/controllers/api/warehouse/goodsIssueController.js
+    participant Service as «object»<br/>src/services/warehouse/goodsIssues/detailReturns/goodsIssueReturnService.js
+    participant Rules as Reglas de devolución de material
+    participant Inventory as Inventario de materiales
+    participant Status as Estados de surtimiento
     participant Prisma as Prisma / PostgreSQL
-    participant Socket as emitInventoryUpdated
+    participant Socket as Eventos de inventario
 
     Browser->>Router: PATCH /:id/details/:detailId/returns
     Router->>Router: autenticar, validar y autorizar
@@ -1333,9 +1335,9 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant Client as Cliente HTTP / web
-    participant Route as src/routes/api/warehouse/wasteIssueApiRoute.js<br/>GET /api/warehouse/waste-issues
-    participant Controller as «controller»<br/>Controlador<br/>src/controllers/api/warehouse/wasteIssueController.js<br/>getAllWasteIssues
-    participant Domain as «object»<br/>Objeto de dominio<br/>src/services/warehouse/wasteIssues/wasteIssueService.js<br/>wasteIssueService.findAllWasteIssues
+    participant Route as src/routes/api/warehouse/wasteIssueApiRoute.js
+    participant Controller as «controller»<br/>src/controllers/api/warehouse/wasteIssueController.js
+    participant Domain as «object»<br/>src/services/warehouse/wasteIssues/wasteIssueService.js
     Note over Controller,Domain: Variables de frontera: req.query/params
 
     Client->>Route: GET /api/warehouse/waste-issues
@@ -1362,9 +1364,9 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant Client as Cliente HTTP / web
-    participant Route as src/routes/api/warehouse/wasteIssueApiRoute.js<br/>POST /api/warehouse/waste-issues
-    participant Controller as «controller»<br/>Controlador<br/>src/controllers/api/warehouse/wasteIssueController.js<br/>registerWasteIssue
-    participant Domain as «object»<br/>Objeto de dominio<br/>src/services/warehouse/wasteIssues/wasteIssueService.js<br/>wasteIssueService.createWasteIssue
+    participant Route as src/routes/api/warehouse/wasteIssueApiRoute.js
+    participant Controller as «controller»<br/>src/controllers/api/warehouse/wasteIssueController.js
+    participant Domain as «object»<br/>src/services/warehouse/wasteIssues/wasteIssueService.js
     Note over Controller,Domain: Variables de frontera: req.body/DTO, tx
 
     Client->>Route: POST /api/warehouse/waste-issues
@@ -1391,9 +1393,9 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant Client as Cliente HTTP / web
-    participant Route as src/routes/api/warehouse/wasteIssueApiRoute.js<br/>PATCH /api/warehouse/waste-issues/:id/header
-    participant Controller as «controller»<br/>Controlador<br/>src/controllers/api/warehouse/wasteIssueController.js<br/>editWasteIssueHeader
-    participant Domain as «object»<br/>Objeto de dominio<br/>src/services/warehouse/wasteIssues/wasteIssueService.js<br/>wasteIssueService.updateWasteIssueHeader
+    participant Route as src/routes/api/warehouse/wasteIssueApiRoute.js
+    participant Controller as «controller»<br/>src/controllers/api/warehouse/wasteIssueController.js
+    participant Domain as «object»<br/>src/services/warehouse/wasteIssues/wasteIssueService.js
     Note over Controller,Domain: Variables de frontera: req.params.id, req.body/DTO
 
     Client->>Route: PATCH /api/warehouse/waste-issues/:id/header
@@ -1420,9 +1422,9 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant Client as Cliente HTTP / web
-    participant Route as src/routes/api/warehouse/wasteIssueApiRoute.js<br/>PATCH /api/warehouse/waste-issues/:id/details
-    participant Controller as «controller»<br/>Controlador<br/>src/controllers/api/warehouse/wasteIssueController.js<br/>editWasteIssueDetails
-    participant Domain as «object»<br/>Objeto de dominio<br/>src/services/warehouse/wasteIssues/wasteIssueService.js<br/>wasteIssueService.updateWasteIssueDetails
+    participant Route as src/routes/api/warehouse/wasteIssueApiRoute.js
+    participant Controller as «controller»<br/>src/controllers/api/warehouse/wasteIssueController.js
+    participant Domain as «object»<br/>src/services/warehouse/wasteIssues/wasteIssueService.js
     Note over Controller,Domain: Variables de frontera: req.params.id, req.body/DTO, tx
 
     Client->>Route: PATCH /api/warehouse/waste-issues/:id/details
@@ -1449,15 +1451,15 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     Note over Router,Controller: Variables de frontera: id, details, isSupplied y tx
-    participant Router as src/routes/api/warehouse/wasteIssueApiRoute.js<br/>PATCH /api/warehouse/waste-issues/:id/details
-    participant Controller as «controller»<br/>Controlador<br/>src/controllers/api/warehouse/wasteIssueController.js<br/>editWasteIssueDetails
-    participant Service as «object»<br/>src/services/warehouse/wasteIssues/wasteIssueService.js<br/>updateWasteIssueDetails
+    participant Router as src/routes/api/warehouse/wasteIssueApiRoute.js
+    participant Controller as «controller»<br/>src/controllers/api/warehouse/wasteIssueController.js
+    participant Service as «object»<br/>src/services/warehouse/wasteIssues/wasteIssueService.js
     participant Rules as issueFulfillmentRules
-    participant Movement as applyWasteIssueMovement
-    participant Stock as applyWasteStockChange
-    participant Status as findWasteIssueFulfillmentStatusIds
+    participant Movement as Movimientos de merma
+    participant Stock as Existencias de merma
+    participant Status as Estados de surtimiento de merma
     participant Prisma as Prisma / PostgreSQL
-    participant Socket as emitInventoryUpdated
+    participant Socket as Eventos de inventario
 
     Router->>Controller: editWasteIssueDetails(req, res)
     Controller->>Service: updateWasteIssueDetails({ id, details: wasteIssueDto.details })
@@ -1484,14 +1486,14 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     Note over Router,Controller: Variables de frontera: id, detailId, returnDto, userId y tx
-    participant Router as src/routes/api/warehouse/wasteIssueApiRoute.js<br/>PATCH /api/warehouse/waste-issues/:id/details/:detailId/returns
-    participant Controller as «controller»<br/>Controlador<br/>src/controllers/api/warehouse/wasteIssueController.js<br/>registerWasteIssueDetailReturn
-    participant Service as «object»<br/>src/services/warehouse/wasteIssues/detailReturns/wasteIssueReturnService.js<br/>returnWasteIssueDetail
-    participant Rules as Validaciones de returnWasteIssueDetail
-    participant Inventory as applyWasteIssueReturnMovement
-    participant Status as findWasteIssueFulfillmentStatusIds
+    participant Router as src/routes/api/warehouse/wasteIssueApiRoute.js
+    participant Controller as «controller»<br/>src/controllers/api/warehouse/wasteIssueController.js
+    participant Service as «object»<br/>src/services/warehouse/wasteIssues/detailReturns/wasteIssueReturnService.js
+    participant Rules as Reglas de devolución de merma
+    participant Inventory as Inventario de mermas
+    participant Status as Estados de surtimiento de merma
     participant Prisma as Prisma / PostgreSQL
-    participant Socket as emitInventoryUpdated
+    participant Socket as Eventos de inventario
 
     Router->>Controller: registerWasteIssueDetailReturn(req, res)
     Controller->>Service: returnWasteIssueDetail({ id, detailId, returnDto, userId })
@@ -1518,9 +1520,9 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant Client as Cliente HTTP / web
-    participant Route as src/routes/api/warehouse/materialApiRoute.js<br/>GET /api/warehouse/materials
-    participant Controller as «controller»<br/>Controlador<br/>src/controllers/api/warehouse/materialController.js<br/>getAllMaterials
-    participant Domain as «object»<br/>Objeto de dominio<br/>src/services/warehouse/materials/materialService.js<br/>findAllMaterials
+    participant Route as src/routes/api/warehouse/materialApiRoute.js
+    participant Controller as «controller»<br/>src/controllers/api/warehouse/materialController.js
+    participant Domain as «object»<br/>src/services/warehouse/materials/materialService.js
     Note over Controller,Domain: Variables de frontera: req.query/params
 
     Client->>Route: GET /api/warehouse/materials
@@ -1547,9 +1549,9 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant Client as Cliente HTTP / web
-    participant Route as src/routes/api/admin/movementApiRoute.js<br/>GET /api/admin/movements/materials
-    participant Controller as «controller»<br/>Controlador<br/>src/controllers/api/admin/movementController.js<br/>getAllMaterialMovements
-    participant Domain as «object»<br/>Objeto de dominio<br/>src/services/inventory/movementQueryService.js<br/>movementQueryService.findAllMaterialMovements
+    participant Route as src/routes/api/admin/movementApiRoute.js
+    participant Controller as «controller»<br/>src/controllers/api/admin/movementController.js
+    participant Domain as «object»<br/>src/services/inventory/movementQueryService.js
     Note over Controller,Domain: Variables de frontera: req.query/params
 
     Client->>Route: GET /api/admin/movements/materials
@@ -1576,9 +1578,9 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant Client as Cliente HTTP / web
-    participant Route as src/routes/api/warehouse/reportApiRoute.js<br/>GET /api/warehouse/reports/inventory/excel
-    participant Controller as «controller»<br/>Controlador<br/>src/controllers/api/warehouse/reportController.js<br/>exportWarehouseReportExcel
-    participant Domain as «object»<br/>Objeto de dominio<br/>src/services/warehouse/reportService.js + src/utils/reportExcelUtils.js<br/>reportService.findWarehouseReportRows / sendExcelReport
+    participant Route as src/routes/api/warehouse/reportApiRoute.js
+    participant Controller as «controller»<br/>src/controllers/api/warehouse/reportController.js
+    participant Domain as «object»<br/>src/services/warehouse/reportService.js + src/utils/reportExcelUtils.js
     Note over Controller,Domain: Variables de frontera: req.query/params
 
     Client->>Route: GET /api/warehouse/reports/inventory/excel
@@ -1605,9 +1607,9 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant Client as Cliente HTTP / web
-    participant Route as src/routes/api/warehouse/reportApiRoute.js<br/>GET /api/warehouse/reports/goods-issues/excel
-    participant Controller as «controller»<br/>Controlador<br/>src/controllers/api/warehouse/reportController.js<br/>exportGoodsIssueReportExcel
-    participant Domain as «object»<br/>Objeto de dominio<br/>src/services/warehouse/reportService.js + src/utils/reportExcelUtils.js<br/>reportService.findGoodsIssueReportRows / sendExcelReport
+    participant Route as src/routes/api/warehouse/reportApiRoute.js
+    participant Controller as «controller»<br/>src/controllers/api/warehouse/reportController.js
+    participant Domain as «object»<br/>src/services/warehouse/reportService.js + src/utils/reportExcelUtils.js
     Note over Controller,Domain: Variables de frontera: req.query/params
 
     Client->>Route: GET /api/warehouse/reports/goods-issues/excel
@@ -1634,9 +1636,9 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant Client as Cliente HTTP / web
-    participant Route as src/routes/api/admin/reportApiRoute.js<br/>GET /api/admin/reports/movements/materials/excel
-    participant Controller as «controller»<br/>Controlador<br/>src/controllers/api/admin/reportController.js<br/>exportMovementReport
-    participant Domain as «object»<br/>Objeto de dominio<br/>src/services/inventory/reportService.js<br/>inventory/reportService.findMovementReportRows
+    participant Route as src/routes/api/admin/reportApiRoute.js
+    participant Controller as «controller»<br/>src/controllers/api/admin/reportController.js
+    participant Domain as «object»<br/>src/services/inventory/reportService.js
     Note over Controller,Domain: Variables de frontera: req.query/params
 
     Client->>Route: GET /api/admin/reports/movements/materials/excel
@@ -1663,9 +1665,9 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant Client as Cliente HTTP / web
-    participant Route as src/routes/api/warehouse/wasteApiRoute.js<br/>GET /api/warehouse/wastes
-    participant Controller as «controller»<br/>Controlador<br/>src/controllers/api/warehouse/wasteController.js<br/>getAllWastes
-    participant Domain as «object»<br/>Objeto de dominio<br/>src/services/warehouse/wastes/wasteService.js<br/>wasteService.findAllWastes
+    participant Route as src/routes/api/warehouse/wasteApiRoute.js
+    participant Controller as «controller»<br/>src/controllers/api/warehouse/wasteController.js
+    participant Domain as «object»<br/>src/services/warehouse/wastes/wasteService.js
     Note over Controller,Domain: Variables de frontera: req.query/params
 
     Client->>Route: GET /api/warehouse/wastes
@@ -1692,9 +1694,9 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant Client as Cliente HTTP / web
-    participant Route as src/routes/api/admin/movementApiRoute.js<br/>GET /api/admin/movements/wastes
-    participant Controller as «controller»<br/>Controlador<br/>src/controllers/api/admin/movementController.js<br/>getAllWasteMovements
-    participant Domain as «object»<br/>Objeto de dominio<br/>src/services/inventory/movementQueryService.js<br/>movementQueryService.findAllWasteMovements
+    participant Route as src/routes/api/admin/movementApiRoute.js
+    participant Controller as «controller»<br/>src/controllers/api/admin/movementController.js
+    participant Domain as «object»<br/>src/services/inventory/movementQueryService.js
     Note over Controller,Domain: Variables de frontera: req.query/params
 
     Client->>Route: GET /api/admin/movements/wastes
@@ -1721,9 +1723,9 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant Client as Cliente HTTP / web
-    participant Route as src/routes/api/warehouse/reportApiRoute.js<br/>GET /api/warehouse/reports/waste-issues/excel
-    participant Controller as «controller»<br/>Controlador<br/>src/controllers/api/warehouse/reportController.js<br/>exportWasteIssueReportExcel
-    participant Domain as «object»<br/>Objeto de dominio<br/>src/services/warehouse/reportService.js + src/utils/reportExcelUtils.js<br/>reportService.findWasteIssueReportRows / sendExcelReport
+    participant Route as src/routes/api/warehouse/reportApiRoute.js
+    participant Controller as «controller»<br/>src/controllers/api/warehouse/reportController.js
+    participant Domain as «object»<br/>src/services/warehouse/reportService.js + src/utils/reportExcelUtils.js
     Note over Controller,Domain: Variables de frontera: req.query/params
 
     Client->>Route: GET /api/warehouse/reports/waste-issues/excel
@@ -1750,9 +1752,9 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant Client as Cliente HTTP / web
-    participant Route as src/routes/api/warehouse/reportApiRoute.js<br/>GET /api/warehouse/reports/wastes/excel
-    participant Controller as «controller»<br/>Controlador<br/>src/controllers/api/warehouse/reportController.js<br/>exportWasteReportExcel
-    participant Domain as «object»<br/>Objeto de dominio<br/>src/services/warehouse/reportService.js + src/utils/reportExcelUtils.js<br/>reportService.findWasteReportRows / sendExcelReport
+    participant Route as src/routes/api/warehouse/reportApiRoute.js
+    participant Controller as «controller»<br/>src/controllers/api/warehouse/reportController.js
+    participant Domain as «object»<br/>src/services/warehouse/reportService.js + src/utils/reportExcelUtils.js
     Note over Controller,Domain: Variables de frontera: req.query/params
 
     Client->>Route: GET /api/warehouse/reports/wastes/excel
@@ -1779,9 +1781,9 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant Client as Cliente HTTP / web
-    participant Route as src/routes/api/admin/reportApiRoute.js<br/>GET /api/admin/reports/movements/wastes/excel
-    participant Controller as «controller»<br/>Controlador<br/>src/controllers/api/admin/reportController.js<br/>exportWasteMovementReport
-    participant Domain as «object»<br/>Objeto de dominio<br/>src/services/inventory/reportService.js<br/>inventory/reportService.findMovementReportRows
+    participant Route as src/routes/api/admin/reportApiRoute.js
+    participant Controller as «controller»<br/>src/controllers/api/admin/reportController.js
+    participant Domain as «object»<br/>src/services/inventory/reportService.js
     Note over Controller,Domain: Variables de frontera: req.query/params
 
     Client->>Route: GET /api/admin/reports/movements/wastes/excel
@@ -1808,9 +1810,9 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant Client as Cliente HTTP / web
-    participant Route as src/routes/api/warehouse/reportApiRoute.js<br/>GET /api/warehouse/reports/goods-receipts/excel
-    participant Controller as «controller»<br/>Controlador<br/>src/controllers/api/warehouse/reportController.js<br/>exportGoodsReceiptReportExcel
-    participant Domain as «object»<br/>Objeto de dominio<br/>src/services/warehouse/reportService.js + src/utils/reportExcelUtils.js<br/>reportService.findGoodsReceiptReportRows / sendExcelReport
+    participant Route as src/routes/api/warehouse/reportApiRoute.js
+    participant Controller as «controller»<br/>src/controllers/api/warehouse/reportController.js
+    participant Domain as «object»<br/>src/services/warehouse/reportService.js + src/utils/reportExcelUtils.js
     Note over Controller,Domain: Variables de frontera: req.query/params
 
     Client->>Route: GET /api/warehouse/reports/goods-receipts/excel
@@ -1837,9 +1839,9 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant Client as Cliente HTTP / web
-    participant Route as src/routes/api/warehouse/reportApiRoute.js<br/>GET /api/warehouse/reports/suppliers/excel
-    participant Controller as «controller»<br/>Controlador<br/>src/controllers/api/warehouse/reportController.js<br/>exportSupplierReportExcel
-    participant Domain as «object»<br/>Objeto de dominio<br/>src/services/warehouse/reportService.js + src/utils/reportExcelUtils.js<br/>reportService.findSupplierReportRows / sendExcelReport
+    participant Route as src/routes/api/warehouse/reportApiRoute.js
+    participant Controller as «controller»<br/>src/controllers/api/warehouse/reportController.js
+    participant Domain as «object»<br/>src/services/warehouse/reportService.js + src/utils/reportExcelUtils.js
     Note over Controller,Domain: Variables de frontera: req.query/params
 
     Client->>Route: GET /api/warehouse/reports/suppliers/excel
@@ -1866,9 +1868,9 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant Client as Cliente HTTP / web
-    participant Route as src/routes/api/sales/reportApiRoute.js<br/>GET /api/sales/reports/clients/excel
-    participant Controller as «controller»<br/>Controlador<br/>src/controllers/api/sales/reportController.js<br/>exportClientReport
-    participant Domain as «object»<br/>Objeto de dominio<br/>src/services/sales/clientService.js + src/utils/reportExcelUtils.js<br/>clientService.findAllClients / sendExcelReport
+    participant Route as src/routes/api/sales/reportApiRoute.js
+    participant Controller as «controller»<br/>src/controllers/api/sales/reportController.js
+    participant Domain as «object»<br/>src/services/sales/clientService.js + src/utils/reportExcelUtils.js
     Note over Controller,Domain: Variables de frontera: req.query/params
 
     Client->>Route: GET /api/sales/reports/clients/excel
@@ -1895,9 +1897,9 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant Client as Cliente HTTP / web
-    participant Route as src/routes/api/admin/reportApiRoute.js<br/>GET /api/admin/reports/persons/excel
-    participant Controller as «controller»<br/>Controlador<br/>src/controllers/api/admin/reportController.js<br/>exportPersonReport
-    participant Domain as «object»<br/>Objeto de dominio<br/>src/services/admin/person/personService.js + src/utils/reportExcelUtils.js<br/>personService.findAllPersons / sendExcelReport
+    participant Route as src/routes/api/admin/reportApiRoute.js
+    participant Controller as «controller»<br/>src/controllers/api/admin/reportController.js
+    participant Domain as «object»<br/>src/services/admin/person/personService.js + src/utils/reportExcelUtils.js
     Note over Controller,Domain: Variables de frontera: req.query/params
 
     Client->>Route: GET /api/admin/reports/persons/excel
@@ -1924,9 +1926,9 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant Client as Cliente HTTP / web
-    participant Route as src/routes/api/admin/reportApiRoute.js<br/>GET /api/admin/reports/users/excel
-    participant Controller as «controller»<br/>Controlador<br/>src/controllers/api/admin/reportController.js<br/>exportUserReport
-    participant Domain as «object»<br/>Objeto de dominio<br/>src/services/admin/userService.js + src/utils/reportExcelUtils.js<br/>userService.findAllUsers / sendExcelReport
+    participant Route as src/routes/api/admin/reportApiRoute.js
+    participant Controller as «controller»<br/>src/controllers/api/admin/reportController.js
+    participant Domain as «object»<br/>src/services/admin/userService.js + src/utils/reportExcelUtils.js
     Note over Controller,Domain: Variables de frontera: req.query/params
 
     Client->>Route: GET /api/admin/reports/users/excel
