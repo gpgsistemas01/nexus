@@ -478,6 +478,9 @@ const renderDataDictionaryModel = (name, model) => {
 const generateDatabaseSchema = async () => {
     const models = parsePrismaModels(await readFile(path.join(ROOT, 'prisma/schema.prisma'), 'utf8'));
     validateDatabaseAreas(models);
+    const areaByModel = new Map(DATABASE_AREAS.flatMap(([area, names]) => (
+        names.map((name) => [name, area])
+    )));
     const diagrams = DATABASE_AREAS.map(([title, names]) => {
         const selected = new Set(names);
         const entities = names.map((name) => renderEntity(name, models.get(name))).join('\n');
@@ -486,6 +489,11 @@ const generateDatabaseSchema = async () => {
             .map(({ field, target, optional }) => `    ${target} ${optional ? 'o|' : '||'}--o{ ${source} : "${field}"`));
         return `## ${title}\n\n\`\`\`mermaid\nerDiagram\n${entities}\n${relations.join('\n')}\n\`\`\``;
     }).join('\n\n');
+    const crossAreaRelations = [...models.entries()].flatMap(([source, model]) => (
+        model.relations
+            .filter(({ target }) => areaByModel.get(source) !== areaByModel.get(target))
+            .map(({ field, target, optional }) => `    ${target} ${optional ? 'o|' : '||'}--o{ ${source} : "${field}"`)
+    ));
     return `<!-- Archivo generado por scripts/generateArchitectureDocs.js. No editar manualmente. -->
 # Diagramas de la base de datos
 
@@ -507,8 +515,18 @@ ${diagrams}
 
 Los modelos de identidad y catálogo son referenciados desde los documentos de compra,
 salida, ajuste y merma. Para evitar repetir entidades y producir diagramas ilegibles,
-cada diagrama detalla las relaciones internas de su área; consulta el esquema Prisma
-para las relaciones transversales y las reglas \`onDelete\`/\`onUpdate\`.
+cada diagrama anterior detalla las relaciones internas de su área y la vista siguiente
+muestra sólo las asociaciones que cruzan esos límites. Los atributos permanecen en las
+vistas por área y en el diccionario técnico.
+
+\`\`\`mermaid
+erDiagram
+${crossAreaRelations.join('\n')}
+\`\`\`
+
+Consulta el esquema Prisma para las reglas \`onDelete\`/\`onUpdate\`. Una relación puede
+aparecer con el nombre del campo inverso porque la vista se deriva de la relación Prisma;
+la dirección de lectura no implica propiedad del proceso de negocio.
 `;
 };
 
