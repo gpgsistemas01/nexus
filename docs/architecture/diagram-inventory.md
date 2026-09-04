@@ -11,7 +11,7 @@ cada `CU-*` dentro del rango identifica un diagrama individual.
 El **tipo semántico** prevalece sobre la directiva Mermaid. Un `flowchart` puede
 representar contexto, actividad, dependencia, navegación o trazabilidad; no se etiqueta
 como “diagrama de flujo” genérico si las flechas tienen otra semántica. El inventario
-registra **271 diagramas vigentes**: 266 curados y 5 generados.
+registra **272 diagramas vigentes**: 266 curados y 6 generados.
 
 ## Catálogo por familia y tipo
 
@@ -37,7 +37,7 @@ registra **271 diagramas vigentes**: 266 curados y 5 generados.
 | `DIA-DOC-FLU-001` | Actividad documental | `technical-code-documentation.md#recorrido-para-incorporar-documentación` | 1 | Gobierno técnico; curado. |
 | `DIA-API-SEQ-001` | Secuencia de middleware | `api-contract.md#prefijo-montaje-y-orden-de-middleware` | 1 | Registro Express; curado. |
 | `DIA-GEN-COD-001` | Dependencias generadas | `generated/code-map.md#dependencias-entre-áreas` | 1 | `src`; regenerar. |
-| `DIA-GEN-ER-001..004` | Entidad–relación | Cuatro áreas de `generated/database-schema.md` | 4 | Prisma; regenerar. |
+| `DIA-GEN-ER-001..005` | Entidad–relación | Cuatro áreas y relaciones transversales de `generated/database-schema.md` | 5 | Prisma; regenerar. |
 | `DIA-REQ-DOM-001` | Clases de dominio conceptual | `domain-and-use-cases.md#modelo-de-dominio-conceptual` | 1 | Requisitos y glosario; curado. |
 | `DIA-REQ-CU-GRP-AUT..REP` | Casos de uso por seis grupos | `domain-and-use-cases.md#casos-de-uso-vigentes` | 6 | Catálogo `CU-*`; curado. |
 | `DIA-REQ-EST-001` | Estados/datos por acción | `domain-and-use-cases.md#estados-y-datos-modificados-por-acción` | 1 | Reglas de dominio; curado. |
