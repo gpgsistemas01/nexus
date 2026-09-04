@@ -79,6 +79,29 @@ Esta guía vive aquí —y no en el `README.md` raíz— porque Pandoc, las plan
 motores PDF son herramientas del flujo documental, no requisitos para ejecutar Nexus.
 El README del sistema sólo lista los comandos para que puedan descubrirse.
 
+Pandoc y Playwright intervienen en etapas distintas y ninguno sustituye al otro:
+
+| Herramienta | Finalidad | Comando del proyecto |
+| --- | --- | --- |
+| Playwright | Abre Nexus en Chromium y genera las capturas del manual. Sólo se necesita cuando deben actualizarse las imágenes. | `npm run docs:screenshots` |
+| Pandoc | Ensambla el Markdown y las imágenes existentes para generar HTML, DOCX o PDF. | `npm run docs:export -- <paquete> <formato>` |
+
+Una extensión de Playwright para Visual Studio Code tampoco reemplaza estas herramientas: puede
+facilitar la ejecución desde el editor, pero el script de capturas requiere el paquete `playwright`
+y la exportación final continúa requiriendo el ejecutable `pandoc`.
+
+Para generar capturas se necesitan dos componentes en el mismo entorno donde se abre la terminal:
+
+```bash
+npm install --no-save playwright
+npx playwright install chromium
+```
+
+El primer comando instala el paquete de Node.js que usa el script y el segundo descarga el
+ejecutable de Chromium compatible que Playwright controla. No se instala una extensión dentro del
+navegador habitual ni es suficiente con instalar la extensión de Playwright para Visual Studio
+Code.
+
 ### Estructura exportable
 
 La estructura actual es válida para exportar: cada paquete comienza en el `index.md` de
@@ -118,13 +141,28 @@ por un Markdown de su misma familia.
 
 ### Preparar las herramientas
 
+Estos comandos pueden ejecutarse desde la terminal integrada de Visual Studio Code
+(`Terminal` > `New Terminal`), abierta en la raíz del repositorio. Visual Studio Code no instala
+Pandoc por sí mismo: la instalación se realiza en el mismo sistema, contenedor o entorno remoto
+donde se ejecutará `npm run docs:export`.
+
+Existen extensiones de Visual Studio Code que integran funciones de Pandoc, pero son opcionales y
+no sustituyen la instalación requerida por este proyecto. `npm run docs:export` ejecuta el comando
+`pandoc` directamente, por lo que el ejecutable debe estar disponible en la terminal mediante
+`PATH`; una extensión sólo puede usarse como complemento para trabajar desde el editor.
+
 1. Desde la raíz del repositorio, instala la versión de Node.js indicada en `package.json`
    y ejecuta `npm ci`.
-2. Instala [Pandoc](https://pandoc.org/installing.html) y comprueba `pandoc --version`. En
-   Debian o Ubuntu puede usarse `sudo apt-get install pandoc`.
-3. Para PDF, instala un motor compatible. Se recomienda TeX Live mediante
-   `sudo apt-get install texlive-xetex` y `DOCS_PDF_ENGINE=xelatex`. HTML y DOCX no lo
-   necesitan.
+2. Instala [Pandoc](https://pandoc.org/installing.html) en el sistema donde está abierta la
+   terminal de Visual Studio Code y comprueba `pandoc --version`:
+   - **Windows:** descarga y ejecuta el instalador oficial de Pandoc; después cierra y vuelve a
+     abrir la terminal integrada. Windows no utiliza `sudo`.
+   - **Debian o Ubuntu:** ejecuta `sudo apt-get install pandoc`. Si la cuenta no dispone de
+     `sudo`, solicita la instalación al administrador del equipo.
+3. Para PDF, instala un motor compatible en el mismo sistema. En Debian o Ubuntu se recomienda
+   TeX Live mediante `sudo apt-get install texlive-xetex`; en Windows debe utilizarse su
+   instalador oficial. Después define `DOCS_PDF_ENGINE=xelatex`. HTML y DOCX no necesitan este
+   motor.
 4. Para aplicar estilos corporativos a DOCX, prepara una plantilla y define
    `DOCS_REFERENCE_DOC=/ruta/reference.docx`.
 5. Valida siempre el paquete con `--check` antes de generar el archivo.
