@@ -202,86 +202,28 @@ y URL y enlaza backend; no dibuja Prisma ni atribuye seguridad a la validación 
 
 ## Vistas técnicas aplicadas por flujo frontend
 
-Estas vistas no son diagramas de casos de uso: comienzan dentro del navegador y muestran
-la composición EJS/JavaScript, eventos, factories y transporte que implementan el caso.
+### Relación entre la colección canónica y las vistas adicionales
+
 La columna **Diagrama aplicado** de la matriz anterior enlaza los 63 recorridos
-`DIA-FE-CU-*`. Esta sección conserva primero las perspectivas dinámicas para los flujos
-cuya secuencia o decisión necesita más detalle y después incorpora una vista técnica con
-contexto de código para cada caso.
-Cada vista dinámica se vincula con un solo `CU-*` y nombra página, aplicación, request y
-endpoint concretos. La reutilización de una factory o componente se explica en la ficha
-transversal, pero no se usa para hacer que una secuencia represente varios casos. Todos
-Todos los CRUD conservan su vista aplicada `DIA-FE-CU-*` y su recorrido técnico contextual,
-sin forzar una secuencia dinámica cuando no existe coordinación adicional.
+`DIA-FE-CU-*` de `frontend-code-sequence-diagrams.md`. Esa colección es propietaria del
+orden interacción → UI → aplicación → request → endpoint → resultado visible. Este
+documento es propietario de las fichas por tipo de módulo, los límites del navegador y
+las vistas que responden una pregunta adicional. Ninguna vista adicional extiende la
+seguridad del frontend hacia el servidor ni sustituye la secuencia enlazada.
 
-### Inicio de sesión y establecimiento de la navegación autenticada
+La revisión de las vistas existentes produjo esta decisión:
 
-**Identificador:** `DIA-FE-SEQ-002`. **Caso:** `CU-AUT-01`. Explica qué módulos del
-navegador recopilan credenciales y entregan el control al servidor; no describe la
-validación del token, que pertenece al backend.
+| Vista conservada aquí | Pregunta adicional y razón | Conexión e impacto |
+| --- | --- | --- |
+| `DIA-FE-ACT-001` · `CU-CAT-14` | ¿Cómo condicionan proveedor y plantilla la habilitación, el mapeo de *snapshots* y el envío? La actividad hace visibles decisiones de UI, no la persistencia. | Complementa `DIA-FE-CU-CAT-14` y termina en su mismo `POST`. Cambios en decisiones visuales actualizan la actividad; cambios en módulos, payload o endpoint actualizan la secuencia canónica; las reglas definitivas permanecen en backend. |
+| `DIA-FE-TEC-EST-CU-IDA-07` | ¿Qué modos del formulario separan consulta, edición y cambio de contraseña, y a cuál vuelve tras éxito o error? | Complementa `DIA-FE-CU-IDA-07` y se conecta con los recorridos de consulta/edición relacionados. No crea otro caso ni otra API; si cambia el modo se revisan sus controles y la secuencia cuya mutación activa. |
+| `DIA-FE-TEC-EST-CU-CAT-05` | ¿Cómo evoluciona el modo de ajuste entre consulta, validación visual, envío y error? | Complementa `DIA-FE-CU-CAT-05` y termina en el mismo `PATCH`. No representa estados persistidos ni validación definitiva; un cambio de endpoint afecta la secuencia, mientras un cambio de modo afecta esta vista. |
 
-```mermaid
-sequenceDiagram
-    actor User as Usuario
-    participant EJS as loginPage.ejs
-    participant Form as loginForm / useForm
-    participant App as login
-    participant Request as loginRequest / apiRequest
-    participant API as POST /api/auth/login
-    participant Browser as Navegador
-
-    EJS->>Form: carga el módulo del formulario
-    User->>Form: captura y envía credenciales
-    Form->>Form: valida campos requeridos
-    Form->>App: { formData }
-    App->>Request: { data: formData }
-    Request->>API: petición JSON
-    API-->>Request: respuesta y cookies de sesión
-    Request-->>App: respuesta normalizada
-    App-->>Form: resultado exitoso
-    Form->>Browser: navega a la portada autenticada
-```
-
-### Ajuste de existencias desde el navegador
-
-Esta vista se conserva porque la ficha de materiales identifica una mutación adicional
-que sí cambia el flujo CRUD común. Documenta exclusivamente `CU-CAT-05`; el ajuste de
-merma, surtimientos, devoluciones y cambios de entradas no sustituyen nombres dentro de
-esta secuencia y requieren una vista propia cuando su coordinación de frontend deba
-explicarse.
-
-**Identificador:** `DIA-FE-SEQ-001`. **Caso:** `CU-CAT-05`. **Tipo:** secuencia Mermaid
-con semántica UML. **Actor:** `Administrador del sistema` es el actor canónico del caso;
-los participantes técnicos se nombran por responsabilidad o módulo y nunca se declaran
-como actores.
-
-```mermaid
-sequenceDiagram
-    actor User as Administrador del sistema
-    participant EJS as materialsPage.ejs
-    participant Form as materialForm / useForm
-    participant App as editMaterialStock
-    participant Factory as createApplicationMutation
-    participant Request as editMaterialStockRequest
-    participant API as PATCH /api/warehouse/materials/:id/stock
-
-    EJS->>Form: carga módulo y formulario
-    User->>Form: confirma ajuste
-    Form->>Form: selecciona campos y valida
-    Form->>App: { formData, id }
-    App->>Factory: mutación configurada editStock
-    Factory->>Request: { data: formData, id }
-    Request->>API: apiRequest({ method: patch, url, data })
-    API-->>Request: { material, code }
-    Request-->>Factory: response
-    Factory-->>Form: material
-    Form->>Form: form.onSave?.(material)
-```
-
-La autorización, validación definitiva, transacción, auditoría y movimiento pertenecen
-al backend y se consultan en el [contrato de la ruta](../data/api-contract.md#ejemplo-aplicado-ajuste-de-existencias-de-material).
-La correspondencia completa requisito–frontend–backend–prueba está en la
-[matriz de trazabilidad técnica](traceability-matrix.md).
+Las antiguas secuencias selectivas de login, ajuste, corrección y devoluciones no se
+mantienen aquí: repetían la pregunta ya contestada por sus `DIA-FE-CU-*`. Su detalle se
+consolidó en la colección canónica. La reutilización de factories o UI compartida se
+conecta mediante el código de patrón y las vistas estructurales; no exige duplicar la
+secuencia de cada consumidor.
 
 ### Alta de merma desde una plantilla de material
 
@@ -301,87 +243,6 @@ flowchart TB
     editable --> validate{"¿Validación del navegador correcta?"}
     validate -->|No| errors["Mostrar errores sin llamar la API"]
     validate -->|Sí| register["registerWaste → POST /api/warehouse/wastes"]
-```
-
-### Corrección de un detalle de entrada
-
-**Identificador:** `DIA-FE-SEQ-003`. **Caso:** `CU-ENT-04`. La vista se concentra en el
-modal secundario y en el evento que sincroniza el documento principal después de una
-respuesta exitosa.
-
-```mermaid
-sequenceDiagram
-    actor Warehouse as Almacén
-    participant Main as goodsReceiptModal
-    participant Correction as correctionModal / correctionForm
-    participant App as correctGoodsReceiptDetail
-    participant Request as correctGoodsReceiptDetailRequest
-    participant API as PATCH /api/warehouse/goods-receipts/:id/details/:detailId/corrections
-
-    Warehouse->>Main: selecciona Corregir detalle
-    Main->>Correction: openGoodsReceiptCorrectionModal({ receipt, detail })
-    Correction->>Correction: precarga detalle y recalcula totales previstos
-    Warehouse->>Correction: confirma datos corregidos
-    Correction->>Correction: valida cantidad y costo
-    Correction->>App: { id, detailId, formData }
-    App->>Request: mutación configurada
-    Request->>API: petición JSON
-    API-->>Correction: { correction, code }
-    Correction->>Main: emite goods-receipt-correction:applied
-    Main->>Main: reemplaza documento y refresca detalles/totales
-```
-
-### Devolución de un detalle de material surtido
-
-**Identificador:** `DIA-FE-SEQ-004`. **Caso:** `CU-SAL-06`. La secuencia concreta la
-configuración del componente compartido para una salida de materiales; no usa nombres
-alternativos que también pretendan representar la devolución de merma.
-
-```mermaid
-sequenceDiagram
-    actor Warehouse as Almacén
-    participant Issue as goodsIssueModal
-    participant Return as issueReturn UI
-    participant Domain as initializeGoodsIssueReturns
-    participant App as returnGoodsIssueDetail
-    participant API as PATCH /api/warehouse/goods-issues/:id/details/:detailId/returns
-
-    Warehouse->>Issue: selecciona Devolver en un detalle
-    Issue->>Domain: entrega detalles y documento actual
-    Domain->>Return: abre devolución con cantidad retornable
-    Warehouse->>Return: captura cantidad y confirma
-    Return->>Return: valida límite retornable
-    Return->>App: { id, detailId, formData }
-    App->>API: returnGoodsIssueDetailRequest
-    API-->>App: salida actualizada
-    App-->>Return: respuesta exitosa
-    Return->>Issue: recarga la página y consulta el estado actualizado
-```
-
-### Devolución de un detalle de merma surtida
-
-**Identificador:** `DIA-FE-SEQ-006`. **Caso:** `CU-SAL-12`. Esta vista muestra la
-configuración y el endpoint propios de `WasteIssue`, aunque la UI base sea reutilizada.
-
-```mermaid
-sequenceDiagram
-    actor Warehouse as Almacén
-    participant Issue as wasteIssueModal
-    participant Return as issueReturn UI
-    participant Domain as initializeWasteIssueReturns
-    participant App as returnWasteIssueDetail
-    participant API as PATCH /api/warehouse/waste-issues/:id/details/:detailId/returns
-
-    Warehouse->>Issue: selecciona Devolver en un detalle de merma
-    Issue->>Domain: entrega detalle y salida de merma actual
-    Domain->>Return: abre devolución con cantidad retornable
-    Warehouse->>Return: captura cantidad y confirma
-    Return->>Return: valida límite retornable
-    Return->>App: { id, detailId, formData }
-    App->>API: returnWasteIssueDetailRequest
-    API-->>App: wasteIssueReturn
-    App-->>Return: respuesta exitosa
-    Return->>Issue: recarga la página y consulta la salida actualizada
 ```
 
 ### Estados técnicos complementarios
