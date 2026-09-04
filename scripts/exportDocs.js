@@ -22,6 +22,18 @@ const manualReferences = [
     manualErrorCatalog,
     'docs/user-manual/screenshot-inventory.md'
 ];
+const sequenceGroups = [
+    'authentication',
+    'identity-access',
+    'catalogs',
+    'purchases',
+    'issues',
+    'reports'
+];
+const sequenceDocuments = (side) => [
+    `docs/architecture/${side}-code-sequences/index.md`,
+    ...sequenceGroups.map((group) => `docs/architecture/${side}-code-sequences/${group}.md`)
+];
 const MANIFESTS = Object.freeze({
     'manual-usuario': [...manualCommon, ...manualCases, ...manualReferences],
     'manual-administrador': [
@@ -66,14 +78,16 @@ const MANIFESTS = Object.freeze({
         'docs/architecture/web-navigation-and-screen-catalog.md',
         'docs/architecture/technical-code-documentation.md',
         'docs/architecture/backend-technical-documentation.md',
-        'docs/architecture/backend-code-sequence-diagrams.md',
+        ...sequenceDocuments('backend'),
         'docs/architecture/frontend-technical-documentation.md',
-        'docs/architecture/frontend-code-sequence-diagrams.md',
+        ...sequenceDocuments('frontend'),
         'docs/architecture/traceability-matrix.md',
         'docs/architecture/design-and-construction-patterns.md',
         'docs/architecture/code-diagrams.md',
         'docs/architecture/diagram-conventions.md',
-        'docs/architecture/diagram-inventory.md'
+        'docs/architecture/diagram-inventory.md',
+        'docs/architecture/decisions/index.md',
+        'docs/architecture/decisions/ADR-001-secuencias-por-perspectiva-y-grupo.md'
     ],
     pruebas: [
         'docs/testing/test-plan.md',

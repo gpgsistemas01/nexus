@@ -22,9 +22,29 @@ const DATABASE_AREAS = [
 const USE_CASE_DOCUMENTS = {
     catalog: path.join(ROOT, 'docs/requirements/use-case-descriptions.md'),
     backendMatrix: path.join(ROOT, 'docs/architecture/backend-technical-documentation.md'),
-    backendDiagrams: path.join(ROOT, 'docs/architecture/backend-code-sequence-diagrams.md'),
+    backendDiagrams: path.join(ROOT, 'docs/architecture/backend-code-sequences'),
     frontendMatrix: path.join(ROOT, 'docs/architecture/frontend-technical-documentation.md'),
-    frontendDiagrams: path.join(ROOT, 'docs/architecture/frontend-code-sequence-diagrams.md')
+    frontendDiagrams: path.join(ROOT, 'docs/architecture/frontend-code-sequences')
+};
+
+const readDocumentSource = async (documentPath) => {
+    const entries = await readdir(documentPath, { withFileTypes: true }).catch(() => null);
+    if (!entries) return readFile(documentPath, 'utf8');
+    const chapterOrder = [
+        'index.md',
+        'authentication.md',
+        'identity-access.md',
+        'catalogs.md',
+        'purchases.md',
+        'issues.md',
+        'reports.md'
+    ];
+    const availableFiles = new Set(entries.filter((entry) => entry.isFile()).map((entry) => entry.name));
+    const unexpectedFiles = [...availableFiles].filter((file) => file.endsWith('.md') && !chapterOrder.includes(file));
+    if (unexpectedFiles.length) {
+        throw new Error(`Colección documental con capítulos no registrados: ${unexpectedFiles.join(', ')}`);
+    }
+    return (await Promise.all(chapterOrder.map((file) => readFile(path.join(documentPath, file), 'utf8')))).join('\n');
 };
 
 const toPosix = (value) => value.split(path.sep).join('/');
@@ -67,7 +87,7 @@ const SOURCE_PATH_PATTERN = /src\/[A-Za-z0-9_./-]+\.(?:ejs|js)/g;
 
 const validateUseCaseDiagramCoverage = async () => {
     const sources = new Map(await Promise.all(
-        Object.entries(USE_CASE_DOCUMENTS).map(async ([name, file]) => [name, await readFile(file, 'utf8')])
+        Object.entries(USE_CASE_DOCUMENTS).map(async ([name, file]) => [name, await readDocumentSource(file)])
     ));
     const expectedIds = getUseCaseTableIds(sources.get('catalog'));
     const failures = [];
@@ -93,7 +113,16 @@ const validateUseCaseDiagramCoverage = async () => {
         const prefix = side === 'backend' ? 'BE' : 'FE';
         validateIds(`matriz ${side}`, getUseCaseTableIds(matrix));
         for (const id of expectedIds) {
-            const diagramFile = `${side}-code-sequence-diagrams.md`;
+            const group = id.split('-')[1];
+            const groupFiles = {
+                AUT: 'authentication',
+                IDA: 'identity-access',
+                CAT: 'catalogs',
+                ENT: 'purchases',
+                SAL: 'issues',
+                REP: 'reports'
+            };
+            const diagramFile = `${side}-code-sequences/${groupFiles[group]}.md`;
             const diagramReference = `[\`DIA-${prefix}-${id}\`](${diagramFile}#${id.toLowerCase()})`;
             if (!matrix.includes(diagramReference)) {
                 failures.push(`matriz ${side}: ${id} no enlaza su diagrama aplicado`);
