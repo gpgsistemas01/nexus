@@ -293,6 +293,23 @@ hacia la implementación. Se añadirá otra vista de componentes únicamente si 
 una frontera estable que ninguna vista vigente pueda localizar; agregar
 otra por cantidad de casos o por repetir imports produciría documentación duplicada.
 
+### Enlaces entre diagramas y patrones
+
+UML permite expresar dependencias, notas y estereotipos entre elementos de una misma
+vista, pero no define que un diagrama se incruste dentro de otro. En Nexus tampoco se
+usan enlaces `click` dentro de Mermaid: no funcionan de manera uniforme en GitHub, en
+los paquetes exportados ni en todos los renderizadores. Por ello, la relación entre una
+vista aplicada y su patrón se documenta como metadato Markdown inmediatamente antes del
+bloque, mediante **Identificador**, **Pregunta** y **Patrones**.
+
+Los códigos `DIA-PAT-*` de **Patrones** apuntan conceptualmente al
+[catálogo visual de patrones aplicados](design-and-construction-patterns.md#catálogo-visual-de-patrones-aplicados),
+y la matriz técnica enlaza el `DIA-FE-CU-*` o `DIA-BE-CU-*` concreto. Dentro del bloque
+se muestran únicamente los participantes, relaciones o mensajes que prueban la
+aplicación del patrón; no se agrega un nodo que represente a otro diagrama. Esta forma
+conserva navegación, legibilidad y compatibilidad sin confundir una referencia
+documental con una relación del modelo.
+
 ## Patrones de implementación que deben verse en los diagramas
 
 Los diagramas de arquitectura muestran soluciones que sí tienen evidencia en el
