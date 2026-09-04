@@ -26,6 +26,17 @@ locales mecánicas permanecen en el código para no convertir el diagrama en una
 transcripción ilegible. Cada caso mantiene una secuencia específica aunque reutilice un
 patrón, porque cambian módulos, firmas, rutas, datos o efectos.
 
+### Relación con la documentación técnica
+
+Este archivo es la **fuente canónica del recorrido secuencial por caso**: si cambia el
+orden ruta → controller → servicio → persistencia o efecto, se actualiza aquí. La
+[documentación técnica del backend](backend-technical-documentation.md#relación-entre-la-colección-canónica-y-las-vistas-adicionales)
+explica responsabilidades, mantiene la matriz de trazabilidad y sólo conserva otra vista
+cuando responde una pregunta distinta, por ejemplo una actividad centrada en decisiones,
+un ciclo transaccional o una coordinación transversal. Esas vistas complementarias
+enlazan el `DIA-BE-CU-*` correspondiente; no lo sustituyen ni autorizan mantener una
+segunda secuencia del mismo recorrido.
+
 ### Regla de identificación y lectura
 
 El encabezado `CU-<grupo>-<número>` enlaza directamente la ficha funcional del mismo
@@ -81,27 +92,28 @@ sequenceDiagram
     participant Router as src/routes/api/authApiRoute.js
     participant Controller as «controller»<br/>src/controllers/api/authController.js
     participant Service as «object»<br/>src/services/authService.js
-    participant User as userService
+    participant User as «object»<br/>src/services/admin/userService.js
     participant Prisma as Prisma / PostgreSQL
-    participant Token as jwtService / cookies
+    participant Token as «object»<br/>src/services/jwtService.js
+    participant Cookies as «object»<br/>src/utils/cookiesUtils.js
 
     Browser->>Router: POST /api/auth/login { name, password }
-    Router->>Router: validar tipo y campos
-    Router->>Controller: petición validada
+    Router->>Router: loginValidation(req, res, next) → validateLogin(req, res, next)
+    Router->>Controller: login(req, res)
     Controller->>Service: loginUser({ name, password })
     Service->>User: getUserIdByLogin(name, password)
-    User->>Prisma: buscar cuenta, persona y un acceso
+    User->>Prisma: getDb().user.findUnique({ where: { name }, select })
     Prisma-->>User: usuario o ausencia
-    User->>User: comprobar actividad, acceso y contraseña cifrada
+    User->>User: verifyPassword(password, user.password) y validar isActive/accesses
     User-->>Service: userId o null
     alt Credenciales inválidas o cuenta inactiva
         Service-->>Controller: error de autenticación
         Controller-->>Browser: respuesta de error sin sesión
     else Credenciales válidas
-        Service->>Token: generar access token y refresh token con userId
+        Service->>Token: generateAccessToken(tokenDto) y generateRefreshToken(tokenDto)
         Token-->>Service: credenciales firmadas
         Service-->>Controller: access token y refresh token
-        Controller->>Token: establecer cookies de autenticación
+        Controller->>Cookies: setAuthCookies(res, tokens.newAccessToken, tokens.newRefreshToken)
         Controller-->>Browser: éxito y cookies protegidas
     end
 ```
@@ -113,20 +125,20 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant Client as Cliente HTTP / web
-    participant Route as src/routes/web/auth/logoutWebRoute.js
+    participant Route as «object»<br/>src/routes/web/auth/logoutWebRoute.js
     participant Controller as «controller»<br/>src/controllers/web/authController.js
-    participant Domain as «object»<br/>cookies / redirect
-    Note over Controller,Domain: Variables de frontera: sin variables adicionales
+    participant Response as Respuesta Express
+    Note over Controller,Response: Variables de frontera: sin variables adicionales
 
     Client->>Route: POST /cerrar-sesion
     Route->>Route: ejecutar en orden el middleware configurado para la ruta
     Route->>Controller: controllers/web/authController.logout(req, res)
     activate Controller
-    Controller->>Domain: clearCookie(name, options) y res.redirect(path)
-    activate Domain
-    Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
-    Domain-->>Controller: resultado del servicio o error de dominio tipado
-    deactivate Domain
+    Controller->>Response: clearCookie(name, options) y res.redirect(path)
+    activate Response
+    Response->>Response: comprobar datos de frontera y reglas propias de la operación
+    Response-->>Controller: resultado del servicio o error de dominio tipado
+    deactivate Response
     alt El servicio devuelve el resultado
         Controller-->>Client: status HTTP y cuerpo concretos del controller
     else El servicio propaga un error de dominio
@@ -522,13 +534,13 @@ sequenceDiagram
     participant Router as src/routes/api/warehouse/materialApiRoute.js
     participant Controller as «controller»<br/>src/controllers/api/warehouse/materialController.js
     participant Service as «object»<br/>src/services/warehouse/materials/materialService.js
-    participant Adjustment as Ajustes de existencias
-    participant Reference as Referencias anuales
-    participant Stock as stockHelpers
-    participant Movement as Movimientos de inventario
-    participant SupplierMaterial as Existencias por proveedor
+    participant Adjustment as «object»<br/>src/services/warehouse/adjustmentService.js
+    participant Reference as «object»<br/>src/services/document/referenceNumberService.js
+    participant Stock as «object»<br/>src/services/inventory/stockHelpers.js
+    participant Movement as «object»<br/>src/services/inventory/movementService.js
+    participant SupplierMaterial as «object»<br/>src/services/warehouse/materials/supplierMaterialService.js
     participant Prisma as Prisma / PostgreSQL
-    participant Socket as Eventos de inventario
+    participant Socket as «object»<br/>src/utils/socketUtils.js
 
     Router->>Controller: editMaterialStock(req, res)
     Controller->>Service: updateMaterialStock({ id, materialDto, userId })
@@ -787,7 +799,7 @@ sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route as src/routes/api/warehouse/wasteApiRoute.js
     participant Controller as «controller»<br/>src/controllers/api/warehouse/wasteController.js
-    participant Domain as «object»<br/>src/services/warehouse/wastes/wasteMaterialService.js + src/services/warehouse/wastes/wasteService.js
+    participant Domain as «object»<br/>src/services/warehouse/wastes/wasteMaterialService.js<br/>src/services/warehouse/wastes/wasteService.js
     Note over Controller,Domain: Variables de frontera: req.body/DTO, req.query/params, tx
 
     Client->>Route: GET /api/warehouse/wastes/material-templates y POST /api/warehouse/wastes
@@ -846,12 +858,12 @@ sequenceDiagram
     participant Router as src/routes/api/warehouse/wasteApiRoute.js
     participant Controller as «controller»<br/>src/controllers/api/warehouse/wasteController.js
     participant Service as «object»<br/>src/services/warehouse/wastes/wasteService.js
-    participant Adjustment as Ajustes de merma
-    participant Reference as Referencias anuales
-    participant Stock as stockHelpers
-    participant Movement as Movimientos de merma
+    participant Adjustment as «object»<br/>src/services/warehouse/wastes/wasteStockAdjustmentService.js
+    participant Reference as «object»<br/>src/services/document/referenceNumberService.js
+    participant Stock as «object»<br/>src/services/inventory/stockHelpers.js
+    participant Movement as «object»<br/>src/services/warehouse/wastes/wasteMovementService.js
     participant Prisma as Prisma / PostgreSQL
-    participant Socket as Eventos de inventario
+    participant Socket as «object»<br/>src/utils/socketUtils.js
 
     Router->>Controller: editWasteStock(req, res)
     Controller->>Service: updateWasteStock({ id, wasteStockDto, userId })
@@ -1023,13 +1035,13 @@ sequenceDiagram
     participant Browser as Navegador
     participant Router as src/routes/api/warehouse/goodsReceiptApiRoute.js
     participant Controller as «controller»<br/>src/controllers/api/warehouse/goodsReceiptController.js
-    participant DTO as DTO de entrada
+    participant DTO as «object»<br/>src/dtos/goodsReceiptDTO.js
     participant Service as «object»<br/>src/services/warehouse/goodsReceipts/goodsReceiptService.js
-    participant Reference as referenceNumberService
-    participant DetailBuilder as Constructor de detalles
-    participant Inventory as Inventario de materiales
+    participant Reference as «object»<br/>src/services/document/referenceNumberService.js
+    participant DetailBuilder as «object»<br/>src/services/warehouse/goodsReceipts/goodsReceiptHelpers.js
+    participant Inventory as «object»<br/>src/services/inventory/movementService.js
     participant Prisma as Prisma / PostgreSQL
-    participant Socket as Eventos de inventario
+    participant Socket as «object»<br/>src/utils/socketUtils.js
 
     Browser->>Router: POST /api/warehouse/goods-receipts
     Router->>Router: autenticar, validar y autorizar
@@ -1089,11 +1101,11 @@ sequenceDiagram
     participant Router as src/routes/api/warehouse/goodsReceiptApiRoute.js
     participant Controller as «controller»<br/>src/controllers/api/warehouse/goodsReceiptController.js
     participant Service as «object»<br/>src/services/warehouse/goodsReceipts/detailChanges/goodsReceiptCorrectionService.js
-    participant Change as goodsReceiptDetailChangeService
-    participant Reason as reasonService
-    participant Inventory as movementService
+    participant Change as «object»<br/>src/services/warehouse/goodsReceipts/detailChanges/goodsReceiptDetailChangeService.js
+    participant Reason as «object»<br/>src/services/warehouse/reasonService.js
+    participant Inventory as «object»<br/>src/services/inventory/movementService.js
     participant Prisma as Prisma / PostgreSQL
-    participant Socket as Eventos de inventario
+    participant Socket as «object»<br/>src/utils/socketUtils.js
 
     Router->>Controller: correctGoodsReceiptDetail(req, res)
     Controller->>Service: correctGoodsReceiptDetailLine({ id, detailId, correctionDto, userId })
@@ -1264,11 +1276,11 @@ sequenceDiagram
     participant Browser as Navegador
     participant Router as src/routes/api/warehouse/goodsIssueApiRoute.js
     participant Controller as «controller»<br/>src/controllers/api/warehouse/goodsIssueController.js
-    participant DTO as DTO de detalles de salida
+    participant DTO as «object»<br/>src/dtos/goodsIssueDTO.js
     participant Service as «object»<br/>src/services/warehouse/goodsIssues/goodsIssueService.js
-    participant Inventory as Inventario de materiales
+    participant Inventory as «object»<br/>src/services/inventory/movementService.js
     participant Prisma as Prisma / PostgreSQL
-    participant Socket as Eventos de inventario
+    participant Socket as «object»<br/>src/utils/socketUtils.js
 
     Browser->>Router: PATCH /:id/details
     Router->>Router: autenticar, validar y autorizar
@@ -1301,26 +1313,25 @@ sequenceDiagram
     participant Router as src/routes/api/warehouse/goodsIssueApiRoute.js
     participant Controller as «controller»<br/>src/controllers/api/warehouse/goodsIssueController.js
     participant Service as «object»<br/>src/services/warehouse/goodsIssues/detailReturns/goodsIssueReturnService.js
-    participant Rules as Reglas de devolución de material
-    participant Inventory as Inventario de materiales
-    participant Status as Estados de surtimiento
+    participant Inventory as «object»<br/>src/services/inventory/movementService.js
+    participant Status as «object»<br/>src/services/warehouse/issues/issueFulfillmentRules.js
     participant Prisma as Prisma / PostgreSQL
-    participant Socket as Eventos de inventario
+    participant Socket as «object»<br/>src/utils/socketUtils.js
 
     Browser->>Router: PATCH /:id/details/:detailId/returns
     Router->>Router: autenticar, validar y autorizar
     Router->>Controller: req, res
-    Controller->>Service: { id, detailId, returnDto, userId }
-    Service->>Prisma: iniciar $transaction
+    Controller->>Service: returnGoodsIssueDetail({ id, detailId, returnDto, userId })
+    Service->>Prisma: getDb().$transaction(async tx)
     Service->>Prisma: cargar salida y detalle surtido
-    Service->>Rules: validar estado, cantidad surtida y devoluciones previas
+    Service->>Service: validar estado, cantidad surtida y devoluciones previas
     alt Cantidad no retornable
-        Rules-->>Service: error de dominio
+        Service-->>Service: error de dominio
         Service-->>Controller: rollback y error
     else Cantidad válida
         Service->>Inventory: incrementar existencia y crear movimiento inverso con tx
         Service->>Prisma: crear GoodsIssueReturn
-        Service->>Status: recalcular detalle y encabezado con tx
+        Service->>Status: resolveIssueFulfillmentStatus(refreshedDetails)
         Prisma-->>Service: salida actualizada y commit
         Service-->>Controller: salida y devolución
         Controller->>Socket: publicar después del commit
@@ -1454,12 +1465,12 @@ sequenceDiagram
     participant Router as src/routes/api/warehouse/wasteIssueApiRoute.js
     participant Controller as «controller»<br/>src/controllers/api/warehouse/wasteIssueController.js
     participant Service as «object»<br/>src/services/warehouse/wasteIssues/wasteIssueService.js
-    participant Rules as issueFulfillmentRules
-    participant Movement as Movimientos de merma
-    participant Stock as Existencias de merma
-    participant Status as Estados de surtimiento de merma
+    participant Rules as «object»<br/>src/services/warehouse/issues/issueFulfillmentRules.js
+    participant Movement as «object»<br/>src/services/warehouse/wastes/wasteMovementService.js
+    participant Stock as «object»<br/>src/services/warehouse/wastes/wasteInventoryService.js
+    participant Status as «object»<br/>src/services/warehouse/wasteIssues/wasteIssueFulfillmentService.js
     participant Prisma as Prisma / PostgreSQL
-    participant Socket as Eventos de inventario
+    participant Socket as «object»<br/>src/utils/socketUtils.js
 
     Router->>Controller: editWasteIssueDetails(req, res)
     Controller->>Service: updateWasteIssueDetails({ id, details: wasteIssueDto.details })
@@ -1489,22 +1500,20 @@ sequenceDiagram
     participant Router as src/routes/api/warehouse/wasteIssueApiRoute.js
     participant Controller as «controller»<br/>src/controllers/api/warehouse/wasteIssueController.js
     participant Service as «object»<br/>src/services/warehouse/wasteIssues/detailReturns/wasteIssueReturnService.js
-    participant Rules as Reglas de devolución de merma
-    participant Inventory as Inventario de mermas
-    participant Status as Estados de surtimiento de merma
+    participant Status as «object»<br/>src/services/warehouse/wasteIssues/wasteIssueFulfillmentService.js
     participant Prisma as Prisma / PostgreSQL
-    participant Socket as Eventos de inventario
+    participant Socket as «object»<br/>src/utils/socketUtils.js
 
     Router->>Controller: registerWasteIssueDetailReturn(req, res)
     Controller->>Service: returnWasteIssueDetail({ id, detailId, returnDto, userId })
     Service->>Prisma: iniciar $transaction
     Service->>Prisma: cargar WasteIssue y WasteIssueDetail surtido
-    Service->>Rules: validar estado, cantidad surtida y devoluciones previas
+    Service->>Service: validar estado, cantidad surtida y devoluciones previas
     alt Cantidad de merma no retornable
-        Rules-->>Service: error de dominio
+        Service-->>Service: error de dominio
         Service-->>Controller: rollback y error
     else Cantidad válida
-        Service->>Inventory: devolver existencia de merma con tx
+        Service->>Service: aplicar devolución de existencia de merma con tx
         Service->>Prisma: crear WasteIssueReturn
         Service->>Status: recalcular detalle y encabezado con tx
         Prisma-->>Service: salida de merma actualizada y commit
@@ -1558,7 +1567,7 @@ sequenceDiagram
     Route->>Route: ejecutar en orden el middleware configurado para la ruta
     Route->>Controller: getAllMaterialMovements(req, res)
     activate Controller
-    Controller->>Domain: movementQueryService.findAllMaterialMovements, sólo lectura
+    Controller->>Domain: findAllMaterialMovements(getMovementListParams(req))
     activate Domain
     Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
     Domain-->>Controller: resultado del servicio o error de dominio tipado
@@ -1580,7 +1589,7 @@ sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route as src/routes/api/warehouse/reportApiRoute.js
     participant Controller as «controller»<br/>src/controllers/api/warehouse/reportController.js
-    participant Domain as «object»<br/>src/services/warehouse/reportService.js + src/utils/reportExcelUtils.js
+    participant Domain as «object»<br/>src/services/warehouse/reportService.js<br/>src/utils/reportExcelUtils.js
     Note over Controller,Domain: Variables de frontera: req.query/params
 
     Client->>Route: GET /api/warehouse/reports/inventory/excel
@@ -1609,7 +1618,7 @@ sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route as src/routes/api/warehouse/reportApiRoute.js
     participant Controller as «controller»<br/>src/controllers/api/warehouse/reportController.js
-    participant Domain as «object»<br/>src/services/warehouse/reportService.js + src/utils/reportExcelUtils.js
+    participant Domain as «object»<br/>src/services/warehouse/reportService.js<br/>src/utils/reportExcelUtils.js
     Note over Controller,Domain: Variables de frontera: req.query/params
 
     Client->>Route: GET /api/warehouse/reports/goods-issues/excel
@@ -1645,7 +1654,7 @@ sequenceDiagram
     Route->>Route: ejecutar en orden el middleware configurado para la ruta
     Route->>Controller: exportMovementReport(req, res)
     activate Controller
-    Controller->>Domain: inventory/reportService.findMovementReportRows y respuesta Excel
+    Controller->>Domain: findMovementReportRows({ context: 'materials', ...getMovementReportParams(req.query) })
     activate Domain
     Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
     Domain-->>Controller: resultado del servicio o error de dominio tipado
@@ -1703,7 +1712,7 @@ sequenceDiagram
     Route->>Route: ejecutar en orden el middleware configurado para la ruta
     Route->>Controller: getAllWasteMovements(req, res)
     activate Controller
-    Controller->>Domain: movementQueryService.findAllWasteMovements, sólo lectura
+    Controller->>Domain: findAllWasteMovements(getMovementListParams(req))
     activate Domain
     Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
     Domain-->>Controller: resultado del servicio o error de dominio tipado
@@ -1725,7 +1734,7 @@ sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route as src/routes/api/warehouse/reportApiRoute.js
     participant Controller as «controller»<br/>src/controllers/api/warehouse/reportController.js
-    participant Domain as «object»<br/>src/services/warehouse/reportService.js + src/utils/reportExcelUtils.js
+    participant Domain as «object»<br/>src/services/warehouse/reportService.js<br/>src/utils/reportExcelUtils.js
     Note over Controller,Domain: Variables de frontera: req.query/params
 
     Client->>Route: GET /api/warehouse/reports/waste-issues/excel
@@ -1754,7 +1763,7 @@ sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route as src/routes/api/warehouse/reportApiRoute.js
     participant Controller as «controller»<br/>src/controllers/api/warehouse/reportController.js
-    participant Domain as «object»<br/>src/services/warehouse/reportService.js + src/utils/reportExcelUtils.js
+    participant Domain as «object»<br/>src/services/warehouse/reportService.js<br/>src/utils/reportExcelUtils.js
     Note over Controller,Domain: Variables de frontera: req.query/params
 
     Client->>Route: GET /api/warehouse/reports/wastes/excel
@@ -1790,7 +1799,7 @@ sequenceDiagram
     Route->>Route: ejecutar en orden el middleware configurado para la ruta
     Route->>Controller: exportWasteMovementReport(req, res)
     activate Controller
-    Controller->>Domain: inventory/reportService.findMovementReportRows en contexto merma y respuesta Excel
+    Controller->>Domain: findMovementReportRows({ context: 'wastes', ...getMovementReportParams(req.query) })
     activate Domain
     Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
     Domain-->>Controller: resultado del servicio o error de dominio tipado
@@ -1812,7 +1821,7 @@ sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route as src/routes/api/warehouse/reportApiRoute.js
     participant Controller as «controller»<br/>src/controllers/api/warehouse/reportController.js
-    participant Domain as «object»<br/>src/services/warehouse/reportService.js + src/utils/reportExcelUtils.js
+    participant Domain as «object»<br/>src/services/warehouse/reportService.js<br/>src/utils/reportExcelUtils.js
     Note over Controller,Domain: Variables de frontera: req.query/params
 
     Client->>Route: GET /api/warehouse/reports/goods-receipts/excel
@@ -1841,7 +1850,7 @@ sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route as src/routes/api/warehouse/reportApiRoute.js
     participant Controller as «controller»<br/>src/controllers/api/warehouse/reportController.js
-    participant Domain as «object»<br/>src/services/warehouse/reportService.js + src/utils/reportExcelUtils.js
+    participant Domain as «object»<br/>src/services/warehouse/reportService.js<br/>src/utils/reportExcelUtils.js
     Note over Controller,Domain: Variables de frontera: req.query/params
 
     Client->>Route: GET /api/warehouse/reports/suppliers/excel
@@ -1870,7 +1879,7 @@ sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route as src/routes/api/sales/reportApiRoute.js
     participant Controller as «controller»<br/>src/controllers/api/sales/reportController.js
-    participant Domain as «object»<br/>src/services/sales/clientService.js + src/utils/reportExcelUtils.js
+    participant Domain as «object»<br/>src/services/sales/clientService.js<br/>src/utils/reportExcelUtils.js
     Note over Controller,Domain: Variables de frontera: req.query/params
 
     Client->>Route: GET /api/sales/reports/clients/excel
@@ -1899,7 +1908,7 @@ sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route as src/routes/api/admin/reportApiRoute.js
     participant Controller as «controller»<br/>src/controllers/api/admin/reportController.js
-    participant Domain as «object»<br/>src/services/admin/person/personService.js + src/utils/reportExcelUtils.js
+    participant Domain as «object»<br/>src/services/admin/person/personService.js<br/>src/utils/reportExcelUtils.js
     Note over Controller,Domain: Variables de frontera: req.query/params
 
     Client->>Route: GET /api/admin/reports/persons/excel
@@ -1928,7 +1937,7 @@ sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route as src/routes/api/admin/reportApiRoute.js
     participant Controller as «controller»<br/>src/controllers/api/admin/reportController.js
-    participant Domain as «object»<br/>src/services/admin/userService.js + src/utils/reportExcelUtils.js
+    participant Domain as «object»<br/>src/services/admin/userService.js<br/>src/utils/reportExcelUtils.js
     Note over Controller,Domain: Variables de frontera: req.query/params
 
     Client->>Route: GET /api/admin/reports/users/excel

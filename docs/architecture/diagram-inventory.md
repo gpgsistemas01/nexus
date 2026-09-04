@@ -25,9 +25,8 @@ registra **271 diagramas vigentes**: 266 curados y 5 generados.
 | `DIA-ARQ-EST-001` | Estados de acceso | `architecture-and-web-views.md#estados-de-acceso-y-sesión` | 1 | Sesión y rutas; curado. |
 | `DIA-ARQ-NAV-001..002` | Navegación y redirecciones | Mapa de sitio y redirecciones de `architecture-and-web-views.md` | 2 | Rutas web y menú; curado. |
 | `DIA-BE-CMP-001..002` | Capas y registro de rutas | “Relación entre ambas capas” y “Registro de rutas” del backend | 2 | Código backend; curado. |
-| `DIA-BE-SEQ-001..010` | Secuencias de surtimiento, autenticación, entrada, corrección, devoluciones, auditoría y ajustes de existencia | Backend, “Vistas técnicas aplicadas” | 10 | Controllers, servicios, transacciones y efectos posteriores; curado por caso. |
+| `DIA-BE-SEQ-006` | Secuencia transversal de auditoría de escrituras | Backend, “Vistas técnicas aplicadas” | 1 | Ejecución posterior a la respuesta y garantía *best effort*; complementa todos los casos de escritura sin duplicar su recorrido. |
 | `DIA-BE-ACT-001..002` | Actividades de surtimiento y cancelación | Backend, “Vistas técnicas aplicadas” | 2 | Decisiones y errores de servicios; curado. |
-| `DIA-FE-SEQ-001..004`, `DIA-FE-SEQ-006` | Secuencias de ajuste, login, corrección y devoluciones de material y merma | Frontend, “Vistas técnicas aplicadas por flujo” | 5 | Página, aplicación, UI y transporte; curado por caso. `DIA-FE-SEQ-005` se retiró porque separaba la exportación de su módulo propietario. |
 | `DIA-FE-ACT-001` | Actividad de alta de merma desde plantilla | Frontend, “Alta de merma…” | 1 | Dependencias y validación del navegador; curado. |
 | `DIA-FE-CU-AUT-01..REP-15` | Secuencia de ejecución frontend por caso | `frontend-code-sequence-diagrams.md` | 63 | Página/interacción, aplicación, request y resultado concretos; curado desde la matriz frontend. |
 | `DIA-BE-CU-AUT-01..REP-15` | Secuencia de ejecución backend por caso | `backend-code-sequence-diagrams.md` | 63 | Ruta/controller, servicio, persistencia o efecto concretos; curado desde la matriz backend. |
