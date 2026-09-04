@@ -54,17 +54,17 @@ La referencia identifica las soluciones aplicadas sin repetirlas dentro de Merma
 implementación se reconoce directamente por las rutas `src/...`, símbolos y llamadas
 del recorrido concreto.
 
-| Código | Patrón aplicado | Elementos que permiten reconocerlo |
-| --- | --- | --- |
-| `FE-P01` | Capas del navegador | Página/UI → aplicación → servicio HTTP → endpoint. |
-| `FE-P02` | Factory CRUD | `createCrudApplication` configurada con requests y claves del recurso. |
-| `FE-P03` | Factory/adaptador de catálogo | `createApplicationList` + request y transformación de opciones. |
-| `FE-P04` | Mutación por composición | Operación adicional incorporada al CRUD sin herencia. |
-| `FE-P05` | Composición de salidas | `createIssueApplication` configurada para material o merma. |
-| `FE-P06` | UI de devolución compartida | `issueReturnUI` parametrizada por el contexto de la salida. |
-| `FE-P07` | Consulta tabular | DataTable + filtros + aplicación de lectura contextual. |
-| `FE-P08` | Factory de reporte | `createReportApplication` + `buildExcelButton` y request de descarga. |
-| `FE-P09` | Navegación compuesta | Formulario o layout común coordina navegación/sesión sin duplicar el endpoint. |
+| Código | Patrón aplicado | Vista canónica | Elementos que permiten reconocerlo |
+| --- | --- | --- | --- |
+| `FE-P01` | Capas del navegador | [`DIA-PAT-EST-001`](design-and-construction-patterns.md#estructura-por-dominio-capas-y-fronteras) | Página/UI → aplicación → servicio HTTP → endpoint. |
+| `FE-P02` | Factory CRUD | [`DIA-PAT-CON-001`](design-and-construction-patterns.md#factories-y-composición-sobre-herencia) | `createCrudApplication` configurada con requests y claves del recurso. |
+| `FE-P03` | Factory/adaptador de catálogo | [`DIA-PAT-CON-001`](design-and-construction-patterns.md#factories-y-composición-sobre-herencia) | `createApplicationList` + request y transformación de opciones. |
+| `FE-P04` | Mutación por composición | [`DIA-PAT-CON-001`](design-and-construction-patterns.md#factories-y-composición-sobre-herencia) | Operación adicional incorporada al CRUD sin herencia. |
+| `FE-P05` | Composición de salidas | [`DIA-PAT-CON-001`](design-and-construction-patterns.md#factories-y-composición-sobre-herencia) | `createIssueApplication` configurada para material o merma. |
+| `FE-P06` | UI de devolución compartida | [`DIA-PAT-EST-001`](design-and-construction-patterns.md#estructura-por-dominio-capas-y-fronteras) | `issueReturnUI` parametrizada por el contexto de la salida. |
+| `FE-P07` | Consulta tabular | [`DIA-PAT-EST-001`](design-and-construction-patterns.md#estructura-por-dominio-capas-y-fronteras) | DataTable + filtros + aplicación de lectura contextual. |
+| `FE-P08` | Factory de reporte | [`DIA-PAT-CON-001`](design-and-construction-patterns.md#factories-y-composición-sobre-herencia) | `createReportApplication` + `buildExcelButton` y request de descarga. |
+| `FE-P09` | Navegación compuesta | [`DIA-PAT-EST-001`](design-and-construction-patterns.md#estructura-por-dominio-capas-y-fronteras) | Formulario o layout común coordina navegación/sesión sin duplicar el endpoint. |
 
 ### Cobertura de casos frontend
 
