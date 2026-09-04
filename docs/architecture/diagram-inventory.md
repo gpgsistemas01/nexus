@@ -22,8 +22,8 @@ registra **272 diagramas vigentes**: 266 curados y 6 generados.
 | `DIA-ARQ-DEP-001..002` | Despliegue actual y objetivo | Secciones “Despliegue” de `architecture-and-web-views.md` | 2 | Infraestructura y configuración; curado. |
 | `DIA-ARQ-CMP-001` | Componentes | `architecture-and-web-views.md#componentes-de-aplicación` | 1 | Diseño por capas; curado. |
 | `DIA-ARQ-SEQ-001` | Secuencia extremo a extremo | `architecture-and-web-views.md#recorrido-de-una-interacción` | 1 | Interacción representativa; curado. |
-| `DIA-ARQ-EST-001` | Estados de acceso | `architecture-and-web-views.md#estados-de-acceso-y-sesión` | 1 | Sesión y rutas; curado. |
-| `DIA-ARQ-NAV-001..002` | Navegación y redirecciones | Mapa de sitio y redirecciones de `architecture-and-web-views.md` | 2 | Rutas web y menú; curado. |
+| `DIA-ARQ-EST-001` | Estados de acceso | `web-navigation-and-screen-catalog.md#estados-de-acceso-y-sesión` | 1 | Sesión y rutas; curado. |
+| `DIA-ARQ-NAV-001..002` | Navegación y redirecciones | Mapa de sitio y redirecciones de `web-navigation-and-screen-catalog.md` | 2 | Rutas web y menú; curado. |
 | `DIA-BE-CMP-001..002` | Capas y registro de rutas | “Relación entre ambas capas” y “Registro de rutas” del backend | 2 | Código backend; curado. |
 | `DIA-BE-SEQ-006` | Secuencia transversal de auditoría de escrituras | Backend, “Vistas técnicas aplicadas” | 1 | Ejecución posterior a la respuesta y garantía *best effort*; complementa todos los casos de escritura sin duplicar su recorrido. |
 | `DIA-BE-ACT-001..002` | Actividades de surtimiento y cancelación | Backend, “Vistas técnicas aplicadas” | 2 | Decisiones y errores de servicios; curado. |

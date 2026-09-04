@@ -61,7 +61,9 @@ const MANIFESTS = Object.freeze({
         'docs/requirements/business-glossary.md'
     ],
     arquitectura: [
+        'docs/architecture/index.md',
         'docs/architecture/architecture-and-web-views.md',
+        'docs/architecture/web-navigation-and-screen-catalog.md',
         'docs/architecture/technical-code-documentation.md',
         'docs/architecture/backend-technical-documentation.md',
         'docs/architecture/backend-code-sequence-diagrams.md',

@@ -33,6 +33,14 @@ concreta, sin convertir cada archivo en un documento independiente.
 | Justificación | La prosa explica separación entre transporte y dominio, reutilización y límite transaccional cuando no son evidentes por el nombre. | Bloques explicados y referencias al patrón propietario. |
 | Trazabilidad | La explicación enlaza código, contrato HTTP, requisito y evidencia ejecutable sin copiar sus reglas. | Guía técnica, contrato API, mapa generado y plan de pruebas. |
 
+Las correspondencias entre vistas también se adoptan de manera selectiva. En Nexus,
+una secuencia aplicada declara códigos `FE-P*` o `BE-P*`, y el índice de su colección
+los relaciona con un identificador canónico `DIA-PAT-*`. Así puede recorrerse la
+manifestación concreta hacia el patrón sin incrustar un diagrama dentro de otro. La
+[convención de enlace](../architecture/diagram-conventions.md#enlaces-entre-diagramas-y-patrones)
+es local: 42010 y 1016 orientan la separación, las relaciones y la trazabilidad entre
+vistas, pero no prescriben esos códigos, Markdown ni Mermaid.
+
 Los campos **nombre, firma, entrada/salida, efecto y evidencia** son la plantilla local
 elegida para hacer verificable esa alineación. ISO/IEC/IEEE 1016 no obliga a usar
 Markdown, Mermaid, JSDoc ni esos encabezados. Una evaluación contractual de conformidad

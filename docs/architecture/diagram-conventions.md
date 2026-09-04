@@ -360,6 +360,42 @@ aplicación del patrón; no se agrega un nodo que represente a otro diagrama. Es
 conserva navegación, legibilidad y compatibilidad sin confundir una referencia
 documental con una relación del modelo.
 
+La relación se resuelve en dos saltos verificables: la línea **Patrones** del caso usa
+un código local `FE-P*` o `BE-P*`; el índice rápido de su colección traduce ese código
+a una vista estable `DIA-PAT-*` y enlaza su ubicación canónica. El código local expresa
+cómo se manifiesta el patrón en esa perspectiva, mientras `DIA-PAT-*` conserva una sola
+explicación y representación del patrón compartido. Si un patrón no tiene evidencia
+suficiente para una vista canónica, no se incorpora al índice aplicado.
+
+Esta es una convención documental de Nexus, no una sintaxis exigida por UML o por una
+norma ISO. La aplicación selectiva de ISO/IEC/IEEE 42010 justifica declarar relaciones
+entre vistas y mantener correspondencias trazables; ISO/IEC/IEEE 1016 ayuda a relacionar
+elementos, interfaces, vistas y justificación del diseño. Ninguna de las dos prescribe
+Mermaid, el campo **Patrones**, los códigos `DIA-PAT-*` ni enlaces entre bloques. Esos
+mecanismos locales implementan la trazabilidad sin afirmar conformidad formal.
+
+### Simetría de detalle entre secuencias frontend y backend
+
+Las dos colecciones tienen el mismo **nivel de evidencia**, pero no necesitan el mismo
+número de participantes ni mensajes. Ambas deben identificar archivos reales, variables
+de frontera, al menos dos firmas comprobables y un recorrido ordenado con un mínimo de
+siete mensajes. `npm run docs:check` aplica ese piso común a frontend y backend.
+
+El contenido se detiene en la responsabilidad de cada perspectiva:
+
+- frontend muestra interacción, recolección o validación, aplicación, servicio HTTP,
+  respuesta o error normalizado y efecto visible;
+- backend muestra ruta y middleware, controller/DTO, servicio, persistencia o efecto,
+  respuesta HTTP y propagación del error;
+- una coordinación especializada se agrega sólo donde realmente ocurre. El frontend no
+  reproduce transacciones o consultas internas del servidor, y el backend no simula
+  estados visuales del navegador para igualar artificialmente el tamaño del diagrama.
+
+Por tanto, la paridad se evalúa por trazabilidad y resultado observable, no por igualdad
+gráfica. Si un flujo frontend contiene una factory, un adaptador, validación especializada
+o coordinación de UI relevante, esos participantes sí se muestran; los temporales
+mecánicos permanecen en el código igual que en backend.
+
 ## Patrones de implementación que deben verse en los diagramas
 
 Los diagramas de arquitectura muestran soluciones que sí tienen evidencia en el

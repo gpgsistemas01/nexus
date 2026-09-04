@@ -87,7 +87,7 @@ Los registros centrales `src/routes/api/index.js` y `src/routes/web/index.js` co
 los routers por dominio y evitan que `src/app.js` mezcle el arranque de infraestructura
 con el catálogo de endpoints. Las convenciones equivalentes entre backend y frontend,
 incluyendo reutilización de componentes y ubicación de pruebas CRUD, se detallan en el
-[mapa visual de arquitectura y vistas web](docs/architecture/architecture-and-web-views.md#5-organización-consistente-de-front-y-back).
+[descripción de arquitectura y construcción](docs/architecture/architecture-and-web-views.md#3-organización-consistente-de-front-y-back).
 
 ## Documentación
 
