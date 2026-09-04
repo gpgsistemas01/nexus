@@ -19,6 +19,20 @@ cumplimiento formal.
 | ISO/IEC/IEEE 42010:2022 | Sólo arquitectura. | Interesados, preocupaciones, alcance y semántica de las vistas arquitectónicas. | No gobierna la redacción de requisitos ni convierte Mermaid en UML o C4 formal. |
 | ISO/IEC 27001 e ISO 9001 | No aplicables como sistema de gestión por decisión del repositorio. | Sus temas pueden originar requisitos concretos si existe una obligación organizacional. | Nexus no declara un SGSI, un sistema de gestión de calidad ni certificación. |
 
+### Aplicación de marcos prácticos no normativos
+
+Las normas anteriores se complementan con prácticas de organización que no constituyen
+certificación. Su aplicación detallada y los criterios de división se mantienen en
+[Buenas prácticas para organizar la documentación](documentation-practices.md).
+
+| Práctica | Aplicación en Nexus | Límite declarado |
+| --- | --- | --- |
+| Diátaxis | Se distingue guía práctica, referencia, explicación y aprendizaje según la necesidad de quien lee. | No se cuadruplica contenido ni se fuerza una plantilla única. |
+| arc42 | Se usa como lista de cobertura para contexto, construcción, ejecución, despliegue, decisiones y calidad. | No se declara adopción integral ni se reemplazan los artefactos propietarios. |
+| Modelo C4 | Se aplica revelado progresivo entre contexto, contenedores, componentes y detalle de código. | Mermaid y las convenciones locales no se presentan automáticamente como C4 formal. |
+| ADR | Las decisiones arquitectónicas transversales conservan contexto, alternativas y consecuencias. | No se crea un registro para cambios editoriales o locales. |
+| Docs as Code | Markdown, Git, generación, comprobaciones y manifiestos de publicación forman un flujo reproducible. | La automatización no inventa decisiones curadas ni versiona resultados de `build/docs`. |
+
 ### Aplicación de ISO/IEC/IEEE 1016 a la referencia técnica
 
 La adopción es deliberadamente parcial. Nexus usa conceptos de descripción de diseño

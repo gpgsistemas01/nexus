@@ -29,7 +29,8 @@ por capas** y una correspondencia de **MVC web extendido**.
 | ¿Dónde se ejecutan cliente, servidor y persistencia? | Contenedores y despliegue en la descripción de arquitectura. | Curado cuando cambia la topología. |
 | ¿Cuál es el patrón arquitectónico y cómo se dividen las responsabilidades? | Componentes y organización por capas en la descripción; catálogo de patrones para la justificación. | Curado cuando cambia una decisión de diseño. |
 | ¿Qué dependencias existen realmente en el código? | Mapa generado y diagramas vigentes del código. | `npm run docs:architecture` y revisión manual, respectivamente. |
-| ¿Cómo se ejecuta un caso de uso concreto? | Secuencias de código de [backend](backend-code-sequence-diagrams.md) y [frontend](frontend-code-sequence-diagrams.md). | Curado junto con el caso afectado. |
+| ¿Cómo se ejecuta un caso de uso concreto? | Secuencias de código de [backend](backend-code-sequences/index.md) y [frontend](frontend-code-sequences/index.md), divididas por grupo funcional. | Curado junto con el caso afectado. |
+| ¿Por qué se eligió una alternativa arquitectónica transversal? | [Registros de decisiones](decisions/index.md). | Crear o reemplazar un ADR cuando cambie una decisión relevante. |
 | ¿Cómo navega una persona por las pantallas? | Navegación y catálogo de pantallas web. | Curado junto con rutas, permisos y vistas. |
 | ¿Qué diagramas existen y qué notación usan? | [Inventario](diagram-inventory.md) y [convenciones](diagram-conventions.md). | Actualizar al agregar, retirar o cambiar una vista. |
 
