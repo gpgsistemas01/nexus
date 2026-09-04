@@ -1,7 +1,14 @@
-body { font-family: Arial, sans-serif; line-height: 1.5; color: #20242a; max-width: 1050px; margin: auto; }
+body { font-family: Arial, sans-serif; font-size: 11pt; line-height: 1.5; color: #20242a; max-width: 1050px; margin: auto; padding: 2rem; }
+#title-block-header { min-height: 70vh; display: flex; flex-direction: column; justify-content: center; text-align: center; border-bottom: 2px solid #17365d; page-break-after: always; }
+#title-block-header .title { font-size: 2.4rem; margin-bottom: 1rem; }
+#title-block-header .subtitle { color: #46566b; font-size: 1.15rem; }
+#title-block-header .author, #title-block-header .date { margin: 0.25rem; }
 h1, h2, h3 { color: #17365d; page-break-after: avoid; }
+p { orphans: 3; widows: 3; }
+code { font-family: "Courier New", monospace; background: #f3f5f7; padding: 0.1rem 0.2rem; }
+blockquote { border-left: 4px solid #9aa4b2; margin-left: 0; padding-left: 1rem; color: #46566b; }
 table { border-collapse: collapse; width: 100%; }
 th, td { border: 1px solid #9aa4b2; padding: 0.4rem; vertical-align: top; }
 th { background: #dce6f1; }
 img { max-width: 100%; height: auto; }
-@media print { h1 { page-break-before: always; } h1:first-of-type { page-break-before: avoid; } }
+@media print { body { max-width: none; padding: 0; } h1 { page-break-before: always; } h1:first-of-type { page-break-before: avoid; } }
