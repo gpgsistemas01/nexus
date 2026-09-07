@@ -254,6 +254,7 @@ try {
             '--file-scope',
             '--standalone',
             '--toc',
+            '--metadata=toc-title:Tabla de contenido',
             '--lof',
             '--metadata=lang:es-MX',
             '--metadata=lof-title:Índice de imágenes',
