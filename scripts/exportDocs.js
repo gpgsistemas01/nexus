@@ -283,7 +283,7 @@ try {
         const scopedSources = preparedSources.map((source) => path.relative(temporaryDirectory, source));
         const args = [
             ...scopedSources,
-            '--from=gfm+header_attributes+implicit_figures',
+            '--from=markdown+header_attributes+implicit_figures',
             '--file-scope',
             '--standalone',
             '--toc',
