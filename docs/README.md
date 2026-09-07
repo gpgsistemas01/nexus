@@ -234,10 +234,12 @@ no sustituyen la instalación requerida por este proyecto. `npm run docs:export`
    - **macOS:** descarga e instala [MacTeX](https://tug.org/mactex/mactex-download.html) y vuelve a
      abrir la terminal.
 
-   En todos los casos, comprueba la instalación con `xelatex --version`. Sólo al ejecutar una
-   exportación PDF, indica al script cuál motor debe usar. La variable se coloca en la misma
-   terminal desde la que se ejecuta `docs:export`; no se agrega al código ni es necesario
-   guardarla en `.env`:
+   En todos los casos, comprueba la instalación con `xelatex --version`. Al ejecutar una
+   exportación PDF, indica explícitamente al script cuál motor debe usar para que Pandoc no dependa
+   del motor predeterminado de cada estación. `DOCS_PDF_ENGINE` es opcional para el script: si se
+   omite, Pandoc selecciona su motor predeterminado, que también debe estar instalado. Para seguir
+   el flujo reproducible recomendado, define la variable en la misma terminal desde la que se
+   ejecuta `docs:export`; no se agrega al código ni es necesario guardarla en `.env`:
 
    ```powershell
    # PowerShell (Windows)
@@ -251,8 +253,8 @@ no sustituyen la instalación requerida por este proyecto. `npm run docs:export`
    ```
 
    En PowerShell la variable permanece durante esa sesión de terminal; puede retirarla después con
-   `Remove-Item Env:DOCS_PDF_ENGINE`. Sustituye `<paquete>` por un valor de la tabla siguiente,
-   por ejemplo `todos`.
+   `Remove-Item Env:DOCS_PDF_ENGINE`. En Bash, la asignación mostrada sólo aplica a ese comando.
+   Sustituye `<paquete>` por un valor de la tabla siguiente, por ejemplo `todos`.
 
 5. Valida siempre el paquete con `--check` antes de generar el archivo.
 
