@@ -87,7 +87,7 @@ Pandoc y Playwright intervienen en etapas distintas y ninguno sustituye al otro:
 | Node.js y dependencias (`npm ci`) | Ejecutan los scripts del repositorio. | Todos los comandos `npm run docs:*`. |
 | Playwright y Chromium (instalación opcional) | Abren Nexus y generan las capturas del manual. Sólo se necesitan al actualizar imágenes. | `npm run docs:screenshots` |
 | Mermaid CLI (instalación opcional) | Convierte cada bloque Mermaid en una imagen temporal para la exportación. | Lo invoca automáticamente `docs:export` cuando el paquete contiene diagramas. |
-| Pandoc (herramienta del sistema) | Ensambla el Markdown y las imágenes existentes para generar DOCX o PDF. | `npm run docs:export -- <paquete> <formato>` |
+| Pandoc (herramienta del sistema) | Ensambla el Markdown y las imágenes existentes, convierte la navegación del paquete en hipervínculos internos y genera un índice de imágenes para DOCX o PDF. | `npm run docs:export -- <paquete> <formato>` |
 | XeLaTeX u otro motor PDF (herramienta del sistema) | Compone el PDF solicitado por Pandoc; no se necesita para DOCX. | Sólo `docs:export` con formato `pdf`. |
 
 Una extensión de Playwright para Visual Studio Code tampoco reemplaza estas herramientas: puede
@@ -154,16 +154,23 @@ DOCX y PDF. Se aplican estas reglas:
 | --- | --- | --- |
 | Imagen versionada, incluida una captura | `![texto alternativo](ruta/relativa.png)` dentro de la sección que la explica. | Una ruta absoluta de la estación de trabajo o un enlace a la propia imagen. |
 | Diagrama Mermaid | Un encabezado descriptivo seguido de un bloque cercado `mermaid`. El encabezado es la referencia y se convierte en la leyenda al exportar. | Una ruta hacia el PNG generado: ese archivo no existe en las fuentes versionadas y lo crea el exportador bajo `build/docs/diagrams/`. |
-| Referencia hacia otra sección o documento | Un enlace Markdown relativo, por ejemplo `[casos de uso](requirements/use-case-descriptions.md)`. | Un campo de referencia agregado después sólo en Word. |
+| Referencia hacia otra sección del mismo archivo | Un enlace Markdown al ancla, por ejemplo `[preparación](#preparar-las-herramientas)`. | Una ruta al archivo fuente. |
+| Referencia hacia otro Markdown incluido en el paquete | Un enlace Markdown relativo, por ejemplo `[casos de uso](requirements/use-case-descriptions.md)`. | Un enlace hacia el archivo `.md` dentro del DOCX o PDF. |
+| Sitio externo | Una URL absoluta `https://` o un enlace `mailto:`. | Una ruta local o dependiente de la estación de trabajo. |
+| Markdown, código u otro recurso local no incluido en el paquete | Puede conservar el enlace relativo en la fuente para navegar por el repositorio; al exportar se presenta sólo su etiqueta. | Un hipervínculo que el lector del DOCX o PDF no pueda abrir. |
 
 - los enlaces hacia otro Markdown, código o imagen del repositorio usan rutas **relativas al
   archivo que contiene el enlace**; así funcionan en el repositorio, en otros clones y durante la
   validación;
 - sólo los sitios externos usan URL absolutas `https://`;
+- un hipervínculo se conserva en el documento exportado sólo cuando su destino también forma parte
+  del paquete, es una sección del mismo documento o es un sitio externo. Los enlaces locales hacia
+  fuentes no incluidas se convierten en texto para no publicar destinos `.md`, rutas de código o
+  referencias que dependan del repositorio;
 - las imágenes y los diagramas renderizados sí deben tener una **referencia documental**: texto
   alternativo o leyenda que identifique la figura y una mención dentro de la sección que la
-  explica. Esto es distinto de convertir la imagen en un hipervínculo; no debe envolverse en otro
-  enlace sólo para abrir el archivo de imagen;
+  explica. El exportador reúne esas leyendas en un **Índice de imágenes** navegable; no debe
+  envolverse la imagen en otro enlace sólo para abrir el archivo;
 - los diagramas Mermaid no usan instrucciones `click`: la navegación hacia otro documento se
   expresa con un enlace Markdown junto al diagrama, porque esos enlaces internos de Mermaid no
   funcionan de manera uniforme en DOCX y PDF.
@@ -176,10 +183,10 @@ dentro del documento final.
 
 Para los bloques Mermaid, el exportador toma el encabezado Markdown más cercano y lo convierte en
 la leyenda de la figura; para las capturas, el texto alternativo conserva el identificador
-`CAP-*` y la operación mostrada. Pandoc utiliza esas leyendas como figuras en DOCX y PDF. No
-se generan campos dinámicos de referencia cruzada propios de Microsoft Word: una referencia como
-“consulte el diagrama de autenticación” se mantiene como texto y enlace Markdown, por lo que
-también funciona fuera de DOCX.
+`CAP-*` y la operación mostrada. Pandoc utiliza esas leyendas como figuras en DOCX y PDF, crea el
+**Índice de imágenes** y enlaza cada entrada con su figura. Los enlaces Markdown entre fuentes del
+mismo paquete se resuelven durante el ensamblado y quedan como hipervínculos internos: el artefacto
+publicado no navega hacia archivos `.md`.
 
 Por tanto, las imágenes que existen como archivos sí tienen una referencia
 `![descripción](ruta/relativa.png)` dentro del
