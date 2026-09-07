@@ -1,7 +1,7 @@
 import { findMovementReportRows } from "../../../services/inventory/reportService.js";
 import { findAllPersons } from "../../../services/admin/person/personService.js";
 import { findAllUsers } from "../../../services/admin/userService.js";
-import { getDataTableOrder, getDataTableSearch } from "../../../utils/requestQueryUtils.js";
+import { getDataTableOrder, getDataTableSearch, isMonthlyReportQuery } from "../../../utils/requestQueryUtils.js";
 import { getReportMonthDateRange } from "../../../utils/formattersUtils.js";
 import { createFormulaCell, sendExcelReport } from "../../../utils/reportExcelUtils.js";
 
@@ -13,7 +13,6 @@ const WASTE_MOVEMENT_SHEET_NAME = 'Movimientos de merma';
 const WASTE_MOVEMENT_FILENAME = 'informe_movimientos_merma';
 const USER_FILENAME = 'informe_usuarios';
 const PERSON_FILENAME = 'informe_personas';
-const isMonthlyReportRequest = (query = {}) => query.monthlyReport === 'true' || query.monthlyReport === true;
 
 const MOVEMENT_REPORT_COLUMNS = [
     'Fecha',
@@ -46,7 +45,7 @@ const mapMovementReportRow = (row, index) => [
 const getMovementReportParams = (query) => {
     const columns = ['date', 'type', 'referenceNumber', null, null, null, null, null, null, null];
     const { orderBy, orderDir } = getDataTableOrder({ query, columns, defaultDirection: 'desc' });
-    const monthlyReport = isMonthlyReportRequest(query);
+    const monthlyReport = isMonthlyReportQuery(query);
     const monthDateRange = monthlyReport ? getReportMonthDateRange(query.reportMonth) : {};
 
     return {
@@ -79,7 +78,7 @@ const sendMovementReport = async ({ req, res, context, sheetName, filename, addi
 };
 
 export const exportMovementReport = async (req, res) => {
-    const monthlyReport = isMonthlyReportRequest(req.query);
+    const monthlyReport = isMonthlyReportQuery(req.query);
 
     return sendMovementReport({
         req,

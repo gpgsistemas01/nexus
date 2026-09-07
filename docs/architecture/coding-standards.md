@@ -180,6 +180,8 @@ bloque anidado. En una prueba equivalente se usan dos espacios por nivel.
   cuando corresponde.
 - DTOs aceptan únicamente campos permitidos y normalizan el contrato de entrada o salida.
 - Validators rechazan forma y límites de entrada sin duplicar decisiones transaccionales.
+  Una regla específica de un formulario permanece privada en `validators/forms`; sólo
+  los validadores de campo independientes del recurso se exportan desde `validators/fields`.
 - Módulos de `application` coordinan casos de uso del navegador; `pages` componen y
   registran el contexto; `ui` y `views/shared` contienen presentación reutilizable.
 - Antes de agregar un proceso se revisan factories, componentes y flujos equivalentes.

@@ -358,6 +358,10 @@ conservan su adaptador de dominio.
 `createDataTableListController` construye controllers de lectura configurando función
 de consulta, columnas y orden predeterminado. Roles, departamentos, presentaciones,
 unidades, motivos y estados de cumplimiento reutilizan el mismo parsing de DataTable.
+Las salidas de material y merma, que agregan el mismo conjunto de filtros operativos,
+reutilizan `utils/issueQueryUtils.getIssueDataTableQuery`; cada controller conserva su
+lista segura de columnas, servicio de dominio y alcance de acceso. El parser permanece
+en `utils` porque normaliza la query HTTP sin responder ni coordinar el caso de uso.
 
 Son **factory functions**, no los patrones GoF *Factory Method* o *Abstract Factory*:
 no existe jerarquía de creadores/productos. Tampoco `createIssueApplication` es

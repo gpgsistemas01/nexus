@@ -14,42 +14,21 @@ import {
     updateGoodsIssueHeader
 } from "../../../services/warehouse/goodsIssues/goodsIssueService.js";
 import { returnGoodsIssueDetail } from '../../../services/warehouse/goodsIssues/detailReturns/goodsIssueReturnService.js';
-import { getDataTableOrder, getDataTablePaging, getDataTableSearch } from "../../../utils/requestQueryUtils.js";
 import { sanitizeEmptyStrings } from "../../../utils/formattersUtils.js";
 import { emitInventoryUpdated } from "../../../utils/socketUtils.js";
+import { getIssueDataTableQuery } from '../../../utils/issueQueryUtils.js';
+
+const DATATABLE_COLUMNS = ['referenceNumber', 'requestDate', 'departmentName', 'projectNumber', 'clientName', null, null];
 
 export const getAllGoodsIssues = async (req, res) => {
 
-    const { skip, take } = getDataTablePaging(req.query);
-    const search = getDataTableSearch(req.query);
-    const fulfillmentStatusId = req.query.fulfillmentStatusId || '';
-    const observationsSearch = req.query.observationsSearch || '';
-    const startDate = req.query.startDate || '';
-    const endDate = req.query.endDate || '';
-    const clientId = req.query.clientId || '';
-    const departmentId = req.query.departmentId || '';
-    const personId = req.query.personId || '';
-
-    const columns = ['referenceNumber', 'requestDate', 'departmentName', 'projectNumber', 'clientName', null, null];
-    const { orderBy, orderDir } = getDataTableOrder({
+    const query = getIssueDataTableQuery({
         query: req.query,
-        columns,
-        defaultDirection: 'desc'
+        columns: DATATABLE_COLUMNS
     });
 
     const result = await findAllGoodsIssues({
-        skip,
-        take,
-        search,
-        startDate,
-        endDate,
-        clientId,
-        departmentId,
-        personId,
-        fulfillmentStatusId,
-        observationsSearch,
-        orderBy,
-        orderDir,
+        ...query,
         accesses: req.user?.accesses
     });
 

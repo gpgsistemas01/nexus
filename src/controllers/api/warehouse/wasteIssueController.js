@@ -13,10 +13,10 @@ import {
     updateWasteIssueHeader
 } from '../../../services/warehouse/wasteIssues/wasteIssueService.js';
 import { returnWasteIssueDetail } from '../../../services/warehouse/wasteIssues/detailReturns/wasteIssueReturnService.js';
-import { getDataTableOrder, getDataTablePaging, getDataTableSearch } from '../../../utils/requestQueryUtils.js';
 import { sanitizeEmptyStrings } from '../../../utils/formattersUtils.js';
 import { successCodeMessages } from '../../../messages/codeMessages.js';
 import { emitInventoryUpdated } from '../../../utils/socketUtils.js';
+import { getIssueDataTableQuery } from '../../../utils/issueQueryUtils.js';
 
 const DATATABLE_COLUMNS = [
     'referenceNumber',
@@ -31,35 +31,12 @@ const DATATABLE_COLUMNS = [
 
 export const getAllWasteIssues = async (req, res) => {
 
-    const { skip, take } = getDataTablePaging(req.query);
-    const search = getDataTableSearch(req.query);
-    const fulfillmentStatusId = req.query.fulfillmentStatusId || '';
-    const observationsSearch = req.query.observationsSearch || '';
-    const startDate = req.query.startDate || '';
-    const endDate = req.query.endDate || '';
-    const clientId = req.query.clientId || '';
-    const departmentId = req.query.departmentId || '';
-    const personId = req.query.personId || '';
-    const { orderBy, orderDir } = getDataTableOrder({
+    const query = getIssueDataTableQuery({
         query: req.query,
-        columns: DATATABLE_COLUMNS,
-        defaultDirection: 'desc'
+        columns: DATATABLE_COLUMNS
     });
 
-    const result = await findAllWasteIssues({
-        skip,
-        take,
-        search,
-        startDate,
-        endDate,
-        clientId,
-        departmentId,
-        personId,
-        fulfillmentStatusId,
-        observationsSearch,
-        orderBy,
-        orderDir
-    });
+    const result = await findAllWasteIssues(query);
 
     return res.status(200).json(result);
 };

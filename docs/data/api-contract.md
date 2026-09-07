@@ -123,6 +123,10 @@ observa el consumidor, por lo que se revisa como parte del contrato.
 
 Los controladores que reutilizan `requestQueryUtils.js` aceptan estas variantes. Cada
 recurso declara por separado sus filtros adicionales y columnas ordenables.
+Las salidas de material y merma componen esas utilidades mediante
+`src/utils/issueQueryUtils.js`: comparten la normalización de filtros de salida, pero
+cada controller proporciona su arreglo seguro de columnas y conserva sus reglas de
+acceso y servicio de dominio.
 
 | Concepto | Parámetros aceptados | Normalización |
 | --- | --- | --- |

@@ -1,5 +1,6 @@
 import { MovementFindDatabaseError } from "../../errors/inventory/movementError.js";
 import { getDb } from "../../repository/baseRepository.js";
+import { buildDateRangeFilter } from "../../utils/requestQueryUtils.js";
 import { formatDateLongWithTime } from "../../utils/formattersUtils.js";
 import { createServiceLogger, logServiceError } from "../../utils/logger.js";
 
@@ -94,27 +95,11 @@ const WASTE_MOVEMENT_DETAIL_SELECT = {
     }
 };
 
-const getMovementDateFilter = ({ startDate, endDate }) => {
-
-    if (!startDate && !endDate) return {};
-
-    return {
-        date: {
-            ...(startDate && {
-                gte: new Date(startDate)
-            }),
-            ...(endDate && (() => {
-
-                const nextDay = new Date(endDate);
-                nextDay.setDate(nextDay.getDate() + 1);
-
-                return {
-                    lt: nextDay
-                };
-            })())
-        }
-    };
-};
+const getMovementDateFilter = ({ startDate, endDate }) => buildDateRangeFilter({
+    field: 'date',
+    startDate,
+    endDate
+});
 
 const getMovementSearchFilter = (search) => {
 

@@ -1,27 +1,31 @@
 import { body } from "express-validator";
 import { errorMap } from "../../messages/codeMessages.js";
-import { validateBoolean, validateDate, validateDetailsArray, validateInvoice, validateNonNegativeNumber, validatePositiveNumber, validateTextOptional, validateUUID } from "../fields/fieldsValidator.js";
+import { validateBoolean, validateDate, validateInvoice, validateNonNegativeNumber, validatePositiveNumber, validateTextOptional, validateUUID } from "../fields/fieldsValidator.js";
+
+const validateGoodsReceiptDetails = details => {
+    details.forEach(detail => {
+        if (!detail.materialId || !detail.quantity || !detail.costPerUnitType) {
+            throw new Error(errorMap['details'].INVALID_FORMAT_REQUIRED);
+        }
+
+        const qty = Number(detail.quantity);
+        const costPerUnitType = Number(detail.costPerUnitType);
+
+        if (!Number.isFinite(qty) || qty < 1) throw new Error(errorMap['details'].INVALID_FORMAT_QUANTITY);
+        if (!Number.isFinite(costPerUnitType) || costPerUnitType <= 0) throw new Error(errorMap['details'].INVALID_FORMAT_UNIT_COST_BY_QUANTITY);
+    });
+
+    return true;
+};
+
+const validateDetailsArray = body('details')
+    .isArray({ min: 1 }).withMessage(errorMap['details'].REQUIRED)
+    .custom(validateGoodsReceiptDetails);
 
 const validateOptionalGoodsReceiptDetails = body('details')
     .optional({ values: 'undefined' })
     .isArray().withMessage(errorMap['details'].REQUIRED)
-    .custom(details => {
-
-        details.forEach(detail => {
-
-            if (!detail.materialId || !detail.quantity || !detail.costPerUnitType) {
-                throw new Error(errorMap['details'].INVALID_FORMAT_REQUIRED);
-            }
-
-            const qty = Number(detail.quantity);
-            const costPerUnitType = Number(detail.costPerUnitType);
-
-            if (!Number.isFinite(qty) || qty < 1) throw new Error(errorMap['details'].INVALID_FORMAT_QUANTITY);
-            if (!Number.isFinite(costPerUnitType) || costPerUnitType <= 0) throw new Error(errorMap['details'].INVALID_FORMAT_UNIT_COST_BY_QUANTITY);
-        });
-
-        return true;
-    });
+    .custom(validateGoodsReceiptDetails);
 
 export const goodsReceiptValidation = [
     validateUUID('supplierId'),

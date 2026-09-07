@@ -33,7 +33,8 @@ vi.mock('../../../../../src/services/warehouse/reportService.js', () => ({
 
 vi.mock('../../../../../src/utils/requestQueryUtils.js', () => ({
   getDataTableOrder: () => ({ orderBy: 'name', orderDir: 'asc' }),
-  getDataTableSearch: () => ''
+  getDataTableSearch: () => '',
+  isMonthlyReportQuery: query => query?.monthlyReport === true || query?.monthlyReport === 'true'
 }));
 
 vi.mock('../../../../../src/utils/formattersUtils.js', () => ({
