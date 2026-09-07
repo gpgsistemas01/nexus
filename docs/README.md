@@ -119,7 +119,9 @@ publicar, todavía se debe revisar lo siguiente:
 - Mermaid permanece como fuente Markdown; durante la exportación, el script entrega a Pandoc las
   imágenes PNG de los diagramas en lugar de copiar el código y conserva esos recursos generados
   bajo `build/docs/` para su revisión. Esto también aplica a una copia de trabajo de Windows que
-  use finales de línea CRLF;
+  use finales de línea CRLF. Si un editor o una integración serializa accidentalmente todo el
+  contenido de un bloque en una sola línea con secuencias literales `\n`, el exportador las
+  restaura como saltos de línea antes de invocar Mermaid CLI;
 - PDF requiere un motor adicional a Pandoc;
 - una captura generada sólo se referencia después de ser revisada y existir en la estación
   que ensambla el documento.
@@ -156,7 +158,7 @@ DOCX y PDF. Se aplican estas reglas:
 | Imagen versionada, incluida una captura | `![texto alternativo](ruta/relativa.png)` dentro de la sección que la explica. | Una ruta absoluta de la estación de trabajo o un enlace a la propia imagen. |
 | Diagrama Mermaid | Un encabezado descriptivo seguido de un bloque cercado `mermaid`. El encabezado es la referencia y se convierte en la leyenda al exportar. | Una ruta hacia el PNG generado: ese archivo no existe en las fuentes versionadas y lo crea el exportador bajo `build/docs/diagrams/`. |
 | Referencia hacia otra sección del mismo archivo | Un enlace Markdown al ancla, por ejemplo `[preparación](#preparar-las-herramientas)`. | Una ruta al archivo fuente. |
-| Referencia hacia otro Markdown incluido en el paquete | Un enlace Markdown relativo, por ejemplo `[casos de uso](requirements/use-case-descriptions.md)`. | Un enlace hacia el archivo `.md` dentro del DOCX o PDF. |
+| Referencia hacia otro Markdown incluido en el paquete | Un enlace Markdown relativo, por ejemplo `[casos de uso](requirements/use-case-descriptions.md)`. El exportador lo convierte en un ancla interna. | Un enlace hacia el archivo `.md` dentro del DOCX o PDF. |
 | Sitio externo | Una URL absoluta `https://` o un enlace `mailto:`. | Una ruta local o dependiente de la estación de trabajo. |
 | Markdown, código u otro recurso local no incluido en el paquete | Puede conservar el enlace relativo en la fuente para navegar por el repositorio; al exportar se presenta sólo su etiqueta. | Un hipervínculo que el lector del DOCX o PDF no pueda abrir. |
 
@@ -165,9 +167,10 @@ DOCX y PDF. Se aplican estas reglas:
   validación;
 - sólo los sitios externos usan URL absolutas `https://`;
 - un hipervínculo se conserva en el documento exportado sólo cuando su destino también forma parte
-  del paquete, es una sección del mismo documento o es un sitio externo. Los enlaces locales hacia
-  fuentes no incluidas se convierten en texto para no publicar destinos `.md`, rutas de código o
-  referencias que dependan del repositorio;
+  del paquete, es una sección del mismo documento o es un sitio externo. El exportador asigna
+  identificadores únicos por archivo y reemplaza las rutas `.md` incluidas por esas anclas internas;
+  los enlaces locales hacia fuentes no incluidas se convierten en texto para no publicar destinos
+  `.md`, rutas de código o referencias que dependan del repositorio;
 - las imágenes y los diagramas renderizados sí deben tener una **referencia documental**: texto
   alternativo o leyenda que identifique la figura y una mención dentro de la sección que la
   explica. El exportador reúne esas leyendas en un **Índice de imágenes** navegable; no debe
