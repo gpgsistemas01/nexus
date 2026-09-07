@@ -116,8 +116,9 @@ publicaciones. Los paquetes no dependen de archivos binarios versionados. Antes 
 publicar, todavía se debe revisar lo siguiente:
 
 - un enlace o una imagen ausente hace fallar `--check`;
-- Mermaid permanece como fuente Markdown; durante la exportación, el script genera imágenes PNG
-  temporales de los diagramas y las entrega a Pandoc en lugar de copiar el código;
+- Mermaid permanece como fuente Markdown; durante la exportación, el script entrega a Pandoc las
+  imágenes PNG de los diagramas en lugar de copiar el código y conserva esos recursos generados
+  bajo `build/docs/` para su revisión;
 - PDF requiere un motor adicional a Pandoc;
 - una captura generada sólo se referencia después de ser revisada y existir en la estación
   que ensambla el documento.
@@ -152,7 +153,7 @@ DOCX y PDF. Se aplican estas reglas:
 | Recurso | Qué debe declararse en el Markdown | Qué no debe declararse |
 | --- | --- | --- |
 | Imagen versionada, incluida una captura | `![texto alternativo](ruta/relativa.png)` dentro de la sección que la explica. | Una ruta absoluta de la estación de trabajo o un enlace a la propia imagen. |
-| Diagrama Mermaid | Un encabezado descriptivo seguido de un bloque cercado `mermaid`. El encabezado es la referencia y se convierte en la leyenda al exportar. | Una ruta hacia el PNG temporal: ese archivo no existe en el repositorio y lo crea el exportador. |
+| Diagrama Mermaid | Un encabezado descriptivo seguido de un bloque cercado `mermaid`. El encabezado es la referencia y se convierte en la leyenda al exportar. | Una ruta hacia el PNG generado: ese archivo no existe en las fuentes versionadas y lo crea el exportador bajo `build/docs/diagrams/`. |
 | Referencia hacia otra sección o documento | Un enlace Markdown relativo, por ejemplo `[casos de uso](requirements/use-case-descriptions.md)`. | Un campo de referencia agregado después sólo en Word. |
 
 - los enlaces hacia otro Markdown, código o imagen del repositorio usan rutas **relativas al
@@ -184,8 +185,10 @@ Por tanto, las imágenes que existen como archivos sí tienen una referencia
 `![descripción](ruta/relativa.png)` dentro del
 Markdown. Los diagramas Mermaid no tienen una referencia a una imagen PNG en el Markdown: su
 referencia versionada es el encabezado más el bloque Mermaid, y la referencia al PNG se crea sólo
-en la copia temporal de exportación. `--check` valida ambos contratos y rechaza una imagen sin texto
-alternativo o un bloque Mermaid sin encabezado.
+en la copia temporal de exportación. El PNG visual queda en `build/docs/diagrams/` y su código
+Mermaid se guarda por separado en `build/docs/diagram-sources/`; ambos usan el mismo identificador.
+`--check` valida los contratos de las fuentes y rechaza una imagen sin texto alternativo o un bloque
+Mermaid sin encabezado.
 
 ### Preparar las herramientas
 
@@ -218,9 +221,10 @@ no sustituyen la instalación requerida por este proyecto. `npm run docs:export`
    npm install --no-save @mermaid-js/mermaid-cli
    ```
 
-   El exportador detecta los bloques `mermaid`, genera imágenes PNG temporales y las elimina al
-   terminar. Las fuentes Markdown no se modifican. Si el paquete no contiene diagramas, esta
-   herramienta no se invoca.
+   El exportador detecta los bloques `mermaid`, incorpora las imágenes PNG al documento y conserva
+   una copia visual en `build/docs/diagrams/`. El código empleado para generar cada imagen queda en
+   `build/docs/diagram-sources/`, separado de los PNG. Las fuentes Markdown no se modifican. Si el
+   paquete no contiene diagramas, esta herramienta no se invoca.
 4. DOCX no requiere otra herramienta. Para PDF, Pandoc necesita un programa que componga
    el PDF desde la terminal; Adobe Acrobat o Adobe Reader sirven para abrir el resultado, pero no
    realizan esa composición para este script. El flujo recomendado usa **XeLaTeX**. Instálalo en

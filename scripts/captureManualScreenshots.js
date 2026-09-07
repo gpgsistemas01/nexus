@@ -5,6 +5,7 @@ import process from 'node:process';
 const baseURL = process.env.DOCS_BASE_URL ?? 'http://127.0.0.1:3000';
 const storageState = process.env.DOCS_STORAGE_STATE;
 const outputRoot = path.resolve('docs/user-manual/images');
+const screenshotDelay = 1500;
 
 const click = (selector, ready, requirement) => ({ selector, ready, requirement });
 const filter = (selector, label) => ({ selector, label, filter: true });
@@ -153,6 +154,7 @@ const capturePage = async (page, capture) => {
         await runAction(page, action, capture.id);
     }
 
+    await page.waitForTimeout(screenshotDelay);
     await page.screenshot({ path: path.join(directory, capture.name), fullPage: true });
     console.log(`${ capture.id } -> ${ path.join(capture.module, capture.name) } [${ formatCoverage(capture.useCases) }]`);
 };
