@@ -75,6 +75,7 @@ sequenceDiagram
 sequenceDiagram
     participant Browser as Navegador
     participant View as src/public/js/plugins/datatable/warehouse/materials/materialDatatable.js
+    participant Dialog as src/public/js/ui/reportExportDialog.js
     participant Application as src/public/js/application/warehouse/report.js
     participant Request as src/public/js/services/warehouse/reportService.js
     participant HTTP as src/public/js/services/axiosInstanceApi.js
@@ -82,6 +83,8 @@ sequenceDiagram
     Note over Application,Transport: Variables de frontera: params/filtros
 
     Browser->>View: Botón Excel de materialDatatable.js
+    View->>Dialog: showInventoryExportDialog()
+    Dialog-->>View: inventoryScope activo/existencia
     View->>View: recopilar y validar las variables de frontera indicadas
     View->>Application: exportWarehouseReport({ params })
     Application->>Request: exportWarehouseReportRequest({ params })
@@ -276,6 +279,7 @@ sequenceDiagram
 sequenceDiagram
     participant Browser as Navegador
     participant View as src/public/js/plugins/datatable/warehouse/wastes/wasteDatatable.js
+    participant Dialog as src/public/js/ui/reportExportDialog.js
     participant Application as src/public/js/application/warehouse/report.js
     participant Request as src/public/js/services/warehouse/reportService.js
     participant HTTP as src/public/js/services/axiosInstanceApi.js
@@ -283,6 +287,8 @@ sequenceDiagram
     Note over Application,Transport: Variables de frontera: params/filtros
 
     Browser->>View: Botón Excel de wasteDatatable.js
+    View->>Dialog: showInventoryExportDialog()
+    Dialog-->>View: inventoryScope activo/existencia
     View->>View: recopilar y validar las variables de frontera indicadas
     View->>Application: exportWasteReport({ params })
     Application->>Request: exportWasteReportRequest({ params })
