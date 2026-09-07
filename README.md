@@ -15,6 +15,7 @@ Nexus es una plataforma de control operativo para administrar inventario, compra
 - [Base de datos, usuarios y permisos](#base-de-datos-usuarios-y-permisos)
 - [Ejecución](#ejecución)
 - [Scripts disponibles](#scripts-disponibles)
+- [Publicación de documentos y capturas](#publicación-de-documentos-y-capturas)
 - [Rutas](#rutas)
 - [Pruebas automatizadas](#pruebas-automatizadas)
 - [Convenciones de desarrollo](#convenciones-de-desarrollo)
@@ -212,6 +213,22 @@ npm start
 | `npm run test:db` | Verifica variables, migra la base de pruebas y ejecuta pruebas. |
 | `npm run docs:architecture` | Regenera el mapa de código, el esquema de base de datos y el diccionario técnico derivados del código y Prisma. |
 | `npm run docs:check` | Comprueba sin modificar archivos que la documentación generada esté actualizada. |
+| `npm run docs:export -- <paquete> <docx\|pdf>` | Valida y exporta un paquete documental con Pandoc; PDF requiere además un motor PDF. |
+| `npm run docs:screenshots` | Regenera en Chromium todas las capturas del manual usando Nexus y una sesión de prueba preparados. |
+
+## Publicación de documentos y capturas
+
+Estos procesos no forman parte del arranque normal de Nexus y requieren herramientas distintas:
+
+- la **exportación** usa las dependencias instaladas por `npm ci`, Pandoc instalado en el sistema
+  y, para PDF, un motor como XeLaTeX;
+- la **captura** usa Playwright y su navegador Chromium, además de Nexus en ejecución, una base de
+  datos ficticia con estados específicos y una sesión autenticada con los permisos necesarios.
+
+La guía completa y secuencial —instalación por sistema operativo, validación, nombres de paquetes,
+creación y eliminación del estado de sesión, cierre de Playwright y detención de Nexus— está en
+[Exportar la documentación](docs/README.md#exportar-la-documentación). No ejecute
+`docs:screenshots` sólo para exportar: Pandoc reutiliza las imágenes ya revisadas.
 
 ## Rutas principales
 

@@ -104,16 +104,22 @@ pertenecer a una cuenta ficticia con todos los permisos que se documentan y cont
 
 1. un material y una merma activos que admitan edición y ajuste;
 2. una compra abierta con un detalle corregible y cancelable;
-3. una salida aprobada y pendiente o parcial para mostrar el surtido de material, y otra completa
-   con cantidad retornable para mostrar la devolución;
+3. una salida aprobada y pendiente o parcial para mostrar el surtido de material, y **otra salida
+   distinta**, aprobada y completamente surtida, con cantidad aún retornable para mostrar la
+   devolución; abrir el modal de surtimiento durante la captura no modifica el primer registro;
 4. los estados equivalentes para una salida de merma;
 5. al menos una persona, un usuario, un proveedor y un cliente editables;
 6. movimientos de material y merma para que los historiales no aparezcan vacíos.
 
-Si falta un permiso, un registro o un estado requerido, el selector de la acción no aparece y el
-script falla en esa captura. Este comportamiento es intencional: evita publicar una secuencia
-incompleta o incoherente. `DOCS_STORAGE_STATE` es obligatorio para las vistas protegidas; la
-pantalla de inicio de sesión se toma en un contexto separado y sin autenticación.
+El script recorre todas las páginas del listado para localizar cada acción; el registro requerido no
+tiene que aparecer en la primera página. Si falta un permiso, un registro o un estado requerido, el
+selector de la acción no aparece y el script falla en esa captura con el identificador, selector y
+prerrequisito que debe revisarse. Por ejemplo, `.btn-return-detail` sólo aparece para una salida
+aprobada y completamente surtida; una salida pendiente o parcialmente surtida muestra
+`.btn-edit-detail` en su lugar. Este comportamiento es intencional: evita publicar una secuencia
+incompleta o incoherente. `DOCS_STORAGE_STATE` es
+obligatorio para las vistas protegidas; la pantalla de inicio de sesión se toma en un contexto
+separado y sin autenticación.
 
 ## Revisión antes de publicar
 
@@ -124,4 +130,7 @@ figuran en el inventario. La opción `--list` es sólo de consulta y no elimina 
 Después de ejecutar `npm run docs:screenshots`, se debe comprobar que los datos sean ficticios,
 que no aparezcan contraseñas, cookies ni datos personales, que los textos sean legibles y que el
 estado visible coincida con los casos de uso asignados en la tabla. Sólo entonces las imágenes
-revisadas se referencian desde el recorrido correspondiente del manual.
+revisadas se referencian desde el recorrido correspondiente del manual. Al completar todo el
+inventario, el script elimina automáticamente el archivo temporal indicado por
+`DOCS_STORAGE_STATE`; si la ejecución falla, lo conserva para permitir un reintento y debe
+eliminarse manualmente cuando ya no se vaya a utilizar.
