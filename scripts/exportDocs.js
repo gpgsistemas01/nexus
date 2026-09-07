@@ -1,4 +1,5 @@
 import { access, mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
+import { existsSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import path from 'node:path';
@@ -231,7 +232,7 @@ await Promise.all([
     mkdir(diagramSourceDirectory, { recursive: true })
 ]);
 const renderedDiagrams = new Map();
-const mermaidExecutable = path.join(ROOT, 'node_modules', '.bin', process.platform === 'win32' ? 'mmdc.cmd' : 'mmdc');
+const mermaidExecutable = path.join(ROOT, 'node_modules', '@mermaid-js', 'mermaid-cli', 'src', 'cli.js');
 
 const prepareSource = async (source, publicationSources) => {
     const content = await readFile(path.join(ROOT, source), 'utf8');
@@ -247,10 +248,14 @@ const prepareSource = async (source, publicationSources) => {
         const id = createHash('sha256').update(diagram).digest('hex').slice(0, 16);
         let image = renderedDiagrams.get(id);
         if (!image) {
+            if (!existsSync(mermaidExecutable)) {
+                console.error('Mermaid CLI no está disponible. Ejecuta npm install --no-save @mermaid-js/mermaid-cli antes de exportar documentos con diagramas.');
+                return null;
+            }
             const input = path.join(diagramSourceDirectory, `${id}.mmd`);
             image = path.join(diagramOutputDirectory, `${id}.png`);
             await writeFile(input, diagram);
-            const result = spawnSync(mermaidExecutable, ['--input', input, '--output', image, '--backgroundColor', 'white', '--scale', '2'], { cwd: ROOT, stdio: 'inherit' });
+            const result = spawnSync(process.execPath, [mermaidExecutable, '--input', input, '--output', image, '--backgroundColor', 'white', '--scale', '2'], { cwd: ROOT, stdio: 'inherit' });
             if (result.error?.code === 'ENOENT') {
                 console.error('Mermaid CLI no está disponible. Ejecuta npm install --no-save @mermaid-js/mermaid-cli antes de exportar documentos con diagramas.');
                 return null;
@@ -267,6 +272,8 @@ const prepareSource = async (source, publicationSources) => {
 let failedStatus = 0;
 try {
     for (const { publication, sources } of publications) {
+        const output = path.join(outputDirectory, `${publication}.${requestedFormat}`);
+        await rm(output, { force: true });
         const preparedSources = [];
         const publicationSources = new Set(sources);
         for (const source of sources) {
@@ -279,7 +286,6 @@ try {
         }
         if (failedStatus) break;
 
-        const output = path.join(outputDirectory, `${publication}.${requestedFormat}`);
         const scopedSources = preparedSources.map((source) => path.relative(temporaryDirectory, source));
         const args = [
             ...scopedSources,
