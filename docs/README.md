@@ -87,7 +87,7 @@ Pandoc y Playwright intervienen en etapas distintas y ninguno sustituye al otro:
 | Node.js y dependencias (`npm ci`) | Ejecutan los scripts del repositorio. | Todos los comandos `npm run docs:*`. |
 | Playwright y Chromium (instalación opcional) | Abren Nexus y generan las capturas del manual. Sólo se necesitan al actualizar imágenes. | `npm run docs:screenshots` |
 | Mermaid CLI (instalación opcional) | Convierte cada bloque Mermaid en una imagen temporal para la exportación. | Lo invoca automáticamente `docs:export` cuando el paquete contiene diagramas. |
-| Pandoc (herramienta del sistema) | Ensambla el Markdown y las imágenes existentes para generar DOCX o PDF. | `npm run docs:export -- <paquete> <formato>` |
+| Pandoc (herramienta del sistema) | Ensambla el Markdown y las imágenes existentes, convierte la navegación del paquete en hipervínculos internos y genera un índice de imágenes para DOCX o PDF. | `npm run docs:export -- <paquete> <formato>` |
 | XeLaTeX u otro motor PDF (herramienta del sistema) | Compone el PDF solicitado por Pandoc; no se necesita para DOCX. | Sólo `docs:export` con formato `pdf`. |
 
 Una extensión de Playwright para Visual Studio Code tampoco reemplaza estas herramientas: puede
@@ -154,16 +154,23 @@ DOCX y PDF. Se aplican estas reglas:
 | --- | --- | --- |
 | Imagen versionada, incluida una captura | `![texto alternativo](ruta/relativa.png)` dentro de la sección que la explica. | Una ruta absoluta de la estación de trabajo o un enlace a la propia imagen. |
 | Diagrama Mermaid | Un encabezado descriptivo seguido de un bloque cercado `mermaid`. El encabezado es la referencia y se convierte en la leyenda al exportar. | Una ruta hacia el PNG generado: ese archivo no existe en las fuentes versionadas y lo crea el exportador bajo `build/docs/diagrams/`. |
-| Referencia hacia otra sección o documento | Un enlace Markdown relativo, por ejemplo `[casos de uso](requirements/use-case-descriptions.md)`. | Un campo de referencia agregado después sólo en Word. |
+| Referencia hacia otra sección del mismo archivo | Un enlace Markdown al ancla, por ejemplo `[preparación](#preparar-las-herramientas)`. | Una ruta al archivo fuente. |
+| Referencia hacia otro Markdown incluido en el paquete | Un enlace Markdown relativo, por ejemplo `[casos de uso](requirements/use-case-descriptions.md)`. | Un enlace hacia el archivo `.md` dentro del DOCX o PDF. |
+| Sitio externo | Una URL absoluta `https://` o un enlace `mailto:`. | Una ruta local o dependiente de la estación de trabajo. |
+| Markdown, código u otro recurso local no incluido en el paquete | Puede conservar el enlace relativo en la fuente para navegar por el repositorio; al exportar se presenta sólo su etiqueta. | Un hipervínculo que el lector del DOCX o PDF no pueda abrir. |
 
 - los enlaces hacia otro Markdown, código o imagen del repositorio usan rutas **relativas al
   archivo que contiene el enlace**; así funcionan en el repositorio, en otros clones y durante la
   validación;
 - sólo los sitios externos usan URL absolutas `https://`;
+- un hipervínculo se conserva en el documento exportado sólo cuando su destino también forma parte
+  del paquete, es una sección del mismo documento o es un sitio externo. Los enlaces locales hacia
+  fuentes no incluidas se convierten en texto para no publicar destinos `.md`, rutas de código o
+  referencias que dependan del repositorio;
 - las imágenes y los diagramas renderizados sí deben tener una **referencia documental**: texto
   alternativo o leyenda que identifique la figura y una mención dentro de la sección que la
-  explica. Esto es distinto de convertir la imagen en un hipervínculo; no debe envolverse en otro
-  enlace sólo para abrir el archivo de imagen;
+  explica. El exportador reúne esas leyendas en un **Índice de imágenes** navegable; no debe
+  envolverse la imagen en otro enlace sólo para abrir el archivo;
 - los diagramas Mermaid no usan instrucciones `click`: la navegación hacia otro documento se
   expresa con un enlace Markdown junto al diagrama, porque esos enlaces internos de Mermaid no
   funcionan de manera uniforme en DOCX y PDF.
@@ -176,10 +183,10 @@ dentro del documento final.
 
 Para los bloques Mermaid, el exportador toma el encabezado Markdown más cercano y lo convierte en
 la leyenda de la figura; para las capturas, el texto alternativo conserva el identificador
-`CAP-*` y la operación mostrada. Pandoc utiliza esas leyendas como figuras en DOCX y PDF. No
-se generan campos dinámicos de referencia cruzada propios de Microsoft Word: una referencia como
-“consulte el diagrama de autenticación” se mantiene como texto y enlace Markdown, por lo que
-también funciona fuera de DOCX.
+`CAP-*` y la operación mostrada. Pandoc utiliza esas leyendas como figuras en DOCX y PDF, crea el
+**Índice de imágenes** y enlaza cada entrada con su figura. Los enlaces Markdown entre fuentes del
+mismo paquete se resuelven durante el ensamblado y quedan como hipervínculos internos: el artefacto
+publicado no navega hacia archivos `.md`.
 
 Por tanto, las imágenes que existen como archivos sí tienen una referencia
 `![descripción](ruta/relativa.png)` dentro del
@@ -416,65 +423,45 @@ Después de aprobar las imágenes, vuelva a [Exportar los manuales](#exportar-lo
    npx playwright install chromium
    ```
 
-4. Elija **un solo bloque** según la terminal. Defina `DOCS_BASE_URL` con el **origen**, sin
-   `/inicio-sesion` al final, y cree el estado
-   de sesión en una ruta temporal. El comando `codegen` sí agrega la ruta de acceso al abrir el
-   navegador. Inicie sesión con la cuenta ficticia que reúne los permisos del inventario,
-   compruebe que puede abrir una página protegida y **cierre la ventana de Chromium que abrió
-   Playwright** con el botón **X** de la ventana o con `Alt+F4` en Windows (`Cmd+W` en macOS).
-   No cierre la terminal con `Ctrl+C`: `codegen` guarda el archivo al cerrarse la ventana y después
-   termina por sí solo. Espere a que reaparezca el prompt de la terminal; sólo entonces continúe
-   con el paso 5.
+4. Elija **un solo bloque** según la terminal y defina las credenciales de la cuenta ficticia que
+   reúne los permisos del inventario. `DOCS_BASE_URL` contiene sólo el origen, sin
+   `/inicio-sesion`. El script abre esa ruta, completa el formulario e inicia la sesión
+   automáticamente; no es necesario ejecutar `playwright codegen` ni crear un archivo de cookies.
 
-   En PowerShell —es el bloque correcto si recibió el error de cmdlet para `export`—:
+   En PowerShell:
 
    ```powershell
    $env:DOCS_BASE_URL = "http://127.0.0.1:3000"
-   $env:DOCS_STORAGE_STATE = Join-Path $env:TEMP "nexus-storage-state.json"
-   npx playwright codegen --save-storage="$env:DOCS_STORAGE_STATE" "${env:DOCS_BASE_URL}/inicio-sesion"
-   Test-Path "$env:DOCS_STORAGE_STATE"
+   $env:DOCS_LOGIN_NAME = "usuario-ficticio"
+   $env:DOCS_LOGIN_PASSWORD = "contraseña-ficticia"
    ```
 
    En Bash:
 
    ```bash
    export DOCS_BASE_URL=http://127.0.0.1:3000
-   export DOCS_STORAGE_STATE=/tmp/nexus-storage-state.json
-   npx playwright codegen --save-storage="$DOCS_STORAGE_STATE" "$DOCS_BASE_URL/inicio-sesion"
-   test -f "$DOCS_STORAGE_STATE"
+   export DOCS_LOGIN_NAME=usuario-ficticio
+   export DOCS_LOGIN_PASSWORD='contraseña-ficticia'
    ```
 
-   La comprobación final debe devolver `True` en PowerShell o terminar sin error en Bash. Si no
-   existe el archivo, no continúe al paso 5: repita `codegen`, complete el inicio de sesión y cierre
-   su ventana. En PowerShell puede mostrar la ubicación real con
-   `Write-Output $env:DOCS_STORAGE_STATE` y abrir sus datos con
-   `Get-Item $env:DOCS_STORAGE_STATE`; en Bash use `printf '%s\n' "$DOCS_STORAGE_STATE"` y
-   `ls -l "$DOCS_STORAGE_STATE"`.
-
-   `/tmp/nexus-storage-state.json` es una ruta temporal absoluta de Linux o macOS: está fuera del
-   proyecto y por eso no aparece en el explorador del repositorio. En Windows, el bloque de
-   PowerShell usa `Join-Path $env:TEMP`, que normalmente resuelve a una carpeta bajo
-   `C:\Users\<usuario>\AppData\Local\Temp`. El archivo se crea **al cerrar Chromium y terminar
-   `codegen`**, no al definir la variable. Contiene credenciales y cookies; no lo copie dentro del
-   repositorio ni lo agregue a Git.
+   Use exclusivamente credenciales de prueba, no las escriba en `.env`, archivos del repositorio
+   ni scripts compartidos y retire las variables al terminar. Como alternativa compatible con el
+   flujo anterior, puede omitir ambas variables y proporcionar `DOCS_STORAGE_STATE`; nunca mezcle
+   credenciales automáticas con un estado de otra cuenta.
 5. Sin cerrar el servidor de la terminal 1, ejecute en la **misma terminal del paso 4**:
 
    ```bash
    npm run docs:screenshots
    ```
 
-   El comando reutiliza `DOCS_BASE_URL` y `DOCS_STORAGE_STATE` definidos en el paso anterior, tanto
-   en Bash como en PowerShell.
-
-   Si PowerShell indica que `$DOCS_STORAGE_STATE` no está establecida, se copió la sintaxis de
-   Bash. En PowerShell el nombre correcto incluye el prefijo `$env:` y debe ejecutarse el bloque
-   PowerShell completo en la misma terminal antes de `npm run docs:screenshots`.
+   El comando reutiliza `DOCS_BASE_URL`, `DOCS_LOGIN_NAME` y `DOCS_LOGIN_PASSWORD` definidos en el
+   paso anterior. Si se proporcionó `DOCS_STORAGE_STATE` en lugar de credenciales, reutiliza ese
+   estado sin ejecutar el inicio de sesión automático.
 
    El comando elimina primero `docs/user-manual/images/` y genera el juego completo; no lo
    interrumpa ni mezcle imágenes de ejecuciones distintas. Espere el mensaje `Capturas generadas`
-   y después `Estado temporal de autenticación eliminado` antes de continuar. Cuando la ejecución
-   completa termina correctamente, el script elimina automáticamente el archivo indicado por
-   `DOCS_STORAGE_STATE` para no conservar cookies en el equipo.
+   antes de continuar. Si se usó `DOCS_STORAGE_STATE`, el script elimina ese archivo al completar
+   la ejecución.
 
    Para localizar las acciones, el script recorre todas las páginas del listado; la salida no tiene
    que encontrarse entre los primeros diez registros. Si aun así falla esperando
@@ -483,25 +470,22 @@ Después de aprobar las imágenes, vuelva a [Exportar los manuales](#exportar-lo
 6. Revise los PNG conforme a
    [Revisión antes de publicar](user-manual/screenshot-inventory.md#revisión-antes-de-publicar).
    Si una captura contiene datos reales, es ilegible o representa un estado incorrecto, corrija el
-   entorno de prueba, genere un nuevo estado de sesión repitiendo el paso 4 y vuelva a ejecutar el
-   paso 5.
-7. Si la captura falla antes de terminar, el archivo se conserva para que pueda corregir los datos
-   y reintentar sin iniciar sesión de nuevo. Si decide no reintentar, elimínelo manualmente desde la
-   misma terminal del paso 4:
+   entorno de prueba y vuelva a ejecutar el paso 5.
+7. Retire las credenciales de la terminal cuando termine:
 
    ```powershell
    # PowerShell
-   Remove-Item $env:DOCS_STORAGE_STATE
+   Remove-Item Env:DOCS_LOGIN_NAME, Env:DOCS_LOGIN_PASSWORD
    ```
 
    ```bash
    # Bash
-   rm -- "$DOCS_STORAGE_STATE"
+   unset DOCS_LOGIN_NAME DOCS_LOGIN_PASSWORD
    ```
 
-   En una ejecución correcta no necesita ejecutar esos comandos: el script ya hizo la eliminación.
-   La ruta está en la carpeta temporal mostrada en el paso 4, no dentro del proyecto. Cuando todas
-   las capturas estén aprobadas, vuelva a la terminal 1, donde sigue ejecutándose `npm run dev`, y
+   Si optó por `DOCS_STORAGE_STATE` y una captura falla, elimine manualmente ese archivo cuando no
+   vaya a reintentar; una ejecución correcta lo elimina automáticamente. Cuando todas las capturas
+   estén aprobadas, vuelva a la terminal 1, donde sigue ejecutándose `npm run dev`, y
    presione `Ctrl+C` una vez. Espere a que reaparezca el prompt: eso detiene Nodemon y Nexus; no hay
    que escribir `npm stop`. Después vuelva al flujo
    [Exportar los manuales](#exportar-los-manuales). Para el manual completo en DOCX:

@@ -4,6 +4,8 @@ import process from 'node:process';
 
 const baseURL = process.env.DOCS_BASE_URL ?? 'http://127.0.0.1:3000';
 const storageState = process.env.DOCS_STORAGE_STATE;
+const loginName = process.env.DOCS_LOGIN_NAME;
+const loginPassword = process.env.DOCS_LOGIN_PASSWORD;
 const outputRoot = path.resolve('docs/user-manual/images');
 const screenshotDelay = 1500;
 
@@ -159,6 +161,18 @@ const capturePage = async (page, capture) => {
     console.log(`${ capture.id } -> ${ path.join(capture.module, capture.name) } [${ formatCoverage(capture.useCases) }]`);
 };
 
+const login = async (page) => {
+    await page.goto(new URL('/inicio-sesion', baseURL).href, { waitUntil: 'domcontentloaded' });
+    await page.locator('#loginForm').waitFor({ state: 'visible' });
+    await page.locator('#nameInput').fill(loginName);
+    await page.locator('#passwordInput').fill(loginPassword);
+    await Promise.all([
+        page.waitForURL(url => url.pathname === '/almacen/materiales'),
+        page.locator('#submitBtn').click()
+    ]);
+    console.log('Sesión de capturas iniciada automáticamente.');
+};
+
 validateInventory();
 
 if (process.argv.includes('--list')) {
@@ -174,8 +188,14 @@ if (process.argv.includes('--list')) {
 }
 
 const protectedCaptures = captures.filter(item => !item.public);
-if (protectedCaptures.length && !storageState) {
-    throw new Error('DOCS_STORAGE_STATE es obligatorio para generar las capturas de páginas protegidas.');
+if (Boolean(loginName) !== Boolean(loginPassword)) {
+    throw new Error('DOCS_LOGIN_NAME y DOCS_LOGIN_PASSWORD deben definirse juntos.');
+}
+if (storageState && loginName) {
+    throw new Error('Use credenciales automáticas o DOCS_STORAGE_STATE, no ambos mecanismos.');
+}
+if (protectedCaptures.length && !storageState && !loginName) {
+    throw new Error('Defina DOCS_LOGIN_NAME y DOCS_LOGIN_PASSWORD, o proporcione DOCS_STORAGE_STATE, para generar las capturas protegidas.');
 }
 
 // La salida representa una ejecución completa. Se elimina sólo después de validar la
@@ -192,14 +212,15 @@ try {
     for (const capture of captures.filter(item => item.public)) await capturePage(publicPage, capture);
     await publicContext.close();
 
-    const authenticatedContext = await browser.newContext({ ...contextOptions, storageState });
+    const authenticatedContext = await browser.newContext({ ...contextOptions, ...(storageState ? { storageState } : {}) });
     const authenticatedPage = await authenticatedContext.newPage();
+    if (!storageState) await login(authenticatedPage);
     for (const capture of protectedCaptures) await capturePage(authenticatedPage, capture);
     await authenticatedContext.close();
 } finally {
     await browser.close();
 }
 
-await rm(storageState, { force: true });
+if (storageState) await rm(storageState, { force: true });
 console.log(`Capturas generadas en ${ path.relative(process.cwd(), outputRoot) }.`);
-console.log('Estado temporal de autenticación eliminado.');
+if (storageState) console.log('Estado temporal de autenticación eliminado.');

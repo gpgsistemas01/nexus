@@ -119,9 +119,9 @@ aprobada y completamente surtida; una salida pendiente o parcialmente surtida mu
 `.btn-edit-detail` en su lugar. Este comportamiento es intencional: evita publicar una secuencia
 incompleta o incoherente. Para las capturas de devolución, la automatización cambia el filtro
 predeterminado **Pendiente** a **Surtido** antes de buscar `.btn-return-detail`, tanto en salidas de
-material como de merma. `DOCS_STORAGE_STATE` es
-obligatorio para las vistas protegidas; la pantalla de inicio de sesión se toma en un contexto
-separado y sin autenticación.
+material como de merma. Para las vistas protegidas, el script inicia sesión automáticamente con
+`DOCS_LOGIN_NAME` y `DOCS_LOGIN_PASSWORD`, o reutiliza `DOCS_STORAGE_STATE` como alternativa. La
+pantalla de inicio de sesión se toma en un contexto separado y sin autenticación.
 
 ## Revisión antes de publicar
 
@@ -133,6 +133,7 @@ Después de ejecutar `npm run docs:screenshots`, se debe comprobar que los datos
 que no aparezcan contraseñas, cookies ni datos personales, que los textos sean legibles y que el
 estado visible coincida con los casos de uso asignados en la tabla. Sólo entonces las imágenes
 revisadas se referencian desde el recorrido correspondiente del manual. Al completar todo el
-inventario, el script elimina automáticamente el archivo temporal indicado por
-`DOCS_STORAGE_STATE`; si la ejecución falla, lo conserva para permitir un reintento y debe
-eliminarse manualmente cuando ya no se vaya a utilizar.
+inventario, si se proporcionó `DOCS_STORAGE_STATE`, el script elimina automáticamente ese archivo;
+si la ejecución falla, lo conserva para permitir un reintento y debe eliminarse manualmente cuando
+ya no se vaya a utilizar. Las credenciales automáticas sólo permanecen en las variables del proceso
+y deben retirarse de la terminal después de generar las capturas.

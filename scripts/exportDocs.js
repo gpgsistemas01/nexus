@@ -103,12 +103,26 @@ const formats = new Set(['docx', 'pdf']);
 const publicationNames = Object.keys(MANIFESTS);
 const mermaidBlock = /^```mermaid\n([\s\S]*?)^```$/gm;
 const externalLink = /^(?:https?:|mailto:)/;
+const markdownLink = /(?<!!)\[([^\]]+)\]\(([^) ]+)([^)]*)\)/g;
 const diagramCaption = (content, index) => {
     const headings = [...content.slice(0, index).matchAll(/^#{1,6}\s+(.+)$/gm)];
     const heading = headings.at(-1)?.[1].replace(/[`[*_\]]/g, '').trim();
     if (!heading) throw new Error('Cada bloque Mermaid debe estar declarado bajo un encabezado Markdown.');
     return `Diagrama — ${heading}`;
 };
+
+const prepareLinks = (content, source, publicationSources) => content.replace(
+    markdownLink,
+    (reference, label, link) => {
+        if (link.startsWith('#') || externalLink.test(link)) return reference;
+        const [target] = link.split('#');
+        const resolvedTarget = path.relative(
+            ROOT,
+            path.resolve(ROOT, path.dirname(source), target)
+        ).split(path.sep).join('/');
+        return target.endsWith('.md') && publicationSources.has(resolvedTarget) ? reference : label;
+    }
+);
 
 if ((requestedPublication !== 'todos' && !MANIFESTS[requestedPublication])
     || (checkOnly ? requestedFormat && !formats.has(requestedFormat) : !formats.has(requestedFormat))) {
@@ -186,13 +200,13 @@ await Promise.all([
 const renderedDiagrams = new Map();
 const mermaidExecutable = path.join(ROOT, 'node_modules', '.bin', process.platform === 'win32' ? 'mmdc.cmd' : 'mmdc');
 
-const prepareSource = async (source) => {
+const prepareSource = async (source, publicationSources) => {
     const content = await readFile(path.join(ROOT, source), 'utf8');
     const blocks = [...content.matchAll(mermaidBlock)];
 
     const renderedSource = path.join(temporaryDirectory, source);
     await mkdir(path.dirname(renderedSource), { recursive: true });
-    let renderedContent = content.replace(/(!\[[^\]]*\]\()([^) ]+)/g, (reference, prefix, image) => (
+    let renderedContent = prepareLinks(content, source, publicationSources).replace(/(!\[[^\]]*\]\()([^) ]+)/g, (reference, prefix, image) => (
         `${prefix}${path.resolve(ROOT, path.dirname(source), image)}`
     ));
     for (const match of blocks) {
@@ -221,8 +235,9 @@ let failedStatus = 0;
 try {
     for (const { publication, sources } of publications) {
         const preparedSources = [];
+        const publicationSources = new Set(sources);
         for (const source of sources) {
-            const preparedSource = await prepareSource(source);
+            const preparedSource = await prepareSource(source, publicationSources);
             if (!preparedSource) {
                 failedStatus = 1;
                 break;
@@ -232,10 +247,22 @@ try {
         if (failedStatus) break;
 
         const output = path.join(outputDirectory, `${publication}.${requestedFormat}`);
-        const args = [...preparedSources, '--from=gfm+implicit_figures', '--file-scope', '--standalone', '--toc', `--output=${output}`, '--resource-path=.:docs'];
+        const scopedSources = preparedSources.map((source) => path.relative(temporaryDirectory, source));
+        const args = [
+            ...scopedSources,
+            '--from=gfm+implicit_figures',
+            '--file-scope',
+            '--standalone',
+            '--toc',
+            '--lof',
+            '--metadata=lang:es-MX',
+            '--metadata=lof-title:Índice de imágenes',
+            `--output=${output}`,
+            `--resource-path=${[ROOT, path.join(ROOT, 'docs')].join(path.delimiter)}`
+        ];
         if (requestedFormat === 'docx' && process.env.DOCS_REFERENCE_DOC) args.push(`--reference-doc=${process.env.DOCS_REFERENCE_DOC}`);
         if (requestedFormat === 'pdf' && process.env.DOCS_PDF_ENGINE) args.push(`--pdf-engine=${process.env.DOCS_PDF_ENGINE}`);
-        const result = spawnSync('pandoc', args, { cwd: ROOT, stdio: 'inherit' });
+        const result = spawnSync('pandoc', args, { cwd: temporaryDirectory, stdio: 'inherit' });
         if (result.status !== 0) {
             failedStatus = result.status ?? 1;
             break;
