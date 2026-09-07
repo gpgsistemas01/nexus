@@ -6,7 +6,7 @@ const baseURL = process.env.DOCS_BASE_URL ?? 'http://127.0.0.1:3000';
 const storageState = process.env.DOCS_STORAGE_STATE;
 const outputRoot = path.resolve('docs/user-manual/images');
 
-const click = (selector, ready) => ({ selector, ready });
+const click = (selector, ready, requirement) => ({ selector, ready, requirement });
 const reportDialog = click('.datatable-export-button', '.report-export-modal');
 const formatCoverage = (useCases) => useCases.length ? useCases.join(', ') : 'Transversal';
 
@@ -44,14 +44,14 @@ const captures = [
     { id: 'CAP-SAL-MAT-02-CREATE', module: 'salidas-material', name: '02-formulario-registro.png', route: '/salidas/materiales', ready: '#table', action: click('button:has-text("Nueva salida")', '#goodsIssueModal.show'), useCases: ['CU-SAL-02'] },
     { id: 'CAP-SAL-MAT-03-EDIT', module: 'salidas-material', name: '03-edicion-encabezado.png', route: '/salidas/materiales', ready: '#table', action: click('#table tbody .btn-edit', '#goodsIssueModal.show'), useCases: ['CU-SAL-03', 'CU-SAL-04'] },
     { id: 'CAP-SAL-MAT-04-SUPPLY', module: 'salidas-material', name: '04-surtir-detalles.png', route: '/salidas/materiales', ready: '#table', action: click('#table tbody .btn-edit-detail', '#goodsIssueModal.show'), useCases: ['CU-SAL-05'] },
-    { id: 'CAP-SAL-MAT-05-RETURN', module: 'salidas-material', name: '05-devolver-detalle.png', route: '/salidas/materiales', ready: '#table', actions: [click('#table tbody .btn-return-detail', '#goodsIssueModal.show'), click('#materialTable tbody .return-issue-detail-btn', '#issueReturnModal.show')], useCases: ['CU-SAL-06'] },
+    { id: 'CAP-SAL-MAT-05-RETURN', module: 'salidas-material', name: '05-devolver-detalle.png', route: '/salidas/materiales', ready: '#table', actions: [click('#table tbody .btn-return-detail', '#goodsIssueModal.show', 'una salida de material aprobada, completamente surtida y con cantidad retornable'), click('#materialTable tbody .return-issue-detail-btn', '#issueReturnModal.show', 'un detalle surtido que todavía tenga cantidad retornable')], useCases: ['CU-SAL-06'] },
     { id: 'CAP-REP-SAL-MAT-06-EXPORT', module: 'salidas-material', name: '06-exportar-reporte.png', route: '/salidas/materiales', ready: '#table', action: reportDialog, useCases: ['CU-REP-04'] },
 
     { id: 'CAP-SAL-WAS-01-LIST', module: 'salidas-merma', name: '01-listado.png', route: '/salidas/mermas', ready: '#table', useCases: ['CU-SAL-07', 'CU-REP-08'] },
     { id: 'CAP-SAL-WAS-02-CREATE', module: 'salidas-merma', name: '02-formulario-registro.png', route: '/salidas/mermas', ready: '#table', action: click('button:has-text("Nueva salida")', '#wasteIssueModal.show'), useCases: ['CU-SAL-08'] },
     { id: 'CAP-SAL-WAS-03-EDIT', module: 'salidas-merma', name: '03-edicion-encabezado.png', route: '/salidas/mermas', ready: '#table', action: click('#table tbody .btn-edit', '#wasteIssueModal.show'), useCases: ['CU-SAL-09', 'CU-SAL-10'] },
     { id: 'CAP-SAL-WAS-04-SUPPLY', module: 'salidas-merma', name: '04-surtir-detalles.png', route: '/salidas/mermas', ready: '#table', action: click('#table tbody .btn-edit-detail', '#wasteIssueModal.show'), useCases: ['CU-SAL-11'] },
-    { id: 'CAP-SAL-WAS-05-RETURN', module: 'salidas-merma', name: '05-devolver-detalle.png', route: '/salidas/mermas', ready: '#table', actions: [click('#table tbody .btn-return-detail', '#wasteIssueModal.show'), click('#materialTable tbody .return-issue-detail-btn', '#issueReturnModal.show')], useCases: ['CU-SAL-12'] },
+    { id: 'CAP-SAL-WAS-05-RETURN', module: 'salidas-merma', name: '05-devolver-detalle.png', route: '/salidas/mermas', ready: '#table', actions: [click('#table tbody .btn-return-detail', '#wasteIssueModal.show', 'una salida de merma aprobada, completamente surtida y con cantidad retornable'), click('#materialTable tbody .return-issue-detail-btn', '#issueReturnModal.show', 'un detalle surtido que todavía tenga cantidad retornable')], useCases: ['CU-SAL-12'] },
     { id: 'CAP-REP-SAL-WAS-06-EXPORT', module: 'salidas-merma', name: '06-exportar-reporte.png', route: '/salidas/mermas', ready: '#table', action: reportDialog, useCases: ['CU-REP-08'] },
 
     { id: 'CAP-IDA-PER-01-LIST', module: 'personas', name: '01-listado.png', route: '/personas', ready: '#table', useCases: ['CU-IDA-01', 'CU-REP-14'] },
@@ -84,9 +84,43 @@ const validateInventory = () => {
     }
 };
 
+const findTriggerAcrossPages = async (page, selector) => {
+    const trigger = page.locator(selector).first();
+    await page.locator('#table tbody tr').first().waitFor({ state: 'visible' });
+
+    while (!await trigger.isVisible()) {
+        const advanced = await page.evaluate(async () => {
+            const table = globalThis.$?.('#table').DataTable();
+            if (!table) return false;
+            const { page, pages } = table.page.info();
+            if (page + 1 >= pages) return false;
+
+            await new Promise(resolve => {
+                globalThis.$('#table').one('draw.dt', resolve);
+                table.page('next').draw('page');
+            });
+            return true;
+        });
+        if (!advanced) break;
+    }
+
+    return trigger;
+};
+
 const runAction = async (page, action, captureId) => {
-    const trigger = page.locator(action.selector).first();
-    await trigger.waitFor({ state: 'visible' });
+    const trigger = action.selector.startsWith('#table tbody ')
+        ? await findTriggerAcrossPages(page, action.selector)
+        : page.locator(action.selector).first();
+    try {
+        await trigger.waitFor({ state: 'visible' });
+    } catch (error) {
+        if (!action.requirement) throw error;
+        throw new Error(
+            `${ captureId } no puede prepararse: no apareció ${ action.selector }. `
+            + `Verifique que la sesión tenga permiso para surtir y que los datos incluyan ${ action.requirement }.`,
+            { cause: error }
+        );
+    }
     await trigger.click();
     await page.locator(action.ready).first().waitFor({ state: 'visible' });
     console.log(`  Acción preparada para ${ captureId }: ${ action.selector }`);
@@ -147,4 +181,6 @@ try {
     await browser.close();
 }
 
+await rm(storageState, { force: true });
 console.log(`Capturas generadas en ${ path.relative(process.cwd(), outputRoot) }.`);
+console.log('Estado temporal de autenticación eliminado.');

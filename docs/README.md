@@ -84,9 +84,11 @@ Pandoc y Playwright intervienen en etapas distintas y ninguno sustituye al otro:
 
 | Herramienta | Finalidad | Comando del proyecto |
 | --- | --- | --- |
-| Playwright | Abre Nexus en Chromium y genera las capturas del manual. Sólo se necesita cuando deben actualizarse las imágenes. | `npm run docs:screenshots` |
-| Mermaid CLI | Convierte cada bloque de código Mermaid en una imagen para que el diagrama conserve su aspecto visual en el documento exportado. | Lo invoca automáticamente `docs:export`. |
-| Pandoc | Ensambla el Markdown y las imágenes existentes para generar DOCX o PDF. | `npm run docs:export -- <paquete> <formato>` |
+| Node.js y dependencias (`npm ci`) | Ejecutan los scripts del repositorio. | Todos los comandos `npm run docs:*`. |
+| Playwright y Chromium (instalación opcional) | Abren Nexus y generan las capturas del manual. Sólo se necesitan al actualizar imágenes. | `npm run docs:screenshots` |
+| Mermaid CLI (instalación opcional) | Convierte cada bloque Mermaid en una imagen temporal para la exportación. | Lo invoca automáticamente `docs:export` cuando el paquete contiene diagramas. |
+| Pandoc (herramienta del sistema) | Ensambla el Markdown y las imágenes existentes para generar DOCX o PDF. | `npm run docs:export -- <paquete> <formato>` |
+| XeLaTeX u otro motor PDF (herramienta del sistema) | Compone el PDF solicitado por Pandoc; no se necesita para DOCX. | Sólo `docs:export` con formato `pdf`. |
 
 Una extensión de Playwright para Visual Studio Code tampoco reemplaza estas herramientas: puede
 facilitar la ejecución desde el editor, pero el script de capturas requiere el paquete `playwright`
@@ -403,8 +405,11 @@ Después de aprobar las imágenes, vuelva a [Exportar los manuales](#exportar-lo
    `/inicio-sesion` al final, y cree el estado
    de sesión en una ruta temporal. El comando `codegen` sí agrega la ruta de acceso al abrir el
    navegador. Inicie sesión con la cuenta ficticia que reúne los permisos del inventario,
-   compruebe que puede abrir una página protegida y cierre la ventana. Al cerrar, `codegen` guarda
-   la sesión y termina; sólo entonces continúa con el paso 5.
+   compruebe que puede abrir una página protegida y **cierre la ventana de Chromium que abrió
+   Playwright** con el botón **X** de la ventana o con `Alt+F4` en Windows (`Cmd+W` en macOS).
+   No cierre la terminal con `Ctrl+C`: `codegen` guarda el archivo al cerrarse la ventana y después
+   termina por sí solo. Espere a que reaparezca el prompt de la terminal; sólo entonces continúe
+   con el paso 5.
 
    En PowerShell —es el bloque correcto si recibió el error de cmdlet para `export`—:
 
@@ -426,7 +431,17 @@ Después de aprobar las imágenes, vuelva a [Exportar los manuales](#exportar-lo
 
    La comprobación final debe devolver `True` en PowerShell o terminar sin error en Bash. Si no
    existe el archivo, no continúe al paso 5: repita `codegen`, complete el inicio de sesión y cierre
-   su ventana. El archivo puede contener credenciales y cookies; manténgalo fuera del repositorio.
+   su ventana. En PowerShell puede mostrar la ubicación real con
+   `Write-Output $env:DOCS_STORAGE_STATE` y abrir sus datos con
+   `Get-Item $env:DOCS_STORAGE_STATE`; en Bash use `printf '%s\n' "$DOCS_STORAGE_STATE"` y
+   `ls -l "$DOCS_STORAGE_STATE"`.
+
+   `/tmp/nexus-storage-state.json` es una ruta temporal absoluta de Linux o macOS: está fuera del
+   proyecto y por eso no aparece en el explorador del repositorio. En Windows, el bloque de
+   PowerShell usa `Join-Path $env:TEMP`, que normalmente resuelve a una carpeta bajo
+   `C:\Users\<usuario>\AppData\Local\Temp`. El archivo se crea **al cerrar Chromium y terminar
+   `codegen`**, no al definir la variable. Contiene credenciales y cookies; no lo copie dentro del
+   repositorio ni lo agregue a Git.
 5. Sin cerrar el servidor de la terminal 1, ejecute en la **misma terminal del paso 4**:
 
    ```bash
@@ -442,13 +457,38 @@ Después de aprobar las imágenes, vuelva a [Exportar los manuales](#exportar-lo
 
    El comando elimina primero `docs/user-manual/images/` y genera el juego completo; no lo
    interrumpa ni mezcle imágenes de ejecuciones distintas. Espere el mensaje `Capturas generadas`
-   antes de continuar.
+   y después `Estado temporal de autenticación eliminado` antes de continuar. Cuando la ejecución
+   completa termina correctamente, el script elimina automáticamente el archivo indicado por
+   `DOCS_STORAGE_STATE` para no conservar cookies en el equipo.
+
+   Para localizar las acciones, el script recorre todas las páginas del listado; la salida no tiene
+   que encontrarse entre los primeros diez registros. Si aun así falla esperando
+   `.btn-return-detail`, revise que la sesión tenga permiso de surtimiento y que la salida esté
+   aprobada, completamente surtida y con cantidad todavía retornable.
 6. Revise los PNG conforme a
    [Revisión antes de publicar](user-manual/screenshot-inventory.md#revisión-antes-de-publicar).
    Si una captura contiene datos reales, es ilegible o representa un estado incorrecto, corrija el
-   entorno de prueba y repita el paso 5.
-7. Cuando todas las capturas estén aprobadas, elimine el archivo indicado por
-   `DOCS_STORAGE_STATE`, detenga el servidor de la terminal 1 y vuelva al flujo
+   entorno de prueba, genere un nuevo estado de sesión repitiendo el paso 4 y vuelva a ejecutar el
+   paso 5.
+7. Si la captura falla antes de terminar, el archivo se conserva para que pueda corregir los datos
+   y reintentar sin iniciar sesión de nuevo. Si decide no reintentar, elimínelo manualmente desde la
+   misma terminal del paso 4:
+
+   ```powershell
+   # PowerShell
+   Remove-Item $env:DOCS_STORAGE_STATE
+   ```
+
+   ```bash
+   # Bash
+   rm -- "$DOCS_STORAGE_STATE"
+   ```
+
+   En una ejecución correcta no necesita ejecutar esos comandos: el script ya hizo la eliminación.
+   La ruta está en la carpeta temporal mostrada en el paso 4, no dentro del proyecto. Cuando todas
+   las capturas estén aprobadas, vuelva a la terminal 1, donde sigue ejecutándose `npm run dev`, y
+   presione `Ctrl+C` una vez. Espere a que reaparezca el prompt: eso detiene Nodemon y Nexus; no hay
+   que escribir `npm stop`. Después vuelva al flujo
    [Exportar los manuales](#exportar-los-manuales). Para el manual completo en DOCX:
 
    ```bash
