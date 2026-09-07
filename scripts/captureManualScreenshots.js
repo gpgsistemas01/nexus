@@ -110,7 +110,13 @@ const findTriggerAcrossPages = async (page, selector) => {
 
 const runAction = async (page, action, captureId) => {
     if (action.filter) {
-        await page.locator(action.selector).selectOption({ label: action.label });
+        const filterControl = page.locator(action.selector);
+        if (!await filterControl.isVisible()) {
+            const filterPanel = page.locator('.table-filters-panel').filter({ has: filterControl });
+            await filterPanel.locator('.table-filters-summary').click();
+            await filterControl.waitFor({ state: 'visible' });
+        }
+        await filterControl.selectOption({ label: action.label });
         await page.locator('#table').evaluate(table => new Promise(resolve => {
             globalThis.$(table).one('draw.dt', resolve);
             document.querySelector('#tableFiltersForm').requestSubmit();
