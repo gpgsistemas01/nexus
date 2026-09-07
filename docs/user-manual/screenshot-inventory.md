@@ -117,7 +117,9 @@ selector de la acción no aparece y el script falla en esa captura con el identi
 prerrequisito que debe revisarse. Por ejemplo, `.btn-return-detail` sólo aparece para una salida
 aprobada y completamente surtida; una salida pendiente o parcialmente surtida muestra
 `.btn-edit-detail` en su lugar. Este comportamiento es intencional: evita publicar una secuencia
-incompleta o incoherente. `DOCS_STORAGE_STATE` es
+incompleta o incoherente. Para las capturas de devolución, la automatización cambia el filtro
+predeterminado **Pendiente** a **Surtido** antes de buscar `.btn-return-detail`, tanto en salidas de
+material como de merma. `DOCS_STORAGE_STATE` es
 obligatorio para las vistas protegidas; la pantalla de inicio de sesión se toma en un contexto
 separado y sin autenticación.
 
