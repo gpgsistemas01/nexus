@@ -1,7 +1,7 @@
 import { DOM_EVENT_NAMES } from '../constants/events.js';
 import { notifications } from "../plugins/swal/swalComponent.js";
 import { getTimeZoneDateTimeParts } from '../utils/timeZone.js';
-import { showReportExportDialog } from './reportExportDialog.js';
+import { showInventoryExportDialog, showReportExportDialog } from './reportExportDialog.js';
 
 const getCurrentMexicoMonth = () => {
     const { year, month } = getTimeZoneDateTimeParts(new Date());
@@ -24,7 +24,8 @@ export const buildTableExportParams = (table, params = {}) => {
 export const buildExcelButton = ({
     filename = 'reporte.xlsx',
     request,
-    allowMonthlyReport = true
+    allowMonthlyReport = true,
+    allowInventoryScope = false
 } = {}) => ({
     text: 'Exportar Excel',
     className: 'datatable-export-button',
@@ -38,6 +39,7 @@ export const buildExcelButton = ({
 
             let reportType = allowMonthlyReport ? 'monthly' : 'custom';
             let reportMonth = '';
+            let inventoryScope = '';
 
             if (allowMonthlyReport) {
                 const result = await showReportExportDialog(getCurrentMexicoMonth());
@@ -46,11 +48,17 @@ export const buildExcelButton = ({
 
                 reportType = result.value.type;
                 reportMonth = reportType === 'specificMonth' ? result.value.month : '';
+            } else if (allowInventoryScope) {
+                const result = await showInventoryExportDialog();
+
+                if (!result.isConfirmed) return;
+                inventoryScope = result.value.inventoryScope;
             }
 
             const blob = await request({
                 monthlyReport: reportType === 'monthly' || reportType === 'specificMonth',
-                reportMonth
+                reportMonth,
+                inventoryScope
             });
             const url = window.URL.createObjectURL(blob);
             const link = document.createElement('a');
