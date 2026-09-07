@@ -38,6 +38,23 @@ las creaciones vigentes no usan todas el mismo código HTTP: la ficha debe regis
 `status` real del controller hasta que una decisión funcional cambie y pruebe el
 contrato.
 
+### Alcance de exportación de inventarios
+
+`GET /api/warehouse/reports/inventory/excel` y
+`GET /api/warehouse/reports/wastes/excel` aceptan el parámetro query opcional
+`inventoryScope`. Sus valores contractuales son:
+
+| Valor | Registros incluidos |
+| --- | --- |
+| `activeOrStock` | Activos o con existencia distinta de cero; es el valor predeterminado. |
+| `active` | Sólo registros activos. |
+| `inStock` | Sólo registros con existencia distinta de cero. |
+
+El alcance se combina con la búsqueda, proveedor y orden aplicables al listado. Un valor ausente o
+desconocido conserva `activeOrStock` para no excluir existencias que ya formaban parte del reporte.
+La respuesta correcta sigue siendo el archivo Excel del endpoint; el modal es interfaz cliente y
+no cambia el método HTTP.
+
 ### Prefijo, montaje y orden de middleware
 
 `registerApiRoutes` monta los routers declarados en `API_ROUTES` bajo `/api`. Por ello,

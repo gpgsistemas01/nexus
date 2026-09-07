@@ -298,15 +298,16 @@ export const buildMonthlyGoodsReceiptSummary = (rows = []) => {
 
 export const findWarehouseReportRows = async ({
     search = '',
+    inventoryScope = 'activeOrStock',
     orderBy = 'name',
     orderDir = 'asc'
 } = {}) => {
-    const where = {
-        AND: [
-            // An inactive inventory item remains relevant while it still has stock.
-            { OR: [{ material: { isActive: true } }, { currentStock: { not: 0 } }] }
-        ]
+    const scopeFilter = {
+        active: { material: { isActive: true } },
+        inStock: { currentStock: { not: 0 } },
+        activeOrStock: { OR: [{ material: { isActive: true } }, { currentStock: { not: 0 } }] }
     };
+    const where = { AND: [scopeFilter[inventoryScope] || scopeFilter.activeOrStock] };
 
     if (search) where.AND.push({
         material: { name: { contains: search, mode: 'insensitive' } }
@@ -431,15 +432,16 @@ export const findSupplierReportRows = async ({
 export const findWasteReportRows = async ({
     search = '',
     supplierId = null,
+    inventoryScope = 'activeOrStock',
     orderBy = 'name',
     orderDir = 'asc'
 } = {}) => {
-    const where = {
-        AND: [
-            // Do not lose traceability of inactive waste that is still in inventory.
-            { OR: [{ isActive: true }, { currentStock: { not: 0 } }] }
-        ]
+    const scopeFilter = {
+        active: { isActive: true },
+        inStock: { currentStock: { not: 0 } },
+        activeOrStock: { OR: [{ isActive: true }, { currentStock: { not: 0 } }] }
     };
+    const where = { AND: [scopeFilter[inventoryScope] || scopeFilter.activeOrStock] };
 
     if (search) where.AND.push({
         OR: [

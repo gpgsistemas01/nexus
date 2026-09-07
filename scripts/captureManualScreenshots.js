@@ -19,6 +19,7 @@ const captures = [
     { id: 'CAP-CAT-MAT-02-CREATE', module: 'materiales', name: '02-formulario-alta.png', route: '/almacen/materiales', ready: '#table', action: click('button:has-text("Nuevo material")', '#materialModal.show'), useCases: ['CU-CAT-02', 'CU-CAT-17', 'CU-CAT-18'] },
     { id: 'CAP-CAT-MAT-03-EDIT', module: 'materiales', name: '03-formulario-edicion.png', route: '/almacen/materiales', ready: '#table', action: click('#table tbody .btn-edit', '#materialModal.show'), useCases: ['CU-CAT-03', 'CU-CAT-04'] },
     { id: 'CAP-CAT-MAT-04-STOCK', module: 'materiales', name: '04-ajuste-existencia.png', route: '/almacen/materiales', ready: '#table', action: click('#table tbody .btn-adjust-stock', '#materialModal.show'), useCases: ['CU-CAT-05', 'CU-CAT-19'] },
+    { id: 'CAP-REP-MAT-05-EXPORT', module: 'materiales', name: '05-exportar-reporte.png', route: '/almacen/materiales', ready: '#table', action: reportDialog, useCases: ['CU-REP-03'] },
 
     { id: 'CAP-CAT-SUP-01-LIST', module: 'proveedores', name: '01-listado.png', route: '/proveedores', ready: '#table', useCases: ['CU-CAT-06', 'CU-REP-12'] },
     { id: 'CAP-CAT-SUP-02-CREATE', module: 'proveedores', name: '02-formulario-alta.png', route: '/proveedores', ready: '#table', action: click('button:has-text("Nuevo proveedor")', '#supplierModal.show'), useCases: ['CU-CAT-07'] },
@@ -33,7 +34,6 @@ const captures = [
     { id: 'CAP-CAT-WAS-03-EDIT', module: 'mermas', name: '03-formulario-edicion.png', route: '/almacen/mermas', ready: '#table', action: click('#table tbody .btn-edit', '#wasteModal.show'), useCases: ['CU-CAT-15'] },
     { id: 'CAP-CAT-WAS-04-STOCK', module: 'mermas', name: '04-ajuste-existencia.png', route: '/almacen/mermas', ready: '#table', action: click('#table tbody .btn-adjust-stock', '#wasteModal.show'), useCases: ['CU-CAT-16'] },
     { id: 'CAP-REP-WAS-05-EXPORT', module: 'mermas', name: '05-exportar-reporte.png', route: '/almacen/mermas', ready: '#table', action: reportDialog, useCases: ['CU-REP-09'] },
-
     { id: 'CAP-ENT-01-LIST', module: 'compras', name: '01-listado.png', route: '/compras', ready: '#table', useCases: ['CU-ENT-01'] },
     { id: 'CAP-ENT-02-CREATE', module: 'compras', name: '02-formulario-registro.png', route: '/compras', ready: '#table', action: click('button:has-text("Nueva compra")', '#goodsReceiptModal.show'), useCases: ['CU-ENT-02'] },
     { id: 'CAP-ENT-03-EDIT', module: 'compras', name: '03-edicion-compra.png', route: '/compras', ready: '#table', action: click('#table tbody .btn-edit', '#goodsReceiptModal.show'), useCases: ['CU-ENT-03', 'CU-ENT-05'] },

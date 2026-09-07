@@ -65,8 +65,8 @@ técnica de modelos, campos y relaciones.
    cambio y, después de fusionarla, regenera y versiona el mapa de código, el esquema de
    base de datos y el diccionario técnico en `main` si fuera necesario.
 4. Antes de publicar: validar el paquete con
-   `npm run docs:export -- <paquete> html --check`; generar DOCX, PDF o HTML sólo en
-   desarrollo/CI. Las capturas se actualizan mediante `npm run docs:screenshots` con un
+   `npm run docs:export -- <paquete> --check`; generar DOCX o PDF sólo en desarrollo/CI.
+   Las capturas se actualizan mediante `npm run docs:screenshots` con un
    entorno y una sesión de prueba preparados.
 
 No se duplica el catálogo de rutas en documentos manuales: su fuente es el mapa
@@ -77,14 +77,16 @@ el código puede inferir decisiones de arquitectura.
 
 Esta guía vive aquí —y no en el `README.md` raíz— porque Pandoc, las plantillas y los
 motores PDF son herramientas del flujo documental, no requisitos para ejecutar Nexus.
-El README del sistema sólo lista los comandos para que puedan descubrirse.
+La exportación y la generación de capturas se ejecutan sólo en desarrollo o CI y por eso
+sus comandos se mantienen fuera de la guía operativa de la aplicación.
 
 Pandoc y Playwright intervienen en etapas distintas y ninguno sustituye al otro:
 
 | Herramienta | Finalidad | Comando del proyecto |
 | --- | --- | --- |
 | Playwright | Abre Nexus en Chromium y genera las capturas del manual. Sólo se necesita cuando deben actualizarse las imágenes. | `npm run docs:screenshots` |
-| Pandoc | Ensambla el Markdown y las imágenes existentes para generar HTML, DOCX o PDF. | `npm run docs:export -- <paquete> <formato>` |
+| Mermaid CLI | Convierte cada bloque de código Mermaid en una imagen para que el diagrama conserve su aspecto visual en el documento exportado. | Lo invoca automáticamente `docs:export`. |
+| Pandoc | Ensambla el Markdown y las imágenes existentes para generar DOCX o PDF. | `npm run docs:export -- <paquete> <formato>` |
 
 Una extensión de Playwright para Visual Studio Code tampoco reemplaza estas herramientas: puede
 facilitar la ejecución desde el editor, pero el script de capturas requiere el paquete `playwright`
@@ -105,15 +107,15 @@ Code.
 ### Estructura exportable
 
 La estructura actual es válida para exportar: cada paquete comienza en el `index.md` de
-su propia familia, las fuentes curadas permanecen junto a esa entrada, `styles/` contiene
-la presentación y `build/docs/` recibe los resultados ignorados por Git. El paquete de
+su propia familia, las fuentes curadas permanecen junto a esa entrada y `build/docs/` recibe los
+resultados ignorados por Git. El paquete de
 requisitos comienza en `requirements/index.md`, no en una carpeta genérica de
 publicaciones. Los paquetes no dependen de archivos binarios versionados. Antes de
 publicar, todavía se debe revisar lo siguiente:
 
 - un enlace o una imagen ausente hace fallar `--check`;
-- Mermaid permanece como fuente Markdown y necesita renderizarse previamente si el formato
-  final no admite esos bloques;
+- Mermaid permanece como fuente Markdown; durante la exportación, el script genera imágenes PNG
+  temporales de los diagramas y las entrega a Pandoc en lugar de copiar el código;
 - PDF requiere un motor adicional a Pandoc;
 - una captura generada sólo se referencia después de ser revisada y existir en la estación
   que ensambla el documento.
@@ -139,12 +141,61 @@ Las carpetas de imágenes se crean al incorporar la primera imagen real. No se a
 archivos binarios de relleno ni `.gitkeep`; cada imagen versionada debe estar referenciada
 por un Markdown de su misma familia.
 
+### Enlaces e imágenes
+
+Las referencias y los hipervínculos se declaran en los Markdown fuente, no se agregan manualmente
+después de crear el DOCX. Así una sola fuente conserva la misma navegación en el repositorio,
+DOCX y PDF. Se aplican estas reglas:
+
+| Recurso | Qué debe declararse en el Markdown | Qué no debe declararse |
+| --- | --- | --- |
+| Imagen versionada, incluida una captura | `![texto alternativo](ruta/relativa.png)` dentro de la sección que la explica. | Una ruta absoluta de la estación de trabajo o un enlace a la propia imagen. |
+| Diagrama Mermaid | Un encabezado descriptivo seguido de un bloque cercado `mermaid`. El encabezado es la referencia y se convierte en la leyenda al exportar. | Una ruta hacia el PNG temporal: ese archivo no existe en el repositorio y lo crea el exportador. |
+| Referencia hacia otra sección o documento | Un enlace Markdown relativo, por ejemplo `[casos de uso](requirements/use-case-descriptions.md)`. | Un campo de referencia agregado después sólo en Word. |
+
+- los enlaces hacia otro Markdown, código o imagen del repositorio usan rutas **relativas al
+  archivo que contiene el enlace**; así funcionan en el repositorio, en otros clones y durante la
+  validación;
+- sólo los sitios externos usan URL absolutas `https://`;
+- las imágenes y los diagramas renderizados sí deben tener una **referencia documental**: texto
+  alternativo o leyenda que identifique la figura y una mención dentro de la sección que la
+  explica. Esto es distinto de convertir la imagen en un hipervínculo; no debe envolverse en otro
+  enlace sólo para abrir el archivo de imagen;
+- los diagramas Mermaid no usan instrucciones `click`: la navegación hacia otro documento se
+  expresa con un enlace Markdown junto al diagrama, porque esos enlaces internos de Mermaid no
+  funcionan de manera uniforme en DOCX y PDF.
+
+`docs:export -- <paquete> <formato> --check` comprueba que las rutas locales declaradas existan y
+rechaza rutas locales absolutas en enlaces e imágenes. Durante la exportación, el script puede
+usar rutas absolutas únicamente dentro de su copia temporal para que Pandoc encuentre los
+recursos; esas rutas no se escriben en los Markdown originales. DOCX y PDF incorporan las imágenes
+dentro del documento final.
+
+Para los bloques Mermaid, el exportador toma el encabezado Markdown más cercano y lo convierte en
+la leyenda de la figura; para las capturas, el texto alternativo conserva el identificador
+`CAP-*` y la operación mostrada. Pandoc utiliza esas leyendas como figuras en DOCX y PDF. No
+se generan campos dinámicos de referencia cruzada propios de Microsoft Word: una referencia como
+“consulte el diagrama de autenticación” se mantiene como texto y enlace Markdown, por lo que
+también funciona fuera de DOCX.
+
+Por tanto, las imágenes que existen como archivos sí tienen una referencia
+`![descripción](ruta/relativa.png)` dentro del
+Markdown. Los diagramas Mermaid no tienen una referencia a una imagen PNG en el Markdown: su
+referencia versionada es el encabezado más el bloque Mermaid, y la referencia al PNG se crea sólo
+en la copia temporal de exportación. `--check` valida ambos contratos y rechaza una imagen sin texto
+alternativo o un bloque Mermaid sin encabezado.
+
 ### Preparar las herramientas
 
 Estos comandos pueden ejecutarse desde la terminal integrada de Visual Studio Code
 (`Terminal` > `New Terminal`), abierta en la raíz del repositorio. Visual Studio Code no instala
 Pandoc por sí mismo: la instalación se realiza en el mismo sistema, contenedor o entorno remoto
 donde se ejecutará `npm run docs:export`.
+
+Antes de copiar un bloque, identifique la terminal activa. Si el prompt comienza con `PS`, está en
+**PowerShell** y debe usar `$env:NOMBRE = "valor"`. La instrucción `export NOMBRE=valor` pertenece
+sólo a **Bash** y produce el error “`export` no se reconoce como nombre de un cmdlet” cuando se pega
+en PowerShell. No mezcle líneas de ambos bloques.
 
 Existen extensiones de Visual Studio Code que integran funciones de Pandoc, pero son opcionales y
 no sustituyen la instalación requerida por este proyecto. `npm run docs:export` ejecuta el comando
@@ -159,36 +210,269 @@ no sustituyen la instalación requerida por este proyecto. `npm run docs:export`
      abrir la terminal integrada. Windows no utiliza `sudo`.
    - **Debian o Ubuntu:** ejecuta `sudo apt-get install pandoc`. Si la cuenta no dispone de
      `sudo`, solicita la instalación al administrador del equipo.
-3. Para PDF, instala un motor compatible en el mismo sistema. En Debian o Ubuntu se recomienda
-   TeX Live mediante `sudo apt-get install texlive-xetex`; en Windows debe utilizarse su
-   instalador oficial. Después define `DOCS_PDF_ENGINE=xelatex`. HTML y DOCX no necesitan este
-   motor.
-4. Para aplicar estilos corporativos a DOCX, prepara una plantilla y define
-   `DOCS_REFERENCE_DOC=/ruta/reference.docx`.
+3. Instala Mermaid CLI en la estación que realiza la exportación:
+
+   ```bash
+   npm install --no-save @mermaid-js/mermaid-cli
+   ```
+
+   El exportador detecta los bloques `mermaid`, genera imágenes PNG temporales y las elimina al
+   terminar. Las fuentes Markdown no se modifican. Si el paquete no contiene diagramas, esta
+   herramienta no se invoca.
+4. DOCX no requiere otra herramienta. Para PDF, Pandoc necesita un programa que componga
+   el PDF desde la terminal; Adobe Acrobat o Adobe Reader sirven para abrir el resultado, pero no
+   realizan esa composición para este script. El flujo recomendado usa **XeLaTeX**, incluido en
+   TeX Live: en Debian o Ubuntu se instala con `sudo apt-get install texlive-xetex`; en Windows se
+   instala una distribución de TeX que incluya `xelatex`. Comprueba `xelatex --version` y, sólo al
+   ejecutar una exportación PDF, indica al script cuál motor debe usar. La variable se coloca en
+   la misma terminal desde la que se ejecuta `docs:export`; no se agrega al código ni es necesario
+   guardarla en `.env`:
+
+   ```powershell
+   # PowerShell (Windows)
+   $env:DOCS_PDF_ENGINE = "xelatex"
+   npm run docs:export -- <paquete> pdf
+   ```
+
+   ```bash
+   # Bash (Linux, macOS o contenedor)
+   DOCS_PDF_ENGINE=xelatex npm run docs:export -- <paquete> pdf
+   ```
+
+   En PowerShell la variable permanece durante esa sesión de terminal; puede retirarla después con
+   `Remove-Item Env:DOCS_PDF_ENGINE`. Sustituye `<paquete>` por un valor de la tabla siguiente,
+   por ejemplo `todos`.
+
 5. Valida siempre el paquete con `--check` antes de generar el archivo.
+
+La portada **ya se genera** con `title`, `subtitle`, `author` y `date` del encabezado YAML del
+primer Markdown de cada paquete; esos datos pueden variar sin crear una plantilla. Un DOCX también
+se genera directamente sin definir `DOCS_REFERENCE_DOC`. Esa variable es opcional y sólo se usa
+si la organización ya dispone de un archivo `.docx` de referencia para aplicar tipografías,
+márgenes, encabezados o estilos corporativos al resultado; no contiene ni reemplaza los datos de
+la portada.
 
 ### Comandos
 
-Los paquetes admitidos son `manual-usuario`, `manual-administrador`, `manual-almacen`,
-`manual-reportes`, `requisitos`, `arquitectura` y `pruebas`. Los tres paquetes de actor reutilizan
-los grupos de casos del manual general y omiten los grupos ajenos a sus responsabilidades. Los
-formatos admitidos son `html`, `docx` y `pdf`.
+En los comandos, `<paquete>` significa **qué contenido se va a reunir en un solo archivo**. No es
+un paquete de npm. Elija uno de estos valores:
+
+| Valor de `<paquete>` | Contenido generado | Cuándo usarlo |
+| --- | --- | --- |
+| `manual-usuario` | Manual completo con todos los grupos funcionales, referencias e inventario de capturas. | Para publicar el manual general. |
+| `manual-administrador` | Acceso, identidad, catálogos y reportes disponibles para Sistemas. | Para personal administrador del sistema. |
+| `manual-almacen` | Acceso, catálogos, compras, salidas y reportes operativos. | Para personal de almacén y proveeduría. |
+| `manual-reportes` | Acceso, consultas y exportaciones de catálogos, compras, salidas y movimientos. | Para usuarios que sólo consultan o generan reportes. |
+| `requisitos` | Especificación y trazabilidad de requisitos. | Para revisión funcional. |
+| `arquitectura` | Diseño y documentación técnica de frontend, backend y datos. | Para revisión técnica. |
+| `pruebas` | Plan, cobertura, catálogo y resultados de pruebas. | Para evidencia de calidad. |
+| `todos` | Los siete documentos anteriores, cada uno en su propio archivo. | Para preparar una entrega documental completa con un solo comando. |
+
+Los paquetes específicos por actor reutilizan las secciones del manual completo y omiten las que
+no corresponden a ese recorrido. Los formatos de entrega admitidos son `docx` y `pdf`; Markdown
+permanece como fuente navegable y por eso no se genera una copia HTML equivalente.
+
+### Volver a generar documentos existentes
+
+No es necesario eliminar manualmente un resultado antes de ejecutar nuevamente los comandos:
+
+- `npm run docs:export -- <paquete> <formato>` escribe siempre en
+  `build/docs/<paquete>.<formato>` y reemplaza el archivo de esa misma combinación de paquete y
+  formato;
+- `npm run docs:architecture` vuelve a escribir los Markdown derivados que administra el
+  generador;
+- `npm run docs:screenshots` es el único flujo que hace una limpieza completa: después de validar
+  la configuración, elimina automáticamente `docs/user-manual/images/` y genera de nuevo todo el
+  inventario. No elimine esa carpeta por separado ni intente conservar capturas parciales.
+
+Una exportación no elimina otros paquetes o formatos de `build/docs/`. Por ejemplo, volver a
+generar `manual-usuario.pdf` no borra un `manual-usuario.docx` anterior. Esto permite conservar
+varios formatos durante la revisión; antes de entregar, seleccione el archivo recién generado y,
+si va a compartir la carpeta completa, retire de ella los resultados antiguos que no formen parte
+de la entrega. Nunca elimine los Markdown fuente de `docs/` para regenerar un documento.
+
+Para generar todos los documentos al mismo tiempo, use `todos`. El comando valida primero las
+fuentes e imágenes de los siete paquetes y después crea un archivo independiente por paquete:
+
+```bash
+npm run docs:export -- todos docx
+```
+
+El resultado no es un único documento combinado: se crean los cuatro manuales, requisitos,
+arquitectura y pruebas dentro de `build/docs/`. Para generar los siete PDF, prepare XeLaTeX y use
+`DOCS_PDF_ENGINE=xelatex npm run docs:export -- todos pdf`.
+
+### Flujo general de exportación
+
+Para exportar `requisitos`, `arquitectura` o `pruebas`:
+
+1. Complete la [preparación de herramientas](#preparar-las-herramientas): dependencias de
+   Node.js, Pandoc y, sólo para PDF, un motor PDF.
+2. Desde la raíz del repositorio, valide fuentes, enlaces e imágenes sin generar un archivo:
+
+   ```bash
+   npm run docs:export -- <paquete> --check
+   ```
+
+3. Corrija cualquier referencia ausente y ejecute la exportación en el formato requerido:
+
+   ```bash
+   npm run docs:export -- <paquete> <docx|pdf>
+   ```
+
+4. Revise el resultado creado en `build/docs/`. La portada se genera automáticamente. Si eligió
+   PDF, use `DOCS_PDF_ENGINE=xelatex` como se indicó en la preparación.
+
+Si la entrega incluye toda la documentación, sustituya `<paquete>` por `todos` en los pasos 2 y
+3. Antes debe comprobar también que las capturas requeridas por los cuatro manuales ya existan y
+estén aprobadas. Actualizarlas es una acción independiente de la exportación.
+
+### Exportar los manuales
+
+Los paquetes `manual-usuario`, `manual-administrador`, `manual-almacen` y `manual-reportes`
+incluyen capturas de la aplicación, pero `docs:export` **no toma capturas ni abre Nexus**. Antes de
+exportar uno de esos paquetes se requieren:
+
+- las dependencias de Node.js y Pandoc indicadas en [Preparar las herramientas](#preparar-las-herramientas);
+- un motor PDF sólo cuando el formato solicitado sea PDF;
+- todos los Markdown del paquete actualizados;
+- todas las imágenes referenciadas presentes en `docs/user-manual/images/`, revisadas y
+  correspondientes a la versión del manual.
+
+Si se cumplen esos requisitos, no necesita una base de datos, una sesión ni Playwright para
+exportar. Valide y genere el manual:
+
+```bash
+npm run docs:export -- manual-usuario --check
+npm run docs:export -- manual-usuario docx
+```
+
+Sustituya `manual-usuario` por el paquete de actor y `docx` por `pdf` cuando corresponda. Si falta una
+imagen, `--check` detiene el proceso; en ese caso ejecute primero el flujo independiente siguiente.
+
+### Actualizar las capturas del manual
+
+Este flujo sólo se ejecuta en un clon sin las imágenes requeridas o cuando una pantalla cambió.
+Su resultado son archivos PNG revisables en `docs/user-manual/images/`; **no genera DOCX ni PDF**.
+Después de aprobar las imágenes, vuelva a [Exportar los manuales](#exportar-los-manuales).
+
+1. Prepare una base de prueba con los permisos y registros ficticios enumerados en
+   [Datos de prueba requeridos](user-manual/screenshot-inventory.md#datos-de-prueba-requeridos).
+   No utilice producción ni datos personales reales.
+2. Inicie Nexus contra ese entorno de prueba y confirme la URL accesible desde la estación de
+   capturas. La ruta de acceso registrada por la aplicación es `/inicio-sesion`; por tanto,
+   `http://127.0.0.1:3000/inicio-sesion` es correcta cuando Nexus se ejecuta localmente con el
+   puerto predeterminado `3000`. Si `PORT` tiene otro valor o se usa otro entorno, cambie el origen
+   de `DOCS_BASE_URL`, pero conserve `/inicio-sesion`.
+
+   Para trabajar localmente se necesitan **dos terminales**. En la primera, complete la
+   [configuración inicial de Nexus](../README.md#configuración-inicial), ejecute lo siguiente y
+   mantenga el proceso abierto:
+
+   ```powershell
+   # Terminal 1, PowerShell o Bash
+   npm run dev
+   ```
+
+   Espere el mensaje `Servidor escuchando en puerto 3000`. En una segunda terminal compruebe la
+   página antes de abrir Playwright:
+
+   ```powershell
+   # Terminal 2, PowerShell
+   Invoke-WebRequest -UseBasicParsing "http://127.0.0.1:3000/inicio-sesion"
+   ```
+
+   ```bash
+   # Terminal 2, Bash
+   curl --fail http://127.0.0.1:3000/inicio-sesion
+   ```
+
+   Debe obtener una respuesta HTTP satisfactoria. `ERR_CONNECTION_REFUSED` significa que no hay un
+   proceso escuchando en esa dirección o puerto; no indica que `/inicio-sesion` sea una ruta
+   incorrecta. Inicie Nexus, mantenga abierta la primera terminal y repita la comprobación. Si el
+   servidor anunció otro puerto, use ese mismo puerto tanto en esta prueba como en
+   `DOCS_BASE_URL`.
+3. Instale Playwright y su Chromium, si todavía no están disponibles:
+
+   ```bash
+   npm install --no-save playwright
+   npx playwright install chromium
+   ```
+
+4. Elija **un solo bloque** según la terminal. Defina `DOCS_BASE_URL` con el **origen**, sin
+   `/inicio-sesion` al final, y cree el estado
+   de sesión en una ruta temporal. El comando `codegen` sí agrega la ruta de acceso al abrir el
+   navegador. Inicie sesión con la cuenta ficticia que reúne los permisos del inventario,
+   compruebe que puede abrir una página protegida y cierre la ventana. Al cerrar, `codegen` guarda
+   la sesión y termina; sólo entonces continúa con el paso 5.
+
+   En PowerShell —es el bloque correcto si recibió el error de cmdlet para `export`—:
+
+   ```powershell
+   $env:DOCS_BASE_URL = "http://127.0.0.1:3000"
+   $env:DOCS_STORAGE_STATE = Join-Path $env:TEMP "nexus-storage-state.json"
+   npx playwright codegen --save-storage="$env:DOCS_STORAGE_STATE" "${env:DOCS_BASE_URL}/inicio-sesion"
+   Test-Path "$env:DOCS_STORAGE_STATE"
+   ```
+
+   En Bash:
+
+   ```bash
+   export DOCS_BASE_URL=http://127.0.0.1:3000
+   export DOCS_STORAGE_STATE=/tmp/nexus-storage-state.json
+   npx playwright codegen --save-storage="$DOCS_STORAGE_STATE" "$DOCS_BASE_URL/inicio-sesion"
+   test -f "$DOCS_STORAGE_STATE"
+   ```
+
+   La comprobación final debe devolver `True` en PowerShell o terminar sin error en Bash. Si no
+   existe el archivo, no continúe al paso 5: repita `codegen`, complete el inicio de sesión y cierre
+   su ventana. El archivo puede contener credenciales y cookies; manténgalo fuera del repositorio.
+5. Sin cerrar el servidor de la terminal 1, ejecute en la **misma terminal del paso 4**:
+
+   ```bash
+   npm run docs:screenshots
+   ```
+
+   El comando reutiliza `DOCS_BASE_URL` y `DOCS_STORAGE_STATE` definidos en el paso anterior, tanto
+   en Bash como en PowerShell.
+
+   Si PowerShell indica que `$DOCS_STORAGE_STATE` no está establecida, se copió la sintaxis de
+   Bash. En PowerShell el nombre correcto incluye el prefijo `$env:` y debe ejecutarse el bloque
+   PowerShell completo en la misma terminal antes de `npm run docs:screenshots`.
+
+   El comando elimina primero `docs/user-manual/images/` y genera el juego completo; no lo
+   interrumpa ni mezcle imágenes de ejecuciones distintas. Espere el mensaje `Capturas generadas`
+   antes de continuar.
+6. Revise los PNG conforme a
+   [Revisión antes de publicar](user-manual/screenshot-inventory.md#revisión-antes-de-publicar).
+   Si una captura contiene datos reales, es ilegible o representa un estado incorrecto, corrija el
+   entorno de prueba y repita el paso 5.
+7. Cuando todas las capturas estén aprobadas, elimine el archivo indicado por
+   `DOCS_STORAGE_STATE`, detenga el servidor de la terminal 1 y vuelva al flujo
+   [Exportar los manuales](#exportar-los-manuales). Para el manual completo en DOCX:
+
+   ```bash
+   npm run docs:export -- manual-usuario --check
+   npm run docs:export -- manual-usuario docx
+   ```
+
+### Ejemplos de exportación
 
 ```bash
 # Sólo valida fuentes e imágenes; no necesita Pandoc.
-npm run docs:export -- requisitos html --check
+npm run docs:export -- requisitos --check
 
-# Genera build/docs/manual-usuario.html.
-npm run docs:export -- manual-usuario html
+# Genera build/docs/manual-usuario.docx.
+npm run docs:export -- manual-usuario docx
 
-# Genera un manual con el recorrido del personal de almacén.
-npm run docs:export -- manual-almacen html
+# Genera en DOCX un manual con el recorrido del personal de almacén.
+npm run docs:export -- manual-almacen docx
 
-# Genera un DOCX con una plantilla opcional.
-DOCS_REFERENCE_DOC=/ruta/reference.docx npm run docs:export -- arquitectura docx
+# Genera un DOCX, incluida la portada definida en el Markdown.
+npm run docs:export -- arquitectura docx
 
-# Genera un PDF con XeLaTeX.
-DOCS_PDF_ENGINE=xelatex npm run docs:export -- pruebas pdf
+# Genera un PDF después de definir DOCS_PDF_ENGINE en la misma terminal como se explicó arriba.
+npm run docs:export -- pruebas pdf
 ```
 
 La exportación se ejecuta en desarrollo o CI, nunca mediante `npm start` ni como parte del

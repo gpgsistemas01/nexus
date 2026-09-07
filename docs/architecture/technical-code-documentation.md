@@ -176,5 +176,5 @@ estado y no se mezcla con el recorrido implementado.
    existiendo.
 5. Regenerar los inventarios si cambió una fuente derivada y ejecutar
    `npm run docs:check`.
-6. Validar el paquete con `npm run docs:export -- arquitectura html --check` para detectar
+6. Validar el paquete con `npm run docs:export -- arquitectura --check` para detectar
    fuentes o imágenes ausentes.

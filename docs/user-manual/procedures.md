@@ -2,7 +2,9 @@
 
 Este capítulo integra las capturas generadas con los pasos que las requieren. El texto situado
 sobre cada imagen es su ID actualizado y estable; los casos de uso asociados permiten verificar
-la trazabilidad. Antes de exportar, ejecute `npm run docs:screenshots` y revise las imágenes.
+la trazabilidad. Antes de exportar, compruebe que las imágenes existentes estén completas,
+revisadas y correspondan a la versión del manual. Ejecute `npm run docs:screenshots` sólo si falta
+una captura o cambió una pantalla; actualizar capturas y exportar el manual son acciones distintas.
 
 ## Convenciones del recorrido
 
