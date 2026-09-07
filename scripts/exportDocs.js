@@ -101,7 +101,7 @@ const [requestedPublication, requestedFormat] = process.argv.slice(2).filter((ar
 const checkOnly = process.argv.includes('--check');
 const formats = new Set(['docx', 'pdf']);
 const publicationNames = Object.keys(MANIFESTS);
-const mermaidBlock = /^```mermaid\n([\s\S]*?)^```$/gm;
+const mermaidBlock = /^```mermaid\r?\n([\s\S]*?)^```\r?$/gm;
 const externalLink = /^(?:https?:|mailto:)/;
 const markdownLink = /(?<!!)\[([^\]]+)\]\(([^) ]+)([^)]*)\)/g;
 const diagramCaption = (content, index) => {
