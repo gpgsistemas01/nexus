@@ -7,6 +7,7 @@ const storageState = process.env.DOCS_STORAGE_STATE;
 const outputRoot = path.resolve('docs/user-manual/images');
 
 const click = (selector, ready, requirement) => ({ selector, ready, requirement });
+const filter = (selector, label) => ({ selector, label, filter: true });
 const reportDialog = click('.datatable-export-button', '.report-export-modal');
 const formatCoverage = (useCases) => useCases.length ? useCases.join(', ') : 'Transversal';
 
@@ -44,14 +45,14 @@ const captures = [
     { id: 'CAP-SAL-MAT-02-CREATE', module: 'salidas-material', name: '02-formulario-registro.png', route: '/salidas/materiales', ready: '#table', action: click('button:has-text("Nueva salida")', '#goodsIssueModal.show'), useCases: ['CU-SAL-02'] },
     { id: 'CAP-SAL-MAT-03-EDIT', module: 'salidas-material', name: '03-edicion-encabezado.png', route: '/salidas/materiales', ready: '#table', action: click('#table tbody .btn-edit', '#goodsIssueModal.show'), useCases: ['CU-SAL-03', 'CU-SAL-04'] },
     { id: 'CAP-SAL-MAT-04-SUPPLY', module: 'salidas-material', name: '04-surtir-detalles.png', route: '/salidas/materiales', ready: '#table', action: click('#table tbody .btn-edit-detail', '#goodsIssueModal.show'), useCases: ['CU-SAL-05'] },
-    { id: 'CAP-SAL-MAT-05-RETURN', module: 'salidas-material', name: '05-devolver-detalle.png', route: '/salidas/materiales', ready: '#table', actions: [click('#table tbody .btn-return-detail', '#goodsIssueModal.show', 'una salida de material aprobada, completamente surtida y con cantidad retornable'), click('#materialTable tbody .return-issue-detail-btn', '#issueReturnModal.show', 'un detalle surtido que todavía tenga cantidad retornable')], useCases: ['CU-SAL-06'] },
+    { id: 'CAP-SAL-MAT-05-RETURN', module: 'salidas-material', name: '05-devolver-detalle.png', route: '/salidas/materiales', ready: '#table', actions: [filter('#fulfillmentStatusFilter', 'Surtido'), click('#table tbody .btn-return-detail', '#goodsIssueModal.show', 'una salida de material aprobada, completamente surtida y con cantidad retornable'), click('#materialTable tbody .return-issue-detail-btn', '#issueReturnModal.show', 'un detalle surtido que todavía tenga cantidad retornable')], useCases: ['CU-SAL-06'] },
     { id: 'CAP-REP-SAL-MAT-06-EXPORT', module: 'salidas-material', name: '06-exportar-reporte.png', route: '/salidas/materiales', ready: '#table', action: reportDialog, useCases: ['CU-REP-04'] },
 
     { id: 'CAP-SAL-WAS-01-LIST', module: 'salidas-merma', name: '01-listado.png', route: '/salidas/mermas', ready: '#table', useCases: ['CU-SAL-07', 'CU-REP-08'] },
     { id: 'CAP-SAL-WAS-02-CREATE', module: 'salidas-merma', name: '02-formulario-registro.png', route: '/salidas/mermas', ready: '#table', action: click('button:has-text("Nueva salida")', '#wasteIssueModal.show'), useCases: ['CU-SAL-08'] },
     { id: 'CAP-SAL-WAS-03-EDIT', module: 'salidas-merma', name: '03-edicion-encabezado.png', route: '/salidas/mermas', ready: '#table', action: click('#table tbody .btn-edit', '#wasteIssueModal.show'), useCases: ['CU-SAL-09', 'CU-SAL-10'] },
     { id: 'CAP-SAL-WAS-04-SUPPLY', module: 'salidas-merma', name: '04-surtir-detalles.png', route: '/salidas/mermas', ready: '#table', action: click('#table tbody .btn-edit-detail', '#wasteIssueModal.show'), useCases: ['CU-SAL-11'] },
-    { id: 'CAP-SAL-WAS-05-RETURN', module: 'salidas-merma', name: '05-devolver-detalle.png', route: '/salidas/mermas', ready: '#table', actions: [click('#table tbody .btn-return-detail', '#wasteIssueModal.show', 'una salida de merma aprobada, completamente surtida y con cantidad retornable'), click('#materialTable tbody .return-issue-detail-btn', '#issueReturnModal.show', 'un detalle surtido que todavía tenga cantidad retornable')], useCases: ['CU-SAL-12'] },
+    { id: 'CAP-SAL-WAS-05-RETURN', module: 'salidas-merma', name: '05-devolver-detalle.png', route: '/salidas/mermas', ready: '#table', actions: [filter('#fulfillmentStatusFilter', 'Surtido'), click('#table tbody .btn-return-detail', '#wasteIssueModal.show', 'una salida de merma aprobada, completamente surtida y con cantidad retornable'), click('#materialTable tbody .return-issue-detail-btn', '#issueReturnModal.show', 'un detalle surtido que todavía tenga cantidad retornable')], useCases: ['CU-SAL-12'] },
     { id: 'CAP-REP-SAL-WAS-06-EXPORT', module: 'salidas-merma', name: '06-exportar-reporte.png', route: '/salidas/mermas', ready: '#table', action: reportDialog, useCases: ['CU-REP-08'] },
 
     { id: 'CAP-IDA-PER-01-LIST', module: 'personas', name: '01-listado.png', route: '/personas', ready: '#table', useCases: ['CU-IDA-01', 'CU-REP-14'] },
@@ -108,6 +109,16 @@ const findTriggerAcrossPages = async (page, selector) => {
 };
 
 const runAction = async (page, action, captureId) => {
+    if (action.filter) {
+        await page.locator(action.selector).selectOption({ label: action.label });
+        await page.locator('#table').evaluate(table => new Promise(resolve => {
+            globalThis.$(table).one('draw.dt', resolve);
+            document.querySelector('#tableFiltersForm').requestSubmit();
+        }));
+        console.log(`  Filtro preparado para ${ captureId }: ${ action.label }`);
+        return;
+    }
+
     const trigger = action.selector.startsWith('#table tbody ')
         ? await findTriggerAcrossPages(page, action.selector)
         : page.locator(action.selector).first();
