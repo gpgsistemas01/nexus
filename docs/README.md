@@ -118,7 +118,8 @@ publicar, todavía se debe revisar lo siguiente:
 - un enlace o una imagen ausente hace fallar `--check`;
 - Mermaid permanece como fuente Markdown; durante la exportación, el script entrega a Pandoc las
   imágenes PNG de los diagramas en lugar de copiar el código y conserva esos recursos generados
-  bajo `build/docs/` para su revisión;
+  bajo `build/docs/` para su revisión. Esto también aplica a una copia de trabajo de Windows que
+  use finales de línea CRLF;
 - PDF requiere un motor adicional a Pandoc;
 - una captura generada sólo se referencia después de ser revisada y existir en la estación
   que ensambla el documento.
