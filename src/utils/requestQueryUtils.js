@@ -35,6 +35,10 @@ export const getDataTableSearch = (query = {}) => {
     return '';
 };
 
+export const isMonthlyReportQuery = (query = {}) => (
+    query.monthlyReport === true || query.monthlyReport === 'true'
+);
+
 export const getDataTableOrder = ({
     query = {},
     columns = [],

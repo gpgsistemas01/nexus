@@ -4,7 +4,8 @@ import {
   buildDateRangeFilter,
   getDataTableOrder,
   getDataTablePaging,
-  getDataTableSearch
+  getDataTableSearch,
+  isMonthlyReportQuery
 } from '../../../src/utils/requestQueryUtils.js';
 
 describe('requestQueryUtils', () => {
@@ -47,5 +48,13 @@ describe('requestQueryUtils', () => {
   it('retorna un filtro vacío si falta el campo o el rango de fechas', () => {
     expect(buildDateRangeFilter({ field: 'createdAt' })).toEqual({});
     expect(buildDateRangeFilter({ startDate: '2026-06-01' })).toEqual({});
+  });
+
+  it('identifica únicamente solicitudes mensuales booleanas o serializadas', () => {
+    expect(isMonthlyReportQuery({ monthlyReport: true })).toBe(true);
+    expect(isMonthlyReportQuery({ monthlyReport: 'true' })).toBe(true);
+    expect(isMonthlyReportQuery({ monthlyReport: false })).toBe(false);
+    expect(isMonthlyReportQuery({ monthlyReport: 'false' })).toBe(false);
+    expect(isMonthlyReportQuery()).toBe(false);
   });
 });

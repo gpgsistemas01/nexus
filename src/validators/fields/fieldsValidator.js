@@ -230,28 +230,6 @@ export const validateDateOptional = (fieldName) => {
         .toDate()
 }
 
-export const validateDetailsArray =
-    body('details')
-        .isArray({ min: 1 }).withMessage(errorMap['details'].REQUIRED)
-        .custom(details => {
-
-            details.forEach(detail => {
-
-                if (!detail.materialId || !detail.quantity || !detail.costPerUnitType) {
-                    throw new Error(errorMap['details'].INVALID_FORMAT_REQUIRED);
-                }
-
-                const qty = Number(detail.quantity);
-                const costPerUnitType = Number(detail.costPerUnitType);
-
-                if (!Number.isFinite(qty) || qty < 1) throw new Error(errorMap['details'].INVALID_FORMAT_QUANTITY);
-                if (!Number.isFinite(costPerUnitType) || costPerUnitType <= 0) throw new Error(errorMap['details'].INVALID_FORMAT_UNIT_COST_BY_QUANTITY);
-            });
-
-            return true;
-        })
-;
-
 export const validateIssueDetailsArray = ({
     allowDetailId = false,
     exclusiveMinimum = true,

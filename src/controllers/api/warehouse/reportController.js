@@ -1,5 +1,5 @@
 import { buildMonthlyGoodsReceiptSummary, buildWasteReportSummary, findGoodsIssueReportRows, findGoodsReceiptReportRows, findSupplierReportRows, findWarehouseReportRows, findWasteIssueReportRows, findWasteReportRows } from "../../../services/warehouse/reportService.js";
-import { getDataTableOrder, getDataTableSearch } from "../../../utils/requestQueryUtils.js";
+import { getDataTableOrder, getDataTableSearch, isMonthlyReportQuery } from "../../../utils/requestQueryUtils.js";
 import { getReportMonthDateRange } from "../../../utils/formattersUtils.js";
 import { createFormulaCell, sendExcelReport } from "../../../utils/reportExcelUtils.js";
 
@@ -15,7 +15,6 @@ const SUPPLIER_SHEET_NAME = 'Proveedores';
 const SUPPLIER_FILENAME = 'reporte_proveedores';
 const WASTE_SHEET_NAME = 'Mermas';
 const WASTE_FILENAME = 'reporte_mermas';
-const isMonthlyReportRequest = (query = {}) => query.monthlyReport === 'true' || query.monthlyReport === true;
 const createColumnTotalFormula = (column, firstRow, rowCount, value) => createFormulaCell(
     rowCount ? `SUM(${ column }${ firstRow }:${ column }${ firstRow + rowCount - 1 })` : '0',
     value
@@ -49,7 +48,7 @@ const buildIssueReportQuery = (req) => {
         columns: ISSUE_REPORT_COLUMNS,
         defaultDirection: 'desc'
     });
-    const monthlyReport = isMonthlyReportRequest(req.query);
+    const monthlyReport = isMonthlyReportQuery(req.query);
     const monthDateRange = monthlyReport ? getReportMonthDateRange(req.query.reportMonth) : {};
 
     return {
@@ -178,7 +177,7 @@ export const exportGoodsReceiptReportExcel = async (req, res) => {
         defaultDirection: 'desc'
     });
 
-    const monthlyReport = isMonthlyReportRequest(req.query);
+    const monthlyReport = isMonthlyReportQuery(req.query);
     const monthDateRange = monthlyReport ? getReportMonthDateRange(req.query.reportMonth) : {};
 
     const rows = await findGoodsReceiptReportRows({
