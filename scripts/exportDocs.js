@@ -173,13 +173,22 @@ if (pandoc.error || pandoc.status !== 0) {
 const outputDirectory = path.join(ROOT, 'build/docs');
 await mkdir(outputDirectory, { recursive: true });
 const temporaryDirectory = await mkdtemp(path.join(outputDirectory, '.export-'));
+const diagramOutputDirectory = path.join(outputDirectory, 'diagrams');
+const diagramSourceDirectory = path.join(outputDirectory, 'diagram-sources');
+await Promise.all([
+    rm(diagramOutputDirectory, { recursive: true, force: true }),
+    rm(diagramSourceDirectory, { recursive: true, force: true })
+]);
+await Promise.all([
+    mkdir(diagramOutputDirectory, { recursive: true }),
+    mkdir(diagramSourceDirectory, { recursive: true })
+]);
 const renderedDiagrams = new Map();
 const mermaidExecutable = path.join(ROOT, 'node_modules', '.bin', process.platform === 'win32' ? 'mmdc.cmd' : 'mmdc');
 
 const prepareSource = async (source) => {
     const content = await readFile(path.join(ROOT, source), 'utf8');
     const blocks = [...content.matchAll(mermaidBlock)];
-    if (!blocks.length) return source;
 
     const renderedSource = path.join(temporaryDirectory, source);
     await mkdir(path.dirname(renderedSource), { recursive: true });
@@ -191,8 +200,8 @@ const prepareSource = async (source) => {
         const id = createHash('sha256').update(diagram).digest('hex').slice(0, 16);
         let image = renderedDiagrams.get(id);
         if (!image) {
-            const input = path.join(temporaryDirectory, `${id}.mmd`);
-            image = path.join(temporaryDirectory, `${id}.png`);
+            const input = path.join(diagramSourceDirectory, `${id}.mmd`);
+            image = path.join(diagramOutputDirectory, `${id}.png`);
             await writeFile(input, diagram);
             const result = spawnSync(mermaidExecutable, ['--input', input, '--output', image, '--backgroundColor', 'white', '--scale', '2'], { cwd: ROOT, stdio: 'inherit' });
             if (result.error?.code === 'ENOENT') {
