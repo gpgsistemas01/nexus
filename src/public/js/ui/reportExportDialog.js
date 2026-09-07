@@ -67,3 +67,23 @@ export const showReportExportDialog = (currentMonth) => notifications.showDialog
         return { type, month };
     }
 });
+
+export const showInventoryExportDialog = () => notifications.showDialog({
+    title: 'Exportar inventario',
+    html: (() => {
+        const content = document.createElement('div');
+        content.className = 'text-start report-export-options';
+        content.innerHTML = '<p class="mb-3">Selecciona qué registros deseas incluir.</p>';
+        content.append(
+            createReportOption({ value: 'activeOrStock', label: 'Activos o con existencia', checked: true }),
+            createReportOption({ value: 'active', label: 'Sólo activos' }),
+            createReportOption({ value: 'inStock', label: 'Sólo con existencia' })
+        );
+        return content;
+    })(),
+    popupClass: 'report-export-modal',
+    confirmButtonText: 'Descargar',
+    preConfirm: () => ({
+        inventoryScope: document.querySelector(`input[name="${ REPORT_TYPE_NAME }"]:checked`)?.value || 'activeOrStock'
+    })
+});

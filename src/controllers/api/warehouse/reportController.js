@@ -100,6 +100,7 @@ export const exportWarehouseReportExcel = async (req, res) => {
 
     const rows = await findWarehouseReportRows({
         search: getDataTableSearch(req.query),
+        inventoryScope: req.query.inventoryScope,
         orderBy,
         orderDir
     });
@@ -305,6 +306,7 @@ export const exportWasteReportExcel = async (req, res) => {
     const rows = await findWasteReportRows({
         search: getDataTableSearch(req.query),
         supplierId: req.query.supplierId || null,
+        inventoryScope: req.query.inventoryScope,
         orderBy,
         orderDir
     });

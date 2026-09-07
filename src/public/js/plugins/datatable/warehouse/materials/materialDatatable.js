@@ -109,7 +109,11 @@ export const createMaterialDatatable = async (context) => {
                 buildExcelButton({
                     filename: formatFileName('reporte_inventario_materiales'),
                     allowMonthlyReport: false,
-                    request: () => exportWarehouseReport(buildTableExportParams(table, filters.getValues()))
+                    allowInventoryScope: true,
+                    request: ({ inventoryScope } = {}) => exportWarehouseReport(buildTableExportParams(table, {
+                        ...filters.getValues(),
+                        inventoryScope
+                    }))
                 })
             ]
         }

@@ -23,6 +23,16 @@ Cada procedimiento identifica sus casos de uso, controles, errores posibles y ca
 3. Seleccione el botón **Buscar / filtrar** para actualizar la tabla; use **Limpiar filtros** para restablecerla.
 4. En la tabla, seleccione **Nuevo material**, **Exportar Excel**, **Editar registro** o **Ajustar stock**, según la operación requerida.
 
+### CAP-REP-MAT-05-EXPORT — Exportar inventario
+
+**Casos:** `CU-REP-03`.
+
+1. Seleccione **Exportar Excel** y compruebe el modal:
+
+   ![CAP-REP-MAT-05-EXPORT: alcance del inventario](../images/materiales/05-exportar-reporte.png)
+
+2. Elija **Activos o con existencia**, **Sólo activos** o **Sólo con existencia** y seleccione **Descargar**.
+
 <a id="CAP-CAT-MAT-02-CREATE"></a>
 ### CAP-CAT-MAT-02-CREATE — Formulario alta
 
@@ -194,6 +204,16 @@ Cada procedimiento identifica sus casos de uso, controles, errores posibles y ca
 3. Seleccione el botón **Buscar / filtrar** para actualizar la tabla; use **Limpiar filtros** para restablecerla.
 4. En la tabla, seleccione **Nueva merma**, **Exportar Excel**, **Editar registro** o **Ajustar stock**, según la operación requerida.
 
+### CAP-REP-WAS-05-EXPORT — Exportar inventario de mermas
+
+**Casos:** `CU-REP-09`.
+
+1. Seleccione **Exportar Excel** y compruebe el modal:
+
+   ![CAP-REP-WAS-05-EXPORT: alcance del inventario de mermas](../images/mermas/05-exportar-reporte.png)
+
+2. Elija **Activos o con existencia**, **Sólo activos** o **Sólo con existencia** y seleccione **Descargar**.
+
 <a id="CAP-CAT-WAS-02-CREATE"></a>
 ### CAP-CAT-WAS-02-CREATE — Formulario registro
 
@@ -241,19 +261,3 @@ Cada procedimiento identifica sus casos de uso, controles, errores posibles y ca
 
 2. Elija una opción en **Seleccione una razón...** y complete los campos **Nuevo stock** y **Observaciones**.
 3. Revise el efecto sobre la existencia y seleccione el botón **Ajustar**.
-
-<a id="CAP-REP-WAS-05-EXPORT"></a>
-### CAP-REP-WAS-05-EXPORT — Exportar reporte
-
-**Casos:** `CU-REP-09`.
-
-**Errores posibles:** [Catálogos e inventario](../error-messages.md#errores-catalogos).
-
-**Controles que debe usar:** Botón **Exportar Excel**; opciones **Mes actual**, **Otro mes** o **Personalizado: usar filtros aplicados**; campo **Mes del reporte** cuando corresponda y botón **Descargar**.
-
-1. Seleccione el botón **Exportar Excel** para abrir el diálogo de alcance. Antes de continuar, compruebe que la pantalla mostrada coincida con la captura:
-
-   ![CAP-REP-WAS-05-EXPORT: exportar reporte](../images/mermas/05-exportar-reporte.png)
-
-2. Elija **Mes actual**, **Otro mes** o **Personalizado: usar filtros aplicados** y, cuando corresponda, complete **Mes del reporte**.
-3. Seleccione el botón **Descargar** para generar el archivo.

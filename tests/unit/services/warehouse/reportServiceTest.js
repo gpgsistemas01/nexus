@@ -89,4 +89,18 @@ describe('consulta del reporte de mermas', () => {
       orderBy: { name: 'asc' }
     }));
   });
+
+  it.each([
+    ['active', { isActive: true }],
+    ['inStock', { currentStock: { not: 0 } }],
+    ['activeOrStock', { OR: [{ isActive: true }, { currentStock: { not: 0 } }] }]
+  ])('aplica el alcance %s al inventario exportado', async (inventoryScope, expectedFilter) => {
+    wasteFindMany.mockResolvedValue([]);
+
+    await findWasteReportRows({ inventoryScope });
+
+    expect(wasteFindMany).toHaveBeenCalledWith(expect.objectContaining({
+      where: { AND: [expectedFilter] }
+    }));
+  });
 });

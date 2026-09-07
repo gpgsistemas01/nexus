@@ -27,29 +27,37 @@ imágenes; no se exporta toda la carpeta `docs` como un único documento.
 
 - Markdown es la fuente versionada y conserva notas de mantenimiento, enlaces al repositorio y
   bloques Mermaid que no tienen valor en una entrega impresa.
-- HTML es una vista navegable y sirve como paso de diagnóstico.
-- DOCX es el formato editable para revisión y firmas. Una plantilla `reference.docx` puede
-  definir portada, tipografías, encabezados, tablas y numeración.
+- DOCX es el formato editable para revisión y firmas. Se genera sin una plantilla adicional; un
+  `reference.docx` opcional puede definir tipografías, encabezados, tablas y numeración.
 - PDF es la entrega no editable. Pandoc requiere un motor PDF instalado; la organización debe
-  elegir y fijar uno antes de declarar reproducibilidad.
+  elegir y fijar uno antes de declarar reproducibilidad. Adobe Acrobat o Adobe Reader abren el
+  archivo terminado, pero no reemplazan al motor que lo compone desde Pandoc.
 
 La portada se genera desde `title`, `subtitle`, `author` y `date` del bloque YAML del
-primer archivo del manifiesto. En HTML adopta `#title-block-header` y los estilos de
-`document.css`; en DOCX adopta los estilos del documento de referencia cuando se
-proporciona. No se mantiene una portada como captura: así sus versiones, estado, fecha y
-responsable permanecen revisables como texto. Markdown aporta títulos, énfasis, listas,
-tablas, citas y bloques de código; CSS da formato a HTML y `DOCS_REFERENCE_DOC` permite
-controlar tipografías, márgenes, encabezados, tablas y numeración de DOCX.
+primer archivo del manifiesto. En DOCX puede adoptar los estilos de un documento de referencia cuando se
+proporciona, pero no lo necesita para generar la portada. No se mantiene una portada como
+captura: así sus versiones, estado, fecha y responsable permanecen revisables como texto.
+Markdown aporta títulos, énfasis, listas,
+tablas, citas y bloques de código; `DOCS_REFERENCE_DOC` permite controlar tipografías, márgenes,
+encabezados, tablas y numeración de DOCX.
 
 `scripts/exportDocs.js` ensambla los manifiestos cuyos archivos de entrada viven en la familia
 correspondiente, comprueba imágenes y delega la conversión a Pandoc. Es herramienta **de desarrollo/CI**, no dependencia ni proceso
-del servidor en producción. El estilo HTML vive en `docs/styles/document.css`; el estilo DOCX
-se pasa con `DOCS_REFERENCE_DOC`. Los diagramas Mermaid deben renderizarse a SVG o PNG antes de
-una entrega que no soporte Mermaid; el Markdown conserva el bloque como fuente.
+del servidor en producción. El estilo DOCX se pasa con `DOCS_REFERENCE_DOC`. El exportador conserva
+cada bloque Mermaid en el Markdown fuente,
+lo renderiza como una imagen PNG temporal mediante Mermaid CLI y entrega esa imagen a Pandoc. Así
+DOCX y PDF muestran el diagrama visual en vez de copiar su código; los archivos temporales se
+eliminan al finalizar.
+
+Al repetir una exportación, el archivo de la misma combinación de paquete y formato se reemplaza;
+no se exige una limpieza manual previa. Los demás formatos permanecen en `build/docs/` hasta que
+se retiren de forma intencional. El flujo de capturas es distinto: el script elimina
+automáticamente el inventario anterior y lo genera completo para impedir que una publicación
+mezcle ejecuciones.
 
 La preparación del entorno y los comandos no se duplican en esta norma. Se mantienen en la
 [guía operativa de exportación](../README.md#exportar-la-documentación), que es la entrada para
-quien trabaja con los documentos. El `README.md` raíz sólo enumera los scripts del proyecto.
+quien trabaja con los documentos.
 
 ## Imágenes y capturas
 
@@ -74,10 +82,10 @@ permiso que el manual pretende demostrar.
 
 Playwright **no se ejecuta junto con Pandoc**. Primero, y sólo cuando cambian las pantallas,
 `docs:screenshots` abre la aplicación y actualiza las imágenes; después `docs:export`
-lee esas imágenes ya existentes. Pandoc por sí solo genera HTML y DOCX sin Playwright,
+lee esas imágenes ya existentes. Pandoc por sí solo genera DOCX sin Playwright,
 LibreOffice ni Microsoft Word. Para PDF siempre delega la composición final a un motor
 adicional (`DOCS_PDF_ENGINE`); esa dependencia no puede eliminarse sin escoger otro
-conversor o publicar HTML/DOCX en su lugar.
+conversor o publicar DOCX en su lugar.
 
 ## Versionado
 

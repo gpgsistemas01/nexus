@@ -65,8 +65,9 @@ describe('exportación del reporte de mermas', () => {
       totals: { wasteQuantity: 7, squareMeters: 40.5 }
     });
 
-    await exportWasteReportExcel({ query: {} }, res);
+    await exportWasteReportExcel({ query: { inventoryScope: 'active' } }, res);
 
+    expect(findWasteReportRows).toHaveBeenCalledWith(expect.objectContaining({ inventoryScope: 'active' }));
     expect(buildWasteReportSummary).toHaveBeenCalledWith([{ id: 'waste-1' }, { id: 'waste-2' }]);
     expect(sendExcelReport).toHaveBeenCalledTimes(1);
     expect(sendExcelReport).toHaveBeenCalledWith({

@@ -1,5 +1,6 @@
-import { access, mkdir, readFile } from 'node:fs/promises';
+import { access, mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import { spawnSync } from 'node:child_process';
+import { createHash } from 'node:crypto';
 import path from 'node:path';
 import process from 'node:process';
 
@@ -96,30 +97,70 @@ const MANIFESTS = Object.freeze({
         'docs/testing/unit-test-results.md'
     ]
 });
-const [publication, requestedFormat = 'html'] = process.argv.slice(2).filter((argument) => argument !== '--check');
+const [requestedPublication, requestedFormat] = process.argv.slice(2).filter((argument) => argument !== '--check');
 const checkOnly = process.argv.includes('--check');
-const formats = new Set(['html', 'docx', 'pdf']);
+const formats = new Set(['docx', 'pdf']);
+const publicationNames = Object.keys(MANIFESTS);
+const mermaidBlock = /^```mermaid\n([\s\S]*?)^```$/gm;
+const externalLink = /^(?:https?:|mailto:)/;
+const diagramCaption = (content, index) => {
+    const headings = [...content.slice(0, index).matchAll(/^#{1,6}\s+(.+)$/gm)];
+    const heading = headings.at(-1)?.[1].replace(/[`[*_\]]/g, '').trim();
+    if (!heading) throw new Error('Cada bloque Mermaid debe estar declarado bajo un encabezado Markdown.');
+    return `Diagrama — ${heading}`;
+};
 
-if (!MANIFESTS[publication] || !formats.has(requestedFormat)) {
-    console.error('Uso: npm run docs:export -- <manual-usuario|manual-administrador|manual-almacen|manual-reportes|requisitos|arquitectura|pruebas> <html|docx|pdf> [--check]');
+if ((requestedPublication !== 'todos' && !MANIFESTS[requestedPublication])
+    || (checkOnly ? requestedFormat && !formats.has(requestedFormat) : !formats.has(requestedFormat))) {
+    console.error('Uso: npm run docs:export -- <todos|manual-usuario|manual-administrador|manual-almacen|manual-reportes|requisitos|arquitectura|pruebas> [docx|pdf] [--check]');
     process.exit(1);
 }
 
-const sources = MANIFESTS[publication];
-await Promise.all(sources.map((source) => access(path.join(ROOT, source))));
-const sourceContents = await Promise.all(sources.map(async (source) => ({
-    source,
-    content: await readFile(path.join(ROOT, source), 'utf8')
-})));
-const imageReferences = sourceContents.flatMap(({ source, content }) => (
-    [...content.matchAll(/!\[[^\]]*\]\(([^) ]+)/g)].map((match) => ({ source, image: match[1] }))
-));
-await Promise.all(imageReferences.map(({ source, image }) => (
-    access(path.resolve(ROOT, path.dirname(source), image))
-)));
+const requestedPublications = requestedPublication === 'todos' ? publicationNames : [requestedPublication];
+const publications = await Promise.all(requestedPublications.map(async (publication) => {
+    const sources = MANIFESTS[publication];
+    await Promise.all(sources.map((source) => access(path.join(ROOT, source))));
+    const sourceContents = await Promise.all(sources.map(async (source) => ({
+        source,
+        content: await readFile(path.join(ROOT, source), 'utf8')
+    })));
+    for (const { source, content } of sourceContents) {
+        for (const match of content.matchAll(mermaidBlock)) {
+            try {
+                diagramCaption(content, match.index);
+            } catch (error) {
+                throw new Error(`${error.message} Fuente: ${source}.`);
+            }
+        }
+    }
+    const imageReferences = sourceContents.flatMap(({ source, content }) => (
+        [...content.matchAll(/!\[([^\]]*)\]\(([^) ]+)/g)].map((match) => ({ source, alternative: match[1].trim(), image: match[2] }))
+    ));
+    const linkReferences = sourceContents.flatMap(({ source, content }) => (
+        [...content.matchAll(/(?<!!)\[[^\]]*\]\(([^) ]+)/g)].map((match) => ({ source, link: match[1] }))
+    ));
+    for (const { source, alternative, image } of imageReferences) {
+        if (!alternative) throw new Error(`La imagen ${image} de ${source} debe declarar texto alternativo.`);
+        if (path.isAbsolute(image) || externalLink.test(image)) {
+            throw new Error(`La imagen ${image} de ${source} debe usar una ruta relativa.`);
+        }
+    }
+    await Promise.all(imageReferences.map(({ source, image }) => (
+        access(path.resolve(ROOT, path.dirname(source), image))
+    )));
+    await Promise.all(linkReferences.map(({ source, link }) => {
+        if (link.startsWith('#') || externalLink.test(link)) return null;
+        if (path.isAbsolute(link)) throw new Error(`El enlace local ${link} de ${source} debe usar una ruta relativa.`);
+        const [target] = link.split('#');
+        return target ? access(path.resolve(ROOT, path.dirname(source), target)) : null;
+    }));
+    return { publication, sources, imageReferences };
+}));
 
 if (checkOnly) {
-    console.log(`Paquete ${publication}: ${sources.length} fuentes y ${imageReferences.length} imágenes válidas.`);
+    for (const { publication, sources, imageReferences } of publications) {
+        console.log(`Paquete ${publication}: ${sources.length} fuentes y ${imageReferences.length} imágenes válidas.`);
+    }
     process.exit(0);
 }
 
@@ -131,11 +172,68 @@ if (pandoc.error || pandoc.status !== 0) {
 
 const outputDirectory = path.join(ROOT, 'build/docs');
 await mkdir(outputDirectory, { recursive: true });
-const output = path.join(outputDirectory, `${publication}.${requestedFormat}`);
-const args = [...sources, '--from=gfm', '--file-scope', '--standalone', '--toc', `--output=${output}`, '--resource-path=.:docs'];
-if (requestedFormat === 'html') args.push('--css=../../docs/styles/document.css');
-if (requestedFormat === 'docx' && process.env.DOCS_REFERENCE_DOC) args.push(`--reference-doc=${process.env.DOCS_REFERENCE_DOC}`);
-if (requestedFormat === 'pdf' && process.env.DOCS_PDF_ENGINE) args.push(`--pdf-engine=${process.env.DOCS_PDF_ENGINE}`);
-const result = spawnSync('pandoc', args, { cwd: ROOT, stdio: 'inherit' });
-if (result.status !== 0) process.exit(result.status ?? 1);
-console.log(`Documento generado en ${path.relative(ROOT, output)}.`);
+const temporaryDirectory = await mkdtemp(path.join(outputDirectory, '.export-'));
+const renderedDiagrams = new Map();
+const mermaidExecutable = path.join(ROOT, 'node_modules', '.bin', process.platform === 'win32' ? 'mmdc.cmd' : 'mmdc');
+
+const prepareSource = async (source) => {
+    const content = await readFile(path.join(ROOT, source), 'utf8');
+    const blocks = [...content.matchAll(mermaidBlock)];
+    if (!blocks.length) return source;
+
+    const renderedSource = path.join(temporaryDirectory, source);
+    await mkdir(path.dirname(renderedSource), { recursive: true });
+    let renderedContent = content.replace(/(!\[[^\]]*\]\()([^) ]+)/g, (reference, prefix, image) => (
+        `${prefix}${path.resolve(ROOT, path.dirname(source), image)}`
+    ));
+    for (const match of blocks) {
+        const diagram = match[1];
+        const id = createHash('sha256').update(diagram).digest('hex').slice(0, 16);
+        let image = renderedDiagrams.get(id);
+        if (!image) {
+            const input = path.join(temporaryDirectory, `${id}.mmd`);
+            image = path.join(temporaryDirectory, `${id}.png`);
+            await writeFile(input, diagram);
+            const result = spawnSync(mermaidExecutable, ['--input', input, '--output', image, '--backgroundColor', 'white', '--scale', '2'], { cwd: ROOT, stdio: 'inherit' });
+            if (result.error?.code === 'ENOENT') {
+                console.error('Mermaid CLI no está disponible. Ejecuta npm install --no-save @mermaid-js/mermaid-cli antes de exportar documentos con diagramas.');
+                return null;
+            }
+            if (result.status !== 0) return null;
+            renderedDiagrams.set(id, image);
+        }
+        renderedContent = renderedContent.replace(match[0], `![${diagramCaption(content, match.index)}](${image})`);
+    }
+    await writeFile(renderedSource, renderedContent);
+    return renderedSource;
+};
+
+let failedStatus = 0;
+try {
+    for (const { publication, sources } of publications) {
+        const preparedSources = [];
+        for (const source of sources) {
+            const preparedSource = await prepareSource(source);
+            if (!preparedSource) {
+                failedStatus = 1;
+                break;
+            }
+            preparedSources.push(preparedSource);
+        }
+        if (failedStatus) break;
+
+        const output = path.join(outputDirectory, `${publication}.${requestedFormat}`);
+        const args = [...preparedSources, '--from=gfm+implicit_figures', '--file-scope', '--standalone', '--toc', `--output=${output}`, '--resource-path=.:docs'];
+        if (requestedFormat === 'docx' && process.env.DOCS_REFERENCE_DOC) args.push(`--reference-doc=${process.env.DOCS_REFERENCE_DOC}`);
+        if (requestedFormat === 'pdf' && process.env.DOCS_PDF_ENGINE) args.push(`--pdf-engine=${process.env.DOCS_PDF_ENGINE}`);
+        const result = spawnSync('pandoc', args, { cwd: ROOT, stdio: 'inherit' });
+        if (result.status !== 0) {
+            failedStatus = result.status ?? 1;
+            break;
+        }
+        console.log(`Documento generado en ${path.relative(ROOT, output)}.`);
+    }
+} finally {
+    await rm(temporaryDirectory, { recursive: true, force: true });
+}
+if (failedStatus) process.exit(failedStatus);

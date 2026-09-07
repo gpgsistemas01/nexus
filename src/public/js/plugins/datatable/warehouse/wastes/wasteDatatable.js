@@ -60,7 +60,11 @@ export const createWasteDatatable = async (context) => {
                 buildExcelButton({
                     filename: formatFileName('reporte_mermas'),
                     allowMonthlyReport: false,
-                    request: () => exportWasteReport(buildTableExportParams(table, filters.getValues()))
+                    allowInventoryScope: true,
+                    request: ({ inventoryScope } = {}) => exportWasteReport(buildTableExportParams(table, {
+                        ...filters.getValues(),
+                        inventoryScope
+                    }))
                 })
             ]
         }
