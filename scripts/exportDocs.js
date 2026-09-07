@@ -104,6 +104,17 @@ const publicationNames = Object.keys(MANIFESTS);
 const mermaidBlock = /^```mermaid\r?\n([\s\S]*?)^```\r?$/gm;
 const externalLink = /^(?:https?:|mailto:)/;
 const markdownLink = /(?<!!)\[([^\]]+)\]\(([^) ]+)([^)]*)\)/g;
+const documentAnchor = (source, fragment) => [
+    'documento',
+    source.replace(/\.md$/, '').replace(/[^\p{L}\p{N}]+/gu, '-'),
+    fragment
+].filter(Boolean).join('-').toLowerCase();
+const normalizeMermaidSource = (source) => {
+    const content = source.replace(/\r?\n$/, '');
+    return !content.includes('\n') && content.includes('\\n')
+        ? `${content.replace(/\\r\\n|\\n/g, '\n')}\n`
+        : source;
+};
 const diagramCaption = (content, index) => {
     const headings = [...content.slice(0, index).matchAll(/^#{1,6}\s+(.+)$/gm)];
     const heading = headings.at(-1)?.[1].replace(/[`[*_\]]/g, '').trim();
@@ -113,16 +124,38 @@ const diagramCaption = (content, index) => {
 
 const prepareLinks = (content, source, publicationSources) => content.replace(
     markdownLink,
-    (reference, label, link) => {
-        if (link.startsWith('#') || externalLink.test(link)) return reference;
-        const [target] = link.split('#');
+    (reference, label, link, suffix) => {
+        if (externalLink.test(link)) return reference;
+        if (link.startsWith('#')) {
+            return `[${label}](#${documentAnchor(source, link.slice(1))}${suffix})`;
+        }
+        const [target, fragment] = link.split('#');
         const resolvedTarget = path.relative(
             ROOT,
             path.resolve(ROOT, path.dirname(source), target)
         ).split(path.sep).join('/');
-        return target.endsWith('.md') && publicationSources.has(resolvedTarget) ? reference : label;
+        return target.endsWith('.md') && publicationSources.has(resolvedTarget)
+            ? `[${label}](#${documentAnchor(resolvedTarget, fragment)}${suffix})`
+            : label;
     }
 );
+
+const addInternalAnchors = (content, source) => {
+    const anchoredAliases = content.replace(
+        /^<a id="([^"]+)"><\/a>$/gm,
+        (anchor, fragment) => `[]{#${documentAnchor(source, fragment)}}`
+    );
+    const anchoredHeadings = anchoredAliases.replace(
+        /^(#{1,6})\s+(.+)$/gm,
+        (heading, level, title) => `${level} ${title} {#${documentAnchor(source, title
+            .replace(/[`*_\[\]]/g, '')
+            .toLowerCase()
+            .replace(/[^\p{L}\p{N} _-]/gu, '')
+            .trim()
+            .replace(/[ _]/g, '-'))}}`
+    );
+    return `[]{#${documentAnchor(source)}}\n\n${anchoredHeadings}`;
+};
 
 if ((requestedPublication !== 'todos' && !MANIFESTS[requestedPublication])
     || (checkOnly ? requestedFormat && !formats.has(requestedFormat) : !formats.has(requestedFormat))) {
@@ -206,11 +239,11 @@ const prepareSource = async (source, publicationSources) => {
 
     const renderedSource = path.join(temporaryDirectory, source);
     await mkdir(path.dirname(renderedSource), { recursive: true });
-    let renderedContent = prepareLinks(content, source, publicationSources).replace(/(!\[[^\]]*\]\()([^) ]+)/g, (reference, prefix, image) => (
+    let renderedContent = addInternalAnchors(prepareLinks(content, source, publicationSources), source).replace(/(!\[[^\]]*\]\()([^) ]+)/g, (reference, prefix, image) => (
         `${prefix}${path.resolve(ROOT, path.dirname(source), image)}`
     ));
     for (const match of blocks) {
-        const diagram = match[1];
+        const diagram = normalizeMermaidSource(match[1]);
         const id = createHash('sha256').update(diagram).digest('hex').slice(0, 16);
         let image = renderedDiagrams.get(id);
         if (!image) {
@@ -250,7 +283,7 @@ try {
         const scopedSources = preparedSources.map((source) => path.relative(temporaryDirectory, source));
         const args = [
             ...scopedSources,
-            '--from=gfm+implicit_figures',
+            '--from=gfm+header_attributes+implicit_figures',
             '--file-scope',
             '--standalone',
             '--toc',
