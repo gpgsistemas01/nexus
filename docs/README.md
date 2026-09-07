@@ -223,11 +223,20 @@ no sustituyen la instalación requerida por este proyecto. `npm run docs:export`
    herramienta no se invoca.
 4. DOCX no requiere otra herramienta. Para PDF, Pandoc necesita un programa que componga
    el PDF desde la terminal; Adobe Acrobat o Adobe Reader sirven para abrir el resultado, pero no
-   realizan esa composición para este script. El flujo recomendado usa **XeLaTeX**, incluido en
-   TeX Live: en Debian o Ubuntu se instala con `sudo apt-get install texlive-xetex`; en Windows se
-   instala una distribución de TeX que incluya `xelatex`. Comprueba `xelatex --version` y, sólo al
-   ejecutar una exportación PDF, indica al script cuál motor debe usar. La variable se coloca en
-   la misma terminal desde la que se ejecuta `docs:export`; no se agrega al código ni es necesario
+   realizan esa composición para este script. El flujo recomendado usa **XeLaTeX**. Instálalo en
+   el mismo sistema donde se ejecutará Pandoc:
+
+   - **Windows:** descarga y ejecuta el instalador de
+     [TeX Live](https://tug.org/texlive/acquire-netinstall.html). Al terminar, cierra y vuelve a
+     abrir la terminal integrada para actualizar `PATH`.
+   - **Debian o Ubuntu:** ejecuta `sudo apt-get install texlive-xetex`. Si la cuenta no dispone de
+     `sudo`, solicita la instalación al administrador del equipo.
+   - **macOS:** descarga e instala [MacTeX](https://tug.org/mactex/mactex-download.html) y vuelve a
+     abrir la terminal.
+
+   En todos los casos, comprueba la instalación con `xelatex --version`. Sólo al ejecutar una
+   exportación PDF, indica al script cuál motor debe usar. La variable se coloca en la misma
+   terminal desde la que se ejecuta `docs:export`; no se agrega al código ni es necesario
    guardarla en `.env`:
 
    ```powershell
