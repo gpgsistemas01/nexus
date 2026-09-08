@@ -238,34 +238,68 @@ no sustituyen la instalación requerida por este proyecto. `npm run docs:export`
    paquete no contiene diagramas, esta herramienta no se invoca.
 4. DOCX no requiere otra herramienta. Para PDF, Pandoc necesita un programa que componga
    el PDF desde la terminal; Adobe Acrobat o Adobe Reader sirven para abrir el resultado, pero no
-   realizan esa composición para este script. El flujo recomendado usa **XeLaTeX**. Instálalo en
-   el mismo sistema donde se ejecutará Pandoc:
+   realizan esa composición para este script. **XeLaTeX no es el único motor compatible**: es la
+   opción recomendada por el proyecto porque maneja Unicode y texto en español directamente, está
+   disponible mediante distribuciones mantenidas para Windows, Linux y macOS, y permite que todas
+   las estaciones usen el mismo motor en vez de depender del predeterminado local de Pandoc.
+   Instálalo en el mismo sistema donde se ejecutará Pandoc:
 
-   - **Windows:** descarga y ejecuta el instalador de
-     [TeX Live](https://tug.org/texlive/acquire-netinstall.html). Al terminar, cierra y vuelve a
-     abrir la terminal integrada para actualizar `PATH`.
+   - **Windows:** XeLaTeX se instala **en Windows, no dentro de este repositorio, npm, VS Code ni
+     Playwright**. Descarga `install-tl-windows.exe` desde
+     [TeX Live](https://tug.org/texlive/acquire-netinstall.html), ejecútalo y conserva una
+     instalación de TeX Live que incluya XeLaTeX. El instalador crea una carpeta del sistema como
+     `C:\texlive\<versión>\` y agrega su subcarpeta `bin\windows` a `PATH`; no copies esos archivos
+     dentro de `SistemaMerma`. Al terminar, cierra **todas** las terminales de VS Code, abre una
+     terminal PowerShell nueva en el repositorio y ejecuta `xelatex --version`. Si PowerShell aún
+     no encuentra el comando, reinicia VS Code y revisa que
+     `C:\texlive\<versión>\bin\windows` esté en la variable `PATH` de Windows.
    - **Debian o Ubuntu:** ejecuta `sudo apt-get install texlive-xetex`. Si la cuenta no dispone de
      `sudo`, solicita la instalación al administrador del equipo.
    - **macOS:** descarga e instala [MacTeX](https://tug.org/mactex/mactex-download.html) y vuelve a
      abrir la terminal.
 
+   Si la estación ya tiene otro motor admitido por Pandoc, puede reutilizarlo: no es obligatorio
+   instalar XeLaTeX. Por ejemplo, una instalación existente de `pdflatex`, `lualatex` o `tectonic`
+   se selecciona asignando ese nombre a `DOCS_PDF_ENGINE`. Primero compruebe que su ejecutable
+   responda desde la misma terminal:
+
+   ```powershell
+   # Ejemplo en PowerShell si pdflatex ya está instalado
+   pdflatex --version
+   $env:DOCS_PDF_ENGINE = "pdflatex"
+   npm run docs:export -- todos pdf
+   ```
+
+   El proyecto recomienda XeLaTeX para mantener un resultado reproducible, pero el exportador no
+   fija ese nombre: valida y pasa a Pandoc el ejecutable indicado en `DOCS_PDF_ENGINE`. Cambiar de
+   motor puede modificar tipografías, saltos de página o requerir paquetes propios de la
+   distribución elegida, por lo que el PDF resultante debe revisarse antes de publicarlo.
+
    En todos los casos, comprueba la instalación con `xelatex --version`. Al ejecutar una
    exportación PDF, indica explícitamente al script cuál motor debe usar para que Pandoc no dependa
-   del motor predeterminado de cada estación. `DOCS_PDF_ENGINE` es opcional para el script: si se
-   omite, Pandoc selecciona su motor predeterminado, que también debe estar instalado. Para seguir
-   el flujo reproducible recomendado, define la variable en la misma terminal desde la que se
+   del motor predeterminado de cada estación. `DOCS_PDF_ENGINE` es obligatorio para exportar PDF;
+   así el script no intenta usar implícitamente `pdflatex` en una estación donde no está instalado.
+   Define la variable en la misma terminal desde la que se
    ejecuta `docs:export`; no se agrega al código ni es necesario guardarla en `.env`:
 
    ```powershell
    # PowerShell (Windows)
+   xelatex --version
    $env:DOCS_PDF_ENGINE = "xelatex"
-   npm run docs:export -- <paquete> pdf
+   npm run docs:export -- todos pdf
    ```
 
    ```bash
    # Bash (Linux, macOS o contenedor)
    DOCS_PDF_ENGINE=xelatex npm run docs:export -- <paquete> pdf
    ```
+
+   El error `'pdflatex' not found` no significa que el documento requiera específicamente
+   `pdflatex`: significa que Pandoc intentó usar ese motor predeterminado y no encontró su
+   ejecutable. No se corrige instalando Playwright. Puede instalar el XeLaTeX recomendado o usar
+   otro motor que ya tenga instalado, definir su nombre en `DOCS_PDF_ENGINE` y repetir el comando
+   con el separador `--` de npm. Si sólo necesita el documento editable, genere `docx`, que no
+   requiere un motor PDF.
 
    En PowerShell la variable permanece durante esa sesión de terminal; puede retirarla después con
    `Remove-Item Env:DOCS_PDF_ENGINE`. En Bash, la asignación mostrada sólo aplica a ese comando.
@@ -466,6 +500,12 @@ Después de aprobar las imágenes, vuelva a [Exportar los manuales](#exportar-lo
    interrumpa ni mezcle imágenes de ejecuciones distintas. Espere el mensaje `Capturas generadas`
    antes de continuar. Si se usó `DOCS_STORAGE_STATE`, el script elimina ese archivo al completar
    la ejecución.
+
+   No hay que ejecutar un comando adicional para “cerrar Playwright”: el script cierra sus
+   contextos y el navegador Chromium automáticamente, incluso si una captura falla. Cuando
+   reaparece el prompt de la terminal 2, Playwright ya terminó. `Ctrl+C` se reserva para detener el
+   servidor Nexus/Nodemon que continúa abierto en la terminal 1; si se interrumpe manualmente el
+   script de capturas con `Ctrl+C`, descarte el juego incompleto y vuelva a ejecutar este paso.
 
    Para localizar las acciones, el script recorre todas las páginas del listado; la salida no tiene
    que encontrarse entre los primeros diez registros. Si aun así falla esperando
