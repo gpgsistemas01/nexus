@@ -1,4 +1,4 @@
-import { MaterialNotFound } from "../../../errors/warehouse/materialError.js";
+import { MaterialInactiveConflict, MaterialNotFound } from "../../../errors/warehouse/materialError.js";
 import { roundTo } from "../../../utils/formattersUtils.js";
 import { calculateConvertedQuantity } from "../../inventory/stockHelpers.js";
 import { GOODS_RECEIPT_STATUS_NAMES } from "../../../constants/warehouseStatuses.js";
@@ -21,7 +21,7 @@ export const GOODS_RECEIPT_DETAIL_INCLUDE = Object.freeze({
     }
 });
 
-export const buildGoodsReceiptDetails = async (details, { tx = null } = {}) => {
+export const buildGoodsReceiptDetails = async (details, { tx = null, requireActive = true } = {}) => {
 
     const materialIds = details.map(d => d.materialId);
 
@@ -34,6 +34,7 @@ export const buildGoodsReceiptDetails = async (details, { tx = null } = {}) => {
         const material = materialMap.get(materialId);
 
         if (!material) throw new MaterialNotFound();
+        if (requireActive && !material.isActive) throw new MaterialInactiveConflict();
 
         const { name, base, height } = material;
         const netPurchaseAmount = roundTo(quantity * costPerUnitType);

@@ -25,7 +25,7 @@ flowchart LR
     catalogs["RF-CAT-001 a RF-CAT-018\nCatálogos operativos"]
     receipts["RF-REC-001 a RF-REC-008\nEntradas y correcciones"]
     issues["RF-ISS-001 a RF-ISS-006\nSalidas y devoluciones"]
-    inventory["RN-002 a RN-005 y RN-011 a RN-018\nIntegridad de existencias y movimientos"]
+    inventory["RN-002 a RN-005 y RN-011 a RN-023\nIntegridad de existencias, movimientos y recursos activos"]
 
     receipts --> auth
     receipts --> catalogs
@@ -74,6 +74,58 @@ flowchart LR
 Las flechas representan transiciones observables del usuario, no rutas concretas de la API.
 La bifurcación de eliminación aplica `RN-007`; el límite atómico aplica `RN-002`. La
 matriz de operaciones define cuál de estas ramas existe realmente para cada módulo.
+
+## Impacto del estado activo en los procesos de almacén
+
+**Diagrama:** `DIA-REQ-ACT-001`. Esta actividad distingue el indicador de catálogo
+`isActive` de los estados de documentos y muestra únicamente efectos comprobados en los
+procesos vigentes. Una línea hacia «conservar» significa que cambiar la casilla no
+ejecuta esa operación.
+
+Se usa un **diagrama de actividad con nodos de decisión** porque la pregunta funcional es
+qué camino sigue el caso según el estado del recurso. Un diagrama de estados sugeriría
+incorrectamente que `isActive` es el estado del documento, y una secuencia duplicaría la
+coordinación entre capas que ya se conserva en los diagramas backend y frontend. Las
+vistas individuales de los casos afectados reutilizan abajo la misma decisión en su
+contexto concreto.
+
+```mermaid
+flowchart TD
+    actor["Actor confirma alta o edición<br/>con Activo marcado o desmarcado"] --> persist["Nexus persiste isActive<br/>en material, merma o proveedor"]
+    persist --> preserve["Conservar identidad, relaciones,<br/>stock, movimientos e historia"]
+    persist --> resource{"¿Qué catálogo cambió?"}
+
+    resource -->|Material| materialUse{"¿Uso nuevo o detalle<br/>ya comprometido?"}
+    materialUse -->|Nueva compra, salida o relación| materialValidation{"¿Material y proveedor activos?"}
+    materialValidation -->|No| rejectMaterial["Rechazar el detalle o alta;<br/>no mover stock"]
+    materialValidation -->|Sí| allowMaterial["Permitir continuar"]
+    materialUse -->|Surtir salida existente| fulfillMaterial["Permitir completar el pendiente<br/>si hay stock"]
+    materialUse -->|Reporte| materialReport{"¿Qué alcance se eligió?"}
+    materialReport -->|Sólo activos| activeMaterial["Incluir sólo materiales activos"]
+    materialReport -->|Sólo con existencia| stockedMaterial["Incluir por stock,<br/>aunque esté inactivo"]
+    materialReport -->|Activos o con existencia| materialUnion["Incluir si está activo<br/>o conserva stock"]
+
+    resource -->|Merma| wasteUse{"¿Uso nuevo o detalle<br/>ya comprometido?"}
+    wasteUse -->|Consulta o reporte| wasteScope["Conservar visible según filtros;<br/>aplicar Activo / con existencia"]
+    wasteUse -->|Registrar salida| wasteValidation{"¿La merma está activa?"}
+    wasteValidation -->|Sí| allowWaste["Permitir validar el detalle"]
+    wasteValidation -->|No| rejectWaste["Rechazar el detalle;<br/>no descontar stock"]
+    wasteUse -->|Surtir salida existente| fulfillWaste["Permitir completar el pendiente<br/>si hay stock"]
+
+    resource -->|Proveedor| supplier["Conservar proveedor y relaciones;<br/>impedir nuevas altas y detalles"]
+```
+
+La desactivación impide incorporar el recurso en una nueva compra, salida, merma o
+relación aplicable, pero no cancela compromisos ya registrados. Si una salida quedó
+**Surtido parcial** y después se desactiva el material, la merma o el proveedor, Nexus
+permite surtir sus detalles pendientes usando el snapshot del documento, siempre que
+haya stock. Así puede cerrarse la solicitud sin habilitar usos nuevos; si no debe
+entregarse, se conserva pendiente hasta que el negocio defina una cancelación, pues
+desactivar el catálogo no cancela automáticamente el documento. Los reportes de
+inventario de material y merma aplican el alcance elegido: **Sólo activos**, **Sólo con
+existencia** o **Activos o con existencia**.
+Los estados **Pendiente**, **Surtido parcial**, **Surtido** y **Cancelado** pertenecen a
+documentos y se derivan en otra máquina de estados; no dependen de `isActive`.
 
 ## Revisión de flujos y nivel de detalle
 
@@ -225,17 +277,22 @@ flowchart LR
 #### `CU-CAT-02` — Crear material
 
 ```mermaid
-flowchart LR
-    request["Actor solicita crear material"] --> validate["Nexus valida permiso, datos y relaciones"]
-    validate --> result["Nexus responde: Alta con presentación, unidad y relaciones válidas."]
+flowchart TD
+    request["Actor solicita crear material"] --> validate["Nexus valida permiso, identidad y relaciones"]
+    validate --> active{"¿Proveedor activo?"}
+    active -->|No| reject["Rechazar el alta<br/>sin crear relación ni stock"]
+    active -->|Sí| result["Crear o reutilizar identidad<br/>y registrar relación"]
 ```
 
 #### `CU-CAT-03` — Editar material
 
 ```mermaid
-flowchart LR
+flowchart TD
     request["Actor solicita editar material"] --> validate["Nexus valida permiso, datos y relaciones"]
-    validate --> result["Nexus responde: Actualización de datos generales admitidos."]
+    validate --> active{"¿Cambió Activo?"}
+    active -->|No| result["Actualizar datos generales admitidos"]
+    active -->|Sí| preserve["Persistir activo o inactivo<br/>y conservar identidad, stock e historia"]
+    preserve --> boundary["Bloquear usos nuevos<br/>sin cancelar detalles comprometidos"]
 ```
 
 #### `CU-CAT-04` — Retirar material
@@ -281,9 +338,10 @@ flowchart LR
 #### `CU-CAT-09` — Cambiar estado de proveedor
 
 ```mermaid
-flowchart LR
+flowchart TD
     request["Actor solicita cambiar estado de proveedor"] --> validate["Nexus valida permiso, datos y relaciones"]
-    validate --> result["Nexus responde: Activación o desactivación del proveedor."]
+    validate --> result["Persistir activación o desactivación<br/>sin borrar relaciones ni historia"]
+    result --> boundary["Aplicar el nuevo estado sólo a usos nuevos<br/>y conservar compromisos existentes"]
 ```
 
 #### `CU-CAT-10` — Consultar clientes
@@ -321,17 +379,22 @@ flowchart LR
 #### `CU-CAT-14` — Registrar merma
 
 ```mermaid
-flowchart LR
+flowchart TD
     request["Actor solicita registrar merma"] --> validate["Nexus valida permiso, datos y relaciones"]
-    validate --> result["Nexus responde: Alta desde una plantilla material-proveedor."]
+    validate --> active{"¿Proveedor y material de plantilla activos?"}
+    active -->|No| reject["Rechazar el alta<br/>sin crear merma ni stock"]
+    active -->|Sí| result["Crear merma desde la plantilla<br/>y registrar stock inicial"]
 ```
 
 #### `CU-CAT-15` — Editar merma
 
 ```mermaid
-flowchart LR
+flowchart TD
     request["Actor solicita editar merma"] --> validate["Nexus valida permiso, datos y relaciones"]
-    validate --> result["Nexus responde: Actualización sin alterar su identidad física."]
+    validate --> active{"¿Cambió Activo?"}
+    active -->|No| result["Actualizar datos admitidos<br/>sin alterar identidad física"]
+    active -->|Sí| preserve["Persistir activo o inactivo<br/>y conservar stock, snapshots e historia"]
+    preserve --> boundary["Bloquear salidas nuevas<br/>sin cancelar detalles comprometidos"]
 ```
 
 #### `CU-CAT-16` — Ajustar existencia de merma
@@ -387,17 +450,23 @@ flowchart LR
 #### `CU-ENT-02` — Crear compra de material
 
 ```mermaid
-flowchart LR
+flowchart TD
     request["Actor solicita crear compra de material"] --> validate["Nexus valida permiso, datos y relaciones"]
-    validate --> result["Nexus responde: Compra, detalles, existencias y movimientos transaccionales."]
+    validate --> active{"¿Proveedor y materiales activos?"}
+    active -->|No| reject["Rechazar la compra<br/>sin detalles, movimiento ni stock"]
+    active -->|Sí| result["Registrar compra, detalles,<br/>existencias y movimientos"]
 ```
 
 #### `CU-ENT-03` — Editar compra de material
 
 ```mermaid
-flowchart LR
+flowchart TD
     request["Actor solicita editar compra de material"] --> validate["Nexus valida permiso, datos y relaciones"]
-    validate --> result["Nexus responde: Edición de encabezado y detalles admitidos."]
+    validate --> newDetails{"¿Agrega detalles nuevos?"}
+    newDetails -->|No| header["Actualizar encabezado permitido"]
+    newDetails -->|Sí| active{"¿Proveedor original y materiales activos?"}
+    active -->|No| reject["Rechazar detalles nuevos<br/>y conservar compra histórica"]
+    active -->|Sí| result["Agregar detalles y movimiento<br/>sin reaplicar detalles anteriores"]
 ```
 
 #### `CU-ENT-04` — Corregir material de una compra
@@ -429,9 +498,11 @@ flowchart LR
 #### `CU-SAL-02` — Crear salida de material
 
 ```mermaid
-flowchart LR
+flowchart TD
     request["Actor solicita crear salida de material"] --> validate["Nexus valida permiso, datos y relaciones"]
-    validate --> result["Nexus responde: Creación pendiente sin descontar existencias."]
+    validate --> active{"¿Materiales y proveedores activos?"}
+    active -->|No| reject["Rechazar salida<br/>sin crear detalles ni descontar stock"]
+    active -->|Sí| result["Crear salida pendiente<br/>sin descontar existencias"]
 ```
 
 #### `CU-SAL-03` — Editar encabezado de salida de material
@@ -453,9 +524,13 @@ flowchart LR
 #### `CU-SAL-05` — Surtir material
 
 ```mermaid
-flowchart LR
+flowchart TD
     request["Actor solicita surtir material"] --> validate["Nexus valida permiso, datos y relaciones"]
-    validate --> result["Nexus responde: Descuento de existencia y registro de movimiento."]
+    validate --> committed{"¿El detalle ya pertenece a la salida?"}
+    committed -->|No| reject["Rechazar uso nuevo"]
+    committed -->|Sí| stock{"¿Hay existencia suficiente?"}
+    stock -->|No| conflict["Rechazar sin cambios"]
+    stock -->|Sí aunque el catálogo esté inactivo| result["Surtir pendiente y registrar movimiento"]
 ```
 
 #### `CU-SAL-06` — Devolver material surtido
@@ -477,9 +552,11 @@ flowchart LR
 #### `CU-SAL-08` — Crear salida de merma
 
 ```mermaid
-flowchart LR
+flowchart TD
     request["Actor solicita crear salida de merma"] --> validate["Nexus valida permiso, datos y relaciones"]
-    validate --> result["Nexus responde: Creación pendiente sin descontar existencias."]
+    validate --> active{"¿Mermas activas?"}
+    active -->|No| reject["Rechazar salida<br/>sin crear detalles ni descontar stock"]
+    active -->|Sí| result["Crear salida pendiente<br/>sin descontar existencias"]
 ```
 
 #### `CU-SAL-09` — Editar encabezado de salida de merma
@@ -501,9 +578,13 @@ flowchart LR
 #### `CU-SAL-11` — Surtir merma
 
 ```mermaid
-flowchart LR
+flowchart TD
     request["Actor solicita surtir merma"] --> validate["Nexus valida permiso, datos y relaciones"]
-    validate --> result["Nexus responde: Descuento de existencia y registro de movimiento."]
+    validate --> committed{"¿El detalle ya pertenece a la salida?"}
+    committed -->|No| reject["Rechazar uso nuevo"]
+    committed -->|Sí| stock{"¿Hay existencia suficiente?"}
+    stock -->|No| conflict["Rechazar sin cambios"]
+    stock -->|Sí aunque la merma esté inactiva| result["Surtir pendiente y registrar movimiento"]
 ```
 
 #### `CU-SAL-12` — Devolver merma surtida

@@ -55,22 +55,43 @@ Esta tabla documenta el contrato funcional de las acciones; no convierte surtir 
 devolver en actualizaciones CRUD genéricas. «Modo» es la configuración de pantalla y
 «estado requerido» es la precondición persistida.
 
+En catálogos, **estado** significa el indicador activo/inactivo que el actor modifica
+con la casilla **Activo** dentro de `create` o `edit`; no es otro modo ni una operación
+de inventario. El cambio conserva identidad, relaciones, stock e historia. En documentos
+de compra o salida, en cambio, los estados y el cumplimiento se derivan de crear,
+corregir, cancelar, surtir o devolver conforme a sus reglas; el actor no los captura
+como un campo libre.
+
+El efecto del indicador en consultas, reportes, altas y surtimientos se representa en
+[`DIA-REQ-ACT-001`](requirements-diagrams.md#impacto-del-estado-activo-en-los-procesos-de-almacén).
+Los recursos inactivos no pueden incorporarse a operaciones nuevas. Una salida existente
+con pendientes sí puede completarse después de la desactivación: usa su detalle histórico
+y exige stock, pero no vuelve a seleccionar el recurso ni crea otra relación.
+
 | Contexto / acción | Modo y estado requerido | Datos que pueden cambiar | Efectos que no deben confundirse con edición |
 | --- | --- | --- | --- |
-| Material o merma / crear | `create`; no existe registro | identidad editable, relaciones obligatorias, mínimos, estado y existencia inicial admitida | crea existencia y, cuando corresponde, movimiento inicial |
-| Material o merma / editar | `edit`; registro existente y no protegido por la regla específica | nombre o datos secundarios autorizados, mínimo, costo permitido y estado | no cambia existencia; el stock usa `adjust` |
-| Material o merma / ajustar | `adjust`; registro existente y actor autorizado | cantidad física, cantidad convertida derivada, motivo y observaciones | crea ajuste y movimiento; no cambia identidad |
-| Entrada / crear | `create`; documento nuevo | proveedor, factura, fechas, receptor y detalles nuevos | incrementa existencias y crea movimientos en una transacción |
-| Entrada / editar | `edit`; entrada no cancelada | encabezado permitido y detalles **nuevos**; proveedor original inmutable | una partida persistida se cambia mediante `correct`, no sobrescribiéndola |
+| Material / crear | `create`; no existe la relación material-proveedor | nombre, proveedor, presentación, unidad, base, altura, stock mínimo, costo máximo, estado, existencia inicial y observaciones | crea o reutiliza la identidad y crea la relación; una relación repetida se rechaza sin sumar stock |
+| Material / editar | `edit`; relación existente | nombre, stock mínimo, costo máximo y estado | proveedor, presentación, unidad y dimensiones permanecen bloqueados; no cambia existencia |
+| Material / ajustar | `edit-stock`; relación existente y actor autorizado | nueva existencia total, motivo y observaciones | crea ajuste y movimiento; no cambia identidad ni interpreta la cantidad como incremento |
+| Merma / crear | `create`; no existe la combinación de nombre, proveedor y dimensiones | proveedor, material de referencia, nombre, base, altura, stock mínimo, costo máximo, estado, existencia inicial y observaciones | crea la merma y su movimiento inicial; una identidad repetida se rechaza sin sumar stock |
+| Merma / editar | `edit`; merma existente | nombre, stock mínimo, costo máximo y estado | proveedor, material de referencia, presentación, unidad y dimensiones permanecen bloqueados; no cambia existencia |
+| Merma / ajustar | `edit-stock`; merma existente y actor autorizado | nuevo stock total, motivo y observaciones | crea ajuste y movimiento; no cambia identidad ni interpreta el stock como incremento |
+| Entrada / crear | `create`; documento nuevo | tipo de comprobante, factura cuando aplica, proveedor, receptor, fecha de recepción, observaciones y detalles | incrementa existencias y crea movimientos en una transacción |
+| Entrada / editar | `edit`; entrada no cancelada | tipo de comprobante, factura cuando aplica, receptor, fecha, observaciones y detalles **nuevos** | el proveedor permanece bloqueado; una partida persistida se cambia mediante `correct`, no sobrescribiéndola |
+| Entrada / consultar | `view`; entrada cancelada | ninguno | formulario, detalles y acciones permanecen en sólo lectura |
 | Entrada / corregir o cancelar detalle | `correct`; detalle persistido y documento habilitado | cantidad/costo corregidos, motivo, valores anterior y nuevo | ajusta stock y movimiento conservando historia |
-| Salida / crear | `create`; documento nuevo | encabezado contextual y detalles solicitados | no descuenta stock mientras el detalle no se surta |
-| Salida / editar | `edit`; no cancelada y con detalle editable | encabezado permitido, detalles nuevos o cantidades aún no surtidas según servicio | no reescribe cantidades ya surtidas o devueltas |
-| Salida / surtir | `supply`; detalle pendiente o parcial | cantidad surtida acumulada, estado de detalle y encabezado | reduce existencia y crea movimiento atómicamente |
-| Salida / devolver | `return`; detalle con cantidad surtida disponible | cantidad devuelta acumulada y estados derivados | incrementa existencia y crea movimiento inverso; no elimina el detalle |
+| Salida de material o merma / crear | `create`; documento nuevo | cliente, asesor, área, solicitante, proyecto, fecha de solicitud, observaciones y detalles solicitados | no descuenta stock mientras el detalle no se surta |
+| Salida de material o merma / editar completa | `edit`; salida pendiente | encabezado y detalles nuevos o cantidades todavía no surtidas | no reescribe cantidades ya surtidas o devueltas |
+| Salida de material o merma / editar encabezado | `edit-header`; salida no cancelada que ya no está pendiente | cliente, asesor, área, solicitante, proyecto, fecha de solicitud y observaciones | los detalles permanecen en sólo lectura y no cambia inventario |
+| Salida de material o merma / surtir | `edit-detail`; detalle pendiente o parcial | selección del detalle y cantidad de proyecto a surtir | el encabezado permanece bloqueado; reduce existencia y crea movimiento atómicamente |
+| Salida de material o merma / devolver | `return`; detalle con cantidad surtida disponible | cantidad devuelta y observaciones de devolución | encabezado y detalles originales permanecen bloqueados; incrementa existencia y crea movimiento inverso |
+| Salida de material o merma / consultar | `view`; salida cancelada | ninguno | formulario y detalles permanecen en sólo lectura |
 
-Los campos HTTP exactos pertenecen al [contrato API](../data/api-contract.md); las reglas
-observables pertenecen a la [especificación](requirements-specification.md). Esta matriz
-sólo mantiene la diferencia contextual que el operador necesita conocer.
+Los nombres técnicos de los campos HTTP pertenecen al
+[contrato API](../data/api-contract.md); las reglas observables pertenecen a la
+[especificación](requirements-specification.md). Esta matriz enumera los controles por
+modo para hacer verificable qué puede modificar el operador, sin convertir el estado
+visual del formulario en un estado persistido del documento.
 
 ## Límites de interpretación
 

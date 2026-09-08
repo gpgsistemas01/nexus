@@ -12,6 +12,7 @@ const findInitialStockAdjustmentReason = vi.fn();
 const generateYearlyReferenceNumber = vi.fn();
 const throwIfReferenceNumberAlreadyExists = vi.fn();
 const createWasteMovement = vi.fn();
+const findUniqueSupplier = vi.fn();
 
 vi.mock('../../../../../src/utils/logger.js', () => ({
   createServiceLogger: () => ({}),
@@ -28,6 +29,10 @@ vi.mock('../../../../../src/repository/baseRepository.js', () => ({
 
 vi.mock('../../../../../src/services/warehouse/wastes/wasteMaterialService.js', () => ({
   resolveWasteMaterialSnapshot
+}));
+
+vi.mock('../../../../../src/services/warehouse/supplierService.js', () => ({
+  findUniqueSupplier
 }));
 
 vi.mock('../../../../../src/services/warehouse/reasonService.js', () => ({
@@ -96,6 +101,7 @@ const createWaste = (overrides = {}) => ({
 describe('wasteController complete flow', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    findUniqueSupplier.mockResolvedValue({ id: 'supplier-1', isActive: true });
     transaction.mockImplementation((callback) => callback({
       waste: {
         create: wasteCreate,

@@ -7,6 +7,7 @@ vi.mock('../../../src/services/warehouse/materials/materialService.js', () => ({
 }));
 
 import {
+    buildGoodsReceiptDetails,
     cancelGoodsReceiptDetailAndTotals,
     createGoodsReceiptDetailsAndUpdateTotals
 } from '../../../src/services/warehouse/goodsReceipts/goodsReceiptHelpers.js';
@@ -58,6 +59,7 @@ describe('cancelGoodsReceiptDetailAndTotals', () => {
                 findMany: vi.fn().mockResolvedValue([{
                     id: 'material-id',
                     name: 'Material',
+                    isActive: true,
                     base: null,
                     height: null
                 }])
@@ -87,5 +89,45 @@ describe('cancelGoodsReceiptDetailAndTotals', () => {
                 supplier: true
             })
         }));
+    });
+
+    it('rechaza materiales inactivos al agregar detalles nuevos', async () => {
+        const tx = {
+            material: {
+                findMany: vi.fn().mockResolvedValue([{
+                    id: 'material-id',
+                    name: 'Material inactivo',
+                    isActive: false,
+                    base: null,
+                    height: null
+                }])
+            }
+        };
+
+        await expect(createGoodsReceiptDetailsAndUpdateTotals({
+            tx,
+            goodsReceiptId: 'receipt-id',
+            details: [{ materialId: 'material-id', quantity: 1, costPerUnitType: 10 }]
+        })).rejects.toMatchObject({ code: 'MATERIAL_INACTIVE_CONFLICT' });
+    });
+
+    it('permite calcular una corrección histórica aunque el material esté inactivo', async () => {
+        const tx = {
+            material: {
+                findMany: vi.fn().mockResolvedValue([{
+                    id: 'material-id',
+                    name: 'Material inactivo',
+                    isActive: false,
+                    base: null,
+                    height: null
+                }])
+            }
+        };
+
+        await expect(buildGoodsReceiptDetails([
+            { materialId: 'material-id', quantity: 1, costPerUnitType: 10 }
+        ], { tx, requireActive: false })).resolves.toEqual([
+            expect.objectContaining({ materialId: 'material-id', quantity: 1 })
+        ]);
     });
 });

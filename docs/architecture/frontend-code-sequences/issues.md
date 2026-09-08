@@ -52,6 +52,9 @@ sequenceDiagram
 
     Browser->>View: goodsIssueModal.js captura documento y materiales
     View->>View: recopilar y validar las variables de frontera indicadas
+    alt Se agrega otra vez la misma combinación material-proveedor
+        View->>View: reemplazar el renglón y su cantidad sin sumar ni duplicar
+    end
     View->>Application: registerGoodsIssue({ formData })
     Application->>Request: registerGoodsIssueRequest({ formData })
     activate Application
@@ -253,6 +256,9 @@ sequenceDiagram
 
     Browser->>View: wasteIssueModal.js captura documento y mermas
     View->>View: recopilar y validar las variables de frontera indicadas
+    alt Se agrega otra vez la misma merma
+        View->>View: reemplazar el renglón y su cantidad sin sumar ni duplicar
+    end
     View->>Application: registerWasteIssue({ formData })
     Application->>Request: registerWasteIssueRequest({ formData })
     activate Application

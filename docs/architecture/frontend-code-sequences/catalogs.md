@@ -57,6 +57,11 @@ sequenceDiagram
     activate Application
     Request->>HTTP: apiRequest({ method: 'post', url, data/params })
     HTTP->>Transport: envía POST /api/warehouse/materials
+    alt Ya existe la identidad y la relación con el proveedor
+        Transport-->>View: 409 MATERIAL_ALREADY_EXISTS y conservar stock y dirigir al ajuste
+    else Identidad existente sólo para otro proveedor o identidad nueva
+        Transport->>Transport: reutilizar identidad o crearla y registrar la relación proveedor-material
+    end
     Transport-->>HTTP: status HTTP y payload del endpoint
     HTTP-->>Request: respuesta o error normalizado
     Request-->>Application: resultado del request
@@ -462,6 +467,11 @@ sequenceDiagram
     activate Application
     Request->>HTTP: apiRequest({ method: 'post', url, data/params })
     HTTP->>Transport: enviar POST /api/warehouse/wastes
+    alt Misma identidad de merma
+        Transport-->>View: 409 WASTE_ALREADY_EXISTS y no incrementar stock
+    else Merma nueva
+        Transport->>Transport: crear merma y ajuste de existencia inicial
+    end
     Transport-->>HTTP: status HTTP y payload del endpoint
     HTTP-->>Request: respuesta o error normalizado
     Request-->>Application: resultado del request

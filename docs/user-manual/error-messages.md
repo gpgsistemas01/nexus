@@ -67,8 +67,10 @@ formulario, sin abrir otra cuenta ni crear un registro duplicado.
 |---|---|
 | **Material no encontrado.**, **Proveedor no encontrado.**, **Cliente no encontrado.**, **Persona no encontrada.**, **Usuario no encontrado.** o **La merma no existe.** | Actualice el listado. El registro pudo haberse retirado o modificado desde otra sesión. |
 | **Presentación no encontrada.**, **Unidad no encontrada.**, **Departamento no encontrado.** o **Razón de stock inicial no encontrada para registrar...** | No continúe el alta o ajuste; solicite revisar el catálogo de configuración. |
-| **Ya existe un material con el mismo nombre, presentación, unidad de medida y dimensiones.** | Seleccione el material existente o cambie únicamente los datos que realmente distinguen al material. |
-| **Ya existe una merma con el nombre, proveedor y dimensiones indicados.** | Seleccione la merma existente; no duplique el registro. |
+| **Ya existe un material con el mismo nombre, presentación, unidad de medida y dimensiones.** | Seleccione el inventario existente y use **Ajustar stock** para establecer la nueva existencia total; no repita el alta ni interprete el valor como una cantidad para sumar. |
+| **Ya existe una merma con el nombre, proveedor y dimensiones indicados.** | Seleccione la merma existente y use **Ajustar stock** para establecer el nuevo stock total; el alta rechazada no incrementó su existencia. |
+| **El material está inactivo y no puede utilizarse en una operación nueva.** | No lo agregue a una compra, salida o relación nueva. Reactívelo sólo si vuelve a estar autorizado; un detalle registrado antes de desactivarlo puede surtirse desde la salida existente. |
+| **El proveedor está inactivo y no puede utilizarse en una operación nueva.** | Seleccione un proveedor activo o reactive el registro cuando corresponda. Las salidas ya registradas conservan sus detalles y pueden completar el surtido pendiente. |
 | **No se puede cambiar el proveedor del material porque ya tiene historial de compras o salidas.** | Conserve la relación histórica y registre la identidad correcta conforme al flujo de materiales. |
 | **No se puede eliminar la relación entre el material y el proveedor porque el material tiene historial de compras, salidas, mermas, movimientos o ajustes de stock.** | Retire o desactive el registro cuando el flujo lo permita; no intente borrar su historia. |
 

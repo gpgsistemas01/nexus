@@ -33,12 +33,14 @@ alineación sin renombrar silenciosamente contratos existentes.
 | Término canónico | Definición compartida | Alias o distinción importante |
 | --- | --- | --- |
 | Material | Artículo base administrado en inventario, definido por nombre, presentación, unidad y reglas de existencia. | No representa por sí solo la existencia de un proveedor concreto. |
+| Identidad de material | Combinación de nombre, presentación, unidad de medida, base y altura que permite reconocer el mismo artículo aunque lo ofrezcan proveedores distintos. | El proveedor no forma parte de esta identidad: se conserva en la oferta proveedor-material. Cambiar stock, costo máximo, mínimo o estado activo no crea otra identidad. |
 | Presentación | Forma comercial o física en que se identifica un material. | Es catálogo auxiliar; no es la unidad de medida. |
 | Unidad de medida | Unidad y símbolo usados para expresar cantidades de un material. | Debe conservarse separada de factores o cantidades convertidas. |
 | Proveedor | Organización que suministra materiales y participa en entradas de compra. | Sus nombres legal y comercial son datos distintos. |
 | Oferta proveedor-material | Relación única entre proveedor y material que conserva SKU del proveedor, costo máximo y existencia asociada. | En código corresponde a `SupplierMaterial`; no es un material duplicado. |
 | Existencia | Cantidad disponible de un recurso en un contexto identificable. | `stock` es el nombre técnico aceptado; toda modificación debe quedar explicada por un movimiento o ajuste permitido. |
 | Merma | Existencia reutilizable o residual vinculada a una oferta proveedor-material y, cuando aplica, dimensiones propias. | En código aparece como `Waste`; no significa eliminación física ni salida de merma. |
+| Identidad de merma | Combinación de proveedor, nombre, base y altura que permite reconocer una merma ya registrada. | Presentación y unidad son snapshots de la plantilla y no sustituyen esa combinación. Stock, costo máximo, mínimo y estado activo tampoco forman parte de la identidad. |
 | Cliente | Organización o contexto comercial receptor de una salida. Puede tener un asesor asociado. | No es lo mismo que proyecto. |
 | Proyecto | Contexto de trabajo identificable que puede relacionarse con salidas. | Está modelado, pero su CRUD completo permanece pendiente. |
 
@@ -61,6 +63,7 @@ alineación sin renombrar silenciosamente contratos existentes.
 | Movimiento | Registro inmutable del efecto de una entrada, salida, devolución, corrección o ajuste sobre existencias. | El documento explica el motivo; el movimiento demuestra el efecto. |
 | Referencia documental | Identificador legible y único que enlaza documentos y movimientos con su origen. | No sustituye el UUID técnico. |
 | Estado | Situación general de un documento o registro. | Se distingue del estado de cumplimiento de una entrega. |
+| Estado activo | Indicador de disponibilidad de un registro de catálogo para operaciones posteriores. | Activar o desactivar no elimina el registro, no cambia su identidad ni modifica sus existencias o historia. |
 | Estado de cumplimiento | Grado de suministro o atención de un documento/detalle. | No debe usarse como sinónimo de activo, cancelado o aprobado. |
 
 ## Cantidades

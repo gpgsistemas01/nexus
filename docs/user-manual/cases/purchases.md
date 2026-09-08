@@ -6,6 +6,21 @@ Cada procedimiento identifica sus casos de uso, controles, errores posibles y ca
 
 **Propósito.** Consultar, registrar, editar y corregir compras, además de delimitar reportes.
 
+**Campos por modo del formulario.** En **alta** se editan tipo y número de comprobante, proveedor,
+persona que recibe, fecha de recepción, observaciones y los nuevos renglones de material. En
+**edición** se conservan editables el comprobante, persona que recibe, fecha, observaciones y la
+incorporación de nuevos renglones; el proveedor y los detalles ya confirmados no se editan desde el
+formulario principal. Cada detalle existente se cambia mediante **Corrección**, donde sólo se editan
+**Cantidad correcta** y **Costo por presentación correcto**, o se retira mediante **Cancelación**.
+En modo **consulta**, incluida una compra cancelada, todos los campos permanecen deshabilitados.
+
+**Cómo cambia el estado.** El estado de la compra y de cada detalle no se captura directamente.
+Una compra nueva queda confirmada con sus detalles activos. **Corrección** conserva el detalle
+activo y registra los valores anterior y corregido. **Cancelación** cambia únicamente el renglón
+seleccionado a cancelado, revierte su inventario y conserva su historia; cuando ya no queda ningún
+detalle activo, Nexus deriva la compra como cancelada y desde entonces la presenta en modo
+consulta. Abrir o editar el encabezado no cambia esos estados.
+
 <a id="CAP-ENT-01-LIST"></a>
 ### CAP-ENT-01-LIST — Listado
 
@@ -39,6 +54,12 @@ Cada procedimiento identifica sus casos de uso, controles, errores posibles y ca
 2. Elija la opción **Factura** o **Remisión**. Complete **Número de Factura** cuando corresponda; elija opciones en **Buscar proveedor...** y **Buscar persona que recibe...**; capture **Fecha y hora de recepción:** y **Observaciones**.
 3. En el detalle, elija una opción en **Buscar material...**, complete **Cantidad** y **Costo por Presentación**, y pulse **Agregar** por cada renglón.
 4. Revise el encabezado y los detalles, y seleccione **Confirmar**.
+
+Una compra sí puede contener el mismo material en más de un renglón, por ejemplo cuando las
+cantidades tienen costos por presentación distintos. Cada renglón se conserva por separado y su
+cantidad incrementa la existencia al confirmar. En cambio, una factura no se registra dos veces
+para el mismo proveedor: si Nexus indica el folio donde ya existe, abra esa compra y agregue ahí los
+materiales faltantes.
 
 <a id="CAP-ENT-03-EDIT"></a>
 ### CAP-ENT-03-EDIT — Edicion compra
