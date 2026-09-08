@@ -235,7 +235,10 @@ no sustituyen la instalación requerida por este proyecto. `npm run docs:export`
    El exportador detecta los bloques `mermaid`, incorpora las imágenes PNG al documento y conserva
    una copia visual en `build/docs/diagrams/`. El código empleado para generar cada imagen queda en
    `build/docs/diagram-sources/`, separado de los PNG. Las fuentes Markdown no se modifican. Si el
-   paquete no contiene diagramas, esta herramienta no se invoca.
+   paquete no contiene diagramas, esta herramienta no se invoca. Los nombres se derivan del
+   contenido de cada diagrama: una exportación posterior reutiliza los PNG que ya coincidan y sólo
+   convierte diagramas nuevos o modificados. Para forzar su regeneración completa, elimina
+   `build/docs/diagrams/` antes de exportar.
 4. DOCX no requiere otra herramienta. Para PDF, Pandoc necesita un programa que componga
    el PDF desde la terminal; Adobe Acrobat o Adobe Reader sirven para abrir el resultado, pero no
    realizan esa composición para este script. **XeLaTeX no es el único motor compatible**: es la
@@ -341,7 +344,8 @@ No es necesario eliminar manualmente un resultado antes de ejecutar nuevamente l
 
 - `npm run docs:export -- <paquete> <formato>` escribe siempre en
   `build/docs/<paquete>.<formato>` y reemplaza el archivo de esa misma combinación de paquete y
-  formato;
+  formato; conserva la caché de diagramas de `build/docs/diagrams/` para evitar conversiones
+  repetidas;
 - `npm run docs:architecture` vuelve a escribir los Markdown derivados que administra el
   generador;
 - `npm run docs:screenshots` es el único flujo que hace una limpieza completa: después de validar
