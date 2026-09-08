@@ -315,7 +315,7 @@ describe('waste issue controller database integration', () => {
       advisorId: ids.advisor,
       clientId: ids.client,
       departmentId: ids.department,
-      projectNumber: 'PR-INACTIVE',
+      projectNumber: 'PR-INACT',
       requestDate: '2026-08-11T12:30:00.000Z',
       details: [
         { wasteId: ids.waste, quantity: 1 },
@@ -341,7 +341,7 @@ describe('waste issue controller database integration', () => {
         advisorId: ids.advisor,
         clientId: ids.client,
         departmentId: ids.department,
-        projectNumber: 'PR-INACTIVE-NEW',
+        projectNumber: 'PR-NEWACT',
         requestDate: '2026-08-11T12:45:00.000Z',
         details: [{ wasteId: ids.secondWaste, quantity: 1 }]
       }).expect(409);
