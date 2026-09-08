@@ -2,9 +2,27 @@
 
 Cada procedimiento identifica sus casos de uso, controles, errores posibles y captura de referencia.
 
+**Cómo cambia el estado.** El estado no es un campo editable. Al registrar una salida y sus
+detalles, Nexus los deja **Pendientes**. Al confirmar un surtido, el sistema calcula
+automáticamente **Surtido parcial** o **Surtido** según la cantidad acumulada. La devolución sólo
+está disponible sobre un detalle surtido: una devolución parcial conserva el detalle como
+**Surtido** y devolver toda la cantidad lo deja **Cancelado**. Si todos los detalles quedan
+cancelados, Nexus también cancela la salida. Estos cambios actualizan documento, detalle,
+existencia y movimiento como una sola operación; abrir el formulario o cambiar de modo no altera
+por sí solo ningún estado.
+
 ## Salidas de material
 
 **Propósito.** Registrar y dar seguimiento al surtido y devolución de materiales.
+
+**Campos por modo del formulario.** En **alta** se editan cliente, asesor, área, solicitante, número
+de proyecto, fecha de solicitud, observaciones y los materiales solicitados. En **edición completa**
+se habilitan esos mismos datos y la incorporación de detalles sólo mientras la salida esté
+pendiente; después, la edición se limita al **encabezado** y los detalles quedan de consulta. En
+**surtido** el encabezado es de sólo lectura y únicamente se editan **Surtir** y **Cantidad de
+proyecto** en los renglones pendientes. En **devolución** el documento es de sólo lectura y la acción
+habilita únicamente **Cantidad a devolver** y **Observaciones**. Una salida cancelada se abre en
+**consulta**, sin campos editables.
 
 <a id="CAP-SAL-MAT-01-LIST"></a>
 ### CAP-SAL-MAT-01-LIST — Listado
@@ -40,6 +58,10 @@ Cada procedimiento identifica sus casos de uso, controles, errores posibles y ca
 3. Complete **Número de proyecto**, **Fecha y hora de solicitud:** y **Observaciones**.
 4. Elija una opción en **Buscar material...**, complete **Cantidad** y pulse **Agregar** por cada detalle.
 5. Revise los datos y seleccione **Guardar**.
+
+Cada combinación de material y proveedor debe aparecer una sola vez. Si vuelve a agregar la misma
+combinación antes de guardar, el formulario reemplaza la cantidad del renglón existente; no crea
+otro renglón ni suma ambas cantidades. Capture en **Cantidad** el total que desea solicitar.
 
 <a id="CAP-SAL-MAT-03-EDIT"></a>
 ### CAP-SAL-MAT-03-EDIT — Edicion encabezado
@@ -109,6 +131,15 @@ Cada procedimiento identifica sus casos de uso, controles, errores posibles y ca
 
 **Propósito.** Registrar y dar seguimiento al surtido y devolución de mermas.
 
+**Campos por modo del formulario.** En **alta** se editan cliente, asesor, área, solicitante, número
+de proyecto, fecha de solicitud, observaciones y las mermas solicitadas. En **edición completa** se
+habilitan esos mismos datos y la incorporación de detalles sólo mientras la salida esté pendiente;
+después, la edición se limita al **encabezado** y los detalles quedan de consulta. En **surtido** el
+encabezado es de sólo lectura y únicamente se editan **Surtir** y **Cantidad de proyecto** en los
+renglones pendientes. En **devolución** el documento es de sólo lectura y la acción habilita
+únicamente **Cantidad a devolver** y **Observaciones**. Una salida cancelada se abre en **consulta**,
+sin campos editables.
+
 <a id="CAP-SAL-WAS-01-LIST"></a>
 ### CAP-SAL-WAS-01-LIST — Listado
 
@@ -143,6 +174,11 @@ Cada procedimiento identifica sus casos de uso, controles, errores posibles y ca
 3. Complete **Número de proyecto**, **Fecha y hora de solicitud** y **Observaciones**.
 4. Elija una opción en **Buscar merma...**, complete **Cantidad** y pulse **Agregar** por cada detalle.
 5. Revise los datos y seleccione **Guardar**.
+
+Cada merma debe aparecer una sola vez. Si vuelve a agregarla antes de guardar, el formulario
+reemplaza la cantidad del renglón existente; no crea otro renglón ni suma ambas cantidades. Capture
+en **Cantidad** el total que desea solicitar. Nexus también rechaza una solicitud enviada con la
+misma merma repetida.
 
 <a id="CAP-SAL-WAS-03-EDIT"></a>
 ### CAP-SAL-WAS-03-EDIT — Edicion encabezado

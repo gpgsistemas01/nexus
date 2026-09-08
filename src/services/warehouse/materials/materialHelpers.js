@@ -3,6 +3,8 @@ import { findUniquePresentation } from "../presentationService.js";
 import { findUniqueUnitMeasure } from "../unitMeasureService.js";
 import { createServiceLogger, logServiceError } from "../../../utils/logger.js";
 import { PRISMA_ERROR_CODES } from "../../../constants/prisma.js";
+import { findUniqueSupplier } from "../supplierService.js";
+import { SupplierInactiveConflict } from "../../../errors/warehouse/supplierError.js";
 
 const serviceLogger = createServiceLogger('warehouse.materials.materialHelpers');
 
@@ -13,8 +15,13 @@ export const prepareMaterialData = async ({ tx, materialDto, materialId = null }
 
     const { presentationId, unitMeasureId, supplierId, maxUnitCost, ...rest } = materialDto;
 
-    await findUniqueUnitMeasure({ tx, id: unitMeasureId });
-    await findUniquePresentation({ tx, id: presentationId });
+    const [, , supplier] = await Promise.all([
+        findUniqueUnitMeasure({ tx, id: unitMeasureId }),
+        findUniquePresentation({ tx, id: presentationId }),
+        findUniqueSupplier({ tx, id: supplierId })
+    ]);
+
+    if (supplier?.isActive === false) throw new SupplierInactiveConflict();
 
     return {
         rest,

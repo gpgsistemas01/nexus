@@ -7,6 +7,13 @@ export class SupplierNotFound extends AppError {
     }
 }
 
+export class SupplierInactiveConflict extends AppError {
+
+    constructor () {
+        super('El proveedor está inactivo y no puede utilizarse en una operación nueva', 'SUPPLIER_INACTIVE_CONFLICT', 409);
+    }
+}
+
 export class SupplierCodeNotFound extends AppError {
 
     constructor () {

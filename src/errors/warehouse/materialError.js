@@ -7,6 +7,13 @@ export class MaterialNotFound extends AppError {
     }
 }
 
+export class MaterialInactiveConflict extends AppError {
+
+    constructor () {
+        super('El material está inactivo y no puede utilizarse en una operación nueva', 'MATERIAL_INACTIVE_CONFLICT', 409);
+    }
+}
+
 export class MaterialAlreadyExists extends AppError {
 
     constructor () {

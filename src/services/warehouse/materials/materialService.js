@@ -71,6 +71,7 @@ export const findAllMaterials = async ({
 const DEFAULT_MATERIAL_SNAPSHOT_SELECT = {
     id: true,
     name: true,
+    isActive: true,
     minStock: true,
     base: true,
     height: true,

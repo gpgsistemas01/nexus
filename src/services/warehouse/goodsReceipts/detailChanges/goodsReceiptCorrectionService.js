@@ -45,7 +45,7 @@ export const correctGoodsReceiptDetailLine = async ({
                 materialId: currentDetail.materialId,
                 quantity,
                 costPerUnitType
-            }], { tx });
+            }], { tx, requireActive: false });
             const correctedQuantity = normalizeDecimal(correctedDetail.quantity);
             const currentQuantity = normalizeDecimal(currentDetail.quantity);
             const quantityDifference = normalizeDecimal(correctedQuantity - currentQuantity);

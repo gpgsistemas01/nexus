@@ -1,4 +1,5 @@
-import { MaterialNotFound } from "../../../errors/warehouse/materialError.js";
+import { MaterialInactiveConflict, MaterialNotFound } from "../../../errors/warehouse/materialError.js";
+import { SupplierInactiveConflict } from "../../../errors/warehouse/supplierError.js";
 import { GoodsIssueMissingMaxUnitCost } from "../../../errors/inventory/stockError.js";
 import { buildStockKey } from "../../../utils/formattersUtils.js";
 import { calculateConvertedQuantity } from "../../inventory/stockHelpers.js";
@@ -36,6 +37,8 @@ export const buildGoodsIssueDetails = async ({
         const sp = spMap.get(key);
 
         if (!sp) throw new MaterialNotFound();
+        if (!sp.isActive) throw new MaterialInactiveConflict();
+        if (!sp.supplier.isActive) throw new SupplierInactiveConflict();
 
         if (presentationId && sp.presentation?.id !== presentationId) throw new MaterialNotFound();
 

@@ -6,6 +6,17 @@ Cada procedimiento identifica sus casos de uso, controles, errores posibles y ca
 
 **Propósito.** Consultar el inventario, registrar o editar materiales y ajustar existencias.
 
+**Qué significa identidad y estado.** La identidad de un material es la combinación de
+**Nombre**, **Presentación**, **Unidad**, **Base** y **Altura** que permite reconocer el mismo
+artículo. **Proveedor** pertenece a una relación de inventario separada, por lo que una misma
+identidad puede estar asociada con proveedores distintos. **Stock Mínimo**, **Costo Máximo**,
+existencia y **Activo** no forman parte de la identidad. Desmarcar **Activo** conserva el material,
+su relación con el proveedor, su existencia y su historia. Ya no puede incorporarse a una compra,
+salida o relación nueva. Si estaba incluido en una salida antes de desactivarlo, todavía puede
+surtirse el pendiente para completar ese compromiso, siempre que haya existencia suficiente. En
+los reportes, **Sólo activos** lo excluye, mientras **Sólo con existencia** puede incluirlo si aún
+conserva stock. Volver a marcarlo permite usarlo nuevamente en operaciones nuevas.
+
 <a id="CAP-CAT-MAT-01-LIST"></a>
 ### CAP-CAT-MAT-01-LIST — Listado inventario
 
@@ -40,7 +51,10 @@ Cada procedimiento identifica sus casos de uso, controles, errores posibles y ca
 
 **Errores posibles:** [Validación de formularios](../error-messages.md#errores-validacion), [Catálogos e inventario](../error-messages.md#errores-catalogos).
 
-**Controles que debe usar:** Botón **Nuevo material**; campo **Nombre**; selectores **Buscar proveedor...**, **Buscar presentación...** y **Buscar unidad...**; campos **Stock Mínimo**, **Costo Máximo**, **Base** y **Altura**; casilla **Activo** y botón **Guardar**.
+**Campos editables en modo alta:** **Nombre**, **Buscar proveedor...**, **Buscar presentación...**,
+**Buscar unidad...**, **Stock Mínimo**, **Costo Máximo**, **Base**, **Altura**, **Nueva cantidad**,
+**Observaciones** y **Activo**. La razón **Stock inicial** es automática. Use **Nuevo material** para
+abrir el formulario y **Guardar** para confirmarlo.
 
 1. Seleccione el botón **Nuevo material** para abrir el formulario de alta. Antes de continuar, compruebe que la pantalla mostrada coincida con la captura:
 
@@ -49,6 +63,12 @@ Cada procedimiento identifica sus casos de uso, controles, errores posibles y ca
 2. Complete **Nombre**; elija opciones en **Buscar proveedor...**, **Buscar presentación...** y **Buscar unidad...**; capture **Stock Mínimo**, **Costo Máximo**, **Base** y **Altura**, y revise la casilla **Activo**.
 3. Seleccione el botón **Guardar** para registrar el material.
 
+Si ya existe la misma combinación de nombre, presentación, unidad, dimensiones y proveedor, Nexus
+rechaza el alta: localice el material existente y use **Ajustar stock**; **Nueva cantidad** representa
+la existencia total que debe quedar, no una cantidad que se sume. Si la identidad ya existe para
+otro proveedor, Nexus reutiliza el material y crea la relación de inventario con el proveedor
+seleccionado.
+
 <a id="CAP-CAT-MAT-03-EDIT"></a>
 ### CAP-CAT-MAT-03-EDIT — Formulario edicion
 
@@ -56,13 +76,16 @@ Cada procedimiento identifica sus casos de uso, controles, errores posibles y ca
 
 **Errores posibles:** [Validación de formularios](../error-messages.md#errores-validacion), [Catálogos e inventario](../error-messages.md#errores-catalogos).
 
-**Controles que debe usar:** Acción **Editar registro** de la fila; campo **Nombre**; selectores **Buscar proveedor...**, **Buscar presentación...** y **Buscar unidad...**; campos **Stock Mínimo**, **Costo Máximo**, **Base** y **Altura**; casilla **Activo** y botón **Actualizar**.
+**Campos editables en modo edición:** **Nombre**, **Stock Mínimo**, **Costo Máximo** y **Activo**.
+**Proveedor**, **Presentación**, **Unidad**, **Base**, **Altura** y la existencia no se pueden editar en
+este modo. Use la acción **Editar registro** y el botón **Actualizar**.
 
 1. En la fila del material, seleccione la acción **Editar registro** para abrir el formulario. Antes de continuar, compruebe que la pantalla mostrada coincida con la captura:
 
    ![CAP-CAT-MAT-03-EDIT: formulario edicion](../images/materiales/03-formulario-edicion.png)
 
-2. Modifique **Nombre**, **Buscar proveedor...**, **Buscar presentación...**, **Buscar unidad...**, **Stock Mínimo**, **Costo Máximo**, **Base** o **Altura** según corresponda, y revise la casilla **Activo**.
+2. Modifique **Nombre**, **Stock Mínimo**, **Costo Máximo** o **Activo** según corresponda. Revise los
+   demás datos sólo como referencia.
 3. Seleccione el botón **Actualizar** para guardar los cambios.
 
 <a id="CAP-CAT-MAT-04-STOCK"></a>
@@ -72,7 +95,9 @@ Cada procedimiento identifica sus casos de uso, controles, errores posibles y ca
 
 **Errores posibles:** [Validación de formularios](../error-messages.md#errores-validacion), [Catálogos e inventario](../error-messages.md#errores-catalogos).
 
-**Controles que debe usar:** Acción **Ajustar stock**; selector **Seleccione una razón...**, campos **Nueva cantidad** y **Observaciones**, y botón **Ajustar**.
+**Campos editables en modo ajuste:** **Seleccione una razón...**, **Nueva cantidad** y
+**Observaciones**. Los datos de identidad y catálogo quedan sólo para consulta. Use la acción
+**Ajustar stock** y el botón **Ajustar**.
 
 1. En la fila del material, seleccione la acción **Ajustar stock**. Antes de continuar, compruebe que la pantalla mostrada coincida con la captura:
 
@@ -84,6 +109,10 @@ Cada procedimiento identifica sus casos de uso, controles, errores posibles y ca
 ## Proveedores
 
 **Propósito.** Consultar y mantener el catálogo de proveedores.
+
+La casilla **Activo** controla el estado del proveedor dentro del mismo formulario de alta o
+edición. Desmarcarla no elimina el proveedor ni sus materiales o documentos históricos; volver a
+marcarla lo reactiva. Este cambio no es un ajuste de stock.
 
 <a id="CAP-CAT-SUP-01-LIST"></a>
 ### CAP-CAT-SUP-01-LIST — Listado
@@ -187,6 +216,16 @@ Cada procedimiento identifica sus casos de uso, controles, errores posibles y ca
 
 **Propósito.** Consultar y mantener mermas, ajustar existencias y delimitar reportes.
 
+**Qué significa identidad y estado.** La identidad de una merma es la combinación de
+**Proveedor**, **Nombre**, **Ancho/Base** y **Largo/Altura**. La presentación y unidad se conservan
+como datos de la plantilla seleccionada; el stock mínimo, costo máximo, existencia y estado
+**Activo** no forman parte de la identidad. Desmarcar **Activo** no elimina la merma ni cambia su
+stock o historia, pero Nexus rechaza una merma inactiva al intentar registrarla en una nueva salida.
+Si la merma ya pertenecía a una salida pendiente o parcial, puede surtirse el detalle restante para
+cerrar el compromiso, siempre que haya stock; desactivarla no cancela la salida. Los reportes pueden
+conservarla cuando se elige **Sólo con existencia** y aún tiene stock. Volver a marcarla permite
+utilizarla nuevamente en una nueva salida.
+
 <a id="CAP-CAT-WAS-01-LIST"></a>
 ### CAP-CAT-WAS-01-LIST — Listado inventario
 
@@ -221,7 +260,11 @@ Cada procedimiento identifica sus casos de uso, controles, errores posibles y ca
 
 **Errores posibles:** [Validación de formularios](../error-messages.md#errores-validacion), [Catálogos e inventario](../error-messages.md#errores-catalogos).
 
-**Controles que debe usar:** Botón **Nueva merma**; selectores **Buscar proveedor...** y **Buscar material de referencia...**; campos **Ancho confirmado de la merma (m)**, **Largo real de la merma (m)**, **Stock mínimo** y **Costo máximo unitario**; casilla **Activo** y botón **Guardar**.
+**Campos editables en modo alta:** **Buscar proveedor...**, **Buscar material de referencia...**,
+**Ancho confirmado de la merma (m)**, **Largo real de la merma (m)**, **Stock mínimo**, **Costo
+máximo unitario**, **Nuevo stock**, **Observaciones** y **Activo**. El nombre, presentación y unidad
+provienen del material de referencia y la razón **Stock inicial** es automática. Use **Nueva merma**
+para abrir el formulario y **Guardar** para confirmarlo.
 
 1. Seleccione el botón **Nueva merma** para abrir el formulario de registro. Antes de continuar, compruebe que la pantalla mostrada coincida con la captura:
 
@@ -230,6 +273,11 @@ Cada procedimiento identifica sus casos de uso, controles, errores posibles y ca
 2. Elija opciones en **Buscar proveedor...** y **Buscar material de referencia...**; complete **Ancho confirmado de la merma (m)**, **Largo real de la merma (m)**, **Stock mínimo** y **Costo máximo unitario**, y revise la casilla **Activo**.
 3. Seleccione el botón **Guardar** para registrar la merma.
 
+Si ya existe una merma con el mismo nombre, proveedor, ancho y largo, Nexus rechaza el alta y no
+suma la existencia capturada. Localice esa merma en el listado y use **Ajustar stock**; **Nuevo
+stock** representa la existencia total que debe quedar, no una cantidad que se agregue al valor
+actual.
+
 <a id="CAP-CAT-WAS-03-EDIT"></a>
 ### CAP-CAT-WAS-03-EDIT — Formulario edicion
 
@@ -237,13 +285,16 @@ Cada procedimiento identifica sus casos de uso, controles, errores posibles y ca
 
 **Errores posibles:** [Validación de formularios](../error-messages.md#errores-validacion), [Catálogos e inventario](../error-messages.md#errores-catalogos).
 
-**Controles que debe usar:** Acción **Editar registro**; selectores **Buscar proveedor...** y **Buscar material de referencia...**; campos **Ancho confirmado de la merma (m)**, **Largo real de la merma (m)**, **Stock mínimo** y **Costo máximo unitario**; casilla **Activo** y botón **Actualizar**.
+**Campos editables en modo edición:** **Nombre**, **Stock mínimo**, **Costo máximo unitario** y
+**Activo**. **Proveedor**, material de referencia, presentación, unidad, ancho, largo y existencia
+quedan sólo para consulta. Use la acción **Editar registro** y el botón **Actualizar**.
 
 1. En la fila de la merma, seleccione la acción **Editar registro**. Antes de continuar, compruebe que la pantalla mostrada coincida con la captura:
 
    ![CAP-CAT-WAS-03-EDIT: formulario edicion](../images/mermas/03-formulario-edicion.png)
 
-2. Modifique únicamente los selectores o campos indicados y revise la casilla **Activo**.
+2. Modifique **Nombre**, **Stock mínimo**, **Costo máximo unitario** o **Activo** según corresponda.
+   Revise los demás datos sólo como referencia.
 3. Seleccione el botón **Actualizar** para guardar los cambios.
 
 <a id="CAP-CAT-WAS-04-STOCK"></a>
@@ -253,7 +304,9 @@ Cada procedimiento identifica sus casos de uso, controles, errores posibles y ca
 
 **Errores posibles:** [Validación de formularios](../error-messages.md#errores-validacion), [Catálogos e inventario](../error-messages.md#errores-catalogos).
 
-**Controles que debe usar:** Acción **Ajustar stock**; selector **Seleccione una razón...**, campos **Nuevo stock** y **Observaciones**, y botón **Ajustar**.
+**Campos editables en modo ajuste:** **Seleccione una razón...**, **Nuevo stock** y
+**Observaciones**. Los datos de identidad y catálogo quedan sólo para consulta. Use la acción
+**Ajustar stock** y el botón **Ajustar**.
 
 1. En la fila de la merma, seleccione la acción **Ajustar stock**. Antes de continuar, compruebe que la pantalla mostrada coincida con la captura:
 

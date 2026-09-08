@@ -26,6 +26,7 @@ const SUPPLIER_MATERIAL_SNAPSHOT_INCLUDE = {
         select: {
             id: true,
             name: true,
+            isActive: true,
             base: true,
             height: true,
             presentation: true,
@@ -35,7 +36,8 @@ const SUPPLIER_MATERIAL_SNAPSHOT_INCLUDE = {
     supplier: {
         select: {
             id: true,
-            tradeName: true
+            tradeName: true,
+            isActive: true
         }
     }
 };

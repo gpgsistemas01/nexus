@@ -34,6 +34,7 @@ describe('plantillas de material para el CRUD de mermas', () => {
 
     expect(materialFindMany).toHaveBeenCalledWith(expect.objectContaining({
       where: {
+        isActive: true,
         name: { contains: 'lo', mode: 'insensitive' },
         supplierMaterials: { some: { supplierId: 'supplier-1' } }
       },

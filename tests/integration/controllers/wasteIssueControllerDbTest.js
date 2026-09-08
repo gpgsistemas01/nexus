@@ -309,6 +309,61 @@ describe('waste issue controller database integration', () => {
     })).toBe(1);
   });
 
+  it('permite completar una salida parcial aunque la merma se desactive después de solicitarla', async () => {
+    const created = await request(app).post('/waste-issues').send({
+      requesterId: ids.requester,
+      advisorId: ids.advisor,
+      clientId: ids.client,
+      departmentId: ids.department,
+      projectNumber: 'PR-INACT',
+      requestDate: '2026-08-11T12:30:00.000Z',
+      details: [
+        { wasteId: ids.waste, quantity: 1 },
+        { wasteId: ids.secondWaste, quantity: 1 }
+      ]
+    }).expect(201);
+    const issueId = created.body.wasteIssue.id;
+    const firstDetail = created.body.wasteIssue.details.find(detail => detail.wasteId === ids.waste);
+    const secondDetail = created.body.wasteIssue.details.find(detail => detail.wasteId === ids.secondWaste);
+
+    await request(app).patch(`/waste-issues/${ issueId }/details`).send({
+      details: [{ id: firstDetail.id, isSupplied: true, projectConvertedQuantity: 1 }]
+    }).expect(200);
+
+    await prisma.waste.update({
+      where: { id: ids.secondWaste },
+      data: { isActive: false }
+    });
+
+    try {
+      const rejectedNewIssue = await request(app).post('/waste-issues').send({
+        requesterId: ids.requester,
+        advisorId: ids.advisor,
+        clientId: ids.client,
+        departmentId: ids.department,
+        projectNumber: 'PR-NEWACT',
+        requestDate: '2026-08-11T12:45:00.000Z',
+        details: [{ wasteId: ids.secondWaste, quantity: 1 }]
+      }).expect(409);
+
+      expect(rejectedNewIssue.body.code).toBe('WASTE_ISSUE_STATE_CONFLICT');
+
+      const completed = await request(app).patch(`/waste-issues/${ issueId }/details`).send({
+        details: [{ id: secondDetail.id, isSupplied: true, projectConvertedQuantity: 1 }]
+      }).expect(200);
+
+      expect(completed.body.wasteIssue.fulfillmentStatus).toMatchObject({ name: 'Surtido' });
+      expect(completed.body.wasteIssue.details).toEqual(expect.arrayContaining([
+        expect.objectContaining({ id: secondDetail.id, isSupplied: true })
+      ]));
+    } finally {
+      await prisma.waste.update({
+        where: { id: ids.secondWaste },
+        data: { isActive: true }
+      });
+    }
+  });
+
   it('rechaza stock insuficiente y revierte toda la transacción', async () => {
     const before = await prisma.waste.findUnique({ where: { id: ids.waste } });
     const created = await request(app).post('/waste-issues').send({

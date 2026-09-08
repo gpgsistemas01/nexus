@@ -16,6 +16,7 @@ import { generateYearlyReferenceNumber, throwIfReferenceNumberAlreadyExists } fr
 import { findPersonById } from "../../admin/person/personService.js";
 import { applyInventoryMovement } from "../../inventory/movementService.js";
 import { findUniqueSupplier } from "../supplierService.js";
+import { SupplierInactiveConflict } from "../../../errors/warehouse/supplierError.js";
 import { buildGoodsReceiptDetails, calculateGoodsReceiptTotals, createGoodsReceiptDetailsAndUpdateTotals, GOODS_RECEIPT_DETAIL_INCLUDE } from "./goodsReceiptHelpers.js";
 import { updateMaterialUnitCostIfHigher } from "../materials/supplierMaterialService.js";
 import { isAppError } from "../../../errors/AppError.js";
@@ -135,6 +136,8 @@ export const createGoodsReceipt = async ({ goodsReceiptDto }) => {
 
         const supplier = await findUniqueSupplier({ id: supplierId });
 
+        if (supplier?.isActive === false) throw new SupplierInactiveConflict();
+
         await assertGoodsReceiptInvoiceAvailable({
             supplierId,
             invoice: goodsReceiptData.invoice
@@ -248,6 +251,9 @@ export const updateGoodsReceipt = async ({ id, goodsReceiptDto }) => {
                 select: {
                     id: true,
                     supplierId: true,
+                    supplier: {
+                        select: { isActive: true }
+                    },
                     status: {
                         select: { name: true }
                     }
@@ -264,6 +270,10 @@ export const updateGoodsReceipt = async ({ id, goodsReceiptDto }) => {
 
         if (supplierId !== goodsReceipt.supplierId) {
             throw new GoodsReceiptSupplierChangeConflict();
+        }
+
+        if (newDetails.length && goodsReceipt.supplier?.isActive === false) {
+            throw new SupplierInactiveConflict();
         }
 
         if (!receivedBy) throw new PersonReceivedByNotFound();
