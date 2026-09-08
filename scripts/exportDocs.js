@@ -162,7 +162,7 @@ const addInternalAnchors = (content, source) => {
     };
     const anchoredAliases = content.replace(
         /^<a id="([^"]+)"><\/a>$/gm,
-        (anchor, fragment) => `[]{#${uniqueDocumentAnchor(fragment)}}`
+        (anchor, fragment) => `[]{#${uniqueDocumentAnchor(fragment)}}\n`
     );
     const anchoredHeadings = anchoredAliases.replace(
         /^(#{1,6})\s+(.+)$/gm,
