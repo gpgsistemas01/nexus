@@ -143,13 +143,20 @@ const prepareLinks = (content, source, publicationSources) => content.replace(
 );
 
 const addInternalAnchors = (content, source) => {
+    const anchorOccurrences = new Map();
+    const uniqueDocumentAnchor = (fragment) => {
+        const anchor = documentAnchor(source, fragment);
+        const occurrence = (anchorOccurrences.get(anchor) ?? 0) + 1;
+        anchorOccurrences.set(anchor, occurrence);
+        return occurrence === 1 ? anchor : `${anchor}-${occurrence}`;
+    };
     const anchoredAliases = content.replace(
         /^<a id="([^"]+)"><\/a>$/gm,
-        (anchor, fragment) => `[]{#${documentAnchor(source, fragment)}}`
+        (anchor, fragment) => `[]{#${uniqueDocumentAnchor(fragment)}}`
     );
     const anchoredHeadings = anchoredAliases.replace(
         /^(#{1,6})\s+(.+)$/gm,
-        (heading, level, title) => `${level} ${title} {#${documentAnchor(source, title
+        (heading, level, title) => `${level} ${title} {#${uniqueDocumentAnchor(title
             .replace(/[`*_\[\]]/g, '')
             .toLowerCase()
             .replace(/[^\p{L}\p{N} _-]/gu, '')
@@ -244,14 +251,9 @@ const temporaryDirectory = await mkdtemp(path.join(outputDirectory, '.export-'))
 const diagramOutputDirectory = path.join(outputDirectory, 'diagrams');
 const diagramSourceDirectory = path.join(outputDirectory, 'diagram-sources');
 await Promise.all([
-    rm(diagramOutputDirectory, { recursive: true, force: true }),
-    rm(diagramSourceDirectory, { recursive: true, force: true })
-]);
-await Promise.all([
     mkdir(diagramOutputDirectory, { recursive: true }),
     mkdir(diagramSourceDirectory, { recursive: true })
 ]);
-const renderedDiagrams = new Map();
 const mermaidExecutable = path.join(ROOT, 'node_modules', '@mermaid-js', 'mermaid-cli', 'src', 'cli.js');
 
 const prepareSource = async (source, publicationSources) => {
@@ -266,22 +268,24 @@ const prepareSource = async (source, publicationSources) => {
     for (const match of blocks) {
         const diagram = normalizeMermaidSource(match[1]);
         const id = createHash('sha256').update(diagram).digest('hex').slice(0, 16);
-        let image = renderedDiagrams.get(id);
-        if (!image) {
+        const input = path.join(diagramSourceDirectory, `${id}.mmd`);
+        const image = path.join(diagramOutputDirectory, `${id}.png`);
+        await writeFile(input, diagram);
+        if (!existsSync(image)) {
             if (!existsSync(mermaidExecutable)) {
                 console.error('Mermaid CLI no está disponible. Ejecuta npm install --no-save @mermaid-js/mermaid-cli antes de exportar documentos con diagramas.');
                 return null;
             }
-            const input = path.join(diagramSourceDirectory, `${id}.mmd`);
-            image = path.join(diagramOutputDirectory, `${id}.png`);
-            await writeFile(input, diagram);
             const result = spawnSync(process.execPath, [mermaidExecutable, '--input', input, '--output', image, '--backgroundColor', 'white', '--scale', '2'], { cwd: ROOT, stdio: 'inherit' });
             if (result.error?.code === 'ENOENT') {
+                await rm(image, { force: true });
                 console.error('Mermaid CLI no está disponible. Ejecuta npm install --no-save @mermaid-js/mermaid-cli antes de exportar documentos con diagramas.');
                 return null;
             }
-            if (result.status !== 0) return null;
-            renderedDiagrams.set(id, image);
+            if (result.status !== 0) {
+                await rm(image, { force: true });
+                return null;
+            }
         }
         renderedContent = renderedContent.replace(match[0], `![${diagramCaption(content, match.index)}](${image})`);
     }
