@@ -455,11 +455,13 @@ stateDiagram-v2
     Cancelada --> [*]
 ```
 
-`Parcial` es la etiqueta abreviada de `Surtido parcial` y `Surtida` representa el valor
-persistido `Surtido`. La devolución parcial no crea un estado `Devuelta`: conserva el
-detalle como surtido mientras aún exista cantidad neta entregada. Sólo cuando todos los
-detalles resultan cancelados se deriva `Cancelado` para el encabezado. Esta aclaración
-evita interpretar el diagrama como un catálogo adicional de estados.
+`Parcial` es la etiqueta abreviada de cumplimiento `Surtido parcial` y `Surtida` representa
+el cumplimiento persistido `Surtido`. La devolución es una operación, no un estado ni un
+sinónimo de cancelar: una devolución parcial conserva el detalle `Surtido`, mientras que
+devolver todo lo surtido deriva `Cancelado` para ese detalle. Sólo cuando todos los detalles
+resultan cancelados se derivan cumplimiento `Cancelado` y estado documental `Cancelada`
+para el encabezado. Esta aclaración evita interpretar el diagrama como un catálogo adicional
+de estados o como una acción independiente de cancelación.
 
 ## Vistas de diseño del sistema
 
