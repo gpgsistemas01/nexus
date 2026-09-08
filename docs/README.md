@@ -518,7 +518,10 @@ Después de aprobar las imágenes, vuelva a [Exportar los manuales](#exportar-lo
 Si la comprobación del paso 3 responde `ERR_CONNECTION_REFUSED`, confirme que Nexus siga activo y
 que la URL use el puerto anunciado. Si la captura falla esperando `.btn-return-detail`, compruebe
 el permiso de surtimiento y que exista una salida aprobada, completamente surtida y con cantidad
-retornable. El script recorre todas las páginas del listado para localizarla.
+retornable. El script recorre todas las páginas del listado para localizarla. Las líneas `Paso N/T`
+son acciones preparatorias, no capturas duplicadas. Después de corregir los datos puede definir
+`DOCS_CAPTURE_IDS=CAP-SAL-WAS-05-RETURN` para regenerar sólo la captura fallida y conservar las
+demás imágenes.
 
 ### Ejemplos de exportación
 

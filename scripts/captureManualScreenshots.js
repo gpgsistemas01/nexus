@@ -6,6 +6,10 @@ const baseURL = process.env.DOCS_BASE_URL ?? 'http://127.0.0.1:3000';
 const storageState = process.env.DOCS_STORAGE_STATE;
 const loginName = process.env.DOCS_LOGIN_NAME;
 const loginPassword = process.env.DOCS_LOGIN_PASSWORD;
+const requestedCaptureIds = (process.env.DOCS_CAPTURE_IDS ?? '')
+    .split(',')
+    .map(id => id.trim())
+    .filter(Boolean);
 const outputRoot = path.resolve('docs/user-manual/images');
 const screenshotDelay = 1500;
 
@@ -88,6 +92,18 @@ const validateInventory = () => {
     }
 };
 
+const selectCaptures = () => {
+    if (!requestedCaptureIds.length) return captures;
+
+    const capturesById = new Map(captures.map(capture => [capture.id, capture]));
+    const unknownIds = requestedCaptureIds.filter(id => !capturesById.has(id));
+    if (unknownIds.length) {
+        throw new Error(`DOCS_CAPTURE_IDS contiene identificadores desconocidos: ${ unknownIds.join(', ') }`);
+    }
+
+    return [...new Set(requestedCaptureIds)].map(id => capturesById.get(id));
+};
+
 const findTriggerAcrossPages = async (page, selector) => {
     const trigger = page.locator(selector).first();
     await page.locator('#table tbody tr').first().waitFor({ state: 'visible' });
@@ -111,7 +127,7 @@ const findTriggerAcrossPages = async (page, selector) => {
     }
 };
 
-const runAction = async (page, action, captureId) => {
+const runAction = async (page, action, captureId, step) => {
     if (action.filter) {
         const filterControl = page.locator(action.selector);
         if (!await filterControl.isVisible()) {
@@ -126,7 +142,7 @@ const runAction = async (page, action, captureId) => {
             })),
             page.locator('#applyFiltersButton').click()
         ]);
-        console.log(`  Filtro preparado para ${ captureId }: ${ action.label }`);
+        console.log(`  Paso ${ step } de ${ captureId }: filtro ${ action.label }`);
         return;
     }
 
@@ -156,7 +172,7 @@ const runAction = async (page, action, captureId) => {
     }
     await trigger.click();
     await page.locator(action.ready).first().waitFor({ state: 'visible' });
-    console.log(`  Acción preparada para ${ captureId }: ${ action.selector }`);
+    console.log(`  Paso ${ step } de ${ captureId }: acción ${ action.selector }`);
 };
 
 const capturePage = async (page, capture) => {
@@ -165,8 +181,9 @@ const capturePage = async (page, capture) => {
     await page.goto(new URL(capture.route, baseURL).href, { waitUntil: 'domcontentloaded' });
     await page.locator(capture.ready).first().waitFor({ state: 'visible' });
 
-    for (const action of capture.actions ?? (capture.action ? [capture.action] : [])) {
-        await runAction(page, action, capture.id);
+    const actions = capture.actions ?? (capture.action ? [capture.action] : []);
+    for (const [index, action] of actions.entries()) {
+        await runAction(page, action, capture.id, `${ index + 1 }/${ actions.length }`);
     }
 
     await page.waitForTimeout(screenshotDelay);
@@ -187,6 +204,7 @@ const login = async (page) => {
 };
 
 validateInventory();
+const selectedCaptures = selectCaptures();
 
 if (process.argv.includes('--list')) {
     console.log('| Orden | ID | Ruta | Casos de uso |');
@@ -200,7 +218,7 @@ if (process.argv.includes('--list')) {
     process.exit(0);
 }
 
-const protectedCaptures = captures.filter(item => !item.public);
+const protectedCaptures = selectedCaptures.filter(item => !item.public);
 if (Boolean(loginName) !== Boolean(loginPassword)) {
     throw new Error('DOCS_LOGIN_NAME y DOCS_LOGIN_PASSWORD deben definirse juntos.');
 }
@@ -211,9 +229,16 @@ if (protectedCaptures.length && !storageState && !loginName) {
     throw new Error('Defina DOCS_LOGIN_NAME y DOCS_LOGIN_PASSWORD, o proporcione DOCS_STORAGE_STATE, para generar las capturas protegidas.');
 }
 
-// La salida representa una ejecución completa. Se elimina sólo después de validar la
-// configuración para no mezclar capturas anteriores con el inventario actual.
-await rm(outputRoot, { recursive: true, force: true });
+if (requestedCaptureIds.length) {
+    await Promise.all(selectedCaptures.map(capture => rm(
+        path.join(outputRoot, capture.module, capture.name),
+        { force: true }
+    )));
+} else {
+    // Una ejecución completa sustituye todo el inventario. Una ejecución selectiva
+    // conserva las capturas no solicitadas para poder reintentar únicamente las fallidas.
+    await rm(outputRoot, { recursive: true, force: true });
+}
 
 const { chromium } = await import('playwright');
 const browser = await chromium.launch();
@@ -222,7 +247,7 @@ try {
     const publicContext = await browser.newContext(contextOptions);
     const publicPage = await publicContext.newPage();
 
-    for (const capture of captures.filter(item => item.public)) await capturePage(publicPage, capture);
+    for (const capture of selectedCaptures.filter(item => item.public)) await capturePage(publicPage, capture);
     await publicContext.close();
 
     const authenticatedContext = await browser.newContext({ ...contextOptions, ...(storageState ? { storageState } : {}) });

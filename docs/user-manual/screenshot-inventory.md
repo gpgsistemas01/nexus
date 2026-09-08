@@ -126,11 +126,30 @@ demás listados. Para las vistas protegidas, el script inicia sesión automátic
 `DOCS_LOGIN_NAME` y `DOCS_LOGIN_PASSWORD`, o reutiliza `DOCS_STORAGE_STATE` como alternativa. La
 pantalla de inicio de sesión se toma en un contexto separado y sin autenticación.
 
+Las líneas indentadas `Paso N/T de CAP-*` describen los filtros y clics necesarios para preparar
+**una sola captura**; no indican que se haya escrito otro PNG. Sólo la línea sin sangría
+`CAP-* -> ruta.png [...]` confirma la escritura. Después de corregir un prerrequisito puede
+reintentarse únicamente la captura fallida, sin regenerar ni eliminar las que ya funcionaron:
+
+```powershell
+# PowerShell
+$env:DOCS_CAPTURE_IDS = 'CAP-SAL-WAS-05-RETURN'
+npm run docs:screenshots
+Remove-Item Env:DOCS_CAPTURE_IDS
+```
+
+```bash
+# Bash; se aceptan varios identificadores separados por comas.
+DOCS_CAPTURE_IDS=CAP-SAL-WAS-05-RETURN npm run docs:screenshots
+```
+
 ## Revisión antes de publicar
 
-Cada ejecución elimina por completo `docs/user-manual/images/` después de validar la
-configuración y antes de abrir el navegador. Así se retiran archivos obsoletos, incluso si ya no
-figuran en el inventario. La opción `--list` es sólo de consulta y no elimina archivos.
+Cada ejecución completa elimina `docs/user-manual/images/` después de validar la configuración y
+antes de abrir el navegador. Así se retiran archivos obsoletos, incluso si ya no figuran en el
+inventario. Una ejecución selectiva con `DOCS_CAPTURE_IDS` elimina y sustituye sólo los PNG
+solicitados; si falla, las demás capturas se conservan. La opción `--list` es sólo de consulta y no
+elimina archivos.
 
 Después de ejecutar `npm run docs:screenshots`, se debe comprobar que los datos sean ficticios,
 que no aparezcan contraseñas, cookies ni datos personales, que los textos sean legibles y que el
