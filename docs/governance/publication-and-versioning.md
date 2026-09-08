@@ -50,13 +50,18 @@ DOCX y PDF muestran el diagrama visual en vez de copiar su código; los archivos
 eliminan al finalizar.
 
 Antes de convertir, cada enlace local con fragmento se valida contra un título o ancla
-explícita real. Si apunta al mismo archivo, se transforma al identificador único de esa
-sección; si apunta a otro Markdown incluido en el manifiesto, se transforma al
-identificador del documento y sección de destino. Un enlace a otro documento sin
-fragmento lleva al inicio de ese documento. Los enlaces a fuentes que no forman parte
-del paquete se presentan como texto. Esta navegación la resuelve Markdown/Pandoc:
-Mermaid se limita a producir la figura y no usa `click`, porque el hipervínculo dejaría
-de ser uniforme al renderizar el bloque como imagen para DOCX o PDF.
+explícita real. Las referencias entre fuentes incluidas conservan su ruta Markdown
+relativa y Pandoc las resuelve al ensamblarlas con alcance por archivo. Un enlace a otro
+documento sin fragmento lleva al inicio de ese documento. Los enlaces a fuentes que no
+forman parte del paquete se presentan como texto. Mermaid se limita a producir la figura
+y no usa `click`, porque el hipervínculo dejaría de ser uniforme al renderizar el bloque
+como imagen para DOCX o PDF.
+
+Para DOCX, el exportador materializa la tabla de contenido y el índice de imágenes como
+navegación interna a partir de los títulos y leyendas del paquete. No delega esa tarea a
+campos de Word pendientes de actualización, porque además de mostrar un aviso al abrir el
+archivo esos campos no contienen un resultado calculado por Pandoc. En PDF se conservan
+los índices nativos de Pandoc, que el motor de composición resuelve durante la exportación.
 
 Las anclas explícitas que preceden a un encabezado se preparan como un bloque independiente.
 La separación evita que Pandoc interprete el encabezado y su atributo interno como texto visible;

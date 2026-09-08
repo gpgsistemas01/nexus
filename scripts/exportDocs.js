@@ -86,6 +86,7 @@ const MANIFESTS = Object.freeze({
         'docs/architecture/traceability-matrix.md',
         'docs/architecture/design-and-construction-patterns.md',
         'docs/architecture/code-diagrams.md',
+        'docs/generated/code-map.md',
         'docs/architecture/diagram-conventions.md',
         'docs/architecture/diagram-inventory.md',
         'docs/architecture/decisions/index.md',
@@ -106,11 +107,6 @@ const publicationNames = Object.keys(MANIFESTS);
 const mermaidBlock = /^```mermaid\r?\n([\s\S]*?)^```\r?$/gm;
 const externalLink = /^(?:https?:|mailto:)/;
 const markdownLink = /(?<!!)\[([^\]]+)\]\(([^) ]+)([^)]*)\)/g;
-const documentAnchor = (source, fragment) => [
-    'documento',
-    source.replace(/\.md$/, '').replace(/[^\p{L}\p{N}]+/gu, '-'),
-    fragment
-].filter(Boolean).join('-').toLowerCase();
 const headingFragment = (title) => title
     .replace(/[`*_\[\]]/g, '')
     .toLowerCase()
@@ -136,19 +132,15 @@ const diagramCaption = (content, index) => {
 
 const prepareLinks = (content, source, publicationSources) => content.replace(
     markdownLink,
-    (reference, label, link, suffix) => {
+    (reference, label, link) => {
         if (externalLink.test(link)) return reference;
-        if (link.startsWith('#')) {
-            return `[${label}](#${documentAnchor(source, link.slice(1))}${suffix})`;
-        }
-        const [target, fragment] = link.split('#');
+        if (link.startsWith('#')) return reference;
+        const [target] = link.split('#');
         const resolvedTarget = path.relative(
             ROOT,
             path.resolve(ROOT, path.dirname(source), target)
         ).split(path.sep).join('/');
-        return target.endsWith('.md') && publicationSources.has(resolvedTarget)
-            ? `[${label}](#${documentAnchor(resolvedTarget, fragment)}${suffix})`
-            : label;
+        return target.endsWith('.md') && publicationSources.has(resolvedTarget) ? reference : label;
     }
 );
 
@@ -168,7 +160,53 @@ const addInternalAnchors = (content, source) => {
         /^(#{1,6})\s+(.+)$/gm,
         (heading, level, title) => `${level} ${title} {#${uniqueDocumentAnchor(headingFragment(title))}}`
     );
-    return `[]{#${documentAnchor(source)}}\n\n${anchoredHeadings}`;
+};
+
+const buildDocumentIndexes = async (preparedSources) => {
+    const headings = [];
+    const figures = [];
+    const indexDirectory = path.dirname(preparedSources[0]);
+    for (const preparedSource of preparedSources) {
+        const content = await readFile(preparedSource, 'utf8');
+        const sourceLink = path.relative(indexDirectory, preparedSource).split(path.sep).join('/');
+        const headingOccurrences = new Map();
+        headings.push(...[...content.matchAll(/^(#{1,6})\s+(.+)$/gm)].map((match) => {
+            const fragment = headingFragment(match[2]);
+            const occurrence = headingOccurrences.get(fragment) ?? 0;
+            headingOccurrences.set(fragment, occurrence + 1);
+            return {
+                level: match[1].length,
+                title: match[2],
+                link: `${sourceLink}#${fragment}${occurrence ? `-${occurrence}` : ''}`
+            };
+        }).filter(({ level }) => level <= 3));
+        figures.push(...[...content.matchAll(/^\s*!\[([^\]]+)\]\([^)]+\)\{#([^}]+)\}$/gm)].map((match) => ({
+            title: match[1],
+            link: `${sourceLink}#${match[2]}`
+        })));
+    }
+    const tableOfContents = headings.map(({ level, title, link }) => (
+        `${'    '.repeat(level - 1)}- [${title}](${link})`
+    ));
+    const listOfFigures = figures.map(({ title, link }) => `- [${title}](${link})`);
+    return [
+        '## Tabla de contenido',
+        '',
+        ...tableOfContents,
+        ...(listOfFigures.length ? [
+            '',
+            '## Índice de imágenes',
+            '',
+            ...listOfFigures
+        ] : []),
+        ''
+    ].join('\n');
+};
+
+const insertAfterFrontMatter = (content, insertion) => {
+    const frontMatter = content.match(/^---\r?\n[\s\S]*?\r?\n---\r?\n/);
+    if (!frontMatter) return `${insertion}\n${content}`;
+    return `${frontMatter[0]}${insertion}\n${content.slice(frontMatter[0].length)}`;
 };
 
 if ((requestedPublication !== 'todos' && !MANIFESTS[requestedPublication])
@@ -282,7 +320,7 @@ const prepareSource = async (source, publicationSources) => {
 
     const renderedSource = path.join(temporaryDirectory, source);
     await mkdir(path.dirname(renderedSource), { recursive: true });
-    let renderedContent = addInternalAnchors(prepareLinks(content, source, publicationSources), source).replace(/(!\[[^\]]*\]\()([^) ]+)/g, (reference, prefix, image) => (
+    let renderedContent = prepareLinks(content, source, publicationSources).replace(/(!\[[^\]]*\]\()([^) ]+)/g, (reference, prefix, image) => (
         `${prefix}${path.resolve(ROOT, path.dirname(source), image)}`
     ));
     for (const match of blocks) {
@@ -309,6 +347,7 @@ const prepareSource = async (source, publicationSources) => {
         }
         renderedContent = renderedContent.replace(match[0], `![${diagramCaption(content, match.index)}](${image})`);
     }
+    renderedContent = addFigureAnchors(renderedContent);
     await writeFile(renderedSource, renderedContent);
     return renderedSource;
 };
@@ -330,20 +369,31 @@ try {
         }
         if (failedStatus) break;
 
+        if (requestedFormat === 'docx') {
+            const firstSource = preparedSources[0];
+            const firstContent = await readFile(firstSource, 'utf8');
+            const indexes = await buildDocumentIndexes(preparedSources);
+            await writeFile(firstSource, insertAfterFrontMatter(firstContent, indexes));
+        }
+
         const scopedSources = preparedSources.map((source) => path.relative(temporaryDirectory, source));
         const args = [
             ...scopedSources,
             '--from=markdown+header_attributes+implicit_figures',
             '--file-scope',
             '--standalone',
-            '--toc',
-            '--metadata=toc-title:Tabla de contenido',
-            '--lof',
             '--metadata=lang:es-MX',
-            '--metadata=lof-title:Índice de imágenes',
             `--output=${output}`,
             `--resource-path=${[ROOT, path.join(ROOT, 'docs')].join(path.delimiter)}`
         ];
+        if (requestedFormat === 'pdf') {
+            args.push(
+                '--toc',
+                '--metadata=toc-title:Tabla de contenido',
+                '--lof',
+                '--metadata=lof-title:Índice de imágenes'
+            );
+        }
         if (requestedFormat === 'docx' && process.env.DOCS_REFERENCE_DOC) args.push(`--reference-doc=${process.env.DOCS_REFERENCE_DOC}`);
         if (requestedFormat === 'pdf') args.push(`--pdf-engine=${pdfEngine}`);
         const result = spawnSync('pandoc', args, { cwd: temporaryDirectory, stdio: 'inherit' });
