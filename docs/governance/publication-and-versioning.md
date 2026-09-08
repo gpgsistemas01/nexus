@@ -63,6 +63,10 @@ campos de Word pendientes de actualización, porque además de mostrar un aviso 
 archivo esos campos no contienen un resultado calculado por Pandoc. En PDF se conservan
 los índices nativos de Pandoc, que el motor de composición resuelve durante la exportación.
 
+Las anclas explícitas que preceden a un encabezado se preparan como un bloque independiente.
+La separación evita que Pandoc interprete el encabezado y su atributo interno como texto visible;
+los identificadores sirven sólo para navegación y no forman parte del título publicado.
+
 Al repetir una exportación, el archivo de la misma combinación de paquete y formato se reemplaza;
 no se exige una limpieza manual previa. Los demás formatos permanecen en `build/docs/` hasta que
 se retiren de forma intencional. El flujo de capturas es distinto: el script elimina
