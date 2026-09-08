@@ -56,9 +56,9 @@ alineación sin renombrar silenciosamente contratos existentes.
 | Encabezado | Datos generales compartidos por todos los detalles de un documento, como actores, fechas, cliente, proyecto y observaciones. | Editar encabezado no equivale a cambiar cantidades de detalle. |
 | Detalle | Renglón de un documento que identifica recurso, cantidad, importes o estado de cumplimiento. | Sus operaciones pueden requerir un permiso diferente del encabezado. |
 | Suministro o entrega | Aplicación total o parcial de un detalle que afecta existencia y registra movimiento. | No es sinónimo de crear o editar el documento. |
-| Devolución | Reingreso de una cantidad previamente suministrada, enlazado con documento, detalle y movimiento originales. | No elimina el suministro histórico. |
+| Devolución | Operación que reingresa una cantidad previamente suministrada y la enlaza con documento, detalle y movimiento originales. | Puede ser parcial o total, no elimina el suministro histórico y no es una acción directa de cancelación. |
 | Corrección | Cambio trazable de un detalle de entrada que conserva valor anterior, valor corregido, motivo y actor. | No es una edición silenciosa ni una devolución. |
-| Cancelación | Transición que invalida un documento o detalle conforme a sus reglas, conservando su historia. | No implica eliminación física. |
+| Cancelación | Transición que invalida un documento o detalle conforme a sus reglas, conservando su historia. | En salidas es un resultado derivado: la devolución total cancela el detalle y sólo la cancelación de todos los detalles cancela el encabezado; no existe una acción ni un endpoint de cancelación directa. |
 | Ajuste de stock | Operación controlada que propone y, cuando se aprueba, aplica una diferencia de existencia con motivo y trazabilidad. | El modelo o servicio aislado no prueba que exista un flujo completo. |
 | Movimiento | Registro inmutable del efecto de una entrada, salida, devolución, corrección o ajuste sobre existencias. | El documento explica el motivo; el movimiento demuestra el efecto. |
 | Referencia documental | Identificador legible y único que enlaza documentos y movimientos con su origen. | No sustituye el UUID técnico. |

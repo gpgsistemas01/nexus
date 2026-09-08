@@ -196,7 +196,12 @@ sequenceDiagram
     else Cantidad válida
         Service->>Inventory: incrementar existencia y crear movimiento inverso con tx
         Service->>Prisma: crear GoodsIssueReturn
-        Service->>Status: resolveIssueFulfillmentStatus(refreshedDetails)
+        Service->>Prisma: recargar todos los detalles con tx
+        alt todos los detalles quedan Cancelado
+            Service->>Status: derivar cumplimiento Cancelado y estado documental Cancelada
+        else existe algún detalle no cancelado
+            Service->>Status: resolveIssueFulfillmentStatus(refreshedDetails) sin cancelar el encabezado
+        end
         Prisma-->>Service: salida actualizada y commit
         Service-->>Controller: salida y devolución
         Controller->>Socket: publicar después del commit
@@ -405,7 +410,12 @@ sequenceDiagram
     else Cantidad válida
         Service->>Service: aplicar devolución de existencia de merma con tx
         Service->>Prisma: crear WasteIssueReturn
-        Service->>Status: recalcular detalle y encabezado con tx
+        Service->>Prisma: recargar todos los detalles con tx
+        alt todos los detalles quedan Cancelado
+            Service->>Status: derivar cumplimiento Cancelado y estado documental Cancelada
+        else existe algún detalle no cancelado
+            Service->>Status: derivar cumplimiento agregado sin cancelar el encabezado
+        end
         Prisma-->>Service: salida de merma actualizada y commit
         Service-->>Controller: wasteIssueReturn
         Controller->>Socket: publicar después del commit

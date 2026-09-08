@@ -9,7 +9,11 @@ está disponible sobre un detalle surtido: una devolución parcial conserva el d
 **Surtido** y devolver toda la cantidad lo deja **Cancelado**. Si todos los detalles quedan
 cancelados, Nexus también cancela la salida. Estos cambios actualizan documento, detalle,
 existencia y movimiento como una sola operación; abrir el formulario o cambiar de modo no altera
-por sí solo ningún estado.
+por sí solo ningún estado. **Devolver** es la acción que registra el retorno y reintegra
+existencias; **cancelar** no es otro botón ni otro procedimiento para las salidas, sino el resultado
+automático de una devolución total. A nivel de detalle se cancela sólo el renglón devuelto por
+completo; a nivel de encabezado, la salida se cancela sólo si todos sus renglones ya están
+cancelados.
 
 ## Salidas de material
 
