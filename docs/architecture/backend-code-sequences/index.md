@@ -26,6 +26,10 @@ Las variables
 locales mecánicas permanecen en el código para no convertir el diagrama en una
 transcripción ilegible. Cada caso mantiene una secuencia específica aunque reutilice un
 patrón, porque cambian módulos, firmas, rutas, datos o efectos.
+La frontera que origina una petición se rotula siempre **Navegador** o
+**Cliente HTTP / web**; el rol humano pertenece a la ficha funcional y no sustituye al
+cliente técnico en una secuencia backend. Incluso las vistas que amplían una coordinación
+atómica conservan esa entidad y muestran la petición de entrada y su resultado.
 
 ### Relación con la documentación técnica
 

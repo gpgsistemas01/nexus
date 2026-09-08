@@ -256,6 +256,7 @@ La revisión de las vistas existentes produjo esta decisión:
 | `DIA-BE-ACT-002` · `CU-ENT-05` | ¿Qué decisiones provocan rechazo, rollback o cancelación? La actividad prioriza ramas y errores que una secuencia lineal hace menos visibles. | Complementa `DIA-BE-CU-ENT-05`; comparte servicio y transacción, pero no altera el orden canónico. Un cambio de condición exige revisar ambas vistas y la máquina normativa si cambia un estado de negocio. |
 | `DIA-BE-ACT-001` · `CU-SAL-05` | ¿Cómo se clasifican actualizaciones y surtimientos y qué errores impiden continuar? | Complementa `DIA-BE-CU-SAL-05` y referencia la máquina de estados de requisitos. Cambios de participantes actualizan la secuencia; cambios de ramas actualizan la actividad; cambios de estados también actualizan requisitos. |
 | `DIA-BE-SEQ-006` · `RN-008` | ¿Cuándo se ejecuta la auditoría transversal y puede revertir la operación? Se conserva porque cruza todas las escrituras y establece la garantía *best effort*, no porque detalle otro caso. | Se conecta con el middleware de auditoría y con todo `DIA-BE-CU-*` de escritura mediante el evento `finish`. Un cambio en auditoría no modifica la transacción de cada caso, salvo que deje de ser posterior o pase a ser obligatoria. |
+| `DIA-BE-TEC-EST-AUT-01` | ¿Qué estado efectivo debe conservar una cuenta para atravesar `authorizeUserApi` o `authorizeUserWeb`? | Complementa las secuencias autenticadas: distingue un token válido de un usuario activo y autorizado sin repetir cada ruta protegida. |
 | `DIA-BE-TEC-EST-CU-ENT-04` | ¿Cuál es el ciclo técnico de la corrección entre recepción, commit/rollback, evento y respuesta? | Complementa `DIA-BE-CU-ENT-04`. No sustituye los estados funcionales de requisitos; sólo obliga a revisar la secuencia si cambia el límite transaccional o la publicación posterior. |
 
 Las antiguas secuencias selectivas de autenticación, ajustes, entrada, corrección,
@@ -369,6 +370,33 @@ sequenceDiagram
 
 Estas vistas permanecen aquí porque añaden ciclos técnicos que no repite la colección
 de secuencias por caso.
+
+**Estado técnico complementario:** `DIA-BE-TEC-EST-AUT-01`. Una máquina de estados es
+la vista adecuada porque la pregunta es si la cuenta conserva las condiciones para
+atravesar el middleware entre peticiones; una secuencia explica el orden de una petición,
+pero no expresa con igual claridad la pérdida de elegibilidad. `getLoggedUser(userId)`
+vuelve a consultar estas condiciones en `authorizeUserApi` y `authorizeUserWeb`.
+
+```mermaid
+stateDiagram-v2
+    [*] --> TokenValido: firma y vigencia aceptadas
+    TokenValido --> Invalido: usuario inexistente o inactivo
+    TokenValido --> Invalido: persona asociada inactiva
+    TokenValido --> Invalido: sin asignaciones
+    TokenValido --> UsuarioActivo: User activo y persona activa o ausente
+    UsuarioActivo --> Autorizado: existe asignación rol/departamento permitida
+    UsuarioActivo --> Prohibido: ninguna asignación satisface el permiso
+    Autorizado --> MiddlewareSuperado: req.user validado y next()
+    Invalido --> Rechazado401: INVALID_AUTH
+    Prohibido --> Rechazado403: FORBIDDEN
+    MiddlewareSuperado --> [*]
+    Rechazado401 --> [*]
+    Rechazado403 --> [*]
+```
+
+El estado **Usuario activo** exige `User.isActive`, una `Person.isActive` cuando la cuenta
+es humana y al menos una asignación vigente. El JWT sólo conduce a **Token válido**; no
+evita que una desactivación o la pérdida de asignaciones bloquee la siguiente petición.
 
 **Estado técnico complementario:** `DIA-BE-TEC-EST-CU-ENT-04`. Muestra el ciclo de la
 transacción de corrección; los estados funcionales permanecen en requisitos.

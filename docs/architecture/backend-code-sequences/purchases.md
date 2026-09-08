@@ -114,6 +114,7 @@ sequenceDiagram
 
 ```mermaid
 sequenceDiagram
+    participant Client as Cliente HTTP / web
     Note over Router,Controller: Variables de frontera: id, detailId, correctionDto, userId y tx
     participant Router as src/routes/api/warehouse/goodsReceiptApiRoute.js
     participant Controller@{ "type": "control" } as src/controllers/api/warehouse/goodsReceiptController.js
@@ -125,6 +126,7 @@ sequenceDiagram
     participant Prisma as Prisma / PostgreSQL
     participant Socket as src/utils/socketUtils.js
 
+    Client->>Router: PATCH /api/warehouse/goods-receipts/:id/details/:detailId/corrections + accessToken
     Router->>Controller: correctGoodsReceiptDetail(req, res)
     Controller->>CorrectionDto: createGoodsReceiptDtoForCorrection(req.body) → sanitizeEmptyStrings(...)
     CorrectionDto-->>Controller: correctionDto normalizado
@@ -138,6 +140,7 @@ sequenceDiagram
     Prisma-->>Service: entrada corregida y commit
     Service-->>Controller: goodsReceipt y correction
     Controller->>Socket: publicar después del commit
+    Controller-->>Client: 200 entrada y corrección
 ```
 
 ## `CU-ENT-05`
