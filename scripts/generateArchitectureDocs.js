@@ -165,6 +165,9 @@ const validateUseCaseDiagramCoverage = async () => {
                 failures.push(`diagramas ${side}: ${id} no identifica sus variables de frontera`);
             }
             const sequence = getMermaidBlocks(body)[0] ?? '';
+            if (side === 'backend' && !/^\s*(?:actor|participant)\s+\S+(?:@\{[^}]+\})?\s+as\s+(?:Navegador|Cliente HTTP \/ web)$/m.test(sequence)) {
+                failures.push(`diagramas backend: ${id} no identifica la frontera como Navegador o Cliente HTTP / web`);
+            }
             const messages = sequence.split('\n').filter((line) => line.includes('->>'));
             if (messages.length < MIN_SEQUENCE_MESSAGES) {
                 failures.push(`diagramas ${side}: ${id} no alcanza el detalle mínimo de ${MIN_SEQUENCE_MESSAGES} mensajes ordenados`);

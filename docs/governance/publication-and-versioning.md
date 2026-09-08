@@ -49,6 +49,15 @@ lo renderiza como una imagen PNG temporal mediante Mermaid CLI y entrega esa ima
 DOCX y PDF muestran el diagrama visual en vez de copiar su código; los archivos temporales se
 eliminan al finalizar.
 
+Antes de convertir, cada enlace local con fragmento se valida contra un título o ancla
+explícita real. Si apunta al mismo archivo, se transforma al identificador único de esa
+sección; si apunta a otro Markdown incluido en el manifiesto, se transforma al
+identificador del documento y sección de destino. Un enlace a otro documento sin
+fragmento lleva al inicio de ese documento. Los enlaces a fuentes que no forman parte
+del paquete se presentan como texto. Esta navegación la resuelve Markdown/Pandoc:
+Mermaid se limita a producir la figura y no usa `click`, porque el hipervínculo dejaría
+de ser uniforme al renderizar el bloque como imagen para DOCX o PDF.
+
 Al repetir una exportación, el archivo de la misma combinación de paquete y formato se reemplaza;
 no se exige una limpieza manual previa. Los demás formatos permanecen en `build/docs/` hasta que
 se retiren de forma intencional. El flujo de capturas es distinto: el script elimina

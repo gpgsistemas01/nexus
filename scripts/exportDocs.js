@@ -111,6 +111,16 @@ const documentAnchor = (source, fragment) => [
     source.replace(/\.md$/, '').replace(/[^\p{L}\p{N}]+/gu, '-'),
     fragment
 ].filter(Boolean).join('-').toLowerCase();
+const headingFragment = (title) => title
+    .replace(/[`*_\[\]]/g, '')
+    .toLowerCase()
+    .replace(/[^\p{L}\p{N} _-]/gu, '')
+    .trim()
+    .replace(/[ _]/g, '-');
+const getDocumentFragments = (content) => new Set([
+    ...[...content.matchAll(/^<a id="([^"]+)"><\/a>$/gm)].map((match) => match[1]),
+    ...[...content.matchAll(/^#{1,6}\s+(.+)$/gm)].map((match) => headingFragment(match[1]))
+]);
 const normalizeMermaidSource = (source) => {
     const content = source.replace(/\r?\n$/, '');
     return !content.includes('\n') && content.includes('\\n')
@@ -156,12 +166,7 @@ const addInternalAnchors = (content, source) => {
     );
     const anchoredHeadings = anchoredAliases.replace(
         /^(#{1,6})\s+(.+)$/gm,
-        (heading, level, title) => `${level} ${title} {#${uniqueDocumentAnchor(title
-            .replace(/[`*_\[\]]/g, '')
-            .toLowerCase()
-            .replace(/[^\p{L}\p{N} _-]/gu, '')
-            .trim()
-            .replace(/[ _]/g, '-'))}}`
+        (heading, level, title) => `${level} ${title} {#${uniqueDocumentAnchor(headingFragment(title))}}`
     );
     return `[]{#${documentAnchor(source)}}\n\n${anchoredHeadings}`;
 };
@@ -180,6 +185,7 @@ const publications = await Promise.all(requestedPublications.map(async (publicat
         source,
         content: await readFile(path.join(ROOT, source), 'utf8')
     })));
+    const contentsBySource = new Map(sourceContents.map(({ source, content }) => [source, content]));
     for (const { source, content } of sourceContents) {
         for (const match of content.matchAll(mermaidBlock)) {
             try {
@@ -210,6 +216,20 @@ const publications = await Promise.all(requestedPublications.map(async (publicat
         const [target] = link.split('#');
         return target ? access(path.resolve(ROOT, path.dirname(source), target)) : null;
     }));
+    for (const { source, link } of linkReferences) {
+        if (externalLink.test(link)) continue;
+        const [target, fragment] = link.split('#');
+        if (!fragment) continue;
+        const resolvedTarget = target
+            ? path.relative(ROOT, path.resolve(ROOT, path.dirname(source), target)).split(path.sep).join('/')
+            : source;
+        if (!resolvedTarget.endsWith('.md')) continue;
+        const targetContent = contentsBySource.get(resolvedTarget)
+            ?? await readFile(path.join(ROOT, resolvedTarget), 'utf8');
+        if (!getDocumentFragments(targetContent).has(decodeURIComponent(fragment))) {
+            throw new Error(`El enlace ${link} de ${source} no corresponde a un título o ancla de ${resolvedTarget}.`);
+        }
+    }
     return { publication, sources, imageReferences };
 }));
 
