@@ -1091,9 +1091,13 @@ stock y movimiento. Esta diferencia debe permanecer visible en pruebas y documen
 
 ```mermaid
 flowchart LR
-    reportRequest["Elegir reporte y parámetros"] --> reportMode{"¿Mensual o filtrado?"}
-    reportMode -->|mensual| reportRange["Derivar rango del mes y neutralizar filtros incompatibles"]
-    reportMode -->|filtrado| reportFilters["Normalizar búsqueda, fechas, relaciones y orden"]
+    reportRequest["Elegir reporte y parámetros"] --> reportKind{"¿Inventario o reporte temporal?"}
+    reportKind -->|inventario de material o merma| inventoryScope{"¿Activos, con existencia o ambos?"}
+    inventoryScope --> inventoryFilters["Combinar inventoryScope con búsqueda, proveedor y orden"]
+    reportKind -->|compras, salidas o movimientos| reportMode{"¿Mes actual, otro mes o filtros?"}
+    reportMode -->|mes actual u otro mes| reportRange["Derivar rango del mes y neutralizar filtros incompatibles"]
+    reportMode -->|filtros aplicados| reportFilters["Normalizar búsqueda, fechas, relaciones y orden"]
+    inventoryFilters --> reportQuery["Consultar filas autorizadas en servicio de reportes"]
     reportRange --> reportQuery["Consultar filas autorizadas en servicio de reportes"]
     reportFilters --> reportQuery
     reportQuery --> reportTransform["Construir encabezados, filas, agrupaciones y totales"]
@@ -1102,7 +1106,9 @@ flowchart LR
     reportExcel --> reportResponse["Enviar archivo Excel"]
 ```
 
-Los reportes concretos reutilizan el canal consulta → transformación → Excel, pero
+Los inventarios no aplican selección mensual: su modal elige `inventoryScope`. Los
+reportes temporales conservan mes actual, otro mes o filtros aplicados. Todos reutilizan
+el canal consulta → transformación → Excel, pero
 mantienen columnas, agrupación, fórmulas, permiso y nombre de hoja propios. Una nueva
 variante replica ese proceso con configuración contextual antes de crear otro canal.
 

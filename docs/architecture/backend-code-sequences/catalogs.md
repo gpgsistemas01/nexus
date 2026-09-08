@@ -135,6 +135,7 @@ sequenceDiagram
 
 ```mermaid
 sequenceDiagram
+    participant Client as Cliente HTTP / web
     Note over Router,Controller: Variables de frontera: id, DTO de ajuste y userId
     participant Router as src/routes/api/warehouse/materialApiRoute.js
     participant Controller@{ "type": "control" } as src/controllers/api/warehouse/materialController.js
@@ -148,6 +149,7 @@ sequenceDiagram
     participant Prisma as Prisma / PostgreSQL
     participant Socket as src/utils/socketUtils.js
 
+    Client->>Router: PATCH /api/warehouse/materials/:id/stock + accessToken
     Router->>Controller: editMaterialStock(req, res)
     Controller->>StockDto: createMaterialDtoForStockUpdate(req.body) → sanitizeEmptyStrings(...)
     StockDto-->>Controller: materialDto normalizado
@@ -164,6 +166,7 @@ sequenceDiagram
     Adjustment-->>Service: supplierMaterial actualizado
     Service-->>Controller: material
     Controller->>Socket: publicar después del commit
+    Controller-->>Client: 200 material actualizado
 ```
 
 ## `CU-CAT-06`
@@ -488,6 +491,7 @@ sequenceDiagram
 
 ```mermaid
 sequenceDiagram
+    participant Client as Cliente HTTP / web
     Note over Router,Controller: Variables de frontera: id, DTO de ajuste y userId
     participant Router as src/routes/api/warehouse/wasteApiRoute.js
     participant Controller@{ "type": "control" } as src/controllers/api/warehouse/wasteController.js
@@ -500,6 +504,7 @@ sequenceDiagram
     participant Prisma as Prisma / PostgreSQL
     participant Socket as src/utils/socketUtils.js
 
+    Client->>Router: PATCH /api/warehouse/wastes/:id/stock + accessToken
     Router->>Controller: editWasteStock(req, res)
     Controller->>StockDto: createWasteDtoForStockUpdate(req.body) → sanitizeEmptyStrings(...)
     StockDto-->>Controller: wasteStockDto normalizado
@@ -515,6 +520,7 @@ sequenceDiagram
     Prisma-->>Service: merma actualizada y commit
     Service-->>Controller: waste
     Controller->>Socket: publicar después del commit
+    Controller-->>Client: 200 merma actualizada
 ```
 
 ## `CU-CAT-17`

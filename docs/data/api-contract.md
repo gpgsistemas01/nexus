@@ -109,10 +109,13 @@ observa el consumidor, por lo que se revisa como parte del contrato.
   `Authorization: Bearer` porque `verifyApiTokenRequired` no lo consume.
 - Una cookie ausente, inválida o vencida responde `401` con
   `{ "code": "INVALID_AUTH" }` y elimina la cookie de acceso cuando corresponde.
-- `authorizeUserApi(permission)` vuelve a cargar el usuario, resuelve la política del
-  permiso y expone el usuario autorizado como `req.user`.
+- `authorizeUserApi(permission)` vuelve a cargar el usuario y sólo continúa si
+  `User.isActive = true`, la persona asociada está activa (cuando existe) y hay al menos
+  una asignación. Después resuelve la política del permiso y expone el usuario validado
+  como `req.user`; un JWT vigente por sí solo no satisface este middleware.
 - Un usuario autenticado sin el rol y departamento exigidos responde `403` con
-  `{ "code": "FORBIDDEN" }`; si el usuario ya no existe responde `401`.
+  `{ "code": "FORBIDDEN" }`; si el usuario ya no existe, está inactivo, su persona está
+  inactiva o perdió todas sus asignaciones responde `401 INVALID_AUTH`.
 
 #### Validación
 
