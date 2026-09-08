@@ -425,26 +425,19 @@ Este flujo sólo se ejecuta en un clon sin las imágenes requeridas o cuando una
 Su resultado son archivos PNG revisables en `docs/user-manual/images/`; **no genera DOCX ni PDF**.
 Después de aprobar las imágenes, vuelva a [Exportar los manuales](#exportar-los-manuales).
 
-1. Prepare una base de prueba con los permisos y registros ficticios enumerados en
+1. Prepare una base de prueba con los permisos y registros ficticios de
    [Datos de prueba requeridos](user-manual/screenshot-inventory.md#datos-de-prueba-requeridos).
    No utilice producción ni datos personales reales.
-2. Inicie Nexus contra ese entorno de prueba y confirme la URL accesible desde la estación de
-   capturas. La ruta de acceso registrada por la aplicación es `/inicio-sesion`; por tanto,
-   `http://127.0.0.1:3000/inicio-sesion` es correcta cuando Nexus se ejecuta localmente con el
-   puerto predeterminado `3000`. Si `PORT` tiene otro valor o se usa otro entorno, cambie el origen
-   de `DOCS_BASE_URL`, pero conserve `/inicio-sesion`.
-
-   Para trabajar localmente se necesitan **dos terminales**. En la primera, complete la
-   [configuración inicial de Nexus](../README.md#configuración-inicial), ejecute lo siguiente y
-   mantenga el proceso abierto:
+2. Abra la terminal 1, complete la [configuración inicial de Nexus](../README.md#configuración-inicial)
+   e inicie la aplicación:
 
    ```powershell
    # Terminal 1, PowerShell o Bash
    npm run dev
    ```
 
-   Espere el mensaje `Servidor escuchando en puerto 3000`. En una segunda terminal compruebe la
-   página antes de abrir Playwright:
+   Mantenga esta terminal abierta y espere el mensaje `Servidor escuchando en puerto 3000`.
+3. Abra la terminal 2 y compruebe la página de inicio de sesión:
 
    ```powershell
    # Terminal 2, PowerShell
@@ -456,73 +449,51 @@ Después de aprobar las imágenes, vuelva a [Exportar los manuales](#exportar-lo
    curl --fail http://127.0.0.1:3000/inicio-sesion
    ```
 
-   Debe obtener una respuesta HTTP satisfactoria. `ERR_CONNECTION_REFUSED` significa que no hay un
-   proceso escuchando en esa dirección o puerto; no indica que `/inicio-sesion` sea una ruta
-   incorrecta. Inicie Nexus, mantenga abierta la primera terminal y repita la comprobación. Si el
-   servidor anunció otro puerto, use ese mismo puerto tanto en esta prueba como en
-   `DOCS_BASE_URL`.
-3. Instale Playwright y su Chromium, si todavía no están disponibles:
+   Si Nexus usa otro puerto, sustitúyalo en esta URL y después en `DOCS_BASE_URL`.
+4. Instale Playwright y Chromium en la terminal 2, si todavía no están disponibles:
 
    ```bash
    npm install --no-save playwright
    npx playwright install chromium
    ```
 
-4. Elija **un solo bloque** según la terminal y defina las credenciales de la cuenta ficticia que
-   reúne los permisos del inventario. `DOCS_BASE_URL` contiene sólo el origen, sin
-   `/inicio-sesion`. El script abre esa ruta, completa el formulario e inicia la sesión
-   automáticamente; no es necesario ejecutar `playwright codegen` ni crear un archivo de cookies.
-
-   En PowerShell:
+5. Cierre cualquier instancia de Playwright que haya iniciado manualmente. Vuelva a la terminal
+   que ejecuta ese comando, presione `Ctrl+C` y espere a que reaparezca el prompt; no basta con
+   cerrar la ventana de Playwright.
+6. En la terminal 2, defina `DOCS_BASE_URL` y las credenciales de una cuenta ficticia. Elija **un
+   solo bloque** y no agregue `/inicio-sesion` a `DOCS_BASE_URL`.
 
    ```powershell
+   # PowerShell
    $env:DOCS_BASE_URL = "http://127.0.0.1:3000"
    $env:DOCS_LOGIN_NAME = "usuario-ficticio"
    $env:DOCS_LOGIN_PASSWORD = "contraseña-ficticia"
    ```
 
-   En Bash:
-
    ```bash
+   # Bash
    export DOCS_BASE_URL=http://127.0.0.1:3000
    export DOCS_LOGIN_NAME=usuario-ficticio
    export DOCS_LOGIN_PASSWORD='contraseña-ficticia'
    ```
 
-   Use exclusivamente credenciales de prueba, no las escriba en `.env`, archivos del repositorio
-   ni scripts compartidos y retire las variables al terminar. Como alternativa compatible con el
-   flujo anterior, puede omitir ambas variables y proporcionar `DOCS_STORAGE_STATE`; nunca mezcle
-   credenciales automáticas con un estado de otra cuenta.
-5. Sin cerrar el servidor de la terminal 1, ejecute en la **misma terminal del paso 4**:
+   No guarde estas credenciales en `.env` ni en archivos del repositorio. Como alternativa, defina
+   sólo `DOCS_STORAGE_STATE`; no mezcle ambos mecanismos.
+7. Sin cerrar Nexus, genere las capturas desde la terminal 2:
 
    ```bash
    npm run docs:screenshots
    ```
 
-   El comando reutiliza `DOCS_BASE_URL`, `DOCS_LOGIN_NAME` y `DOCS_LOGIN_PASSWORD` definidos en el
-   paso anterior. Si se proporcionó `DOCS_STORAGE_STATE` en lugar de credenciales, reutiliza ese
-   estado sin ejecutar el inicio de sesión automático.
-
-   El comando elimina primero `docs/user-manual/images/` y genera el juego completo; no lo
-   interrumpa ni mezcle imágenes de ejecuciones distintas. Espere el mensaje `Capturas generadas`
-   antes de continuar. Si se usó `DOCS_STORAGE_STATE`, el script elimina ese archivo al completar
-   la ejecución.
-
-   No hay que ejecutar un comando adicional para “cerrar Playwright”: el script cierra sus
-   contextos y el navegador Chromium automáticamente, incluso si una captura falla. Cuando
-   reaparece el prompt de la terminal 2, Playwright ya terminó. `Ctrl+C` se reserva para detener el
-   servidor Nexus/Nodemon que continúa abierto en la terminal 1; si se interrumpe manualmente el
-   script de capturas con `Ctrl+C`, descarte el juego incompleto y vuelva a ejecutar este paso.
-
-   Para localizar las acciones, el script recorre todas las páginas del listado; la salida no tiene
-   que encontrarse entre los primeros diez registros. Si aun así falla esperando
-   `.btn-return-detail`, revise que la sesión tenga permiso de surtimiento y que la salida esté
-   aprobada, completamente surtida y con cantidad todavía retornable.
-6. Revise los PNG conforme a
+   No interrumpa el comando: primero elimina `docs/user-manual/images/` y después genera el juego
+   completo.
+8. Espere el mensaje `Capturas generadas` y a que reaparezca el prompt de la terminal 2. En ese
+   momento, el script ya cerró Playwright y Chromium automáticamente y puede usar el siguiente
+   comando.
+9. Revise los PNG conforme a
    [Revisión antes de publicar](user-manual/screenshot-inventory.md#revisión-antes-de-publicar).
-   Si una captura contiene datos reales, es ilegible o representa un estado incorrecto, corrija el
-   entorno de prueba y vuelva a ejecutar el paso 5.
-7. Retire las credenciales de la terminal cuando termine:
+   Si debe corregir el entorno, repita los pasos 7 a 9.
+10. Retire las credenciales de la terminal 2:
 
    ```powershell
    # PowerShell
@@ -534,17 +505,20 @@ Después de aprobar las imágenes, vuelva a [Exportar los manuales](#exportar-lo
    unset DOCS_LOGIN_NAME DOCS_LOGIN_PASSWORD
    ```
 
-   Si optó por `DOCS_STORAGE_STATE` y una captura falla, elimine manualmente ese archivo cuando no
-   vaya a reintentar; una ejecución correcta lo elimina automáticamente. Cuando todas las capturas
-   estén aprobadas, vuelva a la terminal 1, donde sigue ejecutándose `npm run dev`, y
-   presione `Ctrl+C` una vez. Espere a que reaparezca el prompt: eso detiene Nodemon y Nexus; no hay
-   que escribir `npm stop`. Después vuelva al flujo
-   [Exportar los manuales](#exportar-los-manuales). Para el manual completo en DOCX:
+   Si una ejecución con `DOCS_STORAGE_STATE` falla, elimine ese archivo manualmente cuando no vaya
+   a reintentar; una ejecución correcta lo elimina automáticamente.
+11. Vuelva a la terminal 1, presione `Ctrl+C` y espere el prompt para detener Nexus/Nodemon.
+12. Exporte el manual completo en DOCX:
 
    ```bash
    npm run docs:export -- manual-usuario --check
    npm run docs:export -- manual-usuario docx
    ```
+
+Si la comprobación del paso 3 responde `ERR_CONNECTION_REFUSED`, confirme que Nexus siga activo y
+que la URL use el puerto anunciado. Si la captura falla esperando `.btn-return-detail`, compruebe
+el permiso de surtimiento y que exista una salida aprobada, completamente surtida y con cantidad
+retornable. El script recorre todas las páginas del listado para localizarla.
 
 ### Ejemplos de exportación
 
