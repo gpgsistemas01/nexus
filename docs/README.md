@@ -245,8 +245,9 @@ no sustituyen la instalación requerida por este proyecto. `npm run docs:export`
    Instálalo en el mismo sistema donde se ejecutará Pandoc:
 
    - **Windows:** XeLaTeX se instala **en Windows, no dentro de este repositorio, npm, VS Code ni
-     Playwright**. Descarga `install-tl-windows.exe` desde
-     [TeX Live](https://tug.org/texlive/acquire-netinstall.html), ejecútalo y conserva una
+     Playwright**. Descarga el instalador oficial
+     [`install-tl-windows.exe`](https://mirror.ctan.org/systems/texlive/tlnet/install-tl-windows.exe),
+     ejecútalo y conserva una
      instalación de TeX Live que incluya XeLaTeX. El instalador crea una carpeta del sistema como
      `C:\texlive\<versión>\` y agrega su subcarpeta `bin\windows` a `PATH`; no copies esos archivos
      dentro de `SistemaMerma`. Al terminar, cierra **todas** las terminales de VS Code, abre una
