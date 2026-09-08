@@ -11,7 +11,7 @@ cada `CU-*` dentro del rango identifica un diagrama individual.
 El **tipo semántico** prevalece sobre la directiva Mermaid. Un `flowchart` puede
 representar contexto, actividad, dependencia, navegación o trazabilidad; no se etiqueta
 como “diagrama de flujo” genérico si las flechas tienen otra semántica. El inventario
-registra **272 diagramas vigentes**: 266 curados y 6 generados.
+registra **273 diagramas vigentes**: 267 curados y 6 generados.
 
 ## Catálogo por familia y tipo
 
@@ -27,6 +27,7 @@ registra **272 diagramas vigentes**: 266 curados y 6 generados.
 | `DIA-BE-CMP-001..002` | Capas y registro de rutas | “Relación entre ambas capas” y “Registro de rutas” del backend | 2 | Código backend; curado. |
 | `DIA-BE-SEQ-006` | Secuencia transversal de auditoría de escrituras | Backend, “Vistas técnicas aplicadas” | 1 | Ejecución posterior a la respuesta y garantía *best effort*; complementa todos los casos de escritura sin duplicar su recorrido. |
 | `DIA-BE-ACT-001..002` | Actividades de surtimiento y cancelación | Backend, “Vistas técnicas aplicadas” | 2 | Decisiones y errores de servicios; curado. |
+| `DIA-REQ-ACT-001` | Impacto del estado activo | `requirements-diagrams.md#impacto-del-estado-activo-en-los-procesos-de-almacén` | 1 | Actividad funcional que separa `isActive`, filtros de inventario y estados documentales; curado desde servicios y reportes vigentes. |
 | `DIA-FE-ACT-001` | Actividad de alta de merma desde plantilla | Frontend, “Alta de merma…” | 1 | Dependencias y validación del navegador; curado. |
 | `DIA-FE-CU-AUT-01..REP-15` | Secuencia de ejecución frontend por caso | `frontend-code-sequences/`, con índice y capítulos por grupo | 63 | Página/interacción, aplicación, request y resultado concretos; curado desde la matriz frontend. |
 | `DIA-BE-CU-AUT-01..REP-15` | Secuencia de ejecución backend por caso | `backend-code-sequences/`, con índice y capítulos por grupo | 63 | Ruta/controller, servicio, persistencia o efecto concretos; curado desde la matriz backend. |

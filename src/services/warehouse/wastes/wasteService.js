@@ -8,6 +8,8 @@ import { registerWasteStockAdjustment } from './wasteStockAdjustmentService.js';
 import { createServiceLogger, getModelLogContext, logServiceError, logServiceInfo } from "../../../utils/logger.js";
 import { PRISMA_ERROR_CODES } from "../../../constants/prisma.js";
 import { resolveWasteMaterialSnapshot } from './wasteMaterialService.js';
+import { findUniqueSupplier } from '../supplierService.js';
+import { SupplierInactiveConflict } from '../../../errors/warehouse/supplierError.js';
 
 const serviceLogger = createServiceLogger('warehouse.wasteService');
 
@@ -152,6 +154,10 @@ export const createWasteWithInitialStockAdjustment = async ({
     try {
 
         const waste = await getDb().$transaction(async (tx) => {
+
+            const supplier = await findUniqueSupplier({ tx, id: wasteDto.supplierId });
+
+            if (supplier?.isActive === false) throw new SupplierInactiveConflict();
 
             const material = await resolveWasteMaterialSnapshot({
                 tx,

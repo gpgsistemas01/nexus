@@ -52,7 +52,7 @@ sequenceDiagram
     IssueDto-->>Controller: goodsIssueDto normalizado
     Controller->>Domain: goodsIssueService.createGoodsIssue({ goodsIssueDto }) crea encabezado y detalles solicitados
     activate Domain
-    Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
+    Domain->>Domain: comprobar material y proveedor activos para cada detalle nuevo
     Domain-->>Controller: resultado del servicio o error de dominio tipado
     deactivate Domain
     alt El servicio devuelve el resultado
@@ -151,7 +151,7 @@ sequenceDiagram
     IssueDto-->>Controller: { details }
     Controller->>Service: { id, goodsIssueDto }
     Service->>Prisma: cargar salida y detalles
-    Service->>Service: validar estado y calcular pendientes
+    Service->>Service: validar estado y calcular pendientes desde el snapshot sin volver a exigir isActive
     Service->>Prisma: iniciar $transaction
     opt Hay detalles por surtir
         Service->>Inventory: applyInventoryMovement({ tx, ISSUE, details })
@@ -254,7 +254,12 @@ sequenceDiagram
     IssueDto-->>Controller: wasteIssueDto normalizado
     Controller->>Domain: wasteIssueService.createWasteIssue({ wasteIssueDto }) crea encabezado y detalles de merma
     activate Domain
-    Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
+    Domain->>Domain: comprobar datos, merma activa y que cada wasteId aparezca una sola vez
+    alt Hay una merma repetida o inactiva
+        Domain-->>Controller: WASTE_ISSUE_STATE_CONFLICT sin crear la salida
+    else Las mermas son únicas
+        Domain->>Domain: crear encabezado y un detalle por merma
+    end
     Domain-->>Controller: resultado del servicio o error de dominio tipado
     deactivate Domain
     alt El servicio devuelve el resultado
@@ -352,7 +357,7 @@ sequenceDiagram
     IssueDto-->>Controller: wasteIssueDto normalizado
     Controller->>Service: updateWasteIssueDetails({ id, details: wasteIssueDto.details })
     Service->>Prisma: iniciar $transaction y cargar salida/detalles
-    Service->>Service: validar estado, ids únicos y detalles vigentes
+    Service->>Service: validar estado, ids únicos y detalles históricos sin volver a exigir isActive
     Service->>Status: resolver ids de cumplimiento con tx
     loop Cada detalle nuevo con isSupplied
         Service->>Rules: derivar estado completo del detalle

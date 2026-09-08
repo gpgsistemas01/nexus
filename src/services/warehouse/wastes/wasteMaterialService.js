@@ -17,10 +17,13 @@ const getHighestUnitCost = (offers = []) => offers.reduce((highest, offer) => {
     return cost == null ? highest : Math.max(highest ?? cost, cost);
 }, null);
 
-export const resolveWasteMaterialSnapshot = async ({ tx = null, materialId }) => {
+export const resolveWasteMaterialSnapshot = async ({ tx = null, materialId, requireActive = true }) => {
     const db = getDb(tx);
     const material = await db.material.findUnique({
-        where: { id: materialId },
+        where: {
+            id: materialId,
+            ...(requireActive && { isActive: true })
+        },
         select: WASTE_MATERIAL_SNAPSHOT_SELECT
     });
 
@@ -56,6 +59,7 @@ export const findWasteMaterialTemplates = async ({ search = '', skip = 0, take =
     };
 
     const where = {
+        isActive: true,
         ...(search && { name: { contains: search, mode: 'insensitive' } }),
         supplierMaterials: { some: { supplierId } }
     };

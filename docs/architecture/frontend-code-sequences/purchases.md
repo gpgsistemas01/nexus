@@ -56,6 +56,9 @@ sequenceDiagram
     Modal->>Modal: resetear formulario, inicializar selectores y ocultar/mostrar factura
     Warehouse->>DetailUI: seleccionar material, cantidad y costo por presentación
     DetailUI->>DetailUI: validar y agregar detalle, recalcular tabla y totales
+    opt Se agrega otra vez el mismo material
+        DetailUI->>DetailUI: conservar otro renglón porque cada cantidad y costo se procesan por separado
+    end
     Warehouse->>Form: confirmar compra
     Form->>Form: normalizar comprobante y adjuntar details
     Form->>Form: validateFields(goodsReceiptValidation, formData)
@@ -66,6 +69,11 @@ sequenceDiagram
         App->>Request: createCrudApplication.register({ data })
         Request->>HTTP: apiRequest({ method: post, url, data })
         HTTP->>API: POST /api/warehouse/goods-receipts
+        alt La factura ya existe para el proveedor
+            API-->>Form: 409 con el folio de la compra existente
+        else Compra nueva
+            API->>API: registrar todos los renglones e incrementar sus cantidades
+        end
         API-->>HTTP: { goodsReceipt, code }
         HTTP-->>Request: respuesta normalizada
         Request-->>Form: respuesta normalizada

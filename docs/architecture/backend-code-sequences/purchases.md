@@ -56,6 +56,14 @@ sequenceDiagram
     ReceiptDto-->>Controller: goodsReceiptDto
     Controller->>Service: { goodsReceiptDto }
     Service->>Prisma: validar proveedor, factura y persona receptora
+    alt Proveedor o material inactivo
+        Service-->>Controller: SUPPLIER_INACTIVE_CONFLICT o MATERIAL_INACTIVE_CONFLICT sin crear entrada ni movimiento
+    end
+    alt La factura ya existe para el proveedor
+        Service-->>Controller: GOODS_RECEIPT_INVOICE_ALREADY_EXISTS con folio existente
+    else La factura está disponible o es remisión
+        Service->>DetailBuilder: conservar y calcular cada renglón, incluso materiales repetidos
+    end
     Service->>DetailBuilder: construir detalles y calcular totales
     Service->>Prisma: iniciar $transaction
     Service->>Reference: generar referencia anual con tx

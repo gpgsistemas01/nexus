@@ -101,6 +101,43 @@ y las páginas publicadas en el [mapa generado](../generated/code-map.md#rutas-w
 | `utils` y `constants` | Transformaciones, validaciones auxiliares, formatos y valores sin estado visual. | Todas las capas del navegador que los importan. | Sin diagrama salvo que una transformación tenga decisiones de negocio, caso en que debe moverse o documentarse en su flujo propietario. |
 | `views/shared` | Parciales configurables para formularios, tablas, modales y estructura común. | Vistas EJS propietarias. | Diagrama de **componentes/composición**, no secuencia por inclusión. |
 
+### Contrato técnico de los modos de formulario de almacén
+
+Los modos provienen de `FORM_MODES`; no son estados persistidos. La habilitación se
+centraliza en los arreglos `materialFields` y `wasteFields`, en
+`ISSUE_HEADER_ENABLED_MODES` y `issueFormUI`, y en la configuración del modal de
+compras. La siguiente matriz registra esa frontera para evitar que el manual describa
+controles que la interfaz realmente bloquea:
+
+La casilla `isActive` de materiales y mermas viaja en `create` o `edit`: no provoca un
+cambio de modo y no debe confundirse con la identidad ni con una transición documental.
+En salidas, `resolveIssueEditMode` sólo traduce el estado persistido a la presentación
+adecuada; los servicios derivan `fulfillmentStatus` después de surtir o devolver. Por
+ello el frontend no ofrece esos estados como campos editables.
+
+| Flujo | Modo | Controles habilitados por la vista | Controles bloqueados o de consulta |
+| --- | --- | --- | --- |
+| Material | `create` | Identidad y relación (`name`, `supplierId`, `presentationId`, `unitMeasureId`, `base`, `height`), `minStock`, `maxUnitCost`, `isActive`, `newStock` y `observations` | `reasonId` muestra el motivo fijo de stock inicial. En el contexto de compra se ocultan stock inicial y costo máximo. |
+| Material | `edit` | `name`, `minStock`, `maxUnitCost`, `isActive` | Proveedor, presentación, unidad, dimensiones y sección de stock. |
+| Material | `edit-stock` | `newStock`, `reasonId`, `observations` | Identidad, relación, mínimos, costo y estado. |
+| Merma | `create` | Plantilla (`supplierId`, `materialId`), `name`, `base`, `height`, `minStock`, `maxUnitCost`, `isActive`, `newStock` y `observations` | `reasonId` muestra el motivo fijo de stock inicial; presentación y unidad son datos derivados de la plantilla. |
+| Merma | `edit` | `name`, `minStock`, `maxUnitCost`, `isActive` | Plantilla, proveedor, presentación, unidad, dimensiones y sección de stock. |
+| Merma | `edit-stock` | `newStock`, `reasonId`, `observations` | Identidad, plantilla, dimensiones, mínimos, costo y estado. |
+| Compra | `create` | Tipo de comprobante, factura condicional, proveedor, receptor, fecha, observaciones y captura de detalles. | Ninguno de los datos nuevos; la captura de materiales se habilita después de elegir proveedor. |
+| Compra | `edit` | Tipo de comprobante, factura condicional, receptor, fecha, observaciones y detalles nuevos. | Proveedor y detalles persistidos; éstos se cambian sólo mediante corrección o cancelación. |
+| Compra | `view` | Ninguno. | Encabezado, detalles y acciones de una compra cancelada. |
+| Salida de material o merma | `create` | Encabezado completo y captura de detalles. | Cantidades surtidas y devueltas, todavía inexistentes. |
+| Salida de material o merma | `edit` | Encabezado completo y detalles de una salida pendiente. | Cantidades surtidas o devueltas. |
+| Salida de material o merma | `edit-header` | Encabezado completo. | Todos los detalles. |
+| Salida de material o merma | `edit-detail` | Selección del renglón y cantidad de proyecto que se surtirá. | Encabezado y detalles ya surtidos. |
+| Salida de material o merma | `return` | Cantidad y observaciones de la devolución en su diálogo específico. | Encabezado y detalle original. |
+| Salida de material o merma | `view` | Ninguno. | Encabezado y detalles de una salida cancelada. |
+
+La regla funcional equivalente y los estados requeridos se mantienen en la
+[matriz de operaciones](../requirements/requirements-operations-matrix.md#modos-precondiciones-y-datos-modificados);
+las secuencias muestran únicamente la coordinación que cruza componentes o transporte,
+no vuelven a enumerar cada control.
+
 ## Aplicación de todos los casos al código frontend
 
 Esta matriz documenta cada `CU-*` desde el código que se ejecuta en el navegador. Una

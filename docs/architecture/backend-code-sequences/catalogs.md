@@ -52,7 +52,12 @@ sequenceDiagram
     MaterialDto-->>Controller: materialDto normalizado
     Controller->>Domain: materialService.createMaterial({ materialDto }) crea identidad y relación de proveedor
     activate Domain
-    Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
+    Domain->>Domain: buscar identidad por nombre, presentación, unidad y dimensiones
+    alt Identidad y proveedor ya relacionados
+        Domain-->>Controller: MATERIAL_ALREADY_EXISTS sin modificar stock
+    else Identidad existente con otro proveedor o identidad nueva
+        Domain->>Domain: reutilizar o crear identidad y registrar relación y stock inicial
+    end
     Domain-->>Controller: resultado del servicio o error de dominio tipado
     deactivate Domain
     alt El servicio devuelve el resultado
@@ -429,7 +434,12 @@ sequenceDiagram
     WasteDto-->>Controller: wasteDto normalizado
     Controller->>Domain: findWasteMaterialTemplates({ wasteDto }) alimenta la selección y createWasteWithInitialStockAdjustment crea merma, ajuste y movimiento inicial
     activate Domain
-    Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
+    Domain->>Domain: buscar misma combinación de proveedor, nombre, base y altura
+    alt La merma ya existe
+        Domain-->>Controller: WASTE_ALREADY_EXISTS sin incrementar stock
+    else La merma no existe
+        Domain->>Domain: crear merma, ajuste y movimiento de existencia inicial
+    end
     Domain-->>Controller: resultado del servicio o error de dominio tipado
     deactivate Domain
     alt El servicio devuelve el resultado

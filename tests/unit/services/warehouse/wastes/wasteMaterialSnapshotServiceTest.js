@@ -27,6 +27,9 @@ it('obtiene el costo unitario máximo entre todos los proveedores del material',
   });
   await expect(resolveWasteMaterialSnapshot({ materialId: 'material-1' }))
     .resolves.toEqual(expect.objectContaining({ id: 'material-1', maxUnitCost: 27.5 }));
+  expect(materialFindUnique).toHaveBeenCalledWith(expect.objectContaining({
+    where: { id: 'material-1', isActive: true }
+  }));
   expect(materialFindMany).toHaveBeenCalledWith({
     where: { name: { equals: 'Lona', mode: 'insensitive' } },
     select: {

@@ -78,7 +78,8 @@ export const findAllSuppliers = async ({
 
 const DEFAULT_SUPPLIER_SELECT = {
     id: true,
-    tradeName: true
+    tradeName: true,
+    isActive: true
 };
 
 export const findUniqueSupplier = async ({
