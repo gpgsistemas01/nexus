@@ -101,6 +101,7 @@ const MANIFESTS = Object.freeze({
 const [requestedPublication, requestedFormat] = process.argv.slice(2).filter((argument) => argument !== '--check');
 const checkOnly = process.argv.includes('--check');
 const formats = new Set(['docx', 'pdf']);
+const pdfEngine = process.env.DOCS_PDF_ENGINE;
 const publicationNames = Object.keys(MANIFESTS);
 const mermaidBlock = /^```mermaid\r?\n([\s\S]*?)^```\r?$/gm;
 const externalLink = /^(?:https?:|mailto:)/;
@@ -217,6 +218,25 @@ if (pandoc.error || pandoc.status !== 0) {
     console.error('Pandoc no está disponible. Instálalo o usa --check para validar las fuentes.');
     process.exit(1);
 }
+if (requestedFormat === 'pdf' && !pdfEngine) {
+    console.error([
+        'La exportación PDF requiere definir DOCS_PDF_ENGINE; el flujo recomendado usa xelatex.',
+        'XeLaTeX no es obligatorio: también puedes indicar otro motor instalado que admita Pandoc.',
+        'Windows: instala TeX Live en el sistema (no con npm ni dentro del repositorio).',
+        'Comprueba primero que esté instalado con: xelatex --version',
+        'PowerShell: $env:DOCS_PDF_ENGINE = "xelatex"; npm run docs:export -- <paquete> pdf',
+        'Bash: DOCS_PDF_ENGINE=xelatex npm run docs:export -- <paquete> pdf',
+        'También puedes generar DOCX sin un motor PDF: npm run docs:export -- <paquete> docx'
+    ].join('\n'));
+    process.exit(1);
+}
+if (requestedFormat === 'pdf') {
+    const pdfEngineCheck = spawnSync(pdfEngine, ['--version'], { encoding: 'utf8' });
+    if (pdfEngineCheck.error || pdfEngineCheck.status !== 0) {
+        console.error(`El motor PDF configurado en DOCS_PDF_ENGINE (${pdfEngine}) no está disponible en PATH. Instálalo, vuelve a abrir la terminal y comprueba: ${pdfEngine} --version`);
+        process.exit(1);
+    }
+}
 
 const outputDirectory = path.join(ROOT, 'build/docs');
 await mkdir(outputDirectory, { recursive: true });
@@ -301,7 +321,7 @@ try {
             `--resource-path=${[ROOT, path.join(ROOT, 'docs')].join(path.delimiter)}`
         ];
         if (requestedFormat === 'docx' && process.env.DOCS_REFERENCE_DOC) args.push(`--reference-doc=${process.env.DOCS_REFERENCE_DOC}`);
-        if (requestedFormat === 'pdf' && process.env.DOCS_PDF_ENGINE) args.push(`--pdf-engine=${process.env.DOCS_PDF_ENGINE}`);
+        if (requestedFormat === 'pdf') args.push(`--pdf-engine=${pdfEngine}`);
         const result = spawnSync('pandoc', args, { cwd: temporaryDirectory, stdio: 'inherit' });
         if (result.status !== 0) {
             failedStatus = result.status ?? 1;

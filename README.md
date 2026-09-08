@@ -281,8 +281,8 @@ quiere probar, puede reutilizarse `tests/helpers/rollbackTransaction.js` para fo
 rollback. La estrategia y ubicación de cada tipo de prueba están detalladas en
 [`docs/testing/service-test-coverage.md`](docs/testing/service-test-coverage.md).
 
-Flujo recomendado para automatización independiente (el segundo comando ya vuelve a
-verificar y migrar, por lo que normalmente basta con ejecutarlo solo):
+Flujo recomendado para pruebas con base de datos (el comando valida la URL aislada, aplica las
+migraciones, genera Prisma y ejecuta la integración):
 
 ```bash
 npm run test:db
@@ -293,8 +293,14 @@ Los scripts de prueba validan primero que exista `DATABASE_TEST_URL` y que no se
 Para pruebas que no requieren base de datos real, usa:
 
 ```bash
-npm test
+npm run test:unit
 ```
+
+`npm test` es un alias equivalente para la suite unitaria. Para una entrega ejecute primero
+`npm run test:unit`, después `npm run test:integration` con `DATABASE_TEST_URL` aislada y finalmente
+`npm run docs:check`; conserve en la evidencia el comando, el resultado y el commit. Las pruebas
+son procesos de una sola ejecución y regresan al prompt automáticamente. Sólo `npm run test:watch`
+permanece observando cambios y se cierra con `Ctrl+C`.
 
 ## Convenciones de desarrollo
 
