@@ -111,15 +111,18 @@ pertenecer a una cuenta ficticia con todos los permisos que se documentan y cont
 5. al menos una persona, un usuario, un proveedor y un cliente editables;
 6. movimientos de material y merma para que los historiales no aparezcan vacíos.
 
-El script recorre todas las páginas del listado para localizar cada acción; el registro requerido no
-tiene que aparecer en la primera página. Si falta un permiso, un registro o un estado requerido, el
-selector de la acción no aparece y el script falla en esa captura con el identificador, selector y
-prerrequisito que debe revisarse. Por ejemplo, `.btn-return-detail` sólo aparece para una salida
+El script recorre todas las páginas del listado filtrado para localizar cada acción; el registro
+requerido no tiene que aparecer en la primera página. Si no encuentra la acción después de revisar
+la última página, falla inmediatamente con el identificador, selector y prerrequisito que debe
+prepararse, sin esperar nuevamente el tiempo límite de Playwright. Por ejemplo,
+`.btn-return-detail` sólo aparece para una salida
 aprobada y completamente surtida; una salida pendiente o parcialmente surtida muestra
 `.btn-edit-detail` en su lugar. Este comportamiento es intencional: evita publicar una secuencia
 incompleta o incoherente. Para las capturas de devolución, la automatización cambia el filtro
-predeterminado **Pendiente** a **Surtido** antes de buscar `.btn-return-detail`, tanto en salidas de
-material como de merma. Para las vistas protegidas, el script inicia sesión automáticamente con
+predeterminado **Pendiente** a **Surtido**, selecciona **Buscar / filtrar**, espera que termine la
+actualización del listado y sólo entonces busca `.btn-return-detail`, tanto en salidas de material
+como de merma. Este recorrido reutiliza el mismo envío de filtros de tabla usado en compras y los
+demás listados. Para las vistas protegidas, el script inicia sesión automáticamente con
 `DOCS_LOGIN_NAME` y `DOCS_LOGIN_PASSWORD`, o reutiliza `DOCS_STORAGE_STATE` como alternativa. La
 pantalla de inicio de sesión se toma en un contexto separado y sin autenticación.
 

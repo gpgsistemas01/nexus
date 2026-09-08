@@ -144,13 +144,21 @@ const prepareLinks = (content, source, publicationSources) => content.replace(
     }
 );
 
-const addFigureAnchors = (content) => {
-    let figureIndex = 0;
-    return content.replace(
-        /^(\s*)(!\[[^\]]+\]\([^)]+\))$/gm,
-        (figure, indentation, image) => (
-            `${indentation}${image}{#figura-${++figureIndex}}`
-        )
+const addInternalAnchors = (content, source) => {
+    const anchorOccurrences = new Map();
+    const uniqueDocumentAnchor = (fragment) => {
+        const anchor = documentAnchor(source, fragment);
+        const occurrence = (anchorOccurrences.get(anchor) ?? 0) + 1;
+        anchorOccurrences.set(anchor, occurrence);
+        return occurrence === 1 ? anchor : `${anchor}-${occurrence}`;
+    };
+    const anchoredAliases = content.replace(
+        /^<a id="([^"]+)"><\/a>$/gm,
+        (anchor, fragment) => `[]{#${uniqueDocumentAnchor(fragment)}}\n`
+    );
+    const anchoredHeadings = anchoredAliases.replace(
+        /^(#{1,6})\s+(.+)$/gm,
+        (heading, level, title) => `${level} ${title} {#${uniqueDocumentAnchor(headingFragment(title))}}`
     );
 };
 

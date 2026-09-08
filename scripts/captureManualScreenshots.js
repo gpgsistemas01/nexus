@@ -92,7 +92,9 @@ const findTriggerAcrossPages = async (page, selector) => {
     const trigger = page.locator(selector).first();
     await page.locator('#table tbody tr').first().waitFor({ state: 'visible' });
 
-    while (!await trigger.isVisible()) {
+    while (true) {
+        if (await trigger.isVisible()) return trigger;
+
         const advanced = await page.evaluate(async () => {
             const table = globalThis.$?.('#table').DataTable();
             if (!table) return false;
@@ -105,10 +107,8 @@ const findTriggerAcrossPages = async (page, selector) => {
             });
             return true;
         });
-        if (!advanced) break;
+        if (!advanced) return null;
     }
-
-    return trigger;
 };
 
 const runAction = async (page, action, captureId) => {
@@ -120,10 +120,12 @@ const runAction = async (page, action, captureId) => {
             await filterControl.waitFor({ state: 'visible' });
         }
         await filterControl.selectOption({ label: action.label });
-        await page.locator('#table').evaluate(table => new Promise(resolve => {
-            globalThis.$(table).one('draw.dt', resolve);
-            document.querySelector('#tableFiltersForm').requestSubmit();
-        }));
+        await Promise.all([
+            page.locator('#table').evaluate(table => new Promise(resolve => {
+                globalThis.$(table).one('draw.dt', resolve);
+            })),
+            page.locator('#applyFiltersButton').click()
+        ]);
         console.log(`  Filtro preparado para ${ captureId }: ${ action.label }`);
         return;
     }
@@ -131,6 +133,17 @@ const runAction = async (page, action, captureId) => {
     const trigger = action.selector.startsWith('#table tbody ')
         ? await findTriggerAcrossPages(page, action.selector)
         : page.locator(action.selector).first();
+
+    if (!trigger) {
+        const preparation = action.requirement
+            ? `Verifique los permisos de la sesión y prepare ${ action.requirement } en el entorno de prueba.`
+            : '';
+        throw new Error(
+            `${ captureId } no puede prepararse: no existe ${ action.selector } en ninguna página del listado filtrado. `
+            + `La automatización no crea ni modifica registros.${ preparation ? ` ${ preparation }` : '' }`
+        );
+    }
+
     try {
         await trigger.waitFor({ state: 'visible' });
     } catch (error) {
