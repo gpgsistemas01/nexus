@@ -127,9 +127,10 @@ Playwright. Por ejemplo,
 aprobada y completamente surtida; una salida pendiente o parcialmente surtida muestra
 `.btn-edit-detail` en su lugar. Este comportamiento es intencional: evita publicar una secuencia
 incompleta o incoherente. Para las capturas de devolución, la automatización cambia el filtro
-predeterminado **Pendiente** a **Surtido**, selecciona **Buscar / filtrar**, espera que termine la
-actualización del listado y sólo entonces busca `.btn-return-detail`, tanto en salidas de material
-como de merma. Este recorrido reutiliza el mismo envío de filtros de tabla usado en compras y los
+predeterminado **Pendiente** a **Surtido**, selecciona **Buscar / filtrar**, espera que terminen la
+carga inicial y la actualización filtrada del listado, y sólo entonces busca `.btn-return-detail`,
+tanto en salidas de material como de merma. Este recorrido reutiliza el mismo envío de filtros de
+tabla usado en compras y los
 demás listados. Para las vistas protegidas, el script inicia sesión automáticamente con
 `DOCS_LOGIN_NAME` y `DOCS_LOGIN_PASSWORD`, o reutiliza `DOCS_STORAGE_STATE` como alternativa. La
 pantalla de inicio de sesión se toma en un contexto separado y sin autenticación.
