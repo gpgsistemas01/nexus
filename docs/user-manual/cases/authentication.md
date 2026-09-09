@@ -22,6 +22,22 @@ Cada procedimiento identifica sus casos de uso, controles, errores posibles y ca
 2. Escriba la cuenta asignada en el campo **Nombre de usuario** y la clave en **Contraseña**.
 3. Si corresponde, marque la casilla **Recordar credenciales** y seleccione el botón **Ingresar**.
 
+<a id="CAP-AUT-02-MENU"></a>
+### CAP-AUT-02-MENU — Menú principal
+
+**Casos:** `CU-AUT-02`.
+
+**Errores posibles:** [Acceso y autorización](../error-messages.md#errores-acceso).
+
+**Controles que debe usar:** Botón **Menú principal**, secciones y opciones habilitadas para su cuenta, y botón **Cerrar sesión**.
+
+1. Después de iniciar sesión, seleccione **Menú principal** y compruebe que las opciones autorizadas coincidan con la captura:
+
+   ![CAP-AUT-02-MENU: menú principal](../images/acceso/02-menu-principal.png)
+
+2. Seleccione una sección para desplegar sus módulos. Nexus sólo muestra las opciones permitidas por el rol y el área de la cuenta.
+3. Para terminar, use **Cerrar sesión**; no cierre solamente la pestaña del navegador.
+
 ## Página no encontrada
 
 **Propósito.** Reconocer una dirección que no corresponde a una página disponible.
