@@ -107,6 +107,11 @@ const publicationNames = Object.keys(MANIFESTS);
 const mermaidBlock = /^```mermaid\r?\n([\s\S]*?)^```\r?$/gm;
 const externalLink = /^(?:https?:|mailto:)/;
 const markdownLink = /(?<!!)\[([^\]]+)\]\(([^) ]+)([^)]*)\)/g;
+const documentAnchor = (source, fragment) => [
+    'documento',
+    source.replace(/\.md$/, '').replace(/[^\p{L}\p{N}]+/gu, '-'),
+    fragment
+].filter(Boolean).join('-').toLowerCase();
 const headingFragment = (title) => title
     .replace(/[`*_\[\]]/g, '')
     .toLowerCase()
@@ -132,15 +137,19 @@ const diagramCaption = (content, index) => {
 
 const prepareLinks = (content, source, publicationSources) => content.replace(
     markdownLink,
-    (reference, label, link) => {
+    (reference, label, link, suffix) => {
         if (externalLink.test(link)) return reference;
-        if (link.startsWith('#')) return reference;
-        const [target] = link.split('#');
+        if (link.startsWith('#')) {
+            return `[${label}](#${documentAnchor(source, link.slice(1))}${suffix})`;
+        }
+        const [target, fragment] = link.split('#');
         const resolvedTarget = path.relative(
             ROOT,
             path.resolve(ROOT, path.dirname(source), target)
         ).split(path.sep).join('/');
-        return target.endsWith('.md') && publicationSources.has(resolvedTarget) ? reference : label;
+        return target.endsWith('.md') && publicationSources.has(resolvedTarget)
+            ? `[${label}](#${documentAnchor(resolvedTarget, fragment)}${suffix})`
+            : label;
     }
 );
 
@@ -160,29 +169,32 @@ const addInternalAnchors = (content, source) => {
         /^(#{1,6})\s+(.+)$/gm,
         (heading, level, title) => `${level} ${title} {#${uniqueDocumentAnchor(headingFragment(title))}}`
     );
+    return `[]{#${documentAnchor(source)}}\n\n${anchoredHeadings}`;
+};
+
+const addFigureAnchors = (content, source) => {
+    let figureIndex = 0;
+    return content.replace(
+        /^(\s*)(!\[[^\]]+\]\([^)]+\))$/gm,
+        (figure, indentation, image) => (
+            `${indentation}${image}{#${documentAnchor(source, `figura-${++figureIndex}`)}}`
+        )
+    );
 };
 
 const buildDocumentIndexes = async (preparedSources) => {
     const headings = [];
     const figures = [];
-    const indexDirectory = path.dirname(preparedSources[0]);
     for (const preparedSource of preparedSources) {
         const content = await readFile(preparedSource, 'utf8');
-        const sourceLink = path.relative(indexDirectory, preparedSource).split(path.sep).join('/');
-        const headingOccurrences = new Map();
-        headings.push(...[...content.matchAll(/^(#{1,6})\s+(.+)$/gm)].map((match) => {
-            const fragment = headingFragment(match[2]);
-            const occurrence = headingOccurrences.get(fragment) ?? 0;
-            headingOccurrences.set(fragment, occurrence + 1);
-            return {
-                level: match[1].length,
-                title: match[2],
-                link: `${sourceLink}#${fragment}${occurrence ? `-${occurrence}` : ''}`
-            };
-        }).filter(({ level }) => level <= 3));
+        headings.push(...[...content.matchAll(/^(#{1,6})\s+(.+?)\s+\{#([^}]+)\}$/gm)].map((match) => ({
+            level: match[1].length,
+            title: match[2],
+            link: `#${match[3]}`
+        })).filter(({ level }) => level <= 3));
         figures.push(...[...content.matchAll(/^\s*!\[([^\]]+)\]\([^)]+\)\{#([^}]+)\}$/gm)].map((match) => ({
             title: match[1],
-            link: `${sourceLink}#${match[2]}`
+            link: `#${match[2]}`
         })));
     }
     const tableOfContents = headings.map(({ level, title, link }) => (
@@ -320,7 +332,7 @@ const prepareSource = async (source, publicationSources) => {
 
     const renderedSource = path.join(temporaryDirectory, source);
     await mkdir(path.dirname(renderedSource), { recursive: true });
-    let renderedContent = prepareLinks(content, source, publicationSources).replace(/(!\[[^\]]*\]\()([^) ]+)/g, (reference, prefix, image) => (
+    let renderedContent = addInternalAnchors(prepareLinks(content, source, publicationSources), source).replace(/(!\[[^\]]*\]\()([^) ]+)/g, (reference, prefix, image) => (
         `${prefix}${path.resolve(ROOT, path.dirname(source), image)}`
     ));
     for (const match of blocks) {
@@ -347,7 +359,7 @@ const prepareSource = async (source, publicationSources) => {
         }
         renderedContent = renderedContent.replace(match[0], `![${diagramCaption(content, match.index)}](${image})`);
     }
-    renderedContent = addFigureAnchors(renderedContent);
+    renderedContent = addFigureAnchors(renderedContent, source);
     await writeFile(renderedSource, renderedContent);
     return renderedSource;
 };
