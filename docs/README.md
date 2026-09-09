@@ -425,11 +425,19 @@ Este flujo sólo se ejecuta en un clon sin las imágenes requeridas o cuando una
 Su resultado son archivos PNG revisables en `docs/user-manual/images/`; **no genera DOCX ni PDF**.
 Después de aprobar las imágenes, vuelva a [Exportar los manuales](#exportar-los-manuales).
 
+El comando `npm run docs:screenshots` automatiza el ciclo de la aplicación: comprueba
+`DOCS_BASE_URL`, inicia una instancia temporal de Nexus cuando no existe una, espera a que responda,
+ejecuta el mismo inventario de capturas y detiene únicamente la instancia que inició. Si Nexus ya
+está disponible, la reutiliza y no la detiene. La base con datos ficticios, las credenciales y la
+instalación opcional de Playwright y Chromium siguen siendo prerrequisitos explícitos, porque el
+comando no debe crear datos, guardar secretos ni instalar dependencias por su cuenta.
+
 1. Prepare una base de prueba con los permisos y registros ficticios de
    [Datos de prueba requeridos](user-manual/screenshot-inventory.md#datos-de-prueba-requeridos).
    No utilice producción ni datos personales reales.
-2. Abra la terminal 1, complete la [configuración inicial de Nexus](../README.md#configuración-inicial)
-   e inicie la aplicación:
+2. Complete la [configuración inicial de Nexus](../README.md#configuración-inicial). El comando
+   automático puede iniciar y detener Nexus; si prefiere inspeccionar sus logs en otra terminal,
+   inicie la aplicación manualmente:
 
    ```powershell
    # Terminal 1, PowerShell o Bash
@@ -437,7 +445,9 @@ Después de aprobar las imágenes, vuelva a [Exportar los manuales](#exportar-lo
    ```
 
    Mantenga esta terminal abierta y espere el mensaje `Servidor escuchando en puerto 3000`.
-3. Abra la terminal 2 y compruebe la página de inicio de sesión:
+3. El comando automático comprueba la página de inicio de sesión y espera hasta 30 segundos cuando
+   inicia Nexus. Si administra la aplicación manualmente, abra la terminal 2 y compruébela antes de
+   continuar:
 
    ```powershell
    # Terminal 2, PowerShell
@@ -479,11 +489,15 @@ Después de aprobar las imágenes, vuelva a [Exportar los manuales](#exportar-lo
 
    No guarde estas credenciales en `.env` ni en archivos del repositorio. Como alternativa, defina
    sólo `DOCS_STORAGE_STATE`; no mezcle ambos mecanismos.
-7. Sin cerrar Nexus, genere las capturas desde la terminal 2:
+7. Genere las capturas. El mismo comando incluye la comprobación, el arranque y la detención de
+   Nexus en el proceso:
 
    ```bash
    npm run docs:screenshots
    ```
+
+   Si Nexus ya se administra por separado, el comando reutiliza esa instancia y no la detiene.
+   `DOCS_CAPTURE_IDS` permite ejecutar sólo las capturas seleccionadas con el mismo flujo.
 
    No interrumpa el comando: primero elimina `docs/user-manual/images/` y después genera el juego
    completo.
@@ -507,7 +521,8 @@ Después de aprobar las imágenes, vuelva a [Exportar los manuales](#exportar-lo
 
    Si una ejecución con `DOCS_STORAGE_STATE` falla, elimine ese archivo manualmente cuando no vaya
    a reintentar; una ejecución correcta lo elimina automáticamente.
-11. Vuelva a la terminal 1, presione `Ctrl+C` y espere el prompt para detener Nexus/Nodemon.
+11. Si inició Nexus manualmente en la terminal 1, presione `Ctrl+C` y espere el prompt para
+    detener Nexus/Nodemon. El comando automático ya detuvo su instancia temporal.
 12. Exporte el manual completo en DOCX:
 
    ```bash

@@ -214,7 +214,7 @@ npm start
 | `npm run docs:architecture` | Regenera el mapa de código, el esquema de base de datos y el diccionario técnico derivados del código y Prisma. |
 | `npm run docs:check` | Comprueba sin modificar archivos que la documentación generada esté actualizada. |
 | `npm run docs:export -- <paquete> <docx\|pdf>` | Valida y exporta un paquete documental con Pandoc; PDF requiere además un motor PDF. |
-| `npm run docs:screenshots` | Regenera en Chromium todas las capturas del manual usando Nexus y una sesión de prueba preparados. |
+| `npm run docs:screenshots` | Comprueba o inicia Nexus, genera en Chromium todas las capturas y detiene la instancia temporal al terminar. |
 
 ## Publicación de documentos y capturas
 

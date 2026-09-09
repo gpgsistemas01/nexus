@@ -143,6 +143,10 @@ Remove-Item Env:DOCS_CAPTURE_IDS
 DOCS_CAPTURE_IDS=CAP-SAL-WAS-05-RETURN npm run docs:screenshots
 ```
 
+`npm run docs:screenshots` también comprueba, inicia y detiene una instancia local de Nexus. El
+flujo reutiliza una instancia que ya responda en `DOCS_BASE_URL` y sólo detiene la que haya iniciado
+él mismo; la selección mediante `DOCS_CAPTURE_IDS` permanece a cargo del mismo inventario.
+
 ## Revisión antes de publicar
 
 Cada ejecución completa elimina `docs/user-manual/images/` después de validar la configuración y
