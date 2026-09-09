@@ -6,6 +6,11 @@ Cada procedimiento identifica sus casos de uso, controles, errores posibles y ca
 
 **Propósito.** Consultar y mantener las personas que participan en la operación.
 
+**Ruta en el menú:** **Menú principal → Personas**.
+
+<a id="CAP-IDA-PER-00-NAVIGATION"></a>
+![CAP-IDA-PER-00-NAVIGATION: acceso a personas desde el menú principal](../images/personas/00-acceso-menu-principal.png)
+
 <a id="CAP-IDA-PER-01-LIST"></a>
 ### CAP-IDA-PER-01-LIST — Listado
 
@@ -60,6 +65,11 @@ Cada procedimiento identifica sus casos de uso, controles, errores posibles y ca
 ## Usuarios
 
 **Propósito.** Administrar cuentas y cambios de contraseña.
+
+**Ruta en el menú:** **Menú principal → Usuarios**.
+
+<a id="CAP-IDA-USR-00-NAVIGATION"></a>
+![CAP-IDA-USR-00-NAVIGATION: acceso a usuarios desde el menú principal](../images/usuarios/00-acceso-menu-principal.png)
 
 <a id="CAP-IDA-USR-01-LIST"></a>
 ### CAP-IDA-USR-01-LIST — Listado

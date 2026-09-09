@@ -514,9 +514,12 @@ Playwright y Chromium se preparan automáticamente en el mismo entorno antes de 
    ```
 
 Si la comprobación del paso 3 responde `ERR_CONNECTION_REFUSED`, confirme que Nexus siga activo y
-que la URL use el puerto anunciado. Si la captura falla esperando `.btn-return-detail`, compruebe
+que la URL use el puerto anunciado. Si la captura falla esperando el botón **Nueva salida** de
+salidas de merma, compruebe que la cuenta tenga `waste:issues-manage`; el acceso al listado por sí
+solo no sustituye el permiso de administración. Si falla esperando `.btn-return-detail`, compruebe
 el permiso de surtimiento y que exista una salida aprobada, completamente surtida y con cantidad
-retornable. El script recorre todas las páginas del listado para localizarla. Las líneas `Paso N/T`
+retornable. El script espera a que DataTables termine de cargar y recorre todas las páginas del
+listado para localizar la acción requerida. Las líneas `Paso N/T`
 son acciones preparatorias, no capturas duplicadas. Después de corregir los datos puede definir
 `DOCS_CAPTURE_IDS=CAP-SAL-WAS-05-RETURN` para regenerar sólo la captura fallida y conservar las
 demás imágenes.

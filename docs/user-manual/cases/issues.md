@@ -19,6 +19,11 @@ cancelados.
 
 **Propósito.** Registrar y dar seguimiento al surtido y devolución de materiales.
 
+**Ruta en el menú:** **Menú principal → Salidas → Materiales**.
+
+<a id="CAP-SAL-MAT-00-NAVIGATION"></a>
+![CAP-SAL-MAT-00-NAVIGATION: acceso a salidas de material desde el menú principal](../images/salidas-material/00-acceso-menu-principal.png)
+
 **Campos por modo del formulario.** En **alta** se editan cliente, asesor, área, solicitante, número
 de proyecto, fecha de solicitud, observaciones y los materiales solicitados. En **edición completa**
 se habilitan esos mismos datos y la incorporación de detalles sólo mientras la salida esté
@@ -140,6 +145,11 @@ otro renglón ni suma ambas cantidades. Capture en **Cantidad** el total que des
 ## Salidas de merma
 
 **Propósito.** Registrar y dar seguimiento al surtido y devolución de mermas.
+
+**Ruta en el menú:** **Menú principal → Salidas → Mermas**.
+
+<a id="CAP-SAL-WAS-00-NAVIGATION"></a>
+![CAP-SAL-WAS-00-NAVIGATION: acceso a salidas de merma desde el menú principal](../images/salidas-merma/00-acceso-menu-principal.png)
 
 **Campos por modo del formulario.** En **alta** se editan cliente, asesor, área, solicitante, número
 de proyecto, fecha de solicitud, observaciones y las mermas solicitadas. En **edición completa** se

@@ -6,6 +6,11 @@ Cada procedimiento identifica sus casos de uso, controles, errores posibles y ca
 
 **Propósito.** Consultar el inventario, registrar o editar materiales y ajustar existencias.
 
+**Ruta en el menú:** **Menú principal → Almacén → Materiales**.
+
+<a id="CAP-CAT-MAT-00-NAVIGATION"></a>
+![CAP-CAT-MAT-00-NAVIGATION: acceso a materiales desde el menú principal](../images/materiales/00-acceso-menu-principal.png)
+
 **Qué significa identidad y estado.** La identidad de un material es la combinación de
 **Nombre**, **Presentación**, **Unidad**, **Base** y **Altura** que permite reconocer el mismo
 artículo. **Proveedor** pertenece a una relación de inventario separada, por lo que una misma
@@ -110,6 +115,11 @@ este modo. Use la acción **Editar registro** y el botón **Actualizar**.
 
 **Propósito.** Consultar y mantener el catálogo de proveedores.
 
+**Ruta en el menú:** **Menú principal → Proveedores**.
+
+<a id="CAP-CAT-SUP-00-NAVIGATION"></a>
+![CAP-CAT-SUP-00-NAVIGATION: acceso a proveedores desde el menú principal](../images/proveedores/00-acceso-menu-principal.png)
+
 La casilla **Activo** controla el estado del proveedor dentro del mismo formulario de alta o
 edición. Desmarcarla no elimina el proveedor ni sus materiales o documentos históricos; volver a
 marcarla lo reactiva. Este cambio no es un ajuste de stock.
@@ -166,6 +176,11 @@ marcarla lo reactiva. Este cambio no es un ajuste de stock.
 
 **Propósito.** Consultar y mantener el catálogo de clientes.
 
+**Ruta en el menú:** **Menú principal → Clientes**.
+
+<a id="CAP-CAT-CLI-00-NAVIGATION"></a>
+![CAP-CAT-CLI-00-NAVIGATION: acceso a clientes desde el menú principal](../images/clientes/00-acceso-menu-principal.png)
+
 <a id="CAP-CAT-CLI-01-LIST"></a>
 ### CAP-CAT-CLI-01-LIST — Listado
 
@@ -215,6 +230,11 @@ marcarla lo reactiva. Este cambio no es un ajuste de stock.
 ## Mermas e inventario
 
 **Propósito.** Consultar y mantener mermas, ajustar existencias y delimitar reportes.
+
+**Ruta en el menú:** **Menú principal → Almacén → Mermas**.
+
+<a id="CAP-CAT-WAS-00-NAVIGATION"></a>
+![CAP-CAT-WAS-00-NAVIGATION: acceso al inventario de mermas desde el menú principal](../images/mermas/00-acceso-menu-principal.png)
 
 **Qué significa identidad y estado.** La identidad de una merma es la combinación de
 **Proveedor**, **Nombre**, **Ancho/Base** y **Largo/Altura**. La presentación y unidad se conservan
