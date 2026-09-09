@@ -1,12 +1,57 @@
 import { spawn } from 'node:child_process';
+import { createRequire } from 'node:module';
 import process from 'node:process';
 
+const require = createRequire(import.meta.url);
 const baseURL = new URL(process.env.DOCS_BASE_URL ?? 'http://127.0.0.1:3000');
 const screenshotArguments = process.argv.slice(2);
 const startupTimeout = 30000;
 const retryDelay = 500;
+const npmCommand = process.env.npm_execpath
+    ? process.execPath
+    : (process.platform === 'win32' ? 'npm.cmd' : 'npm');
+const npmArguments = process.env.npm_execpath ? [process.env.npm_execpath] : [];
 
 const delay = milliseconds => new Promise(resolve => setTimeout(resolve, milliseconds));
+
+const runCommand = (command, argumentsList, description) => new Promise((resolve, reject) => {
+    const childProcess = spawn(command, argumentsList, { stdio: 'inherit' });
+
+    childProcess.once('error', reject);
+    childProcess.once('exit', (code, signal) => {
+        if (signal) reject(new Error(`${ description } terminó por la señal ${ signal }.`));
+        else if (code === 0) resolve();
+        else reject(new Error(`${ description } terminó con el código ${ code ?? 1 }.`));
+    });
+});
+
+const isPlaywrightInstalled = () => {
+    try {
+        require.resolve('playwright');
+        return true;
+    } catch (error) {
+        if (error.code === 'MODULE_NOT_FOUND') return false;
+        throw error;
+    }
+};
+
+const preparePlaywright = async () => {
+    if (!isPlaywrightInstalled()) {
+        console.log('Playwright no está instalado; se instalará temporalmente para generar las capturas.');
+        await runCommand(
+            npmCommand,
+            [...npmArguments, 'install', '--no-save', '--package-lock=false', 'playwright'],
+            'La instalación de Playwright'
+        );
+    }
+
+    console.log('Comprobando la instalación de Chromium para Playwright.');
+    await runCommand(
+        npmCommand,
+        [...npmArguments, 'exec', '--', 'playwright', 'install', 'chromium'],
+        'La instalación de Chromium para Playwright'
+    );
+};
 
 const isApplicationReady = async () => {
     try {
@@ -80,6 +125,8 @@ const stopApplication = async (applicationProcess) => {
 let applicationProcess;
 
 try {
+    if (!screenshotArguments.includes('--list')) await preparePlaywright();
+
     if (!screenshotArguments.includes('--list') && !await isApplicationReady()) {
         applicationProcess = startApplication();
         await waitForApplication(applicationProcess);
