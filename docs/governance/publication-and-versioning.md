@@ -93,11 +93,11 @@ visible del navegador con el tamaño fijado por el script; no concatena el conte
 de la pantalla. Cuando hay un modal, conserva también el contexto visible de la página en lugar de
 recortar únicamente el cuadro de diálogo.
 
-Playwright es una herramienta opcional de desarrollo: se instala en la estación que genera el
-manual con `npm install --no-save playwright` y `npx playwright install chromium`; no se incluye
-en producción. Se configuran `DOCS_BASE_URL` y, para páginas protegidas,
-`DOCS_STORAGE_STATE` con una sesión de datos ficticios. El inventario cubre los listados
-principales; cada modal o paso nuevo agrega al mismo script una acción localizada y otra captura
+Playwright es una herramienta opcional de desarrollo: `npm run docs:screenshots` instala
+temporalmente el paquete cuando falta y comprueba que su Chromium compatible esté instalado; no se
+incluye en producción ni se agrega a los manifiestos del proyecto. Se configuran `DOCS_BASE_URL` y,
+para páginas protegidas, `DOCS_STORAGE_STATE` con una sesión de datos ficticios. El inventario cubre
+los listados principales; cada modal o paso nuevo agrega al mismo script una acción localizada y otra captura
 numerada. El acceso puede capturarse sin sesión; el resto debe fallar si la cuenta no posee el
 permiso que el manual pretende demostrar.
 
