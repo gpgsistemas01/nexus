@@ -239,7 +239,9 @@ no sustituyen la instalación requerida por este proyecto. `npm run docs:export`
    `build/docs/diagrams/` antes de exportar.
 4. DOCX no requiere otra herramienta. Para PDF, Pandoc necesita un programa que componga
    el PDF desde la terminal; Adobe Acrobat o Adobe Reader sirven para abrir el resultado, pero no
-   realizan esa composición para este script. **XeLaTeX no es el único motor compatible**: es la
+   realizan esa composición para este script. [Pandoc documenta los motores admitidos por
+   `--pdf-engine`](https://pandoc.org/MANUAL.html#option--pdf-engine). **[XeLaTeX](https://tug.org/xetex/)
+   no es el único motor compatible**: es la
    opción recomendada por el proyecto porque maneja Unicode y texto en español directamente, está
    disponible mediante distribuciones mantenidas para Windows, Linux y macOS, y permite que todas
    las estaciones usen el mismo motor en vez de depender del predeterminado local de Pandoc.
@@ -261,8 +263,10 @@ no sustituyen la instalación requerida por este proyecto. `npm run docs:export`
      abrir la terminal.
 
    Si la estación ya tiene otro motor admitido por Pandoc, puede reutilizarlo: no es obligatorio
-   instalar XeLaTeX. Por ejemplo, una instalación existente de `pdflatex`, `lualatex` o `tectonic`
-   se selecciona asignando ese nombre a `DOCS_PDF_ENGINE`. Primero compruebe que su ejecutable
+   instalar XeLaTeX. Por ejemplo, una instalación existente de
+   [`pdflatex`](https://www.latex-project.org/get/), [`lualatex`](https://www.luatex.org/) o
+   [`tectonic`](https://tectonic-typesetting.github.io/en-US/install.html) se selecciona asignando
+   ese nombre a `DOCS_PDF_ENGINE`. Primero compruebe que su ejecutable
    responda desde la misma terminal:
 
    ```powershell
