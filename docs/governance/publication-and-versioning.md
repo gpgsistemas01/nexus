@@ -88,7 +88,10 @@ El manual usa `docs/user-manual/images/`. `scripts/captureManualScreenshots.js` 
 capturas con Playwright a partir de un estado de autenticación de prueba. El script recorre un
 inventario explícito de módulos, espera un elemento estable y sólo después captura. Los modales
 requieren una acción propia; no se debe usar una demora arbitraria. La automatización es
-repetible, pero no se ejecuta en producción ni durante `npm start`.
+repetible, pero no se ejecuta en producción ni durante `npm start`. Cada PNG representa el área
+visible del navegador con el tamaño fijado por el script; no concatena el contenido situado fuera
+de la pantalla. Cuando hay un modal, conserva también el contexto visible de la página en lugar de
+recortar únicamente el cuadro de diálogo.
 
 Playwright es una herramienta opcional de desarrollo: se instala en la estación que genera el
 manual con `npm install --no-save playwright` y `npx playwright install chromium`; no se incluye
@@ -104,6 +107,10 @@ lee esas imágenes ya existentes. Pandoc por sí solo genera DOCX sin Playwright
 LibreOffice ni Microsoft Word. Para PDF siempre delega la composición final a un motor
 adicional (`DOCS_PDF_ENGINE`); esa dependencia no puede eliminarse sin escoger otro
 conversor o publicar DOCX en su lugar.
+
+`docs:screenshots` coordina el generador con una instancia local de Nexus: comprueba si ya responde,
+la inicia y espera cuando hace falta, y al terminar detiene sólo el proceso que creó. No cambia el
+inventario ni convierte la captura en parte de la exportación documental.
 
 ## Versionado
 

@@ -26,7 +26,7 @@ conserva stock. Volver a marcarlo permite usarlo nuevamente en operaciones nueva
 
 **Controles que debe usar:** Buscador **Buscar por Material**, filtro **Proveedor**, botones **Buscar / filtrar**, **Limpiar filtros**, **Exportar Excel** y **Nuevo material**, además de las acciones de cada fila.
 
-1. Antes de usar los controles, compruebe que la pantalla inicial coincida con la captura:
+1. Abra **Filtros** y compruebe que los controles desplegados coincidan con la captura:
 
    ![CAP-CAT-MAT-01-LIST: listado inventario](../images/materiales/01-listado-inventario.png)
 
@@ -235,7 +235,7 @@ utilizarla nuevamente en una nueva salida.
 
 **Controles que debe usar:** Buscador **Buscar por Material o Proveedor**, filtro **Proveedor**, botones **Buscar / filtrar**, **Limpiar filtros**, **Exportar Excel** y **Nueva merma**, además de las acciones por fila.
 
-1. Antes de usar los controles, compruebe que la pantalla inicial coincida con la captura:
+1. Abra **Filtros** y compruebe que los controles desplegados coincidan con la captura:
 
    ![CAP-CAT-WAS-01-LIST: listado inventario](../images/mermas/01-listado-inventario.png)
 

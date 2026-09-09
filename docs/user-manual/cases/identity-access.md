@@ -15,7 +15,7 @@ Cada procedimiento identifica sus casos de uso, controles, errores posibles y ca
 
 **Controles que debe usar:** Buscador **Buscar por Nombre**; filtros **Área** y **Rol**; botones **Buscar / filtrar**, **Limpiar filtros**, **Exportar Excel** y **Nueva persona**, y acción **Editar registro** por fila.
 
-1. Antes de usar los controles, compruebe que la pantalla inicial coincida con la captura:
+1. Abra **Filtros** y compruebe que los controles desplegados coincidan con la captura:
 
    ![CAP-IDA-PER-01-LIST: listado](../images/personas/01-listado.png)
 
