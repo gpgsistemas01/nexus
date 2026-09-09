@@ -82,8 +82,9 @@ repeticiones.
 | --- | --- | --- | --- | --- | --- | --- |
 | `EP-NNN` | ID del caso, `SU-*`, ruta o comando focalizado | Commit, Node/Vitest, SO y servicios usados | Fecha y persona o CI | Conteos y observación obtenida | Aprobado, fallido, bloqueado o no ejecutado | Salida de CI, consulta verificable o incidencia |
 
-En este repositorio, `unit-test-catalog.md` mantiene el diseño agrupado de la suite
-unitaria y `unit-test-results.md` mantiene su última ejecución. No se duplican 280 filas
+El [catálogo de pruebas unitarias](unit-test-catalog.md) mantiene el diseño agrupado de
+la suite y el [registro de resultados unitarios](unit-test-results.md) mantiene su última
+ejecución. No se duplican 295 filas
 si los nombres y datos ya están en el código; sí se crea o amplía una ficha cuando el
 caso es manual, regula una aceptación contractual, introduce una técnica o ambiente no
 catalogado, o necesita evidencia que el runner no conserva.
