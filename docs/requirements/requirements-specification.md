@@ -16,7 +16,7 @@ movimientos y reportes. OpenAPI, una interfaz completa de requisiciones y objeti
 nivel de servicio permanecen fuera de la línea base implementada.
 
 Este documento no sustituye historias de usuario, diseños de pantalla ni el contrato
-HTTP. El [contrato API](../data/api-contract.md), el
+HTTP. El [contrato API](../architecture/api-contract.md), el
 [mapa generado](../generated/code-map.md) y el esquema Prisma aportan esos otros niveles
 de detalle. Su estructura adopta selectivamente las prácticas de ingeniería de
 requisitos descritas en el [criterio sobre normas documentales](../governance/documentation-standards.md),

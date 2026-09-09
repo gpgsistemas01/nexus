@@ -74,12 +74,20 @@ const MANIFESTS = Object.freeze({
         'docs/requirements/requirements-operations-matrix.md',
         'docs/requirements/business-glossary.md'
     ],
+    datos: [
+        'docs/data/index.md',
+        'docs/data/database-users-and-permissions-analysis.md',
+        'docs/data/postgresql-runtime-and-migration-roles.md',
+        'docs/generated/database-schema.md',
+        'docs/generated/data-dictionary.md'
+    ],
     arquitectura: [
         'docs/architecture/index.md',
         'docs/architecture/architecture-and-web-views.md',
         'docs/architecture/web-navigation-and-screen-catalog.md',
         'docs/architecture/technical-code-documentation.md',
         'docs/architecture/backend-technical-documentation.md',
+        'docs/architecture/api-contract.md',
         ...sequenceDocuments('backend'),
         'docs/architecture/frontend-technical-documentation.md',
         ...sequenceDocuments('frontend'),
@@ -224,7 +232,7 @@ const insertAfterFrontMatter = (content, insertion) => {
 
 if ((requestedPublication !== 'todos' && !MANIFESTS[requestedPublication])
     || (checkOnly ? requestedFormat && !formats.has(requestedFormat) : !formats.has(requestedFormat))) {
-    console.error('Uso: npm run docs:export -- <todos|manual-usuario|manual-administrador|manual-almacen|manual-reportes|requisitos|arquitectura|pruebas> [docx|pdf] [--check]');
+    console.error('Uso: npm run docs:export -- <todos|manual-usuario|manual-administrador|manual-almacen|manual-reportes|requisitos|datos|arquitectura|pruebas> [docx|pdf] [--check]');
     process.exit(1);
 }
 

@@ -19,9 +19,14 @@ Cada entrega exportable conserva este orden:
 5. contenido principal;
 6. trazabilidad, glosario, referencias y anexos.
 
-Los paquetes recomendados son **Requisitos**, **Diseño y arquitectura**, **Plan y evidencia de
-pruebas** y **Manual de usuario**. Cada paquete tiene su propio archivo de entrada y carpeta de
-imágenes; no se exporta toda la carpeta `docs` como un único documento.
+Los paquetes recomendados son **Requisitos**, **Datos, acceso y operación**, **Diseño y
+arquitectura**, **Plan y evidencia de pruebas** y **Manual de usuario**. Cada paquete tiene su
+propio archivo de entrada y carpeta de imágenes; no se exporta toda la carpeta `docs` como un
+único documento. El paquete de datos incorpora tanto los documentos curados de `docs/data/`
+como el esquema y el diccionario de `docs/generated/`; estos últimos se regeneran desde Prisma
+antes de exportar y no se editan manualmente. El contrato API pertenece al paquete de arquitectura
+porque describe la interfaz HTTP y el transporte JSON; no se incluye en datos por el solo hecho de
+que sus cuerpos transporten información.
 
 ## Formatos y estilos
 
