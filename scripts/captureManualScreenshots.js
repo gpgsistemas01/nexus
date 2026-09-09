@@ -105,11 +105,24 @@ const selectCaptures = () => {
 };
 
 const findTriggerAcrossPages = async (page, selector) => {
-    const trigger = page.locator(selector).first();
     await page.locator('#table tbody tr').first().waitFor({ state: 'visible' });
 
     while (true) {
-        if (await trigger.isVisible()) return trigger;
+        const triggers = page.locator(selector);
+        for (let index = 0; index < await triggers.count(); index += 1) {
+            const trigger = triggers.nth(index);
+            if (await trigger.isVisible()) return trigger;
+
+            const responsiveControl = trigger.locator('xpath=ancestor::tr[1]').locator('.dtr-control').first();
+            if (!await responsiveControl.isVisible()) continue;
+
+            await responsiveControl.click();
+            const responsiveTrigger = page.locator(selector);
+            for (let responsiveIndex = 0; responsiveIndex < await responsiveTrigger.count(); responsiveIndex += 1) {
+                const candidate = responsiveTrigger.nth(responsiveIndex);
+                if (await candidate.isVisible()) return candidate;
+            }
+        }
 
         const advanced = await page.evaluate(async () => {
             const table = globalThis.$?.('#table').DataTable();
