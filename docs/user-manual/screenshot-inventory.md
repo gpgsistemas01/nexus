@@ -132,7 +132,14 @@ actualización del listado y sólo entonces busca `.btn-return-detail`, tanto en
 como de merma. Este recorrido reutiliza el mismo envío de filtros de tabla usado en compras y los
 demás listados. Para las vistas protegidas, el script inicia sesión automáticamente con
 `DOCS_LOGIN_NAME` y `DOCS_LOGIN_PASSWORD`, o reutiliza `DOCS_STORAGE_STATE` como alternativa. La
-pantalla de inicio de sesión se toma en un contexto separado y sin autenticación.
+automatización no obtiene ni guarda esas credenciales: Playwright las escribe directamente en el
+formulario de acceso y conserva las cookies resultantes sólo en la memoria de su contexto mientras
+genera las imágenes. No crea un archivo de sesión. `DOCS_STORAGE_STATE` permite leer un archivo de
+sesión preparado previamente como mecanismo alternativo; nunca se genera a partir del usuario y la
+contraseña. Estos valores sólo se leen del entorno del proceso, no se agregan al archivo `.env`, y
+deben retirarse de la terminal al terminar, como indica la
+[guía de exportación](../README.md#exportar-la-documentación). La pantalla de inicio de sesión se
+toma en un contexto separado y sin autenticación.
 
 Las líneas indentadas `Paso N/T de CAP-*` describen los filtros y clics necesarios para preparar
 **una sola captura**; no indican que se haya escrito otro PNG. Sólo la línea sin sangría
