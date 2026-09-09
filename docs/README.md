@@ -85,7 +85,7 @@ Pandoc y Playwright intervienen en etapas distintas y ninguno sustituye al otro:
 | Herramienta | Finalidad | Comando del proyecto |
 | --- | --- | --- |
 | Node.js y dependencias (`npm ci`) | Ejecutan los scripts del repositorio. | Todos los comandos `npm run docs:*`. |
-| Playwright y Chromium (instalación opcional) | Abren Nexus y generan las capturas del manual. Sólo se necesitan al actualizar imágenes. | `npm run docs:screenshots` |
+| Playwright y Chromium (instalación automática) | Abren Nexus y generan las capturas del manual. Sólo se necesitan al actualizar imágenes. | `npm run docs:screenshots` |
 | Mermaid CLI (instalación opcional) | Convierte cada bloque Mermaid en una imagen temporal para la exportación. | Lo invoca automáticamente `docs:export` cuando el paquete contiene diagramas. |
 | Pandoc (herramienta del sistema) | Ensambla el Markdown y las imágenes existentes y convierte la navegación del paquete en hipervínculos internos. Para DOCX, el exportador materializa la tabla de contenido y el índice de imágenes antes de invocarlo; para PDF, Pandoc los compone con el motor configurado. | `npm run docs:export -- <paquete> <formato>` |
 | XeLaTeX u otro motor PDF (herramienta del sistema) | Compone el PDF solicitado por Pandoc; no se necesita para DOCX. | Sólo `docs:export` con formato `pdf`. |
@@ -94,17 +94,10 @@ Una extensión de Playwright para Visual Studio Code tampoco reemplaza estas her
 facilitar la ejecución desde el editor, pero el script de capturas requiere el paquete `playwright`
 y la exportación final continúa requiriendo el ejecutable `pandoc`.
 
-Para generar capturas se necesitan dos componentes en el mismo entorno donde se abre la terminal:
-
-```bash
-npm install --no-save playwright
-npx playwright install chromium
-```
-
-El primer comando instala el paquete de Node.js que usa el script y el segundo descarga el
-ejecutable de Chromium compatible que Playwright controla. No se instala una extensión dentro del
-navegador habitual ni es suficiente con instalar la extensión de Playwright para Visual Studio
-Code.
+Al generar capturas, el comando instala temporalmente el paquete de Node.js si no está disponible y
+comprueba la instalación del ejecutable de Chromium compatible. No modifica `package.json` ni
+`package-lock.json`. No se instala una extensión dentro del navegador habitual ni es suficiente
+con instalar la extensión de Playwright para Visual Studio Code.
 
 ### Estructura exportable
 
@@ -428,9 +421,9 @@ Después de aprobar las imágenes, vuelva a [Exportar los manuales](#exportar-lo
 El comando `npm run docs:screenshots` automatiza el ciclo de la aplicación: comprueba
 `DOCS_BASE_URL`, inicia una instancia temporal de Nexus cuando no existe una, espera a que responda,
 ejecuta el mismo inventario de capturas y detiene únicamente la instancia que inició. Si Nexus ya
-está disponible, la reutiliza y no la detiene. La base con datos ficticios, las credenciales y la
-instalación opcional de Playwright y Chromium siguen siendo prerrequisitos explícitos, porque el
-comando no debe crear datos, guardar secretos ni instalar dependencias por su cuenta.
+está disponible, la reutiliza y no la detiene. La base con datos ficticios y las credenciales siguen
+siendo prerrequisitos explícitos, porque el comando no debe crear datos ni guardar secretos.
+Playwright y Chromium se preparan automáticamente en el mismo entorno antes de iniciar Nexus.
 
 1. Prepare una base de prueba con los permisos y registros ficticios de
    [Datos de prueba requeridos](user-manual/screenshot-inventory.md#datos-de-prueba-requeridos).
@@ -460,17 +453,7 @@ comando no debe crear datos, guardar secretos ni instalar dependencias por su cu
    ```
 
    Si Nexus usa otro puerto, sustitúyalo en esta URL y después en `DOCS_BASE_URL`.
-4. Instale Playwright y Chromium en la terminal 2, si todavía no están disponibles:
-
-   ```bash
-   npm install --no-save playwright
-   npx playwright install chromium
-   ```
-
-5. Cierre cualquier instancia de Playwright que haya iniciado manualmente. Vuelva a la terminal
-   que ejecuta ese comando, presione `Ctrl+C` y espere a que reaparezca el prompt; no basta con
-   cerrar la ventana de Playwright.
-6. En la terminal 2, defina `DOCS_BASE_URL` y las credenciales de una cuenta ficticia. Elija **un
+4. En la terminal 2, defina `DOCS_BASE_URL` y las credenciales de una cuenta ficticia. Elija **un
    solo bloque** y no agregue `/inicio-sesion` a `DOCS_BASE_URL`.
 
    ```powershell
@@ -489,7 +472,7 @@ comando no debe crear datos, guardar secretos ni instalar dependencias por su cu
 
    No guarde estas credenciales en `.env` ni en archivos del repositorio. Como alternativa, defina
    sólo `DOCS_STORAGE_STATE`; no mezcle ambos mecanismos.
-7. Genere las capturas. El mismo comando incluye la comprobación, el arranque y la detención de
+5. Genere las capturas. El mismo comando incluye la comprobación, el arranque y la detención de
    Nexus en el proceso:
 
    ```bash
@@ -501,13 +484,13 @@ comando no debe crear datos, guardar secretos ni instalar dependencias por su cu
 
    No interrumpa el comando: primero elimina `docs/user-manual/images/` y después genera el juego
    completo.
-8. Espere el mensaje `Capturas generadas` y a que reaparezca el prompt de la terminal 2. En ese
+6. Espere el mensaje `Capturas generadas` y a que reaparezca el prompt de la terminal 2. En ese
    momento, el script ya cerró Playwright y Chromium automáticamente y puede usar el siguiente
    comando.
-9. Revise los PNG conforme a
+7. Revise los PNG conforme a
    [Revisión antes de publicar](user-manual/screenshot-inventory.md#revisión-antes-de-publicar).
-   Si debe corregir el entorno, repita los pasos 7 a 9.
-10. Retire las credenciales de la terminal 2:
+   Si debe corregir el entorno, repita los pasos 5 a 7.
+8. Retire las credenciales de la terminal 2:
 
    ```powershell
    # PowerShell
@@ -521,9 +504,9 @@ comando no debe crear datos, guardar secretos ni instalar dependencias por su cu
 
    Si una ejecución con `DOCS_STORAGE_STATE` falla, elimine ese archivo manualmente cuando no vaya
    a reintentar; una ejecución correcta lo elimina automáticamente.
-11. Si inició Nexus manualmente en la terminal 1, presione `Ctrl+C` y espere el prompt para
+9. Si inició Nexus manualmente en la terminal 1, presione `Ctrl+C` y espere el prompt para
     detener Nexus/Nodemon. El comando automático ya detuvo su instancia temporal.
-12. Exporte el manual completo en DOCX:
+10. Exporte el manual completo en DOCX:
 
    ```bash
    npm run docs:export -- manual-usuario --check
