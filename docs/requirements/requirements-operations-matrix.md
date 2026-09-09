@@ -88,7 +88,7 @@ y exige stock, pero no vuelve a seleccionar el recurso ni crea otra relación.
 | Salida de material o merma / consultar | `view`; salida cancelada | ninguno | formulario y detalles permanecen en sólo lectura |
 
 Los nombres técnicos de los campos HTTP pertenecen al
-[contrato API](../data/api-contract.md); las reglas observables pertenecen a la
+[contrato API](../architecture/api-contract.md); las reglas observables pertenecen a la
 [especificación](requirements-specification.md). Esta matriz enumera los controles por
 modo para hacer verificable qué puede modificar el operador, sin convertir el estado
 visual del formulario en un estado persistido del documento.

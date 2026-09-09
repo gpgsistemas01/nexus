@@ -18,7 +18,7 @@ presentan en español:
 ```text
 docs/
 ├── architecture/  # Arquitectura, construcción y convenciones técnicas
-├── data/          # Datos, acceso, permisos y contrato HTTP
+├── data/          # Datos persistentes, acceso y permisos
 ├── governance/    # Criterios para mantener la documentación
 ├── user-manual/   # Entrada, capítulos e imágenes del manual
 ├── requirements/  # Entrada, requisitos, casos de uso e imágenes
@@ -29,9 +29,9 @@ docs/
 
 | Familia | Artefacto principal | Artefactos complementarios | Evidencia generada |
 | --- | --- | --- | --- |
-| Arquitectura y construcción | [Índice de arquitectura y construcción](architecture/index.md) | [Descripción de arquitectura](architecture/architecture-and-web-views.md), [navegación y catálogo web](architecture/web-navigation-and-screen-catalog.md), [guía técnica común](architecture/technical-code-documentation.md), referencias de [backend](architecture/backend-technical-documentation.md) y [frontend](architecture/frontend-technical-documentation.md), secuencias de ejecución por caso del [backend](architecture/backend-code-sequences/index.md) y [frontend](architecture/frontend-code-sequences/index.md), [decisiones](architecture/decisions/index.md), [diagramas vigentes del código](architecture/code-diagrams.md), [inventario de diagramas](architecture/diagram-inventory.md), [trazabilidad técnica](architecture/traceability-matrix.md), [patrones aplicados](architecture/design-and-construction-patterns.md), [estándar de codificación](architecture/coding-standards.md) y [convenciones de diagramas](architecture/diagram-conventions.md) | [Mapa del código](generated/code-map.md), derivado de rutas e importaciones de `src` |
+| Arquitectura y construcción | [Índice de arquitectura y construcción](architecture/index.md) | [Descripción de arquitectura](architecture/architecture-and-web-views.md), [contrato API](architecture/api-contract.md), [navegación y catálogo web](architecture/web-navigation-and-screen-catalog.md), [guía técnica común](architecture/technical-code-documentation.md), referencias de [backend](architecture/backend-technical-documentation.md) y [frontend](architecture/frontend-technical-documentation.md), secuencias de ejecución por caso del [backend](architecture/backend-code-sequences/index.md) y [frontend](architecture/frontend-code-sequences/index.md), [decisiones](architecture/decisions/index.md), [diagramas vigentes del código](architecture/code-diagrams.md), [inventario de diagramas](architecture/diagram-inventory.md), [trazabilidad técnica](architecture/traceability-matrix.md), [patrones aplicados](architecture/design-and-construction-patterns.md), [estándar de codificación](architecture/coding-standards.md) y [convenciones de diagramas](architecture/diagram-conventions.md) | [Mapa del código](generated/code-map.md), derivado de rutas e importaciones de `src` |
 | Dominio y requisitos | [Índice y portada del paquete](requirements/index.md); la [especificación](requirements/requirements-specification.md) es la fuente normativa | [Visión y alcance](requirements/vision-scope-and-requirements.md), [dominio y casos de uso](requirements/domain-and-use-cases.md), [catálogo de casos de uso](requirements/use-case-descriptions.md), [matriz de operaciones](requirements/requirements-operations-matrix.md), [diagramas de requisitos](requirements/requirements-diagrams.md) y [glosario](requirements/business-glossary.md) | No aplica; el estado funcional requiere revisión humana |
-| Datos, acceso y operación | [Mapa de datos, persistencia y acceso](data/index.md) | [Análisis de usuarios y permisos](data/database-users-and-permissions-analysis.md), [roles PostgreSQL](data/postgresql-runtime-and-migration-roles.md) y [contrato API](data/api-contract.md) | [Esquema de base de datos](generated/database-schema.md) y [diccionario técnico](generated/data-dictionary.md), derivados de `prisma/schema.prisma` |
+| Datos, acceso y operación | [Mapa de datos, persistencia y acceso](data/index.md) | [Análisis de usuarios y permisos](data/database-users-and-permissions-analysis.md) y [roles PostgreSQL](data/postgresql-runtime-and-migration-roles.md) | [Esquema de base de datos](generated/database-schema.md) y [diccionario técnico](generated/data-dictionary.md), derivados de `prisma/schema.prisma` |
 | Pruebas | [Estrategia de pruebas](testing/service-test-coverage.md) | [Plan de pruebas](testing/test-plan.md), [ambiente, estrategia y catálogo unitario](testing/unit-test-catalog.md), y [resultados unitarios](testing/unit-test-results.md) de la última ejecución verificada | La evidencia ejecutable vive en `tests`; el catálogo y el resumen versionado complementan la salida de Vitest/CI |
 | Gobierno documental | [Normas y criterios](governance/documentation-standards.md) | [Buenas prácticas de organización](governance/documentation-practices.md), [registro de aplicación de normas](governance/standards-application.md) y [convenciones de diagramas](architecture/diagram-conventions.md), compartidas también con arquitectura | No aplica |
 
@@ -327,9 +327,10 @@ un paquete de npm. Elija uno de estos valores:
 | `manual-almacen` | Acceso, catálogos, compras, salidas y reportes operativos. | Para personal de almacén y proveeduría. |
 | `manual-reportes` | Acceso, consultas y exportaciones de catálogos, compras, salidas y movimientos. | Para usuarios que sólo consultan o generan reportes. |
 | `requisitos` | Especificación y trazabilidad de requisitos. | Para revisión funcional. |
-| `arquitectura` | Diseño y documentación técnica de frontend, backend y datos. | Para revisión técnica. |
+| `datos` | Mapa de datos, decisiones de acceso, esquema y diccionario técnico generados. | Para revisar persistencia y acceso a los datos. |
+| `arquitectura` | Diseño, documentación técnica y contrato API con estructuras JSON y validaciones. | Para revisión técnica y de integraciones HTTP. |
 | `pruebas` | Plan, cobertura, catálogo y resultados de pruebas. | Para evidencia de calidad. |
-| `todos` | Los siete documentos anteriores, cada uno en su propio archivo. | Para preparar una entrega documental completa con un solo comando. |
+| `todos` | Los ocho documentos anteriores, cada uno en su propio archivo. | Para preparar una entrega documental completa con un solo comando. |
 
 Los paquetes específicos por actor reutilizan las secciones del manual completo y omiten las que
 no corresponden a ese recorrido. Los formatos de entrega admitidos son `docx` y `pdf`; Markdown
@@ -356,19 +357,19 @@ si va a compartir la carpeta completa, retire de ella los resultados antiguos qu
 de la entrega. Nunca elimine los Markdown fuente de `docs/` para regenerar un documento.
 
 Para generar todos los documentos al mismo tiempo, use `todos`. El comando valida primero las
-fuentes e imágenes de los siete paquetes y después crea un archivo independiente por paquete:
+fuentes e imágenes de los ocho paquetes y después crea un archivo independiente por paquete:
 
 ```bash
 npm run docs:export -- todos docx
 ```
 
-El resultado no es un único documento combinado: se crean los cuatro manuales, requisitos,
-arquitectura y pruebas dentro de `build/docs/`. Para generar los siete PDF, prepare XeLaTeX y use
+El resultado no es un único documento combinado: se crean los cuatro manuales, requisitos, datos,
+arquitectura y pruebas dentro de `build/docs/`. Para generar los ocho PDF, prepare XeLaTeX y use
 `DOCS_PDF_ENGINE=xelatex npm run docs:export -- todos pdf`.
 
 ### Flujo general de exportación
 
-Para exportar `requisitos`, `arquitectura` o `pruebas`:
+Para exportar `requisitos`, `datos`, `arquitectura` o `pruebas`:
 
 1. Complete la [preparación de herramientas](#preparar-las-herramientas): dependencias de
    Node.js, Pandoc y, sólo para PDF, un motor PDF.
