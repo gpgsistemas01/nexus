@@ -88,7 +88,6 @@ Pandoc y Playwright intervienen en etapas distintas y ninguno sustituye al otro:
 | Playwright y Chromium (instalación automática) | Abren Nexus y generan las capturas del manual. Sólo se necesitan al actualizar imágenes. | `npm run docs:screenshots` |
 | Mermaid CLI (instalación opcional) | Convierte cada bloque Mermaid en una imagen temporal para la exportación. | Lo invoca automáticamente `docs:export` cuando el paquete contiene diagramas. |
 | Pandoc (herramienta del sistema) | Ensambla el Markdown y las imágenes existentes y convierte la navegación del paquete en hipervínculos internos. Para DOCX, el exportador materializa la tabla de contenido y el índice de imágenes antes de invocarlo; para PDF, Pandoc los compone con el motor configurado. | `npm run docs:export -- <paquete> <formato>` |
-| `zip` y `unzip` (herramientas del sistema) | Aplican al DOCX generado la alineación justificada de los párrafos de contenido sin modificar tablas, títulos, código ni leyendas. | Sólo `docs:export` con formato `docx`. |
 | XeLaTeX u otro motor PDF (herramienta del sistema) | Compone el PDF solicitado por Pandoc; no se necesita para DOCX. | Sólo `docs:export` con formato `pdf`. |
 
 Una extensión de Playwright para Visual Studio Code tampoco reemplaza estas herramientas: puede
