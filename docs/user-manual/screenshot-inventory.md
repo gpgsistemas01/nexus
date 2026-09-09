@@ -14,6 +14,10 @@ operaciones que modifican existencias y, al final, la exportación.
 Una misma imagen se reutiliza cuando la interfaz es realmente la misma. Por ejemplo, el listado
 muestra tanto la consulta como el punto de entrada de una exportación directa. No se crean
 capturas duplicadas para cada caso de uso ni imágenes de un archivo Excel descargado.
+Cuando un listado dispone de un panel **Filtros**, su captura inicial lo muestra desplegado para
+que el usuario pueda ubicar los campos y las acciones descritas en el procedimiento.
+Cuando un procedimiento requiere sustituir un filtro predeterminado, se incluye además una captura
+del valor nuevo ya aplicado y de los resultados que habilitan el paso siguiente.
 
 ## Inventario automatizado
 
@@ -51,24 +55,26 @@ comprobar el inventario sin iniciar Nexus ni Playwright se ejecuta
 | 26 | `CAP-SAL-MAT-04-SUPPLY` | `docs/user-manual/images/salidas-material/04-surtir-detalles.png` | `CU-SAL-05` |
 | 27 | `CAP-SAL-MAT-05-RETURN` | `docs/user-manual/images/salidas-material/05-devolver-detalle.png` | `CU-SAL-06` |
 | 28 | `CAP-REP-SAL-MAT-06-EXPORT` | `docs/user-manual/images/salidas-material/06-exportar-reporte.png` | `CU-REP-04` |
-| 29 | `CAP-SAL-WAS-01-LIST` | `docs/user-manual/images/salidas-merma/01-listado.png` | `CU-SAL-07`, `CU-REP-08` |
-| 30 | `CAP-SAL-WAS-02-CREATE` | `docs/user-manual/images/salidas-merma/02-formulario-registro.png` | `CU-SAL-08` |
-| 31 | `CAP-SAL-WAS-03-EDIT` | `docs/user-manual/images/salidas-merma/03-edicion-encabezado.png` | `CU-SAL-09`, `CU-SAL-10` |
-| 32 | `CAP-SAL-WAS-04-SUPPLY` | `docs/user-manual/images/salidas-merma/04-surtir-detalles.png` | `CU-SAL-11` |
-| 33 | `CAP-SAL-WAS-05-RETURN` | `docs/user-manual/images/salidas-merma/05-devolver-detalle.png` | `CU-SAL-12` |
-| 34 | `CAP-REP-SAL-WAS-06-EXPORT` | `docs/user-manual/images/salidas-merma/06-exportar-reporte.png` | `CU-REP-08` |
-| 35 | `CAP-IDA-PER-01-LIST` | `docs/user-manual/images/personas/01-listado.png` | `CU-IDA-01`, `CU-REP-14` |
-| 36 | `CAP-IDA-PER-02-CREATE` | `docs/user-manual/images/personas/02-formulario-alta.png` | `CU-IDA-02`, `CU-IDA-08`, `CU-IDA-09` |
-| 37 | `CAP-IDA-PER-03-EDIT` | `docs/user-manual/images/personas/03-formulario-edicion.png` | `CU-IDA-03` |
-| 38 | `CAP-IDA-USR-01-LIST` | `docs/user-manual/images/usuarios/01-listado.png` | `CU-IDA-04`, `CU-REP-15` |
-| 39 | `CAP-IDA-USR-02-CREATE` | `docs/user-manual/images/usuarios/02-formulario-alta.png` | `CU-IDA-05` |
-| 40 | `CAP-IDA-USR-03-EDIT` | `docs/user-manual/images/usuarios/03-formulario-edicion.png` | `CU-IDA-06` |
-| 41 | `CAP-IDA-USR-04-PASSWORD` | `docs/user-manual/images/usuarios/04-cambio-contrasena.png` | `CU-IDA-07` |
-| 42 | `CAP-REP-MOV-MAT-01-LIST` | `docs/user-manual/images/movimientos-material/01-historial-y-filtros.png` | `CU-REP-02` |
-| 43 | `CAP-REP-MOV-MAT-02-EXPORT` | `docs/user-manual/images/movimientos-material/02-exportar-reporte.png` | `CU-REP-05` |
-| 44 | `CAP-REP-MOV-WAS-01-LIST` | `docs/user-manual/images/movimientos-merma/01-historial-y-filtros.png` | `CU-REP-07` |
-| 45 | `CAP-REP-MOV-WAS-02-EXPORT` | `docs/user-manual/images/movimientos-merma/02-exportar-reporte.png` | `CU-REP-10` |
-| 46 | `CAP-ERR-404-NOT-FOUND` | `docs/user-manual/images/errores/01-pagina-no-encontrada.png` | Transversal |
+| 29 | `CAP-SAL-MAT-07-FILTER` | `docs/user-manual/images/salidas-material/07-filtro-surtido.png` | `CU-SAL-01`, `CU-SAL-06` |
+| 30 | `CAP-SAL-WAS-01-LIST` | `docs/user-manual/images/salidas-merma/01-listado.png` | `CU-SAL-07`, `CU-REP-08` |
+| 31 | `CAP-SAL-WAS-02-CREATE` | `docs/user-manual/images/salidas-merma/02-formulario-registro.png` | `CU-SAL-08` |
+| 32 | `CAP-SAL-WAS-03-EDIT` | `docs/user-manual/images/salidas-merma/03-edicion-encabezado.png` | `CU-SAL-09`, `CU-SAL-10` |
+| 33 | `CAP-SAL-WAS-04-SUPPLY` | `docs/user-manual/images/salidas-merma/04-surtir-detalles.png` | `CU-SAL-11` |
+| 34 | `CAP-SAL-WAS-05-RETURN` | `docs/user-manual/images/salidas-merma/05-devolver-detalle.png` | `CU-SAL-12` |
+| 35 | `CAP-REP-SAL-WAS-06-EXPORT` | `docs/user-manual/images/salidas-merma/06-exportar-reporte.png` | `CU-REP-08` |
+| 36 | `CAP-SAL-WAS-07-FILTER` | `docs/user-manual/images/salidas-merma/07-filtro-surtido.png` | `CU-SAL-07`, `CU-SAL-12` |
+| 37 | `CAP-IDA-PER-01-LIST` | `docs/user-manual/images/personas/01-listado.png` | `CU-IDA-01`, `CU-REP-14` |
+| 38 | `CAP-IDA-PER-02-CREATE` | `docs/user-manual/images/personas/02-formulario-alta.png` | `CU-IDA-02`, `CU-IDA-08`, `CU-IDA-09` |
+| 39 | `CAP-IDA-PER-03-EDIT` | `docs/user-manual/images/personas/03-formulario-edicion.png` | `CU-IDA-03` |
+| 40 | `CAP-IDA-USR-01-LIST` | `docs/user-manual/images/usuarios/01-listado.png` | `CU-IDA-04`, `CU-REP-15` |
+| 41 | `CAP-IDA-USR-02-CREATE` | `docs/user-manual/images/usuarios/02-formulario-alta.png` | `CU-IDA-05` |
+| 42 | `CAP-IDA-USR-03-EDIT` | `docs/user-manual/images/usuarios/03-formulario-edicion.png` | `CU-IDA-06` |
+| 43 | `CAP-IDA-USR-04-PASSWORD` | `docs/user-manual/images/usuarios/04-cambio-contrasena.png` | `CU-IDA-07` |
+| 44 | `CAP-REP-MOV-MAT-01-LIST` | `docs/user-manual/images/movimientos-material/01-historial-y-filtros.png` | `CU-REP-02` |
+| 45 | `CAP-REP-MOV-MAT-02-EXPORT` | `docs/user-manual/images/movimientos-material/02-exportar-reporte.png` | `CU-REP-05` |
+| 46 | `CAP-REP-MOV-WAS-01-LIST` | `docs/user-manual/images/movimientos-merma/01-historial-y-filtros.png` | `CU-REP-07` |
+| 47 | `CAP-REP-MOV-WAS-02-EXPORT` | `docs/user-manual/images/movimientos-merma/02-exportar-reporte.png` | `CU-REP-10` |
+| 48 | `CAP-ERR-404-NOT-FOUND` | `docs/user-manual/images/errores/01-pagina-no-encontrada.png` | Transversal |
 
 ## Cobertura adicional necesaria
 
@@ -111,10 +117,12 @@ pertenecer a una cuenta ficticia con todos los permisos que se documentan y cont
 5. al menos una persona, un usuario, un proveedor y un cliente editables;
 6. movimientos de material y merma para que los historiales no aparezcan vacíos.
 
-El script recorre todas las páginas del listado filtrado para localizar cada acción; el registro
-requerido no tiene que aparecer en la primera página. Si no encuentra la acción después de revisar
-la última página, falla inmediatamente con el identificador, selector y prerrequisito que debe
-prepararse, sin esperar nuevamente el tiempo límite de Playwright. Por ejemplo,
+El script recorre todas las páginas del listado filtrado para localizar cada acción visible; el
+registro requerido no tiene que aparecer en la primera página y una copia oculta del control,
+creada por la vista responsiva de la tabla, no impide seleccionar otra copia visible. Si no
+encuentra la acción después de revisar la última página, falla inmediatamente con el identificador,
+selector y prerrequisito que debe prepararse, sin esperar nuevamente el tiempo límite de
+Playwright. Por ejemplo,
 `.btn-return-detail` sólo aparece para una salida
 aprobada y completamente surtida; una salida pendiente o parcialmente surtida muestra
 `.btn-edit-detail` en su lugar. Este comportamiento es intencional: evita publicar una secuencia
@@ -153,8 +161,11 @@ elimina archivos.
 
 Después de ejecutar `npm run docs:screenshots`, se debe comprobar que los datos sean ficticios,
 que no aparezcan contraseñas, cookies ni datos personales, que los textos sean legibles y que el
-estado visible coincida con los casos de uso asignados en la tabla. Sólo entonces las imágenes
-revisadas se referencian desde el recorrido correspondiente del manual. Al completar todo el
+estado visible coincida con los casos de uso asignados en la tabla. Cada imagen debe corresponder
+al área visible de 1440 × 1000 píxeles, sin agregar el contenido que queda debajo de la pantalla.
+En los pasos con modal se conserva el contexto visible que lo rodea; no se recorta sólo el modal.
+Sólo entonces las imágenes revisadas se referencian desde el recorrido correspondiente del
+manual. Al completar todo el
 inventario, si se proporcionó `DOCS_STORAGE_STATE`, el script elimina automáticamente ese archivo;
 si la ejecución falla, lo conserva para permitir un reintento y debe eliminarse manualmente cuando
 ya no se vaya a utilizar. Las credenciales automáticas sólo permanecen en las variables del proceso
