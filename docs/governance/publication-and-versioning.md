@@ -50,18 +50,24 @@ DOCX y PDF muestran el diagrama visual en vez de copiar su código; los archivos
 eliminan al finalizar.
 
 Antes de convertir, cada enlace local con fragmento se valida contra un título o ancla
-explícita real. Las referencias entre fuentes incluidas conservan su ruta Markdown
-relativa y Pandoc las resuelve al ensamblarlas con alcance por archivo. Un enlace a otro
-documento sin fragmento lleva al inicio de ese documento. Los enlaces a fuentes que no
-forman parte del paquete se presentan como texto. Mermaid se limita a producir la figura
-y no usa `click`, porque el hipervínculo dejaría de ser uniforme al renderizar el bloque
-como imagen para DOCX o PDF.
+explícita real. Las referencias entre fuentes incluidas se declaran con una ruta Markdown
+relativa al archivo de origen; el exportador las convierte en referencias internas únicas
+antes de ensamblar el paquete. Un enlace a otro documento sin fragmento lleva al inicio de
+ese documento. Los enlaces a fuentes que no forman parte del paquete se presentan como
+texto. No es necesario distribuir los Markdown junto al DOCX o PDF: sus referencias pasan
+a ser internas; sólo los enlaces web conservan una URL absoluta. Mermaid se limita a producir
+la figura y no usa `click`, porque el hipervínculo dejaría de ser uniforme al renderizar el
+bloque como imagen para DOCX o PDF.
 
 Para DOCX, el exportador materializa la tabla de contenido y el índice de imágenes como
 navegación interna a partir de los títulos y leyendas del paquete. No delega esa tarea a
 campos de Word pendientes de actualización, porque además de mostrar un aviso al abrir el
 archivo esos campos no contienen un resultado calculado por Pandoc. En PDF se conservan
 los índices nativos de Pandoc, que el motor de composición resuelve durante la exportación.
+Todas las figuras de un paquete reciben una leyenda correlativa `Figura N. …`, incluida en
+el índice y asociada a la misma referencia interna que la imagen. La numeración se materializa
+durante cada exportación, en vez de depender de campos `SEQ` de Word, para que DOCX y PDF
+publiquen el mismo número y para que los paquetes generados sin Microsoft Word sean completos.
 
 Las anclas explícitas que preceden a un encabezado se preparan como un bloque independiente.
 La separación evita que Pandoc interprete el encabezado y su atributo interno como texto visible;
