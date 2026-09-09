@@ -480,7 +480,9 @@ Playwright y Chromium se preparan automáticamente en el mismo entorno antes de 
    ```
 
    Si Nexus ya se administra por separado, el comando reutiliza esa instancia y no la detiene.
-   `DOCS_CAPTURE_IDS` permite ejecutar sólo las capturas seleccionadas con el mismo flujo.
+   `DOCS_CAPTURE_IDS` permite ejecutar sólo las capturas seleccionadas con el mismo flujo. Si una
+   ejecución completa se interrumpe, `DOCS_CAPTURE_FROM=CAP-*` reanuda el inventario desde ese
+   identificador y conserva las imágenes anteriores. No combine ambas variables.
 
    No interrumpa el comando: primero elimina `docs/user-manual/images/` y después genera el juego
    completo.
@@ -513,7 +515,9 @@ Playwright y Chromium se preparan automáticamente en el mismo entorno antes de 
    npm run docs:export -- manual-usuario docx
    ```
 
-Si la comprobación del paso 3 responde `ERR_CONNECTION_REFUSED`, confirme que Nexus siga activo y
+El límite de 30 segundos de Playwright es el tiempo máximo para que una condición de la página se
+cumpla, no una pausa que el proceso deba consumir en cada captura. Si la comprobación del paso 3
+responde `ERR_CONNECTION_REFUSED`, confirme que Nexus siga activo y
 que la URL use el puerto anunciado. Si la captura falla esperando el botón **Nueva salida** de
 salidas de merma, compruebe que la cuenta tenga `waste:issues-manage`; el acceso al listado por sí
 solo no sustituye el permiso de administración. Si falla esperando `.btn-return-detail`, compruebe
@@ -521,8 +525,9 @@ el permiso de surtimiento y que exista una salida aprobada, completamente surtid
 retornable. El script espera a que DataTables termine de cargar y recorre todas las páginas del
 listado para localizar la acción requerida. Las líneas `Paso N/T`
 son acciones preparatorias, no capturas duplicadas. Después de corregir los datos puede definir
-`DOCS_CAPTURE_IDS=CAP-SAL-WAS-05-RETURN` para regenerar sólo la captura fallida y conservar las
-demás imágenes.
+`DOCS_CAPTURE_IDS=CAP-SAL-WAS-05-RETURN` para regenerar sólo la captura fallida, o
+`DOCS_CAPTURE_FROM=CAP-SAL-WAS-05-RETURN` para continuar con ella y todas las posteriores; ambos
+mecanismos conservan las demás imágenes.
 
 ### Ejemplos de exportación
 
