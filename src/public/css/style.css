@@ -118,6 +118,11 @@
 body {
   --mdb-body-color: #332D2D;
   --mdb-body-bg: #ffffff;
+  text-align: justify;
+}
+
+table {
+  text-align: left;
 }
 
 /* tooltip styles */
