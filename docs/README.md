@@ -248,9 +248,15 @@ no sustituyen la instalación requerida por este proyecto. `npm run docs:export`
    Instálalo en el mismo sistema donde se ejecutará Pandoc:
 
    - **Windows:** XeLaTeX se instala **en Windows, no dentro de este repositorio, npm, VS Code ni
-     Playwright**. Descarga el instalador oficial
-     [`install-tl-windows.exe`](https://mirror.ctan.org/systems/texlive/tlnet/install-tl-windows.exe),
-     ejecútalo y conserva una
+     Playwright**. Descarga el instalador desde la
+     [página oficial de instalación por red de TeX Live](https://www.tug.org/texlive/acquire-netinstall.html)
+     o usa su enlace directo oficial:
+     [`install-tl-windows.exe`](https://mirror.ctan.org/systems/texlive/tlnet/install-tl-windows.exe).
+     Microsoft Edge puede mostrar “no se descarga habitualmente” porque el archivo tiene pocas
+     descargas registradas; ese aviso, por sí solo, no confirma que el archivo sea malicioso. Antes
+     de abrirlo, comprueba que la dirección de descarga sea exactamente `https://mirror.ctan.org/`
+     y no continúes si llegó desde otro dominio, por correo o mediante un anuncio. También puedes
+     analizar el archivo con Microsoft Defender. Después, ejecútalo y conserva una
      instalación de TeX Live que incluya XeLaTeX. El instalador crea una carpeta del sistema como
      `C:\texlive\<versión>\` y agrega su subcarpeta `bin\windows` a `PATH`; no copies esos archivos
      dentro de `SistemaMerma`. Al terminar, cierra **todas** las terminales de VS Code, abre una
@@ -261,6 +267,22 @@ no sustituyen la instalación requerida por este proyecto. `npm run docs:export`
      `sudo`, solicita la instalación al administrador del equipo.
    - **macOS:** descarga e instala [MacTeX](https://tug.org/mactex/mactex-download.html) y vuelve a
      abrir la terminal.
+
+   En Windows, XeLaTeX, pdfLaTeX y LuaLaTeX no se descargan como tres aplicaciones separadas: los
+   tres forman parte de una distribución TeX. Estos son los enlaces que corresponden a cada motor
+   admitido en esta guía:
+
+   | Motor para `DOCS_PDF_ENGINE` | Descarga para Windows | Comprobación |
+   | --- | --- | --- |
+   | `xelatex` (recomendado) | [TeX Live: `install-tl-windows.exe`](https://mirror.ctan.org/systems/texlive/tlnet/install-tl-windows.exe) | `xelatex --version` |
+   | `pdflatex` | [TeX Live: `install-tl-windows.exe`](https://mirror.ctan.org/systems/texlive/tlnet/install-tl-windows.exe) | `pdflatex --version` |
+   | `lualatex` | [TeX Live: `install-tl-windows.exe`](https://mirror.ctan.org/systems/texlive/tlnet/install-tl-windows.exe) | `lualatex --version` |
+   | `tectonic` | [Publicaciones oficiales de Tectonic](https://github.com/tectonic-typesetting/tectonic/releases/latest) (descarga el archivo para `x86_64-pc-windows-msvc`) | `tectonic --version` |
+
+   Instala sólo uno de estos motores para exportar PDF. Una instalación de TeX Live sirve para las
+   tres primeras opciones, por lo que no debes ejecutar el mismo instalador tres veces. Los enlaces
+   pasan por sitios oficiales y pueden redirigir a un espejo o al archivo de la versión vigente;
+   evita copias publicadas en páginas de terceros.
 
    Si la estación ya tiene otro motor admitido por Pandoc, puede reutilizarlo: no es obligatorio
    instalar XeLaTeX. Por ejemplo, una instalación existente de
