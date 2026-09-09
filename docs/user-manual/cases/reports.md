@@ -15,7 +15,7 @@ Cada procedimiento identifica sus casos de uso, controles, errores posibles y ca
 
 **Controles que debe usar:** Buscador **Buscar por Material, Proveedor o Folio**; filtros **Fecha de inicio:**, **Fecha de fin:**, **Tipo de movimiento:**, **Proveedor:** y **Material:**; botones **Buscar / filtrar**, **Limpiar filtros** y **Exportar Excel**.
 
-1. Antes de usar los controles, compruebe que la pantalla inicial coincida con la captura:
+1. Abra **Filtros** y compruebe que los controles desplegados coincidan con la captura:
 
    ![CAP-REP-MOV-MAT-01-LIST: historial y filtros](../images/movimientos-material/01-historial-y-filtros.png)
 
@@ -52,7 +52,7 @@ Cada procedimiento identifica sus casos de uso, controles, errores posibles y ca
 
 **Controles que debe usar:** Buscador **Buscar por Material, Proveedor o Folio**; filtros **Fecha de inicio:**, **Fecha de fin:**, **Tipo de movimiento:**, **Proveedor:** y **Merma:**; botones **Buscar / filtrar**, **Limpiar filtros** y **Exportar Excel**.
 
-1. Antes de usar los controles, compruebe que la pantalla inicial coincida con la captura:
+1. Abra **Filtros** y compruebe que los controles desplegados coincidan con la captura:
 
    ![CAP-REP-MOV-WAS-01-LIST: historial y filtros](../images/movimientos-merma/01-historial-y-filtros.png)
 
