@@ -30,7 +30,7 @@ consulta. Abrir o editar el encabezado no cambia esos estados.
 
 **Controles que debe usar:** Buscador **Buscar por Folio o N° Factura**; filtros **Fecha de inicio:**, **Fecha de fin:**, **Proveedor:** y **Persona que recibe:**; botones **Buscar / filtrar**, **Limpiar filtros**, **Exportar Excel** y **Nueva compra**; acción **Editar registro** por fila.
 
-1. Antes de usar los controles, compruebe que la pantalla inicial coincida con la captura:
+1. Abra **Filtros** y compruebe que los controles desplegados coincidan con la captura:
 
    ![CAP-ENT-01-LIST: listado](../images/compras/01-listado.png)
 
