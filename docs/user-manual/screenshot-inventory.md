@@ -172,16 +172,36 @@ Remove-Item Env:DOCS_CAPTURE_IDS
 DOCS_CAPTURE_IDS=CAP-SAL-WAS-05-RETURN npm run docs:screenshots
 ```
 
+Si una ejecución completa se interrumpe, `DOCS_CAPTURE_FROM` permite continuar desde la captura
+fallida y generar todas las siguientes sin eliminar las imágenes anteriores:
+
+```powershell
+# PowerShell
+$env:DOCS_CAPTURE_FROM = 'CAP-SAL-WAS-00-NAVIGATION'
+npm run docs:screenshots
+Remove-Item Env:DOCS_CAPTURE_FROM
+```
+
+```bash
+# Bash
+DOCS_CAPTURE_FROM=CAP-SAL-WAS-00-NAVIGATION npm run docs:screenshots
+```
+
+Use `DOCS_CAPTURE_IDS` para capturas aisladas o `DOCS_CAPTURE_FROM` para el resto del inventario;
+no defina ambos en la misma ejecución.
+
 `npm run docs:screenshots` también comprueba, inicia y detiene una instancia local de Nexus. El
 flujo reutiliza una instancia que ya responda en `DOCS_BASE_URL` y sólo detiene la que haya iniciado
-él mismo; la selección mediante `DOCS_CAPTURE_IDS` permanece a cargo del mismo inventario.
+él mismo; la selección o reanudación mediante `DOCS_CAPTURE_IDS` o `DOCS_CAPTURE_FROM` permanece a
+cargo del mismo inventario.
 
 ## Revisión antes de publicar
 
 Cada ejecución completa elimina `docs/user-manual/images/` después de validar la configuración y
 antes de abrir el navegador. Así se retiran archivos obsoletos, incluso si ya no figuran en el
 inventario. Una ejecución selectiva con `DOCS_CAPTURE_IDS` elimina y sustituye sólo los PNG
-solicitados; si falla, las demás capturas se conservan. La opción `--list` es sólo de consulta y no
+solicitados; una reanudación con `DOCS_CAPTURE_FROM` hace lo mismo con la captura indicada y las
+posteriores. Si falla, las demás capturas se conservan. La opción `--list` es sólo de consulta y no
 elimina archivos.
 
 Después de ejecutar `npm run docs:screenshots`, se debe comprobar que los datos sean ficticios,
