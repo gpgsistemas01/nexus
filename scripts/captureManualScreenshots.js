@@ -10,6 +10,7 @@ const requestedCaptureIds = (process.env.DOCS_CAPTURE_IDS ?? '')
     .split(',')
     .map(id => id.trim())
     .filter(Boolean);
+const requestedCaptureFrom = process.env.DOCS_CAPTURE_FROM?.trim();
 const outputRoot = path.resolve('docs/user-manual/images');
 const screenshotDelay = 1500;
 
@@ -109,6 +110,18 @@ const validateInventory = () => {
 };
 
 const selectCaptures = () => {
+    if (requestedCaptureIds.length && requestedCaptureFrom) {
+        throw new Error('Use DOCS_CAPTURE_IDS o DOCS_CAPTURE_FROM, no ambos mecanismos.');
+    }
+
+    if (requestedCaptureFrom) {
+        const startIndex = captures.findIndex(capture => capture.id === requestedCaptureFrom);
+        if (startIndex === -1) {
+            throw new Error(`DOCS_CAPTURE_FROM contiene un identificador desconocido: ${ requestedCaptureFrom }`);
+        }
+        return captures.slice(startIndex);
+    }
+
     if (!requestedCaptureIds.length) return captures;
 
     const capturesById = new Map(captures.map(capture => [capture.id, capture]));
@@ -125,14 +138,14 @@ const waitForDataTableReady = async (page) => {
         const table = globalThis.$?.('#table');
         if (!table || !globalThis.$.fn.DataTable.isDataTable(table)) return false;
 
-        const settings = table.DataTable().settings()[0];
-        return settings.iDraw > 0 && !settings.bDrawing;
+        const dataTable = table.DataTable();
+        const settings = dataTable.settings()[0];
+        return dataTable.ajax.json() !== undefined && settings.iDraw > 0 && !settings.bDrawing;
     });
 };
 
 const findTriggerAcrossPages = async (page, selector) => {
     const visibleTrigger = page.locator(`${ selector }:visible`).first();
-    await page.locator('#table tbody tr').first().waitFor({ state: 'visible' });
 
     while (true) {
         if (await visibleTrigger.count()) return visibleTrigger;
@@ -207,7 +220,18 @@ const capturePage = async (page, capture) => {
     await mkdir(directory, { recursive: true });
     await page.goto(new URL(capture.route, baseURL).href, { waitUntil: 'domcontentloaded' });
     await page.locator(capture.ready).first().waitFor({ state: 'visible' });
-    if (capture.ready === '#table') await waitForDataTableReady(page);
+    if (capture.ready === '#table') {
+        try {
+            await waitForDataTableReady(page);
+        } catch (error) {
+            throw new Error(
+                `${ capture.id } no pudo cargarse: DataTables no terminó su consulta dentro del límite de Playwright. `
+                + `El límite no es una pausa obligatoria. Para reanudar desde esta captura, defina `
+                + `DOCS_CAPTURE_FROM=${ capture.id } y ejecute nuevamente npm run docs:screenshots.`,
+                { cause: error }
+            );
+        }
+    }
 
     const actions = capture.actions ?? (capture.action ? [capture.action] : []);
     for (const [index, action] of actions.entries()) {
@@ -257,7 +281,7 @@ if (protectedCaptures.length && !storageState && !loginName) {
     throw new Error('Defina DOCS_LOGIN_NAME y DOCS_LOGIN_PASSWORD, o proporcione DOCS_STORAGE_STATE, para generar las capturas protegidas.');
 }
 
-if (requestedCaptureIds.length) {
+if (requestedCaptureIds.length || requestedCaptureFrom) {
     await Promise.all(selectedCaptures.map(capture => rm(
         path.join(outputRoot, capture.module, capture.name),
         { force: true }
