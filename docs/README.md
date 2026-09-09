@@ -238,8 +238,14 @@ no sustituyen la instalación requerida por este proyecto. `npm run docs:export`
    convierte diagramas nuevos o modificados. Para forzar su regeneración completa, elimina
    `build/docs/diagrams/` antes de exportar.
 4. DOCX no requiere otra herramienta. Para PDF, Pandoc necesita un programa que componga
-   el PDF desde la terminal; Adobe Acrobat o Adobe Reader sirven para abrir el resultado, pero no
-   realizan esa composición para este script. [Pandoc documenta los motores admitidos por
+   el PDF desde la terminal. El flujo automatizado tiene dos etapas: Pandoc transforma los archivos
+   Markdown en un documento intermedio y el motor convierte ese contenido, las tipografías y la
+   distribución de cada página en el PDF final. Pandoc no realiza por sí solo esa segunda etapa.
+
+   Adobe Reader sólo visualiza el PDF ya terminado. Adobe Acrobat puede crear o editar archivos
+   PDF mediante sus propias funciones, pero no es un motor aceptado por la opción `--pdf-engine` de
+   Pandoc ni lo invoca `npm run docs:export`. Por eso tener Acrobat instalado no proporciona el
+   ejecutable que este flujo automatizado necesita. [Pandoc documenta los motores admitidos por
    `--pdf-engine`](https://pandoc.org/MANUAL.html#option--pdf-engine). **[XeLaTeX](https://tug.org/xetex/)
    no es el único motor compatible**: es la
    opción recomendada por el proyecto porque maneja Unicode y texto en español directamente, está
@@ -283,6 +289,12 @@ no sustituyen la instalación requerida por este proyecto. `npm run docs:export`
    tres primeras opciones, por lo que no debes ejecutar el mismo instalador tres veces. Los enlaces
    pasan por sitios oficiales y pueden redirigir a un espejo o al archivo de la versión vigente;
    evita copias publicadas en páginas de terceros.
+
+   Si no quieres instalar un motor, genera el archivo editable con
+   `npm run docs:export -- <paquete> docx` y conviértelo manualmente a PDF con una aplicación que ya
+   tengas. Esa conversión queda fuera de `docs:export`: el proyecto no puede repetirla ni comprobar
+   que conserve los mismos saltos de página, tipografías, enlaces e índices. Para generar el PDF
+   directamente con el comando del proyecto sí es necesario configurar un motor.
 
    Si la estación ya tiene otro motor admitido por Pandoc, puede reutilizarlo: no es obligatorio
    instalar XeLaTeX. Por ejemplo, una instalación existente de
