@@ -172,12 +172,13 @@ const addInternalAnchors = (content, source) => {
     return `[]{#${documentAnchor(source)}}\n\n${anchoredHeadings}`;
 };
 
-const addFigureAnchors = (content, source) => {
-    let figureIndex = 0;
+const addFigureAnchors = (content, source, firstFigureNumber) => {
+    let figureNumber = firstFigureNumber;
     return content.replace(
-        /^(\s*)(!\[[^\]]+\]\([^)]+\))$/gm,
-        (figure, indentation, image) => (
-            `${indentation}${image}{#${documentAnchor(source, `figura-${++figureIndex}`)}}`
+        /^(\s*)(!\[([^\]]+)\]\([^)]+\))$/gm,
+        (figure, indentation, image, title) => (
+            `${indentation}${image.replace(`![${title}]`, `![Figura ${figureNumber}. ${title}]`)}`
+            + `{#${documentAnchor(source, `figura-${figureNumber++}`)}}`
         )
     );
 };
@@ -326,7 +327,7 @@ await Promise.all([
 ]);
 const mermaidExecutable = path.join(ROOT, 'node_modules', '@mermaid-js', 'mermaid-cli', 'src', 'cli.js');
 
-const prepareSource = async (source, publicationSources) => {
+const prepareSource = async (source, publicationSources, firstFigureNumber) => {
     const content = await readFile(path.join(ROOT, source), 'utf8');
     const blocks = [...content.matchAll(mermaidBlock)];
 
@@ -359,9 +360,13 @@ const prepareSource = async (source, publicationSources) => {
         }
         renderedContent = renderedContent.replace(match[0], `![${diagramCaption(content, match.index)}](${image})`);
     }
-    renderedContent = addFigureAnchors(renderedContent, source);
+    renderedContent = addFigureAnchors(renderedContent, source, firstFigureNumber);
     await writeFile(renderedSource, renderedContent);
-    return renderedSource;
+    return {
+        renderedSource,
+        nextFigureNumber: firstFigureNumber
+            + [...renderedContent.matchAll(/^\s*!\[[^\]]+\]\([^)]+\)\{#[^}]+\}$/gm)].length
+    };
 };
 
 let failedStatus = 0;
@@ -371,13 +376,15 @@ try {
         await rm(output, { force: true });
         const preparedSources = [];
         const publicationSources = new Set(sources);
+        let nextFigureNumber = 1;
         for (const source of sources) {
-            const preparedSource = await prepareSource(source, publicationSources);
-            if (!preparedSource) {
+            const prepared = await prepareSource(source, publicationSources, nextFigureNumber);
+            if (!prepared) {
                 failedStatus = 1;
                 break;
             }
-            preparedSources.push(preparedSource);
+            preparedSources.push(prepared.renderedSource);
+            nextFigureNumber = prepared.nextFigureNumber;
         }
         if (failedStatus) break;
 
@@ -392,7 +399,6 @@ try {
         const args = [
             ...scopedSources,
             '--from=markdown+header_attributes+implicit_figures',
-            '--file-scope',
             '--standalone',
             '--metadata=lang:es-MX',
             `--output=${output}`,
