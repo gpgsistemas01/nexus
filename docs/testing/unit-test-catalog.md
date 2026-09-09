@@ -16,20 +16,20 @@ un archivo de prueba, se actualizan conjuntamente este catálogo y ese registro.
 La referencia estable de la ejecución completa es **`SU-UNIT-001` — Suite unitaria de
 Nexus**. El término *suite* designa aquí el conjunto seleccionado por Vitest; cada
 `*Test.js` es un archivo de prueba y cada `it` o fila materializada por `it.each` es un
-caso. Esta distinción evita presentar los 70 archivos como si fueran 70 ejecuciones
+caso. Esta distinción evita presentar los 73 archivos como si fueran 73 ejecuciones
 independientes.
 
 | Campo | Definición de `SU-UNIT-001` |
 | --- | --- |
 | Objetivo | Detectar regresiones en reglas, transformaciones, decisiones, contratos entre capas y efectos observables que pueden aislarse de infraestructura real. |
-| Elemento bajo prueba | Módulos de servidor y navegador localizados por los 70 archivos de prueba inventariados en este documento. |
+| Elemento bajo prueba | Módulos de servidor y navegador localizados por los 73 archivos de prueba inventariados en este documento. |
 | Orquestador | Script `test:unit` de `package.json`, con selección y exclusiones definidas en `vitestConfig.js`. |
 | Precondiciones | Dependencias instaladas mediante `npm ci`, runtime admitido y ejecución desde la raíz. No requiere servidor, navegador, Redis ni PostgreSQL activos. |
 | Preparación | Cada archivo construye fixtures y dobles locales; los hooks `beforeEach`/`afterEach` restablecen mocks o globals cuando corresponde. |
 | Ejecución | Vitest importa los archivos seleccionados, materializa los casos parametrizados y ejecuta los archivos con el aislamiento propio del runner. |
 | Criterio de aprobación | Todos los archivos y casos descubiertos terminan aprobados, ninguno queda fallido y no existe un error del runner. Una advertencia o desviación ambiental se conserva en el registro y se resuelve antes de usar la corrida como validación del runtime admitido. |
 | Criterio de bloqueo | Fallo al instalar/importar, runtime no disponible o dependencia ambiental inesperada que impida ejecutar los casos; se informa como bloqueado, no como aprobado. |
-| Resultado producido | Resumen de archivos/casos aprobados, fallidos u omitidos, duración y código de salida. La última evidencia se conserva en `unit-test-results.md`. |
+| Resultado producido | Resumen de archivos/casos aprobados, fallidos u omitidos, duración y código de salida. La última evidencia se conserva en el [registro de resultados unitarios](unit-test-results.md). |
 | Fuera de alcance | Persistencia real, migraciones, contrato HTTP con servicios reales, renderizado en navegador y pruebas manuales; corresponden a integración, esquema o validación manual. |
 
 La suite completa se referencia por `SU-UNIT-001` en resultados y solicitudes de
@@ -90,11 +90,11 @@ declaran expresamente.
 | `SU-UNIT-001-G10` Interfaz cliente | `tests/unit/public/js/ui/**/*Test.js` (5) | Estado de formularios, totales, modal/selector de inventario y permisos de edición de salidas según estado. | Stubs del DOM, tablas de estado y verificación de propiedades/callbacks observables. |
 | `SU-UNIT-001-G11` Utilidades y validadores cliente | `tests/unit/public/js/utils/**/*Test.js` (5) | Colecciones de detalles, operaciones DOM y validaciones de recepción, material y merma. | Funciones puras o DOM mínimo; equivalencias, fronteras y entradas ausentes. |
 | `SU-UNIT-001-G12` Rutas | `tests/unit/routes/api/warehouse/*Test.js` y `tests/unit/routes/web/warehouse/*Test.js` (3) | Orden de middleware, autorización y enlace de controllers para merma y salida de merma. | Router aislado, spies y decisiones de acceso positivas/negativas. |
-| `SU-UNIT-001-G13` Servicios | `tests/unit/services/**/*Test.js` (9) | Identidad y consulta de movimientos, factura de recepción, relación proveedor-material, reportes, listado/material/snapshot de merma. | Prisma y colaboradores simulados; fronteras, errores, argumentos y ausencia de colaboración inválida. |
-| `SU-UNIT-001-G14` Utilidades de servidor | `tests/unit/utils/*Test.js` (4) | Formato, exportación Excel, query/paginación e identidad canónica del inventario. | Funciones puras, tablas de entrada, colecciones vacías y valores frontera. |
-| `SU-UNIT-001-G15` Validadores de servidor | `tests/unit/validators/*Test.js` (3) | Precisión decimal, cantidad de devolución y obligatoriedad de campos. | Clases de equivalencia y análisis de límites con casos aceptados y rechazados. |
+| `SU-UNIT-001-G13` Servicios | `tests/unit/services/**/*Test.js` (10) | Identidad y consulta de movimientos, detalles de salidas, factura de recepción, relación proveedor-material, reportes, listado/material/snapshot de merma. | Prisma y colaboradores simulados; fronteras, errores, argumentos y ausencia de colaboración inválida. |
+| `SU-UNIT-001-G14` Utilidades de servidor | `tests/unit/utils/*Test.js` (5) | Formato, exportación Excel, query/paginación, relaciones de selección e identidad canónica del inventario. | Funciones puras, tablas de entrada, colecciones vacías y valores frontera. |
+| `SU-UNIT-001-G15` Validadores de servidor | `tests/unit/validators/*Test.js` (4) | Precisión decimal, detalles de compra, cantidad de devolución y obligatoriedad de campos. | Clases de equivalencia y análisis de límites con casos aceptados y rechazados. |
 
-La suite contiene **70 archivos de prueba**. El número de casos puede cambiar cuando se
+La suite contiene **73 archivos de prueba**. El número de casos puede cambiar cuando se
 amplían tablas parametrizadas; el conteo efectivo y su estado se toman siempre de la
 ejecución de Vitest registrada, no de una suma manual de llamadas a `it`.
 
@@ -105,7 +105,7 @@ explícita su correspondencia con el formato del [plan de pruebas](test-plan.md)
 grupo recibe un ID `DP-UNIT-GNN`; sus casos son los `it` y las filas de `it.each` de los
 archivos indicados, identificados documentalmente como `CP-UNIT-GNN-*`. El asterisco no
 es un caso genérico: remite al nombre completo que Vitest materializa como evidencia
-ejecutable y evita mantener una segunda copia de los 280 nombres.
+ejecutable y evita mantener una segunda copia de los 295 nombres.
 
 Todos los casos comparten las precondiciones, el ambiente y la limpieza de la ficha
 `SU-UNIT-001`. La siguiente tabla agrega los datos variables y el resultado esperado de
@@ -132,8 +132,8 @@ otro antes de registrar su ejecución.
 
 La acción reproducible de cada `CP-UNIT-*` es la invocación descrita por su nombre
 `it`; el detalle de fixtures permanece junto a esa invocación. El registro de ejecución
-vigente es `SU-UNIT-001` en `unit-test-results.md`, que conserva revisión, ambiente,
-fecha, conteos, resultado real y observaciones.
+vigente es `SU-UNIT-001` en el [registro de resultados unitarios](unit-test-results.md),
+que conserva revisión, ambiente, fecha, conteos, resultado real y observaciones.
 
 ## Diagrama de identificación de lo probado
 
@@ -170,7 +170,7 @@ flowchart TB
 ```
 
 **Propósito:** identificar qué debe comprobar la suite y ubicar su ficha de diseño.
-**Alcance:** los 15 grupos y 70 archivos seleccionados por `vitestConfig.js`.
+**Alcance:** los 15 grupos y 73 archivos seleccionados por `vitestConfig.js`.
 **Fuente:** tabla de grupos, archivos `tests/unit/**/*Test.js` y configuración de
 Vitest. **Límite:** muestra cobertura estructural documentada, no porcentaje de código,
 persistencia real, navegador real ni integración entre capas.
