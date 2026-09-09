@@ -6,6 +6,11 @@ Cada procedimiento identifica sus casos de uso, controles, errores posibles y ca
 
 **Propósito.** Consultar, registrar, editar y corregir compras, además de delimitar reportes.
 
+**Ruta en el menú:** **Menú principal → Compras**.
+
+<a id="CAP-ENT-00-NAVIGATION"></a>
+![CAP-ENT-00-NAVIGATION: acceso a compras desde el menú principal](../images/compras/00-acceso-menu-principal.png)
+
 **Campos por modo del formulario.** En **alta** se editan tipo y número de comprobante, proveedor,
 persona que recibe, fecha de recepción, observaciones y los nuevos renglones de material. En
 **edición** se conservan editables el comprobante, persona que recibe, fecha, observaciones y la

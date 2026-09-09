@@ -6,6 +6,11 @@ Cada procedimiento identifica sus casos de uso, controles, errores posibles y ca
 
 **Propósito.** Consultar el historial, aplicar filtros y delimitar su reporte.
 
+**Ruta en el menú:** **Menú principal → Movimientos → Materiales**.
+
+<a id="CAP-REP-MOV-MAT-00-NAVIGATION"></a>
+![CAP-REP-MOV-MAT-00-NAVIGATION: acceso a movimientos de material desde el menú principal](../images/movimientos-material/00-acceso-menu-principal.png)
+
 <a id="CAP-REP-MOV-MAT-01-LIST"></a>
 ### CAP-REP-MOV-MAT-01-LIST — Historial y filtros
 
@@ -42,6 +47,11 @@ Cada procedimiento identifica sus casos de uso, controles, errores posibles y ca
 ## Movimientos de merma
 
 **Propósito.** Consultar el historial, aplicar filtros y delimitar su reporte.
+
+**Ruta en el menú:** **Menú principal → Movimientos → Mermas**.
+
+<a id="CAP-REP-MOV-WAS-00-NAVIGATION"></a>
+![CAP-REP-MOV-WAS-00-NAVIGATION: acceso a movimientos de merma desde el menú principal](../images/movimientos-merma/00-acceso-menu-principal.png)
 
 <a id="CAP-REP-MOV-WAS-01-LIST"></a>
 ### CAP-REP-MOV-WAS-01-LIST — Historial y filtros
