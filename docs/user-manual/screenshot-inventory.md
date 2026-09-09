@@ -126,7 +126,8 @@ Playwright. Por ejemplo,
 `.btn-return-detail` sólo aparece para una salida
 aprobada y completamente surtida; una salida pendiente o parcialmente surtida muestra
 `.btn-edit-detail` en su lugar. Este comportamiento es intencional: evita publicar una secuencia
-incompleta o incoherente. Para las capturas de devolución, la automatización cambia el filtro
+incompleta o incoherente. Para las capturas de surtido, la automatización selecciona directamente
+**Surtir detalle** después de acceder al módulo. Para las capturas de devolución, cambia el filtro
 predeterminado **Pendiente** a **Surtido**, selecciona **Buscar / filtrar**, espera que terminen la
 carga inicial y la actualización filtrada del listado, y sólo entonces busca `.btn-return-detail`,
 tanto en salidas de material como de merma. Este recorrido reutiliza el mismo envío de filtros de

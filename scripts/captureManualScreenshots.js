@@ -113,8 +113,7 @@ const waitForDataTableReady = async (page) => {
         if (!table || !globalThis.$.fn.DataTable.isDataTable(table)) return false;
 
         const settings = table.DataTable().settings()[0];
-        const requestFinished = !settings.jqXHR || settings.jqXHR.readyState === 4;
-        return settings.iDraw > 0 && !settings.bDrawing && requestFinished;
+        return settings.iDraw > 0 && !settings.bDrawing;
     });
 };
 
