@@ -37,7 +37,7 @@
     "docs:architecture": "node scripts/generateArchitectureDocs.js",
     "docs:check": "node scripts/generateArchitectureDocs.js --check",
     "docs:export": "node scripts/exportDocs.js",
-    "docs:screenshots": "node scripts/captureManualScreenshots.js",
+    "docs:screenshots": "node scripts/runManualScreenshotWorkflow.js",
     "db:migrate": "prisma migrate deploy && prisma generate",
     "db:generate": "prisma generate"
   },

@@ -108,6 +108,10 @@ LibreOffice ni Microsoft Word. Para PDF siempre delega la composición final a u
 adicional (`DOCS_PDF_ENGINE`); esa dependencia no puede eliminarse sin escoger otro
 conversor o publicar DOCX en su lugar.
 
+`docs:screenshots` coordina el generador con una instancia local de Nexus: comprueba si ya responde,
+la inicia y espera cuando hace falta, y al terminar detiene sólo el proceso que creó. No cambia el
+inventario ni convierte la captura en parte de la exportación documental.
+
 ## Versionado
 
 Sistema y documentación evolucionan de forma relacionada, pero no comparten número por fuerza:
