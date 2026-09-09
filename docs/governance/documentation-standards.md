@@ -67,7 +67,7 @@ Por tanto, las tablas de símbolos, firmas y bloques de código de las referenci
 [backend](../architecture/backend-technical-documentation.md) y
 [frontend](../architecture/frontend-technical-documentation.md) son una convención local
 alineada selectivamente con 1016. Las fichas actuales del
-[contrato API](../data/api-contract.md) preparan la migración incremental a OpenAPI. No
+[contrato API](../architecture/api-contract.md) preparan la migración incremental a OpenAPI. No
 se atribuye a ninguna ISO una plantilla que la norma no proporciona.
 
 ISO 9001 o ISO/IEC 27001 sólo deben introducirse como requisitos documentales si la

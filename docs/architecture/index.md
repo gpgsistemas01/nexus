@@ -14,11 +14,13 @@ por capas** y una correspondencia de **MVC web extendido**.
    las capas.
 2. [Patrones de diseño y construcción](design-and-construction-patterns.md): definición,
    evidencia y reglas de aplicación de los patrones confirmados.
-3. [Diagramas vigentes del código](code-diagrams.md): superficie HTTP, dominios,
+3. [Contrato de la API](api-contract.md): transporte JSON, rutas, cuerpos, respuestas,
+   errores y validaciones observables.
+4. [Diagramas vigentes del código](code-diagrams.md): superficie HTTP, dominios,
    colaboraciones y reutilización observada.
-4. [Navegación y catálogo de pantallas web](web-navigation-and-screen-catalog.md): estados
+5. [Navegación y catálogo de pantallas web](web-navigation-and-screen-catalog.md): estados
    de acceso, mapa del menú, pantallas y redirecciones.
-5. [Mapa generado del código](../generated/code-map.md): rutas, dependencias reales entre
+6. [Mapa generado del código](../generated/code-map.md): rutas, dependencias reales entre
    áreas y exportaciones detectadas automáticamente.
 
 ## Vistas y responsabilidades
@@ -28,6 +30,7 @@ por capas** y una correspondencia de **MVC web extendido**.
 | ¿Quién usa Nexus y de qué sistemas externos depende? | Contexto en la descripción de arquitectura. | Curado cuando cambia el límite del sistema. |
 | ¿Dónde se ejecutan cliente, servidor y persistencia? | Contenedores y despliegue en la descripción de arquitectura. | Curado cuando cambia la topología. |
 | ¿Cuál es el patrón arquitectónico y cómo se dividen las responsabilidades? | Componentes y organización por capas en la descripción; catálogo de patrones para la justificación. | Curado cuando cambia una decisión de diseño. |
+| ¿Qué datos recibe y devuelve una ruta HTTP? | [Contrato de la API](api-contract.md). | Curado junto con rutas, validadores, DTO, controladores y pruebas HTTP. |
 | ¿Qué dependencias existen realmente en el código? | Mapa generado y diagramas vigentes del código. | `npm run docs:architecture` y revisión manual, respectivamente. |
 | ¿Cómo se ejecuta un caso de uso concreto? | Secuencias de código de [backend](backend-code-sequences/index.md) y [frontend](frontend-code-sequences/index.md), divididas por grupo funcional. | Curado junto con el caso afectado. |
 | ¿Por qué se eligió una alternativa arquitectónica transversal? | [Registros de decisiones](decisions/index.md). | Crear o reemplazar un ADR cuando cambie una decisión relevante. |

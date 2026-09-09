@@ -5,7 +5,7 @@
 Este documento aplica la [guía técnica común](technical-code-documentation.md) al código
 que se ejecuta en Node.js: `src/routes`, `src/middleware`, `src/controllers`, `src/dtos`,
 `src/services`, `src/repository` y Prisma. El contrato consumible de cada endpoint
-permanece en el [contrato API](../data/api-contract.md); aquí se explican nombres,
+permanece en el [contrato API](api-contract.md); aquí se explican nombres,
 responsabilidades, colaboraciones y límites transaccionales de la implementación.
 
 ## Cómo documentar controladores y servicios

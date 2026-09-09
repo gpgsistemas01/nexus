@@ -6,7 +6,7 @@ Este documento aplica la [guía técnica común](technical-code-documentation.md
 que se ejecuta en el navegador y a su composición EJS: `src/public/js`,
 `src/views/pages` y `src/views/shared`. El [documento de backend](backend-technical-documentation.md)
 conserva rutas, controladores, servicios de dominio y persistencia. Una explicación de
-frontend enlaza el [contrato API](../data/api-contract.md), pero no vuelve a declarar
+frontend enlaza el [contrato API](api-contract.md), pero no vuelve a declarar
 permisos ni reglas de negocio que el servidor debe hacer cumplir.
 
 ## Capas documentales del navegador
@@ -67,7 +67,7 @@ La unidad de documentación es el **flujo funcional**, no un archivo aislado. Ca
 cubre todos sus módulos propietarios de servicio, aplicación, página y EJS; los símbolos
 compartidos aparecen después en una ficha transversal. De este modo no se presenta
 materiales como si fuera el único flujo documentado ni se repite una ficha idéntica por
-cada operación CRUD. Las rutas concretas se verifican en el [contrato API](../data/api-contract.md)
+cada operación CRUD. Las rutas concretas se verifican en el [contrato API](api-contract.md)
 y las páginas publicadas en el [mapa generado](../generated/code-map.md#rutas-web-16).
 
 ### Fichas de flujos funcionales

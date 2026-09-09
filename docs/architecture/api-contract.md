@@ -1,0 +1,478 @@
+# Contrato de la API
+
+Este documento es propietario del contrato HTTP y no de las reglas de negocio ni del
+esquema persistente. La relación con requisitos, diseño y evidencia se consulta en el
+[mapa de datos, persistencia y acceso](../data/index.md).
+
+## Cómo documentar una ruta API
+
+La documentación de una ruta combina información de varias capas, pero conserva una
+sola ficha contractual en esta familia. El [mapa generado](../generated/code-map.md)
+mantiene el inventario de métodos, URLs y archivos; una ficha se agrega aquí sólo cuando
+necesita explicar cómo consumir la operación. La explicación interna de nombres y
+colaboraciones se mantiene en la
+[documentación técnica del código](technical-code-documentation.md), sin
+copiar el contrato HTTP.
+
+### Alcance y nivel de cobertura
+
+Este artefacto es una referencia curada del comportamiento implementado, no una
+especificación OpenAPI completa ni un mecanismo de validación en tiempo de ejecución.
+El [mapa generado](../generated/code-map.md) es el inventario exhaustivo de
+métodos y rutas registradas. Este documento añade las reglas transversales, los cuerpos
+de escritura conocidos y las fichas que necesitan contexto; por tanto, que una ruta
+aparezca sólo en el mapa no significa que tenga documentados aquí todos sus parámetros,
+respuestas y errores.
+
+Cuando exista una diferencia, se comprueba primero el router registrado y después sus
+validadores, DTO, controller y pruebas de integración. La documentación se corrige para
+reflejar ese comportamiento o se cambia la implementación mediante una decisión aparte;
+el ejemplo de este documento nunca amplía por sí solo los campos que acepta el servidor.
+
+No se adopta una norma ISO como sustituto de una especificación de interfaz HTTP para
+Express. [ISO/IEC/IEEE 1016:2009](https://www.iso.org/standard/45144.html) puede orientar
+la descripción de interfaces dentro del diseño, pero **OpenAPI 3.1** es la referencia
+procesable prevista para métodos, parámetros, cuerpos, respuestas y seguridad. Esta
+distinción y el alcance adoptado se conservan en las
+[normas documentales](../governance/documentation-standards.md#decisión-para-documentación-técnica-y-rutas-api).
+
+Cada ficha de ruta debe indicar, cuando aplique:
+
+| Campo | Contenido verificable | Fuente que se revisa |
+| --- | --- | --- |
+| Identidad | Método HTTP, ruta completa y propósito observable. | `src/routes/api/index.js` y router del dominio. |
+| Acceso | Cookie de sesión, permiso requerido y respuestas `401` o `403`. | `authMiddleware.js`, `permissions.js` y router. |
+| Entrada | Parámetros de ruta, query, tipo de contenido y cuerpo aceptado. | Router, validadores y DTO. |
+| Salida correcta | Código HTTP, forma JSON o archivo y código estable de éxito. | Controller y prueba HTTP. |
+| Errores | Código HTTP, `code`, `message`, `meta` o `errors` que el consumidor puede interpretar. | Middleware, errores de dominio y manejador final. |
+| Efectos | Persistencia, movimiento, auditoría o evento que sea relevante para el consumidor. | Servicio y requisitos; no se infiere sólo desde el verbo HTTP. |
+| Evidencia | Prueba de integración que comprueba el contrato o brecha explícita del plan. | `tests/integration` y plan de pruebas. |
+
+No se documenta una respuesta supuesta a partir de convenciones generales. Por ejemplo,
+las creaciones vigentes no usan todas el mismo código HTTP: la ficha debe registrar el
+`status` real del controller hasta que una decisión funcional cambie y pruebe el
+contrato.
+
+### Alcance de exportación de inventarios
+
+`GET /api/warehouse/reports/inventory/excel` y
+`GET /api/warehouse/reports/wastes/excel` aceptan el parámetro query opcional
+`inventoryScope`. Sus valores contractuales son:
+
+| Valor | Registros incluidos |
+| --- | --- |
+| `activeOrStock` | Activos o con existencia distinta de cero; es el valor predeterminado. |
+| `active` | Sólo registros activos. |
+| `inStock` | Sólo registros con existencia distinta de cero. |
+
+El alcance se combina con la búsqueda, proveedor y orden aplicables al listado. Un valor ausente o
+desconocido conserva `activeOrStock` para no excluir existencias que ya formaban parte del reporte.
+La respuesta correcta sigue siendo el archivo Excel del endpoint; el modal es interfaz cliente y
+no cambia el método HTTP.
+
+### Prefijo, montaje y orden de middleware
+
+`registerApiRoutes` monta los routers declarados en `API_ROUTES` bajo `/api`. Por ello,
+la URL contractual se obtiene uniendo `/api`, el prefijo del dominio y el path local del
+router. Un `router.patch('/:id/stock', ...)` montado en `/warehouse/materials` se publica
+como `PATCH /api/warehouse/materials/:id/stock`.
+
+Para rutas privadas con cuerpo JSON se conserva este recorrido:
+
+```mermaid
+sequenceDiagram
+    actor Client as Cliente web
+    participant App as app.js
+    participant Auth as verifyApiTokenRequired
+    participant Rules as Validadores + validate
+    participant Access as authorizeUserApi
+    participant Handler as Controller
+    participant Errors as Manejador de error
+
+    Client->>App: método /api/... + cookie accessToken
+    App->>App: express.json + checkTypeContentJson
+    App->>Auth: verificar firma y vigencia
+    Auth->>Rules: req.userId
+    Rules->>Access: entrada validada
+    Access->>Handler: req.user con accesos y permisos
+    Handler-->>Client: respuesta contractual
+    Handler-->>Errors: AppError o error no controlado
+    Errors-->>Client: error JSON
+```
+
+El orden concreto se lee de izquierda a derecha en cada declaración del router. La
+autenticación suele preceder la validación y la autorización; las excepciones públicas,
+como inicio o renovación de sesión, se documentan expresamente y no se fuerzan a usar
+middleware que contradiga su propósito. Un cambio de orden puede modificar qué error
+observa el consumidor, por lo que se revisa como parte del contrato.
+
+### Reglas transversales vigentes
+
+#### Tipo de contenido
+
+- `express.json()` analiza las peticiones bajo `/api`.
+- `checkTypeContentJson` permite `GET`, peticiones sin cuerpo y cuerpos vacíos; cuando
+  existe un cuerpo exige que `Content-Type` incluya `application/json`.
+- Un tipo incompatible responde `415` con
+  `{ "code": "INVALID_CONTENT_TYPE", "contentType": "application/json" }`.
+- Las rutas `/upload` y `/text` tienen validadores separados para
+  `multipart/form-data` y `text/plain`; no se asume que pertenecen al contrato JSON.
+
+#### JSON como medio de transporte
+
+JSON (*JavaScript Object Notation*) es un formato textual para representar objetos,
+arreglos, strings, números, booleanos y `null`. Un archivo con extensión `.json` puede
+guardar o intercambiar esos datos entre programas; en una API HTTP, la misma estructura
+se transporta normalmente en el cuerpo de la petición o de la respuesta y no requiere
+que exista un archivo físico. JSON define la representación de los datos, mientras que
+la API define las rutas, métodos, permisos y efectos disponibles para intercambiarlos.
+
+En Nexus, el consumidor serializa el objeto como JSON, envía
+`Content-Type: application/json` y conserva los nombres de campo indicados por el
+contrato. Los comentarios, las comas finales y los valores JavaScript `undefined`,
+`NaN` o `Infinity` no forman parte de JSON válido. Los parámetros de ruta, como `:id`,
+y los parámetros query viajan en la URL, no se repiten dentro del cuerpo salvo que la
+ficha de la operación lo indique.
+
+Las respuestas ordinarias usan JSON, excepto las descargas, que devuelven un archivo, y
+la renovación correcta de sesión, que actualmente responde `200` con el texto `OK` por
+medio de `sendStatus(200)`. Las credenciales no se colocan en la URL: el inicio de
+sesión recibe la contraseña en el cuerpo y los tokens posteriores viajan en cookies
+`httpOnly`. El consumidor web actual opera en el mismo origen; una integración desde
+otro origen no debe asumir CORS ni autenticación Bearer mientras la configuración del
+servidor no los declare.
+
+### Cuerpos JSON de las rutas de escritura
+
+La siguiente matriz documenta los datos que el cliente envía en las rutas registradas
+que reciben cuerpo. `:id` y `:detailId` se sustituyen en la URL. Los UUID y valores de
+los ejemplos son demostrativos; no identifican registros que necesariamente existan.
+Las reglas de presencia, formato y límites se consultan en la
+[matriz de validaciones por campo](#matriz-de-validaciones-por-campo).
+
+La columna **Estructura** usa una notación abreviada semejante a un esquema: por ejemplo,
+`{ name, password }` enumera propiedades, pero **no es JSON para copiar**, porque omite
+comillas y valores. Los bloques marcados como `json` en
+[Demostraciones de estructura](#demostraciones-de-estructura) sí son JSON válido. Se
+deben enviar sólo los campos de la operación; los DTO descartan campos adicionales en
+varios flujos, pero ese comportamiento no se considera una autorización para enviarlos
+y no es uniforme en toda la API.
+
+| Rutas | Estructura abreviada del cuerpo JSON |
+| --- | --- |
+| `POST /api/auth/login` | `{ name, password }` |
+| `POST /api/auth/refresh` | Sin cuerpo; utiliza la cookie de renovación. |
+| `POST /api/admin/persons`, `PUT /api/admin/persons/:id` | `{ fullName, accesses: [{ departmentId, roleId }] }` |
+| `POST /api/admin/users` | `{ name, password, personId, roleId, departmentId }` |
+| `PATCH /api/admin/users/:id` | `{ name, personId, roleId, departmentId }` |
+| `PATCH /api/admin/users/:id/password` | `{ password }` |
+| `POST /api/sales/clients`, `PUT /api/sales/clients/:id` | `{ name }` |
+| `POST /api/warehouse/suppliers`, `PUT /api/warehouse/suppliers/:id` | `{ legalName, tradeName, isActive }` |
+| `POST /api/warehouse/materials` | `{ name, supplierId, presentationId, unitMeasureId, base, height, minStock, maxUnitCost, isActive, newStock, observations }`; `base`, `height`, `minStock` y `observations` pueden omitirse conforme a sus reglas. |
+| `PATCH /api/warehouse/materials/:id` | `{ name, supplierId, minStock, maxUnitCost, isActive }`; `minStock` puede omitirse. |
+| `PATCH /api/warehouse/materials/:id/stock` | `{ supplierId, newStock, reasonId, observations }`; `observations` puede omitirse. |
+| `POST /api/warehouse/wastes` | `{ name, materialId, supplierId, base, height, minStock, maxUnitCost, isActive, newStock, observations }`; `minStock` y `observations` pueden omitirse. |
+| `PATCH /api/warehouse/wastes/:id` | `{ name, minStock, maxUnitCost, isActive }`; `minStock` puede omitirse. |
+| `PATCH /api/warehouse/wastes/:id/stock` | `{ newStock, reasonId, observations }`; `observations` puede omitirse. |
+| `POST /api/warehouse/goods-receipts` | `{ supplierId, receivedById, isInvoiced, invoice, receptionDate, observations, details: [{ materialId, quantity, costPerUnitType }] }`; `invoice` sólo se envía al facturar y `observations` puede omitirse. |
+| `PATCH /api/warehouse/goods-receipts/:id` | La estructura del alta; `details` puede omitirse y cada detalle existente puede incluir `id`. |
+| `PATCH /api/warehouse/goods-receipts/:id/details/:detailId/corrections` | `{ quantity, costPerUnitType }` |
+| Altas y ediciones completas de `/api/warehouse/goods-issues` | Encabezado `{ advisorId, clientId, departmentId, requesterId, projectNumber, requestDate, observations }` más `details: [{ materialId, supplierId, presentationId, quantity }]`; `observations` y `presentationId` pueden omitirse. En `PATCH /:id`, un detalle existente incluye `id`. |
+| Altas y ediciones completas de `/api/warehouse/waste-issues` | El mismo encabezado más `details: [{ wasteId, quantity }]`; `observations` puede omitirse. |
+| `PATCH /api/warehouse/{goods-issues,waste-issues}/:id/header` | Sólo el encabezado común anterior. |
+| `PATCH /api/warehouse/{goods-issues,waste-issues}/:id/details` | `{ details: [{ id, isSupplied, projectConvertedQuantity }] }` |
+| `PATCH /api/warehouse/{goods-issues,waste-issues}/:id/details/:detailId/returns` | `{ returnQuantity, observations }`; `observations` puede omitirse. |
+
+Las rutas `GET`, `DELETE /api/warehouse/materials/:id` y las cancelaciones de detalle
+no reciben cuerpo JSON. Sus filtros se envían como query y sus identificadores forman
+parte de la URL.
+
+#### Demostraciones de estructura
+
+Una petición simple de ajuste separa el identificador del material, que viaja en la
+URL, de los datos modificables, que viajan en el cuerpo:
+
+```http
+PATCH /api/warehouse/materials/550e8400-e29b-41d4-a716-446655440000/stock
+Content-Type: application/json
+```
+
+```json
+{
+  "supplierId": "9a7b3302-28a2-4af5-b53f-317be93ab56a",
+  "newStock": 125.5,
+  "reasonId": "5bb1f600-0fc8-4ace-9881-ef36ad37d197",
+  "observations": "Conteo físico de almacén"
+}
+```
+
+Una entrada de almacén demuestra un cuerpo compuesto con encabezado y una matriz de
+detalles:
+
+```json
+{
+  "supplierId": "9a7b3302-28a2-4af5-b53f-317be93ab56a",
+  "receivedById": "2a5553be-63f6-463d-a346-409d838cdbf5",
+  "isInvoiced": true,
+  "invoice": "FAC-1042",
+  "receptionDate": "2026-09-09",
+  "observations": "Entrega completa",
+  "details": [
+    {
+      "materialId": "550e8400-e29b-41d4-a716-446655440000",
+      "quantity": 20,
+      "costPerUnitType": 37.5
+    }
+  ]
+}
+```
+
+La edición de surtido usa el identificador estable de cada fila para transportar su
+estado y cantidad:
+
+```json
+{
+  "details": [
+    {
+      "id": "a642ab8d-edf2-4750-a527-872a46180fe1",
+      "isSupplied": true,
+      "projectConvertedQuantity": 8.25
+    }
+  ]
+}
+```
+
+#### Autenticación y autorización
+
+- La API actual recibe el token en la cookie `accessToken`; no documenta un encabezado
+  `Authorization: Bearer` porque `verifyApiTokenRequired` no lo consume.
+- La renovación recibe `refreshToken` desde su cookie y responde `200` con `OK`; no se
+  envía el token dentro de un objeto JSON ni se devuelve en la respuesta.
+- Una cookie ausente, inválida o vencida responde `401` con
+  `{ "code": "INVALID_AUTH" }` y elimina la cookie de acceso cuando corresponde.
+- `authorizeUserApi(permission)` vuelve a cargar el usuario y sólo continúa si
+  `User.isActive = true`, la persona asociada está activa (cuando existe) y hay al menos
+  una asignación. Después resuelve la política del permiso y expone el usuario validado
+  como `req.user`; un JWT vigente por sí solo no satisface este middleware.
+- Un usuario autenticado sin el rol y departamento exigidos responde `403` con
+  `{ "code": "FORBIDDEN" }`; si el usuario ya no existe, está inactivo, su persona está
+  inactiva o perdió todas sus asignaciones responde `401 INVALID_AUTH`.
+
+#### Validación
+
+- Los arreglos de `express-validator` se ejecutan antes de `validate`.
+- Una entrada inválida responde `400` con
+  `{ "errors": { "campo": { "code": "..." } }, "code": "VALIDATION_ERROR" }`.
+- Los errores de `details` pueden contener errores anidados por índice; la ficha de una
+  operación con detalles debe mostrar esa estructura y no reducirla a un string.
+- `validateLogin` es una excepción deliberada: una entrada de acceso inválida responde
+  `401` con `{ "code": "LOGIN_ERROR" }` para no usar el contrato de formularios CRUD.
+
+##### Brechas de validación observadas
+
+La presencia de un arreglo de `express-validator` no basta para rechazar una petición:
+el router también debe ejecutar el middleware que lee `validationResult`. Actualmente,
+las rutas de personas declaran `personValidation`, pero no registran `validate`; por
+ello sus errores de `fullName` y `accesses` no se traducen al `400 VALIDATION_ERROR`
+descrito arriba. Las rutas de clientes tampoco registran un arreglo de validación antes
+del controller. Son brechas de implementación pendientes, no excepciones contractuales
+que un consumidor deba aprovechar. Hasta corregirlas y cubrirlas con pruebas HTTP, no
+se atribuye a esos endpoints la respuesta uniforme de validación.
+
+##### Matriz de validaciones por campo
+
+La siguiente matriz permite consultar las reglas transversales sin reconstruirlas a
+partir de cada formulario. **No sustituye la composición de validadores de una ruta**:
+un campo sólo se exige cuando el arreglo registrado por esa operación incluye la regla,
+y las variantes condicionales se evalúan con el resto del cuerpo. Los límites indicados
+corresponden al servidor; el navegador puede repetirlos para dar retroalimentación
+inmediata, pero no es la fuente de aceptación del payload. Esta matriz describe campos
+del cuerpo; un `:id` incluido en el path conserva el manejo que implemente la ruta y no
+queda validado automáticamente por compartir nombre con un UUID del cuerpo.
+
+| Campo o familia | Presencia | Formato y límite aceptado | Código de error principal |
+| --- | --- | --- | --- |
+| `name` de merma y `fullName` | Obligatoria en el validador que lo declara; se aplica `trim`. La ruta de personas conserva la brecha indicada arriba | Texto con letras o números y separadores admitidos. Máximo: merma `200`, persona `255` | `NAME_REQUIRED`, `NAME_INVALID_TYPE`, `NAME_INVALID_FORMAT`, `NAME_TOO_LONG` |
+| `name` de material, `legalName` y `tradeName` | Obligatoria; se aplica `trim` | Texto sin `<`, `>`, `\\`, llaves ni corchetes. Máximo: material/razón social `200`, nombre comercial `100` | `NAME_REQUIRED`, `NAME_INVALID_TYPE`, `NAME_INVALID_FORMAT`, `NAME_TOO_LONG` |
+| `name` de cliente | El DTO espera el campo y aplica `trim`, pero la ruta no registra validación de formulario | No existe todavía una regla HTTP uniforme documentable; el modelo persistente limita el valor a `255` caracteres | No existe todavía un código de validación de campo garantizado por la ruta |
+| `name` de usuario | Obligatoria | Texto sin espacios, compuesto por letras ASCII, números o `_`; máximo `50` | `USERNAME_REQUIRED`, `USERNAME_INVALID_TYPE`, `USERNAME_NO_SPACES`, `USERNAME_INVALID_FORMAT`, `USERNAME_TOO_LONG` |
+| `password` | Obligatoria en alta, cambio de contraseña e inicio de sesión; no pertenece a la edición general del usuario | Entre `6` y `50` caracteres, al menos una mayúscula y un número; caracteres admitidos por la regla de contraseña | `PASSWORD_REQUIRED`, `PASSWORD_INVALID_TYPE`, `PASSWORD_TOO_SHORT`, `PASSWORD_TOO_LONG`, `PASSWORD_NEEDS_UPPERCASE`, `PASSWORD_NEEDS_NUMBER`, `PASSWORD_INVALID_FORMAT` |
+| `supplierId`, `materialId`, `presentationId`, `unitMeasureId`, `reasonId`, `receivedById`, `advisorId`, `clientId`, `departmentId`, `requesterId` y `roleId` | Obligatoria cuando la operación incluye el campo; `reasonId` de material puede depender del contexto | UUID versión 4 | Código `<CAMPO>_REQUIRED` o `<CAMPO>_INVALID_UUID` definido para el identificador |
+| `isActive`, `isInvoiced` | Obligatoria cuando la operación incluye el campo | Booleano reconocido por `express-validator`; se normaliza a booleano | Código requerido o booleano inválido propio del campo |
+| `isSupplied` | Obligatoria en la edición de surtido | Booleano o representación textual procesada por el validador de detalles | `SUPPLIED_REQUIRED`, `SUPPLIED_INVALID_BOOLEAN` |
+| `quantity`, `returnQuantity`, `costPerUnitType` y cantidades de detalle | Según la operación; las cantidades operativas son obligatorias | Número con hasta `8` enteros y `6` decimales. El mínimo es contextual: normalmente mayor que cero; una corrección de cantidad admite cero y la cantidad surtida admite el límite declarado por su flujo | Código requerido, número inválido o longitud propio del campo; los detalles usan códigos `DETAILS_*` |
+| `newStock`, `minStock`, `maxUnitCost`, `base`, `height` | Obligatoria, opcional o condicional según alta, edición, ajuste y contexto de entrada | Número con hasta `8` enteros y `6` decimales. Merma exige existencia/costo no negativos y dimensiones positivas; material permite dimensiones opcionales emparejadas; `minStock` es opcional | Código requerido, número inválido o longitud propio del campo |
+| `projectNumber` | Obligatoria en encabezados de salida | Texto, después de `trim`, de máximo `10` caracteres | `PROJECT_NUMBER_REQUIRED`, `PROJECT_NUMBER_INVALID_TYPE`, `PROJECT_NUMBER_TOO_LONG` |
+| `requestDate`, `receptionDate` | Obligatoria en el encabezado correspondiente | Fecha ISO 8601 que produzca una fecha válida | Código requerido o formato inválido propio del campo |
+| `invoice` | Obligatoria sólo cuando `isInvoiced` es `true` | Texto alfanumérico con guion, máximo `50` | `INVOICE_REQUIRED`, `INVOICE_INVALID_TYPE`, `INVOICE_INVALID_FORMAT`, `INVOICE_TOO_LONG` |
+| `observations` | Opcional | Texto sin `<`, `>`, `\\`, llaves ni corchetes; después de `trim`, máximo `500` | `OBSERVATIONS_INVALID_TYPE`, `OBSERVATIONS_INVALID_FORMAT`, `OBSERVATIONS_TOO_LONG` |
+| `details` | Obligatoria y con al menos un elemento en altas de documentos; una edición de entrada admite que no se envíe | Arreglo; cada elemento valida identificadores y valores numéricos del tipo de documento. En ediciones de surtido, los errores se organizan por `detail.id` y campo | `DETAILS_REQUIRED` o el código `DETAILS_INVALID_FORMAT_*` aplicable |
+| `accesses` | Declarada como obligatoria en `personValidation`, con al menos un elemento; la ruta conserva la brecha indicada arriba | Arreglo sin áreas repetidas; cada `departmentId` y `roleId` debe ser UUID v4 | Mensaje específico de selección, duplicado, área o rol inválido; todavía no se garantiza como respuesta HTTP |
+
+En errores simples la clave coincide con el nombre del campo. Para una matriz editable
+de detalles, la forma observable conserva dos dimensiones —identificador de fila y
+campo—, por ejemplo:
+
+```json
+{
+  "errors": {
+    "550e8400-e29b-41d4-a716-446655440000": {
+      "projectConvertedQuantity": { "code": "REQUIRED_QUANTITY" },
+      "isSupplied": { "code": "SUPPLIED_REQUIRED" }
+    }
+  },
+  "code": "VALIDATION_ERROR"
+}
+```
+
+Las reglas reutilizables se mantienen en `src/validators/fields/fieldsValidator.js`,
+los arreglos aplicados a cada operación en `src/validators/forms/` y los códigos
+estables en `src/messages/codeMessages.js`. Al cambiar cualquiera de esas fuentes se
+revisa esta matriz junto con la ficha contractual de la ruta afectada.
+
+#### Respuestas y errores de dominio
+
+- Los listados para DataTables responden `200` con `data`, `recordsTotal` y
+  `recordsFiltered`.
+- Las escrituras responden con el recurso o resultado y un `code` estable de éxito; el
+  código HTTP exacto se documenta por operación.
+- Un `AppError` conserva su `statusCode` y responde con `code`, `message` y `meta`.
+- Una ruta API inexistente responde `404` con
+  `{ "message": "Ruta no encontrada." }`.
+- Un error no controlado responde `500` con `code: "SERVER_ERROR"` y se registra con el
+  contexto de la petición; ningún contrato debe depender del stack interno.
+
+### Query de listados compatibles con DataTables
+
+Los controladores que reutilizan `requestQueryUtils.js` aceptan estas variantes. Cada
+recurso declara por separado sus filtros adicionales y columnas ordenables.
+Las salidas de material y merma componen esas utilidades mediante
+`src/utils/issueQueryUtils.js`: comparten la normalización de filtros de salida, pero
+cada controller proporciona su arreglo seguro de columnas y conserva sus reglas de
+acceso y servicio de dominio.
+
+| Concepto | Parámetros aceptados | Normalización |
+| --- | --- | --- |
+| Inicio | `start` | Entero no negativo; fallback `0`. |
+| Tamaño | `length` | Entero no negativo; fallback `10`. |
+| Búsqueda | `search`, `search.value` o `search[value]` | String; fallback vacío. |
+| Columna | `order[0].column` o `order[0][column]` | Índice hacia la lista segura declarada por el controller. |
+| Dirección | `order[0].dir` o `order[0][dir]` | Sólo `asc` o `desc`; cualquier otro valor usa la dirección predeterminada. |
+
+El cliente no envía un nombre de columna arbitrario directamente a Prisma. El
+controller traduce el índice usando su arreglo `columns`, lo que forma parte de la
+especificación particular del listado.
+
+### Ejemplo aplicado: ajuste de existencias de material
+
+Esta ficha muestra el nivel de detalle esperado; no reemplaza los validadores ni las
+reglas de negocio.
+
+| Campo | Contrato vigente |
+| --- | --- |
+| Identidad | `PATCH /api/warehouse/materials/:id/stock`; registra un ajuste protegido sobre las existencias de un material. |
+| Acceso | Cookie `accessToken` válida y permiso `MATERIALS_ADJUST_STOCK`. Respuestas transversales `401` y `403`. |
+| Parámetro | `id`: identificador del material leído desde `req.params.id`. |
+| Cuerpo JSON | `supplierId`, `newStock`, `reasonId` y `observations`, sujetos a `materialStockValidation`; el DTO sólo conserva esos campos. |
+| Validación | `supplierId` y `reasonId` deben ser UUID válidos; `newStock` usa la validación numérica del contexto; `observations` usa la regla compartida de inventario. |
+| Respuesta correcta | `200` con `{ "material": { ... }, "code": "UPDATED_MATERIAL" }`. |
+| Efectos posteriores | El servicio registra el ajuste y, después de completarlo, el controller emite `inventory-updated` con contexto `material`. |
+| Implementación | Router `materialApiRoute.js` → `editMaterialStock` → `createMaterialDtoForStockUpdate` → `updateMaterialStock`. |
+
+Los conflictos y errores de dominio concretos de esta operación deben añadirse a la
+ficha cuando estén respaldados por pruebas HTTP. El flujo técnico de una operación
+transaccional más compleja se encuentra en la
+[actividad de surtimiento de materiales](backend-technical-documentation.md#actividad-de-decisión-y-surtimiento-de-materiales).
+
+## Exportación mensual de reportes
+
+Los endpoints de exportación de compras, salidas y movimientos aceptan
+`monthlyReport=true`. En ese modo ignoran los filtros aplicados al listado y consultan
+el mes actual de México de forma predeterminada. El parámetro opcional `reportMonth`,
+con formato `AAAA-MM`, permite consultar un mes calendario específico; un valor
+ausente o inválido conserva el comportamiento seguro del mes actual.
+
+La interfaz conserva **Mes actual** como opción explícita porque es el caso de uso
+principal y evita una selección innecesaria. **Otro mes** habilita un selector mensual
+Flatpickr —con valor contractual `AAAA-MM`— y **Personalizado** reutiliza los filtros
+aplicados al listado; así no se mezclan un periodo calendario completo y un reporte
+filtrado. El selector reutiliza los mismos tokens visuales y estados habilitado, enfocado
+y deshabilitado de los campos de formulario; así el periodo permanece legible dentro
+del modal sin introducir una variante de estilo exclusiva para la exportación.
+
+## Decisión
+
+**Sí conviene adoptar OpenAPI, pero Swagger no sustituye la documentación de
+arquitectura.** OpenAPI documentaría el contrato HTTP —rutas, parámetros, payloads,
+respuestas, errores y autenticación—; Swagger UI sería sólo una interfaz para consultar
+y probar ese contrato.
+
+Nexus todavía no publica un contrato OpenAPI. El
+[mapa generado](../generated/code-map.md) mantiene el inventario de métodos y rutas
+reales, pero no pretende inferir esquemas desde `express-validator`, DTO, controllers y
+servicios. Una especificación que sólo liste endpoints daría una falsa sensación de
+cobertura.
+
+## Propuesta simple
+
+1. Crear un contrato OpenAPI 3.1 versionado, comenzando por un CRUD completo y sus
+   errores; clientes o proveedores son mejores candidatos que un flujo transaccional.
+2. Reutilizar componentes de esquema para paginación, errores, identificadores y
+   respuestas comunes. No copiar el mismo payload entre operaciones o dominios.
+3. Validar el contrato en CI y agregar pruebas de integración relacionadas con el CRUD
+   documentado, siguiendo [la estrategia de pruebas](../testing/service-test-coverage.md).
+4. Publicar Swagger UI sólo como visualizador del contrato. En producción debe quedar
+   deshabilitado o protegido si revela operaciones internas.
+5. Migrar el siguiente recurso únicamente cuando el anterior describa solicitudes,
+   respuestas y errores reales. No declarar la API completa de una vez con esquemas
+   incompletos.
+
+## Cuándo implementarlo
+
+Priorizar OpenAPI cuando exista al menos una de estas necesidades:
+
+- integración con otro sistema o equipo;
+- generación de clientes o pruebas de contrato;
+- consumidores que no pueden leer el código del servidor;
+- necesidad de probar endpoints desde una interfaz controlada.
+
+Mientras la aplicación web sea el único consumidor, no es un bloqueo operativo. Aun
+así, el contrato aporta valor y debe incorporarse incrementalmente en lugar de intentar
+generarlo automáticamente desde rutas que no contienen toda la semántica.
+
+## Fuente de verdad actual
+
+Hasta adoptar OpenAPI, se consulta en este orden:
+
+1. [mapa generado](../generated/code-map.md) para métodos y rutas;
+2. `src/routes/api/` para middleware, permisos y validadores;
+3. `src/validators/`, `src/dtos/` y controllers para entradas y respuestas;
+4. pruebas de integración para comportamiento observable y persistencia.
+
+## Precisión de valores decimales
+
+Los payloads de creación y edición aceptan hasta **8 dígitos enteros y 6 decimales**
+para precios, existencias, cantidades y medidas. La API conserva esos seis decimales y
+la persistencia usa `DECIMAL(18,6)`; no debe interpretarse una representación visual de
+dos decimales como el valor contractual almacenado.
+
+El navegador mantiene hasta seis decimales durante captura, cálculos y envío. Las
+tablas, resúmenes y cantidades de sólo lectura reutilizan `formatDecimal` o
+`formatCurrency` para mostrar dos decimales. Por tanto, el redondeo es una decisión de
+presentación y nunca debe aplicarse al payload antes de crear o actualizar un recurso.
+
+## Relaciones de inventario en el cliente web
+
+Los datos de inventario consumidos por los formularios y listados CRUD conservan las
+relaciones `presentation` y `unitMeasure` como objetos. Cuando Select2 las transporta
+en atributos HTML, el cliente debe deserializarlas antes de leer `name`, `symbol` o
+`id`; una cadena con el nombre de la presentación no forma parte de este contrato.
+
+## Presentación de conflictos en el cliente web
+
+Las respuestas HTTP `409` conservan un código de error estable en `code` y una
+descripción legible en `message`. El cliente muestra ambos valores en el modal de
+advertencia: el código identifica el conflicto en el título y el mensaje explica la
+causa en el texto normal. Si la respuesta no incluye `code`, el título usa
+**Conflicto**; si no incluye `message`, el texto reutiliza el mensaje asociado al
+código o el fallback general del manejador de errores.
