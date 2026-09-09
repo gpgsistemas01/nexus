@@ -5,6 +5,8 @@ import { createHash } from 'node:crypto';
 import path from 'node:path';
 import process from 'node:process';
 
+import { justifyDocxParagraphs } from './justifyDocxParagraphs.js';
+
 const ROOT = process.cwd();
 const manualCases = [
     'docs/user-manual/cases/authentication.md',
@@ -427,6 +429,7 @@ try {
             failedStatus = result.status ?? 1;
             break;
         }
+        if (requestedFormat === 'docx') await justifyDocxParagraphs(output, temporaryDirectory);
         console.log(`Documento generado en ${path.relative(ROOT, output)}.`);
     }
 } finally {
