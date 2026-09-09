@@ -33,7 +33,9 @@ que sus cuerpos transporten información.
 - Markdown es la fuente versionada y conserva notas de mantenimiento, enlaces al repositorio y
   bloques Mermaid que no tienen valor en una entrega impresa.
 - DOCX es el formato editable para revisión y firmas. Se genera sin una plantilla adicional; un
-  `reference.docx` opcional puede definir tipografías, encabezados, tablas y numeración.
+  `reference.docx` opcional puede definir tipografías, encabezados, tablas y numeración. El
+  exportador justifica los párrafos de contenido y conserva la alineación de títulos, código,
+  leyendas y celdas de tabla.
 - PDF es la entrega no editable. Pandoc requiere un motor PDF instalado; la organización debe
   elegir y fijar uno antes de declarar reproducibilidad. Adobe Acrobat o Adobe Reader abren el
   archivo terminado, pero no reemplazan al motor que lo compone desde Pandoc.
@@ -48,7 +50,9 @@ encabezados, tablas y numeración de DOCX.
 
 `scripts/exportDocs.js` ensambla los manifiestos cuyos archivos de entrada viven en la familia
 correspondiente, comprueba imágenes y delega la conversión a Pandoc. Es herramienta **de desarrollo/CI**, no dependencia ni proceso
-del servidor en producción. El estilo DOCX se pasa con `DOCS_REFERENCE_DOC`. El exportador conserva
+del servidor en producción. El estilo DOCX se pasa con `DOCS_REFERENCE_DOC`; después de la
+conversión, el exportador aplica la justificación al contenido mediante las herramientas `zip` y
+`unzip`, sin sobrescribir la alineación de tablas ni elementos especiales. El exportador conserva
 cada bloque Mermaid en el Markdown fuente,
 lo renderiza como una imagen PNG temporal mediante Mermaid CLI y entrega esa imagen a Pandoc. Así
 DOCX y PDF muestran el diagrama visual en vez de copiar su código; los archivos temporales se
