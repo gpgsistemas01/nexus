@@ -107,6 +107,17 @@ const selectCaptures = () => {
     return [...new Set(requestedCaptureIds)].map(id => capturesById.get(id));
 };
 
+const waitForDataTableReady = async (page) => {
+    await page.waitForFunction(() => {
+        const table = globalThis.$?.('#table');
+        if (!table || !globalThis.$.fn.DataTable.isDataTable(table)) return false;
+
+        const settings = table.DataTable().settings()[0];
+        const requestFinished = !settings.jqXHR || settings.jqXHR.readyState === 4;
+        return settings.iDraw > 0 && !settings.bDrawing && requestFinished;
+    });
+};
+
 const findTriggerAcrossPages = async (page, selector) => {
     const visibleTrigger = page.locator(`${ selector }:visible`).first();
     await page.locator('#table tbody tr').first().waitFor({ state: 'visible' });
@@ -132,6 +143,7 @@ const findTriggerAcrossPages = async (page, selector) => {
 
 const runAction = async (page, action, captureId, step) => {
     if (action.filter) {
+        await waitForDataTableReady(page);
         const filterControl = page.locator(action.selector);
         if (!await filterControl.isVisible()) {
             const filterPanel = page.locator('.table-filters-panel').filter({ has: filterControl });
