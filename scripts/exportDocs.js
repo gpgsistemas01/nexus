@@ -412,7 +412,6 @@ try {
             failedStatus = result.status ?? 1;
             break;
         }
-        await justifyDocxParagraphs(docxOutput, temporaryDirectory);
         if (requestedFormat === 'pdf') {
             console.log(`Documento intermedio generado en ${path.relative(ROOT, docxOutput)}.`);
             const conversion = spawnSync(pdfConverter, [
