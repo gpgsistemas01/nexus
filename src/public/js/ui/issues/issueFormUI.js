@@ -24,7 +24,7 @@ const ISSUE_MODAL_MODE_CONFIG = Object.freeze({
     [FORM_MODES.CREATE]: { submitLabel: 'Guardar' },
     [FORM_MODES.EDIT]: { action: 'Editar', submitLabel: 'Editar' },
     [FORM_MODES.EDIT_HEADER]: { action: 'Editar', submitLabel: 'Editar' },
-    [FORM_MODES.EDIT_DETAIL]: { actionKey: 'detailAction', submitLabelKey: 'detailAction' },
+    [FORM_MODES.EDIT_DETAIL]: { actionKey: 'detailAction', submitLabel: 'Surtir' },
     [FORM_MODES.RETURN]: { actionKey: 'returnAction', hideSubmit: true },
     [FORM_MODES.VIEW]: { action: 'Consultar', hideSubmit: true, disableForm: true }
 });
@@ -145,7 +145,7 @@ export const applyIssueModalMode = ({
 
     const actions = { detailAction, returnAction };
     const action = config.action ?? actions[config.actionKey];
-    const submitLabel = config.submitLabel ?? actions[config.submitLabelKey];
+    const submitLabel = config.submitLabel;
 
     title.textContent = mode === FORM_MODES.CREATE
         ? createTitle
