@@ -360,6 +360,13 @@ if (storageState && loginName) {
 if (protectedCaptures.length && !storageState && !loginName) {
     throw new Error('Defina DOCS_LOGIN_NAME y DOCS_LOGIN_PASSWORD, o proporcione DOCS_STORAGE_STATE, para generar las capturas protegidas.');
 }
+if (protectedCaptures.length && storageState && !existsSync(storageState)) {
+    throw new Error(
+        `No existe el archivo indicado por DOCS_STORAGE_STATE: ${ storageState }. `
+        + 'Complete el inicio de sesión en Playwright codegen, presione Ctrl+C una vez en la terminal donde lo ejecutó, '
+        + 'espere a que termine y vuelva el prompt, y compruebe que el archivo se haya guardado.'
+    );
+}
 
 if (requestedCaptureIds.length || requestedCaptureFrom || recoverMissingCaptures) {
     await Promise.all(selectedCaptures.map(capture => rm(
@@ -383,12 +390,14 @@ try {
     for (const capture of selectedCaptures.filter(item => item.public)) await capturePageWithRecovery(publicPage, capture);
     await publicContext.close();
 
-    const authenticatedContext = await browser.newContext({ ...contextOptions, ...(storageState ? { storageState } : {}) });
-    authenticatedContext.setDefaultTimeout(captureTimeout);
-    const authenticatedPage = await authenticatedContext.newPage();
-    if (!storageState) await login(authenticatedPage);
-    for (const capture of protectedCaptures) await capturePageWithRecovery(authenticatedPage, capture);
-    await authenticatedContext.close();
+    if (protectedCaptures.length) {
+        const authenticatedContext = await browser.newContext({ ...contextOptions, ...(storageState ? { storageState } : {}) });
+        authenticatedContext.setDefaultTimeout(captureTimeout);
+        const authenticatedPage = await authenticatedContext.newPage();
+        if (!storageState) await login(authenticatedPage);
+        for (const capture of protectedCaptures) await capturePageWithRecovery(authenticatedPage, capture);
+        await authenticatedContext.close();
+    }
 } finally {
     await browser.close();
 }
