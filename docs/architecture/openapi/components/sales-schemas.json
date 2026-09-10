@@ -1,0 +1,77 @@
+{
+  "Client": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "name": {
+        "type": "string"
+      },
+      "advisorId": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "format": "uuid"
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "id",
+      "name"
+    ]
+  },
+  "ClientRequest": {
+    "type": "object",
+    "properties": {
+      "name": {
+        "type": "string"
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "name"
+    ]
+  },
+  "ClientList": {
+    "type": "object",
+    "properties": {
+      "data": {
+        "type": "array",
+        "items": {
+          "$ref": "../openapi.json#/components/schemas/Client"
+        }
+      },
+      "recordsTotal": {
+        "type": "integer"
+      },
+      "recordsFiltered": {
+        "type": "integer"
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "data",
+      "recordsTotal",
+      "recordsFiltered"
+    ]
+  },
+  "ClientResponse": {
+    "type": "object",
+    "properties": {
+      "client": {
+        "$ref": "../openapi.json#/components/schemas/Client"
+      },
+      "code": {
+        "$ref": "../openapi.json#/components/schemas/SuccessCode"
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "client",
+      "code"
+    ]
+  }
+}

@@ -5,8 +5,10 @@ import { createHash } from 'node:crypto';
 import path from 'node:path';
 import process from 'node:process';
 import { pathToFileURL } from 'node:url';
+import { bundleOpenApiContract } from './openApiContractUtils.js';
 
 const ROOT = process.cwd();
+const OPENAPI_SOURCE = 'docs/architecture/openapi/openapi.json';
 const manualCases = [
     'docs/user-manual/cases/authentication.md',
     'docs/user-manual/cases/identity-access.md',
@@ -345,10 +347,12 @@ await mkdir(outputDirectory, { recursive: true });
 const temporaryDirectory = await mkdtemp(path.join(outputDirectory, '.export-'));
 const diagramOutputDirectory = path.join(outputDirectory, 'diagrams');
 const diagramSourceDirectory = path.join(outputDirectory, 'diagram-sources');
+const openApiOutputDirectory = path.join(outputDirectory, 'openapi');
 await Promise.all([
     ...Object.values(documentOutputDirectories).map((directory) => mkdir(directory, { recursive: true })),
     mkdir(diagramOutputDirectory, { recursive: true }),
-    mkdir(diagramSourceDirectory, { recursive: true })
+    mkdir(diagramSourceDirectory, { recursive: true }),
+    mkdir(openApiOutputDirectory, { recursive: true })
 ]);
 const mermaidExecutable = path.join(ROOT, 'node_modules', '@mermaid-js', 'mermaid-cli', 'src', 'cli.js');
 
@@ -451,6 +455,12 @@ try {
                 failedStatus = conversion.status ?? 1;
                 break;
             }
+        }
+        if (publication === 'arquitectura') {
+            const openApiOutput = path.join(openApiOutputDirectory, 'openapi.json');
+            const openApiContract = await bundleOpenApiContract(path.join(ROOT, OPENAPI_SOURCE));
+            await writeFile(openApiOutput, `${JSON.stringify(openApiContract, null, 2)}\n`);
+            console.log(`Contrato OpenAPI exportado en ${path.relative(ROOT, openApiOutput)}.`);
         }
         console.log(`Documento generado en ${path.relative(ROOT, output)}.`);
     }
