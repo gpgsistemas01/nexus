@@ -39,7 +39,9 @@ La [guía de publicación y versionado](governance/publication-and-versioning.md
 portadas, formatos, idioma, capturas, paquetes exportables y la relación entre las
 versiones del sistema y del documento. `requirements/index.md` y
 `user-manual/index.md` son las entradas de sus paquetes; fijan el orden de exportación
-sin separar la portada de la familia documental a la que pertenece.
+sin separar la portada de la familia documental a la que pertenece. Los manuales general y por
+actor comparten `user-manual/overview.md` y `user-manual/procedures.md`; cada entrada conserva
+su propia portada y selección de casos.
 
 El manual incluye una [matriz de validación y modos de formulario](user-manual/form-validation-matrix.md)
 como referencia operativa exportable. La matriz de operaciones de requisitos sigue siendo la
@@ -94,9 +96,9 @@ Pandoc y Playwright intervienen en etapas distintas y ninguno sustituye al otro:
 | --- | --- | --- |
 | Node.js y dependencias (`npm ci`) | Ejecutan los scripts del repositorio. | Todos los comandos `npm run docs:*`. |
 | Playwright y Chromium (instalación automática) | Abren Nexus y generan las capturas del manual. Sólo se necesitan al actualizar imágenes. | `npm run docs:screenshots` |
-| Mermaid CLI (instalación opcional) | Convierte cada bloque Mermaid en una imagen temporal para la exportación. | Lo invoca automáticamente `docs:export` cuando el paquete contiene diagramas. |
+| Mermaid CLI (instalación automática) | Convierte cada bloque Mermaid en una imagen temporal para la exportación. | `docs:export` lo instala temporalmente cuando debe generar un diagrama y todavía no está disponible. |
 | Pandoc (herramienta del sistema) | Ensambla el Markdown y las imágenes existentes, convierte la navegación del paquete en hipervínculos internos y genera el DOCX. | `npm run docs:export -- <paquete> <formato>` |
-| LibreOffice (herramienta del sistema) | Convierte a PDF el DOCX que acaba de generar el exportador. | Sólo `docs:export` con formato `pdf`. |
+| LibreOffice (instalación automática) | Convierte a PDF el DOCX que acaba de generar el exportador. | Sólo `docs:export` con formato `pdf`; si falta, el comando intenta instalarlo con el gestor de paquetes del sistema. |
 
 Una extensión de Playwright para Visual Studio Code tampoco reemplaza estas herramientas: puede
 facilitar la ejecución desde el editor, pero el script de capturas requiere el paquete `playwright`
@@ -123,7 +125,6 @@ publicar, todavía se debe revisar lo siguiente:
   use finales de línea CRLF. Si un editor o una integración serializa accidentalmente todo el
   contenido de un bloque en una sola línea con secuencias literales `\n`, el exportador las
   restaura como saltos de línea antes de invocar Mermaid CLI;
-- PDF requiere LibreOffice para convertir el DOCX ya generado;
 - una captura generada sólo se referencia después de ser revisada y existir en la estación
   que ensambla el documento.
 
@@ -251,14 +252,17 @@ no sustituyen la instalación requerida por este proyecto. `npm run docs:export`
      abrir la terminal integrada. Windows no utiliza `sudo`.
    - **Debian o Ubuntu:** ejecuta `sudo apt-get install pandoc`. Si la cuenta no dispone de
      `sudo`, solicita la instalación al administrador del equipo.
-3. Instala Mermaid CLI en la estación que realiza la exportación:
+3. Mermaid CLI se instala automáticamente cuando el paquete contiene un diagrama que aún debe
+   renderizarse. La instalación es temporal y no modifica `package.json` ni `package-lock.json`. Si
+   el entorno no tiene acceso al registro de npm, puede prepararse manualmente con:
 
    ```bash
    npm install --no-save @mermaid-js/mermaid-cli
    ```
 
-   El exportador detecta los bloques `mermaid`, incorpora las imágenes PNG al documento y conserva
-   una copia visual en `build/docs/diagrams/`. El código empleado para generar cada imagen queda en
+   El exportador detecta los bloques `mermaid`, prepara el CLI cuando hace falta, incorpora las
+   imágenes PNG al documento y conserva una copia visual en `build/docs/diagrams/`. El código
+   empleado para generar cada imagen queda en
    `build/docs/diagram-sources/`, separado de los PNG. Las fuentes Markdown no se modifican. Si el
    paquete no contiene diagramas, esta herramienta no se invoca. Los nombres se derivan del
    contenido de cada diagrama: una exportación posterior reutiliza los PNG que ya coincidan y sólo
@@ -268,11 +272,20 @@ no sustituyen la instalación requerida por este proyecto. `npm run docs:export`
    después lo convierte con LibreOffice en modo no interactivo. Así DOCX y PDF recorren la misma
    maquetación y ya no se necesita TeX Live ni configurar `DOCS_PDF_ENGINE`.
 
-   Instala [LibreOffice desde su sitio oficial](https://www.libreoffice.org/download/download-libreoffice/)
+   Si `soffice` no está disponible, el comando intenta instalar LibreOffice con `apt-get` en
+   Debian o Ubuntu, Homebrew en macOS y WinGet en Windows. La instalación se realiza únicamente al
+   solicitar PDF y reutiliza una instalación existente en las siguientes ejecuciones. En Linux,
+   una cuenta sin privilegios utiliza `sudo`.
+
+   Si el equipo no dispone de uno de esos gestores o la cuenta no puede instalar paquetes, instala
+   [LibreOffice desde su sitio oficial](https://www.libreoffice.org/download/download-libreoffice/)
    en el mismo sistema donde se ejecutará el comando:
 
-   - **Windows:** instala LibreOffice, cierra todas las terminales de VS Code y abre una nueva. Si
-     `soffice --version` no responde, agrega `C:\Program Files\LibreOffice\program` al `PATH`.
+   - **Windows:** la instalación con WinGet se solicita en modo silencioso y no interactivo. La
+     conversión utiliza `soffice.com`, la variante de consola de LibreOffice, y oculta ventanas de
+     proceso adicionales para que la exportación continúe sin pedir cerrar `office.exe` ni pulsar
+     Enter. Los avisos de seguridad del propio sistema operativo, si aparecen, todavía requieren la
+     autorización correspondiente.
    - **Debian o Ubuntu:** ejecuta `sudo apt-get install libreoffice`. Si no dispones de `sudo`,
      solicita la instalación al administrador.
    - **macOS:** instala LibreOffice y agrega el ejecutable de la aplicación al `PATH` si la terminal
@@ -289,7 +302,7 @@ no sustituyen la instalación requerida por este proyecto. `npm run docs:export`
    ruta en `DOCS_PDF_CONVERTER`; por ejemplo, en PowerShell:
 
    ```powershell
-   $env:DOCS_PDF_CONVERTER = "C:\Program Files\LibreOffice\program\soffice.exe"
+   $env:DOCS_PDF_CONVERTER = "C:\Program Files\LibreOffice\program\soffice.com"
    npm run docs:export -- todos pdf
    ```
 
@@ -362,16 +375,15 @@ npm run docs:export -- todos docx
 ```
 
 El resultado no es un único documento combinado: los cuatro manuales, requisitos, datos,
-arquitectura y pruebas se crean dentro de `build/docs/docx/`. Para generar los ocho PDF, prepara
-LibreOffice y usa `npm run docs:export -- todos pdf`; los PDF quedan en `build/docs/pdf/` y también
-se conservan los ocho DOCX intermedios.
+arquitectura y pruebas se crean dentro de `build/docs/docx/`. Para generar los ocho PDF, usa
+`npm run docs:export -- todos pdf`; los PDF quedan en `build/docs/pdf/` y también se conservan
+los ocho DOCX intermedios.
 
 ### Flujo general de exportación
 
 Para exportar `requisitos`, `datos`, `arquitectura` o `pruebas`:
 
-1. Complete la [preparación de herramientas](#preparar-las-herramientas): dependencias de
-   Node.js, Pandoc y, sólo para PDF, LibreOffice.
+1. Complete la [preparación de herramientas](#preparar-las-herramientas).
 2. Desde la raíz del repositorio, valide fuentes, enlaces e imágenes sin generar un archivo:
 
    ```bash
@@ -397,8 +409,7 @@ Los paquetes `manual-usuario`, `manual-administrador`, `manual-almacen` y `manua
 incluyen capturas de la aplicación, pero `docs:export` **no toma capturas ni abre Nexus**. Antes de
 exportar uno de esos paquetes se requieren:
 
-- las dependencias de Node.js y Pandoc indicadas en [Preparar las herramientas](#preparar-las-herramientas);
-- LibreOffice sólo cuando el formato solicitado sea PDF;
+- las herramientas indicadas en [Preparar las herramientas](#preparar-las-herramientas);
 - todos los Markdown del paquete actualizados;
 - todas las imágenes referenciadas presentes en `docs/user-manual/images/`, revisadas y
   correspondientes a la versión del manual.
