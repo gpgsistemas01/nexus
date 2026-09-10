@@ -36,9 +36,9 @@ que sus cuerpos transporten información.
   `reference.docx` opcional puede definir tipografías, encabezados, tablas y numeración. El
   exportador justifica los párrafos de contenido y conserva la alineación de títulos, código,
   leyendas y celdas de tabla.
-- PDF es la entrega no editable. Pandoc requiere un motor PDF instalado; la organización debe
-  elegir y fijar uno antes de declarar reproducibilidad. Adobe Acrobat o Adobe Reader abren el
-  archivo terminado, pero no reemplazan al motor que lo compone desde Pandoc.
+- PDF es la entrega no editable. El exportador genera primero el DOCX y lo convierte mediante
+  LibreOffice en modo no interactivo; conserva ambos archivos para que la entrega PDF corresponda
+  al documento editable revisado.
 
 La portada se genera desde `title`, `subtitle`, `author` y `date` del bloque YAML del
 primer archivo del manifiesto. En DOCX puede adoptar los estilos de un documento de referencia cuando se
@@ -119,9 +119,9 @@ permiso que el manual pretende demostrar.
 Playwright **no se ejecuta junto con Pandoc**. Primero, y sólo cuando cambian las pantallas,
 `docs:screenshots` abre la aplicación y actualiza las imágenes; después `docs:export`
 lee esas imágenes ya existentes. Pandoc por sí solo genera DOCX sin Playwright,
-LibreOffice ni Microsoft Word. Para PDF siempre delega la composición final a un motor
-adicional (`DOCS_PDF_ENGINE`); esa dependencia no puede eliminarse sin escoger otro
-conversor o publicar DOCX en su lugar.
+LibreOffice ni Microsoft Word. Para PDF, el exportador aplica primero el formato final al DOCX y
+delega su conversión a LibreOffice; `DOCS_PDF_CONVERTER` permite indicar la ruta de `soffice` cuando
+no está disponible en `PATH`.
 
 `docs:screenshots` coordina el generador con una instancia local de Nexus: comprueba si ya responde,
 la inicia y espera cuando hace falta, y al terminar detiene sólo el proceso que creó. No cambia el

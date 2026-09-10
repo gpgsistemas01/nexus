@@ -87,9 +87,9 @@ Pandoc y Playwright intervienen en etapas distintas y ninguno sustituye al otro:
 | Node.js y dependencias (`npm ci`) | Ejecutan los scripts del repositorio. | Todos los comandos `npm run docs:*`. |
 | Playwright y Chromium (instalación automática) | Abren Nexus y generan las capturas del manual. Sólo se necesitan al actualizar imágenes. | `npm run docs:screenshots` |
 | Mermaid CLI (instalación opcional) | Convierte cada bloque Mermaid en una imagen temporal para la exportación. | Lo invoca automáticamente `docs:export` cuando el paquete contiene diagramas. |
-| Pandoc (herramienta del sistema) | Ensambla el Markdown y las imágenes existentes y convierte la navegación del paquete en hipervínculos internos. Para DOCX, el exportador materializa la tabla de contenido y el índice de imágenes antes de invocarlo; para PDF, Pandoc los compone con el motor configurado. | `npm run docs:export -- <paquete> <formato>` |
-| `zip` y `unzip` (herramientas del sistema) | Aplican al DOCX generado la alineación justificada de los párrafos de contenido sin modificar tablas, títulos, código ni leyendas. | Sólo `docs:export` con formato `docx`. |
-| XeLaTeX u otro motor PDF (herramienta del sistema) | Compone el PDF solicitado por Pandoc; no se necesita para DOCX. | Sólo `docs:export` con formato `pdf`. |
+| Pandoc (herramienta del sistema) | Ensambla el Markdown y las imágenes existentes, convierte la navegación del paquete en hipervínculos internos y genera el DOCX. | `npm run docs:export -- <paquete> <formato>` |
+| `zip` y `unzip` (herramientas del sistema) | Aplican al DOCX generado la alineación justificada de los párrafos de contenido sin modificar tablas, títulos, código ni leyendas. | `docs:export` con formato `docx` o `pdf`. |
+| LibreOffice (herramienta del sistema) | Convierte a PDF el DOCX que acaba de generar el exportador. | Sólo `docs:export` con formato `pdf`. |
 
 Una extensión de Playwright para Visual Studio Code tampoco reemplaza estas herramientas: puede
 facilitar la ejecución desde el editor, pero el script de capturas requiere el paquete `playwright`
@@ -186,7 +186,7 @@ generar DOCX, el exportador crea una tabla de contenido y un **Índice de imáge
 navegables a partir de los títulos y leyendas preparados; no deja campos pendientes de
 actualización al abrir el archivo en Word. Las leyendas se numeran de forma correlativa como
 `Figura N. …` para que el mismo identificador y número se publiquen en DOCX y PDF, sin depender
-de campos `SEQ` de Word. En PDF, Pandoc y el motor configurado componen ambos índices. Los enlaces
+de campos `SEQ` de Word. El PDF conserva los índices materializados primero en el DOCX. Los enlaces
 Markdown entre fuentes del mismo paquete se resuelven durante el ensamblado y
 quedan como hipervínculos internos: el artefacto publicado no navega hacia archivos `.md`.
 
@@ -237,123 +237,39 @@ no sustituyen la instalación requerida por este proyecto. `npm run docs:export`
    contenido de cada diagrama: una exportación posterior reutiliza los PNG que ya coincidan y sólo
    convierte diagramas nuevos o modificados. Para forzar su regeneración completa, elimina
    `build/docs/diagrams/` antes de exportar.
-4. DOCX no requiere otra herramienta. Para PDF, Pandoc necesita un programa que componga
-   el PDF desde la terminal. El flujo automatizado tiene dos etapas: Pandoc transforma los archivos
-   Markdown en una representación intermedia interna —no en un archivo DOCX— y el motor convierte
-   ese contenido, las tipografías y la distribución de cada página en el PDF final. Pandoc no
-   realiza por sí solo esa segunda etapa.
+4. DOCX no requiere otra herramienta. Para PDF, el exportador genera primero ese mismo DOCX,
+   aplica su formato final y después lo convierte con LibreOffice en modo no interactivo. Así DOCX
+   y PDF recorren la misma maquetación y ya no se necesita TeX Live ni configurar
+   `DOCS_PDF_ENGINE`.
 
-   Adobe Reader sólo visualiza el PDF ya terminado. Adobe Acrobat puede crear o editar archivos
-   PDF mediante sus propias funciones, pero no es un motor aceptado por la opción `--pdf-engine` de
-   Pandoc ni lo invoca `npm run docs:export`. Por eso tener Acrobat instalado no proporciona el
-   ejecutable que este flujo automatizado necesita. [Pandoc documenta los motores admitidos por
-   `--pdf-engine`](https://pandoc.org/MANUAL.html#option--pdf-engine). **[XeLaTeX](https://tug.org/xetex/)
-   no es el único motor compatible**: es la
-   opción recomendada por el proyecto porque maneja Unicode y texto en español directamente, está
-   disponible mediante distribuciones mantenidas para Windows, Linux y macOS, y permite que todas
-   las estaciones usen el mismo motor en vez de depender del predeterminado local de Pandoc.
-   Instálalo en el mismo sistema donde se ejecutará Pandoc:
+   Instala [LibreOffice desde su sitio oficial](https://www.libreoffice.org/download/download-libreoffice/)
+   en el mismo sistema donde se ejecutará el comando:
 
-   - **Windows:** XeLaTeX se instala **en Windows, no dentro de este repositorio, npm, VS Code ni
-     Playwright**. Descarga el instalador desde la
-     [página oficial de instalación por red de TeX Live](https://www.tug.org/texlive/acquire-netinstall.html)
-     o usa su enlace directo oficial:
-     [`install-tl-windows.exe`](https://mirror.ctan.org/systems/texlive/tlnet/install-tl-windows.exe).
-     Microsoft Edge puede mostrar “no se descarga habitualmente” porque el archivo tiene pocas
-     descargas registradas; ese aviso, por sí solo, no confirma que el archivo sea malicioso. Antes
-     de abrirlo, comprueba que la dirección de descarga sea exactamente `https://mirror.ctan.org/`
-     y no continúes si llegó desde otro dominio, por correo o mediante un anuncio. También puedes
-     analizar el archivo con Microsoft Defender. Después, ejecútalo y conserva una
-     instalación de TeX Live que incluya XeLaTeX. El instalador crea una carpeta del sistema como
-     `C:\texlive\<versión>\` y agrega su subcarpeta `bin\windows` a `PATH`; no copies esos archivos
-     dentro de `SistemaMerma`. Al terminar, cierra **todas** las terminales de VS Code, abre una
-     terminal PowerShell nueva en el repositorio y ejecuta `xelatex --version`. Si PowerShell aún
-     no encuentra el comando, reinicia VS Code y revisa que
-     `C:\texlive\<versión>\bin\windows` esté en la variable `PATH` de Windows.
-   - **Debian o Ubuntu:** ejecuta `sudo apt-get install texlive-xetex`. Si la cuenta no dispone de
-     `sudo`, solicita la instalación al administrador del equipo.
-   - **macOS:** descarga e instala [MacTeX](https://tug.org/mactex/mactex-download.html) y vuelve a
-     abrir la terminal.
+   - **Windows:** instala LibreOffice, cierra todas las terminales de VS Code y abre una nueva. Si
+     `soffice --version` no responde, agrega `C:\Program Files\LibreOffice\program` al `PATH`.
+   - **Debian o Ubuntu:** ejecuta `sudo apt-get install libreoffice`. Si no dispones de `sudo`,
+     solicita la instalación al administrador.
+   - **macOS:** instala LibreOffice y agrega el ejecutable de la aplicación al `PATH` si la terminal
+     no reconoce `soffice`.
 
-   En Windows, XeLaTeX, pdfLaTeX y LuaLaTeX no se descargan como tres aplicaciones separadas: los
-   tres forman parte de una distribución TeX. Estos son los enlaces que corresponden a cada motor
-   admitido en esta guía:
-
-   | Motor para `DOCS_PDF_ENGINE` | Descarga para Windows | Comprobación |
-   | --- | --- | --- |
-   | `xelatex` (recomendado) | [TeX Live: `install-tl-windows.exe`](https://mirror.ctan.org/systems/texlive/tlnet/install-tl-windows.exe) | `xelatex --version` |
-   | `pdflatex` | [TeX Live: `install-tl-windows.exe`](https://mirror.ctan.org/systems/texlive/tlnet/install-tl-windows.exe) | `pdflatex --version` |
-   | `lualatex` | [TeX Live: `install-tl-windows.exe`](https://mirror.ctan.org/systems/texlive/tlnet/install-tl-windows.exe) | `lualatex --version` |
-   | `tectonic` | [Publicaciones oficiales de Tectonic](https://github.com/tectonic-typesetting/tectonic/releases/latest) (descarga el archivo para `x86_64-pc-windows-msvc`) | `tectonic --version` |
-
-   Instala sólo uno de estos motores para exportar PDF. Una instalación de TeX Live sirve para las
-   tres primeras opciones, por lo que no debes ejecutar el mismo instalador tres veces. Los enlaces
-   pasan por sitios oficiales y pueden redirigir a un espejo o al archivo de la versión vigente;
-   evita copias publicadas en páginas de terceros.
-
-   Si no quieres instalar un motor, genera el archivo editable con
-   `npm run docs:export -- <paquete> docx` y conviértelo manualmente a PDF con una aplicación que ya
-   tengas. Esa conversión queda fuera de `docs:export`: el proyecto no puede repetirla ni comprobar
-   que conserve los mismos saltos de página, tipografías, enlaces e índices. Para generar el PDF
-   directamente con el comando del proyecto sí es necesario configurar un motor.
-
-   También es posible generar primero el DOCX y después abrirlo en Microsoft Word o Adobe Acrobat
-   para guardarlo como PDF. Esto evita instalar TeX Live cuando la conversión será manual, pero no
-   elimina la necesidad de un programa que produzca el PDF: en ese caso Word o Acrobat actúan como
-   conversor fuera del script. Actualmente `docs:export` no usa el DOCX como entrada para PDF; cada
-   formato se genera por separado desde las mismas fuentes Markdown. Automatizar la ruta
-   DOCX-a-PDF requeriría instalar y configurar un conversor ejecutable en todos los entornos, y el
-   resultado dependería de sus fuentes, versión y reglas de maquetación. Por eso el flujo publicado
-   conserva el DOCX para revisión editable y usa un motor explícito para el PDF reproducible.
-
-   Si la estación ya tiene otro motor admitido por Pandoc, puede reutilizarlo: no es obligatorio
-   instalar XeLaTeX. Por ejemplo, una instalación existente de
-   [`pdflatex`](https://www.latex-project.org/get/), [`lualatex`](https://www.luatex.org/) o
-   [`tectonic`](https://tectonic-typesetting.github.io/en-US/install.html) se selecciona asignando
-   ese nombre a `DOCS_PDF_ENGINE`. Primero compruebe que su ejecutable
-   responda desde la misma terminal:
+   Comprueba la instalación con `soffice --version` y ejecuta normalmente:
 
    ```powershell
-   # Ejemplo en PowerShell si pdflatex ya está instalado
-   pdflatex --version
-   $env:DOCS_PDF_ENGINE = "pdflatex"
    npm run docs:export -- todos pdf
    ```
 
-   El proyecto recomienda XeLaTeX para mantener un resultado reproducible, pero el exportador no
-   fija ese nombre: valida y pasa a Pandoc el ejecutable indicado en `DOCS_PDF_ENGINE`. Cambiar de
-   motor puede modificar tipografías, saltos de página o requerir paquetes propios de la
-   distribución elegida, por lo que el PDF resultante debe revisarse antes de publicarlo.
-
-   En todos los casos, comprueba la instalación con `xelatex --version`. Al ejecutar una
-   exportación PDF, indica explícitamente al script cuál motor debe usar para que Pandoc no dependa
-   del motor predeterminado de cada estación. `DOCS_PDF_ENGINE` es obligatorio para exportar PDF;
-   así el script no intenta usar implícitamente `pdflatex` en una estación donde no está instalado.
-   Define la variable en la misma terminal desde la que se
-   ejecuta `docs:export`; no se agrega al código ni es necesario guardarla en `.env`:
+   El comando conserva ambos resultados, `build/docs/<paquete>.docx` y
+   `build/docs/<paquete>.pdf`. Si el ejecutable tiene otro nombre o no está en `PATH`, define su
+   ruta en `DOCS_PDF_CONVERTER`; por ejemplo, en PowerShell:
 
    ```powershell
-   # PowerShell (Windows)
-   xelatex --version
-   $env:DOCS_PDF_ENGINE = "xelatex"
+   $env:DOCS_PDF_CONVERTER = "C:\Program Files\LibreOffice\program\soffice.exe"
    npm run docs:export -- todos pdf
    ```
 
-   ```bash
-   # Bash (Linux, macOS o contenedor)
-   DOCS_PDF_ENGINE=xelatex npm run docs:export -- <paquete> pdf
-   ```
-
-   El error `'pdflatex' not found` no significa que el documento requiera específicamente
-   `pdflatex`: significa que Pandoc intentó usar ese motor predeterminado y no encontró su
-   ejecutable. No se corrige instalando Playwright. Puede instalar el XeLaTeX recomendado o usar
-   otro motor que ya tenga instalado, definir su nombre en `DOCS_PDF_ENGINE` y repetir el comando
-   con el separador `--` de npm. Si sólo necesita el documento editable, genere `docx`, que no
-   requiere un motor PDF.
-
-   En PowerShell la variable permanece durante esa sesión de terminal; puede retirarla después con
-   `Remove-Item Env:DOCS_PDF_ENGINE`. En Bash, la asignación mostrada sólo aplica a ese comando.
-   Sustituye `<paquete>` por un valor de la tabla siguiente, por ejemplo `todos`.
+   Adobe Reader sólo visualiza el resultado. La conversión automatizada usa LibreOffice porque
+   proporciona un ejecutable invocable de forma uniforme; Word o Acrobat todavía pueden usarse
+   para convertir manualmente el DOCX conservado.
 
 5. Valida siempre el paquete con `--check` antes de generar el archivo.
 
@@ -413,15 +329,15 @@ npm run docs:export -- todos docx
 ```
 
 El resultado no es un único documento combinado: se crean los cuatro manuales, requisitos, datos,
-arquitectura y pruebas dentro de `build/docs/`. Para generar los ocho PDF, prepare XeLaTeX y use
-`DOCS_PDF_ENGINE=xelatex npm run docs:export -- todos pdf`.
+arquitectura y pruebas dentro de `build/docs/`. Para generar los ocho PDF, prepara LibreOffice y
+usa `npm run docs:export -- todos pdf`; también se conservan los ocho DOCX intermedios.
 
 ### Flujo general de exportación
 
 Para exportar `requisitos`, `datos`, `arquitectura` o `pruebas`:
 
 1. Complete la [preparación de herramientas](#preparar-las-herramientas): dependencias de
-   Node.js, Pandoc y, sólo para PDF, un motor PDF.
+   Node.js, Pandoc y, sólo para PDF, LibreOffice.
 2. Desde la raíz del repositorio, valide fuentes, enlaces e imágenes sin generar un archivo:
 
    ```bash
@@ -434,8 +350,8 @@ Para exportar `requisitos`, `datos`, `arquitectura` o `pruebas`:
    npm run docs:export -- <paquete> <docx|pdf>
    ```
 
-4. Revise el resultado creado en `build/docs/`. La portada se genera automáticamente. Si eligió
-   PDF, use `DOCS_PDF_ENGINE=xelatex` como se indicó en la preparación.
+4. Revise los resultados creados en `build/docs/`. La portada se genera automáticamente. Si eligió
+   PDF, se conservan tanto el DOCX usado como entrada como el PDF convertido.
 
 Si la entrega incluye toda la documentación, sustituya `<paquete>` por `todos` en los pasos 2 y
 3. Antes debe comprobar también que las capturas requeridas por los cuatro manuales ya existan y
@@ -448,7 +364,7 @@ incluyen capturas de la aplicación, pero `docs:export` **no toma capturas ni ab
 exportar uno de esos paquetes se requieren:
 
 - las dependencias de Node.js y Pandoc indicadas en [Preparar las herramientas](#preparar-las-herramientas);
-- un motor PDF sólo cuando el formato solicitado sea PDF;
+- LibreOffice sólo cuando el formato solicitado sea PDF;
 - todos los Markdown del paquete actualizados;
 - todas las imágenes referenciadas presentes en `docs/user-manual/images/`, revisadas y
   correspondientes a la versión del manual.
@@ -596,7 +512,7 @@ npm run docs:export -- manual-almacen docx
 # Genera un DOCX, incluida la portada definida en el Markdown.
 npm run docs:export -- arquitectura docx
 
-# Genera un PDF después de definir DOCS_PDF_ENGINE en la misma terminal como se explicó arriba.
+# Genera primero el DOCX y después lo convierte a PDF con LibreOffice.
 npm run docs:export -- pruebas pdf
 ```
 
