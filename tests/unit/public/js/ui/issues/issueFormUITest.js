@@ -1,6 +1,9 @@
 import { describe, expect, it } from 'vitest';
 
-import { resolveIssueEditMode } from '../../../../../../src/public/js/ui/issues/issueFormUI.js';
+import {
+  applyIssueModalMode,
+  resolveIssueEditMode
+} from '../../../../../../src/public/js/ui/issues/issueFormUI.js';
 
 describe('modo CRUD compartido de salidas según surtido', () => {
   it.each([
@@ -25,5 +28,28 @@ describe('modo CRUD compartido de salidas según surtido', () => {
       status: { name: 'Cancelada' },
       fulfillmentStatus: { name: 'Cancelado' }
     })).toBe('view');
+  });
+});
+
+describe('etiquetas del formulario compartido de salidas', () => {
+  it('usa el verbo de la operación para confirmar el surtimiento', () => {
+    const title = { textContent: '' };
+    const submit = {
+      textContent: '',
+      classList: { add: () => {} }
+    };
+
+    applyIssueModalMode({
+      form: { querySelector: () => submit },
+      modalElement: { querySelector: () => title },
+      mode: 'edit-detail',
+      entityName: 'salida',
+      referenceNumber: 'S-1',
+      createTitle: 'Registrar salida',
+      detailAction: 'Surtir materiales de la'
+    });
+
+    expect(title.textContent).toBe('Surtir materiales de la salida - Folio S-1');
+    expect(submit.textContent).toBe('Surtir');
   });
 });
