@@ -33,9 +33,7 @@ que sus cuerpos transporten información.
 - Markdown es la fuente versionada y conserva notas de mantenimiento, enlaces al repositorio y
   bloques Mermaid que no tienen valor en una entrega impresa.
 - DOCX es el formato editable para revisión y firmas. Se genera sin una plantilla adicional; un
-  `reference.docx` opcional puede definir tipografías, encabezados, tablas y numeración. El
-  exportador justifica los párrafos de contenido y conserva la alineación de títulos, código,
-  leyendas y celdas de tabla.
+  `reference.docx` opcional puede definir tipografías, encabezados, tablas y numeración.
 - PDF es la entrega no editable. El exportador genera primero el DOCX y lo convierte mediante
   LibreOffice en modo no interactivo; conserva los editables en `build/docs/docx/` y las entregas
   finales en `build/docs/pdf/` para que cada PDF corresponda al DOCX revisado sin mezclar formatos.
@@ -70,7 +68,7 @@ Para DOCX, el exportador materializa la tabla de contenido y el índice de imág
 navegación interna a partir de los títulos y leyendas del paquete. No delega esa tarea a
 campos de Word pendientes de actualización, porque además de mostrar un aviso al abrir el
 archivo esos campos no contienen un resultado calculado por Pandoc. En PDF se conservan
-los índices nativos de Pandoc, que el motor de composición resuelve durante la exportación.
+la misma tabla de contenido y el mismo índice de imágenes al convertir el DOCX con LibreOffice.
 Todas las figuras de un paquete reciben una leyenda correlativa `Figura N. …`, incluida en
 el índice y asociada a la misma referencia interna que la imagen. La numeración se materializa
 durante cada exportación, en vez de depender de campos `SEQ` de Word, para que DOCX y PDF
@@ -118,9 +116,9 @@ permiso que el manual pretende demostrar.
 Playwright **no se ejecuta junto con Pandoc**. Primero, y sólo cuando cambian las pantallas,
 `docs:screenshots` abre la aplicación y actualiza las imágenes; después `docs:export`
 lee esas imágenes ya existentes. Pandoc por sí solo genera DOCX sin Playwright,
-LibreOffice ni Microsoft Word. Para PDF, el exportador aplica primero el formato final al DOCX y
-delega su conversión a LibreOffice; `DOCS_PDF_CONVERTER` permite indicar la ruta de `soffice` cuando
-no está disponible en `PATH`.
+LibreOffice ni Microsoft Word. Para PDF, el exportador genera primero el DOCX y delega su conversión
+a LibreOffice; `DOCS_PDF_CONVERTER` permite indicar la ruta de `soffice` cuando no está disponible
+en `PATH`.
 
 `docs:screenshots` coordina el generador con una instancia local de Nexus: comprueba si ya responde,
 la inicia y espera cuando hace falta, y al terminar detiene sólo el proceso que creó. No cambia el
