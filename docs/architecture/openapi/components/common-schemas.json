@@ -1,0 +1,91 @@
+{
+  "SuccessCode": {
+    "type": "string",
+    "description": "Código estable consumido por la interfaz."
+  },
+  "Error": {
+    "type": "object",
+    "properties": {
+      "code": {
+        "type": "string"
+      },
+      "message": {
+        "type": "string"
+      },
+      "meta": {
+        "type": "object",
+        "additionalProperties": true
+      }
+    },
+    "additionalProperties": false
+  },
+  "ValidationError": {
+    "type": "object",
+    "properties": {
+      "code": {
+        "const": "VALIDATION_ERROR"
+      },
+      "errors": {
+        "type": "object",
+        "additionalProperties": true
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "code",
+      "errors"
+    ]
+  },
+  "NamedCatalog": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "name": {
+        "type": "string"
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "id",
+      "name"
+    ]
+  },
+  "NamedCatalogList": {
+    "type": "object",
+    "properties": {
+      "data": {
+        "type": "array",
+        "items": {
+          "$ref": "../openapi.json#/components/schemas/NamedCatalog"
+        }
+      },
+      "recordsTotal": {
+        "type": "integer"
+      },
+      "recordsFiltered": {
+        "type": "integer"
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "data",
+      "recordsTotal",
+      "recordsFiltered"
+    ]
+  },
+  "CodeResponse": {
+    "type": "object",
+    "properties": {
+      "code": {
+        "$ref": "../openapi.json#/components/schemas/SuccessCode"
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "code"
+    ]
+  }
+}

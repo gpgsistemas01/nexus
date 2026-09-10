@@ -1,0 +1,1098 @@
+{
+  "Supplier": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "legalName": {
+        "type": "string"
+      },
+      "tradeName": {
+        "type": "string"
+      },
+      "isActive": {
+        "type": "boolean"
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "id",
+      "legalName",
+      "tradeName",
+      "isActive"
+    ]
+  },
+  "Material": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "name": {
+        "type": "string"
+      },
+      "supplierId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "presentationId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "unitMeasureId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "base": {
+        "type": [
+          "number",
+          "null"
+        ]
+      },
+      "height": {
+        "type": [
+          "number",
+          "null"
+        ]
+      },
+      "minStock": {
+        "type": [
+          "number",
+          "null"
+        ]
+      },
+      "maxUnitCost": {
+        "type": "number"
+      },
+      "currentStock": {
+        "type": "number"
+      },
+      "isActive": {
+        "type": "boolean"
+      },
+      "supplier": {
+        "$ref": "../openapi.json#/components/schemas/Supplier"
+      },
+      "presentation": {
+        "$ref": "../openapi.json#/components/schemas/NamedCatalog"
+      },
+      "unitMeasure": {
+        "$ref": "../openapi.json#/components/schemas/NamedCatalog"
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "id",
+      "name"
+    ]
+  },
+  "Waste": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "name": {
+        "type": "string"
+      },
+      "materialId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "supplierId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "base": {
+        "type": "number"
+      },
+      "height": {
+        "type": "number"
+      },
+      "minStock": {
+        "type": [
+          "number",
+          "null"
+        ]
+      },
+      "maxUnitCost": {
+        "type": "number"
+      },
+      "currentStock": {
+        "type": "number"
+      },
+      "isActive": {
+        "type": "boolean"
+      },
+      "supplier": {
+        "$ref": "../openapi.json#/components/schemas/Supplier"
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "id",
+      "name"
+    ]
+  },
+  "Issue": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "referenceNumber": {
+        "type": "string"
+      },
+      "requestDate": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "requesterId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "advisorId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "clientId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "departmentId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "projectNumber": {
+        "type": "string"
+      },
+      "observations": {
+        "type": [
+          "string",
+          "null"
+        ]
+      },
+      "details": {
+        "type": "array",
+        "items": {
+          "$ref": "../openapi.json#/components/schemas/IssueDetail"
+        }
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "id",
+      "referenceNumber"
+    ]
+  },
+  "IssueDetail": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "quantity": {
+        "type": "number"
+      },
+      "isSupplied": {
+        "type": "boolean"
+      },
+      "projectConvertedQuantity": {
+        "type": [
+          "number",
+          "null"
+        ]
+      },
+      "materialId": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "format": "uuid"
+      },
+      "wasteId": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "format": "uuid"
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "id",
+      "quantity"
+    ]
+  },
+  "GoodsReceipt": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "referenceNumber": {
+        "type": "string"
+      },
+      "supplierId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "receivedById": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "isInvoiced": {
+        "type": "boolean"
+      },
+      "invoice": {
+        "type": [
+          "string",
+          "null"
+        ]
+      },
+      "receptionDate": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "observations": {
+        "type": [
+          "string",
+          "null"
+        ]
+      },
+      "details": {
+        "type": "array",
+        "items": {
+          "$ref": "../openapi.json#/components/schemas/GoodsReceiptDetail"
+        }
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "id",
+      "referenceNumber"
+    ]
+  },
+  "GoodsReceiptDetail": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "materialId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "quantity": {
+        "type": "number"
+      },
+      "costPerUnitType": {
+        "type": "number"
+      },
+      "isCancelled": {
+        "type": "boolean"
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "id",
+      "materialId",
+      "quantity",
+      "costPerUnitType"
+    ]
+  },
+  "Return": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "returnQuantity": {
+        "type": "number"
+      },
+      "observations": {
+        "type": [
+          "string",
+          "null"
+        ]
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "id",
+      "returnQuantity"
+    ]
+  },
+  "SupplierRequest": {
+    "type": "object",
+    "properties": {
+      "legalName": {
+        "type": "string"
+      },
+      "tradeName": {
+        "type": "string"
+      },
+      "isActive": {
+        "type": "boolean"
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "legalName",
+      "tradeName",
+      "isActive"
+    ]
+  },
+  "MaterialCreateRequest": {
+    "type": "object",
+    "properties": {
+      "name": {
+        "type": "string"
+      },
+      "supplierId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "presentationId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "unitMeasureId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "base": {
+        "type": "number"
+      },
+      "height": {
+        "type": "number"
+      },
+      "minStock": {
+        "type": "number"
+      },
+      "maxUnitCost": {
+        "type": "number"
+      },
+      "isActive": {
+        "type": "boolean"
+      },
+      "newStock": {
+        "type": "number"
+      },
+      "observations": {
+        "type": "string"
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "name",
+      "supplierId",
+      "presentationId",
+      "unitMeasureId",
+      "maxUnitCost",
+      "isActive",
+      "newStock"
+    ]
+  },
+  "MaterialUpdateRequest": {
+    "type": "object",
+    "properties": {
+      "name": {
+        "type": "string"
+      },
+      "supplierId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "minStock": {
+        "type": "number"
+      },
+      "maxUnitCost": {
+        "type": "number"
+      },
+      "isActive": {
+        "type": "boolean"
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "name",
+      "supplierId",
+      "maxUnitCost",
+      "isActive"
+    ]
+  },
+  "MaterialStockRequest": {
+    "type": "object",
+    "properties": {
+      "supplierId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "newStock": {
+        "type": "number"
+      },
+      "reasonId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "observations": {
+        "type": "string"
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "supplierId",
+      "newStock",
+      "reasonId"
+    ]
+  },
+  "WasteCreateRequest": {
+    "type": "object",
+    "properties": {
+      "name": {
+        "type": "string"
+      },
+      "materialId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "supplierId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "base": {
+        "type": "number"
+      },
+      "height": {
+        "type": "number"
+      },
+      "minStock": {
+        "type": "number"
+      },
+      "maxUnitCost": {
+        "type": "number"
+      },
+      "isActive": {
+        "type": "boolean"
+      },
+      "newStock": {
+        "type": "number"
+      },
+      "observations": {
+        "type": "string"
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "name",
+      "materialId",
+      "supplierId",
+      "base",
+      "height",
+      "maxUnitCost",
+      "isActive",
+      "newStock"
+    ]
+  },
+  "WasteUpdateRequest": {
+    "type": "object",
+    "properties": {
+      "name": {
+        "type": "string"
+      },
+      "minStock": {
+        "type": "number"
+      },
+      "maxUnitCost": {
+        "type": "number"
+      },
+      "isActive": {
+        "type": "boolean"
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "name",
+      "maxUnitCost",
+      "isActive"
+    ]
+  },
+  "WasteStockRequest": {
+    "type": "object",
+    "properties": {
+      "newStock": {
+        "type": "number"
+      },
+      "reasonId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "observations": {
+        "type": "string"
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "newStock",
+      "reasonId"
+    ]
+  },
+  "IssueHeaderRequest": {
+    "type": "object",
+    "properties": {
+      "advisorId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "clientId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "departmentId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "requesterId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "projectNumber": {
+        "type": "string"
+      },
+      "requestDate": {
+        "type": "string",
+        "format": "date"
+      },
+      "observations": {
+        "type": [
+          "string",
+          "null"
+        ]
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "advisorId",
+      "clientId",
+      "departmentId",
+      "requesterId",
+      "projectNumber",
+      "requestDate"
+    ]
+  },
+  "GoodsIssueRequest": {
+    "type": "object",
+    "properties": {
+      "advisorId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "clientId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "departmentId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "requesterId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "projectNumber": {
+        "type": "string"
+      },
+      "requestDate": {
+        "type": "string",
+        "format": "date"
+      },
+      "observations": {
+        "type": [
+          "string",
+          "null"
+        ]
+      },
+      "details": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "materialId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "supplierId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "presentationId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "quantity": {
+              "type": "number"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "materialId",
+            "supplierId",
+            "quantity"
+          ]
+        }
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "advisorId",
+      "clientId",
+      "departmentId",
+      "requesterId",
+      "projectNumber",
+      "requestDate",
+      "details"
+    ]
+  },
+  "WasteIssueRequest": {
+    "type": "object",
+    "properties": {
+      "advisorId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "clientId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "departmentId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "requesterId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "projectNumber": {
+        "type": "string"
+      },
+      "requestDate": {
+        "type": "string",
+        "format": "date"
+      },
+      "observations": {
+        "type": [
+          "string",
+          "null"
+        ]
+      },
+      "details": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "wasteId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "quantity": {
+              "type": "number"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "wasteId",
+            "quantity"
+          ]
+        }
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "advisorId",
+      "clientId",
+      "departmentId",
+      "requesterId",
+      "projectNumber",
+      "requestDate",
+      "details"
+    ]
+  },
+  "IssueDetailsUpdateRequest": {
+    "type": "object",
+    "properties": {
+      "details": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "isSupplied": {
+              "type": "boolean"
+            },
+            "projectConvertedQuantity": {
+              "type": "number"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "isSupplied",
+            "projectConvertedQuantity"
+          ]
+        }
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "details"
+    ]
+  },
+  "ReturnRequest": {
+    "type": "object",
+    "properties": {
+      "returnQuantity": {
+        "type": "number"
+      },
+      "observations": {
+        "type": "string"
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "returnQuantity"
+    ]
+  },
+  "GoodsReceiptRequest": {
+    "type": "object",
+    "properties": {
+      "supplierId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "receivedById": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "isInvoiced": {
+        "type": "boolean"
+      },
+      "invoice": {
+        "type": "string"
+      },
+      "receptionDate": {
+        "type": "string",
+        "format": "date"
+      },
+      "observations": {
+        "type": "string"
+      },
+      "details": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "materialId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "quantity": {
+              "type": "number"
+            },
+            "costPerUnitType": {
+              "type": "number"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "materialId",
+            "quantity",
+            "costPerUnitType"
+          ]
+        }
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "supplierId",
+      "receivedById",
+      "receptionDate",
+      "details"
+    ]
+  },
+  "GoodsReceiptCorrectionRequest": {
+    "type": "object",
+    "properties": {
+      "quantity": {
+        "type": "number"
+      },
+      "costPerUnitType": {
+        "type": "number"
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "quantity",
+      "costPerUnitType"
+    ]
+  },
+  "SupplierList": {
+    "type": "object",
+    "properties": {
+      "data": {
+        "type": "array",
+        "items": {
+          "$ref": "../openapi.json#/components/schemas/Supplier"
+        }
+      },
+      "recordsTotal": {
+        "type": "integer"
+      },
+      "recordsFiltered": {
+        "type": "integer"
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "data",
+      "recordsTotal",
+      "recordsFiltered"
+    ]
+  },
+  "MaterialList": {
+    "type": "object",
+    "properties": {
+      "data": {
+        "type": "array",
+        "items": {
+          "$ref": "../openapi.json#/components/schemas/Material"
+        }
+      },
+      "recordsTotal": {
+        "type": "integer"
+      },
+      "recordsFiltered": {
+        "type": "integer"
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "data",
+      "recordsTotal",
+      "recordsFiltered"
+    ]
+  },
+  "WasteList": {
+    "type": "object",
+    "properties": {
+      "data": {
+        "type": "array",
+        "items": {
+          "$ref": "../openapi.json#/components/schemas/Waste"
+        }
+      },
+      "recordsTotal": {
+        "type": "integer"
+      },
+      "recordsFiltered": {
+        "type": "integer"
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "data",
+      "recordsTotal",
+      "recordsFiltered"
+    ]
+  },
+  "IssueList": {
+    "type": "object",
+    "properties": {
+      "data": {
+        "type": "array",
+        "items": {
+          "$ref": "../openapi.json#/components/schemas/Issue"
+        }
+      },
+      "recordsTotal": {
+        "type": "integer"
+      },
+      "recordsFiltered": {
+        "type": "integer"
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "data",
+      "recordsTotal",
+      "recordsFiltered"
+    ]
+  },
+  "GoodsReceiptList": {
+    "type": "object",
+    "properties": {
+      "data": {
+        "type": "array",
+        "items": {
+          "$ref": "../openapi.json#/components/schemas/GoodsReceipt"
+        }
+      },
+      "recordsTotal": {
+        "type": "integer"
+      },
+      "recordsFiltered": {
+        "type": "integer"
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "data",
+      "recordsTotal",
+      "recordsFiltered"
+    ]
+  },
+  "SupplierResponse": {
+    "type": "object",
+    "properties": {
+      "supplier": {
+        "$ref": "../openapi.json#/components/schemas/Supplier"
+      },
+      "code": {
+        "$ref": "../openapi.json#/components/schemas/SuccessCode"
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "supplier",
+      "code"
+    ]
+  },
+  "MaterialResponse": {
+    "type": "object",
+    "properties": {
+      "material": {
+        "$ref": "../openapi.json#/components/schemas/Material"
+      },
+      "code": {
+        "$ref": "../openapi.json#/components/schemas/SuccessCode"
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "material",
+      "code"
+    ]
+  },
+  "WasteResponse": {
+    "type": "object",
+    "properties": {
+      "waste": {
+        "$ref": "../openapi.json#/components/schemas/Waste"
+      },
+      "code": {
+        "$ref": "../openapi.json#/components/schemas/SuccessCode"
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "waste",
+      "code"
+    ]
+  },
+  "GoodsIssueResponse": {
+    "type": "object",
+    "properties": {
+      "goodsIssue": {
+        "$ref": "../openapi.json#/components/schemas/Issue"
+      },
+      "code": {
+        "$ref": "../openapi.json#/components/schemas/SuccessCode"
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "goodsIssue",
+      "code"
+    ]
+  },
+  "WasteIssueResponse": {
+    "type": "object",
+    "properties": {
+      "wasteIssue": {
+        "$ref": "../openapi.json#/components/schemas/Issue"
+      },
+      "code": {
+        "$ref": "../openapi.json#/components/schemas/SuccessCode"
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "wasteIssue",
+      "code"
+    ]
+  },
+  "GoodsReceiptResponse": {
+    "type": "object",
+    "properties": {
+      "goodsReceipt": {
+        "$ref": "../openapi.json#/components/schemas/GoodsReceipt"
+      },
+      "code": {
+        "$ref": "../openapi.json#/components/schemas/SuccessCode"
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "goodsReceipt",
+      "code"
+    ]
+  },
+  "GoodsIssueReturnResponse": {
+    "type": "object",
+    "properties": {
+      "goodsIssueReturn": {
+        "$ref": "../openapi.json#/components/schemas/Return"
+      },
+      "code": {
+        "$ref": "../openapi.json#/components/schemas/SuccessCode"
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "goodsIssueReturn",
+      "code"
+    ]
+  },
+  "WasteIssueReturnResponse": {
+    "type": "object",
+    "properties": {
+      "wasteIssueReturn": {
+        "$ref": "../openapi.json#/components/schemas/Return"
+      },
+      "code": {
+        "$ref": "../openapi.json#/components/schemas/SuccessCode"
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "wasteIssueReturn",
+      "code"
+    ]
+  }
+}

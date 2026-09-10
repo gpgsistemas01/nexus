@@ -14,8 +14,8 @@ por capas** y una correspondencia de **MVC web extendido**.
    las capas.
 2. [Patrones de diseño y construcción](design-and-construction-patterns.md): definición,
    evidencia y reglas de aplicación de los patrones confirmados.
-3. [Contrato de la API](api-contract.md): transporte JSON, rutas, cuerpos, respuestas,
-   errores y validaciones observables.
+3. [Contrato de la API](api-contract.md) y [OpenAPI 3.1](openapi/openapi.json): transporte JSON,
+   rutas, esquemas de solicitud y respuesta, errores y validaciones observables.
 4. [Diagramas vigentes del código](code-diagrams.md): superficie HTTP, dominios,
    colaboraciones y reutilización observada.
 5. [Navegación y catálogo de pantallas web](web-navigation-and-screen-catalog.md): estados

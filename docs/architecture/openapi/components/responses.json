@@ -1,0 +1,32 @@
+{
+  "Unauthorized": {
+    "description": "Sesión ausente o inválida.",
+    "content": {
+      "application/json": {
+        "schema": {
+          "$ref": "../openapi.json#/components/schemas/Error"
+        }
+      }
+    }
+  },
+  "Forbidden": {
+    "description": "Permiso insuficiente.",
+    "content": {
+      "application/json": {
+        "schema": {
+          "$ref": "../openapi.json#/components/schemas/Error"
+        }
+      }
+    }
+  },
+  "ServerError": {
+    "description": "Error no controlado.",
+    "content": {
+      "application/json": {
+        "schema": {
+          "$ref": "../openapi.json#/components/schemas/Error"
+        }
+      }
+    }
+  }
+}
