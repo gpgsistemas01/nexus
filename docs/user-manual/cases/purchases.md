@@ -60,6 +60,9 @@ consulta. Abrir o editar el encabezado no cambia esos estados.
 3. En el detalle, elija una opción en **Buscar material...**, complete **Cantidad** y **Costo por Presentación**, y pulse **Agregar** por cada renglón.
 4. Revise el encabezado y los detalles, y seleccione **Confirmar**.
 
+   🟨 **ADVERTENCIA:** confirmar la compra incrementa la existencia de cada renglón. Si Nexus no
+   muestra un resultado concluyente, consulte el listado y el folio antes de volver a confirmar.
+
 Una compra sí puede contener el mismo material en más de un renglón, por ejemplo cuando las
 cantidades tienen costos por presentación distintos. Cada renglón se conserva por separado y su
 cantidad incrementa la existencia al confirmar. En cambio, una factura no se registra dos veces
@@ -97,6 +100,9 @@ materiales faltantes.
 
 2. Complete **Cantidad correcta** y **Costo por presentación correcto**.
 3. Seleccione **Corregir detalle** para confirmar o **Regresar** para salir sin aplicar la corrección.
+
+Al confirmar, compruebe los valores corregidos y la existencia resultante en Nexus. Si aparece un
+error o el estado queda incierto, actualice la compra antes de repetir la corrección.
 
 <a id="CAP-REP-ENT-05-EXPORT"></a>
 ### CAP-REP-ENT-05-EXPORT — Exportar reporte
