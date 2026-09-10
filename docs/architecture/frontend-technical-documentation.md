@@ -106,8 +106,16 @@ y las páginas publicadas en el [mapa generado](../generated/code-map.md#rutas-w
 Los modos provienen de `FORM_MODES`; no son estados persistidos. La habilitación se
 centraliza en los arreglos `materialFields` y `wasteFields`, en
 `ISSUE_HEADER_ENABLED_MODES` y `issueFormUI`, y en la configuración del modal de
-compras. La siguiente matriz registra esa frontera para evitar que el manual describa
-controles que la interfaz realmente bloquea:
+compras. La siguiente matriz es el inventario técnico de esa frontera: usa nombres de
+propiedad y reúne todos los modos para facilitar la revisión del código. El manual no
+la reproduce; allí cada procedimiento nombra sólo los controles que el operador usa y
+advierte los bloqueos que afectan ese recorrido.
+
+El atributo visual `disabled` no constituye una regla de autorización. Impide la
+captura accidental y comunica el modo vigente, pero los DTO, validadores y servicios
+del servidor siguen limitando los datos aceptados y aplicando las precondiciones de la
+operación. Un valor visible en un control bloqueado es contexto para el operador, no
+parte editable de la solicitud.
 
 La casilla `isActive` de materiales y mermas viaja en `create` o `edit`: no provoca un
 cambio de modo y no debe confundirse con la identidad ni con una transición documental.
