@@ -1,0 +1,356 @@
+{
+  "Access": {
+    "type": "object",
+    "properties": {
+      "departmentId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "roleId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "department": {
+        "$ref": "../openapi.json#/components/schemas/NamedCatalog"
+      },
+      "role": {
+        "$ref": "../openapi.json#/components/schemas/NamedCatalog"
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "departmentId",
+      "roleId"
+    ]
+  },
+  "Person": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "fullName": {
+        "type": "string"
+      },
+      "isActive": {
+        "type": "boolean"
+      },
+      "accesses": {
+        "type": "array",
+        "items": {
+          "$ref": "../openapi.json#/components/schemas/Access"
+        }
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "id",
+      "fullName"
+    ]
+  },
+  "User": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "name": {
+        "type": "string"
+      },
+      "isActive": {
+        "type": "boolean"
+      },
+      "personId": {
+        "oneOf": [
+          {
+            "type": "string",
+            "format": "uuid"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "person": {
+        "oneOf": [
+          {
+            "$ref": "../openapi.json#/components/schemas/Person"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "roleName": {
+        "type": [
+          "string",
+          "null"
+        ]
+      },
+      "departmentName": {
+        "type": [
+          "string",
+          "null"
+        ]
+      },
+      "accesses": {
+        "type": "array",
+        "items": {
+          "$ref": "../openapi.json#/components/schemas/Access"
+        }
+      },
+      "permissions": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "id",
+      "name"
+    ]
+  },
+  "Movement": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "date": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "type": {
+        "type": "string"
+      },
+      "referenceNumber": {
+        "type": "string"
+      },
+      "previousStock": {
+        "type": "number"
+      },
+      "quantity": {
+        "type": "number"
+      },
+      "newStock": {
+        "type": "number"
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "id",
+      "date",
+      "type"
+    ]
+  },
+  "PersonRequest": {
+    "type": "object",
+    "properties": {
+      "fullName": {
+        "type": "string"
+      },
+      "accesses": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "departmentId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "roleId": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "departmentId",
+            "roleId"
+          ]
+        }
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "fullName",
+      "accesses"
+    ]
+  },
+  "UserCreateRequest": {
+    "type": "object",
+    "properties": {
+      "name": {
+        "type": "string"
+      },
+      "password": {
+        "type": "string"
+      },
+      "personId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "roleId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "departmentId": {
+        "type": "string",
+        "format": "uuid"
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "name",
+      "password",
+      "personId",
+      "roleId",
+      "departmentId"
+    ]
+  },
+  "UserUpdateRequest": {
+    "type": "object",
+    "properties": {
+      "name": {
+        "type": "string"
+      },
+      "personId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "roleId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "departmentId": {
+        "type": "string",
+        "format": "uuid"
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "name",
+      "personId",
+      "roleId",
+      "departmentId"
+    ]
+  },
+  "PasswordRequest": {
+    "type": "object",
+    "properties": {
+      "password": {
+        "type": "string"
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "password"
+    ]
+  },
+  "PersonList": {
+    "type": "object",
+    "properties": {
+      "data": {
+        "type": "array",
+        "items": {
+          "$ref": "../openapi.json#/components/schemas/Person"
+        }
+      },
+      "recordsTotal": {
+        "type": "integer"
+      },
+      "recordsFiltered": {
+        "type": "integer"
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "data",
+      "recordsTotal",
+      "recordsFiltered"
+    ]
+  },
+  "UserList": {
+    "type": "object",
+    "properties": {
+      "data": {
+        "type": "array",
+        "items": {
+          "$ref": "../openapi.json#/components/schemas/User"
+        }
+      },
+      "recordsTotal": {
+        "type": "integer"
+      },
+      "recordsFiltered": {
+        "type": "integer"
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "data",
+      "recordsTotal",
+      "recordsFiltered"
+    ]
+  },
+  "MovementList": {
+    "type": "object",
+    "properties": {
+      "data": {
+        "type": "array",
+        "items": {
+          "$ref": "../openapi.json#/components/schemas/Movement"
+        }
+      },
+      "recordsTotal": {
+        "type": "integer"
+      },
+      "recordsFiltered": {
+        "type": "integer"
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "data",
+      "recordsTotal",
+      "recordsFiltered"
+    ]
+  },
+  "PersonResponse": {
+    "type": "object",
+    "properties": {
+      "person": {
+        "$ref": "../openapi.json#/components/schemas/Person"
+      },
+      "code": {
+        "$ref": "../openapi.json#/components/schemas/SuccessCode"
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "person",
+      "code"
+    ]
+  },
+  "UserResponse": {
+    "type": "object",
+    "properties": {
+      "user": {
+        "$ref": "../openapi.json#/components/schemas/User"
+      },
+      "code": {
+        "$ref": "../openapi.json#/components/schemas/SuccessCode"
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "user",
+      "code"
+    ]
+  }
+}

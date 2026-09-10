@@ -16,8 +16,10 @@ copiar el contrato HTTP.
 
 ### Alcance y nivel de cobertura
 
-Este artefacto es una referencia curada del comportamiento implementado, no una
-especificación OpenAPI completa ni un mecanismo de validación en tiempo de ejecución.
+Este artefacto es una referencia curada del comportamiento implementado. La
+[especificación OpenAPI 3.1](openapi/openapi.json) complementaria describe de forma procesable
+los esquemas de solicitud y respuesta de todas las operaciones registradas; no es un
+mecanismo de validación en tiempo de ejecución.
 El [mapa generado](../generated/code-map.md) es el inventario exhaustivo de
 métodos y rutas registradas. Este documento añade las reglas transversales, los cuerpos
 de escritura conocidos y las fichas que necesitan contexto; por tanto, que una ruta
@@ -402,52 +404,67 @@ del modal sin introducir una variante de estilo exclusiva para la exportación.
 
 ## Decisión
 
-**Sí conviene adoptar OpenAPI, pero Swagger no sustituye la documentación de
-arquitectura.** OpenAPI documentaría el contrato HTTP —rutas, parámetros, payloads,
-respuestas, errores y autenticación—; Swagger UI sería sólo una interfaz para consultar
-y probar ese contrato.
+**Nexus adopta OpenAPI, pero Swagger no sustituye la documentación de arquitectura.**
+La [especificación versionada](openapi/openapi.json) documenta el contrato HTTP —rutas,
+parámetros, payloads, respuestas, errores y autenticación—; Swagger UI sería sólo una
+interfaz opcional para consultar y probar ese contrato.
 
-Nexus todavía no publica un contrato OpenAPI. El
-[mapa generado](../generated/code-map.md) mantiene el inventario de métodos y rutas
-reales, pero no pretende inferir esquemas desde `express-validator`, DTO, controllers y
-servicios. Una especificación que sólo liste endpoints daría una falsa sensación de
-cobertura.
+El contrato OpenAPI publica las 61 operaciones actuales y sus esquemas de entrada y
+salida. `npm run docs:check` compara sus operaciones con el
+[mapa generado](../generated/code-map.md), de modo que una ruta nueva, eliminada o
+renombrada exige actualizar ambos artefactos. La comprobación no infiere la semántica de
+`express-validator`, DTO, controllers y servicios: sus cambios deben reflejarse
+deliberadamente en los componentes afectados del contrato.
 
-## Propuesta simple
+### Organización y exportación del contrato procesable
 
-1. Crear un contrato OpenAPI 3.1 versionado, comenzando por un CRUD completo y sus
-   errores; clientes o proveedores son mejores candidatos que un flujo transaccional.
-2. Reutilizar componentes de esquema para paginación, errores, identificadores y
+Las fuentes se dividen por responsabilidad bajo `docs/architecture/openapi/`:
+
+- `openapi.json` es el punto de entrada y conserva metadatos, seguridad y referencias;
+- `paths/auth.json`, `paths/admin.json`, `paths/sales.json` y `paths/warehouse.json`
+  agrupan las operaciones conforme a los routers existentes;
+- `components/common-schemas.json` contiene los contratos transversales y los archivos
+  `*-schemas.json` de autenticación, administración, ventas y almacén conservan los
+  contratos reutilizables de entrada y salida de cada dominio;
+- `components/responses.json` concentra las respuestas transversales.
+
+Esta división reduce conflictos de edición, permite revisar cada dominio por separado y
+mantiene juntos los esquemas compartidos. No se divide según si una ruta devuelve JSON o
+exporta Excel: el tipo de medio se declara en la respuesta de la propia operación.
+
+La fuente modular y el artefacto publicado cumplen propósitos diferentes. Las referencias
+relativas son válidas al consultar `docs/architecture/openapi/openapi.json` dentro del
+repositorio; al exportar `arquitectura` —también mediante `todos`— el flujo las resuelve y
+genera un único contrato autocontenido en `build/docs/openapi/openapi.json`. Ese archivo
+se puede importar directamente en validadores, generadores de clientes y visualizadores
+sin distribuir el árbol de fuentes.
+
+El contrato procesable no se incrusta como miles de líneas dentro del DOCX o PDF. El
+documento humano explica las reglas y el JSON resuelto se entrega por separado para
+herramientas. Tanto `npm run docs:check` como la exportación recorren el mismo punto de
+entrada modular, evitando mantener manualmente una segunda especificación consolidada.
+
+## Mantenimiento incremental
+
+1. Reutilizar componentes de esquema para paginación, errores, identificadores y
    respuestas comunes. No copiar el mismo payload entre operaciones o dominios.
-3. Validar el contrato en CI y agregar pruebas de integración relacionadas con el CRUD
-   documentado, siguiendo [la estrategia de pruebas](../testing/service-test-coverage.md).
-4. Publicar Swagger UI sólo como visualizador del contrato. En producción debe quedar
+2. Validar el contrato con `npm run docs:check` y agregar pruebas de integración
+   relacionadas con el CRUD documentado, siguiendo
+   [la estrategia de pruebas](../testing/service-test-coverage.md).
+3. Publicar Swagger UI sólo como visualizador del contrato. En producción debe quedar
    deshabilitado o protegido si revela operaciones internas.
-5. Migrar el siguiente recurso únicamente cuando el anterior describa solicitudes,
-   respuestas y errores reales. No declarar la API completa de una vez con esquemas
-   incompletos.
-
-## Cuándo implementarlo
-
-Priorizar OpenAPI cuando exista al menos una de estas necesidades:
-
-- integración con otro sistema o equipo;
-- generación de clientes o pruebas de contrato;
-- consumidores que no pueden leer el código del servidor;
-- necesidad de probar endpoints desde una interfaz controlada.
-
-Mientras la aplicación web sea el único consumidor, no es un bloqueo operativo. Aun
-así, el contrato aporta valor y debe incorporarse incrementalmente en lugar de intentar
-generarlo automáticamente desde rutas que no contienen toda la semántica.
+4. Actualizar en una misma modificación la operación, sus componentes reutilizables y
+   las pruebas cuando cambie el contrato HTTP.
 
 ## Fuente de verdad actual
 
-Hasta adoptar OpenAPI, se consulta en este orden:
+El contrato se consulta en este orden:
 
-1. [mapa generado](../generated/code-map.md) para métodos y rutas;
-2. `src/routes/api/` para middleware, permisos y validadores;
-3. `src/validators/`, `src/dtos/` y controllers para entradas y respuestas;
-4. pruebas de integración para comportamiento observable y persistencia.
+1. [OpenAPI 3.1](openapi/openapi.json) para parámetros y esquemas de solicitud y respuesta;
+2. [mapa generado](../generated/code-map.md) para el inventario de métodos y rutas;
+3. `src/routes/api/` para middleware, permisos y validadores;
+4. `src/validators/`, `src/dtos/` y controllers para contrastar entradas y respuestas;
+5. pruebas de integración para comportamiento observable y persistencia.
 
 ## Precisión de valores decimales
 

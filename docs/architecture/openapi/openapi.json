@@ -1,0 +1,370 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Nexus API",
+    "version": "1.0.0",
+    "description": "Contrato procesable de solicitudes y respuestas implementadas. Los listados reflejan la proyección observable; algunos campos dependen de permisos."
+  },
+  "servers": [
+    {
+      "url": "/"
+    }
+  ],
+  "paths": {
+    "/api/auth/login": {
+      "$ref": "./paths/auth.json#/~1api~1auth~1login"
+    },
+    "/api/auth/me": {
+      "$ref": "./paths/auth.json#/~1api~1auth~1me"
+    },
+    "/api/auth/refresh": {
+      "$ref": "./paths/auth.json#/~1api~1auth~1refresh"
+    },
+    "/api/sales/clients": {
+      "$ref": "./paths/sales.json#/~1api~1sales~1clients"
+    },
+    "/api/sales/clients/{id}": {
+      "$ref": "./paths/sales.json#/~1api~1sales~1clients~1{id}"
+    },
+    "/api/sales/reports/clients/excel": {
+      "$ref": "./paths/sales.json#/~1api~1sales~1reports~1clients~1excel"
+    },
+    "/api/warehouse/materials": {
+      "$ref": "./paths/warehouse.json#/~1api~1warehouse~1materials"
+    },
+    "/api/warehouse/materials/{id}": {
+      "$ref": "./paths/warehouse.json#/~1api~1warehouse~1materials~1{id}"
+    },
+    "/api/warehouse/materials/{id}/stock": {
+      "$ref": "./paths/warehouse.json#/~1api~1warehouse~1materials~1{id}~1stock"
+    },
+    "/api/warehouse/wastes/material-templates": {
+      "$ref": "./paths/warehouse.json#/~1api~1warehouse~1wastes~1material-templates"
+    },
+    "/api/warehouse/wastes": {
+      "$ref": "./paths/warehouse.json#/~1api~1warehouse~1wastes"
+    },
+    "/api/warehouse/wastes/{id}": {
+      "$ref": "./paths/warehouse.json#/~1api~1warehouse~1wastes~1{id}"
+    },
+    "/api/warehouse/wastes/{id}/stock": {
+      "$ref": "./paths/warehouse.json#/~1api~1warehouse~1wastes~1{id}~1stock"
+    },
+    "/api/warehouse/waste-issues": {
+      "$ref": "./paths/warehouse.json#/~1api~1warehouse~1waste-issues"
+    },
+    "/api/warehouse/waste-issues/{id}": {
+      "$ref": "./paths/warehouse.json#/~1api~1warehouse~1waste-issues~1{id}"
+    },
+    "/api/warehouse/waste-issues/{id}/header": {
+      "$ref": "./paths/warehouse.json#/~1api~1warehouse~1waste-issues~1{id}~1header"
+    },
+    "/api/warehouse/waste-issues/{id}/details": {
+      "$ref": "./paths/warehouse.json#/~1api~1warehouse~1waste-issues~1{id}~1details"
+    },
+    "/api/warehouse/waste-issues/{id}/details/{detailId}/returns": {
+      "$ref": "./paths/warehouse.json#/~1api~1warehouse~1waste-issues~1{id}~1details~1{detailId}~1returns"
+    },
+    "/api/warehouse/suppliers": {
+      "$ref": "./paths/warehouse.json#/~1api~1warehouse~1suppliers"
+    },
+    "/api/warehouse/suppliers/{id}": {
+      "$ref": "./paths/warehouse.json#/~1api~1warehouse~1suppliers~1{id}"
+    },
+    "/api/warehouse/goods-receipts": {
+      "$ref": "./paths/warehouse.json#/~1api~1warehouse~1goods-receipts"
+    },
+    "/api/warehouse/goods-receipts/{id}": {
+      "$ref": "./paths/warehouse.json#/~1api~1warehouse~1goods-receipts~1{id}"
+    },
+    "/api/warehouse/goods-receipts/{id}/details/{detailId}/corrections": {
+      "$ref": "./paths/warehouse.json#/~1api~1warehouse~1goods-receipts~1{id}~1details~1{detailId}~1corrections"
+    },
+    "/api/warehouse/goods-receipts/{id}/details/{detailId}/cancel": {
+      "$ref": "./paths/warehouse.json#/~1api~1warehouse~1goods-receipts~1{id}~1details~1{detailId}~1cancel"
+    },
+    "/api/warehouse/goods-issues": {
+      "$ref": "./paths/warehouse.json#/~1api~1warehouse~1goods-issues"
+    },
+    "/api/warehouse/goods-issues/{id}": {
+      "$ref": "./paths/warehouse.json#/~1api~1warehouse~1goods-issues~1{id}"
+    },
+    "/api/warehouse/goods-issues/{id}/header": {
+      "$ref": "./paths/warehouse.json#/~1api~1warehouse~1goods-issues~1{id}~1header"
+    },
+    "/api/warehouse/goods-issues/{id}/details": {
+      "$ref": "./paths/warehouse.json#/~1api~1warehouse~1goods-issues~1{id}~1details"
+    },
+    "/api/warehouse/goods-issues/{id}/details/{detailId}/returns": {
+      "$ref": "./paths/warehouse.json#/~1api~1warehouse~1goods-issues~1{id}~1details~1{detailId}~1returns"
+    },
+    "/api/warehouse/reports/inventory/excel": {
+      "$ref": "./paths/warehouse.json#/~1api~1warehouse~1reports~1inventory~1excel"
+    },
+    "/api/warehouse/reports/goods-issues/excel": {
+      "$ref": "./paths/warehouse.json#/~1api~1warehouse~1reports~1goods-issues~1excel"
+    },
+    "/api/warehouse/reports/waste-issues/excel": {
+      "$ref": "./paths/warehouse.json#/~1api~1warehouse~1reports~1waste-issues~1excel"
+    },
+    "/api/warehouse/reports/goods-receipts/excel": {
+      "$ref": "./paths/warehouse.json#/~1api~1warehouse~1reports~1goods-receipts~1excel"
+    },
+    "/api/warehouse/reports/wastes/excel": {
+      "$ref": "./paths/warehouse.json#/~1api~1warehouse~1reports~1wastes~1excel"
+    },
+    "/api/warehouse/reports/suppliers/excel": {
+      "$ref": "./paths/warehouse.json#/~1api~1warehouse~1reports~1suppliers~1excel"
+    },
+    "/api/warehouse/unit-measures": {
+      "$ref": "./paths/warehouse.json#/~1api~1warehouse~1unit-measures"
+    },
+    "/api/warehouse/presentations": {
+      "$ref": "./paths/warehouse.json#/~1api~1warehouse~1presentations"
+    },
+    "/api/warehouse/reasons": {
+      "$ref": "./paths/warehouse.json#/~1api~1warehouse~1reasons"
+    },
+    "/api/warehouse/fulfillment-statuses": {
+      "$ref": "./paths/warehouse.json#/~1api~1warehouse~1fulfillment-statuses"
+    },
+    "/api/admin/users": {
+      "$ref": "./paths/admin.json#/~1api~1admin~1users"
+    },
+    "/api/admin/users/{id}": {
+      "$ref": "./paths/admin.json#/~1api~1admin~1users~1{id}"
+    },
+    "/api/admin/users/{id}/password": {
+      "$ref": "./paths/admin.json#/~1api~1admin~1users~1{id}~1password"
+    },
+    "/api/admin/roles": {
+      "$ref": "./paths/admin.json#/~1api~1admin~1roles"
+    },
+    "/api/admin/departments": {
+      "$ref": "./paths/admin.json#/~1api~1admin~1departments"
+    },
+    "/api/admin/persons": {
+      "$ref": "./paths/admin.json#/~1api~1admin~1persons"
+    },
+    "/api/admin/persons/{id}": {
+      "$ref": "./paths/admin.json#/~1api~1admin~1persons~1{id}"
+    },
+    "/api/admin/movements/wastes": {
+      "$ref": "./paths/admin.json#/~1api~1admin~1movements~1wastes"
+    },
+    "/api/admin/movements/materials": {
+      "$ref": "./paths/admin.json#/~1api~1admin~1movements~1materials"
+    },
+    "/api/admin/reports/movements/materials/excel": {
+      "$ref": "./paths/admin.json#/~1api~1admin~1reports~1movements~1materials~1excel"
+    },
+    "/api/admin/reports/movements/wastes/excel": {
+      "$ref": "./paths/admin.json#/~1api~1admin~1reports~1movements~1wastes~1excel"
+    },
+    "/api/admin/reports/users/excel": {
+      "$ref": "./paths/admin.json#/~1api~1admin~1reports~1users~1excel"
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "cookieAuth": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "accessToken"
+      }
+    },
+    "responses": {
+      "Unauthorized": {
+        "$ref": "./components/responses.json#/Unauthorized"
+      },
+      "Forbidden": {
+        "$ref": "./components/responses.json#/Forbidden"
+      },
+      "ServerError": {
+        "$ref": "./components/responses.json#/ServerError"
+      }
+    },
+    "schemas": {
+      "SuccessCode": {
+        "$ref": "./components/common-schemas.json#/SuccessCode"
+      },
+      "Error": {
+        "$ref": "./components/common-schemas.json#/Error"
+      },
+      "ValidationError": {
+        "$ref": "./components/common-schemas.json#/ValidationError"
+      },
+      "NamedCatalog": {
+        "$ref": "./components/common-schemas.json#/NamedCatalog"
+      },
+      "Access": {
+        "$ref": "./components/admin-schemas.json#/Access"
+      },
+      "Person": {
+        "$ref": "./components/admin-schemas.json#/Person"
+      },
+      "User": {
+        "$ref": "./components/admin-schemas.json#/User"
+      },
+      "Client": {
+        "$ref": "./components/sales-schemas.json#/Client"
+      },
+      "Supplier": {
+        "$ref": "./components/warehouse-schemas.json#/Supplier"
+      },
+      "Material": {
+        "$ref": "./components/warehouse-schemas.json#/Material"
+      },
+      "Waste": {
+        "$ref": "./components/warehouse-schemas.json#/Waste"
+      },
+      "Issue": {
+        "$ref": "./components/warehouse-schemas.json#/Issue"
+      },
+      "IssueDetail": {
+        "$ref": "./components/warehouse-schemas.json#/IssueDetail"
+      },
+      "GoodsReceipt": {
+        "$ref": "./components/warehouse-schemas.json#/GoodsReceipt"
+      },
+      "GoodsReceiptDetail": {
+        "$ref": "./components/warehouse-schemas.json#/GoodsReceiptDetail"
+      },
+      "Movement": {
+        "$ref": "./components/admin-schemas.json#/Movement"
+      },
+      "Return": {
+        "$ref": "./components/warehouse-schemas.json#/Return"
+      },
+      "LoginRequest": {
+        "$ref": "./components/auth-schemas.json#/LoginRequest"
+      },
+      "PersonRequest": {
+        "$ref": "./components/admin-schemas.json#/PersonRequest"
+      },
+      "UserCreateRequest": {
+        "$ref": "./components/admin-schemas.json#/UserCreateRequest"
+      },
+      "UserUpdateRequest": {
+        "$ref": "./components/admin-schemas.json#/UserUpdateRequest"
+      },
+      "PasswordRequest": {
+        "$ref": "./components/admin-schemas.json#/PasswordRequest"
+      },
+      "ClientRequest": {
+        "$ref": "./components/sales-schemas.json#/ClientRequest"
+      },
+      "SupplierRequest": {
+        "$ref": "./components/warehouse-schemas.json#/SupplierRequest"
+      },
+      "MaterialCreateRequest": {
+        "$ref": "./components/warehouse-schemas.json#/MaterialCreateRequest"
+      },
+      "MaterialUpdateRequest": {
+        "$ref": "./components/warehouse-schemas.json#/MaterialUpdateRequest"
+      },
+      "MaterialStockRequest": {
+        "$ref": "./components/warehouse-schemas.json#/MaterialStockRequest"
+      },
+      "WasteCreateRequest": {
+        "$ref": "./components/warehouse-schemas.json#/WasteCreateRequest"
+      },
+      "WasteUpdateRequest": {
+        "$ref": "./components/warehouse-schemas.json#/WasteUpdateRequest"
+      },
+      "WasteStockRequest": {
+        "$ref": "./components/warehouse-schemas.json#/WasteStockRequest"
+      },
+      "IssueHeaderRequest": {
+        "$ref": "./components/warehouse-schemas.json#/IssueHeaderRequest"
+      },
+      "GoodsIssueRequest": {
+        "$ref": "./components/warehouse-schemas.json#/GoodsIssueRequest"
+      },
+      "WasteIssueRequest": {
+        "$ref": "./components/warehouse-schemas.json#/WasteIssueRequest"
+      },
+      "IssueDetailsUpdateRequest": {
+        "$ref": "./components/warehouse-schemas.json#/IssueDetailsUpdateRequest"
+      },
+      "ReturnRequest": {
+        "$ref": "./components/warehouse-schemas.json#/ReturnRequest"
+      },
+      "GoodsReceiptRequest": {
+        "$ref": "./components/warehouse-schemas.json#/GoodsReceiptRequest"
+      },
+      "GoodsReceiptCorrectionRequest": {
+        "$ref": "./components/warehouse-schemas.json#/GoodsReceiptCorrectionRequest"
+      },
+      "NamedCatalogList": {
+        "$ref": "./components/common-schemas.json#/NamedCatalogList"
+      },
+      "PersonList": {
+        "$ref": "./components/admin-schemas.json#/PersonList"
+      },
+      "UserList": {
+        "$ref": "./components/admin-schemas.json#/UserList"
+      },
+      "ClientList": {
+        "$ref": "./components/sales-schemas.json#/ClientList"
+      },
+      "SupplierList": {
+        "$ref": "./components/warehouse-schemas.json#/SupplierList"
+      },
+      "MaterialList": {
+        "$ref": "./components/warehouse-schemas.json#/MaterialList"
+      },
+      "WasteList": {
+        "$ref": "./components/warehouse-schemas.json#/WasteList"
+      },
+      "IssueList": {
+        "$ref": "./components/warehouse-schemas.json#/IssueList"
+      },
+      "GoodsReceiptList": {
+        "$ref": "./components/warehouse-schemas.json#/GoodsReceiptList"
+      },
+      "MovementList": {
+        "$ref": "./components/admin-schemas.json#/MovementList"
+      },
+      "PersonResponse": {
+        "$ref": "./components/admin-schemas.json#/PersonResponse"
+      },
+      "UserResponse": {
+        "$ref": "./components/admin-schemas.json#/UserResponse"
+      },
+      "ClientResponse": {
+        "$ref": "./components/sales-schemas.json#/ClientResponse"
+      },
+      "SupplierResponse": {
+        "$ref": "./components/warehouse-schemas.json#/SupplierResponse"
+      },
+      "MaterialResponse": {
+        "$ref": "./components/warehouse-schemas.json#/MaterialResponse"
+      },
+      "WasteResponse": {
+        "$ref": "./components/warehouse-schemas.json#/WasteResponse"
+      },
+      "GoodsIssueResponse": {
+        "$ref": "./components/warehouse-schemas.json#/GoodsIssueResponse"
+      },
+      "WasteIssueResponse": {
+        "$ref": "./components/warehouse-schemas.json#/WasteIssueResponse"
+      },
+      "GoodsReceiptResponse": {
+        "$ref": "./components/warehouse-schemas.json#/GoodsReceiptResponse"
+      },
+      "GoodsIssueReturnResponse": {
+        "$ref": "./components/warehouse-schemas.json#/GoodsIssueReturnResponse"
+      },
+      "WasteIssueReturnResponse": {
+        "$ref": "./components/warehouse-schemas.json#/WasteIssueReturnResponse"
+      },
+      "CodeResponse": {
+        "$ref": "./components/common-schemas.json#/CodeResponse"
+      },
+      "CurrentUserResponse": {
+        "$ref": "./components/auth-schemas.json#/CurrentUserResponse"
+      }
+    }
+  }
+}
