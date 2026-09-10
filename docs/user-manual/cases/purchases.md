@@ -29,7 +29,7 @@ consulta. Abrir o editar el encabezado no cambia esos estados.
 <a id="CAP-ENT-01-LIST"></a>
 ### CAP-ENT-01-LIST — Listado
 
-**Casos:** `CU-ENT-01`.
+**Casos de uso:** `CU-ENT-01` — Consultar compras de material.
 
 **Errores posibles:** [Compras](../error-messages.md#errores-compras).
 
@@ -46,7 +46,7 @@ consulta. Abrir o editar el encabezado no cambia esos estados.
 <a id="CAP-ENT-02-CREATE"></a>
 ### CAP-ENT-02-CREATE — Formulario registro
 
-**Casos:** `CU-ENT-02`.
+**Casos de uso:** `CU-ENT-02` — Crear compra de material.
 
 **Errores posibles:** [Validación de formularios](../error-messages.md#errores-validacion), [Compras](../error-messages.md#errores-compras).
 
@@ -69,7 +69,7 @@ materiales faltantes.
 <a id="CAP-ENT-03-EDIT"></a>
 ### CAP-ENT-03-EDIT — Edicion compra
 
-**Casos:** `CU-ENT-03`, `CU-ENT-05`.
+**Casos de uso:** `CU-ENT-03` — Editar compra de material; `CU-ENT-05` — Cancelar material de una compra.
 
 **Errores posibles:** [Validación de formularios](../error-messages.md#errores-validacion), [Compras](../error-messages.md#errores-compras).
 
@@ -85,7 +85,7 @@ materiales faltantes.
 <a id="CAP-ENT-04-CORRECT"></a>
 ### CAP-ENT-04-CORRECT — Correccion detalle
 
-**Casos:** `CU-ENT-04`.
+**Casos de uso:** `CU-ENT-04` — Corregir material de una compra.
 
 **Errores posibles:** [Validación de formularios](../error-messages.md#errores-validacion), [Compras](../error-messages.md#errores-compras).
 
@@ -101,7 +101,7 @@ materiales faltantes.
 <a id="CAP-REP-ENT-05-EXPORT"></a>
 ### CAP-REP-ENT-05-EXPORT — Exportar reporte
 
-**Casos:** `CU-REP-11`.
+**Casos de uso:** `CU-REP-11` — Generar reporte de compras de material.
 
 **Errores posibles:** [Compras](../error-messages.md#errores-compras).
 
@@ -117,7 +117,7 @@ materiales faltantes.
 <a id="CAP-ENT-06-VIEW"></a>
 ### CAP-ENT-06-VIEW — Consultar compra cancelada
 
-**Casos:** `CU-ENT-03`, `CU-ENT-05`.
+**Caso de uso:** `CU-ENT-01` — Consultar compras de material.
 
 1. Localice una compra con estado **Cancelada** y seleccione **Editar registro**.
 2. Compruebe que el formulario, sus detalles y sus acciones permanezcan en modo consulta, como en

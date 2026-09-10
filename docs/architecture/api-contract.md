@@ -21,8 +21,8 @@ Este artefacto es una referencia curada del comportamiento implementado. La
 los esquemas de solicitud y respuesta de todas las operaciones registradas; no es un
 mecanismo de validación en tiempo de ejecución.
 El [mapa generado](../generated/code-map.md) es el inventario exhaustivo de
-métodos y rutas registradas. Este documento añade las reglas transversales, los cuerpos
-de escritura conocidos y las fichas que necesitan contexto; por tanto, que una ruta
+métodos y rutas registradas. Este documento añade las reglas transversales y las fichas
+que necesitan contexto; por tanto, que una ruta
 aparezca sólo en el mapa no significa que tenga documentados aquí todos sus parámetros,
 respuestas y errores.
 
@@ -144,105 +144,33 @@ sesión recibe la contraseña en el cuerpo y los tokens posteriores viajan en co
 otro origen no debe asumir CORS ni autenticación Bearer mientras la configuración del
 servidor no los declare.
 
-### Cuerpos JSON de las rutas de escritura
+### Solicitudes y respuestas JSON
 
-La siguiente matriz documenta los datos que el cliente envía en las rutas registradas
-que reciben cuerpo. `:id` y `:detailId` se sustituyen en la URL. Los UUID y valores de
-los ejemplos son demostrativos; no identifican registros que necesariamente existan.
-Las reglas de presencia, formato y límites se consultan en la
-[matriz de validaciones por campo](#matriz-de-validaciones-por-campo).
+Los cuerpos de solicitud y respuesta **se mantienen en OpenAPI y no se replican como
+otra tabla exhaustiva en este documento**. La especificación ya relaciona cada método y
+ruta con `requestBody`, código de estado, tipo de medio y esquema; duplicar aquí sólo
+las solicitudes obligaría a sincronizar dos inventarios y dejaría las respuestas con un
+nivel de detalle desigual. Replicar también todas las respuestas duplicaría aún más el
+contrato sin aportar otra fuente de verdad.
 
-La columna **Estructura** usa una notación abreviada semejante a un esquema: por ejemplo,
-`{ name, password }` enumera propiedades, pero **no es JSON para copiar**, porque omite
-comillas y valores. Los bloques marcados como `json` en
-[Demostraciones de estructura](#demostraciones-de-estructura) sí son JSON válido. Se
-deben enviar sólo los campos de la operación; los DTO descartan campos adicionales en
-varios flujos, pero ese comportamiento no se considera una autorización para enviarlos
-y no es uniforme en toda la API.
+Esta guía curada conserva únicamente las reglas transversales, las excepciones y las
+fichas que explican efectos o decisiones que un esquema no comunica por sí solo. Para
+consultar una operación se sigue la misma lectura en ambos sentidos:
 
-| Rutas | Estructura abreviada del cuerpo JSON |
-| --- | --- |
-| `POST /api/auth/login` | `{ name, password }` |
-| `POST /api/auth/refresh` | Sin cuerpo; utiliza la cookie de renovación. |
-| `POST /api/admin/persons`, `PUT /api/admin/persons/:id` | `{ fullName, accesses: [{ departmentId, roleId }] }` |
-| `POST /api/admin/users` | `{ name, password, personId, roleId, departmentId }` |
-| `PATCH /api/admin/users/:id` | `{ name, personId, roleId, departmentId }` |
-| `PATCH /api/admin/users/:id/password` | `{ password }` |
-| `POST /api/sales/clients`, `PUT /api/sales/clients/:id` | `{ name }` |
-| `POST /api/warehouse/suppliers`, `PUT /api/warehouse/suppliers/:id` | `{ legalName, tradeName, isActive }` |
-| `POST /api/warehouse/materials` | `{ name, supplierId, presentationId, unitMeasureId, base, height, minStock, maxUnitCost, isActive, newStock, observations }`; `base`, `height`, `minStock` y `observations` pueden omitirse conforme a sus reglas. |
-| `PATCH /api/warehouse/materials/:id` | `{ name, supplierId, minStock, maxUnitCost, isActive }`; `minStock` puede omitirse. |
-| `PATCH /api/warehouse/materials/:id/stock` | `{ supplierId, newStock, reasonId, observations }`; `observations` puede omitirse. |
-| `POST /api/warehouse/wastes` | `{ name, materialId, supplierId, base, height, minStock, maxUnitCost, isActive, newStock, observations }`; `minStock` y `observations` pueden omitirse. |
-| `PATCH /api/warehouse/wastes/:id` | `{ name, minStock, maxUnitCost, isActive }`; `minStock` puede omitirse. |
-| `PATCH /api/warehouse/wastes/:id/stock` | `{ newStock, reasonId, observations }`; `observations` puede omitirse. |
-| `POST /api/warehouse/goods-receipts` | `{ supplierId, receivedById, isInvoiced, invoice, receptionDate, observations, details: [{ materialId, quantity, costPerUnitType }] }`; `invoice` sólo se envía al facturar y `observations` puede omitirse. |
-| `PATCH /api/warehouse/goods-receipts/:id` | La estructura del alta; `details` puede omitirse y cada detalle existente puede incluir `id`. |
-| `PATCH /api/warehouse/goods-receipts/:id/details/:detailId/corrections` | `{ quantity, costPerUnitType }` |
-| Altas y ediciones completas de `/api/warehouse/goods-issues` | Encabezado `{ advisorId, clientId, departmentId, requesterId, projectNumber, requestDate, observations }` más `details: [{ materialId, supplierId, presentationId, quantity }]`; `observations` y `presentationId` pueden omitirse. En `PATCH /:id`, un detalle existente incluye `id`. |
-| Altas y ediciones completas de `/api/warehouse/waste-issues` | El mismo encabezado más `details: [{ wasteId, quantity }]`; `observations` puede omitirse. |
-| `PATCH /api/warehouse/{goods-issues,waste-issues}/:id/header` | Sólo el encabezado común anterior. |
-| `PATCH /api/warehouse/{goods-issues,waste-issues}/:id/details` | `{ details: [{ id, isSupplied, projectConvertedQuantity }] }` |
-| `PATCH /api/warehouse/{goods-issues,waste-issues}/:id/details/:detailId/returns` | `{ returnQuantity, observations }`; `observations` puede omitirse. |
+| Pregunta | Solicitud | Respuesta | Fuente propietaria |
+| --- | --- | --- | --- |
+| ¿Qué medio se transporta? | `requestBody.content` | `responses.<status>.content` | Operación bajo `openapi/paths/*.json` |
+| ¿Qué propiedades existen y cuáles son obligatorias? | `schema`, `required` y `additionalProperties` | `schema`, `required` y `additionalProperties` | Componente reutilizable bajo `openapi/components/*-schemas.json` |
+| ¿Qué variante aplica? | `oneOf`, propiedades condicionales o esquema específico de la operación | Código HTTP y esquema asociado a ese código | Operación y componente referenciado |
+| ¿Qué ocurre en errores comunes? | La validación aplicable se explica en esta guía | `401`, `403` y `500`, más errores propios de la operación | `openapi/components/responses.json` y operación |
+| ¿Qué ejemplo se debe copiar? | Sólo un bloque `json` explícito o un ejemplo OpenAPI; nunca la notación abreviada de una tabla | Sólo un ejemplo vinculado al esquema y código HTTP | OpenAPI o ficha curada excepcional |
 
-Las rutas `GET`, `DELETE /api/warehouse/materials/:id` y las cancelaciones de detalle
-no reciben cuerpo JSON. Sus filtros se envían como query y sus identificadores forman
-parte de la URL.
-
-#### Demostraciones de estructura
-
-Una petición simple de ajuste separa el identificador del material, que viaja en la
-URL, de los datos modificables, que viajan en el cuerpo:
-
-```http
-PATCH /api/warehouse/materials/550e8400-e29b-41d4-a716-446655440000/stock
-Content-Type: application/json
-```
-
-```json
-{
-  "supplierId": "9a7b3302-28a2-4af5-b53f-317be93ab56a",
-  "newStock": 125.5,
-  "reasonId": "5bb1f600-0fc8-4ace-9881-ef36ad37d197",
-  "observations": "Conteo físico de almacén"
-}
-```
-
-Una entrada de almacén demuestra un cuerpo compuesto con encabezado y una matriz de
-detalles:
-
-```json
-{
-  "supplierId": "9a7b3302-28a2-4af5-b53f-317be93ab56a",
-  "receivedById": "2a5553be-63f6-463d-a346-409d838cdbf5",
-  "isInvoiced": true,
-  "invoice": "FAC-1042",
-  "receptionDate": "2026-09-09",
-  "observations": "Entrega completa",
-  "details": [
-    {
-      "materialId": "550e8400-e29b-41d4-a716-446655440000",
-      "quantity": 20,
-      "costPerUnitType": 37.5
-    }
-  ]
-}
-```
-
-La edición de surtido usa el identificador estable de cada fila para transportar su
-estado y cantidad:
-
-```json
-{
-  "details": [
-    {
-      "id": "a642ab8d-edf2-4750-a527-872a46180fe1",
-      "isSupplied": true,
-      "projectConvertedQuantity": 8.25
-    }
-  ]
-}
-```
+La ausencia de `requestBody` significa que la operación no recibe un cuerpo contractual;
+parámetros de ruta y query se consultan en `parameters`. La ausencia de
+`application/json` en una respuesta también es significativa: por ejemplo, una descarga
+usa su tipo de archivo y la renovación correcta de sesión devuelve `text/plain`. El
+[ejemplo aplicado de ajuste de existencias](#ejemplo-aplicado-ajuste-de-existencias-de-material)
+muestra una ficha humana completa sin convertirla en un segundo catálogo de payloads.
 
 #### Autenticación y autorización
 

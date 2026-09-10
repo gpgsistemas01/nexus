@@ -2,7 +2,8 @@
 
 Este capítulo forma parte del [catálogo de secuencias del código backend](index.md) y conserva los recorridos aplicados del grupo `AUT`. Las reglas comunes de lectura, trazabilidad y mantenimiento se declaran en el índice de la colección.
 
-## `CU-AUT-01`
+<a id="cu-aut-01"></a>
+## `CU-AUT-01` — Iniciar sesión
 
 **Patrones:** `BE-P01`, `BE-P08`.
 
@@ -39,7 +40,8 @@ sequenceDiagram
     end
 ```
 
-## `CU-AUT-02`
+<a id="cu-aut-02"></a>
+## `CU-AUT-02` — Cerrar sesión
 
 **Patrones:** `BE-P08`.
 

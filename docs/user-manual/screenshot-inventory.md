@@ -159,6 +159,21 @@ deben retirarse de la terminal al terminar, como indica la
 [guía de exportación](../README.md#exportar-la-documentación). La pantalla de inicio de sesión se
 toma en un contexto separado y sin autenticación.
 
+No hace falta ejecutar un comando previo para obtener una sesión cuando se dispone de una cuenta
+ficticia: las credenciales pueden definirse en el mismo comando y el inicio de sesión se realiza en
+ese momento:
+
+```bash
+DOCS_LOGIN_NAME='usuario-ficticio' DOCS_LOGIN_PASSWORD='valor-temporal' npm run docs:screenshots
+```
+
+En PowerShell se definen ambas variables con `$env:` antes del comando y se eliminan al terminar.
+`DOCS_STORAGE_STATE` sólo conviene cuando otro flujo controlado ya entrega el archivo; el repositorio
+no extrae credenciales ni crea ese archivo, para evitar persistir secretos.
+
+🟥 **DATO SENSIBLE:** no escriba valores reales en este documento, `.env`, el historial de
+shell o archivos versionados. Use secretos efímeros del entorno de desarrollo o CI.
+
 Las líneas indentadas `Paso N/T de CAP-*` describen los filtros y clics necesarios para preparar
 **una sola captura**; no indican que se haya escrito otro PNG. Sólo la línea sin sangría
 `CAP-* -> ruta.png [...]` confirma la escritura. Después de corregir un prerrequisito puede
@@ -212,6 +227,13 @@ con `DOCS_CAPTURE_IDS` o `DOCS_CAPTURE_FROM`.
 flujo reutiliza una instancia que ya responda en `DOCS_BASE_URL` y sólo detiene la que haya iniciado
 él mismo; la selección o reanudación mediante `DOCS_CAPTURE_IDS` o `DOCS_CAPTURE_FROM` permanece a
 cargo del mismo inventario.
+
+Cada captura que falla por tiempo de espera se recupera automáticamente desde su ruta inicial. El
+valor predeterminado realiza hasta **dos reintentos** y conserva las capturas anteriores. Puede
+ajustarse puntualmente con `DOCS_CAPTURE_RETRIES` (cero desactiva los reintentos) y
+`DOCS_CAPTURE_TIMEOUT_MS` (30 000 ms de forma predeterminada). Los errores de permisos, selectores
+o datos faltantes no se reintentan: requieren corregir el prerrequisito indicado. Si se agotan los
+reintentos, use `DOCS_CAPTURE_IDS` para esa captura o `DOCS_CAPTURE_FROM` para reanudar el resto.
 
 ## Revisión antes de publicar
 

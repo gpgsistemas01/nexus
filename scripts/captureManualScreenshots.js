@@ -15,6 +15,16 @@ const requestedCaptureFrom = process.env.DOCS_CAPTURE_FROM?.trim();
 const recoverMissingCaptures = process.argv.includes('--missing');
 const outputRoot = path.resolve('docs/user-manual/images');
 const screenshotDelay = 1500;
+const retryDelay = 1000;
+const captureTimeout = Number(process.env.DOCS_CAPTURE_TIMEOUT_MS ?? '30000');
+const captureRetries = Number(process.env.DOCS_CAPTURE_RETRIES ?? '2');
+
+if (!Number.isInteger(captureTimeout) || captureTimeout <= 0) {
+    throw new Error('DOCS_CAPTURE_TIMEOUT_MS debe ser un entero mayor a cero.');
+}
+if (!Number.isInteger(captureRetries) || captureRetries < 0) {
+    throw new Error('DOCS_CAPTURE_RETRIES debe ser un entero mayor o igual a cero.');
+}
 
 const click = (selector, ready, requirement) => ({ selector, ready, requirement });
 const filter = (selector, label) => ({ selector, label, filter: true });
@@ -282,6 +292,32 @@ const capturePage = async (page, capture) => {
     console.log(`${ capture.id } -> ${ path.join(capture.module, capture.name) } [${ formatCoverage(capture.useCases) }]`);
 };
 
+const isTimeoutError = (error) => {
+    let currentError = error;
+    while (currentError) {
+        if (currentError.name === 'TimeoutError'
+            || /timeout|tiempo límite/i.test(String(currentError.message ?? ''))) return true;
+        currentError = currentError.cause;
+    }
+    return false;
+};
+
+const capturePageWithRecovery = async (page, capture) => {
+    for (let attempt = 0; attempt <= captureRetries; attempt += 1) {
+        try {
+            await capturePage(page, capture);
+            return;
+        } catch (error) {
+            if (!isTimeoutError(error) || attempt === captureRetries) throw error;
+            console.warn(
+                `${ capture.id } excedió el tiempo límite; reintento ${ attempt + 1 }/${ captureRetries } `
+                + 'desde la ruta inicial, sin eliminar las demás capturas.'
+            );
+            await page.waitForTimeout(retryDelay);
+        }
+    }
+};
+
 const login = async (page) => {
     await page.goto(new URL('/inicio-sesion', baseURL).href, { waitUntil: 'domcontentloaded' });
     await page.locator('#loginForm').waitFor({ state: 'visible' });
@@ -341,15 +377,17 @@ const browser = await chromium.launch();
 try {
     const contextOptions = { viewport: { width: 1440, height: 1000 }, reducedMotion: 'reduce' };
     const publicContext = await browser.newContext(contextOptions);
+    publicContext.setDefaultTimeout(captureTimeout);
     const publicPage = await publicContext.newPage();
 
-    for (const capture of selectedCaptures.filter(item => item.public)) await capturePage(publicPage, capture);
+    for (const capture of selectedCaptures.filter(item => item.public)) await capturePageWithRecovery(publicPage, capture);
     await publicContext.close();
 
     const authenticatedContext = await browser.newContext({ ...contextOptions, ...(storageState ? { storageState } : {}) });
+    authenticatedContext.setDefaultTimeout(captureTimeout);
     const authenticatedPage = await authenticatedContext.newPage();
     if (!storageState) await login(authenticatedPage);
-    for (const capture of protectedCaptures) await capturePage(authenticatedPage, capture);
+    for (const capture of protectedCaptures) await capturePageWithRecovery(authenticatedPage, capture);
     await authenticatedContext.close();
 } finally {
     await browser.close();

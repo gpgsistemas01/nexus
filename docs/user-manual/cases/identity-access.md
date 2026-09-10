@@ -14,7 +14,7 @@ Cada procedimiento identifica sus casos de uso, controles, errores posibles y ca
 <a id="CAP-IDA-PER-01-LIST"></a>
 ### CAP-IDA-PER-01-LIST — Listado
 
-**Casos:** `CU-IDA-01`, `CU-REP-14`.
+**Casos de uso:** `CU-IDA-01` — Consultar personas; `CU-REP-14` — Generar reporte de personas.
 
 **Errores posibles:** [Catálogos e inventario](../error-messages.md#errores-catalogos).
 
@@ -31,7 +31,7 @@ Cada procedimiento identifica sus casos de uso, controles, errores posibles y ca
 <a id="CAP-IDA-PER-02-CREATE"></a>
 ### CAP-IDA-PER-02-CREATE — Formulario alta
 
-**Casos:** `CU-IDA-02`, `CU-IDA-08`, `CU-IDA-09`.
+**Casos de uso:** `CU-IDA-02` — Crear persona; `CU-IDA-08` — Consultar roles; `CU-IDA-09` — Consultar departamentos.
 
 **Errores posibles:** [Validación de formularios](../error-messages.md#errores-validacion), [Catálogos e inventario](../error-messages.md#errores-catalogos).
 
@@ -48,7 +48,7 @@ Cada procedimiento identifica sus casos de uso, controles, errores posibles y ca
 <a id="CAP-IDA-PER-03-EDIT"></a>
 ### CAP-IDA-PER-03-EDIT — Formulario edicion
 
-**Casos:** `CU-IDA-03`.
+**Casos de uso:** `CU-IDA-03` — Editar persona.
 
 **Errores posibles:** [Validación de formularios](../error-messages.md#errores-validacion), [Catálogos e inventario](../error-messages.md#errores-catalogos).
 
@@ -74,7 +74,7 @@ Cada procedimiento identifica sus casos de uso, controles, errores posibles y ca
 <a id="CAP-IDA-USR-01-LIST"></a>
 ### CAP-IDA-USR-01-LIST — Listado
 
-**Casos:** `CU-IDA-04`, `CU-REP-15`.
+**Casos de uso:** `CU-IDA-04` — Consultar usuarios; `CU-REP-15` — Generar reporte de usuarios.
 
 **Errores posibles:** [Acceso y autorización](../error-messages.md#errores-acceso), [Catálogos e inventario](../error-messages.md#errores-catalogos).
 
@@ -90,7 +90,7 @@ Cada procedimiento identifica sus casos de uso, controles, errores posibles y ca
 <a id="CAP-IDA-USR-02-CREATE"></a>
 ### CAP-IDA-USR-02-CREATE — Formulario alta
 
-**Casos:** `CU-IDA-05`.
+**Casos de uso:** `CU-IDA-05` — Crear usuario y asignar acceso.
 
 **Errores posibles:** [Validación de formularios](../error-messages.md#errores-validacion), [Acceso y autorización](../error-messages.md#errores-acceso), [Catálogos e inventario](../error-messages.md#errores-catalogos).
 
@@ -106,7 +106,7 @@ Cada procedimiento identifica sus casos de uso, controles, errores posibles y ca
 <a id="CAP-IDA-USR-03-EDIT"></a>
 ### CAP-IDA-USR-03-EDIT — Formulario edicion
 
-**Casos:** `CU-IDA-06`.
+**Casos de uso:** `CU-IDA-06` — Editar usuario y acceso.
 
 **Errores posibles:** [Validación de formularios](../error-messages.md#errores-validacion), [Acceso y autorización](../error-messages.md#errores-acceso), [Catálogos e inventario](../error-messages.md#errores-catalogos).
 
@@ -124,7 +124,7 @@ Cada procedimiento identifica sus casos de uso, controles, errores posibles y ca
 <a id="CAP-IDA-USR-04-PASSWORD"></a>
 ### CAP-IDA-USR-04-PASSWORD — Cambio contrasena
 
-**Casos:** `CU-IDA-07`.
+**Casos de uso:** `CU-IDA-07` — Cambiar contraseña de usuario.
 
 **Errores posibles:** [Validación de formularios](../error-messages.md#errores-validacion), [Acceso y autorización](../error-messages.md#errores-acceso), [Catálogos e inventario](../error-messages.md#errores-catalogos).
 
