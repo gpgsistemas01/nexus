@@ -10,6 +10,12 @@ status: En revisión
 
 # Manual de usuario
 
+## Datos generales del documento
+
+| Versión documental | Versión del sistema | Estado | Fecha | Responsable |
+| --- | --- | --- | --- | --- |
+| 0.2 | 1.0.0 | En revisión | 2026-09-10 | Equipo Nexus |
+
 Los metadatos anteriores generan la portada al exportar con Pandoc; el título Markdown
 se conserva como encabezado de la versión navegable en el repositorio. La portada no es
 una imagen ni depende de Playwright.

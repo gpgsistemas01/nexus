@@ -1,5 +1,11 @@
 # Arquitectura y construcción de Nexus
 
+## Datos generales del documento
+
+| Versión documental | Versión del sistema | Estado | Fecha | Responsable |
+| --- | --- | --- | --- | --- |
+| 1.0 | 1.0.0 | En revisión | 2026-09-10 | Equipo Nexus |
+
 ## Propósito
 
 Este índice presenta la documentación arquitectónica por pregunta y nivel de detalle.

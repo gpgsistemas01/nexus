@@ -7,6 +7,12 @@ date: 2026-09-04
 
 # Manual del personal de almacén
 
+## Datos generales del documento
+
+| Versión documental | Versión del sistema | Estado | Fecha | Responsable |
+| --- | --- | --- | --- | --- |
+| 0.2 | 1.0.0 | En revisión | 2026-09-10 | Equipo Nexus |
+
 Esta guía corresponde al actor **Personal de almacén (área Almacén y proveeduría)**. Debe confirmar el estado del documento y la existencia disponible antes de una operación que afecte inventario.
 
 ## Recorrido recomendado

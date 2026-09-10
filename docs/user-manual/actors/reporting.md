@@ -7,6 +7,12 @@ date: 2026-09-04
 
 # Manual del usuario de consultas y reportes
 
+## Datos generales del documento
+
+| Versión documental | Versión del sistema | Estado | Fecha | Responsable |
+| --- | --- | --- | --- | --- |
+| 0.2 | 1.0.0 | En revisión | 2026-09-10 | Equipo Nexus |
+
 Esta guía corresponde al actor **Usuario con permiso sobre el reporte o consulta**. El permiso determina qué listados y exportaciones puede utilizar.
 
 ## Recorrido recomendado
