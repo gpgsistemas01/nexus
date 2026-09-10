@@ -6,6 +6,8 @@ import path from 'node:path';
 import process from 'node:process';
 import { pathToFileURL } from 'node:url';
 import { bundleOpenApiContract } from './openApiContractUtils.js';
+import { prepareMermaidCli } from './prepareMermaidCli.js';
+import { preparePdfConverter } from './preparePdfConverter.js';
 
 const ROOT = process.cwd();
 const OPENAPI_SOURCE = 'docs/architecture/openapi/openapi.json';
@@ -18,9 +20,12 @@ const manualCases = [
     'docs/user-manual/cases/reports.md'
 ];
 const [authenticationCases, identityCases, catalogCases, purchaseCases, issueCases, reportCases] = manualCases;
+const manualOverview = 'docs/user-manual/overview.md';
+const manualProcedures = 'docs/user-manual/procedures.md';
 const manualCommon = [
     'docs/user-manual/index.md',
-    'docs/user-manual/procedures.md'
+    manualOverview,
+    manualProcedures
 ];
 const manualErrorCatalog = 'docs/user-manual/error-messages.md';
 const manualValidationMatrix = 'docs/user-manual/form-validation-matrix.md';
@@ -45,6 +50,8 @@ const MANIFESTS = Object.freeze({
     'manual-usuario': [...manualCommon, ...manualCases, ...manualReferences],
     'manual-administrador': [
         'docs/user-manual/actors/administrator.md',
+        manualOverview,
+        manualProcedures,
         authenticationCases,
         identityCases,
         catalogCases,
@@ -54,6 +61,8 @@ const MANIFESTS = Object.freeze({
     ],
     'manual-almacen': [
         'docs/user-manual/actors/warehouse.md',
+        manualOverview,
+        manualProcedures,
         authenticationCases,
         catalogCases,
         purchaseCases,
@@ -64,6 +73,8 @@ const MANIFESTS = Object.freeze({
     ],
     'manual-reportes': [
         'docs/user-manual/actors/reporting.md',
+        manualOverview,
+        manualProcedures,
         authenticationCases,
         catalogCases,
         purchaseCases,
@@ -118,7 +129,7 @@ const MANIFESTS = Object.freeze({
 const [requestedPublication, requestedFormat] = process.argv.slice(2).filter((argument) => argument !== '--check');
 const checkOnly = process.argv.includes('--check');
 const formats = new Set(['docx', 'pdf']);
-const pdfConverter = process.env.DOCS_PDF_CONVERTER || 'soffice';
+let pdfConverter = process.env.DOCS_PDF_CONVERTER;
 const publicationNames = Object.keys(MANIFESTS);
 const mermaidBlock = /^```mermaid\r?\n([\s\S]*?)^```\r?$/gm;
 const externalLink = /^(?:https?:|mailto:)/;
@@ -336,9 +347,10 @@ if (pandoc.error || pandoc.status !== 0) {
     process.exit(1);
 }
 if (requestedFormat === 'pdf') {
-    const pdfConverterCheck = spawnSync(pdfConverter, ['--version'], { encoding: 'utf8' });
-    if (pdfConverterCheck.error || pdfConverterCheck.status !== 0) {
-        console.error(`El conversor DOCX a PDF (${pdfConverter}) no está disponible en PATH. Instala LibreOffice, vuelve a abrir la terminal y comprueba: ${pdfConverter} --version`);
+    try {
+        pdfConverter = preparePdfConverter({ configuredConverter: pdfConverter });
+    } catch (error) {
+        console.error(error.message);
         process.exit(1);
     }
 }
@@ -377,14 +389,16 @@ const prepareSource = async (source, publicationSources, firstFigureNumber) => {
         const image = path.join(diagramOutputDirectory, `${id}.png`);
         await writeFile(input, diagram);
         if (!existsSync(image)) {
-            if (!existsSync(mermaidExecutable)) {
-                console.error('Mermaid CLI no está disponible. Ejecuta npm install --no-save @mermaid-js/mermaid-cli antes de exportar documentos con diagramas.');
+            try {
+                prepareMermaidCli({ executable: mermaidExecutable });
+            } catch (error) {
+                console.error(error.message);
                 return null;
             }
             const result = spawnSync(process.execPath, [mermaidExecutable, '--input', input, '--output', image, '--backgroundColor', 'white', '--scale', '2'], { cwd: ROOT, stdio: 'inherit' });
             if (result.error?.code === 'ENOENT') {
                 await rm(image, { force: true });
-                console.error('Mermaid CLI no está disponible. Ejecuta npm install --no-save @mermaid-js/mermaid-cli antes de exportar documentos con diagramas.');
+                console.error('Mermaid CLI no pudo ejecutarse después de preparar la dependencia.');
                 return null;
             }
             if (result.status !== 0) {
@@ -454,7 +468,7 @@ try {
                 '--outdir',
                 documentOutputDirectories.pdf,
                 docxOutput
-            ], { cwd: ROOT, stdio: 'inherit' });
+            ], { cwd: ROOT, stdio: 'inherit', windowsHide: true });
             if (conversion.status !== 0 || !existsSync(output)) {
                 console.error(`No se pudo convertir ${path.relative(ROOT, docxOutput)} a PDF con ${pdfConverter}.`);
                 failedStatus = conversion.status ?? 1;

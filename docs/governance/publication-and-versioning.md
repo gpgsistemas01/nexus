@@ -35,6 +35,10 @@ antes de exportar y no se editan manualmente. El contrato API pertenece al paque
 porque describe la interfaz HTTP y el transporte JSON; no se incluye en datos por el solo hecho de
 que sus cuerpos transporten información.
 
+Los manuales por actor conservan su propia entrada y reutilizan `overview.md` y
+`procedures.md`; así comparten las indicaciones generales y las convenciones de los casos sin
+duplicarlas ni sustituir la portada del actor.
+
 ## Formatos y estilos
 
 - Markdown es la fuente versionada y conserva notas de mantenimiento, enlaces al repositorio y
@@ -56,10 +60,9 @@ encabezados, tablas y numeración de DOCX.
 `scripts/exportDocs.js` ensambla los manifiestos cuyos archivos de entrada viven en la familia
 correspondiente, comprueba imágenes y delega la conversión a Pandoc. Es herramienta **de desarrollo/CI**, no dependencia ni proceso
 del servidor en producción. El estilo DOCX se pasa con `DOCS_REFERENCE_DOC`. El exportador conserva
-cada bloque Mermaid en el Markdown fuente,
-lo renderiza como una imagen PNG temporal mediante Mermaid CLI y entrega esa imagen a Pandoc. Así
-DOCX y PDF muestran el diagrama visual en vez de copiar su código; los archivos temporales se
-eliminan al finalizar.
+cada bloque Mermaid en el Markdown fuente, lo renderiza como una imagen PNG temporal y entrega
+esa imagen a Pandoc. Así DOCX y PDF muestran el diagrama visual en vez de copiar su código; los
+archivos temporales se eliminan al finalizar.
 
 Antes de convertir, cada enlace local con fragmento se valida contra un título o ancla
 explícita real. Las referencias entre fuentes incluidas se declaran con una ruta Markdown
@@ -112,20 +115,17 @@ visible del navegador con el tamaño fijado por el script; no concatena el conte
 de la pantalla. Cuando hay un modal, conserva también el contexto visible de la página en lugar de
 recortar únicamente el cuadro de diálogo.
 
-Playwright es una herramienta opcional de desarrollo: `npm run docs:screenshots` instala
-temporalmente el paquete cuando falta y comprueba que su Chromium compatible esté instalado; no se
-incluye en producción ni se agrega a los manifiestos del proyecto. Se configuran `DOCS_BASE_URL` y,
-para páginas protegidas, `DOCS_STORAGE_STATE` con una sesión de datos ficticios. El inventario cubre
+Playwright es una herramienta opcional de desarrollo y no se incluye en producción. Se configuran
+`DOCS_BASE_URL` y, para páginas protegidas, `DOCS_STORAGE_STATE` con una sesión de datos ficticios. El inventario cubre
 los listados principales; cada modal o paso nuevo agrega al mismo script una acción localizada y otra captura
 numerada. El acceso puede capturarse sin sesión; el resto debe fallar si la cuenta no posee el
 permiso que el manual pretende demostrar.
 
 Playwright **no se ejecuta junto con Pandoc**. Primero, y sólo cuando cambian las pantallas,
 `docs:screenshots` abre la aplicación y actualiza las imágenes; después `docs:export`
-lee esas imágenes ya existentes. Pandoc por sí solo genera DOCX sin Playwright,
-LibreOffice ni Microsoft Word. Para PDF, el exportador genera primero el DOCX y delega su conversión
-a LibreOffice; `DOCS_PDF_CONVERTER` permite indicar la ruta de `soffice` cuando no está disponible
-en `PATH`.
+lee esas imágenes ya existentes. Pandoc genera DOCX sin Playwright; para PDF, el exportador
+convierte después ese DOCX con LibreOffice. La instalación y configuración de estas herramientas
+pertenecen a la [guía operativa de exportación](../README.md#preparar-las-herramientas).
 
 `docs:screenshots` coordina el generador con una instancia local de Nexus: comprueba si ya responde,
 la inicia y espera cuando hace falta, y al terminar detiene sólo el proceso que creó. No cambia el
