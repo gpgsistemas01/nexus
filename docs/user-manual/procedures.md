@@ -8,6 +8,12 @@ una captura o cambió una pantalla; actualizar capturas y exportar el manual son
 
 ## Convenciones del recorrido
 
+Cada procedimiento conserva una explicación breve del flujo: **para qué sirve, qué debe estar
+preparado, qué controles intervienen, qué pasos sigue la persona y qué resultado debe comprobar**.
+No describe la implementación interna ni repite todas las reglas del sistema. Una tarea se amplía
+sólo cuando existe una decisión, un cambio de estado, un efecto sobre existencias o una forma de
+recuperación que la persona necesita conocer para completarla sin ayuda.
+
 - **Precondiciones:** use una cuenta ficticia autorizada y los datos indicados en el inventario.
 - **Alternativas y errores:** si una acción no aparece, no cambie de cuenta; valide permisos y
   estado del registro. Si una validación impide continuar, corrija el dato señalado sin repetir
@@ -23,6 +29,31 @@ una captura o cambió una pantalla; actualizar capturas y exportar el manual son
 🟨 **ADVERTENCIA:** antes de confirmar una escritura, revise la
 [matriz de validación y modos](form-validation-matrix.md); una acción visible después de surtir,
 devolver, corregir o cancelar puede habilitar menos campos que la edición general.
+
+### Resaltado y advertencias
+
+El manual no colorea párrafos completos ni usa el color como único significado. La negrita se
+reserva para controles y mensajes literales de Nexus; los identificadores técnicos se presentan
+como código. Los avisos usan además una etiqueta textual, de modo que continúan siendo comprensibles
+en una impresión sin color o para quien utiliza tecnologías de asistencia:
+
+- 🟨 **ADVERTENCIA:** una condición que debe revisarse antes de actuar o una operación que puede
+  cambiar información, estados o existencias;
+- 🟥 **DATO SENSIBLE:** información que no debe incluirse en capturas, archivos o solicitudes de
+  soporte.
+
+Un aviso general aparece una sola vez cuando aplica de la misma forma a todo el manual. Se repite
+dentro de un procedimiento únicamente junto al paso donde ignorarlo puede causar un resultado
+difícil de revertir o cuando la recuperación cambia para ese caso. Las notas informativas que no
+requieren una decisión se redactan como parte del paso, sin añadir otro color.
+
+### Extensión y uso de capturas
+
+Los pasos describen acciones observables y una comprobación final; no enumeran clics evidentes ni
+copian el catálogo completo de validaciones. Una captura se incluye cuando permite ubicar controles,
+distinguir un modo o estado, o reconocer dónde recuperarse. No se agrega una imagen por cada mensaje:
+un mensaje breve con una única acción se documenta como texto, y sólo un diálogo, estado o error cuya
+disposición visual aporte información conserva una captura junto al paso que lo produce.
 
 ## Casos por grupo funcional
 

@@ -109,7 +109,14 @@ este modo. Use la acción **Editar registro** y el botón **Actualizar**.
    ![CAP-CAT-MAT-04-STOCK: ajuste existencia](../images/materiales/04-ajuste-existencia.png)
 
 2. Elija una opción en **Seleccione una razón...** y complete los campos **Nueva cantidad** y **Observaciones**.
+
+   🟨 **ADVERTENCIA:** **Nueva cantidad** sustituye la existencia actual; no es una cantidad que
+   Nexus agregará al inventario.
+
 3. Revise el efecto sobre la existencia y seleccione el botón **Ajustar**.
+
+Al finalizar, vuelva al listado y confirme que la existencia mostrada sea exactamente la cantidad
+capturada. Si no puede confirmarlo, actualice el listado antes de intentar otro ajuste.
 
 ## Proveedores
 
@@ -333,4 +340,11 @@ quedan sólo para consulta. Use la acción **Editar registro** y el botón **Act
    ![CAP-CAT-WAS-04-STOCK: ajuste existencia](../images/mermas/04-ajuste-existencia.png)
 
 2. Elija una opción en **Seleccione una razón...** y complete los campos **Nuevo stock** y **Observaciones**.
+
+   🟨 **ADVERTENCIA:** **Nuevo stock** sustituye la existencia actual; no es una cantidad que Nexus
+   sumará al inventario de merma.
+
 3. Revise el efecto sobre la existencia y seleccione el botón **Ajustar**.
+
+Al finalizar, vuelva al listado y confirme que la existencia mostrada sea exactamente la cantidad
+capturada. Si no puede confirmarlo, actualice el listado antes de intentar otro ajuste.

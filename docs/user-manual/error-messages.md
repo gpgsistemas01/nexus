@@ -8,6 +8,24 @@ corregirse. Los errores que no corresponden a un campo aparecen como notificaci�
 se debe repetir una operación que modifica datos hasta comprobar si el registro, el documento o
 la existencia cambiaron.
 
+### Secuencia breve de recuperación
+
+Ante un mensaje, siga siempre este orden y después consulte la fila específica del catálogo:
+
+1. **Lea y conserve el contexto:** identifique el campo, registro, folio o acción mencionados, sin
+   copiar contraseñas, cookies, tokens ni datos personales.
+2. **Determine si hubo cambios:** si intentaba guardar, surtir, devolver, corregir o ajustar
+   existencias, actualice el listado o vuelva a consultar el registro antes de repetir la acción.
+3. **Recupérese o escale:** corrija sólo el dato indicado cuando el formulario siga abierto; si el
+   estado es incierto, el error es del servidor o el mismo mensaje reaparece, no repita la escritura
+   y entregue a soporte el texto, folio, módulo y momento aproximado.
+
+Las tablas reúnen mensajes que comparten la misma recuperación para evitar repetir instrucciones
+en cada procedimiento. El procedimiento enlaza la sección aplicable y sólo incorpora una advertencia
+local cuando el riesgo o la acción de recuperación son exclusivos de ese paso. No se necesita una
+captura para cada notificación: se incluye únicamente si ayuda a reconocer el estado, localizar el
+control de salida o distinguir una pantalla que no puede explicarse con claridad mediante el texto.
+
 | Situación | Presentación | Acción recomendada |
 |---|---|---|
 | Datos incompletos o con formato inválido | Mensaje junto al campo y desplazamiento al primer error. | Corrija únicamente los campos señalados y vuelva a confirmar. |
