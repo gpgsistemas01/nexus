@@ -220,8 +220,8 @@ npm start
 
 Estos procesos no forman parte del arranque normal de Nexus y requieren herramientas distintas:
 
-- la **exportación** usa las dependencias instaladas por `npm ci`, Pandoc instalado en el sistema
-  y, para PDF, LibreOffice como conversor del DOCX generado;
+- la **exportación** usa las dependencias instaladas por `npm ci` y Pandoc; prepara Mermaid CLI
+  para los diagramas y LibreOffice para PDF cuando hacen falta;
 - la **captura** usa Playwright y su navegador Chromium, además de Nexus en ejecución, una base de
   datos ficticia con estados específicos y una sesión autenticada con los permisos necesarios.
 
