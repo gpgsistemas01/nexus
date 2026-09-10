@@ -88,7 +88,6 @@ Pandoc y Playwright intervienen en etapas distintas y ninguno sustituye al otro:
 | Playwright y Chromium (instalación automática) | Abren Nexus y generan las capturas del manual. Sólo se necesitan al actualizar imágenes. | `npm run docs:screenshots` |
 | Mermaid CLI (instalación opcional) | Convierte cada bloque Mermaid en una imagen temporal para la exportación. | Lo invoca automáticamente `docs:export` cuando el paquete contiene diagramas. |
 | Pandoc (herramienta del sistema) | Ensambla el Markdown y las imágenes existentes, convierte la navegación del paquete en hipervínculos internos y genera el DOCX. | `npm run docs:export -- <paquete> <formato>` |
-| `zip` y `unzip` (herramientas del sistema) | Aplican al DOCX generado la alineación justificada de los párrafos de contenido sin modificar tablas, títulos, código ni leyendas. | `docs:export` con formato `docx` o `pdf`. |
 | LibreOffice (herramienta del sistema) | Convierte a PDF el DOCX que acaba de generar el exportador. | Sólo `docs:export` con formato `pdf`. |
 
 Una extensión de Playwright para Visual Studio Code tampoco reemplaza estas herramientas: puede
@@ -257,10 +256,9 @@ no sustituyen la instalación requerida por este proyecto. `npm run docs:export`
    contenido de cada diagrama: una exportación posterior reutiliza los PNG que ya coincidan y sólo
    convierte diagramas nuevos o modificados. Para forzar su regeneración completa, elimina
    `build/docs/diagrams/` antes de exportar.
-4. DOCX no requiere otra herramienta. Para PDF, el exportador genera primero ese mismo DOCX,
-   aplica su formato final y después lo convierte con LibreOffice en modo no interactivo. Así DOCX
-   y PDF recorren la misma maquetación y ya no se necesita TeX Live ni configurar
-   `DOCS_PDF_ENGINE`.
+4. DOCX no requiere otra herramienta. Para PDF, el exportador genera primero ese mismo DOCX y
+   después lo convierte con LibreOffice en modo no interactivo. Así DOCX y PDF recorren la misma
+   maquetación y ya no se necesita TeX Live ni configurar `DOCS_PDF_ENGINE`.
 
    Instala [LibreOffice desde su sitio oficial](https://www.libreoffice.org/download/download-libreoffice/)
    en el mismo sistema donde se ejecutará el comando:
