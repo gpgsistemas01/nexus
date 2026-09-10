@@ -4,6 +4,7 @@ import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import path from 'node:path';
 import process from 'node:process';
+import { pathToFileURL } from 'node:url';
 
 import { justifyDocxParagraphs } from './justifyDocxParagraphs.js';
 
@@ -112,7 +113,7 @@ const MANIFESTS = Object.freeze({
 const [requestedPublication, requestedFormat] = process.argv.slice(2).filter((argument) => argument !== '--check');
 const checkOnly = process.argv.includes('--check');
 const formats = new Set(['docx', 'pdf']);
-const pdfEngine = process.env.DOCS_PDF_ENGINE;
+const pdfConverter = process.env.DOCS_PDF_CONVERTER || 'soffice';
 const publicationNames = Object.keys(MANIFESTS);
 const mermaidBlock = /^```mermaid\r?\n([\s\S]*?)^```\r?$/gm;
 const externalLink = /^(?:https?:|mailto:)/;
@@ -306,32 +307,25 @@ if (pandoc.error || pandoc.status !== 0) {
     console.error('Pandoc no está disponible. Instálalo o usa --check para validar las fuentes.');
     process.exit(1);
 }
-if (requestedFormat === 'pdf' && !pdfEngine) {
-    console.error([
-        'La exportación PDF requiere definir DOCS_PDF_ENGINE; el flujo recomendado usa xelatex.',
-        'XeLaTeX no es obligatorio: también puedes indicar otro motor instalado que admita Pandoc.',
-        'Windows: instala TeX Live en el sistema (no con npm ni dentro del repositorio).',
-        'Comprueba primero que esté instalado con: xelatex --version',
-        'PowerShell: $env:DOCS_PDF_ENGINE = "xelatex"; npm run docs:export -- <paquete> pdf',
-        'Bash: DOCS_PDF_ENGINE=xelatex npm run docs:export -- <paquete> pdf',
-        'También puedes generar DOCX sin un motor PDF: npm run docs:export -- <paquete> docx'
-    ].join('\n'));
-    process.exit(1);
-}
 if (requestedFormat === 'pdf') {
-    const pdfEngineCheck = spawnSync(pdfEngine, ['--version'], { encoding: 'utf8' });
-    if (pdfEngineCheck.error || pdfEngineCheck.status !== 0) {
-        console.error(`El motor PDF configurado en DOCS_PDF_ENGINE (${pdfEngine}) no está disponible en PATH. Instálalo, vuelve a abrir la terminal y comprueba: ${pdfEngine} --version`);
+    const pdfConverterCheck = spawnSync(pdfConverter, ['--version'], { encoding: 'utf8' });
+    if (pdfConverterCheck.error || pdfConverterCheck.status !== 0) {
+        console.error(`El conversor DOCX a PDF (${pdfConverter}) no está disponible en PATH. Instala LibreOffice, vuelve a abrir la terminal y comprueba: ${pdfConverter} --version`);
         process.exit(1);
     }
 }
 
 const outputDirectory = path.join(ROOT, 'build/docs');
+const documentOutputDirectories = {
+    docx: path.join(outputDirectory, 'docx'),
+    pdf: path.join(outputDirectory, 'pdf')
+};
 await mkdir(outputDirectory, { recursive: true });
 const temporaryDirectory = await mkdtemp(path.join(outputDirectory, '.export-'));
 const diagramOutputDirectory = path.join(outputDirectory, 'diagrams');
 const diagramSourceDirectory = path.join(outputDirectory, 'diagram-sources');
 await Promise.all([
+    ...Object.values(documentOutputDirectories).map((directory) => mkdir(directory, { recursive: true })),
     mkdir(diagramOutputDirectory, { recursive: true }),
     mkdir(diagramSourceDirectory, { recursive: true })
 ]);
@@ -382,8 +376,10 @@ const prepareSource = async (source, publicationSources, firstFigureNumber) => {
 let failedStatus = 0;
 try {
     for (const { publication, sources } of publications) {
-        const output = path.join(outputDirectory, `${publication}.${requestedFormat}`);
+        const output = path.join(documentOutputDirectories[requestedFormat], `${publication}.${requestedFormat}`);
+        const docxOutput = path.join(documentOutputDirectories.docx, `${publication}.docx`);
         await rm(output, { force: true });
+        if (requestedFormat === 'pdf') await rm(docxOutput, { force: true });
         const preparedSources = [];
         const publicationSources = new Set(sources);
         let nextFigureNumber = 1;
@@ -398,12 +394,10 @@ try {
         }
         if (failedStatus) break;
 
-        if (requestedFormat === 'docx') {
-            const firstSource = preparedSources[0];
-            const firstContent = await readFile(firstSource, 'utf8');
-            const indexes = await buildDocumentIndexes(preparedSources);
-            await writeFile(firstSource, insertAfterFrontMatter(firstContent, indexes));
-        }
+        const firstSource = preparedSources[0];
+        const firstContent = await readFile(firstSource, 'utf8');
+        const indexes = await buildDocumentIndexes(preparedSources);
+        await writeFile(firstSource, insertAfterFrontMatter(firstContent, indexes));
 
         const scopedSources = preparedSources.map((source) => path.relative(temporaryDirectory, source));
         const args = [
@@ -411,25 +405,33 @@ try {
             '--from=markdown+header_attributes+implicit_figures',
             '--standalone',
             '--metadata=lang:es-MX',
-            `--output=${output}`,
+            `--output=${docxOutput}`,
             `--resource-path=${[ROOT, path.join(ROOT, 'docs')].join(path.delimiter)}`
         ];
-        if (requestedFormat === 'pdf') {
-            args.push(
-                '--toc',
-                '--metadata=toc-title:Tabla de contenido',
-                '--lof',
-                '--metadata=lof-title:Índice de imágenes'
-            );
-        }
-        if (requestedFormat === 'docx' && process.env.DOCS_REFERENCE_DOC) args.push(`--reference-doc=${process.env.DOCS_REFERENCE_DOC}`);
-        if (requestedFormat === 'pdf') args.push(`--pdf-engine=${pdfEngine}`);
+        if (process.env.DOCS_REFERENCE_DOC) args.push(`--reference-doc=${process.env.DOCS_REFERENCE_DOC}`);
         const result = spawnSync('pandoc', args, { cwd: temporaryDirectory, stdio: 'inherit' });
         if (result.status !== 0) {
             failedStatus = result.status ?? 1;
             break;
         }
-        if (requestedFormat === 'docx') await justifyDocxParagraphs(output, temporaryDirectory);
+        await justifyDocxParagraphs(docxOutput, temporaryDirectory);
+        if (requestedFormat === 'pdf') {
+            console.log(`Documento intermedio generado en ${path.relative(ROOT, docxOutput)}.`);
+            const conversion = spawnSync(pdfConverter, [
+                `-env:UserInstallation=${pathToFileURL(path.join(temporaryDirectory, 'libreoffice-profile')).href}`,
+                '--headless',
+                '--convert-to',
+                'pdf',
+                '--outdir',
+                documentOutputDirectories.pdf,
+                docxOutput
+            ], { cwd: ROOT, stdio: 'inherit' });
+            if (conversion.status !== 0 || !existsSync(output)) {
+                console.error(`No se pudo convertir ${path.relative(ROOT, docxOutput)} a PDF con ${pdfConverter}.`);
+                failedStatus = conversion.status ?? 1;
+                break;
+            }
+        }
         console.log(`Documento generado en ${path.relative(ROOT, output)}.`);
     }
 } finally {
