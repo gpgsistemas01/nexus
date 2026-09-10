@@ -3,6 +3,7 @@ import path from 'node:path';
 import process from 'node:process';
 
 const DEFAULT_CONVERTER = 'soffice';
+const CONVERTER_CHECK_TIMEOUT = 15000;
 
 const getConverterCandidates = (platform, environment) => {
     if (platform === 'win32') {
@@ -22,8 +23,18 @@ const getConverterCandidates = (platform, environment) => {
 };
 
 const isCommandAvailable = (command, runCommand) => {
-    const result = runCommand(command, ['--version'], { encoding: 'utf8', windowsHide: true });
+    const result = runCommand(command, ['--version'], {
+        encoding: 'utf8',
+        timeout: CONVERTER_CHECK_TIMEOUT,
+        windowsHide: true
+    });
     return !result.error && result.status === 0;
+};
+
+const getConfiguredConverterCandidates = (configuredConverter, platform) => {
+    if (platform !== 'win32' || !/\.exe$/i.test(configuredConverter)) return [configuredConverter];
+
+    return [configuredConverter.replace(/\.exe$/i, '.com'), configuredConverter];
 };
 
 const runInstallationCommand = (command, argumentsList, runCommand) => {
@@ -68,7 +79,9 @@ export const preparePdfConverter = ({
     getUserId = process.getuid
 } = {}) => {
     if (configuredConverter) {
-        if (isCommandAvailable(configuredConverter, runCommand)) return configuredConverter;
+        const configuredCandidates = getConfiguredConverterCandidates(configuredConverter, platform);
+        const availableConverter = configuredCandidates.find(candidate => isCommandAvailable(candidate, runCommand));
+        if (availableConverter) return availableConverter;
         throw new Error(
             `El conversor configurado en DOCS_PDF_CONVERTER (${configuredConverter}) no está disponible.`
         );

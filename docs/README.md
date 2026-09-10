@@ -306,6 +306,11 @@ no sustituyen la instalación requerida por este proyecto. `npm run docs:export`
    npm run docs:export -- todos pdf
    ```
 
+   Si una configuración existente apunta a `soffice.exe`, el exportador usa automáticamente el
+   ejecutable de consola `soffice.com` de la misma carpeta. La comprobación del conversor tiene un
+   tiempo límite para que un proceso de LibreOffice que no responda no deje la exportación
+   bloqueada indefinidamente.
+
    Adobe Reader sólo visualiza el resultado. La conversión automatizada usa LibreOffice porque
    proporciona un ejecutable invocable de forma uniforme; Word o Acrobat todavía pueden usarse
    para convertir manualmente el DOCX conservado.
