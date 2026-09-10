@@ -65,7 +65,7 @@ abrir el formulario y **Guardar** para confirmarlo.
 
    ![CAP-CAT-MAT-02-CREATE: formulario alta](../images/materiales/02-formulario-alta.png)
 
-2. Complete **Nombre**; elija opciones en **Buscar proveedor...**, **Buscar presentación...** y **Buscar unidad...**; capture **Stock Mínimo**, **Costo Máximo**, **Base** y **Altura**, y revise la casilla **Activo**.
+2. Complete **Nombre**; elija opciones en **Buscar proveedor...**, **Buscar presentación...** y **Buscar unidad...**; capture **Stock Mínimo**, **Costo Máximo**, **Base**, **Altura**, **Nueva cantidad** y **Observaciones**, y revise la casilla **Activo**.
 3. Seleccione el botón **Guardar** para registrar el material.
 
 Si ya existe la misma combinación de nombre, presentación, unidad, dimensiones y proveedor, Nexus
@@ -290,7 +290,7 @@ para abrir el formulario y **Guardar** para confirmarlo.
 
    ![CAP-CAT-WAS-02-CREATE: formulario registro](../images/mermas/02-formulario-registro.png)
 
-2. Elija opciones en **Buscar proveedor...** y **Buscar material de referencia...**; complete **Ancho confirmado de la merma (m)**, **Largo real de la merma (m)**, **Stock mínimo** y **Costo máximo unitario**, y revise la casilla **Activo**.
+2. Elija opciones en **Buscar proveedor...** y **Buscar material de referencia...**; complete **Ancho confirmado de la merma (m)**, **Largo real de la merma (m)**, **Stock mínimo**, **Costo máximo unitario**, **Nuevo stock** y **Observaciones**, y revise la casilla **Activo**.
 3. Seleccione el botón **Guardar** para registrar la merma.
 
 Si ya existe una merma con el mismo nombre, proveedor, ancho y largo, Nexus rechaza el alta y no

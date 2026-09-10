@@ -1,3 +1,4 @@
+import { existsSync } from 'node:fs';
 import { mkdir, rm } from 'node:fs/promises';
 import path from 'node:path';
 import process from 'node:process';
@@ -11,11 +12,13 @@ const requestedCaptureIds = (process.env.DOCS_CAPTURE_IDS ?? '')
     .map(id => id.trim())
     .filter(Boolean);
 const requestedCaptureFrom = process.env.DOCS_CAPTURE_FROM?.trim();
+const recoverMissingCaptures = process.argv.includes('--missing');
 const outputRoot = path.resolve('docs/user-manual/images');
 const screenshotDelay = 1500;
 
 const click = (selector, ready, requirement) => ({ selector, ready, requirement });
 const filter = (selector, label) => ({ selector, label, filter: true });
+const clickStatus = (status, selector, ready, requirement) => ({ status, selector, ready, requirement });
 const openFilters = click('.table-filters-summary', '#tableFiltersForm:visible');
 const reportDialog = click('.datatable-export-button', '.report-export-modal');
 const openMainMenu = click('#appMenuOffcanvasBtn', '#appMenu.show');
@@ -56,6 +59,7 @@ const captures = [
     { id: 'CAP-ENT-03-EDIT', module: 'compras', name: '03-edicion-compra.png', route: '/compras', ready: '#table', action: click('#table tbody .btn-edit', '#goodsReceiptModal.show'), useCases: ['CU-ENT-03', 'CU-ENT-05'] },
     { id: 'CAP-ENT-04-CORRECT', module: 'compras', name: '04-correccion-detalle.png', route: '/compras', ready: '#table', actions: [click('#table tbody .btn-edit', '#goodsReceiptModal.show'), click('#materialTable tbody .correct-detail-btn', '#goodsReceiptCorrectionModal.show')], useCases: ['CU-ENT-04'] },
     { id: 'CAP-REP-ENT-05-EXPORT', module: 'compras', name: '05-exportar-reporte.png', route: '/compras', ready: '#table', action: reportDialog, useCases: ['CU-REP-11'] },
+    { id: 'CAP-ENT-06-VIEW', module: 'compras', name: '06-consulta-cancelada.png', route: '/compras', ready: '#table', action: clickStatus('Cancelada', '.btn-edit', '#goodsReceiptModal.show', 'una compra cancelada'), useCases: ['CU-ENT-03', 'CU-ENT-05'] },
 
     { id: 'CAP-SAL-MAT-00-NAVIGATION', module: 'salidas-material', name: '00-acceso-menu-principal.png', route: '/salidas/materiales', ready: '#table', action: openMainMenu, useCases: ['CU-SAL-01'] },
     { id: 'CAP-SAL-MAT-01-LIST', module: 'salidas-material', name: '01-listado.png', route: '/salidas/materiales', ready: '#table', action: openFilters, useCases: ['CU-CAT-20', 'CU-SAL-01'] },
@@ -65,6 +69,7 @@ const captures = [
     { id: 'CAP-SAL-MAT-05-RETURN', module: 'salidas-material', name: '05-devolver-detalle.png', route: '/salidas/materiales', ready: '#table', actions: [filter('#fulfillmentStatusFilter', 'Surtido'), click('#table tbody .btn-return-detail', '#goodsIssueModal.show', 'una salida de material aprobada, completamente surtida y con cantidad retornable'), click('#materialTable tbody .return-issue-detail-btn', '#issueReturnModal.show', 'un detalle surtido que todavía tenga cantidad retornable')], useCases: ['CU-SAL-06'] },
     { id: 'CAP-REP-SAL-MAT-06-EXPORT', module: 'salidas-material', name: '06-exportar-reporte.png', route: '/salidas/materiales', ready: '#table', action: reportDialog, useCases: ['CU-REP-04'] },
     { id: 'CAP-SAL-MAT-07-FILTER', module: 'salidas-material', name: '07-filtro-surtido.png', route: '/salidas/materiales', ready: '#table', action: filter('#fulfillmentStatusFilter', 'Surtido'), useCases: ['CU-SAL-01', 'CU-SAL-06'] },
+    { id: 'CAP-SAL-MAT-08-VIEW', module: 'salidas-material', name: '08-consulta-cancelada.png', route: '/salidas/materiales', ready: '#table', actions: [filter('#fulfillmentStatusFilter', 'Cancelado'), clickStatus('Cancelada', '.btn-edit', '#goodsIssueModal.show', 'una salida de material cancelada')], useCases: ['CU-SAL-03', 'CU-SAL-04'] },
 
     { id: 'CAP-SAL-WAS-00-NAVIGATION', module: 'salidas-merma', name: '00-acceso-menu-principal.png', route: '/salidas/mermas', ready: '#table', action: openMainMenu, useCases: ['CU-SAL-07'] },
     { id: 'CAP-SAL-WAS-01-LIST', module: 'salidas-merma', name: '01-listado.png', route: '/salidas/mermas', ready: '#table', action: openFilters, useCases: ['CU-SAL-07', 'CU-REP-08'] },
@@ -74,6 +79,7 @@ const captures = [
     { id: 'CAP-SAL-WAS-05-RETURN', module: 'salidas-merma', name: '05-devolver-detalle.png', route: '/salidas/mermas', ready: '#table', actions: [filter('#fulfillmentStatusFilter', 'Surtido'), click('#table tbody .btn-return-detail', '#wasteIssueModal.show', 'una salida de merma aprobada, completamente surtida y con cantidad retornable'), click('#materialTable tbody .return-issue-detail-btn', '#issueReturnModal.show', 'un detalle surtido que todavía tenga cantidad retornable')], useCases: ['CU-SAL-12'] },
     { id: 'CAP-REP-SAL-WAS-06-EXPORT', module: 'salidas-merma', name: '06-exportar-reporte.png', route: '/salidas/mermas', ready: '#table', action: reportDialog, useCases: ['CU-REP-08'] },
     { id: 'CAP-SAL-WAS-07-FILTER', module: 'salidas-merma', name: '07-filtro-surtido.png', route: '/salidas/mermas', ready: '#table', action: filter('#fulfillmentStatusFilter', 'Surtido'), useCases: ['CU-SAL-07', 'CU-SAL-12'] },
+    { id: 'CAP-SAL-WAS-08-VIEW', module: 'salidas-merma', name: '08-consulta-cancelada.png', route: '/salidas/mermas', ready: '#table', actions: [filter('#fulfillmentStatusFilter', 'Cancelado'), clickStatus('Cancelada', '.btn-edit', '#wasteIssueModal.show', 'una salida de merma cancelada')], useCases: ['CU-SAL-09', 'CU-SAL-10'] },
 
     { id: 'CAP-IDA-PER-00-NAVIGATION', module: 'personas', name: '00-acceso-menu-principal.png', route: '/personas', ready: '#table', action: openMainMenu, useCases: ['CU-IDA-01'] },
     { id: 'CAP-IDA-PER-01-LIST', module: 'personas', name: '01-listado.png', route: '/personas', ready: '#table', action: openFilters, useCases: ['CU-IDA-01', 'CU-REP-14'] },
@@ -110,9 +116,13 @@ const validateInventory = () => {
 };
 
 const selectCaptures = () => {
-    if (requestedCaptureIds.length && requestedCaptureFrom) {
-        throw new Error('Use DOCS_CAPTURE_IDS o DOCS_CAPTURE_FROM, no ambos mecanismos.');
+    const selectionMechanisms = [requestedCaptureIds.length > 0, Boolean(requestedCaptureFrom), recoverMissingCaptures]
+        .filter(Boolean).length;
+    if (selectionMechanisms > 1) {
+        throw new Error('Use DOCS_CAPTURE_IDS, DOCS_CAPTURE_FROM o --missing; no combine mecanismos.');
     }
+
+    if (recoverMissingCaptures) return captures.filter(capture => !existsSync(path.join(outputRoot, capture.module, capture.name)));
 
     if (requestedCaptureFrom) {
         const startIndex = captures.findIndex(capture => capture.id === requestedCaptureFrom);
@@ -166,6 +176,33 @@ const findTriggerAcrossPages = async (page, selector) => {
     }
 };
 
+const findStatusTriggerAcrossPages = async (page, { status, selector }) => {
+    while (true) {
+        const rowIndex = await page.locator('#table').evaluate((tableElement, expectedStatus) => {
+            const table = globalThis.$(tableElement).DataTable();
+            return table.rows({ page: 'current' }).data().toArray()
+                .findIndex(row => row.status?.name === expectedStatus);
+        }, status);
+        if (rowIndex >= 0) {
+            const trigger = page.locator('#table tbody tr').nth(rowIndex).locator(`${ selector }:visible`).first();
+            if (await trigger.count()) return trigger;
+        }
+
+        const advanced = await page.locator('#table').evaluate(async tableElement => {
+            const table = globalThis.$(tableElement).DataTable();
+            const { page, pages } = table.page.info();
+            if (page + 1 >= pages) return false;
+
+            await new Promise(resolve => {
+                globalThis.$(tableElement).one('draw.dt', resolve);
+                table.page('next').draw('page');
+            });
+            return true;
+        });
+        if (!advanced) return null;
+    }
+};
+
 const runAction = async (page, action, captureId, step) => {
     if (action.filter) {
         await waitForDataTableReady(page);
@@ -186,9 +223,11 @@ const runAction = async (page, action, captureId, step) => {
         return;
     }
 
-    const trigger = action.selector.startsWith('#table tbody ')
-        ? await findTriggerAcrossPages(page, action.selector)
-        : page.locator(action.selector).first();
+    const trigger = action.status
+        ? await findStatusTriggerAcrossPages(page, action)
+        : action.selector.startsWith('#table tbody ')
+            ? await findTriggerAcrossPages(page, action.selector)
+            : page.locator(action.selector).first();
 
     if (!trigger) {
         const preparation = action.requirement
@@ -270,6 +309,11 @@ if (process.argv.includes('--list')) {
     process.exit(0);
 }
 
+if (recoverMissingCaptures && !selectedCaptures.length) {
+    console.log('El inventario de capturas ya está completo; no hay archivos que recuperar.');
+    process.exit(0);
+}
+
 const protectedCaptures = selectedCaptures.filter(item => !item.public);
 if (Boolean(loginName) !== Boolean(loginPassword)) {
     throw new Error('DOCS_LOGIN_NAME y DOCS_LOGIN_PASSWORD deben definirse juntos.');
@@ -281,7 +325,7 @@ if (protectedCaptures.length && !storageState && !loginName) {
     throw new Error('Defina DOCS_LOGIN_NAME y DOCS_LOGIN_PASSWORD, o proporcione DOCS_STORAGE_STATE, para generar las capturas protegidas.');
 }
 
-if (requestedCaptureIds.length || requestedCaptureFrom) {
+if (requestedCaptureIds.length || requestedCaptureFrom || recoverMissingCaptures) {
     await Promise.all(selectedCaptures.map(capture => rm(
         path.join(outputRoot, capture.module, capture.name),
         { force: true }

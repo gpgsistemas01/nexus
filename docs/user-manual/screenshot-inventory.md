@@ -55,38 +55,41 @@ comprobar el inventario sin iniciar Nexus ni Playwright se ejecuta
 | 26 | `CAP-ENT-03-EDIT` | `docs/user-manual/images/compras/03-edicion-compra.png` | `CU-ENT-03`, `CU-ENT-05` |
 | 27 | `CAP-ENT-04-CORRECT` | `docs/user-manual/images/compras/04-correccion-detalle.png` | `CU-ENT-04` |
 | 28 | `CAP-REP-ENT-05-EXPORT` | `docs/user-manual/images/compras/05-exportar-reporte.png` | `CU-REP-11` |
-| 29 | `CAP-SAL-MAT-00-NAVIGATION` | `docs/user-manual/images/salidas-material/00-acceso-menu-principal.png` | `CU-SAL-01` |
-| 30 | `CAP-SAL-MAT-01-LIST` | `docs/user-manual/images/salidas-material/01-listado.png` | `CU-CAT-20`, `CU-SAL-01` |
-| 31 | `CAP-SAL-MAT-02-CREATE` | `docs/user-manual/images/salidas-material/02-formulario-registro.png` | `CU-SAL-02` |
-| 32 | `CAP-SAL-MAT-03-EDIT` | `docs/user-manual/images/salidas-material/03-edicion-encabezado.png` | `CU-SAL-03`, `CU-SAL-04` |
-| 33 | `CAP-SAL-MAT-04-SUPPLY` | `docs/user-manual/images/salidas-material/04-surtir-detalles.png` | `CU-SAL-05` |
-| 34 | `CAP-SAL-MAT-05-RETURN` | `docs/user-manual/images/salidas-material/05-devolver-detalle.png` | `CU-SAL-06` |
-| 35 | `CAP-REP-SAL-MAT-06-EXPORT` | `docs/user-manual/images/salidas-material/06-exportar-reporte.png` | `CU-REP-04` |
-| 36 | `CAP-SAL-MAT-07-FILTER` | `docs/user-manual/images/salidas-material/07-filtro-surtido.png` | `CU-SAL-01`, `CU-SAL-06` |
-| 37 | `CAP-SAL-WAS-00-NAVIGATION` | `docs/user-manual/images/salidas-merma/00-acceso-menu-principal.png` | `CU-SAL-07` |
-| 38 | `CAP-SAL-WAS-01-LIST` | `docs/user-manual/images/salidas-merma/01-listado.png` | `CU-SAL-07`, `CU-REP-08` |
-| 39 | `CAP-SAL-WAS-02-CREATE` | `docs/user-manual/images/salidas-merma/02-formulario-registro.png` | `CU-SAL-08` |
-| 40 | `CAP-SAL-WAS-03-EDIT` | `docs/user-manual/images/salidas-merma/03-edicion-encabezado.png` | `CU-SAL-09`, `CU-SAL-10` |
-| 41 | `CAP-SAL-WAS-04-SUPPLY` | `docs/user-manual/images/salidas-merma/04-surtir-detalles.png` | `CU-SAL-11` |
-| 42 | `CAP-SAL-WAS-05-RETURN` | `docs/user-manual/images/salidas-merma/05-devolver-detalle.png` | `CU-SAL-12` |
-| 43 | `CAP-REP-SAL-WAS-06-EXPORT` | `docs/user-manual/images/salidas-merma/06-exportar-reporte.png` | `CU-REP-08` |
-| 44 | `CAP-SAL-WAS-07-FILTER` | `docs/user-manual/images/salidas-merma/07-filtro-surtido.png` | `CU-SAL-07`, `CU-SAL-12` |
-| 45 | `CAP-IDA-PER-00-NAVIGATION` | `docs/user-manual/images/personas/00-acceso-menu-principal.png` | `CU-IDA-01` |
-| 46 | `CAP-IDA-PER-01-LIST` | `docs/user-manual/images/personas/01-listado.png` | `CU-IDA-01`, `CU-REP-14` |
-| 47 | `CAP-IDA-PER-02-CREATE` | `docs/user-manual/images/personas/02-formulario-alta.png` | `CU-IDA-02`, `CU-IDA-08`, `CU-IDA-09` |
-| 48 | `CAP-IDA-PER-03-EDIT` | `docs/user-manual/images/personas/03-formulario-edicion.png` | `CU-IDA-03` |
-| 49 | `CAP-IDA-USR-00-NAVIGATION` | `docs/user-manual/images/usuarios/00-acceso-menu-principal.png` | `CU-IDA-04` |
-| 50 | `CAP-IDA-USR-01-LIST` | `docs/user-manual/images/usuarios/01-listado.png` | `CU-IDA-04`, `CU-REP-15` |
-| 51 | `CAP-IDA-USR-02-CREATE` | `docs/user-manual/images/usuarios/02-formulario-alta.png` | `CU-IDA-05` |
-| 52 | `CAP-IDA-USR-03-EDIT` | `docs/user-manual/images/usuarios/03-formulario-edicion.png` | `CU-IDA-06` |
-| 53 | `CAP-IDA-USR-04-PASSWORD` | `docs/user-manual/images/usuarios/04-cambio-contrasena.png` | `CU-IDA-07` |
-| 54 | `CAP-REP-MOV-MAT-00-NAVIGATION` | `docs/user-manual/images/movimientos-material/00-acceso-menu-principal.png` | `CU-REP-02` |
-| 55 | `CAP-REP-MOV-MAT-01-LIST` | `docs/user-manual/images/movimientos-material/01-historial-y-filtros.png` | `CU-REP-02` |
-| 56 | `CAP-REP-MOV-MAT-02-EXPORT` | `docs/user-manual/images/movimientos-material/02-exportar-reporte.png` | `CU-REP-05` |
-| 57 | `CAP-REP-MOV-WAS-00-NAVIGATION` | `docs/user-manual/images/movimientos-merma/00-acceso-menu-principal.png` | `CU-REP-07` |
-| 58 | `CAP-REP-MOV-WAS-01-LIST` | `docs/user-manual/images/movimientos-merma/01-historial-y-filtros.png` | `CU-REP-07` |
-| 59 | `CAP-REP-MOV-WAS-02-EXPORT` | `docs/user-manual/images/movimientos-merma/02-exportar-reporte.png` | `CU-REP-10` |
-| 60 | `CAP-ERR-404-NOT-FOUND` | `docs/user-manual/images/errores/01-pagina-no-encontrada.png` | Transversal |
+| 29 | `CAP-ENT-06-VIEW` | `docs/user-manual/images/compras/06-consulta-cancelada.png` | `CU-ENT-03`, `CU-ENT-05` |
+| 30 | `CAP-SAL-MAT-00-NAVIGATION` | `docs/user-manual/images/salidas-material/00-acceso-menu-principal.png` | `CU-SAL-01` |
+| 31 | `CAP-SAL-MAT-01-LIST` | `docs/user-manual/images/salidas-material/01-listado.png` | `CU-CAT-20`, `CU-SAL-01` |
+| 32 | `CAP-SAL-MAT-02-CREATE` | `docs/user-manual/images/salidas-material/02-formulario-registro.png` | `CU-SAL-02` |
+| 33 | `CAP-SAL-MAT-03-EDIT` | `docs/user-manual/images/salidas-material/03-edicion-encabezado.png` | `CU-SAL-03`, `CU-SAL-04` |
+| 34 | `CAP-SAL-MAT-04-SUPPLY` | `docs/user-manual/images/salidas-material/04-surtir-detalles.png` | `CU-SAL-05` |
+| 35 | `CAP-SAL-MAT-05-RETURN` | `docs/user-manual/images/salidas-material/05-devolver-detalle.png` | `CU-SAL-06` |
+| 36 | `CAP-REP-SAL-MAT-06-EXPORT` | `docs/user-manual/images/salidas-material/06-exportar-reporte.png` | `CU-REP-04` |
+| 37 | `CAP-SAL-MAT-07-FILTER` | `docs/user-manual/images/salidas-material/07-filtro-surtido.png` | `CU-SAL-01`, `CU-SAL-06` |
+| 38 | `CAP-SAL-MAT-08-VIEW` | `docs/user-manual/images/salidas-material/08-consulta-cancelada.png` | `CU-SAL-03`, `CU-SAL-04` |
+| 39 | `CAP-SAL-WAS-00-NAVIGATION` | `docs/user-manual/images/salidas-merma/00-acceso-menu-principal.png` | `CU-SAL-07` |
+| 40 | `CAP-SAL-WAS-01-LIST` | `docs/user-manual/images/salidas-merma/01-listado.png` | `CU-SAL-07`, `CU-REP-08` |
+| 41 | `CAP-SAL-WAS-02-CREATE` | `docs/user-manual/images/salidas-merma/02-formulario-registro.png` | `CU-SAL-08` |
+| 42 | `CAP-SAL-WAS-03-EDIT` | `docs/user-manual/images/salidas-merma/03-edicion-encabezado.png` | `CU-SAL-09`, `CU-SAL-10` |
+| 43 | `CAP-SAL-WAS-04-SUPPLY` | `docs/user-manual/images/salidas-merma/04-surtir-detalles.png` | `CU-SAL-11` |
+| 44 | `CAP-SAL-WAS-05-RETURN` | `docs/user-manual/images/salidas-merma/05-devolver-detalle.png` | `CU-SAL-12` |
+| 45 | `CAP-REP-SAL-WAS-06-EXPORT` | `docs/user-manual/images/salidas-merma/06-exportar-reporte.png` | `CU-REP-08` |
+| 46 | `CAP-SAL-WAS-07-FILTER` | `docs/user-manual/images/salidas-merma/07-filtro-surtido.png` | `CU-SAL-07`, `CU-SAL-12` |
+| 47 | `CAP-SAL-WAS-08-VIEW` | `docs/user-manual/images/salidas-merma/08-consulta-cancelada.png` | `CU-SAL-09`, `CU-SAL-10` |
+| 48 | `CAP-IDA-PER-00-NAVIGATION` | `docs/user-manual/images/personas/00-acceso-menu-principal.png` | `CU-IDA-01` |
+| 49 | `CAP-IDA-PER-01-LIST` | `docs/user-manual/images/personas/01-listado.png` | `CU-IDA-01`, `CU-REP-14` |
+| 50 | `CAP-IDA-PER-02-CREATE` | `docs/user-manual/images/personas/02-formulario-alta.png` | `CU-IDA-02`, `CU-IDA-08`, `CU-IDA-09` |
+| 51 | `CAP-IDA-PER-03-EDIT` | `docs/user-manual/images/personas/03-formulario-edicion.png` | `CU-IDA-03` |
+| 52 | `CAP-IDA-USR-00-NAVIGATION` | `docs/user-manual/images/usuarios/00-acceso-menu-principal.png` | `CU-IDA-04` |
+| 53 | `CAP-IDA-USR-01-LIST` | `docs/user-manual/images/usuarios/01-listado.png` | `CU-IDA-04`, `CU-REP-15` |
+| 54 | `CAP-IDA-USR-02-CREATE` | `docs/user-manual/images/usuarios/02-formulario-alta.png` | `CU-IDA-05` |
+| 55 | `CAP-IDA-USR-03-EDIT` | `docs/user-manual/images/usuarios/03-formulario-edicion.png` | `CU-IDA-06` |
+| 56 | `CAP-IDA-USR-04-PASSWORD` | `docs/user-manual/images/usuarios/04-cambio-contrasena.png` | `CU-IDA-07` |
+| 57 | `CAP-REP-MOV-MAT-00-NAVIGATION` | `docs/user-manual/images/movimientos-material/00-acceso-menu-principal.png` | `CU-REP-02` |
+| 58 | `CAP-REP-MOV-MAT-01-LIST` | `docs/user-manual/images/movimientos-material/01-historial-y-filtros.png` | `CU-REP-02` |
+| 59 | `CAP-REP-MOV-MAT-02-EXPORT` | `docs/user-manual/images/movimientos-material/02-exportar-reporte.png` | `CU-REP-05` |
+| 60 | `CAP-REP-MOV-WAS-00-NAVIGATION` | `docs/user-manual/images/movimientos-merma/00-acceso-menu-principal.png` | `CU-REP-07` |
+| 61 | `CAP-REP-MOV-WAS-01-LIST` | `docs/user-manual/images/movimientos-merma/01-historial-y-filtros.png` | `CU-REP-07` |
+| 62 | `CAP-REP-MOV-WAS-02-EXPORT` | `docs/user-manual/images/movimientos-merma/02-exportar-reporte.png` | `CU-REP-10` |
+| 63 | `CAP-ERR-404-NOT-FOUND` | `docs/user-manual/images/errores/01-pagina-no-encontrada.png` | Transversal |
 
 ## Cobertura adicional necesaria
 
@@ -126,8 +129,9 @@ pertenecer a una cuenta ficticia con todos los permisos que se documentan y cont
    distinta**, aprobada y completamente surtida, con cantidad aún retornable para mostrar la
    devolución; abrir el modal de surtimiento durante la captura no modifica el primer registro;
 4. los estados equivalentes para una salida de merma;
-5. al menos una persona, un usuario, un proveedor y un cliente editables;
-6. movimientos de material y merma para que los historiales no aparezcan vacíos.
+5. una compra cancelada y salidas canceladas de material y merma para comprobar el modo de consulta;
+6. al menos una persona, un usuario, un proveedor y un cliente editables;
+7. movimientos de material y merma para que los historiales no aparezcan vacíos.
 
 El script recorre todas las páginas del listado filtrado para localizar cada acción visible; el
 registro requerido no tiene que aparecer en la primera página y una copia oculta del control,
@@ -189,6 +193,20 @@ DOCS_CAPTURE_FROM=CAP-SAL-WAS-00-NAVIGATION npm run docs:screenshots
 
 Use `DOCS_CAPTURE_IDS` para capturas aisladas o `DOCS_CAPTURE_FROM` para el resto del inventario;
 no defina ambos en la misma ejecución.
+
+Si se recibieron las fuentes sin algunos PNG, el inventario no puede recuperar esos binarios desde
+Git porque no se versionan. Sí puede **regenerar automáticamente sólo los archivos ausentes** desde
+la interfaz preparada, sin borrar las capturas que ya existen:
+
+```bash
+npm run docs:screenshots -- --missing
+```
+
+Este modo compara las rutas del arreglo `captures` con `docs/user-manual/images/`, reutiliza la
+misma sesión, navegación y datos ficticios del flujo completo, y termina sin abrir el navegador si
+el inventario ya está completo. No sustituye la revisión visual posterior ni puede reconstruir una
+captura sin acceso a Nexus, credenciales y registros de prueba compatibles. No combine `--missing`
+con `DOCS_CAPTURE_IDS` o `DOCS_CAPTURE_FROM`.
 
 `npm run docs:screenshots` también comprueba, inicia y detiene una instancia local de Nexus. El
 flujo reutiliza una instancia que ya responda en `DOCS_BASE_URL` y sólo detiene la que haya iniciado
