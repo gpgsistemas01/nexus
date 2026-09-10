@@ -116,6 +116,20 @@ const publicationNames = Object.keys(MANIFESTS);
 const mermaidBlock = /^```mermaid\r?\n([\s\S]*?)^```\r?$/gm;
 const externalLink = /^(?:https?:|mailto:)/;
 const markdownLink = /(?<!!)\[([^\]]+)\]\(([^) ]+)([^)]*)\)/g;
+const documentDataHeading = /^## Datos generales del documento$/m;
+const documentDataTable = [
+    '\\| Versión documental \\| Versión del sistema \\| Estado \\| Fecha \\| Responsable \\|',
+    '\\| --- \\| --- \\| --- \\| --- \\| --- \\|',
+    '\\| [^\\r\\n]+ \\|'
+].join('\\r?\\n');
+const documentDataAtStart = new RegExp(
+    `^# [^\\r\\n]+\\r?\\n\\r?\\n## Datos generales del documento\\r?\\n\\r?\\n${documentDataTable}$`,
+    'm'
+);
+const preparedDocumentData = new RegExp(
+    `^## Datos generales del documento(?: \\{#[^}]+\\})?\\r?\\n\\r?\\n${documentDataTable}$`,
+    'm'
+);
 const documentAnchor = (source, fragment) => [
     'documento',
     source.replace(/\.md$/, '').replace(/[^\p{L}\p{N}]+/gu, '-'),
@@ -225,10 +239,11 @@ const buildDocumentIndexes = async (preparedSources) => {
     ].join('\n');
 };
 
-const insertAfterFrontMatter = (content, insertion) => {
-    const frontMatter = content.match(/^---\r?\n[\s\S]*?\r?\n---\r?\n/);
-    if (!frontMatter) return `${insertion}\n${content}`;
-    return `${frontMatter[0]}${insertion}\n${content.slice(frontMatter[0].length)}`;
+const insertAfterDocumentData = (content, insertion) => {
+    const documentData = content.match(preparedDocumentData);
+    if (!documentData) throw new Error('La entrada del paquete no contiene una tabla de datos generales válida.');
+    const insertionIndex = documentData.index + documentData[0].length;
+    return `${content.slice(0, insertionIndex)}\n\n${insertion}\n${content.slice(insertionIndex).replace(/^\r?\n+/, '')}`;
 };
 
 if ((requestedPublication !== 'todos' && !MANIFESTS[requestedPublication])
@@ -245,6 +260,14 @@ const publications = await Promise.all(requestedPublications.map(async (publicat
         source,
         content: await readFile(path.join(ROOT, source), 'utf8')
     })));
+    const [entry, ...chapters] = sourceContents;
+    if (!documentDataAtStart.test(entry.content)) {
+        throw new Error(`La entrada ${entry.source} debe declarar la tabla de datos generales inmediatamente después del título.`);
+    }
+    const chapterWithDocumentData = chapters.find(({ content }) => documentDataHeading.test(content));
+    if (chapterWithDocumentData) {
+        throw new Error(`La tabla de datos generales pertenece sólo a la entrada del paquete, no a ${chapterWithDocumentData.source}.`);
+    }
     const contentsBySource = new Map(sourceContents.map(({ source, content }) => [source, content]));
     for (const { source, content } of sourceContents) {
         for (const match of content.matchAll(mermaidBlock)) {
@@ -395,7 +418,7 @@ try {
         const firstSource = preparedSources[0];
         const firstContent = await readFile(firstSource, 'utf8');
         const indexes = await buildDocumentIndexes(preparedSources);
-        await writeFile(firstSource, insertAfterFrontMatter(firstContent, indexes));
+        await writeFile(firstSource, insertAfterDocumentData(firstContent, indexes));
 
         const scopedSources = preparedSources.map((source) => path.relative(temporaryDirectory, source));
         const args = [

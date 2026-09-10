@@ -7,6 +7,12 @@ status: En revisión
 
 # Requisitos de Nexus
 
+## Datos generales del documento
+
+| Versión documental | Versión del sistema | Estado | Fecha | Responsable |
+| --- | --- | --- | --- | --- |
+| 1.1 | 1.0.0 | En revisión | 2026-09-10 | Equipo Nexus |
+
 Este es el punto de entrada y la portada del paquete exportable de requisitos. La
 [especificación de requisitos](requirements-specification.md) conserva la definición
 normativa; este índice organiza su lectura sin duplicarla.
