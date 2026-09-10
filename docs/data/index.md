@@ -1,5 +1,11 @@
 # Mapa de datos, persistencia y acceso
 
+## Datos generales del documento
+
+| Versión documental | Versión del sistema | Estado | Fecha | Responsable |
+| --- | --- | --- | --- | --- |
+| 1.0 | 1.0.0 | En revisión | 2026-09-10 | Equipo Nexus |
+
 ## Propósito
 
 Esta página es la entrada única a la documentación relacionada con datos. No vuelve a

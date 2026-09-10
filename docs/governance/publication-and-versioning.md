@@ -13,11 +13,18 @@ Cada entrega exportable conserva este orden:
 
 1. portada: producto, título del documento, versión del sistema, versión documental, fecha,
    estado y responsable;
-2. control de cambios y aprobaciones;
-3. tabla de contenido generada;
-4. propósito, audiencia, alcance y exclusiones;
-5. contenido principal;
-6. trazabilidad, glosario, referencias y anexos.
+2. tabla **Datos generales del documento**;
+3. control de cambios y aprobaciones;
+4. tabla de contenido generada;
+5. propósito, audiencia, alcance y exclusiones;
+6. contenido principal;
+7. trazabilidad, glosario, referencias y anexos.
+
+La tabla **Datos generales del documento** pertenece únicamente al archivo de entrada de
+cada paquete exportable y se ubica inmediatamente después de su título. Registra versión
+documental, versión del sistema, estado, fecha y responsable. El exportador inserta la
+tabla de contenido después de estos datos generales; los capítulos, anexos y artefactos
+generados no repiten la tabla porque forman parte del mismo documento publicado.
 
 Los paquetes recomendados son **Requisitos**, **Datos, acceso y operación**, **Diseño y
 arquitectura**, **Plan y evidencia de pruebas** y **Manual de usuario**. Cada paquete tiene su

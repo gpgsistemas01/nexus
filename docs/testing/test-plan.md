@@ -1,5 +1,11 @@
 # Plan de pruebas
 
+## Datos generales del documento
+
+| Versión documental | Versión del sistema | Estado | Fecha | Responsable |
+| --- | --- | --- | --- | --- |
+| 1.0 | 1.0.0 | En revisión | 2026-09-10 | Equipo Nexus |
+
 ## Objetivo y alcance
 
 Este plan acepta cambios de Nexus mediante evidencia de los flujos que registran o
