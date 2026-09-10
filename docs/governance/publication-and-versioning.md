@@ -33,10 +33,12 @@ que sus cuerpos transporten información.
 - Markdown es la fuente versionada y conserva notas de mantenimiento, enlaces al repositorio y
   bloques Mermaid que no tienen valor en una entrega impresa.
 - DOCX es el formato editable para revisión y firmas. Se genera sin una plantilla adicional; un
-  `reference.docx` opcional puede definir tipografías, encabezados, tablas y numeración.
-- PDF es la entrega no editable. Pandoc requiere un motor PDF instalado; la organización debe
-  elegir y fijar uno antes de declarar reproducibilidad. Adobe Acrobat o Adobe Reader abren el
-  archivo terminado, pero no reemplazan al motor que lo compone desde Pandoc.
+  `reference.docx` opcional puede definir tipografías, encabezados, tablas y numeración. El
+  exportador justifica los párrafos de contenido y conserva la alineación de títulos, código,
+  leyendas y celdas de tabla.
+- PDF es la entrega no editable. El exportador genera primero el DOCX y lo convierte mediante
+  LibreOffice en modo no interactivo; conserva los editables en `build/docs/docx/` y las entregas
+  finales en `build/docs/pdf/` para que cada PDF corresponda al DOCX revisado sin mezclar formatos.
 
 La portada se genera desde `title`, `subtitle`, `author` y `date` del bloque YAML del
 primer archivo del manifiesto. En DOCX puede adoptar los estilos de un documento de referencia cuando se
@@ -79,10 +81,11 @@ La separación evita que Pandoc interprete el encabezado y su atributo interno c
 los identificadores sirven sólo para navegación y no forman parte del título publicado.
 
 Al repetir una exportación, el archivo de la misma combinación de paquete y formato se reemplaza;
-no se exige una limpieza manual previa. Los demás formatos permanecen en `build/docs/` hasta que
-se retiren de forma intencional. El flujo de capturas es distinto: el script elimina
-automáticamente el inventario anterior y lo genera completo para impedir que una publicación
-mezcle ejecuciones.
+no se exige una limpieza manual previa. Los DOCX permanecen en `build/docs/docx/` y los PDF en
+`build/docs/pdf/` hasta que se retiren de forma intencional. Esta separación distingue los
+editables de revisión de las entregas no editables sin duplicar la estructura por paquete. El flujo
+de capturas es distinto: el script elimina automáticamente el inventario anterior y lo genera
+completo para impedir que una publicación mezcle ejecuciones.
 
 La preparación del entorno y los comandos no se duplican en esta norma. Se mantienen en la
 [guía operativa de exportación](../README.md#exportar-la-documentación), que es la entrada para
@@ -115,9 +118,9 @@ permiso que el manual pretende demostrar.
 Playwright **no se ejecuta junto con Pandoc**. Primero, y sólo cuando cambian las pantallas,
 `docs:screenshots` abre la aplicación y actualiza las imágenes; después `docs:export`
 lee esas imágenes ya existentes. Pandoc por sí solo genera DOCX sin Playwright,
-LibreOffice ni Microsoft Word. Para PDF siempre delega la composición final a un motor
-adicional (`DOCS_PDF_ENGINE`); esa dependencia no puede eliminarse sin escoger otro
-conversor o publicar DOCX en su lugar.
+LibreOffice ni Microsoft Word. Para PDF, el exportador aplica primero el formato final al DOCX y
+delega su conversión a LibreOffice; `DOCS_PDF_CONVERTER` permite indicar la ruta de `soffice` cuando
+no está disponible en `PATH`.
 
 `docs:screenshots` coordina el generador con una instancia local de Nexus: comprueba si ya responde,
 la inicia y espera cuando hace falta, y al terminar detiene sólo el proceso que creó. No cambia el

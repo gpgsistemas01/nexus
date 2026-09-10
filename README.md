@@ -213,7 +213,7 @@ npm start
 | `npm run test:db` | Verifica variables, migra la base de pruebas y ejecuta pruebas. |
 | `npm run docs:architecture` | Regenera el mapa de código, el esquema de base de datos y el diccionario técnico derivados del código y Prisma. |
 | `npm run docs:check` | Comprueba sin modificar archivos que la documentación generada esté actualizada. |
-| `npm run docs:export -- <paquete> <docx\|pdf>` | Valida y exporta un paquete documental con Pandoc; PDF requiere además un motor PDF. |
+| `npm run docs:export -- <paquete> <docx\|pdf>` | Valida y genera el DOCX con Pandoc; para PDF convierte después ese DOCX con LibreOffice. |
 | `npm run docs:screenshots` | Comprueba o inicia Nexus, genera en Chromium todas las capturas y detiene la instancia temporal al terminar. |
 
 ## Publicación de documentos y capturas
@@ -221,7 +221,7 @@ npm start
 Estos procesos no forman parte del arranque normal de Nexus y requieren herramientas distintas:
 
 - la **exportación** usa las dependencias instaladas por `npm ci`, Pandoc instalado en el sistema
-  y, para PDF, un motor como XeLaTeX;
+  y, para PDF, LibreOffice como conversor del DOCX generado;
 - la **captura** usa Playwright y su navegador Chromium, además de Nexus en ejecución, una base de
   datos ficticia con estados específicos y una sesión autenticada con los permisos necesarios.
 
