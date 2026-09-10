@@ -15,6 +15,26 @@ describe('preparePdfConverter', () => {
 
     expect(converter).toBe('/opt/libreoffice/soffice');
     expect(runCommand).toHaveBeenCalledOnce();
+    expect(runCommand).toHaveBeenCalledWith('/opt/libreoffice/soffice', ['--version'], {
+      encoding: 'utf8',
+      timeout: 15000,
+      windowsHide: true
+    });
+  });
+
+  it('uses the console companion when the configured Windows converter points to soffice.exe', () => {
+    const graphicalExecutable = 'C:\\Program Files\\LibreOffice\\program\\soffice.exe';
+    const consoleExecutable = 'C:\\Program Files\\LibreOffice\\program\\soffice.com';
+    const runCommand = vi.fn(command => command === consoleExecutable ? successfulResult : missingResult);
+
+    const converter = preparePdfConverter({
+      configuredConverter: graphicalExecutable,
+      platform: 'win32',
+      runCommand
+    });
+
+    expect(converter).toBe(consoleExecutable);
+    expect(runCommand).toHaveBeenCalledOnce();
   });
 
   it('installs LibreOffice with apt-get when soffice is missing on Linux', () => {
