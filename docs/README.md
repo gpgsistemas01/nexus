@@ -309,7 +309,11 @@ no sustituyen la instalación requerida por este proyecto. `npm run docs:export`
    Si una configuración existente apunta a `soffice.exe`, el exportador usa automáticamente el
    ejecutable de consola `soffice.com` de la misma carpeta. La comprobación del conversor tiene un
    tiempo límite para que un proceso de LibreOffice que no responda no deje la exportación
-   bloqueada indefinidamente.
+   bloqueada indefinidamente. Tanto esa comprobación como la conversión eliminan `PYTHONHOME` y
+   `PYTHONPATH` sólo del entorno del subproceso de LibreOffice. Esto evita que una instalación de
+   Python configurada en la terminal interfiera con el Python integrado de LibreOffice y muestre
+   el aviso `Could not find platform independent libraries <prefix>`; las variables de la terminal
+   y del proceso principal no se modifican.
 
    Adobe Reader sólo visualiza el resultado. La conversión automatizada usa LibreOffice porque
    proporciona un ejecutable invocable de forma uniforme; Word o Acrobat todavía pueden usarse

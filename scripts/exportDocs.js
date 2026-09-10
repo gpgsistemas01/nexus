@@ -7,7 +7,10 @@ import process from 'node:process';
 import { pathToFileURL } from 'node:url';
 import { bundleOpenApiContract } from './openApiContractUtils.js';
 import { prepareMermaidCli } from './prepareMermaidCli.js';
-import { preparePdfConverter } from './preparePdfConverter.js';
+import {
+    preparePdfConverter,
+    preparePdfConverterEnvironment
+} from './preparePdfConverter.js';
 
 const ROOT = process.cwd();
 const OPENAPI_SOURCE = 'docs/architecture/openapi/openapi.json';
@@ -468,7 +471,12 @@ try {
                 '--outdir',
                 documentOutputDirectories.pdf,
                 docxOutput
-            ], { cwd: ROOT, stdio: 'inherit', windowsHide: true });
+            ], {
+                cwd: ROOT,
+                env: preparePdfConverterEnvironment(),
+                stdio: 'inherit',
+                windowsHide: true
+            });
             if (conversion.status !== 0 || !existsSync(output)) {
                 console.error(`No se pudo convertir ${path.relative(ROOT, docxOutput)} a PDF con ${pdfConverter}.`);
                 failedStatus = conversion.status ?? 1;

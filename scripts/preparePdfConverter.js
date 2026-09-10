@@ -4,6 +4,11 @@ import process from 'node:process';
 
 const DEFAULT_CONVERTER = 'soffice';
 const CONVERTER_CHECK_TIMEOUT = 15000;
+const PYTHON_ENVIRONMENT_VARIABLES = new Set(['PYTHONHOME', 'PYTHONPATH']);
+
+export const preparePdfConverterEnvironment = (environment = process.env) => Object.fromEntries(
+    Object.entries(environment).filter(([name]) => !PYTHON_ENVIRONMENT_VARIABLES.has(name.toUpperCase()))
+);
 
 const getConverterCandidates = (platform, environment) => {
     if (platform === 'win32') {
@@ -22,9 +27,10 @@ const getConverterCandidates = (platform, environment) => {
     return [DEFAULT_CONVERTER];
 };
 
-const isCommandAvailable = (command, runCommand) => {
+const isCommandAvailable = (command, runCommand, environment) => {
     const result = runCommand(command, ['--version'], {
         encoding: 'utf8',
+        env: environment,
         timeout: CONVERTER_CHECK_TIMEOUT,
         windowsHide: true
     });
@@ -78,9 +84,12 @@ export const preparePdfConverter = ({
     runCommand = spawnSync,
     getUserId = process.getuid
 } = {}) => {
+    const converterEnvironment = preparePdfConverterEnvironment(environment);
     if (configuredConverter) {
         const configuredCandidates = getConfiguredConverterCandidates(configuredConverter, platform);
-        const availableConverter = configuredCandidates.find(candidate => isCommandAvailable(candidate, runCommand));
+        const availableConverter = configuredCandidates.find(
+            candidate => isCommandAvailable(candidate, runCommand, converterEnvironment)
+        );
         if (availableConverter) return availableConverter;
         throw new Error(
             `El conversor configurado en DOCS_PDF_CONVERTER (${configuredConverter}) no está disponible.`
@@ -88,13 +97,15 @@ export const preparePdfConverter = ({
     }
 
     const candidates = getConverterCandidates(platform, environment);
-    const availableConverter = candidates.find(candidate => isCommandAvailable(candidate, runCommand));
+    const availableConverter = candidates.find(
+        candidate => isCommandAvailable(candidate, runCommand, converterEnvironment)
+    );
     if (availableConverter) return availableConverter;
 
     console.log('LibreOffice no está disponible; se instalará para completar la exportación PDF.');
     const installed = installLibreOffice({ platform, runCommand, getUserId });
     const installedConverter = installed
-        ? candidates.find(candidate => isCommandAvailable(candidate, runCommand))
+        ? candidates.find(candidate => isCommandAvailable(candidate, runCommand, converterEnvironment))
         : null;
     if (installedConverter) return installedConverter;
 

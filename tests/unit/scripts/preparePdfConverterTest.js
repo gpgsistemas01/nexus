@@ -1,15 +1,35 @@
 import { describe, expect, it, vi } from 'vitest';
-import { preparePdfConverter } from '../../../scripts/preparePdfConverter.js';
+import {
+  preparePdfConverter,
+  preparePdfConverterEnvironment
+} from '../../../scripts/preparePdfConverter.js';
 
 const successfulResult = { status: 0 };
 const missingResult = { error: { code: 'ENOENT' }, status: null };
 
 describe('preparePdfConverter', () => {
+  it('removes Python overrides from the LibreOffice environment without mutating the source', () => {
+    const environment = {
+      PATH: '/usr/bin',
+      PythonHome: '/embedded/python',
+      PYTHONPATH: '/custom/modules'
+    };
+
+    expect(preparePdfConverterEnvironment(environment)).toEqual({ PATH: '/usr/bin' });
+    expect(environment).toEqual({
+      PATH: '/usr/bin',
+      PythonHome: '/embedded/python',
+      PYTHONPATH: '/custom/modules'
+    });
+  });
+
   it('reuses the configured converter without attempting an installation', () => {
     const runCommand = vi.fn(() => successfulResult);
+    const environment = { PATH: '/usr/bin', PYTHONHOME: '/embedded/python' };
 
     const converter = preparePdfConverter({
       configuredConverter: '/opt/libreoffice/soffice',
+      environment,
       runCommand
     });
 
@@ -17,6 +37,7 @@ describe('preparePdfConverter', () => {
     expect(runCommand).toHaveBeenCalledOnce();
     expect(runCommand).toHaveBeenCalledWith('/opt/libreoffice/soffice', ['--version'], {
       encoding: 'utf8',
+      env: { PATH: '/usr/bin' },
       timeout: 15000,
       windowsHide: true
     });
