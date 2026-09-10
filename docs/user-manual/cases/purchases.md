@@ -79,7 +79,7 @@ materiales faltantes.
 
    ![CAP-ENT-03-EDIT: edicion compra](../images/compras/03-edicion-compra.png)
 
-2. Modifique las opciones, campos o selectores indicados y use **Agregar** para incorporar los detalles permitidos.
+2. Modifique el comprobante, la persona que recibe, la fecha o las observaciones, y use **Agregar** para incorporar detalles nuevos. El proveedor y los renglones ya confirmados permanecen deshabilitados; para cambiar la cantidad o el costo de uno de esos renglones, use **Corregir detalle de compra**.
 3. Seleccione **Actualizar** para guardar o **Regresar** para salir sin confirmar.
 
 <a id="CAP-ENT-04-CORRECT"></a>
@@ -113,3 +113,16 @@ materiales faltantes.
 
 2. Elija **Mes actual**, **Otro mes** o **Personalizado: usar filtros aplicados** y complete **Mes del reporte** cuando corresponda.
 3. Seleccione **Descargar** para generar el archivo.
+
+<a id="CAP-ENT-06-VIEW"></a>
+### CAP-ENT-06-VIEW — Consultar compra cancelada
+
+**Casos:** `CU-ENT-03`, `CU-ENT-05`.
+
+1. Localice una compra con estado **Cancelada** y seleccione **Editar registro**.
+2. Compruebe que el formulario, sus detalles y sus acciones permanezcan en modo consulta, como en
+   la captura:
+
+   ![CAP-ENT-06-VIEW: consulta de compra cancelada](../images/compras/06-consulta-cancelada.png)
+
+3. Use **Regresar** para cerrar el formulario; una compra cancelada no admite nuevos cambios.

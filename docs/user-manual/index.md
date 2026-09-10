@@ -1,9 +1,9 @@
 ---
 title: Manual de usuario de Nexus
-subtitle: "Versión documental 0.2 · Sistema 1.0.0 · Estado: En revisión"
+subtitle: "Versión documental 0.3 · Sistema 1.0.0 · Estado: En revisión"
 author: Equipo Nexus
-date: 2026-09-04
-document-version: 0.2
+date: 2026-09-10
+document-version: 0.3
 system-version: 1.0.0
 status: En revisión
 ---

@@ -91,7 +91,7 @@ otro renglón ni suma ambas cantidades. Capture en **Cantidad** el total que des
 
    ![CAP-SAL-MAT-03-EDIT: edicion encabezado](../images/salidas-material/03-edicion-encabezado.png)
 
-2. Modifique los selectores y campos indicados y, si el estado lo permite, use **Buscar material...**, **Cantidad** y **Agregar** para incorporar detalles.
+2. Modifique los selectores y campos indicados. Mientras la salida esté pendiente, también puede usar **Buscar material...**, **Cantidad** y **Agregar** para incorporar detalles; después del primer surtido, los detalles quedan deshabilitados.
 3. Seleccione **Editar** para guardar o **Regresar** para salir sin confirmar.
 
 <a id="CAP-SAL-MAT-04-SUPPLY"></a>
@@ -107,7 +107,7 @@ otro renglón ni suma ambas cantidades. Capture en **Cantidad** el total que des
 
    ![CAP-SAL-MAT-04-SUPPLY: surtir detalles](../images/salidas-material/04-surtir-detalles.png)
 
-2. Marque la casilla de la columna **Surtir** y complete **Cantidad de proyecto** en cada renglón que se entregará.
+2. En los renglones pendientes, marque la casilla **Surtir** y complete **Cantidad de proyecto**. El encabezado y los renglones ya surtidos permanecen deshabilitados como referencia.
 3. Revise la existencia y seleccione **Editar detalles de la**.
 
 <a id="CAP-SAL-MAT-05-RETURN"></a>
@@ -123,7 +123,7 @@ otro renglón ni suma ambas cantidades. Capture en **Cantidad** el total que des
 
    ![CAP-SAL-MAT-05-RETURN: devolver detalle](../images/salidas-material/05-devolver-detalle.png)
 
-2. Complete **Cantidad a devolver** y **Observaciones**.
+2. Complete **Cantidad a devolver** y **Observaciones**. El encabezado y los demás datos del detalle permanecen deshabilitados como referencia.
 3. Seleccione **Devolver** para confirmar o **Regresar** para salir sin aplicar la devolución.
 
 <a id="CAP-REP-SAL-MAT-06-EXPORT"></a>
@@ -141,6 +141,19 @@ otro renglón ni suma ambas cantidades. Capture en **Cantidad** el total que des
 
 2. Elija el alcance mensual, otro mes o los filtros aplicados y complete **Mes del reporte** cuando corresponda.
 3. Seleccione **Descargar** para generar el archivo.
+
+<a id="CAP-SAL-MAT-08-VIEW"></a>
+### CAP-SAL-MAT-08-VIEW — Consultar salida cancelada
+
+**Casos:** `CU-SAL-03`, `CU-SAL-04`.
+
+1. Seleccione **Cancelado** en **Estado de surtido:**, aplique el filtro y abra **Editar registro**.
+2. Compruebe que el encabezado, los detalles y las acciones permanezcan deshabilitados, como en la
+   captura:
+
+   ![CAP-SAL-MAT-08-VIEW: consulta de salida de material cancelada](../images/salidas-material/08-consulta-cancelada.png)
+
+3. Use **Regresar** para cerrar el formulario sin cambios.
 
 ## Salidas de merma
 
@@ -219,7 +232,9 @@ misma merma repetida.
 
    ![CAP-SAL-WAS-03-EDIT: edicion encabezado](../images/salidas-merma/03-edicion-encabezado.png)
 
-2. Modifique los selectores y campos indicados y, si el estado lo permite, use **Buscar merma...**, **Cantidad** y **Agregar** para incorporar detalles.
+2. Modifique los selectores y campos indicados. Mientras la salida esté pendiente, también puede
+   usar **Buscar merma...**, **Cantidad** y **Agregar** para incorporar detalles; después del primer
+   surtido, los detalles quedan deshabilitados.
 3. Seleccione **Editar** para guardar o **Regresar** para salir sin confirmar.
 
 <a id="CAP-SAL-WAS-04-SUPPLY"></a>
@@ -235,7 +250,7 @@ misma merma repetida.
 
    ![CAP-SAL-WAS-04-SUPPLY: surtir detalles](../images/salidas-merma/04-surtir-detalles.png)
 
-2. Marque la casilla de la columna **Surtir** y complete **Cantidad de proyecto** en cada renglón que se entregará.
+2. En los renglones pendientes, marque la casilla **Surtir** y complete **Cantidad de proyecto**. El encabezado y los renglones ya surtidos permanecen deshabilitados como referencia.
 3. Revise la existencia y seleccione **Surtir**.
 
 <a id="CAP-SAL-WAS-05-RETURN"></a>
@@ -251,7 +266,7 @@ misma merma repetida.
 
    ![CAP-SAL-WAS-05-RETURN: devolver detalle](../images/salidas-merma/05-devolver-detalle.png)
 
-2. Complete **Cantidad a devolver** y **Observaciones**.
+2. Complete **Cantidad a devolver** y **Observaciones**. El encabezado y los demás datos del detalle permanecen deshabilitados como referencia.
 3. Seleccione **Devolver** para confirmar o **Regresar** para salir sin aplicar la devolución.
 
 <a id="CAP-REP-SAL-WAS-06-EXPORT"></a>
@@ -269,3 +284,16 @@ misma merma repetida.
 
 2. Elija el alcance mensual, otro mes o los filtros aplicados y complete **Mes del reporte** cuando corresponda.
 3. Seleccione **Descargar** para generar el archivo.
+
+<a id="CAP-SAL-WAS-08-VIEW"></a>
+### CAP-SAL-WAS-08-VIEW — Consultar salida cancelada
+
+**Casos:** `CU-SAL-09`, `CU-SAL-10`.
+
+1. Seleccione **Cancelado** en **Estado de surtido:**, aplique el filtro y abra **Editar registro**.
+2. Compruebe que el encabezado, los detalles y las acciones permanezcan deshabilitados, como en la
+   captura:
+
+   ![CAP-SAL-WAS-08-VIEW: consulta de salida de merma cancelada](../images/salidas-merma/08-consulta-cancelada.png)
+
+3. Use **Regresar** para cerrar el formulario sin cambios.

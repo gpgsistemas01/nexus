@@ -116,7 +116,9 @@ Cada procedimiento identifica sus casos de uso, controles, errores posibles y ca
 
    ![CAP-IDA-USR-03-EDIT: formulario edicion](../images/usuarios/03-formulario-edicion.png)
 
-2. Revise los selectores **Buscar área...** y **Buscar rol...**, y modifique el campo **Usuario** si corresponde.
+2. Revise los selectores **Buscar área...** y **Buscar rol...**, y modifique el campo **Usuario** si
+   corresponde. La **Contraseña** permanece deshabilitada y sólo se modifica mediante **Cambiar
+   contraseña**.
 3. Seleccione el botón **Actualizar** para guardar los cambios.
 
 <a id="CAP-IDA-USR-04-PASSWORD"></a>
@@ -132,5 +134,6 @@ Cada procedimiento identifica sus casos de uso, controles, errores posibles y ca
 
    ![CAP-IDA-USR-04-PASSWORD: cambio contrasena](../images/usuarios/04-cambio-contrasena.png)
 
-2. Escriba la nueva clave conforme a la política en el campo **Contraseña**.
+2. Compruebe que **Usuario**, área y rol permanezcan deshabilitados como referencia, y escriba la
+   nueva clave conforme a la política en **Contraseña**.
 3. Seleccione **Actualizar contraseña** para confirmar o **Regresar** para salir sin cambios.
