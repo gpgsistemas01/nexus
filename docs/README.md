@@ -492,8 +492,41 @@ Playwright y Chromium se preparan automáticamente en el mismo entorno antes de 
    export DOCS_LOGIN_PASSWORD='contraseña-ficticia'
    ```
 
-   No guarde estas credenciales en `.env` ni en archivos del repositorio. Como alternativa, defina
-   sólo `DOCS_STORAGE_STATE`; no mezcle ambos mecanismos.
+   No guarde estas credenciales en `.env` ni en archivos del repositorio. Si sólo va a generar
+   capturas públicas, como `CAP-AUT-01-LOGIN` o `CAP-ERR-404-NOT-FOUND`, omita tanto las credenciales
+   como el archivo de sesión y continúe en el paso 5.
+
+   Para capturas protegidas, como alternativa a las credenciales puede crear una sesión temporal
+   con Playwright. Siga esta secuencia completa en PowerShell en lugar de definir
+   `DOCS_LOGIN_NAME` y `DOCS_LOGIN_PASSWORD`:
+
+   1. En la terminal 2, defina la URL, indique la ruta del archivo temporal e inicie `codegen`:
+
+      ```powershell
+      $env:DOCS_BASE_URL = "http://127.0.0.1:3000"
+      $env:DOCS_STORAGE_STATE = Join-Path $env:TEMP "nexus-storage-state.json"
+      npx playwright codegen --save-storage="$env:DOCS_STORAGE_STATE" "${env:DOCS_BASE_URL}/inicio-sesion"
+      ```
+
+   2. En la ventana de **Chromium** abierta por el tercer comando, complete el formulario de Nexus
+      con datos ficticios y confirme que ya ve una pantalla protegida.
+   3. Vuelva a la **terminal 2**, donde `codegen` continúa en ejecución, y presione `Ctrl+C` una vez.
+      No lo haga en la terminal 1, porque esa terminal mantiene Nexus disponible para las capturas,
+      y no finalice el proceso desde el Administrador de tareas ni con `Stop-Process`.
+   4. Espere a que Playwright cierre Chromium, termine `codegen` y reaparezca el prompt. No cierre
+      PowerShell ni ejecute todavía `npm run docs:screenshots`.
+   5. Compruebe que Playwright haya guardado la sesión:
+
+      ```powershell
+      Test-Path "$env:DOCS_STORAGE_STATE"
+      ```
+
+      Continúe únicamente si devuelve `True`; si devuelve `False`, repita esta secuencia desde el
+      subpaso 1. Definir la variable por sí solo no crea el archivo. No mezcle
+      `DOCS_STORAGE_STATE` con las variables de credenciales.
+
+   Es necesario completar los cinco subpasos y terminar `codegen` antes de iniciar las capturas:
+   mientras sigue abierto, el archivo puede no estar guardado y la terminal 2 continúa ocupada.
 5. Genere las capturas. El mismo comando incluye la comprobación, el arranque y la detención de
    Nexus en el proceso:
 
@@ -516,11 +549,18 @@ Playwright y Chromium se preparan automáticamente en el mismo entorno antes de 
 7. Revise los PNG conforme a
    [Revisión antes de publicar](user-manual/screenshot-inventory.md#revisión-antes-de-publicar).
    Si debe corregir el entorno, repita los pasos 5 a 7.
-8. Retire las credenciales de la terminal 2:
+8. Retire de la terminal 2 las variables del mecanismo que haya utilizado. Las variables se
+   definieron manualmente en PowerShell o Bash y **no se eliminan automáticamente** cuando terminan
+   `codegen` o el comando de capturas:
 
    ```powershell
    # PowerShell
    Remove-Item Env:DOCS_LOGIN_NAME, Env:DOCS_LOGIN_PASSWORD
+   ```
+
+   ```powershell
+   # PowerShell, si utilizó el archivo de sesión
+   Remove-Item Env:DOCS_STORAGE_STATE
    ```
 
    ```bash
@@ -528,8 +568,12 @@ Playwright y Chromium se preparan automáticamente en el mismo entorno antes de 
    unset DOCS_LOGIN_NAME DOCS_LOGIN_PASSWORD
    ```
 
-   Si una ejecución con `DOCS_STORAGE_STATE` falla, elimine ese archivo manualmente cuando no vaya
-   a reintentar; una ejecución correcta lo elimina automáticamente.
+   Hay dos elementos distintos: la variable `DOCS_STORAGE_STATE` permanece definida en la terminal
+   hasta ejecutar `Remove-Item`, mientras que el archivo JSON al que apunta sí lo elimina
+   automáticamente una ejecución correcta de `npm run docs:screenshots`. Si la ejecución falla, el
+   archivo se conserva para reintentar y debe eliminarse manualmente cuando ya no se vaya a usar.
+   Retire la variable aunque el archivo ya haya sido eliminado para que una ejecución futura no
+   apunte a una ruta inexistente.
 9. Si inició Nexus manualmente en la terminal 1, presione `Ctrl+C` y espere el prompt para
     detener Nexus/Nodemon. El comando automático ya detuvo su instancia temporal.
 10. Exporte el manual completo en DOCX:

@@ -157,7 +157,9 @@ sesión preparado previamente como mecanismo alternativo; nunca se genera a part
 contraseña. Estos valores sólo se leen del entorno del proceso, no se agregan al archivo `.env`, y
 deben retirarse de la terminal al terminar, como indica la
 [guía de exportación](../README.md#exportar-la-documentación). La pantalla de inicio de sesión se
-toma en un contexto separado y sin autenticación.
+toma en un contexto separado y sin autenticación. Una selección compuesta únicamente por capturas
+públicas tampoco abre un contexto autenticado ni necesita leer el archivo indicado por
+`DOCS_STORAGE_STATE`.
 
 No hace falta ejecutar un comando previo para obtener una sesión cuando se dispone de una cuenta
 ficticia: las credenciales pueden definirse en el mismo comando y el inicio de sesión se realiza en
