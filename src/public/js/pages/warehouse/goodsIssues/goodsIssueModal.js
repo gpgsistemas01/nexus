@@ -63,7 +63,7 @@ export const openGoodsIssueModal = ({ mode, data = null }) => {
         entityName: GOODS_ISSUE_ENTITY_NAME,
         referenceNumber: data?.referenceNumber,
         createTitle: 'Registrar salida',
-        detailAction: 'Editar detalles de la',
+        detailAction: 'Surtir materiales de la',
         returnAction: 'Devolver materiales surtidos de la'
     });
 
