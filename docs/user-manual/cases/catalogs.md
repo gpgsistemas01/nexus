@@ -25,7 +25,7 @@ conserva stock. Volver a marcarlo permite usarlo nuevamente en operaciones nueva
 <a id="CAP-CAT-MAT-01-LIST"></a>
 ### CAP-CAT-MAT-01-LIST — Listado inventario
 
-**Casos:** `CU-AUT-02`, `CU-CAT-01`, `CU-REP-01`, `CU-REP-03`.
+**Casos de uso:** `CU-AUT-02` — Cerrar sesión; `CU-CAT-01` — Consultar materiales; `CU-REP-01` — Consultar inventario de materiales; `CU-REP-03` — Generar reporte de inventario de materiales.
 
 **Errores posibles:** [Catálogos e inventario](../error-messages.md#errores-catalogos).
 
@@ -41,7 +41,7 @@ conserva stock. Volver a marcarlo permite usarlo nuevamente en operaciones nueva
 
 ### CAP-REP-MAT-05-EXPORT — Exportar inventario
 
-**Casos:** `CU-REP-03`.
+**Casos de uso:** `CU-REP-03` — Generar reporte de inventario de materiales.
 
 1. Seleccione **Exportar Excel** y compruebe el modal:
 
@@ -52,7 +52,7 @@ conserva stock. Volver a marcarlo permite usarlo nuevamente en operaciones nueva
 <a id="CAP-CAT-MAT-02-CREATE"></a>
 ### CAP-CAT-MAT-02-CREATE — Formulario alta
 
-**Casos:** `CU-CAT-02`, `CU-CAT-17`, `CU-CAT-18`.
+**Casos de uso:** `CU-CAT-02` — Crear material; `CU-CAT-17` — Consultar presentaciones; `CU-CAT-18` — Consultar unidades de medida.
 
 **Errores posibles:** [Validación de formularios](../error-messages.md#errores-validacion), [Catálogos e inventario](../error-messages.md#errores-catalogos).
 
@@ -77,7 +77,7 @@ seleccionado.
 <a id="CAP-CAT-MAT-03-EDIT"></a>
 ### CAP-CAT-MAT-03-EDIT — Formulario edicion
 
-**Casos:** `CU-CAT-03`, `CU-CAT-04`.
+**Casos de uso:** `CU-CAT-03` — Editar material; `CU-CAT-04` — Retirar material.
 
 **Errores posibles:** [Validación de formularios](../error-messages.md#errores-validacion), [Catálogos e inventario](../error-messages.md#errores-catalogos).
 
@@ -96,7 +96,7 @@ este modo. Use la acción **Editar registro** y el botón **Actualizar**.
 <a id="CAP-CAT-MAT-04-STOCK"></a>
 ### CAP-CAT-MAT-04-STOCK — Ajuste existencia
 
-**Casos:** `CU-CAT-05`, `CU-CAT-19`.
+**Casos de uso:** `CU-CAT-05` — Ajustar existencia de material; `CU-CAT-19` — Consultar motivos de ajuste.
 
 **Errores posibles:** [Validación de formularios](../error-messages.md#errores-validacion), [Catálogos e inventario](../error-messages.md#errores-catalogos).
 
@@ -127,7 +127,7 @@ marcarla lo reactiva. Este cambio no es un ajuste de stock.
 <a id="CAP-CAT-SUP-01-LIST"></a>
 ### CAP-CAT-SUP-01-LIST — Listado
 
-**Casos:** `CU-CAT-06`, `CU-REP-12`.
+**Casos de uso:** `CU-CAT-06` — Consultar proveedores; `CU-REP-12` — Generar reporte de proveedores.
 
 **Errores posibles:** [Catálogos e inventario](../error-messages.md#errores-catalogos).
 
@@ -143,7 +143,7 @@ marcarla lo reactiva. Este cambio no es un ajuste de stock.
 <a id="CAP-CAT-SUP-02-CREATE"></a>
 ### CAP-CAT-SUP-02-CREATE — Formulario alta
 
-**Casos:** `CU-CAT-07`.
+**Casos de uso:** `CU-CAT-07` — Crear proveedor.
 
 **Errores posibles:** [Validación de formularios](../error-messages.md#errores-validacion), [Catálogos e inventario](../error-messages.md#errores-catalogos).
 
@@ -159,7 +159,7 @@ marcarla lo reactiva. Este cambio no es un ajuste de stock.
 <a id="CAP-CAT-SUP-03-EDIT"></a>
 ### CAP-CAT-SUP-03-EDIT — Formulario edicion y estado
 
-**Casos:** `CU-CAT-08`, `CU-CAT-09`.
+**Casos de uso:** `CU-CAT-08` — Editar proveedor; `CU-CAT-09` — Cambiar estado de proveedor.
 
 **Errores posibles:** [Validación de formularios](../error-messages.md#errores-validacion), [Catálogos e inventario](../error-messages.md#errores-catalogos).
 
@@ -184,7 +184,7 @@ marcarla lo reactiva. Este cambio no es un ajuste de stock.
 <a id="CAP-CAT-CLI-01-LIST"></a>
 ### CAP-CAT-CLI-01-LIST — Listado
 
-**Casos:** `CU-CAT-10`, `CU-REP-13`.
+**Casos de uso:** `CU-CAT-10` — Consultar clientes; `CU-REP-13` — Generar reporte de clientes.
 
 **Errores posibles:** [Catálogos e inventario](../error-messages.md#errores-catalogos).
 
@@ -200,7 +200,7 @@ marcarla lo reactiva. Este cambio no es un ajuste de stock.
 <a id="CAP-CAT-CLI-02-CREATE"></a>
 ### CAP-CAT-CLI-02-CREATE — Formulario alta
 
-**Casos:** `CU-CAT-11`.
+**Casos de uso:** `CU-CAT-11` — Crear cliente.
 
 **Errores posibles:** [Validación de formularios](../error-messages.md#errores-validacion), [Catálogos e inventario](../error-messages.md#errores-catalogos).
 
@@ -215,7 +215,7 @@ marcarla lo reactiva. Este cambio no es un ajuste de stock.
 <a id="CAP-CAT-CLI-03-EDIT"></a>
 ### CAP-CAT-CLI-03-EDIT — Formulario edicion
 
-**Casos:** `CU-CAT-12`.
+**Casos de uso:** `CU-CAT-12` — Editar cliente.
 
 **Errores posibles:** [Validación de formularios](../error-messages.md#errores-validacion), [Catálogos e inventario](../error-messages.md#errores-catalogos).
 
@@ -249,7 +249,7 @@ utilizarla nuevamente en una nueva salida.
 <a id="CAP-CAT-WAS-01-LIST"></a>
 ### CAP-CAT-WAS-01-LIST — Listado inventario
 
-**Casos:** `CU-CAT-13`, `CU-REP-06`, `CU-REP-09`.
+**Casos de uso:** `CU-CAT-13` — Consultar mermas; `CU-REP-06` — Consultar inventario de mermas; `CU-REP-09` — Generar reporte de mermas.
 
 **Errores posibles:** [Catálogos e inventario](../error-messages.md#errores-catalogos).
 
@@ -265,7 +265,7 @@ utilizarla nuevamente en una nueva salida.
 
 ### CAP-REP-WAS-05-EXPORT — Exportar inventario de mermas
 
-**Casos:** `CU-REP-09`.
+**Casos de uso:** `CU-REP-09` — Generar reporte de mermas.
 
 1. Seleccione **Exportar Excel** y compruebe el modal:
 
@@ -276,7 +276,7 @@ utilizarla nuevamente en una nueva salida.
 <a id="CAP-CAT-WAS-02-CREATE"></a>
 ### CAP-CAT-WAS-02-CREATE — Formulario registro
 
-**Casos:** `CU-CAT-14`.
+**Casos de uso:** `CU-CAT-14` — Registrar merma.
 
 **Errores posibles:** [Validación de formularios](../error-messages.md#errores-validacion), [Catálogos e inventario](../error-messages.md#errores-catalogos).
 
@@ -301,7 +301,7 @@ actual.
 <a id="CAP-CAT-WAS-03-EDIT"></a>
 ### CAP-CAT-WAS-03-EDIT — Formulario edicion
 
-**Casos:** `CU-CAT-15`.
+**Casos de uso:** `CU-CAT-15` — Editar merma.
 
 **Errores posibles:** [Validación de formularios](../error-messages.md#errores-validacion), [Catálogos e inventario](../error-messages.md#errores-catalogos).
 
@@ -320,7 +320,7 @@ quedan sólo para consulta. Use la acción **Editar registro** y el botón **Act
 <a id="CAP-CAT-WAS-04-STOCK"></a>
 ### CAP-CAT-WAS-04-STOCK — Ajuste existencia
 
-**Casos:** `CU-CAT-16`.
+**Casos de uso:** `CU-CAT-16` — Ajustar existencia de merma.
 
 **Errores posibles:** [Validación de formularios](../error-messages.md#errores-validacion), [Catálogos e inventario](../error-messages.md#errores-catalogos).
 

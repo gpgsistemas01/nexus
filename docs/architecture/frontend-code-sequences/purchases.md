@@ -2,7 +2,8 @@
 
 Este capítulo forma parte del [catálogo de secuencias del código frontend](index.md) y conserva los recorridos aplicados del grupo `ENT`. Las reglas comunes de lectura, trazabilidad y mantenimiento se declaran en el índice de la colección.
 
-## `CU-ENT-01`
+<a id="cu-ent-01"></a>
+## `CU-ENT-01` — Consultar compras de material
 
 **Patrones:** `FE-P02`, `FE-P04`.
 
@@ -36,7 +37,8 @@ sequenceDiagram
     deactivate Application
 ```
 
-## `CU-ENT-02`
+<a id="cu-ent-02"></a>
+## `CU-ENT-02` — Crear compra de material
 
 **Patrones:** `FE-P02`, `FE-P04`.
 
@@ -81,7 +83,8 @@ sequenceDiagram
     end
 ```
 
-## `CU-ENT-03`
+<a id="cu-ent-03"></a>
+## `CU-ENT-03` — Editar compra de material
 
 **Patrones:** `FE-P02`, `FE-P04`.
 
@@ -115,7 +118,8 @@ sequenceDiagram
     deactivate Application
 ```
 
-## `CU-ENT-04`
+<a id="cu-ent-04"></a>
+## `CU-ENT-04` — Corregir material de una compra
 
 **Patrones:** `FE-P02`, `FE-P04`.
 
@@ -149,7 +153,8 @@ sequenceDiagram
     deactivate Application
 ```
 
-## `CU-ENT-05`
+<a id="cu-ent-05"></a>
+## `CU-ENT-05` — Cancelar material de una compra
 
 **Patrones:** `FE-P02`, `FE-P04`.
 

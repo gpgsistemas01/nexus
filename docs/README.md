@@ -41,6 +41,10 @@ versiones del sistema y del documento. `requirements/index.md` y
 `user-manual/index.md` son las entradas de sus paquetes; fijan el orden de exportación
 sin separar la portada de la familia documental a la que pertenece.
 
+El manual incluye una [matriz de validación y modos de formulario](user-manual/form-validation-matrix.md)
+como referencia operativa exportable. La matriz de operaciones de requisitos sigue siendo la
+fuente normativa de capacidades y permisos; ambas matrices responden preguntas distintas.
+
 Un artefacto puede apoyar más de una familia, pero conserva una sola responsabilidad. Por
 ejemplo, las convenciones de diagramas gobiernan la notación y no reemplazan los diagramas
 de arquitectura o requisitos. Del mismo modo, el esquema y el diccionario pertenecen a la
@@ -57,6 +61,10 @@ técnica de modelos, campos y relaciones.
 | Operativo | `README.md`, configuración y scripts | Código y configuración versionados | Se actualiza cuando cambia la instalación, ejecución o automatización. |
 
 ## Regla de actualización
+
+La [matriz de criterios para actualizar documentación y sistema](governance/documentation-practices.md#criterios-para-actualizar-documentación-y-sistema)
+determina si un hallazgo exige modificar sólo documentación, sólo implementación o ambas.
+Las reglas siguientes indican cómo validar el resultado una vez clasificado:
 
 1. Cambios en routers, imports o Prisma: ejecutar `npm run docs:architecture`.
 2. Cambios de diseño, comportamiento o decisiones: editar el documento curado

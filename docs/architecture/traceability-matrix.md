@@ -7,7 +7,7 @@ su límite; el contrato API une ambos; Prisma evidencia persistencia; y las prue
 registran el resultado verificable. Ningún documento sustituye al anterior. El recorrido
 bidireccional es:
 
-`RF/RN/RC ↔ CU ↔ vista frontend ↔ API ↔ ruta/controller/servicio ↔ datos ↔ prueba`.
+`RF/RN/RC ↔ CU ↔ procedimiento del manual ↔ vista frontend ↔ API ↔ ruta/controller/servicio ↔ datos ↔ prueba`.
 
 Esta matriz agrupa capacidades que comparten implementación. La fila no afirma cobertura
 completa: “brecha” significa que existe código o requisito sin evidencia automatizada
@@ -30,10 +30,18 @@ suficiente. Los archivos exactos de rutas y exports se localizan en el mapa gene
 ## Obligación al cambiar una capacidad
 
 1. partir del identificador normativo y confirmar su `CU-*` y actor;
-2. actualizar la ficha frontend si cambian interacción, payload o endpoint;
-3. actualizar contrato y ficha backend si cambian middleware, DTO, regla o transacción;
-4. regenerar ER/mapa si cambian Prisma, rutas o imports;
-5. elegir la vista dinámica desde las matrices; si representa un caso, debe identificar
+2. contrastar nombre, disparador, precondiciones, flujo principal, alternativas, excepciones y
+   postcondiciones en la [ficha normativa](../requirements/use-case-descriptions.md), y actualizarla
+   cuando cambie cualquiera de esos elementos;
+3. revisar el [procedimiento del manual](../user-manual/procedures.md#casos-por-grupo-funcional):
+   debe conservar el mismo identificador y nombre, describir los controles observables y no
+   atribuir una pantalla de consulta a un caso que exige una escritura;
+4. actualizar la ficha frontend si cambian interacción, payload o endpoint;
+5. actualizar contrato y ficha backend si cambian middleware, DTO, regla o transacción;
+6. conservar el nombre normativo junto al `CU-*` en los encabezados de las secuencias frontend y
+   backend; el identificador permite comparar cobertura y el nombre hace explícito el objetivo;
+7. regenerar ER/mapa si cambian Prisma, rutas o imports;
+8. elegir la vista dinámica desde las matrices; si representa un caso, debe identificar
    un único `CU-*` y sus participantes concretos;
-6. registrar prueba unitaria para la regla aislada y de integración para contrato,
+9. registrar prueba unitaria para la regla aislada y de integración para contrato,
    persistencia o rollback; actualizar la fila si se cierra una brecha.

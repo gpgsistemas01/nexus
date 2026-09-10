@@ -2,7 +2,8 @@
 
 Este capítulo forma parte del [catálogo de secuencias del código backend](index.md) y conserva los recorridos aplicados del grupo `SAL`. Las reglas comunes de lectura, trazabilidad y mantenimiento se declaran en el índice de la colección.
 
-## `CU-SAL-01`
+<a id="cu-sal-01"></a>
+## `CU-SAL-01` — Consultar salidas de material
 
 **Patrones:** `BE-P01`.
 
@@ -31,7 +32,8 @@ sequenceDiagram
     deactivate Controller
 ```
 
-## `CU-SAL-02`
+<a id="cu-sal-02"></a>
+## `CU-SAL-02` — Crear salida de material
 
 **Patrones:** `BE-P01`, `BE-P03`, `BE-P04`.
 
@@ -63,7 +65,8 @@ sequenceDiagram
     deactivate Controller
 ```
 
-## `CU-SAL-03`
+<a id="cu-sal-03"></a>
+## `CU-SAL-03` — Editar encabezado de salida de material
 
 **Patrones:** `BE-P01`, `BE-P04`.
 
@@ -95,7 +98,8 @@ sequenceDiagram
     deactivate Controller
 ```
 
-## `CU-SAL-04`
+<a id="cu-sal-04"></a>
+## `CU-SAL-04` — Editar detalles de material de una salida
 
 **Patrones:** `BE-P01`, `BE-P03`, `BE-P04`, `BE-P05`.
 
@@ -127,7 +131,8 @@ sequenceDiagram
     deactivate Controller
 ```
 
-## `CU-SAL-05`
+<a id="cu-sal-05"></a>
+## `CU-SAL-05` — Surtir material
 
 **Patrones:** `BE-P01`, `BE-P03`, `BE-P04`, `BE-P05`.
 
@@ -164,7 +169,8 @@ sequenceDiagram
     Controller-->>Browser: 200 { goodsIssue, code }
 ```
 
-## `CU-SAL-06`
+<a id="cu-sal-06"></a>
+## `CU-SAL-06` — Devolver material surtido
 
 **Patrones:** `BE-P01`, `BE-P03`, `BE-P04`, `BE-P05`.
 
@@ -209,7 +215,8 @@ sequenceDiagram
     end
 ```
 
-## `CU-SAL-07`
+<a id="cu-sal-07"></a>
+## `CU-SAL-07` — Consultar salidas de merma
 
 **Patrones:** `BE-P01`.
 
@@ -238,7 +245,8 @@ sequenceDiagram
     deactivate Controller
 ```
 
-## `CU-SAL-08`
+<a id="cu-sal-08"></a>
+## `CU-SAL-08` — Crear salida de merma
 
 **Patrones:** `BE-P01`, `BE-P03`, `BE-P04`.
 
@@ -275,7 +283,8 @@ sequenceDiagram
     deactivate Controller
 ```
 
-## `CU-SAL-09`
+<a id="cu-sal-09"></a>
+## `CU-SAL-09` — Editar encabezado de salida de merma
 
 **Patrones:** `BE-P01`, `BE-P04`.
 
@@ -307,7 +316,8 @@ sequenceDiagram
     deactivate Controller
 ```
 
-## `CU-SAL-10`
+<a id="cu-sal-10"></a>
+## `CU-SAL-10` — Editar detalles de merma de una salida
 
 **Patrones:** `BE-P01`, `BE-P03`, `BE-P04`, `BE-P05`.
 
@@ -339,7 +349,8 @@ sequenceDiagram
     deactivate Controller
 ```
 
-## `CU-SAL-11`
+<a id="cu-sal-11"></a>
+## `CU-SAL-11` — Surtir merma
 
 **Patrones:** `BE-P01`, `BE-P03`, `BE-P04`, `BE-P05`.
 
@@ -380,7 +391,8 @@ sequenceDiagram
     Controller-->>Client: 200 salida de merma actualizada
 ```
 
-## `CU-SAL-12`
+<a id="cu-sal-12"></a>
+## `CU-SAL-12` — Devolver merma surtida
 
 **Patrones:** `BE-P01`, `BE-P03`, `BE-P04`, `BE-P05`.
 

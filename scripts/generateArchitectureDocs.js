@@ -90,6 +90,10 @@ const validateUseCaseDiagramCoverage = async () => {
         Object.entries(USE_CASE_DOCUMENTS).map(async ([name, file]) => [name, await readDocumentSource(file)])
     ));
     const expectedIds = getUseCaseTableIds(sources.get('catalog'));
+    const expectedTitles = new Map(
+        [...sources.get('catalog').matchAll(/^#### `(CU-[A-Z]+-\d+)` — (.+)$/gm)]
+            .map((match) => [match[1], match[2]])
+    );
     const failures = [];
     const sourceFiles = new Set((await walk(path.join(ROOT, 'src')))
         .map((file) => toPosix(path.relative(ROOT, file))));
@@ -149,9 +153,12 @@ const validateUseCaseDiagramCoverage = async () => {
                 failures.push(`diagramas ${side}: ${pattern} no enlaza una vista canónica DIA-PAT-* desde el índice rápido`);
             }
         }
-        const sections = [...source.matchAll(/^## `(CU-[A-Z]+-\d+)`\n([\s\S]*?)(?=^## `CU-|(?![\s\S]))/gm)];
+        const sections = [...source.matchAll(/^## `(CU-[A-Z]+-\d+)` — (.+)\n([\s\S]*?)(?=^## `CU-|(?![\s\S]))/gm)];
         validateIds(`diagramas ${side}`, sections.map((match) => match[1]));
-        for (const [, id, body] of sections) {
+        for (const [, id, title, body] of sections) {
+            if (title !== expectedTitles.get(id)) {
+                failures.push(`diagramas ${side}: ${id} no conserva el nombre normativo (${expectedTitles.get(id)})`);
+            }
             if ((body.match(/^```mermaid$/gm) ?? []).length !== 1) {
                 failures.push(`diagramas ${side}: ${id} debe contener exactamente un bloque Mermaid`);
             }
