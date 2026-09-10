@@ -6,8 +6,6 @@ import path from 'node:path';
 import process from 'node:process';
 import { pathToFileURL } from 'node:url';
 
-import { justifyDocxParagraphs } from './justifyDocxParagraphs.js';
-
 const ROOT = process.cwd();
 const manualCases = [
     'docs/user-manual/cases/authentication.md',
