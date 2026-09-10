@@ -9,7 +9,7 @@ Cada procedimiento identifica sus casos de uso, controles, errores posibles y ca
 <a id="CAP-AUT-01-LOGIN"></a>
 ### CAP-AUT-01-LOGIN — Inicio sesion
 
-**Casos:** `CU-AUT-01`.
+**Casos de uso:** `CU-AUT-01` — Iniciar sesión.
 
 **Errores posibles:** [Acceso y autorización](../error-messages.md#errores-acceso).
 
@@ -25,7 +25,7 @@ Cada procedimiento identifica sus casos de uso, controles, errores posibles y ca
 <a id="CAP-AUT-02-MENU"></a>
 ### CAP-AUT-02-MENU — Menú principal
 
-**Casos:** `CU-AUT-02`.
+**Casos de uso:** `CU-AUT-02` — Cerrar sesión.
 
 **Errores posibles:** [Acceso y autorización](../error-messages.md#errores-acceso).
 
@@ -45,7 +45,7 @@ Cada procedimiento identifica sus casos de uso, controles, errores posibles y ca
 <a id="CAP-ERR-404-NOT-FOUND"></a>
 ### CAP-ERR-404-NOT-FOUND — Pagina no encontrada
 
-**Casos:** Transversal.
+**Caso de uso:** transversal — Recuperarse de una ruta inexistente.
 
 **Errores posibles:** [Error 404](../error-messages.md#error-404).
 

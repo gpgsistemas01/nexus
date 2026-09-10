@@ -2,7 +2,8 @@
 
 Este capítulo forma parte del [catálogo de secuencias del código frontend](index.md) y conserva los recorridos aplicados del grupo `IDA`. Las reglas comunes de lectura, trazabilidad y mantenimiento se declaran en el índice de la colección.
 
-## `CU-IDA-01`
+<a id="cu-ida-01"></a>
+## `CU-IDA-01` — Consultar personas
 
 **Patrones:** `FE-P02`.
 
@@ -36,7 +37,8 @@ sequenceDiagram
     deactivate Application
 ```
 
-## `CU-IDA-02`
+<a id="cu-ida-02"></a>
+## `CU-IDA-02` — Crear persona
 
 **Patrones:** `FE-P02`.
 
@@ -70,7 +72,8 @@ sequenceDiagram
     deactivate Application
 ```
 
-## `CU-IDA-03`
+<a id="cu-ida-03"></a>
+## `CU-IDA-03` — Editar persona
 
 **Patrones:** `FE-P02`.
 
@@ -104,7 +107,8 @@ sequenceDiagram
     deactivate Application
 ```
 
-## `CU-IDA-04`
+<a id="cu-ida-04"></a>
+## `CU-IDA-04` — Consultar usuarios
 
 **Patrones:** `FE-P02`.
 
@@ -138,7 +142,8 @@ sequenceDiagram
     deactivate Application
 ```
 
-## `CU-IDA-05`
+<a id="cu-ida-05"></a>
+## `CU-IDA-05` — Crear usuario y asignar acceso
 
 **Patrones:** `FE-P02`.
 
@@ -172,7 +177,8 @@ sequenceDiagram
     deactivate Application
 ```
 
-## `CU-IDA-06`
+<a id="cu-ida-06"></a>
+## `CU-IDA-06` — Editar usuario y acceso
 
 **Patrones:** `FE-P02`.
 
@@ -206,7 +212,8 @@ sequenceDiagram
     deactivate Application
 ```
 
-## `CU-IDA-07`
+<a id="cu-ida-07"></a>
+## `CU-IDA-07` — Cambiar contraseña de usuario
 
 **Patrones:** `FE-P02`.
 
@@ -240,7 +247,8 @@ sequenceDiagram
     deactivate Application
 ```
 
-## `CU-IDA-08`
+<a id="cu-ida-08"></a>
+## `CU-IDA-08` — Consultar roles
 
 **Patrones:** `FE-P03`.
 
@@ -274,7 +282,8 @@ sequenceDiagram
     deactivate Application
 ```
 
-## `CU-IDA-09`
+<a id="cu-ida-09"></a>
+## `CU-IDA-09` — Consultar departamentos
 
 **Patrones:** `FE-P03`.
 

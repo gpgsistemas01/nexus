@@ -14,7 +14,7 @@ Cada procedimiento identifica sus casos de uso, controles, errores posibles y ca
 <a id="CAP-REP-MOV-MAT-01-LIST"></a>
 ### CAP-REP-MOV-MAT-01-LIST — Historial y filtros
 
-**Casos:** `CU-REP-02`.
+**Casos de uso:** `CU-REP-02` — Consultar movimientos de materiales.
 
 **Errores posibles:** [Reportes](../error-messages.md#errores-reportes).
 
@@ -31,7 +31,7 @@ Cada procedimiento identifica sus casos de uso, controles, errores posibles y ca
 <a id="CAP-REP-MOV-MAT-02-EXPORT"></a>
 ### CAP-REP-MOV-MAT-02-EXPORT — Exportar reporte
 
-**Casos:** `CU-REP-05`.
+**Casos de uso:** `CU-REP-05` — Generar reporte de movimientos de materiales.
 
 **Errores posibles:** [Reportes](../error-messages.md#errores-reportes).
 
@@ -56,7 +56,7 @@ Cada procedimiento identifica sus casos de uso, controles, errores posibles y ca
 <a id="CAP-REP-MOV-WAS-01-LIST"></a>
 ### CAP-REP-MOV-WAS-01-LIST — Historial y filtros
 
-**Casos:** `CU-REP-07`.
+**Casos de uso:** `CU-REP-07` — Consultar movimientos de mermas.
 
 **Errores posibles:** [Reportes](../error-messages.md#errores-reportes).
 
@@ -73,7 +73,7 @@ Cada procedimiento identifica sus casos de uso, controles, errores posibles y ca
 <a id="CAP-REP-MOV-WAS-02-EXPORT"></a>
 ### CAP-REP-MOV-WAS-02-EXPORT — Exportar reporte
 
-**Casos:** `CU-REP-10`.
+**Casos de uso:** `CU-REP-10` — Generar reporte de movimientos de mermas.
 
 **Errores posibles:** [Reportes](../error-messages.md#errores-reportes).
 

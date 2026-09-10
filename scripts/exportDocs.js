@@ -23,7 +23,9 @@ const manualCommon = [
     'docs/user-manual/procedures.md'
 ];
 const manualErrorCatalog = 'docs/user-manual/error-messages.md';
+const manualValidationMatrix = 'docs/user-manual/form-validation-matrix.md';
 const manualReferences = [
+    manualValidationMatrix,
     manualErrorCatalog,
     'docs/user-manual/screenshot-inventory.md'
 ];
@@ -47,6 +49,7 @@ const MANIFESTS = Object.freeze({
         identityCases,
         catalogCases,
         reportCases,
+        manualValidationMatrix,
         manualErrorCatalog
     ],
     'manual-almacen': [
@@ -56,6 +59,7 @@ const MANIFESTS = Object.freeze({
         purchaseCases,
         issueCases,
         reportCases,
+        manualValidationMatrix,
         manualErrorCatalog
     ],
     'manual-reportes': [
@@ -65,6 +69,7 @@ const MANIFESTS = Object.freeze({
         purchaseCases,
         issueCases,
         reportCases,
+        manualValidationMatrix,
         manualErrorCatalog
     ],
     requisitos: [

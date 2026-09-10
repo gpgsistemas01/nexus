@@ -2,7 +2,8 @@
 
 Este capítulo forma parte del [catálogo de secuencias del código backend](index.md) y conserva los recorridos aplicados del grupo `REP`. Las reglas comunes de lectura, trazabilidad y mantenimiento se declaran en el índice de la colección.
 
-## `CU-REP-01`
+<a id="cu-rep-01"></a>
+## `CU-REP-01` — Consultar inventario de materiales
 
 **Patrones:** `BE-P06`.
 
@@ -31,7 +32,8 @@ sequenceDiagram
     deactivate Controller
 ```
 
-## `CU-REP-02`
+<a id="cu-rep-02"></a>
+## `CU-REP-02` — Consultar movimientos de materiales
 
 **Patrones:** `BE-P06`.
 
@@ -60,7 +62,8 @@ sequenceDiagram
     deactivate Controller
 ```
 
-## `CU-REP-03`
+<a id="cu-rep-03"></a>
+## `CU-REP-03` — Generar reporte de inventario de materiales
 
 **Patrones:** `BE-P07`.
 
@@ -89,7 +92,8 @@ sequenceDiagram
     deactivate Controller
 ```
 
-## `CU-REP-04`
+<a id="cu-rep-04"></a>
+## `CU-REP-04` — Generar reporte de salidas de material
 
 **Patrones:** `BE-P07`.
 
@@ -118,7 +122,8 @@ sequenceDiagram
     deactivate Controller
 ```
 
-## `CU-REP-05`
+<a id="cu-rep-05"></a>
+## `CU-REP-05` — Generar reporte de movimientos de materiales
 
 **Patrones:** `BE-P07`.
 
@@ -147,7 +152,8 @@ sequenceDiagram
     deactivate Controller
 ```
 
-## `CU-REP-06`
+<a id="cu-rep-06"></a>
+## `CU-REP-06` — Consultar inventario de mermas
 
 **Patrones:** `BE-P06`.
 
@@ -176,7 +182,8 @@ sequenceDiagram
     deactivate Controller
 ```
 
-## `CU-REP-07`
+<a id="cu-rep-07"></a>
+## `CU-REP-07` — Consultar movimientos de mermas
 
 **Patrones:** `BE-P06`.
 
@@ -205,7 +212,8 @@ sequenceDiagram
     deactivate Controller
 ```
 
-## `CU-REP-08`
+<a id="cu-rep-08"></a>
+## `CU-REP-08` — Generar reporte de salidas de merma
 
 **Patrones:** `BE-P07`.
 
@@ -234,7 +242,8 @@ sequenceDiagram
     deactivate Controller
 ```
 
-## `CU-REP-09`
+<a id="cu-rep-09"></a>
+## `CU-REP-09` — Generar reporte de mermas
 
 **Patrones:** `BE-P07`.
 
@@ -263,7 +272,8 @@ sequenceDiagram
     deactivate Controller
 ```
 
-## `CU-REP-10`
+<a id="cu-rep-10"></a>
+## `CU-REP-10` — Generar reporte de movimientos de mermas
 
 **Patrones:** `BE-P07`.
 
@@ -292,7 +302,8 @@ sequenceDiagram
     deactivate Controller
 ```
 
-## `CU-REP-11`
+<a id="cu-rep-11"></a>
+## `CU-REP-11` — Generar reporte de compras de material
 
 **Patrones:** `BE-P07`.
 
@@ -321,7 +332,8 @@ sequenceDiagram
     deactivate Controller
 ```
 
-## `CU-REP-12`
+<a id="cu-rep-12"></a>
+## `CU-REP-12` — Generar reporte de proveedores
 
 **Patrones:** `BE-P07`.
 
@@ -350,7 +362,8 @@ sequenceDiagram
     deactivate Controller
 ```
 
-## `CU-REP-13`
+<a id="cu-rep-13"></a>
+## `CU-REP-13` — Generar reporte de clientes
 
 **Patrones:** `BE-P07`.
 
@@ -379,7 +392,8 @@ sequenceDiagram
     deactivate Controller
 ```
 
-## `CU-REP-14`
+<a id="cu-rep-14"></a>
+## `CU-REP-14` — Generar reporte de personas
 
 **Patrones:** `BE-P07`.
 
@@ -408,7 +422,8 @@ sequenceDiagram
     deactivate Controller
 ```
 
-## `CU-REP-15`
+<a id="cu-rep-15"></a>
+## `CU-REP-15` — Generar reporte de usuarios
 
 **Patrones:** `BE-P07`.
 

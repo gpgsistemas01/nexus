@@ -43,8 +43,9 @@ correspondiente y no repite su secuencia.
 
 ### Regla de identificación y lectura
 
-El encabezado `CU-<grupo>-<número>` enlaza directamente la ficha funcional del mismo
-identificador. El diagrama de esa sección se identifica de forma determinista como
+El encabezado `CU-<grupo>-<número> — <nombre>` conserva el identificador y el nombre
+normativos de la ficha funcional. El identificador enlaza la trazabilidad; el nombre permite
+reconocer el objetivo sin interpretar solamente el código. El diagrama de esa sección se identifica de forma determinista como
 `DIA-FE-CU-<grupo>-<número>`; por ejemplo, la sección `CU-ENT-02` contiene
 `DIA-FE-CU-ENT-02`. La matriz técnica mantiene el enlace navegable y la evidencia de
 código. Aquí se conserva solamente la información propia de la vista: patrones,

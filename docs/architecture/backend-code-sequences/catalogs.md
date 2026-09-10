@@ -2,7 +2,8 @@
 
 Este capítulo forma parte del [catálogo de secuencias del código backend](index.md) y conserva los recorridos aplicados del grupo `CAT`. Las reglas comunes de lectura, trazabilidad y mantenimiento se declaran en el índice de la colección.
 
-## `CU-CAT-01`
+<a id="cu-cat-01"></a>
+## `CU-CAT-01` — Consultar materiales
 
 **Patrones:** `BE-P01`.
 
@@ -31,7 +32,8 @@ sequenceDiagram
     deactivate Controller
 ```
 
-## `CU-CAT-02`
+<a id="cu-cat-02"></a>
+## `CU-CAT-02` — Crear material
 
 **Patrones:** `BE-P01`, `BE-P03`, `BE-P04`.
 
@@ -68,7 +70,8 @@ sequenceDiagram
     deactivate Controller
 ```
 
-## `CU-CAT-03`
+<a id="cu-cat-03"></a>
+## `CU-CAT-03` — Editar material
 
 **Patrones:** `BE-P01`, `BE-P03`, `BE-P04`.
 
@@ -100,7 +103,8 @@ sequenceDiagram
     deactivate Controller
 ```
 
-## `CU-CAT-04`
+<a id="cu-cat-04"></a>
+## `CU-CAT-04` — Retirar material
 
 **Patrones:** `BE-P01`, `BE-P03`, `BE-P04`.
 
@@ -129,7 +133,8 @@ sequenceDiagram
     deactivate Controller
 ```
 
-## `CU-CAT-05`
+<a id="cu-cat-05"></a>
+## `CU-CAT-05` — Ajustar existencia de material
 
 **Patrones:** `BE-P01`, `BE-P03`, `BE-P04`, `BE-P05`.
 
@@ -169,7 +174,8 @@ sequenceDiagram
     Controller-->>Client: 200 material actualizado
 ```
 
-## `CU-CAT-06`
+<a id="cu-cat-06"></a>
+## `CU-CAT-06` — Consultar proveedores
 
 **Patrones:** `BE-P01`.
 
@@ -198,7 +204,8 @@ sequenceDiagram
     deactivate Controller
 ```
 
-## `CU-CAT-07`
+<a id="cu-cat-07"></a>
+## `CU-CAT-07` — Crear proveedor
 
 **Patrones:** `BE-P01`.
 
@@ -230,7 +237,8 @@ sequenceDiagram
     deactivate Controller
 ```
 
-## `CU-CAT-08`
+<a id="cu-cat-08"></a>
+## `CU-CAT-08` — Editar proveedor
 
 **Patrones:** `BE-P01`.
 
@@ -262,7 +270,8 @@ sequenceDiagram
     deactivate Controller
 ```
 
-## `CU-CAT-09`
+<a id="cu-cat-09"></a>
+## `CU-CAT-09` — Cambiar estado de proveedor
 
 **Patrones:** `BE-P01`.
 
@@ -294,7 +303,8 @@ sequenceDiagram
     deactivate Controller
 ```
 
-## `CU-CAT-10`
+<a id="cu-cat-10"></a>
+## `CU-CAT-10` — Consultar clientes
 
 **Patrones:** `BE-P01`.
 
@@ -323,7 +333,8 @@ sequenceDiagram
     deactivate Controller
 ```
 
-## `CU-CAT-11`
+<a id="cu-cat-11"></a>
+## `CU-CAT-11` — Crear cliente
 
 **Patrones:** `BE-P01`.
 
@@ -355,7 +366,8 @@ sequenceDiagram
     deactivate Controller
 ```
 
-## `CU-CAT-12`
+<a id="cu-cat-12"></a>
+## `CU-CAT-12` — Editar cliente
 
 **Patrones:** `BE-P01`.
 
@@ -387,7 +399,8 @@ sequenceDiagram
     deactivate Controller
 ```
 
-## `CU-CAT-13`
+<a id="cu-cat-13"></a>
+## `CU-CAT-13` — Consultar mermas
 
 **Patrones:** `BE-P01`.
 
@@ -416,7 +429,8 @@ sequenceDiagram
     deactivate Controller
 ```
 
-## `CU-CAT-14`
+<a id="cu-cat-14"></a>
+## `CU-CAT-14` — Registrar merma
 
 **Patrones:** `BE-P01`, `BE-P03`, `BE-P04`, `BE-P05`.
 
@@ -453,7 +467,8 @@ sequenceDiagram
     deactivate Controller
 ```
 
-## `CU-CAT-15`
+<a id="cu-cat-15"></a>
+## `CU-CAT-15` — Editar merma
 
 **Patrones:** `BE-P01`.
 
@@ -485,7 +500,8 @@ sequenceDiagram
     deactivate Controller
 ```
 
-## `CU-CAT-16`
+<a id="cu-cat-16"></a>
+## `CU-CAT-16` — Ajustar existencia de merma
 
 **Patrones:** `BE-P01`, `BE-P03`, `BE-P04`, `BE-P05`.
 
@@ -523,7 +539,8 @@ sequenceDiagram
     Controller-->>Client: 200 merma actualizada
 ```
 
-## `CU-CAT-17`
+<a id="cu-cat-17"></a>
+## `CU-CAT-17` — Consultar presentaciones
 
 **Patrones:** `BE-P02`.
 
@@ -552,7 +569,8 @@ sequenceDiagram
     deactivate Controller
 ```
 
-## `CU-CAT-18`
+<a id="cu-cat-18"></a>
+## `CU-CAT-18` — Consultar unidades de medida
 
 **Patrones:** `BE-P02`.
 
@@ -581,7 +599,8 @@ sequenceDiagram
     deactivate Controller
 ```
 
-## `CU-CAT-19`
+<a id="cu-cat-19"></a>
+## `CU-CAT-19` — Consultar motivos de ajuste
 
 **Patrones:** `BE-P02`.
 
@@ -610,7 +629,8 @@ sequenceDiagram
     deactivate Controller
 ```
 
-## `CU-CAT-20`
+<a id="cu-cat-20"></a>
+## `CU-CAT-20` — Consultar estados de cumplimiento
 
 **Patrones:** `BE-P02`.
 

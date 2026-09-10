@@ -14,7 +14,7 @@ status: En revisión
 
 | Versión documental | Versión del sistema | Estado | Fecha | Responsable |
 | --- | --- | --- | --- | --- |
-| 0.2 | 1.0.0 | En revisión | 2026-09-10 | Equipo Nexus |
+| 0.3 | 1.0.0 | En revisión | 2026-09-10 | Equipo Nexus |
 
 Los metadatos anteriores generan la portada al exportar con Pandoc; el título Markdown
 se conserva como encabezado de la versión navegable en el repositorio. La portada no es
@@ -25,6 +25,9 @@ una imagen ni depende de Playwright.
 Este manual se prepara para personal autorizado. Requiere un navegador compatible, la URL del
 entorno y una cuenta asignada. Las opciones visibles dependen del rol y el área; una ausencia de
 opción no se debe resolver compartiendo credenciales.
+
+🟥 **DATO SENSIBLE:** no incluya contraseñas, cookies, tokens ni datos personales en
+capturas, exportaciones o solicitudes de soporte.
 
 ## Acceso
 
@@ -49,6 +52,10 @@ Los identificadores, nombres, orden, casos de uso cubiertos y datos de prueba ne
 definen en el [inventario de capturas](screenshot-inventory.md). El inventario sigue el recorrido
 real de las vistas y es la fuente para la automatización; no se deben agregar imágenes aisladas
 sin incorporarlas también a esa secuencia.
+
+La [matriz de validación y modos de formulario](form-validation-matrix.md) permite localizar los
+campos comprobados, la recuperación esperada y las excepciones de edición sin duplicar las reglas
+en cada procedimiento.
 
 ### Continuidad de consultas y exportaciones
 
