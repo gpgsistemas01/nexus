@@ -239,8 +239,9 @@ no sustituyen la instalación requerida por este proyecto. `npm run docs:export`
    `build/docs/diagrams/` antes de exportar.
 4. DOCX no requiere otra herramienta. Para PDF, Pandoc necesita un programa que componga
    el PDF desde la terminal. El flujo automatizado tiene dos etapas: Pandoc transforma los archivos
-   Markdown en un documento intermedio y el motor convierte ese contenido, las tipografías y la
-   distribución de cada página en el PDF final. Pandoc no realiza por sí solo esa segunda etapa.
+   Markdown en una representación intermedia interna —no en un archivo DOCX— y el motor convierte
+   ese contenido, las tipografías y la distribución de cada página en el PDF final. Pandoc no
+   realiza por sí solo esa segunda etapa.
 
    Adobe Reader sólo visualiza el PDF ya terminado. Adobe Acrobat puede crear o editar archivos
    PDF mediante sus propias funciones, pero no es un motor aceptado por la opción `--pdf-engine` de
@@ -295,6 +296,15 @@ no sustituyen la instalación requerida por este proyecto. `npm run docs:export`
    tengas. Esa conversión queda fuera de `docs:export`: el proyecto no puede repetirla ni comprobar
    que conserve los mismos saltos de página, tipografías, enlaces e índices. Para generar el PDF
    directamente con el comando del proyecto sí es necesario configurar un motor.
+
+   También es posible generar primero el DOCX y después abrirlo en Microsoft Word o Adobe Acrobat
+   para guardarlo como PDF. Esto evita instalar TeX Live cuando la conversión será manual, pero no
+   elimina la necesidad de un programa que produzca el PDF: en ese caso Word o Acrobat actúan como
+   conversor fuera del script. Actualmente `docs:export` no usa el DOCX como entrada para PDF; cada
+   formato se genera por separado desde las mismas fuentes Markdown. Automatizar la ruta
+   DOCX-a-PDF requeriría instalar y configurar un conversor ejecutable en todos los entornos, y el
+   resultado dependería de sus fuentes, versión y reglas de maquetación. Por eso el flujo publicado
+   conserva el DOCX para revisión editable y usa un motor explícito para el PDF reproducible.
 
    Si la estación ya tiene otro motor admitido por Pandoc, puede reutilizarlo: no es obligatorio
    instalar XeLaTeX. Por ejemplo, una instalación existente de
