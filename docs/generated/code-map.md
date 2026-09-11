@@ -19,6 +19,11 @@ flowchart LR
     controllers["controllers (35 módulos)"] --> messages["messages (2 módulos)"]
     controllers["controllers (35 módulos)"] --> services["services (52 módulos)"]
     controllers["controllers (35 módulos)"] --> utils["utils (11 módulos)"]
+    controllers["controllers (33 módulos)"] --> constants["constants (9 módulos)"]
+    controllers["controllers (33 módulos)"] --> dtos["dtos (10 módulos)"]
+    controllers["controllers (33 módulos)"] --> messages["messages (2 módulos)"]
+    controllers["controllers (33 módulos)"] --> services["services (50 módulos)"]
+    controllers["controllers (33 módulos)"] --> utils["utils (11 módulos)"]
     dtos["dtos (10 módulos)"] --> utils["utils (11 módulos)"]
     errors["errors (18 módulos)"] --> public["public (181 módulos)"]
     middleware["middleware (5 módulos)"] --> constants["constants (9 módulos)"]
@@ -35,6 +40,15 @@ flowchart LR
     services["services (52 módulos)"] --> errors["errors (18 módulos)"]
     services["services (52 módulos)"] --> repository["repository (1 módulos)"]
     services["services (52 módulos)"] --> utils["utils (11 módulos)"]
+    routes["routes (37 módulos)"] --> constants["constants (9 módulos)"]
+    routes["routes (37 módulos)"] --> controllers["controllers (33 módulos)"]
+    routes["routes (37 módulos)"] --> middleware["middleware (5 módulos)"]
+    routes["routes (37 módulos)"] --> validators["validators (14 módulos)"]
+    services["services (50 módulos)"] --> constants["constants (9 módulos)"]
+    services["services (50 módulos)"] --> dtos["dtos (10 módulos)"]
+    services["services (50 módulos)"] --> errors["errors (17 módulos)"]
+    services["services (50 módulos)"] --> repository["repository (1 módulos)"]
+    services["services (50 módulos)"] --> utils["utils (11 módulos)"]
     utils["utils (11 módulos)"] --> constants["constants (9 módulos)"]
     utils["utils (11 módulos)"] --> errors["errors (18 módulos)"]
     validators["validators (15 módulos)"] --> messages["messages (2 módulos)"]
@@ -141,6 +155,7 @@ flowchart LR
 | `GET` | `/revocar-sesion` | [`src/routes/web/auth/refreshWebRoute.js`](../../src/routes/web/auth/refreshWebRoute.js) |
 | `POST` | `/cerrar-sesion` | [`src/routes/web/auth/logoutWebRoute.js`](../../src/routes/web/auth/logoutWebRoute.js) |
 | `GET` | `/almacen/materiales` | [`src/routes/web/warehouse/materialWebRoute.js`](../../src/routes/web/warehouse/materialWebRoute.js) |
+| `GET` | `/almacen/consumibles` | [`src/routes/web/warehouse/consumableWebRoute.js`](../../src/routes/web/warehouse/consumableWebRoute.js) |
 | `GET` | `/almacen/mermas` | [`src/routes/web/warehouse/wasteWebRoute.js`](../../src/routes/web/warehouse/wasteWebRoute.js) |
 | `GET` | `/compras` | [`src/routes/web/warehouse/goodsReceiptWebRoute.js`](../../src/routes/web/warehouse/goodsReceiptWebRoute.js) |
 | `GET` | `/salidas/materiales` | [`src/routes/web/warehouse/goodsIssueWebRoute.js`](../../src/routes/web/warehouse/goodsIssueWebRoute.js) |
@@ -193,6 +208,7 @@ cuando el flujo necesita una vista curada.
 | [`src/controllers/web/admin/userController.js`](../../src/controllers/web/admin/userController.js) | `getUsersPage` |
 | [`src/controllers/web/authController.js`](../../src/controllers/web/authController.js) | `login`, `logout`, `refreshAuthToken` |
 | [`src/controllers/web/sales/clientController.js`](../../src/controllers/web/sales/clientController.js) | `getClientsPage` |
+| [`src/controllers/web/warehouse/consumableController.js`](../../src/controllers/web/warehouse/consumableController.js) | `getConsumablesPage` |
 | [`src/controllers/web/warehouse/goodsIssueController.js`](../../src/controllers/web/warehouse/goodsIssueController.js) | `getGoodsIssuesPage` |
 | [`src/controllers/web/warehouse/goodsReceiptController.js`](../../src/controllers/web/warehouse/goodsReceiptController.js) | `getGoodsReceiptsPage` |
 | [`src/controllers/web/warehouse/materialController.js`](../../src/controllers/web/warehouse/materialController.js) | `getMaterialsPage` |
