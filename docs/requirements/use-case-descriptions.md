@@ -540,7 +540,7 @@ Cada ficha representa una sola acción sobre una sola entidad. Los elementos com
 | Participación de actor y sistema | **Actor:** abre el alta, captura datos y confirma.<br>**Nexus:** carga opciones, valida, registra y comunica el resultado. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de alta.<br>3. Existen los datos relacionados requeridos para completar el registro. |
 | Inferencia desde código | **Directa.** `materialApiRoute.js` POST → validación → DTO → `createMaterial`. |
-| Flujo principal | 1. **Actor:** abre la opción para crear material **(ver E1)**.<br>2. **Nexus:** muestra el formulario y carga las opciones relacionadas que puede utilizar.<br>3. **Actor:** captura los datos y relaciones requeridos y confirma **(ver A1)**.<br>4. **Nexus:** valida autorización, obligatoriedad, formato, identidad y relaciones **(ver A2)**.<br>5. **Nexus:** registra material, actualiza el listado y muestra la confirmación. |
+| Flujo principal | 1. **Actor:** abre la opción para crear material **(ver E1)**.<br>2. **Nexus:** muestra el formulario y carga las opciones relacionadas que puede utilizar.<br>3. **Actor:** captura nombre, proveedor, presentación, unidad, ambas dimensiones o ninguna, y los datos de inventario requeridos; después confirma **(ver A1)**.<br>4. **Nexus:** valida autorización, obligatoriedad, formato, identidad y relaciones **(ver A2)**.<br>5. **Nexus:** registra la identidad o reutiliza la existente, crea la oferta del proveedor, actualiza el listado y muestra la confirmación. |
 | Flujos alternativos | **A1 — Datos inválidos (después del paso 3):**<br>1. **Nexus:** valida la información capturada, detecta campos incompletos, formatos incorrectos, relaciones no permitidas o cantidades fuera de las reglas del caso y los señala sin registrar cambios.<br>2. **Actor:** corrige la información indicada y vuelve a confirmar; continúa en el paso 4 del flujo principal.<br>**A2 — Identidad ya registrada (después del paso 4):**<br>1. **Actor:** revisa el material coincidente que Nexus presenta.<br>2. **Nexus:** si ya existe la relación con el mismo proveedor, rechaza el alta sin modificar la existencia e indica que debe ajustarse el inventario existente; termina el caso de uso.<br>3. **Nexus:** si la identidad sólo existe para otro proveedor, reutiliza el material y crea la nueva relación proveedor-material; continúa en el paso 5 del flujo principal. |
 | Excepciones | **E1 — Acceso rechazado (después del paso 1):**<br>1. **Nexus:** comprueba las precondiciones y la autorización, determina que alguna no se cumple y rechaza la solicitud sin modificar datos ni exponer información no autorizada; comunica el motivo.<br>2. **Actor:** reconoce el rechazo; termina el caso de uso. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** Alta con presentación, unidad y relaciones válidas.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
@@ -556,10 +556,10 @@ Cada ficha representa una sola acción sobre una sola entidad. Los elementos com
 | Participación de actor y sistema | **Actor:** selecciona el registro, modifica datos y confirma.<br>**Nexus:** presenta valores vigentes, valida, actualiza y comunica el resultado. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de edición.<br>3. El registro objetivo existe.<br>4. El registro se encuentra en un estado que admite los cambios solicitados. |
 | Inferencia desde código | **Directa.** `materialApiRoute.js` PATCH `/:id` → validación → DTO → `updateMaterial`. |
-| Flujo principal | 1. **Actor:** selecciona material y abre la edición **(ver E1)**.<br>2. **Nexus:** muestra los valores actuales y habilita sólo los campos permitidos.<br>3. **Actor:** modifica los datos admitidos y confirma **(ver A1)**.<br>4. **Nexus:** valida autorización, formato, identidad y relaciones.<br>5. **Nexus:** guarda los cambios, actualiza el listado y muestra la confirmación. |
-| Flujos alternativos | **A1 — Datos inválidos (después del paso 3):**<br>1. **Nexus:** valida la información capturada, detecta campos incompletos, formatos incorrectos, relaciones no permitidas o cantidades fuera de las reglas del caso y los señala sin registrar cambios.<br>2. **Actor:** corrige la información indicada y vuelve a confirmar; continúa en el paso 4 del flujo principal. |
+| Flujo principal | 1. **Actor:** selecciona material y abre la edición **(ver E1)**.<br>2. **Nexus:** muestra los valores actuales; bloquea proveedor, presentación, unidad y dimensiones, y habilita nombre, stock mínimo, costo máximo y estado.<br>3. **Actor:** modifica los datos admitidos y confirma **(ver A1)**.<br>4. **Nexus:** valida autorización, formato, identidad y relaciones **(ver A2)**.<br>5. **Nexus:** actualiza los datos compartidos del material y el costo de la oferta seleccionada, actualiza el listado y muestra la confirmación. |
+| Flujos alternativos | **A1 — Datos inválidos (después del paso 3):**<br>1. **Nexus:** valida la información capturada, detecta campos incompletos, formatos incorrectos, relaciones no permitidas o cantidades fuera de las reglas del caso y los señala sin registrar cambios.<br>2. **Actor:** corrige la información indicada y vuelve a confirmar; continúa en el paso 4 del flujo principal.<br>**A2 — El nombre produce una identidad existente (después del paso 4):**<br>1. **Nexus:** compara el nombre sin distinguir mayúsculas junto con la presentación, unidad y dimensiones inmutables.<br>2. **Nexus:** rechaza la edición sin modificar el material ni la oferta y comunica que la identidad ya existe; termina el caso de uso. |
 | Excepciones | **E1 — Acceso rechazado (después del paso 1):**<br>1. **Nexus:** comprueba las precondiciones y la autorización, determina que alguna no se cumple y rechaza la solicitud sin modificar datos ni exponer información no autorizada; comunica el motivo.<br>2. **Actor:** reconoce el rechazo; termina el caso de uso. |
-| Postcondiciones (éxito y fallo) | 1. **Éxito:** Actualización de datos generales admitidos.<br>2. **Éxito al desactivar:** el material conserva identidad, relaciones, stock e historia; queda excluido de operaciones nuevas, pero los detalles de salidas ya comprometidos pueden terminar de surtirse.<br>3. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
+| Postcondiciones (éxito y fallo) | 1. **Éxito:** El nombre, stock mínimo y estado compartidos se reflejan en todas las ofertas del material; el costo máximo cambia sólo en la oferta seleccionada.<br>2. **Éxito al desactivar:** el material conserva identidad, relaciones, stock e historia; queda excluido de operaciones nuevas, pero los detalles de salidas ya comprometidos pueden terminar de surtirse.<br>3. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
 | Requisitos relacionados | `RF-CAT-007`. |
 
 #### `CU-CAT-04` — Retirar material
@@ -797,7 +797,7 @@ Cada ficha representa una sola acción sobre una sola entidad. Los elementos com
 | Flujo principal | 1. **Actor:** abre el formulario del proceso que requiere unidades de medida **(ver E1)**.<br>2. **Nexus:** comprueba su autorización y carga unidades de medida vigentes.<br>3. **Actor:** consulta o selecciona una opción de unidades de medida.<br>4. **Nexus:** conserva la selección para continuar el proceso principal sin modificar el catálogo. |
 | Excepciones | **E1 — Acceso rechazado (después del paso 1):**<br>1. **Nexus:** comprueba las precondiciones y la autorización, determina que alguna no se cumple y rechaza la solicitud sin modificar datos ni exponer información no autorizada; comunica el motivo.<br>2. **Actor:** reconoce el rechazo; termina el caso de uso. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** Catálogo auxiliar de sólo lectura.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
-| Requisitos relacionados | `RF-CAT-005`. |
+| Requisitos relacionados | `RF-CAT-019`. |
 
 #### `CU-CAT-19` — Consultar motivos de ajuste
 
@@ -812,7 +812,7 @@ Cada ficha representa una sola acción sobre una sola entidad. Los elementos com
 | Flujo principal | 1. **Actor:** abre el formulario del proceso que requiere motivos de ajuste **(ver E1)**.<br>2. **Nexus:** comprueba su autorización y carga motivos de ajuste vigentes.<br>3. **Actor:** consulta o selecciona una opción de motivos de ajuste.<br>4. **Nexus:** conserva la selección para continuar el proceso principal sin modificar el catálogo. |
 | Excepciones | **E1 — Acceso rechazado (después del paso 1):**<br>1. **Nexus:** comprueba las precondiciones y la autorización, determina que alguna no se cumple y rechaza la solicitud sin modificar datos ni exponer información no autorizada; comunica el motivo.<br>2. **Actor:** reconoce el rechazo; termina el caso de uso. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** Catálogo auxiliar de sólo lectura.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
-| Requisitos relacionados | `RF-CAT-005`. |
+| Requisitos relacionados | `RF-CAT-020`. |
 
 #### `CU-CAT-20` — Consultar estados de cumplimiento
 
@@ -827,7 +827,7 @@ Cada ficha representa una sola acción sobre una sola entidad. Los elementos com
 | Flujo principal | 1. **Actor:** abre el formulario del proceso que requiere estados de cumplimiento **(ver E1)**.<br>2. **Nexus:** comprueba su autorización y carga estados de cumplimiento vigentes.<br>3. **Actor:** consulta o selecciona una opción de estados de cumplimiento.<br>4. **Nexus:** conserva la selección para continuar el proceso principal sin modificar el catálogo. |
 | Excepciones | **E1 — Acceso rechazado (después del paso 1):**<br>1. **Nexus:** comprueba las precondiciones y la autorización, determina que alguna no se cumple y rechaza la solicitud sin modificar datos ni exponer información no autorizada; comunica el motivo.<br>2. **Actor:** reconoce el rechazo; termina el caso de uso. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** Catálogo auxiliar de sólo lectura.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
-| Requisitos relacionados | `RF-CAT-005`. |
+| Requisitos relacionados | `RF-CAT-021`. |
 
 ### Grupo funcional ENT — Compras de material
 
@@ -1155,7 +1155,7 @@ Cada ficha representa una sola acción sobre una sola entidad. Los elementos com
 | Flujo principal | 1. **Actor:** abre la consulta de inventario de materiales y define los filtros del reporte **(ver E1)**.<br>2. **Nexus:** muestra la información autorizada que corresponde a esos filtros.<br>3. **Actor:** selecciona «Exportar Excel», elige incluir registros activos o con existencia, sólo activos o sólo con existencia, y confirma.<br>4. **Nexus:** vuelve a comprobar autorización y parámetros y prepara las filas con los filtros y el alcance elegidos.<br>5. **Nexus:** genera el archivo de Excel e inicia su descarga; si no hay datos, informa que el resultado está vacío. |
 | Excepciones | **E1 — Acceso rechazado (después del paso 1):**<br>1. **Nexus:** comprueba las precondiciones y la autorización, determina que alguna no se cumple y rechaza la solicitud sin modificar datos ni exponer información no autorizada; comunica el motivo.<br>2. **Actor:** reconoce el rechazo; termina el caso de uso. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** Archivo Excel con filtros, columnas y cálculos propios del reporte.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
-| Requisitos relacionados | `RF-REP-002` a `RF-REP-005`. |
+| Requisitos relacionados | `RF-REP-002`, `RF-REP-004`, `RF-REP-008`. |
 
 #### `CU-REP-04` — Generar reporte de salidas de material
 
@@ -1170,7 +1170,7 @@ Cada ficha representa una sola acción sobre una sola entidad. Los elementos com
 | Flujo principal | 1. **Actor:** abre la consulta de salidas de material y define los filtros del reporte **(ver E1)**.<br>2. **Nexus:** muestra la información autorizada que corresponde a esos filtros.<br>3. **Actor:** selecciona «Exportar Excel», elige las opciones disponibles y confirma.<br>4. **Nexus:** vuelve a comprobar autorización y parámetros y prepara las filas, agrupaciones y totales.<br>5. **Nexus:** genera el archivo de Excel e inicia su descarga; si no hay datos, informa que el resultado está vacío. |
 | Excepciones | **E1 — Acceso rechazado (después del paso 1):**<br>1. **Nexus:** comprueba las precondiciones y la autorización, determina que alguna no se cumple y rechaza la solicitud sin modificar datos ni exponer información no autorizada; comunica el motivo.<br>2. **Actor:** reconoce el rechazo; termina el caso de uso. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** Archivo Excel con filtros, columnas y cálculos propios del reporte.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
-| Requisitos relacionados | `RF-REP-002` a `RF-REP-005`. |
+| Requisitos relacionados | `RF-REP-002`, `RF-REP-004`. |
 
 #### `CU-REP-05` — Generar reporte de movimientos de materiales
 
@@ -1185,7 +1185,7 @@ Cada ficha representa una sola acción sobre una sola entidad. Los elementos com
 | Flujo principal | 1. **Actor:** abre la consulta de movimientos de materiales y define los filtros del reporte **(ver E1)**.<br>2. **Nexus:** muestra la información autorizada que corresponde a esos filtros.<br>3. **Actor:** selecciona «Exportar Excel», elige las opciones disponibles y confirma.<br>4. **Nexus:** vuelve a comprobar autorización y parámetros y prepara las filas, agrupaciones y totales.<br>5. **Nexus:** genera el archivo de Excel e inicia su descarga; si no hay datos, informa que el resultado está vacío. |
 | Excepciones | **E1 — Acceso rechazado (después del paso 1):**<br>1. **Nexus:** comprueba las precondiciones y la autorización, determina que alguna no se cumple y rechaza la solicitud sin modificar datos ni exponer información no autorizada; comunica el motivo.<br>2. **Actor:** reconoce el rechazo; termina el caso de uso. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** Archivo Excel con filtros, columnas y cálculos propios del reporte.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
-| Requisitos relacionados | `RF-REP-002` a `RF-REP-005`. |
+| Requisitos relacionados | `RF-REP-002`, `RF-REP-004`, `RF-REP-005`. |
 
 #### `CU-REP-06` — Consultar inventario de mermas
 
@@ -1230,7 +1230,7 @@ Cada ficha representa una sola acción sobre una sola entidad. Los elementos com
 | Flujo principal | 1. **Actor:** abre la consulta de salidas de merma y define los filtros del reporte **(ver E1)**.<br>2. **Nexus:** muestra la información autorizada que corresponde a esos filtros.<br>3. **Actor:** selecciona «Exportar Excel», elige las opciones disponibles y confirma.<br>4. **Nexus:** vuelve a comprobar autorización y parámetros y prepara las filas, agrupaciones y totales.<br>5. **Nexus:** genera el archivo de Excel e inicia su descarga; si no hay datos, informa que el resultado está vacío. |
 | Excepciones | **E1 — Acceso rechazado (después del paso 1):**<br>1. **Nexus:** comprueba las precondiciones y la autorización, determina que alguna no se cumple y rechaza la solicitud sin modificar datos ni exponer información no autorizada; comunica el motivo.<br>2. **Actor:** reconoce el rechazo; termina el caso de uso. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** Archivo Excel con filtros, columnas y cálculos propios del reporte.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
-| Requisitos relacionados | `RF-REP-002` a `RF-REP-005`. |
+| Requisitos relacionados | `RF-REP-002`, `RF-REP-004`. |
 
 #### `CU-REP-09` — Generar reporte de mermas
 
@@ -1245,7 +1245,7 @@ Cada ficha representa una sola acción sobre una sola entidad. Los elementos com
 | Flujo principal | 1. **Actor:** abre la consulta de mermas y define los filtros del reporte **(ver E1)**.<br>2. **Nexus:** muestra la información autorizada que corresponde a esos filtros.<br>3. **Actor:** selecciona «Exportar Excel», elige incluir registros activos o con existencia, sólo activos o sólo con existencia, y confirma.<br>4. **Nexus:** vuelve a comprobar autorización y parámetros y prepara las filas, agrupaciones y totales con los filtros y el alcance elegidos.<br>5. **Nexus:** genera el archivo de Excel e inicia su descarga; si no hay datos, informa que el resultado está vacío. |
 | Excepciones | **E1 — Acceso rechazado (después del paso 1):**<br>1. **Nexus:** comprueba las precondiciones y la autorización, determina que alguna no se cumple y rechaza la solicitud sin modificar datos ni exponer información no autorizada; comunica el motivo.<br>2. **Actor:** reconoce el rechazo; termina el caso de uso. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** Archivo Excel con filtros, columnas y cálculos propios del reporte.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
-| Requisitos relacionados | `RF-REP-002` a `RF-REP-005`. |
+| Requisitos relacionados | `RF-REP-002` a `RF-REP-004`, `RF-REP-006` a `RF-REP-009`. |
 
 #### `CU-REP-10` — Generar reporte de movimientos de mermas
 
@@ -1260,7 +1260,7 @@ Cada ficha representa una sola acción sobre una sola entidad. Los elementos com
 | Flujo principal | 1. **Actor:** abre la consulta de movimientos de mermas y define los filtros del reporte **(ver E1)**.<br>2. **Nexus:** muestra la información autorizada que corresponde a esos filtros.<br>3. **Actor:** selecciona «Exportar Excel», elige las opciones disponibles y confirma.<br>4. **Nexus:** vuelve a comprobar autorización y parámetros y prepara las filas, agrupaciones y totales.<br>5. **Nexus:** genera el archivo de Excel e inicia su descarga; si no hay datos, informa que el resultado está vacío. |
 | Excepciones | **E1 — Acceso rechazado (después del paso 1):**<br>1. **Nexus:** comprueba las precondiciones y la autorización, determina que alguna no se cumple y rechaza la solicitud sin modificar datos ni exponer información no autorizada; comunica el motivo.<br>2. **Actor:** reconoce el rechazo; termina el caso de uso. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** Archivo Excel con filtros, columnas y cálculos propios del reporte.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
-| Requisitos relacionados | `RF-REP-002` a `RF-REP-005`. |
+| Requisitos relacionados | `RF-REP-002`, `RF-REP-004`, `RF-REP-005`. |
 
 
 #### `CU-REP-11` — Generar reporte de compras de material
@@ -1276,7 +1276,7 @@ Cada ficha representa una sola acción sobre una sola entidad. Los elementos com
 | Flujo principal | 1. **Actor:** abre la consulta de compras de material y define los filtros del reporte **(ver E1)**.<br>2. **Nexus:** muestra la información autorizada que corresponde a esos filtros.<br>3. **Actor:** selecciona «Exportar Excel», elige las opciones disponibles y confirma.<br>4. **Nexus:** vuelve a comprobar autorización y parámetros y prepara las filas, agrupaciones y totales.<br>5. **Nexus:** genera el archivo de Excel e inicia su descarga; si no hay datos, informa que el resultado está vacío. |
 | Excepciones | **E1 — Acceso rechazado (después del paso 1):**<br>1. **Nexus:** comprueba las precondiciones y la autorización, determina que alguna no se cumple y rechaza la solicitud sin modificar datos ni exponer información no autorizada; comunica el motivo.<br>2. **Actor:** reconoce el rechazo; termina el caso de uso. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** Archivo Excel con filtros, columnas y cálculos propios del reporte.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
-| Requisitos relacionados | `RF-REP-002` a `RF-REP-005`. |
+| Requisitos relacionados | `RF-REP-002`, `RF-REP-004`. |
 
 #### `CU-REP-12` — Generar reporte de proveedores
 
@@ -1291,7 +1291,7 @@ Cada ficha representa una sola acción sobre una sola entidad. Los elementos com
 | Flujo principal | 1. **Actor:** abre la consulta de proveedores y define los filtros del reporte **(ver E1)**.<br>2. **Nexus:** muestra la información autorizada que corresponde a esos filtros.<br>3. **Actor:** selecciona «Exportar Excel», elige las opciones disponibles y confirma.<br>4. **Nexus:** vuelve a comprobar autorización y parámetros y prepara las filas, agrupaciones y totales.<br>5. **Nexus:** genera el archivo de Excel e inicia su descarga; si no hay datos, informa que el resultado está vacío. |
 | Excepciones | **E1 — Acceso rechazado (después del paso 1):**<br>1. **Nexus:** comprueba las precondiciones y la autorización, determina que alguna no se cumple y rechaza la solicitud sin modificar datos ni exponer información no autorizada; comunica el motivo.<br>2. **Actor:** reconoce el rechazo; termina el caso de uso. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** Archivo Excel con filtros, columnas y cálculos propios del reporte.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
-| Requisitos relacionados | `RF-REP-002` a `RF-REP-005`. |
+| Requisitos relacionados | `RF-REP-002`, `RF-REP-004`. |
 
 #### `CU-REP-13` — Generar reporte de clientes
 
@@ -1306,7 +1306,7 @@ Cada ficha representa una sola acción sobre una sola entidad. Los elementos com
 | Flujo principal | 1. **Actor:** abre la consulta de clientes y define los filtros del reporte **(ver E1)**.<br>2. **Nexus:** muestra la información autorizada que corresponde a esos filtros.<br>3. **Actor:** selecciona «Exportar Excel», elige las opciones disponibles y confirma.<br>4. **Nexus:** vuelve a comprobar autorización y parámetros y prepara las filas, agrupaciones y totales.<br>5. **Nexus:** genera el archivo de Excel e inicia su descarga; si no hay datos, informa que el resultado está vacío. |
 | Excepciones | **E1 — Acceso rechazado (después del paso 1):**<br>1. **Nexus:** comprueba las precondiciones y la autorización, determina que alguna no se cumple y rechaza la solicitud sin modificar datos ni exponer información no autorizada; comunica el motivo.<br>2. **Actor:** reconoce el rechazo; termina el caso de uso. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** Archivo Excel con filtros, columnas y cálculos propios del reporte.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
-| Requisitos relacionados | `RF-REP-002` a `RF-REP-005`. |
+| Requisitos relacionados | `RF-REP-002`, `RF-REP-004`. |
 
 #### `CU-REP-14` — Generar reporte de personas
 
@@ -1321,7 +1321,7 @@ Cada ficha representa una sola acción sobre una sola entidad. Los elementos com
 | Flujo principal | 1. **Actor:** abre la consulta de personas y define los filtros del reporte **(ver E1)**.<br>2. **Nexus:** muestra la información autorizada que corresponde a esos filtros.<br>3. **Actor:** selecciona «Exportar Excel», elige las opciones disponibles y confirma.<br>4. **Nexus:** vuelve a comprobar autorización y parámetros y prepara las filas, agrupaciones y totales.<br>5. **Nexus:** genera el archivo de Excel e inicia su descarga; si no hay datos, informa que el resultado está vacío. |
 | Excepciones | **E1 — Acceso rechazado (después del paso 1):**<br>1. **Nexus:** comprueba las precondiciones y la autorización, determina que alguna no se cumple y rechaza la solicitud sin modificar datos ni exponer información no autorizada; comunica el motivo.<br>2. **Actor:** reconoce el rechazo; termina el caso de uso. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** Archivo Excel con filtros, columnas y cálculos propios del reporte.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
-| Requisitos relacionados | `RF-REP-002` a `RF-REP-005`. |
+| Requisitos relacionados | `RF-REP-002`, `RF-REP-004`. |
 
 #### `CU-REP-15` — Generar reporte de usuarios
 
@@ -1336,7 +1336,7 @@ Cada ficha representa una sola acción sobre una sola entidad. Los elementos com
 | Flujo principal | 1. **Actor:** abre la consulta de usuarios y define los filtros del reporte **(ver E1)**.<br>2. **Nexus:** muestra la información autorizada que corresponde a esos filtros.<br>3. **Actor:** selecciona «Exportar Excel», elige las opciones disponibles y confirma.<br>4. **Nexus:** vuelve a comprobar autorización y parámetros y prepara las filas, agrupaciones y totales.<br>5. **Nexus:** genera el archivo de Excel e inicia su descarga; si no hay datos, informa que el resultado está vacío. |
 | Excepciones | **E1 — Acceso rechazado (después del paso 1):**<br>1. **Nexus:** comprueba las precondiciones y la autorización, determina que alguna no se cumple y rechaza la solicitud sin modificar datos ni exponer información no autorizada; comunica el motivo.<br>2. **Actor:** reconoce el rechazo; termina el caso de uso. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** Archivo Excel con filtros, columnas y cálculos propios del reporte.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
-| Requisitos relacionados | `RF-REP-002` a `RF-REP-005`. |
+| Requisitos relacionados | `RF-REP-002`, `RF-REP-004`. |
 
 ## Relación entre familias y reutilización
 

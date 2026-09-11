@@ -70,8 +70,8 @@ y exige stock, pero no vuelve a seleccionar el recurso ni crea otra relación.
 
 | Contexto / acción | Modo y estado requerido | Datos que pueden cambiar | Efectos que no deben confundirse con edición |
 | --- | --- | --- | --- |
-| Material / crear | `create`; no existe la relación material-proveedor | nombre, proveedor, presentación, unidad, base, altura, stock mínimo, costo máximo, estado, existencia inicial y observaciones | crea o reutiliza la identidad y crea la relación; una relación repetida se rechaza sin sumar stock |
-| Material / editar | `edit`; relación existente | nombre, stock mínimo, costo máximo y estado | proveedor, presentación, unidad y dimensiones permanecen bloqueados; no cambia existencia |
+| Material / crear | `create`; no existe la relación material-proveedor | nombre, proveedor, presentación, unidad, ambas dimensiones o ninguna, stock mínimo, costo máximo, estado, existencia inicial y observaciones | crea o reutiliza la identidad compartida y crea la oferta; una oferta repetida se rechaza sin modificar stock ni costo |
+| Material / editar | `edit`; relación existente | nombre, stock mínimo y estado compartidos; costo máximo de la oferta seleccionada | proveedor, presentación, unidad y dimensiones permanecen bloqueados; un nombre que produzca otra identidad se rechaza y no cambia existencia |
 | Material / ajustar | `edit-stock`; relación existente y actor autorizado | nueva existencia total, motivo y observaciones | crea ajuste y movimiento; no cambia identidad ni interpreta la cantidad como incremento |
 | Merma / crear | `create`; no existe la combinación de nombre, proveedor y dimensiones | proveedor, material de referencia, nombre, base, altura, stock mínimo, costo máximo, estado, existencia inicial y observaciones | crea la merma y su movimiento inicial; una identidad repetida se rechaza sin sumar stock |
 | Merma / editar | `edit`; merma existente | nombre, stock mínimo, costo máximo y estado | proveedor, material de referencia, presentación, unidad y dimensiones permanecen bloqueados; no cambia existencia |

@@ -22,7 +22,7 @@ flowchart LR
     atomic["RN-002\nAtomicidad documental"]
     quantities["RN-003\nConsistencia de cantidades"]
     trace["RN-005 y RN-008\nHistoria y auditoría"]
-    catalogs["RF-CAT-001 a RF-CAT-018\nCatálogos operativos"]
+    catalogs["RF-CAT-001 a RF-CAT-021\nCatálogos operativos"]
     receipts["RF-REC-001 a RF-REC-008\nEntradas y correcciones"]
     issues["RF-ISS-001 a RF-ISS-006\nSalidas y devoluciones"]
     inventory["RN-002 a RN-005 y RN-011 a RN-023\nIntegridad de existencias, movimientos y recursos activos"]
