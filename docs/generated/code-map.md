@@ -14,11 +14,11 @@ cada archivo individual.
 
 ```mermaid
 flowchart LR
-    controllers["controllers (32 módulos)"] --> constants["constants (9 módulos)"]
-    controllers["controllers (32 módulos)"] --> dtos["dtos (10 módulos)"]
-    controllers["controllers (32 módulos)"] --> messages["messages (2 módulos)"]
-    controllers["controllers (32 módulos)"] --> services["services (50 módulos)"]
-    controllers["controllers (32 módulos)"] --> utils["utils (11 módulos)"]
+    controllers["controllers (33 módulos)"] --> constants["constants (9 módulos)"]
+    controllers["controllers (33 módulos)"] --> dtos["dtos (10 módulos)"]
+    controllers["controllers (33 módulos)"] --> messages["messages (2 módulos)"]
+    controllers["controllers (33 módulos)"] --> services["services (50 módulos)"]
+    controllers["controllers (33 módulos)"] --> utils["utils (11 módulos)"]
     dtos["dtos (10 módulos)"] --> utils["utils (11 módulos)"]
     errors["errors (17 módulos)"] --> public["public (179 módulos)"]
     middleware["middleware (5 módulos)"] --> constants["constants (9 módulos)"]
@@ -26,10 +26,10 @@ flowchart LR
     middleware["middleware (5 módulos)"] --> services["services (50 módulos)"]
     middleware["middleware (5 módulos)"] --> utils["utils (11 módulos)"]
     repository["repository (1 módulos)"] --> lib["lib (2 módulos)"]
-    routes["routes (36 módulos)"] --> constants["constants (9 módulos)"]
-    routes["routes (36 módulos)"] --> controllers["controllers (32 módulos)"]
-    routes["routes (36 módulos)"] --> middleware["middleware (5 módulos)"]
-    routes["routes (36 módulos)"] --> validators["validators (14 módulos)"]
+    routes["routes (37 módulos)"] --> constants["constants (9 módulos)"]
+    routes["routes (37 módulos)"] --> controllers["controllers (33 módulos)"]
+    routes["routes (37 módulos)"] --> middleware["middleware (5 módulos)"]
+    routes["routes (37 módulos)"] --> validators["validators (14 módulos)"]
     services["services (50 módulos)"] --> constants["constants (9 módulos)"]
     services["services (50 módulos)"] --> dtos["dtos (10 módulos)"]
     services["services (50 módulos)"] --> errors["errors (17 módulos)"]
@@ -110,7 +110,7 @@ flowchart LR
 | `GET` | `/api/admin/reports/movements/wastes/excel` | [`src/routes/api/admin/reportApiRoute.js`](../../src/routes/api/admin/reportApiRoute.js) |
 | `GET` | `/api/admin/reports/users/excel` | [`src/routes/api/admin/reportApiRoute.js`](../../src/routes/api/admin/reportApiRoute.js) |
 
-## Rutas web (16)
+## Rutas web (17)
 
 | Método | Ruta | Definición |
 | --- | --- | --- |
@@ -119,6 +119,7 @@ flowchart LR
 | `GET` | `/revocar-sesion` | [`src/routes/web/auth/refreshWebRoute.js`](../../src/routes/web/auth/refreshWebRoute.js) |
 | `POST` | `/cerrar-sesion` | [`src/routes/web/auth/logoutWebRoute.js`](../../src/routes/web/auth/logoutWebRoute.js) |
 | `GET` | `/almacen/materiales` | [`src/routes/web/warehouse/materialWebRoute.js`](../../src/routes/web/warehouse/materialWebRoute.js) |
+| `GET` | `/almacen/consumibles` | [`src/routes/web/warehouse/consumableWebRoute.js`](../../src/routes/web/warehouse/consumableWebRoute.js) |
 | `GET` | `/almacen/mermas` | [`src/routes/web/warehouse/wasteWebRoute.js`](../../src/routes/web/warehouse/wasteWebRoute.js) |
 | `GET` | `/compras` | [`src/routes/web/warehouse/goodsReceiptWebRoute.js`](../../src/routes/web/warehouse/goodsReceiptWebRoute.js) |
 | `GET` | `/salidas/materiales` | [`src/routes/web/warehouse/goodsIssueWebRoute.js`](../../src/routes/web/warehouse/goodsIssueWebRoute.js) |
@@ -167,6 +168,7 @@ cuando el flujo necesita una vista curada.
 | [`src/controllers/web/admin/userController.js`](../../src/controllers/web/admin/userController.js) | `getUsersPage` |
 | [`src/controllers/web/authController.js`](../../src/controllers/web/authController.js) | `login`, `logout`, `refreshAuthToken` |
 | [`src/controllers/web/sales/clientController.js`](../../src/controllers/web/sales/clientController.js) | `getClientsPage` |
+| [`src/controllers/web/warehouse/consumableController.js`](../../src/controllers/web/warehouse/consumableController.js) | `getConsumablesPage` |
 | [`src/controllers/web/warehouse/goodsIssueController.js`](../../src/controllers/web/warehouse/goodsIssueController.js) | `getGoodsIssuesPage` |
 | [`src/controllers/web/warehouse/goodsReceiptController.js`](../../src/controllers/web/warehouse/goodsReceiptController.js) | `getGoodsReceiptsPage` |
 | [`src/controllers/web/warehouse/materialController.js`](../../src/controllers/web/warehouse/materialController.js) | `getMaterialsPage` |
