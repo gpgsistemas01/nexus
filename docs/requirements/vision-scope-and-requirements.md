@@ -99,9 +99,9 @@ rol, área y permiso.
   versionada en código.
 - Aplicación móvil nativa, operación sin conexión e integraciones públicas con ERP,
   CRM o transportistas.
-- CRUD público de proyectos, estados generales, roles, departamentos, presentaciones,
-  unidades, motivos o estados de surtido; varios son catálogos de solo lectura en la
-  API actual.
+- CRUD público de proyectos. El mantenimiento de estados generales, roles, departamentos,
+  presentaciones, unidades, motivos y estados de surtido es privado y está reservado al
+  administrador del sistema.
 - Eliminación física generalizada del historial operacional.
 
 ## Criterios de calidad para redactar requisitos
@@ -152,7 +152,7 @@ mostrar el alcance y los rangos que deben revisarse juntos.
 | --- | --- | --- |
 | Autenticación | `RF-AUT-001` a `RF-AUT-003` | Iniciar, renovar y cerrar sesión como obligaciones independientes. |
 | Identidades y acceso | `RF-IAM-001` a `RF-IAM-008` | Consultar, crear y actualizar usuarios o personas, cambiar contraseña y consultar catálogos de acceso. |
-| Catálogos | `RF-CAT-001` a `RF-CAT-021` | Consultar, crear, actualizar, retirar o ajustar cada recurso según su política. |
+| Catálogos | `RF-CAT-001` a `RF-CAT-028` | Consultar, crear, actualizar, retirar o ajustar cada recurso según su política. |
 | Entradas | `RF-REC-001` a `RF-REC-008` | Consultar, registrar, editar, corregir y cancelar entradas o detalles. |
 | Salidas de material | `RF-ISS-001` a `RF-ISS-006` | Consultar, crear, editar encabezado, editar detalles, surtir y devolver. |
 | Merma y sus salidas | `RF-WST-001` a `RF-WST-007`; `RF-MER-001` a `RF-MER-009` | Operar inventario y salidas de merma conservando snapshots y reglas dimensionales. |
@@ -205,17 +205,13 @@ permanecer en un solo requisito.
 
 1. **Proyectos sin CRUD.** `Project` participa en salidas, pero no tiene
    rutas ni servicio de administración. Debe definirse su fuente de datos y responsable.
-2. **Catálogos parcialmente administrables.** Estados, roles, departamentos,
-   presentaciones, unidades, motivos y estados de surtido se consultan, pero no todos
-   tienen mantenimiento desde la aplicación. Debe decidirse cuáles son datos maestros
-   administrados y cuáles pertenecen exclusivamente al seed.
-3. **Auditoría incompleta.** Algunos hechos registran `User` creador/aprobador, mientras
+2. **Auditoría incompleta.** Algunos hechos registran `User` creador/aprobador, mientras
    otros solo conservan una `Person` participante o marcas de tiempo. La ampliación de
    auditoría está detallada en `docs/data/database-users-and-permissions-analysis.md`.
-4. **Criterios de producto.** Faltan propietarios de negocio, metas cuantificables,
+3. **Criterios de producto.** Faltan propietarios de negocio, metas cuantificables,
    SLA, política de retención y recuperación, clasificación de datos y criterios de
    aceptación acordados con usuarios. Este documento no inventa esos compromisos.
-5. **Cobertura.** Persisten servicios sin cobertura CRUD completa; el inventario
+4. **Cobertura.** Persisten servicios sin cobertura CRUD completa; el inventario
    actualizado se mantiene en `docs/testing/service-test-coverage.md`.
 
 ## Criterio para mantener este documento

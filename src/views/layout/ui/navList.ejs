@@ -40,7 +40,20 @@ const items = [
     createNavLink({ content: 'Usuarios', icon: 'fa-solid fa-users-gear', href: '/usuarios-sistemas', permission: 'users:manage' }),
     createNavLink({ content: 'Personas', icon: 'fa-solid fa-id-badge', href: '/personas', permission: 'persons:page-view' }),
     createNavLink({ content: 'Clientes', icon: 'fa-solid fa-address-book', href: '/clientes', permission: 'clients:page-view' }),
-    createNavLink({ content: 'Proveedores', icon: 'fa-solid fa-truck-fast', href: '/proveedores', permission: 'suppliers:page-view' })
+    createNavLink({ content: 'Proveedores', icon: 'fa-solid fa-truck-fast', href: '/proveedores', permission: 'suppliers:page-view' }),
+    {
+        content: 'Catálogos',
+        icon: 'fa-solid fa-list',
+        children: [
+            createNavLink({ content: 'Roles', icon: 'fa-solid fa-user-tag', href: '/catalogos/roles', permission: 'catalogs:page-view' }),
+            createNavLink({ content: 'Departamentos', icon: 'fa-solid fa-building', href: '/catalogos/departments', permission: 'catalogs:page-view' }),
+            createNavLink({ content: 'Estados operativos', icon: 'fa-solid fa-circle-check', href: '/catalogos/statuses', permission: 'catalogs:page-view' }),
+            createNavLink({ content: 'Presentaciones', icon: 'fa-solid fa-box-open', href: '/catalogos/presentations', permission: 'catalogs:page-view' }),
+            createNavLink({ content: 'Unidades de medida', icon: 'fa-solid fa-ruler', href: '/catalogos/unit-measures', permission: 'catalogs:page-view' }),
+            createNavLink({ content: 'Motivos de ajuste', icon: 'fa-solid fa-clipboard-list', href: '/catalogos/reasons', permission: 'catalogs:page-view' }),
+            createNavLink({ content: 'Estados de surtido', icon: 'fa-solid fa-list-check', href: '/catalogos/fulfillment-statuses', permission: 'catalogs:page-view' })
+        ]
+    }
 ].map(item => {
     const visibleChildren = (item.children || []).filter(child => child.isVisible);
 

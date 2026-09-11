@@ -56,7 +56,8 @@ export const findAllReasons = async ({
         },
         select: {
             id: true,
-            name: true
+            name: true,
+            isActive: true
         }
     });
 

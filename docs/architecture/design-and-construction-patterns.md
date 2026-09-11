@@ -624,8 +624,8 @@ no un catálogo para seleccionar relaciones.
 
 ### Estado de surtimiento
 
-`FulfillmentStatus` es una referencia interna de sólo lectura usada por encabezados,
-detalles y filtros. No es un CRUD administrable. Sus transiciones funcionales y los
+`FulfillmentStatus` es una referencia interna usada por encabezados, detalles y filtros;
+su mantenimiento está reservado al administrador del sistema. Sus transiciones funcionales y los
 datos afectados se documentan en la
 [matriz de operaciones](../requirements/requirements-operations-matrix.md#modos-precondiciones-y-datos-modificados);
 su representación física se consulta en el

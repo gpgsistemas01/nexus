@@ -163,6 +163,13 @@ recurso.
 | RF-CAT-019 | Un usuario autorizado debe poder consultar unidades de medida sin modificar el catálogo. | Implementado | `src/routes/api/warehouse/unitMeasureApiRoute.js` |
 | RF-CAT-020 | Un usuario autorizado debe poder consultar motivos de ajuste sin modificar el catálogo. | Implementado | `src/routes/api/warehouse/reasonApiRoute.js` |
 | RF-CAT-021 | Un usuario autorizado debe poder consultar estados de cumplimiento sin modificar el catálogo. | Implementado | `src/routes/api/warehouse/fulfillmentStatusApiRoute.js` |
+| RF-CAT-022 | El administrador del sistema debe poder crear, actualizar y eliminar roles, rechazando duplicados o registros relacionados. | Implementado | `src/routes/api/admin/roleApiRoute.js`, `src/services/catalogAdministrationService.js` |
+| RF-CAT-023 | El administrador del sistema debe poder crear, actualizar y eliminar departamentos, rechazando duplicados o registros relacionados. | Implementado | `src/routes/api/admin/departmentApiRoute.js`, `src/services/catalogAdministrationService.js` |
+| RF-CAT-024 | El administrador del sistema debe poder crear, actualizar y eliminar estados operativos, rechazando duplicados o registros relacionados. | Implementado | `src/routes/api/admin/statusApiRoute.js`, `src/services/catalogAdministrationService.js` |
+| RF-CAT-025 | El administrador del sistema debe poder crear, actualizar y eliminar presentaciones, rechazando duplicados o registros relacionados. | Implementado | `src/routes/api/warehouse/presentationApiRoute.js`, `src/services/catalogAdministrationService.js` |
+| RF-CAT-026 | El administrador del sistema debe poder crear, actualizar y eliminar unidades de medida con nombre y símbolo, rechazando duplicados o registros relacionados. | Implementado | `src/routes/api/warehouse/unitMeasureApiRoute.js`, `src/services/catalogAdministrationService.js` |
+| RF-CAT-027 | El administrador del sistema debe poder crear, actualizar, activar y eliminar motivos de ajuste, rechazando duplicados o registros relacionados. | Implementado | `src/routes/api/warehouse/reasonApiRoute.js`, `src/services/catalogAdministrationService.js` |
+| RF-CAT-028 | El administrador del sistema debe poder crear, actualizar y eliminar estados de surtido, rechazando duplicados o registros relacionados. | Implementado | `src/routes/api/warehouse/fulfillmentStatusApiRoute.js`, `src/services/catalogAdministrationService.js` |
 
 ### 4.3 Entradas, salidas e inventario
 

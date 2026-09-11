@@ -163,6 +163,30 @@
     },
     "/api/admin/reports/users/excel": {
       "$ref": "./paths/admin.json#/~1api~1admin~1reports~1users~1excel"
+    },
+    "/api/admin/roles/{id}": {
+      "$ref": "./paths/admin.json#/~1api~1admin~1roles~1{id}"
+    },
+    "/api/admin/departments/{id}": {
+      "$ref": "./paths/admin.json#/~1api~1admin~1departments~1{id}"
+    },
+    "/api/admin/statuses": {
+      "$ref": "./paths/admin.json#/~1api~1admin~1statuses"
+    },
+    "/api/admin/statuses/{id}": {
+      "$ref": "./paths/admin.json#/~1api~1admin~1statuses~1{id}"
+    },
+    "/api/warehouse/presentations/{id}": {
+      "$ref": "./paths/warehouse.json#/~1api~1warehouse~1presentations~1{id}"
+    },
+    "/api/warehouse/unit-measures/{id}": {
+      "$ref": "./paths/warehouse.json#/~1api~1warehouse~1unit-measures~1{id}"
+    },
+    "/api/warehouse/reasons/{id}": {
+      "$ref": "./paths/warehouse.json#/~1api~1warehouse~1reasons~1{id}"
+    },
+    "/api/warehouse/fulfillment-statuses/{id}": {
+      "$ref": "./paths/warehouse.json#/~1api~1warehouse~1fulfillment-statuses~1{id}"
     }
   },
   "components": {

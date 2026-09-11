@@ -40,4 +40,22 @@ describe('políticas funcionales de acceso', () => {
             PERMISSIONS.WASTE_ISSUES_SUPPLY
         ]));
     });
+
+    it('reserva la administración de catálogos al administrador de sistemas', () => {
+        const administratorPermissions = getGrantedPermissions([{
+            role: 'Administrador del sistema',
+            department: 'SISTEMAS'
+        }]);
+        const warehousePermissions = getGrantedPermissions([{
+            role: 'Almacenista',
+            department: 'ALMACÉN Y PROVEDURÍA'
+        }]);
+
+        expect(administratorPermissions).toEqual(expect.arrayContaining([
+            PERMISSIONS.CATALOGS_MANAGE,
+            PERMISSIONS.CATALOGS_PAGE_VIEW,
+            PERMISSIONS.STATUSES_READ
+        ]));
+        expect(warehousePermissions).not.toContain(PERMISSIONS.CATALOGS_MANAGE);
+    });
 });

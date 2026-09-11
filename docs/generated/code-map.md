@@ -14,37 +14,37 @@ cada archivo individual.
 
 ```mermaid
 flowchart LR
-    controllers["controllers (32 módulos)"] --> constants["constants (9 módulos)"]
-    controllers["controllers (32 módulos)"] --> dtos["dtos (10 módulos)"]
-    controllers["controllers (32 módulos)"] --> messages["messages (2 módulos)"]
-    controllers["controllers (32 módulos)"] --> services["services (50 módulos)"]
-    controllers["controllers (32 módulos)"] --> utils["utils (11 módulos)"]
+    controllers["controllers (35 módulos)"] --> constants["constants (9 módulos)"]
+    controllers["controllers (35 módulos)"] --> dtos["dtos (10 módulos)"]
+    controllers["controllers (35 módulos)"] --> messages["messages (2 módulos)"]
+    controllers["controllers (35 módulos)"] --> services["services (52 módulos)"]
+    controllers["controllers (35 módulos)"] --> utils["utils (11 módulos)"]
     dtos["dtos (10 módulos)"] --> utils["utils (11 módulos)"]
-    errors["errors (17 módulos)"] --> public["public (179 módulos)"]
+    errors["errors (18 módulos)"] --> public["public (181 módulos)"]
     middleware["middleware (5 módulos)"] --> constants["constants (9 módulos)"]
     middleware["middleware (5 módulos)"] --> messages["messages (2 módulos)"]
-    middleware["middleware (5 módulos)"] --> services["services (50 módulos)"]
+    middleware["middleware (5 módulos)"] --> services["services (52 módulos)"]
     middleware["middleware (5 módulos)"] --> utils["utils (11 módulos)"]
     repository["repository (1 módulos)"] --> lib["lib (2 módulos)"]
-    routes["routes (36 módulos)"] --> constants["constants (9 módulos)"]
-    routes["routes (36 módulos)"] --> controllers["controllers (32 módulos)"]
-    routes["routes (36 módulos)"] --> middleware["middleware (5 módulos)"]
-    routes["routes (36 módulos)"] --> validators["validators (14 módulos)"]
-    services["services (50 módulos)"] --> constants["constants (9 módulos)"]
-    services["services (50 módulos)"] --> dtos["dtos (10 módulos)"]
-    services["services (50 módulos)"] --> errors["errors (17 módulos)"]
-    services["services (50 módulos)"] --> repository["repository (1 módulos)"]
-    services["services (50 módulos)"] --> utils["utils (11 módulos)"]
+    routes["routes (38 módulos)"] --> constants["constants (9 módulos)"]
+    routes["routes (38 módulos)"] --> controllers["controllers (35 módulos)"]
+    routes["routes (38 módulos)"] --> middleware["middleware (5 módulos)"]
+    routes["routes (38 módulos)"] --> validators["validators (15 módulos)"]
+    services["services (52 módulos)"] --> constants["constants (9 módulos)"]
+    services["services (52 módulos)"] --> dtos["dtos (10 módulos)"]
+    services["services (52 módulos)"] --> errors["errors (18 módulos)"]
+    services["services (52 módulos)"] --> repository["repository (1 módulos)"]
+    services["services (52 módulos)"] --> utils["utils (11 módulos)"]
     utils["utils (11 módulos)"] --> constants["constants (9 módulos)"]
-    utils["utils (11 módulos)"] --> errors["errors (17 módulos)"]
-    validators["validators (14 módulos)"] --> messages["messages (2 módulos)"]
+    utils["utils (11 módulos)"] --> errors["errors (18 módulos)"]
+    validators["validators (15 módulos)"] --> messages["messages (2 módulos)"]
 ```
 
 > Alcance: módulos JavaScript bajo `src/`. Los recursos EJS, CSS y el esquema Prisma se
 > explican en la documentación curada, porque una lista automática no describe sus
 > decisiones de diseño.
 
-## Endpoints API (61)
+## Endpoints API (83)
 
 | Método | Ruta | Definición |
 | --- | --- | --- |
@@ -92,15 +92,37 @@ flowchart LR
 | `GET` | `/api/warehouse/reports/wastes/excel` | [`src/routes/api/warehouse/reportApiRoute.js`](../../src/routes/api/warehouse/reportApiRoute.js) |
 | `GET` | `/api/warehouse/reports/suppliers/excel` | [`src/routes/api/warehouse/reportApiRoute.js`](../../src/routes/api/warehouse/reportApiRoute.js) |
 | `GET` | `/api/warehouse/unit-measures` | [`src/routes/api/warehouse/unitMeasureApiRoute.js`](../../src/routes/api/warehouse/unitMeasureApiRoute.js) |
+| `POST` | `/api/warehouse/unit-measures` | [`src/routes/api/warehouse/unitMeasureApiRoute.js`](../../src/routes/api/warehouse/unitMeasureApiRoute.js) |
+| `PUT` | `/api/warehouse/unit-measures/:id` | [`src/routes/api/warehouse/unitMeasureApiRoute.js`](../../src/routes/api/warehouse/unitMeasureApiRoute.js) |
+| `DELETE` | `/api/warehouse/unit-measures/:id` | [`src/routes/api/warehouse/unitMeasureApiRoute.js`](../../src/routes/api/warehouse/unitMeasureApiRoute.js) |
 | `GET` | `/api/warehouse/presentations` | [`src/routes/api/warehouse/presentationApiRoute.js`](../../src/routes/api/warehouse/presentationApiRoute.js) |
+| `POST` | `/api/warehouse/presentations` | [`src/routes/api/warehouse/presentationApiRoute.js`](../../src/routes/api/warehouse/presentationApiRoute.js) |
+| `PUT` | `/api/warehouse/presentations/:id` | [`src/routes/api/warehouse/presentationApiRoute.js`](../../src/routes/api/warehouse/presentationApiRoute.js) |
+| `DELETE` | `/api/warehouse/presentations/:id` | [`src/routes/api/warehouse/presentationApiRoute.js`](../../src/routes/api/warehouse/presentationApiRoute.js) |
 | `GET` | `/api/warehouse/reasons` | [`src/routes/api/warehouse/reasonApiRoute.js`](../../src/routes/api/warehouse/reasonApiRoute.js) |
+| `POST` | `/api/warehouse/reasons` | [`src/routes/api/warehouse/reasonApiRoute.js`](../../src/routes/api/warehouse/reasonApiRoute.js) |
+| `PUT` | `/api/warehouse/reasons/:id` | [`src/routes/api/warehouse/reasonApiRoute.js`](../../src/routes/api/warehouse/reasonApiRoute.js) |
+| `DELETE` | `/api/warehouse/reasons/:id` | [`src/routes/api/warehouse/reasonApiRoute.js`](../../src/routes/api/warehouse/reasonApiRoute.js) |
 | `GET` | `/api/warehouse/fulfillment-statuses` | [`src/routes/api/warehouse/fulfillmentStatusApiRoute.js`](../../src/routes/api/warehouse/fulfillmentStatusApiRoute.js) |
+| `POST` | `/api/warehouse/fulfillment-statuses` | [`src/routes/api/warehouse/fulfillmentStatusApiRoute.js`](../../src/routes/api/warehouse/fulfillmentStatusApiRoute.js) |
+| `PUT` | `/api/warehouse/fulfillment-statuses/:id` | [`src/routes/api/warehouse/fulfillmentStatusApiRoute.js`](../../src/routes/api/warehouse/fulfillmentStatusApiRoute.js) |
+| `DELETE` | `/api/warehouse/fulfillment-statuses/:id` | [`src/routes/api/warehouse/fulfillmentStatusApiRoute.js`](../../src/routes/api/warehouse/fulfillmentStatusApiRoute.js) |
 | `GET` | `/api/admin/users` | [`src/routes/api/admin/userApiRoute.js`](../../src/routes/api/admin/userApiRoute.js) |
 | `POST` | `/api/admin/users` | [`src/routes/api/admin/userApiRoute.js`](../../src/routes/api/admin/userApiRoute.js) |
 | `PATCH` | `/api/admin/users/:id` | [`src/routes/api/admin/userApiRoute.js`](../../src/routes/api/admin/userApiRoute.js) |
 | `PATCH` | `/api/admin/users/:id/password` | [`src/routes/api/admin/userApiRoute.js`](../../src/routes/api/admin/userApiRoute.js) |
 | `GET` | `/api/admin/roles` | [`src/routes/api/admin/roleApiRoute.js`](../../src/routes/api/admin/roleApiRoute.js) |
+| `POST` | `/api/admin/roles` | [`src/routes/api/admin/roleApiRoute.js`](../../src/routes/api/admin/roleApiRoute.js) |
+| `PUT` | `/api/admin/roles/:id` | [`src/routes/api/admin/roleApiRoute.js`](../../src/routes/api/admin/roleApiRoute.js) |
+| `DELETE` | `/api/admin/roles/:id` | [`src/routes/api/admin/roleApiRoute.js`](../../src/routes/api/admin/roleApiRoute.js) |
 | `GET` | `/api/admin/departments` | [`src/routes/api/admin/departmentApiRoute.js`](../../src/routes/api/admin/departmentApiRoute.js) |
+| `POST` | `/api/admin/departments` | [`src/routes/api/admin/departmentApiRoute.js`](../../src/routes/api/admin/departmentApiRoute.js) |
+| `PUT` | `/api/admin/departments/:id` | [`src/routes/api/admin/departmentApiRoute.js`](../../src/routes/api/admin/departmentApiRoute.js) |
+| `DELETE` | `/api/admin/departments/:id` | [`src/routes/api/admin/departmentApiRoute.js`](../../src/routes/api/admin/departmentApiRoute.js) |
+| `GET` | `/api/admin/statuses` | [`src/routes/api/admin/statusApiRoute.js`](../../src/routes/api/admin/statusApiRoute.js) |
+| `POST` | `/api/admin/statuses` | [`src/routes/api/admin/statusApiRoute.js`](../../src/routes/api/admin/statusApiRoute.js) |
+| `PUT` | `/api/admin/statuses/:id` | [`src/routes/api/admin/statusApiRoute.js`](../../src/routes/api/admin/statusApiRoute.js) |
+| `DELETE` | `/api/admin/statuses/:id` | [`src/routes/api/admin/statusApiRoute.js`](../../src/routes/api/admin/statusApiRoute.js) |
 | `GET` | `/api/admin/persons` | [`src/routes/api/admin/personApiRoute.js`](../../src/routes/api/admin/personApiRoute.js) |
 | `POST` | `/api/admin/persons` | [`src/routes/api/admin/personApiRoute.js`](../../src/routes/api/admin/personApiRoute.js) |
 | `PUT` | `/api/admin/persons/:id` | [`src/routes/api/admin/personApiRoute.js`](../../src/routes/api/admin/personApiRoute.js) |
@@ -110,7 +132,7 @@ flowchart LR
 | `GET` | `/api/admin/reports/movements/wastes/excel` | [`src/routes/api/admin/reportApiRoute.js`](../../src/routes/api/admin/reportApiRoute.js) |
 | `GET` | `/api/admin/reports/users/excel` | [`src/routes/api/admin/reportApiRoute.js`](../../src/routes/api/admin/reportApiRoute.js) |
 
-## Rutas web (16)
+## Rutas web (17)
 
 | Método | Ruta | Definición |
 | --- | --- | --- |
@@ -130,6 +152,7 @@ flowchart LR
 | `GET` | `/movimientos/materiales` | [`src/routes/web/admin/movementWebRoute.js`](../../src/routes/web/admin/movementWebRoute.js) |
 | `GET` | `/movimientos/mermas` | [`src/routes/web/admin/movementWebRoute.js`](../../src/routes/web/admin/movementWebRoute.js) |
 | `GET` | `/movimientos` | [`src/routes/web/admin/movementWebRoute.js`](../../src/routes/web/admin/movementWebRoute.js) |
+| `GET` | `/catalogos/:catalog` | [`src/routes/web/admin/catalogWebRoute.js`](../../src/routes/web/admin/catalogWebRoute.js) |
 
 ## Símbolos exportados por controladores
 
@@ -146,8 +169,10 @@ cuando el flujo necesita una vista curada.
 | [`src/controllers/api/admin/personController.js`](../../src/controllers/api/admin/personController.js) | `editPerson`, `getAllPersons`, `registerPerson` |
 | [`src/controllers/api/admin/reportController.js`](../../src/controllers/api/admin/reportController.js) | `exportMovementReport`, `exportPersonReport`, `exportUserReport`, `exportWasteMovementReport` |
 | [`src/controllers/api/admin/roleController.js`](../../src/controllers/api/admin/roleController.js) | `getAllRoles` |
+| [`src/controllers/api/admin/statusController.js`](../../src/controllers/api/admin/statusController.js) | `getAllStatuses` |
 | [`src/controllers/api/admin/userController.js`](../../src/controllers/api/admin/userController.js) | `editUser`, `editUserPassword`, `getAllUsers`, `registerUser` |
 | [`src/controllers/api/authController.js`](../../src/controllers/api/authController.js) | `getCurrentUser`, `login`, `refreshAuthToken` |
+| [`src/controllers/api/catalogAdministrationController.js`](../../src/controllers/api/catalogAdministrationController.js) | `createCatalogMutationControllers` |
 | [`src/controllers/api/createDataTableListController.js`](../../src/controllers/api/createDataTableListController.js) | `createDataTableListController` |
 | [`src/controllers/api/sales/clientController.js`](../../src/controllers/api/sales/clientController.js) | `editClient`, `getAllClients`, `registerClient` |
 | [`src/controllers/api/sales/reportController.js`](../../src/controllers/api/sales/reportController.js) | `exportClientReport` |
@@ -162,6 +187,7 @@ cuando el flujo necesita una vista curada.
 | [`src/controllers/api/warehouse/unitMeasureController.js`](../../src/controllers/api/warehouse/unitMeasureController.js) | `getAllUnitMeasures` |
 | [`src/controllers/api/warehouse/wasteController.js`](../../src/controllers/api/warehouse/wasteController.js) | `editWaste`, `editWasteStock`, `getAllWastes`, `getWasteMaterialTemplates`, `registerWaste` |
 | [`src/controllers/api/warehouse/wasteIssueController.js`](../../src/controllers/api/warehouse/wasteIssueController.js) | `editWasteIssue`, `editWasteIssueDetails`, `editWasteIssueHeader`, `getAllWasteIssues`, `registerWasteIssue`, `registerWasteIssueDetailReturn` |
+| [`src/controllers/web/admin/catalogController.js`](../../src/controllers/web/admin/catalogController.js) | `getCatalogPage` |
 | [`src/controllers/web/admin/movementController.js`](../../src/controllers/web/admin/movementController.js) | `getMaterialMovementPage`, `getWasteMovementPage` |
 | [`src/controllers/web/admin/personController.js`](../../src/controllers/web/admin/personController.js) | `getPersonsPage` |
 | [`src/controllers/web/admin/userController.js`](../../src/controllers/web/admin/userController.js) | `getUsersPage` |
@@ -187,9 +213,11 @@ sólo cuando aportan información que el código no expresa por sí mismo.
 | [`src/services/admin/person/personRules.js`](../../src/services/admin/person/personRules.js) | `isValidInternalClientAdvisor` |
 | [`src/services/admin/person/personService.js`](../../src/services/admin/person/personService.js) | `createPerson`, `findAllPersons`, `findPersonById`, `updatePerson` |
 | [`src/services/admin/roleService.js`](../../src/services/admin/roleService.js) | `findAllRoles` |
+| [`src/services/admin/statusService.js`](../../src/services/admin/statusService.js) | `findAllStatuses` |
 | [`src/services/admin/userService.js`](../../src/services/admin/userService.js) | `createUser`, `findAllUsers`, `getLoggedUser`, `getUserIdByLogin`, `updateUser`, `updateUserPassword` |
 | [`src/services/audit/auditService.js`](../../src/services/audit/auditService.js) | `isAuditWriteRequest`, `persistWriteAudit` |
 | [`src/services/authService.js`](../../src/services/authService.js) | `getNewRefreshToken`, `loginUser` |
+| [`src/services/catalogAdministrationService.js`](../../src/services/catalogAdministrationService.js) | `CATALOG_MODELS`, `createCatalogEntry`, `deleteCatalogEntry`, `findAllCatalogEntries`, `updateCatalogEntry` |
 | [`src/services/document/referenceNumberService.js`](../../src/services/document/referenceNumberService.js) | `generateYearlyReferenceNumber`, `incrementNonYearlyReferenceNumberCounter`, `throwIfReferenceNumberAlreadyExists` |
 | [`src/services/inventory/materialIdentity.js`](../../src/services/inventory/materialIdentity.js) | `getMaterialIdentityWidth` |
 | [`src/services/inventory/movementHelpers.js`](../../src/services/inventory/movementHelpers.js) | `buildInventoryMovementDetail`, `buildStockUpdateSummary` |

@@ -15,6 +15,7 @@ import fulfillmentStatusApiRoutes from './warehouse/fulfillmentStatusApiRoute.js
 import userApiRoutes from './admin/userApiRoute.js';
 import roleApiRoutes from './admin/roleApiRoute.js';
 import departmentApiRoutes from './admin/departmentApiRoute.js';
+import statusApiRoutes from './admin/statusApiRoute.js';
 import personApiRoutes from './admin/personApiRoute.js';
 import movementApiRoutes from './admin/movementApiRoute.js';
 import adminReportApiRoutes from './admin/reportApiRoute.js';
@@ -37,6 +38,7 @@ const API_ROUTES = [
     ['/admin/users', userApiRoutes],
     ['/admin/roles', roleApiRoutes],
     ['/admin/departments', departmentApiRoutes],
+    ['/admin/statuses', statusApiRoutes],
     ['/admin/persons', personApiRoutes],
     ['/admin/movements', movementApiRoutes],
     ['/admin/reports', adminReportApiRoutes]

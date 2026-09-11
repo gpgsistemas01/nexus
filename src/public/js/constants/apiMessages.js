@@ -1,6 +1,9 @@
 import { buildGoodsReceiptInvoiceAlreadyExistsMessage } from './goodsReceiptMessages.js';
 
 export const errorMessages = {
+    CATALOG_ENTRY_NOT_FOUND: 'Registro de catálogo no encontrado.',
+    CATALOG_ENTRY_ALREADY_EXISTS: 'Ya existe un registro con esos datos.',
+    CATALOG_ENTRY_IN_USE: 'El registro no puede eliminarse porque está en uso.',
     // 🔐 AUTH / GENERALES
     LOGIN_ERROR: 'Usuario o contraseña incorrectos.',
     VALIDATION_ERROR: 'Errores de validación.',
@@ -282,6 +285,9 @@ export const errorMessages = {
 };
 
 const successMessages = {
+    CREATED_CATALOG_ENTRY: '¡Registro creado exitosamente!',
+    UPDATED_CATALOG_ENTRY: '¡Registro actualizado exitosamente!',
+    DELETED_CATALOG_ENTRY: '¡Registro eliminado exitosamente!',
     CREATED_ACCOUNT: '¡Cuenta registrada exitosamente!',
     UPDATED_ACCOUNT: '¡Cuenta actualizada con éxito!',
     SUCCESS_LOGIN: '¡Inicio de sesión exitoso!',

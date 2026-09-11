@@ -48,7 +48,7 @@ fuente de verdad.
 | Dimensiones | Base y altura opcionales que caracterizan físicamente un material o una merma y participan en el cálculo de cantidad convertida. | No son cantidades de inventario. En textos operativos, «ancho» y «largo» se interpretan como los campos **Base** y **Altura** mostrados por Nexus. |
 | Presentación | Forma comercial o física en que se identifica un material. | Es catálogo auxiliar; no es la unidad de medida. |
 | Unidad de medida | Unidad y símbolo usados para expresar cantidades de un material. | Debe conservarse separada de factores o cantidades convertidas. |
-| Catálogo auxiliar | Conjunto controlado de opciones que clasifica o configura otros registros, como presentación, unidad, motivo o estado de cumplimiento. | En el alcance actual varios son de sólo lectura; que aparezcan en un selector no implica que exista su CRUD. |
+| Catálogo auxiliar | Conjunto controlado de opciones que clasifica o configura otros registros, como presentación, unidad, motivo o estado de cumplimiento. | Su consulta alimenta selectores operativos y su mantenimiento está reservado al administrador del sistema. |
 | Proveedor | Organización que suministra materiales y participa en entradas de compra. | Sus nombres legal y comercial son datos distintos. |
 | Oferta proveedor-material | Relación única entre proveedor y material que conserva costo máximo y existencia asociada. | En código corresponde a `SupplierMaterial`; no es un material duplicado. |
 | Inventario | Vista conjunta de las existencias de materiales por proveedor o de las existencias independientes de merma. | No es un único saldo global: materiales y mermas mantienen relaciones, movimientos y reportes separados. |

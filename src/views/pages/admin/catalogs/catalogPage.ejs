@@ -1,0 +1,37 @@
+<%- include('../../../shared/tables/mainTable', { title: config.title }) %>
+
+<% const form = {
+    id: 'catalogForm',
+    inputs: config.fields.filter(field => field.type !== 'checkbox').map((field, index) => ({
+        id: `catalog${ index }Input`,
+        type: 'text',
+        name: field.name,
+        label: field.label,
+        col: '12',
+        value: '',
+        attrs: {}
+    })),
+    checkboxes: config.fields.filter(field => field.type === 'checkbox').map(field => ({
+        id: `catalog${ field.name }Input`,
+        type: 'checkbox',
+        name: field.name,
+        label: field.label,
+        value: 'true',
+        isChecked: true
+    }))
+}; %>
+
+<%- include('../../../shared/layout/modal', {
+    modalId: 'catalogModal',
+    modalTitle: `Registrar ${ config.title.toLowerCase() }`,
+    dialogClass: 'modal-dialog-centered',
+    form
+}) %>
+
+<script>window.catalogConfig = <%- catalogConfigJson %>;</script>
+<script type="module" src="/js/pages/admin/catalogs/catalogPage.js"></script>
+
+<%- contentFor('title') %>
+<%= config.title %>
+<%- contentFor('layoutType') %>
+site

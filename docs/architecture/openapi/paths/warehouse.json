@@ -1569,6 +1569,72 @@
           "$ref": "../openapi.json#/components/responses/ServerError"
         }
       }
+    },
+    "post": {
+      "operationId": "createWarehouseUnitMeasures",
+      "security": [
+        {
+          "cookieAuth": []
+        }
+      ],
+      "requestBody": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "required": [
+                "name"
+              ],
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "symbol": {
+                  "type": "string"
+                },
+                "isActive": {
+                  "type": "boolean"
+                }
+              }
+            }
+          }
+        }
+      },
+      "responses": {
+        "201": {
+          "description": "Registro creado.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "400": {
+          "$ref": "../openapi.json#/components/responses/ValidationError"
+        },
+        "401": {
+          "$ref": "../openapi.json#/components/responses/Unauthorized"
+        },
+        "403": {
+          "$ref": "../openapi.json#/components/responses/Forbidden"
+        },
+        "409": {
+          "description": "El registro ya existe o está en uso.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "500": {
+          "$ref": "../openapi.json#/components/responses/ServerError"
+        }
+      }
     }
   },
   "/api/warehouse/presentations": {
@@ -1595,6 +1661,72 @@
         },
         "403": {
           "$ref": "../openapi.json#/components/responses/Forbidden"
+        },
+        "500": {
+          "$ref": "../openapi.json#/components/responses/ServerError"
+        }
+      }
+    },
+    "post": {
+      "operationId": "createWarehousePresentations",
+      "security": [
+        {
+          "cookieAuth": []
+        }
+      ],
+      "requestBody": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "required": [
+                "name"
+              ],
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "symbol": {
+                  "type": "string"
+                },
+                "isActive": {
+                  "type": "boolean"
+                }
+              }
+            }
+          }
+        }
+      },
+      "responses": {
+        "201": {
+          "description": "Registro creado.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "400": {
+          "$ref": "../openapi.json#/components/responses/ValidationError"
+        },
+        "401": {
+          "$ref": "../openapi.json#/components/responses/Unauthorized"
+        },
+        "403": {
+          "$ref": "../openapi.json#/components/responses/Forbidden"
+        },
+        "409": {
+          "description": "El registro ya existe o está en uso.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
         },
         "500": {
           "$ref": "../openapi.json#/components/responses/ServerError"
@@ -1631,6 +1763,72 @@
           "$ref": "../openapi.json#/components/responses/ServerError"
         }
       }
+    },
+    "post": {
+      "operationId": "createWarehouseReasons",
+      "security": [
+        {
+          "cookieAuth": []
+        }
+      ],
+      "requestBody": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "required": [
+                "name"
+              ],
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "symbol": {
+                  "type": "string"
+                },
+                "isActive": {
+                  "type": "boolean"
+                }
+              }
+            }
+          }
+        }
+      },
+      "responses": {
+        "201": {
+          "description": "Registro creado.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "400": {
+          "$ref": "../openapi.json#/components/responses/ValidationError"
+        },
+        "401": {
+          "$ref": "../openapi.json#/components/responses/Unauthorized"
+        },
+        "403": {
+          "$ref": "../openapi.json#/components/responses/Forbidden"
+        },
+        "409": {
+          "description": "El registro ya existe o está en uso.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "500": {
+          "$ref": "../openapi.json#/components/responses/ServerError"
+        }
+      }
     }
   },
   "/api/warehouse/fulfillment-statuses": {
@@ -1662,6 +1860,584 @@
           "$ref": "../openapi.json#/components/responses/ServerError"
         }
       }
+    },
+    "post": {
+      "operationId": "createWarehouseFulfillmentStatuses",
+      "security": [
+        {
+          "cookieAuth": []
+        }
+      ],
+      "requestBody": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "required": [
+                "name"
+              ],
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "symbol": {
+                  "type": "string"
+                },
+                "isActive": {
+                  "type": "boolean"
+                }
+              }
+            }
+          }
+        }
+      },
+      "responses": {
+        "201": {
+          "description": "Registro creado.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "400": {
+          "$ref": "../openapi.json#/components/responses/ValidationError"
+        },
+        "401": {
+          "$ref": "../openapi.json#/components/responses/Unauthorized"
+        },
+        "403": {
+          "$ref": "../openapi.json#/components/responses/Forbidden"
+        },
+        "409": {
+          "description": "El registro ya existe o está en uso.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "500": {
+          "$ref": "../openapi.json#/components/responses/ServerError"
+        }
+      }
     }
+  },
+  "/api/warehouse/presentations/{id}": {
+    "put": {
+      "operationId": "updateWarehousePresentations",
+      "security": [
+        {
+          "cookieAuth": []
+        }
+      ],
+      "requestBody": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "required": [
+                "name"
+              ],
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "symbol": {
+                  "type": "string"
+                },
+                "isActive": {
+                  "type": "boolean"
+                }
+              }
+            }
+          }
+        }
+      },
+      "responses": {
+        "200": {
+          "description": "Registro actualizado.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "400": {
+          "$ref": "../openapi.json#/components/responses/ValidationError"
+        },
+        "401": {
+          "$ref": "../openapi.json#/components/responses/Unauthorized"
+        },
+        "403": {
+          "$ref": "../openapi.json#/components/responses/Forbidden"
+        },
+        "409": {
+          "description": "El registro ya existe o está en uso.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "500": {
+          "$ref": "../openapi.json#/components/responses/ServerError"
+        }
+      }
+    },
+    "delete": {
+      "operationId": "deleteWarehousePresentations",
+      "security": [
+        {
+          "cookieAuth": []
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Registro eliminado.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "401": {
+          "$ref": "../openapi.json#/components/responses/Unauthorized"
+        },
+        "403": {
+          "$ref": "../openapi.json#/components/responses/Forbidden"
+        },
+        "404": {
+          "description": "Registro no encontrado.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "409": {
+          "description": "El registro ya existe o está en uso.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "500": {
+          "$ref": "../openapi.json#/components/responses/ServerError"
+        }
+      }
+    },
+    "parameters": [
+      {
+        "name": "id",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        }
+      }
+    ]
+  },
+  "/api/warehouse/unit-measures/{id}": {
+    "put": {
+      "operationId": "updateWarehouseUnitMeasures",
+      "security": [
+        {
+          "cookieAuth": []
+        }
+      ],
+      "requestBody": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "required": [
+                "name"
+              ],
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "symbol": {
+                  "type": "string"
+                },
+                "isActive": {
+                  "type": "boolean"
+                }
+              }
+            }
+          }
+        }
+      },
+      "responses": {
+        "200": {
+          "description": "Registro actualizado.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "400": {
+          "$ref": "../openapi.json#/components/responses/ValidationError"
+        },
+        "401": {
+          "$ref": "../openapi.json#/components/responses/Unauthorized"
+        },
+        "403": {
+          "$ref": "../openapi.json#/components/responses/Forbidden"
+        },
+        "409": {
+          "description": "El registro ya existe o está en uso.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "500": {
+          "$ref": "../openapi.json#/components/responses/ServerError"
+        }
+      }
+    },
+    "delete": {
+      "operationId": "deleteWarehouseUnitMeasures",
+      "security": [
+        {
+          "cookieAuth": []
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Registro eliminado.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "401": {
+          "$ref": "../openapi.json#/components/responses/Unauthorized"
+        },
+        "403": {
+          "$ref": "../openapi.json#/components/responses/Forbidden"
+        },
+        "404": {
+          "description": "Registro no encontrado.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "409": {
+          "description": "El registro ya existe o está en uso.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "500": {
+          "$ref": "../openapi.json#/components/responses/ServerError"
+        }
+      }
+    },
+    "parameters": [
+      {
+        "name": "id",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        }
+      }
+    ]
+  },
+  "/api/warehouse/reasons/{id}": {
+    "put": {
+      "operationId": "updateWarehouseReasons",
+      "security": [
+        {
+          "cookieAuth": []
+        }
+      ],
+      "requestBody": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "required": [
+                "name"
+              ],
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "symbol": {
+                  "type": "string"
+                },
+                "isActive": {
+                  "type": "boolean"
+                }
+              }
+            }
+          }
+        }
+      },
+      "responses": {
+        "200": {
+          "description": "Registro actualizado.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "400": {
+          "$ref": "../openapi.json#/components/responses/ValidationError"
+        },
+        "401": {
+          "$ref": "../openapi.json#/components/responses/Unauthorized"
+        },
+        "403": {
+          "$ref": "../openapi.json#/components/responses/Forbidden"
+        },
+        "409": {
+          "description": "El registro ya existe o está en uso.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "500": {
+          "$ref": "../openapi.json#/components/responses/ServerError"
+        }
+      }
+    },
+    "delete": {
+      "operationId": "deleteWarehouseReasons",
+      "security": [
+        {
+          "cookieAuth": []
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Registro eliminado.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "401": {
+          "$ref": "../openapi.json#/components/responses/Unauthorized"
+        },
+        "403": {
+          "$ref": "../openapi.json#/components/responses/Forbidden"
+        },
+        "404": {
+          "description": "Registro no encontrado.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "409": {
+          "description": "El registro ya existe o está en uso.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "500": {
+          "$ref": "../openapi.json#/components/responses/ServerError"
+        }
+      }
+    },
+    "parameters": [
+      {
+        "name": "id",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        }
+      }
+    ]
+  },
+  "/api/warehouse/fulfillment-statuses/{id}": {
+    "put": {
+      "operationId": "updateWarehouseFulfillmentStatuses",
+      "security": [
+        {
+          "cookieAuth": []
+        }
+      ],
+      "requestBody": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "required": [
+                "name"
+              ],
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "symbol": {
+                  "type": "string"
+                },
+                "isActive": {
+                  "type": "boolean"
+                }
+              }
+            }
+          }
+        }
+      },
+      "responses": {
+        "200": {
+          "description": "Registro actualizado.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "400": {
+          "$ref": "../openapi.json#/components/responses/ValidationError"
+        },
+        "401": {
+          "$ref": "../openapi.json#/components/responses/Unauthorized"
+        },
+        "403": {
+          "$ref": "../openapi.json#/components/responses/Forbidden"
+        },
+        "409": {
+          "description": "El registro ya existe o está en uso.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "500": {
+          "$ref": "../openapi.json#/components/responses/ServerError"
+        }
+      }
+    },
+    "delete": {
+      "operationId": "deleteWarehouseFulfillmentStatuses",
+      "security": [
+        {
+          "cookieAuth": []
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Registro eliminado.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "401": {
+          "$ref": "../openapi.json#/components/responses/Unauthorized"
+        },
+        "403": {
+          "$ref": "../openapi.json#/components/responses/Forbidden"
+        },
+        "404": {
+          "description": "Registro no encontrado.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "409": {
+          "description": "El registro ya existe o está en uso.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "500": {
+          "$ref": "../openapi.json#/components/responses/ServerError"
+        }
+      }
+    },
+    "parameters": [
+      {
+        "name": "id",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        }
+      }
+    ]
   }
 }

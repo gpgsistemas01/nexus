@@ -132,6 +132,7 @@ propietaria y no registran rutas web independientes.
 | Administración | Personas (`/personas`) | Administrar personas participantes del negocio. | Filtrar y crear/editar datos y asignaciones. | `src/views/pages/admin/persons/personsPage.ejs` |
 | Administración | Movimientos de materiales (`/movimientos/materiales`) | Auditar movimientos del inventario de materiales. | Filtrar, consultar y exportar el historial. | `src/views/pages/admin/movements/movementsPage.ejs` |
 | Administración | Movimientos de merma (`/movimientos/mermas`) | Auditar movimientos del inventario de merma. | Filtrar, consultar y exportar el historial. | `src/views/pages/admin/movements/movementsPage.ejs` |
+| Administración | Catálogos (`/catalogos/:catalog`) | Administrar roles, departamentos, estados, presentaciones, unidades, motivos y estados de surtido. | Buscar, crear, editar y eliminar registros; las eliminaciones con relaciones se rechazan. | `src/views/pages/admin/catalogs/catalogPage.ejs` |
 | Sistema | No encontrada (`/error/404`) | Recuperar al usuario de una URL inexistente. | Volver al inicio apropiado según la sesión. | `src/views/pages/error/notFound/notFoundPage.ejs` |
 
 ### Redirecciones de compatibilidad

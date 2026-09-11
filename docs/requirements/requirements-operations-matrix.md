@@ -26,17 +26,18 @@ permiso se agrupan. Los valores de permiso son los declarados en
 | --- | --- | --- |
 | Administración / personas | `L → persons:read`; `C, U → persons:write`; exportar `→ person:reports-read` | Implementado |
 | Administración / usuarios | `L, C, U, cambiar contraseña/accesos → users:manage`; exportar `→ admin:reports-read` | Implementado |
-| Administración / roles | `L → roles:read` | Implementado sólo lectura |
-| Administración / departamentos | `L → departments:read` | Implementado sólo lectura |
+| Administración / roles | `L → roles:read`; `C, U, D → catalogs:manage` | Implementado |
+| Administración / departamentos | `L → departments:read`; `C, U, D → catalogs:manage` | Implementado |
+| Administración / estados operativos | `L → statuses:read`; `C, U, D → catalogs:manage` | Implementado |
 | Administración / clientes | `L → clients:read`; `C → clients:create`; `U → clients:update`; exportar `→ client:reports-read` | Implementado |
 | Contexto pendiente / proyectos | Sin rutas API CRUD ni permiso registrado | Modelado |
 | Almacén / materiales | `L → materials:read`; costo en la consulta `→ inventory:costs-read`; `C, U, D → materials:write`; ajustar existencia `→ materials:adjust-stock`; exportar inventario `→ warehouse:reports-read` | Implementado |
 | Almacén / merma | `L → wastes:read`; costo en la consulta `→ inventory:costs-read`; `C, U → wastes:write`; ajustar existencia `→ wastes:adjust-stock`; exportar `→ warehouse:reports-read` | Implementado |
 | Almacén / proveedores | `L, C → suppliers:manage`; `U → suppliers:update`; exportar `→ supplier:reports-read` | Implementado |
-| Almacén / presentación | `L → presentations:read` | Implementado sólo lectura |
-| Almacén / unidad de medida | `L → unit:measures-read` | Implementado sólo lectura |
-| Almacén / motivo de ajuste | `L → reasons:read` | Implementado sólo lectura |
-| Almacén / estado de cumplimiento | `L → fulfillment:statuses-read` | Implementado sólo lectura |
+| Almacén / presentación | `L → presentations:read`; `C, U, D → catalogs:manage` | Implementado |
+| Almacén / unidad de medida | `L → unit:measures-read`; `C, U, D → catalogs:manage` | Implementado |
+| Almacén / motivo de ajuste | `L → reasons:read`; `C, U, D → catalogs:manage` | Implementado |
+| Almacén / estado de cumplimiento | `L → fulfillment:statuses-read`; `C, U, D → catalogs:manage` | Implementado |
 | Compras / entradas | `L, C, U encabezado, corregir detalle, cancelar detalle → goods:receipts-manage`; exportar `→ warehouse:reports-read` | Implementado |
 | Salidas / material | `L, C, U documento/encabezado → goods:issues-manage`; actualizar detalles y devolver `→ goods:issue-details-manage`; exportar `→ warehouse:reports-read` | Implementado |
 | Salidas / merma | `L, C, U documento/encabezado → waste:issues-manage`; suministrar detalles y devolver `→ waste:issues-supply`; exportar `→ warehouse:reports-read` | Implementado |

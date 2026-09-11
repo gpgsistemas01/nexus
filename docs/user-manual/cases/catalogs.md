@@ -2,6 +2,17 @@
 
 Cada procedimiento identifica sus casos de uso, controles, errores posibles y captura de referencia.
 
+## Catálogos auxiliares
+
+**Ruta en el menú:** **Menú principal → Catálogos**, seguida de **Roles**, **Departamentos**,
+**Estados operativos**, **Presentaciones**, **Unidades de medida**, **Motivos de ajuste** o
+**Estados de surtido**. Esta sección está disponible para el administrador del sistema.
+
+Cada pantalla permite buscar por nombre, abrir **Nuevo registro**, editar una fila o eliminarla.
+Las unidades de medida solicitan también **Símbolo** y los motivos permiten controlar **Activo**.
+Nexus rechaza nombres duplicados y no elimina registros que ya estén relacionados con información
+operativa; en ese caso se debe conservar el registro o corregir primero la relación correspondiente.
+
 ## Materiales e inventario
 
 **Propósito.** Consultar el inventario, registrar o editar materiales y ajustar existencias.

@@ -202,6 +202,72 @@
           "$ref": "../openapi.json#/components/responses/ServerError"
         }
       }
+    },
+    "post": {
+      "operationId": "createAdminRoles",
+      "security": [
+        {
+          "cookieAuth": []
+        }
+      ],
+      "requestBody": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "required": [
+                "name"
+              ],
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "symbol": {
+                  "type": "string"
+                },
+                "isActive": {
+                  "type": "boolean"
+                }
+              }
+            }
+          }
+        }
+      },
+      "responses": {
+        "201": {
+          "description": "Registro creado.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "400": {
+          "$ref": "../openapi.json#/components/responses/ValidationError"
+        },
+        "401": {
+          "$ref": "../openapi.json#/components/responses/Unauthorized"
+        },
+        "403": {
+          "$ref": "../openapi.json#/components/responses/Forbidden"
+        },
+        "409": {
+          "description": "El registro ya existe o está en uso.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "500": {
+          "$ref": "../openapi.json#/components/responses/ServerError"
+        }
+      }
     }
   },
   "/api/admin/departments": {
@@ -228,6 +294,72 @@
         },
         "403": {
           "$ref": "../openapi.json#/components/responses/Forbidden"
+        },
+        "500": {
+          "$ref": "../openapi.json#/components/responses/ServerError"
+        }
+      }
+    },
+    "post": {
+      "operationId": "createAdminDepartments",
+      "security": [
+        {
+          "cookieAuth": []
+        }
+      ],
+      "requestBody": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "required": [
+                "name"
+              ],
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "symbol": {
+                  "type": "string"
+                },
+                "isActive": {
+                  "type": "boolean"
+                }
+              }
+            }
+          }
+        }
+      },
+      "responses": {
+        "201": {
+          "description": "Registro creado.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "400": {
+          "$ref": "../openapi.json#/components/responses/ValidationError"
+        },
+        "401": {
+          "$ref": "../openapi.json#/components/responses/Unauthorized"
+        },
+        "403": {
+          "$ref": "../openapi.json#/components/responses/Forbidden"
+        },
+        "409": {
+          "description": "El registro ya existe o está en uso.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
         },
         "500": {
           "$ref": "../openapi.json#/components/responses/ServerError"
@@ -514,5 +646,486 @@
         }
       }
     }
+  },
+  "/api/admin/roles/{id}": {
+    "put": {
+      "operationId": "updateAdminRoles",
+      "security": [
+        {
+          "cookieAuth": []
+        }
+      ],
+      "requestBody": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "required": [
+                "name"
+              ],
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "symbol": {
+                  "type": "string"
+                },
+                "isActive": {
+                  "type": "boolean"
+                }
+              }
+            }
+          }
+        }
+      },
+      "responses": {
+        "200": {
+          "description": "Registro actualizado.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "400": {
+          "$ref": "../openapi.json#/components/responses/ValidationError"
+        },
+        "401": {
+          "$ref": "../openapi.json#/components/responses/Unauthorized"
+        },
+        "403": {
+          "$ref": "../openapi.json#/components/responses/Forbidden"
+        },
+        "409": {
+          "description": "El registro ya existe o está en uso.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "500": {
+          "$ref": "../openapi.json#/components/responses/ServerError"
+        }
+      }
+    },
+    "delete": {
+      "operationId": "deleteAdminRoles",
+      "security": [
+        {
+          "cookieAuth": []
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Registro eliminado.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "401": {
+          "$ref": "../openapi.json#/components/responses/Unauthorized"
+        },
+        "403": {
+          "$ref": "../openapi.json#/components/responses/Forbidden"
+        },
+        "404": {
+          "description": "Registro no encontrado.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "409": {
+          "description": "El registro ya existe o está en uso.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "500": {
+          "$ref": "../openapi.json#/components/responses/ServerError"
+        }
+      }
+    },
+    "parameters": [
+      {
+        "name": "id",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        }
+      }
+    ]
+  },
+  "/api/admin/departments/{id}": {
+    "put": {
+      "operationId": "updateAdminDepartments",
+      "security": [
+        {
+          "cookieAuth": []
+        }
+      ],
+      "requestBody": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "required": [
+                "name"
+              ],
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "symbol": {
+                  "type": "string"
+                },
+                "isActive": {
+                  "type": "boolean"
+                }
+              }
+            }
+          }
+        }
+      },
+      "responses": {
+        "200": {
+          "description": "Registro actualizado.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "400": {
+          "$ref": "../openapi.json#/components/responses/ValidationError"
+        },
+        "401": {
+          "$ref": "../openapi.json#/components/responses/Unauthorized"
+        },
+        "403": {
+          "$ref": "../openapi.json#/components/responses/Forbidden"
+        },
+        "409": {
+          "description": "El registro ya existe o está en uso.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "500": {
+          "$ref": "../openapi.json#/components/responses/ServerError"
+        }
+      }
+    },
+    "delete": {
+      "operationId": "deleteAdminDepartments",
+      "security": [
+        {
+          "cookieAuth": []
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Registro eliminado.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "401": {
+          "$ref": "../openapi.json#/components/responses/Unauthorized"
+        },
+        "403": {
+          "$ref": "../openapi.json#/components/responses/Forbidden"
+        },
+        "404": {
+          "description": "Registro no encontrado.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "409": {
+          "description": "El registro ya existe o está en uso.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "500": {
+          "$ref": "../openapi.json#/components/responses/ServerError"
+        }
+      }
+    },
+    "parameters": [
+      {
+        "name": "id",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        }
+      }
+    ]
+  },
+  "/api/admin/statuses": {
+    "get": {
+      "operationId": "getAdminStatuses",
+      "security": [
+        {
+          "cookieAuth": []
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Respuesta correcta.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "401": {
+          "$ref": "../openapi.json#/components/responses/Unauthorized"
+        },
+        "403": {
+          "$ref": "../openapi.json#/components/responses/Forbidden"
+        },
+        "500": {
+          "$ref": "../openapi.json#/components/responses/ServerError"
+        }
+      }
+    },
+    "post": {
+      "operationId": "createAdminStatuses",
+      "security": [
+        {
+          "cookieAuth": []
+        }
+      ],
+      "requestBody": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "required": [
+                "name"
+              ],
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "symbol": {
+                  "type": "string"
+                },
+                "isActive": {
+                  "type": "boolean"
+                }
+              }
+            }
+          }
+        }
+      },
+      "responses": {
+        "201": {
+          "description": "Registro creado.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "400": {
+          "$ref": "../openapi.json#/components/responses/ValidationError"
+        },
+        "401": {
+          "$ref": "../openapi.json#/components/responses/Unauthorized"
+        },
+        "403": {
+          "$ref": "../openapi.json#/components/responses/Forbidden"
+        },
+        "409": {
+          "description": "El registro ya existe o está en uso.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "500": {
+          "$ref": "../openapi.json#/components/responses/ServerError"
+        }
+      }
+    }
+  },
+  "/api/admin/statuses/{id}": {
+    "put": {
+      "operationId": "updateAdminStatuses",
+      "security": [
+        {
+          "cookieAuth": []
+        }
+      ],
+      "requestBody": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "required": [
+                "name"
+              ],
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "symbol": {
+                  "type": "string"
+                },
+                "isActive": {
+                  "type": "boolean"
+                }
+              }
+            }
+          }
+        }
+      },
+      "responses": {
+        "200": {
+          "description": "Registro actualizado.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "400": {
+          "$ref": "../openapi.json#/components/responses/ValidationError"
+        },
+        "401": {
+          "$ref": "../openapi.json#/components/responses/Unauthorized"
+        },
+        "403": {
+          "$ref": "../openapi.json#/components/responses/Forbidden"
+        },
+        "409": {
+          "description": "El registro ya existe o está en uso.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "500": {
+          "$ref": "../openapi.json#/components/responses/ServerError"
+        }
+      }
+    },
+    "delete": {
+      "operationId": "deleteAdminStatuses",
+      "security": [
+        {
+          "cookieAuth": []
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Registro eliminado.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "401": {
+          "$ref": "../openapi.json#/components/responses/Unauthorized"
+        },
+        "403": {
+          "$ref": "../openapi.json#/components/responses/Forbidden"
+        },
+        "404": {
+          "description": "Registro no encontrado.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "409": {
+          "description": "El registro ya existe o está en uso.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "500": {
+          "$ref": "../openapi.json#/components/responses/ServerError"
+        }
+      }
+    },
+    "parameters": [
+      {
+        "name": "id",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        }
+      }
+    ]
   }
 }

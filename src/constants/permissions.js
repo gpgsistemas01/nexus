@@ -3,6 +3,8 @@ export const PERMISSIONS = Object.freeze({
     MATERIALS_WRITE: 'materials:write',
     MATERIALS_ADJUST_STOCK: 'materials:adjust-stock',
     INVENTORY_COSTS_READ: 'inventory:costs-read',
+    CATALOGS_MANAGE: 'catalogs:manage',
+    CATALOGS_PAGE_VIEW: 'catalogs:page-view',
     DEPARTMENTS_READ: 'departments:read',
     MOVEMENTS_READ: 'movements:read',
     PERSONS_READ: 'persons:read',
@@ -10,6 +12,7 @@ export const PERMISSIONS = Object.freeze({
     ADMIN_REPORTS_READ: 'admin:reports-read',
     PERSON_REPORTS_READ: 'person:reports-read',
     ROLES_READ: 'roles:read',
+    STATUSES_READ: 'statuses:read',
     USERS_MANAGE: 'users:manage',
     CLIENTS_READ: 'clients:read',
     CLIENTS_CREATE: 'clients:create',
@@ -46,6 +49,14 @@ const createPolicy = ({ roles, departments }) => Object.freeze({
 });
 
 export const AUTHORIZATION_POLICIES = Object.freeze({
+    [PERMISSIONS.CATALOGS_MANAGE]: createPolicy({
+        roles: ['Administrador del sistema'],
+        departments: ['SISTEMAS']
+    }),
+    [PERMISSIONS.CATALOGS_PAGE_VIEW]: createPolicy({
+        roles: ['Administrador del sistema'],
+        departments: ['SISTEMAS']
+    }),
     [PERMISSIONS.MATERIALS_READ]: createPolicy({
         roles: [
             'Almacenista',
@@ -244,6 +255,10 @@ export const AUTHORIZATION_POLICIES = Object.freeze({
     [PERMISSIONS.WASTES_ADJUST_STOCK]: createPolicy({
     roles: ['Administrador del sistema'],
     departments: ['SISTEMAS']
+    }),
+    [PERMISSIONS.STATUSES_READ]: createPolicy({
+        roles: ['Administrador del sistema'],
+        departments: ['SISTEMAS']
     }),
     [PERMISSIONS.WASTE_ISSUES_MANAGE]: createPolicy({
         roles: ['Almacenista', 'Coordinador', 'Auxiliar', 'Administrador del sistema'],
