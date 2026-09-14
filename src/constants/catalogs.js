@@ -1,0 +1,46 @@
+export const MANAGED_CATALOGS = Object.freeze({
+    departments: {
+        model: 'department',
+        fields: ['name'],
+        maxLengths: { name: 50 },
+        label: 'Áreas',
+        entityLabel: 'área'
+    },
+    roles: {
+        model: 'role',
+        fields: ['name'],
+        maxLengths: { name: 50 },
+        label: 'Roles',
+        entityLabel: 'rol'
+    },
+    presentations: {
+        model: 'presentation',
+        fields: ['name'],
+        maxLengths: { name: 50 },
+        label: 'Presentaciones',
+        entityLabel: 'presentación'
+    },
+    'unit-measures': {
+        model: 'unitMeasure',
+        fields: ['name', 'symbol'],
+        maxLengths: { name: 20, symbol: 10 },
+        label: 'Unidades de medida',
+        entityLabel: 'unidad de medida'
+    },
+    reasons: {
+        model: 'stockAdjustmentReason',
+        fields: ['name', 'isActive'],
+        maxLengths: { name: 100 },
+        label: 'Motivos de ajuste',
+        entityLabel: 'motivo de ajuste'
+    },
+    'fulfillment-statuses': {
+        model: 'fulfillmentStatus',
+        fields: ['name'],
+        maxLengths: { name: 50 },
+        label: 'Estados de cumplimiento',
+        entityLabel: 'estado de cumplimiento'
+    }
+});
+
+export const MANAGED_CATALOG_NAMES = Object.freeze(Object.keys(MANAGED_CATALOGS));

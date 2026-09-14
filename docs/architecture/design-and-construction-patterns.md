@@ -1,5 +1,69 @@
 # Patrones de diseño y construcción aplicados
 
+## Registro de catálogos con lista blanca
+
+Los catálogos auxiliares administrables aplican un **Registry/Strategy** acotado:
+`catalogService` relaciona cada nombre público con su modelo Prisma, sus campos y sus
+etiquetas. Controller, rutas y plantilla se comparten, mientras cada catálogo conserva
+una URL y una entrada de navegación propias. En frontend, la página sólo compone el
+flujo; formulario, modal, aplicación, transporte y DataTable mantienen la misma
+separación utilizada por los demás CRUD. Así se evita duplicar seis implementaciones
+sin permitir que el cliente seleccione modelos o campos arbitrarios. Las lecturas
+operativas de cada dominio permanecen separadas para alimentar sus selectores.
+
+La lista blanca es una frontera de seguridad. La página y el API administrativo
+comprueban `catalogs:manage`; ocultar el enlace sólo mejora la navegación y nunca
+reemplaza la autorización del servidor.
+
+El flujo común no termina en los parciales visuales. En frontend, el listado se adapta
+con `createCrudApplication.getAll`, se entrega a `createDataTable` mediante su opción
+`ajax` y las altas o ediciones usan `handleSubmit`, que cierra el modal, presenta el
+mensaje y recarga la DataTable conservando o reiniciando la página según el modo. Así,
+Catálogos comparte el mismo ciclo observable que Clientes y Proveedores sin duplicar el
+manejo de carga, error o refresco. En backend, el router aplica autenticación y
+`catalogs:manage` antes del controller; el controller conserva el contrato DataTables y
+delega normalización, lista blanca, validación y persistencia al servicio. El registro
+**Registry/Strategy** es la única variación deliberada frente a un servicio por recurso.
+Las columnas se entregan directamente a `createDataTable` y se componen desde los
+campos del catálogo activo; no se mantienen seis arreglos equivalentes. La acción
+reutiliza `buildMdbEditActionButton` con el verbo **Editar**, sin agregar `catalog` a
+los contextos de negocio de `renderActionButtons`.
+Las reglas visibles se crean mediante `createCatalogValidation` en la capa compartida
+`utils/validations`, igual que los demás formularios; `catalogForm` sólo aporta etiqueta
+y límites del recurso actual.
+
+Los controles del formulario mantienen etiquetas de acción formadas únicamente por
+verbos: **Guardar** al crear, **Actualizar** al editar, **Regresar** para salir y
+**Cerrar** como etiqueta accesible del control de cabecera. El título del modal sí
+incluye la entidad para aportar contexto, pero no forma parte de la etiqueta del botón.
+
+El campo **Activo** se compone sólo para **Motivos de ajuste**, porque es el único de
+los seis modelos administrables que define `isActive` en el esquema Prisma. Agregarlo
+a otro catálogo requiere primero un cambio explícito del modelo y su migración.
+
+El parámetro `catalog` se valida en la frontera HTTP contra `MANAGED_CATALOG_NAMES` y
+el servicio vuelve a resolverlo desde `MANAGED_CATALOGS`; así no se puede seleccionar
+un modelo arbitrario aunque el servicio se invoque fuera de la ruta. Como en los demás
+módulos que reciben `id` en la URL, el servicio resuelve la existencia de la entidad y
+traduce tanto el `P2025` como el `P2023` de Prisma a una entrada no encontrada que
+incluye la etiqueta del catálogo. El validator HTTP se reserva para el contrato del body
+y para `catalog`, que selecciona una estrategia y requiere rechazo antes del controller.
+
+El registro contiene exactamente estos catálogos; ningún otro módulo forma parte de este
+flujo compartido:
+
+| Catálogo visible | Identificador de URL y API | Modelo Prisma | Campos administrables |
+| --- | --- | --- | --- |
+| Áreas | `departments` | `Department` | `name` (máximo 50) |
+| Roles | `roles` | `Role` | `name` (máximo 50) |
+| Presentaciones | `presentations` | `Presentation` | `name` (máximo 50) |
+| Unidades de medida | `unit-measures` | `UnitMeasure` | `name` (máximo 20), `symbol` (máximo 10) |
+| Motivos de ajuste | `reasons` | `StockAdjustmentReason` | `name` (máximo 100), `isActive` booleano |
+| Estados de cumplimiento | `fulfillment-statuses` | `FulfillmentStatus` | `name` (máximo 50) |
+
+**Clientes** y **Proveedores** no pertenecen a este registro: conservan sus módulos,
+rutas, permisos, formularios y reglas de negocio propios.
+
 ## Alcance de la revisión
 
 Este documento registra patrones que tienen evidencia repetida en el código. Distingue

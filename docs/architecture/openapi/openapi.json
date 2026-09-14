@@ -163,6 +163,12 @@
     },
     "/api/admin/reports/users/excel": {
       "$ref": "./paths/admin.json#/~1api~1admin~1reports~1users~1excel"
+    },
+    "/api/admin/catalogs/{catalog}": {
+      "$ref": "./paths/admin.json#/~1api~1admin~1catalogs~1{catalog}"
+    },
+    "/api/admin/catalogs/{catalog}/{id}": {
+      "$ref": "./paths/admin.json#/~1api~1admin~1catalogs~1{catalog}~1{id}"
     }
   },
   "components": {

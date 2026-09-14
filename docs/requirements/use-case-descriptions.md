@@ -165,7 +165,7 @@ como listas planas difíciles de revisar.
 | --- | --- | --- |
 | `AUT` | Sesión. | `CU-AUT-01` a `CU-AUT-02` |
 | `IDA` | Personas; usuarios y credenciales; catálogos de acceso. | `CU-IDA-01` a `CU-IDA-09` |
-| `CAT` | Materiales; proveedores; clientes; mermas; catálogos auxiliares de sólo lectura. | `CU-CAT-01` a `CU-CAT-20` |
+| `CAT` | Materiales; proveedores; clientes; mermas; consulta operativa y administración restringida de catálogos auxiliares. | `CU-CAT-01` a `CU-CAT-38` |
 | `ENT` | Compras de material. | `CU-ENT-01` a `CU-ENT-05` |
 | `SAL` | Salidas de material; salidas de merma. | `CU-SAL-01` a `CU-SAL-12` |
 | `REP` | Materiales; mermas; compras; proveedores; clientes; identidad. | `CU-REP-01` a `CU-REP-15` |
@@ -231,6 +231,24 @@ conjunto; el cambio de identificador no modifica el alcance funcional del caso.
 | `CU-CAT-18` | Consultar unidades de medida | Catálogo auxiliar de sólo lectura. |
 | `CU-CAT-19` | Consultar motivos de ajuste | Catálogo auxiliar de sólo lectura. |
 | `CU-CAT-20` | Consultar estados de cumplimiento | Catálogo auxiliar de sólo lectura. |
+| `CU-CAT-21` | Consultar área | Pantalla y listado independiente de Áreas, restringidos al administrador. |
+| `CU-CAT-22` | Crear área | Alta de área con los campos permitidos. |
+| `CU-CAT-23` | Editar área | Actualización de área con los campos permitidos. |
+| `CU-CAT-24` | Consultar rol | Pantalla y listado independiente de Roles, restringidos al administrador. |
+| `CU-CAT-25` | Crear rol | Alta de rol con los campos permitidos. |
+| `CU-CAT-26` | Editar rol | Actualización de rol con los campos permitidos. |
+| `CU-CAT-27` | Consultar presentación | Pantalla y listado independiente de Presentaciones, restringidos al administrador. |
+| `CU-CAT-28` | Crear presentación | Alta de presentación con los campos permitidos. |
+| `CU-CAT-29` | Editar presentación | Actualización de presentación con los campos permitidos. |
+| `CU-CAT-30` | Consultar unidad de medida | Pantalla y listado independiente de Unidades de medida, restringidos al administrador. |
+| `CU-CAT-31` | Crear unidad de medida | Alta de unidad de medida con los campos permitidos. |
+| `CU-CAT-32` | Editar unidad de medida | Actualización de unidad de medida con los campos permitidos. |
+| `CU-CAT-33` | Consultar motivo de ajuste | Pantalla y listado independiente de Motivos de ajuste, restringidos al administrador. |
+| `CU-CAT-34` | Crear motivo de ajuste | Alta de motivo de ajuste con los campos permitidos. |
+| `CU-CAT-35` | Editar motivo de ajuste | Actualización de motivo de ajuste con los campos permitidos. |
+| `CU-CAT-36` | Consultar estado de cumplimiento | Pantalla y listado independiente de Estados de cumplimiento, restringidos al administrador. |
+| `CU-CAT-37` | Crear estado de cumplimiento | Alta de estado de cumplimiento con los campos permitidos. |
+| `CU-CAT-38` | Editar estado de cumplimiento | Actualización de estado de cumplimiento con los campos permitidos. |
 
 ### Grupo funcional ENT — Compras de material
 
@@ -830,6 +848,288 @@ Cada ficha representa una sola acción sobre una sola entidad. Los elementos com
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** Catálogo auxiliar de sólo lectura.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
 | Requisitos relacionados | `RF-CAT-021`. |
 
+#### `CU-CAT-21` — Consultar área
+
+| Sección | Información relevante |
+| --- | --- |
+| Identificador | `CU-CAT-21` |
+| Nombre | Consultar área. |
+| Actor y disparador | **Actor:** Administrador del sistema del área Sistemas. **Disparador:** selecciona **Áreas** en el submenú **Catálogos auxiliares**. |
+| Participación de actor y sistema | **Actor:** abre y revisa el listado de Áreas.<br>**Nexus:** autoriza, valida el recurso registrado y devuelve sus entradas. |
+| Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con `catalogs:manage` y pertenece al contexto administrativo autorizado. |
+| Inferencia desde código | **Directa.** GET `/api/admin/catalogs/departments` → `findAllCatalogEntries`. |
+| Flujo principal | 1. **Administrador:** selecciona **Áreas** en el submenú **Catálogos auxiliares** **(ver E1)**.<br>2. **Nexus:** valida `catalogs:manage` y el identificador `departments` contra la lista blanca.<br>3. **Nexus:** muestra la pantalla y tabla exclusivas de Áreas.<br>4. **Administrador:** revisa las entradas sin modificar datos. |
+| Excepciones | **E1 — Acceso, recurso o entrada rechazados:**<br>1. **Nexus:** rechaza la operación sin exponer otro catálogo ni producir cambios parciales.<br>2. **Administrador:** reconoce el rechazo; termina el caso de uso. |
+| Postcondiciones (éxito y fallo) | 1. **Éxito:** La tabla muestra exclusivamente las entradas de Áreas.<br>2. **Fallo:** No se exponen datos ni modelos no autorizados. |
+| Requisitos relacionados | `RF-CAT-022`, `RN-001`, `RN-006`. |
+
+#### `CU-CAT-22` — Crear área
+
+| Sección | Información relevante |
+| --- | --- |
+| Identificador | `CU-CAT-22` |
+| Nombre | Crear área. |
+| Actor y disparador | **Actor:** Administrador del sistema del área Sistemas. **Disparador:** selecciona **Nuevo** en la pantalla **Áreas**. |
+| Participación de actor y sistema | **Actor:** captura y confirma una nueva entrada de Áreas.<br>**Nexus:** autoriza, limita los campos, valida, crea y refresca la tabla. |
+| Precondiciones | 1. El actor inició sesión y cuenta con `catalogs:manage`.<br>2. La pantalla seleccionada corresponde exactamente a **Áreas**. |
+| Inferencia desde código | **Directa.** POST `/api/admin/catalogs/departments` → `createCatalogEntry`. |
+| Flujo principal | 1. **Administrador:** abre la pantalla **Áreas** y selecciona **Nuevo** **(ver E1)**.<br>2. **Nexus:** presenta únicamente el campo **Nombre**.<br>3. **Administrador:** captura los datos y selecciona **Guardar** **(ver A1)**.<br>4. **Nexus:** normaliza, valida y crea la entrada de Áreas.<br>5. **Nexus:** confirma y refresca la tabla de Áreas. |
+| Flujos alternativos | **A1 — Datos inválidos (después del paso 3):**<br>1. **Nexus:** señala los campos requeridos sin crear la entrada.<br>2. **Administrador:** corrige y vuelve a confirmar; continúa en el paso 4. |
+| Excepciones | **E1 — Acceso, recurso o entrada rechazados:**<br>1. **Nexus:** rechaza la operación sin exponer otro catálogo ni producir cambios parciales.<br>2. **Administrador:** reconoce el rechazo; termina el caso de uso. |
+| Postcondiciones (éxito y fallo) | 1. **Éxito:** La nueva entrada de Áreas queda registrada y visible.<br>2. **Fallo:** No se crea ninguna entrada. |
+| Requisitos relacionados | `RF-CAT-023`, `RN-001`, `RN-006`. |
+
+#### `CU-CAT-23` — Editar área
+
+| Sección | Información relevante |
+| --- | --- |
+| Identificador | `CU-CAT-23` |
+| Nombre | Editar área. |
+| Actor y disparador | **Actor:** Administrador del sistema del área Sistemas. **Disparador:** selecciona **Editar registro** en la pantalla **Áreas**. |
+| Participación de actor y sistema | **Actor:** modifica y confirma una entrada de Áreas.<br>**Nexus:** autoriza, limita los campos, valida, actualiza y refresca la tabla. |
+| Precondiciones | 1. El actor inició sesión y cuenta con `catalogs:manage`.<br>2. La entrada existe en **Áreas**. |
+| Inferencia desde código | **Directa.** PUT `/api/admin/catalogs/departments/:id` → `updateCatalogEntry`. |
+| Flujo principal | 1. **Administrador:** abre **Áreas** y selecciona **Editar registro** en una fila **(ver E1)**.<br>2. **Nexus:** presenta los valores existentes y únicamente el campo **Nombre**.<br>3. **Administrador:** modifica los datos y selecciona **Actualizar** **(ver A1)**.<br>4. **Nexus:** normaliza, valida y actualiza la entrada de Áreas.<br>5. **Nexus:** confirma y refresca la tabla de Áreas. |
+| Flujos alternativos | **A1 — Datos inválidos (después del paso 3):**<br>1. **Nexus:** señala los campos requeridos y conserva la entrada sin cambios.<br>2. **Administrador:** corrige y vuelve a confirmar; continúa en el paso 4. |
+| Excepciones | **E1 — Acceso, recurso o entrada rechazados:**<br>1. **Nexus:** rechaza la operación sin exponer otro catálogo ni producir cambios parciales.<br>2. **Administrador:** reconoce el rechazo; termina el caso de uso. |
+| Postcondiciones (éxito y fallo) | 1. **Éxito:** La entrada de Áreas conserva los cambios admitidos.<br>2. **Fallo:** La entrada conserva su estado anterior. |
+| Requisitos relacionados | `RF-CAT-024`, `RN-001`, `RN-006`. |
+
+#### `CU-CAT-24` — Consultar rol
+
+| Sección | Información relevante |
+| --- | --- |
+| Identificador | `CU-CAT-24` |
+| Nombre | Consultar rol. |
+| Actor y disparador | **Actor:** Administrador del sistema del área Sistemas. **Disparador:** selecciona **Roles** en el submenú **Catálogos auxiliares**. |
+| Participación de actor y sistema | **Actor:** abre y revisa el listado de Roles.<br>**Nexus:** autoriza, valida el recurso registrado y devuelve sus entradas. |
+| Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con `catalogs:manage` y pertenece al contexto administrativo autorizado. |
+| Inferencia desde código | **Directa.** GET `/api/admin/catalogs/roles` → `findAllCatalogEntries`. |
+| Flujo principal | 1. **Administrador:** selecciona **Roles** en el submenú **Catálogos auxiliares** **(ver E1)**.<br>2. **Nexus:** valida `catalogs:manage` y el identificador `roles` contra la lista blanca.<br>3. **Nexus:** muestra la pantalla y tabla exclusivas de Roles.<br>4. **Administrador:** revisa las entradas sin modificar datos. |
+| Excepciones | **E1 — Acceso, recurso o entrada rechazados:**<br>1. **Nexus:** rechaza la operación sin exponer otro catálogo ni producir cambios parciales.<br>2. **Administrador:** reconoce el rechazo; termina el caso de uso. |
+| Postcondiciones (éxito y fallo) | 1. **Éxito:** La tabla muestra exclusivamente las entradas de Roles.<br>2. **Fallo:** No se exponen datos ni modelos no autorizados. |
+| Requisitos relacionados | `RF-CAT-022`, `RN-001`, `RN-006`. |
+
+#### `CU-CAT-25` — Crear rol
+
+| Sección | Información relevante |
+| --- | --- |
+| Identificador | `CU-CAT-25` |
+| Nombre | Crear rol. |
+| Actor y disparador | **Actor:** Administrador del sistema del área Sistemas. **Disparador:** selecciona **Nuevo** en la pantalla **Roles**. |
+| Participación de actor y sistema | **Actor:** captura y confirma una nueva entrada de Roles.<br>**Nexus:** autoriza, limita los campos, valida, crea y refresca la tabla. |
+| Precondiciones | 1. El actor inició sesión y cuenta con `catalogs:manage`.<br>2. La pantalla seleccionada corresponde exactamente a **Roles**. |
+| Inferencia desde código | **Directa.** POST `/api/admin/catalogs/roles` → `createCatalogEntry`. |
+| Flujo principal | 1. **Administrador:** abre la pantalla **Roles** y selecciona **Nuevo** **(ver E1)**.<br>2. **Nexus:** presenta únicamente el campo **Nombre**.<br>3. **Administrador:** captura los datos y selecciona **Guardar** **(ver A1)**.<br>4. **Nexus:** normaliza, valida y crea la entrada de Roles.<br>5. **Nexus:** confirma y refresca la tabla de Roles. |
+| Flujos alternativos | **A1 — Datos inválidos (después del paso 3):**<br>1. **Nexus:** señala los campos requeridos sin crear la entrada.<br>2. **Administrador:** corrige y vuelve a confirmar; continúa en el paso 4. |
+| Excepciones | **E1 — Acceso, recurso o entrada rechazados:**<br>1. **Nexus:** rechaza la operación sin exponer otro catálogo ni producir cambios parciales.<br>2. **Administrador:** reconoce el rechazo; termina el caso de uso. |
+| Postcondiciones (éxito y fallo) | 1. **Éxito:** La nueva entrada de Roles queda registrada y visible.<br>2. **Fallo:** No se crea ninguna entrada. |
+| Requisitos relacionados | `RF-CAT-023`, `RN-001`, `RN-006`. |
+
+#### `CU-CAT-26` — Editar rol
+
+| Sección | Información relevante |
+| --- | --- |
+| Identificador | `CU-CAT-26` |
+| Nombre | Editar rol. |
+| Actor y disparador | **Actor:** Administrador del sistema del área Sistemas. **Disparador:** selecciona **Editar registro** en la pantalla **Roles**. |
+| Participación de actor y sistema | **Actor:** modifica y confirma una entrada de Roles.<br>**Nexus:** autoriza, limita los campos, valida, actualiza y refresca la tabla. |
+| Precondiciones | 1. El actor inició sesión y cuenta con `catalogs:manage`.<br>2. La entrada existe en **Roles**. |
+| Inferencia desde código | **Directa.** PUT `/api/admin/catalogs/roles/:id` → `updateCatalogEntry`. |
+| Flujo principal | 1. **Administrador:** abre **Roles** y selecciona **Editar registro** en una fila **(ver E1)**.<br>2. **Nexus:** presenta los valores existentes y únicamente el campo **Nombre**.<br>3. **Administrador:** modifica los datos y selecciona **Actualizar** **(ver A1)**.<br>4. **Nexus:** normaliza, valida y actualiza la entrada de Roles.<br>5. **Nexus:** confirma y refresca la tabla de Roles. |
+| Flujos alternativos | **A1 — Datos inválidos (después del paso 3):**<br>1. **Nexus:** señala los campos requeridos y conserva la entrada sin cambios.<br>2. **Administrador:** corrige y vuelve a confirmar; continúa en el paso 4. |
+| Excepciones | **E1 — Acceso, recurso o entrada rechazados:**<br>1. **Nexus:** rechaza la operación sin exponer otro catálogo ni producir cambios parciales.<br>2. **Administrador:** reconoce el rechazo; termina el caso de uso. |
+| Postcondiciones (éxito y fallo) | 1. **Éxito:** La entrada de Roles conserva los cambios admitidos.<br>2. **Fallo:** La entrada conserva su estado anterior. |
+| Requisitos relacionados | `RF-CAT-024`, `RN-001`, `RN-006`. |
+
+#### `CU-CAT-27` — Consultar presentación
+
+| Sección | Información relevante |
+| --- | --- |
+| Identificador | `CU-CAT-27` |
+| Nombre | Consultar presentación. |
+| Actor y disparador | **Actor:** Administrador del sistema del área Sistemas. **Disparador:** selecciona **Presentaciones** en el submenú **Catálogos auxiliares**. |
+| Participación de actor y sistema | **Actor:** abre y revisa el listado de Presentaciones.<br>**Nexus:** autoriza, valida el recurso registrado y devuelve sus entradas. |
+| Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con `catalogs:manage` y pertenece al contexto administrativo autorizado. |
+| Inferencia desde código | **Directa.** GET `/api/admin/catalogs/presentations` → `findAllCatalogEntries`. |
+| Flujo principal | 1. **Administrador:** selecciona **Presentaciones** en el submenú **Catálogos auxiliares** **(ver E1)**.<br>2. **Nexus:** valida `catalogs:manage` y el identificador `presentations` contra la lista blanca.<br>3. **Nexus:** muestra la pantalla y tabla exclusivas de Presentaciones.<br>4. **Administrador:** revisa las entradas sin modificar datos. |
+| Excepciones | **E1 — Acceso, recurso o entrada rechazados:**<br>1. **Nexus:** rechaza la operación sin exponer otro catálogo ni producir cambios parciales.<br>2. **Administrador:** reconoce el rechazo; termina el caso de uso. |
+| Postcondiciones (éxito y fallo) | 1. **Éxito:** La tabla muestra exclusivamente las entradas de Presentaciones.<br>2. **Fallo:** No se exponen datos ni modelos no autorizados. |
+| Requisitos relacionados | `RF-CAT-022`, `RN-001`, `RN-006`. |
+
+#### `CU-CAT-28` — Crear presentación
+
+| Sección | Información relevante |
+| --- | --- |
+| Identificador | `CU-CAT-28` |
+| Nombre | Crear presentación. |
+| Actor y disparador | **Actor:** Administrador del sistema del área Sistemas. **Disparador:** selecciona **Nuevo** en la pantalla **Presentaciones**. |
+| Participación de actor y sistema | **Actor:** captura y confirma una nueva entrada de Presentaciones.<br>**Nexus:** autoriza, limita los campos, valida, crea y refresca la tabla. |
+| Precondiciones | 1. El actor inició sesión y cuenta con `catalogs:manage`.<br>2. La pantalla seleccionada corresponde exactamente a **Presentaciones**. |
+| Inferencia desde código | **Directa.** POST `/api/admin/catalogs/presentations` → `createCatalogEntry`. |
+| Flujo principal | 1. **Administrador:** abre la pantalla **Presentaciones** y selecciona **Nuevo** **(ver E1)**.<br>2. **Nexus:** presenta únicamente el campo **Nombre**.<br>3. **Administrador:** captura los datos y selecciona **Guardar** **(ver A1)**.<br>4. **Nexus:** normaliza, valida y crea la entrada de Presentaciones.<br>5. **Nexus:** confirma y refresca la tabla de Presentaciones. |
+| Flujos alternativos | **A1 — Datos inválidos (después del paso 3):**<br>1. **Nexus:** señala los campos requeridos sin crear la entrada.<br>2. **Administrador:** corrige y vuelve a confirmar; continúa en el paso 4. |
+| Excepciones | **E1 — Acceso, recurso o entrada rechazados:**<br>1. **Nexus:** rechaza la operación sin exponer otro catálogo ni producir cambios parciales.<br>2. **Administrador:** reconoce el rechazo; termina el caso de uso. |
+| Postcondiciones (éxito y fallo) | 1. **Éxito:** La nueva entrada de Presentaciones queda registrada y visible.<br>2. **Fallo:** No se crea ninguna entrada. |
+| Requisitos relacionados | `RF-CAT-023`, `RN-001`, `RN-006`. |
+
+#### `CU-CAT-29` — Editar presentación
+
+| Sección | Información relevante |
+| --- | --- |
+| Identificador | `CU-CAT-29` |
+| Nombre | Editar presentación. |
+| Actor y disparador | **Actor:** Administrador del sistema del área Sistemas. **Disparador:** selecciona **Editar registro** en la pantalla **Presentaciones**. |
+| Participación de actor y sistema | **Actor:** modifica y confirma una entrada de Presentaciones.<br>**Nexus:** autoriza, limita los campos, valida, actualiza y refresca la tabla. |
+| Precondiciones | 1. El actor inició sesión y cuenta con `catalogs:manage`.<br>2. La entrada existe en **Presentaciones**. |
+| Inferencia desde código | **Directa.** PUT `/api/admin/catalogs/presentations/:id` → `updateCatalogEntry`. |
+| Flujo principal | 1. **Administrador:** abre **Presentaciones** y selecciona **Editar registro** en una fila **(ver E1)**.<br>2. **Nexus:** presenta los valores existentes y únicamente el campo **Nombre**.<br>3. **Administrador:** modifica los datos y selecciona **Actualizar** **(ver A1)**.<br>4. **Nexus:** normaliza, valida y actualiza la entrada de Presentaciones.<br>5. **Nexus:** confirma y refresca la tabla de Presentaciones. |
+| Flujos alternativos | **A1 — Datos inválidos (después del paso 3):**<br>1. **Nexus:** señala los campos requeridos y conserva la entrada sin cambios.<br>2. **Administrador:** corrige y vuelve a confirmar; continúa en el paso 4. |
+| Excepciones | **E1 — Acceso, recurso o entrada rechazados:**<br>1. **Nexus:** rechaza la operación sin exponer otro catálogo ni producir cambios parciales.<br>2. **Administrador:** reconoce el rechazo; termina el caso de uso. |
+| Postcondiciones (éxito y fallo) | 1. **Éxito:** La entrada de Presentaciones conserva los cambios admitidos.<br>2. **Fallo:** La entrada conserva su estado anterior. |
+| Requisitos relacionados | `RF-CAT-024`, `RN-001`, `RN-006`. |
+
+#### `CU-CAT-30` — Consultar unidad de medida
+
+| Sección | Información relevante |
+| --- | --- |
+| Identificador | `CU-CAT-30` |
+| Nombre | Consultar unidad de medida. |
+| Actor y disparador | **Actor:** Administrador del sistema del área Sistemas. **Disparador:** selecciona **Unidades de medida** en el submenú **Catálogos auxiliares**. |
+| Participación de actor y sistema | **Actor:** abre y revisa el listado de Unidades de medida.<br>**Nexus:** autoriza, valida el recurso registrado y devuelve sus entradas. |
+| Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con `catalogs:manage` y pertenece al contexto administrativo autorizado. |
+| Inferencia desde código | **Directa.** GET `/api/admin/catalogs/unit-measures` → `findAllCatalogEntries`. |
+| Flujo principal | 1. **Administrador:** selecciona **Unidades de medida** en el submenú **Catálogos auxiliares** **(ver E1)**.<br>2. **Nexus:** valida `catalogs:manage` y el identificador `unit-measures` contra la lista blanca.<br>3. **Nexus:** muestra la pantalla y tabla exclusivas de Unidades de medida.<br>4. **Administrador:** revisa las entradas sin modificar datos. |
+| Excepciones | **E1 — Acceso, recurso o entrada rechazados:**<br>1. **Nexus:** rechaza la operación sin exponer otro catálogo ni producir cambios parciales.<br>2. **Administrador:** reconoce el rechazo; termina el caso de uso. |
+| Postcondiciones (éxito y fallo) | 1. **Éxito:** La tabla muestra exclusivamente las entradas de Unidades de medida.<br>2. **Fallo:** No se exponen datos ni modelos no autorizados. |
+| Requisitos relacionados | `RF-CAT-022`, `RN-001`, `RN-006`. |
+
+#### `CU-CAT-31` — Crear unidad de medida
+
+| Sección | Información relevante |
+| --- | --- |
+| Identificador | `CU-CAT-31` |
+| Nombre | Crear unidad de medida. |
+| Actor y disparador | **Actor:** Administrador del sistema del área Sistemas. **Disparador:** selecciona **Nuevo** en la pantalla **Unidades de medida**. |
+| Participación de actor y sistema | **Actor:** captura y confirma una nueva entrada de Unidades de medida.<br>**Nexus:** autoriza, limita los campos, valida, crea y refresca la tabla. |
+| Precondiciones | 1. El actor inició sesión y cuenta con `catalogs:manage`.<br>2. La pantalla seleccionada corresponde exactamente a **Unidades de medida**. |
+| Inferencia desde código | **Directa.** POST `/api/admin/catalogs/unit-measures` → `createCatalogEntry`. |
+| Flujo principal | 1. **Administrador:** abre la pantalla **Unidades de medida** y selecciona **Nuevo** **(ver E1)**.<br>2. **Nexus:** presenta únicamente los campos **Nombre** y **Símbolo**.<br>3. **Administrador:** captura los datos y selecciona **Guardar** **(ver A1)**.<br>4. **Nexus:** normaliza, valida y crea la entrada de Unidades de medida.<br>5. **Nexus:** confirma y refresca la tabla de Unidades de medida. |
+| Flujos alternativos | **A1 — Datos inválidos (después del paso 3):**<br>1. **Nexus:** señala los campos requeridos sin crear la entrada.<br>2. **Administrador:** corrige y vuelve a confirmar; continúa en el paso 4. |
+| Excepciones | **E1 — Acceso, recurso o entrada rechazados:**<br>1. **Nexus:** rechaza la operación sin exponer otro catálogo ni producir cambios parciales.<br>2. **Administrador:** reconoce el rechazo; termina el caso de uso. |
+| Postcondiciones (éxito y fallo) | 1. **Éxito:** La nueva entrada de Unidades de medida queda registrada y visible.<br>2. **Fallo:** No se crea ninguna entrada. |
+| Requisitos relacionados | `RF-CAT-023`, `RN-001`, `RN-006`. |
+
+#### `CU-CAT-32` — Editar unidad de medida
+
+| Sección | Información relevante |
+| --- | --- |
+| Identificador | `CU-CAT-32` |
+| Nombre | Editar unidad de medida. |
+| Actor y disparador | **Actor:** Administrador del sistema del área Sistemas. **Disparador:** selecciona **Editar registro** en la pantalla **Unidades de medida**. |
+| Participación de actor y sistema | **Actor:** modifica y confirma una entrada de Unidades de medida.<br>**Nexus:** autoriza, limita los campos, valida, actualiza y refresca la tabla. |
+| Precondiciones | 1. El actor inició sesión y cuenta con `catalogs:manage`.<br>2. La entrada existe en **Unidades de medida**. |
+| Inferencia desde código | **Directa.** PUT `/api/admin/catalogs/unit-measures/:id` → `updateCatalogEntry`. |
+| Flujo principal | 1. **Administrador:** abre **Unidades de medida** y selecciona **Editar registro** en una fila **(ver E1)**.<br>2. **Nexus:** presenta los valores existentes y únicamente los campos **Nombre** y **Símbolo**.<br>3. **Administrador:** modifica los datos y selecciona **Actualizar** **(ver A1)**.<br>4. **Nexus:** normaliza, valida y actualiza la entrada de Unidades de medida.<br>5. **Nexus:** confirma y refresca la tabla de Unidades de medida. |
+| Flujos alternativos | **A1 — Datos inválidos (después del paso 3):**<br>1. **Nexus:** señala los campos requeridos y conserva la entrada sin cambios.<br>2. **Administrador:** corrige y vuelve a confirmar; continúa en el paso 4. |
+| Excepciones | **E1 — Acceso, recurso o entrada rechazados:**<br>1. **Nexus:** rechaza la operación sin exponer otro catálogo ni producir cambios parciales.<br>2. **Administrador:** reconoce el rechazo; termina el caso de uso. |
+| Postcondiciones (éxito y fallo) | 1. **Éxito:** La entrada de Unidades de medida conserva los cambios admitidos.<br>2. **Fallo:** La entrada conserva su estado anterior. |
+| Requisitos relacionados | `RF-CAT-024`, `RN-001`, `RN-006`. |
+
+#### `CU-CAT-33` — Consultar motivo de ajuste
+
+| Sección | Información relevante |
+| --- | --- |
+| Identificador | `CU-CAT-33` |
+| Nombre | Consultar motivo de ajuste. |
+| Actor y disparador | **Actor:** Administrador del sistema del área Sistemas. **Disparador:** selecciona **Motivos de ajuste** en el submenú **Catálogos auxiliares**. |
+| Participación de actor y sistema | **Actor:** abre y revisa el listado de Motivos de ajuste.<br>**Nexus:** autoriza, valida el recurso registrado y devuelve sus entradas. |
+| Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con `catalogs:manage` y pertenece al contexto administrativo autorizado. |
+| Inferencia desde código | **Directa.** GET `/api/admin/catalogs/reasons` → `findAllCatalogEntries`. |
+| Flujo principal | 1. **Administrador:** selecciona **Motivos de ajuste** en el submenú **Catálogos auxiliares** **(ver E1)**.<br>2. **Nexus:** valida `catalogs:manage` y el identificador `reasons` contra la lista blanca.<br>3. **Nexus:** muestra la pantalla y tabla exclusivas de Motivos de ajuste.<br>4. **Administrador:** revisa las entradas sin modificar datos. |
+| Excepciones | **E1 — Acceso, recurso o entrada rechazados:**<br>1. **Nexus:** rechaza la operación sin exponer otro catálogo ni producir cambios parciales.<br>2. **Administrador:** reconoce el rechazo; termina el caso de uso. |
+| Postcondiciones (éxito y fallo) | 1. **Éxito:** La tabla muestra exclusivamente las entradas de Motivos de ajuste.<br>2. **Fallo:** No se exponen datos ni modelos no autorizados. |
+| Requisitos relacionados | `RF-CAT-022`, `RN-001`, `RN-006`. |
+
+#### `CU-CAT-34` — Crear motivo de ajuste
+
+| Sección | Información relevante |
+| --- | --- |
+| Identificador | `CU-CAT-34` |
+| Nombre | Crear motivo de ajuste. |
+| Actor y disparador | **Actor:** Administrador del sistema del área Sistemas. **Disparador:** selecciona **Nuevo** en la pantalla **Motivos de ajuste**. |
+| Participación de actor y sistema | **Actor:** captura y confirma una nueva entrada de Motivos de ajuste.<br>**Nexus:** autoriza, limita los campos, valida, crea y refresca la tabla. |
+| Precondiciones | 1. El actor inició sesión y cuenta con `catalogs:manage`.<br>2. La pantalla seleccionada corresponde exactamente a **Motivos de ajuste**. |
+| Inferencia desde código | **Directa.** POST `/api/admin/catalogs/reasons` → `createCatalogEntry`. |
+| Flujo principal | 1. **Administrador:** abre la pantalla **Motivos de ajuste** y selecciona **Nuevo** **(ver E1)**.<br>2. **Nexus:** presenta únicamente los campos **Nombre** y **Activo**.<br>3. **Administrador:** captura los datos y selecciona **Guardar** **(ver A1)**.<br>4. **Nexus:** normaliza, valida y crea la entrada de Motivos de ajuste.<br>5. **Nexus:** confirma y refresca la tabla de Motivos de ajuste. |
+| Flujos alternativos | **A1 — Datos inválidos (después del paso 3):**<br>1. **Nexus:** señala los campos requeridos sin crear la entrada.<br>2. **Administrador:** corrige y vuelve a confirmar; continúa en el paso 4. |
+| Excepciones | **E1 — Acceso, recurso o entrada rechazados:**<br>1. **Nexus:** rechaza la operación sin exponer otro catálogo ni producir cambios parciales.<br>2. **Administrador:** reconoce el rechazo; termina el caso de uso. |
+| Postcondiciones (éxito y fallo) | 1. **Éxito:** La nueva entrada de Motivos de ajuste queda registrada y visible.<br>2. **Fallo:** No se crea ninguna entrada. |
+| Requisitos relacionados | `RF-CAT-023`, `RN-001`, `RN-006`. |
+
+#### `CU-CAT-35` — Editar motivo de ajuste
+
+| Sección | Información relevante |
+| --- | --- |
+| Identificador | `CU-CAT-35` |
+| Nombre | Editar motivo de ajuste. |
+| Actor y disparador | **Actor:** Administrador del sistema del área Sistemas. **Disparador:** selecciona **Editar registro** en la pantalla **Motivos de ajuste**. |
+| Participación de actor y sistema | **Actor:** modifica y confirma una entrada de Motivos de ajuste.<br>**Nexus:** autoriza, limita los campos, valida, actualiza y refresca la tabla. |
+| Precondiciones | 1. El actor inició sesión y cuenta con `catalogs:manage`.<br>2. La entrada existe en **Motivos de ajuste**. |
+| Inferencia desde código | **Directa.** PUT `/api/admin/catalogs/reasons/:id` → `updateCatalogEntry`. |
+| Flujo principal | 1. **Administrador:** abre **Motivos de ajuste** y selecciona **Editar registro** en una fila **(ver E1)**.<br>2. **Nexus:** presenta los valores existentes y únicamente los campos **Nombre** y **Activo**.<br>3. **Administrador:** modifica los datos y selecciona **Actualizar** **(ver A1)**.<br>4. **Nexus:** normaliza, valida y actualiza la entrada de Motivos de ajuste.<br>5. **Nexus:** confirma y refresca la tabla de Motivos de ajuste. |
+| Flujos alternativos | **A1 — Datos inválidos (después del paso 3):**<br>1. **Nexus:** señala los campos requeridos y conserva la entrada sin cambios.<br>2. **Administrador:** corrige y vuelve a confirmar; continúa en el paso 4. |
+| Excepciones | **E1 — Acceso, recurso o entrada rechazados:**<br>1. **Nexus:** rechaza la operación sin exponer otro catálogo ni producir cambios parciales.<br>2. **Administrador:** reconoce el rechazo; termina el caso de uso. |
+| Postcondiciones (éxito y fallo) | 1. **Éxito:** La entrada de Motivos de ajuste conserva los cambios admitidos.<br>2. **Fallo:** La entrada conserva su estado anterior. |
+| Requisitos relacionados | `RF-CAT-024`, `RN-001`, `RN-006`. |
+
+#### `CU-CAT-36` — Consultar estado de cumplimiento
+
+| Sección | Información relevante |
+| --- | --- |
+| Identificador | `CU-CAT-36` |
+| Nombre | Consultar estado de cumplimiento. |
+| Actor y disparador | **Actor:** Administrador del sistema del área Sistemas. **Disparador:** selecciona **Estados de cumplimiento** en el submenú **Catálogos auxiliares**. |
+| Participación de actor y sistema | **Actor:** abre y revisa el listado de Estados de cumplimiento.<br>**Nexus:** autoriza, valida el recurso registrado y devuelve sus entradas. |
+| Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con `catalogs:manage` y pertenece al contexto administrativo autorizado. |
+| Inferencia desde código | **Directa.** GET `/api/admin/catalogs/fulfillment-statuses` → `findAllCatalogEntries`. |
+| Flujo principal | 1. **Administrador:** selecciona **Estados de cumplimiento** en el submenú **Catálogos auxiliares** **(ver E1)**.<br>2. **Nexus:** valida `catalogs:manage` y el identificador `fulfillment-statuses` contra la lista blanca.<br>3. **Nexus:** muestra la pantalla y tabla exclusivas de Estados de cumplimiento.<br>4. **Administrador:** revisa las entradas sin modificar datos. |
+| Excepciones | **E1 — Acceso, recurso o entrada rechazados:**<br>1. **Nexus:** rechaza la operación sin exponer otro catálogo ni producir cambios parciales.<br>2. **Administrador:** reconoce el rechazo; termina el caso de uso. |
+| Postcondiciones (éxito y fallo) | 1. **Éxito:** La tabla muestra exclusivamente las entradas de Estados de cumplimiento.<br>2. **Fallo:** No se exponen datos ni modelos no autorizados. |
+| Requisitos relacionados | `RF-CAT-022`, `RN-001`, `RN-006`. |
+
+#### `CU-CAT-37` — Crear estado de cumplimiento
+
+| Sección | Información relevante |
+| --- | --- |
+| Identificador | `CU-CAT-37` |
+| Nombre | Crear estado de cumplimiento. |
+| Actor y disparador | **Actor:** Administrador del sistema del área Sistemas. **Disparador:** selecciona **Nuevo** en la pantalla **Estados de cumplimiento**. |
+| Participación de actor y sistema | **Actor:** captura y confirma una nueva entrada de Estados de cumplimiento.<br>**Nexus:** autoriza, limita los campos, valida, crea y refresca la tabla. |
+| Precondiciones | 1. El actor inició sesión y cuenta con `catalogs:manage`.<br>2. La pantalla seleccionada corresponde exactamente a **Estados de cumplimiento**. |
+| Inferencia desde código | **Directa.** POST `/api/admin/catalogs/fulfillment-statuses` → `createCatalogEntry`. |
+| Flujo principal | 1. **Administrador:** abre la pantalla **Estados de cumplimiento** y selecciona **Nuevo** **(ver E1)**.<br>2. **Nexus:** presenta únicamente el campo **Nombre**.<br>3. **Administrador:** captura los datos y selecciona **Guardar** **(ver A1)**.<br>4. **Nexus:** normaliza, valida y crea la entrada de Estados de cumplimiento.<br>5. **Nexus:** confirma y refresca la tabla de Estados de cumplimiento. |
+| Flujos alternativos | **A1 — Datos inválidos (después del paso 3):**<br>1. **Nexus:** señala los campos requeridos sin crear la entrada.<br>2. **Administrador:** corrige y vuelve a confirmar; continúa en el paso 4. |
+| Excepciones | **E1 — Acceso, recurso o entrada rechazados:**<br>1. **Nexus:** rechaza la operación sin exponer otro catálogo ni producir cambios parciales.<br>2. **Administrador:** reconoce el rechazo; termina el caso de uso. |
+| Postcondiciones (éxito y fallo) | 1. **Éxito:** La nueva entrada de Estados de cumplimiento queda registrada y visible.<br>2. **Fallo:** No se crea ninguna entrada. |
+| Requisitos relacionados | `RF-CAT-023`, `RN-001`, `RN-006`. |
+
+#### `CU-CAT-38` — Editar estado de cumplimiento
+
+| Sección | Información relevante |
+| --- | --- |
+| Identificador | `CU-CAT-38` |
+| Nombre | Editar estado de cumplimiento. |
+| Actor y disparador | **Actor:** Administrador del sistema del área Sistemas. **Disparador:** selecciona **Editar registro** en la pantalla **Estados de cumplimiento**. |
+| Participación de actor y sistema | **Actor:** modifica y confirma una entrada de Estados de cumplimiento.<br>**Nexus:** autoriza, limita los campos, valida, actualiza y refresca la tabla. |
+| Precondiciones | 1. El actor inició sesión y cuenta con `catalogs:manage`.<br>2. La entrada existe en **Estados de cumplimiento**. |
+| Inferencia desde código | **Directa.** PUT `/api/admin/catalogs/fulfillment-statuses/:id` → `updateCatalogEntry`. |
+| Flujo principal | 1. **Administrador:** abre **Estados de cumplimiento** y selecciona **Editar registro** en una fila **(ver E1)**.<br>2. **Nexus:** presenta los valores existentes y únicamente el campo **Nombre**.<br>3. **Administrador:** modifica los datos y selecciona **Actualizar** **(ver A1)**.<br>4. **Nexus:** normaliza, valida y actualiza la entrada de Estados de cumplimiento.<br>5. **Nexus:** confirma y refresca la tabla de Estados de cumplimiento. |
+| Flujos alternativos | **A1 — Datos inválidos (después del paso 3):**<br>1. **Nexus:** señala los campos requeridos y conserva la entrada sin cambios.<br>2. **Administrador:** corrige y vuelve a confirmar; continúa en el paso 4. |
+| Excepciones | **E1 — Acceso, recurso o entrada rechazados:**<br>1. **Nexus:** rechaza la operación sin exponer otro catálogo ni producir cambios parciales.<br>2. **Administrador:** reconoce el rechazo; termina el caso de uso. |
+| Postcondiciones (éxito y fallo) | 1. **Éxito:** La entrada de Estados de cumplimiento conserva los cambios admitidos.<br>2. **Fallo:** La entrada conserva su estado anterior. |
+| Requisitos relacionados | `RF-CAT-024`, `RN-001`, `RN-006`. |
+
 ### Grupo funcional ENT — Compras de material
 
 Cada ficha representa una sola acción sobre una sola entidad. Los elementos compartidos se reutilizan en la implementación, pero no fusionan objetivos del actor.
@@ -1343,7 +1643,7 @@ Cada ficha representa una sola acción sobre una sola entidad. Los elementos com
 
 | Tema compartido | Casos | Elementos reutilizables que deben evaluarse primero | Diferencia que debe conservarse |
 | --- | --- | --- | --- |
-| CRUD de identidades y catálogos | `CU-IDA-01` a `CU-IDA-09`; `CU-CAT-01` a `CU-CAT-20` | Fábricas CRUD, listados, formularios, validación y refresco de tabla. | Permisos, identidad del recurso, relaciones y política de eliminación. |
+| CRUD de identidades y catálogos | `CU-IDA-01` a `CU-IDA-09`; `CU-CAT-01` a `CU-CAT-38` | Fábricas CRUD, listados, formularios, validación y refresco de tabla. | Permisos, identidad del recurso, relaciones y política de eliminación. |
 | Documentos con detalles | `CU-ENT-02`, `CU-ENT-03`, `CU-SAL-02` a `CU-SAL-04` y `CU-SAL-08` a `CU-SAL-10` | Encabezado, modal/formulario, tabla de detalles, DTO y transacción coordinadora. | La entrada incrementa stock al confirmarse; la salida no lo descuenta hasta surtir. |
 | Operación de salidas | `CU-SAL-02` a `CU-SAL-06` y `CU-SAL-08` a `CU-SAL-12` | Proceso de material replicable para merma, componentes informativos y coordinación de movimientos. | Inventario, conversión, permisos, estados y cantidades acumuladas del contexto. |
 | Consulta y exportación | `CU-REP-01` a `CU-REP-15` y casos de consulta de cada familia | Filtros, paginación, dependencias entre selects y utilidades Excel. | Columnas, agrupaciones, fórmulas y permiso de cada reporte. |

@@ -74,18 +74,6 @@ const MANIFESTS = Object.freeze({
         manualValidationMatrix,
         manualErrorCatalog
     ],
-    'manual-reportes': [
-        'docs/user-manual/actors/reporting.md',
-        manualOverview,
-        manualProcedures,
-        authenticationCases,
-        catalogCases,
-        purchaseCases,
-        issueCases,
-        reportCases,
-        manualValidationMatrix,
-        manualErrorCatalog
-    ],
     requisitos: [
         'docs/requirements/index.md',
         'docs/requirements/vision-scope-and-requirements.md',
@@ -269,7 +257,7 @@ const insertAfterDocumentData = (content, insertion) => {
 
 if ((requestedPublication !== 'todos' && !MANIFESTS[requestedPublication])
     || (checkOnly ? requestedFormat && !formats.has(requestedFormat) : !formats.has(requestedFormat))) {
-    console.error('Uso: npm run docs:export -- <todos|manual-usuario|manual-administrador|manual-almacen|manual-reportes|requisitos|datos|arquitectura|pruebas> [docx|pdf] [--check]');
+    console.error('Uso: npm run docs:export -- <todos|manual-usuario|manual-administrador|manual-almacen|requisitos|datos|arquitectura|pruebas> [docx|pdf] [--check]');
     process.exit(1);
 }
 

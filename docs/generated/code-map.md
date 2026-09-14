@@ -14,37 +14,39 @@ cada archivo individual.
 
 ```mermaid
 flowchart LR
-    controllers["controllers (33 módulos)"] --> constants["constants (9 módulos)"]
-    controllers["controllers (33 módulos)"] --> dtos["dtos (10 módulos)"]
-    controllers["controllers (33 módulos)"] --> messages["messages (2 módulos)"]
-    controllers["controllers (33 módulos)"] --> services["services (50 módulos)"]
-    controllers["controllers (33 módulos)"] --> utils["utils (11 módulos)"]
+    controllers["controllers (35 módulos)"] --> constants["constants (10 módulos)"]
+    controllers["controllers (35 módulos)"] --> dtos["dtos (10 módulos)"]
+    controllers["controllers (35 módulos)"] --> messages["messages (2 módulos)"]
+    controllers["controllers (35 módulos)"] --> services["services (51 módulos)"]
+    controllers["controllers (35 módulos)"] --> utils["utils (11 módulos)"]
     dtos["dtos (10 módulos)"] --> utils["utils (11 módulos)"]
-    errors["errors (17 módulos)"] --> public["public (179 módulos)"]
-    middleware["middleware (5 módulos)"] --> constants["constants (9 módulos)"]
+    errors["errors (18 módulos)"] --> messages["messages (2 módulos)"]
+    errors["errors (18 módulos)"] --> public["public (185 módulos)"]
+    middleware["middleware (5 módulos)"] --> constants["constants (10 módulos)"]
     middleware["middleware (5 módulos)"] --> messages["messages (2 módulos)"]
-    middleware["middleware (5 módulos)"] --> services["services (50 módulos)"]
+    middleware["middleware (5 módulos)"] --> services["services (51 módulos)"]
     middleware["middleware (5 módulos)"] --> utils["utils (11 módulos)"]
     repository["repository (1 módulos)"] --> lib["lib (2 módulos)"]
-    routes["routes (37 módulos)"] --> constants["constants (9 módulos)"]
-    routes["routes (37 módulos)"] --> controllers["controllers (33 módulos)"]
-    routes["routes (37 módulos)"] --> middleware["middleware (5 módulos)"]
-    routes["routes (37 módulos)"] --> validators["validators (14 módulos)"]
-    services["services (50 módulos)"] --> constants["constants (9 módulos)"]
-    services["services (50 módulos)"] --> dtos["dtos (10 módulos)"]
-    services["services (50 módulos)"] --> errors["errors (17 módulos)"]
-    services["services (50 módulos)"] --> repository["repository (1 módulos)"]
-    services["services (50 módulos)"] --> utils["utils (11 módulos)"]
-    utils["utils (11 módulos)"] --> constants["constants (9 módulos)"]
-    utils["utils (11 módulos)"] --> errors["errors (17 módulos)"]
-    validators["validators (14 módulos)"] --> messages["messages (2 módulos)"]
+    routes["routes (39 módulos)"] --> constants["constants (10 módulos)"]
+    routes["routes (39 módulos)"] --> controllers["controllers (35 módulos)"]
+    routes["routes (39 módulos)"] --> middleware["middleware (5 módulos)"]
+    routes["routes (39 módulos)"] --> validators["validators (15 módulos)"]
+    services["services (51 módulos)"] --> constants["constants (10 módulos)"]
+    services["services (51 módulos)"] --> dtos["dtos (10 módulos)"]
+    services["services (51 módulos)"] --> errors["errors (18 módulos)"]
+    services["services (51 módulos)"] --> repository["repository (1 módulos)"]
+    services["services (51 módulos)"] --> utils["utils (11 módulos)"]
+    utils["utils (11 módulos)"] --> constants["constants (10 módulos)"]
+    utils["utils (11 módulos)"] --> errors["errors (18 módulos)"]
+    validators["validators (15 módulos)"] --> constants["constants (10 módulos)"]
+    validators["validators (15 módulos)"] --> messages["messages (2 módulos)"]
 ```
 
 > Alcance: módulos JavaScript bajo `src/`. Los recursos EJS, CSS y el esquema Prisma se
 > explican en la documentación curada, porque una lista automática no describe sus
 > decisiones de diseño.
 
-## Endpoints API (61)
+## Endpoints API (64)
 
 | Método | Ruta | Definición |
 | --- | --- | --- |
@@ -109,8 +111,11 @@ flowchart LR
 | `GET` | `/api/admin/reports/movements/materials/excel` | [`src/routes/api/admin/reportApiRoute.js`](../../src/routes/api/admin/reportApiRoute.js) |
 | `GET` | `/api/admin/reports/movements/wastes/excel` | [`src/routes/api/admin/reportApiRoute.js`](../../src/routes/api/admin/reportApiRoute.js) |
 | `GET` | `/api/admin/reports/users/excel` | [`src/routes/api/admin/reportApiRoute.js`](../../src/routes/api/admin/reportApiRoute.js) |
+| `GET` | `/api/admin/catalogs/:catalog` | [`src/routes/api/admin/catalogApiRoute.js`](../../src/routes/api/admin/catalogApiRoute.js) |
+| `POST` | `/api/admin/catalogs/:catalog` | [`src/routes/api/admin/catalogApiRoute.js`](../../src/routes/api/admin/catalogApiRoute.js) |
+| `PUT` | `/api/admin/catalogs/:catalog/:id` | [`src/routes/api/admin/catalogApiRoute.js`](../../src/routes/api/admin/catalogApiRoute.js) |
 
-## Rutas web (17)
+## Rutas web (19)
 
 | Método | Ruta | Definición |
 | --- | --- | --- |
@@ -131,6 +136,8 @@ flowchart LR
 | `GET` | `/movimientos/materiales` | [`src/routes/web/admin/movementWebRoute.js`](../../src/routes/web/admin/movementWebRoute.js) |
 | `GET` | `/movimientos/mermas` | [`src/routes/web/admin/movementWebRoute.js`](../../src/routes/web/admin/movementWebRoute.js) |
 | `GET` | `/movimientos` | [`src/routes/web/admin/movementWebRoute.js`](../../src/routes/web/admin/movementWebRoute.js) |
+| `GET` | `/catalogos` | [`src/routes/web/admin/catalogWebRoute.js`](../../src/routes/web/admin/catalogWebRoute.js) |
+| `GET` | `/catalogos/:catalog` | [`src/routes/web/admin/catalogWebRoute.js`](../../src/routes/web/admin/catalogWebRoute.js) |
 
 ## Símbolos exportados por controladores
 
@@ -142,6 +149,7 @@ cuando el flujo necesita una vista curada.
 
 | Módulo | Símbolos exportados |
 | --- | --- |
+| [`src/controllers/api/admin/catalogController.js`](../../src/controllers/api/admin/catalogController.js) | `editCatalogEntry`, `getAllCatalogEntries`, `registerCatalogEntry` |
 | [`src/controllers/api/admin/departmentController.js`](../../src/controllers/api/admin/departmentController.js) | `getAllDepartments` |
 | [`src/controllers/api/admin/movementController.js`](../../src/controllers/api/admin/movementController.js) | `getAllMaterialMovements`, `getAllWasteMovements` |
 | [`src/controllers/api/admin/personController.js`](../../src/controllers/api/admin/personController.js) | `editPerson`, `getAllPersons`, `registerPerson` |
@@ -163,6 +171,7 @@ cuando el flujo necesita una vista curada.
 | [`src/controllers/api/warehouse/unitMeasureController.js`](../../src/controllers/api/warehouse/unitMeasureController.js) | `getAllUnitMeasures` |
 | [`src/controllers/api/warehouse/wasteController.js`](../../src/controllers/api/warehouse/wasteController.js) | `editWaste`, `editWasteStock`, `getAllWastes`, `getWasteMaterialTemplates`, `registerWaste` |
 | [`src/controllers/api/warehouse/wasteIssueController.js`](../../src/controllers/api/warehouse/wasteIssueController.js) | `editWasteIssue`, `editWasteIssueDetails`, `editWasteIssueHeader`, `getAllWasteIssues`, `registerWasteIssue`, `registerWasteIssueDetailReturn` |
+| [`src/controllers/web/admin/catalogController.js`](../../src/controllers/web/admin/catalogController.js) | `getCatalogsPage` |
 | [`src/controllers/web/admin/movementController.js`](../../src/controllers/web/admin/movementController.js) | `getMaterialMovementPage`, `getWasteMovementPage` |
 | [`src/controllers/web/admin/personController.js`](../../src/controllers/web/admin/personController.js) | `getPersonsPage` |
 | [`src/controllers/web/admin/userController.js`](../../src/controllers/web/admin/userController.js) | `getUsersPage` |
@@ -185,6 +194,7 @@ sólo cuando aportan información que el código no expresa por sí mismo.
 
 | Módulo | Símbolos exportados |
 | --- | --- |
+| [`src/services/admin/catalogService.js`](../../src/services/admin/catalogService.js) | `createCatalogEntry`, `findAllCatalogEntries`, `getManagedCatalog`, `updateCatalogEntry` |
 | [`src/services/admin/departmentService.js`](../../src/services/admin/departmentService.js) | `findAllDepartments`, `findDepartmentById` |
 | [`src/services/admin/person/personRules.js`](../../src/services/admin/person/personRules.js) | `isValidInternalClientAdvisor` |
 | [`src/services/admin/person/personService.js`](../../src/services/admin/person/personService.js) | `createPerson`, `findAllPersons`, `findPersonById`, `updatePerson` |

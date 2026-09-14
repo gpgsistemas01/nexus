@@ -26,8 +26,8 @@ permiso se agrupan. Los valores de permiso son los declarados en
 | --- | --- | --- |
 | Administración / personas | `L → persons:read`; `C, U → persons:write`; exportar `→ person:reports-read` | Implementado |
 | Administración / usuarios | `L, C, U, cambiar contraseña/accesos → users:manage`; exportar `→ admin:reports-read` | Implementado |
-| Administración / roles | `L → roles:read` | Implementado sólo lectura |
-| Administración / departamentos | `L → departments:read` | Implementado sólo lectura |
+| Administración / catálogos auxiliares | `L, C, U` de áreas, roles, presentaciones, unidades de medida, motivos de ajuste y estados de cumplimiento `→ catalogs:manage` | Implementado; acceso exclusivo del administrador del sistema del área Sistemas |
+| Formularios operativos / roles y departamentos | `L → roles:read`, `departments:read` | Implementado sólo lectura |
 | Administración / clientes | `L → clients:read`; `C → clients:create`; `U → clients:update`; exportar `→ client:reports-read` | Implementado |
 | Contexto pendiente / proyectos | Sin rutas API CRUD ni permiso registrado | Modelado |
 | Almacén / materiales | `L → materials:read`; costo en la consulta `→ inventory:costs-read`; `C, U, D → materials:write`; ajustar existencia `→ materials:adjust-stock`; exportar inventario `→ warehouse:reports-read` | Implementado |

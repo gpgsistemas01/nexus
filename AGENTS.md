@@ -48,6 +48,9 @@
 - Antes de crear un componente, *helper*, servicio, flujo, función o validación, busca una implementación equivalente.
 - Respeta nombres, estructura, errores, validaciones, acceso a datos, respuestas HTTP y organización de pruebas vigentes.
 - No introduzcas otro patrón cuando el proyecto ya tenga una convención establecida.
+- Los catálogos auxiliares administrables reutilizan `admin/catalogs`: agrega cada
+  recurso a su lista blanca y conserva separadas las lecturas operativas existentes.
+  La vista y toda escritura requieren `catalogs:manage` en el servidor.
 
 ## Documentación
 

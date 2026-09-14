@@ -1,0 +1,20 @@
+<div
+    id="catalogContext"
+    hidden
+    data-catalog="<%= catalog.name %>"
+    data-entity-label="<%= catalog.entityLabel %>"
+    data-fields="<%= catalog.fields.join(',') %>"
+    data-name-max-length="<%= catalog.maxLengths.name %>"
+    data-symbol-max-length="<%= catalog.maxLengths.symbol || '' %>"
+></div>
+
+<%- include('../../../shared/tables/mainTable', { title: catalog.label }) %>
+
+<%- include('catalogModal') %>
+
+<script type="module" src="/js/pages/admin/catalogs/catalogsPage.js"></script>
+
+<%- contentFor('title') %>
+<%= catalog.label %>
+<%- contentFor('layoutType') %>
+site

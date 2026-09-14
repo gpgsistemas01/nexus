@@ -11,7 +11,7 @@ export const pickFormFields = (data, fields) => Object.fromEntries(
         .map((field) => [field, data[field]])
 );
 
-export const handleSubmit = async ({ form, formData, create, update }) => {
+export const handleSubmit = async ({ form, formData, create, update, reloadTable = true }) => {
     
     const id = form.dataset.id;
     const mode = form.dataset.mode;
@@ -31,9 +31,7 @@ export const handleSubmit = async ({ form, formData, create, update }) => {
 
     notifications.showSuccess(response.message);
     closeModal(form);
-    reloadMainTable({
-        resetPaging: mode === FORM_MODES.CREATE
-    });
+    if (reloadTable) reloadMainTable({ resetPaging: mode === FORM_MODES.CREATE });
 
     return response.data;
 }

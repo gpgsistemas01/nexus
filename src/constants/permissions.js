@@ -2,6 +2,7 @@ export const PERMISSIONS = Object.freeze({
     MATERIALS_READ: 'materials:read',
     MATERIALS_WRITE: 'materials:write',
     MATERIALS_ADJUST_STOCK: 'materials:adjust-stock',
+    CATALOGS_MANAGE: 'catalogs:manage',
     INVENTORY_COSTS_READ: 'inventory:costs-read',
     DEPARTMENTS_READ: 'departments:read',
     MOVEMENTS_READ: 'movements:read',
@@ -46,6 +47,10 @@ const createPolicy = ({ roles, departments }) => Object.freeze({
 });
 
 export const AUTHORIZATION_POLICIES = Object.freeze({
+    [PERMISSIONS.CATALOGS_MANAGE]: createPolicy({
+        roles: ['Administrador del sistema'],
+        departments: ['SISTEMAS']
+    }),
     [PERMISSIONS.MATERIALS_READ]: createPolicy({
         roles: [
             'Almacenista',
