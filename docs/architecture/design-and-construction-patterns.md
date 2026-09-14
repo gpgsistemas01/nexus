@@ -37,9 +37,11 @@ verbos: **Guardar** al crear, **Actualizar** al editar, **Regresar** para salir 
 **Cerrar** como etiqueta accesible del control de cabecera. El título del modal sí
 incluye la entidad para aportar contexto, pero no forma parte de la etiqueta del botón.
 
-El campo **Activo** se compone sólo para **Motivos de ajuste**, porque es el único de
-los seis modelos administrables que define `isActive` en el esquema Prisma. Agregarlo
-a otro catálogo requiere primero un cambio explícito del modelo y su migración.
+El campo **Activo** forma parte del contrato común de los seis catálogos administrables.
+El registro lo declara entre sus campos permitidos, el backend valida que sea booleano,
+la pantalla lo presenta en formulario y listado, y Prisma lo conserva con valor inicial
+activo. Las lecturas operativas sólo ofrecen registros activos; el listado administrativo
+incluye ambos estados para permitir su reactivación.
 
 El parámetro `catalog` se valida en la frontera HTTP contra `MANAGED_CATALOG_NAMES` y
 el servicio vuelve a resolverlo desde `MANAGED_CATALOGS`; así no se puede seleccionar
@@ -54,15 +56,192 @@ flujo compartido:
 
 | Catálogo visible | Identificador de URL y API | Modelo Prisma | Campos administrables |
 | --- | --- | --- | --- |
-| Áreas | `departments` | `Department` | `name` (máximo 50) |
-| Roles | `roles` | `Role` | `name` (máximo 50) |
-| Presentaciones | `presentations` | `Presentation` | `name` (máximo 50) |
-| Unidades de medida | `unit-measures` | `UnitMeasure` | `name` (máximo 20), `symbol` (máximo 10) |
+| Áreas | `departments` | `Department` | `name` (máximo 50), `isActive` booleano |
+| Roles | `roles` | `Role` | `name` (máximo 50), `isActive` booleano |
+| Presentaciones | `presentations` | `Presentation` | `name` (máximo 50), `isActive` booleano |
+| Unidades de medida | `unit-measures` | `UnitMeasure` | `name` (máximo 20), `symbol` (máximo 10), `isActive` booleano |
 | Motivos de ajuste | `reasons` | `StockAdjustmentReason` | `name` (máximo 100), `isActive` booleano |
-| Estados de cumplimiento | `fulfillment-statuses` | `FulfillmentStatus` | `name` (máximo 50) |
+| Estados de cumplimiento | `fulfillment-statuses` | `FulfillmentStatus` | `name` (máximo 50), `isActive` booleano |
 
 **Clientes** y **Proveedores** no pertenecen a este registro: conservan sus módulos,
 rutas, permisos, formularios y reglas de negocio propios.
+
+En términos de negocio, clientes y proveedores **sí son catálogos comerciales** porque
+son datos maestros reutilizados por salidas y compras. La distinción anterior es de
+implementación: no son catálogos auxiliares ni deben agregarse al registro compartido.
+Ambos conservan su indicador Activo en base de datos, backend, formulario y listado; sus
+selectores operativos excluyen inactivos, mientras sus pantallas propietarias los mantienen
+visibles para consulta y reactivación.
+
+### Diagrama del patrón de catálogos administrables
+
+**Diagrama:** `DIA-ARQ-CAT-001`. La vista muestra la variante permitida por la lista blanca
+y la correspondencia del estado activo a través de las capas, sin confundir clientes o
+proveedores con estrategias del registro auxiliar.
+
+```mermaid
+flowchart LR
+    admin["Administrador<br/>elige un catálogo"] --> page["Página compartida<br/>listado y formulario"]
+    page --> api["Ruta y controller<br/>con catalogs:manage"]
+    api --> registry{"Registro de lista blanca<br/>campos y modelo"}
+    registry --> service["Servicio compartido<br/>normaliza y valida"]
+    service --> prisma["Modelo Prisma<br/>isActive"]
+    prisma --> page
+
+    operational["Formulario operativo<br/>requiere una opción"] --> read["Lectura propia del dominio<br/>sólo registros activos"]
+    read --> prisma
+
+    commercial["Clientes y proveedores<br/>catálogos comerciales"] -.->|"mismo ciclo visible,<br/>módulos propietarios"| page
+    commercial -.->|"fuera de la lista blanca"| registry
+```
+
+El recorrido superior se reutiliza para Áreas, Roles, Presentaciones, Unidades de medida,
+Motivos de ajuste y Estados de cumplimiento. La línea discontinua documenta semejanza de
+negocio y de experiencia, no dependencia del registro.
+
+### Diagrama del ciclo CRUD compartido
+
+**Diagrama:** `DIA-ARQ-CAT-002`. Una sola actividad representa el ciclo común porque
+consultar, crear y editar pasan por la misma composición de pantalla, autorización,
+validación, persistencia y refresco. No se mantiene un diagrama por acción ni por catálogo:
+esas copias repetirían el patrón sin aportar decisiones diferentes. Se crea una vista
+adicional únicamente cuando una operación incorpore otra coordinación, por ejemplo una
+transacción de inventario o una política de eliminación propia.
+
+```mermaid
+flowchart TD
+    open["Administrador abre<br/>un catálogo autorizado"] --> list["Nexus consulta y muestra<br/>todos sus registros"]
+    list --> choice{"¿Qué necesita hacer?"}
+
+    choice -->|Consultar| review["Revisar, buscar<br/>o cambiar de página"]
+    review --> list
+
+    choice -->|Crear| createForm["Abrir formulario<br/>con Activo marcado"]
+    createForm --> capture["Capturar los campos<br/>del catálogo"]
+
+    choice -->|Editar| editForm["Abrir formulario<br/>con valores vigentes"]
+    editForm --> capture
+
+    capture --> confirm["Guardar o actualizar"]
+    confirm --> authorize["Nexus comprueba autorización<br/>y datos permitidos"]
+    authorize --> valid{"¿La información<br/>es válida?"}
+    valid -->|No| correction["Mostrar campos por corregir<br/>sin guardar cambios"]
+    correction --> capture
+    valid -->|Sí| persist["Crear o actualizar<br/>el registro"]
+    persist --> refresh["Confirmar y refrescar<br/>el mismo listado"]
+    refresh --> list
+```
+
+La rama **Editar** incluye activar o desactivar mediante la casilla **Activo**; no existe
+una acción de eliminación dentro de este patrón. El listado administrativo conserva los
+registros inactivos para que puedan revisarse y reactivarse. Los endpoints operativos de
+cada dominio permanecen fuera de este ciclo y sólo ofrecen opciones activas.
+
+### Secuencias técnicas del patrón CRUD en frontend y backend
+
+Las vistas técnicas se dividen por frontera de ejecución. `DIA-ARQ-CAT-003` explica la
+reutilización dentro del navegador y termina en la petición HTTP;
+`DIA-ARQ-CAT-004` comienza en esa petición y explica la selección segura del catálogo y
+su persistencia. Separarlas mantiene legibles los participantes de cada lado sin
+presentar frontend y backend como un único componente. Ambas complementan la actividad
+funcional `DIA-ARQ-CAT-002` y juntas documentan el mismo patrón, no dos CRUD distintos.
+
+#### Secuencia compartida del frontend
+
+**Diagrama:** `DIA-ARQ-CAT-003`. La página compone una sola DataTable, formulario y
+modal. `createCrudApplication` adapta las mismas operaciones de consulta, alta y edición,
+y el servicio HTTP sólo sustituye método, URL y payload según la acción elegida.
+
+```mermaid
+sequenceDiagram
+    actor Admin as Administrador
+    participant Page as src/public/js/pages/admin/catalogs/catalogsPage.js
+    participant Table as src/public/js/plugins/datatable/admin/catalogs/catalogDatatable.js
+    participant Form as src/public/js/pages/admin/catalogs/catalogForm.js<br/>src/public/js/pages/admin/catalogs/catalogModal.js
+    participant FrontApp as src/public/js/application/admin/catalogs/catalogs.js<br/>src/public/js/application/createCrudApplication.js
+    participant Http as src/public/js/services/admin/catalogService.js
+    participant Api as API administrativa de catálogos
+
+    Admin->>Page: abrir el catálogo seleccionado
+    Page->>Table: createCatalogDatatable()
+    Table->>FrontApp: getCatalogEntries({ start, length, search, catalog })
+    FrontApp->>Http: getCatalogEntriesRequest({ params })
+    Http->>Api: GET /api/admin/catalogs/:catalog
+    Api-->>Http: data, recordsTotal, recordsFiltered
+    Http-->>FrontApp: respuesta del listado
+    FrontApp-->>Table: data, recordsTotal, recordsFiltered
+    Table-->>Admin: mostrar listado y acciones permitidas
+
+    Admin->>Form: capturar alta o edición y confirmar
+    Form->>Form: validateFields(catalogValidation, formData)
+    alt alta
+        Form->>FrontApp: registerCatalogEntry({ formData, catalog })
+        FrontApp->>Http: createCatalogEntryRequest({ catalog, data })
+        Http->>Api: POST /api/admin/catalogs/:catalog
+    else edición, incluida activación o desactivación
+        Form->>FrontApp: editCatalogEntry({ formData, id, catalog })
+        FrontApp->>Http: editCatalogEntryRequest({ catalog, data, id })
+        Http->>Api: PUT /api/admin/catalogs/:catalog/:id
+    end
+    Api-->>Http: registro y código de éxito
+    Http-->>FrontApp: respuesta de la mutación
+    FrontApp-->>Form: registro y mensaje de éxito
+    Form->>Form: cerrar modal, notificar y reloadMainTable()
+```
+
+#### Secuencia compartida del backend
+
+**Diagrama:** `DIA-ARQ-CAT-004`. El backend conserva el mismo pipeline de autenticación,
+autorización y validación para el recurso solicitado. El controller traduce el contrato
+HTTP y el servicio resuelve `catalog` contra `MANAGED_CATALOGS` antes de acceder al modelo
+Prisma permitido.
+
+```mermaid
+sequenceDiagram
+    participant Client as Cliente HTTP / web
+    participant Route as src/routes/api/admin/catalogApiRoute.js
+    participant Validation as src/middleware/authMiddleware.js<br/>src/middleware/validatorMiddleware.js<br/>src/validators/forms/catalogValidations.js
+    participant Controller as src/controllers/api/admin/catalogController.js
+    participant BackService as src/services/admin/catalogService.js<br/>src/constants/catalogs.js
+    database Db as Prisma / PostgreSQL
+
+    Client->>Route: GET, POST o PUT /api/admin/catalogs/:catalog
+    Route->>Validation: verifyApiTokenRequired, authorizeUserApi(CATALOGS_MANAGE), validate
+    alt acceso, catálogo o body inválido
+        Validation-->>Client: rechazo sin consultar ni modificar datos
+    else petición autorizada y válida
+        Validation->>Controller: continuar con params, query y body
+        alt consulta GET
+            Controller->>BackService: findAllCatalogEntries(catalog, { skip, take, search })
+            BackService->>BackService: getCatalog(catalog) resuelve MANAGED_CATALOGS
+            BackService->>Db: model.findMany(), model.count()
+            Db-->>BackService: registros y totales
+            BackService-->>Controller: resultado paginado
+            Controller-->>Client: data, recordsTotal, recordsFiltered
+        else alta POST
+            Controller->>BackService: createCatalogEntry(catalog, body)
+            BackService->>BackService: normalizar, validar y resolver MANAGED_CATALOGS
+            BackService->>Db: model.create({ data })
+            Db-->>BackService: registro creado
+            BackService-->>Controller: registro creado
+            Controller-->>Client: 201, registro y código de éxito
+        else edición PUT
+            Controller->>BackService: updateCatalogEntry(catalog, id, body)
+            BackService->>BackService: normalizar, validar y resolver MANAGED_CATALOGS
+            BackService->>Db: model.update({ where: { id }, data })
+            Db-->>BackService: registro actualizado
+            BackService-->>Controller: registro actualizado
+            Controller-->>Client: 200, registro y código de éxito
+        end
+    end
+```
+
+No se requiere una secuencia separada para cada catálogo ni para cada verbo HTTP: los
+fragmentos de cada lado hacen explícitas las únicas bifurcaciones del CRUD vigente. Si se
+incorpora una eliminación real o una operación con transacción o efectos adicionales,
+esa coordinación sí debe representarse en otra vista. Ambos diagramas deben revisarse
+cuando cambie la composición compartida, el contrato HTTP, el orden de middleware o la
+resolución de `MANAGED_CATALOGS`; `npm run docs:check` comprueba sus rutas y referencias.
 
 ## Alcance de la revisión
 
@@ -287,7 +466,7 @@ flowchart LR
 
 Cada diagrama específico declara una línea **Patrones** con los códigos resueltos por el
 índice rápido de frontend o backend. Así se identifica la solución aplicada sin repetir
-su explicación ni añadir vistas intermedias en los 63 casos de cada perspectiva. La
+su explicación ni añadir vistas intermedias en los 81 casos de cada perspectiva. La
 cadena de lectura es **patrón aplicado → recorrido concreto del caso**: una
 refactorización cambia primero este catálogo y sus implementaciones, y los códigos
 permiten localizar después todos los casos afectados. `DIA-PAT-TST-001` representa

@@ -36,7 +36,7 @@ habilita únicamente **Cantidad a devolver** y **Observaciones**. Una salida can
 <a id="CAP-SAL-MAT-01-LIST"></a>
 ### CAP-SAL-MAT-01-LIST — Listado
 
-**Casos de uso:** `CU-CAT-20` — Consultar estados de cumplimiento; `CU-SAL-01` — Consultar salidas de material.
+**Casos de uso:** `CU-CAT-30` — Consultar estados de cumplimiento; `CU-SAL-01` — Consultar salidas de material.
 
 **Errores posibles:** [Salidas de material](../error-messages.md#errores-salidas-material).
 
@@ -136,13 +136,13 @@ resultado es incierto, actualice la salida antes de intentar surtir nuevamente.
 <a id="CAP-REP-SAL-MAT-06-EXPORT"></a>
 ### CAP-REP-SAL-MAT-06-EXPORT — Exportar reporte
 
-**Casos de uso:** `CU-REP-04` — Generar reporte de salidas de material.
+**Casos de uso:** `CU-SAL-07` — Generar reporte de salidas de material.
 
 **Errores posibles:** [Salidas de material](../error-messages.md#errores-salidas-material).
 
 **Controles que debe usar:** Botón **Exportar Excel**; opciones de alcance mensual, otro mes o filtros aplicados; campo **Mes del reporte** y botón **Descargar**.
 
-1. Seleccione **Exportar Excel** para abrir el diálogo de alcance. Antes de continuar, compruebe que la pantalla mostrada coincida con la captura:
+1. Seleccione **Exportar Excel** para abrir el modal **Exportar reporte**. Antes de continuar, compruebe que la pantalla mostrada coincida con la captura:
 
    ![CAP-REP-SAL-MAT-06-EXPORT: exportar reporte](../images/salidas-material/06-exportar-reporte.png)
 
@@ -183,7 +183,7 @@ sin campos editables.
 <a id="CAP-SAL-WAS-01-LIST"></a>
 ### CAP-SAL-WAS-01-LIST — Listado
 
-**Casos de uso:** `CU-SAL-07` — Consultar salidas de merma; `CU-REP-08` — Generar reporte de salidas de merma.
+**Casos de uso:** `CU-SAL-08` — Consultar salidas de merma; `CU-SAL-14` — Generar reporte de salidas de merma.
 
 **Errores posibles:** [Salidas de merma](../error-messages.md#errores-salidas-merma).
 
@@ -206,7 +206,7 @@ sin campos editables.
 <a id="CAP-SAL-WAS-02-CREATE"></a>
 ### CAP-SAL-WAS-02-CREATE — Formulario registro
 
-**Casos de uso:** `CU-SAL-08` — Crear salida de merma.
+**Casos de uso:** `CU-SAL-09` — Crear salida de merma.
 
 **Errores posibles:** [Validación de formularios](../error-messages.md#errores-validacion), [Salidas de merma](../error-messages.md#errores-salidas-merma).
 
@@ -229,7 +229,7 @@ misma merma repetida.
 <a id="CAP-SAL-WAS-03-EDIT"></a>
 ### CAP-SAL-WAS-03-EDIT — Edicion encabezado
 
-**Casos de uso:** `CU-SAL-09` — Editar encabezado de salida de merma; `CU-SAL-10` — Editar detalles de merma de una salida.
+**Casos de uso:** `CU-SAL-10` — Editar encabezado de salida de merma; `CU-SAL-11` — Editar detalles de merma de una salida.
 
 **Errores posibles:** [Validación de formularios](../error-messages.md#errores-validacion), [Salidas de merma](../error-messages.md#errores-salidas-merma).
 
@@ -247,7 +247,7 @@ misma merma repetida.
 <a id="CAP-SAL-WAS-04-SUPPLY"></a>
 ### CAP-SAL-WAS-04-SUPPLY — Surtir detalles
 
-**Casos de uso:** `CU-SAL-11` — Surtir merma.
+**Casos de uso:** `CU-SAL-12` — Surtir merma.
 
 **Errores posibles:** [Validación de formularios](../error-messages.md#errores-validacion), [Salidas de merma](../error-messages.md#errores-salidas-merma).
 
@@ -270,7 +270,7 @@ resultado es incierto, actualice la salida antes de intentar surtir nuevamente.
 <a id="CAP-SAL-WAS-05-RETURN"></a>
 ### CAP-SAL-WAS-05-RETURN — Devolver detalle
 
-**Casos de uso:** `CU-SAL-12` — Devolver merma surtida.
+**Casos de uso:** `CU-SAL-13` — Devolver merma surtida.
 
 **Errores posibles:** [Validación de formularios](../error-messages.md#errores-validacion), [Salidas de merma](../error-messages.md#errores-salidas-merma).
 
@@ -286,13 +286,13 @@ resultado es incierto, actualice la salida antes de intentar surtir nuevamente.
 <a id="CAP-REP-SAL-WAS-06-EXPORT"></a>
 ### CAP-REP-SAL-WAS-06-EXPORT — Exportar reporte
 
-**Casos de uso:** `CU-REP-08` — Generar reporte de salidas de merma.
+**Casos de uso:** `CU-SAL-14` — Generar reporte de salidas de merma.
 
 **Errores posibles:** [Salidas de merma](../error-messages.md#errores-salidas-merma).
 
 **Controles que debe usar:** Botón **Exportar Excel**; opciones de alcance mensual, otro mes o filtros aplicados; campo **Mes del reporte** y botón **Descargar**.
 
-1. Seleccione **Exportar Excel** para abrir el diálogo de alcance. Antes de continuar, compruebe que la pantalla mostrada coincida con la captura:
+1. Seleccione **Exportar Excel** para abrir el modal **Exportar reporte**. Antes de continuar, compruebe que la pantalla mostrada coincida con la captura:
 
    ![CAP-REP-SAL-WAS-06-EXPORT: exportar reporte](../images/salidas-merma/06-exportar-reporte.png)
 
@@ -302,7 +302,7 @@ resultado es incierto, actualice la salida antes de intentar surtir nuevamente.
 <a id="CAP-SAL-WAS-08-VIEW"></a>
 ### CAP-SAL-WAS-08-VIEW — Consultar salida cancelada
 
-**Caso de uso:** `CU-SAL-07` — Consultar salidas de merma.
+**Caso de uso:** `CU-SAL-08` — Consultar salidas de merma.
 
 1. Seleccione **Cancelado** en **Estado de surtido:**, aplique el filtro y abra **Editar registro**.
 2. Compruebe que el encabezado, los detalles y las acciones permanezcan deshabilitados, como en la

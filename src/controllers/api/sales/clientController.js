@@ -9,8 +9,9 @@ export const getAllClients = async (req, res) => {
     const { skip, take } = getDataTablePaging(req.query);
     const search = getDataTableSearch(req.query);
     const advisorId = req.query.advisorId || null;
+    const onlyActive = req.query.onlyActive === 'true';
 
-    const columns = ['name', null];
+    const columns = ['name', 'isActive', null];
     const { orderBy, orderDir } = getDataTableOrder({
         query: req.query,
         columns
@@ -18,6 +19,7 @@ export const getAllClients = async (req, res) => {
 
     const result = await findAllClients({
         advisorId,
+        onlyActive,
         skip,
         take,
         search,

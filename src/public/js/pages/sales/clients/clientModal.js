@@ -19,7 +19,10 @@ export const openClientModal = ({
     initForm({ form, mode, id: data?.id });
     clearFormErrors(form);
 
+    form.reset();
+
     form.elements.name.value = data?.name || '';
+    form.elements.isActive.checked = data?.isActive ?? true;
 
     if (mode === FORM_MODES.CREATE) {
 

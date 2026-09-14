@@ -9,14 +9,15 @@ export const findAllFulfillmentStatuses = async ({
 }) => {
     const db = getDb();
 
-    const where = search
-        ? {
+    const where = {
+        isActive: true,
+        ...(search && {
             name: {
                 contains: search,
                 mode: 'insensitive'
             }
-        }
-        : {};
+        })
+    };
 
     const statuses = await db.fulfillmentStatus.findMany({
         skip,
@@ -27,7 +28,8 @@ export const findAllFulfillmentStatuses = async ({
         },
         select: {
             id: true,
-            name: true
+            name: true,
+            isActive: true
         }
     });
 

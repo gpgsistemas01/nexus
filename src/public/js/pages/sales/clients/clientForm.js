@@ -8,7 +8,10 @@ const formId = FORM_SELECTORS.CLIENT;
 
 useForm({
     selector: formId,
-    normalizeData: ({ formData }) => formData,
+    normalizeData: ({ formData, form }) => ({
+        ...formData,
+        isActive: form.elements.isActive.checked
+    }),
     getErrors: ({ formData }) => validateFields(clientValidation, formData),
     sendRequest: async ({ formData, form }) => {
 

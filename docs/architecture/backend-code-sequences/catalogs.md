@@ -3,6 +3,7 @@
 Este capítulo forma parte del [catálogo de secuencias del código backend](index.md) y conserva los recorridos aplicados del grupo `CAT`. Las reglas comunes de lectura, trazabilidad y mantenimiento se declaran en el índice de la colección.
 
 <a id="cu-cat-01"></a>
+
 ## `CU-CAT-01` — Consultar materiales
 
 **Patrones:** `BE-P01`.
@@ -33,6 +34,7 @@ sequenceDiagram
 ```
 
 <a id="cu-cat-02"></a>
+
 ## `CU-CAT-02` — Crear material
 
 **Patrones:** `BE-P01`, `BE-P03`, `BE-P04`.
@@ -71,6 +73,7 @@ sequenceDiagram
 ```
 
 <a id="cu-cat-03"></a>
+
 ## `CU-CAT-03` — Editar material
 
 **Patrones:** `BE-P01`, `BE-P03`, `BE-P04`.
@@ -104,6 +107,7 @@ sequenceDiagram
 ```
 
 <a id="cu-cat-04"></a>
+
 ## `CU-CAT-04` — Retirar material
 
 **Patrones:** `BE-P01`, `BE-P03`, `BE-P04`.
@@ -134,6 +138,7 @@ sequenceDiagram
 ```
 
 <a id="cu-cat-05"></a>
+
 ## `CU-CAT-05` — Ajustar existencia de material
 
 **Patrones:** `BE-P01`, `BE-P03`, `BE-P04`, `BE-P05`.
@@ -174,8 +179,133 @@ sequenceDiagram
     Controller-->>Client: 200 material actualizado
 ```
 
-<a id="cu-cat-06"></a>
-## `CU-CAT-06` — Consultar proveedores
+<a id="cu-cat-10"></a>
+
+## `CU-CAT-06` — Consultar inventario de materiales
+
+**Patrones:** `BE-P06`.
+
+```mermaid
+sequenceDiagram
+    participant Client as Cliente HTTP / web
+    participant Route as src/routes/api/warehouse/materialApiRoute.js
+    participant Controller@{ "type": "control" } as src/controllers/api/warehouse/materialController.js
+    participant Domain as src/services/warehouse/materials/materialService.js
+    Note over Controller,Domain: Variables de frontera: req.query/params
+
+    Client->>Route: GET /api/warehouse/materials
+    Route->>Route: ejecutar en orden el middleware configurado para la ruta
+    Route->>Controller: getAllMaterials(req, res)
+    activate Controller
+    Controller->>Domain: findAllMaterials({ query: req.query })
+    activate Domain
+    Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
+    Domain-->>Controller: resultado del servicio o error de dominio tipado
+    deactivate Domain
+    alt El servicio devuelve el resultado
+        Controller-->>Client: status HTTP y cuerpo concretos del controller
+    else El servicio propaga un error de dominio
+        Controller-->>Client: error entregado al middleware final para su respuesta HTTP
+    end
+    deactivate Controller
+```
+
+<a id="cu-cat-08"></a>
+
+## `CU-CAT-07` — Generar reporte de inventario de materiales
+
+**Patrones:** `BE-P07`.
+
+```mermaid
+sequenceDiagram
+    participant Client as Cliente HTTP / web
+    participant Route as src/routes/api/warehouse/reportApiRoute.js
+    participant Controller@{ "type": "control" } as src/controllers/api/warehouse/reportController.js
+    participant Domain as src/services/warehouse/reportService.js<br/>src/utils/reportExcelUtils.js
+    Note over Controller,Domain: Variables de frontera: req.query/params
+
+    Client->>Route: GET /api/warehouse/reports/inventory/excel
+    Route->>Route: ejecutar en orden el middleware configurado para la ruta
+    Route->>Controller: exportWarehouseReportExcel(req, res)
+    activate Controller
+    Controller->>Domain: reportService.findWarehouseReportRows({ query: req.query }) y sendExcelReport
+    activate Domain
+    Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
+    Domain-->>Controller: resultado del servicio o error de dominio tipado
+    deactivate Domain
+    alt El servicio devuelve el resultado
+        Controller-->>Client: status HTTP y cuerpo concretos del controller
+    else El servicio propaga un error de dominio
+        Controller-->>Client: error entregado al middleware final para su respuesta HTTP
+    end
+    deactivate Controller
+```
+
+<a id="cu-sal-07"></a>
+
+## `CU-CAT-08` — Consultar movimientos de materiales
+
+**Patrones:** `BE-P06`.
+
+```mermaid
+sequenceDiagram
+    participant Client as Cliente HTTP / web
+    participant Route as src/routes/api/admin/movementApiRoute.js
+    participant Controller@{ "type": "control" } as src/controllers/api/admin/movementController.js
+    participant Domain as src/services/inventory/movementQueryService.js
+    Note over Controller,Domain: Variables de frontera: req.query/params
+
+    Client->>Route: GET /api/admin/movements/materials
+    Route->>Route: ejecutar en orden el middleware configurado para la ruta
+    Route->>Controller: getAllMaterialMovements(req, res)
+    activate Controller
+    Controller->>Domain: findAllMaterialMovements(getMovementListParams(req))
+    activate Domain
+    Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
+    Domain-->>Controller: resultado del servicio o error de dominio tipado
+    deactivate Domain
+    alt El servicio devuelve el resultado
+        Controller-->>Client: status HTTP y cuerpo concretos del controller
+    else El servicio propaga un error de dominio
+        Controller-->>Client: error entregado al middleware final para su respuesta HTTP
+    end
+    deactivate Controller
+```
+
+<a id="cu-cat-07"></a>
+
+## `CU-CAT-09` — Generar reporte de movimientos de materiales
+
+**Patrones:** `BE-P07`.
+
+```mermaid
+sequenceDiagram
+    participant Client as Cliente HTTP / web
+    participant Route as src/routes/api/admin/reportApiRoute.js
+    participant Controller@{ "type": "control" } as src/controllers/api/admin/reportController.js
+    participant Domain as src/services/inventory/reportService.js
+    Note over Controller,Domain: Variables de frontera: req.query/params
+
+    Client->>Route: GET /api/admin/reports/movements/materials/excel
+    Route->>Route: ejecutar en orden el middleware configurado para la ruta
+    Route->>Controller: exportMovementReport(req, res)
+    activate Controller
+    Controller->>Domain: findMovementReportRows({ context: 'materials', ...getMovementReportParams(req.query) })
+    activate Domain
+    Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
+    Domain-->>Controller: resultado del servicio o error de dominio tipado
+    deactivate Domain
+    alt El servicio devuelve el resultado
+        Controller-->>Client: status HTTP y cuerpo concretos del controller
+    else El servicio propaga un error de dominio
+        Controller-->>Client: error entregado al middleware final para su respuesta HTTP
+    end
+    deactivate Controller
+```
+
+<a id="cu-cat-23"></a>
+
+## `CU-CAT-10` — Consultar proveedores
 
 **Patrones:** `BE-P01`.
 
@@ -204,8 +334,9 @@ sequenceDiagram
     deactivate Controller
 ```
 
-<a id="cu-cat-07"></a>
-## `CU-CAT-07` — Crear proveedor
+<a id="cu-cat-11"></a>
+
+## `CU-CAT-11` — Crear proveedor
 
 **Patrones:** `BE-P01`.
 
@@ -237,8 +368,9 @@ sequenceDiagram
     deactivate Controller
 ```
 
-<a id="cu-cat-08"></a>
-## `CU-CAT-08` — Editar proveedor
+<a id="cu-cat-12"></a>
+
+## `CU-CAT-12` — Editar proveedor
 
 **Patrones:** `BE-P01`.
 
@@ -270,8 +402,9 @@ sequenceDiagram
     deactivate Controller
 ```
 
-<a id="cu-cat-09"></a>
-## `CU-CAT-09` — Cambiar estado de proveedor
+<a id="cu-cat-13"></a>
+
+## `CU-CAT-13` — Cambiar estado de proveedor
 
 **Patrones:** `BE-P01`.
 
@@ -303,8 +436,40 @@ sequenceDiagram
     deactivate Controller
 ```
 
-<a id="cu-cat-10"></a>
-## `CU-CAT-10` — Consultar clientes
+<a id="cu-cat-15"></a>
+
+## `CU-CAT-14` — Generar reporte de proveedores
+
+**Patrones:** `BE-P07`.
+
+```mermaid
+sequenceDiagram
+    participant Client as Cliente HTTP / web
+    participant Route as src/routes/api/warehouse/reportApiRoute.js
+    participant Controller@{ "type": "control" } as src/controllers/api/warehouse/reportController.js
+    participant Domain as src/services/warehouse/reportService.js<br/>src/utils/reportExcelUtils.js
+    Note over Controller,Domain: Variables de frontera: req.query/params
+
+    Client->>Route: GET /api/warehouse/reports/suppliers/excel
+    Route->>Route: ejecutar en orden el middleware configurado para la ruta
+    Route->>Controller: exportSupplierReportExcel(req, res)
+    activate Controller
+    Controller->>Domain: reportService.findSupplierReportRows({ query: req.query }) y sendExcelReport
+    activate Domain
+    Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
+    Domain-->>Controller: resultado del servicio o error de dominio tipado
+    deactivate Domain
+    alt El servicio devuelve el resultado
+        Controller-->>Client: status HTTP y cuerpo concretos del controller
+    else El servicio propaga un error de dominio
+        Controller-->>Client: error entregado al middleware final para su respuesta HTTP
+    end
+    deactivate Controller
+```
+
+<a id="cu-cat-18"></a>
+
+## `CU-CAT-15` — Consultar clientes
 
 **Patrones:** `BE-P01`.
 
@@ -333,8 +498,9 @@ sequenceDiagram
     deactivate Controller
 ```
 
-<a id="cu-cat-11"></a>
-## `CU-CAT-11` — Crear cliente
+<a id="cu-cat-16"></a>
+
+## `CU-CAT-16` — Crear cliente
 
 **Patrones:** `BE-P01`.
 
@@ -366,8 +532,9 @@ sequenceDiagram
     deactivate Controller
 ```
 
-<a id="cu-cat-12"></a>
-## `CU-CAT-12` — Editar cliente
+<a id="cu-cat-17"></a>
+
+## `CU-CAT-17` — Editar cliente
 
 **Patrones:** `BE-P01`.
 
@@ -399,8 +566,40 @@ sequenceDiagram
     deactivate Controller
 ```
 
-<a id="cu-cat-13"></a>
-## `CU-CAT-13` — Consultar mermas
+<a id="cu-cat-19"></a>
+
+## `CU-CAT-18` — Generar reporte de clientes
+
+**Patrones:** `BE-P07`.
+
+```mermaid
+sequenceDiagram
+    participant Client as Cliente HTTP / web
+    participant Route as src/routes/api/sales/reportApiRoute.js
+    participant Controller@{ "type": "control" } as src/controllers/api/sales/reportController.js
+    participant Domain as src/services/sales/clientService.js<br/>src/utils/reportExcelUtils.js
+    Note over Controller,Domain: Variables de frontera: req.query/params
+
+    Client->>Route: GET /api/sales/reports/clients/excel
+    Route->>Route: ejecutar en orden el middleware configurado para la ruta
+    Route->>Controller: exportClientReport(req, res)
+    activate Controller
+    Controller->>Domain: clientService.findAllClients({ query: req.query }) prepara filas y el controller llama sendExcelReport
+    activate Domain
+    Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
+    Domain-->>Controller: resultado del servicio o error de dominio tipado
+    deactivate Domain
+    alt El servicio devuelve el resultado
+        Controller-->>Client: status HTTP y cuerpo concretos del controller
+    else El servicio propaga un error de dominio
+        Controller-->>Client: error entregado al middleware final para su respuesta HTTP
+    end
+    deactivate Controller
+```
+
+<a id="cu-ida-04"></a>
+
+## `CU-CAT-19` — Consultar mermas
 
 **Patrones:** `BE-P01`.
 
@@ -429,8 +628,9 @@ sequenceDiagram
     deactivate Controller
 ```
 
-<a id="cu-cat-14"></a>
-## `CU-CAT-14` — Registrar merma
+<a id="cu-cat-20"></a>
+
+## `CU-CAT-20` — Registrar merma
 
 **Patrones:** `BE-P01`, `BE-P03`, `BE-P04`, `BE-P05`.
 
@@ -467,8 +667,9 @@ sequenceDiagram
     deactivate Controller
 ```
 
-<a id="cu-cat-15"></a>
-## `CU-CAT-15` — Editar merma
+<a id="cu-cat-21"></a>
+
+## `CU-CAT-21` — Editar merma
 
 **Patrones:** `BE-P01`.
 
@@ -500,8 +701,9 @@ sequenceDiagram
     deactivate Controller
 ```
 
-<a id="cu-cat-16"></a>
-## `CU-CAT-16` — Ajustar existencia de merma
+<a id="cu-cat-22"></a>
+
+## `CU-CAT-22` — Ajustar existencia de merma
 
 **Patrones:** `BE-P01`, `BE-P03`, `BE-P04`, `BE-P05`.
 
@@ -539,8 +741,133 @@ sequenceDiagram
     Controller-->>Client: 200 merma actualizada
 ```
 
-<a id="cu-cat-17"></a>
-## `CU-CAT-17` — Consultar presentaciones
+<a id="cu-cat-27"></a>
+
+## `CU-CAT-23` — Consultar inventario de mermas
+
+**Patrones:** `BE-P06`.
+
+```mermaid
+sequenceDiagram
+    participant Client as Cliente HTTP / web
+    participant Route as src/routes/api/warehouse/wasteApiRoute.js
+    participant Controller@{ "type": "control" } as src/controllers/api/warehouse/wasteController.js
+    participant Domain as src/services/warehouse/wastes/wasteService.js
+    Note over Controller,Domain: Variables de frontera: req.query/params
+
+    Client->>Route: GET /api/warehouse/wastes
+    Route->>Route: ejecutar en orden el middleware configurado para la ruta
+    Route->>Controller: getAllWastes(req, res)
+    activate Controller
+    Controller->>Domain: wasteService.findAllWastes({ query: req.query })
+    activate Domain
+    Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
+    Domain-->>Controller: resultado del servicio o error de dominio tipado
+    deactivate Domain
+    alt El servicio devuelve el resultado
+        Controller-->>Client: status HTTP y cuerpo concretos del controller
+    else El servicio propaga un error de dominio
+        Controller-->>Client: error entregado al middleware final para su respuesta HTTP
+    end
+    deactivate Controller
+```
+
+<a id="cu-cat-25"></a>
+
+## `CU-CAT-24` — Generar reporte de mermas
+
+**Patrones:** `BE-P07`.
+
+```mermaid
+sequenceDiagram
+    participant Client as Cliente HTTP / web
+    participant Route as src/routes/api/warehouse/reportApiRoute.js
+    participant Controller@{ "type": "control" } as src/controllers/api/warehouse/reportController.js
+    participant Domain as src/services/warehouse/reportService.js<br/>src/utils/reportExcelUtils.js
+    Note over Controller,Domain: Variables de frontera: req.query/params
+
+    Client->>Route: GET /api/warehouse/reports/wastes/excel
+    Route->>Route: ejecutar en orden el middleware configurado para la ruta
+    Route->>Controller: exportWasteReportExcel(req, res)
+    activate Controller
+    Controller->>Domain: reportService.findWasteReportRows({ query: req.query }) y sendExcelReport
+    activate Domain
+    Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
+    Domain-->>Controller: resultado del servicio o error de dominio tipado
+    deactivate Domain
+    alt El servicio devuelve el resultado
+        Controller-->>Client: status HTTP y cuerpo concretos del controller
+    else El servicio propaga un error de dominio
+        Controller-->>Client: error entregado al middleware final para su respuesta HTTP
+    end
+    deactivate Controller
+```
+
+<a id="cu-cat-26"></a>
+
+## `CU-CAT-25` — Consultar movimientos de mermas
+
+**Patrones:** `BE-P06`.
+
+```mermaid
+sequenceDiagram
+    participant Client as Cliente HTTP / web
+    participant Route as src/routes/api/admin/movementApiRoute.js
+    participant Controller@{ "type": "control" } as src/controllers/api/admin/movementController.js
+    participant Domain as src/services/inventory/movementQueryService.js
+    Note over Controller,Domain: Variables de frontera: req.query/params
+
+    Client->>Route: GET /api/admin/movements/wastes
+    Route->>Route: ejecutar en orden el middleware configurado para la ruta
+    Route->>Controller: getAllWasteMovements(req, res)
+    activate Controller
+    Controller->>Domain: findAllWasteMovements(getMovementListParams(req))
+    activate Domain
+    Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
+    Domain-->>Controller: resultado del servicio o error de dominio tipado
+    deactivate Domain
+    alt El servicio devuelve el resultado
+        Controller-->>Client: status HTTP y cuerpo concretos del controller
+    else El servicio propaga un error de dominio
+        Controller-->>Client: error entregado al middleware final para su respuesta HTTP
+    end
+    deactivate Controller
+```
+
+<a id="cu-sal-14"></a>
+
+## `CU-CAT-26` — Generar reporte de movimientos de mermas
+
+**Patrones:** `BE-P07`.
+
+```mermaid
+sequenceDiagram
+    participant Client as Cliente HTTP / web
+    participant Route as src/routes/api/admin/reportApiRoute.js
+    participant Controller@{ "type": "control" } as src/controllers/api/admin/reportController.js
+    participant Domain as src/services/inventory/reportService.js
+    Note over Controller,Domain: Variables de frontera: req.query/params
+
+    Client->>Route: GET /api/admin/reports/movements/wastes/excel
+    Route->>Route: ejecutar en orden el middleware configurado para la ruta
+    Route->>Controller: exportWasteMovementReport(req, res)
+    activate Controller
+    Controller->>Domain: findMovementReportRows({ context: 'wastes', ...getMovementReportParams(req.query) })
+    activate Domain
+    Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
+    Domain-->>Controller: resultado del servicio o error de dominio tipado
+    deactivate Domain
+    alt El servicio devuelve el resultado
+        Controller-->>Client: status HTTP y cuerpo concretos del controller
+    else El servicio propaga un error de dominio
+        Controller-->>Client: error entregado al middleware final para su respuesta HTTP
+    end
+    deactivate Controller
+```
+
+<a id="cu-ent-06"></a>
+
+## `CU-CAT-27` — Consultar presentaciones
 
 **Patrones:** `BE-P02`.
 
@@ -569,8 +896,9 @@ sequenceDiagram
     deactivate Controller
 ```
 
-<a id="cu-cat-18"></a>
-## `CU-CAT-18` — Consultar unidades de medida
+<a id="cu-cat-28"></a>
+
+## `CU-CAT-28` — Consultar unidades de medida
 
 **Patrones:** `BE-P02`.
 
@@ -599,8 +927,9 @@ sequenceDiagram
     deactivate Controller
 ```
 
-<a id="cu-cat-19"></a>
-## `CU-CAT-19` — Consultar motivos de ajuste
+<a id="cu-cat-29"></a>
+
+## `CU-CAT-29` — Consultar motivos de ajuste
 
 **Patrones:** `BE-P02`.
 
@@ -629,8 +958,9 @@ sequenceDiagram
     deactivate Controller
 ```
 
-<a id="cu-cat-20"></a>
-## `CU-CAT-20` — Consultar estados de cumplimiento
+<a id="cu-cat-30"></a>
+
+## `CU-CAT-30` — Consultar estados de cumplimiento
 
 **Patrones:** `BE-P02`.
 
@@ -662,8 +992,9 @@ sequenceDiagram
 
 
 
-<a id="cu-cat-21"></a>
-## `CU-CAT-21` — Consultar área
+<a id="cu-cat-31"></a>
+
+## `CU-CAT-31` — Consultar área
 
 **Patrones:** `BE-P02`.
 
@@ -692,8 +1023,9 @@ sequenceDiagram
     deactivate Controller
 ```
 
-<a id="cu-cat-22"></a>
-## `CU-CAT-22` — Crear área
+<a id="cu-cat-32"></a>
+
+## `CU-CAT-32` — Crear área
 
 **Patrones:** `BE-P02`.
 
@@ -722,8 +1054,9 @@ sequenceDiagram
     deactivate Controller
 ```
 
-<a id="cu-cat-23"></a>
-## `CU-CAT-23` — Editar área
+<a id="cu-cat-33"></a>
+
+## `CU-CAT-33` — Editar área
 
 **Patrones:** `BE-P02`.
 
@@ -752,8 +1085,9 @@ sequenceDiagram
     deactivate Controller
 ```
 
-<a id="cu-cat-24"></a>
-## `CU-CAT-24` — Consultar rol
+<a id="cu-cat-34"></a>
+
+## `CU-CAT-34` — Consultar rol
 
 **Patrones:** `BE-P02`.
 
@@ -782,8 +1116,9 @@ sequenceDiagram
     deactivate Controller
 ```
 
-<a id="cu-cat-25"></a>
-## `CU-CAT-25` — Crear rol
+<a id="cu-cat-35"></a>
+
+## `CU-CAT-35` — Crear rol
 
 **Patrones:** `BE-P02`.
 
@@ -812,8 +1147,9 @@ sequenceDiagram
     deactivate Controller
 ```
 
-<a id="cu-cat-26"></a>
-## `CU-CAT-26` — Editar rol
+<a id="cu-cat-36"></a>
+
+## `CU-CAT-36` — Editar rol
 
 **Patrones:** `BE-P02`.
 
@@ -842,8 +1178,9 @@ sequenceDiagram
     deactivate Controller
 ```
 
-<a id="cu-cat-27"></a>
-## `CU-CAT-27` — Consultar presentación
+<a id="cu-cat-37"></a>
+
+## `CU-CAT-37` — Consultar presentación
 
 **Patrones:** `BE-P02`.
 
@@ -872,8 +1209,9 @@ sequenceDiagram
     deactivate Controller
 ```
 
-<a id="cu-cat-28"></a>
-## `CU-CAT-28` — Crear presentación
+<a id="cu-cat-38"></a>
+
+## `CU-CAT-38` — Crear presentación
 
 **Patrones:** `BE-P02`.
 
@@ -902,8 +1240,9 @@ sequenceDiagram
     deactivate Controller
 ```
 
-<a id="cu-cat-29"></a>
-## `CU-CAT-29` — Editar presentación
+<a id="cu-cat-39"></a>
+
+## `CU-CAT-39` — Editar presentación
 
 **Patrones:** `BE-P02`.
 
@@ -932,8 +1271,9 @@ sequenceDiagram
     deactivate Controller
 ```
 
-<a id="cu-cat-30"></a>
-## `CU-CAT-30` — Consultar unidad de medida
+<a id="cu-cat-40"></a>
+
+## `CU-CAT-40` — Consultar unidad de medida
 
 **Patrones:** `BE-P02`.
 
@@ -962,8 +1302,9 @@ sequenceDiagram
     deactivate Controller
 ```
 
-<a id="cu-cat-31"></a>
-## `CU-CAT-31` — Crear unidad de medida
+<a id="cu-cat-41"></a>
+
+## `CU-CAT-41` — Crear unidad de medida
 
 **Patrones:** `BE-P02`.
 
@@ -992,8 +1333,9 @@ sequenceDiagram
     deactivate Controller
 ```
 
-<a id="cu-cat-32"></a>
-## `CU-CAT-32` — Editar unidad de medida
+<a id="cu-cat-42"></a>
+
+## `CU-CAT-42` — Editar unidad de medida
 
 **Patrones:** `BE-P02`.
 
@@ -1022,8 +1364,9 @@ sequenceDiagram
     deactivate Controller
 ```
 
-<a id="cu-cat-33"></a>
-## `CU-CAT-33` — Consultar motivo de ajuste
+<a id="cu-cat-43"></a>
+
+## `CU-CAT-43` — Consultar motivo de ajuste
 
 **Patrones:** `BE-P02`.
 
@@ -1052,8 +1395,9 @@ sequenceDiagram
     deactivate Controller
 ```
 
-<a id="cu-cat-34"></a>
-## `CU-CAT-34` — Crear motivo de ajuste
+<a id="cu-cat-44"></a>
+
+## `CU-CAT-44` — Crear motivo de ajuste
 
 **Patrones:** `BE-P02`.
 
@@ -1082,8 +1426,9 @@ sequenceDiagram
     deactivate Controller
 ```
 
-<a id="cu-cat-35"></a>
-## `CU-CAT-35` — Editar motivo de ajuste
+<a id="cu-cat-45"></a>
+
+## `CU-CAT-45` — Editar motivo de ajuste
 
 **Patrones:** `BE-P02`.
 
@@ -1112,8 +1457,9 @@ sequenceDiagram
     deactivate Controller
 ```
 
-<a id="cu-cat-36"></a>
-## `CU-CAT-36` — Consultar estado de cumplimiento
+<a id="cu-cat-46"></a>
+
+## `CU-CAT-46` — Consultar estado de cumplimiento
 
 **Patrones:** `BE-P02`.
 
@@ -1142,8 +1488,9 @@ sequenceDiagram
     deactivate Controller
 ```
 
-<a id="cu-cat-37"></a>
-## `CU-CAT-37` — Crear estado de cumplimiento
+<a id="cu-cat-47"></a>
+
+## `CU-CAT-47` — Crear estado de cumplimiento
 
 **Patrones:** `BE-P02`.
 
@@ -1172,8 +1519,9 @@ sequenceDiagram
     deactivate Controller
 ```
 
-<a id="cu-cat-38"></a>
-## `CU-CAT-38` — Editar estado de cumplimiento
+<a id="cu-cat-48"></a>
+
+## `CU-CAT-48` — Editar estado de cumplimiento
 
 **Patrones:** `BE-P02`.
 

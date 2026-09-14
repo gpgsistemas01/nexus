@@ -1,5 +1,6 @@
-import { validateText } from "../fields/fieldsValidator.js";
+import { validateBoolean, validateText } from "../fields/fieldsValidator.js";
 
 export const clientValidation = [
     validateText({ fieldName: 'name', maxLength: 255 }),
+    validateBoolean('isActive')
 ];

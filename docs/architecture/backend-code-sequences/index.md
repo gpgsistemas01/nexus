@@ -77,21 +77,20 @@ del recorrido concreto.
 La comparación con el catálogo y la matriz técnica confirma que cada identificador
 aparece una vez, conserva su referencia de patrones y contiene un bloque Mermaid.
 
-| Grupo | Rango cubierto | Diagramas | Estado |
+| Grupo propietario | Rango cubierto | Diagramas | Estado |
 | --- | --- | ---: | --- |
 | Autenticación | `CU-AUT-01..02` | 2 | Completo |
-| Identidad y acceso | `CU-IDA-01..09` | 9 | Completo |
-| Catálogos | `CU-CAT-01..20` | 20 | Completo |
-| Entradas | `CU-ENT-01..05` | 5 | Completo |
-| Salidas | `CU-SAL-01..12` | 12 | Completo |
-| Consultas y reportes | `CU-REP-01..15` | 15 | Completo |
-| **Total** | `CU-AUT-01..CU-REP-15` | **63** | **63 de 63** |
+| Identidad y acceso | `CU-IDA-01..11` | 11 | Completo |
+| Catálogos | `CU-CAT-01..48` | 48 | Completo |
+| Entradas | `CU-ENT-01..06` | 6 | Completo |
+| Salidas | `CU-SAL-01..14` | 14 | Completo |
+| **Total** | Cinco grupos propietarios | **81** | **81 de 81** |
 
-### Capítulos por grupo funcional
+### Capítulos técnicos
 
 - [Autenticación](authentication.md): casos `CU-AUT-*`.
 - [Identidad y acceso](identity-access.md): casos `CU-IDA-*`.
 - [Catálogos e inventario](catalogs.md): casos `CU-CAT-*`.
 - [Compras y entradas](purchases.md): casos `CU-ENT-*`.
 - [Salidas](issues.md): casos `CU-SAL-*`.
-- [Consultas y reportes](reports.md): casos `CU-REP-*`.
+- [Nota histórica sobre infraestructura de consultas y exportaciones](reports.md): los casos y diagramas están dentro de su grupo propietario.

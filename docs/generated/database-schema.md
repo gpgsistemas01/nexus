@@ -20,10 +20,12 @@ erDiagram
     Department {
         String id PK
         String name UK
+        Boolean isActive
     }
     Role {
         String id PK
         String name UK
+        Boolean isActive
     }
     User {
         String id PK
@@ -83,6 +85,7 @@ erDiagram
     FulfillmentStatus {
         String id PK
         String name UK
+        Boolean isActive
     }
     Project {
         String id PK
@@ -94,6 +97,7 @@ erDiagram
     Client {
         String id PK
         String name
+        Boolean isActive
         String advisorId FK
     }
     Supplier {
@@ -119,10 +123,12 @@ erDiagram
         String id PK
         String name
         String symbol
+        Boolean isActive
     }
     Presentation {
         String id PK
         String name UK
+        Boolean isActive
     }
     SupplierMaterial {
         String id PK

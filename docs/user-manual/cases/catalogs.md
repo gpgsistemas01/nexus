@@ -8,15 +8,17 @@ Cada procedimiento identifica sus casos de uso, controles, errores posibles y ca
 
 **Ruta en el menú:** **Menú principal → Catálogos auxiliares →** elija **Áreas**, **Roles**, **Presentaciones**, **Unidades de medida**, **Motivos de ajuste** o **Estados de cumplimiento**.
 
-**Casos de uso:** Áreas: `CU-CAT-21` a `CU-CAT-23`; Roles: `CU-CAT-24` a `CU-CAT-26`; Presentaciones: `CU-CAT-27` a `CU-CAT-29`; Unidades de medida: `CU-CAT-30` a `CU-CAT-32`; Motivos de ajuste: `CU-CAT-33` a `CU-CAT-35`; Estados de cumplimiento: `CU-CAT-36` a `CU-CAT-38`. Cada rango corresponde, en orden, a consultar, crear y editar.
+**Casos de uso:** Áreas: `CU-CAT-31` a `CU-CAT-33`; Roles: `CU-CAT-34` a `CU-CAT-36`; Presentaciones: `CU-CAT-37` a `CU-CAT-39`; Unidades de medida: `CU-CAT-40` a `CU-CAT-42`; Motivos de ajuste: `CU-CAT-43` a `CU-CAT-45`; Estados de cumplimiento: `CU-CAT-46` a `CU-CAT-48`. Cada rango corresponde, en orden, a consultar, crear y editar.
 
 **Acceso:** estas pantallas y sus escrituras son exclusivas del administrador del sistema del área Sistemas. Que un rol, área, presentación, unidad, motivo o estado aparezca en un selector operativo no concede acceso a su mantenimiento.
 
-Cada opción abre una pantalla propia con la tabla del recurso seleccionado. No use **Clientes** o **Proveedores** desde este recorrido: ambos conservan sus módulos, formularios, permisos y reglas independientes.
+Cada opción abre una pantalla propia con la tabla del recurso seleccionado. **Clientes** y
+**Proveedores** también son catálogos comerciales, pero no se administran desde este recorrido:
+conservan módulos, formularios, permisos y reglas independientes.
 
 1. Seleccione el catálogo requerido en el submenú y revise que el encabezado corresponda al recurso que desea modificar.
-2. Para registrar una entrada, seleccione **Agregar** y complete **Nombre** (máximo 50 caracteres para Áreas, Roles, Presentaciones y Estados de cumplimiento; 20 para Unidades de medida; 100 para Motivos de ajuste). Complete también **Símbolo** —máximo 10— sólo para Unidades de medida o confirme **Activo** sólo para Motivos de ajuste. Seleccione **Guardar**.
-3. Para modificar una entrada, seleccione **Editar** en su fila, cambie únicamente los campos habilitados y seleccione **Actualizar**.
+2. Para registrar una entrada, seleccione **Agregar** y complete **Nombre** (máximo 50 caracteres para Áreas, Roles, Presentaciones y Estados de cumplimiento; 20 para Unidades de medida; 100 para Motivos de ajuste). Complete también **Símbolo** —máximo 10— sólo para Unidades de medida, revise la casilla **Activo** y seleccione **Guardar**.
+3. Para modificar una entrada, seleccione **Editar** en su fila, cambie únicamente los campos habilitados —incluido **Activo**— y seleccione **Actualizar**. Una entrada inactiva permanece en esta tabla para poder consultarla o reactivarla, pero deja de ofrecerse en formularios operativos nuevos.
 4. Compruebe que la tabla de esa misma pantalla muestre el resultado antes de continuar con otro catálogo.
 
 Los botones del formulario indican solamente la acción: **Guardar**, **Actualizar** y
@@ -47,7 +49,7 @@ conserva stock. Volver a marcarlo permite usarlo nuevamente en operaciones nueva
 <a id="CAP-CAT-MAT-01-LIST"></a>
 ### CAP-CAT-MAT-01-LIST — Listado inventario
 
-**Casos de uso:** `CU-AUT-02` — Cerrar sesión; `CU-CAT-01` — Consultar materiales; `CU-REP-01` — Consultar inventario de materiales; `CU-REP-03` — Generar reporte de inventario de materiales.
+**Casos de uso:** `CU-AUT-02` — Cerrar sesión; `CU-CAT-01` — Consultar materiales; `CU-CAT-06` — Consultar inventario de materiales; `CU-CAT-07` — Generar reporte de inventario de materiales.
 
 **Errores posibles:** [Catálogos e inventario](../error-messages.md#errores-catalogos).
 
@@ -63,7 +65,7 @@ conserva stock. Volver a marcarlo permite usarlo nuevamente en operaciones nueva
 
 ### CAP-REP-MAT-05-EXPORT — Exportar inventario
 
-**Casos de uso:** `CU-REP-03` — Generar reporte de inventario de materiales.
+**Casos de uso:** `CU-CAT-07` — Generar reporte de inventario de materiales.
 
 1. Seleccione **Exportar Excel** y compruebe el modal:
 
@@ -74,7 +76,7 @@ conserva stock. Volver a marcarlo permite usarlo nuevamente en operaciones nueva
 <a id="CAP-CAT-MAT-02-CREATE"></a>
 ### CAP-CAT-MAT-02-CREATE — Formulario alta
 
-**Casos de uso:** `CU-CAT-02` — Crear material; `CU-CAT-17` — Consultar presentaciones; `CU-CAT-18` — Consultar unidades de medida.
+**Casos de uso:** `CU-CAT-02` — Crear material; `CU-CAT-27` — Consultar presentaciones; `CU-CAT-28` — Consultar unidades de medida.
 
 **Errores posibles:** [Validación de formularios](../error-messages.md#errores-validacion), [Catálogos e inventario](../error-messages.md#errores-catalogos).
 
@@ -118,7 +120,7 @@ este modo. Use la acción **Editar registro** y el botón **Actualizar**.
 <a id="CAP-CAT-MAT-04-STOCK"></a>
 ### CAP-CAT-MAT-04-STOCK — Ajuste existencia
 
-**Casos de uso:** `CU-CAT-05` — Ajustar existencia de material; `CU-CAT-19` — Consultar motivos de ajuste.
+**Casos de uso:** `CU-CAT-05` — Ajustar existencia de material; `CU-CAT-29` — Consultar motivos de ajuste.
 
 **Errores posibles:** [Validación de formularios](../error-messages.md#errores-validacion), [Catálogos e inventario](../error-messages.md#errores-catalogos).
 
@@ -156,7 +158,7 @@ marcarla lo reactiva. Este cambio no es un ajuste de stock.
 <a id="CAP-CAT-SUP-01-LIST"></a>
 ### CAP-CAT-SUP-01-LIST — Listado
 
-**Casos de uso:** `CU-CAT-06` — Consultar proveedores; `CU-REP-12` — Generar reporte de proveedores.
+**Casos de uso:** `CU-CAT-10` — Consultar proveedores; `CU-CAT-14` — Generar reporte de proveedores.
 
 **Errores posibles:** [Catálogos e inventario](../error-messages.md#errores-catalogos).
 
@@ -168,11 +170,15 @@ marcarla lo reactiva. Este cambio no es un ajuste de stock.
 
 2. Escriba un término en el buscador **Buscar por Nombre comercial o Razón social** para localizar un proveedor.
 3. En la tabla, seleccione **Nuevo proveedor**, **Exportar Excel** o la acción **Editar registro** de una fila.
+4. Si selecciona **Exportar Excel**, Nexus abre el modal **Exportar reporte**. Confirme que se aplicarán la búsqueda, los filtros y el orden actuales; seleccione **Descargar** para continuar o cierre el modal para cancelar.
+
+   <a id="CAP-CAT-SUP-04-EXPORT"></a>
+   ![CAP-CAT-SUP-04-EXPORT: modal para exportar proveedores](../images/proveedores/04-exportar-reporte.png)
 
 <a id="CAP-CAT-SUP-02-CREATE"></a>
 ### CAP-CAT-SUP-02-CREATE — Formulario alta
 
-**Casos de uso:** `CU-CAT-07` — Crear proveedor.
+**Casos de uso:** `CU-CAT-11` — Crear proveedor.
 
 **Errores posibles:** [Validación de formularios](../error-messages.md#errores-validacion), [Catálogos e inventario](../error-messages.md#errores-catalogos).
 
@@ -188,7 +194,7 @@ marcarla lo reactiva. Este cambio no es un ajuste de stock.
 <a id="CAP-CAT-SUP-03-EDIT"></a>
 ### CAP-CAT-SUP-03-EDIT — Formulario edicion y estado
 
-**Casos de uso:** `CU-CAT-08` — Editar proveedor; `CU-CAT-09` — Cambiar estado de proveedor.
+**Casos de uso:** `CU-CAT-12` — Editar proveedor; `CU-CAT-13` — Cambiar estado de proveedor.
 
 **Errores posibles:** [Validación de formularios](../error-messages.md#errores-validacion), [Catálogos e inventario](../error-messages.md#errores-catalogos).
 
@@ -207,13 +213,17 @@ marcarla lo reactiva. Este cambio no es un ajuste de stock.
 
 **Ruta en el menú:** **Menú principal → Clientes**.
 
+La casilla **Activo** permite retirar un cliente de las selecciones de operaciones nuevas sin
+eliminarlo ni perder sus salidas históricas. La pantalla de Clientes sigue mostrando ambos estados
+para que el administrador pueda revisarlos o reactivarlos.
+
 <a id="CAP-CAT-CLI-00-NAVIGATION"></a>
 ![CAP-CAT-CLI-00-NAVIGATION: acceso a clientes desde el menú principal](../images/clientes/00-acceso-menu-principal.png)
 
 <a id="CAP-CAT-CLI-01-LIST"></a>
 ### CAP-CAT-CLI-01-LIST — Listado
 
-**Casos de uso:** `CU-CAT-10` — Consultar clientes; `CU-REP-13` — Generar reporte de clientes.
+**Casos de uso:** `CU-CAT-15` — Consultar clientes; `CU-CAT-18` — Generar reporte de clientes.
 
 **Errores posibles:** [Catálogos e inventario](../error-messages.md#errores-catalogos).
 
@@ -225,36 +235,40 @@ marcarla lo reactiva. Este cambio no es un ajuste de stock.
 
 2. Escriba un término en el buscador **Buscar por Nombre** para localizar un cliente.
 3. En la tabla, seleccione **Nuevo cliente**, **Exportar Excel** o la acción **Editar registro** de una fila.
+4. Si selecciona **Exportar Excel**, Nexus abre el modal **Exportar reporte**. Confirme que se aplicarán la búsqueda, los filtros y el orden actuales; seleccione **Descargar** para continuar o cierre el modal para cancelar.
+
+   <a id="CAP-CAT-CLI-04-EXPORT"></a>
+   ![CAP-CAT-CLI-04-EXPORT: modal para exportar clientes](../images/clientes/04-exportar-reporte.png)
 
 <a id="CAP-CAT-CLI-02-CREATE"></a>
 ### CAP-CAT-CLI-02-CREATE — Formulario alta
 
-**Casos de uso:** `CU-CAT-11` — Crear cliente.
+**Casos de uso:** `CU-CAT-16` — Crear cliente.
 
 **Errores posibles:** [Validación de formularios](../error-messages.md#errores-validacion), [Catálogos e inventario](../error-messages.md#errores-catalogos).
 
-**Controles que debe usar:** Botón **Nuevo cliente**, campo **Nombre** y botón **Guardar**.
+**Controles que debe usar:** Botón **Nuevo cliente**, campo **Nombre**, casilla **Activo** y botón **Guardar**.
 
 1. Seleccione el botón **Nuevo cliente** para abrir el formulario de alta. Antes de continuar, compruebe que la pantalla mostrada coincida con la captura:
 
    ![CAP-CAT-CLI-02-CREATE: formulario alta](../images/clientes/02-formulario-alta.png)
 
-2. Complete el campo **Nombre** y seleccione el botón **Guardar**.
+2. Complete el campo **Nombre**, revise la casilla **Activo** y seleccione el botón **Guardar**.
 
 <a id="CAP-CAT-CLI-03-EDIT"></a>
 ### CAP-CAT-CLI-03-EDIT — Formulario edicion
 
-**Casos de uso:** `CU-CAT-12` — Editar cliente.
+**Casos de uso:** `CU-CAT-17` — Editar cliente.
 
 **Errores posibles:** [Validación de formularios](../error-messages.md#errores-validacion), [Catálogos e inventario](../error-messages.md#errores-catalogos).
 
-**Controles que debe usar:** Acción **Editar registro**, campo **Nombre** y botón **Actualizar**.
+**Controles que debe usar:** Acción **Editar registro**, campo **Nombre**, casilla **Activo** y botón **Actualizar**.
 
 1. En la fila del cliente, seleccione la acción **Editar registro**. Antes de continuar, compruebe que la pantalla mostrada coincida con la captura:
 
    ![CAP-CAT-CLI-03-EDIT: formulario edicion](../images/clientes/03-formulario-edicion.png)
 
-2. Modifique el campo **Nombre** y seleccione el botón **Actualizar**.
+2. Modifique el campo **Nombre** o la casilla **Activo** y seleccione el botón **Actualizar**.
 
 ## Mermas e inventario
 
@@ -278,7 +292,7 @@ utilizarla nuevamente en una nueva salida.
 <a id="CAP-CAT-WAS-01-LIST"></a>
 ### CAP-CAT-WAS-01-LIST — Listado inventario
 
-**Casos de uso:** `CU-CAT-13` — Consultar mermas; `CU-REP-06` — Consultar inventario de mermas; `CU-REP-09` — Generar reporte de mermas.
+**Casos de uso:** `CU-CAT-19` — Consultar mermas; `CU-CAT-23` — Consultar inventario de mermas; `CU-CAT-24` — Generar reporte de mermas.
 
 **Errores posibles:** [Catálogos e inventario](../error-messages.md#errores-catalogos).
 
@@ -294,7 +308,7 @@ utilizarla nuevamente en una nueva salida.
 
 ### CAP-REP-WAS-05-EXPORT — Exportar inventario de mermas
 
-**Casos de uso:** `CU-REP-09` — Generar reporte de mermas.
+**Casos de uso:** `CU-CAT-24` — Generar reporte de mermas.
 
 1. Seleccione **Exportar Excel** y compruebe el modal:
 
@@ -305,7 +319,7 @@ utilizarla nuevamente en una nueva salida.
 <a id="CAP-CAT-WAS-02-CREATE"></a>
 ### CAP-CAT-WAS-02-CREATE — Formulario registro
 
-**Casos de uso:** `CU-CAT-14` — Registrar merma.
+**Casos de uso:** `CU-CAT-20` — Registrar merma.
 
 **Errores posibles:** [Validación de formularios](../error-messages.md#errores-validacion), [Catálogos e inventario](../error-messages.md#errores-catalogos).
 
@@ -330,7 +344,7 @@ actual.
 <a id="CAP-CAT-WAS-03-EDIT"></a>
 ### CAP-CAT-WAS-03-EDIT — Formulario edicion
 
-**Casos de uso:** `CU-CAT-15` — Editar merma.
+**Casos de uso:** `CU-CAT-21` — Editar merma.
 
 **Errores posibles:** [Validación de formularios](../error-messages.md#errores-validacion), [Catálogos e inventario](../error-messages.md#errores-catalogos).
 
@@ -349,7 +363,7 @@ quedan sólo para consulta. Use la acción **Editar registro** y el botón **Act
 <a id="CAP-CAT-WAS-04-STOCK"></a>
 ### CAP-CAT-WAS-04-STOCK — Ajuste existencia
 
-**Casos de uso:** `CU-CAT-16` — Ajustar existencia de merma.
+**Casos de uso:** `CU-CAT-22` — Ajustar existencia de merma.
 
 **Errores posibles:** [Validación de formularios](../error-messages.md#errores-validacion), [Catálogos e inventario](../error-messages.md#errores-catalogos).
 

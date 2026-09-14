@@ -39,7 +39,7 @@ información que permite recorrer su objetivo sin consultar una segunda descripc
   participante y una acción observable. Capturar, confirmar, validar, persistir y
   presentar el resultado se separan cuando ocurren en momentos distintos. Se nombran el botón, enlace o acción que dispara cada transición; el formulario,
   diálogo o tabla que abre Nexus; los mensajes de confirmación o error; y la validación
-  y escritura en base de datos cuando forman parte del caso. Expresiones pasivas como
+  y conservación del resultado cuando forman parte del caso. Expresiones pasivas como
   «revisa» o «verifica el resultado» no sustituyen una interacción observable. El paso
   desde el que se desprende una variante o un rechazo incluye entre paréntesis
   **(ver A1)** o **(ver E1)**, según el identificador correspondiente.
@@ -49,9 +49,11 @@ información que permite recorrer su objetivo sin consultar una segunda descripc
   inválida cuando Nexus permite corregirla y volver al flujo principal. La secuencia
   comienza con el participante que debe actuar después del paso referenciado: si ese
   paso corresponde a Nexus, comienza el actor; si corresponde al actor, comienza Nexus.
-  También registra las opciones que se desprenden del recorrido principal pero
-  abandonan su resultado esperado para iniciar un objetivo distinto; no se crea una
-  sección de continuaciones asociadas para esas decisiones.
+  En los casos de consulta que preceden a operaciones de mantenimiento, el flujo
+  principal termina con la acción de alta por ser la continuación prioritaria y esa
+  selección constituye el disparador del caso siguiente. Permanecer en la consulta y
+  elegir las demás acciones se documentan como alternativas; no se crea una sección de
+  continuaciones asociadas para esas decisiones.
 - **Excepciones:** título breve, punto de rechazo o fallo y serie numerada de pasos que
   describe el efecto protegido y la terminación del caso. Su secuencia respeta la misma
   alternancia de participantes definida para los flujos alternativos.
@@ -77,9 +79,10 @@ destino fuera otro caso de uso, no se redactaría como un salto de control infor
 
 - Una asociación simple enlaza objetivos relacionados y se dibuja sin texto; no implica
   por sí misma inclusión, extensión ni una llamada entre casos. Cuando una consulta
-  presenta una acción asociada que desvía al actor del resultado esperado, se documenta
-  como flujo alternativo: el actor **termina la consulta** y luego **inicia** el caso
-  seleccionado. Ambos objetivos permanecen independientes y el segundo vuelve a
+  presenta operaciones de mantenimiento, su acción prioritaria cierra el flujo principal
+  y dispara el caso siguiente; las demás acciones se documentan como alternativas. El
+  actor **termina la consulta** y luego **inicia** el caso seleccionado. Ambos objetivos
+  permanecen independientes y el segundo vuelve a
   comprobar sus precondiciones y autorización.
 - `«include»` identifica un caso requerido que el caso base incorpora siempre; al
   concluir, la interacción continúa en el paso siguiente a la inclusión.
@@ -89,8 +92,9 @@ destino fuera otro caso de uso, no se redactaría como un salto de control infor
   heredado aplicable; no representa una llamada entre casos.
 
 La relación debe aparecer también en el diagrama y nombrar ambos identificadores `CU-*`.
-En el catálogo vigente no hay saltos entre casos de uso: compartir servicios de
-inventario, persistencia o consulta no crea por sí solo una relación UML.
+Estas continuaciones son asociaciones entre objetivos independientes, no saltos de
+control, `«include»` ni `«extend»`; compartir servicios de inventario, persistencia o
+consulta tampoco crea por sí solo una relación UML.
 
 El actor principal inicia el objetivo, pero no obtiene autorización por aparecer aquí.
 En cada ficha, **Nexus** identifica al sistema como participante interno; no se modela
@@ -133,12 +137,11 @@ y sólo se enlazan como evidencia.
 
 Los grupos funcionales reúnen objetivos por capacidad de negocio y reducen el tamaño de
 cada vista; no representan paquetes UML, paquetes documentales, permisos, capas de código
-ni unidades de despliegue. El catálogo usa `CU-<GRUPO>-<SECUENCIA>`: el código de grupo
-es estable y la secuencia comienza en `01` dentro de cada grupo. La numeración sigue el
-orden funcional del catálogo para que el identificador permita localizar la familia y
-su posición de lectura. Si una reorganización exige renumerar, el cambio se realiza de
-forma coordinada en el catálogo, las fichas, los diagramas y la trazabilidad técnica; un
-identificador retirado no se reasigna a un objetivo distinto.
+ni unidades de despliegue. El catálogo conserva identificadores estables
+`CU-<FAMILIA>-<SECUENCIA>`: el código de familia y su secuencia permanecen estables
+aunque cambie la ubicación de lectura. Si una reorganización exigiera renumerar, el
+cambio se realizaría de forma coordinada en el catálogo, las fichas, los diagramas y la
+trazabilidad técnica; un identificador retirado no se reasigna a un objetivo distinto.
 
 | Código | Grupo funcional | Alcance |
 | --- | --- | --- |
@@ -147,12 +150,12 @@ identificador retirado no se reasigna a un objetivo distinto.
 | `CAT` | Catálogos | Recursos operativos y contextuales reutilizados por documentos. |
 | `ENT` | Compras de material | Consulta, registro, edición, corrección y cancelación de compras recibidas. |
 | `SAL` | Salidas de material y de merma | Consulta, creación, edición, surtimiento y devolución de materiales o mermas. |
-| `REP` | Consultas y reportes | Movimientos, inventario, vistas consolidadas y archivos. |
 
 #### Criterio de agrupación vigente
 
-Se mantienen los grupos funcionales porque expresan capacidades de negocio estables y
-conservan la trazabilidad de los identificadores. Dentro de ellos, los casos se ordenan
+Se mantienen cinco grupos funcionales propietarios porque expresan capacidades de
+negocio estables. Cada consulta o reporte se ubica en el grupo del recurso desde el que
+se inicia; no existe un grupo independiente para reportes. Dentro de ellos, los casos se ordenan
 por la entidad o el documento sobre el que actúan. Cada secuencia comienza con la
 consulta y continúa con las operaciones CRUD disponibles sobre el mismo recurso. Las
 operaciones específicas —por ejemplo retirar, ajustar existencia, cambiar estado,
@@ -164,20 +167,18 @@ como listas planas difíciles de revisar.
 | Grupo | Familias internas de lectura | Casos |
 | --- | --- | --- |
 | `AUT` | Sesión. | `CU-AUT-01` a `CU-AUT-02` |
-| `IDA` | Personas; usuarios y credenciales; catálogos de acceso. | `CU-IDA-01` a `CU-IDA-09` |
-| `CAT` | Materiales; proveedores; clientes; mermas; consulta operativa y administración restringida de catálogos auxiliares. | `CU-CAT-01` a `CU-CAT-38` |
-| `ENT` | Compras de material. | `CU-ENT-01` a `CU-ENT-05` |
-| `SAL` | Salidas de material; salidas de merma. | `CU-SAL-01` a `CU-SAL-12` |
-| `REP` | Materiales; mermas; compras; proveedores; clientes; identidad. | `CU-REP-01` a `CU-REP-15` |
+| `IDA` | Personas; usuarios y credenciales; catálogos de acceso y sus reportes. | `CU-IDA-01` a `CU-IDA-11` |
+| `CAT` | Materiales; proveedores; clientes; mermas; inventarios, movimientos, reportes y catálogos auxiliares. | `CU-CAT-01` a `CU-CAT-48` |
+| `ENT` | Compras de material y su reporte. | `CU-ENT-01` a `CU-ENT-06` |
+| `SAL` | Salidas de material y merma con sus reportes. | `CU-SAL-01` a `CU-SAL-14` |
 
 Las familias internas son ayudas visuales, no nuevos grupos funcionales, permisos ni
 módulos de código. Un caso conserva un único identificador y una única entidad aunque su
 implementación reutilice validaciones, formularios, servicios o exportadores.
 
-El orden anterior también determina la secuencia numérica: dentro de cada grupo se
-recorren las familias en el orden vertical del diagrama y se asignan identificadores
-consecutivos a sus casos en el orden en que aparecen. El catálogo y las fichas se
-presentan después en esa misma secuencia. No se conserva al final del grupo una
+El orden anterior determina la lectura dentro de cada grupo. La numeración sigue el
+orden de lectura del catálogo dentro de cada grupo propietario. El catálogo y las fichas
+se presentan después en esa misma secuencia. No se conserva al final del grupo una
 operación especial que pertenece a una familia anterior. Las asociaciones simples se
 dibujan sin etiqueta; sólo una relación `«include»` o `«extend»` debe indicar su
 semántica explícitamente.
@@ -200,12 +201,14 @@ conjunto; el cambio de identificador no modifica el alcance funcional del caso.
 | `CU-IDA-01` | Consultar personas | Listado de personas y asignaciones. |
 | `CU-IDA-02` | Crear persona | Alta de persona sin crear cuenta. |
 | `CU-IDA-03` | Editar persona | Actualización de datos y asignaciones de persona. |
-| `CU-IDA-04` | Consultar usuarios | Listado de cuentas y accesos. |
-| `CU-IDA-05` | Crear usuario y asignar acceso | Alta transaccional de cuenta y asignación. |
-| `CU-IDA-06` | Editar usuario y acceso | Actualización transaccional de cuenta y asignación. |
-| `CU-IDA-07` | Cambiar contraseña de usuario | Actualización cifrada de la credencial. |
-| `CU-IDA-08` | Consultar roles | Catálogo de acceso de sólo lectura. |
-| `CU-IDA-09` | Consultar departamentos | Catálogo de acceso de sólo lectura. |
+| `CU-IDA-04` | Generar reporte de personas | Archivo Excel con filtros, columnas y cálculos propios del reporte. |
+| `CU-IDA-05` | Consultar usuarios | Listado de cuentas y accesos. |
+| `CU-IDA-06` | Crear usuario y asignar acceso | Alta transaccional de cuenta y asignación. |
+| `CU-IDA-07` | Editar usuario y acceso | Actualización transaccional de cuenta y asignación. |
+| `CU-IDA-08` | Cambiar contraseña de usuario | Actualización cifrada de la credencial. |
+| `CU-IDA-09` | Generar reporte de usuarios | Archivo Excel con filtros, columnas y cálculos propios del reporte. |
+| `CU-IDA-10` | Consultar roles | Catálogo de acceso de sólo lectura. |
+| `CU-IDA-11` | Consultar departamentos | Catálogo de acceso de sólo lectura. |
 
 ### Grupo funcional CAT — Catálogos
 
@@ -216,39 +219,49 @@ conjunto; el cambio de identificador no modifica el alcance funcional del caso.
 | `CU-CAT-03` | Editar material | Actualización de datos generales admitidos. |
 | `CU-CAT-04` | Retirar material | Retiro condicionado por la historia operativa. |
 | `CU-CAT-05` | Ajustar existencia de material | Ajuste trazable de inventario. |
-| `CU-CAT-06` | Consultar proveedores | Listado de proveedores autorizados. |
-| `CU-CAT-07` | Crear proveedor | Alta con código e identidad válidos. |
-| `CU-CAT-08` | Editar proveedor | Actualización de datos admitidos. |
-| `CU-CAT-09` | Cambiar estado de proveedor | Activación o desactivación del proveedor. |
-| `CU-CAT-10` | Consultar clientes | Listado de clientes autorizados. |
-| `CU-CAT-11` | Crear cliente | Alta con asesor opcional válido. |
-| `CU-CAT-12` | Editar cliente | Actualización de datos y asesor opcional. |
-| `CU-CAT-13` | Consultar mermas | Listado de existencias de merma. |
-| `CU-CAT-14` | Registrar merma | Alta desde una plantilla material-proveedor. |
-| `CU-CAT-15` | Editar merma | Actualización sin alterar su identidad física. |
-| `CU-CAT-16` | Ajustar existencia de merma | Ajuste trazable de inventario de merma. |
-| `CU-CAT-17` | Consultar presentaciones | Catálogo auxiliar de sólo lectura. |
-| `CU-CAT-18` | Consultar unidades de medida | Catálogo auxiliar de sólo lectura. |
-| `CU-CAT-19` | Consultar motivos de ajuste | Catálogo auxiliar de sólo lectura. |
-| `CU-CAT-20` | Consultar estados de cumplimiento | Catálogo auxiliar de sólo lectura. |
-| `CU-CAT-21` | Consultar área | Pantalla y listado independiente de Áreas, restringidos al administrador. |
-| `CU-CAT-22` | Crear área | Alta de área con los campos permitidos. |
-| `CU-CAT-23` | Editar área | Actualización de área con los campos permitidos. |
-| `CU-CAT-24` | Consultar rol | Pantalla y listado independiente de Roles, restringidos al administrador. |
-| `CU-CAT-25` | Crear rol | Alta de rol con los campos permitidos. |
-| `CU-CAT-26` | Editar rol | Actualización de rol con los campos permitidos. |
-| `CU-CAT-27` | Consultar presentación | Pantalla y listado independiente de Presentaciones, restringidos al administrador. |
-| `CU-CAT-28` | Crear presentación | Alta de presentación con los campos permitidos. |
-| `CU-CAT-29` | Editar presentación | Actualización de presentación con los campos permitidos. |
-| `CU-CAT-30` | Consultar unidad de medida | Pantalla y listado independiente de Unidades de medida, restringidos al administrador. |
-| `CU-CAT-31` | Crear unidad de medida | Alta de unidad de medida con los campos permitidos. |
-| `CU-CAT-32` | Editar unidad de medida | Actualización de unidad de medida con los campos permitidos. |
-| `CU-CAT-33` | Consultar motivo de ajuste | Pantalla y listado independiente de Motivos de ajuste, restringidos al administrador. |
-| `CU-CAT-34` | Crear motivo de ajuste | Alta de motivo de ajuste con los campos permitidos. |
-| `CU-CAT-35` | Editar motivo de ajuste | Actualización de motivo de ajuste con los campos permitidos. |
-| `CU-CAT-36` | Consultar estado de cumplimiento | Pantalla y listado independiente de Estados de cumplimiento, restringidos al administrador. |
-| `CU-CAT-37` | Crear estado de cumplimiento | Alta de estado de cumplimiento con los campos permitidos. |
-| `CU-CAT-38` | Editar estado de cumplimiento | Actualización de estado de cumplimiento con los campos permitidos. |
+| `CU-CAT-06` | Consultar inventario de materiales | Consulta autorizada sin modificar datos. |
+| `CU-CAT-07` | Generar reporte de inventario de materiales | Archivo Excel con filtros, columnas y cálculos propios del reporte. |
+| `CU-CAT-08` | Consultar movimientos de materiales | Consulta autorizada sin modificar datos. |
+| `CU-CAT-09` | Generar reporte de movimientos de materiales | Archivo Excel con filtros, columnas y cálculos propios del reporte. |
+| `CU-CAT-10` | Consultar proveedores | Listado de proveedores autorizados. |
+| `CU-CAT-11` | Crear proveedor | Alta con código e identidad válidos. |
+| `CU-CAT-12` | Editar proveedor | Actualización de datos admitidos. |
+| `CU-CAT-13` | Cambiar estado de proveedor | Activación o desactivación del proveedor. |
+| `CU-CAT-14` | Generar reporte de proveedores | Archivo Excel con filtros, columnas y cálculos propios del reporte. |
+| `CU-CAT-15` | Consultar clientes | Listado de clientes autorizados. |
+| `CU-CAT-16` | Crear cliente | Alta con asesor opcional válido. |
+| `CU-CAT-17` | Editar cliente | Actualización de datos y asesor opcional. |
+| `CU-CAT-18` | Generar reporte de clientes | Archivo Excel con filtros, columnas y cálculos propios del reporte. |
+| `CU-CAT-19` | Consultar mermas | Listado de existencias de merma. |
+| `CU-CAT-20` | Registrar merma | Alta desde una plantilla material-proveedor. |
+| `CU-CAT-21` | Editar merma | Actualización sin alterar su identidad física. |
+| `CU-CAT-22` | Ajustar existencia de merma | Ajuste trazable de inventario de merma. |
+| `CU-CAT-23` | Consultar inventario de mermas | Consulta autorizada sin modificar datos. |
+| `CU-CAT-24` | Generar reporte de mermas | Archivo Excel con filtros, columnas y cálculos propios del reporte. |
+| `CU-CAT-25` | Consultar movimientos de mermas | Consulta autorizada sin modificar datos. |
+| `CU-CAT-26` | Generar reporte de movimientos de mermas | Archivo Excel con filtros, columnas y cálculos propios del reporte. |
+| `CU-CAT-27` | Consultar presentaciones | Catálogo auxiliar de sólo lectura. |
+| `CU-CAT-28` | Consultar unidades de medida | Catálogo auxiliar de sólo lectura. |
+| `CU-CAT-29` | Consultar motivos de ajuste | Catálogo auxiliar de sólo lectura. |
+| `CU-CAT-30` | Consultar estados de cumplimiento | Catálogo auxiliar de sólo lectura. |
+| `CU-CAT-31` | Consultar área | Pantalla y listado independiente de Áreas, restringidos al administrador. |
+| `CU-CAT-32` | Crear área | Alta de área con los campos permitidos. |
+| `CU-CAT-33` | Editar área | Actualización de área con los campos permitidos. |
+| `CU-CAT-34` | Consultar rol | Pantalla y listado independiente de Roles, restringidos al administrador. |
+| `CU-CAT-35` | Crear rol | Alta de rol con los campos permitidos. |
+| `CU-CAT-36` | Editar rol | Actualización de rol con los campos permitidos. |
+| `CU-CAT-37` | Consultar presentación | Pantalla y listado independiente de Presentaciones, restringidos al administrador. |
+| `CU-CAT-38` | Crear presentación | Alta de presentación con los campos permitidos. |
+| `CU-CAT-39` | Editar presentación | Actualización de presentación con los campos permitidos. |
+| `CU-CAT-40` | Consultar unidad de medida | Pantalla y listado independiente de Unidades de medida, restringidos al administrador. |
+| `CU-CAT-41` | Crear unidad de medida | Alta de unidad de medida con los campos permitidos. |
+| `CU-CAT-42` | Editar unidad de medida | Actualización de unidad de medida con los campos permitidos. |
+| `CU-CAT-43` | Consultar motivo de ajuste | Pantalla y listado independiente de Motivos de ajuste, restringidos al administrador. |
+| `CU-CAT-44` | Crear motivo de ajuste | Alta de motivo de ajuste con los campos permitidos. |
+| `CU-CAT-45` | Editar motivo de ajuste | Actualización de motivo de ajuste con los campos permitidos. |
+| `CU-CAT-46` | Consultar estado de cumplimiento | Pantalla y listado independiente de Estados de cumplimiento, restringidos al administrador. |
+| `CU-CAT-47` | Crear estado de cumplimiento | Alta de estado de cumplimiento con los campos permitidos. |
+| `CU-CAT-48` | Editar estado de cumplimiento | Actualización de estado de cumplimiento con los campos permitidos. |
 
 ### Grupo funcional ENT — Compras de material
 
@@ -259,6 +272,8 @@ conjunto; el cambio de identificador no modifica el alcance funcional del caso.
 | `CU-ENT-03` | Editar compra de material | Edición de encabezado y detalles admitidos. |
 | `CU-ENT-04` | Corregir material de una compra | Corrección de cantidad o costo con historial. |
 | `CU-ENT-05` | Cancelar material de una compra | Cancelación del detalle y reversión de inventario. |
+| `CU-ENT-06` | Generar reporte de compras de material | Archivo Excel con filtros, columnas y cálculos propios del reporte. |
+
 
 ### Grupo funcional SAL — Salidas de material y de merma
 
@@ -270,75 +285,19 @@ conjunto; el cambio de identificador no modifica el alcance funcional del caso.
 | `CU-SAL-04` | Editar detalles de material de una salida | Actualización de detalles todavía modificables. |
 | `CU-SAL-05` | Surtir material | Descuento de existencia y registro de movimiento. |
 | `CU-SAL-06` | Devolver material surtido | Reintegro de existencia y movimiento inverso. |
-| `CU-SAL-07` | Consultar salidas de merma | Consulta sin modificar existencias. |
-| `CU-SAL-08` | Crear salida de merma | Creación pendiente sin descontar existencias. |
-| `CU-SAL-09` | Editar encabezado de salida de merma | Edición de los campos admitidos. |
-| `CU-SAL-10` | Editar detalles de merma de una salida | Actualización de detalles todavía modificables. |
-| `CU-SAL-11` | Surtir merma | Descuento de existencia y registro de movimiento. |
-| `CU-SAL-12` | Devolver merma surtida | Reintegro de existencia y movimiento inverso. |
-
-### Grupo funcional REP — Consultas y reportes
-
-| Identificador | Caso de uso específico | Evidencia funcional |
-| --- | --- | --- |
-| `CU-REP-01` | Consultar inventario de materiales | Consulta autorizada sin modificar datos. |
-| `CU-REP-02` | Consultar movimientos de materiales | Consulta autorizada sin modificar datos. |
-| `CU-REP-03` | Generar reporte de inventario de materiales | Archivo Excel con filtros, columnas y cálculos propios del reporte. |
-| `CU-REP-04` | Generar reporte de salidas de material | Archivo Excel con filtros, columnas y cálculos propios del reporte. |
-| `CU-REP-05` | Generar reporte de movimientos de materiales | Archivo Excel con filtros, columnas y cálculos propios del reporte. |
-| `CU-REP-06` | Consultar inventario de mermas | Consulta autorizada sin modificar datos. |
-| `CU-REP-07` | Consultar movimientos de mermas | Consulta autorizada sin modificar datos. |
-| `CU-REP-08` | Generar reporte de salidas de merma | Archivo Excel con filtros, columnas y cálculos propios del reporte. |
-| `CU-REP-09` | Generar reporte de mermas | Archivo Excel con filtros, columnas y cálculos propios del reporte. |
-| `CU-REP-10` | Generar reporte de movimientos de mermas | Archivo Excel con filtros, columnas y cálculos propios del reporte. |
-| `CU-REP-11` | Generar reporte de compras de material | Archivo Excel con filtros, columnas y cálculos propios del reporte. |
-| `CU-REP-12` | Generar reporte de proveedores | Archivo Excel con filtros, columnas y cálculos propios del reporte. |
-| `CU-REP-13` | Generar reporte de clientes | Archivo Excel con filtros, columnas y cálculos propios del reporte. |
-| `CU-REP-14` | Generar reporte de personas | Archivo Excel con filtros, columnas y cálculos propios del reporte. |
-| `CU-REP-15` | Generar reporte de usuarios | Archivo Excel con filtros, columnas y cálculos propios del reporte. |
+| `CU-SAL-07` | Generar reporte de salidas de material | Archivo Excel con filtros, columnas y cálculos propios del reporte. |
+| `CU-SAL-08` | Consultar salidas de merma | Consulta sin modificar existencias. |
+| `CU-SAL-09` | Crear salida de merma | Creación pendiente sin descontar existencias. |
+| `CU-SAL-10` | Editar encabezado de salida de merma | Edición de los campos admitidos. |
+| `CU-SAL-11` | Editar detalles de merma de una salida | Actualización de detalles todavía modificables. |
+| `CU-SAL-12` | Surtir merma | Descuento de existencia y registro de movimiento. |
+| `CU-SAL-13` | Devolver merma surtida | Reintegro de existencia y movimiento inverso. |
+| `CU-SAL-14` | Generar reporte de salidas de merma | Archivo Excel con filtros, columnas y cálculos propios del reporte. |
 
 La evidencia orienta la búsqueda, pero no impone una organización por casos de uso
 dentro de `src`: la aplicación está organizada por capas y dominio. Las pruebas
 unitarias siguen la ubicación paralela al artefacto y las integraciones CRUD permanecen
 bajo `tests/integration/controllers`.
-
-## Inferencia de pasos desde la implementación
-
-Los pasos siguientes se contrastaron en cuatro niveles: el JavaScript de la vista revela
-el disparador y las acciones que ejecuta el actor; el router fija autenticación, permiso,
-validación y operación HTTP; el controller normaliza filtros o construye el DTO; y el
-servicio determina reglas, transacciones, existencias, movimientos y estados. Esa
-evidencia técnica se traduce a comportamiento observable y no se copia como si el actor
-invocara controllers, DTO o servicios.
-
-| Evidencia observada | Se asigna a | Descripción a nivel de negocio |
-| --- | --- | --- |
-| Clic, selección, captura o confirmación en la vista | Actor | Abre una opción, proporciona datos, elige una acción o confirma. |
-| Renderizado, carga de opciones, mensaje o descarga | Nexus | Presenta información y comunica el resultado. |
-| Autenticación, permiso y validación de router | Nexus | Comprueba que la operación y los datos estén permitidos. |
-| Normalización, consulta, DTO o respuesta del controller | Nexus | Interpreta la solicitud y prepara o presenta el resultado. |
-| Regla, transacción, existencia, movimiento o estado del servicio | Nexus | Ejecuta la regla de negocio y conserva la consistencia. |
-| Necesidad externa que no aparece en el código | Actor y requisitos | Explica el disparador, pero no se atribuye al sistema. |
-
-La evidencia se clasifica como **Directa** cuando existe una entrada HTTP propia,
-**Compuesta** cuando varias escrituras forman una operación, **Compartida** cuando dos
-objetivos reutilizan la misma consulta o mutación, y **Subflujo** cuando la intención se
-resuelve dentro de una ruta más general. En estos dos últimos casos el código permite
-inferir la ejecución, pero no demuestra por sí solo que exista una opción de interfaz o
-un permiso independiente. En particular:
-
-- consultar inventario de materiales o mermas reutiliza los listados de esos recursos;
-- cambiar el estado de un proveedor forma parte de su edición;
-- surtir material o merma se confirma mediante la actualización de detalles y no mediante
-  una ruta `/supply`;
-- los reportes sí tienen rutas de exportación independientes por entidad.
-
-Esta distinción evita inventar pasos: el código prueba el recorrido ejecutable, mientras
-la intención, el actor y el resultado esperado se conservan en los requisitos. El
-**disparador** se documenta por separado y el primer paso del flujo materializa esa
-iniciativa del actor; Nexus sólo continúa después de la solicitud, salvo que un caso
-declare expresamente un inicio automático.
-
 
 ## Fichas específicas de los casos de uso
 
@@ -361,7 +320,6 @@ la consulta de la sesión actual permanecen como responsabilidades internas de N
 | Actor y disparador | **Actor:** Usuario registrado. **Disparador:** necesita acceder a las capacidades de Nexus para realizar su trabajo autorizado. |
 | Participación de actor y sistema | **Actor:** abre el acceso, captura sus credenciales y confirma.<br>**Nexus:** valida la cuenta, crea la sesión y dirige al usuario al alcance disponible. |
 | Precondiciones | 1. La cuenta existe y está activa.<br>2. El actor no dispone de una sesión autenticada vigente. |
-| Inferencia desde código | **Directa.** `authApiRoute.js` POST `/login` → `loginValidation` → `login` → `loginUser`. |
 | Flujo principal | 1. **Actor:** abre la página de acceso.<br>2. **Nexus:** muestra el formulario de credenciales.<br>3. **Actor:** captura usuario y contraseña y selecciona «Iniciar sesión» **(ver E1)**.<br>4. **Nexus:** valida los datos y comprueba que correspondan a una cuenta activa.<br>5. **Nexus:** establece las credenciales de sesión y presenta la página inicial con las opciones autorizadas. |
 | Excepciones | **E1 — Credenciales rechazadas (después del paso 3):**<br>1. **Nexus:** valida las credenciales, determina que son inválidas o que la cuenta no admite acceso y rechaza la solicitud sin crear la sesión; comunica el error.<br>2. **Actor:** reconoce el rechazo; termina el caso de uso. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** Existe una sesión autenticada atribuida a la cuenta y el usuario puede acceder únicamente a las capacidades autorizadas.<br>2. **Fallo:** No se crean credenciales de sesión ni se expone información protegida. |
@@ -376,7 +334,6 @@ la consulta de la sesión actual permanecen como responsabilidades internas de N
 | Actor y disparador | **Actor:** Usuario registrado con sesión autenticada. **Disparador:** decide terminar su acceso a Nexus. |
 | Participación de actor y sistema | **Actor:** selecciona la opción de cierre.<br>**Nexus:** elimina las credenciales del navegador y confirma la terminación de la sesión. |
 | Precondiciones | 1. El actor dispone de una sesión autenticada. |
-| Inferencia desde código | **Directa.** `logoutWebRoute.js` POST `/` → `logout` → `clearAuthCookies`. |
 | Flujo principal | 1. **Actor:** selecciona «Cerrar sesión» **(ver E1)**.<br>2. **Nexus:** elimina las credenciales y el destino de retorno conservados en el navegador.<br>3. **Nexus:** dirige al actor fuera del área protegida y confirma el cierre. |
 | Excepciones | **E1 — Acceso rechazado (después del paso 1):**<br>1. **Nexus:** comprueba las precondiciones y la autorización, determina que alguna no se cumple y rechaza la solicitud sin modificar datos ni exponer información no autorizada; comunica el motivo.<br>2. **Actor:** reconoce el rechazo; termina el caso de uso. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** El navegador deja de conservar las credenciales de acceso de la sesión.<br>2. **Fallo:** El sistema no debe presentar contenido protegido sin volver a comprobar una sesión válida. |
@@ -395,9 +352,8 @@ Cada ficha representa una sola acción sobre una sola entidad. Los elementos com
 | Actor y disparador | **Actor:** Administrador del sistema. **Disparador:** necesita localizar o revisar personas y abre la opción de consulta correspondiente. |
 | Participación de actor y sistema | **Actor:** abre la consulta, define criterios y selecciona registros.<br>**Nexus:** autoriza, presenta filtros y devuelve sólo la información permitida. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de consulta o reporte correspondiente. |
-| Inferencia desde código | **Directa.** `personApiRoute.js` GET → `getAllPersons` → `personService`. |
-| Flujo principal | 1. **Actor:** abre la opción para consultar personas **(ver E1)**.<br>2. **Nexus:** comprueba su autorización y muestra la tabla con búsqueda, filtros y paginación disponibles **(ver A1)**.<br>3. **Actor:** captura los criterios que necesita y solicita aplicarlos.<br>4. **Nexus:** actualiza la tabla y el total con la información autorizada, sin modificar datos.<br>5. **Actor:** selecciona un registro cuando necesita revisar su información.<br>6. **Nexus:** muestra el detalle y las acciones que el actor puede ejecutar **(ver A2)**. |
-| Flujos alternativos | **A1 — Iniciar una creación (después del paso 2):**<br>1. **Actor:** selecciona la opción para crear una persona en lugar de continuar la consulta; termina `CU-IDA-01` y puede iniciar `CU-IDA-02` Crear persona.<br>**A2 — Elegir una acción sobre el registro (después del paso 6):**<br>1. **Actor:** selecciona editar la persona en lugar de concluir la consulta; termina `CU-IDA-01` y puede iniciar `CU-IDA-03` Editar persona. Cada caso elegido comprueba nuevamente sus precondiciones y autorización; la selección no constituye `«include»` ni `«extend»`. |
+| Flujo principal | 1. **Actor:** abre la opción para consultar personas **(ver E1)**.<br>2. **Nexus:** comprueba su autorización y muestra la consulta con sus criterios disponibles.<br>3. **Actor:** define los criterios que necesita y solicita aplicarlos **(ver A1)**.<br>4. **Nexus:** presenta la información autorizada y la acción principal para registrar una persona.<br>5. **Actor:** selecciona la acción principal; termina `CU-IDA-01` y con esa selección dispara `CU-IDA-02` Crear persona. |
+| Flujos alternativos | **A1 — Continuar la consulta (después del paso 3):**<br>1. **Nexus:** actualiza la información y el total sin modificar datos.<br>2. **Actor:** revisa los resultados o cambia los criterios.<br>3. **Nexus:** conserva la consulta disponible; termina el caso de uso.<br>**A2 — Elegir otra acción (después del paso 4 del flujo principal):**<br>1. **Actor:** selecciona editar la persona en lugar de iniciar el alta; termina `CU-IDA-01` y puede iniciar `CU-IDA-03` Editar persona. También puede iniciar `CU-IDA-04` Generar reporte de personas. Cada caso elegido comprueba nuevamente sus precondiciones y autorización; la selección no constituye `«include»` ni `«extend»`. |
 | Excepciones | **E1 — Acceso rechazado (después del paso 1):**<br>1. **Nexus:** comprueba las precondiciones y la autorización, determina que alguna no se cumple y rechaza la solicitud sin modificar datos ni exponer información no autorizada; comunica el motivo.<br>2. **Actor:** reconoce el rechazo; termina el caso de uso. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** Listado de personas y asignaciones.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
 | Requisitos relacionados | `RF-IAM-002`. |
@@ -408,10 +364,9 @@ Cada ficha representa una sola acción sobre una sola entidad. Los elementos com
 | --- | --- |
 | Identificador | `CU-IDA-02` |
 | Nombre | Crear persona. |
-| Actor y disparador | **Actor:** Administrador del sistema. **Disparador:** necesita incorporar una persona y selecciona la acción de alta. |
+| Actor y disparador | **Actor:** Administrador del sistema. **Disparador:** selecciona la acción principal para crear una persona desde `CU-IDA-01` Consultar personas. |
 | Participación de actor y sistema | **Actor:** abre el alta, captura datos y confirma.<br>**Nexus:** carga opciones, valida, registra y comunica el resultado. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de alta.<br>3. Existen los datos relacionados requeridos para completar el registro. |
-| Inferencia desde código | **Directa.** `personApiRoute.js` POST → `personValidation` → `registerPerson` → `personService`. |
 | Flujo principal | 1. **Actor:** abre la opción para crear persona **(ver E1)**.<br>2. **Nexus:** muestra el formulario y carga las opciones relacionadas que puede utilizar.<br>3. **Actor:** captura los datos y relaciones requeridos y confirma **(ver A1)**.<br>4. **Nexus:** valida autorización, obligatoriedad, formato, identidad y relaciones.<br>5. **Nexus:** registra persona, actualiza el listado y muestra la confirmación. |
 | Flujos alternativos | **A1 — Datos inválidos (después del paso 3):**<br>1. **Nexus:** valida la información capturada, detecta campos incompletos, formatos incorrectos, relaciones no permitidas o cantidades fuera de las reglas del caso y los señala sin registrar cambios.<br>2. **Actor:** corrige la información indicada y vuelve a confirmar; continúa en el paso 4 del flujo principal. |
 | Excepciones | **E1 — Acceso rechazado (después del paso 1):**<br>1. **Nexus:** comprueba las precondiciones y la autorización, determina que alguna no se cumple y rechaza la solicitud sin modificar datos ni exponer información no autorizada; comunica el motivo.<br>2. **Actor:** reconoce el rechazo; termina el caso de uso. |
@@ -427,102 +382,125 @@ Cada ficha representa una sola acción sobre una sola entidad. Los elementos com
 | Actor y disparador | **Actor:** Administrador del sistema. **Disparador:** detecta datos que debe corregir en una persona y selecciona su acción de edición. |
 | Participación de actor y sistema | **Actor:** selecciona el registro, modifica datos y confirma.<br>**Nexus:** presenta valores vigentes, valida, actualiza y comunica el resultado. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de edición.<br>3. El registro objetivo existe.<br>4. El registro se encuentra en un estado que admite los cambios solicitados. |
-| Inferencia desde código | **Directa.** `personApiRoute.js` PUT `/:id` → `personValidation` → `editPerson` → `personService`. |
 | Flujo principal | 1. **Actor:** selecciona persona y abre la edición **(ver E1)**.<br>2. **Nexus:** muestra los valores actuales y habilita sólo los campos permitidos.<br>3. **Actor:** modifica los datos admitidos y confirma **(ver A1)**.<br>4. **Nexus:** valida autorización, formato, identidad y relaciones.<br>5. **Nexus:** guarda los cambios, actualiza el listado y muestra la confirmación. |
 | Flujos alternativos | **A1 — Datos inválidos (después del paso 3):**<br>1. **Nexus:** valida la información capturada, detecta campos incompletos, formatos incorrectos, relaciones no permitidas o cantidades fuera de las reglas del caso y los señala sin registrar cambios.<br>2. **Actor:** corrige la información indicada y vuelve a confirmar; continúa en el paso 4 del flujo principal. |
 | Excepciones | **E1 — Acceso rechazado (después del paso 1):**<br>1. **Nexus:** comprueba las precondiciones y la autorización, determina que alguna no se cumple y rechaza la solicitud sin modificar datos ni exponer información no autorizada; comunica el motivo.<br>2. **Actor:** reconoce el rechazo; termina el caso de uso. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** Actualización de datos y asignaciones de persona.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
 | Requisitos relacionados | `RF-IAM-008`. |
 
-#### `CU-IDA-04` — Consultar usuarios
+
+#### `CU-IDA-04` — Generar reporte de personas
 
 | Sección | Información relevante |
 | --- | --- |
 | Identificador | `CU-IDA-04` |
-| Nombre | Consultar usuarios. |
-| Actor y disparador | **Actor:** Administrador del sistema. **Disparador:** necesita localizar o revisar usuarios y abre la opción de consulta correspondiente. |
-| Participación de actor y sistema | **Actor:** abre la consulta, define criterios y selecciona registros.<br>**Nexus:** autoriza, presenta filtros y devuelve sólo la información permitida. |
+| Nombre | Generar reporte de personas. |
+| Actor y disparador | **Actor:** Usuario con permiso sobre el reporte o consulta. **Disparador:** desde `CU-IDA-01` Consultar personas, selecciona la opción para generar el reporte con los filtros que necesita conservar. |
+| Participación de actor y sistema | **Actor:** define filtros y solicita la exportación.<br>**Nexus:** autoriza, consolida la información y entrega el archivo. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de consulta o reporte correspondiente. |
-| Inferencia desde código | **Directa.** `userApiRoute.js` GET → `getAllUsers` → `userService`. |
-| Flujo principal | 1. **Actor:** abre la opción para consultar usuarios **(ver E1)**.<br>2. **Nexus:** comprueba su autorización y muestra la tabla con búsqueda, filtros y paginación disponibles **(ver A1)**.<br>3. **Actor:** captura los criterios que necesita y solicita aplicarlos.<br>4. **Nexus:** actualiza la tabla y el total con la información autorizada, sin modificar datos.<br>5. **Actor:** selecciona un registro cuando necesita revisar su información.<br>6. **Nexus:** muestra el detalle y las acciones que el actor puede ejecutar **(ver A2)**. |
-| Flujos alternativos | **A1 — Iniciar una creación (después del paso 2):**<br>1. **Actor:** selecciona crear un usuario en lugar de continuar la consulta; termina `CU-IDA-04` y puede iniciar `CU-IDA-05` Crear usuario y asignar acceso.<br>**A2 — Elegir una acción sobre el registro (después del paso 6):**<br>1. **Actor:** selecciona editar el usuario o cambiar su contraseña en lugar de concluir la consulta; termina `CU-IDA-04` y puede iniciar `CU-IDA-06` Editar usuario y acceso o `CU-IDA-07` Cambiar contraseña de usuario. Cada caso elegido comprueba nuevamente sus precondiciones y autorización; la selección no constituye `«include»` ni `«extend»`. |
-| Excepciones | **E1 — Acceso rechazado (después del paso 1):**<br>1. **Nexus:** comprueba las precondiciones y la autorización, determina que alguna no se cumple y rechaza la solicitud sin modificar datos ni exponer información no autorizada; comunica el motivo.<br>2. **Actor:** reconoce el rechazo; termina el caso de uso. |
-| Postcondiciones (éxito y fallo) | 1. **Éxito:** Listado de cuentas y accesos.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
-| Requisitos relacionados | `RF-IAM-001`. |
+| Flujo principal | 1. **Nexus:** después de que el actor selecciona la exportación desde la consulta de origen, abre el modal **Exportar reporte** y muestra las opciones aplicables **(ver E1)**.<br>2. **Actor:** conserva o ajusta los filtros, incluye las opciones disponibles y confirma.<br>3. **Nexus:** vuelve a comprobar autorización y parámetros y prepara la información de personas.<br>4. **Nexus:** genera el archivo de Excel e inicia su descarga; si no hay datos, informa que el resultado está vacío. |
+| Excepciones | **E1 — Exportación rechazada (después del disparador):**<br>1. **Nexus:** comprueba las precondiciones y la autorización, determina que alguna no se cumple y rechaza la solicitud sin modificar datos ni exponer información no autorizada; comunica el motivo.<br>2. **Actor:** reconoce el rechazo; termina el caso de uso. |
+| Postcondiciones (éxito y fallo) | 1. **Éxito:** Archivo Excel con filtros, columnas y cálculos propios del reporte.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
+| Requisitos relacionados | `RF-REP-002`, `RF-REP-004`. |
 
-#### `CU-IDA-05` — Crear usuario y asignar acceso
+#### `CU-IDA-05` — Consultar usuarios
 
 | Sección | Información relevante |
 | --- | --- |
 | Identificador | `CU-IDA-05` |
+| Nombre | Consultar usuarios. |
+| Actor y disparador | **Actor:** Administrador del sistema. **Disparador:** necesita localizar o revisar usuarios y abre la opción de consulta correspondiente. |
+| Participación de actor y sistema | **Actor:** abre la consulta, define criterios y selecciona registros.<br>**Nexus:** autoriza, presenta filtros y devuelve sólo la información permitida. |
+| Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de consulta o reporte correspondiente. |
+| Flujo principal | 1. **Actor:** abre la opción para consultar usuarios **(ver E1)**.<br>2. **Nexus:** comprueba su autorización y muestra la consulta con sus criterios disponibles.<br>3. **Actor:** define los criterios que necesita y solicita aplicarlos **(ver A1)**.<br>4. **Nexus:** presenta la información autorizada y la acción principal para registrar un usuario.<br>5. **Actor:** selecciona la acción principal; termina `CU-IDA-05` y con esa selección dispara `CU-IDA-06` Crear usuario y asignar acceso. |
+| Flujos alternativos | **A1 — Continuar la consulta (después del paso 3):**<br>1. **Nexus:** actualiza la información y el total sin modificar datos.<br>2. **Actor:** revisa los resultados o cambia los criterios.<br>3. **Nexus:** conserva la consulta disponible; termina el caso de uso.<br>**A2 — Elegir otra acción (después del paso 4 del flujo principal):**<br>1. **Actor:** selecciona editar el usuario o cambiar su contraseña en lugar de iniciar el alta; termina `CU-IDA-05` y puede iniciar `CU-IDA-07` Editar usuario y acceso o `CU-IDA-08` Cambiar contraseña de usuario. También puede iniciar `CU-IDA-09` Generar reporte de usuarios. Cada caso elegido comprueba nuevamente sus precondiciones y autorización; la selección no constituye `«include»` ni `«extend»`. |
+| Excepciones | **E1 — Acceso rechazado (después del paso 1):**<br>1. **Nexus:** comprueba las precondiciones y la autorización, determina que alguna no se cumple y rechaza la solicitud sin modificar datos ni exponer información no autorizada; comunica el motivo.<br>2. **Actor:** reconoce el rechazo; termina el caso de uso. |
+| Postcondiciones (éxito y fallo) | 1. **Éxito:** Listado de cuentas y accesos.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
+| Requisitos relacionados | `RF-IAM-001`. |
+
+#### `CU-IDA-06` — Crear usuario y asignar acceso
+
+| Sección | Información relevante |
+| --- | --- |
+| Identificador | `CU-IDA-06` |
 | Nombre | Crear usuario y asignar acceso. |
-| Actor y disparador | **Actor:** Administrador del sistema. **Disparador:** necesita crear una cuenta y asignarle acceso, por lo que selecciona la acción de alta. |
+| Actor y disparador | **Actor:** Administrador del sistema. **Disparador:** selecciona la acción principal para crear un usuario desde `CU-IDA-05` Consultar usuarios. |
 | Participación de actor y sistema | **Actor:** abre el alta, captura datos y confirma.<br>**Nexus:** carga opciones, valida, registra y comunica el resultado. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de alta.<br>3. Existen los datos relacionados requeridos para completar el registro. |
-| Inferencia desde código | **Directa.** `userApiRoute.js` POST → `userValidation` → `registerUser` → `userService`. |
 | Flujo principal | 1. **Actor:** abre la opción para crear usuario y asignar acceso **(ver E1)**.<br>2. **Nexus:** muestra el formulario y carga las opciones relacionadas que puede utilizar.<br>3. **Actor:** captura los datos y relaciones requeridos y confirma **(ver A1)**.<br>4. **Nexus:** valida autorización, obligatoriedad, formato, identidad y relaciones.<br>5. **Nexus:** registra usuario y asignar acceso, actualiza el listado y muestra la confirmación. |
 | Flujos alternativos | **A1 — Datos inválidos (después del paso 3):**<br>1. **Nexus:** valida la información capturada, detecta campos incompletos, formatos incorrectos, relaciones no permitidas o cantidades fuera de las reglas del caso y los señala sin registrar cambios.<br>2. **Actor:** corrige la información indicada y vuelve a confirmar; continúa en el paso 4 del flujo principal. |
 | Excepciones | **E1 — Acceso rechazado (después del paso 1):**<br>1. **Nexus:** comprueba las precondiciones y la autorización, determina que alguna no se cumple y rechaza la solicitud sin modificar datos ni exponer información no autorizada; comunica el motivo.<br>2. **Actor:** reconoce el rechazo; termina el caso de uso. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** Alta transaccional de cuenta y asignación.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
 | Requisitos relacionados | `RF-IAM-004`. |
 
-#### `CU-IDA-06` — Editar usuario y acceso
+#### `CU-IDA-07` — Editar usuario y acceso
 
 | Sección | Información relevante |
 | --- | --- |
-| Identificador | `CU-IDA-06` |
+| Identificador | `CU-IDA-07` |
 | Nombre | Editar usuario y acceso. |
 | Actor y disparador | **Actor:** Administrador del sistema. **Disparador:** detecta datos que debe corregir en una cuenta o su acceso y selecciona su acción de edición. |
 | Participación de actor y sistema | **Actor:** selecciona el registro, modifica datos y confirma.<br>**Nexus:** presenta valores vigentes, valida, actualiza y comunica el resultado. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de edición.<br>3. El registro objetivo existe.<br>4. El registro se encuentra en un estado que admite los cambios solicitados. |
-| Inferencia desde código | **Directa.** `userApiRoute.js` PATCH `/:id` → `userEditValidation` → `editUser` → `userService`. |
 | Flujo principal | 1. **Actor:** selecciona usuario y acceso y abre la edición **(ver E1)**.<br>2. **Nexus:** muestra los valores actuales y habilita sólo los campos permitidos.<br>3. **Actor:** modifica los datos admitidos y confirma **(ver A1)**.<br>4. **Nexus:** valida autorización, formato, identidad y relaciones.<br>5. **Nexus:** guarda los cambios, actualiza el listado y muestra la confirmación. |
 | Flujos alternativos | **A1 — Datos inválidos (después del paso 3):**<br>1. **Nexus:** valida la información capturada, detecta campos incompletos, formatos incorrectos, relaciones no permitidas o cantidades fuera de las reglas del caso y los señala sin registrar cambios.<br>2. **Actor:** corrige la información indicada y vuelve a confirmar; continúa en el paso 4 del flujo principal. |
 | Excepciones | **E1 — Acceso rechazado (después del paso 1):**<br>1. **Nexus:** comprueba las precondiciones y la autorización, determina que alguna no se cumple y rechaza la solicitud sin modificar datos ni exponer información no autorizada; comunica el motivo.<br>2. **Actor:** reconoce el rechazo; termina el caso de uso. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** Actualización transaccional de cuenta y asignación.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
 | Requisitos relacionados | `RF-IAM-005`. |
 
-#### `CU-IDA-07` — Cambiar contraseña de usuario
+#### `CU-IDA-08` — Cambiar contraseña de usuario
 
 | Sección | Información relevante |
 | --- | --- |
-| Identificador | `CU-IDA-07` |
+| Identificador | `CU-IDA-08` |
 | Nombre | Cambiar contraseña de usuario. |
 | Actor y disparador | **Actor:** Administrador del sistema. **Disparador:** necesita renovar la credencial de una cuenta y abre la edición de contraseña. |
 | Participación de actor y sistema | **Actor:** selecciona el registro, modifica datos y confirma.<br>**Nexus:** presenta valores vigentes, valida, actualiza y comunica el resultado. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de cambio de credencial.<br>3. La cuenta objetivo existe. |
-| Inferencia desde código | **Directa.** `userApiRoute.js` PATCH `/:id/password` → `userPasswordValidation` → `editUserPassword` → `userService`. |
 | Flujo principal | 1. **Actor:** selecciona un usuario y abre «Editar contraseña» **(ver E1)**.<br>2. **Nexus:** muestra el formulario de nueva contraseña sin exponer la credencial actual.<br>3. **Actor:** captura y confirma la nueva contraseña **(ver A1)**.<br>4. **Nexus:** valida la credencial, la cifra y reemplaza el valor anterior.<br>5. **Nexus:** cierra el formulario y confirma la actualización. |
 | Flujos alternativos | **A1 — Datos inválidos (después del paso 3):**<br>1. **Nexus:** valida la información capturada, detecta campos incompletos, formatos incorrectos, relaciones no permitidas o cantidades fuera de las reglas del caso y los señala sin registrar cambios.<br>2. **Actor:** corrige la información indicada y vuelve a confirmar; continúa en el paso 4 del flujo principal. |
 | Excepciones | **E1 — Acceso rechazado (después del paso 1):**<br>1. **Nexus:** comprueba las precondiciones y la autorización, determina que alguna no se cumple y rechaza la solicitud sin modificar datos ni exponer información no autorizada; comunica el motivo.<br>2. **Actor:** reconoce el rechazo; termina el caso de uso. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** Actualización cifrada de la credencial.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
 | Requisitos relacionados | `RF-IAM-006`. |
 
-#### `CU-IDA-08` — Consultar roles
+
+#### `CU-IDA-09` — Generar reporte de usuarios
 
 | Sección | Información relevante |
 | --- | --- |
-| Identificador | `CU-IDA-08` |
+| Identificador | `CU-IDA-09` |
+| Nombre | Generar reporte de usuarios. |
+| Actor y disparador | **Actor:** Usuario con permiso sobre el reporte o consulta. **Disparador:** desde `CU-IDA-05` Consultar usuarios, selecciona la opción para generar el reporte con los filtros que necesita conservar. |
+| Participación de actor y sistema | **Actor:** define filtros y solicita la exportación.<br>**Nexus:** autoriza, consolida la información y entrega el archivo. |
+| Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de consulta o reporte correspondiente. |
+| Flujo principal | 1. **Nexus:** después de que el actor selecciona la exportación desde la consulta de origen, abre el modal **Exportar reporte** y muestra las opciones aplicables **(ver E1)**.<br>2. **Actor:** conserva o ajusta los filtros, incluye las opciones disponibles y confirma.<br>3. **Nexus:** vuelve a comprobar autorización y parámetros y prepara la información de usuarios.<br>4. **Nexus:** genera el archivo de Excel e inicia su descarga; si no hay datos, informa que el resultado está vacío. |
+| Excepciones | **E1 — Exportación rechazada (después del disparador):**<br>1. **Nexus:** comprueba las precondiciones y la autorización, determina que alguna no se cumple y rechaza la solicitud sin modificar datos ni exponer información no autorizada; comunica el motivo.<br>2. **Actor:** reconoce el rechazo; termina el caso de uso. |
+| Postcondiciones (éxito y fallo) | 1. **Éxito:** Archivo Excel con filtros, columnas y cálculos propios del reporte.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
+| Requisitos relacionados | `RF-REP-002`, `RF-REP-004`. |
+
+#### `CU-IDA-10` — Consultar roles
+
+| Sección | Información relevante |
+| --- | --- |
+| Identificador | `CU-IDA-10` |
 | Nombre | Consultar roles. |
 | Actor y disparador | **Actor:** Administrador del sistema. **Disparador:** abre un formulario cuyo selector requiere roles. |
 | Participación de actor y sistema | **Actor:** abre la consulta, define criterios y selecciona registros.<br>**Nexus:** autoriza, presenta filtros y devuelve sólo la información permitida. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de consulta o reporte correspondiente. |
-| Inferencia desde código | **Directa.** `roleApiRoute.js` GET → `getAllRoles`. |
 | Flujo principal | 1. **Actor:** abre el formulario del proceso que requiere roles **(ver E1)**.<br>2. **Nexus:** comprueba su autorización y carga roles vigentes.<br>3. **Actor:** consulta o selecciona una opción de roles.<br>4. **Nexus:** conserva la selección para continuar el proceso principal sin modificar el catálogo. |
 | Excepciones | **E1 — Acceso rechazado (después del paso 1):**<br>1. **Nexus:** comprueba las precondiciones y la autorización, determina que alguna no se cumple y rechaza la solicitud sin modificar datos ni exponer información no autorizada; comunica el motivo.<br>2. **Actor:** reconoce el rechazo; termina el caso de uso. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** Catálogo de acceso de sólo lectura.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
 | Requisitos relacionados | `RF-IAM-003`. |
 
-#### `CU-IDA-09` — Consultar departamentos
+#### `CU-IDA-11` — Consultar departamentos
 
 | Sección | Información relevante |
 | --- | --- |
-| Identificador | `CU-IDA-09` |
+| Identificador | `CU-IDA-11` |
 | Nombre | Consultar departamentos. |
 | Actor y disparador | **Actor:** Administrador del sistema. **Disparador:** abre un formulario cuyo selector requiere departamentos. |
 | Participación de actor y sistema | **Actor:** abre la consulta, define criterios y selecciona registros.<br>**Nexus:** autoriza, presenta filtros y devuelve sólo la información permitida. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de consulta o reporte correspondiente. |
-| Inferencia desde código | **Directa.** `departmentApiRoute.js` GET → `getAllDepartments`. |
 | Flujo principal | 1. **Actor:** abre el formulario del proceso que requiere departamentos **(ver E1)**.<br>2. **Nexus:** comprueba su autorización y carga departamentos vigentes.<br>3. **Actor:** consulta o selecciona una opción de departamentos.<br>4. **Nexus:** conserva la selección para continuar el proceso principal sin modificar el catálogo. |
 | Excepciones | **E1 — Acceso rechazado (después del paso 1):**<br>1. **Nexus:** comprueba las precondiciones y la autorización, determina que alguna no se cumple y rechaza la solicitud sin modificar datos ni exponer información no autorizada; comunica el motivo.<br>2. **Actor:** reconoce el rechazo; termina el caso de uso. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** Catálogo de acceso de sólo lectura.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
@@ -541,9 +519,8 @@ Cada ficha representa una sola acción sobre una sola entidad. Los elementos com
 | Actor y disparador | **Actor:** Personal de almacén. **Disparador:** necesita localizar o revisar materiales y abre la opción de consulta correspondiente. |
 | Participación de actor y sistema | **Actor:** abre la consulta, define criterios y selecciona registros.<br>**Nexus:** autoriza, presenta filtros y devuelve sólo la información permitida. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de consulta o reporte correspondiente. |
-| Inferencia desde código | **Directa.** `materialApiRoute.js` GET → `getAllMaterials` → `findAllMaterials`. |
-| Flujo principal | 1. **Actor:** abre la opción para consultar materiales **(ver E1)**.<br>2. **Nexus:** comprueba su autorización y muestra la tabla con búsqueda, filtros y paginación disponibles **(ver A1)**.<br>3. **Actor:** captura los criterios que necesita y solicita aplicarlos.<br>4. **Nexus:** actualiza la tabla y el total con la información autorizada, sin modificar datos.<br>5. **Actor:** selecciona un registro cuando necesita revisar su información.<br>6. **Nexus:** muestra el detalle y las acciones que el actor puede ejecutar **(ver A2)**. |
-| Flujos alternativos | **A1 — Iniciar una creación (después del paso 2):**<br>1. **Actor:** selecciona la opción para crear un material en lugar de continuar la consulta; termina `CU-CAT-01` y puede iniciar `CU-CAT-02` Crear material.<br>**A2 — Elegir una acción sobre el registro (después del paso 6):**<br>1. **Actor:** selecciona editar, retirar o ajustar la existencia del material en lugar de concluir la consulta; termina `CU-CAT-01` y puede iniciar `CU-CAT-03` Editar material, `CU-CAT-04` Retirar material o `CU-CAT-05` Ajustar existencia de material. Cada caso elegido comprueba nuevamente sus precondiciones y autorización; la selección no constituye `«include»` ni `«extend»`. |
+| Flujo principal | 1. **Actor:** abre la opción para consultar materiales **(ver E1)**.<br>2. **Nexus:** comprueba su autorización y muestra la consulta con sus criterios disponibles.<br>3. **Actor:** define los criterios que necesita y solicita aplicarlos **(ver A1)**.<br>4. **Nexus:** presenta la información autorizada y la acción principal para registrar un material.<br>5. **Actor:** selecciona la acción principal; termina `CU-CAT-01` y con esa selección dispara `CU-CAT-02` Crear material. |
+| Flujos alternativos | **A1 — Continuar la consulta (después del paso 3):**<br>1. **Nexus:** actualiza la información y el total sin modificar datos.<br>2. **Actor:** revisa los resultados o cambia los criterios.<br>3. **Nexus:** conserva la consulta disponible; termina el caso de uso.<br>**A2 — Elegir otra acción (después del paso 4 del flujo principal):**<br>1. **Actor:** selecciona editar, retirar o ajustar la existencia del material en lugar de iniciar el alta; termina `CU-CAT-01` y puede iniciar `CU-CAT-03` Editar material, `CU-CAT-04` Retirar material o `CU-CAT-05` Ajustar existencia de material. Cada caso elegido comprueba nuevamente sus precondiciones y autorización; la selección no constituye `«include»` ni `«extend»`. |
 | Excepciones | **E1 — Acceso rechazado (después del paso 1):**<br>1. **Nexus:** comprueba las precondiciones y la autorización, determina que alguna no se cumple y rechaza la solicitud sin modificar datos ni exponer información no autorizada; comunica el motivo.<br>2. **Actor:** reconoce el rechazo; termina el caso de uso. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** Listado de materiales y ofertas de proveedor.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
 | Requisitos relacionados | `RF-CAT-001`. |
@@ -554,10 +531,9 @@ Cada ficha representa una sola acción sobre una sola entidad. Los elementos com
 | --- | --- |
 | Identificador | `CU-CAT-02` |
 | Nombre | Crear material. |
-| Actor y disparador | **Actor:** Personal de almacén. **Disparador:** necesita incorporar un material y selecciona la acción de alta. |
+| Actor y disparador | **Actor:** Personal de almacén. **Disparador:** selecciona la acción principal para crear un material desde `CU-CAT-01` Consultar materiales. |
 | Participación de actor y sistema | **Actor:** abre el alta, captura datos y confirma.<br>**Nexus:** carga opciones, valida, registra y comunica el resultado. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de alta.<br>3. Existen los datos relacionados requeridos para completar el registro. |
-| Inferencia desde código | **Directa.** `materialApiRoute.js` POST → validación → DTO → `createMaterial`. |
 | Flujo principal | 1. **Actor:** abre la opción para crear material **(ver E1)**.<br>2. **Nexus:** muestra el formulario y carga las opciones relacionadas que puede utilizar.<br>3. **Actor:** captura nombre, proveedor, presentación, unidad, ambas dimensiones o ninguna, y los datos de inventario requeridos; después confirma **(ver A1)**.<br>4. **Nexus:** valida autorización, obligatoriedad, formato, identidad y relaciones **(ver A2)**.<br>5. **Nexus:** registra la identidad o reutiliza la existente, crea la oferta del proveedor, actualiza el listado y muestra la confirmación. |
 | Flujos alternativos | **A1 — Datos inválidos (después del paso 3):**<br>1. **Nexus:** valida la información capturada, detecta campos incompletos, formatos incorrectos, relaciones no permitidas o cantidades fuera de las reglas del caso y los señala sin registrar cambios.<br>2. **Actor:** corrige la información indicada y vuelve a confirmar; continúa en el paso 4 del flujo principal.<br>**A2 — Identidad ya registrada (después del paso 4):**<br>1. **Actor:** revisa el material coincidente que Nexus presenta.<br>2. **Nexus:** si ya existe la relación con el mismo proveedor, rechaza el alta sin modificar la existencia e indica que debe ajustarse el inventario existente; termina el caso de uso.<br>3. **Nexus:** si la identidad sólo existe para otro proveedor, reutiliza el material y crea la nueva relación proveedor-material; continúa en el paso 5 del flujo principal. |
 | Excepciones | **E1 — Acceso rechazado (después del paso 1):**<br>1. **Nexus:** comprueba las precondiciones y la autorización, determina que alguna no se cumple y rechaza la solicitud sin modificar datos ni exponer información no autorizada; comunica el motivo.<br>2. **Actor:** reconoce el rechazo; termina el caso de uso. |
@@ -573,7 +549,6 @@ Cada ficha representa una sola acción sobre una sola entidad. Los elementos com
 | Actor y disparador | **Actor:** Personal de almacén. **Disparador:** detecta datos que debe corregir en un material y selecciona su acción de edición. |
 | Participación de actor y sistema | **Actor:** selecciona el registro, modifica datos y confirma.<br>**Nexus:** presenta valores vigentes, valida, actualiza y comunica el resultado. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de edición.<br>3. El registro objetivo existe.<br>4. El registro se encuentra en un estado que admite los cambios solicitados. |
-| Inferencia desde código | **Directa.** `materialApiRoute.js` PATCH `/:id` → validación → DTO → `updateMaterial`. |
 | Flujo principal | 1. **Actor:** selecciona material y abre la edición **(ver E1)**.<br>2. **Nexus:** muestra los valores actuales; bloquea proveedor, presentación, unidad y dimensiones, y habilita nombre, stock mínimo, costo máximo y estado.<br>3. **Actor:** modifica los datos admitidos y confirma **(ver A1)**.<br>4. **Nexus:** valida autorización, formato, identidad y relaciones **(ver A2)**.<br>5. **Nexus:** actualiza los datos compartidos del material y el costo de la oferta seleccionada, actualiza el listado y muestra la confirmación. |
 | Flujos alternativos | **A1 — Datos inválidos (después del paso 3):**<br>1. **Nexus:** valida la información capturada, detecta campos incompletos, formatos incorrectos, relaciones no permitidas o cantidades fuera de las reglas del caso y los señala sin registrar cambios.<br>2. **Actor:** corrige la información indicada y vuelve a confirmar; continúa en el paso 4 del flujo principal.<br>**A2 — El nombre produce una identidad existente (después del paso 4):**<br>1. **Nexus:** compara el nombre sin distinguir mayúsculas junto con la presentación, unidad y dimensiones inmutables.<br>2. **Nexus:** rechaza la edición sin modificar el material ni la oferta y comunica que la identidad ya existe; termina el caso de uso. |
 | Excepciones | **E1 — Acceso rechazado (después del paso 1):**<br>1. **Nexus:** comprueba las precondiciones y la autorización, determina que alguna no se cumple y rechaza la solicitud sin modificar datos ni exponer información no autorizada; comunica el motivo.<br>2. **Actor:** reconoce el rechazo; termina el caso de uso. |
@@ -589,7 +564,6 @@ Cada ficha representa una sola acción sobre una sola entidad. Los elementos com
 | Actor y disparador | **Actor:** Personal de almacén. **Disparador:** determina que debe retirar material y solicita la eliminación. |
 | Participación de actor y sistema | **Actor:** solicita y confirma el retiro.<br>**Nexus:** comprueba historia y relaciones, ejecuta sólo el retiro permitido e informa el resultado. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de retiro.<br>3. El recurso objetivo existe.<br>4. El recurso se encuentra en un estado que permite retirarlo. |
-| Inferencia desde código | **Directa.** `materialApiRoute.js` DELETE `/:id` → `removeMaterial` → `deleteMaterial`. |
 | Flujo principal | 1. **Actor:** selecciona un material y solicita retirarlo **(ver E1)**.<br>2. **Nexus:** identifica el material y solicita confirmar la eliminación.<br>3. **Actor:** confirma que desea retirarlo.<br>4. **Nexus:** comprueba si el material tiene historia protegida o relaciones con proveedores **(ver A1)**.<br>5. **Nexus:** elimina la relación proveedor-material y, cuando no quedan otras relaciones ni historia protegida, elimina también la identidad del material; después actualiza el listado y confirma el retiro. |
 | Flujos alternativos | **A1 — Material con historia o relaciones protegidas (después del paso 4):**<br>1. **Actor:** revisa el conflicto y las relaciones que Nexus informa.<br>2. **Nexus:** conserva la identidad, la existencia y la historia del material sin efectuar una eliminación parcial.<br>3. **Actor:** reconoce que el material no puede retirarse en esas condiciones; termina el caso de uso. |
 | Excepciones | **E1 — Acceso rechazado (después del paso 1):**<br>1. **Nexus:** comprueba las precondiciones y la autorización, determina que alguna no se cumple y rechaza la solicitud sin modificar datos ni exponer información no autorizada; comunica el motivo.<br>2. **Actor:** reconoce el rechazo; termina el caso de uso. |
@@ -605,526 +579,652 @@ Cada ficha representa una sola acción sobre una sola entidad. Los elementos com
 | Actor y disparador | **Actor:** Administrador del sistema. **Disparador:** detecta o autoriza una diferencia de existencia de material y abre el ajuste de stock desde la consulta de materiales. |
 | Participación de actor y sistema | **Actor:** selecciona el inventario, captura el ajuste y confirma.<br>**Nexus:** muestra la existencia, valida, registra el ajuste y actualiza inventario. |
 | Precondiciones | 1. El actor inició sesión como administrador del sistema.<br>2. El actor cuenta con el permiso `materials:adjust-stock`.<br>3. El recurso cuya existencia se ajustará existe. |
-| Inferencia desde código | **Directa.** `materialApiRoute.js` PATCH `/:id/stock` → `updateMaterialStock` → evento de inventario. |
 | Flujo principal | 1. **Actor:** selecciona el material y abre «Ajustar existencia» **(ver E1)**.<br>2. **Nexus:** muestra la existencia actual y los campos de tipo, cantidad y motivo.<br>3. **Actor:** captura el ajuste y lo confirma **(ver A1)**.<br>4. **Nexus:** valida la autorización, el motivo y la cantidad y registra el ajuste junto con la nueva existencia.<br>5. **Nexus:** actualiza las vistas de inventario y confirma el resultado. |
 | Flujos alternativos | **A1 — Datos inválidos (después del paso 3):**<br>1. **Nexus:** valida la información capturada, detecta campos incompletos, formatos incorrectos, relaciones no permitidas o cantidades fuera de las reglas del caso y los señala sin registrar cambios.<br>2. **Actor:** corrige la información indicada y vuelve a confirmar; continúa en el paso 4 del flujo principal. |
 | Excepciones | **E1 — Acceso rechazado (después del paso 1):**<br>1. **Nexus:** comprueba las precondiciones y la autorización, determina que alguna no se cumple y rechaza la solicitud sin modificar datos ni exponer información no autorizada; comunica el motivo.<br>2. **Actor:** reconoce el rechazo; termina el caso de uso. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** La existencia del material refleja el ajuste autorizado.<br>2. **Éxito:** El ajuste queda registrado con su motivo y trazabilidad.<br>3. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
 | Requisitos relacionados | `RF-CAT-009`. |
 
-#### `CU-CAT-06` — Consultar proveedores
+
+#### `CU-CAT-06` — Consultar inventario de materiales
 
 | Sección | Información relevante |
 | --- | --- |
 | Identificador | `CU-CAT-06` |
-| Nombre | Consultar proveedores. |
-| Actor y disparador | **Actor:** Personal de almacén. **Disparador:** necesita localizar o revisar proveedores y abre la opción de consulta correspondiente. |
+| Nombre | Consultar inventario de materiales. |
+| Actor y disparador | **Actor:** Usuario con permiso sobre el reporte o consulta. **Disparador:** necesita localizar o revisar inventario de materiales y abre la opción de consulta correspondiente. |
 | Participación de actor y sistema | **Actor:** abre la consulta, define criterios y selecciona registros.<br>**Nexus:** autoriza, presenta filtros y devuelve sólo la información permitida. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de consulta o reporte correspondiente. |
-| Inferencia desde código | **Directa.** `supplierApiRoute.js` GET → `getAllSuppliers`. |
-| Flujo principal | 1. **Actor:** abre la opción para consultar proveedores **(ver E1)**.<br>2. **Nexus:** comprueba su autorización y muestra la tabla con búsqueda, filtros y paginación disponibles **(ver A1)**.<br>3. **Actor:** captura los criterios que necesita y solicita aplicarlos.<br>4. **Nexus:** actualiza la tabla y el total con la información autorizada, sin modificar datos.<br>5. **Actor:** selecciona un registro cuando necesita revisar su información.<br>6. **Nexus:** muestra el detalle y las acciones que el actor puede ejecutar **(ver A2)**. |
-| Flujos alternativos | **A1 — Iniciar una creación (después del paso 2):**<br>1. **Actor:** selecciona la opción para crear un proveedor en lugar de continuar la consulta; termina `CU-CAT-06` y puede iniciar `CU-CAT-07` Crear proveedor.<br>**A2 — Elegir una acción sobre el registro (después del paso 6):**<br>1. **Actor:** selecciona editar el proveedor o cambiar su estado en lugar de concluir la consulta; termina `CU-CAT-06` y puede iniciar `CU-CAT-08` Editar proveedor o `CU-CAT-09` Cambiar estado de proveedor. Cada caso elegido comprueba nuevamente sus precondiciones y autorización; la selección no constituye `«include»` ni `«extend»`. |
+| Flujo principal | 1. **Actor:** abre la opción para consultar inventario de materiales **(ver E1)**.<br>2. **Nexus:** comprueba su autorización y muestra los filtros disponibles.<br>3. **Actor:** define los criterios que necesita y solicita aplicarlos **(ver A1)**.<br>4. **Nexus:** presenta la información autorizada y la opción **Exportar Excel**.<br>5. **Actor:** selecciona **Exportar Excel**; termina `CU-CAT-06` y con esa selección dispara `CU-CAT-07` Generar reporte de inventario de materiales. |
+| Flujos alternativos | **A1 — Permanecer en la consulta (después del paso 3):**<br>1. **Nexus:** actualiza la tabla y el total sin modificar datos.<br>2. **Actor:** revisa los resultados o cambia los criterios.<br>3. **Nexus:** conserva la consulta disponible; termina el caso de uso. |
 | Excepciones | **E1 — Acceso rechazado (después del paso 1):**<br>1. **Nexus:** comprueba las precondiciones y la autorización, determina que alguna no se cumple y rechaza la solicitud sin modificar datos ni exponer información no autorizada; comunica el motivo.<br>2. **Actor:** reconoce el rechazo; termina el caso de uso. |
-| Postcondiciones (éxito y fallo) | 1. **Éxito:** Listado de proveedores autorizados.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
-| Requisitos relacionados | `RF-CAT-002`. |
+| Postcondiciones (éxito y fallo) | 1. **Éxito:** Consulta autorizada sin modificar datos.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
+| Requisitos relacionados | `RF-REP-001`. |
 
-#### `CU-CAT-07` — Crear proveedor
+
+#### `CU-CAT-07` — Generar reporte de inventario de materiales
 
 | Sección | Información relevante |
 | --- | --- |
 | Identificador | `CU-CAT-07` |
+| Nombre | Generar reporte de inventario de materiales. |
+| Actor y disparador | **Actor:** Usuario con permiso sobre el reporte o consulta. **Disparador:** desde `CU-CAT-06` Consultar inventario de materiales, selecciona **Exportar Excel** con los filtros que necesita conservar. |
+| Participación de actor y sistema | **Actor:** define filtros y solicita la exportación.<br>**Nexus:** autoriza, consolida la información y entrega el archivo. |
+| Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de consulta o reporte correspondiente. |
+| Flujo principal | 1. **Nexus:** después de que el actor selecciona la exportación desde la consulta de origen, abre el modal **Exportar reporte** y muestra las opciones aplicables **(ver E1)**.<br>2. **Actor:** conserva o ajusta los filtros, incluye el alcance y las opciones disponibles y confirma.<br>3. **Nexus:** vuelve a comprobar autorización y parámetros y prepara la información de inventario de materiales.<br>4. **Nexus:** genera el archivo de Excel e inicia su descarga; si no hay datos, informa que el resultado está vacío. |
+| Excepciones | **E1 — Exportación rechazada (después del disparador):**<br>1. **Nexus:** comprueba las precondiciones y la autorización, determina que alguna no se cumple y rechaza la solicitud sin modificar datos ni exponer información no autorizada; comunica el motivo.<br>2. **Actor:** reconoce el rechazo; termina el caso de uso. |
+| Postcondiciones (éxito y fallo) | 1. **Éxito:** Archivo Excel con filtros, columnas y cálculos propios del reporte.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
+| Requisitos relacionados | `RF-REP-002`, `RF-REP-004`, `RF-REP-008`. |
+
+
+#### `CU-CAT-08` — Consultar movimientos de materiales
+
+| Sección | Información relevante |
+| --- | --- |
+| Identificador | `CU-CAT-08` |
+| Nombre | Consultar movimientos de materiales. |
+| Actor y disparador | **Actor:** Usuario con permiso sobre el reporte o consulta. **Disparador:** necesita localizar o revisar movimientos de materiales y abre la opción de consulta correspondiente. |
+| Participación de actor y sistema | **Actor:** abre la consulta, define criterios y selecciona registros.<br>**Nexus:** autoriza, presenta filtros y devuelve sólo la información permitida. |
+| Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de consulta o reporte correspondiente. |
+| Flujo principal | 1. **Actor:** abre la opción para consultar movimientos de materiales **(ver E1)**.<br>2. **Nexus:** comprueba su autorización y muestra los filtros disponibles.<br>3. **Actor:** define los criterios que necesita y solicita aplicarlos **(ver A1)**.<br>4. **Nexus:** presenta la información autorizada y la opción **Exportar Excel**.<br>5. **Actor:** selecciona **Exportar Excel**; termina `CU-CAT-08` y con esa selección dispara `CU-CAT-09` Generar reporte de movimientos de materiales. |
+| Flujos alternativos | **A1 — Permanecer en la consulta (después del paso 3):**<br>1. **Nexus:** actualiza la tabla y el total sin modificar datos.<br>2. **Actor:** revisa los resultados o cambia los criterios.<br>3. **Nexus:** conserva la consulta disponible; termina el caso de uso. |
+| Excepciones | **E1 — Acceso rechazado (después del paso 1):**<br>1. **Nexus:** comprueba las precondiciones y la autorización, determina que alguna no se cumple y rechaza la solicitud sin modificar datos ni exponer información no autorizada; comunica el motivo.<br>2. **Actor:** reconoce el rechazo; termina el caso de uso. |
+| Postcondiciones (éxito y fallo) | 1. **Éxito:** Consulta autorizada sin modificar datos.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
+| Requisitos relacionados | `RF-REP-001`. |
+
+
+#### `CU-CAT-09` — Generar reporte de movimientos de materiales
+
+| Sección | Información relevante |
+| --- | --- |
+| Identificador | `CU-CAT-09` |
+| Nombre | Generar reporte de movimientos de materiales. |
+| Actor y disparador | **Actor:** Usuario con permiso sobre el reporte o consulta. **Disparador:** desde `CU-CAT-08` Consultar movimientos de materiales, selecciona **Exportar Excel** con los filtros que necesita conservar. |
+| Participación de actor y sistema | **Actor:** define filtros y solicita la exportación.<br>**Nexus:** autoriza, consolida la información y entrega el archivo. |
+| Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de consulta o reporte correspondiente. |
+| Flujo principal | 1. **Nexus:** después de que el actor selecciona la exportación desde la consulta de origen, abre el modal **Exportar reporte** y muestra las opciones aplicables **(ver E1)**.<br>2. **Actor:** conserva o ajusta los filtros, incluye las opciones disponibles y confirma.<br>3. **Nexus:** vuelve a comprobar autorización y parámetros y prepara la información de movimientos de materiales.<br>4. **Nexus:** genera el archivo de Excel e inicia su descarga; si no hay datos, informa que el resultado está vacío. |
+| Excepciones | **E1 — Exportación rechazada (después del disparador):**<br>1. **Nexus:** comprueba las precondiciones y la autorización, determina que alguna no se cumple y rechaza la solicitud sin modificar datos ni exponer información no autorizada; comunica el motivo.<br>2. **Actor:** reconoce el rechazo; termina el caso de uso. |
+| Postcondiciones (éxito y fallo) | 1. **Éxito:** Archivo Excel con filtros, columnas y cálculos propios del reporte.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
+| Requisitos relacionados | `RF-REP-002`, `RF-REP-004`, `RF-REP-005`. |
+
+#### `CU-CAT-10` — Consultar proveedores
+
+| Sección | Información relevante |
+| --- | --- |
+| Identificador | `CU-CAT-10` |
+| Nombre | Consultar proveedores. |
+| Actor y disparador | **Actor:** Personal de almacén. **Disparador:** necesita localizar o revisar proveedores y abre la opción de consulta correspondiente. |
+| Participación de actor y sistema | **Actor:** abre la consulta, define criterios y selecciona registros.<br>**Nexus:** autoriza, presenta filtros y devuelve sólo la información permitida. |
+| Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de consulta o reporte correspondiente. |
+| Flujo principal | 1. **Actor:** abre la opción para consultar proveedores **(ver E1)**.<br>2. **Nexus:** comprueba su autorización y muestra la consulta con sus criterios disponibles.<br>3. **Actor:** define los criterios que necesita y solicita aplicarlos **(ver A1)**.<br>4. **Nexus:** presenta la información autorizada y la acción principal para registrar un proveedor.<br>5. **Actor:** selecciona la acción principal; termina `CU-CAT-10` y con esa selección dispara `CU-CAT-11` Crear proveedor. |
+| Flujos alternativos | **A1 — Continuar la consulta (después del paso 3):**<br>1. **Nexus:** actualiza la información y el total sin modificar datos.<br>2. **Actor:** revisa los resultados o cambia los criterios.<br>3. **Nexus:** conserva la consulta disponible; termina el caso de uso.<br>**A2 — Elegir otra acción (después del paso 4 del flujo principal):**<br>1. **Actor:** selecciona editar el proveedor o cambiar su estado en lugar de iniciar el alta; termina `CU-CAT-10` y puede iniciar `CU-CAT-12` Editar proveedor o `CU-CAT-13` Cambiar estado de proveedor. También puede iniciar `CU-CAT-14` Generar reporte de proveedores. Cada caso elegido comprueba nuevamente sus precondiciones y autorización; la selección no constituye `«include»` ni `«extend»`. |
+| Excepciones | **E1 — Acceso rechazado (después del paso 1):**<br>1. **Nexus:** comprueba las precondiciones y la autorización, determina que alguna no se cumple y rechaza la solicitud sin modificar datos ni exponer información no autorizada; comunica el motivo.<br>2. **Actor:** reconoce el rechazo; termina el caso de uso. |
+| Postcondiciones (éxito y fallo) | 1. **Éxito:** Listado de proveedores autorizados.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
+| Requisitos relacionados | `RF-CAT-002`. |
+
+#### `CU-CAT-11` — Crear proveedor
+
+| Sección | Información relevante |
+| --- | --- |
+| Identificador | `CU-CAT-11` |
 | Nombre | Crear proveedor. |
-| Actor y disparador | **Actor:** Personal de almacén. **Disparador:** necesita incorporar un proveedor y selecciona la acción de alta. |
+| Actor y disparador | **Actor:** Personal de almacén. **Disparador:** selecciona la acción principal para crear un proveedor desde `CU-CAT-10` Consultar proveedores. |
 | Participación de actor y sistema | **Actor:** abre el alta, captura datos y confirma.<br>**Nexus:** carga opciones, valida, registra y comunica el resultado. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de alta.<br>3. Existen los datos relacionados requeridos para completar el registro. |
-| Inferencia desde código | **Directa.** `supplierApiRoute.js` POST → `supplierValidation` → `registerSupplier`. |
 | Flujo principal | 1. **Actor:** abre la opción para crear proveedor **(ver E1)**.<br>2. **Nexus:** muestra el formulario y carga las opciones relacionadas que puede utilizar.<br>3. **Actor:** captura los datos y relaciones requeridos y confirma **(ver A1)**.<br>4. **Nexus:** valida autorización, obligatoriedad, formato, identidad y relaciones.<br>5. **Nexus:** registra proveedor, actualiza el listado y muestra la confirmación. |
 | Flujos alternativos | **A1 — Datos inválidos (después del paso 3):**<br>1. **Nexus:** valida la información capturada, detecta campos incompletos, formatos incorrectos, relaciones no permitidas o cantidades fuera de las reglas del caso y los señala sin registrar cambios.<br>2. **Actor:** corrige la información indicada y vuelve a confirmar; continúa en el paso 4 del flujo principal. |
 | Excepciones | **E1 — Acceso rechazado (después del paso 1):**<br>1. **Nexus:** comprueba las precondiciones y la autorización, determina que alguna no se cumple y rechaza la solicitud sin modificar datos ni exponer información no autorizada; comunica el motivo.<br>2. **Actor:** reconoce el rechazo; termina el caso de uso. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** Alta con código e identidad válidos.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
 | Requisitos relacionados | `RF-CAT-010`. |
 
-#### `CU-CAT-08` — Editar proveedor
+#### `CU-CAT-12` — Editar proveedor
 
 | Sección | Información relevante |
 | --- | --- |
-| Identificador | `CU-CAT-08` |
+| Identificador | `CU-CAT-12` |
 | Nombre | Editar proveedor. |
 | Actor y disparador | **Actor:** Personal de almacén. **Disparador:** detecta datos que debe corregir en un proveedor y selecciona su acción de edición. |
 | Participación de actor y sistema | **Actor:** selecciona el registro, modifica datos y confirma.<br>**Nexus:** presenta valores vigentes, valida, actualiza y comunica el resultado. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de edición.<br>3. El registro objetivo existe.<br>4. El registro se encuentra en un estado que admite los cambios solicitados. |
-| Inferencia desde código | **Directa.** `supplierApiRoute.js` PUT `/:id` → `supplierValidation` → `editSupplier`. |
 | Flujo principal | 1. **Actor:** selecciona proveedor y abre la edición **(ver E1)**.<br>2. **Nexus:** muestra los valores actuales y habilita sólo los campos permitidos.<br>3. **Actor:** modifica los datos admitidos y confirma **(ver A1)**.<br>4. **Nexus:** valida autorización, formato, identidad y relaciones.<br>5. **Nexus:** guarda los cambios, actualiza el listado y muestra la confirmación. |
 | Flujos alternativos | **A1 — Datos inválidos (después del paso 3):**<br>1. **Nexus:** valida la información capturada, detecta campos incompletos, formatos incorrectos, relaciones no permitidas o cantidades fuera de las reglas del caso y los señala sin registrar cambios.<br>2. **Actor:** corrige la información indicada y vuelve a confirmar; continúa en el paso 4 del flujo principal. |
 | Excepciones | **E1 — Acceso rechazado (después del paso 1):**<br>1. **Nexus:** comprueba las precondiciones y la autorización, determina que alguna no se cumple y rechaza la solicitud sin modificar datos ni exponer información no autorizada; comunica el motivo.<br>2. **Actor:** reconoce el rechazo; termina el caso de uso. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** Actualización de datos admitidos.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
 | Requisitos relacionados | `RF-CAT-011`. |
 
-#### `CU-CAT-09` — Cambiar estado de proveedor
+#### `CU-CAT-13` — Cambiar estado de proveedor
 
 | Sección | Información relevante |
 | --- | --- |
-| Identificador | `CU-CAT-09` |
+| Identificador | `CU-CAT-13` |
 | Nombre | Cambiar estado de proveedor. |
 | Actor y disparador | **Actor:** Personal de almacén. **Disparador:** necesita activar o desactivar un proveedor y abre su edición. |
 | Participación de actor y sistema | **Actor:** selecciona el registro, modifica datos y confirma.<br>**Nexus:** presenta valores vigentes, valida, actualiza y comunica el resultado. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de edición.<br>3. El proveedor objetivo existe. |
-| Inferencia desde código | **Subflujo.** el estado viaja por `supplierApiRoute.js` PUT `/:id`; no existe una ruta independiente de estado. |
 | Flujo principal | 1. **Actor:** selecciona un proveedor y abre su edición **(ver E1)**.<br>2. **Nexus:** muestra los datos actuales, incluido el estado.<br>3. **Actor:** elige el nuevo estado y confirma **(ver A1)**.<br>4. **Nexus:** valida los datos y actualiza el proveedor como parte de la edición.<br>5. **Nexus:** refresca el listado y confirma el cambio de estado. |
 | Flujos alternativos | **A1 — Datos inválidos (después del paso 3):**<br>1. **Nexus:** valida la información capturada, detecta campos incompletos, formatos incorrectos, relaciones no permitidas o cantidades fuera de las reglas del caso y los señala sin registrar cambios.<br>2. **Actor:** corrige la información indicada y vuelve a confirmar; continúa en el paso 4 del flujo principal. |
 | Excepciones | **E1 — Acceso rechazado (después del paso 1):**<br>1. **Nexus:** comprueba las precondiciones y la autorización, determina que alguna no se cumple y rechaza la solicitud sin modificar datos ni exponer información no autorizada; comunica el motivo.<br>2. **Actor:** reconoce el rechazo; termina el caso de uso. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** Activación o desactivación del proveedor.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
 | Requisitos relacionados | `RF-CAT-011`. |
 
-#### `CU-CAT-10` — Consultar clientes
 
-| Sección | Información relevante |
-| --- | --- |
-| Identificador | `CU-CAT-10` |
-| Nombre | Consultar clientes. |
-| Actor y disparador | **Actor:** Administrador del sistema. **Disparador:** necesita localizar o revisar clientes y abre la opción de consulta correspondiente. |
-| Participación de actor y sistema | **Actor:** abre la consulta, define criterios y selecciona registros.<br>**Nexus:** autoriza, presenta filtros y devuelve sólo la información permitida. |
-| Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de consulta o reporte correspondiente. |
-| Inferencia desde código | **Directa.** `clientApiRoute.js` GET → `getAllClients`. |
-| Flujo principal | 1. **Actor:** abre la opción para consultar clientes **(ver E1)**.<br>2. **Nexus:** comprueba su autorización y muestra la tabla con búsqueda, filtros y paginación disponibles **(ver A1)**.<br>3. **Actor:** captura los criterios que necesita y solicita aplicarlos.<br>4. **Nexus:** actualiza la tabla y el total con la información autorizada, sin modificar datos.<br>5. **Actor:** selecciona un registro cuando necesita revisar su información.<br>6. **Nexus:** muestra el detalle y las acciones que el actor puede ejecutar **(ver A2)**. |
-| Flujos alternativos | **A1 — Iniciar una creación (después del paso 2):**<br>1. **Actor:** selecciona la opción para crear un cliente en lugar de continuar la consulta; termina `CU-CAT-10` y puede iniciar `CU-CAT-11` Crear cliente.<br>**A2 — Elegir una acción sobre el registro (después del paso 6):**<br>1. **Actor:** selecciona editar el cliente en lugar de concluir la consulta; termina `CU-CAT-10` y puede iniciar `CU-CAT-12` Editar cliente. Cada caso elegido comprueba nuevamente sus precondiciones y autorización; la selección no constituye `«include»` ni `«extend»`. |
-| Excepciones | **E1 — Acceso rechazado (después del paso 1):**<br>1. **Nexus:** comprueba las precondiciones y la autorización, determina que alguna no se cumple y rechaza la solicitud sin modificar datos ni exponer información no autorizada; comunica el motivo.<br>2. **Actor:** reconoce el rechazo; termina el caso de uso. |
-| Postcondiciones (éxito y fallo) | 1. **Éxito:** Listado de clientes autorizados.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
-| Requisitos relacionados | `RF-CAT-003`. |
-
-#### `CU-CAT-11` — Crear cliente
-
-| Sección | Información relevante |
-| --- | --- |
-| Identificador | `CU-CAT-11` |
-| Nombre | Crear cliente. |
-| Actor y disparador | **Actor:** Administrador del sistema. **Disparador:** necesita incorporar un cliente y selecciona la acción de alta. |
-| Participación de actor y sistema | **Actor:** abre el alta, captura datos y confirma.<br>**Nexus:** carga opciones, valida, registra y comunica el resultado. |
-| Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de alta.<br>3. Existen los datos relacionados requeridos para completar el registro. |
-| Inferencia desde código | **Directa.** `clientApiRoute.js` POST → `registerClient`. |
-| Flujo principal | 1. **Actor:** abre la opción para crear cliente **(ver E1)**.<br>2. **Nexus:** muestra el formulario y carga las opciones relacionadas que puede utilizar.<br>3. **Actor:** captura los datos y relaciones requeridos y confirma **(ver A1)**.<br>4. **Nexus:** valida autorización, obligatoriedad, formato, identidad y relaciones.<br>5. **Nexus:** registra cliente, actualiza el listado y muestra la confirmación. |
-| Flujos alternativos | **A1 — Datos inválidos (después del paso 3):**<br>1. **Nexus:** valida la información capturada, detecta campos incompletos, formatos incorrectos, relaciones no permitidas o cantidades fuera de las reglas del caso y los señala sin registrar cambios.<br>2. **Actor:** corrige la información indicada y vuelve a confirmar; continúa en el paso 4 del flujo principal. |
-| Excepciones | **E1 — Acceso rechazado (después del paso 1):**<br>1. **Nexus:** comprueba las precondiciones y la autorización, determina que alguna no se cumple y rechaza la solicitud sin modificar datos ni exponer información no autorizada; comunica el motivo.<br>2. **Actor:** reconoce el rechazo; termina el caso de uso. |
-| Postcondiciones (éxito y fallo) | 1. **Éxito:** Alta con asesor opcional válido.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
-| Requisitos relacionados | `RF-CAT-013`. |
-
-#### `CU-CAT-12` — Editar cliente
-
-| Sección | Información relevante |
-| --- | --- |
-| Identificador | `CU-CAT-12` |
-| Nombre | Editar cliente. |
-| Actor y disparador | **Actor:** Administrador del sistema. **Disparador:** detecta datos que debe corregir en un cliente y selecciona su acción de edición. |
-| Participación de actor y sistema | **Actor:** selecciona el registro, modifica datos y confirma.<br>**Nexus:** presenta valores vigentes, valida, actualiza y comunica el resultado. |
-| Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de edición.<br>3. El registro objetivo existe.<br>4. El registro se encuentra en un estado que admite los cambios solicitados. |
-| Inferencia desde código | **Directa.** `clientApiRoute.js` PUT `/:id` → `editClient`. |
-| Flujo principal | 1. **Actor:** selecciona cliente y abre la edición **(ver E1)**.<br>2. **Nexus:** muestra los valores actuales y habilita sólo los campos permitidos.<br>3. **Actor:** modifica los datos admitidos y confirma **(ver A1)**.<br>4. **Nexus:** valida autorización, formato, identidad y relaciones.<br>5. **Nexus:** guarda los cambios, actualiza el listado y muestra la confirmación. |
-| Flujos alternativos | **A1 — Datos inválidos (después del paso 3):**<br>1. **Nexus:** valida la información capturada, detecta campos incompletos, formatos incorrectos, relaciones no permitidas o cantidades fuera de las reglas del caso y los señala sin registrar cambios.<br>2. **Actor:** corrige la información indicada y vuelve a confirmar; continúa en el paso 4 del flujo principal. |
-| Excepciones | **E1 — Acceso rechazado (después del paso 1):**<br>1. **Nexus:** comprueba las precondiciones y la autorización, determina que alguna no se cumple y rechaza la solicitud sin modificar datos ni exponer información no autorizada; comunica el motivo.<br>2. **Actor:** reconoce el rechazo; termina el caso de uso. |
-| Postcondiciones (éxito y fallo) | 1. **Éxito:** Actualización de datos y asesor opcional.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
-| Requisitos relacionados | `RF-CAT-014`. |
-
-#### `CU-CAT-13` — Consultar mermas
-
-| Sección | Información relevante |
-| --- | --- |
-| Identificador | `CU-CAT-13` |
-| Nombre | Consultar mermas. |
-| Actor y disparador | **Actor:** Personal de almacén. **Disparador:** necesita localizar o revisar mermas y abre la opción de consulta correspondiente. |
-| Participación de actor y sistema | **Actor:** abre la consulta, define criterios y selecciona registros.<br>**Nexus:** autoriza, presenta filtros y devuelve sólo la información permitida. |
-| Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de consulta o reporte correspondiente. |
-| Inferencia desde código | **Directa.** `wasteApiRoute.js` GET → `getAllWastes` → `findAllWastes`. |
-| Flujo principal | 1. **Actor:** abre la opción para consultar mermas **(ver E1)**.<br>2. **Nexus:** comprueba su autorización y muestra la tabla con búsqueda, filtros y paginación disponibles **(ver A1)**.<br>3. **Actor:** captura los criterios que necesita y solicita aplicarlos.<br>4. **Nexus:** actualiza la tabla y el total con la información autorizada, sin modificar datos.<br>5. **Actor:** selecciona un registro cuando necesita revisar su información.<br>6. **Nexus:** muestra el detalle y las acciones que el actor puede ejecutar **(ver A2)**. |
-| Flujos alternativos | **A1 — Iniciar una creación (después del paso 2):**<br>1. **Actor:** selecciona la opción para registrar una merma en lugar de continuar la consulta; termina `CU-CAT-13` y puede iniciar `CU-CAT-14` Registrar merma.<br>**A2 — Elegir una acción sobre el registro (después del paso 6):**<br>1. **Actor:** selecciona editar o ajustar la existencia de la merma en lugar de concluir la consulta; termina `CU-CAT-13` y puede iniciar `CU-CAT-15` Editar merma o `CU-CAT-16` Ajustar existencia de merma. Cada caso elegido comprueba nuevamente sus precondiciones y autorización; la selección no constituye `«include»` ni `«extend»`. |
-| Excepciones | **E1 — Acceso rechazado (después del paso 1):**<br>1. **Nexus:** comprueba las precondiciones y la autorización, determina que alguna no se cumple y rechaza la solicitud sin modificar datos ni exponer información no autorizada; comunica el motivo.<br>2. **Actor:** reconoce el rechazo; termina el caso de uso. |
-| Postcondiciones (éxito y fallo) | 1. **Éxito:** Listado de existencias de merma.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
-| Requisitos relacionados | `RF-CAT-004`. |
-
-#### `CU-CAT-14` — Registrar merma
+#### `CU-CAT-14` — Generar reporte de proveedores
 
 | Sección | Información relevante |
 | --- | --- |
 | Identificador | `CU-CAT-14` |
-| Nombre | Registrar merma. |
-| Actor y disparador | **Actor:** Personal de almacén. **Disparador:** necesita registrar una merma y abre su formulario de registro. |
-| Participación de actor y sistema | **Actor:** abre el alta, captura datos y confirma.<br>**Nexus:** carga opciones, valida, registra y comunica el resultado. |
-| Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de alta.<br>3. Existen los datos relacionados requeridos para completar el registro. |
-| Inferencia desde código | **Compuesta.** GET `/material-templates` → POST de merma → DTO → alta con ajuste inicial → evento de inventario. |
-| Flujo principal | 1. **Actor:** abre «Agregar merma» y selecciona primero un proveedor **(ver E1)**.<br>2. **Nexus:** carga los materiales de ese proveedor que pueden utilizarse como plantilla.<br>3. **Actor:** elige el material, completa los datos propios de la merma y confirma **(ver A1)**.<br>4. **Nexus:** valida identidad, dimensiones, existencia y datos relacionados **(ver A2)**.<br>5. **Nexus:** crea la merma con sus propios datos históricos, registra su existencia inicial y confirma el alta. |
-| Flujos alternativos | **A1 — Datos inválidos (después del paso 3):**<br>1. **Nexus:** valida la información capturada, detecta campos incompletos, formatos incorrectos, relaciones no permitidas o cantidades fuera de las reglas del caso y los señala sin registrar cambios.<br>2. **Actor:** corrige la información indicada y vuelve a confirmar; continúa en el paso 4 del flujo principal.<br>**A2 — Merma ya registrada (después del paso 4):**<br>1. **Actor:** revisa la merma coincidente que Nexus presenta.<br>2. **Nexus:** rechaza el alta, conserva la existencia y muestra la opción para localizar el registro existente.<br>3. **Actor:** termina `CU-CAT-14` y puede iniciar `CU-CAT-16` Ajustar existencia de merma; termina el caso de uso. |
-| Excepciones | **E1 — Acceso rechazado (después del paso 1):**<br>1. **Nexus:** comprueba las precondiciones y la autorización, determina que alguna no se cumple y rechaza la solicitud sin modificar datos ni exponer información no autorizada; comunica el motivo.<br>2. **Actor:** reconoce el rechazo; termina el caso de uso. |
-| Postcondiciones (éxito y fallo) | 1. **Éxito:** Alta desde una plantilla material-proveedor.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
-| Requisitos relacionados | `RF-CAT-015`. |
+| Nombre | Generar reporte de proveedores. |
+| Actor y disparador | **Actor:** Usuario con permiso sobre el reporte o consulta. **Disparador:** desde `CU-CAT-10` Consultar proveedores, selecciona la opción para generar el reporte con los filtros que necesita conservar. |
+| Participación de actor y sistema | **Actor:** define filtros y solicita la exportación.<br>**Nexus:** autoriza, consolida la información y entrega el archivo. |
+| Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de consulta o reporte correspondiente. |
+| Flujo principal | 1. **Nexus:** después de que el actor selecciona la exportación desde la consulta de origen, abre el modal **Exportar reporte** y muestra las opciones aplicables **(ver E1)**.<br>2. **Actor:** conserva o ajusta los filtros, incluye las opciones disponibles y confirma.<br>3. **Nexus:** vuelve a comprobar autorización y parámetros y prepara la información de proveedores.<br>4. **Nexus:** genera el archivo de Excel e inicia su descarga; si no hay datos, informa que el resultado está vacío. |
+| Excepciones | **E1 — Exportación rechazada (después del disparador):**<br>1. **Nexus:** comprueba las precondiciones y la autorización, determina que alguna no se cumple y rechaza la solicitud sin modificar datos ni exponer información no autorizada; comunica el motivo.<br>2. **Actor:** reconoce el rechazo; termina el caso de uso. |
+| Postcondiciones (éxito y fallo) | 1. **Éxito:** Archivo Excel con filtros, columnas y cálculos propios del reporte.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
+| Requisitos relacionados | `RF-REP-002`, `RF-REP-004`. |
 
-#### `CU-CAT-15` — Editar merma
+#### `CU-CAT-15` — Consultar clientes
 
 | Sección | Información relevante |
 | --- | --- |
 | Identificador | `CU-CAT-15` |
+| Nombre | Consultar clientes. |
+| Actor y disparador | **Actor:** Administrador del sistema. **Disparador:** necesita localizar o revisar clientes y abre la opción de consulta correspondiente. |
+| Participación de actor y sistema | **Actor:** abre la consulta, define criterios y selecciona registros.<br>**Nexus:** autoriza, presenta filtros y devuelve sólo la información permitida. |
+| Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de consulta o reporte correspondiente. |
+| Flujo principal | 1. **Actor:** abre la opción para consultar clientes **(ver E1)**.<br>2. **Nexus:** comprueba su autorización y muestra la consulta con sus criterios disponibles.<br>3. **Actor:** define los criterios que necesita y solicita aplicarlos **(ver A1)**.<br>4. **Nexus:** presenta la información autorizada y la acción principal para registrar un cliente.<br>5. **Actor:** selecciona la acción principal; termina `CU-CAT-15` y con esa selección dispara `CU-CAT-16` Crear cliente. |
+| Flujos alternativos | **A1 — Continuar la consulta (después del paso 3):**<br>1. **Nexus:** actualiza la información y el total sin modificar datos.<br>2. **Actor:** revisa los resultados o cambia los criterios.<br>3. **Nexus:** conserva la consulta disponible; termina el caso de uso.<br>**A2 — Elegir otra acción (después del paso 4 del flujo principal):**<br>1. **Actor:** selecciona editar el cliente en lugar de iniciar el alta; termina `CU-CAT-15` y puede iniciar `CU-CAT-17` Editar cliente. También puede iniciar `CU-CAT-18` Generar reporte de clientes. Cada caso elegido comprueba nuevamente sus precondiciones y autorización; la selección no constituye `«include»` ni `«extend»`. |
+| Excepciones | **E1 — Acceso rechazado (después del paso 1):**<br>1. **Nexus:** comprueba las precondiciones y la autorización, determina que alguna no se cumple y rechaza la solicitud sin modificar datos ni exponer información no autorizada; comunica el motivo.<br>2. **Actor:** reconoce el rechazo; termina el caso de uso. |
+| Postcondiciones (éxito y fallo) | 1. **Éxito:** Listado de clientes autorizados.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
+| Requisitos relacionados | `RF-CAT-003`. |
+
+#### `CU-CAT-16` — Crear cliente
+
+| Sección | Información relevante |
+| --- | --- |
+| Identificador | `CU-CAT-16` |
+| Nombre | Crear cliente. |
+| Actor y disparador | **Actor:** Administrador del sistema. **Disparador:** selecciona la acción principal para crear un cliente desde `CU-CAT-15` Consultar clientes. |
+| Participación de actor y sistema | **Actor:** abre el alta, captura datos y confirma.<br>**Nexus:** carga opciones, valida, registra y comunica el resultado. |
+| Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de alta.<br>3. Existen los datos relacionados requeridos para completar el registro. |
+| Flujo principal | 1. **Actor:** abre la opción para crear cliente **(ver E1)**.<br>2. **Nexus:** muestra el formulario con el cliente inicialmente activo.<br>3. **Actor:** captura el nombre, revisa la casilla **Activo** y confirma **(ver A1)**.<br>4. **Nexus:** comprueba que la información sea válida.<br>5. **Nexus:** registra el cliente, actualiza el listado y muestra la confirmación. |
+| Flujos alternativos | **A1 — Datos inválidos (después del paso 3):**<br>1. **Nexus:** valida la información capturada, detecta campos incompletos, formatos incorrectos, relaciones no permitidas o cantidades fuera de las reglas del caso y los señala sin registrar cambios.<br>2. **Actor:** corrige la información indicada y vuelve a confirmar; continúa en el paso 4 del flujo principal. |
+| Excepciones | **E1 — Acceso rechazado (después del paso 1):**<br>1. **Nexus:** comprueba las precondiciones y la autorización, determina que alguna no se cumple y rechaza la solicitud sin modificar datos ni exponer información no autorizada; comunica el motivo.<br>2. **Actor:** reconoce el rechazo; termina el caso de uso. |
+| Postcondiciones (éxito y fallo) | 1. **Éxito:** El cliente queda registrado con el estado elegido.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
+| Requisitos relacionados | `RF-CAT-013`. |
+
+#### `CU-CAT-17` — Editar cliente
+
+| Sección | Información relevante |
+| --- | --- |
+| Identificador | `CU-CAT-17` |
+| Nombre | Editar cliente. |
+| Actor y disparador | **Actor:** Administrador del sistema. **Disparador:** detecta datos que debe corregir en un cliente y selecciona su acción de edición. |
+| Participación de actor y sistema | **Actor:** selecciona el registro, modifica datos y confirma.<br>**Nexus:** presenta valores vigentes, valida, actualiza y comunica el resultado. |
+| Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de edición.<br>3. El registro objetivo existe.<br>4. El registro se encuentra en un estado que admite los cambios solicitados. |
+| Flujo principal | 1. **Actor:** selecciona cliente y abre la edición **(ver E1)**.<br>2. **Nexus:** muestra el nombre y el estado actuales.<br>3. **Actor:** modifica el nombre o la casilla **Activo** y confirma **(ver A1)**.<br>4. **Nexus:** comprueba que la información sea válida.<br>5. **Nexus:** guarda los cambios, actualiza el listado y muestra la confirmación. |
+| Flujos alternativos | **A1 — Datos inválidos (después del paso 3):**<br>1. **Nexus:** valida la información capturada, detecta campos incompletos, formatos incorrectos, relaciones no permitidas o cantidades fuera de las reglas del caso y los señala sin registrar cambios.<br>2. **Actor:** corrige la información indicada y vuelve a confirmar; continúa en el paso 4 del flujo principal. |
+| Excepciones | **E1 — Acceso rechazado (después del paso 1):**<br>1. **Nexus:** comprueba las precondiciones y la autorización, determina que alguna no se cumple y rechaza la solicitud sin modificar datos ni exponer información no autorizada; comunica el motivo.<br>2. **Actor:** reconoce el rechazo; termina el caso de uso. |
+| Postcondiciones (éxito y fallo) | 1. **Éxito:** El cliente conserva el nombre y estado elegidos; si queda inactivo, ya no se ofrece en salidas nuevas y mantiene su historia.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
+| Requisitos relacionados | `RF-CAT-014`. |
+
+
+#### `CU-CAT-18` — Generar reporte de clientes
+
+| Sección | Información relevante |
+| --- | --- |
+| Identificador | `CU-CAT-18` |
+| Nombre | Generar reporte de clientes. |
+| Actor y disparador | **Actor:** Usuario con permiso sobre el reporte o consulta. **Disparador:** desde `CU-CAT-15` Consultar clientes, selecciona la opción para generar el reporte con los filtros que necesita conservar. |
+| Participación de actor y sistema | **Actor:** define filtros y solicita la exportación.<br>**Nexus:** autoriza, consolida la información y entrega el archivo. |
+| Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de consulta o reporte correspondiente. |
+| Flujo principal | 1. **Nexus:** después de que el actor selecciona la exportación desde la consulta de origen, abre el modal **Exportar reporte** y muestra las opciones aplicables **(ver E1)**.<br>2. **Actor:** conserva o ajusta los filtros, incluye las opciones disponibles y confirma.<br>3. **Nexus:** vuelve a comprobar autorización y parámetros y prepara la información de clientes.<br>4. **Nexus:** genera el archivo de Excel e inicia su descarga; si no hay datos, informa que el resultado está vacío. |
+| Excepciones | **E1 — Exportación rechazada (después del disparador):**<br>1. **Nexus:** comprueba las precondiciones y la autorización, determina que alguna no se cumple y rechaza la solicitud sin modificar datos ni exponer información no autorizada; comunica el motivo.<br>2. **Actor:** reconoce el rechazo; termina el caso de uso. |
+| Postcondiciones (éxito y fallo) | 1. **Éxito:** Archivo Excel con filtros, columnas y cálculos propios del reporte.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
+| Requisitos relacionados | `RF-REP-002`, `RF-REP-004`. |
+
+#### `CU-CAT-19` — Consultar mermas
+
+| Sección | Información relevante |
+| --- | --- |
+| Identificador | `CU-CAT-19` |
+| Nombre | Consultar mermas. |
+| Actor y disparador | **Actor:** Personal de almacén. **Disparador:** necesita localizar o revisar mermas y abre la opción de consulta correspondiente. |
+| Participación de actor y sistema | **Actor:** abre la consulta, define criterios y selecciona registros.<br>**Nexus:** autoriza, presenta filtros y devuelve sólo la información permitida. |
+| Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de consulta o reporte correspondiente. |
+| Flujo principal | 1. **Actor:** abre la opción para consultar mermas **(ver E1)**.<br>2. **Nexus:** comprueba su autorización y muestra la consulta con sus criterios disponibles.<br>3. **Actor:** define los criterios que necesita y solicita aplicarlos **(ver A1)**.<br>4. **Nexus:** presenta la información autorizada y la acción principal para registrar una merma.<br>5. **Actor:** selecciona la acción principal; termina `CU-CAT-19` y con esa selección dispara `CU-CAT-20` Registrar merma. |
+| Flujos alternativos | **A1 — Continuar la consulta (después del paso 3):**<br>1. **Nexus:** actualiza la información y el total sin modificar datos.<br>2. **Actor:** revisa los resultados o cambia los criterios.<br>3. **Nexus:** conserva la consulta disponible; termina el caso de uso.<br>**A2 — Elegir otra acción (después del paso 4 del flujo principal):**<br>1. **Actor:** selecciona editar o ajustar la existencia de la merma en lugar de iniciar el alta; termina `CU-CAT-19` y puede iniciar `CU-CAT-21` Editar merma o `CU-CAT-22` Ajustar existencia de merma. Cada caso elegido comprueba nuevamente sus precondiciones y autorización; la selección no constituye `«include»` ni `«extend»`. |
+| Excepciones | **E1 — Acceso rechazado (después del paso 1):**<br>1. **Nexus:** comprueba las precondiciones y la autorización, determina que alguna no se cumple y rechaza la solicitud sin modificar datos ni exponer información no autorizada; comunica el motivo.<br>2. **Actor:** reconoce el rechazo; termina el caso de uso. |
+| Postcondiciones (éxito y fallo) | 1. **Éxito:** Listado de existencias de merma.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
+| Requisitos relacionados | `RF-CAT-004`. |
+
+#### `CU-CAT-20` — Registrar merma
+
+| Sección | Información relevante |
+| --- | --- |
+| Identificador | `CU-CAT-20` |
+| Nombre | Registrar merma. |
+| Actor y disparador | **Actor:** Personal de almacén. **Disparador:** selecciona la acción principal para registrar una merma desde `CU-CAT-19` Consultar mermas. |
+| Participación de actor y sistema | **Actor:** abre el alta, captura datos y confirma.<br>**Nexus:** carga opciones, valida, registra y comunica el resultado. |
+| Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de alta.<br>3. Existen los datos relacionados requeridos para completar el registro. |
+| Flujo principal | 1. **Actor:** abre «Agregar merma» y selecciona primero un proveedor **(ver E1)**.<br>2. **Nexus:** carga los materiales de ese proveedor que pueden utilizarse como plantilla.<br>3. **Actor:** elige el material, completa los datos propios de la merma y confirma **(ver A1)**.<br>4. **Nexus:** valida identidad, dimensiones, existencia y datos relacionados **(ver A2)**.<br>5. **Nexus:** crea la merma con sus propios datos históricos, registra su existencia inicial y confirma el alta. |
+| Flujos alternativos | **A1 — Datos inválidos (después del paso 3):**<br>1. **Nexus:** valida la información capturada, detecta campos incompletos, formatos incorrectos, relaciones no permitidas o cantidades fuera de las reglas del caso y los señala sin registrar cambios.<br>2. **Actor:** corrige la información indicada y vuelve a confirmar; continúa en el paso 4 del flujo principal.<br>**A2 — Merma ya registrada (después del paso 4):**<br>1. **Actor:** revisa la merma coincidente que Nexus presenta.<br>2. **Nexus:** rechaza el alta, conserva la existencia y muestra la opción para localizar el registro existente.<br>3. **Actor:** termina `CU-CAT-20` y puede iniciar `CU-CAT-22` Ajustar existencia de merma; termina el caso de uso. |
+| Excepciones | **E1 — Acceso rechazado (después del paso 1):**<br>1. **Nexus:** comprueba las precondiciones y la autorización, determina que alguna no se cumple y rechaza la solicitud sin modificar datos ni exponer información no autorizada; comunica el motivo.<br>2. **Actor:** reconoce el rechazo; termina el caso de uso. |
+| Postcondiciones (éxito y fallo) | 1. **Éxito:** Alta desde una plantilla material-proveedor.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
+| Requisitos relacionados | `RF-CAT-015`. |
+
+#### `CU-CAT-21` — Editar merma
+
+| Sección | Información relevante |
+| --- | --- |
+| Identificador | `CU-CAT-21` |
 | Nombre | Editar merma. |
 | Actor y disparador | **Actor:** Personal de almacén. **Disparador:** detecta datos que debe corregir en una merma y selecciona su acción de edición. |
 | Participación de actor y sistema | **Actor:** selecciona el registro, modifica datos y confirma.<br>**Nexus:** presenta valores vigentes, valida, actualiza y comunica el resultado. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de edición.<br>3. El registro objetivo existe.<br>4. El registro se encuentra en un estado que admite los cambios solicitados. |
-| Inferencia desde código | **Directa.** `wasteApiRoute.js` PATCH `/:id` → validación → DTO → `updateWaste`. |
 | Flujo principal | 1. **Actor:** selecciona merma y abre la edición **(ver E1)**.<br>2. **Nexus:** muestra los valores actuales y habilita sólo los campos permitidos.<br>3. **Actor:** modifica los datos admitidos y confirma **(ver A1)**.<br>4. **Nexus:** valida autorización, formato, identidad y relaciones.<br>5. **Nexus:** guarda los cambios, actualiza el listado y muestra la confirmación. |
 | Flujos alternativos | **A1 — Datos inválidos (después del paso 3):**<br>1. **Nexus:** valida la información capturada, detecta campos incompletos, formatos incorrectos, relaciones no permitidas o cantidades fuera de las reglas del caso y los señala sin registrar cambios.<br>2. **Actor:** corrige la información indicada y vuelve a confirmar; continúa en el paso 4 del flujo principal. |
 | Excepciones | **E1 — Acceso rechazado (después del paso 1):**<br>1. **Nexus:** comprueba las precondiciones y la autorización, determina que alguna no se cumple y rechaza la solicitud sin modificar datos ni exponer información no autorizada; comunica el motivo.<br>2. **Actor:** reconoce el rechazo; termina el caso de uso. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** Actualización sin alterar su identidad física.<br>2. **Éxito al desactivar:** la merma no puede agregarse a salidas nuevas; conserva stock e historia y puede completar detalles previamente comprometidos.<br>3. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
 | Requisitos relacionados | `RF-CAT-016`, `RF-CAT-017`. |
 
-#### `CU-CAT-16` — Ajustar existencia de merma
+#### `CU-CAT-22` — Ajustar existencia de merma
 
 | Sección | Información relevante |
 | --- | --- |
-| Identificador | `CU-CAT-16` |
+| Identificador | `CU-CAT-22` |
 | Nombre | Ajustar existencia de merma. |
 | Actor y disparador | **Actor:** Administrador del sistema. **Disparador:** detecta o autoriza una diferencia de existencia de merma y abre el ajuste de stock desde la consulta de mermas. |
 | Participación de actor y sistema | **Actor:** selecciona el inventario, captura el ajuste y confirma.<br>**Nexus:** muestra la existencia, valida, registra el ajuste y actualiza inventario. |
 | Precondiciones | 1. El actor inició sesión como administrador del sistema.<br>2. El actor cuenta con el permiso `wastes:adjust-stock`.<br>3. El recurso cuya existencia se ajustará existe. |
-| Inferencia desde código | **Directa.** `wasteApiRoute.js` PATCH `/:id/stock` → `updateWasteStock` → evento de inventario. |
 | Flujo principal | 1. **Actor:** selecciona el registro de merma y abre «Ajustar existencia» **(ver E1)**.<br>2. **Nexus:** muestra la existencia actual y los campos de tipo, cantidad y motivo.<br>3. **Actor:** captura el ajuste y lo confirma **(ver A1)**.<br>4. **Nexus:** valida la autorización, el motivo y la cantidad y registra el ajuste junto con la nueva existencia.<br>5. **Nexus:** actualiza las vistas de inventario y confirma el resultado. |
 | Flujos alternativos | **A1 — Datos inválidos (después del paso 3):**<br>1. **Nexus:** valida la información capturada, detecta campos incompletos, formatos incorrectos, relaciones no permitidas o cantidades fuera de las reglas del caso y los señala sin registrar cambios.<br>2. **Actor:** corrige la información indicada y vuelve a confirmar; continúa en el paso 4 del flujo principal. |
 | Excepciones | **E1 — Acceso rechazado (después del paso 1):**<br>1. **Nexus:** comprueba las precondiciones y la autorización, determina que alguna no se cumple y rechaza la solicitud sin modificar datos ni exponer información no autorizada; comunica el motivo.<br>2. **Actor:** reconoce el rechazo; termina el caso de uso. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** La existencia de la merma refleja el ajuste autorizado.<br>2. **Éxito:** El ajuste queda registrado con su motivo y trazabilidad.<br>3. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
 | Requisitos relacionados | `RF-CAT-018`. |
 
-#### `CU-CAT-17` — Consultar presentaciones
+
+#### `CU-CAT-23` — Consultar inventario de mermas
 
 | Sección | Información relevante |
 | --- | --- |
-| Identificador | `CU-CAT-17` |
+| Identificador | `CU-CAT-23` |
+| Nombre | Consultar inventario de mermas. |
+| Actor y disparador | **Actor:** Usuario con permiso sobre el reporte o consulta. **Disparador:** necesita localizar o revisar inventario de mermas y abre la opción de consulta correspondiente. |
+| Participación de actor y sistema | **Actor:** abre la consulta, define criterios y selecciona registros.<br>**Nexus:** autoriza, presenta filtros y devuelve sólo la información permitida. |
+| Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de consulta o reporte correspondiente. |
+| Flujo principal | 1. **Actor:** abre la opción para consultar inventario de mermas **(ver E1)**.<br>2. **Nexus:** comprueba su autorización y muestra los filtros disponibles.<br>3. **Actor:** define los criterios que necesita y solicita aplicarlos **(ver A1)**.<br>4. **Nexus:** presenta la información autorizada y la opción **Exportar Excel**.<br>5. **Actor:** selecciona **Exportar Excel**; termina `CU-CAT-23` y con esa selección dispara `CU-CAT-24` Generar reporte de mermas. |
+| Flujos alternativos | **A1 — Permanecer en la consulta (después del paso 3):**<br>1. **Nexus:** actualiza la tabla y el total sin modificar datos.<br>2. **Actor:** revisa los resultados o cambia los criterios.<br>3. **Nexus:** conserva la consulta disponible; termina el caso de uso. |
+| Excepciones | **E1 — Acceso rechazado (después del paso 1):**<br>1. **Nexus:** comprueba las precondiciones y la autorización, determina que alguna no se cumple y rechaza la solicitud sin modificar datos ni exponer información no autorizada; comunica el motivo.<br>2. **Actor:** reconoce el rechazo; termina el caso de uso. |
+| Postcondiciones (éxito y fallo) | 1. **Éxito:** Consulta autorizada sin modificar datos.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
+| Requisitos relacionados | `RF-REP-001`. |
+
+
+#### `CU-CAT-24` — Generar reporte de mermas
+
+| Sección | Información relevante |
+| --- | --- |
+| Identificador | `CU-CAT-24` |
+| Nombre | Generar reporte de mermas. |
+| Actor y disparador | **Actor:** Usuario con permiso sobre el reporte o consulta. **Disparador:** desde `CU-CAT-23` Consultar inventario de mermas, selecciona **Exportar Excel** con los filtros que necesita conservar. |
+| Participación de actor y sistema | **Actor:** define filtros y solicita la exportación.<br>**Nexus:** autoriza, consolida la información y entrega el archivo. |
+| Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de consulta o reporte correspondiente. |
+| Flujo principal | 1. **Nexus:** después de que el actor selecciona la exportación desde la consulta de origen, abre el modal **Exportar reporte** y muestra las opciones aplicables **(ver E1)**.<br>2. **Actor:** conserva o ajusta los filtros, incluye el alcance y las opciones disponibles y confirma.<br>3. **Nexus:** vuelve a comprobar autorización y parámetros y prepara la información de mermas.<br>4. **Nexus:** genera el archivo de Excel e inicia su descarga; si no hay datos, informa que el resultado está vacío. |
+| Excepciones | **E1 — Exportación rechazada (después del disparador):**<br>1. **Nexus:** comprueba las precondiciones y la autorización, determina que alguna no se cumple y rechaza la solicitud sin modificar datos ni exponer información no autorizada; comunica el motivo.<br>2. **Actor:** reconoce el rechazo; termina el caso de uso. |
+| Postcondiciones (éxito y fallo) | 1. **Éxito:** Archivo Excel con filtros, columnas y cálculos propios del reporte.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
+| Requisitos relacionados | `RF-REP-002` a `RF-REP-004`, `RF-REP-006` a `RF-REP-009`. |
+
+
+#### `CU-CAT-25` — Consultar movimientos de mermas
+
+| Sección | Información relevante |
+| --- | --- |
+| Identificador | `CU-CAT-25` |
+| Nombre | Consultar movimientos de mermas. |
+| Actor y disparador | **Actor:** Usuario con permiso sobre el reporte o consulta. **Disparador:** necesita localizar o revisar movimientos de mermas y abre la opción de consulta correspondiente. |
+| Participación de actor y sistema | **Actor:** abre la consulta, define criterios y selecciona registros.<br>**Nexus:** autoriza, presenta filtros y devuelve sólo la información permitida. |
+| Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de consulta o reporte correspondiente. |
+| Flujo principal | 1. **Actor:** abre la opción para consultar movimientos de mermas **(ver E1)**.<br>2. **Nexus:** comprueba su autorización y muestra los filtros disponibles.<br>3. **Actor:** define los criterios que necesita y solicita aplicarlos **(ver A1)**.<br>4. **Nexus:** presenta la información autorizada y la opción **Exportar Excel**.<br>5. **Actor:** selecciona **Exportar Excel**; termina `CU-CAT-25` y con esa selección dispara `CU-CAT-26` Generar reporte de movimientos de mermas. |
+| Flujos alternativos | **A1 — Permanecer en la consulta (después del paso 3):**<br>1. **Nexus:** actualiza la tabla y el total sin modificar datos.<br>2. **Actor:** revisa los resultados o cambia los criterios.<br>3. **Nexus:** conserva la consulta disponible; termina el caso de uso. |
+| Excepciones | **E1 — Acceso rechazado (después del paso 1):**<br>1. **Nexus:** comprueba las precondiciones y la autorización, determina que alguna no se cumple y rechaza la solicitud sin modificar datos ni exponer información no autorizada; comunica el motivo.<br>2. **Actor:** reconoce el rechazo; termina el caso de uso. |
+| Postcondiciones (éxito y fallo) | 1. **Éxito:** Consulta autorizada sin modificar datos.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
+| Requisitos relacionados | `RF-REP-001`. |
+
+
+#### `CU-CAT-26` — Generar reporte de movimientos de mermas
+
+| Sección | Información relevante |
+| --- | --- |
+| Identificador | `CU-CAT-26` |
+| Nombre | Generar reporte de movimientos de mermas. |
+| Actor y disparador | **Actor:** Usuario con permiso sobre el reporte o consulta. **Disparador:** desde `CU-CAT-25` Consultar movimientos de mermas, selecciona **Exportar Excel** con los filtros que necesita conservar. |
+| Participación de actor y sistema | **Actor:** define filtros y solicita la exportación.<br>**Nexus:** autoriza, consolida la información y entrega el archivo. |
+| Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de consulta o reporte correspondiente. |
+| Flujo principal | 1. **Nexus:** después de que el actor selecciona la exportación desde la consulta de origen, abre el modal **Exportar reporte** y muestra las opciones aplicables **(ver E1)**.<br>2. **Actor:** conserva o ajusta los filtros, incluye las opciones disponibles y confirma.<br>3. **Nexus:** vuelve a comprobar autorización y parámetros y prepara la información de movimientos de mermas.<br>4. **Nexus:** genera el archivo de Excel e inicia su descarga; si no hay datos, informa que el resultado está vacío. |
+| Excepciones | **E1 — Exportación rechazada (después del disparador):**<br>1. **Nexus:** comprueba las precondiciones y la autorización, determina que alguna no se cumple y rechaza la solicitud sin modificar datos ni exponer información no autorizada; comunica el motivo.<br>2. **Actor:** reconoce el rechazo; termina el caso de uso. |
+| Postcondiciones (éxito y fallo) | 1. **Éxito:** Archivo Excel con filtros, columnas y cálculos propios del reporte.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
+| Requisitos relacionados | `RF-REP-002`, `RF-REP-004`, `RF-REP-005`. |
+
+#### `CU-CAT-27` — Consultar presentaciones
+
+| Sección | Información relevante |
+| --- | --- |
+| Identificador | `CU-CAT-27` |
 | Nombre | Consultar presentaciones. |
 | Actor y disparador | **Actor:** Personal de almacén. **Disparador:** abre un formulario cuyo selector requiere presentaciones. |
 | Participación de actor y sistema | **Actor:** abre la consulta, define criterios y selecciona registros.<br>**Nexus:** autoriza, presenta filtros y devuelve sólo la información permitida. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de consulta o reporte correspondiente. |
-| Inferencia desde código | **Directa.** `presentationApiRoute.js` GET → `getAllPresentations`. |
 | Flujo principal | 1. **Actor:** abre el formulario del proceso que requiere presentaciones **(ver E1)**.<br>2. **Nexus:** comprueba su autorización y carga presentaciones vigentes.<br>3. **Actor:** consulta o selecciona una opción de presentaciones.<br>4. **Nexus:** conserva la selección para continuar el proceso principal sin modificar el catálogo. |
 | Excepciones | **E1 — Acceso rechazado (después del paso 1):**<br>1. **Nexus:** comprueba las precondiciones y la autorización, determina que alguna no se cumple y rechaza la solicitud sin modificar datos ni exponer información no autorizada; comunica el motivo.<br>2. **Actor:** reconoce el rechazo; termina el caso de uso. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** Catálogo auxiliar de sólo lectura.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
 | Requisitos relacionados | `RF-CAT-005`. |
 
-#### `CU-CAT-18` — Consultar unidades de medida
+#### `CU-CAT-28` — Consultar unidades de medida
 
 | Sección | Información relevante |
 | --- | --- |
-| Identificador | `CU-CAT-18` |
+| Identificador | `CU-CAT-28` |
 | Nombre | Consultar unidades de medida. |
 | Actor y disparador | **Actor:** Personal de almacén. **Disparador:** abre un formulario cuyo selector requiere unidades de medida. |
 | Participación de actor y sistema | **Actor:** abre la consulta, define criterios y selecciona registros.<br>**Nexus:** autoriza, presenta filtros y devuelve sólo la información permitida. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de consulta o reporte correspondiente. |
-| Inferencia desde código | **Directa.** `unitMeasureApiRoute.js` GET → `getAllUnitMeasures`. |
 | Flujo principal | 1. **Actor:** abre el formulario del proceso que requiere unidades de medida **(ver E1)**.<br>2. **Nexus:** comprueba su autorización y carga unidades de medida vigentes.<br>3. **Actor:** consulta o selecciona una opción de unidades de medida.<br>4. **Nexus:** conserva la selección para continuar el proceso principal sin modificar el catálogo. |
 | Excepciones | **E1 — Acceso rechazado (después del paso 1):**<br>1. **Nexus:** comprueba las precondiciones y la autorización, determina que alguna no se cumple y rechaza la solicitud sin modificar datos ni exponer información no autorizada; comunica el motivo.<br>2. **Actor:** reconoce el rechazo; termina el caso de uso. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** Catálogo auxiliar de sólo lectura.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
 | Requisitos relacionados | `RF-CAT-019`. |
 
-#### `CU-CAT-19` — Consultar motivos de ajuste
+#### `CU-CAT-29` — Consultar motivos de ajuste
 
 | Sección | Información relevante |
 | --- | --- |
-| Identificador | `CU-CAT-19` |
+| Identificador | `CU-CAT-29` |
 | Nombre | Consultar motivos de ajuste. |
 | Actor y disparador | **Actor:** Personal de almacén. **Disparador:** abre un formulario cuyo selector requiere motivos de ajuste. |
 | Participación de actor y sistema | **Actor:** abre la consulta, define criterios y selecciona registros.<br>**Nexus:** autoriza, presenta filtros y devuelve sólo la información permitida. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de consulta o reporte correspondiente. |
-| Inferencia desde código | **Directa.** `reasonApiRoute.js` GET → `getAllReasons`. |
 | Flujo principal | 1. **Actor:** abre el formulario del proceso que requiere motivos de ajuste **(ver E1)**.<br>2. **Nexus:** comprueba su autorización y carga motivos de ajuste vigentes.<br>3. **Actor:** consulta o selecciona una opción de motivos de ajuste.<br>4. **Nexus:** conserva la selección para continuar el proceso principal sin modificar el catálogo. |
 | Excepciones | **E1 — Acceso rechazado (después del paso 1):**<br>1. **Nexus:** comprueba las precondiciones y la autorización, determina que alguna no se cumple y rechaza la solicitud sin modificar datos ni exponer información no autorizada; comunica el motivo.<br>2. **Actor:** reconoce el rechazo; termina el caso de uso. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** Catálogo auxiliar de sólo lectura.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
 | Requisitos relacionados | `RF-CAT-020`. |
 
-#### `CU-CAT-20` — Consultar estados de cumplimiento
+#### `CU-CAT-30` — Consultar estados de cumplimiento
 
 | Sección | Información relevante |
 | --- | --- |
-| Identificador | `CU-CAT-20` |
+| Identificador | `CU-CAT-30` |
 | Nombre | Consultar estados de cumplimiento. |
 | Actor y disparador | **Actor:** Personal de almacén. **Disparador:** abre un formulario cuyo selector requiere estados de cumplimiento. |
 | Participación de actor y sistema | **Actor:** abre la consulta, define criterios y selecciona registros.<br>**Nexus:** autoriza, presenta filtros y devuelve sólo la información permitida. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de consulta o reporte correspondiente. |
-| Inferencia desde código | **Directa.** `fulfillmentStatusApiRoute.js` GET → `getAllFulfillmentStatuses`. |
 | Flujo principal | 1. **Actor:** abre el formulario del proceso que requiere estados de cumplimiento **(ver E1)**.<br>2. **Nexus:** comprueba su autorización y carga estados de cumplimiento vigentes.<br>3. **Actor:** consulta o selecciona una opción de estados de cumplimiento.<br>4. **Nexus:** conserva la selección para continuar el proceso principal sin modificar el catálogo. |
 | Excepciones | **E1 — Acceso rechazado (después del paso 1):**<br>1. **Nexus:** comprueba las precondiciones y la autorización, determina que alguna no se cumple y rechaza la solicitud sin modificar datos ni exponer información no autorizada; comunica el motivo.<br>2. **Actor:** reconoce el rechazo; termina el caso de uso. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** Catálogo auxiliar de sólo lectura.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
 | Requisitos relacionados | `RF-CAT-021`. |
 
-#### `CU-CAT-21` — Consultar área
+#### `CU-CAT-31` — Consultar área
 
 | Sección | Información relevante |
 | --- | --- |
-| Identificador | `CU-CAT-21` |
+| Identificador | `CU-CAT-31` |
 | Nombre | Consultar área. |
 | Actor y disparador | **Actor:** Administrador del sistema del área Sistemas. **Disparador:** selecciona **Áreas** en el submenú **Catálogos auxiliares**. |
 | Participación de actor y sistema | **Actor:** abre y revisa el listado de Áreas.<br>**Nexus:** autoriza, valida el recurso registrado y devuelve sus entradas. |
-| Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con `catalogs:manage` y pertenece al contexto administrativo autorizado. |
-| Inferencia desde código | **Directa.** GET `/api/admin/catalogs/departments` → `findAllCatalogEntries`. |
-| Flujo principal | 1. **Administrador:** selecciona **Áreas** en el submenú **Catálogos auxiliares** **(ver E1)**.<br>2. **Nexus:** valida `catalogs:manage` y el identificador `departments` contra la lista blanca.<br>3. **Nexus:** muestra la pantalla y tabla exclusivas de Áreas.<br>4. **Administrador:** revisa las entradas sin modificar datos. |
+| Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con autorización para administrar catálogos y pertenece al contexto administrativo autorizado. |
+| Flujo principal | 1. **Administrador:** selecciona **Áreas** en el submenú **Catálogos auxiliares** **(ver E1)**.<br>2. **Nexus:** comprueba que puede consultar Áreas y muestra su tabla.<br>3. **Nexus:** presenta **Nuevo** como acción principal para registrar un área.<br>4. **Administrador:** selecciona **Nuevo**; termina `CU-CAT-31` y con esa selección dispara `CU-CAT-32` Crear área. |
+| Flujos alternativos | **A1 — Permanecer en la consulta (después del paso 3):**<br>1. **Administrador:** decide no iniciar el alta y revisa o busca entradas sin modificar datos.<br>2. **Nexus:** conserva la tabla de Áreas; termina el caso de uso.<br>**A2 — Editar una entrada (después del paso 3 del flujo principal):**<br>1. **Administrador:** selecciona **Editar registro** en una entrada; termina `CU-CAT-31` y puede iniciar `CU-CAT-33` Editar área. El caso de edición comprueba nuevamente sus precondiciones y autorización. |
 | Excepciones | **E1 — Acceso, recurso o entrada rechazados:**<br>1. **Nexus:** rechaza la operación sin exponer otro catálogo ni producir cambios parciales.<br>2. **Administrador:** reconoce el rechazo; termina el caso de uso. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** La tabla muestra exclusivamente las entradas de Áreas.<br>2. **Fallo:** No se exponen datos ni modelos no autorizados. |
 | Requisitos relacionados | `RF-CAT-022`, `RN-001`, `RN-006`. |
 
-#### `CU-CAT-22` — Crear área
+#### `CU-CAT-32` — Crear área
 
 | Sección | Información relevante |
 | --- | --- |
-| Identificador | `CU-CAT-22` |
+| Identificador | `CU-CAT-32` |
 | Nombre | Crear área. |
-| Actor y disparador | **Actor:** Administrador del sistema del área Sistemas. **Disparador:** selecciona **Nuevo** en la pantalla **Áreas**. |
+| Actor y disparador | **Actor:** Administrador del sistema del área Sistemas. **Disparador:** selecciona **Nuevo** en `CU-CAT-31` Consultar área. |
 | Participación de actor y sistema | **Actor:** captura y confirma una nueva entrada de Áreas.<br>**Nexus:** autoriza, limita los campos, valida, crea y refresca la tabla. |
-| Precondiciones | 1. El actor inició sesión y cuenta con `catalogs:manage`.<br>2. La pantalla seleccionada corresponde exactamente a **Áreas**. |
-| Inferencia desde código | **Directa.** POST `/api/admin/catalogs/departments` → `createCatalogEntry`. |
-| Flujo principal | 1. **Administrador:** abre la pantalla **Áreas** y selecciona **Nuevo** **(ver E1)**.<br>2. **Nexus:** presenta únicamente el campo **Nombre**.<br>3. **Administrador:** captura los datos y selecciona **Guardar** **(ver A1)**.<br>4. **Nexus:** normaliza, valida y crea la entrada de Áreas.<br>5. **Nexus:** confirma y refresca la tabla de Áreas. |
+| Precondiciones | 1. El actor inició sesión y cuenta con autorización para administrar catálogos.<br>2. La pantalla seleccionada corresponde exactamente a **Áreas**. |
+| Flujo principal | 1. **Administrador:** abre la pantalla **Áreas** y selecciona **Nuevo** **(ver E1)**.<br>2. **Nexus:** presenta los campos **Nombre** y **Activo**.<br>3. **Administrador:** captura los datos y selecciona **Guardar** **(ver A1)**.<br>4. **Nexus:** revisa la información y crea la entrada de Áreas.<br>5. **Nexus:** confirma y refresca la tabla de Áreas. |
 | Flujos alternativos | **A1 — Datos inválidos (después del paso 3):**<br>1. **Nexus:** señala los campos requeridos sin crear la entrada.<br>2. **Administrador:** corrige y vuelve a confirmar; continúa en el paso 4. |
 | Excepciones | **E1 — Acceso, recurso o entrada rechazados:**<br>1. **Nexus:** rechaza la operación sin exponer otro catálogo ni producir cambios parciales.<br>2. **Administrador:** reconoce el rechazo; termina el caso de uso. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** La nueva entrada de Áreas queda registrada y visible.<br>2. **Fallo:** No se crea ninguna entrada. |
 | Requisitos relacionados | `RF-CAT-023`, `RN-001`, `RN-006`. |
 
-#### `CU-CAT-23` — Editar área
+#### `CU-CAT-33` — Editar área
 
 | Sección | Información relevante |
 | --- | --- |
-| Identificador | `CU-CAT-23` |
+| Identificador | `CU-CAT-33` |
 | Nombre | Editar área. |
 | Actor y disparador | **Actor:** Administrador del sistema del área Sistemas. **Disparador:** selecciona **Editar registro** en la pantalla **Áreas**. |
 | Participación de actor y sistema | **Actor:** modifica y confirma una entrada de Áreas.<br>**Nexus:** autoriza, limita los campos, valida, actualiza y refresca la tabla. |
-| Precondiciones | 1. El actor inició sesión y cuenta con `catalogs:manage`.<br>2. La entrada existe en **Áreas**. |
-| Inferencia desde código | **Directa.** PUT `/api/admin/catalogs/departments/:id` → `updateCatalogEntry`. |
-| Flujo principal | 1. **Administrador:** abre **Áreas** y selecciona **Editar registro** en una fila **(ver E1)**.<br>2. **Nexus:** presenta los valores existentes y únicamente el campo **Nombre**.<br>3. **Administrador:** modifica los datos y selecciona **Actualizar** **(ver A1)**.<br>4. **Nexus:** normaliza, valida y actualiza la entrada de Áreas.<br>5. **Nexus:** confirma y refresca la tabla de Áreas. |
+| Precondiciones | 1. El actor inició sesión y cuenta con autorización para administrar catálogos.<br>2. La entrada existe en **Áreas**. |
+| Flujo principal | 1. **Administrador:** abre **Áreas** y selecciona **Editar registro** en una fila **(ver E1)**.<br>2. **Nexus:** presenta los valores existentes de **Nombre** y **Activo**.<br>3. **Administrador:** modifica los datos y selecciona **Actualizar** **(ver A1)**.<br>4. **Nexus:** revisa la información y actualiza la entrada de Áreas.<br>5. **Nexus:** confirma y refresca la tabla de Áreas. |
 | Flujos alternativos | **A1 — Datos inválidos (después del paso 3):**<br>1. **Nexus:** señala los campos requeridos y conserva la entrada sin cambios.<br>2. **Administrador:** corrige y vuelve a confirmar; continúa en el paso 4. |
 | Excepciones | **E1 — Acceso, recurso o entrada rechazados:**<br>1. **Nexus:** rechaza la operación sin exponer otro catálogo ni producir cambios parciales.<br>2. **Administrador:** reconoce el rechazo; termina el caso de uso. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** La entrada de Áreas conserva los cambios admitidos.<br>2. **Fallo:** La entrada conserva su estado anterior. |
 | Requisitos relacionados | `RF-CAT-024`, `RN-001`, `RN-006`. |
 
-#### `CU-CAT-24` — Consultar rol
+#### `CU-CAT-34` — Consultar rol
 
 | Sección | Información relevante |
 | --- | --- |
-| Identificador | `CU-CAT-24` |
+| Identificador | `CU-CAT-34` |
 | Nombre | Consultar rol. |
 | Actor y disparador | **Actor:** Administrador del sistema del área Sistemas. **Disparador:** selecciona **Roles** en el submenú **Catálogos auxiliares**. |
 | Participación de actor y sistema | **Actor:** abre y revisa el listado de Roles.<br>**Nexus:** autoriza, valida el recurso registrado y devuelve sus entradas. |
-| Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con `catalogs:manage` y pertenece al contexto administrativo autorizado. |
-| Inferencia desde código | **Directa.** GET `/api/admin/catalogs/roles` → `findAllCatalogEntries`. |
-| Flujo principal | 1. **Administrador:** selecciona **Roles** en el submenú **Catálogos auxiliares** **(ver E1)**.<br>2. **Nexus:** valida `catalogs:manage` y el identificador `roles` contra la lista blanca.<br>3. **Nexus:** muestra la pantalla y tabla exclusivas de Roles.<br>4. **Administrador:** revisa las entradas sin modificar datos. |
+| Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con autorización para administrar catálogos y pertenece al contexto administrativo autorizado. |
+| Flujo principal | 1. **Administrador:** selecciona **Roles** en el submenú **Catálogos auxiliares** **(ver E1)**.<br>2. **Nexus:** comprueba que puede consultar Roles y muestra su tabla.<br>3. **Nexus:** presenta **Nuevo** como acción principal para registrar un rol.<br>4. **Administrador:** selecciona **Nuevo**; termina `CU-CAT-34` y con esa selección dispara `CU-CAT-35` Crear rol. |
+| Flujos alternativos | **A1 — Permanecer en la consulta (después del paso 3):**<br>1. **Administrador:** decide no iniciar el alta y revisa o busca entradas sin modificar datos.<br>2. **Nexus:** conserva la tabla de Roles; termina el caso de uso.<br>**A2 — Editar una entrada (después del paso 3 del flujo principal):**<br>1. **Administrador:** selecciona **Editar registro** en una entrada; termina `CU-CAT-34` y puede iniciar `CU-CAT-36` Editar rol. El caso de edición comprueba nuevamente sus precondiciones y autorización. |
 | Excepciones | **E1 — Acceso, recurso o entrada rechazados:**<br>1. **Nexus:** rechaza la operación sin exponer otro catálogo ni producir cambios parciales.<br>2. **Administrador:** reconoce el rechazo; termina el caso de uso. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** La tabla muestra exclusivamente las entradas de Roles.<br>2. **Fallo:** No se exponen datos ni modelos no autorizados. |
 | Requisitos relacionados | `RF-CAT-022`, `RN-001`, `RN-006`. |
 
-#### `CU-CAT-25` — Crear rol
+#### `CU-CAT-35` — Crear rol
 
 | Sección | Información relevante |
 | --- | --- |
-| Identificador | `CU-CAT-25` |
+| Identificador | `CU-CAT-35` |
 | Nombre | Crear rol. |
-| Actor y disparador | **Actor:** Administrador del sistema del área Sistemas. **Disparador:** selecciona **Nuevo** en la pantalla **Roles**. |
+| Actor y disparador | **Actor:** Administrador del sistema del área Sistemas. **Disparador:** selecciona **Nuevo** en `CU-CAT-34` Consultar rol. |
 | Participación de actor y sistema | **Actor:** captura y confirma una nueva entrada de Roles.<br>**Nexus:** autoriza, limita los campos, valida, crea y refresca la tabla. |
-| Precondiciones | 1. El actor inició sesión y cuenta con `catalogs:manage`.<br>2. La pantalla seleccionada corresponde exactamente a **Roles**. |
-| Inferencia desde código | **Directa.** POST `/api/admin/catalogs/roles` → `createCatalogEntry`. |
-| Flujo principal | 1. **Administrador:** abre la pantalla **Roles** y selecciona **Nuevo** **(ver E1)**.<br>2. **Nexus:** presenta únicamente el campo **Nombre**.<br>3. **Administrador:** captura los datos y selecciona **Guardar** **(ver A1)**.<br>4. **Nexus:** normaliza, valida y crea la entrada de Roles.<br>5. **Nexus:** confirma y refresca la tabla de Roles. |
+| Precondiciones | 1. El actor inició sesión y cuenta con autorización para administrar catálogos.<br>2. La pantalla seleccionada corresponde exactamente a **Roles**. |
+| Flujo principal | 1. **Administrador:** abre la pantalla **Roles** y selecciona **Nuevo** **(ver E1)**.<br>2. **Nexus:** presenta los campos **Nombre** y **Activo**.<br>3. **Administrador:** captura los datos y selecciona **Guardar** **(ver A1)**.<br>4. **Nexus:** revisa la información y crea la entrada de Roles.<br>5. **Nexus:** confirma y refresca la tabla de Roles. |
 | Flujos alternativos | **A1 — Datos inválidos (después del paso 3):**<br>1. **Nexus:** señala los campos requeridos sin crear la entrada.<br>2. **Administrador:** corrige y vuelve a confirmar; continúa en el paso 4. |
 | Excepciones | **E1 — Acceso, recurso o entrada rechazados:**<br>1. **Nexus:** rechaza la operación sin exponer otro catálogo ni producir cambios parciales.<br>2. **Administrador:** reconoce el rechazo; termina el caso de uso. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** La nueva entrada de Roles queda registrada y visible.<br>2. **Fallo:** No se crea ninguna entrada. |
 | Requisitos relacionados | `RF-CAT-023`, `RN-001`, `RN-006`. |
 
-#### `CU-CAT-26` — Editar rol
+#### `CU-CAT-36` — Editar rol
 
 | Sección | Información relevante |
 | --- | --- |
-| Identificador | `CU-CAT-26` |
+| Identificador | `CU-CAT-36` |
 | Nombre | Editar rol. |
 | Actor y disparador | **Actor:** Administrador del sistema del área Sistemas. **Disparador:** selecciona **Editar registro** en la pantalla **Roles**. |
 | Participación de actor y sistema | **Actor:** modifica y confirma una entrada de Roles.<br>**Nexus:** autoriza, limita los campos, valida, actualiza y refresca la tabla. |
-| Precondiciones | 1. El actor inició sesión y cuenta con `catalogs:manage`.<br>2. La entrada existe en **Roles**. |
-| Inferencia desde código | **Directa.** PUT `/api/admin/catalogs/roles/:id` → `updateCatalogEntry`. |
-| Flujo principal | 1. **Administrador:** abre **Roles** y selecciona **Editar registro** en una fila **(ver E1)**.<br>2. **Nexus:** presenta los valores existentes y únicamente el campo **Nombre**.<br>3. **Administrador:** modifica los datos y selecciona **Actualizar** **(ver A1)**.<br>4. **Nexus:** normaliza, valida y actualiza la entrada de Roles.<br>5. **Nexus:** confirma y refresca la tabla de Roles. |
+| Precondiciones | 1. El actor inició sesión y cuenta con autorización para administrar catálogos.<br>2. La entrada existe en **Roles**. |
+| Flujo principal | 1. **Administrador:** abre **Roles** y selecciona **Editar registro** en una fila **(ver E1)**.<br>2. **Nexus:** presenta los valores existentes de **Nombre** y **Activo**.<br>3. **Administrador:** modifica los datos y selecciona **Actualizar** **(ver A1)**.<br>4. **Nexus:** revisa la información y actualiza la entrada de Roles.<br>5. **Nexus:** confirma y refresca la tabla de Roles. |
 | Flujos alternativos | **A1 — Datos inválidos (después del paso 3):**<br>1. **Nexus:** señala los campos requeridos y conserva la entrada sin cambios.<br>2. **Administrador:** corrige y vuelve a confirmar; continúa en el paso 4. |
 | Excepciones | **E1 — Acceso, recurso o entrada rechazados:**<br>1. **Nexus:** rechaza la operación sin exponer otro catálogo ni producir cambios parciales.<br>2. **Administrador:** reconoce el rechazo; termina el caso de uso. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** La entrada de Roles conserva los cambios admitidos.<br>2. **Fallo:** La entrada conserva su estado anterior. |
 | Requisitos relacionados | `RF-CAT-024`, `RN-001`, `RN-006`. |
 
-#### `CU-CAT-27` — Consultar presentación
+#### `CU-CAT-37` — Consultar presentación
 
 | Sección | Información relevante |
 | --- | --- |
-| Identificador | `CU-CAT-27` |
+| Identificador | `CU-CAT-37` |
 | Nombre | Consultar presentación. |
 | Actor y disparador | **Actor:** Administrador del sistema del área Sistemas. **Disparador:** selecciona **Presentaciones** en el submenú **Catálogos auxiliares**. |
 | Participación de actor y sistema | **Actor:** abre y revisa el listado de Presentaciones.<br>**Nexus:** autoriza, valida el recurso registrado y devuelve sus entradas. |
-| Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con `catalogs:manage` y pertenece al contexto administrativo autorizado. |
-| Inferencia desde código | **Directa.** GET `/api/admin/catalogs/presentations` → `findAllCatalogEntries`. |
-| Flujo principal | 1. **Administrador:** selecciona **Presentaciones** en el submenú **Catálogos auxiliares** **(ver E1)**.<br>2. **Nexus:** valida `catalogs:manage` y el identificador `presentations` contra la lista blanca.<br>3. **Nexus:** muestra la pantalla y tabla exclusivas de Presentaciones.<br>4. **Administrador:** revisa las entradas sin modificar datos. |
+| Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con autorización para administrar catálogos y pertenece al contexto administrativo autorizado. |
+| Flujo principal | 1. **Administrador:** selecciona **Presentaciones** en el submenú **Catálogos auxiliares** **(ver E1)**.<br>2. **Nexus:** comprueba que puede consultar Presentaciones y muestra su tabla.<br>3. **Nexus:** presenta **Nuevo** como acción principal para registrar una presentación.<br>4. **Administrador:** selecciona **Nuevo**; termina `CU-CAT-37` y con esa selección dispara `CU-CAT-38` Crear presentación. |
+| Flujos alternativos | **A1 — Permanecer en la consulta (después del paso 3):**<br>1. **Administrador:** decide no iniciar el alta y revisa o busca entradas sin modificar datos.<br>2. **Nexus:** conserva la tabla de Presentaciones; termina el caso de uso.<br>**A2 — Editar una entrada (después del paso 3 del flujo principal):**<br>1. **Administrador:** selecciona **Editar registro** en una entrada; termina `CU-CAT-37` y puede iniciar `CU-CAT-39` Editar presentación. El caso de edición comprueba nuevamente sus precondiciones y autorización. |
 | Excepciones | **E1 — Acceso, recurso o entrada rechazados:**<br>1. **Nexus:** rechaza la operación sin exponer otro catálogo ni producir cambios parciales.<br>2. **Administrador:** reconoce el rechazo; termina el caso de uso. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** La tabla muestra exclusivamente las entradas de Presentaciones.<br>2. **Fallo:** No se exponen datos ni modelos no autorizados. |
 | Requisitos relacionados | `RF-CAT-022`, `RN-001`, `RN-006`. |
 
-#### `CU-CAT-28` — Crear presentación
+#### `CU-CAT-38` — Crear presentación
 
 | Sección | Información relevante |
 | --- | --- |
-| Identificador | `CU-CAT-28` |
+| Identificador | `CU-CAT-38` |
 | Nombre | Crear presentación. |
-| Actor y disparador | **Actor:** Administrador del sistema del área Sistemas. **Disparador:** selecciona **Nuevo** en la pantalla **Presentaciones**. |
+| Actor y disparador | **Actor:** Administrador del sistema del área Sistemas. **Disparador:** selecciona **Nuevo** en `CU-CAT-37` Consultar presentación. |
 | Participación de actor y sistema | **Actor:** captura y confirma una nueva entrada de Presentaciones.<br>**Nexus:** autoriza, limita los campos, valida, crea y refresca la tabla. |
-| Precondiciones | 1. El actor inició sesión y cuenta con `catalogs:manage`.<br>2. La pantalla seleccionada corresponde exactamente a **Presentaciones**. |
-| Inferencia desde código | **Directa.** POST `/api/admin/catalogs/presentations` → `createCatalogEntry`. |
-| Flujo principal | 1. **Administrador:** abre la pantalla **Presentaciones** y selecciona **Nuevo** **(ver E1)**.<br>2. **Nexus:** presenta únicamente el campo **Nombre**.<br>3. **Administrador:** captura los datos y selecciona **Guardar** **(ver A1)**.<br>4. **Nexus:** normaliza, valida y crea la entrada de Presentaciones.<br>5. **Nexus:** confirma y refresca la tabla de Presentaciones. |
+| Precondiciones | 1. El actor inició sesión y cuenta con autorización para administrar catálogos.<br>2. La pantalla seleccionada corresponde exactamente a **Presentaciones**. |
+| Flujo principal | 1. **Administrador:** abre la pantalla **Presentaciones** y selecciona **Nuevo** **(ver E1)**.<br>2. **Nexus:** presenta los campos **Nombre** y **Activo**.<br>3. **Administrador:** captura los datos y selecciona **Guardar** **(ver A1)**.<br>4. **Nexus:** revisa la información y crea la entrada de Presentaciones.<br>5. **Nexus:** confirma y refresca la tabla de Presentaciones. |
 | Flujos alternativos | **A1 — Datos inválidos (después del paso 3):**<br>1. **Nexus:** señala los campos requeridos sin crear la entrada.<br>2. **Administrador:** corrige y vuelve a confirmar; continúa en el paso 4. |
 | Excepciones | **E1 — Acceso, recurso o entrada rechazados:**<br>1. **Nexus:** rechaza la operación sin exponer otro catálogo ni producir cambios parciales.<br>2. **Administrador:** reconoce el rechazo; termina el caso de uso. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** La nueva entrada de Presentaciones queda registrada y visible.<br>2. **Fallo:** No se crea ninguna entrada. |
 | Requisitos relacionados | `RF-CAT-023`, `RN-001`, `RN-006`. |
 
-#### `CU-CAT-29` — Editar presentación
+#### `CU-CAT-39` — Editar presentación
 
 | Sección | Información relevante |
 | --- | --- |
-| Identificador | `CU-CAT-29` |
+| Identificador | `CU-CAT-39` |
 | Nombre | Editar presentación. |
 | Actor y disparador | **Actor:** Administrador del sistema del área Sistemas. **Disparador:** selecciona **Editar registro** en la pantalla **Presentaciones**. |
 | Participación de actor y sistema | **Actor:** modifica y confirma una entrada de Presentaciones.<br>**Nexus:** autoriza, limita los campos, valida, actualiza y refresca la tabla. |
-| Precondiciones | 1. El actor inició sesión y cuenta con `catalogs:manage`.<br>2. La entrada existe en **Presentaciones**. |
-| Inferencia desde código | **Directa.** PUT `/api/admin/catalogs/presentations/:id` → `updateCatalogEntry`. |
-| Flujo principal | 1. **Administrador:** abre **Presentaciones** y selecciona **Editar registro** en una fila **(ver E1)**.<br>2. **Nexus:** presenta los valores existentes y únicamente el campo **Nombre**.<br>3. **Administrador:** modifica los datos y selecciona **Actualizar** **(ver A1)**.<br>4. **Nexus:** normaliza, valida y actualiza la entrada de Presentaciones.<br>5. **Nexus:** confirma y refresca la tabla de Presentaciones. |
+| Precondiciones | 1. El actor inició sesión y cuenta con autorización para administrar catálogos.<br>2. La entrada existe en **Presentaciones**. |
+| Flujo principal | 1. **Administrador:** abre **Presentaciones** y selecciona **Editar registro** en una fila **(ver E1)**.<br>2. **Nexus:** presenta los valores existentes de **Nombre** y **Activo**.<br>3. **Administrador:** modifica los datos y selecciona **Actualizar** **(ver A1)**.<br>4. **Nexus:** revisa la información y actualiza la entrada de Presentaciones.<br>5. **Nexus:** confirma y refresca la tabla de Presentaciones. |
 | Flujos alternativos | **A1 — Datos inválidos (después del paso 3):**<br>1. **Nexus:** señala los campos requeridos y conserva la entrada sin cambios.<br>2. **Administrador:** corrige y vuelve a confirmar; continúa en el paso 4. |
 | Excepciones | **E1 — Acceso, recurso o entrada rechazados:**<br>1. **Nexus:** rechaza la operación sin exponer otro catálogo ni producir cambios parciales.<br>2. **Administrador:** reconoce el rechazo; termina el caso de uso. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** La entrada de Presentaciones conserva los cambios admitidos.<br>2. **Fallo:** La entrada conserva su estado anterior. |
 | Requisitos relacionados | `RF-CAT-024`, `RN-001`, `RN-006`. |
 
-#### `CU-CAT-30` — Consultar unidad de medida
+#### `CU-CAT-40` — Consultar unidad de medida
 
 | Sección | Información relevante |
 | --- | --- |
-| Identificador | `CU-CAT-30` |
+| Identificador | `CU-CAT-40` |
 | Nombre | Consultar unidad de medida. |
 | Actor y disparador | **Actor:** Administrador del sistema del área Sistemas. **Disparador:** selecciona **Unidades de medida** en el submenú **Catálogos auxiliares**. |
 | Participación de actor y sistema | **Actor:** abre y revisa el listado de Unidades de medida.<br>**Nexus:** autoriza, valida el recurso registrado y devuelve sus entradas. |
-| Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con `catalogs:manage` y pertenece al contexto administrativo autorizado. |
-| Inferencia desde código | **Directa.** GET `/api/admin/catalogs/unit-measures` → `findAllCatalogEntries`. |
-| Flujo principal | 1. **Administrador:** selecciona **Unidades de medida** en el submenú **Catálogos auxiliares** **(ver E1)**.<br>2. **Nexus:** valida `catalogs:manage` y el identificador `unit-measures` contra la lista blanca.<br>3. **Nexus:** muestra la pantalla y tabla exclusivas de Unidades de medida.<br>4. **Administrador:** revisa las entradas sin modificar datos. |
+| Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con autorización para administrar catálogos y pertenece al contexto administrativo autorizado. |
+| Flujo principal | 1. **Administrador:** selecciona **Unidades de medida** en el submenú **Catálogos auxiliares** **(ver E1)**.<br>2. **Nexus:** comprueba que puede consultar Unidades de medida y muestra su tabla.<br>3. **Nexus:** presenta **Nuevo** como acción principal para registrar una unidad de medida.<br>4. **Administrador:** selecciona **Nuevo**; termina `CU-CAT-40` y con esa selección dispara `CU-CAT-41` Crear unidad de medida. |
+| Flujos alternativos | **A1 — Permanecer en la consulta (después del paso 3):**<br>1. **Administrador:** decide no iniciar el alta y revisa o busca entradas sin modificar datos.<br>2. **Nexus:** conserva la tabla de Unidades de medida; termina el caso de uso.<br>**A2 — Editar una entrada (después del paso 3 del flujo principal):**<br>1. **Administrador:** selecciona **Editar registro** en una entrada; termina `CU-CAT-40` y puede iniciar `CU-CAT-42` Editar unidad de medida. El caso de edición comprueba nuevamente sus precondiciones y autorización. |
 | Excepciones | **E1 — Acceso, recurso o entrada rechazados:**<br>1. **Nexus:** rechaza la operación sin exponer otro catálogo ni producir cambios parciales.<br>2. **Administrador:** reconoce el rechazo; termina el caso de uso. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** La tabla muestra exclusivamente las entradas de Unidades de medida.<br>2. **Fallo:** No se exponen datos ni modelos no autorizados. |
 | Requisitos relacionados | `RF-CAT-022`, `RN-001`, `RN-006`. |
 
-#### `CU-CAT-31` — Crear unidad de medida
+#### `CU-CAT-41` — Crear unidad de medida
 
 | Sección | Información relevante |
 | --- | --- |
-| Identificador | `CU-CAT-31` |
+| Identificador | `CU-CAT-41` |
 | Nombre | Crear unidad de medida. |
-| Actor y disparador | **Actor:** Administrador del sistema del área Sistemas. **Disparador:** selecciona **Nuevo** en la pantalla **Unidades de medida**. |
+| Actor y disparador | **Actor:** Administrador del sistema del área Sistemas. **Disparador:** selecciona **Nuevo** en `CU-CAT-40` Consultar unidad de medida. |
 | Participación de actor y sistema | **Actor:** captura y confirma una nueva entrada de Unidades de medida.<br>**Nexus:** autoriza, limita los campos, valida, crea y refresca la tabla. |
-| Precondiciones | 1. El actor inició sesión y cuenta con `catalogs:manage`.<br>2. La pantalla seleccionada corresponde exactamente a **Unidades de medida**. |
-| Inferencia desde código | **Directa.** POST `/api/admin/catalogs/unit-measures` → `createCatalogEntry`. |
-| Flujo principal | 1. **Administrador:** abre la pantalla **Unidades de medida** y selecciona **Nuevo** **(ver E1)**.<br>2. **Nexus:** presenta únicamente los campos **Nombre** y **Símbolo**.<br>3. **Administrador:** captura los datos y selecciona **Guardar** **(ver A1)**.<br>4. **Nexus:** normaliza, valida y crea la entrada de Unidades de medida.<br>5. **Nexus:** confirma y refresca la tabla de Unidades de medida. |
+| Precondiciones | 1. El actor inició sesión y cuenta con autorización para administrar catálogos.<br>2. La pantalla seleccionada corresponde exactamente a **Unidades de medida**. |
+| Flujo principal | 1. **Administrador:** abre la pantalla **Unidades de medida** y selecciona **Nuevo** **(ver E1)**.<br>2. **Nexus:** presenta los campos **Nombre**, **Símbolo** y **Activo**.<br>3. **Administrador:** captura los datos y selecciona **Guardar** **(ver A1)**.<br>4. **Nexus:** revisa la información y crea la entrada de Unidades de medida.<br>5. **Nexus:** confirma y refresca la tabla de Unidades de medida. |
 | Flujos alternativos | **A1 — Datos inválidos (después del paso 3):**<br>1. **Nexus:** señala los campos requeridos sin crear la entrada.<br>2. **Administrador:** corrige y vuelve a confirmar; continúa en el paso 4. |
 | Excepciones | **E1 — Acceso, recurso o entrada rechazados:**<br>1. **Nexus:** rechaza la operación sin exponer otro catálogo ni producir cambios parciales.<br>2. **Administrador:** reconoce el rechazo; termina el caso de uso. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** La nueva entrada de Unidades de medida queda registrada y visible.<br>2. **Fallo:** No se crea ninguna entrada. |
 | Requisitos relacionados | `RF-CAT-023`, `RN-001`, `RN-006`. |
 
-#### `CU-CAT-32` — Editar unidad de medida
+#### `CU-CAT-42` — Editar unidad de medida
 
 | Sección | Información relevante |
 | --- | --- |
-| Identificador | `CU-CAT-32` |
+| Identificador | `CU-CAT-42` |
 | Nombre | Editar unidad de medida. |
 | Actor y disparador | **Actor:** Administrador del sistema del área Sistemas. **Disparador:** selecciona **Editar registro** en la pantalla **Unidades de medida**. |
 | Participación de actor y sistema | **Actor:** modifica y confirma una entrada de Unidades de medida.<br>**Nexus:** autoriza, limita los campos, valida, actualiza y refresca la tabla. |
-| Precondiciones | 1. El actor inició sesión y cuenta con `catalogs:manage`.<br>2. La entrada existe en **Unidades de medida**. |
-| Inferencia desde código | **Directa.** PUT `/api/admin/catalogs/unit-measures/:id` → `updateCatalogEntry`. |
-| Flujo principal | 1. **Administrador:** abre **Unidades de medida** y selecciona **Editar registro** en una fila **(ver E1)**.<br>2. **Nexus:** presenta los valores existentes y únicamente los campos **Nombre** y **Símbolo**.<br>3. **Administrador:** modifica los datos y selecciona **Actualizar** **(ver A1)**.<br>4. **Nexus:** normaliza, valida y actualiza la entrada de Unidades de medida.<br>5. **Nexus:** confirma y refresca la tabla de Unidades de medida. |
+| Precondiciones | 1. El actor inició sesión y cuenta con autorización para administrar catálogos.<br>2. La entrada existe en **Unidades de medida**. |
+| Flujo principal | 1. **Administrador:** abre **Unidades de medida** y selecciona **Editar registro** en una fila **(ver E1)**.<br>2. **Nexus:** presenta los valores existentes de **Nombre**, **Símbolo** y **Activo**.<br>3. **Administrador:** modifica los datos y selecciona **Actualizar** **(ver A1)**.<br>4. **Nexus:** revisa la información y actualiza la entrada de Unidades de medida.<br>5. **Nexus:** confirma y refresca la tabla de Unidades de medida. |
 | Flujos alternativos | **A1 — Datos inválidos (después del paso 3):**<br>1. **Nexus:** señala los campos requeridos y conserva la entrada sin cambios.<br>2. **Administrador:** corrige y vuelve a confirmar; continúa en el paso 4. |
 | Excepciones | **E1 — Acceso, recurso o entrada rechazados:**<br>1. **Nexus:** rechaza la operación sin exponer otro catálogo ni producir cambios parciales.<br>2. **Administrador:** reconoce el rechazo; termina el caso de uso. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** La entrada de Unidades de medida conserva los cambios admitidos.<br>2. **Fallo:** La entrada conserva su estado anterior. |
 | Requisitos relacionados | `RF-CAT-024`, `RN-001`, `RN-006`. |
 
-#### `CU-CAT-33` — Consultar motivo de ajuste
+#### `CU-CAT-43` — Consultar motivo de ajuste
 
 | Sección | Información relevante |
 | --- | --- |
-| Identificador | `CU-CAT-33` |
+| Identificador | `CU-CAT-43` |
 | Nombre | Consultar motivo de ajuste. |
 | Actor y disparador | **Actor:** Administrador del sistema del área Sistemas. **Disparador:** selecciona **Motivos de ajuste** en el submenú **Catálogos auxiliares**. |
 | Participación de actor y sistema | **Actor:** abre y revisa el listado de Motivos de ajuste.<br>**Nexus:** autoriza, valida el recurso registrado y devuelve sus entradas. |
-| Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con `catalogs:manage` y pertenece al contexto administrativo autorizado. |
-| Inferencia desde código | **Directa.** GET `/api/admin/catalogs/reasons` → `findAllCatalogEntries`. |
-| Flujo principal | 1. **Administrador:** selecciona **Motivos de ajuste** en el submenú **Catálogos auxiliares** **(ver E1)**.<br>2. **Nexus:** valida `catalogs:manage` y el identificador `reasons` contra la lista blanca.<br>3. **Nexus:** muestra la pantalla y tabla exclusivas de Motivos de ajuste.<br>4. **Administrador:** revisa las entradas sin modificar datos. |
+| Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con autorización para administrar catálogos y pertenece al contexto administrativo autorizado. |
+| Flujo principal | 1. **Administrador:** selecciona **Motivos de ajuste** en el submenú **Catálogos auxiliares** **(ver E1)**.<br>2. **Nexus:** comprueba que puede consultar Motivos de ajuste y muestra su tabla.<br>3. **Nexus:** presenta **Nuevo** como acción principal para registrar un motivo de ajuste.<br>4. **Administrador:** selecciona **Nuevo**; termina `CU-CAT-43` y con esa selección dispara `CU-CAT-44` Crear motivo de ajuste. |
+| Flujos alternativos | **A1 — Permanecer en la consulta (después del paso 3):**<br>1. **Administrador:** decide no iniciar el alta y revisa o busca entradas sin modificar datos.<br>2. **Nexus:** conserva la tabla de Motivos de ajuste; termina el caso de uso.<br>**A2 — Editar una entrada (después del paso 3 del flujo principal):**<br>1. **Administrador:** selecciona **Editar registro** en una entrada; termina `CU-CAT-43` y puede iniciar `CU-CAT-45` Editar motivo de ajuste. El caso de edición comprueba nuevamente sus precondiciones y autorización. |
 | Excepciones | **E1 — Acceso, recurso o entrada rechazados:**<br>1. **Nexus:** rechaza la operación sin exponer otro catálogo ni producir cambios parciales.<br>2. **Administrador:** reconoce el rechazo; termina el caso de uso. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** La tabla muestra exclusivamente las entradas de Motivos de ajuste.<br>2. **Fallo:** No se exponen datos ni modelos no autorizados. |
 | Requisitos relacionados | `RF-CAT-022`, `RN-001`, `RN-006`. |
 
-#### `CU-CAT-34` — Crear motivo de ajuste
+#### `CU-CAT-44` — Crear motivo de ajuste
 
 | Sección | Información relevante |
 | --- | --- |
-| Identificador | `CU-CAT-34` |
+| Identificador | `CU-CAT-44` |
 | Nombre | Crear motivo de ajuste. |
-| Actor y disparador | **Actor:** Administrador del sistema del área Sistemas. **Disparador:** selecciona **Nuevo** en la pantalla **Motivos de ajuste**. |
+| Actor y disparador | **Actor:** Administrador del sistema del área Sistemas. **Disparador:** selecciona **Nuevo** en `CU-CAT-43` Consultar motivo de ajuste. |
 | Participación de actor y sistema | **Actor:** captura y confirma una nueva entrada de Motivos de ajuste.<br>**Nexus:** autoriza, limita los campos, valida, crea y refresca la tabla. |
-| Precondiciones | 1. El actor inició sesión y cuenta con `catalogs:manage`.<br>2. La pantalla seleccionada corresponde exactamente a **Motivos de ajuste**. |
-| Inferencia desde código | **Directa.** POST `/api/admin/catalogs/reasons` → `createCatalogEntry`. |
-| Flujo principal | 1. **Administrador:** abre la pantalla **Motivos de ajuste** y selecciona **Nuevo** **(ver E1)**.<br>2. **Nexus:** presenta únicamente los campos **Nombre** y **Activo**.<br>3. **Administrador:** captura los datos y selecciona **Guardar** **(ver A1)**.<br>4. **Nexus:** normaliza, valida y crea la entrada de Motivos de ajuste.<br>5. **Nexus:** confirma y refresca la tabla de Motivos de ajuste. |
+| Precondiciones | 1. El actor inició sesión y cuenta con autorización para administrar catálogos.<br>2. La pantalla seleccionada corresponde exactamente a **Motivos de ajuste**. |
+| Flujo principal | 1. **Administrador:** abre la pantalla **Motivos de ajuste** y selecciona **Nuevo** **(ver E1)**.<br>2. **Nexus:** presenta únicamente los campos **Nombre** y **Activo**.<br>3. **Administrador:** captura los datos y selecciona **Guardar** **(ver A1)**.<br>4. **Nexus:** revisa la información y crea la entrada de Motivos de ajuste.<br>5. **Nexus:** confirma y refresca la tabla de Motivos de ajuste. |
 | Flujos alternativos | **A1 — Datos inválidos (después del paso 3):**<br>1. **Nexus:** señala los campos requeridos sin crear la entrada.<br>2. **Administrador:** corrige y vuelve a confirmar; continúa en el paso 4. |
 | Excepciones | **E1 — Acceso, recurso o entrada rechazados:**<br>1. **Nexus:** rechaza la operación sin exponer otro catálogo ni producir cambios parciales.<br>2. **Administrador:** reconoce el rechazo; termina el caso de uso. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** La nueva entrada de Motivos de ajuste queda registrada y visible.<br>2. **Fallo:** No se crea ninguna entrada. |
 | Requisitos relacionados | `RF-CAT-023`, `RN-001`, `RN-006`. |
 
-#### `CU-CAT-35` — Editar motivo de ajuste
+#### `CU-CAT-45` — Editar motivo de ajuste
 
 | Sección | Información relevante |
 | --- | --- |
-| Identificador | `CU-CAT-35` |
+| Identificador | `CU-CAT-45` |
 | Nombre | Editar motivo de ajuste. |
 | Actor y disparador | **Actor:** Administrador del sistema del área Sistemas. **Disparador:** selecciona **Editar registro** en la pantalla **Motivos de ajuste**. |
 | Participación de actor y sistema | **Actor:** modifica y confirma una entrada de Motivos de ajuste.<br>**Nexus:** autoriza, limita los campos, valida, actualiza y refresca la tabla. |
-| Precondiciones | 1. El actor inició sesión y cuenta con `catalogs:manage`.<br>2. La entrada existe en **Motivos de ajuste**. |
-| Inferencia desde código | **Directa.** PUT `/api/admin/catalogs/reasons/:id` → `updateCatalogEntry`. |
-| Flujo principal | 1. **Administrador:** abre **Motivos de ajuste** y selecciona **Editar registro** en una fila **(ver E1)**.<br>2. **Nexus:** presenta los valores existentes y únicamente los campos **Nombre** y **Activo**.<br>3. **Administrador:** modifica los datos y selecciona **Actualizar** **(ver A1)**.<br>4. **Nexus:** normaliza, valida y actualiza la entrada de Motivos de ajuste.<br>5. **Nexus:** confirma y refresca la tabla de Motivos de ajuste. |
+| Precondiciones | 1. El actor inició sesión y cuenta con autorización para administrar catálogos.<br>2. La entrada existe en **Motivos de ajuste**. |
+| Flujo principal | 1. **Administrador:** abre **Motivos de ajuste** y selecciona **Editar registro** en una fila **(ver E1)**.<br>2. **Nexus:** presenta los valores existentes y únicamente los campos **Nombre** y **Activo**.<br>3. **Administrador:** modifica los datos y selecciona **Actualizar** **(ver A1)**.<br>4. **Nexus:** revisa la información y actualiza la entrada de Motivos de ajuste.<br>5. **Nexus:** confirma y refresca la tabla de Motivos de ajuste. |
 | Flujos alternativos | **A1 — Datos inválidos (después del paso 3):**<br>1. **Nexus:** señala los campos requeridos y conserva la entrada sin cambios.<br>2. **Administrador:** corrige y vuelve a confirmar; continúa en el paso 4. |
 | Excepciones | **E1 — Acceso, recurso o entrada rechazados:**<br>1. **Nexus:** rechaza la operación sin exponer otro catálogo ni producir cambios parciales.<br>2. **Administrador:** reconoce el rechazo; termina el caso de uso. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** La entrada de Motivos de ajuste conserva los cambios admitidos.<br>2. **Fallo:** La entrada conserva su estado anterior. |
 | Requisitos relacionados | `RF-CAT-024`, `RN-001`, `RN-006`. |
 
-#### `CU-CAT-36` — Consultar estado de cumplimiento
+#### `CU-CAT-46` — Consultar estado de cumplimiento
 
 | Sección | Información relevante |
 | --- | --- |
-| Identificador | `CU-CAT-36` |
+| Identificador | `CU-CAT-46` |
 | Nombre | Consultar estado de cumplimiento. |
 | Actor y disparador | **Actor:** Administrador del sistema del área Sistemas. **Disparador:** selecciona **Estados de cumplimiento** en el submenú **Catálogos auxiliares**. |
 | Participación de actor y sistema | **Actor:** abre y revisa el listado de Estados de cumplimiento.<br>**Nexus:** autoriza, valida el recurso registrado y devuelve sus entradas. |
-| Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con `catalogs:manage` y pertenece al contexto administrativo autorizado. |
-| Inferencia desde código | **Directa.** GET `/api/admin/catalogs/fulfillment-statuses` → `findAllCatalogEntries`. |
-| Flujo principal | 1. **Administrador:** selecciona **Estados de cumplimiento** en el submenú **Catálogos auxiliares** **(ver E1)**.<br>2. **Nexus:** valida `catalogs:manage` y el identificador `fulfillment-statuses` contra la lista blanca.<br>3. **Nexus:** muestra la pantalla y tabla exclusivas de Estados de cumplimiento.<br>4. **Administrador:** revisa las entradas sin modificar datos. |
+| Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con autorización para administrar catálogos y pertenece al contexto administrativo autorizado. |
+| Flujo principal | 1. **Administrador:** selecciona **Estados de cumplimiento** en el submenú **Catálogos auxiliares** **(ver E1)**.<br>2. **Nexus:** comprueba que puede consultar Estados de cumplimiento y muestra su tabla.<br>3. **Nexus:** presenta **Nuevo** como acción principal para registrar un estado de cumplimiento.<br>4. **Administrador:** selecciona **Nuevo**; termina `CU-CAT-46` y con esa selección dispara `CU-CAT-47` Crear estado de cumplimiento. |
+| Flujos alternativos | **A1 — Permanecer en la consulta (después del paso 3):**<br>1. **Administrador:** decide no iniciar el alta y revisa o busca entradas sin modificar datos.<br>2. **Nexus:** conserva la tabla de Estados de cumplimiento; termina el caso de uso.<br>**A2 — Editar una entrada (después del paso 3 del flujo principal):**<br>1. **Administrador:** selecciona **Editar registro** en una entrada; termina `CU-CAT-46` y puede iniciar `CU-CAT-48` Editar estado de cumplimiento. El caso de edición comprueba nuevamente sus precondiciones y autorización. |
 | Excepciones | **E1 — Acceso, recurso o entrada rechazados:**<br>1. **Nexus:** rechaza la operación sin exponer otro catálogo ni producir cambios parciales.<br>2. **Administrador:** reconoce el rechazo; termina el caso de uso. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** La tabla muestra exclusivamente las entradas de Estados de cumplimiento.<br>2. **Fallo:** No se exponen datos ni modelos no autorizados. |
 | Requisitos relacionados | `RF-CAT-022`, `RN-001`, `RN-006`. |
 
-#### `CU-CAT-37` — Crear estado de cumplimiento
+#### `CU-CAT-47` — Crear estado de cumplimiento
 
 | Sección | Información relevante |
 | --- | --- |
-| Identificador | `CU-CAT-37` |
+| Identificador | `CU-CAT-47` |
 | Nombre | Crear estado de cumplimiento. |
-| Actor y disparador | **Actor:** Administrador del sistema del área Sistemas. **Disparador:** selecciona **Nuevo** en la pantalla **Estados de cumplimiento**. |
+| Actor y disparador | **Actor:** Administrador del sistema del área Sistemas. **Disparador:** selecciona **Nuevo** en `CU-CAT-46` Consultar estado de cumplimiento. |
 | Participación de actor y sistema | **Actor:** captura y confirma una nueva entrada de Estados de cumplimiento.<br>**Nexus:** autoriza, limita los campos, valida, crea y refresca la tabla. |
-| Precondiciones | 1. El actor inició sesión y cuenta con `catalogs:manage`.<br>2. La pantalla seleccionada corresponde exactamente a **Estados de cumplimiento**. |
-| Inferencia desde código | **Directa.** POST `/api/admin/catalogs/fulfillment-statuses` → `createCatalogEntry`. |
-| Flujo principal | 1. **Administrador:** abre la pantalla **Estados de cumplimiento** y selecciona **Nuevo** **(ver E1)**.<br>2. **Nexus:** presenta únicamente el campo **Nombre**.<br>3. **Administrador:** captura los datos y selecciona **Guardar** **(ver A1)**.<br>4. **Nexus:** normaliza, valida y crea la entrada de Estados de cumplimiento.<br>5. **Nexus:** confirma y refresca la tabla de Estados de cumplimiento. |
+| Precondiciones | 1. El actor inició sesión y cuenta con autorización para administrar catálogos.<br>2. La pantalla seleccionada corresponde exactamente a **Estados de cumplimiento**. |
+| Flujo principal | 1. **Administrador:** abre la pantalla **Estados de cumplimiento** y selecciona **Nuevo** **(ver E1)**.<br>2. **Nexus:** presenta los campos **Nombre** y **Activo**.<br>3. **Administrador:** captura los datos y selecciona **Guardar** **(ver A1)**.<br>4. **Nexus:** revisa la información y crea la entrada de Estados de cumplimiento.<br>5. **Nexus:** confirma y refresca la tabla de Estados de cumplimiento. |
 | Flujos alternativos | **A1 — Datos inválidos (después del paso 3):**<br>1. **Nexus:** señala los campos requeridos sin crear la entrada.<br>2. **Administrador:** corrige y vuelve a confirmar; continúa en el paso 4. |
 | Excepciones | **E1 — Acceso, recurso o entrada rechazados:**<br>1. **Nexus:** rechaza la operación sin exponer otro catálogo ni producir cambios parciales.<br>2. **Administrador:** reconoce el rechazo; termina el caso de uso. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** La nueva entrada de Estados de cumplimiento queda registrada y visible.<br>2. **Fallo:** No se crea ninguna entrada. |
 | Requisitos relacionados | `RF-CAT-023`, `RN-001`, `RN-006`. |
 
-#### `CU-CAT-38` — Editar estado de cumplimiento
+#### `CU-CAT-48` — Editar estado de cumplimiento
 
 | Sección | Información relevante |
 | --- | --- |
-| Identificador | `CU-CAT-38` |
+| Identificador | `CU-CAT-48` |
 | Nombre | Editar estado de cumplimiento. |
 | Actor y disparador | **Actor:** Administrador del sistema del área Sistemas. **Disparador:** selecciona **Editar registro** en la pantalla **Estados de cumplimiento**. |
 | Participación de actor y sistema | **Actor:** modifica y confirma una entrada de Estados de cumplimiento.<br>**Nexus:** autoriza, limita los campos, valida, actualiza y refresca la tabla. |
-| Precondiciones | 1. El actor inició sesión y cuenta con `catalogs:manage`.<br>2. La entrada existe en **Estados de cumplimiento**. |
-| Inferencia desde código | **Directa.** PUT `/api/admin/catalogs/fulfillment-statuses/:id` → `updateCatalogEntry`. |
-| Flujo principal | 1. **Administrador:** abre **Estados de cumplimiento** y selecciona **Editar registro** en una fila **(ver E1)**.<br>2. **Nexus:** presenta los valores existentes y únicamente el campo **Nombre**.<br>3. **Administrador:** modifica los datos y selecciona **Actualizar** **(ver A1)**.<br>4. **Nexus:** normaliza, valida y actualiza la entrada de Estados de cumplimiento.<br>5. **Nexus:** confirma y refresca la tabla de Estados de cumplimiento. |
+| Precondiciones | 1. El actor inició sesión y cuenta con autorización para administrar catálogos.<br>2. La entrada existe en **Estados de cumplimiento**. |
+| Flujo principal | 1. **Administrador:** abre **Estados de cumplimiento** y selecciona **Editar registro** en una fila **(ver E1)**.<br>2. **Nexus:** presenta los valores existentes de **Nombre** y **Activo**.<br>3. **Administrador:** modifica los datos y selecciona **Actualizar** **(ver A1)**.<br>4. **Nexus:** revisa la información y actualiza la entrada de Estados de cumplimiento.<br>5. **Nexus:** confirma y refresca la tabla de Estados de cumplimiento. |
 | Flujos alternativos | **A1 — Datos inválidos (después del paso 3):**<br>1. **Nexus:** señala los campos requeridos y conserva la entrada sin cambios.<br>2. **Administrador:** corrige y vuelve a confirmar; continúa en el paso 4. |
 | Excepciones | **E1 — Acceso, recurso o entrada rechazados:**<br>1. **Nexus:** rechaza la operación sin exponer otro catálogo ni producir cambios parciales.<br>2. **Administrador:** reconoce el rechazo; termina el caso de uso. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** La entrada de Estados de cumplimiento conserva los cambios admitidos.<br>2. **Fallo:** La entrada conserva su estado anterior. |
@@ -1143,9 +1243,8 @@ Cada ficha representa una sola acción sobre una sola entidad. Los elementos com
 | Actor y disparador | **Actor:** Personal de almacén. **Disparador:** necesita localizar o revisar compras de material y abre la opción de consulta correspondiente. |
 | Participación de actor y sistema | **Actor:** abre la consulta, define criterios y selecciona registros.<br>**Nexus:** autoriza, presenta filtros y devuelve sólo la información permitida. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de consulta o reporte correspondiente. |
-| Inferencia desde código | **Directa.** `goodsReceiptApiRoute.js` GET → normalización de filtros/paginación → `findAllGoodsReceipts`. |
-| Flujo principal | 1. **Actor:** abre la opción para consultar compras de material **(ver E1)**.<br>2. **Nexus:** comprueba su autorización y muestra la tabla paginada con búsqueda por folio o número de factura y filtros por periodo, proveedor y persona receptora **(ver A1)**.<br>3. **Actor:** captura los criterios que necesita y solicita aplicarlos.<br>4. **Nexus:** actualiza la tabla y el total con la información autorizada, sin modificar datos.<br>5. **Actor:** selecciona un registro cuando necesita revisar su información.<br>6. **Nexus:** muestra el detalle y las acciones que el actor puede ejecutar **(ver A2)**. |
-| Flujos alternativos | **A1 — Iniciar una creación (después del paso 2):**<br>1. **Actor:** selecciona crear una compra en lugar de continuar la consulta; termina `CU-ENT-01` y puede iniciar `CU-ENT-02` Crear compra de material.<br>**A2 — Elegir una acción sobre el registro (después del paso 6):**<br>1. **Actor:** selecciona editar la compra, corregir uno de sus materiales o cancelarlo en lugar de concluir la consulta; termina `CU-ENT-01` y puede iniciar `CU-ENT-03` Editar compra de material, `CU-ENT-04` Corregir material de una compra o `CU-ENT-05` Cancelar material de una compra. Cada caso elegido comprueba nuevamente sus precondiciones y autorización; la selección no constituye `«include»` ni `«extend»`. |
+| Flujo principal | 1. **Actor:** abre la opción para consultar compras de material **(ver E1)**.<br>2. **Nexus:** comprueba su autorización y muestra la consulta con sus criterios disponibles.<br>3. **Actor:** define los criterios que necesita y solicita aplicarlos **(ver A1)**.<br>4. **Nexus:** presenta la información autorizada y la acción principal para registrar una compra.<br>5. **Actor:** selecciona la acción principal; termina `CU-ENT-01` y con esa selección dispara `CU-ENT-02` Crear compra de material. |
+| Flujos alternativos | **A1 — Continuar la consulta (después del paso 3):**<br>1. **Nexus:** actualiza la información y el total sin modificar datos.<br>2. **Actor:** revisa los resultados o cambia los criterios.<br>3. **Nexus:** conserva la consulta disponible; termina el caso de uso.<br>**A2 — Elegir otra acción (después del paso 4 del flujo principal):**<br>1. **Actor:** selecciona editar la compra, corregir uno de sus materiales o cancelarlo en lugar de iniciar el alta; termina `CU-ENT-01` y puede iniciar `CU-ENT-03` Editar compra de material, `CU-ENT-04` Corregir material de una compra o `CU-ENT-05` Cancelar material de una compra. También puede iniciar `CU-ENT-06` Generar reporte de compras de material. Cada caso elegido comprueba nuevamente sus precondiciones y autorización; la selección no constituye `«include»` ni `«extend»`. |
 | Excepciones | **E1 — Acceso rechazado (después del paso 1):**<br>1. **Nexus:** comprueba las precondiciones y la autorización, determina que alguna no se cumple y rechaza la solicitud sin modificar datos ni exponer información no autorizada; comunica el motivo.<br>2. **Actor:** reconoce el rechazo; termina el caso de uso. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** Listado y detalle sin modificar inventario.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
 | Requisitos relacionados | `RF-REC-001`. |
@@ -1156,10 +1255,9 @@ Cada ficha representa una sola acción sobre una sola entidad. Los elementos com
 | --- | --- |
 | Identificador | `CU-ENT-02` |
 | Nombre | Crear compra de material. |
-| Actor y disparador | **Actor:** Personal de almacén. **Disparador:** recibe materiales de un proveedor y abre la acción de alta de compra. |
+| Actor y disparador | **Actor:** Personal de almacén. **Disparador:** selecciona la acción principal para crear una compra desde `CU-ENT-01` Consultar compras de material. |
 | Participación de actor y sistema | **Actor:** abre el alta, captura datos y confirma.<br>**Nexus:** carga opciones, valida, registra y comunica el resultado. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de alta.<br>3. Existen los datos relacionados requeridos para completar el registro. |
-| Inferencia desde código | **Compuesta.** POST → validación → DTO → `createGoodsReceipt` → evento de inventario. |
 | Flujo principal | 1. **Actor:** abre «Agregar compra» **(ver E1)**.<br>2. **Nexus:** muestra el formulario y carga proveedores, personas receptoras y materiales disponibles.<br>3. **Actor:** indica si el comprobante es factura o remisión; captura el número de factura sólo cuando corresponde, proveedor, persona receptora, fecha y hora de recepción y observaciones.<br>4. **Actor:** agrega cada material con su cantidad y costo por presentación, revisa los detalles y confirma **(ver A1)** **(ver A2)**.<br>5. **Nexus:** valida el tipo de comprobante, la factura cuando aplica, las relaciones, la fecha, las cantidades y los costos, y calcula los totales **(ver A3)** **(ver A4)**.<br>6. **Nexus:** registra compra y detalles, incrementa existencias y conserva los movimientos como una sola operación.<br>7. **Nexus:** actualiza la tabla y confirma el registro. |
 | Flujos alternativos | **A1 — Datos inválidos (después del paso 4):**<br>1. **Nexus:** valida la información capturada, detecta campos incompletos, formatos incorrectos, relaciones no permitidas o cantidades fuera de las reglas del caso y los señala sin registrar cambios.<br>2. **Actor:** corrige la información indicada y vuelve a confirmar; continúa en el paso 5 del flujo principal.<br>**A2 — Material repetido en el detalle (después del paso 4):**<br>1. **Nexus:** conserva renglones separados del mismo material cuando representan cantidades o costos por presentación distintos y muestra cada detalle para revisión.<br>2. **Actor:** confirma que los renglones corresponden a recepciones diferenciadas; continúa en el paso 5 del flujo principal.<br>**A3 — Factura ya registrada (después del paso 5):**<br>1. **Actor:** revisa el folio existente que Nexus presenta.<br>2. **Nexus:** rechaza la combinación repetida de proveedor y factura sin registrar compra, detalles, movimientos ni existencias.<br>3. **Actor:** termina `CU-ENT-02` y puede abrir la compra existente para agregar los materiales faltantes; termina el caso de uso.<br>**A4 — Material o proveedor inactivo (después del paso 5):**<br>1. **Actor:** revisa los recursos inactivos señalados por Nexus.<br>2. **Nexus:** conserva el formulario sin crear detalles, movimientos ni cambios de stock.<br>3. **Actor:** selecciona recursos activos o solicita su reactivación cuando proceda y vuelve a confirmar; continúa en el paso 5 del flujo principal. |
 | Excepciones | **E1 — Acceso rechazado (después del paso 1):**<br>1. **Nexus:** comprueba las precondiciones y la autorización, determina que alguna no se cumple y rechaza la solicitud sin modificar datos ni exponer información no autorizada; comunica el motivo.<br>2. **Actor:** reconoce el rechazo; termina el caso de uso. |
@@ -1175,7 +1273,6 @@ Cada ficha representa una sola acción sobre una sola entidad. Los elementos com
 | Actor y disparador | **Actor:** Personal de almacén. **Disparador:** detecta datos que debe corregir en una compra de material y selecciona su acción de edición. |
 | Participación de actor y sistema | **Actor:** selecciona el registro, modifica datos y confirma.<br>**Nexus:** presenta valores vigentes, valida, actualiza y comunica el resultado. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de edición.<br>3. El registro objetivo existe.<br>4. El registro se encuentra en un estado que admite los cambios solicitados. |
-| Inferencia desde código | **Directa.** PATCH `/:id` → validación de encabezado → `updateGoodsReceipt` → evento de inventario. |
 | Flujo principal | 1. **Actor:** selecciona una compra y abre su edición **(ver E1)**.<br>2. **Nexus:** muestra el encabezado y los detalles actuales y habilita sólo los campos permitidos.<br>3. **Actor:** modifica el tipo de comprobante, número de factura cuando aplica, proveedor, persona receptora, fecha, observaciones o agrega detalles con material, cantidad y costo por presentación; después selecciona «Actualizar» **(ver A1)**.<br>4. **Nexus:** valida el estado, la factura y los cambios solicitados **(ver A2)**.<br>5. **Nexus:** guarda los cambios sin volver a aplicar la existencia de detalles anteriores y confirma la actualización. |
 | Flujos alternativos | **A1 — Datos inválidos (después del paso 3):**<br>1. **Nexus:** valida la información capturada, detecta campos incompletos, formatos incorrectos, relaciones no permitidas o cantidades fuera de las reglas del caso y los señala sin registrar cambios.<br>2. **Actor:** corrige la información indicada y vuelve a confirmar; continúa en el paso 4 del flujo principal.<br>**A2 — Recurso inactivo en un detalle nuevo (después del paso 4):**<br>1. **Actor:** revisa el material o proveedor inactivo señalado por Nexus.<br>2. **Nexus:** conserva el encabezado y los detalles persistidos sin agregar el detalle nuevo ni modificar stock.<br>3. **Actor:** selecciona recursos activos y vuelve a confirmar; continúa en el paso 4 del flujo principal. |
 | Excepciones | **E1 — Acceso rechazado (después del paso 1):**<br>1. **Nexus:** comprueba las precondiciones y la autorización, determina que alguna no se cumple y rechaza la solicitud sin modificar datos ni exponer información no autorizada; comunica el motivo.<br>2. **Actor:** reconoce el rechazo; termina el caso de uso. |
@@ -1191,7 +1288,6 @@ Cada ficha representa una sola acción sobre una sola entidad. Los elementos com
 | Actor y disparador | **Actor:** Personal de almacén. **Disparador:** detecta una diferencia en un material de una compra y abre la corrección del detalle. |
 | Participación de actor y sistema | **Actor:** selecciona el detalle, captura la corrección y confirma.<br>**Nexus:** valida y coordina detalle, existencia, movimiento, totales e historial. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso operativo.<br>3. La compra y el detalle existen.<br>4. El detalle se encuentra en un estado que admite corrección. |
-| Inferencia desde código | **Compuesta.** PATCH `/:id/details/:detailId/corrections` → DTO → `correctGoodsReceiptDetailLine` → evento. |
 | Flujo principal | 1. **Actor:** selecciona un material de la compra y abre «Corregir detalle» **(ver E1)**.<br>2. **Nexus:** muestra el detalle y sus valores actuales y habilita «Cantidad correcta» y «Costo por presentación correcto».<br>3. **Actor:** captura la corrección y la confirma **(ver A1)**.<br>4. **Nexus:** valida que la cantidad corregida sea positiva y no exceda la recibida, que el costo sea positivo, que exista una diferencia y que el inventario permita aplicar la reducción **(ver E2)**.<br>5. **Nexus:** actualiza detalle, existencia, movimiento, totales e historial como una sola operación y confirma. |
 | Flujos alternativos | **A1 — Datos inválidos (después del paso 3):**<br>1. **Nexus:** valida la información capturada, detecta campos incompletos, formatos incorrectos, relaciones no permitidas o cantidades fuera de las reglas del caso y los señala sin registrar cambios.<br>2. **Actor:** corrige la información indicada y vuelve a confirmar; continúa en el paso 4 del flujo principal. |
 | Excepciones | **E1 — Acceso rechazado (después del paso 1):**<br>1. **Nexus:** comprueba las precondiciones y la autorización, determina que alguna no se cumple y rechaza la solicitud sin modificar datos ni exponer información no autorizada; comunica el motivo.<br>2. **Actor:** reconoce el rechazo; termina el caso de uso.<br>**E2 — Existencia insuficiente para reducir la recepción (después del paso 4):**<br>1. **Actor:** revisa la existencia disponible y la reducción que Nexus no puede aplicar.<br>2. **Nexus:** rechaza la corrección y conserva sin cambios el detalle, la existencia, el movimiento, los totales y el historial; termina el caso de uso. |
@@ -1207,11 +1303,25 @@ Cada ficha representa una sola acción sobre una sola entidad. Los elementos com
 | Actor y disparador | **Actor:** Personal de almacén. **Disparador:** determina que debe anular material de una compra y solicita la cancelación. |
 | Participación de actor y sistema | **Actor:** selecciona el detalle y confirma la cancelación.<br>**Nexus:** valida y coordina la cancelación, la existencia, el movimiento y los totales. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso operativo.<br>3. La compra y el detalle activo existen.<br>4. El detalle se encuentra en un estado que admite cancelación. |
-| Inferencia desde código | **Compuesta.** PATCH `/:id/details/:detailId/cancel` → `cancelGoodsReceiptDetailLine` → evento. |
 | Flujo principal | 1. **Actor:** selecciona un detalle activo y solicita cancelarlo **(ver E1)**.<br>2. **Nexus:** identifica el detalle y solicita confirmación.<br>3. **Actor:** confirma la cancelación.<br>4. **Nexus:** valida que el detalle siga activo y que la existencia recibida pueda revertirse **(ver E2)**.<br>5. **Nexus:** cancela el detalle, revierte existencia, movimiento y totales y confirma el resultado. |
 | Excepciones | **E1 — Acceso rechazado (después del paso 1):**<br>1. **Nexus:** comprueba las precondiciones y la autorización, determina que alguna no se cumple y rechaza la solicitud sin modificar datos ni exponer información no autorizada; comunica el motivo.<br>2. **Actor:** reconoce el rechazo; termina el caso de uso.<br>**E2 — Detalle no cancelable o existencia insuficiente (después del paso 4):**<br>1. **Actor:** revisa el estado vigente del detalle o la existencia insuficiente que Nexus informa.<br>2. **Nexus:** rechaza la cancelación y conserva sin cambios el detalle, la existencia, el movimiento y los totales; termina el caso de uso. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** El detalle queda cancelado.<br>2. **Éxito:** La existencia recibida por el detalle queda revertida.<br>3. **Éxito:** El movimiento y los totales reflejan la cancelación.<br>4. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
 | Requisitos relacionados | `RF-REC-008`, `RN-002`, `RN-012`, `RN-017`. |
+
+#### `CU-ENT-06` — Generar reporte de compras de material
+
+| Sección | Información relevante |
+| --- | --- |
+| Identificador | `CU-ENT-06` |
+| Nombre | Generar reporte de compras de material. |
+| Actor y disparador | **Actor:** Usuario con permiso sobre el reporte o consulta. **Disparador:** desde `CU-ENT-01` Consultar compras de material, selecciona la opción para generar el reporte con los filtros que necesita conservar. |
+| Participación de actor y sistema | **Actor:** define filtros y solicita la exportación.<br>**Nexus:** autoriza, consolida la información y entrega el archivo. |
+| Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de consulta o reporte correspondiente. |
+| Flujo principal | 1. **Nexus:** después de que el actor selecciona la exportación desde la consulta de origen, abre el modal **Exportar reporte** y muestra las opciones aplicables **(ver E1)**.<br>2. **Actor:** conserva o ajusta los filtros, incluye las opciones disponibles y confirma.<br>3. **Nexus:** vuelve a comprobar autorización y parámetros y prepara la información de compras de material.<br>4. **Nexus:** genera el archivo de Excel e inicia su descarga; si no hay datos, informa que el resultado está vacío. |
+| Excepciones | **E1 — Exportación rechazada (después del disparador):**<br>1. **Nexus:** comprueba las precondiciones y la autorización, determina que alguna no se cumple y rechaza la solicitud sin modificar datos ni exponer información no autorizada; comunica el motivo.<br>2. **Actor:** reconoce el rechazo; termina el caso de uso. |
+| Postcondiciones (éxito y fallo) | 1. **Éxito:** Archivo Excel con filtros, columnas y cálculos propios del reporte.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
+| Requisitos relacionados | `RF-REP-002`, `RF-REP-004`. |
+
 
 ### Grupo funcional SAL — Salidas de material y de merma
 
@@ -1226,9 +1336,8 @@ Cada ficha representa una sola acción sobre una sola entidad. Los elementos com
 | Actor y disparador | **Actor:** Personal de almacén. **Disparador:** necesita localizar o revisar salidas de material y abre la opción de consulta correspondiente. |
 | Participación de actor y sistema | **Actor:** abre la consulta, define criterios y selecciona registros.<br>**Nexus:** autoriza, presenta filtros y devuelve sólo la información permitida. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de consulta o reporte correspondiente. |
-| Inferencia desde código | **Directa.** `goodsIssueApiRoute.js` GET → filtros/paginación → `findAllGoodsIssues`. |
-| Flujo principal | 1. **Actor:** abre la opción para consultar salidas de material **(ver E1)**.<br>2. **Nexus:** comprueba su autorización y muestra la tabla con búsqueda, filtros y paginación disponibles **(ver A1)**.<br>3. **Actor:** captura los criterios que necesita y solicita aplicarlos.<br>4. **Nexus:** actualiza la tabla y el total con la información autorizada, sin modificar datos.<br>5. **Actor:** selecciona un registro cuando necesita revisar su información.<br>6. **Nexus:** muestra el detalle y las acciones que el actor puede ejecutar **(ver A2)**. |
-| Flujos alternativos | **A1 — Iniciar una creación (después del paso 2):**<br>1. **Actor:** selecciona crear una salida de material en lugar de continuar la consulta; termina `CU-SAL-01` y puede iniciar `CU-SAL-02` Crear salida de material.<br>**A2 — Elegir una acción sobre el registro (después del paso 6):**<br>1. **Actor:** selecciona editar el encabezado o los materiales, surtir o devolver material en lugar de concluir la consulta; termina `CU-SAL-01` y puede iniciar `CU-SAL-03` Editar encabezado, `CU-SAL-04` Editar detalles de material, `CU-SAL-05` Surtir material o `CU-SAL-06` Devolver material surtido. Cada caso elegido comprueba nuevamente sus precondiciones y autorización; la selección no constituye `«include»` ni `«extend»`. |
+| Flujo principal | 1. **Actor:** abre la opción para consultar salidas de material **(ver E1)**.<br>2. **Nexus:** comprueba su autorización y muestra la consulta con sus criterios disponibles.<br>3. **Actor:** define los criterios que necesita y solicita aplicarlos **(ver A1)**.<br>4. **Nexus:** presenta la información autorizada y la acción principal para registrar una salida de material.<br>5. **Actor:** selecciona la acción principal; termina `CU-SAL-01` y con esa selección dispara `CU-SAL-02` Crear salida de material. |
+| Flujos alternativos | **A1 — Continuar la consulta (después del paso 3):**<br>1. **Nexus:** actualiza la información y el total sin modificar datos.<br>2. **Actor:** revisa los resultados o cambia los criterios.<br>3. **Nexus:** conserva la consulta disponible; termina el caso de uso.<br>**A2 — Elegir otra acción (después del paso 4 del flujo principal):**<br>1. **Actor:** selecciona editar el encabezado o los materiales, surtir o devolver material en lugar de iniciar el alta; termina `CU-SAL-01` y puede iniciar `CU-SAL-03` Editar encabezado, `CU-SAL-04` Editar detalles de material, `CU-SAL-05` Surtir material o `CU-SAL-06` Devolver material surtido. También puede iniciar `CU-SAL-07` Generar reporte de salidas de material. Cada caso elegido comprueba nuevamente sus precondiciones y autorización; la selección no constituye `«include»` ni `«extend»`. |
 | Excepciones | **E1 — Acceso rechazado (después del paso 1):**<br>1. **Nexus:** comprueba las precondiciones y la autorización, determina que alguna no se cumple y rechaza la solicitud sin modificar datos ni exponer información no autorizada; comunica el motivo.<br>2. **Actor:** reconoce el rechazo; termina el caso de uso. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** Consulta sin modificar existencias.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
 | Requisitos relacionados | `RF-ISS-001`. |
@@ -1239,10 +1348,9 @@ Cada ficha representa una sola acción sobre una sola entidad. Los elementos com
 | --- | --- |
 | Identificador | `CU-SAL-02` |
 | Nombre | Crear salida de material. |
-| Actor y disparador | **Actor:** Personal de almacén. **Disparador:** recibe una solicitud de material y abre la acción de alta de salida. |
+| Actor y disparador | **Actor:** Personal de almacén. **Disparador:** selecciona la acción principal para crear una salida desde `CU-SAL-01` Consultar salidas de material. |
 | Participación de actor y sistema | **Actor:** abre el alta, captura datos y confirma.<br>**Nexus:** carga opciones, valida, registra y comunica el resultado. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de alta.<br>3. Existen los datos relacionados requeridos para completar el registro. |
-| Inferencia desde código | **Directa.** POST → validación → DTO → `createGoodsIssue`. |
 | Flujo principal | 1. **Actor:** abre «Agregar salida de material» **(ver E1)**.<br>2. **Nexus:** muestra el formulario y carga clientes, asesores, áreas, solicitantes y materiales disponibles.<br>3. **Actor:** selecciona cliente, asesor, área y solicitante; captura número de proyecto, fecha y hora de solicitud y observaciones.<br>4. **Actor:** agrega cada material con su cantidad, revisa los detalles y selecciona «Guardar» **(ver A1)**. Si vuelve a agregar la misma combinación material-proveedor, el formulario reemplaza su renglón con la cantidad capturada más reciente, sin sumarla.<br>5. **Nexus:** valida participantes, relaciones, materiales y cantidades **(ver A2)**.<br>6. **Nexus:** crea la salida pendiente sin descontar existencias, actualiza la tabla y confirma. |
 | Flujos alternativos | **A1 — Datos inválidos (después del paso 4):**<br>1. **Nexus:** valida la información capturada, detecta campos incompletos, formatos incorrectos, relaciones no permitidas o cantidades fuera de las reglas del caso y los señala sin registrar cambios.<br>2. **Actor:** corrige la información indicada y vuelve a confirmar; continúa en el paso 5 del flujo principal.<br>**A2 — Material o proveedor inactivo (después del paso 5):**<br>1. **Actor:** revisa los recursos inactivos señalados por Nexus.<br>2. **Nexus:** conserva el formulario sin crear la salida, detalles ni cambios de stock.<br>3. **Actor:** selecciona recursos activos y vuelve a confirmar; continúa en el paso 5 del flujo principal. |
 | Excepciones | **E1 — Acceso rechazado (después del paso 1):**<br>1. **Nexus:** comprueba las precondiciones y la autorización, determina que alguna no se cumple y rechaza la solicitud sin modificar datos ni exponer información no autorizada; comunica el motivo.<br>2. **Actor:** reconoce el rechazo; termina el caso de uso. |
@@ -1258,7 +1366,6 @@ Cada ficha representa una sola acción sobre una sola entidad. Los elementos com
 | Actor y disparador | **Actor:** Personal de almacén. **Disparador:** detecta datos que debe corregir en el encabezado de una salida de material y selecciona su acción de edición. |
 | Participación de actor y sistema | **Actor:** selecciona el registro, modifica datos y confirma.<br>**Nexus:** presenta valores vigentes, valida, actualiza y comunica el resultado. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de edición.<br>3. El registro objetivo existe.<br>4. El registro se encuentra en un estado que admite los cambios solicitados. |
-| Inferencia desde código | **Directa.** PATCH `/:id/header` → validación → DTO → `updateGoodsIssueHeader`. |
 | Flujo principal | 1. **Actor:** selecciona una salida de material y abre la edición de encabezado **(ver E1)**.<br>2. **Nexus:** muestra los datos actuales y habilita sólo los campos permitidos por su estado.<br>3. **Actor:** modifica los datos contextuales y confirma **(ver A1)**.<br>4. **Nexus:** valida el estado, los participantes y las relaciones y actualiza el encabezado.<br>5. **Nexus:** conserva intactas las cantidades y existencias y confirma la actualización. |
 | Flujos alternativos | **A1 — Datos inválidos (después del paso 3):**<br>1. **Nexus:** valida la información capturada, detecta campos incompletos, formatos incorrectos, relaciones no permitidas o cantidades fuera de las reglas del caso y los señala sin registrar cambios.<br>2. **Actor:** corrige la información indicada y vuelve a confirmar; continúa en el paso 4 del flujo principal. |
 | Excepciones | **E1 — Acceso rechazado (después del paso 1):**<br>1. **Nexus:** comprueba las precondiciones y la autorización, determina que alguna no se cumple y rechaza la solicitud sin modificar datos ni exponer información no autorizada; comunica el motivo.<br>2. **Actor:** reconoce el rechazo; termina el caso de uso. |
@@ -1274,7 +1381,6 @@ Cada ficha representa una sola acción sobre una sola entidad. Los elementos com
 | Actor y disparador | **Actor:** Personal de almacén. **Disparador:** necesita agregar o corregir materiales de una salida todavía modificables y abre los detalles. |
 | Participación de actor y sistema | **Actor:** selecciona la salida o detalle, captura la acción y confirma.<br>**Nexus:** presenta cantidades y acciones permitidas, valida y actualiza documento, inventario y movimientos cuando corresponde. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de edición.<br>3. La salida existe.<br>4. La salida se encuentra en un estado que admite modificar sus detalles. |
-| Inferencia desde código | **Compartida.** PATCH `/:id/details` → validación → DTO → `updateGoodsIssueDetails`. |
 | Flujo principal | 1. **Actor:** abre los detalles de una salida todavía modificable **(ver E1)**.<br>2. **Nexus:** muestra los materiales actuales, cantidades y acciones permitidas.<br>3. **Actor:** agrega o modifica materiales y confirma los cambios **(ver A1)**.<br>4. **Nexus:** valida estado, recursos, cantidades pendientes y acumulados.<br>5. **Nexus:** actualiza los detalles sin descontar existencias y confirma el resultado. |
 | Flujos alternativos | **A1 — Datos inválidos (después del paso 3):**<br>1. **Nexus:** valida la información capturada, detecta campos incompletos, formatos incorrectos, relaciones no permitidas o cantidades fuera de las reglas del caso y los señala sin registrar cambios.<br>2. **Actor:** corrige la información indicada y vuelve a confirmar; continúa en el paso 4 del flujo principal. |
 | Excepciones | **E1 — Acceso rechazado (después del paso 1):**<br>1. **Nexus:** comprueba las precondiciones y la autorización, determina que alguna no se cumple y rechaza la solicitud sin modificar datos ni exponer información no autorizada; comunica el motivo.<br>2. **Actor:** reconoce el rechazo; termina el caso de uso. |
@@ -1290,7 +1396,6 @@ Cada ficha representa una sola acción sobre una sola entidad. Los elementos com
 | Actor y disparador | **Actor:** Personal de almacén. **Disparador:** va a entregar material de una solicitud pendiente y abre sus detalles. |
 | Participación de actor y sistema | **Actor:** selecciona la salida o detalle, captura la acción y confirma.<br>**Nexus:** presenta cantidades y acciones permitidas, valida y actualiza documento, inventario y movimientos cuando corresponde. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso operativo.<br>3. La salida y el detalle existen.<br>4. El detalle conserva cantidad pendiente.<br>5. Hay existencia suficiente para surtir la cantidad solicitada. |
-| Inferencia desde código | **Subflujo.** la confirmación de surtido usa PATCH `/:id/details` y `updateGoodsIssueDetails`; no hay ruta `/supply`. |
 | Flujo principal | 1. **Actor:** abre los detalles de la salida de material y selecciona un renglón pendiente **(ver E1)**.<br>2. **Nexus:** muestra la cantidad pendiente y la existencia disponible.<br>3. **Actor:** marca los renglones que surtirá, captura la cantidad de proyecto requerida para cada uno y confirma **(ver A1)**.<br>4. **Nexus:** valida el estado, los renglones seleccionados, la cantidad pendiente y la existencia suficiente **(ver A2)** **(ver E2)**.<br>5. **Nexus:** descuenta existencia, acumula lo surtido, actualiza estados, registra el movimiento y confirma. |
 | Flujos alternativos | **A1 — Datos inválidos (después del paso 3):**<br>1. **Nexus:** valida la información capturada, detecta campos incompletos, formatos incorrectos, relaciones no permitidas o cantidades fuera de las reglas del caso y los señala sin registrar cambios.<br>2. **Actor:** corrige la información indicada y vuelve a confirmar; continúa en el paso 4 del flujo principal.<br>**A2 — Recurso desactivado después de registrar la salida (después del paso 4):**<br>1. **Actor:** revisa el aviso de que el recurso del detalle fue desactivado después de registrar la salida.<br>2. **Nexus:** conserva el detalle histórico y permite surtir su pendiente si existe stock suficiente, sin habilitar el recurso para operaciones nuevas.<br>3. **Actor:** confirma que completará el compromiso y continúa en el paso 5 del flujo principal, o cancela la confirmación y termina el caso de uso con el detalle pendiente. |
 | Excepciones | **E1 — Acceso rechazado (después del paso 1):**<br>1. **Nexus:** comprueba las precondiciones y la autorización, determina que alguna no se cumple y rechaza la solicitud sin modificar datos ni exponer información no autorizada; comunica el motivo.<br>2. **Actor:** reconoce el rechazo; termina el caso de uso.<br>**E2 — Existencia insuficiente o detalle ya atendido (después del paso 4):**<br>1. **Actor:** revisa la existencia o la cantidad pendiente vigentes que Nexus informa.<br>2. **Nexus:** rechaza el surtimiento y conserva sin cambios el detalle, el encabezado, la existencia y los movimientos; termina el caso de uso. |
@@ -1306,347 +1411,139 @@ Cada ficha representa una sola acción sobre una sola entidad. Los elementos com
 | Actor y disparador | **Actor:** Personal de almacén. **Disparador:** recibe de vuelta material surtido y abre la devolución del detalle. |
 | Participación de actor y sistema | **Actor:** selecciona la salida o detalle, captura la acción y confirma.<br>**Nexus:** presenta cantidades y acciones permitidas, valida y actualiza documento, inventario y movimientos cuando corresponde. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso operativo.<br>3. La salida y el detalle existen.<br>4. El detalle conserva una cantidad surtida todavía retornable. |
-| Inferencia desde código | **Directa.** PATCH `/:id/details/:detailId/returns` → DTO → `returnGoodsIssueDetail` → evento. |
 | Flujo principal | 1. **Actor:** abre una salida de material y selecciona un detalle surtido para devolverlo **(ver E1)**.<br>2. **Nexus:** muestra la cantidad que todavía puede devolverse.<br>3. **Actor:** captura la cantidad recibida de vuelta, registra las observaciones y selecciona «Devolver» **(ver A1)**.<br>4. **Nexus:** valida la cantidad retornable.<br>5. **Nexus:** reintegra existencia, acumula la devolución, actualiza estados, registra el movimiento inverso y confirma. |
 | Flujos alternativos | **A1 — Datos inválidos (después del paso 3):**<br>1. **Nexus:** valida la información capturada, detecta campos incompletos, formatos incorrectos, relaciones no permitidas o cantidades fuera de las reglas del caso y los señala sin registrar cambios.<br>2. **Actor:** corrige la información indicada y vuelve a confirmar; continúa en el paso 4 del flujo principal. |
 | Excepciones | **E1 — Acceso rechazado (después del paso 1):**<br>1. **Nexus:** comprueba las precondiciones y la autorización, determina que alguna no se cumple y rechaza la solicitud sin modificar datos ni exponer información no autorizada; comunica el motivo.<br>2. **Actor:** reconoce el rechazo; termina el caso de uso. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** La existencia aumenta en la cantidad devuelta y el movimiento inverso queda registrado.<br>2. **Éxito, devolución parcial del detalle:** el detalle acumula la devolución y conserva cumplimiento `Surtido`; no queda cancelado.<br>3. **Éxito, devolución total del detalle:** el detalle acumula la devolución y deriva cumplimiento `Cancelado`; no se ejecuta una acción adicional de cancelación.<br>4. **Éxito, agregación del encabezado:** sólo si todos los detalles tienen cumplimiento `Cancelado`, la salida deriva cumplimiento `Cancelado` y estado documental `Cancelada`; mientras exista otro detalle no cancelado, el encabezado no se cancela.<br>5. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
 | Requisitos relacionados | `RF-ISS-003`, `RN-002`, `RN-014`, `RN-028`, `RN-029`. |
 
-#### `CU-SAL-07` — Consultar salidas de merma
+
+#### `CU-SAL-07` — Generar reporte de salidas de material
 
 | Sección | Información relevante |
 | --- | --- |
 | Identificador | `CU-SAL-07` |
-| Nombre | Consultar salidas de merma. |
-| Actor y disparador | **Actor:** Personal de almacén. **Disparador:** necesita localizar o revisar salidas de merma y abre la opción de consulta correspondiente. |
-| Participación de actor y sistema | **Actor:** abre la consulta, define criterios y selecciona registros.<br>**Nexus:** autoriza, presenta filtros y devuelve sólo la información permitida. |
+| Nombre | Generar reporte de salidas de material. |
+| Actor y disparador | **Actor:** Usuario con permiso sobre el reporte o consulta. **Disparador:** desde `CU-SAL-01` Consultar salidas de material, selecciona la opción para generar el reporte con los filtros que necesita conservar. |
+| Participación de actor y sistema | **Actor:** define filtros y solicita la exportación.<br>**Nexus:** autoriza, consolida la información y entrega el archivo. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de consulta o reporte correspondiente. |
-| Inferencia desde código | **Directa.** `wasteIssueApiRoute.js` GET → filtros/paginación → `findAllWasteIssues`. |
-| Flujo principal | 1. **Actor:** abre la opción para consultar salidas de merma **(ver E1)**.<br>2. **Nexus:** comprueba su autorización y muestra la tabla con búsqueda, filtros y paginación disponibles **(ver A1)**.<br>3. **Actor:** captura los criterios que necesita y solicita aplicarlos.<br>4. **Nexus:** actualiza la tabla y el total con la información autorizada, sin modificar datos.<br>5. **Actor:** selecciona un registro cuando necesita revisar su información.<br>6. **Nexus:** muestra el detalle y las acciones que el actor puede ejecutar **(ver A2)**. |
-| Flujos alternativos | **A1 — Iniciar una creación (después del paso 2):**<br>1. **Actor:** selecciona crear una salida de merma en lugar de continuar la consulta; termina `CU-SAL-07` y puede iniciar `CU-SAL-08` Crear salida de merma.<br>**A2 — Elegir una acción sobre el registro (después del paso 6):**<br>1. **Actor:** selecciona editar el encabezado o las mermas, surtir o devolver merma en lugar de concluir la consulta; termina `CU-SAL-07` y puede iniciar `CU-SAL-09` Editar encabezado, `CU-SAL-10` Editar detalles de merma, `CU-SAL-11` Surtir merma o `CU-SAL-12` Devolver merma surtida. Cada caso elegido comprueba nuevamente sus precondiciones y autorización; la selección no constituye `«include»` ni `«extend»`. |
-| Excepciones | **E1 — Acceso rechazado (después del paso 1):**<br>1. **Nexus:** comprueba las precondiciones y la autorización, determina que alguna no se cumple y rechaza la solicitud sin modificar datos ni exponer información no autorizada; comunica el motivo.<br>2. **Actor:** reconoce el rechazo; termina el caso de uso. |
-| Postcondiciones (éxito y fallo) | 1. **Éxito:** Consulta sin modificar existencias.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
-| Requisitos relacionados | `RF-WST-001`. |
+| Flujo principal | 1. **Nexus:** después de que el actor selecciona la exportación desde la consulta de origen, abre el modal **Exportar reporte** y muestra las opciones aplicables **(ver E1)**.<br>2. **Actor:** conserva o ajusta los filtros, incluye las opciones disponibles y confirma.<br>3. **Nexus:** vuelve a comprobar autorización y parámetros y prepara la información de salidas de material.<br>4. **Nexus:** genera el archivo de Excel e inicia su descarga; si no hay datos, informa que el resultado está vacío. |
+| Excepciones | **E1 — Exportación rechazada (después del disparador):**<br>1. **Nexus:** comprueba las precondiciones y la autorización, determina que alguna no se cumple y rechaza la solicitud sin modificar datos ni exponer información no autorizada; comunica el motivo.<br>2. **Actor:** reconoce el rechazo; termina el caso de uso. |
+| Postcondiciones (éxito y fallo) | 1. **Éxito:** Archivo Excel con filtros, columnas y cálculos propios del reporte.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
+| Requisitos relacionados | `RF-REP-002`, `RF-REP-004`. |
 
-#### `CU-SAL-08` — Crear salida de merma
+#### `CU-SAL-08` — Consultar salidas de merma
 
 | Sección | Información relevante |
 | --- | --- |
 | Identificador | `CU-SAL-08` |
+| Nombre | Consultar salidas de merma. |
+| Actor y disparador | **Actor:** Personal de almacén. **Disparador:** necesita localizar o revisar salidas de merma y abre la opción de consulta correspondiente. |
+| Participación de actor y sistema | **Actor:** abre la consulta, define criterios y selecciona registros.<br>**Nexus:** autoriza, presenta filtros y devuelve sólo la información permitida. |
+| Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de consulta o reporte correspondiente. |
+| Flujo principal | 1. **Actor:** abre la opción para consultar salidas de merma **(ver E1)**.<br>2. **Nexus:** comprueba su autorización y muestra la consulta con sus criterios disponibles.<br>3. **Actor:** define los criterios que necesita y solicita aplicarlos **(ver A1)**.<br>4. **Nexus:** presenta la información autorizada y la acción principal para registrar una salida de merma.<br>5. **Actor:** selecciona la acción principal; termina `CU-SAL-08` y con esa selección dispara `CU-SAL-09` Crear salida de merma. |
+| Flujos alternativos | **A1 — Continuar la consulta (después del paso 3):**<br>1. **Nexus:** actualiza la información y el total sin modificar datos.<br>2. **Actor:** revisa los resultados o cambia los criterios.<br>3. **Nexus:** conserva la consulta disponible; termina el caso de uso.<br>**A2 — Elegir otra acción (después del paso 4 del flujo principal):**<br>1. **Actor:** selecciona editar el encabezado o las mermas, surtir o devolver merma en lugar de iniciar el alta; termina `CU-SAL-08` y puede iniciar `CU-SAL-10` Editar encabezado, `CU-SAL-11` Editar detalles de merma, `CU-SAL-12` Surtir merma o `CU-SAL-13` Devolver merma surtida. También puede iniciar `CU-SAL-14` Generar reporte de salidas de merma. Cada caso elegido comprueba nuevamente sus precondiciones y autorización; la selección no constituye `«include»` ni `«extend»`. |
+| Excepciones | **E1 — Acceso rechazado (después del paso 1):**<br>1. **Nexus:** comprueba las precondiciones y la autorización, determina que alguna no se cumple y rechaza la solicitud sin modificar datos ni exponer información no autorizada; comunica el motivo.<br>2. **Actor:** reconoce el rechazo; termina el caso de uso. |
+| Postcondiciones (éxito y fallo) | 1. **Éxito:** Consulta sin modificar existencias.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
+| Requisitos relacionados | `RF-WST-001`. |
+
+#### `CU-SAL-09` — Crear salida de merma
+
+| Sección | Información relevante |
+| --- | --- |
+| Identificador | `CU-SAL-09` |
 | Nombre | Crear salida de merma. |
-| Actor y disparador | **Actor:** Personal de almacén. **Disparador:** recibe una solicitud de merma y abre la acción de alta de salida. |
+| Actor y disparador | **Actor:** Personal de almacén. **Disparador:** selecciona la acción principal para crear una salida desde `CU-SAL-08` Consultar salidas de merma. |
 | Participación de actor y sistema | **Actor:** abre el alta, captura datos y confirma.<br>**Nexus:** carga opciones, valida, registra y comunica el resultado. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de alta.<br>3. Existen los datos relacionados requeridos para completar el registro. |
-| Inferencia desde código | **Directa.** POST → validación → DTO → `createWasteIssue`. |
 | Flujo principal | 1. **Actor:** abre «Agregar salida de merma» **(ver E1)**.<br>2. **Nexus:** muestra el formulario y carga clientes, asesores, áreas, solicitantes y mermas disponibles.<br>3. **Actor:** selecciona cliente, asesor, área y solicitante; captura número de proyecto, fecha y hora de solicitud y observaciones.<br>4. **Actor:** agrega cada merma con su cantidad, revisa los detalles y selecciona «Guardar» **(ver A1)**. Si vuelve a agregar la misma merma, el formulario reemplaza su renglón con la cantidad capturada más reciente, sin sumarla.<br>5. **Nexus:** valida participantes, relaciones, mermas y cantidades y rechaza cualquier carga que todavía contenga una merma repetida **(ver A2)**.<br>6. **Nexus:** crea la salida pendiente sin descontar existencias, actualiza la tabla y confirma. |
 | Flujos alternativos | **A1 — Datos inválidos (después del paso 4):**<br>1. **Nexus:** valida la información capturada, detecta campos incompletos, formatos incorrectos, relaciones no permitidas o cantidades fuera de las reglas del caso y los señala sin registrar cambios.<br>2. **Actor:** corrige la información indicada y vuelve a confirmar; continúa en el paso 5 del flujo principal.<br>**A2 — Merma inactiva (después del paso 5):**<br>1. **Actor:** revisa la merma inactiva señalada por Nexus.<br>2. **Nexus:** conserva el formulario sin crear la salida, detalles ni cambios de stock.<br>3. **Actor:** selecciona una merma activa y vuelve a confirmar; continúa en el paso 5 del flujo principal. |
 | Excepciones | **E1 — Acceso rechazado (después del paso 1):**<br>1. **Nexus:** comprueba las precondiciones y la autorización, determina que alguna no se cumple y rechaza la solicitud sin modificar datos ni exponer información no autorizada; comunica el motivo.<br>2. **Actor:** reconoce el rechazo; termina el caso de uso. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** La salida de merma queda registrada en estado pendiente.<br>2. **Éxito:** Las existencias permanecen sin cambios hasta el surtimiento.<br>3. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
 | Requisitos relacionados | `RF-WST-002`. |
 
-#### `CU-SAL-09` — Editar encabezado de salida de merma
+#### `CU-SAL-10` — Editar encabezado de salida de merma
 
 | Sección | Información relevante |
 | --- | --- |
-| Identificador | `CU-SAL-09` |
+| Identificador | `CU-SAL-10` |
 | Nombre | Editar encabezado de salida de merma. |
 | Actor y disparador | **Actor:** Personal de almacén. **Disparador:** detecta datos que debe corregir en el encabezado de una salida de merma y selecciona su acción de edición. |
 | Participación de actor y sistema | **Actor:** selecciona el registro, modifica datos y confirma.<br>**Nexus:** presenta valores vigentes, valida, actualiza y comunica el resultado. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de edición.<br>3. El registro objetivo existe.<br>4. El registro se encuentra en un estado que admite los cambios solicitados. |
-| Inferencia desde código | **Directa.** PATCH `/:id/header` → validación → DTO → `updateWasteIssueHeader`. |
 | Flujo principal | 1. **Actor:** selecciona una salida de merma y abre la edición de encabezado **(ver E1)**.<br>2. **Nexus:** muestra los datos actuales y habilita sólo los campos permitidos por su estado.<br>3. **Actor:** modifica los datos contextuales y confirma **(ver A1)**.<br>4. **Nexus:** valida el estado, los participantes y las relaciones y actualiza el encabezado.<br>5. **Nexus:** conserva intactas las cantidades y existencias y confirma la actualización. |
 | Flujos alternativos | **A1 — Datos inválidos (después del paso 3):**<br>1. **Nexus:** valida la información capturada, detecta campos incompletos, formatos incorrectos, relaciones no permitidas o cantidades fuera de las reglas del caso y los señala sin registrar cambios.<br>2. **Actor:** corrige la información indicada y vuelve a confirmar; continúa en el paso 4 del flujo principal. |
 | Excepciones | **E1 — Acceso rechazado (después del paso 1):**<br>1. **Nexus:** comprueba las precondiciones y la autorización, determina que alguna no se cumple y rechaza la solicitud sin modificar datos ni exponer información no autorizada; comunica el motivo.<br>2. **Actor:** reconoce el rechazo; termina el caso de uso. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** El encabezado conserva los cambios admitidos.<br>2. **Éxito:** Los detalles, las cantidades y las existencias permanecen sin cambios.<br>3. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
 | Requisitos relacionados | `RF-WST-004`. |
 
-#### `CU-SAL-10` — Editar detalles de merma de una salida
+#### `CU-SAL-11` — Editar detalles de merma de una salida
 
 | Sección | Información relevante |
 | --- | --- |
-| Identificador | `CU-SAL-10` |
+| Identificador | `CU-SAL-11` |
 | Nombre | Editar detalles de merma de una salida. |
 | Actor y disparador | **Actor:** Personal de almacén. **Disparador:** necesita agregar o corregir mermas de una salida todavía modificables y abre los detalles. |
 | Participación de actor y sistema | **Actor:** selecciona la salida o detalle, captura la acción y confirma.<br>**Nexus:** presenta cantidades y acciones permitidas, valida y actualiza documento, inventario y movimientos cuando corresponde. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de edición.<br>3. La salida existe.<br>4. La salida se encuentra en un estado que admite modificar sus detalles. |
-| Inferencia desde código | **Compartida.** PATCH `/:id/details` → validación → DTO → `updateWasteIssueDetails`. |
 | Flujo principal | 1. **Actor:** abre los detalles de una salida todavía modificable **(ver E1)**.<br>2. **Nexus:** muestra las mermas actuales, cantidades y acciones permitidas.<br>3. **Actor:** agrega o modifica mermas y confirma los cambios **(ver A1)**.<br>4. **Nexus:** valida estado, recursos, cantidades pendientes y acumulados.<br>5. **Nexus:** actualiza los detalles sin descontar existencias y confirma el resultado. |
 | Flujos alternativos | **A1 — Datos inválidos (después del paso 3):**<br>1. **Nexus:** valida la información capturada, detecta campos incompletos, formatos incorrectos, relaciones no permitidas o cantidades fuera de las reglas del caso y los señala sin registrar cambios.<br>2. **Actor:** corrige la información indicada y vuelve a confirmar; continúa en el paso 4 del flujo principal. |
 | Excepciones | **E1 — Acceso rechazado (después del paso 1):**<br>1. **Nexus:** comprueba las precondiciones y la autorización, determina que alguna no se cumple y rechaza la solicitud sin modificar datos ni exponer información no autorizada; comunica el motivo.<br>2. **Actor:** reconoce el rechazo; termina el caso de uso. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** Los detalles conservan las mermas y cantidades confirmadas.<br>2. **Éxito:** Las existencias permanecen sin cambios hasta el surtimiento.<br>3. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
 | Requisitos relacionados | `RF-WST-005`. |
 
-#### `CU-SAL-11` — Surtir merma
+#### `CU-SAL-12` — Surtir merma
 
 | Sección | Información relevante |
 | --- | --- |
-| Identificador | `CU-SAL-11` |
+| Identificador | `CU-SAL-12` |
 | Nombre | Surtir merma. |
 | Actor y disparador | **Actor:** Personal de almacén. **Disparador:** va a entregar merma de una solicitud pendiente y abre sus detalles. |
 | Participación de actor y sistema | **Actor:** selecciona el detalle pendiente, registra la cantidad convertida del proyecto cuando aplica y confirma el surtimiento.<br>**Nexus:** presenta cantidades y acciones permitidas, valida y actualiza documento, inventario y movimientos. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso operativo.<br>3. La salida y el detalle existen.<br>4. El detalle conserva cantidad pendiente.<br>5. Hay existencia suficiente para surtir la cantidad solicitada. |
-| Inferencia desde código | **Subflujo.** la confirmación de surtido usa PATCH `/:id/details` y `updateWasteIssueDetails`; no hay ruta `/supply`. |
 | Flujo principal | 1. **Actor:** abre los detalles de la salida de merma y selecciona un renglón pendiente **(ver E1)**.<br>2. **Nexus:** muestra la cantidad solicitada pendiente y la existencia disponible.<br>3. **Actor:** marca el detalle para surtirlo, registra la cantidad convertida del proyecto cuando corresponde y confirma **(ver A1)**.<br>4. **Nexus:** valida el estado, el detalle seleccionado y la existencia suficiente para surtir toda su cantidad pendiente **(ver A2)** **(ver E2)**.<br>5. **Nexus:** descuenta la cantidad pendiente completa, marca el detalle como surtido, actualiza estados, registra el movimiento y confirma. |
 | Flujos alternativos | **A1 — Datos inválidos (después del paso 3):**<br>1. **Nexus:** valida la información capturada, detecta campos incompletos, formatos incorrectos, relaciones no permitidas o cantidades fuera de las reglas del caso y los señala sin registrar cambios.<br>2. **Actor:** corrige la información indicada y vuelve a confirmar; continúa en el paso 4 del flujo principal.<br>**A2 — Merma desactivada después de registrar la salida (después del paso 4):**<br>1. **Actor:** revisa el aviso de que la merma fue desactivada después de registrar la salida.<br>2. **Nexus:** conserva el detalle histórico y permite surtir su pendiente si existe stock suficiente, mientras mantiene la merma bloqueada para salidas nuevas.<br>3. **Actor:** confirma que completará el compromiso y continúa en el paso 5 del flujo principal, o cancela la confirmación y termina el caso de uso con el detalle pendiente. |
 | Excepciones | **E1 — Acceso rechazado (después del paso 1):**<br>1. **Nexus:** comprueba las precondiciones y la autorización, determina que alguna no se cumple y rechaza la solicitud sin modificar datos ni exponer información no autorizada; comunica el motivo.<br>2. **Actor:** reconoce el rechazo; termina el caso de uso.<br>**E2 — Existencia insuficiente o detalle ya atendido (después del paso 4):**<br>1. **Actor:** revisa la existencia o la cantidad pendiente vigentes que Nexus informa.<br>2. **Nexus:** rechaza el surtimiento y conserva sin cambios el detalle, el encabezado, la existencia y los movimientos; termina el caso de uso. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** La existencia disminuye en la cantidad surtida.<br>2. **Éxito:** El detalle acumula la cantidad surtida.<br>3. **Éxito:** Los estados de cumplimiento quedan actualizados.<br>4. **Éxito:** El movimiento de salida queda registrado.<br>5. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
 | Requisitos relacionados | `RF-WST-003`, `RN-002`, `RN-003`, `RN-012`, `RN-015`, `RN-016`. |
 
-#### `CU-SAL-12` — Devolver merma surtida
+#### `CU-SAL-13` — Devolver merma surtida
 
 | Sección | Información relevante |
 | --- | --- |
-| Identificador | `CU-SAL-12` |
+| Identificador | `CU-SAL-13` |
 | Nombre | Devolver merma surtida. |
 | Actor y disparador | **Actor:** Personal de almacén. **Disparador:** recibe de vuelta merma surtida y abre la devolución del detalle. |
 | Participación de actor y sistema | **Actor:** selecciona la salida o detalle, captura la acción y confirma.<br>**Nexus:** presenta cantidades y acciones permitidas, valida y actualiza documento, inventario y movimientos cuando corresponde. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso operativo.<br>3. La salida y el detalle existen.<br>4. El detalle conserva una cantidad surtida todavía retornable. |
-| Inferencia desde código | **Directa.** PATCH `/:id/details/:detailId/returns` → DTO → `returnWasteIssueDetail` → evento. |
 | Flujo principal | 1. **Actor:** abre una salida de merma y selecciona un detalle surtido para devolverlo **(ver E1)**.<br>2. **Nexus:** muestra la cantidad que todavía puede devolverse.<br>3. **Actor:** captura la cantidad recibida de vuelta, registra las observaciones y selecciona «Devolver» **(ver A1)**.<br>4. **Nexus:** valida la cantidad retornable.<br>5. **Nexus:** reintegra existencia, acumula la devolución, actualiza estados, registra el movimiento inverso y confirma. |
 | Flujos alternativos | **A1 — Datos inválidos (después del paso 3):**<br>1. **Nexus:** valida la información capturada, detecta campos incompletos, formatos incorrectos, relaciones no permitidas o cantidades fuera de las reglas del caso y los señala sin registrar cambios.<br>2. **Actor:** corrige la información indicada y vuelve a confirmar; continúa en el paso 4 del flujo principal. |
 | Excepciones | **E1 — Acceso rechazado (después del paso 1):**<br>1. **Nexus:** comprueba las precondiciones y la autorización, determina que alguna no se cumple y rechaza la solicitud sin modificar datos ni exponer información no autorizada; comunica el motivo.<br>2. **Actor:** reconoce el rechazo; termina el caso de uso. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** La existencia aumenta en la cantidad devuelta y el movimiento inverso queda registrado.<br>2. **Éxito, devolución parcial del detalle:** el detalle acumula la devolución y conserva cumplimiento `Surtido`; no queda cancelado.<br>3. **Éxito, devolución total del detalle:** el detalle acumula la devolución y deriva cumplimiento `Cancelado`; no se ejecuta una acción adicional de cancelación.<br>4. **Éxito, agregación del encabezado:** sólo si todos los detalles tienen cumplimiento `Cancelado`, la salida deriva cumplimiento `Cancelado` y estado documental `Cancelada`; mientras exista otro detalle no cancelado, el encabezado no se cancela.<br>5. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
 | Requisitos relacionados | `RF-WST-006`, `RN-002`, `RN-014`, `RN-028`, `RN-029`. |
 
-### Grupo funcional REP — Consultas y reportes
 
-Cada ficha representa una sola acción sobre una sola entidad. Los elementos compartidos se reutilizan en la implementación, pero no fusionan objetivos del actor.
-
-#### `CU-REP-01` — Consultar inventario de materiales
+#### `CU-SAL-14` — Generar reporte de salidas de merma
 
 | Sección | Información relevante |
 | --- | --- |
-| Identificador | `CU-REP-01` |
-| Nombre | Consultar inventario de materiales. |
-| Actor y disparador | **Actor:** Usuario con permiso sobre el reporte o consulta. **Disparador:** necesita localizar o revisar inventario de materiales y abre la opción de consulta correspondiente. |
-| Participación de actor y sistema | **Actor:** abre la consulta, define criterios y selecciona registros.<br>**Nexus:** autoriza, presenta filtros y devuelve sólo la información permitida. |
-| Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de consulta o reporte correspondiente. |
-| Inferencia desde código | **Compartida.** reutiliza GET de `materialApiRoute.js`; el código no expone otra consulta de inventario. |
-| Flujo principal | 1. **Actor:** abre la opción para consultar inventario de materiales **(ver E1)**.<br>2. **Nexus:** comprueba su autorización y muestra la tabla con búsqueda, filtros y paginación disponibles.<br>3. **Actor:** captura los criterios que necesita y solicita aplicarlos.<br>4. **Nexus:** actualiza la tabla y el total con la información autorizada, sin modificar datos.<br>5. **Actor:** selecciona un registro cuando necesita revisar su información.<br>6. **Nexus:** muestra el detalle y las acciones que el actor puede ejecutar. |
-| Excepciones | **E1 — Acceso rechazado (después del paso 1):**<br>1. **Nexus:** comprueba las precondiciones y la autorización, determina que alguna no se cumple y rechaza la solicitud sin modificar datos ni exponer información no autorizada; comunica el motivo.<br>2. **Actor:** reconoce el rechazo; termina el caso de uso. |
-| Postcondiciones (éxito y fallo) | 1. **Éxito:** Consulta autorizada sin modificar datos.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
-| Requisitos relacionados | `RF-REP-001`. |
-
-#### `CU-REP-02` — Consultar movimientos de materiales
-
-| Sección | Información relevante |
-| --- | --- |
-| Identificador | `CU-REP-02` |
-| Nombre | Consultar movimientos de materiales. |
-| Actor y disparador | **Actor:** Usuario con permiso sobre el reporte o consulta. **Disparador:** necesita localizar o revisar movimientos de materiales y abre la opción de consulta correspondiente. |
-| Participación de actor y sistema | **Actor:** abre la consulta, define criterios y selecciona registros.<br>**Nexus:** autoriza, presenta filtros y devuelve sólo la información permitida. |
-| Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de consulta o reporte correspondiente. |
-| Inferencia desde código | **Directa.** `movementApiRoute.js` GET `/materials` → `getAllMaterialMovements`. |
-| Flujo principal | 1. **Actor:** abre la opción para consultar movimientos de materiales **(ver E1)**.<br>2. **Nexus:** comprueba su autorización y muestra la tabla con búsqueda, filtros y paginación disponibles.<br>3. **Actor:** captura los criterios que necesita y solicita aplicarlos.<br>4. **Nexus:** actualiza la tabla y el total con la información autorizada, sin modificar datos.<br>5. **Actor:** selecciona un registro cuando necesita revisar su información.<br>6. **Nexus:** muestra el detalle y las acciones que el actor puede ejecutar. |
-| Excepciones | **E1 — Acceso rechazado (después del paso 1):**<br>1. **Nexus:** comprueba las precondiciones y la autorización, determina que alguna no se cumple y rechaza la solicitud sin modificar datos ni exponer información no autorizada; comunica el motivo.<br>2. **Actor:** reconoce el rechazo; termina el caso de uso. |
-| Postcondiciones (éxito y fallo) | 1. **Éxito:** Consulta autorizada sin modificar datos.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
-| Requisitos relacionados | `RF-REP-001`. |
-
-#### `CU-REP-03` — Generar reporte de inventario de materiales
-
-| Sección | Información relevante |
-| --- | --- |
-| Identificador | `CU-REP-03` |
-| Nombre | Generar reporte de inventario de materiales. |
-| Actor y disparador | **Actor:** Usuario con permiso sobre el reporte o consulta. **Disparador:** necesita analizar o entregar información de inventario de materiales y solicita su exportación. |
-| Participación de actor y sistema | **Actor:** define filtros y solicita la exportación.<br>**Nexus:** autoriza, consolida la información y entrega el archivo. |
-| Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de consulta o reporte correspondiente. |
-| Inferencia desde código | **Directa.** `reportApiRoute.js` GET `/inventory/excel` → `exportWarehouseReportExcel` → `sendExcelReport`. |
-| Flujo principal | 1. **Actor:** abre la consulta de inventario de materiales y define los filtros del reporte **(ver E1)**.<br>2. **Nexus:** muestra la información autorizada que corresponde a esos filtros.<br>3. **Actor:** selecciona «Exportar Excel», elige incluir registros activos o con existencia, sólo activos o sólo con existencia, y confirma.<br>4. **Nexus:** vuelve a comprobar autorización y parámetros y prepara las filas con los filtros y el alcance elegidos.<br>5. **Nexus:** genera el archivo de Excel e inicia su descarga; si no hay datos, informa que el resultado está vacío. |
-| Excepciones | **E1 — Acceso rechazado (después del paso 1):**<br>1. **Nexus:** comprueba las precondiciones y la autorización, determina que alguna no se cumple y rechaza la solicitud sin modificar datos ni exponer información no autorizada; comunica el motivo.<br>2. **Actor:** reconoce el rechazo; termina el caso de uso. |
-| Postcondiciones (éxito y fallo) | 1. **Éxito:** Archivo Excel con filtros, columnas y cálculos propios del reporte.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
-| Requisitos relacionados | `RF-REP-002`, `RF-REP-004`, `RF-REP-008`. |
-
-#### `CU-REP-04` — Generar reporte de salidas de material
-
-| Sección | Información relevante |
-| --- | --- |
-| Identificador | `CU-REP-04` |
-| Nombre | Generar reporte de salidas de material. |
-| Actor y disparador | **Actor:** Usuario con permiso sobre el reporte o consulta. **Disparador:** necesita analizar o entregar información de salidas de material y solicita su exportación. |
-| Participación de actor y sistema | **Actor:** define filtros y solicita la exportación.<br>**Nexus:** autoriza, consolida la información y entrega el archivo. |
-| Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de consulta o reporte correspondiente. |
-| Inferencia desde código | **Directa.** `reportApiRoute.js` GET `/goods-issues/excel` → `exportGoodsIssueReportExcel` → `sendExcelReport`. |
-| Flujo principal | 1. **Actor:** abre la consulta de salidas de material y define los filtros del reporte **(ver E1)**.<br>2. **Nexus:** muestra la información autorizada que corresponde a esos filtros.<br>3. **Actor:** selecciona «Exportar Excel», elige las opciones disponibles y confirma.<br>4. **Nexus:** vuelve a comprobar autorización y parámetros y prepara las filas, agrupaciones y totales.<br>5. **Nexus:** genera el archivo de Excel e inicia su descarga; si no hay datos, informa que el resultado está vacío. |
-| Excepciones | **E1 — Acceso rechazado (después del paso 1):**<br>1. **Nexus:** comprueba las precondiciones y la autorización, determina que alguna no se cumple y rechaza la solicitud sin modificar datos ni exponer información no autorizada; comunica el motivo.<br>2. **Actor:** reconoce el rechazo; termina el caso de uso. |
-| Postcondiciones (éxito y fallo) | 1. **Éxito:** Archivo Excel con filtros, columnas y cálculos propios del reporte.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
-| Requisitos relacionados | `RF-REP-002`, `RF-REP-004`. |
-
-#### `CU-REP-05` — Generar reporte de movimientos de materiales
-
-| Sección | Información relevante |
-| --- | --- |
-| Identificador | `CU-REP-05` |
-| Nombre | Generar reporte de movimientos de materiales. |
-| Actor y disparador | **Actor:** Usuario con permiso sobre el reporte o consulta. **Disparador:** necesita analizar o entregar información de movimientos de materiales y solicita su exportación. |
-| Participación de actor y sistema | **Actor:** define filtros y solicita la exportación.<br>**Nexus:** autoriza, consolida la información y entrega el archivo. |
-| Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de consulta o reporte correspondiente. |
-| Inferencia desde código | **Directa.** `admin/reportApiRoute.js` GET `/movements/materials/excel` → `exportMovementReport` → `sendExcelReport`. |
-| Flujo principal | 1. **Actor:** abre la consulta de movimientos de materiales y define los filtros del reporte **(ver E1)**.<br>2. **Nexus:** muestra la información autorizada que corresponde a esos filtros.<br>3. **Actor:** selecciona «Exportar Excel», elige las opciones disponibles y confirma.<br>4. **Nexus:** vuelve a comprobar autorización y parámetros y prepara las filas, agrupaciones y totales.<br>5. **Nexus:** genera el archivo de Excel e inicia su descarga; si no hay datos, informa que el resultado está vacío. |
-| Excepciones | **E1 — Acceso rechazado (después del paso 1):**<br>1. **Nexus:** comprueba las precondiciones y la autorización, determina que alguna no se cumple y rechaza la solicitud sin modificar datos ni exponer información no autorizada; comunica el motivo.<br>2. **Actor:** reconoce el rechazo; termina el caso de uso. |
-| Postcondiciones (éxito y fallo) | 1. **Éxito:** Archivo Excel con filtros, columnas y cálculos propios del reporte.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
-| Requisitos relacionados | `RF-REP-002`, `RF-REP-004`, `RF-REP-005`. |
-
-#### `CU-REP-06` — Consultar inventario de mermas
-
-| Sección | Información relevante |
-| --- | --- |
-| Identificador | `CU-REP-06` |
-| Nombre | Consultar inventario de mermas. |
-| Actor y disparador | **Actor:** Usuario con permiso sobre el reporte o consulta. **Disparador:** necesita localizar o revisar inventario de mermas y abre la opción de consulta correspondiente. |
-| Participación de actor y sistema | **Actor:** abre la consulta, define criterios y selecciona registros.<br>**Nexus:** autoriza, presenta filtros y devuelve sólo la información permitida. |
-| Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de consulta o reporte correspondiente. |
-| Inferencia desde código | **Compartida.** reutiliza GET de `wasteApiRoute.js`; el código no expone otra consulta de inventario. |
-| Flujo principal | 1. **Actor:** abre la opción para consultar inventario de mermas **(ver E1)**.<br>2. **Nexus:** comprueba su autorización y muestra la tabla con búsqueda, filtros y paginación disponibles.<br>3. **Actor:** captura los criterios que necesita y solicita aplicarlos.<br>4. **Nexus:** actualiza la tabla y el total con la información autorizada, sin modificar datos.<br>5. **Actor:** selecciona un registro cuando necesita revisar su información.<br>6. **Nexus:** muestra el detalle y las acciones que el actor puede ejecutar. |
-| Excepciones | **E1 — Acceso rechazado (después del paso 1):**<br>1. **Nexus:** comprueba las precondiciones y la autorización, determina que alguna no se cumple y rechaza la solicitud sin modificar datos ni exponer información no autorizada; comunica el motivo.<br>2. **Actor:** reconoce el rechazo; termina el caso de uso. |
-| Postcondiciones (éxito y fallo) | 1. **Éxito:** Consulta autorizada sin modificar datos.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
-| Requisitos relacionados | `RF-REP-001`. |
-
-#### `CU-REP-07` — Consultar movimientos de mermas
-
-| Sección | Información relevante |
-| --- | --- |
-| Identificador | `CU-REP-07` |
-| Nombre | Consultar movimientos de mermas. |
-| Actor y disparador | **Actor:** Usuario con permiso sobre el reporte o consulta. **Disparador:** necesita localizar o revisar movimientos de mermas y abre la opción de consulta correspondiente. |
-| Participación de actor y sistema | **Actor:** abre la consulta, define criterios y selecciona registros.<br>**Nexus:** autoriza, presenta filtros y devuelve sólo la información permitida. |
-| Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de consulta o reporte correspondiente. |
-| Inferencia desde código | **Directa.** `movementApiRoute.js` GET `/wastes` → `getAllWasteMovements`. |
-| Flujo principal | 1. **Actor:** abre la opción para consultar movimientos de mermas **(ver E1)**.<br>2. **Nexus:** comprueba su autorización y muestra la tabla con búsqueda, filtros y paginación disponibles.<br>3. **Actor:** captura los criterios que necesita y solicita aplicarlos.<br>4. **Nexus:** actualiza la tabla y el total con la información autorizada, sin modificar datos.<br>5. **Actor:** selecciona un registro cuando necesita revisar su información.<br>6. **Nexus:** muestra el detalle y las acciones que el actor puede ejecutar. |
-| Excepciones | **E1 — Acceso rechazado (después del paso 1):**<br>1. **Nexus:** comprueba las precondiciones y la autorización, determina que alguna no se cumple y rechaza la solicitud sin modificar datos ni exponer información no autorizada; comunica el motivo.<br>2. **Actor:** reconoce el rechazo; termina el caso de uso. |
-| Postcondiciones (éxito y fallo) | 1. **Éxito:** Consulta autorizada sin modificar datos.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
-| Requisitos relacionados | `RF-REP-001`. |
-
-#### `CU-REP-08` — Generar reporte de salidas de merma
-
-| Sección | Información relevante |
-| --- | --- |
-| Identificador | `CU-REP-08` |
+| Identificador | `CU-SAL-14` |
 | Nombre | Generar reporte de salidas de merma. |
-| Actor y disparador | **Actor:** Usuario con permiso sobre el reporte o consulta. **Disparador:** necesita analizar o entregar información de salidas de merma y solicita su exportación. |
+| Actor y disparador | **Actor:** Usuario con permiso sobre el reporte o consulta. **Disparador:** desde `CU-SAL-08` Consultar salidas de merma, selecciona la opción para generar el reporte con los filtros que necesita conservar. |
 | Participación de actor y sistema | **Actor:** define filtros y solicita la exportación.<br>**Nexus:** autoriza, consolida la información y entrega el archivo. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de consulta o reporte correspondiente. |
-| Inferencia desde código | **Directa.** `reportApiRoute.js` GET `/waste-issues/excel` → `exportWasteIssueReportExcel` → `sendExcelReport`. |
-| Flujo principal | 1. **Actor:** abre la consulta de salidas de merma y define los filtros del reporte **(ver E1)**.<br>2. **Nexus:** muestra la información autorizada que corresponde a esos filtros.<br>3. **Actor:** selecciona «Exportar Excel», elige las opciones disponibles y confirma.<br>4. **Nexus:** vuelve a comprobar autorización y parámetros y prepara las filas, agrupaciones y totales.<br>5. **Nexus:** genera el archivo de Excel e inicia su descarga; si no hay datos, informa que el resultado está vacío. |
-| Excepciones | **E1 — Acceso rechazado (después del paso 1):**<br>1. **Nexus:** comprueba las precondiciones y la autorización, determina que alguna no se cumple y rechaza la solicitud sin modificar datos ni exponer información no autorizada; comunica el motivo.<br>2. **Actor:** reconoce el rechazo; termina el caso de uso. |
+| Flujo principal | 1. **Nexus:** después de que el actor selecciona la exportación desde la consulta de origen, abre el modal **Exportar reporte** y muestra las opciones aplicables **(ver E1)**.<br>2. **Actor:** conserva o ajusta los filtros, incluye las opciones disponibles y confirma.<br>3. **Nexus:** vuelve a comprobar autorización y parámetros y prepara la información de salidas de merma.<br>4. **Nexus:** genera el archivo de Excel e inicia su descarga; si no hay datos, informa que el resultado está vacío. |
+| Excepciones | **E1 — Exportación rechazada (después del disparador):**<br>1. **Nexus:** comprueba las precondiciones y la autorización, determina que alguna no se cumple y rechaza la solicitud sin modificar datos ni exponer información no autorizada; comunica el motivo.<br>2. **Actor:** reconoce el rechazo; termina el caso de uso. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** Archivo Excel con filtros, columnas y cálculos propios del reporte.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
 | Requisitos relacionados | `RF-REP-002`, `RF-REP-004`. |
-
-#### `CU-REP-09` — Generar reporte de mermas
-
-| Sección | Información relevante |
-| --- | --- |
-| Identificador | `CU-REP-09` |
-| Nombre | Generar reporte de mermas. |
-| Actor y disparador | **Actor:** Usuario con permiso sobre el reporte o consulta. **Disparador:** necesita analizar o entregar información de mermas y solicita su exportación. |
-| Participación de actor y sistema | **Actor:** define filtros y solicita la exportación.<br>**Nexus:** autoriza, consolida la información y entrega el archivo. |
-| Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de consulta o reporte correspondiente. |
-| Inferencia desde código | **Directa.** `reportApiRoute.js` GET `/wastes/excel` → `exportWasteReportExcel` → `sendExcelReport`. |
-| Flujo principal | 1. **Actor:** abre la consulta de mermas y define los filtros del reporte **(ver E1)**.<br>2. **Nexus:** muestra la información autorizada que corresponde a esos filtros.<br>3. **Actor:** selecciona «Exportar Excel», elige incluir registros activos o con existencia, sólo activos o sólo con existencia, y confirma.<br>4. **Nexus:** vuelve a comprobar autorización y parámetros y prepara las filas, agrupaciones y totales con los filtros y el alcance elegidos.<br>5. **Nexus:** genera el archivo de Excel e inicia su descarga; si no hay datos, informa que el resultado está vacío. |
-| Excepciones | **E1 — Acceso rechazado (después del paso 1):**<br>1. **Nexus:** comprueba las precondiciones y la autorización, determina que alguna no se cumple y rechaza la solicitud sin modificar datos ni exponer información no autorizada; comunica el motivo.<br>2. **Actor:** reconoce el rechazo; termina el caso de uso. |
-| Postcondiciones (éxito y fallo) | 1. **Éxito:** Archivo Excel con filtros, columnas y cálculos propios del reporte.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
-| Requisitos relacionados | `RF-REP-002` a `RF-REP-004`, `RF-REP-006` a `RF-REP-009`. |
-
-#### `CU-REP-10` — Generar reporte de movimientos de mermas
-
-| Sección | Información relevante |
-| --- | --- |
-| Identificador | `CU-REP-10` |
-| Nombre | Generar reporte de movimientos de mermas. |
-| Actor y disparador | **Actor:** Usuario con permiso sobre el reporte o consulta. **Disparador:** necesita analizar o entregar información de movimientos de mermas y solicita su exportación. |
-| Participación de actor y sistema | **Actor:** define filtros y solicita la exportación.<br>**Nexus:** autoriza, consolida la información y entrega el archivo. |
-| Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de consulta o reporte correspondiente. |
-| Inferencia desde código | **Directa.** `admin/reportApiRoute.js` GET `/movements/wastes/excel` → `exportWasteMovementReport` → `sendExcelReport`. |
-| Flujo principal | 1. **Actor:** abre la consulta de movimientos de mermas y define los filtros del reporte **(ver E1)**.<br>2. **Nexus:** muestra la información autorizada que corresponde a esos filtros.<br>3. **Actor:** selecciona «Exportar Excel», elige las opciones disponibles y confirma.<br>4. **Nexus:** vuelve a comprobar autorización y parámetros y prepara las filas, agrupaciones y totales.<br>5. **Nexus:** genera el archivo de Excel e inicia su descarga; si no hay datos, informa que el resultado está vacío. |
-| Excepciones | **E1 — Acceso rechazado (después del paso 1):**<br>1. **Nexus:** comprueba las precondiciones y la autorización, determina que alguna no se cumple y rechaza la solicitud sin modificar datos ni exponer información no autorizada; comunica el motivo.<br>2. **Actor:** reconoce el rechazo; termina el caso de uso. |
-| Postcondiciones (éxito y fallo) | 1. **Éxito:** Archivo Excel con filtros, columnas y cálculos propios del reporte.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
-| Requisitos relacionados | `RF-REP-002`, `RF-REP-004`, `RF-REP-005`. |
-
-
-#### `CU-REP-11` — Generar reporte de compras de material
-
-| Sección | Información relevante |
-| --- | --- |
-| Identificador | `CU-REP-11` |
-| Nombre | Generar reporte de compras de material. |
-| Actor y disparador | **Actor:** Usuario con permiso sobre el reporte o consulta. **Disparador:** necesita analizar o entregar información de compras de material y solicita su exportación. |
-| Participación de actor y sistema | **Actor:** define filtros y solicita la exportación.<br>**Nexus:** autoriza, consolida la información y entrega el archivo. |
-| Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de consulta o reporte correspondiente. |
-| Inferencia desde código | **Directa.** `reportApiRoute.js` GET `/goods-receipts/excel` → `exportGoodsReceiptReportExcel` → `sendExcelReport`. |
-| Flujo principal | 1. **Actor:** abre la consulta de compras de material y define los filtros del reporte **(ver E1)**.<br>2. **Nexus:** muestra la información autorizada que corresponde a esos filtros.<br>3. **Actor:** selecciona «Exportar Excel», elige las opciones disponibles y confirma.<br>4. **Nexus:** vuelve a comprobar autorización y parámetros y prepara las filas, agrupaciones y totales.<br>5. **Nexus:** genera el archivo de Excel e inicia su descarga; si no hay datos, informa que el resultado está vacío. |
-| Excepciones | **E1 — Acceso rechazado (después del paso 1):**<br>1. **Nexus:** comprueba las precondiciones y la autorización, determina que alguna no se cumple y rechaza la solicitud sin modificar datos ni exponer información no autorizada; comunica el motivo.<br>2. **Actor:** reconoce el rechazo; termina el caso de uso. |
-| Postcondiciones (éxito y fallo) | 1. **Éxito:** Archivo Excel con filtros, columnas y cálculos propios del reporte.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
-| Requisitos relacionados | `RF-REP-002`, `RF-REP-004`. |
-
-#### `CU-REP-12` — Generar reporte de proveedores
-
-| Sección | Información relevante |
-| --- | --- |
-| Identificador | `CU-REP-12` |
-| Nombre | Generar reporte de proveedores. |
-| Actor y disparador | **Actor:** Usuario con permiso sobre el reporte o consulta. **Disparador:** necesita analizar o entregar información de proveedores y solicita su exportación. |
-| Participación de actor y sistema | **Actor:** define filtros y solicita la exportación.<br>**Nexus:** autoriza, consolida la información y entrega el archivo. |
-| Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de consulta o reporte correspondiente. |
-| Inferencia desde código | **Directa.** `reportApiRoute.js` GET `/suppliers/excel` → `exportSupplierReportExcel` → `sendExcelReport`. |
-| Flujo principal | 1. **Actor:** abre la consulta de proveedores y define los filtros del reporte **(ver E1)**.<br>2. **Nexus:** muestra la información autorizada que corresponde a esos filtros.<br>3. **Actor:** selecciona «Exportar Excel», elige las opciones disponibles y confirma.<br>4. **Nexus:** vuelve a comprobar autorización y parámetros y prepara las filas, agrupaciones y totales.<br>5. **Nexus:** genera el archivo de Excel e inicia su descarga; si no hay datos, informa que el resultado está vacío. |
-| Excepciones | **E1 — Acceso rechazado (después del paso 1):**<br>1. **Nexus:** comprueba las precondiciones y la autorización, determina que alguna no se cumple y rechaza la solicitud sin modificar datos ni exponer información no autorizada; comunica el motivo.<br>2. **Actor:** reconoce el rechazo; termina el caso de uso. |
-| Postcondiciones (éxito y fallo) | 1. **Éxito:** Archivo Excel con filtros, columnas y cálculos propios del reporte.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
-| Requisitos relacionados | `RF-REP-002`, `RF-REP-004`. |
-
-#### `CU-REP-13` — Generar reporte de clientes
-
-| Sección | Información relevante |
-| --- | --- |
-| Identificador | `CU-REP-13` |
-| Nombre | Generar reporte de clientes. |
-| Actor y disparador | **Actor:** Usuario con permiso sobre el reporte o consulta. **Disparador:** necesita analizar o entregar información de clientes y solicita su exportación. |
-| Participación de actor y sistema | **Actor:** define filtros y solicita la exportación.<br>**Nexus:** autoriza, consolida la información y entrega el archivo. |
-| Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de consulta o reporte correspondiente. |
-| Inferencia desde código | **Directa.** `sales/reportApiRoute.js` GET `/clients/excel` → `exportClientReport` → `sendExcelReport`. |
-| Flujo principal | 1. **Actor:** abre la consulta de clientes y define los filtros del reporte **(ver E1)**.<br>2. **Nexus:** muestra la información autorizada que corresponde a esos filtros.<br>3. **Actor:** selecciona «Exportar Excel», elige las opciones disponibles y confirma.<br>4. **Nexus:** vuelve a comprobar autorización y parámetros y prepara las filas, agrupaciones y totales.<br>5. **Nexus:** genera el archivo de Excel e inicia su descarga; si no hay datos, informa que el resultado está vacío. |
-| Excepciones | **E1 — Acceso rechazado (después del paso 1):**<br>1. **Nexus:** comprueba las precondiciones y la autorización, determina que alguna no se cumple y rechaza la solicitud sin modificar datos ni exponer información no autorizada; comunica el motivo.<br>2. **Actor:** reconoce el rechazo; termina el caso de uso. |
-| Postcondiciones (éxito y fallo) | 1. **Éxito:** Archivo Excel con filtros, columnas y cálculos propios del reporte.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
-| Requisitos relacionados | `RF-REP-002`, `RF-REP-004`. |
-
-#### `CU-REP-14` — Generar reporte de personas
-
-| Sección | Información relevante |
-| --- | --- |
-| Identificador | `CU-REP-14` |
-| Nombre | Generar reporte de personas. |
-| Actor y disparador | **Actor:** Usuario con permiso sobre el reporte o consulta. **Disparador:** necesita analizar o entregar información de personas y solicita su exportación. |
-| Participación de actor y sistema | **Actor:** define filtros y solicita la exportación.<br>**Nexus:** autoriza, consolida la información y entrega el archivo. |
-| Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de consulta o reporte correspondiente. |
-| Inferencia desde código | **Directa.** `admin/reportApiRoute.js` GET `/persons/excel` → `exportPersonReport` → `sendExcelReport`. |
-| Flujo principal | 1. **Actor:** abre la consulta de personas y define los filtros del reporte **(ver E1)**.<br>2. **Nexus:** muestra la información autorizada que corresponde a esos filtros.<br>3. **Actor:** selecciona «Exportar Excel», elige las opciones disponibles y confirma.<br>4. **Nexus:** vuelve a comprobar autorización y parámetros y prepara las filas, agrupaciones y totales.<br>5. **Nexus:** genera el archivo de Excel e inicia su descarga; si no hay datos, informa que el resultado está vacío. |
-| Excepciones | **E1 — Acceso rechazado (después del paso 1):**<br>1. **Nexus:** comprueba las precondiciones y la autorización, determina que alguna no se cumple y rechaza la solicitud sin modificar datos ni exponer información no autorizada; comunica el motivo.<br>2. **Actor:** reconoce el rechazo; termina el caso de uso. |
-| Postcondiciones (éxito y fallo) | 1. **Éxito:** Archivo Excel con filtros, columnas y cálculos propios del reporte.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
-| Requisitos relacionados | `RF-REP-002`, `RF-REP-004`. |
-
-#### `CU-REP-15` — Generar reporte de usuarios
-
-| Sección | Información relevante |
-| --- | --- |
-| Identificador | `CU-REP-15` |
-| Nombre | Generar reporte de usuarios. |
-| Actor y disparador | **Actor:** Usuario con permiso sobre el reporte o consulta. **Disparador:** necesita analizar o entregar información de usuarios y solicita su exportación. |
-| Participación de actor y sistema | **Actor:** define filtros y solicita la exportación.<br>**Nexus:** autoriza, consolida la información y entrega el archivo. |
-| Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de consulta o reporte correspondiente. |
-| Inferencia desde código | **Directa.** `admin/reportApiRoute.js` GET `/users/excel` → `exportUserReport` → `sendExcelReport`. |
-| Flujo principal | 1. **Actor:** abre la consulta de usuarios y define los filtros del reporte **(ver E1)**.<br>2. **Nexus:** muestra la información autorizada que corresponde a esos filtros.<br>3. **Actor:** selecciona «Exportar Excel», elige las opciones disponibles y confirma.<br>4. **Nexus:** vuelve a comprobar autorización y parámetros y prepara las filas, agrupaciones y totales.<br>5. **Nexus:** genera el archivo de Excel e inicia su descarga; si no hay datos, informa que el resultado está vacío. |
-| Excepciones | **E1 — Acceso rechazado (después del paso 1):**<br>1. **Nexus:** comprueba las precondiciones y la autorización, determina que alguna no se cumple y rechaza la solicitud sin modificar datos ni exponer información no autorizada; comunica el motivo.<br>2. **Actor:** reconoce el rechazo; termina el caso de uso. |
-| Postcondiciones (éxito y fallo) | 1. **Éxito:** Archivo Excel con filtros, columnas y cálculos propios del reporte.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
-| Requisitos relacionados | `RF-REP-002`, `RF-REP-004`. |
-
 ## Relación entre familias y reutilización
 
 | Tema compartido | Casos | Elementos reutilizables que deben evaluarse primero | Diferencia que debe conservarse |
 | --- | --- | --- | --- |
-| CRUD de identidades y catálogos | `CU-IDA-01` a `CU-IDA-09`; `CU-CAT-01` a `CU-CAT-38` | Fábricas CRUD, listados, formularios, validación y refresco de tabla. | Permisos, identidad del recurso, relaciones y política de eliminación. |
-| Documentos con detalles | `CU-ENT-02`, `CU-ENT-03`, `CU-SAL-02` a `CU-SAL-04` y `CU-SAL-08` a `CU-SAL-10` | Encabezado, modal/formulario, tabla de detalles, DTO y transacción coordinadora. | La entrada incrementa stock al confirmarse; la salida no lo descuenta hasta surtir. |
-| Operación de salidas | `CU-SAL-02` a `CU-SAL-06` y `CU-SAL-08` a `CU-SAL-12` | Proceso de material replicable para merma, componentes informativos y coordinación de movimientos. | Inventario, conversión, permisos, estados y cantidades acumuladas del contexto. |
-| Consulta y exportación | `CU-REP-01` a `CU-REP-15` y casos de consulta de cada familia | Filtros, paginación, dependencias entre selects y utilidades Excel. | Columnas, agrupaciones, fórmulas y permiso de cada reporte. |
+| CRUD de identidades y catálogos | `CU-IDA-01` a `CU-IDA-11`; `CU-CAT-01` a `CU-CAT-48` | Fábricas CRUD, listados, formularios, validación y refresco de tabla. | Permisos, identidad del recurso, relaciones y política de eliminación. |
+| Documentos con detalles | `CU-ENT-02`, `CU-ENT-03`, `CU-SAL-02` a `CU-SAL-04` y `CU-SAL-09` a `CU-SAL-11` | Encabezado, modal/formulario, tabla de detalles, DTO y transacción coordinadora. | La entrada incrementa stock al confirmarse; la salida no lo descuenta hasta surtir. |
+| Operación de salidas | `CU-SAL-02` a `CU-SAL-06` y `CU-SAL-09` a `CU-SAL-13` | Proceso de material replicable para merma, componentes informativos y coordinación de movimientos. | Inventario, conversión, permisos, estados y cantidades acumuladas del contexto. |
+| Consulta y exportación | `CU-IDA-04`, `CU-IDA-09`, `CU-CAT-07`, `CU-CAT-09`, `CU-CAT-14`, `CU-CAT-18`, `CU-CAT-24`, `CU-CAT-26`, `CU-ENT-06`, `CU-SAL-07` y `CU-SAL-14` y casos de consulta de cada familia | Filtros, paginación, dependencias entre selects y utilidades Excel. | Columnas, agrupaciones, fórmulas y permiso de cada reporte. |
 
 Reutilizar no significa fusionar reglas de negocio. Antes de crear otro flujo se revisan
 los [patrones de diseño y construcción](../architecture/design-and-construction-patterns.md), se replica

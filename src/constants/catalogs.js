@@ -1,28 +1,28 @@
 export const MANAGED_CATALOGS = Object.freeze({
     departments: {
         model: 'department',
-        fields: ['name'],
+        fields: ['name', 'isActive'],
         maxLengths: { name: 50 },
         label: 'Áreas',
         entityLabel: 'área'
     },
     roles: {
         model: 'role',
-        fields: ['name'],
+        fields: ['name', 'isActive'],
         maxLengths: { name: 50 },
         label: 'Roles',
         entityLabel: 'rol'
     },
     presentations: {
         model: 'presentation',
-        fields: ['name'],
+        fields: ['name', 'isActive'],
         maxLengths: { name: 50 },
         label: 'Presentaciones',
         entityLabel: 'presentación'
     },
     'unit-measures': {
         model: 'unitMeasure',
-        fields: ['name', 'symbol'],
+        fields: ['name', 'symbol', 'isActive'],
         maxLengths: { name: 20, symbol: 10 },
         label: 'Unidades de medida',
         entityLabel: 'unidad de medida'
@@ -36,7 +36,7 @@ export const MANAGED_CATALOGS = Object.freeze({
     },
     'fulfillment-statuses': {
         model: 'fulfillmentStatus',
-        fields: ['name'],
+        fields: ['name', 'isActive'],
         maxLengths: { name: 50 },
         label: 'Estados de cumplimiento',
         entityLabel: 'estado de cumplimiento'

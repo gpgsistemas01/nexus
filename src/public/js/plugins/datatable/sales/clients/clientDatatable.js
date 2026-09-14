@@ -23,6 +23,11 @@ export const createClientDatatable = () => {
             columns: [
                 { data: 'name', title: 'Nombre' },
                 {
+                    data: 'isActive',
+                    title: 'Activo',
+                    render: value => value ? 'Sí' : 'No'
+                },
+                {
                     data: null,
                     title: 'Acciones',
                     render: () => renderActionButtons({ context: 'client' })

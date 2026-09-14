@@ -24,6 +24,7 @@ const numberToSupplierCode = (number) => {
 };
 
 export const findAllSuppliers = async ({
+    onlyActive = false,
     skip = 0,
     take = 10,
     search = '',
@@ -33,8 +34,9 @@ export const findAllSuppliers = async ({
 
     const db = getDb();
 
-    const where = search
-        ? {
+    const where = {
+        ...(onlyActive && { isActive: true }),
+        ...(search && {
             OR: [
                 {
                     tradeName: {
@@ -49,8 +51,8 @@ export const findAllSuppliers = async ({
                     }
                 }
             ]
-        }
-        : {};
+        })
+    };
 
     const suppliers = await db.supplier.findMany({
         ...(take > 0 && { skip, take }),

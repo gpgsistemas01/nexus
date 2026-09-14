@@ -62,7 +62,7 @@ describe('validaciones de campos obligatorios', () => {
     ['', 'valor vacío'],
     ['   ', 'valor compuesto sólo por espacios']
   ])('CRUD de clientes: rechaza el nombre requerido cuando recibe %s (%s)', async (name) => {
-    const requestBody = name === undefined ? {} : { name };
+    const requestBody = name === undefined ? { isActive: true } : { name, isActive: true };
     const errors = await runValidation(clientValidation, requestBody);
 
     expect(errors).toEqual([
@@ -71,7 +71,7 @@ describe('validaciones de campos obligatorios', () => {
   });
 
   it('CRUD de clientes: conserva el campo y acepta un valor válido', async () => {
-    const requestBody = { name: 'Cliente válido' };
+    const requestBody = { name: 'Cliente válido', isActive: true };
 
     await expect(runValidation(clientValidation, requestBody)).resolves.toEqual([]);
     expect(requestBody.name).toBe('Cliente válido');

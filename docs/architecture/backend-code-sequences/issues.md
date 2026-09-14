@@ -3,6 +3,7 @@
 Este capítulo forma parte del [catálogo de secuencias del código backend](index.md) y conserva los recorridos aplicados del grupo `SAL`. Las reglas comunes de lectura, trazabilidad y mantenimiento se declaran en el índice de la colección.
 
 <a id="cu-sal-01"></a>
+
 ## `CU-SAL-01` — Consultar salidas de material
 
 **Patrones:** `BE-P01`.
@@ -33,6 +34,7 @@ sequenceDiagram
 ```
 
 <a id="cu-sal-02"></a>
+
 ## `CU-SAL-02` — Crear salida de material
 
 **Patrones:** `BE-P01`, `BE-P03`, `BE-P04`.
@@ -66,6 +68,7 @@ sequenceDiagram
 ```
 
 <a id="cu-sal-03"></a>
+
 ## `CU-SAL-03` — Editar encabezado de salida de material
 
 **Patrones:** `BE-P01`, `BE-P04`.
@@ -99,6 +102,7 @@ sequenceDiagram
 ```
 
 <a id="cu-sal-04"></a>
+
 ## `CU-SAL-04` — Editar detalles de material de una salida
 
 **Patrones:** `BE-P01`, `BE-P03`, `BE-P04`, `BE-P05`.
@@ -132,6 +136,7 @@ sequenceDiagram
 ```
 
 <a id="cu-sal-05"></a>
+
 ## `CU-SAL-05` — Surtir material
 
 **Patrones:** `BE-P01`, `BE-P03`, `BE-P04`, `BE-P05`.
@@ -170,6 +175,7 @@ sequenceDiagram
 ```
 
 <a id="cu-sal-06"></a>
+
 ## `CU-SAL-06` — Devolver material surtido
 
 **Patrones:** `BE-P01`, `BE-P03`, `BE-P04`, `BE-P05`.
@@ -215,8 +221,40 @@ sequenceDiagram
     end
 ```
 
-<a id="cu-sal-07"></a>
-## `CU-SAL-07` — Consultar salidas de merma
+<a id="cu-sal-08"></a>
+
+## `CU-SAL-07` — Generar reporte de salidas de material
+
+**Patrones:** `BE-P07`.
+
+```mermaid
+sequenceDiagram
+    participant Client as Cliente HTTP / web
+    participant Route as src/routes/api/warehouse/reportApiRoute.js
+    participant Controller@{ "type": "control" } as src/controllers/api/warehouse/reportController.js
+    participant Domain as src/services/warehouse/reportService.js<br/>src/utils/reportExcelUtils.js
+    Note over Controller,Domain: Variables de frontera: req.query/params
+
+    Client->>Route: GET /api/warehouse/reports/goods-issues/excel
+    Route->>Route: ejecutar en orden el middleware configurado para la ruta
+    Route->>Controller: exportGoodsIssueReportExcel(req, res)
+    activate Controller
+    Controller->>Domain: reportService.findGoodsIssueReportRows({ query: req.query }) y sendExcelReport
+    activate Domain
+    Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
+    Domain-->>Controller: resultado del servicio o error de dominio tipado
+    deactivate Domain
+    alt El servicio devuelve el resultado
+        Controller-->>Client: status HTTP y cuerpo concretos del controller
+    else El servicio propaga un error de dominio
+        Controller-->>Client: error entregado al middleware final para su respuesta HTTP
+    end
+    deactivate Controller
+```
+
+<a id="cu-cat-09"></a>
+
+## `CU-SAL-08` — Consultar salidas de merma
 
 **Patrones:** `BE-P01`.
 
@@ -245,8 +283,9 @@ sequenceDiagram
     deactivate Controller
 ```
 
-<a id="cu-sal-08"></a>
-## `CU-SAL-08` — Crear salida de merma
+<a id="cu-sal-09"></a>
+
+## `CU-SAL-09` — Crear salida de merma
 
 **Patrones:** `BE-P01`, `BE-P03`, `BE-P04`.
 
@@ -283,8 +322,9 @@ sequenceDiagram
     deactivate Controller
 ```
 
-<a id="cu-sal-09"></a>
-## `CU-SAL-09` — Editar encabezado de salida de merma
+<a id="cu-sal-10"></a>
+
+## `CU-SAL-10` — Editar encabezado de salida de merma
 
 **Patrones:** `BE-P01`, `BE-P04`.
 
@@ -316,8 +356,9 @@ sequenceDiagram
     deactivate Controller
 ```
 
-<a id="cu-sal-10"></a>
-## `CU-SAL-10` — Editar detalles de merma de una salida
+<a id="cu-sal-11"></a>
+
+## `CU-SAL-11` — Editar detalles de merma de una salida
 
 **Patrones:** `BE-P01`, `BE-P03`, `BE-P04`, `BE-P05`.
 
@@ -349,8 +390,9 @@ sequenceDiagram
     deactivate Controller
 ```
 
-<a id="cu-sal-11"></a>
-## `CU-SAL-11` — Surtir merma
+<a id="cu-sal-12"></a>
+
+## `CU-SAL-12` — Surtir merma
 
 **Patrones:** `BE-P01`, `BE-P03`, `BE-P04`, `BE-P05`.
 
@@ -391,8 +433,9 @@ sequenceDiagram
     Controller-->>Client: 200 salida de merma actualizada
 ```
 
-<a id="cu-sal-12"></a>
-## `CU-SAL-12` — Devolver merma surtida
+<a id="cu-sal-13"></a>
+
+## `CU-SAL-13` — Devolver merma surtida
 
 **Patrones:** `BE-P01`, `BE-P03`, `BE-P04`, `BE-P05`.
 
@@ -434,3 +477,34 @@ sequenceDiagram
         Controller-->>Client: 200 devolución registrada
     end
 ```
+
+## `CU-SAL-14` — Generar reporte de salidas de merma
+
+**Patrones:** `BE-P07`.
+
+```mermaid
+sequenceDiagram
+    participant Client as Cliente HTTP / web
+    participant Route as src/routes/api/warehouse/reportApiRoute.js
+    participant Controller@{ "type": "control" } as src/controllers/api/warehouse/reportController.js
+    participant Domain as src/services/warehouse/reportService.js<br/>src/utils/reportExcelUtils.js
+    Note over Controller,Domain: Variables de frontera: req.query/params
+
+    Client->>Route: GET /api/warehouse/reports/waste-issues/excel
+    Route->>Route: ejecutar en orden el middleware configurado para la ruta
+    Route->>Controller: exportWasteIssueReportExcel(req, res)
+    activate Controller
+    Controller->>Domain: reportService.findWasteIssueReportRows({ query: req.query }) y sendExcelReport
+    activate Domain
+    Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
+    Domain-->>Controller: resultado del servicio o error de dominio tipado
+    deactivate Domain
+    alt El servicio devuelve el resultado
+        Controller-->>Client: status HTTP y cuerpo concretos del controller
+    else El servicio propaga un error de dominio
+        Controller-->>Client: error entregado al middleware final para su respuesta HTTP
+    end
+    deactivate Controller
+```
+
+<a id="cu-cat-24"></a>

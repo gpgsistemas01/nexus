@@ -9,14 +9,15 @@ export const findAllUnitMeasures = async ({
     orderDir = 'asc'
 }) => {
 
-    const where = search
-        ? {
+    const where = {
+        isActive: true,
+        ...(search && {
             name: {
                 contains: search,
                 mode: 'insensitive'
             }
-        }
-        : {};
+        })
+    };
 
     const units = await getDb().unitMeasure.findMany({
         skip,
@@ -28,7 +29,8 @@ export const findAllUnitMeasures = async ({
         select: {
             id: true,
             name: true,
-            symbol: true
+            symbol: true,
+            isActive: true
         }
     });
 
@@ -43,7 +45,8 @@ export const findAllUnitMeasures = async ({
 }
 
 const DEFAULT_UNIT_MEASURE_SELECT = {
-    id: true
+    id: true,
+    isActive: true
 };
 
 export const findUniqueUnitMeasure = async ({
@@ -52,8 +55,8 @@ export const findUniqueUnitMeasure = async ({
 }) => {
 
     const db = getDb(tx);
-    const unit = await db.unitMeasure.findUnique({
-        where: { id },
+    const unit = await db.unitMeasure.findFirst({
+        where: { id, isActive: true },
         select: DEFAULT_UNIT_MEASURE_SELECT
     });
 
