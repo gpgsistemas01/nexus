@@ -1,4 +1,4 @@
-import { beforeAll, describe, expect, it } from 'vitest';
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import request from 'supertest';
 
 import { createControllerTestApp } from '../../helpers/controllerTestHarness.js';
@@ -9,7 +9,7 @@ const names = {
   role: `IT Role ${testSuffix}`,
   presentation: `IT Presentation ${testSuffix}`,
   unit: `IT Unit ${testSuffix}`,
-  managedUnit: `IT Managed Unit ${testSuffix}`,
+  managedUnit: `IT MU ${testSuffix}`,
   unitSymbol: `iu${testSuffix.slice(-4)}`,
   status: `IT Status ${testSuffix}`,
   reason: `IT Reason ${testSuffix}`
@@ -21,7 +21,15 @@ let app;
 const cleanupCatalogs = async () => {
   await prisma.stockAdjustmentReason.deleteMany({ where: { name: { startsWith: 'IT Reason ' } } });
   await prisma.fulfillmentStatus.deleteMany({ where: { name: { startsWith: 'IT Status ' } } });
-  await prisma.unitMeasure.deleteMany({ where: { name: { startsWith: 'IT Unit ' } } });
+  await prisma.unitMeasure.deleteMany({
+    where: {
+      OR: [
+        { name: { startsWith: 'IT Unit ' } },
+        { name: { startsWith: 'IT MU ' } },
+        { name: { startsWith: 'IT Managed Unit ' } }
+      ]
+    }
+  });
   await prisma.presentation.deleteMany({ where: { name: { startsWith: 'IT Presentation ' } } });
   await prisma.role.deleteMany({ where: { name: { startsWith: 'IT Role ' } } });
   await prisma.department.deleteMany({ where: { name: { startsWith: 'IT Department ' } } });
@@ -85,6 +93,9 @@ describe('catalog controllers database integration', () => {
     await cleanupCatalogs();
   });
 
+  afterAll(async () => {
+    await cleanupCatalogs();
+  });
 
   it('guarda catálogos en DATABASE_TEST_URL y los lee desde sus controllers', async () => {
     const department = await prisma.department.create({ data: { name: names.department } });
@@ -143,7 +154,7 @@ describe('catalog controllers database integration', () => {
       data: [expect.objectContaining({ id: created.body.data.id, name: names.managedUnit })]
     });
 
-    const updatedName = `${ names.managedUnit } updated`;
+    const updatedName = `${ names.managedUnit } v2`;
     await request(app)
       .put(`/managed/unit-measures/${ created.body.data.id }`)
       .send({ name: updatedName, symbol: names.unitSymbol })
