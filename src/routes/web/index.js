@@ -3,6 +3,7 @@ import loginWebRoutes from './auth/loginWebRoute.js';
 import refreshWebRoutes from './auth/refreshWebRoute.js';
 import logoutWebRoutes from './auth/logoutWebRoute.js';
 import materialWebRoutes from './warehouse/materialWebRoute.js';
+import consumableWebRoutes from './warehouse/consumableWebRoute.js';
 import wasteWebRoutes from './warehouse/wasteWebRoute.js';
 import goodsReceiptWebRoutes from './warehouse/goodsReceiptWebRoute.js';
 import goodsIssueWebRoutes from './warehouse/goodsIssueWebRoute.js';
@@ -19,6 +20,7 @@ const WEB_ROUTES = [
     ['/revocar-sesion', refreshWebRoutes],
     ['/cerrar-sesion', logoutWebRoutes],
     ['/almacen/materiales', materialWebRoutes],
+    ['/almacen/consumibles', consumableWebRoutes],
     ['/almacen/mermas', wasteWebRoutes],
     ['/compras', goodsReceiptWebRoutes],
     ['/salidas/materiales', goodsIssueWebRoutes],
