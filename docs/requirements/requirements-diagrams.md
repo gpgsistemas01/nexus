@@ -22,7 +22,7 @@ flowchart LR
     atomic["RN-002\nAtomicidad documental"]
     quantities["RN-003\nConsistencia de cantidades"]
     trace["RN-005 y RN-008\nHistoria y auditoría"]
-    catalogs["RF-CAT-001 a RF-CAT-021\nCatálogos operativos"]
+    catalogs["RF-CAT-001 a RF-CAT-024\nCatálogos operativos"]
     receipts["RF-REC-001 a RF-REC-008\nEntradas y correcciones"]
     issues["RF-ISS-001 a RF-ISS-006\nSalidas y devoluciones"]
     inventory["RN-002 a RN-005 y RN-011 a RN-023\nIntegridad de existencias, movimientos y recursos activos"]
@@ -437,6 +437,162 @@ flowchart LR
     validate --> result["Nexus responde: Catálogo auxiliar de sólo lectura."]
 ```
 
+#### `CU-CAT-21` — Consultar área
+
+```mermaid
+flowchart LR
+    request["Administrador solicita consultar Áreas"] --> authorize["Nexus valida catalogs:manage y departments"]
+    authorize --> result["Mostrar exclusivamente la tabla de Áreas"]
+```
+
+#### `CU-CAT-22` — Crear área
+
+```mermaid
+flowchart LR
+    request["Administrador captura una nueva entrada de Áreas"] --> authorize["Nexus valida catalogs:manage y departments"]
+    authorize --> persist["Validar campos y crear área"]
+    persist --> result["Confirmar y refrescar Áreas"]
+```
+
+#### `CU-CAT-23` — Editar área
+
+```mermaid
+flowchart LR
+    request["Administrador edita una entrada de Áreas"] --> authorize["Nexus valida catalogs:manage y departments"]
+    authorize --> persist["Validar campos y actualizar área"]
+    persist --> result["Confirmar y refrescar Áreas"]
+```
+
+#### `CU-CAT-24` — Consultar rol
+
+```mermaid
+flowchart LR
+    request["Administrador solicita consultar Roles"] --> authorize["Nexus valida catalogs:manage y roles"]
+    authorize --> result["Mostrar exclusivamente la tabla de Roles"]
+```
+
+#### `CU-CAT-25` — Crear rol
+
+```mermaid
+flowchart LR
+    request["Administrador captura una nueva entrada de Roles"] --> authorize["Nexus valida catalogs:manage y roles"]
+    authorize --> persist["Validar campos y crear rol"]
+    persist --> result["Confirmar y refrescar Roles"]
+```
+
+#### `CU-CAT-26` — Editar rol
+
+```mermaid
+flowchart LR
+    request["Administrador edita una entrada de Roles"] --> authorize["Nexus valida catalogs:manage y roles"]
+    authorize --> persist["Validar campos y actualizar rol"]
+    persist --> result["Confirmar y refrescar Roles"]
+```
+
+#### `CU-CAT-27` — Consultar presentación
+
+```mermaid
+flowchart LR
+    request["Administrador solicita consultar Presentaciones"] --> authorize["Nexus valida catalogs:manage y presentations"]
+    authorize --> result["Mostrar exclusivamente la tabla de Presentaciones"]
+```
+
+#### `CU-CAT-28` — Crear presentación
+
+```mermaid
+flowchart LR
+    request["Administrador captura una nueva entrada de Presentaciones"] --> authorize["Nexus valida catalogs:manage y presentations"]
+    authorize --> persist["Validar campos y crear presentación"]
+    persist --> result["Confirmar y refrescar Presentaciones"]
+```
+
+#### `CU-CAT-29` — Editar presentación
+
+```mermaid
+flowchart LR
+    request["Administrador edita una entrada de Presentaciones"] --> authorize["Nexus valida catalogs:manage y presentations"]
+    authorize --> persist["Validar campos y actualizar presentación"]
+    persist --> result["Confirmar y refrescar Presentaciones"]
+```
+
+#### `CU-CAT-30` — Consultar unidad de medida
+
+```mermaid
+flowchart LR
+    request["Administrador solicita consultar Unidades de medida"] --> authorize["Nexus valida catalogs:manage y unit-measures"]
+    authorize --> result["Mostrar exclusivamente la tabla de Unidades de medida"]
+```
+
+#### `CU-CAT-31` — Crear unidad de medida
+
+```mermaid
+flowchart LR
+    request["Administrador captura una nueva entrada de Unidades de medida"] --> authorize["Nexus valida catalogs:manage y unit-measures"]
+    authorize --> persist["Validar campos y crear unidad de medida"]
+    persist --> result["Confirmar y refrescar Unidades de medida"]
+```
+
+#### `CU-CAT-32` — Editar unidad de medida
+
+```mermaid
+flowchart LR
+    request["Administrador edita una entrada de Unidades de medida"] --> authorize["Nexus valida catalogs:manage y unit-measures"]
+    authorize --> persist["Validar campos y actualizar unidad de medida"]
+    persist --> result["Confirmar y refrescar Unidades de medida"]
+```
+
+#### `CU-CAT-33` — Consultar motivo de ajuste
+
+```mermaid
+flowchart LR
+    request["Administrador solicita consultar Motivos de ajuste"] --> authorize["Nexus valida catalogs:manage y reasons"]
+    authorize --> result["Mostrar exclusivamente la tabla de Motivos de ajuste"]
+```
+
+#### `CU-CAT-34` — Crear motivo de ajuste
+
+```mermaid
+flowchart LR
+    request["Administrador captura una nueva entrada de Motivos de ajuste"] --> authorize["Nexus valida catalogs:manage y reasons"]
+    authorize --> persist["Validar campos y crear motivo de ajuste"]
+    persist --> result["Confirmar y refrescar Motivos de ajuste"]
+```
+
+#### `CU-CAT-35` — Editar motivo de ajuste
+
+```mermaid
+flowchart LR
+    request["Administrador edita una entrada de Motivos de ajuste"] --> authorize["Nexus valida catalogs:manage y reasons"]
+    authorize --> persist["Validar campos y actualizar motivo de ajuste"]
+    persist --> result["Confirmar y refrescar Motivos de ajuste"]
+```
+
+#### `CU-CAT-36` — Consultar estado de cumplimiento
+
+```mermaid
+flowchart LR
+    request["Administrador solicita consultar Estados de cumplimiento"] --> authorize["Nexus valida catalogs:manage y fulfillment-statuses"]
+    authorize --> result["Mostrar exclusivamente la tabla de Estados de cumplimiento"]
+```
+
+#### `CU-CAT-37` — Crear estado de cumplimiento
+
+```mermaid
+flowchart LR
+    request["Administrador captura una nueva entrada de Estados de cumplimiento"] --> authorize["Nexus valida catalogs:manage y fulfillment-statuses"]
+    authorize --> persist["Validar campos y crear estado de cumplimiento"]
+    persist --> result["Confirmar y refrescar Estados de cumplimiento"]
+```
+
+#### `CU-CAT-38` — Editar estado de cumplimiento
+
+```mermaid
+flowchart LR
+    request["Administrador edita una entrada de Estados de cumplimiento"] --> authorize["Nexus valida catalogs:manage y fulfillment-statuses"]
+    authorize --> persist["Validar campos y actualizar estado de cumplimiento"]
+    persist --> result["Confirmar y refrescar Estados de cumplimiento"]
+```
+
 ### Grupo funcional ENT — Compras de material
 
 #### `CU-ENT-01` — Consultar compras de material
@@ -741,7 +897,7 @@ el código.
 | Compleja | `CU-SAL-05`, `CU-SAL-06`, `CU-SAL-11`, `CU-SAL-12` | Acumulados, estados, existencias y movimientos dependen de cantidades previas. | Máquina de estados ya incluida en este documento. |
 | Compleja | `CU-REP-03` a `CU-REP-05` y `CU-REP-08` a `CU-REP-15` | Filtros, variantes mensual/detallada, fórmulas, totales y archivo deben conservar el mismo resultado de dominio. | Canal de generación de reportes incluido abajo. |
 | Intermedia | `CU-CAT-02`, `CU-CAT-03`, `CU-CAT-07`, `CU-CAT-08`, `CU-CAT-11`, `CU-CAT-12`, `CU-CAT-14`, `CU-CAT-15`, `CU-ENT-03`, `CU-SAL-02` a `CU-SAL-04` y `CU-SAL-08` a `CU-SAL-10` | Coordinan relaciones o detalles, pero no agregan participantes o estados que justifiquen una secuencia transaccional. | Flujo funcional en su grupo y vista técnica complementaria incluida abajo. |
-| Directa | `CU-IDA-01` a `CU-IDA-03`, `CU-CAT-01`, `CU-CAT-06`, `CU-CAT-10`, `CU-CAT-13`, `CU-CAT-17` a `CU-CAT-20`, `CU-ENT-01`, `CU-SAL-01`, `CU-SAL-07`, `CU-REP-01`, `CU-REP-02`, `CU-REP-06` y `CU-REP-07` | Consulta o mutación directa sin estados coordinados adicionales. | Flujo funcional en su grupo y vista técnica complementaria incluida abajo. |
+| Directa | `CU-IDA-01` a `CU-IDA-03`, `CU-CAT-01`, `CU-CAT-06`, `CU-CAT-10`, `CU-CAT-13`, `CU-CAT-17` a `CU-CAT-38`, `CU-ENT-01`, `CU-SAL-01`, `CU-SAL-07`, `CU-REP-01`, `CU-REP-02`, `CU-REP-06` y `CU-REP-07` | Consulta o mutación directa sin estados coordinados adicionales. | Flujo funcional en su grupo y vista técnica complementaria incluida abajo. |
 
 Las vistas siguientes completan los casos de coordinación intermedia y directa con el
 mismo criterio aplicado a los casos de coordinación compleja: muestran la ejecución
@@ -825,7 +981,7 @@ La secuencia hace visible que la existencia y la identidad no se confían al for
 No muestra componentes EJS ni refresco de DataTable porque pertenecen a la presentación,
 no a la actualización de dominio.
 
-### Patrón de consulta de catálogos — `CU-CAT-01`, `CU-CAT-06`, `CU-CAT-10`, `CU-CAT-13` y `CU-CAT-17` a `CU-CAT-20`
+### Patrón de consulta de catálogos — `CU-CAT-01`, `CU-CAT-06`, `CU-CAT-10`, `CU-CAT-13` y `CU-CAT-17` a `CU-CAT-20`; `CU-CAT-21`, `CU-CAT-24`, `CU-CAT-27`, `CU-CAT-30`, `CU-CAT-33` y `CU-CAT-36`
 
 ```mermaid
 flowchart LR
@@ -840,7 +996,7 @@ La fábrica de listado se reutiliza cuando el recurso la configura; el diagrama 
 que todos los catálogos compartan filtros o permisos. Los routers y servicios concretos
 siguen siendo las fuentes verificables de cada variante.
 
-### Patrón de alta de catálogos — `CU-CAT-02`, `CU-CAT-07`, `CU-CAT-11` y `CU-CAT-14`
+### Patrón de alta de catálogos — `CU-CAT-02`, `CU-CAT-07`, `CU-CAT-11`, `CU-CAT-14`, `CU-CAT-22`, `CU-CAT-25`, `CU-CAT-28`, `CU-CAT-31`, `CU-CAT-34` y `CU-CAT-37`
 
 ```mermaid
 flowchart LR
@@ -850,11 +1006,10 @@ flowchart LR
     catalogCreateDb --> catalogCreateUi["Respuesta y refresco CRUD"]
 ```
 
-Cliente, proveedor, material, merma y catálogos auxiliares recorren capas equivalentes,
-pero sus relaciones y reglas no se trasladan a una fábrica común. El refresco final es
+Cliente, proveedor, material, merma y catálogos auxiliares recorren capas equivalentes. Los catálogos auxiliares reutilizan su registro con lista blanca; las relaciones y reglas de los demás recursos no se trasladan a esa configuración. El refresco final es
 una reacción de `createCrudApplication`, no parte de la transacción de persistencia.
 
-### Patrón de edición de catálogos — `CU-CAT-03`, `CU-CAT-08`, `CU-CAT-12` y `CU-CAT-15`
+### Patrón de edición de catálogos — `CU-CAT-03`, `CU-CAT-08`, `CU-CAT-12`, `CU-CAT-15`, `CU-CAT-23`, `CU-CAT-26`, `CU-CAT-29`, `CU-CAT-32`, `CU-CAT-35` y `CU-CAT-38`
 
 ```mermaid
 flowchart LR

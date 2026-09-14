@@ -174,11 +174,29 @@ flowchart LR
             ucWasteEdit(["CU-CAT-15 Editar merma"])
             ucWasteStock(["CU-CAT-16 Ajustar existencia de merma"])
         end
-        subgraph auxiliaryCatalogFamily["Catálogos auxiliares de sólo lectura"]
+        subgraph auxiliaryCatalogFamily["Catálogos auxiliares"]
             ucPresentationQuery(["CU-CAT-17 Consultar presentaciones"])
             ucUnitQuery(["CU-CAT-18 Consultar unidades de medida"])
             ucAdjustmentReasonQuery(["CU-CAT-19 Consultar motivos de ajuste"])
             ucFulfillmentStatusQuery(["CU-CAT-20 Consultar estados de cumplimiento"])
+            ucCatalog21(["CU-CAT-21 Consultar área"])
+            ucCatalog22(["CU-CAT-22 Crear área"])
+            ucCatalog23(["CU-CAT-23 Editar área"])
+            ucCatalog24(["CU-CAT-24 Consultar rol"])
+            ucCatalog25(["CU-CAT-25 Crear rol"])
+            ucCatalog26(["CU-CAT-26 Editar rol"])
+            ucCatalog27(["CU-CAT-27 Consultar presentación"])
+            ucCatalog28(["CU-CAT-28 Crear presentación"])
+            ucCatalog29(["CU-CAT-29 Editar presentación"])
+            ucCatalog30(["CU-CAT-30 Consultar unidad de medida"])
+            ucCatalog31(["CU-CAT-31 Crear unidad de medida"])
+            ucCatalog32(["CU-CAT-32 Editar unidad de medida"])
+            ucCatalog33(["CU-CAT-33 Consultar motivo de ajuste"])
+            ucCatalog34(["CU-CAT-34 Crear motivo de ajuste"])
+            ucCatalog35(["CU-CAT-35 Editar motivo de ajuste"])
+            ucCatalog36(["CU-CAT-36 Consultar estado de cumplimiento"])
+            ucCatalog37(["CU-CAT-37 Crear estado de cumplimiento"])
+            ucCatalog38(["CU-CAT-38 Editar estado de cumplimiento"])
         end
     end
 
@@ -193,6 +211,12 @@ flowchart LR
     admin --- ucClientQuery
     admin --- ucMaterialStock
     admin --- ucWasteStock
+    admin --- ucCatalog21
+    admin --- ucCatalog24
+    admin --- ucCatalog27
+    admin --- ucCatalog30
+    admin --- ucCatalog33
+    admin --- ucCatalog36
     ucMaterialQuery --- ucMaterialCreate
     ucMaterialQuery --- ucMaterialEdit
     ucMaterialQuery --- ucMaterialRemove
@@ -205,13 +229,25 @@ flowchart LR
     ucWasteQuery --- ucWasteCreate
     ucWasteQuery --- ucWasteEdit
     ucWasteStock -. "«extend»" .-> ucWasteQuery
+    ucCatalog21 --- ucCatalog22
+    ucCatalog21 --- ucCatalog23
+    ucCatalog24 --- ucCatalog25
+    ucCatalog24 --- ucCatalog26
+    ucCatalog27 --- ucCatalog28
+    ucCatalog27 --- ucCatalog29
+    ucCatalog30 --- ucCatalog31
+    ucCatalog30 --- ucCatalog32
+    ucCatalog33 --- ucCatalog34
+    ucCatalog33 --- ucCatalog35
+    ucCatalog36 --- ucCatalog37
+    ucCatalog36 --- ucCatalog38
 ```
 
 Los ajustes se muestran como extensiones porque el administrador los abre como una
 acción opcional desde la consulta de materiales o mermas; consultar el inventario no
 obliga a ejecutar un ajuste. La asociación exclusiva con el administrador refleja los
 permisos `materials:adjust-stock` y `wastes:adjust-stock`. El personal de almacén puede
-consultar ambos listados, pero no hereda esas dos asociaciones restringidas.
+consultar ambos listados, pero no hereda esas dos asociaciones restringidas. La administración de **Áreas**, **Roles**, **Presentaciones**, **Unidades de medida**, **Motivos de ajuste** y **Estados de cumplimiento** también se asocia directamente con el administrador: no se hereda hacia Almacén y exige `catalogs:manage` en cada vista y solicitud API.
 
 ### Grupo funcional ENT — Compras de material
 

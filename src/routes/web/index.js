@@ -13,6 +13,7 @@ import personWebRoutes from './admin/personWebRoute.js';
 import clientWebRoutes from './sales/clientWebRoute.js';
 import supplierWebRoutes from './warehouse/supplierWebRoute.js';
 import movementWebRoutes from './admin/movementWebRoute.js';
+import catalogWebRoutes from './admin/catalogWebRoute.js';
 
 const WEB_ROUTES = [
     ['/', homeWebRoutes],
@@ -29,7 +30,8 @@ const WEB_ROUTES = [
     ['/personas', personWebRoutes],
     ['/clientes', clientWebRoutes],
     ['/proveedores', supplierWebRoutes],
-    ['/movimientos', movementWebRoutes]
+    ['/movimientos', movementWebRoutes],
+    ['/catalogos', catalogWebRoutes]
 ];
 
 const WEB_REDIRECTS = [

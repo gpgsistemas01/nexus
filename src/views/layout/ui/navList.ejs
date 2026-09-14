@@ -17,6 +17,7 @@ const items = [
         icon: 'fa-solid fa-warehouse',
         children: [
             createNavLink({ content: 'Materiales', icon: 'fa-solid fa-boxes-stacked', href: '/almacen/materiales', permission: 'materials:read' }),
+            createNavLink({ content: 'Consumibles', icon: 'fa-solid fa-box', href: '/almacen/consumibles', permission: 'materials:read' }),
             createNavLink({ content: 'Mermas', icon: 'fa-solid fa-recycle', href: '/almacen/mermas', permission: 'wastes:page-view' })
         ]
     },
@@ -38,6 +39,18 @@ const items = [
         ]
     },
     createNavLink({ content: 'Usuarios', icon: 'fa-solid fa-users-gear', href: '/usuarios-sistemas', permission: 'users:manage' }),
+    {
+        content: 'Catálogos',
+        icon: 'fa-solid fa-list',
+        children: [
+            createNavLink({ content: 'Áreas', icon: 'fa-solid fa-building', href: '/catalogos/departments', permission: 'catalogs:manage' }),
+            createNavLink({ content: 'Roles', icon: 'fa-solid fa-user-tag', href: '/catalogos/roles', permission: 'catalogs:manage' }),
+            createNavLink({ content: 'Presentaciones', icon: 'fa-solid fa-box-open', href: '/catalogos/presentations', permission: 'catalogs:manage' }),
+            createNavLink({ content: 'Unidades de medida', icon: 'fa-solid fa-ruler', href: '/catalogos/unit-measures', permission: 'catalogs:manage' }),
+            createNavLink({ content: 'Motivos de ajuste', icon: 'fa-solid fa-clipboard-list', href: '/catalogos/reasons', permission: 'catalogs:manage' }),
+            createNavLink({ content: 'Estados de cumplimiento', icon: 'fa-solid fa-list-check', href: '/catalogos/fulfillment-statuses', permission: 'catalogs:manage' })
+        ]
+    },
     createNavLink({ content: 'Personas', icon: 'fa-solid fa-id-badge', href: '/personas', permission: 'persons:page-view' }),
     createNavLink({ content: 'Clientes', icon: 'fa-solid fa-address-book', href: '/clientes', permission: 'clients:page-view' }),
     createNavLink({ content: 'Proveedores', icon: 'fa-solid fa-truck-fast', href: '/proveedores', permission: 'suppliers:page-view' })

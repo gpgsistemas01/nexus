@@ -94,4 +94,5 @@ Cada guía de actor funciona como punto de entrada y enlaza únicamente los grup
 
 - [Administrador del sistema](actors/administrator.md).
 - [Personal de almacén](actors/warehouse.md).
-- [Usuario de consultas y reportes](actors/reporting.md).
+Los reportes se incluyen en el manual del actor que puede abrir el módulo; no se mantiene
+un manual global que mezcle capacidades incompatibles.

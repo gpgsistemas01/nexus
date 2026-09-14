@@ -658,3 +658,546 @@ sequenceDiagram
     end
     deactivate Controller
 ```
+
+
+
+
+<a id="cu-cat-21"></a>
+## `CU-CAT-21` — Consultar área
+
+**Patrones:** `BE-P02`.
+
+```mermaid
+sequenceDiagram
+    participant Client as Cliente HTTP / web
+    participant Route as src/routes/api/admin/catalogApiRoute.js
+    participant Controller@{ "type": "control" } as src/controllers/api/admin/catalogController.js
+    participant Domain as src/services/admin/catalogService.js
+    Note over Controller,Domain: Variables de frontera: req.params.catalog
+
+    Client->>Route: GET /api/admin/catalogs/departments
+    Route->>Route: ejecutar en orden el middleware configurado para la ruta
+    Route->>Controller: getAllCatalogEntries(req, res)
+    activate Controller
+    Controller->>Domain: findAllCatalogEntries(req.params.catalog) consulta el modelo permitido por la lista blanca
+    activate Domain
+    Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
+    Domain-->>Controller: resultado del servicio o error de dominio tipado
+    deactivate Domain
+    alt El servicio devuelve el resultado
+        Controller-->>Client: status HTTP y cuerpo concretos del controller
+    else El servicio propaga un error de dominio
+        Controller-->>Client: error entregado al middleware final para su respuesta HTTP
+    end
+    deactivate Controller
+```
+
+<a id="cu-cat-22"></a>
+## `CU-CAT-22` — Crear área
+
+**Patrones:** `BE-P02`.
+
+```mermaid
+sequenceDiagram
+    participant Client as Cliente HTTP / web
+    participant Route as src/routes/api/admin/catalogApiRoute.js
+    participant Controller@{ "type": "control" } as src/controllers/api/admin/catalogController.js
+    participant Domain as src/services/admin/catalogService.js
+    Note over Controller,Domain: Variables de frontera: req.params.catalog/req.body
+
+    Client->>Route: POST /api/admin/catalogs/departments
+    Route->>Route: ejecutar en orden el middleware configurado para la ruta
+    Route->>Controller: registerCatalogEntry(req, res)
+    activate Controller
+    Controller->>Domain: createCatalogEntry(req.params.catalog/req.body) normaliza y crea únicamente los campos permitidos
+    activate Domain
+    Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
+    Domain-->>Controller: resultado del servicio o error de dominio tipado
+    deactivate Domain
+    alt El servicio devuelve el resultado
+        Controller-->>Client: status HTTP y cuerpo concretos del controller
+    else El servicio propaga un error de dominio
+        Controller-->>Client: error entregado al middleware final para su respuesta HTTP
+    end
+    deactivate Controller
+```
+
+<a id="cu-cat-23"></a>
+## `CU-CAT-23` — Editar área
+
+**Patrones:** `BE-P02`.
+
+```mermaid
+sequenceDiagram
+    participant Client as Cliente HTTP / web
+    participant Route as src/routes/api/admin/catalogApiRoute.js
+    participant Controller@{ "type": "control" } as src/controllers/api/admin/catalogController.js
+    participant Domain as src/services/admin/catalogService.js
+    Note over Controller,Domain: Variables de frontera: req.params.catalog/req.params.id/req.body
+
+    Client->>Route: PUT /api/admin/catalogs/departments/:id
+    Route->>Route: ejecutar en orden el middleware configurado para la ruta
+    Route->>Controller: editCatalogEntry(req, res)
+    activate Controller
+    Controller->>Domain: updateCatalogEntry(req.params.catalog/req.params.id/req.body) normaliza y actualiza únicamente los campos permitidos
+    activate Domain
+    Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
+    Domain-->>Controller: resultado del servicio o error de dominio tipado
+    deactivate Domain
+    alt El servicio devuelve el resultado
+        Controller-->>Client: status HTTP y cuerpo concretos del controller
+    else El servicio propaga un error de dominio
+        Controller-->>Client: error entregado al middleware final para su respuesta HTTP
+    end
+    deactivate Controller
+```
+
+<a id="cu-cat-24"></a>
+## `CU-CAT-24` — Consultar rol
+
+**Patrones:** `BE-P02`.
+
+```mermaid
+sequenceDiagram
+    participant Client as Cliente HTTP / web
+    participant Route as src/routes/api/admin/catalogApiRoute.js
+    participant Controller@{ "type": "control" } as src/controllers/api/admin/catalogController.js
+    participant Domain as src/services/admin/catalogService.js
+    Note over Controller,Domain: Variables de frontera: req.params.catalog
+
+    Client->>Route: GET /api/admin/catalogs/roles
+    Route->>Route: ejecutar en orden el middleware configurado para la ruta
+    Route->>Controller: getAllCatalogEntries(req, res)
+    activate Controller
+    Controller->>Domain: findAllCatalogEntries(req.params.catalog) consulta el modelo permitido por la lista blanca
+    activate Domain
+    Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
+    Domain-->>Controller: resultado del servicio o error de dominio tipado
+    deactivate Domain
+    alt El servicio devuelve el resultado
+        Controller-->>Client: status HTTP y cuerpo concretos del controller
+    else El servicio propaga un error de dominio
+        Controller-->>Client: error entregado al middleware final para su respuesta HTTP
+    end
+    deactivate Controller
+```
+
+<a id="cu-cat-25"></a>
+## `CU-CAT-25` — Crear rol
+
+**Patrones:** `BE-P02`.
+
+```mermaid
+sequenceDiagram
+    participant Client as Cliente HTTP / web
+    participant Route as src/routes/api/admin/catalogApiRoute.js
+    participant Controller@{ "type": "control" } as src/controllers/api/admin/catalogController.js
+    participant Domain as src/services/admin/catalogService.js
+    Note over Controller,Domain: Variables de frontera: req.params.catalog/req.body
+
+    Client->>Route: POST /api/admin/catalogs/roles
+    Route->>Route: ejecutar en orden el middleware configurado para la ruta
+    Route->>Controller: registerCatalogEntry(req, res)
+    activate Controller
+    Controller->>Domain: createCatalogEntry(req.params.catalog/req.body) normaliza y crea únicamente los campos permitidos
+    activate Domain
+    Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
+    Domain-->>Controller: resultado del servicio o error de dominio tipado
+    deactivate Domain
+    alt El servicio devuelve el resultado
+        Controller-->>Client: status HTTP y cuerpo concretos del controller
+    else El servicio propaga un error de dominio
+        Controller-->>Client: error entregado al middleware final para su respuesta HTTP
+    end
+    deactivate Controller
+```
+
+<a id="cu-cat-26"></a>
+## `CU-CAT-26` — Editar rol
+
+**Patrones:** `BE-P02`.
+
+```mermaid
+sequenceDiagram
+    participant Client as Cliente HTTP / web
+    participant Route as src/routes/api/admin/catalogApiRoute.js
+    participant Controller@{ "type": "control" } as src/controllers/api/admin/catalogController.js
+    participant Domain as src/services/admin/catalogService.js
+    Note over Controller,Domain: Variables de frontera: req.params.catalog/req.params.id/req.body
+
+    Client->>Route: PUT /api/admin/catalogs/roles/:id
+    Route->>Route: ejecutar en orden el middleware configurado para la ruta
+    Route->>Controller: editCatalogEntry(req, res)
+    activate Controller
+    Controller->>Domain: updateCatalogEntry(req.params.catalog/req.params.id/req.body) normaliza y actualiza únicamente los campos permitidos
+    activate Domain
+    Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
+    Domain-->>Controller: resultado del servicio o error de dominio tipado
+    deactivate Domain
+    alt El servicio devuelve el resultado
+        Controller-->>Client: status HTTP y cuerpo concretos del controller
+    else El servicio propaga un error de dominio
+        Controller-->>Client: error entregado al middleware final para su respuesta HTTP
+    end
+    deactivate Controller
+```
+
+<a id="cu-cat-27"></a>
+## `CU-CAT-27` — Consultar presentación
+
+**Patrones:** `BE-P02`.
+
+```mermaid
+sequenceDiagram
+    participant Client as Cliente HTTP / web
+    participant Route as src/routes/api/admin/catalogApiRoute.js
+    participant Controller@{ "type": "control" } as src/controllers/api/admin/catalogController.js
+    participant Domain as src/services/admin/catalogService.js
+    Note over Controller,Domain: Variables de frontera: req.params.catalog
+
+    Client->>Route: GET /api/admin/catalogs/presentations
+    Route->>Route: ejecutar en orden el middleware configurado para la ruta
+    Route->>Controller: getAllCatalogEntries(req, res)
+    activate Controller
+    Controller->>Domain: findAllCatalogEntries(req.params.catalog) consulta el modelo permitido por la lista blanca
+    activate Domain
+    Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
+    Domain-->>Controller: resultado del servicio o error de dominio tipado
+    deactivate Domain
+    alt El servicio devuelve el resultado
+        Controller-->>Client: status HTTP y cuerpo concretos del controller
+    else El servicio propaga un error de dominio
+        Controller-->>Client: error entregado al middleware final para su respuesta HTTP
+    end
+    deactivate Controller
+```
+
+<a id="cu-cat-28"></a>
+## `CU-CAT-28` — Crear presentación
+
+**Patrones:** `BE-P02`.
+
+```mermaid
+sequenceDiagram
+    participant Client as Cliente HTTP / web
+    participant Route as src/routes/api/admin/catalogApiRoute.js
+    participant Controller@{ "type": "control" } as src/controllers/api/admin/catalogController.js
+    participant Domain as src/services/admin/catalogService.js
+    Note over Controller,Domain: Variables de frontera: req.params.catalog/req.body
+
+    Client->>Route: POST /api/admin/catalogs/presentations
+    Route->>Route: ejecutar en orden el middleware configurado para la ruta
+    Route->>Controller: registerCatalogEntry(req, res)
+    activate Controller
+    Controller->>Domain: createCatalogEntry(req.params.catalog/req.body) normaliza y crea únicamente los campos permitidos
+    activate Domain
+    Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
+    Domain-->>Controller: resultado del servicio o error de dominio tipado
+    deactivate Domain
+    alt El servicio devuelve el resultado
+        Controller-->>Client: status HTTP y cuerpo concretos del controller
+    else El servicio propaga un error de dominio
+        Controller-->>Client: error entregado al middleware final para su respuesta HTTP
+    end
+    deactivate Controller
+```
+
+<a id="cu-cat-29"></a>
+## `CU-CAT-29` — Editar presentación
+
+**Patrones:** `BE-P02`.
+
+```mermaid
+sequenceDiagram
+    participant Client as Cliente HTTP / web
+    participant Route as src/routes/api/admin/catalogApiRoute.js
+    participant Controller@{ "type": "control" } as src/controllers/api/admin/catalogController.js
+    participant Domain as src/services/admin/catalogService.js
+    Note over Controller,Domain: Variables de frontera: req.params.catalog/req.params.id/req.body
+
+    Client->>Route: PUT /api/admin/catalogs/presentations/:id
+    Route->>Route: ejecutar en orden el middleware configurado para la ruta
+    Route->>Controller: editCatalogEntry(req, res)
+    activate Controller
+    Controller->>Domain: updateCatalogEntry(req.params.catalog/req.params.id/req.body) normaliza y actualiza únicamente los campos permitidos
+    activate Domain
+    Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
+    Domain-->>Controller: resultado del servicio o error de dominio tipado
+    deactivate Domain
+    alt El servicio devuelve el resultado
+        Controller-->>Client: status HTTP y cuerpo concretos del controller
+    else El servicio propaga un error de dominio
+        Controller-->>Client: error entregado al middleware final para su respuesta HTTP
+    end
+    deactivate Controller
+```
+
+<a id="cu-cat-30"></a>
+## `CU-CAT-30` — Consultar unidad de medida
+
+**Patrones:** `BE-P02`.
+
+```mermaid
+sequenceDiagram
+    participant Client as Cliente HTTP / web
+    participant Route as src/routes/api/admin/catalogApiRoute.js
+    participant Controller@{ "type": "control" } as src/controllers/api/admin/catalogController.js
+    participant Domain as src/services/admin/catalogService.js
+    Note over Controller,Domain: Variables de frontera: req.params.catalog
+
+    Client->>Route: GET /api/admin/catalogs/unit-measures
+    Route->>Route: ejecutar en orden el middleware configurado para la ruta
+    Route->>Controller: getAllCatalogEntries(req, res)
+    activate Controller
+    Controller->>Domain: findAllCatalogEntries(req.params.catalog) consulta el modelo permitido por la lista blanca
+    activate Domain
+    Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
+    Domain-->>Controller: resultado del servicio o error de dominio tipado
+    deactivate Domain
+    alt El servicio devuelve el resultado
+        Controller-->>Client: status HTTP y cuerpo concretos del controller
+    else El servicio propaga un error de dominio
+        Controller-->>Client: error entregado al middleware final para su respuesta HTTP
+    end
+    deactivate Controller
+```
+
+<a id="cu-cat-31"></a>
+## `CU-CAT-31` — Crear unidad de medida
+
+**Patrones:** `BE-P02`.
+
+```mermaid
+sequenceDiagram
+    participant Client as Cliente HTTP / web
+    participant Route as src/routes/api/admin/catalogApiRoute.js
+    participant Controller@{ "type": "control" } as src/controllers/api/admin/catalogController.js
+    participant Domain as src/services/admin/catalogService.js
+    Note over Controller,Domain: Variables de frontera: req.params.catalog/req.body
+
+    Client->>Route: POST /api/admin/catalogs/unit-measures
+    Route->>Route: ejecutar en orden el middleware configurado para la ruta
+    Route->>Controller: registerCatalogEntry(req, res)
+    activate Controller
+    Controller->>Domain: createCatalogEntry(req.params.catalog/req.body) normaliza y crea únicamente los campos permitidos
+    activate Domain
+    Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
+    Domain-->>Controller: resultado del servicio o error de dominio tipado
+    deactivate Domain
+    alt El servicio devuelve el resultado
+        Controller-->>Client: status HTTP y cuerpo concretos del controller
+    else El servicio propaga un error de dominio
+        Controller-->>Client: error entregado al middleware final para su respuesta HTTP
+    end
+    deactivate Controller
+```
+
+<a id="cu-cat-32"></a>
+## `CU-CAT-32` — Editar unidad de medida
+
+**Patrones:** `BE-P02`.
+
+```mermaid
+sequenceDiagram
+    participant Client as Cliente HTTP / web
+    participant Route as src/routes/api/admin/catalogApiRoute.js
+    participant Controller@{ "type": "control" } as src/controllers/api/admin/catalogController.js
+    participant Domain as src/services/admin/catalogService.js
+    Note over Controller,Domain: Variables de frontera: req.params.catalog/req.params.id/req.body
+
+    Client->>Route: PUT /api/admin/catalogs/unit-measures/:id
+    Route->>Route: ejecutar en orden el middleware configurado para la ruta
+    Route->>Controller: editCatalogEntry(req, res)
+    activate Controller
+    Controller->>Domain: updateCatalogEntry(req.params.catalog/req.params.id/req.body) normaliza y actualiza únicamente los campos permitidos
+    activate Domain
+    Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
+    Domain-->>Controller: resultado del servicio o error de dominio tipado
+    deactivate Domain
+    alt El servicio devuelve el resultado
+        Controller-->>Client: status HTTP y cuerpo concretos del controller
+    else El servicio propaga un error de dominio
+        Controller-->>Client: error entregado al middleware final para su respuesta HTTP
+    end
+    deactivate Controller
+```
+
+<a id="cu-cat-33"></a>
+## `CU-CAT-33` — Consultar motivo de ajuste
+
+**Patrones:** `BE-P02`.
+
+```mermaid
+sequenceDiagram
+    participant Client as Cliente HTTP / web
+    participant Route as src/routes/api/admin/catalogApiRoute.js
+    participant Controller@{ "type": "control" } as src/controllers/api/admin/catalogController.js
+    participant Domain as src/services/admin/catalogService.js
+    Note over Controller,Domain: Variables de frontera: req.params.catalog
+
+    Client->>Route: GET /api/admin/catalogs/reasons
+    Route->>Route: ejecutar en orden el middleware configurado para la ruta
+    Route->>Controller: getAllCatalogEntries(req, res)
+    activate Controller
+    Controller->>Domain: findAllCatalogEntries(req.params.catalog) consulta el modelo permitido por la lista blanca
+    activate Domain
+    Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
+    Domain-->>Controller: resultado del servicio o error de dominio tipado
+    deactivate Domain
+    alt El servicio devuelve el resultado
+        Controller-->>Client: status HTTP y cuerpo concretos del controller
+    else El servicio propaga un error de dominio
+        Controller-->>Client: error entregado al middleware final para su respuesta HTTP
+    end
+    deactivate Controller
+```
+
+<a id="cu-cat-34"></a>
+## `CU-CAT-34` — Crear motivo de ajuste
+
+**Patrones:** `BE-P02`.
+
+```mermaid
+sequenceDiagram
+    participant Client as Cliente HTTP / web
+    participant Route as src/routes/api/admin/catalogApiRoute.js
+    participant Controller@{ "type": "control" } as src/controllers/api/admin/catalogController.js
+    participant Domain as src/services/admin/catalogService.js
+    Note over Controller,Domain: Variables de frontera: req.params.catalog/req.body
+
+    Client->>Route: POST /api/admin/catalogs/reasons
+    Route->>Route: ejecutar en orden el middleware configurado para la ruta
+    Route->>Controller: registerCatalogEntry(req, res)
+    activate Controller
+    Controller->>Domain: createCatalogEntry(req.params.catalog/req.body) normaliza y crea únicamente los campos permitidos
+    activate Domain
+    Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
+    Domain-->>Controller: resultado del servicio o error de dominio tipado
+    deactivate Domain
+    alt El servicio devuelve el resultado
+        Controller-->>Client: status HTTP y cuerpo concretos del controller
+    else El servicio propaga un error de dominio
+        Controller-->>Client: error entregado al middleware final para su respuesta HTTP
+    end
+    deactivate Controller
+```
+
+<a id="cu-cat-35"></a>
+## `CU-CAT-35` — Editar motivo de ajuste
+
+**Patrones:** `BE-P02`.
+
+```mermaid
+sequenceDiagram
+    participant Client as Cliente HTTP / web
+    participant Route as src/routes/api/admin/catalogApiRoute.js
+    participant Controller@{ "type": "control" } as src/controllers/api/admin/catalogController.js
+    participant Domain as src/services/admin/catalogService.js
+    Note over Controller,Domain: Variables de frontera: req.params.catalog/req.params.id/req.body
+
+    Client->>Route: PUT /api/admin/catalogs/reasons/:id
+    Route->>Route: ejecutar en orden el middleware configurado para la ruta
+    Route->>Controller: editCatalogEntry(req, res)
+    activate Controller
+    Controller->>Domain: updateCatalogEntry(req.params.catalog/req.params.id/req.body) normaliza y actualiza únicamente los campos permitidos
+    activate Domain
+    Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
+    Domain-->>Controller: resultado del servicio o error de dominio tipado
+    deactivate Domain
+    alt El servicio devuelve el resultado
+        Controller-->>Client: status HTTP y cuerpo concretos del controller
+    else El servicio propaga un error de dominio
+        Controller-->>Client: error entregado al middleware final para su respuesta HTTP
+    end
+    deactivate Controller
+```
+
+<a id="cu-cat-36"></a>
+## `CU-CAT-36` — Consultar estado de cumplimiento
+
+**Patrones:** `BE-P02`.
+
+```mermaid
+sequenceDiagram
+    participant Client as Cliente HTTP / web
+    participant Route as src/routes/api/admin/catalogApiRoute.js
+    participant Controller@{ "type": "control" } as src/controllers/api/admin/catalogController.js
+    participant Domain as src/services/admin/catalogService.js
+    Note over Controller,Domain: Variables de frontera: req.params.catalog
+
+    Client->>Route: GET /api/admin/catalogs/fulfillment-statuses
+    Route->>Route: ejecutar en orden el middleware configurado para la ruta
+    Route->>Controller: getAllCatalogEntries(req, res)
+    activate Controller
+    Controller->>Domain: findAllCatalogEntries(req.params.catalog) consulta el modelo permitido por la lista blanca
+    activate Domain
+    Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
+    Domain-->>Controller: resultado del servicio o error de dominio tipado
+    deactivate Domain
+    alt El servicio devuelve el resultado
+        Controller-->>Client: status HTTP y cuerpo concretos del controller
+    else El servicio propaga un error de dominio
+        Controller-->>Client: error entregado al middleware final para su respuesta HTTP
+    end
+    deactivate Controller
+```
+
+<a id="cu-cat-37"></a>
+## `CU-CAT-37` — Crear estado de cumplimiento
+
+**Patrones:** `BE-P02`.
+
+```mermaid
+sequenceDiagram
+    participant Client as Cliente HTTP / web
+    participant Route as src/routes/api/admin/catalogApiRoute.js
+    participant Controller@{ "type": "control" } as src/controllers/api/admin/catalogController.js
+    participant Domain as src/services/admin/catalogService.js
+    Note over Controller,Domain: Variables de frontera: req.params.catalog/req.body
+
+    Client->>Route: POST /api/admin/catalogs/fulfillment-statuses
+    Route->>Route: ejecutar en orden el middleware configurado para la ruta
+    Route->>Controller: registerCatalogEntry(req, res)
+    activate Controller
+    Controller->>Domain: createCatalogEntry(req.params.catalog/req.body) normaliza y crea únicamente los campos permitidos
+    activate Domain
+    Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
+    Domain-->>Controller: resultado del servicio o error de dominio tipado
+    deactivate Domain
+    alt El servicio devuelve el resultado
+        Controller-->>Client: status HTTP y cuerpo concretos del controller
+    else El servicio propaga un error de dominio
+        Controller-->>Client: error entregado al middleware final para su respuesta HTTP
+    end
+    deactivate Controller
+```
+
+<a id="cu-cat-38"></a>
+## `CU-CAT-38` — Editar estado de cumplimiento
+
+**Patrones:** `BE-P02`.
+
+```mermaid
+sequenceDiagram
+    participant Client as Cliente HTTP / web
+    participant Route as src/routes/api/admin/catalogApiRoute.js
+    participant Controller@{ "type": "control" } as src/controllers/api/admin/catalogController.js
+    participant Domain as src/services/admin/catalogService.js
+    Note over Controller,Domain: Variables de frontera: req.params.catalog/req.params.id/req.body
+
+    Client->>Route: PUT /api/admin/catalogs/fulfillment-statuses/:id
+    Route->>Route: ejecutar en orden el middleware configurado para la ruta
+    Route->>Controller: editCatalogEntry(req, res)
+    activate Controller
+    Controller->>Domain: updateCatalogEntry(req.params.catalog/req.params.id/req.body) normaliza y actualiza únicamente los campos permitidos
+    activate Domain
+    Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
+    Domain-->>Controller: resultado del servicio o error de dominio tipado
+    deactivate Domain
+    alt El servicio devuelve el resultado
+        Controller-->>Client: status HTTP y cuerpo concretos del controller
+    else El servicio propaga un error de dominio
+        Controller-->>Client: error entregado al middleware final para su respuesta HTTP
+    end
+    deactivate Controller
+```

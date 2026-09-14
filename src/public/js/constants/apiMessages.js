@@ -82,6 +82,13 @@ export const errorMessages = {
 
     DEPARTMENTS_REQUIRED: 'Los departamentos son requeridos.',
     DEPARTMENTS_INVALID_FORMAT: 'Los departamentos seleccionados no son válidos.',
+    CATALOG_NOT_FOUND: meta => `El catálogo ${ meta.catalogName || 'solicitado' } no está disponible.`,
+    CATALOG_ENTRY_NOT_FOUND: meta => `El registro de ${ meta.catalogLabel || 'Catálogos' } no está disponible.`,
+    CATALOG_VALIDATION_ERROR: meta => `Revise los campos obligatorios de ${ meta.catalogLabel || 'Catálogos' }.`,
+    PERSON_ACCESSES_REQUIRED: 'Seleccione un área y un rol, y agréguelos a la tabla antes de guardar.',
+    PERSON_ACCESSES_DUPLICATE_DEPARTMENT: 'Elimine el área repetida; cada área sólo puede tener un rol para la persona.',
+    PERSON_ACCESSES_INVALID_DEPARTMENT: 'Revise los accesos y vuelva a seleccionar el área que ya no sea válida.',
+    PERSON_ACCESSES_INVALID_ROLE: 'Revise los accesos y vuelva a seleccionar el rol que ya no sea válido.',
 
     // 👤 USERNAME
     USERNAME_REQUIRED: 'El nombre de usuario es requerido.',
@@ -298,10 +305,12 @@ const successMessages = {
     CREATED_GOODS_ISSUE: '¡Salida de almacén creada exitosamente!',
     UPDATED_GOODS_ISSUE: '¡Salida de almacén actualizada exitosamente!',
     CREATED_CLIENT: '¡Cliente creado exitosamente!',
+    CREATED_CATALOG_ENTRY: '¡Entrada de catálogo creada exitosamente!',
     CREATED_USER: '¡Usuario creado exitosamente!',
     UPDATED_USER: '¡Usuario actualizado exitosamente!',
     UPDATED_USER_PASSWORD: '¡Contraseña actualizada exitosamente!',
     UPDATED_CLIENT: '¡Cliente actualizado exitosamente!',
+    UPDATED_CATALOG_ENTRY: '¡Entrada de catálogo actualizada exitosamente!',
     CREATED_WASTE: '¡Merma registrada exitosamente!',
     UPDATED_WASTE: '¡Merma actualizada exitosamente!',
     DELETED_WASTE: '¡Merma eliminada exitosamente!',

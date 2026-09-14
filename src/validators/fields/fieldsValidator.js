@@ -62,6 +62,21 @@ export const validateText = ({ fieldName, maxLength }) =>
         .matches(genericRegex).withMessage(errorMap['name'].INVALID_FORMAT)
 ;
 
+export const validateTextWhen = ({ fieldName, maxLength, predicate }) =>
+    requireValue(body(fieldName).if((value, { req }) => predicate(req, value)).trim(), errorMap['name'].REQUIRED)
+        .isString().withMessage(errorMap['name'].INVALID_TYPE)
+        .isLength({ max: maxLength }).withMessage(errorMap['name'].TOO_LONG(maxLength))
+        .matches(genericRegex).withMessage(errorMap['name'].INVALID_FORMAT)
+;
+
+export const validateTextWithDynamicMaxLength = ({ fieldName, getMaxLength, predicate = () => true }) =>
+    requireValue(body(fieldName).if((value, { req }) => predicate(req, value)).trim(), errorMap['name'].REQUIRED)
+        .isString().withMessage(errorMap['name'].INVALID_TYPE)
+        .custom((value, { req }) => value.length <= getMaxLength(req))
+        .withMessage((_, { req }) => errorMap['name'].TOO_LONG(getMaxLength(req)))
+        .matches(genericRegex).withMessage(errorMap['name'].INVALID_FORMAT)
+;
+
 export const validateTextOptional = ({ fieldName, maxLength }) => {
 
     const errors = errorMap[fieldName];
@@ -76,6 +91,12 @@ export const validateTextOptional = ({ fieldName, maxLength }) => {
 
 export const validateBoolean = (fieldName) =>
     requireValue(body(fieldName), errorMap[fieldName].REQUIRED)
+        .isBoolean().withMessage(errorMap[fieldName].INVALID_BOOLEAN)
+        .toBoolean()
+;
+
+export const validateBooleanWhen = ({ fieldName, predicate }) =>
+    requireValue(body(fieldName).if((value, { req }) => predicate(req, value)), errorMap[fieldName].REQUIRED)
         .isBoolean().withMessage(errorMap[fieldName].INVALID_BOOLEAN)
         .toBoolean()
 ;

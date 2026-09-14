@@ -708,3 +708,636 @@ sequenceDiagram
     end
     deactivate Application
 ```
+
+
+
+
+<a id="cu-cat-21"></a>
+## `CU-CAT-21` — Consultar área
+
+**Patrones:** `FE-P03`.
+
+```mermaid
+sequenceDiagram
+    participant Browser as Navegador
+    participant View as src/public/js/plugins/datatable/admin/catalogs/catalogDatatable.js
+    participant Application as src/public/js/application/admin/catalogs/catalogs.js
+    participant Request as src/public/js/services/admin/catalogService.js
+    participant HTTP as src/public/js/services/axiosInstanceApi.js
+    participant Transport@{ "type": "control" } as src/routes/api/admin/catalogApiRoute.js<br/>src/controllers/api/admin/catalogController.js
+    Note over Application,Transport: Variables de frontera: params/catalog
+
+    Browser->>View: abrir y cargar la tabla del catálogo
+    View->>View: recopilar y validar las variables de frontera indicadas
+    View->>Application: getAllCatalogEntries({ params, catalog })
+    Application->>Request: getAllCatalogEntriesRequest({ params, catalog })
+    activate Application
+    Request->>HTTP: apiRequest({ method: 'get', url, data/params })
+    HTTP->>Transport: consume GET /api/admin/catalogs/departments
+    Transport-->>HTTP: status HTTP y payload del endpoint
+    HTTP-->>Request: respuesta o error normalizado
+    Request-->>Application: resultado del request
+    alt Respuesta exitosa
+        Application-->>View: entidad, colección o archivo normalizado
+        View-->>Browser: actualizar la vista con el resultado
+    else Respuesta rechazada
+        Application-->>View: error normalizado por apiRequest
+        View-->>Browser: conservar contexto y mostrar el mensaje
+    end
+    deactivate Application
+```
+
+<a id="cu-cat-22"></a>
+## `CU-CAT-22` — Crear área
+
+**Patrones:** `FE-P03`.
+
+```mermaid
+sequenceDiagram
+    participant Browser as Navegador
+    participant View as src/public/js/pages/admin/catalogs/catalogForm.js
+    participant Application as src/public/js/application/admin/catalogs/catalogs.js
+    participant Request as src/public/js/services/admin/catalogService.js
+    participant HTTP as src/public/js/services/axiosInstanceApi.js
+    participant Transport@{ "type": "control" } as src/routes/api/admin/catalogApiRoute.js<br/>src/controllers/api/admin/catalogController.js
+    Note over Application,Transport: Variables de frontera: catalog/data
+
+    Browser->>View: confirmar el formulario de alta
+    View->>View: recopilar y validar las variables de frontera indicadas
+    View->>Application: registerCatalogEntry({ catalog, data })
+    Application->>Request: registerCatalogEntryRequest({ catalog, data })
+    activate Application
+    Request->>HTTP: apiRequest({ method: 'get', url, data/params })
+    HTTP->>Transport: consume POST /api/admin/catalogs/departments
+    Transport-->>HTTP: status HTTP y payload del endpoint
+    HTTP-->>Request: respuesta o error normalizado
+    Request-->>Application: resultado del request
+    alt Respuesta exitosa
+        Application-->>View: entidad, colección o archivo normalizado
+        View-->>Browser: actualizar la vista con el resultado
+    else Respuesta rechazada
+        Application-->>View: error normalizado por apiRequest
+        View-->>Browser: conservar contexto y mostrar el mensaje
+    end
+    deactivate Application
+```
+
+<a id="cu-cat-23"></a>
+## `CU-CAT-23` — Editar área
+
+**Patrones:** `FE-P03`.
+
+```mermaid
+sequenceDiagram
+    participant Browser as Navegador
+    participant View as src/public/js/pages/admin/catalogs/catalogForm.js
+    participant Application as src/public/js/application/admin/catalogs/catalogs.js
+    participant Request as src/public/js/services/admin/catalogService.js
+    participant HTTP as src/public/js/services/axiosInstanceApi.js
+    participant Transport@{ "type": "control" } as src/routes/api/admin/catalogApiRoute.js<br/>src/controllers/api/admin/catalogController.js
+    Note over Application,Transport: Variables de frontera: catalog/id/data
+
+    Browser->>View: confirmar el formulario de edición
+    View->>View: recopilar y validar las variables de frontera indicadas
+    View->>Application: editCatalogEntry({ catalog, id, data })
+    Application->>Request: editCatalogEntryRequest({ catalog, id, data })
+    activate Application
+    Request->>HTTP: apiRequest({ method: 'get', url, data/params })
+    HTTP->>Transport: consume PUT /api/admin/catalogs/departments/:id
+    Transport-->>HTTP: status HTTP y payload del endpoint
+    HTTP-->>Request: respuesta o error normalizado
+    Request-->>Application: resultado del request
+    alt Respuesta exitosa
+        Application-->>View: entidad, colección o archivo normalizado
+        View-->>Browser: actualizar la vista con el resultado
+    else Respuesta rechazada
+        Application-->>View: error normalizado por apiRequest
+        View-->>Browser: conservar contexto y mostrar el mensaje
+    end
+    deactivate Application
+```
+
+<a id="cu-cat-24"></a>
+## `CU-CAT-24` — Consultar rol
+
+**Patrones:** `FE-P03`.
+
+```mermaid
+sequenceDiagram
+    participant Browser as Navegador
+    participant View as src/public/js/plugins/datatable/admin/catalogs/catalogDatatable.js
+    participant Application as src/public/js/application/admin/catalogs/catalogs.js
+    participant Request as src/public/js/services/admin/catalogService.js
+    participant HTTP as src/public/js/services/axiosInstanceApi.js
+    participant Transport@{ "type": "control" } as src/routes/api/admin/catalogApiRoute.js<br/>src/controllers/api/admin/catalogController.js
+    Note over Application,Transport: Variables de frontera: params/catalog
+
+    Browser->>View: abrir y cargar la tabla del catálogo
+    View->>View: recopilar y validar las variables de frontera indicadas
+    View->>Application: getAllCatalogEntries({ params, catalog })
+    Application->>Request: getAllCatalogEntriesRequest({ params, catalog })
+    activate Application
+    Request->>HTTP: apiRequest({ method: 'get', url, data/params })
+    HTTP->>Transport: consume GET /api/admin/catalogs/roles
+    Transport-->>HTTP: status HTTP y payload del endpoint
+    HTTP-->>Request: respuesta o error normalizado
+    Request-->>Application: resultado del request
+    alt Respuesta exitosa
+        Application-->>View: entidad, colección o archivo normalizado
+        View-->>Browser: actualizar la vista con el resultado
+    else Respuesta rechazada
+        Application-->>View: error normalizado por apiRequest
+        View-->>Browser: conservar contexto y mostrar el mensaje
+    end
+    deactivate Application
+```
+
+<a id="cu-cat-25"></a>
+## `CU-CAT-25` — Crear rol
+
+**Patrones:** `FE-P03`.
+
+```mermaid
+sequenceDiagram
+    participant Browser as Navegador
+    participant View as src/public/js/pages/admin/catalogs/catalogForm.js
+    participant Application as src/public/js/application/admin/catalogs/catalogs.js
+    participant Request as src/public/js/services/admin/catalogService.js
+    participant HTTP as src/public/js/services/axiosInstanceApi.js
+    participant Transport@{ "type": "control" } as src/routes/api/admin/catalogApiRoute.js<br/>src/controllers/api/admin/catalogController.js
+    Note over Application,Transport: Variables de frontera: catalog/data
+
+    Browser->>View: confirmar el formulario de alta
+    View->>View: recopilar y validar las variables de frontera indicadas
+    View->>Application: registerCatalogEntry({ catalog, data })
+    Application->>Request: registerCatalogEntryRequest({ catalog, data })
+    activate Application
+    Request->>HTTP: apiRequest({ method: 'get', url, data/params })
+    HTTP->>Transport: consume POST /api/admin/catalogs/roles
+    Transport-->>HTTP: status HTTP y payload del endpoint
+    HTTP-->>Request: respuesta o error normalizado
+    Request-->>Application: resultado del request
+    alt Respuesta exitosa
+        Application-->>View: entidad, colección o archivo normalizado
+        View-->>Browser: actualizar la vista con el resultado
+    else Respuesta rechazada
+        Application-->>View: error normalizado por apiRequest
+        View-->>Browser: conservar contexto y mostrar el mensaje
+    end
+    deactivate Application
+```
+
+<a id="cu-cat-26"></a>
+## `CU-CAT-26` — Editar rol
+
+**Patrones:** `FE-P03`.
+
+```mermaid
+sequenceDiagram
+    participant Browser as Navegador
+    participant View as src/public/js/pages/admin/catalogs/catalogForm.js
+    participant Application as src/public/js/application/admin/catalogs/catalogs.js
+    participant Request as src/public/js/services/admin/catalogService.js
+    participant HTTP as src/public/js/services/axiosInstanceApi.js
+    participant Transport@{ "type": "control" } as src/routes/api/admin/catalogApiRoute.js<br/>src/controllers/api/admin/catalogController.js
+    Note over Application,Transport: Variables de frontera: catalog/id/data
+
+    Browser->>View: confirmar el formulario de edición
+    View->>View: recopilar y validar las variables de frontera indicadas
+    View->>Application: editCatalogEntry({ catalog, id, data })
+    Application->>Request: editCatalogEntryRequest({ catalog, id, data })
+    activate Application
+    Request->>HTTP: apiRequest({ method: 'get', url, data/params })
+    HTTP->>Transport: consume PUT /api/admin/catalogs/roles/:id
+    Transport-->>HTTP: status HTTP y payload del endpoint
+    HTTP-->>Request: respuesta o error normalizado
+    Request-->>Application: resultado del request
+    alt Respuesta exitosa
+        Application-->>View: entidad, colección o archivo normalizado
+        View-->>Browser: actualizar la vista con el resultado
+    else Respuesta rechazada
+        Application-->>View: error normalizado por apiRequest
+        View-->>Browser: conservar contexto y mostrar el mensaje
+    end
+    deactivate Application
+```
+
+<a id="cu-cat-27"></a>
+## `CU-CAT-27` — Consultar presentación
+
+**Patrones:** `FE-P03`.
+
+```mermaid
+sequenceDiagram
+    participant Browser as Navegador
+    participant View as src/public/js/plugins/datatable/admin/catalogs/catalogDatatable.js
+    participant Application as src/public/js/application/admin/catalogs/catalogs.js
+    participant Request as src/public/js/services/admin/catalogService.js
+    participant HTTP as src/public/js/services/axiosInstanceApi.js
+    participant Transport@{ "type": "control" } as src/routes/api/admin/catalogApiRoute.js<br/>src/controllers/api/admin/catalogController.js
+    Note over Application,Transport: Variables de frontera: params/catalog
+
+    Browser->>View: abrir y cargar la tabla del catálogo
+    View->>View: recopilar y validar las variables de frontera indicadas
+    View->>Application: getAllCatalogEntries({ params, catalog })
+    Application->>Request: getAllCatalogEntriesRequest({ params, catalog })
+    activate Application
+    Request->>HTTP: apiRequest({ method: 'get', url, data/params })
+    HTTP->>Transport: consume GET /api/admin/catalogs/presentations
+    Transport-->>HTTP: status HTTP y payload del endpoint
+    HTTP-->>Request: respuesta o error normalizado
+    Request-->>Application: resultado del request
+    alt Respuesta exitosa
+        Application-->>View: entidad, colección o archivo normalizado
+        View-->>Browser: actualizar la vista con el resultado
+    else Respuesta rechazada
+        Application-->>View: error normalizado por apiRequest
+        View-->>Browser: conservar contexto y mostrar el mensaje
+    end
+    deactivate Application
+```
+
+<a id="cu-cat-28"></a>
+## `CU-CAT-28` — Crear presentación
+
+**Patrones:** `FE-P03`.
+
+```mermaid
+sequenceDiagram
+    participant Browser as Navegador
+    participant View as src/public/js/pages/admin/catalogs/catalogForm.js
+    participant Application as src/public/js/application/admin/catalogs/catalogs.js
+    participant Request as src/public/js/services/admin/catalogService.js
+    participant HTTP as src/public/js/services/axiosInstanceApi.js
+    participant Transport@{ "type": "control" } as src/routes/api/admin/catalogApiRoute.js<br/>src/controllers/api/admin/catalogController.js
+    Note over Application,Transport: Variables de frontera: catalog/data
+
+    Browser->>View: confirmar el formulario de alta
+    View->>View: recopilar y validar las variables de frontera indicadas
+    View->>Application: registerCatalogEntry({ catalog, data })
+    Application->>Request: registerCatalogEntryRequest({ catalog, data })
+    activate Application
+    Request->>HTTP: apiRequest({ method: 'get', url, data/params })
+    HTTP->>Transport: consume POST /api/admin/catalogs/presentations
+    Transport-->>HTTP: status HTTP y payload del endpoint
+    HTTP-->>Request: respuesta o error normalizado
+    Request-->>Application: resultado del request
+    alt Respuesta exitosa
+        Application-->>View: entidad, colección o archivo normalizado
+        View-->>Browser: actualizar la vista con el resultado
+    else Respuesta rechazada
+        Application-->>View: error normalizado por apiRequest
+        View-->>Browser: conservar contexto y mostrar el mensaje
+    end
+    deactivate Application
+```
+
+<a id="cu-cat-29"></a>
+## `CU-CAT-29` — Editar presentación
+
+**Patrones:** `FE-P03`.
+
+```mermaid
+sequenceDiagram
+    participant Browser as Navegador
+    participant View as src/public/js/pages/admin/catalogs/catalogForm.js
+    participant Application as src/public/js/application/admin/catalogs/catalogs.js
+    participant Request as src/public/js/services/admin/catalogService.js
+    participant HTTP as src/public/js/services/axiosInstanceApi.js
+    participant Transport@{ "type": "control" } as src/routes/api/admin/catalogApiRoute.js<br/>src/controllers/api/admin/catalogController.js
+    Note over Application,Transport: Variables de frontera: catalog/id/data
+
+    Browser->>View: confirmar el formulario de edición
+    View->>View: recopilar y validar las variables de frontera indicadas
+    View->>Application: editCatalogEntry({ catalog, id, data })
+    Application->>Request: editCatalogEntryRequest({ catalog, id, data })
+    activate Application
+    Request->>HTTP: apiRequest({ method: 'get', url, data/params })
+    HTTP->>Transport: consume PUT /api/admin/catalogs/presentations/:id
+    Transport-->>HTTP: status HTTP y payload del endpoint
+    HTTP-->>Request: respuesta o error normalizado
+    Request-->>Application: resultado del request
+    alt Respuesta exitosa
+        Application-->>View: entidad, colección o archivo normalizado
+        View-->>Browser: actualizar la vista con el resultado
+    else Respuesta rechazada
+        Application-->>View: error normalizado por apiRequest
+        View-->>Browser: conservar contexto y mostrar el mensaje
+    end
+    deactivate Application
+```
+
+<a id="cu-cat-30"></a>
+## `CU-CAT-30` — Consultar unidad de medida
+
+**Patrones:** `FE-P03`.
+
+```mermaid
+sequenceDiagram
+    participant Browser as Navegador
+    participant View as src/public/js/plugins/datatable/admin/catalogs/catalogDatatable.js
+    participant Application as src/public/js/application/admin/catalogs/catalogs.js
+    participant Request as src/public/js/services/admin/catalogService.js
+    participant HTTP as src/public/js/services/axiosInstanceApi.js
+    participant Transport@{ "type": "control" } as src/routes/api/admin/catalogApiRoute.js<br/>src/controllers/api/admin/catalogController.js
+    Note over Application,Transport: Variables de frontera: params/catalog
+
+    Browser->>View: abrir y cargar la tabla del catálogo
+    View->>View: recopilar y validar las variables de frontera indicadas
+    View->>Application: getAllCatalogEntries({ params, catalog })
+    Application->>Request: getAllCatalogEntriesRequest({ params, catalog })
+    activate Application
+    Request->>HTTP: apiRequest({ method: 'get', url, data/params })
+    HTTP->>Transport: consume GET /api/admin/catalogs/unit-measures
+    Transport-->>HTTP: status HTTP y payload del endpoint
+    HTTP-->>Request: respuesta o error normalizado
+    Request-->>Application: resultado del request
+    alt Respuesta exitosa
+        Application-->>View: entidad, colección o archivo normalizado
+        View-->>Browser: actualizar la vista con el resultado
+    else Respuesta rechazada
+        Application-->>View: error normalizado por apiRequest
+        View-->>Browser: conservar contexto y mostrar el mensaje
+    end
+    deactivate Application
+```
+
+<a id="cu-cat-31"></a>
+## `CU-CAT-31` — Crear unidad de medida
+
+**Patrones:** `FE-P03`.
+
+```mermaid
+sequenceDiagram
+    participant Browser as Navegador
+    participant View as src/public/js/pages/admin/catalogs/catalogForm.js
+    participant Application as src/public/js/application/admin/catalogs/catalogs.js
+    participant Request as src/public/js/services/admin/catalogService.js
+    participant HTTP as src/public/js/services/axiosInstanceApi.js
+    participant Transport@{ "type": "control" } as src/routes/api/admin/catalogApiRoute.js<br/>src/controllers/api/admin/catalogController.js
+    Note over Application,Transport: Variables de frontera: catalog/data
+
+    Browser->>View: confirmar el formulario de alta
+    View->>View: recopilar y validar las variables de frontera indicadas
+    View->>Application: registerCatalogEntry({ catalog, data })
+    Application->>Request: registerCatalogEntryRequest({ catalog, data })
+    activate Application
+    Request->>HTTP: apiRequest({ method: 'get', url, data/params })
+    HTTP->>Transport: consume POST /api/admin/catalogs/unit-measures
+    Transport-->>HTTP: status HTTP y payload del endpoint
+    HTTP-->>Request: respuesta o error normalizado
+    Request-->>Application: resultado del request
+    alt Respuesta exitosa
+        Application-->>View: entidad, colección o archivo normalizado
+        View-->>Browser: actualizar la vista con el resultado
+    else Respuesta rechazada
+        Application-->>View: error normalizado por apiRequest
+        View-->>Browser: conservar contexto y mostrar el mensaje
+    end
+    deactivate Application
+```
+
+<a id="cu-cat-32"></a>
+## `CU-CAT-32` — Editar unidad de medida
+
+**Patrones:** `FE-P03`.
+
+```mermaid
+sequenceDiagram
+    participant Browser as Navegador
+    participant View as src/public/js/pages/admin/catalogs/catalogForm.js
+    participant Application as src/public/js/application/admin/catalogs/catalogs.js
+    participant Request as src/public/js/services/admin/catalogService.js
+    participant HTTP as src/public/js/services/axiosInstanceApi.js
+    participant Transport@{ "type": "control" } as src/routes/api/admin/catalogApiRoute.js<br/>src/controllers/api/admin/catalogController.js
+    Note over Application,Transport: Variables de frontera: catalog/id/data
+
+    Browser->>View: confirmar el formulario de edición
+    View->>View: recopilar y validar las variables de frontera indicadas
+    View->>Application: editCatalogEntry({ catalog, id, data })
+    Application->>Request: editCatalogEntryRequest({ catalog, id, data })
+    activate Application
+    Request->>HTTP: apiRequest({ method: 'get', url, data/params })
+    HTTP->>Transport: consume PUT /api/admin/catalogs/unit-measures/:id
+    Transport-->>HTTP: status HTTP y payload del endpoint
+    HTTP-->>Request: respuesta o error normalizado
+    Request-->>Application: resultado del request
+    alt Respuesta exitosa
+        Application-->>View: entidad, colección o archivo normalizado
+        View-->>Browser: actualizar la vista con el resultado
+    else Respuesta rechazada
+        Application-->>View: error normalizado por apiRequest
+        View-->>Browser: conservar contexto y mostrar el mensaje
+    end
+    deactivate Application
+```
+
+<a id="cu-cat-33"></a>
+## `CU-CAT-33` — Consultar motivo de ajuste
+
+**Patrones:** `FE-P03`.
+
+```mermaid
+sequenceDiagram
+    participant Browser as Navegador
+    participant View as src/public/js/plugins/datatable/admin/catalogs/catalogDatatable.js
+    participant Application as src/public/js/application/admin/catalogs/catalogs.js
+    participant Request as src/public/js/services/admin/catalogService.js
+    participant HTTP as src/public/js/services/axiosInstanceApi.js
+    participant Transport@{ "type": "control" } as src/routes/api/admin/catalogApiRoute.js<br/>src/controllers/api/admin/catalogController.js
+    Note over Application,Transport: Variables de frontera: params/catalog
+
+    Browser->>View: abrir y cargar la tabla del catálogo
+    View->>View: recopilar y validar las variables de frontera indicadas
+    View->>Application: getAllCatalogEntries({ params, catalog })
+    Application->>Request: getAllCatalogEntriesRequest({ params, catalog })
+    activate Application
+    Request->>HTTP: apiRequest({ method: 'get', url, data/params })
+    HTTP->>Transport: consume GET /api/admin/catalogs/reasons
+    Transport-->>HTTP: status HTTP y payload del endpoint
+    HTTP-->>Request: respuesta o error normalizado
+    Request-->>Application: resultado del request
+    alt Respuesta exitosa
+        Application-->>View: entidad, colección o archivo normalizado
+        View-->>Browser: actualizar la vista con el resultado
+    else Respuesta rechazada
+        Application-->>View: error normalizado por apiRequest
+        View-->>Browser: conservar contexto y mostrar el mensaje
+    end
+    deactivate Application
+```
+
+<a id="cu-cat-34"></a>
+## `CU-CAT-34` — Crear motivo de ajuste
+
+**Patrones:** `FE-P03`.
+
+```mermaid
+sequenceDiagram
+    participant Browser as Navegador
+    participant View as src/public/js/pages/admin/catalogs/catalogForm.js
+    participant Application as src/public/js/application/admin/catalogs/catalogs.js
+    participant Request as src/public/js/services/admin/catalogService.js
+    participant HTTP as src/public/js/services/axiosInstanceApi.js
+    participant Transport@{ "type": "control" } as src/routes/api/admin/catalogApiRoute.js<br/>src/controllers/api/admin/catalogController.js
+    Note over Application,Transport: Variables de frontera: catalog/data
+
+    Browser->>View: confirmar el formulario de alta
+    View->>View: recopilar y validar las variables de frontera indicadas
+    View->>Application: registerCatalogEntry({ catalog, data })
+    Application->>Request: registerCatalogEntryRequest({ catalog, data })
+    activate Application
+    Request->>HTTP: apiRequest({ method: 'get', url, data/params })
+    HTTP->>Transport: consume POST /api/admin/catalogs/reasons
+    Transport-->>HTTP: status HTTP y payload del endpoint
+    HTTP-->>Request: respuesta o error normalizado
+    Request-->>Application: resultado del request
+    alt Respuesta exitosa
+        Application-->>View: entidad, colección o archivo normalizado
+        View-->>Browser: actualizar la vista con el resultado
+    else Respuesta rechazada
+        Application-->>View: error normalizado por apiRequest
+        View-->>Browser: conservar contexto y mostrar el mensaje
+    end
+    deactivate Application
+```
+
+<a id="cu-cat-35"></a>
+## `CU-CAT-35` — Editar motivo de ajuste
+
+**Patrones:** `FE-P03`.
+
+```mermaid
+sequenceDiagram
+    participant Browser as Navegador
+    participant View as src/public/js/pages/admin/catalogs/catalogForm.js
+    participant Application as src/public/js/application/admin/catalogs/catalogs.js
+    participant Request as src/public/js/services/admin/catalogService.js
+    participant HTTP as src/public/js/services/axiosInstanceApi.js
+    participant Transport@{ "type": "control" } as src/routes/api/admin/catalogApiRoute.js<br/>src/controllers/api/admin/catalogController.js
+    Note over Application,Transport: Variables de frontera: catalog/id/data
+
+    Browser->>View: confirmar el formulario de edición
+    View->>View: recopilar y validar las variables de frontera indicadas
+    View->>Application: editCatalogEntry({ catalog, id, data })
+    Application->>Request: editCatalogEntryRequest({ catalog, id, data })
+    activate Application
+    Request->>HTTP: apiRequest({ method: 'get', url, data/params })
+    HTTP->>Transport: consume PUT /api/admin/catalogs/reasons/:id
+    Transport-->>HTTP: status HTTP y payload del endpoint
+    HTTP-->>Request: respuesta o error normalizado
+    Request-->>Application: resultado del request
+    alt Respuesta exitosa
+        Application-->>View: entidad, colección o archivo normalizado
+        View-->>Browser: actualizar la vista con el resultado
+    else Respuesta rechazada
+        Application-->>View: error normalizado por apiRequest
+        View-->>Browser: conservar contexto y mostrar el mensaje
+    end
+    deactivate Application
+```
+
+<a id="cu-cat-36"></a>
+## `CU-CAT-36` — Consultar estado de cumplimiento
+
+**Patrones:** `FE-P03`.
+
+```mermaid
+sequenceDiagram
+    participant Browser as Navegador
+    participant View as src/public/js/plugins/datatable/admin/catalogs/catalogDatatable.js
+    participant Application as src/public/js/application/admin/catalogs/catalogs.js
+    participant Request as src/public/js/services/admin/catalogService.js
+    participant HTTP as src/public/js/services/axiosInstanceApi.js
+    participant Transport@{ "type": "control" } as src/routes/api/admin/catalogApiRoute.js<br/>src/controllers/api/admin/catalogController.js
+    Note over Application,Transport: Variables de frontera: params/catalog
+
+    Browser->>View: abrir y cargar la tabla del catálogo
+    View->>View: recopilar y validar las variables de frontera indicadas
+    View->>Application: getAllCatalogEntries({ params, catalog })
+    Application->>Request: getAllCatalogEntriesRequest({ params, catalog })
+    activate Application
+    Request->>HTTP: apiRequest({ method: 'get', url, data/params })
+    HTTP->>Transport: consume GET /api/admin/catalogs/fulfillment-statuses
+    Transport-->>HTTP: status HTTP y payload del endpoint
+    HTTP-->>Request: respuesta o error normalizado
+    Request-->>Application: resultado del request
+    alt Respuesta exitosa
+        Application-->>View: entidad, colección o archivo normalizado
+        View-->>Browser: actualizar la vista con el resultado
+    else Respuesta rechazada
+        Application-->>View: error normalizado por apiRequest
+        View-->>Browser: conservar contexto y mostrar el mensaje
+    end
+    deactivate Application
+```
+
+<a id="cu-cat-37"></a>
+## `CU-CAT-37` — Crear estado de cumplimiento
+
+**Patrones:** `FE-P03`.
+
+```mermaid
+sequenceDiagram
+    participant Browser as Navegador
+    participant View as src/public/js/pages/admin/catalogs/catalogForm.js
+    participant Application as src/public/js/application/admin/catalogs/catalogs.js
+    participant Request as src/public/js/services/admin/catalogService.js
+    participant HTTP as src/public/js/services/axiosInstanceApi.js
+    participant Transport@{ "type": "control" } as src/routes/api/admin/catalogApiRoute.js<br/>src/controllers/api/admin/catalogController.js
+    Note over Application,Transport: Variables de frontera: catalog/data
+
+    Browser->>View: confirmar el formulario de alta
+    View->>View: recopilar y validar las variables de frontera indicadas
+    View->>Application: registerCatalogEntry({ catalog, data })
+    Application->>Request: registerCatalogEntryRequest({ catalog, data })
+    activate Application
+    Request->>HTTP: apiRequest({ method: 'get', url, data/params })
+    HTTP->>Transport: consume POST /api/admin/catalogs/fulfillment-statuses
+    Transport-->>HTTP: status HTTP y payload del endpoint
+    HTTP-->>Request: respuesta o error normalizado
+    Request-->>Application: resultado del request
+    alt Respuesta exitosa
+        Application-->>View: entidad, colección o archivo normalizado
+        View-->>Browser: actualizar la vista con el resultado
+    else Respuesta rechazada
+        Application-->>View: error normalizado por apiRequest
+        View-->>Browser: conservar contexto y mostrar el mensaje
+    end
+    deactivate Application
+```
+
+<a id="cu-cat-38"></a>
+## `CU-CAT-38` — Editar estado de cumplimiento
+
+**Patrones:** `FE-P03`.
+
+```mermaid
+sequenceDiagram
+    participant Browser as Navegador
+    participant View as src/public/js/pages/admin/catalogs/catalogForm.js
+    participant Application as src/public/js/application/admin/catalogs/catalogs.js
+    participant Request as src/public/js/services/admin/catalogService.js
+    participant HTTP as src/public/js/services/axiosInstanceApi.js
+    participant Transport@{ "type": "control" } as src/routes/api/admin/catalogApiRoute.js<br/>src/controllers/api/admin/catalogController.js
+    Note over Application,Transport: Variables de frontera: catalog/id/data
+
+    Browser->>View: confirmar el formulario de edición
+    View->>View: recopilar y validar las variables de frontera indicadas
+    View->>Application: editCatalogEntry({ catalog, id, data })
+    Application->>Request: editCatalogEntryRequest({ catalog, id, data })
+    activate Application
+    Request->>HTTP: apiRequest({ method: 'get', url, data/params })
+    HTTP->>Transport: consume PUT /api/admin/catalogs/fulfillment-statuses/:id
+    Transport-->>HTTP: status HTTP y payload del endpoint
+    HTTP-->>Request: respuesta o error normalizado
+    Request-->>Application: resultado del request
+    alt Respuesta exitosa
+        Application-->>View: entidad, colección o archivo normalizado
+        View-->>Browser: actualizar la vista con el resultado
+    else Respuesta rechazada
+        Application-->>View: error normalizado por apiRequest
+        View-->>Browser: conservar contexto y mostrar el mensaje
+    end
+    deactivate Application
+```

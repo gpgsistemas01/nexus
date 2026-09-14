@@ -338,12 +338,11 @@ un paquete de npm. Elija uno de estos valores:
 | `manual-usuario` | Manual completo con todos los grupos funcionales, referencias e inventario de capturas. | Para publicar el manual general. |
 | `manual-administrador` | Acceso, identidad, catálogos y reportes disponibles para Sistemas. | Para personal administrador del sistema. |
 | `manual-almacen` | Acceso, catálogos, compras, salidas y reportes operativos. | Para personal de almacén y proveeduría. |
-| `manual-reportes` | Acceso, consultas y exportaciones de catálogos, compras, salidas y movimientos. | Para usuarios que sólo consultan o generan reportes. |
 | `requisitos` | Especificación y trazabilidad de requisitos. | Para revisión funcional. |
 | `datos` | Mapa de datos, decisiones de acceso, esquema y diccionario técnico generados. | Para revisar persistencia y acceso a los datos. |
 | `arquitectura` | Diseño, documentación técnica y contrato API con estructuras JSON y validaciones. | Para revisión técnica y de integraciones HTTP. |
 | `pruebas` | Plan, cobertura, catálogo y resultados de pruebas. | Para evidencia de calidad. |
-| `todos` | Los ocho documentos anteriores, cada uno en su propio archivo. | Para preparar una entrega documental completa con un solo comando. |
+| `todos` | Los siete documentos anteriores, cada uno en su propio archivo. | Para preparar una entrega documental completa con un solo comando. |
 
 Los paquetes específicos por actor reutilizan las secciones del manual completo y omiten las que
 no corresponden a ese recorrido. Los formatos de entrega admitidos son `docx` y `pdf`; Markdown
@@ -409,12 +408,12 @@ Para exportar `requisitos`, `datos`, `arquitectura` o `pruebas`:
    `build/docs/pdf/`. La portada se genera automáticamente y se conservan ambos formatos.
 
 Si la entrega incluye toda la documentación, sustituya `<paquete>` por `todos` en los pasos 2 y
-3. Antes debe comprobar también que las capturas requeridas por los cuatro manuales ya existan y
+3. Antes debe comprobar también que las capturas requeridas por los tres manuales ya existan y
 estén aprobadas. Actualizarlas es una acción independiente de la exportación.
 
 ### Exportar los manuales
 
-Los paquetes `manual-usuario`, `manual-administrador`, `manual-almacen` y `manual-reportes`
+Los paquetes `manual-usuario`, `manual-administrador` y `manual-almacen`
 incluyen capturas de la aplicación, pero `docs:export` **no toma capturas ni abre Nexus**. Antes de
 exportar uno de esos paquetes se requieren:
 

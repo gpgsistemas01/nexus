@@ -137,8 +137,13 @@ vez como `RN-*`, en lugar de subdividir o extender la explicación dentro de una
 Para conservar trazabilidad, `RF-CAT-001` a `RF-CAT-005` mantienen el primer recurso
 de la obligación original y se acotan a su consulta. Las operaciones separadas reciben
 `RF-CAT-006` a `RF-CAT-018`; las demás consultas antes agrupadas en `RF-CAT-005`
-reciben `RF-CAT-019` a `RF-CAT-021`. No se reasigna un identificador existente a otro
+reciben `RF-CAT-019` a `RF-CAT-024`. No se reasigna un identificador existente a otro
 recurso.
+
+La administración compartida comprende exactamente **Áreas**, **Roles**,
+**Presentaciones**, **Unidades de medida**, **Motivos de ajuste** y **Estados de
+cumplimiento**. Clientes, proveedores, materiales y mermas permanecen en sus requisitos
+y módulos propietarios; no se interpretan como variantes del catálogo auxiliar.
 
 | ID | Requisito y criterio de aceptación | Estado | Evidencia principal |
 | --- | --- | --- | --- |
@@ -160,9 +165,12 @@ recurso.
 | RF-CAT-016 | El sistema debe impedir que una edición de merma cambie su proveedor, presentación, unidad de medida o dimensiones, para conservar su identidad física. | Implementado | `src/dtos/wasteDTO.js`, `src/services/warehouse/wastes/wasteService.js` |
 | RF-CAT-017 | Almacén debe poder actualizar el nombre, estado activo y datos secundarios admitidos de una merma sin alterar sus existencias ni historia. | Implementado | `src/routes/api/warehouse/wasteApiRoute.js`, `src/views/pages/warehouse/wastes` |
 | RF-CAT-018 | El administrador del sistema debe poder ajustar las existencias de una merma únicamente mediante la acción autorizada disponible desde su consulta; el personal de almacén sin ese permiso no debe poder ejecutarla. | Implementado | `src/routes/api/warehouse/wasteApiRoute.js`, `src/controllers/api/warehouse/wasteController.js`, `src/constants/permissions.js`, modelo `WasteStockAdjustment` |
-| RF-CAT-019 | Un usuario autorizado debe poder consultar unidades de medida sin modificar el catálogo. | Implementado | `src/routes/api/warehouse/unitMeasureApiRoute.js` |
-| RF-CAT-020 | Un usuario autorizado debe poder consultar motivos de ajuste sin modificar el catálogo. | Implementado | `src/routes/api/warehouse/reasonApiRoute.js` |
-| RF-CAT-021 | Un usuario autorizado debe poder consultar estados de cumplimiento sin modificar el catálogo. | Implementado | `src/routes/api/warehouse/fulfillmentStatusApiRoute.js` |
+| RF-CAT-019 | Los usuarios operativos autorizados deben poder consultar unidades de medida; sólo el administrador del sistema puede crear o editarlas desde la administración de catálogos. | Implementado | `src/routes/api/warehouse/unitMeasureApiRoute.js`; `src/routes/api/admin/catalogApiRoute.js` |
+| RF-CAT-020 | Los usuarios operativos autorizados deben poder consultar motivos de ajuste; sólo el administrador del sistema puede crear, editar o cambiar su estado desde la administración de catálogos. | Implementado | `src/routes/api/warehouse/reasonApiRoute.js`; `src/routes/api/admin/catalogApiRoute.js` |
+| RF-CAT-021 | Los usuarios operativos autorizados deben poder consultar estados de cumplimiento; sólo el administrador del sistema puede crearlos o editarlos desde la administración de catálogos. | Implementado | `src/routes/api/warehouse/fulfillmentStatusApiRoute.js`; `src/routes/api/admin/catalogApiRoute.js` |
+| RF-CAT-022 | Sólo el administrador del sistema del área Sistemas debe poder abrir y consultar las pantallas de áreas, roles, presentaciones, unidades de medida, motivos de ajuste y estados de cumplimiento administrables. | Implementado | `src/routes/web/admin/catalogWebRoute.js`, `src/routes/api/admin/catalogApiRoute.js`, permiso `catalogs:manage` |
+| RF-CAT-023 | El administrador autorizado debe poder crear una entrada en Áreas, Roles, Presentaciones, Unidades de medida, Motivos de ajuste o Estados de cumplimiento, capturando únicamente los campos admitidos para el recurso. | Implementado | `src/services/admin/catalogService.js`, `src/controllers/api/admin/catalogController.js` |
+| RF-CAT-024 | El administrador autorizado debe poder editar una entrada existente de Áreas, Roles, Presentaciones, Unidades de medida, Motivos de ajuste o Estados de cumplimiento sin acceder a modelos o campos fuera de la lista blanca. | Implementado | `src/services/admin/catalogService.js`, `tests/unit/services/admin/catalogServiceTest.js` |
 
 ### 4.3 Entradas, salidas e inventario
 

@@ -2,6 +2,28 @@
 
 Cada procedimiento identifica sus casos de uso, controles, errores posibles y captura de referencia.
 
+## Catálogos auxiliares
+
+**Propósito.** Consultar, crear y editar las opciones auxiliares que configuran otros flujos del sistema.
+
+**Ruta en el menú:** **Menú principal → Catálogos auxiliares →** elija **Áreas**, **Roles**, **Presentaciones**, **Unidades de medida**, **Motivos de ajuste** o **Estados de cumplimiento**.
+
+**Casos de uso:** Áreas: `CU-CAT-21` a `CU-CAT-23`; Roles: `CU-CAT-24` a `CU-CAT-26`; Presentaciones: `CU-CAT-27` a `CU-CAT-29`; Unidades de medida: `CU-CAT-30` a `CU-CAT-32`; Motivos de ajuste: `CU-CAT-33` a `CU-CAT-35`; Estados de cumplimiento: `CU-CAT-36` a `CU-CAT-38`. Cada rango corresponde, en orden, a consultar, crear y editar.
+
+**Acceso:** estas pantallas y sus escrituras son exclusivas del administrador del sistema del área Sistemas. Que un rol, área, presentación, unidad, motivo o estado aparezca en un selector operativo no concede acceso a su mantenimiento.
+
+Cada opción abre una pantalla propia con la tabla del recurso seleccionado. No use **Clientes** o **Proveedores** desde este recorrido: ambos conservan sus módulos, formularios, permisos y reglas independientes.
+
+1. Seleccione el catálogo requerido en el submenú y revise que el encabezado corresponda al recurso que desea modificar.
+2. Para registrar una entrada, seleccione **Agregar** y complete **Nombre** (máximo 50 caracteres para Áreas, Roles, Presentaciones y Estados de cumplimiento; 20 para Unidades de medida; 100 para Motivos de ajuste). Complete también **Símbolo** —máximo 10— sólo para Unidades de medida o confirme **Activo** sólo para Motivos de ajuste. Seleccione **Guardar**.
+3. Para modificar una entrada, seleccione **Editar** en su fila, cambie únicamente los campos habilitados y seleccione **Actualizar**.
+4. Compruebe que la tabla de esa misma pantalla muestre el resultado antes de continuar con otro catálogo.
+
+Los botones del formulario indican solamente la acción: **Guardar**, **Actualizar** y
+**Regresar**; el encabezado identifica el catálogo que se está registrando o editando.
+
+**Errores posibles:** [Validación de formularios](../error-messages.md#errores-validacion), [Acceso y autorización](../error-messages.md#errores-acceso), [Catálogos e inventario](../error-messages.md#errores-catalogos).
+
 ## Materiales e inventario
 
 **Propósito.** Consultar el inventario, registrar o editar materiales y ajustar existencias.
