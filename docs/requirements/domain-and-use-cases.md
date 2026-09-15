@@ -61,9 +61,9 @@ El diagrama se mantiene en Mermaid para que GitHub lo represente correctamente. 
 **aproximación visual a un diagrama UML de casos de uso**, no UML estricto: Mermaid no
 ofrece ese tipo de diagrama y se emplean nodos de `flowchart` con la semántica que se
 explica a continuación. Los límites rectangulares representan el sistema. Cada actor se
-muestra fuera de esos límites como un clasificador con el estereotipo UML `«actor»`; se
-usa esta notación alternativa a la figura humana porque Mermaid no incorpora actores en
-`flowchart`. Las asociaciones muestran quién inicia un objetivo y no equivalen a
+muestra fuera de esos límites con la figura `person` disponible en `flowchart`; la figura
+identifica un actor humano, pero no convierte la vista en UML estricto. Las asociaciones
+muestran quién inicia un objetivo y no equivalen a
 permisos individuales. Cuando una acción opcional nace dentro de una consulta, se usa
 `«extend»` hacia el caso base; la asociación directa con el actor sigue indicando quién
 puede iniciar la acción. Ventas no es
@@ -96,7 +96,7 @@ La decisión y las familias resultantes se resumen en el
 
 ```mermaid
 flowchart LR
-    user["«actor»<br/>Usuario registrado"]
+    user@{ shape: person, label: "Usuario registrado" }
 
     subgraph authPackage["Nexus · Grupo funcional AUT: Autenticación"]
         ucLogin(["CU-AUT-01 Iniciar sesión"])
@@ -111,7 +111,7 @@ flowchart LR
 
 ```mermaid
 flowchart LR
-    admin["«actor»<br/>Administrador del sistema (área Sistemas)"]
+    admin@{ shape: person, label: "Administrador del sistema (área Sistemas)" }
 
     subgraph identityPackage["Nexus · Grupo funcional IDA: Identidad y acceso"]
         subgraph personFamily["Personas"]
@@ -150,8 +150,8 @@ flowchart LR
 
 ```mermaid
 flowchart LR
-    warehouse["«actor»<br/>Personal de almacén (área Almacén y proveduría)"]
-    admin["«actor»<br/>Administrador del sistema (área Sistemas)"]
+    warehouse@{ shape: person, label: "Personal de almacén (área Almacén y proveduría)" }
+    admin@{ shape: person, label: "Administrador del sistema (área Sistemas)" }
 
     subgraph catalogPackage["Nexus · Grupo funcional CAT: Catálogos"]
         direction TB
@@ -278,8 +278,8 @@ consultar ambos listados, pero no hereda esas dos asociaciones restringidas. La 
 
 ```mermaid
 flowchart LR
-    warehouse["«actor»<br/>Personal de almacén (área Almacén y proveduría)"]
-    admin["«actor»<br/>Administrador del sistema (área Sistemas)"]
+    warehouse@{ shape: person, label: "Personal de almacén (área Almacén y proveduría)" }
+    admin@{ shape: person, label: "Administrador del sistema (área Sistemas)" }
     admin -- "generaliza" --> warehouse
 
     subgraph receiptPackage["Nexus · Grupo funcional ENT: Compras de material"]
@@ -303,8 +303,8 @@ flowchart LR
 
 ```mermaid
 flowchart LR
-    warehouse["«actor»<br/>Personal de almacén (área Almacén y proveduría)"]
-    admin["«actor»<br/>Administrador del sistema (área Sistemas)"]
+    warehouse@{ shape: person, label: "Personal de almacén (área Almacén y proveduría)" }
+    admin@{ shape: person, label: "Administrador del sistema (área Sistemas)" }
     admin -- "generaliza" --> warehouse
 
     subgraph issuePackage["Nexus · Grupo funcional SAL: Salidas"]
