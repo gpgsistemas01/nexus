@@ -189,6 +189,21 @@ export const clientValidation = {
     }),
 }
 
+export const createCatalogValidation = ({ entityLabel, nameMaxLength, symbolMaxLength }) => ({
+    name: value => validateText({
+        name: value,
+        length: nameMaxLength,
+        fieldName: `El nombre de ${ entityLabel }`
+    }),
+    symbol: value => value === undefined
+        ? null
+        : validateText({
+            name: value,
+            length: symbolMaxLength,
+            fieldName: `El símbolo de ${ entityLabel }`
+        })
+});
+
 export const userValidation = {
     name: validateUsername,
     password: validatePassword,

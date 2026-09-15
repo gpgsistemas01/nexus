@@ -30,7 +30,7 @@ export const createUserDatatable = () => {
                     render: () => [
                         buildMdbEditActionButton({
                             className: 'btn-edit',
-                            label: 'Editar usuario'
+                            label: 'Editar registro'
                         }),
                         buildMdbActionButton({
                             className: 'btn-edit-password',

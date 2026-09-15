@@ -13,6 +13,7 @@ export const initClientFilterSelect = ({
     getOptions: getAllClients,
     placeholder: 'Filtrar por cliente',
     selectedId,
+    data: () => ({ onlyActive: true }),
     mapOption: (client) => ({ id: client.id, text: client.name })
 });
 
@@ -26,6 +27,7 @@ export const initClientSelect = ({
     containerSelector: modalSelector,
     get: getAllClients,
     placeholder: 'Buscar cliente...',
+    data: () => ({ onlyActive: true }),
     mapOption: (client) => ({
         id: client.id,
         text: client.name,

@@ -87,3 +87,10 @@ export const showInventoryExportDialog = () => notifications.showDialog({
         inventoryScope: document.querySelector(`input[name="${ REPORT_TYPE_NAME }"]:checked`)?.value || 'activeOrStock'
     })
 });
+
+export const showFilteredExportDialog = () => notifications.showDialog({
+    title: 'Exportar reporte',
+    text: 'Se aplicarán al archivo la búsqueda, los filtros y el orden actuales.',
+    popupClass: 'report-export-modal',
+    confirmButtonText: 'Descargar'
+});

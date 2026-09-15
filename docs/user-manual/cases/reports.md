@@ -14,7 +14,7 @@ Cada procedimiento identifica sus casos de uso, controles, errores posibles y ca
 <a id="CAP-REP-MOV-MAT-01-LIST"></a>
 ### CAP-REP-MOV-MAT-01-LIST — Historial y filtros
 
-**Casos de uso:** `CU-REP-02` — Consultar movimientos de materiales.
+**Casos de uso:** `CU-CAT-08` — Consultar movimientos de materiales.
 
 **Errores posibles:** [Reportes](../error-messages.md#errores-reportes).
 
@@ -26,18 +26,18 @@ Cada procedimiento identifica sus casos de uso, controles, errores posibles y ca
 
 2. Escriba un término en **Buscar por Material, Proveedor o Folio** o complete **Fecha de inicio:**, **Fecha de fin:**, **Tipo de movimiento:**, **Proveedor:** y **Material:**.
 3. Seleccione **Buscar / filtrar** para actualizar el historial; use **Limpiar filtros** para restablecerlo.
-4. Seleccione **Exportar Excel** si necesita descargar la consulta.
+4. Seleccione **Exportar Excel** para abrir el modal **Exportar reporte**; revise el alcance y seleccione **Descargar**.
 
 <a id="CAP-REP-MOV-MAT-02-EXPORT"></a>
 ### CAP-REP-MOV-MAT-02-EXPORT — Exportar reporte
 
-**Casos de uso:** `CU-REP-05` — Generar reporte de movimientos de materiales.
+**Casos de uso:** `CU-CAT-09` — Generar reporte de movimientos de materiales.
 
 **Errores posibles:** [Reportes](../error-messages.md#errores-reportes).
 
 **Controles que debe usar:** Botón **Exportar Excel**; opciones **Mes actual**, **Otro mes** o **Personalizado: usar filtros aplicados**; campo **Mes del reporte** y botón **Descargar**.
 
-1. Seleccione **Exportar Excel** para abrir el diálogo de alcance. Antes de continuar, compruebe que la pantalla mostrada coincida con la captura:
+1. Seleccione **Exportar Excel** para abrir el modal **Exportar reporte**. Antes de continuar, compruebe que la pantalla mostrada coincida con la captura:
 
    ![CAP-REP-MOV-MAT-02-EXPORT: exportar reporte](../images/movimientos-material/02-exportar-reporte.png)
 
@@ -56,7 +56,7 @@ Cada procedimiento identifica sus casos de uso, controles, errores posibles y ca
 <a id="CAP-REP-MOV-WAS-01-LIST"></a>
 ### CAP-REP-MOV-WAS-01-LIST — Historial y filtros
 
-**Casos de uso:** `CU-REP-07` — Consultar movimientos de mermas.
+**Casos de uso:** `CU-CAT-25` — Consultar movimientos de mermas.
 
 **Errores posibles:** [Reportes](../error-messages.md#errores-reportes).
 
@@ -68,18 +68,18 @@ Cada procedimiento identifica sus casos de uso, controles, errores posibles y ca
 
 2. Escriba un término en **Buscar por Material, Proveedor o Folio** o complete **Fecha de inicio:**, **Fecha de fin:**, **Tipo de movimiento:**, **Proveedor:** y **Merma:**.
 3. Seleccione **Buscar / filtrar** para actualizar el historial; use **Limpiar filtros** para restablecerlo.
-4. Seleccione **Exportar Excel** si necesita descargar la consulta.
+4. Seleccione **Exportar Excel** para abrir el modal **Exportar reporte**; revise el alcance y seleccione **Descargar**.
 
 <a id="CAP-REP-MOV-WAS-02-EXPORT"></a>
 ### CAP-REP-MOV-WAS-02-EXPORT — Exportar reporte
 
-**Casos de uso:** `CU-REP-10` — Generar reporte de movimientos de mermas.
+**Casos de uso:** `CU-CAT-26` — Generar reporte de movimientos de mermas.
 
 **Errores posibles:** [Reportes](../error-messages.md#errores-reportes).
 
 **Controles que debe usar:** Botón **Exportar Excel**; opciones **Mes actual**, **Otro mes** o **Personalizado: usar filtros aplicados**; campo **Mes del reporte** y botón **Descargar**.
 
-1. Seleccione **Exportar Excel** para abrir el diálogo de alcance. Antes de continuar, compruebe que la pantalla mostrada coincida con la captura:
+1. Seleccione **Exportar Excel** para abrir el modal **Exportar reporte**. Antes de continuar, compruebe que la pantalla mostrada coincida con la captura:
 
    ![CAP-REP-MOV-WAS-02-EXPORT: exportar reporte](../images/movimientos-merma/02-exportar-reporte.png)
 

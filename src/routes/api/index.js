@@ -18,6 +18,7 @@ import departmentApiRoutes from './admin/departmentApiRoute.js';
 import personApiRoutes from './admin/personApiRoute.js';
 import movementApiRoutes from './admin/movementApiRoute.js';
 import adminReportApiRoutes from './admin/reportApiRoute.js';
+import catalogApiRoutes from './admin/catalogApiRoute.js';
 
 const API_ROUTES = [
     ['/auth', authApiRoutes],
@@ -39,7 +40,8 @@ const API_ROUTES = [
     ['/admin/departments', departmentApiRoutes],
     ['/admin/persons', personApiRoutes],
     ['/admin/movements', movementApiRoutes],
-    ['/admin/reports', adminReportApiRoutes]
+    ['/admin/reports', adminReportApiRoutes],
+    ['/admin/catalogs', catalogApiRoutes]
 ];
 
 export const registerApiRoutes = (app, { apiPrefix = '/api' } = {}) => {

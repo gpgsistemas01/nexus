@@ -65,9 +65,11 @@ nombres de archivos van en participantes y los símbolos ejecutados en mensajes,
 en párrafos dentro de una sola etiqueta. Si para explicar una colaboración reutilizada hiciera falta
 repetirla en varios casos, se enlaza su vista `DIA-PAT-*` y la secuencia del caso conserva
 sólo la invocación y el resultado observable.
-En cada documento de arquitectura, los diagramas asociados con `CU-*` siguen el orden
-del catálogo de casos de uso; si un caso necesita más de una vista, permanecen juntas,
-y las vistas transversales sin caso se ubican después. En mensajes y etiquetas de
+En cada colección, los diagramas asociados con `CU-*` siguen el orden secuencial del
+catálogo dentro de cada grupo propietario. Cada consulta o reporte se coloca junto al
+recurso funcional que lo origina tanto en requisitos como en las colecciones técnicas.
+Si un caso necesita más de una vista, permanecen juntas, y las vistas transversales sin
+caso se ubican después. En mensajes y etiquetas de
 `sequenceDiagram` se evita el punto y coma, porque GitHub puede interpretarlo como un
 separador de sentencias; se usa una coma o una oración nueva.
 

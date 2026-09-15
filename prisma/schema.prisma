@@ -8,17 +8,19 @@ datasource db {
 }
 
 model Department {
-  id                   String                 @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name                 String                 @unique @db.VarChar(50)
-  personAccesses       PersonRoleDepartment[]
-  accesses             UserRoleDepartment[]
-  goodsIssues          GoodsIssue[]
-  wasteIssues          WasteIssue[]
+  id             String                 @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name           String                 @unique @db.VarChar(50)
+  isActive       Boolean                @default(true)
+  personAccesses PersonRoleDepartment[]
+  accesses       UserRoleDepartment[]
+  goodsIssues    GoodsIssue[]
+  wasteIssues    WasteIssue[]
 }
 
 model Role {
   id             String                 @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name           String                 @unique @db.VarChar(50)
+  isActive       Boolean                @default(true)
   accesses       UserRoleDepartment[]
   personAccesses PersonRoleDepartment[]
 }
@@ -86,19 +88,19 @@ model UserRoleDepartment {
 /// persistido; la cuenta `User` conserva la trazabilidad del actor que ejecuta acciones.
 /// El UUID y sus claves foráneas mantienen el seguimiento histórico de la persona.
 model Person {
-  id                            String                 @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  fullName                      String                 @db.VarChar(255)
-  isActive                      Boolean                @default(true)
-  goodsReceipts                 GoodsReceipt[]
-  accesses                      PersonRoleDepartment[]
-  users                         User[]
-  approverGoodsIssues           GoodsIssue[]           @relation("ApproverGoodsIssueRelation")
-  requesterGoodsIssues          GoodsIssue[]           @relation("RequesterGoodsIssueRelation")
-  requesterWasteIssues          WasteIssue[]           @relation("RequesterWasteIssueRelation")
-  warehouseStaffGoodsIssues     GoodsIssue[]           @relation("WarehouseStaffGoodsIssueRelation")
-  clients                       Client[]
-  goodsIssues                   GoodsIssue[]
-  advisedWasteIssues            WasteIssue[]           @relation("AdvisorWasteIssueRelation")
+  id                        String                 @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  fullName                  String                 @db.VarChar(255)
+  isActive                  Boolean                @default(true)
+  goodsReceipts             GoodsReceipt[]
+  accesses                  PersonRoleDepartment[]
+  users                     User[]
+  approverGoodsIssues       GoodsIssue[]           @relation("ApproverGoodsIssueRelation")
+  requesterGoodsIssues      GoodsIssue[]           @relation("RequesterGoodsIssueRelation")
+  requesterWasteIssues      WasteIssue[]           @relation("RequesterWasteIssueRelation")
+  warehouseStaffGoodsIssues GoodsIssue[]           @relation("WarehouseStaffGoodsIssueRelation")
+  clients                   Client[]
+  goodsIssues               GoodsIssue[]
+  advisedWasteIssues        WasteIssue[]           @relation("AdvisorWasteIssueRelation")
 }
 
 /// Accesos por área y rol asignados a una persona del negocio (`Person`).
@@ -117,29 +119,29 @@ model PersonRoleDepartment {
 }
 
 model Status {
-  id                   String                @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name                 String                @unique
-  goodsReceipts        GoodsReceipt[]
-  goodsIssues          GoodsIssue[]
-  wasteIssues          WasteIssue[]
+  id            String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name          String         @unique
+  goodsReceipts GoodsReceipt[]
+  goodsIssues   GoodsIssue[]
+  wasteIssues   WasteIssue[]
 }
 
 model Material {
-  id                                 String                      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name                               String                      @db.VarChar(200)
-  sku                                String?                     @unique @db.VarChar(200)
-  presentationId                     String                      @db.Uuid
-  unitMeasureId                      String                      @db.Uuid
-  isActive                           Boolean                     @default(true)
-  minStock                           Decimal                     @default(0) @db.Decimal(18, 6)
-  base                               Decimal?                    @db.Decimal(18, 6)
-  height                             Decimal?                    @db.Decimal(18, 6)
-  presentation                       Presentation                @relation(fields: [presentationId], references: [id])
-  unitMeasure                        UnitMeasure                 @relation(fields: [unitMeasureId], references: [id])
+  id                                 String                     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name                               String                     @db.VarChar(200)
+  sku                                String?                    @unique @db.VarChar(200)
+  presentationId                     String                     @db.Uuid
+  unitMeasureId                      String                     @db.Uuid
+  isActive                           Boolean                    @default(true)
+  minStock                           Decimal                    @default(0) @db.Decimal(18, 6)
+  base                               Decimal?                   @db.Decimal(18, 6)
+  height                             Decimal?                   @db.Decimal(18, 6)
+  presentation                       Presentation               @relation(fields: [presentationId], references: [id])
+  unitMeasure                        UnitMeasure                @relation(fields: [unitMeasureId], references: [id])
   goodsIssueDetails                  GoodsIssueDetail[]
   goodsReceiptDetails                GoodsReceiptDetail[]
-  previousGoodsReceiptDetailChanges  GoodsReceiptDetailChange[]  @relation("PreviousGoodsReceiptDetailChangeMaterial")
-  correctedGoodsReceiptDetailChanges GoodsReceiptDetailChange[]  @relation("CorrectedGoodsReceiptDetailChangeMaterial")
+  previousGoodsReceiptDetailChanges  GoodsReceiptDetailChange[] @relation("PreviousGoodsReceiptDetailChangeMaterial")
+  correctedGoodsReceiptDetailChanges GoodsReceiptDetailChange[] @relation("CorrectedGoodsReceiptDetailChangeMaterial")
   movementDetails                    MovementDetail[]
   supplierMaterials                  SupplierMaterial[]
   stockAdjustmentDetails             StockAdjustmentDetail[]
@@ -149,6 +151,7 @@ model UnitMeasure {
   id        String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name      String     @db.VarChar(20)
   symbol    String     @db.VarChar(10)
+  isActive  Boolean    @default(true)
   materials Material[]
   wastes    Waste[]
 
@@ -158,6 +161,7 @@ model UnitMeasure {
 model Presentation {
   id        String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name      String     @unique @db.VarChar(50)
+  isActive  Boolean    @default(true)
   materials Material[]
   wastes    Waste[]
 }
@@ -413,17 +417,18 @@ model WasteIssueReturn {
 }
 
 model Project {
-  id                   String                @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  referenceNumber      String                @unique @db.VarChar(50)
-  client               String                @db.VarChar(50)
-  name                 String                @db.VarChar(50)
-  date                 DateTime
-  goodsIssues          GoodsIssue[]
+  id              String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  referenceNumber String       @unique @db.VarChar(50)
+  client          String       @db.VarChar(50)
+  name            String       @db.VarChar(50)
+  date            DateTime
+  goodsIssues     GoodsIssue[]
 }
 
 model Client {
   id          String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name        String       @db.VarChar(255)
+  isActive    Boolean      @default(true)
   advisorId   String?      @db.Uuid
   advisor     Person?      @relation(fields: [advisorId], references: [id])
   goodsIssues GoodsIssue[]
@@ -612,6 +617,7 @@ model GoodsIssueReturn {
 model FulfillmentStatus {
   id                String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name              String             @unique @db.VarChar(50)
+  isActive          Boolean            @default(true)
   goodsIssues       GoodsIssue[]
   goodsIssueDetails GoodsIssueDetail[]
   wasteIssues       WasteIssue[]

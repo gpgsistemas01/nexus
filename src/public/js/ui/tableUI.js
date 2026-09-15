@@ -1,7 +1,11 @@
 import { DOM_EVENT_NAMES } from '../constants/events.js';
 import { notifications } from "../plugins/swal/swalComponent.js";
 import { getTimeZoneDateTimeParts } from '../utils/timeZone.js';
-import { showInventoryExportDialog, showReportExportDialog } from './reportExportDialog.js';
+import {
+    showFilteredExportDialog,
+    showInventoryExportDialog,
+    showReportExportDialog
+} from './reportExportDialog.js';
 
 const getCurrentMexicoMonth = () => {
     const { year, month } = getTimeZoneDateTimeParts(new Date());
@@ -53,6 +57,10 @@ export const buildExcelButton = ({
 
                 if (!result.isConfirmed) return;
                 inventoryScope = result.value.inventoryScope;
+            } else {
+                const result = await showFilteredExportDialog();
+
+                if (!result.isConfirmed) return;
             }
 
             const blob = await request({

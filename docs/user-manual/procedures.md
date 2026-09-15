@@ -64,13 +64,15 @@ Los procedimientos se dividen por grupo para localizar una tarea sin recorrer un
 - [Catálogos e inventario](cases/catalogs.md): consultar y mantener materiales, proveedores, clientes y mermas.
 - [Compras de material](cases/purchases.md): registrar, editar, corregir y exportar compras.
 - [Salidas de material y merma](cases/issues.md): registrar, surtir, devolver y exportar salidas.
-- [Consultas y reportes](cases/reports.md): consultar movimientos y seleccionar el alcance de su exportación.
+- [Exportaciones desde consultas](cases/reports.md): usar el modal de exportación de inventarios y movimientos desde su consulta propietaria.
 
 ### Relación con requisitos y arquitectura
 
 El manual explica **cómo opera la persona usuaria**; no sustituye la descripción normativa ni
 las secuencias técnicas. Para revisar un cambio sin perder detalle, use el identificador y nombre
-`CU-*` del procedimiento para recorrer las siguientes vistas del mismo grupo:
+`CU-*` del procedimiento para recorrer las siguientes vistas del mismo grupo. El capítulo de
+[exportaciones desde consultas](cases/reports.md) complementa los grupos propietarios y
+no constituye un grupo adicional:
 
 | Grupo | Descripción normativa | Diagramas funcionales | Secuencia frontend | Secuencia backend | Procedimiento operativo |
 | --- | --- | --- | --- | --- | --- |
@@ -79,7 +81,6 @@ las secuencias técnicas. Para revisar un cambio sin perder detalle, use el iden
 | `CAT` | [Fichas de catálogos](../requirements/use-case-descriptions.md#grupo-funcional-cat--catálogos) | [Flujos `CU-CAT`](../requirements/requirements-diagrams.md#grupo-funcional-cat--catálogos) | [Frontend](../architecture/frontend-code-sequences/catalogs.md) | [Backend](../architecture/backend-code-sequences/catalogs.md) | [Catálogos e inventario](cases/catalogs.md) |
 | `ENT` | [Fichas de compras](../requirements/use-case-descriptions.md#grupo-funcional-ent--compras-de-material) | [Flujos `CU-ENT`](../requirements/requirements-diagrams.md#grupo-funcional-ent--compras-de-material) | [Frontend](../architecture/frontend-code-sequences/purchases.md) | [Backend](../architecture/backend-code-sequences/purchases.md) | [Compras](cases/purchases.md) |
 | `SAL` | [Fichas de salidas](../requirements/use-case-descriptions.md#grupo-funcional-sal--salidas-de-material-y-de-merma) | [Flujos `CU-SAL`](../requirements/requirements-diagrams.md#grupo-funcional-sal--salidas-de-material-y-de-merma) | [Frontend](../architecture/frontend-code-sequences/issues.md) | [Backend](../architecture/backend-code-sequences/issues.md) | [Salidas](cases/issues.md) |
-| `REP` | [Fichas de consultas y reportes](../requirements/use-case-descriptions.md#grupo-funcional-rep--consultas-y-reportes) | [Flujos `CU-REP`](../requirements/requirements-diagrams.md#grupo-funcional-rep--consultas-y-reportes) | [Frontend](../architecture/frontend-code-sequences/reports.md) | [Backend](../architecture/backend-code-sequences/reports.md) | [Movimientos y exportaciones](cases/reports.md) |
 
 Al mantener un caso, conserve el mismo **identificador y nombre** en estas vistas. Actualice la
 ficha normativa si cambia el objetivo, actor, disparador, precondición, flujo, excepción o
@@ -94,4 +95,5 @@ Cada guía de actor funciona como punto de entrada y enlaza únicamente los grup
 
 - [Administrador del sistema](actors/administrator.md).
 - [Personal de almacén](actors/warehouse.md).
-- [Usuario de consultas y reportes](actors/reporting.md).
+Los reportes se incluyen en el manual del actor que puede abrir el módulo; no se mantiene
+un manual global que mezcle capacidades incompatibles.

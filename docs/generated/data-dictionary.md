@@ -32,6 +32,7 @@ usuarios y responsables se mantiene en el
 | --- | --- | --- | --- | --- | --- |
 | `id` | `String` | Sí | PK | `dbgenerated("gen_random_uuid()")` | `@db.Uuid` |
 | `name` | `String` | Sí | UK | — | `@db.VarChar(50)` |
+| `isActive` | `Boolean` | Sí | — | `true` | — |
 
 ### `Role`
 
@@ -39,6 +40,7 @@ usuarios y responsables se mantiene en el
 | --- | --- | --- | --- | --- | --- |
 | `id` | `String` | Sí | PK | `dbgenerated("gen_random_uuid()")` | `@db.Uuid` |
 | `name` | `String` | Sí | UK | — | `@db.VarChar(50)` |
+| `isActive` | `Boolean` | Sí | — | `true` | — |
 
 ### `User`
 
@@ -127,6 +129,7 @@ usuarios y responsables se mantiene en el
 | --- | --- | --- | --- | --- | --- |
 | `id` | `String` | Sí | PK | `dbgenerated("gen_random_uuid()")` | `@db.Uuid` |
 | `name` | `String` | Sí | UK | — | `@db.VarChar(50)` |
+| `isActive` | `Boolean` | Sí | — | `true` | — |
 
 ### `Project`
 
@@ -144,6 +147,7 @@ usuarios y responsables se mantiene en el
 | --- | --- | --- | --- | --- | --- |
 | `id` | `String` | Sí | PK | `dbgenerated("gen_random_uuid()")` | `@db.Uuid` |
 | `name` | `String` | Sí | — | — | `@db.VarChar(255)` |
+| `isActive` | `Boolean` | Sí | — | `true` | — |
 | `advisorId` | `String?` | No | FK | — | `@db.Uuid` |
 
 | Relación Prisma | Destino | Campos FK | Cardinalidad desde este modelo |
@@ -187,6 +191,7 @@ usuarios y responsables se mantiene en el
 | `id` | `String` | Sí | PK | `dbgenerated("gen_random_uuid()")` | `@db.Uuid` |
 | `name` | `String` | Sí | — | — | `@db.VarChar(20)` |
 | `symbol` | `String` | Sí | — | — | `@db.VarChar(10)` |
+| `isActive` | `Boolean` | Sí | — | `true` | — |
 
 ### `Presentation`
 
@@ -194,6 +199,7 @@ usuarios y responsables se mantiene en el
 | --- | --- | --- | --- | --- | --- |
 | `id` | `String` | Sí | PK | `dbgenerated("gen_random_uuid()")` | `@db.Uuid` |
 | `name` | `String` | Sí | UK | — | `@db.VarChar(50)` |
+| `isActive` | `Boolean` | Sí | — | `true` | — |
 
 ### `SupplierMaterial`
 

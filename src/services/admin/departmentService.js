@@ -10,6 +10,7 @@ export const findAllDepartments = async ({
 }) => {
 
     const where = {
+        isActive: true,
         ...(search && {
             name: {
                 contains: search,
@@ -45,14 +46,15 @@ export const findAllDepartments = async ({
 
 const DEFAULT_DEPARTMENT_SELECT = {
     id: true,
-    name: true
+    name: true,
+    isActive: true
 };
 
 export const findDepartmentById = async ({ tx, id }) => {
 
     const db = getDb(tx);
     const department = await db.department.findFirst({
-        where: { id },
+        where: { id, isActive: true },
         select: DEFAULT_DEPARTMENT_SELECT
     });
 

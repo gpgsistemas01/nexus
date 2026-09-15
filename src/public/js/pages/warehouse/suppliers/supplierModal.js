@@ -21,7 +21,7 @@ export const openSupplierModal = ({
 
     form.reset();
 
-    if (form.elements.isActive) form.elements.isActive.checked = true;
+    form.elements.isActive.checked = data?.isActive ?? true;
     
     form.elements.tradeName.value = data?.tradeName || '';
     form.elements.legalName.value = data?.legalName || '';

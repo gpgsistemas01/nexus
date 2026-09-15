@@ -1,0 +1,37 @@
+<% const form = {
+    id: 'catalogForm',
+    inputs: [
+        {
+            id: 'catalogNameInput',
+            type: 'text',
+            name: 'name',
+            label: 'Nombre',
+            col: '12',
+            attrs: { maxlength: catalog.maxLengths.name }
+        },
+        {
+            id: 'catalogSymbolInput',
+            type: 'text',
+            name: 'symbol',
+            label: 'Símbolo',
+            col: '12',
+            attrs: { maxlength: catalog.maxLengths.symbol || 10 }
+        }
+    ],
+    checkboxes: [
+        {
+            id: 'catalogActiveInput',
+            type: 'checkbox',
+            name: 'isActive',
+            label: 'Activo',
+            value: 'true',
+            isChecked: true
+        }
+    ]
+}; %>
+
+<%- include('../../../shared/layout/modal', {
+    modalId: 'catalogModal',
+    dialogClass: 'modal-dialog-centered',
+    form
+}) %>

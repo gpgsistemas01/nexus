@@ -1,5 +1,14 @@
 # Información común de uso
 
+## Acceso por actor y seguridad
+
+Documentar los módulos disponibles para cada actor no debilita la seguridad: evita que
+el manual indique operaciones que ese actor no puede ejecutar. Se describen capacidades
+y recorridos, pero nunca credenciales, tokens ni técnicas para eludir controles. El
+servidor siempre vuelve a autorizar cada solicitud. **Catálogos** corresponde sólo al
+administrador del sistema; **Consumibles** pertenece a Almacén y usa el acceso de
+consulta de materiales.
+
 ## Antes de comenzar
 
 Este manual se prepara para personal autorizado. Requiere un navegador compatible, la URL del
