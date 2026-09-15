@@ -1,4 +1,4 @@
-# Actualizar las capturas del manual
+# 8. Actualizar las capturas del manual
 
 Este flujo sólo se ejecuta en un clon sin las imágenes requeridas o cuando una pantalla cambió.
 Su resultado son archivos PNG revisables en `docs/user-manual/images/`; **no genera DOCX ni PDF**.

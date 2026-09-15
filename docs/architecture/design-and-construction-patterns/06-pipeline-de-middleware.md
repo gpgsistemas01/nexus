@@ -1,4 +1,4 @@
-# 2. Pipeline de middleware
+# 6. Pipeline de middleware
 
 Express construye cada endpoint como una secuencia de funciones. Nexus reutiliza esa
 capacidad como pipeline: autenticación, validación de campos, consolidación de errores,

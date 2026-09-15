@@ -111,7 +111,7 @@ flowchart TB
 ```
 
 Las reglas de notación, nivel de detalle y mantenimiento de una vista nueva permanecen
-en las [convenciones de diagramas](diagram-conventions/03-patron-minimo-de-cada-diagrama.md#patrón-mínimo-de-cada-diagrama).
+en las [convenciones de diagramas](diagram-conventions/03-patron-minimo-de-cada-diagrama.md#3-patrón-mínimo-de-cada-diagrama).
 En particular, primero se reutiliza la progresión existente de contexto, contenedores,
 estructura, dinámica, reutilización y detalle generado.
 

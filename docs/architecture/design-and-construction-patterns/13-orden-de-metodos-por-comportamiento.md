@@ -1,4 +1,4 @@
-# 9. Orden de métodos por comportamiento
+# 13. Orden de métodos por comportamiento
 
 Los módulos que representan el mismo tipo de recurso conservan un orden de lectura
 común aunque cambien los nombres del dominio. Para un CRUD, el orden es: **consulta,

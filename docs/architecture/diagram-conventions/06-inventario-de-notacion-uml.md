@@ -1,4 +1,4 @@
-# Inventario de notación UML
+# 6. Inventario de notación UML
 
 La revisión de las vistas vigentes evita llamar UML a cualquier bloque Mermaid. No
 faltan diagramas para describir el alcance actual, pero sí es necesario distinguir los
@@ -44,7 +44,7 @@ vista aplicada y su patrón se documenta como metadato Markdown inmediatamente a
 bloque, mediante **Identificador**, **Pregunta** y **Patrones**.
 
 Los códigos `DIA-PAT-*` de **Patrones** apuntan conceptualmente al
-[catálogo visual de patrones aplicados](../design-and-construction-patterns/04-catalogo-visual-de-patrones-aplicados.md#catálogo-visual-de-patrones-aplicados),
+[catálogo visual de patrones aplicados](../design-and-construction-patterns/04-catalogo-visual-de-patrones-aplicados.md#4-catálogo-visual-de-patrones-aplicados),
 y la matriz técnica enlaza el `DIA-FE-CU-*` o `DIA-BE-CU-*` concreto. Dentro del bloque
 se muestran únicamente los participantes, relaciones o mensajes que prueban la
 aplicación del patrón; no se agrega un nodo que represente a otro diagrama. Esta forma

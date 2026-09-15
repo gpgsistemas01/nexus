@@ -1,4 +1,4 @@
-# Diagramas derivados de casos de uso y de código
+# 5. Diagramas derivados de casos de uso y de código
 
 La revisión separa dos preguntas que no deben resolverse con la misma fuente. Los casos
 de uso explican **por qué y para quién** ocurre una operación; el código permite afirmar

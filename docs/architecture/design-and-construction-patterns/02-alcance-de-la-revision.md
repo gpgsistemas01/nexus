@@ -1,4 +1,4 @@
-# Alcance de la revisión
+# 2. Alcance de la revisión
 
 Este documento registra patrones que tienen evidencia repetida en el código. Distingue
 un **patrón formal o arquitectónico** de una simple función con un nombre parecido. El

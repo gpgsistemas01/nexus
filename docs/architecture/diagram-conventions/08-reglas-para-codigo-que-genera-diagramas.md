@@ -1,4 +1,4 @@
-# Reglas para código que genera diagramas
+# 8. Reglas para código que genera diagramas
 
 El generador sigue el patrón **extraer → normalizar → representar → comprobar/escribir**:
 

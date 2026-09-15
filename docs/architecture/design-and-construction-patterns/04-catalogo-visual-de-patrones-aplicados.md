@@ -1,4 +1,4 @@
-# Catálogo visual de patrones aplicados
+# 4. Catálogo visual de patrones aplicados
 
 Estas vistas representan únicamente patrones con implementación y consumidores
 verificables. En las vistas estructurales, una caja nombra el patrón o estrategia, el

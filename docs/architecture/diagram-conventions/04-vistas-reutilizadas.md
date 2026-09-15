@@ -1,4 +1,4 @@
-# Vistas reutilizadas
+# 4. Vistas reutilizadas
 
 | Vista | Patrón o notación | Pregunta que responde | Fuente y actualización |
 | --- | --- | --- | --- |

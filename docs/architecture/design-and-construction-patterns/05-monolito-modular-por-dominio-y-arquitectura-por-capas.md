@@ -1,4 +1,4 @@
-# 1. Monolito modular por dominio y arquitectura por capas
+# 5. Monolito modular por dominio y arquitectura por capas
 
 Nexus se despliega como una aplicación, pero organiza responsabilidades por dominio y
 capa. El recorrido habitual es:

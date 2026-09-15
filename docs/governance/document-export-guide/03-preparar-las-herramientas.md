@@ -1,4 +1,4 @@
-# Preparar las herramientas
+# 3. Preparar las herramientas
 
 Estos comandos pueden ejecutarse desde la terminal integrada de Visual Studio Code
 (`Terminal` > `New Terminal`), abierta en la raíz del repositorio. Visual Studio Code no instala

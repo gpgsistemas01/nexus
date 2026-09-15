@@ -1,4 +1,4 @@
-# Estructura exportable
+# 1. Estructura exportable
 
 La estructura actual es válida para exportar: cada paquete comienza en el `index.md` de
 su propia familia, las fuentes curadas permanecen junto a esa entrada y `build/docs/` recibe los

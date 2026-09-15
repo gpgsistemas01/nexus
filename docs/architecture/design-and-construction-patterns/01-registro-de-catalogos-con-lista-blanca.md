@@ -1,4 +1,4 @@
-# Registro de catálogos con lista blanca
+# 1. Registro de catálogos con lista blanca
 
 Los catálogos auxiliares administrables aplican un **Registry/Strategy** acotado:
 `catalogService` relaciona cada nombre público con su modelo Prisma, sus campos y sus

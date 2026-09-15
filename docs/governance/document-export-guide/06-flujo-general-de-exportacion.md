@@ -1,4 +1,4 @@
-# Flujo general de exportación
+# 6. Flujo general de exportación
 
 Para exportar `requisitos`, `datos`, `arquitectura` o `pruebas`:
 

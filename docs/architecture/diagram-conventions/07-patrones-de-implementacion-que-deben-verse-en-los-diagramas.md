@@ -1,4 +1,4 @@
-# Patrones de implementación que deben verse en los diagramas
+# 7. Patrones de implementación que deben verse en los diagramas
 
 Los diagramas de arquitectura muestran soluciones que sí tienen evidencia en el
 código. La relación vigente es:
