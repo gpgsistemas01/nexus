@@ -9,10 +9,13 @@ import { buildExcelButton, buildTableExportParams } from "../../../../ui/tableUI
 import { getResponsiveRowData } from '../../core/responsive/rowData.js';
 import { DATATABLE_SELECTORS } from "../../../../constants/selectors.js";
 import { formatFileName } from "../../../../utils/formatters.js";
+import { hasPermission, UI_PERMISSIONS } from "../../../../constants/permissions.js";
 
 const selector = DATATABLE_SELECTORS.MAIN;
 
-export const createSupplierDatatable = () => {
+export const createSupplierDatatable = (context) => {
+
+    const canSeeActive = hasPermission(context, UI_PERMISSIONS.CATALOGS_MANAGE);
 
     const table = createDataTable({
         options: {
@@ -23,6 +26,11 @@ export const createSupplierDatatable = () => {
             columns: [
                 { data: 'tradeName', title: 'Nombre comercial' },
                 { data: 'legalName', title: 'Razón social' },
+                ...(canSeeActive ? [{
+                    data: 'isActive',
+                    title: 'Activo',
+                    render: value => value ? 'Sí' : 'No'
+                }] : []),
                 {
                     data: null,
                     title: 'Acciones',

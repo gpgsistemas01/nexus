@@ -37,10 +37,12 @@ const configureMaterialsRealtime = (table) => {
 export const createMaterialDatatable = async (context) => {
 
     const canSeeCost = hasPermission(context, UI_PERMISSIONS.INVENTORY_COSTS_READ);
+    const canSeeActive = hasPermission(context, UI_PERMISSIONS.CATALOGS_MANAGE);
     const canManageMaterials = hasPermission(context, UI_PERMISSIONS.MATERIALS_WRITE);
 
     renderWarehouseInventoryHeader({
         tableElement,
+        canSeeActive,
         canSeeCost,
         canManageItems: canManageMaterials
     });
@@ -50,6 +52,7 @@ export const createMaterialDatatable = async (context) => {
     });
 
     const columns = buildWarehouseInventoryColumns({
+        canSeeActive,
         canSeeCost,
         canManageItems: canManageMaterials,
         renderActions: (_, __, row) => renderActionButtons({

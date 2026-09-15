@@ -1,4 +1,5 @@
 export const UI_PERMISSIONS = Object.freeze({
+    CATALOGS_MANAGE: 'catalogs:manage',
     PERSONS_WRITE: 'persons:write',
     MATERIALS_WRITE: 'materials:write',
     MATERIALS_ADJUST_STOCK: 'materials:adjust-stock',
