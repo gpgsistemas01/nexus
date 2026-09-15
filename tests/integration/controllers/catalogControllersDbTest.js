@@ -133,13 +133,18 @@ describe('catalog controllers database integration', () => {
   it('crea, consulta y edita un catálogo administrable mediante el flujo compartido', async () => {
     const created = await request(app)
       .post('/managed/unit-measures')
-      .send({ name: names.managedUnit, symbol: names.unitSymbol, unexpected: 'discarded' })
+      .send({
+        name: names.managedUnit,
+        symbol: names.unitSymbol,
+        isActive: true,
+        unexpected: 'discarded'
+      })
       .expect('Content-Type', /json/)
       .expect(201);
 
     expect(created.body).toMatchObject({
       code: 'CREATED_CATALOG_ENTRY',
-      data: { name: names.managedUnit, symbol: names.unitSymbol }
+      data: { name: names.managedUnit, symbol: names.unitSymbol, isActive: true }
     });
 
     const listed = await request(app)
@@ -151,31 +156,39 @@ describe('catalog controllers database integration', () => {
     expect(listed.body).toMatchObject({
       recordsTotal: expect.any(Number),
       recordsFiltered: 1,
-      data: [expect.objectContaining({ id: created.body.data.id, name: names.managedUnit })]
+      data: [expect.objectContaining({
+        id: created.body.data.id,
+        name: names.managedUnit,
+        isActive: true
+      })]
     });
 
     const updatedName = `${ names.managedUnit } v2`;
     await request(app)
       .put(`/managed/unit-measures/${ created.body.data.id }`)
-      .send({ name: updatedName, symbol: names.unitSymbol })
+      .send({ name: updatedName, symbol: names.unitSymbol, isActive: false })
       .expect('Content-Type', /json/)
       .expect(200)
       .expect(response => {
         expect(response.body).toMatchObject({
           code: 'UPDATED_CATALOG_ENTRY',
-          data: { id: created.body.data.id, name: updatedName }
+          data: { id: created.body.data.id, name: updatedName, isActive: false }
         });
       });
 
     await expect(prisma.unitMeasure.findUnique({
       where: { id: created.body.data.id }
-    })).resolves.toMatchObject({ name: updatedName, symbol: names.unitSymbol });
+    })).resolves.toMatchObject({
+      name: updatedName,
+      symbol: names.unitSymbol,
+      isActive: false
+    });
   });
 
   it('rechaza el payload antes de persistir cuando excede el límite del catálogo', async () => {
     await request(app)
       .post('/managed/unit-measures')
-      .send({ name: 'x'.repeat(21), symbol: names.unitSymbol })
+      .send({ name: 'x'.repeat(21), symbol: names.unitSymbol, isActive: true })
       .expect('Content-Type', /json/)
       .expect(400)
       .expect(response => {

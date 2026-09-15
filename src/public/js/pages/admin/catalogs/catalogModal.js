@@ -6,6 +6,7 @@ import { openModal } from '../../../ui/modalUI.js';
 
 const form = document.querySelector('#catalogForm');
 const modal = document.querySelector('#catalogModal');
+const catalogFields = new Set(document.querySelector('#catalogContext').dataset.fields.split(','));
 
 export const openCatalogModal = ({ catalog, entityLabel, mode, data = null }) => {
     const isCreating = isCreateMode(mode);
@@ -26,7 +27,7 @@ export const openCatalogModal = ({ catalog, entityLabel, mode, data = null }) =>
     setFormSectionVisibility({
         form,
         selector: '#catalogActiveInput',
-        isVisible: catalog === 'reasons',
+        isVisible: catalogFields.has('isActive'),
         fieldNames: ['isActive']
     });
 
