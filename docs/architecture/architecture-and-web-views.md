@@ -262,7 +262,7 @@ la experiencia web.
 ## 3. Organización consistente de front y back
 
 La clasificación completa de factories, composición, pipeline, transacciones, eventos
-y test harness se mantiene en [patrones de diseño y construcción](design-and-construction-patterns.md).
+y test harness se mantiene en [patrones de diseño y construcción](design-and-construction-patterns/index.md).
 Esta sección aplica esas decisiones a la organización de capas y recursos.
 
 La unidad de organización es el **dominio funcional** (`admin`, `sales`, `warehouse`),

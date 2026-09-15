@@ -43,7 +43,7 @@ flowchart LR
 Contexto y contenedores no se dibujan otra vez aquí: se reutilizan las vistas canónicas.
 Esto aplica **Single Source of Truth** como criterio documental y evita que dos diagramas
 que responden la misma pregunta diverjan. Los patrones de implementación se explican en
-[Patrones de diseño y construcción](design-and-construction-patterns.md); estas vistas
+[Patrones de diseño y construcción](design-and-construction-patterns/index.md); estas vistas
 sólo muestran dónde aparecen.
 
 ## 2. Vista estructural: superficie HTTP registrada
@@ -150,12 +150,12 @@ El código confirma varias coordinaciones que no se entienden sólo con el diagr
 
 | Operación | Evidencia del código | Vista que explica el comportamiento |
 | --- | --- | --- |
-| Crear/editar usuario, acceso o contraseña | `src/services/admin/userService.js`, cifrado y asignaciones `UserRoleDepartment`. | [Secuencia de identidad y acceso](../requirements/requirements-diagrams.md#crear-o-editar-usuario-y-acceso--cu-ida-06-cu-ida-07-cu-ida-08). |
-| Eliminar material o relación de proveedor | `materialService.deleteMaterial` y relaciones de uso en `supplierMaterialService.js`. | [Decisión de eliminación](../requirements/requirements-diagrams.md#eliminar-material-o-relación-de-proveedor--cu-cat-04). |
-| Registrar una entrada | `goodsReceiptService.createGoodsReceipt`, referencias y servicios de inventario/costo. | [Secuencia de registro](../requirements/requirements-diagrams.md#crear-compra-de-material--cu-ent-02). |
-| Corregir o cancelar detalle de entrada | `src/services/warehouse/goodsReceipts/detailChanges` y servicios de inventario. | [Secuencia atómica](../requirements/requirements-diagrams.md#coordinación-atómica-de-correcciones-de-entrada). |
-| Surtir o devolver detalle de salida | Servicios de salidas de material/merma, reglas de cumplimiento y movimientos. | [Máquina de estados](../requirements/requirements-diagrams.md#estados-de-surtimiento-y-devolución). |
-| Generar reporte Excel | Controllers de reporte, servicios de consulta y `reportExcelUtils.js`. | [Canal de generación](../requirements/requirements-diagrams.md#generar-reportes-específicos--cu-cat-07-a-cu-cat-09-y-cu-sal-14-a-cu-ida-09). |
+| Crear/editar usuario, acceso o contraseña | `src/services/admin/userService.js`, cifrado y asignaciones `UserRoleDepartment`. | [Secuencia de identidad y acceso](../requirements/diagrams/cross-cutting/14-crear-o-editar-usuario-y-acceso-cu-ida-06-cu-ida-07-cu-ida-08.md#crear-o-editar-usuario-y-acceso--cu-ida-06-cu-ida-07-cu-ida-08). |
+| Eliminar material o relación de proveedor | `materialService.deleteMaterial` y relaciones de uso en `supplierMaterialService.js`. | [Decisión de eliminación](../requirements/diagrams/cross-cutting/15-eliminar-material-o-relacion-de-proveedor-cu-cat-04.md#eliminar-material-o-relación-de-proveedor--cu-cat-04). |
+| Registrar una entrada | `goodsReceiptService.createGoodsReceipt`, referencias y servicios de inventario/costo. | [Secuencia de registro](../requirements/diagrams/cross-cutting/16-crear-compra-de-material-cu-ent-02.md#crear-compra-de-material--cu-ent-02). |
+| Corregir o cancelar detalle de entrada | `src/services/warehouse/goodsReceipts/detailChanges` y servicios de inventario. | [Secuencia atómica](../requirements/diagrams/cross-cutting/18-coordinacion-atomica-de-correcciones-de-entrada.md#coordinación-atómica-de-correcciones-de-entrada). |
+| Surtir o devolver detalle de salida | Servicios de salidas de material/merma, reglas de cumplimiento y movimientos. | [Máquina de estados](../requirements/diagrams/cross-cutting/index.md#estados-de-surtimiento-y-devolución). |
+| Generar reporte Excel | Controllers de reporte, servicios de consulta y `reportExcelUtils.js`. | [Canal de generación](../requirements/diagrams/cross-cutting/17-generar-reportes-especificos-cu-ida-04-cu-ida-09-cu-cat-07-cu-cat-09-cu-.md#generar-reportes-específicos--cu-ida-04-cu-ida-09-cu-cat-07-cu-cat-09-cu-cat-14-cu-cat-18-cu-cat-24-cu-cat-26-cu-ent-06-cu-sal-07-y-cu-sal-14). |
 
 No se duplican aquí esas vistas: combinan reglas de coordinación compleja con evidencia
 del código, por lo que su fuente normativa sigue siendo la documentación de requisitos.

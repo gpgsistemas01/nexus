@@ -1,5 +1,5 @@
 import { access, mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
-import { existsSync } from 'node:fs';
+import { existsSync, readdirSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import path from 'node:path';
@@ -14,15 +14,38 @@ import {
 
 const ROOT = process.cwd();
 const OPENAPI_SOURCE = 'docs/architecture/openapi/openapi.json';
-const manualCases = [
-    'docs/user-manual/cases/authentication.md',
-    'docs/user-manual/cases/identity-access.md',
-    'docs/user-manual/cases/catalogs.md',
-    'docs/user-manual/cases/purchases.md',
-    'docs/user-manual/cases/issues.md',
-    'docs/user-manual/cases/reports.md'
+const collectionGroups = [
+    'authentication',
+    'identity-access',
+    'catalogs',
+    'purchases',
+    'issues'
 ];
-const [authenticationCases, identityCases, catalogCases, purchaseCases, issueCases, reportCases] = manualCases;
+const getDirectoryDocuments = (directory) => {
+    const entries = readdirSync(path.join(ROOT, directory), { withFileTypes: true })
+        .filter((entry) => entry.isDirectory() || entry.name.endsWith('.md'))
+        .sort((left, right) => left.name.localeCompare(right.name));
+    const chapters = entries.flatMap((entry) => {
+        if (entry.name === 'index.md') return [];
+        const source = `${directory}/${entry.name}`;
+        return entry.isDirectory() ? getDirectoryDocuments(source) : [source];
+    });
+    return [`${directory}/index.md`, ...chapters];
+};
+const getCollectionDocuments = (base, groups) => [
+    `${base}/index.md`,
+    ...groups.flatMap((group) => getDirectoryDocuments(`${base}/${group}`))
+];
+const manualCaseGroups = [...collectionGroups, 'reports'];
+const manualCases = Object.fromEntries(manualCaseGroups.map((group) => [
+    group,
+    getCollectionDocuments('docs/user-manual/cases', [group]).slice(1)
+]));
+const requirementUseCases = getCollectionDocuments('docs/requirements/use-cases', collectionGroups);
+const requirementDiagrams = getCollectionDocuments(
+    'docs/requirements/diagrams',
+    [...collectionGroups, 'cross-cutting']
+);
 const manualOverview = 'docs/user-manual/overview.md';
 const manualProcedures = 'docs/user-manual/procedures.md';
 const manualErrorCatalog = 'docs/user-manual/error-messages.md';
@@ -40,19 +63,19 @@ const sequenceGroups = [
     'issues',
     'reports'
 ];
-const sequenceDocuments = (side) => [
-    `docs/architecture/${side}-code-sequences/index.md`,
-    ...sequenceGroups.map((group) => `docs/architecture/${side}-code-sequences/${group}.md`)
-];
+const sequenceDocuments = (side) => getCollectionDocuments(
+    `docs/architecture/${side}-code-sequences`,
+    sequenceGroups
+);
 const MANIFESTS = Object.freeze({
     'manual-administrador': [
         'docs/user-manual/actors/administrator.md',
         manualOverview,
         manualProcedures,
-        authenticationCases,
-        identityCases,
-        catalogCases,
-        reportCases,
+        ...manualCases.authentication,
+        ...manualCases['identity-access'],
+        ...manualCases.catalogs,
+        ...manualCases.reports,
         manualValidationMatrix,
         manualErrorCatalog
     ],
@@ -60,21 +83,21 @@ const MANIFESTS = Object.freeze({
         'docs/user-manual/actors/warehouse.md',
         manualOverview,
         manualProcedures,
-        authenticationCases,
-        catalogCases,
-        purchaseCases,
-        issueCases,
-        reportCases,
+        ...manualCases.authentication,
+        ...manualCases.catalogs,
+        ...manualCases.purchases,
+        ...manualCases.issues,
+        ...manualCases.reports,
         manualValidationMatrix,
         manualErrorCatalog
     ],
     requisitos: [
         'docs/requirements/index.md',
         'docs/requirements/vision-scope-and-requirements.md',
-        'docs/requirements/requirements-specification.md',
+        ...getDirectoryDocuments('docs/requirements/requirements-specification'),
         'docs/requirements/domain-and-use-cases.md',
-        'docs/requirements/use-case-descriptions.md',
-        'docs/requirements/requirements-diagrams.md',
+        ...requirementUseCases,
+        ...requirementDiagrams,
         'docs/requirements/requirements-operations-matrix.md',
         'docs/requirements/business-glossary.md'
     ],
@@ -96,10 +119,10 @@ const MANIFESTS = Object.freeze({
         'docs/architecture/frontend-technical-documentation.md',
         ...sequenceDocuments('frontend'),
         'docs/architecture/traceability-matrix.md',
-        'docs/architecture/design-and-construction-patterns.md',
+        ...getDirectoryDocuments('docs/architecture/design-and-construction-patterns'),
         'docs/architecture/code-diagrams.md',
         'docs/generated/code-map.md',
-        'docs/architecture/diagram-conventions.md',
+        ...getDirectoryDocuments('docs/architecture/diagram-conventions'),
         'docs/architecture/diagram-inventory.md',
         'docs/architecture/decisions/index.md',
         'docs/architecture/decisions/ADR-001-secuencias-por-perspectiva-y-grupo.md'

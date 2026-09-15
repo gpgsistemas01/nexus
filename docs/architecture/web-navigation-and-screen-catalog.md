@@ -7,7 +7,7 @@ Nexus: estados de acceso, navegación disponible, pantallas y redirecciones de
 compatibilidad. No describe contenedores, componentes, despliegue ni dependencias entre
 capas; esas decisiones pertenecen a la [descripción de arquitectura](architecture-and-web-views.md).
 
-Las vistas usan Mermaid y siguen las [convenciones de diagramas](diagram-conventions.md).
+Las vistas usan Mermaid y siguen las [convenciones de diagramas](diagram-conventions/index.md).
 Las rutas registradas se comprueban en el [mapa generado del código](../generated/code-map.md),
 mientras que aquí se conserva el propósito visible y la estructura de navegación que
 no pueden inferirse automáticamente.
@@ -164,6 +164,6 @@ Al agregar, renombrar o retirar una vista web:
 
 Los diagramas describen el diseño a nivel de sistema; el código sigue siendo la fuente
 de verdad para los detalles de endpoints, payloads y reglas de autorización. Las vistas
-nuevas deben seguir las [convenciones y patrones para diagramas](diagram-conventions.md),
+nuevas deben seguir las [convenciones y patrones para diagramas](diagram-conventions/index.md),
 incluida la distinción entre notación visual, patrón documental y patrón con evidencia
 en el código.

@@ -51,7 +51,7 @@ Las correspondencias entre vistas también se adoptan de manera selectiva. En Ne
 una secuencia aplicada declara códigos `FE-P*` o `BE-P*`, y el índice de su colección
 los relaciona con un identificador canónico `DIA-PAT-*`. Así puede recorrerse la
 manifestación concreta hacia el patrón sin incrustar un diagrama dentro de otro. La
-[convención de enlace](../architecture/diagram-conventions.md#enlaces-entre-diagramas-y-patrones)
+[convención de enlace](../architecture/diagram-conventions/06-inventario-de-notacion-uml.md#enlaces-entre-diagramas-y-patrones)
 es local: 42010 y 1016 orientan la separación, las relaciones y la trazabilidad entre
 vistas, pero no prescriben esos códigos, Markdown ni Mermaid.
 

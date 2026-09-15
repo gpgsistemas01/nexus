@@ -43,7 +43,7 @@ documentos.
 | Pregunta técnica | Ubicación propietaria | Uso de diagramas |
 | --- | --- | --- |
 | ¿Qué responsabilidad tiene una capa, dominio o componente y cómo colabora? | [Arquitectura y catálogo de vistas web](architecture-and-web-views.md) para contexto y componentes; [diagramas vigentes del código](code-diagrams.md) para estructura, dinámica y reutilización. | Actualizar la vista Mermaid existente si cambia su semántica; crear otra sólo si responde una pregunta diferente. |
-| ¿Qué patrón se reutiliza y dónde están sus puntos de extensión? | [Patrones de diseño y construcción](design-and-construction-patterns.md). | Enlazar su diagrama canónico o agregar una vista que evidencie el patrón sin enumerar cada consumidor. |
+| ¿Qué patrón se reutiliza y dónde están sus puntos de extensión? | [Patrones de diseño y construcción](design-and-construction-patterns/index.md). | Enlazar su diagrama canónico o agregar una vista que evidencie el patrón sin enumerar cada consumidor. |
 | ¿Qué rutas e importaciones existen realmente? | [Mapa generado del código](../generated/code-map.md). | Regenerar con `npm run docs:architecture`; no mantener a mano otro inventario. |
 | ¿Qué modelos, campos y relaciones persisten? | [Esquema generado](../generated/database-schema.md), [diccionario técnico](../generated/data-dictionary.md) y `prisma/schema.prisma`. | Enlazar el diagrama entidad-relación generado; las decisiones de acceso permanecen en la [familia de datos](../data/index.md). |
 | ¿Cuál es el contrato HTTP observable? | [Contrato de la API](api-contract.md); el mapa generado localiza los endpoints registrados. | Un flujo de secuencia puede enlazar el contrato, pero no repetir todas sus respuestas y errores. |
@@ -111,7 +111,7 @@ flowchart TB
 ```
 
 Las reglas de notación, nivel de detalle y mantenimiento de una vista nueva permanecen
-en las [convenciones de diagramas](diagram-conventions.md#patrón-mínimo-de-cada-diagrama).
+en las [convenciones de diagramas](diagram-conventions/03-patron-minimo-de-cada-diagrama.md#patrón-mínimo-de-cada-diagrama).
 En particular, primero se reutiliza la progresión existente de contexto, contenedores,
 estructura, dinámica, reutilización y detalle generado.
 
@@ -157,7 +157,7 @@ Ejemplos vigentes que deben enlazarse antes de crear otra vista:
 - entidades y cardinalidades en el
   [esquema generado de base de datos](../generated/database-schema.md);
 - flujos funcionales y estados en los
-  [diagramas de requisitos](../requirements/requirements-diagrams.md).
+  [diagramas de requisitos](../requirements/diagrams/index.md).
 
 No se crea un diagrama por endpoint, tabla o función. Cuando un caso sí requiere una
 vista dinámica, ésta se limita a ese `CU-*` y no se generaliza para representar otros

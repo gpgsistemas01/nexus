@@ -227,7 +227,7 @@ Estos procesos no forman parte del arranque normal de Nexus y requieren herramie
 
 La guía completa y secuencial —instalación por sistema operativo, validación, nombres de paquetes,
 creación y eliminación del estado de sesión, cierre de Playwright y detención de Nexus— está en
-[Exportar la documentación](docs/README.md#exportar-la-documentación). No ejecute
+[Exportar la documentación](docs/governance/document-export-guide/index.md). No ejecute
 `docs:screenshots` sólo para exportar: Pandoc reutiliza las imágenes ya revisadas.
 
 ## Rutas principales

@@ -31,7 +31,7 @@ suficiente. Los archivos exactos de rutas y exports se localizan en el mapa gene
 
 1. partir del identificador normativo y confirmar su `CU-*` y actor;
 2. contrastar nombre, disparador, precondiciones, flujo principal, alternativas, excepciones y
-   postcondiciones en la [ficha normativa](../requirements/use-case-descriptions.md), y actualizarla
+   postcondiciones en la [ficha normativa](../requirements/use-cases/index.md), y actualizarla
    cuando cambie cualquiera de esos elementos;
 3. revisar el [procedimiento del manual](../user-manual/procedures.md#casos-por-grupo-funcional):
    debe conservar el mismo identificador y nombre, describir los controles observables y no

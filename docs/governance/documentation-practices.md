@@ -62,12 +62,15 @@ Toda colección dividida conserva:
 - un manifiesto de publicación explícito;
 - validación conjunta de cobertura, referencias y fuentes requeridas.
 
+La aplicación de estos criterios a los artefactos extensos se registra en la
+[revisión de documentos no orientados por caso de uso](non-use-case-document-review.md).
+
 ## Aplicación por familia
 
 | Familia | Organización aplicada | Criterio de crecimiento |
 | --- | --- | --- |
-| Manual de usuario | Entrada general, procedimientos, capítulos por grupo funcional y entradas por actor. | Agregar una tarea al capítulo propietario; crear otro grupo sólo cuando exista un recorrido independiente. |
-| Requisitos | Entrada, especificación normativa, fichas, matrices, diagramas y glosario. | Separar una colección sólo si mantiene identificadores y una fuente normativa única; no dividir por actor si ello duplica requisitos. |
+| Manual de usuario | Entrada general, procedimientos, índices por área, un archivo por recorrido `CAP-*` y entradas por actor. | Agregar cada tarea como archivo del área propietaria; crear otra área sólo cuando exista un recorrido independiente. |
+| Requisitos | Entrada y especificación normativa; fichas y diagramas en subcarpetas con índices por grupo y un archivo por caso; matrices y glosario. | Agregar cada caso como archivo del grupo propietario sin dividir por actor ni duplicar requisitos; conservar los identificadores al mover contenido. |
 | Arquitectura | Entrada por preguntas, vistas generales, patrones, referencia técnica, secuencias por perspectiva y grupo, decisiones y convenciones. | Comenzar en contexto y abrir detalle por enlace; crear una vista sólo si responde una pregunta distinta. |
 | Datos | Entrada, contrato HTTP, análisis de acceso y evidencia generada del esquema. | Mantener contratos y decisiones separados de inventarios derivados; preferir una especificación procesable cuando madure el contrato. |
 | Pruebas | Estrategia, plan, catálogos y resultados. | Separar estrategia, diseño y evidencia; un catálogo se divide por nivel o dominio sólo si conserva una cobertura verificable. |

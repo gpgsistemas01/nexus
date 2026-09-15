@@ -120,7 +120,7 @@ flowchart LR
 ```
 
 Los grafos se escriben en Mermaid y siguen las
-[convenciones de diagramas](../architecture/diagram-conventions.md). Debajo de cada grafo
+[convenciones de diagramas](../architecture/diagram-conventions/index.md). Debajo de cada grafo
 se documentan su propósito, alcance, fuente y límites; los IDs visibles deben coincidir
 con las tablas y con la prueba ejecutable.
 

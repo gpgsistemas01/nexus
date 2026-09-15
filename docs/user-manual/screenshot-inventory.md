@@ -6,7 +6,7 @@ Cada captura tiene un identificador estable `CAP-<grupo>-<ámbito>-<paso>-<estad
 identificador permite relacionarla con uno o más casos de uso sin depender del nombre del
 archivo. Ese mismo identificador se publica como ancla junto a la imagen en los
 [procedimientos del manual](procedures.md), de modo que puede citarse como, por ejemplo,
-`cases/catalogs.md#CAP-CAT-MAT-02-CREATE`. La ruta conserva el patrón
+`cases/catalogs/04-cap-cat-mat-02-create.md#CAP-CAT-MAT-02-CREATE`. La ruta conserva el patrón
 `images/<módulo>/NN-descripcion.png`: `NN` expresa el orden
 en que el lector recorre el módulo, desde el listado hacia la captura de datos, la edición, las
 operaciones que modifican existencias y, al final, la exportación.
@@ -176,7 +176,7 @@ genera las imágenes. No crea un archivo de sesión. `DOCS_STORAGE_STATE` permit
 sesión preparado previamente como mecanismo alternativo; nunca se genera a partir del usuario y la
 contraseña. Estos valores sólo se leen del entorno del proceso, no se agregan al archivo `.env`, y
 deben retirarse de la terminal al terminar, como indica la
-[guía de exportación](../README.md#exportar-la-documentación). La pantalla de inicio de sesión se
+[guía de exportación](../governance/document-export-guide/index.md). La pantalla de inicio de sesión se
 toma en un contexto separado y sin autenticación. Una selección compuesta únicamente por capturas
 públicas tampoco abre un contexto autenticado ni necesita leer el archivo indicado por
 `DOCS_STORAGE_STATE`.

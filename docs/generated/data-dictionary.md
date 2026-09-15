@@ -4,7 +4,7 @@
 Este inventario se genera desde `prisma/schema.prisma` y enumera campos escalares,
 obligatoriedad, claves, valores predeterminados, tipos de base de datos y relaciones
 propietarias. Se aplican las
-[convenciones de diagramas](../architecture/diagram-conventions.md).
+[convenciones de diagramas](../architecture/diagram-conventions/index.md).
 
 El tipo Prisma y el atributo `@db` describen la representación técnica. Prisma y las
 migraciones son la fuente de verdad para restricciones completas, índices, acciones
