@@ -132,7 +132,6 @@ model Material {
   sku                                String?                    @unique @db.VarChar(200)
   presentationId                     String                     @db.Uuid
   unitMeasureId                      String                     @db.Uuid
-  isActive                           Boolean                    @default(true)
   minStock                           Decimal                    @default(0) @db.Decimal(18, 6)
   base                               Decimal?                   @db.Decimal(18, 6)
   height                             Decimal?                   @db.Decimal(18, 6)
@@ -187,6 +186,7 @@ model SupplierMaterial {
   sku               String?  @db.VarChar(50)
   currentStock      Decimal  @default(0) @db.Decimal(18, 6)
   convertedQuantity Decimal  @default(0) @db.Decimal(18, 6)
+  isActive           Boolean  @default(true)
   supplierId        String   @db.Uuid
   materialId        String   @db.Uuid
   supplier          Supplier @relation(fields: [supplierId], references: [id])

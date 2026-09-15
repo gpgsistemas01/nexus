@@ -161,7 +161,8 @@ export const createWasteWithInitialStockAdjustment = async ({
 
             const material = await resolveWasteMaterialSnapshot({
                 tx,
-                materialId: wasteDto.materialId
+                materialId: wasteDto.materialId,
+                supplierId: wasteDto.supplierId
             });
 
             if (!material) throw new WasteNotFound();

@@ -13,7 +13,7 @@ const MAX_RETRIES = 5;
 
 export const prepareMaterialData = async ({ tx, materialDto, materialId = null }) => {
 
-    const { presentationId, unitMeasureId, supplierId, maxUnitCost, ...rest } = materialDto;
+    const { presentationId, unitMeasureId, supplierId, maxUnitCost, isActive, ...rest } = materialDto;
 
     const [, , supplier] = await Promise.all([
         findUniqueUnitMeasure({ tx, id: unitMeasureId }),
@@ -29,7 +29,8 @@ export const prepareMaterialData = async ({ tx, materialDto, materialId = null }
             presentationId,
             unitMeasureId,
             supplierId,
-            maxUnitCost
+            maxUnitCost,
+            isActive
         }
     };
 };

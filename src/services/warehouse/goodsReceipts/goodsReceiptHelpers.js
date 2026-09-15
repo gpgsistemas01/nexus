@@ -21,11 +21,11 @@ export const GOODS_RECEIPT_DETAIL_INCLUDE = Object.freeze({
     }
 });
 
-export const buildGoodsReceiptDetails = async (details, { tx = null, requireActive = true } = {}) => {
+export const buildGoodsReceiptDetails = async (details, { tx = null, supplierId = null, requireActive = true } = {}) => {
 
     const materialIds = details.map(d => d.materialId);
 
-    const materials = await findMaterialsSnapshot({ tx, materialIds });
+    const materials = await findMaterialsSnapshot({ tx, materialIds, supplierId });
 
     const materialMap = new Map(materials.map(p => [p.id, p]));
 
@@ -168,8 +168,8 @@ export const cancelGoodsReceiptDetailAndTotals = ({ tx, goodsReceiptId, detailId
     })
 );
 
-export const createGoodsReceiptDetailsAndUpdateTotals = async ({ tx, goodsReceiptId, details }) => {
-    const processedDetails = await buildGoodsReceiptDetails(details, { tx });
+export const createGoodsReceiptDetailsAndUpdateTotals = async ({ tx, goodsReceiptId, supplierId, details }) => {
+    const processedDetails = await buildGoodsReceiptDetails(details, { tx, supplierId });
     const createdDetails = await tx.goodsReceiptDetail.createManyAndReturn({
         data: processedDetails.map(detail => ({
             ...detail,

@@ -34,14 +34,13 @@ describe('plantillas de material para el CRUD de mermas', () => {
 
     expect(materialFindMany).toHaveBeenCalledWith(expect.objectContaining({
       where: {
-        isActive: true,
         name: { contains: 'lo', mode: 'insensitive' },
-        supplierMaterials: { some: { supplierId: 'supplier-1' } }
+        supplierMaterials: { some: { supplierId: 'supplier-1', isActive: true } }
       },
       orderBy: { name: 'asc' }
     }));
     expect(materialFindMany.mock.calls[0][0].select.supplierMaterials).toEqual({
-      where: { supplierId: 'supplier-1' },
+      where: { supplierId: 'supplier-1', isActive: true },
       select: { maxUnitCost: true }
     });
     expect(result.data).toEqual([

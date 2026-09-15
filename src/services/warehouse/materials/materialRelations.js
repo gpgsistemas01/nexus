@@ -6,7 +6,8 @@ export const syncSupplierMaterial = async ({
     supplierId,
     previousSupplierId = null,
     materialId,
-    maxUnitCost
+    maxUnitCost,
+    isActive
 }) => {
 
     if (previousSupplierId && previousSupplierId !== supplierId) {
@@ -21,6 +22,7 @@ export const syncSupplierMaterial = async ({
         tx,
         supplierId,
         materialId,
-        maxUnitCost
+        maxUnitCost,
+        isActive
     });
 };

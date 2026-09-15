@@ -1,7 +1,5 @@
 import { formatCurrency, formatDecimal } from "../../../../utils/formatUtils.js";
-import { buildInventorySelectText, getBase, getCurrentStock, getHeight, getMaxUnitCost, getMinStock, getPresentation, getUnitMeasure } from "../../../../utils/warehouseInventoryUtils.js";
-
-const CENTERED_CELL_CLASS = 'text-center align-middle';
+import { buildInventorySelectText, getBase, getCurrentStock, getHeight, getIsActive, getMaxUnitCost, getMinStock, getPresentation, getUnitMeasure } from "../../../../utils/warehouseInventoryUtils.js";
 
 export const renderWarehouseInventoryHeader = ({ tableElement, canSeeActive, canSeeCost, canManageItems }) => {
 
@@ -33,42 +31,34 @@ export const buildWarehouseInventoryColumns = ({ canSeeActive, canSeeCost, canMa
     const columns = [
         {
             data: null,
-            className: CENTERED_CELL_CLASS,
             render: (data, type, row) => buildInventorySelectText(row)
         },
         { 
             data: null,
-            className: CENTERED_CELL_CLASS,
             render: (_, __, row) => formatDecimal(getBase(row))
         },
         { 
             data: null,
-            className: CENTERED_CELL_CLASS,
             render: (_, __, row) => formatDecimal(getHeight(row))
         },
         { 
             data: null,
-            className: CENTERED_CELL_CLASS,
             render: (_, __, row) => formatDecimal(getCurrentStock(row))
         },
         { 
             data: null,
-            className: CENTERED_CELL_CLASS,
             render: (_, __, row) => formatDecimal(getMinStock(row))
         },
         { 
             data: null,
-            className: CENTERED_CELL_CLASS,
             render: (_, __, row) => getPresentation(row)
         },
         {
             data: 'convertedQuantity',
-            className: CENTERED_CELL_CLASS,
             render: formatDecimal
         },
         { 
             data: null,
-            className: CENTERED_CELL_CLASS,
             render: (_, __, row) => getUnitMeasure(row)
         }
     ];
@@ -76,16 +66,14 @@ export const buildWarehouseInventoryColumns = ({ canSeeActive, canSeeCost, canMa
     if (canSeeCost) {
         columns.push({ 
             data: null,
-            className: CENTERED_CELL_CLASS,
             render: (_, __, row) => formatCurrency (getMaxUnitCost(row))
         });
     }
 
     if (canSeeActive) {
         columns.push({
-            data: 'isActive',
-            className: CENTERED_CELL_CLASS,
-            render: value => value ? 'Sí' : 'No'
+            data: null,
+            render: (_, __, row) => getIsActive(row) ? 'Sí' : 'No'
         });
     }
 
@@ -93,7 +81,6 @@ export const buildWarehouseInventoryColumns = ({ canSeeActive, canSeeCost, canMa
         columns.push({
             data: null,
             title: 'Acciones',
-            className: CENTERED_CELL_CLASS,
             render: renderActions
         });
     }

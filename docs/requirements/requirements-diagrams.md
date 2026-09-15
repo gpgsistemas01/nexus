@@ -91,19 +91,19 @@ contexto concreto.
 
 ```mermaid
 flowchart TD
-    actor["Actor confirma alta o edición<br/>con Activo marcado o desmarcado"] --> persist["Nexus conserva el estado<br/>del catálogo"]
+    actor["Actor confirma alta o edición<br/>con Activo marcado o desmarcado"] --> persist["Nexus conserva el estado<br/>del recurso operativo"]
     persist --> preserve["Conservar identidad, relaciones,<br/>stock, movimientos e historia"]
     persist --> resource{"¿Qué catálogo cambió?"}
 
-    resource -->|Material| materialUse{"¿Uso nuevo o detalle<br/>ya comprometido?"}
-    materialUse -->|Nueva compra, salida o relación| materialValidation{"¿Material y proveedor activos?"}
+    resource -->|Oferta proveedor-material| materialUse{"¿Uso nuevo o detalle<br/>ya comprometido?"}
+    materialUse -->|Nueva compra, salida o relación| materialValidation{"¿Oferta y proveedor activos?"}
     materialValidation -->|No| rejectMaterial["Rechazar el detalle o alta;<br/>no mover stock"]
     materialValidation -->|Sí| allowMaterial["Permitir continuar"]
     materialUse -->|Surtir salida existente| fulfillMaterial["Permitir completar el pendiente<br/>si hay stock"]
     materialUse -->|Reporte| materialReport{"¿Qué alcance se eligió?"}
-    materialReport -->|Sólo activos| activeMaterial["Incluir sólo materiales activos"]
-    materialReport -->|Sólo con existencia| stockedMaterial["Incluir por stock,<br/>aunque esté inactivo"]
-    materialReport -->|Activos o con existencia| materialUnion["Incluir si está activo<br/>o conserva stock"]
+    materialReport -->|Sólo activos| activeMaterial["Incluir sólo ofertas activas"]
+    materialReport -->|Sólo con existencia| stockedMaterial["Incluir por stock,<br/>aunque esté inactiva"]
+    materialReport -->|Activos o con existencia| materialUnion["Incluir si está activa<br/>o conserva stock"]
 
     resource -->|Merma| wasteUse{"¿Uso nuevo o detalle<br/>ya comprometido?"}
     wasteUse -->|Consulta o reporte| wasteScope["Conservar visible según filtros;<br/>aplicar Activo / con existencia"]
@@ -119,7 +119,7 @@ flowchart TD
 
 La desactivación impide incorporar el recurso en una nueva compra, salida, merma o
 relación aplicable, pero no cancela compromisos ya registrados. Si una salida quedó
-**Surtido parcial** y después se desactiva el material, la merma o el proveedor, Nexus
+**Surtido parcial** y después se desactiva la oferta proveedor-material, la merma o el proveedor, Nexus
 permite surtir sus detalles pendientes usando el snapshot del documento, siempre que
 haya stock. Así puede cerrarse la solicitud sin habilitar usos nuevos; si no debe
 entregarse, se conserva pendiente hasta que el negocio defina una cancelación, pues

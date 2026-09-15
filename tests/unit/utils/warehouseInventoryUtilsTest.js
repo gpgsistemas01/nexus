@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import {
   getBase,
   getHeight,
+  getIsActive,
   getMaterialName,
   getPresentation,
   getPresentationId,
@@ -54,6 +55,19 @@ describe('select de material reutilizado por el CRUD de merma', () => {
     expect(getSupplierName(prismaDetail)).toBe('Proveedor Prisma');
     expect(getPresentation({ presentation: { name: 'PIEZA' } })).toBe('PIEZA');
     expect(getUnitMeasure({ unitMeasure: 'pza' })).toBe('pza');
+  });
+
+  it.each([
+    ['oferta plana activa', { isActive: true }, true],
+    ['oferta plana inactiva', { isActive: false }, false],
+    ['oferta anidada activa', { supplierMaterial: { isActive: true } }, true],
+    ['oferta anidada inactiva', { supplierMaterial: { isActive: false } }, false],
+    ['estado plano prioritario', { isActive: false, supplierMaterial: { isActive: true } }, false],
+    ['estado plano nulo', { isActive: null, supplierMaterial: { isActive: true } }, true],
+    ['contrato sin estado', { material: { isActive: true } }, false],
+    ['valor vacío', undefined, false]
+  ])('obtiene el estado activo para %s', (_, item, expected) => {
+    expect(getIsActive(item)).toBe(expected);
   });
 
   it('resuelve de forma segura la presentación del listado CRUD de merma', () => {

@@ -33,6 +33,9 @@ export const getUnitMeasureId = (item = {}) => (
 export const getMaxUnitCost = (item) => item.maxUnitCost ?? item.supplierMaterial?.maxUnitCost;
 export const getCurrentStock = (item) => item.currentStock ?? item.supplierMaterial?.currentStock;
 export const getMinStock = (item) => item.minStock ?? item.supplierMaterial?.minStock;
+export const getIsActive = (item = {}) => (
+    item.isActive ?? item.supplierMaterial?.isActive ?? false
+);
 export const getMaterialName = (item = {}) => (
     item.material?.name
     ?? item.supplierMaterial?.material?.name

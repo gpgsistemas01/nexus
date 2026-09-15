@@ -114,7 +114,6 @@ erDiagram
         String sku UK
         String presentationId FK
         String unitMeasureId FK
-        Boolean isActive
         Decimal minStock
         Decimal base
         Decimal height
@@ -136,6 +135,7 @@ erDiagram
         String sku
         Decimal currentStock
         Decimal convertedQuantity
+        Boolean isActive
         String supplierId FK
         String materialId FK
     }
