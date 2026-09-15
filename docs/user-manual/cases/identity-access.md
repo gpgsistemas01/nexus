@@ -14,7 +14,7 @@ Cada procedimiento identifica sus casos de uso, controles, errores posibles y ca
 <a id="CAP-IDA-PER-01-LIST"></a>
 ### CAP-IDA-PER-01-LIST — Listado
 
-**Casos de uso:** `CU-IDA-01` — Consultar personas; `CU-REP-14` — Generar reporte de personas.
+**Casos de uso:** `CU-IDA-01` — Consultar personas; `CU-IDA-04` — Generar reporte de personas.
 
 **Errores posibles:** [Catálogos e inventario](../error-messages.md#errores-catalogos).
 
@@ -27,11 +27,15 @@ Cada procedimiento identifica sus casos de uso, controles, errores posibles y ca
 2. Escriba un término en **Buscar por Nombre** o elija opciones en los filtros **Área** y **Rol**.
 3. Seleccione **Buscar / filtrar** para actualizar la tabla; use **Limpiar filtros** para restablecerla.
 4. En la tabla, seleccione **Nueva persona**, **Exportar Excel** o **Editar registro** en una fila.
+5. Si selecciona **Exportar Excel**, Nexus abre el modal **Exportar reporte**. Confirme que se aplicarán la búsqueda, los filtros y el orden actuales; seleccione **Descargar** para continuar o cierre el modal para cancelar.
+
+   <a id="CAP-IDA-PER-04-EXPORT"></a>
+   ![CAP-IDA-PER-04-EXPORT: modal para exportar personas](../images/personas/04-exportar-reporte.png)
 
 <a id="CAP-IDA-PER-02-CREATE"></a>
 ### CAP-IDA-PER-02-CREATE — Formulario alta
 
-**Casos de uso:** `CU-IDA-02` — Crear persona; `CU-IDA-08` — Consultar roles; `CU-IDA-09` — Consultar departamentos.
+**Casos de uso:** `CU-IDA-02` — Crear persona; `CU-IDA-10` — Consultar roles; `CU-IDA-11` — Consultar departamentos.
 
 **Errores posibles:** [Validación de formularios](../error-messages.md#errores-validacion), [Catálogos e inventario](../error-messages.md#errores-catalogos).
 
@@ -74,23 +78,27 @@ Cada procedimiento identifica sus casos de uso, controles, errores posibles y ca
 <a id="CAP-IDA-USR-01-LIST"></a>
 ### CAP-IDA-USR-01-LIST — Listado
 
-**Casos de uso:** `CU-IDA-04` — Consultar usuarios; `CU-REP-15` — Generar reporte de usuarios.
+**Casos de uso:** `CU-IDA-05` — Consultar usuarios; `CU-IDA-09` — Generar reporte de usuarios.
 
 **Errores posibles:** [Acceso y autorización](../error-messages.md#errores-acceso), [Catálogos e inventario](../error-messages.md#errores-catalogos).
 
-**Controles que debe usar:** Buscador **Buscar por Usuario**; botones **Exportar Excel** y **Nuevo usuario**; acciones **Editar usuario** y **Cambiar contraseña** de cada fila.
+**Controles que debe usar:** Buscador **Buscar por Usuario**; botones **Exportar Excel** y **Nuevo usuario**; acciones **Editar registro** y **Cambiar contraseña** de cada fila.
 
 1. Antes de usar los controles, compruebe que la pantalla inicial coincida con la captura:
 
    ![CAP-IDA-USR-01-LIST: listado](../images/usuarios/01-listado.png)
 
 2. Escriba un término en el buscador **Buscar por Usuario** para localizar una cuenta.
-3. En la tabla, seleccione **Nuevo usuario**, **Exportar Excel**, **Editar usuario** o **Cambiar contraseña**.
+3. En la tabla, seleccione **Nuevo usuario**, **Exportar Excel**, **Editar registro** o **Cambiar contraseña**.
+4. Si selecciona **Exportar Excel**, Nexus abre el modal **Exportar reporte**. Confirme que se aplicarán la búsqueda, los filtros y el orden actuales; seleccione **Descargar** para continuar o cierre el modal para cancelar.
+
+   <a id="CAP-IDA-USR-05-EXPORT"></a>
+   ![CAP-IDA-USR-05-EXPORT: modal para exportar usuarios](../images/usuarios/05-exportar-reporte.png)
 
 <a id="CAP-IDA-USR-02-CREATE"></a>
 ### CAP-IDA-USR-02-CREATE — Formulario alta
 
-**Casos de uso:** `CU-IDA-05` — Crear usuario y asignar acceso.
+**Casos de uso:** `CU-IDA-06` — Crear usuario y asignar acceso.
 
 **Errores posibles:** [Validación de formularios](../error-messages.md#errores-validacion), [Acceso y autorización](../error-messages.md#errores-acceso), [Catálogos e inventario](../error-messages.md#errores-catalogos).
 
@@ -106,13 +114,13 @@ Cada procedimiento identifica sus casos de uso, controles, errores posibles y ca
 <a id="CAP-IDA-USR-03-EDIT"></a>
 ### CAP-IDA-USR-03-EDIT — Formulario edicion
 
-**Casos de uso:** `CU-IDA-06` — Editar usuario y acceso.
+**Casos de uso:** `CU-IDA-07` — Editar usuario y acceso.
 
 **Errores posibles:** [Validación de formularios](../error-messages.md#errores-validacion), [Acceso y autorización](../error-messages.md#errores-acceso), [Catálogos e inventario](../error-messages.md#errores-catalogos).
 
-**Controles que debe usar:** Acción **Editar usuario**; selectores **Buscar área...** y **Buscar rol...**; campo **Usuario** y botón **Actualizar**.
+**Controles que debe usar:** Acción **Editar registro**; selectores **Buscar área...** y **Buscar rol...**; campo **Usuario** y botón **Actualizar**.
 
-1. En la fila de la cuenta, seleccione la acción **Editar usuario**. Antes de continuar, compruebe que la pantalla mostrada coincida con la captura:
+1. En la fila de la cuenta, seleccione la acción **Editar registro**. Antes de continuar, compruebe que la pantalla mostrada coincida con la captura:
 
    ![CAP-IDA-USR-03-EDIT: formulario edicion](../images/usuarios/03-formulario-edicion.png)
 
@@ -124,7 +132,7 @@ Cada procedimiento identifica sus casos de uso, controles, errores posibles y ca
 <a id="CAP-IDA-USR-04-PASSWORD"></a>
 ### CAP-IDA-USR-04-PASSWORD — Cambio contrasena
 
-**Casos de uso:** `CU-IDA-07` — Cambiar contraseña de usuario.
+**Casos de uso:** `CU-IDA-08` — Cambiar contraseña de usuario.
 
 **Errores posibles:** [Validación de formularios](../error-messages.md#errores-validacion), [Acceso y autorización](../error-messages.md#errores-acceso), [Catálogos e inventario](../error-messages.md#errores-catalogos).
 

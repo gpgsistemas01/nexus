@@ -80,6 +80,7 @@ export const getManagedCatalog = (catalogName) => {
         fields: [...catalog.fields],
         maxLengths: { ...catalog.maxLengths },
         label: catalog.label,
-        entityLabel: catalog.entityLabel
+        entityLabel: catalog.entityLabel,
+        createButtonLabel: catalog.createButtonLabel
     };
 };

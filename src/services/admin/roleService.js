@@ -11,6 +11,7 @@ export const findAllRoles = async ({
     const db = getDb();
 
     const where = {
+        isActive: true,
         ...(search && {
             name: {
                 contains: search,
@@ -28,7 +29,8 @@ export const findAllRoles = async ({
         },
         select: {
             id: true,
-            name: true
+            name: true,
+            isActive: true
         }
     });
 

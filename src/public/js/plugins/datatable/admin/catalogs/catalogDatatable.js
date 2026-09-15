@@ -9,6 +9,7 @@ import { getResponsiveRowData } from '../../core/responsive/rowData.js';
 const page = document.querySelector('#catalogContext');
 const catalog = page.dataset.catalog;
 const entityLabel = page.dataset.entityLabel;
+const createButtonLabel = page.dataset.createButtonLabel;
 const fields = new Set(page.dataset.fields.split(','));
 const selector = '#table';
 
@@ -32,13 +33,13 @@ export const createCatalogDatatable = () => {
                     title: 'Acciones',
                     render: () => buildMdbEditActionButton({
                         className: 'btn-edit',
-                        label: 'Editar'
+                        label: 'Editar registro'
                     })
                 }
             ],
             searchPlaceholder: 'Buscar por nombre',
             buttons: [{
-                text: 'Agregar',
+                text: createButtonLabel,
                 action: () => openCatalogModal({
                     catalog,
                     entityLabel,

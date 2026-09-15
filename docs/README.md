@@ -37,11 +37,10 @@ docs/
 
 La [guía de publicación y versionado](governance/publication-and-versioning.md) define
 portadas, formatos, idioma, capturas, paquetes exportables y la relación entre las
-versiones del sistema y del documento. `requirements/index.md` y
-`user-manual/index.md` son las entradas de sus paquetes; fijan el orden de exportación
-sin separar la portada de la familia documental a la que pertenece. Los manuales general y por
-actor comparten `user-manual/overview.md` y `user-manual/procedures.md`; cada entrada conserva
-su propia portada y selección de casos.
+versiones del sistema y del documento. `requirements/index.md` es la entrada del paquete de requisitos. Los manuales se publican
+exclusivamente por actor desde `user-manual/actors/`; comparten
+`user-manual/overview.md` y `user-manual/procedures.md`, pero cada entrada conserva su propia
+portada y selección de casos. No se mantiene un manual general que mezcle recorridos y permisos.
 
 El manual incluye una [matriz de validación y modos de formulario](user-manual/form-validation-matrix.md)
 como referencia operativa exportable. La matriz de operaciones de requisitos sigue siendo la
@@ -335,16 +334,15 @@ un paquete de npm. Elija uno de estos valores:
 
 | Valor de `<paquete>` | Contenido generado | Cuándo usarlo |
 | --- | --- | --- |
-| `manual-usuario` | Manual completo con todos los grupos funcionales, referencias e inventario de capturas. | Para publicar el manual general. |
 | `manual-administrador` | Acceso, identidad, catálogos y reportes disponibles para Sistemas. | Para personal administrador del sistema. |
 | `manual-almacen` | Acceso, catálogos, compras, salidas y reportes operativos. | Para personal de almacén y proveeduría. |
 | `requisitos` | Especificación y trazabilidad de requisitos. | Para revisión funcional. |
 | `datos` | Mapa de datos, decisiones de acceso, esquema y diccionario técnico generados. | Para revisar persistencia y acceso a los datos. |
 | `arquitectura` | Diseño, documentación técnica y contrato API con estructuras JSON y validaciones. | Para revisión técnica y de integraciones HTTP. |
 | `pruebas` | Plan, cobertura, catálogo y resultados de pruebas. | Para evidencia de calidad. |
-| `todos` | Los siete documentos anteriores, cada uno en su propio archivo. | Para preparar una entrega documental completa con un solo comando. |
+| `todos` | Los seis documentos anteriores, cada uno en su propio archivo. | Para preparar una entrega documental completa con un solo comando. |
 
-Los paquetes específicos por actor reutilizan las secciones del manual completo y omiten las que
+Los paquetes por actor reutilizan las secciones comunes y omiten las que
 no corresponden a ese recorrido. Los formatos de entrega admitidos son `docx` y `pdf`; Markdown
 permanece como fuente navegable y por eso no se genera una copia HTML equivalente.
 
@@ -369,23 +367,23 @@ No es necesario eliminar manualmente un resultado antes de ejecutar nuevamente l
   inventario. No elimine esa carpeta por separado ni intente conservar capturas parciales.
 
 Una exportación no elimina otros paquetes o formatos de `build/docs/`. Por ejemplo, volver a
-generar `pdf/manual-usuario.pdf` no borra `docx/manual-usuario.docx`. Separar las carpetas evita
+generar `pdf/manual-almacen.pdf` no borra `docx/manual-almacen.docx`. Separar las carpetas evita
 mezclar entregables editables y finales y permite conservar ambos durante la revisión. Antes de
 entregar, seleccione el archivo recién generado y, si va a compartir la carpeta completa, retire de
 ella los resultados antiguos que no formen parte de la entrega. Nunca elimine los Markdown fuente
 de `docs/` para regenerar un documento.
 
 Para generar todos los documentos al mismo tiempo, use `todos`. El comando valida primero las
-fuentes e imágenes de los ocho paquetes y después crea un archivo independiente por paquete:
+fuentes e imágenes de los seis paquetes y después crea un archivo independiente por paquete:
 
 ```bash
 npm run docs:export -- todos docx
 ```
 
-El resultado no es un único documento combinado: los cuatro manuales, requisitos, datos,
-arquitectura y pruebas se crean dentro de `build/docs/docx/`. Para generar los ocho PDF, usa
+El resultado no es un único documento combinado: los dos manuales por actor, requisitos, datos,
+arquitectura y pruebas se crean dentro de `build/docs/docx/`. Para generar los seis PDF, use
 `npm run docs:export -- todos pdf`; los PDF quedan en `build/docs/pdf/` y también se conservan
-los ocho DOCX intermedios.
+los seis DOCX intermedios.
 
 ### Flujo general de exportación
 
@@ -408,12 +406,12 @@ Para exportar `requisitos`, `datos`, `arquitectura` o `pruebas`:
    `build/docs/pdf/`. La portada se genera automáticamente y se conservan ambos formatos.
 
 Si la entrega incluye toda la documentación, sustituya `<paquete>` por `todos` en los pasos 2 y
-3. Antes debe comprobar también que las capturas requeridas por los tres manuales ya existan y
+3. Antes debe comprobar también que las capturas requeridas por los dos manuales ya existan y
 estén aprobadas. Actualizarlas es una acción independiente de la exportación.
 
 ### Exportar los manuales
 
-Los paquetes `manual-usuario`, `manual-administrador` y `manual-almacen`
+Los paquetes `manual-administrador` y `manual-almacen`
 incluyen capturas de la aplicación, pero `docs:export` **no toma capturas ni abre Nexus**. Antes de
 exportar uno de esos paquetes se requieren:
 
@@ -426,11 +424,11 @@ Si se cumplen esos requisitos, no necesita una base de datos, una sesión ni Pla
 exportar. Valide y genere el manual:
 
 ```bash
-npm run docs:export -- manual-usuario --check
-npm run docs:export -- manual-usuario docx
+npm run docs:export -- manual-administrador --check
+npm run docs:export -- manual-administrador docx
 ```
 
-Sustituya `manual-usuario` por el paquete de actor y `docx` por `pdf` cuando corresponda. Si falta una
+Sustituya `manual-administrador` por `manual-almacen` y `docx` por `pdf` cuando corresponda. Si falta una
 imagen, `--check` detiene el proceso; en ese caso ejecute primero el flujo independiente siguiente.
 
 ### Actualizar las capturas del manual
@@ -575,11 +573,11 @@ Playwright y Chromium se preparan automáticamente en el mismo entorno antes de 
    apunte a una ruta inexistente.
 9. Si inició Nexus manualmente en la terminal 1, presione `Ctrl+C` y espere el prompt para
     detener Nexus/Nodemon. El comando automático ya detuvo su instancia temporal.
-10. Exporte el manual completo en DOCX:
+10. Exporte el manual del actor en DOCX:
 
    ```bash
-   npm run docs:export -- manual-usuario --check
-   npm run docs:export -- manual-usuario docx
+   npm run docs:export -- manual-administrador --check
+   npm run docs:export -- manual-administrador docx
    ```
 
 El límite de 30 segundos de Playwright es el tiempo máximo para que una condición de la página se
@@ -602,8 +600,8 @@ mecanismos conservan las demás imágenes.
 # Sólo valida fuentes e imágenes; no necesita Pandoc.
 npm run docs:export -- requisitos --check
 
-# Genera build/docs/docx/manual-usuario.docx.
-npm run docs:export -- manual-usuario docx
+# Genera build/docs/docx/manual-administrador.docx.
+npm run docs:export -- manual-administrador docx
 
 # Genera en DOCX un manual con el recorrido del personal de almacén.
 npm run docs:export -- manual-almacen docx

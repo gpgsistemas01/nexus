@@ -3,6 +3,7 @@
 Este capítulo forma parte del [catálogo de secuencias del código frontend](index.md) y conserva los recorridos aplicados del grupo `SAL`. Las reglas comunes de lectura, trazabilidad y mantenimiento se declaran en el índice de la colección.
 
 <a id="cu-sal-01"></a>
+
 ## `CU-SAL-01` — Consultar salidas de material
 
 **Patrones:** `FE-P05`.
@@ -38,6 +39,7 @@ sequenceDiagram
 ```
 
 <a id="cu-sal-02"></a>
+
 ## `CU-SAL-02` — Crear salida de material
 
 **Patrones:** `FE-P05`.
@@ -76,6 +78,7 @@ sequenceDiagram
 ```
 
 <a id="cu-sal-03"></a>
+
 ## `CU-SAL-03` — Editar encabezado de salida de material
 
 **Patrones:** `FE-P05`.
@@ -111,6 +114,7 @@ sequenceDiagram
 ```
 
 <a id="cu-sal-04"></a>
+
 ## `CU-SAL-04` — Editar detalles de material de una salida
 
 **Patrones:** `FE-P05`.
@@ -146,6 +150,7 @@ sequenceDiagram
 ```
 
 <a id="cu-sal-05"></a>
+
 ## `CU-SAL-05` — Surtir material
 
 **Patrones:** `FE-P05`.
@@ -181,6 +186,7 @@ sequenceDiagram
 ```
 
 <a id="cu-sal-06"></a>
+
 ## `CU-SAL-06` — Devolver material surtido
 
 **Patrones:** `FE-P05`, `FE-P06`.
@@ -212,8 +218,48 @@ sequenceDiagram
     Return->>Issue: recarga la página y consulta el estado actualizado
 ```
 
-<a id="cu-sal-07"></a>
-## `CU-SAL-07` — Consultar salidas de merma
+<a id="cu-sal-08"></a>
+
+## `CU-SAL-07` — Generar reporte de salidas de material
+
+**Patrones:** `FE-P08`.
+
+```mermaid
+sequenceDiagram
+    participant Browser as Navegador
+    participant View as src/public/js/plugins/datatable/warehouse/goodsIssues/goodsIssueDatatable.js
+    participant Dialog as src/public/js/ui/reportExportDialog.js
+    participant Application as src/public/js/application/warehouse/report.js
+    participant Request as src/public/js/services/warehouse/reportService.js
+    participant HTTP as src/public/js/services/axiosInstanceApi.js
+    participant Transport@{ "type": "control" } as src/routes/api/warehouse/reportApiRoute.js<br/>src/controllers/api/warehouse/reportController.js
+    Note over Application,Transport: Variables de frontera: params/filtros
+
+    Browser->>View: Botón Excel del listado de salidas de material
+    View->>Dialog: showReportExportDialog(currentMonth)
+    Dialog-->>View: alcance confirmado o cancelación
+    View->>View: recopilar y validar las variables de frontera indicadas
+    View->>Application: exportGoodsIssueReport({ params })
+    Application->>Request: exportGoodsIssueReportRequest({ params })
+    activate Application
+    Request->>HTTP: apiRequest({ method: 'get', url, params })
+    HTTP->>Transport: descarga GET /api/warehouse/reports/goods-issues/excel
+    Transport-->>HTTP: status HTTP y payload del endpoint
+    HTTP-->>Request: respuesta o error normalizado
+    Request-->>Application: resultado del request
+    alt Respuesta exitosa
+        Application-->>View: entidad, colección o archivo normalizado
+        View-->>Browser: actualizar la vista con el resultado
+    else Respuesta rechazada
+        Application-->>View: error normalizado por apiRequest
+        View-->>Browser: conservar contexto y mostrar el mensaje
+    end
+    deactivate Application
+```
+
+<a id="cu-cat-09"></a>
+
+## `CU-SAL-08` — Consultar salidas de merma
 
 **Patrones:** `FE-P05`.
 
@@ -247,8 +293,9 @@ sequenceDiagram
     deactivate Application
 ```
 
-<a id="cu-sal-08"></a>
-## `CU-SAL-08` — Crear salida de merma
+<a id="cu-sal-09"></a>
+
+## `CU-SAL-09` — Crear salida de merma
 
 **Patrones:** `FE-P05`.
 
@@ -285,8 +332,9 @@ sequenceDiagram
     deactivate Application
 ```
 
-<a id="cu-sal-09"></a>
-## `CU-SAL-09` — Editar encabezado de salida de merma
+<a id="cu-sal-10"></a>
+
+## `CU-SAL-10` — Editar encabezado de salida de merma
 
 **Patrones:** `FE-P05`.
 
@@ -320,8 +368,9 @@ sequenceDiagram
     deactivate Application
 ```
 
-<a id="cu-sal-10"></a>
-## `CU-SAL-10` — Editar detalles de merma de una salida
+<a id="cu-sal-11"></a>
+
+## `CU-SAL-11` — Editar detalles de merma de una salida
 
 **Patrones:** `FE-P05`.
 
@@ -355,8 +404,9 @@ sequenceDiagram
     deactivate Application
 ```
 
-<a id="cu-sal-11"></a>
-## `CU-SAL-11` — Surtir merma
+<a id="cu-sal-12"></a>
+
+## `CU-SAL-12` — Surtir merma
 
 **Patrones:** `FE-P05`.
 
@@ -390,8 +440,9 @@ sequenceDiagram
     deactivate Application
 ```
 
-<a id="cu-sal-12"></a>
-## `CU-SAL-12` — Devolver merma surtida
+<a id="cu-sal-13"></a>
+
+## `CU-SAL-13` — Devolver merma surtida
 
 **Patrones:** `FE-P05`, `FE-P06`.
 
@@ -421,3 +472,42 @@ sequenceDiagram
     App-->>Return: respuesta exitosa
     Return->>Issue: recarga la página y consulta la salida actualizada
 ```
+
+## `CU-SAL-14` — Generar reporte de salidas de merma
+
+**Patrones:** `FE-P08`.
+
+```mermaid
+sequenceDiagram
+    participant Browser as Navegador
+    participant View as src/public/js/plugins/datatable/warehouse/wasteIssues/wasteIssueDatatable.js
+    participant Dialog as src/public/js/ui/reportExportDialog.js
+    participant Application as src/public/js/application/warehouse/report.js
+    participant Request as src/public/js/services/warehouse/reportService.js
+    participant HTTP as src/public/js/services/axiosInstanceApi.js
+    participant Transport@{ "type": "control" } as src/routes/api/warehouse/reportApiRoute.js<br/>src/controllers/api/warehouse/reportController.js
+    Note over Application,Transport: Variables de frontera: params/filtros
+
+    Browser->>View: Botón Excel del listado de salidas de merma
+    View->>Dialog: showReportExportDialog(currentMonth)
+    Dialog-->>View: alcance confirmado o cancelación
+    View->>View: recopilar y validar las variables de frontera indicadas
+    View->>Application: exportWasteIssueReport({ params })
+    Application->>Request: exportWasteIssueReportRequest({ params })
+    activate Application
+    Request->>HTTP: apiRequest({ method: 'get', url, params })
+    HTTP->>Transport: descarga GET /api/warehouse/reports/waste-issues/excel
+    Transport-->>HTTP: status HTTP y payload del endpoint
+    HTTP-->>Request: respuesta o error normalizado
+    Request-->>Application: resultado del request
+    alt Respuesta exitosa
+        Application-->>View: entidad, colección o archivo normalizado
+        View-->>Browser: actualizar la vista con el resultado
+    else Respuesta rechazada
+        Application-->>View: error normalizado por apiRequest
+        View-->>Browser: conservar contexto y mostrar el mensaje
+    end
+    deactivate Application
+```
+
+<a id="cu-cat-24"></a>

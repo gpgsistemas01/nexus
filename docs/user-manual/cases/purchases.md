@@ -50,7 +50,7 @@ consulta. Abrir o editar el encabezado no cambia esos estados.
 
 **Errores posibles:** [Validación de formularios](../error-messages.md#errores-validacion), [Compras](../error-messages.md#errores-compras).
 
-**Controles que debe usar:** Botón **Nueva compra**; opciones **Factura** o **Remisión**; campo **Número de Factura**; selectores **Buscar proveedor...** y **Buscar persona que recibe...**; campos **Fecha y hora de recepción:** y **Observaciones**; selector **Buscar material...**, campos **Cantidad** y **Costo por Presentación**, botón **Agregar** y botón **Confirmar**.
+**Controles que debe usar:** Botón **Nueva compra**; opciones **Factura** o **Remisión**; campo **Número de Factura**; selectores **Buscar proveedor...** y **Buscar persona que recibe...**; campos **Fecha y hora de recepción:** y **Observaciones**; selector **Buscar material...**, campos **Cantidad** y **Costo por Presentación**, botón **Agregar** y botón **Guardar**.
 
 1. Seleccione **Nueva compra** para abrir el formulario. Antes de continuar, compruebe que la pantalla mostrada coincida con la captura:
 
@@ -58,7 +58,7 @@ consulta. Abrir o editar el encabezado no cambia esos estados.
 
 2. Elija la opción **Factura** o **Remisión**. Complete **Número de Factura** cuando corresponda; elija opciones en **Buscar proveedor...** y **Buscar persona que recibe...**; capture **Fecha y hora de recepción:** y **Observaciones**.
 3. En el detalle, elija una opción en **Buscar material...**, complete **Cantidad** y **Costo por Presentación**, y pulse **Agregar** por cada renglón.
-4. Revise el encabezado y los detalles, y seleccione **Confirmar**.
+4. Revise el encabezado y los detalles, y seleccione **Guardar**.
 
    🟨 **ADVERTENCIA:** confirmar la compra incrementa la existencia de cada renglón. Si Nexus no
    muestra un resultado concluyente, consulte el listado y el folio antes de volver a confirmar.
@@ -107,13 +107,13 @@ error o el estado queda incierto, actualice la compra antes de repetir la correc
 <a id="CAP-REP-ENT-05-EXPORT"></a>
 ### CAP-REP-ENT-05-EXPORT — Exportar reporte
 
-**Casos de uso:** `CU-REP-11` — Generar reporte de compras de material.
+**Casos de uso:** `CU-ENT-06` — Generar reporte de compras de material.
 
 **Errores posibles:** [Compras](../error-messages.md#errores-compras).
 
 **Controles que debe usar:** Botón **Exportar Excel**; opciones **Mes actual**, **Otro mes** o **Personalizado: usar filtros aplicados**; campo **Mes del reporte** y botón **Descargar**.
 
-1. Seleccione **Exportar Excel** para abrir el diálogo de alcance. Antes de continuar, compruebe que la pantalla mostrada coincida con la captura:
+1. Seleccione **Exportar Excel** para abrir el modal **Exportar reporte**. Antes de continuar, compruebe que la pantalla mostrada coincida con la captura:
 
    ![CAP-REP-ENT-05-EXPORT: exportar reporte](../images/compras/05-exportar-reporte.png)
 

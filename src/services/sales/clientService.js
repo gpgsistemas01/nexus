@@ -7,11 +7,13 @@ const serviceLogger = createServiceLogger('sales.clientService');
 
 const CLIENT_SELECT = {
     id: true,
-    name: true
+    name: true,
+    isActive: true
 };
 
 export const findAllClients = async ({
     advisorId,
+    onlyActive = false,
     skip = 0,
     take = 10,
     search = '',
@@ -21,6 +23,7 @@ export const findAllClients = async ({
 
     const where = {
         ...(advisorId && { advisorId: advisorId }),
+        ...(onlyActive && { isActive: true }),
         ...(search && {
             name: {
                 contains: search,

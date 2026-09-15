@@ -22,8 +22,8 @@ const ISSUE_HEADER_FIELD_NAMES = Object.freeze([
 ]);
 const ISSUE_MODAL_MODE_CONFIG = Object.freeze({
     [FORM_MODES.CREATE]: { submitLabel: 'Guardar' },
-    [FORM_MODES.EDIT]: { action: 'Editar', submitLabel: 'Editar' },
-    [FORM_MODES.EDIT_HEADER]: { action: 'Editar', submitLabel: 'Editar' },
+    [FORM_MODES.EDIT]: { action: 'Editar', submitLabel: 'Actualizar' },
+    [FORM_MODES.EDIT_HEADER]: { action: 'Editar', submitLabel: 'Actualizar' },
     [FORM_MODES.EDIT_DETAIL]: { actionKey: 'detailAction', submitLabel: 'Surtir' },
     [FORM_MODES.RETURN]: { actionKey: 'returnAction', hideSubmit: true },
     [FORM_MODES.VIEW]: { action: 'Consultar', hideSubmit: true, disableForm: true }

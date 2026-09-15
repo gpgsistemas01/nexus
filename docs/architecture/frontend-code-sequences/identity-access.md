@@ -3,6 +3,7 @@
 Este capítulo forma parte del [catálogo de secuencias del código frontend](index.md) y conserva los recorridos aplicados del grupo `IDA`. Las reglas comunes de lectura, trazabilidad y mantenimiento se declaran en el índice de la colección.
 
 <a id="cu-ida-01"></a>
+
 ## `CU-IDA-01` — Consultar personas
 
 **Patrones:** `FE-P02`.
@@ -38,6 +39,7 @@ sequenceDiagram
 ```
 
 <a id="cu-ida-02"></a>
+
 ## `CU-IDA-02` — Crear persona
 
 **Patrones:** `FE-P02`.
@@ -73,6 +75,7 @@ sequenceDiagram
 ```
 
 <a id="cu-ida-03"></a>
+
 ## `CU-IDA-03` — Editar persona
 
 **Patrones:** `FE-P02`.
@@ -107,8 +110,48 @@ sequenceDiagram
     deactivate Application
 ```
 
-<a id="cu-ida-04"></a>
-## `CU-IDA-04` — Consultar usuarios
+<a id="cu-ida-05"></a>
+
+## `CU-IDA-04` — Generar reporte de personas
+
+**Patrones:** `FE-P08`.
+
+```mermaid
+sequenceDiagram
+    participant Browser as Navegador
+    participant View as src/public/js/plugins/datatable/admin/persons/personDatatable.js
+    participant Dialog as src/public/js/ui/reportExportDialog.js
+    participant Application as src/public/js/application/admin/report.js
+    participant Request as src/public/js/services/admin/reportService.js
+    participant HTTP as src/public/js/services/axiosInstanceApi.js
+    participant Transport@{ "type": "control" } as src/controllers/api/admin/reportController.js
+    Note over Application,Transport: Variables de frontera: params/filtros
+
+    Browser->>View: Botón Excel de personDatatable.js
+    View->>Dialog: showFilteredExportDialog()
+    Dialog-->>View: alcance confirmado o cancelación
+    View->>View: recopilar y validar las variables de frontera indicadas
+    View->>Application: exportPersonReport({ params })
+    Application->>Request: exportPersonReportRequest({ params })
+    activate Application
+    Request->>HTTP: apiRequest({ method: 'get', url, params })
+    HTTP->>Transport: descarga GET /api/admin/reports/persons/excel
+    Transport-->>HTTP: status HTTP y payload del endpoint
+    HTTP-->>Request: respuesta o error normalizado
+    Request-->>Application: resultado del request
+    alt Respuesta exitosa
+        Application-->>View: entidad, colección o archivo normalizado
+        View-->>Browser: actualizar la vista con el resultado
+    else Respuesta rechazada
+        Application-->>View: error normalizado por apiRequest
+        View-->>Browser: conservar contexto y mostrar el mensaje
+    end
+    deactivate Application
+```
+
+<a id="cu-ida-09"></a>
+
+## `CU-IDA-05` — Consultar usuarios
 
 **Patrones:** `FE-P02`.
 
@@ -142,8 +185,9 @@ sequenceDiagram
     deactivate Application
 ```
 
-<a id="cu-ida-05"></a>
-## `CU-IDA-05` — Crear usuario y asignar acceso
+<a id="cu-ida-06"></a>
+
+## `CU-IDA-06` — Crear usuario y asignar acceso
 
 **Patrones:** `FE-P02`.
 
@@ -177,8 +221,9 @@ sequenceDiagram
     deactivate Application
 ```
 
-<a id="cu-ida-06"></a>
-## `CU-IDA-06` — Editar usuario y acceso
+<a id="cu-ida-07"></a>
+
+## `CU-IDA-07` — Editar usuario y acceso
 
 **Patrones:** `FE-P02`.
 
@@ -212,8 +257,9 @@ sequenceDiagram
     deactivate Application
 ```
 
-<a id="cu-ida-07"></a>
-## `CU-IDA-07` — Cambiar contraseña de usuario
+<a id="cu-ida-08"></a>
+
+## `CU-IDA-08` — Cambiar contraseña de usuario
 
 **Patrones:** `FE-P02`.
 
@@ -247,8 +293,46 @@ sequenceDiagram
     deactivate Application
 ```
 
-<a id="cu-ida-08"></a>
-## `CU-IDA-08` — Consultar roles
+<a id="cu-ida-10"></a>
+
+## `CU-IDA-09` — Generar reporte de usuarios
+
+**Patrones:** `FE-P08`.
+
+```mermaid
+sequenceDiagram
+    participant Browser as Navegador
+    participant View as src/public/js/plugins/datatable/admin/users/userDatatable.js
+    participant Dialog as src/public/js/ui/reportExportDialog.js
+    participant Application as src/public/js/application/admin/report.js
+    participant Request as src/public/js/services/admin/reportService.js
+    participant HTTP as src/public/js/services/axiosInstanceApi.js
+    participant Transport@{ "type": "control" } as src/routes/api/admin/reportApiRoute.js<br/>src/controllers/api/admin/reportController.js
+    Note over Application,Transport: Variables de frontera: params/filtros
+
+    Browser->>View: Botón Excel de userDatatable.js
+    View->>Dialog: showFilteredExportDialog()
+    Dialog-->>View: alcance confirmado o cancelación
+    View->>View: recopilar y validar las variables de frontera indicadas
+    View->>Application: exportUserReport({ params })
+    Application->>Request: exportUserReportRequest({ params })
+    activate Application
+    Request->>HTTP: apiRequest({ method: 'get', url, params })
+    HTTP->>Transport: descarga GET /api/admin/reports/users/excel
+    Transport-->>HTTP: status HTTP y payload del endpoint
+    HTTP-->>Request: respuesta o error normalizado
+    Request-->>Application: resultado del request
+    alt Respuesta exitosa
+        Application-->>View: entidad, colección o archivo normalizado
+        View-->>Browser: actualizar la vista con el resultado
+    else Respuesta rechazada
+        Application-->>View: error normalizado por apiRequest
+        View-->>Browser: conservar contexto y mostrar el mensaje
+    end
+    deactivate Application
+```
+
+## `CU-IDA-10` — Consultar roles
 
 **Patrones:** `FE-P03`.
 
@@ -282,8 +366,9 @@ sequenceDiagram
     deactivate Application
 ```
 
-<a id="cu-ida-09"></a>
-## `CU-IDA-09` — Consultar departamentos
+<a id="cu-ida-11"></a>
+
+## `CU-IDA-11` — Consultar departamentos
 
 **Patrones:** `FE-P03`.
 
