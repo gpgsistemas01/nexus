@@ -55,7 +55,7 @@ flujo de negocio no se repiten porque pertenecen a la ficha del caso de uso.
 ## Índice rápido de patrones por caso
 
 Cada caso conserva una línea **Patrones** con códigos de este índice y enlaza el
-[catálogo canónico](../design-and-construction-patterns/03-resumen-de-patrones-confirmados.md#resumen-de-patrones-confirmados).
+[catálogo canónico](../design-and-construction-patterns/03-resumen-de-patrones-confirmados.md#3-resumen-de-patrones-confirmados).
 La referencia identifica las soluciones aplicadas sin repetirlas dentro de Mermaid. La
 implementación se reconoce directamente por las rutas `src/...`, símbolos y llamadas
 del recorrido concreto.

@@ -1,4 +1,4 @@
-# 6. Publicación de eventos de inventario
+# 10. Publicación de eventos de inventario
 
 `emitInventoryUpdated` funciona como publicador: recibe `material` o `waste`, resuelve
 los nombres de eventos y notifica inventario y movimientos mediante Socket.IO. Los

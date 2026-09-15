@@ -1,4 +1,4 @@
-# 7. Audit Trail transversal
+# 11. Audit Trail transversal
 
 `auditWrites` implementa el patrón **Audit Trail** como middleware transversal. Filtra
 `POST`, `PUT`, `PATCH` y `DELETE` bajo `/api`, espera el evento `finish`, descarta

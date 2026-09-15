@@ -1,4 +1,4 @@
-# Resumen de patrones confirmados
+# 3. Resumen de patrones confirmados
 
 | Nivel | Patrón o estrategia confirmada | Evidencia principal |
 | --- | --- | --- |

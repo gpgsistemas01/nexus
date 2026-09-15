@@ -1,4 +1,4 @@
-# Exportar los manuales
+# 7. Exportar los manuales
 
 Los paquetes `manual-administrador` y `manual-almacen`
 incluyen capturas de la aplicación, pero `docs:export` **no toma capturas ni abre Nexus**. Antes de

@@ -1,4 +1,4 @@
-# Dos lecturas complementarias
+# 2. Dos lecturas complementarias
 
 Nexus separa deliberadamente dos preguntas que no deben resolverse en el mismo nivel de
 detalle:

@@ -1,4 +1,4 @@
-# Enlaces e imágenes
+# 2. Enlaces e imágenes
 
 Las referencias y los hipervínculos se declaran en los Markdown fuente, no se agregan manualmente
 después de crear el DOCX. Así una sola fuente conserva la misma navegación en el repositorio,

@@ -1,4 +1,4 @@
-# Comandos
+# 4. Comandos
 
 En los comandos, `<paquete>` significa **qué contenido se va a reunir en un solo archivo**. No es
 un paquete de npm. Elija uno de estos valores:

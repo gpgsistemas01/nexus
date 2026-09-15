@@ -1,4 +1,4 @@
-# 8. Composición y propiedad de componentes visuales
+# 12. Composición y propiedad de componentes visuales
 
 Los partials de `src/views/shared` y las piezas independientes del recurso bajo
 `public/js/ui` o `plugins` se componen desde páginas específicas. Un formulario o modal

@@ -1,4 +1,4 @@
-# Propósito
+# 1. Propósito
 
 Los diagramas de Nexus también siguen patrones, pero se distingue entre:
 

@@ -1,4 +1,4 @@
-# 4. Factory functions y composición de aplicaciones
+# 8. Factory functions y composición de aplicaciones
 
 ### CRUD común del navegador
 

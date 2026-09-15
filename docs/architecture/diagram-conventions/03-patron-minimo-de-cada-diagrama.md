@@ -1,4 +1,4 @@
-# Patrón mínimo de cada diagrama
+# 3. Patrón mínimo de cada diagrama
 
 Antes de crear otro diagrama se reutiliza una vista existente si responde la misma
 pregunta. Si se necesita uno nuevo, debe quedar claro —en el título o texto inmediato—:

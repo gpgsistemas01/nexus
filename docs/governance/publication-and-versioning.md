@@ -137,7 +137,7 @@ Playwright **no se ejecuta junto con Pandoc**. Primero, y sólo cuando cambian l
 `docs:screenshots` abre la aplicación y actualiza las imágenes; después `docs:export`
 lee esas imágenes ya existentes. Pandoc genera DOCX sin Playwright; para PDF, el exportador
 convierte después ese DOCX con LibreOffice. La instalación y configuración de estas herramientas
-pertenecen a la [guía operativa de exportación](document-export-guide/03-preparar-las-herramientas.md#preparar-las-herramientas).
+pertenecen a la [guía operativa de exportación](document-export-guide/03-preparar-las-herramientas.md#3-preparar-las-herramientas).
 
 `docs:screenshots` coordina el generador con una instancia local de Nexus: comprueba si ya responde,
 la inicia y espera cuando hace falta, y al terminar detiene sólo el proceso que creó. No cambia el

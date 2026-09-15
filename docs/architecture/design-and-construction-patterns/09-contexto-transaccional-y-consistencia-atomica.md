@@ -1,4 +1,4 @@
-# 5. Contexto transaccional y consistencia atómica
+# 9. Contexto transaccional y consistencia atómica
 
 `src/repository/baseRepository.js` expone únicamente `getDb(tx)`: propaga el cliente de
 transacción cuando el caso de uso ya está dentro de `$transaction`, o usa Prisma cuando

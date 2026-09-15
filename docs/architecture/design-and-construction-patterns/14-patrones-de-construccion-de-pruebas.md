@@ -1,4 +1,4 @@
-# 10. Patrones de construcción de pruebas
+# 14. Patrones de construcción de pruebas
 
 `createControllerTestApp` es una factory de test harness: crea una aplicación Express
 mínima, instala parsing JSON y deja que cada prueba registre las rutas necesarias. Se

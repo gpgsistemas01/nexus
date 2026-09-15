@@ -1,4 +1,4 @@
-# Ejemplos de exportación
+# 9. Ejemplos de exportación
 
 ```bash
 # Sólo valida fuentes e imágenes; no necesita Pandoc.
