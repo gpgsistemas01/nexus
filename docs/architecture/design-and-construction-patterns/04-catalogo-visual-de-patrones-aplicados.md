@@ -132,23 +132,21 @@ sequenceDiagram
 
     Controller->>Service: función importada({ DTO, id, userId })
     Service->>Prisma: prisma.$transaction(async tx => ...)
-    rect rgb(245, 248, 255)
-        Prisma->>Writes: helper({ ..., tx }) usa getDb(tx)
-        Writes->>Writes: escribir documento, detalle, existencia y movimiento
-        alt falla una escritura
-            Writes-->>Prisma: propagar error
-            Prisma-->>Service: rollback
-            Service-->>Controller: propagar error sin publicar
-        else todas las escrituras terminan
-            Writes-->>Prisma: resultado
-            Prisma-->>Service: commit
-            Service-->>Controller: devolver resultado confirmado
-            opt mutación de inventario
-                Controller->>Events: publicar actualización no durable
-            end
-            Controller-->>Audit: finalizar respuesta HTTP exitosa
-            Audit->>Audit: sanitizar y persistir CriticalWriteAudit best effort
+    Prisma->>Writes: helper({ ..., tx }) usa getDb(tx)
+    Writes->>Writes: escribir documento, detalle, existencia y movimiento
+    alt falla una escritura
+        Writes-->>Prisma: propagar error
+        Prisma-->>Service: rollback
+        Service-->>Controller: propagar error sin publicar
+    else todas las escrituras terminan
+        Writes-->>Prisma: resultado
+        Prisma-->>Service: commit
+        Service-->>Controller: devolver resultado confirmado
+        opt mutación de inventario
+            Controller->>Events: publicar actualización no durable
         end
+        Controller-->>Audit: finalizar respuesta HTTP exitosa
+        Audit->>Audit: sanitizar y persistir CriticalWriteAudit best effort
     end
 ```
 
