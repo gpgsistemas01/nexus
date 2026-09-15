@@ -21,8 +21,10 @@ conservan módulos, formularios, permisos y reglas independientes.
 3. Para modificar una entrada, seleccione **Editar registro** en su fila, cambie únicamente los campos habilitados —incluido **Activo**— y seleccione **Actualizar**. Una entrada inactiva permanece en esta tabla para poder consultarla o reactivarla, pero deja de ofrecerse en formularios operativos nuevos.
 4. Compruebe que la tabla de esa misma pantalla muestre el resultado antes de continuar con otro catálogo.
 
-Los botones del formulario indican solamente la acción: **Guardar**, **Actualizar** y
-**Regresar**; el encabezado identifica el catálogo que se está registrando o editando.
+El estado **Activo** se controla dentro del mismo formulario: no existe una acción rápida fuera
+del modal, porque el cambio debe confirmarse junto con los demás datos mediante **Guardar** o
+**Actualizar** y puede descartarse con **Regresar**. El encabezado identifica el catálogo que se
+está registrando o editando.
 
 **Errores posibles:** [Validación de formularios](../error-messages.md#errores-validacion), [Acceso y autorización](../error-messages.md#errores-acceso), [Catálogos e inventario](../error-messages.md#errores-catalogos).
 
@@ -62,6 +64,9 @@ conserva stock. Volver a marcarlo permite usarlo nuevamente en operaciones nueva
 2. Escriba un término en el buscador **Buscar por Material** o elija una opción en el filtro **Proveedor**.
 3. Seleccione el botón **Buscar / filtrar** para actualizar la tabla; use **Limpiar filtros** para restablecerla.
 4. En la tabla, seleccione **Nuevo material**, **Exportar Excel**, **Editar registro** o **Ajustar stock**, según la operación requerida.
+
+La columna **Activo**, ubicada antes de **Acciones**, se muestra en la tabla únicamente al
+administrador del sistema; los demás usuarios autorizados consultan el inventario sin esa columna.
 
 ### CAP-REP-MAT-05-EXPORT — Exportar inventario
 
@@ -174,6 +179,9 @@ marcarla lo reactiva. Este cambio no es un ajuste de stock.
 
    <a id="CAP-CAT-SUP-04-EXPORT"></a>
    ![CAP-CAT-SUP-04-EXPORT: modal para exportar proveedores](../images/proveedores/04-exportar-reporte.png)
+
+La columna **Activo**, ubicada antes de **Acciones**, se muestra en el listado únicamente al
+administrador del sistema.
 
 <a id="CAP-CAT-SUP-02-CREATE"></a>
 ### CAP-CAT-SUP-02-CREATE — Formulario alta
@@ -305,6 +313,9 @@ utilizarla nuevamente en una nueva salida.
 2. Escriba un término en el buscador **Buscar por Material o Proveedor** o elija una opción en el filtro **Proveedor**.
 3. Seleccione el botón **Buscar / filtrar** para actualizar la tabla; use **Limpiar filtros** para restablecerla.
 4. En la tabla, seleccione **Nueva merma**, **Exportar Excel**, **Editar registro** o **Ajustar stock**, según la operación requerida.
+
+La columna **Activo**, ubicada antes de **Acciones**, se muestra en la tabla únicamente al
+administrador del sistema; los demás usuarios autorizados consultan las mermas sin esa columna.
 
 ### CAP-REP-WAS-05-EXPORT — Exportar inventario de mermas
 

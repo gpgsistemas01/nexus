@@ -3,7 +3,7 @@ import { buildInventorySelectText, getBase, getCurrentStock, getHeight, getMaxUn
 
 const CENTERED_CELL_CLASS = 'text-center align-middle';
 
-export const renderWarehouseInventoryHeader = ({ tableElement, canSeeCost, canManageItems }) => {
+export const renderWarehouseInventoryHeader = ({ tableElement, canSeeActive, canSeeCost, canManageItems }) => {
 
     tableElement.innerHTML = `
         <thead>
@@ -15,6 +15,7 @@ export const renderWarehouseInventoryHeader = ({ tableElement, canSeeCost, canMa
                 <th rowspan="2">Presentación</th>
                 <th colspan="2" data-responsive-group="conversion">Conversión</th>
                 ${ canSeeCost ? '<th rowspan="2">Costo Unitario de Conversión</th>' : '' }
+                ${ canSeeActive ? '<th rowspan="2">Activo</th>' : '' }
                 ${ canManageItems ? '<th rowspan="2">Acciones</th>' : '' }
             </tr>
             <tr>
@@ -27,7 +28,7 @@ export const renderWarehouseInventoryHeader = ({ tableElement, canSeeCost, canMa
     `;
 };
 
-export const buildWarehouseInventoryColumns = ({ canSeeCost, canManageItems, renderActions }) => {
+export const buildWarehouseInventoryColumns = ({ canSeeActive, canSeeCost, canManageItems, renderActions }) => {
 
     const columns = [
         {
@@ -77,6 +78,14 @@ export const buildWarehouseInventoryColumns = ({ canSeeCost, canManageItems, ren
             data: null,
             className: CENTERED_CELL_CLASS,
             render: (_, __, row) => formatCurrency (getMaxUnitCost(row))
+        });
+    }
+
+    if (canSeeActive) {
+        columns.push({
+            data: 'isActive',
+            className: CENTERED_CELL_CLASS,
+            render: value => value ? 'Sí' : 'No'
         });
     }
 
