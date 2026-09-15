@@ -26,7 +26,6 @@ const SUPPLIER_MATERIAL_SNAPSHOT_INCLUDE = {
         select: {
             id: true,
             name: true,
-            isActive: true,
             base: true,
             height: true,
             presentation: true,
@@ -109,7 +108,7 @@ export const findCurrentSupplierMaterialByMaterialId = async ({
 
 export const mapSupplierMaterial = (sp) => {
 
-    const { id, material, supplier, maxUnitCost, currentStock, convertedQuantity, canDelete } = sp;
+    const { id, material, supplier, maxUnitCost, currentStock, convertedQuantity, isActive, canDelete } = sp;
 
     return {
         ...material,
@@ -118,6 +117,7 @@ export const mapSupplierMaterial = (sp) => {
         maxUnitCost,
         currentStock,
         convertedQuantity,
+        isActive,
         ...(canDelete !== undefined && { canDelete }),
         supplier: { ...supplier }
     };
@@ -182,6 +182,7 @@ export const findAllSupplierMaterials = async ({
         where,
         select: {
             id: true,
+            isActive: true,
             ...(canReadCosts && { maxUnitCost: true }),
             currentStock: true,
             convertedQuantity: true,
@@ -190,7 +191,6 @@ export const findAllSupplierMaterials = async ({
                     id: true,
                     name: true,
                     minStock: true,
-                    isActive: true,
                     base: true,
                     height: true,
                     presentation: true,
@@ -260,6 +260,7 @@ export const findSupplierMaterialByIds = async ({
         },
         select: {
             id: true,
+            isActive: true,
             currentStock: true,
             convertedQuantity: true,
             maxUnitCost: true,
@@ -268,7 +269,6 @@ export const findSupplierMaterialByIds = async ({
                     id: true,
                     name: true,
                     minStock: true,
-                    isActive: true,
                     base: true,
                     height: true,
                     presentation: true,
@@ -301,6 +301,7 @@ export const findSupplierMaterialById = async ({
         where: { id },
         select: {
             id: true,
+            isActive: true,
             currentStock: true,
             convertedQuantity: true,
             maxUnitCost: true,
@@ -309,7 +310,6 @@ export const findSupplierMaterialById = async ({
                     id: true,
                     name: true,
                     minStock: true,
-                    isActive: true,
                     base: true,
                     height: true,
                     presentation: true,
@@ -355,7 +355,8 @@ export const saveSupplierMaterial = async ({
     tx,
     supplierId,
     materialId,
-    maxUnitCost
+    maxUnitCost,
+    isActive
 }) => {
 
     const db = getDb(tx);
@@ -363,7 +364,8 @@ export const saveSupplierMaterial = async ({
     const data = {
         supplierId,
         materialId,
-        maxUnitCost
+        maxUnitCost,
+        ...(isActive !== undefined && { isActive })
     };
 
     return db.supplierMaterial.upsert({
@@ -375,7 +377,8 @@ export const saveSupplierMaterial = async ({
         },
         create: data,
         update: {
-            maxUnitCost
+            maxUnitCost,
+            ...(isActive !== undefined && { isActive })
         }
     });
 };

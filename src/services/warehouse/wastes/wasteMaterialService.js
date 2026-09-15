@@ -17,13 +17,10 @@ const getHighestUnitCost = (offers = []) => offers.reduce((highest, offer) => {
     return cost == null ? highest : Math.max(highest ?? cost, cost);
 }, null);
 
-export const resolveWasteMaterialSnapshot = async ({ tx = null, materialId, requireActive = true }) => {
+export const resolveWasteMaterialSnapshot = async ({ tx = null, materialId, supplierId = null, requireActive = true }) => {
     const db = getDb(tx);
     const material = await db.material.findUnique({
-        where: {
-            id: materialId,
-            ...(requireActive && { isActive: true })
-        },
+        where: { id: materialId },
         select: WASTE_MATERIAL_SNAPSHOT_SELECT
     });
 
@@ -35,7 +32,10 @@ export const resolveWasteMaterialSnapshot = async ({ tx = null, materialId, requ
         select: {
             base: true,
             height: true,
-            supplierMaterials: { select: { maxUnitCost: true } }
+            supplierMaterials: {
+                where: { isActive: true },
+                select: { maxUnitCost: true }
+            }
         }
     });
     const maxUnitCost = matchingMaterials.reduce((highest, candidate) => {
@@ -48,6 +48,15 @@ export const resolveWasteMaterialSnapshot = async ({ tx = null, materialId, requ
             : Math.max(highest ?? candidateCost, candidateCost);
     }, null);
 
+    if (requireActive && supplierId) {
+        const activeOffer = await db.supplierMaterial.findUnique({
+            where: { supplierId_materialId: { supplierId, materialId } },
+            select: { isActive: true }
+        });
+
+        if (!activeOffer?.isActive) return null;
+    }
+
     return { ...material, maxUnitCost };
 };
 
@@ -59,9 +68,8 @@ export const findWasteMaterialTemplates = async ({ search = '', skip = 0, take =
     };
 
     const where = {
-        isActive: true,
         ...(search && { name: { contains: search, mode: 'insensitive' } }),
-        supplierMaterials: { some: { supplierId } }
+        supplierMaterials: { some: { supplierId, isActive: true } }
     };
     const materials = await getDb().material.findMany({
         where,
@@ -74,7 +82,7 @@ export const findWasteMaterialTemplates = async ({ search = '', skip = 0, take =
             presentation: { select: { id: true, name: true } },
             unitMeasure: { select: { id: true, name: true, symbol: true } },
             supplierMaterials: {
-                where: { supplierId },
+                where: { supplierId, isActive: true },
                 select: { maxUnitCost: true }
             }
         }

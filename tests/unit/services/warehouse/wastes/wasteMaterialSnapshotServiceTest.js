@@ -2,10 +2,12 @@ import { expect, it, vi } from 'vitest';
 
 const materialFindMany = vi.fn();
 const materialFindUnique = vi.fn();
+const supplierMaterialFindUnique = vi.fn();
 
 vi.mock('../../../../../src/repository/baseRepository.js', () => ({
   getDb: () => ({
-    material: { findMany: materialFindMany, findUnique: materialFindUnique }
+    material: { findMany: materialFindMany, findUnique: materialFindUnique },
+    supplierMaterial: { findUnique: supplierMaterialFindUnique }
   })
 }));
 
@@ -25,17 +27,22 @@ it('obtiene el costo unitario máximo entre todos los proveedores del material',
     presentation: { id: 'presentation-1', name: 'ROLLO' },
     unitMeasure: { id: 'unit-1', name: 'Metro cuadrado' }
   });
-  await expect(resolveWasteMaterialSnapshot({ materialId: 'material-1' }))
+  supplierMaterialFindUnique.mockResolvedValue({ isActive: true });
+  await expect(resolveWasteMaterialSnapshot({ materialId: 'material-1', supplierId: 'supplier-1' }))
     .resolves.toEqual(expect.objectContaining({ id: 'material-1', maxUnitCost: 27.5 }));
   expect(materialFindUnique).toHaveBeenCalledWith(expect.objectContaining({
-    where: { id: 'material-1', isActive: true }
+    where: { id: 'material-1' }
   }));
   expect(materialFindMany).toHaveBeenCalledWith({
     where: { name: { equals: 'Lona', mode: 'insensitive' } },
     select: {
       base: true,
       height: true,
-      supplierMaterials: { select: { maxUnitCost: true } }
+      supplierMaterials: { where: { isActive: true }, select: { maxUnitCost: true } }
     }
+  });
+  expect(supplierMaterialFindUnique).toHaveBeenCalledWith({
+    where: { supplierId_materialId: { supplierId: 'supplier-1', materialId: 'material-1' } },
+    select: { isActive: true }
   });
 });

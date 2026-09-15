@@ -74,6 +74,7 @@ describe('cancelGoodsReceiptDetailAndTotals', () => {
         await createGoodsReceiptDetailsAndUpdateTotals({
             tx,
             goodsReceiptId: 'receipt-id',
+            supplierId: 'supplier-id',
             details: [{ materialId: 'material-id', quantity: 1, costPerUnitType: 10 }]
         });
 
@@ -107,6 +108,7 @@ describe('cancelGoodsReceiptDetailAndTotals', () => {
         await expect(createGoodsReceiptDetailsAndUpdateTotals({
             tx,
             goodsReceiptId: 'receipt-id',
+            supplierId: 'supplier-id',
             details: [{ materialId: 'material-id', quantity: 1, costPerUnitType: 10 }]
         })).rejects.toMatchObject({ code: 'MATERIAL_INACTIVE_CONFLICT' });
     });

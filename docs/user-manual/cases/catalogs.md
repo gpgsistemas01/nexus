@@ -41,12 +41,14 @@ está registrando o editando.
 **Nombre**, **Presentación**, **Unidad**, **Base** y **Altura** que permite reconocer el mismo
 artículo. **Proveedor** pertenece a una relación de inventario separada, por lo que una misma
 identidad puede estar asociada con proveedores distintos. **Stock Mínimo**, **Costo Máximo**,
-existencia y **Activo** no forman parte de la identidad. Desmarcar **Activo** conserva el material,
-su relación con el proveedor, su existencia y su historia. Ya no puede incorporarse a una compra,
-salida o relación nueva. Si estaba incluido en una salida antes de desactivarlo, todavía puede
-surtirse el pendiente para completar ese compromiso, siempre que haya existencia suficiente. En
-los reportes, **Sólo activos** lo excluye, mientras **Sólo con existencia** puede incluirlo si aún
-conserva stock. Volver a marcarlo permite usarlo nuevamente en operaciones nuevas.
+existencia y **Activo** no forman parte de la identidad. **Activo** pertenece a cada oferta
+proveedor-material: desmarcarlo conserva la identidad compartida, la relación seleccionada, su
+existencia y su historia, sin desactivar las ofertas del mismo material asociadas con otros
+proveedores. La oferta inactiva ya no puede incorporarse a una compra o salida nueva. Si estaba
+incluida en una salida antes de desactivarla, todavía puede surtirse el pendiente para completar
+ese compromiso, siempre que haya existencia suficiente. En
+los reportes, **Sólo activos** la excluye, mientras **Sólo con existencia** puede incluirla si aún
+conserva stock. Volver a marcarla permite usar esa oferta nuevamente en operaciones nuevas.
 
 <a id="CAP-CAT-MAT-01-LIST"></a>
 ### CAP-CAT-MAT-01-LIST — Listado inventario
