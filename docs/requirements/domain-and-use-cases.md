@@ -6,7 +6,7 @@ Este documento contiene dos vistas curadas diferentes: el modelo conceptual expl
 el vocabulario del negocio y el diagrama de casos de uso muestra objetivos de actores.
 Los campos SQL y cardinalidades físicas están en el
 [ER generado](../generated/database-schema.md), y los criterios verificables en la
-[especificación de requisitos](requirements-specification.md). No se repiten aquí.
+[especificación de requisitos](requirements-specification/index.md). No se repiten aquí.
 
 ## Modelo de dominio conceptual
 
@@ -72,7 +72,7 @@ su participación futura queda pendiente de definición.
 
 Los participantes, precondiciones, garantías, pasos, alternativas y excepciones de cada
 objetivo se detallan por tema en el
-[catálogo de descripciones de casos de uso](use-case-descriptions.md).
+[catálogo de descripciones de casos de uso](use-cases/index.md).
 La vista se divide en bloques por grupo funcional para mantenerla legible. Estos bloques
 no son paquetes UML ni paquetes documentales: el único límite de sistema es Nexus. Cada
 bloque conserva los actores fuera del sistema y muestra una sola vez los casos que le
@@ -90,7 +90,7 @@ operativo; agruparlos sólo por acción mezclaría entidades con validaciones di
 Dentro de cada grupo se usa por ello un **segundo nivel visual por entidad o documento**.
 Este nivel mejora la lectura, pero no cambia identificadores ni fusiona casos de uso.
 La decisión y las familias resultantes se resumen en el
-[criterio de agrupación vigente](use-case-descriptions.md#criterio-de-agrupación-vigente).
+[criterio de agrupación vigente](use-cases/index.md#criterio-de-agrupación-vigente).
 
 ### Grupo funcional AUT — Autenticación
 
@@ -396,7 +396,7 @@ un paquete independiente de reportes dentro del límite de Nexus. Los identifica
 reportes se muestran junto a la consulta o recurso desde el que se inician. Los identificadores son los mismos del catálogo
 operativo y permiten pasar de cada objetivo visual a su descripción y a su diagrama de
 flujo específico en
-[Diagramas de requisitos](requirements-diagrams.md#flujos-de-cada-caso-de-uso).
+[Diagramas de requisitos](diagrams/index.md#flujos-de-cada-caso-de-uso).
 No se usa «administrar» o «mantener» como objetivo: cada óvalo expresa una operación
 observable.
 

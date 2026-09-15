@@ -1,0 +1,14 @@
+# `CU-SAL-02` — Crear salida de material
+
+| Sección | Información relevante |
+| --- | --- |
+| Identificador | `CU-SAL-02` |
+| Nombre | Crear salida de material. |
+| Actor y disparador | **Actor:** Personal de almacén. **Disparador:** selecciona la acción principal para crear una salida desde `CU-SAL-01` Consultar salidas de material. |
+| Participación de actor y sistema | **Actor:** abre el alta, captura datos y confirma.<br>**Nexus:** carga opciones, valida, registra y comunica el resultado. |
+| Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de alta.<br>3. Existen los datos relacionados requeridos para completar el registro. |
+| Flujo principal | 1. **Actor:** abre «Agregar salida de material» **(ver E1)**.<br>2. **Nexus:** muestra el formulario y carga clientes, asesores, áreas, solicitantes y materiales disponibles.<br>3. **Actor:** selecciona cliente, asesor, área y solicitante; captura número de proyecto, fecha y hora de solicitud y observaciones.<br>4. **Actor:** agrega cada material con su cantidad, revisa los detalles y selecciona «Guardar» **(ver A1)**. Si vuelve a agregar la misma combinación material-proveedor, el formulario reemplaza su renglón con la cantidad capturada más reciente, sin sumarla.<br>5. **Nexus:** valida participantes, relaciones, materiales y cantidades **(ver A2)**.<br>6. **Nexus:** crea la salida pendiente sin descontar existencias, actualiza la tabla y confirma. |
+| Flujos alternativos | **A1 — Datos inválidos (después del paso 4):**<br>1. **Nexus:** valida la información capturada, detecta campos incompletos, formatos incorrectos, relaciones no permitidas o cantidades fuera de las reglas del caso y los señala sin registrar cambios.<br>2. **Actor:** corrige la información indicada y vuelve a confirmar; continúa en el paso 5 del flujo principal.<br>**A2 — Material o proveedor inactivo (después del paso 5):**<br>1. **Actor:** revisa los recursos inactivos señalados por Nexus.<br>2. **Nexus:** conserva el formulario sin crear la salida, detalles ni cambios de stock.<br>3. **Actor:** selecciona recursos activos y vuelve a confirmar; continúa en el paso 5 del flujo principal. |
+| Excepciones | **E1 — Acceso rechazado (después del paso 1):**<br>1. **Nexus:** comprueba las precondiciones y la autorización, determina que alguna no se cumple y rechaza la solicitud sin modificar datos ni exponer información no autorizada; comunica el motivo.<br>2. **Actor:** reconoce el rechazo; termina el caso de uso. |
+| Postcondiciones (éxito y fallo) | 1. **Éxito:** La salida de material queda registrada en estado pendiente.<br>2. **Éxito:** Las existencias permanecen sin cambios hasta el surtimiento.<br>3. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
+| Requisitos relacionados | `RF-ISS-004`. |

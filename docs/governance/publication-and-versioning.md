@@ -39,6 +39,14 @@ Los manuales por actor conservan su propia entrada y reutilizan `overview.md` y
 `procedures.md`; así comparten las indicaciones generales y las convenciones de los casos sin
 duplicarlas ni sustituir la portada del actor.
 
+Las colecciones extensas de requisitos se mantienen en Markdown por grupo funcional bajo
+`requirements/use-cases/` y `requirements/diagrams/`, con un archivo por cada `CU-*`. Los
+diagramas transversales viven en su propia colección y cada procedimiento del manual se separa
+bajo `user-manual/cases/<área>/`. Esta división permite revisar y navegar un caso sin cargar
+las demás fichas, figuras o instrucciones, mientras el manifiesto `requisitos` conserva la
+entrega integral requerida para auditoría. Dividir la fuente no crea copias normativas ni cambia
+los identificadores `CU-*` y `DIA-*`.
+
 ## Formatos y estilos
 
 - Markdown es la fuente versionada y conserva notas de mantenimiento, enlaces al repositorio y
@@ -48,6 +56,10 @@ duplicarlas ni sustituir la portada del actor.
 - PDF es la entrega no editable. El exportador genera primero el DOCX y lo convierte mediante
   LibreOffice en modo no interactivo; conserva los editables en `build/docs/docx/` y las entregas
   finales en `build/docs/pdf/` para que cada PDF corresponda al DOCX revisado sin mezclar formatos.
+- HTML o EPUB no se generan como otro artefacto: la navegación granular ya se publica desde los
+  Markdown enlazados, mientras DOCX cubre revisión y PDF cubre entrega. Incorporar otro formato sin
+  una audiencia, requisito de distribución o validación propia duplicaría salidas sin reducir el
+  contenido normativo.
 
 La portada se genera desde `title`, `subtitle`, `author` y `date` del bloque YAML del
 primer archivo del manifiesto. En DOCX puede adoptar los estilos de un documento de referencia cuando se
@@ -96,7 +108,7 @@ de capturas es distinto: el script elimina automáticamente el inventario anteri
 completo para impedir que una publicación mezcle ejecuciones.
 
 La preparación del entorno y los comandos no se duplican en esta norma. Se mantienen en la
-[guía operativa de exportación](../README.md#exportar-la-documentación), que es la entrada para
+[guía operativa de exportación](document-export-guide/index.md), que es la entrada para
 quien trabaja con los documentos.
 
 ## Imágenes y capturas
@@ -125,7 +137,7 @@ Playwright **no se ejecuta junto con Pandoc**. Primero, y sólo cuando cambian l
 `docs:screenshots` abre la aplicación y actualiza las imágenes; después `docs:export`
 lee esas imágenes ya existentes. Pandoc genera DOCX sin Playwright; para PDF, el exportador
 convierte después ese DOCX con LibreOffice. La instalación y configuración de estas herramientas
-pertenecen a la [guía operativa de exportación](../README.md#preparar-las-herramientas).
+pertenecen a la [guía operativa de exportación](document-export-guide/03-preparar-las-herramientas.md#preparar-las-herramientas).
 
 `docs:screenshots` coordina el generador con una instancia local de Nexus: comprueba si ya responde,
 la inicia y espera cuando hace falta, y al terminar detiene sólo el proceso que creó. No cambia el

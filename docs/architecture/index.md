@@ -18,7 +18,7 @@ por capas** y una correspondencia de **MVC web extendido**.
 1. [Descripción de arquitectura y construcción](architecture-and-web-views.md): contexto,
    contenedores, despliegue, componentes, recorrido extremo a extremo y organización de
    las capas.
-2. [Patrones de diseño y construcción](design-and-construction-patterns.md): definición,
+2. [Patrones de diseño y construcción](design-and-construction-patterns/index.md): definición,
    evidencia y reglas de aplicación de los patrones confirmados.
 3. [Contrato de la API](api-contract.md) y [OpenAPI 3.1](openapi/openapi.json): transporte JSON,
    rutas, esquemas de solicitud y respuesta, errores y validaciones observables.
@@ -41,7 +41,7 @@ por capas** y una correspondencia de **MVC web extendido**.
 | ¿Cómo se ejecuta un caso de uso concreto? | Secuencias de código de [backend](backend-code-sequences/index.md) y [frontend](frontend-code-sequences/index.md), divididas por grupo funcional. | Curado junto con el caso afectado. |
 | ¿Por qué se eligió una alternativa arquitectónica transversal? | [Registros de decisiones](decisions/index.md). | Crear o reemplazar un ADR cuando cambie una decisión relevante. |
 | ¿Cómo navega una persona por las pantallas? | Navegación y catálogo de pantallas web. | Curado junto con rutas, permisos y vistas. |
-| ¿Qué diagramas existen y qué notación usan? | [Inventario](diagram-inventory.md) y [convenciones](diagram-conventions.md). | Actualizar al agregar, retirar o cambiar una vista. |
+| ¿Qué diagramas existen y qué notación usan? | [Inventario](diagram-inventory.md) y [convenciones](diagram-conventions/index.md). | Actualizar al agregar, retirar o cambiar una vista. |
 
 ## Regla de división
 

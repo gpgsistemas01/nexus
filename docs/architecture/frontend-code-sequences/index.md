@@ -27,7 +27,7 @@ Los temporales mecánicos
 permanecen en el código. Cada caso mantiene una secuencia específica aunque reutilice
 una factory o componente, porque cambian módulos, firmas, rutas, datos o efectos.
 Su detalle se evalúa con la
-[regla de simetría entre frontend y backend](../diagram-conventions.md#simetría-de-detalle-entre-secuencias-frontend-y-backend):
+[regla de simetría entre frontend y backend](../diagram-conventions/06-inventario-de-notacion-uml.md#simetría-de-detalle-entre-secuencias-frontend-y-backend):
 debe aportar el mismo nivel de evidencia, sin copiar middleware, transacciones ni
 persistencia que pertenecen a la perspectiva del servidor.
 
@@ -55,22 +55,22 @@ flujo de negocio no se repiten porque pertenecen a la ficha del caso de uso.
 ## Índice rápido de patrones por caso
 
 Cada caso conserva una línea **Patrones** con códigos de este índice y enlaza el
-[catálogo canónico](../design-and-construction-patterns.md#resumen-de-patrones-confirmados).
+[catálogo canónico](../design-and-construction-patterns/03-resumen-de-patrones-confirmados.md#resumen-de-patrones-confirmados).
 La referencia identifica las soluciones aplicadas sin repetirlas dentro de Mermaid. La
 implementación se reconoce directamente por las rutas `src/...`, símbolos y llamadas
 del recorrido concreto.
 
 | Código | Patrón aplicado | Vista canónica | Elementos que permiten reconocerlo |
 | --- | --- | --- | --- |
-| `FE-P01` | Capas del navegador | [`DIA-PAT-EST-001`](../design-and-construction-patterns.md#estructura-por-dominio-capas-y-fronteras) | Página/UI → aplicación → servicio HTTP → endpoint. |
-| `FE-P02` | Factory CRUD | [`DIA-PAT-CON-001`](../design-and-construction-patterns.md#factories-y-composición-sobre-herencia) | `createCrudApplication` configurada con requests y claves del recurso. |
-| `FE-P03` | Factory/adaptador de catálogo | [`DIA-PAT-CON-001`](../design-and-construction-patterns.md#factories-y-composición-sobre-herencia) | `createApplicationList` + request y transformación de opciones. |
-| `FE-P04` | Mutación por composición | [`DIA-PAT-CON-001`](../design-and-construction-patterns.md#factories-y-composición-sobre-herencia) | Operación adicional incorporada al CRUD sin herencia. |
-| `FE-P05` | Composición de salidas | [`DIA-PAT-CON-001`](../design-and-construction-patterns.md#factories-y-composición-sobre-herencia) | `createIssueApplication` configurada para material o merma. |
-| `FE-P06` | UI de devolución compartida | [`DIA-PAT-EST-001`](../design-and-construction-patterns.md#estructura-por-dominio-capas-y-fronteras) | `issueReturnUI` parametrizada por el contexto de la salida. |
-| `FE-P07` | Consulta tabular | [`DIA-PAT-EST-001`](../design-and-construction-patterns.md#estructura-por-dominio-capas-y-fronteras) | DataTable + filtros + aplicación de lectura contextual. |
-| `FE-P08` | Factory de reporte | [`DIA-PAT-CON-001`](../design-and-construction-patterns.md#factories-y-composición-sobre-herencia) | `createReportApplication` + `buildExcelButton` y request de descarga. |
-| `FE-P09` | Navegación compuesta | [`DIA-PAT-EST-001`](../design-and-construction-patterns.md#estructura-por-dominio-capas-y-fronteras) | Formulario o layout común coordina navegación/sesión sin duplicar el endpoint. |
+| `FE-P01` | Capas del navegador | [`DIA-PAT-EST-001`](../design-and-construction-patterns/04-catalogo-visual-de-patrones-aplicados.md#estructura-por-dominio-capas-y-fronteras) | Página/UI → aplicación → servicio HTTP → endpoint. |
+| `FE-P02` | Factory CRUD | [`DIA-PAT-CON-001`](../design-and-construction-patterns/04-catalogo-visual-de-patrones-aplicados.md#factories-y-composición-sobre-herencia) | `createCrudApplication` configurada con requests y claves del recurso. |
+| `FE-P03` | Factory/adaptador de catálogo | [`DIA-PAT-CON-001`](../design-and-construction-patterns/04-catalogo-visual-de-patrones-aplicados.md#factories-y-composición-sobre-herencia) | `createApplicationList` + request y transformación de opciones. |
+| `FE-P04` | Mutación por composición | [`DIA-PAT-CON-001`](../design-and-construction-patterns/04-catalogo-visual-de-patrones-aplicados.md#factories-y-composición-sobre-herencia) | Operación adicional incorporada al CRUD sin herencia. |
+| `FE-P05` | Composición de salidas | [`DIA-PAT-CON-001`](../design-and-construction-patterns/04-catalogo-visual-de-patrones-aplicados.md#factories-y-composición-sobre-herencia) | `createIssueApplication` configurada para material o merma. |
+| `FE-P06` | UI de devolución compartida | [`DIA-PAT-EST-001`](../design-and-construction-patterns/04-catalogo-visual-de-patrones-aplicados.md#estructura-por-dominio-capas-y-fronteras) | `issueReturnUI` parametrizada por el contexto de la salida. |
+| `FE-P07` | Consulta tabular | [`DIA-PAT-EST-001`](../design-and-construction-patterns/04-catalogo-visual-de-patrones-aplicados.md#estructura-por-dominio-capas-y-fronteras) | DataTable + filtros + aplicación de lectura contextual. |
+| `FE-P08` | Factory de reporte | [`DIA-PAT-CON-001`](../design-and-construction-patterns/04-catalogo-visual-de-patrones-aplicados.md#factories-y-composición-sobre-herencia) | `createReportApplication` + `buildExcelButton` y request de descarga. |
+| `FE-P09` | Navegación compuesta | [`DIA-PAT-EST-001`](../design-and-construction-patterns/04-catalogo-visual-de-patrones-aplicados.md#estructura-por-dominio-capas-y-fronteras) | Formulario o layout común coordina navegación/sesión sin duplicar el endpoint. |
 
 ### Cobertura de casos frontend
 
@@ -88,9 +88,9 @@ aparece una vez, conserva su referencia de patrones y contiene un bloque Mermaid
 
 ### Capítulos técnicos
 
-- [Autenticación](authentication.md): casos `CU-AUT-*`.
-- [Identidad y acceso](identity-access.md): casos `CU-IDA-*`.
-- [Catálogos e inventario](catalogs.md): casos `CU-CAT-*`.
-- [Compras y entradas](purchases.md): casos `CU-ENT-*`.
-- [Salidas](issues.md): casos `CU-SAL-*`.
-- [Nota histórica sobre infraestructura de consultas y exportaciones](reports.md): los casos y diagramas están dentro de su grupo propietario.
+- [Autenticación](authentication/index.md): casos `CU-AUT-*`.
+- [Identidad y acceso](identity-access/index.md): casos `CU-IDA-*`.
+- [Catálogos e inventario](catalogs/index.md): casos `CU-CAT-*`.
+- [Compras y entradas](purchases/index.md): casos `CU-ENT-*`.
+- [Salidas](issues/index.md): casos `CU-SAL-*`.
+- [Nota histórica sobre infraestructura de consultas y exportaciones](reports/index.md): los casos y diagramas están dentro de su grupo propietario.

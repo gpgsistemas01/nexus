@@ -16,7 +16,7 @@ es propietario de cada afirmación y cómo recorrerla hasta su evidencia.
 
 | Pregunta | Artefacto propietario | Evidencia o vista complementaria |
 | --- | --- | --- |
-| ¿Qué comportamiento o restricción debe cumplir Nexus? | [Especificación de requisitos](../requirements/requirements-specification.md) y [políticas transversales](../requirements/requirements-specification.md#45-políticas-transversales-del-negocio). | Los [casos de uso](../requirements/use-case-descriptions.md) organizan la interacción; no redefinen columnas. |
+| ¿Qué comportamiento o restricción debe cumplir Nexus? | [Especificación de requisitos](../requirements/requirements-specification/index.md) y [políticas transversales](../requirements/requirements-specification/04-catalogo-unificado-por-ambito/05-politicas-transversales-del-negocio.md#45-políticas-transversales-del-negocio). | Los [casos de uso](../requirements/use-cases/index.md) organizan la interacción; no redefinen columnas. |
 | ¿Qué significa un concepto para el negocio? | [Glosario](../requirements/business-glossary.md) y [modelo de dominio](../requirements/domain-and-use-cases.md). | El diccionario técnico enlaza estos artefactos, pero no infiere significado desde nombres de tablas. |
 | ¿Cómo se separan cuenta, persona, asignación y autorización? | [Análisis de usuarios y permisos](database-users-and-permissions-analysis.md), como decisión de diseño de acceso. | `prisma/schema.prisma`, políticas del servidor y el [diagrama ER](../generated/database-schema.md) son evidencia. |
 | ¿Qué estructura persistente existe? | `prisma/schema.prisma` y las migraciones de `prisma/migrations`. | El [diagrama ER](../generated/database-schema.md) y el [diccionario técnico](../generated/data-dictionary.md) se generan desde Prisma. |

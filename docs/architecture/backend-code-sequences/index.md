@@ -56,21 +56,21 @@ flujo de negocio no se repiten porque pertenecen a la ficha del caso de uso.
 ## Índice rápido de patrones por caso
 
 Cada caso conserva una línea **Patrones** con códigos de este índice y enlaza el
-[catálogo canónico](../design-and-construction-patterns.md#resumen-de-patrones-confirmados).
+[catálogo canónico](../design-and-construction-patterns/03-resumen-de-patrones-confirmados.md#resumen-de-patrones-confirmados).
 La referencia identifica las soluciones aplicadas sin repetirlas dentro de Mermaid. La
 implementación se reconoce directamente por las rutas `src/...`, símbolos y llamadas
 del recorrido concreto.
 
 | Código | Patrón aplicado | Vista canónica | Elementos que permiten reconocerlo |
 | --- | --- | --- | --- |
-| `BE-P01` | Capas, pipeline y DTO funcional | [`DIA-PAT-FRO-001`](../design-and-construction-patterns.md#pipeline-dto-y-políticas-declarativas) | Ruta/middleware → controller/DTO → servicio → Prisma; el DTO sólo aparece cuando hay entrada. |
-| `BE-P02` | Factory de catálogo | [`DIA-PAT-CON-001`](../design-and-construction-patterns.md#factories-y-composición-sobre-herencia) | `createDataTableListController` parametriza consulta, columnas y orden. |
-| `BE-P03` | Transaction Script y `tx` explícito | [`DIA-PAT-DIN-001`](../design-and-construction-patterns.md#transacción-eventos-y-auditoría) | El servicio propietario abre `$transaction` y propaga `tx` a las escrituras relacionadas. |
-| `BE-P04` | Composición de servicios | [`DIA-PAT-DIN-001`](../design-and-construction-patterns.md#transacción-eventos-y-auditoría) | El servicio del caso coordina reglas, referencias, inventario o cumplimiento reutilizados. |
-| `BE-P05` | Publicación posterior al commit | [`DIA-PAT-DIN-001`](../design-and-construction-patterns.md#transacción-eventos-y-auditoría) | El controller llama `emitInventoryUpdated` después del resultado del servicio. |
-| `BE-P06` | Query Service | [`DIA-PAT-EST-001`](../design-and-construction-patterns.md#estructura-por-dominio-capas-y-fronteras) | Controller de listado + consulta contextual de sólo lectura. |
-| `BE-P07` | Composición de reporte | [`DIA-PAT-CON-001`](../design-and-construction-patterns.md#factories-y-composición-sobre-herencia) | Consulta de dominio + `sendExcelReport`, sin modificar inventario. |
-| `BE-P08` | Sesión web | [`DIA-PAT-FRO-001`](../design-and-construction-patterns.md#pipeline-dto-y-políticas-declarativas) | Autenticación, JWT/cookies, cierre o redirección en la frontera web. |
+| `BE-P01` | Capas, pipeline y DTO funcional | [`DIA-PAT-FRO-001`](../design-and-construction-patterns/04-catalogo-visual-de-patrones-aplicados.md#pipeline-dto-y-políticas-declarativas) | Ruta/middleware → controller/DTO → servicio → Prisma; el DTO sólo aparece cuando hay entrada. |
+| `BE-P02` | Factory de catálogo | [`DIA-PAT-CON-001`](../design-and-construction-patterns/04-catalogo-visual-de-patrones-aplicados.md#factories-y-composición-sobre-herencia) | `createDataTableListController` parametriza consulta, columnas y orden. |
+| `BE-P03` | Transaction Script y `tx` explícito | [`DIA-PAT-DIN-001`](../design-and-construction-patterns/04-catalogo-visual-de-patrones-aplicados.md#transacción-eventos-y-auditoría) | El servicio propietario abre `$transaction` y propaga `tx` a las escrituras relacionadas. |
+| `BE-P04` | Composición de servicios | [`DIA-PAT-DIN-001`](../design-and-construction-patterns/04-catalogo-visual-de-patrones-aplicados.md#transacción-eventos-y-auditoría) | El servicio del caso coordina reglas, referencias, inventario o cumplimiento reutilizados. |
+| `BE-P05` | Publicación posterior al commit | [`DIA-PAT-DIN-001`](../design-and-construction-patterns/04-catalogo-visual-de-patrones-aplicados.md#transacción-eventos-y-auditoría) | El controller llama `emitInventoryUpdated` después del resultado del servicio. |
+| `BE-P06` | Query Service | [`DIA-PAT-EST-001`](../design-and-construction-patterns/04-catalogo-visual-de-patrones-aplicados.md#estructura-por-dominio-capas-y-fronteras) | Controller de listado + consulta contextual de sólo lectura. |
+| `BE-P07` | Composición de reporte | [`DIA-PAT-CON-001`](../design-and-construction-patterns/04-catalogo-visual-de-patrones-aplicados.md#factories-y-composición-sobre-herencia) | Consulta de dominio + `sendExcelReport`, sin modificar inventario. |
+| `BE-P08` | Sesión web | [`DIA-PAT-FRO-001`](../design-and-construction-patterns/04-catalogo-visual-de-patrones-aplicados.md#pipeline-dto-y-políticas-declarativas) | Autenticación, JWT/cookies, cierre o redirección en la frontera web. |
 
 ### Cobertura de casos backend
 
@@ -88,9 +88,9 @@ aparece una vez, conserva su referencia de patrones y contiene un bloque Mermaid
 
 ### Capítulos técnicos
 
-- [Autenticación](authentication.md): casos `CU-AUT-*`.
-- [Identidad y acceso](identity-access.md): casos `CU-IDA-*`.
-- [Catálogos e inventario](catalogs.md): casos `CU-CAT-*`.
-- [Compras y entradas](purchases.md): casos `CU-ENT-*`.
-- [Salidas](issues.md): casos `CU-SAL-*`.
-- [Nota histórica sobre infraestructura de consultas y exportaciones](reports.md): los casos y diagramas están dentro de su grupo propietario.
+- [Autenticación](authentication/index.md): casos `CU-AUT-*`.
+- [Identidad y acceso](identity-access/index.md): casos `CU-IDA-*`.
+- [Catálogos e inventario](catalogs/index.md): casos `CU-CAT-*`.
+- [Compras y entradas](purchases/index.md): casos `CU-ENT-*`.
+- [Salidas](issues/index.md): casos `CU-SAL-*`.
+- [Nota histórica sobre infraestructura de consultas y exportaciones](reports/index.md): los casos y diagramas están dentro de su grupo propietario.

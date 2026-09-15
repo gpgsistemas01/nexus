@@ -63,7 +63,7 @@ corregir, cancelar, surtir o devolver conforme a sus reglas; el actor no los cap
 como un campo libre.
 
 El efecto del indicador en consultas, reportes, altas y surtimientos se representa en
-[`DIA-REQ-ACT-001`](requirements-diagrams.md#impacto-del-estado-activo-en-los-procesos-de-almacén).
+[`DIA-REQ-ACT-001`](diagrams/index.md#impacto-del-estado-activo-en-los-procesos-de-almacén).
 Los recursos inactivos no pueden incorporarse a operaciones nuevas. Una salida existente
 con pendientes sí puede completarse después de la desactivación: usa su detalle histórico
 y exige stock, pero no vuelve a seleccionar el recurso ni crea otra relación.
@@ -89,7 +89,7 @@ y exige stock, pero no vuelve a seleccionar el recurso ni crea otra relación.
 
 Los nombres técnicos de los campos HTTP pertenecen al
 [contrato API](../architecture/api-contract.md); las reglas observables pertenecen a la
-[especificación](requirements-specification.md). Esta matriz enumera los controles por
+[especificación](requirements-specification/index.md). Esta matriz enumera los controles por
 modo para hacer verificable qué puede modificar el operador, sin convertir el estado
 visual del formulario en un estado persistido del documento.
 
@@ -113,7 +113,7 @@ visual del formulario en un estado persistido del documento.
 - **Permisos:** `src/constants/permissions.js`; esta matriz conserva el valor público del
   permiso y no duplica sus listas de roles/departamentos.
 - **Método y URL exactos:** [mapa generado](../generated/code-map.md).
-- **Criterio funcional:** [especificación de requisitos](requirements-specification.md).
+- **Criterio funcional:** [especificación de requisitos](requirements-specification/index.md).
 - **Cobertura:** matriz CRUD del [plan de pruebas](../testing/test-plan.md).
 
 Al agregar o retirar una operación se actualizan ruta, permiso, requisito y prueba;

@@ -59,28 +59,28 @@ disposición visual aporte información conserva una captura junto al paso que l
 
 Los procedimientos se dividen por grupo para localizar una tarea sin recorrer un único archivo extenso:
 
-- [Autenticación y navegación](cases/authentication.md): iniciar sesión y recuperarse de una página no encontrada.
-- [Identidad y acceso](cases/identity-access.md): administrar personas, accesos, usuarios y contraseñas.
-- [Catálogos e inventario](cases/catalogs.md): consultar y mantener materiales, proveedores, clientes y mermas.
-- [Compras de material](cases/purchases.md): registrar, editar, corregir y exportar compras.
-- [Salidas de material y merma](cases/issues.md): registrar, surtir, devolver y exportar salidas.
-- [Exportaciones desde consultas](cases/reports.md): usar el modal de exportación de inventarios y movimientos desde su consulta propietaria.
+- [Autenticación y navegación](cases/authentication/index.md): iniciar sesión y recuperarse de una página no encontrada.
+- [Identidad y acceso](cases/identity-access/index.md): administrar personas, accesos, usuarios y contraseñas.
+- [Catálogos e inventario](cases/catalogs/index.md): consultar y mantener materiales, proveedores, clientes y mermas.
+- [Compras de material](cases/purchases/index.md): registrar, editar, corregir y exportar compras.
+- [Salidas de material y merma](cases/issues/index.md): registrar, surtir, devolver y exportar salidas.
+- [Exportaciones desde consultas](cases/reports/index.md): usar el modal de exportación de inventarios y movimientos desde su consulta propietaria.
 
 ### Relación con requisitos y arquitectura
 
 El manual explica **cómo opera la persona usuaria**; no sustituye la descripción normativa ni
 las secuencias técnicas. Para revisar un cambio sin perder detalle, use el identificador y nombre
 `CU-*` del procedimiento para recorrer las siguientes vistas del mismo grupo. El capítulo de
-[exportaciones desde consultas](cases/reports.md) complementa los grupos propietarios y
+[exportaciones desde consultas](cases/reports/index.md) complementa los grupos propietarios y
 no constituye un grupo adicional:
 
 | Grupo | Descripción normativa | Diagramas funcionales | Secuencia frontend | Secuencia backend | Procedimiento operativo |
 | --- | --- | --- | --- | --- | --- |
-| `AUT` | [Fichas de autenticación](../requirements/use-case-descriptions.md#grupo-funcional-aut--autenticación) | [Flujos `CU-AUT`](../requirements/requirements-diagrams.md#grupo-funcional-aut--autenticación) | [Frontend](../architecture/frontend-code-sequences/authentication.md) | [Backend](../architecture/backend-code-sequences/authentication.md) | [Acceso](cases/authentication.md) |
-| `IDA` | [Fichas de identidad y acceso](../requirements/use-case-descriptions.md#grupo-funcional-ida--identidad-y-acceso) | [Flujos `CU-IDA`](../requirements/requirements-diagrams.md#grupo-funcional-ida--identidad-y-acceso) | [Frontend](../architecture/frontend-code-sequences/identity-access.md) | [Backend](../architecture/backend-code-sequences/identity-access.md) | [Personas y usuarios](cases/identity-access.md) |
-| `CAT` | [Fichas de catálogos](../requirements/use-case-descriptions.md#grupo-funcional-cat--catálogos) | [Flujos `CU-CAT`](../requirements/requirements-diagrams.md#grupo-funcional-cat--catálogos) | [Frontend](../architecture/frontend-code-sequences/catalogs.md) | [Backend](../architecture/backend-code-sequences/catalogs.md) | [Catálogos e inventario](cases/catalogs.md) |
-| `ENT` | [Fichas de compras](../requirements/use-case-descriptions.md#grupo-funcional-ent--compras-de-material) | [Flujos `CU-ENT`](../requirements/requirements-diagrams.md#grupo-funcional-ent--compras-de-material) | [Frontend](../architecture/frontend-code-sequences/purchases.md) | [Backend](../architecture/backend-code-sequences/purchases.md) | [Compras](cases/purchases.md) |
-| `SAL` | [Fichas de salidas](../requirements/use-case-descriptions.md#grupo-funcional-sal--salidas-de-material-y-de-merma) | [Flujos `CU-SAL`](../requirements/requirements-diagrams.md#grupo-funcional-sal--salidas-de-material-y-de-merma) | [Frontend](../architecture/frontend-code-sequences/issues.md) | [Backend](../architecture/backend-code-sequences/issues.md) | [Salidas](cases/issues.md) |
+| `AUT` | [Fichas de autenticación](../requirements/use-cases/authentication/index.md#grupo-funcional-aut--autenticación) | [Flujos `CU-AUT`](../requirements/diagrams/authentication/index.md#grupo-funcional-aut--autenticación) | [Frontend](../architecture/frontend-code-sequences/authentication/index.md) | [Backend](../architecture/backend-code-sequences/authentication/index.md) | [Acceso](cases/authentication/index.md) |
+| `IDA` | [Fichas de identidad y acceso](../requirements/use-cases/identity-access/index.md#grupo-funcional-ida--identidad-y-acceso) | [Flujos `CU-IDA`](../requirements/diagrams/identity-access/index.md#grupo-funcional-ida--identidad-y-acceso) | [Frontend](../architecture/frontend-code-sequences/identity-access/index.md) | [Backend](../architecture/backend-code-sequences/identity-access/index.md) | [Personas y usuarios](cases/identity-access/index.md) |
+| `CAT` | [Fichas de catálogos](../requirements/use-cases/catalogs/index.md#grupo-funcional-cat--catálogos) | [Flujos `CU-CAT`](../requirements/diagrams/catalogs/index.md#grupo-funcional-cat--catálogos) | [Frontend](../architecture/frontend-code-sequences/catalogs/index.md) | [Backend](../architecture/backend-code-sequences/catalogs/index.md) | [Catálogos e inventario](cases/catalogs/index.md) |
+| `ENT` | [Fichas de compras](../requirements/use-cases/purchases/index.md#grupo-funcional-ent--compras-de-material) | [Flujos `CU-ENT`](../requirements/diagrams/purchases/index.md#grupo-funcional-ent--compras-de-material) | [Frontend](../architecture/frontend-code-sequences/purchases/index.md) | [Backend](../architecture/backend-code-sequences/purchases/index.md) | [Compras](cases/purchases/index.md) |
+| `SAL` | [Fichas de salidas](../requirements/use-cases/issues/index.md#grupo-funcional-sal--salidas-de-material-y-de-merma) | [Flujos `CU-SAL`](../requirements/diagrams/issues/index.md#grupo-funcional-sal--salidas-de-material-y-de-merma) | [Frontend](../architecture/frontend-code-sequences/issues/index.md) | [Backend](../architecture/backend-code-sequences/issues/index.md) | [Salidas](cases/issues/index.md) |
 
 Al mantener un caso, conserve el mismo **identificador y nombre** en estas vistas. Actualice la
 ficha normativa si cambia el objetivo, actor, disparador, precondición, flujo, excepción o

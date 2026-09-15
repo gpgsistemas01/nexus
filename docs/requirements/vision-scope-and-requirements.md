@@ -144,7 +144,7 @@ prueba correspondiente.
 
 La visión no mantiene una segunda lista de enunciados `RF-*`: hacerlo produjo niveles de
 detalle distintos entre acceso, catálogos y operación. La
-[especificación normativa](requirements-specification.md#4-catálogo-unificado-por-ámbito) es la
+[especificación normativa](requirements-specification/04-catalogo-unificado-por-ambito/index.md#4-catálogo-unificado-por-ámbito) es la
 única fuente de cada obligación, criterio, estado y evidencia. Esta vista se limita a
 mostrar el alcance y los rangos que deben revisarse juntos.
 
@@ -168,8 +168,8 @@ permanecen como condiciones o criterios `CA-*`; no se crea un requisito por camp
 ## Alcance de datos y calidad
 
 La visión tampoco duplica los enunciados de datos o calidad. Los ámbitos de
-[persistencia e integridad](requirements-specification.md#46-persistencia-e-integridad-de-información)
-y de [operación y calidad](requirements-specification.md#47-operación-y-calidad-del-producto)
+[persistencia e integridad](requirements-specification/04-catalogo-unificado-por-ambito/06-persistencia-e-integridad-de-informacion.md#46-persistencia-e-integridad-de-información)
+y de [operación y calidad](requirements-specification/04-catalogo-unificado-por-ambito/07-operacion-y-calidad-del-producto.md#47-operación-y-calidad-del-producto)
 son sus fuentes normativas.
 
 | Área | Requisitos normativos | Alcance resumido |

@@ -20,31 +20,60 @@ const DATABASE_AREAS = [
     ['Mermas e inventario de merma', ['Waste', 'WasteIssue', 'WasteIssueDetail', 'WasteIssueReturn', 'WasteMovement', 'WasteMovementDetail', 'WasteStockAdjustment', 'WasteStockAdjustmentDetail']]
 ];
 const USE_CASE_DOCUMENTS = {
-    catalog: path.join(ROOT, 'docs/requirements/use-case-descriptions.md'),
+    catalog: path.join(ROOT, 'docs/requirements/use-cases'),
     backendMatrix: path.join(ROOT, 'docs/architecture/backend-technical-documentation.md'),
     backendDiagrams: path.join(ROOT, 'docs/architecture/backend-code-sequences'),
     frontendMatrix: path.join(ROOT, 'docs/architecture/frontend-technical-documentation.md'),
     frontendDiagrams: path.join(ROOT, 'docs/architecture/frontend-code-sequences')
 };
 
-const readDocumentSource = async (documentPath) => {
+const readDocumentSource = async (documentPath, isNestedCollection = false) => {
     const entries = await readdir(documentPath, { withFileTypes: true }).catch(() => null);
     if (!entries) return readFile(documentPath, 'utf8');
     const chapterOrder = [
         'index.md',
-        'authentication.md',
-        'identity-access.md',
-        'catalogs.md',
-        'purchases.md',
-        'issues.md',
-        'reports.md'
+        'authentication',
+        'identity-access',
+        'catalogs',
+        'purchases',
+        'issues',
+        'reports'
     ];
-    const availableFiles = new Set(entries.filter((entry) => entry.isFile()).map((entry) => entry.name));
-    const unexpectedFiles = [...availableFiles].filter((file) => file.endsWith('.md') && !chapterOrder.includes(file));
-    if (unexpectedFiles.length) {
-        throw new Error(`Colección documental con capítulos no registrados: ${unexpectedFiles.join(', ')}`);
+    const markdownFiles = entries
+        .filter((entry) => entry.isFile() && entry.name.endsWith('.md'))
+        .map((entry) => entry.name);
+    const directories = entries.filter((entry) => entry.isDirectory()).map((entry) => entry.name);
+    if (!directories.length) {
+        const registeredFiles = chapterOrder.map((chapter) => (
+            chapter === 'index.md' ? chapter : `${chapter}.md`
+        ));
+        const unexpectedFiles = isNestedCollection
+            ? []
+            : markdownFiles.filter((file) => !registeredFiles.includes(file));
+        if (unexpectedFiles.length) {
+            throw new Error(`Colección documental con capítulos no registrados: ${unexpectedFiles.join(', ')}`);
+        }
+        const orderedFiles = isNestedCollection
+            ? ['index.md', ...markdownFiles.filter((file) => file !== 'index.md').sort()]
+                .filter((file) => markdownFiles.includes(file))
+            : registeredFiles.filter((file) => markdownFiles.includes(file));
+        return (await Promise.all(orderedFiles.map((file) => (
+            readFile(path.join(documentPath, file), 'utf8')
+        )))).join('\n');
     }
-    return (await Promise.all(chapterOrder.map((file) => readFile(path.join(documentPath, file), 'utf8')))).join('\n');
+    const unexpectedEntries = [
+        ...markdownFiles.filter((file) => file !== 'index.md'),
+        ...directories.filter((directory) => !chapterOrder.includes(directory))
+    ];
+    if (unexpectedEntries.length) {
+        throw new Error(`Colección documental con capítulos no registrados: ${unexpectedEntries.join(', ')}`);
+    }
+    const orderedEntries = chapterOrder.filter((entry) => (
+        markdownFiles.includes(entry) || directories.includes(entry)
+    ));
+    return (await Promise.all(orderedEntries.map((entry) => (
+        readDocumentSource(path.join(documentPath, entry), true)
+    )))).join('\n');
 };
 
 const toPosix = (value) => value.split(path.sep).join('/');
@@ -91,7 +120,7 @@ const validateUseCaseDiagramCoverage = async () => {
     ));
     const expectedIds = getUseCaseTableIds(sources.get('catalog'));
     const expectedTitles = new Map(
-        [...sources.get('catalog').matchAll(/^#### `(CU-[A-Z]+-\d+)` — (.+)$/gm)]
+        [...sources.get('catalog').matchAll(/^#{1,6} `(CU-[A-Z]+-\d+)` — (.+)$/gm)]
             .map((match) => [match[1], match[2]])
     );
     const failures = [];
@@ -126,7 +155,7 @@ const validateUseCaseDiagramCoverage = async () => {
                 SAL: 'issues',
                 REP: 'reports'
             };
-            const diagramFile = `${side}-code-sequences/${groupFiles[group]}.md`;
+            const diagramFile = `${side}-code-sequences/${groupFiles[group]}/${id.toLowerCase()}.md`;
             const diagramReference = `[\`DIA-${prefix}-${id}\`](${diagramFile}#${id.toLowerCase()})`;
             if (!matrix.includes(diagramReference)) {
                 failures.push(`matriz ${side}: ${id} no enlaza su diagrama aplicado`);
@@ -153,7 +182,7 @@ const validateUseCaseDiagramCoverage = async () => {
                 failures.push(`diagramas ${side}: ${pattern} no enlaza una vista canónica DIA-PAT-* desde el índice rápido`);
             }
         }
-        const sections = [...source.matchAll(/^## `(CU-[A-Z]+-\d+)` — (.+)\n([\s\S]*?)(?=^## `CU-|(?![\s\S]))/gm)];
+        const sections = [...source.matchAll(/^#{1,6} `(CU-[A-Z]+-\d+)` — (.+)\n([\s\S]*?)(?=^#{1,6} `CU-|(?![\s\S]))/gm)];
         validateIds(`diagramas ${side}`, sections.map((match) => match[1]));
         for (const [, id, title, body] of sections) {
             if (title !== expectedTitles.get(id)) {
@@ -381,7 +410,7 @@ const generateCodeMap = async () => {
 Este inventario se genera **a partir del código fuente**. Ejecuta \`npm run docs:architecture\`
 después de cambiar rutas o dependencias entre capas; \`npm run docs:check\` detecta si esta
 versión quedó desactualizada. La semántica y el patrón de esta vista se describen en las
-[convenciones de diagramas](../architecture/diagram-conventions.md).
+[convenciones de diagramas](../architecture/diagram-conventions/index.md).
 
 ## Dependencias entre áreas
 
@@ -564,7 +593,7 @@ Estos diagramas ER se generan desde los modelos y relaciones de
 \`prisma/schema.prisma\`. Se separan por área para que puedan leerse y revisarse en
 GitHub; las relaciones que cruzan áreas se describen en la sección final. La semántica
 y el patrón de esta vista se describen en las
-[convenciones de diagramas](../architecture/diagram-conventions.md).
+[convenciones de diagramas](../architecture/diagram-conventions/index.md).
 
 La marca \`PK\` identifica claves primarias, \`FK\` claves foráneas y \`UK\` campos
 únicos. Los campos compuestos y demás restricciones siguen teniendo como fuente de
@@ -609,7 +638,7 @@ const generateDataDictionary = async () => {
 Este inventario se genera desde \`prisma/schema.prisma\` y enumera campos escalares,
 obligatoriedad, claves, valores predeterminados, tipos de base de datos y relaciones
 propietarias. Se aplican las
-[convenciones de diagramas](../architecture/diagram-conventions.md).
+[convenciones de diagramas](../architecture/diagram-conventions/index.md).
 
 El tipo Prisma y el atributo \`@db\` describen la representación técnica. Prisma y las
 migraciones son la fuente de verdad para restricciones completas, índices, acciones

@@ -17,8 +17,8 @@ Esta guía corresponde al actor **Administrador del sistema (área Sistemas)**. 
 
 ## Recorrido recomendado
 
-1. Inicie en [autenticación y navegación](../cases/authentication.md).
-2. Use [identidad y acceso](../cases/identity-access.md) para administrar personas, áreas, roles, usuarios y contraseñas.
-3. Use **Catálogos auxiliares** y elija la pantalla independiente de **Áreas**, **Roles**, **Presentaciones**, **Unidades de medida**, **Motivos de ajuste** o **Estados de cumplimiento**. Siga el procedimiento de [catálogos e inventario](../cases/catalogs.md#catálogos-auxiliares) para consultar, crear o editar únicamente esos recursos; clientes y proveedores conservan sus módulos propios.
-4. Cuando tenga el permiso correspondiente, consulte [movimientos y reportes](../cases/reports.md).
+1. Inicie en [autenticación y navegación](../cases/authentication/index.md).
+2. Use [identidad y acceso](../cases/identity-access/index.md) para administrar personas, áreas, roles, usuarios y contraseñas.
+3. Use **Catálogos auxiliares** y elija la pantalla independiente de **Áreas**, **Roles**, **Presentaciones**, **Unidades de medida**, **Motivos de ajuste** o **Estados de cumplimiento**. Siga el procedimiento de [catálogos e inventario](../cases/catalogs/index.md#catálogos-auxiliares) para consultar, crear o editar únicamente esos recursos; clientes y proveedores conservan sus módulos propios.
+4. Cuando tenga el permiso correspondiente, consulte [movimientos y reportes](../cases/reports/index.md).
 5. Ante un rechazo, siga el vínculo **Errores posibles** del procedimiento; no cambie de cuenta para eludir permisos.

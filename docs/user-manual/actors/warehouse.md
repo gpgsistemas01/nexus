@@ -17,11 +17,11 @@ Esta guía corresponde al actor **Personal de almacén (área Almacén y proveed
 
 ## Recorrido recomendado
 
-1. Inicie en [autenticación y navegación](../cases/authentication.md).
-2. Consulte y mantenga los elementos permitidos en [catálogos e inventario](../cases/catalogs.md).
+1. Inicie en [autenticación y navegación](../cases/authentication/index.md).
+2. Consulte y mantenga los elementos permitidos en [catálogos e inventario](../cases/catalogs/index.md).
    **Consumibles** aparece dentro de **Almacén** con el acceso de consulta de materiales;
    administrar catálogos auxiliares no forma parte de este manual.
-3. Registre recepciones y correcciones en [compras de material](../cases/purchases.md).
-4. Registre, surta o reciba devoluciones en [salidas de material y merma](../cases/issues.md).
-5. Consulte el resultado en [movimientos y reportes](../cases/reports.md).
+3. Registre recepciones y correcciones en [compras de material](../cases/purchases/index.md).
+4. Registre, surta o reciba devoluciones en [salidas de material y merma](../cases/issues/index.md).
+5. Consulte el resultado en [movimientos y reportes](../cases/reports/index.md).
 6. Ante un rechazo, siga el vínculo **Errores posibles** del procedimiento y compruebe el estado antes de repetir una escritura.

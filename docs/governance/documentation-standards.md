@@ -15,7 +15,7 @@ decisión que corresponde.
 En particular, ISO/IEC/IEEE 29148 no se adopta como una plantilla de casos de uso. La
 norma orienta la calidad y el contenido de los requisitos, mientras que la estructura
 de dos columnas, sus secciones y el nivel de detalle de cada ficha son una convención
-documental de Nexus. La [estructura de las fichas](../requirements/use-case-descriptions.md#estructura-de-las-fichas)
+documental de Nexus. La [estructura de las fichas](../requirements/use-cases/index.md#estructura-de-las-fichas)
 define la plantilla vigente y permite distinguir qué información se registra y cuál se
 mantiene en otros artefactos.
 
@@ -40,9 +40,9 @@ establecer cómo debe implementarse.
 
 | Referencia | Uso recomendado en Nexus | Alcance actual |
 | --- | --- | --- |
-| [ISO/IEC/IEEE 29148:2018](https://www.iso.org/standard/72089.html) | Mantener requisitos identificables, necesarios, verificables, trazables y separados de su evidencia de implementación. | Aplica a `requirements-specification.md`, `use-case-descriptions.md` y `requirements-diagrams.md`. Es la guía principal, no una declaración de conformidad. |
+| [ISO/IEC/IEEE 29148:2018](https://www.iso.org/standard/72089.html) | Mantener requisitos identificables, necesarios, verificables, trazables y separados de su evidencia de implementación. | Aplica a `requirements-specification/`, `use-cases/` y `diagrams/`. Es la guía principal, no una declaración de conformidad. |
 | [ISO/IEC/IEEE 1016:2009](https://www.iso.org/standard/45144.html) | Estructurar una descripción de diseño mediante interesados, preocupaciones, puntos de vista, vistas, elementos de diseño, relaciones y justificación. | Es la referencia más próxima para la documentación técnica del código y complementa 42010. Se aplica selectivamente a la guía común y a las referencias separadas de backend y frontend; no prescribe JSDoc, nombres de funciones, bloques de código ni una plantilla por endpoint. |
-| [ISO/IEC/IEEE 42010:2022](https://www.iso.org/standard/74393.html) | Explicar interesados, preocupaciones, puntos de vista, vistas y decisiones arquitectónicas cuando esa información sea útil. | Aplica de forma ligera a `architecture-and-web-views.md` y a las [convenciones de diagramas](../architecture/diagram-conventions.md); no exige reemplazar Mermaid ni adoptar una herramienta nueva. |
+| [ISO/IEC/IEEE 42010:2022](https://www.iso.org/standard/74393.html) | Explicar interesados, preocupaciones, puntos de vista, vistas y decisiones arquitectónicas cuando esa información sea útil. | Aplica de forma ligera a `architecture-and-web-views.md` y a las [convenciones de diagramas](../architecture/diagram-conventions/index.md); no exige reemplazar Mermaid ni adoptar una herramienta nueva. |
 | [ISO/IEC 25010:2023](https://www.iso.org/standard/78176.html) | Usar un vocabulario consistente para características de calidad y convertir sólo objetivos acordados en requisitos medibles. | Sirve para revisar la sección de calidad; no autoriza inventar umbrales de rendimiento, disponibilidad o seguridad. |
 | [ISO/IEC/IEEE 15289:2019](https://www.iso.org/standard/74909.html) | Orientar el contenido y ciclo de vida de los elementos de información sin imponer un formato único. | Útil si el conjunto documental crece o necesita entregables contractuales; por ahora basta el índice y la regla de actualización existentes. |
 | OpenAPI 3.1 | Versionar el contrato HTTP de rutas, parámetros, cuerpos, respuestas, errores y autenticación. | Es una especificación técnica complementaria, no una norma ISO ni un sustituto de requisitos o arquitectura. Su adopción sigue la estrategia de `api-contract.md`. |
