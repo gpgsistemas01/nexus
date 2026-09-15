@@ -76,7 +76,7 @@ export const openGoodsReceiptModal = ({ mode, data = null }) => {
         form.reset();
         value = INVOICE_VALUES.INVOICE;
         modalElement.querySelector(HEADING_SELECTORS.MODAL_TITLE).textContent = 'Registrar compra';
-        form.querySelector(BUTTON_SELECTORS.SUBMIT).textContent = 'Confirmar';
+        form.querySelector(BUTTON_SELECTORS.SUBMIT).textContent = 'Guardar';
         form.querySelector(INPUT_SELECTORS.PRESENTATION_DISPLAY).value = '';
         toggleDetailFormActions({
             mode,

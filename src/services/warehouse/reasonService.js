@@ -38,14 +38,15 @@ export const findAllReasons = async ({
     orderDir = 'asc'
 }) => {
 
-    const where = search
-        ? {
+    const where = {
+        isActive: true,
+        ...(search && {
             name: {
                 contains: search,
                 mode: 'insensitive'
             }
-        }
-        : {};
+        })
+    };
 
     const reasons = await getDb().stockAdjustmentReason.findMany({
         skip,
@@ -56,7 +57,8 @@ export const findAllReasons = async ({
         },
         select: {
             id: true,
-            name: true
+            name: true,
+            isActive: true
         }
     });
 

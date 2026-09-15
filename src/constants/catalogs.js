@@ -1,45 +1,51 @@
 export const MANAGED_CATALOGS = Object.freeze({
     departments: {
         model: 'department',
-        fields: ['name'],
+        fields: ['name', 'isActive'],
         maxLengths: { name: 50 },
         label: 'Áreas',
-        entityLabel: 'área'
+        entityLabel: 'área',
+        createButtonLabel: 'Nueva área'
     },
     roles: {
         model: 'role',
-        fields: ['name'],
+        fields: ['name', 'isActive'],
         maxLengths: { name: 50 },
         label: 'Roles',
-        entityLabel: 'rol'
+        entityLabel: 'rol',
+        createButtonLabel: 'Nuevo rol'
     },
     presentations: {
         model: 'presentation',
-        fields: ['name'],
+        fields: ['name', 'isActive'],
         maxLengths: { name: 50 },
         label: 'Presentaciones',
-        entityLabel: 'presentación'
+        entityLabel: 'presentación',
+        createButtonLabel: 'Nueva presentación'
     },
     'unit-measures': {
         model: 'unitMeasure',
-        fields: ['name', 'symbol'],
+        fields: ['name', 'symbol', 'isActive'],
         maxLengths: { name: 20, symbol: 10 },
         label: 'Unidades de medida',
-        entityLabel: 'unidad de medida'
+        entityLabel: 'unidad de medida',
+        createButtonLabel: 'Nueva unidad de medida'
     },
     reasons: {
         model: 'stockAdjustmentReason',
         fields: ['name', 'isActive'],
         maxLengths: { name: 100 },
         label: 'Motivos de ajuste',
-        entityLabel: 'motivo de ajuste'
+        entityLabel: 'motivo de ajuste',
+        createButtonLabel: 'Nuevo motivo de ajuste'
     },
     'fulfillment-statuses': {
         model: 'fulfillmentStatus',
-        fields: ['name'],
+        fields: ['name', 'isActive'],
         maxLengths: { name: 50 },
         label: 'Estados de cumplimiento',
-        entityLabel: 'estado de cumplimiento'
+        entityLabel: 'estado de cumplimiento',
+        createButtonLabel: 'Nuevo estado de cumplimiento'
     }
 });
 

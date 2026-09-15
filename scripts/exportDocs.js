@@ -25,11 +25,6 @@ const manualCases = [
 const [authenticationCases, identityCases, catalogCases, purchaseCases, issueCases, reportCases] = manualCases;
 const manualOverview = 'docs/user-manual/overview.md';
 const manualProcedures = 'docs/user-manual/procedures.md';
-const manualCommon = [
-    'docs/user-manual/index.md',
-    manualOverview,
-    manualProcedures
-];
 const manualErrorCatalog = 'docs/user-manual/error-messages.md';
 const manualValidationMatrix = 'docs/user-manual/form-validation-matrix.md';
 const manualReferences = [
@@ -50,7 +45,6 @@ const sequenceDocuments = (side) => [
     ...sequenceGroups.map((group) => `docs/architecture/${side}-code-sequences/${group}.md`)
 ];
 const MANIFESTS = Object.freeze({
-    'manual-usuario': [...manualCommon, ...manualCases, ...manualReferences],
     'manual-administrador': [
         'docs/user-manual/actors/administrator.md',
         manualOverview,
@@ -257,7 +251,7 @@ const insertAfterDocumentData = (content, insertion) => {
 
 if ((requestedPublication !== 'todos' && !MANIFESTS[requestedPublication])
     || (checkOnly ? requestedFormat && !formats.has(requestedFormat) : !formats.has(requestedFormat))) {
-    console.error('Uso: npm run docs:export -- <todos|manual-usuario|manual-administrador|manual-almacen|requisitos|datos|arquitectura|pruebas> [docx|pdf] [--check]');
+    console.error('Uso: npm run docs:export -- <todos|manual-administrador|manual-almacen|requisitos|datos|arquitectura|pruebas> [docx|pdf] [--check]');
     process.exit(1);
 }
 

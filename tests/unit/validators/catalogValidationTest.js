@@ -17,12 +17,28 @@ const runValidation = async ({ rules = catalogEntryValidation, catalog, id, body
 
 describe('validación HTTP de catálogos administrables', () => {
   it.each([
-    ['departments', { name: ' Ventas ' }, { name: 'Ventas' }],
-    ['roles', { name: ' Operador ' }, { name: 'Operador' }],
-    ['presentations', { name: ' Caja ' }, { name: 'Caja' }],
-    ['unit-measures', { name: ' Metro ', symbol: ' m ' }, { name: 'Metro', symbol: 'm' }],
+    [
+      'departments',
+      { name: ' Ventas ', isActive: 'true' },
+      { name: 'Ventas', isActive: true }
+    ],
+    ['roles', { name: ' Operador ', isActive: 'true' }, { name: 'Operador', isActive: true }],
+    [
+      'presentations',
+      { name: ' Caja ', isActive: 'true' },
+      { name: 'Caja', isActive: true }
+    ],
+    [
+      'unit-measures',
+      { name: ' Metro ', symbol: ' m ', isActive: 'true' },
+      { name: 'Metro', symbol: 'm', isActive: true }
+    ],
     ['reasons', { name: ' Ajuste ', isActive: 'true' }, { name: 'Ajuste', isActive: true }],
-    ['fulfillment-statuses', { name: ' Pendiente ' }, { name: 'Pendiente' }]
+    [
+      'fulfillment-statuses',
+      { name: ' Pendiente ', isActive: 'true' },
+      { name: 'Pendiente', isActive: true }
+    ]
   ])('acepta y normaliza los campos válidos de %s', async (catalog, body, expected) => {
     const result = await runValidation({ catalog, body });
 
@@ -31,7 +47,8 @@ describe('validación HTTP de catálogos administrables', () => {
   });
 
   it.each([
-    ['unit-measures', { name: 'Metro' }, 'symbol', errorMap.name.REQUIRED],
+    ['unit-measures', { name: 'Metro', isActive: true }, 'symbol', errorMap.name.REQUIRED],
+    ['departments', { name: 'Ventas' }, 'isActive', errorMap.isActive.REQUIRED],
     ['reasons', { name: 'Ajuste' }, 'isActive', errorMap.isActive.REQUIRED],
     ['reasons', { name: 'Ajuste', isActive: 'not-boolean' }, 'isActive', errorMap.isActive.INVALID_BOOLEAN]
   ])('rechaza el contrato inválido de %s', async (catalog, body, path, code) => {
@@ -51,7 +68,7 @@ describe('validación HTTP de catálogos administrables', () => {
     const body = {
       name: 'x'.repeat(length),
       ...(catalog === 'unit-measures' ? { symbol: 'u' } : {}),
-      ...(catalog === 'reasons' ? { isActive: true } : {})
+      isActive: true
     };
     const { errors } = await runValidation({ catalog, body });
 
@@ -78,7 +95,7 @@ describe('validación HTTP de catálogos administrables', () => {
       rules: catalogEntryEditValidation,
       catalog: 'roles',
       id: 'not-a-uuid',
-      body: { name: 'Operador' }
+      body: { name: 'Operador', isActive: true }
     });
 
     expect(errors).toEqual([]);

@@ -3,6 +3,7 @@
 Este capítulo forma parte del [catálogo de secuencias del código backend](index.md) y conserva los recorridos aplicados del grupo `IDA`. Las reglas comunes de lectura, trazabilidad y mantenimiento se declaran en el índice de la colección.
 
 <a id="cu-ida-01"></a>
+
 ## `CU-IDA-01` — Consultar personas
 
 **Patrones:** `BE-P01`.
@@ -33,6 +34,7 @@ sequenceDiagram
 ```
 
 <a id="cu-ida-02"></a>
+
 ## `CU-IDA-02` — Crear persona
 
 **Patrones:** `BE-P01`, `BE-P03`, `BE-P04`.
@@ -66,6 +68,7 @@ sequenceDiagram
 ```
 
 <a id="cu-ida-03"></a>
+
 ## `CU-IDA-03` — Editar persona
 
 **Patrones:** `BE-P01`, `BE-P03`, `BE-P04`.
@@ -98,8 +101,40 @@ sequenceDiagram
     deactivate Controller
 ```
 
-<a id="cu-ida-04"></a>
-## `CU-IDA-04` — Consultar usuarios
+<a id="cu-ida-05"></a>
+
+## `CU-IDA-04` — Generar reporte de personas
+
+**Patrones:** `BE-P07`.
+
+```mermaid
+sequenceDiagram
+    participant Client as Cliente HTTP / web
+    participant Route as src/routes/api/admin/reportApiRoute.js
+    participant Controller@{ "type": "control" } as src/controllers/api/admin/reportController.js
+    participant Domain as src/services/admin/person/personService.js<br/>src/utils/reportExcelUtils.js
+    Note over Controller,Domain: Variables de frontera: req.query/params
+
+    Client->>Route: GET /api/admin/reports/persons/excel
+    Route->>Route: ejecutar en orden el middleware configurado para la ruta
+    Route->>Controller: exportPersonReport(req, res)
+    activate Controller
+    Controller->>Domain: personService.findAllPersons({ query: req.query }) prepara filas y el controller llama sendExcelReport
+    activate Domain
+    Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
+    Domain-->>Controller: resultado del servicio o error de dominio tipado
+    deactivate Domain
+    alt El servicio devuelve el resultado
+        Controller-->>Client: status HTTP y cuerpo concretos del controller
+    else El servicio propaga un error de dominio
+        Controller-->>Client: error entregado al middleware final para su respuesta HTTP
+    end
+    deactivate Controller
+```
+
+<a id="cu-ida-09"></a>
+
+## `CU-IDA-05` — Consultar usuarios
 
 **Patrones:** `BE-P01`.
 
@@ -128,8 +163,9 @@ sequenceDiagram
     deactivate Controller
 ```
 
-<a id="cu-ida-05"></a>
-## `CU-IDA-05` — Crear usuario y asignar acceso
+<a id="cu-ida-06"></a>
+
+## `CU-IDA-06` — Crear usuario y asignar acceso
 
 **Patrones:** `BE-P01`, `BE-P03`, `BE-P04`.
 
@@ -161,8 +197,9 @@ sequenceDiagram
     deactivate Controller
 ```
 
-<a id="cu-ida-06"></a>
-## `CU-IDA-06` — Editar usuario y acceso
+<a id="cu-ida-07"></a>
+
+## `CU-IDA-07` — Editar usuario y acceso
 
 **Patrones:** `BE-P01`, `BE-P03`, `BE-P04`.
 
@@ -194,8 +231,9 @@ sequenceDiagram
     deactivate Controller
 ```
 
-<a id="cu-ida-07"></a>
-## `CU-IDA-07` — Cambiar contraseña de usuario
+<a id="cu-ida-08"></a>
+
+## `CU-IDA-08` — Cambiar contraseña de usuario
 
 **Patrones:** `BE-P01`.
 
@@ -227,8 +265,38 @@ sequenceDiagram
     deactivate Controller
 ```
 
-<a id="cu-ida-08"></a>
-## `CU-IDA-08` — Consultar roles
+<a id="cu-ida-10"></a>
+
+## `CU-IDA-09` — Generar reporte de usuarios
+
+**Patrones:** `BE-P07`.
+
+```mermaid
+sequenceDiagram
+    participant Client as Cliente HTTP / web
+    participant Route as src/routes/api/admin/reportApiRoute.js
+    participant Controller@{ "type": "control" } as src/controllers/api/admin/reportController.js
+    participant Domain as src/services/admin/userService.js<br/>src/utils/reportExcelUtils.js
+    Note over Controller,Domain: Variables de frontera: req.query/params
+
+    Client->>Route: GET /api/admin/reports/users/excel
+    Route->>Route: ejecutar en orden el middleware configurado para la ruta
+    Route->>Controller: exportUserReport(req, res)
+    activate Controller
+    Controller->>Domain: userService.findAllUsers({ query: req.query }) prepara filas y el controller llama sendExcelReport
+    activate Domain
+    Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
+    Domain-->>Controller: resultado del servicio o error de dominio tipado
+    deactivate Domain
+    alt El servicio devuelve el resultado
+        Controller-->>Client: status HTTP y cuerpo concretos del controller
+    else El servicio propaga un error de dominio
+        Controller-->>Client: error entregado al middleware final para su respuesta HTTP
+    end
+    deactivate Controller
+```
+
+## `CU-IDA-10` — Consultar roles
 
 **Patrones:** `BE-P02`.
 
@@ -257,8 +325,9 @@ sequenceDiagram
     deactivate Controller
 ```
 
-<a id="cu-ida-09"></a>
-## `CU-IDA-09` — Consultar departamentos
+<a id="cu-ida-11"></a>
+
+## `CU-IDA-11` — Consultar departamentos
 
 **Patrones:** `BE-P02`.
 

@@ -26,10 +26,11 @@ describe('catalogService', () => {
   it('provides the presentation contract for an individual catalog page', () => {
     expect(getManagedCatalog('unit-measures')).toEqual({
       name: 'unit-measures',
-      fields: ['name', 'symbol'],
+      fields: ['name', 'symbol', 'isActive'],
       maxLengths: { name: 20, symbol: 10 },
       label: 'Unidades de medida',
-      entityLabel: 'unidad de medida'
+      entityLabel: 'unidad de medida',
+      createButtonLabel: 'Nueva unidad de medida'
     });
   });
 
@@ -60,11 +61,12 @@ describe('catalogService', () => {
     await createCatalogEntry('unit-measures', {
       name: ' Metro ',
       symbol: ' m ',
+      isActive: false,
       unexpected: 'discarded'
     });
 
     expect(database.unitMeasure.create).toHaveBeenCalledWith({
-      data: { name: 'Metro', symbol: 'm' }
+      data: { name: 'Metro', symbol: 'm', isActive: false }
     });
   });
 
@@ -94,7 +96,8 @@ describe('catalogService', () => {
 
     await expect(updateCatalogEntry('unit-measures', '4fe1eb70-6ad3-4a22-95d6-2a95c362c01c', {
       name: 'Metro',
-      symbol: 'm'
+      symbol: 'm',
+      isActive: true
     })).rejects.toMatchObject({
       code: 'CATALOG_ENTRY_NOT_FOUND',
       statusCode: 404,
@@ -108,7 +111,8 @@ describe('catalogService', () => {
 
     await expect(updateCatalogEntry('unit-measures', 'not-a-uuid', {
       name: 'Metro',
-      symbol: 'm'
+      symbol: 'm',
+      isActive: true
     })).rejects.toMatchObject({
       code: 'CATALOG_ENTRY_NOT_FOUND',
       statusCode: 404,
@@ -117,8 +121,8 @@ describe('catalogService', () => {
   });
 
   it.each([
-    [{ name: 'x'.repeat(21), symbol: 'm' }, 'a name longer than the Prisma column'],
-    [{ name: 'Metro', symbol: 'x'.repeat(11) }, 'a symbol longer than the Prisma column']
+    [{ name: 'x'.repeat(21), symbol: 'm', isActive: true }, 'a name longer than the Prisma column'],
+    [{ name: 'Metro', symbol: 'x'.repeat(11), isActive: true }, 'a symbol longer than the Prisma column']
   ])('rejects %s before accessing Prisma (%s)', async (input) => {
     await expect(createCatalogEntry('unit-measures', input))
       .rejects.toMatchObject({ code: 'CATALOG_VALIDATION_ERROR', statusCode: 400 });

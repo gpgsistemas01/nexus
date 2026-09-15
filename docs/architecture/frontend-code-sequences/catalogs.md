@@ -3,6 +3,7 @@
 Este capítulo forma parte del [catálogo de secuencias del código frontend](index.md) y conserva los recorridos aplicados del grupo `CAT`. Las reglas comunes de lectura, trazabilidad y mantenimiento se declaran en el índice de la colección.
 
 <a id="cu-cat-01"></a>
+
 ## `CU-CAT-01` — Consultar materiales
 
 **Patrones:** `FE-P02`.
@@ -38,6 +39,7 @@ sequenceDiagram
 ```
 
 <a id="cu-cat-02"></a>
+
 ## `CU-CAT-02` — Crear material
 
 **Patrones:** `FE-P02`.
@@ -78,6 +80,7 @@ sequenceDiagram
 ```
 
 <a id="cu-cat-03"></a>
+
 ## `CU-CAT-03` — Editar material
 
 **Patrones:** `FE-P02`.
@@ -113,6 +116,7 @@ sequenceDiagram
 ```
 
 <a id="cu-cat-04"></a>
+
 ## `CU-CAT-04` — Retirar material
 
 **Patrones:** `FE-P02`.
@@ -148,6 +152,7 @@ sequenceDiagram
 ```
 
 <a id="cu-cat-05"></a>
+
 ## `CU-CAT-05` — Ajustar existencia de material
 
 **Patrones:** `FE-P02`.
@@ -179,8 +184,156 @@ sequenceDiagram
     Form->>Form: form.onSave?.(material)
 ```
 
-<a id="cu-cat-06"></a>
-## `CU-CAT-06` — Consultar proveedores
+<a id="cu-cat-10"></a>
+
+## `CU-CAT-06` — Consultar inventario de materiales
+
+**Patrones:** `FE-P07`.
+
+```mermaid
+sequenceDiagram
+    participant Browser as Navegador
+    participant View as src/public/js/pages/warehouse/materials/materialsPage.js
+    participant Request as src/public/js/services/warehouse/materialService.js
+    participant HTTP as src/public/js/services/axiosInstanceApi.js
+    participant Transport@{ "type": "control" } as src/routes/api/warehouse/materialApiRoute.js<br/>src/controllers/api/warehouse/materialController.js
+    Note over Request,Transport: Variables de frontera: params/filtros
+
+    Browser->>View: La consulta es el listado de materialsPage.js, no hay página de reporte
+    View->>View: recopilar y validar las variables de frontera indicadas
+    View->>Request: getAllMaterialsRequest({ params })
+    activate Request
+    Request->>HTTP: apiRequest({ method: 'get', url, params })
+    HTTP->>Transport: GET /api/warehouse/materials
+    Transport-->>HTTP: status HTTP y payload del endpoint
+    HTTP-->>Request: respuesta o error normalizado
+    alt Respuesta exitosa
+        Request-->>View: entidad, colección o archivo normalizado
+        View-->>Browser: actualizar la vista con el resultado
+    else Respuesta rechazada
+        Request-->>View: error normalizado por apiRequest
+        View-->>Browser: conservar contexto y mostrar el mensaje
+    end
+    deactivate Request
+```
+
+<a id="cu-cat-08"></a>
+
+## `CU-CAT-07` — Generar reporte de inventario de materiales
+
+**Patrones:** `FE-P08`.
+
+```mermaid
+sequenceDiagram
+    participant Browser as Navegador
+    participant View as src/public/js/plugins/datatable/warehouse/materials/materialDatatable.js
+    participant Dialog as src/public/js/ui/reportExportDialog.js
+    participant Application as src/public/js/application/warehouse/report.js
+    participant Request as src/public/js/services/warehouse/reportService.js
+    participant HTTP as src/public/js/services/axiosInstanceApi.js
+    participant Transport@{ "type": "control" } as src/routes/api/warehouse/reportApiRoute.js<br/>src/controllers/api/warehouse/reportController.js
+    Note over Application,Transport: Variables de frontera: params/filtros
+
+    Browser->>View: Botón Excel de materialDatatable.js
+    View->>Dialog: showInventoryExportDialog()
+    Dialog-->>View: inventoryScope activo/existencia
+    View->>View: recopilar y validar las variables de frontera indicadas
+    View->>Application: exportWarehouseReport({ params })
+    Application->>Request: exportWarehouseReportRequest({ params })
+    activate Application
+    Request->>HTTP: apiRequest({ method: 'get', url, params })
+    HTTP->>Transport: descarga GET /api/warehouse/reports/inventory/excel
+    Transport-->>HTTP: status HTTP y payload del endpoint
+    HTTP-->>Request: respuesta o error normalizado
+    Request-->>Application: resultado del request
+    alt Respuesta exitosa
+        Application-->>View: entidad, colección o archivo normalizado
+        View-->>Browser: actualizar la vista con el resultado
+    else Respuesta rechazada
+        Application-->>View: error normalizado por apiRequest
+        View-->>Browser: conservar contexto y mostrar el mensaje
+    end
+    deactivate Application
+```
+
+<a id="cu-sal-07"></a>
+
+## `CU-CAT-08` — Consultar movimientos de materiales
+
+**Patrones:** `FE-P07`.
+
+```mermaid
+sequenceDiagram
+    participant Browser as Navegador
+    participant View as src/public/js/pages/admin/movements/movementsPage.js
+    participant Application as src/public/js/application/admin/movements/movements.js
+    participant Request as src/public/js/services/admin/movementService.js
+    participant HTTP as src/public/js/services/axiosInstanceApi.js
+    participant Transport@{ "type": "control" } as src/routes/api/admin/movementApiRoute.js<br/>src/controllers/api/admin/movementController.js
+    Note over Application,Transport: Variables de frontera: params/filtros
+
+    Browser->>View: movementsPage.js selecciona el contexto material
+    View->>View: recopilar y validar las variables de frontera indicadas
+    View->>Application: getAllMovements({ context: 'materials', params })
+    Application->>Request: getAllMovementsRequest({ context, params })
+    activate Application
+    Request->>HTTP: apiRequest({ method: 'get', url, data/params })
+    HTTP->>Transport: consultar GET /api/admin/movements/materials
+    Transport-->>HTTP: status HTTP y payload del endpoint
+    HTTP-->>Request: respuesta o error normalizado
+    Request-->>Application: resultado del request
+    alt Respuesta exitosa
+        Application-->>View: entidad, colección o archivo normalizado
+        View-->>Browser: actualizar la vista con el resultado
+    else Respuesta rechazada
+        Application-->>View: error normalizado por apiRequest
+        View-->>Browser: conservar contexto y mostrar el mensaje
+    end
+    deactivate Application
+```
+
+<a id="cu-cat-07"></a>
+
+## `CU-CAT-09` — Generar reporte de movimientos de materiales
+
+**Patrones:** `FE-P08`.
+
+```mermaid
+sequenceDiagram
+    participant Browser as Navegador
+    participant View as src/public/js/plugins/datatable/admin/movements/movementDatatable.js
+    participant Dialog as src/public/js/ui/reportExportDialog.js
+    participant Application as src/public/js/application/admin/report.js
+    participant Request as src/public/js/services/admin/reportService.js
+    participant HTTP as src/public/js/services/axiosInstanceApi.js
+    participant Transport@{ "type": "control" } as src/routes/api/admin/reportApiRoute.js<br/>src/controllers/api/admin/reportController.js
+    Note over Application,Transport: Variables de frontera: params/filtros
+
+    Browser->>View: Botón Excel de movimientos en contexto material
+    View->>Dialog: showReportExportDialog(currentMonth)
+    Dialog-->>View: alcance confirmado o cancelación
+    View->>View: recopilar y validar las variables de frontera indicadas
+    View->>Application: exportMovementReport({ params, type: materials })
+    Application->>Request: exportMovementReportRequest({ params, type: materials })
+    activate Application
+    Request->>HTTP: apiRequest({ method: 'get', url, params })
+    HTTP->>Transport: descarga GET /api/admin/reports/movements/materials/excel
+    Transport-->>HTTP: status HTTP y payload del endpoint
+    HTTP-->>Request: respuesta o error normalizado
+    Request-->>Application: resultado del request
+    alt Respuesta exitosa
+        Application-->>View: entidad, colección o archivo normalizado
+        View-->>Browser: actualizar la vista con el resultado
+    else Respuesta rechazada
+        Application-->>View: error normalizado por apiRequest
+        View-->>Browser: conservar contexto y mostrar el mensaje
+    end
+    deactivate Application
+```
+
+<a id="cu-cat-23"></a>
+
+## `CU-CAT-10` — Consultar proveedores
 
 **Patrones:** `FE-P02`.
 
@@ -214,8 +367,9 @@ sequenceDiagram
     deactivate Application
 ```
 
-<a id="cu-cat-07"></a>
-## `CU-CAT-07` — Crear proveedor
+<a id="cu-cat-11"></a>
+
+## `CU-CAT-11` — Crear proveedor
 
 **Patrones:** `FE-P02`.
 
@@ -249,8 +403,9 @@ sequenceDiagram
     deactivate Application
 ```
 
-<a id="cu-cat-08"></a>
-## `CU-CAT-08` — Editar proveedor
+<a id="cu-cat-12"></a>
+
+## `CU-CAT-12` — Editar proveedor
 
 **Patrones:** `FE-P02`.
 
@@ -284,8 +439,9 @@ sequenceDiagram
     deactivate Application
 ```
 
-<a id="cu-cat-09"></a>
-## `CU-CAT-09` — Cambiar estado de proveedor
+<a id="cu-cat-13"></a>
+
+## `CU-CAT-13` — Cambiar estado de proveedor
 
 **Patrones:** `FE-P02`.
 
@@ -319,8 +475,48 @@ sequenceDiagram
     deactivate Application
 ```
 
-<a id="cu-cat-10"></a>
-## `CU-CAT-10` — Consultar clientes
+<a id="cu-cat-15"></a>
+
+## `CU-CAT-14` — Generar reporte de proveedores
+
+**Patrones:** `FE-P08`.
+
+```mermaid
+sequenceDiagram
+    participant Browser as Navegador
+    participant View as src/public/js/plugins/datatable/warehouse/suppliers/supplierDatatable.js
+    participant Dialog as src/public/js/ui/reportExportDialog.js
+    participant Application as src/public/js/application/warehouse/report.js
+    participant Request as src/public/js/services/warehouse/reportService.js
+    participant HTTP as src/public/js/services/axiosInstanceApi.js
+    participant Transport@{ "type": "control" } as src/routes/api/warehouse/reportApiRoute.js<br/>src/controllers/api/warehouse/reportController.js
+    Note over Application,Transport: Variables de frontera: params/filtros
+
+    Browser->>View: Botón Excel de supplierDatatable.js
+    View->>Dialog: showFilteredExportDialog()
+    Dialog-->>View: alcance confirmado o cancelación
+    View->>View: recopilar y validar las variables de frontera indicadas
+    View->>Application: exportSupplierReport({ params })
+    Application->>Request: exportSupplierReportRequest({ params })
+    activate Application
+    Request->>HTTP: apiRequest({ method: 'get', url, params })
+    HTTP->>Transport: descarga GET /api/warehouse/reports/suppliers/excel
+    Transport-->>HTTP: status HTTP y payload del endpoint
+    HTTP-->>Request: respuesta o error normalizado
+    Request-->>Application: resultado del request
+    alt Respuesta exitosa
+        Application-->>View: entidad, colección o archivo normalizado
+        View-->>Browser: actualizar la vista con el resultado
+    else Respuesta rechazada
+        Application-->>View: error normalizado por apiRequest
+        View-->>Browser: conservar contexto y mostrar el mensaje
+    end
+    deactivate Application
+```
+
+<a id="cu-cat-18"></a>
+
+## `CU-CAT-15` — Consultar clientes
 
 **Patrones:** `FE-P02`.
 
@@ -354,8 +550,9 @@ sequenceDiagram
     deactivate Application
 ```
 
-<a id="cu-cat-11"></a>
-## `CU-CAT-11` — Crear cliente
+<a id="cu-cat-16"></a>
+
+## `CU-CAT-16` — Crear cliente
 
 **Patrones:** `FE-P02`.
 
@@ -389,8 +586,9 @@ sequenceDiagram
     deactivate Application
 ```
 
-<a id="cu-cat-12"></a>
-## `CU-CAT-12` — Editar cliente
+<a id="cu-cat-17"></a>
+
+## `CU-CAT-17` — Editar cliente
 
 **Patrones:** `FE-P02`.
 
@@ -424,8 +622,48 @@ sequenceDiagram
     deactivate Application
 ```
 
-<a id="cu-cat-13"></a>
-## `CU-CAT-13` — Consultar mermas
+<a id="cu-cat-19"></a>
+
+## `CU-CAT-18` — Generar reporte de clientes
+
+**Patrones:** `FE-P08`.
+
+```mermaid
+sequenceDiagram
+    participant Browser as Navegador
+    participant View as src/public/js/plugins/datatable/sales/clients/clientDatatable.js
+    participant Dialog as src/public/js/ui/reportExportDialog.js
+    participant Application as src/public/js/application/sales/report.js
+    participant Request as src/public/js/services/sales/reportService.js
+    participant HTTP as src/public/js/services/axiosInstanceApi.js
+    participant Transport@{ "type": "control" } as src/routes/api/sales/reportApiRoute.js<br/>src/controllers/api/sales/reportController.js
+    Note over Application,Transport: Variables de frontera: params/filtros
+
+    Browser->>View: Botón Excel de clientDatatable.js
+    View->>Dialog: showFilteredExportDialog()
+    Dialog-->>View: alcance confirmado o cancelación
+    View->>View: recopilar y validar las variables de frontera indicadas
+    View->>Application: exportClientReport({ params })
+    Application->>Request: exportClientReportRequest({ params })
+    activate Application
+    Request->>HTTP: apiRequest({ method: 'get', url, params })
+    HTTP->>Transport: descarga GET /api/sales/reports/clients/excel
+    Transport-->>HTTP: status HTTP y payload del endpoint
+    HTTP-->>Request: respuesta o error normalizado
+    Request-->>Application: resultado del request
+    alt Respuesta exitosa
+        Application-->>View: entidad, colección o archivo normalizado
+        View-->>Browser: actualizar la vista con el resultado
+    else Respuesta rechazada
+        Application-->>View: error normalizado por apiRequest
+        View-->>Browser: conservar contexto y mostrar el mensaje
+    end
+    deactivate Application
+```
+
+<a id="cu-ida-04"></a>
+
+## `CU-CAT-19` — Consultar mermas
 
 **Patrones:** `FE-P02`.
 
@@ -459,8 +697,9 @@ sequenceDiagram
     deactivate Application
 ```
 
-<a id="cu-cat-14"></a>
-## `CU-CAT-14` — Registrar merma
+<a id="cu-cat-20"></a>
+
+## `CU-CAT-20` — Registrar merma
 
 **Patrones:** `FE-P02`.
 
@@ -499,8 +738,9 @@ sequenceDiagram
     deactivate Application
 ```
 
-<a id="cu-cat-15"></a>
-## `CU-CAT-15` — Editar merma
+<a id="cu-cat-21"></a>
+
+## `CU-CAT-21` — Editar merma
 
 **Patrones:** `FE-P02`.
 
@@ -534,8 +774,9 @@ sequenceDiagram
     deactivate Application
 ```
 
-<a id="cu-cat-16"></a>
-## `CU-CAT-16` — Ajustar existencia de merma
+<a id="cu-cat-22"></a>
+
+## `CU-CAT-22` — Ajustar existencia de merma
 
 **Patrones:** `FE-P02`.
 
@@ -569,8 +810,156 @@ sequenceDiagram
     deactivate Application
 ```
 
-<a id="cu-cat-17"></a>
-## `CU-CAT-17` — Consultar presentaciones
+<a id="cu-cat-27"></a>
+
+## `CU-CAT-23` — Consultar inventario de mermas
+
+**Patrones:** `FE-P07`.
+
+```mermaid
+sequenceDiagram
+    participant Browser as Navegador
+    participant View as src/public/js/pages/warehouse/wastes/wastesPage.js
+    participant Request as src/public/js/services/warehouse/wasteService.js
+    participant HTTP as src/public/js/services/axiosInstanceApi.js
+    participant Transport@{ "type": "control" } as src/routes/api/warehouse/wasteApiRoute.js<br/>src/controllers/api/warehouse/wasteController.js
+    Note over Request,Transport: Variables de frontera: params/filtros
+
+    Browser->>View: La consulta es el listado de wastesPage.js, no hay página de reporte
+    View->>View: recopilar y validar las variables de frontera indicadas
+    View->>Request: getAllWastesRequest({ params })
+    activate Request
+    Request->>HTTP: apiRequest({ method: 'get', url, params })
+    HTTP->>Transport: GET /api/warehouse/wastes
+    Transport-->>HTTP: status HTTP y payload del endpoint
+    HTTP-->>Request: respuesta o error normalizado
+    alt Respuesta exitosa
+        Request-->>View: entidad, colección o archivo normalizado
+        View-->>Browser: actualizar la vista con el resultado
+    else Respuesta rechazada
+        Request-->>View: error normalizado por apiRequest
+        View-->>Browser: conservar contexto y mostrar el mensaje
+    end
+    deactivate Request
+```
+
+<a id="cu-cat-25"></a>
+
+## `CU-CAT-24` — Generar reporte de mermas
+
+**Patrones:** `FE-P08`.
+
+```mermaid
+sequenceDiagram
+    participant Browser as Navegador
+    participant View as src/public/js/plugins/datatable/warehouse/wastes/wasteDatatable.js
+    participant Dialog as src/public/js/ui/reportExportDialog.js
+    participant Application as src/public/js/application/warehouse/report.js
+    participant Request as src/public/js/services/warehouse/reportService.js
+    participant HTTP as src/public/js/services/axiosInstanceApi.js
+    participant Transport@{ "type": "control" } as src/routes/api/warehouse/reportApiRoute.js<br/>src/controllers/api/warehouse/reportController.js
+    Note over Application,Transport: Variables de frontera: params/filtros
+
+    Browser->>View: Botón Excel de wasteDatatable.js
+    View->>Dialog: showInventoryExportDialog()
+    Dialog-->>View: inventoryScope activo/existencia
+    View->>View: recopilar y validar las variables de frontera indicadas
+    View->>Application: exportWasteReport({ params })
+    Application->>Request: exportWasteReportRequest({ params })
+    activate Application
+    Request->>HTTP: apiRequest({ method: 'get', url, params })
+    HTTP->>Transport: descarga GET /api/warehouse/reports/wastes/excel
+    Transport-->>HTTP: status HTTP y payload del endpoint
+    HTTP-->>Request: respuesta o error normalizado
+    Request-->>Application: resultado del request
+    alt Respuesta exitosa
+        Application-->>View: entidad, colección o archivo normalizado
+        View-->>Browser: actualizar la vista con el resultado
+    else Respuesta rechazada
+        Application-->>View: error normalizado por apiRequest
+        View-->>Browser: conservar contexto y mostrar el mensaje
+    end
+    deactivate Application
+```
+
+<a id="cu-cat-26"></a>
+
+## `CU-CAT-25` — Consultar movimientos de mermas
+
+**Patrones:** `FE-P07`.
+
+```mermaid
+sequenceDiagram
+    participant Browser as Navegador
+    participant View as src/public/js/pages/admin/movements/movementsPage.js
+    participant Application as src/public/js/application/admin/movements/movements.js
+    participant Request as src/public/js/services/admin/movementService.js
+    participant HTTP as src/public/js/services/axiosInstanceApi.js
+    participant Transport@{ "type": "control" } as src/routes/api/admin/movementApiRoute.js<br/>src/controllers/api/admin/movementController.js
+    Note over Application,Transport: Variables de frontera: params/filtros
+
+    Browser->>View: movementsPage.js selecciona el contexto merma
+    View->>View: recopilar y validar las variables de frontera indicadas
+    View->>Application: getAllMovements({ context: 'wastes', params })
+    Application->>Request: getAllMovementsRequest({ context, params })
+    activate Application
+    Request->>HTTP: apiRequest({ method: 'get', url, data/params })
+    HTTP->>Transport: consultar GET /api/admin/movements/wastes
+    Transport-->>HTTP: status HTTP y payload del endpoint
+    HTTP-->>Request: respuesta o error normalizado
+    Request-->>Application: resultado del request
+    alt Respuesta exitosa
+        Application-->>View: entidad, colección o archivo normalizado
+        View-->>Browser: actualizar la vista con el resultado
+    else Respuesta rechazada
+        Application-->>View: error normalizado por apiRequest
+        View-->>Browser: conservar contexto y mostrar el mensaje
+    end
+    deactivate Application
+```
+
+<a id="cu-sal-14"></a>
+
+## `CU-CAT-26` — Generar reporte de movimientos de mermas
+
+**Patrones:** `FE-P08`.
+
+```mermaid
+sequenceDiagram
+    participant Browser as Navegador
+    participant View as src/public/js/plugins/datatable/admin/movements/movementDatatable.js
+    participant Dialog as src/public/js/ui/reportExportDialog.js
+    participant Application as src/public/js/application/admin/report.js
+    participant Request as src/public/js/services/admin/reportService.js
+    participant HTTP as src/public/js/services/axiosInstanceApi.js
+    participant Transport@{ "type": "control" } as src/routes/api/admin/reportApiRoute.js<br/>src/controllers/api/admin/reportController.js
+    Note over Application,Transport: Variables de frontera: params/filtros
+
+    Browser->>View: Botón Excel de movimientos en contexto merma
+    View->>Dialog: showReportExportDialog(currentMonth)
+    Dialog-->>View: alcance confirmado o cancelación
+    View->>View: recopilar y validar las variables de frontera indicadas
+    View->>Application: exportMovementReport({ params, type: wastes })
+    Application->>Request: exportMovementReportRequest({ params, type: wastes })
+    activate Application
+    Request->>HTTP: apiRequest({ method: 'get', url, params })
+    HTTP->>Transport: descarga GET /api/admin/reports/movements/wastes/excel
+    Transport-->>HTTP: status HTTP y payload del endpoint
+    HTTP-->>Request: respuesta o error normalizado
+    Request-->>Application: resultado del request
+    alt Respuesta exitosa
+        Application-->>View: entidad, colección o archivo normalizado
+        View-->>Browser: actualizar la vista con el resultado
+    else Respuesta rechazada
+        Application-->>View: error normalizado por apiRequest
+        View-->>Browser: conservar contexto y mostrar el mensaje
+    end
+    deactivate Application
+```
+
+<a id="cu-ent-06"></a>
+
+## `CU-CAT-27` — Consultar presentaciones
 
 **Patrones:** `FE-P03`.
 
@@ -604,8 +993,9 @@ sequenceDiagram
     deactivate Application
 ```
 
-<a id="cu-cat-18"></a>
-## `CU-CAT-18` — Consultar unidades de medida
+<a id="cu-cat-28"></a>
+
+## `CU-CAT-28` — Consultar unidades de medida
 
 **Patrones:** `FE-P03`.
 
@@ -639,8 +1029,9 @@ sequenceDiagram
     deactivate Application
 ```
 
-<a id="cu-cat-19"></a>
-## `CU-CAT-19` — Consultar motivos de ajuste
+<a id="cu-cat-29"></a>
+
+## `CU-CAT-29` — Consultar motivos de ajuste
 
 **Patrones:** `FE-P03`.
 
@@ -674,8 +1065,9 @@ sequenceDiagram
     deactivate Application
 ```
 
-<a id="cu-cat-20"></a>
-## `CU-CAT-20` — Consultar estados de cumplimiento
+<a id="cu-cat-30"></a>
+
+## `CU-CAT-30` — Consultar estados de cumplimiento
 
 **Patrones:** `FE-P03`.
 
@@ -712,8 +1104,9 @@ sequenceDiagram
 
 
 
-<a id="cu-cat-21"></a>
-## `CU-CAT-21` — Consultar área
+<a id="cu-cat-31"></a>
+
+## `CU-CAT-31` — Consultar área
 
 **Patrones:** `FE-P03`.
 
@@ -747,8 +1140,9 @@ sequenceDiagram
     deactivate Application
 ```
 
-<a id="cu-cat-22"></a>
-## `CU-CAT-22` — Crear área
+<a id="cu-cat-32"></a>
+
+## `CU-CAT-32` — Crear área
 
 **Patrones:** `FE-P03`.
 
@@ -782,8 +1176,9 @@ sequenceDiagram
     deactivate Application
 ```
 
-<a id="cu-cat-23"></a>
-## `CU-CAT-23` — Editar área
+<a id="cu-cat-33"></a>
+
+## `CU-CAT-33` — Editar área
 
 **Patrones:** `FE-P03`.
 
@@ -817,8 +1212,9 @@ sequenceDiagram
     deactivate Application
 ```
 
-<a id="cu-cat-24"></a>
-## `CU-CAT-24` — Consultar rol
+<a id="cu-cat-34"></a>
+
+## `CU-CAT-34` — Consultar rol
 
 **Patrones:** `FE-P03`.
 
@@ -852,8 +1248,9 @@ sequenceDiagram
     deactivate Application
 ```
 
-<a id="cu-cat-25"></a>
-## `CU-CAT-25` — Crear rol
+<a id="cu-cat-35"></a>
+
+## `CU-CAT-35` — Crear rol
 
 **Patrones:** `FE-P03`.
 
@@ -887,8 +1284,9 @@ sequenceDiagram
     deactivate Application
 ```
 
-<a id="cu-cat-26"></a>
-## `CU-CAT-26` — Editar rol
+<a id="cu-cat-36"></a>
+
+## `CU-CAT-36` — Editar rol
 
 **Patrones:** `FE-P03`.
 
@@ -922,8 +1320,9 @@ sequenceDiagram
     deactivate Application
 ```
 
-<a id="cu-cat-27"></a>
-## `CU-CAT-27` — Consultar presentación
+<a id="cu-cat-37"></a>
+
+## `CU-CAT-37` — Consultar presentación
 
 **Patrones:** `FE-P03`.
 
@@ -957,8 +1356,9 @@ sequenceDiagram
     deactivate Application
 ```
 
-<a id="cu-cat-28"></a>
-## `CU-CAT-28` — Crear presentación
+<a id="cu-cat-38"></a>
+
+## `CU-CAT-38` — Crear presentación
 
 **Patrones:** `FE-P03`.
 
@@ -992,8 +1392,9 @@ sequenceDiagram
     deactivate Application
 ```
 
-<a id="cu-cat-29"></a>
-## `CU-CAT-29` — Editar presentación
+<a id="cu-cat-39"></a>
+
+## `CU-CAT-39` — Editar presentación
 
 **Patrones:** `FE-P03`.
 
@@ -1027,8 +1428,9 @@ sequenceDiagram
     deactivate Application
 ```
 
-<a id="cu-cat-30"></a>
-## `CU-CAT-30` — Consultar unidad de medida
+<a id="cu-cat-40"></a>
+
+## `CU-CAT-40` — Consultar unidad de medida
 
 **Patrones:** `FE-P03`.
 
@@ -1062,8 +1464,9 @@ sequenceDiagram
     deactivate Application
 ```
 
-<a id="cu-cat-31"></a>
-## `CU-CAT-31` — Crear unidad de medida
+<a id="cu-cat-41"></a>
+
+## `CU-CAT-41` — Crear unidad de medida
 
 **Patrones:** `FE-P03`.
 
@@ -1097,8 +1500,9 @@ sequenceDiagram
     deactivate Application
 ```
 
-<a id="cu-cat-32"></a>
-## `CU-CAT-32` — Editar unidad de medida
+<a id="cu-cat-42"></a>
+
+## `CU-CAT-42` — Editar unidad de medida
 
 **Patrones:** `FE-P03`.
 
@@ -1132,8 +1536,9 @@ sequenceDiagram
     deactivate Application
 ```
 
-<a id="cu-cat-33"></a>
-## `CU-CAT-33` — Consultar motivo de ajuste
+<a id="cu-cat-43"></a>
+
+## `CU-CAT-43` — Consultar motivo de ajuste
 
 **Patrones:** `FE-P03`.
 
@@ -1167,8 +1572,9 @@ sequenceDiagram
     deactivate Application
 ```
 
-<a id="cu-cat-34"></a>
-## `CU-CAT-34` — Crear motivo de ajuste
+<a id="cu-cat-44"></a>
+
+## `CU-CAT-44` — Crear motivo de ajuste
 
 **Patrones:** `FE-P03`.
 
@@ -1202,8 +1608,9 @@ sequenceDiagram
     deactivate Application
 ```
 
-<a id="cu-cat-35"></a>
-## `CU-CAT-35` — Editar motivo de ajuste
+<a id="cu-cat-45"></a>
+
+## `CU-CAT-45` — Editar motivo de ajuste
 
 **Patrones:** `FE-P03`.
 
@@ -1237,8 +1644,9 @@ sequenceDiagram
     deactivate Application
 ```
 
-<a id="cu-cat-36"></a>
-## `CU-CAT-36` — Consultar estado de cumplimiento
+<a id="cu-cat-46"></a>
+
+## `CU-CAT-46` — Consultar estado de cumplimiento
 
 **Patrones:** `FE-P03`.
 
@@ -1272,8 +1680,9 @@ sequenceDiagram
     deactivate Application
 ```
 
-<a id="cu-cat-37"></a>
-## `CU-CAT-37` — Crear estado de cumplimiento
+<a id="cu-cat-47"></a>
+
+## `CU-CAT-47` — Crear estado de cumplimiento
 
 **Patrones:** `FE-P03`.
 
@@ -1307,8 +1716,9 @@ sequenceDiagram
     deactivate Application
 ```
 
-<a id="cu-cat-38"></a>
-## `CU-CAT-38` — Editar estado de cumplimiento
+<a id="cu-cat-48"></a>
+
+## `CU-CAT-48` — Editar estado de cumplimiento
 
 **Patrones:** `FE-P03`.
 

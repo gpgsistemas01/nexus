@@ -8,6 +8,8 @@ import {
 } from '../fields/fieldsValidator.js';
 
 const isCatalog = catalogName => req => req.params.catalog === catalogName;
+const catalogHasField = fieldName => req => MANAGED_CATALOGS[req.params.catalog]
+    ?.fields.includes(fieldName);
 const getCatalogMaxLength = fieldName => req => MANAGED_CATALOGS[req.params.catalog]?.maxLengths[fieldName];
 export const catalogNameValidation = param('catalog')
     .isIn(MANAGED_CATALOG_NAMES)
@@ -30,7 +32,7 @@ export const catalogEntryValidation = [
     }),
     validateBooleanWhen({
         fieldName: 'isActive',
-        predicate: isCatalog('reasons')
+        predicate: catalogHasField('isActive')
     })
 ];
 

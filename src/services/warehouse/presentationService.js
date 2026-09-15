@@ -9,14 +9,15 @@ export const findAllPresentations = async ({
     orderDir = 'asc'
 }) => {
 
-    const where = search
-        ? {
+    const where = {
+        isActive: true,
+        ...(search && {
             name: {
                 contains: search,
                 mode: 'insensitive'
             }
-        }
-        : {};
+        })
+    };
 
     const presentations = await getDb().presentation.findMany({
         skip,
@@ -27,7 +28,8 @@ export const findAllPresentations = async ({
         },
         select: {
             id: true,
-            name: true
+            name: true,
+            isActive: true
         }
     });
 
@@ -42,7 +44,8 @@ export const findAllPresentations = async ({
 }
 
 const DEFAULT_PRESENTATION_SELECT = {
-    id: true
+    id: true,
+    isActive: true
 };
 
 export const findUniquePresentation = async ({
@@ -51,8 +54,8 @@ export const findUniquePresentation = async ({
 }) => {
 
     const db = getDb(tx);
-    const presentation = await db.presentation.findUnique({
-        where: { id },
+    const presentation = await db.presentation.findFirst({
+        where: { id, isActive: true },
         select: DEFAULT_PRESENTATION_SELECT
     });
 

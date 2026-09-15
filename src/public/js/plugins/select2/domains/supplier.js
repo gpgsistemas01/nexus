@@ -13,6 +13,7 @@ export const initSupplierFilterSelect = ({
     getOptions: getAllSuppliers,
     placeholder: 'Filtrar por proveedor',
     selectedId,
+    data: () => ({ onlyActive: true }),
     mapOption: (supplier) => ({ id: supplier.id, text: supplier.tradeName })
 });
 
@@ -25,6 +26,7 @@ const initSupplierSelect = ({
     containerSelector: modalSelector,
     get: getAllSuppliers,
     placeholder: 'Buscar proveedor...',
+    data: () => ({ onlyActive: true }),
     mapOption: (supplier) => ({
         id: supplier.id,
         text: `${ supplier.tradeName }`,

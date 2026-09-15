@@ -42,13 +42,13 @@ describe('clientController database integration', () => {
   it('guarda, lista y actualiza clientes desde el controller con todos sus servicios', async () => {
     const registerResponse = await request(app)
       .post('/clients')
-      .send({ name: `  ${clientName}  ` })
+      .send({ name: `  ${clientName}  `, isActive: true })
       .expect('Content-Type', /json/)
       .expect(200);
     const createdClient = registerResponse.body.client;
 
     expect(registerResponse.body).toMatchObject({
-      client: expect.objectContaining({ id: createdClient.id, name: clientName }),
+      client: expect.objectContaining({ id: createdClient.id, name: clientName, isActive: true }),
       code: expect.any(String)
     });
 
@@ -60,26 +60,27 @@ describe('clientController database integration', () => {
 
     expect(listResponse.body).toMatchObject({
       recordsFiltered: 1,
-      data: [expect.objectContaining({ id: createdClient.id, name: clientName })]
+      data: [expect.objectContaining({ id: createdClient.id, name: clientName, isActive: true })]
     });
 
     const editResponse = await request(app)
       .put(`/clients/${createdClient.id}`)
-      .send({ name: updatedClientName })
+      .send({ name: updatedClientName, isActive: false })
       .expect('Content-Type', /json/)
       .expect(200);
 
     expect(editResponse.body).toMatchObject({
-      client: expect.objectContaining({ id: createdClient.id, name: updatedClientName }),
+      client: expect.objectContaining({ id: createdClient.id, name: updatedClientName, isActive: false }),
       code: expect.any(String)
     });
 
     await expect(prisma.client.findUnique({
       where: { id: createdClient.id },
-      select: { id: true, name: true }
+      select: { id: true, name: true, isActive: true }
     })).resolves.toEqual({
       id: createdClient.id,
-      name: updatedClientName
+      name: updatedClientName,
+      isActive: false
     });
   });
 
@@ -88,7 +89,7 @@ describe('clientController database integration', () => {
 
     const response = await request(app)
       .put(`/clients/${missingId}`)
-      .send({ name: 'Cliente inexistente' })
+      .send({ name: 'Cliente inexistente', isActive: true })
       .expect('Content-Type', /json/)
       .expect(404);
 
