@@ -4,7 +4,7 @@ Esta colección **no es un catálogo de diagramas de casos de uso**. Es la lectu
 complementaria del catálogo funcional: cada `CU-*` aporta trazabilidad, mientras Mermaid
 muestra la ejecución entre vista/UI, aplicación, request y endpoint. Para entender el
 objetivo y la interacción con lenguaje de negocio se consulta primero el [modelo y los
-diagramas funcionales de casos de uso](../../requirements/domain-and-use-cases.md#casos-de-uso-vigentes).
+diagramas funcionales de casos de uso](../../requirements/domain-and-use-cases/03-casos-de-uso-vigentes.md).
 
 La [matriz técnica de frontend](../frontend-technical-documentation/05-aplicacion-de-todos-los-casos-al-codigo-frontend.md)
 es el índice único de trazabilidad: relaciona caso, interacción, implementación y

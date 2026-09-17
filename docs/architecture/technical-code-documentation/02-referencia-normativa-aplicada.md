@@ -5,7 +5,7 @@ La referencia internacional más cercana a este artefacto es
 descripciones de diseño de software. Nexus adopta selectivamente su separación de
 elementos de diseño, relaciones, interfaces, vistas y justificación. La aplicación y
 sus límites se registran en
-[Aplicación de normas en Nexus](../../governance/standards-application.md#aplicación-de-isoiecieee-1016-a-la-referencia-técnica).
+[Aplicación de normas en Nexus](../../governance/standards-application/02-resultado-de-aplicabilidad.md#aplicación-de-isoiecieee-1016-a-la-referencia-técnica).
 
 La norma no define cómo nombrar funciones JavaScript, escribir JSDoc, insertar bloques
 de código o documentar endpoints Express. Por eso esta guía mantiene una convención

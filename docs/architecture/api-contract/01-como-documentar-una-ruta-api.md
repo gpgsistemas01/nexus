@@ -34,7 +34,7 @@ Express. [ISO/IEC/IEEE 1016:2009](https://www.iso.org/standard/45144.html) puede
 la descripción de interfaces dentro del diseño, pero **OpenAPI 3.1** es la referencia
 procesable prevista para métodos, parámetros, cuerpos, respuestas y seguridad. Esta
 distinción y el alcance adoptado se conservan en las
-[normas documentales](../../governance/documentation-standards.md#decisión-para-documentación-técnica-y-rutas-api).
+[normas documentales](../../governance/documentation-standards/03-aplicacion-por-tipo-de-documento.md#decisión-para-documentación-técnica-y-rutas-api).
 
 Cada ficha de ruta debe indicar, cuando aplique:
 

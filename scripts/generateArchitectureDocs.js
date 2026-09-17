@@ -646,7 +646,7 @@ propietarias. Se aplican las
 El tipo Prisma y el atributo \`@db\` describen la representación técnica. Prisma y las
 migraciones son la fuente de verdad para restricciones completas, índices, acciones
 referenciales y SQL. El propósito de negocio de los agregados se explica en el
-[modelo de dominio y casos de uso](../requirements/domain-and-use-cases.md); este generador no inventa
+[modelo de dominio y casos de uso](../requirements/domain-and-use-cases/index.md); este generador no inventa
 definiciones de negocio a partir de nombres de tablas. La terminología compartida con
 usuarios y responsables se mantiene en el
 [glosario del negocio](../requirements/business-glossary.md).

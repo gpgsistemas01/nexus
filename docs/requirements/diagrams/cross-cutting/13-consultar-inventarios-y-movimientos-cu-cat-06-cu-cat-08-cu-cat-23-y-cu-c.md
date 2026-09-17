@@ -1,4 +1,4 @@
-# Consultar inventarios y movimientos — `CU-CAT-06`, `CU-CAT-08`, `CU-CAT-23` y `CU-CAT-25`
+# 13. Consultar inventarios y movimientos — `CU-CAT-06`, `CU-CAT-08`, `CU-CAT-23` y `CU-CAT-25`
 
 ```mermaid
 flowchart TB

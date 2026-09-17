@@ -1,4 +1,4 @@
-# Editar persona — `CU-IDA-03`
+# 3. Editar persona — `CU-IDA-03`
 
 ```mermaid
 sequenceDiagram

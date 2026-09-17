@@ -10,4 +10,4 @@ sin recorrer todos los archivos.
 Las flechas continuas significan llamada o delegación; las discontinuas significan
 configuración o reutilización. Ninguna asociación concede permisos ni convierte una ruta
 en caso de uso. Los objetivos del actor se mantienen en el
-[diagrama de casos de uso](../../requirements/domain-and-use-cases.md#casos-de-uso-vigentes).
+[diagrama de casos de uso](../../requirements/domain-and-use-cases/03-casos-de-uso-vigentes.md).

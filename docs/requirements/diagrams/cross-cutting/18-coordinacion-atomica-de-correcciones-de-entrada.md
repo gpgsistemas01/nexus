@@ -1,4 +1,4 @@
-# Coordinación atómica de correcciones de entrada
+# 18. Coordinación atómica de correcciones de entrada
 
 Esta secuencia ayuda a desarrollo y pruebas a localizar el límite de `CU-ENT-04` y `CU-ENT-05`. Su alcance comienza después de autorizar y validar la petición y termina con la
 respuesta del servicio. Los mensajes dentro del bloque **Transacción Prisma** son una

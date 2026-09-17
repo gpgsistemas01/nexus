@@ -1,4 +1,4 @@
-# Consultar personas y usuarios — `CU-IDA-01` y `CU-IDA-05`
+# 1. Consultar personas y usuarios — `CU-IDA-01` y `CU-IDA-05`
 
 ```mermaid
 sequenceDiagram

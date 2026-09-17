@@ -1,4 +1,4 @@
-# Consultar compras de material — `CU-ENT-01`
+# 7. Consultar compras de material — `CU-ENT-01`
 
 ```mermaid
 sequenceDiagram

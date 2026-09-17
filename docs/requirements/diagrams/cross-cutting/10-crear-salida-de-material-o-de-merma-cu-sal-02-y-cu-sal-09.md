@@ -1,4 +1,4 @@
-# Crear salida de material o de merma — `CU-SAL-02` y `CU-SAL-09`
+# 10. Crear salida de material o de merma — `CU-SAL-02` y `CU-SAL-09`
 
 ```mermaid
 sequenceDiagram

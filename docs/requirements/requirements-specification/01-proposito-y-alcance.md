@@ -18,7 +18,7 @@ Este documento no sustituye historias de usuario, diseños de pantalla ni el con
 HTTP. El [contrato API](../../architecture/api-contract/index.md), el
 [mapa generado](../../generated/code-map.md) y el esquema Prisma aportan esos otros niveles
 de detalle. Su estructura adopta selectivamente las prácticas de ingeniería de
-requisitos descritas en el [criterio sobre normas documentales](../../governance/documentation-standards.md),
+requisitos descritas en el [criterio sobre normas documentales](../../governance/documentation-standards/index.md),
 sin declarar conformidad o certificación ISO.
 
 Los objetivos de actor, con participantes, precondiciones, garantías, pasos, flujos
