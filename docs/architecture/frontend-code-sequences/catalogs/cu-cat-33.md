@@ -1,25 +1,25 @@
 <a id="cu-cat-33"></a>
-# `CU-CAT-33` — Editar área
+# `CU-CAT-33` — Consultar presentación
 
 **Patrones:** `FE-P03`.
 
 ```mermaid
 sequenceDiagram
     participant Browser as Navegador
-    participant View as src/public/js/pages/admin/catalogs/catalogForm.js
+    participant View as src/public/js/plugins/datatable/admin/catalogs/catalogDatatable.js
     participant Application as src/public/js/application/admin/catalogs/catalogs.js
     participant Request as src/public/js/services/admin/catalogService.js
     participant HTTP as src/public/js/services/axiosInstanceApi.js
     participant Transport@{ "type": "control" } as src/routes/api/admin/catalogApiRoute.js<br/>src/controllers/api/admin/catalogController.js
-    Note over Application,Transport: Variables de frontera: catalog/id/data
+    Note over Application,Transport: Variables de frontera: params/catalog
 
-    Browser->>View: confirmar el formulario de edición
+    Browser->>View: abrir y cargar la tabla del catálogo
     View->>View: recopilar y validar las variables de frontera indicadas
-    View->>Application: editCatalogEntry({ catalog, id, data })
-    Application->>Request: editCatalogEntryRequest({ catalog, id, data })
+    View->>Application: getAllCatalogEntries({ params, catalog })
+    Application->>Request: getAllCatalogEntriesRequest({ params, catalog })
     activate Application
     Request->>HTTP: apiRequest({ method: 'get', url, data/params })
-    HTTP->>Transport: consume PUT /api/admin/catalogs/departments/:id
+    HTTP->>Transport: consume GET /api/admin/catalogs/presentations
     Transport-->>HTTP: status HTTP y payload del endpoint
     HTTP-->>Request: respuesta o error normalizado
     Request-->>Application: resultado del request

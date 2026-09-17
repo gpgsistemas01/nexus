@@ -30,28 +30,24 @@
 | `CU-CAT-24` | Generar reporte de mermas | Archivo Excel con filtros, columnas y cálculos propios del reporte. |
 | `CU-CAT-25` | Consultar movimientos de mermas | Consulta autorizada sin modificar datos. |
 | `CU-CAT-26` | Generar reporte de movimientos de mermas | Archivo Excel con filtros, columnas y cálculos propios del reporte. |
-| `CU-CAT-27` | Consultar presentaciones | Catálogo auxiliar de sólo lectura. |
-| `CU-CAT-28` | Consultar unidades de medida | Catálogo auxiliar de sólo lectura. |
-| `CU-CAT-29` | Consultar motivos de ajuste | Catálogo auxiliar de sólo lectura. |
-| `CU-CAT-30` | Consultar estados de cumplimiento | Catálogo auxiliar de sólo lectura. |
-| `CU-CAT-31` | Consultar área | Pantalla y listado independiente de Áreas, restringidos al administrador. |
-| `CU-CAT-32` | Crear área | Alta de área con los campos permitidos. |
-| `CU-CAT-33` | Editar área | Actualización de área con los campos permitidos. |
-| `CU-CAT-34` | Consultar rol | Pantalla y listado independiente de Roles, restringidos al administrador. |
-| `CU-CAT-35` | Crear rol | Alta de rol con los campos permitidos. |
-| `CU-CAT-36` | Editar rol | Actualización de rol con los campos permitidos. |
-| `CU-CAT-37` | Consultar presentación | Pantalla y listado independiente de Presentaciones, restringidos al administrador. |
-| `CU-CAT-38` | Crear presentación | Alta de presentación con los campos permitidos. |
-| `CU-CAT-39` | Editar presentación | Actualización de presentación con los campos permitidos. |
-| `CU-CAT-40` | Consultar unidad de medida | Pantalla y listado independiente de Unidades de medida, restringidos al administrador. |
-| `CU-CAT-41` | Crear unidad de medida | Alta de unidad de medida con los campos permitidos. |
-| `CU-CAT-42` | Editar unidad de medida | Actualización de unidad de medida con los campos permitidos. |
-| `CU-CAT-43` | Consultar motivo de ajuste | Pantalla y listado independiente de Motivos de ajuste, restringidos al administrador. |
-| `CU-CAT-44` | Crear motivo de ajuste | Alta de motivo de ajuste con los campos permitidos. |
-| `CU-CAT-45` | Editar motivo de ajuste | Actualización de motivo de ajuste con los campos permitidos. |
-| `CU-CAT-46` | Consultar estado de cumplimiento | Pantalla y listado independiente de Estados de cumplimiento, restringidos al administrador. |
-| `CU-CAT-47` | Crear estado de cumplimiento | Alta de estado de cumplimiento con los campos permitidos. |
-| `CU-CAT-48` | Editar estado de cumplimiento | Actualización de estado de cumplimiento con los campos permitidos. |
+| `CU-CAT-27` | Consultar área | Pantalla y listado independiente de Áreas, restringidos al administrador. |
+| `CU-CAT-28` | Crear área | Alta de área con los campos permitidos. |
+| `CU-CAT-29` | Editar área | Actualización de área con los campos permitidos. |
+| `CU-CAT-30` | Consultar rol | Pantalla y listado independiente de Roles, restringidos al administrador. |
+| `CU-CAT-31` | Crear rol | Alta de rol con los campos permitidos. |
+| `CU-CAT-32` | Editar rol | Actualización de rol con los campos permitidos. |
+| `CU-CAT-33` | Consultar presentación | Pantalla y listado independiente de Presentaciones, restringidos al administrador. |
+| `CU-CAT-34` | Crear presentación | Alta de presentación con los campos permitidos. |
+| `CU-CAT-35` | Editar presentación | Actualización de presentación con los campos permitidos. |
+| `CU-CAT-36` | Consultar unidad de medida | Pantalla y listado independiente de Unidades de medida, restringidos al administrador. |
+| `CU-CAT-37` | Crear unidad de medida | Alta de unidad de medida con los campos permitidos. |
+| `CU-CAT-38` | Editar unidad de medida | Actualización de unidad de medida con los campos permitidos. |
+| `CU-CAT-39` | Consultar motivo de ajuste | Pantalla y listado independiente de Motivos de ajuste, restringidos al administrador. |
+| `CU-CAT-40` | Crear motivo de ajuste | Alta de motivo de ajuste con los campos permitidos. |
+| `CU-CAT-41` | Editar motivo de ajuste | Actualización de motivo de ajuste con los campos permitidos. |
+| `CU-CAT-42` | Consultar estado de cumplimiento | Pantalla y listado independiente de Estados de cumplimiento, restringidos al administrador. |
+| `CU-CAT-43` | Crear estado de cumplimiento | Alta de estado de cumplimiento con los campos permitidos. |
+| `CU-CAT-44` | Editar estado de cumplimiento | Actualización de estado de cumplimiento con los campos permitidos. |
 
 
 ## Fichas específicas
@@ -88,25 +84,21 @@ Cada ficha representa una sola acción sobre una sola entidad. Los elementos com
 - [`CU-CAT-24` — Generar reporte de mermas](cu-cat-24.md)
 - [`CU-CAT-25` — Consultar movimientos de mermas](cu-cat-25.md)
 - [`CU-CAT-26` — Generar reporte de movimientos de mermas](cu-cat-26.md)
-- [`CU-CAT-27` — Consultar presentaciones](cu-cat-27.md)
-- [`CU-CAT-28` — Consultar unidades de medida](cu-cat-28.md)
-- [`CU-CAT-29` — Consultar motivos de ajuste](cu-cat-29.md)
-- [`CU-CAT-30` — Consultar estados de cumplimiento](cu-cat-30.md)
-- [`CU-CAT-31` — Consultar área](cu-cat-31.md)
-- [`CU-CAT-32` — Crear área](cu-cat-32.md)
-- [`CU-CAT-33` — Editar área](cu-cat-33.md)
-- [`CU-CAT-34` — Consultar rol](cu-cat-34.md)
-- [`CU-CAT-35` — Crear rol](cu-cat-35.md)
-- [`CU-CAT-36` — Editar rol](cu-cat-36.md)
-- [`CU-CAT-37` — Consultar presentación](cu-cat-37.md)
-- [`CU-CAT-38` — Crear presentación](cu-cat-38.md)
-- [`CU-CAT-39` — Editar presentación](cu-cat-39.md)
-- [`CU-CAT-40` — Consultar unidad de medida](cu-cat-40.md)
-- [`CU-CAT-41` — Crear unidad de medida](cu-cat-41.md)
-- [`CU-CAT-42` — Editar unidad de medida](cu-cat-42.md)
-- [`CU-CAT-43` — Consultar motivo de ajuste](cu-cat-43.md)
-- [`CU-CAT-44` — Crear motivo de ajuste](cu-cat-44.md)
-- [`CU-CAT-45` — Editar motivo de ajuste](cu-cat-45.md)
-- [`CU-CAT-46` — Consultar estado de cumplimiento](cu-cat-46.md)
-- [`CU-CAT-47` — Crear estado de cumplimiento](cu-cat-47.md)
-- [`CU-CAT-48` — Editar estado de cumplimiento](cu-cat-48.md)
+- [`CU-CAT-27` — Consultar área](cu-cat-27.md)
+- [`CU-CAT-28` — Crear área](cu-cat-28.md)
+- [`CU-CAT-29` — Editar área](cu-cat-29.md)
+- [`CU-CAT-30` — Consultar rol](cu-cat-30.md)
+- [`CU-CAT-31` — Crear rol](cu-cat-31.md)
+- [`CU-CAT-32` — Editar rol](cu-cat-32.md)
+- [`CU-CAT-33` — Consultar presentación](cu-cat-33.md)
+- [`CU-CAT-34` — Crear presentación](cu-cat-34.md)
+- [`CU-CAT-35` — Editar presentación](cu-cat-35.md)
+- [`CU-CAT-36` — Consultar unidad de medida](cu-cat-36.md)
+- [`CU-CAT-37` — Crear unidad de medida](cu-cat-37.md)
+- [`CU-CAT-38` — Editar unidad de medida](cu-cat-38.md)
+- [`CU-CAT-39` — Consultar motivo de ajuste](cu-cat-39.md)
+- [`CU-CAT-40` — Crear motivo de ajuste](cu-cat-40.md)
+- [`CU-CAT-41` — Editar motivo de ajuste](cu-cat-41.md)
+- [`CU-CAT-42` — Consultar estado de cumplimiento](cu-cat-42.md)
+- [`CU-CAT-43` — Crear estado de cumplimiento](cu-cat-43.md)
+- [`CU-CAT-44` — Editar estado de cumplimiento](cu-cat-44.md)

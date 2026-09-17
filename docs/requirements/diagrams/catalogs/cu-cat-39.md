@@ -1,8 +1,7 @@
-# `CU-CAT-39` — Editar presentación
+# `CU-CAT-39` — Consultar motivo de ajuste
 
 ```mermaid
 flowchart LR
-    request["Administrador selecciona Editar registro<br/>y confirma Actualizar"] --> authorize["Nexus valida catalogs:manage y presentations"]
-    authorize --> persist["Validar campos y actualizar presentación"]
-    persist --> result["Confirmar y refrescar Presentaciones"]
+    request["Administrador solicita consultar Motivos de ajuste"] --> authorize["Nexus valida catalogs:manage y reasons"]
+    authorize --> result["Mostrar exclusivamente la tabla de Motivos de ajuste"]
 ```

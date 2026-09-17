@@ -32,5 +32,3 @@ sequenceDiagram
     end
     deactivate Application
 ```
-
-<a id="cu-cat-27"></a>

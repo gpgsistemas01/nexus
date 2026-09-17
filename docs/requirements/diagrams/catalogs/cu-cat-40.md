@@ -1,7 +1,8 @@
-# `CU-CAT-40` — Consultar unidad de medida
+# `CU-CAT-40` — Crear motivo de ajuste
 
 ```mermaid
 flowchart LR
-    request["Administrador solicita consultar Unidades de medida"] --> authorize["Nexus valida catalogs:manage y unit-measures"]
-    authorize --> result["Mostrar exclusivamente la tabla de Unidades de medida"]
+    request["Administrador selecciona Nuevo motivo de ajuste<br/>y confirma Guardar"] --> authorize["Nexus valida catalogs:manage y reasons"]
+    authorize --> persist["Validar campos y crear motivo de ajuste"]
+    persist --> result["Confirmar y refrescar Motivos de ajuste"]
 ```
