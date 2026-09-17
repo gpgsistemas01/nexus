@@ -1,5 +1,5 @@
 <a id="CAP-CAT-MAT-04-STOCK"></a>
-# CAP-CAT-MAT-04-STOCK — Ajuste existencia
+# 6. CAP-CAT-MAT-04-STOCK — Ajuste existencia
 
 **Casos de uso:** `CU-CAT-05` — Ajustar existencia de material; `CU-CAT-29` — Consultar motivos de ajuste.
 

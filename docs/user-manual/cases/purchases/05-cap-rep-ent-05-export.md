@@ -1,5 +1,5 @@
 <a id="CAP-REP-ENT-05-EXPORT"></a>
-# CAP-REP-ENT-05-EXPORT — Exportar reporte
+# 5. CAP-REP-ENT-05-EXPORT — Exportar reporte
 
 **Casos de uso:** `CU-ENT-06` — Generar reporte de compras de material.
 

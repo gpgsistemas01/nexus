@@ -1,5 +1,5 @@
 <a id="CAP-ENT-03-EDIT"></a>
-# CAP-ENT-03-EDIT — Edicion compra
+# 3. CAP-ENT-03-EDIT — Edicion compra
 
 **Casos de uso:** `CU-ENT-03` — Editar compra de material; `CU-ENT-05` — Cancelar material de una compra.
 

@@ -1,5 +1,5 @@
 <a id="CAP-SAL-MAT-03-EDIT"></a>
-# CAP-SAL-MAT-03-EDIT — Edicion encabezado
+# 3. CAP-SAL-MAT-03-EDIT — Edicion encabezado
 
 **Casos de uso:** `CU-SAL-03` — Editar encabezado de salida de material; `CU-SAL-04` — Editar detalles de material de una salida.
 

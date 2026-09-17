@@ -1,5 +1,5 @@
 <a id="CAP-SAL-WAS-02-CREATE"></a>
-# CAP-SAL-WAS-02-CREATE — Formulario registro
+# 9. CAP-SAL-WAS-02-CREATE — Formulario registro
 
 **Casos de uso:** `CU-SAL-09` — Crear salida de merma.
 

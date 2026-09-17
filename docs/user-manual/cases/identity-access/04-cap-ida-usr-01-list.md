@@ -1,5 +1,5 @@
 <a id="CAP-IDA-USR-01-LIST"></a>
-# CAP-IDA-USR-01-LIST — Listado
+# 4. CAP-IDA-USR-01-LIST — Listado
 
 **Casos de uso:** `CU-IDA-05` — Consultar usuarios; `CU-IDA-09` — Generar reporte de usuarios.
 

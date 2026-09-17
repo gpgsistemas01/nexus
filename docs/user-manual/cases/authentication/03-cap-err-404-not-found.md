@@ -1,5 +1,5 @@
 <a id="CAP-ERR-404-NOT-FOUND"></a>
-# CAP-ERR-404-NOT-FOUND — Pagina no encontrada
+# 3. CAP-ERR-404-NOT-FOUND — Pagina no encontrada
 
 **Caso de uso:** transversal — Recuperarse de una ruta inexistente.
 

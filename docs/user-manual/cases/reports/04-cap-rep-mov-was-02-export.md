@@ -1,5 +1,5 @@
 <a id="CAP-REP-MOV-WAS-02-EXPORT"></a>
-# CAP-REP-MOV-WAS-02-EXPORT — Exportar reporte
+# 4. CAP-REP-MOV-WAS-02-EXPORT — Exportar reporte
 
 **Casos de uso:** `CU-CAT-26` — Generar reporte de movimientos de mermas.
 

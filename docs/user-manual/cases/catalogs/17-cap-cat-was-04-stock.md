@@ -1,5 +1,5 @@
 <a id="CAP-CAT-WAS-04-STOCK"></a>
-# CAP-CAT-WAS-04-STOCK — Ajuste existencia
+# 17. CAP-CAT-WAS-04-STOCK — Ajuste existencia
 
 **Casos de uso:** `CU-CAT-22` — Ajustar existencia de merma.
 

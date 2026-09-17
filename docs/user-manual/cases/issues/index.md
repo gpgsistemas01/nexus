@@ -2,6 +2,8 @@
 
 Cada procedimiento identifica sus casos de uso, controles, errores posibles y captura de referencia.
 
+## Capítulos
+
 **Cómo cambia el estado.** El estado no es un campo editable. Al registrar una salida y sus
 detalles, Nexus los deja **Pendientes**. Al confirmar un surtido, el sistema calcula
 automáticamente **Surtido parcial** o **Surtido** según la cantidad acumulada. La devolución sólo
@@ -15,7 +17,7 @@ automático de una devolución total. A nivel de detalle se cancela sólo el ren
 completo; a nivel de encabezado, la salida se cancela sólo si todos sus renglones ya están
 cancelados.
 
-## Salidas de material
+### Salidas de material
 
 **Propósito.** Registrar y dar seguimiento al surtido y devolución de materiales.
 
@@ -33,15 +35,15 @@ proyecto** en los renglones pendientes. En **devolución** el documento es de s�
 habilita únicamente **Cantidad a devolver** y **Observaciones**. Una salida cancelada se abre en
 **consulta**, sin campos editables.
 
-- [CAP-SAL-MAT-01-LIST — Listado](01-cap-sal-mat-01-list.md)
-- [CAP-SAL-MAT-02-CREATE — Formulario registro](02-cap-sal-mat-02-create.md)
-- [CAP-SAL-MAT-03-EDIT — Edicion encabezado](03-cap-sal-mat-03-edit.md)
-- [CAP-SAL-MAT-04-SUPPLY — Surtir detalles](04-cap-sal-mat-04-supply.md)
-- [CAP-SAL-MAT-05-RETURN — Devolver detalle](05-cap-sal-mat-05-return.md)
-- [CAP-REP-SAL-MAT-06-EXPORT — Exportar reporte](06-cap-rep-sal-mat-06-export.md)
-- [CAP-SAL-MAT-08-VIEW — Consultar salida cancelada](07-cap-sal-mat-08-view.md)
+1. [1. CAP-SAL-MAT-01-LIST — Listado](01-cap-sal-mat-01-list.md)
+2. [2. CAP-SAL-MAT-02-CREATE — Formulario registro](02-cap-sal-mat-02-create.md)
+3. [3. CAP-SAL-MAT-03-EDIT — Edicion encabezado](03-cap-sal-mat-03-edit.md)
+4. [4. CAP-SAL-MAT-04-SUPPLY — Surtir detalles](04-cap-sal-mat-04-supply.md)
+5. [5. CAP-SAL-MAT-05-RETURN — Devolver detalle](05-cap-sal-mat-05-return.md)
+6. [6. CAP-REP-SAL-MAT-06-EXPORT — Exportar reporte](06-cap-rep-sal-mat-06-export.md)
+7. [7. CAP-SAL-MAT-08-VIEW — Consultar salida cancelada](07-cap-sal-mat-08-view.md)
 
-## Salidas de merma
+### Salidas de merma
 
 **Propósito.** Registrar y dar seguimiento al surtido y devolución de mermas.
 
@@ -59,10 +61,10 @@ renglones pendientes. En **devolución** el documento es de sólo lectura y la a
 únicamente **Cantidad a devolver** y **Observaciones**. Una salida cancelada se abre en **consulta**,
 sin campos editables.
 
-- [CAP-SAL-WAS-01-LIST — Listado](08-cap-sal-was-01-list.md)
-- [CAP-SAL-WAS-02-CREATE — Formulario registro](09-cap-sal-was-02-create.md)
-- [CAP-SAL-WAS-03-EDIT — Edicion encabezado](10-cap-sal-was-03-edit.md)
-- [CAP-SAL-WAS-04-SUPPLY — Surtir detalles](11-cap-sal-was-04-supply.md)
-- [CAP-SAL-WAS-05-RETURN — Devolver detalle](12-cap-sal-was-05-return.md)
-- [CAP-REP-SAL-WAS-06-EXPORT — Exportar reporte](13-cap-rep-sal-was-06-export.md)
-- [CAP-SAL-WAS-08-VIEW — Consultar salida cancelada](14-cap-sal-was-08-view.md)
+8. [8. CAP-SAL-WAS-01-LIST — Listado](08-cap-sal-was-01-list.md)
+9. [9. CAP-SAL-WAS-02-CREATE — Formulario registro](09-cap-sal-was-02-create.md)
+10. [10. CAP-SAL-WAS-03-EDIT — Edicion encabezado](10-cap-sal-was-03-edit.md)
+11. [11. CAP-SAL-WAS-04-SUPPLY — Surtir detalles](11-cap-sal-was-04-supply.md)
+12. [12. CAP-SAL-WAS-05-RETURN — Devolver detalle](12-cap-sal-was-05-return.md)
+13. [13. CAP-REP-SAL-WAS-06-EXPORT — Exportar reporte](13-cap-rep-sal-was-06-export.md)
+14. [14. CAP-SAL-WAS-08-VIEW — Consultar salida cancelada](14-cap-sal-was-08-view.md)

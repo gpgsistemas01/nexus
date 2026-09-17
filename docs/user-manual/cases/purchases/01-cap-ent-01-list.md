@@ -1,5 +1,5 @@
 <a id="CAP-ENT-01-LIST"></a>
-# CAP-ENT-01-LIST — Listado
+# 1. CAP-ENT-01-LIST — Listado
 
 **Casos de uso:** `CU-ENT-01` — Consultar compras de material.
 

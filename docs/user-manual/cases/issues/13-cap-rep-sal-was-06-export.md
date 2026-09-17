@@ -1,5 +1,5 @@
 <a id="CAP-REP-SAL-WAS-06-EXPORT"></a>
-# CAP-REP-SAL-WAS-06-EXPORT — Exportar reporte
+# 13. CAP-REP-SAL-WAS-06-EXPORT — Exportar reporte
 
 **Casos de uso:** `CU-SAL-14` — Generar reporte de salidas de merma.
 

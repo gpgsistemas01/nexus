@@ -1,5 +1,5 @@
 <a id="CAP-SAL-MAT-05-RETURN"></a>
-# CAP-SAL-MAT-05-RETURN — Devolver detalle
+# 5. CAP-SAL-MAT-05-RETURN — Devolver detalle
 
 **Casos de uso:** `CU-SAL-06` — Devolver material surtido.
 

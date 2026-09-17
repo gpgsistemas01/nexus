@@ -1,5 +1,5 @@
 <a id="CAP-AUT-01-LOGIN"></a>
-# CAP-AUT-01-LOGIN — Inicio sesion
+# 1. CAP-AUT-01-LOGIN — Inicio sesion
 
 **Casos de uso:** `CU-AUT-01` — Iniciar sesión.
 

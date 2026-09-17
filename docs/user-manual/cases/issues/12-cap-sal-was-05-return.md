@@ -1,5 +1,5 @@
 <a id="CAP-SAL-WAS-05-RETURN"></a>
-# CAP-SAL-WAS-05-RETURN — Devolver detalle
+# 12. CAP-SAL-WAS-05-RETURN — Devolver detalle
 
 **Casos de uso:** `CU-SAL-13` — Devolver merma surtida.
 
