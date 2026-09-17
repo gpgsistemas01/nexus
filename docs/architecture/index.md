@@ -4,14 +4,42 @@
 
 | Versión documental | Versión del sistema | Estado | Fecha | Responsable |
 | --- | --- | --- | --- | --- |
-| 1.0 | 1.0.0 | En revisión | 2026-09-10 | Equipo Nexus |
+| 1.1 | 1.0.0 | En revisión | 2026-09-17 | Equipo Nexus |
 
 ## Propósito
 
 Este índice presenta la documentación arquitectónica por pregunta y nivel de detalle.
-Es la entrada de la familia; no repite decisiones ni diagramas que tienen un documento
-propietario. Nexus se describe como un **monolito modular por dominio con arquitectura
-por capas** y una correspondencia de **MVC web extendido**.
+Es la portada y entrada del **documento de arquitectura** exportable; no repite decisiones
+ni diagramas que tienen un capítulo propietario. Nexus se describe como un **monolito
+modular por dominio con arquitectura por capas** y una correspondencia de **MVC web
+extendido**.
+
+## Relación con visión, SRS y casos de uso
+
+Arquitectura responde **cómo** está organizada la solución y cómo satisface las
+obligaciones del sistema. No es propietaria del propósito y alcance de negocio ni de la
+conducta normativa de los actores:
+
+| Fuente | Responsabilidad | Uso desde arquitectura |
+| --- | --- | --- |
+| [Visión y alcance](../requirements/vision-scope-and-requirements/index.md) | Define por qué existe el producto, sus interesados y sus límites. | Alimenta el contexto y las preocupaciones arquitectónicas. |
+| [SRS](../requirements/requirements-specification/index.md) y [casos de uso](../requirements/use-cases/index.md) | Definen qué debe hacer el sistema, sus reglas y los flujos actor–Nexus. | Aportan los `CU-*` y requisitos que la solución debe realizar. |
+| Este documento de arquitectura | Define estructura, responsabilidades, decisiones, contratos, despliegue y realización técnica. | Traza cada obligación hacia vistas, secuencias, código y pruebas sin copiar su definición funcional. |
+
+Que los servicios ejecuten un “caso de uso” o que las secuencias técnicas se organicen
+por `CU-*` no cambia la propiedad documental. La ficha funcional permanece en la SRS;
+backend y frontend muestran colaboraciones internas, errores técnicos y persistencia.
+Ambas vistas se conectan mediante la
+[matriz de trazabilidad](traceability-matrix/index.md).
+
+## Forma arquitectónica y criterios normativos
+
+El [modelo de vistas aplicado](architecture-and-web-views/05-modelo-de-vistas-de-arquitectura-aplicado.md)
+es la fuente propietaria del enfoque Viewpoint/View, su adaptación de 4+1 y el apoyo de
+los niveles de C4. Los [criterios documentales](../governance/documentation-standards/03-aplicacion-por-tipo-de-documento.md)
+determinan qué orientan ISO/IEC/IEEE 42010, 29148, 1016 y 15289, qué entrega conserva cada
+contenido y los límites de la adopción. Este índice sólo dirige a esas decisiones: no
+mantiene otra versión de las normas ni del modelo de vistas.
 
 ## Orden de lectura recomendado
 

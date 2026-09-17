@@ -2,8 +2,9 @@
 
 | Artefacto | Decisión | Motivo |
 | --- | --- | --- |
+| Portadas de requisitos y arquitectura | Conservadas como entradas | Presentan propósito, límites, orden de lectura y enlaces hacia las fuentes propietarias; no conservan una segunda versión de normas, diagramas o reglas detalladas. |
 | Especificación de requisitos | Dividido | Propósito, convenciones, actores, catálogo normativo, terminado y mantenimiento son responsabilidades estables; el índice conserva su orden normativo. |
-| Visión, alcance y requisitos | Dividido | Visión, contexto, interesados, alcance, calidad y trazabilidad responden consultas independientes; el índice conserva el recorrido del documento. |
+| Visión y alcance | Dividido | Visión, contexto, interesados, alcance, calidad y trazabilidad resumida responden consultas independientes; el índice conserva el recorrido del documento y enlaza la SRS como artefacto normativo separado. |
 | Modelo de dominio, casos de uso y relación entre vistas | Dividido | El modelo conceptual, los casos, los estados afectados y las vistas de diseño tienen responsabilidades diferenciadas y un orden estable. |
 | Documentos de gobierno | Divididos | Normas, prácticas, revisión estructural, aplicación y publicación conservan entradas propias; dentro de cada artefacto, sus decisiones y criterios se consultan como capítulos numerados. |
 | Patrones de diseño y construcción | Dividido | Cada patrón responde una pregunta técnica independiente y puede cambiar sin obligar a abrir el catálogo completo. |
@@ -12,7 +13,7 @@
 | Secuencias frontend y backend | Divididas por `CU-*` | Aunque son arquitectura técnica, cada secuencia acompaña un caso concreto; los índices de perspectiva y grupo conservan la navegación. |
 | Guía técnica común | Dividida | Propósito, ubicación, entornos, incorporación y criterios de diagramación son consultas independientes; la entrada conserva el recorrido recomendado. |
 | Documentación técnica frontend y backend | Conservada | Sus matrices permiten comparar cobertura de toda una perspectiva; el detalle por caso ya vive en las colecciones de secuencias. |
-| Arquitectura y vistas web | Dividida | Contexto, arquitectura, vistas web, organización de capas y herramientas conservan un orden progresivo, pero pueden consultarse y mantenerse como capítulos independientes. |
+| Descripción de arquitectura y construcción | Dividida | Contexto y despliegue, vistas web, organización de capas, modelo de vistas y herramientas conservan un orden progresivo, pero pueden consultarse y mantenerse como capítulos independientes. Los criterios ISO permanecen en gobierno documental. |
 | Navegación y catálogo web | Dividido | El mapa de navegación, el catálogo de pantallas y sus reglas de mantenimiento responden preguntas separadas y la entrada mantiene su alcance común. |
 | Diagramas vigentes del código | Dividido | Organización, estructura, dinámica y reutilización son puntos de vista estables; cada capítulo conserva su vista canónica sin duplicarla. |
 | Estándar de codificación | Dividido | Cada grupo de reglas tiene un alcance técnico estable y consultable; la entrada sigue siendo la única portada normativa del estándar. |

@@ -1,6 +1,6 @@
 ---
 title: Especificación de requisitos de Nexus
-document-version: 1.1
+document-version: 1.2
 system-version: 1.0.0
 status: En revisión
 ---
@@ -11,15 +11,30 @@ status: En revisión
 
 | Versión documental | Versión del sistema | Estado | Fecha | Responsable |
 | --- | --- | --- | --- | --- |
-| 1.1 | 1.0.0 | En revisión | 2026-09-10 | Equipo Nexus |
+| 1.2 | 1.0.0 | En revisión | 2026-09-17 | Equipo Nexus |
 
 Este es el punto de entrada y la portada del paquete exportable de requisitos. La
 [especificación de requisitos](requirements-specification/index.md) conserva la definición
 normativa; este índice organiza su lectura sin duplicarla.
 
+## Responsabilidad de cada nivel
+
+Este paquete contiene tres niveles relacionados, pero no intercambiables:
+
+| Nivel | Responsabilidad | Ejemplo de contenido |
+| --- | --- | --- |
+| [Visión y alcance](vision-scope-and-requirements/index.md) | Explicar la necesidad, los interesados, los límites y las capacidades esperadas sin diseñar la solución. | Objetivo del producto, actores interesados, alcance incluido y excluido. |
+| [SRS](requirements-specification/index.md) | Establecer las obligaciones verificables del sistema. Las [fichas de casos de uso](use-cases/index.md) forman parte de esta familia normativa y desarrollan la interacción de los actores. | Requisitos, reglas, atributos de calidad, precondiciones, flujos y postcondiciones. |
+| [Arquitectura](../architecture/index.md) | Describir cómo la solución satisface esas obligaciones mediante vistas, decisiones y evidencia técnica. Se publica como documento separado. | Contexto técnico, contenedores, componentes, despliegue, contratos y secuencias internas. |
+
+Los casos de uso no se trasladan ni se duplican en arquitectura. Arquitectura enlaza el
+`CU-*` normativo y documenta su realización en las secuencias técnicas y en la matriz de
+trazabilidad. De este modo, **visión** dice por qué y hasta dónde, la **SRS** dice qué debe
+ocurrir y **arquitectura** explica cómo se construye y ejecuta la solución.
+
 ## Orden del paquete
 
-1. [Visión, alcance y requisitos](vision-scope-and-requirements/index.md).
+1. [Visión y alcance](vision-scope-and-requirements/index.md).
 2. [Especificación de requisitos](requirements-specification/index.md).
 3. [Dominio y casos de uso](domain-and-use-cases/index.md).
 4. [Descripciones de casos de uso](use-cases/index.md).
