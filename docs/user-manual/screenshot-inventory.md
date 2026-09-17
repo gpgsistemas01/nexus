@@ -250,7 +250,8 @@ flujo reutiliza una instancia que ya responda en `DOCS_BASE_URL` y sólo detiene
 él mismo; la selección o reanudación mediante `DOCS_CAPTURE_IDS` o `DOCS_CAPTURE_FROM` permanece a
 cargo del mismo inventario.
 
-Cada captura que falla por tiempo de espera se recupera automáticamente desde su ruta inicial. El
+Cada captura que falla por tiempo de espera se recupera automáticamente en una página nueva desde
+su ruta inicial, para descartar navegación, modales o solicitudes pendientes del intento anterior. El
 valor predeterminado realiza hasta **dos reintentos** y conserva las capturas anteriores. Puede
 ajustarse puntualmente con `DOCS_CAPTURE_RETRIES` (cero desactiva los reintentos) y
 `DOCS_CAPTURE_TIMEOUT_MS` (30 000 ms de forma predeterminada). Los errores de permisos, selectores

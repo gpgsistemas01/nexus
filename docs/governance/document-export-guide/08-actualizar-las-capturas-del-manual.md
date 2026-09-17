@@ -148,7 +148,9 @@ Playwright y Chromium se preparan automáticamente en el mismo entorno antes de 
    ```
 
 El límite de 30 segundos de Playwright es el tiempo máximo para que una condición de la página se
-cumpla, no una pausa que el proceso deba consumir en cada captura. Si la comprobación del paso 3
+cumpla, no una pausa que el proceso deba consumir en cada captura. Cuando se agota, cada reintento
+abre una página nueva desde la ruta inicial para descartar el estado incompleto del intento anterior.
+Si la comprobación del paso 3
 responde `ERR_CONNECTION_REFUSED`, confirme que Nexus siga activo y
 que la URL use el puerto anunciado. Si la captura falla esperando el botón **Nueva salida** de
 salidas de merma, compruebe que la cuenta tenga `waste:issues-manage`; el acceso al listado por sí
