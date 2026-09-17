@@ -213,7 +213,7 @@ npm start
 | `npm run test:db` | Verifica variables, migra la base de pruebas y ejecuta pruebas. |
 | `npm run docs:architecture` | Regenera el mapa de código, el esquema de base de datos y el diccionario técnico derivados del código y Prisma. |
 | `npm run docs:check` | Comprueba sin modificar archivos que la documentación generada esté actualizada. |
-| `npm run docs:export -- <paquete> <docx\|pdf>` | Valida y genera el DOCX con Pandoc; para PDF convierte después ese DOCX con LibreOffice. |
+| `npm run docs:export -- <paquete> <docx\|pdf\|ambos>` | Valida y genera el DOCX con Pandoc; `pdf` o `ambos` convierten después ese DOCX con LibreOffice y conservan los dos formatos. |
 | `npm run docs:screenshots` | Comprueba o inicia Nexus, genera en Chromium todas las capturas y detiene la instancia temporal al terminar. |
 
 ## Publicación de documentos y capturas

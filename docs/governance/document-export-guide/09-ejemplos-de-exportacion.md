@@ -4,11 +4,14 @@
 # Sólo valida fuentes e imágenes; no necesita Pandoc.
 npm run docs:export -- requisitos --check
 
-# Genera los conjuntos en build/docs/docx/administrador/.
+# Genera los conjuntos en build/docs/docx/manuales/administrador/.
 npm run docs:export -- manual-administrador docx
 
-# Genera los conjuntos del personal de almacén en build/docs/docx/almacen/.
+# Genera los conjuntos del personal de almacén en build/docs/docx/manuales/almacen/.
 npm run docs:export -- manual-almacen docx
+
+# Genera DOCX y PDF del personal de almacén con la misma estructura.
+npm run docs:export -- manual-almacen ambos
 
 # Genera un DOCX, incluida la portada definida en el Markdown.
 npm run docs:export -- arquitectura docx

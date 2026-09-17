@@ -65,7 +65,7 @@ const administrator = 'docs/user-manual/actors/administrator.md';
 const warehouse = 'docs/user-manual/actors/warehouse.md';
 const MANUALS = Object.freeze({
     'manual-administrador': {
-        directory: 'administrador',
+        directory: 'manuales/administrador',
         parts: {
             autenticacion: manualPart(administrator, manualCases.authentication),
             'identidad-y-acceso': manualPart(administrator, manualCases['identity-access']),
@@ -75,7 +75,7 @@ const MANUALS = Object.freeze({
         }
     },
     'manual-almacen': {
-        directory: 'almacen',
+        directory: 'manuales/almacen',
         parts: {
             autenticacion: manualPart(warehouse, manualCases.authentication),
             catalogos: manualPart(warehouse, [
@@ -83,7 +83,24 @@ const MANUALS = Object.freeze({
                 ...manualCases.reports
             ]),
             'compras-de-material': manualPart(warehouse, manualCases.purchases),
-            'salidas-de-material-y-merma': manualPart(warehouse, manualCases.issues)
+            'salidas-de-material': manualPart(warehouse, manualCaseFiles('issues', [
+                '01-cap-sal-mat-01-list.md',
+                '02-cap-sal-mat-02-create.md',
+                '03-cap-sal-mat-03-edit.md',
+                '04-cap-sal-mat-04-supply.md',
+                '05-cap-sal-mat-05-return.md',
+                '06-cap-rep-sal-mat-06-export.md',
+                '07-cap-sal-mat-08-view.md'
+            ])),
+            'salidas-de-merma': manualPart(warehouse, manualCaseFiles('issues', [
+                '08-cap-sal-was-01-list.md',
+                '09-cap-sal-was-02-create.md',
+                '10-cap-sal-was-03-edit.md',
+                '11-cap-sal-was-04-supply.md',
+                '12-cap-sal-was-05-return.md',
+                '13-cap-rep-sal-was-06-export.md',
+                '14-cap-sal-was-08-view.md'
+            ]))
         }
     }
 });
@@ -146,7 +163,8 @@ const MANIFESTS = Object.freeze({
 });
 const [requestedPublication, requestedFormat] = process.argv.slice(2).filter((argument) => argument !== '--check');
 const checkOnly = process.argv.includes('--check');
-const formats = new Set(['docx', 'pdf']);
+const formats = new Set(['docx', 'pdf', 'ambos']);
+const outputFormat = requestedFormat === 'ambos' ? 'pdf' : requestedFormat;
 let pdfConverter = process.env.DOCS_PDF_CONVERTER;
 const publicationNames = [...Object.keys(MANUALS), ...Object.keys(MANIFESTS)];
 const mermaidBlock = /^```mermaid\r?\n([\s\S]*?)^```\r?$/gm;
@@ -284,7 +302,7 @@ const insertAfterDocumentData = (content, insertion) => {
 
 if ((requestedPublication !== 'todos' && !MANIFESTS[requestedPublication] && !MANUALS[requestedPublication])
     || (checkOnly ? requestedFormat && !formats.has(requestedFormat) : !formats.has(requestedFormat))) {
-    console.error('Uso: npm run docs:export -- <todos|manual-administrador|manual-almacen|requisitos|datos|arquitectura|pruebas> [docx|pdf] [--check]');
+    console.error('Uso: npm run docs:export -- <todos|manual-administrador|manual-almacen|requisitos|datos|arquitectura|pruebas> [docx|pdf|ambos] [--check]');
     process.exit(1);
 }
 
@@ -373,7 +391,7 @@ if (pandoc.error || pandoc.status !== 0) {
     console.error('Pandoc no está disponible. Instálalo o usa --check para validar las fuentes.');
     process.exit(1);
 }
-if (requestedFormat === 'pdf') {
+if (outputFormat === 'pdf') {
     try {
         pdfConverter = preparePdfConverter({ configuredConverter: pdfConverter });
     } catch (error) {
@@ -447,16 +465,16 @@ const prepareSource = async (source, publicationSources, firstFigureNumber) => {
 let failedStatus = 0;
 try {
     for (const { publication, document, directory, sources } of publications) {
-        const relativeOutput = directory ? path.join(directory, `${document}.${requestedFormat}`) : `${document}.${requestedFormat}`;
+        const relativeOutput = directory ? path.join(directory, `${document}.${outputFormat}`) : `${document}.${outputFormat}`;
         const relativeDocxOutput = directory ? path.join(directory, `${document}.docx`) : `${document}.docx`;
-        const output = path.join(documentOutputDirectories[requestedFormat], relativeOutput);
+        const output = path.join(documentOutputDirectories[outputFormat], relativeOutput);
         const docxOutput = path.join(documentOutputDirectories.docx, relativeDocxOutput);
         await Promise.all([
             mkdir(path.dirname(output), { recursive: true }),
             mkdir(path.dirname(docxOutput), { recursive: true })
         ]);
         await rm(output, { force: true });
-        if (requestedFormat === 'pdf') await rm(docxOutput, { force: true });
+        if (outputFormat === 'pdf') await rm(docxOutput, { force: true });
         const preparedSources = [];
         const publicationSources = new Set(sources);
         let nextFigureNumber = 1;
@@ -491,7 +509,7 @@ try {
             failedStatus = result.status ?? 1;
             break;
         }
-        if (requestedFormat === 'pdf') {
+        if (outputFormat === 'pdf') {
             console.log(`Documento intermedio generado en ${path.relative(ROOT, docxOutput)}.`);
             const conversion = spawnSync(pdfConverter, [
                 `-env:UserInstallation=${pathToFileURL(path.join(temporaryDirectory, 'libreoffice-profile')).href}`,
