@@ -22,7 +22,8 @@ imagen, `--check` detiene el proceso; en ese caso ejecute primero el flujo indep
 
 El resultado se organiza primero por actor y después por conjunto funcional. Por ejemplo, el comando
 del administrador escribe `build/docs/docx/administrador/acceso.docx`,
-`identidad-y-acceso.docx`, `catalogos.docx` y `reportes.docx`; el de almacén escribe dentro de
-`build/docs/docx/almacen/` los archivos de acceso, catálogos, compras de material, salidas de
-material, salidas de merma y reportes. Cada archivo conserva la portada del actor y únicamente los
-recorridos que corresponden a ese conjunto.
+`personas.docx`, `usuarios.docx` y `catalogos-auxiliares.docx`; el de almacén escribe dentro de
+`build/docs/docx/almacen/` un archivo por módulo operativo. Los procedimientos de consulta y
+exportación de movimientos quedan junto a `materiales.docx` o `mermas.docx`, en vez de producir un
+archivo genérico de reportes. Cada archivo conserva la portada del actor y únicamente los recorridos
+que corresponden a ese módulo.
