@@ -88,7 +88,7 @@ Los registros centrales `src/routes/api/index.js` y `src/routes/web/index.js` co
 los routers por dominio y evitan que `src/app.js` mezcle el arranque de infraestructura
 con el catálogo de endpoints. Las convenciones equivalentes entre backend y frontend,
 incluyendo reutilización de componentes y ubicación de pruebas CRUD, se detallan en el
-[descripción de arquitectura y construcción](docs/architecture/architecture-and-web-views.md#3-organización-consistente-de-front-y-back).
+[descripción de arquitectura y construcción](docs/architecture/architecture-and-web-views/index.md).
 
 ## Documentación
 
@@ -345,7 +345,7 @@ El objetivo es mover la aplicación a un **VPS**. Hasta definir y versionar el p
 inverso, TLS, automatización, respaldos y monitoreo, esa topología permanece propuesta.
 También debe decidirse expresamente si el VPS conservará Supabase como base de datos
 administrada o alojará una instancia propia de PostgreSQL. Consulta la
-[vista de despliegue actual y objetivo](docs/architecture/architecture-and-web-views.md#despliegue-actual-render-y-supabase).
+[vista de despliegue actual y objetivo](docs/architecture/architecture-and-web-views/02-arquitectura-del-sistema.md).
 
 La documentación (`README.md` y `docs/`) **se conserva y versiona en este
 repositorio**. Las reglas de `.dockerignore` únicamente la excluyen del contexto de

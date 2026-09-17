@@ -7,7 +7,7 @@
 
 ## Fuentes de verdad
 
-- Consulta `docs/architecture/coding-standards.md` para formato, nombres, capas, imports, errores y convenciones de frontend y pruebas.
+- Consulta `docs/architecture/coding-standards/index.md` para formato, nombres, capas, imports, errores y convenciones de frontend y pruebas.
 - Consulta `docs/README.md` para identificar el documento propietario de arquitectura, requisitos, datos, pruebas o gobierno antes de editar documentación.
 - Trata `prisma/schema.prisma` como fuente técnica del modelo de datos y `src/routes` como fuente de las rutas registradas.
 - No edites manualmente `docs/generated/`; regenera esos archivos con `npm run docs:architecture`.

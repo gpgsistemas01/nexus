@@ -15,16 +15,16 @@ por capas** y una correspondencia de **MVC web extendido**.
 
 ## Orden de lectura recomendado
 
-1. [Descripción de arquitectura y construcción](architecture-and-web-views.md): contexto,
+1. [Descripción de arquitectura y construcción](architecture-and-web-views/index.md): contexto,
    contenedores, despliegue, componentes, recorrido extremo a extremo y organización de
    las capas.
 2. [Patrones de diseño y construcción](design-and-construction-patterns/index.md): definición,
    evidencia y reglas de aplicación de los patrones confirmados.
 3. [Contrato de la API](api-contract.md) y [OpenAPI 3.1](openapi/openapi.json): transporte JSON,
    rutas, esquemas de solicitud y respuesta, errores y validaciones observables.
-4. [Diagramas vigentes del código](code-diagrams.md): superficie HTTP, dominios,
+4. [Diagramas vigentes del código](code-diagrams/index.md): superficie HTTP, dominios,
    colaboraciones y reutilización observada.
-5. [Navegación y catálogo de pantallas web](web-navigation-and-screen-catalog.md): estados
+5. [Navegación y catálogo de pantallas web](web-navigation-and-screen-catalog/index.md): estados
    de acceso, mapa del menú, pantallas y redirecciones.
 6. [Mapa generado del código](../generated/code-map.md): rutas, dependencias reales entre
    áreas y exportaciones detectadas automáticamente.

@@ -11,7 +11,7 @@ sola ficha contractual en esta familia. El [mapa generado](../generated/code-map
 mantiene el inventario de métodos, URLs y archivos; una ficha se agrega aquí sólo cuando
 necesita explicar cómo consumir la operación. La explicación interna de nombres y
 colaboraciones se mantiene en la
-[documentación técnica del código](technical-code-documentation.md), sin
+[documentación técnica del código](technical-code-documentation/index.md), sin
 copiar el contrato HTTP.
 
 ### Alcance y nivel de cobertura
