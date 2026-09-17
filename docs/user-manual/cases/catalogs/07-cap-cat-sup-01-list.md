@@ -1,5 +1,5 @@
 <a id="CAP-CAT-SUP-01-LIST"></a>
-# CAP-CAT-SUP-01-LIST — Listado
+# 7. CAP-CAT-SUP-01-LIST — Listado
 
 **Casos de uso:** `CU-CAT-10` — Consultar proveedores; `CU-CAT-14` — Generar reporte de proveedores.
 

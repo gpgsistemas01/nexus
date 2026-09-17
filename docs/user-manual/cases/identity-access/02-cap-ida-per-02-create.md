@@ -1,5 +1,5 @@
 <a id="CAP-IDA-PER-02-CREATE"></a>
-# CAP-IDA-PER-02-CREATE — Formulario alta
+# 2. CAP-IDA-PER-02-CREATE — Formulario alta
 
 **Casos de uso:** `CU-IDA-02` — Crear persona; `CU-IDA-10` — Consultar roles; `CU-IDA-11` — Consultar departamentos.
 

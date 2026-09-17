@@ -1,5 +1,5 @@
 <a id="CAP-SAL-MAT-04-SUPPLY"></a>
-# CAP-SAL-MAT-04-SUPPLY — Surtir detalles
+# 4. CAP-SAL-MAT-04-SUPPLY — Surtir detalles
 
 **Casos de uso:** `CU-SAL-05` — Surtir material.
 

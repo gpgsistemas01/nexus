@@ -1,5 +1,5 @@
 <a id="CAP-IDA-PER-03-EDIT"></a>
-# CAP-IDA-PER-03-EDIT — Formulario edicion
+# 3. CAP-IDA-PER-03-EDIT — Formulario edicion
 
 **Casos de uso:** `CU-IDA-03` — Editar persona.
 

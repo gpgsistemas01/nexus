@@ -1,5 +1,5 @@
 <a id="CAP-IDA-USR-02-CREATE"></a>
-# CAP-IDA-USR-02-CREATE — Formulario alta
+# 5. CAP-IDA-USR-02-CREATE — Formulario alta
 
 **Casos de uso:** `CU-IDA-06` — Crear usuario y asignar acceso.
 

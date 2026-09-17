@@ -1,5 +1,5 @@
 <a id="CAP-IDA-USR-04-PASSWORD"></a>
-# CAP-IDA-USR-04-PASSWORD — Cambio contrasena
+# 7. CAP-IDA-USR-04-PASSWORD — Cambio contrasena
 
 **Casos de uso:** `CU-IDA-08` — Cambiar contraseña de usuario.
 

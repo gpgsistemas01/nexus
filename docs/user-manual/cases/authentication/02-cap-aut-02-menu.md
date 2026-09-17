@@ -1,5 +1,5 @@
 <a id="CAP-AUT-02-MENU"></a>
-# CAP-AUT-02-MENU — Menú principal
+# 2. CAP-AUT-02-MENU — Menú principal
 
 **Casos de uso:** `CU-AUT-02` — Cerrar sesión.
 

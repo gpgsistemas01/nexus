@@ -1,5 +1,5 @@
 <a id="CAP-SAL-WAS-03-EDIT"></a>
-# CAP-SAL-WAS-03-EDIT — Edicion encabezado
+# 10. CAP-SAL-WAS-03-EDIT — Edicion encabezado
 
 **Casos de uso:** `CU-SAL-10` — Editar encabezado de salida de merma; `CU-SAL-11` — Editar detalles de merma de una salida.
 

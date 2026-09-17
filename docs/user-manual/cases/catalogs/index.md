@@ -2,11 +2,13 @@
 
 Cada procedimiento identifica sus casos de uso, controles, errores posibles y captura de referencia.
 
-## Catálogos auxiliares
+## Capítulos
 
-- [Catálogos auxiliares](01-catalogos-auxiliares.md)
+### Catálogos auxiliares
 
-## Materiales e inventario
+1. [1. Catálogos auxiliares](01-catalogos-auxiliares.md)
+
+### Materiales e inventario
 
 **Propósito.** Consultar el inventario, registrar o editar materiales y ajustar existencias.
 
@@ -28,13 +30,13 @@ ese compromiso, siempre que haya existencia suficiente. En
 los reportes, **Sólo activos** la excluye, mientras **Sólo con existencia** puede incluirla si aún
 conserva stock. Volver a marcarla permite usar esa oferta nuevamente en operaciones nuevas.
 
-- [CAP-CAT-MAT-01-LIST — Listado inventario](02-cap-cat-mat-01-list.md)
-- [CAP-REP-MAT-05-EXPORT — Exportar inventario](03-cap-rep-mat-05-export.md)
-- [CAP-CAT-MAT-02-CREATE — Formulario alta](04-cap-cat-mat-02-create.md)
-- [CAP-CAT-MAT-03-EDIT — Formulario edicion](05-cap-cat-mat-03-edit.md)
-- [CAP-CAT-MAT-04-STOCK — Ajuste existencia](06-cap-cat-mat-04-stock.md)
+2. [2. CAP-CAT-MAT-01-LIST — Listado inventario](02-cap-cat-mat-01-list.md)
+3. [3. CAP-REP-MAT-05-EXPORT — Exportar inventario](03-cap-rep-mat-05-export.md)
+4. [4. CAP-CAT-MAT-02-CREATE — Formulario alta](04-cap-cat-mat-02-create.md)
+5. [5. CAP-CAT-MAT-03-EDIT — Formulario edicion](05-cap-cat-mat-03-edit.md)
+6. [6. CAP-CAT-MAT-04-STOCK — Ajuste existencia](06-cap-cat-mat-04-stock.md)
 
-## Proveedores
+### Proveedores
 
 **Propósito.** Consultar y mantener el catálogo de proveedores.
 
@@ -47,11 +49,11 @@ La casilla **Activo** controla el estado del proveedor dentro del mismo formular
 edición. Desmarcarla no elimina el proveedor ni sus materiales o documentos históricos; volver a
 marcarla lo reactiva. Este cambio no es un ajuste de stock.
 
-- [CAP-CAT-SUP-01-LIST — Listado](07-cap-cat-sup-01-list.md)
-- [CAP-CAT-SUP-02-CREATE — Formulario alta](08-cap-cat-sup-02-create.md)
-- [CAP-CAT-SUP-03-EDIT — Formulario edición y estado](09-cap-cat-sup-03-edit.md)
+7. [7. CAP-CAT-SUP-01-LIST — Listado](07-cap-cat-sup-01-list.md)
+8. [8. CAP-CAT-SUP-02-CREATE — Formulario alta](08-cap-cat-sup-02-create.md)
+9. [9. CAP-CAT-SUP-03-EDIT — Formulario edición y estado](09-cap-cat-sup-03-edit.md)
 
-## Clientes
+### Clientes
 
 **Propósito.** Consultar y mantener el catálogo de clientes.
 
@@ -64,11 +66,11 @@ para que el administrador pueda revisarlos o reactivarlos.
 <a id="CAP-CAT-CLI-00-NAVIGATION"></a>
 ![CAP-CAT-CLI-00-NAVIGATION: acceso a clientes desde el menú principal](../../images/clientes/00-acceso-menu-principal.png)
 
-- [CAP-CAT-CLI-01-LIST — Listado](10-cap-cat-cli-01-list.md)
-- [CAP-CAT-CLI-02-CREATE — Formulario alta](11-cap-cat-cli-02-create.md)
-- [CAP-CAT-CLI-03-EDIT — Formulario edicion](12-cap-cat-cli-03-edit.md)
+10. [10. CAP-CAT-CLI-01-LIST — Listado](10-cap-cat-cli-01-list.md)
+11. [11. CAP-CAT-CLI-02-CREATE — Formulario alta](11-cap-cat-cli-02-create.md)
+12. [12. CAP-CAT-CLI-03-EDIT — Formulario edicion](12-cap-cat-cli-03-edit.md)
 
-## Mermas e inventario
+### Mermas e inventario
 
 **Propósito.** Consultar y mantener mermas, ajustar existencias y delimitar reportes.
 
@@ -87,8 +89,8 @@ cerrar el compromiso, siempre que haya stock; desactivarla no cancela la salida.
 conservarla cuando se elige **Sólo con existencia** y aún tiene stock. Volver a marcarla permite
 utilizarla nuevamente en una nueva salida.
 
-- [CAP-CAT-WAS-01-LIST — Listado inventario](13-cap-cat-was-01-list.md)
-- [CAP-REP-WAS-05-EXPORT — Exportar inventario de mermas](14-cap-rep-was-05-export.md)
-- [CAP-CAT-WAS-02-CREATE — Formulario registro](15-cap-cat-was-02-create.md)
-- [CAP-CAT-WAS-03-EDIT — Formulario edicion](16-cap-cat-was-03-edit.md)
-- [CAP-CAT-WAS-04-STOCK — Ajuste existencia](17-cap-cat-was-04-stock.md)
+13. [13. CAP-CAT-WAS-01-LIST — Listado inventario](13-cap-cat-was-01-list.md)
+14. [14. CAP-REP-WAS-05-EXPORT — Exportar inventario de mermas](14-cap-rep-was-05-export.md)
+15. [15. CAP-CAT-WAS-02-CREATE — Formulario registro](15-cap-cat-was-02-create.md)
+16. [16. CAP-CAT-WAS-03-EDIT — Formulario edicion](16-cap-cat-was-03-edit.md)
+17. [17. CAP-CAT-WAS-04-STOCK — Ajuste existencia](17-cap-cat-was-04-stock.md)

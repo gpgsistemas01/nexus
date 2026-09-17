@@ -1,5 +1,5 @@
 <a id="CAP-ENT-04-CORRECT"></a>
-# CAP-ENT-04-CORRECT — Correccion detalle
+# 4. CAP-ENT-04-CORRECT — Correccion detalle
 
 **Casos de uso:** `CU-ENT-04` — Corregir material de una compra.
 

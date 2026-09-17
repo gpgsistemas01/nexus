@@ -1,5 +1,5 @@
 <a id="CAP-SAL-MAT-02-CREATE"></a>
-# CAP-SAL-MAT-02-CREATE — Formulario registro
+# 2. CAP-SAL-MAT-02-CREATE — Formulario registro
 
 **Casos de uso:** `CU-SAL-02` — Crear salida de material.
 

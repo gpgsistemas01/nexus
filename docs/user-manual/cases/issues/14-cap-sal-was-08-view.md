@@ -1,5 +1,5 @@
 <a id="CAP-SAL-WAS-08-VIEW"></a>
-# CAP-SAL-WAS-08-VIEW — Consultar salida cancelada
+# 14. CAP-SAL-WAS-08-VIEW — Consultar salida cancelada
 
 **Caso de uso:** `CU-SAL-08` — Consultar salidas de merma.
 

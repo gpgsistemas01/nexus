@@ -1,4 +1,4 @@
-# CAP-REP-WAS-05-EXPORT — Exportar inventario de mermas
+# 14. CAP-REP-WAS-05-EXPORT — Exportar inventario de mermas
 
 **Casos de uso:** `CU-CAT-24` — Generar reporte de mermas.
 

@@ -1,5 +1,5 @@
 <a id="CAP-REP-SAL-MAT-06-EXPORT"></a>
-# CAP-REP-SAL-MAT-06-EXPORT — Exportar reporte
+# 6. CAP-REP-SAL-MAT-06-EXPORT — Exportar reporte
 
 **Casos de uso:** `CU-SAL-07` — Generar reporte de salidas de material.
 

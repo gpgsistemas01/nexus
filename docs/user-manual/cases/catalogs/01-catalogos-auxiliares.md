@@ -1,4 +1,4 @@
-# Catálogos auxiliares
+# 1. Catálogos auxiliares
 **Propósito.** Consultar, crear y editar las opciones auxiliares que configuran otros flujos del sistema.
 
 **Ruta en el menú:** **Menú principal → Catálogos auxiliares →** elija **Áreas**, **Roles**, **Presentaciones**, **Unidades de medida**, **Motivos de ajuste** o **Estados de cumplimiento**.

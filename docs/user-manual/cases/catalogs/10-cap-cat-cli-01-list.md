@@ -1,5 +1,5 @@
 <a id="CAP-CAT-CLI-01-LIST"></a>
-# CAP-CAT-CLI-01-LIST — Listado
+# 10. CAP-CAT-CLI-01-LIST — Listado
 
 **Casos de uso:** `CU-CAT-15` — Consultar clientes; `CU-CAT-18` — Generar reporte de clientes.
 

@@ -1,5 +1,5 @@
 <a id="CAP-CAT-WAS-02-CREATE"></a>
-# CAP-CAT-WAS-02-CREATE — Formulario registro
+# 15. CAP-CAT-WAS-02-CREATE — Formulario registro
 
 **Casos de uso:** `CU-CAT-20` — Registrar merma.
 
