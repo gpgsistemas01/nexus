@@ -1,25 +1,25 @@
 <a id="cu-cat-30"></a>
-# `CU-CAT-30` — Consultar estados de cumplimiento
+# `CU-CAT-30` — Consultar rol
 
 **Patrones:** `FE-P03`.
 
 ```mermaid
 sequenceDiagram
     participant Browser as Navegador
-    participant View as src/public/js/plugins/select2/domains/fulfillmentStatus.js
-    participant Application as src/public/js/application/warehouse/catalogs/fulfillmentStatuses.js
-    participant Request as src/public/js/services/warehouse/fulfillmentStatusService.js
+    participant View as src/public/js/plugins/datatable/admin/catalogs/catalogDatatable.js
+    participant Application as src/public/js/application/admin/catalogs/catalogs.js
+    participant Request as src/public/js/services/admin/catalogService.js
     participant HTTP as src/public/js/services/axiosInstanceApi.js
-    participant Transport@{ "type": "control" } as src/routes/api/warehouse/fulfillmentStatusApiRoute.js<br/>src/controllers/api/warehouse/fulfillmentStatusController.js
-    Note over Application,Transport: Variables de frontera: params/filtros
+    participant Transport@{ "type": "control" } as src/routes/api/admin/catalogApiRoute.js<br/>src/controllers/api/admin/catalogController.js
+    Note over Application,Transport: Variables de frontera: params/catalog
 
-    Browser->>View: Estado visible en tablas y formularios de salidas
+    Browser->>View: abrir y cargar la tabla del catálogo
     View->>View: recopilar y validar las variables de frontera indicadas
-    View->>Application: getAllFulfillmentStatuses({ params })
-    Application->>Request: getAllFulfillmentStatusesRequest({ params })
+    View->>Application: getAllCatalogEntries({ params, catalog })
+    Application->>Request: getAllCatalogEntriesRequest({ params, catalog })
     activate Application
     Request->>HTTP: apiRequest({ method: 'get', url, data/params })
-    HTTP->>Transport: consume GET /api/warehouse/fulfillment-statuses
+    HTTP->>Transport: consume GET /api/admin/catalogs/roles
     Transport-->>HTTP: status HTTP y payload del endpoint
     HTTP-->>Request: respuesta o error normalizado
     Request-->>Application: resultado del request
@@ -32,8 +32,5 @@ sequenceDiagram
     end
     deactivate Application
 ```
-
-
-
 
 <a id="cu-cat-31"></a>

@@ -1,25 +1,25 @@
 <a id="cu-cat-28"></a>
-# `CU-CAT-28` — Consultar unidades de medida
+# `CU-CAT-28` — Crear área
 
 **Patrones:** `FE-P03`.
 
 ```mermaid
 sequenceDiagram
     participant Browser as Navegador
-    participant View as src/public/js/plugins/select2/domains/unitMeasure.js
-    participant Application as src/public/js/application/warehouse/catalogs/unitMeasures.js
-    participant Request as src/public/js/services/warehouse/unitMeasureService.js
+    participant View as src/public/js/pages/admin/catalogs/catalogForm.js
+    participant Application as src/public/js/application/admin/catalogs/catalogs.js
+    participant Request as src/public/js/services/admin/catalogService.js
     participant HTTP as src/public/js/services/axiosInstanceApi.js
-    participant Transport@{ "type": "control" } as src/routes/api/warehouse/unitMeasureApiRoute.js<br/>src/controllers/api/warehouse/unitMeasureController.js
-    Note over Application,Transport: Variables de frontera: params/filtros
+    participant Transport@{ "type": "control" } as src/routes/api/admin/catalogApiRoute.js<br/>src/controllers/api/admin/catalogController.js
+    Note over Application,Transport: Variables de frontera: catalog/data
 
-    Browser->>View: Select de unidad en formularios de material y merma
+    Browser->>View: confirmar el formulario de alta
     View->>View: recopilar y validar las variables de frontera indicadas
-    View->>Application: getAllUnitMeasures({ params })
-    Application->>Request: getAllUnitMeasuresRequest({ params })
+    View->>Application: registerCatalogEntry({ catalog, data })
+    Application->>Request: registerCatalogEntryRequest({ catalog, data })
     activate Application
     Request->>HTTP: apiRequest({ method: 'get', url, data/params })
-    HTTP->>Transport: consume GET /api/warehouse/unit-measures
+    HTTP->>Transport: consume POST /api/admin/catalogs/departments
     Transport-->>HTTP: status HTTP y payload del endpoint
     HTTP-->>Request: respuesta o error normalizado
     Request-->>Application: resultado del request

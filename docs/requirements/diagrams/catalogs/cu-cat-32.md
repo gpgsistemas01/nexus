@@ -1,8 +1,8 @@
-# `CU-CAT-32` — Crear área
+# `CU-CAT-32` — Editar rol
 
 ```mermaid
 flowchart LR
-    request["Administrador selecciona Nueva área<br/>y confirma Guardar"] --> authorize["Nexus valida catalogs:manage y departments"]
-    authorize --> persist["Validar campos y crear área"]
-    persist --> result["Confirmar y refrescar Áreas"]
+    request["Administrador selecciona Editar registro<br/>y confirma Actualizar"] --> authorize["Nexus valida catalogs:manage y roles"]
+    authorize --> persist["Validar campos y actualizar rol"]
+    persist --> result["Confirmar y refrescar Roles"]
 ```

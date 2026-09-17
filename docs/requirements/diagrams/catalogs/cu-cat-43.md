@@ -1,7 +1,8 @@
-# `CU-CAT-43` — Consultar motivo de ajuste
+# `CU-CAT-43` — Crear estado de cumplimiento
 
 ```mermaid
 flowchart LR
-    request["Administrador solicita consultar Motivos de ajuste"] --> authorize["Nexus valida catalogs:manage y reasons"]
-    authorize --> result["Mostrar exclusivamente la tabla de Motivos de ajuste"]
+    request["Administrador selecciona Nuevo estado de cumplimiento<br/>y confirma Guardar"] --> authorize["Nexus valida catalogs:manage y fulfillment-statuses"]
+    authorize --> persist["Validar campos y crear estado de cumplimiento"]
+    persist --> result["Confirmar y refrescar Estados de cumplimiento"]
 ```

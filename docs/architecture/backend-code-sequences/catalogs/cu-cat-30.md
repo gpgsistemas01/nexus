@@ -1,21 +1,21 @@
 <a id="cu-cat-30"></a>
-# `CU-CAT-30` — Consultar estados de cumplimiento
+# `CU-CAT-30` — Consultar rol
 
 **Patrones:** `BE-P02`.
 
 ```mermaid
 sequenceDiagram
     participant Client as Cliente HTTP / web
-    participant Route as src/routes/api/warehouse/fulfillmentStatusApiRoute.js
-    participant Controller@{ "type": "control" } as src/controllers/api/warehouse/fulfillmentStatusController.js
-    participant Domain as src/services/warehouse/fulfillmentStatusService.js
-    Note over Controller,Domain: Variables de frontera: req.query/params
+    participant Route as src/routes/api/admin/catalogApiRoute.js
+    participant Controller@{ "type": "control" } as src/controllers/api/admin/catalogController.js
+    participant Domain as src/services/admin/catalogService.js
+    Note over Controller,Domain: Variables de frontera: req.params.catalog
 
-    Client->>Route: GET /api/warehouse/fulfillment-statuses
+    Client->>Route: GET /api/admin/catalogs/roles
     Route->>Route: ejecutar en orden el middleware configurado para la ruta
-    Route->>Controller: getAllFulfillmentStatuses(req, res)
+    Route->>Controller: getAllCatalogEntries(req, res)
     activate Controller
-    Controller->>Domain: fulfillmentStatusService.findAllFulfillmentStatuses({ query: req.query }) sirve estados de sólo lectura
+    Controller->>Domain: findAllCatalogEntries(req.params.catalog) consulta el modelo permitido por la lista blanca
     activate Domain
     Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
     Domain-->>Controller: resultado del servicio o error de dominio tipado
@@ -27,8 +27,5 @@ sequenceDiagram
     end
     deactivate Controller
 ```
-
-
-
 
 <a id="cu-cat-31"></a>

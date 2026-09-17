@@ -1,25 +1,25 @@
 <a id="cu-cat-43"></a>
-# `CU-CAT-43` — Consultar motivo de ajuste
+# `CU-CAT-43` — Crear estado de cumplimiento
 
 **Patrones:** `FE-P03`.
 
 ```mermaid
 sequenceDiagram
     participant Browser as Navegador
-    participant View as src/public/js/plugins/datatable/admin/catalogs/catalogDatatable.js
+    participant View as src/public/js/pages/admin/catalogs/catalogForm.js
     participant Application as src/public/js/application/admin/catalogs/catalogs.js
     participant Request as src/public/js/services/admin/catalogService.js
     participant HTTP as src/public/js/services/axiosInstanceApi.js
     participant Transport@{ "type": "control" } as src/routes/api/admin/catalogApiRoute.js<br/>src/controllers/api/admin/catalogController.js
-    Note over Application,Transport: Variables de frontera: params/catalog
+    Note over Application,Transport: Variables de frontera: catalog/data
 
-    Browser->>View: abrir y cargar la tabla del catálogo
+    Browser->>View: confirmar el formulario de alta
     View->>View: recopilar y validar las variables de frontera indicadas
-    View->>Application: getAllCatalogEntries({ params, catalog })
-    Application->>Request: getAllCatalogEntriesRequest({ params, catalog })
+    View->>Application: registerCatalogEntry({ catalog, data })
+    Application->>Request: registerCatalogEntryRequest({ catalog, data })
     activate Application
     Request->>HTTP: apiRequest({ method: 'get', url, data/params })
-    HTTP->>Transport: consume GET /api/admin/catalogs/reasons
+    HTTP->>Transport: consume POST /api/admin/catalogs/fulfillment-statuses
     Transport-->>HTTP: status HTTP y payload del endpoint
     HTTP-->>Request: respuesta o error normalizado
     Request-->>Application: resultado del request

@@ -1,5 +1,5 @@
 <a id="cu-cat-32"></a>
-# `CU-CAT-32` — Crear área
+# `CU-CAT-32` — Editar rol
 
 **Patrones:** `BE-P02`.
 
@@ -9,13 +9,13 @@ sequenceDiagram
     participant Route as src/routes/api/admin/catalogApiRoute.js
     participant Controller@{ "type": "control" } as src/controllers/api/admin/catalogController.js
     participant Domain as src/services/admin/catalogService.js
-    Note over Controller,Domain: Variables de frontera: req.params.catalog/req.body
+    Note over Controller,Domain: Variables de frontera: req.params.catalog/req.params.id/req.body
 
-    Client->>Route: POST /api/admin/catalogs/departments
+    Client->>Route: PUT /api/admin/catalogs/roles/:id
     Route->>Route: ejecutar en orden el middleware configurado para la ruta
-    Route->>Controller: registerCatalogEntry(req, res)
+    Route->>Controller: editCatalogEntry(req, res)
     activate Controller
-    Controller->>Domain: createCatalogEntry(req.params.catalog/req.body) normaliza y crea únicamente los campos permitidos
+    Controller->>Domain: updateCatalogEntry(req.params.catalog/req.params.id/req.body) normaliza y actualiza únicamente los campos permitidos
     activate Domain
     Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
     Domain-->>Controller: resultado del servicio o error de dominio tipado

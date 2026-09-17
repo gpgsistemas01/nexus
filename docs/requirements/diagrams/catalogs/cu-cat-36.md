@@ -1,8 +1,7 @@
-# `CU-CAT-36` — Editar rol
+# `CU-CAT-36` — Consultar unidad de medida
 
 ```mermaid
 flowchart LR
-    request["Administrador selecciona Editar registro<br/>y confirma Actualizar"] --> authorize["Nexus valida catalogs:manage y roles"]
-    authorize --> persist["Validar campos y actualizar rol"]
-    persist --> result["Confirmar y refrescar Roles"]
+    request["Administrador solicita consultar Unidades de medida"] --> authorize["Nexus valida catalogs:manage y unit-measures"]
+    authorize --> result["Mostrar exclusivamente la tabla de Unidades de medida"]
 ```

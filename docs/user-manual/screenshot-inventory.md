@@ -31,9 +31,9 @@ comprobar el inventario sin iniciar Nexus ni Playwright se ejecuta
 | 2 | `CAP-AUT-02-MENU` | `docs/user-manual/images/acceso/02-menu-principal.png` | `CU-AUT-02` |
 | 3 | `CAP-CAT-MAT-00-NAVIGATION` | `docs/user-manual/images/materiales/00-acceso-menu-principal.png` | `CU-CAT-01` |
 | 4 | `CAP-CAT-MAT-01-LIST` | `docs/user-manual/images/materiales/01-listado-inventario.png` | `CU-CAT-01`, `CU-CAT-06`, `CU-CAT-07` |
-| 5 | `CAP-CAT-MAT-02-CREATE` | `docs/user-manual/images/materiales/02-formulario-alta.png` | `CU-CAT-02`, `CU-CAT-27`, `CU-CAT-28` |
+| 5 | `CAP-CAT-MAT-02-CREATE` | `docs/user-manual/images/materiales/02-formulario-alta.png` | `CU-CAT-02` |
 | 6 | `CAP-CAT-MAT-03-EDIT` | `docs/user-manual/images/materiales/03-formulario-edicion.png` | `CU-CAT-03`, `CU-CAT-04` |
-| 7 | `CAP-CAT-MAT-04-STOCK` | `docs/user-manual/images/materiales/04-ajuste-existencia.png` | `CU-CAT-05`, `CU-CAT-29` |
+| 7 | `CAP-CAT-MAT-04-STOCK` | `docs/user-manual/images/materiales/04-ajuste-existencia.png` | `CU-CAT-05` |
 | 8 | `CAP-REP-MAT-05-EXPORT` | `docs/user-manual/images/materiales/05-exportar-reporte.png` | `CU-CAT-07` |
 | 9 | `CAP-CAT-SUP-00-NAVIGATION` | `docs/user-manual/images/proveedores/00-acceso-menu-principal.png` | `CU-CAT-10` |
 | 10 | `CAP-CAT-SUP-01-LIST` | `docs/user-manual/images/proveedores/01-listado.png` | `CU-CAT-10`, `CU-CAT-14` |
@@ -51,24 +51,24 @@ comprobar el inventario sin iniciar Nexus ni Playwright se ejecuta
 | 22 | `CAP-CAT-WAS-03-EDIT` | `docs/user-manual/images/mermas/03-formulario-edicion.png` | `CU-CAT-21` |
 | 23 | `CAP-CAT-WAS-04-STOCK` | `docs/user-manual/images/mermas/04-ajuste-existencia.png` | `CU-CAT-22` |
 | 24 | `CAP-REP-WAS-05-EXPORT` | `docs/user-manual/images/mermas/05-exportar-reporte.png` | `CU-CAT-24` |
-| 25 | `CAP-CAT-AREA-01-LIST` | `docs/user-manual/images/catalogos/areas/01-listado.png` | `CU-CAT-31` |
-| 26 | `CAP-CAT-AREA-02-CREATE` | `docs/user-manual/images/catalogos/areas/02-formulario-alta.png` | `CU-CAT-32` |
-| 27 | `CAP-CAT-AREA-03-EDIT` | `docs/user-manual/images/catalogos/areas/03-formulario-edicion.png` | `CU-CAT-33` |
-| 28 | `CAP-CAT-ROLE-01-LIST` | `docs/user-manual/images/catalogos/roles/01-listado.png` | `CU-CAT-34` |
-| 29 | `CAP-CAT-ROLE-02-CREATE` | `docs/user-manual/images/catalogos/roles/02-formulario-alta.png` | `CU-CAT-35` |
-| 30 | `CAP-CAT-ROLE-03-EDIT` | `docs/user-manual/images/catalogos/roles/03-formulario-edicion.png` | `CU-CAT-36` |
-| 31 | `CAP-CAT-PRE-01-LIST` | `docs/user-manual/images/catalogos/presentaciones/01-listado.png` | `CU-CAT-37` |
-| 32 | `CAP-CAT-PRE-02-CREATE` | `docs/user-manual/images/catalogos/presentaciones/02-formulario-alta.png` | `CU-CAT-38` |
-| 33 | `CAP-CAT-PRE-03-EDIT` | `docs/user-manual/images/catalogos/presentaciones/03-formulario-edicion.png` | `CU-CAT-39` |
-| 34 | `CAP-CAT-UNIT-01-LIST` | `docs/user-manual/images/catalogos/unidades-medida/01-listado.png` | `CU-CAT-40` |
-| 35 | `CAP-CAT-UNIT-02-CREATE` | `docs/user-manual/images/catalogos/unidades-medida/02-formulario-alta.png` | `CU-CAT-41` |
-| 36 | `CAP-CAT-UNIT-03-EDIT` | `docs/user-manual/images/catalogos/unidades-medida/03-formulario-edicion.png` | `CU-CAT-42` |
-| 37 | `CAP-CAT-REASON-01-LIST` | `docs/user-manual/images/catalogos/motivos-ajuste/01-listado.png` | `CU-CAT-43` |
-| 38 | `CAP-CAT-REASON-02-CREATE` | `docs/user-manual/images/catalogos/motivos-ajuste/02-formulario-alta.png` | `CU-CAT-44` |
-| 39 | `CAP-CAT-REASON-03-EDIT` | `docs/user-manual/images/catalogos/motivos-ajuste/03-formulario-edicion.png` | `CU-CAT-45` |
-| 40 | `CAP-CAT-STATUS-01-LIST` | `docs/user-manual/images/catalogos/estados-cumplimiento/01-listado.png` | `CU-CAT-46` |
-| 41 | `CAP-CAT-STATUS-02-CREATE` | `docs/user-manual/images/catalogos/estados-cumplimiento/02-formulario-alta.png` | `CU-CAT-47` |
-| 42 | `CAP-CAT-STATUS-03-EDIT` | `docs/user-manual/images/catalogos/estados-cumplimiento/03-formulario-edicion.png` | `CU-CAT-48` |
+| 25 | `CAP-CAT-AREA-01-LIST` | `docs/user-manual/images/catalogos/areas/01-listado.png` | `CU-CAT-27` |
+| 26 | `CAP-CAT-AREA-02-CREATE` | `docs/user-manual/images/catalogos/areas/02-formulario-alta.png` | `CU-CAT-28` |
+| 27 | `CAP-CAT-AREA-03-EDIT` | `docs/user-manual/images/catalogos/areas/03-formulario-edicion.png` | `CU-CAT-29` |
+| 28 | `CAP-CAT-ROLE-01-LIST` | `docs/user-manual/images/catalogos/roles/01-listado.png` | `CU-CAT-30` |
+| 29 | `CAP-CAT-ROLE-02-CREATE` | `docs/user-manual/images/catalogos/roles/02-formulario-alta.png` | `CU-CAT-31` |
+| 30 | `CAP-CAT-ROLE-03-EDIT` | `docs/user-manual/images/catalogos/roles/03-formulario-edicion.png` | `CU-CAT-32` |
+| 31 | `CAP-CAT-PRE-01-LIST` | `docs/user-manual/images/catalogos/presentaciones/01-listado.png` | `CU-CAT-33` |
+| 32 | `CAP-CAT-PRE-02-CREATE` | `docs/user-manual/images/catalogos/presentaciones/02-formulario-alta.png` | `CU-CAT-34` |
+| 33 | `CAP-CAT-PRE-03-EDIT` | `docs/user-manual/images/catalogos/presentaciones/03-formulario-edicion.png` | `CU-CAT-35` |
+| 34 | `CAP-CAT-UNIT-01-LIST` | `docs/user-manual/images/catalogos/unidades-medida/01-listado.png` | `CU-CAT-36` |
+| 35 | `CAP-CAT-UNIT-02-CREATE` | `docs/user-manual/images/catalogos/unidades-medida/02-formulario-alta.png` | `CU-CAT-37` |
+| 36 | `CAP-CAT-UNIT-03-EDIT` | `docs/user-manual/images/catalogos/unidades-medida/03-formulario-edicion.png` | `CU-CAT-38` |
+| 37 | `CAP-CAT-REASON-01-LIST` | `docs/user-manual/images/catalogos/motivos-ajuste/01-listado.png` | `CU-CAT-39` |
+| 38 | `CAP-CAT-REASON-02-CREATE` | `docs/user-manual/images/catalogos/motivos-ajuste/02-formulario-alta.png` | `CU-CAT-40` |
+| 39 | `CAP-CAT-REASON-03-EDIT` | `docs/user-manual/images/catalogos/motivos-ajuste/03-formulario-edicion.png` | `CU-CAT-41` |
+| 40 | `CAP-CAT-STATUS-01-LIST` | `docs/user-manual/images/catalogos/estados-cumplimiento/01-listado.png` | `CU-CAT-42` |
+| 41 | `CAP-CAT-STATUS-02-CREATE` | `docs/user-manual/images/catalogos/estados-cumplimiento/02-formulario-alta.png` | `CU-CAT-43` |
+| 42 | `CAP-CAT-STATUS-03-EDIT` | `docs/user-manual/images/catalogos/estados-cumplimiento/03-formulario-edicion.png` | `CU-CAT-44` |
 | 43 | `CAP-ENT-00-NAVIGATION` | `docs/user-manual/images/compras/00-acceso-menu-principal.png` | `CU-ENT-01` |
 | 44 | `CAP-ENT-01-LIST` | `docs/user-manual/images/compras/01-listado.png` | `CU-ENT-01` |
 | 45 | `CAP-ENT-02-CREATE` | `docs/user-manual/images/compras/02-formulario-registro.png` | `CU-ENT-02` |
@@ -77,7 +77,7 @@ comprobar el inventario sin iniciar Nexus ni Playwright se ejecuta
 | 48 | `CAP-REP-ENT-05-EXPORT` | `docs/user-manual/images/compras/05-exportar-reporte.png` | `CU-ENT-06` |
 | 49 | `CAP-ENT-06-VIEW` | `docs/user-manual/images/compras/06-consulta-cancelada.png` | `CU-ENT-03`, `CU-ENT-05` |
 | 50 | `CAP-SAL-MAT-00-NAVIGATION` | `docs/user-manual/images/salidas-material/00-acceso-menu-principal.png` | `CU-SAL-01` |
-| 51 | `CAP-SAL-MAT-01-LIST` | `docs/user-manual/images/salidas-material/01-listado.png` | `CU-CAT-30`, `CU-SAL-01` |
+| 51 | `CAP-SAL-MAT-01-LIST` | `docs/user-manual/images/salidas-material/01-listado.png` | `CU-SAL-01` |
 | 52 | `CAP-SAL-MAT-02-CREATE` | `docs/user-manual/images/salidas-material/02-formulario-registro.png` | `CU-SAL-02` |
 | 53 | `CAP-SAL-MAT-03-EDIT` | `docs/user-manual/images/salidas-material/03-edicion-encabezado.png` | `CU-SAL-03`, `CU-SAL-04` |
 | 54 | `CAP-SAL-MAT-04-SUPPLY` | `docs/user-manual/images/salidas-material/04-surtir-detalles.png` | `CU-SAL-05` |
@@ -96,7 +96,7 @@ comprobar el inventario sin iniciar Nexus ni Playwright se ejecuta
 | 67 | `CAP-SAL-WAS-08-VIEW` | `docs/user-manual/images/salidas-merma/08-consulta-cancelada.png` | `CU-SAL-10`, `CU-SAL-11` |
 | 68 | `CAP-IDA-PER-00-NAVIGATION` | `docs/user-manual/images/personas/00-acceso-menu-principal.png` | `CU-IDA-01` |
 | 69 | `CAP-IDA-PER-01-LIST` | `docs/user-manual/images/personas/01-listado.png` | `CU-IDA-01`, `CU-IDA-04` |
-| 70 | `CAP-IDA-PER-02-CREATE` | `docs/user-manual/images/personas/02-formulario-alta.png` | `CU-IDA-02`, `CU-IDA-10`, `CU-IDA-11` |
+| 70 | `CAP-IDA-PER-02-CREATE` | `docs/user-manual/images/personas/02-formulario-alta.png` | `CU-IDA-02` |
 | 71 | `CAP-IDA-PER-03-EDIT` | `docs/user-manual/images/personas/03-formulario-edicion.png` | `CU-IDA-03` |
 | 72 | `CAP-IDA-PER-04-EXPORT` | `docs/user-manual/images/personas/04-exportar-reporte.png` | `CU-IDA-04` |
 | 73 | `CAP-IDA-USR-00-NAVIGATION` | `docs/user-manual/images/usuarios/00-acceso-menu-principal.png` | `CU-IDA-05` |
@@ -126,7 +126,7 @@ estados necesarios para explicar decisiones y consecuencias del proceso:
   información se descarga;
 - la navegación autenticada general y el acceso específico de cada módulo, que muestran dónde
   seleccionar cada opción y dónde cerrar sesión sin capturar ni publicar credenciales;
-- los catálogos **Roles**, **Áreas**, **Presentaciones**, **Unidades de medida**, **Motivos de ajuste** y **Estados de cumplimiento** dentro de los formularios donde se consumen (`CU-IDA-10`, `CU-IDA-11` y `CU-CAT-27` a `CU-CAT-30`) para documentar la lectura operativa; las capturas `CAP-CAT-AREA-*`, `CAP-CAT-ROLE-*`, `CAP-CAT-PRE-*`, `CAP-CAT-UNIT-*`, `CAP-CAT-REASON-*` y `CAP-CAT-STATUS-*` cubren además listado, alta y edición de cada pantalla administrativa (`CU-CAT-31` a `CU-CAT-48`).
+- los catálogos **Roles**, **Áreas**, **Presentaciones**, **Unidades de medida**, **Motivos de ajuste** y **Estados de cumplimiento** dentro de los formularios donde se consumen para documentar su disponibilidad como apoyo técnico, sin tratarlos como casos de uso; las capturas `CAP-CAT-AREA-*`, `CAP-CAT-ROLE-*`, `CAP-CAT-PRE-*`, `CAP-CAT-UNIT-*`, `CAP-CAT-REASON-*` y `CAP-CAT-STATUS-*` cubren además listado, alta y edición de cada pantalla administrativa (`CU-CAT-27` a `CU-CAT-44`).
 
 Los inventarios de materiales y mermas abren un diálogo específico de alcance: **Activos o con
 existencia**, **Sólo activos** o **Sólo con existencia**. Se documentan mediante

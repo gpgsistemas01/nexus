@@ -36,5 +36,3 @@ sequenceDiagram
     Controller->>Socket: publicar después del commit
     Controller-->>Client: 200 merma actualizada
 ```
-
-<a id="cu-cat-27"></a>

@@ -1,7 +1,8 @@
-# `CU-CAT-34` — Consultar rol
+# `CU-CAT-34` — Crear presentación
 
 ```mermaid
 flowchart LR
-    request["Administrador solicita consultar Roles"] --> authorize["Nexus valida catalogs:manage y roles"]
-    authorize --> result["Mostrar exclusivamente la tabla de Roles"]
+    request["Administrador selecciona Nueva presentación<br/>y confirma Guardar"] --> authorize["Nexus valida catalogs:manage y presentations"]
+    authorize --> persist["Validar campos y crear presentación"]
+    persist --> result["Confirmar y refrescar Presentaciones"]
 ```

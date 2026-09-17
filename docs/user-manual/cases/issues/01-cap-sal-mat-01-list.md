@@ -1,7 +1,7 @@
 <a id="CAP-SAL-MAT-01-LIST"></a>
 # 1. CAP-SAL-MAT-01-LIST — Listado
 
-**Casos de uso:** `CU-CAT-30` — Consultar estados de cumplimiento; `CU-SAL-01` — Consultar salidas de material.
+**Casos de uso:** `CU-SAL-01` — Consultar salidas de material.
 
 **Errores posibles:** [Salidas de material](../../error-messages.md#errores-salidas-material).
 

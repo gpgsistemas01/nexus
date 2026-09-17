@@ -70,16 +70,10 @@ flowchart LR
             ucPasswordEdit(["CU-IDA-08 Cambiar contraseña de usuario"])
             ucUserReport(["CU-IDA-09 Generar reporte de usuarios"])
         end
-        subgraph accessCatalogFamily["Catálogos de acceso"]
-            ucRoleQuery(["CU-IDA-10 Consultar roles"])
-            ucDepartmentQuery(["CU-IDA-11 Consultar departamentos"])
-        end
     end
 
     admin --- ucPersonQuery
     admin --- ucUserQuery
-    admin --- ucRoleQuery
-    admin --- ucDepartmentQuery
     ucPersonQuery --- ucPersonCreate
     ucPersonQuery --- ucPersonEdit
     ucPersonQuery --- ucPersonReport
@@ -133,69 +127,61 @@ flowchart LR
             ucWasteMovementReport(["CU-CAT-26 Generar reporte de movimientos de mermas"])
         end
         subgraph auxiliaryCatalogFamily["Catálogos auxiliares"]
-            ucPresentationQuery(["CU-CAT-27 Consultar presentaciones"])
-            ucUnitQuery(["CU-CAT-28 Consultar unidades de medida"])
-            ucAdjustmentReasonQuery(["CU-CAT-29 Consultar motivos de ajuste"])
-            ucFulfillmentStatusQuery(["CU-CAT-30 Consultar estados de cumplimiento"])
-            ucCatalog21(["CU-CAT-31 Consultar área"])
-            ucCatalog22(["CU-CAT-32 Crear área"])
-            ucCatalog23(["CU-CAT-33 Editar área"])
-            ucCatalog24(["CU-CAT-34 Consultar rol"])
-            ucCatalog25(["CU-CAT-35 Crear rol"])
-            ucCatalog26(["CU-CAT-36 Editar rol"])
-            ucCatalog27(["CU-CAT-37 Consultar presentación"])
-            ucCatalog28(["CU-CAT-38 Crear presentación"])
-            ucCatalog29(["CU-CAT-39 Editar presentación"])
-            ucCatalog30(["CU-CAT-40 Consultar unidad de medida"])
-            ucCatalog31(["CU-CAT-41 Crear unidad de medida"])
-            ucCatalog32(["CU-CAT-42 Editar unidad de medida"])
-            ucCatalog33(["CU-CAT-43 Consultar motivo de ajuste"])
-            ucCatalog34(["CU-CAT-44 Crear motivo de ajuste"])
-            ucCatalog35(["CU-CAT-45 Editar motivo de ajuste"])
-            ucCatalog36(["CU-CAT-46 Consultar estado de cumplimiento"])
-            ucCatalog37(["CU-CAT-47 Crear estado de cumplimiento"])
-            ucCatalog38(["CU-CAT-48 Editar estado de cumplimiento"])
+            ucCatalog21(["CU-CAT-27 Consultar área"])
+            ucCatalog22(["CU-CAT-28 Crear área"])
+            ucCatalog23(["CU-CAT-29 Editar área"])
+            ucCatalog24(["CU-CAT-30 Consultar rol"])
+            ucCatalog25(["CU-CAT-31 Crear rol"])
+            ucCatalog26(["CU-CAT-32 Editar rol"])
+            ucCatalog27(["CU-CAT-33 Consultar presentación"])
+            ucCatalog28(["CU-CAT-34 Crear presentación"])
+            ucCatalog29(["CU-CAT-35 Editar presentación"])
+            ucCatalog30(["CU-CAT-36 Consultar unidad de medida"])
+            ucCatalog31(["CU-CAT-37 Crear unidad de medida"])
+            ucCatalog32(["CU-CAT-38 Editar unidad de medida"])
+            ucCatalog33(["CU-CAT-39 Consultar motivo de ajuste"])
+            ucCatalog34(["CU-CAT-40 Crear motivo de ajuste"])
+            ucCatalog35(["CU-CAT-41 Editar motivo de ajuste"])
+            ucCatalog36(["CU-CAT-42 Consultar estado de cumplimiento"])
+            ucCatalog37(["CU-CAT-43 Crear estado de cumplimiento"])
+            ucCatalog38(["CU-CAT-44 Editar estado de cumplimiento"])
         end
     end
 
     warehouse --- ucMaterialQuery
+    warehouse --- ucMaterialCreate
+    warehouse --- ucMaterialEdit
+    warehouse --- ucMaterialRemove
     warehouse --- ucSupplierQuery
+    warehouse --- ucSupplierCreate
+    warehouse --- ucClientQuery
+    warehouse --- ucClientCreate
     warehouse --- ucWasteQuery
-    warehouse --- ucPresentationQuery
-    warehouse --- ucUnitQuery
-    warehouse --- ucAdjustmentReasonQuery
-    warehouse --- ucFulfillmentStatusQuery
+    warehouse --- ucWasteCreate
+    warehouse --- ucWasteEdit
     warehouse --- ucMaterialInventory
+    warehouse --- ucMaterialInventoryReport
     warehouse --- ucMaterialMovements
+    warehouse --- ucMaterialMovementReport
     warehouse --- ucWasteInventory
+    warehouse --- ucWasteReport
     warehouse --- ucWasteMovements
+    warehouse --- ucWasteMovementReport
     admin -- "generaliza" --> warehouse
-    admin --- ucClientQuery
     admin --- ucMaterialStock
     admin --- ucWasteStock
+    admin --- ucSupplierEdit
+    admin --- ucSupplierStatus
+    admin --- ucSupplierReport
+    admin --- ucClientEdit
+    admin --- ucClientReport
     admin --- ucCatalog21
     admin --- ucCatalog24
     admin --- ucCatalog27
     admin --- ucCatalog30
     admin --- ucCatalog33
     admin --- ucCatalog36
-    ucMaterialQuery --- ucMaterialCreate
-    ucMaterialQuery --- ucMaterialEdit
-    ucMaterialQuery --- ucMaterialRemove
-    ucMaterialInventory --- ucMaterialInventoryReport
-    ucMaterialMovements --- ucMaterialMovementReport
     ucMaterialStock -. "«extend»" .-> ucMaterialQuery
-    ucSupplierQuery --- ucSupplierCreate
-    ucSupplierQuery --- ucSupplierEdit
-    ucSupplierQuery --- ucSupplierStatus
-    ucSupplierQuery --- ucSupplierReport
-    ucClientQuery --- ucClientCreate
-    ucClientQuery --- ucClientEdit
-    ucClientQuery --- ucClientReport
-    ucWasteQuery --- ucWasteCreate
-    ucWasteQuery --- ucWasteEdit
-    ucWasteInventory --- ucWasteReport
-    ucWasteMovements --- ucWasteMovementReport
     ucWasteStock -. "«extend»" .-> ucWasteQuery
     ucCatalog21 --- ucCatalog22
     ucCatalog21 --- ucCatalog23
@@ -215,7 +201,19 @@ Los ajustes se muestran como extensiones porque el administrador los abre como u
 acción opcional desde la consulta de materiales o mermas; consultar el inventario no
 obliga a ejecutar un ajuste. La asociación exclusiva con el administrador refleja los
 permisos `materials:adjust-stock` y `wastes:adjust-stock`. El personal de almacén puede
-consultar ambos listados, pero no hereda esas dos asociaciones restringidas. La administración de **Áreas**, **Roles**, **Presentaciones**, **Unidades de medida**, **Motivos de ajuste** y **Estados de cumplimiento** también se asocia directamente con el administrador: no se hereda hacia Almacén y exige `catalogs:manage` en cada vista y solicitud API.
+consultar ambos listados, pero no hereda esas dos asociaciones restringidas. Del mismo
+modo, las rutas API permiten al personal de Almacén consultar y crear proveedores y
+clientes, mientras que la edición de proveedores, el cambio de su estado, la edición de
+clientes y los reportes respectivos quedan asociados al administrador por sus permisos
+más restrictivos.
+
+La administración de **Áreas**, **Roles**, **Presentaciones**, **Unidades de medida**,
+**Motivos de ajuste** y **Estados de cumplimiento** se asocia directamente con el
+administrador: no se hereda hacia Almacén y exige `catalogs:manage` en cada vista y
+solicitud API. Las consultas operativas de roles, áreas, presentaciones, unidades de
+medida, motivos de ajuste y estados de cumplimiento alimentan controles de selección
+dentro de otros flujos. Se conservan como soporte técnico autorizado de esos casos, pero
+no reciben identificador ni se representan como objetivos independientes del actor.
 
 ### Grupo funcional ENT — Compras de material
 
@@ -327,8 +325,9 @@ extensión entre casos de uso.
 Los actores vigentes son **Personal de almacén** del área Almacén y proveduría y
 **Administrador del sistema** del área Sistemas. El Administrador del sistema se muestra
 como especialización en los grupos operativos donde su acceso heredado debe distinguirse
-del correspondiente al Personal de almacén; en `CAT` conserva además la asociación
-directa con clientes. En `AUT`, **Usuario registrado** representa a ambos porque no varían
+del correspondiente al Personal de almacén; en `CAT` conserva además asociaciones
+directas con las operaciones restringidas de proveedores, clientes, ajustes y catálogos
+auxiliares. En `AUT`, **Usuario registrado** representa a ambos porque no varían
 los casos de inicio y cierre de sesión. Esta generalización expresa disponibilidad
 funcional, no omite las comprobaciones de permiso del servidor. Solicitantes,
 aprobadores, asesores y proveedores participan como roles o entidades del negocio, pero
@@ -343,11 +342,13 @@ flujo específico en
 No se usa «administrar» o «mantener» como objetivo: cada óvalo expresa una operación
 observable.
 
-Dentro de cada grupo, la lectura se organiza por recurso: desde su consulta se trazan
-asociaciones simples, sin etiqueta, hacia las operaciones CRUD y específicas que le
-corresponden. Sólo las relaciones con semántica `«include»` o `«extend»` deben indicarla
-explícitamente. Corregir, cancelar, ajustar, cambiar estado, surtir o devolver permanecen
-junto al recurso que modifican y reciben la secuencia correspondiente a esa posición.
+Dentro de cada grupo, la lectura se organiza por recurso. En `CAT`, las asociaciones
+directas entre actor y objetivo hacen explícita la diferencia de acceso comprobada por
+las rutas API; en los demás grupos, desde la consulta se trazan asociaciones simples,
+sin etiqueta, hacia las operaciones CRUD y específicas que le corresponden. Sólo las
+relaciones con semántica `«include»` o `«extend»` deben indicarla explícitamente.
+Corregir, cancelar, ajustar, cambiar estado, surtir o devolver permanecen junto al
+recurso que modifican y reciben la secuencia correspondiente a esa posición.
 Cuando el orden cambia, catálogo, fichas, diagramas y referencias técnicas se renumeran
 en conjunto para conservar la trazabilidad. Una asociación simple no implica inclusión,
 extensión ni dependencia de ejecución; una relación `«include»` o `«extend»` sólo existe
