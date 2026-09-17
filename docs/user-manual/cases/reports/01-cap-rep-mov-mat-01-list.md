@@ -1,5 +1,5 @@
 <a id="CAP-REP-MOV-MAT-01-LIST"></a>
-# CAP-REP-MOV-MAT-01-LIST — Historial y filtros
+# 1. CAP-REP-MOV-MAT-01-LIST — Historial y filtros
 
 **Casos de uso:** `CU-CAT-08` — Consultar movimientos de materiales.
 

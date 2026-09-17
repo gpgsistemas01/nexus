@@ -1,5 +1,5 @@
 <a id="CAP-CAT-MAT-01-LIST"></a>
-# CAP-CAT-MAT-01-LIST — Listado inventario
+# 2. CAP-CAT-MAT-01-LIST — Listado inventario
 
 **Casos de uso:** `CU-AUT-02` — Cerrar sesión; `CU-CAT-01` — Consultar materiales; `CU-CAT-06` — Consultar inventario de materiales; `CU-CAT-07` — Generar reporte de inventario de materiales.
 

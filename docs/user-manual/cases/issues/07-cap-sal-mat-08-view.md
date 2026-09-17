@@ -1,5 +1,5 @@
 <a id="CAP-SAL-MAT-08-VIEW"></a>
-# CAP-SAL-MAT-08-VIEW — Consultar salida cancelada
+# 7. CAP-SAL-MAT-08-VIEW — Consultar salida cancelada
 
 **Caso de uso:** `CU-SAL-01` — Consultar salidas de material.
 

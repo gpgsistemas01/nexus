@@ -1,5 +1,5 @@
 <a id="CAP-SAL-WAS-01-LIST"></a>
-# CAP-SAL-WAS-01-LIST — Listado
+# 8. CAP-SAL-WAS-01-LIST — Listado
 
 **Casos de uso:** `CU-SAL-08` — Consultar salidas de merma; `CU-SAL-14` — Generar reporte de salidas de merma.
 

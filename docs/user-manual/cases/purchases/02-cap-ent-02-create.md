@@ -1,5 +1,5 @@
 <a id="CAP-ENT-02-CREATE"></a>
-# CAP-ENT-02-CREATE — Formulario registro
+# 2. CAP-ENT-02-CREATE — Formulario registro
 
 **Casos de uso:** `CU-ENT-02` — Crear compra de material.
 

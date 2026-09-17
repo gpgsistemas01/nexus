@@ -1,5 +1,5 @@
 <a id="CAP-SAL-WAS-04-SUPPLY"></a>
-# CAP-SAL-WAS-04-SUPPLY — Surtir detalles
+# 11. CAP-SAL-WAS-04-SUPPLY — Surtir detalles
 
 **Casos de uso:** `CU-SAL-12` — Surtir merma.
 

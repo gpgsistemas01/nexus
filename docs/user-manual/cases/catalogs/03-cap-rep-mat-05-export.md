@@ -1,4 +1,4 @@
-# CAP-REP-MAT-05-EXPORT — Exportar inventario
+# 3. CAP-REP-MAT-05-EXPORT — Exportar inventario
 
 **Casos de uso:** `CU-CAT-07` — Generar reporte de inventario de materiales.
 

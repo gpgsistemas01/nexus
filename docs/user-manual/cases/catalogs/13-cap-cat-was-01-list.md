@@ -1,5 +1,5 @@
 <a id="CAP-CAT-WAS-01-LIST"></a>
-# CAP-CAT-WAS-01-LIST — Listado inventario
+# 13. CAP-CAT-WAS-01-LIST — Listado inventario
 
 **Casos de uso:** `CU-CAT-19` — Consultar mermas; `CU-CAT-23` — Consultar inventario de mermas; `CU-CAT-24` — Generar reporte de mermas.
 

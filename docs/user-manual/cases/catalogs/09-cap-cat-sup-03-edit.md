@@ -1,5 +1,5 @@
 <a id="CAP-CAT-SUP-03-EDIT"></a>
-# CAP-CAT-SUP-03-EDIT — Formulario edición y estado
+# 9. CAP-CAT-SUP-03-EDIT — Formulario edición y estado
 
 **Casos de uso:** `CU-CAT-12` — Editar proveedor; `CU-CAT-13` — Cambiar estado de proveedor.
 

@@ -1,5 +1,5 @@
 <a id="CAP-IDA-PER-01-LIST"></a>
-# CAP-IDA-PER-01-LIST — Listado
+# 1. CAP-IDA-PER-01-LIST — Listado
 
 **Casos de uso:** `CU-IDA-01` — Consultar personas; `CU-IDA-04` — Generar reporte de personas.
 

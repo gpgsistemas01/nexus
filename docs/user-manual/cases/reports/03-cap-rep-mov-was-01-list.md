@@ -1,5 +1,5 @@
 <a id="CAP-REP-MOV-WAS-01-LIST"></a>
-# CAP-REP-MOV-WAS-01-LIST — Historial y filtros
+# 3. CAP-REP-MOV-WAS-01-LIST — Historial y filtros
 
 **Casos de uso:** `CU-CAT-25` — Consultar movimientos de mermas.
 

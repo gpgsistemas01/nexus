@@ -1,5 +1,5 @@
 <a id="CAP-ENT-06-VIEW"></a>
-# CAP-ENT-06-VIEW — Consultar compra cancelada
+# 6. CAP-ENT-06-VIEW — Consultar compra cancelada
 
 **Caso de uso:** `CU-ENT-01` — Consultar compras de material.
 

@@ -1,5 +1,5 @@
 <a id="CAP-IDA-USR-03-EDIT"></a>
-# CAP-IDA-USR-03-EDIT — Formulario edicion
+# 6. CAP-IDA-USR-03-EDIT — Formulario edicion
 
 **Casos de uso:** `CU-IDA-07` — Editar usuario y acceso.
 

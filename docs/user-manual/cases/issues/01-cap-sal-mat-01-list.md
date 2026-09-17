@@ -1,5 +1,5 @@
 <a id="CAP-SAL-MAT-01-LIST"></a>
-# CAP-SAL-MAT-01-LIST — Listado
+# 1. CAP-SAL-MAT-01-LIST — Listado
 
 **Casos de uso:** `CU-CAT-30` — Consultar estados de cumplimiento; `CU-SAL-01` — Consultar salidas de material.
 
