@@ -20,9 +20,11 @@ npm run docs:export -- manual-administrador docx
 Sustituya `manual-administrador` por `manual-almacen` y `docx` por `pdf` cuando corresponda. Si falta una
 imagen, `--check` detiene el proceso; en ese caso ejecute primero el flujo independiente siguiente.
 
-El resultado se organiza primero por actor y después por conjunto funcional. Por ejemplo, el comando
-del administrador escribe `build/docs/docx/administrador/acceso.docx`,
-`identidad-y-acceso.docx`, `catalogos.docx` y `reportes.docx`; el de almacén escribe dentro de
-`build/docs/docx/almacen/` los archivos de acceso, catálogos, compras de material, salidas de
-material, salidas de merma y reportes. Cada archivo conserva la portada del actor y únicamente los
-recorridos que corresponden a ese conjunto.
+El resultado se organiza primero por actor y después con los mismos grupos funcionales de los casos
+de uso. Por ejemplo, el comando del administrador escribe
+`build/docs/docx/administrador/autenticacion.docx`, `identidad-y-acceso.docx` y `catalogos.docx`;
+el de almacén escribe `autenticacion.docx`, `catalogos.docx`, `compras-de-material.docx` y
+`salidas-de-material-y-merma.docx` dentro de `build/docs/docx/almacen/`. Las capturas de consultas y
+exportaciones quedan en el grupo `CU-*` que respaldan, en vez de crear grupos distintos por pantalla
+o un archivo genérico de reportes.
+Cada archivo conserva la portada del actor y únicamente los recorridos que corresponden a ese grupo.

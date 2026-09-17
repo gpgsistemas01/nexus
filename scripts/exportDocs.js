@@ -58,26 +58,32 @@ const manualPart = (actor, cases) => [
     manualValidationMatrix,
     manualErrorCatalog
 ];
-const issueCases = manualCases.issues;
+const manualCaseFiles = (group, names) => names.map((name) => (
+    `docs/user-manual/cases/${group}/${name}`
+));
+const administrator = 'docs/user-manual/actors/administrator.md';
+const warehouse = 'docs/user-manual/actors/warehouse.md';
 const MANUALS = Object.freeze({
     'manual-administrador': {
         directory: 'administrador',
         parts: {
-            acceso: manualPart('docs/user-manual/actors/administrator.md', manualCases.authentication),
-            'identidad-y-acceso': manualPart('docs/user-manual/actors/administrator.md', manualCases['identity-access']),
-            catalogos: manualPart('docs/user-manual/actors/administrator.md', manualCases.catalogs.slice(0, 1)),
-            reportes: manualPart('docs/user-manual/actors/administrator.md', manualCases.reports)
+            autenticacion: manualPart(administrator, manualCases.authentication),
+            'identidad-y-acceso': manualPart(administrator, manualCases['identity-access']),
+            catalogos: manualPart(administrator, manualCaseFiles('catalogs', [
+                '01-catalogos-auxiliares.md'
+            ]))
         }
     },
     'manual-almacen': {
         directory: 'almacen',
         parts: {
-            acceso: manualPart('docs/user-manual/actors/warehouse.md', manualCases.authentication),
-            catalogos: manualPart('docs/user-manual/actors/warehouse.md', manualCases.catalogs.slice(1)),
-            'compras-de-material': manualPart('docs/user-manual/actors/warehouse.md', manualCases.purchases),
-            'salidas-de-material': manualPart('docs/user-manual/actors/warehouse.md', issueCases.slice(0, 7)),
-            'salidas-de-merma': manualPart('docs/user-manual/actors/warehouse.md', issueCases.slice(7)),
-            reportes: manualPart('docs/user-manual/actors/warehouse.md', manualCases.reports)
+            autenticacion: manualPart(warehouse, manualCases.authentication),
+            catalogos: manualPart(warehouse, [
+                ...manualCases.catalogs.slice(1),
+                ...manualCases.reports
+            ]),
+            'compras-de-material': manualPart(warehouse, manualCases.purchases),
+            'salidas-de-material-y-merma': manualPart(warehouse, manualCases.issues)
         }
     }
 });
