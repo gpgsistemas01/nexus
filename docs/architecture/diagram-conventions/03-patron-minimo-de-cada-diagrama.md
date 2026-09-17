@@ -12,7 +12,7 @@ pregunta. Si se necesita uno nuevo, debe quedar claro —en el título o texto i
    aplicable.
 
 Todo diagrama curado tiene un identificador estable registrado en el
-[inventario de diagramas](../diagram-inventory.md). Los diagramas de un caso de uso usan
+[inventario de diagramas](../diagram-inventory/index.md). Los diagramas de un caso de uso usan
 `DIA-REQ-CU-<identificador CU>`; las demás vistas usan
 `DIA-<familia>-<tipo>-<número>`. El título indica su semántica (contexto, contenedores,
 componentes, secuencia, actividad, estados, ER, navegación o flujo), porque `flowchart`

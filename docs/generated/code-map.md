@@ -144,7 +144,7 @@ flowchart LR
 Este inventario enumera los nombres públicos declarados por los módulos bajo
 `src/controllers`. Permite localizar el adaptador HTTP o web sin inferir su propósito
 desde el nombre. La responsabilidad, entrada, salida y servicio coordinado se explican
-en la [documentación técnica del backend](../architecture/backend-technical-documentation.md)
+en la [documentación técnica del backend](../architecture/backend-technical-documentation/index.md)
 cuando el flujo necesita una vista curada.
 
 | Módulo | Símbolos exportados |

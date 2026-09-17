@@ -161,7 +161,7 @@ detallan en el [ambiente, estrategia y catálogo unitario](unit-test-catalog.md)
 Además del código, esta tabla registra **cómo** se aplica el nivel unitario. La fuente
 ejecutable continúa en `tests/unit`; la tabla explica intención, aislamiento y evidencia
 sin copiar cada `it`. La trazabilidad funcional se mantiene en la
-[matriz técnica](../architecture/traceability-matrix.md).
+[matriz técnica](../architecture/traceability-matrix/index.md).
 
 | Unidad / ubicación | Técnica aplicada | Resultado que se observa | Ejemplos vigentes |
 | --- | --- | --- | --- |

@@ -1,26 +1,24 @@
-# Contrato de la API
+# 1. Cómo documentar una ruta API
 
 Este documento es propietario del contrato HTTP y no de las reglas de negocio ni del
 esquema persistente. La relación con requisitos, diseño y evidencia se consulta en el
-[mapa de datos, persistencia y acceso](../data/index.md).
-
-## Cómo documentar una ruta API
+[mapa de datos, persistencia y acceso](../../data/index.md).
 
 La documentación de una ruta combina información de varias capas, pero conserva una
-sola ficha contractual en esta familia. El [mapa generado](../generated/code-map.md)
+sola ficha contractual en esta familia. El [mapa generado](../../generated/code-map.md)
 mantiene el inventario de métodos, URLs y archivos; una ficha se agrega aquí sólo cuando
 necesita explicar cómo consumir la operación. La explicación interna de nombres y
 colaboraciones se mantiene en la
-[documentación técnica del código](technical-code-documentation/index.md), sin
+[documentación técnica del código](../technical-code-documentation/index.md), sin
 copiar el contrato HTTP.
 
 ### Alcance y nivel de cobertura
 
 Este artefacto es una referencia curada del comportamiento implementado. La
-[especificación OpenAPI 3.1](openapi/openapi.json) complementaria describe de forma procesable
+[especificación OpenAPI 3.1](../openapi/openapi.json) complementaria describe de forma procesable
 los esquemas de solicitud y respuesta de todas las operaciones registradas; no es un
 mecanismo de validación en tiempo de ejecución.
-El [mapa generado](../generated/code-map.md) es el inventario exhaustivo de
+El [mapa generado](../../generated/code-map.md) es el inventario exhaustivo de
 métodos y rutas registradas. Este documento añade las reglas transversales y las fichas
 que necesitan contexto; por tanto, que una ruta
 aparezca sólo en el mapa no significa que tenga documentados aquí todos sus parámetros,
@@ -36,7 +34,7 @@ Express. [ISO/IEC/IEEE 1016:2009](https://www.iso.org/standard/45144.html) puede
 la descripción de interfaces dentro del diseño, pero **OpenAPI 3.1** es la referencia
 procesable prevista para métodos, parámetros, cuerpos, respuestas y seguridad. Esta
 distinción y el alcance adoptado se conservan en las
-[normas documentales](../governance/documentation-standards.md#decisión-para-documentación-técnica-y-rutas-api).
+[normas documentales](../../governance/documentation-standards.md#decisión-para-documentación-técnica-y-rutas-api).
 
 Cada ficha de ruta debe indicar, cuando aplique:
 
@@ -312,112 +310,4 @@ reglas de negocio.
 Los conflictos y errores de dominio concretos de esta operación deben añadirse a la
 ficha cuando estén respaldados por pruebas HTTP. El flujo técnico de una operación
 transaccional más compleja se encuentra en la
-[actividad de surtimiento de materiales](backend-technical-documentation.md#actividad-de-decisión-y-surtimiento-de-materiales).
-
-## Exportación mensual de reportes
-
-Los endpoints de exportación de compras, salidas y movimientos aceptan
-`monthlyReport=true`. En ese modo ignoran los filtros aplicados al listado y consultan
-el mes actual de México de forma predeterminada. El parámetro opcional `reportMonth`,
-con formato `AAAA-MM`, permite consultar un mes calendario específico; un valor
-ausente o inválido conserva el comportamiento seguro del mes actual.
-
-La interfaz conserva **Mes actual** como opción explícita porque es el caso de uso
-principal y evita una selección innecesaria. **Otro mes** habilita un selector mensual
-Flatpickr —con valor contractual `AAAA-MM`— y **Personalizado** reutiliza los filtros
-aplicados al listado; así no se mezclan un periodo calendario completo y un reporte
-filtrado. El selector reutiliza los mismos tokens visuales y estados habilitado, enfocado
-y deshabilitado de los campos de formulario; así el periodo permanece legible dentro
-del modal sin introducir una variante de estilo exclusiva para la exportación.
-
-## Decisión
-
-**Nexus adopta OpenAPI, pero Swagger no sustituye la documentación de arquitectura.**
-La [especificación versionada](openapi/openapi.json) documenta el contrato HTTP —rutas,
-parámetros, payloads, respuestas, errores y autenticación—; Swagger UI sería sólo una
-interfaz opcional para consultar y probar ese contrato.
-
-El contrato OpenAPI publica las 61 operaciones actuales y sus esquemas de entrada y
-salida. `npm run docs:check` compara sus operaciones con el
-[mapa generado](../generated/code-map.md), de modo que una ruta nueva, eliminada o
-renombrada exige actualizar ambos artefactos. La comprobación no infiere la semántica de
-`express-validator`, DTO, controllers y servicios: sus cambios deben reflejarse
-deliberadamente en los componentes afectados del contrato.
-
-### Organización y exportación del contrato procesable
-
-Las fuentes se dividen por responsabilidad bajo `docs/architecture/openapi/`:
-
-- `openapi.json` es el punto de entrada y conserva metadatos, seguridad y referencias;
-- `paths/auth.json`, `paths/admin.json`, `paths/sales.json` y `paths/warehouse.json`
-  agrupan las operaciones conforme a los routers existentes;
-- `components/common-schemas.json` contiene los contratos transversales y los archivos
-  `*-schemas.json` de autenticación, administración, ventas y almacén conservan los
-  contratos reutilizables de entrada y salida de cada dominio;
-- `components/responses.json` concentra las respuestas transversales.
-
-Esta división reduce conflictos de edición, permite revisar cada dominio por separado y
-mantiene juntos los esquemas compartidos. No se divide según si una ruta devuelve JSON o
-exporta Excel: el tipo de medio se declara en la respuesta de la propia operación.
-
-La fuente modular y el artefacto publicado cumplen propósitos diferentes. Las referencias
-relativas son válidas al consultar `docs/architecture/openapi/openapi.json` dentro del
-repositorio; al exportar `arquitectura` —también mediante `todos`— el flujo las resuelve y
-genera un único contrato autocontenido en `build/docs/openapi/openapi.json`. Ese archivo
-se puede importar directamente en validadores, generadores de clientes y visualizadores
-sin distribuir el árbol de fuentes.
-
-El contrato procesable no se incrusta como miles de líneas dentro del DOCX o PDF. El
-documento humano explica las reglas y el JSON resuelto se entrega por separado para
-herramientas. Tanto `npm run docs:check` como la exportación recorren el mismo punto de
-entrada modular, evitando mantener manualmente una segunda especificación consolidada.
-
-## Mantenimiento incremental
-
-1. Reutilizar componentes de esquema para paginación, errores, identificadores y
-   respuestas comunes. No copiar el mismo payload entre operaciones o dominios.
-2. Validar el contrato con `npm run docs:check` y agregar pruebas de integración
-   relacionadas con el CRUD documentado, siguiendo
-   [la estrategia de pruebas](../testing/service-test-coverage.md).
-3. Publicar Swagger UI sólo como visualizador del contrato. En producción debe quedar
-   deshabilitado o protegido si revela operaciones internas.
-4. Actualizar en una misma modificación la operación, sus componentes reutilizables y
-   las pruebas cuando cambie el contrato HTTP.
-
-## Fuente de verdad actual
-
-El contrato se consulta en este orden:
-
-1. [OpenAPI 3.1](openapi/openapi.json) para parámetros y esquemas de solicitud y respuesta;
-2. [mapa generado](../generated/code-map.md) para el inventario de métodos y rutas;
-3. `src/routes/api/` para middleware, permisos y validadores;
-4. `src/validators/`, `src/dtos/` y controllers para contrastar entradas y respuestas;
-5. pruebas de integración para comportamiento observable y persistencia.
-
-## Precisión de valores decimales
-
-Los payloads de creación y edición aceptan hasta **8 dígitos enteros y 6 decimales**
-para precios, existencias, cantidades y medidas. La API conserva esos seis decimales y
-la persistencia usa `DECIMAL(18,6)`; no debe interpretarse una representación visual de
-dos decimales como el valor contractual almacenado.
-
-El navegador mantiene hasta seis decimales durante captura, cálculos y envío. Las
-tablas, resúmenes y cantidades de sólo lectura reutilizan `formatDecimal` o
-`formatCurrency` para mostrar dos decimales. Por tanto, el redondeo es una decisión de
-presentación y nunca debe aplicarse al payload antes de crear o actualizar un recurso.
-
-## Relaciones de inventario en el cliente web
-
-Los datos de inventario consumidos por los formularios y listados CRUD conservan las
-relaciones `presentation` y `unitMeasure` como objetos. Cuando Select2 las transporta
-en atributos HTML, el cliente debe deserializarlas antes de leer `name`, `symbol` o
-`id`; una cadena con el nombre de la presentación no forma parte de este contrato.
-
-## Presentación de conflictos en el cliente web
-
-Las respuestas HTTP `409` conservan un código de error estable en `code` y una
-descripción legible en `message`. El cliente muestra ambos valores en el modal de
-advertencia: el código identifica el conflicto en el título y el mensaje explica la
-causa en el texto normal. Si la respuesta no incluye `code`, el título usa
-**Conflicto**; si no incluye `message`, el texto reutiliza el mensaje asociado al
-código o el fallback general del manejador de errores.
+[actividad de surtimiento de materiales](../backend-technical-documentation/06-vistas-tecnicas-aplicadas.md#actividad-de-decisión-y-surtimiento-de-materiales).

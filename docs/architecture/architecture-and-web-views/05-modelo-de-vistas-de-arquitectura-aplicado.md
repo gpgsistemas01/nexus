@@ -18,6 +18,6 @@ contexto/contenedores + componentes/capas + una vista dinámica sólo si existe
 coordinación no trivial + ER cuando cambia persistencia + despliegue cuando cambia
 infraestructura**. Frontend y backend comparten el escenario y el contrato API; cada uno
 mantiene únicamente el tramo dinámico de su responsabilidad. El
-[inventario de diagramas](../diagram-inventory.md) permite localizar cada vista y la
-[matriz de trazabilidad](../traceability-matrix.md) recorre requisito, implementación y
+[inventario de diagramas](../diagram-inventory/index.md) permite localizar cada vista y la
+[matriz de trazabilidad](../traceability-matrix/index.md) recorre requisito, implementación y
 prueba.

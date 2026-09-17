@@ -1,19 +1,4 @@
-# Inventario de diagramas
-
-## Criterio de identificación
-
-Este inventario es el catálogo equivalente al inventario de capturas del manual. Cada
-fuente Mermaid tiene un identificador estable y se localiza por documento y encabezado,
-no por número de línea. `DIA-REQ-CU-<CU>` reutiliza el identificador normativo del caso;
-los demás siguen `DIA-<familia>-<tipo>-<número>`. Los rangos de la tabla son inclusivos:
-cada `CU-*` dentro del rango identifica un diagrama individual.
-
-El **tipo semántico** prevalece sobre la directiva Mermaid. Un `flowchart` puede
-representar contexto, actividad, dependencia, navegación o trazabilidad; no se etiqueta
-como “diagrama de flujo” genérico si las flechas tienen otra semántica. El inventario
-registra **276 diagramas vigentes**: 270 curados y 6 generados.
-
-## Catálogo por familia y tipo
+# 2. Catálogo por familia y tipo
 
 | ID o rango | Tipo semántico | Ubicación canónica | Cantidad | Fuente / mantenimiento |
 | --- | --- | --- | ---: | --- |
@@ -37,7 +22,7 @@ registra **276 diagramas vigentes**: 270 curados y 6 generados.
 | `DIA-PAT-DAT-001`, `DIA-PAT-RES-001` | Contrato de detalle y resumen de patrones | `design-and-construction-patterns/` y `diagram-conventions/` | 2 | Patrones confirmados; curado. |
 | `DIA-PAT-EST-001`, `DIA-PAT-FRO-001`, `DIA-PAT-CON-001`, `DIA-PAT-DIN-001`, `DIA-PAT-TST-001` | Estructura, frontera, construcción, dinámica y pruebas de patrones aplicados | `design-and-construction-patterns/04-catalogo-visual-de-patrones-aplicados.md` | 5 | Símbolos y consumidores comprobables; sus códigos se referencian desde cada caso frontend/backend. |
 | `DIA-DOC-FLU-001` | Actividad documental | `technical-code-documentation/index.md#recorrido-para-incorporar-documentación` | 1 | Gobierno técnico; curado. |
-| `DIA-API-SEQ-001` | Secuencia de middleware | `api-contract.md#prefijo-montaje-y-orden-de-middleware` | 1 | Registro Express; curado. |
+| `DIA-API-SEQ-001` | Secuencia de middleware | `api-contract/01-como-documentar-una-ruta-api.md#prefijo-montaje-y-orden-de-middleware` | 1 | Registro Express; curado. |
 | `DIA-GEN-COD-001` | Dependencias generadas | `generated/code-map.md#dependencias-entre-áreas` | 1 | `src`; regenerar. |
 | `DIA-GEN-ER-001..005` | Entidad–relación | Cuatro áreas y relaciones transversales de `generated/database-schema.md` | 5 | Prisma; regenerar. |
 | `DIA-REQ-DOM-001` | Clases de dominio conceptual | `domain-and-use-cases.md#modelo-de-dominio-conceptual` | 1 | Requisitos y glosario; curado. |
@@ -50,17 +35,3 @@ registra **276 diagramas vigentes**: 270 curados y 6 generados.
 | `DIA-REQ-EST-002` | Estados de surtimiento/devolución | `requirements/diagrams/cross-cutting/index.md#estados-de-surtimiento-y-devolución` | 1 | Reglas normativas; curado. |
 | `DIA-REQ-CAL-001` | Requisitos de calidad | `requirements/diagrams/cross-cutting/20-requisitos-de-calidad-y-restricciones.md` | 1 | Requisitos `RC-*`; curado. |
 | `DIA-REQ-TRA-002` | Trazabilidad a evidencia | `requirements/diagrams/cross-cutting/21-trazabilidad-del-requisito-a-la-evidencia.md` | 1 | Requisitos e implementación; curado. |
-
-## Control de completitud y coherencia
-
-El total se obtiene de cada bloque Mermaid de `docs`: arquitectura (178), datos
-(1), generados (5) y requisitos (93). Al agregar, retirar o mover un bloque se actualiza
-su fila, cantidad y enlace en el mismo cambio. Los diagramas generados nunca se editan a
-mano. Los de caso individual conservan el `CU-*`; una vista agrupada enumera los casos a
-los que aplica y no suplanta sus fichas.
-
-Antes de crear otra vista se consulta la matriz de decisión de frontend/backend y las
-convenciones. Una secuencia muestra orden y participantes; una actividad, decisiones;
-una máquina de estados, transiciones persistentes; componentes/containers, estructura;
-ER, relaciones persistentes. Esta separación evita representar el mismo hecho con tipos
-incompatibles.
