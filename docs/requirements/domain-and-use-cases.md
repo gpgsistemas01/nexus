@@ -475,7 +475,7 @@ de estados o como una acción independiente de cancelación.
 ## Vistas de diseño del sistema
 
 El diseño no se duplica en este archivo. Consulta la
-[arquitectura del sistema](../architecture/architecture-and-web-views.md#1-arquitectura-del-sistema)
+[arquitectura del sistema](../architecture/architecture-and-web-views/02-arquitectura-del-sistema.md)
 para contexto, contenedores, despliegue, componentes y secuencia; el
 [mapa generado](../generated/code-map.md) para imports y rutas; y el
 [ER](../generated/database-schema.md) para diseño físico de datos. La vista de despliegue
