@@ -50,11 +50,37 @@ const manualOverview = 'docs/user-manual/overview.md';
 const manualProcedures = 'docs/user-manual/procedures.md';
 const manualErrorCatalog = 'docs/user-manual/error-messages.md';
 const manualValidationMatrix = 'docs/user-manual/form-validation-matrix.md';
-const manualReferences = [
+const manualPart = (actor, cases) => [
+    actor,
+    manualOverview,
+    manualProcedures,
+    ...cases,
     manualValidationMatrix,
-    manualErrorCatalog,
-    'docs/user-manual/screenshot-inventory.md'
+    manualErrorCatalog
 ];
+const issueCases = manualCases.issues;
+const MANUALS = Object.freeze({
+    'manual-administrador': {
+        directory: 'administrador',
+        parts: {
+            acceso: manualPart('docs/user-manual/actors/administrator.md', manualCases.authentication),
+            'identidad-y-acceso': manualPart('docs/user-manual/actors/administrator.md', manualCases['identity-access']),
+            catalogos: manualPart('docs/user-manual/actors/administrator.md', manualCases.catalogs.slice(0, 1)),
+            reportes: manualPart('docs/user-manual/actors/administrator.md', manualCases.reports)
+        }
+    },
+    'manual-almacen': {
+        directory: 'almacen',
+        parts: {
+            acceso: manualPart('docs/user-manual/actors/warehouse.md', manualCases.authentication),
+            catalogos: manualPart('docs/user-manual/actors/warehouse.md', manualCases.catalogs.slice(1)),
+            'compras-de-material': manualPart('docs/user-manual/actors/warehouse.md', manualCases.purchases),
+            'salidas-de-material': manualPart('docs/user-manual/actors/warehouse.md', issueCases.slice(0, 7)),
+            'salidas-de-merma': manualPart('docs/user-manual/actors/warehouse.md', issueCases.slice(7)),
+            reportes: manualPart('docs/user-manual/actors/warehouse.md', manualCases.reports)
+        }
+    }
+});
 const sequenceGroups = [
     'authentication',
     'identity-access',
@@ -68,29 +94,6 @@ const sequenceDocuments = (side) => getCollectionDocuments(
     sequenceGroups
 );
 const MANIFESTS = Object.freeze({
-    'manual-administrador': [
-        'docs/user-manual/actors/administrator.md',
-        manualOverview,
-        manualProcedures,
-        ...manualCases.authentication,
-        ...manualCases['identity-access'],
-        ...manualCases.catalogs,
-        ...manualCases.reports,
-        manualValidationMatrix,
-        manualErrorCatalog
-    ],
-    'manual-almacen': [
-        'docs/user-manual/actors/warehouse.md',
-        manualOverview,
-        manualProcedures,
-        ...manualCases.authentication,
-        ...manualCases.catalogs,
-        ...manualCases.purchases,
-        ...manualCases.issues,
-        ...manualCases.reports,
-        manualValidationMatrix,
-        manualErrorCatalog
-    ],
     requisitos: [
         'docs/requirements/index.md',
         ...getDirectoryDocuments('docs/requirements/vision-scope-and-requirements'),
@@ -139,7 +142,7 @@ const [requestedPublication, requestedFormat] = process.argv.slice(2).filter((ar
 const checkOnly = process.argv.includes('--check');
 const formats = new Set(['docx', 'pdf']);
 let pdfConverter = process.env.DOCS_PDF_CONVERTER;
-const publicationNames = Object.keys(MANIFESTS);
+const publicationNames = [...Object.keys(MANUALS), ...Object.keys(MANIFESTS)];
 const mermaidBlock = /^```mermaid\r?\n([\s\S]*?)^```\r?$/gm;
 const externalLink = /^(?:https?:|mailto:)/;
 const markdownLink = /(?<!!)\[([^\]]+)\]\(([^) ]+)([^)]*)\)/g;
@@ -273,15 +276,24 @@ const insertAfterDocumentData = (content, insertion) => {
     return `${content.slice(0, insertionIndex)}\n\n${insertion}\n${content.slice(insertionIndex).replace(/^\r?\n+/, '')}`;
 };
 
-if ((requestedPublication !== 'todos' && !MANIFESTS[requestedPublication])
+if ((requestedPublication !== 'todos' && !MANIFESTS[requestedPublication] && !MANUALS[requestedPublication])
     || (checkOnly ? requestedFormat && !formats.has(requestedFormat) : !formats.has(requestedFormat))) {
     console.error('Uso: npm run docs:export -- <todos|manual-administrador|manual-almacen|requisitos|datos|arquitectura|pruebas> [docx|pdf] [--check]');
     process.exit(1);
 }
 
 const requestedPublications = requestedPublication === 'todos' ? publicationNames : [requestedPublication];
-const publications = await Promise.all(requestedPublications.map(async (publication) => {
-    const sources = MANIFESTS[publication];
+const publicationParts = requestedPublications.flatMap((publication) => {
+    const manual = MANUALS[publication];
+    if (!manual) return [{ publication, document: publication, sources: MANIFESTS[publication] }];
+    return Object.entries(manual.parts).map(([document, sources]) => ({
+        publication,
+        document,
+        directory: manual.directory,
+        sources
+    }));
+});
+const publications = await Promise.all(publicationParts.map(async ({ publication, document, directory, sources }) => {
     await Promise.all(sources.map((source) => access(path.join(ROOT, source))));
     const sourceContents = await Promise.all(sources.map(async (source) => ({
         source,
@@ -340,12 +352,12 @@ const publications = await Promise.all(requestedPublications.map(async (publicat
             throw new Error(`El enlace ${link} de ${source} no corresponde a un título o ancla de ${resolvedTarget}.`);
         }
     }
-    return { publication, sources, imageReferences };
+    return { publication, document, directory, sources, imageReferences };
 }));
 
 if (checkOnly) {
-    for (const { publication, sources, imageReferences } of publications) {
-        console.log(`Paquete ${publication}: ${sources.length} fuentes y ${imageReferences.length} imágenes válidas.`);
+    for (const { publication, document, sources, imageReferences } of publications) {
+        console.log(`Paquete ${publication}/${document}: ${sources.length} fuentes y ${imageReferences.length} imágenes válidas.`);
     }
     process.exit(0);
 }
@@ -428,9 +440,15 @@ const prepareSource = async (source, publicationSources, firstFigureNumber) => {
 
 let failedStatus = 0;
 try {
-    for (const { publication, sources } of publications) {
-        const output = path.join(documentOutputDirectories[requestedFormat], `${publication}.${requestedFormat}`);
-        const docxOutput = path.join(documentOutputDirectories.docx, `${publication}.docx`);
+    for (const { publication, document, directory, sources } of publications) {
+        const relativeOutput = directory ? path.join(directory, `${document}.${requestedFormat}`) : `${document}.${requestedFormat}`;
+        const relativeDocxOutput = directory ? path.join(directory, `${document}.docx`) : `${document}.docx`;
+        const output = path.join(documentOutputDirectories[requestedFormat], relativeOutput);
+        const docxOutput = path.join(documentOutputDirectories.docx, relativeDocxOutput);
+        await Promise.all([
+            mkdir(path.dirname(output), { recursive: true }),
+            mkdir(path.dirname(docxOutput), { recursive: true })
+        ]);
         await rm(output, { force: true });
         if (requestedFormat === 'pdf') await rm(docxOutput, { force: true });
         const preparedSources = [];
@@ -475,7 +493,7 @@ try {
                 '--convert-to',
                 'pdf',
                 '--outdir',
-                documentOutputDirectories.pdf,
+                path.dirname(output),
                 docxOutput
             ], {
                 cwd: ROOT,

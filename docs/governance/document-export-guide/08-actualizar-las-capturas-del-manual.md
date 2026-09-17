@@ -100,13 +100,13 @@ Playwright y Chromium se preparan automáticamente en el mismo entorno antes de 
 
    Si Nexus ya se administra por separado, el comando reutiliza esa instancia y no la detiene.
    `DOCS_CAPTURE_IDS` permite ejecutar sólo las capturas seleccionadas con el mismo flujo. Si una
-   ejecución completa se interrumpe, `DOCS_CAPTURE_FROM=CAP-*` reanuda el inventario desde ese
-   identificador y conserva las imágenes anteriores. Para regenerar automáticamente únicamente los
-   PNG ausentes, use `npm run docs:screenshots -- --missing`. No combine ese argumento con las
-   variables de selección.
+   ejecución se interrumpe, vuelva a ejecutar el mismo comando: detectará la primera captura ausente,
+   informará desde cuál reanuda y conservará las imágenes anteriores. `DOCS_CAPTURE_FROM=CAP-*`
+   permite elegir explícitamente otro punto. Para regenerar automáticamente únicamente los PNG
+   ausentes, use `npm run docs:screenshots -- --missing`. No combine mecanismos de selección.
 
-   No interrumpa el comando: primero elimina `docs/user-manual/images/` y después genera el juego
-   completo.
+   Use `npm run docs:screenshots -- --fresh` sólo cuando necesite eliminar primero
+   `docs/user-manual/images/` y regenerar deliberadamente el juego completo.
 6. Espere el mensaje `Capturas generadas` y a que reaparezca el prompt de la terminal 2. En ese
    momento, el script ya cerró Playwright y Chromium automáticamente y puede usar el siguiente
    comando.

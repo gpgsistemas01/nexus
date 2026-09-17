@@ -1,17 +1,18 @@
 # 4. Comandos
 
-En los comandos, `<paquete>` significa **qué contenido se va a reunir en un solo archivo**. No es
-un paquete de npm. Elija uno de estos valores:
+En los comandos, `<paquete>` significa **qué colección documental se va a generar**. No es
+un paquete de npm. Los manuales producen varios archivos por conjunto funcional; los demás
+paquetes producen un archivo. Elija uno de estos valores:
 
 | Valor de `<paquete>` | Contenido generado | Cuándo usarlo |
 | --- | --- | --- |
-| `manual-administrador` | Acceso, identidad, catálogos y reportes disponibles para Sistemas. | Para personal administrador del sistema. |
-| `manual-almacen` | Acceso, catálogos, compras, salidas y reportes operativos. | Para personal de almacén y proveeduría. |
+| `manual-administrador` | Carpeta `administrador/` con archivos separados de acceso, identidad y acceso, catálogos y reportes. | Para personal administrador del sistema. |
+| `manual-almacen` | Carpeta `almacen/` con archivos separados de acceso, catálogos, compras de material, salidas de material, salidas de merma y reportes. | Para personal de almacén y proveeduría. |
 | `requisitos` | Especificación y trazabilidad de requisitos. | Para revisión funcional. |
 | `datos` | Mapa de datos, decisiones de acceso, esquema y diccionario técnico generados. | Para revisar persistencia y acceso a los datos. |
 | `arquitectura` | Diseño, documentación técnica y contrato API con estructuras JSON y validaciones. | Para revisión técnica y de integraciones HTTP. |
 | `pruebas` | Plan, cobertura, catálogo y resultados de pruebas. | Para evidencia de calidad. |
-| `todos` | Los seis documentos anteriores, cada uno en su propio archivo. | Para preparar una entrega documental completa con un solo comando. |
+| `todos` | Los dos manuales por conjuntos y los cuatro documentos técnicos anteriores. | Para preparar una entrega documental completa con un solo comando. |
 
 Los paquetes por actor reutilizan las secciones comunes y omiten las que
 no corresponden a ese recorrido. Los formatos de entrega admitidos son `docx` y `pdf`; Markdown
