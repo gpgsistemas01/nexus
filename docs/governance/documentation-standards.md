@@ -45,7 +45,7 @@ establecer cómo debe implementarse.
 | [ISO/IEC/IEEE 42010:2022](https://www.iso.org/standard/74393.html) | Explicar interesados, preocupaciones, puntos de vista, vistas y decisiones arquitectónicas cuando esa información sea útil. | Aplica de forma ligera a `architecture-and-web-views/index.md` y a las [convenciones de diagramas](../architecture/diagram-conventions/index.md); no exige reemplazar Mermaid ni adoptar una herramienta nueva. |
 | [ISO/IEC 25010:2023](https://www.iso.org/standard/78176.html) | Usar un vocabulario consistente para características de calidad y convertir sólo objetivos acordados en requisitos medibles. | Sirve para revisar la sección de calidad; no autoriza inventar umbrales de rendimiento, disponibilidad o seguridad. |
 | [ISO/IEC/IEEE 15289:2019](https://www.iso.org/standard/74909.html) | Orientar el contenido y ciclo de vida de los elementos de información sin imponer un formato único. | Útil si el conjunto documental crece o necesita entregables contractuales; por ahora basta el índice y la regla de actualización existentes. |
-| OpenAPI 3.1 | Versionar el contrato HTTP de rutas, parámetros, cuerpos, respuestas, errores y autenticación. | Es una especificación técnica complementaria, no una norma ISO ni un sustituto de requisitos o arquitectura. Su adopción sigue la estrategia de `api-contract.md`. |
+| OpenAPI 3.1 | Versionar el contrato HTTP de rutas, parámetros, cuerpos, respuestas, errores y autenticación. | Es una especificación técnica complementaria, no una norma ISO ni un sustituto de requisitos o arquitectura. Su adopción sigue la estrategia de `api-contract/index.md`. |
 
 ### Decisión para documentación técnica y rutas API
 
@@ -64,10 +64,10 @@ documentar una ruta Express. Para Nexus se combinan referencias según la pregun
   manera procesable métodos HTTP, parámetros, cuerpos, respuestas, errores y seguridad.
 
 Por tanto, las tablas de símbolos, firmas y bloques de código de las referencias de
-[backend](../architecture/backend-technical-documentation.md) y
-[frontend](../architecture/frontend-technical-documentation.md) son una convención local
+[backend](../architecture/backend-technical-documentation/index.md) y
+[frontend](../architecture/frontend-technical-documentation/index.md) son una convención local
 alineada selectivamente con 1016. Las fichas actuales del
-[contrato API](../architecture/api-contract.md) se complementan con la
+[contrato API](../architecture/api-contract/index.md) se complementan con la
 [especificación OpenAPI 3.1](../architecture/openapi/openapi.json). No se atribuye a ninguna ISO
 una plantilla que la norma no proporciona.
 

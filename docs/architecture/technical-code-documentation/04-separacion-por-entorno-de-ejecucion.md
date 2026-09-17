@@ -3,10 +3,10 @@
 La documentación técnica se divide por responsabilidad para evitar mezclar contratos
 HTTP y reglas de servidor con interacción del navegador:
 
-- [Backend: controladores y servicios](../backend-technical-documentation.md) documenta
+- [Backend: controladores y servicios](../backend-technical-documentation/index.md) documenta
   rutas internas, adaptación HTTP, DTO, reglas de dominio, errores, transacciones y
   persistencia.
-- [Frontend: navegador e interfaz](../frontend-technical-documentation.md) documenta
+- [Frontend: navegador e interfaz](../frontend-technical-documentation/index.md) documenta
   servicios HTTP del cliente, aplicaciones, páginas, formularios, UI compartida,
   plugins y composición EJS.
 

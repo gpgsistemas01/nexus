@@ -35,8 +35,8 @@ una entrega normativa completa, pero una revisión focalizada puede abrir sólo 
 grupo afectado.
 
 La especificación y los casos se conectan con frontend, API, backend, persistencia y
-pruebas mediante la [matriz de trazabilidad técnica](../architecture/traceability-matrix.md);
-el [inventario de diagramas](../architecture/diagram-inventory.md) asigna identificadores
+pruebas mediante la [matriz de trazabilidad técnica](../architecture/traceability-matrix/index.md);
+el [inventario de diagramas](../architecture/diagram-inventory/index.md) asigna identificadores
 estables a todas sus vistas.
 
 `scripts/exportDocs.js` conserva este mismo orden al generar el paquete `requisitos`.

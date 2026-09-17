@@ -6,7 +6,7 @@ pero el bloque Mermaid describe cómo se ejecuta el código mediante endpoint, c
 servicios, efectos y variables de frontera. Para comprender el objetivo con lenguaje de
 negocio se consulta primero el [modelo y los diagramas funcionales de casos de uso](../../requirements/domain-and-use-cases.md#casos-de-uso-vigentes).
 
-La [matriz técnica de backend](../backend-technical-documentation.md#aplicación-de-todos-los-casos-al-código-backend)
+La [matriz técnica de backend](../backend-technical-documentation/04-aplicacion-de-todos-los-casos-al-codigo-backend.md)
 es el índice único de trazabilidad: relaciona caso, entrada HTTP, implementación y
 diagrama. Esta colección no vuelve a copiar esa relación en cada sección. Los
 participantes identifican su archivo concreto; los métodos y la URL HTTP se indican
@@ -35,7 +35,7 @@ atómica conservan esa entidad y muestran la petición de entrada y su resultado
 
 Esta colección es la **fuente canónica del recorrido secuencial por caso**: si cambia el
 orden ruta → controller → servicio → persistencia o efecto, se actualiza en el capítulo funcional correspondiente. La
-[documentación técnica del backend](../backend-technical-documentation.md#relación-entre-la-colección-canónica-y-las-vistas-adicionales)
+[documentación técnica del backend](../backend-technical-documentation/06-vistas-tecnicas-aplicadas.md#relación-entre-la-colección-canónica-y-las-vistas-adicionales)
 explica responsabilidades, mantiene la matriz de trazabilidad y sólo conserva otra vista
 cuando responde una pregunta distinta, por ejemplo una actividad centrada en decisiones,
 un ciclo transaccional o una coordinación transversal. Esas vistas complementarias

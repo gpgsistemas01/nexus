@@ -21,9 +21,9 @@ const DATABASE_AREAS = [
 ];
 const USE_CASE_DOCUMENTS = {
     catalog: path.join(ROOT, 'docs/requirements/use-cases'),
-    backendMatrix: path.join(ROOT, 'docs/architecture/backend-technical-documentation.md'),
+    backendMatrix: path.join(ROOT, 'docs/architecture/backend-technical-documentation'),
     backendDiagrams: path.join(ROOT, 'docs/architecture/backend-code-sequences'),
-    frontendMatrix: path.join(ROOT, 'docs/architecture/frontend-technical-documentation.md'),
+    frontendMatrix: path.join(ROOT, 'docs/architecture/frontend-technical-documentation'),
     frontendDiagrams: path.join(ROOT, 'docs/architecture/frontend-code-sequences')
 };
 
@@ -116,7 +116,10 @@ const SOURCE_PATH_PATTERN = /src\/[A-Za-z0-9_./-]+\.(?:ejs|js)/g;
 
 const validateUseCaseDiagramCoverage = async () => {
     const sources = new Map(await Promise.all(
-        Object.entries(USE_CASE_DOCUMENTS).map(async ([name, file]) => [name, await readDocumentSource(file)])
+        Object.entries(USE_CASE_DOCUMENTS).map(async ([name, file]) => [
+            name,
+            await readDocumentSource(file, name.endsWith('Matrix'))
+        ])
     ));
     const expectedIds = getUseCaseTableIds(sources.get('catalog'));
     const expectedTitles = new Map(
@@ -155,7 +158,7 @@ const validateUseCaseDiagramCoverage = async () => {
                 SAL: 'issues',
                 REP: 'reports'
             };
-            const diagramFile = `${side}-code-sequences/${groupFiles[group]}/${id.toLowerCase()}.md`;
+            const diagramFile = `../${side}-code-sequences/${groupFiles[group]}/${id.toLowerCase()}.md`;
             const diagramReference = `[\`DIA-${prefix}-${id}\`](${diagramFile}#${id.toLowerCase()})`;
             if (!matrix.includes(diagramReference)) {
                 failures.push(`matriz ${side}: ${id} no enlaza su diagrama aplicado`);
@@ -440,7 +443,7 @@ ${table(webRoutes)}
 Este inventario enumera los nombres públicos declarados por los módulos bajo
 \`src/controllers\`. Permite localizar el adaptador HTTP o web sin inferir su propósito
 desde el nombre. La responsabilidad, entrada, salida y servicio coordinado se explican
-en la [documentación técnica del backend](../architecture/backend-technical-documentation.md)
+en la [documentación técnica del backend](../architecture/backend-technical-documentation/index.md)
 cuando el flujo necesita una vista curada.
 
 ${moduleExportsTable(controllerModules)}

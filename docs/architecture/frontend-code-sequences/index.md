@@ -6,7 +6,7 @@ muestra la ejecución entre vista/UI, aplicación, request y endpoint. Para ente
 objetivo y la interacción con lenguaje de negocio se consulta primero el [modelo y los
 diagramas funcionales de casos de uso](../../requirements/domain-and-use-cases.md#casos-de-uso-vigentes).
 
-La [matriz técnica de frontend](../frontend-technical-documentation.md#aplicación-de-todos-los-casos-al-código-frontend)
+La [matriz técnica de frontend](../frontend-technical-documentation/05-aplicacion-de-todos-los-casos-al-codigo-frontend.md)
 es el índice único de trazabilidad: relaciona caso, interacción, implementación y
 diagrama. Esta colección no vuelve a copiar esa relación en cada sección. Los
 participantes identifican su archivo concreto. Los métodos, requests y endpoints se
@@ -35,7 +35,7 @@ persistencia que pertenecen a la perspectiva del servidor.
 
 Esta colección es la **fuente canónica del recorrido secuencial por caso**: si cambia la
 cadena interacción → UI → aplicación → request → endpoint → resultado visible, se
-actualiza en el capítulo funcional correspondiente. La [documentación técnica del frontend](../frontend-technical-documentation.md#relación-entre-la-colección-canónica-y-las-vistas-adicionales)
+actualiza en el capítulo funcional correspondiente. La [documentación técnica del frontend](../frontend-technical-documentation/07-vistas-tecnicas-aplicadas-por-flujo-frontend.md#relación-entre-la-colección-canónica-y-las-vistas-adicionales)
 explica las responsabilidades del navegador, mantiene la matriz de trazabilidad y sólo
 conserva otra vista cuando responde una pregunta distinta, como decisiones de una
 actividad o modos de un formulario. La vista adicional enlaza el `DIA-FE-CU-*`
