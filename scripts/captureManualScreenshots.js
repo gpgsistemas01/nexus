@@ -15,6 +15,7 @@ const requestedCaptureIds = (process.env.DOCS_CAPTURE_IDS ?? '')
     .filter(Boolean);
 const requestedCaptureFrom = process.env.DOCS_CAPTURE_FROM?.trim();
 const recoverMissingCaptures = process.argv.includes('--missing');
+const forceFreshCapture = process.argv.includes('--fresh');
 const outputRoot = path.resolve('docs/user-manual/images');
 const screenshotDelay = 1500;
 const retryDelay = 1000;
@@ -35,6 +36,7 @@ const openFilters = click('.table-filters-summary', '#tableFiltersForm:visible')
 const reportDialog = click('.datatable-export-button', '.report-export-modal');
 const openMainMenu = click('#appMenuOffcanvasBtn', '#appMenu.show');
 const formatCoverage = (useCases) => useCases.length ? useCases.join(', ') : 'Transversal';
+let lastCompletedCaptureId;
 
 // El orden de este inventario es el orden narrativo del manual. Los identificadores son
 // estables; el número del archivo sólo ordena las imágenes dentro de cada módulo.
@@ -68,22 +70,22 @@ const captures = [
     { id: 'CAP-CAT-WAS-04-STOCK', module: 'mermas', name: '04-ajuste-existencia.png', route: '/almacen/mermas', ready: '#table', action: click('#table tbody .btn-adjust-stock', '#wasteModal.show'), useCases: ['CU-CAT-22'] },
     { id: 'CAP-REP-WAS-05-EXPORT', module: 'mermas', name: '05-exportar-reporte.png', route: '/almacen/mermas', ready: '#table', action: reportDialog, useCases: ['CU-CAT-24'] },
     { id: 'CAP-CAT-AREA-01-LIST', module: 'catalogos/areas', name: '01-listado.png', route: '/catalogos/departments', ready: '#table', useCases: ['CU-CAT-31'] },
-    { id: 'CAP-CAT-AREA-02-CREATE', module: 'catalogos/areas', name: '02-formulario-alta.png', route: '/catalogos/departments', ready: '#table', action: click('button:has-text("Nuevo registro de área")', '#catalogModal.show'), useCases: ['CU-CAT-32'] },
+    { id: 'CAP-CAT-AREA-02-CREATE', module: 'catalogos/areas', name: '02-formulario-alta.png', route: '/catalogos/departments', ready: '#table', action: click('button:has-text("Nueva área")', '#catalogModal.show'), useCases: ['CU-CAT-32'] },
     { id: 'CAP-CAT-AREA-03-EDIT', module: 'catalogos/areas', name: '03-formulario-edicion.png', route: '/catalogos/departments', ready: '#table', action: click('#table tbody .btn-edit', '#catalogModal.show', 'al menos un área'), useCases: ['CU-CAT-33'] },
     { id: 'CAP-CAT-ROLE-01-LIST', module: 'catalogos/roles', name: '01-listado.png', route: '/catalogos/roles', ready: '#table', useCases: ['CU-CAT-34'] },
-    { id: 'CAP-CAT-ROLE-02-CREATE', module: 'catalogos/roles', name: '02-formulario-alta.png', route: '/catalogos/roles', ready: '#table', action: click('button:has-text("Nuevo registro de rol")', '#catalogModal.show'), useCases: ['CU-CAT-35'] },
+    { id: 'CAP-CAT-ROLE-02-CREATE', module: 'catalogos/roles', name: '02-formulario-alta.png', route: '/catalogos/roles', ready: '#table', action: click('button:has-text("Nuevo rol")', '#catalogModal.show'), useCases: ['CU-CAT-35'] },
     { id: 'CAP-CAT-ROLE-03-EDIT', module: 'catalogos/roles', name: '03-formulario-edicion.png', route: '/catalogos/roles', ready: '#table', action: click('#table tbody .btn-edit', '#catalogModal.show', 'al menos un rol'), useCases: ['CU-CAT-36'] },
     { id: 'CAP-CAT-PRE-01-LIST', module: 'catalogos/presentaciones', name: '01-listado.png', route: '/catalogos/presentations', ready: '#table', useCases: ['CU-CAT-37'] },
-    { id: 'CAP-CAT-PRE-02-CREATE', module: 'catalogos/presentaciones', name: '02-formulario-alta.png', route: '/catalogos/presentations', ready: '#table', action: click('button:has-text("Nuevo registro de presentación")', '#catalogModal.show'), useCases: ['CU-CAT-38'] },
+    { id: 'CAP-CAT-PRE-02-CREATE', module: 'catalogos/presentaciones', name: '02-formulario-alta.png', route: '/catalogos/presentations', ready: '#table', action: click('button:has-text("Nueva presentación")', '#catalogModal.show'), useCases: ['CU-CAT-38'] },
     { id: 'CAP-CAT-PRE-03-EDIT', module: 'catalogos/presentaciones', name: '03-formulario-edicion.png', route: '/catalogos/presentations', ready: '#table', action: click('#table tbody .btn-edit', '#catalogModal.show', 'al menos una presentación'), useCases: ['CU-CAT-39'] },
     { id: 'CAP-CAT-UNIT-01-LIST', module: 'catalogos/unidades-medida', name: '01-listado.png', route: '/catalogos/unit-measures', ready: '#table', useCases: ['CU-CAT-40'] },
-    { id: 'CAP-CAT-UNIT-02-CREATE', module: 'catalogos/unidades-medida', name: '02-formulario-alta.png', route: '/catalogos/unit-measures', ready: '#table', action: click('button:has-text("Nuevo registro de unidad de medida")', '#catalogModal.show'), useCases: ['CU-CAT-41'] },
+    { id: 'CAP-CAT-UNIT-02-CREATE', module: 'catalogos/unidades-medida', name: '02-formulario-alta.png', route: '/catalogos/unit-measures', ready: '#table', action: click('button:has-text("Nueva unidad de medida")', '#catalogModal.show'), useCases: ['CU-CAT-41'] },
     { id: 'CAP-CAT-UNIT-03-EDIT', module: 'catalogos/unidades-medida', name: '03-formulario-edicion.png', route: '/catalogos/unit-measures', ready: '#table', action: click('#table tbody .btn-edit', '#catalogModal.show', 'al menos una unidad de medida'), useCases: ['CU-CAT-42'] },
     { id: 'CAP-CAT-REASON-01-LIST', module: 'catalogos/motivos-ajuste', name: '01-listado.png', route: '/catalogos/reasons', ready: '#table', useCases: ['CU-CAT-43'] },
-    { id: 'CAP-CAT-REASON-02-CREATE', module: 'catalogos/motivos-ajuste', name: '02-formulario-alta.png', route: '/catalogos/reasons', ready: '#table', action: click('button:has-text("Nuevo registro de motivo de ajuste")', '#catalogModal.show'), useCases: ['CU-CAT-44'] },
+    { id: 'CAP-CAT-REASON-02-CREATE', module: 'catalogos/motivos-ajuste', name: '02-formulario-alta.png', route: '/catalogos/reasons', ready: '#table', action: click('button:has-text("Nuevo motivo de ajuste")', '#catalogModal.show'), useCases: ['CU-CAT-44'] },
     { id: 'CAP-CAT-REASON-03-EDIT', module: 'catalogos/motivos-ajuste', name: '03-formulario-edicion.png', route: '/catalogos/reasons', ready: '#table', action: click('#table tbody .btn-edit', '#catalogModal.show', 'al menos un motivo de ajuste'), useCases: ['CU-CAT-45'] },
     { id: 'CAP-CAT-STATUS-01-LIST', module: 'catalogos/estados-cumplimiento', name: '01-listado.png', route: '/catalogos/fulfillment-statuses', ready: '#table', useCases: ['CU-CAT-46'] },
-    { id: 'CAP-CAT-STATUS-02-CREATE', module: 'catalogos/estados-cumplimiento', name: '02-formulario-alta.png', route: '/catalogos/fulfillment-statuses', ready: '#table', action: click('button:has-text("Nuevo registro de estado de cumplimiento")', '#catalogModal.show'), useCases: ['CU-CAT-47'] },
+    { id: 'CAP-CAT-STATUS-02-CREATE', module: 'catalogos/estados-cumplimiento', name: '02-formulario-alta.png', route: '/catalogos/fulfillment-statuses', ready: '#table', action: click('button:has-text("Nuevo estado de cumplimiento")', '#catalogModal.show'), useCases: ['CU-CAT-47'] },
     { id: 'CAP-CAT-STATUS-03-EDIT', module: 'catalogos/estados-cumplimiento', name: '03-formulario-edicion.png', route: '/catalogos/fulfillment-statuses', ready: '#table', action: click('#table tbody .btn-edit', '#catalogModal.show', 'al menos un estado de cumplimiento'), useCases: ['CU-CAT-48'] },
 
     { id: 'CAP-ENT-00-NAVIGATION', module: 'compras', name: '00-acceso-menu-principal.png', route: '/compras', ready: '#table', action: openMainMenu, useCases: ['CU-ENT-01'] },
@@ -151,10 +153,10 @@ const validateInventory = () => {
 };
 
 const selectCaptures = () => {
-    const selectionMechanisms = [requestedCaptureIds.length > 0, Boolean(requestedCaptureFrom), recoverMissingCaptures]
+    const selectionMechanisms = [requestedCaptureIds.length > 0, Boolean(requestedCaptureFrom), recoverMissingCaptures, forceFreshCapture]
         .filter(Boolean).length;
     if (selectionMechanisms > 1) {
-        throw new Error('Use DOCS_CAPTURE_IDS, DOCS_CAPTURE_FROM o --missing; no combine mecanismos.');
+        throw new Error('Use DOCS_CAPTURE_IDS, DOCS_CAPTURE_FROM, --missing o --fresh; no combine mecanismos.');
     }
 
     if (recoverMissingCaptures) return captures.filter(capture => !existsSync(path.join(outputRoot, capture.module, capture.name)));
@@ -177,6 +179,9 @@ const selectCaptures = () => {
 
     return [...new Set(requestedCaptureIds)].map(id => capturesById.get(id));
 };
+
+const capturePath = capture => path.join(outputRoot, capture.module, capture.name);
+const firstMissingCapture = () => captures.find(capture => !existsSync(capturePath(capture)));
 
 const waitForDataTableReady = async (page) => {
     await page.waitForFunction(() => {
@@ -317,17 +322,28 @@ const capturePage = async (page, capture) => {
     console.log(`${ capture.id } -> ${ path.join(capture.module, capture.name) } [${ formatCoverage(capture.useCases) }]`);
 };
 
-const capturePageWithRecovery = (context, capture) => captureWithRecovery({
-    context,
-    capture,
-    capturePage,
-    retries: captureRetries,
-    retryDelay,
-    onRetry: attempt => console.warn(
-        `${ capture.id } excedió el tiempo límite; reintento ${ attempt }/${ captureRetries } `
-        + 'en una página nueva desde la ruta inicial, sin eliminar las demás capturas.'
-    )
-});
+const capturePageWithRecovery = async (context, capture) => {
+    try {
+        await captureWithRecovery({
+            context,
+            capture,
+            capturePage,
+            retries: captureRetries,
+            retryDelay,
+            onRetry: attempt => console.warn(
+                `${ capture.id } excedió el tiempo límite; reintento ${ attempt }/${ captureRetries } `
+                + 'en una página nueva desde la ruta inicial, sin eliminar las demás capturas.'
+            )
+        });
+        lastCompletedCaptureId = capture.id;
+    } catch (error) {
+        console.error(
+            `${ capture.id } quedó pendiente. Última captura completada: ${ lastCompletedCaptureId ?? 'ninguna' }. `
+            + 'Ejecute nuevamente npm run docs:screenshots para reanudar automáticamente desde este punto.'
+        );
+        throw error;
+    }
+};
 
 const login = async (page) => {
     await page.goto(new URL('/inicio-sesion', baseURL).href, { waitUntil: 'domcontentloaded' });
@@ -342,7 +358,7 @@ const login = async (page) => {
 };
 
 validateInventory();
-const selectedCaptures = selectCaptures();
+let selectedCaptures = selectCaptures();
 
 if (process.argv.includes('--list')) {
     console.log('| Orden | ID | Ruta | Casos de uso |');
@@ -354,6 +370,17 @@ if (process.argv.includes('--list')) {
         console.log(`| ${ index + 1 } | \`${ capture.id }\` | \`docs/user-manual/images/${ capture.module }/${ capture.name }\` | ${ coverage } |`);
     });
     process.exit(0);
+}
+
+if (!requestedCaptureIds.length && !requestedCaptureFrom && !recoverMissingCaptures && !forceFreshCapture) {
+    const pendingCapture = firstMissingCapture();
+    if (pendingCapture && captures.some(capture => existsSync(capturePath(capture)))) {
+        selectedCaptures = captures.slice(captures.indexOf(pendingCapture));
+        console.log(
+            `Se reanudará la secuencia desde ${ pendingCapture.id }; las capturas anteriores ya completas se conservan. `
+            + 'Use --fresh para regenerar todo el inventario.'
+        );
+    }
 }
 
 if (recoverMissingCaptures && !selectedCaptures.length) {
@@ -379,7 +406,7 @@ if (protectedCaptures.length && storageState && !existsSync(storageState)) {
     );
 }
 
-if (requestedCaptureIds.length || requestedCaptureFrom || recoverMissingCaptures) {
+if (requestedCaptureIds.length || requestedCaptureFrom || recoverMissingCaptures || (!forceFreshCapture && selectedCaptures.length < captures.length)) {
     await Promise.all(selectedCaptures.map(capture => rm(
         path.join(outputRoot, capture.module, capture.name),
         { force: true }

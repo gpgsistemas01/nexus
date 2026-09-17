@@ -260,12 +260,13 @@ reintentos, use `DOCS_CAPTURE_IDS` para esa captura o `DOCS_CAPTURE_FROM` para r
 
 ## Revisión antes de publicar
 
-Cada ejecución completa elimina `docs/user-manual/images/` después de validar la configuración y
-antes de abrir el navegador. Así se retiran archivos obsoletos, incluso si ya no figuran en el
-inventario. Una ejecución selectiva con `DOCS_CAPTURE_IDS` elimina y sustituye sólo los PNG
-solicitados; una reanudación con `DOCS_CAPTURE_FROM` hace lo mismo con la captura indicada y las
-posteriores. Si falla, las demás capturas se conservan. La opción `--list` es sólo de consulta y no
-elimina archivos.
+La primera ejecución recorre el inventario en su orden narrativo. Si se interrumpe, la siguiente
+ejecución sin opciones localiza la primera captura ausente, conserva las anteriores y reanuda desde
+ese punto; el mensaje de error informa además la última captura terminada. Use `--fresh` cuando
+necesite eliminar `docs/user-manual/images/` y regenerar deliberadamente el inventario completo.
+Una ejecución selectiva con `DOCS_CAPTURE_IDS` elimina y sustituye sólo los PNG solicitados; una
+reanudación explícita con `DOCS_CAPTURE_FROM` hace lo mismo con la captura indicada y las posteriores.
+La opción `--list` es sólo de consulta y no elimina archivos.
 
 Después de ejecutar `npm run docs:screenshots`, se debe comprobar que los datos sean ficticios,
 que no aparezcan contraseñas, cookies ni datos personales, que los textos sean legibles y que el
