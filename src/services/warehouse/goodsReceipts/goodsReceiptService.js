@@ -147,7 +147,7 @@ export const createGoodsReceipt = async ({ goodsReceiptDto }) => {
 
         if (!receivedBy) throw new PersonReceivedByNotFound();
 
-        const processedDetails = await buildGoodsReceiptDetails(details);
+        const processedDetails = await buildGoodsReceiptDetails(details, { supplierId });
 
         const totals = calculateGoodsReceiptTotals(processedDetails);
 
@@ -310,6 +310,7 @@ export const updateGoodsReceipt = async ({ id, goodsReceiptDto }) => {
             const { createdDetails, updatedReceipt } = await createGoodsReceiptDetailsAndUpdateTotals({
                 tx,
                 goodsReceiptId: id,
+                supplierId: goodsReceipt.supplierId,
                 details: newDetails
             });
 

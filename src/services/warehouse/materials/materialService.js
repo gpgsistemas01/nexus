@@ -71,7 +71,6 @@ export const findAllMaterials = async ({
 const DEFAULT_MATERIAL_SNAPSHOT_SELECT = {
     id: true,
     name: true,
-    isActive: true,
     minStock: true,
     base: true,
     height: true,
@@ -81,7 +80,8 @@ const DEFAULT_MATERIAL_SNAPSHOT_SELECT = {
 
 export const findMaterialsSnapshot = async ({
     tx = null,
-    materialIds
+    materialIds,
+    supplierId = null
 }) => {
 
     const db = getDb(tx);
@@ -92,10 +92,23 @@ export const findMaterialsSnapshot = async ({
                 in: materialIds
             }
         },
-        select: DEFAULT_MATERIAL_SNAPSHOT_SELECT
+        select: {
+            ...DEFAULT_MATERIAL_SNAPSHOT_SELECT,
+            ...(supplierId && {
+                supplierMaterials: {
+                    where: { supplierId },
+                    select: { isActive: true }
+                }
+            })
+        }
     });
 
-    return materials;
+    if (!supplierId) return materials;
+
+    return materials.map(({ supplierMaterials, ...material }) => ({
+        ...material,
+        isActive: supplierMaterials[0]?.isActive ?? false
+    }));
 }
 
 export const existsMaterial = async ({
@@ -157,7 +170,8 @@ export const createMaterial = async ({
                 tx,
                 supplierId: relations.supplierId,
                 materialId,
-                maxUnitCost: relations.maxUnitCost
+                maxUnitCost: relations.maxUnitCost,
+                isActive: relations.isActive
             });
 
             if (newStock !== undefined) {
@@ -210,7 +224,7 @@ export const updateMaterial = async (materialDto, id) => {
         const material = await getDb().$transaction(async (tx) => {
 
             await existsMaterial({ tx, id });
-            const { supplierId, maxUnitCost, ...materialData } = materialDto;
+            const { supplierId, maxUnitCost, isActive, ...materialData } = materialDto;
 
             const currentMaterial = await tx.material.findUnique({
                 where: { id },
@@ -251,7 +265,7 @@ export const updateMaterial = async (materialDto, id) => {
                         supplierId
                     }
                 },
-                data: { maxUnitCost }
+                data: { maxUnitCost, isActive }
             });
 
             return findSupplierMaterialByIds({

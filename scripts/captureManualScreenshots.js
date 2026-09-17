@@ -3,6 +3,8 @@ import { mkdir, rm } from 'node:fs/promises';
 import path from 'node:path';
 import process from 'node:process';
 
+import { captureWithRecovery } from './manualScreenshotRecovery.js';
+
 const baseURL = process.env.DOCS_BASE_URL ?? 'http://127.0.0.1:3000';
 const storageState = process.env.DOCS_STORAGE_STATE;
 const loginName = process.env.DOCS_LOGIN_NAME;
@@ -315,31 +317,17 @@ const capturePage = async (page, capture) => {
     console.log(`${ capture.id } -> ${ path.join(capture.module, capture.name) } [${ formatCoverage(capture.useCases) }]`);
 };
 
-const isTimeoutError = (error) => {
-    let currentError = error;
-    while (currentError) {
-        if (currentError.name === 'TimeoutError'
-            || /timeout|tiempo límite/i.test(String(currentError.message ?? ''))) return true;
-        currentError = currentError.cause;
-    }
-    return false;
-};
-
-const capturePageWithRecovery = async (page, capture) => {
-    for (let attempt = 0; attempt <= captureRetries; attempt += 1) {
-        try {
-            await capturePage(page, capture);
-            return;
-        } catch (error) {
-            if (!isTimeoutError(error) || attempt === captureRetries) throw error;
-            console.warn(
-                `${ capture.id } excedió el tiempo límite; reintento ${ attempt + 1 }/${ captureRetries } `
-                + 'desde la ruta inicial, sin eliminar las demás capturas.'
-            );
-            await page.waitForTimeout(retryDelay);
-        }
-    }
-};
+const capturePageWithRecovery = (context, capture) => captureWithRecovery({
+    context,
+    capture,
+    capturePage,
+    retries: captureRetries,
+    retryDelay,
+    onRetry: attempt => console.warn(
+        `${ capture.id } excedió el tiempo límite; reintento ${ attempt }/${ captureRetries } `
+        + 'en una página nueva desde la ruta inicial, sin eliminar las demás capturas.'
+    )
+});
 
 const login = async (page) => {
     await page.goto(new URL('/inicio-sesion', baseURL).href, { waitUntil: 'domcontentloaded' });
@@ -408,17 +396,19 @@ try {
     const contextOptions = { viewport: { width: 1440, height: 1000 }, reducedMotion: 'reduce' };
     const publicContext = await browser.newContext(contextOptions);
     publicContext.setDefaultTimeout(captureTimeout);
-    const publicPage = await publicContext.newPage();
 
-    for (const capture of selectedCaptures.filter(item => item.public)) await capturePageWithRecovery(publicPage, capture);
+    for (const capture of selectedCaptures.filter(item => item.public)) await capturePageWithRecovery(publicContext, capture);
     await publicContext.close();
 
     if (protectedCaptures.length) {
         const authenticatedContext = await browser.newContext({ ...contextOptions, ...(storageState ? { storageState } : {}) });
         authenticatedContext.setDefaultTimeout(captureTimeout);
-        const authenticatedPage = await authenticatedContext.newPage();
-        if (!storageState) await login(authenticatedPage);
-        for (const capture of protectedCaptures) await capturePageWithRecovery(authenticatedPage, capture);
+        if (!storageState) {
+            const loginPage = await authenticatedContext.newPage();
+            await login(loginPage);
+            await loginPage.close();
+        }
+        for (const capture of protectedCaptures) await capturePageWithRecovery(authenticatedContext, capture);
         await authenticatedContext.close();
     }
 } finally {

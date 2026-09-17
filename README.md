@@ -37,7 +37,7 @@ Nexus es una plataforma de control operativo para administrar inventario, compra
 La visión del producto, sus usuarios, el alcance vigente, los criterios para redactar
 requisitos verificables, los requisitos funcionales y de datos, los atributos de
 calidad y las brechas encontradas al contrastar documentación, código y Prisma se mantienen en
-[`docs/requirements/vision-scope-and-requirements.md`](docs/requirements/vision-scope-and-requirements.md).
+[`docs/requirements/vision-scope-and-requirements/index.md`](docs/requirements/vision-scope-and-requirements/index.md).
 
 Ese documento describe el comportamiento implementado, no una promesa de funciones
 futuras. En particular, distingue las capacidades expuestas de los modelos o servicios
@@ -88,7 +88,7 @@ Los registros centrales `src/routes/api/index.js` y `src/routes/web/index.js` co
 los routers por dominio y evitan que `src/app.js` mezcle el arranque de infraestructura
 con el catálogo de endpoints. Las convenciones equivalentes entre backend y frontend,
 incluyendo reutilización de componentes y ubicación de pruebas CRUD, se detallan en el
-[descripción de arquitectura y construcción](docs/architecture/architecture-and-web-views.md#3-organización-consistente-de-front-y-back).
+[descripción de arquitectura y construcción](docs/architecture/architecture-and-web-views/index.md).
 
 ## Documentación
 
@@ -227,7 +227,7 @@ Estos procesos no forman parte del arranque normal de Nexus y requieren herramie
 
 La guía completa y secuencial —instalación por sistema operativo, validación, nombres de paquetes,
 creación y eliminación del estado de sesión, cierre de Playwright y detención de Nexus— está en
-[Exportar la documentación](docs/README.md#exportar-la-documentación). No ejecute
+[Exportar la documentación](docs/governance/document-export-guide/index.md). No ejecute
 `docs:screenshots` sólo para exportar: Pandoc reutiliza las imágenes ya revisadas.
 
 ## Rutas principales
@@ -345,7 +345,7 @@ El objetivo es mover la aplicación a un **VPS**. Hasta definir y versionar el p
 inverso, TLS, automatización, respaldos y monitoreo, esa topología permanece propuesta.
 También debe decidirse expresamente si el VPS conservará Supabase como base de datos
 administrada o alojará una instancia propia de PostgreSQL. Consulta la
-[vista de despliegue actual y objetivo](docs/architecture/architecture-and-web-views.md#despliegue-actual-render-y-supabase).
+[vista de despliegue actual y objetivo](docs/architecture/architecture-and-web-views/02-arquitectura-del-sistema.md).
 
 La documentación (`README.md` y `docs/`) **se conserva y versiona en este
 repositorio**. Las reglas de `.dockerignore` únicamente la excluyen del contexto de

@@ -63,15 +63,15 @@ corregir, cancelar, surtir o devolver conforme a sus reglas; el actor no los cap
 como un campo libre.
 
 El efecto del indicador en consultas, reportes, altas y surtimientos se representa en
-[`DIA-REQ-ACT-001`](requirements-diagrams.md#impacto-del-estado-activo-en-los-procesos-de-almacén).
+[`DIA-REQ-ACT-001`](diagrams/index.md#impacto-del-estado-activo-en-los-procesos-de-almacén).
 Los recursos inactivos no pueden incorporarse a operaciones nuevas. Una salida existente
 con pendientes sí puede completarse después de la desactivación: usa su detalle histórico
 y exige stock, pero no vuelve a seleccionar el recurso ni crea otra relación.
 
 | Contexto / acción | Modo y estado requerido | Datos que pueden cambiar | Efectos que no deben confundirse con edición |
 | --- | --- | --- | --- |
-| Material / crear | `create`; no existe la relación material-proveedor | nombre, proveedor, presentación, unidad, ambas dimensiones o ninguna, stock mínimo, costo máximo, estado, existencia inicial y observaciones | crea o reutiliza la identidad compartida y crea la oferta; una oferta repetida se rechaza sin modificar stock ni costo |
-| Material / editar | `edit`; relación existente | nombre, stock mínimo y estado compartidos; costo máximo de la oferta seleccionada | proveedor, presentación, unidad y dimensiones permanecen bloqueados; un nombre que produzca otra identidad se rechaza y no cambia existencia |
+| Material / crear | `create`; no existe la relación material-proveedor | nombre, proveedor, presentación, unidad, ambas dimensiones o ninguna, stock mínimo, costo máximo, estado de la oferta, existencia inicial y observaciones | crea o reutiliza la identidad compartida y crea la oferta; una oferta repetida se rechaza sin modificar stock ni costo |
+| Material / editar | `edit`; relación existente | nombre y stock mínimo compartidos; costo máximo y estado de la oferta seleccionada | proveedor, presentación, unidad y dimensiones permanecen bloqueados; un nombre que produzca otra identidad se rechaza y no cambia existencia |
 | Material / ajustar | `edit-stock`; relación existente y actor autorizado | nueva existencia total, motivo y observaciones | crea ajuste y movimiento; no cambia identidad ni interpreta la cantidad como incremento |
 | Merma / crear | `create`; no existe la combinación de nombre, proveedor y dimensiones | proveedor, material de referencia, nombre, base, altura, stock mínimo, costo máximo, estado, existencia inicial y observaciones | crea la merma y su movimiento inicial; una identidad repetida se rechaza sin sumar stock |
 | Merma / editar | `edit`; merma existente | nombre, stock mínimo, costo máximo y estado | proveedor, material de referencia, presentación, unidad y dimensiones permanecen bloqueados; no cambia existencia |
@@ -88,8 +88,8 @@ y exige stock, pero no vuelve a seleccionar el recurso ni crea otra relación.
 | Salida de material o merma / consultar | `view`; salida cancelada | ninguno | formulario y detalles permanecen en sólo lectura |
 
 Los nombres técnicos de los campos HTTP pertenecen al
-[contrato API](../architecture/api-contract.md); las reglas observables pertenecen a la
-[especificación](requirements-specification.md). Esta matriz enumera los controles por
+[contrato API](../architecture/api-contract/index.md); las reglas observables pertenecen a la
+[especificación](requirements-specification/index.md). Esta matriz enumera los controles por
 modo para hacer verificable qué puede modificar el operador, sin convertir el estado
 visual del formulario en un estado persistido del documento.
 
@@ -113,7 +113,7 @@ visual del formulario en un estado persistido del documento.
 - **Permisos:** `src/constants/permissions.js`; esta matriz conserva el valor público del
   permiso y no duplica sus listas de roles/departamentos.
 - **Método y URL exactos:** [mapa generado](../generated/code-map.md).
-- **Criterio funcional:** [especificación de requisitos](requirements-specification.md).
+- **Criterio funcional:** [especificación de requisitos](requirements-specification/index.md).
 - **Cobertura:** matriz CRUD del [plan de pruebas](../testing/test-plan.md).
 
 Al agregar o retirar una operación se actualizan ruta, permiso, requisito y prueba;

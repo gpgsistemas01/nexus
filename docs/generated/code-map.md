@@ -4,7 +4,7 @@
 Este inventario se genera **a partir del código fuente**. Ejecuta `npm run docs:architecture`
 después de cambiar rutas o dependencias entre capas; `npm run docs:check` detecta si esta
 versión quedó desactualizada. La semántica y el patrón de esta vista se describen en las
-[convenciones de diagramas](../architecture/diagram-conventions.md).
+[convenciones de diagramas](../architecture/diagram-conventions/index.md).
 
 ## Dependencias entre áreas
 
@@ -144,7 +144,7 @@ flowchart LR
 Este inventario enumera los nombres públicos declarados por los módulos bajo
 `src/controllers`. Permite localizar el adaptador HTTP o web sin inferir su propósito
 desde el nombre. La responsabilidad, entrada, salida y servicio coordinado se explican
-en la [documentación técnica del backend](../architecture/backend-technical-documentation.md)
+en la [documentación técnica del backend](../architecture/backend-technical-documentation/index.md)
 cuando el flujo necesita una vista curada.
 
 | Módulo | Símbolos exportados |

@@ -19,11 +19,13 @@ const tableElement = document.querySelector(selectorTable);
 
 export const createWasteDatatable = async (context) => {
     const canSeeCost = hasPermission(context, UI_PERMISSIONS.INVENTORY_COSTS_READ);
+    const canSeeActive = hasPermission(context, UI_PERMISSIONS.CATALOGS_MANAGE);
     const canManageWastes = hasPermission(context, UI_PERMISSIONS.WASTES_WRITE);
     const canAdjustStock = hasPermission(context, UI_PERMISSIONS.WASTES_ADJUST_STOCK);
 
     renderWarehouseInventoryHeader({
         tableElement,
+        canSeeActive,
         canSeeCost,
         canManageItems: canManageWastes
     });
@@ -33,6 +35,7 @@ export const createWasteDatatable = async (context) => {
     });
 
     const columns = buildWarehouseInventoryColumns({
+        canSeeActive,
         canSeeCost,
         canManageItems: canManageWastes,
         renderActions: () => renderActionButtons({

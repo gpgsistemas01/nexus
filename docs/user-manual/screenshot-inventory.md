@@ -6,7 +6,7 @@ Cada captura tiene un identificador estable `CAP-<grupo>-<ámbito>-<paso>-<estad
 identificador permite relacionarla con uno o más casos de uso sin depender del nombre del
 archivo. Ese mismo identificador se publica como ancla junto a la imagen en los
 [procedimientos del manual](procedures.md), de modo que puede citarse como, por ejemplo,
-`cases/catalogs.md#CAP-CAT-MAT-02-CREATE`. La ruta conserva el patrón
+`cases/catalogs/04-cap-cat-mat-02-create.md#CAP-CAT-MAT-02-CREATE`. La ruta conserva el patrón
 `images/<módulo>/NN-descripcion.png`: `NN` expresa el orden
 en que el lector recorre el módulo, desde el listado hacia la captura de datos, la edición, las
 operaciones que modifican existencias y, al final, la exportación.
@@ -176,7 +176,7 @@ genera las imágenes. No crea un archivo de sesión. `DOCS_STORAGE_STATE` permit
 sesión preparado previamente como mecanismo alternativo; nunca se genera a partir del usuario y la
 contraseña. Estos valores sólo se leen del entorno del proceso, no se agregan al archivo `.env`, y
 deben retirarse de la terminal al terminar, como indica la
-[guía de exportación](../README.md#exportar-la-documentación). La pantalla de inicio de sesión se
+[guía de exportación](../governance/document-export-guide/index.md). La pantalla de inicio de sesión se
 toma en un contexto separado y sin autenticación. Una selección compuesta únicamente por capturas
 públicas tampoco abre un contexto autenticado ni necesita leer el archivo indicado por
 `DOCS_STORAGE_STATE`.
@@ -250,7 +250,8 @@ flujo reutiliza una instancia que ya responda en `DOCS_BASE_URL` y sólo detiene
 él mismo; la selección o reanudación mediante `DOCS_CAPTURE_IDS` o `DOCS_CAPTURE_FROM` permanece a
 cargo del mismo inventario.
 
-Cada captura que falla por tiempo de espera se recupera automáticamente desde su ruta inicial. El
+Cada captura que falla por tiempo de espera se recupera automáticamente en una página nueva desde
+su ruta inicial, para descartar navegación, modales o solicitudes pendientes del intento anterior. El
 valor predeterminado realiza hasta **dos reintentos** y conserva las capturas anteriores. Puede
 ajustarse puntualmente con `DOCS_CAPTURE_RETRIES` (cero desactiva los reintentos) y
 `DOCS_CAPTURE_TIMEOUT_MS` (30 000 ms de forma predeterminada). Los errores de permisos, selectores

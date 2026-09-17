@@ -303,9 +303,9 @@ export const findWarehouseReportRows = async ({
     orderDir = 'asc'
 } = {}) => {
     const scopeFilter = {
-        active: { material: { isActive: true } },
+        active: { isActive: true },
         inStock: { currentStock: { not: 0 } },
-        activeOrStock: { OR: [{ material: { isActive: true } }, { currentStock: { not: 0 } }] }
+        activeOrStock: { OR: [{ isActive: true }, { currentStock: { not: 0 } }] }
     };
     const where = { AND: [scopeFilter[inventoryScope] || scopeFilter.activeOrStock] };
 
