@@ -1,5 +1,12 @@
 # Especificación de requisitos
 
+Esta SRS define **qué debe cumplir Nexus** mediante requisitos y reglas verificables. Las
+[descripciones de casos de uso](../use-cases/index.md) son su complemento normativo para
+los objetivos y recorridos actor–sistema: pertenecen a requisitos, no a arquitectura.
+La [visión y alcance](../vision-scope-and-requirements/index.md) aporta el porqué y los
+límites de alto nivel; el [documento de arquitectura](../../architecture/index.md) explica
+cómo la solución realiza y evidencia estas obligaciones sin redefinirlas.
+
 ## Contenido
 
 1. [1. Propósito y alcance](01-proposito-y-alcance.md)
