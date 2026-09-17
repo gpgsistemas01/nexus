@@ -27,7 +27,8 @@ npm run docs:export -- todos docx
 ```
 
 El resultado no es un único documento combinado: los manuales se organizan en las carpetas
-`administrador/` y `almacen/` y dentro de ellas se separan por conjunto funcional. Requisitos,
+`administrador/` y `almacen/` y dentro de ellas se separan con los mismos grupos funcionales de los
+casos de uso. Requisitos,
 datos, arquitectura y pruebas permanecen como documentos independientes en `build/docs/docx/`.
 Para generar los PDF, use `npm run docs:export -- todos pdf`; quedan en `build/docs/pdf/` y también
 se conservan los DOCX intermedios con la misma organización.

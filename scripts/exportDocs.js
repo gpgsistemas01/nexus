@@ -67,19 +67,9 @@ const MANUALS = Object.freeze({
     'manual-administrador': {
         directory: 'administrador',
         parts: {
-            acceso: manualPart(administrator, manualCases.authentication),
-            personas: manualPart(administrator, manualCaseFiles('identity-access', [
-                '01-cap-ida-per-01-list.md',
-                '02-cap-ida-per-02-create.md',
-                '03-cap-ida-per-03-edit.md'
-            ])),
-            usuarios: manualPart(administrator, manualCaseFiles('identity-access', [
-                '04-cap-ida-usr-01-list.md',
-                '05-cap-ida-usr-02-create.md',
-                '06-cap-ida-usr-03-edit.md',
-                '07-cap-ida-usr-04-password.md'
-            ])),
-            'catalogos-auxiliares': manualPart(administrator, manualCaseFiles('catalogs', [
+            autenticacion: manualPart(administrator, manualCases.authentication),
+            'identidad-y-acceso': manualPart(administrator, manualCases['identity-access']),
+            catalogos: manualPart(administrator, manualCaseFiles('catalogs', [
                 '01-catalogos-auxiliares.md'
             ]))
         }
@@ -87,62 +77,13 @@ const MANUALS = Object.freeze({
     'manual-almacen': {
         directory: 'almacen',
         parts: {
-            acceso: manualPart(warehouse, manualCases.authentication),
-            materiales: manualPart(warehouse, [
-                ...manualCaseFiles('catalogs', [
-                    '02-cap-cat-mat-01-list.md',
-                    '03-cap-rep-mat-05-export.md',
-                    '04-cap-cat-mat-02-create.md',
-                    '05-cap-cat-mat-03-edit.md',
-                    '06-cap-cat-mat-04-stock.md'
-                ]),
-                ...manualCaseFiles('reports', [
-                    '01-cap-rep-mov-mat-01-list.md',
-                    '02-cap-rep-mov-mat-02-export.md'
-                ])
-            ]),
-            proveedores: manualPart(warehouse, manualCaseFiles('catalogs', [
-                '07-cap-cat-sup-01-list.md',
-                '08-cap-cat-sup-02-create.md',
-                '09-cap-cat-sup-03-edit.md'
-            ])),
-            clientes: manualPart(warehouse, manualCaseFiles('catalogs', [
-                '10-cap-cat-cli-01-list.md',
-                '11-cap-cat-cli-02-create.md',
-                '12-cap-cat-cli-03-edit.md'
-            ])),
-            mermas: manualPart(warehouse, [
-                ...manualCaseFiles('catalogs', [
-                    '13-cap-cat-was-01-list.md',
-                    '14-cap-rep-was-05-export.md',
-                    '15-cap-cat-was-02-create.md',
-                    '16-cap-cat-was-03-edit.md',
-                    '17-cap-cat-was-04-stock.md'
-                ]),
-                ...manualCaseFiles('reports', [
-                    '03-cap-rep-mov-was-01-list.md',
-                    '04-cap-rep-mov-was-02-export.md'
-                ])
+            autenticacion: manualPart(warehouse, manualCases.authentication),
+            catalogos: manualPart(warehouse, [
+                ...manualCases.catalogs.slice(1),
+                ...manualCases.reports
             ]),
             'compras-de-material': manualPart(warehouse, manualCases.purchases),
-            'salidas-de-material': manualPart(warehouse, manualCaseFiles('issues', [
-                '01-cap-sal-mat-01-list.md',
-                '02-cap-sal-mat-02-create.md',
-                '03-cap-sal-mat-03-edit.md',
-                '04-cap-sal-mat-04-supply.md',
-                '05-cap-sal-mat-05-return.md',
-                '06-cap-rep-sal-mat-06-export.md',
-                '07-cap-sal-mat-08-view.md'
-            ])),
-            'salidas-de-merma': manualPart(warehouse, manualCaseFiles('issues', [
-                '08-cap-sal-was-01-list.md',
-                '09-cap-sal-was-02-create.md',
-                '10-cap-sal-was-03-edit.md',
-                '11-cap-sal-was-04-supply.md',
-                '12-cap-sal-was-05-return.md',
-                '13-cap-rep-sal-was-06-export.md',
-                '14-cap-sal-was-08-view.md'
-            ]))
+            'salidas-de-material-y-merma': manualPart(warehouse, manualCases.issues)
         }
     }
 });
