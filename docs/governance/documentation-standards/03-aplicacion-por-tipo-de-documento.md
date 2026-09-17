@@ -33,6 +33,24 @@ alineada selectivamente con 1016. Las fichas actuales del
 [especificación OpenAPI 3.1](../../architecture/openapi/openapi.json). No se atribuye a ninguna ISO
 una plantilla que la norma no proporciona.
 
+### Entregables recomendados para Nexus
+
+La aplicación conjunta de estas referencias no obliga a elegir entre SRS y arquitectura:
+ambas responden preguntas distintas y deben conservarse como entregas coordinadas.
+
+| Entrega | Contenido recomendado | Relación con casos de uso |
+| --- | --- | --- |
+| Visión y alcance | Necesidad, interesados, contexto de negocio, objetivos y límites del producto. | Resume capacidades; no contiene el flujo detallado. |
+| SRS | Requisitos funcionales y de calidad, reglas, condiciones, resultados, atributos, estado y trazabilidad. | Es propietaria de actores, precondiciones, flujo principal, alternativas, excepciones y postcondiciones de cada `CU-*`. |
+| Descripción de arquitectura | Interesados y preocupaciones arquitectónicas, puntos de vista, vistas, correspondencias, decisiones y justificación; se complementa con elementos, interfaces y relaciones de diseño. | Usa los `CU-*` como escenarios o entradas para seleccionar y validar vistas; documenta su realización sin copiar la ficha. |
+
+ISO/IEC/IEEE 15289 permite gobernar estos contenidos como elementos de información; no
+se interpreta aquí que cada concepto deba convertirse en un archivo físico independiente.
+Por ello Nexus mantiene fuentes Markdown modulares y produce paquetes exportables. ISO no
+obliga a utilizar Mermaid, UML, C4, 4+1, arc42 ni una herramienta concreta: son elecciones
+locales para representar las vistas y sólo se atribuyen a la norma los conceptos que ésta
+orienta.
+
 ISO 9001 o ISO/IEC 27001 sólo deben introducirse como requisitos documentales si la
 organización adopta formalmente un sistema de gestión de calidad o de seguridad de la
 información. No son necesarias únicamente porque Nexus sea una aplicación de software.

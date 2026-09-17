@@ -4,6 +4,12 @@ Este documento describe las vistas arquitectónicas del sistema y las decisiones
 organización del código. Los diagramas usan **Mermaid**, por lo que GitHub los
 renderiza directamente sin guardar imágenes que puedan quedar desactualizadas.
 
+Es el núcleo descriptivo del [documento de arquitectura](../index.md). Los casos de uso
+no se redefinen aquí: pertenecen a la [SRS](../../requirements/requirements-specification/index.md)
+y a sus [fichas normativas](../../requirements/use-cases/index.md). Esta descripción toma
+sus identificadores como entrada y documenta contexto técnico, contenedores, componentes,
+despliegue y recorridos de realización.
+
 Dentro de la familia, esta descripción se relaciona con tres niveles de detalle:
 
 - este documento **curado** explica contexto, decisiones, responsabilidades y flujos;

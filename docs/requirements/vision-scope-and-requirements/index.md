@@ -1,5 +1,11 @@
-# Visión, alcance y requisitos de Nexus
+# Visión y alcance de Nexus
 
+Este documento presenta el propósito, los interesados y los límites del producto a nivel
+ejecutivo. No es la SRS, no contiene el detalle normativo de los casos de uso y no define
+la solución técnica. Esas responsabilidades pertenecen respectivamente a la
+[especificación de requisitos](../requirements-specification/index.md), sus
+[fichas de casos de uso](../use-cases/index.md) y el
+[documento de arquitectura](../../architecture/index.md).
 
 ## Capítulos
 
