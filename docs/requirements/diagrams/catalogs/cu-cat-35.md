@@ -1,8 +1,8 @@
-# `CU-CAT-35` — Crear rol
+# `CU-CAT-35` — Editar presentación
 
 ```mermaid
 flowchart LR
-    request["Administrador selecciona Nuevo rol<br/>y confirma Guardar"] --> authorize["Nexus valida catalogs:manage y roles"]
-    authorize --> persist["Validar campos y crear rol"]
-    persist --> result["Confirmar y refrescar Roles"]
+    request["Administrador selecciona Editar registro<br/>y confirma Actualizar"] --> authorize["Nexus valida catalogs:manage y presentations"]
+    authorize --> persist["Validar campos y actualizar presentación"]
+    persist --> result["Confirmar y refrescar Presentaciones"]
 ```

@@ -1,7 +1,8 @@
-# `CU-CAT-28` — Consultar unidades de medida
+# `CU-CAT-28` — Crear área
 
 ```mermaid
 flowchart LR
-    request["Actor solicita consultar unidades de medida"] --> validate["Nexus valida permiso, datos y relaciones"]
-    validate --> result["Nexus responde: Catálogo auxiliar de sólo lectura."]
+    request["Administrador selecciona Nueva área<br/>y confirma Guardar"] --> authorize["Nexus valida catalogs:manage y departments"]
+    authorize --> persist["Validar campos y crear área"]
+    persist --> result["Confirmar y refrescar Áreas"]
 ```

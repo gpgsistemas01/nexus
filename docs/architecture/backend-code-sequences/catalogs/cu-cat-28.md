@@ -1,21 +1,21 @@
 <a id="cu-cat-28"></a>
-# `CU-CAT-28` — Consultar unidades de medida
+# `CU-CAT-28` — Crear área
 
 **Patrones:** `BE-P02`.
 
 ```mermaid
 sequenceDiagram
     participant Client as Cliente HTTP / web
-    participant Route as src/routes/api/warehouse/unitMeasureApiRoute.js
-    participant Controller@{ "type": "control" } as src/controllers/api/warehouse/unitMeasureController.js
-    participant Domain as src/services/warehouse/unitMeasureService.js
-    Note over Controller,Domain: Variables de frontera: req.query/params
+    participant Route as src/routes/api/admin/catalogApiRoute.js
+    participant Controller@{ "type": "control" } as src/controllers/api/admin/catalogController.js
+    participant Domain as src/services/admin/catalogService.js
+    Note over Controller,Domain: Variables de frontera: req.params.catalog/req.body
 
-    Client->>Route: GET /api/warehouse/unit-measures
+    Client->>Route: POST /api/admin/catalogs/departments
     Route->>Route: ejecutar en orden el middleware configurado para la ruta
-    Route->>Controller: getAllUnitMeasures(req, res)
+    Route->>Controller: registerCatalogEntry(req, res)
     activate Controller
-    Controller->>Domain: unitMeasureService.findAllUnitMeasures({ query: req.query }) sirve el catálogo de sólo lectura
+    Controller->>Domain: createCatalogEntry(req.params.catalog/req.body) normaliza y crea únicamente los campos permitidos
     activate Domain
     Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
     Domain-->>Controller: resultado del servicio o error de dominio tipado

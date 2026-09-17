@@ -1,7 +1,8 @@
-# `CU-CAT-29` — Consultar motivos de ajuste
+# `CU-CAT-29` — Editar área
 
 ```mermaid
 flowchart LR
-    request["Actor solicita consultar motivos de ajuste"] --> validate["Nexus valida permiso, datos y relaciones"]
-    validate --> result["Nexus responde: Catálogo auxiliar de sólo lectura."]
+    request["Administrador selecciona Editar registro<br/>y confirma Actualizar"] --> authorize["Nexus valida catalogs:manage y departments"]
+    authorize --> persist["Validar campos y actualizar área"]
+    persist --> result["Confirmar y refrescar Áreas"]
 ```

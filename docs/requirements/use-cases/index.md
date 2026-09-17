@@ -106,6 +106,10 @@ actor mientras no se definan y autoricen sus objetivos concretos.
 Los casos de catálogos siguen listar-crear-actualizar y sólo incluyen eliminar, activar,
 desactivar o ajustar cuando el contexto lo permite. Los documentos comparten encabezado
 y detalles, pero surtir, devolver y corregir mantienen reglas y efectos propios.
+Las lecturas de roles, áreas, presentaciones, unidades de medida, motivos de ajuste y
+estados de cumplimiento que sólo alimentan selectores son soporte técnico de esos
+objetivos: conservan autorización y trazabilidad arquitectónica, pero no reciben un
+identificador de caso de uso independiente.
 
 ## Catálogo operativo y granularidad
 
@@ -167,8 +171,8 @@ como listas planas difíciles de revisar.
 | Grupo | Familias internas de lectura | Casos |
 | --- | --- | --- |
 | `AUT` | Sesión. | `CU-AUT-01` a `CU-AUT-02` |
-| `IDA` | Personas; usuarios y credenciales; catálogos de acceso y sus reportes. | `CU-IDA-01` a `CU-IDA-11` |
-| `CAT` | Materiales; proveedores; clientes; mermas; inventarios, movimientos, reportes y catálogos auxiliares. | `CU-CAT-01` a `CU-CAT-48` |
+| `IDA` | Personas; usuarios y credenciales; sus consultas y reportes. | `CU-IDA-01` a `CU-IDA-09` |
+| `CAT` | Materiales; proveedores; clientes; mermas; inventarios, movimientos, reportes y catálogos auxiliares. | `CU-CAT-01` a `CU-CAT-44` |
 | `ENT` | Compras de material y su reporte. | `CU-ENT-01` a `CU-ENT-06` |
 | `SAL` | Salidas de material y merma con sus reportes. | `CU-SAL-01` a `CU-SAL-14` |
 
@@ -199,7 +203,7 @@ conjunto; el cambio de identificador no modifica el alcance funcional del caso.
 
 | Tema compartido | Casos | Elementos reutilizables que deben evaluarse primero | Diferencia que debe conservarse |
 | --- | --- | --- | --- |
-| CRUD de identidades y catálogos | `CU-IDA-01` a `CU-IDA-11`; `CU-CAT-01` a `CU-CAT-48` | Fábricas CRUD, listados, formularios, validación y refresco de tabla. | Permisos, identidad del recurso, relaciones y política de eliminación. |
+| CRUD de identidades y catálogos | `CU-IDA-01` a `CU-IDA-09`; `CU-CAT-01` a `CU-CAT-44` | Fábricas CRUD, listados, formularios, validación y refresco de tabla. | Permisos, identidad del recurso, relaciones y política de eliminación. |
 | Documentos con detalles | `CU-ENT-02`, `CU-ENT-03`, `CU-SAL-02` a `CU-SAL-04` y `CU-SAL-09` a `CU-SAL-11` | Encabezado, modal/formulario, tabla de detalles, DTO y transacción coordinadora. | La entrada incrementa stock al confirmarse; la salida no lo descuenta hasta surtir. |
 | Operación de salidas | `CU-SAL-02` a `CU-SAL-06` y `CU-SAL-09` a `CU-SAL-13` | Proceso de material replicable para merma, componentes informativos y coordinación de movimientos. | Inventario, conversión, permisos, estados y cantidades acumuladas del contexto. |
 | Consulta y exportación | `CU-IDA-04`, `CU-IDA-09`, `CU-CAT-07`, `CU-CAT-09`, `CU-CAT-14`, `CU-CAT-18`, `CU-CAT-24`, `CU-CAT-26`, `CU-ENT-06`, `CU-SAL-07` y `CU-SAL-14` y casos de consulta de cada familia | Filtros, paginación, dependencias entre selects y utilidades Excel. | Columnas, agrupaciones, fórmulas y permiso de cada reporte. |

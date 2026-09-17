@@ -1,21 +1,21 @@
 <a id="cu-cat-29"></a>
-# `CU-CAT-29` — Consultar motivos de ajuste
+# `CU-CAT-29` — Editar área
 
 **Patrones:** `BE-P02`.
 
 ```mermaid
 sequenceDiagram
     participant Client as Cliente HTTP / web
-    participant Route as src/routes/api/warehouse/reasonApiRoute.js
-    participant Controller@{ "type": "control" } as src/controllers/api/warehouse/reasonController.js
-    participant Domain as src/services/warehouse/reasonService.js
-    Note over Controller,Domain: Variables de frontera: req.query/params
+    participant Route as src/routes/api/admin/catalogApiRoute.js
+    participant Controller@{ "type": "control" } as src/controllers/api/admin/catalogController.js
+    participant Domain as src/services/admin/catalogService.js
+    Note over Controller,Domain: Variables de frontera: req.params.catalog/req.params.id/req.body
 
-    Client->>Route: GET /api/warehouse/reasons
+    Client->>Route: PUT /api/admin/catalogs/departments/:id
     Route->>Route: ejecutar en orden el middleware configurado para la ruta
-    Route->>Controller: getAllReasons(req, res)
+    Route->>Controller: editCatalogEntry(req, res)
     activate Controller
-    Controller->>Domain: reasonService.findAllReasons({ query: req.query }) sirve motivos, helpers resuelven motivos internos
+    Controller->>Domain: updateCatalogEntry(req.params.catalog/req.params.id/req.body) normaliza y actualiza únicamente los campos permitidos
     activate Domain
     Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
     Domain-->>Controller: resultado del servicio o error de dominio tipado

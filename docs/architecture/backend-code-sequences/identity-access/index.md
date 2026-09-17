@@ -14,5 +14,3 @@ Este capítulo forma parte del [catálogo de secuencias del código backend](../
 - [`CU-IDA-07` — Editar usuario y acceso](cu-ida-07.md)
 - [`CU-IDA-08` — Cambiar contraseña de usuario](cu-ida-08.md)
 - [`CU-IDA-09` — Generar reporte de usuarios](cu-ida-09.md)
-- [`CU-IDA-10` — Consultar roles](cu-ida-10.md)
-- [`CU-IDA-11` — Consultar departamentos](cu-ida-11.md)

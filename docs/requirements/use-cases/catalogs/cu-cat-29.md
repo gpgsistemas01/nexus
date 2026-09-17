@@ -1,13 +1,14 @@
-# `CU-CAT-29` — Consultar motivos de ajuste
+# `CU-CAT-29` — Editar área
 
 | Sección | Información relevante |
 | --- | --- |
 | Identificador | `CU-CAT-29` |
-| Nombre | Consultar motivos de ajuste. |
-| Actor y disparador | **Actor:** Personal de almacén. **Disparador:** abre un formulario cuyo selector requiere motivos de ajuste. |
-| Participación de actor y sistema | **Actor:** abre la consulta, define criterios y selecciona registros.<br>**Nexus:** autoriza, presenta filtros y devuelve sólo la información permitida. |
-| Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de consulta o reporte correspondiente. |
-| Flujo principal | 1. **Actor:** abre el formulario del proceso que requiere motivos de ajuste **(ver E1)**.<br>2. **Nexus:** comprueba su autorización y carga motivos de ajuste vigentes.<br>3. **Actor:** consulta o selecciona una opción de motivos de ajuste.<br>4. **Nexus:** conserva la selección para continuar el proceso principal sin modificar el catálogo. |
-| Excepciones | **E1 — Acceso rechazado (después del paso 1):**<br>1. **Nexus:** comprueba las precondiciones y la autorización, determina que alguna no se cumple y rechaza la solicitud sin modificar datos ni exponer información no autorizada; comunica el motivo.<br>2. **Actor:** reconoce el rechazo; termina el caso de uso. |
-| Postcondiciones (éxito y fallo) | 1. **Éxito:** Catálogo auxiliar de sólo lectura.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
-| Requisitos relacionados | `RF-CAT-020`. |
+| Nombre | Editar área. |
+| Actor y disparador | **Actor:** Administrador del sistema del área Sistemas. **Disparador:** selecciona **Editar registro** en la pantalla **Áreas**. |
+| Participación de actor y sistema | **Actor:** modifica y confirma una entrada de Áreas.<br>**Nexus:** autoriza, limita los campos, valida, actualiza y refresca la tabla. |
+| Precondiciones | 1. El actor inició sesión y cuenta con autorización para administrar catálogos.<br>2. La entrada existe en **Áreas**. |
+| Flujo principal | 1. **Administrador:** abre **Áreas** y selecciona **Editar registro** en una fila **(ver E1)**.<br>2. **Nexus:** presenta los valores existentes de **Nombre** y **Activo**.<br>3. **Administrador:** modifica los datos y selecciona **Actualizar** **(ver A1)**.<br>4. **Nexus:** revisa la información y actualiza la entrada de Áreas.<br>5. **Nexus:** confirma y refresca la tabla de Áreas. |
+| Flujos alternativos | **A1 — Datos inválidos (después del paso 3):**<br>1. **Nexus:** señala los campos requeridos y conserva la entrada sin cambios.<br>2. **Administrador:** corrige y vuelve a confirmar; continúa en el paso 4. |
+| Excepciones | **E1 — Acceso, recurso o entrada rechazados:**<br>1. **Nexus:** rechaza la operación sin exponer otro catálogo ni producir cambios parciales.<br>2. **Administrador:** reconoce el rechazo; termina el caso de uso. |
+| Postcondiciones (éxito y fallo) | 1. **Éxito:** La entrada de Áreas conserva los cambios admitidos.<br>2. **Fallo:** La entrada conserva su estado anterior. |
+| Requisitos relacionados | `RF-CAT-024`, `RN-001`, `RN-006`. |

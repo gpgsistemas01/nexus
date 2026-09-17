@@ -1,25 +1,25 @@
 <a id="cu-cat-29"></a>
-# `CU-CAT-29` — Consultar motivos de ajuste
+# `CU-CAT-29` — Editar área
 
 **Patrones:** `FE-P03`.
 
 ```mermaid
 sequenceDiagram
     participant Browser as Navegador
-    participant View as src/public/js/plugins/select2/domains/reason.js
-    participant Application as src/public/js/application/warehouse/catalogs/reasons.js
-    participant Request as src/public/js/services/warehouse/reasonService.js
+    participant View as src/public/js/pages/admin/catalogs/catalogForm.js
+    participant Application as src/public/js/application/admin/catalogs/catalogs.js
+    participant Request as src/public/js/services/admin/catalogService.js
     participant HTTP as src/public/js/services/axiosInstanceApi.js
-    participant Transport@{ "type": "control" } as src/routes/api/warehouse/reasonApiRoute.js<br/>src/controllers/api/warehouse/reasonController.js
-    Note over Application,Transport: Variables de frontera: params/filtros
+    participant Transport@{ "type": "control" } as src/routes/api/admin/catalogApiRoute.js<br/>src/controllers/api/admin/catalogController.js
+    Note over Application,Transport: Variables de frontera: catalog/id/data
 
-    Browser->>View: Select de motivo en los modos de ajuste
+    Browser->>View: confirmar el formulario de edición
     View->>View: recopilar y validar las variables de frontera indicadas
-    View->>Application: getAllReasons({ params })
-    Application->>Request: getAllReasonsRequest({ params })
+    View->>Application: editCatalogEntry({ catalog, id, data })
+    Application->>Request: editCatalogEntryRequest({ catalog, id, data })
     activate Application
     Request->>HTTP: apiRequest({ method: 'get', url, data/params })
-    HTTP->>Transport: consume GET /api/warehouse/reasons
+    HTTP->>Transport: consume PUT /api/admin/catalogs/departments/:id
     Transport-->>HTTP: status HTTP y payload del endpoint
     HTTP-->>Request: respuesta o error normalizado
     Request-->>Application: resultado del request

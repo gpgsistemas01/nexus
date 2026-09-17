@@ -13,8 +13,6 @@
 | `CU-IDA-07` | Editar usuario y acceso | Actualización transaccional de cuenta y asignación. |
 | `CU-IDA-08` | Cambiar contraseña de usuario | Actualización cifrada de la credencial. |
 | `CU-IDA-09` | Generar reporte de usuarios | Archivo Excel con filtros, columnas y cálculos propios del reporte. |
-| `CU-IDA-10` | Consultar roles | Catálogo de acceso de sólo lectura. |
-| `CU-IDA-11` | Consultar departamentos | Catálogo de acceso de sólo lectura. |
 
 
 ## Fichas específicas
@@ -34,5 +32,3 @@ Cada ficha representa una sola acción sobre una sola entidad. Los elementos com
 - [`CU-IDA-07` — Editar usuario y acceso](cu-ida-07.md)
 - [`CU-IDA-08` — Cambiar contraseña de usuario](cu-ida-08.md)
 - [`CU-IDA-09` — Generar reporte de usuarios](cu-ida-09.md)
-- [`CU-IDA-10` — Consultar roles](cu-ida-10.md)
-- [`CU-IDA-11` — Consultar departamentos](cu-ida-11.md)

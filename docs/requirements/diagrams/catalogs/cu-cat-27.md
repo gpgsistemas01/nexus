@@ -1,7 +1,7 @@
-# `CU-CAT-27` — Consultar presentaciones
+# `CU-CAT-27` — Consultar área
 
 ```mermaid
 flowchart LR
-    request["Actor solicita consultar presentaciones"] --> validate["Nexus valida permiso, datos y relaciones"]
-    validate --> result["Nexus responde: Catálogo auxiliar de sólo lectura."]
+    request["Administrador solicita consultar Áreas"] --> authorize["Nexus valida catalogs:manage y departments"]
+    authorize --> result["Mostrar exclusivamente la tabla de Áreas"]
 ```

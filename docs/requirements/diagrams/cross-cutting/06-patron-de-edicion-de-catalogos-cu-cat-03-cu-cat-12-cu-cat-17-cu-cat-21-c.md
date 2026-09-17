@@ -1,4 +1,4 @@
-# 6. Patrón de edición de catálogos — `CU-CAT-03`, `CU-CAT-12`, `CU-CAT-17`, `CU-CAT-21`, `CU-CAT-33`, `CU-CAT-36`, `CU-CAT-39`, `CU-CAT-42`, `CU-CAT-45` y `CU-CAT-48`
+# 6. Patrón de edición de catálogos — `CU-CAT-03`, `CU-CAT-12`, `CU-CAT-17`, `CU-CAT-21`, `CU-CAT-29`, `CU-CAT-32`, `CU-CAT-35`, `CU-CAT-38`, `CU-CAT-41` y `CU-CAT-44`
 
 ```mermaid
 flowchart LR
