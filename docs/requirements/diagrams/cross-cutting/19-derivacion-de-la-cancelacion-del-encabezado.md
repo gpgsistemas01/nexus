@@ -1,4 +1,4 @@
-# Derivación de la cancelación del encabezado
+# 19. Derivación de la cancelación del encabezado
 
 El siguiente diagrama separa la **operación de devolver** de la **transición derivada a
 cancelado**, tanto para el detalle como para el encabezado. No existe una acción independiente

@@ -93,9 +93,9 @@ const MANIFESTS = Object.freeze({
     ],
     requisitos: [
         'docs/requirements/index.md',
-        'docs/requirements/vision-scope-and-requirements.md',
+        ...getDirectoryDocuments('docs/requirements/vision-scope-and-requirements'),
         ...getDirectoryDocuments('docs/requirements/requirements-specification'),
-        'docs/requirements/domain-and-use-cases.md',
+        ...getDirectoryDocuments('docs/requirements/domain-and-use-cases'),
         ...requirementUseCases,
         ...requirementDiagrams,
         'docs/requirements/requirements-operations-matrix.md',

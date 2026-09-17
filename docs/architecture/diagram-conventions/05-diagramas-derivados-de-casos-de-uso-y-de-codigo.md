@@ -8,7 +8,7 @@ negocio.
 
 | Origen | Diagrama necesario | Estado y ubicación | Razón para generarlo o mantenerlo curado |
 | --- | --- | --- | --- |
-| Casos `CU-*` | Casos de uso por actor y límite de Nexus | Curado en `domain-and-use-cases.md`. | Actores, objetivos y asociaciones requieren decisión funcional; no se infieren de una ruta. |
+| Casos `CU-*` | Casos de uso por actor y límite de Nexus | Curado en `domain-and-use-cases/index.md`. | Actores, objetivos y asociaciones requieren decisión funcional; no se infieren de una ruta. |
 | Casos `CU-*` | Flujo de actividad y vista técnica complementaria de cada objetivo | Curado por familia en `requirements/diagrams/`. | El primero representa escenario exitoso, decisiones y resultado; la segunda hace visible su ejecución entre capas o la bifurcación que el flujo omite, sin fusionar objetivos. |
 | Casos con estados | Máquina de estados de salidas, surtimientos y devoluciones | Curada en requisitos. | Los nombres y transiciones combinan reglas y cantidades; el código es evidencia, no única fuente normativa. |
 | Casos transaccionales | Secuencia específica cuando la coordinación técnica aporta información adicional | Curada en requisitos o en la referencia técnica correspondiente y enlazada al servicio. | Explica el límite atómico y rollback del caso sin fusionarlo con otra operación. |

@@ -37,7 +37,7 @@ Nexus es una plataforma de control operativo para administrar inventario, compra
 La visión del producto, sus usuarios, el alcance vigente, los criterios para redactar
 requisitos verificables, los requisitos funcionales y de datos, los atributos de
 calidad y las brechas encontradas al contrastar documentación, código y Prisma se mantienen en
-[`docs/requirements/vision-scope-and-requirements.md`](docs/requirements/vision-scope-and-requirements.md).
+[`docs/requirements/vision-scope-and-requirements/index.md`](docs/requirements/vision-scope-and-requirements/index.md).
 
 Ese documento describe el comportamiento implementado, no una promesa de funciones
 futuras. En particular, distingue las capacidades expuestas de los modelos o servicios

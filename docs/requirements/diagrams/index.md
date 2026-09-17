@@ -13,7 +13,7 @@ un propósito, alcance, semántica y fuente de verdad definidos.
 ## Vista de requisitos y dependencias
 
 Esta vista contiene **requisitos**, no actores ni casos de uso. Las operaciones del
-usuario se muestran exclusivamente en el [diagrama de casos de uso](../domain-and-use-cases.md#casos-de-uso-vigentes). Una flecha `A --> B` significa que el cumplimiento de `A`
+usuario se muestran exclusivamente en el [diagrama de casos de uso](../domain-and-use-cases/03-casos-de-uso-vigentes.md). Una flecha `A --> B` significa que el cumplimiento de `A`
 depende de `B`; no representa navegación, permiso ni interacción humana.
 
 ```mermaid

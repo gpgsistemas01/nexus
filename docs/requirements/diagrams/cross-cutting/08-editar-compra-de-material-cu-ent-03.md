@@ -1,4 +1,4 @@
-# Editar compra de material — `CU-ENT-03`
+# 8. Editar compra de material — `CU-ENT-03`
 
 ```mermaid
 sequenceDiagram

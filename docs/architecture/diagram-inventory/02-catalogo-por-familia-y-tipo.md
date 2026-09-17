@@ -25,9 +25,9 @@
 | `DIA-API-SEQ-001` | Secuencia de middleware | `api-contract/01-como-documentar-una-ruta-api.md#prefijo-montaje-y-orden-de-middleware` | 1 | Registro Express; curado. |
 | `DIA-GEN-COD-001` | Dependencias generadas | `generated/code-map.md#dependencias-entre-áreas` | 1 | `src`; regenerar. |
 | `DIA-GEN-ER-001..005` | Entidad–relación | Cuatro áreas y relaciones transversales de `generated/database-schema.md` | 5 | Prisma; regenerar. |
-| `DIA-REQ-DOM-001` | Clases de dominio conceptual | `domain-and-use-cases.md#modelo-de-dominio-conceptual` | 1 | Requisitos y glosario; curado. |
-| `DIA-REQ-CU-GRP-AUT..SAL` | Casos de uso por cinco grupos propietarios | `domain-and-use-cases.md#casos-de-uso-vigentes` | 5 | Los reportes se integran con el grupo del recurso que los inicia; curado. |
-| `DIA-REQ-EST-001` | Estados/datos por acción | `domain-and-use-cases.md#estados-y-datos-modificados-por-acción` | 1 | Reglas de dominio; curado. |
+| `DIA-REQ-DOM-001` | Clases de dominio conceptual | `domain-and-use-cases/02-modelo-de-dominio-conceptual.md` | 1 | Requisitos y glosario; curado. |
+| `DIA-REQ-CU-GRP-AUT..SAL` | Casos de uso por cinco grupos propietarios | `domain-and-use-cases/03-casos-de-uso-vigentes.md` | 5 | Los reportes se integran con el grupo del recurso que los inicia; curado. |
+| `DIA-REQ-EST-001` | Estados/datos por acción | `domain-and-use-cases/04-estados-y-datos-modificados-por-accion.md` | 1 | Reglas de dominio; curado. |
 | `DIA-REQ-TRA-001`, `DIA-REQ-CRUD-001` | Dependencias y ciclo CRUD | Primeras dos vistas de `requirements/diagrams/index.md` | 2 | Requisitos; curado. |
 | `DIA-REQ-CU-AUT-01..CU-SAL-14` | Flujo individual de cada caso vigente | `requirements/diagrams/` | 81 | Una vista curada por cada `CU-*`. |
 | `DIA-REQ-ESP-001..017` | Vistas adicionales agrupadas | `requirements/diagrams/cross-cutting/index.md` | 17 | Casos con coordinación o patrón común; curado. |

@@ -1,4 +1,4 @@
-# Eliminar material o relación de proveedor — `CU-CAT-04`
+# 15. Eliminar material o relación de proveedor — `CU-CAT-04`
 
 ```mermaid
 flowchart TB

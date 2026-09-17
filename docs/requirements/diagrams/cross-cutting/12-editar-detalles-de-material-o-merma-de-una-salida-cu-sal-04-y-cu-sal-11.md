@@ -1,4 +1,4 @@
-# Editar detalles de material o merma de una salida — `CU-SAL-04` y `CU-SAL-11`
+# 12. Editar detalles de material o merma de una salida — `CU-SAL-04` y `CU-SAL-11`
 
 ```mermaid
 flowchart LR

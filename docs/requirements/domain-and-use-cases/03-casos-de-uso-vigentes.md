@@ -1,61 +1,4 @@
-# Modelo de dominio, casos de uso y relación entre vistas
-
-## Alcance de las vistas
-
-Este documento contiene dos vistas curadas diferentes: el modelo conceptual explica
-el vocabulario del negocio y el diagrama de casos de uso muestra objetivos de actores.
-Los campos SQL y cardinalidades físicas están en el
-[ER generado](../generated/database-schema.md), y los criterios verificables en la
-[especificación de requisitos](requirements-specification/index.md). No se repiten aquí.
-
-## Modelo de dominio conceptual
-
-Se usa `classDiagram`, notación UML soportada por Mermaid. Las clases no representan
-clases JavaScript ni copian tablas: son conceptos del negocio. La multiplicidad indica
-la relación conceptual vigente; una relación pendiente se omite para no presentar una
-intención como parte del dominio operativo.
-
-```mermaid
-classDiagram
-    class Usuario
-    class Persona
-    class AsignacionAcceso
-    class Cliente
-    class Proveedor
-    class Material
-    class Merma
-    class OfertaProveedorMaterial
-    class EntradaCompra
-    class SalidaMaterial
-    class SalidaMerma
-    class DetalleDocumento
-    class Movimiento
-    class Existencia
-
-    Usuario "1" --> "0..*" AsignacionAcceso : posee
-    Persona "1" --> "0..*" AsignacionAcceso : desempeña
-    Proveedor "1" --> "0..*" OfertaProveedorMaterial : ofrece
-    Material "1" --> "0..*" OfertaProveedorMaterial : cotizado como
-    Material "1" --> "0..*" Merma : origina
-    Proveedor "1" --> "0..*" EntradaCompra : abastece
-    EntradaCompra "1" *-- "1..*" DetalleDocumento : contiene
-    SalidaMaterial "1" *-- "1..*" DetalleDocumento : contiene
-    SalidaMerma "1" *-- "1..*" DetalleDocumento : contiene
-    Cliente "0..1" --> "0..*" SalidaMaterial : contextualiza
-    Material "1" --> "0..*" SalidaMaterial : se entrega en
-    Merma "1" --> "0..*" SalidaMerma : se entrega en
-    EntradaCompra "1" --> "0..*" Movimiento : produce
-    SalidaMaterial "1" --> "0..*" Movimiento : produce
-    SalidaMerma "1" --> "0..*" Movimiento : produce
-    Movimiento "0..*" --> "1" Existencia : modifica
-```
-
-`Persona` puede ser solicitante, receptor o referencia comercial sin que eso convierta
-a esa persona en usuario. En particular, **asesor** es un dato del contexto comercial,
-no un actor con acceso. Los proyectos siguen modelados técnicamente, pero se excluyen de
-esta vista vigente hasta definir su flujo.
-
-## Casos de uso vigentes
+# 3. Casos de uso vigentes
 
 El diagrama se mantiene en Mermaid para que GitHub lo represente correctamente. Es una
 **aproximación visual a un diagrama UML de casos de uso**, no UML estricto: Mermaid no
@@ -72,7 +15,7 @@ su participación futura queda pendiente de definición.
 
 Los participantes, precondiciones, garantías, pasos, alternativas y excepciones de cada
 objetivo se detallan por tema en el
-[catálogo de descripciones de casos de uso](use-cases/index.md).
+[catálogo de descripciones de casos de uso](../use-cases/index.md).
 La vista se divide en bloques por grupo funcional para mantenerla legible. Estos bloques
 no son paquetes UML ni paquetes documentales: el único límite de sistema es Nexus. Cada
 bloque conserva los actores fuera del sistema y muestra una sola vez los casos que le
@@ -90,7 +33,7 @@ operativo; agruparlos sólo por acción mezclaría entidades con validaciones di
 Dentro de cada grupo se usa por ello un **segundo nivel visual por entidad o documento**.
 Este nivel mejora la lectura, pero no cambia identificadores ni fusiona casos de uso.
 La decisión y las familias resultantes se resumen en el
-[criterio de agrupación vigente](use-cases/index.md#criterio-de-agrupación-vigente).
+[criterio de agrupación vigente](../use-cases/index.md#criterio-de-agrupación-vigente).
 
 ### Grupo funcional AUT — Autenticación
 
@@ -396,7 +339,7 @@ un paquete independiente de reportes dentro del límite de Nexus. Los identifica
 reportes se muestran junto a la consulta o recurso desde el que se inician. Los identificadores son los mismos del catálogo
 operativo y permiten pasar de cada objetivo visual a su descripción y a su diagrama de
 flujo específico en
-[Diagramas de requisitos](diagrams/index.md#flujos-de-cada-caso-de-uso).
+[Diagramas de requisitos](../diagrams/index.md#flujos-de-cada-caso-de-uso).
 No se usa «administrar» o «mantener» como objetivo: cada óvalo expresa una operación
 observable.
 
@@ -433,52 +376,3 @@ caso sin que ambos deban compartir nombre.
 No se dibujan operaciones pendientes como asociaciones. Las áreas que eventualmente
 soliciten o registren salidas, y el mantenimiento de proyectos, deben definirse primero
 como alcance, permisos y criterios de aceptación.
-
-## Estados y datos modificados por acción
-
-Los modos de formulario (`crear`, `editar`, `surtir`, `devolver`) no son estados del
-documento. El siguiente UML usa exclusivamente los nombres persistidos que resuelve el
-código (`Pendiente`, `Surtido parcial`, `Surtido` y `Cancelado`); por tanto, no presenta
-`Borrador` o `Devuelta` como estados aunque esas palabras puedan describir una acción o
-una condición funcional. La máquina resume el **cumplimiento agregado** común a salidas
-de material y merma. El estado de cada detalle y el del encabezado se derivan después de
-la operación, no se asignan desde el formulario.
-
-Las diferencias de permisos, campos y efectos se consultan en la
-[matriz de operaciones](requirements-operations-matrix.md#modos-precondiciones-y-datos-modificados),
-y las reglas verificables están en `src/constants/warehouseStatuses.js`,
-`src/services/warehouse/issues/issueFulfillmentRules.js` y los servicios específicos de
-salidas de material y merma.
-
-```mermaid
-stateDiagram-v2
-    [*] --> Pendiente: crear encabezado y detalles
-    Pendiente --> Pendiente: editar encabezado o detalles admitidos
-    Pendiente --> Parcial: surtir parte de al menos un detalle
-    Pendiente --> Surtida: surtir todos los detalles
-    Parcial --> Parcial: surtir sin completar el documento
-    Parcial --> Surtida: completar todos los detalles
-    Surtida --> Surtida: devolución parcial de un detalle
-    Surtida --> Cancelada: devolver todo lo surtido de todos los detalles
-    Parcial --> Cancelada: devolver todo lo surtido de todos los detalles
-    Cancelada --> [*]
-```
-
-`Parcial` es la etiqueta abreviada de cumplimiento `Surtido parcial` y `Surtida` representa
-el cumplimiento persistido `Surtido`. La devolución es una operación, no un estado ni un
-sinónimo de cancelar: una devolución parcial conserva el detalle `Surtido`, mientras que
-devolver todo lo surtido deriva `Cancelado` para ese detalle. Sólo cuando todos los detalles
-resultan cancelados se derivan cumplimiento `Cancelado` y estado documental `Cancelada`
-para el encabezado. Esta aclaración evita interpretar el diagrama como un catálogo adicional
-de estados o como una acción independiente de cancelación.
-
-## Vistas de diseño del sistema
-
-El diseño no se duplica en este archivo. Consulta la
-[arquitectura del sistema](../architecture/architecture-and-web-views/02-arquitectura-del-sistema.md)
-para contexto, contenedores, despliegue, componentes y secuencia; el
-[mapa generado](../generated/code-map.md) para imports y rutas; y el
-[ER](../generated/database-schema.md) para diseño físico de datos. La vista de despliegue
-distingue el entorno vigente en Render y Supabase del objetivo de trasladar la
-aplicación a un VPS; los detalles todavía no decididos se presentan como propuesta y
-no como infraestructura implementada.

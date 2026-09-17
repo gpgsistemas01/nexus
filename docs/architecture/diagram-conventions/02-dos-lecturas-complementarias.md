@@ -5,7 +5,7 @@ detalle:
 
 | Lectura | Pregunta | Notación y vocabulario | Fuente |
 | --- | --- | --- | --- |
-| Funcional | ¿Qué objetivo cumple el actor y qué resultado espera? | Aproximación UML de casos de uso y lenguaje del negocio, sin métodos ni variables. | [Modelo y casos de uso](../../requirements/domain-and-use-cases.md#casos-de-uso-vigentes). |
+| Funcional | ¿Qué objetivo cumple el actor y qué resultado espera? | Aproximación UML de casos de uso y lenguaje del negocio, sin métodos ni variables. | [Modelo y casos de uso](../../requirements/domain-and-use-cases/03-casos-de-uso-vigentes.md). |
 | Ejecución | ¿Qué archivos, símbolos, llamadas y datos ejecutan ese objetivo? | Secuencia Mermaid con semántica UML y notación literal de JavaScript/HTTP cuando corresponde. | [Secuencias backend](../backend-code-sequences/index.md) y [secuencias frontend](../frontend-code-sequences/index.md). |
 
 El identificador `CU-*` enlaza ambas lecturas, pero no convierte una secuencia técnica en

@@ -1,4 +1,4 @@
-# Consultar salidas de material o de merma — `CU-SAL-01` y `CU-SAL-08`
+# 9. Consultar salidas de material o de merma — `CU-SAL-01` y `CU-SAL-08`
 
 ```mermaid
 flowchart LR

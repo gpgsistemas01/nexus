@@ -19,9 +19,9 @@ normativa; este índice organiza su lectura sin duplicarla.
 
 ## Orden del paquete
 
-1. [Visión, alcance y requisitos](vision-scope-and-requirements.md).
+1. [Visión, alcance y requisitos](vision-scope-and-requirements/index.md).
 2. [Especificación de requisitos](requirements-specification/index.md).
-3. [Dominio y casos de uso](domain-and-use-cases.md).
+3. [Dominio y casos de uso](domain-and-use-cases/index.md).
 4. [Descripciones de casos de uso](use-cases/index.md).
 5. [Diagramas de requisitos](diagrams/index.md).
 6. [Matriz de requisitos y operaciones](requirements-operations-matrix.md).

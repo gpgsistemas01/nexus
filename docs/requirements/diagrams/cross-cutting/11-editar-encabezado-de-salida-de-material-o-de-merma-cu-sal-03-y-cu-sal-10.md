@@ -1,4 +1,4 @@
-# Editar encabezado de salida de material o de merma — `CU-SAL-03` y `CU-SAL-10`
+# 11. Editar encabezado de salida de material o de merma — `CU-SAL-03` y `CU-SAL-10`
 
 ```mermaid
 flowchart LR

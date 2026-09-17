@@ -1,4 +1,4 @@
-# Crear persona — `CU-IDA-02`
+# 2. Crear persona — `CU-IDA-02`
 
 ```mermaid
 sequenceDiagram

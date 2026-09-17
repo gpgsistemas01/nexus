@@ -4,7 +4,7 @@ Esta colección **no es un catálogo de diagramas de casos de uso**. Es la lectu
 complementaria del catálogo funcional: cada `CU-*` sirve como vínculo de trazabilidad,
 pero el bloque Mermaid describe cómo se ejecuta el código mediante endpoint, controller,
 servicios, efectos y variables de frontera. Para comprender el objetivo con lenguaje de
-negocio se consulta primero el [modelo y los diagramas funcionales de casos de uso](../../requirements/domain-and-use-cases.md#casos-de-uso-vigentes).
+negocio se consulta primero el [modelo y los diagramas funcionales de casos de uso](../../requirements/domain-and-use-cases/03-casos-de-uso-vigentes.md).
 
 La [matriz técnica de backend](../backend-technical-documentation/04-aplicacion-de-todos-los-casos-al-codigo-backend.md)
 es el índice único de trazabilidad: relaciona caso, entrada HTTP, implementación y
