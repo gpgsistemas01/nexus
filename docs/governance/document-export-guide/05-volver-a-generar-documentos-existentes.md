@@ -13,7 +13,8 @@ No es necesario eliminar manualmente un resultado antes de ejecutar nuevamente l
   inventario parcial, reanuda desde la primera captura ausente.
 
 Una exportación no elimina otros paquetes o formatos de `build/docs/`. Por ejemplo, volver a
-generar `pdf/almacen/compras-de-material.pdf` no borra `docx/almacen/compras-de-material.docx`. Separar las carpetas evita
+generar `pdf/manuales/almacen/compras-de-material.pdf` no borra
+`docx/manuales/almacen/compras-de-material.docx`. Separar las carpetas evita
 mezclar entregables editables y finales y permite conservar ambos durante la revisión. Antes de
 entregar, seleccione el archivo recién generado y, si va a compartir la carpeta completa, retire de
 ella los resultados antiguos que no formen parte de la entrega. Nunca elimine los Markdown fuente
@@ -27,8 +28,9 @@ npm run docs:export -- todos docx
 ```
 
 El resultado no es un único documento combinado: los manuales se organizan en las carpetas
-`administrador/` y `almacen/` y dentro de ellas se separan con los mismos grupos funcionales de los
-casos de uso. Requisitos,
+`manuales/administrador/` y `manuales/almacen/`; dentro de ellas se separan con los mismos grupos
+funcionales de los casos de uso, salvo las salidas de material y de merma, que se entregan en
+archivos independientes. Requisitos,
 datos, arquitectura y pruebas permanecen como documentos independientes en `build/docs/docx/`.
-Para generar los PDF, use `npm run docs:export -- todos pdf`; quedan en `build/docs/pdf/` y también
-se conservan los DOCX intermedios con la misma organización.
+Para generar los dos formatos, use `npm run docs:export -- todos ambos`; los PDF quedan en
+`build/docs/pdf/` y los DOCX en `build/docs/docx/`, con la misma organización.

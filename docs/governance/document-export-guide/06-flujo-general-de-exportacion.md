@@ -12,7 +12,7 @@ Para exportar `requisitos`, `datos`, `arquitectura` o `pruebas`:
 3. Corrija cualquier referencia ausente y ejecute la exportación en el formato requerido:
 
    ```bash
-   npm run docs:export -- <paquete> <docx|pdf>
+   npm run docs:export -- <paquete> <docx|pdf|ambos>
    ```
 
 4. Revise el DOCX creado en `build/docs/docx/` y, si eligió PDF, el archivo convertido en
