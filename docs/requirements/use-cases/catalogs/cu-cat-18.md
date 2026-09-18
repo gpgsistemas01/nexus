@@ -1,14 +1,14 @@
-# `CU-CAT-18` — Consultar mermas
+# `CU-CAT-18` — Editar presentación
 
 | Sección | Información relevante |
 | --- | --- |
 | Identificador | `CU-CAT-18` |
-| Nombre | Consultar mermas. |
-| Actor y disparador | **Actor:** Personal de almacén. **Disparador:** necesita localizar o revisar mermas y abre la opción de consulta correspondiente. |
-| Participación de actor y sistema | **Actor:** abre la consulta, define criterios y selecciona registros.<br>**Nexus:** autoriza, presenta filtros y devuelve sólo la información permitida. |
-| Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de consulta o reporte correspondiente. |
-| Flujo principal | 1. **Actor:** abre la opción para consultar mermas **(ver E1)**.<br>2. **Nexus:** comprueba su autorización y muestra la consulta con sus criterios disponibles.<br>3. **Actor:** define los criterios que necesita y solicita aplicarlos **(ver A1)**.<br>4. **Nexus:** presenta el listado con sus existencias, la acción principal para registrar una merma y la opción **Exportar Excel**.<br>5. **Actor:** selecciona la acción principal; termina `CU-CAT-18` y con esa selección dispara `CU-CAT-19` Registrar merma. |
-| Flujos alternativos | **A1 — Continuar la consulta (después del paso 3):**<br>1. **Nexus:** actualiza la información y el total sin modificar datos.<br>2. **Actor:** revisa los resultados o cambia los criterios.<br>3. **Nexus:** conserva la consulta disponible; termina el caso de uso.<br>**A2 — Elegir otra acción (después del paso 4 del flujo principal):**<br>1. **Actor:** selecciona editar o ajustar la existencia de la merma en lugar de iniciar el alta; termina `CU-CAT-18` y puede iniciar `CU-CAT-20` Editar merma, `CU-CAT-21` Ajustar existencia de merma o `CU-CAT-22` Generar reporte de mermas. Para generar el reporte selecciona **Exportar Excel** y conserva los filtros de la consulta. Cada caso elegido comprueba nuevamente sus precondiciones y autorización; la selección no constituye `«include»` ni `«extend»`. |
-| Excepciones | **E1 — Acceso rechazado (después del paso 1):**<br>1. **Nexus:** comprueba las precondiciones y la autorización, determina que alguna no se cumple y rechaza la solicitud sin modificar datos ni exponer información no autorizada; comunica el motivo.<br>2. **Actor:** reconoce el rechazo; termina el caso de uso. |
-| Postcondiciones (éxito y fallo) | 1. **Éxito:** Listado de existencias de merma.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
-| Requisitos relacionados | `RF-CAT-004`. |
+| Nombre | Editar presentación. |
+| Actor y disparador | **Actor:** Administrador del sistema del área Sistemas. **Disparador:** selecciona **Editar registro** en la pantalla **Presentaciones**. |
+| Participación de actor y sistema | **Actor:** modifica y confirma una entrada de Presentaciones.<br>**Nexus:** autoriza, limita los campos, valida, actualiza y refresca la tabla. |
+| Precondiciones | 1. El actor inició sesión y cuenta con autorización para administrar catálogos.<br>2. La entrada existe en **Presentaciones**. |
+| Flujo principal | 1. **Administrador:** abre **Presentaciones** y selecciona **Editar registro** en una fila **(ver E1)**.<br>2. **Nexus:** presenta los valores existentes de **Nombre** y **Activo**.<br>3. **Administrador:** modifica los datos y selecciona **Actualizar** **(ver A1)**.<br>4. **Nexus:** revisa la información y actualiza la entrada de Presentaciones.<br>5. **Nexus:** confirma y refresca la tabla de Presentaciones. |
+| Flujos alternativos | **A1 — Datos inválidos (después del paso 3):**<br>1. **Nexus:** señala los campos requeridos y conserva la entrada sin cambios.<br>2. **Administrador:** corrige y vuelve a confirmar; continúa en el paso 4. |
+| Excepciones | **E1 — Acceso, recurso o entrada rechazados:**<br>1. **Nexus:** rechaza la operación sin exponer otro catálogo ni producir cambios parciales.<br>2. **Administrador:** reconoce el rechazo; termina el caso de uso. |
+| Postcondiciones (éxito y fallo) | 1. **Éxito:** La entrada de Presentaciones conserva los cambios admitidos.<br>2. **Fallo:** La entrada conserva su estado anterior. |
+| Requisitos relacionados | `RF-CAT-024`, `RN-001`, `RN-006`. |

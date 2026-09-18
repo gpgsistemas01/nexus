@@ -1,25 +1,25 @@
 <a id="cu-cat-21"></a>
-# `CU-CAT-21` — Ajustar existencia de merma
+# `CU-CAT-21` — Editar unidad de medida
 
-**Patrones:** `FE-P02`.
+**Patrones:** `FE-P03`.
 
 ```mermaid
 sequenceDiagram
     participant Browser as Navegador
-    participant View as src/public/js/pages/warehouse/wastes/wasteForm.js
-    participant Application as src/public/js/application/warehouse/wastes/wastes.js
-    participant Request as src/public/js/services/warehouse/wasteService.js
+    participant View as src/public/js/pages/admin/catalogs/catalogForm.js
+    participant Application as src/public/js/application/admin/catalogs/catalogs.js
+    participant Request as src/public/js/services/admin/catalogService.js
     participant HTTP as src/public/js/services/axiosInstanceApi.js
-    participant Transport@{ "type": "control" } as src/routes/api/warehouse/wasteApiRoute.js<br/>src/controllers/api/warehouse/wasteController.js
-    Note over Application,Transport: Variables de frontera: id, formData/payload
+    participant Transport@{ "type": "control" } as src/routes/api/admin/catalogApiRoute.js<br/>src/controllers/api/admin/catalogController.js
+    Note over Application,Transport: Variables de frontera: catalog/id/data
 
-    Browser->>View: wasteForm.js usa el modo de ajuste
+    Browser->>View: confirmar el formulario de edición
     View->>View: recopilar y validar las variables de frontera indicadas
-    View->>Application: editWasteStock({ id, formData })
-    Application->>Request: editWasteStockRequest({ id, formData })
+    View->>Application: editCatalogEntry({ catalog, id, data })
+    Application->>Request: editCatalogEntryRequest({ catalog, id, data })
     activate Application
-    Request->>HTTP: apiRequest({ method: 'patch', url, data/params })
-    HTTP->>Transport: envía PATCH /api/warehouse/wastes/:id/stock
+    Request->>HTTP: apiRequest({ method: 'get', url, data/params })
+    HTTP->>Transport: consume PUT /api/admin/catalogs/unit-measures/:id
     Transport-->>HTTP: status HTTP y payload del endpoint
     HTTP-->>Request: respuesta o error normalizado
     Request-->>Application: resultado del request
@@ -32,3 +32,5 @@ sequenceDiagram
     end
     deactivate Application
 ```
+
+<a id="cu-cat-22"></a>

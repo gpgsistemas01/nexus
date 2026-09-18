@@ -1,7 +1,7 @@
 <a id="CAP-CAT-MAT-02-CREATE"></a>
 # 4. CAP-CAT-MAT-02-CREATE — Formulario alta
 
-**Casos de uso:** `CU-CAT-02` — Crear material.
+**Casos de uso:** `CU-ALM-02` — Crear material.
 
 **Errores posibles:** [Validación de formularios](../../error-messages.md#errores-validacion), [Catálogos e inventario](../../error-messages.md#errores-catalogos).
 

@@ -1,25 +1,25 @@
 <a id="cu-cat-16"></a>
-# `CU-CAT-16` — Editar cliente
+# `CU-CAT-16` — Consultar presentación
 
-**Patrones:** `FE-P02`.
+**Patrones:** `FE-P03`.
 
 ```mermaid
 sequenceDiagram
     participant Browser as Navegador
-    participant View as src/public/js/pages/sales/clients/clientModal.js
-    participant Application as src/public/js/application/sales/clients/clients.js
-    participant Request as src/public/js/services/sales/clientService.js
+    participant View as src/public/js/plugins/datatable/admin/catalogs/catalogDatatable.js
+    participant Application as src/public/js/application/admin/catalogs/catalogs.js
+    participant Request as src/public/js/services/admin/catalogService.js
     participant HTTP as src/public/js/services/axiosInstanceApi.js
-    participant Transport@{ "type": "control" } as src/routes/api/sales/clientApiRoute.js<br/>src/controllers/api/sales/clientController.js
-    Note over Application,Transport: Variables de frontera: id, formData/payload
+    participant Transport@{ "type": "control" } as src/routes/api/admin/catalogApiRoute.js<br/>src/controllers/api/admin/catalogController.js
+    Note over Application,Transport: Variables de frontera: params/catalog
 
-    Browser->>View: clientModal.js precarga el cliente
+    Browser->>View: abrir y cargar la tabla del catálogo
     View->>View: recopilar y validar las variables de frontera indicadas
-    View->>Application: editClient({ id, formData })
-    Application->>Request: editClientRequest({ id, formData })
+    View->>Application: getAllCatalogEntries({ params, catalog })
+    Application->>Request: getAllCatalogEntriesRequest({ params, catalog })
     activate Application
-    Request->>HTTP: apiRequest({ method: 'put', url, data/params })
-    HTTP->>Transport: envía PUT /api/sales/clients/:id
+    Request->>HTTP: apiRequest({ method: 'get', url, data/params })
+    HTTP->>Transport: consume GET /api/admin/catalogs/presentations
     Transport-->>HTTP: status HTTP y payload del endpoint
     HTTP-->>Request: respuesta o error normalizado
     Request-->>Application: resultado del request
@@ -33,4 +33,4 @@ sequenceDiagram
     deactivate Application
 ```
 
-<a id="cu-cat-18"></a>
+<a id="cu-cat-17"></a>

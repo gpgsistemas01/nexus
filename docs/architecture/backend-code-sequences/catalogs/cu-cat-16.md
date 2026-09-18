@@ -1,24 +1,21 @@
 <a id="cu-cat-16"></a>
-# `CU-CAT-16` — Editar cliente
+# `CU-CAT-16` — Consultar presentación
 
-**Patrones:** `BE-P01`.
+**Patrones:** `BE-P02`.
 
 ```mermaid
 sequenceDiagram
     participant Client as Cliente HTTP / web
-    participant Route as src/routes/api/sales/clientApiRoute.js
-    participant Controller@{ "type": "control" } as src/controllers/api/sales/clientController.js
-    participant ClientDto as «object»<br/>clientDto<br/>src/dtos/clientDTO.js
-    participant Domain as src/services/sales/clientService.js
-    Note over Controller,Domain: Variables de frontera: req.params.id, req.body/DTO
+    participant Route as src/routes/api/admin/catalogApiRoute.js
+    participant Controller@{ "type": "control" } as src/controllers/api/admin/catalogController.js
+    participant Domain as src/services/admin/catalogService.js
+    Note over Controller,Domain: Variables de frontera: req.params.catalog
 
-    Client->>Route: PUT /api/sales/clients/:id
+    Client->>Route: GET /api/admin/catalogs/presentations
     Route->>Route: ejecutar en orden el middleware configurado para la ruta
-    Route->>Controller: editClient(req, res)
+    Route->>Controller: getAllCatalogEntries(req, res)
     activate Controller
-    Controller->>ClientDto: createClientDtoForEdit(req.body) → sanitizeEmptyStrings(...)
-    ClientDto-->>Controller: clientDto normalizado
-    Controller->>Domain: clientService.updateClient({ id: req.params.id, clientDto }) actualiza Client
+    Controller->>Domain: findAllCatalogEntries(req.params.catalog) consulta el modelo permitido por la lista blanca
     activate Domain
     Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
     Domain-->>Controller: resultado del servicio o error de dominio tipado
@@ -31,4 +28,4 @@ sequenceDiagram
     deactivate Controller
 ```
 
-<a id="cu-cat-18"></a>
+<a id="cu-cat-17"></a>

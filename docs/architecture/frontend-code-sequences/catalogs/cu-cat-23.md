@@ -1,25 +1,25 @@
 <a id="cu-cat-23"></a>
-# `CU-CAT-23` — Consultar movimientos de mermas
+# `CU-CAT-23` — Crear motivo de ajuste
 
-**Patrones:** `FE-P07`.
+**Patrones:** `FE-P03`.
 
 ```mermaid
 sequenceDiagram
     participant Browser as Navegador
-    participant View as src/public/js/pages/admin/movements/movementsPage.js
-    participant Application as src/public/js/application/admin/movements/movements.js
-    participant Request as src/public/js/services/admin/movementService.js
+    participant View as src/public/js/pages/admin/catalogs/catalogForm.js
+    participant Application as src/public/js/application/admin/catalogs/catalogs.js
+    participant Request as src/public/js/services/admin/catalogService.js
     participant HTTP as src/public/js/services/axiosInstanceApi.js
-    participant Transport@{ "type": "control" } as src/routes/api/admin/movementApiRoute.js<br/>src/controllers/api/admin/movementController.js
-    Note over Application,Transport: Variables de frontera: params/filtros
+    participant Transport@{ "type": "control" } as src/routes/api/admin/catalogApiRoute.js<br/>src/controllers/api/admin/catalogController.js
+    Note over Application,Transport: Variables de frontera: catalog/data
 
-    Browser->>View: movementsPage.js selecciona el contexto merma
+    Browser->>View: confirmar el formulario de alta
     View->>View: recopilar y validar las variables de frontera indicadas
-    View->>Application: getAllMovements({ context: 'wastes', params })
-    Application->>Request: getAllMovementsRequest({ context, params })
+    View->>Application: registerCatalogEntry({ catalog, data })
+    Application->>Request: registerCatalogEntryRequest({ catalog, data })
     activate Application
     Request->>HTTP: apiRequest({ method: 'get', url, data/params })
-    HTTP->>Transport: consultar GET /api/admin/movements/wastes
+    HTTP->>Transport: consume POST /api/admin/catalogs/reasons
     Transport-->>HTTP: status HTTP y payload del endpoint
     HTTP-->>Request: respuesta o error normalizado
     Request-->>Application: resultado del request
@@ -33,4 +33,4 @@ sequenceDiagram
     deactivate Application
 ```
 
-<a id="cu-sal-14"></a>
+<a id="cu-cat-24"></a>

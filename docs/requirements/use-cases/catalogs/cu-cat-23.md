@@ -1,14 +1,14 @@
-# `CU-CAT-23` — Consultar movimientos de mermas
+# `CU-CAT-23` — Crear motivo de ajuste
 
 | Sección | Información relevante |
 | --- | --- |
 | Identificador | `CU-CAT-23` |
-| Nombre | Consultar movimientos de mermas. |
-| Actor y disparador | **Actor:** Usuario con permiso sobre el reporte o consulta. **Disparador:** necesita localizar o revisar movimientos de mermas y abre la opción de consulta correspondiente. |
-| Participación de actor y sistema | **Actor:** abre la consulta, define criterios y selecciona registros.<br>**Nexus:** autoriza, presenta filtros y devuelve sólo la información permitida. |
-| Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de consulta o reporte correspondiente. |
-| Flujo principal | 1. **Actor:** abre la opción para consultar movimientos de mermas **(ver E1)**.<br>2. **Nexus:** comprueba su autorización y muestra los filtros disponibles.<br>3. **Actor:** define los criterios que necesita y solicita aplicarlos **(ver A1)**.<br>4. **Nexus:** presenta la información autorizada y la opción **Exportar Excel**.<br>5. **Actor:** selecciona **Exportar Excel**; termina `CU-CAT-23` y con esa selección dispara `CU-CAT-24` Generar reporte de movimientos de mermas. |
-| Flujos alternativos | **A1 — Permanecer en la consulta (después del paso 3):**<br>1. **Nexus:** actualiza la tabla y el total sin modificar datos.<br>2. **Actor:** revisa los resultados o cambia los criterios.<br>3. **Nexus:** conserva la consulta disponible; termina el caso de uso. |
-| Excepciones | **E1 — Acceso rechazado (después del paso 1):**<br>1. **Nexus:** comprueba las precondiciones y la autorización, determina que alguna no se cumple y rechaza la solicitud sin modificar datos ni exponer información no autorizada; comunica el motivo.<br>2. **Actor:** reconoce el rechazo; termina el caso de uso. |
-| Postcondiciones (éxito y fallo) | 1. **Éxito:** Consulta autorizada sin modificar datos.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
-| Requisitos relacionados | `RF-REP-001`. |
+| Nombre | Crear motivo de ajuste. |
+| Actor y disparador | **Actor:** Administrador del sistema del área Sistemas. **Disparador:** selecciona **Nuevo motivo de ajuste** en `CU-CAT-22` Consultar motivo de ajuste. |
+| Participación de actor y sistema | **Actor:** captura y confirma una nueva entrada de Motivos de ajuste.<br>**Nexus:** autoriza, limita los campos, valida, crea y refresca la tabla. |
+| Precondiciones | 1. El actor inició sesión y cuenta con autorización para administrar catálogos.<br>2. La pantalla seleccionada corresponde exactamente a **Motivos de ajuste**. |
+| Flujo principal | 1. **Administrador:** abre la pantalla **Motivos de ajuste** y selecciona **Nuevo motivo de ajuste** **(ver E1)**.<br>2. **Nexus:** presenta únicamente los campos **Nombre** y **Activo**.<br>3. **Administrador:** captura los datos y selecciona **Guardar** **(ver A1)**.<br>4. **Nexus:** revisa la información y crea la entrada de Motivos de ajuste.<br>5. **Nexus:** confirma y refresca la tabla de Motivos de ajuste. |
+| Flujos alternativos | **A1 — Datos inválidos (después del paso 3):**<br>1. **Nexus:** señala los campos requeridos sin crear la entrada.<br>2. **Administrador:** corrige y vuelve a confirmar; continúa en el paso 4. |
+| Excepciones | **E1 — Acceso, recurso o entrada rechazados:**<br>1. **Nexus:** rechaza la operación sin exponer otro catálogo ni producir cambios parciales.<br>2. **Administrador:** reconoce el rechazo; termina el caso de uso. |
+| Postcondiciones (éxito y fallo) | 1. **Éxito:** La nueva entrada de Motivos de ajuste queda registrada y visible.<br>2. **Fallo:** No se crea ninguna entrada. |
+| Requisitos relacionados | `RF-CAT-023`, `RN-001`, `RN-006`. |

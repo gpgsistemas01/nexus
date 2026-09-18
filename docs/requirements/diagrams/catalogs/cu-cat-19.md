@@ -1,9 +1,7 @@
-# `CU-CAT-19` — Registrar merma
+# `CU-CAT-19` — Consultar unidad de medida
 
 ```mermaid
-flowchart TD
-    request["Actor solicita registrar merma"] --> validate["Nexus valida permiso, datos y relaciones"]
-    validate --> active{"¿Proveedor y material de plantilla activos?"}
-    active -->|No| reject["Rechazar el alta<br/>sin crear merma ni stock"]
-    active -->|Sí| result["Crear merma desde la plantilla<br/>y registrar stock inicial"]
+flowchart LR
+    request["Administrador solicita consultar Unidades de medida"] --> authorize["Nexus valida catalogs:manage y unit-measures"]
+    authorize --> result["Mostrar exclusivamente la tabla de Unidades de medida"]
 ```

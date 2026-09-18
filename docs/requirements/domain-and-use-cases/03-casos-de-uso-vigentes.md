@@ -24,11 +24,11 @@ generalizan mediante un actor común cuando comparten asociaciones y la distinci
 ellos aporta información al grupo. Si todos participan de la misma forma, el actor común
 los representa sin enumerar cada rol o área.
 
-Se conservan cinco grupos funcionales propietarios porque representan capacidades estables del
-negocio: autenticación, identidad y acceso, catálogos, compras de material y salidas. Las
-consultas y exportaciones se integran en el grupo del recurso que las origina; no forman un
-paquete funcional independiente. Dividirlos otra vez en
-nuevos grupos por cada entidad fragmentaría procesos que comparten actor, reglas y ciclo
+Se conservan seis grupos funcionales propietarios porque representan capacidades estables del
+negocio: autenticación, identidad y acceso, almacén, catálogos, compras de material y
+salidas. Las consultas y exportaciones se integran en el grupo del recurso que las
+origina; no forman un paquete funcional independiente. Dividirlos otra vez en nuevos
+grupos por cada entidad fragmentaría procesos que comparten actor, reglas y ciclo
 operativo; agruparlos sólo por acción mezclaría entidades con validaciones distintas.
 Dentro de cada grupo se usa por ello un **segundo nivel visual por entidad o documento**.
 Este nivel mejora la lectura, pero no cambia identificadores ni fusiona casos de uso.
@@ -85,6 +85,63 @@ flowchart LR
     ucUserQuery --- ucUserReport
 ```
 
+### Grupo funcional ALM — Almacén
+
+```mermaid
+flowchart LR
+    warehouse["«actor»<br/>Personal de almacén (área Almacén y proveduría)"]
+    admin["«actor»<br/>Administrador del sistema (área Sistemas)"]
+    admin -- "generaliza" --> warehouse
+
+    subgraph warehousePackage["Nexus · Grupo funcional ALM: Almacén"]
+        direction TB
+        subgraph materialWarehouseFamily["Materiales"]
+            ucMaterialQuery(["CU-ALM-01 Consultar materiales"])
+            ucMaterialCreate(["CU-ALM-02 Crear material"])
+            ucMaterialEdit(["CU-ALM-03 Editar material"])
+            ucMaterialRemove(["CU-ALM-04 Retirar material"])
+            ucMaterialStock(["CU-ALM-05 Ajustar existencia de material"])
+            ucMaterialInventoryReport(["CU-ALM-06 Generar reporte de inventario de materiales"])
+            ucMaterialMovements(["CU-ALM-07 Consultar movimientos de materiales"])
+            ucMaterialMovementReport(["CU-ALM-08 Generar reporte de movimientos de materiales"])
+        end
+        subgraph wasteWarehouseFamily["Mermas"]
+            ucWasteQuery(["CU-ALM-09 Consultar mermas"])
+            ucWasteCreate(["CU-ALM-10 Registrar merma"])
+            ucWasteEdit(["CU-ALM-11 Editar merma"])
+            ucWasteStock(["CU-ALM-12 Ajustar existencia de merma"])
+            ucWasteReport(["CU-ALM-13 Generar reporte de mermas"])
+            ucWasteMovements(["CU-ALM-14 Consultar movimientos de mermas"])
+            ucWasteMovementReport(["CU-ALM-15 Generar reporte de movimientos de mermas"])
+        end
+    end
+
+    warehouse --- ucMaterialQuery
+    warehouse --- ucWasteQuery
+    admin --- ucMaterialStock
+    admin --- ucWasteStock
+    ucMaterialQuery --- ucMaterialCreate
+    ucMaterialQuery --- ucMaterialEdit
+    ucMaterialQuery --- ucMaterialRemove
+    ucMaterialQuery --- ucMaterialInventoryReport
+    ucMaterialQuery --- ucMaterialMovements
+    ucMaterialMovements --- ucMaterialMovementReport
+    ucMaterialStock -. "«extend»" .-> ucMaterialQuery
+    ucWasteQuery --- ucWasteCreate
+    ucWasteQuery --- ucWasteEdit
+    ucWasteQuery --- ucWasteReport
+    ucWasteQuery --- ucWasteMovements
+    ucWasteMovements --- ucWasteMovementReport
+    ucWasteStock -. "«extend»" .-> ucWasteQuery
+```
+
+El grupo de **Almacén** concentra los casos operativos de material y merma porque comparten
+actor, reglas de inventario, ciclo de consulta y operación sobre la misma área funcional.
+Los recursos comerciales y de configuración quedan para `CAT`, mientras los documentos de
+entrada y salida mantienen su propio grupo de negocio. La numeración `CU-ALM-*` sustituye en
+este ámbito el uso previo de `CU-CAT-*` para material y merma, sin cambiar la intención del
+objetivo ni la lógica del flujo.
+
 ### Grupo funcional CAT — Catálogos
 
 ```mermaid
@@ -94,45 +151,37 @@ flowchart LR
 
     subgraph catalogPackage["Nexus · Grupo funcional CAT: Catálogos"]
         direction TB
-        subgraph materialCatalogFamily["Materiales"]
-            ucMaterialMovements(["CU-CAT-07 Consultar movimientos de materiales"])
-            ucMaterialMovementReport(["CU-CAT-08 Generar reporte de movimientos de materiales"])
-        end
         subgraph supplierCatalogFamily["Proveedores"]
-            ucSupplierQuery(["CU-CAT-09 Consultar proveedores"])
-            ucSupplierCreate(["CU-CAT-10 Crear proveedor"])
-            ucSupplierEdit(["CU-CAT-11 Editar proveedor"])
-            ucSupplierReport(["CU-CAT-13 Generar reporte de proveedores"])
+            ucSupplierQuery(["CU-CAT-01 Consultar proveedores"])
+            ucSupplierCreate(["CU-CAT-02 Crear proveedor"])
+            ucSupplierEdit(["CU-CAT-03 Editar proveedor"])
+            ucSupplierReport(["CU-CAT-05 Generar reporte de proveedores"])
         end
         subgraph clientCatalogFamily["Clientes"]
-            ucClientQuery(["CU-CAT-14 Consultar clientes"])
-            ucClientCreate(["CU-CAT-15 Crear cliente"])
-            ucClientEdit(["CU-CAT-16 Editar cliente"])
-            ucClientReport(["CU-CAT-17 Generar reporte de clientes"])
-        end
-        subgraph wasteCatalogFamily["Mermas"]
-            ucWasteMovements(["CU-CAT-23 Consultar movimientos de mermas"])
-            ucWasteMovementReport(["CU-CAT-24 Generar reporte de movimientos de mermas"])
+            ucClientQuery(["CU-CAT-06 Consultar clientes"])
+            ucClientCreate(["CU-CAT-07 Crear cliente"])
+            ucClientEdit(["CU-CAT-08 Editar cliente"])
+            ucClientReport(["CU-CAT-09 Generar reporte de clientes"])
         end
         subgraph auxiliaryCatalogFamily["Catálogos auxiliares"]
-            ucCatalog21(["CU-CAT-25 Consultar área"])
-            ucCatalog22(["CU-CAT-26 Crear área"])
-            ucCatalog23(["CU-CAT-27 Editar área"])
-            ucCatalog24(["CU-CAT-28 Consultar rol"])
-            ucCatalog25(["CU-CAT-29 Crear rol"])
-            ucCatalog26(["CU-CAT-30 Editar rol"])
-            ucCatalog27(["CU-CAT-31 Consultar presentación"])
-            ucCatalog28(["CU-CAT-32 Crear presentación"])
-            ucCatalog29(["CU-CAT-33 Editar presentación"])
-            ucCatalog30(["CU-CAT-34 Consultar unidad de medida"])
-            ucCatalog31(["CU-CAT-35 Crear unidad de medida"])
-            ucCatalog32(["CU-CAT-36 Editar unidad de medida"])
-            ucCatalog33(["CU-CAT-37 Consultar motivo de ajuste"])
-            ucCatalog34(["CU-CAT-38 Crear motivo de ajuste"])
-            ucCatalog35(["CU-CAT-39 Editar motivo de ajuste"])
-            ucCatalog36(["CU-CAT-40 Consultar estado de cumplimiento"])
-            ucCatalog37(["CU-CAT-41 Crear estado de cumplimiento"])
-            ucCatalog38(["CU-CAT-42 Editar estado de cumplimiento"])
+            ucCatalog21(["CU-CAT-10 Consultar área"])
+            ucCatalog22(["CU-CAT-11 Crear área"])
+            ucCatalog23(["CU-CAT-12 Editar área"])
+            ucCatalog24(["CU-CAT-13 Consultar rol"])
+            ucCatalog25(["CU-CAT-14 Crear rol"])
+            ucCatalog26(["CU-CAT-15 Editar rol"])
+            ucCatalog27(["CU-CAT-16 Consultar presentación"])
+            ucCatalog28(["CU-CAT-17 Crear presentación"])
+            ucCatalog29(["CU-CAT-18 Editar presentación"])
+            ucCatalog30(["CU-CAT-19 Consultar unidad de medida"])
+            ucCatalog31(["CU-CAT-20 Crear unidad de medida"])
+            ucCatalog32(["CU-CAT-21 Editar unidad de medida"])
+            ucCatalog33(["CU-CAT-22 Consultar motivo de ajuste"])
+            ucCatalog34(["CU-CAT-23 Crear motivo de ajuste"])
+            ucCatalog35(["CU-CAT-24 Editar motivo de ajuste"])
+            ucCatalog36(["CU-CAT-25 Consultar estado de cumplimiento"])
+            ucCatalog37(["CU-CAT-26 Crear estado de cumplimiento"])
+            ucCatalog38(["CU-CAT-27 Editar estado de cumplimiento"])
         end
     end
 
@@ -147,16 +196,12 @@ flowchart LR
     admin --- ucCatalog30
     admin --- ucCatalog33
     admin --- ucCatalog36
-    admin --- ucMaterialMovements
-    admin --- ucWasteMovements
-    ucMaterialMovements --- ucMaterialMovementReport
     ucSupplierQuery --- ucSupplierCreate
     ucSupplierQuery --- ucSupplierEdit
     ucSupplierQuery --- ucSupplierReport
     ucClientQuery --- ucClientCreate
     ucClientQuery --- ucClientEdit
     ucClientQuery --- ucClientReport
-    ucWasteMovements --- ucWasteMovementReport
     ucCatalog21 --- ucCatalog22
     ucCatalog21 --- ucCatalog23
     ucCatalog24 --- ucCatalog25
@@ -178,48 +223,6 @@ solicitud API. Las consultas operativas de roles, áreas, presentaciones, unidad
 medida, motivos de ajuste y estados de cumplimiento alimentan controles de selección
 dentro de otros flujos. Se conservan como soporte técnico autorizado de esos casos, pero
 no reciben identificador ni se representan como objetivos independientes del actor.
-
-### Grupo funcional ALM - Almacen
-
-```mermaid
-flowchart LR
-    warehouse["«actor»<br/>Personal de almacén (área Almacén y proveduría)"]
-    admin["«actor»<br/>Administrador del sistema (área Sistemas)"]
-    admin -- "generaliza" --> warehouse
-
-    subgraph catalogPackage["Nexus · Grupo funcional CAT: Catálogos"]
-        direction TB
-        subgraph materialCatalogFamily["Materiales"]
-            ucMaterialQuery(["CU-CAT-01 Consultar materiales"])
-            ucMaterialCreate(["CU-CAT-02 Crear material"])
-            ucMaterialEdit(["CU-CAT-03 Editar material"])
-            ucMaterialRemove(["CU-CAT-04 Retirar material"])
-            ucMaterialStock(["CU-CAT-05 Ajustar existencia de material"])
-            ucMaterialInventoryReport(["CU-CAT-06 Generar reporte de inventario de materiales"])
-        end
-        subgraph wasteCatalogFamily["Mermas"]
-            ucWasteQuery(["CU-CAT-18 Consultar mermas"])
-            ucWasteCreate(["CU-CAT-19 Registrar merma"])
-            ucWasteEdit(["CU-CAT-20 Editar merma"])
-            ucWasteStock(["CU-CAT-21 Ajustar existencia de merma"])
-            ucWasteReport(["CU-CAT-22 Generar reporte de mermas"])
-        end
-    end
-
-    warehouse --- ucWasteQuery
-    warehouse --- ucMaterialQuery
-    admin --- ucWasteStock
-    admin --- ucMaterialStock
-    ucWasteQuery --- ucWasteCreate
-    ucWasteQuery --- ucWasteEdit
-    ucWasteQuery --- ucWasteReport
-    ucWasteStock -. "«extend»" .-> ucWasteQuery
-    ucMaterialQuery --- ucMaterialCreate
-    ucMaterialQuery --- ucMaterialEdit
-    ucMaterialQuery --- ucMaterialRemove
-    ucMaterialQuery --- ucMaterialInventoryReport
-    ucMaterialStock -. "«extend»" .-> ucMaterialQuery
-```
 
 ### Grupo funcional ENT — Compras de material
 
@@ -323,7 +326,7 @@ continúan fuera del diagrama por su estado no vigente.
 
 `CU-SAL-05` y `CU-SAL-12` actualizan la existencia y registra el movimiento como parte de su propio
 flujo; `CU-SAL-06` y `CU-SAL-13` registran la reversión y el movimiento inverso. No existe una relación
-`«include»` con `CU-CAT-07` y `CU-CAT-23`: consultar movimientos es otro objetivo iniciado por un
+`«include»` con `CU-ALM-07` y `CU-ALM-14`: consultar movimientos es otro objetivo iniciado por un
 actor, mientras registrar un movimiento es una responsabilidad interna de Nexus. Por la
 misma razón, compartir servicios entre grupos no se representa como salto, inclusión o
 extensión entre casos de uso.

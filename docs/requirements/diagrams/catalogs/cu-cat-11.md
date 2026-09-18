@@ -1,7 +1,8 @@
-# `CU-CAT-11` — Editar proveedor
+# `CU-CAT-11` — Crear área
 
 ```mermaid
 flowchart LR
-    request["Actor solicita editar proveedor"] --> validate["Nexus valida permiso, datos y relaciones"]
-    validate --> result["Nexus responde: Actualización de datos admitidos."]
+    request["Administrador selecciona Nueva área<br/>y confirma Guardar"] --> authorize["Nexus valida catalogs:manage y departments"]
+    authorize --> persist["Validar campos y crear área"]
+    persist --> result["Confirmar y refrescar Áreas"]
 ```

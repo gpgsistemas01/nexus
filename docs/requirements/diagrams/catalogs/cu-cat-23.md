@@ -1,8 +1,8 @@
-# `CU-CAT-23` — Consultar movimientos de mermas
+# `CU-CAT-23` — Crear motivo de ajuste
 
 ```mermaid
 flowchart LR
-    request["Actor solicita consultar movimientos de mermas"] --> validate["Nexus valida permiso, datos y relaciones"]
-    validate --> result["Nexus responde: Consulta autorizada sin modificar datos."]
-    result --> report["Actor elige exportar y dispara CU-CAT-24"]
+    request["Administrador selecciona Nuevo motivo de ajuste<br/>y confirma Guardar"] --> authorize["Nexus valida catalogs:manage y reasons"]
+    authorize --> persist["Validar campos y crear motivo de ajuste"]
+    persist --> result["Confirmar y refrescar Motivos de ajuste"]
 ```

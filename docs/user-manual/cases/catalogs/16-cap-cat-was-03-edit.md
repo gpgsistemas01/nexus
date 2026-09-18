@@ -1,7 +1,7 @@
 <a id="CAP-CAT-WAS-03-EDIT"></a>
 # 16. CAP-CAT-WAS-03-EDIT — Formulario edicion
 
-**Casos de uso:** `CU-CAT-20` — Editar merma.
+**Casos de uso:** `CU-ALM-11` — Editar merma.
 
 **Errores posibles:** [Validación de formularios](../../error-messages.md#errores-validacion), [Catálogos e inventario](../../error-messages.md#errores-catalogos).
 

@@ -1,25 +1,25 @@
 <a id="cu-cat-14"></a>
-# `CU-CAT-14` — Consultar clientes
+# `CU-CAT-14` — Crear rol
 
-**Patrones:** `FE-P02`.
+**Patrones:** `FE-P03`.
 
 ```mermaid
 sequenceDiagram
     participant Browser as Navegador
-    participant View as src/views/pages/sales/clients/clientsPage.ejs<br/>src/public/js/pages/sales/clients/clientsPage.js
-    participant Application as src/public/js/application/sales/clients/clients.js
-    participant Request as src/public/js/services/sales/clientService.js
+    participant View as src/public/js/pages/admin/catalogs/catalogForm.js
+    participant Application as src/public/js/application/admin/catalogs/catalogs.js
+    participant Request as src/public/js/services/admin/catalogService.js
     participant HTTP as src/public/js/services/axiosInstanceApi.js
-    participant Transport@{ "type": "control" } as src/routes/api/sales/clientApiRoute.js<br/>src/controllers/api/sales/clientController.js
-    Note over Application,Transport: Variables de frontera: params/filtros
+    participant Transport@{ "type": "control" } as src/routes/api/admin/catalogApiRoute.js<br/>src/controllers/api/admin/catalogController.js
+    Note over Application,Transport: Variables de frontera: catalog/data
 
-    Browser->>View: clientsPage.ejs y clientsPage.js cargan clientes
+    Browser->>View: confirmar el formulario de alta
     View->>View: recopilar y validar las variables de frontera indicadas
-    View->>Application: getAllClients({ params })
-    Application->>Request: getAllClientsRequest({ params })
+    View->>Application: registerCatalogEntry({ catalog, data })
+    Application->>Request: registerCatalogEntryRequest({ catalog, data })
     activate Application
     Request->>HTTP: apiRequest({ method: 'get', url, data/params })
-    HTTP->>Transport: consulta GET /api/sales/clients
+    HTTP->>Transport: consume POST /api/admin/catalogs/roles
     Transport-->>HTTP: status HTTP y payload del endpoint
     HTTP-->>Request: respuesta o error normalizado
     Request-->>Application: resultado del request

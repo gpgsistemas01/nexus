@@ -1,24 +1,24 @@
 <a id="cu-cat-03"></a>
-# `CU-CAT-03` — Editar material
+# `CU-CAT-03` — Editar proveedor
 
-**Patrones:** `BE-P01`, `BE-P03`, `BE-P04`.
+**Patrones:** `BE-P01`.
 
 ```mermaid
 sequenceDiagram
     participant Client as Cliente HTTP / web
-    participant Route as src/routes/api/warehouse/materialApiRoute.js
-    participant Controller@{ "type": "control" } as src/controllers/api/warehouse/materialController.js
-    participant MaterialDto as «object»<br/>materialDto<br/>src/dtos/materialDTO.js
-    participant Domain as src/services/warehouse/materials/materialService.js
-    Note over Controller,Domain: Variables de frontera: req.params.id, req.body/DTO, tx
+    participant Route as src/routes/api/warehouse/supplierApiRoute.js
+    participant Controller@{ "type": "control" } as src/controllers/api/warehouse/supplierController.js
+    participant SupplierDto as «object»<br/>supplierDto<br/>src/dtos/supplierDTO.js
+    participant Domain as src/services/warehouse/supplierService.js
+    Note over Controller,Domain: Variables de frontera: req.params.id, req.body/DTO
 
-    Client->>Route: PATCH /api/warehouse/materials/:id
+    Client->>Route: PUT /api/warehouse/suppliers/:id
     Route->>Route: ejecutar en orden el middleware configurado para la ruta
-    Route->>Controller: editMaterial(req, res)
+    Route->>Controller: editSupplier(req, res)
     activate Controller
-    Controller->>MaterialDto: createMaterialDtoForEdit(req.body) → sanitizeEmptyStrings(...)
-    MaterialDto-->>Controller: materialDto normalizado
-    Controller->>Domain: materialService.updateMaterial({ id: req.params.id, materialDto }) sincroniza datos y relación
+    Controller->>SupplierDto: createSupplierDtoForEdit(req.body) → sanitizeEmptyStrings(...)
+    SupplierDto-->>Controller: supplierDto normalizado
+    Controller->>Domain: supplierService.updateSupplier({ id: req.params.id, supplierDto }) actualiza datos del proveedor
     activate Domain
     Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
     Domain-->>Controller: resultado del servicio o error de dominio tipado

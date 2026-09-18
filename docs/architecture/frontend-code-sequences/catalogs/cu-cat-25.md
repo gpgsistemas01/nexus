@@ -1,5 +1,5 @@
 <a id="cu-cat-25"></a>
-# `CU-CAT-25` — Consultar área
+# `CU-CAT-25` — Consultar estado de cumplimiento
 
 **Patrones:** `FE-P03`.
 
@@ -19,7 +19,7 @@ sequenceDiagram
     Application->>Request: getAllCatalogEntriesRequest({ params, catalog })
     activate Application
     Request->>HTTP: apiRequest({ method: 'get', url, data/params })
-    HTTP->>Transport: consume GET /api/admin/catalogs/departments
+    HTTP->>Transport: consume GET /api/admin/catalogs/fulfillment-statuses
     Transport-->>HTTP: status HTTP y payload del endpoint
     HTTP-->>Request: respuesta o error normalizado
     Request-->>Application: resultado del request

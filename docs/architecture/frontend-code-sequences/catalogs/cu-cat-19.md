@@ -1,30 +1,25 @@
 <a id="cu-cat-19"></a>
-# `CU-CAT-19` — Registrar merma
+# `CU-CAT-19` — Consultar unidad de medida
 
-**Patrones:** `FE-P02`.
+**Patrones:** `FE-P03`.
 
 ```mermaid
 sequenceDiagram
     participant Browser as Navegador
-    participant View as src/public/js/pages/warehouse/wastes/wasteModal.js<br/>src/public/js/pages/warehouse/wastes/wasteForm.js
-    participant Application as src/public/js/application/warehouse/wastes/wastes.js
-    participant Request as src/public/js/services/warehouse/wasteService.js
+    participant View as src/public/js/plugins/datatable/admin/catalogs/catalogDatatable.js
+    participant Application as src/public/js/application/admin/catalogs/catalogs.js
+    participant Request as src/public/js/services/admin/catalogService.js
     participant HTTP as src/public/js/services/axiosInstanceApi.js
-    participant Transport@{ "type": "control" } as src/routes/api/warehouse/wasteApiRoute.js<br/>src/controllers/api/warehouse/wasteController.js
-    Note over Application,Transport: Variables de frontera: formData/payload
+    participant Transport@{ "type": "control" } as src/routes/api/admin/catalogApiRoute.js<br/>src/controllers/api/admin/catalogController.js
+    Note over Application,Transport: Variables de frontera: params/catalog
 
-    Browser->>View: wasteModal.js y wasteForm.js seleccionan una plantilla de material
+    Browser->>View: abrir y cargar la tabla del catálogo
     View->>View: recopilar y validar las variables de frontera indicadas
-    View->>Application: getWasteMaterialTemplates({ params })
-    Application->>Request: registerWaste({ formData })
+    View->>Application: getAllCatalogEntries({ params, catalog })
+    Application->>Request: getAllCatalogEntriesRequest({ params, catalog })
     activate Application
-    Request->>HTTP: apiRequest({ method: 'post', url, data/params })
-    HTTP->>Transport: enviar POST /api/warehouse/wastes
-    alt Misma identidad de merma
-        Transport-->>View: 409 WASTE_ALREADY_EXISTS y no incrementar stock
-    else Merma nueva
-        Transport->>Transport: crear merma y ajuste de existencia inicial
-    end
+    Request->>HTTP: apiRequest({ method: 'get', url, data/params })
+    HTTP->>Transport: consume GET /api/admin/catalogs/unit-measures
     Transport-->>HTTP: status HTTP y payload del endpoint
     HTTP-->>Request: respuesta o error normalizado
     Request-->>Application: resultado del request

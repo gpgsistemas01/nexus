@@ -152,16 +152,13 @@ trazabilidad técnica; un identificador retirado no se reasigna a un objetivo di
 | `AUT` | Autenticación | Inicio y cierre observable de la sesión del usuario. |
 | `IDA` | Identidad y acceso | Personas, cuentas, credenciales y asignaciones de acceso. |
 | `ALM` | Almacén | Materiales, mermas, existencias, movimientos y reportes operativos del almacén. |
-| `ALM` | Almacén | Materiales, mermas, existencias, movimientos y reportes operativos del almacén. |
-| `CAT` | Catálogos | Recursos comerciales y contextuales reutilizados por documentos. |
-| `ALM` | Almacén | Materiales, mermas, existencias, movimientos y reportes operativos del almacén. |
 | `CAT` | Catálogos | Recursos comerciales y contextuales reutilizados por documentos. |
 | `ENT` | Compras de material | Consulta, registro, edición, corrección y cancelación de compras recibidas. |
-Se mantienen seis grupos funcionales propietarios porque expresan capacidades de
+| `SAL` | Salidas de material y de merma | Consulta, creación, edición, surtimiento y devolución de materiales o mermas. |
 
 #### Criterio de agrupación vigente
 
-Se mantienen cinco grupos funcionales propietarios porque expresan capacidades de
+Se mantienen seis grupos funcionales propietarios porque expresan capacidades de
 negocio estables. Cada consulta o reporte se ubica en el grupo del recurso desde el que
 se inicia; no existe un grupo independiente para reportes. Dentro de ellos, los casos se ordenan
 por la entidad o el documento sobre el que actúan. Cada secuencia comienza con la
@@ -176,7 +173,8 @@ como listas planas difíciles de revisar.
 | --- | --- | --- |
 | `AUT` | Sesión. | `CU-AUT-01` a `CU-AUT-02` |
 | `IDA` | Personas; usuarios y credenciales; sus consultas y reportes. | `CU-IDA-01` a `CU-IDA-09` |
-| `CAT` | Materiales; proveedores; clientes; mermas; inventarios, movimientos, reportes y catálogos auxiliares. | `CU-CAT-01` a `CU-CAT-42` |
+| `ALM` | Materiales; mermas; inventarios y movimientos del almacén. | `CU-ALM-01` a `CU-ALM-15` |
+| `CAT` | Proveedores; clientes; catálogos auxiliares y reportes complementarios. | `CU-CAT-01` a `CU-CAT-27` |
 | `ENT` | Compras de material y su reporte. | `CU-ENT-01` a `CU-ENT-06` |
 | `SAL` | Salidas de material y merma con sus reportes. | `CU-SAL-01` a `CU-SAL-14` |
 
@@ -200,17 +198,19 @@ conjunto; el cambio de identificador no modifica el alcance funcional del caso.
 
 - [AUT — Autenticación](authentication/index.md)
 - [IDA — Identidad y acceso](identity-access/index.md)
+- [ALM — Almacén](../use-cases/catalogs/index.md)
 - [CAT — Catálogos](catalogs/index.md)
 - [ENT — Compras de material](purchases/index.md)
 - [SAL — Salidas de material y de merma](issues/index.md)
+
 ## Relación entre familias y reutilización
 
 | Tema compartido | Casos | Elementos reutilizables que deben evaluarse primero | Diferencia que debe conservarse |
 | --- | --- | --- | --- |
-| CRUD de identidades y catálogos | `CU-IDA-01` a `CU-IDA-09`; `CU-CAT-01` a `CU-CAT-42` | Fábricas CRUD, listados, formularios, validación y refresco de tabla. | Permisos, identidad del recurso, relaciones y política de eliminación. |
+| CRUD de identidades y catálogos | `CU-IDA-01` a `CU-IDA-09`; `CU-ALM-01` a `CU-ALM-06`; `CU-ALM-09` a `CU-ALM-13`; `CU-CAT-01` a `CU-CAT-27` | Fábricas CRUD, listados, formularios, validación y refresco de tabla. | Permisos, identidad del recurso, relaciones y política de eliminación. |
 | Documentos con detalles | `CU-ENT-02`, `CU-ENT-03`, `CU-SAL-02` a `CU-SAL-04` y `CU-SAL-09` a `CU-SAL-11` | Encabezado, modal/formulario, tabla de detalles, DTO y transacción coordinadora. | La entrada incrementa stock al confirmarse; la salida no lo descuenta hasta surtir. |
 | Operación de salidas | `CU-SAL-02` a `CU-SAL-06` y `CU-SAL-09` a `CU-SAL-13` | Proceso de material replicable para merma, componentes informativos y coordinación de movimientos. | Inventario, conversión, permisos, estados y cantidades acumuladas del contexto. |
-| Consulta y exportación | `CU-IDA-04`, `CU-IDA-09`, `CU-CAT-06`, `CU-CAT-08`, `CU-CAT-13`, `CU-CAT-17`, `CU-CAT-22`, `CU-CAT-24`, `CU-ENT-06`, `CU-SAL-07` y `CU-SAL-14` y casos de consulta de cada familia | Filtros, paginación, dependencias entre selects y utilidades Excel. | Columnas, agrupaciones, fórmulas y permiso de cada reporte. |
+| Consulta y exportación | `CU-IDA-04`, `CU-IDA-09`, `CU-ALM-06`, `CU-ALM-08`, `CU-ALM-13`, `CU-ALM-15`, `CU-CAT-05`, `CU-CAT-09`, `CU-ENT-06`, `CU-SAL-07` y `CU-SAL-14` y casos de consulta de cada familia | Filtros, paginación, dependencias entre selects y utilidades Excel. | Columnas, agrupaciones, fórmulas y permiso de cada reporte. |
 
 Reutilizar no significa fusionar reglas de negocio. Antes de crear otro flujo se revisan
 los [patrones de diseño y construcción](../../architecture/design-and-construction-patterns/index.md), se replica

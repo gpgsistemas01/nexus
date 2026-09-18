@@ -1,33 +1,39 @@
 <a id="cu-cat-05"></a>
-# `CU-CAT-05` — Ajustar existencia de material
+# `CU-CAT-05` — Generar reporte de proveedores
 
-**Patrones:** `FE-P02`.
+**Patrones:** `FE-P08`.
 
 ```mermaid
 sequenceDiagram
-    Note over User,App: Variables de frontera: id, DTO de ajuste y userId
-    actor User as Administrador del sistema
-    participant EJS as src/views/pages/warehouse/materials/materialsPage.ejs
-    participant Form as src/public/js/pages/warehouse/materials/materialForm.js
-    participant App as src/public/js/application/warehouse/materials/materials.js
-    participant Factory as src/public/js/application/createCrudApplication.js
-    participant Request as src/public/js/services/warehouse/materialService.js
+    participant Browser as Navegador
+    participant View as src/public/js/plugins/datatable/warehouse/suppliers/supplierDatatable.js
+    participant Dialog as src/public/js/ui/reportExportDialog.js
+    participant Application as src/public/js/application/warehouse/report.js
+    participant Request as src/public/js/services/warehouse/reportService.js
     participant HTTP as src/public/js/services/axiosInstanceApi.js
-    participant API@{ "type": "control" } as src/controllers/api/warehouse/materialController.js
+    participant Transport@{ "type": "control" } as src/routes/api/warehouse/reportApiRoute.js<br/>src/controllers/api/warehouse/reportController.js
+    Note over Application,Transport: Variables de frontera: params/filtros
 
-    EJS->>Form: carga módulo y formulario
-    User->>Form: confirma ajuste
-    Form->>Form: selecciona campos y valida
-    Form->>App: editMaterialStock({ formData, id })
-    App->>Factory: createApplicationMutation({ request: editMaterialStockRequest, dataKey: 'material' })({ formData, id })
-    Factory->>Request: editMaterialStockRequest({ data: formData, id })
-    Request->>HTTP: apiRequest({ method: patch, url, data })
-    HTTP->>API: PATCH /api/warehouse/materials/:id/stock
-    API-->>HTTP: { material, code }
-    HTTP-->>Request: respuesta normalizada
-    Request-->>Factory: response
-    Factory-->>Form: material
-    Form->>Form: form.onSave?.(material)
+    Browser->>View: Botón Excel de supplierDatatable.js
+    View->>Dialog: showFilteredExportDialog()
+    Dialog-->>View: alcance confirmado o cancelación
+    View->>View: recopilar y validar las variables de frontera indicadas
+    View->>Application: exportSupplierReport({ params })
+    Application->>Request: exportSupplierReportRequest({ params })
+    activate Application
+    Request->>HTTP: apiRequest({ method: 'get', url, params })
+    HTTP->>Transport: descarga GET /api/warehouse/reports/suppliers/excel
+    Transport-->>HTTP: status HTTP y payload del endpoint
+    HTTP-->>Request: respuesta o error normalizado
+    Request-->>Application: resultado del request
+    alt Respuesta exitosa
+        Application-->>View: entidad, colección o archivo normalizado
+        View-->>Browser: actualizar la vista con el resultado
+    else Respuesta rechazada
+        Application-->>View: error normalizado por apiRequest
+        View-->>Browser: conservar contexto y mostrar el mensaje
+    end
+    deactivate Application
 ```
 
 <a id="cu-cat-09"></a>

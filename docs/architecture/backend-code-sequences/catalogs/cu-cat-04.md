@@ -1,21 +1,24 @@
 <a id="cu-cat-04"></a>
-# `CU-CAT-04` — Retirar material
+# `CU-CAT-04` — Cambiar estado de proveedor
 
-**Patrones:** `BE-P01`, `BE-P03`, `BE-P04`.
+**Patrones:** `BE-P01`.
 
 ```mermaid
 sequenceDiagram
     participant Client as Cliente HTTP / web
-    participant Route as src/routes/api/warehouse/materialApiRoute.js
-    participant Controller@{ "type": "control" } as src/controllers/api/warehouse/materialController.js
-    participant Domain as src/services/warehouse/materials/materialService.js
-    Note over Controller,Domain: Variables de frontera: req.params.id
+    participant Route as src/routes/api/warehouse/supplierApiRoute.js
+    participant Controller@{ "type": "control" } as src/controllers/api/warehouse/supplierController.js
+    participant SupplierDto as «object»<br/>supplierDto<br/>src/dtos/supplierDTO.js
+    participant Domain as src/services/warehouse/supplierService.js
+    Note over Controller,Domain: Variables de frontera: req.params.id, req.body/DTO
 
-    Client->>Route: DELETE /api/warehouse/materials/:id
+    Client->>Route: PUT /api/warehouse/suppliers/:id
     Route->>Route: ejecutar en orden el middleware configurado para la ruta
-    Route->>Controller: removeMaterial(req, res)
+    Route->>Controller: editSupplier(req, res)
     activate Controller
-    Controller->>Domain: materialService.deleteMaterial(req.params.id) protege referencias antes de eliminar relación
+    Controller->>SupplierDto: createSupplierDtoForEdit(req.body) → sanitizeEmptyStrings(...)
+    SupplierDto-->>Controller: supplierDto normalizado
+    Controller->>Domain: supplierService.updateSupplier(supplierDto, req.params.id) aplica el estado incluido en el DTO, no hay endpoint separado
     activate Domain
     Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
     Domain-->>Controller: resultado del servicio o error de dominio tipado
@@ -28,4 +31,4 @@ sequenceDiagram
     deactivate Controller
 ```
 
-<a id="cu-cat-05"></a>
+<a id="cu-cat-06"></a>

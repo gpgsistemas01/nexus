@@ -1,8 +1,8 @@
-# `CU-CAT-18` — Consultar mermas
+# `CU-CAT-18` — Editar presentación
 
 ```mermaid
 flowchart LR
-    request["Actor solicita consultar mermas"] --> validate["Nexus valida permiso, datos y relaciones"]
-    validate --> result["Nexus responde: Listado de existencias de merma."]
-    result --> report["Actor elige exportar y dispara CU-CAT-22"]
+    request["Administrador selecciona Editar registro<br/>y confirma Actualizar"] --> authorize["Nexus valida catalogs:manage y presentations"]
+    authorize --> persist["Validar campos y actualizar presentación"]
+    persist --> result["Confirmar y refrescar Presentaciones"]
 ```

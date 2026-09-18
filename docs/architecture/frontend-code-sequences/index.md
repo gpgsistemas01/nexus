@@ -81,7 +81,8 @@ aparece una vez, conserva su referencia de patrones y contiene un bloque Mermaid
 | --- | --- | ---: | --- |
 | Autenticación | `CU-AUT-01..02` | 2 | Completo |
 | Identidad y acceso | `CU-IDA-01..09` | 9 | Completo |
-| Catálogos | `CU-CAT-01..42` | 42 | Completo |
+| Almacén | `CU-ALM-01..15` | 15 | Completo |
+| Catálogos | `CU-CAT-01..17`, `CU-CAT-10..42` | 27 | Completo |
 | Entradas | `CU-ENT-01..06` | 6 | Completo |
 | Salidas | `CU-SAL-01..14` | 14 | Completo |
 | **Total** | Cinco grupos propietarios | **81** | **81 de 81** |
@@ -90,7 +91,7 @@ aparece una vez, conserva su referencia de patrones y contiene un bloque Mermaid
 
 - [Autenticación](authentication/index.md): casos `CU-AUT-*`.
 - [Identidad y acceso](identity-access/index.md): casos `CU-IDA-*`.
-- [Catálogos e inventario](catalogs/index.md): casos `CU-CAT-*`.
+- [Almacén y catálogos](catalogs/index.md): casos `CU-ALM-*` y `CU-CAT-*`.
 - [Compras y entradas](purchases/index.md): casos `CU-ENT-*`.
 - [Salidas](issues/index.md): casos `CU-SAL-*`.
 - [Nota histórica sobre infraestructura de consultas y exportaciones](reports/index.md): los casos y diagramas están dentro de su grupo propietario.

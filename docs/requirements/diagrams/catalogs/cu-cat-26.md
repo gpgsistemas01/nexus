@@ -1,8 +1,8 @@
-# `CU-CAT-26` — Crear área
+# `CU-CAT-26` — Crear estado de cumplimiento
 
 ```mermaid
 flowchart LR
-    request["Administrador selecciona Nueva área<br/>y confirma Guardar"] --> authorize["Nexus valida catalogs:manage y departments"]
-    authorize --> persist["Validar campos y crear área"]
-    persist --> result["Confirmar y refrescar Áreas"]
+    request["Administrador selecciona Nuevo estado de cumplimiento<br/>y confirma Guardar"] --> authorize["Nexus valida catalogs:manage y fulfillment-statuses"]
+    authorize --> persist["Validar campos y crear estado de cumplimiento"]
+    persist --> result["Confirmar y refrescar Estados de cumplimiento"]
 ```

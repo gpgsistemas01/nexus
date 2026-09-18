@@ -1,7 +1,7 @@
-# `CU-CAT-16` — Editar cliente
+# `CU-CAT-16` — Consultar presentación
 
 ```mermaid
 flowchart LR
-    request["Actor solicita editar cliente"] --> validate["Nexus valida permiso, datos y relaciones"]
-    validate --> result["Nexus responde: Actualización de datos y asesor opcional."]
+    request["Administrador solicita consultar Presentaciones"] --> authorize["Nexus valida catalogs:manage y presentations"]
+    authorize --> result["Mostrar exclusivamente la tabla de Presentaciones"]
 ```

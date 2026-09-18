@@ -1,5 +1,5 @@
 <a id="cu-cat-26"></a>
-# `CU-CAT-26` — Crear área
+# `CU-CAT-26` — Crear estado de cumplimiento
 
 **Patrones:** `BE-P02`.
 
@@ -11,7 +11,7 @@ sequenceDiagram
     participant Domain as src/services/admin/catalogService.js
     Note over Controller,Domain: Variables de frontera: req.params.catalog/req.body
 
-    Client->>Route: POST /api/admin/catalogs/departments
+    Client->>Route: POST /api/admin/catalogs/fulfillment-statuses
     Route->>Route: ejecutar en orden el middleware configurado para la ruta
     Route->>Controller: registerCatalogEntry(req, res)
     activate Controller

@@ -1,5 +1,5 @@
 <a id="cu-cat-27"></a>
-# `CU-CAT-27` — Editar área
+# `CU-CAT-27` — Editar estado de cumplimiento
 
 **Patrones:** `BE-P02`.
 
@@ -11,7 +11,7 @@ sequenceDiagram
     participant Domain as src/services/admin/catalogService.js
     Note over Controller,Domain: Variables de frontera: req.params.catalog/req.params.id/req.body
 
-    Client->>Route: PUT /api/admin/catalogs/departments/:id
+    Client->>Route: PUT /api/admin/catalogs/fulfillment-statuses/:id
     Route->>Route: ejecutar en orden el middleware configurado para la ruta
     Route->>Controller: editCatalogEntry(req, res)
     activate Controller
@@ -27,5 +27,3 @@ sequenceDiagram
     end
     deactivate Controller
 ```
-
-<a id="cu-cat-28"></a>

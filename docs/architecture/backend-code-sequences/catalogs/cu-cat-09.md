@@ -1,21 +1,21 @@
 <a id="cu-cat-09"></a>
-# `CU-CAT-09` — Consultar proveedores
+# `CU-CAT-09` — Generar reporte de clientes
 
-**Patrones:** `BE-P01`.
+**Patrones:** `BE-P07`.
 
 ```mermaid
 sequenceDiagram
     participant Client as Cliente HTTP / web
-    participant Route as src/routes/api/warehouse/supplierApiRoute.js
-    participant Controller@{ "type": "control" } as src/controllers/api/warehouse/supplierController.js
-    participant Domain as src/services/warehouse/supplierService.js
+    participant Route as src/routes/api/sales/reportApiRoute.js
+    participant Controller@{ "type": "control" } as src/controllers/api/sales/reportController.js
+    participant Domain as src/services/sales/clientService.js<br/>src/utils/reportExcelUtils.js
     Note over Controller,Domain: Variables de frontera: req.query/params
 
-    Client->>Route: GET /api/warehouse/suppliers
+    Client->>Route: GET /api/sales/reports/clients/excel
     Route->>Route: ejecutar en orden el middleware configurado para la ruta
-    Route->>Controller: getAllSuppliers(req, res)
+    Route->>Controller: exportClientReport(req, res)
     activate Controller
-    Controller->>Domain: supplierService.findAllSuppliers({ query: req.query }) consulta proveedores
+    Controller->>Domain: clientService.findAllClients({ query: req.query }) prepara filas y el controller llama sendExcelReport
     activate Domain
     Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
     Domain-->>Controller: resultado del servicio o error de dominio tipado
@@ -28,4 +28,4 @@ sequenceDiagram
     deactivate Controller
 ```
 
-<a id="cu-cat-10"></a>
+<a id="cu-ida-04"></a>

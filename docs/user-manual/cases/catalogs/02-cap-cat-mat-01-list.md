@@ -1,7 +1,7 @@
 <a id="CAP-CAT-MAT-01-LIST"></a>
 # 2. CAP-CAT-MAT-01-LIST — Listado inventario
 
-**Casos de uso:** `CU-AUT-02` — Cerrar sesión; `CU-CAT-01` — Consultar materiales e inventario; `CU-CAT-06` — Generar reporte de inventario de materiales.
+**Casos de uso:** `CU-AUT-02` — Cerrar sesión; `CU-ALM-01` — Consultar materiales e inventario; `CU-ALM-06` — Generar reporte de inventario de materiales.
 
 **Errores posibles:** [Catálogos e inventario](../../error-messages.md#errores-catalogos).
 

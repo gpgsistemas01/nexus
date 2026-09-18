@@ -1,21 +1,21 @@
 <a id="cu-cat-17"></a>
-# `CU-CAT-17` — Generar reporte de clientes
+# `CU-CAT-17` — Crear presentación
 
-**Patrones:** `BE-P07`.
+**Patrones:** `BE-P02`.
 
 ```mermaid
 sequenceDiagram
     participant Client as Cliente HTTP / web
-    participant Route as src/routes/api/sales/reportApiRoute.js
-    participant Controller@{ "type": "control" } as src/controllers/api/sales/reportController.js
-    participant Domain as src/services/sales/clientService.js<br/>src/utils/reportExcelUtils.js
-    Note over Controller,Domain: Variables de frontera: req.query/params
+    participant Route as src/routes/api/admin/catalogApiRoute.js
+    participant Controller@{ "type": "control" } as src/controllers/api/admin/catalogController.js
+    participant Domain as src/services/admin/catalogService.js
+    Note over Controller,Domain: Variables de frontera: req.params.catalog/req.body
 
-    Client->>Route: GET /api/sales/reports/clients/excel
+    Client->>Route: POST /api/admin/catalogs/presentations
     Route->>Route: ejecutar en orden el middleware configurado para la ruta
-    Route->>Controller: exportClientReport(req, res)
+    Route->>Controller: registerCatalogEntry(req, res)
     activate Controller
-    Controller->>Domain: clientService.findAllClients({ query: req.query }) prepara filas y el controller llama sendExcelReport
+    Controller->>Domain: createCatalogEntry(req.params.catalog/req.body) normaliza y crea únicamente los campos permitidos
     activate Domain
     Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
     Domain-->>Controller: resultado del servicio o error de dominio tipado
@@ -28,4 +28,4 @@ sequenceDiagram
     deactivate Controller
 ```
 
-<a id="cu-ida-04"></a>
+<a id="cu-cat-18"></a>

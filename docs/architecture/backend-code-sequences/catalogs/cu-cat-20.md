@@ -1,24 +1,21 @@
 <a id="cu-cat-20"></a>
-# `CU-CAT-20` — Editar merma
+# `CU-CAT-20` — Crear unidad de medida
 
-**Patrones:** `BE-P01`.
+**Patrones:** `BE-P02`.
 
 ```mermaid
 sequenceDiagram
     participant Client as Cliente HTTP / web
-    participant Route as src/routes/api/warehouse/wasteApiRoute.js
-    participant Controller@{ "type": "control" } as src/controllers/api/warehouse/wasteController.js
-    participant WasteDto as «object»<br/>wasteDto<br/>src/dtos/wasteDTO.js
-    participant Domain as src/services/warehouse/wastes/wasteService.js
-    Note over Controller,Domain: Variables de frontera: req.params.id, req.body/DTO
+    participant Route as src/routes/api/admin/catalogApiRoute.js
+    participant Controller@{ "type": "control" } as src/controllers/api/admin/catalogController.js
+    participant Domain as src/services/admin/catalogService.js
+    Note over Controller,Domain: Variables de frontera: req.params.catalog/req.body
 
-    Client->>Route: PATCH /api/warehouse/wastes/:id
+    Client->>Route: POST /api/admin/catalogs/unit-measures
     Route->>Route: ejecutar en orden el middleware configurado para la ruta
-    Route->>Controller: editWaste(req, res)
+    Route->>Controller: registerCatalogEntry(req, res)
     activate Controller
-    Controller->>WasteDto: createWasteDtoForEdit(req.body) → sanitizeEmptyStrings(...)
-    WasteDto-->>Controller: wasteDto normalizado
-    Controller->>Domain: wasteService.updateWaste({ id: req.params.id, wasteDto }) actualiza datos sin tratar stock como edición
+    Controller->>Domain: createCatalogEntry(req.params.catalog/req.body) normaliza y crea únicamente los campos permitidos
     activate Domain
     Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
     Domain-->>Controller: resultado del servicio o error de dominio tipado

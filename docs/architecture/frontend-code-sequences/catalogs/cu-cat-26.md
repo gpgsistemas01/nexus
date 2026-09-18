@@ -1,5 +1,5 @@
 <a id="cu-cat-26"></a>
-# `CU-CAT-26` — Crear área
+# `CU-CAT-26` — Crear estado de cumplimiento
 
 **Patrones:** `FE-P03`.
 
@@ -19,7 +19,7 @@ sequenceDiagram
     Application->>Request: registerCatalogEntryRequest({ catalog, data })
     activate Application
     Request->>HTTP: apiRequest({ method: 'get', url, data/params })
-    HTTP->>Transport: consume POST /api/admin/catalogs/departments
+    HTTP->>Transport: consume POST /api/admin/catalogs/fulfillment-statuses
     Transport-->>HTTP: status HTTP y payload del endpoint
     HTTP-->>Request: respuesta o error normalizado
     Request-->>Application: resultado del request

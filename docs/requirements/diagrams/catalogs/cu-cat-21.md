@@ -1,7 +1,8 @@
-# `CU-CAT-21` — Ajustar existencia de merma
+# `CU-CAT-21` — Editar unidad de medida
 
 ```mermaid
 flowchart LR
-    request["Actor solicita ajustar existencia de merma"] --> validate["Nexus valida permiso, datos y relaciones"]
-    validate --> result["Nexus responde: Ajuste trazable de inventario de merma."]
+    request["Administrador selecciona Editar registro<br/>y confirma Actualizar"] --> authorize["Nexus valida catalogs:manage y unit-measures"]
+    authorize --> persist["Validar campos y actualizar unidad de medida"]
+    persist --> result["Confirmar y refrescar Unidades de medida"]
 ```

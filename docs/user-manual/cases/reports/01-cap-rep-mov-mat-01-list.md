@@ -1,7 +1,7 @@
 <a id="CAP-REP-MOV-MAT-01-LIST"></a>
 # 1. CAP-REP-MOV-MAT-01-LIST — Historial y filtros
 
-**Casos de uso:** `CU-CAT-07` — Consultar movimientos de materiales.
+**Casos de uso:** `CU-ALM-07` — Consultar movimientos de materiales.
 
 **Errores posibles:** [Reportes](../../error-messages.md#errores-reportes).
 

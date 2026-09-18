@@ -1,5 +1,5 @@
 <a id="cu-cat-27"></a>
-# `CU-CAT-27` — Editar área
+# `CU-CAT-27` — Editar estado de cumplimiento
 
 **Patrones:** `FE-P03`.
 
@@ -19,7 +19,7 @@ sequenceDiagram
     Application->>Request: editCatalogEntryRequest({ catalog, id, data })
     activate Application
     Request->>HTTP: apiRequest({ method: 'get', url, data/params })
-    HTTP->>Transport: consume PUT /api/admin/catalogs/departments/:id
+    HTTP->>Transport: consume PUT /api/admin/catalogs/fulfillment-statuses/:id
     Transport-->>HTTP: status HTTP y payload del endpoint
     HTTP-->>Request: respuesta o error normalizado
     Request-->>Application: resultado del request
@@ -32,5 +32,3 @@ sequenceDiagram
     end
     deactivate Application
 ```
-
-<a id="cu-cat-28"></a>

@@ -1,28 +1,25 @@
 <a id="cu-cat-13"></a>
-# `CU-CAT-13` — Generar reporte de proveedores
+# `CU-CAT-13` — Consultar rol
 
-**Patrones:** `FE-P08`.
+**Patrones:** `FE-P03`.
 
 ```mermaid
 sequenceDiagram
     participant Browser as Navegador
-    participant View as src/public/js/plugins/datatable/warehouse/suppliers/supplierDatatable.js
-    participant Dialog as src/public/js/ui/reportExportDialog.js
-    participant Application as src/public/js/application/warehouse/report.js
-    participant Request as src/public/js/services/warehouse/reportService.js
+    participant View as src/public/js/plugins/datatable/admin/catalogs/catalogDatatable.js
+    participant Application as src/public/js/application/admin/catalogs/catalogs.js
+    participant Request as src/public/js/services/admin/catalogService.js
     participant HTTP as src/public/js/services/axiosInstanceApi.js
-    participant Transport@{ "type": "control" } as src/routes/api/warehouse/reportApiRoute.js<br/>src/controllers/api/warehouse/reportController.js
-    Note over Application,Transport: Variables de frontera: params/filtros
+    participant Transport@{ "type": "control" } as src/routes/api/admin/catalogApiRoute.js<br/>src/controllers/api/admin/catalogController.js
+    Note over Application,Transport: Variables de frontera: params/catalog
 
-    Browser->>View: Botón Excel de supplierDatatable.js
-    View->>Dialog: showFilteredExportDialog()
-    Dialog-->>View: alcance confirmado o cancelación
+    Browser->>View: abrir y cargar la tabla del catálogo
     View->>View: recopilar y validar las variables de frontera indicadas
-    View->>Application: exportSupplierReport({ params })
-    Application->>Request: exportSupplierReportRequest({ params })
+    View->>Application: getAllCatalogEntries({ params, catalog })
+    Application->>Request: getAllCatalogEntriesRequest({ params, catalog })
     activate Application
-    Request->>HTTP: apiRequest({ method: 'get', url, params })
-    HTTP->>Transport: descarga GET /api/warehouse/reports/suppliers/excel
+    Request->>HTTP: apiRequest({ method: 'get', url, data/params })
+    HTTP->>Transport: consume GET /api/admin/catalogs/roles
     Transport-->>HTTP: status HTTP y payload del endpoint
     HTTP-->>Request: respuesta o error normalizado
     Request-->>Application: resultado del request
@@ -36,4 +33,4 @@ sequenceDiagram
     deactivate Application
 ```
 
-<a id="cu-cat-17"></a>
+<a id="cu-cat-14"></a>

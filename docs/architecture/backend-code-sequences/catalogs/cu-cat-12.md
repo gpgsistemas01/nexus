@@ -1,24 +1,21 @@
 <a id="cu-cat-12"></a>
-# `CU-CAT-12` — Cambiar estado de proveedor
+# `CU-CAT-12` — Editar área
 
-**Patrones:** `BE-P01`.
+**Patrones:** `BE-P02`.
 
 ```mermaid
 sequenceDiagram
     participant Client as Cliente HTTP / web
-    participant Route as src/routes/api/warehouse/supplierApiRoute.js
-    participant Controller@{ "type": "control" } as src/controllers/api/warehouse/supplierController.js
-    participant SupplierDto as «object»<br/>supplierDto<br/>src/dtos/supplierDTO.js
-    participant Domain as src/services/warehouse/supplierService.js
-    Note over Controller,Domain: Variables de frontera: req.params.id, req.body/DTO
+    participant Route as src/routes/api/admin/catalogApiRoute.js
+    participant Controller@{ "type": "control" } as src/controllers/api/admin/catalogController.js
+    participant Domain as src/services/admin/catalogService.js
+    Note over Controller,Domain: Variables de frontera: req.params.catalog/req.params.id/req.body
 
-    Client->>Route: PUT /api/warehouse/suppliers/:id
+    Client->>Route: PUT /api/admin/catalogs/departments/:id
     Route->>Route: ejecutar en orden el middleware configurado para la ruta
-    Route->>Controller: editSupplier(req, res)
+    Route->>Controller: editCatalogEntry(req, res)
     activate Controller
-    Controller->>SupplierDto: createSupplierDtoForEdit(req.body) → sanitizeEmptyStrings(...)
-    SupplierDto-->>Controller: supplierDto normalizado
-    Controller->>Domain: supplierService.updateSupplier(supplierDto, req.params.id) aplica el estado incluido en el DTO, no hay endpoint separado
+    Controller->>Domain: updateCatalogEntry(req.params.catalog/req.params.id/req.body) normaliza y actualiza únicamente los campos permitidos
     activate Domain
     Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
     Domain-->>Controller: resultado del servicio o error de dominio tipado
@@ -31,4 +28,4 @@ sequenceDiagram
     deactivate Controller
 ```
 
-<a id="cu-cat-14"></a>
+<a id="cu-cat-13"></a>

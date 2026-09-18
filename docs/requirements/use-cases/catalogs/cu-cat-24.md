@@ -1,13 +1,14 @@
-# `CU-CAT-24` — Generar reporte de movimientos de mermas
+# `CU-CAT-24` — Editar motivo de ajuste
 
 | Sección | Información relevante |
 | --- | --- |
 | Identificador | `CU-CAT-24` |
-| Nombre | Generar reporte de movimientos de mermas. |
-| Actor y disparador | **Actor:** Usuario con permiso sobre el reporte o consulta. **Disparador:** desde `CU-CAT-23` Consultar movimientos de mermas, selecciona **Exportar Excel** con los filtros que necesita conservar. |
-| Participación de actor y sistema | **Actor:** define filtros y solicita la exportación.<br>**Nexus:** autoriza, consolida la información y entrega el archivo. |
-| Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de consulta o reporte correspondiente. |
-| Flujo principal | 1. **Nexus:** después de que el actor selecciona la exportación desde la consulta de origen, abre el modal **Exportar reporte** y muestra las opciones aplicables **(ver E1)**.<br>2. **Actor:** conserva o ajusta los filtros, incluye las opciones disponibles y confirma.<br>3. **Nexus:** vuelve a comprobar autorización y parámetros y prepara la información de movimientos de mermas.<br>4. **Nexus:** genera el archivo de Excel e inicia su descarga; si no hay datos, informa que el resultado está vacío. |
-| Excepciones | **E1 — Exportación rechazada (después del disparador):**<br>1. **Nexus:** comprueba las precondiciones y la autorización, determina que alguna no se cumple y rechaza la solicitud sin modificar datos ni exponer información no autorizada; comunica el motivo.<br>2. **Actor:** reconoce el rechazo; termina el caso de uso. |
-| Postcondiciones (éxito y fallo) | 1. **Éxito:** Archivo Excel con filtros, columnas y cálculos propios del reporte.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
-| Requisitos relacionados | `RF-REP-002`, `RF-REP-004`, `RF-REP-005`. |
+| Nombre | Editar motivo de ajuste. |
+| Actor y disparador | **Actor:** Administrador del sistema del área Sistemas. **Disparador:** selecciona **Editar registro** en la pantalla **Motivos de ajuste**. |
+| Participación de actor y sistema | **Actor:** modifica y confirma una entrada de Motivos de ajuste.<br>**Nexus:** autoriza, limita los campos, valida, actualiza y refresca la tabla. |
+| Precondiciones | 1. El actor inició sesión y cuenta con autorización para administrar catálogos.<br>2. La entrada existe en **Motivos de ajuste**. |
+| Flujo principal | 1. **Administrador:** abre **Motivos de ajuste** y selecciona **Editar registro** en una fila **(ver E1)**.<br>2. **Nexus:** presenta los valores existentes y únicamente los campos **Nombre** y **Activo**.<br>3. **Administrador:** modifica los datos y selecciona **Actualizar** **(ver A1)**.<br>4. **Nexus:** revisa la información y actualiza la entrada de Motivos de ajuste.<br>5. **Nexus:** confirma y refresca la tabla de Motivos de ajuste. |
+| Flujos alternativos | **A1 — Datos inválidos (después del paso 3):**<br>1. **Nexus:** señala los campos requeridos y conserva la entrada sin cambios.<br>2. **Administrador:** corrige y vuelve a confirmar; continúa en el paso 4. |
+| Excepciones | **E1 — Acceso, recurso o entrada rechazados:**<br>1. **Nexus:** rechaza la operación sin exponer otro catálogo ni producir cambios parciales.<br>2. **Administrador:** reconoce el rechazo; termina el caso de uso. |
+| Postcondiciones (éxito y fallo) | 1. **Éxito:** La entrada de Motivos de ajuste conserva los cambios admitidos.<br>2. **Fallo:** La entrada conserva su estado anterior. |
+| Requisitos relacionados | `RF-CAT-024`, `RN-001`, `RN-006`. |

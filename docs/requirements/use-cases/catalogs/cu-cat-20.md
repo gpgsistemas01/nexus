@@ -1,14 +1,14 @@
-# `CU-CAT-20` — Editar merma
+# `CU-CAT-20` — Crear unidad de medida
 
 | Sección | Información relevante |
 | --- | --- |
 | Identificador | `CU-CAT-20` |
-| Nombre | Editar merma. |
-| Actor y disparador | **Actor:** Personal de almacén. **Disparador:** detecta datos que debe corregir en una merma y selecciona su acción de edición. |
-| Participación de actor y sistema | **Actor:** selecciona el registro, modifica datos y confirma.<br>**Nexus:** presenta valores vigentes, valida, actualiza y comunica el resultado. |
-| Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de edición.<br>3. El registro objetivo existe.<br>4. El registro se encuentra en un estado que admite los cambios solicitados. |
-| Flujo principal | 1. **Actor:** selecciona merma y abre la edición **(ver E1)**.<br>2. **Nexus:** muestra los valores actuales y habilita sólo los campos permitidos.<br>3. **Actor:** modifica los datos admitidos y confirma **(ver A1)**.<br>4. **Nexus:** valida autorización, formato, identidad y relaciones.<br>5. **Nexus:** guarda los cambios, actualiza el listado y muestra la confirmación. |
-| Flujos alternativos | **A1 — Datos inválidos (después del paso 3):**<br>1. **Nexus:** valida la información capturada, detecta campos incompletos, formatos incorrectos, relaciones no permitidas o cantidades fuera de las reglas del caso y los señala sin registrar cambios.<br>2. **Actor:** corrige la información indicada y vuelve a confirmar; continúa en el paso 4 del flujo principal. |
-| Excepciones | **E1 — Acceso rechazado (después del paso 1):**<br>1. **Nexus:** comprueba las precondiciones y la autorización, determina que alguna no se cumple y rechaza la solicitud sin modificar datos ni exponer información no autorizada; comunica el motivo.<br>2. **Actor:** reconoce el rechazo; termina el caso de uso. |
-| Postcondiciones (éxito y fallo) | 1. **Éxito:** Actualización sin alterar su identidad física.<br>2. **Éxito al desactivar:** la merma no puede agregarse a salidas nuevas; conserva stock e historia y puede completar detalles previamente comprometidos.<br>3. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
-| Requisitos relacionados | `RF-CAT-016`, `RF-CAT-017`. |
+| Nombre | Crear unidad de medida. |
+| Actor y disparador | **Actor:** Administrador del sistema del área Sistemas. **Disparador:** selecciona **Nueva unidad de medida** en `CU-CAT-19` Consultar unidad de medida. |
+| Participación de actor y sistema | **Actor:** captura y confirma una nueva entrada de Unidades de medida.<br>**Nexus:** autoriza, limita los campos, valida, crea y refresca la tabla. |
+| Precondiciones | 1. El actor inició sesión y cuenta con autorización para administrar catálogos.<br>2. La pantalla seleccionada corresponde exactamente a **Unidades de medida**. |
+| Flujo principal | 1. **Administrador:** abre la pantalla **Unidades de medida** y selecciona **Nueva unidad de medida** **(ver E1)**.<br>2. **Nexus:** presenta los campos **Nombre**, **Símbolo** y **Activo**.<br>3. **Administrador:** captura los datos y selecciona **Guardar** **(ver A1)**.<br>4. **Nexus:** revisa la información y crea la entrada de Unidades de medida.<br>5. **Nexus:** confirma y refresca la tabla de Unidades de medida. |
+| Flujos alternativos | **A1 — Datos inválidos (después del paso 3):**<br>1. **Nexus:** señala los campos requeridos sin crear la entrada.<br>2. **Administrador:** corrige y vuelve a confirmar; continúa en el paso 4. |
+| Excepciones | **E1 — Acceso, recurso o entrada rechazados:**<br>1. **Nexus:** rechaza la operación sin exponer otro catálogo ni producir cambios parciales.<br>2. **Administrador:** reconoce el rechazo; termina el caso de uso. |
+| Postcondiciones (éxito y fallo) | 1. **Éxito:** La nueva entrada de Unidades de medida queda registrada y visible.<br>2. **Fallo:** No se crea ninguna entrada. |
+| Requisitos relacionados | `RF-CAT-023`, `RN-001`, `RN-006`. |

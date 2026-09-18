@@ -1,21 +1,21 @@
 <a id="cu-cat-14"></a>
-# `CU-CAT-14` — Consultar clientes
+# `CU-CAT-14` — Crear rol
 
-**Patrones:** `BE-P01`.
+**Patrones:** `BE-P02`.
 
 ```mermaid
 sequenceDiagram
     participant Client as Cliente HTTP / web
-    participant Route as src/routes/api/sales/clientApiRoute.js
-    participant Controller@{ "type": "control" } as src/controllers/api/sales/clientController.js
-    participant Domain as src/services/sales/clientService.js
-    Note over Controller,Domain: Variables de frontera: req.query/params
+    participant Route as src/routes/api/admin/catalogApiRoute.js
+    participant Controller@{ "type": "control" } as src/controllers/api/admin/catalogController.js
+    participant Domain as src/services/admin/catalogService.js
+    Note over Controller,Domain: Variables de frontera: req.params.catalog/req.body
 
-    Client->>Route: GET /api/sales/clients
+    Client->>Route: POST /api/admin/catalogs/roles
     Route->>Route: ejecutar en orden el middleware configurado para la ruta
-    Route->>Controller: getAllClients(req, res)
+    Route->>Controller: registerCatalogEntry(req, res)
     activate Controller
-    Controller->>Domain: clientService.findAllClients({ query: req.query }) consulta Client
+    Controller->>Domain: createCatalogEntry(req.params.catalog/req.body) normaliza y crea únicamente los campos permitidos
     activate Domain
     Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
     Domain-->>Controller: resultado del servicio o error de dominio tipado

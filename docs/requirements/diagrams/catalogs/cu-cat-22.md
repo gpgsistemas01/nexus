@@ -1,8 +1,7 @@
-# `CU-CAT-22` — Generar reporte de mermas
+# `CU-CAT-22` — Consultar motivo de ajuste
 
 ```mermaid
 flowchart LR
-    request["Actor selecciona exportar desde CU-CAT-18: mermas"] --> modal["Nexus abre el modal Exportar reporte"]
-    modal --> validate["Nexus valida permiso, datos y relaciones"]
-    validate --> result["Nexus responde: Archivo Excel con filtros, columnas y cálculos propios del reporte."]
+    request["Administrador solicita consultar Motivos de ajuste"] --> authorize["Nexus valida catalogs:manage y reasons"]
+    authorize --> result["Mostrar exclusivamente la tabla de Motivos de ajuste"]
 ```

@@ -1,24 +1,21 @@
 <a id="cu-cat-10"></a>
-# `CU-CAT-10` — Crear proveedor
+# `CU-CAT-10` — Consultar área
 
-**Patrones:** `BE-P01`.
+**Patrones:** `BE-P02`.
 
 ```mermaid
 sequenceDiagram
     participant Client as Cliente HTTP / web
-    participant Route as src/routes/api/warehouse/supplierApiRoute.js
-    participant Controller@{ "type": "control" } as src/controllers/api/warehouse/supplierController.js
-    participant SupplierDto as «object»<br/>supplierDto<br/>src/dtos/supplierDTO.js
-    participant Domain as src/services/warehouse/supplierService.js
-    Note over Controller,Domain: Variables de frontera: req.body/DTO
+    participant Route as src/routes/api/admin/catalogApiRoute.js
+    participant Controller@{ "type": "control" } as src/controllers/api/admin/catalogController.js
+    participant Domain as src/services/admin/catalogService.js
+    Note over Controller,Domain: Variables de frontera: req.params.catalog
 
-    Client->>Route: POST /api/warehouse/suppliers
+    Client->>Route: GET /api/admin/catalogs/departments
     Route->>Route: ejecutar en orden el middleware configurado para la ruta
-    Route->>Controller: registerSupplier(req, res)
+    Route->>Controller: getAllCatalogEntries(req, res)
     activate Controller
-    Controller->>SupplierDto: createSupplierDtoForRegister(req.body) → sanitizeEmptyStrings(...)
-    SupplierDto-->>Controller: supplierDto normalizado
-    Controller->>Domain: supplierService.createSupplier({ supplierDto }) persiste el proveedor
+    Controller->>Domain: findAllCatalogEntries(req.params.catalog) consulta el modelo permitido por la lista blanca
     activate Domain
     Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
     Domain-->>Controller: resultado del servicio o error de dominio tipado

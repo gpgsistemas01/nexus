@@ -1,7 +1,8 @@
-# `CU-CAT-15` — Crear cliente
+# `CU-CAT-15` — Editar rol
 
 ```mermaid
 flowchart LR
-    request["Actor solicita crear cliente"] --> validate["Nexus valida permiso, datos y relaciones"]
-    validate --> result["Nexus responde: Alta con asesor opcional válido."]
+    request["Administrador selecciona Editar registro<br/>y confirma Actualizar"] --> authorize["Nexus valida catalogs:manage y roles"]
+    authorize --> persist["Validar campos y actualizar rol"]
+    persist --> result["Confirmar y refrescar Roles"]
 ```

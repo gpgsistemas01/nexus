@@ -1,7 +1,7 @@
 <a id="CAP-CAT-MAT-04-STOCK"></a>
 # 6. CAP-CAT-MAT-04-STOCK — Ajuste existencia
 
-**Casos de uso:** `CU-CAT-05` — Ajustar existencia de material.
+**Casos de uso:** `CU-ALM-05` — Ajustar existencia de material.
 
 **Errores posibles:** [Validación de formularios](../../error-messages.md#errores-validacion), [Catálogos e inventario](../../error-messages.md#errores-catalogos).
 

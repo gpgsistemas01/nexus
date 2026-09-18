@@ -1,8 +1,7 @@
-# `CU-CAT-07` — Consultar movimientos de materiales
+# `CU-CAT-07` — Crear cliente
 
 ```mermaid
 flowchart LR
-    request["Actor solicita consultar movimientos de materiales"] --> validate["Nexus valida permiso, datos y relaciones"]
-    validate --> result["Nexus responde: Consulta autorizada sin modificar datos."]
-    result --> report["Actor elige exportar y dispara CU-CAT-08"]
+    request["Actor solicita crear cliente"] --> validate["Nexus valida permiso, datos y relaciones"]
+    validate --> result["Nexus responde: Alta con asesor opcional válido."]
 ```

@@ -1,14 +1,14 @@
-# `CU-CAT-04` — Retirar material
+# `CU-CAT-04` — Cambiar estado de proveedor
 
 | Sección | Información relevante |
 | --- | --- |
 | Identificador | `CU-CAT-04` |
-| Nombre | Retirar material. |
-| Actor y disparador | **Actor:** Personal de almacén. **Disparador:** determina que debe retirar material y solicita la eliminación. |
-| Participación de actor y sistema | **Actor:** solicita y confirma el retiro.<br>**Nexus:** comprueba historia y relaciones, ejecuta sólo el retiro permitido e informa el resultado. |
-| Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de retiro.<br>3. El recurso objetivo existe.<br>4. El recurso se encuentra en un estado que permite retirarlo. |
-| Flujo principal | 1. **Actor:** selecciona un material y solicita retirarlo **(ver E1)**.<br>2. **Nexus:** identifica el material y solicita confirmar la eliminación.<br>3. **Actor:** confirma que desea retirarlo.<br>4. **Nexus:** comprueba si el material tiene historia protegida o relaciones con proveedores **(ver A1)**.<br>5. **Nexus:** elimina la relación proveedor-material y, cuando no quedan otras relaciones ni historia protegida, elimina también la identidad del material; después actualiza el listado y confirma el retiro. |
-| Flujos alternativos | **A1 — Material con historia o relaciones protegidas (después del paso 4):**<br>1. **Actor:** revisa el conflicto y las relaciones que Nexus informa.<br>2. **Nexus:** conserva la identidad, la existencia y la historia del material sin efectuar una eliminación parcial.<br>3. **Actor:** reconoce que el material no puede retirarse en esas condiciones; termina el caso de uso. |
+| Nombre | Cambiar estado de proveedor. |
+| Actor y disparador | **Actor:** Personal de almacén. **Disparador:** necesita activar o desactivar un proveedor y selecciona **Editar registro** en `CU-CAT-01` Consultar proveedores. |
+| Participación de actor y sistema | **Actor:** selecciona el registro, modifica datos y confirma.<br>**Nexus:** presenta valores vigentes, valida, actualiza y comunica el resultado. |
+| Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de edición.<br>3. El proveedor objetivo existe. |
+| Flujo principal | 1. **Nexus:** abre el mismo formulario utilizado para editar el proveedor **(ver E1)**.<br>2. **Nexus:** muestra sus datos actuales y la casilla **Activo**.<br>3. **Actor:** marca o desmarca **Activo** y selecciona **Actualizar** **(ver A1)**.<br>4. **Nexus:** valida los datos y actualiza el proveedor como parte de la edición.<br>5. **Nexus:** refresca el listado y confirma el cambio de estado. |
+| Flujos alternativos | **A1 — Datos inválidos (después del paso 3):**<br>1. **Nexus:** valida la información capturada, detecta campos incompletos, formatos incorrectos, relaciones no permitidas o cantidades fuera de las reglas del caso y los señala sin registrar cambios.<br>2. **Actor:** corrige la información indicada y vuelve a confirmar; continúa en el paso 4 del flujo principal. |
 | Excepciones | **E1 — Acceso rechazado (después del paso 1):**<br>1. **Nexus:** comprueba las precondiciones y la autorización, determina que alguna no se cumple y rechaza la solicitud sin modificar datos ni exponer información no autorizada; comunica el motivo.<br>2. **Actor:** reconoce el rechazo; termina el caso de uso. |
-| Postcondiciones (éxito y fallo) | 1. **Éxito:** La relación seleccionada deja de estar disponible y la identidad sólo se elimina si no conserva otras relaciones ni historia protegida.<br>2. **Fallo:** La identidad, las relaciones, la existencia y la historia permanecen sin cambios; no se produce un retiro parcial ni se expone información no autorizada. |
-| Requisitos relacionados | `RF-CAT-008`, `RN-007`. |
+| Postcondiciones (éxito y fallo) | 1. **Éxito:** Activación o desactivación del proveedor.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
+| Requisitos relacionados | `RF-CAT-011`. |

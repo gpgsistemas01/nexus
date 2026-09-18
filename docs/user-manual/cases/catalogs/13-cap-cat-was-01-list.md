@@ -1,7 +1,7 @@
 <a id="CAP-CAT-WAS-01-LIST"></a>
 # 13. CAP-CAT-WAS-01-LIST — Listado inventario
 
-**Casos de uso:** `CU-CAT-18` — Consultar mermas e inventario; `CU-CAT-22` — Generar reporte de mermas.
+**Casos de uso:** `CU-ALM-09` — Consultar mermas e inventario; `CU-ALM-13` — Generar reporte de mermas.
 
 **Errores posibles:** [Catálogos e inventario](../../error-messages.md#errores-catalogos).
 

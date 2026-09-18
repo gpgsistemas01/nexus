@@ -1,5 +1,5 @@
 <a id="cu-cat-25"></a>
-# `CU-CAT-25` — Consultar área
+# `CU-CAT-25` — Consultar estado de cumplimiento
 
 **Patrones:** `BE-P02`.
 
@@ -11,7 +11,7 @@ sequenceDiagram
     participant Domain as src/services/admin/catalogService.js
     Note over Controller,Domain: Variables de frontera: req.params.catalog
 
-    Client->>Route: GET /api/admin/catalogs/departments
+    Client->>Route: GET /api/admin/catalogs/fulfillment-statuses
     Route->>Route: ejecutar en orden el middleware configurado para la ruta
     Route->>Controller: getAllCatalogEntries(req, res)
     activate Controller

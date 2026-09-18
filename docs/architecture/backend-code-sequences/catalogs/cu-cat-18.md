@@ -1,21 +1,21 @@
 <a id="cu-cat-18"></a>
-# `CU-CAT-18` — Consultar mermas
+# `CU-CAT-18` — Editar presentación
 
-**Patrones:** `BE-P01`.
+**Patrones:** `BE-P02`.
 
 ```mermaid
 sequenceDiagram
     participant Client as Cliente HTTP / web
-    participant Route as src/routes/api/warehouse/wasteApiRoute.js
-    participant Controller@{ "type": "control" } as src/controllers/api/warehouse/wasteController.js
-    participant Domain as src/services/warehouse/wastes/wasteService.js
-    Note over Controller,Domain: Variables de frontera: req.query/params
+    participant Route as src/routes/api/admin/catalogApiRoute.js
+    participant Controller@{ "type": "control" } as src/controllers/api/admin/catalogController.js
+    participant Domain as src/services/admin/catalogService.js
+    Note over Controller,Domain: Variables de frontera: req.params.catalog/req.params.id/req.body
 
-    Client->>Route: GET /api/warehouse/wastes
+    Client->>Route: PUT /api/admin/catalogs/presentations/:id
     Route->>Route: ejecutar en orden el middleware configurado para la ruta
-    Route->>Controller: getAllWastes(req, res)
+    Route->>Controller: editCatalogEntry(req, res)
     activate Controller
-    Controller->>Domain: wasteService.findAllWastes({ query: req.query }) consulta merma e inventario
+    Controller->>Domain: updateCatalogEntry(req.params.catalog/req.params.id/req.body) normaliza y actualiza únicamente los campos permitidos
     activate Domain
     Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
     Domain-->>Controller: resultado del servicio o error de dominio tipado

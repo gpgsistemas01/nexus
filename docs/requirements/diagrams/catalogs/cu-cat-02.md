@@ -1,9 +1,7 @@
-# `CU-CAT-02` — Crear material
+# `CU-CAT-02` — Crear proveedor
 
 ```mermaid
-flowchart TD
-    request["Actor solicita crear material"] --> validate["Nexus valida permiso, identidad y relaciones"]
-    validate --> active{"¿Proveedor activo?"}
-    active -->|No| reject["Rechazar el alta<br/>sin crear relación ni stock"]
-    active -->|Sí| result["Crear o reutilizar identidad<br/>y registrar relación"]
+flowchart LR
+    request["Actor solicita crear proveedor"] --> validate["Nexus valida permiso, datos y relaciones"]
+    validate --> result["Nexus responde: Alta con código e identidad válidos."]
 ```

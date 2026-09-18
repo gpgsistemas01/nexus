@@ -1,25 +1,25 @@
 <a id="cu-cat-07"></a>
-# `CU-CAT-07` — Consultar movimientos de materiales
+# `CU-CAT-07` — Crear cliente
 
-**Patrones:** `FE-P07`.
+**Patrones:** `FE-P02`.
 
 ```mermaid
 sequenceDiagram
     participant Browser as Navegador
-    participant View as src/public/js/pages/admin/movements/movementsPage.js
-    participant Application as src/public/js/application/admin/movements/movements.js
-    participant Request as src/public/js/services/admin/movementService.js
+    participant View as src/public/js/pages/sales/clients/clientModal.js<br/>src/public/js/pages/sales/clients/clientForm.js
+    participant Application as src/public/js/application/sales/clients/clients.js
+    participant Request as src/public/js/services/sales/clientService.js
     participant HTTP as src/public/js/services/axiosInstanceApi.js
-    participant Transport@{ "type": "control" } as src/routes/api/admin/movementApiRoute.js<br/>src/controllers/api/admin/movementController.js
-    Note over Application,Transport: Variables de frontera: params/filtros
+    participant Transport@{ "type": "control" } as src/routes/api/sales/clientApiRoute.js<br/>src/controllers/api/sales/clientController.js
+    Note over Application,Transport: Variables de frontera: formData/payload
 
-    Browser->>View: movementsPage.js selecciona el contexto material
+    Browser->>View: clientModal.js abre clientForm.js en alta
     View->>View: recopilar y validar las variables de frontera indicadas
-    View->>Application: getAllMovements({ context: 'materials', params })
-    Application->>Request: getAllMovementsRequest({ context, params })
+    View->>Application: registerClient({ formData })
+    Application->>Request: createClientRequest({ formData })
     activate Application
-    Request->>HTTP: apiRequest({ method: 'get', url, data/params })
-    HTTP->>Transport: consultar GET /api/admin/movements/materials
+    Request->>HTTP: apiRequest({ method: 'post', url, data/params })
+    HTTP->>Transport: envía POST /api/sales/clients
     Transport-->>HTTP: status HTTP y payload del endpoint
     HTTP-->>Request: respuesta o error normalizado
     Request-->>Application: resultado del request
@@ -33,4 +33,4 @@ sequenceDiagram
     deactivate Application
 ```
 
-<a id="cu-cat-06"></a>
+<a id="cu-cat-08"></a>

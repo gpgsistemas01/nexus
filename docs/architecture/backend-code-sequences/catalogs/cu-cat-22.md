@@ -1,21 +1,21 @@
 <a id="cu-cat-22"></a>
-# `CU-CAT-22` — Generar reporte de mermas
+# `CU-CAT-22` — Consultar motivo de ajuste
 
-**Patrones:** `BE-P07`.
+**Patrones:** `BE-P02`.
 
 ```mermaid
 sequenceDiagram
     participant Client as Cliente HTTP / web
-    participant Route as src/routes/api/warehouse/reportApiRoute.js
-    participant Controller@{ "type": "control" } as src/controllers/api/warehouse/reportController.js
-    participant Domain as src/services/warehouse/reportService.js<br/>src/utils/reportExcelUtils.js
-    Note over Controller,Domain: Variables de frontera: req.query/params
+    participant Route as src/routes/api/admin/catalogApiRoute.js
+    participant Controller@{ "type": "control" } as src/controllers/api/admin/catalogController.js
+    participant Domain as src/services/admin/catalogService.js
+    Note over Controller,Domain: Variables de frontera: req.params.catalog
 
-    Client->>Route: GET /api/warehouse/reports/wastes/excel
+    Client->>Route: GET /api/admin/catalogs/reasons
     Route->>Route: ejecutar en orden el middleware configurado para la ruta
-    Route->>Controller: exportWasteReportExcel(req, res)
+    Route->>Controller: getAllCatalogEntries(req, res)
     activate Controller
-    Controller->>Domain: reportService.findWasteReportRows({ query: req.query }) y sendExcelReport
+    Controller->>Domain: findAllCatalogEntries(req.params.catalog) consulta el modelo permitido por la lista blanca
     activate Domain
     Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
     Domain-->>Controller: resultado del servicio o error de dominio tipado
@@ -28,4 +28,4 @@ sequenceDiagram
     deactivate Controller
 ```
 
-<a id="cu-cat-24"></a>
+<a id="cu-cat-23"></a>

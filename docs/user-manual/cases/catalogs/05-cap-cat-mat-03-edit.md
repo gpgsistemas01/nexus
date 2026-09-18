@@ -1,7 +1,7 @@
 <a id="CAP-CAT-MAT-03-EDIT"></a>
 # 5. CAP-CAT-MAT-03-EDIT — Formulario edicion
 
-**Casos de uso:** `CU-CAT-03` — Editar material; `CU-CAT-04` — Retirar material.
+**Casos de uso:** `CU-ALM-03` — Editar material; `CU-ALM-04` — Retirar material.
 
 **Errores posibles:** [Validación de formularios](../../error-messages.md#errores-validacion), [Catálogos e inventario](../../error-messages.md#errores-catalogos).
 

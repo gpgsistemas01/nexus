@@ -1,21 +1,21 @@
 <a id="cu-cat-24"></a>
-# `CU-CAT-24` — Generar reporte de movimientos de mermas
+# `CU-CAT-24` — Editar motivo de ajuste
 
-**Patrones:** `BE-P07`.
+**Patrones:** `BE-P02`.
 
 ```mermaid
 sequenceDiagram
     participant Client as Cliente HTTP / web
-    participant Route as src/routes/api/admin/reportApiRoute.js
-    participant Controller@{ "type": "control" } as src/controllers/api/admin/reportController.js
-    participant Domain as src/services/inventory/reportService.js
-    Note over Controller,Domain: Variables de frontera: req.query/params
+    participant Route as src/routes/api/admin/catalogApiRoute.js
+    participant Controller@{ "type": "control" } as src/controllers/api/admin/catalogController.js
+    participant Domain as src/services/admin/catalogService.js
+    Note over Controller,Domain: Variables de frontera: req.params.catalog/req.params.id/req.body
 
-    Client->>Route: GET /api/admin/reports/movements/wastes/excel
+    Client->>Route: PUT /api/admin/catalogs/reasons/:id
     Route->>Route: ejecutar en orden el middleware configurado para la ruta
-    Route->>Controller: exportWasteMovementReport(req, res)
+    Route->>Controller: editCatalogEntry(req, res)
     activate Controller
-    Controller->>Domain: findMovementReportRows({ context: 'wastes', ...getMovementReportParams(req.query) })
+    Controller->>Domain: updateCatalogEntry(req.params.catalog/req.params.id/req.body) normaliza y actualiza únicamente los campos permitidos
     activate Domain
     Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
     Domain-->>Controller: resultado del servicio o error de dominio tipado
@@ -28,4 +28,4 @@ sequenceDiagram
     deactivate Controller
 ```
 
-<a id="cu-ent-06"></a>
+<a id="cu-cat-25"></a>

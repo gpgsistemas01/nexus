@@ -1,24 +1,21 @@
 <a id="cu-cat-15"></a>
-# `CU-CAT-15` — Crear cliente
+# `CU-CAT-15` — Editar rol
 
-**Patrones:** `BE-P01`.
+**Patrones:** `BE-P02`.
 
 ```mermaid
 sequenceDiagram
     participant Client as Cliente HTTP / web
-    participant Route as src/routes/api/sales/clientApiRoute.js
-    participant Controller@{ "type": "control" } as src/controllers/api/sales/clientController.js
-    participant ClientDto as «object»<br/>clientDto<br/>src/dtos/clientDTO.js
-    participant Domain as src/services/sales/clientService.js
-    Note over Controller,Domain: Variables de frontera: req.body/DTO
+    participant Route as src/routes/api/admin/catalogApiRoute.js
+    participant Controller@{ "type": "control" } as src/controllers/api/admin/catalogController.js
+    participant Domain as src/services/admin/catalogService.js
+    Note over Controller,Domain: Variables de frontera: req.params.catalog/req.params.id/req.body
 
-    Client->>Route: POST /api/sales/clients
+    Client->>Route: PUT /api/admin/catalogs/roles/:id
     Route->>Route: ejecutar en orden el middleware configurado para la ruta
-    Route->>Controller: registerClient(req, res)
+    Route->>Controller: editCatalogEntry(req, res)
     activate Controller
-    Controller->>ClientDto: createClientDtoForRegister(req.body) → sanitizeEmptyStrings(...)
-    ClientDto-->>Controller: clientDto normalizado
-    Controller->>Domain: clientService.createClient({ clientDto }) persiste Client
+    Controller->>Domain: updateCatalogEntry(req.params.catalog/req.params.id/req.body) normaliza y actualiza únicamente los campos permitidos
     activate Domain
     Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
     Domain-->>Controller: resultado del servicio o error de dominio tipado

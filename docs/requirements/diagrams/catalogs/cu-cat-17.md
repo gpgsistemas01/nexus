@@ -1,8 +1,8 @@
-# `CU-CAT-17` — Generar reporte de clientes
+# `CU-CAT-17` — Crear presentación
 
 ```mermaid
 flowchart LR
-    request["Actor selecciona exportar desde CU-CAT-14: clientes"] --> modal["Nexus abre el modal Exportar reporte"]
-    modal --> validate["Nexus valida permiso, datos y relaciones"]
-    validate --> result["Nexus responde: Archivo Excel con filtros, columnas y cálculos propios del reporte."]
+    request["Administrador selecciona Nueva presentación<br/>y confirma Guardar"] --> authorize["Nexus valida catalogs:manage y presentations"]
+    authorize --> persist["Validar campos y crear presentación"]
+    persist --> result["Confirmar y refrescar Presentaciones"]
 ```

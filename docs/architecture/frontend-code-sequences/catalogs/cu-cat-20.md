@@ -1,25 +1,25 @@
 <a id="cu-cat-20"></a>
-# `CU-CAT-20` — Editar merma
+# `CU-CAT-20` — Crear unidad de medida
 
-**Patrones:** `FE-P02`.
+**Patrones:** `FE-P03`.
 
 ```mermaid
 sequenceDiagram
     participant Browser as Navegador
-    participant View as src/public/js/pages/warehouse/wastes/wasteModal.js
-    participant Application as src/public/js/application/warehouse/wastes/wastes.js
-    participant Request as src/public/js/services/warehouse/wasteService.js
+    participant View as src/public/js/pages/admin/catalogs/catalogForm.js
+    participant Application as src/public/js/application/admin/catalogs/catalogs.js
+    participant Request as src/public/js/services/admin/catalogService.js
     participant HTTP as src/public/js/services/axiosInstanceApi.js
-    participant Transport@{ "type": "control" } as src/routes/api/warehouse/wasteApiRoute.js<br/>src/controllers/api/warehouse/wasteController.js
-    Note over Application,Transport: Variables de frontera: id, formData/payload
+    participant Transport@{ "type": "control" } as src/routes/api/admin/catalogApiRoute.js<br/>src/controllers/api/admin/catalogController.js
+    Note over Application,Transport: Variables de frontera: catalog/data
 
-    Browser->>View: wasteModal.js precarga la merma
+    Browser->>View: confirmar el formulario de alta
     View->>View: recopilar y validar las variables de frontera indicadas
-    View->>Application: editWaste({ id, formData })
-    Application->>Request: editWasteRequest({ id, formData })
+    View->>Application: registerCatalogEntry({ catalog, data })
+    Application->>Request: registerCatalogEntryRequest({ catalog, data })
     activate Application
-    Request->>HTTP: apiRequest({ method: 'patch', url, data/params })
-    HTTP->>Transport: envía PATCH /api/warehouse/wastes/:id
+    Request->>HTTP: apiRequest({ method: 'get', url, data/params })
+    HTTP->>Transport: consume POST /api/admin/catalogs/unit-measures
     Transport-->>HTTP: status HTTP y payload del endpoint
     HTTP-->>Request: respuesta o error normalizado
     Request-->>Application: resultado del request

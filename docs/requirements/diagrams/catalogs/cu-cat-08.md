@@ -1,8 +1,7 @@
-# `CU-CAT-08` — Generar reporte de movimientos de materiales
+# `CU-CAT-08` — Editar cliente
 
 ```mermaid
 flowchart LR
-    request["Actor selecciona exportar desde CU-CAT-07: movimientos de materiales"] --> modal["Nexus abre el modal Exportar reporte"]
-    modal --> validate["Nexus valida permiso, datos y relaciones"]
-    validate --> result["Nexus responde: Archivo Excel con filtros, columnas y cálculos propios del reporte."]
+    request["Actor solicita editar cliente"] --> validate["Nexus valida permiso, datos y relaciones"]
+    validate --> result["Nexus responde: Actualización de datos y asesor opcional."]
 ```

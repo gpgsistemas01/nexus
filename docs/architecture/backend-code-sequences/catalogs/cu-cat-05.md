@@ -1,42 +1,31 @@
 <a id="cu-cat-05"></a>
-# `CU-CAT-05` — Ajustar existencia de material
+# `CU-CAT-05` — Generar reporte de proveedores
 
-**Patrones:** `BE-P01`, `BE-P03`, `BE-P04`, `BE-P05`.
+**Patrones:** `BE-P07`.
 
 ```mermaid
 sequenceDiagram
     participant Client as Cliente HTTP / web
-    Note over Router,Controller: Variables de frontera: id, DTO de ajuste y userId
-    participant Router as src/routes/api/warehouse/materialApiRoute.js
-    participant Controller@{ "type": "control" } as src/controllers/api/warehouse/materialController.js
-    participant StockDto as «object»<br/>materialDto<br/>src/dtos/materialDTO.js
-    participant Service as src/services/warehouse/materials/materialService.js
-    participant Adjustment as src/services/warehouse/adjustmentService.js
-    participant Reference as src/services/document/referenceNumberService.js
-    participant Stock as src/services/inventory/stockHelpers.js
-    participant Movement as src/services/inventory/movementService.js
-    participant SupplierMaterial as src/services/warehouse/materials/supplierMaterialService.js
-    participant Prisma as Prisma / PostgreSQL
-    participant Socket as src/utils/socketUtils.js
+    participant Route as src/routes/api/warehouse/reportApiRoute.js
+    participant Controller@{ "type": "control" } as src/controllers/api/warehouse/reportController.js
+    participant Domain as src/services/warehouse/reportService.js<br/>src/utils/reportExcelUtils.js
+    Note over Controller,Domain: Variables de frontera: req.query/params
 
-    Client->>Router: PATCH /api/warehouse/materials/:id/stock + accessToken
-    Router->>Controller: editMaterialStock(req, res)
-    Controller->>StockDto: createMaterialDtoForStockUpdate(req.body) → sanitizeEmptyStrings(...)
-    StockDto-->>Controller: materialDto normalizado
-    Controller->>Service: updateMaterialStock({ id, materialDto, userId })
-    Service->>Adjustment: material, proveedor, motivo y nueva existencia
-    Adjustment->>Prisma: iniciar $transaction
-    Adjustment->>SupplierMaterial: localizar relación con tx
-    Adjustment->>Reference: generar referencia anual con tx
-    Adjustment->>Stock: calcular diferencias y validar existencia
-    Adjustment->>Prisma: crear StockAdjustment y detalle
-    Adjustment->>Movement: crear movimiento ADJUSTMENT con tx
-    Adjustment->>SupplierMaterial: actualizar stock y cantidad convertida con tx
-    Prisma-->>Adjustment: relación actualizada y commit
-    Adjustment-->>Service: supplierMaterial actualizado
-    Service-->>Controller: material
-    Controller->>Socket: publicar después del commit
-    Controller-->>Client: 200 material actualizado
+    Client->>Route: GET /api/warehouse/reports/suppliers/excel
+    Route->>Route: ejecutar en orden el middleware configurado para la ruta
+    Route->>Controller: exportSupplierReportExcel(req, res)
+    activate Controller
+    Controller->>Domain: reportService.findSupplierReportRows({ query: req.query }) y sendExcelReport
+    activate Domain
+    Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
+    Domain-->>Controller: resultado del servicio o error de dominio tipado
+    deactivate Domain
+    alt El servicio devuelve el resultado
+        Controller-->>Client: status HTTP y cuerpo concretos del controller
+    else El servicio propaga un error de dominio
+        Controller-->>Client: error entregado al middleware final para su respuesta HTTP
+    end
+    deactivate Controller
 ```
 
 <a id="cu-cat-09"></a>

@@ -153,6 +153,7 @@ const validateUseCaseDiagramCoverage = async () => {
             const groupFiles = {
                 AUT: 'authentication',
                 IDA: 'identity-access',
+                ALM: 'catalogs',
                 CAT: 'catalogs',
                 ENT: 'purchases',
                 SAL: 'issues',
@@ -185,7 +186,7 @@ const validateUseCaseDiagramCoverage = async () => {
                 failures.push(`diagramas ${side}: ${pattern} no enlaza una vista canónica DIA-PAT-* desde el índice rápido`);
             }
         }
-        const sections = [...source.matchAll(/^#{1,6} `(CU-[A-Z]+-\d+)` — (.+)\n([\s\S]*?)(?=^#{1,6} `CU-|(?![\s\S]))/gm)];
+        const sections = [...source.matchAll(/^#{1,6} `(CU-[A-Z]+-\d+)` — (.+)\r?\n([\s\S]*?)(?=^#{1,6} `CU-|(?![\s\S]))/gm)];
         validateIds(`diagramas ${side}`, sections.map((match) => match[1]));
         for (const [, id, title, body] of sections) {
             if (title !== expectedTitles.get(id)) {

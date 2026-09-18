@@ -1,7 +1,7 @@
 <a id="CAP-CAT-WAS-02-CREATE"></a>
 # 15. CAP-CAT-WAS-02-CREATE — Formulario registro
 
-**Casos de uso:** `CU-CAT-19` — Registrar merma.
+**Casos de uso:** `CU-ALM-10` — Registrar merma.
 
 **Errores posibles:** [Validación de formularios](../../error-messages.md#errores-validacion), [Catálogos e inventario](../../error-messages.md#errores-catalogos).
 

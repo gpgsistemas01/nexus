@@ -1,21 +1,24 @@
 <a id="cu-cat-07"></a>
-# `CU-CAT-07` — Consultar movimientos de materiales
+# `CU-CAT-07` — Crear cliente
 
-**Patrones:** `BE-P06`.
+**Patrones:** `BE-P01`.
 
 ```mermaid
 sequenceDiagram
     participant Client as Cliente HTTP / web
-    participant Route as src/routes/api/admin/movementApiRoute.js
-    participant Controller@{ "type": "control" } as src/controllers/api/admin/movementController.js
-    participant Domain as src/services/inventory/movementQueryService.js
-    Note over Controller,Domain: Variables de frontera: req.query/params
+    participant Route as src/routes/api/sales/clientApiRoute.js
+    participant Controller@{ "type": "control" } as src/controllers/api/sales/clientController.js
+    participant ClientDto as «object»<br/>clientDto<br/>src/dtos/clientDTO.js
+    participant Domain as src/services/sales/clientService.js
+    Note over Controller,Domain: Variables de frontera: req.body/DTO
 
-    Client->>Route: GET /api/admin/movements/materials
+    Client->>Route: POST /api/sales/clients
     Route->>Route: ejecutar en orden el middleware configurado para la ruta
-    Route->>Controller: getAllMaterialMovements(req, res)
+    Route->>Controller: registerClient(req, res)
     activate Controller
-    Controller->>Domain: findAllMaterialMovements(getMovementListParams(req))
+    Controller->>ClientDto: createClientDtoForRegister(req.body) → sanitizeEmptyStrings(...)
+    ClientDto-->>Controller: clientDto normalizado
+    Controller->>Domain: clientService.createClient({ clientDto }) persiste Client
     activate Domain
     Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
     Domain-->>Controller: resultado del servicio o error de dominio tipado
@@ -28,4 +31,4 @@ sequenceDiagram
     deactivate Controller
 ```
 
-<a id="cu-cat-06"></a>
+<a id="cu-cat-08"></a>
