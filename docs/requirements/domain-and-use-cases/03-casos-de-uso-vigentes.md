@@ -153,21 +153,17 @@ flowchart LR
     admin -- "generaliza" --> warehouse
     admin --- ucMaterialStock
     admin --- ucWasteStock
-    admin --- ucSupplierEdit
-    admin --- ucSupplierStatus
-    admin --- ucSupplierReport
-    admin --- ucClientEdit
-    admin --- ucClientReport
     admin --- ucCatalog21
     admin --- ucCatalog24
     admin --- ucCatalog27
     admin --- ucCatalog30
     admin --- ucCatalog33
     admin --- ucCatalog36
+    admin --- ucMaterialMovements
+    admin --- ucWasteMovements
     ucMaterialQuery --- ucMaterialCreate
     ucMaterialQuery --- ucMaterialEdit
     ucMaterialQuery --- ucMaterialRemove
-    ucMaterialQuery --- ucMaterialMovements
     ucMaterialQuery --- ucMaterialInventoryReport
     ucMaterialMovements --- ucMaterialMovementReport
     ucMaterialStock -. "«extend»" .-> ucMaterialQuery
@@ -180,7 +176,6 @@ flowchart LR
     ucClientQuery --- ucClientReport
     ucWasteQuery --- ucWasteCreate
     ucWasteQuery --- ucWasteEdit
-    ucWasteQuery --- ucWasteMovements
     ucWasteQuery --- ucWasteReport
     ucWasteMovements --- ucWasteMovementReport
     ucWasteStock -. "«extend»" .-> ucWasteQuery
