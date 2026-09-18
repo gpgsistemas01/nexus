@@ -1,4 +1,4 @@
-# 17. Generar reportes específicos — `CU-IDA-04`, `CU-IDA-09`, `CU-ALM-06`, `CU-ALM-08`, `CU-CAT-05`, `CU-CAT-09`, `CU-ALM-13`, `CU-ALM-15`, `CU-ENT-06`, `CU-SAL-07` y `CU-SAL-14`
+# 17. Generar reportes específicos — `CU-IDA-04`, `CU-IDA-09`, `CU-ALM-06`, `CU-ALM-08`, `CU-CAT-04`, `CU-CAT-08`, `CU-ALM-13`, `CU-ALM-15`, `CU-ENT-06`, `CU-SAL-07` y `CU-SAL-14`
 
 ```mermaid
 flowchart LR

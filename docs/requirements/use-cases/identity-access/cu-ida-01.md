@@ -4,7 +4,7 @@
 | --- | --- |
 | Identificador | `CU-IDA-01` |
 | Nombre | Consultar personas. |
-| Actor y disparador | **Actor:** Administrador del sistema. **Disparador:** necesita localizar o revisar personas y abre la opción de consulta correspondiente. |
+| Actor y disparador | **Actor:** Personal de almacén o Administrador del sistema. **Disparador:** necesita localizar o revisar personas y abre la opción de consulta correspondiente. |
 | Participación de actor y sistema | **Actor:** abre la consulta, define criterios y selecciona registros.<br>**Nexus:** autoriza, presenta filtros y devuelve sólo la información permitida. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de consulta o reporte correspondiente. |
 | Flujo principal | 1. **Actor:** abre la opción para consultar personas **(ver E1)**.<br>2. **Nexus:** comprueba su autorización y muestra la consulta con sus criterios disponibles.<br>3. **Actor:** define los criterios que necesita y solicita aplicarlos **(ver A1)**.<br>4. **Nexus:** presenta la información autorizada y la acción principal para registrar una persona.<br>5. **Actor:** selecciona la acción principal; termina `CU-IDA-01` y con esa selección dispara `CU-IDA-02` Crear persona. |

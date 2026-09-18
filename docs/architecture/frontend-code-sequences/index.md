@@ -82,7 +82,7 @@ aparece una vez, conserva su referencia de patrones y contiene un bloque Mermaid
 | Autenticación | `CU-AUT-01..02` | 2 | Completo |
 | Identidad y acceso | `CU-IDA-01..09` | 9 | Completo |
 | Almacén | `CU-ALM-01..15` | 15 | Completo |
-| Catálogos | `CU-CAT-01..17`, `CU-CAT-10..42` | 27 | Completo |
+| Catálogos | `CU-CAT-01..26` | 26 | Completo |
 | Entradas | `CU-ENT-01..06` | 6 | Completo |
 | Salidas | `CU-SAL-01..14` | 14 | Completo |
 | **Total** | Cinco grupos propietarios | **81** | **81 de 81** |

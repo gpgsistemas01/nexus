@@ -1,25 +1,28 @@
 <a id="cu-cat-04"></a>
-# `CU-CAT-04` — Cambiar estado de proveedor
+# `CU-CAT-04` — Generar reporte de proveedores
 
-**Patrones:** `FE-P02`.
+**Patrones:** `FE-P08`.
 
 ```mermaid
 sequenceDiagram
     participant Browser as Navegador
-    participant View as src/public/js/pages/warehouse/suppliers/supplierForm.js
-    participant Application as src/public/js/application/warehouse/suppliers/suppliers.js
-    participant Request as src/public/js/services/warehouse/supplierService.js
+    participant View as src/public/js/plugins/datatable/warehouse/suppliers/supplierDatatable.js
+    participant Dialog as src/public/js/ui/reportExportDialog.js
+    participant Application as src/public/js/application/warehouse/report.js
+    participant Request as src/public/js/services/warehouse/reportService.js
     participant HTTP as src/public/js/services/axiosInstanceApi.js
-    participant Transport@{ "type": "control" } as src/routes/api/warehouse/supplierApiRoute.js<br/>src/controllers/api/warehouse/supplierController.js
-    Note over Application,Transport: Variables de frontera: id, formData/payload
+    participant Transport@{ "type": "control" } as src/routes/api/warehouse/reportApiRoute.js<br/>src/controllers/api/warehouse/reportController.js
+    Note over Application,Transport: Variables de frontera: params/filtros
 
-    Browser->>View: El estado se edita en supplierForm.js, no hay pantalla separada
+    Browser->>View: Botón Excel de supplierDatatable.js
+    View->>Dialog: showFilteredExportDialog()
+    Dialog-->>View: alcance confirmado o cancelación
     View->>View: recopilar y validar las variables de frontera indicadas
-    View->>Application: editSupplier({ id, formData })
-    Application->>Request: editSupplierRequest({ id, data: formData })
+    View->>Application: exportSupplierReport({ params })
+    Application->>Request: exportSupplierReportRequest({ params })
     activate Application
-    Request->>HTTP: apiRequest({ method: 'put', url, data/params })
-    HTTP->>Transport: enviar PUT /api/warehouse/suppliers/:id
+    Request->>HTTP: apiRequest({ method: 'get', url, params })
+    HTTP->>Transport: descarga GET /api/warehouse/reports/suppliers/excel
     Transport-->>HTTP: status HTTP y payload del endpoint
     HTTP-->>Request: respuesta o error normalizado
     Request-->>Application: resultado del request
@@ -33,4 +36,4 @@ sequenceDiagram
     deactivate Application
 ```
 
-<a id="cu-cat-06"></a>
+<a id="cu-cat-08"></a>

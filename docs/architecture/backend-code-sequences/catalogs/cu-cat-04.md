@@ -1,24 +1,21 @@
 <a id="cu-cat-04"></a>
-# `CU-CAT-04` — Cambiar estado de proveedor
+# `CU-CAT-04` — Generar reporte de proveedores
 
-**Patrones:** `BE-P01`.
+**Patrones:** `BE-P07`.
 
 ```mermaid
 sequenceDiagram
     participant Client as Cliente HTTP / web
-    participant Route as src/routes/api/warehouse/supplierApiRoute.js
-    participant Controller@{ "type": "control" } as src/controllers/api/warehouse/supplierController.js
-    participant SupplierDto as «object»<br/>supplierDto<br/>src/dtos/supplierDTO.js
-    participant Domain as src/services/warehouse/supplierService.js
-    Note over Controller,Domain: Variables de frontera: req.params.id, req.body/DTO
+    participant Route as src/routes/api/warehouse/reportApiRoute.js
+    participant Controller@{ "type": "control" } as src/controllers/api/warehouse/reportController.js
+    participant Domain as src/services/warehouse/reportService.js<br/>src/utils/reportExcelUtils.js
+    Note over Controller,Domain: Variables de frontera: req.query/params
 
-    Client->>Route: PUT /api/warehouse/suppliers/:id
+    Client->>Route: GET /api/warehouse/reports/suppliers/excel
     Route->>Route: ejecutar en orden el middleware configurado para la ruta
-    Route->>Controller: editSupplier(req, res)
+    Route->>Controller: exportSupplierReportExcel(req, res)
     activate Controller
-    Controller->>SupplierDto: createSupplierDtoForEdit(req.body) → sanitizeEmptyStrings(...)
-    SupplierDto-->>Controller: supplierDto normalizado
-    Controller->>Domain: supplierService.updateSupplier(supplierDto, req.params.id) aplica el estado incluido en el DTO, no hay endpoint separado
+    Controller->>Domain: reportService.findSupplierReportRows({ query: req.query }) y sendExcelReport
     activate Domain
     Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
     Domain-->>Controller: resultado del servicio o error de dominio tipado
@@ -31,4 +28,4 @@ sequenceDiagram
     deactivate Controller
 ```
 
-<a id="cu-cat-06"></a>
+<a id="cu-cat-08"></a>

@@ -4,7 +4,7 @@
 | --- | --- |
 | Identificador | `CU-CAT-03` |
 | Nombre | Editar proveedor. |
-| Actor y disparador | **Actor:** Personal de almacén. **Disparador:** detecta datos que debe corregir en un proveedor y selecciona su acción de edición. |
+| Actor y disparador | **Actor:** Administrador del sistema. **Disparador:** detecta datos que debe corregir en un proveedor y selecciona su acción de edición. |
 | Participación de actor y sistema | **Actor:** selecciona el registro, modifica datos y confirma.<br>**Nexus:** presenta valores vigentes, valida, actualiza y comunica el resultado. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de edición.<br>3. El registro objetivo existe.<br>4. El registro se encuentra en un estado que admite los cambios solicitados. |
 | Flujo principal | 1. **Actor:** selecciona **Editar registro** en el proveedor **(ver E1)**.<br>2. **Nexus:** muestra la razón social, el nombre comercial, el teléfono y el estado actuales.<br>3. **Actor:** modifica los datos necesarios, revisa la casilla **Activo** y selecciona **Actualizar** **(ver A1)**.<br>4. **Nexus:** valida que la información sea válida.<br>5. **Nexus:** guarda los cambios, actualiza el listado y muestra la confirmación. |

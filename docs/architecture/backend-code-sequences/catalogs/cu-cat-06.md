@@ -1,5 +1,5 @@
 <a id="cu-cat-06"></a>
-# `CU-CAT-06` — Consultar clientes
+# `CU-CAT-06` — Crear cliente
 
 **Patrones:** `BE-P01`.
 
@@ -8,14 +8,17 @@ sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route as src/routes/api/sales/clientApiRoute.js
     participant Controller@{ "type": "control" } as src/controllers/api/sales/clientController.js
+    participant ClientDto as «object»<br/>clientDto<br/>src/dtos/clientDTO.js
     participant Domain as src/services/sales/clientService.js
-    Note over Controller,Domain: Variables de frontera: req.query/params
+    Note over Controller,Domain: Variables de frontera: req.body/DTO
 
-    Client->>Route: GET /api/sales/clients
+    Client->>Route: POST /api/sales/clients
     Route->>Route: ejecutar en orden el middleware configurado para la ruta
-    Route->>Controller: getAllClients(req, res)
+    Route->>Controller: registerClient(req, res)
     activate Controller
-    Controller->>Domain: clientService.findAllClients({ query: req.query }) consulta Client
+    Controller->>ClientDto: createClientDtoForRegister(req.body) → sanitizeEmptyStrings(...)
+    ClientDto-->>Controller: clientDto normalizado
+    Controller->>Domain: clientService.createClient({ clientDto }) persiste Client
     activate Domain
     Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
     Domain-->>Controller: resultado del servicio o error de dominio tipado

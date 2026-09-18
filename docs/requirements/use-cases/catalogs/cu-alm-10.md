@@ -4,7 +4,7 @@
 | --- | --- |
 | Identificador | `CU-ALM-10` |
 | Nombre | Registrar merma. |
-| Actor y disparador | **Actor:** Personal de almacén. **Disparador:** selecciona la acción principal para registrar una merma desde `CU-ALM-09` Consultar mermas. |
+| Actor y disparador | **Actor:** Personal de almacén o Administrador del sistema. **Disparador:** selecciona la acción principal para registrar una merma desde `CU-ALM-09` Consultar mermas. |
 | Participación de actor y sistema | **Actor:** abre el alta, captura datos y confirma.<br>**Nexus:** carga opciones, valida, registra y comunica el resultado. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de alta.<br>3. Existen los datos relacionados requeridos para completar el registro. |
 | Flujo principal | 1. **Actor:** abre «Agregar merma» y selecciona primero un proveedor **(ver E1)**.<br>2. **Nexus:** carga los materiales de ese proveedor que pueden utilizarse como plantilla.<br>3. **Actor:** elige el material, completa los datos propios de la merma y confirma **(ver A1)**.<br>4. **Nexus:** valida identidad, dimensiones, existencia y datos relacionados **(ver A2)**.<br>5. **Nexus:** crea la merma con sus propios datos históricos, registra su existencia inicial y confirma el alta. |

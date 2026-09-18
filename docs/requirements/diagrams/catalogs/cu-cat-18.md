@@ -1,8 +1,7 @@
-# `CU-CAT-18` — Editar presentación
+# `CU-CAT-18` — Consultar unidad de medida
 
 ```mermaid
 flowchart LR
-    request["Administrador selecciona Editar registro<br/>y confirma Actualizar"] --> authorize["Nexus valida catalogs:manage y presentations"]
-    authorize --> persist["Validar campos y actualizar presentación"]
-    persist --> result["Confirmar y refrescar Presentaciones"]
+    request["Administrador solicita consultar Unidades de medida"] --> authorize["Nexus valida catalogs:manage y unit-measures"]
+    authorize --> result["Mostrar exclusivamente la tabla de Unidades de medida"]
 ```

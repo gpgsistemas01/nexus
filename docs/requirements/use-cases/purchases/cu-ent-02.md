@@ -4,7 +4,7 @@
 | --- | --- |
 | Identificador | `CU-ENT-02` |
 | Nombre | Crear compra de material. |
-| Actor y disparador | **Actor:** Personal de almacén. **Disparador:** selecciona la acción principal para crear una compra desde `CU-ENT-01` Consultar compras de material. |
+| Actor y disparador | **Actor:** Personal de almacén o Administrador del sistema. **Disparador:** selecciona la acción principal para crear una compra desde `CU-ENT-01` Consultar compras de material. |
 | Participación de actor y sistema | **Actor:** abre el alta, captura datos y confirma.<br>**Nexus:** carga opciones, valida, registra y comunica el resultado. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de alta.<br>3. Existen los datos relacionados requeridos para completar el registro. |
 | Flujo principal | 1. **Actor:** abre «Agregar compra» **(ver E1)**.<br>2. **Nexus:** muestra el formulario y carga proveedores, personas receptoras y materiales disponibles.<br>3. **Actor:** indica si el comprobante es factura o remisión; captura el número de factura sólo cuando corresponde, proveedor, persona receptora, fecha y hora de recepción y observaciones.<br>4. **Actor:** agrega cada material con su cantidad y costo por presentación, revisa los detalles y confirma **(ver A1)** **(ver A2)**.<br>5. **Nexus:** valida el tipo de comprobante, la factura cuando aplica, las relaciones, la fecha, las cantidades y los costos, y calcula los totales **(ver A3)** **(ver A4)**.<br>6. **Nexus:** registra compra y detalles, incrementa existencias y conserva los movimientos como una sola operación.<br>7. **Nexus:** actualiza la tabla y confirma el registro. |

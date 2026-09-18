@@ -23,6 +23,18 @@ secuencia técnica. Todos los casos usan la misma plantilla y el nivel de detall
 por las interacciones y decisiones aplicables, no por exigir el mismo número de pasos a
 objetivos de distinta complejidad.
 
+## Semántica de actores y generalización UML
+
+Las asociaciones directas del diagrama indican qué actor inicia cada objetivo. Cuando un
+caso tiene una asociación directa con un actor, su ficha nombra ese actor y, si ese actor
+es una generalización no abstracta, también su especialización mediante “o”.
+Cuando un caso sólo está conectado con otro caso de uso, hereda el actor de ese caso
+relacionado. La generalización `Administrador del sistema --generaliza--> Personal de
+almacén` se conserva en el diagrama, pero no se añade como segundo actor en una ficha que
+ya tiene una asociación directa.
+Las asociaciones entre casos de uso sólo representan objetivos relacionados o
+continuaciones visibles; no sustituyen la asociación del actor ni conceden permisos.
+
 ## Estructura de las fichas
 
 Cada caso emplea la misma tabla de dos columnas y conserva dentro de ella toda la
@@ -174,7 +186,7 @@ como listas planas difíciles de revisar.
 | `AUT` | Sesión. | `CU-AUT-01` a `CU-AUT-02` |
 | `IDA` | Personas; usuarios y credenciales; sus consultas y reportes. | `CU-IDA-01` a `CU-IDA-09` |
 | `ALM` | Materiales; mermas; inventarios y movimientos del almacén. | `CU-ALM-01` a `CU-ALM-15` |
-| `CAT` | Proveedores; clientes; catálogos auxiliares y reportes complementarios. | `CU-CAT-01` a `CU-CAT-27` |
+| `CAT` | Proveedores; clientes; catálogos auxiliares y reportes complementarios. | `CU-CAT-01` a `CU-CAT-26` |
 | `ENT` | Compras de material y su reporte. | `CU-ENT-01` a `CU-ENT-06` |
 | `SAL` | Salidas de material y merma con sus reportes. | `CU-SAL-01` a `CU-SAL-14` |
 
@@ -207,10 +219,10 @@ conjunto; el cambio de identificador no modifica el alcance funcional del caso.
 
 | Tema compartido | Casos | Elementos reutilizables que deben evaluarse primero | Diferencia que debe conservarse |
 | --- | --- | --- | --- |
-| CRUD de identidades y catálogos | `CU-IDA-01` a `CU-IDA-09`; `CU-ALM-01` a `CU-ALM-06`; `CU-ALM-09` a `CU-ALM-13`; `CU-CAT-01` a `CU-CAT-27` | Fábricas CRUD, listados, formularios, validación y refresco de tabla. | Permisos, identidad del recurso, relaciones y política de eliminación. |
+| CRUD de identidades y catálogos | `CU-IDA-01` a `CU-IDA-09`; `CU-ALM-01` a `CU-ALM-06`; `CU-ALM-09` a `CU-ALM-13`; `CU-CAT-01` a `CU-CAT-26` | Fábricas CRUD, listados, formularios, validación y refresco de tabla. | Permisos, identidad del recurso, relaciones y política de eliminación. |
 | Documentos con detalles | `CU-ENT-02`, `CU-ENT-03`, `CU-SAL-02` a `CU-SAL-04` y `CU-SAL-09` a `CU-SAL-11` | Encabezado, modal/formulario, tabla de detalles, DTO y transacción coordinadora. | La entrada incrementa stock al confirmarse; la salida no lo descuenta hasta surtir. |
 | Operación de salidas | `CU-SAL-02` a `CU-SAL-06` y `CU-SAL-09` a `CU-SAL-13` | Proceso de material replicable para merma, componentes informativos y coordinación de movimientos. | Inventario, conversión, permisos, estados y cantidades acumuladas del contexto. |
-| Consulta y exportación | `CU-IDA-04`, `CU-IDA-09`, `CU-ALM-06`, `CU-ALM-08`, `CU-ALM-13`, `CU-ALM-15`, `CU-CAT-05`, `CU-CAT-09`, `CU-ENT-06`, `CU-SAL-07` y `CU-SAL-14` y casos de consulta de cada familia | Filtros, paginación, dependencias entre selects y utilidades Excel. | Columnas, agrupaciones, fórmulas y permiso de cada reporte. |
+| Consulta y exportación | `CU-IDA-04`, `CU-IDA-09`, `CU-ALM-06`, `CU-ALM-08`, `CU-ALM-13`, `CU-ALM-15`, `CU-CAT-04`, `CU-CAT-08`, `CU-ENT-06`, `CU-SAL-07` y `CU-SAL-14` y casos de consulta de cada familia | Filtros, paginación, dependencias entre selects y utilidades Excel. | Columnas, agrupaciones, fórmulas y permiso de cada reporte. |
 
 Reutilizar no significa fusionar reglas de negocio. Antes de crear otro flujo se revisan
 los [patrones de diseño y construcción](../../architecture/design-and-construction-patterns/index.md), se replica

@@ -36,4 +36,3 @@ sequenceDiagram
     deactivate Application
 ```
 
-<a id="cu-cat-05"></a>

@@ -1,28 +1,25 @@
 <a id="cu-cat-05"></a>
-# `CU-CAT-05` — Generar reporte de proveedores
+# `CU-CAT-05` — Consultar clientes
 
-**Patrones:** `FE-P08`.
+**Patrones:** `FE-P02`.
 
 ```mermaid
 sequenceDiagram
     participant Browser as Navegador
-    participant View as src/public/js/plugins/datatable/warehouse/suppliers/supplierDatatable.js
-    participant Dialog as src/public/js/ui/reportExportDialog.js
-    participant Application as src/public/js/application/warehouse/report.js
-    participant Request as src/public/js/services/warehouse/reportService.js
+    participant View as src/views/pages/sales/clients/clientsPage.ejs<br/>src/public/js/pages/sales/clients/clientsPage.js
+    participant Application as src/public/js/application/sales/clients/clients.js
+    participant Request as src/public/js/services/sales/clientService.js
     participant HTTP as src/public/js/services/axiosInstanceApi.js
-    participant Transport@{ "type": "control" } as src/routes/api/warehouse/reportApiRoute.js<br/>src/controllers/api/warehouse/reportController.js
+    participant Transport@{ "type": "control" } as src/routes/api/sales/clientApiRoute.js<br/>src/controllers/api/sales/clientController.js
     Note over Application,Transport: Variables de frontera: params/filtros
 
-    Browser->>View: Botón Excel de supplierDatatable.js
-    View->>Dialog: showFilteredExportDialog()
-    Dialog-->>View: alcance confirmado o cancelación
+    Browser->>View: clientsPage.ejs y clientsPage.js cargan clientes
     View->>View: recopilar y validar las variables de frontera indicadas
-    View->>Application: exportSupplierReport({ params })
-    Application->>Request: exportSupplierReportRequest({ params })
+    View->>Application: getAllClients({ params })
+    Application->>Request: getAllClientsRequest({ params })
     activate Application
-    Request->>HTTP: apiRequest({ method: 'get', url, params })
-    HTTP->>Transport: descarga GET /api/warehouse/reports/suppliers/excel
+    Request->>HTTP: apiRequest({ method: 'get', url, data/params })
+    HTTP->>Transport: consulta GET /api/sales/clients
     Transport-->>HTTP: status HTTP y payload del endpoint
     HTTP-->>Request: respuesta o error normalizado
     Request-->>Application: resultado del request
@@ -36,4 +33,4 @@ sequenceDiagram
     deactivate Application
 ```
 
-<a id="cu-cat-09"></a>
+<a id="cu-cat-06"></a>

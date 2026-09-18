@@ -4,7 +4,7 @@
 | --- | --- |
 | Identificador | `CU-ALM-15` |
 | Nombre | Generar reporte de movimientos de mermas. |
-| Actor y disparador | **Actor:** Usuario con permiso sobre el reporte o consulta. **Disparador:** desde `CU-ALM-14` Consultar movimientos de mermas, selecciona **Exportar Excel** con los filtros que necesita conservar. |
+| Actor y disparador | **Actor:** Personal de almacén o Administrador del sistema. **Disparador:** desde `CU-ALM-14` Consultar movimientos de mermas, selecciona **Exportar Excel** con los filtros que necesita conservar. |
 | Participación de actor y sistema | **Actor:** define filtros y solicita la exportación.<br>**Nexus:** autoriza, consolida la información y entrega el archivo. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de consulta o reporte correspondiente. |
 | Flujo principal | 1. **Nexus:** después de que el actor selecciona la exportación desde la consulta de origen, abre el modal **Exportar reporte** y muestra las opciones aplicables **(ver E1)**.<br>2. **Actor:** conserva o ajusta los filtros, incluye las opciones disponibles y confirma.<br>3. **Nexus:** vuelve a comprobar autorización y parámetros y prepara la información de movimientos de mermas.<br>4. **Nexus:** genera el archivo de Excel e inicia su descarga; si no hay datos, informa que el resultado está vacío. |

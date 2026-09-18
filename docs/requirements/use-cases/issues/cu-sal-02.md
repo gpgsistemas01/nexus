@@ -4,7 +4,7 @@
 | --- | --- |
 | Identificador | `CU-SAL-02` |
 | Nombre | Crear salida de material. |
-| Actor y disparador | **Actor:** Personal de almacén. **Disparador:** selecciona la acción principal para crear una salida desde `CU-SAL-01` Consultar salidas de material. |
+| Actor y disparador | **Actor:** Personal de almacén o Administrador del sistema. **Disparador:** selecciona la acción principal para crear una salida desde `CU-SAL-01` Consultar salidas de material. |
 | Participación de actor y sistema | **Actor:** abre el alta, captura datos y confirma.<br>**Nexus:** carga opciones, valida, registra y comunica el resultado. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de alta.<br>3. Existen los datos relacionados requeridos para completar el registro. |
 | Flujo principal | 1. **Actor:** abre «Agregar salida de material» **(ver E1)**.<br>2. **Nexus:** muestra el formulario y carga clientes, asesores, áreas, solicitantes y materiales disponibles.<br>3. **Actor:** selecciona cliente, asesor, área y solicitante; captura número de proyecto, fecha y hora de solicitud y observaciones.<br>4. **Actor:** agrega cada material con su cantidad, revisa los detalles y selecciona «Guardar» **(ver A1)**. Si vuelve a agregar la misma combinación material-proveedor, el formulario reemplaza su renglón con la cantidad capturada más reciente, sin sumarla.<br>5. **Nexus:** valida participantes, relaciones, materiales y cantidades **(ver A2)**.<br>6. **Nexus:** crea la salida pendiente sin descontar existencias, actualiza la tabla y confirma. |

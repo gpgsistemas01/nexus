@@ -4,7 +4,7 @@
 | --- | --- |
 | Identificador | `CU-ENT-05` |
 | Nombre | Cancelar material de una compra. |
-| Actor y disparador | **Actor:** Personal de almacén. **Disparador:** determina que debe anular material de una compra y solicita la cancelación. |
+| Actor y disparador | **Actor:** Personal de almacén o Administrador del sistema. **Disparador:** determina que debe anular material de una compra y solicita la cancelación. |
 | Participación de actor y sistema | **Actor:** selecciona el detalle y confirma la cancelación.<br>**Nexus:** valida y coordina la cancelación, la existencia, el movimiento y los totales. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso operativo.<br>3. La compra y el detalle activo existen.<br>4. El detalle se encuentra en un estado que admite cancelación. |
 | Flujo principal | 1. **Actor:** selecciona un detalle activo y solicita cancelarlo **(ver E1)**.<br>2. **Nexus:** identifica el detalle y solicita confirmación.<br>3. **Actor:** confirma la cancelación.<br>4. **Nexus:** valida que el detalle siga activo y que la existencia recibida pueda revertirse **(ver E2)**.<br>5. **Nexus:** cancela el detalle, revierte existencia, movimiento y totales y confirma el resultado. |

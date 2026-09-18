@@ -1,25 +1,28 @@
 <a id="cu-cat-08"></a>
-# `CU-CAT-08` — Editar cliente
+# `CU-CAT-08` — Generar reporte de clientes
 
-**Patrones:** `FE-P02`.
+**Patrones:** `FE-P08`.
 
 ```mermaid
 sequenceDiagram
     participant Browser as Navegador
-    participant View as src/public/js/pages/sales/clients/clientModal.js
-    participant Application as src/public/js/application/sales/clients/clients.js
-    participant Request as src/public/js/services/sales/clientService.js
+    participant View as src/public/js/plugins/datatable/sales/clients/clientDatatable.js
+    participant Dialog as src/public/js/ui/reportExportDialog.js
+    participant Application as src/public/js/application/sales/report.js
+    participant Request as src/public/js/services/sales/reportService.js
     participant HTTP as src/public/js/services/axiosInstanceApi.js
-    participant Transport@{ "type": "control" } as src/routes/api/sales/clientApiRoute.js<br/>src/controllers/api/sales/clientController.js
-    Note over Application,Transport: Variables de frontera: id, formData/payload
+    participant Transport@{ "type": "control" } as src/routes/api/sales/reportApiRoute.js<br/>src/controllers/api/sales/reportController.js
+    Note over Application,Transport: Variables de frontera: params/filtros
 
-    Browser->>View: clientModal.js precarga el cliente
+    Browser->>View: Botón Excel de clientDatatable.js
+    View->>Dialog: showFilteredExportDialog()
+    Dialog-->>View: alcance confirmado o cancelación
     View->>View: recopilar y validar las variables de frontera indicadas
-    View->>Application: editClient({ id, formData })
-    Application->>Request: editClientRequest({ id, formData })
+    View->>Application: exportClientReport({ params })
+    Application->>Request: exportClientReportRequest({ params })
     activate Application
-    Request->>HTTP: apiRequest({ method: 'put', url, data/params })
-    HTTP->>Transport: envía PUT /api/sales/clients/:id
+    Request->>HTTP: apiRequest({ method: 'get', url, params })
+    HTTP->>Transport: descarga GET /api/sales/reports/clients/excel
     Transport-->>HTTP: status HTTP y payload del endpoint
     HTTP-->>Request: respuesta o error normalizado
     Request-->>Application: resultado del request
@@ -33,4 +36,4 @@ sequenceDiagram
     deactivate Application
 ```
 
-<a id="cu-alm-09"></a>
+<a id="cu-ida-04"></a>

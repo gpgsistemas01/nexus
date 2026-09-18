@@ -4,7 +4,7 @@
 | --- | --- |
 | Identificador | `CU-SAL-04` |
 | Nombre | Editar detalles de material de una salida. |
-| Actor y disparador | **Actor:** Personal de almacén. **Disparador:** necesita agregar o corregir materiales de una salida todavía modificables y abre los detalles. |
+| Actor y disparador | **Actor:** Personal de almacén o Administrador del sistema. **Disparador:** necesita agregar o corregir materiales de una salida todavía modificables y abre los detalles. |
 | Participación de actor y sistema | **Actor:** selecciona la salida o detalle, captura la acción y confirma.<br>**Nexus:** presenta cantidades y acciones permitidas, valida y actualiza documento, inventario y movimientos cuando corresponde. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de edición.<br>3. La salida existe.<br>4. La salida se encuentra en un estado que admite modificar sus detalles. |
 | Flujo principal | 1. **Actor:** abre los detalles de una salida todavía modificable **(ver E1)**.<br>2. **Nexus:** muestra los materiales actuales, cantidades y acciones permitidas.<br>3. **Actor:** agrega o modifica materiales y confirma los cambios **(ver A1)**.<br>4. **Nexus:** valida estado, recursos, cantidades pendientes y acumulados.<br>5. **Nexus:** actualiza los detalles sin descontar existencias y confirma el resultado. |

@@ -1,4 +1,4 @@
-# 6. Patrón de edición de catálogos — `CU-ALM-03`, `CU-CAT-03`, `CU-CAT-08`, `CU-ALM-11`, `CU-CAT-12`, `CU-CAT-15`, `CU-CAT-18`, `CU-CAT-21`, `CU-CAT-24` y `CU-CAT-27`
+# 6. Patrón de edición de catálogos — `CU-ALM-03`, `CU-CAT-03`, `CU-CAT-07`, `CU-ALM-11`, `CU-CAT-11`, `CU-CAT-14`, `CU-CAT-17`, `CU-CAT-20`, `CU-CAT-23` y `CU-CAT-26`
 
 ```mermaid
 flowchart LR

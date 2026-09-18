@@ -4,7 +4,7 @@
 | --- | --- |
 | Identificador | `CU-ALM-07` |
 | Nombre | Consultar movimientos de materiales. |
-| Actor y disparador | **Actor:** Usuario con permiso sobre el reporte o consulta. **Disparador:** necesita localizar o revisar movimientos de materiales y abre la opción de consulta correspondiente. |
+| Actor y disparador | **Actor:** Personal de almacén o Administrador del sistema. **Disparador:** necesita localizar o revisar movimientos de materiales y abre la opción de consulta correspondiente. |
 | Participación de actor y sistema | **Actor:** abre la consulta, define criterios y selecciona registros.<br>**Nexus:** autoriza, presenta filtros y devuelve sólo la información permitida. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de consulta o reporte correspondiente. |
 | Flujo principal | 1. **Actor:** abre la opción para consultar movimientos de materiales **(ver E1)**.<br>2. **Nexus:** comprueba su autorización y muestra los filtros disponibles.<br>3. **Actor:** define los criterios que necesita y solicita aplicarlos **(ver A1)**.<br>4. **Nexus:** presenta la información autorizada y la opción **Exportar Excel**.<br>5. **Actor:** selecciona **Exportar Excel**; termina `CU-ALM-07` y con esa selección dispara `CU-ALM-08` Generar reporte de movimientos de materiales. |

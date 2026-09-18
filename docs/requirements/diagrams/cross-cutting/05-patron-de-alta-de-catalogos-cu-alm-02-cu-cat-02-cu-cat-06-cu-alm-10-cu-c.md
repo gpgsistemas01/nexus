@@ -1,4 +1,4 @@
-# 5. Patrón de alta de catálogos — `CU-ALM-02`, `CU-CAT-02`, `CU-CAT-07`, `CU-ALM-10`, `CU-CAT-11`, `CU-CAT-14`, `CU-CAT-17`, `CU-CAT-20`, `CU-CAT-23` y `CU-CAT-26`
+# 5. Patrón de alta de catálogos — `CU-ALM-02`, `CU-CAT-02`, `CU-CAT-06`, `CU-ALM-10`, `CU-CAT-10`, `CU-CAT-13`, `CU-CAT-16`, `CU-CAT-19`, `CU-CAT-22` y `CU-CAT-25`
 
 ```mermaid
 flowchart LR

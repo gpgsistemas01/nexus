@@ -4,7 +4,7 @@
 | --- | --- |
 | Identificador | `CU-SAL-13` |
 | Nombre | Devolver merma surtida. |
-| Actor y disparador | **Actor:** Personal de almacén. **Disparador:** recibe de vuelta merma surtida y abre la devolución del detalle. |
+| Actor y disparador | **Actor:** Personal de almacén o Administrador del sistema. **Disparador:** recibe de vuelta merma surtida y abre la devolución del detalle. |
 | Participación de actor y sistema | **Actor:** selecciona la salida o detalle, captura la acción y confirma.<br>**Nexus:** presenta cantidades y acciones permitidas, valida y actualiza documento, inventario y movimientos cuando corresponde. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso operativo.<br>3. La salida y el detalle existen.<br>4. El detalle conserva una cantidad surtida todavía retornable. |
 | Flujo principal | 1. **Actor:** abre una salida de merma y selecciona un detalle surtido para devolverlo **(ver E1)**.<br>2. **Nexus:** muestra la cantidad que todavía puede devolverse.<br>3. **Actor:** captura la cantidad recibida de vuelta, registra las observaciones y selecciona «Devolver» **(ver A1)**.<br>4. **Nexus:** valida la cantidad retornable.<br>5. **Nexus:** reintegra existencia, acumula la devolución, actualiza estados, registra el movimiento inverso y confirma. |

@@ -4,7 +4,7 @@
 | --- | --- |
 | Identificador | `CU-CAT-02` |
 | Nombre | Crear proveedor. |
-| Actor y disparador | **Actor:** Personal de almacén. **Disparador:** selecciona la acción principal para crear un proveedor desde `CU-CAT-01` Consultar proveedores. |
+| Actor y disparador | **Actor:** Personal de almacén o Administrador del sistema. **Disparador:** selecciona la acción principal para crear un proveedor desde `CU-CAT-01` Consultar proveedores. |
 | Participación de actor y sistema | **Actor:** abre el alta, captura datos y confirma.<br>**Nexus:** carga opciones, valida, registra y comunica el resultado. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de alta. |
 | Flujo principal | 1. **Actor:** selecciona **Nuevo proveedor** **(ver E1)**.<br>2. **Nexus:** muestra el formulario con la casilla **Activo** seleccionada inicialmente.<br>3. **Actor:** captura razón social, nombre comercial y teléfono, revisa el estado y selecciona **Guardar** **(ver A1)**.<br>4. **Nexus:** valida que la información sea válida.<br>5. **Nexus:** registra proveedor, actualiza el listado y muestra la confirmación. |

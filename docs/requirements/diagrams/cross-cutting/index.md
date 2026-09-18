@@ -17,9 +17,9 @@ el código.
 | Compleja | `CU-ENT-02` | Referencia, documento, detalles, stock y movimientos se confirman juntos; el costo se revisa después del commit. | Secuencia de registro incluida abajo. |
 | Compleja | `CU-ENT-04`, `CU-ENT-05` | Corrección/cancelación altera historia, totales, stock y movimiento. | Secuencia atómica ya incluida en este documento. |
 | Compleja | `CU-SAL-05`, `CU-SAL-06`, `CU-SAL-12`, `CU-SAL-13` | Acumulados, estados, existencias y movimientos dependen de cantidades previas. | Máquina de estados ya incluida en este documento. |
-| Compleja | `CU-IDA-04`, `CU-IDA-09`, `CU-ALM-06`, `CU-ALM-08`, `CU-ALM-13`, `CU-ALM-15`, `CU-CAT-05`, `CU-CAT-09`, `CU-ENT-06`, `CU-SAL-07` y `CU-SAL-14` | Filtros, variantes mensual/detallada, fórmulas, totales y archivo deben conservar el mismo resultado de dominio. | Canal de generación de reportes incluido abajo. |
-| Intermedia | `CU-ALM-02`, `CU-ALM-03`, `CU-ALM-10`, `CU-ALM-11`, `CU-CAT-02`, `CU-CAT-03`, `CU-CAT-07`, `CU-CAT-08`, `CU-ENT-03`, `CU-SAL-02` a `CU-SAL-04` y `CU-SAL-09` a `CU-SAL-11` | Coordinan relaciones o detalles, pero no agregan participantes o estados que justifiquen una secuencia transaccional. | Flujo funcional en su grupo y vista técnica complementaria incluida abajo. |
-| Directa | `CU-IDA-01` a `CU-IDA-03`; `CU-ALM-01`, `CU-ALM-07`, `CU-ALM-09`, `CU-ALM-14`, `CU-CAT-01`, `CU-CAT-06`, `CU-CAT-10` a `CU-CAT-27`; `CU-ENT-01`; `CU-SAL-01` y `CU-SAL-08` | Consulta o mutación directa sin estados coordinados adicionales. | Flujo funcional en su grupo y vista técnica complementaria incluida abajo. |
+| Compleja | `CU-IDA-04`, `CU-IDA-09`, `CU-ALM-06`, `CU-ALM-08`, `CU-ALM-13`, `CU-ALM-15`, `CU-CAT-04`, `CU-CAT-08`, `CU-ENT-06`, `CU-SAL-07` y `CU-SAL-14` | Filtros, variantes mensual/detallada, fórmulas, totales y archivo deben conservar el mismo resultado de dominio. | Canal de generación de reportes incluido abajo. |
+| Intermedia | `CU-ALM-02`, `CU-ALM-03`, `CU-ALM-10`, `CU-ALM-11`, `CU-CAT-02`, `CU-CAT-03`, `CU-CAT-06`, `CU-CAT-07`, `CU-ENT-03`, `CU-SAL-02` a `CU-SAL-04` y `CU-SAL-09` a `CU-SAL-11` | Coordinan relaciones o detalles, pero no agregan participantes o estados que justifiquen una secuencia transaccional. | Flujo funcional en su grupo y vista técnica complementaria incluida abajo. |
+| Directa | `CU-IDA-01` a `CU-IDA-03`; `CU-ALM-01`, `CU-ALM-07`, `CU-ALM-09`, `CU-ALM-14`, `CU-CAT-01`, `CU-CAT-05`, `CU-CAT-09` a `CU-CAT-26`; `CU-ENT-01`; `CU-SAL-01` y `CU-SAL-08` | Consulta o mutación directa sin estados coordinados adicionales. | Flujo funcional en su grupo y vista técnica complementaria incluida abajo. |
 
 Las vistas siguientes completan los casos de coordinación intermedia y directa con el
 mismo criterio aplicado a los casos de coordinación compleja: muestran la ejecución
@@ -29,9 +29,9 @@ orientada al código.
 - [1. Consultar personas y usuarios — `CU-IDA-01` y `CU-IDA-05`](01-consultar-personas-y-usuarios-cu-ida-01-y-cu-ida-05.md)
 - [2. Crear persona — `CU-IDA-02`](02-crear-persona-cu-ida-02.md)
 - [3. Editar persona — `CU-IDA-03`](03-editar-persona-cu-ida-03.md)
-- [4. Patrón de consulta de catálogos — `CU-ALM-01`, `CU-CAT-01`, `CU-CAT-06`, `CU-ALM-09`; `CU-CAT-10`, `CU-CAT-13`, `CU-CAT-16`, `CU-CAT-19`, `CU-CAT-22` y `CU-CAT-25`](04-patron-de-consulta-de-catalogos-cu-alm-01-cu-cat-01-cu-cat-06-cu-alm-09-.md)
-- [5. Patrón de alta de catálogos — `CU-ALM-02`, `CU-CAT-02`, `CU-CAT-07`, `CU-ALM-10`, `CU-CAT-11`, `CU-CAT-14`, `CU-CAT-17`, `CU-CAT-20`, `CU-CAT-23` y `CU-CAT-26`](05-patron-de-alta-de-catalogos-cu-alm-02-cu-cat-02-cu-cat-07-cu-alm-10-cu-c.md)
-- [6. Patrón de edición de catálogos — `CU-ALM-03`, `CU-CAT-03`, `CU-CAT-08`, `CU-ALM-11`, `CU-CAT-12`, `CU-CAT-15`, `CU-CAT-18`, `CU-CAT-21`, `CU-CAT-24` y `CU-CAT-27`](06-patron-de-edicion-de-catalogos-cu-alm-03-cu-cat-03-cu-cat-08-cu-alm-11-c.md)
+- [4. Patrón de consulta de catálogos — `CU-ALM-01`, `CU-CAT-01`, `CU-CAT-05`, `CU-ALM-09`; `CU-CAT-09`, `CU-CAT-12`, `CU-CAT-15`, `CU-CAT-18`, `CU-CAT-21` y `CU-CAT-24`](04-patron-de-consulta-de-catalogos-cu-alm-01-cu-cat-01-cu-cat-05-cu-alm-09-.md)
+- [5. Patrón de alta de catálogos — `CU-ALM-02`, `CU-CAT-02`, `CU-CAT-06`, `CU-ALM-10`, `CU-CAT-10`, `CU-CAT-13`, `CU-CAT-16`, `CU-CAT-19`, `CU-CAT-22` y `CU-CAT-25`](05-patron-de-alta-de-catalogos-cu-alm-02-cu-cat-02-cu-cat-06-cu-alm-10-cu-c.md)
+- [6. Patrón de edición de catálogos — `CU-ALM-03`, `CU-CAT-03`, `CU-CAT-07`, `CU-ALM-11`, `CU-CAT-11`, `CU-CAT-14`, `CU-CAT-17`, `CU-CAT-20`, `CU-CAT-23` y `CU-CAT-26`](06-patron-de-edicion-de-catalogos-cu-alm-03-cu-cat-03-cu-cat-07-cu-alm-11-c.md)
 - [7. Consultar compras de material — `CU-ENT-01`](07-consultar-compras-de-material-cu-ent-01.md)
 - [8. Editar compra de material — `CU-ENT-03`](08-editar-compra-de-material-cu-ent-03.md)
 - [9. Consultar salidas de material o de merma — `CU-SAL-01` y `CU-SAL-08`](09-consultar-salidas-de-material-o-de-merma-cu-sal-01-y-cu-sal-08.md)
@@ -42,7 +42,7 @@ orientada al código.
 - [14. Crear o editar usuario y acceso — `CU-IDA-06`, `CU-IDA-07`, `CU-IDA-08`](14-crear-o-editar-usuario-y-acceso-cu-ida-06-cu-ida-07-cu-ida-08.md)
 - [15. Eliminar material o relación de proveedor — `CU-ALM-04`](15-eliminar-material-o-relacion-de-proveedor-cu-alm-04.md)
 - [16. Crear compra de material — `CU-ENT-02`](16-crear-compra-de-material-cu-ent-02.md)
-- [17. Generar reportes específicos — `CU-IDA-04`, `CU-IDA-09`, `CU-ALM-06`, `CU-ALM-08`, `CU-ALM-13`, `CU-ALM-15`, `CU-CAT-05`, `CU-CAT-09`, `CU-ENT-06`, `CU-SAL-07` y `CU-SAL-14`](17-generar-reportes-especificos-cu-ida-04-cu-ida-09-cu-alm-06-cu-alm-08-cu-.md)
+- [17. Generar reportes específicos — `CU-IDA-04`, `CU-IDA-09`, `CU-ALM-06`, `CU-ALM-08`, `CU-ALM-13`, `CU-ALM-15`, `CU-CAT-04`, `CU-CAT-08`, `CU-ENT-06`, `CU-SAL-07` y `CU-SAL-14`](17-generar-reportes-especificos-cu-ida-04-cu-ida-09-cu-alm-06-cu-alm-08-cu-.md)
 
 ## Coordinación atómica de correcciones de entrada
 

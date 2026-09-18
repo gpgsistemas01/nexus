@@ -4,7 +4,7 @@
 | --- | --- |
 | Identificador | `CU-ENT-03` |
 | Nombre | Editar compra de material. |
-| Actor y disparador | **Actor:** Personal de almacén. **Disparador:** detecta datos que debe corregir en una compra de material y selecciona su acción de edición. |
+| Actor y disparador | **Actor:** Personal de almacén o Administrador del sistema. **Disparador:** detecta datos que debe corregir en una compra de material y selecciona su acción de edición. |
 | Participación de actor y sistema | **Actor:** selecciona el registro, modifica datos y confirma.<br>**Nexus:** presenta valores vigentes, valida, actualiza y comunica el resultado. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de edición.<br>3. El registro objetivo existe.<br>4. El registro se encuentra en un estado que admite los cambios solicitados. |
 | Flujo principal | 1. **Actor:** selecciona una compra y abre su edición **(ver E1)**.<br>2. **Nexus:** muestra el encabezado y los detalles actuales y habilita sólo los campos permitidos.<br>3. **Actor:** modifica el tipo de comprobante, número de factura cuando aplica, proveedor, persona receptora, fecha, observaciones o agrega detalles con material, cantidad y costo por presentación; después selecciona «Actualizar» **(ver A1)**.<br>4. **Nexus:** valida el estado, la factura y los cambios solicitados **(ver A2)**.<br>5. **Nexus:** guarda los cambios sin volver a aplicar la existencia de detalles anteriores y confirma la actualización. |

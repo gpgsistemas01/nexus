@@ -1,8 +1,8 @@
-# `CU-CAT-23` — Crear motivo de ajuste
+# `CU-CAT-23` — Editar motivo de ajuste
 
 ```mermaid
 flowchart LR
-    request["Administrador selecciona Nuevo motivo de ajuste<br/>y confirma Guardar"] --> authorize["Nexus valida catalogs:manage y reasons"]
-    authorize --> persist["Validar campos y crear motivo de ajuste"]
+    request["Administrador selecciona Editar registro<br/>y confirma Actualizar"] --> authorize["Nexus valida catalogs:manage y reasons"]
+    authorize --> persist["Validar campos y actualizar motivo de ajuste"]
     persist --> result["Confirmar y refrescar Motivos de ajuste"]
 ```

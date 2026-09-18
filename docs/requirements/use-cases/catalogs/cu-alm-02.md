@@ -4,7 +4,7 @@
 | --- | --- |
 | Identificador | `CU-ALM-02` |
 | Nombre | Crear material. |
-| Actor y disparador | **Actor:** Personal de almacén. **Disparador:** selecciona la acción principal para crear un material desde `CU-ALM-01` Consultar materiales. |
+| Actor y disparador | **Actor:** Personal de almacén o Administrador del sistema. **Disparador:** selecciona la acción principal para crear un material desde `CU-ALM-01` Consultar materiales. |
 | Participación de actor y sistema | **Actor:** abre el alta, captura datos y confirma.<br>**Nexus:** carga opciones, valida, registra y comunica el resultado. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de alta.<br>3. Existen los datos relacionados requeridos para completar el registro. |
 | Flujo principal | 1. **Actor:** abre la opción para crear material **(ver E1)**.<br>2. **Nexus:** muestra el formulario y carga las opciones relacionadas que puede utilizar.<br>3. **Actor:** captura nombre, proveedor, presentación, unidad, ambas dimensiones o ninguna, y los datos de inventario requeridos; después confirma **(ver A1)**.<br>4. **Nexus:** valida autorización, obligatoriedad, formato, identidad y relaciones **(ver A2)**.<br>5. **Nexus:** registra la identidad o reutiliza la existente, crea la oferta del proveedor, actualiza el listado y muestra la confirmación. |

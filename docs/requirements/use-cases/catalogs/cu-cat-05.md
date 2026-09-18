@@ -1,13 +1,14 @@
-# `CU-CAT-05` — Generar reporte de proveedores
+# `CU-CAT-05` — Consultar clientes
 
 | Sección | Información relevante |
 | --- | --- |
 | Identificador | `CU-CAT-05` |
-| Nombre | Generar reporte de proveedores. |
-| Actor y disparador | **Actor:** Usuario con permiso sobre el reporte o consulta. **Disparador:** desde `CU-CAT-01` Consultar proveedores, selecciona la opción para generar el reporte con los filtros que necesita conservar. |
-| Participación de actor y sistema | **Actor:** solicita la exportación y confirma el alcance informado.<br>**Nexus:** autoriza, consolida la información y entrega el archivo. |
+| Nombre | Consultar clientes. |
+| Actor y disparador | **Actor:** Administrador del sistema. **Disparador:** necesita localizar o revisar clientes y abre la opción de consulta correspondiente. |
+| Participación de actor y sistema | **Actor:** abre la consulta, define criterios y selecciona registros.<br>**Nexus:** autoriza, presenta filtros y devuelve sólo la información permitida. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de consulta o reporte correspondiente. |
-| Flujo principal | 1. **Nexus:** después de que el actor selecciona la exportación desde la consulta de origen, abre el modal **Exportar reporte** e informa que aplicará la búsqueda, los filtros y el orden actuales **(ver E1)**.<br>2. **Actor:** revisa el alcance informado y confirma la descarga.<br>3. **Nexus:** vuelve a comprobar autorización y parámetros y prepara la información de proveedores.<br>4. **Nexus:** genera el archivo de Excel e inicia su descarga; si no hay datos, informa que el resultado está vacío. |
-| Excepciones | **E1 — Exportación rechazada (después del disparador):**<br>1. **Nexus:** comprueba las precondiciones y la autorización, determina que alguna no se cumple y rechaza la solicitud sin modificar datos ni exponer información no autorizada; comunica el motivo.<br>2. **Actor:** reconoce el rechazo; termina el caso de uso. |
-| Postcondiciones (éxito y fallo) | 1. **Éxito:** Archivo Excel con filtros, columnas y cálculos propios del reporte.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
-| Requisitos relacionados | `RF-REP-002`, `RF-REP-004`. |
+| Flujo principal | 1. **Actor:** abre la opción para consultar clientes **(ver E1)**.<br>2. **Nexus:** comprueba su autorización y muestra la consulta con sus criterios disponibles.<br>3. **Actor:** define los criterios que necesita y solicita aplicarlos **(ver A1)**.<br>4. **Nexus:** presenta la información autorizada y la acción principal para registrar un cliente.<br>5. **Actor:** selecciona la acción principal; termina `CU-CAT-05` y con esa selección dispara `CU-CAT-06` Crear cliente. |
+| Flujos alternativos | **A1 — Continuar la consulta (después del paso 3):**<br>1. **Nexus:** actualiza la información y el total sin modificar datos.<br>2. **Actor:** revisa los resultados o cambia los criterios.<br>3. **Nexus:** conserva la consulta disponible; termina el caso de uso.<br>**A2 — Elegir otra acción (después del paso 4 del flujo principal):**<br>1. **Actor:** selecciona editar el cliente en lugar de iniciar el alta; termina `CU-CAT-05` y puede iniciar `CU-CAT-07` Editar cliente. También puede iniciar `CU-CAT-08` Generar reporte de clientes. Cada caso elegido comprueba nuevamente sus precondiciones y autorización; la selección no constituye `«include»` ni `«extend»`. |
+| Excepciones | **E1 — Acceso rechazado (después del paso 1):**<br>1. **Nexus:** comprueba las precondiciones y la autorización, determina que alguna no se cumple y rechaza la solicitud sin modificar datos ni exponer información no autorizada; comunica el motivo.<br>2. **Actor:** reconoce el rechazo; termina el caso de uso. |
+| Postcondiciones (éxito y fallo) | 1. **Éxito:** Listado de clientes autorizados.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
+| Requisitos relacionados | `RF-CAT-003`. |

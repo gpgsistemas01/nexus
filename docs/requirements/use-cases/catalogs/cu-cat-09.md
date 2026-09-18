@@ -1,13 +1,14 @@
-# `CU-CAT-09` — Generar reporte de clientes
+# `CU-CAT-09` — Consultar área
 
 | Sección | Información relevante |
 | --- | --- |
 | Identificador | `CU-CAT-09` |
-| Nombre | Generar reporte de clientes. |
-| Actor y disparador | **Actor:** Usuario con permiso sobre el reporte o consulta. **Disparador:** desde `CU-CAT-06` Consultar clientes, selecciona la opción para generar el reporte con los filtros que necesita conservar. |
-| Participación de actor y sistema | **Actor:** solicita la exportación y confirma el alcance informado.<br>**Nexus:** autoriza, consolida la información y entrega el archivo. |
-| Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de consulta o reporte correspondiente. |
-| Flujo principal | 1. **Nexus:** después de que el actor selecciona la exportación desde la consulta de origen, abre el modal **Exportar reporte** e informa que aplicará la búsqueda, los filtros y el orden actuales **(ver E1)**.<br>2. **Actor:** revisa el alcance informado y confirma la descarga.<br>3. **Nexus:** vuelve a comprobar autorización y parámetros y prepara la información de clientes.<br>4. **Nexus:** genera el archivo de Excel e inicia su descarga; si no hay datos, informa que el resultado está vacío. |
-| Excepciones | **E1 — Exportación rechazada (después del disparador):**<br>1. **Nexus:** comprueba las precondiciones y la autorización, determina que alguna no se cumple y rechaza la solicitud sin modificar datos ni exponer información no autorizada; comunica el motivo.<br>2. **Actor:** reconoce el rechazo; termina el caso de uso. |
-| Postcondiciones (éxito y fallo) | 1. **Éxito:** Archivo Excel con filtros, columnas y cálculos propios del reporte.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
-| Requisitos relacionados | `RF-REP-002`, `RF-REP-004`. |
+| Nombre | Consultar área. |
+| Actor y disparador | **Actor:** Administrador del sistema del área Sistemas. **Disparador:** selecciona **Áreas** en el submenú **Catálogos auxiliares**. |
+| Participación de actor y sistema | **Actor:** abre y revisa el listado de Áreas.<br>**Nexus:** autoriza, valida el recurso registrado y devuelve sus entradas. |
+| Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con autorización para administrar catálogos y pertenece al contexto administrativo autorizado. |
+| Flujo principal | 1. **Administrador:** selecciona **Áreas** en el submenú **Catálogos auxiliares** **(ver E1)**.<br>2. **Nexus:** comprueba que puede consultar Áreas y muestra su tabla.<br>3. **Nexus:** presenta **Nueva área** como acción principal para registrar un área.<br>4. **Administrador:** selecciona **Nueva área**; termina `CU-CAT-09` y con esa selección dispara `CU-CAT-10` Crear área. |
+| Flujos alternativos | **A1 — Permanecer en la consulta (después del paso 3):**<br>1. **Administrador:** decide no iniciar el alta y revisa o busca entradas sin modificar datos.<br>2. **Nexus:** conserva la tabla de Áreas; termina el caso de uso.<br>**A2 — Editar una entrada (después del paso 3 del flujo principal):**<br>1. **Administrador:** selecciona **Editar registro** en una entrada; termina `CU-CAT-09` y puede iniciar `CU-CAT-11` Editar área. El caso de edición comprueba nuevamente sus precondiciones y autorización. |
+| Excepciones | **E1 — Acceso, recurso o entrada rechazados:**<br>1. **Nexus:** rechaza la operación sin exponer otro catálogo ni producir cambios parciales.<br>2. **Administrador:** reconoce el rechazo; termina el caso de uso. |
+| Postcondiciones (éxito y fallo) | 1. **Éxito:** La tabla muestra exclusivamente las entradas de Áreas.<br>2. **Fallo:** No se exponen datos ni modelos no autorizados. |
+| Requisitos relacionados | `RF-CAT-022`, `RN-001`, `RN-006`. |

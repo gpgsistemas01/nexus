@@ -4,7 +4,7 @@
 | --- | --- |
 | Identificador | `CU-ALM-11` |
 | Nombre | Editar merma. |
-| Actor y disparador | **Actor:** Personal de almacén. **Disparador:** detecta datos que debe corregir en una merma y selecciona su acción de edición. |
+| Actor y disparador | **Actor:** Personal de almacén o Administrador del sistema. **Disparador:** detecta datos que debe corregir en una merma y selecciona su acción de edición. |
 | Participación de actor y sistema | **Actor:** selecciona el registro, modifica datos y confirma.<br>**Nexus:** presenta valores vigentes, valida, actualiza y comunica el resultado. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de edición.<br>3. El registro objetivo existe.<br>4. El registro se encuentra en un estado que admite los cambios solicitados. |
 | Flujo principal | 1. **Actor:** selecciona merma y abre la edición **(ver E1)**.<br>2. **Nexus:** muestra los valores actuales y habilita sólo los campos permitidos.<br>3. **Actor:** modifica los datos admitidos y confirma **(ver A1)**.<br>4. **Nexus:** valida autorización, formato, identidad y relaciones.<br>5. **Nexus:** guarda los cambios, actualiza el listado y muestra la confirmación. |

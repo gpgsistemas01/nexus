@@ -1,7 +1,7 @@
 <a id="CAP-CAT-CLI-01-LIST"></a>
 # 10. CAP-CAT-CLI-01-LIST — Listado
 
-**Casos de uso:** `CU-CAT-06` — Consultar clientes; `CU-CAT-09` — Generar reporte de clientes.
+**Casos de uso:** `CU-CAT-05` — Consultar clientes; `CU-CAT-08` — Generar reporte de clientes.
 
 **Errores posibles:** [Catálogos e inventario](../../error-messages.md#errores-catalogos).
 

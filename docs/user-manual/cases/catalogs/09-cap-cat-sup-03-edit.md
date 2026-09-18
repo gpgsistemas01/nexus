@@ -1,7 +1,6 @@
 <a id="CAP-CAT-SUP-03-EDIT"></a>
 # 9. CAP-CAT-SUP-03-EDIT — Formulario edición y estado
 
-**Casos de uso:** `CU-CAT-03` — Editar proveedor; `CU-CAT-04` — Cambiar estado de proveedor.
 
 **Errores posibles:** [Validación de formularios](../../error-messages.md#errores-validacion), [Catálogos e inventario](../../error-messages.md#errores-catalogos).
 

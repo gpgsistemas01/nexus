@@ -4,7 +4,7 @@
 | --- | --- |
 | Identificador | `CU-ALM-04` |
 | Nombre | Retirar material. |
-| Actor y disparador | **Actor:** Personal de almacén. **Disparador:** determina que debe retirar material y solicita la eliminación. |
+| Actor y disparador | **Actor:** Personal de almacén o Administrador del sistema. **Disparador:** determina que debe retirar material y solicita la eliminación. |
 | Participación de actor y sistema | **Actor:** solicita y confirma el retiro.<br>**Nexus:** comprueba historia y relaciones, ejecuta sólo el retiro permitido e informa el resultado. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de retiro.<br>3. El recurso objetivo existe.<br>4. El recurso se encuentra en un estado que permite retirarlo. |
 | Flujo principal | 1. **Actor:** selecciona un material y solicita retirarlo **(ver E1)**.<br>2. **Nexus:** identifica el material y solicita confirmar la eliminación.<br>3. **Actor:** confirma que desea retirarlo.<br>4. **Nexus:** comprueba si el material tiene historia protegida o relaciones con proveedores **(ver A1)**.<br>5. **Nexus:** elimina la relación proveedor-material y, cuando no quedan otras relaciones ni historia protegida, elimina también la identidad del material; después actualiza el listado y confirma el retiro. |

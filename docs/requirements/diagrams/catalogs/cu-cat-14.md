@@ -1,8 +1,8 @@
-# `CU-CAT-14` — Crear rol
+# `CU-CAT-14` — Editar rol
 
 ```mermaid
 flowchart LR
-    request["Administrador selecciona Nuevo rol<br/>y confirma Guardar"] --> authorize["Nexus valida catalogs:manage y roles"]
-    authorize --> persist["Validar campos y crear rol"]
+    request["Administrador selecciona Editar registro<br/>y confirma Actualizar"] --> authorize["Nexus valida catalogs:manage y roles"]
+    authorize --> persist["Validar campos y actualizar rol"]
     persist --> result["Confirmar y refrescar Roles"]
 ```

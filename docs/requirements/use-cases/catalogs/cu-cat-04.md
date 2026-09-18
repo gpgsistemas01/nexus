@@ -1,14 +1,13 @@
-# `CU-CAT-04` — Cambiar estado de proveedor
+# `CU-CAT-04` — Generar reporte de proveedores
 
 | Sección | Información relevante |
 | --- | --- |
 | Identificador | `CU-CAT-04` |
-| Nombre | Cambiar estado de proveedor. |
-| Actor y disparador | **Actor:** Personal de almacén. **Disparador:** necesita activar o desactivar un proveedor y selecciona **Editar registro** en `CU-CAT-01` Consultar proveedores. |
-| Participación de actor y sistema | **Actor:** selecciona el registro, modifica datos y confirma.<br>**Nexus:** presenta valores vigentes, valida, actualiza y comunica el resultado. |
-| Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de edición.<br>3. El proveedor objetivo existe. |
-| Flujo principal | 1. **Nexus:** abre el mismo formulario utilizado para editar el proveedor **(ver E1)**.<br>2. **Nexus:** muestra sus datos actuales y la casilla **Activo**.<br>3. **Actor:** marca o desmarca **Activo** y selecciona **Actualizar** **(ver A1)**.<br>4. **Nexus:** valida los datos y actualiza el proveedor como parte de la edición.<br>5. **Nexus:** refresca el listado y confirma el cambio de estado. |
-| Flujos alternativos | **A1 — Datos inválidos (después del paso 3):**<br>1. **Nexus:** valida la información capturada, detecta campos incompletos, formatos incorrectos, relaciones no permitidas o cantidades fuera de las reglas del caso y los señala sin registrar cambios.<br>2. **Actor:** corrige la información indicada y vuelve a confirmar; continúa en el paso 4 del flujo principal. |
-| Excepciones | **E1 — Acceso rechazado (después del paso 1):**<br>1. **Nexus:** comprueba las precondiciones y la autorización, determina que alguna no se cumple y rechaza la solicitud sin modificar datos ni exponer información no autorizada; comunica el motivo.<br>2. **Actor:** reconoce el rechazo; termina el caso de uso. |
-| Postcondiciones (éxito y fallo) | 1. **Éxito:** Activación o desactivación del proveedor.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
-| Requisitos relacionados | `RF-CAT-011`. |
+| Nombre | Generar reporte de proveedores. |
+| Actor y disparador | **Actor:** Administrador del sistema. **Disparador:** desde `CU-CAT-01` Consultar proveedores, selecciona la opción para generar el reporte con los filtros que necesita conservar. |
+| Participación de actor y sistema | **Actor:** solicita la exportación y confirma el alcance informado.<br>**Nexus:** autoriza, consolida la información y entrega el archivo. |
+| Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de consulta o reporte correspondiente. |
+| Flujo principal | 1. **Nexus:** después de que el actor selecciona la exportación desde la consulta de origen, abre el modal **Exportar reporte** e informa que aplicará la búsqueda, los filtros y el orden actuales **(ver E1)**.<br>2. **Actor:** revisa el alcance informado y confirma la descarga.<br>3. **Nexus:** vuelve a comprobar autorización y parámetros y prepara la información de proveedores.<br>4. **Nexus:** genera el archivo de Excel e inicia su descarga; si no hay datos, informa que el resultado está vacío. |
+| Excepciones | **E1 — Exportación rechazada (después del disparador):**<br>1. **Nexus:** comprueba las precondiciones y la autorización, determina que alguna no se cumple y rechaza la solicitud sin modificar datos ni exponer información no autorizada; comunica el motivo.<br>2. **Actor:** reconoce el rechazo; termina el caso de uso. |
+| Postcondiciones (éxito y fallo) | 1. **Éxito:** Archivo Excel con filtros, columnas y cálculos propios del reporte.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
+| Requisitos relacionados | `RF-REP-002`, `RF-REP-004`. |

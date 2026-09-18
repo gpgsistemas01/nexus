@@ -4,7 +4,7 @@
 | --- | --- |
 | Identificador | `CU-ENT-04` |
 | Nombre | Corregir material de una compra. |
-| Actor y disparador | **Actor:** Personal de almacén. **Disparador:** detecta una diferencia en un material de una compra y abre la corrección del detalle. |
+| Actor y disparador | **Actor:** Personal de almacén o Administrador del sistema. **Disparador:** detecta una diferencia en un material de una compra y abre la corrección del detalle. |
 | Participación de actor y sistema | **Actor:** selecciona el detalle, captura la corrección y confirma.<br>**Nexus:** valida y coordina detalle, existencia, movimiento, totales e historial. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso operativo.<br>3. La compra y el detalle existen.<br>4. El detalle se encuentra en un estado que admite corrección. |
 | Flujo principal | 1. **Actor:** selecciona un material de la compra y abre «Corregir detalle» **(ver E1)**.<br>2. **Nexus:** muestra el detalle y sus valores actuales y habilita «Cantidad correcta» y «Costo por presentación correcto».<br>3. **Actor:** captura la corrección y la confirma **(ver A1)**.<br>4. **Nexus:** valida que la cantidad corregida sea positiva y no exceda la recibida, que el costo sea positivo, que exista una diferencia y que el inventario permita aplicar la reducción **(ver E2)**.<br>5. **Nexus:** actualiza detalle, existencia, movimiento, totales e historial como una sola operación y confirma. |

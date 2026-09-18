@@ -4,7 +4,7 @@
 | --- | --- |
 | Identificador | `CU-SAL-12` |
 | Nombre | Surtir merma. |
-| Actor y disparador | **Actor:** Personal de almacén. **Disparador:** va a entregar merma de una solicitud pendiente y abre sus detalles. |
+| Actor y disparador | **Actor:** Personal de almacén o Administrador del sistema. **Disparador:** va a entregar merma de una solicitud pendiente y abre sus detalles. |
 | Participación de actor y sistema | **Actor:** selecciona el detalle pendiente, registra la cantidad convertida del proyecto cuando aplica y confirma el surtimiento.<br>**Nexus:** presenta cantidades y acciones permitidas, valida y actualiza documento, inventario y movimientos. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso operativo.<br>3. La salida y el detalle existen.<br>4. El detalle conserva cantidad pendiente.<br>5. Hay existencia suficiente para surtir la cantidad solicitada. |
 | Flujo principal | 1. **Actor:** abre los detalles de la salida de merma y selecciona un renglón pendiente **(ver E1)**.<br>2. **Nexus:** muestra la cantidad solicitada pendiente y la existencia disponible.<br>3. **Actor:** marca el detalle para surtirlo, registra la cantidad convertida del proyecto cuando corresponde y confirma **(ver A1)**.<br>4. **Nexus:** valida el estado, el detalle seleccionado y la existencia suficiente para surtir toda su cantidad pendiente **(ver A2)** **(ver E2)**.<br>5. **Nexus:** descuenta la cantidad pendiente completa, marca el detalle como surtido, actualiza estados, registra el movimiento y confirma. |

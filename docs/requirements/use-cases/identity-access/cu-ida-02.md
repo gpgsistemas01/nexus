@@ -4,7 +4,7 @@
 | --- | --- |
 | Identificador | `CU-IDA-02` |
 | Nombre | Crear persona. |
-| Actor y disparador | **Actor:** Administrador del sistema. **Disparador:** selecciona la acción principal para crear una persona desde `CU-IDA-01` Consultar personas. |
+| Actor y disparador | **Actor:** Personal de almacén o Administrador del sistema. **Disparador:** selecciona la acción principal para crear una persona desde `CU-IDA-01` Consultar personas. |
 | Participación de actor y sistema | **Actor:** abre el alta, captura datos y confirma.<br>**Nexus:** carga opciones, valida, registra y comunica el resultado. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de alta.<br>3. Existen los datos relacionados requeridos para completar el registro. |
 | Flujo principal | 1. **Actor:** abre la opción para crear persona **(ver E1)**.<br>2. **Nexus:** muestra el formulario y carga las opciones relacionadas que puede utilizar.<br>3. **Actor:** captura los datos y relaciones requeridos y confirma **(ver A1)**.<br>4. **Nexus:** valida autorización, obligatoriedad, formato, identidad y relaciones.<br>5. **Nexus:** registra persona, actualiza el listado y muestra la confirmación. |
