@@ -93,12 +93,6 @@ flowchart LR
     subgraph catalogPackage["Nexus · Grupo funcional CAT: Catálogos"]
         direction TB
         subgraph materialCatalogFamily["Materiales"]
-            ucMaterialQuery(["CU-CAT-01 Consultar materiales"])
-            ucMaterialCreate(["CU-CAT-02 Crear material"])
-            ucMaterialEdit(["CU-CAT-03 Editar material"])
-            ucMaterialRemove(["CU-CAT-04 Retirar material"])
-            ucMaterialStock(["CU-CAT-05 Ajustar existencia de material"])
-            ucMaterialInventoryReport(["CU-CAT-06 Generar reporte de inventario de materiales"])
             ucMaterialMovements(["CU-CAT-07 Consultar movimientos de materiales"])
             ucMaterialMovementReport(["CU-CAT-08 Generar reporte de movimientos de materiales"])
         end
@@ -106,7 +100,6 @@ flowchart LR
             ucSupplierQuery(["CU-CAT-09 Consultar proveedores"])
             ucSupplierCreate(["CU-CAT-10 Crear proveedor"])
             ucSupplierEdit(["CU-CAT-11 Editar proveedor"])
-            ucSupplierStatus(["CU-CAT-12 Cambiar estado de proveedor"])
             ucSupplierReport(["CU-CAT-13 Generar reporte de proveedores"])
         end
         subgraph clientCatalogFamily["Clientes"]
@@ -116,11 +109,6 @@ flowchart LR
             ucClientReport(["CU-CAT-17 Generar reporte de clientes"])
         end
         subgraph wasteCatalogFamily["Mermas"]
-            ucWasteQuery(["CU-CAT-18 Consultar mermas"])
-            ucWasteCreate(["CU-CAT-19 Registrar merma"])
-            ucWasteEdit(["CU-CAT-20 Editar merma"])
-            ucWasteStock(["CU-CAT-21 Ajustar existencia de merma"])
-            ucWasteReport(["CU-CAT-22 Generar reporte de mermas"])
             ucWasteMovements(["CU-CAT-23 Consultar movimientos de mermas"])
             ucWasteMovementReport(["CU-CAT-24 Generar reporte de movimientos de mermas"])
         end
@@ -161,24 +149,14 @@ flowchart LR
     admin --- ucCatalog36
     admin --- ucMaterialMovements
     admin --- ucWasteMovements
-    ucMaterialQuery --- ucMaterialCreate
-    ucMaterialQuery --- ucMaterialEdit
-    ucMaterialQuery --- ucMaterialRemove
-    ucMaterialQuery --- ucMaterialInventoryReport
     ucMaterialMovements --- ucMaterialMovementReport
-    ucMaterialStock -. "«extend»" .-> ucMaterialQuery
     ucSupplierQuery --- ucSupplierCreate
     ucSupplierQuery --- ucSupplierEdit
-    ucSupplierQuery --- ucSupplierStatus
     ucSupplierQuery --- ucSupplierReport
     ucClientQuery --- ucClientCreate
     ucClientQuery --- ucClientEdit
     ucClientQuery --- ucClientReport
-    ucWasteQuery --- ucWasteCreate
-    ucWasteQuery --- ucWasteEdit
-    ucWasteQuery --- ucWasteReport
     ucWasteMovements --- ucWasteMovementReport
-    ucWasteStock -. "«extend»" .-> ucWasteQuery
     ucCatalog21 --- ucCatalog22
     ucCatalog21 --- ucCatalog23
     ucCatalog24 --- ucCatalog25
@@ -213,6 +191,46 @@ solicitud API. Las consultas operativas de roles, áreas, presentaciones, unidad
 medida, motivos de ajuste y estados de cumplimiento alimentan controles de selección
 dentro de otros flujos. Se conservan como soporte técnico autorizado de esos casos, pero
 no reciben identificador ni se representan como objetivos independientes del actor.
+
+### Grupo funcional ALM - Almacen
+
+```mermaid
+flowchart LR
+    warehouse["«actor»<br/>Personal de almacén (área Almacén y proveduría)"]
+    admin["«actor»<br/>Administrador del sistema (área Sistemas)"]
+    admin -- "generaliza" --> warehouse
+
+    subgraph catalogPackage["Nexus · Grupo funcional CAT: Catálogos"]
+        direction TB
+        subgraph materialCatalogFamily["Materiales"]
+            ucMaterialQuery(["CU-CAT-01 Consultar materiales"])
+            ucMaterialCreate(["CU-CAT-02 Crear material"])
+            ucMaterialEdit(["CU-CAT-03 Editar material"])
+            ucMaterialRemove(["CU-CAT-04 Retirar material"])
+            ucMaterialStock(["CU-CAT-05 Ajustar existencia de material"])
+            ucMaterialInventoryReport(["CU-CAT-06 Generar reporte de inventario de materiales"])
+        end
+        subgraph wasteCatalogFamily["Mermas"]
+            ucWasteQuery(["CU-CAT-18 Consultar mermas"])
+            ucWasteCreate(["CU-CAT-19 Registrar merma"])
+            ucWasteEdit(["CU-CAT-20 Editar merma"])
+            ucWasteStock(["CU-CAT-21 Ajustar existencia de merma"])
+            ucWasteReport(["CU-CAT-22 Generar reporte de mermas"])
+        end
+    end
+
+    ucWasteQuery --- ucWasteCreate
+    ucWasteQuery --- ucWasteEdit
+    ucWasteQuery --- ucWasteReport
+    ucWasteMovements --- ucWasteMovementReport
+    ucWasteStock -. "«extend»" .-> ucWasteQuery
+    ucMaterialQuery --- ucMaterialCreate
+    ucMaterialQuery --- ucMaterialEdit
+    ucMaterialQuery --- ucMaterialRemove
+    ucMaterialQuery --- ucMaterialInventoryReport
+    ucMaterialMovements --- ucMaterialMovementReport
+    ucMaterialStock -. "«extend»" .-> ucMaterialQuery
+```
 
 ### Grupo funcional ENT — Compras de material
 
