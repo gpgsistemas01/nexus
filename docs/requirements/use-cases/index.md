@@ -151,9 +151,13 @@ trazabilidad técnica; un identificador retirado no se reasigna a un objetivo di
 | --- | --- | --- |
 | `AUT` | Autenticación | Inicio y cierre observable de la sesión del usuario. |
 | `IDA` | Identidad y acceso | Personas, cuentas, credenciales y asignaciones de acceso. |
-| `CAT` | Catálogos | Recursos operativos y contextuales reutilizados por documentos. |
+| `ALM` | Almacén | Materiales, mermas, existencias, movimientos y reportes operativos del almacén. |
+| `ALM` | Almacén | Materiales, mermas, existencias, movimientos y reportes operativos del almacén. |
+| `CAT` | Catálogos | Recursos comerciales y contextuales reutilizados por documentos. |
+| `ALM` | Almacén | Materiales, mermas, existencias, movimientos y reportes operativos del almacén. |
+| `CAT` | Catálogos | Recursos comerciales y contextuales reutilizados por documentos. |
 | `ENT` | Compras de material | Consulta, registro, edición, corrección y cancelación de compras recibidas. |
-| `SAL` | Salidas de material y de merma | Consulta, creación, edición, surtimiento y devolución de materiales o mermas. |
+Se mantienen seis grupos funcionales propietarios porque expresan capacidades de
 
 #### Criterio de agrupación vigente
 
