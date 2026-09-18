@@ -1,5 +1,5 @@
 <a id="cu-cat-38"></a>
-# `CU-CAT-38` — Editar unidad de medida
+# `CU-CAT-38` — Crear motivo de ajuste
 
 **Patrones:** `BE-P02`.
 
@@ -9,13 +9,13 @@ sequenceDiagram
     participant Route as src/routes/api/admin/catalogApiRoute.js
     participant Controller@{ "type": "control" } as src/controllers/api/admin/catalogController.js
     participant Domain as src/services/admin/catalogService.js
-    Note over Controller,Domain: Variables de frontera: req.params.catalog/req.params.id/req.body
+    Note over Controller,Domain: Variables de frontera: req.params.catalog/req.body
 
-    Client->>Route: PUT /api/admin/catalogs/unit-measures/:id
+    Client->>Route: POST /api/admin/catalogs/reasons
     Route->>Route: ejecutar en orden el middleware configurado para la ruta
-    Route->>Controller: editCatalogEntry(req, res)
+    Route->>Controller: registerCatalogEntry(req, res)
     activate Controller
-    Controller->>Domain: updateCatalogEntry(req.params.catalog/req.params.id/req.body) normaliza y actualiza únicamente los campos permitidos
+    Controller->>Domain: createCatalogEntry(req.params.catalog/req.body) normaliza y crea únicamente los campos permitidos
     activate Domain
     Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
     Domain-->>Controller: resultado del servicio o error de dominio tipado

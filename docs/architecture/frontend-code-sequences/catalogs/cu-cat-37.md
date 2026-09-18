@@ -1,25 +1,25 @@
 <a id="cu-cat-37"></a>
-# `CU-CAT-37` — Crear unidad de medida
+# `CU-CAT-37` — Consultar motivo de ajuste
 
 **Patrones:** `FE-P03`.
 
 ```mermaid
 sequenceDiagram
     participant Browser as Navegador
-    participant View as src/public/js/pages/admin/catalogs/catalogForm.js
+    participant View as src/public/js/plugins/datatable/admin/catalogs/catalogDatatable.js
     participant Application as src/public/js/application/admin/catalogs/catalogs.js
     participant Request as src/public/js/services/admin/catalogService.js
     participant HTTP as src/public/js/services/axiosInstanceApi.js
     participant Transport@{ "type": "control" } as src/routes/api/admin/catalogApiRoute.js<br/>src/controllers/api/admin/catalogController.js
-    Note over Application,Transport: Variables de frontera: catalog/data
+    Note over Application,Transport: Variables de frontera: params/catalog
 
-    Browser->>View: confirmar el formulario de alta
+    Browser->>View: abrir y cargar la tabla del catálogo
     View->>View: recopilar y validar las variables de frontera indicadas
-    View->>Application: registerCatalogEntry({ catalog, data })
-    Application->>Request: registerCatalogEntryRequest({ catalog, data })
+    View->>Application: getAllCatalogEntries({ params, catalog })
+    Application->>Request: getAllCatalogEntriesRequest({ params, catalog })
     activate Application
     Request->>HTTP: apiRequest({ method: 'get', url, data/params })
-    HTTP->>Transport: consume POST /api/admin/catalogs/unit-measures
+    HTTP->>Transport: consume GET /api/admin/catalogs/reasons
     Transport-->>HTTP: status HTTP y payload del endpoint
     HTTP-->>Request: respuesta o error normalizado
     Request-->>Application: resultado del request

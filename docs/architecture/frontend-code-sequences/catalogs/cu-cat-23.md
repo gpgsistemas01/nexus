@@ -1,33 +1,36 @@
 <a id="cu-cat-23"></a>
-# `CU-CAT-23` — Consultar inventario de mermas
+# `CU-CAT-23` — Consultar movimientos de mermas
 
 **Patrones:** `FE-P07`.
 
 ```mermaid
 sequenceDiagram
     participant Browser as Navegador
-    participant View as src/public/js/pages/warehouse/wastes/wastesPage.js
-    participant Request as src/public/js/services/warehouse/wasteService.js
+    participant View as src/public/js/pages/admin/movements/movementsPage.js
+    participant Application as src/public/js/application/admin/movements/movements.js
+    participant Request as src/public/js/services/admin/movementService.js
     participant HTTP as src/public/js/services/axiosInstanceApi.js
-    participant Transport@{ "type": "control" } as src/routes/api/warehouse/wasteApiRoute.js<br/>src/controllers/api/warehouse/wasteController.js
-    Note over Request,Transport: Variables de frontera: params/filtros
+    participant Transport@{ "type": "control" } as src/routes/api/admin/movementApiRoute.js<br/>src/controllers/api/admin/movementController.js
+    Note over Application,Transport: Variables de frontera: params/filtros
 
-    Browser->>View: La consulta es el listado de wastesPage.js, no hay página de reporte
+    Browser->>View: movementsPage.js selecciona el contexto merma
     View->>View: recopilar y validar las variables de frontera indicadas
-    View->>Request: getAllWastesRequest({ params })
-    activate Request
-    Request->>HTTP: apiRequest({ method: 'get', url, params })
-    HTTP->>Transport: GET /api/warehouse/wastes
+    View->>Application: getAllMovements({ context: 'wastes', params })
+    Application->>Request: getAllMovementsRequest({ context, params })
+    activate Application
+    Request->>HTTP: apiRequest({ method: 'get', url, data/params })
+    HTTP->>Transport: consultar GET /api/admin/movements/wastes
     Transport-->>HTTP: status HTTP y payload del endpoint
     HTTP-->>Request: respuesta o error normalizado
+    Request-->>Application: resultado del request
     alt Respuesta exitosa
-        Request-->>View: entidad, colección o archivo normalizado
+        Application-->>View: entidad, colección o archivo normalizado
         View-->>Browser: actualizar la vista con el resultado
     else Respuesta rechazada
-        Request-->>View: error normalizado por apiRequest
+        Application-->>View: error normalizado por apiRequest
         View-->>Browser: conservar contexto y mostrar el mensaje
     end
-    deactivate Request
+    deactivate Application
 ```
 
-<a id="cu-cat-25"></a>
+<a id="cu-sal-14"></a>

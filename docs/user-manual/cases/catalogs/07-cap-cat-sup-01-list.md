@@ -1,7 +1,7 @@
 <a id="CAP-CAT-SUP-01-LIST"></a>
 # 7. CAP-CAT-SUP-01-LIST — Listado
 
-**Casos de uso:** `CU-CAT-10` — Consultar proveedores; `CU-CAT-14` — Generar reporte de proveedores.
+**Casos de uso:** `CU-CAT-09` — Consultar proveedores; `CU-CAT-13` — Generar reporte de proveedores.
 
 **Errores posibles:** [Catálogos e inventario](../../error-messages.md#errores-catalogos).
 

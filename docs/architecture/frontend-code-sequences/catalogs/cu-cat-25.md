@@ -1,25 +1,25 @@
 <a id="cu-cat-25"></a>
-# `CU-CAT-25` — Consultar movimientos de mermas
+# `CU-CAT-25` — Consultar área
 
-**Patrones:** `FE-P07`.
+**Patrones:** `FE-P03`.
 
 ```mermaid
 sequenceDiagram
     participant Browser as Navegador
-    participant View as src/public/js/pages/admin/movements/movementsPage.js
-    participant Application as src/public/js/application/admin/movements/movements.js
-    participant Request as src/public/js/services/admin/movementService.js
+    participant View as src/public/js/plugins/datatable/admin/catalogs/catalogDatatable.js
+    participant Application as src/public/js/application/admin/catalogs/catalogs.js
+    participant Request as src/public/js/services/admin/catalogService.js
     participant HTTP as src/public/js/services/axiosInstanceApi.js
-    participant Transport@{ "type": "control" } as src/routes/api/admin/movementApiRoute.js<br/>src/controllers/api/admin/movementController.js
-    Note over Application,Transport: Variables de frontera: params/filtros
+    participant Transport@{ "type": "control" } as src/routes/api/admin/catalogApiRoute.js<br/>src/controllers/api/admin/catalogController.js
+    Note over Application,Transport: Variables de frontera: params/catalog
 
-    Browser->>View: movementsPage.js selecciona el contexto merma
+    Browser->>View: abrir y cargar la tabla del catálogo
     View->>View: recopilar y validar las variables de frontera indicadas
-    View->>Application: getAllMovements({ context: 'wastes', params })
-    Application->>Request: getAllMovementsRequest({ context, params })
+    View->>Application: getAllCatalogEntries({ params, catalog })
+    Application->>Request: getAllCatalogEntriesRequest({ params, catalog })
     activate Application
     Request->>HTTP: apiRequest({ method: 'get', url, data/params })
-    HTTP->>Transport: consultar GET /api/admin/movements/wastes
+    HTTP->>Transport: consume GET /api/admin/catalogs/departments
     Transport-->>HTTP: status HTTP y payload del endpoint
     HTTP-->>Request: respuesta o error normalizado
     Request-->>Application: resultado del request
@@ -33,4 +33,4 @@ sequenceDiagram
     deactivate Application
 ```
 
-<a id="cu-sal-14"></a>
+<a id="cu-cat-26"></a>

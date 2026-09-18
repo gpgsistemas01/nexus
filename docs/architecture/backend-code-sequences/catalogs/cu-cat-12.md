@@ -1,5 +1,5 @@
 <a id="cu-cat-12"></a>
-# `CU-CAT-12` — Editar proveedor
+# `CU-CAT-12` — Cambiar estado de proveedor
 
 **Patrones:** `BE-P01`.
 
@@ -18,7 +18,7 @@ sequenceDiagram
     activate Controller
     Controller->>SupplierDto: createSupplierDtoForEdit(req.body) → sanitizeEmptyStrings(...)
     SupplierDto-->>Controller: supplierDto normalizado
-    Controller->>Domain: supplierService.updateSupplier({ id: req.params.id, supplierDto }) actualiza datos del proveedor
+    Controller->>Domain: supplierService.updateSupplier(supplierDto, req.params.id) aplica el estado incluido en el DTO, no hay endpoint separado
     activate Domain
     Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
     Domain-->>Controller: resultado del servicio o error de dominio tipado
@@ -31,4 +31,4 @@ sequenceDiagram
     deactivate Controller
 ```
 
-<a id="cu-cat-13"></a>
+<a id="cu-cat-14"></a>

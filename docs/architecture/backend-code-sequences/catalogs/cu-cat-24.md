@@ -1,21 +1,21 @@
 <a id="cu-cat-24"></a>
-# `CU-CAT-24` — Generar reporte de mermas
+# `CU-CAT-24` — Generar reporte de movimientos de mermas
 
 **Patrones:** `BE-P07`.
 
 ```mermaid
 sequenceDiagram
     participant Client as Cliente HTTP / web
-    participant Route as src/routes/api/warehouse/reportApiRoute.js
-    participant Controller@{ "type": "control" } as src/controllers/api/warehouse/reportController.js
-    participant Domain as src/services/warehouse/reportService.js<br/>src/utils/reportExcelUtils.js
+    participant Route as src/routes/api/admin/reportApiRoute.js
+    participant Controller@{ "type": "control" } as src/controllers/api/admin/reportController.js
+    participant Domain as src/services/inventory/reportService.js
     Note over Controller,Domain: Variables de frontera: req.query/params
 
-    Client->>Route: GET /api/warehouse/reports/wastes/excel
+    Client->>Route: GET /api/admin/reports/movements/wastes/excel
     Route->>Route: ejecutar en orden el middleware configurado para la ruta
-    Route->>Controller: exportWasteReportExcel(req, res)
+    Route->>Controller: exportWasteMovementReport(req, res)
     activate Controller
-    Controller->>Domain: reportService.findWasteReportRows({ query: req.query }) y sendExcelReport
+    Controller->>Domain: findMovementReportRows({ context: 'wastes', ...getMovementReportParams(req.query) })
     activate Domain
     Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
     Domain-->>Controller: resultado del servicio o error de dominio tipado
@@ -28,4 +28,4 @@ sequenceDiagram
     deactivate Controller
 ```
 
-<a id="cu-cat-26"></a>
+<a id="cu-ent-06"></a>

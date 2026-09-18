@@ -1,14 +1,13 @@
-# `CU-CAT-22` — Ajustar existencia de merma
+# `CU-CAT-22` — Generar reporte de mermas
 
 | Sección | Información relevante |
 | --- | --- |
 | Identificador | `CU-CAT-22` |
-| Nombre | Ajustar existencia de merma. |
-| Actor y disparador | **Actor:** Administrador del sistema. **Disparador:** detecta o autoriza una diferencia de existencia de merma y abre el ajuste de stock desde la consulta de mermas. |
-| Participación de actor y sistema | **Actor:** selecciona el inventario, captura el ajuste y confirma.<br>**Nexus:** muestra la existencia, valida, registra el ajuste y actualiza inventario. |
-| Precondiciones | 1. El actor inició sesión como administrador del sistema.<br>2. El actor cuenta con el permiso `wastes:adjust-stock`.<br>3. El recurso cuya existencia se ajustará existe. |
-| Flujo principal | 1. **Actor:** selecciona el registro de merma y abre «Ajustar existencia» **(ver E1)**.<br>2. **Nexus:** muestra la existencia actual y los campos de tipo, cantidad y motivo.<br>3. **Actor:** captura el ajuste y lo confirma **(ver A1)**.<br>4. **Nexus:** valida la autorización, el motivo y la cantidad y registra el ajuste junto con la nueva existencia.<br>5. **Nexus:** actualiza las vistas de inventario y confirma el resultado. |
-| Flujos alternativos | **A1 — Datos inválidos (después del paso 3):**<br>1. **Nexus:** valida la información capturada, detecta campos incompletos, formatos incorrectos, relaciones no permitidas o cantidades fuera de las reglas del caso y los señala sin registrar cambios.<br>2. **Actor:** corrige la información indicada y vuelve a confirmar; continúa en el paso 4 del flujo principal. |
-| Excepciones | **E1 — Acceso rechazado (después del paso 1):**<br>1. **Nexus:** comprueba las precondiciones y la autorización, determina que alguna no se cumple y rechaza la solicitud sin modificar datos ni exponer información no autorizada; comunica el motivo.<br>2. **Actor:** reconoce el rechazo; termina el caso de uso. |
-| Postcondiciones (éxito y fallo) | 1. **Éxito:** La existencia de la merma refleja el ajuste autorizado.<br>2. **Éxito:** El ajuste queda registrado con su motivo y trazabilidad.<br>3. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
-| Requisitos relacionados | `RF-CAT-018`. |
+| Nombre | Generar reporte de mermas. |
+| Actor y disparador | **Actor:** Usuario con permiso sobre el reporte o consulta. **Disparador:** desde `CU-CAT-18` Consultar mermas, selecciona **Exportar Excel** con los filtros que necesita conservar. |
+| Participación de actor y sistema | **Actor:** define filtros y solicita la exportación.<br>**Nexus:** autoriza, consolida la información y entrega el archivo. |
+| Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de consulta o reporte correspondiente. |
+| Flujo principal | 1. **Nexus:** después de que el actor selecciona la exportación desde la consulta de origen, abre el modal **Exportar reporte** y muestra las opciones aplicables **(ver E1)**.<br>2. **Actor:** conserva o ajusta los filtros, incluye el alcance y las opciones disponibles y confirma.<br>3. **Nexus:** vuelve a comprobar autorización y parámetros y prepara la información de mermas.<br>4. **Nexus:** genera el archivo de Excel e inicia su descarga; si no hay datos, informa que el resultado está vacío. |
+| Excepciones | **E1 — Exportación rechazada (después del disparador):**<br>1. **Nexus:** comprueba las precondiciones y la autorización, determina que alguna no se cumple y rechaza la solicitud sin modificar datos ni exponer información no autorizada; comunica el motivo.<br>2. **Actor:** reconoce el rechazo; termina el caso de uso. |
+| Postcondiciones (éxito y fallo) | 1. **Éxito:** Archivo Excel con filtros, columnas y cálculos propios del reporte.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
+| Requisitos relacionados | `RF-REP-002` a `RF-REP-004`, `RF-REP-006` a `RF-REP-009`. |

@@ -1,5 +1,5 @@
 <a id="cu-cat-11"></a>
-# `CU-CAT-11` — Crear proveedor
+# `CU-CAT-11` — Editar proveedor
 
 **Patrones:** `BE-P01`.
 
@@ -10,15 +10,15 @@ sequenceDiagram
     participant Controller@{ "type": "control" } as src/controllers/api/warehouse/supplierController.js
     participant SupplierDto as «object»<br/>supplierDto<br/>src/dtos/supplierDTO.js
     participant Domain as src/services/warehouse/supplierService.js
-    Note over Controller,Domain: Variables de frontera: req.body/DTO
+    Note over Controller,Domain: Variables de frontera: req.params.id, req.body/DTO
 
-    Client->>Route: POST /api/warehouse/suppliers
+    Client->>Route: PUT /api/warehouse/suppliers/:id
     Route->>Route: ejecutar en orden el middleware configurado para la ruta
-    Route->>Controller: registerSupplier(req, res)
+    Route->>Controller: editSupplier(req, res)
     activate Controller
-    Controller->>SupplierDto: createSupplierDtoForRegister(req.body) → sanitizeEmptyStrings(...)
+    Controller->>SupplierDto: createSupplierDtoForEdit(req.body) → sanitizeEmptyStrings(...)
     SupplierDto-->>Controller: supplierDto normalizado
-    Controller->>Domain: supplierService.createSupplier({ supplierDto }) persiste el proveedor
+    Controller->>Domain: supplierService.updateSupplier({ id: req.params.id, supplierDto }) actualiza datos del proveedor
     activate Domain
     Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
     Domain-->>Controller: resultado del servicio o error de dominio tipado

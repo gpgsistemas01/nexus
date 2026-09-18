@@ -3,5 +3,6 @@
 ```mermaid
 flowchart LR
     request["Actor solicita consultar materiales"] --> validate["Nexus valida permiso, datos y relaciones"]
-    validate --> result["Nexus responde: Listado de materiales y ofertas de proveedor."]
+    validate --> result["Nexus responde: Listado de materiales, ofertas y existencias."]
+    result --> report["Actor elige exportar y dispara CU-CAT-06"]
 ```

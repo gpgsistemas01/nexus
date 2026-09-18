@@ -1,28 +1,25 @@
 <a id="cu-cat-09"></a>
-# `CU-CAT-09` — Generar reporte de movimientos de materiales
+# `CU-CAT-09` — Consultar proveedores
 
-**Patrones:** `FE-P08`.
+**Patrones:** `FE-P02`.
 
 ```mermaid
 sequenceDiagram
     participant Browser as Navegador
-    participant View as src/public/js/plugins/datatable/admin/movements/movementDatatable.js
-    participant Dialog as src/public/js/ui/reportExportDialog.js
-    participant Application as src/public/js/application/admin/report.js
-    participant Request as src/public/js/services/admin/reportService.js
+    participant View as src/views/pages/warehouse/suppliers/suppliersPage.ejs<br/>src/public/js/pages/warehouse/suppliers/suppliersPage.js
+    participant Application as src/public/js/application/warehouse/suppliers/suppliers.js
+    participant Request as src/public/js/services/warehouse/supplierService.js
     participant HTTP as src/public/js/services/axiosInstanceApi.js
-    participant Transport@{ "type": "control" } as src/routes/api/admin/reportApiRoute.js<br/>src/controllers/api/admin/reportController.js
+    participant Transport@{ "type": "control" } as src/routes/api/warehouse/supplierApiRoute.js<br/>src/controllers/api/warehouse/supplierController.js
     Note over Application,Transport: Variables de frontera: params/filtros
 
-    Browser->>View: Botón Excel de movimientos en contexto material
-    View->>Dialog: showReportExportDialog(currentMonth)
-    Dialog-->>View: alcance confirmado o cancelación
+    Browser->>View: suppliersPage.ejs y suppliersPage.js cargan proveedores
     View->>View: recopilar y validar las variables de frontera indicadas
-    View->>Application: exportMovementReport({ params, type: materials })
-    Application->>Request: exportMovementReportRequest({ params, type: materials })
+    View->>Application: getAllSuppliers({ params })
+    Application->>Request: getAllSuppliersRequest({ params })
     activate Application
-    Request->>HTTP: apiRequest({ method: 'get', url, params })
-    HTTP->>Transport: descarga GET /api/admin/reports/movements/materials/excel
+    Request->>HTTP: apiRequest({ method: 'get', url, data/params })
+    HTTP->>Transport: consulta GET /api/warehouse/suppliers
     Transport-->>HTTP: status HTTP y payload del endpoint
     HTTP-->>Request: respuesta o error normalizado
     Request-->>Application: resultado del request
@@ -36,4 +33,4 @@ sequenceDiagram
     deactivate Application
 ```
 
-<a id="cu-cat-23"></a>
+<a id="cu-cat-10"></a>

@@ -1,28 +1,28 @@
 <a id="cu-cat-24"></a>
-# `CU-CAT-24` — Generar reporte de mermas
+# `CU-CAT-24` — Generar reporte de movimientos de mermas
 
 **Patrones:** `FE-P08`.
 
 ```mermaid
 sequenceDiagram
     participant Browser as Navegador
-    participant View as src/public/js/plugins/datatable/warehouse/wastes/wasteDatatable.js
+    participant View as src/public/js/plugins/datatable/admin/movements/movementDatatable.js
     participant Dialog as src/public/js/ui/reportExportDialog.js
-    participant Application as src/public/js/application/warehouse/report.js
-    participant Request as src/public/js/services/warehouse/reportService.js
+    participant Application as src/public/js/application/admin/report.js
+    participant Request as src/public/js/services/admin/reportService.js
     participant HTTP as src/public/js/services/axiosInstanceApi.js
-    participant Transport@{ "type": "control" } as src/routes/api/warehouse/reportApiRoute.js<br/>src/controllers/api/warehouse/reportController.js
+    participant Transport@{ "type": "control" } as src/routes/api/admin/reportApiRoute.js<br/>src/controllers/api/admin/reportController.js
     Note over Application,Transport: Variables de frontera: params/filtros
 
-    Browser->>View: Botón Excel de wasteDatatable.js
-    View->>Dialog: showInventoryExportDialog()
-    Dialog-->>View: inventoryScope activo/existencia
+    Browser->>View: Botón Excel de movimientos en contexto merma
+    View->>Dialog: showReportExportDialog(currentMonth)
+    Dialog-->>View: alcance confirmado o cancelación
     View->>View: recopilar y validar las variables de frontera indicadas
-    View->>Application: exportWasteReport({ params })
-    Application->>Request: exportWasteReportRequest({ params })
+    View->>Application: exportMovementReport({ params, type: wastes })
+    Application->>Request: exportMovementReportRequest({ params, type: wastes })
     activate Application
     Request->>HTTP: apiRequest({ method: 'get', url, params })
-    HTTP->>Transport: descarga GET /api/warehouse/reports/wastes/excel
+    HTTP->>Transport: descarga GET /api/admin/reports/movements/wastes/excel
     Transport-->>HTTP: status HTTP y payload del endpoint
     HTTP-->>Request: respuesta o error normalizado
     Request-->>Application: resultado del request
@@ -36,4 +36,4 @@ sequenceDiagram
     deactivate Application
 ```
 
-<a id="cu-cat-26"></a>
+<a id="cu-ent-06"></a>

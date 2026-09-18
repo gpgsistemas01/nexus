@@ -3,7 +3,7 @@
 
 **Ruta en el menú:** **Menú principal → Catálogos auxiliares →** elija **Áreas**, **Roles**, **Presentaciones**, **Unidades de medida**, **Motivos de ajuste** o **Estados de cumplimiento**.
 
-**Casos de uso:** Áreas: `CU-CAT-27` a `CU-CAT-29`; Roles: `CU-CAT-30` a `CU-CAT-32`; Presentaciones: `CU-CAT-33` a `CU-CAT-35`; Unidades de medida: `CU-CAT-36` a `CU-CAT-38`; Motivos de ajuste: `CU-CAT-39` a `CU-CAT-41`; Estados de cumplimiento: `CU-CAT-42` a `CU-CAT-44`. Cada rango corresponde, en orden, a consultar, crear y editar.
+**Casos de uso:** Áreas: `CU-CAT-25` a `CU-CAT-27`; Roles: `CU-CAT-28` a `CU-CAT-30`; Presentaciones: `CU-CAT-31` a `CU-CAT-33`; Unidades de medida: `CU-CAT-34` a `CU-CAT-36`; Motivos de ajuste: `CU-CAT-37` a `CU-CAT-39`; Estados de cumplimiento: `CU-CAT-40` a `CU-CAT-42`. Cada rango corresponde, en orden, a consultar, crear y editar.
 
 **Acceso:** estas pantallas y sus escrituras son exclusivas del administrador del sistema del área Sistemas. Que un rol, área, presentación, unidad, motivo o estado aparezca en un selector operativo no concede acceso a su mantenimiento.
 

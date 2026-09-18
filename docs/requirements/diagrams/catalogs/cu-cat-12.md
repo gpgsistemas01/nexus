@@ -1,7 +1,8 @@
-# `CU-CAT-12` — Editar proveedor
+# `CU-CAT-12` — Cambiar estado de proveedor
 
 ```mermaid
-flowchart LR
-    request["Actor solicita editar proveedor"] --> validate["Nexus valida permiso, datos y relaciones"]
-    validate --> result["Nexus responde: Actualización de datos admitidos."]
+flowchart TD
+    request["Actor solicita cambiar estado de proveedor"] --> validate["Nexus valida permiso, datos y relaciones"]
+    validate --> result["Persistir activación o desactivación<br/>sin borrar relaciones ni historia"]
+    result --> boundary["Aplicar el nuevo estado sólo a usos nuevos<br/>y conservar compromisos existentes"]
 ```

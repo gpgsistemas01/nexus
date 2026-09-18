@@ -1,7 +1,7 @@
 <a id="CAP-REP-MOV-MAT-02-EXPORT"></a>
 # 2. CAP-REP-MOV-MAT-02-EXPORT — Exportar reporte
 
-**Casos de uso:** `CU-CAT-09` — Generar reporte de movimientos de materiales.
+**Casos de uso:** `CU-CAT-08` — Generar reporte de movimientos de materiales.
 
 **Errores posibles:** [Reportes](../../error-messages.md#errores-reportes).
 

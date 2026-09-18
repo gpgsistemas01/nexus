@@ -1,7 +1,8 @@
-# `CU-CAT-39` — Consultar motivo de ajuste
+# `CU-CAT-39` — Editar motivo de ajuste
 
 ```mermaid
 flowchart LR
-    request["Administrador solicita consultar Motivos de ajuste"] --> authorize["Nexus valida catalogs:manage y reasons"]
-    authorize --> result["Mostrar exclusivamente la tabla de Motivos de ajuste"]
+    request["Administrador selecciona Editar registro<br/>y confirma Actualizar"] --> authorize["Nexus valida catalogs:manage y reasons"]
+    authorize --> persist["Validar campos y actualizar motivo de ajuste"]
+    persist --> result["Confirmar y refrescar Motivos de ajuste"]
 ```

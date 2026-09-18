@@ -1,5 +1,5 @@
 <a id="cu-cat-10"></a>
-# `CU-CAT-10` — Consultar proveedores
+# `CU-CAT-10` — Crear proveedor
 
 **Patrones:** `BE-P01`.
 
@@ -8,14 +8,17 @@ sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route as src/routes/api/warehouse/supplierApiRoute.js
     participant Controller@{ "type": "control" } as src/controllers/api/warehouse/supplierController.js
+    participant SupplierDto as «object»<br/>supplierDto<br/>src/dtos/supplierDTO.js
     participant Domain as src/services/warehouse/supplierService.js
-    Note over Controller,Domain: Variables de frontera: req.query/params
+    Note over Controller,Domain: Variables de frontera: req.body/DTO
 
-    Client->>Route: GET /api/warehouse/suppliers
+    Client->>Route: POST /api/warehouse/suppliers
     Route->>Route: ejecutar en orden el middleware configurado para la ruta
-    Route->>Controller: getAllSuppliers(req, res)
+    Route->>Controller: registerSupplier(req, res)
     activate Controller
-    Controller->>Domain: supplierService.findAllSuppliers({ query: req.query }) consulta proveedores
+    Controller->>SupplierDto: createSupplierDtoForRegister(req.body) → sanitizeEmptyStrings(...)
+    SupplierDto-->>Controller: supplierDto normalizado
+    Controller->>Domain: supplierService.createSupplier({ supplierDto }) persiste el proveedor
     activate Domain
     Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
     Domain-->>Controller: resultado del servicio o error de dominio tipado

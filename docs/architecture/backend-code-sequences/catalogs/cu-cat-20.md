@@ -1,7 +1,7 @@
 <a id="cu-cat-20"></a>
-# `CU-CAT-20` — Registrar merma
+# `CU-CAT-20` — Editar merma
 
-**Patrones:** `BE-P01`, `BE-P03`, `BE-P04`, `BE-P05`.
+**Patrones:** `BE-P01`.
 
 ```mermaid
 sequenceDiagram
@@ -9,23 +9,18 @@ sequenceDiagram
     participant Route as src/routes/api/warehouse/wasteApiRoute.js
     participant Controller@{ "type": "control" } as src/controllers/api/warehouse/wasteController.js
     participant WasteDto as «object»<br/>wasteDto<br/>src/dtos/wasteDTO.js
-    participant Domain as src/services/warehouse/wastes/wasteMaterialService.js<br/>src/services/warehouse/wastes/wasteService.js
-    Note over Controller,Domain: Variables de frontera: req.body/DTO, req.query/params, tx
+    participant Domain as src/services/warehouse/wastes/wasteService.js
+    Note over Controller,Domain: Variables de frontera: req.params.id, req.body/DTO
 
-    Client->>Route: GET /api/warehouse/wastes/material-templates y POST /api/warehouse/wastes
+    Client->>Route: PATCH /api/warehouse/wastes/:id
     Route->>Route: ejecutar en orden el middleware configurado para la ruta
-    Route->>Controller: getWasteMaterialTemplates(req, res)/registerWaste
+    Route->>Controller: editWaste(req, res)
     activate Controller
-    Controller->>WasteDto: createWasteDtoForRegister(req.body) → sanitizeEmptyStrings(...)
+    Controller->>WasteDto: createWasteDtoForEdit(req.body) → sanitizeEmptyStrings(...)
     WasteDto-->>Controller: wasteDto normalizado
-    Controller->>Domain: findWasteMaterialTemplates({ wasteDto }) alimenta la selección y createWasteWithInitialStockAdjustment crea merma, ajuste y movimiento inicial
+    Controller->>Domain: wasteService.updateWaste({ id: req.params.id, wasteDto }) actualiza datos sin tratar stock como edición
     activate Domain
-    Domain->>Domain: buscar misma combinación de proveedor, nombre, base y altura
-    alt La merma ya existe
-        Domain-->>Controller: WASTE_ALREADY_EXISTS sin incrementar stock
-    else La merma no existe
-        Domain->>Domain: crear merma, ajuste y movimiento de existencia inicial
-    end
+    Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
     Domain-->>Controller: resultado del servicio o error de dominio tipado
     deactivate Domain
     alt El servicio devuelve el resultado

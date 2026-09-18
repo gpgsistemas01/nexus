@@ -1,7 +1,7 @@
 <a id="CAP-CAT-CLI-03-EDIT"></a>
 # 12. CAP-CAT-CLI-03-EDIT — Formulario edicion
 
-**Casos de uso:** `CU-CAT-17` — Editar cliente.
+**Casos de uso:** `CU-CAT-16` — Editar cliente.
 
 **Errores posibles:** [Validación de formularios](../../error-messages.md#errores-validacion), [Catálogos e inventario](../../error-messages.md#errores-catalogos).
 

@@ -1,7 +1,7 @@
 <a id="CAP-CAT-WAS-04-STOCK"></a>
 # 17. CAP-CAT-WAS-04-STOCK — Ajuste existencia
 
-**Casos de uso:** `CU-CAT-22` — Ajustar existencia de merma.
+**Casos de uso:** `CU-CAT-21` — Ajustar existencia de merma.
 
 **Errores posibles:** [Validación de formularios](../../error-messages.md#errores-validacion), [Catálogos e inventario](../../error-messages.md#errores-catalogos).
 

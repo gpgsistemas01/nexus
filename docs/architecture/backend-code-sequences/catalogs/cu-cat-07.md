@@ -1,21 +1,21 @@
 <a id="cu-cat-07"></a>
-# `CU-CAT-07` — Generar reporte de inventario de materiales
+# `CU-CAT-07` — Consultar movimientos de materiales
 
-**Patrones:** `BE-P07`.
+**Patrones:** `BE-P06`.
 
 ```mermaid
 sequenceDiagram
     participant Client as Cliente HTTP / web
-    participant Route as src/routes/api/warehouse/reportApiRoute.js
-    participant Controller@{ "type": "control" } as src/controllers/api/warehouse/reportController.js
-    participant Domain as src/services/warehouse/reportService.js<br/>src/utils/reportExcelUtils.js
+    participant Route as src/routes/api/admin/movementApiRoute.js
+    participant Controller@{ "type": "control" } as src/controllers/api/admin/movementController.js
+    participant Domain as src/services/inventory/movementQueryService.js
     Note over Controller,Domain: Variables de frontera: req.query/params
 
-    Client->>Route: GET /api/warehouse/reports/inventory/excel
+    Client->>Route: GET /api/admin/movements/materials
     Route->>Route: ejecutar en orden el middleware configurado para la ruta
-    Route->>Controller: exportWarehouseReportExcel(req, res)
+    Route->>Controller: getAllMaterialMovements(req, res)
     activate Controller
-    Controller->>Domain: reportService.findWarehouseReportRows({ query: req.query }) y sendExcelReport
+    Controller->>Domain: findAllMaterialMovements(getMovementListParams(req))
     activate Domain
     Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
     Domain-->>Controller: resultado del servicio o error de dominio tipado
@@ -28,4 +28,4 @@ sequenceDiagram
     deactivate Controller
 ```
 
-<a id="cu-sal-07"></a>
+<a id="cu-cat-06"></a>

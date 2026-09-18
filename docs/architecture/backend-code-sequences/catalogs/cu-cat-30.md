@@ -1,5 +1,5 @@
 <a id="cu-cat-30"></a>
-# `CU-CAT-30` — Consultar rol
+# `CU-CAT-30` — Editar rol
 
 **Patrones:** `BE-P02`.
 
@@ -9,13 +9,13 @@ sequenceDiagram
     participant Route as src/routes/api/admin/catalogApiRoute.js
     participant Controller@{ "type": "control" } as src/controllers/api/admin/catalogController.js
     participant Domain as src/services/admin/catalogService.js
-    Note over Controller,Domain: Variables de frontera: req.params.catalog
+    Note over Controller,Domain: Variables de frontera: req.params.catalog/req.params.id/req.body
 
-    Client->>Route: GET /api/admin/catalogs/roles
+    Client->>Route: PUT /api/admin/catalogs/roles/:id
     Route->>Route: ejecutar en orden el middleware configurado para la ruta
-    Route->>Controller: getAllCatalogEntries(req, res)
+    Route->>Controller: editCatalogEntry(req, res)
     activate Controller
-    Controller->>Domain: findAllCatalogEntries(req.params.catalog) consulta el modelo permitido por la lista blanca
+    Controller->>Domain: updateCatalogEntry(req.params.catalog/req.params.id/req.body) normaliza y actualiza únicamente los campos permitidos
     activate Domain
     Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
     Domain-->>Controller: resultado del servicio o error de dominio tipado

@@ -1,24 +1,21 @@
 <a id="cu-cat-17"></a>
-# `CU-CAT-17` — Editar cliente
+# `CU-CAT-17` — Generar reporte de clientes
 
-**Patrones:** `BE-P01`.
+**Patrones:** `BE-P07`.
 
 ```mermaid
 sequenceDiagram
     participant Client as Cliente HTTP / web
-    participant Route as src/routes/api/sales/clientApiRoute.js
-    participant Controller@{ "type": "control" } as src/controllers/api/sales/clientController.js
-    participant ClientDto as «object»<br/>clientDto<br/>src/dtos/clientDTO.js
-    participant Domain as src/services/sales/clientService.js
-    Note over Controller,Domain: Variables de frontera: req.params.id, req.body/DTO
+    participant Route as src/routes/api/sales/reportApiRoute.js
+    participant Controller@{ "type": "control" } as src/controllers/api/sales/reportController.js
+    participant Domain as src/services/sales/clientService.js<br/>src/utils/reportExcelUtils.js
+    Note over Controller,Domain: Variables de frontera: req.query/params
 
-    Client->>Route: PUT /api/sales/clients/:id
+    Client->>Route: GET /api/sales/reports/clients/excel
     Route->>Route: ejecutar en orden el middleware configurado para la ruta
-    Route->>Controller: editClient(req, res)
+    Route->>Controller: exportClientReport(req, res)
     activate Controller
-    Controller->>ClientDto: createClientDtoForEdit(req.body) → sanitizeEmptyStrings(...)
-    ClientDto-->>Controller: clientDto normalizado
-    Controller->>Domain: clientService.updateClient({ id: req.params.id, clientDto }) actualiza Client
+    Controller->>Domain: clientService.findAllClients({ query: req.query }) prepara filas y el controller llama sendExcelReport
     activate Domain
     Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
     Domain-->>Controller: resultado del servicio o error de dominio tipado
@@ -31,4 +28,4 @@ sequenceDiagram
     deactivate Controller
 ```
 
-<a id="cu-cat-19"></a>
+<a id="cu-ida-04"></a>

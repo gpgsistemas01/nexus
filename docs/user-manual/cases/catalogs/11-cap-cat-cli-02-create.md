@@ -1,7 +1,7 @@
 <a id="CAP-CAT-CLI-02-CREATE"></a>
 # 11. CAP-CAT-CLI-02-CREATE — Formulario alta
 
-**Casos de uso:** `CU-CAT-16` — Crear cliente.
+**Casos de uso:** `CU-CAT-15` — Crear cliente.
 
 **Errores posibles:** [Validación de formularios](../../error-messages.md#errores-validacion), [Catálogos e inventario](../../error-messages.md#errores-catalogos).
 

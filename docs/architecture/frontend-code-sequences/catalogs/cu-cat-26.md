@@ -1,28 +1,25 @@
 <a id="cu-cat-26"></a>
-# `CU-CAT-26` — Generar reporte de movimientos de mermas
+# `CU-CAT-26` — Crear área
 
-**Patrones:** `FE-P08`.
+**Patrones:** `FE-P03`.
 
 ```mermaid
 sequenceDiagram
     participant Browser as Navegador
-    participant View as src/public/js/plugins/datatable/admin/movements/movementDatatable.js
-    participant Dialog as src/public/js/ui/reportExportDialog.js
-    participant Application as src/public/js/application/admin/report.js
-    participant Request as src/public/js/services/admin/reportService.js
+    participant View as src/public/js/pages/admin/catalogs/catalogForm.js
+    participant Application as src/public/js/application/admin/catalogs/catalogs.js
+    participant Request as src/public/js/services/admin/catalogService.js
     participant HTTP as src/public/js/services/axiosInstanceApi.js
-    participant Transport@{ "type": "control" } as src/routes/api/admin/reportApiRoute.js<br/>src/controllers/api/admin/reportController.js
-    Note over Application,Transport: Variables de frontera: params/filtros
+    participant Transport@{ "type": "control" } as src/routes/api/admin/catalogApiRoute.js<br/>src/controllers/api/admin/catalogController.js
+    Note over Application,Transport: Variables de frontera: catalog/data
 
-    Browser->>View: Botón Excel de movimientos en contexto merma
-    View->>Dialog: showReportExportDialog(currentMonth)
-    Dialog-->>View: alcance confirmado o cancelación
+    Browser->>View: confirmar el formulario de alta
     View->>View: recopilar y validar las variables de frontera indicadas
-    View->>Application: exportMovementReport({ params, type: wastes })
-    Application->>Request: exportMovementReportRequest({ params, type: wastes })
+    View->>Application: registerCatalogEntry({ catalog, data })
+    Application->>Request: registerCatalogEntryRequest({ catalog, data })
     activate Application
-    Request->>HTTP: apiRequest({ method: 'get', url, params })
-    HTTP->>Transport: descarga GET /api/admin/reports/movements/wastes/excel
+    Request->>HTTP: apiRequest({ method: 'get', url, data/params })
+    HTTP->>Transport: consume POST /api/admin/catalogs/departments
     Transport-->>HTTP: status HTTP y payload del endpoint
     HTTP-->>Request: respuesta o error normalizado
     Request-->>Application: resultado del request
@@ -36,4 +33,4 @@ sequenceDiagram
     deactivate Application
 ```
 
-<a id="cu-ent-06"></a>
+<a id="cu-cat-27"></a>
