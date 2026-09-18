@@ -135,12 +135,11 @@ flowchart LR
     end
 
     warehouse --- ucMaterialQuery
-    warehouse --- ucSupplierQuery
-    warehouse --- ucClientQuery
-    warehouse --- ucWasteQuery
+    warehouse --- ucSupplierCreate
+    warehouse --- ucClientCreate
     admin -- "generaliza" --> warehouse
-    admin --- ucMaterialStock
-    admin --- ucWasteStock
+    admin --- ucSupplierQuery
+    admin --- ucClientQuery
     admin --- ucCatalog21
     admin --- ucCatalog24
     admin --- ucCatalog27
@@ -219,16 +218,16 @@ flowchart LR
         end
     end
 
+    warehouse --- ucWasteQuery
+    warehouse --- ucMaterialQuery
     ucWasteQuery --- ucWasteCreate
     ucWasteQuery --- ucWasteEdit
     ucWasteQuery --- ucWasteReport
-    ucWasteMovements --- ucWasteMovementReport
     ucWasteStock -. "«extend»" .-> ucWasteQuery
     ucMaterialQuery --- ucMaterialCreate
     ucMaterialQuery --- ucMaterialEdit
     ucMaterialQuery --- ucMaterialRemove
     ucMaterialQuery --- ucMaterialInventoryReport
-    ucMaterialMovements --- ucMaterialMovementReport
     ucMaterialStock -. "«extend»" .-> ucMaterialQuery
 ```
 
