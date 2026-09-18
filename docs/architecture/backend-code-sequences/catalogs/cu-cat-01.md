@@ -28,4 +28,3 @@ sequenceDiagram
     deactivate Controller
 ```
 
-<a id="cu-cat-02"></a>

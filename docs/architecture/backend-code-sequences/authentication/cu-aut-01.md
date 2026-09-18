@@ -36,4 +36,3 @@ sequenceDiagram
     end
 ```
 
-<a id="cu-aut-02"></a>

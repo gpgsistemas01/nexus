@@ -6,12 +6,12 @@ Aceptada el 4 de septiembre de 2026.
 
 ## Contexto
 
-Las 81 secuencias frontend y las 81 secuencias backend estaban almacenadas en dos
+Las 72 secuencias frontend y las 72 secuencias backend estaban almacenadas en dos
 archivos monolíticos. La separación por perspectiva era correcta, pero localizar o
 modificar un grupo exigía recorrer más de dos mil líneas y concentraba cambios
 independientes en la misma fuente.
 
-Los casos ya poseen grupos estables (`AUT`, `IDA`, `CAT`, `ENT`, `SAL` y `REP`), y el
+Los casos ya poseen grupos estables (`AUT`, `IDA`, `ALM`, `CAT`, `ENT` y `SAL`), y el
 manual utiliza esos límites funcionales para localizar procedimientos. La publicación de
 arquitectura puede ensamblar varias fuentes sin convertirlas en entregas independientes.
 

@@ -40,4 +40,3 @@ sequenceDiagram
     Controller-->>Client: 200 salida de merma actualizada
 ```
 
-<a id="cu-sal-13"></a>

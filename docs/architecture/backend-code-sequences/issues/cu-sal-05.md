@@ -36,4 +36,3 @@ sequenceDiagram
     Controller-->>Browser: 200 { goodsIssue, code }
 ```
 
-<a id="cu-sal-06"></a>

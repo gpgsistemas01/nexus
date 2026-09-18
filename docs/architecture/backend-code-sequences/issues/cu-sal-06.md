@@ -44,4 +44,3 @@ sequenceDiagram
     end
 ```
 
-<a id="cu-sal-08"></a>

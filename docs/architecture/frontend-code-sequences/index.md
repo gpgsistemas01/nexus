@@ -85,7 +85,7 @@ aparece una vez, conserva su referencia de patrones y contiene un bloque Mermaid
 | Catálogos | `CU-CAT-01..26` | 26 | Completo |
 | Entradas | `CU-ENT-01..06` | 6 | Completo |
 | Salidas | `CU-SAL-01..14` | 14 | Completo |
-| **Total** | Cinco grupos propietarios | **81** | **81 de 81** |
+| **Total** | Seis grupos propietarios | **72** | **72 de 72** |
 
 ### Capítulos técnicos
 

@@ -44,4 +44,3 @@ sequenceDiagram
     Controller-->>Browser: 200 { goodsReceipt, code }
 ```
 
-<a id="cu-ent-03"></a>

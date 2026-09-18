@@ -38,4 +38,3 @@ sequenceDiagram
     deactivate Application
 ```
 
-<a id="cu-alm-11"></a>

@@ -29,4 +29,3 @@ sequenceDiagram
     Form->>Browser: navega a la portada autenticada
 ```
 
-<a id="cu-aut-02"></a>

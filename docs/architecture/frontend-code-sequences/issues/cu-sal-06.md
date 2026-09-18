@@ -30,4 +30,3 @@ sequenceDiagram
     Return->>Issue: recarga la página y consulta el estado actualizado
 ```
 
-<a id="cu-sal-08"></a>

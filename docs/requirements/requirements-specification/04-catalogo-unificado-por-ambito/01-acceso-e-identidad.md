@@ -11,7 +11,7 @@ recurso.
 | RF-AUT-002 | Una sesión vigente debe poder renovarse reemplazando las credenciales correspondientes. | Implementado | `src/routes/web/auth/refreshWebRoute.js` |
 | RF-AUT-003 | Una sesión autenticada debe poder cerrarse invalidando las credenciales correspondientes. | Implementado | `src/routes/web/auth/logoutWebRoute.js` |
 | RF-IAM-001 | Administración debe poder consultar usuarios y sus asignaciones de rol y departamento sin exponer contraseñas. | Implementado | `src/routes/api/admin/userApiRoute.js`, `src/controllers/api/admin/userController.js` |
-| RF-IAM-002 | Administración debe poder consultar personas y sus asignaciones sin concederles acceso implícito. | Implementado | `src/routes/api/admin/personApiRoute.js`, `src/views/pages/admin/persons` |
+| RF-IAM-002 | Almacén o Administración deben poder consultar personas y sus asignaciones sin concederles acceso implícito. | Implementado | `src/routes/api/admin/personApiRoute.js`, `src/views/pages/admin/persons` |
 | RF-IAM-003 | Administración debe poder consultar roles y departamentos activos para componer asignaciones de acceso; los inactivos permanecen visibles sólo en su mantenimiento. | Implementado | `src/routes/api/admin/roleApiRoute.js`, `src/routes/api/admin/departmentApiRoute.js` |
 | RF-IAM-004 | Administración debe poder crear un usuario con una cuenta única y una asignación válida de rol y departamento; la persona asociada es opcional. | Implementado | `src/routes/api/admin/userApiRoute.js`, `src/controllers/api/admin/userController.js` |
 | RF-IAM-005 | Administración debe poder actualizar los datos admitidos y reemplazar atómicamente la asignación de acceso de un usuario. | Implementado | `src/routes/api/admin/userApiRoute.js`, `src/services/admin/userService.js` |

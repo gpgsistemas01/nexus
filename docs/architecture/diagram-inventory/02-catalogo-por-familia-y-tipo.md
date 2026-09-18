@@ -15,8 +15,8 @@
 | `DIA-BE-ACT-001..002` | Actividades de surtimiento y cancelación | Backend, “Vistas técnicas aplicadas” | 2 | Decisiones y errores de servicios; curado. |
 | `DIA-REQ-ACT-001` | Impacto del estado activo | `requirements/diagrams/index.md#impacto-del-estado-activo-en-los-procesos-de-almacén` | 1 | Actividad funcional que separa `isActive`, filtros de inventario y estados documentales; curado desde servicios y reportes vigentes. |
 | `DIA-FE-ACT-001` | Actividad de alta de merma desde plantilla | Frontend, “Alta de merma…” | 1 | Dependencias y validación del navegador; curado. |
-| `DIA-FE-CU-AUT-01..SAL-14` | Secuencia de ejecución frontend por caso | `frontend-code-sequences/`, con índice y capítulos por grupo | 81 | Página/interacción, aplicación, request y resultado concretos; curado desde la matriz frontend. |
-| `DIA-BE-CU-AUT-01..SAL-14` | Secuencia de ejecución backend por caso | `backend-code-sequences/`, con índice y capítulos por grupo | 81 | Ruta/controller, servicio, persistencia o efecto concretos; curado desde la matriz backend. |
+| `DIA-FE-CU-AUT-01..SAL-14` | Secuencia de ejecución frontend por caso | `frontend-code-sequences/`, con índice y capítulos por grupo | 72 | Página/interacción, aplicación, request y resultado concretos; curado desde la matriz frontend. |
+| `DIA-BE-CU-AUT-01..SAL-14` | Secuencia de ejecución backend por caso | `backend-code-sequences/`, con índice y capítulos por grupo | 72 | Ruta/controller, servicio, persistencia o efecto concretos; curado desde la matriz backend. |
 | `DIA-BE-TEC-EST-AUT-01`, `DIA-BE-TEC-EST-CU-ENT-04`, `DIA-FE-TEC-EST-CU-IDA-08`, `DIA-FE-TEC-EST-CU-ALM-05` | Estados técnicos complementarios | Secciones técnicas del caso correspondiente | 4 | Elegibilidad de acceso y transacción backend, más modos de formulario frontend; no duplican estados normativos. |
 | `DIA-COD-ORG-001`, `DIA-COD-EST-001..002`, `DIA-COD-DIN-001`, `DIA-COD-REU-001` | Organización, estructura, dinámica y reutilización | `code-diagrams/index.md`, secciones 1 a 5 | 5 | Código e imports; curado. |
 | `DIA-PAT-DAT-001`, `DIA-PAT-RES-001` | Contrato de detalle y resumen de patrones | `design-and-construction-patterns/` y `diagram-conventions/` | 2 | Patrones confirmados; curado. |
@@ -26,10 +26,10 @@
 | `DIA-GEN-COD-001` | Dependencias generadas | `generated/code-map.md#dependencias-entre-áreas` | 1 | `src`; regenerar. |
 | `DIA-GEN-ER-001..005` | Entidad–relación | Cuatro áreas y relaciones transversales de `generated/database-schema.md` | 5 | Prisma; regenerar. |
 | `DIA-REQ-DOM-001` | Clases de dominio conceptual | `domain-and-use-cases/02-modelo-de-dominio-conceptual.md` | 1 | Requisitos y glosario; curado. |
-| `DIA-REQ-CU-GRP-AUT..SAL` | Casos de uso por cinco grupos propietarios | `domain-and-use-cases/03-casos-de-uso-vigentes.md` | 5 | Los reportes se integran con el grupo del recurso que los inicia; curado. |
+| `DIA-REQ-CU-GRP-AUT..SAL` | Casos de uso por seis grupos propietarios | `domain-and-use-cases/03-casos-de-uso-vigentes.md` | 6 | Los reportes se integran con el grupo del recurso que los inicia; curado. |
 | `DIA-REQ-EST-001` | Estados/datos por acción | `domain-and-use-cases/04-estados-y-datos-modificados-por-accion.md` | 1 | Reglas de dominio; curado. |
 | `DIA-REQ-TRA-001`, `DIA-REQ-CRUD-001` | Dependencias y ciclo CRUD | Primeras dos vistas de `requirements/diagrams/index.md` | 2 | Requisitos; curado. |
-| `DIA-REQ-CU-AUT-01..CU-SAL-14` | Flujo individual de cada caso vigente | `requirements/diagrams/` | 81 | Una vista curada por cada `CU-*`. |
+| `DIA-REQ-CU-AUT-01..CU-SAL-14` | Flujo individual de cada caso vigente | `requirements/diagrams/` | 72 | Una vista curada por cada `CU-*`. |
 | `DIA-REQ-ESP-001..017` | Vistas adicionales agrupadas | `requirements/diagrams/cross-cutting/index.md` | 17 | Casos con coordinación o patrón común; curado. |
 | `DIA-REQ-SEQ-ATM-001` | Secuencia atómica de corrección/cancelación | `requirements/diagrams/cross-cutting/18-coordinacion-atomica-de-correcciones-de-entrada.md` | 1 | Servicios transaccionales; curado. |
 | `DIA-REQ-EST-002` | Estados de surtimiento/devolución | `requirements/diagrams/cross-cutting/index.md#estados-de-surtimiento-y-devolución` | 1 | Reglas normativas; curado. |

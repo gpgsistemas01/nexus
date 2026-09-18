@@ -34,4 +34,3 @@ sequenceDiagram
     Controller-->>Client: 200 entrada y corrección
 ```
 
-<a id="cu-ent-05"></a>

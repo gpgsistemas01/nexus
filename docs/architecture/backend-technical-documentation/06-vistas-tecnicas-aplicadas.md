@@ -2,7 +2,7 @@
 
 ### Relación entre la colección canónica y las vistas adicionales
 
-La columna **Diagrama aplicado** de la matriz anterior enlaza los 81 recorridos
+La columna **Diagrama aplicado** de la matriz anterior enlaza los 72 recorridos
 `DIA-BE-CU-*` de `backend-code-sequences/index.md`. Esa colección es propietaria del
 orden ruta → controller → servicio → persistencia o efecto. Este documento es propietario
 de las fichas, los criterios de documentación y las vistas que contestan una pregunta

@@ -17,7 +17,7 @@ documentación de los casos directos.
 Las colecciones completas están en los [diagramas frontend aplicados al
 código](../frontend-code-sequences/index.md) y los [diagramas backend aplicados al
 código](../backend-code-sequences/index.md); ambas conservan una vista independiente para
-cada uno de los 81 casos, incluso cuando la forma de la colaboración se repite.
+cada uno de los 72 casos, incluso cuando la forma de la colaboración se repite.
 Cada vista específica declara únicamente los códigos de los patrones aplicados y deja
 su explicación en el catálogo canónico; el bloque Mermaid muestra directamente el
 recorrido particular. Las secuencias y actividades que necesitan mayor profundidad se

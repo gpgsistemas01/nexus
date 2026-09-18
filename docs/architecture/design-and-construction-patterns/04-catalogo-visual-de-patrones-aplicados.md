@@ -173,7 +173,7 @@ flowchart LR
 
 Cada diagrama específico declara una línea **Patrones** con los códigos resueltos por el
 índice rápido de frontend o backend. Así se identifica la solución aplicada sin repetir
-su explicación ni añadir vistas intermedias en los 81 casos de cada perspectiva. La
+su explicación ni añadir vistas intermedias en los 72 casos de cada perspectiva. La
 cadena de lectura es **patrón aplicado → recorrido concreto del caso**: una
 refactorización cambia primero este catálogo y sus implementaciones, y los códigos
 permiten localizar después todos los casos afectados. `DIA-PAT-TST-001` representa

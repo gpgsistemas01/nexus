@@ -36,4 +36,3 @@ sequenceDiagram
     deactivate Application
 ```
 
-<a id="cu-sal-10"></a>

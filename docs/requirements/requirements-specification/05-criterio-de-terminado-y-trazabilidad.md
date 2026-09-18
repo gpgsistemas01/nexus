@@ -17,3 +17,11 @@ Cualquier requisito o regla nuevo o modificado se considera listo para revisión
 La evidencia puede enlazarse desde una incidencia hacia el ID del requisito. No se
 añade una matriz duplicada de cada endpoint: el mapa generado ya conserva ese
 inventario y evita que dos listas manuales diverjan.
+
+No todo requisito debe crear un caso de uso independiente. Los requisitos de soporte
+para selectores operativos, unicidad de relaciones, validaciones compartidas, permisos
+transversales o cálculos de reportes pueden estar relacionados con varias fichas o con
+ninguna ficha exclusiva cuando describen una responsabilidad interna de Nexus. La
+completitud se verifica en sentido inverso: cada caso vigente debe enlazar al menos un
+`RF-*` o una regla `RN-*`, y cada requisito de soporte debe conservar evidencia técnica
+o una relación explícita con los flujos que regula.

@@ -39,4 +39,3 @@ sequenceDiagram
     Controller-->>Client: 200 material actualizado
 ```
 
-<a id="cu-cat-01"></a>

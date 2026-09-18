@@ -2,7 +2,7 @@
 
 ### Relación entre la colección canónica y las vistas adicionales
 
-La columna **Diagrama aplicado** de la matriz anterior enlaza los 81 recorridos
+La columna **Diagrama aplicado** de la matriz anterior enlaza los 72 recorridos
 `DIA-FE-CU-*` de `frontend-code-sequences/index.md`. Esa colección es propietaria del
 orden interacción → UI → aplicación → request → endpoint → resultado visible. Este
 documento es propietario de las fichas por tipo de módulo, los límites del navegador y

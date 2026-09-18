@@ -33,4 +33,3 @@ sequenceDiagram
     deactivate Application
 ```
 
-<a id="cu-ida-07"></a>
