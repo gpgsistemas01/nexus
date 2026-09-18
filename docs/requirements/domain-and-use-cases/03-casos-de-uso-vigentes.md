@@ -54,6 +54,7 @@ flowchart LR
 
 ```mermaid
 flowchart LR
+    warehouse["«actor»<br/>Personal de almacén (área Almacén y proveduría)"]
     admin["«actor»<br/>Administrador del sistema (área Sistemas)"]
 
     subgraph identityPackage["Nexus · Grupo funcional IDA: Identidad y acceso"]
@@ -72,7 +73,8 @@ flowchart LR
         end
     end
 
-    admin --- ucPersonQuery
+    admin -- "generaliza" --> warehouse
+    warehouse --- ucPersonQuery
     admin --- ucUserQuery
     ucPersonQuery --- ucPersonCreate
     ucPersonQuery --- ucPersonEdit
@@ -134,7 +136,6 @@ flowchart LR
         end
     end
 
-    warehouse --- ucMaterialQuery
     warehouse --- ucSupplierCreate
     warehouse --- ucClientCreate
     admin -- "generaliza" --> warehouse
@@ -169,19 +170,6 @@ flowchart LR
     ucCatalog36 --- ucCatalog37
     ucCatalog36 --- ucCatalog38
 ```
-
-La consulta de materiales o mermas ya presenta sus existencias. Inventario no se modela
-como una segunda consulta: **Exportar Excel** dispara el caso de reporte desde el mismo
-listado, mientras crear, editar o ajustar disparan sus casos respectivos. Los ajustes se
-muestran como extensiones porque el administrador los abre como una acción opcional desde
-esa consulta; consultar el listado no obliga a ejecutar un ajuste. La asociación exclusiva
-con el administrador refleja los permisos `materials:adjust-stock` y
-`wastes:adjust-stock`. El personal de almacén puede
-consultar ambos listados, pero no hereda esas dos asociaciones restringidas. Del mismo
-modo, las rutas API permiten al personal de Almacén consultar y crear proveedores y
-clientes, mientras que la edición de proveedores, el cambio de su estado, la edición de
-clientes y los reportes respectivos quedan asociados al administrador por sus permisos
-más restrictivos.
 
 La administración de **Áreas**, **Roles**, **Presentaciones**, **Unidades de medida**,
 **Motivos de ajuste** y **Estados de cumplimiento** se asocia directamente con el
@@ -220,6 +208,8 @@ flowchart LR
 
     warehouse --- ucWasteQuery
     warehouse --- ucMaterialQuery
+    admin --- ucWasteStock
+    admin --- ucMaterialStock
     ucWasteQuery --- ucWasteCreate
     ucWasteQuery --- ucWasteEdit
     ucWasteQuery --- ucWasteReport
