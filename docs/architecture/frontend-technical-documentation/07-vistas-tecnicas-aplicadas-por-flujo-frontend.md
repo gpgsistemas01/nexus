@@ -13,7 +13,7 @@ La revisión de las vistas existentes produjo esta decisión:
 
 | Vista conservada aquí | Pregunta adicional y razón | Conexión e impacto |
 | --- | --- | --- |
-| `DIA-FE-ACT-001` · `CU-CAT-20` | ¿Cómo condicionan proveedor y plantilla la habilitación, el mapeo de *snapshots* y el envío? La actividad hace visibles decisiones de UI, no la persistencia. | Complementa `DIA-FE-CU-CAT-20` y termina en su mismo `POST`. Cambios en decisiones visuales actualizan la actividad; cambios en módulos, payload o endpoint actualizan la secuencia canónica; las reglas definitivas permanecen en backend. |
+| `DIA-FE-ACT-001` · `CU-CAT-19` | ¿Cómo condicionan proveedor y plantilla la habilitación, el mapeo de *snapshots* y el envío? La actividad hace visibles decisiones de UI, no la persistencia. | Complementa `DIA-FE-CU-CAT-19` y termina en su mismo `POST`. Cambios en decisiones visuales actualizan la actividad; cambios en módulos, payload o endpoint actualizan la secuencia canónica; las reglas definitivas permanecen en backend. |
 | `DIA-FE-TEC-EST-CU-IDA-08` | ¿Qué modos del formulario separan consulta, edición y cambio de contraseña, y a cuál vuelve tras éxito o error? | Complementa `DIA-FE-CU-IDA-08` y se conecta con los recorridos de consulta/edición relacionados. No crea otro caso ni otra API; si cambia el modo se revisan sus controles y la secuencia cuya mutación activa. |
 | `DIA-FE-TEC-EST-CU-CAT-05` | ¿Cómo evoluciona el modo de ajuste entre consulta, validación visual, envío y error? | Complementa `DIA-FE-CU-CAT-05` y termina en el mismo `PATCH`. No representa estados persistidos ni validación definitiva; un cambio de endpoint afecta la secuencia, mientras un cambio de modo afecta esta vista. |
 
@@ -25,7 +25,7 @@ secuencia de cada consumidor.
 
 ### Alta de merma desde una plantilla de material
 
-**Identificador:** `DIA-FE-ACT-001`. **Caso:** `CU-CAT-20`. Esta actividad hace visible
+**Identificador:** `DIA-FE-ACT-001`. **Caso:** `CU-CAT-19`. Esta actividad hace visible
 la dependencia proveedor → material y la preparación de snapshots; no representa las
 decisiones de persistencia del servicio.
 

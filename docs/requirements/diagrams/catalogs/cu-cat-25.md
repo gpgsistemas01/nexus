@@ -1,8 +1,7 @@
-# `CU-CAT-25` — Consultar movimientos de mermas
+# `CU-CAT-25` — Consultar área
 
 ```mermaid
 flowchart LR
-    request["Actor solicita consultar movimientos de mermas"] --> validate["Nexus valida permiso, datos y relaciones"]
-    validate --> result["Nexus responde: Consulta autorizada sin modificar datos."]
-    result --> report["Actor elige exportar y dispara CU-CAT-26"]
+    request["Administrador solicita consultar Áreas"] --> authorize["Nexus valida catalogs:manage y departments"]
+    authorize --> result["Mostrar exclusivamente la tabla de Áreas"]
 ```

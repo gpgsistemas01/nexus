@@ -1,4 +1,4 @@
-# 4. Patrón de consulta de catálogos — `CU-CAT-01`, `CU-CAT-10`, `CU-CAT-15`, `CU-CAT-19`; `CU-CAT-27`, `CU-CAT-30`, `CU-CAT-33`, `CU-CAT-36`, `CU-CAT-39` y `CU-CAT-42`
+# 4. Patrón de consulta de catálogos — `CU-CAT-01`, `CU-CAT-09`, `CU-CAT-14`, `CU-CAT-18`; `CU-CAT-25`, `CU-CAT-28`, `CU-CAT-31`, `CU-CAT-34`, `CU-CAT-37` y `CU-CAT-40`
 
 ```mermaid
 flowchart LR

@@ -1,5 +1,5 @@
 <a id="cu-cat-38"></a>
-# `CU-CAT-38` — Editar unidad de medida
+# `CU-CAT-38` — Crear motivo de ajuste
 
 **Patrones:** `FE-P03`.
 
@@ -11,15 +11,15 @@ sequenceDiagram
     participant Request as src/public/js/services/admin/catalogService.js
     participant HTTP as src/public/js/services/axiosInstanceApi.js
     participant Transport@{ "type": "control" } as src/routes/api/admin/catalogApiRoute.js<br/>src/controllers/api/admin/catalogController.js
-    Note over Application,Transport: Variables de frontera: catalog/id/data
+    Note over Application,Transport: Variables de frontera: catalog/data
 
-    Browser->>View: confirmar el formulario de edición
+    Browser->>View: confirmar el formulario de alta
     View->>View: recopilar y validar las variables de frontera indicadas
-    View->>Application: editCatalogEntry({ catalog, id, data })
-    Application->>Request: editCatalogEntryRequest({ catalog, id, data })
+    View->>Application: registerCatalogEntry({ catalog, data })
+    Application->>Request: registerCatalogEntryRequest({ catalog, data })
     activate Application
     Request->>HTTP: apiRequest({ method: 'get', url, data/params })
-    HTTP->>Transport: consume PUT /api/admin/catalogs/unit-measures/:id
+    HTTP->>Transport: consume POST /api/admin/catalogs/reasons
     Transport-->>HTTP: status HTTP y payload del endpoint
     HTTP-->>Request: respuesta o error normalizado
     Request-->>Application: resultado del request

@@ -1,8 +1,8 @@
-# `CU-CAT-26` — Generar reporte de movimientos de mermas
+# `CU-CAT-26` — Crear área
 
 ```mermaid
 flowchart LR
-    request["Actor selecciona exportar desde CU-CAT-25: movimientos de mermas"] --> modal["Nexus abre el modal Exportar reporte"]
-    modal --> validate["Nexus valida permiso, datos y relaciones"]
-    validate --> result["Nexus responde: Archivo Excel con filtros, columnas y cálculos propios del reporte."]
+    request["Administrador selecciona Nueva área<br/>y confirma Guardar"] --> authorize["Nexus valida catalogs:manage y departments"]
+    authorize --> persist["Validar campos y crear área"]
+    persist --> result["Confirmar y refrescar Áreas"]
 ```

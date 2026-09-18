@@ -1,7 +1,7 @@
 <a id="CAP-CAT-SUP-02-CREATE"></a>
 # 8. CAP-CAT-SUP-02-CREATE — Formulario alta
 
-**Casos de uso:** `CU-CAT-11` — Crear proveedor.
+**Casos de uso:** `CU-CAT-10` — Crear proveedor.
 
 **Errores posibles:** [Validación de formularios](../../error-messages.md#errores-validacion), [Catálogos e inventario](../../error-messages.md#errores-catalogos).
 

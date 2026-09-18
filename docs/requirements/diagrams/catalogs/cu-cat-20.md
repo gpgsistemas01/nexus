@@ -1,9 +1,10 @@
-# `CU-CAT-20` — Registrar merma
+# `CU-CAT-20` — Editar merma
 
 ```mermaid
 flowchart TD
-    request["Actor solicita registrar merma"] --> validate["Nexus valida permiso, datos y relaciones"]
-    validate --> active{"¿Proveedor y material de plantilla activos?"}
-    active -->|No| reject["Rechazar el alta<br/>sin crear merma ni stock"]
-    active -->|Sí| result["Crear merma desde la plantilla<br/>y registrar stock inicial"]
+    request["Actor solicita editar merma"] --> validate["Nexus valida permiso, datos y relaciones"]
+    validate --> active{"¿Cambió Activo?"}
+    active -->|No| result["Actualizar datos admitidos<br/>sin alterar identidad física"]
+    active -->|Sí| preserve["Persistir activo o inactivo<br/>y conservar stock, snapshots e historia"]
+    preserve --> boundary["Bloquear salidas nuevas<br/>sin cancelar detalles comprometidos"]
 ```

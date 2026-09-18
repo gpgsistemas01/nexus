@@ -1,25 +1,30 @@
 <a id="cu-cat-19"></a>
-# `CU-CAT-19` — Consultar mermas
+# `CU-CAT-19` — Registrar merma
 
 **Patrones:** `FE-P02`.
 
 ```mermaid
 sequenceDiagram
     participant Browser as Navegador
-    participant View as src/views/pages/warehouse/wastes/wastesPage.ejs<br/>src/public/js/pages/warehouse/wastes/wastesPage.js
+    participant View as src/public/js/pages/warehouse/wastes/wasteModal.js<br/>src/public/js/pages/warehouse/wastes/wasteForm.js
     participant Application as src/public/js/application/warehouse/wastes/wastes.js
     participant Request as src/public/js/services/warehouse/wasteService.js
     participant HTTP as src/public/js/services/axiosInstanceApi.js
     participant Transport@{ "type": "control" } as src/routes/api/warehouse/wasteApiRoute.js<br/>src/controllers/api/warehouse/wasteController.js
-    Note over Application,Transport: Variables de frontera: params/filtros
+    Note over Application,Transport: Variables de frontera: formData/payload
 
-    Browser->>View: wastesPage.ejs y wastesPage.js cargan mermas
+    Browser->>View: wasteModal.js y wasteForm.js seleccionan una plantilla de material
     View->>View: recopilar y validar las variables de frontera indicadas
-    View->>Application: getAllWastes({ params })
-    Application->>Request: getAllWastesRequest({ params })
+    View->>Application: getWasteMaterialTemplates({ params })
+    Application->>Request: registerWaste({ formData })
     activate Application
-    Request->>HTTP: apiRequest({ method: 'get', url, data/params })
-    HTTP->>Transport: consulta GET /api/warehouse/wastes
+    Request->>HTTP: apiRequest({ method: 'post', url, data/params })
+    HTTP->>Transport: enviar POST /api/warehouse/wastes
+    alt Misma identidad de merma
+        Transport-->>View: 409 WASTE_ALREADY_EXISTS y no incrementar stock
+    else Merma nueva
+        Transport->>Transport: crear merma y ajuste de existencia inicial
+    end
     Transport-->>HTTP: status HTTP y payload del endpoint
     HTTP-->>Request: respuesta o error normalizado
     Request-->>Application: resultado del request

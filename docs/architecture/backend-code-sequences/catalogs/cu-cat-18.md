@@ -1,21 +1,21 @@
 <a id="cu-cat-18"></a>
-# `CU-CAT-18` — Generar reporte de clientes
+# `CU-CAT-18` — Consultar mermas
 
-**Patrones:** `BE-P07`.
+**Patrones:** `BE-P01`.
 
 ```mermaid
 sequenceDiagram
     participant Client as Cliente HTTP / web
-    participant Route as src/routes/api/sales/reportApiRoute.js
-    participant Controller@{ "type": "control" } as src/controllers/api/sales/reportController.js
-    participant Domain as src/services/sales/clientService.js<br/>src/utils/reportExcelUtils.js
+    participant Route as src/routes/api/warehouse/wasteApiRoute.js
+    participant Controller@{ "type": "control" } as src/controllers/api/warehouse/wasteController.js
+    participant Domain as src/services/warehouse/wastes/wasteService.js
     Note over Controller,Domain: Variables de frontera: req.query/params
 
-    Client->>Route: GET /api/sales/reports/clients/excel
+    Client->>Route: GET /api/warehouse/wastes
     Route->>Route: ejecutar en orden el middleware configurado para la ruta
-    Route->>Controller: exportClientReport(req, res)
+    Route->>Controller: getAllWastes(req, res)
     activate Controller
-    Controller->>Domain: clientService.findAllClients({ query: req.query }) prepara filas y el controller llama sendExcelReport
+    Controller->>Domain: wasteService.findAllWastes({ query: req.query }) consulta merma e inventario
     activate Domain
     Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
     Domain-->>Controller: resultado del servicio o error de dominio tipado
@@ -28,4 +28,4 @@ sequenceDiagram
     deactivate Controller
 ```
 
-<a id="cu-ida-04"></a>
+<a id="cu-cat-19"></a>

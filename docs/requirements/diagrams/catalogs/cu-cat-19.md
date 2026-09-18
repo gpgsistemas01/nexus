@@ -1,7 +1,9 @@
-# `CU-CAT-19` — Consultar mermas
+# `CU-CAT-19` — Registrar merma
 
 ```mermaid
-flowchart LR
-    request["Actor solicita consultar mermas"] --> validate["Nexus valida permiso, datos y relaciones"]
-    validate --> result["Nexus responde: Listado de existencias de merma."]
+flowchart TD
+    request["Actor solicita registrar merma"] --> validate["Nexus valida permiso, datos y relaciones"]
+    validate --> active{"¿Proveedor y material de plantilla activos?"}
+    active -->|No| reject["Rechazar el alta<br/>sin crear merma ni stock"]
+    active -->|Sí| result["Crear merma desde la plantilla<br/>y registrar stock inicial"]
 ```

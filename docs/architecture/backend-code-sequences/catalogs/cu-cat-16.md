@@ -1,5 +1,5 @@
 <a id="cu-cat-16"></a>
-# `CU-CAT-16` — Crear cliente
+# `CU-CAT-16` — Editar cliente
 
 **Patrones:** `BE-P01`.
 
@@ -10,15 +10,15 @@ sequenceDiagram
     participant Controller@{ "type": "control" } as src/controllers/api/sales/clientController.js
     participant ClientDto as «object»<br/>clientDto<br/>src/dtos/clientDTO.js
     participant Domain as src/services/sales/clientService.js
-    Note over Controller,Domain: Variables de frontera: req.body/DTO
+    Note over Controller,Domain: Variables de frontera: req.params.id, req.body/DTO
 
-    Client->>Route: POST /api/sales/clients
+    Client->>Route: PUT /api/sales/clients/:id
     Route->>Route: ejecutar en orden el middleware configurado para la ruta
-    Route->>Controller: registerClient(req, res)
+    Route->>Controller: editClient(req, res)
     activate Controller
-    Controller->>ClientDto: createClientDtoForRegister(req.body) → sanitizeEmptyStrings(...)
+    Controller->>ClientDto: createClientDtoForEdit(req.body) → sanitizeEmptyStrings(...)
     ClientDto-->>Controller: clientDto normalizado
-    Controller->>Domain: clientService.createClient({ clientDto }) persiste Client
+    Controller->>Domain: clientService.updateClient({ id: req.params.id, clientDto }) actualiza Client
     activate Domain
     Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
     Domain-->>Controller: resultado del servicio o error de dominio tipado
@@ -31,4 +31,4 @@ sequenceDiagram
     deactivate Controller
 ```
 
-<a id="cu-cat-17"></a>
+<a id="cu-cat-18"></a>

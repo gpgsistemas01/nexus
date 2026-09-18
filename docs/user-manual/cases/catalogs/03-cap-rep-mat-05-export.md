@@ -1,6 +1,6 @@
 # 3. CAP-REP-MAT-05-EXPORT — Exportar inventario
 
-**Casos de uso:** `CU-CAT-07` — Generar reporte de inventario de materiales.
+**Casos de uso:** `CU-CAT-06` — Generar reporte de inventario de materiales.
 
 1. Seleccione **Exportar Excel** y compruebe el modal:
 

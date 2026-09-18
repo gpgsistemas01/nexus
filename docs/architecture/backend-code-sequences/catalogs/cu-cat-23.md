@@ -1,21 +1,21 @@
 <a id="cu-cat-23"></a>
-# `CU-CAT-23` — Consultar inventario de mermas
+# `CU-CAT-23` — Consultar movimientos de mermas
 
 **Patrones:** `BE-P06`.
 
 ```mermaid
 sequenceDiagram
     participant Client as Cliente HTTP / web
-    participant Route as src/routes/api/warehouse/wasteApiRoute.js
-    participant Controller@{ "type": "control" } as src/controllers/api/warehouse/wasteController.js
-    participant Domain as src/services/warehouse/wastes/wasteService.js
+    participant Route as src/routes/api/admin/movementApiRoute.js
+    participant Controller@{ "type": "control" } as src/controllers/api/admin/movementController.js
+    participant Domain as src/services/inventory/movementQueryService.js
     Note over Controller,Domain: Variables de frontera: req.query/params
 
-    Client->>Route: GET /api/warehouse/wastes
+    Client->>Route: GET /api/admin/movements/wastes
     Route->>Route: ejecutar en orden el middleware configurado para la ruta
-    Route->>Controller: getAllWastes(req, res)
+    Route->>Controller: getAllWasteMovements(req, res)
     activate Controller
-    Controller->>Domain: wasteService.findAllWastes({ query: req.query })
+    Controller->>Domain: findAllWasteMovements(getMovementListParams(req))
     activate Domain
     Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
     Domain-->>Controller: resultado del servicio o error de dominio tipado
@@ -28,4 +28,4 @@ sequenceDiagram
     deactivate Controller
 ```
 
-<a id="cu-cat-25"></a>
+<a id="cu-sal-14"></a>

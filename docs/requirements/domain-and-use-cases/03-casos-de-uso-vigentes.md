@@ -98,75 +98,58 @@ flowchart LR
             ucMaterialEdit(["CU-CAT-03 Editar material"])
             ucMaterialRemove(["CU-CAT-04 Retirar material"])
             ucMaterialStock(["CU-CAT-05 Ajustar existencia de material"])
-            ucMaterialInventory(["CU-CAT-06 Consultar inventario de materiales"])
-            ucMaterialInventoryReport(["CU-CAT-07 Generar reporte de inventario de materiales"])
-            ucMaterialMovements(["CU-CAT-08 Consultar movimientos de materiales"])
-            ucMaterialMovementReport(["CU-CAT-09 Generar reporte de movimientos de materiales"])
+            ucMaterialInventoryReport(["CU-CAT-06 Generar reporte de inventario de materiales"])
+            ucMaterialMovements(["CU-CAT-07 Consultar movimientos de materiales"])
+            ucMaterialMovementReport(["CU-CAT-08 Generar reporte de movimientos de materiales"])
         end
         subgraph supplierCatalogFamily["Proveedores"]
-            ucSupplierQuery(["CU-CAT-10 Consultar proveedores"])
-            ucSupplierCreate(["CU-CAT-11 Crear proveedor"])
-            ucSupplierEdit(["CU-CAT-12 Editar proveedor"])
-            ucSupplierStatus(["CU-CAT-13 Cambiar estado de proveedor"])
-            ucSupplierReport(["CU-CAT-14 Generar reporte de proveedores"])
+            ucSupplierQuery(["CU-CAT-09 Consultar proveedores"])
+            ucSupplierCreate(["CU-CAT-10 Crear proveedor"])
+            ucSupplierEdit(["CU-CAT-11 Editar proveedor"])
+            ucSupplierStatus(["CU-CAT-12 Cambiar estado de proveedor"])
+            ucSupplierReport(["CU-CAT-13 Generar reporte de proveedores"])
         end
         subgraph clientCatalogFamily["Clientes"]
-            ucClientQuery(["CU-CAT-15 Consultar clientes"])
-            ucClientCreate(["CU-CAT-16 Crear cliente"])
-            ucClientEdit(["CU-CAT-17 Editar cliente"])
-            ucClientReport(["CU-CAT-18 Generar reporte de clientes"])
+            ucClientQuery(["CU-CAT-14 Consultar clientes"])
+            ucClientCreate(["CU-CAT-15 Crear cliente"])
+            ucClientEdit(["CU-CAT-16 Editar cliente"])
+            ucClientReport(["CU-CAT-17 Generar reporte de clientes"])
         end
         subgraph wasteCatalogFamily["Mermas"]
-            ucWasteQuery(["CU-CAT-19 Consultar mermas"])
-            ucWasteCreate(["CU-CAT-20 Registrar merma"])
-            ucWasteEdit(["CU-CAT-21 Editar merma"])
-            ucWasteStock(["CU-CAT-22 Ajustar existencia de merma"])
-            ucWasteInventory(["CU-CAT-23 Consultar inventario de mermas"])
-            ucWasteReport(["CU-CAT-24 Generar reporte de mermas"])
-            ucWasteMovements(["CU-CAT-25 Consultar movimientos de mermas"])
-            ucWasteMovementReport(["CU-CAT-26 Generar reporte de movimientos de mermas"])
+            ucWasteQuery(["CU-CAT-18 Consultar mermas"])
+            ucWasteCreate(["CU-CAT-19 Registrar merma"])
+            ucWasteEdit(["CU-CAT-20 Editar merma"])
+            ucWasteStock(["CU-CAT-21 Ajustar existencia de merma"])
+            ucWasteReport(["CU-CAT-22 Generar reporte de mermas"])
+            ucWasteMovements(["CU-CAT-23 Consultar movimientos de mermas"])
+            ucWasteMovementReport(["CU-CAT-24 Generar reporte de movimientos de mermas"])
         end
         subgraph auxiliaryCatalogFamily["Catálogos auxiliares"]
-            ucCatalog21(["CU-CAT-27 Consultar área"])
-            ucCatalog22(["CU-CAT-28 Crear área"])
-            ucCatalog23(["CU-CAT-29 Editar área"])
-            ucCatalog24(["CU-CAT-30 Consultar rol"])
-            ucCatalog25(["CU-CAT-31 Crear rol"])
-            ucCatalog26(["CU-CAT-32 Editar rol"])
-            ucCatalog27(["CU-CAT-33 Consultar presentación"])
-            ucCatalog28(["CU-CAT-34 Crear presentación"])
-            ucCatalog29(["CU-CAT-35 Editar presentación"])
-            ucCatalog30(["CU-CAT-36 Consultar unidad de medida"])
-            ucCatalog31(["CU-CAT-37 Crear unidad de medida"])
-            ucCatalog32(["CU-CAT-38 Editar unidad de medida"])
-            ucCatalog33(["CU-CAT-39 Consultar motivo de ajuste"])
-            ucCatalog34(["CU-CAT-40 Crear motivo de ajuste"])
-            ucCatalog35(["CU-CAT-41 Editar motivo de ajuste"])
-            ucCatalog36(["CU-CAT-42 Consultar estado de cumplimiento"])
-            ucCatalog37(["CU-CAT-43 Crear estado de cumplimiento"])
-            ucCatalog38(["CU-CAT-44 Editar estado de cumplimiento"])
+            ucCatalog21(["CU-CAT-25 Consultar área"])
+            ucCatalog22(["CU-CAT-26 Crear área"])
+            ucCatalog23(["CU-CAT-27 Editar área"])
+            ucCatalog24(["CU-CAT-28 Consultar rol"])
+            ucCatalog25(["CU-CAT-29 Crear rol"])
+            ucCatalog26(["CU-CAT-30 Editar rol"])
+            ucCatalog27(["CU-CAT-31 Consultar presentación"])
+            ucCatalog28(["CU-CAT-32 Crear presentación"])
+            ucCatalog29(["CU-CAT-33 Editar presentación"])
+            ucCatalog30(["CU-CAT-34 Consultar unidad de medida"])
+            ucCatalog31(["CU-CAT-35 Crear unidad de medida"])
+            ucCatalog32(["CU-CAT-36 Editar unidad de medida"])
+            ucCatalog33(["CU-CAT-37 Consultar motivo de ajuste"])
+            ucCatalog34(["CU-CAT-38 Crear motivo de ajuste"])
+            ucCatalog35(["CU-CAT-39 Editar motivo de ajuste"])
+            ucCatalog36(["CU-CAT-40 Consultar estado de cumplimiento"])
+            ucCatalog37(["CU-CAT-41 Crear estado de cumplimiento"])
+            ucCatalog38(["CU-CAT-42 Editar estado de cumplimiento"])
         end
     end
 
     warehouse --- ucMaterialQuery
-    warehouse --- ucMaterialCreate
-    warehouse --- ucMaterialEdit
-    warehouse --- ucMaterialRemove
     warehouse --- ucSupplierQuery
-    warehouse --- ucSupplierCreate
     warehouse --- ucClientQuery
-    warehouse --- ucClientCreate
     warehouse --- ucWasteQuery
-    warehouse --- ucWasteCreate
-    warehouse --- ucWasteEdit
-    warehouse --- ucMaterialInventory
-    warehouse --- ucMaterialInventoryReport
-    warehouse --- ucMaterialMovements
-    warehouse --- ucMaterialMovementReport
-    warehouse --- ucWasteInventory
-    warehouse --- ucWasteReport
-    warehouse --- ucWasteMovements
-    warehouse --- ucWasteMovementReport
     admin -- "generaliza" --> warehouse
     admin --- ucMaterialStock
     admin --- ucWasteStock
@@ -181,7 +164,25 @@ flowchart LR
     admin --- ucCatalog30
     admin --- ucCatalog33
     admin --- ucCatalog36
+    ucMaterialQuery --- ucMaterialCreate
+    ucMaterialQuery --- ucMaterialEdit
+    ucMaterialQuery --- ucMaterialRemove
+    ucMaterialQuery --- ucMaterialMovements
+    ucMaterialQuery --- ucMaterialInventoryReport
+    ucMaterialMovements --- ucMaterialMovementReport
     ucMaterialStock -. "«extend»" .-> ucMaterialQuery
+    ucSupplierQuery --- ucSupplierCreate
+    ucSupplierQuery --- ucSupplierEdit
+    ucSupplierQuery --- ucSupplierStatus
+    ucSupplierQuery --- ucSupplierReport
+    ucClientQuery --- ucClientCreate
+    ucClientQuery --- ucClientEdit
+    ucClientQuery --- ucClientReport
+    ucWasteQuery --- ucWasteCreate
+    ucWasteQuery --- ucWasteEdit
+    ucWasteQuery --- ucWasteMovements
+    ucWasteQuery --- ucWasteReport
+    ucWasteMovements --- ucWasteMovementReport
     ucWasteStock -. "«extend»" .-> ucWasteQuery
     ucCatalog21 --- ucCatalog22
     ucCatalog21 --- ucCatalog23
@@ -197,10 +198,13 @@ flowchart LR
     ucCatalog36 --- ucCatalog38
 ```
 
-Los ajustes se muestran como extensiones porque el administrador los abre como una
-acción opcional desde la consulta de materiales o mermas; consultar el inventario no
-obliga a ejecutar un ajuste. La asociación exclusiva con el administrador refleja los
-permisos `materials:adjust-stock` y `wastes:adjust-stock`. El personal de almacén puede
+La consulta de materiales o mermas ya presenta sus existencias. Inventario no se modela
+como una segunda consulta: **Exportar Excel** dispara el caso de reporte desde el mismo
+listado, mientras crear, editar o ajustar disparan sus casos respectivos. Los ajustes se
+muestran como extensiones porque el administrador los abre como una acción opcional desde
+esa consulta; consultar el listado no obliga a ejecutar un ajuste. La asociación exclusiva
+con el administrador refleja los permisos `materials:adjust-stock` y
+`wastes:adjust-stock`. El personal de almacén puede
 consultar ambos listados, pero no hereda esas dos asociaciones restringidas. Del mismo
 modo, las rutas API permiten al personal de Almacén consultar y crear proveedores y
 clientes, mientras que la edición de proveedores, el cambio de su estado, la edición de
@@ -317,7 +321,7 @@ continúan fuera del diagrama por su estado no vigente.
 
 `CU-SAL-05` y `CU-SAL-12` actualizan la existencia y registra el movimiento como parte de su propio
 flujo; `CU-SAL-06` y `CU-SAL-13` registran la reversión y el movimiento inverso. No existe una relación
-`«include»` con `CU-CAT-08` y `CU-CAT-25`: consultar movimientos es otro objetivo iniciado por un
+`«include»` con `CU-CAT-07` y `CU-CAT-23`: consultar movimientos es otro objetivo iniciado por un
 actor, mientras registrar un movimiento es una responsabilidad interna de Nexus. Por la
 misma razón, compartir servicios entre grupos no se representa como salto, inclusión o
 extensión entre casos de uso.
@@ -342,10 +346,10 @@ flujo específico en
 No se usa «administrar» o «mantener» como objetivo: cada óvalo expresa una operación
 observable.
 
-Dentro de cada grupo, la lectura se organiza por recurso. En `CAT`, las asociaciones
-directas entre actor y objetivo hacen explícita la diferencia de acceso comprobada por
-las rutas API; en los demás grupos, desde la consulta se trazan asociaciones simples,
-sin etiqueta, hacia las operaciones CRUD y específicas que le corresponden. Sólo las
+Dentro de cada grupo, la lectura se organiza por recurso: desde la consulta se trazan
+asociaciones simples, sin etiqueta, hacia las operaciones CRUD y específicas que le
+corresponden. En `CAT`, las asociaciones directas adicionales del administrador hacen
+explícitas las operaciones restringidas comprobadas por las rutas API. Sólo las
 relaciones con semántica `«include»` o `«extend»` deben indicarla explícitamente.
 Corregir, cancelar, ajustar, cambiar estado, surtir o devolver permanecen junto al
 recurso que modifican y reciben la secuencia correspondiente a esa posición.

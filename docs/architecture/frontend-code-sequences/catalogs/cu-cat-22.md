@@ -1,25 +1,28 @@
 <a id="cu-cat-22"></a>
-# `CU-CAT-22` — Ajustar existencia de merma
+# `CU-CAT-22` — Generar reporte de mermas
 
-**Patrones:** `FE-P02`.
+**Patrones:** `FE-P08`.
 
 ```mermaid
 sequenceDiagram
     participant Browser as Navegador
-    participant View as src/public/js/pages/warehouse/wastes/wasteForm.js
-    participant Application as src/public/js/application/warehouse/wastes/wastes.js
-    participant Request as src/public/js/services/warehouse/wasteService.js
+    participant View as src/public/js/plugins/datatable/warehouse/wastes/wasteDatatable.js
+    participant Dialog as src/public/js/ui/reportExportDialog.js
+    participant Application as src/public/js/application/warehouse/report.js
+    participant Request as src/public/js/services/warehouse/reportService.js
     participant HTTP as src/public/js/services/axiosInstanceApi.js
-    participant Transport@{ "type": "control" } as src/routes/api/warehouse/wasteApiRoute.js<br/>src/controllers/api/warehouse/wasteController.js
-    Note over Application,Transport: Variables de frontera: id, formData/payload
+    participant Transport@{ "type": "control" } as src/routes/api/warehouse/reportApiRoute.js<br/>src/controllers/api/warehouse/reportController.js
+    Note over Application,Transport: Variables de frontera: params/filtros
 
-    Browser->>View: wasteForm.js usa el modo de ajuste
+    Browser->>View: Botón Excel de wasteDatatable.js
+    View->>Dialog: showInventoryExportDialog()
+    Dialog-->>View: inventoryScope activo/existencia
     View->>View: recopilar y validar las variables de frontera indicadas
-    View->>Application: editWasteStock({ id, formData })
-    Application->>Request: editWasteStockRequest({ id, formData })
+    View->>Application: exportWasteReport({ params })
+    Application->>Request: exportWasteReportRequest({ params })
     activate Application
-    Request->>HTTP: apiRequest({ method: 'patch', url, data/params })
-    HTTP->>Transport: envía PATCH /api/warehouse/wastes/:id/stock
+    Request->>HTTP: apiRequest({ method: 'get', url, params })
+    HTTP->>Transport: descarga GET /api/warehouse/reports/wastes/excel
     Transport-->>HTTP: status HTTP y payload del endpoint
     HTTP-->>Request: respuesta o error normalizado
     Request-->>Application: resultado del request
@@ -32,3 +35,5 @@ sequenceDiagram
     end
     deactivate Application
 ```
+
+<a id="cu-cat-24"></a>

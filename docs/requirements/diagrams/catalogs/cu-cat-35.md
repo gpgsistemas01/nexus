@@ -1,8 +1,8 @@
-# `CU-CAT-35` — Editar presentación
+# `CU-CAT-35` — Crear unidad de medida
 
 ```mermaid
 flowchart LR
-    request["Administrador selecciona Editar registro<br/>y confirma Actualizar"] --> authorize["Nexus valida catalogs:manage y presentations"]
-    authorize --> persist["Validar campos y actualizar presentación"]
-    persist --> result["Confirmar y refrescar Presentaciones"]
+    request["Administrador selecciona Nueva unidad de medida<br/>y confirma Guardar"] --> authorize["Nexus valida catalogs:manage y unit-measures"]
+    authorize --> persist["Validar campos y crear unidad de medida"]
+    persist --> result["Confirmar y refrescar Unidades de medida"]
 ```
