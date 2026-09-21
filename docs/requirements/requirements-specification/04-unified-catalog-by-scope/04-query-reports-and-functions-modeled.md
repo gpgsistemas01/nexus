@@ -2,11 +2,11 @@
 
 | ID | Requisito y criterio de aceptación | Estado | Evidencia principal |
 | --- | --- | --- | --- |
-| RF-REP-001 | Un usuario autorizado debe poder consultar movimientos de materiales o mermas con filtros; el filtro de inventario permanece bloqueado hasta elegir proveedor y se limpia cuando éste cambia. | Implementado | `src/routes/api/admin/movementApiRoute.js`, `src/views/pages/admin/movements`, `src/public/js/plugins/datatable/core/filters/tableFilterDependencies.js` |
+| RF-REP-001 | Almacén o Administración deben poder consultar movimientos de materiales o mermas con filtros; el filtro de inventario permanece bloqueado hasta elegir proveedor y se limpia cuando éste cambia. | Parcial | `src/routes/api/admin/movementApiRoute.js`, `src/routes/web/admin/movementWebRoute.js`, `src/constants/permissions.js` |
 | RF-REP-002 | Un usuario autorizado debe poder exportar los reportes registrados para su ámbito con los filtros aplicables. | Implementado | routers `reportApiRoute.js` de los dominios administrativo, comercial y de almacén |
 | RF-REP-003 | El reporte de mermas debe consolidar por nombre, proveedor y ancho; el largo también debe separar grupos excepto para la presentación `ROLLO`. | Implementado | `src/controllers/api/warehouse/reportController.js`, `src/services/warehouse/reportService.js` |
 | RF-REP-004 | Los archivos Excel deben incluir fórmulas en los valores derivados de otras celdas y conservar el resultado calculado por el dominio. | Implementado | `src/utils/reportExcelUtils.js`, `src/controllers/api/warehouse/reportController.js`, `src/controllers/api/admin/reportController.js` |
-| RF-REP-005 | Un usuario autorizado debe poder exportar los movimientos ofrecidos por la consulta conservando su ámbito y filtros aplicables. | Implementado | `src/routes/api/admin/movementApiRoute.js`, `src/views/pages/admin/movements` |
+| RF-REP-005 | Almacén o Administración deben poder exportar los movimientos ofrecidos por la consulta conservando su ámbito y filtros aplicables. | Parcial | `src/routes/api/admin/reportApiRoute.js`, `src/routes/web/admin/movementWebRoute.js`, `src/constants/permissions.js` |
 | RF-REP-006 | El reporte de mermas debe presentar como total de cada grupo la suma del stock de sus existencias. | Implementado | `src/services/warehouse/reportService.js` |
 | RF-REP-007 | La exportación de mermas debe incluir todos los grupos y el total general en una sola hoja denominada `Mermas`. | Implementado | `src/controllers/api/warehouse/reportController.js` |
 | RF-REP-008 | Antes de exportar inventario de materiales o mermas, el usuario debe poder incluir registros activos o con existencia, sólo activos o sólo registros con existencia; la opción elegida debe combinarse con los filtros visibles. | Implementado | `src/public/js/ui/reportExportDialog.js`, `src/services/warehouse/reportService.js` |
@@ -23,3 +23,9 @@
 | RF-REQ-001 | Una reimplementación de requisiciones debe permanecer fuera del alcance vigente hasta definir y aprobar nuevamente su comportamiento, autorización, persistencia y pruebas. | Fuera del alcance actual | `prisma/migrations/20260827000000_remove_purchase_requisitions/migration.sql` |
 | RF-PRJ-001 | Administración debe poder mantener proyectos cuando se registre un CRUD autorizado para esa capacidad. | Modelado | modelo `Project` |
 | RF-PRJ-002 | Almacén debe poder seleccionar un proyecto como contexto de salida cuando se defina el flujo funcional correspondiente. | Modelado | modelo `Project` |
+
+`RF-REP-001` y `RF-REP-005` permanecen parciales porque la consulta y la exportación
+de movimientos sólo están disponibles actualmente para el Administrador del sistema del
+área Sistemas. El Personal de almacén aún no puede iniciar `CU-ALM-07`, `CU-ALM-08`,
+`CU-ALM-14` ni `CU-ALM-15`, aunque la operación de inventario forme parte de sus
+responsabilidades definidas.
