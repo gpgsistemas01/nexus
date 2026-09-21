@@ -12,13 +12,13 @@ individuales ni una secuencia técnica.
 ```mermaid
 flowchart LR
     warehouse["Personal de almacén y proveduría<br/>Actor operativo"]
-    administration["Administración del sistema<br/>Actor administrativo"]
+    systems["Área Sistemas<br/>Administrador del sistema"]
     management["Coordinación y dirección<br/>Parte interesada de supervisión"]
     nexus["Nexus<br/>Sistema de control operativo"]
     supabase[("Supabase<br/>Servicio externo de PostgreSQL")]
 
     warehouse -->|"Registra y consulta la operación<br/>de inventario"| nexus
-    administration -->|"Administra accesos, personas,<br/>catálogos y ajustes protegidos"| nexus
+    systems -->|"Administra accesos, personas,<br/>catálogos y ajustes protegidos"| nexus
     management -->|"Consulta trazabilidad,<br/>reportes e indicadores"| nexus
     nexus -->|"Persiste y consulta<br/>datos operativos"| supabase
 ```
