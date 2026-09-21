@@ -90,9 +90,9 @@ destino fuera otro caso de uso, no se redactaría como un salto de control infor
   por sí misma inclusión, extensión ni una llamada entre casos. Cuando una consulta
   presenta operaciones de mantenimiento, su acción prioritaria cierra el flujo principal
   y dispara el caso siguiente; las demás acciones se documentan como alternativas. El
-  actor **termina la consulta** y luego **inicia** el caso seleccionado. Ambos objetivos
-  permanecen independientes y el segundo vuelve a
-  comprobar sus precondiciones y autorización.
+  actor ejecuta el **disparador documentado en la ficha del caso siguiente** y termina
+  la consulta; después, **Nexus inicia** el caso seleccionado. Ambos objetivos permanecen
+  independientes y el segundo vuelve a comprobar sus precondiciones y autorización.
 - `«include»` identifica un caso requerido que el caso base incorpora siempre; al
   concluir, la interacción continúa en el paso siguiente a la inclusión.
 - `«extend»` identifica comportamiento opcional que se inserta en un punto de extensión
