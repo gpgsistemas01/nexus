@@ -31,12 +31,12 @@ con instalar la extensión de Playwright para Visual Studio Code.
 
 ## Contenido
 
-1. [1. Estructura exportable](01-estructura-exportable.md)
-2. [2. Enlaces e imágenes](02-enlaces-e-imagenes.md)
-3. [3. Preparar las herramientas](03-preparar-las-herramientas.md)
-4. [4. Comandos](04-comandos.md)
-5. [5. Volver a generar documentos existentes](05-volver-a-generar-documentos-existentes.md)
-6. [6. Flujo general de exportación](06-flujo-general-de-exportacion.md)
-7. [7. Exportar los manuales](07-exportar-los-manuales.md)
-8. [8. Actualizar las capturas del manual](08-actualizar-las-capturas-del-manual.md)
-9. [9. Ejemplos de exportación](09-ejemplos-de-exportacion.md)
+1. [1. Estructura exportable](01-structure-exportable.md)
+2. [2. Enlaces e imágenes](02-links-and-images.md)
+3. [3. Preparar las herramientas](03-prepare-the-tools.md)
+4. [4. Comandos](04-commands.md)
+5. [5. Volver a generar documentos existentes](05-regenerate-to-generate-documents-existing.md)
+6. [6. Flujo general de exportación](06-flow-general-of-export.md)
+7. [7. Exportar los manuales](07-export-the-manuals.md)
+8. [8. Actualizar las capturas del manual](08-update-the-screenshots-of-the-manual.md)
+9. [9. Ejemplos de exportación](09-examples-of-export.md)

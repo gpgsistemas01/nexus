@@ -9,7 +9,7 @@
 
 1. Seleccione **Exportar Excel** para abrir el modal **Exportar reporte**. Antes de continuar, compruebe que la pantalla mostrada coincida con la captura:
 
-   ![CAP-REP-ENT-05-EXPORT: exportar reporte](../../images/compras/05-exportar-reporte.png)
+   ![CAP-REP-ENT-05-EXPORT: exportar reporte](../../images/purchases/05-export-report.png)
 
 2. Elija **Mes actual**, **Otro mes** o **Personalizado: usar filtros aplicados** y complete **Mes del reporte** cuando corresponda.
 3. Seleccione **Descargar** para generar el archivo.

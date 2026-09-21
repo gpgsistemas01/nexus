@@ -36,9 +36,9 @@ en lugar de redibujarla.
 
 ## Capítulos
 
-1. [1. Mantenimiento y fuentes](01-mantenimiento-y-fuentes.md)
-2. [2. Arquitectura del sistema](02-arquitectura-del-sistema.md)
-3. [3. Vistas web relacionadas](03-vistas-web-relacionadas.md)
-4. [4. Organización consistente de front y back](04-organizacion-consistente-de-front-y-back.md)
-5. [5. Modelo de vistas de arquitectura aplicado](05-modelo-de-vistas-de-arquitectura-aplicado.md)
-6. [6. Herramientas](06-herramientas.md)
+1. [1. Mantenimiento y fuentes](01-maintenance-and-sources.md)
+2. [2. Arquitectura del sistema](02-architecture-of-the-system.md)
+3. [3. Vistas web relacionadas](03-views-web-related.md)
+4. [4. Organización consistente de front y back](04-organization-consistent-of-frontend-and-back.md)
+5. [5. Modelo de vistas de arquitectura aplicado](05-model-of-views-of-architecture-applied.md)
+6. [6. Herramientas](06-tools.md)

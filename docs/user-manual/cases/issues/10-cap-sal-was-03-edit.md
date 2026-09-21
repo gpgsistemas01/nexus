@@ -9,7 +9,7 @@
 
 1. En la fila de la salida, seleccione **Editar registro**. Antes de continuar, compruebe que la pantalla mostrada coincida con la captura:
 
-   ![CAP-SAL-WAS-03-EDIT: edicion encabezado](../../images/salidas-merma/03-edicion-encabezado.png)
+   ![CAP-SAL-WAS-03-EDIT: edicion encabezado](../../images/waste-issues/03-edit-header.png)
 
 2. Modifique los selectores y campos indicados. Mientras la salida esté pendiente, también puede
    usar **Buscar merma...**, **Cantidad** y **Agregar** para incorporar detalles; después del primer

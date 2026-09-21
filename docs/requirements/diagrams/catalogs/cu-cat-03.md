@@ -2,6 +2,7 @@
 
 ```mermaid
 flowchart LR
+    accTitle: CU-CAT-03 — Editar proveedor
     request["Actor solicita editar proveedor"] --> validate["Nexus valida permiso, datos y relaciones"]
     validate --> result["Nexus responde: Actualización de datos admitidos."]
 ```

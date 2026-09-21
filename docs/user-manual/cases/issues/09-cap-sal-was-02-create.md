@@ -9,7 +9,7 @@
 
 1. Seleccione **Nueva salida** para abrir el formulario. Antes de continuar, compruebe que la pantalla mostrada coincida con la captura:
 
-   ![CAP-SAL-WAS-02-CREATE: formulario registro](../../images/salidas-merma/02-formulario-registro.png)
+   ![CAP-SAL-WAS-02-CREATE: formulario registro](../../images/waste-issues/02-form-registration.png)
 
 2. Elija opciones en **Buscar cliente...**, **Buscar asesor...**, **Buscar área...** y **Buscar solicitante...**.
 3. Complete **Número de proyecto**, **Fecha y hora de solicitud** y **Observaciones**.

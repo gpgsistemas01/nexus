@@ -9,7 +9,7 @@
 
 1. En la fila de la persona, seleccione **Editar registro**. Antes de continuar, compruebe que la pantalla mostrada coincida con la captura:
 
-   ![CAP-IDA-PER-03-EDIT: formulario edicion](../../images/personas/03-formulario-edicion.png)
+   ![CAP-IDA-PER-03-EDIT: formulario edicion](../../images/people/03-form-edit.png)
 
 2. Modifique **Nombre completo** si corresponde.
 3. Use los selectores **Buscar área...** y **Buscar rol...**, el botón **Agregar** y los controles de accesos existentes para dejar sólo los accesos autorizados.

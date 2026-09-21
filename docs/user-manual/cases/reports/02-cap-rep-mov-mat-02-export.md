@@ -9,7 +9,7 @@
 
 1. Seleccione **Exportar Excel** para abrir el modal **Exportar reporte**. Antes de continuar, compruebe que la pantalla mostrada coincida con la captura:
 
-   ![CAP-REP-MOV-MAT-02-EXPORT: exportar reporte](../../images/movimientos-material/02-exportar-reporte.png)
+   ![CAP-REP-MOV-MAT-02-EXPORT: exportar reporte](../../images/material-movements/02-export-report.png)
 
 2. Elija **Mes actual**, **Otro mes** o **Personalizado: usar filtros aplicados** y complete **Mes del reporte** cuando corresponda.
 3. Seleccione **Descargar** para generar el archivo.

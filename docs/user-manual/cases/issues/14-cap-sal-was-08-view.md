@@ -7,6 +7,6 @@
 2. Compruebe que el encabezado, los detalles y las acciones permanezcan deshabilitados, como en la
    captura:
 
-   ![CAP-SAL-WAS-08-VIEW: consulta de salida de merma cancelada](../../images/salidas-merma/08-consulta-cancelada.png)
+   ![CAP-SAL-WAS-08-VIEW: consulta de salida de merma cancelada](../../images/waste-issues/08-query-cancelled.png)
 
 3. Use **Regresar** para cerrar el formulario sin cambios.

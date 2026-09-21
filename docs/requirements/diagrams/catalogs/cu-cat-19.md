@@ -2,6 +2,7 @@
 
 ```mermaid
 flowchart LR
+    accTitle: CU-CAT-19 — Crear unidad de medida
     request["Administrador selecciona Nueva unidad de medida<br/>y confirma Guardar"] --> authorize["Nexus valida catalogs:manage y unit-measures"]
     authorize --> persist["Validar campos y crear unidad de medida"]
     persist --> result["Confirmar y refrescar Unidades de medida"]

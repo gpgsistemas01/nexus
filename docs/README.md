@@ -11,9 +11,10 @@ vista concreta sin sustituirlo. Los artefactos generados son evidencia técnica 
 fuente versionada; pertenecen a una familia, pero no contienen decisiones curadas.
 
 Cada familia tiene una carpeta propia para que su ubicación también comunique su
-responsabilidad. Como rutas técnicas del repositorio, los nombres de estas carpetas se
-mantienen en inglés; los títulos, el contenido y los nombres de los paquetes exportables se
-presentan en español:
+responsabilidad. Como rutas técnicas del repositorio, los nombres de carpetas y archivos
+se mantienen en inglés; `index.md`, `README.md` y los identificadores estables como
+`cu-cat-01.md` se conservan por convención. Los títulos, el contenido y los nombres de
+los paquetes exportables se presentan en español:
 
 ```text
 docs/
@@ -79,7 +80,7 @@ arquitectónico mediante la matriz de trazabilidad.
 
 ## Regla de actualización
 
-La [matriz de criterios para actualizar documentación y sistema](governance/documentation-practices/08-criterios-para-actualizar-documentacion-y-sistema.md)
+La [matriz de criterios para actualizar documentación y sistema](governance/documentation-practices/08-criteria-for-update-documentation-and-system.md)
 determina si un hallazgo exige modificar sólo documentación, sólo implementación o ambas.
 Las reglas siguientes indican cómo validar el resultado una vez clasificado:
 

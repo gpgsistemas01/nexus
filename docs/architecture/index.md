@@ -34,9 +34,9 @@ Ambas vistas se conectan mediante la
 
 ## Forma arquitectónica y criterios normativos
 
-El [modelo de vistas aplicado](architecture-and-web-views/05-modelo-de-vistas-de-arquitectura-aplicado.md)
+El [modelo de vistas aplicado](architecture-and-web-views/05-model-of-views-of-architecture-applied.md)
 es la fuente propietaria del enfoque Viewpoint/View, su adaptación de 4+1 y el apoyo de
-los niveles de C4. Los [criterios documentales](../governance/documentation-standards/03-aplicacion-por-tipo-de-documento.md)
+los niveles de C4. Los [criterios documentales](../governance/documentation-standards/03-application-by-type-of-document.md)
 determinan qué orientan ISO/IEC/IEEE 42010, 29148, 1016 y 15289, qué entrega conserva cada
 contenido y los límites de la adopción. Este índice sólo dirige a esas decisiones: no
 mantiene otra versión de las normas ni del modelo de vistas.

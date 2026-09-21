@@ -2,6 +2,7 @@
 
 ```mermaid
 flowchart TD
+    accTitle: CU-ALM-11 — Editar merma
     request["Actor solicita editar merma"] --> validate["Nexus valida permiso, datos y relaciones"]
     validate --> active{"¿Cambió Activo?"}
     active -->|No| result["Actualizar datos admitidos<br/>sin alterar identidad física"]

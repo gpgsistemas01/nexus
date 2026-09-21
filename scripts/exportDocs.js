@@ -70,7 +70,7 @@ const MANUALS = Object.freeze({
             autenticacion: manualPart(administrator, manualCases.authentication),
             'identidad-y-acceso': manualPart(administrator, manualCases['identity-access']),
             catalogos: manualPart(administrator, manualCaseFiles('catalogs', [
-                '01-catalogos-auxiliares.md'
+                '01-catalogs-auxiliary.md'
             ]))
         }
     },
@@ -152,7 +152,7 @@ const MANIFESTS = Object.freeze({
         ...getDirectoryDocuments('docs/architecture/diagram-inventory'),
         ...getDirectoryDocuments('docs/architecture/coding-standards'),
         'docs/architecture/decisions/index.md',
-        'docs/architecture/decisions/ADR-001-secuencias-por-perspectiva-y-grupo.md'
+        'docs/architecture/decisions/ADR-001-sequences-by-perspective-and-group.md'
     ],
     pruebas: [
         'docs/testing/test-plan.md',
