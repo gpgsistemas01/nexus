@@ -2,7 +2,7 @@
 
 ```mermaid
 sequenceDiagram
-    actor Admin as Administración
+    actor Admin as Administrador del sistema
     participant Controller as userController
     participant Service as userService
     participant Person as personService

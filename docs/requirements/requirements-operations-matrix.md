@@ -24,11 +24,11 @@ permiso se agrupan. Los valores de permiso son los declarados en
 
 | Área / contexto | Operaciones y permiso API | Estado |
 | --- | --- | --- |
-| Administración / personas | `L → persons:read`; `C, U → persons:write`; exportar `→ person:reports-read` | Implementado |
-| Administración / usuarios | `L, C, U, cambiar contraseña/accesos → users:manage`; exportar `→ admin:reports-read` | Implementado |
-| Administración / catálogos auxiliares | `L, C, U` de áreas, roles, presentaciones, unidades de medida, motivos de ajuste y estados de cumplimiento `→ catalogs:manage` | Implementado; acceso exclusivo del administrador del sistema del área Sistemas |
+| Sistemas / personas | `L → persons:read`; `C, U → persons:write`; exportar `→ person:reports-read` | Implementado |
+| Sistemas / usuarios | `L, C, U, cambiar contraseña/accesos → users:manage`; exportar `→ admin:reports-read` | Implementado |
+| Sistemas / catálogos auxiliares | `L, C, U` de áreas, roles, presentaciones, unidades de medida, motivos de ajuste y estados de cumplimiento `→ catalogs:manage` | Implementado; acceso exclusivo del Administrador del sistema del área Sistemas |
 | Formularios operativos / roles y departamentos | `L → roles:read`, `departments:read` | Implementado sólo lectura |
-| Administración / clientes | `L → clients:read`; `C → clients:create`; `U → clients:update`; exportar `→ client:reports-read` | Parcial; el Personal de almacén aún no dispone del recorrido de consulta y alta definido en `CU-CAT-05` y `CU-CAT-06` |
+| Sistemas / clientes | `L → clients:read`; `C → clients:create`; `U → clients:update`; exportar `→ client:reports-read` | Parcial; el Personal de almacén aún no dispone del recorrido de consulta y alta definido en `CU-CAT-05` y `CU-CAT-06` |
 | Contexto pendiente / proyectos | Sin rutas API CRUD ni permiso registrado | Modelado |
 | Almacén / materiales | `L → materials:read`; costo en la consulta `→ inventory:costs-read`; `C, U, D → materials:write`; ajustar existencia `→ materials:adjust-stock`; exportar inventario `→ warehouse:reports-read` | Implementado |
 | Almacén / merma | `L → wastes:read`; costo en la consulta `→ inventory:costs-read`; `C, U → wastes:write`; ajustar existencia `→ wastes:adjust-stock`; exportar `→ warehouse:reports-read` | Implementado |
@@ -40,7 +40,7 @@ permiso se agrupan. Los valores de permiso son los declarados en
 | Compras / entradas | `L, C, U encabezado, corregir detalle, cancelar detalle → goods:receipts-manage`; exportar `→ warehouse:reports-read` | Implementado |
 | Salidas / material | `L, C, U documento/encabezado → goods:issues-manage`; actualizar detalles y devolver `→ goods:issue-details-manage`; exportar `→ warehouse:reports-read` | Implementado |
 | Salidas / merma | `L, C, U documento/encabezado → waste:issues-manage`; suministrar detalles y devolver `→ waste:issues-supply`; exportar `→ warehouse:reports-read` | Implementado |
-| Inventario / movimientos | `L material y merma → movements:read`; exportar `→ admin:reports-read` | Parcial; el Personal de almacén aún no puede consultar ni exportar movimientos como establecen `CU-ALM-07`, `CU-ALM-08`, `CU-ALM-14` y `CU-ALM-15` |
+| Inventario / movimientos | `L material y merma → movements:read`; exportar `→ admin:reports-read` | Implementado para el Administrador del sistema del área Sistemas; el Personal de almacén no tiene acceso a este módulo |
 | Inventario / ajustes de material y merma | Sin rutas API completas; existen modelos y servicios parciales para crear, aprobar/aplicar y cancelar | Parcial |
 | Abastecimiento / requisiciones | Módulo retirado del código y del esquema vigente; requiere un nuevo alcance antes de reimplementarse | Fuera del alcance actual |
 

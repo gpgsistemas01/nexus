@@ -63,7 +63,7 @@ inicia o recibe una interacción. Navegador, EJS, router, controller, servicio y
 datos son `participant`. Una secuencia técnica puede omitir al actor humano cuando su
 límite empieza en HTTP y enlaza el `CU-*` que ya lo identifica; una secuencia de
 experiencia completa sí debe mostrar el actor canónico del caso. No se cambia el actor
-por «Usuario» si el requisito distingue Almacén de Administración.
+por «Usuario» si el requisito distingue al Personal de almacén del Administrador del sistema.
 
 Los participantes de las secuencias técnicas combinan la figura de Mermaid con una
 etiqueta sólo cuando hace falta aportar semántica que la figura no posee. La figura

@@ -1,6 +1,6 @@
 # Casos: Consultas y reportes
 
-Cada procedimiento identifica sus casos de uso, controles, errores posibles y captura de referencia.
+Cada procedimiento identifica sus casos de uso, controles, errores posibles y captura de referencia. Este módulo y sus dos accesos del menú son exclusivos del **Administrador del sistema** del área Sistemas; el Personal de almacén no puede consultar ni exportar movimientos actualmente.
 
 ## Capítulos
 

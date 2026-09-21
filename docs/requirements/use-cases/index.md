@@ -41,15 +41,13 @@ Cada caso emplea la misma tabla de dos columnas y conserva dentro de ella toda l
 información que permite recorrer su objetivo sin consultar una segunda descripción:
 
 - **Identificador y nombre:** identidad estable y objetivo observable.
-- **Actor y disparador:** responsable que inicia el caso y necesidad que lo activa.
-- **Participación de actores y sistema:** acciones que realiza el actor y respuestas,
-  validaciones o escrituras que Nexus ejecuta durante la interacción.
+- **Actor:** responsable que inicia el caso.
+- **Disparador:** necesidad o evento observable que activa el caso. Estas dos secciones permanecen separadas para no confundir quién participa con el motivo de inicio.
 - **Precondiciones:** lista numerada de estados que deben existir antes del primer paso;
   cada condición se registra por separado y no se confunde con una acción de validación
   ni con un resultado obtenido durante el flujo.
 - **Flujo principal:** interacción numerada paso a paso; cada paso identifica un solo
-  participante y una acción observable. Capturar, confirmar, validar, persistir y
-  presentar el resultado se separan cuando ocurren en momentos distintos. Se nombran el botón, enlace o acción que dispara cada transición; el formulario,
+  participante y una acción observable. Los turnos alternan entre actor y Nexus; cuando varias acciones consecutivas corresponden al mismo participante, se integran en un solo paso. Capturar filas de una tabla describe además la acción **Agregar** y la revisión de cada renglón, no sólo la captura genérica. Toda consulta o escritura identifica la interacción con la base de datos y remite a su excepción técnica. Se nombran el botón, enlace o acción que dispara cada transición; el formulario,
   diálogo o tabla que abre Nexus; los mensajes de confirmación o error; y la validación
   y conservación del resultado cuando forman parte del caso. Expresiones pasivas como
   «revisa» o «verifica el resultado» no sustituyen una interacción observable. El paso
@@ -64,8 +62,7 @@ información que permite recorrer su objetivo sin consultar una segunda descripc
   En los casos de consulta que preceden a operaciones de mantenimiento, el flujo
   principal termina con la acción de alta por ser la continuación prioritaria y esa
   selección constituye el disparador del caso siguiente. Permanecer en la consulta y
-  elegir las demás acciones se documentan como alternativas; no se crea una sección de
-  continuaciones asociadas para esas decisiones.
+  elegir cada una de las demás acciones se documenta como un flujo alternativo independiente y no ambiguo; no se agrupan destinos distintos bajo «Elegir otra acción» ni se crea una sección de continuaciones asociadas.
 - **Excepciones:** título breve, punto de rechazo o fallo y serie numerada de pasos que
   describe el efecto protegido y la terminación del caso. Su secuencia respeta la misma
   alternancia de participantes definida para los flujos alternativos.

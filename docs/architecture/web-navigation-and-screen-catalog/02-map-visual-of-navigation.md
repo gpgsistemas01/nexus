@@ -79,6 +79,7 @@ flowchart TB
 
     menu --> warehouse(["Almacén"])
     warehouse --> materials["Materiales<br/>/almacen/materiales"]
+    warehouse --> consumables["Consumibles<br/>/almacen/consumibles"]
     warehouse --> wastes["Mermas<br/>/almacen/mermas"]
 
     menu --> purchases["Compras<br/>/compras"]
@@ -92,12 +93,22 @@ flowchart TB
     movements --> wasteMovements["Mermas<br/>/movimientos/mermas"]
 
     menu --> users["Usuarios<br/>/usuarios-sistemas"]
+    menu --> catalogs(["Catálogos"])
+    catalogs --> departments["Áreas<br/>/catalogos/departments"]
+    catalogs --> roles["Roles<br/>/catalogos/roles"]
+    catalogs --> presentations["Presentaciones<br/>/catalogos/presentations"]
+    catalogs --> units["Unidades de medida<br/>/catalogos/unit-measures"]
+    catalogs --> reasons["Motivos de ajuste<br/>/catalogos/reasons"]
+    catalogs --> fulfillment["Estados de cumplimiento<br/>/catalogos/fulfillment-statuses"]
     menu --> persons["Personas<br/>/personas"]
     menu --> clients["Clientes<br/>/clientes"]
     menu --> suppliers["Proveedores<br/>/proveedores"]
 ```
 
-La ruta `/movimientos` redirige a `/movimientos/materiales`; los alias históricos se
+Los dos accesos de **Movimientos** requieren `movements:read`, permiso asignado
+actualmente sólo al **Administrador del sistema** del área Sistemas. Los seis accesos
+de **Catálogos** requieren `catalogs:manage` y tienen el mismo actor exclusivo. La ruta
+`/movimientos` redirige a `/movimientos/materiales`; los alias históricos se
 documentan en [Redirecciones de compatibilidad](03-catalog-of-screens.md#redirecciones-de-compatibilidad). No
 se dibujan los modales CRUD como páginas porque reutilizan el contexto de su pantalla
 propietaria y no registran rutas web independientes.

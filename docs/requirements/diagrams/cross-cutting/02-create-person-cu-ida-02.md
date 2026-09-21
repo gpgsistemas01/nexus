@@ -2,7 +2,7 @@
 
 ```mermaid
 sequenceDiagram
-    actor Admin as Administración
+    actor Admin as Administrador del sistema
     participant Route as personApiRoute
     participant Validation as personValidation
     participant Controller as personController
