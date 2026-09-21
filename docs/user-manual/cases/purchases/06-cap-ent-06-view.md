@@ -7,6 +7,6 @@
 2. Compruebe que el formulario, sus detalles y sus acciones permanezcan en modo consulta, como en
    la captura:
 
-   ![CAP-ENT-06-VIEW: consulta de compra cancelada](../../images/compras/06-consulta-cancelada.png)
+   ![CAP-ENT-06-VIEW: consulta de compra cancelada](../../images/purchases/06-query-cancelled.png)
 
 3. Use **Regresar** para cerrar el formulario; una compra cancelada no admite nuevos cambios.

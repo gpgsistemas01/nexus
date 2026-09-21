@@ -9,7 +9,7 @@
 
 1. En la fila de la cuenta, seleccione la acción **Editar registro**. Antes de continuar, compruebe que la pantalla mostrada coincida con la captura:
 
-   ![CAP-IDA-USR-03-EDIT: formulario edicion](../../images/usuarios/03-formulario-edicion.png)
+   ![CAP-IDA-USR-03-EDIT: formulario edicion](../../images/users/03-form-edit.png)
 
 2. Revise los selectores **Buscar área...** y **Buscar rol...**, y modifique el campo **Usuario** si
    corresponde. La **Contraseña** permanece deshabilitada y sólo se modifica mediante **Cambiar

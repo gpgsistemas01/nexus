@@ -13,7 +13,7 @@ un propósito, alcance, semántica y fuente de verdad definidos.
 ## Vista de requisitos y dependencias
 
 Esta vista contiene **requisitos**, no actores ni casos de uso. Las operaciones del
-usuario se muestran exclusivamente en el [diagrama de casos de uso](../domain-and-use-cases/03-casos-de-uso-vigentes.md). Una flecha `A --> B` significa que el cumplimiento de `A`
+usuario se muestran exclusivamente en el [diagrama de casos de uso](../domain-and-use-cases/03-cases-of-use-current.md). Una flecha `A --> B` significa que el cumplimiento de `A`
 depende de `B`; no representa navegación, permiso ni interacción humana.
 
 ```mermaid
@@ -41,7 +41,7 @@ flowchart LR
 ```
 
 El texto verificable y el estado de cada identificador se mantienen una sola vez en la
-[especificación](../requirements-specification/04-catalogo-unificado-por-ambito/index.md#4-catálogo-unificado-por-ámbito). La
+[especificación](../requirements-specification/04-unified-catalog-by-scope/index.md#4-catálogo-unificado-por-ámbito). La
 [matriz de operaciones](../requirements-operations-matrix.md#matriz-vigente) documenta los
 permisos, y el mapa generado documenta las rutas; repetirlos aquí mezclaría vistas.
 

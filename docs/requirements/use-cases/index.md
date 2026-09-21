@@ -3,7 +3,7 @@
 ## Propósito y alcance
 
 Este catálogo desarrolla los objetivos representados en el
-[diagrama de casos de uso](../domain-and-use-cases/03-casos-de-uso-vigentes.md). Agrupa los
+[diagrama de casos de uso](../domain-and-use-cases/03-cases-of-use-current.md). Agrupa los
 casos que comparten tema, actor, ciclo CRUD o efectos de inventario para revisar sus
 semejanzas sin crear un documento por módulo.
 

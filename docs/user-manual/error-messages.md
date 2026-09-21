@@ -165,7 +165,7 @@ conserve la dirección y repórtela. No modifique manualmente la URL para intent
 área.
 
 La captura automatizada tiene el ID `CAP-ERR-404-NOT-FOUND` y la ruta
-`docs/user-manual/images/errores/01-pagina-no-encontrada.png`. Se incorpora al manual únicamente
+`docs/user-manual/images/errors/01-page-not-found.png`. Se incorpora al manual únicamente
 después de generar y revisar la imagen real.
 
 Una petición técnica a una ruta de API inexistente recibe el mensaje **Ruta no encontrada.** en

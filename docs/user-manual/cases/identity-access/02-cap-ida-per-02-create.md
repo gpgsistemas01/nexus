@@ -9,7 +9,7 @@
 
 1. Seleccione el botón **Nueva persona** para abrir el formulario. Antes de continuar, compruebe que la pantalla mostrada coincida con la captura:
 
-   ![CAP-IDA-PER-02-CREATE: formulario alta](../../images/personas/02-formulario-alta.png)
+   ![CAP-IDA-PER-02-CREATE: formulario alta](../../images/people/02-form-creation.png)
 
 2. Complete el campo **Nombre completo**.
 3. Elija opciones en **Buscar área...** y **Buscar rol...**, y seleccione **Agregar** para incorporar cada acceso requerido.

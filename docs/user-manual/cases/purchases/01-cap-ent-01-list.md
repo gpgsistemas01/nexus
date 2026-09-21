@@ -9,7 +9,7 @@
 
 1. Abra **Filtros** y compruebe que los controles desplegados coincidan con la captura:
 
-   ![CAP-ENT-01-LIST: listado](../../images/compras/01-listado.png)
+   ![CAP-ENT-01-LIST: listado](../../images/purchases/01-list.png)
 
 2. Escriba un término en **Buscar por Folio o N° Factura** o complete **Fecha de inicio:**, **Fecha de fin:**, **Proveedor:** y **Persona que recibe:**.
 3. Seleccione **Buscar / filtrar** para actualizar la tabla; use **Limpiar filtros** para restablecerla.

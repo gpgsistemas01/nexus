@@ -7,7 +7,7 @@ identificador permite relacionarla con uno o más casos de uso sin depender del 
 archivo. Ese mismo identificador se publica como ancla junto a la imagen en los
 [procedimientos del manual](procedures.md), de modo que puede citarse como, por ejemplo,
 `cases/catalogs/04-cap-cat-mat-02-create.md#CAP-CAT-MAT-02-CREATE`. La ruta conserva el patrón
-`images/<módulo>/NN-descripcion.png`: `NN` expresa el orden
+`images/<módulo>/NN-description.png`: `NN` expresa el orden
 en que el lector recorre el módulo, desde el listado hacia la captura de datos, la edición, las
 operaciones que modifican existencias y, al final, la exportación.
 
@@ -27,91 +27,91 @@ comprobar el inventario sin iniciar Nexus ni Playwright se ejecuta
 
 | Orden | ID | Ruta | Casos de uso |
 |---:|---|---|---|
-| 1 | `CAP-AUT-01-LOGIN` | `docs/user-manual/images/acceso/01-inicio-sesion.png` | `CU-AUT-01` |
-| 2 | `CAP-AUT-02-MENU` | `docs/user-manual/images/acceso/02-menu-principal.png` | `CU-AUT-02` |
-| 3 | `CAP-CAT-MAT-00-NAVIGATION` | `docs/user-manual/images/materiales/00-acceso-menu-principal.png` | `CU-ALM-01` |
-| 4 | `CAP-CAT-MAT-01-LIST` | `docs/user-manual/images/materiales/01-listado-inventario.png` | `CU-ALM-01`, `CU-ALM-06` |
-| 5 | `CAP-CAT-MAT-02-CREATE` | `docs/user-manual/images/materiales/02-formulario-alta.png` | `CU-ALM-02` |
-| 6 | `CAP-CAT-MAT-03-EDIT` | `docs/user-manual/images/materiales/03-formulario-edicion.png` | `CU-ALM-03`, `CU-ALM-04` |
-| 7 | `CAP-CAT-MAT-04-STOCK` | `docs/user-manual/images/materiales/04-ajuste-existencia.png` | `CU-ALM-05` |
-| 8 | `CAP-REP-MAT-05-EXPORT` | `docs/user-manual/images/materiales/05-exportar-reporte.png` | `CU-ALM-06` |
-| 9 | `CAP-CAT-SUP-00-NAVIGATION` | `docs/user-manual/images/proveedores/00-acceso-menu-principal.png` | `CU-CAT-01` |
-| 10 | `CAP-CAT-SUP-01-LIST` | `docs/user-manual/images/proveedores/01-listado.png` | `CU-CAT-01`, `CU-CAT-04` |
-| 11 | `CAP-CAT-SUP-02-CREATE` | `docs/user-manual/images/proveedores/02-formulario-alta.png` | `CU-CAT-02` |
-| 12 | `CAP-CAT-SUP-03-EDIT` | `docs/user-manual/images/proveedores/03-formulario-edicion-y-estado.png` | `CU-CAT-03`, `CU-CAT-04` |
-| 13 | `CAP-CAT-SUP-04-EXPORT` | `docs/user-manual/images/proveedores/04-exportar-reporte.png` | `CU-CAT-04` |
-| 14 | `CAP-CAT-CLI-00-NAVIGATION` | `docs/user-manual/images/clientes/00-acceso-menu-principal.png` | `CU-CAT-05` |
-| 15 | `CAP-CAT-CLI-01-LIST` | `docs/user-manual/images/clientes/01-listado.png` | `CU-CAT-05`, `CU-CAT-08` |
-| 16 | `CAP-CAT-CLI-02-CREATE` | `docs/user-manual/images/clientes/02-formulario-alta.png` | `CU-CAT-06` |
-| 17 | `CAP-CAT-CLI-03-EDIT` | `docs/user-manual/images/clientes/03-formulario-edicion.png` | `CU-CAT-07` |
-| 18 | `CAP-CAT-CLI-04-EXPORT` | `docs/user-manual/images/clientes/04-exportar-reporte.png` | `CU-CAT-08` |
-| 19 | `CAP-CAT-WAS-00-NAVIGATION` | `docs/user-manual/images/mermas/00-acceso-menu-principal.png` | `CU-ALM-09` |
-| 20 | `CAP-CAT-WAS-01-LIST` | `docs/user-manual/images/mermas/01-listado-inventario.png` | `CU-ALM-09`, `CU-ALM-13` |
-| 21 | `CAP-CAT-WAS-02-CREATE` | `docs/user-manual/images/mermas/02-formulario-registro.png` | `CU-ALM-10` |
-| 22 | `CAP-CAT-WAS-03-EDIT` | `docs/user-manual/images/mermas/03-formulario-edicion.png` | `CU-ALM-11` |
-| 23 | `CAP-CAT-WAS-04-STOCK` | `docs/user-manual/images/mermas/04-ajuste-existencia.png` | `CU-ALM-12` |
-| 24 | `CAP-REP-WAS-05-EXPORT` | `docs/user-manual/images/mermas/05-exportar-reporte.png` | `CU-ALM-13` |
-| 25 | `CAP-CAT-AREA-01-LIST` | `docs/user-manual/images/catalogos/areas/01-listado.png` | `CU-CAT-09` |
-| 26 | `CAP-CAT-AREA-02-CREATE` | `docs/user-manual/images/catalogos/areas/02-formulario-alta.png` | `CU-CAT-10` |
-| 27 | `CAP-CAT-AREA-03-EDIT` | `docs/user-manual/images/catalogos/areas/03-formulario-edicion.png` | `CU-CAT-11` |
-| 28 | `CAP-CAT-ROLE-01-LIST` | `docs/user-manual/images/catalogos/roles/01-listado.png` | `CU-CAT-12` |
-| 29 | `CAP-CAT-ROLE-02-CREATE` | `docs/user-manual/images/catalogos/roles/02-formulario-alta.png` | `CU-CAT-13` |
-| 30 | `CAP-CAT-ROLE-03-EDIT` | `docs/user-manual/images/catalogos/roles/03-formulario-edicion.png` | `CU-CAT-14` |
-| 31 | `CAP-CAT-PRE-01-LIST` | `docs/user-manual/images/catalogos/presentaciones/01-listado.png` | `CU-CAT-15` |
-| 32 | `CAP-CAT-PRE-02-CREATE` | `docs/user-manual/images/catalogos/presentaciones/02-formulario-alta.png` | `CU-CAT-16` |
-| 33 | `CAP-CAT-PRE-03-EDIT` | `docs/user-manual/images/catalogos/presentaciones/03-formulario-edicion.png` | `CU-CAT-17` |
-| 34 | `CAP-CAT-UNIT-01-LIST` | `docs/user-manual/images/catalogos/unidades-medida/01-listado.png` | `CU-CAT-18` |
-| 35 | `CAP-CAT-UNIT-02-CREATE` | `docs/user-manual/images/catalogos/unidades-medida/02-formulario-alta.png` | `CU-CAT-19` |
-| 36 | `CAP-CAT-UNIT-03-EDIT` | `docs/user-manual/images/catalogos/unidades-medida/03-formulario-edicion.png` | `CU-CAT-20` |
-| 37 | `CAP-CAT-REASON-01-LIST` | `docs/user-manual/images/catalogos/motivos-ajuste/01-listado.png` | `CU-CAT-21` |
-| 38 | `CAP-CAT-REASON-02-CREATE` | `docs/user-manual/images/catalogos/motivos-ajuste/02-formulario-alta.png` | `CU-CAT-22` |
-| 39 | `CAP-CAT-REASON-03-EDIT` | `docs/user-manual/images/catalogos/motivos-ajuste/03-formulario-edicion.png` | `CU-CAT-23` |
-| 40 | `CAP-CAT-STATUS-01-LIST` | `docs/user-manual/images/catalogos/estados-cumplimiento/01-listado.png` | `CU-CAT-24` |
-| 41 | `CAP-CAT-STATUS-02-CREATE` | `docs/user-manual/images/catalogos/estados-cumplimiento/02-formulario-alta.png` | `CU-CAT-25` |
-| 42 | `CAP-CAT-STATUS-03-EDIT` | `docs/user-manual/images/catalogos/estados-cumplimiento/03-formulario-edicion.png` | `CU-CAT-26` |
-| 43 | `CAP-ENT-00-NAVIGATION` | `docs/user-manual/images/compras/00-acceso-menu-principal.png` | `CU-ENT-01` |
-| 44 | `CAP-ENT-01-LIST` | `docs/user-manual/images/compras/01-listado.png` | `CU-ENT-01` |
-| 45 | `CAP-ENT-02-CREATE` | `docs/user-manual/images/compras/02-formulario-registro.png` | `CU-ENT-02` |
-| 46 | `CAP-ENT-03-EDIT` | `docs/user-manual/images/compras/03-edicion-compra.png` | `CU-ENT-03`, `CU-ENT-05` |
-| 47 | `CAP-ENT-04-CORRECT` | `docs/user-manual/images/compras/04-correccion-detalle.png` | `CU-ENT-04` |
-| 48 | `CAP-REP-ENT-05-EXPORT` | `docs/user-manual/images/compras/05-exportar-reporte.png` | `CU-ENT-06` |
-| 49 | `CAP-ENT-06-VIEW` | `docs/user-manual/images/compras/06-consulta-cancelada.png` | `CU-ENT-03`, `CU-ENT-05` |
-| 50 | `CAP-SAL-MAT-00-NAVIGATION` | `docs/user-manual/images/salidas-material/00-acceso-menu-principal.png` | `CU-SAL-01` |
-| 51 | `CAP-SAL-MAT-01-LIST` | `docs/user-manual/images/salidas-material/01-listado.png` | `CU-SAL-01` |
-| 52 | `CAP-SAL-MAT-02-CREATE` | `docs/user-manual/images/salidas-material/02-formulario-registro.png` | `CU-SAL-02` |
-| 53 | `CAP-SAL-MAT-03-EDIT` | `docs/user-manual/images/salidas-material/03-edicion-encabezado.png` | `CU-SAL-03`, `CU-SAL-04` |
-| 54 | `CAP-SAL-MAT-04-SUPPLY` | `docs/user-manual/images/salidas-material/04-surtir-detalles.png` | `CU-SAL-05` |
-| 55 | `CAP-SAL-MAT-05-RETURN` | `docs/user-manual/images/salidas-material/05-devolver-detalle.png` | `CU-SAL-06` |
-| 56 | `CAP-REP-SAL-MAT-06-EXPORT` | `docs/user-manual/images/salidas-material/06-exportar-reporte.png` | `CU-SAL-07` |
-| 57 | `CAP-SAL-MAT-07-FILTER` | `docs/user-manual/images/salidas-material/07-filtro-surtido.png` | `CU-SAL-01`, `CU-SAL-06` |
-| 58 | `CAP-SAL-MAT-08-VIEW` | `docs/user-manual/images/salidas-material/08-consulta-cancelada.png` | `CU-SAL-03`, `CU-SAL-04` |
-| 59 | `CAP-SAL-WAS-00-NAVIGATION` | `docs/user-manual/images/salidas-merma/00-acceso-menu-principal.png` | `CU-SAL-08` |
-| 60 | `CAP-SAL-WAS-01-LIST` | `docs/user-manual/images/salidas-merma/01-listado.png` | `CU-SAL-08`, `CU-SAL-14` |
-| 61 | `CAP-SAL-WAS-02-CREATE` | `docs/user-manual/images/salidas-merma/02-formulario-registro.png` | `CU-SAL-09` |
-| 62 | `CAP-SAL-WAS-03-EDIT` | `docs/user-manual/images/salidas-merma/03-edicion-encabezado.png` | `CU-SAL-10`, `CU-SAL-11` |
-| 63 | `CAP-SAL-WAS-04-SUPPLY` | `docs/user-manual/images/salidas-merma/04-surtir-detalles.png` | `CU-SAL-12` |
-| 64 | `CAP-SAL-WAS-05-RETURN` | `docs/user-manual/images/salidas-merma/05-devolver-detalle.png` | `CU-SAL-13` |
-| 65 | `CAP-REP-SAL-WAS-06-EXPORT` | `docs/user-manual/images/salidas-merma/06-exportar-reporte.png` | `CU-SAL-14` |
-| 66 | `CAP-SAL-WAS-07-FILTER` | `docs/user-manual/images/salidas-merma/07-filtro-surtido.png` | `CU-SAL-08`, `CU-SAL-13` |
-| 67 | `CAP-SAL-WAS-08-VIEW` | `docs/user-manual/images/salidas-merma/08-consulta-cancelada.png` | `CU-SAL-10`, `CU-SAL-11` |
-| 68 | `CAP-IDA-PER-00-NAVIGATION` | `docs/user-manual/images/personas/00-acceso-menu-principal.png` | `CU-IDA-01` |
-| 69 | `CAP-IDA-PER-01-LIST` | `docs/user-manual/images/personas/01-listado.png` | `CU-IDA-01`, `CU-IDA-04` |
-| 70 | `CAP-IDA-PER-02-CREATE` | `docs/user-manual/images/personas/02-formulario-alta.png` | `CU-IDA-02` |
-| 71 | `CAP-IDA-PER-03-EDIT` | `docs/user-manual/images/personas/03-formulario-edicion.png` | `CU-IDA-03` |
-| 72 | `CAP-IDA-PER-04-EXPORT` | `docs/user-manual/images/personas/04-exportar-reporte.png` | `CU-IDA-04` |
-| 73 | `CAP-IDA-USR-00-NAVIGATION` | `docs/user-manual/images/usuarios/00-acceso-menu-principal.png` | `CU-IDA-05` |
-| 74 | `CAP-IDA-USR-01-LIST` | `docs/user-manual/images/usuarios/01-listado.png` | `CU-IDA-05`, `CU-IDA-09` |
-| 75 | `CAP-IDA-USR-02-CREATE` | `docs/user-manual/images/usuarios/02-formulario-alta.png` | `CU-IDA-06` |
-| 76 | `CAP-IDA-USR-03-EDIT` | `docs/user-manual/images/usuarios/03-formulario-edicion.png` | `CU-IDA-07` |
-| 77 | `CAP-IDA-USR-04-PASSWORD` | `docs/user-manual/images/usuarios/04-cambio-contrasena.png` | `CU-IDA-08` |
-| 78 | `CAP-IDA-USR-05-EXPORT` | `docs/user-manual/images/usuarios/05-exportar-reporte.png` | `CU-IDA-09` |
-| 79 | `CAP-REP-MOV-MAT-00-NAVIGATION` | `docs/user-manual/images/movimientos-material/00-acceso-menu-principal.png` | `CU-ALM-07` |
-| 80 | `CAP-REP-MOV-MAT-01-LIST` | `docs/user-manual/images/movimientos-material/01-historial-y-filtros.png` | `CU-ALM-07` |
-| 81 | `CAP-REP-MOV-MAT-02-EXPORT` | `docs/user-manual/images/movimientos-material/02-exportar-reporte.png` | `CU-ALM-08` |
-| 82 | `CAP-REP-MOV-WAS-00-NAVIGATION` | `docs/user-manual/images/movimientos-merma/00-acceso-menu-principal.png` | `CU-ALM-14` |
-| 83 | `CAP-REP-MOV-WAS-01-LIST` | `docs/user-manual/images/movimientos-merma/01-historial-y-filtros.png` | `CU-ALM-14` |
-| 84 | `CAP-REP-MOV-WAS-02-EXPORT` | `docs/user-manual/images/movimientos-merma/02-exportar-reporte.png` | `CU-ALM-15` |
-| 85 | `CAP-ERR-404-NOT-FOUND` | `docs/user-manual/images/errores/01-pagina-no-encontrada.png` | Transversal |
+| 1 | `CAP-AUT-01-LOGIN` | `docs/user-manual/images/access/01-login-session.png` | `CU-AUT-01` |
+| 2 | `CAP-AUT-02-MENU` | `docs/user-manual/images/access/02-menu-main.png` | `CU-AUT-02` |
+| 3 | `CAP-CAT-MAT-00-NAVIGATION` | `docs/user-manual/images/materials/00-access-menu-main.png` | `CU-ALM-01` |
+| 4 | `CAP-CAT-MAT-01-LIST` | `docs/user-manual/images/materials/01-list-inventory.png` | `CU-ALM-01`, `CU-ALM-06` |
+| 5 | `CAP-CAT-MAT-02-CREATE` | `docs/user-manual/images/materials/02-form-creation.png` | `CU-ALM-02` |
+| 6 | `CAP-CAT-MAT-03-EDIT` | `docs/user-manual/images/materials/03-form-edit.png` | `CU-ALM-03`, `CU-ALM-04` |
+| 7 | `CAP-CAT-MAT-04-STOCK` | `docs/user-manual/images/materials/04-adjustment-stock.png` | `CU-ALM-05` |
+| 8 | `CAP-REP-MAT-05-EXPORT` | `docs/user-manual/images/materials/05-export-report.png` | `CU-ALM-06` |
+| 9 | `CAP-CAT-SUP-00-NAVIGATION` | `docs/user-manual/images/suppliers/00-access-menu-main.png` | `CU-CAT-01` |
+| 10 | `CAP-CAT-SUP-01-LIST` | `docs/user-manual/images/suppliers/01-list.png` | `CU-CAT-01`, `CU-CAT-04` |
+| 11 | `CAP-CAT-SUP-02-CREATE` | `docs/user-manual/images/suppliers/02-form-creation.png` | `CU-CAT-02` |
+| 12 | `CAP-CAT-SUP-03-EDIT` | `docs/user-manual/images/suppliers/03-form-edit-and-state.png` | `CU-CAT-03`, `CU-CAT-04` |
+| 13 | `CAP-CAT-SUP-04-EXPORT` | `docs/user-manual/images/suppliers/04-export-report.png` | `CU-CAT-04` |
+| 14 | `CAP-CAT-CLI-00-NAVIGATION` | `docs/user-manual/images/clients/00-access-menu-main.png` | `CU-CAT-05` |
+| 15 | `CAP-CAT-CLI-01-LIST` | `docs/user-manual/images/clients/01-list.png` | `CU-CAT-05`, `CU-CAT-08` |
+| 16 | `CAP-CAT-CLI-02-CREATE` | `docs/user-manual/images/clients/02-form-creation.png` | `CU-CAT-06` |
+| 17 | `CAP-CAT-CLI-03-EDIT` | `docs/user-manual/images/clients/03-form-edit.png` | `CU-CAT-07` |
+| 18 | `CAP-CAT-CLI-04-EXPORT` | `docs/user-manual/images/clients/04-export-report.png` | `CU-CAT-08` |
+| 19 | `CAP-CAT-WAS-00-NAVIGATION` | `docs/user-manual/images/waste/00-access-menu-main.png` | `CU-ALM-09` |
+| 20 | `CAP-CAT-WAS-01-LIST` | `docs/user-manual/images/waste/01-list-inventory.png` | `CU-ALM-09`, `CU-ALM-13` |
+| 21 | `CAP-CAT-WAS-02-CREATE` | `docs/user-manual/images/waste/02-form-registration.png` | `CU-ALM-10` |
+| 22 | `CAP-CAT-WAS-03-EDIT` | `docs/user-manual/images/waste/03-form-edit.png` | `CU-ALM-11` |
+| 23 | `CAP-CAT-WAS-04-STOCK` | `docs/user-manual/images/waste/04-adjustment-stock.png` | `CU-ALM-12` |
+| 24 | `CAP-REP-WAS-05-EXPORT` | `docs/user-manual/images/waste/05-export-report.png` | `CU-ALM-13` |
+| 25 | `CAP-CAT-AREA-01-LIST` | `docs/user-manual/images/catalogs/areas/01-list.png` | `CU-CAT-09` |
+| 26 | `CAP-CAT-AREA-02-CREATE` | `docs/user-manual/images/catalogs/areas/02-form-creation.png` | `CU-CAT-10` |
+| 27 | `CAP-CAT-AREA-03-EDIT` | `docs/user-manual/images/catalogs/areas/03-form-edit.png` | `CU-CAT-11` |
+| 28 | `CAP-CAT-ROLE-01-LIST` | `docs/user-manual/images/catalogs/roles/01-list.png` | `CU-CAT-12` |
+| 29 | `CAP-CAT-ROLE-02-CREATE` | `docs/user-manual/images/catalogs/roles/02-form-creation.png` | `CU-CAT-13` |
+| 30 | `CAP-CAT-ROLE-03-EDIT` | `docs/user-manual/images/catalogs/roles/03-form-edit.png` | `CU-CAT-14` |
+| 31 | `CAP-CAT-PRE-01-LIST` | `docs/user-manual/images/catalogs/presentations/01-list.png` | `CU-CAT-15` |
+| 32 | `CAP-CAT-PRE-02-CREATE` | `docs/user-manual/images/catalogs/presentations/02-form-creation.png` | `CU-CAT-16` |
+| 33 | `CAP-CAT-PRE-03-EDIT` | `docs/user-manual/images/catalogs/presentations/03-form-edit.png` | `CU-CAT-17` |
+| 34 | `CAP-CAT-UNIT-01-LIST` | `docs/user-manual/images/catalogs/unit-measures/01-list.png` | `CU-CAT-18` |
+| 35 | `CAP-CAT-UNIT-02-CREATE` | `docs/user-manual/images/catalogs/unit-measures/02-form-creation.png` | `CU-CAT-19` |
+| 36 | `CAP-CAT-UNIT-03-EDIT` | `docs/user-manual/images/catalogs/unit-measures/03-form-edit.png` | `CU-CAT-20` |
+| 37 | `CAP-CAT-REASON-01-LIST` | `docs/user-manual/images/catalogs/adjustment-reasons/01-list.png` | `CU-CAT-21` |
+| 38 | `CAP-CAT-REASON-02-CREATE` | `docs/user-manual/images/catalogs/adjustment-reasons/02-form-creation.png` | `CU-CAT-22` |
+| 39 | `CAP-CAT-REASON-03-EDIT` | `docs/user-manual/images/catalogs/adjustment-reasons/03-form-edit.png` | `CU-CAT-23` |
+| 40 | `CAP-CAT-STATUS-01-LIST` | `docs/user-manual/images/catalogs/fulfillment-statuses/01-list.png` | `CU-CAT-24` |
+| 41 | `CAP-CAT-STATUS-02-CREATE` | `docs/user-manual/images/catalogs/fulfillment-statuses/02-form-creation.png` | `CU-CAT-25` |
+| 42 | `CAP-CAT-STATUS-03-EDIT` | `docs/user-manual/images/catalogs/fulfillment-statuses/03-form-edit.png` | `CU-CAT-26` |
+| 43 | `CAP-ENT-00-NAVIGATION` | `docs/user-manual/images/purchases/00-access-menu-main.png` | `CU-ENT-01` |
+| 44 | `CAP-ENT-01-LIST` | `docs/user-manual/images/purchases/01-list.png` | `CU-ENT-01` |
+| 45 | `CAP-ENT-02-CREATE` | `docs/user-manual/images/purchases/02-form-registration.png` | `CU-ENT-02` |
+| 46 | `CAP-ENT-03-EDIT` | `docs/user-manual/images/purchases/03-edit-purchase.png` | `CU-ENT-03`, `CU-ENT-05` |
+| 47 | `CAP-ENT-04-CORRECT` | `docs/user-manual/images/purchases/04-correction-detail.png` | `CU-ENT-04` |
+| 48 | `CAP-REP-ENT-05-EXPORT` | `docs/user-manual/images/purchases/05-export-report.png` | `CU-ENT-06` |
+| 49 | `CAP-ENT-06-VIEW` | `docs/user-manual/images/purchases/06-query-cancelled.png` | `CU-ENT-03`, `CU-ENT-05` |
+| 50 | `CAP-SAL-MAT-00-NAVIGATION` | `docs/user-manual/images/material-issues/00-access-menu-main.png` | `CU-SAL-01` |
+| 51 | `CAP-SAL-MAT-01-LIST` | `docs/user-manual/images/material-issues/01-list.png` | `CU-SAL-01` |
+| 52 | `CAP-SAL-MAT-02-CREATE` | `docs/user-manual/images/material-issues/02-form-registration.png` | `CU-SAL-02` |
+| 53 | `CAP-SAL-MAT-03-EDIT` | `docs/user-manual/images/material-issues/03-edit-header.png` | `CU-SAL-03`, `CU-SAL-04` |
+| 54 | `CAP-SAL-MAT-04-SUPPLY` | `docs/user-manual/images/material-issues/04-supply-details.png` | `CU-SAL-05` |
+| 55 | `CAP-SAL-MAT-05-RETURN` | `docs/user-manual/images/material-issues/05-return-detail.png` | `CU-SAL-06` |
+| 56 | `CAP-REP-SAL-MAT-06-EXPORT` | `docs/user-manual/images/material-issues/06-export-report.png` | `CU-SAL-07` |
+| 57 | `CAP-SAL-MAT-07-FILTER` | `docs/user-manual/images/material-issues/07-filter-supplied.png` | `CU-SAL-01`, `CU-SAL-06` |
+| 58 | `CAP-SAL-MAT-08-VIEW` | `docs/user-manual/images/material-issues/08-query-cancelled.png` | `CU-SAL-03`, `CU-SAL-04` |
+| 59 | `CAP-SAL-WAS-00-NAVIGATION` | `docs/user-manual/images/waste-issues/00-access-menu-main.png` | `CU-SAL-08` |
+| 60 | `CAP-SAL-WAS-01-LIST` | `docs/user-manual/images/waste-issues/01-list.png` | `CU-SAL-08`, `CU-SAL-14` |
+| 61 | `CAP-SAL-WAS-02-CREATE` | `docs/user-manual/images/waste-issues/02-form-registration.png` | `CU-SAL-09` |
+| 62 | `CAP-SAL-WAS-03-EDIT` | `docs/user-manual/images/waste-issues/03-edit-header.png` | `CU-SAL-10`, `CU-SAL-11` |
+| 63 | `CAP-SAL-WAS-04-SUPPLY` | `docs/user-manual/images/waste-issues/04-supply-details.png` | `CU-SAL-12` |
+| 64 | `CAP-SAL-WAS-05-RETURN` | `docs/user-manual/images/waste-issues/05-return-detail.png` | `CU-SAL-13` |
+| 65 | `CAP-REP-SAL-WAS-06-EXPORT` | `docs/user-manual/images/waste-issues/06-export-report.png` | `CU-SAL-14` |
+| 66 | `CAP-SAL-WAS-07-FILTER` | `docs/user-manual/images/waste-issues/07-filter-supplied.png` | `CU-SAL-08`, `CU-SAL-13` |
+| 67 | `CAP-SAL-WAS-08-VIEW` | `docs/user-manual/images/waste-issues/08-query-cancelled.png` | `CU-SAL-10`, `CU-SAL-11` |
+| 68 | `CAP-IDA-PER-00-NAVIGATION` | `docs/user-manual/images/people/00-access-menu-main.png` | `CU-IDA-01` |
+| 69 | `CAP-IDA-PER-01-LIST` | `docs/user-manual/images/people/01-list.png` | `CU-IDA-01`, `CU-IDA-04` |
+| 70 | `CAP-IDA-PER-02-CREATE` | `docs/user-manual/images/people/02-form-creation.png` | `CU-IDA-02` |
+| 71 | `CAP-IDA-PER-03-EDIT` | `docs/user-manual/images/people/03-form-edit.png` | `CU-IDA-03` |
+| 72 | `CAP-IDA-PER-04-EXPORT` | `docs/user-manual/images/people/04-export-report.png` | `CU-IDA-04` |
+| 73 | `CAP-IDA-USR-00-NAVIGATION` | `docs/user-manual/images/users/00-access-menu-main.png` | `CU-IDA-05` |
+| 74 | `CAP-IDA-USR-01-LIST` | `docs/user-manual/images/users/01-list.png` | `CU-IDA-05`, `CU-IDA-09` |
+| 75 | `CAP-IDA-USR-02-CREATE` | `docs/user-manual/images/users/02-form-creation.png` | `CU-IDA-06` |
+| 76 | `CAP-IDA-USR-03-EDIT` | `docs/user-manual/images/users/03-form-edit.png` | `CU-IDA-07` |
+| 77 | `CAP-IDA-USR-04-PASSWORD` | `docs/user-manual/images/users/04-change-password.png` | `CU-IDA-08` |
+| 78 | `CAP-IDA-USR-05-EXPORT` | `docs/user-manual/images/users/05-export-report.png` | `CU-IDA-09` |
+| 79 | `CAP-REP-MOV-MAT-00-NAVIGATION` | `docs/user-manual/images/material-movements/00-access-menu-main.png` | `CU-ALM-07` |
+| 80 | `CAP-REP-MOV-MAT-01-LIST` | `docs/user-manual/images/material-movements/01-history-and-filters.png` | `CU-ALM-07` |
+| 81 | `CAP-REP-MOV-MAT-02-EXPORT` | `docs/user-manual/images/material-movements/02-export-report.png` | `CU-ALM-08` |
+| 82 | `CAP-REP-MOV-WAS-00-NAVIGATION` | `docs/user-manual/images/waste-movements/00-access-menu-main.png` | `CU-ALM-14` |
+| 83 | `CAP-REP-MOV-WAS-01-LIST` | `docs/user-manual/images/waste-movements/01-history-and-filters.png` | `CU-ALM-14` |
+| 84 | `CAP-REP-MOV-WAS-02-EXPORT` | `docs/user-manual/images/waste-movements/02-export-report.png` | `CU-ALM-15` |
+| 85 | `CAP-ERR-404-NOT-FOUND` | `docs/user-manual/images/errors/01-page-not-found.png` | Transversal |
 
 ## Cobertura adicional necesaria
 

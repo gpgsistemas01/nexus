@@ -11,7 +11,7 @@
 
 1. En la fila de la merma, seleccione la acción **Ajustar stock**. Antes de continuar, compruebe que la pantalla mostrada coincida con la captura:
 
-   ![CAP-CAT-WAS-04-STOCK: ajuste existencia](../../images/mermas/04-ajuste-existencia.png)
+   ![CAP-CAT-WAS-04-STOCK: ajuste existencia](../../images/waste/04-adjustment-stock.png)
 
 2. Elija una opción en **Seleccione una razón...** y complete los campos **Nuevo stock** y **Observaciones**.
 

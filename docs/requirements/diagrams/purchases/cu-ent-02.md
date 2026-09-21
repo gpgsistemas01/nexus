@@ -2,6 +2,7 @@
 
 ```mermaid
 flowchart TD
+    accTitle: CU-ENT-02 — Crear compra de material
     request["Actor selecciona Nueva compra<br/>y confirma Guardar"] --> validate["Nexus valida permiso, datos y relaciones"]
     validate --> active{"¿Proveedor y materiales activos?"}
     active -->|No| reject["Rechazar la compra<br/>sin detalles, movimiento ni stock"]

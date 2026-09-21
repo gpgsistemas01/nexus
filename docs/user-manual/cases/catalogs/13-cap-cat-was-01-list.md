@@ -9,7 +9,7 @@
 
 1. Abra **Filtros** y compruebe que los controles desplegados coincidan con la captura:
 
-   ![CAP-CAT-WAS-01-LIST: listado inventario](../../images/mermas/01-listado-inventario.png)
+   ![CAP-CAT-WAS-01-LIST: listado inventario](../../images/waste/01-list-inventory.png)
 
 2. Escriba un término en el buscador **Buscar por Material o Proveedor** o elija una opción en el filtro **Proveedor**.
 3. Seleccione el botón **Buscar / filtrar** para actualizar la tabla; use **Limpiar filtros** para restablecerla.

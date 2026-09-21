@@ -9,7 +9,7 @@
 
 1. En la fila de la cuenta, seleccione la acción **Cambiar contraseña**. Antes de continuar, compruebe que la pantalla mostrada coincida con la captura:
 
-   ![CAP-IDA-USR-04-PASSWORD: cambio contrasena](../../images/usuarios/04-cambio-contrasena.png)
+   ![CAP-IDA-USR-04-PASSWORD: cambio contrasena](../../images/users/04-change-password.png)
 
 2. Compruebe que **Usuario**, área y rol permanezcan deshabilitados como referencia, y escriba la
    nueva clave conforme a la política en **Contraseña**.

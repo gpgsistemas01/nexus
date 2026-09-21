@@ -3,7 +3,7 @@
 
 ## Capítulos
 
-1. [1. Objetivo](01-objetivo.md)
-2. [2. Criterios de división](02-criterios-de-division.md)
-3. [3. Resultado de la revisión](03-resultado-de-la-revision.md)
-4. [4. Regla de mantenimiento](04-regla-de-mantenimiento.md)
+1. [1. Objetivo](01-objective.md)
+2. [2. Criterios de división](02-criteria-of-splitting.md)
+3. [3. Resultado de la revisión](03-result-of-the-review.md)
+4. [4. Regla de mantenimiento](04-rule-of-maintenance.md)

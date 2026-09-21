@@ -2,6 +2,7 @@
 
 ```mermaid
 flowchart TD
+    accTitle: CU-ENT-03 — Editar compra de material
     request["Actor solicita editar compra de material"] --> validate["Nexus valida permiso, datos y relaciones"]
     validate --> newDetails{"¿Agrega detalles nuevos?"}
     newDetails -->|No| header["Actualizar encabezado permitido"]

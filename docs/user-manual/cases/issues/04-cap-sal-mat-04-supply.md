@@ -9,7 +9,7 @@
 
 1. En la fila de la salida, seleccione **Surtir detalle** para abrir sus renglones pendientes. Antes de continuar, compruebe que la pantalla mostrada coincida con la captura:
 
-   ![CAP-SAL-MAT-04-SUPPLY: surtir detalles](../../images/salidas-material/04-surtir-detalles.png)
+   ![CAP-SAL-MAT-04-SUPPLY: surtir detalles](../../images/material-issues/04-supply-details.png)
 
 2. En los renglones pendientes, marque la casilla **Surtir** y complete **Cantidad de proyecto**. El encabezado y los renglones ya surtidos permanecen deshabilitados como referencia.
 

@@ -9,7 +9,7 @@
 
 1. En la fila de la compra, seleccione **Editar registro** para abrir el formulario. Antes de continuar, compruebe que la pantalla mostrada coincida con la captura:
 
-   ![CAP-ENT-03-EDIT: edicion compra](../../images/compras/03-edicion-compra.png)
+   ![CAP-ENT-03-EDIT: edicion compra](../../images/purchases/03-edit-purchase.png)
 
 2. Modifique el comprobante, la persona que recibe, la fecha o las observaciones, y use **Agregar** para incorporar detalles nuevos. El proveedor y los renglones ya confirmados permanecen deshabilitados; para cambiar la cantidad o el costo de uno de esos renglones, use **Corregir detalle de compra**.
 3. Seleccione **Actualizar** para guardar o **Regresar** para salir sin confirmar.

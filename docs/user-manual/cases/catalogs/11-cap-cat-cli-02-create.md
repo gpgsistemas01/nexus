@@ -9,6 +9,6 @@
 
 1. Seleccione el botón **Nuevo cliente** para abrir el formulario de alta. Antes de continuar, compruebe que la pantalla mostrada coincida con la captura:
 
-   ![CAP-CAT-CLI-02-CREATE: formulario alta](../../images/clientes/02-formulario-alta.png)
+   ![CAP-CAT-CLI-02-CREATE: formulario alta](../../images/clients/02-form-creation.png)
 
 2. Complete el campo **Nombre**, revise la casilla **Activo** y seleccione el botón **Guardar**.

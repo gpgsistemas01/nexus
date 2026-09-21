@@ -9,7 +9,7 @@
 
 1. Abra la compra mediante **Editar registro** y, en el renglón requerido, seleccione **Corregir detalle de compra**. Antes de continuar, compruebe que la pantalla mostrada coincida con la captura:
 
-   ![CAP-ENT-04-CORRECT: correccion detalle](../../images/compras/04-correccion-detalle.png)
+   ![CAP-ENT-04-CORRECT: correccion detalle](../../images/purchases/04-correction-detail.png)
 
 2. Complete **Cantidad correcta** y **Costo por presentación correcto**.
 3. Seleccione **Corregir detalle** para confirmar o **Regresar** para salir sin aplicar la corrección.

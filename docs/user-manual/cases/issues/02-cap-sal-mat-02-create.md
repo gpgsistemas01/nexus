@@ -9,7 +9,7 @@
 
 1. Seleccione **Nueva salida** para abrir el formulario. Antes de continuar, compruebe que la pantalla mostrada coincida con la captura:
 
-   ![CAP-SAL-MAT-02-CREATE: formulario registro](../../images/salidas-material/02-formulario-registro.png)
+   ![CAP-SAL-MAT-02-CREATE: formulario registro](../../images/material-issues/02-form-registration.png)
 
 2. Elija opciones en **Buscar cliente...**, **Buscar asesor...**, **Buscar área...** y **Buscar solicitante...**.
 3. Complete **Número de proyecto**, **Fecha y hora de solicitud:** y **Observaciones**.

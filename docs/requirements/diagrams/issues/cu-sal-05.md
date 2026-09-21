@@ -2,6 +2,7 @@
 
 ```mermaid
 flowchart TD
+    accTitle: CU-SAL-05 — Surtir material
     request["Actor solicita surtir material"] --> validate["Nexus valida permiso, datos y relaciones"]
     validate --> committed{"¿El detalle ya pertenece a la salida?"}
     committed -->|No| reject["Rechazar uso nuevo"]
