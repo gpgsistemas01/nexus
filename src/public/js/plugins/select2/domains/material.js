@@ -83,18 +83,19 @@ const attachMaterialHandler = ({
                             tradeName,
                         }
                     },           
-                    onSave: (createdMaterial) => {
+                    onSave: (createdSupplierMaterial) => {
 
-                        createdMaterial = mapSelectMaterialData(createdMaterial);
+                        const material = createdSupplierMaterial.material;
+                        const materialOption = mapSelectMaterialData(createdSupplierMaterial);
 
                         toggleMaterialOption({
                             selector: baseSelector,
-                            data: createdMaterial
+                            data: materialOption
                         });
 
                         setMdbWrapperInputValue({
                             selector: `${ modalSelector } ${ wrapperSelector }`,
-                            value: createdMaterial.presentation.name
+                            value: material.presentation.name
                         });
                     }
                 })

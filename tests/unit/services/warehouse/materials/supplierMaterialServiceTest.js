@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 const materialFindMany = vi.fn();
 const materialFindFirst = vi.fn();
 const supplierMaterialFindMany = vi.fn();
+const supplierMaterialFindUnique = vi.fn();
 const supplierMaterialCount = vi.fn();
 const supplierMaterialUpdateMany = vi.fn();
 
@@ -11,6 +12,7 @@ vi.mock('../../../../../src/repository/baseRepository.js', () => ({
     material: { findMany: materialFindMany, findFirst: materialFindFirst },
     supplierMaterial: {
       findMany: supplierMaterialFindMany,
+      findUnique: supplierMaterialFindUnique,
       count: supplierMaterialCount,
       updateMany: supplierMaterialUpdateMany
     }
@@ -20,6 +22,7 @@ vi.mock('../../../../../src/repository/baseRepository.js', () => ({
 const {
   existsMaterialUsage,
   findAllSupplierMaterials,
+  findSupplierMaterialByIds,
   updateSupplierMaterialStock
 } = await import('../../../../../src/services/warehouse/materials/supplierMaterialService.js');
 
@@ -55,7 +58,80 @@ describe('listado del CRUD de materiales', () => {
     expect(materialFindMany.mock.calls[0][0].where.AND).not.toContainEqual(
       { purchaseRequisitionsDetails: { none: {} } }
     );
-    expect(result.data[0].canDelete).toBe(true);
+    expect(result.data[0]).toEqual(expect.objectContaining({
+      id: 'offer-1',
+      material: expect.objectContaining({ id: 'material-1', name: 'Lona' }),
+      canDelete: true
+    }));
+  });
+
+  it('conserva el mismo contrato anidado al consultar un material recién creado', async () => {
+    const supplierMaterial = {
+      id: 'offer-1',
+      material: { id: 'material-1', name: 'Lona' },
+      supplier: { id: 'supplier-1', tradeName: 'Proveedor' }
+    };
+    supplierMaterialFindUnique.mockResolvedValue(supplierMaterial);
+
+    const result = await findSupplierMaterialByIds({
+      materialId: 'material-1',
+      supplierId: 'supplier-1'
+    });
+
+    expect(result).toEqual(supplierMaterial);
+    expect(result.material).toEqual({ id: 'material-1', name: 'Lona' });
+  });
+
+  it('entrega el mismo material anidado desde el listado y después de crearlo', async () => {
+    const supplierMaterial = {
+      id: 'offer-1',
+      currentStock: 0,
+      convertedQuantity: 0,
+      material: {
+        id: 'material-1',
+        name: 'Lona',
+        minStock: 1,
+        presentation: { id: 'presentation-1', name: 'ROLLO' },
+        unitMeasure: { id: 'unit-1', symbol: 'm²' }
+      },
+      supplier: { id: 'supplier-1', tradeName: 'Proveedor' }
+    };
+    supplierMaterialFindMany.mockResolvedValue([supplierMaterial]);
+    supplierMaterialFindUnique.mockResolvedValue(supplierMaterial);
+
+    const [listedMaterials, createdMaterial] = await Promise.all([
+      findAllSupplierMaterials({}),
+      findSupplierMaterialByIds({
+        materialId: 'material-1',
+        supplierId: 'supplier-1'
+      })
+    ]);
+
+    expect(listedMaterials.data[0]).toEqual(expect.objectContaining({
+      id: createdMaterial.id,
+      material: createdMaterial.material,
+      supplier: createdMaterial.supplier
+    }));
+  });
+
+  it('mantiene el contrato anidado para los consumidores operativos', async () => {
+    supplierMaterialFindUnique.mockResolvedValue({
+      id: 'offer-1',
+      currentStock: 4,
+      material: { id: 'material-1', name: 'Lona' },
+      supplier: { id: 'supplier-1', tradeName: 'Proveedor' }
+    });
+
+    const result = await findSupplierMaterialByIds({
+      materialId: 'material-1',
+      supplierId: 'supplier-1'
+    });
+
+    expect(result).toEqual(expect.objectContaining({
+      id: 'offer-1',
+      material: expect.objectContaining({ id: 'material-1', name: 'Lona' }),
+      currentStock: 4
+    }));
   });
 
   it('reutiliza las relaciones históricas en una sola consulta antes de eliminar', async () => {
