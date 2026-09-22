@@ -69,4 +69,36 @@ describe('stockHelpers', () => {
       });
     }
   });
+
+  it('obtiene los metadatos desde el contrato anidado de proveedor-material', () => {
+    let capturedError;
+
+    try {
+      assertSufficientStock({
+        material: {
+          id: 'supplier-material-1',
+          material: {
+            id: 'material-1',
+            name: 'Lámina',
+            base: 2,
+            height: 3
+          },
+          supplier: { id: 'supplier-1', tradeName: 'Proveedor Uno' }
+        },
+        newStock: -1,
+        requestedQuantity: 5
+      });
+    } catch (error) {
+      capturedError = error;
+    }
+
+    expect(capturedError).toBeInstanceOf(GoodsIssueInsufficientStock);
+    expect(capturedError.meta).toMatchObject({
+      materialName: 'Lámina',
+      materialId: 'material-1',
+      supplierId: 'supplier-1',
+      supplierName: 'Proveedor Uno',
+      requestedQuantity: 5
+    });
+  });
 });

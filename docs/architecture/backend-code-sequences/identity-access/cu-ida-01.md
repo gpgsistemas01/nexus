@@ -17,7 +17,7 @@ sequenceDiagram
     Controller->>Domain: personService.findAllPersons({ query: req.query }) consulta Person y asignaciones
     activate Domain
     alt Servicio resuelto
-        Domain-->>Controller: personService.findAllPersons() resuelve datos de dominio
+        Domain-->>Controller: personService.findAllPersons() devuelve { data, recordsTotal, recordsFiltered } para la tabla solicitada
         Controller-->>Client: HTTP 2xx { code, data }
     else AppError propagado
         Domain-->>Controller: throw AppError { code, message, meta, statusCode }

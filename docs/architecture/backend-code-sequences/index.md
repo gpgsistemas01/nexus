@@ -12,8 +12,10 @@ diagrama. Esta colección no vuelve a copiar esa relación en cada sección. Los
 participantes identifican su archivo concreto; los métodos y la URL HTTP se indican
 en los mensajes que ejecutan cada proceso para no repetirlos en las entidades.
 La figura `control` marca el adaptador HTTP sin repetir el estereotipo textual de
-controlador. Los módulos de servicio, rutas y utilidades no reciben `«object»`: el estereotipo identifica los DTO JSON que el controller construye
-realmente, junto con la función y el archivo `src/dtos/` que los originan. En el recorrido
+controlador. Los módulos de servicio, rutas y utilidades no se presentan como objetos:
+los DTO JSON que el controller construye se distinguen mediante un participante con
+línea de vida y nombre de instancia subrayado, junto con la función y el archivo
+`src/dtos/` que los originan. En el recorrido
 común se separan cliente,
 ruta, controller y servicio de dominio; sólo las coordinaciones atómicas
 despliegan módulos colaboradores, persistencia o publicación como participantes
@@ -21,10 +23,15 @@ adicionales. De este modo se conservan pocas entidades sin ocultar el controller
 módulo responsable. Los mensajes conservan las llamadas y sus parámetros relevantes en
 orden (`req.params`, `req.body`/DTO, parámetros de consulta y `tx`) para hacer visible el
 contrato entre participantes. Esos parámetros no se declaran como participantes ni se
-enumeran en una nota separada. Los recorridos identifican por su símbolo ejecutable los
-validadores y middleware que cambian la interpretación del caso; no se admite una
-etiqueta genérica como «ejecutar middleware», y la ruta enlazada conserva la fuente de
-verdad del pipeline completo. Todos explicitan activación de responsabilidades,
+enumeran en una nota separada. El pipeline completo y reutilizado de middleware se
+explica una sola vez en `DIA-PAT-FRO-001`. El recorrido de un caso incorpora como
+participante un middleware sólo cuando su alternativa cambia la interpretación de ese
+caso; entonces identifica el archivo, el validador y el símbolo ejecutado, nunca una
+etiqueta genérica como «ejecutar middleware». La ruta enlazada sigue siendo la fuente de
+verdad del orden completo. En particular, la validación de entrada del backend ocurre en
+los arreglos de `src/validators/forms` y en
+`validatorMiddleware.validate(req, res, next)` **antes** del controller; el DTO
+normaliza datos aceptados y no sustituye esa validación. Todos explicitan activación de responsabilidades,
 resultado HTTP y propagación de error; las coordinaciones complejas agregan sus
 colaboradores y límites transaccionales.
 Las variables

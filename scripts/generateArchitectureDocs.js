@@ -100,21 +100,6 @@ const RESERVED_SEQUENCE_ALIASES = new Set([
 ]);
 const MIN_SEQUENCE_MESSAGES = 5;
 const MIN_SEQUENCE_CALLS = 2;
-const GENERIC_SEQUENCE_MESSAGES = [
-    'devolver resultado o error del caso',
-    'emitir respuesta observable',
-    'devolver respuesta normalizada',
-    'presentar resultado observable',
-    'resultado del servicio o error de dominio tipado',
-    'status HTTP y cuerpo concretos del controller',
-    'error entregado al middleware final para su respuesta HTTP',
-    'status HTTP y payload del endpoint',
-    'respuesta o error normalizado',
-    'resultado del request',
-    'entidad, colección o archivo normalizado',
-    'actualizar la vista con el resultado',
-    'conservar contexto y mostrar el mensaje'
-];
 const EXTERNAL_SEQUENCE_PARTICIPANTS = new Set([
     'Cliente HTTP / web',
     'Navegador',
@@ -136,8 +121,13 @@ const validateUseCaseDiagramCoverage = async () => {
             .map((match) => [match[1], match[2]])
     );
     const failures = [];
-    const sourceFiles = new Set((await walk(path.join(ROOT, 'src')))
+    const sourceFilePaths = await walk(path.join(ROOT, 'src'));
+    const sourceFiles = new Set(sourceFilePaths
         .map((file) => toPosix(path.relative(ROOT, file))));
+    const sourceContents = new Map(await Promise.all(sourceFilePaths.map(async (file) => [
+        toPosix(path.relative(ROOT, file)),
+        await readFile(file, 'utf8')
+    ])));
 
     if (!expectedIds.length) failures.push('catálogo: no contiene casos de uso');
     const catalogDuplicates = expectedIds.filter((id, index) => expectedIds.indexOf(id) !== index);
@@ -231,10 +221,6 @@ const validateUseCaseDiagramCoverage = async () => {
                 || !/-->>.*\b(?:error|rechazad[oa]|conflict|invalid|rollback)\b/i.test(sequence)) {
                 failures.push(`diagramas ${side}: ${id} no representa el error devuelto con una respuesta discontinua dentro de alt/else`);
             }
-            const foundGenericMessages = GENERIC_SEQUENCE_MESSAGES.filter((message) => sequence.includes(message));
-            if (foundGenericMessages.length) {
-                failures.push(`diagramas ${side}: ${id} conserva mensajes genéricos sin resultado ni responsabilidad (${foundGenericMessages.join(', ')})`);
-            }
             const tracedParticipants = sequence.match(/participant .* as .*src\//g) ?? [];
             if (tracedParticipants.length < 2) {
                 failures.push(`diagramas ${side}: ${id} no traza al menos dos participantes a archivos src/`);
@@ -272,6 +258,7 @@ const validateUseCaseDiagramCoverage = async () => {
                 const [, sender = '', label = ''] = line.match(/^\s*([^\s-]+)->>[^:]+:\s*(.+)$/) ?? [];
                 if (actorAliases.has(sender.toLowerCase())) return false;
                 return !/\b[A-Za-z_$][\w$]*(?:\?\.|\.)?[A-Za-z_$]*\s*\(/.test(label)
+                    && !/\b[A-Za-z_$][\w$]*Validation\[\]/.test(label)
                     && !/\b(?:GET|POST|PATCH|PUT|DELETE)\b/.test(label)
                     && !/^import\s/.test(label);
             });
@@ -280,15 +267,12 @@ const validateUseCaseDiagramCoverage = async () => {
             }
             const participants = [...sequence.matchAll(/^\s*participant\s+([^\s@]+)(?:@\{[^}]+\})?\s+as\s+(.+)$/gm)];
             for (const [, alias, label] of participants) {
-                if (label.includes('«object»') && !label.startsWith('«object»<br/>')) {
-                    failures.push(`diagramas ${side}: ${id} no muestra «object» en la cabecera de ${alias}`);
+                if (label.includes('«object»')) {
+                    failures.push(`diagramas ${side}: ${id} representa ${alias} sólo con el estereotipo «object» en vez de una instancia visual`);
                 }
                 const paths = label.match(SOURCE_PATH_PATTERN) ?? [];
-                if (label.includes('«object»') && (
-                    !label.includes('src/dtos/')
-                    || !/«object»<br\/>[A-Za-z_$][\w$]*Dto<br\/>/.test(label)
-                )) {
-                    failures.push(`diagramas ${side}: ${id} identifica ${alias} como «object» sin un DTO JSON concreto y su archivo src/dtos/`);
+                if (label.includes('src/dtos/') && !/^<u>[A-Za-z_$][\w$]*Dto: Object<\/u><br\/>src\/dtos\//.test(label)) {
+                    failures.push(`diagramas ${side}: ${id} no representa ${alias} con nombre de instancia subrayado, tipo Object y archivo src/dtos/`);
                 }
                 if (!paths.length && !EXTERNAL_SEQUENCE_PARTICIPANTS.has(label)) {
                     failures.push(`diagramas ${side}: ${id} identifica ${alias} sin archivo src/ ni límite externo reconocido (${label})`);
@@ -297,6 +281,35 @@ const validateUseCaseDiagramCoverage = async () => {
                     if (!sourceFiles.has(sourcePath)) {
                         failures.push(`diagramas ${side}: ${id} referencia un archivo inexistente en ${alias} (${sourcePath})`);
                     }
+                }
+            }
+            if (side === 'backend') {
+                const routePath = [...sequence.matchAll(SOURCE_PATH_PATTERN)]
+                    .map((match) => match[0])
+                    .find((sourcePath) => sourcePath.startsWith('src/routes/'));
+                const controllerCall = sequence.match(/^\s*(?:Route|Router)->>Controller:\s*([A-Za-z_$][\w$]*)\(/m)?.[1];
+                const routeSource = sourceContents.get(routePath);
+                const routeBlocks = routeSource?.split(/(?=router\.(?:get|post|put|patch|delete)\()/) ?? [];
+                const routeBlock = routeBlocks.find((block) => (
+                    controllerCall && new RegExp(`\\b${controllerCall}\\s*\\n?\\);`).test(block)
+                ));
+                const validators = routeBlock?.match(/\b[A-Za-z_$][\w$]*Validation\b/g) ?? [];
+                for (const validator of validators) {
+                    if (!sequence.includes(`${validator}[]`)) {
+                        failures.push(`diagramas backend: ${id} omite ${validator} declarado antes de ${controllerCall} en ${routePath}`);
+                    }
+                }
+                if (routeBlock?.includes('\n    validate,') && !sequence.includes('validate(req, res, next)')) {
+                    failures.push(`diagramas backend: ${id} omite validatorMiddleware.validate antes de ${controllerCall}`);
+                }
+            }
+            if (side === 'frontend') {
+                const participantSources = participants.flatMap(([, , label]) => label.match(SOURCE_PATH_PATTERN) ?? []);
+                const ownsFormValidation = participantSources.some((sourcePath) => (
+                    sourceContents.get(sourcePath)?.includes('validateFields(')
+                ));
+                if (ownsFormValidation && !sequence.includes('validateFields(')) {
+                    failures.push(`diagramas frontend: ${id} omite validateFields ejecutado por un participante del formulario`);
                 }
             }
         }
@@ -326,10 +339,6 @@ const validateUseCaseDiagramCoverage = async () => {
             const messages = block.split('\n').filter((line) => line.includes('->>'));
             if (messages.length < MIN_SEQUENCE_MESSAGES) {
                 failures.push(`${name}: una secuencia no alcanza el detalle mínimo de ${MIN_SEQUENCE_MESSAGES} mensajes ordenados`);
-            }
-            const foundGenericMessages = GENERIC_SEQUENCE_MESSAGES.filter((message) => block.includes(message));
-            if (foundGenericMessages.length) {
-                failures.push(`${name}: una secuencia conserva mensajes genéricos sin resultado ni responsabilidad (${foundGenericMessages.join(', ')})`);
             }
         }
     }

@@ -286,7 +286,7 @@ export const findSupplierMaterialByIds = async ({
 
     if (!supplierMaterial) throw new MaterialNotFound();
 
-    return mapSupplierMaterial(supplierMaterial);
+    return supplierMaterial;
 };
 
 

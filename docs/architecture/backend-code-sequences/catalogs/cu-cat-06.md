@@ -8,7 +8,7 @@ sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route as src/routes/api/sales/clientApiRoute.js
     participant Controller@{ "type": "control" } as src/controllers/api/sales/clientController.js
-    participant ClientDto as «object»<br/>clientDto<br/>src/dtos/clientDTO.js
+    participant ClientDto as <u>clientDto: Object</u><br/>src/dtos/clientDTO.js
     participant Domain as src/services/sales/clientService.js
     participant ErrorHandler as src/app.js
 
@@ -20,7 +20,7 @@ sequenceDiagram
     Controller->>Domain: clientService.createClient({ clientDto }) persiste Client
     activate Domain
     alt Servicio resuelto
-        Domain-->>Controller: clientService.createClient() resuelve datos de dominio
+        Domain-->>Controller: clientService.createClient() devuelve client creado y persistido
         Controller-->>Client: HTTP 2xx { code, data }
     else AppError propagado
         Domain-->>Controller: throw AppError { code, message, meta, statusCode }

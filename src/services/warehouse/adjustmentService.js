@@ -45,18 +45,18 @@ const createStockAdjustmentMovement = async ({
 };
 
 const calculateStockAdjustmentValues = ({
-    material,
+    supplierMaterial,
     newStock,
     base = null,
     height = null
 }) => {
 
-    const previousStock = toNumber(material.currentStock) || 0;
+    const previousStock = toNumber(supplierMaterial.currentStock) || 0;
     const difference = normalizeDecimal(newStock - previousStock);
-    const previousConvertedQuantity = toNumber(material.convertedQuantity) || 0;
+    const previousConvertedQuantity = toNumber(supplierMaterial.convertedQuantity) || 0;
     const hasCustomDimensions = base !== null && height !== null;
-    const materialBase = hasCustomDimensions ? base : material.base;
-    const materialHeight = hasCustomDimensions ? height : material.height;
+    const materialBase = hasCustomDimensions ? base : supplierMaterial.material.base;
+    const materialHeight = hasCustomDimensions ? height : supplierMaterial.material.height;
     const calculatedNewConvertedQuantity = hasCustomDimensions
         ? previousConvertedQuantity + calculateConvertedQuantity({
             quantity: difference,
@@ -74,7 +74,7 @@ const calculateStockAdjustmentValues = ({
     );
 
     assertSufficientStock({
-        material,
+        material: supplierMaterial,
         newStock,
         newConvertedQuantity,
         requestedQuantity: Math.abs(difference)
@@ -113,7 +113,7 @@ export const createStockAdjustment = async ({
 
     const execute = async (transaction) => {
 
-        const material = await findSupplierMaterialByIds({
+        const supplierMaterial = await findSupplierMaterialByIds({
             tx: transaction,
             materialId,
             supplierId
@@ -121,7 +121,7 @@ export const createStockAdjustment = async ({
 
         referenceNumber = await generateYearlyReferenceNumber({ type: DOCUMENT_REFERENCE_TYPES.STOCK_ADJUSTMENT, tx: transaction });
 
-        const materialName = material.name;
+        const materialName = supplierMaterial.material.name;
 
         const {
             previousStock,
@@ -133,7 +133,7 @@ export const createStockAdjustment = async ({
             materialBase,
             materialHeight
         } = calculateStockAdjustmentValues({
-            material,
+            supplierMaterial,
             newStock,
             base,
             height
@@ -237,12 +237,12 @@ export const createStockAdjustmentByQuantityChange = async ({
 }) => {
 
     const execute = async (transaction) => {
-        const material = await findSupplierMaterialByIds({
+        const supplierMaterial = await findSupplierMaterialByIds({
             tx: transaction,
             materialId,
             supplierId
         });
-        const newStock = normalizeDecimal((toNumber(material.currentStock) || 0) + Number(quantityChange));
+        const newStock = normalizeDecimal((toNumber(supplierMaterial.currentStock) || 0) + Number(quantityChange));
 
         return createStockAdjustment({
             tx: transaction,

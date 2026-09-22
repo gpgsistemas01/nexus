@@ -27,7 +27,7 @@ export const calculateConvertedQuantity = ({
 
 const getStockErrorMeta = (material = {}) => ({
     materialName: material.name ?? material.material?.name ?? 'Material desconocido',
-    materialId: material.id ?? material.materialId ?? material.material?.id,
+    materialId: material.material?.id ?? material.materialId ?? material.id,
     supplierId: material.supplierId ?? material.supplier?.id,
     height: material.height ?? material.material?.height ?? null,
     base: material.base ?? material.material?.base ?? null,
