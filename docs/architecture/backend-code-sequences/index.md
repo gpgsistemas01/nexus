@@ -3,7 +3,7 @@
 Esta colección **no es un catálogo de diagramas de casos de uso**. Es la lectura técnica
 complementaria del catálogo funcional: cada `CU-*` sirve como vínculo de trazabilidad,
 pero el bloque Mermaid describe cómo se ejecuta el código mediante endpoint, controller,
-servicios, efectos y variables de frontera. Para comprender el objetivo con lenguaje de
+servicios y efectos. Para comprender el objetivo con lenguaje de
 negocio se consulta primero el [modelo y los diagramas funcionales de casos de uso](../../requirements/domain-and-use-cases/03-cases-of-use-current.md).
 
 La [matriz técnica de backend](../backend-technical-documentation/04-application-of-all-the-cases-to-the-code-backend.md)
@@ -18,8 +18,10 @@ común se separan cliente,
 ruta, controller y servicio de dominio; sólo las coordinaciones atómicas
 despliegan módulos colaboradores, persistencia o publicación como participantes
 adicionales. De este modo se conservan pocas entidades sin ocultar el controller ni el
-módulo responsable. Los mensajes conservan las llamadas en orden y las notas nombran datos que cruzan la
-frontera (`req.params`, `req.body`/DTO, parámetros de consulta y `tx`). Todos los recorridos
+módulo responsable. Los mensajes conservan las llamadas y sus parámetros relevantes en
+orden (`req.params`, `req.body`/DTO, parámetros de consulta y `tx`) para hacer visible el
+contrato entre participantes. Esos parámetros no se declaran como participantes ni se
+enumeran en una nota separada. Todos los recorridos
 explicitan middleware, activación de responsabilidades, resultado HTTP y propagación de
 error; las coordinaciones complejas agregan sus colaboradores y límites transaccionales.
 Las variables

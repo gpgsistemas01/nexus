@@ -10,29 +10,30 @@ sequenceDiagram
     participant Controller@{ "type": "control" } as src/controllers/api/warehouse/wasteController.js
     participant WasteDto as «object»<br/>wasteDto<br/>src/dtos/wasteDTO.js
     participant Domain as src/services/warehouse/wastes/wasteMaterialService.js<br/>src/services/warehouse/wastes/wasteService.js
-    Note over Controller,Domain: Variables de frontera: req.body/DTO, req.query/params, tx
+    participant ErrorHandler as src/app.js
 
     Client->>Route: GET /api/warehouse/wastes/material-templates y POST /api/warehouse/wastes
-    Route->>Route: ejecutar en orden el middleware configurado para la ruta
     Route->>Controller: getWasteMaterialTemplates(req, res)/registerWaste
     activate Controller
-    Controller->>WasteDto: createWasteDtoForRegister(req.body) → sanitizeEmptyStrings(...)
+    Controller->>WasteDto: createWasteDtoForRegister(req.body)
     WasteDto-->>Controller: wasteDto normalizado
     Controller->>Domain: findWasteMaterialTemplates({ wasteDto }) alimenta la selección y createWasteWithInitialStockAdjustment crea merma, ajuste y movimiento inicial
     activate Domain
-    Domain->>Domain: buscar misma combinación de proveedor, nombre, base y altura
+    Domain->>Domain: findWasteByIdentity({ tx, supplierId, name, base, height })
     alt La merma ya existe
         Domain-->>Controller: WASTE_ALREADY_EXISTS sin incrementar stock
     else La merma no existe
-        Domain->>Domain: crear merma, ajuste y movimiento de existencia inicial
+        Domain->>Domain: createWasteWithInitialStockAdjustment({ wasteDto, userId })
     end
-    Domain-->>Controller: resultado del servicio o error de dominio tipado
+    alt Servicio resuelto
+        Domain-->>Controller: findWasteMaterialTemplates() resuelve datos de dominio
+        Controller-->>Client: HTTP 2xx { code, data }
+    else AppError propagado
+        Domain-->>Controller: throw AppError { code, message, meta, statusCode }
+        Controller->>ErrorHandler: next(error)
+        ErrorHandler-->>Client: res.status(error.statusCode).json({ code, message, meta })
+    end
     deactivate Domain
-    alt El servicio devuelve el resultado
-        Controller-->>Client: status HTTP y cuerpo concretos del controller
-    else El servicio propaga un error de dominio
-        Controller-->>Client: error entregado al middleware final para su respuesta HTTP
-    end
     deactivate Controller
 ```
 

@@ -10,29 +10,28 @@ sequenceDiagram
     participant Controller@{ "type": "control" } as src/controllers/api/warehouse/wasteIssueController.js
     participant IssueDto as «object»<br/>wasteIssueDto<br/>src/dtos/wasteIssueDTO.js
     participant Domain as src/services/warehouse/wasteIssues/wasteIssueService.js
-    Note over Controller,Domain: Variables de frontera: req.body/DTO, tx
+    participant ErrorHandler as src/app.js
 
     Client->>Route: POST /api/warehouse/waste-issues
-    Route->>Route: ejecutar en orden el middleware configurado para la ruta
     Route->>Controller: registerWasteIssue(req, res)
     activate Controller
-    Controller->>IssueDto: createWasteIssueDtoForRegister(req.body) → sanitizeEmptyStrings(...)
+    Controller->>IssueDto: createWasteIssueDtoForRegister(req.body)
     IssueDto-->>Controller: wasteIssueDto normalizado
     Controller->>Domain: wasteIssueService.createWasteIssue({ wasteIssueDto }) crea encabezado y detalles de merma
     activate Domain
-    Domain->>Domain: comprobar datos, merma activa y que cada wasteId aparezca una sola vez
     alt Hay una merma repetida o inactiva
         Domain-->>Controller: WASTE_ISSUE_STATE_CONFLICT sin crear la salida
     else Las mermas son únicas
-        Domain->>Domain: crear encabezado y un detalle por merma
     end
-    Domain-->>Controller: resultado del servicio o error de dominio tipado
+    alt Servicio resuelto
+        Domain-->>Controller: wasteIssueService.createWasteIssue() resuelve datos de dominio
+        Controller-->>Client: HTTP 2xx { code, data }
+    else AppError propagado
+        Domain-->>Controller: throw AppError { code, message, meta, statusCode }
+        Controller->>ErrorHandler: next(error)
+        ErrorHandler-->>Client: res.status(error.statusCode).json({ code, message, meta })
+    end
     deactivate Domain
-    alt El servicio devuelve el resultado
-        Controller-->>Client: status HTTP y cuerpo concretos del controller
-    else El servicio propaga un error de dominio
-        Controller-->>Client: error entregado al middleware final para su respuesta HTTP
-    end
     deactivate Controller
 ```
 

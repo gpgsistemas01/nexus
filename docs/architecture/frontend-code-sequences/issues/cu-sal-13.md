@@ -5,7 +5,6 @@
 
 ```mermaid
 sequenceDiagram
-    Note over Warehouse,App: Variables de frontera: id, detailId, returnDto, userId y tx
     actor Warehouse as Almacén
     participant Issue as src/public/js/pages/warehouse/wasteIssues/returns/wasteIssueReturn.js
     participant Return as src/public/js/ui/issues/issueReturnUI.js
@@ -18,14 +17,21 @@ sequenceDiagram
     Issue->>Issue: initializeWasteIssueReturns({ details, getIssueId })
     Issue->>Return: wasteIssueReturn.open({ issue: { id }, detail })
     Warehouse->>Return: captura cantidad y confirma
-    Return->>Return: valida límite retornable
+    Return->>Return: validateFields(issueReturnValidation, formData)
     Return->>App: returnWasteIssueDetail({ id, detailId, formData })
     App->>Request: returnWasteIssueDetailRequest({ id, detailId, data: formData })
-    Request->>HTTP: apiRequest({ method: patch, url, data })
+    Request->>HTTP: apiRequest({ method: 'patch', url, data })
     HTTP->>API: PATCH /api/warehouse/waste-issues/:id/details/:detailId/returns
-    API-->>HTTP: wasteIssueReturn
-    HTTP-->>Request: respuesta normalizada
-    Request-->>App: wasteIssueReturn
-    App-->>Return: respuesta exitosa
-    Return->>Issue: recarga la página y consulta la salida actualizada
+    alt Respuesta exitosa
+        API-->>HTTP: 200 { wasteIssueReturn, code }
+        HTTP-->>Request: apiRequest() resuelve response.data
+        Request-->>App: wasteIssueReturn
+        App-->>Return: operación de devolución resuelve response.data
+        Return->>Issue: window.location.reload()
+    else Cantidad inválida, estado incompatible o error HTTP
+        API-->>HTTP: status HTTP { code, message }
+        HTTP-->>Request: apiRequest() rechaza { code, message, meta }
+        Request-->>App: error propagado
+        App-->>Return: operación rechaza { code, message, meta }, sin reload
+    end
 ```

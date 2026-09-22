@@ -18,9 +18,10 @@ representada como parte del dominio. Así, la vista mantiene separadas las
 responsabilidades de navegador, UI, aplicación, servicio de request, cliente HTTP y
 frontera API/controller. Cada archivo frontend que interviene en el recorrido aparece en
 su participante correspondiente; sólo se omiten auxiliares que no reciben mensajes en la
-secuencia. Los mensajes conservan métodos y requests en orden y
-las notas nombran los datos de frontera
-(`id`, `detailId`, `formData`/payload, parámetros y filtros). Todos los recorridos
+secuencia. Los mensajes conservan métodos, requests y parámetros relevantes en orden
+(`id`, `detailId`, `formData`/payload, parámetros y filtros) para hacer visible el
+contrato entre participantes. Esos parámetros no se convierten en líneas de vida ni se
+enumeran en una nota separada. Todos los recorridos
 explicitan recolección/validación de entrada, request, respuesta exitosa, error normalizado
 y efecto visible; las coordinaciones complejas añaden sus módulos especializados.
 Los temporales mecánicos

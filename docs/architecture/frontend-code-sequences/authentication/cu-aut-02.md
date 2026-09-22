@@ -9,7 +9,6 @@ sequenceDiagram
     participant View as src/views/layout/ui/logoutForm.ejs
     participant Route as src/routes/web/auth/logoutWebRoute.js
     participant Controller@{ "type": "control" } as src/controllers/web/authController.js
-    Note over View,Controller: Variables de frontera: sin variables de frontera adicionales
 
     Browser->>View: activar botón Salir
     View->>View: construir el POST sin payload adicional
@@ -18,8 +17,14 @@ sequenceDiagram
     Route->>Controller: logout(req, res)
     activate Controller
     Controller->>Controller: clearAuthCookies(res)
-    Controller-->>Browser: responder redirect a /inicio-sesion
-    Browser->>Browser: seguir redirección y renderizar inicio de sesión
+    alt req.error recibido desde refresh
+        Controller->>Controller: redirectWithFlash(res, INVALID_AUTH, req.error, 'error')
+        Controller-->>Browser: redirect 302 con flash de error
+    else Cierre solicitado
+        Controller->>Controller: redirectWithFlash(res, SUCCESS_LOGOUT, code, 'info')
+        Controller-->>Browser: redirect 302 con flash informativo
+    end
+    Browser->>Browser: GET /inicio-sesion
     deactivate Controller
     deactivate Route
 ```

@@ -11,24 +11,22 @@ sequenceDiagram
     participant Request as src/public/js/services/warehouse/supplierService.js
     participant HTTP as src/public/js/services/axiosInstanceApi.js
     participant Transport@{ "type": "control" } as src/routes/api/warehouse/supplierApiRoute.js<br/>src/controllers/api/warehouse/supplierController.js
-    Note over Application,Transport: Variables de frontera: id, formData/payload
 
     Browser->>View: supplierModal.js precarga el proveedor
-    View->>View: recopilar y validar las variables de frontera indicadas
     View->>Application: editSupplier({ id, formData })
     Application->>Request: editSupplierRequest({ id, formData })
     activate Application
-    Request->>HTTP: apiRequest({ method: 'put', url, data/params })
+    Request->>HTTP: apiRequest({ method: 'put', url, data })
     HTTP->>Transport: envía PUT /api/warehouse/suppliers/:id
-    Transport-->>HTTP: status HTTP y payload del endpoint
-    HTTP-->>Request: respuesta o error normalizado
-    Request-->>Application: resultado del request
+    Transport-->>HTTP: HTTP 2xx { code, data }
+    HTTP-->>Request: apiRequest() resuelve response.data
+    Request-->>Application: editSupplierRequest() resuelve response.data
     alt Respuesta exitosa
-        Application-->>View: entidad, colección o archivo normalizado
-        View-->>Browser: actualizar la vista con el resultado
+        Application-->>View: editSupplier() resuelve response.data
+        View-->>Browser: DOM o DataTable actualizado con response.data
     else Respuesta rechazada
-        Application-->>View: error normalizado por apiRequest
-        View-->>Browser: conservar contexto y mostrar el mensaje
+        Application-->>View: error Axios normalizado { code, message, meta }
+        View-->>Browser: formulario o filtros conservados, mensaje visible
     end
     deactivate Application
 ```

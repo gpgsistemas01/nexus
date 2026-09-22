@@ -9,22 +9,22 @@ sequenceDiagram
     participant Route as src/routes/api/warehouse/goodsReceiptApiRoute.js
     participant Controller@{ "type": "control" } as src/controllers/api/warehouse/goodsReceiptController.js
     participant Domain as src/services/warehouse/goodsReceipts/goodsReceiptService.js
-    Note over Controller,Domain: Variables de frontera: req.query/params
+    participant ErrorHandler as src/app.js
 
     Client->>Route: GET /api/warehouse/goods-receipts
-    Route->>Route: ejecutar en orden el middleware configurado para la ruta
     Route->>Controller: getAllGoodsReceipts(req, res)
     activate Controller
     Controller->>Domain: goodsReceiptService.findAllGoodsReceipts({ query: req.query }) consulta entradas y totales
     activate Domain
-    Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
-    Domain-->>Controller: resultado del servicio o error de dominio tipado
-    deactivate Domain
-    alt El servicio devuelve el resultado
-        Controller-->>Client: status HTTP y cuerpo concretos del controller
-    else El servicio propaga un error de dominio
-        Controller-->>Client: error entregado al middleware final para su respuesta HTTP
+    alt Servicio resuelto
+        Domain-->>Controller: goodsReceiptService.findAllGoodsReceipts() resuelve datos de dominio
+        Controller-->>Client: HTTP 2xx { code, data }
+    else AppError propagado
+        Domain-->>Controller: throw AppError { code, message, meta, statusCode }
+        Controller->>ErrorHandler: next(error)
+        ErrorHandler-->>Client: res.status(error.statusCode).json({ code, message, meta })
     end
+    deactivate Domain
     deactivate Controller
 ```
 

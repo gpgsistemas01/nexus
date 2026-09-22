@@ -5,7 +5,6 @@
 
 ```mermaid
 sequenceDiagram
-    Note over Router,Controller: Variables de frontera: goodsReceiptDto y tx
     participant Browser as Navegador
     participant Router as src/routes/api/warehouse/goodsReceiptApiRoute.js
     participant Controller@{ "type": "control" } as src/controllers/api/warehouse/goodsReceiptController.js
@@ -18,29 +17,29 @@ sequenceDiagram
     participant Socket as src/utils/socketUtils.js
 
     Browser->>Router: POST /api/warehouse/goods-receipts
-    Router->>Router: autenticar, validar y autorizar
-    Router->>Controller: req, res
-    Controller->>ReceiptDto: createGoodsReceiptDtoForRegister(req.body) → sanitizeEmptyStrings(...)
+    Router->>Controller: registerGoodsReceipt(req, res)
+    Controller->>ReceiptDto: createGoodsReceiptDtoForRegister(req.body)
     ReceiptDto-->>Controller: goodsReceiptDto
-    Controller->>Service: { goodsReceiptDto }
-    Service->>Prisma: validar proveedor, factura y persona receptora
-    alt Proveedor o material inactivo
-        Service-->>Controller: SUPPLIER_INACTIVE_CONFLICT o MATERIAL_INACTIVE_CONFLICT sin crear entrada ni movimiento
+    Controller->>Service: registerGoodsReceipt({ goodsReceiptDto })
+    Service->>Prisma: createGoodsReceipt() valida proveedor, factura y persona receptora
+    break Proveedor o material inactivo
+        Service-->>Controller: error SUPPLIER_INACTIVE_CONFLICT o MATERIAL_INACTIVE_CONFLICT
+        Controller-->>Browser: 409 { code, message }
     end
     alt La factura ya existe para el proveedor
-        Service-->>Controller: GOODS_RECEIPT_INVOICE_ALREADY_EXISTS con folio existente
+        Service-->>Controller: error GOODS_RECEIPT_INVOICE_ALREADY_EXISTS con folio existente
+        Controller-->>Browser: 409 { code, message, meta }
     else La factura está disponible o es remisión
-        Service->>DetailBuilder: conservar y calcular cada renglón, incluso materiales repetidos
+        Service->>DetailBuilder: buildGoodsReceiptDetails(details, { tx, supplierId })
     end
-    Service->>DetailBuilder: construir detalles y calcular totales
-    Service->>Prisma: iniciar $transaction
-    Service->>Reference: generar referencia anual con tx
-    Service->>Prisma: crear encabezado, detalles y totales
+    Service->>DetailBuilder: calculateGoodsReceiptTotals(details)
+    Service->>Prisma: getDb().$transaction(async tx => ...)
+    Service->>Reference: generateYearlyReferenceNumber({ type, tx })
+    Service->>Prisma: createGoodsReceiptDetailsAndUpdateTotals({ tx, goodsReceiptId, supplierId, details })
     Service->>Inventory: applyInventoryMovement({ tx, ENTRY, details })
-    Inventory->>Prisma: incrementar existencias y crear movimiento
+    Inventory->>Prisma: applyInventoryMovement({ tx, type: ENTRY, details })
     Prisma-->>Service: entrada confirmada y commit
     Service-->>Controller: goodsReceipt
-    Controller->>Socket: emitInventoryUpdated(...)
+    Controller->>Socket: emitInventoryUpdated({ context: 'material', source: 'goods-receipt-created' })
     Controller-->>Browser: 200 { goodsReceipt, code }
 ```
-

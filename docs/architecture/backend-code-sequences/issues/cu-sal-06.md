@@ -5,7 +5,6 @@
 
 ```mermaid
 sequenceDiagram
-    Note over Router,Controller: Variables de frontera: id, detailId, returnDto, userId y tx
     participant Browser as Navegador
     participant Router as src/routes/api/warehouse/goodsIssueApiRoute.js
     participant Controller@{ "type": "control" } as src/controllers/api/warehouse/goodsIssueController.js
@@ -17,30 +16,28 @@ sequenceDiagram
     participant Socket as src/utils/socketUtils.js
 
     Browser->>Router: PATCH /:id/details/:detailId/returns
-    Router->>Router: autenticar, validar y autorizar
-    Router->>Controller: req, res
-    Controller->>ReturnDto: createGoodsIssueDtoForReturn(req.body) → sanitizeEmptyStrings(...)
+    Router->>Controller: registerGoodsIssueDetailReturn(req, res)
+    Controller->>ReturnDto: createGoodsIssueDtoForReturn(req.body)
     ReturnDto-->>Controller: returnDto normalizado
     Controller->>Service: returnGoodsIssueDetail({ id, detailId, returnDto, userId })
     Service->>Prisma: getDb().$transaction(async tx)
-    Service->>Prisma: cargar salida y detalle surtido
-    Service->>Service: validar estado, cantidad surtida y devoluciones previas
+    Service->>Prisma: tx.goodsIssueDetail.findFirst({ where: { id: detailId, goodsIssueId: id } })
+    Service->>Service: returnGoodsIssueDetail() valida estado, cantidad y devoluciones
     alt Cantidad no retornable
         Service-->>Service: error de dominio
         Service-->>Controller: rollback y error
     else Cantidad válida
-        Service->>Inventory: incrementar existencia y crear movimiento inverso con tx
-        Service->>Prisma: crear GoodsIssueReturn
-        Service->>Prisma: recargar todos los detalles con tx
+        Service->>Inventory: applyInventoryMovement({ tx, movementType: ENTRY, details })
+        Service->>Prisma: tx.goodsIssueReturn.create({ data })
+        Service->>Prisma: tx.goodsIssueDetail.findMany({ where: { goodsIssueId: id } })
         alt todos los detalles quedan Cancelado
-            Service->>Status: derivar cumplimiento Cancelado y estado documental Cancelada
+            Service->>Status: resolveIssueFulfillmentStatus(details)
         else existe algún detalle no cancelado
             Service->>Status: resolveIssueFulfillmentStatus(refreshedDetails) sin cancelar el encabezado
         end
         Prisma-->>Service: salida actualizada y commit
         Service-->>Controller: salida y devolución
-        Controller->>Socket: publicar después del commit
+        Controller->>Socket: emitInventoryUpdated({ context: 'material', source: 'goods-issue-return-created' })
         Controller-->>Browser: 200 { goodsIssueReturn, code }
     end
 ```
-

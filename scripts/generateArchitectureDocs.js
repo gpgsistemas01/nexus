@@ -98,13 +98,22 @@ const RESERVED_SEQUENCE_ALIASES = new Set([
     'actor', 'alt', 'and', 'autonumber', 'break', 'critical', 'details', 'else', 'end',
     'loop', 'note', 'opt', 'option', 'par', 'participant', 'rect'
 ]);
-const MIN_SEQUENCE_MESSAGES = 7;
+const MIN_SEQUENCE_MESSAGES = 5;
 const MIN_SEQUENCE_CALLS = 2;
 const GENERIC_SEQUENCE_MESSAGES = [
     'devolver resultado o error del caso',
     'emitir respuesta observable',
     'devolver respuesta normalizada',
-    'presentar resultado observable'
+    'presentar resultado observable',
+    'resultado del servicio o error de dominio tipado',
+    'status HTTP y cuerpo concretos del controller',
+    'error entregado al middleware final para su respuesta HTTP',
+    'status HTTP y payload del endpoint',
+    'respuesta o error normalizado',
+    'resultado del request',
+    'entidad, colección o archivo normalizado',
+    'actualizar la vista con el resultado',
+    'conservar contexto y mostrar el mensaje'
 ];
 const EXTERNAL_SEQUENCE_PARTICIPANTS = new Set([
     'Cliente HTTP / web',
@@ -201,9 +210,6 @@ const validateUseCaseDiagramCoverage = async () => {
             if ((body.match(/^sequenceDiagram$/gm) ?? []).length !== 1) {
                 failures.push(`diagramas ${side}: ${id} debe contener exactamente una secuencia de código`);
             }
-            if (!body.includes('Variables de frontera:')) {
-                failures.push(`diagramas ${side}: ${id} no identifica sus variables de frontera`);
-            }
             const sequence = getMermaidBlocks(body)[0] ?? '';
             if (side === 'backend' && !/^\s*(?:actor|participant)\s+\S+(?:@\{[^}]+\})?\s+as\s+(?:Navegador|Cliente HTTP \/ web)$/m.test(sequence)) {
                 failures.push(`diagramas backend: ${id} no identifica la frontera como Navegador o Cliente HTTP / web`);
@@ -216,7 +222,14 @@ const validateUseCaseDiagramCoverage = async () => {
                 line.match(/\b[A-Za-z_$][\w$]*(?:\.[A-Za-z_$][\w$]*)?\(/g) ?? []
             ));
             if (calls.length < MIN_SEQUENCE_CALLS) {
-                failures.push(`diagramas ${side}: ${id} no identifica al menos ${MIN_SEQUENCE_CALLS} métodos o funciones con sus variables`);
+                failures.push(`diagramas ${side}: ${id} no identifica al menos ${MIN_SEQUENCE_CALLS} métodos o funciones con sus parámetros relevantes`);
+            }
+            if (sequence.includes('Variables de frontera:')) {
+                failures.push(`diagramas ${side}: ${id} transcribe variables de frontera que pertenecen al código enlazado`);
+            }
+            if (!/^\s*alt\s+/m.test(sequence)
+                || !/-->>.*\b(?:error|rechazad[oa]|conflict|invalid|rollback)\b/i.test(sequence)) {
+                failures.push(`diagramas ${side}: ${id} no representa el error devuelto con una respuesta discontinua dentro de alt/else`);
             }
             const foundGenericMessages = GENERIC_SEQUENCE_MESSAGES.filter((message) => sequence.includes(message));
             if (foundGenericMessages.length) {
@@ -247,6 +260,23 @@ const validateUseCaseDiagramCoverage = async () => {
             const reservedAliases = aliases.filter((alias) => RESERVED_SEQUENCE_ALIASES.has(alias));
             if (reservedAliases.length) {
                 failures.push(`diagramas ${side}: ${id} usa alias reservados de Mermaid (${reservedAliases.join(', ')})`);
+            }
+            const actorAliases = new Set([
+                'browser',
+                'client',
+                ...[...sequence.matchAll(/^\s*actor\s+([^\s@]+)(?:@\{[^}]+\})?\s+as\s+/gm)]
+                    .map((match) => match[1].toLowerCase())
+            ]);
+            const nonTechnicalMessages = messages.filter((line) => {
+                if (line.includes('-->>')) return false;
+                const [, sender = '', label = ''] = line.match(/^\s*([^\s-]+)->>[^:]+:\s*(.+)$/) ?? [];
+                if (actorAliases.has(sender.toLowerCase())) return false;
+                return !/\b[A-Za-z_$][\w$]*(?:\?\.|\.)?[A-Za-z_$]*\s*\(/.test(label)
+                    && !/\b(?:GET|POST|PATCH|PUT|DELETE)\b/.test(label)
+                    && !/^import\s/.test(label);
+            });
+            if (nonTechnicalMessages.length) {
+                failures.push(`diagramas ${side}: ${id} contiene mensajes internos sin método, request HTTP ni import técnico (${nonTechnicalMessages.map((line) => line.trim()).join(' | ')})`);
             }
             const participants = [...sequence.matchAll(/^\s*participant\s+([^\s@]+)(?:@\{[^}]+\})?\s+as\s+(.+)$/gm)];
             for (const [, alias, label] of participants) {
