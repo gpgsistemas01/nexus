@@ -13,8 +13,14 @@ sequenceDiagram
     participant Transport@{ "type": "control" } as src/routes/api/warehouse/materialApiRoute.js<br/>src/controllers/api/warehouse/materialController.js
 
     Browser->>View: materialModal.js abre materialForm.js en modo alta
-    View->>Application: registerMaterial({ formData })
-    Application->>Request: registerMaterialRequest({ formData })
+    View->>View: validateFields(getMaterialValidation(form), formData)
+    alt Alta desde compra
+        View->>Application: registerMaterial({ formData, creationContext: 'goodsReceipt' })
+        Application->>Application: buildGoodsReceiptMaterialData(data) omite maxUnitCost y newStock
+    else Alta directa
+        View->>Application: registerMaterial({ formData, creationContext: null })
+    end
+    Application->>Request: registerMaterialRequest({ data })
     activate Application
     Request->>HTTP: apiRequest({ method: 'post', url, data })
     HTTP->>Transport: envía POST /api/warehouse/materials
@@ -34,4 +40,3 @@ sequenceDiagram
     end
     deactivate Application
 ```
-

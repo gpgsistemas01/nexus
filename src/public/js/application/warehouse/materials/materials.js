@@ -3,14 +3,17 @@ import { createCrudApplication } from "../../createCrudApplication.js";
 
 const GOODS_RECEIPT_CREATION_CONTEXT = 'goodsReceipt';
 
-const omitMaxUnitCost = ({ maxUnitCost: _maxUnitCost, ...formData }) => formData;
+const buildGoodsReceiptMaterialData = ({ maxUnitCost: _maxUnitCost, newStock: _newStock, ...formData }) => ({
+    ...formData,
+    creationContext: GOODS_RECEIPT_CREATION_CONTEXT
+});
 
 const materialApplication = createCrudApplication({
     requests: {
         getAll: getAllMaterialsRequest,
         register: ({ data, creationContext = null }) => registerMaterialRequest({
             data: creationContext === GOODS_RECEIPT_CREATION_CONTEXT
-                ? omitMaxUnitCost(data)
+                ? buildGoodsReceiptMaterialData(data)
                 : data
         }),
         edit: editMaterialRequest,
