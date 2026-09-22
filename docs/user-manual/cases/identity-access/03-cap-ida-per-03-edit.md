@@ -12,5 +12,7 @@
    ![CAP-IDA-PER-03-EDIT: formulario edicion](../../images/people/03-form-edit.png)
 
 2. Modifique **Nombre completo** si corresponde.
-3. Use los selectores **Buscar área...** y **Buscar rol...**, el botón **Agregar** y los controles de accesos existentes para dejar sólo los accesos autorizados.
-4. Seleccione el botón **Actualizar** para guardar los cambios.
+3. Para incorporar un acceso, elija opciones en **Buscar área...** y **Buscar rol...**, seleccione **Agregar** y compruebe que aparezca en la tabla. Para retirar uno, use **Eliminar acceso** en su renglón.
+4. Repita las operaciones necesarias, revise la tabla y seleccione **Actualizar** para guardar todos los cambios. Agregar o eliminar un renglón todavía no modifica las asignaciones persistidas hasta confirmar.
+
+Cada área puede aparecer **una sola vez** y sólo puede tener un rol para la persona. Para cambiar el rol de un área ya registrada, elimine primero su renglón y vuelva a agregar la misma área con el rol correcto; Nexus rechaza agregar directamente un segundo acceso para esa área.
