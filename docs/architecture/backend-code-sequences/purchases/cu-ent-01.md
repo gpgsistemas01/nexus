@@ -17,7 +17,7 @@ sequenceDiagram
     Controller->>Domain: goodsReceiptService.findAllGoodsReceipts({ query: req.query }) consulta entradas y totales
     activate Domain
     alt Servicio resuelto
-        Domain-->>Controller: goodsReceiptService.findAllGoodsReceipts() resuelve datos de dominio
+        Domain-->>Controller: goodsReceiptService.findAllGoodsReceipts() devuelve { data, recordsTotal, recordsFiltered } para la tabla solicitada
         Controller-->>Client: HTTP 2xx { code, data }
     else AppError propagado
         Domain-->>Controller: throw AppError { code, message, meta, statusCode }

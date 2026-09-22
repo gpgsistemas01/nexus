@@ -36,11 +36,12 @@ antes de entregar datos normalizados al caso de uso?
 
 ```mermaid
 sequenceDiagram
-    participant Client as Cliente HTTP
-    participant Route as routes/api/*ApiRoute.js
-    participant Auth as middleware/authMiddleware.js
-    participant Validation as validators/forms/* + validatorMiddleware.validate
-    participant Controller as controllers/api/*Controller.js + dtos/*DTO.js
+    actor Client as Cliente HTTP
+    participant Route@{ "type": "boundary" } as routes/api/*ApiRoute.js
+    participant Auth@{ "type": "control" } as middleware/authMiddleware.js
+    participant Validation@{ "type": "control" } as validators/forms/* + validatorMiddleware.validate
+    participant Controller@{ "type": "control" } as controllers/api/*Controller.js
+    participant Dto as <u>resourceDto: Object</u><br/>dtos/*DTO.js
     participant Service as services/*Service.js
 
     Client->>Route: enviar petición
@@ -60,9 +61,10 @@ sequenceDiagram
             else permiso concedido
                 Auth->>Controller: controller(req, res) con req.user
                 opt el endpoint acepta un DTO
-                    Controller->>Controller: create*Dto(req.body)
+                    Controller->>Dto: create*Dto(req.body)
+                    Dto-->>Controller: resourceDto normalizado
                 end
-                Controller->>Service: invocar función importada con DTO, params y userId
+                Controller->>Service: invocar función importada con resourceDto, params y userId
                 Service-->>Controller: devolver resultado o error de dominio
                 Controller-->>Client: emitir respuesta HTTP
             end
@@ -77,6 +79,11 @@ La construcción se comprueba desde la declaración ordenada de middleware en
 de entrada en [`src/controllers/api`](../../../src/controllers/api) y
 [`src/dtos`](../../../src/dtos). Las etiquetas genéricas `*` agrupan archivos equivalentes;
 el diagrama de cada caso las reemplaza por su ruta, controller, DTO y servicio concretos.
+Las figuras `boundary` y `control`, el actor y la línea de vida del objeto son parte de
+la lectura visual; los textos de la cabecera no funcionan como estereotipos sustitutos.
+La validación mostrada es la autoritativa del backend. Una validación frontend se traza
+por separado como auto-mensaje del formulario o módulo UI y como alternativa previa al
+request, sin omitir que el servidor vuelve a validar la entrada.
 
 ### Factories y composición sobre herencia
 

@@ -13,21 +13,26 @@ sequenceDiagram
     participant Transport@{ "type": "control" } as src/routes/api/admin/catalogApiRoute.js<br/>src/controllers/api/admin/catalogController.js
 
     Browser->>View: confirmar el formulario de alta
-    View->>Application: registerCatalogEntry({ catalog, data })
-    Application->>Request: createCatalogEntryRequest({ catalog, data })
-    activate Application
-    Request->>HTTP: apiRequest({ method: 'post', url, data })
-    HTTP->>Transport: consume POST /api/admin/catalogs/fulfillment-statuses
-    Transport-->>HTTP: HTTP 2xx { code, data }
-    HTTP-->>Request: apiRequest() resuelve response.data
-    Request-->>Application: createCatalogEntryRequest() resuelve response.data
-    alt Respuesta exitosa
-        Application-->>View: registerCatalogEntry() resuelve response.data
-        View-->>Browser: DOM o DataTable actualizado con response.data
-    else Respuesta rechazada
-        Application-->>View: error Axios normalizado { code, message, meta }
-        View-->>Browser: formulario o filtros conservados, mensaje visible
+    View->>View: validateFields(catalogValidation, formData)
+    alt catalogValidation devuelve errores
+        View-->>Browser: useForm.getErrors() conserva datos y muestra errores por campo
+    else Formulario válido
+        View->>Application: registerCatalogEntry({ catalog, data })
+        Application->>Request: createCatalogEntryRequest({ catalog, data })
+        activate Application
+        Request->>HTTP: apiRequest({ method: 'post', url, data })
+        HTTP->>Transport: consume POST /api/admin/catalogs/fulfillment-statuses
+        Transport-->>HTTP: HTTP 2xx { code, data }
+        HTTP-->>Request: apiRequest() resuelve response.data
+        Request-->>Application: createCatalogEntryRequest() resuelve response.data
+        alt Respuesta exitosa
+            Application-->>View: registerCatalogEntry() resuelve response.data
+            View-->>Browser: DOM o DataTable actualizado con response.data
+        else Respuesta rechazada
+            Application-->>View: error Axios normalizado { code, message, meta }
+            View-->>Browser: formulario o filtros conservados, mensaje visible
+        end
+        deactivate Application
     end
-    deactivate Application
 ```
 

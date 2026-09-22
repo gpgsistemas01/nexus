@@ -13,20 +13,25 @@ sequenceDiagram
     participant Transport@{ "type": "control" } as src/routes/api/warehouse/wasteApiRoute.js<br/>src/controllers/api/warehouse/wasteController.js
 
     Browser->>View: wasteForm.js usa el modo de ajuste
-    View->>Application: editWasteStock({ id, formData })
-    Application->>Request: editWasteStockRequest({ id, formData })
-    activate Application
-    Request->>HTTP: apiRequest({ method: 'patch', url, data })
-    HTTP->>Transport: envía PATCH /api/warehouse/wastes/:id/stock
-    Transport-->>HTTP: HTTP 2xx { code, data }
-    HTTP-->>Request: apiRequest() resuelve response.data
-    Request-->>Application: editWasteStockRequest() resuelve response.data
-    alt Respuesta exitosa
-        Application-->>View: editWasteStock() resuelve response.data
-        View-->>Browser: DOM o DataTable actualizado con response.data
-    else Respuesta rechazada
-        Application-->>View: error Axios normalizado { code, message, meta }
-        View-->>Browser: formulario o filtros conservados, mensaje visible
+    View->>View: validateFields(wasteStockValidation, formData)
+    alt wasteStockValidation devuelve errores
+        View-->>Browser: useForm.getErrors() conserva datos y muestra errores por campo
+    else Formulario válido
+        View->>Application: editWasteStock({ id, formData })
+        Application->>Request: editWasteStockRequest({ id, formData })
+        activate Application
+        Request->>HTTP: apiRequest({ method: 'patch', url, data })
+        HTTP->>Transport: envía PATCH /api/warehouse/wastes/:id/stock
+        Transport-->>HTTP: HTTP 2xx { code, data }
+        HTTP-->>Request: apiRequest() resuelve response.data
+        Request-->>Application: editWasteStockRequest() resuelve response.data
+        alt Respuesta exitosa
+            Application-->>View: editWasteStock() resuelve response.data
+            View-->>Browser: DOM o DataTable actualizado con response.data
+        else Respuesta rechazada
+            Application-->>View: error Axios normalizado { code, message, meta }
+            View-->>Browser: formulario o filtros conservados, mensaje visible
+        end
+        deactivate Application
     end
-    deactivate Application
 ```

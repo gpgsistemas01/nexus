@@ -80,7 +80,7 @@ busca una profundidad equivalente dentro de los límites de cada perspectiva:
 | Evidencia revisada | Frontend | Backend |
 | --- | --- | --- |
 | Inicio del recorrido | Evento de navegador, vista o módulo UI. | Petición HTTP y ruta registrada. |
-| Coordinación propia | Validación visual, aplicación, servicio de request y cliente HTTP, cada uno con su archivo. | Middleware, controller/DTO y servicio de dominio. |
+| Coordinación propia | Validación visual, aplicación, servicio de request y cliente HTTP, cada uno con su archivo. | Validación autoritativa en middleware, controller/DTO y servicio de dominio. |
 | Frontera compartida | Método, endpoint, payload o parámetros enviados. | Método, endpoint y datos recibidos desde `req`. |
 | Resultado | Respuesta normalizada, error y efecto visible. | Persistencia o efecto, respuesta HTTP y propagación de error. |
 
@@ -92,7 +92,9 @@ El contenido se detiene en la responsabilidad de cada perspectiva:
 
 - frontend muestra interacción, recolección o validación, aplicación, servicio HTTP,
   respuesta o error normalizado y efecto visible;
-- backend muestra ruta y middleware, controller/DTO, servicio, persistencia o efecto,
+- backend muestra ruta y, cuando cambia la alternativa del caso, el middleware exacto;
+  la validación de entrada siempre pertenece al middleware y no al controller/DTO;
+  después muestra servicio, persistencia o efecto,
   respuesta HTTP y propagación del error;
 - una coordinación especializada se agrega sólo donde realmente ocurre. El frontend no
   reproduce transacciones o consultas internas del servidor, y el backend no simula

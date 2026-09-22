@@ -17,7 +17,7 @@ sequenceDiagram
     Controller->>Domain: findAllMaterialMovements(getMovementListParams(req))
     activate Domain
     alt Servicio resuelto
-        Domain-->>Controller: findAllMaterialMovements() resuelve datos de dominio
+        Domain-->>Controller: findAllMaterialMovements() devuelve { data, recordsTotal, recordsFiltered } para la tabla solicitada
         Controller-->>Client: HTTP 2xx { code, data }
     else AppError propagado
         Domain-->>Controller: throw AppError { code, message, meta, statusCode }

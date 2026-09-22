@@ -12,17 +12,18 @@ diagrama. Esta colección no vuelve a copiar esa relación en cada sección. Los
 participantes identifican su archivo concreto. Los métodos, requests y endpoints se
 indican en los mensajes que ejecutan cada proceso para no repetirlos en las entidades.
 La figura `control` marca la frontera API y el controller backend que recibe cada request,
-sin repetir el estereotipo textual de controlador ni abrir otra línea de vida. Los módulos UI, de aplicación y request no reciben
-`«object»`: ese estereotipo se reserva para un objeto JSON o una instancia de clase
-representada como parte del dominio. Así, la vista mantiene separadas las
+sin repetir el estereotipo textual de controlador ni abrir otra línea de vida. Los
+módulos UI, de aplicación y request no se presentan como objetos: cuando una instancia
+necesita línea de vida se usa la figura de participante y el nombre subrayado
+`instancia: Tipo`, no un estereotipo aislado. Así, la vista mantiene separadas las
 responsabilidades de navegador, UI, aplicación, servicio de request, cliente HTTP y
 frontera API/controller. Cada archivo frontend que interviene en el recorrido aparece en
 su participante correspondiente; sólo se omiten auxiliares que no reciben mensajes en la
 secuencia. Los mensajes conservan métodos, requests y parámetros relevantes en orden
 (`id`, `detailId`, `formData`/payload, parámetros y filtros) para hacer visible el
 contrato entre participantes. Esos parámetros no se convierten en líneas de vida ni se
-enumeran en una nota separada. Todos los recorridos
-explicitan recolección/validación de entrada, request, respuesta exitosa, error normalizado
+enumeran en una nota separada. Todos los recorridos explicitan recolección y validación
+de entrada en el módulo frontend que realmente la ejecuta, request, respuesta exitosa, error normalizado
 y efecto visible; las coordinaciones complejas añaden sus módulos especializados.
 Los temporales mecánicos
 permanecen en el código. Cada caso mantiene una secuencia específica aunque reutilice
@@ -31,6 +32,12 @@ Su detalle se evalúa con la
 [regla de simetría entre frontend y backend](../diagram-conventions/06-inventory-of-notation-uml.md#simetría-de-detalle-entre-secuencias-frontend-y-backend):
 debe aportar el mismo nivel de evidencia, sin copiar middleware, transacciones ni
 persistencia que pertenecen a la perspectiva del servidor.
+
+La validación frontend representa retroalimentación inmediata y evita requests
+innecesarios, pero no es un control de seguridad. Cuando cambia el recorrido se muestra
+como auto-mensaje (`validateFields`, `checkValidity` u otra función real) y una rama que
+conserva el formulario ante el error. La validación autoritativa se vuelve a ejecutar en
+el backend mediante middleware; no se atribuye al controller ni al DTO.
 
 ### Relación con la documentación técnica
 
