@@ -126,6 +126,7 @@ describe('select de material reutilizado por el CRUD de merma', () => {
     const option = mapSelectMaterialData({
       id: 'supplier-material-1',
       material: {
+        id: 'material-1',
         name: 'Lámina',
         base: 2,
         height: 3,
@@ -140,6 +141,34 @@ describe('select de material reutilizado por el CRUD de merma', () => {
     }));
     expect(option).not.toHaveProperty('presentationName');
     expect(getPresentation(JSON.parse(option.material))).toBe('ROLLO');
+  });
+
+  it('normaliza el material recién creado para conservarlo como opción seleccionada', () => {
+    const createdMaterial = {
+      id: 'supplier-material-1',
+      material: {
+        id: 'material-1',
+        name: 'Lámina',
+        base: 2,
+        height: 3,
+        presentation: { id: 'presentation-1', name: 'ROLLO' },
+        unitMeasure: { id: 'unit-1', symbol: 'm²' }
+      },
+      supplier: { id: 'supplier-1', tradeName: 'Proveedor Norte' }
+    };
+
+    const option = mapSelectMaterialData(createdMaterial);
+
+    expect(option).toEqual(expect.objectContaining({
+      id: 'supplier-material-1',
+      text: 'Lámina (2 × 3) · Proveedor Norte'
+    }));
+    expect(JSON.parse(option.material)).toEqual(expect.objectContaining({
+      id: 'material-1',
+      presentation: createdMaterial.material.presentation,
+      unitMeasure: createdMaterial.material.unitMeasure
+    }));
+    expect(JSON.parse(option.supplier)).toEqual(createdMaterial.supplier);
   });
 
   it('serializa las relaciones de la plantilla que Select2 conserva en la opción HTML', () => {
