@@ -9,6 +9,8 @@ sequenceDiagram
     participant Modal as src/public/js/pages/warehouse/goodsReceipts/goodsReceiptModal.js
     participant Form as src/public/js/pages/warehouse/goodsReceipts/goodsReceiptForm.js
     participant DetailUI as src/public/js/pages/warehouse/goodsReceipts/goodsReceiptDetails.js<br/>src/public/js/plugins/datatable/warehouse/goodsReceipts/goodsReceiptDatatable.js
+    participant MaterialUI as src/public/js/plugins/select2/modules/goodsReceiptSelect.js<br/>src/public/js/pages/warehouse/materials/materialModal.js
+    participant MaterialApp as src/public/js/application/warehouse/materials/materials.js
     participant App as src/public/js/application/warehouse/goodsReceipts/goodsReceipts.js
     participant Request as src/public/js/services/warehouse/goodsReceiptService.js
     participant HTTP as src/public/js/services/axiosInstanceApi.js
@@ -16,6 +18,13 @@ sequenceDiagram
 
     Warehouse->>Modal: abrir «Nueva compra»
     Modal->>Modal: openGoodsReceiptModal({ mode: create })
+    opt El material no está catalogado
+        DetailUI->>MaterialUI: setupMaterialSelect({ creationContext: 'goodsReceipt' }) abre openMaterialModal(...)
+        MaterialUI->>MaterialApp: registerMaterial({ formData, creationContext: 'goodsReceipt' })
+        MaterialApp->>MaterialApp: buildGoodsReceiptMaterialData(data) omite maxUnitCost y newStock
+        MaterialApp->>HTTP: POST /api/warehouse/materials con creationContext
+        HTTP-->>MaterialUI: material creado con stock cero y costo aún nulo
+    end
     Warehouse->>DetailUI: seleccionar material, cantidad y costo por presentación
     DetailUI->>DetailUI: addGoodsReceiptMaterial()
     opt Se agrega otra vez el mismo material

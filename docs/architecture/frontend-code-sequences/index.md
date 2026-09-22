@@ -88,6 +88,11 @@ aparece una vez, conserva su referencia de patrones y contiene un bloque Mermaid
 | Salidas | `CU-SAL-01..14` | 14 | Completo |
 | **Total** | Seis grupos propietarios | **72** | **72 de 72** |
 
+Los casos de inicio y cierre de sesión permanecen en esta colección sólo como
+realización técnica de `CU-AUT-01` y `CU-AUT-02`. La autenticación como condición
+transversal se especifica en requisitos y no se repite como participante ni mediante
+pasos genéricos dentro de los demás recorridos frontend.
+
 ### Capítulos técnicos
 
 - [Autenticación](authentication/index.md): casos `CU-AUT-*`.

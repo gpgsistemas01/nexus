@@ -68,7 +68,8 @@ describe('aplicación del CRUD de materiales', () => {
         minStock: 2,
         base: 3,
         height: 4,
-        isActive: true
+        isActive: true,
+        creationContext: 'goodsReceipt'
       }
     });
   });

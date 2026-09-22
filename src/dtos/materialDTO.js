@@ -1,5 +1,7 @@
 import { normalizeMaterialDimensions, toNumber } from '../utils/formattersUtils.js';
 
+const MATERIAL_CREATION_CONTEXT_GOODS_RECEIPT = 'goodsReceipt';
+
 const buildMaterialDataDto = (body = {}) => ({
     name: body.name.trim(),
     supplierId: body.supplierId,
@@ -21,11 +23,25 @@ const buildMaterialStockDto = (body = {}, { includeSupplier = true, includeReaso
     ...includeReason && Object.prototype.hasOwnProperty.call(body, 'reasonId') ? { reasonId: body.reasonId } : {}
 });
 
-export const createMaterialDtoForRegister = (body = {}) => ({
-    ...buildMaterialDataDto(body),
-    ...buildMaterialSecondaryDataDto(body),
-    ...buildMaterialStockDto(body, { includeSupplier: false, includeReason: false })
-});
+export const createMaterialDtoForRegister = (body = {}) => {
+    const materialData = buildMaterialDataDto(body);
+
+    if (body.creationContext === MATERIAL_CREATION_CONTEXT_GOODS_RECEIPT) {
+        return {
+            ...materialData,
+            ...(Object.prototype.hasOwnProperty.call(body, 'minStock') && body.minStock !== null
+                ? { minStock: Number(body.minStock) }
+                : {}),
+            ...(Object.prototype.hasOwnProperty.call(body, 'isActive') ? { isActive: Boolean(body.isActive) } : {})
+        };
+    }
+
+    return {
+        ...materialData,
+        ...buildMaterialSecondaryDataDto(body),
+        ...buildMaterialStockDto(body, { includeSupplier: false, includeReason: false })
+    };
+};
 
 export const createMaterialDtoForEdit = (body = {}) => ({
     name: body.name.trim(),

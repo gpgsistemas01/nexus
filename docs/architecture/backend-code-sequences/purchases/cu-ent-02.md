@@ -7,6 +7,8 @@
 sequenceDiagram
     participant Browser as Navegador
     participant Router as src/routes/api/warehouse/goodsReceiptApiRoute.js
+    participant Auth as src/middleware/authMiddleware.js
+    participant Validator as src/validators/forms/goodsReceiptValidations.js<br/>src/middleware/validatorMiddleware.js
     participant Controller@{ "type": "control" } as src/controllers/api/warehouse/goodsReceiptController.js
     participant ReceiptDto as «object»<br/>goodsReceiptDto<br/>src/dtos/goodsReceiptDTO.js
     participant Service as src/services/warehouse/goodsReceipts/goodsReceiptService.js
@@ -17,6 +19,9 @@ sequenceDiagram
     participant Socket as src/utils/socketUtils.js
 
     Browser->>Router: POST /api/warehouse/goods-receipts
+    Router->>Auth: verifyApiTokenRequired(req, res, next)
+    Router->>Validator: goodsReceiptValidation[] y validate(req, res, next)
+    Router->>Auth: authorizeUserApi(PERMISSIONS.GOODS_RECEIPTS_MANAGE)(req, res, next)
     Router->>Controller: registerGoodsReceipt(req, res)
     Controller->>ReceiptDto: createGoodsReceiptDtoForRegister(req.body)
     ReceiptDto-->>Controller: goodsReceiptDto

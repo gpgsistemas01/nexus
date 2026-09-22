@@ -21,9 +21,12 @@ adicionales. De este modo se conservan pocas entidades sin ocultar el controller
 módulo responsable. Los mensajes conservan las llamadas y sus parámetros relevantes en
 orden (`req.params`, `req.body`/DTO, parámetros de consulta y `tx`) para hacer visible el
 contrato entre participantes. Esos parámetros no se declaran como participantes ni se
-enumeran en una nota separada. Todos los recorridos
-explicitan middleware, activación de responsabilidades, resultado HTTP y propagación de
-error; las coordinaciones complejas agregan sus colaboradores y límites transaccionales.
+enumeran en una nota separada. Los recorridos identifican por su símbolo ejecutable los
+validadores y middleware que cambian la interpretación del caso; no se admite una
+etiqueta genérica como «ejecutar middleware», y la ruta enlazada conserva la fuente de
+verdad del pipeline completo. Todos explicitan activación de responsabilidades,
+resultado HTTP y propagación de error; las coordinaciones complejas agregan sus
+colaboradores y límites transaccionales.
 Las variables
 locales mecánicas permanecen en el código para no convertir el diagrama en una
 transcripción ilegible. Cada caso mantiene una secuencia específica aunque reutilice un
@@ -88,6 +91,12 @@ aparece una vez, conserva su referencia de patrones y contiene un bloque Mermaid
 | Entradas | `CU-ENT-01..06` | 6 | Completo |
 | Salidas | `CU-SAL-01..14` | 14 | Completo |
 | **Total** | Seis grupos propietarios | **72** | **72 de 72** |
+
+Los casos `CU-AUT-01` y `CU-AUT-02` se conservan aquí porque iniciar y cerrar sesión son
+objetivos funcionales con código propio, no para repetir la autenticación dentro de cada
+caso. La obligación transversal de autenticar y autorizar pertenece a requisitos
+(`RN-001` y `RN-009`); las demás secuencias sólo muestran el middleware concreto cuando
+afecta la lectura técnica de su entrada.
 
 ### Capítulos técnicos
 
