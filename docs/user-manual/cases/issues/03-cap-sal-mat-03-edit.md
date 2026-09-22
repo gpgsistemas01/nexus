@@ -11,5 +11,5 @@
 
    ![CAP-SAL-MAT-03-EDIT: edicion encabezado](../../images/material-issues/03-edit-header.png)
 
-2. Modifique los selectores y campos indicados. Mientras la salida esté pendiente, también puede usar **Buscar material...**, **Cantidad** y **Agregar** para incorporar detalles; después del primer surtido, los detalles quedan deshabilitados.
-3. Seleccione **Actualizar** para guardar o **Regresar** para salir sin confirmar.
+2. Modifique los selectores y campos indicados. Mientras la salida esté pendiente, para incorporar un detalle elija una opción en **Buscar material...**, complete **Cantidad**, seleccione **Agregar** y compruebe que el renglón aparezca en la tabla; repita la operación cuando necesite más detalles. Después del primer surtido, los detalles quedan deshabilitados.
+3. Revise la tabla y seleccione **Actualizar** para guardar o **Regresar** para salir sin confirmar.

@@ -128,6 +128,16 @@ compartir participantes, precondiciones y reglas; no reciben identificador `CU-*
 identificadores se asignan a operaciones concretas que pueden autorizarse, probarse y
 trazarse por separado.
 
+Agregar un renglón a la tabla de detalles de un formulario no constituye por sí solo otro
+caso de uso cuando el renglón es una preparación transitoria del documento: no deja una
+postcondición de negocio independiente, no se autoriza por separado y sólo se persiste al
+confirmar el objetivo principal. En esos casos, la ficha de creación o edición debe
+explicitar la selección de los datos, la acción **Agregar**, la respuesta de Nexus en la
+tabla, la posible repetición y la confirmación final. Se separa un caso únicamente cuando
+la operación sobre el detalle tiene disparador, autorización, reglas y resultado
+persistido propios —por ejemplo corregir, cancelar, surtir o devolver un detalle ya
+registrado—; compartir la misma tabla o formulario no decide la granularidad.
+
 ISO/IEC/IEEE 29148 orienta la ingeniería y calidad de requisitos, pero no se usa como
 fuente de una plantilla obligatoria, de nombres gramaticales para actores ni del formato
 paso a paso de los flujos de casos de uso. La tabla de dos columnas, las secciones

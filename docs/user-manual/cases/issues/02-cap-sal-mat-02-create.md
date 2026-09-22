@@ -13,8 +13,8 @@
 
 2. Elija opciones en **Buscar cliente...**, **Buscar asesor...**, **Buscar área...** y **Buscar solicitante...**.
 3. Complete **Número de proyecto**, **Fecha y hora de solicitud:** y **Observaciones**.
-4. Elija una opción en **Buscar material...**, complete **Cantidad** y pulse **Agregar** por cada detalle.
-5. Revise los datos y seleccione **Guardar**.
+4. Elija una opción en **Buscar material...**, complete **Cantidad** y pulse **Agregar**. Compruebe que el detalle aparezca en la tabla y repita este paso para cada material requerido.
+5. Revise el encabezado y los renglones de la tabla y seleccione **Guardar**.
 
 Cada combinación de material y proveedor debe aparecer una sola vez. Si vuelve a agregar la misma
 combinación antes de guardar, el formulario reemplaza la cantidad del renglón existente; no crea
