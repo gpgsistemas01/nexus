@@ -6,7 +6,6 @@
 ```mermaid
 sequenceDiagram
     participant Client as Cliente HTTP / web
-    Note over Router,Controller: Variables de frontera: id, DTO de ajuste y userId
     participant Router as src/routes/api/warehouse/materialApiRoute.js
     participant Controller@{ "type": "control" } as src/controllers/api/warehouse/materialController.js
     participant StockDto as «object»<br/>materialDto<br/>src/dtos/materialDTO.js
@@ -21,21 +20,28 @@ sequenceDiagram
 
     Client->>Router: PATCH /api/warehouse/materials/:id/stock + accessToken
     Router->>Controller: editMaterialStock(req, res)
-    Controller->>StockDto: createMaterialDtoForStockUpdate(req.body) → sanitizeEmptyStrings(...)
+    Controller->>StockDto: createMaterialDtoForStockUpdate(req.body)
     StockDto-->>Controller: materialDto normalizado
     Controller->>Service: updateMaterialStock({ id, materialDto, userId })
-    Service->>Adjustment: material, proveedor, motivo y nueva existencia
-    Adjustment->>Prisma: iniciar $transaction
-    Adjustment->>SupplierMaterial: localizar relación con tx
-    Adjustment->>Reference: generar referencia anual con tx
-    Adjustment->>Stock: calcular diferencias y validar existencia
-    Adjustment->>Prisma: crear StockAdjustment y detalle
-    Adjustment->>Movement: crear movimiento ADJUSTMENT con tx
-    Adjustment->>SupplierMaterial: actualizar stock y cantidad convertida con tx
-    Prisma-->>Adjustment: relación actualizada y commit
-    Adjustment-->>Service: supplierMaterial actualizado
-    Service-->>Controller: material
-    Controller->>Socket: publicar después del commit
-    Controller-->>Client: 200 material actualizado
+    Service->>Adjustment: createStockAdjustment({ material, supplier, reason, newStock })
+    Adjustment->>Prisma: getDb().$transaction(async tx => ...)
+    Adjustment->>SupplierMaterial: findSupplierMaterialByIds({ tx, materialId, supplierId })
+    Adjustment->>Reference: generateYearlyReferenceNumber({ type, tx })
+    Adjustment->>Stock: calculateStockAdjustmentValues({ currentStock, newStock })
+    Adjustment->>Prisma: tx.stockAdjustment.create({ data })
+    Adjustment->>Movement: createInventoryMovement({ tx, type: ADJUSTMENT, details })
+    Adjustment->>SupplierMaterial: updateSupplierMaterialStock({ tx, supplierMaterialId, quantity })
+    alt Commit confirmado
+        Prisma-->>Adjustment: relación actualizada
+        Adjustment-->>Service: supplierMaterial actualizado
+        Service-->>Controller: material
+        Controller->>Socket: emitInventoryUpdated()
+        Controller-->>Client: 200 { material, code }
+    else Regla de stock o persistencia rechazada
+        Prisma-->>Adjustment: error Prisma
+        Adjustment-->>Service: error de dominio tipado y rollback
+        Service-->>Controller: error propagado
+        Controller-->>Client: status HTTP { code, message }
+    end
 ```
 

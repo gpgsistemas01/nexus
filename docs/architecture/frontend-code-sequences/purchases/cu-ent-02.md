@@ -13,34 +13,33 @@ sequenceDiagram
     participant Request as src/public/js/services/warehouse/goodsReceiptService.js
     participant HTTP as src/public/js/services/axiosInstanceApi.js
     participant API@{ "type": "control" } as src/controllers/api/warehouse/goodsReceiptController.js
-    Note over Form,Request: Variables de frontera: isInvoiced, invoice, supplierId, receivedById, receptionDate, observations y details
 
     Warehouse->>Modal: abrir «Nueva compra»
-    Modal->>Modal: resetear formulario, inicializar selectores y ocultar/mostrar factura
+    Modal->>Modal: openGoodsReceiptModal({ mode: create })
     Warehouse->>DetailUI: seleccionar material, cantidad y costo por presentación
-    DetailUI->>DetailUI: validar y agregar detalle, recalcular tabla y totales
+    DetailUI->>DetailUI: addGoodsReceiptMaterial()
     opt Se agrega otra vez el mismo material
-        DetailUI->>DetailUI: conservar otro renglón porque cada cantidad y costo se procesan por separado
+        DetailUI->>DetailUI: addGoodsReceiptMaterial() conserva un renglón independiente
     end
     Warehouse->>Form: confirmar compra
-    Form->>Form: normalizar comprobante y adjuntar details
+    Form->>Form: normalizeGoodsReceiptData({ form, formData })
     Form->>Form: validateFields(goodsReceiptValidation, formData)
     alt Hay errores de captura
         Form-->>Warehouse: mostrar campos inválidos sin enviar request
     else Captura válida
         Form->>App: registerGoodsReceipt({ formData })
         App->>Request: createCrudApplication.register({ data })
-        Request->>HTTP: apiRequest({ method: post, url, data })
+        Request->>HTTP: apiRequest({ method: 'post', url, data })
         HTTP->>API: POST /api/warehouse/goods-receipts
         alt La factura ya existe para el proveedor
-            API-->>Form: 409 con el folio de la compra existente
+            API-->>HTTP: 409 { code, message, meta }
+            HTTP-->>Request: apiRequest() rechaza { code, message, meta }
+            Request-->>Form: error con el folio, conservar formulario
         else Compra nueva
-            API->>API: registrar todos los renglones e incrementar sus cantidades
+            API-->>HTTP: 200 { goodsReceipt, code }
+            HTTP-->>Request: apiRequest() resuelve response.data
+            Request-->>Form: goodsReceipt
+            Form-->>Warehouse: cerrar modal, notificar y actualizar listado
         end
-        API-->>HTTP: { goodsReceipt, code }
-        HTTP-->>Request: respuesta normalizada
-        Request-->>Form: respuesta normalizada
-        Form-->>Warehouse: cerrar modal, notificar y actualizar listado
     end
 ```
-

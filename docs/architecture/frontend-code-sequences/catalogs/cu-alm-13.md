@@ -12,26 +12,24 @@ sequenceDiagram
     participant Request as src/public/js/services/warehouse/reportService.js
     participant HTTP as src/public/js/services/axiosInstanceApi.js
     participant Transport@{ "type": "control" } as src/routes/api/warehouse/reportApiRoute.js<br/>src/controllers/api/warehouse/reportController.js
-    Note over Application,Transport: Variables de frontera: params/filtros
 
     Browser->>View: Botón Excel de wasteDatatable.js
     View->>Dialog: showInventoryExportDialog()
-    Dialog-->>View: inventoryScope activo/existencia
-    View->>View: recopilar y validar las variables de frontera indicadas
+    Dialog-->>View: inventoryScope: 'active' | 'stock'
     View->>Application: exportWasteReport({ params })
     Application->>Request: exportWasteReportRequest({ params })
     activate Application
     Request->>HTTP: apiRequest({ method: 'get', url, params })
     HTTP->>Transport: descarga GET /api/warehouse/reports/wastes/excel
-    Transport-->>HTTP: status HTTP y payload del endpoint
-    HTTP-->>Request: respuesta o error normalizado
-    Request-->>Application: resultado del request
+    Transport-->>HTTP: HTTP 2xx { code, data }
+    HTTP-->>Request: apiRequest() resuelve response.data
+    Request-->>Application: exportWasteReportRequest() resuelve response.data
     alt Respuesta exitosa
-        Application-->>View: entidad, colección o archivo normalizado
-        View-->>Browser: actualizar la vista con el resultado
+        Application-->>View: exportWasteReport() resuelve response.data
+        View-->>Browser: DOM o DataTable actualizado con response.data
     else Respuesta rechazada
-        Application-->>View: error normalizado por apiRequest
-        View-->>Browser: conservar contexto y mostrar el mensaje
+        Application-->>View: error Axios normalizado { code, message, meta }
+        View-->>Browser: formulario o filtros conservados, mensaje visible
     end
     deactivate Application
 ```

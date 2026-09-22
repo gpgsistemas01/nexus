@@ -68,9 +68,11 @@ mecanismos locales implementan la trazabilidad sin afirmar conformidad formal.
 ### Simetría de detalle entre secuencias frontend y backend
 
 Las dos colecciones tienen el mismo **nivel de evidencia**, pero no necesitan el mismo
-número de participantes ni mensajes. Ambas deben identificar archivos reales, variables
-de frontera, al menos dos firmas comprobables y un recorrido ordenado con un mínimo de
-siete mensajes. `npm run docs:check` aplica ese piso común a frontend y backend.
+número de participantes ni mensajes. Ambas deben identificar archivos reales, incluir
+los parámetros relevantes dentro de al menos dos firmas comprobables y conservar un
+recorrido ordenado con un mínimo de cinco mensajes. Este piso evita agregar mensajes
+genéricos sólo para alcanzar una cantidad; `npm run docs:check` también exige que cada
+mensaje interno síncrono nombre un método, request HTTP o import técnico.
 
 Esto no significa que el frontend deba copiar el detalle interno del backend. La revisión
 busca una profundidad equivalente dentro de los límites de cada perspectiva:

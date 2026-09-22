@@ -26,6 +26,13 @@ Cada recorrido contextual usa una secuencia para hacer visible el orden del cód
 actividad `flowchart` se conserva sólo cuando existen decisiones que cambian el camino;
 una vista de estados se agrega cuando el caso tiene un ciclo técnico relevante. No se
 mantiene un `flowchart` lineal si comunica menos que la secuencia equivalente.
+Como criterio de trazabilidad inspirado en ICONIX, el identificador `CU-*` enlaza el
+objetivo funcional y la secuencia asigna ese comportamiento a los métodos principales de
+los participantes. La matriz técnica completa el rastro hacia endpoint, implementación y
+pruebas. Los parámetros relevantes permanecen dentro de la firma del método porque
+aclaran qué información cruza entre responsabilidades. Esto no convierte cada parámetro
+en participante: una línea de vida adicional sólo representa un objeto del dominio que
+participa en la colaboración.
 El detalle de una secuencia se incorpora de forma progresiva: primero se identifican
 los participantes y el camino exitoso, después se añaden únicamente las validaciones,
 alternativas, transacciones o efectos que cambian la interpretación del caso. Los
@@ -51,8 +58,8 @@ específicos de su implementación.
 Cada colección de aplicación al código incluye un índice breve de patrones. El diagrama
 de cada caso declara los códigos que aplica, pero esa línea funciona sólo como índice y
 no como explicación de la construcción. La secuencia conserva el recorrido concreto:
-participantes con archivos o símbolos ejecutables, mensajes con llamadas ordenadas y
-datos de frontera, y notas sólo para límites que no caben en un mensaje. La explicación
+participantes con archivos o símbolos ejecutables, mensajes con las llamadas principales
+ordenadas y notas sólo para límites que no caben en un mensaje. La explicación
 reutilizable y su secuencia canónica permanecen en el catálogo de patrones. Así una
 refactorización se revisa primero en `DIA-PAT-*` y sus implementaciones, y los casos
 afectados se localizan por su línea **Patrones**, sin insertar participantes ficticios
@@ -71,8 +78,8 @@ etiqueta sólo cuando hace falta aportar semántica que la figura no posee. La f
 o frontera API que lo contiene), por lo que **no** repite el estereotipo
 `«controller»`. `«object»` se reserva para un objeto JSON o una instancia de clase que
 forme parte del modelo de dominio; no identifica archivos, módulos, servicios, vistas,
-helpers ni funciones. Cuando un controller crea un DTO JSON que interviene en el
-recorrido, la secuencia lo incorpora como participante `«object»`, nombra la variable
+helpers ni funciones. Cuando un controller crea un DTO JSON del dominio que interviene en el
+recorrido, la secuencia lo incorpora como participante `«object»`, nombra la instancia
 concreta y mantiene el archivo `src/dtos/` que prueba su construcción. Los demás
 participantes ejecutables se identifican sólo por sus archivos y el símbolo exacto se
 muestra en el mensaje que representa su ejecución.
@@ -99,7 +106,7 @@ sólo para la clasificación que Mermaid no puede expresar directamente.
 | Base de datos | Figura `database` cuando se necesita distinguir persistencia | Almacén persistente externo al proceso. Si agrupa Prisma/PostgreSQL, los mensajes aclaran la operación. |
 | Línea de vida | Línea vertical discontinua bajo cada cabecera | Existencia del participante en el intervalo representado, leído de arriba hacia abajo. |
 | Activación | Barra vertical entre `activate` y `deactivate` | Periodo en que un participante controla la colaboración; no expresa duración real. |
-| Mensaje síncrono | Flecha continua `->>` | Llamada o interacción cuyo orden importa. El texto nombra la acción, firma o datos de frontera. |
+| Mensaje síncrono | Flecha continua `->>` | Llamada o interacción cuyo orden importa. El texto prioriza el método que permite seguir la realización del caso. |
 | Respuesta | Flecha discontinua `-->>` | Resultado, estado HTTP, payload o error observable. |
 | Auto-mensaje | Flecha que vuelve al mismo participante | Validación o regla dentro del mismo archivo, sin inventar otro componente. |
 | `alt` / `else` | Fragmento combinado con ramas | Caminos mutuamente excluyentes elegidos por una condición. |
@@ -144,16 +151,33 @@ Para que una secuencia sea detallada sin mezclar niveles, se aplican estas regla
   el archivo u objeto concreto del caso, no una función, endpoint ni oración sobre el
   resultado;
 - los mensajes nombran una acción concreta y mantienen el orden comprobable;
-- las llamadas se escriben como `objeto.metodo(variable)` o `funcion(variable)`, no como
-  una descripción sin firma; cuando un participante agrupa ruta y controller, su etiqueta
-  nombra ambos archivos y el mensaje nombra el símbolo del controller;
-- las variables de frontera que condicionan la llamada (`id`, `detailId`, payload,
-  filtros, DTO o `tx`) se nombran en el diagrama; los temporales internos que no cambian
-  la colaboración se consultan en el código enlazado;
+- todo mensaje síncrono entre participantes técnicos nombra un método o función, un
+  request HTTP o un `import` real del repositorio. El lenguaje de interacción se reserva
+  para mensajes iniciados por actores o límites externos, y las respuestas describen el
+  resultado observable;
+- las llamadas se escriben como `objeto.metodo(parametro)` o `funcion(parametro)`, no
+  como una descripción sin firma; conservan los parámetros relevantes para reconocer el
+  contrato entre participantes, pero omiten temporales y estructuras internas que no
+  cambian la colaboración; cuando un participante agrupa ruta y controller, su etiqueta
+  nombra ambos archivos y el mensaje nombra el símbolo ejecutado;
+- una instancia sólo obtiene línea de vida y nombre cuando es un objeto del dominio o un
+  DTO de dominio que participa en la colaboración; se representa con `«object»` conforme
+  a UML. Los parámetros escalares, identificadores, filtros, payloads y `tx` pueden
+  aparecer dentro de un mensaje cuando explican el contrato, pero no se convierten en
+  participantes ni líneas de vida;
 - `alt`/`opt` se usa sólo para una decisión que cambia el recorrido y `rect` sólo para
   señalar un límite relevante, como una transacción;
 - las respuestas discontinuas muestran resultados o errores observables, no repiten la
   llamada anterior;
+- una respuesta nombra el método que resolvió la promesa, el estado y contrato HTTP, el
+  objeto de dominio devuelto o el efecto visible concreto. Se evitan etiquetas ambiguas
+  como “resultado del servicio”, “respuesta normalizada”, “actualizar la vista” o
+  “mostrar el mensaje” sin identificar el dato, método o efecto correspondiente;
+- un error no se modela como participante ni como `«object»`: se representa mediante una
+  respuesta discontinua dentro de una rama `alt`/`else`. Backend muestra su propagación
+  como error de dominio o persistencia, el rollback cuando corresponda y la respuesta
+  HTTP `{ code, message }`; frontend muestra el error normalizado desde `apiRequest`
+  hasta la UI y el efecto de conservar el contexto para permitir corrección;
 - una vista que exceda aproximadamente siete participantes se divide por responsabilidad
   o se complementa con una vista estructural, en lugar de reducir su legibilidad;
 - el detalle mecánico que no altera coordinación permanece en texto, tablas o código.
@@ -180,15 +204,15 @@ Express— pueden mostrarse sin ruta; no deben usarse para ocultar un módulo in
 `npm run docs:check` valida que cada ruta declarada exista y que ningún otro participante
 interno quede identificado sólo por una etiqueta genérica.
 
-Los mensajes entre participantes internos nombran el símbolo ejecutado con su firma
-observable y las variables que cruzan la llamada, por ejemplo
-`loginUser({ name, password })` o `editMaterialStockRequest({ data: formData, id })`.
-Las escrituras muestran `tx` cuando se propaga y las respuestas nombran el resultado o
-error observable. No se inventa una función para describir una regla interna: si la regla
+Los mensajes entre participantes internos nombran el símbolo ejecutado con su firma y
+sus parámetros relevantes, por ejemplo `loginUser({ name, password })` o
+`editMaterialStockRequest({ data: formData, id })`. Las respuestas nombran el resultado
+o error observable. La propagación de `tx` se muestra cuando permite comprobar el límite
+transaccional. No se inventa una función para describir una regla interna: si la regla
 no tiene símbolo propio, se expresa como una auto-llamada del archivo propietario con los
 datos que evalúa. Los mensajes iniciados por un actor o dirigidos a un límite externo
 pueden conservar lenguaje de interacción, pero no sustituyen las llamadas ejecutables.
-Cada secuencia contiene al menos dos firmas de código comprobables; `npm run docs:check`
+Cada secuencia contiene al menos dos métodos o funciones comprobables; `npm run docs:check`
 rechaza recorridos compuestos únicamente por descripciones genéricas.
 
 La orientación se conserva por tipo: `LR` para recorridos y dependencias, `TB` para capas

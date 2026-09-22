@@ -5,7 +5,6 @@
 
 ```mermaid
 sequenceDiagram
-    Note over Router,Controller: Variables de frontera: name, password y cookies
     participant Browser as Navegador
     participant Router as src/routes/api/authApiRoute.js
     participant Controller@{ "type": "control" } as src/controllers/api/authController.js
