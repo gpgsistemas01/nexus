@@ -17,7 +17,7 @@ sequenceDiagram
     Controller->>Domain: materialService.findAllMaterials({ query: req.query }) consulta material, proveedor y existencia
     activate Domain
     alt Servicio resuelto
-        Domain-->>Controller: materialService.findAllMaterials() resuelve datos de dominio
+        Domain-->>Controller: materialService.findAllMaterials() devuelve { data, recordsTotal, recordsFiltered } para la tabla solicitada
         Controller-->>Client: HTTP 2xx { code, data }
     else AppError propagado
         Domain-->>Controller: throw AppError { code, message, meta, statusCode }

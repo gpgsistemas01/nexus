@@ -17,7 +17,7 @@ sequenceDiagram
     Controller->>Domain: reportService.findWasteIssueReportRows({ query: req.query }) y sendExcelReport
     activate Domain
     alt Servicio resuelto
-        Domain-->>Controller: reportService.findWasteIssueReportRows() resuelve datos de dominio
+        Domain-->>Controller: reportService.findWasteIssueReportRows() devuelve filas filtradas que sendExcelReport convierte en el archivo Excel
         Controller-->>Client: HTTP 2xx { code, data }
     else AppError propagado
         Domain-->>Controller: throw AppError { code, message, meta, statusCode }

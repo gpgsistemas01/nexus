@@ -17,7 +17,7 @@ sequenceDiagram
     Controller->>Domain: findMovementReportRows({ context: 'materials', ...getMovementReportParams(req.query) })
     activate Domain
     alt Servicio resuelto
-        Domain-->>Controller: findMovementReportRows() resuelve datos de dominio
+        Domain-->>Controller: findMovementReportRows() devuelve filas filtradas que sendExcelReport convierte en el archivo Excel
         Controller-->>Client: HTTP 2xx { code, data }
     else AppError propagado
         Domain-->>Controller: throw AppError { code, message, meta, statusCode }

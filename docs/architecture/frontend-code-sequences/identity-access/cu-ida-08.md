@@ -13,20 +13,25 @@ sequenceDiagram
     participant Transport@{ "type": "control" } as src/routes/api/admin/userApiRoute.js<br/>src/controllers/api/admin/userController.js
 
     Browser->>View: userForm.js selecciona el modo de contraseña
-    View->>Application: editUserPassword({ id, formData })
-    Application->>Request: editUserPasswordRequest({ id, formData })
-    activate Application
-    Request->>HTTP: apiRequest({ method: 'patch', url, data })
-    HTTP->>Transport: envía PATCH /api/admin/users/:id/password
-    Transport-->>HTTP: HTTP 2xx { code, data }
-    HTTP-->>Request: apiRequest() resuelve response.data
-    Request-->>Application: editUserPasswordRequest() resuelve response.data
-    alt Respuesta exitosa
-        Application-->>View: editUserPassword() resuelve response.data
-        View-->>Browser: DOM o DataTable actualizado con response.data
-    else Respuesta rechazada
-        Application-->>View: error Axios normalizado { code, message, meta }
-        View-->>Browser: formulario o filtros conservados, mensaje visible
+    View->>View: validateFields(userPasswordValidation, formData)
+    alt userPasswordValidation devuelve errores
+        View-->>Browser: useForm.getErrors() conserva datos y muestra errores por campo
+    else Formulario válido
+        View->>Application: editUserPassword({ id, formData })
+        Application->>Request: editUserPasswordRequest({ id, formData })
+        activate Application
+        Request->>HTTP: apiRequest({ method: 'patch', url, data })
+        HTTP->>Transport: envía PATCH /api/admin/users/:id/password
+        Transport-->>HTTP: HTTP 2xx { code, data }
+        HTTP-->>Request: apiRequest() resuelve response.data
+        Request-->>Application: editUserPasswordRequest() resuelve response.data
+        alt Respuesta exitosa
+            Application-->>View: editUserPassword() resuelve response.data
+            View-->>Browser: DOM o DataTable actualizado con response.data
+        else Respuesta rechazada
+            Application-->>View: error Axios normalizado { code, message, meta }
+            View-->>Browser: formulario o filtros conservados, mensaje visible
+        end
+        deactivate Application
     end
-    deactivate Application
 ```

@@ -17,7 +17,7 @@ sequenceDiagram
     Controller->>Domain: userService.findAllUsers({ query: req.query }) prepara filas y el controller llama sendExcelReport
     activate Domain
     alt Servicio resuelto
-        Domain-->>Controller: userService.findAllUsers() resuelve datos de dominio
+        Domain-->>Controller: userService.findAllUsers() devuelve { data, recordsTotal, recordsFiltered } para la tabla solicitada
         Controller-->>Client: HTTP 2xx { code, data }
     else AppError propagado
         Domain-->>Controller: throw AppError { code, message, meta, statusCode }

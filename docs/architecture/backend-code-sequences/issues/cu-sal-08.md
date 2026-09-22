@@ -17,7 +17,7 @@ sequenceDiagram
     Controller->>Domain: wasteIssueService.findAllWasteIssues({ query: req.query }) consulta salidas de merma
     activate Domain
     alt Servicio resuelto
-        Domain-->>Controller: wasteIssueService.findAllWasteIssues() resuelve datos de dominio
+        Domain-->>Controller: wasteIssueService.findAllWasteIssues() devuelve { data, recordsTotal, recordsFiltered } para la tabla solicitada
         Controller-->>Client: HTTP 2xx { code, data }
     else AppError propagado
         Domain-->>Controller: throw AppError { code, message, meta, statusCode }

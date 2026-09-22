@@ -17,7 +17,7 @@ sequenceDiagram
     Controller->>Domain: materialService.deleteMaterial(req.params.id) protege referencias antes de eliminar relación
     activate Domain
     alt Servicio resuelto
-        Domain-->>Controller: materialService.deleteMaterial() resuelve datos de dominio
+        Domain-->>Controller: materialService.deleteMaterial() devuelve material eliminado o relación con proveedor desactivada según sus referencias
         Controller-->>Client: HTTP 2xx { code, data }
     else AppError propagado
         Domain-->>Controller: throw AppError { code, message, meta, statusCode }

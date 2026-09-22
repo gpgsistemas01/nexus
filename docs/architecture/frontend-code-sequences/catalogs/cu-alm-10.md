@@ -13,25 +13,30 @@ sequenceDiagram
     participant Transport@{ "type": "control" } as src/routes/api/warehouse/wasteApiRoute.js<br/>src/controllers/api/warehouse/wasteController.js
 
     Browser->>View: wasteModal.js y wasteForm.js seleccionan una plantilla de material
-    View->>Application: getWasteMaterialTemplates({ params })
-    Application->>Request: registerWaste({ formData })
-    activate Application
-    Request->>HTTP: apiRequest({ method: 'post', url, data })
-    HTTP->>Transport: enviar POST /api/warehouse/wastes
-    alt Misma identidad de merma
-        Transport-->>View: 409 WASTE_ALREADY_EXISTS y no incrementar stock
-    else Merma nueva
+    View->>View: validateFields(wasteValidation, formData)
+    alt wasteValidation devuelve errores
+        View-->>Browser: useForm.getErrors() conserva datos y muestra errores por campo
+    else Formulario válido
+        View->>Application: getWasteMaterialTemplates({ params })
+        Application->>Request: registerWaste({ formData })
+        activate Application
+        Request->>HTTP: apiRequest({ method: 'post', url, data })
+        HTTP->>Transport: enviar POST /api/warehouse/wastes
+        alt Misma identidad de merma
+            Transport-->>View: 409 WASTE_ALREADY_EXISTS y no incrementar stock
+        else Merma nueva
+        end
+        Transport-->>HTTP: HTTP 2xx { code, data }
+        HTTP-->>Request: apiRequest() resuelve response.data
+        Request-->>Application: registerWaste() resuelve response.data
+        alt Respuesta exitosa
+            Application-->>View: getWasteMaterialTemplates() resuelve response.data
+            View-->>Browser: DOM o DataTable actualizado con response.data
+        else Respuesta rechazada
+            Application-->>View: error Axios normalizado { code, message, meta }
+            View-->>Browser: formulario o filtros conservados, mensaje visible
+        end
+        deactivate Application
     end
-    Transport-->>HTTP: HTTP 2xx { code, data }
-    HTTP-->>Request: apiRequest() resuelve response.data
-    Request-->>Application: registerWaste() resuelve response.data
-    alt Respuesta exitosa
-        Application-->>View: getWasteMaterialTemplates() resuelve response.data
-        View-->>Browser: DOM o DataTable actualizado con response.data
-    else Respuesta rechazada
-        Application-->>View: error Axios normalizado { code, message, meta }
-        View-->>Browser: formulario o filtros conservados, mensaje visible
-    end
-    deactivate Application
 ```
 

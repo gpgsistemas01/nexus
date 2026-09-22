@@ -13,21 +13,26 @@ sequenceDiagram
     participant Transport@{ "type": "control" } as src/routes/api/warehouse/supplierApiRoute.js<br/>src/controllers/api/warehouse/supplierController.js
 
     Browser->>View: supplierModal.js abre supplierForm.js en alta
-    View->>Application: registerSupplier({ formData })
-    Application->>Request: registerSupplierRequest({ formData })
-    activate Application
-    Request->>HTTP: apiRequest({ method: 'post', url, data })
-    HTTP->>Transport: envía POST /api/warehouse/suppliers
-    Transport-->>HTTP: HTTP 2xx { code, data }
-    HTTP-->>Request: apiRequest() resuelve response.data
-    Request-->>Application: registerSupplierRequest() resuelve response.data
-    alt Respuesta exitosa
-        Application-->>View: registerSupplier() resuelve response.data
-        View-->>Browser: DOM o DataTable actualizado con response.data
-    else Respuesta rechazada
-        Application-->>View: error Axios normalizado { code, message, meta }
-        View-->>Browser: formulario o filtros conservados, mensaje visible
+    View->>View: validateFields(supplierValidation, formData)
+    alt supplierValidation devuelve errores
+        View-->>Browser: useForm.getErrors() conserva datos y muestra errores por campo
+    else Formulario válido
+        View->>Application: registerSupplier({ formData })
+        Application->>Request: registerSupplierRequest({ formData })
+        activate Application
+        Request->>HTTP: apiRequest({ method: 'post', url, data })
+        HTTP->>Transport: envía POST /api/warehouse/suppliers
+        Transport-->>HTTP: HTTP 2xx { code, data }
+        HTTP-->>Request: apiRequest() resuelve response.data
+        Request-->>Application: registerSupplierRequest() resuelve response.data
+        alt Respuesta exitosa
+            Application-->>View: registerSupplier() resuelve response.data
+            View-->>Browser: DOM o DataTable actualizado con response.data
+        else Respuesta rechazada
+            Application-->>View: error Axios normalizado { code, message, meta }
+            View-->>Browser: formulario o filtros conservados, mensaje visible
+        end
+        deactivate Application
     end
-    deactivate Application
 ```
 

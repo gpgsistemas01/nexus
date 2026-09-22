@@ -15,22 +15,27 @@ sequenceDiagram
     participant API@{ "type": "control" } as src/controllers/api/warehouse/materialController.js
 
     User->>Form: confirma ajuste
-    Form->>App: editMaterialStock({ formData, id })
-    App->>Factory: createApplicationMutation({ request: editMaterialStockRequest, dataKey: 'material' })({ formData, id })
-    Factory->>Request: editMaterialStockRequest({ data: formData, id })
-    Request->>HTTP: apiRequest({ method: 'patch', url, data })
-    HTTP->>API: PATCH /api/warehouse/materials/:id/stock
-    alt Respuesta exitosa
-        API-->>HTTP: 200 { material, code }
-        HTTP-->>Request: apiRequest() resuelve response.data
-        Request-->>Factory: material
-        Factory-->>Form: material
-        Form->>Form: form.onSave?.(material)
-    else Respuesta HTTP rechazada
-        API-->>HTTP: status HTTP { code, message }
-        HTTP-->>Request: apiRequest() rechaza { code, message, meta }
-        Request-->>Factory: error propagado
-        Factory-->>Form: mutación rechaza { code, message, meta }, formulario conservado
+    Form->>Form: validateFields(materialStockValidation, formData)
+    alt materialStockValidation devuelve errores
+        Form-->>Browser: useForm.getErrors() conserva datos y muestra errores por campo
+    else Formulario válido
+        Form->>App: editMaterialStock({ formData, id })
+        App->>Factory: createApplicationMutation({ request: editMaterialStockRequest, dataKey: 'material' })({ formData, id })
+        Factory->>Request: editMaterialStockRequest({ data: formData, id })
+        Request->>HTTP: apiRequest({ method: 'patch', url, data })
+        HTTP->>API: PATCH /api/warehouse/materials/:id/stock
+        alt Respuesta exitosa
+            API-->>HTTP: 200 { material, code }
+            HTTP-->>Request: apiRequest() resuelve response.data
+            Request-->>Factory: material
+            Factory-->>Form: material
+            Form->>Form: form.onSave?.(material)
+        else Respuesta HTTP rechazada
+            API-->>HTTP: status HTTP { code, message }
+            HTTP-->>Request: apiRequest() rechaza { code, message, meta }
+            Request-->>Factory: error propagado
+            Factory-->>Form: mutación rechaza { code, message, meta }, formulario conservado
+        end
     end
 ```
 
