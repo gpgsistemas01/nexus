@@ -345,7 +345,7 @@ El objetivo es mover la aplicación a un **VPS**. Hasta definir y versionar el p
 inverso, TLS, automatización, respaldos y monitoreo, esa topología permanece propuesta.
 También debe decidirse expresamente si el VPS conservará Supabase como base de datos
 administrada o alojará una instancia propia de PostgreSQL. Consulta la
-[vista de despliegue actual y objetivo](docs/architecture/architecture-and-web-views/02-arquitectura-del-sistema.md).
+[vista de despliegue actual y objetivo](docs/architecture/architecture-and-web-views/02-architecture-of-the-system.md).
 
 La documentación (`README.md` y `docs/`) **se conserva y versiona en este
 repositorio**. Las reglas de `.dockerignore` únicamente la excluyen del contexto de

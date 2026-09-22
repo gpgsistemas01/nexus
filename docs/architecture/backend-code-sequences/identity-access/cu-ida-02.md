@@ -10,25 +10,24 @@ sequenceDiagram
     participant Controller@{ "type": "control" } as src/controllers/api/admin/personController.js
     participant PersonDto as «object»<br/>personDto<br/>src/dtos/personDTO.js
     participant Domain as src/services/admin/person/personService.js
-    Note over Controller,Domain: Variables de frontera: req.body/DTO, tx
+    participant ErrorHandler as src/app.js
 
     Client->>Route: POST /api/admin/persons
-    Route->>Route: ejecutar en orden el middleware configurado para la ruta
     Route->>Controller: registerPerson(req, res)
     activate Controller
-    Controller->>PersonDto: createPersonDtoForRegister(req.body) → sanitizeEmptyStrings(...)
+    Controller->>PersonDto: createPersonDtoForRegister(req.body)
     PersonDto-->>Controller: personDto normalizado
     Controller->>Domain: personService.createPerson({ personDto }) valida y crea persona/asignaciones
     activate Domain
-    Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
-    Domain-->>Controller: resultado del servicio o error de dominio tipado
-    deactivate Domain
-    alt El servicio devuelve el resultado
-        Controller-->>Client: status HTTP y cuerpo concretos del controller
-    else El servicio propaga un error de dominio
-        Controller-->>Client: error entregado al middleware final para su respuesta HTTP
+    alt Servicio resuelto
+        Domain-->>Controller: personService.createPerson() resuelve datos de dominio
+        Controller-->>Client: HTTP 2xx { code, data }
+    else AppError propagado
+        Domain-->>Controller: throw AppError { code, message, meta, statusCode }
+        Controller->>ErrorHandler: next(error)
+        ErrorHandler-->>Client: res.status(error.statusCode).json({ code, message, meta })
     end
+    deactivate Domain
     deactivate Controller
 ```
 
-<a id="cu-ida-03"></a>

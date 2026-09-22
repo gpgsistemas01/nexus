@@ -1,14 +1,14 @@
-# `CU-CAT-17` — Editar cliente
+# `CU-CAT-17` — Editar presentación
 
 | Sección | Información relevante |
 | --- | --- |
 | Identificador | `CU-CAT-17` |
-| Nombre | Editar cliente. |
-| Actor y disparador | **Actor:** Administrador del sistema. **Disparador:** detecta datos que debe corregir en un cliente y selecciona su acción de edición. |
-| Participación de actor y sistema | **Actor:** selecciona el registro, modifica datos y confirma.<br>**Nexus:** presenta valores vigentes, valida, actualiza y comunica el resultado. |
-| Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de edición.<br>3. El registro objetivo existe.<br>4. El registro se encuentra en un estado que admite los cambios solicitados. |
-| Flujo principal | 1. **Actor:** selecciona cliente y abre la edición **(ver E1)**.<br>2. **Nexus:** muestra el nombre y el estado actuales.<br>3. **Actor:** modifica el nombre o la casilla **Activo** y confirma **(ver A1)**.<br>4. **Nexus:** comprueba que la información sea válida.<br>5. **Nexus:** guarda los cambios, actualiza el listado y muestra la confirmación. |
-| Flujos alternativos | **A1 — Datos inválidos (después del paso 3):**<br>1. **Nexus:** valida la información capturada, detecta campos incompletos, formatos incorrectos, relaciones no permitidas o cantidades fuera de las reglas del caso y los señala sin registrar cambios.<br>2. **Actor:** corrige la información indicada y vuelve a confirmar; continúa en el paso 4 del flujo principal. |
-| Excepciones | **E1 — Acceso rechazado (después del paso 1):**<br>1. **Nexus:** comprueba las precondiciones y la autorización, determina que alguna no se cumple y rechaza la solicitud sin modificar datos ni exponer información no autorizada; comunica el motivo.<br>2. **Actor:** reconoce el rechazo; termina el caso de uso. |
-| Postcondiciones (éxito y fallo) | 1. **Éxito:** El cliente conserva el nombre y estado elegidos; si queda inactivo, ya no se ofrece en salidas nuevas y mantiene su historia.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
-| Requisitos relacionados | `RF-CAT-014`. |
+| Nombre | Editar presentación. |
+| Actor | Administrador del sistema del área Sistemas. |
+| Disparador | Selecciona **Editar registro** en la pantalla **Presentaciones**. |
+| Precondiciones | 1. El actor inició sesión y cuenta con autorización para administrar catálogos.<br>2. La entrada existe en **Presentaciones**. |
+| Flujo principal | 1. **Actor:** abre **Presentaciones** y selecciona **Editar registro** en una fila **(ver E1)**.<br>2. **Nexus:** presenta los valores existentes de **Nombre** y **Activo**.<br>3. **Actor:** modifica los datos y selecciona **Actualizar** **(ver A1)**.<br>4. **Nexus:** revisa la información y actualiza la entrada de Presentaciones; confirma y refresca la tabla de Presentaciones. Además, guarda los cambios de la operación en la base de datos **(ver EBD)**. |
+| Flujos alternativos | **A1 — Datos inválidos (después del paso 3):**<br>1. **Nexus:** señala los campos requeridos y conserva la entrada sin cambios.<br>2. **Actor:** corrige y vuelve a confirmar; continúa en el paso 4. |
+| Excepciones | **E1 — Acceso, recurso o entrada rechazados (después del paso 1):**<br>1. **Nexus:** rechaza la operación sin exponer otro catálogo ni producir cambios parciales.<br>2. **Actor:** reconoce el rechazo; termina el caso de uso.<br>**EBD — Error de base de datos o de conexión (durante el paso 4 del flujo principal):**<br>1. **Nexus:** detecta que no puede consultar o guardar la información, revierte cualquier cambio parcial y comunica que la operación no se completó.<br>2. **Actor:** recibe el aviso, conserva los datos capturados cuando existe un formulario y decide reintentar más tarde o terminar el caso de uso. |
+| Postcondiciones (éxito y fallo) | 1. **Éxito:** La entrada de Presentaciones conserva los cambios admitidos.<br>2. **Fallo:** La entrada conserva su estado anterior. |
+| Requisitos relacionados | `RF-CAT-024`, `RN-001`, `RN-006`. |

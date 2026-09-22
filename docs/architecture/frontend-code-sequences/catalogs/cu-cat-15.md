@@ -1,36 +1,33 @@
 <a id="cu-cat-15"></a>
-# `CU-CAT-15` — Consultar clientes
+# `CU-CAT-15` — Consultar presentación
 
-**Patrones:** `FE-P02`.
+**Patrones:** `FE-P03`.
 
 ```mermaid
 sequenceDiagram
     participant Browser as Navegador
-    participant View as src/views/pages/sales/clients/clientsPage.ejs<br/>src/public/js/pages/sales/clients/clientsPage.js
-    participant Application as src/public/js/application/sales/clients/clients.js
-    participant Request as src/public/js/services/sales/clientService.js
+    participant View as src/public/js/plugins/datatable/admin/catalogs/catalogDatatable.js
+    participant Application as src/public/js/application/admin/catalogs/catalogs.js
+    participant Request as src/public/js/services/admin/catalogService.js
     participant HTTP as src/public/js/services/axiosInstanceApi.js
-    participant Transport@{ "type": "control" } as src/routes/api/sales/clientApiRoute.js<br/>src/controllers/api/sales/clientController.js
-    Note over Application,Transport: Variables de frontera: params/filtros
+    participant Transport@{ "type": "control" } as src/routes/api/admin/catalogApiRoute.js<br/>src/controllers/api/admin/catalogController.js
 
-    Browser->>View: clientsPage.ejs y clientsPage.js cargan clientes
-    View->>View: recopilar y validar las variables de frontera indicadas
-    View->>Application: getAllClients({ params })
-    Application->>Request: getAllClientsRequest({ params })
+    Browser->>View: abrir y cargar la tabla del catálogo
+    View->>Application: getAllCatalogEntries({ params, catalog })
+    Application->>Request: getCatalogEntriesRequest({ params, catalog })
     activate Application
-    Request->>HTTP: apiRequest({ method: 'get', url, data/params })
-    HTTP->>Transport: consulta GET /api/sales/clients
-    Transport-->>HTTP: status HTTP y payload del endpoint
-    HTTP-->>Request: respuesta o error normalizado
-    Request-->>Application: resultado del request
+    Request->>HTTP: apiRequest({ method: 'get', url, params })
+    HTTP->>Transport: consume GET /api/admin/catalogs/presentations
+    Transport-->>HTTP: HTTP 2xx { code, data }
+    HTTP-->>Request: apiRequest() resuelve response.data
+    Request-->>Application: getCatalogEntriesRequest() resuelve response.data
     alt Respuesta exitosa
-        Application-->>View: entidad, colección o archivo normalizado
-        View-->>Browser: actualizar la vista con el resultado
+        Application-->>View: getAllCatalogEntries() resuelve response.data
+        View-->>Browser: DOM o DataTable actualizado con response.data
     else Respuesta rechazada
-        Application-->>View: error normalizado por apiRequest
-        View-->>Browser: conservar contexto y mostrar el mensaje
+        Application-->>View: error Axios normalizado { code, message, meta }
+        View-->>Browser: formulario o filtros conservados, mensaje visible
     end
     deactivate Application
 ```
 
-<a id="cu-cat-16"></a>

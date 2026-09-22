@@ -11,7 +11,7 @@ Cada procedimiento identifica sus casos de uso, controles, errores posibles y ca
 **Ruta en el menú:** **Menú principal → Compras**.
 
 <a id="CAP-ENT-00-NAVIGATION"></a>
-![CAP-ENT-00-NAVIGATION: acceso a compras desde el menú principal](../../images/compras/00-acceso-menu-principal.png)
+![CAP-ENT-00-NAVIGATION: acceso a compras desde el menú principal](../../images/purchases/00-access-menu-main.png)
 
 **Campos por modo del formulario.** En **alta** se editan tipo y número de comprobante, proveedor,
 persona que recibe, fecha de recepción, observaciones y los nuevos renglones de material. En

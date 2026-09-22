@@ -1,7 +1,7 @@
 <a id="CAP-CAT-WAS-01-LIST"></a>
 # 13. CAP-CAT-WAS-01-LIST — Listado inventario
 
-**Casos de uso:** `CU-CAT-19` — Consultar mermas; `CU-CAT-23` — Consultar inventario de mermas; `CU-CAT-24` — Generar reporte de mermas.
+**Casos de uso:** `CU-ALM-09` — Consultar mermas e inventario; `CU-ALM-13` — Generar reporte de mermas.
 
 **Errores posibles:** [Catálogos e inventario](../../error-messages.md#errores-catalogos).
 
@@ -9,7 +9,7 @@
 
 1. Abra **Filtros** y compruebe que los controles desplegados coincidan con la captura:
 
-   ![CAP-CAT-WAS-01-LIST: listado inventario](../../images/mermas/01-listado-inventario.png)
+   ![CAP-CAT-WAS-01-LIST: listado inventario](../../images/waste/01-list-inventory.png)
 
 2. Escriba un término en el buscador **Buscar por Material o Proveedor** o elija una opción en el filtro **Proveedor**.
 3. Seleccione el botón **Buscar / filtrar** para actualizar la tabla; use **Limpiar filtros** para restablecerla.

@@ -1,31 +1,30 @@
 <a id="cu-cat-19"></a>
-# `CU-CAT-19` — Consultar mermas
+# `CU-CAT-19` — Crear unidad de medida
 
-**Patrones:** `BE-P01`.
+**Patrones:** `BE-P02`.
 
 ```mermaid
 sequenceDiagram
     participant Client as Cliente HTTP / web
-    participant Route as src/routes/api/warehouse/wasteApiRoute.js
-    participant Controller@{ "type": "control" } as src/controllers/api/warehouse/wasteController.js
-    participant Domain as src/services/warehouse/wastes/wasteService.js
-    Note over Controller,Domain: Variables de frontera: req.query/params
+    participant Route as src/routes/api/admin/catalogApiRoute.js
+    participant Controller@{ "type": "control" } as src/controllers/api/admin/catalogController.js
+    participant Domain as src/services/admin/catalogService.js
+    participant ErrorHandler as src/app.js
 
-    Client->>Route: GET /api/warehouse/wastes
-    Route->>Route: ejecutar en orden el middleware configurado para la ruta
-    Route->>Controller: getAllWastes(req, res)
+    Client->>Route: POST /api/admin/catalogs/unit-measures
+    Route->>Controller: registerCatalogEntry(req, res)
     activate Controller
-    Controller->>Domain: wasteService.findAllWastes({ query: req.query }) consulta merma e inventario
+    Controller->>Domain: createCatalogEntry(req.params.catalog/req.body) normaliza y crea únicamente los campos permitidos
     activate Domain
-    Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
-    Domain-->>Controller: resultado del servicio o error de dominio tipado
-    deactivate Domain
-    alt El servicio devuelve el resultado
-        Controller-->>Client: status HTTP y cuerpo concretos del controller
-    else El servicio propaga un error de dominio
-        Controller-->>Client: error entregado al middleware final para su respuesta HTTP
+    alt Servicio resuelto
+        Domain-->>Controller: createCatalogEntry() resuelve datos de dominio
+        Controller-->>Client: HTTP 2xx { code, data }
+    else AppError propagado
+        Domain-->>Controller: throw AppError { code, message, meta, statusCode }
+        Controller->>ErrorHandler: next(error)
+        ErrorHandler-->>Client: res.status(error.statusCode).json({ code, message, meta })
     end
+    deactivate Domain
     deactivate Controller
 ```
 
-<a id="cu-cat-20"></a>

@@ -1,7 +1,7 @@
 <a id="CAP-REP-MOV-WAS-01-LIST"></a>
 # 3. CAP-REP-MOV-WAS-01-LIST — Historial y filtros
 
-**Casos de uso:** `CU-CAT-25` — Consultar movimientos de mermas.
+**Casos de uso:** `CU-ALM-14` — Consultar movimientos de mermas.
 
 **Errores posibles:** [Reportes](../../error-messages.md#errores-reportes).
 
@@ -9,7 +9,7 @@
 
 1. Abra **Filtros** y compruebe que los controles desplegados coincidan con la captura:
 
-   ![CAP-REP-MOV-WAS-01-LIST: historial y filtros](../../images/movimientos-merma/01-historial-y-filtros.png)
+   ![CAP-REP-MOV-WAS-01-LIST: historial y filtros](../../images/waste-movements/01-history-and-filters.png)
 
 2. Escriba un término en **Buscar por Material, Proveedor o Folio** o complete **Fecha de inicio:**, **Fecha de fin:**, **Tipo de movimiento:**, **Proveedor:** y **Merma:**.
 3. Seleccione **Buscar / filtrar** para actualizar el historial; use **Limpiar filtros** para restablecerlo.

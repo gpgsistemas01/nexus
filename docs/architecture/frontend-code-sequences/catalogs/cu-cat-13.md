@@ -1,36 +1,33 @@
 <a id="cu-cat-13"></a>
-# `CU-CAT-13` — Cambiar estado de proveedor
+# `CU-CAT-13` — Crear rol
 
-**Patrones:** `FE-P02`.
+**Patrones:** `FE-P03`.
 
 ```mermaid
 sequenceDiagram
     participant Browser as Navegador
-    participant View as src/public/js/pages/warehouse/suppliers/supplierForm.js
-    participant Application as src/public/js/application/warehouse/suppliers/suppliers.js
-    participant Request as src/public/js/services/warehouse/supplierService.js
+    participant View as src/public/js/pages/admin/catalogs/catalogForm.js
+    participant Application as src/public/js/application/admin/catalogs/catalogs.js
+    participant Request as src/public/js/services/admin/catalogService.js
     participant HTTP as src/public/js/services/axiosInstanceApi.js
-    participant Transport@{ "type": "control" } as src/routes/api/warehouse/supplierApiRoute.js<br/>src/controllers/api/warehouse/supplierController.js
-    Note over Application,Transport: Variables de frontera: id, formData/payload
+    participant Transport@{ "type": "control" } as src/routes/api/admin/catalogApiRoute.js<br/>src/controllers/api/admin/catalogController.js
 
-    Browser->>View: El estado se edita en supplierForm.js, no hay pantalla separada
-    View->>View: recopilar y validar las variables de frontera indicadas
-    View->>Application: editSupplier({ id, formData })
-    Application->>Request: editSupplierRequest({ id, data: formData })
+    Browser->>View: confirmar el formulario de alta
+    View->>Application: registerCatalogEntry({ catalog, data })
+    Application->>Request: createCatalogEntryRequest({ catalog, data })
     activate Application
-    Request->>HTTP: apiRequest({ method: 'put', url, data/params })
-    HTTP->>Transport: enviar PUT /api/warehouse/suppliers/:id
-    Transport-->>HTTP: status HTTP y payload del endpoint
-    HTTP-->>Request: respuesta o error normalizado
-    Request-->>Application: resultado del request
+    Request->>HTTP: apiRequest({ method: 'post', url, data })
+    HTTP->>Transport: consume POST /api/admin/catalogs/roles
+    Transport-->>HTTP: HTTP 2xx { code, data }
+    HTTP-->>Request: apiRequest() resuelve response.data
+    Request-->>Application: createCatalogEntryRequest() resuelve response.data
     alt Respuesta exitosa
-        Application-->>View: entidad, colección o archivo normalizado
-        View-->>Browser: actualizar la vista con el resultado
+        Application-->>View: registerCatalogEntry() resuelve response.data
+        View-->>Browser: DOM o DataTable actualizado con response.data
     else Respuesta rechazada
-        Application-->>View: error normalizado por apiRequest
-        View-->>Browser: conservar contexto y mostrar el mensaje
+        Application-->>View: error Axios normalizado { code, message, meta }
+        View-->>Browser: formulario o filtros conservados, mensaje visible
     end
     deactivate Application
 ```
 
-<a id="cu-cat-15"></a>

@@ -9,7 +9,7 @@
 
 1. Seleccione **Exportar Excel** para abrir el modal **Exportar reporte**. Antes de continuar, compruebe que la pantalla mostrada coincida con la captura:
 
-   ![CAP-REP-SAL-WAS-06-EXPORT: exportar reporte](../../images/salidas-merma/06-exportar-reporte.png)
+   ![CAP-REP-SAL-WAS-06-EXPORT: exportar reporte](../../images/waste-issues/06-export-report.png)
 
 2. Elija el alcance mensual, otro mes o los filtros aplicados y complete **Mes del reporte** cuando corresponda.
 3. Seleccione **Descargar** para generar el archivo.

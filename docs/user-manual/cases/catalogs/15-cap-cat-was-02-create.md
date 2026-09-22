@@ -1,7 +1,7 @@
 <a id="CAP-CAT-WAS-02-CREATE"></a>
 # 15. CAP-CAT-WAS-02-CREATE — Formulario registro
 
-**Casos de uso:** `CU-CAT-20` — Registrar merma.
+**Casos de uso:** `CU-ALM-10` — Registrar merma.
 
 **Errores posibles:** [Validación de formularios](../../error-messages.md#errores-validacion), [Catálogos e inventario](../../error-messages.md#errores-catalogos).
 
@@ -13,7 +13,7 @@ para abrir el formulario y **Guardar** para confirmarlo.
 
 1. Seleccione el botón **Nueva merma** para abrir el formulario de registro. Antes de continuar, compruebe que la pantalla mostrada coincida con la captura:
 
-   ![CAP-CAT-WAS-02-CREATE: formulario registro](../../images/mermas/02-formulario-registro.png)
+   ![CAP-CAT-WAS-02-CREATE: formulario registro](../../images/waste/02-form-registration.png)
 
 2. Elija opciones en **Buscar proveedor...** y **Buscar material de referencia...**; complete **Ancho confirmado de la merma (m)**, **Largo real de la merma (m)**, **Stock mínimo**, **Costo máximo unitario**, **Nuevo stock** y **Observaciones**, y revise la casilla **Activo**.
 3. Seleccione el botón **Guardar** para registrar la merma.

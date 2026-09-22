@@ -1,7 +1,6 @@
 <a id="CAP-CAT-SUP-03-EDIT"></a>
 # 9. CAP-CAT-SUP-03-EDIT — Formulario edición y estado
 
-**Casos de uso:** `CU-CAT-12` — Editar proveedor; `CU-CAT-13` — Cambiar estado de proveedor.
 
 **Errores posibles:** [Validación de formularios](../../error-messages.md#errores-validacion), [Catálogos e inventario](../../error-messages.md#errores-catalogos).
 
@@ -9,7 +8,7 @@
 
 1. En la fila del proveedor, seleccione la acción **Editar registro**. Antes de continuar, compruebe que la pantalla mostrada coincida con la captura:
 
-   ![CAP-CAT-SUP-03-EDIT: formulario edicion y estado](../../images/proveedores/03-formulario-edicion-y-estado.png)
+   ![CAP-CAT-SUP-03-EDIT: formulario edicion y estado](../../images/suppliers/03-form-edit-and-state.png)
 
 2. Modifique los campos **Razón social**, **Nombre comercial** o **Teléfono** necesarios y revise la casilla **Activo**.
 3. Seleccione el botón **Actualizar** para guardar los cambios.

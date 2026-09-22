@@ -1,7 +1,7 @@
 <a id="CAP-CAT-SUP-02-CREATE"></a>
 # 8. CAP-CAT-SUP-02-CREATE — Formulario alta
 
-**Casos de uso:** `CU-CAT-11` — Crear proveedor.
+**Casos de uso:** `CU-CAT-02` — Crear proveedor.
 
 **Errores posibles:** [Validación de formularios](../../error-messages.md#errores-validacion), [Catálogos e inventario](../../error-messages.md#errores-catalogos).
 
@@ -9,7 +9,7 @@
 
 1. Seleccione el botón **Nuevo proveedor** para abrir el formulario de alta. Antes de continuar, compruebe que la pantalla mostrada coincida con la captura:
 
-   ![CAP-CAT-SUP-02-CREATE: formulario alta](../../images/proveedores/02-formulario-alta.png)
+   ![CAP-CAT-SUP-02-CREATE: formulario alta](../../images/suppliers/02-form-creation.png)
 
 2. Complete los campos **Razón social**, **Nombre comercial** y **Teléfono**, y revise la casilla **Activo**.
 3. Seleccione el botón **Guardar** para registrar el proveedor.

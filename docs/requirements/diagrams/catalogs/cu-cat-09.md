@@ -1,8 +1,10 @@
-# `CU-CAT-09` — Generar reporte de movimientos de materiales
+# `CU-CAT-09` — Consultar área
 
 ```mermaid
 flowchart LR
-    request["Actor selecciona exportar desde CU-CAT-08: movimientos de materiales"] --> modal["Nexus abre el modal Exportar reporte"]
-    modal --> validate["Nexus valida permiso, datos y relaciones"]
-    validate --> result["Nexus responde: Archivo Excel con filtros, columnas y cálculos propios del reporte."]
+    accTitle: CU-CAT-09 — Consultar área
+    request["Administrador solicita consultar Áreas"] --> authorize["Nexus valida catalogs:manage y departments"]
+    authorize --> result["Mostrar exclusivamente la tabla de Áreas"]
+    result --> create["Administrador elige crear y dispara CU-CAT-10"]
+    result --> edit["Administrador elige editar y puede iniciar CU-CAT-11"]
 ```

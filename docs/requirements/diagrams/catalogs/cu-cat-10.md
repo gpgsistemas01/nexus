@@ -1,9 +1,9 @@
-# `CU-CAT-10` — Consultar proveedores
+# `CU-CAT-10` — Crear área
 
 ```mermaid
 flowchart LR
-    request["Actor solicita consultar proveedores"] --> validate["Nexus valida permiso, datos y relaciones"]
-    validate --> result["Nexus responde: Listado de proveedores autorizados."]
-    result --> primary["Actor elige la acción principal y dispara CU-CAT-11"]
-    result --> report["Actor elige exportar y puede iniciar CU-CAT-14"]
+    accTitle: CU-CAT-10 — Crear área
+    request["Administrador selecciona Nueva área<br/>y confirma Guardar"] --> authorize["Nexus valida catalogs:manage y departments"]
+    authorize --> persist["Validar campos y crear área"]
+    persist --> result["Confirmar y refrescar Áreas"]
 ```

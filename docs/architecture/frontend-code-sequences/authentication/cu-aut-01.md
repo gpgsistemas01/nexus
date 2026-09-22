@@ -5,7 +5,6 @@
 
 ```mermaid
 sequenceDiagram
-    Note over User,App: Variables de frontera: name, password y cookies
     actor User as Usuario
     participant EJS as src/views/pages/home/login/loginPage.ejs
     participant Form as src/public/js/pages/home/login/loginForm.js
@@ -15,18 +14,23 @@ sequenceDiagram
     participant API@{ "type": "control" } as src/controllers/api/authController.js
     participant Browser as Navegador
 
-    EJS->>Form: carga el módulo del formulario
+    EJS->>Form: import './loginForm.js'
     User->>Form: captura y envía credenciales
-    Form->>Form: valida campos requeridos
+    Form->>Form: validateFields(loginValidation, formData)
     Form->>App: login({ formData })
     App->>Request: loginRequest({ data: formData })
-    Request->>HTTP: apiRequest({ method: post, url, data })
+    Request->>HTTP: apiRequest({ method: 'post', url, data })
     HTTP->>API: POST /api/auth/login
-    API-->>HTTP: respuesta y cookies de sesión
-    HTTP-->>Request: respuesta normalizada
-    Request-->>App: respuesta normalizada
-    App-->>Form: resultado exitoso
-    Form->>Browser: navega a la portada autenticada
+    alt Credenciales aceptadas
+        API-->>HTTP: 200 y cookies de sesión
+        HTTP-->>Request: apiRequest() resuelve response.data
+        Request-->>App: loginRequest() resuelve { message }
+        App-->>Form: resultado exitoso
+        Form->>Browser: window.location.replace('/almacen/materiales')
+    else Credenciales rechazadas
+        API-->>HTTP: 401 { code, message }
+        HTTP-->>Request: apiRequest() rechaza { code, message, meta }
+        Request-->>App: error propagado
+        App-->>Form: login() rechaza { code, message }, sin navegación
+    end
 ```
-
-<a id="cu-aut-02"></a>

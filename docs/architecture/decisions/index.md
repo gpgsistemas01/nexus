@@ -11,7 +11,7 @@ las consecuencias de una elección relevante.
 
 | Identificador | Estado | Decisión |
 | --- | --- | --- |
-| [ADR-001](ADR-001-secuencias-por-perspectiva-y-grupo.md) | Aceptada | Organizar las secuencias por perspectiva técnica y grupo funcional. |
+| [ADR-001](ADR-001-sequences-by-perspective-and-group.md) | Aceptada | Organizar las secuencias por perspectiva técnica y grupo funcional. |
 
 ## Convención
 

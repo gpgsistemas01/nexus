@@ -1,8 +1,9 @@
-# `CU-CAT-25` — Consultar movimientos de mermas
+# `CU-CAT-25` — Crear estado de cumplimiento
 
 ```mermaid
 flowchart LR
-    request["Actor solicita consultar movimientos de mermas"] --> validate["Nexus valida permiso, datos y relaciones"]
-    validate --> result["Nexus responde: Consulta autorizada sin modificar datos."]
-    result --> report["Actor elige exportar y dispara CU-CAT-26"]
+    accTitle: CU-CAT-25 — Crear estado de cumplimiento
+    request["Administrador selecciona Nuevo estado de cumplimiento<br/>y confirma Guardar"] --> authorize["Nexus valida catalogs:manage y fulfillment-statuses"]
+    authorize --> persist["Validar campos y crear estado de cumplimiento"]
+    persist --> result["Confirmar y refrescar Estados de cumplimiento"]
 ```

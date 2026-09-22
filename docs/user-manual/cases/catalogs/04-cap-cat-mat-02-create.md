@@ -1,7 +1,7 @@
 <a id="CAP-CAT-MAT-02-CREATE"></a>
 # 4. CAP-CAT-MAT-02-CREATE — Formulario alta
 
-**Casos de uso:** `CU-CAT-02` — Crear material.
+**Casos de uso:** `CU-ALM-02` — Crear material.
 
 **Errores posibles:** [Validación de formularios](../../error-messages.md#errores-validacion), [Catálogos e inventario](../../error-messages.md#errores-catalogos).
 
@@ -12,7 +12,7 @@ abrir el formulario y **Guardar** para confirmarlo.
 
 1. Seleccione el botón **Nuevo material** para abrir el formulario de alta. Antes de continuar, compruebe que la pantalla mostrada coincida con la captura:
 
-   ![CAP-CAT-MAT-02-CREATE: formulario alta](../../images/materiales/02-formulario-alta.png)
+   ![CAP-CAT-MAT-02-CREATE: formulario alta](../../images/materials/02-form-creation.png)
 
 2. Complete **Nombre**; elija opciones en **Buscar proveedor...**, **Buscar presentación...** y **Buscar unidad...**; capture **Stock Mínimo**, **Costo Máximo**, **Base**, **Altura**, **Nueva cantidad** y **Observaciones**, y revise la casilla **Activo**.
 3. Seleccione el botón **Guardar** para registrar el material.

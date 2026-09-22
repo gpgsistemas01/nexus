@@ -1,34 +1,30 @@
 <a id="cu-cat-13"></a>
-# `CU-CAT-13` — Cambiar estado de proveedor
+# `CU-CAT-13` — Crear rol
 
-**Patrones:** `BE-P01`.
+**Patrones:** `BE-P02`.
 
 ```mermaid
 sequenceDiagram
     participant Client as Cliente HTTP / web
-    participant Route as src/routes/api/warehouse/supplierApiRoute.js
-    participant Controller@{ "type": "control" } as src/controllers/api/warehouse/supplierController.js
-    participant SupplierDto as «object»<br/>supplierDto<br/>src/dtos/supplierDTO.js
-    participant Domain as src/services/warehouse/supplierService.js
-    Note over Controller,Domain: Variables de frontera: req.params.id, req.body/DTO
+    participant Route as src/routes/api/admin/catalogApiRoute.js
+    participant Controller@{ "type": "control" } as src/controllers/api/admin/catalogController.js
+    participant Domain as src/services/admin/catalogService.js
+    participant ErrorHandler as src/app.js
 
-    Client->>Route: PUT /api/warehouse/suppliers/:id
-    Route->>Route: ejecutar en orden el middleware configurado para la ruta
-    Route->>Controller: editSupplier(req, res)
+    Client->>Route: POST /api/admin/catalogs/roles
+    Route->>Controller: registerCatalogEntry(req, res)
     activate Controller
-    Controller->>SupplierDto: createSupplierDtoForEdit(req.body) → sanitizeEmptyStrings(...)
-    SupplierDto-->>Controller: supplierDto normalizado
-    Controller->>Domain: supplierService.updateSupplier(supplierDto, req.params.id) aplica el estado incluido en el DTO, no hay endpoint separado
+    Controller->>Domain: createCatalogEntry(req.params.catalog/req.body) normaliza y crea únicamente los campos permitidos
     activate Domain
-    Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
-    Domain-->>Controller: resultado del servicio o error de dominio tipado
-    deactivate Domain
-    alt El servicio devuelve el resultado
-        Controller-->>Client: status HTTP y cuerpo concretos del controller
-    else El servicio propaga un error de dominio
-        Controller-->>Client: error entregado al middleware final para su respuesta HTTP
+    alt Servicio resuelto
+        Domain-->>Controller: createCatalogEntry() resuelve datos de dominio
+        Controller-->>Client: HTTP 2xx { code, data }
+    else AppError propagado
+        Domain-->>Controller: throw AppError { code, message, meta, statusCode }
+        Controller->>ErrorHandler: next(error)
+        ErrorHandler-->>Client: res.status(error.statusCode).json({ code, message, meta })
     end
+    deactivate Domain
     deactivate Controller
 ```
 
-<a id="cu-cat-15"></a>

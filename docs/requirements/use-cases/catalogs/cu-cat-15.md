@@ -1,14 +1,14 @@
-# `CU-CAT-15` — Consultar clientes
+# `CU-CAT-15` — Consultar presentación
 
 | Sección | Información relevante |
 | --- | --- |
 | Identificador | `CU-CAT-15` |
-| Nombre | Consultar clientes. |
-| Actor y disparador | **Actor:** Administrador del sistema. **Disparador:** necesita localizar o revisar clientes y abre la opción de consulta correspondiente. |
-| Participación de actor y sistema | **Actor:** abre la consulta, define criterios y selecciona registros.<br>**Nexus:** autoriza, presenta filtros y devuelve sólo la información permitida. |
-| Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de consulta o reporte correspondiente. |
-| Flujo principal | 1. **Actor:** abre la opción para consultar clientes **(ver E1)**.<br>2. **Nexus:** comprueba su autorización y muestra la consulta con sus criterios disponibles.<br>3. **Actor:** define los criterios que necesita y solicita aplicarlos **(ver A1)**.<br>4. **Nexus:** presenta la información autorizada y la acción principal para registrar un cliente.<br>5. **Actor:** selecciona la acción principal; termina `CU-CAT-15` y con esa selección dispara `CU-CAT-16` Crear cliente. |
-| Flujos alternativos | **A1 — Continuar la consulta (después del paso 3):**<br>1. **Nexus:** actualiza la información y el total sin modificar datos.<br>2. **Actor:** revisa los resultados o cambia los criterios.<br>3. **Nexus:** conserva la consulta disponible; termina el caso de uso.<br>**A2 — Elegir otra acción (después del paso 4 del flujo principal):**<br>1. **Actor:** selecciona editar el cliente en lugar de iniciar el alta; termina `CU-CAT-15` y puede iniciar `CU-CAT-17` Editar cliente. También puede iniciar `CU-CAT-18` Generar reporte de clientes. Cada caso elegido comprueba nuevamente sus precondiciones y autorización; la selección no constituye `«include»` ni `«extend»`. |
-| Excepciones | **E1 — Acceso rechazado (después del paso 1):**<br>1. **Nexus:** comprueba las precondiciones y la autorización, determina que alguna no se cumple y rechaza la solicitud sin modificar datos ni exponer información no autorizada; comunica el motivo.<br>2. **Actor:** reconoce el rechazo; termina el caso de uso. |
-| Postcondiciones (éxito y fallo) | 1. **Éxito:** Listado de clientes autorizados.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
-| Requisitos relacionados | `RF-CAT-003`. |
+| Nombre | Consultar presentación. |
+| Actor | Administrador del sistema del área Sistemas. |
+| Disparador | Selecciona **Presentaciones** en el submenú **Catálogos auxiliares**. |
+| Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con autorización para administrar catálogos y pertenece al contexto administrativo autorizado. |
+| Flujo principal | 1. **Actor:** selecciona **Presentaciones** en el submenú **Catálogos auxiliares** **(ver E1)**.<br>2. **Nexus:** comprueba que puede consultar Presentaciones y muestra su tabla; presenta **Nueva presentación** como acción principal para registrar una presentación **(ver A1)** **(ver A2)**. Además, consulta la información necesaria en la base de datos **(ver EBD)**.<br>3. **Actor:** selecciona **Nueva presentación**; termina `CU-CAT-15` y con esa selección dispara `CU-CAT-16` Crear presentación. |
+| Flujos alternativos | **A1 — Permanecer en la consulta (después del paso 3):**<br>1. **Actor:** decide no iniciar el alta y revisa o busca entradas sin modificar datos.<br>2. **Nexus:** conserva la tabla de Presentaciones; termina el caso de uso.<br>**A2 — Editar una entrada (después del paso 2 del flujo principal):**<br>1. **Actor:** selecciona **Editar registro** en la pantalla **Presentaciones**; termina `CU-CAT-15`.<br>2. **Nexus:** inicia `CU-CAT-17` Editar presentación y vuelve a comprobar sus precondiciones y autorización. |
+| Excepciones | **E1 — Acceso, recurso o entrada rechazados (después del paso 1):**<br>1. **Nexus:** rechaza la operación sin exponer otro catálogo ni producir cambios parciales.<br>2. **Actor:** reconoce el rechazo; termina el caso de uso.<br>**EBD — Error de base de datos o de conexión (durante el paso 2 del flujo principal):**<br>1. **Nexus:** detecta que no puede consultar o guardar la información, revierte cualquier cambio parcial y comunica que la operación no se completó.<br>2. **Actor:** recibe el aviso, conserva los datos capturados cuando existe un formulario y decide reintentar más tarde o terminar el caso de uso. |
+| Postcondiciones (éxito y fallo) | 1. **Éxito:** La tabla muestra exclusivamente las entradas de Presentaciones.<br>2. **Fallo:** No se exponen datos ni modelos no autorizados. |
+| Requisitos relacionados | `RF-CAT-022`, `RN-001`, `RN-006`. |

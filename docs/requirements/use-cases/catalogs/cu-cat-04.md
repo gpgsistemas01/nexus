@@ -1,14 +1,13 @@
-# `CU-CAT-04` — Retirar material
+# `CU-CAT-04` — Generar reporte de proveedores
 
 | Sección | Información relevante |
 | --- | --- |
 | Identificador | `CU-CAT-04` |
-| Nombre | Retirar material. |
-| Actor y disparador | **Actor:** Personal de almacén. **Disparador:** determina que debe retirar material y solicita la eliminación. |
-| Participación de actor y sistema | **Actor:** solicita y confirma el retiro.<br>**Nexus:** comprueba historia y relaciones, ejecuta sólo el retiro permitido e informa el resultado. |
-| Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de retiro.<br>3. El recurso objetivo existe.<br>4. El recurso se encuentra en un estado que permite retirarlo. |
-| Flujo principal | 1. **Actor:** selecciona un material y solicita retirarlo **(ver E1)**.<br>2. **Nexus:** identifica el material y solicita confirmar la eliminación.<br>3. **Actor:** confirma que desea retirarlo.<br>4. **Nexus:** comprueba si el material tiene historia protegida o relaciones con proveedores **(ver A1)**.<br>5. **Nexus:** elimina la relación proveedor-material y, cuando no quedan otras relaciones ni historia protegida, elimina también la identidad del material; después actualiza el listado y confirma el retiro. |
-| Flujos alternativos | **A1 — Material con historia o relaciones protegidas (después del paso 4):**<br>1. **Actor:** revisa el conflicto y las relaciones que Nexus informa.<br>2. **Nexus:** conserva la identidad, la existencia y la historia del material sin efectuar una eliminación parcial.<br>3. **Actor:** reconoce que el material no puede retirarse en esas condiciones; termina el caso de uso. |
-| Excepciones | **E1 — Acceso rechazado (después del paso 1):**<br>1. **Nexus:** comprueba las precondiciones y la autorización, determina que alguna no se cumple y rechaza la solicitud sin modificar datos ni exponer información no autorizada; comunica el motivo.<br>2. **Actor:** reconoce el rechazo; termina el caso de uso. |
-| Postcondiciones (éxito y fallo) | 1. **Éxito:** La relación seleccionada deja de estar disponible y la identidad sólo se elimina si no conserva otras relaciones ni historia protegida.<br>2. **Fallo:** La identidad, las relaciones, la existencia y la historia permanecen sin cambios; no se produce un retiro parcial ni se expone información no autorizada. |
-| Requisitos relacionados | `RF-CAT-008`, `RN-007`. |
+| Nombre | Generar reporte de proveedores. |
+| Actor | Administrador del sistema. |
+| Disparador | Desde `CU-CAT-01` Consultar proveedores, selecciona la opción para generar el reporte con los filtros que necesita conservar. |
+| Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de consulta o reporte correspondiente. |
+| Flujo principal | 1. **Nexus:** después de que el actor selecciona la exportación desde la consulta de origen, abre el modal **Exportar reporte** e informa que aplicará la búsqueda, los filtros y el orden actuales **(ver E1)**.<br>2. **Actor:** revisa el alcance informado y confirma la descarga.<br>3. **Nexus:** vuelve a comprobar autorización y parámetros y prepara la información de proveedores; genera el archivo de Excel e inicia su descarga; si no hay datos, informa que el resultado está vacío. Además, consulta la información necesaria en la base de datos **(ver EBD)**. |
+| Excepciones | **E1 — Exportación rechazada (después del disparador):**<br>1. **Nexus:** comprueba las precondiciones y la autorización, determina que alguna no se cumple y rechaza la solicitud sin modificar datos ni exponer información no autorizada; comunica el motivo.<br>2. **Actor:** reconoce el rechazo; termina el caso de uso.<br>**EBD — Error de base de datos o de conexión (durante el paso 3 del flujo principal):**<br>1. **Nexus:** detecta que no puede consultar o guardar la información, revierte cualquier cambio parcial y comunica que la operación no se completó.<br>2. **Actor:** recibe el aviso, conserva los datos capturados cuando existe un formulario y decide reintentar más tarde o terminar el caso de uso. |
+| Postcondiciones (éxito y fallo) | 1. **Éxito:** Archivo Excel con filtros, columnas y cálculos propios del reporte.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
+| Requisitos relacionados | `RF-REP-002`, `RF-REP-004`. |

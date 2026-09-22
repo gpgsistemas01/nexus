@@ -1,7 +1,9 @@
-# `CU-CAT-19` — Consultar mermas
+# `CU-CAT-19` — Crear unidad de medida
 
 ```mermaid
 flowchart LR
-    request["Actor solicita consultar mermas"] --> validate["Nexus valida permiso, datos y relaciones"]
-    validate --> result["Nexus responde: Listado de existencias de merma."]
+    accTitle: CU-CAT-19 — Crear unidad de medida
+    request["Administrador selecciona Nueva unidad de medida<br/>y confirma Guardar"] --> authorize["Nexus valida catalogs:manage y unit-measures"]
+    authorize --> persist["Validar campos y crear unidad de medida"]
+    persist --> result["Confirmar y refrescar Unidades de medida"]
 ```

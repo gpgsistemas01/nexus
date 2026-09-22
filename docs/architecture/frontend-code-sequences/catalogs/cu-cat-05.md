@@ -1,33 +1,33 @@
 <a id="cu-cat-05"></a>
-# `CU-CAT-05` — Ajustar existencia de material
+# `CU-CAT-05` — Consultar clientes
 
 **Patrones:** `FE-P02`.
 
 ```mermaid
 sequenceDiagram
-    Note over User,App: Variables de frontera: id, DTO de ajuste y userId
-    actor User as Administrador del sistema
-    participant EJS as src/views/pages/warehouse/materials/materialsPage.ejs
-    participant Form as src/public/js/pages/warehouse/materials/materialForm.js
-    participant App as src/public/js/application/warehouse/materials/materials.js
-    participant Factory as src/public/js/application/createCrudApplication.js
-    participant Request as src/public/js/services/warehouse/materialService.js
+    participant Browser as Navegador
+    participant View as src/views/pages/sales/clients/clientsPage.ejs<br/>src/public/js/pages/sales/clients/clientsPage.js
+    participant Application as src/public/js/application/sales/clients/clients.js
+    participant Request as src/public/js/services/sales/clientService.js
     participant HTTP as src/public/js/services/axiosInstanceApi.js
-    participant API@{ "type": "control" } as src/controllers/api/warehouse/materialController.js
+    participant Transport@{ "type": "control" } as src/routes/api/sales/clientApiRoute.js<br/>src/controllers/api/sales/clientController.js
 
-    EJS->>Form: carga módulo y formulario
-    User->>Form: confirma ajuste
-    Form->>Form: selecciona campos y valida
-    Form->>App: editMaterialStock({ formData, id })
-    App->>Factory: createApplicationMutation({ request: editMaterialStockRequest, dataKey: 'material' })({ formData, id })
-    Factory->>Request: editMaterialStockRequest({ data: formData, id })
-    Request->>HTTP: apiRequest({ method: patch, url, data })
-    HTTP->>API: PATCH /api/warehouse/materials/:id/stock
-    API-->>HTTP: { material, code }
-    HTTP-->>Request: respuesta normalizada
-    Request-->>Factory: response
-    Factory-->>Form: material
-    Form->>Form: form.onSave?.(material)
+    Browser->>View: clientsPage.ejs y clientsPage.js cargan clientes
+    View->>Application: getAllClients({ params })
+    Application->>Request: getAllClientsRequest({ params })
+    activate Application
+    Request->>HTTP: apiRequest({ method: 'get', url, params })
+    HTTP->>Transport: consulta GET /api/sales/clients
+    Transport-->>HTTP: HTTP 2xx { code, data }
+    HTTP-->>Request: apiRequest() resuelve response.data
+    Request-->>Application: getAllClientsRequest() resuelve response.data
+    alt Respuesta exitosa
+        Application-->>View: getAllClients() resuelve response.data
+        View-->>Browser: DOM o DataTable actualizado con response.data
+    else Respuesta rechazada
+        Application-->>View: error Axios normalizado { code, message, meta }
+        View-->>Browser: formulario o filtros conservados, mensaje visible
+    end
+    deactivate Application
 ```
 
-<a id="cu-cat-10"></a>

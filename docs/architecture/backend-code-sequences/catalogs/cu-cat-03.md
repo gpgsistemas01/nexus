@@ -1,34 +1,33 @@
 <a id="cu-cat-03"></a>
-# `CU-CAT-03` — Editar material
+# `CU-CAT-03` — Editar proveedor
 
-**Patrones:** `BE-P01`, `BE-P03`, `BE-P04`.
+**Patrones:** `BE-P01`.
 
 ```mermaid
 sequenceDiagram
     participant Client as Cliente HTTP / web
-    participant Route as src/routes/api/warehouse/materialApiRoute.js
-    participant Controller@{ "type": "control" } as src/controllers/api/warehouse/materialController.js
-    participant MaterialDto as «object»<br/>materialDto<br/>src/dtos/materialDTO.js
-    participant Domain as src/services/warehouse/materials/materialService.js
-    Note over Controller,Domain: Variables de frontera: req.params.id, req.body/DTO, tx
+    participant Route as src/routes/api/warehouse/supplierApiRoute.js
+    participant Controller@{ "type": "control" } as src/controllers/api/warehouse/supplierController.js
+    participant SupplierDto as «object»<br/>supplierDto<br/>src/dtos/supplierDTO.js
+    participant Domain as src/services/warehouse/supplierService.js
+    participant ErrorHandler as src/app.js
 
-    Client->>Route: PATCH /api/warehouse/materials/:id
-    Route->>Route: ejecutar en orden el middleware configurado para la ruta
-    Route->>Controller: editMaterial(req, res)
+    Client->>Route: PUT /api/warehouse/suppliers/:id
+    Route->>Controller: editSupplier(req, res)
     activate Controller
-    Controller->>MaterialDto: createMaterialDtoForEdit(req.body) → sanitizeEmptyStrings(...)
-    MaterialDto-->>Controller: materialDto normalizado
-    Controller->>Domain: materialService.updateMaterial({ id: req.params.id, materialDto }) sincroniza datos y relación
+    Controller->>SupplierDto: createSupplierDtoForEdit(req.body)
+    SupplierDto-->>Controller: supplierDto normalizado
+    Controller->>Domain: supplierService.updateSupplier({ id: req.params.id, supplierDto }) actualiza datos del proveedor
     activate Domain
-    Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
-    Domain-->>Controller: resultado del servicio o error de dominio tipado
-    deactivate Domain
-    alt El servicio devuelve el resultado
-        Controller-->>Client: status HTTP y cuerpo concretos del controller
-    else El servicio propaga un error de dominio
-        Controller-->>Client: error entregado al middleware final para su respuesta HTTP
+    alt Servicio resuelto
+        Domain-->>Controller: supplierService.updateSupplier() resuelve datos de dominio
+        Controller-->>Client: HTTP 2xx { code, data }
+    else AppError propagado
+        Domain-->>Controller: throw AppError { code, message, meta, statusCode }
+        Controller->>ErrorHandler: next(error)
+        ErrorHandler-->>Client: res.status(error.statusCode).json({ code, message, meta })
     end
+    deactivate Domain
     deactivate Controller
 ```
 
-<a id="cu-cat-04"></a>

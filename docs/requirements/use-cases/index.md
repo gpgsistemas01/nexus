@@ -3,7 +3,7 @@
 ## Propósito y alcance
 
 Este catálogo desarrolla los objetivos representados en el
-[diagrama de casos de uso](../domain-and-use-cases/03-casos-de-uso-vigentes.md). Agrupa los
+[diagrama de casos de uso](../domain-and-use-cases/03-cases-of-use-current.md). Agrupa los
 casos que comparten tema, actor, ciclo CRUD o efectos de inventario para revisar sus
 semejanzas sin crear un documento por módulo.
 
@@ -23,21 +23,31 @@ secuencia técnica. Todos los casos usan la misma plantilla y el nivel de detall
 por las interacciones y decisiones aplicables, no por exigir el mismo número de pasos a
 objetivos de distinta complejidad.
 
+## Semántica de actores y generalización UML
+
+Las asociaciones directas del diagrama indican qué actor inicia cada objetivo. Cuando un
+caso tiene una asociación directa con un actor, su ficha nombra ese actor y, si ese actor
+es una generalización no abstracta, también su especialización mediante “o”.
+Cuando un caso sólo está conectado con otro caso de uso, hereda el actor de ese caso
+relacionado. La generalización `Administrador del sistema --generaliza--> Personal de
+almacén` se conserva en el diagrama, pero no se añade como segundo actor en una ficha que
+ya tiene una asociación directa.
+Las asociaciones entre casos de uso sólo representan objetivos relacionados o
+continuaciones visibles; no sustituyen la asociación del actor ni conceden permisos.
+
 ## Estructura de las fichas
 
 Cada caso emplea la misma tabla de dos columnas y conserva dentro de ella toda la
 información que permite recorrer su objetivo sin consultar una segunda descripción:
 
 - **Identificador y nombre:** identidad estable y objetivo observable.
-- **Actor y disparador:** responsable que inicia el caso y necesidad que lo activa.
-- **Participación de actores y sistema:** acciones que realiza el actor y respuestas,
-  validaciones o escrituras que Nexus ejecuta durante la interacción.
+- **Actor:** responsable que inicia el caso.
+- **Disparador:** necesidad o evento observable que activa el caso. Estas dos secciones permanecen separadas para no confundir quién participa con el motivo de inicio.
 - **Precondiciones:** lista numerada de estados que deben existir antes del primer paso;
   cada condición se registra por separado y no se confunde con una acción de validación
   ni con un resultado obtenido durante el flujo.
 - **Flujo principal:** interacción numerada paso a paso; cada paso identifica un solo
-  participante y una acción observable. Capturar, confirmar, validar, persistir y
-  presentar el resultado se separan cuando ocurren en momentos distintos. Se nombran el botón, enlace o acción que dispara cada transición; el formulario,
+  participante y una acción observable. Los turnos alternan entre actor y Nexus; cuando varias acciones consecutivas corresponden al mismo participante, se integran en un solo paso. Capturar filas de una tabla describe además la acción **Agregar** y la revisión de cada renglón, no sólo la captura genérica. Toda consulta o escritura identifica la interacción con la base de datos y remite a su excepción técnica. Se nombran el botón, enlace o acción que dispara cada transición; el formulario,
   diálogo o tabla que abre Nexus; los mensajes de confirmación o error; y la validación
   y conservación del resultado cuando forman parte del caso. Expresiones pasivas como
   «revisa» o «verifica el resultado» no sustituyen una interacción observable. El paso
@@ -52,8 +62,7 @@ información que permite recorrer su objetivo sin consultar una segunda descripc
   En los casos de consulta que preceden a operaciones de mantenimiento, el flujo
   principal termina con la acción de alta por ser la continuación prioritaria y esa
   selección constituye el disparador del caso siguiente. Permanecer en la consulta y
-  elegir las demás acciones se documentan como alternativas; no se crea una sección de
-  continuaciones asociadas para esas decisiones.
+  elegir cada una de las demás acciones se documenta como un flujo alternativo independiente y no ambiguo; no se agrupan destinos distintos bajo «Elegir otra acción» ni se crea una sección de continuaciones asociadas.
 - **Excepciones:** título breve, punto de rechazo o fallo y serie numerada de pasos que
   describe el efecto protegido y la terminación del caso. Su secuencia respeta la misma
   alternancia de participantes definida para los flujos alternativos.
@@ -81,9 +90,9 @@ destino fuera otro caso de uso, no se redactaría como un salto de control infor
   por sí misma inclusión, extensión ni una llamada entre casos. Cuando una consulta
   presenta operaciones de mantenimiento, su acción prioritaria cierra el flujo principal
   y dispara el caso siguiente; las demás acciones se documentan como alternativas. El
-  actor **termina la consulta** y luego **inicia** el caso seleccionado. Ambos objetivos
-  permanecen independientes y el segundo vuelve a
-  comprobar sus precondiciones y autorización.
+  actor ejecuta el **disparador documentado en la ficha del caso siguiente** y termina
+  la consulta; después, **Nexus inicia** el caso seleccionado. Ambos objetivos permanecen
+  independientes y el segundo vuelve a comprobar sus precondiciones y autorización.
 - `«include»` identifica un caso requerido que el caso base incorpora siempre; al
   concluir, la interacción continúa en el paso siguiente a la inclusión.
 - `«extend»` identifica comportamiento opcional que se inserta en un punto de extensión
@@ -119,6 +128,16 @@ compartir participantes, precondiciones y reglas; no reciben identificador `CU-*
 identificadores se asignan a operaciones concretas que pueden autorizarse, probarse y
 trazarse por separado.
 
+Agregar un renglón a la tabla de detalles de un formulario no constituye por sí solo otro
+caso de uso cuando el renglón es una preparación transitoria del documento: no deja una
+postcondición de negocio independiente, no se autoriza por separado y sólo se persiste al
+confirmar el objetivo principal. En esos casos, la ficha de creación o edición debe
+explicitar la selección de los datos, la acción **Agregar**, la respuesta de Nexus en la
+tabla, la posible repetición y la confirmación final. Se separa un caso únicamente cuando
+la operación sobre el detalle tiene disparador, autorización, reglas y resultado
+persistido propios —por ejemplo corregir, cancelar, surtir o devolver un detalle ya
+registrado—; compartir la misma tabla o formulario no decide la granularidad.
+
 ISO/IEC/IEEE 29148 orienta la ingeniería y calidad de requisitos, pero no se usa como
 fuente de una plantilla obligatoria, de nombres gramaticales para actores ni del formato
 paso a paso de los flujos de casos de uso. La tabla de dos columnas, las secciones
@@ -151,13 +170,14 @@ trazabilidad técnica; un identificador retirado no se reasigna a un objetivo di
 | --- | --- | --- |
 | `AUT` | Autenticación | Inicio y cierre observable de la sesión del usuario. |
 | `IDA` | Identidad y acceso | Personas, cuentas, credenciales y asignaciones de acceso. |
-| `CAT` | Catálogos | Recursos operativos y contextuales reutilizados por documentos. |
+| `ALM` | Almacén | Materiales, mermas, existencias, movimientos y reportes operativos del almacén. |
+| `CAT` | Catálogos | Recursos comerciales y contextuales reutilizados por documentos. |
 | `ENT` | Compras de material | Consulta, registro, edición, corrección y cancelación de compras recibidas. |
 | `SAL` | Salidas de material y de merma | Consulta, creación, edición, surtimiento y devolución de materiales o mermas. |
 
 #### Criterio de agrupación vigente
 
-Se mantienen cinco grupos funcionales propietarios porque expresan capacidades de
+Se mantienen seis grupos funcionales propietarios porque expresan capacidades de
 negocio estables. Cada consulta o reporte se ubica en el grupo del recurso desde el que
 se inicia; no existe un grupo independiente para reportes. Dentro de ellos, los casos se ordenan
 por la entidad o el documento sobre el que actúan. Cada secuencia comienza con la
@@ -172,7 +192,8 @@ como listas planas difíciles de revisar.
 | --- | --- | --- |
 | `AUT` | Sesión. | `CU-AUT-01` a `CU-AUT-02` |
 | `IDA` | Personas; usuarios y credenciales; sus consultas y reportes. | `CU-IDA-01` a `CU-IDA-09` |
-| `CAT` | Materiales; proveedores; clientes; mermas; inventarios, movimientos, reportes y catálogos auxiliares. | `CU-CAT-01` a `CU-CAT-44` |
+| `ALM` | Materiales; mermas; inventarios y movimientos del almacén. | `CU-ALM-01` a `CU-ALM-15` |
+| `CAT` | Proveedores; clientes; catálogos auxiliares y reportes complementarios. | `CU-CAT-01` a `CU-CAT-26` |
 | `ENT` | Compras de material y su reporte. | `CU-ENT-01` a `CU-ENT-06` |
 | `SAL` | Salidas de material y merma con sus reportes. | `CU-SAL-01` a `CU-SAL-14` |
 
@@ -196,17 +217,19 @@ conjunto; el cambio de identificador no modifica el alcance funcional del caso.
 
 - [AUT — Autenticación](authentication/index.md)
 - [IDA — Identidad y acceso](identity-access/index.md)
+- [ALM — Almacén](../use-cases/catalogs/index.md)
 - [CAT — Catálogos](catalogs/index.md)
 - [ENT — Compras de material](purchases/index.md)
 - [SAL — Salidas de material y de merma](issues/index.md)
+
 ## Relación entre familias y reutilización
 
 | Tema compartido | Casos | Elementos reutilizables que deben evaluarse primero | Diferencia que debe conservarse |
 | --- | --- | --- | --- |
-| CRUD de identidades y catálogos | `CU-IDA-01` a `CU-IDA-09`; `CU-CAT-01` a `CU-CAT-44` | Fábricas CRUD, listados, formularios, validación y refresco de tabla. | Permisos, identidad del recurso, relaciones y política de eliminación. |
+| CRUD de identidades y catálogos | `CU-IDA-01` a `CU-IDA-09`; `CU-ALM-01` a `CU-ALM-06`; `CU-ALM-09` a `CU-ALM-13`; `CU-CAT-01` a `CU-CAT-26` | Fábricas CRUD, listados, formularios, validación y refresco de tabla. | Permisos, identidad del recurso, relaciones y política de eliminación. |
 | Documentos con detalles | `CU-ENT-02`, `CU-ENT-03`, `CU-SAL-02` a `CU-SAL-04` y `CU-SAL-09` a `CU-SAL-11` | Encabezado, modal/formulario, tabla de detalles, DTO y transacción coordinadora. | La entrada incrementa stock al confirmarse; la salida no lo descuenta hasta surtir. |
 | Operación de salidas | `CU-SAL-02` a `CU-SAL-06` y `CU-SAL-09` a `CU-SAL-13` | Proceso de material replicable para merma, componentes informativos y coordinación de movimientos. | Inventario, conversión, permisos, estados y cantidades acumuladas del contexto. |
-| Consulta y exportación | `CU-IDA-04`, `CU-IDA-09`, `CU-CAT-07`, `CU-CAT-09`, `CU-CAT-14`, `CU-CAT-18`, `CU-CAT-24`, `CU-CAT-26`, `CU-ENT-06`, `CU-SAL-07` y `CU-SAL-14` y casos de consulta de cada familia | Filtros, paginación, dependencias entre selects y utilidades Excel. | Columnas, agrupaciones, fórmulas y permiso de cada reporte. |
+| Consulta y exportación | `CU-IDA-04`, `CU-IDA-09`, `CU-ALM-06`, `CU-ALM-08`, `CU-ALM-13`, `CU-ALM-15`, `CU-CAT-04`, `CU-CAT-08`, `CU-ENT-06`, `CU-SAL-07` y `CU-SAL-14` y casos de consulta de cada familia | Filtros, paginación, dependencias entre selects y utilidades Excel. | Columnas, agrupaciones, fórmulas y permiso de cada reporte. |
 
 Reutilizar no significa fusionar reglas de negocio. Antes de crear otro flujo se revisan
 los [patrones de diseño y construcción](../../architecture/design-and-construction-patterns/index.md), se replica

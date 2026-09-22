@@ -1,7 +1,9 @@
-# `CU-CAT-16` — Crear cliente
+# `CU-CAT-16` — Crear presentación
 
 ```mermaid
 flowchart LR
-    request["Actor solicita crear cliente"] --> validate["Nexus valida permiso, datos y relaciones"]
-    validate --> result["Nexus responde: Alta con asesor opcional válido."]
+    accTitle: CU-CAT-16 — Crear presentación
+    request["Administrador selecciona Nueva presentación<br/>y confirma Guardar"] --> authorize["Nexus valida catalogs:manage y presentations"]
+    authorize --> persist["Validar campos y crear presentación"]
+    persist --> result["Confirmar y refrescar Presentaciones"]
 ```

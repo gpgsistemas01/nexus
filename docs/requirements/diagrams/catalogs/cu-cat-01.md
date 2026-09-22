@@ -1,7 +1,11 @@
-# `CU-CAT-01` — Consultar materiales
+# `CU-CAT-01` — Consultar proveedores
 
 ```mermaid
 flowchart LR
-    request["Actor solicita consultar materiales"] --> validate["Nexus valida permiso, datos y relaciones"]
-    validate --> result["Nexus responde: Listado de materiales y ofertas de proveedor."]
+    accTitle: CU-CAT-01 — Consultar proveedores
+    request["Actor solicita consultar proveedores"] --> validate["Nexus valida permiso, datos y relaciones"]
+    validate --> result["Nexus responde: Listado de proveedores autorizados."]
+    result --> primary["Actor elige la acción principal y dispara CU-CAT-02"]
+    result --> edit["Actor elige editar y puede iniciar CU-CAT-03"]
+    result --> report["Actor elige exportar y puede iniciar CU-CAT-04"]
 ```

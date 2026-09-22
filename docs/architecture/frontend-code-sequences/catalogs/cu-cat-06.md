@@ -1,33 +1,33 @@
 <a id="cu-cat-06"></a>
-# `CU-CAT-06` — Consultar inventario de materiales
+# `CU-CAT-06` — Crear cliente
 
-**Patrones:** `FE-P07`.
+**Patrones:** `FE-P02`.
 
 ```mermaid
 sequenceDiagram
     participant Browser as Navegador
-    participant View as src/public/js/pages/warehouse/materials/materialsPage.js
-    participant Request as src/public/js/services/warehouse/materialService.js
+    participant View as src/public/js/pages/sales/clients/clientModal.js<br/>src/public/js/pages/sales/clients/clientForm.js
+    participant Application as src/public/js/application/sales/clients/clients.js
+    participant Request as src/public/js/services/sales/clientService.js
     participant HTTP as src/public/js/services/axiosInstanceApi.js
-    participant Transport@{ "type": "control" } as src/routes/api/warehouse/materialApiRoute.js<br/>src/controllers/api/warehouse/materialController.js
-    Note over Request,Transport: Variables de frontera: params/filtros
+    participant Transport@{ "type": "control" } as src/routes/api/sales/clientApiRoute.js<br/>src/controllers/api/sales/clientController.js
 
-    Browser->>View: La consulta es el listado de materialsPage.js, no hay página de reporte
-    View->>View: recopilar y validar las variables de frontera indicadas
-    View->>Request: getAllMaterialsRequest({ params })
-    activate Request
-    Request->>HTTP: apiRequest({ method: 'get', url, params })
-    HTTP->>Transport: GET /api/warehouse/materials
-    Transport-->>HTTP: status HTTP y payload del endpoint
-    HTTP-->>Request: respuesta o error normalizado
+    Browser->>View: clientModal.js abre clientForm.js en alta
+    View->>Application: registerClient({ formData })
+    Application->>Request: createClientRequest({ formData })
+    activate Application
+    Request->>HTTP: apiRequest({ method: 'post', url, data })
+    HTTP->>Transport: envía POST /api/sales/clients
+    Transport-->>HTTP: HTTP 2xx { code, data }
+    HTTP-->>Request: apiRequest() resuelve response.data
+    Request-->>Application: createClientRequest() resuelve response.data
     alt Respuesta exitosa
-        Request-->>View: entidad, colección o archivo normalizado
-        View-->>Browser: actualizar la vista con el resultado
+        Application-->>View: registerClient() resuelve response.data
+        View-->>Browser: DOM o DataTable actualizado con response.data
     else Respuesta rechazada
-        Request-->>View: error normalizado por apiRequest
-        View-->>Browser: conservar contexto y mostrar el mensaje
+        Application-->>View: error Axios normalizado { code, message, meta }
+        View-->>Browser: formulario o filtros conservados, mensaje visible
     end
-    deactivate Request
+    deactivate Application
 ```
 
-<a id="cu-cat-08"></a>

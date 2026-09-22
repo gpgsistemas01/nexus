@@ -1,13 +1,14 @@
-# `CU-CAT-14` — Generar reporte de proveedores
+# `CU-CAT-14` — Editar rol
 
 | Sección | Información relevante |
 | --- | --- |
 | Identificador | `CU-CAT-14` |
-| Nombre | Generar reporte de proveedores. |
-| Actor y disparador | **Actor:** Usuario con permiso sobre el reporte o consulta. **Disparador:** desde `CU-CAT-10` Consultar proveedores, selecciona la opción para generar el reporte con los filtros que necesita conservar. |
-| Participación de actor y sistema | **Actor:** solicita la exportación y confirma el alcance informado.<br>**Nexus:** autoriza, consolida la información y entrega el archivo. |
-| Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de consulta o reporte correspondiente. |
-| Flujo principal | 1. **Nexus:** después de que el actor selecciona la exportación desde la consulta de origen, abre el modal **Exportar reporte** e informa que aplicará la búsqueda, los filtros y el orden actuales **(ver E1)**.<br>2. **Actor:** revisa el alcance informado y confirma la descarga.<br>3. **Nexus:** vuelve a comprobar autorización y parámetros y prepara la información de proveedores.<br>4. **Nexus:** genera el archivo de Excel e inicia su descarga; si no hay datos, informa que el resultado está vacío. |
-| Excepciones | **E1 — Exportación rechazada (después del disparador):**<br>1. **Nexus:** comprueba las precondiciones y la autorización, determina que alguna no se cumple y rechaza la solicitud sin modificar datos ni exponer información no autorizada; comunica el motivo.<br>2. **Actor:** reconoce el rechazo; termina el caso de uso. |
-| Postcondiciones (éxito y fallo) | 1. **Éxito:** Archivo Excel con filtros, columnas y cálculos propios del reporte.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
-| Requisitos relacionados | `RF-REP-002`, `RF-REP-004`. |
+| Nombre | Editar rol. |
+| Actor | Administrador del sistema del área Sistemas. |
+| Disparador | Selecciona **Editar registro** en la pantalla **Roles**. |
+| Precondiciones | 1. El actor inició sesión y cuenta con autorización para administrar catálogos.<br>2. La entrada existe en **Roles**. |
+| Flujo principal | 1. **Actor:** abre **Roles** y selecciona **Editar registro** en una fila **(ver E1)**.<br>2. **Nexus:** presenta los valores existentes de **Nombre** y **Activo**.<br>3. **Actor:** modifica los datos y selecciona **Actualizar** **(ver A1)**.<br>4. **Nexus:** revisa la información y actualiza la entrada de Roles; confirma y refresca la tabla de Roles. Además, guarda los cambios de la operación en la base de datos **(ver EBD)**. |
+| Flujos alternativos | **A1 — Datos inválidos (después del paso 3):**<br>1. **Nexus:** señala los campos requeridos y conserva la entrada sin cambios.<br>2. **Actor:** corrige y vuelve a confirmar; continúa en el paso 4. |
+| Excepciones | **E1 — Acceso, recurso o entrada rechazados (después del paso 1):**<br>1. **Nexus:** rechaza la operación sin exponer otro catálogo ni producir cambios parciales.<br>2. **Actor:** reconoce el rechazo; termina el caso de uso.<br>**EBD — Error de base de datos o de conexión (durante el paso 4 del flujo principal):**<br>1. **Nexus:** detecta que no puede consultar o guardar la información, revierte cualquier cambio parcial y comunica que la operación no se completó.<br>2. **Actor:** recibe el aviso, conserva los datos capturados cuando existe un formulario y decide reintentar más tarde o terminar el caso de uso. |
+| Postcondiciones (éxito y fallo) | 1. **Éxito:** La entrada de Roles conserva los cambios admitidos.<br>2. **Fallo:** La entrada conserva su estado anterior. |
+| Requisitos relacionados | `RF-CAT-024`, `RN-001`, `RN-006`. |

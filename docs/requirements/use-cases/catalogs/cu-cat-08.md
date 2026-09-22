@@ -1,14 +1,13 @@
-# `CU-CAT-08` — Consultar movimientos de materiales
+# `CU-CAT-08` — Generar reporte de clientes
 
 | Sección | Información relevante |
 | --- | --- |
 | Identificador | `CU-CAT-08` |
-| Nombre | Consultar movimientos de materiales. |
-| Actor y disparador | **Actor:** Usuario con permiso sobre el reporte o consulta. **Disparador:** necesita localizar o revisar movimientos de materiales y abre la opción de consulta correspondiente. |
-| Participación de actor y sistema | **Actor:** abre la consulta, define criterios y selecciona registros.<br>**Nexus:** autoriza, presenta filtros y devuelve sólo la información permitida. |
+| Nombre | Generar reporte de clientes. |
+| Actor | Administrador del sistema. |
+| Disparador | Desde `CU-CAT-05` Consultar clientes, selecciona la opción para generar el reporte con los filtros que necesita conservar. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de consulta o reporte correspondiente. |
-| Flujo principal | 1. **Actor:** abre la opción para consultar movimientos de materiales **(ver E1)**.<br>2. **Nexus:** comprueba su autorización y muestra los filtros disponibles.<br>3. **Actor:** define los criterios que necesita y solicita aplicarlos **(ver A1)**.<br>4. **Nexus:** presenta la información autorizada y la opción **Exportar Excel**.<br>5. **Actor:** selecciona **Exportar Excel**; termina `CU-CAT-08` y con esa selección dispara `CU-CAT-09` Generar reporte de movimientos de materiales. |
-| Flujos alternativos | **A1 — Permanecer en la consulta (después del paso 3):**<br>1. **Nexus:** actualiza la tabla y el total sin modificar datos.<br>2. **Actor:** revisa los resultados o cambia los criterios.<br>3. **Nexus:** conserva la consulta disponible; termina el caso de uso. |
-| Excepciones | **E1 — Acceso rechazado (después del paso 1):**<br>1. **Nexus:** comprueba las precondiciones y la autorización, determina que alguna no se cumple y rechaza la solicitud sin modificar datos ni exponer información no autorizada; comunica el motivo.<br>2. **Actor:** reconoce el rechazo; termina el caso de uso. |
-| Postcondiciones (éxito y fallo) | 1. **Éxito:** Consulta autorizada sin modificar datos.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
-| Requisitos relacionados | `RF-REP-001`. |
+| Flujo principal | 1. **Nexus:** después de que el actor selecciona la exportación desde la consulta de origen, abre el modal **Exportar reporte** e informa que aplicará la búsqueda, los filtros y el orden actuales **(ver E1)**.<br>2. **Actor:** revisa el alcance informado y confirma la descarga.<br>3. **Nexus:** vuelve a comprobar autorización y parámetros y prepara la información de clientes; genera el archivo de Excel e inicia su descarga; si no hay datos, informa que el resultado está vacío. Además, consulta la información necesaria en la base de datos **(ver EBD)**. |
+| Excepciones | **E1 — Exportación rechazada (después del disparador):**<br>1. **Nexus:** comprueba las precondiciones y la autorización, determina que alguna no se cumple y rechaza la solicitud sin modificar datos ni exponer información no autorizada; comunica el motivo.<br>2. **Actor:** reconoce el rechazo; termina el caso de uso.<br>**EBD — Error de base de datos o de conexión (durante el paso 3 del flujo principal):**<br>1. **Nexus:** detecta que no puede consultar o guardar la información, revierte cualquier cambio parcial y comunica que la operación no se completó.<br>2. **Actor:** recibe el aviso, conserva los datos capturados cuando existe un formulario y decide reintentar más tarde o terminar el caso de uso. |
+| Postcondiciones (éxito y fallo) | 1. **Éxito:** Archivo Excel con filtros, columnas y cálculos propios del reporte.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
+| Requisitos relacionados | `RF-REP-002`, `RF-REP-004`. |

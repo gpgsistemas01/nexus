@@ -1,8 +1,9 @@
-# `CU-CAT-26` — Generar reporte de movimientos de mermas
+# `CU-CAT-26` — Editar estado de cumplimiento
 
 ```mermaid
 flowchart LR
-    request["Actor selecciona exportar desde CU-CAT-25: movimientos de mermas"] --> modal["Nexus abre el modal Exportar reporte"]
-    modal --> validate["Nexus valida permiso, datos y relaciones"]
-    validate --> result["Nexus responde: Archivo Excel con filtros, columnas y cálculos propios del reporte."]
+    accTitle: CU-CAT-26 — Editar estado de cumplimiento
+    request["Administrador selecciona Editar registro<br/>y confirma Actualizar"] --> authorize["Nexus valida catalogs:manage y fulfillment-statuses"]
+    authorize --> persist["Validar campos y actualizar estado de cumplimiento"]
+    persist --> result["Confirmar y refrescar Estados de cumplimiento"]
 ```

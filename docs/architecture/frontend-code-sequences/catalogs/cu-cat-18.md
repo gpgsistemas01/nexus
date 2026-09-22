@@ -1,39 +1,33 @@
 <a id="cu-cat-18"></a>
-# `CU-CAT-18` — Generar reporte de clientes
+# `CU-CAT-18` — Consultar unidad de medida
 
-**Patrones:** `FE-P08`.
+**Patrones:** `FE-P03`.
 
 ```mermaid
 sequenceDiagram
     participant Browser as Navegador
-    participant View as src/public/js/plugins/datatable/sales/clients/clientDatatable.js
-    participant Dialog as src/public/js/ui/reportExportDialog.js
-    participant Application as src/public/js/application/sales/report.js
-    participant Request as src/public/js/services/sales/reportService.js
+    participant View as src/public/js/plugins/datatable/admin/catalogs/catalogDatatable.js
+    participant Application as src/public/js/application/admin/catalogs/catalogs.js
+    participant Request as src/public/js/services/admin/catalogService.js
     participant HTTP as src/public/js/services/axiosInstanceApi.js
-    participant Transport@{ "type": "control" } as src/routes/api/sales/reportApiRoute.js<br/>src/controllers/api/sales/reportController.js
-    Note over Application,Transport: Variables de frontera: params/filtros
+    participant Transport@{ "type": "control" } as src/routes/api/admin/catalogApiRoute.js<br/>src/controllers/api/admin/catalogController.js
 
-    Browser->>View: Botón Excel de clientDatatable.js
-    View->>Dialog: showFilteredExportDialog()
-    Dialog-->>View: alcance confirmado o cancelación
-    View->>View: recopilar y validar las variables de frontera indicadas
-    View->>Application: exportClientReport({ params })
-    Application->>Request: exportClientReportRequest({ params })
+    Browser->>View: abrir y cargar la tabla del catálogo
+    View->>Application: getAllCatalogEntries({ params, catalog })
+    Application->>Request: getCatalogEntriesRequest({ params, catalog })
     activate Application
     Request->>HTTP: apiRequest({ method: 'get', url, params })
-    HTTP->>Transport: descarga GET /api/sales/reports/clients/excel
-    Transport-->>HTTP: status HTTP y payload del endpoint
-    HTTP-->>Request: respuesta o error normalizado
-    Request-->>Application: resultado del request
+    HTTP->>Transport: consume GET /api/admin/catalogs/unit-measures
+    Transport-->>HTTP: HTTP 2xx { code, data }
+    HTTP-->>Request: apiRequest() resuelve response.data
+    Request-->>Application: getCatalogEntriesRequest() resuelve response.data
     alt Respuesta exitosa
-        Application-->>View: entidad, colección o archivo normalizado
-        View-->>Browser: actualizar la vista con el resultado
+        Application-->>View: getAllCatalogEntries() resuelve response.data
+        View-->>Browser: DOM o DataTable actualizado con response.data
     else Respuesta rechazada
-        Application-->>View: error normalizado por apiRequest
-        View-->>Browser: conservar contexto y mostrar el mensaje
+        Application-->>View: error Axios normalizado { code, message, meta }
+        View-->>Browser: formulario o filtros conservados, mensaje visible
     end
     deactivate Application
 ```
 
-<a id="cu-ida-04"></a>

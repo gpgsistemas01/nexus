@@ -9,6 +9,6 @@
 
 1. Antes de usar los controles, compruebe que la pantalla inicial coincida con la captura:
 
-   ![CAP-ERR-404-NOT-FOUND: pagina no encontrada](../../images/errores/01-pagina-no-encontrada.png)
+   ![CAP-ERR-404-NOT-FOUND: pagina no encontrada](../../images/errors/01-page-not-found.png)
 
 2. En la página de error, seleccione el botón **Volver** para regresar mediante la navegación de Nexus.

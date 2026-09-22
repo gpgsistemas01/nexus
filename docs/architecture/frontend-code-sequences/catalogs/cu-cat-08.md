@@ -1,36 +1,36 @@
 <a id="cu-cat-08"></a>
-# `CU-CAT-08` — Consultar movimientos de materiales
+# `CU-CAT-08` — Generar reporte de clientes
 
-**Patrones:** `FE-P07`.
+**Patrones:** `FE-P08`.
 
 ```mermaid
 sequenceDiagram
     participant Browser as Navegador
-    participant View as src/public/js/pages/admin/movements/movementsPage.js
-    participant Application as src/public/js/application/admin/movements/movements.js
-    participant Request as src/public/js/services/admin/movementService.js
+    participant View as src/public/js/plugins/datatable/sales/clients/clientDatatable.js
+    participant Dialog as src/public/js/ui/reportExportDialog.js
+    participant Application as src/public/js/application/sales/report.js
+    participant Request as src/public/js/services/sales/reportService.js
     participant HTTP as src/public/js/services/axiosInstanceApi.js
-    participant Transport@{ "type": "control" } as src/routes/api/admin/movementApiRoute.js<br/>src/controllers/api/admin/movementController.js
-    Note over Application,Transport: Variables de frontera: params/filtros
+    participant Transport@{ "type": "control" } as src/routes/api/sales/reportApiRoute.js<br/>src/controllers/api/sales/reportController.js
 
-    Browser->>View: movementsPage.js selecciona el contexto material
-    View->>View: recopilar y validar las variables de frontera indicadas
-    View->>Application: getAllMovements({ context: 'materials', params })
-    Application->>Request: getAllMovementsRequest({ context, params })
+    Browser->>View: Botón Excel de clientDatatable.js
+    View->>Dialog: showFilteredExportDialog()
+    Dialog-->>View: Promise<boolean> con confirmación o cancelación
+    View->>Application: exportClientReport({ params })
+    Application->>Request: exportClientReportRequest({ params })
     activate Application
-    Request->>HTTP: apiRequest({ method: 'get', url, data/params })
-    HTTP->>Transport: consultar GET /api/admin/movements/materials
-    Transport-->>HTTP: status HTTP y payload del endpoint
-    HTTP-->>Request: respuesta o error normalizado
-    Request-->>Application: resultado del request
+    Request->>HTTP: apiRequest({ method: 'get', url, params })
+    HTTP->>Transport: descarga GET /api/sales/reports/clients/excel
+    Transport-->>HTTP: HTTP 2xx { code, data }
+    HTTP-->>Request: apiRequest() resuelve response.data
+    Request-->>Application: exportClientReportRequest() resuelve response.data
     alt Respuesta exitosa
-        Application-->>View: entidad, colección o archivo normalizado
-        View-->>Browser: actualizar la vista con el resultado
+        Application-->>View: exportClientReport() resuelve response.data
+        View-->>Browser: DOM o DataTable actualizado con response.data
     else Respuesta rechazada
-        Application-->>View: error normalizado por apiRequest
-        View-->>Browser: conservar contexto y mostrar el mensaje
+        Application-->>View: error Axios normalizado { code, message, meta }
+        View-->>Browser: formulario o filtros conservados, mensaje visible
     end
     deactivate Application
 ```
 
-<a id="cu-cat-07"></a>

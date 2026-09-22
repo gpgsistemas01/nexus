@@ -1,8 +1,10 @@
-# `CU-CAT-18` — Generar reporte de clientes
+# `CU-CAT-18` — Consultar unidad de medida
 
 ```mermaid
 flowchart LR
-    request["Actor selecciona exportar desde CU-CAT-15: clientes"] --> modal["Nexus abre el modal Exportar reporte"]
-    modal --> validate["Nexus valida permiso, datos y relaciones"]
-    validate --> result["Nexus responde: Archivo Excel con filtros, columnas y cálculos propios del reporte."]
+    accTitle: CU-CAT-18 — Consultar unidad de medida
+    request["Administrador solicita consultar Unidades de medida"] --> authorize["Nexus valida catalogs:manage y unit-measures"]
+    authorize --> result["Mostrar exclusivamente la tabla de Unidades de medida"]
+    result --> create["Administrador elige crear y dispara CU-CAT-19"]
+    result --> edit["Administrador elige editar y puede iniciar CU-CAT-20"]
 ```

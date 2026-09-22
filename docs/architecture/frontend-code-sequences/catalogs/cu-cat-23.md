@@ -1,33 +1,33 @@
 <a id="cu-cat-23"></a>
-# `CU-CAT-23` — Consultar inventario de mermas
+# `CU-CAT-23` — Editar motivo de ajuste
 
-**Patrones:** `FE-P07`.
+**Patrones:** `FE-P03`.
 
 ```mermaid
 sequenceDiagram
     participant Browser as Navegador
-    participant View as src/public/js/pages/warehouse/wastes/wastesPage.js
-    participant Request as src/public/js/services/warehouse/wasteService.js
+    participant View as src/public/js/pages/admin/catalogs/catalogForm.js
+    participant Application as src/public/js/application/admin/catalogs/catalogs.js
+    participant Request as src/public/js/services/admin/catalogService.js
     participant HTTP as src/public/js/services/axiosInstanceApi.js
-    participant Transport@{ "type": "control" } as src/routes/api/warehouse/wasteApiRoute.js<br/>src/controllers/api/warehouse/wasteController.js
-    Note over Request,Transport: Variables de frontera: params/filtros
+    participant Transport@{ "type": "control" } as src/routes/api/admin/catalogApiRoute.js<br/>src/controllers/api/admin/catalogController.js
 
-    Browser->>View: La consulta es el listado de wastesPage.js, no hay página de reporte
-    View->>View: recopilar y validar las variables de frontera indicadas
-    View->>Request: getAllWastesRequest({ params })
-    activate Request
-    Request->>HTTP: apiRequest({ method: 'get', url, params })
-    HTTP->>Transport: GET /api/warehouse/wastes
-    Transport-->>HTTP: status HTTP y payload del endpoint
-    HTTP-->>Request: respuesta o error normalizado
+    Browser->>View: confirmar el formulario de edición
+    View->>Application: editCatalogEntry({ catalog, id, data })
+    Application->>Request: editCatalogEntryRequest({ catalog, id, data })
+    activate Application
+    Request->>HTTP: apiRequest({ method: 'put', url, data })
+    HTTP->>Transport: consume PUT /api/admin/catalogs/reasons/:id
+    Transport-->>HTTP: HTTP 2xx { code, data }
+    HTTP-->>Request: apiRequest() resuelve response.data
+    Request-->>Application: editCatalogEntryRequest() resuelve response.data
     alt Respuesta exitosa
-        Request-->>View: entidad, colección o archivo normalizado
-        View-->>Browser: actualizar la vista con el resultado
+        Application-->>View: editCatalogEntry() resuelve response.data
+        View-->>Browser: DOM o DataTable actualizado con response.data
     else Respuesta rechazada
-        Request-->>View: error normalizado por apiRequest
-        View-->>Browser: conservar contexto y mostrar el mensaje
+        Application-->>View: error Axios normalizado { code, message, meta }
+        View-->>Browser: formulario o filtros conservados, mensaje visible
     end
-    deactivate Request
+    deactivate Application
 ```
 
-<a id="cu-cat-25"></a>

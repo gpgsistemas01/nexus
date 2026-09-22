@@ -23,5 +23,5 @@ Esta guía corresponde al actor **Personal de almacén (área Almacén y proveed
    administrar catálogos auxiliares no forma parte de este manual.
 3. Registre recepciones y correcciones en [compras de material](../cases/purchases/index.md).
 4. Registre, surta o reciba devoluciones en [salidas de material y merma](../cases/issues/index.md).
-5. Consulte el resultado en [movimientos y reportes](../cases/reports/index.md).
+5. Los historiales y reportes de movimientos no forman parte de este manual: actualmente son exclusivos del **Administrador del sistema** del área Sistemas.
 6. Ante un rechazo, siga el vínculo **Errores posibles** del procedimiento y compruebe el estado antes de repetir una escritura.

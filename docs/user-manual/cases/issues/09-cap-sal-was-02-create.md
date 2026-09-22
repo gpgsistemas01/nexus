@@ -9,12 +9,12 @@
 
 1. Seleccione **Nueva salida** para abrir el formulario. Antes de continuar, compruebe que la pantalla mostrada coincida con la captura:
 
-   ![CAP-SAL-WAS-02-CREATE: formulario registro](../../images/salidas-merma/02-formulario-registro.png)
+   ![CAP-SAL-WAS-02-CREATE: formulario registro](../../images/waste-issues/02-form-registration.png)
 
 2. Elija opciones en **Buscar cliente...**, **Buscar asesor...**, **Buscar área...** y **Buscar solicitante...**.
 3. Complete **Número de proyecto**, **Fecha y hora de solicitud** y **Observaciones**.
-4. Elija una opción en **Buscar merma...**, complete **Cantidad** y pulse **Agregar** por cada detalle.
-5. Revise los datos y seleccione **Guardar**.
+4. Elija una opción en **Buscar merma...**, complete **Cantidad** y pulse **Agregar**. Compruebe que el detalle aparezca en la tabla y repita este paso para cada merma requerida.
+5. Revise el encabezado y los renglones de la tabla y seleccione **Guardar**.
 
 Cada merma debe aparecer una sola vez. Si vuelve a agregarla antes de guardar, el formulario
 reemplaza la cantidad del renglón existente; no crea otro renglón ni suma ambas cantidades. Capture

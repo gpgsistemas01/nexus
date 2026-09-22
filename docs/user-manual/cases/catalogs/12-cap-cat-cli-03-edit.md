@@ -1,7 +1,7 @@
 <a id="CAP-CAT-CLI-03-EDIT"></a>
 # 12. CAP-CAT-CLI-03-EDIT — Formulario edicion
 
-**Casos de uso:** `CU-CAT-17` — Editar cliente.
+**Casos de uso:** `CU-CAT-07` — Editar cliente.
 
 **Errores posibles:** [Validación de formularios](../../error-messages.md#errores-validacion), [Catálogos e inventario](../../error-messages.md#errores-catalogos).
 
@@ -9,6 +9,6 @@
 
 1. En la fila del cliente, seleccione la acción **Editar registro**. Antes de continuar, compruebe que la pantalla mostrada coincida con la captura:
 
-   ![CAP-CAT-CLI-03-EDIT: formulario edicion](../../images/clientes/03-formulario-edicion.png)
+   ![CAP-CAT-CLI-03-EDIT: formulario edicion](../../images/clients/03-form-edit.png)
 
 2. Modifique el campo **Nombre** o la casilla **Activo** y seleccione el botón **Actualizar**.

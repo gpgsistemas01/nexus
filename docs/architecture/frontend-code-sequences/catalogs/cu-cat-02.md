@@ -1,41 +1,33 @@
 <a id="cu-cat-02"></a>
-# `CU-CAT-02` — Crear material
+# `CU-CAT-02` — Crear proveedor
 
 **Patrones:** `FE-P02`.
 
 ```mermaid
 sequenceDiagram
     participant Browser as Navegador
-    participant View as src/public/js/pages/warehouse/materials/materialModal.js<br/>src/public/js/pages/warehouse/materials/materialForm.js
-    participant Application as src/public/js/application/warehouse/materials/materials.js
-    participant Request as src/public/js/services/warehouse/materialService.js
+    participant View as src/public/js/pages/warehouse/suppliers/supplierModal.js<br/>src/public/js/pages/warehouse/suppliers/supplierForm.js
+    participant Application as src/public/js/application/warehouse/suppliers/suppliers.js
+    participant Request as src/public/js/services/warehouse/supplierService.js
     participant HTTP as src/public/js/services/axiosInstanceApi.js
-    participant Transport@{ "type": "control" } as src/routes/api/warehouse/materialApiRoute.js<br/>src/controllers/api/warehouse/materialController.js
-    Note over Application,Transport: Variables de frontera: formData/payload
+    participant Transport@{ "type": "control" } as src/routes/api/warehouse/supplierApiRoute.js<br/>src/controllers/api/warehouse/supplierController.js
 
-    Browser->>View: materialModal.js abre materialForm.js en modo alta
-    View->>View: recopilar y validar las variables de frontera indicadas
-    View->>Application: registerMaterial({ formData })
-    Application->>Request: registerMaterialRequest({ formData })
+    Browser->>View: supplierModal.js abre supplierForm.js en alta
+    View->>Application: registerSupplier({ formData })
+    Application->>Request: registerSupplierRequest({ formData })
     activate Application
-    Request->>HTTP: apiRequest({ method: 'post', url, data/params })
-    HTTP->>Transport: envía POST /api/warehouse/materials
-    alt Ya existe la identidad y la relación con el proveedor
-        Transport-->>View: 409 MATERIAL_ALREADY_EXISTS y conservar stock y dirigir al ajuste
-    else Identidad existente sólo para otro proveedor o identidad nueva
-        Transport->>Transport: reutilizar identidad o crearla y registrar la relación proveedor-material
-    end
-    Transport-->>HTTP: status HTTP y payload del endpoint
-    HTTP-->>Request: respuesta o error normalizado
-    Request-->>Application: resultado del request
+    Request->>HTTP: apiRequest({ method: 'post', url, data })
+    HTTP->>Transport: envía POST /api/warehouse/suppliers
+    Transport-->>HTTP: HTTP 2xx { code, data }
+    HTTP-->>Request: apiRequest() resuelve response.data
+    Request-->>Application: registerSupplierRequest() resuelve response.data
     alt Respuesta exitosa
-        Application-->>View: entidad, colección o archivo normalizado
-        View-->>Browser: actualizar la vista con el resultado
+        Application-->>View: registerSupplier() resuelve response.data
+        View-->>Browser: DOM o DataTable actualizado con response.data
     else Respuesta rechazada
-        Application-->>View: error normalizado por apiRequest
-        View-->>Browser: conservar contexto y mostrar el mensaje
+        Application-->>View: error Axios normalizado { code, message, meta }
+        View-->>Browser: formulario o filtros conservados, mensaje visible
     end
     deactivate Application
 ```
 
-<a id="cu-cat-03"></a>

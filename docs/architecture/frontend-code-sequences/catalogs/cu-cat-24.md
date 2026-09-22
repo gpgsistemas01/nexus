@@ -1,39 +1,33 @@
 <a id="cu-cat-24"></a>
-# `CU-CAT-24` — Generar reporte de mermas
+# `CU-CAT-24` — Consultar estado de cumplimiento
 
-**Patrones:** `FE-P08`.
+**Patrones:** `FE-P03`.
 
 ```mermaid
 sequenceDiagram
     participant Browser as Navegador
-    participant View as src/public/js/plugins/datatable/warehouse/wastes/wasteDatatable.js
-    participant Dialog as src/public/js/ui/reportExportDialog.js
-    participant Application as src/public/js/application/warehouse/report.js
-    participant Request as src/public/js/services/warehouse/reportService.js
+    participant View as src/public/js/plugins/datatable/admin/catalogs/catalogDatatable.js
+    participant Application as src/public/js/application/admin/catalogs/catalogs.js
+    participant Request as src/public/js/services/admin/catalogService.js
     participant HTTP as src/public/js/services/axiosInstanceApi.js
-    participant Transport@{ "type": "control" } as src/routes/api/warehouse/reportApiRoute.js<br/>src/controllers/api/warehouse/reportController.js
-    Note over Application,Transport: Variables de frontera: params/filtros
+    participant Transport@{ "type": "control" } as src/routes/api/admin/catalogApiRoute.js<br/>src/controllers/api/admin/catalogController.js
 
-    Browser->>View: Botón Excel de wasteDatatable.js
-    View->>Dialog: showInventoryExportDialog()
-    Dialog-->>View: inventoryScope activo/existencia
-    View->>View: recopilar y validar las variables de frontera indicadas
-    View->>Application: exportWasteReport({ params })
-    Application->>Request: exportWasteReportRequest({ params })
+    Browser->>View: abrir y cargar la tabla del catálogo
+    View->>Application: getAllCatalogEntries({ params, catalog })
+    Application->>Request: getCatalogEntriesRequest({ params, catalog })
     activate Application
     Request->>HTTP: apiRequest({ method: 'get', url, params })
-    HTTP->>Transport: descarga GET /api/warehouse/reports/wastes/excel
-    Transport-->>HTTP: status HTTP y payload del endpoint
-    HTTP-->>Request: respuesta o error normalizado
-    Request-->>Application: resultado del request
+    HTTP->>Transport: consume GET /api/admin/catalogs/fulfillment-statuses
+    Transport-->>HTTP: HTTP 2xx { code, data }
+    HTTP-->>Request: apiRequest() resuelve response.data
+    Request-->>Application: getCatalogEntriesRequest() resuelve response.data
     alt Respuesta exitosa
-        Application-->>View: entidad, colección o archivo normalizado
-        View-->>Browser: actualizar la vista con el resultado
+        Application-->>View: getAllCatalogEntries() resuelve response.data
+        View-->>Browser: DOM o DataTable actualizado con response.data
     else Respuesta rechazada
-        Application-->>View: error normalizado por apiRequest
-        View-->>Browser: conservar contexto y mostrar el mensaje
+        Application-->>View: error Axios normalizado { code, message, meta }
+        View-->>Browser: formulario o filtros conservados, mensaje visible
     end
     deactivate Application
 ```
 
-<a id="cu-cat-26"></a>

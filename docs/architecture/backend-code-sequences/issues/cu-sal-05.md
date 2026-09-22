@@ -6,7 +6,6 @@
 ```mermaid
 sequenceDiagram
     autonumber
-    Note over Router,Controller: Variables de frontera: id, details, goodsIssueDto, userId y tx
     participant Browser as Navegador
     participant Router as src/routes/api/warehouse/goodsIssueApiRoute.js
     participant Controller@{ "type": "control" } as src/controllers/api/warehouse/goodsIssueController.js
@@ -17,23 +16,27 @@ sequenceDiagram
     participant Socket as src/utils/socketUtils.js
 
     Browser->>Router: PATCH /:id/details
-    Router->>Router: autenticar, validar y autorizar
-    Router->>Controller: req, res
-    Controller->>IssueDto: createGoodsIssueDetailsDtoForEdit(req.body) → sanitizeEmptyStrings(...)
+    Router->>Controller: editGoodsIssueDetails(req, res)
+    Controller->>IssueDto: createGoodsIssueDetailsDtoForEdit(req.body)
     IssueDto-->>Controller: { details }
-    Controller->>Service: { id, goodsIssueDto }
-    Service->>Prisma: cargar salida y detalles
-    Service->>Service: validar estado y calcular pendientes desde el snapshot sin volver a exigir isActive
-    Service->>Prisma: iniciar $transaction
+    Controller->>Service: editGoodsIssue({ id, goodsIssueDto })
+    Service->>Prisma: tx.goodsIssue.findUnique({ where: { id } })
+    Service->>Service: updateGoodsIssueDetails() valida estado y calcula pendientes
+    Service->>Prisma: getDb().$transaction(async tx => ...)
     opt Hay detalles por surtir
         Service->>Inventory: applyInventoryMovement({ tx, ISSUE, details })
-        Inventory->>Prisma: descontar existencias y registrar movimiento
+        Inventory->>Prisma: applyInventoryMovement({ tx, type: ISSUE, details })
     end
-    Service->>Prisma: actualizar detalles y estado del encabezado
-    Prisma-->>Service: salida actualizada y commit
-    Service-->>Controller: goodsIssue
-    Controller->>Socket: emitInventoryUpdated(...)
-    Controller-->>Browser: 200 { goodsIssue, code }
+    Service->>Prisma: tx.goodsIssue.update({ where, data })
+    alt Commit confirmado
+        Prisma-->>Service: salida actualizada
+        Service-->>Controller: goodsIssue
+        Controller->>Socket: emitInventoryUpdated({ context: 'material', source: 'goods-issue-supplied' })
+        Controller-->>Browser: 200 { goodsIssue, code }
+    else Stock insuficiente, estado inválido o error Prisma
+        Prisma-->>Service: error de dominio o persistencia
+        Service-->>Controller: error tipado y rollback
+        Controller-->>Browser: status HTTP { code, message }
+    end
 ```
 
-<a id="cu-sal-06"></a>

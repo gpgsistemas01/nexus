@@ -24,7 +24,7 @@ cancelados.
 **Ruta en el menú:** **Menú principal → Salidas → Materiales**.
 
 <a id="CAP-SAL-MAT-00-NAVIGATION"></a>
-![CAP-SAL-MAT-00-NAVIGATION: acceso a salidas de material desde el menú principal](../../images/salidas-material/00-acceso-menu-principal.png)
+![CAP-SAL-MAT-00-NAVIGATION: acceso a salidas de material desde el menú principal](../../images/material-issues/00-access-menu-main.png)
 
 **Campos por modo del formulario.** En **alta** se editan cliente, asesor, área, solicitante, número
 de proyecto, fecha de solicitud, observaciones y los materiales solicitados. En **edición completa**
@@ -50,7 +50,7 @@ habilita únicamente **Cantidad a devolver** y **Observaciones**. Una salida can
 **Ruta en el menú:** **Menú principal → Salidas → Mermas**.
 
 <a id="CAP-SAL-WAS-00-NAVIGATION"></a>
-![CAP-SAL-WAS-00-NAVIGATION: acceso a salidas de merma desde el menú principal](../../images/salidas-merma/00-acceso-menu-principal.png)
+![CAP-SAL-WAS-00-NAVIGATION: acceso a salidas de merma desde el menú principal](../../images/waste-issues/00-access-menu-main.png)
 
 **Campos por modo del formulario.** En **alta** se editan cliente, asesor, área, solicitante, número
 de proyecto, fecha de solicitud, observaciones y las mermas solicitadas. En **edición completa** se

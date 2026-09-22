@@ -1,31 +1,33 @@
 <a id="cu-cat-07"></a>
-# `CU-CAT-07` — Generar reporte de inventario de materiales
+# `CU-CAT-07` — Editar cliente
 
-**Patrones:** `BE-P07`.
+**Patrones:** `BE-P01`.
 
 ```mermaid
 sequenceDiagram
     participant Client as Cliente HTTP / web
-    participant Route as src/routes/api/warehouse/reportApiRoute.js
-    participant Controller@{ "type": "control" } as src/controllers/api/warehouse/reportController.js
-    participant Domain as src/services/warehouse/reportService.js<br/>src/utils/reportExcelUtils.js
-    Note over Controller,Domain: Variables de frontera: req.query/params
+    participant Route as src/routes/api/sales/clientApiRoute.js
+    participant Controller@{ "type": "control" } as src/controllers/api/sales/clientController.js
+    participant ClientDto as «object»<br/>clientDto<br/>src/dtos/clientDTO.js
+    participant Domain as src/services/sales/clientService.js
+    participant ErrorHandler as src/app.js
 
-    Client->>Route: GET /api/warehouse/reports/inventory/excel
-    Route->>Route: ejecutar en orden el middleware configurado para la ruta
-    Route->>Controller: exportWarehouseReportExcel(req, res)
+    Client->>Route: PUT /api/sales/clients/:id
+    Route->>Controller: editClient(req, res)
     activate Controller
-    Controller->>Domain: reportService.findWarehouseReportRows({ query: req.query }) y sendExcelReport
+    Controller->>ClientDto: createClientDtoForEdit(req.body)
+    ClientDto-->>Controller: clientDto normalizado
+    Controller->>Domain: clientService.updateClient({ id: req.params.id, clientDto }) actualiza Client
     activate Domain
-    Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
-    Domain-->>Controller: resultado del servicio o error de dominio tipado
-    deactivate Domain
-    alt El servicio devuelve el resultado
-        Controller-->>Client: status HTTP y cuerpo concretos del controller
-    else El servicio propaga un error de dominio
-        Controller-->>Client: error entregado al middleware final para su respuesta HTTP
+    alt Servicio resuelto
+        Domain-->>Controller: clientService.updateClient() resuelve datos de dominio
+        Controller-->>Client: HTTP 2xx { code, data }
+    else AppError propagado
+        Domain-->>Controller: throw AppError { code, message, meta, statusCode }
+        Controller->>ErrorHandler: next(error)
+        ErrorHandler-->>Client: res.status(error.statusCode).json({ code, message, meta })
     end
+    deactivate Domain
     deactivate Controller
 ```
 
-<a id="cu-sal-07"></a>

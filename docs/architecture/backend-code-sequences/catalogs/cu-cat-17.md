@@ -1,34 +1,30 @@
 <a id="cu-cat-17"></a>
-# `CU-CAT-17` — Editar cliente
+# `CU-CAT-17` — Editar presentación
 
-**Patrones:** `BE-P01`.
+**Patrones:** `BE-P02`.
 
 ```mermaid
 sequenceDiagram
     participant Client as Cliente HTTP / web
-    participant Route as src/routes/api/sales/clientApiRoute.js
-    participant Controller@{ "type": "control" } as src/controllers/api/sales/clientController.js
-    participant ClientDto as «object»<br/>clientDto<br/>src/dtos/clientDTO.js
-    participant Domain as src/services/sales/clientService.js
-    Note over Controller,Domain: Variables de frontera: req.params.id, req.body/DTO
+    participant Route as src/routes/api/admin/catalogApiRoute.js
+    participant Controller@{ "type": "control" } as src/controllers/api/admin/catalogController.js
+    participant Domain as src/services/admin/catalogService.js
+    participant ErrorHandler as src/app.js
 
-    Client->>Route: PUT /api/sales/clients/:id
-    Route->>Route: ejecutar en orden el middleware configurado para la ruta
-    Route->>Controller: editClient(req, res)
+    Client->>Route: PUT /api/admin/catalogs/presentations/:id
+    Route->>Controller: editCatalogEntry(req, res)
     activate Controller
-    Controller->>ClientDto: createClientDtoForEdit(req.body) → sanitizeEmptyStrings(...)
-    ClientDto-->>Controller: clientDto normalizado
-    Controller->>Domain: clientService.updateClient({ id: req.params.id, clientDto }) actualiza Client
+    Controller->>Domain: updateCatalogEntry(req.params.catalog/req.params.id/req.body) normaliza y actualiza únicamente los campos permitidos
     activate Domain
-    Domain->>Domain: comprobar datos de frontera y reglas propias de la operación
-    Domain-->>Controller: resultado del servicio o error de dominio tipado
-    deactivate Domain
-    alt El servicio devuelve el resultado
-        Controller-->>Client: status HTTP y cuerpo concretos del controller
-    else El servicio propaga un error de dominio
-        Controller-->>Client: error entregado al middleware final para su respuesta HTTP
+    alt Servicio resuelto
+        Domain-->>Controller: updateCatalogEntry() resuelve datos de dominio
+        Controller-->>Client: HTTP 2xx { code, data }
+    else AppError propagado
+        Domain-->>Controller: throw AppError { code, message, meta, statusCode }
+        Controller->>ErrorHandler: next(error)
+        ErrorHandler-->>Client: res.status(error.statusCode).json({ code, message, meta })
     end
+    deactivate Domain
     deactivate Controller
 ```
 
-<a id="cu-cat-19"></a>

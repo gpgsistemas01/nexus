@@ -3,10 +3,10 @@
 Esta colección **no es un catálogo de diagramas de casos de uso**. Es la lectura técnica
 complementaria del catálogo funcional: cada `CU-*` sirve como vínculo de trazabilidad,
 pero el bloque Mermaid describe cómo se ejecuta el código mediante endpoint, controller,
-servicios, efectos y variables de frontera. Para comprender el objetivo con lenguaje de
-negocio se consulta primero el [modelo y los diagramas funcionales de casos de uso](../../requirements/domain-and-use-cases/03-casos-de-uso-vigentes.md).
+servicios y efectos. Para comprender el objetivo con lenguaje de
+negocio se consulta primero el [modelo y los diagramas funcionales de casos de uso](../../requirements/domain-and-use-cases/03-cases-of-use-current.md).
 
-La [matriz técnica de backend](../backend-technical-documentation/04-aplicacion-de-todos-los-casos-al-codigo-backend.md)
+La [matriz técnica de backend](../backend-technical-documentation/04-application-of-all-the-cases-to-the-code-backend.md)
 es el índice único de trazabilidad: relaciona caso, entrada HTTP, implementación y
 diagrama. Esta colección no vuelve a copiar esa relación en cada sección. Los
 participantes identifican su archivo concreto; los métodos y la URL HTTP se indican
@@ -18,10 +18,15 @@ común se separan cliente,
 ruta, controller y servicio de dominio; sólo las coordinaciones atómicas
 despliegan módulos colaboradores, persistencia o publicación como participantes
 adicionales. De este modo se conservan pocas entidades sin ocultar el controller ni el
-módulo responsable. Los mensajes conservan las llamadas en orden y las notas nombran datos que cruzan la
-frontera (`req.params`, `req.body`/DTO, parámetros de consulta y `tx`). Todos los recorridos
-explicitan middleware, activación de responsabilidades, resultado HTTP y propagación de
-error; las coordinaciones complejas agregan sus colaboradores y límites transaccionales.
+módulo responsable. Los mensajes conservan las llamadas y sus parámetros relevantes en
+orden (`req.params`, `req.body`/DTO, parámetros de consulta y `tx`) para hacer visible el
+contrato entre participantes. Esos parámetros no se declaran como participantes ni se
+enumeran en una nota separada. Los recorridos identifican por su símbolo ejecutable los
+validadores y middleware que cambian la interpretación del caso; no se admite una
+etiqueta genérica como «ejecutar middleware», y la ruta enlazada conserva la fuente de
+verdad del pipeline completo. Todos explicitan activación de responsabilidades,
+resultado HTTP y propagación de error; las coordinaciones complejas agregan sus
+colaboradores y límites transaccionales.
 Las variables
 locales mecánicas permanecen en el código para no convertir el diagrama en una
 transcripción ilegible. Cada caso mantiene una secuencia específica aunque reutilice un
@@ -35,7 +40,7 @@ atómica conservan esa entidad y muestran la petición de entrada y su resultado
 
 Esta colección es la **fuente canónica del recorrido secuencial por caso**: si cambia el
 orden ruta → controller → servicio → persistencia o efecto, se actualiza en el capítulo funcional correspondiente. La
-[documentación técnica del backend](../backend-technical-documentation/06-vistas-tecnicas-aplicadas.md#relación-entre-la-colección-canónica-y-las-vistas-adicionales)
+[documentación técnica del backend](../backend-technical-documentation/06-views-technical-applied.md#relación-entre-la-colección-canónica-y-las-vistas-adicionales)
 explica responsabilidades, mantiene la matriz de trazabilidad y sólo conserva otra vista
 cuando responde una pregunta distinta, por ejemplo una actividad centrada en decisiones,
 un ciclo transaccional o una coordinación transversal. Esas vistas complementarias
@@ -56,21 +61,21 @@ flujo de negocio no se repiten porque pertenecen a la ficha del caso de uso.
 ## Índice rápido de patrones por caso
 
 Cada caso conserva una línea **Patrones** con códigos de este índice y enlaza el
-[catálogo canónico](../design-and-construction-patterns/03-resumen-de-patrones-confirmados.md#3-resumen-de-patrones-confirmados).
+[catálogo canónico](../design-and-construction-patterns/03-summary-of-patterns-confirmed.md#3-resumen-de-patrones-confirmados).
 La referencia identifica las soluciones aplicadas sin repetirlas dentro de Mermaid. La
 implementación se reconoce directamente por las rutas `src/...`, símbolos y llamadas
 del recorrido concreto.
 
 | Código | Patrón aplicado | Vista canónica | Elementos que permiten reconocerlo |
 | --- | --- | --- | --- |
-| `BE-P01` | Capas, pipeline y DTO funcional | [`DIA-PAT-FRO-001`](../design-and-construction-patterns/04-catalogo-visual-de-patrones-aplicados.md#pipeline-dto-y-políticas-declarativas) | Ruta/middleware → controller/DTO → servicio → Prisma; el DTO sólo aparece cuando hay entrada. |
-| `BE-P02` | Factory de catálogo | [`DIA-PAT-CON-001`](../design-and-construction-patterns/04-catalogo-visual-de-patrones-aplicados.md#factories-y-composición-sobre-herencia) | `createDataTableListController` parametriza consulta, columnas y orden. |
-| `BE-P03` | Transaction Script y `tx` explícito | [`DIA-PAT-DIN-001`](../design-and-construction-patterns/04-catalogo-visual-de-patrones-aplicados.md#transacción-eventos-y-auditoría) | El servicio propietario abre `$transaction` y propaga `tx` a las escrituras relacionadas. |
-| `BE-P04` | Composición de servicios | [`DIA-PAT-DIN-001`](../design-and-construction-patterns/04-catalogo-visual-de-patrones-aplicados.md#transacción-eventos-y-auditoría) | El servicio del caso coordina reglas, referencias, inventario o cumplimiento reutilizados. |
-| `BE-P05` | Publicación posterior al commit | [`DIA-PAT-DIN-001`](../design-and-construction-patterns/04-catalogo-visual-de-patrones-aplicados.md#transacción-eventos-y-auditoría) | El controller llama `emitInventoryUpdated` después del resultado del servicio. |
-| `BE-P06` | Query Service | [`DIA-PAT-EST-001`](../design-and-construction-patterns/04-catalogo-visual-de-patrones-aplicados.md#estructura-por-dominio-capas-y-fronteras) | Controller de listado + consulta contextual de sólo lectura. |
-| `BE-P07` | Composición de reporte | [`DIA-PAT-CON-001`](../design-and-construction-patterns/04-catalogo-visual-de-patrones-aplicados.md#factories-y-composición-sobre-herencia) | Consulta de dominio + `sendExcelReport`, sin modificar inventario. |
-| `BE-P08` | Sesión web | [`DIA-PAT-FRO-001`](../design-and-construction-patterns/04-catalogo-visual-de-patrones-aplicados.md#pipeline-dto-y-políticas-declarativas) | Autenticación, JWT/cookies, cierre o redirección en la frontera web. |
+| `BE-P01` | Capas, pipeline y DTO funcional | [`DIA-PAT-FRO-001`](../design-and-construction-patterns/04-catalog-visual-of-patterns-applied.md#pipeline-dto-y-políticas-declarativas) | Ruta/middleware → controller/DTO → servicio → Prisma; el DTO sólo aparece cuando hay entrada. |
+| `BE-P02` | Factory de catálogo | [`DIA-PAT-CON-001`](../design-and-construction-patterns/04-catalog-visual-of-patterns-applied.md#factories-y-composición-sobre-herencia) | `createDataTableListController` parametriza consulta, columnas y orden. |
+| `BE-P03` | Transaction Script y `tx` explícito | [`DIA-PAT-DIN-001`](../design-and-construction-patterns/04-catalog-visual-of-patterns-applied.md#transacción-eventos-y-auditoría) | El servicio propietario abre `$transaction` y propaga `tx` a las escrituras relacionadas. |
+| `BE-P04` | Composición de servicios | [`DIA-PAT-DIN-001`](../design-and-construction-patterns/04-catalog-visual-of-patterns-applied.md#transacción-eventos-y-auditoría) | El servicio del caso coordina reglas, referencias, inventario o cumplimiento reutilizados. |
+| `BE-P05` | Publicación posterior al commit | [`DIA-PAT-DIN-001`](../design-and-construction-patterns/04-catalog-visual-of-patterns-applied.md#transacción-eventos-y-auditoría) | El controller llama `emitInventoryUpdated` después del resultado del servicio. |
+| `BE-P06` | Query Service | [`DIA-PAT-EST-001`](../design-and-construction-patterns/04-catalog-visual-of-patterns-applied.md#estructura-por-dominio-capas-y-fronteras) | Controller de listado + consulta contextual de sólo lectura. |
+| `BE-P07` | Composición de reporte | [`DIA-PAT-CON-001`](../design-and-construction-patterns/04-catalog-visual-of-patterns-applied.md#factories-y-composición-sobre-herencia) | Consulta de dominio + `sendExcelReport`, sin modificar inventario. |
+| `BE-P08` | Sesión web | [`DIA-PAT-FRO-001`](../design-and-construction-patterns/04-catalog-visual-of-patterns-applied.md#pipeline-dto-y-políticas-declarativas) | Autenticación, JWT/cookies, cierre o redirección en la frontera web. |
 
 ### Cobertura de casos backend
 
@@ -81,16 +86,23 @@ aparece una vez, conserva su referencia de patrones y contiene un bloque Mermaid
 | --- | --- | ---: | --- |
 | Autenticación | `CU-AUT-01..02` | 2 | Completo |
 | Identidad y acceso | `CU-IDA-01..09` | 9 | Completo |
-| Catálogos | `CU-CAT-01..44` | 44 | Completo |
+| Almacén | `CU-ALM-01..15` | 15 | Completo |
+| Catálogos | `CU-CAT-01..26` | 26 | Completo |
 | Entradas | `CU-ENT-01..06` | 6 | Completo |
 | Salidas | `CU-SAL-01..14` | 14 | Completo |
-| **Total** | Cinco grupos propietarios | **81** | **81 de 81** |
+| **Total** | Seis grupos propietarios | **72** | **72 de 72** |
+
+Los casos `CU-AUT-01` y `CU-AUT-02` se conservan aquí porque iniciar y cerrar sesión son
+objetivos funcionales con código propio, no para repetir la autenticación dentro de cada
+caso. La obligación transversal de autenticar y autorizar pertenece a requisitos
+(`RN-001` y `RN-009`); las demás secuencias sólo muestran el middleware concreto cuando
+afecta la lectura técnica de su entrada.
 
 ### Capítulos técnicos
 
 - [Autenticación](authentication/index.md): casos `CU-AUT-*`.
 - [Identidad y acceso](identity-access/index.md): casos `CU-IDA-*`.
-- [Catálogos e inventario](catalogs/index.md): casos `CU-CAT-*`.
+- [Almacén y catálogos](catalogs/index.md): casos `CU-ALM-*` y `CU-CAT-*`.
 - [Compras y entradas](purchases/index.md): casos `CU-ENT-*`.
 - [Salidas](issues/index.md): casos `CU-SAL-*`.
 - [Nota histórica sobre infraestructura de consultas y exportaciones](reports/index.md): los casos y diagramas están dentro de su grupo propietario.

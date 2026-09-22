@@ -11,26 +11,23 @@ sequenceDiagram
     participant Request as src/public/js/services/admin/personService.js
     participant HTTP as src/public/js/services/axiosInstanceApi.js
     participant Transport@{ "type": "control" } as src/routes/api/admin/personApiRoute.js<br/>src/controllers/api/admin/personController.js
-    Note over Application,Transport: Variables de frontera: id, formData/payload
 
     Browser->>View: personModal.js precarga la persona seleccionada
-    View->>View: recopilar y validar las variables de frontera indicadas
     View->>Application: updatePerson({ id, formData })
     Application->>Request: updatePersonRequest({ id, formData })
     activate Application
-    Request->>HTTP: apiRequest({ method: 'put', url, data/params })
+    Request->>HTTP: apiRequest({ method: 'put', url, data })
     HTTP->>Transport: envía PUT /api/admin/persons/:id
-    Transport-->>HTTP: status HTTP y payload del endpoint
-    HTTP-->>Request: respuesta o error normalizado
-    Request-->>Application: resultado del request
+    Transport-->>HTTP: HTTP 2xx { code, data }
+    HTTP-->>Request: apiRequest() resuelve response.data
+    Request-->>Application: updatePersonRequest() resuelve response.data
     alt Respuesta exitosa
-        Application-->>View: entidad, colección o archivo normalizado
-        View-->>Browser: actualizar la vista con el resultado
+        Application-->>View: updatePerson() resuelve response.data
+        View-->>Browser: DOM o DataTable actualizado con response.data
     else Respuesta rechazada
-        Application-->>View: error normalizado por apiRequest
-        View-->>Browser: conservar contexto y mostrar el mensaje
+        Application-->>View: error Axios normalizado { code, message, meta }
+        View-->>Browser: formulario o filtros conservados, mensaje visible
     end
     deactivate Application
 ```
 
-<a id="cu-ida-05"></a>
