@@ -327,7 +327,7 @@ export const findSupplierMaterialById = async ({
 
     if (!supplierMaterial) throw new MaterialNotFound();
 
-    return mapSupplierMaterial(supplierMaterial);
+    return supplierMaterial;
 };
 
 export const findSupplierMaterialsSnapshot = async ({
