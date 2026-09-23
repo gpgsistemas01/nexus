@@ -9,16 +9,24 @@ sequenceDiagram
     participant Route as src/routes/api/warehouse/materialApiRoute.js
     participant Controller@{ "type": "control" } as src/controllers/api/warehouse/materialController.js
     participant Domain as src/services/warehouse/materials/materialService.js
+    participant SupplierMaterial as src/services/warehouse/materials/supplierMaterialService.js
+    participant Prisma as Prisma / PostgreSQL
     participant ErrorHandler as src/app.js
 
     Client->>Route: GET /api/warehouse/materials
     Route->>Controller: getAllMaterials(req, res)
     activate Controller
-    Controller->>Domain: materialService.findAllMaterials({ query: req.query }) consulta material, proveedor y existencia
+    Controller->>Domain: findAllMaterials({ paginación, filtros, orden, canReadCosts })
     activate Domain
+    Domain->>SupplierMaterial: findAllSupplierMaterials({ ... })
+    SupplierMaterial->>Prisma: supplierMaterial.findMany({ select: { material, supplier, existencia } })
+    Prisma-->>SupplierMaterial: relaciones SupplierMaterial anidadas
+    SupplierMaterial->>Prisma: material.findMany({ relaciones históricas: none }) y conteos
+    Prisma-->>SupplierMaterial: ids eliminables y totales
+    SupplierMaterial-->>Domain: { data: SupplierMaterial[], recordsTotal, recordsFiltered }
     alt Servicio resuelto
-        Domain-->>Controller: materialService.findAllMaterials() devuelve { data, recordsTotal, recordsFiltered } para la tabla solicitada
-        Controller-->>Client: HTTP 2xx { code, data }
+        Domain-->>Controller: { data, recordsTotal, recordsFiltered }
+        Controller-->>Client: HTTP 200 { data: [{ id, material, supplier, ... }], recordsTotal, recordsFiltered }
     else AppError propagado
         Domain-->>Controller: throw AppError { code, message, meta, statusCode }
         Controller->>ErrorHandler: next(error)
@@ -27,4 +35,3 @@ sequenceDiagram
     deactivate Domain
     deactivate Controller
 ```
-
