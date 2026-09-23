@@ -2,6 +2,7 @@ export const materialDataFields = ['name', 'supplierId', 'presentationId', 'unit
 export const materialSecondaryDataFields = ['name', 'supplierId', 'minStock', 'maxUnitCost', 'isActive'];
 export const materialEditableDataFields = ['name', 'minStock', 'maxUnitCost', 'isActive'];
 export const materialStockFields = ['newStock', 'reasonId', 'observations'];
+export const materialStockRequestFields = ['supplierId', ...materialStockFields];
 export const materialCreateFields = [
     ...materialDataFields,
     'minStock',

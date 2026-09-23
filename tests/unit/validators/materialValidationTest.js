@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { validationResult } from 'express-validator';
 
-import { materialValidation } from '../../../src/validators/forms/materialValidations.js';
+import { materialStockValidation, materialValidation } from '../../../src/validators/forms/materialValidations.js';
 
 const validMaterial = {
   name: 'Lámina',
@@ -11,9 +11,9 @@ const validMaterial = {
   isActive: true
 };
 
-const runValidation = async (body) => {
+const runValidation = async (body, validation = materialValidation) => {
   const req = { body };
-  await Promise.all(materialValidation.map(rule => rule.run(req)));
+  await Promise.all(validation.map(rule => rule.run(req)));
   return validationResult(req).array();
 };
 
@@ -35,6 +35,17 @@ describe('materialValidation', () => {
     expect(errors).toEqual(expect.arrayContaining([
       expect.objectContaining({ path: 'maxUnitCost', msg: 'MAX_UNIT_COST_REQUIRED' }),
       expect.objectContaining({ path: 'newStock', msg: 'NEW_STOCK_REQUIRED' })
+    ]));
+  });
+
+  it('rechaza un ajuste de material sin proveedor', async () => {
+    const errors = await runValidation({
+      newStock: 10,
+      reasonId: '44444444-4444-4444-8444-444444444444'
+    }, materialStockValidation);
+
+    expect(errors).toEqual(expect.arrayContaining([
+      expect.objectContaining({ path: 'supplierId', msg: 'SUPPLIER_ID_REQUIRED' })
     ]));
   });
 });

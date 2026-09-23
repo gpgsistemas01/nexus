@@ -4,7 +4,7 @@ import { FORM_SELECTORS } from "../../../constants/selectors.js";
 
 import { handleSubmit, pickFormFields, validateFields } from "../../../utils/formUtils.js";
 import { goodsReceiptMaterialCreateValidation, materialCreateValidation, materialEditValidation, materialStockValidation } from "../../../utils/validations/validators.js";
-import { materialCreateFields, materialSecondaryDataFields, materialStockFields } from './materialFields.js';
+import { materialCreateFields, materialSecondaryDataFields, materialStockRequestFields } from './materialFields.js';
 import { isEditMode, isStockMode } from '../../../constants/formModes.js';
 
 const formId = FORM_SELECTORS.MATERIAL;
@@ -26,7 +26,7 @@ useForm({
     normalizeData: ({ form, formData }) => {
 
         const fields = isStockMode(form.dataset.mode)
-            ? materialStockFields
+            ? materialStockRequestFields
             : isEditMode(form.dataset.mode) ? materialSecondaryDataFields : materialCreateFields;
 
         if (isStockMode(form.dataset.mode) || isEditMode(form.dataset.mode)) {
