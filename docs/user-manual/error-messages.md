@@ -57,7 +57,9 @@ Nexus puede combinar varios mensajes en un mismo intento. Los más frecuentes so
 
 - **El campo es requerido**: proveedor, material, persona que recibe, asesor, solicitante,
   cliente, área, presentación, unidad, razón, rol, nombre, usuario, contraseña, fechas, cantidad,
-  existencia nueva, existencia mínima o costo máximo no fueron capturados.
+  existencia nueva, existencia mínima o costo máximo no fueron capturados. En el alta de material
+  abierta desde una compra, existencia nueva y costo máximo no aparecen ni son obligatorios: se
+  capturan como **Cantidad** y **Costo por Presentación** en el detalle de la compra.
 - **El valor no es válido**: un selector conserva un identificador inexistente, una fecha no tiene
   el formato admitido o una selección ya no está disponible.
 - **Debe ser un número** o **debe ser un número mayor a cero**: cantidades, dimensiones,
