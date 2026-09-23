@@ -21,6 +21,12 @@ describe('validadores del CRUD de materiales', () => {
     expect(materialCreateValidation).toMatchObject(materialValidation);
     expect(materialCreateValidation.newStock).toBe(materialStockValidation.newStock);
     expect(materialCreateValidation.observations).toBe(materialStockValidation.observations);
+    expect(materialStockValidation.supplierId).toBe(materialEditValidation.supplierId);
+  });
+
+  it('requiere el proveedor asociado al ajustar el stock de un material', () => {
+    expect(materialStockValidation.supplierId('')).toEqual(expect.any(String));
+    expect(materialStockValidation.supplierId('supplier-1')).toBeNull();
   });
 
   it.each([

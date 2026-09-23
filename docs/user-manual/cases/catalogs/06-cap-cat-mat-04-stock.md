@@ -9,6 +9,9 @@
 **Observaciones**. Los datos de identidad y catálogo quedan sólo para consulta. Use la acción
 **Ajustar stock** y el botón **Ajustar**.
 
+El proveedor no se captura de nuevo: Nexus conserva y envía automáticamente el proveedor de la
+fila seleccionada porque la existencia corresponde a esa oferta de material.
+
 1. En la fila del material, seleccione la acción **Ajustar stock**. Antes de continuar, compruebe que la pantalla mostrada coincida con la captura:
 
    ![CAP-CAT-MAT-04-STOCK: ajuste existencia](../../images/materials/04-adjustment-stock.png)

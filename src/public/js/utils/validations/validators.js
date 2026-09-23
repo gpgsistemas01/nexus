@@ -50,10 +50,13 @@ export const materialValidation = {
     }),
 }
 
-export const materialStockValidation = createInventoryStockValidation({
-    validateStock: validateNumber,
-    stockFieldName: 'El nuevo stock'
-});
+export const materialStockValidation = {
+    supplierId: materialEditValidation.supplierId,
+    ...createInventoryStockValidation({
+        validateStock: validateNumber,
+        stockFieldName: 'El nuevo stock'
+    })
+};
 
 export const materialCreateValidation = {
     ...materialValidation,
