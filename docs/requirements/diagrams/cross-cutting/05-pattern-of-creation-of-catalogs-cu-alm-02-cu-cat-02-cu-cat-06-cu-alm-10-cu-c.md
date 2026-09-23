@@ -10,3 +10,7 @@ flowchart LR
 
 Cliente, proveedor, material, merma y catálogos auxiliares recorren capas equivalentes. Los catálogos auxiliares reutilizan su registro con lista blanca; las relaciones y reglas de los demás recursos no se trasladan a esa configuración. El refresco final es
 una reacción de `createCrudApplication`, no parte de la transacción de persistencia.
+En `CU-ALM-02`, este patrón conserva dos resultados según el origen: el alta directa agrega el
+ajuste inicial, mientras el alta invocada desde `CU-ENT-02` crea la oferta con existencia cero,
+sin costo máximo y sin ajuste. El [flujo específico](../catalogs/cu-alm-02.md) representa esa
+decisión, que no aplica a los demás catálogos agrupados aquí.

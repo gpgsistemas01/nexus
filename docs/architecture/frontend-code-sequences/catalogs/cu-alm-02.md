@@ -12,31 +12,39 @@ sequenceDiagram
     participant HTTP as src/public/js/services/axiosInstanceApi.js
     participant Transport@{ "type": "control" } as src/routes/api/warehouse/materialApiRoute.js<br/>src/controllers/api/warehouse/materialController.js
 
-    Browser->>View: materialModal.js abre materialForm.js en modo alta
-    View->>View: validateFields(getMaterialValidation(form), formData)
-    alt Alta desde compra
-        View->>Application: registerMaterial({ formData, creationContext: 'goodsReceipt' })
-        Application->>Application: buildGoodsReceiptMaterialData(data) omite maxUnitCost y newStock
+    Browser->>View: openMaterialModal({ mode: CREATE, creationContext, data, onSave })
+    alt creationContext es goodsReceipt
+        View->>View: setFormSectionVisibility(...) oculta maxUnitCost y stock-data-section
+        View->>View: validateFields(goodsReceiptMaterialCreateValidation, formData)
     else Alta directa
-        View->>Application: registerMaterial({ formData, creationContext: null })
+        View->>View: validateFields(materialCreateValidation, formData)
     end
-    Application->>Request: registerMaterialRequest({ data })
-    activate Application
-    Request->>HTTP: apiRequest({ method: 'post', url, data })
-    HTTP->>Transport: envía POST /api/warehouse/materials
-    alt Ya existe la identidad y la relación con el proveedor
-        Transport-->>View: 409 MATERIAL_ALREADY_EXISTS y conservar stock y dirigir al ajuste
-    else Identidad existente sólo para otro proveedor o identidad nueva
+    alt validateFields() devuelve errores
+        View-->>Browser: normalizeFormErrors() conserva formulario y señala campos
+    else Captura válida
+        alt creationContext es goodsReceipt
+            View->>Application: registerMaterial({ formData, creationContext: 'goodsReceipt' })
+            Application->>Application: buildGoodsReceiptMaterialData(data) omite maxUnitCost y newStock
+        else Alta directa
+            View->>Application: registerMaterial({ formData, creationContext: null })
+        end
+        Application->>Request: registerMaterialRequest({ data })
+        activate Application
+        Request->>HTTP: apiRequest({ method: 'post', url: MATERIALS_API_ROUTE, data })
+        HTTP->>Transport: POST /api/warehouse/materials { data }
+        alt HTTP 200
+            Transport-->>HTTP: { material: supplierMaterial, code }
+            HTTP-->>Request: apiRequest() resuelve response.data
+            Request-->>Application: registerMaterialRequest() resuelve response.data
+            Application-->>View: registerMaterial() resuelve supplierMaterial
+            View-->>Browser: onSave(supplierMaterial) y cierre del modal
+        else HTTP 4xx/5xx
+            Transport-->>HTTP: { code, message, meta }
+            HTTP-->>Request: apiRequest() rechaza error normalizado
+            Request-->>Application: registerMaterialRequest() propaga error
+            Application-->>View: registerMaterial() rechaza
+            View-->>Browser: handleSubmit() conserva formulario y muestra mensaje
+        end
+        deactivate Application
     end
-    Transport-->>HTTP: HTTP 2xx { code, data }
-    HTTP-->>Request: apiRequest() resuelve response.data
-    Request-->>Application: registerMaterialRequest() resuelve response.data
-    alt Respuesta exitosa
-        Application-->>View: registerMaterial() resuelve response.data
-        View-->>Browser: DOM o DataTable actualizado con response.data
-    else Respuesta rechazada
-        Application-->>View: error Axios normalizado { code, message, meta }
-        View-->>Browser: formulario o filtros conservados, mensaje visible
-    end
-    deactivate Application
 ```

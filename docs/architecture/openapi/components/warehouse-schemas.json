@@ -89,6 +89,61 @@
       "name"
     ]
   },
+  "SupplierMaterial": {
+    "type": "object",
+    "description": "Relación proveedor-material. El identificador de nivel superior corresponde a SupplierMaterial; la identidad y los datos descriptivos del material permanecen anidados en material.",
+    "properties": {
+      "id": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "isActive": {
+        "type": "boolean"
+      },
+      "maxUnitCost": {
+        "type": "number"
+      },
+      "currentStock": {
+        "type": "number"
+      },
+      "convertedQuantity": {
+        "type": "number"
+      },
+      "canDelete": {
+        "type": "boolean"
+      },
+      "material": {
+        "$ref": "../openapi.json#/components/schemas/Material"
+      },
+      "supplier": {
+        "$ref": "../openapi.json#/components/schemas/SupplierMaterialSupplier"
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "id"
+    ]
+  },
+  "SupplierMaterialSupplier": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "tradeName": {
+        "type": "string"
+      },
+      "isActive": {
+        "type": "boolean"
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "id",
+      "tradeName"
+    ]
+  },
   "Waste": {
     "type": "object",
     "properties": {
@@ -881,7 +936,7 @@
       "data": {
         "type": "array",
         "items": {
-          "$ref": "../openapi.json#/components/schemas/Material"
+          "$ref": "../openapi.json#/components/schemas/SupplierMaterial"
         }
       },
       "recordsTotal": {
@@ -987,7 +1042,7 @@
     "type": "object",
     "properties": {
       "material": {
-        "$ref": "../openapi.json#/components/schemas/Material"
+        "$ref": "../openapi.json#/components/schemas/SupplierMaterial"
       },
       "code": {
         "$ref": "../openapi.json#/components/schemas/SuccessCode"

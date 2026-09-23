@@ -5,7 +5,7 @@
 | Identificador | Caso de uso específico | Evidencia funcional |
 | --- | --- | --- |
 | `CU-ALM-01` | Consultar materiales | Listado de materiales, ofertas de proveedor y existencias. |
-| `CU-ALM-02` | Crear material | Alta con presentación, unidad y relaciones válidas. |
+| `CU-ALM-02` | Crear material | Alta directa con inventario inicial o alta desde compra sin costo ni existencia inicial. |
 | `CU-ALM-03` | Editar material | Actualización de datos generales admitidos. |
 | `CU-ALM-04` | Retirar material | Retiro condicionado por la historia operativa. |
 | `CU-ALM-05` | Ajustar existencia de material | Ajuste trazable de inventario. |

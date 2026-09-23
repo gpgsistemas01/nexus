@@ -6,28 +6,32 @@
 ```mermaid
 sequenceDiagram
     participant Browser as Navegador
-    participant View as src/views/pages/warehouse/materials/materialsPage.ejs<br/>src/public/js/pages/warehouse/materials/materialsPage.js
+    participant View as src/public/js/plugins/datatable/warehouse/materials/materialDatatable.js
+    participant RowAdapter as src/public/js/plugins/datatable/warehouse/materials/materialRow.js
     participant Application as src/public/js/application/warehouse/materials/materials.js
     participant Request as src/public/js/services/warehouse/materialService.js
     participant HTTP as src/public/js/services/axiosInstanceApi.js
     participant Transport@{ "type": "control" } as src/routes/api/warehouse/materialApiRoute.js<br/>src/controllers/api/warehouse/materialController.js
 
-    Browser->>View: materialsPage.ejs y materialsPage.js cargan inventario
+    Browser->>View: materialsPage inicializa el DataTable de inventario
     View->>Application: getAllMaterials({ params })
     Application->>Request: getAllMaterialsRequest({ params })
     activate Application
     Request->>HTTP: apiRequest({ method: 'get', url, params })
     HTTP->>Transport: consulta GET /api/warehouse/materials
-    Transport-->>HTTP: HTTP 2xx { code, data }
+    Transport-->>HTTP: HTTP 200 { data: [{ id de SupplierMaterial, material, supplier, ... }], recordsTotal, recordsFiltered }
     HTTP-->>Request: apiRequest() resuelve response.data
     Request-->>Application: getAllMaterialsRequest() resuelve response.data
     alt Respuesta exitosa
         Application-->>View: getAllMaterials() resuelve response.data
-        View-->>Browser: DOM o DataTable actualizado con response.data
+        View-->>Browser: DataTable renderiza el contrato anidado mediante getters de inventario
+        opt Actor abre edición o ajuste
+            View->>RowAdapter: mapMaterialRowToFormData(fila SupplierMaterial)
+            RowAdapter-->>View: contrato plano del formulario con id del material
+        end
     else Respuesta rechazada
         Application-->>View: error Axios normalizado { code, message, meta }
         View-->>Browser: formulario o filtros conservados, mensaje visible
     end
     deactivate Application
 ```
-

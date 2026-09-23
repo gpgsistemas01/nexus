@@ -12,8 +12,9 @@ sequenceDiagram
     participant HTTP as src/public/js/services/axiosInstanceApi.js
     participant Transport@{ "type": "control" } as src/routes/api/warehouse/materialApiRoute.js<br/>src/controllers/api/warehouse/materialController.js
 
-    Browser->>View: Acción de retiro en materialDatatable.js
-    View->>Application: deleteMaterial({ id })
+    Browser->>View: solicita retirar la fila proveedor-material
+    View->>View: obtiene data.id (id de SupplierMaterial, no material.id)
+    View->>Application: deleteMaterial({ id: data.id })
     Application->>Request: deleteMaterialRequest({ id })
     activate Application
     Request->>HTTP: apiRequest({ method: 'delete', url })
@@ -30,4 +31,3 @@ sequenceDiagram
     end
     deactivate Application
 ```
-
