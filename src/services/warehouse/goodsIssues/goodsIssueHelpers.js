@@ -26,7 +26,7 @@ export const buildGoodsIssueDetails = async ({
 
     const spMap = new Map(
         supplierMaterials.map(sp => [
-            buildStockKey(sp.id, sp.supplier.id),
+            buildStockKey(sp.material.id, sp.supplier.id),
             sp
         ])
     );
@@ -40,9 +40,10 @@ export const buildGoodsIssueDetails = async ({
         if (!sp.isActive) throw new MaterialInactiveConflict();
         if (!sp.supplier.isActive) throw new SupplierInactiveConflict();
 
-        if (presentationId && sp.presentation?.id !== presentationId) throw new MaterialNotFound();
+        if (presentationId && sp.material.presentation?.id !== presentationId) throw new MaterialNotFound();
 
-        const { name, base, height, maxUnitCost } = sp;
+        const { name, base, height } = sp.material;
+        const { maxUnitCost } = sp;
         const convertedQuantity = calculateConvertedQuantity({
             quantity,
             base,

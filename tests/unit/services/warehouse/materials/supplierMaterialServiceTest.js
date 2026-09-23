@@ -22,7 +22,9 @@ vi.mock('../../../../../src/repository/baseRepository.js', () => ({
 const {
   existsMaterialUsage,
   findAllSupplierMaterials,
+  findSupplierMaterialById,
   findSupplierMaterialByIds,
+  findSupplierMaterialsSnapshot,
   updateSupplierMaterialStock
 } = await import('../../../../../src/services/warehouse/materials/supplierMaterialService.js');
 
@@ -132,6 +134,30 @@ describe('listado del CRUD de materiales', () => {
       material: expect.objectContaining({ id: 'material-1', name: 'Lona' }),
       currentStock: 4
     }));
+  });
+
+  it('mantiene el contrato anidado al consultar por el id de proveedor-material', async () => {
+    const supplierMaterial = {
+      id: 'offer-1',
+      material: { id: 'material-1', name: 'Lona' },
+      supplier: { id: 'supplier-1', tradeName: 'Proveedor' }
+    };
+    supplierMaterialFindUnique.mockResolvedValue(supplierMaterial);
+
+    await expect(findSupplierMaterialById({ id: 'offer-1' })).resolves.toEqual(supplierMaterial);
+  });
+
+  it('mantiene el contrato anidado en los datos históricos operativos', async () => {
+    const supplierMaterial = {
+      id: 'offer-1',
+      material: { id: 'material-1', name: 'Lona' },
+      supplier: { id: 'supplier-1', tradeName: 'Proveedor' }
+    };
+    supplierMaterialFindMany.mockResolvedValue([supplierMaterial]);
+
+    await expect(findSupplierMaterialsSnapshot({
+      pairs: [{ materialId: 'material-1', supplierId: 'supplier-1' }]
+    })).resolves.toEqual([supplierMaterial]);
   });
 
   it('reutiliza las relaciones históricas en una sola consulta antes de eliminar', async () => {
