@@ -156,8 +156,9 @@ errores (`ui/forms/formErrorsUI.js`), estado y campos (`ui/forms/formStateUI.js`
 un consumidor no forman parte de esa API: se mantienen privadas dentro del CRUD que
 las necesita.
 
-El listado de materiales conserva el contrato anidado proveedor-material que también
-consumen la tabla y Select2. Sus acciones de edición y ajuste adaptan la fila mediante
+Las consultas de `SupplierMaterial`, incluidos el listado y los snapshots operativos,
+conservan el contrato anidado proveedor-material que consumen la tabla, Select2 y los
+servicios de inventario. Sus acciones de edición y ajuste adaptan la fila mediante
 `plugins/datatable/warehouse/materials/materialRow.js` antes de abrir el modal. El
 adaptador permanece dentro del plugin propietario del listado y no se presenta como UI
 compartida con merma. El modal recibe así el contrato plano de sus inputs y el

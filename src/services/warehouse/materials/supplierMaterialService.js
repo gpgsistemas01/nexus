@@ -106,23 +106,6 @@ export const findCurrentSupplierMaterialByMaterialId = async ({
     return currentSupplierMaterial;
 };
 
-export const mapSupplierMaterial = (sp) => {
-
-    const { id, material, supplier, maxUnitCost, currentStock, convertedQuantity, isActive, canDelete } = sp;
-
-    return {
-        ...material,
-        materialId: material.id,
-        supplierMaterialId: id,
-        maxUnitCost,
-        currentStock,
-        convertedQuantity,
-        isActive,
-        ...(canDelete !== undefined && { canDelete }),
-        supplier: { ...supplier }
-    };
-};
-
 const findDeletableMaterialIds = async ({ db, materialIds }) => {
 
     if (materialIds.length === 0) return new Set();
@@ -327,7 +310,7 @@ export const findSupplierMaterialById = async ({
 
     if (!supplierMaterial) throw new MaterialNotFound();
 
-    return mapSupplierMaterial(supplierMaterial);
+    return supplierMaterial;
 };
 
 export const findSupplierMaterialsSnapshot = async ({
@@ -344,7 +327,7 @@ export const findSupplierMaterialsSnapshot = async ({
         include: SUPPLIER_MATERIAL_SNAPSHOT_INCLUDE
     });
 
-    return materials.map(mapSupplierMaterial);
+    return materials;
 }
 
 export const countTotalSupplierMaterials = async ({

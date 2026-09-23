@@ -15,13 +15,16 @@ const detail = {
 };
 
 const supplierMaterial = {
-    id: 'material-1',
-    name: 'Material',
+    id: 'supplier-material-1',
     isActive: true,
-    base: null,
-    height: null,
     maxUnitCost: 10,
-    presentation: { id: 'presentation-1' },
+    material: {
+        id: 'material-1',
+        name: 'Material',
+        base: null,
+        height: null,
+        presentation: { id: 'presentation-1' }
+    },
     supplier: {
         id: 'supplier-1',
         tradeName: 'Proveedor',
@@ -53,7 +56,9 @@ describe('buildGoodsIssueDetails', () => {
             expect.objectContaining({
                 materialId: 'material-1',
                 supplierId: 'supplier-1',
-                quantity: 2
+                quantity: 2,
+                materialName: 'Material',
+                maxUnitCost: 10
             })
         ]);
     });
