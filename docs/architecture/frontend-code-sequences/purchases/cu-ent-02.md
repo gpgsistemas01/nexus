@@ -11,6 +11,7 @@ sequenceDiagram
     participant DetailUI as src/public/js/pages/warehouse/goodsReceipts/goodsReceiptDetails.js<br/>src/public/js/plugins/datatable/warehouse/goodsReceipts/goodsReceiptDatatable.js
     participant MaterialUI as src/public/js/plugins/select2/modules/goodsReceiptSelect.js<br/>src/public/js/pages/warehouse/materials/materialModal.js
     participant MaterialApp as src/public/js/application/warehouse/materials/materials.js
+    participant MaterialRequest as src/public/js/services/warehouse/materialService.js
     participant App as src/public/js/application/warehouse/goodsReceipts/goodsReceipts.js
     participant Request as src/public/js/services/warehouse/goodsReceiptService.js
     participant HTTP as src/public/js/services/axiosInstanceApi.js
@@ -20,10 +21,21 @@ sequenceDiagram
     Modal->>Modal: openGoodsReceiptModal({ mode: create })
     opt El material no está catalogado
         DetailUI->>MaterialUI: setupMaterialSelect({ creationContext: 'goodsReceipt' }) abre openMaterialModal(...)
+        MaterialUI->>MaterialUI: openMaterialModal({ creationContext: 'goodsReceipt' }) oculta maxUnitCost y sección newStock/observations
         MaterialUI->>MaterialApp: registerMaterial({ formData, creationContext: 'goodsReceipt' })
         MaterialApp->>MaterialApp: buildGoodsReceiptMaterialData(data) omite maxUnitCost y newStock
-        MaterialApp->>HTTP: POST /api/warehouse/materials con creationContext
-        HTTP-->>MaterialUI: material creado con stock cero y costo aún nulo
+        MaterialApp->>MaterialRequest: registerMaterialRequest({ data })
+        MaterialRequest->>HTTP: apiRequest({ method: 'post', url: MATERIALS_API_ROUTE, data })
+        alt Material creado
+            HTTP-->>MaterialRequest: HTTP 200 { material, code }
+            MaterialRequest-->>MaterialApp: registerMaterialRequest() resuelve response.data
+            MaterialApp-->>MaterialUI: registerMaterial() resuelve supplierMaterial
+            MaterialUI->>MaterialUI: onSave() ejecuta mapSelectMaterialData(supplierMaterial) y toggleMaterialOption(...)
+        else Alta rechazada
+            HTTP-->>MaterialRequest: apiRequest() rechaza { code, message, meta }
+            MaterialRequest-->>MaterialApp: registerMaterialRequest() propaga error normalizado
+            MaterialApp-->>MaterialUI: registerMaterial() rechaza y conserva formulario
+        end
     end
     Warehouse->>DetailUI: seleccionar material, cantidad y costo por presentación
     DetailUI->>DetailUI: addGoodsReceiptMaterial()

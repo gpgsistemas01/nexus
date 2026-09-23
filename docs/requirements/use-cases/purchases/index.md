@@ -5,7 +5,7 @@
 | Identificador | Caso de uso específico | Evidencia funcional |
 | --- | --- | --- |
 | `CU-ENT-01` | Consultar compras de material | Listado y detalle sin modificar inventario. |
-| `CU-ENT-02` | Crear compra de material | Compra, detalles, existencias y movimientos transaccionales. |
+| `CU-ENT-02` | Crear compra de material | Compra, alta contextual de materiales no catalogados, detalles, existencias y movimientos transaccionales. |
 | `CU-ENT-03` | Editar compra de material | Edición de encabezado y detalles admitidos. |
 | `CU-ENT-04` | Corregir material de una compra | Corrección de cantidad o costo con historial. |
 | `CU-ENT-05` | Cancelar material de una compra | Cancelación del detalle y reversión de inventario. |
