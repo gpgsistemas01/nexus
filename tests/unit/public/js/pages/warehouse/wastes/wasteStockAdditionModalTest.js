@@ -17,7 +17,7 @@ vi.mock('../../../../../../../src/public/js/utils/warehouseInventoryUtils.js', (
 }));
 
 vi.mock('../../../../../../../src/public/js/utils/formatUtils.js', () => ({
-  formatDecimal: value => `${ value }.00`
+  formatDecimal: value => Number(value).toFixed(2)
 }));
 
 const { FORM_MODES } = await import('../../../../../../../src/public/js/constants/formModes.js');
@@ -35,6 +35,8 @@ describe('modal para agregar existencia de merma', () => {
     const modal = {};
     const name = { textContent: '' };
     const currentStock = { textContent: '' };
+    const resultingStock = { textContent: '' };
+    const quantityInput = { value: '', oninput: null };
     const submit = { textContent: '' };
     form.querySelector = vi.fn(() => submit);
 
@@ -43,7 +45,9 @@ describe('modal para agregar existencia de merma', () => {
         '#wasteStockAdditionForm': form,
         '#wasteStockAdditionModal': modal,
         '#wasteStockAdditionName': name,
-        '#wasteStockAdditionCurrentStock': currentStock
+        '#wasteStockAdditionCurrentStock': currentStock,
+        '#wasteStockAdditionQuantityInput': quantityInput,
+        '#wasteStockAdditionResultingStock': resultingStock
       })[selector])
     });
 
@@ -58,6 +62,10 @@ describe('modal para agregar existencia de merma', () => {
     });
     expect(name.textContent).toBe('Recorte blanco');
     expect(currentStock.textContent).toBe('12.00');
+    expect(resultingStock.textContent).toBe('12.00');
+    quantityInput.value = '3.5';
+    quantityInput.oninput();
+    expect(resultingStock.textContent).toBe('15.50');
     expect(submit.textContent).toBe('Agregar');
     expect(openModal).toHaveBeenCalledWith(modal);
   });

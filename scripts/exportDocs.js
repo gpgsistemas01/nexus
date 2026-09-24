@@ -71,17 +71,15 @@ const MANUALS = Object.freeze({
             'identidad-y-acceso': manualPart(administrator, manualCases['identity-access']),
             catalogos: manualPart(administrator, manualCaseFiles('catalogs', [
                 '01-catalogs-auxiliary.md'
-            ]))
+            ])),
+            reportes: manualPart(administrator, manualCases.reports)
         }
     },
     'manual-almacen': {
         directory: 'manuales/almacen',
         parts: {
             autenticacion: manualPart(warehouse, manualCases.authentication),
-            catalogos: manualPart(warehouse, [
-                ...manualCases.catalogs.slice(1),
-                ...manualCases.reports
-            ]),
+            catalogos: manualPart(warehouse, manualCases.catalogs.slice(1)),
             'compras-de-material': manualPart(warehouse, manualCases.purchases),
             'salidas-de-material': manualPart(warehouse, manualCaseFiles('issues', [
                 '01-cap-sal-mat-01-list.md',
