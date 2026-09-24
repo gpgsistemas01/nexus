@@ -43,7 +43,8 @@ sequenceDiagram
             Service->>Movement: movementDetails.push({ wasteIssueDetailId, quantity })
             Movement->>Stock: applyWasteStockChange({ tx, wasteId, quantityDelta })
         end
-        Movement->>Prisma: createWasteMovement({ tx, type: ISSUE, details })
+        Service->>Movement: applyWasteMovement({ tx, reference: { wasteIssueId }, movementType: ISSUE, details })
+        Movement->>Prisma: createWasteMovement({ tx, reference, movementType: ISSUE, details })
         Service->>Rules: resolveIssueFulfillmentStatus(details)
         Service->>Prisma: tx.wasteIssue.update({ where, data })
         alt Commit confirmado

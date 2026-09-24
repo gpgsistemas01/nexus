@@ -30,6 +30,7 @@
 ## EJS
 
 - No elimines, muevas ni vuelvas a agregar innecesariamente la última línea de un archivo EJS.
+- Conserva exactamente el estado del fin de archivo de cada EJS: si originalmente no termina con salto de línea, no lo agregues; si lo tiene, no lo elimines. Compruébalo en el diff para evitar que la última línea aparezca eliminada y agregada sin un cambio real.
 - Conserva los cierres y llamadas a `contentFor`, salvo que la tarea requiera cambiarlos.
 - Modifica sólo la sección necesaria y revisa el inicio y el final de cada EJS modificado.
 - Reutiliza parciales de `src/views/shared` y módulos compartidos de `src/public/js` antes de duplicar markup, validaciones, requests o manipulación del DOM.

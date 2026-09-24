@@ -113,11 +113,13 @@ flowchart LR
             ucWasteReport(["CU-ALM-13 Generar reporte de mermas"])
             ucWasteMovements(["CU-ALM-14 Consultar movimientos de mermas"])
             ucWasteMovementReport(["CU-ALM-15 Generar reporte de movimientos de mermas"])
+            ucWasteAddStock(["CU-ALM-16 Agregar existencia de merma"])
         end
     end
 
     warehouse --- ucMaterialQuery
     warehouse --- ucWasteQuery
+    warehouse --- ucWasteAddStock
     admin --- ucMaterialStock
     admin --- ucWasteStock
     ucMaterialQuery --- ucMaterialCreate

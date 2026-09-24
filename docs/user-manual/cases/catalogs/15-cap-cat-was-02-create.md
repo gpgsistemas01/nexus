@@ -19,6 +19,7 @@ para abrir el formulario y **Guardar** para confirmarlo.
 3. Seleccione el botón **Guardar** para registrar la merma.
 
 Si ya existe una merma con el mismo nombre, proveedor, ancho y largo, Nexus rechaza el alta y no
-suma la existencia capturada. Localice esa merma en el listado y use **Ajustar stock**; **Nuevo
-stock** representa la existencia total que debe quedar, no una cantidad que se agregue al valor
-actual.
+suma la existencia capturada. No registre otra merma para representar una nueva recepción:
+localice el registro existente en el listado y use **Agregar stock**, que solicita una cantidad
+incremental. **Ajustar stock** permanece reservado al Administrador del sistema para reemplazar el
+saldo total cuando corrige una diferencia autorizada.

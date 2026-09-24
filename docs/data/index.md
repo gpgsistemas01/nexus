@@ -12,6 +12,33 @@ Esta página es la entrada única a la documentación relacionada con datos. No 
 definir requisitos, decisiones de diseño ni detalles del esquema: indica qué artefacto
 es propietario de cada afirmación y cómo recorrerla hasta su evidencia.
 
+
+### Documentos y movimientos de merma
+
+Cada adición incremental se conserva como un documento individual `WasteStockEntry`, con
+folio, merma, nombre capturado, cantidad, saldo anterior, saldo resultante, actor y
+observaciones opcionales. Su estructura sigue el criterio de trazabilidad de
+`GoodsReceiptDetailChange`: la operación de negocio conserva sus datos y referencia un
+movimiento inmutable, en vez de trasladar esos metadatos al historial común.
+
+El documento se vincula uno a uno con un `WasteMovement` de tipo `ENTRY`; su
+`WasteMovementDetail` registra el efecto sobre inventario. Las salidas y ajustes mantienen
+sus propios documentos de origen (`WasteIssue` y `WasteStockAdjustment`). Todos los efectos
+convergen en `WasteMovement` y se aplican mediante `applyWasteMovement`; `createWasteMovement`
+persiste el encabezado y los detalles comunes. Las observaciones pertenecen a
+`WasteStockEntry`, no a `reference` ni al movimiento, y no sustituyen el motivo obligatorio
+de un ajuste administrativo.
+
+La trazabilidad vigente es **documental y por saldo**, no por lote. Cada entrada puede
+recorrerse desde `WasteStockEntry` hasta su movimiento `ENTRY`; cada surtimiento puede
+recorrerse desde `WasteIssue` y `WasteIssueDetail` hasta su movimiento `ISSUE`. Ambos
+movimientos comparten la merma y conservan sus saldos anterior y resultante, por lo que el
+historial cronológico explica cómo cambió la existencia. No existe una relación directa que
+asigne una salida a una entrada específica, porque la existencia de una misma merma se
+administra como un saldo fungible. Esa relación sólo sería válida si el dominio incorporara
+lotes o partidas y una regla explícita de consumo —por ejemplo FIFO—; inferirla únicamente
+por fecha produciría una trazabilidad que el sistema no garantiza.
+
 ## Propiedad de la información
 
 | Pregunta | Artefacto propietario | Evidencia o vista complementaria |

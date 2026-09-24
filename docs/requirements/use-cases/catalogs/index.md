@@ -19,6 +19,7 @@
 | `CU-ALM-13` | Generar reporte de mermas | Archivo Excel con filtros, columnas y cálculos propios del reporte. |
 | `CU-ALM-14` | Consultar movimientos de mermas | Consulta autorizada sin modificar datos. |
 | `CU-ALM-15` | Generar reporte de movimientos de mermas | Archivo Excel con filtros, columnas y cálculos propios del reporte. |
+| `CU-ALM-16` | Agregar existencia de merma | Entrada incremental autorizada para almacén y administración. |
 
 ### Grupo funcional CAT — Catálogos
 

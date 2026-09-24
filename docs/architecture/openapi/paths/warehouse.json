@@ -1663,5 +1663,60 @@
         }
       }
     }
+  },
+  "/api/warehouse/wastes/{id}/stock-additions": {
+    "post": {
+      "operationId": "postWarehouseWastesIdStockAdditions",
+      "security": [
+        {
+          "cookieAuth": []
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Existencia incrementada y documento individual de entrada registrado con su movimiento.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../openapi.json#/components/schemas/WasteResponse"
+              }
+            }
+          }
+        },
+        "400": {
+          "$ref": "../openapi.json#/components/responses/ValidationError"
+        },
+        "401": {
+          "$ref": "../openapi.json#/components/responses/Unauthorized"
+        },
+        "403": {
+          "$ref": "../openapi.json#/components/responses/Forbidden"
+        },
+        "500": {
+          "$ref": "../openapi.json#/components/responses/ServerError"
+        }
+      },
+      "requestBody": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../openapi.json#/components/schemas/WasteStockAdditionRequest"
+            }
+          }
+        }
+      },
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ]
+    }
   }
 }

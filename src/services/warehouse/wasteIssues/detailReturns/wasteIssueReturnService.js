@@ -8,7 +8,8 @@ import {
 import { getDb } from '../../../../repository/baseRepository.js';
 import { createServiceLogger } from '../../../../utils/logger.js';
 import { executeServiceOperation } from '../../../serviceErrorHandler.js';
-import { applyWasteIssueReturnMovement } from '../../wastes/wasteMovementService.js';
+import { applyWasteMovement } from '../../wastes/wasteMovementService.js';
+import { INVENTORY_MOVEMENT_TYPES } from '../../../../constants/inventory.js';
 import { findWasteIssueFulfillmentStatusIds } from '../wasteIssueFulfillmentService.js';
 
 const serviceLogger = createServiceLogger('warehouse.wasteIssues.wasteIssueReturnService');
@@ -34,15 +35,16 @@ const returnWasteIssueDetailTransaction = ({ id, detailId, returnDto, userId }) 
     }
 
     const newTotalReturnedQuantity = returnedQuantity + returnQuantity;
-    const movement = await applyWasteIssueReturnMovement({
+    const movement = await applyWasteMovement({
         tx,
-        wasteIssueId: id,
-        detail: {
+        reference: { wasteIssueId: id },
+        movementType: INVENTORY_MOVEMENT_TYPES.ENTRY,
+        details: [{
             wasteId: detail.wasteId,
             wasteIssueDetailId: detail.id,
             quantity: returnQuantity,
             convertedQuantity: Number(detail.convertedQuantity) * returnQuantity / Number(detail.quantity)
-        }
+        }]
     });
     const statusIds = await findWasteIssueFulfillmentStatusIds(tx);
     const isCanceled = newTotalReturnedQuantity >= suppliedQuantity;

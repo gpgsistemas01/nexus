@@ -1,7 +1,7 @@
 import express from 'express';
 import { authorizeUserApi, verifyApiTokenRequired } from '../../../middleware/authMiddleware.js';
-import { editWaste, editWasteStock, getAllWastes, getWasteMaterialTemplates, registerWaste } from '../../../controllers/api/warehouse/wasteController.js';
-import { wasteEditValidation, wasteStockValidation, wasteValidation } from '../../../validators/forms/wasteValidations.js';
+import { editWaste, editWasteStock, getAllWastes, getWasteMaterialTemplates, registerWaste, registerWasteStockAddition } from '../../../controllers/api/warehouse/wasteController.js';
+import { wasteEditValidation, wasteStockAdditionValidation, wasteStockValidation, wasteValidation } from '../../../validators/forms/wasteValidations.js';
 import { validate } from '../../../middleware/validatorMiddleware.js';
 import { PERMISSIONS } from '../../../constants/permissions.js';
 
@@ -37,6 +37,15 @@ router.patch(
     validate,
     authorizeUserApi(PERMISSIONS.WASTES_WRITE),
     editWaste
+);
+
+router.post(
+    '/:id/stock-additions',
+    verifyApiTokenRequired,
+    wasteStockAdditionValidation,
+    validate,
+    authorizeUserApi(PERMISSIONS.WASTES_ADD_STOCK),
+    registerWasteStockAddition
 );
 
 router.patch(

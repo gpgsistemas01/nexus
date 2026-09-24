@@ -5,7 +5,6 @@ import { createDataTable } from '../../core/base/createDataTable.js';
 import { renderActionButtons } from '../../core/base/actionButtons.js';
 import { setupTableFilters } from "../../core/filters/tableFilter.js";
 import { getAllWastes } from "../../../../application/warehouse/wastes/wastes.js";
-import { openWasteModal } from "../../../../pages/warehouse/wastes/wasteModal.js";
 import { getResponsiveRowData } from '../../core/responsive/rowData.js';
 import { hasPermission, UI_PERMISSIONS } from "../../../../constants/permissions.js";
 import { DATATABLE_SELECTORS } from "../../../../constants/selectors.js";
@@ -17,11 +16,12 @@ import { formatFileName } from "../../../../utils/formatters.js";
 const selectorTable = DATATABLE_SELECTORS.MAIN;
 const tableElement = document.querySelector(selectorTable);
 
-export const createWasteDatatable = async (context) => {
+export const createWasteDatatable = async ({ context, openWasteModal, openWasteStockAdditionModal }) => {
     const canSeeCost = hasPermission(context, UI_PERMISSIONS.INVENTORY_COSTS_READ);
     const canSeeActive = hasPermission(context, UI_PERMISSIONS.CATALOGS_MANAGE);
     const canManageWastes = hasPermission(context, UI_PERMISSIONS.WASTES_WRITE);
     const canAdjustStock = hasPermission(context, UI_PERMISSIONS.WASTES_ADJUST_STOCK);
+    const canAddStock = hasPermission(context, UI_PERMISSIONS.WASTES_ADD_STOCK);
 
     renderWarehouseInventoryHeader({
         tableElement,
@@ -41,7 +41,8 @@ export const createWasteDatatable = async (context) => {
         renderActions: () => renderActionButtons({
             status: 'Abierta',
             context: 'waste',
-            canAdjustStock
+            canAdjustStock,
+            canAddStock
         })
     });
 
@@ -90,6 +91,11 @@ export const createWasteDatatable = async (context) => {
         const data = getResponsiveRowData(table, this);
 
         await openWasteModal({ mode: FORM_MODES.EDIT_STOCK, data });
+    });
+
+    $(`${ selectorTable } tbody`).on(DOM_EVENT_NAMES.CLICK, '.btn-add-stock', async function() {
+        const data = getResponsiveRowData(table, this);
+        openWasteStockAdditionModal({ data });
     });
 
     return table;

@@ -1,6 +1,6 @@
 import { successCodeMessages } from '../../../messages/codeMessages.js';
-import { createWasteWithInitialStockAdjustment, findAllWastes, updateWaste, updateWasteStock } from '../../../services/warehouse/wastes/wasteService.js';
-import { createWasteDtoForEdit, createWasteDtoForRegister, createWasteDtoForStockUpdate } from '../../../dtos/wasteDTO.js';
+import { addWasteStock, createWasteWithInitialStockAdjustment, findAllWastes, updateWaste, updateWasteStock } from '../../../services/warehouse/wastes/wasteService.js';
+import { createWasteDtoForEdit, createWasteDtoForRegister, createWasteDtoForStockAddition, createWasteDtoForStockUpdate } from '../../../dtos/wasteDTO.js';
 import { sanitizeEmptyStrings } from '../../../utils/formattersUtils.js';
 import { getDataTableOrder, getDataTablePaging, getDataTableSearch } from '../../../utils/requestQueryUtils.js';
 import { emitInventoryUpdated } from '../../../utils/socketUtils.js';
@@ -95,4 +95,13 @@ export const editWasteStock = async (req, res) => {
         waste,
         code: successCodeMessages.UPDATED_WASTE
     });
+};
+
+export const registerWasteStockAddition = async (req, res) => {
+    const entryDto = createWasteDtoForStockAddition(req.body);
+    const waste = await addWasteStock({ id: req.params.id, entryDto, userId: req.user.id });
+
+    emitInventoryUpdated({ context: 'waste', source: 'waste-stock-added' });
+
+    return res.status(200).json({ waste, code: successCodeMessages.UPDATED_WASTE });
 };
