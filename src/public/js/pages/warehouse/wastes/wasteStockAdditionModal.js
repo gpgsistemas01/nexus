@@ -15,7 +15,17 @@ export const openWasteStockAdditionModal = ({ data }) => {
         data
     });
     document.querySelector('#wasteStockAdditionName').textContent = buildInventorySelectText(data);
-    document.querySelector('#wasteStockAdditionCurrentStock').textContent = formatDecimal(getCurrentStock(data));
+    const currentStock = Number(getCurrentStock(data));
+    const quantityInput = document.querySelector('#wasteStockAdditionQuantityInput');
+    const resultingStock = document.querySelector('#wasteStockAdditionResultingStock');
+    const updateResultingStock = () => {
+        const quantity = Number(quantityInput.value);
+        resultingStock.textContent = formatDecimal(currentStock + (Number.isFinite(quantity) ? quantity : 0));
+    };
+
+    document.querySelector('#wasteStockAdditionCurrentStock').textContent = formatDecimal(currentStock);
+    quantityInput.oninput = updateResultingStock;
+    updateResultingStock();
     form.querySelector(BUTTON_SELECTORS.SUBMIT).textContent = 'Agregar';
 
     openModal(modal);

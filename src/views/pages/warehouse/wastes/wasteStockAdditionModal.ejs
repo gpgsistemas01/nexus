@@ -41,11 +41,21 @@
                     ]
                 },
                 {
+                    type: 'html',
+                    col: 'col-12',
+                    content: include('../../../shared/forms/informativeValue', {
+                        value: {
+                            id: 'wasteStockAdditionResultingStock',
+                            label: 'Existencia resultante'
+                        }
+                    })
+                },
+                {
                     type: 'textarea',
                     input: {
                         id: 'wasteStockAdditionObservationsInput',
                         name: 'observations',
-                        label: 'Observaciones de la entrada (opcional)'
+                        label: 'Observaciones'
                     }
                 }
             ]
