@@ -1,7 +1,7 @@
 <a id="CAP-CAT-WAS-05-ADD-STOCK"></a>
 # 18. CAP-CAT-WAS-05-ADD-STOCK — Agregar existencia
 
-**Caso de uso:** `CU-ALM-16` — Agregar existencia de merma.
+**Caso de uso:** `CU-ALM-13` — Agregar existencia de merma.
 
 1. En la fila de la merma, seleccione **Agregar stock**.
 2. En el modal **Agregar stock de merma**, compruebe la merma seleccionada y su **Existencia actual**. Estos valores son informativos y no pueden modificarse desde esta operación.

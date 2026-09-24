@@ -6,8 +6,8 @@ Aceptada el 4 de septiembre de 2026.
 
 ## Contexto
 
-Las 72 secuencias frontend y las 72 secuencias backend estaban almacenadas en dos
-archivos monolíticos. La separación por perspectiva era correcta, pero localizar o
+Las secuencias frontend y backend estaban almacenadas en dos archivos monolíticos. La
+separación por perspectiva era correcta, pero localizar o
 modificar un grupo exigía recorrer más de dos mil líneas y concentraba cambios
 independientes en la misma fuente.
 
@@ -19,7 +19,7 @@ arquitectura puede ensamblar varias fuentes sin convertirlas en entregas indepen
 
 1. **Conservar dos archivos únicos:** mantiene pocas rutas, pero dificulta navegación y
    concentra conflictos.
-2. **Crear un archivo por caso:** maximiza aislamiento, pero produce 126 archivos y
+2. **Crear un archivo por caso:** maximiza aislamiento, pero produce más de cien archivos y
    fragmenta excesivamente la lectura.
 3. **Mezclar frontend y backend por grupo:** acerca las dos perspectivas, pero diluye sus
    responsabilidades y reglas de detalle propias.

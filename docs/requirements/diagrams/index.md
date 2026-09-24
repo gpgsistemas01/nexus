@@ -159,7 +159,7 @@ diagramas de secuencia o estados se reservan para explicar coordinación adicion
 
 ## Organización visual de los casos
 
-Los flujos conservan los cinco grupos funcionales propietarios del catálogo y se leen
+Los flujos conservan los seis grupos funcionales propietarios del catálogo y se leen
 dentro de las familias por entidad definidas en el
 [criterio de agrupación vigente](../use-cases/index.md#criterio-de-agrupación-vigente).
 La familia sólo permite localizar casos relacionados: cada encabezado y cada diagrama
@@ -187,7 +187,8 @@ y la fuente curada de cada ficha es el
 
 - [AUT — Autenticación](authentication/index.md)
 - [IDA — Identidad y acceso](identity-access/index.md)
-- [CAT — Catálogos](catalogs/index.md)
+- [ALM — Almacén](catalogs/index.md#grupo-funcional-alm--almacén)
+- [CAT — Catálogos](catalogs/index.md#grupo-funcional-cat--catálogos)
 - [ENT — Compras de material](purchases/index.md)
 - [SAL — Salidas de material y de merma](issues/index.md)
 - [Vistas transversales y restricciones](cross-cutting/index.md)

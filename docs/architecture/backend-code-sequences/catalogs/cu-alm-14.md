@@ -1,23 +1,23 @@
 <a id="cu-alm-14"></a>
-# `CU-ALM-14` — Consultar movimientos de mermas
+# `CU-ALM-14` — Generar reporte de mermas
 
-**Patrones:** `BE-P06`.
+**Patrones:** `BE-P07`.
 
 ```mermaid
 sequenceDiagram
     participant Client as Cliente HTTP / web
-    participant Route as src/routes/api/admin/movementApiRoute.js
-    participant Controller@{ "type": "control" } as src/controllers/api/admin/movementController.js
-    participant Domain as src/services/inventory/movementQueryService.js
+    participant Route as src/routes/api/warehouse/reportApiRoute.js
+    participant Controller@{ "type": "control" } as src/controllers/api/warehouse/reportController.js
+    participant Domain as src/services/warehouse/reportService.js<br/>src/utils/reportExcelUtils.js
     participant ErrorHandler as src/app.js
 
-    Client->>Route: GET /api/admin/movements/wastes
-    Route->>Controller: getAllWasteMovements(req, res)
+    Client->>Route: GET /api/warehouse/reports/wastes/excel
+    Route->>Controller: exportWasteReportExcel(req, res)
     activate Controller
-    Controller->>Domain: findAllWasteMovements(getMovementListParams(req))
+    Controller->>Domain: reportService.findWasteReportRows({ query: req.query }) y sendExcelReport
     activate Domain
     alt Servicio resuelto
-        Domain-->>Controller: findAllWasteMovements() devuelve { data, recordsTotal, recordsFiltered } para la tabla solicitada
+        Domain-->>Controller: reportService.findWasteReportRows() devuelve filas filtradas que sendExcelReport convierte en el archivo Excel
         Controller-->>Client: HTTP 2xx { code, data }
     else AppError propagado
         Domain-->>Controller: throw AppError { code, message, meta, statusCode }

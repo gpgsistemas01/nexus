@@ -34,7 +34,7 @@ negocio que deciden sus variantes, rechazos o efectos. Una referencia no reempla
 paso observable; la ficha debe expresar también dónde valida Nexus la regla y qué
 resultado conserva cuando se incumple.
 
-Las reglas transversales siguientes no se repiten en las 72 fichas vigentes. Aplican por
+Las reglas transversales siguientes no se repiten en las 73 fichas vigentes. Aplican por
 la naturaleza de la interacción y se revisan junto con sus precondiciones y excepciones:
 
 | Alcance de casos de uso | Requisitos y reglas aplicables |
@@ -54,7 +54,7 @@ con los objetivos vigentes se interpreta así:
 | `RF-CAT-005`, `RF-CAT-019` a `RF-CAT-021` | Altas y ediciones que consumen presentaciones, unidades, motivos o estados como selectores; su administración corresponde a `CU-CAT-09` a `CU-CAT-26`. |
 | `RF-REC-006` | `CU-ALM-02` y `CU-ENT-02`: una marca que distingue físicamente el material se resuelve en el catálogo antes de recibirlo. |
 | `RF-WST-001` y `RF-WST-007` | `CU-ALM-09` consulta existencias del catálogo de mermas; `CU-SAL-08` consulta documentos de salida de merma. Los identificadores no se intercambian aunque ambos recorridos sean consultas. |
-| `RF-REP-003`, `RF-REP-006`, `RF-REP-007` y `RF-REP-009` | `CU-ALM-13`, reporte de mermas; complementan sus requisitos relacionados sin crear otra exportación. |
+| `RF-REP-003`, `RF-REP-006`, `RF-REP-007` y `RF-REP-009` | `CU-ALM-14`, reporte de mermas; complementan sus requisitos relacionados sin crear otra exportación. |
 | `RF-MER-001` a `RF-MER-009` | `CU-ALM-10` a `CU-ALM-12` y, para cantidad convertida, `CU-SAL-12` y `CU-SAL-13`; las fichas enlazan cada restricción que modifica su flujo. |
 | `RF-ADJ-001` y `RF-ADJ-002` | `CU-ALM-05` y `CU-ALM-12`, ajustes de material y merma respectivamente. |
 | `RF-REQ-001`, `RF-PRJ-001` y `RF-PRJ-002` | No se asignan a un `CU-*` vigente mientras permanezcan fuera de alcance o modelados. |

@@ -9,4 +9,4 @@ cada `CU-*` dentro del rango identifica un diagrama individual.
 El **tipo semántico** prevalece sobre la directiva Mermaid. Un `flowchart` puede
 representar contexto, actividad, dependencia, navegación o trazabilidad; no se etiqueta
 como “diagrama de flujo” genérico si las flechas tienen otra semántica. El inventario
-registra **276 diagramas vigentes**: 270 curados y 6 generados.
+registra **298 diagramas vigentes**: 292 curados y 6 generados.
