@@ -8,6 +8,7 @@ const mocks = vi.hoisted(() => ({
     registerUserRequest: vi.fn()
   },
   waste: {
+    addWasteStockRequest: vi.fn(),
     editWasteRequest: vi.fn(),
     editWasteStockRequest: vi.fn(),
     getAllWastesRequest: vi.fn(),
@@ -40,7 +41,7 @@ beforeEach(() => {
 describe('consistencia del CRUD entre contextos de aplicación', () => {
   it.each([
     ['usuarios', users, ['editUser', 'editUserPassword', 'getAllUsers', 'registerUser']],
-    ['mermas', wastes, ['editWaste', 'editWasteStock', 'getAllWastes', 'getWasteMaterialTemplates', 'registerWaste']],
+    ['mermas', wastes, ['addWasteStock', 'editWaste', 'editWasteStock', 'getAllWastes', 'getWasteMaterialTemplates', 'registerWaste']],
     [
       'entradas de compra',
       goodsReceipts,
@@ -99,6 +100,7 @@ describe('consistencia del CRUD entre contextos de aplicación', () => {
 
     await users.editUserPassword({ formData: { password: 'new-password' }, id: 'user-1' });
     await wastes.editWasteStock({ formData: { newStock: 4 }, id: 'waste-1' });
+    await wastes.addWasteStock({ formData: { quantity: 2 }, id: 'waste-1' });
     const correction = await goodsReceipts.correctGoodsReceiptDetail({
       formData: { quantity: 3 },
       id: 'receipt-1',
@@ -111,6 +113,9 @@ describe('consistencia del CRUD entre contextos de aplicación', () => {
     });
     expect(mocks.waste.editWasteStockRequest).toHaveBeenCalledWith({
       data: { newStock: 4 }, id: 'waste-1'
+    });
+    expect(mocks.waste.addWasteStockRequest).toHaveBeenCalledWith({
+      data: { quantity: 2 }, id: 'waste-1'
     });
     expect(mocks.goodsReceipt.correctGoodsReceiptDetailRequest).toHaveBeenCalledWith({
       data: { quantity: 3 }, id: 'receipt-1', detailId: 'detail-1'

@@ -443,6 +443,20 @@ erDiagram
         DateTime createdAt
         DateTime updatedAt
     }
+    WasteStockEntry {
+        String id PK
+        String referenceNumber UK
+        String wasteId FK
+        String createdById FK
+        String wasteMovementId UK,FK
+        String materialName
+        Decimal quantity
+        Decimal previousStock
+        Decimal newStock
+        String observations
+        DateTime createdAt
+        DateTime updatedAt
+    }
     WasteStockAdjustment {
         String id PK
         String referenceNumber UK
@@ -482,6 +496,8 @@ erDiagram
     WasteStockAdjustmentDetail o|--o{ WasteMovementDetail : "wasteStockAdjustmentDetail"
     WasteMovement ||--o{ WasteMovementDetail : "movement"
     WasteIssueDetail o|--o{ WasteMovementDetail : "wasteIssueDetail"
+    Waste ||--o{ WasteStockEntry : "waste"
+    WasteMovement ||--o{ WasteStockEntry : "movement"
     WasteMovement o|--o{ WasteStockAdjustment : "movement"
     WasteStockAdjustment ||--o{ WasteStockAdjustmentDetail : "wasteStockAdjustment"
     Waste ||--o{ WasteStockAdjustmentDetail : "waste"
@@ -503,6 +519,7 @@ erDiagram
     StockAdjustmentReason ||--o{ WasteStockAdjustment : "reason"
     User ||--o{ WasteStockAdjustment : "createdBy"
     User o|--o{ WasteStockAdjustment : "approvedBy"
+    User ||--o{ WasteStockEntry : "createdBy"
     User ||--o{ WasteIssue : "createdBy"
     Department ||--o{ WasteIssue : "department"
     Person ||--o{ WasteIssue : "requester"

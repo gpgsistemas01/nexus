@@ -10,8 +10,7 @@ useForm({
     selector: FORM_SELECTORS.WASTE,
     normalizeData: ({ form, formData }) => {
 
-        const fields = isStockMode(form.dataset.mode)
-            ? wasteStockFields
+        const fields = isStockMode(form.dataset.mode) ? wasteStockFields
             : isEditMode(form.dataset.mode) ? wasteEditFields : wasteCreateFields;
 
         if (!isStockMode(form.dataset.mode)) {
@@ -34,6 +33,8 @@ useForm({
         form,
         formData,
         create: registerWaste,
-        update: isStockMode(form.dataset.mode) ? editWasteStock : editWaste
+        update: isStockMode(form.dataset.mode)
+            ? editWasteStock
+            : editWaste
     })
 });

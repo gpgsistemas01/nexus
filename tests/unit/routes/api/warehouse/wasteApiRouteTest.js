@@ -9,11 +9,13 @@ const validate = vi.fn();
 const wasteValidation = [vi.fn()];
 const wasteEditValidation = [vi.fn()];
 const wasteStockValidation = [vi.fn()];
+const wasteStockAdditionValidation = [vi.fn()];
 const getWasteMaterialTemplates = vi.fn();
 const getAllWastes = vi.fn();
 const registerWaste = vi.fn();
 const editWaste = vi.fn();
 const editWasteStock = vi.fn();
+const registerWasteStockAddition = vi.fn();
 
 vi.mock('express', () => ({
   default: {
@@ -30,6 +32,7 @@ vi.mock('../../../../../src/middleware/validatorMiddleware.js', () => ({ validat
 
 vi.mock('../../../../../src/validators/forms/wasteValidations.js', () => ({
   wasteEditValidation,
+  wasteStockAdditionValidation,
   wasteStockValidation,
   wasteValidation
 }));
@@ -39,7 +42,8 @@ vi.mock('../../../../../src/controllers/api/warehouse/wasteController.js', () =>
   editWasteStock,
   getAllWastes,
   getWasteMaterialTemplates,
-  registerWaste
+  registerWaste,
+  registerWasteStockAddition
 }));
 
 const { PERMISSIONS } = await import('../../../../../src/constants/permissions.js');
@@ -63,6 +67,14 @@ describe('wasteApiRoute', () => {
       validate,
       `authorize:${ PERMISSIONS.WASTES_WRITE }`,
       editWaste
+    );
+    expect(post).toHaveBeenCalledWith(
+      '/:id/stock-additions',
+      verifyApiTokenRequired,
+      wasteStockAdditionValidation,
+      validate,
+      `authorize:${ PERMISSIONS.WASTES_ADD_STOCK }`,
+      registerWasteStockAddition
     );
     expect(patch).toHaveBeenCalledWith(
       '/:id/stock',

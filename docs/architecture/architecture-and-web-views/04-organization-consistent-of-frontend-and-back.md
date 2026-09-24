@@ -118,6 +118,22 @@ al alternar los campos dimensionales durante altas, ediciones o ajustes. En las 
 la coordinación específica permanece en los módulos hermanos de formulario y modal; el
 archivo `Page` sólo los compone con el DataTable. Las operaciones realmente comunes del
 formulario están en `ui/issues/issueFormUI.js`.
+
+La entrada incremental no reutiliza el modal CRUD de merma: `wasteStockAdditionModal`
+presenta únicamente la identidad y la existencia actual como datos informativos, y
+`wasteStockAdditionForm` captura cantidad y observaciones. Ambos permanecen junto al
+recurso porque conocen la operación de merma, pero componen el mismo modal de layout,
+controles de formulario, ciclo `useForm` y aplicación que las demás mutaciones. La vista
+EJS incluye los parciales y carga únicamente el entry point de la página. Éste importa
+los formularios y entrega las aperturas de modal al DataTable, igual que los flujos de
+página compuestos, evitando múltiples puntos de entrada para una misma pantalla.
+La misma regla se aplica a clientes, proveedores, materiales, compras y salidas: cada
+EJS publica un único `script type="module"` y su archivo `*Page.js` registra tanto el
+formulario propietario como los formularios de modales auxiliares incluidos en la vista.
+La identidad y la existencia se renderizan con el parcial informativo compartido como
+texto (`span`), no como inputs deshabilitados, porque no forman parte del envío. Sólo
+cantidad y observaciones son controles del formulario; el modal no agrega una descripción
+redundante sobre esos datos.
 La presentación de sus modos se resuelve mediante una configuración única por modo;
 la inicialización calcula una sola vez el estado deshabilitado del formulario y delega
 una sola vez el estado del encabezado. Así, salidas de material y de merma comparten las

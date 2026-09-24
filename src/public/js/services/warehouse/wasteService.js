@@ -32,3 +32,9 @@ export const editWasteStockRequest = ({ data, id }) => apiRequest({
     url: `${ WASTES_API_ROUTE }/${ id }/stock`,
     data
 });
+
+export const addWasteStockRequest = ({ data, id }) => apiRequest({
+    method: 'post',
+    url: `${ WASTES_API_ROUTE }/${ id }/stock-additions`,
+    data
+});

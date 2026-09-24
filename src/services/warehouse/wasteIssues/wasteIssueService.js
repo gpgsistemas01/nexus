@@ -1,4 +1,5 @@
 import { DOCUMENT_REFERENCE_TYPES } from '../../../constants/documentReferenceTypes.js';
+import { INVENTORY_MOVEMENT_TYPES } from '../../../constants/inventory.js';
 import { PRISMA_ERROR_CODES } from '../../../constants/prisma.js';
 import { FULFILLMENT_STATUS_NAMES, GOODS_ISSUE_STATUS_NAMES } from '../../../constants/warehouseStatuses.js';
 import {
@@ -20,7 +21,7 @@ import {
     resolveIssueDetailFulfillmentStatus,
     resolveIssueFulfillmentStatus
 } from '../issues/issueFulfillmentRules.js';
-import { applyWasteIssueMovement } from '../wastes/wasteMovementService.js';
+import { applyWasteMovement } from '../wastes/wasteMovementService.js';
 import { calculateConvertedQuantity } from '../../inventory/stockHelpers.js';
 import { createServiceLogger } from '../../../utils/logger.js';
 import { executeServiceOperation } from '../../serviceErrorHandler.js';
@@ -364,10 +365,11 @@ const updateWasteIssueDetailsTransaction = async ({ id, wasteIssueDto }) => getD
         });
     }
 
-    await applyWasteIssueMovement({
+    await applyWasteMovement({
         tx,
-        wasteIssueId: issue.id,
-        details: supplyDetails
+        reference: { wasteIssueId: issue.id },
+        details: supplyDetails,
+        movementType: INVENTORY_MOVEMENT_TYPES.ISSUE
     });
 
     const details = await tx.wasteIssueDetail.findMany({ where: { wasteIssueId: id } });

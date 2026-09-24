@@ -3,6 +3,7 @@ export const FORM_MODES = Object.freeze({
     EDIT: 'edit',
     EDIT_PASSWORD: 'edit-password',
     EDIT_STOCK: 'edit-stock',
+    ADD_STOCK: 'add-stock',
     EDIT_DETAIL: 'edit-detail',
     EDIT_HEADER: 'edit-header',
     RETURN: 'return',
@@ -18,3 +19,4 @@ export const ISSUE_HEADER_ENABLED_MODES = Object.freeze([
 export const isCreateMode = (mode) => mode === FORM_MODES.CREATE;
 export const isEditMode = (mode) => mode === FORM_MODES.EDIT;
 export const isStockMode = (mode) => mode === FORM_MODES.EDIT_STOCK;
+export const isAddStockMode = (mode) => mode === FORM_MODES.ADD_STOCK;

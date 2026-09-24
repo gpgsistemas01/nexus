@@ -2,6 +2,7 @@ import { FULFILLMENT_STATUS_NAMES, GOODS_ISSUE_STATUS_NAMES } from '../../../../
 import { GOODS_RECEIPT_STATUS_LABELS } from '../../../../constants/goodsReceiptStatuses.js';
 import {
     buildMdbAdjustStockActionButton,
+    buildMdbAddStockActionButton,
     buildMdbDeleteActionButton,
     buildMdbEditActionButton,
     buildMdbReturnActionButton,
@@ -18,6 +19,7 @@ const ACTION_BUTTONS = Object.freeze({
     view: buildMdbViewActionButton({ className: 'btn-edit', label: 'Ver registro' }),
     edit: buildMdbEditActionButton({ className: 'btn-edit', label: 'Editar registro' }),
     adjustStock: buildMdbAdjustStockActionButton({ className: 'btn-adjust-stock', label: 'Ajustar stock' }),
+    addStock: buildMdbAddStockActionButton({ className: 'btn-add-stock', label: 'Agregar stock' }),
     deleteMaterial: buildMdbDeleteActionButton({ className: 'btn-delete-material', label: 'Eliminar material' }),
     deleteWaste: buildMdbDeleteActionButton({ className: 'btn-delete-waste', label: 'Eliminar merma' }),
     supplyDetail: buildMdbSupplyActionButton({ className: 'btn-edit-detail', label: 'Surtir detalle' }),
@@ -36,6 +38,7 @@ export const renderActionButtons = (options = {}) => {
         canManage = true,
         canSupply = true,
         canAdjustStock = false,
+        canAddStock = false,
         canDeleteMaterial = false,
         canDeleteWaste = false
     } = normalizeActionButtonOptions(options);
@@ -56,6 +59,7 @@ export const renderActionButtons = (options = {}) => {
             || EDITABLE_ACTION_CONTEXTS.has(context)
         ), ACTION_BUTTONS.edit],
         [isInventoryItem && canAdjustStock, ACTION_BUTTONS.adjustStock],
+        [context === 'waste' && canAddStock, ACTION_BUTTONS.addStock],
         [context === 'material' && canDeleteMaterial, ACTION_BUTTONS.deleteMaterial],
         [context === 'waste' && canDeleteWaste, ACTION_BUTTONS.deleteWaste],
         [canSupply && isIssue && isApproved && SUPPLY_FULFILLMENT_STATUSES.has(fulfillmentStatus), ACTION_BUTTONS.supplyDetail],

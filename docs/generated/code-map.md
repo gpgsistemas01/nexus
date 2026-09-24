@@ -17,25 +17,25 @@ flowchart LR
     controllers["controllers (35 módulos)"] --> constants["constants (10 módulos)"]
     controllers["controllers (35 módulos)"] --> dtos["dtos (10 módulos)"]
     controllers["controllers (35 módulos)"] --> messages["messages (2 módulos)"]
-    controllers["controllers (35 módulos)"] --> services["services (51 módulos)"]
+    controllers["controllers (35 módulos)"] --> services["services (52 módulos)"]
     controllers["controllers (35 módulos)"] --> utils["utils (11 módulos)"]
     dtos["dtos (10 módulos)"] --> utils["utils (11 módulos)"]
     errors["errors (18 módulos)"] --> messages["messages (2 módulos)"]
-    errors["errors (18 módulos)"] --> public["public (185 módulos)"]
+    errors["errors (18 módulos)"] --> public["public (187 módulos)"]
     middleware["middleware (5 módulos)"] --> constants["constants (10 módulos)"]
     middleware["middleware (5 módulos)"] --> messages["messages (2 módulos)"]
-    middleware["middleware (5 módulos)"] --> services["services (51 módulos)"]
+    middleware["middleware (5 módulos)"] --> services["services (52 módulos)"]
     middleware["middleware (5 módulos)"] --> utils["utils (11 módulos)"]
     repository["repository (1 módulos)"] --> lib["lib (2 módulos)"]
     routes["routes (39 módulos)"] --> constants["constants (10 módulos)"]
     routes["routes (39 módulos)"] --> controllers["controllers (35 módulos)"]
     routes["routes (39 módulos)"] --> middleware["middleware (5 módulos)"]
     routes["routes (39 módulos)"] --> validators["validators (15 módulos)"]
-    services["services (51 módulos)"] --> constants["constants (10 módulos)"]
-    services["services (51 módulos)"] --> dtos["dtos (10 módulos)"]
-    services["services (51 módulos)"] --> errors["errors (18 módulos)"]
-    services["services (51 módulos)"] --> repository["repository (1 módulos)"]
-    services["services (51 módulos)"] --> utils["utils (11 módulos)"]
+    services["services (52 módulos)"] --> constants["constants (10 módulos)"]
+    services["services (52 módulos)"] --> dtos["dtos (10 módulos)"]
+    services["services (52 módulos)"] --> errors["errors (18 módulos)"]
+    services["services (52 módulos)"] --> repository["repository (1 módulos)"]
+    services["services (52 módulos)"] --> utils["utils (11 módulos)"]
     utils["utils (11 módulos)"] --> constants["constants (10 módulos)"]
     utils["utils (11 módulos)"] --> errors["errors (18 módulos)"]
     validators["validators (15 módulos)"] --> constants["constants (10 módulos)"]
@@ -46,7 +46,7 @@ flowchart LR
 > explican en la documentación curada, porque una lista automática no describe sus
 > decisiones de diseño.
 
-## Endpoints API (64)
+## Endpoints API (65)
 
 | Método | Ruta | Definición |
 | --- | --- | --- |
@@ -66,6 +66,7 @@ flowchart LR
 | `GET` | `/api/warehouse/wastes` | [`src/routes/api/warehouse/wasteApiRoute.js`](../../src/routes/api/warehouse/wasteApiRoute.js) |
 | `POST` | `/api/warehouse/wastes` | [`src/routes/api/warehouse/wasteApiRoute.js`](../../src/routes/api/warehouse/wasteApiRoute.js) |
 | `PATCH` | `/api/warehouse/wastes/:id` | [`src/routes/api/warehouse/wasteApiRoute.js`](../../src/routes/api/warehouse/wasteApiRoute.js) |
+| `POST` | `/api/warehouse/wastes/:id/stock-additions` | [`src/routes/api/warehouse/wasteApiRoute.js`](../../src/routes/api/warehouse/wasteApiRoute.js) |
 | `PATCH` | `/api/warehouse/wastes/:id/stock` | [`src/routes/api/warehouse/wasteApiRoute.js`](../../src/routes/api/warehouse/wasteApiRoute.js) |
 | `GET` | `/api/warehouse/waste-issues` | [`src/routes/api/warehouse/wasteIssueApiRoute.js`](../../src/routes/api/warehouse/wasteIssueApiRoute.js) |
 | `POST` | `/api/warehouse/waste-issues` | [`src/routes/api/warehouse/wasteIssueApiRoute.js`](../../src/routes/api/warehouse/wasteIssueApiRoute.js) |
@@ -169,7 +170,7 @@ cuando el flujo necesita una vista curada.
 | [`src/controllers/api/warehouse/reportController.js`](../../src/controllers/api/warehouse/reportController.js) | `exportGoodsIssueReportExcel`, `exportGoodsReceiptReportExcel`, `exportSupplierReportExcel`, `exportWarehouseReportExcel`, `exportWasteIssueReportExcel`, `exportWasteReportExcel` |
 | [`src/controllers/api/warehouse/supplierController.js`](../../src/controllers/api/warehouse/supplierController.js) | `editSupplier`, `getAllSuppliers`, `registerSupplier` |
 | [`src/controllers/api/warehouse/unitMeasureController.js`](../../src/controllers/api/warehouse/unitMeasureController.js) | `getAllUnitMeasures` |
-| [`src/controllers/api/warehouse/wasteController.js`](../../src/controllers/api/warehouse/wasteController.js) | `editWaste`, `editWasteStock`, `getAllWastes`, `getWasteMaterialTemplates`, `registerWaste` |
+| [`src/controllers/api/warehouse/wasteController.js`](../../src/controllers/api/warehouse/wasteController.js) | `editWaste`, `editWasteStock`, `getAllWastes`, `getWasteMaterialTemplates`, `registerWaste`, `registerWasteStockAddition` |
 | [`src/controllers/api/warehouse/wasteIssueController.js`](../../src/controllers/api/warehouse/wasteIssueController.js) | `editWasteIssue`, `editWasteIssueDetails`, `editWasteIssueHeader`, `getAllWasteIssues`, `registerWasteIssue`, `registerWasteIssueDetailReturn` |
 | [`src/controllers/web/admin/catalogController.js`](../../src/controllers/web/admin/catalogController.js) | `getCatalogsPage` |
 | [`src/controllers/web/admin/movementController.js`](../../src/controllers/web/admin/movementController.js) | `getMaterialMovementPage`, `getWasteMovementPage` |
@@ -242,6 +243,7 @@ sólo cuando aportan información que el código no expresa por sí mismo.
 | [`src/services/warehouse/wasteIssues/wasteIssueService.js`](../../src/services/warehouse/wasteIssues/wasteIssueService.js) | `createWasteIssue`, `findAllWasteIssues`, `updateWasteIssue`, `updateWasteIssueDetails`, `updateWasteIssueHeader` |
 | [`src/services/warehouse/wastes/wasteInventoryService.js`](../../src/services/warehouse/wastes/wasteInventoryService.js) | `applyWasteStockChange` |
 | [`src/services/warehouse/wastes/wasteMaterialService.js`](../../src/services/warehouse/wastes/wasteMaterialService.js) | `findWasteMaterialTemplates`, `resolveWasteMaterialSnapshot` |
-| [`src/services/warehouse/wastes/wasteMovementService.js`](../../src/services/warehouse/wastes/wasteMovementService.js) | `applyWasteIssueMovement`, `applyWasteIssueReturnMovement`, `createWasteMovement` |
-| [`src/services/warehouse/wastes/wasteService.js`](../../src/services/warehouse/wastes/wasteService.js) | `createWasteWithInitialStockAdjustment`, `findAllWastes`, `updateWaste`, `updateWasteStock` |
+| [`src/services/warehouse/wastes/wasteMovementService.js`](../../src/services/warehouse/wastes/wasteMovementService.js) | `applyWasteMovement`, `createWasteMovement` |
+| [`src/services/warehouse/wastes/wasteService.js`](../../src/services/warehouse/wastes/wasteService.js) | `addWasteStock`, `createWasteWithInitialStockAdjustment`, `findAllWastes`, `updateWaste`, `updateWasteStock` |
 | [`src/services/warehouse/wastes/wasteStockAdjustmentService.js`](../../src/services/warehouse/wastes/wasteStockAdjustmentService.js) | `registerWasteStockAdjustment` |
+| [`src/services/warehouse/wastes/wasteStockEntryService.js`](../../src/services/warehouse/wastes/wasteStockEntryService.js) | `registerWasteStockEntry` |

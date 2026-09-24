@@ -90,7 +90,8 @@ const WASTE_MOVEMENT_DETAIL_SELECT = {
             createdAt: true,
             referenceNumber: true,
             wasteIssue: { select: REFERENCE_NUMBER_SELECT },
-            wasteStockAdjustment: { select: REFERENCE_NUMBER_SELECT }
+            wasteStockAdjustment: { select: REFERENCE_NUMBER_SELECT },
+            wasteStockEntry: { select: REFERENCE_NUMBER_SELECT }
         }
     }
 };
@@ -233,6 +234,7 @@ const mapWasteMovementDetail = (detail) => ({
     referenceNumber:
         detail.movement.wasteIssue?.referenceNumber ||
         detail.movement.wasteStockAdjustment?.referenceNumber ||
+        detail.movement.wasteStockEntry?.referenceNumber ||
         detail.movement.referenceNumber,
     materialName: detail.waste.name,
     materialBase: detail.waste.base,
@@ -249,7 +251,8 @@ const getWasteMovementSearchFilter = (search) => !search ? {} : ({
         { waste: { supplier: { tradeName: { contains: search, mode: 'insensitive' } } } },
         { movement: { referenceNumber: { contains: search, mode: 'insensitive' } } },
         { movement: { wasteIssue: { referenceNumber: { contains: search, mode: 'insensitive' } } } },
-        { movement: { wasteStockAdjustment: { referenceNumber: { contains: search, mode: 'insensitive' } } } }
+        { movement: { wasteStockAdjustment: { referenceNumber: { contains: search, mode: 'insensitive' } } } },
+        { movement: { wasteStockEntry: { referenceNumber: { contains: search, mode: 'insensitive' } } } }
     ]
 });
 

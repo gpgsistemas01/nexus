@@ -72,7 +72,7 @@ para que el administrador pueda revisarlos o reactivarlos.
 
 ### Mermas e inventario
 
-**Propósito.** Consultar y mantener mermas, ajustar existencias y delimitar reportes.
+**Propósito.** Consultar y mantener mermas, agregar o ajustar existencias según el permiso y delimitar reportes.
 
 **Ruta en el menú:** **Menú principal → Almacén → Mermas**.
 
@@ -94,3 +94,4 @@ utilizarla nuevamente en una nueva salida.
 15. [15. CAP-CAT-WAS-02-CREATE — Formulario registro](15-cap-cat-was-02-create.md)
 16. [16. CAP-CAT-WAS-03-EDIT — Formulario edicion](16-cap-cat-was-03-edit.md)
 17. [17. CAP-CAT-WAS-04-STOCK — Ajuste existencia](17-cap-cat-was-04-stock.md)
+18. [18. CAP-CAT-WAS-05-ADD-STOCK — Agregar existencia](18-cap-cat-was-05-add-stock.md)

@@ -18,9 +18,15 @@ const buildWasteSecondaryDataDto = (body = {}) => ({
     ...(Object.prototype.hasOwnProperty.call(body, 'maxUnitCost') ? { maxUnitCost: toNumber(body.maxUnitCost) } : {})
 });
 
+const buildWasteObservationsDto = (body = {}) => (
+    Object.prototype.hasOwnProperty.call(body, 'observations')
+        ? { observations: body.observations ? body.observations.trim() : null }
+        : {}
+);
+
 const buildWasteStockDto = (body = {}, { includeReason = true } = {}) => ({
     newStock: Number(body.newStock),
-    ...Object.prototype.hasOwnProperty.call(body, 'observations') ? { observations: body.observations ? body.observations.trim() : null } : {},
+    ...buildWasteObservationsDto(body),
     ...includeReason && Object.prototype.hasOwnProperty.call(body, 'reasonId') ? { reasonId: body.reasonId } : {}
 });
 
@@ -37,3 +43,8 @@ export const createWasteDtoForEdit = (body = {}) => ({
 });
 
 export const createWasteDtoForStockUpdate = (body = {}) => buildWasteStockDto(body);
+
+export const createWasteDtoForStockAddition = (body = {}) => ({
+    quantity: Number(body.quantity),
+    ...buildWasteObservationsDto(body)
+});

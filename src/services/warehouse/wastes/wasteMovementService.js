@@ -3,61 +3,53 @@ import { getDb } from '../../../repository/baseRepository.js';
 import { WasteIssueStockConflict } from '../../../errors/warehouse/wasteIssueError.js';
 import { applyWasteStockChange } from './wasteInventoryService.js';
 
-export const createWasteMovement = async ({
+export const createWasteMovement = ({
     tx = null,
-    wasteId,
-    wasteStockAdjustmentDetailId = null,
-    difference,
-    previousStock,
-    newStock
+    reference = {},
+    details,
+    movementType
 }) => {
-
     const db = getDb(tx);
 
     return db.wasteMovement.create({
         data: {
-            type: INVENTORY_MOVEMENT_TYPES.ADJUSTMENT,
-            details: { create: {
-                waste: { connect: { id: wasteId } },
-                ...(wasteStockAdjustmentDetailId && {
-                    wasteStockAdjustmentDetail: { connect: { id: wasteStockAdjustmentDetailId } }
-                }),
-                quantity: difference,
-                previousStock,
-                newStock
-            } }
+            ...reference,
+            type: movementType,
+            details: { create: details }
         },
         include: { details: true }
     });
 };
 
-export const applyWasteIssueMovement = async ({
+export const applyWasteMovement = async ({
     tx,
-    wasteIssueId,
-    details
+    reference = {},
+    details,
+    movementType
 }) => {
-
     const movementDetails = [];
+    const isIssue = movementType === INVENTORY_MOVEMENT_TYPES.ISSUE;
 
     for (const detail of details) {
-        const convertedQuantity = detail.convertedQuantity;
+        const signedQuantity = isIssue ? -detail.quantity : detail.quantity;
+        const signedConvertedQuantity = isIssue
+            ? -detail.convertedQuantity
+            : detail.convertedQuantity;
         const stockChange = await applyWasteStockChange({
             tx,
             id: detail.wasteId,
-            quantityChange: -detail.quantity,
-            convertedQuantityChange: -convertedQuantity
+            quantityChange: signedQuantity,
+            convertedQuantityChange: signedConvertedQuantity
         });
 
         if (!stockChange.updated) {
-            throw new WasteIssueStockConflict({
-                materialName: detail.materialName
-            });
+            throw new WasteIssueStockConflict({ materialName: detail.materialName });
         }
 
         movementDetails.push({
             wasteId: detail.wasteId,
-            wasteIssueDetailId: detail.wasteIssueDetailId,
-            quantity: -detail.quantity,
+            ...(detail.wasteIssueDetailId && { wasteIssueDetailId: detail.wasteIssueDetailId }),
+            quantity: signedQuantity,
             previousStock: stockChange.previousStock,
             newStock: stockChange.newStock
         });
@@ -65,43 +57,10 @@ export const applyWasteIssueMovement = async ({
 
     if (!movementDetails.length) return null;
 
-    return tx.wasteMovement.create({
-        data: {
-            type: INVENTORY_MOVEMENT_TYPES.ISSUE,
-            wasteIssueId,
-            details: { create: movementDetails }
-        },
-        include: { details: true }
-    });
-};
-
-export const applyWasteIssueReturnMovement = async ({
-    tx,
-    wasteIssueId,
-    detail
-}) => {
-
-    const stockChange = await applyWasteStockChange({
+    return createWasteMovement({
         tx,
-        id: detail.wasteId,
-        quantityChange: detail.quantity,
-        convertedQuantityChange: detail.convertedQuantity
-    });
-
-    return tx.wasteMovement.create({
-        data: {
-            type: INVENTORY_MOVEMENT_TYPES.ENTRY,
-            wasteIssueId,
-            details: {
-                create: {
-                    wasteId: detail.wasteId,
-                    wasteIssueDetailId: detail.wasteIssueDetailId,
-                    quantity: detail.quantity,
-                    previousStock: stockChange.previousStock,
-                    newStock: stockChange.newStock
-                }
-            }
-        },
-        include: { details: true }
+        reference,
+        details: movementDetails,
+        movementType
     });
 };

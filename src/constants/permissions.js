@@ -29,6 +29,7 @@ export const PERMISSIONS = Object.freeze({
     UNIT_MEASURES_READ: 'unit:measures-read',
     WASTES_READ: 'wastes:read',
     WASTES_WRITE: 'wastes:write',
+    WASTES_ADD_STOCK: 'wastes:add-stock',
     WASTES_ADJUST_STOCK: 'wastes:adjust-stock',
     WASTE_ISSUES_MANAGE: 'waste:issues-manage',
     WASTE_ISSUES_SUPPLY: 'waste:issues-supply',
@@ -245,7 +246,11 @@ export const AUTHORIZATION_POLICIES = Object.freeze({
     [PERMISSIONS.WASTES_WRITE]: createPolicy({
     roles: ['Almacenista', 'Coordinador', 'Auxiliar', 'Administrador del sistema'],
     departments: ['ALMACÉN Y PROVEDURÍA', 'SISTEMAS']
-}),
+    }),
+    [PERMISSIONS.WASTES_ADD_STOCK]: createPolicy({
+        roles: ['Almacenista', 'Coordinador', 'Auxiliar', 'Administrador del sistema'],
+        departments: ['ALMACÉN Y PROVEDURÍA', 'SISTEMAS']
+    }),
     [PERMISSIONS.WASTES_ADJUST_STOCK]: createPolicy({
     roles: ['Administrador del sistema'],
     departments: ['SISTEMAS']

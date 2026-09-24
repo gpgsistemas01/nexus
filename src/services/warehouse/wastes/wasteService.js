@@ -5,6 +5,7 @@ import { toNumber } from '../../../utils/formattersUtils.js';
 import { calculateConvertedQuantity } from '../../inventory/stockHelpers.js';
 import { findInitialStockAdjustmentReason } from '../reasonService.js';
 import { registerWasteStockAdjustment } from './wasteStockAdjustmentService.js';
+import { registerWasteStockEntry } from './wasteStockEntryService.js';
 import { createServiceLogger, getModelLogContext, logServiceError, logServiceInfo } from "../../../utils/logger.js";
 import { PRISMA_ERROR_CODES } from "../../../constants/prisma.js";
 import { resolveWasteMaterialSnapshot } from './wasteMaterialService.js';
@@ -324,5 +325,34 @@ export const updateWasteStock = async ({
             err,
             fallbackError: new WasteStockAdjustmentDatabaseError()
         });
+    }
+};
+
+export const addWasteStock = async ({ id, entryDto, userId }) => {
+    try {
+        const waste = await getDb().$transaction(async (tx) => {
+            const currentWaste = await findWasteById({ tx, id });
+            await registerWasteStockEntry({
+                tx,
+                waste: currentWaste,
+                quantity: entryDto.quantity,
+                observations: entryDto.observations,
+                userId
+            });
+            return findWasteById({ tx, id });
+        });
+
+        logServiceInfo(serviceLogger, {
+            operation: 'warehouse.wasteService.addWasteStock',
+            ...getModelLogContext('wasteStockEntry', { id, userId, ...entryDto })
+        }, 'Stock de merma agregado correctamente');
+
+        return waste;
+    } catch (err) {
+        logServiceError(serviceLogger, err, {
+            operation: 'warehouse.wasteService.addWasteStock',
+            ...getModelLogContext('wasteStockEntry', { id, userId, ...entryDto })
+        });
+        handleWasteServiceError({ err, fallbackError: new WasteStockAdjustmentDatabaseError() });
     }
 };
