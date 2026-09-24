@@ -1,7 +1,7 @@
 <a id="CAP-REP-MOV-WAS-01-LIST"></a>
 # 3. CAP-REP-MOV-WAS-01-LIST — Historial y filtros
 
-**Casos de uso:** `CU-ALM-14` — Consultar movimientos de mermas.
+**Casos de uso:** `CU-ALM-15` — Consultar movimientos de mermas.
 
 **Errores posibles:** [Reportes](../../error-messages.md#errores-reportes).
 

@@ -110,10 +110,10 @@ flowchart LR
             ucWasteCreate(["CU-ALM-10 Registrar merma"])
             ucWasteEdit(["CU-ALM-11 Editar merma"])
             ucWasteStock(["CU-ALM-12 Ajustar existencia de merma"])
-            ucWasteReport(["CU-ALM-13 Generar reporte de mermas"])
-            ucWasteMovements(["CU-ALM-14 Consultar movimientos de mermas"])
-            ucWasteMovementReport(["CU-ALM-15 Generar reporte de movimientos de mermas"])
-            ucWasteAddStock(["CU-ALM-16 Agregar existencia de merma"])
+            ucWasteAddStock(["CU-ALM-13 Agregar existencia de merma"])
+            ucWasteReport(["CU-ALM-14 Generar reporte de mermas"])
+            ucWasteMovements(["CU-ALM-15 Consultar movimientos de mermas"])
+            ucWasteMovementReport(["CU-ALM-16 Generar reporte de movimientos de mermas"])
         end
     end
 
@@ -329,7 +329,7 @@ continúan fuera del diagrama por su estado no vigente.
 
 `CU-SAL-05` y `CU-SAL-12` actualizan la existencia y registra el movimiento como parte de su propio
 flujo; `CU-SAL-06` y `CU-SAL-13` registran la reversión y el movimiento inverso. No existe una relación
-`«include»` con `CU-ALM-07` y `CU-ALM-14`: consultar movimientos es otro objetivo iniciado por un
+`«include»` con `CU-ALM-07` y `CU-ALM-15`: consultar movimientos es otro objetivo iniciado por un
 actor, mientras registrar un movimiento es una responsabilidad interna de Nexus. Por la
 misma razón, compartir servicios entre grupos no se representa como salto, inclusión o
 extensión entre casos de uso.

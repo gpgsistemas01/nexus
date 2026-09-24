@@ -25,4 +25,4 @@
 | RF-PRJ-001 | El área Sistemas debe poder mantener proyectos cuando se registre un CRUD autorizado para esa capacidad. | Modelado | modelo `Project` |
 | RF-PRJ-002 | Almacén debe poder seleccionar un proyecto como contexto de salida cuando se defina el flujo funcional correspondiente. | Modelado | modelo `Project` |
 
-`RF-REP-001` y `RF-REP-005` están implementados para su alcance vigente: la consulta y la exportación de movimientos sólo están disponibles para el **Administrador del sistema** del área Sistemas. El Personal de almacén no puede iniciar `CU-ALM-07`, `CU-ALM-08`, `CU-ALM-14` ni `CU-ALM-15`.
+`RF-REP-001` y `RF-REP-005` están implementados para su alcance vigente: la consulta y la exportación de movimientos sólo están disponibles para el **Administrador del sistema** del área Sistemas. El Personal de almacén no puede iniciar `CU-ALM-07`, `CU-ALM-08`, `CU-ALM-15` ni `CU-ALM-16`.

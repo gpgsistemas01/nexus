@@ -46,11 +46,11 @@ comprobar el inventario sin iniciar Nexus ni Playwright se ejecuta
 | 17 | `CAP-CAT-CLI-03-EDIT` | `docs/user-manual/images/clients/03-form-edit.png` | `CU-CAT-07` |
 | 18 | `CAP-CAT-CLI-04-EXPORT` | `docs/user-manual/images/clients/04-export-report.png` | `CU-CAT-08` |
 | 19 | `CAP-CAT-WAS-00-NAVIGATION` | `docs/user-manual/images/waste/00-access-menu-main.png` | `CU-ALM-09` |
-| 20 | `CAP-CAT-WAS-01-LIST` | `docs/user-manual/images/waste/01-list-inventory.png` | `CU-ALM-09`, `CU-ALM-13` |
+| 20 | `CAP-CAT-WAS-01-LIST` | `docs/user-manual/images/waste/01-list-inventory.png` | `CU-ALM-09`, `CU-ALM-14` |
 | 21 | `CAP-CAT-WAS-02-CREATE` | `docs/user-manual/images/waste/02-form-registration.png` | `CU-ALM-10` |
 | 22 | `CAP-CAT-WAS-03-EDIT` | `docs/user-manual/images/waste/03-form-edit.png` | `CU-ALM-11` |
 | 23 | `CAP-CAT-WAS-04-STOCK` | `docs/user-manual/images/waste/04-adjustment-stock.png` | `CU-ALM-12` |
-| 24 | `CAP-REP-WAS-05-EXPORT` | `docs/user-manual/images/waste/05-export-report.png` | `CU-ALM-13` |
+| 24 | `CAP-REP-WAS-05-EXPORT` | `docs/user-manual/images/waste/05-export-report.png` | `CU-ALM-14` |
 | 25 | `CAP-CAT-AREA-01-LIST` | `docs/user-manual/images/catalogs/areas/01-list.png` | `CU-CAT-09` |
 | 26 | `CAP-CAT-AREA-02-CREATE` | `docs/user-manual/images/catalogs/areas/02-form-creation.png` | `CU-CAT-10` |
 | 27 | `CAP-CAT-AREA-03-EDIT` | `docs/user-manual/images/catalogs/areas/03-form-edit.png` | `CU-CAT-11` |
@@ -108,9 +108,9 @@ comprobar el inventario sin iniciar Nexus ni Playwright se ejecuta
 | 79 | `CAP-REP-MOV-MAT-00-NAVIGATION` | `docs/user-manual/images/material-movements/00-access-menu-main.png` | `CU-ALM-07` |
 | 80 | `CAP-REP-MOV-MAT-01-LIST` | `docs/user-manual/images/material-movements/01-history-and-filters.png` | `CU-ALM-07` |
 | 81 | `CAP-REP-MOV-MAT-02-EXPORT` | `docs/user-manual/images/material-movements/02-export-report.png` | `CU-ALM-08` |
-| 82 | `CAP-REP-MOV-WAS-00-NAVIGATION` | `docs/user-manual/images/waste-movements/00-access-menu-main.png` | `CU-ALM-14` |
-| 83 | `CAP-REP-MOV-WAS-01-LIST` | `docs/user-manual/images/waste-movements/01-history-and-filters.png` | `CU-ALM-14` |
-| 84 | `CAP-REP-MOV-WAS-02-EXPORT` | `docs/user-manual/images/waste-movements/02-export-report.png` | `CU-ALM-15` |
+| 82 | `CAP-REP-MOV-WAS-00-NAVIGATION` | `docs/user-manual/images/waste-movements/00-access-menu-main.png` | `CU-ALM-15` |
+| 83 | `CAP-REP-MOV-WAS-01-LIST` | `docs/user-manual/images/waste-movements/01-history-and-filters.png` | `CU-ALM-15` |
+| 84 | `CAP-REP-MOV-WAS-02-EXPORT` | `docs/user-manual/images/waste-movements/02-export-report.png` | `CU-ALM-16` |
 | 85 | `CAP-ERR-404-NOT-FOUND` | `docs/user-manual/images/errors/01-page-not-found.png` | Transversal |
 
 ## Cobertura adicional necesaria

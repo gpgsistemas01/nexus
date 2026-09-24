@@ -31,7 +31,7 @@ permiso se agrupan. Los valores de permiso son los declarados en
 | Sistemas / clientes | `L → clients:read`; `C → clients:create`; `U → clients:update`; exportar `→ client:reports-read` | Parcial; el Personal de almacén aún no dispone del recorrido de consulta y alta definido en `CU-CAT-05` y `CU-CAT-06` |
 | Contexto pendiente / proyectos | Sin rutas API CRUD ni permiso registrado | Modelado |
 | Almacén / materiales | `L → materials:read`; costo en la consulta `→ inventory:costs-read`; `C, U, D → materials:write`; ajustar existencia `→ materials:adjust-stock`; exportar inventario `→ warehouse:reports-read` | Implementado |
-| Almacén / merma | `L → wastes:read`; costo en la consulta `→ inventory:costs-read`; `C, U → wastes:write`; ajustar existencia `→ wastes:adjust-stock`; exportar `→ warehouse:reports-read` | Implementado |
+| Almacén / merma | `L → wastes:read`; costo en la consulta `→ inventory:costs-read`; `C, U → wastes:write`; agregar existencia `→ wastes:add-stock`; ajustar existencia `→ wastes:adjust-stock`; exportar `→ warehouse:reports-read` | Implementado |
 | Almacén / proveedores | `L, C → suppliers:manage`; `U → suppliers:update`; exportar `→ supplier:reports-read` | Parcial; el Personal de almacén aún no dispone del recorrido de consulta y alta definido en `CU-CAT-01` y `CU-CAT-02` |
 | Almacén / presentación | `L → presentations:read` | Implementado sólo lectura |
 | Almacén / unidad de medida | `L → unit:measures-read` | Implementado sólo lectura |
