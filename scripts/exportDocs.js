@@ -69,9 +69,7 @@ const MANUALS = Object.freeze({
         parts: {
             autenticacion: manualPart(administrator, manualCases.authentication),
             'identidad-y-acceso': manualPart(administrator, manualCases['identity-access']),
-            catalogos: manualPart(administrator, manualCaseFiles('catalogs', [
-                '01-catalogs-auxiliary.md'
-            ])),
+            catalogos: manualPart(administrator, manualCases.catalogs),
             reportes: manualPart(administrator, manualCases.reports)
         }
     },
@@ -79,7 +77,19 @@ const MANUALS = Object.freeze({
         directory: 'manuales/almacen',
         parts: {
             autenticacion: manualPart(warehouse, manualCases.authentication),
-            catalogos: manualPart(warehouse, manualCases.catalogs.slice(1)),
+            catalogos: manualPart(warehouse, manualCaseFiles('catalogs', [
+                '02-cap-cat-mat-01-list.md',
+                '03-cap-rep-mat-05-export.md',
+                '04-cap-cat-mat-02-create.md',
+                '05-cap-cat-mat-03-edit.md',
+                '08-cap-cat-sup-02-create.md',
+                '11-cap-cat-cli-02-create.md',
+                '13-cap-cat-was-01-list.md',
+                '14-cap-rep-was-05-export.md',
+                '15-cap-cat-was-02-create.md',
+                '16-cap-cat-was-03-edit.md',
+                '18-cap-cat-was-05-add-stock.md'
+            ])),
             'compras-de-material': manualPart(warehouse, manualCases.purchases),
             'salidas-de-material': manualPart(warehouse, manualCaseFiles('issues', [
                 '01-cap-sal-mat-01-list.md',

@@ -4,7 +4,7 @@
 | --- | --- |
 | Identificador | `CU-CAT-01` |
 | Nombre | Consultar proveedores. |
-| Actor | Personal de almacén o Administrador del sistema. |
+| Actor | Administrador del sistema del área Sistemas. |
 | Disparador | Necesita localizar o revisar proveedores y abre la opción de consulta correspondiente. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de consulta o reporte correspondiente. |
 | Flujo principal | 1. **Actor:** abre la opción para consultar proveedores **(ver E1)**.<br>2. **Nexus:** comprueba su autorización y muestra la consulta con sus criterios disponibles.<br>3. **Actor:** define los criterios que necesita y solicita aplicarlos **(ver A1)**.<br>4. **Nexus:** presenta la información autorizada y la acción principal para registrar un proveedor **(ver A2)** **(ver A3)**. Además, consulta la información necesaria en la base de datos **(ver EBD)**.<br>5. **Actor:** selecciona la acción principal; termina `CU-CAT-01` y con esa selección dispara `CU-CAT-02` Crear proveedor. |

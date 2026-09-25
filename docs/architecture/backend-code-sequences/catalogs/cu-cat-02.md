@@ -3,6 +3,10 @@
 
 **Patrones:** `BE-P01`.
 
+El origen visual no altera el contrato backend: tanto el listado de Sistemas como el selector de una
+compra llaman al mismo `POST`. `suppliers:manage` autoriza el alta de Almacén, mientras
+`suppliers:page-view` se comprueba únicamente al intentar abrir la vista web `/proveedores`.
+
 ```mermaid
 sequenceDiagram
     participant Client as Cliente HTTP / web
@@ -43,4 +47,3 @@ sequenceDiagram
         deactivate Controller
     end
 ```
-
