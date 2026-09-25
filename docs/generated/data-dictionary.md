@@ -661,6 +661,29 @@ usuarios y responsables se mantiene en el
 | `movement` | `WasteMovement` | `movementId` | Exactamente uno |
 | `wasteIssueDetail` | `WasteIssueDetail` | `wasteIssueDetailId` | Cero o uno |
 
+### `WasteStockEntry`
+
+| Campo | Tipo Prisma | Obligatorio | Claves | Predeterminado | Reglas Prisma/BD |
+| --- | --- | --- | --- | --- | --- |
+| `id` | `String` | Sí | PK | `dbgenerated("gen_random_uuid()")` | `@db.Uuid` |
+| `referenceNumber` | `String` | Sí | UK | — | `@db.VarChar(50)` |
+| `wasteId` | `String` | Sí | FK | — | `@db.Uuid` |
+| `createdById` | `String` | Sí | FK | — | `@db.Uuid` |
+| `wasteMovementId` | `String` | Sí | UK,FK | — | `@db.Uuid` |
+| `materialName` | `String` | Sí | — | — | `@db.VarChar(200)` |
+| `quantity` | `Decimal` | Sí | — | — | `@db.Decimal(18, 6)` |
+| `previousStock` | `Decimal` | Sí | — | — | `@db.Decimal(18, 6)` |
+| `newStock` | `Decimal` | Sí | — | — | `@db.Decimal(18, 6)` |
+| `observations` | `String?` | No | — | — | `@db.VarChar(500)` |
+| `createdAt` | `DateTime` | Sí | — | `now()` | — |
+| `updatedAt` | `DateTime` | Sí | — | — | `@updatedAt` |
+
+| Relación Prisma | Destino | Campos FK | Cardinalidad desde este modelo |
+| --- | --- | --- | --- |
+| `waste` | `Waste` | `wasteId` | Exactamente uno |
+| `createdBy` | `User` | `createdById` | Exactamente uno |
+| `movement` | `WasteMovement` | `wasteMovementId` | Exactamente uno |
+
 ### `WasteStockAdjustment`
 
 | Campo | Tipo Prisma | Obligatorio | Claves | Predeterminado | Reglas Prisma/BD |

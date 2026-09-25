@@ -5,6 +5,22 @@ import process from 'node:process';
 const require = createRequire(import.meta.url);
 const baseURL = new URL(process.env.DOCS_BASE_URL ?? 'http://127.0.0.1:3000');
 const screenshotArguments = process.argv.slice(2);
+const areaArgumentIndex = screenshotArguments.findIndex(argument => argument === '--area');
+const inlineAreaArgument = screenshotArguments.find(argument => argument.startsWith('--area='))?.split('=', 2)[1];
+const argumentCaptureArea = areaArgumentIndex === -1 ? inlineAreaArgument : screenshotArguments[areaArgumentIndex + 1];
+const environmentCaptureArea = process.env.DOCS_CAPTURE_AREA?.trim();
+const captureArea = argumentCaptureArea ?? environmentCaptureArea;
+const validCaptureAreas = ['almacen', 'sistemas'];
+
+if (argumentCaptureArea && environmentCaptureArea && argumentCaptureArea !== environmentCaptureArea) {
+    throw new Error('El área indicada con --area no coincide con DOCS_CAPTURE_AREA.');
+}
+if (captureArea && !validCaptureAreas.includes(captureArea)) {
+    throw new Error('El área de capturas debe ser almacen o sistemas.');
+}
+if (!captureArea && !screenshotArguments.includes('--list')) {
+    throw new Error('Indique el área con --area almacen|sistemas o DOCS_CAPTURE_AREA.');
+}
 const startupTimeout = 30000;
 const retryDelay = 500;
 const npmCommand = process.env.npm_execpath

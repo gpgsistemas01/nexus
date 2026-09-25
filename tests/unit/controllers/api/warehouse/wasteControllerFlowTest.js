@@ -12,6 +12,7 @@ const findInitialStockAdjustmentReason = vi.fn();
 const generateYearlyReferenceNumber = vi.fn();
 const throwIfReferenceNumberAlreadyExists = vi.fn();
 const createWasteMovement = vi.fn();
+const applyWasteMovement = vi.fn();
 const findUniqueSupplier = vi.fn();
 
 vi.mock('../../../../../src/utils/logger.js', () => ({
@@ -45,6 +46,7 @@ vi.mock('../../../../../src/services/document/referenceNumberService.js', () => 
 }));
 
 vi.mock('../../../../../src/services/warehouse/wastes/wasteMovementService.js', () => ({
+  applyWasteMovement,
   createWasteMovement
 }));
 

@@ -1149,5 +1149,26 @@
       "wasteIssueReturn",
       "code"
     ]
+  },
+  "WasteStockAdditionRequest": {
+    "type": "object",
+    "properties": {
+      "quantity": {
+        "type": "number",
+        "exclusiveMinimum": 0
+      },
+      "observations": {
+        "description": "Nota opcional del documento individual de entrada de merma vinculado al movimiento ENTRY.",
+        "type": [
+          "string",
+          "null"
+        ],
+        "maxLength": 500
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "quantity"
+    ]
   }
 }

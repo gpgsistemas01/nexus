@@ -54,6 +54,14 @@ export const buildMdbAdjustStockActionButton = ({ className, label, htmlAttrs = 
     htmlAttrs
 });
 
+export const buildMdbAddStockActionButton = ({ className, label, htmlAttrs = {} }) => buildMdbActionButton({
+    className,
+    colorClass: 'btn-primary',
+    iconClass: 'fa-solid fa-box-open',
+    label,
+    htmlAttrs
+});
+
 export const buildMdbSupplyActionButton = ({ className, label, htmlAttrs = {} }) => buildMdbActionButton({
     className,
     colorClass: 'btn-secondary',

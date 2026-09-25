@@ -86,6 +86,11 @@ export const wasteStockValidation = createInventoryStockValidation({
     stockFieldName: 'El nuevo stock de merma'
 });
 
+export const wasteStockAdditionValidation = {
+    quantity: value => validatePositiveNumber(value, 'La cantidad a agregar'),
+    observations: value => validateTextOptional(value, 500, 'Las observaciones')
+};
+
 export const wasteValidation = {
     name: value => validateName(value, 200),
     materialId: (value) => isEmptyOrNull(value, 'El material'),

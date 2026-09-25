@@ -11,6 +11,11 @@ export const wasteStockValidation = [
     validateUUID('reasonId')
 ];
 
+export const wasteStockAdditionValidation = [
+    validatePositiveNumber('quantity'),
+    createInventoryObservationsValidation()
+];
+
 const wasteSecondaryDataValidation = [
     ...createInventoryStateValidation(),
     validateNonNegativeNumber('maxUnitCost')

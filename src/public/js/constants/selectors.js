@@ -27,6 +27,7 @@ export const MODAL_SELECTORS = {
     SUPPLIER: '#supplierModal',
     USER: '#userModal',
     WASTE: '#wasteModal',
+    WASTE_STOCK_ADDITION: '#wasteStockAdditionModal',
     WASTE_ISSUE: '#wasteIssueModal',
     GOODS_RECEIPT_CORRECTION: '#goodsReceiptCorrectionModal'
 };
@@ -41,6 +42,7 @@ export const FORM_SELECTORS = {
     SUPPLIER: '#supplierForm',
     USER: '#userForm',
     WASTE: '#wasteForm',
+    WASTE_STOCK_ADDITION: '#wasteStockAdditionForm',
     WASTE_ISSUE: '#wasteIssueForm',
     GOODS_RECEIPT_CORRECTION: '#goodsReceiptCorrectionForm'
 };

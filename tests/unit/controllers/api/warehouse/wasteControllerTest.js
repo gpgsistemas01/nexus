@@ -4,10 +4,12 @@ const createWasteWithInitialStockAdjustment = vi.fn();
 const findAllWastes = vi.fn();
 const updateWaste = vi.fn();
 const updateWasteStock = vi.fn();
+const addWasteStock = vi.fn();
 const findWasteMaterialTemplates = vi.fn();
 
 vi.mock('../../../../../src/services/warehouse/wastes/wasteService.js', () => ({
   createWasteWithInitialStockAdjustment,
+  addWasteStock,
   findAllWastes,
   updateWaste,
   updateWasteStock
@@ -22,7 +24,8 @@ const {
   editWasteStock,
   getAllWastes,
   getWasteMaterialTemplates,
-  registerWaste
+  registerWaste,
+  registerWasteStockAddition
 } = await import('../../../../../src/controllers/api/warehouse/wasteController.js');
 
 const createResponse = () => {
@@ -175,6 +178,26 @@ describe('wasteController', () => {
     expect(updateWasteStock).toHaveBeenCalledWith({
       id: 'waste-1',
       wasteStockDto: { newStock: 4, reasonId: 'reason-1', observations: 'Conteo físico' },
+      userId: 'user-1'
+    });
+    expect(res.json).toHaveBeenCalledWith({ waste, code: 'UPDATED_WASTE' });
+  });
+
+  it('agrega una cantidad al stock sin convertirla en un ajuste absoluto', async () => {
+    const waste = { id: 'waste-1', currentStock: 6 };
+    const req = {
+      params: { id: 'waste-1' },
+      body: { quantity: '2', observations: '  Recortes de producción  ' },
+      user: { id: 'user-1' }
+    };
+    const res = createResponse();
+    addWasteStock.mockResolvedValue(waste);
+
+    await registerWasteStockAddition(req, res);
+
+    expect(addWasteStock).toHaveBeenCalledWith({
+      id: 'waste-1',
+      entryDto: { quantity: 2, observations: 'Recortes de producción' },
       userId: 'user-1'
     });
     expect(res.json).toHaveBeenCalledWith({ waste, code: 'UPDATED_WASTE' });

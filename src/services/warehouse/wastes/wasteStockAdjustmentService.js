@@ -4,6 +4,7 @@ import { generateYearlyReferenceNumber, throwIfReferenceNumberAlreadyExists } fr
 import { normalizeDecimal, toNumber } from '../../../utils/formattersUtils.js';
 import { assertSufficientStock, calculateConvertedQuantity } from '../../inventory/stockHelpers.js';
 import { createWasteMovement } from './wasteMovementService.js';
+import { INVENTORY_MOVEMENT_TYPES } from '../../../constants/inventory.js';
 
 const calculateWasteStockAdjustmentValues = ({
     waste,
@@ -107,11 +108,14 @@ export const registerWasteStockAdjustment = async ({
 
         const movement = await createWasteMovement({
             tx,
-            wasteId,
-            wasteStockAdjustmentDetailId: adjustmentDetail.id,
-            difference: values.difference,
-            previousStock: values.previousStock,
-            newStock: values.newStock
+            movementType: INVENTORY_MOVEMENT_TYPES.ADJUSTMENT,
+            details: [{
+                wasteId,
+                wasteStockAdjustmentDetailId: adjustmentDetail.id,
+                quantity: values.difference,
+                previousStock: values.previousStock,
+                newStock: values.newStock
+            }]
         });
 
         await tx.wasteStockAdjustment.update({

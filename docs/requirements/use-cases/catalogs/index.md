@@ -16,9 +16,10 @@
 | `CU-ALM-10` | Registrar merma | Alta desde una plantilla material-proveedor. |
 | `CU-ALM-11` | Editar merma | Actualización sin alterar su identidad física. |
 | `CU-ALM-12` | Ajustar existencia de merma | Ajuste trazable de inventario de merma. |
-| `CU-ALM-13` | Generar reporte de mermas | Archivo Excel con filtros, columnas y cálculos propios del reporte. |
-| `CU-ALM-14` | Consultar movimientos de mermas | Consulta autorizada sin modificar datos. |
-| `CU-ALM-15` | Generar reporte de movimientos de mermas | Archivo Excel con filtros, columnas y cálculos propios del reporte. |
+| `CU-ALM-13` | Agregar existencia de merma | Entrada incremental autorizada para almacén y administración. |
+| `CU-ALM-14` | Generar reporte de mermas | Archivo Excel con filtros, columnas y cálculos propios del reporte. |
+| `CU-ALM-15` | Consultar movimientos de mermas | Consulta autorizada sin modificar datos. |
+| `CU-ALM-16` | Generar reporte de movimientos de mermas | Archivo Excel con filtros, columnas y cálculos propios del reporte. |
 
 ### Grupo funcional CAT — Catálogos
 
@@ -74,9 +75,10 @@ Cada ficha representa una sola acción sobre una sola entidad. Los elementos com
 - [`CU-ALM-10` — Registrar merma](cu-alm-10.md)
 - [`CU-ALM-11` — Editar merma](cu-alm-11.md)
 - [`CU-ALM-12` — Ajustar existencia de merma](cu-alm-12.md)
-- [`CU-ALM-13` — Generar reporte de mermas](cu-alm-13.md)
-- [`CU-ALM-14` — Consultar movimientos de mermas](cu-alm-14.md)
-- [`CU-ALM-15` — Generar reporte de movimientos de mermas](cu-alm-15.md)
+- [`CU-ALM-13` — Agregar existencia de merma](cu-alm-13.md)
+- [`CU-ALM-14` — Generar reporte de mermas](cu-alm-14.md)
+- [`CU-ALM-15` — Consultar movimientos de mermas](cu-alm-15.md)
+- [`CU-ALM-16` — Generar reporte de movimientos de mermas](cu-alm-16.md)
 
 ### Grupo funcional CAT — Catálogos
 

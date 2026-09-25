@@ -1,4 +1,4 @@
-import { editWasteRequest, editWasteStockRequest, getAllWastesRequest, getWasteMaterialTemplatesRequest, registerWasteRequest } from "../../../services/warehouse/wasteService.js";
+import { addWasteStockRequest, editWasteRequest, editWasteStockRequest, getAllWastesRequest, getWasteMaterialTemplatesRequest, registerWasteRequest } from "../../../services/warehouse/wasteService.js";
 import { createApplicationList, createCrudApplication } from '../../createCrudApplication.js';
 
 const wasteApplication = createCrudApplication({
@@ -6,10 +6,11 @@ const wasteApplication = createCrudApplication({
         getAll: getAllWastesRequest,
         register: registerWasteRequest,
         edit: editWasteRequest,
-        editStock: editWasteStockRequest
+        editStock: editWasteStockRequest,
+        addStock: addWasteStockRequest
     },
     dataKey: 'waste',
-    additionalMutations: ['editStock']
+    additionalMutations: ['editStock', 'addStock']
 });
 
 export const getAllWastes = wasteApplication.getAll;
@@ -18,3 +19,4 @@ export const registerWaste = wasteApplication.register;
 export const editWaste = wasteApplication.edit;
 
 export const editWasteStock = wasteApplication.editStock;
+export const addWasteStock = wasteApplication.addStock;

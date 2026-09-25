@@ -1,0 +1,71 @@
+<% const stockAdditionForm = {
+    id: 'wasteStockAdditionForm',
+    sections: [
+        {
+            title: 'Existencia de merma',
+            groups: [
+                {
+                    type: 'html',
+                    col: 'col-12 col-md-8',
+                    content: include('../../../shared/forms/informativeValue', {
+                        value: {
+                            id: 'wasteStockAdditionName',
+                            label: 'Merma'
+                        }
+                    })
+                },
+                {
+                    type: 'html',
+                    col: 'col-12 col-md-4',
+                    content: include('../../../shared/forms/informativeValue', {
+                        value: {
+                            id: 'wasteStockAdditionCurrentStock',
+                            label: 'Existencia actual'
+                        }
+                    })
+                },
+                {
+                    type: 'inputs',
+                    items: [
+                        {
+                            id: 'wasteStockAdditionQuantityInput',
+                            type: 'number',
+                            name: 'quantity',
+                            label: 'Cantidad a agregar',
+                            attrs: {
+                                min: '0.01',
+                                step: 'any'
+                            },
+                            col: '12'
+                        }
+                    ]
+                },
+                {
+                    type: 'html',
+                    col: 'col-12',
+                    content: include('../../../shared/forms/informativeValue', {
+                        value: {
+                            id: 'wasteStockAdditionResultingStock',
+                            label: 'Existencia resultante'
+                        }
+                    })
+                },
+                {
+                    type: 'textarea',
+                    input: {
+                        id: 'wasteStockAdditionObservationsInput',
+                        name: 'observations',
+                        label: 'Observaciones'
+                    }
+                }
+            ]
+        }
+    ]
+}; %>
+
+<%- include('../../../shared/layout/modal', {
+    modalId: 'wasteStockAdditionModal',
+    modalTitle: 'Agregar stock de merma',
+    dialogClass: 'modal-lg modal-dialog-scrollable',
+    form: stockAdditionForm
+}) %>

@@ -1,9 +1,9 @@
-# `CU-ALM-13` — Generar reporte de mermas
+# `CU-ALM-13` — Agregar existencia de merma
 
 ```mermaid
 flowchart LR
-    accTitle: CU-ALM-13 — Generar reporte de mermas
-    request["Actor selecciona exportar desde CU-ALM-09: mermas"] --> modal["Nexus abre el modal Exportar reporte"]
-    modal --> validate["Nexus valida permiso, datos y relaciones"]
-    validate --> result["Nexus responde: Archivo Excel con filtros, columnas y cálculos propios del reporte."]
+    request["Actor selecciona Agregar stock"] --> authorize["Nexus valida wastes:add-stock"]
+    authorize --> quantity["Actor captura una cantidad positiva"]
+    quantity --> transaction["Nexus crea el documento individual de entrada y su movimiento histórico ENTRY en una transacción"]
+    transaction --> result["Nexus actualiza y confirma el inventario"]
 ```

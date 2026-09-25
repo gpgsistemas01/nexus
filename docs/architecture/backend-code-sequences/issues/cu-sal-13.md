@@ -39,7 +39,7 @@ sequenceDiagram
             Service-->>Service: error de dominio
             Service-->>Controller: rollback y error
         else Cantidad válida
-            Service->>Movement: applyWasteIssueReturnMovement({ tx, wasteIssueId: id, detail })
+            Service->>Movement: applyWasteMovement({ tx, reference: { wasteIssueId: id }, movementType: ENTRY, details })
             Service->>Status: findWasteIssueFulfillmentStatusIds(tx)
             Service->>Prisma: tx.wasteIssueReturn.create({ data })
             Service->>Prisma: tx.wasteIssueDetail.findMany({ where: { wasteIssueId: id } })

@@ -1,6 +1,8 @@
 <a id="CAP-CAT-WAS-04-STOCK"></a>
 # 17. CAP-CAT-WAS-04-STOCK — Ajuste existencia
 
+**Acceso:** exclusivo del Administrador del sistema con `wastes:adjust-stock`.
+
 **Casos de uso:** `CU-ALM-12` — Ajustar existencia de merma.
 
 **Errores posibles:** [Validación de formularios](../../error-messages.md#errores-validacion), [Catálogos e inventario](../../error-messages.md#errores-catalogos).

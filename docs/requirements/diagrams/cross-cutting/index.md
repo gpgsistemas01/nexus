@@ -17,9 +17,9 @@ el código.
 | Compleja | `CU-ENT-02` | Referencia, documento, detalles, stock y movimientos se confirman juntos; el costo se revisa después del commit. | Secuencia de registro incluida abajo. |
 | Compleja | `CU-ENT-04`, `CU-ENT-05` | Corrección/cancelación altera historia, totales, stock y movimiento. | Secuencia atómica ya incluida en este documento. |
 | Compleja | `CU-SAL-05`, `CU-SAL-06`, `CU-SAL-12`, `CU-SAL-13` | Acumulados, estados, existencias y movimientos dependen de cantidades previas. | Máquina de estados ya incluida en este documento. |
-| Compleja | `CU-IDA-04`, `CU-IDA-09`, `CU-ALM-06`, `CU-ALM-08`, `CU-ALM-13`, `CU-ALM-15`, `CU-CAT-04`, `CU-CAT-08`, `CU-ENT-06`, `CU-SAL-07` y `CU-SAL-14` | Filtros, variantes mensual/detallada, fórmulas, totales y archivo deben conservar el mismo resultado de dominio. | Canal de generación de reportes incluido abajo. |
+| Compleja | `CU-IDA-04`, `CU-IDA-09`, `CU-ALM-06`, `CU-ALM-08`, `CU-ALM-14`, `CU-ALM-16`, `CU-CAT-04`, `CU-CAT-08`, `CU-ENT-06`, `CU-SAL-07` y `CU-SAL-14` | Filtros, variantes mensual/detallada, fórmulas, totales y archivo deben conservar el mismo resultado de dominio. | Canal de generación de reportes incluido abajo. |
 | Intermedia | `CU-ALM-02`, `CU-ALM-03`, `CU-ALM-10`, `CU-ALM-11`, `CU-CAT-02`, `CU-CAT-03`, `CU-CAT-06`, `CU-CAT-07`, `CU-ENT-03`, `CU-SAL-02` a `CU-SAL-04` y `CU-SAL-09` a `CU-SAL-11` | Coordinan relaciones o detalles, pero no agregan participantes o estados que justifiquen una secuencia transaccional. | Flujo funcional en su grupo y vista técnica complementaria incluida abajo. |
-| Directa | `CU-IDA-01` a `CU-IDA-03`; `CU-ALM-01`, `CU-ALM-07`, `CU-ALM-09`, `CU-ALM-14`, `CU-CAT-01`, `CU-CAT-05`, `CU-CAT-09` a `CU-CAT-26`; `CU-ENT-01`; `CU-SAL-01` y `CU-SAL-08` | Consulta o mutación directa sin estados coordinados adicionales. | Flujo funcional en su grupo y vista técnica complementaria incluida abajo. |
+| Directa | `CU-IDA-01` a `CU-IDA-03`; `CU-ALM-01`, `CU-ALM-07`, `CU-ALM-09`, `CU-ALM-15`, `CU-CAT-01`, `CU-CAT-05`, `CU-CAT-09` a `CU-CAT-26`; `CU-ENT-01`; `CU-SAL-01` y `CU-SAL-08` | Consulta o mutación directa sin estados coordinados adicionales. | Flujo funcional en su grupo y vista técnica complementaria incluida abajo. |
 
 Las vistas siguientes completan los casos de coordinación intermedia y directa con el
 mismo criterio aplicado a los casos de coordinación compleja: muestran la ejecución
@@ -38,11 +38,11 @@ orientada al código.
 - [10. Crear salida de material o de merma — `CU-SAL-02` y `CU-SAL-09`](10-create-issue-of-material-or-of-waste-cu-sal-02-and-cu-sal-09.md)
 - [11. Editar encabezado de salida de material o de merma — `CU-SAL-03` y `CU-SAL-10`](11-edit-header-of-issue-of-material-or-of-waste-cu-sal-03-and-cu-sal-10.md)
 - [12. Editar detalles de material o merma de una salida — `CU-SAL-04` y `CU-SAL-11`](12-edit-details-of-material-or-waste-of-a-issue-cu-sal-04-and-cu-sal-11.md)
-- [13. Consultar listados y movimientos — `CU-ALM-01`, `CU-ALM-07`, `CU-ALM-09` y `CU-ALM-14`](13-query-lists-and-movements-cu-alm-01-cu-alm-07-cu-alm-09-and-cu-alm-14.md)
+- [13. Consultar listados y movimientos — `CU-ALM-01`, `CU-ALM-07`, `CU-ALM-09` y `CU-ALM-15`](13-query-lists-and-movements-cu-alm-01-cu-alm-07-cu-alm-09-and-cu-alm-15.md)
 - [14. Crear o editar usuario y acceso — `CU-IDA-06`, `CU-IDA-07`, `CU-IDA-08`](14-create-or-edit-user-and-access-cu-ida-06-cu-ida-07-cu-ida-08.md)
 - [15. Eliminar material o relación de proveedor — `CU-ALM-04`](15-remove-material-or-relationship-of-supplier-cu-alm-04.md)
 - [16. Crear compra de material — `CU-ENT-02`](16-create-purchase-of-material-cu-ent-02.md)
-- [17. Generar reportes específicos — `CU-IDA-04`, `CU-IDA-09`, `CU-ALM-06`, `CU-ALM-08`, `CU-ALM-13`, `CU-ALM-15`, `CU-CAT-04`, `CU-CAT-08`, `CU-ENT-06`, `CU-SAL-07` y `CU-SAL-14`](17-generate-reports-specific-cu-ida-04-cu-ida-09-cu-alm-06-cu-alm-08-cu-.md)
+- [17. Generar reportes específicos — `CU-IDA-04`, `CU-IDA-09`, `CU-ALM-06`, `CU-ALM-08`, `CU-ALM-14`, `CU-ALM-16`, `CU-CAT-04`, `CU-CAT-08`, `CU-ENT-06`, `CU-SAL-07` y `CU-SAL-14`](17-generate-reports-specific-cu-ida-04-cu-ida-09-cu-alm-06-cu-alm-08-cu-.md)
 
 ## Coordinación atómica de correcciones de entrada
 

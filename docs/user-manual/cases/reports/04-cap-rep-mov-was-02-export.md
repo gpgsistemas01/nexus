@@ -1,7 +1,7 @@
 <a id="CAP-REP-MOV-WAS-02-EXPORT"></a>
 # 4. CAP-REP-MOV-WAS-02-EXPORT — Exportar reporte
 
-**Casos de uso:** `CU-ALM-15` — Generar reporte de movimientos de mermas.
+**Casos de uso:** `CU-ALM-16` — Generar reporte de movimientos de mermas.
 
 **Errores posibles:** [Reportes](../../error-messages.md#errores-reportes).
 

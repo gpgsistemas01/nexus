@@ -9,14 +9,15 @@
 | `DIA-ARQ-SEQ-001` | Secuencia extremo a extremo | `architecture-and-web-views/index.md#recorrido-de-una-interacción` | 1 | Interacción representativa; curado. |
 | `DIA-ARQ-EST-001` | Estados de acceso | `web-navigation-and-screen-catalog/index.md#estados-de-acceso-y-sesión` | 1 | Sesión y rutas; curado. |
 | `DIA-ARQ-NAV-001..002` | Navegación y redirecciones | Mapa de sitio y redirecciones de `web-navigation-and-screen-catalog/index.md` | 2 | Rutas web y menú; curado. |
+| `DIA-ARQ-NAV-003` | Redirecciones de compatibilidad | `web-navigation-and-screen-catalog/03-catalog-of-screens.md#redirecciones-de-compatibilidad` | 1 | Alias heredados y destinos canónicos; curado desde las rutas web registradas. |
 | `DIA-ARQ-CAT-001..004` | Registro y ciclo CRUD de catálogos | `design-and-construction-patterns/01-registration-of-catalogs-with-checklist-allowlist.md` | 4 | Estructura Registry/Strategy, actividad funcional y secuencias técnicas separadas de frontend y backend de consulta, alta, edición y estado activo; curado. |
 | `DIA-BE-CMP-001..002` | Capas y registro de rutas | “Relación entre ambas capas” y “Registro de rutas” del backend | 2 | Código backend; curado. |
 | `DIA-BE-SEQ-006` | Secuencia transversal de auditoría de escrituras | Backend, “Vistas técnicas aplicadas” | 1 | Ejecución posterior a la respuesta y garantía *best effort*; complementa todos los casos de escritura sin duplicar su recorrido. |
 | `DIA-BE-ACT-001..002` | Actividades de surtimiento y cancelación | Backend, “Vistas técnicas aplicadas” | 2 | Decisiones y errores de servicios; curado. |
 | `DIA-REQ-ACT-001` | Impacto del estado activo | `requirements/diagrams/index.md#impacto-del-estado-activo-en-los-procesos-de-almacén` | 1 | Actividad funcional que separa `isActive`, filtros de inventario y estados documentales; curado desde servicios y reportes vigentes. |
 | `DIA-FE-ACT-001` | Actividad de alta de merma desde plantilla | Frontend, “Alta de merma…” | 1 | Dependencias y validación del navegador; curado. |
-| `DIA-FE-CU-AUT-01..SAL-14` | Secuencia de ejecución frontend por caso | `frontend-code-sequences/`, con índice y capítulos por grupo | 72 | Página/interacción, aplicación, request y resultado concretos; curado desde la matriz frontend. |
-| `DIA-BE-CU-AUT-01..SAL-14` | Secuencia de ejecución backend por caso | `backend-code-sequences/`, con índice y capítulos por grupo | 72 | Ruta/controller, servicio, persistencia o efecto concretos; curado desde la matriz backend. |
+| `DIA-FE-CU-AUT-01..SAL-14` | Secuencia de ejecución frontend por caso | `frontend-code-sequences/`, con índice y capítulos por grupo | 73 | Página/interacción, aplicación, request y resultado concretos; curado desde la matriz frontend. |
+| `DIA-BE-CU-AUT-01..SAL-14` | Secuencia de ejecución backend por caso | `backend-code-sequences/`, con índice y capítulos por grupo | 73 | Ruta/controller, servicio, persistencia o efecto concretos; curado desde la matriz backend. |
 | `DIA-BE-TEC-EST-AUT-01`, `DIA-BE-TEC-EST-CU-ENT-04`, `DIA-FE-TEC-EST-CU-IDA-08`, `DIA-FE-TEC-EST-CU-ALM-05` | Estados técnicos complementarios | Secciones técnicas del caso correspondiente | 4 | Elegibilidad de acceso y transacción backend, más modos de formulario frontend; no duplican estados normativos. |
 | `DIA-COD-ORG-001`, `DIA-COD-EST-001..002`, `DIA-COD-DIN-001`, `DIA-COD-REU-001` | Organización, estructura, dinámica y reutilización | `code-diagrams/index.md`, secciones 1 a 5 | 5 | Código e imports; curado. |
 | `DIA-PAT-DAT-001`, `DIA-PAT-RES-001` | Contrato de detalle y resumen de patrones | `design-and-construction-patterns/` y `diagram-conventions/` | 2 | Patrones confirmados; curado. |
@@ -29,9 +30,12 @@
 | `DIA-REQ-CU-GRP-AUT..SAL` | Casos de uso por seis grupos propietarios | `domain-and-use-cases/03-cases-of-use-current.md` | 6 | Los reportes se integran con el grupo del recurso que los inicia; curado. |
 | `DIA-REQ-EST-001` | Estados/datos por acción | `domain-and-use-cases/04-states-and-data-modified-by-action.md` | 1 | Reglas de dominio; curado. |
 | `DIA-REQ-TRA-001`, `DIA-REQ-CRUD-001` | Dependencias y ciclo CRUD | Primeras dos vistas de `requirements/diagrams/index.md` | 2 | Requisitos; curado. |
-| `DIA-REQ-CU-AUT-01..CU-SAL-14` | Flujo individual de cada caso vigente | `requirements/diagrams/` | 72 | Una vista curada por cada `CU-*`. |
+| `DIA-REQ-CU-AUT-01..CU-SAL-14` | Flujo individual de cada caso vigente | `requirements/diagrams/` | 73 | Una vista curada por cada `CU-*`. |
 | `DIA-REQ-ESP-001..017` | Vistas adicionales agrupadas | `requirements/diagrams/cross-cutting/index.md` | 17 | Casos con coordinación o patrón común; curado. |
 | `DIA-REQ-SEQ-ATM-001` | Secuencia atómica de corrección/cancelación | `requirements/diagrams/cross-cutting/18-coordination-atomic-of-corrections-of-receipt.md` | 1 | Servicios transaccionales; curado. |
 | `DIA-REQ-EST-002` | Estados de surtimiento/devolución | `requirements/diagrams/cross-cutting/index.md#estados-de-surtimiento-y-devolución` | 1 | Reglas normativas; curado. |
 | `DIA-REQ-CAL-001` | Requisitos de calidad | `requirements/diagrams/cross-cutting/20-requirements-of-quality-and-constraints.md` | 1 | Requisitos `RC-*`; curado. |
 | `DIA-REQ-TRA-002` | Trazabilidad a evidencia | `requirements/diagrams/cross-cutting/21-traceability-of-the-requirement-to-the-evidence.md` | 1 | Requisitos e implementación; curado. |
+| `DIA-TST-EST-001` | Diseño y ejecución de pruebas | `testing/test-plan.md#grafos-y-modelos-de-comportamiento` | 1 | Relación entre requisito, diseño, caso, suite y evidencia; curado. |
+| `DIA-TST-COB-001` | Cobertura unitaria por área | `testing/unit-test-catalog.md#diagrama-de-identificación-de-lo-probado` | 1 | Catálogo visual de suites unitarias y diseños cubiertos; curado. |
+| `DIA-MAN-FOR-001` | Modos de formulario | `user-manual/form-validation-matrix.md#modos-de-edición` | 1 | Ayuda operativa para distinguir alta, edición y acciones de estado; curado. |

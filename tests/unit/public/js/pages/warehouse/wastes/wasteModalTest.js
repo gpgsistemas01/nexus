@@ -34,7 +34,7 @@ const { openWasteModal } = await import(
   '../../../../../../../src/public/js/pages/warehouse/wastes/wasteModal.js'
 );
 
-const createInput = () => ({ value: '', checked: false });
+const createInput = () => ({ value: '', checked: false, closest: () => ({ hidden: false }) });
 
 describe('modal del CRUD de mermas', () => {
   beforeEach(() => {
@@ -50,6 +50,8 @@ describe('modal del CRUD de mermas', () => {
         maxUnitCost: createInput(),
         minStock: createInput(),
         newStock: createInput(),
+        quantity: createInput(),
+        reasonId: createInput(),
         observations: createInput()
       },
       querySelector: () => submit

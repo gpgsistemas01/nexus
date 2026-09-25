@@ -1,8 +1,10 @@
 # 8. Actualizar las capturas del manual
 
 Este flujo sólo se ejecuta en un clon sin las imágenes requeridas o cuando una pantalla cambió.
-Su resultado son archivos PNG revisables en `docs/user-manual/images/`; **no genera DOCX ni PDF**.
-Después de aprobar las imágenes, vuelva a [Exportar los manuales](#exportar-los-manuales).
+Su resultado son archivos PNG revisables en `build/docs/screenshots/`; **no genera DOCX ni PDF**
+ni modifica los binarios versionados del manual. `build/` está ignorado por Git, por lo que las
+capturas se publican como artefactos del entorno o de CI sin incorporarlas al diff de una solicitud
+de cambio. Después de revisarlas, vuelva a [Exportar los manuales](#exportar-los-manuales).
 
 El comando `npm run docs:screenshots` automatiza el ciclo de la aplicación: comprueba
 `DOCS_BASE_URL`, inicia una instancia temporal de Nexus cuando no existe una, espera a que responda,
@@ -62,9 +64,13 @@ Playwright y Chromium se preparan automáticamente en el mismo entorno antes de 
    export DOCS_ADMIN_LOGIN_PASSWORD='contraseña-sistemas-ficticia'
    ```
 
-   No guarde estas credenciales en `.env` ni en archivos del repositorio. Si sólo va a generar
-   capturas públicas, como `CAP-AUT-01-LOGIN` o `CAP-ERR-404-NOT-FOUND`, omita tanto las credenciales
-   como el archivo de sesión y continúe en el paso 5.
+   Para ejecutar después el área Sistemas, defina `DOCS_SISTEMAS_LOGIN_NAME` y
+   `DOCS_SISTEMAS_LOGIN_PASSWORD` con su cuenta ficticia. No reutilice una cuenta entre áreas.
+   Como alternativa, cada área admite su propio
+   `DOCS_ALMACEN_STORAGE_STATE` o `DOCS_SISTEMAS_STORAGE_STATE`.
+
+   No guarde estas credenciales en `.env` ni en archivos del repositorio. Cada ejecución incluye
+   las pantallas sin sesión y las pantallas protegidas que corresponden al área seleccionada.
 
    Para capturas protegidas, como alternativa a las credenciales puede crear una sesión temporal
    con Playwright. Siga esta secuencia completa en PowerShell en lugar de definir
@@ -103,18 +109,23 @@ Playwright y Chromium se preparan automáticamente en el mismo entorno antes de 
    Nexus en el proceso:
 
    ```bash
-   npm run docs:screenshots
+   npm run docs:screenshots -- --area almacen
+   npm run docs:screenshots -- --area sistemas
    ```
 
    Si Nexus ya se administra por separado, el comando reutiliza esa instancia y no la detiene.
-   `DOCS_CAPTURE_IDS` permite ejecutar sólo las capturas seleccionadas con el mismo flujo. Si una
+   Cada comando genera únicamente el inventario de su área y usa exclusivamente sus credenciales;
+   una pantalla presente en ambas áreas se captura dos veces porque la sesión determina los botones,
+   acciones y permisos visibles. Las pantallas sin sesión también se guardan dentro de esa misma
+   área. `DOCS_CAPTURE_AREA` queda
+   disponible como alternativa equivalente para automatización de CI. `DOCS_ALMACEN_CAPTURE_IDS` o
+   `DOCS_SISTEMAS_CAPTURE_IDS`, según el área, permite ejecutar sólo las capturas seleccionadas. Si una
    ejecución se interrumpe, vuelva a ejecutar el mismo comando: detectará la primera captura ausente,
-   informará desde cuál reanuda y conservará las imágenes anteriores. `DOCS_CAPTURE_FROM=CAP-*`
-   permite elegir explícitamente otro punto. Para regenerar automáticamente únicamente los PNG
-   ausentes, use `npm run docs:screenshots -- --missing`. No combine mecanismos de selección.
+   informará desde cuál reanuda y conservará las imágenes anteriores. La variable
+   `DOCS_<AREA>_CAPTURE_FROM=CAP-*` permite elegir explícitamente otro punto. Para regenerar sólo los
+   PNG ausentes, agregue `--missing` al comando del área. No combine mecanismos de selección.
 
-   Use `npm run docs:screenshots -- --fresh` sólo cuando necesite eliminar primero
-   `docs/user-manual/images/` y regenerar deliberadamente el juego completo.
+   Agregue `--fresh` al comando de un área sólo cuando necesite regenerar deliberadamente ese grupo.
 6. Espere el mensaje `Capturas generadas` y a que reaparezca el prompt de la terminal 2. En ese
    momento, el script ya cerró Playwright y Chromium automáticamente y puede usar el siguiente
    comando.
@@ -169,6 +180,20 @@ el permiso de surtimiento y que exista una salida aprobada, completamente surtid
 retornable. El script espera a que DataTables termine de cargar y recorre todas las páginas del
 listado para localizar la acción requerida. Las líneas `Paso N/T`
 son acciones preparatorias, no capturas duplicadas. Después de corregir los datos puede definir
-`DOCS_CAPTURE_IDS=CAP-SAL-WAS-05-RETURN` para regenerar sólo la captura fallida, o
-`DOCS_CAPTURE_FROM=CAP-SAL-WAS-05-RETURN` para continuar con ella y todas las posteriores; ambos
+`DOCS_ALMACEN_CAPTURE_IDS=CAP-SAL-WAS-05-RETURN` y ejecute con `--area almacen` para regenerar
+sólo la captura fallida, o use `DOCS_ALMACEN_CAPTURE_FROM=CAP-SAL-WAS-05-RETURN` con la misma
+área para continuar con ella y todas las posteriores; ambos
 mecanismos conservan las demás imágenes.
+
+
+## Precisión de la interacción automatizada
+
+Playwright debe localizar el control funcional mediante selectores estables, texto accesible y el
+estado visible que confirma la transición. No se registran coordenadas ni una zona exacta en
+píxeles: ese nivel de precisión se rompe con el diseño responsivo. Cada captura conserva el área
+completa de 1440 × 1000 para que el lector vea el control, el modal o listado resultante y su
+contexto. El inventario coloca todas las capturas en
+`build/docs/screenshots/areas/<área>/<módulo>/...`, incluidas
+las pantallas previas a la autenticación. Las pantallas compartidas se repiten por área para mostrar
+la interfaz que realmente produce cada sesión. Cada área se ejecuta con un contexto autenticado
+independiente y nunca escribe imágenes en la carpeta de otra área.

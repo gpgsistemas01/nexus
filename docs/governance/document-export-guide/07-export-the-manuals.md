@@ -23,10 +23,14 @@ imagen, `--check` detiene el proceso; en ese caso ejecute primero el flujo indep
 
 El resultado se organiza primero por actor y después con los mismos grupos funcionales de los casos
 de uso. Por ejemplo, el comando del administrador escribe
-`build/docs/docx/manuales/administrador/autenticacion.docx`, `identidad-y-acceso.docx` y `catalogos.docx`;
+`build/docs/docx/manuales/administrador/autenticacion.docx`, `identidad-y-acceso.docx`,
+`catalogos.docx` y `reportes.docx`;
 el de almacén escribe `autenticacion.docx`, `catalogos.docx`, `compras-de-material.docx` y
 los archivos separados `salidas-de-material.docx` y `salidas-de-merma.docx` dentro de
 `build/docs/docx/manuales/almacen/`. Las capturas de consultas y
 exportaciones quedan en el grupo `CU-*` que respaldan, en vez de crear grupos distintos por pantalla
 o un archivo genérico de reportes.
 Cada archivo conserva la portada del actor y únicamente los recorridos que corresponden a ese grupo.
+Los reportes de movimientos no se incorporan al manual de Almacén; se publican en el manual del
+Administrador del sistema del área Sistemas. De forma inversa, las compras y salidas no se
+incorporan al manual de Sistemas.

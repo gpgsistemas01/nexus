@@ -31,7 +31,7 @@ permiso se agrupan. Los valores de permiso son los declarados en
 | Sistemas / clientes | `L → clients:read`; `C → clients:create`; `U → clients:update`; exportar `→ client:reports-read` | Parcial; el Personal de almacén aún no dispone del recorrido de consulta y alta definido en `CU-CAT-05` y `CU-CAT-06` |
 | Contexto pendiente / proyectos | Sin rutas API CRUD ni permiso registrado | Modelado |
 | Almacén / materiales | `L → materials:read`; costo en la consulta `→ inventory:costs-read`; `C, U, D → materials:write`; ajustar existencia `→ materials:adjust-stock`; exportar inventario `→ warehouse:reports-read` | Implementado |
-| Almacén / merma | `L → wastes:read`; costo en la consulta `→ inventory:costs-read`; `C, U → wastes:write`; ajustar existencia `→ wastes:adjust-stock`; exportar `→ warehouse:reports-read` | Implementado |
+| Almacén / merma | `L → wastes:read`; costo en la consulta `→ inventory:costs-read`; `C, U → wastes:write`; agregar existencia `→ wastes:add-stock`; ajustar existencia `→ wastes:adjust-stock`; exportar `→ warehouse:reports-read` | Implementado |
 | Almacén / proveedores | `L, C → suppliers:manage`; `U → suppliers:update`; exportar `→ supplier:reports-read` | Parcial; el Personal de almacén aún no dispone del recorrido de consulta y alta definido en `CU-CAT-01` y `CU-CAT-02` |
 | Almacén / presentación | `L → presentations:read` | Implementado sólo lectura |
 | Almacén / unidad de medida | `L → unit:measures-read` | Implementado sólo lectura |
@@ -77,6 +77,7 @@ y exige stock, pero no vuelve a seleccionar el recurso ni crea otra relación.
 | Merma / crear | `create`; no existe la combinación de nombre, proveedor y dimensiones | proveedor, material de referencia, nombre, base, altura, stock mínimo, costo máximo, estado, existencia inicial y observaciones | crea la merma y su movimiento inicial; una identidad repetida se rechaza sin sumar stock |
 | Merma / editar | `edit`; merma existente | nombre, stock mínimo, costo máximo y estado | proveedor, material de referencia, presentación, unidad y dimensiones permanecen bloqueados; no cambia existencia |
 | Merma / ajustar | `edit-stock`; merma existente y actor autorizado | nuevo stock total, motivo y observaciones | crea ajuste y movimiento; no cambia identidad ni interpreta el stock como incremento |
+| Merma / agregar stock | `add-stock`; merma existente y actor autorizado | cantidad positiva y observaciones opcionales | crea un documento individual de entrada vinculado a su movimiento `ENTRY`; suma la cantidad sin reemplazar el saldo |
 | Entrada / crear | `create`; documento nuevo | tipo de comprobante, factura cuando aplica, proveedor, receptor, fecha de recepción, observaciones y detalles | incrementa existencias y crea movimientos en una transacción |
 | Entrada / editar | `edit`; entrada no cancelada | tipo de comprobante, factura cuando aplica, receptor, fecha, observaciones y detalles **nuevos** | el proveedor permanece bloqueado; una partida persistida se cambia mediante `correct`, no sobrescribiéndola |
 | Entrada / consultar | `view`; entrada cancelada | ninguno | formulario, detalles y acciones permanecen en sólo lectura |

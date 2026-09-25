@@ -2,7 +2,9 @@ import { describe, expect, it } from 'vitest';
 
 import {
   createWasteDtoForEdit,
-  createWasteDtoForRegister
+  createWasteDtoForRegister,
+  createWasteDtoForStockAddition,
+  createWasteDtoForStockUpdate
 } from '../../../src/dtos/wasteDTO.js';
 
 describe('wasteDTO', () => {
@@ -32,5 +34,24 @@ describe('wasteDTO', () => {
       isActive: true,
       newStock: '4'
     })).toMatchObject({ name: 'Recorte confirmado' });
+  });
+
+  it('normaliza las observaciones igual en ajustes y adiciones de stock', () => {
+    expect(createWasteDtoForStockUpdate({
+      newStock: '8',
+      reasonId: 'reason-1',
+      observations: '  Conteo físico  '
+    })).toEqual({
+      newStock: 8,
+      reasonId: 'reason-1',
+      observations: 'Conteo físico'
+    });
+    expect(createWasteDtoForStockAddition({
+      quantity: '3',
+      observations: '  Recepción adicional  '
+    })).toEqual({
+      quantity: 3,
+      observations: 'Recepción adicional'
+    });
   });
 });

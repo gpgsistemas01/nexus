@@ -5,6 +5,7 @@ export const UI_PERMISSIONS = Object.freeze({
     MATERIALS_ADJUST_STOCK: 'materials:adjust-stock',
     INVENTORY_COSTS_READ: 'inventory:costs-read',
     WASTES_WRITE: 'wastes:write',
+    WASTES_ADD_STOCK: 'wastes:add-stock',
     WASTES_ADJUST_STOCK: 'wastes:adjust-stock',
     GOODS_ISSUES_MANAGE: 'goods:issues-manage',
     GOODS_ISSUE_DETAILS_MANAGE: 'goods:issue-details-manage',

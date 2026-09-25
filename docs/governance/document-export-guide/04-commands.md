@@ -6,7 +6,7 @@ paquetes producen un archivo. Elija uno de estos valores:
 
 | Valor de `<paquete>` | Contenido generado | Cuándo usarlo |
 | --- | --- | --- |
-| `manual-administrador` | Carpeta `manuales/administrador/` con archivos separados para los grupos `AUT`, `IDA` y `CAT` que corresponden al actor. | Para personal administrador del sistema. |
+| `manual-administrador` | Carpeta `manuales/administrador/` con archivos separados para autenticación, identidad y acceso, catálogos auxiliares y reportes de movimientos. | Para personal administrador del sistema del área Sistemas. |
 | `manual-almacen` | Carpeta `manuales/almacen/` con archivos separados para los grupos `AUT`, `CAT` y `ENT`; `SAL` se divide entre salidas de material y salidas de merma. | Para personal de almacén y proveeduría. |
 | `requisitos` | Especificación y trazabilidad de requisitos. | Para revisión funcional. |
 | `datos` | Mapa de datos, decisiones de acceso, esquema y diccionario técnico generados. | Para revisar persistencia y acceso a los datos. |
@@ -15,7 +15,9 @@ paquetes producen un archivo. Elija uno de estos valores:
 | `todos` | Los dos manuales por conjuntos y los cuatro documentos técnicos anteriores. | Para preparar una entrega documental completa con un solo comando. |
 
 Los paquetes por actor reutilizan las secciones comunes y omiten las que
-no corresponden a ese recorrido. Los formatos admitidos son `docx`, `pdf` y `ambos`; `pdf` y
+no corresponden a ese recorrido. En particular, los reportes de movimientos se exportan sólo en
+`manual-administrador`; las compras y salidas se exportan sólo en `manual-almacen`. Los formatos
+admitidos son `docx`, `pdf` y `ambos`; `pdf` y
 `ambos` conservan el DOCX intermedio además del PDF, mientras que `ambos` permite expresar esa
 intención de forma explícita. Markdown permanece como fuente navegable y por eso no se genera una
 copia HTML equivalente.

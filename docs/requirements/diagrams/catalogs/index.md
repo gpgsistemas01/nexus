@@ -16,9 +16,10 @@
 - [`CU-ALM-10` — Registrar merma](cu-alm-10.md)
 - [`CU-ALM-11` — Editar merma](cu-alm-11.md)
 - [`CU-ALM-12` — Ajustar existencia de merma](cu-alm-12.md)
-- [`CU-ALM-13` — Generar reporte de mermas](cu-alm-13.md)
-- [`CU-ALM-14` — Consultar movimientos de mermas](cu-alm-14.md)
-- [`CU-ALM-15` — Generar reporte de movimientos de mermas](cu-alm-15.md)
+- [`CU-ALM-13` — Agregar existencia de merma](cu-alm-13.md)
+- [`CU-ALM-14` — Generar reporte de mermas](cu-alm-14.md)
+- [`CU-ALM-15` — Consultar movimientos de mermas](cu-alm-15.md)
+- [`CU-ALM-16` — Generar reporte de movimientos de mermas](cu-alm-16.md)
 
 ### Grupo funcional CAT — Catálogos
 
