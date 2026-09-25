@@ -28,11 +28,11 @@ permiso se agrupan. Los valores de permiso son los declarados en
 | Sistemas / usuarios | `L, C, U, cambiar contraseña/accesos → users:manage`; exportar `→ admin:reports-read` | Implementado |
 | Sistemas / catálogos auxiliares | `L, C, U` de áreas, roles, presentaciones, unidades de medida, motivos de ajuste y estados de cumplimiento `→ catalogs:manage` | Implementado; acceso exclusivo del Administrador del sistema del área Sistemas |
 | Formularios operativos / roles y departamentos | `L → roles:read`, `departments:read` | Implementado sólo lectura |
-| Sistemas / clientes | `L → clients:read`; `C → clients:create`; `U → clients:update`; exportar `→ client:reports-read` | Parcial; el Personal de almacén aún no dispone del recorrido de consulta y alta definido en `CU-CAT-05` y `CU-CAT-06` |
+| Clientes | `L → clients:read`; `C → clients:create`; `U → clients:update`; exportar `→ client:reports-read` | Consulta y alta disponibles para Personal de almacén y Administrador del sistema; actualización y reporte exclusivos de Sistemas |
 | Contexto pendiente / proyectos | Sin rutas API CRUD ni permiso registrado | Modelado |
 | Almacén / materiales | `L → materials:read`; costo en la consulta `→ inventory:costs-read`; `C, U, D → materials:write`; ajustar existencia `→ materials:adjust-stock`; exportar inventario `→ warehouse:reports-read` | Implementado |
 | Almacén / merma | `L → wastes:read`; costo en la consulta `→ inventory:costs-read`; `C, U → wastes:write`; agregar existencia `→ wastes:add-stock`; ajustar existencia `→ wastes:adjust-stock`; exportar `→ warehouse:reports-read` | Implementado |
-| Almacén / proveedores | `L, C → suppliers:manage`; `U → suppliers:update`; exportar `→ supplier:reports-read` | Parcial; el Personal de almacén aún no dispone del recorrido de consulta y alta definido en `CU-CAT-01` y `CU-CAT-02` |
+| Proveedores | `L, C → suppliers:manage`; `U → suppliers:update`; exportar `→ supplier:reports-read` | Consulta y alta disponibles para Personal de almacén y Administrador del sistema; actualización y reporte exclusivos de Sistemas |
 | Almacén / presentación | `L → presentations:read` | Implementado sólo lectura |
 | Almacén / unidad de medida | `L → unit:measures-read` | Implementado sólo lectura |
 | Almacén / motivo de ajuste | `L → reasons:read` | Implementado sólo lectura |

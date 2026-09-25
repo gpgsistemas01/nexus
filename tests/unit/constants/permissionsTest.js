@@ -40,4 +40,16 @@ describe('políticas funcionales de acceso', () => {
             PERMISSIONS.WASTE_ISSUES_SUPPLY
         ]));
     });
+
+    it('permite al personal de almacén abrir las consultas de clientes y proveedores', () => {
+        const permissions = getGrantedPermissions([{
+            role: 'Almacenista',
+            department: 'ALMACÉN Y PROVEDURÍA'
+        }]);
+
+        expect(permissions).toEqual(expect.arrayContaining([
+            PERMISSIONS.CLIENTS_PAGE_VIEW,
+            PERMISSIONS.SUPPLIERS_PAGE_VIEW
+        ]));
+    });
 });
