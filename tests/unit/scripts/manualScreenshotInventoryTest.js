@@ -16,7 +16,7 @@ describe('manual screenshot inventory', () => {
     const output = listInventory();
 
     expect(output).toContain('| 1 | almacen | `CAP-AUT-01-LOGIN` |');
-    expect(output).toContain('| 110 | sistemas | `CAP-ERR-404-SISTEMAS-NOT-FOUND` |');
+    expect(output).toContain('| 100 | sistemas | `CAP-ERR-404-SISTEMAS-NOT-FOUND` |');
   });
 
   it.each(['almacen', 'sistemas'])('limits the inventory to the %s area', area => {
@@ -25,5 +25,15 @@ describe('manual screenshot inventory', () => {
 
     expect(rows.length).toBeGreaterThan(0);
     expect(rows.every(line => line.includes(`| ${ area } |`))).toBe(true);
+  });
+
+  it('assigns clients and suppliers only to the authorized systems area', () => {
+    const warehouseOutput = listInventory('--area', 'almacen');
+    const systemsOutput = listInventory('--area', 'sistemas');
+
+    expect(warehouseOutput).not.toContain('CAP-CAT-SUP-');
+    expect(warehouseOutput).not.toContain('CAP-CAT-CLI-');
+    expect(systemsOutput).toContain('CAP-CAT-SUP-00-NAVIGATION');
+    expect(systemsOutput).toContain('CAP-CAT-CLI-00-NAVIGATION');
   });
 });

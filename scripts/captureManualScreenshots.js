@@ -174,8 +174,8 @@ const captureTemplates = [
     { id: 'CAP-ERR-404-SISTEMAS-NOT-FOUND', module: 'errors', name: '01-page-not-found.png', route: '/pagina-no-existente-manual', ready: '.error-card', area: 'sistemas', unauthenticated: true, useCases: [] }
 ];
 
-const systemAreaModules = ['catalogs/', 'people', 'users', 'material-movements', 'waste-movements'];
-const sharedOperationalModules = ['materials', 'waste', 'suppliers', 'clients'];
+const systemAreaModules = ['catalogs/', 'suppliers', 'clients', 'people', 'users', 'material-movements', 'waste-movements'];
+const sharedOperationalModules = ['materials', 'waste'];
 const getCaptureArea = capture => systemAreaModules.some(module => capture.module.startsWith(module))
     ? 'sistemas'
     : 'almacen';

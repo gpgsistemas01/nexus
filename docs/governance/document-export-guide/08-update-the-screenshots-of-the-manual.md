@@ -131,6 +131,9 @@ Cada comando genera únicamente el inventario del área indicada. `DOCS_CAPTURE_
 como alternativa a `--area` para CI. Para regenerar capturas concretas use
 `DOCS_ALMACEN_CAPTURE_IDS` o `DOCS_SISTEMAS_CAPTURE_IDS`; para continuar desde un punto use la
 variable `DOCS_<AREA>_CAPTURE_FROM`. No combine esos mecanismos con `--missing` o `--fresh`.
+Los listados independientes de clientes y proveedores pertenecen al inventario de Sistemas: no se
+solicitan durante la ejecución de Almacén porque esa cuenta no tiene los permisos de vista de sus
+rutas web.
 
 Por ejemplo, para repetir una captura de Almacén con su archivo de sesión todavía disponible:
 
