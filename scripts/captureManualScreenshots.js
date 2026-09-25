@@ -6,17 +6,21 @@ import process from 'node:process';
 import { captureWithRecovery } from './manualScreenshotRecovery.js';
 
 const baseURL = process.env.DOCS_BASE_URL ?? 'http://127.0.0.1:3000';
-const captureAreas = ['almacen', 'sistemas'];
-const areaArgumentIndex = process.argv.findIndex(argument => argument === '--area');
-const inlineAreaArgument = process.argv.find(argument => argument.startsWith('--area='))?.split('=', 2)[1];
-const argumentCaptureArea = areaArgumentIndex === -1 ? inlineAreaArgument : process.argv[areaArgumentIndex + 1];
-const environmentCaptureArea = process.env.DOCS_CAPTURE_AREA?.trim();
-if (argumentCaptureArea && environmentCaptureArea && argumentCaptureArea !== environmentCaptureArea) {
-    throw new Error('El área indicada con --area no coincide con DOCS_CAPTURE_AREA.');
-}
-const captureArea = argumentCaptureArea ?? environmentCaptureArea;
-const captureAreaPrefix = captureArea?.toUpperCase();
-const requestedCaptureIds = (process.env[`DOCS_${ captureAreaPrefix }_CAPTURE_IDS`] ?? '')
+const authenticatedAreas = Object.freeze({
+    warehouse: {
+        label: 'Almacén',
+        loginName: process.env.DOCS_WAREHOUSE_LOGIN_NAME,
+        loginPassword: process.env.DOCS_WAREHOUSE_LOGIN_PASSWORD,
+        storageState: process.env.DOCS_WAREHOUSE_STORAGE_STATE
+    },
+    administration: {
+        label: 'Sistemas',
+        loginName: process.env.DOCS_ADMIN_LOGIN_NAME,
+        loginPassword: process.env.DOCS_ADMIN_LOGIN_PASSWORD,
+        storageState: process.env.DOCS_ADMIN_STORAGE_STATE
+    }
+});
+const requestedCaptureIds = (process.env.DOCS_CAPTURE_IDS ?? '')
     .split(',')
     .map(id => id.trim())
     .filter(Boolean);
@@ -159,27 +163,17 @@ const captureTemplates = [
     { id: 'CAP-ERR-404-SISTEMAS-NOT-FOUND', module: 'errors', name: '01-page-not-found.png', route: '/pagina-no-existente-manual', ready: '.error-card', area: 'sistemas', unauthenticated: true, useCases: [] }
 ];
 
-const systemAreaModules = ['catalogs/', 'people', 'users', 'material-movements', 'waste-movements'];
-const sharedOperationalModules = ['materials', 'waste', 'suppliers', 'clients'];
-const getCaptureArea = capture => systemAreaModules.some(module => capture.module.startsWith(module))
-    ? 'sistemas'
-    : 'almacen';
-const getCaptureScopePath = capture => path.join('areas', capture.area);
-
-for (const capture of captureTemplates) capture.area ??= getCaptureArea(capture);
-
-const captures = captureTemplates.flatMap(capture => {
-    if (capture.area !== 'almacen'
-        || !sharedOperationalModules.includes(capture.module)
-        || capture.unauthenticated
-        || capture.id.startsWith('CAP-AUT-')) {
-        return [capture];
-    }
-    return [
-        capture,
-        { ...capture, id: `${ capture.id }-SISTEMAS`, area: 'sistemas' }
-    ];
-});
+const administrationModules = new Set([
+    'people',
+    'users',
+    'material-movements',
+    'waste-movements'
+]);
+const captureArea = capture => (
+    capture.module.startsWith('catalogs/') || administrationModules.has(capture.module)
+        ? 'administration'
+        : 'warehouse'
+);
 
 const validateInventory = () => {
     const ids = new Set();
@@ -404,7 +398,8 @@ const capturePageWithRecovery = async (context, capture) => {
     }
 };
 
-const login = async (page, credentials) => {
+const login = async (page, area) => {
+    const { label, loginName, loginPassword } = authenticatedAreas[area];
     await page.goto(new URL('/inicio-sesion', baseURL).href, { waitUntil: 'domcontentloaded' });
     await page.locator('#loginForm').waitFor({ state: 'visible' });
     await page.locator('#nameInput').fill(credentials.name);
@@ -413,7 +408,7 @@ const login = async (page, credentials) => {
         page.waitForURL(url => url.pathname === '/almacen/materiales'),
         page.locator('#submitBtn').click()
     ]);
-    console.log(`Sesión de capturas iniciada automáticamente para ${ credentials.area }.`);
+    console.log(`Sesión de capturas de ${ label } iniciada automáticamente.`);
 };
 
 const getAreaCredentials = area => ({
@@ -454,20 +449,25 @@ if (recoverMissingCaptures && !selectedCaptures.length) {
     process.exit(0);
 }
 
-const protectedAreas = [...new Set(selectedCaptures.filter(item => !item.unauthenticated).map(item => item.area))];
-const credentialsByArea = new Map(protectedAreas.map(area => [area, getAreaCredentials(area)]));
-for (const credentials of credentialsByArea.values()) {
-    if (Boolean(credentials.name) !== Boolean(credentials.password)) {
-        throw new Error(`Las credenciales de ${ credentials.area } deben definirse juntas.`);
+const protectedCaptures = selectedCaptures.filter(item => !item.public);
+const selectedAreas = [...new Set(protectedCaptures.map(captureArea))];
+for (const area of selectedAreas) {
+    const { label, loginName, loginPassword, storageState } = authenticatedAreas[area];
+    if (Boolean(loginName) !== Boolean(loginPassword)) {
+        throw new Error(`DOCS_${ area === 'warehouse' ? 'WAREHOUSE' : 'ADMIN' }_LOGIN_NAME y DOCS_${ area === 'warehouse' ? 'WAREHOUSE' : 'ADMIN' }_LOGIN_PASSWORD deben definirse juntos.`);
     }
-    if (credentials.storageState && credentials.name) {
-        throw new Error(`Use credenciales automáticas o storage state para ${ credentials.area }, no ambos.`);
+    if (storageState && loginName) {
+        throw new Error(`Use credenciales automáticas o el archivo de sesión de ${ label }, no ambos mecanismos.`);
     }
-    if (!credentials.storageState && !credentials.name) {
-        throw new Error(`Defina credenciales o storage state para el área ${ credentials.area }.`);
+    if (!storageState && !loginName) {
+        throw new Error(`Defina las credenciales o el archivo de sesión de ${ label } para generar sus capturas protegidas.`);
     }
-    if (credentials.storageState && !existsSync(credentials.storageState)) {
-        throw new Error(`No existe el archivo de sesión de ${ credentials.area }: ${ credentials.storageState }.`);
+    if (storageState && !existsSync(storageState)) {
+        throw new Error(
+            `No existe el archivo de sesión de ${ label }: ${ storageState }. `
+            + 'Complete el inicio de sesión en Playwright codegen, presione Ctrl+C una vez en la terminal donde lo ejecutó, '
+            + 'espere a que termine y vuelva el prompt, y compruebe que el archivo se haya guardado.'
+        );
     }
 }
 
@@ -492,28 +492,28 @@ try {
     for (const capture of selectedCaptures.filter(item => item.unauthenticated)) await capturePageWithRecovery(unauthenticatedContext, capture);
     await unauthenticatedContext.close();
 
-    for (const area of protectedAreas) {
-        const credentials = credentialsByArea.get(area);
-        const authenticatedContext = await browser.newContext({ ...contextOptions, ...(credentials.storageState ? { storageState: credentials.storageState } : {}) });
+    for (const area of selectedAreas) {
+        const { storageState } = authenticatedAreas[area];
+        const areaCaptures = protectedCaptures.filter(capture => captureArea(capture) === area);
+        const authenticatedContext = await browser.newContext({ ...contextOptions, ...(storageState ? { storageState } : {}) });
         authenticatedContext.setDefaultTimeout(captureTimeout);
         if (!credentials.storageState) {
             const loginPage = await authenticatedContext.newPage();
-            await login(loginPage, credentials);
+            await login(loginPage, area);
             await loginPage.close();
         }
-        for (const capture of selectedCaptures.filter(item => item.area === area)) {
-            await capturePageWithRecovery(authenticatedContext, capture);
-        }
+        for (const capture of areaCaptures) await capturePageWithRecovery(authenticatedContext, capture);
         await authenticatedContext.close();
     }
 } finally {
     await browser.close();
 }
 
-for (const credentials of credentialsByArea.values()) {
-    if (credentials.storageState) await rm(credentials.storageState, { force: true });
+for (const area of selectedAreas) {
+    const { storageState } = authenticatedAreas[area];
+    if (storageState) await rm(storageState, { force: true });
 }
 console.log(`Capturas generadas en ${ path.relative(process.cwd(), outputRoot) }.`);
-if ([...credentialsByArea.values()].some(credentials => credentials.storageState)) {
+if (selectedAreas.some(area => authenticatedAreas[area].storageState)) {
     console.log('Estados temporales de autenticación eliminados.');
 }
