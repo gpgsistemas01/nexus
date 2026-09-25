@@ -3,6 +3,7 @@ import { mkdir, rm } from 'node:fs/promises';
 import path from 'node:path';
 import process from 'node:process';
 
+import { waitForCaptureReady } from './manualScreenshotPageState.js';
 import { captureWithRecovery } from './manualScreenshotRecovery.js';
 
 const baseURL = process.env.DOCS_BASE_URL ?? 'http://127.0.0.1:3000';
@@ -62,6 +63,7 @@ const click = (selector, ready, requirement) => ({ selector, ready, requirement 
 const fill = (selector, value) => ({ selector, value, fill: true });
 const filter = (selector, label) => ({ selector, label, filter: true });
 const clickStatus = (status, selector, ready, requirement) => ({ status, selector, ready, requirement });
+const selectNewOption = (selector, value, optionLabel, ready) => ({ selector, value, optionLabel, ready, selectNew: true });
 const openFilters = click('.table-filters-summary', '#tableFiltersForm:visible');
 const reportDialog = click('.datatable-export-button', '.report-export-modal');
 const openMainMenu = click('#appMenuOffcanvasBtn', '#appMenu.show');
@@ -85,13 +87,15 @@ const captureTemplates = [
 
     { id: 'CAP-CAT-SUP-00-NAVIGATION', module: 'suppliers', name: '00-access-menu-main.png', route: '/proveedores', ready: '#table', action: openMainMenu, useCases: ['CU-CAT-01'] },
     { id: 'CAP-CAT-SUP-01-LIST', module: 'suppliers', name: '01-list.png', route: '/proveedores', ready: '#table', useCases: ['CU-CAT-01', 'CU-CAT-04'] },
-    { id: 'CAP-CAT-SUP-02-CREATE', module: 'suppliers', name: '02-form-creation.png', route: '/proveedores', ready: '#table', action: click('button:has-text("Nuevo proveedor")', '#supplierModal.show'), useCases: ['CU-CAT-02'] },
+    { id: 'CAP-CAT-SUP-02-CREATE', module: 'suppliers', name: '02-form-creation.png', route: '/compras', ready: '#table', actions: [click('button:has-text("Nueva compra")', '#goodsReceiptModal.show'), selectNewOption('#goodsReceiptModal #supplierInput', 'Proveedor para captura', 'Nuevo proveedor', '#supplierModal.show')], area: 'almacen', useCases: ['CU-CAT-02', 'CU-ENT-02'] },
+    { id: 'CAP-CAT-SUP-02-CREATE-SISTEMAS', module: 'suppliers', name: '02-form-creation.png', route: '/proveedores', ready: '#table', action: click('button:has-text("Nuevo proveedor")', '#supplierModal.show'), area: 'sistemas', useCases: ['CU-CAT-02'] },
     { id: 'CAP-CAT-SUP-03-EDIT', module: 'suppliers', name: '03-form-edit-and-state.png', route: '/proveedores', ready: '#table', action: click('#table tbody .btn-edit', '#supplierModal.show'), useCases: ['CU-CAT-03', 'CU-CAT-04'] },
     { id: 'CAP-CAT-SUP-04-EXPORT', module: 'suppliers', name: '04-export-report.png', route: '/proveedores', ready: '#table', action: reportDialog, useCases: ['CU-CAT-04'] },
 
     { id: 'CAP-CAT-CLI-00-NAVIGATION', module: 'clients', name: '00-access-menu-main.png', route: '/clientes', ready: '#table', action: openMainMenu, useCases: ['CU-CAT-05'] },
     { id: 'CAP-CAT-CLI-01-LIST', module: 'clients', name: '01-list.png', route: '/clientes', ready: '#table', useCases: ['CU-CAT-05', 'CU-CAT-08'] },
-    { id: 'CAP-CAT-CLI-02-CREATE', module: 'clients', name: '02-form-creation.png', route: '/clientes', ready: '#table', action: click('button:has-text("Nuevo cliente")', '#clientModal.show'), useCases: ['CU-CAT-06'] },
+    { id: 'CAP-CAT-CLI-02-CREATE', module: 'clients', name: '02-form-creation.png', route: '/salidas/materiales', ready: '#table', actions: [click('button:has-text("Nueva salida")', '#goodsIssueModal.show'), selectNewOption('#goodsIssueModal #clientInput', 'Cliente para captura', 'Nuevo cliente', '#clientModal.show')], area: 'almacen', useCases: ['CU-CAT-06', 'CU-SAL-02'] },
+    { id: 'CAP-CAT-CLI-02-CREATE-SISTEMAS', module: 'clients', name: '02-form-creation.png', route: '/clientes', ready: '#table', action: click('button:has-text("Nuevo cliente")', '#clientModal.show'), area: 'sistemas', useCases: ['CU-CAT-06'] },
     { id: 'CAP-CAT-CLI-03-EDIT', module: 'clients', name: '03-form-edit.png', route: '/clientes', ready: '#table', action: click('#table tbody .btn-edit', '#clientModal.show'), useCases: ['CU-CAT-07'] },
     { id: 'CAP-CAT-CLI-04-EXPORT', module: 'clients', name: '04-export-report.png', route: '/clientes', ready: '#table', action: reportDialog, useCases: ['CU-CAT-08'] },
 
@@ -173,8 +177,8 @@ const captureTemplates = [
     { id: 'CAP-ERR-404-SISTEMAS-NOT-FOUND', module: 'errors', name: '01-page-not-found.png', route: '/pagina-no-existente-manual', ready: '.error-card', area: 'sistemas', unauthenticated: true, useCases: [] }
 ];
 
-const systemAreaModules = ['catalogs/', 'people', 'users', 'material-movements', 'waste-movements'];
-const sharedOperationalModules = ['materials', 'waste', 'suppliers', 'clients'];
+const systemAreaModules = ['catalogs/', 'suppliers', 'clients', 'people', 'users', 'material-movements', 'waste-movements'];
+const sharedOperationalModules = ['materials', 'waste'];
 const getCaptureArea = capture => systemAreaModules.some(module => capture.module.startsWith(module))
     ? 'sistemas'
     : 'almacen';
@@ -318,6 +322,14 @@ const findStatusTriggerAcrossPages = async (page, { status, selector }) => {
 };
 
 const runAction = async (page, action, captureId, step) => {
+    if (action.selectNew) {
+        await page.locator(action.selector).evaluate(select => globalThis.$(select).select2('open'));
+        await page.locator('.select2-container--open .select2-search__field').fill(action.value);
+        await page.locator(`.select2-results__option:has-text("${ action.optionLabel }")`).first().click();
+        await page.locator(action.ready).first().waitFor({ state: 'visible' });
+        console.log(`  Paso ${ step } de ${ captureId }: opción ${ action.optionLabel }`);
+        return;
+    }
     if (action.fill) {
         await page.locator(action.selector).fill(action.value);
         console.log(`  Paso ${ step } de ${ captureId }: captura de ${ action.selector }`);
@@ -377,7 +389,7 @@ const capturePage = async (page, capture) => {
     const directory = path.join(outputRoot, getCaptureScopePath(capture), capture.module);
     await mkdir(directory, { recursive: true });
     await page.goto(new URL(capture.route, baseURL).href, { waitUntil: 'domcontentloaded' });
-    await page.locator(capture.ready).first().waitFor({ state: 'visible' });
+    await waitForCaptureReady(page, capture, baseURL);
     if (capture.ready === '#table') {
         try {
             await waitForDataTableReady(page);

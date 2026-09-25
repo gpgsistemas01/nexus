@@ -131,6 +131,10 @@ Cada comando genera únicamente el inventario del área indicada. `DOCS_CAPTURE_
 como alternativa a `--area` para CI. Para regenerar capturas concretas use
 `DOCS_ALMACEN_CAPTURE_IDS` o `DOCS_SISTEMAS_CAPTURE_IDS`; para continuar desde un punto use la
 variable `DOCS_<AREA>_CAPTURE_FROM`. No combine esos mecanismos con `--missing` o `--fresh`.
+Los listados independientes de clientes y proveedores pertenecen al inventario de Sistemas: no se
+solicitan durante la ejecución de Almacén porque esa cuenta no tiene acceso a sus rutas web. Las
+capturas de alta de Almacén sí abren los mismos modales reutilizados desde **Nueva compra** y
+**Nueva salida**, mediante las opciones **Nuevo proveedor** y **Nuevo cliente** de sus selectores.
 
 Por ejemplo, para repetir una captura de Almacén con su archivo de sesión todavía disponible:
 
@@ -159,6 +163,12 @@ surtimiento y que exista una salida aprobada, completamente surtida y con cantid
 script espera a que DataTables termine de cargar y recorre todas las páginas del listado para
 localizar la acción requerida. Las líneas `Paso N/T` son acciones preparatorias, no capturas
 duplicadas.
+
+Si Nexus redirige una ruta protegida al formulario de acceso, el script detiene esa captura sin
+agotar los reintentos: vuelva a generar el archivo de sesión para la misma instancia indicada en
+`DOCS_BASE_URL`, o revise las credenciales automáticas. Si en su lugar aparece la página de error,
+compruebe que la cuenta del área tenga permiso para abrir la ruta indicada en el mensaje. Esto evita
+confundir una sesión expirada o un permiso ausente con una carga lenta de DataTables.
 
 ## Precisión de la interacción automatizada
 

@@ -5,9 +5,9 @@
 
 **Errores posibles:** [Validación de formularios](../../error-messages.md#errores-validacion), [Catálogos e inventario](../../error-messages.md#errores-catalogos).
 
-**Controles que debe usar:** Botón **Nuevo cliente**, campo **Nombre**, casilla **Activo** y botón **Guardar**.
+**Controles que debe usar:** Opción **Nuevo cliente** del selector de una salida autorizada o botón **Nuevo cliente** del listado de Sistemas; campo **Nombre**, casilla **Activo** y botón **Guardar**.
 
-1. Seleccione el botón **Nuevo cliente** para abrir el formulario de alta. Antes de continuar, compruebe que la pantalla mostrada coincida con la captura:
+1. Desde Almacén, abra **Nueva salida**, escriba el cliente que no existe en el selector y elija **Nuevo cliente**. Desde Sistemas también puede seleccionar el botón **Nuevo cliente** del listado independiente. Antes de continuar, compruebe que la pantalla mostrada coincida con la captura:
 
    ![CAP-CAT-CLI-02-CREATE: formulario alta](../../images/clients/02-form-creation.png)
 

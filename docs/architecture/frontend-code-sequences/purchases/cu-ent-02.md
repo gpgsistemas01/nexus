@@ -9,6 +9,8 @@ sequenceDiagram
     participant Modal as src/public/js/pages/warehouse/goodsReceipts/goodsReceiptModal.js
     participant Form as src/public/js/pages/warehouse/goodsReceipts/goodsReceiptForm.js
     participant DetailUI as src/public/js/pages/warehouse/goodsReceipts/goodsReceiptDetails.js<br/>src/public/js/plugins/datatable/warehouse/goodsReceipts/goodsReceiptDatatable.js
+    participant SupplierSelect as src/public/js/plugins/select2/domains/supplier.js
+    participant SupplierModal as src/public/js/pages/warehouse/suppliers/supplierModal.js<br/>supplierForm.js
     participant MaterialUI as src/public/js/plugins/select2/modules/goodsReceiptSelect.js<br/>src/public/js/pages/warehouse/materials/materialModal.js
     participant MaterialApp as src/public/js/application/warehouse/materials/materials.js
     participant MaterialRequest as src/public/js/services/warehouse/materialService.js
@@ -19,6 +21,15 @@ sequenceDiagram
 
     Warehouse->>Modal: abrir «Nueva compra»
     Modal->>Modal: openGoodsReceiptModal({ mode: create })
+    opt El proveedor no está catalogado
+        Warehouse->>SupplierSelect: escribir nombre y seleccionar Nuevo proveedor
+        SupplierSelect->>SupplierSelect: runAfterSelect2Close(...)
+        SupplierSelect->>SupplierModal: openSupplierModal({ data: { tradeName }, onSave })
+        Note over SupplierModal,SupplierSelect: registerSupplier() y POST /api/warehouse/suppliers<br/>se detallan en DIA-FE-CU-CAT-02
+        SupplierModal->>SupplierSelect: form.onSave(createdSupplier)
+        SupplierSelect->>SupplierSelect: toggleSupplierOption(...) agrega y selecciona
+        SupplierSelect-->>Warehouse: continuar compra sin abrir /proveedores
+    end
     opt El material no está catalogado
         DetailUI->>MaterialUI: setupMaterialSelect({ creationContext: 'goodsReceipt' }) abre openMaterialModal(...)
         MaterialUI->>MaterialUI: openMaterialModal({ creationContext: 'goodsReceipt' }) oculta maxUnitCost y sección newStock/observations
@@ -55,12 +66,16 @@ sequenceDiagram
         alt La factura ya existe para el proveedor
             API-->>HTTP: 409 { code, message, meta }
             HTTP-->>Request: apiRequest() rechaza { code, message, meta }
-            Request-->>Form: error con el folio, conservar formulario
+            Request-->>App: registerGoodsReceiptRequest() propaga { code, message, meta }
+            App-->>Form: registerGoodsReceipt() rechaza con el folio duplicado
+            Form-->>Warehouse: useForm conserva goodsReceiptForm y handleApiError muestra el conflicto
         else Compra nueva
             API-->>HTTP: 200 { goodsReceipt, code }
             HTTP-->>Request: apiRequest() resuelve response.data
-            Request-->>Form: goodsReceipt
-            Form-->>Warehouse: cerrar modal, notificar y actualizar listado
+            Request-->>App: registerGoodsReceiptRequest() resuelve response.data
+            App-->>Form: registerGoodsReceipt() devuelve { message }
+            Form->>Form: handleSubmit(...) ejecuta notifications.showSuccess,<br/>closeModal(form) y reloadMainTable({ resetPaging: true })
+            Form-->>Warehouse: modal cerrado y #table recargada
         end
     end
 ```
