@@ -160,6 +160,12 @@ script espera a que DataTables termine de cargar y recorre todas las páginas de
 localizar la acción requerida. Las líneas `Paso N/T` son acciones preparatorias, no capturas
 duplicadas.
 
+Si Nexus redirige una ruta protegida al formulario de acceso, el script detiene esa captura sin
+agotar los reintentos: vuelva a generar el archivo de sesión para la misma instancia indicada en
+`DOCS_BASE_URL`, o revise las credenciales automáticas. Si en su lugar aparece la página de error,
+compruebe que la cuenta del área tenga permiso para abrir la ruta indicada en el mensaje. Esto evita
+confundir una sesión expirada o un permiso ausente con una carga lenta de DataTables.
+
 ## Precisión de la interacción automatizada
 
 Playwright localiza los controles mediante selectores estables, texto accesible y el estado visible

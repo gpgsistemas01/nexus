@@ -3,6 +3,7 @@ import { mkdir, rm } from 'node:fs/promises';
 import path from 'node:path';
 import process from 'node:process';
 
+import { waitForCaptureReady } from './manualScreenshotPageState.js';
 import { captureWithRecovery } from './manualScreenshotRecovery.js';
 
 const baseURL = process.env.DOCS_BASE_URL ?? 'http://127.0.0.1:3000';
@@ -377,7 +378,7 @@ const capturePage = async (page, capture) => {
     const directory = path.join(outputRoot, getCaptureScopePath(capture), capture.module);
     await mkdir(directory, { recursive: true });
     await page.goto(new URL(capture.route, baseURL).href, { waitUntil: 'domcontentloaded' });
-    await page.locator(capture.ready).first().waitFor({ state: 'visible' });
+    await waitForCaptureReady(page, capture, baseURL);
     if (capture.ready === '#table') {
         try {
             await waitForDataTableReady(page);
