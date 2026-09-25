@@ -39,21 +39,27 @@ Playwright y Chromium se preparan automáticamente en el mismo entorno antes de 
    ```
 
    Si Nexus usa otro puerto, sustitúyalo en esta URL y después en `DOCS_BASE_URL`.
-4. En la terminal 2, defina `DOCS_BASE_URL` y las credenciales de una cuenta ficticia. Elija **un
-   solo bloque** y no agregue `/inicio-sesion` a `DOCS_BASE_URL`.
+4. En la terminal 2, defina `DOCS_BASE_URL` y las credenciales ficticias de **cada área**. El flujo
+   es el mismo para ambos manuales, pero cada grupo de capturas se realiza con la cuenta que tiene
+   sus permisos: Almacén para el manual de almacén y Sistemas para el manual del administrador. No
+   agregue `/inicio-sesion` a `DOCS_BASE_URL`.
 
    ```powershell
    # PowerShell
    $env:DOCS_BASE_URL = "http://127.0.0.1:3000"
-   $env:DOCS_LOGIN_NAME = "usuario-ficticio"
-   $env:DOCS_LOGIN_PASSWORD = "contraseña-ficticia"
+   $env:DOCS_WAREHOUSE_LOGIN_NAME = "usuario-almacen-ficticio"
+   $env:DOCS_WAREHOUSE_LOGIN_PASSWORD = "contraseña-almacen-ficticia"
+   $env:DOCS_ADMIN_LOGIN_NAME = "usuario-sistemas-ficticio"
+   $env:DOCS_ADMIN_LOGIN_PASSWORD = "contraseña-sistemas-ficticia"
    ```
 
    ```bash
    # Bash
    export DOCS_BASE_URL=http://127.0.0.1:3000
-   export DOCS_LOGIN_NAME=usuario-ficticio
-   export DOCS_LOGIN_PASSWORD='contraseña-ficticia'
+   export DOCS_WAREHOUSE_LOGIN_NAME=usuario-almacen-ficticio
+   export DOCS_WAREHOUSE_LOGIN_PASSWORD='contraseña-almacen-ficticia'
+   export DOCS_ADMIN_LOGIN_NAME=usuario-sistemas-ficticio
+   export DOCS_ADMIN_LOGIN_PASSWORD='contraseña-sistemas-ficticia'
    ```
 
    No guarde estas credenciales en `.env` ni en archivos del repositorio. Si sólo va a generar
@@ -62,14 +68,14 @@ Playwright y Chromium se preparan automáticamente en el mismo entorno antes de 
 
    Para capturas protegidas, como alternativa a las credenciales puede crear una sesión temporal
    con Playwright. Siga esta secuencia completa en PowerShell en lugar de definir
-   `DOCS_LOGIN_NAME` y `DOCS_LOGIN_PASSWORD`:
+   las variables de credenciales del área correspondiente:
 
    1. En la terminal 2, defina la URL, indique la ruta del archivo temporal e inicie `codegen`:
 
       ```powershell
       $env:DOCS_BASE_URL = "http://127.0.0.1:3000"
-      $env:DOCS_STORAGE_STATE = Join-Path $env:TEMP "nexus-storage-state.json"
-      npx playwright codegen --save-storage="$env:DOCS_STORAGE_STATE" "${env:DOCS_BASE_URL}/inicio-sesion"
+      $env:DOCS_WAREHOUSE_STORAGE_STATE = Join-Path $env:TEMP "nexus-warehouse-storage-state.json"
+      npx playwright codegen --save-storage="$env:DOCS_WAREHOUSE_STORAGE_STATE" "${env:DOCS_BASE_URL}/inicio-sesion"
       ```
 
    2. En la ventana de **Chromium** abierta por el tercer comando, complete el formulario de Nexus
@@ -82,12 +88,14 @@ Playwright y Chromium se preparan automáticamente en el mismo entorno antes de 
    5. Compruebe que Playwright haya guardado la sesión:
 
       ```powershell
-      Test-Path "$env:DOCS_STORAGE_STATE"
+      Test-Path "$env:DOCS_WAREHOUSE_STORAGE_STATE"
       ```
 
       Continúe únicamente si devuelve `True`; si devuelve `False`, repita esta secuencia desde el
       subpaso 1. Definir la variable por sí solo no crea el archivo. No mezcle
-      `DOCS_STORAGE_STATE` con las variables de credenciales.
+      `DOCS_WAREHOUSE_STORAGE_STATE` con las credenciales de Almacén. Repita los subpasos con
+      `DOCS_ADMIN_STORAGE_STATE` y una cuenta de Sistemas si también generará las capturas del
+      manual del administrador. Cada archivo pertenece exclusivamente a su área.
 
    Es necesario completar los cinco subpasos y terminar `codegen` antes de iniciar las capturas:
    mientras sigue abierto, el archivo puede no estar guardado y la terminal 2 continúa ocupada.
@@ -119,20 +127,22 @@ Playwright y Chromium se preparan automáticamente en el mismo entorno antes de 
 
    ```powershell
    # PowerShell
-   Remove-Item Env:DOCS_LOGIN_NAME, Env:DOCS_LOGIN_PASSWORD
+   Remove-Item Env:DOCS_WAREHOUSE_LOGIN_NAME, Env:DOCS_WAREHOUSE_LOGIN_PASSWORD
+   Remove-Item Env:DOCS_ADMIN_LOGIN_NAME, Env:DOCS_ADMIN_LOGIN_PASSWORD
    ```
 
    ```powershell
    # PowerShell, si utilizó el archivo de sesión
-   Remove-Item Env:DOCS_STORAGE_STATE
+   Remove-Item Env:DOCS_WAREHOUSE_STORAGE_STATE, Env:DOCS_ADMIN_STORAGE_STATE
    ```
 
    ```bash
    # Bash
-   unset DOCS_LOGIN_NAME DOCS_LOGIN_PASSWORD
+   unset DOCS_WAREHOUSE_LOGIN_NAME DOCS_WAREHOUSE_LOGIN_PASSWORD
+   unset DOCS_ADMIN_LOGIN_NAME DOCS_ADMIN_LOGIN_PASSWORD
    ```
 
-   Hay dos elementos distintos: la variable `DOCS_STORAGE_STATE` permanece definida en la terminal
+   Hay dos elementos distintos: cada variable `DOCS_*_STORAGE_STATE` permanece definida en la terminal
    hasta ejecutar `Remove-Item`, mientras que el archivo JSON al que apunta sí lo elimina
    automáticamente una ejecución correcta de `npm run docs:screenshots`. Si la ejecución falla, el
    archivo se conserva para reintentar y debe eliminarse manualmente cuando ya no se vaya a usar.

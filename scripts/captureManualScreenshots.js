@@ -6,9 +6,20 @@ import process from 'node:process';
 import { captureWithRecovery } from './manualScreenshotRecovery.js';
 
 const baseURL = process.env.DOCS_BASE_URL ?? 'http://127.0.0.1:3000';
-const storageState = process.env.DOCS_STORAGE_STATE;
-const loginName = process.env.DOCS_LOGIN_NAME;
-const loginPassword = process.env.DOCS_LOGIN_PASSWORD;
+const authenticatedAreas = Object.freeze({
+    warehouse: {
+        label: 'Almacén',
+        loginName: process.env.DOCS_WAREHOUSE_LOGIN_NAME,
+        loginPassword: process.env.DOCS_WAREHOUSE_LOGIN_PASSWORD,
+        storageState: process.env.DOCS_WAREHOUSE_STORAGE_STATE
+    },
+    administration: {
+        label: 'Sistemas',
+        loginName: process.env.DOCS_ADMIN_LOGIN_NAME,
+        loginPassword: process.env.DOCS_ADMIN_LOGIN_PASSWORD,
+        storageState: process.env.DOCS_ADMIN_STORAGE_STATE
+    }
+});
 const requestedCaptureIds = (process.env.DOCS_CAPTURE_IDS ?? '')
     .split(',')
     .map(id => id.trim())
@@ -138,6 +149,18 @@ const captures = [
 
     { id: 'CAP-ERR-404-NOT-FOUND', module: 'errors', name: '01-page-not-found.png', route: '/pagina-no-existente-manual', ready: '.error-card', public: true, useCases: [] }
 ];
+
+const administrationModules = new Set([
+    'people',
+    'users',
+    'material-movements',
+    'waste-movements'
+]);
+const captureArea = capture => (
+    capture.module.startsWith('catalogs/') || administrationModules.has(capture.module)
+        ? 'administration'
+        : 'warehouse'
+);
 
 const validateInventory = () => {
     const ids = new Set();
@@ -345,7 +368,8 @@ const capturePageWithRecovery = async (context, capture) => {
     }
 };
 
-const login = async (page) => {
+const login = async (page, area) => {
+    const { label, loginName, loginPassword } = authenticatedAreas[area];
     await page.goto(new URL('/inicio-sesion', baseURL).href, { waitUntil: 'domcontentloaded' });
     await page.locator('#loginForm').waitFor({ state: 'visible' });
     await page.locator('#nameInput').fill(loginName);
@@ -354,7 +378,7 @@ const login = async (page) => {
         page.waitForURL(url => url.pathname === '/almacen/materiales'),
         page.locator('#submitBtn').click()
     ]);
-    console.log('Sesión de capturas iniciada automáticamente.');
+    console.log(`Sesión de capturas de ${ label } iniciada automáticamente.`);
 };
 
 validateInventory();
@@ -389,21 +413,25 @@ if (recoverMissingCaptures && !selectedCaptures.length) {
 }
 
 const protectedCaptures = selectedCaptures.filter(item => !item.public);
-if (Boolean(loginName) !== Boolean(loginPassword)) {
-    throw new Error('DOCS_LOGIN_NAME y DOCS_LOGIN_PASSWORD deben definirse juntos.');
-}
-if (storageState && loginName) {
-    throw new Error('Use credenciales automáticas o DOCS_STORAGE_STATE, no ambos mecanismos.');
-}
-if (protectedCaptures.length && !storageState && !loginName) {
-    throw new Error('Defina DOCS_LOGIN_NAME y DOCS_LOGIN_PASSWORD, o proporcione DOCS_STORAGE_STATE, para generar las capturas protegidas.');
-}
-if (protectedCaptures.length && storageState && !existsSync(storageState)) {
-    throw new Error(
-        `No existe el archivo indicado por DOCS_STORAGE_STATE: ${ storageState }. `
-        + 'Complete el inicio de sesión en Playwright codegen, presione Ctrl+C una vez en la terminal donde lo ejecutó, '
-        + 'espere a que termine y vuelva el prompt, y compruebe que el archivo se haya guardado.'
-    );
+const selectedAreas = [...new Set(protectedCaptures.map(captureArea))];
+for (const area of selectedAreas) {
+    const { label, loginName, loginPassword, storageState } = authenticatedAreas[area];
+    if (Boolean(loginName) !== Boolean(loginPassword)) {
+        throw new Error(`DOCS_${ area === 'warehouse' ? 'WAREHOUSE' : 'ADMIN' }_LOGIN_NAME y DOCS_${ area === 'warehouse' ? 'WAREHOUSE' : 'ADMIN' }_LOGIN_PASSWORD deben definirse juntos.`);
+    }
+    if (storageState && loginName) {
+        throw new Error(`Use credenciales automáticas o el archivo de sesión de ${ label }, no ambos mecanismos.`);
+    }
+    if (!storageState && !loginName) {
+        throw new Error(`Defina las credenciales o el archivo de sesión de ${ label } para generar sus capturas protegidas.`);
+    }
+    if (storageState && !existsSync(storageState)) {
+        throw new Error(
+            `No existe el archivo de sesión de ${ label }: ${ storageState }. `
+            + 'Complete el inicio de sesión en Playwright codegen, presione Ctrl+C una vez en la terminal donde lo ejecutó, '
+            + 'espere a que termine y vuelva el prompt, y compruebe que el archivo se haya guardado.'
+        );
+    }
 }
 
 if (requestedCaptureIds.length || requestedCaptureFrom || recoverMissingCaptures || (!forceFreshCapture && selectedCaptures.length < captures.length)) {
@@ -427,21 +455,28 @@ try {
     for (const capture of selectedCaptures.filter(item => item.public)) await capturePageWithRecovery(publicContext, capture);
     await publicContext.close();
 
-    if (protectedCaptures.length) {
+    for (const area of selectedAreas) {
+        const { storageState } = authenticatedAreas[area];
+        const areaCaptures = protectedCaptures.filter(capture => captureArea(capture) === area);
         const authenticatedContext = await browser.newContext({ ...contextOptions, ...(storageState ? { storageState } : {}) });
         authenticatedContext.setDefaultTimeout(captureTimeout);
         if (!storageState) {
             const loginPage = await authenticatedContext.newPage();
-            await login(loginPage);
+            await login(loginPage, area);
             await loginPage.close();
         }
-        for (const capture of protectedCaptures) await capturePageWithRecovery(authenticatedContext, capture);
+        for (const capture of areaCaptures) await capturePageWithRecovery(authenticatedContext, capture);
         await authenticatedContext.close();
     }
 } finally {
     await browser.close();
 }
 
-if (storageState) await rm(storageState, { force: true });
+for (const area of selectedAreas) {
+    const { storageState } = authenticatedAreas[area];
+    if (storageState) await rm(storageState, { force: true });
+}
 console.log(`Capturas generadas en ${ path.relative(process.cwd(), outputRoot) }.`);
-if (storageState) console.log('Estado temporal de autenticación eliminado.');
+if (selectedAreas.some(area => authenticatedAreas[area].storageState)) {
+    console.log('Estados temporales de autenticación eliminados.');
+}

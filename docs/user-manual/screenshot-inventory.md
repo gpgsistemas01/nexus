@@ -140,8 +140,10 @@ del alcance y no un mensaje posterior a la descarga.
 
 ## Datos de prueba requeridos
 
-La automatización no crea ni modifica registros. El estado de prueba usado para las capturas debe
-pertenecer a una cuenta ficticia con todos los permisos que se documentan y contener, como mínimo:
+La automatización no crea ni modifica registros. El estado de prueba debe incluir una cuenta
+ficticia de **Almacén** con los permisos operativos documentados y otra de **Sistemas** con los
+permisos administrativos. El script separa las capturas por área y nunca intenta obtener las de
+almacén con la sesión administrativa. La base debe contener, como mínimo:
 
 1. un material y una merma activos que admitan edición y ajuste;
 2. una compra abierta con un detalle corregible y cancelable;
@@ -168,30 +170,36 @@ predeterminado **Pendiente** a **Surtido**, selecciona **Buscar / filtrar**, esp
 carga inicial y la actualización filtrada del listado, y sólo entonces busca `.btn-return-detail`,
 tanto en salidas de material como de merma. Este recorrido reutiliza el mismo envío de filtros de
 tabla usado en compras y los
-demás listados. Para las vistas protegidas, el script inicia sesión automáticamente con
-`DOCS_LOGIN_NAME` y `DOCS_LOGIN_PASSWORD`, o reutiliza `DOCS_STORAGE_STATE` como alternativa. La
+demás listados. Para las vistas protegidas, el script abre contextos independientes e inicia sesión
+con `DOCS_WAREHOUSE_LOGIN_NAME` y `DOCS_WAREHOUSE_LOGIN_PASSWORD` para Almacén, y con
+`DOCS_ADMIN_LOGIN_NAME` y `DOCS_ADMIN_LOGIN_PASSWORD` para Sistemas. Como alternativa reutiliza
+`DOCS_WAREHOUSE_STORAGE_STATE` o `DOCS_ADMIN_STORAGE_STATE`, respectivamente. La
 automatización no obtiene ni guarda esas credenciales: Playwright las escribe directamente en el
-formulario de acceso y conserva las cookies resultantes sólo en la memoria de su contexto mientras
-genera las imágenes. No crea un archivo de sesión. `DOCS_STORAGE_STATE` permite leer un archivo de
-sesión preparado previamente como mecanismo alternativo; nunca se genera a partir del usuario y la
+formulario de acceso y conserva las cookies resultantes sólo en la memoria del contexto del área
+mientras genera las imágenes. No crea archivos de sesión. Las variables `DOCS_*_STORAGE_STATE`
+permiten leer archivos de sesión preparados previamente como mecanismo alternativo; nunca se
+generan a partir del usuario y la
 contraseña. Estos valores sólo se leen del entorno del proceso, no se agregan al archivo `.env`, y
 deben retirarse de la terminal al terminar, como indica la
 [guía de exportación](../governance/document-export-guide/index.md). La pantalla de inicio de sesión se
 toma en un contexto separado y sin autenticación. Una selección compuesta únicamente por capturas
-públicas tampoco abre un contexto autenticado ni necesita leer el archivo indicado por
-`DOCS_STORAGE_STATE`.
+públicas tampoco abre un contexto autenticado ni necesita leer el archivo de sesión del área
+correspondiente.
 
 No hace falta ejecutar un comando previo para obtener una sesión cuando se dispone de una cuenta
 ficticia: las credenciales pueden definirse en el mismo comando y el inicio de sesión se realiza en
 ese momento:
 
 ```bash
-DOCS_LOGIN_NAME='usuario-ficticio' DOCS_LOGIN_PASSWORD='valor-temporal' npm run docs:screenshots
+DOCS_WAREHOUSE_LOGIN_NAME='usuario-almacen' DOCS_WAREHOUSE_LOGIN_PASSWORD='valor-temporal' \
+DOCS_ADMIN_LOGIN_NAME='usuario-sistemas' DOCS_ADMIN_LOGIN_PASSWORD='otro-valor-temporal' \
+npm run docs:screenshots
 ```
 
 En PowerShell se definen ambas variables con `$env:` antes del comando y se eliminan al terminar.
-`DOCS_STORAGE_STATE` sólo conviene cuando otro flujo controlado ya entrega el archivo; el repositorio
-no extrae credenciales ni crea ese archivo, para evitar persistir secretos.
+Las variables `DOCS_*_STORAGE_STATE` sólo convienen cuando otro flujo controlado ya entrega los
+archivos; el repositorio no extrae credenciales ni crea esos archivos, para evitar persistir
+secretos.
 
 🟥 **DATO SENSIBLE:** no escriba valores reales en este documento, `.env`, el historial de
 shell o archivos versionados. Use secretos efímeros del entorno de desarrollo o CI.
@@ -275,7 +283,8 @@ al área visible de 1440 × 1000 píxeles, sin agregar el contenido que queda de
 En los pasos con modal se conserva el contexto visible que lo rodea; no se recorta sólo el modal.
 Sólo entonces las imágenes revisadas se referencian desde el recorrido correspondiente del
 manual. Al completar todo el
-inventario, si se proporcionó `DOCS_STORAGE_STATE`, el script elimina automáticamente ese archivo;
-si la ejecución falla, lo conserva para permitir un reintento y debe eliminarse manualmente cuando
-ya no se vaya a utilizar. Las credenciales automáticas sólo permanecen en las variables del proceso
-y deben retirarse de la terminal después de generar las capturas.
+inventario, si se proporcionaron archivos mediante `DOCS_WAREHOUSE_STORAGE_STATE` o
+`DOCS_ADMIN_STORAGE_STATE`, el script elimina automáticamente cada archivo utilizado;
+si la ejecución falla, los conserva para permitir un reintento y deben eliminarse manualmente
+cuando ya no se vayan a utilizar. Las credenciales automáticas sólo permanecen en las variables del
+proceso y deben retirarse de la terminal después de generar las capturas.
