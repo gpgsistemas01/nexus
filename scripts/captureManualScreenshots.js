@@ -6,6 +6,16 @@ import process from 'node:process';
 import { captureWithRecovery } from './manualScreenshotRecovery.js';
 
 const baseURL = process.env.DOCS_BASE_URL ?? 'http://127.0.0.1:3000';
+const captureAreas = ['almacen', 'sistemas'];
+const areaArgumentIndex = process.argv.findIndex(argument => argument === '--area');
+const inlineAreaArgument = process.argv.find(argument => argument.startsWith('--area='))?.split('=', 2)[1];
+const argumentCaptureArea = areaArgumentIndex === -1 ? inlineAreaArgument : process.argv[areaArgumentIndex + 1];
+const environmentCaptureArea = process.env.DOCS_CAPTURE_AREA?.trim();
+if (argumentCaptureArea && environmentCaptureArea && argumentCaptureArea !== environmentCaptureArea) {
+    throw new Error('El área indicada con --area no coincide con DOCS_CAPTURE_AREA.');
+}
+const selectedCaptureArea = argumentCaptureArea ?? environmentCaptureArea;
+const captureAreaPrefix = selectedCaptureArea?.toUpperCase();
 const authenticatedAreas = Object.freeze({
     warehouse: {
         label: 'Almacén',
@@ -20,7 +30,7 @@ const authenticatedAreas = Object.freeze({
         storageState: process.env.DOCS_ADMIN_STORAGE_STATE
     }
 });
-const requestedCaptureIds = (process.env.DOCS_CAPTURE_IDS ?? '')
+const requestedCaptureIds = (process.env[`DOCS_${ captureAreaPrefix }_CAPTURE_IDS`] ?? '')
     .split(',')
     .map(id => id.trim())
     .filter(Boolean);
@@ -29,8 +39,8 @@ const selectionAreas = captureAreas.filter(area => (
     process.env[`DOCS_${ area.toUpperCase() }_CAPTURE_IDS`]
     || process.env[`DOCS_${ area.toUpperCase() }_CAPTURE_FROM`]
 ));
-if (selectionAreas.some(area => area !== captureArea)) {
-    throw new Error(`Las variables de selección deben corresponder al área ${ captureArea }.`);
+if (selectionAreas.some(area => area !== selectedCaptureArea)) {
+    throw new Error(`Las variables de selección deben corresponder al área ${ selectedCaptureArea }.`);
 }
 const listCaptures = process.argv.includes('--list');
 const recoverMissingCaptures = process.argv.includes('--missing');
@@ -163,17 +173,29 @@ const captureTemplates = [
     { id: 'CAP-ERR-404-SISTEMAS-NOT-FOUND', module: 'errors', name: '01-page-not-found.png', route: '/pagina-no-existente-manual', ready: '.error-card', area: 'sistemas', unauthenticated: true, useCases: [] }
 ];
 
-const administrationModules = new Set([
-    'people',
-    'users',
-    'material-movements',
-    'waste-movements'
-]);
-const captureArea = capture => (
-    capture.module.startsWith('catalogs/') || administrationModules.has(capture.module)
-        ? 'administration'
-        : 'warehouse'
-);
+const systemAreaModules = ['catalogs/', 'people', 'users', 'material-movements', 'waste-movements'];
+const sharedOperationalModules = ['materials', 'waste', 'suppliers', 'clients'];
+const getCaptureArea = capture => systemAreaModules.some(module => capture.module.startsWith(module))
+    ? 'sistemas'
+    : 'almacen';
+const getCaptureScopePath = capture => path.join('areas', capture.area);
+
+for (const capture of captureTemplates) capture.area ??= getCaptureArea(capture);
+
+const captures = captureTemplates.flatMap(capture => {
+    if (capture.area !== 'almacen'
+        || !sharedOperationalModules.includes(capture.module)
+        || capture.unauthenticated
+        || capture.id.startsWith('CAP-AUT-')) {
+        return [capture];
+    }
+    return [
+        capture,
+        { ...capture, id: `${ capture.id }-SISTEMAS`, area: 'sistemas' }
+    ];
+});
+
+const authenticationArea = area => area === 'almacen' ? 'warehouse' : 'administration';
 
 const validateInventory = () => {
     const ids = new Set();
@@ -195,13 +217,15 @@ const selectCaptures = () => {
         throw new Error(`Use DOCS_${ captureAreaPrefix }_CAPTURE_IDS, DOCS_${ captureAreaPrefix }_CAPTURE_FROM, --missing o --fresh; no combine mecanismos.`);
     }
 
-    if (captureArea && !captureAreas.includes(captureArea)) {
+    if (selectedCaptureArea && !captureAreas.includes(selectedCaptureArea)) {
         throw new Error('DOCS_CAPTURE_AREA debe ser almacen o sistemas.');
     }
-    if (!captureArea && !listCaptures) {
+    if (!selectedCaptureArea && !listCaptures) {
         throw new Error('Indique el área con --area almacen|sistemas o DOCS_CAPTURE_AREA.');
     }
-    const areaCaptures = captureArea ? captures.filter(capture => capture.area === captureArea) : captures;
+    const areaCaptures = selectedCaptureArea
+        ? captures.filter(capture => capture.area === selectedCaptureArea)
+        : captures;
 
     if (recoverMissingCaptures) return areaCaptures.filter(capture => !existsSync(capturePath(capture)));
 
@@ -210,7 +234,9 @@ const selectCaptures = () => {
         if (startIndex === -1) {
             throw new Error(`DOCS_${ captureAreaPrefix }_CAPTURE_FROM contiene un identificador desconocido: ${ requestedCaptureFrom }`);
         }
-        return captures.slice(startIndex).filter(capture => !captureArea || capture.area === captureArea);
+        return captures.slice(startIndex).filter(capture => (
+            !selectedCaptureArea || capture.area === selectedCaptureArea
+        ));
     }
 
     if (!requestedCaptureIds.length) return areaCaptures;
@@ -222,8 +248,8 @@ const selectCaptures = () => {
     }
 
     const selection = [...new Set(requestedCaptureIds)].map(id => capturesById.get(id));
-    if (captureArea && selection.some(capture => capture.area !== captureArea)) {
-        throw new Error(`DOCS_${ captureAreaPrefix }_CAPTURE_IDS contiene capturas fuera del área ${ captureArea }.`);
+    if (selectedCaptureArea && selection.some(capture => capture.area !== selectedCaptureArea)) {
+        throw new Error(`DOCS_${ captureAreaPrefix }_CAPTURE_IDS contiene capturas fuera del área ${ selectedCaptureArea }.`);
     }
     return selection;
 };
@@ -402,21 +428,14 @@ const login = async (page, area) => {
     const { label, loginName, loginPassword } = authenticatedAreas[area];
     await page.goto(new URL('/inicio-sesion', baseURL).href, { waitUntil: 'domcontentloaded' });
     await page.locator('#loginForm').waitFor({ state: 'visible' });
-    await page.locator('#nameInput').fill(credentials.name);
-    await page.locator('#passwordInput').fill(credentials.password);
+    await page.locator('#nameInput').fill(loginName);
+    await page.locator('#passwordInput').fill(loginPassword);
     await Promise.all([
         page.waitForURL(url => url.pathname === '/almacen/materiales'),
         page.locator('#submitBtn').click()
     ]);
     console.log(`Sesión de capturas de ${ label } iniciada automáticamente.`);
 };
-
-const getAreaCredentials = area => ({
-    area,
-    name: process.env[`DOCS_${ area.toUpperCase() }_LOGIN_NAME`],
-    password: process.env[`DOCS_${ area.toUpperCase() }_LOGIN_PASSWORD`],
-    storageState: process.env[`DOCS_${ area.toUpperCase() }_STORAGE_STATE`]
-});
 
 validateInventory();
 let selectedCaptures = selectCaptures();
@@ -449,8 +468,8 @@ if (recoverMissingCaptures && !selectedCaptures.length) {
     process.exit(0);
 }
 
-const protectedCaptures = selectedCaptures.filter(item => !item.public);
-const selectedAreas = [...new Set(protectedCaptures.map(captureArea))];
+const protectedCaptures = selectedCaptures.filter(item => !item.unauthenticated);
+const selectedAreas = [...new Set(protectedCaptures.map(capture => authenticationArea(capture.area)))];
 for (const area of selectedAreas) {
     const { label, loginName, loginPassword, storageState } = authenticatedAreas[area];
     if (Boolean(loginName) !== Boolean(loginPassword)) {
@@ -494,10 +513,10 @@ try {
 
     for (const area of selectedAreas) {
         const { storageState } = authenticatedAreas[area];
-        const areaCaptures = protectedCaptures.filter(capture => captureArea(capture) === area);
+        const areaCaptures = protectedCaptures.filter(capture => authenticationArea(capture.area) === area);
         const authenticatedContext = await browser.newContext({ ...contextOptions, ...(storageState ? { storageState } : {}) });
         authenticatedContext.setDefaultTimeout(captureTimeout);
-        if (!credentials.storageState) {
+        if (!storageState) {
             const loginPage = await authenticatedContext.newPage();
             await login(loginPage, area);
             await loginPage.close();
