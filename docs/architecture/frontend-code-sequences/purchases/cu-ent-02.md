@@ -5,7 +5,8 @@
 
 ```mermaid
 sequenceDiagram
-    actor Warehouse as Personal de almacén
+    actor Initiator as Personal de almacén
+    participant Browser as Navegador
     participant Modal as src/public/js/pages/warehouse/goodsReceipts/goodsReceiptModal.js
     participant Form as src/public/js/pages/warehouse/goodsReceipts/goodsReceiptForm.js
     participant DetailUI as src/public/js/pages/warehouse/goodsReceipts/goodsReceiptDetails.js<br/>src/public/js/plugins/datatable/warehouse/goodsReceipts/goodsReceiptDatatable.js
@@ -19,16 +20,17 @@ sequenceDiagram
     participant HTTP as src/public/js/services/axiosInstanceApi.js
     participant API@{ "type": "control" } as src/controllers/api/warehouse/goodsReceiptController.js
 
-    Warehouse->>Modal: abrir «Nueva compra»
+    Initiator->>Browser: inicia CU-ENT-02 — Crear compra de material
+    Browser->>Modal: abrir «Nueva compra»
     Modal->>Modal: openGoodsReceiptModal({ mode: create })
     opt El proveedor no está catalogado
-        Warehouse->>SupplierSelect: escribir nombre y seleccionar Nuevo proveedor
+        Browser->>SupplierSelect: escribir nombre y seleccionar Nuevo proveedor
         SupplierSelect->>SupplierSelect: runAfterSelect2Close(...)
         SupplierSelect->>SupplierModal: openSupplierModal({ data: { tradeName }, onSave })
         Note over SupplierModal,SupplierSelect: registerSupplier() y POST /api/warehouse/suppliers<br/>se detallan en DIA-FE-CU-CAT-02
         SupplierModal->>SupplierSelect: form.onSave(createdSupplier)
         SupplierSelect->>SupplierSelect: toggleSupplierOption(...) agrega y selecciona
-        SupplierSelect-->>Warehouse: continuar compra sin abrir /proveedores
+        SupplierSelect-->>Browser: continuar compra sin abrir /proveedores
     end
     opt El material no está catalogado
         DetailUI->>MaterialUI: setupMaterialSelect({ creationContext: 'goodsReceipt' }) abre openMaterialModal(...)
@@ -48,16 +50,16 @@ sequenceDiagram
             MaterialApp-->>MaterialUI: registerMaterial() rechaza y conserva formulario
         end
     end
-    Warehouse->>DetailUI: seleccionar material, cantidad y costo por presentación
+    Browser->>DetailUI: seleccionar material, cantidad y costo por presentación
     DetailUI->>DetailUI: addGoodsReceiptMaterial()
     opt Se agrega otra vez el mismo material
         DetailUI->>DetailUI: addGoodsReceiptMaterial() conserva un renglón independiente
     end
-    Warehouse->>Form: confirmar compra
+    Browser->>Form: confirmar compra
     Form->>Form: normalizeGoodsReceiptData({ form, formData })
     Form->>Form: validateFields(goodsReceiptValidation, formData)
     alt Hay errores de captura
-        Form-->>Warehouse: mostrar campos inválidos sin enviar request
+        Form-->>Browser: mostrar campos inválidos sin enviar request
     else Captura válida
         Form->>App: registerGoodsReceipt({ formData })
         App->>Request: createCrudApplication.register({ data })
@@ -68,14 +70,14 @@ sequenceDiagram
             HTTP-->>Request: apiRequest() rechaza { code, message, meta }
             Request-->>App: registerGoodsReceiptRequest() propaga { code, message, meta }
             App-->>Form: registerGoodsReceipt() rechaza con el folio duplicado
-            Form-->>Warehouse: useForm conserva goodsReceiptForm y handleApiError muestra el conflicto
+            Form-->>Browser: useForm conserva goodsReceiptForm y handleApiError muestra el conflicto
         else Compra nueva
             API-->>HTTP: 200 { goodsReceipt, code }
             HTTP-->>Request: apiRequest() resuelve response.data
             Request-->>App: registerGoodsReceiptRequest() resuelve response.data
             App-->>Form: registerGoodsReceipt() devuelve { message }
             Form->>Form: handleSubmit(...) ejecuta notifications.showSuccess,<br/>closeModal(form) y reloadMainTable({ resetPaging: true })
-            Form-->>Warehouse: modal cerrado y #table recargada
+            Form-->>Browser: modal cerrado y #table recargada
         end
     end
 ```

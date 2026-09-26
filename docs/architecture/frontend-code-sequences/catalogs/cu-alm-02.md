@@ -5,6 +5,7 @@
 
 ```mermaid
 sequenceDiagram
+    actor Initiator as Personal de almacén
     participant Browser as Navegador
     participant View as src/public/js/pages/warehouse/materials/materialModal.js<br/>src/public/js/pages/warehouse/materials/materialForm.js
     participant Application as src/public/js/application/warehouse/materials/materials.js
@@ -12,6 +13,7 @@ sequenceDiagram
     participant HTTP as src/public/js/services/axiosInstanceApi.js
     participant Transport@{ "type": "control" } as src/routes/api/warehouse/materialApiRoute.js<br/>src/controllers/api/warehouse/materialController.js
 
+    Initiator->>Browser: inicia CU-ALM-02 — Crear material
     Browser->>View: openMaterialModal({ mode: CREATE, creationContext, data, onSave })
     alt creationContext es goodsReceipt
         View->>View: setFormSectionVisibility(...) oculta maxUnitCost y stock-data-section

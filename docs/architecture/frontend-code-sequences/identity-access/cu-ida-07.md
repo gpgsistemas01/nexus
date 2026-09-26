@@ -5,29 +5,36 @@
 
 ```mermaid
 sequenceDiagram
+    actor Initiator as Administrador del sistema
     participant Browser as Navegador
-    participant View as src/public/js/pages/admin/users/userModal.js
+    participant View as src/public/js/pages/admin/users/userModal.js<br/>userForm.js
     participant Application as src/public/js/application/admin/users/users.js
     participant Request as src/public/js/services/admin/userService.js
     participant HTTP as src/public/js/services/axiosInstanceApi.js
     participant Transport@{ "type": "control" } as src/routes/api/admin/userApiRoute.js<br/>src/controllers/api/admin/userController.js
 
+    Initiator->>Browser: inicia CU-IDA-07 — Editar usuario y acceso
     Browser->>View: userModal.js abre la cuenta y acceso existentes
-    View->>Application: editUser({ id, formData })
-    Application->>Request: editUserRequest({ id, formData })
-    activate Application
-    Request->>HTTP: apiRequest({ method: 'patch', url, data })
-    HTTP->>Transport: envía PATCH /api/admin/users/:id
-    Transport-->>HTTP: HTTP 2xx { code, data }
-    HTTP-->>Request: apiRequest() resuelve response.data
-    Request-->>Application: editUserRequest() resuelve response.data
-    alt Respuesta exitosa
-        Application-->>View: editUser() resuelve response.data
-        View-->>Browser: DOM o DataTable actualizado con response.data
-    else Respuesta rechazada
-        Application-->>View: error Axios normalizado { code, message, meta }
-        View-->>Browser: formulario o filtros conservados, mensaje visible
+    View->>View: validateFields(userEditValidation, formData)
+    alt userEditValidation devuelve errores
+        View-->>Browser: useForm.getErrors() conserva datos y muestra errores por campo
+    else Formulario válido
+        View->>Application: editUser({ id, formData })
+        Application->>Request: editUserRequest({ id, formData })
+        activate Application
+        Request->>HTTP: apiRequest({ method: 'patch', url, data })
+        HTTP->>Transport: envía PATCH /api/admin/users/:id
+        Transport-->>HTTP: HTTP 2xx { code, data }
+        HTTP-->>Request: apiRequest() resuelve response.data
+        Request-->>Application: editUserRequest() resuelve response.data
+        alt Respuesta exitosa
+            Application-->>View: editUser() resuelve response.data
+            View-->>Browser: DOM o DataTable actualizado con response.data
+        else Respuesta rechazada
+            Application-->>View: error Axios normalizado { code, message, meta }
+            View-->>Browser: formulario o filtros conservados, mensaje visible
+        end
+        deactivate Application
     end
-    deactivate Application
 ```
 

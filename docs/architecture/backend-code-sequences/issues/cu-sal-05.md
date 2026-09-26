@@ -14,7 +14,7 @@ sequenceDiagram
     participant IssueDto as <u>goodsIssueDto: Object</u><br/>src/dtos/goodsIssueDTO.js
     participant Service as src/services/warehouse/goodsIssues/goodsIssueService.js
     participant Inventory as src/services/inventory/movementService.js
-    participant Prisma as Prisma / PostgreSQL
+    participant Prisma@{ "type": "database" } as Prisma / PostgreSQL
     participant Socket as src/utils/socketUtils.js
 
     Browser->>Router: PATCH /:id/details
@@ -22,11 +22,11 @@ sequenceDiagram
     Auth->>Validator: goodsIssueDetailsValidation[] y validate(req, res, next)
     Validator->>Auth: authorizeUserApi(PERMISSIONS.GOODS_ISSUE_DETAILS_MANAGE)(req, res, next)
     alt Token ausente o inválido
-        Auth-->>Client: HTTP 401 { code, message }
+        Auth-->>Browser: HTTP 401 { code, message }
     else goodsIssueDetailsValidation rechaza req.body/req.params
-        Validator-->>Client: HTTP 400 { errors }
+        Validator-->>Browser: HTTP 400 { errors }
     else PERMISSIONS.GOODS_ISSUE_DETAILS_MANAGE denegado
-        Auth-->>Client: HTTP 403 { code, message }
+        Auth-->>Browser: HTTP 403 { code, message }
     else Pipeline aceptado
         Router->>Controller: editGoodsIssueDetails(req, res)
         Controller->>IssueDto: createGoodsIssueDetailsDtoForEdit(req.body)

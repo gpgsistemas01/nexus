@@ -5,7 +5,8 @@
 
 ```mermaid
 sequenceDiagram
-    actor User as Administrador del sistema
+    actor Initiator as Administrador del sistema
+    participant Browser as Navegador
     participant EJS as src/views/pages/warehouse/materials/materialsPage.ejs
     participant Form as src/public/js/pages/warehouse/materials/materialForm.js
     participant App as src/public/js/application/warehouse/materials/materials.js
@@ -14,7 +15,8 @@ sequenceDiagram
     participant HTTP as src/public/js/services/axiosInstanceApi.js
     participant API@{ "type": "control" } as src/controllers/api/warehouse/materialController.js
 
-    User->>Form: confirma ajuste
+    Initiator->>Browser: inicia CU-ALM-05 — Ajustar existencia de material
+    Browser->>Form: confirma ajuste
     Form->>Form: validateFields(materialStockValidation, formData)
     alt materialStockValidation devuelve errores
         Form-->>Browser: useForm.getErrors() conserva datos y muestra errores por campo

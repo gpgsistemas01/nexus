@@ -41,7 +41,7 @@ permiso se agrupan. Los valores de permiso son los declarados en
 | Salidas / material | `L, C, U documento/encabezado → goods:issues-manage`; actualizar detalles y devolver `→ goods:issue-details-manage`; exportar `→ warehouse:reports-read` | Implementado |
 | Salidas / merma | `L, C, U documento/encabezado → waste:issues-manage`; suministrar detalles y devolver `→ waste:issues-supply`; exportar `→ warehouse:reports-read` | Implementado |
 | Inventario / movimientos | `L material y merma → movements:read`; exportar `→ admin:reports-read` | Implementado para el Administrador del sistema del área Sistemas; el Personal de almacén no tiene acceso a este módulo |
-| Inventario / ajustes de material y merma | Sin rutas API completas; existen modelos y servicios parciales para crear, aprobar/aplicar y cancelar | Parcial |
+| Inventario / ajustes de material y merma | Ajustar material `→ materials:adjust-stock`; ajustar merma `→ wastes:adjust-stock` | Implementado; el Administrador registra y aplica el ajuste inmediatamente con razón, trazabilidad y movimiento; no existe un flujo separado de solicitud, aprobación o cancelación |
 | Abastecimiento / requisiciones | Módulo retirado del código y del esquema vigente; requiere un nuevo alcance antes de reimplementarse | Fuera del alcance actual |
 
 La autenticación es transversal y no se fuerza dentro del CRUD de un módulo: iniciar

@@ -5,6 +5,7 @@
 
 ```mermaid
 sequenceDiagram
+    actor Initiator as Administrador del sistema
     participant Browser as Navegador
     participant View as src/views/pages/admin/users/usersPage.ejs<br/>src/public/js/pages/admin/users/usersPage.js
     participant Application as src/public/js/application/admin/users/users.js
@@ -12,6 +13,7 @@ sequenceDiagram
     participant HTTP as src/public/js/services/axiosInstanceApi.js
     participant Transport@{ "type": "control" } as src/routes/api/admin/userApiRoute.js<br/>src/controllers/api/admin/userController.js
 
+    Initiator->>Browser: inicia CU-IDA-05 — Consultar usuarios
     Browser->>View: usersPage.ejs y usersPage.js cargan la tabla
     View->>Application: getAllUsers({ params })
     Application->>Request: getAllUsersRequest({ params })

@@ -5,7 +5,8 @@
 
 ```mermaid
 sequenceDiagram
-    actor User as Usuario
+    actor Initiator as Usuario registrado
+    participant Browser as Navegador
     participant EJS as src/views/pages/home/login/loginPage.ejs
     participant Form as src/public/js/pages/home/login/loginForm.js
     participant App as src/public/js/application/auth/login.js
@@ -14,8 +15,9 @@ sequenceDiagram
     participant API@{ "type": "control" } as src/controllers/api/authController.js
     participant Browser as Navegador
 
+    Initiator->>Browser: inicia CU-AUT-01 — Iniciar sesión
     EJS->>Form: import './loginForm.js'
-    User->>Form: captura y envía credenciales
+    Browser->>Form: captura y envía credenciales
     Form->>Form: validateFields(loginValidation, formData)
     Form->>App: login({ formData })
     App->>Request: loginRequest({ data: formData })

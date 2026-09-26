@@ -25,6 +25,12 @@ contrato entre participantes. Esos parámetros no se convierten en líneas de vi
 enumeran en una nota separada. Todos los recorridos explicitan recolección y validación
 de entrada en el módulo frontend que realmente la ejecuta, request, respuesta exitosa, error normalizado
 y efecto visible; las coordinaciones complejas añaden sus módulos especializados.
+Cada secuencia comienza además con la figura visual `actor` del iniciador canónico del
+caso y conserva **Navegador** como participante técnico separado. Cuando el Administrador
+hereda una capacidad del Personal de almacén, se muestra el actor operativo primario y
+no una etiqueta compuesta con “o”; los casos exclusivos de Sistemas muestran al
+Administrador. Esta figura enlaza el objetivo funcional con su realización sin repetir
+las precondiciones ni el flujo narrativo de la ficha.
 Los temporales mecánicos
 permanecen en el código. Cada caso mantiene una secuencia específica aunque reutilice
 una factory o componente, porque cambian módulos, firmas, rutas, datos o efectos.
@@ -57,7 +63,8 @@ reconocer el objetivo sin interpretar solamente el código. El diagrama de esa s
 `DIA-FE-CU-<grupo>-<número>`; por ejemplo, la sección `CU-ENT-02` contiene
 `DIA-FE-CU-ENT-02`. La matriz técnica mantiene el enlace navegable y la evidencia de
 código. Aquí se conserva solamente la información propia de la vista: patrones,
-participantes, eventos, payload, requests y resultado visible. El objetivo, actor y
+participantes, eventos, payload, requests y resultado visible. La figura del actor y el
+mensaje de inicio identifican quién dispara el objetivo; sus responsabilidades, reglas y
 flujo de negocio no se repiten porque pertenecen a la ficha del caso de uso.
 
 ## Índice rápido de patrones por caso

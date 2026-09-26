@@ -5,6 +5,7 @@
 
 ```mermaid
 sequenceDiagram
+    actor Initiator as Personal de almacén
     participant Browser as Navegador
     participant View as src/public/js/pages/warehouse/wastes/wasteModal.js<br/>src/public/js/pages/warehouse/wastes/wasteForm.js
     participant Application as src/public/js/application/warehouse/wastes/wastes.js
@@ -12,6 +13,7 @@ sequenceDiagram
     participant HTTP as src/public/js/services/axiosInstanceApi.js
     participant Transport@{ "type": "control" } as src/routes/api/warehouse/wasteApiRoute.js<br/>src/controllers/api/warehouse/wasteController.js
 
+    Initiator->>Browser: inicia CU-ALM-10 — Registrar merma
     Browser->>View: wasteModal.js y wasteForm.js seleccionan una plantilla de material
     View->>View: validateFields(wasteValidation, formData)
     alt wasteValidation devuelve errores

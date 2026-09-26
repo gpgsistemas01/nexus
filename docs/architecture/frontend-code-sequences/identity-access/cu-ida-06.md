@@ -5,6 +5,7 @@
 
 ```mermaid
 sequenceDiagram
+    actor Initiator as Administrador del sistema
     participant Browser as Navegador
     participant View as src/public/js/pages/admin/users/userModal.js<br/>src/public/js/pages/admin/users/userForm.js
     participant Application as src/public/js/application/admin/users/users.js
@@ -12,6 +13,7 @@ sequenceDiagram
     participant HTTP as src/public/js/services/axiosInstanceApi.js
     participant Transport@{ "type": "control" } as src/routes/api/admin/userApiRoute.js<br/>src/controllers/api/admin/userController.js
 
+    Initiator->>Browser: inicia CU-IDA-06 — Crear usuario y asignar acceso
     Browser->>View: userModal.js abre userForm.js para una cuenta nueva
     View->>View: validateFields(userValidation, formData)
     alt userValidation devuelve errores

@@ -14,25 +14,25 @@ sequenceDiagram
     participant Domain as src/services/warehouse/wasteIssues/wasteIssueService.js
     participant ErrorHandler as src/app.js
 
-    Client->>Route: PATCH /api/warehouse/waste-issues/:id/details
+    Client->>Route: PATCH /api/warehouse/waste-issues/:id
     Route->>Auth: verifyApiTokenRequired(req, res, next)
-    Auth->>Validator: wasteIssueDetailsValidation[] y validate(req, res, next)
-    Validator->>Auth: authorizeUserApi(PERMISSIONS.WASTE_ISSUES_SUPPLY)(req, res, next)
+    Auth->>Validator: wasteIssueUpdateValidation[] y validate(req, res, next)
+    Validator->>Auth: authorizeUserApi(PERMISSIONS.WASTE_ISSUES_MANAGE)(req, res, next)
     alt Token ausente o inválido
         Auth-->>Client: HTTP 401 { code, message }
-    else wasteIssueDetailsValidation rechaza req.body/req.params
+    else wasteIssueUpdateValidation rechaza req.body/req.params
         Validator-->>Client: HTTP 400 { errors }
-    else PERMISSIONS.WASTE_ISSUES_SUPPLY denegado
+    else PERMISSIONS.WASTE_ISSUES_MANAGE denegado
         Auth-->>Client: HTTP 403 { code, message }
     else Pipeline aceptado
-        Route->>Controller: editWasteIssueDetails(req, res)
+        Route->>Controller: editWasteIssue(req, res)
         activate Controller
-        Controller->>IssueDto: createWasteIssueDetailsDtoForEdit(req.body)
+        Controller->>IssueDto: createWasteIssueDtoForEdit(req.body)
         IssueDto-->>Controller: wasteIssueDto normalizado
-        Controller->>Domain: wasteIssueService.updateWasteIssueDetails({ id: req.params.id, wasteIssueDto }) modifica cantidades editables
+        Controller->>Domain: wasteIssueService.updateWasteIssue({ id: req.params.id, wasteIssueDto }) actualiza encabezado y detalles todavía editables
         activate Domain
         alt Servicio resuelto
-            Domain-->>Controller: wasteIssueService.updateWasteIssueDetails() devuelve wasteIssueDetails actualizado y persistido
+            Domain-->>Controller: wasteIssueService.updateWasteIssue() devuelve la salida pendiente actualizada
             Controller-->>Client: HTTP 2xx { code, data }
         else AppError propagado
             Domain-->>Controller: throw AppError { code, message, meta, statusCode }
@@ -43,4 +43,3 @@ sequenceDiagram
         deactivate Controller
     end
 ```
-

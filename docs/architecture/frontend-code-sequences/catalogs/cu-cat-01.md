@@ -5,6 +5,7 @@
 
 ```mermaid
 sequenceDiagram
+    actor Initiator as Administrador del sistema
     participant Browser as Navegador
     participant View as src/views/pages/warehouse/suppliers/suppliersPage.ejs<br/>src/public/js/pages/warehouse/suppliers/suppliersPage.js
     participant Application as src/public/js/application/warehouse/suppliers/suppliers.js
@@ -12,6 +13,7 @@ sequenceDiagram
     participant HTTP as src/public/js/services/axiosInstanceApi.js
     participant Transport@{ "type": "control" } as src/routes/api/warehouse/supplierApiRoute.js<br/>src/controllers/api/warehouse/supplierController.js
 
+    Initiator->>Browser: inicia CU-CAT-01 — Consultar proveedores
     Browser->>View: suppliersPage.ejs y suppliersPage.js cargan proveedores
     View->>Application: getAllSuppliers({ params })
     Application->>Request: getAllSuppliersRequest({ params })

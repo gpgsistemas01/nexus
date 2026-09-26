@@ -5,6 +5,7 @@
 
 ```mermaid
 sequenceDiagram
+    actor Initiator as Personal de almacén
     participant Browser as Navegador
     participant View as src/public/js/plugins/datatable/warehouse/wastes/wasteDatatable.js
     participant Dialog as src/public/js/ui/reportExportDialog.js
@@ -13,6 +14,7 @@ sequenceDiagram
     participant HTTP as src/public/js/services/axiosInstanceApi.js
     participant Transport@{ "type": "control" } as src/routes/api/warehouse/reportApiRoute.js<br/>src/controllers/api/warehouse/reportController.js
 
+    Initiator->>Browser: inicia CU-ALM-14 — Generar reporte de mermas
     Browser->>View: Botón Excel de wasteDatatable.js
     View->>Dialog: showInventoryExportDialog()
     Dialog-->>View: inventoryScope: 'active' | 'stock'
