@@ -272,8 +272,8 @@ export const AUTHORIZATION_POLICIES = Object.freeze({
     departments: ['ALMACÉN Y PROVEDURÍA', 'SISTEMAS']
 }),
     [PERMISSIONS.CLIENTS_PAGE_VIEW]: createPolicy({
-    roles: ['Administrador del sistema'],
-    departments: ['SISTEMAS']
+    roles: ['Almacenista', 'Coordinador', 'Auxiliar', 'Administrador del sistema'],
+    departments: ['ALMACÉN Y PROVEDURÍA', 'SISTEMAS']
 }),
     [PERMISSIONS.GOODS_ISSUES_PAGE_VIEW]: createPolicy({
     roles: ['Almacenista', 'Coordinador', 'Auxiliar', 'Administrador del sistema'],
@@ -284,8 +284,8 @@ export const AUTHORIZATION_POLICIES = Object.freeze({
     departments: ['ALMACÉN Y PROVEDURÍA', 'SISTEMAS']
 }),
     [PERMISSIONS.SUPPLIERS_PAGE_VIEW]: createPolicy({
-    roles: ['Administrador del sistema'],
-    departments: ['SISTEMAS']
+    roles: ['Almacenista', 'Coordinador', 'Auxiliar', 'Administrador del sistema'],
+    departments: ['ALMACÉN Y PROVEDURÍA', 'SISTEMAS']
 }),
     [PERMISSIONS.WASTES_PAGE_VIEW]: createPolicy({
     roles: ['Almacenista', 'Coordinador', 'Auxiliar', 'Administrador del sistema'],

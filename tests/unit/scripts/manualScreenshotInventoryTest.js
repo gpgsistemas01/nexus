@@ -16,7 +16,7 @@ describe('manual screenshot inventory', () => {
     const output = listInventory();
 
     expect(output).toContain('| 1 | almacen | `CAP-AUT-01-LOGIN` |');
-    expect(output).toContain('| 102 | sistemas | `CAP-ERR-404-SISTEMAS-NOT-FOUND` |');
+    expect(output).toContain('| 136 | sistemas | `CAP-ERR-404-SISTEMAS-NOT-FOUND` |');
   });
 
   it.each(['almacen', 'sistemas'])('limits the inventory to the %s area', area => {
@@ -27,15 +27,18 @@ describe('manual screenshot inventory', () => {
     expect(rows.every(line => line.includes(`| ${ area } |`))).toBe(true);
   });
 
-  it('captures only the contextual client and supplier creation flows for warehouse', () => {
+  it('assigns each operational capture to the actors declared by its use case', () => {
     const warehouseOutput = listInventory('--area', 'almacen');
     const systemsOutput = listInventory('--area', 'sistemas');
 
-    expect(warehouseOutput).toContain('CAP-CAT-SUP-02-CREATE');
+    expect(warehouseOutput).toContain('CAP-CAT-SUP-00-NAVIGATION');
     expect(warehouseOutput).toContain('CAP-CAT-CLI-02-CREATE');
-    expect(warehouseOutput).not.toContain('CAP-CAT-SUP-00-NAVIGATION');
-    expect(warehouseOutput).not.toContain('CAP-CAT-CLI-01-LIST');
-    expect(systemsOutput).toContain('CAP-CAT-SUP-00-NAVIGATION');
-    expect(systemsOutput).toContain('CAP-CAT-CLI-00-NAVIGATION');
+    expect(warehouseOutput).toContain('CAP-IDA-PER-00-NAVIGATION');
+    expect(warehouseOutput).not.toContain('CAP-CAT-SUP-03-EDIT');
+    expect(warehouseOutput).not.toContain('CAP-CAT-CLI-04-EXPORT');
+    expect(systemsOutput).toContain('CAP-CAT-SUP-03-EDIT');
+    expect(systemsOutput).toContain('CAP-CAT-CLI-04-EXPORT');
+    expect(systemsOutput).toContain('CAP-ENT-00-NAVIGATION-SISTEMAS');
+    expect(systemsOutput).toContain('CAP-SAL-MAT-00-NAVIGATION-SISTEMAS');
   });
 });
