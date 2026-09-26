@@ -5,6 +5,7 @@
 
 ```mermaid
 sequenceDiagram
+    actor Initiator as Administrador del sistema
     participant Browser as Navegador
     participant View as src/public/js/pages/admin/movements/movementsPage.js
     participant Application as src/public/js/application/admin/movements/movements.js
@@ -12,6 +13,7 @@ sequenceDiagram
     participant HTTP as src/public/js/services/axiosInstanceApi.js
     participant Transport@{ "type": "control" } as src/routes/api/admin/movementApiRoute.js<br/>src/controllers/api/admin/movementController.js
 
+    Initiator->>Browser: inicia CU-ALM-15 — Consultar movimientos de mermas
     Browser->>View: movementsPage.js selecciona el contexto merma
     View->>Application: getAllMovements({ context: 'wastes', params })
     Application->>Request: getAllMovementsRequest({ context, params })

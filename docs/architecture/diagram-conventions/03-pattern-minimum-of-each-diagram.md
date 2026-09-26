@@ -69,8 +69,11 @@ En secuencias, `actor` se reserva para una persona, rol o sistema externo autón
 inicia o recibe una interacción. Navegador, EJS, router, controller, servicio y base de
 datos son `participant`. Una secuencia técnica puede omitir al actor humano cuando su
 límite empieza en HTTP y enlaza el `CU-*` que ya lo identifica; una secuencia de
-experiencia completa sí debe mostrar el actor canónico del caso. No se cambia el actor
-por «Usuario» si el requisito distingue al Personal de almacén del Administrador del sistema.
+experiencia completa sí debe mostrar el actor canónico del caso. Por ello `DIA-FE-CU-*`
+usa la figura `actor` antes de **Navegador**, mientras `DIA-BE-CU-*` comienza en
+**Cliente HTTP / web** o **Navegador**. No se cambia el actor por «Usuario» si el
+requisito distingue al Personal de almacén del Administrador del sistema y no se fusionan
+ambos límites en una sola línea de vida.
 
 Los participantes de las secuencias técnicas se presentan como elementos visuales con
 cabecera y línea de vida; un estereotipo escrito por sí solo no sustituye esa

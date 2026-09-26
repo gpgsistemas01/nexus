@@ -10,7 +10,7 @@ sequenceDiagram
     participant Controller@{ "type": "control" } as src/controllers/api/warehouse/materialController.js
     participant Domain as src/services/warehouse/materials/materialService.js
     participant SupplierMaterial as src/services/warehouse/materials/supplierMaterialService.js
-    participant Prisma as Prisma / PostgreSQL
+    participant Prisma@{ "type": "database" } as Prisma / PostgreSQL
     participant ErrorHandler as src/app.js
 
     Client->>Route: GET /api/warehouse/materials

@@ -5,6 +5,7 @@
 
 ```mermaid
 sequenceDiagram
+    actor Initiator as Personal de almacén
     participant Browser as Navegador
     participant View as src/public/js/pages/warehouse/wasteIssues/wasteIssueForm.js
     participant Application as src/public/js/application/warehouse/wasteIssues/wasteIssues.js
@@ -12,11 +13,13 @@ sequenceDiagram
     participant HTTP as src/public/js/services/axiosInstanceApi.js
     participant Transport@{ "type": "control" } as src/routes/api/warehouse/wasteIssueApiRoute.js<br/>src/controllers/api/warehouse/wasteIssueController.js
 
+    Initiator->>Browser: inicia CU-SAL-12 — Surtir merma
     Browser->>View: Acción Surtir dentro de los detalles de merma
-    View->>View: validateFields(wasteIssueValidation, formData)
-    alt wasteIssueValidation devuelve errores
-        View-->>Browser: useForm.getErrors() conserva datos y muestra errores por campo
-    else Formulario válido
+    View->>View: mapIssueDetailsToSupplyRequest(details)
+    View->>View: validateDetailsFields(...) aplica validateFields(issueProjectQuantityDetailsValidation, detail) a cada detalle
+    alt No hay detalle seleccionado o alguna cantidad es inválida
+        View-->>Browser: useForm.getErrors() conserva datos y muestra el error por detalle
+    else Detalles de surtimiento válidos
         View->>Application: editWasteIssueDetails({ id, formData })
         Application->>Request: editWasteIssueDetailsRequest({ id, data: formData })
         activate Application
@@ -35,4 +38,3 @@ sequenceDiagram
         deactivate Application
     end
 ```
-

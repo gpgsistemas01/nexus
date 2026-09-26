@@ -13,7 +13,7 @@ npm run docs:export -- manual-almacen docx
 # Genera DOCX y PDF del personal de almacén con la misma estructura.
 npm run docs:export -- manual-almacen ambos
 
-# Genera un DOCX, incluida la portada definida en el Markdown.
+# Genera los DOCX de arquitectura por sección y grupo en build/docs/docx/arquitectura/.
 npm run docs:export -- arquitectura docx
 
 # Genera primero el DOCX y después lo convierte a PDF con LibreOffice.

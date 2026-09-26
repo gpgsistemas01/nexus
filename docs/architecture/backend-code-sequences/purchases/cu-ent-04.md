@@ -15,7 +15,7 @@ sequenceDiagram
     participant Change as src/services/warehouse/goodsReceipts/detailChanges/goodsReceiptDetailChangeService.js
     participant Reason as src/services/warehouse/reasonService.js
     participant Inventory as src/services/inventory/movementService.js
-    participant Prisma as Prisma / PostgreSQL
+    participant Prisma@{ "type": "database" } as Prisma / PostgreSQL
     participant Socket as src/utils/socketUtils.js
 
     Client->>Router: PATCH /api/warehouse/goods-receipts/:id/details/:detailId/corrections + accessToken

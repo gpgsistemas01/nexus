@@ -5,7 +5,8 @@
 
 ```mermaid
 sequenceDiagram
-    actor User as Almacenista o Administrador
+    actor Initiator as Personal de almacén
+    participant Browser as Navegador
     participant EJS as src/views/pages/warehouse/wastes/wastesPage.ejs
     participant Page as src/public/js/pages/warehouse/wastes/wastesPage.js
     participant Table as src/public/js/plugins/datatable/warehouse/wastes/wasteDatatable.js
@@ -16,17 +17,18 @@ sequenceDiagram
     participant HTTP as src/public/js/services/axiosInstanceApi.js
     participant Transport@{ "type": "control" } as src/routes/api/warehouse/wasteApiRoute.js<br/>src/controllers/api/warehouse/wasteController.js
 
+    Initiator->>Browser: inicia CU-ALM-13 — Agregar existencia de merma
     EJS->>Page: import wastesPage.js mediante script type=module
     Page->>Modal: import openWasteStockAdditionModal
     Page->>Form: import wasteStockAdditionForm.js y registra useForm
     Page->>Table: createWasteDatatable({ context, openWasteModal, openWasteStockAdditionModal })
-    User->>Table: selecciona Agregar stock en una merma
+    Browser->>Table: selecciona Agregar stock en una merma
     Table->>Modal: openWasteStockAdditionModal({ data })
-    Modal-->>User: muestra identidad, existencia actual, quantity y observations
-    User->>Form: confirma wasteStockAdditionForm
+    Modal-->>Browser: muestra identidad, existencia actual, quantity y observations
+    Browser->>Form: confirma wasteStockAdditionForm
     Form->>Form: validateFields(wasteStockAdditionValidation, { quantity, observations })
     alt wasteStockAdditionValidation devuelve errores
-        Form-->>User: useForm.getErrors() conserva datos y muestra errores por campo
+        Form-->>Browser: useForm.getErrors() conserva datos y muestra errores por campo
     else Formulario válido
         Form->>Application: addWasteStock({ id, formData })
         Application->>Request: addWasteStockRequest({ id, formData })
@@ -38,10 +40,10 @@ sequenceDiagram
         Request-->>Application: addWasteStockRequest() resuelve response.data
         alt Respuesta exitosa
             Application-->>Form: addWasteStock() resuelve response.data
-            Form-->>User: DOM o DataTable actualizado con response.data
+            Form-->>Browser: DOM o DataTable actualizado con response.data
         else Respuesta rechazada
             Application-->>Form: error Axios normalizado { code, message, meta }
-            Form-->>User: formulario o filtros conservados, mensaje visible
+            Form-->>Browser: formulario o filtros conservados, mensaje visible
         end
         deactivate Application
     end

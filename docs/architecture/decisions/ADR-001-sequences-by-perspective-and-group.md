@@ -33,10 +33,22 @@ reglas, patrones y cobertura, seguido de seis capítulos funcionales. Los identi
 `DIA-FE-CU-*` y `DIA-BE-CU-*` no cambian. Las matrices enlazan directamente el capítulo y
 el exportador conserva el orden completo del paquete.
 
+La separación no corta la trazabilidad del recorrido. La secuencia frontend empieza con
+la figura del actor canónico y termina en la frontera HTTP; la secuencia backend retoma
+esa misma operación desde el cliente HTTP y desarrolla autorización, controller,
+servicios y efectos. Unificarlas produciría diagramas con demasiados participantes,
+mezclaría decisiones de interacción con transacciones y duplicaría la frontera común.
+Por ello se enlazan mediante el mismo `CU-*`, método y endpoint en vez de mantener un
+tercer diagrama combinado.
+
 ## Consecuencias
 
 - La navegación y las revisiones quedan acotadas al grupo afectado.
 - Frontend y backend mantienen fuentes canónicas independientes y simétricas.
+- El actor se representa visualmente en frontend; backend conserva como límite al
+  navegador o cliente HTTP y no duplica al actor humano.
+- La coincidencia de método y endpoint permite continuar la lectura entre perspectivas
+  sin fusionarlas en una secuencia que mezcle niveles de detalle.
 - Las reglas comunes no se repiten en los capítulos.
 - El exportador y el verificador deben conocer el orden de la colección.
 - Agregar otro grupo exige actualizar ambos índices, el manifiesto y la validación de

@@ -6,7 +6,10 @@ import path from 'node:path';
 import process from 'node:process';
 import { pathToFileURL } from 'node:url';
 import { bundleOpenApiContract } from './openApiContractUtils.js';
+import { getDocumentExportRequest, getDocumentOutputPlan } from './documentExportFormats.js';
 import { prepareMermaidCli } from './prepareMermaidCli.js';
+import { hasInvalidSvgGeometry, normalizeMermaidSource } from './mermaidExportUtils.js';
+import { validatePdfOutput } from './pdfExportUtils.js';
 import {
     preparePdfConverter,
     preparePdfConverterEnvironment
@@ -41,11 +44,6 @@ const manualCases = Object.fromEntries(manualCaseGroups.map((group) => [
     group,
     getCollectionDocuments('docs/user-manual/cases', [group]).slice(1)
 ]));
-const requirementUseCases = getCollectionDocuments('docs/requirements/use-cases', collectionGroups);
-const requirementDiagrams = getCollectionDocuments(
-    'docs/requirements/diagrams',
-    [...collectionGroups, 'cross-cutting']
-);
 const manualOverview = 'docs/user-manual/overview.md';
 const manualProcedures = 'docs/user-manual/procedures.md';
 const manualErrorCatalog = 'docs/user-manual/error-messages.md';
@@ -68,37 +66,85 @@ const MANUALS = Object.freeze({
         directory: 'manuales/administrador',
         parts: {
             autenticacion: manualPart(administrator, manualCases.authentication),
-            'identidad-y-acceso': manualPart(administrator, manualCases['identity-access']),
+            'movimientos-materiales': manualPart(administrator, manualCaseFiles('reports', [
+                '01-cap-rep-mov-mat-01-list.md',
+                '02-cap-rep-mov-mat-02-export.md'
+            ])),
+            'movimientos-mermas': manualPart(administrator, manualCaseFiles('reports', [
+                '03-cap-rep-mov-was-01-list.md',
+                '04-cap-rep-mov-was-02-export.md'
+            ])),
+            usuarios: manualPart(administrator, manualCaseFiles('identity-access', [
+                '04-cap-ida-usr-01-list.md',
+                '05-cap-ida-usr-02-create.md',
+                '06-cap-ida-usr-03-edit.md',
+                '07-cap-ida-usr-04-password.md'
+            ])),
             catalogos: manualPart(administrator, manualCaseFiles('catalogs', [
                 '01-catalogs-auxiliary.md'
             ])),
-            reportes: manualPart(administrator, manualCases.reports)
+            personas: manualPart(administrator, manualCaseFiles('identity-access', [
+                '01-cap-ida-per-01-list.md',
+                '02-cap-ida-per-02-create.md',
+                '03-cap-ida-per-03-edit.md'
+            ])),
+            clientes: manualPart(administrator, manualCaseFiles('catalogs', [
+                '10-cap-cat-cli-01-list.md',
+                '11-cap-cat-cli-02-create.md',
+                '12-cap-cat-cli-03-edit.md'
+            ])),
+            proveedores: manualPart(administrator, manualCaseFiles('catalogs', [
+                '07-cap-cat-sup-01-list.md',
+                '08-cap-cat-sup-02-create.md',
+                '09-cap-cat-sup-03-edit.md'
+            ]))
         }
     },
     'manual-almacen': {
         directory: 'manuales/almacen',
         parts: {
             autenticacion: manualPart(warehouse, manualCases.authentication),
-            catalogos: manualPart(warehouse, manualCases.catalogs.slice(1)),
-            'compras-de-material': manualPart(warehouse, manualCases.purchases),
-            'salidas-de-material': manualPart(warehouse, manualCaseFiles('issues', [
-                '01-cap-sal-mat-01-list.md',
-                '02-cap-sal-mat-02-create.md',
-                '03-cap-sal-mat-03-edit.md',
-                '04-cap-sal-mat-04-supply.md',
-                '05-cap-sal-mat-05-return.md',
-                '06-cap-rep-sal-mat-06-export.md',
-                '07-cap-sal-mat-08-view.md'
+            'almacen-materiales': manualPart(warehouse, manualCaseFiles('catalogs', [
+                '02-cap-cat-mat-01-list.md',
+                '03-cap-rep-mat-05-export.md',
+                '04-cap-cat-mat-02-create.md',
+                '05-cap-cat-mat-03-edit.md'
             ])),
-            'salidas-de-merma': manualPart(warehouse, manualCaseFiles('issues', [
-                '08-cap-sal-was-01-list.md',
-                '09-cap-sal-was-02-create.md',
-                '10-cap-sal-was-03-edit.md',
-                '11-cap-sal-was-04-supply.md',
-                '12-cap-sal-was-05-return.md',
-                '13-cap-rep-sal-was-06-export.md',
-                '14-cap-sal-was-08-view.md'
-            ]))
+            'almacen-mermas': manualPart(warehouse, manualCaseFiles('catalogs', [
+                '13-cap-cat-was-01-list.md',
+                '14-cap-rep-was-05-export.md',
+                '15-cap-cat-was-02-create.md',
+                '16-cap-cat-was-03-edit.md',
+                '18-cap-cat-was-05-add-stock.md'
+            ])),
+            compras: manualPart(warehouse, [
+                ...manualCases.purchases,
+                ...manualCaseFiles('catalogs', ['08-cap-cat-sup-02-create.md'])
+            ]),
+            'salidas-materiales': manualPart(warehouse, [
+                ...manualCaseFiles('issues', [
+                    '01-cap-sal-mat-01-list.md',
+                    '02-cap-sal-mat-02-create.md',
+                    '03-cap-sal-mat-03-edit.md',
+                    '04-cap-sal-mat-04-supply.md',
+                    '05-cap-sal-mat-05-return.md',
+                    '06-cap-rep-sal-mat-06-export.md',
+                    '07-cap-sal-mat-08-view.md'
+                ]),
+                ...manualCaseFiles('catalogs', ['11-cap-cat-cli-02-create.md'])
+            ]),
+            'salidas-mermas': manualPart(warehouse, [
+                ...manualCaseFiles('issues', [
+                    '08-cap-sal-was-01-list.md',
+                    '09-cap-sal-was-02-create.md',
+                    '10-cap-sal-was-03-edit.md',
+                    '11-cap-sal-was-04-supply.md',
+                    '12-cap-sal-was-05-return.md',
+                    '13-cap-rep-sal-was-06-export.md',
+                    '14-cap-sal-was-08-view.md'
+                ]),
+                ...manualCaseFiles('catalogs', ['11-cap-cat-cli-02-create.md'])
+            ])
         }
     }
 });
@@ -107,64 +153,110 @@ const sequenceGroups = [
     'identity-access',
     'catalogs',
     'purchases',
-    'issues',
-    'reports'
+    'issues'
 ];
-const sequenceDocuments = (side) => getCollectionDocuments(
-    `docs/architecture/${side}-code-sequences`,
-    sequenceGroups
-);
-const MANIFESTS = Object.freeze({
-    requisitos: [
-        'docs/requirements/index.md',
-        ...getDirectoryDocuments('docs/requirements/vision-scope-and-requirements'),
-        ...getDirectoryDocuments('docs/requirements/requirements-specification'),
-        ...getDirectoryDocuments('docs/requirements/domain-and-use-cases'),
-        ...requirementUseCases,
-        ...requirementDiagrams,
-        'docs/requirements/requirements-operations-matrix.md',
-        'docs/requirements/business-glossary.md'
-    ],
-    datos: [
-        'docs/data/index.md',
-        'docs/data/database-users-and-permissions-analysis.md',
-        'docs/data/postgresql-runtime-and-migration-roles.md',
-        'docs/generated/database-schema.md',
-        'docs/generated/data-dictionary.md'
-    ],
-    arquitectura: [
-        'docs/architecture/index.md',
-        ...getDirectoryDocuments('docs/architecture/architecture-and-web-views'),
-        ...getDirectoryDocuments('docs/architecture/web-navigation-and-screen-catalog'),
-        ...getDirectoryDocuments('docs/architecture/technical-code-documentation'),
-        ...getDirectoryDocuments('docs/architecture/backend-technical-documentation'),
-        ...getDirectoryDocuments('docs/architecture/api-contract'),
-        ...sequenceDocuments('backend'),
-        ...getDirectoryDocuments('docs/architecture/frontend-technical-documentation'),
-        ...sequenceDocuments('frontend'),
-        ...getDirectoryDocuments('docs/architecture/traceability-matrix'),
-        ...getDirectoryDocuments('docs/architecture/design-and-construction-patterns'),
-        ...getDirectoryDocuments('docs/architecture/code-diagrams'),
-        'docs/generated/code-map.md',
-        ...getDirectoryDocuments('docs/architecture/diagram-conventions'),
-        ...getDirectoryDocuments('docs/architecture/diagram-inventory'),
-        ...getDirectoryDocuments('docs/architecture/coding-standards'),
-        'docs/architecture/decisions/index.md',
-        'docs/architecture/decisions/ADR-001-sequences-by-perspective-and-group.md'
-    ],
-    pruebas: [
-        'docs/testing/test-plan.md',
-        'docs/testing/service-test-coverage.md',
-        'docs/testing/unit-test-catalog.md',
-        'docs/testing/unit-test-results.md'
-    ]
+const packagePart = (entry, sources) => [entry, ...sources.filter((source) => source !== entry)];
+const REQUIREMENT_ENTRY = 'docs/requirements/index.md';
+const ARCHITECTURE_ENTRY = 'docs/architecture/index.md';
+const PUBLICATIONS = Object.freeze({
+    requisitos: {
+        directory: 'requisitos',
+        parts: {
+            'vision-y-alcance': packagePart(REQUIREMENT_ENTRY, [
+                ...getDirectoryDocuments('docs/requirements/vision-scope-and-requirements')
+            ]),
+            especificacion: packagePart(REQUIREMENT_ENTRY, [
+                ...getDirectoryDocuments('docs/requirements/requirements-specification'),
+                'docs/requirements/requirements-operations-matrix.md',
+                'docs/requirements/business-glossary.md'
+            ]),
+            'dominio-y-casos-de-uso': packagePart(REQUIREMENT_ENTRY, [
+                ...getDirectoryDocuments('docs/requirements/domain-and-use-cases')
+            ]),
+            ...Object.fromEntries(collectionGroups.map((group) => [
+                `casos-de-uso-${group}`,
+                packagePart(REQUIREMENT_ENTRY, getCollectionDocuments('docs/requirements/use-cases', [group]))
+            ])),
+            ...Object.fromEntries([...collectionGroups, 'cross-cutting'].map((group) => [
+                `diagramas-${group}`,
+                packagePart(REQUIREMENT_ENTRY, getCollectionDocuments('docs/requirements/diagrams', [group]))
+            ]))
+        }
+    },
+    datos: {
+        parts: {
+            datos: [
+                'docs/data/index.md',
+                'docs/data/database-users-and-permissions-analysis.md',
+                'docs/data/postgresql-runtime-and-migration-roles.md',
+                'docs/generated/database-schema.md',
+                'docs/generated/data-dictionary.md'
+            ]
+        }
+    },
+    arquitectura: {
+        directory: 'arquitectura',
+        parts: {
+            'vision-y-navegacion': packagePart(ARCHITECTURE_ENTRY, [
+                ...getDirectoryDocuments('docs/architecture/architecture-and-web-views'),
+                ...getDirectoryDocuments('docs/architecture/web-navigation-and-screen-catalog'),
+                ...getDirectoryDocuments('docs/architecture/code-diagrams')
+            ]),
+            'documentacion-tecnica-comun': packagePart(ARCHITECTURE_ENTRY, [
+                ...getDirectoryDocuments('docs/architecture/technical-code-documentation'),
+                ...getDirectoryDocuments('docs/architecture/design-and-construction-patterns'),
+                'docs/generated/code-map.md'
+            ]),
+            backend: packagePart(ARCHITECTURE_ENTRY, [
+                ...getDirectoryDocuments('docs/architecture/backend-technical-documentation')
+            ]),
+            frontend: packagePart(ARCHITECTURE_ENTRY, [
+                ...getDirectoryDocuments('docs/architecture/frontend-technical-documentation')
+            ]),
+            'contrato-api': packagePart(ARCHITECTURE_ENTRY, [
+                ...getDirectoryDocuments('docs/architecture/api-contract')
+            ]),
+            trazabilidad: packagePart(ARCHITECTURE_ENTRY, [
+                ...getDirectoryDocuments('docs/architecture/traceability-matrix')
+            ]),
+            'diagramas-y-convenciones': packagePart(ARCHITECTURE_ENTRY, [
+                ...getDirectoryDocuments('docs/architecture/diagram-conventions'),
+                ...getDirectoryDocuments('docs/architecture/diagram-inventory')
+            ]),
+            'estandar-y-decisiones': packagePart(ARCHITECTURE_ENTRY, [
+                ...getDirectoryDocuments('docs/architecture/coding-standards'),
+                'docs/architecture/decisions/index.md',
+                'docs/architecture/decisions/ADR-001-sequences-by-perspective-and-group.md'
+            ]),
+            ...Object.fromEntries(sequenceGroups.flatMap((group) => ['backend', 'frontend'].map((side) => [
+                `secuencias-${side}-${group}`,
+                packagePart(ARCHITECTURE_ENTRY, getCollectionDocuments(
+                    `docs/architecture/${side}-code-sequences`,
+                    [group]
+                ))
+            ])))
+        }
+    },
+    pruebas: {
+        parts: {
+            pruebas: [
+                'docs/testing/test-plan.md',
+                'docs/testing/service-test-coverage.md',
+                'docs/testing/unit-test-catalog.md',
+                'docs/testing/unit-test-results.md'
+            ]
+        }
+    }
 });
-const [requestedPublication, requestedFormat] = process.argv.slice(2).filter((argument) => argument !== '--check');
-const checkOnly = process.argv.includes('--check');
+const {
+    publication: requestedPublication,
+    format: requestedFormat,
+    checkOnly
+} = getDocumentExportRequest(process.argv.slice(2));
 const formats = new Set(['docx', 'pdf', 'ambos']);
-const outputFormat = requestedFormat === 'ambos' ? 'pdf' : requestedFormat;
+const outputPlan = getDocumentOutputPlan(requestedFormat);
 let pdfConverter = process.env.DOCS_PDF_CONVERTER;
-const publicationNames = [...Object.keys(MANUALS), ...Object.keys(MANIFESTS)];
+const publicationNames = [...Object.keys(MANUALS), ...Object.keys(PUBLICATIONS)];
 const mermaidBlock = /^```mermaid\r?\n([\s\S]*?)^```\r?$/gm;
 const externalLink = /^(?:https?:|mailto:)/;
 const markdownLink = /(?<!!)\[([^\]]+)\]\(([^) ]+)([^)]*)\)/g;
@@ -197,12 +289,6 @@ const getDocumentFragments = (content) => new Set([
     ...[...content.matchAll(/^<a id="([^"]+)"><\/a>$/gm)].map((match) => match[1]),
     ...[...content.matchAll(/^#{1,6}\s+(.+)$/gm)].map((match) => headingFragment(match[1]))
 ]);
-const normalizeMermaidSource = (source) => {
-    const content = source.replace(/\r?\n$/, '');
-    return !content.includes('\n') && content.includes('\\n')
-        ? `${content.replace(/\\r\\n|\\n/g, '\n')}\n`
-        : source;
-};
 const diagramCaption = (content, index) => {
     const headings = [...content.slice(0, index).matchAll(/^#{1,6}\s+(.+)$/gm)];
     const heading = headings.at(-1)?.[1].replace(/[`[*_\]]/g, '').trim();
@@ -298,20 +384,19 @@ const insertAfterDocumentData = (content, insertion) => {
     return `${content.slice(0, insertionIndex)}\n\n${insertion}\n${content.slice(insertionIndex).replace(/^\r?\n+/, '')}`;
 };
 
-if ((requestedPublication !== 'todos' && !MANIFESTS[requestedPublication] && !MANUALS[requestedPublication])
+if ((requestedPublication !== 'todos' && !PUBLICATIONS[requestedPublication] && !MANUALS[requestedPublication])
     || (checkOnly ? requestedFormat && !formats.has(requestedFormat) : !formats.has(requestedFormat))) {
-    console.error('Uso: npm run docs:export -- <todos|manual-administrador|manual-almacen|requisitos|datos|arquitectura|pruebas> [docx|pdf|ambos] [--check]');
+    console.error('Uso: npm run docs:export -- [todos|manual-administrador|manual-almacen|requisitos|datos|arquitectura|pruebas] [docx|pdf|ambos] [--check]');
     process.exit(1);
 }
 
 const requestedPublications = requestedPublication === 'todos' ? publicationNames : [requestedPublication];
 const publicationParts = requestedPublications.flatMap((publication) => {
-    const manual = MANUALS[publication];
-    if (!manual) return [{ publication, document: publication, sources: MANIFESTS[publication] }];
-    return Object.entries(manual.parts).map(([document, sources]) => ({
+    const definition = MANUALS[publication] ?? PUBLICATIONS[publication];
+    return Object.entries(definition.parts).map(([document, sources]) => ({
         publication,
         document,
-        directory: manual.directory,
+        directory: definition.directory,
         sources
     }));
 });
@@ -389,7 +474,7 @@ if (pandoc.error || pandoc.status !== 0) {
     console.error('Pandoc no está disponible. Instálalo o usa --check para validar las fuentes.');
     process.exit(1);
 }
-if (outputFormat === 'pdf') {
+if (outputPlan.generatePdf) {
     try {
         pdfConverter = preparePdfConverter({ configuredConverter: pdfConverter });
     } catch (error) {
@@ -438,14 +523,19 @@ const prepareSource = async (source, publicationSources, firstFigureNumber) => {
                 console.error(error.message);
                 return null;
             }
-            const result = spawnSync(process.execPath, [mermaidExecutable, '--input', input, '--output', image, '--backgroundColor', 'white', '--scale', '2'], { cwd: ROOT, stdio: 'inherit' });
+            const result = spawnSync(process.execPath, [mermaidExecutable, '--input', input, '--output', image, '--backgroundColor', 'white', '--scale', '2'], { cwd: ROOT, encoding: 'utf8' });
+            if (result.stdout) process.stdout.write(result.stdout);
+            if (result.stderr) process.stderr.write(result.stderr);
             if (result.error?.code === 'ENOENT') {
                 await rm(image, { force: true });
                 console.error('Mermaid CLI no pudo ejecutarse después de preparar la dependencia.');
                 return null;
             }
-            if (result.status !== 0) {
+            if (result.status !== 0 || hasInvalidSvgGeometry(`${result.stdout ?? ''}\n${result.stderr ?? ''}`)) {
                 await rm(image, { force: true });
+                if (result.status === 0) {
+                    console.error(`Mermaid produjo geometría inválida al renderizar ${source}.`);
+                }
                 return null;
             }
         }
@@ -463,16 +553,18 @@ const prepareSource = async (source, publicationSources, firstFigureNumber) => {
 let failedStatus = 0;
 try {
     for (const { publication, document, directory, sources } of publications) {
-        const relativeOutput = directory ? path.join(directory, `${document}.${outputFormat}`) : `${document}.${outputFormat}`;
         const relativeDocxOutput = directory ? path.join(directory, `${document}.docx`) : `${document}.docx`;
-        const output = path.join(documentOutputDirectories[outputFormat], relativeOutput);
+        const relativePdfOutput = directory ? path.join(directory, `${document}.pdf`) : `${document}.pdf`;
         const docxOutput = path.join(documentOutputDirectories.docx, relativeDocxOutput);
+        const pdfOutput = path.join(documentOutputDirectories.pdf, relativePdfOutput);
         await Promise.all([
-            mkdir(path.dirname(output), { recursive: true }),
-            mkdir(path.dirname(docxOutput), { recursive: true })
+            mkdir(path.dirname(docxOutput), { recursive: true }),
+            mkdir(path.dirname(pdfOutput), { recursive: true })
         ]);
-        await rm(output, { force: true });
-        if (outputFormat === 'pdf') await rm(docxOutput, { force: true });
+        await Promise.all([
+            rm(docxOutput, { force: true }),
+            ...(outputPlan.generatePdf ? [rm(pdfOutput, { force: true })] : [])
+        ]);
         const preparedSources = [];
         const publicationSources = new Set(sources);
         let nextFigureNumber = 1;
@@ -503,19 +595,21 @@ try {
         ];
         if (process.env.DOCS_REFERENCE_DOC) args.push(`--reference-doc=${process.env.DOCS_REFERENCE_DOC}`);
         const result = spawnSync('pandoc', args, { cwd: temporaryDirectory, stdio: 'inherit' });
-        if (result.status !== 0) {
+        if (result.error || result.status !== 0 || !existsSync(docxOutput)) {
             failedStatus = result.status ?? 1;
             break;
         }
-        if (outputFormat === 'pdf') {
-            console.log(`Documento intermedio generado en ${path.relative(ROOT, docxOutput)}.`);
+        if (outputPlan.generateDocx) {
+            console.log(`Documento DOCX generado en ${path.relative(ROOT, docxOutput)}.`);
+        }
+        if (outputPlan.generatePdf) {
             const conversion = spawnSync(pdfConverter, [
                 `-env:UserInstallation=${pathToFileURL(path.join(temporaryDirectory, 'libreoffice-profile')).href}`,
                 '--headless',
                 '--convert-to',
                 'pdf',
                 '--outdir',
-                path.dirname(output),
+                path.dirname(pdfOutput),
                 docxOutput
             ], {
                 cwd: ROOT,
@@ -523,11 +617,20 @@ try {
                 stdio: 'inherit',
                 windowsHide: true
             });
-            if (conversion.status !== 0 || !existsSync(output)) {
+            if (conversion.error || conversion.status !== 0 || !existsSync(pdfOutput)) {
                 console.error(`No se pudo convertir ${path.relative(ROOT, docxOutput)} a PDF con ${pdfConverter}.`);
                 failedStatus = conversion.status ?? 1;
                 break;
             }
+            try {
+                await validatePdfOutput(pdfOutput);
+            } catch (error) {
+                await rm(pdfOutput, { force: true });
+                console.error(error.message);
+                failedStatus = 1;
+                break;
+            }
+            console.log(`Documento PDF generado en ${path.relative(ROOT, pdfOutput)}.`);
         }
         if (publication === 'arquitectura') {
             const openApiOutput = path.join(openApiOutputDirectory, 'openapi.json');
@@ -535,7 +638,6 @@ try {
             await writeFile(openApiOutput, `${JSON.stringify(openApiContract, null, 2)}\n`);
             console.log(`Contrato OpenAPI exportado en ${path.relative(ROOT, openApiOutput)}.`);
         }
-        console.log(`Documento generado en ${path.relative(ROOT, output)}.`);
     }
 } finally {
     await rm(temporaryDirectory, { recursive: true, force: true });

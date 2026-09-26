@@ -8,7 +8,7 @@ sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route as src/routes/api/admin/personApiRoute.js
     participant Auth as src/middleware/authMiddleware.js
-    participant Validator as src/validators/forms/personValidations.js
+    participant Validator as src/validators/forms/personValidations.js<br/>src/middleware/validatorMiddleware.js
     participant Controller@{ "type": "control" } as src/controllers/api/admin/personController.js
     participant PersonDto as <u>personDto: Object</u><br/>src/dtos/personDTO.js
     participant Domain as src/services/admin/person/personService.js
@@ -16,7 +16,7 @@ sequenceDiagram
 
     Client->>Route: PUT /api/admin/persons/:id
     Route->>Auth: verifyApiTokenRequired(req, res, next)
-    Auth->>Validator: personValidation[] de Express
+    Auth->>Validator: personValidation[] y validate(req, res, next)
     Validator->>Auth: authorizeUserApi(PERMISSIONS.PERSONS_WRITE)(req, res, next)
     alt Token ausente o inválido
         Auth-->>Client: HTTP 401 { code, message }

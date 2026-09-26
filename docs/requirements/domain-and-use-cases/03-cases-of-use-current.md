@@ -148,7 +148,6 @@ objetivo ni la lógica del flujo.
 
 ```mermaid
 flowchart LR
-    warehouse["«actor»<br/>Personal de almacén (área Almacén y proveduría)"]
     admin["«actor»<br/>Administrador del sistema (área Sistemas)"]
 
     subgraph catalogPackage["Nexus · Grupo funcional CAT: Catálogos"]
@@ -187,9 +186,10 @@ flowchart LR
         end
     end
 
-    admin -- "generaliza" --> warehouse
-    warehouse --- ucSupplierQuery
-    warehouse --- ucClientQuery
+    admin --- ucSupplierQuery
+    admin --- ucClientQuery
+    warehouse --- ucSupplierCreate
+    warehouse --- ucClientCreate
     admin --- ucAreaQuery
     admin --- ucRoleQuery
     admin --- ucPresentationQuery
@@ -338,8 +338,9 @@ Los actores vigentes son **Personal de almacén** del área Almacén y provedur�
 **Administrador del sistema** del área Sistemas. El Administrador del sistema se muestra
 como especialización en los grupos operativos donde su acceso heredado debe distinguirse
 del correspondiente al Personal de almacén; en `CAT` conserva además asociaciones
-directas con las operaciones restringidas de proveedores, clientes, ajustes y catálogos
-auxiliares. En `AUT`, **Usuario registrado** representa a ambos porque no varían
+directas con las consultas y operaciones restringidas de proveedores, clientes, ajustes y catálogos
+auxiliares. Personal de almacén sólo se asocia con las altas `CU-CAT-02` y `CU-CAT-06`, que inicia
+desde selectores operativos sin acceso a los listados independientes. En `AUT`, **Usuario registrado** representa a ambos porque no varían
 los casos de inicio y cierre de sesión. Esta generalización expresa disponibilidad
 funcional, no omite las comprobaciones de permiso del servidor. Solicitantes,
 aprobadores, asesores y proveedores participan como roles o entidades del negocio, pero

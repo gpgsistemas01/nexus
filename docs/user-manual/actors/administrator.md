@@ -15,10 +15,21 @@ date: 2026-09-04
 
 Esta guía corresponde al actor **Administrador del sistema (área Sistemas)**. Las opciones visibles dependen de sus permisos efectivos; esta clasificación no autoriza por sí sola una operación.
 
+## Responsabilidades y límites
+
+- Administra cuentas, contraseñas, personas y asignaciones de rol y departamento.
+- Puede ejecutar los recorridos operativos del Personal de almacén y administra las consultas,
+  altas, ediciones, cambios de estado y exportaciones de proveedores y clientes.
+- Administra los catálogos auxiliares, realiza los ajustes de existencia autorizados y consulta los
+  historiales de movimientos.
+- Debe usar únicamente las acciones concedidas por el servidor; pertenecer al área Sistemas no
+  sustituye la comprobación de permisos de cada solicitud.
+
 ## Recorrido recomendado
 
 1. Inicie en [autenticación y navegación](../cases/authentication/index.md).
 2. Use [identidad y acceso](../cases/identity-access/index.md) para administrar personas, áreas, roles, usuarios y contraseñas.
 3. Use **Catálogos auxiliares** y elija la pantalla independiente de **Áreas**, **Roles**, **Presentaciones**, **Unidades de medida**, **Motivos de ajuste** o **Estados de cumplimiento**. Siga el procedimiento de [catálogos e inventario](../cases/catalogs/index.md#catálogos-auxiliares) para consultar, crear o editar únicamente esos recursos; clientes y proveedores conservan sus módulos propios.
-4. Cuando tenga el permiso correspondiente, consulte [movimientos y reportes](../cases/reports/index.md).
-5. Ante un rechazo, siga el vínculo **Errores posibles** del procedimiento; no cambie de cuenta para eludir permisos.
+4. Use los recorridos de [compras](../cases/purchases/index.md) y [salidas](../cases/issues/index.md) cuando necesite intervenir en la operación de almacén.
+5. Cuando tenga el permiso correspondiente, consulte [movimientos y reportes](../cases/reports/index.md).
+6. Ante un rechazo, siga el vínculo **Errores posibles** del procedimiento; no cambie de cuenta para eludir permisos.

@@ -52,6 +52,10 @@
 | `CU-CAT-25` | Crear estado de cumplimiento | Alta de estado de cumplimiento con los campos permitidos. |
 | `CU-CAT-26` | Editar estado de cumplimiento | Actualización de estado de cumplimiento con los campos permitidos. |
 
+Las consultas, ediciones y reportes independientes de proveedores y clientes corresponden al
+Administrador del sistema. Personal de almacén participa únicamente en `CU-CAT-02` y `CU-CAT-06`,
+iniciados desde los selectores de una compra o salida autorizada; al terminar, Nexus devuelve el
+registro creado al formulario de origen sin abrir ni habilitar el listado independiente.
 
 ## Fichas específicas
 

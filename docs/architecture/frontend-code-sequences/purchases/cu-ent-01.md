@@ -5,6 +5,7 @@
 
 ```mermaid
 sequenceDiagram
+    actor Initiator as Personal de almacén
     participant Browser as Navegador
     participant View as src/views/pages/warehouse/goodsReceipts/goodsReceiptsPage.ejs
     participant Application as src/public/js/application/warehouse/goodsReceipts/goodsReceipts.js
@@ -12,6 +13,7 @@ sequenceDiagram
     participant HTTP as src/public/js/services/axiosInstanceApi.js
     participant Transport@{ "type": "control" } as src/routes/api/warehouse/goodsReceiptApiRoute.js<br/>src/controllers/api/warehouse/goodsReceiptController.js
 
+    Initiator->>Browser: inicia CU-ENT-01 — Consultar compras de material
     Browser->>View: goodsReceiptsPage.ejs y su DataTable cargan compras
     View->>Application: getAllGoodsReceipts({ params })
     Application->>Request: getAllGoodsReceiptsRequest({ params })

@@ -5,6 +5,7 @@
 
 ```mermaid
 sequenceDiagram
+    actor Initiator as Personal de almacén
     participant Browser as Navegador
     participant View as src/public/js/plugins/datatable/admin/persons/personDatatable.js
     participant Dialog as src/public/js/ui/reportExportDialog.js
@@ -13,6 +14,7 @@ sequenceDiagram
     participant HTTP as src/public/js/services/axiosInstanceApi.js
     participant Transport@{ "type": "control" } as src/controllers/api/admin/reportController.js
 
+    Initiator->>Browser: inicia CU-IDA-04 — Generar reporte de personas
     Browser->>View: Botón Excel de personDatatable.js
     View->>Dialog: showFilteredExportDialog()
     Dialog-->>View: Promise<boolean> con confirmación o cancelación

@@ -5,6 +5,7 @@
 
 ```mermaid
 sequenceDiagram
+    actor Initiator as Personal de almacén
     participant Browser as Navegador
     participant View as src/views/pages/warehouse/wasteIssues/wasteIssuesPage.ejs
     participant Application as src/public/js/application/warehouse/wasteIssues/wasteIssues.js
@@ -12,6 +13,7 @@ sequenceDiagram
     participant HTTP as src/public/js/services/axiosInstanceApi.js
     participant Transport@{ "type": "control" } as src/routes/api/warehouse/wasteIssueApiRoute.js<br/>src/controllers/api/warehouse/wasteIssueController.js
 
+    Initiator->>Browser: inicia CU-SAL-08 — Consultar salidas de merma
     Browser->>View: wasteIssuesPage.ejs y su DataTable cargan salidas de merma
     View->>Application: getAllWasteIssues({ params })
     Application->>Request: getAllWasteIssuesRequest({ params })
