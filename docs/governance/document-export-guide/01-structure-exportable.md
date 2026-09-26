@@ -14,6 +14,10 @@ publicar, todavía se debe revisar lo siguiente:
   use finales de línea CRLF. Si un editor o una integración serializa accidentalmente todo el
   contenido de un bloque en una sola línea con secuencias literales `\n`, el exportador las
   restaura como saltos de línea antes de invocar Mermaid CLI;
+- las figuras experimentales de participantes de secuencia se normalizan a participantes
+  rectangulares durante la publicación, porque algunas versiones de Mermaid/Chromium producen
+  coordenadas `NaN` o infinitas al rasterizarlas; el exportador también rechaza explícitamente esa
+  geometría si Mermaid la reporta, en vez de incorporar una imagen dañada;
 - una captura generada sólo se referencia después de ser revisada y existir en la estación
   que ensambla el documento.
 

@@ -1,8 +1,9 @@
 # 4. Comandos
 
-En los comandos, `<paquete>` significa **qué colección documental se va a generar**. No es
-un paquete de npm. Los manuales producen varios archivos por conjunto funcional; los demás
-paquetes producen un archivo. Elija uno de estos valores:
+Sin argumentos, `npm run docs:export` genera **todos** los paquetes en DOCX y PDF. Los argumentos
+permiten limitar deliberadamente una ejecución: `<paquete>` significa qué colección documental se
+va a generar y `<formato>` admite `docx`, `pdf` o `ambos`. No son paquetes de npm. Elija uno de
+estos valores cuando no necesite la entrega completa:
 
 | Valor de `<paquete>` | Contenido generado | Cuándo usarlo |
 | --- | --- | --- |

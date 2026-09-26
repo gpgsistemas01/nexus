@@ -21,16 +21,30 @@ Sustituya `manual-administrador` por `manual-almacen` y `docx` por `pdf` cuando 
 `ambos` si desea solicitar explícitamente los dos formatos con un solo comando. Si falta una
 imagen, `--check` detiene el proceso; en ese caso ejecute primero el flujo independiente siguiente.
 
-El resultado se organiza primero por actor y después con los mismos grupos funcionales de los casos
-de uso. Por ejemplo, el comando del administrador escribe
-`build/docs/docx/manuales/administrador/autenticacion.docx`, `identidad-y-acceso.docx`,
-`catalogos.docx` y `reportes.docx`;
-el de almacén escribe `autenticacion.docx`, `catalogos.docx`, `compras-de-material.docx` y
-los archivos separados `salidas-de-material.docx` y `salidas-de-merma.docx` dentro de
-`build/docs/docx/manuales/almacen/`. Las capturas de consultas y
-exportaciones quedan en el grupo `CU-*` que respaldan, en vez de crear grupos distintos por pantalla
-o un archivo genérico de reportes.
-Cada archivo conserva la portada del actor y únicamente los recorridos que corresponden a ese grupo.
-Los reportes de movimientos no se incorporan al manual de Almacén; se publican en el manual del
-Administrador del sistema del área Sistemas. De forma inversa, las compras y salidas no se
-incorporan al manual de Sistemas.
+El resultado se organiza primero por actor y después según los módulos visibles de `navList.ejs`,
+no según las carpetas técnicas que almacenan los casos. Los submenús **Almacén**, **Salidas** y
+**Movimientos** producen un documento por destino visible; **Catálogos** conserva un documento
+para sus seis opciones auxiliares porque comparten pantalla, permiso y procedimiento. Los accesos
+independientes **Usuarios**, **Personas**, **Clientes** y **Proveedores** tampoco se mezclan bajo
+un documento genérico de identidad o catálogos.
+
+El manual de Sistemas contiene `movimientos-materiales`, `movimientos-mermas`, `usuarios`,
+`catalogos`, `personas`, `clientes` y `proveedores`. El manual de Almacén contiene
+`almacen-materiales`, `almacen-mermas`, `compras`, `salidas-materiales` y `salidas-mermas`.
+Ambos agregan por separado `autenticacion` para explicar el acceso y el menú. Esta asignación
+coincide con los módulos por área usados por el inventario de capturas; no agrega a un manual un
+recorrido sólo porque la política técnica permita reutilizar alguna operación desde otro contexto.
+
+Cada archivo conserva la portada del actor, los recorridos permitidos y sólo las capturas
+referenciadas por esos recorridos. Por ejemplo, Almacén no recibe el ajuste absoluto de existencia,
+personas, usuarios, clientes, proveedores independientes, catálogos auxiliares o movimientos; los
+formularios contextuales usados dentro de compras o salidas permanecen en el documento operativo
+que los presenta. Por ello, `compras` incorpora el alta contextual de proveedor y cada documento
+de salidas incorpora el alta contextual de cliente; incluir esos procedimientos no agrega al actor
+los listados independientes **Proveedores** o **Clientes**.
+
+Los reportes tampoco producen un documento genérico: el reporte de inventario queda en
+`almacen-materiales` o `almacen-mermas`; el de compras en `compras`; los de salidas en su destino;
+los de personas, usuarios, clientes y proveedores en el documento del mismo módulo; y cada reporte
+de movimientos en `movimientos-materiales` o `movimientos-mermas`. Así, la captura del diálogo de
+exportación permanece junto a la consulta y los filtros cuyo alcance descarga.
