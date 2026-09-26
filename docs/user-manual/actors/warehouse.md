@@ -17,14 +17,14 @@ Esta guía corresponde al actor **Personal de almacén (área Almacén y proveed
 
 ## Responsabilidades y límites
 
-- Consulta y registra proveedores y clientes; su edición, cambio de estado y exportación corresponden
-  al Administrador del sistema.
 - Consulta y mantiene personas y sus asignaciones cuando cuenta con el permiso correspondiente, sin
   crear por ello una cuenta de acceso.
 - Registra y consulta materiales, mermas, entradas y salidas; surte y recibe devoluciones conforme al
   estado del documento y a la existencia disponible.
-- No administra usuarios, contraseñas, catálogos auxiliares, ajustes absolutos de existencia ni
-  historiales de movimientos.
+- Utiliza los clientes y proveedores autorizados dentro de compras, materiales y salidas, y puede
+  registrarlos desde esos formularios cuando no existen; no accede a sus vistas independientes.
+- No administra clientes, proveedores, usuarios, contraseñas, catálogos auxiliares, ajustes
+  absolutos de existencia ni historiales de movimientos.
 
 ## Recorrido recomendado
 

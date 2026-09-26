@@ -5,6 +5,7 @@
 
 ```mermaid
 sequenceDiagram
+    actor Initiator as Administrador del sistema
     participant Browser as Navegador
     participant View as src/public/js/plugins/datatable/admin/movements/movementDatatable.js
     participant Dialog as src/public/js/ui/reportExportDialog.js
@@ -13,6 +14,7 @@ sequenceDiagram
     participant HTTP as src/public/js/services/axiosInstanceApi.js
     participant Transport@{ "type": "control" } as src/routes/api/admin/reportApiRoute.js<br/>src/controllers/api/admin/reportController.js
 
+    Initiator->>Browser: inicia CU-ALM-08 — Generar reporte de movimientos de materiales
     Browser->>View: Botón Excel de movimientos en contexto material
     View->>Dialog: showReportExportDialog(currentMonth)
     Dialog-->>View: Promise<boolean> con confirmación o cancelación

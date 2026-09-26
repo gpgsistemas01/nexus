@@ -5,6 +5,7 @@
 
 ```mermaid
 sequenceDiagram
+    actor Initiator as Personal de almacén
     participant Browser as Navegador
     participant View as src/public/js/plugins/datatable/warehouse/materials/materialDatatable.js
     participant RowAdapter as src/public/js/plugins/datatable/warehouse/materials/materialRow.js
@@ -13,6 +14,7 @@ sequenceDiagram
     participant HTTP as src/public/js/services/axiosInstanceApi.js
     participant Transport@{ "type": "control" } as src/routes/api/warehouse/materialApiRoute.js<br/>src/controllers/api/warehouse/materialController.js
 
+    Initiator->>Browser: inicia CU-ALM-01 — Consultar materiales
     Browser->>View: materialsPage inicializa el DataTable de inventario
     View->>Application: getAllMaterials({ params })
     Application->>Request: getAllMaterialsRequest({ params })

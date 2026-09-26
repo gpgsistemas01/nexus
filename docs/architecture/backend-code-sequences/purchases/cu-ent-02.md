@@ -3,6 +3,11 @@
 
 **Patrones:** `BE-P01`, `BE-P03`, `BE-P04`, `BE-P05`.
 
+Si el selector crea un proveedor, antes de esta secuencia el navegador completa el `POST
+/api/warehouse/suppliers` de [`CU-CAT-02`](../catalogs/cu-cat-02.md#cu-cat-02). La compra recibe el
+`supplierId` resultante; el alta no se integra en la transacción de la compra ni habilita la ruta web
+independiente de proveedores.
+
 ```mermaid
 sequenceDiagram
     participant Browser as Navegador
@@ -19,7 +24,7 @@ sequenceDiagram
     participant Reference as src/services/document/referenceNumberService.js
     participant Inventory as src/services/inventory/movementService.js
     participant Material as src/services/warehouse/materials/supplierMaterialService.js
-    participant Prisma as Prisma / PostgreSQL
+    participant Prisma@{ "type": "database" } as Prisma / PostgreSQL
     participant Socket as src/utils/socketUtils.js
     participant ErrorHandler as src/app.js
 

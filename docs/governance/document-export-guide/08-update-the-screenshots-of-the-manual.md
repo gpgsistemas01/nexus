@@ -131,11 +131,10 @@ Cada comando genera únicamente el inventario del área indicada. `DOCS_CAPTURE_
 como alternativa a `--area` para CI. Para regenerar capturas concretas use
 `DOCS_ALMACEN_CAPTURE_IDS` o `DOCS_SISTEMAS_CAPTURE_IDS`; para continuar desde un punto use la
 variable `DOCS_<AREA>_CAPTURE_FROM`. No combine esos mecanismos con `--missing` o `--fresh`.
-El inventario sigue los actores de los casos de uso. Las consultas y altas de clientes y proveedores
-se capturan en Almacén y Sistemas; sus ediciones y exportaciones se capturan sólo en Sistemas. Los
-recorridos operativos de compras, salidas y personas también se generan para ambas áreas, mientras
-usuarios, catálogos auxiliares, ajustes absolutos e historiales de movimientos permanecen en
-Sistemas.
+Los listados independientes de clientes y proveedores pertenecen al inventario de Sistemas: no se
+solicitan durante la ejecución de Almacén porque esa cuenta no tiene acceso a sus rutas web. Las
+capturas de alta de Almacén sí abren los mismos modales reutilizados desde **Nueva compra** y
+**Nueva salida**, mediante las opciones **Nuevo proveedor** y **Nuevo cliente** de sus selectores.
 
 Por ejemplo, para repetir una captura de Almacén con su archivo de sesión todavía disponible:
 

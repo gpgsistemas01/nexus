@@ -5,6 +5,7 @@
 
 ```mermaid
 sequenceDiagram
+    actor Initiator as Personal de almacén
     participant Browser as Navegador
     participant View as src/public/js/pages/admin/persons/personModal.js<br/>src/public/js/pages/admin/persons/personForm.js
     participant Application as src/public/js/application/admin/persons/persons.js
@@ -12,6 +13,7 @@ sequenceDiagram
     participant HTTP as src/public/js/services/axiosInstanceApi.js
     participant Transport@{ "type": "control" } as src/routes/api/admin/personApiRoute.js<br/>src/controllers/api/admin/personController.js
 
+    Initiator->>Browser: inicia CU-IDA-02 — Crear persona
     Browser->>View: personModal.js abre personForm.js en modo alta
     View->>View: validateFields(personValidation, formData)
     alt personValidation devuelve errores

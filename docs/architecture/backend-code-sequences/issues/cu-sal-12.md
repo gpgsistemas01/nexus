@@ -16,7 +16,7 @@ sequenceDiagram
     participant Movement as src/services/warehouse/wastes/wasteMovementService.js
     participant Stock as src/services/warehouse/wastes/wasteInventoryService.js
     participant Status as src/services/warehouse/wasteIssues/wasteIssueFulfillmentService.js
-    participant Prisma as Prisma / PostgreSQL
+    participant Prisma@{ "type": "database" } as Prisma / PostgreSQL
     participant Socket as src/utils/socketUtils.js
 
     Client->>Router: PATCH /api/warehouse/waste-issues/:id/details + accessToken

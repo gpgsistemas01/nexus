@@ -5,6 +5,7 @@
 
 ```mermaid
 sequenceDiagram
+    actor Initiator as Personal de almacén
     participant Browser as Navegador
     participant View as src/views/pages/warehouse/goodsIssues/goodsIssuesPage.ejs
     participant Application as src/public/js/application/warehouse/goodsIssues/goodsIssues.js
@@ -12,6 +13,7 @@ sequenceDiagram
     participant HTTP as src/public/js/services/axiosInstanceApi.js
     participant Transport@{ "type": "control" } as src/routes/api/warehouse/goodsIssueApiRoute.js<br/>src/controllers/api/warehouse/goodsIssueController.js
 
+    Initiator->>Browser: inicia CU-SAL-01 — Consultar salidas de material
     Browser->>View: goodsIssuesPage.ejs y su DataTable cargan salidas
     View->>Application: getAllGoodsIssues({ params })
     Application->>Request: getAllGoodsIssuesRequest({ params })

@@ -17,11 +17,10 @@ Una misma imagen sólo se reutiliza dentro del área cuando la interfaz es realm
 pantalla accesible desde Almacén y Sistemas tiene dos capturas aunque comparta ruta: cada una se
 genera con las credenciales de su área y puede mostrar botones distintos. No se crean imágenes de
 un archivo Excel descargado.
-El ámbito de cada captura sigue al actor de su caso de uso. Las consultas y altas de **Clientes** y
-**Proveedores** se generan para Almacén y Sistemas; la edición, el cambio de estado y la exportación
-se conservan sólo en Sistemas. Los recorridos de compras, salidas y personas también se capturan con
-ambas sesiones. Usuarios, catálogos auxiliares, ajustes absolutos e historiales de movimientos son
-exclusivos del Administrador del sistema.
+Los módulos independientes de **Clientes** y **Proveedores** se capturan únicamente con la sesión de
+Sistemas. La sesión de Almacén utiliza registros autorizados de esos catálogos dentro de sus
+operaciones y puede abrir sus modales de alta desde los selectores de compras y salidas, pero no
+puede abrir ni administrar sus listados independientes.
 Cuando un listado dispone de un panel **Filtros**, su captura inicial lo muestra desplegado para
 que el usuario pueda ubicar los campos y las acciones descritas en el procedimiento.
 Cuando un procedimiento requiere sustituir un filtro predeterminado, se incluye además una captura

@@ -11,7 +11,7 @@ sequenceDiagram
     participant Controller@{ "type": "control" } as src/controllers/api/authController.js
     participant Service as src/services/authService.js
     participant User as src/services/admin/userService.js
-    participant Prisma as Prisma / PostgreSQL
+    participant Prisma@{ "type": "database" } as Prisma / PostgreSQL
     participant Token as src/services/jwtService.js
     participant Cookies as src/utils/cookiesUtils.js
 

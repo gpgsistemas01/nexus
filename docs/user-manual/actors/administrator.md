@@ -18,8 +18,8 @@ Esta guía corresponde al actor **Administrador del sistema (área Sistemas)**. 
 ## Responsabilidades y límites
 
 - Administra cuentas, contraseñas, personas y asignaciones de rol y departamento.
-- Puede ejecutar los recorridos operativos del Personal de almacén y, adicionalmente, editar,
-  cambiar el estado y exportar proveedores y clientes.
+- Puede ejecutar los recorridos operativos del Personal de almacén y administra las consultas,
+  altas, ediciones, cambios de estado y exportaciones de proveedores y clientes.
 - Administra los catálogos auxiliares, realiza los ajustes de existencia autorizados y consulta los
   historiales de movimientos.
 - Debe usar únicamente las acciones concedidas por el servidor; pertenecer al área Sistemas no

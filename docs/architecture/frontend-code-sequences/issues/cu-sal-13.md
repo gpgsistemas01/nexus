@@ -5,7 +5,8 @@
 
 ```mermaid
 sequenceDiagram
-    actor Warehouse as Almacén
+    actor Initiator as Personal de almacén
+    participant Browser as Navegador
     participant Issue as src/public/js/pages/warehouse/wasteIssues/returns/wasteIssueReturn.js
     participant Return as src/public/js/ui/issues/issueReturnUI.js
     participant App as src/public/js/application/warehouse/wasteIssues/wasteIssues.js
@@ -13,10 +14,11 @@ sequenceDiagram
     participant HTTP as src/public/js/services/axiosInstanceApi.js
     participant API@{ "type": "control" } as src/controllers/api/warehouse/wasteIssueController.js
 
-    Warehouse->>Issue: selecciona Devolver en un detalle de merma
+    Initiator->>Browser: inicia CU-SAL-13 — Devolver merma surtida
+    Browser->>Issue: selecciona Devolver en un detalle de merma
     Issue->>Issue: initializeWasteIssueReturns({ details, getIssueId })
     Issue->>Return: wasteIssueReturn.open({ issue: { id }, detail })
-    Warehouse->>Return: captura cantidad y confirma
+    Browser->>Return: captura cantidad y confirma
     Return->>Return: validateFields(issueReturnValidation, formData)
     Return->>App: returnWasteIssueDetail({ id, detailId, formData })
     App->>Request: returnWasteIssueDetailRequest({ id, detailId, data: formData })

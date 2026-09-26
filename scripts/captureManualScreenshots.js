@@ -63,6 +63,7 @@ const click = (selector, ready, requirement) => ({ selector, ready, requirement 
 const fill = (selector, value) => ({ selector, value, fill: true });
 const filter = (selector, label) => ({ selector, label, filter: true });
 const clickStatus = (status, selector, ready, requirement) => ({ status, selector, ready, requirement });
+const selectNewOption = (selector, value, optionLabel, ready) => ({ selector, value, optionLabel, ready, selectNew: true });
 const openFilters = click('.table-filters-summary', '#tableFiltersForm:visible');
 const reportDialog = click('.datatable-export-button', '.report-export-modal');
 const openMainMenu = click('#appMenuOffcanvasBtn', '#appMenu.show');
@@ -328,6 +329,14 @@ const findStatusTriggerAcrossPages = async (page, { status, selector }) => {
 };
 
 const runAction = async (page, action, captureId, step) => {
+    if (action.selectNew) {
+        await page.locator(action.selector).evaluate(select => globalThis.$(select).select2('open'));
+        await page.locator('.select2-container--open .select2-search__field').fill(action.value);
+        await page.locator(`.select2-results__option:has-text("${ action.optionLabel }")`).first().click();
+        await page.locator(action.ready).first().waitFor({ state: 'visible' });
+        console.log(`  Paso ${ step } de ${ captureId }: opción ${ action.optionLabel }`);
+        return;
+    }
     if (action.fill) {
         await page.locator(action.selector).fill(action.value);
         console.log(`  Paso ${ step } de ${ captureId }: captura de ${ action.selector }`);

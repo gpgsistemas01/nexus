@@ -42,6 +42,10 @@ La frontera que origina una petición se rotula siempre **Navegador** o
 **Cliente HTTP / web**; el rol humano pertenece a la ficha funcional y no sustituye al
 cliente técnico en una secuencia backend. Incluso las vistas que amplían una coordinación
 atómica conservan esa entidad y muestran la petición de entrada y su resultado.
+Cuando la persistencia participa explícitamente se usa la figura visual `database` para
+**Prisma / PostgreSQL**, no el texto `«database»` sobre un rectángulo ordinario. De igual
+forma, la figura `control` distingue controllers o fronteras HTTP y los DTO conservan su
+notación visual de instancia subrayada; no se agregan estereotipos textuales redundantes.
 
 ### Relación con la documentación técnica
 

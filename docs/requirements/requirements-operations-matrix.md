@@ -28,11 +28,11 @@ permiso se agrupan. Los valores de permiso son los declarados en
 | Sistemas / usuarios | `L, C, U, cambiar contraseña/accesos → users:manage`; exportar `→ admin:reports-read` | Implementado |
 | Sistemas / catálogos auxiliares | `L, C, U` de áreas, roles, presentaciones, unidades de medida, motivos de ajuste y estados de cumplimiento `→ catalogs:manage` | Implementado; acceso exclusivo del Administrador del sistema del área Sistemas |
 | Formularios operativos / roles y departamentos | `L → roles:read`, `departments:read` | Implementado sólo lectura |
-| Clientes | `L → clients:read`; `C → clients:create`; `U → clients:update`; exportar `→ client:reports-read` | Consulta y alta disponibles para Personal de almacén y Administrador del sistema; actualización y reporte exclusivos de Sistemas |
+| Clientes | `L → clients:read`; `C → clients:create`; `U → clients:update`; exportar `→ client:reports-read` | Vista independiente, consulta, actualización y reporte exclusivos de Sistemas; Personal de almacén puede crear desde el selector de una salida autorizada |
 | Contexto pendiente / proyectos | Sin rutas API CRUD ni permiso registrado | Modelado |
 | Almacén / materiales | `L → materials:read`; costo en la consulta `→ inventory:costs-read`; `C, U, D → materials:write`; ajustar existencia `→ materials:adjust-stock`; exportar inventario `→ warehouse:reports-read` | Implementado |
 | Almacén / merma | `L → wastes:read`; costo en la consulta `→ inventory:costs-read`; `C, U → wastes:write`; agregar existencia `→ wastes:add-stock`; ajustar existencia `→ wastes:adjust-stock`; exportar `→ warehouse:reports-read` | Implementado |
-| Proveedores | `L, C → suppliers:manage`; `U → suppliers:update`; exportar `→ supplier:reports-read` | Consulta y alta disponibles para Personal de almacén y Administrador del sistema; actualización y reporte exclusivos de Sistemas |
+| Proveedores | `L, C → suppliers:manage`; `U → suppliers:update`; exportar `→ supplier:reports-read` | Vista independiente, consulta, actualización y reporte exclusivos de Sistemas; Personal de almacén puede crear desde el selector de una operación autorizada |
 | Almacén / presentación | `L → presentations:read` | Implementado sólo lectura |
 | Almacén / unidad de medida | `L → unit:measures-read` | Implementado sólo lectura |
 | Almacén / motivo de ajuste | `L → reasons:read` | Implementado sólo lectura |
@@ -41,7 +41,7 @@ permiso se agrupan. Los valores de permiso son los declarados en
 | Salidas / material | `L, C, U documento/encabezado → goods:issues-manage`; actualizar detalles y devolver `→ goods:issue-details-manage`; exportar `→ warehouse:reports-read` | Implementado |
 | Salidas / merma | `L, C, U documento/encabezado → waste:issues-manage`; suministrar detalles y devolver `→ waste:issues-supply`; exportar `→ warehouse:reports-read` | Implementado |
 | Inventario / movimientos | `L material y merma → movements:read`; exportar `→ admin:reports-read` | Implementado para el Administrador del sistema del área Sistemas; el Personal de almacén no tiene acceso a este módulo |
-| Inventario / ajustes de material y merma | Sin rutas API completas; existen modelos y servicios parciales para crear, aprobar/aplicar y cancelar | Parcial |
+| Inventario / ajustes de material y merma | Ajustar material `→ materials:adjust-stock`; ajustar merma `→ wastes:adjust-stock` | Implementado; el Administrador registra y aplica el ajuste inmediatamente con razón, trazabilidad y movimiento; no existe un flujo separado de solicitud, aprobación o cancelación |
 | Abastecimiento / requisiciones | Módulo retirado del código y del esquema vigente; requiere un nuevo alcance antes de reimplementarse | Fuera del alcance actual |
 
 La autenticación es transversal y no se fuerza dentro del CRUD de un módulo: iniciar
