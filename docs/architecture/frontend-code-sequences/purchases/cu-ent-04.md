@@ -5,6 +5,7 @@
 
 ```mermaid
 sequenceDiagram
+    actor Initiator as Personal de almacén
     participant Browser as Navegador
     participant View as src/public/js/pages/warehouse/goodsReceipts/corrections/correctionModal.js<br/>src/public/js/pages/warehouse/goodsReceipts/corrections/correctionForm.js
     participant Application as src/public/js/application/warehouse/goodsReceipts/goodsReceipts.js
@@ -12,6 +13,7 @@ sequenceDiagram
     participant HTTP as src/public/js/services/axiosInstanceApi.js
     participant Transport@{ "type": "control" } as src/routes/api/warehouse/goodsReceiptApiRoute.js<br/>src/controllers/api/warehouse/goodsReceiptController.js
 
+    Initiator->>Browser: inicia CU-ENT-04 — Corregir material de una compra
     Browser->>View: correctionModal.js y correctionForm.js aíslan la corrección
     View->>View: validateFields(goodsReceiptCorrectionValidation, formData)
     alt goodsReceiptCorrectionValidation devuelve errores

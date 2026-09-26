@@ -120,6 +120,18 @@ const validateUseCaseDiagramCoverage = async () => {
         [...sources.get('catalog').matchAll(/^#{1,6} `(CU-[A-Z]+-\d+)` — (.+)$/gm)]
             .map((match) => [match[1], match[2]])
     );
+    const expectedActors = new Map(
+        [...sources.get('catalog').matchAll(/^#{1,6} `(CU-[A-Z]+-\d+)` — .+\r?\n([\s\S]*?)(?=^#{1,6} `CU-|(?![\s\S]))/gm)]
+            .map(([, id, body]) => {
+                const declaredActor = body.match(/^\| Actor \| (.*?) \|$/m)?.[1] ?? '';
+                const actor = declaredActor.startsWith('Usuario registrado')
+                    ? 'Usuario registrado'
+                    : declaredActor.includes('Personal de almacén')
+                        ? 'Personal de almacén'
+                        : 'Administrador del sistema';
+                return [id, actor];
+            })
+    );
     const failures = [];
     const sourceFilePaths = await walk(path.join(ROOT, 'src'));
     const sourceFiles = new Set(sourceFilePaths
@@ -201,8 +213,25 @@ const validateUseCaseDiagramCoverage = async () => {
                 failures.push(`diagramas ${side}: ${id} debe contener exactamente una secuencia de código`);
             }
             const sequence = getMermaidBlocks(body)[0] ?? '';
+            const visualActors = [...sequence.matchAll(/^\s*actor\s+([^\s@]+)(?:@\{[^}]+\})?\s+as\s+(.+)$/gm)];
+            if (side === 'frontend') {
+                if (visualActors.length !== 1 || visualActors[0]?.[2] !== expectedActors.get(id)) {
+                    failures.push(`diagramas frontend: ${id} debe iniciar con la figura actor de ${expectedActors.get(id)}`);
+                }
+                const actorAlias = visualActors[0]?.[1];
+                if (!actorAlias || !new RegExp(`^\\s*${actorAlias}->>Browser:\\s+inicia ${id} — `, 'm').test(sequence)) {
+                    failures.push(`diagramas frontend: ${id} no enlaza visualmente al actor con Navegador`);
+                }
+            } else if (visualActors.length) {
+                failures.push(`diagramas backend: ${id} duplica al actor humano fuera de la frontera HTTP`);
+            }
             if (side === 'backend' && !/^\s*(?:actor|participant)\s+\S+(?:@\{[^}]+\})?\s+as\s+(?:Navegador|Cliente HTTP \/ web)$/m.test(sequence)) {
                 failures.push(`diagramas backend: ${id} no identifica la frontera como Navegador o Cliente HTTP / web`);
+            }
+            if (/^\s*participant\s+\S+\s+as\s+Prisma \/ PostgreSQL$/m.test(sequence)
+                || (sequence.includes('Prisma / PostgreSQL')
+                    && !/^\s*participant\s+\S+@\{\s*"type"\s*:\s*"database"\s*\}\s+as\s+Prisma \/ PostgreSQL$/m.test(sequence))) {
+                failures.push(`diagramas ${side}: ${id} debe representar Prisma / PostgreSQL con la figura database`);
             }
             const messages = sequence.split('\n').filter((line) => line.includes('->>'));
             if (messages.length < MIN_SEQUENCE_MESSAGES) {

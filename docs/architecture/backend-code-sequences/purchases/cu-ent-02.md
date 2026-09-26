@@ -24,7 +24,7 @@ sequenceDiagram
     participant Reference as src/services/document/referenceNumberService.js
     participant Inventory as src/services/inventory/movementService.js
     participant Material as src/services/warehouse/materials/supplierMaterialService.js
-    participant Prisma as Prisma / PostgreSQL
+    participant Prisma@{ "type": "database" } as Prisma / PostgreSQL
     participant Socket as src/utils/socketUtils.js
     participant ErrorHandler as src/app.js
 

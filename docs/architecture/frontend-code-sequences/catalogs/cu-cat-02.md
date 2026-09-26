@@ -5,6 +5,7 @@
 
 ```mermaid
 sequenceDiagram
+    actor Initiator as Personal de almacén
     participant Browser as Navegador
     participant Origin as src/public/js/pages/warehouse/suppliers/suppliersPage.js<br/>src/public/js/pages/warehouse/goodsReceipts/goodsReceiptModal.js
     participant Select as src/public/js/plugins/select2/domains/supplier.js
@@ -15,6 +16,7 @@ sequenceDiagram
     participant Transport@{ "type": "control" } as src/routes/api/warehouse/supplierApiRoute.js<br/>src/controllers/api/warehouse/supplierController.js
 
     alt Sistemas inicia desde el listado independiente
+    Initiator->>Browser: inicia CU-CAT-02 — Crear proveedor
         Browser->>Origin: seleccionar Nuevo proveedor
         Origin->>View: openSupplierModal({ mode: create })
     else Almacén inicia desde una compra autorizada

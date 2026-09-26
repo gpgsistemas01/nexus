@@ -14,25 +14,25 @@ sequenceDiagram
     participant Domain as src/services/warehouse/goodsIssues/goodsIssueService.js
     participant ErrorHandler as src/app.js
 
-    Client->>Route: PATCH /api/warehouse/goods-issues/:id/details
+    Client->>Route: PATCH /api/warehouse/goods-issues/:id
     Route->>Auth: verifyApiTokenRequired(req, res, next)
-    Auth->>Validator: goodsIssueDetailsValidation[] y validate(req, res, next)
-    Validator->>Auth: authorizeUserApi(PERMISSIONS.GOODS_ISSUE_DETAILS_MANAGE)(req, res, next)
+    Auth->>Validator: goodsIssueUpdateValidation[] y validate(req, res, next)
+    Validator->>Auth: authorizeUserApi(PERMISSIONS.GOODS_ISSUES_MANAGE)(req, res, next)
     alt Token ausente o inválido
         Auth-->>Client: HTTP 401 { code, message }
-    else goodsIssueDetailsValidation rechaza req.body/req.params
+    else goodsIssueUpdateValidation rechaza req.body/req.params
         Validator-->>Client: HTTP 400 { errors }
-    else PERMISSIONS.GOODS_ISSUE_DETAILS_MANAGE denegado
+    else PERMISSIONS.GOODS_ISSUES_MANAGE denegado
         Auth-->>Client: HTTP 403 { code, message }
     else Pipeline aceptado
-        Route->>Controller: editGoodsIssueDetails(req, res)
+        Route->>Controller: editGoodsIssue(req, res)
         activate Controller
-        Controller->>IssueDto: createGoodsIssueDetailsDtoForEdit(req.body)
+        Controller->>IssueDto: createGoodsIssueDtoForEdit(req.body)
         IssueDto-->>Controller: goodsIssueDto normalizado
-        Controller->>Domain: goodsIssueService.updateGoodsIssueDetails({ id: req.params.id, goodsIssueDto }) modifica cantidades todavía editables
+        Controller->>Domain: goodsIssueService.updateGoodsIssue({ id: req.params.id, goodsIssueDto }) actualiza encabezado y detalles todavía editables
         activate Domain
         alt Servicio resuelto
-            Domain-->>Controller: goodsIssueService.updateGoodsIssueDetails() devuelve goodsIssueDetails actualizado y persistido
+            Domain-->>Controller: goodsIssueService.updateGoodsIssue() devuelve la salida pendiente actualizada
             Controller-->>Client: HTTP 2xx { code, data }
         else AppError propagado
             Domain-->>Controller: throw AppError { code, message, meta, statusCode }
@@ -43,4 +43,3 @@ sequenceDiagram
         deactivate Controller
     end
 ```
-

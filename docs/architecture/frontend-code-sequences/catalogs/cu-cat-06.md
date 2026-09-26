@@ -5,6 +5,7 @@
 
 ```mermaid
 sequenceDiagram
+    actor Initiator as Personal de almacén
     participant Browser as Navegador
     participant Origin as src/public/js/pages/sales/clients/clientsPage.js<br/>src/public/js/pages/warehouse/goodsIssues/goodsIssueModal.js
     participant Select as src/public/js/plugins/select2/domains/client.js
@@ -15,6 +16,7 @@ sequenceDiagram
     participant Transport@{ "type": "control" } as src/routes/api/sales/clientApiRoute.js<br/>src/controllers/api/sales/clientController.js
 
     alt Sistemas inicia desde el listado independiente
+    Initiator->>Browser: inicia CU-CAT-06 — Crear cliente
         Browser->>Origin: seleccionar Nuevo cliente
         Origin->>View: openClientModal({ mode: create })
     else Almacén inicia desde una salida autorizada

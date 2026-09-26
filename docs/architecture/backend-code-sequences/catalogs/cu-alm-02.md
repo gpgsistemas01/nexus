@@ -17,7 +17,7 @@ sequenceDiagram
     participant SupplierMaterial as src/services/warehouse/materials/supplierMaterialService.js
     participant Reason as src/services/warehouse/reasonService.js
     participant Adjustment as src/services/warehouse/adjustmentService.js
-    participant Prisma as Prisma / PostgreSQL
+    participant Prisma@{ "type": "database" } as Prisma / PostgreSQL
     participant ErrorHandler as src/app.js
 
     Client->>Route: POST /api/warehouse/materials { req.body }

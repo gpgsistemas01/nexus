@@ -5,6 +5,7 @@
 
 ```mermaid
 sequenceDiagram
+    actor Initiator as Personal de almacén
     participant Browser as Navegador
     participant View as src/public/js/plugins/datatable/warehouse/wasteIssues/wasteIssueDatatable.js
     participant Dialog as src/public/js/ui/reportExportDialog.js
@@ -13,6 +14,7 @@ sequenceDiagram
     participant HTTP as src/public/js/services/axiosInstanceApi.js
     participant Transport@{ "type": "control" } as src/routes/api/warehouse/reportApiRoute.js<br/>src/controllers/api/warehouse/reportController.js
 
+    Initiator->>Browser: inicia CU-SAL-14 — Generar reporte de salidas de merma
     Browser->>View: Botón Excel del listado de salidas de merma
     View->>Dialog: showReportExportDialog(currentMonth)
     Dialog-->>View: Promise<boolean> con confirmación o cancelación

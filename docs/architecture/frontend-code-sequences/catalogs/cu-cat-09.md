@@ -5,6 +5,7 @@
 
 ```mermaid
 sequenceDiagram
+    actor Initiator as Administrador del sistema
     participant Browser as Navegador
     participant View as src/public/js/plugins/datatable/admin/catalogs/catalogDatatable.js
     participant Application as src/public/js/application/admin/catalogs/catalogs.js
@@ -12,6 +13,7 @@ sequenceDiagram
     participant HTTP as src/public/js/services/axiosInstanceApi.js
     participant Transport@{ "type": "control" } as src/routes/api/admin/catalogApiRoute.js<br/>src/controllers/api/admin/catalogController.js
 
+    Initiator->>Browser: inicia CU-CAT-09 — Consultar área
     Browser->>View: abrir y cargar la tabla del catálogo
     View->>Application: getAllCatalogEntries({ params, catalog })
     Application->>Request: getCatalogEntriesRequest({ params, catalog })

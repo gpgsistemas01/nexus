@@ -13,7 +13,7 @@ mostrar el alcance y los rangos que deben revisarse juntos.
 | Catálogos | `RF-CAT-001` a `RF-CAT-024` | Consultar, crear, actualizar, retirar o ajustar cada recurso según su política. |
 | Entradas | `RF-REC-001` a `RF-REC-008` | Consultar, registrar, editar, corregir y cancelar entradas o detalles. |
 | Salidas de material | `RF-ISS-001` a `RF-ISS-006` | Consultar, crear, editar encabezado, editar detalles, surtir y devolver. |
-| Merma y sus salidas | `RF-WST-001` a `RF-WST-007`; `RF-MER-001` a `RF-MER-009` | Operar inventario y salidas de merma conservando snapshots y reglas dimensionales. |
+| Merma y sus salidas | `RF-WST-001` a `RF-WST-007`; `RF-MER-001` a `RF-MER-010` | Operar inventario y salidas de merma conservando snapshots, reglas dimensionales y el alta trazable de existencia. |
 | Ajustes | `RF-ADJ-001`, `RF-ADJ-002` | Registrar y aplicar inmediatamente ajustes autorizados con movimiento y trazabilidad. |
 | Movimientos y reportes | `RF-REP-001` a `RF-REP-009` | Consultar y exportar información autorizada con reglas propias por reporte. |
 | Capacidades no vigentes | `RF-REQ-001`, `RF-PRJ-001`, `RF-PRJ-002` | Requisiciones fuera de alcance y proyectos modelados sin CRUD registrado. |

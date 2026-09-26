@@ -14,10 +14,10 @@ sequenceDiagram
     participant Service as src/services/warehouse/wasteIssues/detailReturns/wasteIssueReturnService.js
     participant Movement as src/services/warehouse/wastes/wasteMovementService.js
     participant Status as src/services/warehouse/wasteIssues/wasteIssueFulfillmentService.js
-    participant Prisma as Prisma / PostgreSQL
+    participant Prisma@{ "type": "database" } as Prisma / PostgreSQL
     participant Socket as src/utils/socketUtils.js
 
-    Client->>Router: POST /api/warehouse/waste-issues/:id/details/:detailId/returns + accessToken
+    Client->>Router: PATCH /api/warehouse/waste-issues/:id/details/:detailId/returns + accessToken
     Router->>Auth: verifyApiTokenRequired(req, res, next)
     Auth->>Validator: issueReturnValidation[] y validate(req, res, next)
     Validator->>Auth: authorizeUserApi(PERMISSIONS.WASTE_ISSUES_SUPPLY)(req, res, next)

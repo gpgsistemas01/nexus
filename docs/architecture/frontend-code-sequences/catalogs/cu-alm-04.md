@@ -5,6 +5,7 @@
 
 ```mermaid
 sequenceDiagram
+    actor Initiator as Personal de almacén
     participant Browser as Navegador
     participant View as src/public/js/plugins/datatable/warehouse/materials/materialDatatable.js
     participant Application as src/public/js/application/warehouse/materials/materials.js
@@ -12,6 +13,7 @@ sequenceDiagram
     participant HTTP as src/public/js/services/axiosInstanceApi.js
     participant Transport@{ "type": "control" } as src/routes/api/warehouse/materialApiRoute.js<br/>src/controllers/api/warehouse/materialController.js
 
+    Initiator->>Browser: inicia CU-ALM-04 — Retirar material
     Browser->>View: solicita retirar la fila proveedor-material
     View->>View: obtiene data.id (id de SupplierMaterial, no material.id)
     View->>Application: deleteMaterial({ id: data.id })

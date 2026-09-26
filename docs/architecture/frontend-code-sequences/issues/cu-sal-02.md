@@ -5,8 +5,9 @@
 
 ```mermaid
 sequenceDiagram
+    actor Initiator as Personal de almacén
     participant Browser as Navegador
-    participant View as src/public/js/pages/warehouse/goodsIssues/goodsIssueModal.js
+    participant View as src/public/js/pages/warehouse/goodsIssues/goodsIssueModal.js<br/>goodsIssueForm.js
     participant ClientSelect as src/public/js/plugins/select2/domains/client.js
     participant ClientModal as src/public/js/pages/sales/clients/clientModal.js<br/>clientForm.js
     participant Application as src/public/js/application/warehouse/goodsIssues/goodsIssues.js
@@ -14,6 +15,7 @@ sequenceDiagram
     participant HTTP as src/public/js/services/axiosInstanceApi.js
     participant Transport@{ "type": "control" } as src/routes/api/warehouse/goodsIssueApiRoute.js<br/>src/controllers/api/warehouse/goodsIssueController.js
 
+    Initiator->>Browser: inicia CU-SAL-02 — Crear salida de material
     Browser->>View: goodsIssueModal.js abre la salida
     opt El cliente no está catalogado
         Browser->>ClientSelect: escribir nombre y seleccionar Nuevo cliente
@@ -25,27 +27,39 @@ sequenceDiagram
         ClientSelect-->>Browser: continuar salida sin abrir /clientes
     end
     Browser->>View: capturar documento y materiales
-    alt Se agrega otra vez la misma combinación material-proveedor
-        View->>View: addGoodsIssueMaterial() reemplaza la cantidad del detalle coincidente
+    View->>View: validateFields(addGoodsIssueMaterialValidation, { materialId, supplierId, quantity })
+    alt El renglón tiene datos inválidos
+        View-->>Browser: normalizeFormErrors(...) señala material, proveedor o cantidad
+    else Renglón válido
+        alt Se agrega otra vez la misma combinación material-proveedor
+            View->>View: upsertIssueDetail(...) reemplaza la cantidad del detalle coincidente
+        else Es una combinación nueva
+            View->>View: upsertIssueDetail(...) incorpora el detalle a la tabla
+        end
     end
-    View->>Application: registerGoodsIssue({ formData })
-    Application->>Request: registerGoodsIssueRequest({ formData })
-    activate Application
-    Request->>HTTP: apiRequest({ method: 'post', url, data })
-    HTTP->>Transport: envía POST /api/warehouse/goods-issues
-    alt Alta resuelta
-        Transport-->>HTTP: HTTP 200 { code, data: { goodsIssue } }
-        HTTP-->>Request: apiRequest() resuelve response.data
-        Request-->>Application: registerGoodsIssueRequest() resuelve response.data
-        Application-->>View: registerGoodsIssue() devuelve { message }
-        View->>View: handleSubmit(...) ejecuta notifications.showSuccess,<br/>closeModal(form) y reloadMainTable({ resetPaging: true })
-        View-->>Browser: modal cerrado y #table recargada
-    else Alta rechazada
-        Transport-->>HTTP: HTTP error { code, message, meta }
-        HTTP-->>Request: apiRequest() rechaza error normalizado
-        Request-->>Application: registerGoodsIssueRequest() propaga error
-        Application-->>View: registerGoodsIssue() rechaza
-        View-->>Browser: useForm conserva goodsIssueForm y handleApiError muestra el error
+    View->>View: validateFields(goodsIssueValidation, formData)
+    alt goodsIssueValidation devuelve errores
+        View-->>Browser: useForm.getErrors() conserva datos y muestra errores por campo
+    else Formulario válido
+        View->>Application: registerGoodsIssue({ formData })
+        Application->>Request: registerGoodsIssueRequest({ formData })
+        activate Application
+        Request->>HTTP: apiRequest({ method: 'post', url, data })
+        HTTP->>Transport: envía POST /api/warehouse/goods-issues
+        alt Alta resuelta
+            Transport-->>HTTP: HTTP 200 { code, data: { goodsIssue } }
+            HTTP-->>Request: apiRequest() resuelve response.data
+            Request-->>Application: registerGoodsIssueRequest() resuelve response.data
+            Application-->>View: registerGoodsIssue() devuelve { message }
+            View->>View: handleSubmit(...) ejecuta notifications.showSuccess,<br/>closeModal(form) y reloadMainTable({ resetPaging: true })
+            View-->>Browser: modal cerrado y #table recargada
+        else Alta rechazada
+            Transport-->>HTTP: HTTP error { code, message, meta }
+            HTTP-->>Request: apiRequest() rechaza error normalizado
+            Request-->>Application: registerGoodsIssueRequest() propaga error
+            Application-->>View: registerGoodsIssue() rechaza
+            View-->>Browser: useForm conserva goodsIssueForm y handleApiError muestra el error
+        end
+        deactivate Application
     end
-    deactivate Application
 ```
