@@ -29,7 +29,7 @@ sequenceDiagram
         View-->>Browser: DataTable renderiza el contrato anidado mediante getters de inventario
         opt Actor abre edición o ajuste
             View->>RowAdapter: mapMaterialRowToFormData(fila SupplierMaterial)
-            RowAdapter-->>View: Object (materialFormData)
+            RowAdapter-->>View: mapMaterialRowToFormData(): Object (materialFormData)
         end
     else Respuesta rechazada
         Application-->>View: throw { status: number, data: Object | null, message: string, raw: Error }

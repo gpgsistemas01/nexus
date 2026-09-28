@@ -51,7 +51,10 @@ sequenceDiagram
             HTTP-->>Request: apiRequest(): Promise[AxiosResponse]
             Request-->>Application: registerGoodsIssueRequest(): Promise[AxiosResponse]
             Application-->>View: registerGoodsIssue(): Promise[{ message: string }]
-            View->>View: handleSubmit(...) ejecuta notifications.showSuccess,<br/>closeModal(form) y reloadMainTable({ resetPaging: true })
+            View->>View: handleSubmit(...)
+            View->>View: notifications.showSuccess(...)
+            View->>View: closeModal(form)
+            View->>View: reloadMainTable({ resetPaging: true })
             View-->>Browser: modal cerrado y #table recargada
         else Alta rechazada
             Transport-->>HTTP: HTTP error { code, message, meta }

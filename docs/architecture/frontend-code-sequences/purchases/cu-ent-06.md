@@ -17,7 +17,7 @@ sequenceDiagram
     Initiator->>Browser: inicia CU-ENT-06 — Generar reporte de compras de material
     Browser->>View: Botón Excel de goodsReceiptDatatable.js
     View->>Dialog: showReportExportDialog(currentMonth)
-    Dialog-->>View: Promise[boolean]
+    Dialog-->>View: showReportExportDialog(): Promise[boolean]
     View->>Application: exportGoodsReceiptReport({ params })
     Application->>Request: exportGoodsReceiptReportRequest({ params })
     activate Application

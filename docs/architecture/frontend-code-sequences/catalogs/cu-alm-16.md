@@ -17,7 +17,7 @@ sequenceDiagram
     Initiator->>Browser: inicia CU-ALM-16 — Generar reporte de movimientos de mermas
     Browser->>View: Botón Excel de movimientos en contexto merma
     View->>Dialog: showReportExportDialog(currentMonth)
-    Dialog-->>View: Promise[boolean]
+    Dialog-->>View: showReportExportDialog(): Promise[boolean]
     View->>Application: exportMovementReport({ params, type: wastes })
     Application->>Request: exportMovementReportRequest({ params, type: wastes })
     activate Application

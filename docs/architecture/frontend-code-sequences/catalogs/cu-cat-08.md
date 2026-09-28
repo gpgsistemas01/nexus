@@ -17,7 +17,7 @@ sequenceDiagram
     Initiator->>Browser: inicia CU-CAT-08 — Generar reporte de clientes
     Browser->>View: Botón Excel de clientDatatable.js
     View->>Dialog: showFilteredExportDialog()
-    Dialog-->>View: Promise[boolean]
+    Dialog-->>View: showFilteredExportDialog(): Promise[boolean]
     View->>Application: exportClientReport({ params })
     Application->>Request: exportClientReportRequest({ params })
     activate Application

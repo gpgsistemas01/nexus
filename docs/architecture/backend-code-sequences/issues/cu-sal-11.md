@@ -28,7 +28,7 @@ sequenceDiagram
         Route->>Controller: editWasteIssue(req, res)
         activate Controller
         Controller->>IssueDto: createWasteIssueDtoForEdit(req.body)
-        IssueDto-->>Controller: Object (wasteIssueDto)
+        IssueDto-->>Controller: createWasteIssueDtoForEdit(): Object (wasteIssueDto)
         Controller->>Domain: wasteIssueService.updateWasteIssue({ id: req.params.id, wasteIssueDto }) actualiza encabezado y detalles todavía editables
         activate Domain
         alt Servicio resuelto

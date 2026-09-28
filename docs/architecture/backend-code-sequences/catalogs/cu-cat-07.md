@@ -28,7 +28,7 @@ sequenceDiagram
         Route->>Controller: editClient(req, res)
         activate Controller
         Controller->>ClientDto: createClientDtoForEdit(req.body)
-        ClientDto-->>Controller: Object (clientDto)
+        ClientDto-->>Controller: createClientDtoForEdit(): Object (clientDto)
         Controller->>Domain: clientService.updateClient({ id: req.params.id, clientDto }) actualiza Client
         activate Domain
         alt Servicio resuelto

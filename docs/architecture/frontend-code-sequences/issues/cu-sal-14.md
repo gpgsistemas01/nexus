@@ -17,7 +17,7 @@ sequenceDiagram
     Initiator->>Browser: inicia CU-SAL-14 — Generar reporte de salidas de merma
     Browser->>View: Botón Excel del listado de salidas de merma
     View->>Dialog: showReportExportDialog(currentMonth)
-    Dialog-->>View: Promise[boolean]
+    Dialog-->>View: showReportExportDialog(): Promise[boolean]
     View->>Application: exportWasteIssueReport({ params })
     Application->>Request: exportWasteIssueReportRequest({ params })
     activate Application

@@ -28,7 +28,7 @@ sequenceDiagram
         Route->>Controller: editGoodsIssueHeader(req, res)
         activate Controller
         Controller->>IssueDto: createGoodsIssueHeaderDtoForEdit(req.body)
-        IssueDto-->>Controller: Object (goodsIssueDto)
+        IssueDto-->>Controller: createGoodsIssueHeaderDtoForEdit(): Object (goodsIssueDto)
         Controller->>Domain: goodsIssueService.updateGoodsIssueHeader({ id: req.params.id, goodsIssueDto }) aplica reglas del encabezado
         activate Domain
         alt Servicio resuelto

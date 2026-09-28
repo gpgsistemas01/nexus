@@ -20,12 +20,14 @@ sequenceDiagram
     activate Domain
     Domain->>SupplierMaterial: findAllSupplierMaterials({ ... })
     SupplierMaterial->>Prisma: supplierMaterial.findMany({ select: { material, supplier, existencia } })
-    Prisma-->>SupplierMaterial: Array[SupplierMaterial]
-    SupplierMaterial->>Prisma: material.findMany({ relaciones históricas: none }) y conteos
-    Prisma-->>SupplierMaterial: { removableIds: Array[number], totals: Object }
-    SupplierMaterial-->>Domain: { data: SupplierMaterial[], recordsTotal, recordsFiltered }
+    Prisma-->>SupplierMaterial: findMany(): Promise[SupplierMaterial[]]
+    SupplierMaterial->>Prisma: material.findMany({ relaciones históricas: none })
+    Prisma-->>SupplierMaterial: findMany(): Promise[{ id: number }[]]
+    SupplierMaterial->>Prisma: supplierMaterial.count({ where })
+    Prisma-->>SupplierMaterial: count(): Promise[number]
+    SupplierMaterial-->>Domain: findAllSupplierMaterials(): Promise[{ data: SupplierMaterial[], recordsTotal: number, recordsFiltered: number }]
     alt Servicio resuelto
-        Domain-->>Controller: { data, recordsTotal, recordsFiltered }
+        Domain-->>Controller: findAllMaterials(): Promise[{ data: SupplierMaterial[], recordsTotal: number, recordsFiltered: number }]
         Controller-->>Client: HTTP 200 { data: [{ id, material, supplier, ... }], recordsTotal, recordsFiltered }
     else AppError propagado
         Domain-->>Controller: throw AppError { code, message, meta, statusCode }

@@ -31,7 +31,7 @@ sequenceDiagram
     else Pipeline aceptado
         Router->>Controller: correctGoodsReceiptDetail(req, res)
         Controller->>CorrectionDto: createGoodsReceiptDtoForCorrection(req.body)
-        CorrectionDto-->>Controller: Object (correctionDto)
+        CorrectionDto-->>Controller: createGoodsReceiptDtoForCorrection(): Object (correctionDto)
         Controller->>Service: correctGoodsReceiptDetailLine({ id, detailId, correctionDto, userId })
         Service->>Prisma: getDb().$transaction(async tx => ...)
         Service->>Change: findReceiptDetailForChange({ tx, goodsReceiptId, detailId })
@@ -40,8 +40,8 @@ sequenceDiagram
         Change->>Inventory: createGoodsReceiptDetailChangeMovementAndUpdateStock({ tx, detail, quantityDifference })
         Service->>Change: createGoodsReceiptDetailChange({ tx, previousDetail, correctedDetail, userId })
         alt Commit confirmado
-            Prisma-->>Service: entrada corregida
-            Service-->>Controller: { goodsReceipt: GoodsReceipt, correction: GoodsReceiptCorrection }
+            Prisma-->>Service: $transaction(): Promise[{ goodsReceipt: GoodsReceipt, correction: GoodsReceiptCorrection }]
+            Service-->>Controller: correctGoodsReceiptDetailLine(): Promise[{ goodsReceipt: GoodsReceipt, correction: GoodsReceiptCorrection }]
             Controller->>Socket: emitInventoryUpdated()
             Controller-->>Client: 200 { goodsReceipt, correction, code }
         else Detalle, motivo o persistencia rechazados

@@ -33,7 +33,7 @@ sequenceDiagram
         Route->>Controller: registerGoodsIssue(req, res)
         activate Controller
         Controller->>IssueDto: createGoodsIssueDtoForRegister(req.body)
-        IssueDto-->>Controller: Object (goodsIssueDto)
+        IssueDto-->>Controller: createGoodsIssueDtoForRegister(): Object (goodsIssueDto)
         Controller->>Domain: goodsIssueService.createGoodsIssue({ goodsIssueDto }) crea encabezado y detalles solicitados
         activate Domain
         alt Servicio resuelto

@@ -28,7 +28,7 @@ sequenceDiagram
         Route->>Controller: editMaterial(req, res)
         activate Controller
         Controller->>MaterialDto: createMaterialDtoForEdit(req.body)
-        MaterialDto-->>Controller: Object (materialDto)
+        MaterialDto-->>Controller: createMaterialDtoForEdit(): Object (materialDto)
         Controller->>Domain: materialService.updateMaterial({ id: req.params.id, materialDto }) sincroniza datos y relación
         activate Domain
         alt Servicio resuelto

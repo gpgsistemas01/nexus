@@ -32,7 +32,7 @@ sequenceDiagram
         Route->>Controller: registerClient(req, res)
         activate Controller
         Controller->>ClientDto: createClientDtoForRegister(req.body)
-        ClientDto-->>Controller: Object (clientDto)
+        ClientDto-->>Controller: createClientDtoForRegister(): Object (clientDto)
         Controller->>Domain: clientService.createClient({ clientDto }) persiste Client
         activate Domain
         alt Servicio resuelto

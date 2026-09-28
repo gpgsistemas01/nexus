@@ -28,7 +28,7 @@ sequenceDiagram
         Route->>Controller: registerUser(req, res)
         activate Controller
         Controller->>UserDto: createUserDtoForRegister(req.body)
-        UserDto-->>Controller: Object (userDto)
+        UserDto-->>Controller: createUserDtoForRegister(): Object (userDto)
         Controller->>Domain: userService.createUser({ userDto }) crea cuenta, contraseña cifrada y acceso
         activate Domain
         alt Servicio resuelto

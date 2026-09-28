@@ -28,7 +28,7 @@ sequenceDiagram
         Route->>Controller: editPerson(req, res)
         activate Controller
         Controller->>PersonDto: createPersonDtoForEdit(req.body)
-        PersonDto-->>Controller: Object (personDto)
+        PersonDto-->>Controller: createPersonDtoForEdit(): Object (personDto)
         Controller->>Domain: personService.updatePerson({ id: req.params.id, personDto }) actualiza persona/asignaciones
         activate Domain
         alt Servicio resuelto

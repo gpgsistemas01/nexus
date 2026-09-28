@@ -17,7 +17,7 @@ sequenceDiagram
     Initiator->>Browser: inicia CU-IDA-04 — Generar reporte de personas
     Browser->>View: Botón Excel de personDatatable.js
     View->>Dialog: showFilteredExportDialog()
-    Dialog-->>View: Promise[boolean]
+    Dialog-->>View: showFilteredExportDialog(): Promise[boolean]
     View->>Application: exportPersonReport({ params })
     Application->>Request: exportPersonReportRequest({ params })
     activate Application

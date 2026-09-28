@@ -32,7 +32,7 @@ sequenceDiagram
         Route->>Controller: registerSupplier(req, res)
         activate Controller
         Controller->>SupplierDto: createSupplierDtoForRegister(req.body)
-        SupplierDto-->>Controller: Object (supplierDto)
+        SupplierDto-->>Controller: createSupplierDtoForRegister(): Object (supplierDto)
         Controller->>Domain: supplierService.createSupplier({ supplierDto }) persiste el proveedor
         activate Domain
         alt Servicio resuelto

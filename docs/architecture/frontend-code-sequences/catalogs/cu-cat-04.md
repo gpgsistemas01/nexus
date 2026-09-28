@@ -17,7 +17,7 @@ sequenceDiagram
     Initiator->>Browser: inicia CU-CAT-04 — Generar reporte de proveedores
     Browser->>View: Botón Excel de supplierDatatable.js
     View->>Dialog: showFilteredExportDialog()
-    Dialog-->>View: Promise[boolean]
+    Dialog-->>View: showFilteredExportDialog(): Promise[boolean]
     View->>Application: exportSupplierReport({ params })
     Application->>Request: exportSupplierReportRequest({ params })
     activate Application
