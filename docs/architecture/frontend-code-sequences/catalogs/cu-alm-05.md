@@ -28,15 +28,15 @@ sequenceDiagram
         HTTP->>API: PATCH /api/warehouse/materials/:id/stock
         alt Respuesta exitosa
             API-->>HTTP: 200 { material, code }
-            HTTP-->>Request: apiRequest() resuelve response.data
-            Request-->>Factory: material
-            Factory-->>Form: material
-            Form->>Form: form.onSave?.(material)
+            HTTP-->>Request: apiRequest(): Promise[AxiosResponse]
+            Request-->>Factory: editMaterialStockRequest(): Promise[AxiosResponse]
+            Factory-->>Form: editMaterialStock(): Promise[{ message: string }]
+            Form->>Form: form.onSave?.(undefined)
         else Respuesta HTTP rechazada
             API-->>HTTP: status HTTP { code, message }
-            HTTP-->>Request: apiRequest() rechaza { code, message, meta }
-            Request-->>Factory: error propagado
-            Factory-->>Form: mutación rechaza { code, message, meta }, formulario conservado
+            HTTP-->>Request: apiRequest(): throw { status: number, data: Object | null, message: string, raw: Error }
+            Request-->>Factory: editMaterialStockRequest(): throw { status: number, data: Object | null, message: string, raw: Error }
+            Factory-->>Form: editMaterialStock(): throw { status: number, data: Object | null, message: string, raw: Error }
         end
     end
 ```

@@ -30,7 +30,7 @@ sequenceDiagram
     else Pipeline aceptado
         Router->>Controller: editGoodsIssueDetails(req, res)
         Controller->>IssueDto: createGoodsIssueDetailsDtoForEdit(req.body)
-        IssueDto-->>Controller: { details }
+        IssueDto-->>Controller: Object ({ details: Object[] })
         Controller->>Service: editGoodsIssue({ id, goodsIssueDto })
         Service->>Prisma: tx.goodsIssue.findUnique({ where: { id } })
         Service->>Service: updateGoodsIssueDetails() valida estado y calcula pendientes
@@ -42,7 +42,7 @@ sequenceDiagram
         Service->>Prisma: tx.goodsIssue.update({ where, data })
         alt Commit confirmado
             Prisma-->>Service: salida actualizada
-            Service-->>Controller: goodsIssue
+            Service-->>Controller: GoodsIssue
             Controller->>Socket: emitInventoryUpdated({ context: 'material', source: 'goods-issue-supplied' })
             Controller-->>Browser: 200 { goodsIssue, code }
         else Stock insuficiente, estado inválido o error Prisma

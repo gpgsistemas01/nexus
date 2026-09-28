@@ -41,7 +41,7 @@ sequenceDiagram
     else Pipeline aceptado
         Router->>Controller: registerGoodsReceipt(req, res)
         Controller->>ReceiptDto: createGoodsReceiptDtoForRegister(req.body)
-        ReceiptDto-->>Controller: goodsReceiptDto
+        ReceiptDto-->>Controller: Object (goodsReceiptDto)
         Controller->>Controller: sanitizeEmptyStrings(goodsReceiptDto)
         Controller->>Service: createGoodsReceipt({ goodsReceiptDto: sanitizedGoodsReceiptDto })
         activate Service
@@ -49,20 +49,20 @@ sequenceDiagram
         Service->>Invoice: assertGoodsReceiptInvoiceAvailable({ supplierId, invoice })
         Service->>Person: findPersonById({ id: receivedById })
         Service->>DetailBuilder: buildGoodsReceiptDetails(details, { supplierId })
-        DetailBuilder-->>Service: processedDetails
-        Service->>DetailBuilder: calculateGoodsReceiptTotals(processedDetails)
-        DetailBuilder-->>Service: totals
+        DetailBuilder-->>Service: Object[]
+        Service->>DetailBuilder: calculateObject(processedDetails)
+        DetailBuilder-->>Service: Object
         Service->>Prisma: getDb().$transaction(async tx => ...)
         Service->>Reference: generateYearlyReferenceNumber({ type: GOODS_RECEIPT, tx })
-        Reference-->>Service: referenceNumber
+        Reference-->>Service: string
         Service->>Prisma: tx.goodsReceipt.create({ data: encabezado, totals, processedDetails })
         Prisma-->>Service: goodsReceipt con details
         Service->>Inventory: applyInventoryMovement({ tx, reference, details, movementType: ENTRY })
         Inventory->>Prisma: tx.supplierMaterial.update(...) y tx.movement.create(...)
         Prisma-->>Service: commit
         Service->>Material: updateMaterialUnitCostIfHigher({ supplierId, details })
-        Material-->>Service: updateMaterialUnitCostIfHigher() resuelve después del commit
-        Service-->>Controller: goodsReceipt
+        Material-->>Service: updateMaterialUnitCostIfHigher(): Promise[void]
+        Service-->>Controller: GoodsReceipt
         deactivate Service
         Controller->>Socket: emitInventoryUpdated({ context: 'material', source: 'goods-receipt-created' })
         Controller-->>Browser: HTTP 200 { goodsReceipt, code }

@@ -27,17 +27,17 @@ sequenceDiagram
         Domain->>Usage: existsMaterialUsage({ tx, materialId })
         Usage->>Prisma: material.findFirst({ relaciones históricas: some })
         alt Existe historia protegida
-            Usage-->>Domain: true
+            Usage-->>Domain: boolean (true)
             Domain-->>Controller: throw MaterialDeleteRelationConflict y rollback
         else Sin historia protegida
-            Usage-->>Domain: false
+            Usage-->>Domain: boolean (false)
             Domain->>Prisma: tx.supplierMaterial.delete({ id })
             Domain->>Prisma: tx.supplierMaterial.count({ materialId })
             opt No quedan relaciones con proveedores
                 Domain->>Prisma: tx.material.delete({ materialId })
             end
-            Prisma-->>Domain: commit devuelve { id: materialId }
-            Domain-->>Controller: material eliminado
+            Prisma-->>Domain: { id: number }
+            Domain-->>Controller: Material
             Controller-->>Client: HTTP 200 { material: { id }, code }
         end
     end

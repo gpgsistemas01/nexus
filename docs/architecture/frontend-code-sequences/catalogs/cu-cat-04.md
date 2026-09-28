@@ -17,20 +17,20 @@ sequenceDiagram
     Initiator->>Browser: inicia CU-CAT-04 — Generar reporte de proveedores
     Browser->>View: Botón Excel de supplierDatatable.js
     View->>Dialog: showFilteredExportDialog()
-    Dialog-->>View: Promise<boolean> con confirmación o cancelación
+    Dialog-->>View: Promise[boolean]
     View->>Application: exportSupplierReport({ params })
     Application->>Request: exportSupplierReportRequest({ params })
     activate Application
     Request->>HTTP: apiRequest({ method: 'get', url, params })
     HTTP->>Transport: descarga GET /api/warehouse/reports/suppliers/excel
     Transport-->>HTTP: HTTP 2xx { code, data }
-    HTTP-->>Request: apiRequest() resuelve response.data
-    Request-->>Application: exportSupplierReportRequest() resuelve response.data
+    HTTP-->>Request: apiRequest(): Promise[AxiosResponse]
+    Request-->>Application: exportSupplierReportRequest(): Promise[AxiosResponse]
     alt Respuesta exitosa
-        Application-->>View: exportSupplierReport() resuelve response.data
+        Application-->>View: exportSupplierReport(): Promise[Blob]
         View-->>Browser: DOM o DataTable actualizado con response.data
     else Respuesta rechazada
-        Application-->>View: error Axios normalizado { code, message, meta }
+        Application-->>View: throw { status: number, data: Object | null, message: string, raw: Error }
         View-->>Browser: formulario o filtros conservados, mensaje visible
     end
     deactivate Application

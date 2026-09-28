@@ -25,13 +25,13 @@ sequenceDiagram
         Request->>HTTP: apiRequest({ method: 'post', url, data })
         HTTP->>Transport: envía POST /api/admin/users
         Transport-->>HTTP: HTTP 2xx { code, data }
-        HTTP-->>Request: apiRequest() resuelve response.data
-        Request-->>Application: registerUserRequest() resuelve response.data
+        HTTP-->>Request: apiRequest(): Promise[AxiosResponse]
+        Request-->>Application: registerUserRequest(): Promise[AxiosResponse]
         alt Respuesta exitosa
-            Application-->>View: registerUser() resuelve response.data
+            Application-->>View: registerUser(): Promise[{ message: string, data: User }]
             View-->>Browser: DOM o DataTable actualizado con response.data
         else Respuesta rechazada
-            Application-->>View: error Axios normalizado { code, message, meta }
+            Application-->>View: throw { status: number, data: Object | null, message: string, raw: Error }
             View-->>Browser: formulario o filtros conservados, mensaje visible
         end
         deactivate Application

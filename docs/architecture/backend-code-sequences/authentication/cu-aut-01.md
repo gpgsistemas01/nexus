@@ -24,16 +24,16 @@ sequenceDiagram
         Controller->>Service: loginUser({ name, password })
         Service->>User: getUserIdByLogin(name, password)
         User->>Prisma: getDb().user.findUnique({ where: { name }, select })
-        Prisma-->>User: usuario o ausencia
+        Prisma-->>User: User | null
         User->>User: verifyPassword(password, user.password) y validar isActive/accesses
-        User-->>Service: userId o null
+        User-->>Service: number | null
         alt Credenciales inválidas o cuenta inactiva
             Service-->>Controller: INVALID_AUTH sin crear tokens ni cookies
             Controller-->>Browser: HTTP 401 { code, message }
         else Credenciales válidas
             Service->>Token: generateAccessToken(tokenDto) y generateRefreshToken(tokenDto)
-            Token-->>Service: accessToken y refreshToken firmados
-            Service-->>Controller: accessToken y refreshToken
+            Token-->>Service: { accessToken: string, refreshToken: string }
+            Service-->>Controller: { accessToken: string, refreshToken: string }
             Controller->>Cookies: setAuthCookies(res, tokens.newAccessToken, tokens.newRefreshToken)
             Controller-->>Browser: HTTP 200 { code } y cookies httpOnly
         end

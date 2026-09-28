@@ -28,11 +28,11 @@ sequenceDiagram
         Route->>Controller: editPerson(req, res)
         activate Controller
         Controller->>PersonDto: createPersonDtoForEdit(req.body)
-        PersonDto-->>Controller: personDto normalizado
+        PersonDto-->>Controller: Object (personDto)
         Controller->>Domain: personService.updatePerson({ id: req.params.id, personDto }) actualiza persona/asignaciones
         activate Domain
         alt Servicio resuelto
-            Domain-->>Controller: personService.updatePerson() devuelve person actualizado y persistido
+            Domain-->>Controller: personService.updatePerson(): Promise[Person]
             Controller-->>Client: HTTP 2xx { code, data }
         else AppError propagado
             Domain-->>Controller: throw AppError { code, message, meta, statusCode }

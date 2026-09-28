@@ -29,7 +29,7 @@ sequenceDiagram
         Controller->>Domain: createCatalogEntry(req.params.catalog, req.body) normaliza y crea únicamente los campos permitidos
         activate Domain
         alt Servicio resuelto
-            Domain-->>Controller: createCatalogEntry() devuelve catalogEntry creado y persistido
+            Domain-->>Controller: createCatalogEntry(): Promise[Object]
             Controller-->>Client: HTTP 2xx { code, data }
         else AppError propagado
             Domain-->>Controller: throw AppError { code, message, meta, statusCode }

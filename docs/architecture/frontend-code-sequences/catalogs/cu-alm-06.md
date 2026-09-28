@@ -17,20 +17,20 @@ sequenceDiagram
     Initiator->>Browser: inicia CU-ALM-06 — Generar reporte de inventario de materiales
     Browser->>View: Botón Excel de materialDatatable.js
     View->>Dialog: showInventoryExportDialog()
-    Dialog-->>View: inventoryScope: 'active' | 'stock'
+    Dialog-->>View: 'active' | 'stock'
     View->>Application: exportWarehouseReport({ params })
     Application->>Request: exportWarehouseReportRequest({ params })
     activate Application
     Request->>HTTP: apiRequest({ method: 'get', url, params })
     HTTP->>Transport: descarga GET /api/warehouse/reports/inventory/excel
     Transport-->>HTTP: HTTP 2xx { code, data }
-    HTTP-->>Request: apiRequest() resuelve response.data
-    Request-->>Application: exportWarehouseReportRequest() resuelve response.data
+    HTTP-->>Request: apiRequest(): Promise[AxiosResponse]
+    Request-->>Application: exportWarehouseReportRequest(): Promise[AxiosResponse]
     alt Respuesta exitosa
-        Application-->>View: exportWarehouseReport() resuelve response.data
+        Application-->>View: exportWarehouseReport(): Promise[Blob]
         View-->>Browser: DOM o DataTable actualizado con response.data
     else Respuesta rechazada
-        Application-->>View: error Axios normalizado { code, message, meta }
+        Application-->>View: throw { status: number, data: Object | null, message: string, raw: Error }
         View-->>Browser: formulario o filtros conservados, mensaje visible
     end
     deactivate Application

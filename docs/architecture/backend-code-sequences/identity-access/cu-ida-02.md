@@ -28,11 +28,11 @@ sequenceDiagram
         Route->>Controller: registerPerson(req, res)
         activate Controller
         Controller->>PersonDto: createPersonDtoForRegister(req.body)
-        PersonDto-->>Controller: personDto normalizado
+        PersonDto-->>Controller: Object (personDto)
         Controller->>Domain: personService.createPerson({ personDto }) valida y crea persona/asignaciones
         activate Domain
         alt Servicio resuelto
-            Domain-->>Controller: personService.createPerson() devuelve person creado y persistido
+            Domain-->>Controller: personService.createPerson(): Promise[Person]
             Controller-->>Client: HTTP 2xx { code, data }
         else AppError propagado
             Domain-->>Controller: throw AppError { code, message, meta, statusCode }

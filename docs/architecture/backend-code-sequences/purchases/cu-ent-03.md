@@ -28,11 +28,11 @@ sequenceDiagram
         Route->>Controller: editGoodsReceiptHeader(req, res)
         activate Controller
         Controller->>ReceiptDto: createGoodsReceiptDtoForEdit(req.body)
-        ReceiptDto-->>Controller: goodsReceiptDto normalizado
+        ReceiptDto-->>Controller: Object (goodsReceiptDto)
         Controller->>Domain: goodsReceiptService.updateGoodsReceipt({ id: req.params.id, goodsReceiptDto }) conserva detalles persistidos y actualiza encabezado permitido
         activate Domain
         alt Servicio resuelto
-            Domain-->>Controller: goodsReceiptService.updateGoodsReceipt() devuelve goodsReceipt actualizado y persistido
+            Domain-->>Controller: goodsReceiptService.updateGoodsReceipt(): Promise[GoodsReceipt]
             Controller-->>Client: HTTP 2xx { code, data }
         else AppError propagado
             Domain-->>Controller: throw AppError { code, message, meta, statusCode }

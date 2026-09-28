@@ -26,13 +26,13 @@ sequenceDiagram
         Request->>HTTP: apiRequest({ method: 'patch', url, data })
         HTTP->>Transport: enviar PATCH /api/warehouse/waste-issues/:id/details
         Transport-->>HTTP: HTTP 2xx { code, data }
-        HTTP-->>Request: apiRequest() resuelve response.data
-        Request-->>Application: editWasteIssueDetailsRequest() resuelve response.data
+        HTTP-->>Request: apiRequest(): Promise[AxiosResponse]
+        Request-->>Application: editWasteIssueDetailsRequest(): Promise[AxiosResponse]
         alt Respuesta exitosa
-            Application-->>View: editWasteIssueDetails() resuelve response.data
+            Application-->>View: editWasteIssueDetails(): Promise[{ message: string, data: WasteIssue }]
             View-->>Browser: DOM o DataTable actualizado con response.data
         else Respuesta rechazada
-            Application-->>View: error Axios normalizado { code, message, meta }
+            Application-->>View: throw { status: number, data: Object | null, message: string, raw: Error }
             View-->>Browser: formulario o filtros conservados, mensaje visible
         end
         deactivate Application

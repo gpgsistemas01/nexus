@@ -25,14 +25,14 @@ sequenceDiagram
     HTTP->>API: POST /api/auth/login
     alt Credenciales aceptadas
         API-->>HTTP: 200 y cookies de sesión
-        HTTP-->>Request: apiRequest() resuelve response.data
-        Request-->>App: loginRequest() resuelve { message }
-        App-->>Form: resultado exitoso
+        HTTP-->>Request: apiRequest(): Promise[AxiosResponse]
+        Request-->>App: loginRequest(): Promise[AxiosResponse]
+        App-->>Form: login(): Promise[{ message: string }]
         Form->>Browser: window.location.replace('/almacen/materiales')
     else Credenciales rechazadas
         API-->>HTTP: 401 { code, message }
-        HTTP-->>Request: apiRequest() rechaza { code, message, meta }
-        Request-->>App: error propagado
-        App-->>Form: login() rechaza { code, message }, sin navegación
+        HTTP-->>Request: apiRequest(): throw { status: number, data: Object | null, message: string, raw: Error }
+        Request-->>App: loginRequest(): throw { status: number, data: Object | null, message: string, raw: Error }
+        App-->>Form: login(): throw { status: number, data: Object | null, message: string, raw: Error }, sin navegación
     end
 ```

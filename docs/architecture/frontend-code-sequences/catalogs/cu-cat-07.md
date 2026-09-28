@@ -25,13 +25,13 @@ sequenceDiagram
         Request->>HTTP: apiRequest({ method: 'put', url, data })
         HTTP->>Transport: envía PUT /api/sales/clients/:id
         Transport-->>HTTP: HTTP 2xx { code, data }
-        HTTP-->>Request: apiRequest() resuelve response.data
-        Request-->>Application: editClientRequest() resuelve response.data
+        HTTP-->>Request: apiRequest(): Promise[AxiosResponse]
+        Request-->>Application: editClientRequest(): Promise[AxiosResponse]
         alt Respuesta exitosa
-            Application-->>View: editClient() resuelve response.data
+            Application-->>View: editClient(): Promise[{ message: string, data: Client }]
             View-->>Browser: DOM o DataTable actualizado con response.data
         else Respuesta rechazada
-            Application-->>View: error Axios normalizado { code, message, meta }
+            Application-->>View: throw { status: number, data: Object | null, message: string, raw: Error }
             View-->>Browser: formulario o filtros conservados, mensaje visible
         end
         deactivate Application

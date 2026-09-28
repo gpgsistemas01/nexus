@@ -17,20 +17,20 @@ sequenceDiagram
     Initiator->>Browser: inicia CU-IDA-04 — Generar reporte de personas
     Browser->>View: Botón Excel de personDatatable.js
     View->>Dialog: showFilteredExportDialog()
-    Dialog-->>View: Promise<boolean> con confirmación o cancelación
+    Dialog-->>View: Promise[boolean]
     View->>Application: exportPersonReport({ params })
     Application->>Request: exportPersonReportRequest({ params })
     activate Application
     Request->>HTTP: apiRequest({ method: 'get', url, params })
     HTTP->>Transport: descarga GET /api/admin/reports/persons/excel
     Transport-->>HTTP: HTTP 2xx { code, data }
-    HTTP-->>Request: apiRequest() resuelve response.data
-    Request-->>Application: exportPersonReportRequest() resuelve response.data
+    HTTP-->>Request: apiRequest(): Promise[AxiosResponse]
+    Request-->>Application: exportPersonReportRequest(): Promise[AxiosResponse]
     alt Respuesta exitosa
-        Application-->>View: exportPersonReport() resuelve response.data
+        Application-->>View: exportPersonReport(): Promise[Blob]
         View-->>Browser: DOM o DataTable actualizado con response.data
     else Respuesta rechazada
-        Application-->>View: error Axios normalizado { code, message, meta }
+        Application-->>View: throw { status: number, data: Object | null, message: string, raw: Error }
         View-->>Browser: formulario o filtros conservados, mensaje visible
     end
     deactivate Application

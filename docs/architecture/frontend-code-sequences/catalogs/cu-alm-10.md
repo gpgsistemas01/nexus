@@ -19,8 +19,8 @@ sequenceDiagram
     alt wasteValidation devuelve errores
         View-->>Browser: useForm.getErrors() conserva datos y muestra errores por campo
     else Formulario válido
-        View->>Application: getWasteMaterialTemplates({ params })
-        Application->>Request: registerWaste({ formData })
+        View->>Application: registerWaste({ formData })
+        Application->>Request: registerWasteRequest({ data: formData })
         activate Application
         Request->>HTTP: apiRequest({ method: 'post', url, data })
         HTTP->>Transport: enviar POST /api/warehouse/wastes
@@ -29,13 +29,13 @@ sequenceDiagram
         else Merma nueva
         end
         Transport-->>HTTP: HTTP 2xx { code, data }
-        HTTP-->>Request: apiRequest() resuelve response.data
-        Request-->>Application: registerWaste() resuelve response.data
+        HTTP-->>Request: apiRequest(): Promise[AxiosResponse]
+        Request-->>Application: registerWasteRequest(): Promise[AxiosResponse]
         alt Respuesta exitosa
-            Application-->>View: getWasteMaterialTemplates() resuelve response.data
-            View-->>Browser: DOM o DataTable actualizado con response.data
+            Application-->>View: registerWaste(): Promise[{ message: string, data: Waste }]
+            View-->>Browser: modal cerrado y #table recargada
         else Respuesta rechazada
-            Application-->>View: error Axios normalizado { code, message, meta }
+            Application-->>View: throw { status: number, data: Object | null, message: string, raw: Error }
             View-->>Browser: formulario o filtros conservados, mensaje visible
         end
         deactivate Application

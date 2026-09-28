@@ -20,9 +20,9 @@ sequenceDiagram
     activate Domain
     Domain->>SupplierMaterial: findAllSupplierMaterials({ ... })
     SupplierMaterial->>Prisma: supplierMaterial.findMany({ select: { material, supplier, existencia } })
-    Prisma-->>SupplierMaterial: relaciones SupplierMaterial anidadas
+    Prisma-->>SupplierMaterial: Array[SupplierMaterial]
     SupplierMaterial->>Prisma: material.findMany({ relaciones históricas: none }) y conteos
-    Prisma-->>SupplierMaterial: ids eliminables y totales
+    Prisma-->>SupplierMaterial: { removableIds: Array[number], totals: Object }
     SupplierMaterial-->>Domain: { data: SupplierMaterial[], recordsTotal, recordsFiltered }
     alt Servicio resuelto
         Domain-->>Controller: { data, recordsTotal, recordsFiltered }
