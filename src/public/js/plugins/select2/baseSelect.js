@@ -7,6 +7,7 @@ import { bindDisabledControlWarning, setDisabledControlWarning } from "../../ui/
 
 const wrapperSelector = INPUT_SELECTORS.PRESENTATION_DISPLAY;
 export const SELECT_RESULTS_LIMIT = 20;
+export const SELECT2_CLOSE_SETTLE_DELAY_MS = 100;
 
 export const buildPaginatedSelectParams = (params = {}, {
     length = SELECT_RESULTS_LIMIT,
@@ -53,7 +54,7 @@ bindDisabledControlWarning(select2DisabledWarningConfig);
 export const runAfterSelect2Close = ({ selector, action }) => {
 
     const $select = $(selector);
-    const deferAction = () => setTimeout(action, 0);
+    const deferAction = () => setTimeout(action, SELECT2_CLOSE_SETTLE_DELAY_MS);
 
     if (!$select.hasClass('select2-hidden-accessible')) {
         deferAction();
