@@ -28,11 +28,11 @@ sequenceDiagram
         Route->>Controller: editWasteIssueHeader(req, res)
         activate Controller
         Controller->>IssueDto: createWasteIssueHeaderDtoForEdit(req.body)
-        IssueDto-->>Controller: wasteIssueDto normalizado
+        IssueDto-->>Controller: Object (wasteIssueDto)
         Controller->>Domain: wasteIssueService.updateWasteIssueHeader({ id: req.params.id, wasteIssueDto }) aplica reglas del encabezado
         activate Domain
         alt Servicio resuelto
-            Domain-->>Controller: wasteIssueService.updateWasteIssueHeader() devuelve wasteIssueHeader actualizado y persistido
+            Domain-->>Controller: wasteIssueService.updateWasteIssueHeader(): Promise[WasteIssue]
             Controller-->>Client: HTTP 2xx { code, data }
         else AppError propagado
             Domain-->>Controller: throw AppError { code, message, meta, statusCode }

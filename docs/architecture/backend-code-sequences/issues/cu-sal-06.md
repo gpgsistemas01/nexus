@@ -30,7 +30,7 @@ sequenceDiagram
     else Pipeline aceptado
         Router->>Controller: registerGoodsIssueDetailReturn(req, res)
         Controller->>ReturnDto: createGoodsIssueDtoForReturn(req.body)
-        ReturnDto-->>Controller: returnDto normalizado
+        ReturnDto-->>Controller: Object (returnDto)
         Controller->>Service: returnGoodsIssueDetail({ id, detailId, returnDto, userId })
         Service->>Prisma: getDb().$transaction(async tx)
         Service->>Prisma: tx.goodsIssueDetail.findFirst({ where: { id: detailId, goodsIssueId: id } })
@@ -48,7 +48,7 @@ sequenceDiagram
                 Service->>Status: resolveIssueFulfillmentStatus(refreshedDetails) sin cancelar el encabezado
             end
             Prisma-->>Service: salida actualizada y commit
-            Service-->>Controller: salida y devolución
+            Service-->>Controller: { goodsIssue: GoodsIssue, goodsIssueReturn: GoodsIssueReturn }
             Controller->>Socket: emitInventoryUpdated({ context: 'material', source: 'goods-issue-return-created' })
             Controller-->>Browser: 200 { goodsIssueReturn, code }
         end

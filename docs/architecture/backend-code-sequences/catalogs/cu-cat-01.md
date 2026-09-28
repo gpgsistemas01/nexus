@@ -17,7 +17,7 @@ sequenceDiagram
     Controller->>Domain: supplierService.findAllSuppliers({ query: req.query }) consulta proveedores
     activate Domain
     alt Servicio resuelto
-        Domain-->>Controller: supplierService.findAllSuppliers() devuelve { data, recordsTotal, recordsFiltered } para la tabla solicitada
+        Domain-->>Controller: supplierService.findAllSuppliers(): Promise[{ data: Supplier[], recordsTotal: number, recordsFiltered: number }]
         Controller-->>Client: HTTP 2xx { code, data }
     else AppError propagado
         Domain-->>Controller: throw AppError { code, message, meta, statusCode }

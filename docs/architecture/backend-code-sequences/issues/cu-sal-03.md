@@ -28,11 +28,11 @@ sequenceDiagram
         Route->>Controller: editGoodsIssueHeader(req, res)
         activate Controller
         Controller->>IssueDto: createGoodsIssueHeaderDtoForEdit(req.body)
-        IssueDto-->>Controller: goodsIssueDto normalizado
+        IssueDto-->>Controller: Object (goodsIssueDto)
         Controller->>Domain: goodsIssueService.updateGoodsIssueHeader({ id: req.params.id, goodsIssueDto }) aplica reglas del encabezado
         activate Domain
         alt Servicio resuelto
-            Domain-->>Controller: goodsIssueService.updateGoodsIssueHeader() devuelve goodsIssueHeader actualizado y persistido
+            Domain-->>Controller: goodsIssueService.updateGoodsIssueHeader(): Promise[GoodsIssue]
             Controller-->>Client: HTTP 2xx { code, data }
         else AppError propagado
             Domain-->>Controller: throw AppError { code, message, meta, statusCode }

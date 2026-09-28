@@ -30,7 +30,7 @@ sequenceDiagram
     else Pipeline aceptado
         Router->>Controller: registerWasteStockAddition(req, res)
         Controller->>StockDto: createWasteDtoForStockAddition(req.body)
-        StockDto-->>Controller: entryDto normalizado
+        StockDto-->>Controller: Object (entryDto)
         Controller->>Service: addWasteStock({ id, entryDto, userId })
         Service->>Prisma: getDb().$transaction(async tx => ...)
         Service->>Prisma: tx.waste.findUnique({ where: { id } })
@@ -43,7 +43,7 @@ sequenceDiagram
         Entry->>Prisma: tx.wasteStockEntry.create({ folio, actor, captura, saldos, movementId })
         alt Commit confirmado
             Prisma-->>Service: merma incrementada
-            Service-->>Controller: waste
+            Service-->>Controller: Waste
             Controller->>Socket: emitInventoryUpdated()
             Controller-->>Client: 200 { waste, code }
         else Cantidad o persistencia rechazada

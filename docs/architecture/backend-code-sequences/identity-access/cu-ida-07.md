@@ -28,11 +28,11 @@ sequenceDiagram
         Route->>Controller: editUser(req, res)
         activate Controller
         Controller->>UserDto: createUserDtoForEdit(req.body)
-        UserDto-->>Controller: userDto normalizado
+        UserDto-->>Controller: Object (userDto)
         Controller->>Domain: userService.updateUser({ id: req.params.id, userDto }) actualiza cuenta y asignación autorizada
         activate Domain
         alt Servicio resuelto
-            Domain-->>Controller: userService.updateUser() devuelve user actualizado y persistido
+            Domain-->>Controller: userService.updateUser(): Promise[User]
             Controller-->>Client: HTTP 2xx { code, data }
         else AppError propagado
             Domain-->>Controller: throw AppError { code, message, meta, statusCode }

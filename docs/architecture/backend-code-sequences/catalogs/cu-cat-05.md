@@ -17,7 +17,7 @@ sequenceDiagram
     Controller->>Domain: clientService.findAllClients({ query: req.query }) consulta Client
     activate Domain
     alt Servicio resuelto
-        Domain-->>Controller: clientService.findAllClients() devuelve { data, recordsTotal, recordsFiltered } para la tabla solicitada
+        Domain-->>Controller: clientService.findAllClients(): Promise[{ data: Client[], recordsTotal: number, recordsFiltered: number }]
         Controller-->>Client: HTTP 2xx { code, data }
     else AppError propagado
         Domain-->>Controller: throw AppError { code, message, meta, statusCode }

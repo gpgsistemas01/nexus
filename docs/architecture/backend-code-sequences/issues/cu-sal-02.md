@@ -33,11 +33,11 @@ sequenceDiagram
         Route->>Controller: registerGoodsIssue(req, res)
         activate Controller
         Controller->>IssueDto: createGoodsIssueDtoForRegister(req.body)
-        IssueDto-->>Controller: goodsIssueDto normalizado
+        IssueDto-->>Controller: Object (goodsIssueDto)
         Controller->>Domain: goodsIssueService.createGoodsIssue({ goodsIssueDto }) crea encabezado y detalles solicitados
         activate Domain
         alt Servicio resuelto
-            Domain-->>Controller: goodsIssueService.createGoodsIssue() devuelve goodsIssue creado y persistido
+            Domain-->>Controller: goodsIssueService.createGoodsIssue(): Promise[GoodsIssue]
             Controller-->>Client: HTTP 2xx { code, data }
         else AppError propagado
             Domain-->>Controller: throw AppError { code, message, meta, statusCode }

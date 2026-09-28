@@ -28,11 +28,11 @@ sequenceDiagram
         Route->>Controller: editWaste(req, res)
         activate Controller
         Controller->>WasteDto: createWasteDtoForEdit(req.body)
-        WasteDto-->>Controller: wasteDto normalizado
+        WasteDto-->>Controller: Object (wasteDto)
         Controller->>Domain: wasteService.updateWaste({ id: req.params.id, wasteDto }) actualiza datos sin tratar stock como edición
         activate Domain
         alt Servicio resuelto
-            Domain-->>Controller: wasteService.updateWaste() devuelve waste actualizado y persistido
+            Domain-->>Controller: wasteService.updateWaste(): Promise[Waste]
             Controller-->>Client: HTTP 2xx { code, data }
         else AppError propagado
             Domain-->>Controller: throw AppError { code, message, meta, statusCode }

@@ -28,11 +28,11 @@ sequenceDiagram
         Route->>Controller: editClient(req, res)
         activate Controller
         Controller->>ClientDto: createClientDtoForEdit(req.body)
-        ClientDto-->>Controller: clientDto normalizado
+        ClientDto-->>Controller: Object (clientDto)
         Controller->>Domain: clientService.updateClient({ id: req.params.id, clientDto }) actualiza Client
         activate Domain
         alt Servicio resuelto
-            Domain-->>Controller: clientService.updateClient() devuelve client actualizado y persistido
+            Domain-->>Controller: clientService.updateClient(): Promise[Client]
             Controller-->>Client: HTTP 2xx { code, data }
         else AppError propagado
             Domain-->>Controller: throw AppError { code, message, meta, statusCode }

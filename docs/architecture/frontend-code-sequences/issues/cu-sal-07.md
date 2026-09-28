@@ -17,20 +17,20 @@ sequenceDiagram
     Initiator->>Browser: inicia CU-SAL-07 — Generar reporte de salidas de material
     Browser->>View: Botón Excel del listado de salidas de material
     View->>Dialog: showReportExportDialog(currentMonth)
-    Dialog-->>View: Promise<boolean> con confirmación o cancelación
+    Dialog-->>View: Promise[boolean]
     View->>Application: exportGoodsIssueReport({ params })
     Application->>Request: exportGoodsIssueReportRequest({ params })
     activate Application
     Request->>HTTP: apiRequest({ method: 'get', url, params })
     HTTP->>Transport: descarga GET /api/warehouse/reports/goods-issues/excel
     Transport-->>HTTP: HTTP 2xx { code, data }
-    HTTP-->>Request: apiRequest() resuelve response.data
-    Request-->>Application: exportGoodsIssueReportRequest() resuelve response.data
+    HTTP-->>Request: apiRequest(): Promise[AxiosResponse]
+    Request-->>Application: exportGoodsIssueReportRequest(): Promise[AxiosResponse]
     alt Respuesta exitosa
-        Application-->>View: exportGoodsIssueReport() resuelve response.data
+        Application-->>View: exportGoodsIssueReport(): Promise[Blob]
         View-->>Browser: DOM o DataTable actualizado con response.data
     else Respuesta rechazada
-        Application-->>View: error Axios normalizado { code, message, meta }
+        Application-->>View: throw { status: number, data: Object | null, message: string, raw: Error }
         View-->>Browser: formulario o filtros conservados, mensaje visible
     end
     deactivate Application

@@ -33,7 +33,7 @@ sequenceDiagram
     else Pipeline aceptado
         Router->>Controller: editMaterialStock(req, res)
         Controller->>StockDto: createMaterialDtoForStockUpdate(req.body)
-        StockDto-->>Controller: materialDto normalizado
+        StockDto-->>Controller: Object (materialDto)
         Controller->>Service: updateMaterialStock({ id, materialDto, userId })
         Service->>Adjustment: createStockAdjustment({ material, supplier, reason, newStock })
         Adjustment->>Prisma: getDb().$transaction(async tx => ...)
@@ -44,9 +44,9 @@ sequenceDiagram
         Adjustment->>Movement: createInventoryMovement({ tx, type: ADJUSTMENT, details })
         Adjustment->>SupplierMaterial: updateSupplierMaterialStock({ tx, supplierMaterialId, quantity })
         alt Commit confirmado
-            Prisma-->>Adjustment: relación actualizada
-            Adjustment-->>Service: supplierMaterial actualizado
-            Service-->>Controller: material
+            Prisma-->>Adjustment: SupplierMaterial
+            Adjustment-->>Service: SupplierMaterial
+            Service-->>Controller: Material
             Controller->>Socket: emitInventoryUpdated()
             Controller-->>Client: 200 { material, code }
         else Regla de stock o persistencia rechazada

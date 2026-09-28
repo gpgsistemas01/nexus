@@ -25,6 +25,12 @@ contrato entre participantes. Esos parámetros no se convierten en líneas de vi
 enumeran en una nota separada. Todos los recorridos explicitan recolección y validación
 de entrada en el módulo frontend que realmente la ejecuta, request, respuesta exitosa, error normalizado
 y efecto visible; las coordinaciones complejas añaden sus módulos especializados.
+Las respuestas de funciones declaran el tipo mediante `funcion(): Tipo`; las operaciones
+asíncronas usan `Promise[Tipo]`. `apiRequest` y los servicios de request devuelven
+`AxiosResponse`; las aplicaciones de consulta lo propagan, las mutaciones lo convierten
+en `{ message, data? }` mediante `createSuccessResponseFromRequest` y las aplicaciones
+de reportes devuelven el `Blob` contenido en `response.data`. Los estados HTTP y cambios
+visibles permanecen como resultados observables, no como tipos de retorno ficticios.
 Cada secuencia comienza además con la figura visual `actor` del iniciador canónico del
 caso y conserva **Navegador** como participante técnico separado. Cuando el Administrador
 hereda una capacidad del Personal de almacén, se muestra el actor operativo primario y

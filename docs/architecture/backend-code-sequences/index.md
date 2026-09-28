@@ -34,6 +34,12 @@ los arreglos de `src/validators/forms` y en
 normaliza datos aceptados y no sustituye esa validación. Todos explicitan activación de responsabilidades,
 resultado HTTP y propagación de error; las coordinaciones complejas agregan sus
 colaboradores y límites transaccionales.
+Las respuestas de métodos declaran su tipo con `metodo(): Tipo`: los servicios
+asíncronos usan `Promise[Tipo]`, los listados muestran su estructura real
+`{ data: Tipo[], recordsTotal: number, recordsFiltered: number }` y los DTO JavaScript
+usan `Object (nombreDto)`. La descripción narrativa del estado persistido no
+sustituye al tipo de dato; los mensajes HTTP y los efectos observables conservan su
+contrato o descripción porque no son retornos de un método interno.
 Las variables
 locales mecánicas permanecen en el código para no convertir el diagrama en una
 transcripción ilegible. Cada caso mantiene una secuencia específica aunque reutilice un

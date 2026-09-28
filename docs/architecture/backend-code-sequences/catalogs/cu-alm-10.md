@@ -20,7 +20,7 @@ sequenceDiagram
     Route->>Auth: verifyApiTokenRequired(req, res, next) y authorizeUserApi(PERMISSIONS.WASTES_READ)
     Route->>Controller: getWasteMaterialTemplates(req, res)
     Controller->>Domain: findWasteMaterialTemplates({ search, skip, take, supplierId })
-    Domain-->>Controller: plantillas activas de material, presentación y unidad
+    Domain-->>Controller: Object[]
     Controller-->>Client: HTTP 200 { code, data: templates }
 
     Client->>Route: POST /api/warehouse/wastes
@@ -37,9 +37,9 @@ sequenceDiagram
         Route->>Controller: registerWaste(req, res)
         activate Controller
         Controller->>WasteDto: createWasteDtoForRegister(req.body)
-        WasteDto-->>Controller: wasteDto normalizado
+        WasteDto-->>Controller: Object (wasteDto)
         Controller->>Formatter: sanitizeEmptyStrings(wasteDto)
-        Formatter-->>Controller: sanitizedWasteDto
+        Formatter-->>Controller: Object (sanitizedWasteDto)
         Controller->>Domain: createWasteWithInitialStockAdjustment({ wasteDto: sanitizedWasteDto, userId: req.user.id })
         activate Domain
         Domain->>Domain: findWasteByIdentity({ tx, supplierId, name, base, height })
@@ -49,7 +49,7 @@ sequenceDiagram
             Domain->>Domain: createWasteWithInitialStockAdjustment({ wasteDto, userId }) crea merma, ajuste y movimiento inicial
         end
         alt Registro confirmado
-            Domain-->>Controller: merma con existencia inicial y relaciones persistidas
+            Domain-->>Controller: Waste
             Controller->>Socket: emitInventoryUpdated({ context: 'waste', source: 'waste-created' })
             Controller-->>Client: HTTP 2xx { code, data }
         else AppError propagado

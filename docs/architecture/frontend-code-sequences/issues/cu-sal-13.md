@@ -26,14 +26,14 @@ sequenceDiagram
     HTTP->>API: PATCH /api/warehouse/waste-issues/:id/details/:detailId/returns
     alt Respuesta exitosa
         API-->>HTTP: 200 { wasteIssueReturn, code }
-        HTTP-->>Request: apiRequest() resuelve response.data
-        Request-->>App: wasteIssueReturn
-        App-->>Return: operación de devolución resuelve response.data
+        HTTP-->>Request: apiRequest(): Promise[AxiosResponse]
+        Request-->>App: returnWasteIssueDetailRequest(): Promise[AxiosResponse]
+        App-->>Return: returnWasteIssueDetail(): Promise[{ message: string, data: WasteIssueReturn }]
         Return->>Issue: window.location.reload()
     else Cantidad inválida, estado incompatible o error HTTP
         API-->>HTTP: status HTTP { code, message }
-        HTTP-->>Request: apiRequest() rechaza { code, message, meta }
-        Request-->>App: error propagado
-        App-->>Return: operación rechaza { code, message, meta }, sin reload
+        HTTP-->>Request: apiRequest(): throw { status: number, data: Object | null, message: string, raw: Error }
+        Request-->>App: returnWasteIssueDetailRequest(): throw { status: number, data: Object | null, message: string, raw: Error }
+        App-->>Return: returnWasteIssueDetail(): throw { status: number, data: Object | null, message: string, raw: Error }
     end
 ```

@@ -41,13 +41,13 @@ sequenceDiagram
         MaterialRequest->>HTTP: apiRequest({ method: 'post', url: MATERIALS_API_ROUTE, data })
         alt Material creado
             HTTP-->>MaterialRequest: HTTP 200 { material, code }
-            MaterialRequest-->>MaterialApp: registerMaterialRequest() resuelve response.data
-            MaterialApp-->>MaterialUI: registerMaterial() resuelve supplierMaterial
+            MaterialRequest-->>MaterialApp: registerMaterialRequest(): Promise[AxiosResponse]
+            MaterialApp-->>MaterialUI: registerMaterial(): Promise[{ message: string, data: SupplierMaterial }]
             MaterialUI->>MaterialUI: onSave() ejecuta mapSelectMaterialData(supplierMaterial) y toggleMaterialOption(...)
         else Alta rechazada
-            HTTP-->>MaterialRequest: apiRequest() rechaza { code, message, meta }
-            MaterialRequest-->>MaterialApp: registerMaterialRequest() propaga error normalizado
-            MaterialApp-->>MaterialUI: registerMaterial() rechaza y conserva formulario
+            HTTP-->>MaterialRequest: apiRequest(): throw { status: number, data: Object | null, message: string, raw: Error }
+            MaterialRequest-->>MaterialApp: registerMaterialRequest(): throw { status: number, data: Object | null, message: string, raw: Error }
+            MaterialApp-->>MaterialUI: registerMaterial(): throw { status: number, data: Object | null, message: string, raw: Error } y conserva formulario
         end
     end
     Browser->>DetailUI: seleccionar material, cantidad y costo por presentación
@@ -67,15 +67,15 @@ sequenceDiagram
         HTTP->>API: POST /api/warehouse/goods-receipts
         alt La factura ya existe para el proveedor
             API-->>HTTP: 409 { code, message, meta }
-            HTTP-->>Request: apiRequest() rechaza { code, message, meta }
-            Request-->>App: registerGoodsReceiptRequest() propaga { code, message, meta }
-            App-->>Form: registerGoodsReceipt() rechaza con el folio duplicado
+            HTTP-->>Request: apiRequest(): throw { status: number, data: Object | null, message: string, raw: Error }
+            Request-->>App: registerGoodsReceiptRequest(): throw { status: number, data: Object | null, message: string, raw: Error }
+            App-->>Form: registerGoodsReceipt(): throw { status: number, data: Object | null, message: string, raw: Error }
             Form-->>Browser: useForm conserva goodsReceiptForm y handleApiError muestra el conflicto
         else Compra nueva
             API-->>HTTP: 200 { goodsReceipt, code }
-            HTTP-->>Request: apiRequest() resuelve response.data
-            Request-->>App: registerGoodsReceiptRequest() resuelve response.data
-            App-->>Form: registerGoodsReceipt() devuelve { message }
+            HTTP-->>Request: apiRequest(): Promise[AxiosResponse]
+            Request-->>App: registerGoodsReceiptRequest(): Promise[AxiosResponse]
+            App-->>Form: registerGoodsReceipt(): Promise[{ message: string }]
             Form->>Form: handleSubmit(...) ejecuta notifications.showSuccess,<br/>closeModal(form) y reloadMainTable({ resetPaging: true })
             Form-->>Browser: modal cerrado y #table recargada
         end

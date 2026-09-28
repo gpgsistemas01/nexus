@@ -17,7 +17,7 @@ sequenceDiagram
     Controller->>Domain: reportService.findWasteReportRows({ query: req.query }) y sendExcelReport
     activate Domain
     alt Servicio resuelto
-        Domain-->>Controller: reportService.findWasteReportRows() devuelve filas filtradas que sendExcelReport convierte en el archivo Excel
+        Domain-->>Controller: reportService.findWasteReportRows(): Promise[Object[]]
         Controller-->>Client: HTTP 2xx { code, data }
     else AppError propagado
         Domain-->>Controller: throw AppError { code, message, meta, statusCode }

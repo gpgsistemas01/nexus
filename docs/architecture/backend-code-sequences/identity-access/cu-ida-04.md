@@ -17,7 +17,7 @@ sequenceDiagram
     Controller->>Domain: personService.findAllPersons({ query: req.query }) prepara filas y el controller llama sendExcelReport
     activate Domain
     alt Servicio resuelto
-        Domain-->>Controller: personService.findAllPersons() devuelve { data, recordsTotal, recordsFiltered } para la tabla solicitada
+        Domain-->>Controller: personService.findAllPersons(): Promise[{ data: Person[], recordsTotal: number, recordsFiltered: number }]
         Controller-->>Client: HTTP 2xx { code, data }
     else AppError propagado
         Domain-->>Controller: throw AppError { code, message, meta, statusCode }

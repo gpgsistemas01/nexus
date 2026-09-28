@@ -21,13 +21,13 @@ sequenceDiagram
     Request->>HTTP: apiRequest({ method: 'get', url, params })
     HTTP->>Transport: consulta GET /api/warehouse/waste-issues
     Transport-->>HTTP: HTTP 2xx { code, data }
-    HTTP-->>Request: apiRequest() resuelve response.data
-    Request-->>Application: getAllWasteIssuesRequest() resuelve response.data
+    HTTP-->>Request: apiRequest(): Promise[AxiosResponse]
+    Request-->>Application: getAllWasteIssuesRequest(): Promise[AxiosResponse]
     alt Respuesta exitosa
-        Application-->>View: getAllWasteIssues() resuelve response.data
+        Application-->>View: getAllWasteIssues(): Promise[AxiosResponse]
         View-->>Browser: DOM o DataTable actualizado con response.data
     else Respuesta rechazada
-        Application-->>View: error Axios normalizado { code, message, meta }
+        Application-->>View: throw { status: number, data: Object | null, message: string, raw: Error }
         View-->>Browser: formulario o filtros conservados, mensaje visible
     end
     deactivate Application

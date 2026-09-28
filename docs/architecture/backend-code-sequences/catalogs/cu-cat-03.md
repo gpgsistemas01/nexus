@@ -28,11 +28,11 @@ sequenceDiagram
         Route->>Controller: editSupplier(req, res)
         activate Controller
         Controller->>SupplierDto: createSupplierDtoForEdit(req.body)
-        SupplierDto-->>Controller: supplierDto normalizado
+        SupplierDto-->>Controller: Object (supplierDto)
         Controller->>Domain: supplierService.updateSupplier({ id: req.params.id, supplierDto }) actualiza datos del proveedor
         activate Domain
         alt Servicio resuelto
-            Domain-->>Controller: supplierService.updateSupplier() devuelve supplier actualizado y persistido
+            Domain-->>Controller: supplierService.updateSupplier(): Promise[Supplier]
             Controller-->>Client: HTTP 2xx { code, data }
         else AppError propagado
             Domain-->>Controller: throw AppError { code, message, meta, statusCode }
