@@ -2,7 +2,7 @@
 
 Para generar la entrega completa:
 
-1. Complete la [preparación de herramientas](#preparar-las-herramientas).
+1. Complete la [preparación de herramientas](03-prepare-the-tools.md).
 2. Desde la raíz del repositorio, valide todas las fuentes, enlaces e imágenes sin generar archivos:
 
    ```bash

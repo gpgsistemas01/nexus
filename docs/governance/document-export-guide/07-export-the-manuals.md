@@ -4,7 +4,7 @@ El paquete `manuales`
 incluye capturas de la aplicación, pero `docs:export` **no toma capturas ni abre Nexus**. Antes de
 exportarlo se requieren:
 
-- las herramientas indicadas en [Preparar las herramientas](#preparar-las-herramientas);
+- las herramientas indicadas en [Preparar las herramientas](03-prepare-the-tools.md);
 - todos los Markdown del paquete actualizados;
 - todas las imágenes referenciadas presentes en `docs/user-manual/images/`, revisadas y
   correspondientes a la versión del manual.
