@@ -21,13 +21,17 @@ DOCX y PDF. Se aplican estas reglas:
 - un hipervínculo se conserva cuando su destino forma parte del mismo documento, corresponde a
   otro archivo generado en la misma ejecución o es un sitio externo. El exportador convierte los
   enlaces internos en anclas y los enlaces entre archivos en rutas relativas desde el documento
-  actual dentro de `build/docs/docx/` o `build/docs/pdf/`, según el formato. Los enlaces locales
+  actual dentro de `build/docs/docx/` o `build/docs/pdf/`, según el formato. Si el enlace declara
+  un fragmento válido, la etiqueta identifica la sección y el documento de destino; sin fragmento,
+  conserva como referencia predeterminada sólo el nombre del documento. Los enlaces locales
   hacia fuentes no publicadas se convierten en texto para no exponer destinos `.md` ni rutas del
   repositorio;
 - las imágenes y los diagramas renderizados sí deben tener una **referencia documental**: texto
   alternativo o leyenda que identifique la figura y una mención dentro de la sección que la
   explica. El exportador reúne esas leyendas en un **Índice de imágenes** navegable; no debe
   envolverse la imagen en otro enlace sólo para abrir el archivo;
+- el exportador limita cada figura al `90 %` del ancho disponible. La proporción original se
+  conserva para que las capturas y los diagramas no rebasen los márgenes de la hoja ni se deformen;
 - los diagramas Mermaid no usan instrucciones `click`: la navegación hacia otro documento se
   expresa con un enlace Markdown junto al diagrama, porque esos enlaces internos de Mermaid no
   funcionan de manera uniforme en DOCX y PDF.
