@@ -29,7 +29,8 @@ Esta guía corresponde al actor **Personal de almacén (área Almacén y proveed
 ## Recorrido recomendado
 
 1. Inicie en [autenticación y navegación](../cases/authentication/index.md).
-2. Consulte y mantenga los elementos permitidos en [catálogos e inventario](../cases/catalogs/index.md).
+2. Consulte y mantenga los elementos permitidos en [catálogos e inventario](../cases/catalogs/index.md),
+   incluidos la consulta y el alta de proveedores y clientes.
    **Consumibles** aparece dentro de **Almacén** con el acceso de consulta de materiales;
    administrar catálogos auxiliares no forma parte de este manual.
 3. Consulte o mantenga personas autorizadas desde [identidad y acceso](../cases/identity-access/index.md).

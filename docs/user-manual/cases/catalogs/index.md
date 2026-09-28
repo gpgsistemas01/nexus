@@ -6,7 +6,12 @@ Cada procedimiento identifica sus casos de uso, controles, errores posibles y ca
 
 ### Catálogos auxiliares
 
-1. [1. Catálogos auxiliares](01-catalogs-auxiliary.md)
+- [Áreas](01-catalog-areas.md)
+- [Roles](01-catalog-roles.md)
+- [Presentaciones](01-catalog-presentations.md)
+- [Unidades de medida](01-catalog-unit-measures.md)
+- [Motivos de ajuste](01-catalog-adjustment-reasons.md)
+- [Estados de cumplimiento](01-catalog-fulfillment-statuses.md)
 
 ### Materiales e inventario
 

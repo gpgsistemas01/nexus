@@ -87,17 +87,15 @@ const captureTemplates = [
 
     { id: 'CAP-CAT-SUP-00-NAVIGATION', module: 'suppliers', name: '00-access-menu-main.png', route: '/proveedores', ready: '#table', action: openMainMenu, useCases: ['CU-CAT-01'] },
     { id: 'CAP-CAT-SUP-01-LIST', module: 'suppliers', name: '01-list.png', route: '/proveedores', ready: '#table', useCases: ['CU-CAT-01', 'CU-CAT-04'] },
-    { id: 'CAP-CAT-SUP-02-CREATE', module: 'suppliers', name: '02-form-creation.png', route: '/compras', ready: '#table', actions: [click('button:has-text("Nueva compra")', '#goodsReceiptModal.show'), selectNewOption('#goodsReceiptModal #supplierInput', 'Proveedor para captura', 'Nuevo proveedor', '#supplierModal.show')], area: 'almacen', useCases: ['CU-CAT-02', 'CU-ENT-02'] },
-    { id: 'CAP-CAT-SUP-02-CREATE-SISTEMAS', module: 'suppliers', name: '02-form-creation.png', route: '/proveedores', ready: '#table', action: click('button:has-text("Nuevo proveedor")', '#supplierModal.show'), area: 'sistemas', useCases: ['CU-CAT-02'] },
-    { id: 'CAP-CAT-SUP-03-EDIT', module: 'suppliers', name: '03-form-edit-and-state.png', route: '/proveedores', ready: '#table', action: click('#table tbody .btn-edit', '#supplierModal.show'), useCases: ['CU-CAT-03', 'CU-CAT-04'] },
-    { id: 'CAP-CAT-SUP-04-EXPORT', module: 'suppliers', name: '04-export-report.png', route: '/proveedores', ready: '#table', action: reportDialog, useCases: ['CU-CAT-04'] },
+    { id: 'CAP-CAT-SUP-02-CREATE', module: 'suppliers', name: '02-form-creation.png', route: '/proveedores', ready: '#table', action: click('button:has-text("Nuevo proveedor")', '#supplierModal.show'), useCases: ['CU-CAT-02'] },
+    { id: 'CAP-CAT-SUP-03-EDIT', module: 'suppliers', name: '03-form-edit-and-state.png', route: '/proveedores', ready: '#table', action: click('#table tbody .btn-edit', '#supplierModal.show'), area: 'sistemas', useCases: ['CU-CAT-03', 'CU-CAT-04'] },
+    { id: 'CAP-CAT-SUP-04-EXPORT', module: 'suppliers', name: '04-export-report.png', route: '/proveedores', ready: '#table', action: reportDialog, area: 'sistemas', useCases: ['CU-CAT-04'] },
 
     { id: 'CAP-CAT-CLI-00-NAVIGATION', module: 'clients', name: '00-access-menu-main.png', route: '/clientes', ready: '#table', action: openMainMenu, useCases: ['CU-CAT-05'] },
     { id: 'CAP-CAT-CLI-01-LIST', module: 'clients', name: '01-list.png', route: '/clientes', ready: '#table', useCases: ['CU-CAT-05', 'CU-CAT-08'] },
-    { id: 'CAP-CAT-CLI-02-CREATE', module: 'clients', name: '02-form-creation.png', route: '/salidas/materiales', ready: '#table', actions: [click('button:has-text("Nueva salida")', '#goodsIssueModal.show'), selectNewOption('#goodsIssueModal #clientInput', 'Cliente para captura', 'Nuevo cliente', '#clientModal.show')], area: 'almacen', useCases: ['CU-CAT-06', 'CU-SAL-02'] },
-    { id: 'CAP-CAT-CLI-02-CREATE-SISTEMAS', module: 'clients', name: '02-form-creation.png', route: '/clientes', ready: '#table', action: click('button:has-text("Nuevo cliente")', '#clientModal.show'), area: 'sistemas', useCases: ['CU-CAT-06'] },
-    { id: 'CAP-CAT-CLI-03-EDIT', module: 'clients', name: '03-form-edit.png', route: '/clientes', ready: '#table', action: click('#table tbody .btn-edit', '#clientModal.show'), useCases: ['CU-CAT-07'] },
-    { id: 'CAP-CAT-CLI-04-EXPORT', module: 'clients', name: '04-export-report.png', route: '/clientes', ready: '#table', action: reportDialog, useCases: ['CU-CAT-08'] },
+    { id: 'CAP-CAT-CLI-02-CREATE', module: 'clients', name: '02-form-creation.png', route: '/clientes', ready: '#table', action: click('button:has-text("Nuevo cliente")', '#clientModal.show'), useCases: ['CU-CAT-06'] },
+    { id: 'CAP-CAT-CLI-03-EDIT', module: 'clients', name: '03-form-edit.png', route: '/clientes', ready: '#table', action: click('#table tbody .btn-edit', '#clientModal.show'), area: 'sistemas', useCases: ['CU-CAT-07'] },
+    { id: 'CAP-CAT-CLI-04-EXPORT', module: 'clients', name: '04-export-report.png', route: '/clientes', ready: '#table', action: reportDialog, area: 'sistemas', useCases: ['CU-CAT-08'] },
 
     { id: 'CAP-CAT-WAS-00-NAVIGATION', module: 'waste', name: '00-access-menu-main.png', route: '/almacen/mermas', ready: '#table', action: openMainMenu, useCases: ['CU-ALM-09'] },
     { id: 'CAP-CAT-WAS-01-LIST', module: 'waste', name: '01-list-inventory.png', route: '/almacen/mermas', ready: '#table', action: openFilters, useCases: ['CU-ALM-09', 'CU-ALM-14'] },
@@ -177,8 +175,17 @@ const captureTemplates = [
     { id: 'CAP-ERR-404-SISTEMAS-NOT-FOUND', module: 'errors', name: '01-page-not-found.png', route: '/pagina-no-existente-manual', ready: '.error-card', area: 'sistemas', unauthenticated: true, useCases: [] }
 ];
 
-const systemAreaModules = ['catalogs/', 'suppliers', 'clients', 'people', 'users', 'material-movements', 'waste-movements'];
-const sharedOperationalModules = ['materials', 'waste'];
+const systemAreaModules = ['catalogs/', 'users', 'material-movements', 'waste-movements'];
+const sharedOperationalModules = [
+    'materials',
+    'waste',
+    'suppliers',
+    'clients',
+    'purchases',
+    'material-issues',
+    'waste-issues',
+    'people'
+];
 const getCaptureArea = capture => systemAreaModules.some(module => capture.module.startsWith(module))
     ? 'sistemas'
     : 'almacen';

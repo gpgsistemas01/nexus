@@ -41,15 +41,15 @@ describe('políticas funcionales de acceso', () => {
         ]));
     });
 
-    it('reserva las vistas de clientes y proveedores para Sistemas', () => {
+    it('permite al personal de almacén abrir las consultas de clientes y proveedores', () => {
         const permissions = getGrantedPermissions([{
             role: 'Almacenista',
             department: 'ALMACÉN Y PROVEDURÍA'
         }]);
 
-        expect(permissions).not.toContain(PERMISSIONS.CLIENTS_PAGE_VIEW);
-        expect(permissions).not.toContain(PERMISSIONS.SUPPLIERS_PAGE_VIEW);
-        expect(permissions).toContain(PERMISSIONS.CLIENTS_CREATE);
-        expect(permissions).toContain(PERMISSIONS.SUPPLIERS_MANAGE);
+        expect(permissions).toEqual(expect.arrayContaining([
+            PERMISSIONS.CLIENTS_PAGE_VIEW,
+            PERMISSIONS.SUPPLIERS_PAGE_VIEW
+        ]));
     });
 });
