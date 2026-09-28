@@ -243,6 +243,13 @@ const validateUseCaseDiagramCoverage = async () => {
             if (calls.length < MIN_SEQUENCE_CALLS) {
                 failures.push(`diagramas ${side}: ${id} no identifica al menos ${MIN_SEQUENCE_CALLS} métodos o funciones con sus parámetros relevantes`);
             }
+            const joinedMethodMessages = messages.filter((line) => (
+                line.includes(' y ')
+                && (line.match(/[A-Za-z_$][\w$]*(?:\.[A-Za-z_$][\w$]*)*\s*\(/g) ?? []).length > 1
+            ));
+            if (joinedMethodMessages.length) {
+                failures.push(`diagramas ${side}: ${id} combina métodos con el conector "y" en vez de separarlos en mensajes (${joinedMethodMessages.map((line) => line.trim()).join(' | ')})`);
+            }
             if (sequence.includes('Variables de frontera:')) {
                 failures.push(`diagramas ${side}: ${id} transcribe variables de frontera que pertenecen al código enlazado`);
             }
@@ -275,6 +282,25 @@ const validateUseCaseDiagramCoverage = async () => {
             const reservedAliases = aliases.filter((alias) => RESERVED_SEQUENCE_ALIASES.has(alias));
             if (reservedAliases.length) {
                 failures.push(`diagramas ${side}: ${id} usa alias reservados de Mermaid (${reservedAliases.join(', ')})`);
+            }
+            const technicalAliases = new Set(
+                [...sequence.matchAll(/^\s*participant\s+([^\s@]+)(?:@\{[^}]+\})?\s+as\s+(.+)$/gm)]
+                    .filter(([, , label]) => label.includes('src/') || label === 'Prisma / PostgreSQL')
+                    .map(([, alias]) => alias)
+            );
+            const untypedMethodResponses = messages.filter((line) => {
+                const [, sender = '', receiver = '', label = ''] = line.match(
+                    /^\s*([^\s-]+)-->>([^:]+):\s*(.+)$/
+                ) ?? [];
+                if (!technicalAliases.has(sender) || !technicalAliases.has(receiver)) return false;
+                if (receiver === 'HTTP') return false;
+                if (/^(?:HTTP\s+)?\d{3}\b|^HTTP\s|^res\.|^redirect\b/i.test(label)) return false;
+                if (/\b(?:throw|error|rechazad[oa]|conflict|invalid|rollback|commit)\b/i.test(label)) return false;
+                if (/^[A-Z][A-Z0-9_]+\b/.test(label)) return false;
+                return !/^[A-Za-z_$][\w$]*(?:\.[A-Za-z_$][\w$]*)*\(\):\s+/.test(label);
+            });
+            if (untypedMethodResponses.length) {
+                failures.push(`diagramas ${side}: ${id} contiene retornos internos sin firma y tipo (${untypedMethodResponses.map((line) => line.trim()).join(' | ')})`);
             }
             const actorAliases = new Set([
                 'browser',

@@ -13,7 +13,8 @@ sequenceDiagram
     Client->>Route: POST /cerrar-sesion
     Route->>Controller: controllers/web/authController.logout(req, res)
     activate Controller
-    Controller->>Response: clearCookie(name, options) y res.redirect(path)
+    Controller->>Response: clearCookie(name, options)
+    Controller->>Response: res.redirect(path)
     activate Response
     alt req.error recibido desde refresh
         Controller->>Response: redirectWithFlash(res, INVALID_AUTH, req.error, 'error')

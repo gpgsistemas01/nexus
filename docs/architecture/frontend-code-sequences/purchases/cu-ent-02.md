@@ -43,7 +43,9 @@ sequenceDiagram
             HTTP-->>MaterialRequest: HTTP 200 { material, code }
             MaterialRequest-->>MaterialApp: registerMaterialRequest(): Promise[AxiosResponse]
             MaterialApp-->>MaterialUI: registerMaterial(): Promise[{ message: string, data: SupplierMaterial }]
-            MaterialUI->>MaterialUI: onSave() ejecuta mapSelectMaterialData(supplierMaterial) y toggleMaterialOption(...)
+            MaterialUI->>MaterialUI: onSave()
+            MaterialUI->>MaterialUI: mapSelectMaterialData(supplierMaterial)
+            MaterialUI->>MaterialUI: toggleMaterialOption(...)
         else Alta rechazada
             HTTP-->>MaterialRequest: apiRequest(): throw { status: number, data: Object | null, message: string, raw: Error }
             MaterialRequest-->>MaterialApp: registerMaterialRequest(): throw { status: number, data: Object | null, message: string, raw: Error }
@@ -76,7 +78,10 @@ sequenceDiagram
             HTTP-->>Request: apiRequest(): Promise[AxiosResponse]
             Request-->>App: registerGoodsReceiptRequest(): Promise[AxiosResponse]
             App-->>Form: registerGoodsReceipt(): Promise[{ message: string }]
-            Form->>Form: handleSubmit(...) ejecuta notifications.showSuccess,<br/>closeModal(form) y reloadMainTable({ resetPaging: true })
+            Form->>Form: handleSubmit(...)
+            Form->>Form: notifications.showSuccess(...)
+            Form->>Form: closeModal(form)
+            Form->>Form: reloadMainTable({ resetPaging: true })
             Form-->>Browser: modal cerrado y #table recargada
         end
     end

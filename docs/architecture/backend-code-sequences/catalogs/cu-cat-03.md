@@ -28,7 +28,7 @@ sequenceDiagram
         Route->>Controller: editSupplier(req, res)
         activate Controller
         Controller->>SupplierDto: createSupplierDtoForEdit(req.body)
-        SupplierDto-->>Controller: Object (supplierDto)
+        SupplierDto-->>Controller: createSupplierDtoForEdit(): Object (supplierDto)
         Controller->>Domain: supplierService.updateSupplier({ id: req.params.id, supplierDto }) actualiza datos del proveedor
         activate Domain
         alt Servicio resuelto

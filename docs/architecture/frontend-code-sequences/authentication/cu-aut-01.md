@@ -13,7 +13,6 @@ sequenceDiagram
     participant Request as src/public/js/services/authService.js
     participant HTTP as src/public/js/services/axiosInstanceApi.js
     participant API@{ "type": "control" } as src/controllers/api/authController.js
-    participant Browser as Navegador
 
     Initiator->>Browser: inicia CU-AUT-01 — Iniciar sesión
     EJS->>Form: import './loginForm.js'

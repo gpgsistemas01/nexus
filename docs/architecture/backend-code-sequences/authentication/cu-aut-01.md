@@ -24,16 +24,18 @@ sequenceDiagram
         Controller->>Service: loginUser({ name, password })
         Service->>User: getUserIdByLogin(name, password)
         User->>Prisma: getDb().user.findUnique({ where: { name }, select })
-        Prisma-->>User: User | null
+        Prisma-->>User: findUnique(): Promise[User | null]
         User->>User: verifyPassword(password, user.password) y validar isActive/accesses
-        User-->>Service: number | null
+        User-->>Service: getUserIdByLogin(): Promise[number | null]
         alt Credenciales inválidas o cuenta inactiva
             Service-->>Controller: INVALID_AUTH sin crear tokens ni cookies
             Controller-->>Browser: HTTP 401 { code, message }
         else Credenciales válidas
-            Service->>Token: generateAccessToken(tokenDto) y generateRefreshToken(tokenDto)
-            Token-->>Service: { accessToken: string, refreshToken: string }
-            Service-->>Controller: { accessToken: string, refreshToken: string }
+            Service->>Token: generateAccessToken(tokenDto)
+            Token-->>Service: generateAccessToken(): string
+            Service->>Token: generateRefreshToken(tokenDto)
+            Token-->>Service: generateRefreshToken(): string
+            Service-->>Controller: loginUser(): Promise[{ newAccessToken: string, newRefreshToken: string }]
             Controller->>Cookies: setAuthCookies(res, tokens.newAccessToken, tokens.newRefreshToken)
             Controller-->>Browser: HTTP 200 { code } y cookies httpOnly
         end

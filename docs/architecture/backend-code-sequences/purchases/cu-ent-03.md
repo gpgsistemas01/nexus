@@ -28,7 +28,7 @@ sequenceDiagram
         Route->>Controller: editGoodsReceiptHeader(req, res)
         activate Controller
         Controller->>ReceiptDto: createGoodsReceiptDtoForEdit(req.body)
-        ReceiptDto-->>Controller: Object (goodsReceiptDto)
+        ReceiptDto-->>Controller: createGoodsReceiptDtoForEdit(): Object (goodsReceiptDto)
         Controller->>Domain: goodsReceiptService.updateGoodsReceipt({ id: req.params.id, goodsReceiptDto }) conserva detalles persistidos y actualiza encabezado permitido
         activate Domain
         alt Servicio resuelto

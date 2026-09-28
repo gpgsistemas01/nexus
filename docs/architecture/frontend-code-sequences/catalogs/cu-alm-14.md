@@ -17,7 +17,7 @@ sequenceDiagram
     Initiator->>Browser: inicia CU-ALM-14 — Generar reporte de mermas
     Browser->>View: Botón Excel de wasteDatatable.js
     View->>Dialog: showInventoryExportDialog()
-    Dialog-->>View: 'active' | 'stock'
+    Dialog-->>View: showInventoryExportDialog(): Promise['active' | 'stock']
     View->>Application: exportWasteReport({ params })
     Application->>Request: exportWasteReportRequest({ params })
     activate Application

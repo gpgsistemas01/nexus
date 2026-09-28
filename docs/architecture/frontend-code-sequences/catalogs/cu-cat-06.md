@@ -37,7 +37,10 @@ sequenceDiagram
             HTTP-->>Request: apiRequest(): Promise[AxiosResponse]
             Request-->>Application: createClientRequest(): Promise[AxiosResponse]
             Application-->>View: registerClient(): Promise[{ message: string, data: Client }]
-            View->>View: handleSubmit(...) ejecuta notifications.showSuccess,<br/>closeModal(form) y reloadMainTable({ resetPaging: true })
+            View->>View: handleSubmit(...)
+            View->>View: notifications.showSuccess(...)
+            View->>View: closeModal(form)
+            View->>View: reloadMainTable({ resetPaging: true })
             opt form.onSave definido por el selector de salida
                 View->>Select: form.onSave(client)
                 Select->>Select: toggleClientOption(...) agrega y selecciona

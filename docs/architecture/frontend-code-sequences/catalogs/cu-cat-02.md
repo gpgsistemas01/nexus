@@ -37,7 +37,10 @@ sequenceDiagram
             HTTP-->>Request: apiRequest(): Promise[AxiosResponse]
             Request-->>Application: registerSupplierRequest(): Promise[AxiosResponse]
             Application-->>View: registerSupplier(): Promise[{ message: string, data: Supplier }]
-            View->>View: handleSubmit(...) ejecuta notifications.showSuccess,<br/>closeModal(form) y reloadMainTable({ resetPaging: true })
+            View->>View: handleSubmit(...)
+            View->>View: notifications.showSuccess(...)
+            View->>View: closeModal(form)
+            View->>View: reloadMainTable({ resetPaging: true })
             opt form.onSave definido por el selector operativo
                 View->>Select: form.onSave(supplier)
                 Select->>Select: toggleSupplierOption(...) agrega y selecciona

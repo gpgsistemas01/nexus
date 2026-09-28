@@ -21,23 +21,23 @@ sequenceDiagram
     Domain->>Prisma: getDb().$transaction(async tx => ...)
     Prisma->>Prisma: tx.supplierMaterial.findUnique({ id })
     alt Relación inexistente
-        Prisma-->>Domain: null
+        Prisma-->>Domain: findUnique(): Promise[null]
         Domain-->>Controller: throw MaterialNotFound
     else Relación encontrada
         Domain->>Usage: existsMaterialUsage({ tx, materialId })
         Usage->>Prisma: material.findFirst({ relaciones históricas: some })
         alt Existe historia protegida
-            Usage-->>Domain: boolean (true)
+            Usage-->>Domain: existsMaterialUsage(): Promise[boolean] (true)
             Domain-->>Controller: throw MaterialDeleteRelationConflict y rollback
         else Sin historia protegida
-            Usage-->>Domain: boolean (false)
+            Usage-->>Domain: existsMaterialUsage(): Promise[boolean] (false)
             Domain->>Prisma: tx.supplierMaterial.delete({ id })
             Domain->>Prisma: tx.supplierMaterial.count({ materialId })
             opt No quedan relaciones con proveedores
                 Domain->>Prisma: tx.material.delete({ materialId })
             end
-            Prisma-->>Domain: { id: number }
-            Domain-->>Controller: Material
+            Prisma-->>Domain: delete(): Promise[{ id: number }]
+            Domain-->>Controller: deleteMaterial(): Promise[Material]
             Controller-->>Client: HTTP 200 { material: { id }, code }
         end
     end

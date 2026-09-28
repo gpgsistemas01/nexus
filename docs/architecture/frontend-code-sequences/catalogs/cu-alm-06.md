@@ -17,7 +17,7 @@ sequenceDiagram
     Initiator->>Browser: inicia CU-ALM-06 — Generar reporte de inventario de materiales
     Browser->>View: Botón Excel de materialDatatable.js
     View->>Dialog: showInventoryExportDialog()
-    Dialog-->>View: 'active' | 'stock'
+    Dialog-->>View: showInventoryExportDialog(): Promise['active' | 'stock']
     View->>Application: exportWarehouseReport({ params })
     Application->>Request: exportWarehouseReportRequest({ params })
     activate Application

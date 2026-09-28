@@ -28,7 +28,7 @@ sequenceDiagram
         Route->>Controller: editUser(req, res)
         activate Controller
         Controller->>UserDto: createUserDtoForEdit(req.body)
-        UserDto-->>Controller: Object (userDto)
+        UserDto-->>Controller: createUserDtoForEdit(): Object (userDto)
         Controller->>Domain: userService.updateUser({ id: req.params.id, userDto }) actualiza cuenta y asignación autorizada
         activate Domain
         alt Servicio resuelto

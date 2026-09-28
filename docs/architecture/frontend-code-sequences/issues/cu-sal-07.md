@@ -17,7 +17,7 @@ sequenceDiagram
     Initiator->>Browser: inicia CU-SAL-07 — Generar reporte de salidas de material
     Browser->>View: Botón Excel del listado de salidas de material
     View->>Dialog: showReportExportDialog(currentMonth)
-    Dialog-->>View: Promise[boolean]
+    Dialog-->>View: showReportExportDialog(): Promise[boolean]
     View->>Application: exportGoodsIssueReport({ params })
     Application->>Request: exportGoodsIssueReportRequest({ params })
     activate Application

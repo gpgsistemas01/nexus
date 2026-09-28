@@ -28,7 +28,7 @@ sequenceDiagram
         Route->>Controller: registerWasteIssue(req, res)
         activate Controller
         Controller->>IssueDto: createWasteIssueDtoForRegister(req.body)
-        IssueDto-->>Controller: Object (wasteIssueDto)
+        IssueDto-->>Controller: createWasteIssueDtoForRegister(): Object (wasteIssueDto)
         Controller->>Domain: wasteIssueService.createWasteIssue({ wasteIssueDto }) crea encabezado y detalles de merma
         activate Domain
         alt Hay una merma repetida o inactiva

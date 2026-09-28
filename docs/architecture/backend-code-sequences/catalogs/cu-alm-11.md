@@ -28,7 +28,7 @@ sequenceDiagram
         Route->>Controller: editWaste(req, res)
         activate Controller
         Controller->>WasteDto: createWasteDtoForEdit(req.body)
-        WasteDto-->>Controller: Object (wasteDto)
+        WasteDto-->>Controller: createWasteDtoForEdit(): Object (wasteDto)
         Controller->>Domain: wasteService.updateWaste({ id: req.params.id, wasteDto }) actualiza datos sin tratar stock como edición
         activate Domain
         alt Servicio resuelto

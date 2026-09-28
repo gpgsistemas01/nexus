@@ -28,7 +28,7 @@ sequenceDiagram
         Route->>Controller: registerPerson(req, res)
         activate Controller
         Controller->>PersonDto: createPersonDtoForRegister(req.body)
-        PersonDto-->>Controller: Object (personDto)
+        PersonDto-->>Controller: createPersonDtoForRegister(): Object (personDto)
         Controller->>Domain: personService.createPerson({ personDto }) valida y crea persona/asignaciones
         activate Domain
         alt Servicio resuelto

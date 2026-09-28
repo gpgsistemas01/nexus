@@ -28,7 +28,7 @@ sequenceDiagram
         Route->>Controller: editGoodsIssue(req, res)
         activate Controller
         Controller->>IssueDto: createGoodsIssueDtoForEdit(req.body)
-        IssueDto-->>Controller: Object (goodsIssueDto)
+        IssueDto-->>Controller: createGoodsIssueDtoForEdit(): Object (goodsIssueDto)
         Controller->>Domain: goodsIssueService.updateGoodsIssue({ id: req.params.id, goodsIssueDto }) actualiza encabezado y detalles todavía editables
         activate Domain
         alt Servicio resuelto

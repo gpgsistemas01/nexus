@@ -28,7 +28,7 @@ sequenceDiagram
         Route->>Controller: editUserPassword(req, res)
         activate Controller
         Controller->>PasswordDto: createUserPasswordDtoForEdit(req.body)
-        PasswordDto-->>Controller: Object (userPasswordDto)
+        PasswordDto-->>Controller: createUserPasswordDtoForEdit(): Object (userPasswordDto)
         Controller->>Domain: userService.updateUserPassword({ id: req.params.id, userPasswordDto }) cifra y sustituye la contraseña
         activate Domain
         alt Servicio resuelto

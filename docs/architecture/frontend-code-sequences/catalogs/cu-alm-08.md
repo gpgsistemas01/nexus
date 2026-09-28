@@ -17,7 +17,7 @@ sequenceDiagram
     Initiator->>Browser: inicia CU-ALM-08 — Generar reporte de movimientos de materiales
     Browser->>View: Botón Excel de movimientos en contexto material
     View->>Dialog: showReportExportDialog(currentMonth)
-    Dialog-->>View: Promise[boolean]
+    Dialog-->>View: showReportExportDialog(): Promise[boolean]
     View->>Application: exportMovementReport({ params, type: materials })
     Application->>Request: exportMovementReportRequest({ params, type: materials })
     activate Application

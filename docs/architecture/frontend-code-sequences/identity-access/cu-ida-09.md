@@ -17,7 +17,7 @@ sequenceDiagram
     Initiator->>Browser: inicia CU-IDA-09 — Generar reporte de usuarios
     Browser->>View: Botón Excel de userDatatable.js
     View->>Dialog: showFilteredExportDialog()
-    Dialog-->>View: Promise[boolean]
+    Dialog-->>View: showFilteredExportDialog(): Promise[boolean]
     View->>Application: exportUserReport({ params })
     Application->>Request: exportUserReportRequest({ params })
     activate Application
