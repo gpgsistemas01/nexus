@@ -26,9 +26,10 @@ antes de exportar y no se editan manualmente. El contrato API pertenece al paque
 porque describe la interfaz HTTP y el transporte JSON; no se incluye en datos por el solo hecho de
 que sus cuerpos transporten información.
 
-Los manuales por actor conservan su propia entrada y reutilizan `overview.md` y
-`procedures.md`; así comparten las indicaciones generales y las convenciones de los casos sin
-duplicarlas ni sustituir la portada del actor. Sus documentos siguen los módulos y destinos
+Los manuales por actor conservan su propia entrada. Cada actor recibe un documento común que
+ensambla `overview.md`, `procedures.md`, la matriz de validación y el catálogo de errores una sola
+vez; los documentos modulares no duplican esos anexos y conservan la portada del actor. Sus
+documentos siguen los módulos y destinos
 visibles de `src/views/layout/ui/navList.ejs` y filtran los procedimientos según los permisos del
 área; la carpeta técnica donde vive un caso no determina el nombre ni el alcance del entregable.
 Las exportaciones y sus secuencias pertenecen al módulo que inicia la consulta, por lo que no se

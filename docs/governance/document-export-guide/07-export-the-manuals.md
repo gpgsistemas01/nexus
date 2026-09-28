@@ -23,17 +23,25 @@ imagen, `--check` detiene el proceso; en ese caso ejecute primero el flujo indep
 
 El resultado se organiza primero por actor y después según los módulos visibles de `navList.ejs`,
 no según las carpetas técnicas que almacenan los casos. Los submenús **Almacén**, **Salidas** y
-**Movimientos** producen un documento por destino visible; **Catálogos** conserva un documento
-para sus seis opciones auxiliares porque comparten pantalla, permiso y procedimiento. Los accesos
-independientes **Usuarios**, **Personas**, **Clientes** y **Proveedores** tampoco se mezclan bajo
-un documento genérico de identidad o catálogos.
+**Movimientos** producen un documento por destino visible. Cada opción de **Catálogos auxiliares**
+produce también su propio documento, aunque comparta permiso y patrón de pantalla con las demás.
+Los accesos independientes **Usuarios**, **Personas**, **Clientes** y **Proveedores** tampoco se
+mezclan bajo un documento genérico de identidad o catálogos.
 
 El manual de Sistemas contiene `movimientos-materiales`, `movimientos-mermas`, `usuarios`,
-`catalogos`, `personas`, `clientes` y `proveedores`. El manual de Almacén contiene
-`almacen-materiales`, `almacen-mermas`, `compras`, `salidas-materiales` y `salidas-mermas`.
+`catalogo-areas`, `catalogo-roles`, `catalogo-presentaciones`, `catalogo-unidades-medida`,
+`catalogo-motivos-ajuste`, `catalogo-estados-cumplimiento`, `personas`, `clientes` y `proveedores`.
+El manual de Almacén contiene `almacen-materiales`, `almacen-mermas`, `compras`, `salidas-materiales` y `salidas-mermas`.
 Ambos agregan por separado `autenticacion` para explicar el acceso y el menú. Esta asignación
 coincide con los módulos por área usados por el inventario de capturas; no agrega a un manual un
 recorrido sólo porque la política técnica permita reutilizar alguna operación desde otro contexto.
+
+Cada actor recibe además un único documento `informacion-general-y-anexos` con las indicaciones
+comunes de uso, las convenciones de los procedimientos, la matriz de validación y el catálogo de
+errores. Estas secciones no se anexan de nuevo a cada documento modular: el módulo conserva su
+portada, procedimiento y capturas, e identifica la referencia común aplicable a sus validaciones y
+errores. De esta manera, una corrección transversal tiene una sola copia publicada y
+los documentos por módulo no crecen con contenido idéntico.
 
 Cada archivo conserva la portada del actor, los recorridos permitidos y sólo las capturas
 referenciadas por esos recorridos. Por ejemplo, Almacén no recibe el ajuste absoluto de existencia,
