@@ -49,8 +49,8 @@ En la segunda terminal de PowerShell, prepare el archivo de sesión de Almacén:
 
 ```powershell
 $env:DOCS_BASE_URL = "http://127.0.0.1:3000"
-$env:DOCS_WAREHOUSE_STORAGE_STATE = Join-Path $env:TEMP "nexus-warehouse-storage-state.json"
-npx playwright codegen --save-storage="$env:DOCS_WAREHOUSE_STORAGE_STATE" "${env:DOCS_BASE_URL}/inicio-sesion"
+$env:DOCS_ALMACEN_STORAGE_STATE = Join-Path $env:TEMP "nexus-almacen-storage-state.json"
+npx playwright codegen --save-storage="$env:DOCS_ALMACEN_STORAGE_STATE" "${env:DOCS_BASE_URL}/inicio-sesion"
 ```
 
 En la ventana de Chromium abierta por `codegen`, inicie sesión con una cuenta ficticia del área
@@ -59,7 +59,7 @@ presione `Ctrl+C` una vez y espere a que Chromium se cierre y reaparezca el prom
 archivo fue escrito:
 
 ```powershell
-Test-Path "$env:DOCS_WAREHOUSE_STORAGE_STATE"
+Test-Path "$env:DOCS_ALMACEN_STORAGE_STATE"
 ```
 
 Continúe sólo si el resultado es `True`. Genere entonces únicamente las capturas de esa área:
@@ -74,7 +74,7 @@ cierra sus propios contextos al terminar. Después de una ejecución correcta el
 temporal, pero la variable permanece definida; retírela antes de continuar:
 
 ```powershell
-Remove-Item Env:DOCS_WAREHOUSE_STORAGE_STATE
+Remove-Item Env:DOCS_ALMACEN_STORAGE_STATE
 ```
 
 ### 2. Sesión y capturas de Sistemas
@@ -84,22 +84,22 @@ reutilice la sesión de Almacén:
 
 ```powershell
 $env:DOCS_BASE_URL = "http://127.0.0.1:3000"
-$env:DOCS_ADMIN_STORAGE_STATE = Join-Path $env:TEMP "nexus-admin-storage-state.json"
-npx playwright codegen --save-storage="$env:DOCS_ADMIN_STORAGE_STATE" "${env:DOCS_BASE_URL}/inicio-sesion"
+$env:DOCS_SISTEMAS_STORAGE_STATE = Join-Path $env:TEMP "nexus-sistemas-storage-state.json"
+npx playwright codegen --save-storage="$env:DOCS_SISTEMAS_STORAGE_STATE" "${env:DOCS_BASE_URL}/inicio-sesion"
 ```
 
 Complete el acceso en Chromium, presione `Ctrl+C` una vez en la segunda terminal, espere el prompt
 y compruebe el archivo:
 
 ```powershell
-Test-Path "$env:DOCS_ADMIN_STORAGE_STATE"
+Test-Path "$env:DOCS_SISTEMAS_STORAGE_STATE"
 ```
 
 Si devuelve `True`, genere las capturas de Sistemas y retire la variable al terminar:
 
 ```powershell
 npm run docs:screenshots -- --area sistemas
-Remove-Item Env:DOCS_ADMIN_STORAGE_STATE
+Remove-Item Env:DOCS_SISTEMAS_STORAGE_STATE
 Remove-Item Env:DOCS_BASE_URL
 ```
 
@@ -141,8 +141,8 @@ Si la ejecución falla, el archivo de sesión no se elimina para permitir el rei
 manualmente cuando ya no se vaya a utilizar.
 
 Como alternativa para automatización controlada, el script también acepta
-`DOCS_WAREHOUSE_LOGIN_NAME` junto con `DOCS_WAREHOUSE_LOGIN_PASSWORD`, o `DOCS_ADMIN_LOGIN_NAME`
-junto con `DOCS_ADMIN_LOGIN_PASSWORD`. No combine credenciales y `storage state` para una misma
+`DOCS_ALMACEN_LOGIN_NAME` junto con `DOCS_ALMACEN_LOGIN_PASSWORD`, o `DOCS_SISTEMAS_LOGIN_NAME`
+junto con `DOCS_SISTEMAS_LOGIN_PASSWORD`. No combine credenciales y `storage state` para una misma
 área. El flujo interactivo con `codegen` es el procedimiento documentado para una actualización
 manual de capturas.
 

@@ -2,11 +2,11 @@
 
 ## Criterio de identificación y orden
 
-Cada captura tiene un identificador estable `CAP-<grupo>-<ámbito>-<paso>-<estado>`. El
+Cada captura tiene un identificador estable `CAP-<grupo>-<ámbito>-<paso>-<estado>-<área>`. El
 identificador permite relacionarla con uno o más casos de uso sin depender del nombre del
 archivo. Ese mismo identificador se publica como ancla junto a la imagen en los
 [procedimientos del manual](procedures.md), de modo que puede citarse como, por ejemplo,
-`cases/catalogs/04-cap-cat-mat-02-create.md#CAP-CAT-MAT-02-CREATE`. La ruta conserva el patrón
+`cases/catalogs/04-cap-cat-mat-02-create.md#CAP-CAT-MAT-02-CREATE-ALMACEN`. La ruta conserva el patrón
 `build/docs/screenshots/areas/<área>/<módulo>/NN-description.png`: las pantallas sin sesión también
 se duplican por área para que cada ejecución produzca un conjunto completo y autocontenido. Esta
 ruta pertenece a los artefactos ignorados por Git y evita incluir PNG en el diff. `NN` expresa el orden
@@ -34,142 +34,142 @@ comprobar el inventario sin iniciar Nexus ni Playwright se ejecuta
 
 | Orden | Ámbito | ID | Ruta | Casos de uso |
 |---:|---|---|---|---|
-| 1 | almacen | `CAP-AUT-01-LOGIN` | `build/docs/screenshots/areas/almacen/access/01-login-session.png` | `CU-AUT-01` |
-| 2 | sistemas | `CAP-AUT-01-SISTEMAS-LOGIN` | `build/docs/screenshots/areas/sistemas/access/01-login-session.png` | `CU-AUT-01` |
-| 3 | almacen | `CAP-AUT-02-MENU` | `build/docs/screenshots/areas/almacen/access/02-menu-main.png` | `CU-AUT-02` |
-| 4 | sistemas | `CAP-AUT-02-SISTEMAS-MENU` | `build/docs/screenshots/areas/sistemas/access/02-menu-main.png` | `CU-AUT-02` |
-| 5 | almacen | `CAP-CAT-MAT-00-NAVIGATION` | `build/docs/screenshots/areas/almacen/materials/00-access-menu-main.png` | `CU-ALM-01` |
+| 1 | almacen | `CAP-AUT-01-LOGIN-ALMACEN` | `build/docs/screenshots/areas/almacen/access/01-login-session.png` | `CU-AUT-01` |
+| 2 | sistemas | `CAP-AUT-01-LOGIN-SISTEMAS` | `build/docs/screenshots/areas/sistemas/access/01-login-session.png` | `CU-AUT-01` |
+| 3 | almacen | `CAP-AUT-02-MENU-ALMACEN` | `build/docs/screenshots/areas/almacen/access/02-menu-main.png` | `CU-AUT-02` |
+| 4 | sistemas | `CAP-AUT-02-MENU-SISTEMAS` | `build/docs/screenshots/areas/sistemas/access/02-menu-main.png` | `CU-AUT-02` |
+| 5 | almacen | `CAP-CAT-MAT-00-NAVIGATION-ALMACEN` | `build/docs/screenshots/areas/almacen/materials/00-access-menu-main.png` | `CU-ALM-01` |
 | 6 | sistemas | `CAP-CAT-MAT-00-NAVIGATION-SISTEMAS` | `build/docs/screenshots/areas/sistemas/materials/00-access-menu-main.png` | `CU-ALM-01` |
-| 7 | almacen | `CAP-CAT-MAT-01-LIST` | `build/docs/screenshots/areas/almacen/materials/01-list-inventory.png` | `CU-ALM-01`, `CU-ALM-06` |
+| 7 | almacen | `CAP-CAT-MAT-01-LIST-ALMACEN` | `build/docs/screenshots/areas/almacen/materials/01-list-inventory.png` | `CU-ALM-01`, `CU-ALM-06` |
 | 8 | sistemas | `CAP-CAT-MAT-01-LIST-SISTEMAS` | `build/docs/screenshots/areas/sistemas/materials/01-list-inventory.png` | `CU-ALM-01`, `CU-ALM-06` |
-| 9 | almacen | `CAP-CAT-MAT-02-CREATE` | `build/docs/screenshots/areas/almacen/materials/02-form-creation.png` | `CU-ALM-02` |
+| 9 | almacen | `CAP-CAT-MAT-02-CREATE-ALMACEN` | `build/docs/screenshots/areas/almacen/materials/02-form-creation.png` | `CU-ALM-02` |
 | 10 | sistemas | `CAP-CAT-MAT-02-CREATE-SISTEMAS` | `build/docs/screenshots/areas/sistemas/materials/02-form-creation.png` | `CU-ALM-02` |
-| 11 | almacen | `CAP-CAT-MAT-03-EDIT` | `build/docs/screenshots/areas/almacen/materials/03-form-edit.png` | `CU-ALM-03`, `CU-ALM-04` |
+| 11 | almacen | `CAP-CAT-MAT-03-EDIT-ALMACEN` | `build/docs/screenshots/areas/almacen/materials/03-form-edit.png` | `CU-ALM-03`, `CU-ALM-04` |
 | 12 | sistemas | `CAP-CAT-MAT-03-EDIT-SISTEMAS` | `build/docs/screenshots/areas/sistemas/materials/03-form-edit.png` | `CU-ALM-03`, `CU-ALM-04` |
-| 13 | sistemas | `CAP-CAT-MAT-04-STOCK` | `build/docs/screenshots/areas/sistemas/materials/04-adjustment-stock.png` | `CU-ALM-05` |
-| 14 | almacen | `CAP-REP-MAT-05-EXPORT` | `build/docs/screenshots/areas/almacen/materials/05-export-report.png` | `CU-ALM-06` |
+| 13 | sistemas | `CAP-CAT-MAT-04-STOCK-SISTEMAS` | `build/docs/screenshots/areas/sistemas/materials/04-adjustment-stock.png` | `CU-ALM-05` |
+| 14 | almacen | `CAP-REP-MAT-05-EXPORT-ALMACEN` | `build/docs/screenshots/areas/almacen/materials/05-export-report.png` | `CU-ALM-06` |
 | 15 | sistemas | `CAP-REP-MAT-05-EXPORT-SISTEMAS` | `build/docs/screenshots/areas/sistemas/materials/05-export-report.png` | `CU-ALM-06` |
-| 16 | almacen | `CAP-CAT-SUP-00-NAVIGATION` | `build/docs/screenshots/areas/almacen/suppliers/00-access-menu-main.png` | `CU-CAT-01` |
+| 16 | almacen | `CAP-CAT-SUP-00-NAVIGATION-ALMACEN` | `build/docs/screenshots/areas/almacen/suppliers/00-access-menu-main.png` | `CU-CAT-01` |
 | 17 | sistemas | `CAP-CAT-SUP-00-NAVIGATION-SISTEMAS` | `build/docs/screenshots/areas/sistemas/suppliers/00-access-menu-main.png` | `CU-CAT-01` |
-| 18 | almacen | `CAP-CAT-SUP-01-LIST` | `build/docs/screenshots/areas/almacen/suppliers/01-list.png` | `CU-CAT-01`, `CU-CAT-04` |
+| 18 | almacen | `CAP-CAT-SUP-01-LIST-ALMACEN` | `build/docs/screenshots/areas/almacen/suppliers/01-list.png` | `CU-CAT-01`, `CU-CAT-04` |
 | 19 | sistemas | `CAP-CAT-SUP-01-LIST-SISTEMAS` | `build/docs/screenshots/areas/sistemas/suppliers/01-list.png` | `CU-CAT-01`, `CU-CAT-04` |
-| 20 | almacen | `CAP-CAT-SUP-02-CREATE` | `build/docs/screenshots/areas/almacen/suppliers/02-form-creation.png` | `CU-CAT-02` |
+| 20 | almacen | `CAP-CAT-SUP-02-CREATE-ALMACEN` | `build/docs/screenshots/areas/almacen/suppliers/02-form-creation.png` | `CU-CAT-02` |
 | 21 | sistemas | `CAP-CAT-SUP-02-CREATE-SISTEMAS` | `build/docs/screenshots/areas/sistemas/suppliers/02-form-creation.png` | `CU-CAT-02` |
-| 22 | sistemas | `CAP-CAT-SUP-03-EDIT` | `build/docs/screenshots/areas/sistemas/suppliers/03-form-edit-and-state.png` | `CU-CAT-03`, `CU-CAT-04` |
-| 23 | sistemas | `CAP-CAT-SUP-04-EXPORT` | `build/docs/screenshots/areas/sistemas/suppliers/04-export-report.png` | `CU-CAT-04` |
-| 24 | almacen | `CAP-CAT-CLI-00-NAVIGATION` | `build/docs/screenshots/areas/almacen/clients/00-access-menu-main.png` | `CU-CAT-05` |
+| 22 | sistemas | `CAP-CAT-SUP-03-EDIT-SISTEMAS` | `build/docs/screenshots/areas/sistemas/suppliers/03-form-edit-and-state.png` | `CU-CAT-03`, `CU-CAT-04` |
+| 23 | sistemas | `CAP-CAT-SUP-04-EXPORT-SISTEMAS` | `build/docs/screenshots/areas/sistemas/suppliers/04-export-report.png` | `CU-CAT-04` |
+| 24 | almacen | `CAP-CAT-CLI-00-NAVIGATION-ALMACEN` | `build/docs/screenshots/areas/almacen/clients/00-access-menu-main.png` | `CU-CAT-05` |
 | 25 | sistemas | `CAP-CAT-CLI-00-NAVIGATION-SISTEMAS` | `build/docs/screenshots/areas/sistemas/clients/00-access-menu-main.png` | `CU-CAT-05` |
-| 26 | almacen | `CAP-CAT-CLI-01-LIST` | `build/docs/screenshots/areas/almacen/clients/01-list.png` | `CU-CAT-05`, `CU-CAT-08` |
+| 26 | almacen | `CAP-CAT-CLI-01-LIST-ALMACEN` | `build/docs/screenshots/areas/almacen/clients/01-list.png` | `CU-CAT-05`, `CU-CAT-08` |
 | 27 | sistemas | `CAP-CAT-CLI-01-LIST-SISTEMAS` | `build/docs/screenshots/areas/sistemas/clients/01-list.png` | `CU-CAT-05`, `CU-CAT-08` |
-| 28 | almacen | `CAP-CAT-CLI-02-CREATE` | `build/docs/screenshots/areas/almacen/clients/02-form-creation.png` | `CU-CAT-06` |
+| 28 | almacen | `CAP-CAT-CLI-02-CREATE-ALMACEN` | `build/docs/screenshots/areas/almacen/clients/02-form-creation.png` | `CU-CAT-06` |
 | 29 | sistemas | `CAP-CAT-CLI-02-CREATE-SISTEMAS` | `build/docs/screenshots/areas/sistemas/clients/02-form-creation.png` | `CU-CAT-06` |
-| 30 | sistemas | `CAP-CAT-CLI-03-EDIT` | `build/docs/screenshots/areas/sistemas/clients/03-form-edit.png` | `CU-CAT-07` |
-| 31 | sistemas | `CAP-CAT-CLI-04-EXPORT` | `build/docs/screenshots/areas/sistemas/clients/04-export-report.png` | `CU-CAT-08` |
-| 32 | almacen | `CAP-CAT-WAS-00-NAVIGATION` | `build/docs/screenshots/areas/almacen/waste/00-access-menu-main.png` | `CU-ALM-09` |
+| 30 | sistemas | `CAP-CAT-CLI-03-EDIT-SISTEMAS` | `build/docs/screenshots/areas/sistemas/clients/03-form-edit.png` | `CU-CAT-07` |
+| 31 | sistemas | `CAP-CAT-CLI-04-EXPORT-SISTEMAS` | `build/docs/screenshots/areas/sistemas/clients/04-export-report.png` | `CU-CAT-08` |
+| 32 | almacen | `CAP-CAT-WAS-00-NAVIGATION-ALMACEN` | `build/docs/screenshots/areas/almacen/waste/00-access-menu-main.png` | `CU-ALM-09` |
 | 33 | sistemas | `CAP-CAT-WAS-00-NAVIGATION-SISTEMAS` | `build/docs/screenshots/areas/sistemas/waste/00-access-menu-main.png` | `CU-ALM-09` |
-| 34 | almacen | `CAP-CAT-WAS-01-LIST` | `build/docs/screenshots/areas/almacen/waste/01-list-inventory.png` | `CU-ALM-09`, `CU-ALM-14` |
+| 34 | almacen | `CAP-CAT-WAS-01-LIST-ALMACEN` | `build/docs/screenshots/areas/almacen/waste/01-list-inventory.png` | `CU-ALM-09`, `CU-ALM-14` |
 | 35 | sistemas | `CAP-CAT-WAS-01-LIST-SISTEMAS` | `build/docs/screenshots/areas/sistemas/waste/01-list-inventory.png` | `CU-ALM-09`, `CU-ALM-14` |
-| 36 | almacen | `CAP-CAT-WAS-02-CREATE` | `build/docs/screenshots/areas/almacen/waste/02-form-registration.png` | `CU-ALM-10` |
+| 36 | almacen | `CAP-CAT-WAS-02-CREATE-ALMACEN` | `build/docs/screenshots/areas/almacen/waste/02-form-registration.png` | `CU-ALM-10` |
 | 37 | sistemas | `CAP-CAT-WAS-02-CREATE-SISTEMAS` | `build/docs/screenshots/areas/sistemas/waste/02-form-registration.png` | `CU-ALM-10` |
-| 38 | almacen | `CAP-CAT-WAS-03-EDIT` | `build/docs/screenshots/areas/almacen/waste/03-form-edit.png` | `CU-ALM-11` |
+| 38 | almacen | `CAP-CAT-WAS-03-EDIT-ALMACEN` | `build/docs/screenshots/areas/almacen/waste/03-form-edit.png` | `CU-ALM-11` |
 | 39 | sistemas | `CAP-CAT-WAS-03-EDIT-SISTEMAS` | `build/docs/screenshots/areas/sistemas/waste/03-form-edit.png` | `CU-ALM-11` |
-| 40 | sistemas | `CAP-CAT-WAS-04-STOCK` | `build/docs/screenshots/areas/sistemas/waste/04-adjustment-stock.png` | `CU-ALM-12` |
-| 41 | almacen | `CAP-REP-WAS-05-EXPORT` | `build/docs/screenshots/areas/almacen/waste/05-export-report.png` | `CU-ALM-14` |
+| 40 | sistemas | `CAP-CAT-WAS-04-STOCK-SISTEMAS` | `build/docs/screenshots/areas/sistemas/waste/04-adjustment-stock.png` | `CU-ALM-12` |
+| 41 | almacen | `CAP-REP-WAS-05-EXPORT-ALMACEN` | `build/docs/screenshots/areas/almacen/waste/05-export-report.png` | `CU-ALM-14` |
 | 42 | sistemas | `CAP-REP-WAS-05-EXPORT-SISTEMAS` | `build/docs/screenshots/areas/sistemas/waste/05-export-report.png` | `CU-ALM-14` |
-| 43 | almacen | `CAP-CAT-WAS-06-ADD-STOCK` | `build/docs/screenshots/areas/almacen/waste/06-add-stock.png` | `CU-ALM-13` |
+| 43 | almacen | `CAP-CAT-WAS-06-ADD-STOCK-ALMACEN` | `build/docs/screenshots/areas/almacen/waste/06-add-stock.png` | `CU-ALM-13` |
 | 44 | sistemas | `CAP-CAT-WAS-06-ADD-STOCK-SISTEMAS` | `build/docs/screenshots/areas/sistemas/waste/06-add-stock.png` | `CU-ALM-13` |
-| 45 | sistemas | `CAP-CAT-AREA-01-LIST` | `build/docs/screenshots/areas/sistemas/catalogs/areas/01-list.png` | `CU-CAT-09` |
-| 46 | sistemas | `CAP-CAT-AREA-02-CREATE` | `build/docs/screenshots/areas/sistemas/catalogs/areas/02-form-creation.png` | `CU-CAT-10` |
-| 47 | sistemas | `CAP-CAT-AREA-03-EDIT` | `build/docs/screenshots/areas/sistemas/catalogs/areas/03-form-edit.png` | `CU-CAT-11` |
-| 48 | sistemas | `CAP-CAT-ROLE-01-LIST` | `build/docs/screenshots/areas/sistemas/catalogs/roles/01-list.png` | `CU-CAT-12` |
-| 49 | sistemas | `CAP-CAT-ROLE-02-CREATE` | `build/docs/screenshots/areas/sistemas/catalogs/roles/02-form-creation.png` | `CU-CAT-13` |
-| 50 | sistemas | `CAP-CAT-ROLE-03-EDIT` | `build/docs/screenshots/areas/sistemas/catalogs/roles/03-form-edit.png` | `CU-CAT-14` |
-| 51 | sistemas | `CAP-CAT-PRE-01-LIST` | `build/docs/screenshots/areas/sistemas/catalogs/presentaciones/01-list.png` | `CU-CAT-15` |
-| 52 | sistemas | `CAP-CAT-PRE-02-CREATE` | `build/docs/screenshots/areas/sistemas/catalogs/presentaciones/02-form-creation.png` | `CU-CAT-16` |
-| 53 | sistemas | `CAP-CAT-PRE-03-EDIT` | `build/docs/screenshots/areas/sistemas/catalogs/presentaciones/03-form-edit.png` | `CU-CAT-17` |
-| 54 | sistemas | `CAP-CAT-UNIT-01-LIST` | `build/docs/screenshots/areas/sistemas/catalogs/unidades-medida/01-list.png` | `CU-CAT-18` |
-| 55 | sistemas | `CAP-CAT-UNIT-02-CREATE` | `build/docs/screenshots/areas/sistemas/catalogs/unidades-medida/02-form-creation.png` | `CU-CAT-19` |
-| 56 | sistemas | `CAP-CAT-UNIT-03-EDIT` | `build/docs/screenshots/areas/sistemas/catalogs/unidades-medida/03-form-edit.png` | `CU-CAT-20` |
-| 57 | sistemas | `CAP-CAT-REASON-01-LIST` | `build/docs/screenshots/areas/sistemas/catalogs/motivos-ajuste/01-list.png` | `CU-CAT-21` |
-| 58 | sistemas | `CAP-CAT-REASON-02-CREATE` | `build/docs/screenshots/areas/sistemas/catalogs/motivos-ajuste/02-form-creation.png` | `CU-CAT-22` |
-| 59 | sistemas | `CAP-CAT-REASON-03-EDIT` | `build/docs/screenshots/areas/sistemas/catalogs/motivos-ajuste/03-form-edit.png` | `CU-CAT-23` |
-| 60 | sistemas | `CAP-CAT-STATUS-01-LIST` | `build/docs/screenshots/areas/sistemas/catalogs/estados-cumplimiento/01-list.png` | `CU-CAT-24` |
-| 61 | sistemas | `CAP-CAT-STATUS-02-CREATE` | `build/docs/screenshots/areas/sistemas/catalogs/estados-cumplimiento/02-form-creation.png` | `CU-CAT-25` |
-| 62 | sistemas | `CAP-CAT-STATUS-03-EDIT` | `build/docs/screenshots/areas/sistemas/catalogs/estados-cumplimiento/03-form-edit.png` | `CU-CAT-26` |
-| 63 | almacen | `CAP-ENT-00-NAVIGATION` | `build/docs/screenshots/areas/almacen/purchases/00-access-menu-main.png` | `CU-ENT-01` |
+| 45 | sistemas | `CAP-CAT-AREA-01-LIST-SISTEMAS` | `build/docs/screenshots/areas/sistemas/catalogs/areas/01-list.png` | `CU-CAT-09` |
+| 46 | sistemas | `CAP-CAT-AREA-02-CREATE-SISTEMAS` | `build/docs/screenshots/areas/sistemas/catalogs/areas/02-form-creation.png` | `CU-CAT-10` |
+| 47 | sistemas | `CAP-CAT-AREA-03-EDIT-SISTEMAS` | `build/docs/screenshots/areas/sistemas/catalogs/areas/03-form-edit.png` | `CU-CAT-11` |
+| 48 | sistemas | `CAP-CAT-ROLE-01-LIST-SISTEMAS` | `build/docs/screenshots/areas/sistemas/catalogs/roles/01-list.png` | `CU-CAT-12` |
+| 49 | sistemas | `CAP-CAT-ROLE-02-CREATE-SISTEMAS` | `build/docs/screenshots/areas/sistemas/catalogs/roles/02-form-creation.png` | `CU-CAT-13` |
+| 50 | sistemas | `CAP-CAT-ROLE-03-EDIT-SISTEMAS` | `build/docs/screenshots/areas/sistemas/catalogs/roles/03-form-edit.png` | `CU-CAT-14` |
+| 51 | sistemas | `CAP-CAT-PRE-01-LIST-SISTEMAS` | `build/docs/screenshots/areas/sistemas/catalogs/presentaciones/01-list.png` | `CU-CAT-15` |
+| 52 | sistemas | `CAP-CAT-PRE-02-CREATE-SISTEMAS` | `build/docs/screenshots/areas/sistemas/catalogs/presentaciones/02-form-creation.png` | `CU-CAT-16` |
+| 53 | sistemas | `CAP-CAT-PRE-03-EDIT-SISTEMAS` | `build/docs/screenshots/areas/sistemas/catalogs/presentaciones/03-form-edit.png` | `CU-CAT-17` |
+| 54 | sistemas | `CAP-CAT-UNIT-01-LIST-SISTEMAS` | `build/docs/screenshots/areas/sistemas/catalogs/unidades-medida/01-list.png` | `CU-CAT-18` |
+| 55 | sistemas | `CAP-CAT-UNIT-02-CREATE-SISTEMAS` | `build/docs/screenshots/areas/sistemas/catalogs/unidades-medida/02-form-creation.png` | `CU-CAT-19` |
+| 56 | sistemas | `CAP-CAT-UNIT-03-EDIT-SISTEMAS` | `build/docs/screenshots/areas/sistemas/catalogs/unidades-medida/03-form-edit.png` | `CU-CAT-20` |
+| 57 | sistemas | `CAP-CAT-REASON-01-LIST-SISTEMAS` | `build/docs/screenshots/areas/sistemas/catalogs/motivos-ajuste/01-list.png` | `CU-CAT-21` |
+| 58 | sistemas | `CAP-CAT-REASON-02-CREATE-SISTEMAS` | `build/docs/screenshots/areas/sistemas/catalogs/motivos-ajuste/02-form-creation.png` | `CU-CAT-22` |
+| 59 | sistemas | `CAP-CAT-REASON-03-EDIT-SISTEMAS` | `build/docs/screenshots/areas/sistemas/catalogs/motivos-ajuste/03-form-edit.png` | `CU-CAT-23` |
+| 60 | sistemas | `CAP-CAT-STATUS-01-LIST-SISTEMAS` | `build/docs/screenshots/areas/sistemas/catalogs/estados-cumplimiento/01-list.png` | `CU-CAT-24` |
+| 61 | sistemas | `CAP-CAT-STATUS-02-CREATE-SISTEMAS` | `build/docs/screenshots/areas/sistemas/catalogs/estados-cumplimiento/02-form-creation.png` | `CU-CAT-25` |
+| 62 | sistemas | `CAP-CAT-STATUS-03-EDIT-SISTEMAS` | `build/docs/screenshots/areas/sistemas/catalogs/estados-cumplimiento/03-form-edit.png` | `CU-CAT-26` |
+| 63 | almacen | `CAP-ENT-00-NAVIGATION-ALMACEN` | `build/docs/screenshots/areas/almacen/purchases/00-access-menu-main.png` | `CU-ENT-01` |
 | 64 | sistemas | `CAP-ENT-00-NAVIGATION-SISTEMAS` | `build/docs/screenshots/areas/sistemas/purchases/00-access-menu-main.png` | `CU-ENT-01` |
-| 65 | almacen | `CAP-ENT-01-LIST` | `build/docs/screenshots/areas/almacen/purchases/01-list.png` | `CU-ENT-01` |
+| 65 | almacen | `CAP-ENT-01-LIST-ALMACEN` | `build/docs/screenshots/areas/almacen/purchases/01-list.png` | `CU-ENT-01` |
 | 66 | sistemas | `CAP-ENT-01-LIST-SISTEMAS` | `build/docs/screenshots/areas/sistemas/purchases/01-list.png` | `CU-ENT-01` |
-| 67 | almacen | `CAP-ENT-02-CREATE` | `build/docs/screenshots/areas/almacen/purchases/02-form-registration.png` | `CU-ENT-02` |
+| 67 | almacen | `CAP-ENT-02-CREATE-ALMACEN` | `build/docs/screenshots/areas/almacen/purchases/02-form-registration.png` | `CU-ENT-02` |
 | 68 | sistemas | `CAP-ENT-02-CREATE-SISTEMAS` | `build/docs/screenshots/areas/sistemas/purchases/02-form-registration.png` | `CU-ENT-02` |
-| 69 | almacen | `CAP-ENT-03-EDIT` | `build/docs/screenshots/areas/almacen/purchases/03-edit-purchase.png` | `CU-ENT-03`, `CU-ENT-05` |
+| 69 | almacen | `CAP-ENT-03-EDIT-ALMACEN` | `build/docs/screenshots/areas/almacen/purchases/03-edit-purchase.png` | `CU-ENT-03`, `CU-ENT-05` |
 | 70 | sistemas | `CAP-ENT-03-EDIT-SISTEMAS` | `build/docs/screenshots/areas/sistemas/purchases/03-edit-purchase.png` | `CU-ENT-03`, `CU-ENT-05` |
-| 71 | almacen | `CAP-ENT-04-CORRECT` | `build/docs/screenshots/areas/almacen/purchases/04-correction-detail.png` | `CU-ENT-04` |
+| 71 | almacen | `CAP-ENT-04-CORRECT-ALMACEN` | `build/docs/screenshots/areas/almacen/purchases/04-correction-detail.png` | `CU-ENT-04` |
 | 72 | sistemas | `CAP-ENT-04-CORRECT-SISTEMAS` | `build/docs/screenshots/areas/sistemas/purchases/04-correction-detail.png` | `CU-ENT-04` |
-| 73 | almacen | `CAP-REP-ENT-05-EXPORT` | `build/docs/screenshots/areas/almacen/purchases/05-export-report.png` | `CU-ENT-06` |
+| 73 | almacen | `CAP-REP-ENT-05-EXPORT-ALMACEN` | `build/docs/screenshots/areas/almacen/purchases/05-export-report.png` | `CU-ENT-06` |
 | 74 | sistemas | `CAP-REP-ENT-05-EXPORT-SISTEMAS` | `build/docs/screenshots/areas/sistemas/purchases/05-export-report.png` | `CU-ENT-06` |
-| 75 | almacen | `CAP-ENT-06-VIEW` | `build/docs/screenshots/areas/almacen/purchases/06-query-cancelled.png` | `CU-ENT-03`, `CU-ENT-05` |
+| 75 | almacen | `CAP-ENT-06-VIEW-ALMACEN` | `build/docs/screenshots/areas/almacen/purchases/06-query-cancelled.png` | `CU-ENT-03`, `CU-ENT-05` |
 | 76 | sistemas | `CAP-ENT-06-VIEW-SISTEMAS` | `build/docs/screenshots/areas/sistemas/purchases/06-query-cancelled.png` | `CU-ENT-03`, `CU-ENT-05` |
-| 77 | almacen | `CAP-SAL-MAT-00-NAVIGATION` | `build/docs/screenshots/areas/almacen/material-issues/00-access-menu-main.png` | `CU-SAL-01` |
+| 77 | almacen | `CAP-SAL-MAT-00-NAVIGATION-ALMACEN` | `build/docs/screenshots/areas/almacen/material-issues/00-access-menu-main.png` | `CU-SAL-01` |
 | 78 | sistemas | `CAP-SAL-MAT-00-NAVIGATION-SISTEMAS` | `build/docs/screenshots/areas/sistemas/material-issues/00-access-menu-main.png` | `CU-SAL-01` |
-| 79 | almacen | `CAP-SAL-MAT-01-LIST` | `build/docs/screenshots/areas/almacen/material-issues/01-list.png` | `CU-SAL-01` |
+| 79 | almacen | `CAP-SAL-MAT-01-LIST-ALMACEN` | `build/docs/screenshots/areas/almacen/material-issues/01-list.png` | `CU-SAL-01` |
 | 80 | sistemas | `CAP-SAL-MAT-01-LIST-SISTEMAS` | `build/docs/screenshots/areas/sistemas/material-issues/01-list.png` | `CU-SAL-01` |
-| 81 | almacen | `CAP-SAL-MAT-02-CREATE` | `build/docs/screenshots/areas/almacen/material-issues/02-form-registration.png` | `CU-SAL-02` |
+| 81 | almacen | `CAP-SAL-MAT-02-CREATE-ALMACEN` | `build/docs/screenshots/areas/almacen/material-issues/02-form-registration.png` | `CU-SAL-02` |
 | 82 | sistemas | `CAP-SAL-MAT-02-CREATE-SISTEMAS` | `build/docs/screenshots/areas/sistemas/material-issues/02-form-registration.png` | `CU-SAL-02` |
-| 83 | almacen | `CAP-SAL-MAT-03-EDIT` | `build/docs/screenshots/areas/almacen/material-issues/03-edit-header.png` | `CU-SAL-03`, `CU-SAL-04` |
+| 83 | almacen | `CAP-SAL-MAT-03-EDIT-ALMACEN` | `build/docs/screenshots/areas/almacen/material-issues/03-edit-header.png` | `CU-SAL-03`, `CU-SAL-04` |
 | 84 | sistemas | `CAP-SAL-MAT-03-EDIT-SISTEMAS` | `build/docs/screenshots/areas/sistemas/material-issues/03-edit-header.png` | `CU-SAL-03`, `CU-SAL-04` |
-| 85 | almacen | `CAP-SAL-MAT-04-SUPPLY` | `build/docs/screenshots/areas/almacen/material-issues/04-supply-details.png` | `CU-SAL-05` |
+| 85 | almacen | `CAP-SAL-MAT-04-SUPPLY-ALMACEN` | `build/docs/screenshots/areas/almacen/material-issues/04-supply-details.png` | `CU-SAL-05` |
 | 86 | sistemas | `CAP-SAL-MAT-04-SUPPLY-SISTEMAS` | `build/docs/screenshots/areas/sistemas/material-issues/04-supply-details.png` | `CU-SAL-05` |
-| 87 | almacen | `CAP-SAL-MAT-05-RETURN` | `build/docs/screenshots/areas/almacen/material-issues/05-return-detail.png` | `CU-SAL-06` |
+| 87 | almacen | `CAP-SAL-MAT-05-RETURN-ALMACEN` | `build/docs/screenshots/areas/almacen/material-issues/05-return-detail.png` | `CU-SAL-06` |
 | 88 | sistemas | `CAP-SAL-MAT-05-RETURN-SISTEMAS` | `build/docs/screenshots/areas/sistemas/material-issues/05-return-detail.png` | `CU-SAL-06` |
-| 89 | almacen | `CAP-REP-SAL-MAT-06-EXPORT` | `build/docs/screenshots/areas/almacen/material-issues/06-export-report.png` | `CU-SAL-07` |
+| 89 | almacen | `CAP-REP-SAL-MAT-06-EXPORT-ALMACEN` | `build/docs/screenshots/areas/almacen/material-issues/06-export-report.png` | `CU-SAL-07` |
 | 90 | sistemas | `CAP-REP-SAL-MAT-06-EXPORT-SISTEMAS` | `build/docs/screenshots/areas/sistemas/material-issues/06-export-report.png` | `CU-SAL-07` |
-| 91 | almacen | `CAP-SAL-MAT-07-FILTER` | `build/docs/screenshots/areas/almacen/material-issues/07-filter-supplied.png` | `CU-SAL-01`, `CU-SAL-06` |
+| 91 | almacen | `CAP-SAL-MAT-07-FILTER-ALMACEN` | `build/docs/screenshots/areas/almacen/material-issues/07-filter-supplied.png` | `CU-SAL-01`, `CU-SAL-06` |
 | 92 | sistemas | `CAP-SAL-MAT-07-FILTER-SISTEMAS` | `build/docs/screenshots/areas/sistemas/material-issues/07-filter-supplied.png` | `CU-SAL-01`, `CU-SAL-06` |
-| 93 | almacen | `CAP-SAL-MAT-08-VIEW` | `build/docs/screenshots/areas/almacen/material-issues/08-query-cancelled.png` | `CU-SAL-03`, `CU-SAL-04` |
+| 93 | almacen | `CAP-SAL-MAT-08-VIEW-ALMACEN` | `build/docs/screenshots/areas/almacen/material-issues/08-query-cancelled.png` | `CU-SAL-03`, `CU-SAL-04` |
 | 94 | sistemas | `CAP-SAL-MAT-08-VIEW-SISTEMAS` | `build/docs/screenshots/areas/sistemas/material-issues/08-query-cancelled.png` | `CU-SAL-03`, `CU-SAL-04` |
-| 95 | almacen | `CAP-SAL-WAS-00-NAVIGATION` | `build/docs/screenshots/areas/almacen/waste-issues/00-access-menu-main.png` | `CU-SAL-08` |
+| 95 | almacen | `CAP-SAL-WAS-00-NAVIGATION-ALMACEN` | `build/docs/screenshots/areas/almacen/waste-issues/00-access-menu-main.png` | `CU-SAL-08` |
 | 96 | sistemas | `CAP-SAL-WAS-00-NAVIGATION-SISTEMAS` | `build/docs/screenshots/areas/sistemas/waste-issues/00-access-menu-main.png` | `CU-SAL-08` |
-| 97 | almacen | `CAP-SAL-WAS-01-LIST` | `build/docs/screenshots/areas/almacen/waste-issues/01-list.png` | `CU-SAL-08`, `CU-SAL-14` |
+| 97 | almacen | `CAP-SAL-WAS-01-LIST-ALMACEN` | `build/docs/screenshots/areas/almacen/waste-issues/01-list.png` | `CU-SAL-08`, `CU-SAL-14` |
 | 98 | sistemas | `CAP-SAL-WAS-01-LIST-SISTEMAS` | `build/docs/screenshots/areas/sistemas/waste-issues/01-list.png` | `CU-SAL-08`, `CU-SAL-14` |
-| 99 | almacen | `CAP-SAL-WAS-02-CREATE` | `build/docs/screenshots/areas/almacen/waste-issues/02-form-registration.png` | `CU-SAL-09` |
+| 99 | almacen | `CAP-SAL-WAS-02-CREATE-ALMACEN` | `build/docs/screenshots/areas/almacen/waste-issues/02-form-registration.png` | `CU-SAL-09` |
 | 100 | sistemas | `CAP-SAL-WAS-02-CREATE-SISTEMAS` | `build/docs/screenshots/areas/sistemas/waste-issues/02-form-registration.png` | `CU-SAL-09` |
-| 101 | almacen | `CAP-SAL-WAS-03-EDIT` | `build/docs/screenshots/areas/almacen/waste-issues/03-edit-header.png` | `CU-SAL-10`, `CU-SAL-11` |
+| 101 | almacen | `CAP-SAL-WAS-03-EDIT-ALMACEN` | `build/docs/screenshots/areas/almacen/waste-issues/03-edit-header.png` | `CU-SAL-10`, `CU-SAL-11` |
 | 102 | sistemas | `CAP-SAL-WAS-03-EDIT-SISTEMAS` | `build/docs/screenshots/areas/sistemas/waste-issues/03-edit-header.png` | `CU-SAL-10`, `CU-SAL-11` |
-| 103 | almacen | `CAP-SAL-WAS-04-SUPPLY` | `build/docs/screenshots/areas/almacen/waste-issues/04-supply-details.png` | `CU-SAL-12` |
+| 103 | almacen | `CAP-SAL-WAS-04-SUPPLY-ALMACEN` | `build/docs/screenshots/areas/almacen/waste-issues/04-supply-details.png` | `CU-SAL-12` |
 | 104 | sistemas | `CAP-SAL-WAS-04-SUPPLY-SISTEMAS` | `build/docs/screenshots/areas/sistemas/waste-issues/04-supply-details.png` | `CU-SAL-12` |
-| 105 | almacen | `CAP-SAL-WAS-05-RETURN` | `build/docs/screenshots/areas/almacen/waste-issues/05-return-detail.png` | `CU-SAL-13` |
+| 105 | almacen | `CAP-SAL-WAS-05-RETURN-ALMACEN` | `build/docs/screenshots/areas/almacen/waste-issues/05-return-detail.png` | `CU-SAL-13` |
 | 106 | sistemas | `CAP-SAL-WAS-05-RETURN-SISTEMAS` | `build/docs/screenshots/areas/sistemas/waste-issues/05-return-detail.png` | `CU-SAL-13` |
-| 107 | almacen | `CAP-REP-SAL-WAS-06-EXPORT` | `build/docs/screenshots/areas/almacen/waste-issues/06-export-report.png` | `CU-SAL-14` |
+| 107 | almacen | `CAP-REP-SAL-WAS-06-EXPORT-ALMACEN` | `build/docs/screenshots/areas/almacen/waste-issues/06-export-report.png` | `CU-SAL-14` |
 | 108 | sistemas | `CAP-REP-SAL-WAS-06-EXPORT-SISTEMAS` | `build/docs/screenshots/areas/sistemas/waste-issues/06-export-report.png` | `CU-SAL-14` |
-| 109 | almacen | `CAP-SAL-WAS-07-FILTER` | `build/docs/screenshots/areas/almacen/waste-issues/07-filter-supplied.png` | `CU-SAL-08`, `CU-SAL-13` |
+| 109 | almacen | `CAP-SAL-WAS-07-FILTER-ALMACEN` | `build/docs/screenshots/areas/almacen/waste-issues/07-filter-supplied.png` | `CU-SAL-08`, `CU-SAL-13` |
 | 110 | sistemas | `CAP-SAL-WAS-07-FILTER-SISTEMAS` | `build/docs/screenshots/areas/sistemas/waste-issues/07-filter-supplied.png` | `CU-SAL-08`, `CU-SAL-13` |
-| 111 | almacen | `CAP-SAL-WAS-08-VIEW` | `build/docs/screenshots/areas/almacen/waste-issues/08-query-cancelled.png` | `CU-SAL-10`, `CU-SAL-11` |
+| 111 | almacen | `CAP-SAL-WAS-08-VIEW-ALMACEN` | `build/docs/screenshots/areas/almacen/waste-issues/08-query-cancelled.png` | `CU-SAL-10`, `CU-SAL-11` |
 | 112 | sistemas | `CAP-SAL-WAS-08-VIEW-SISTEMAS` | `build/docs/screenshots/areas/sistemas/waste-issues/08-query-cancelled.png` | `CU-SAL-10`, `CU-SAL-11` |
-| 113 | almacen | `CAP-IDA-PER-00-NAVIGATION` | `build/docs/screenshots/areas/almacen/people/00-access-menu-main.png` | `CU-IDA-01` |
+| 113 | almacen | `CAP-IDA-PER-00-NAVIGATION-ALMACEN` | `build/docs/screenshots/areas/almacen/people/00-access-menu-main.png` | `CU-IDA-01` |
 | 114 | sistemas | `CAP-IDA-PER-00-NAVIGATION-SISTEMAS` | `build/docs/screenshots/areas/sistemas/people/00-access-menu-main.png` | `CU-IDA-01` |
-| 115 | almacen | `CAP-IDA-PER-01-LIST` | `build/docs/screenshots/areas/almacen/people/01-list.png` | `CU-IDA-01`, `CU-IDA-04` |
+| 115 | almacen | `CAP-IDA-PER-01-LIST-ALMACEN` | `build/docs/screenshots/areas/almacen/people/01-list.png` | `CU-IDA-01`, `CU-IDA-04` |
 | 116 | sistemas | `CAP-IDA-PER-01-LIST-SISTEMAS` | `build/docs/screenshots/areas/sistemas/people/01-list.png` | `CU-IDA-01`, `CU-IDA-04` |
-| 117 | almacen | `CAP-IDA-PER-02-CREATE` | `build/docs/screenshots/areas/almacen/people/02-form-creation.png` | `CU-IDA-02` |
+| 117 | almacen | `CAP-IDA-PER-02-CREATE-ALMACEN` | `build/docs/screenshots/areas/almacen/people/02-form-creation.png` | `CU-IDA-02` |
 | 118 | sistemas | `CAP-IDA-PER-02-CREATE-SISTEMAS` | `build/docs/screenshots/areas/sistemas/people/02-form-creation.png` | `CU-IDA-02` |
-| 119 | almacen | `CAP-IDA-PER-03-EDIT` | `build/docs/screenshots/areas/almacen/people/03-form-edit.png` | `CU-IDA-03` |
+| 119 | almacen | `CAP-IDA-PER-03-EDIT-ALMACEN` | `build/docs/screenshots/areas/almacen/people/03-form-edit.png` | `CU-IDA-03` |
 | 120 | sistemas | `CAP-IDA-PER-03-EDIT-SISTEMAS` | `build/docs/screenshots/areas/sistemas/people/03-form-edit.png` | `CU-IDA-03` |
-| 121 | almacen | `CAP-IDA-PER-04-EXPORT` | `build/docs/screenshots/areas/almacen/people/04-export-report.png` | `CU-IDA-04` |
+| 121 | almacen | `CAP-IDA-PER-04-EXPORT-ALMACEN` | `build/docs/screenshots/areas/almacen/people/04-export-report.png` | `CU-IDA-04` |
 | 122 | sistemas | `CAP-IDA-PER-04-EXPORT-SISTEMAS` | `build/docs/screenshots/areas/sistemas/people/04-export-report.png` | `CU-IDA-04` |
-| 123 | sistemas | `CAP-IDA-USR-00-NAVIGATION` | `build/docs/screenshots/areas/sistemas/users/00-access-menu-main.png` | `CU-IDA-05` |
-| 124 | sistemas | `CAP-IDA-USR-01-LIST` | `build/docs/screenshots/areas/sistemas/users/01-list.png` | `CU-IDA-05`, `CU-IDA-09` |
-| 125 | sistemas | `CAP-IDA-USR-02-CREATE` | `build/docs/screenshots/areas/sistemas/users/02-form-creation.png` | `CU-IDA-06` |
-| 126 | sistemas | `CAP-IDA-USR-03-EDIT` | `build/docs/screenshots/areas/sistemas/users/03-form-edit.png` | `CU-IDA-07` |
-| 127 | sistemas | `CAP-IDA-USR-04-PASSWORD` | `build/docs/screenshots/areas/sistemas/users/04-change-password.png` | `CU-IDA-08` |
-| 128 | sistemas | `CAP-IDA-USR-05-EXPORT` | `build/docs/screenshots/areas/sistemas/users/05-export-report.png` | `CU-IDA-09` |
-| 129 | sistemas | `CAP-REP-MOV-MAT-00-NAVIGATION` | `build/docs/screenshots/areas/sistemas/material-movements/00-access-menu-main.png` | `CU-ALM-07` |
-| 130 | sistemas | `CAP-REP-MOV-MAT-01-LIST` | `build/docs/screenshots/areas/sistemas/material-movements/01-history-and-filters.png` | `CU-ALM-07` |
-| 131 | sistemas | `CAP-REP-MOV-MAT-02-EXPORT` | `build/docs/screenshots/areas/sistemas/material-movements/02-export-report.png` | `CU-ALM-08` |
-| 132 | sistemas | `CAP-REP-MOV-WAS-00-NAVIGATION` | `build/docs/screenshots/areas/sistemas/waste-movements/00-access-menu-main.png` | `CU-ALM-15` |
-| 133 | sistemas | `CAP-REP-MOV-WAS-01-LIST` | `build/docs/screenshots/areas/sistemas/waste-movements/01-history-and-filters.png` | `CU-ALM-15` |
-| 134 | sistemas | `CAP-REP-MOV-WAS-02-EXPORT` | `build/docs/screenshots/areas/sistemas/waste-movements/02-export-report.png` | `CU-ALM-16` |
-| 135 | almacen | `CAP-ERR-404-NOT-FOUND` | `build/docs/screenshots/areas/almacen/errors/01-page-not-found.png` | Transversal |
-| 136 | sistemas | `CAP-ERR-404-SISTEMAS-NOT-FOUND` | `build/docs/screenshots/areas/sistemas/errors/01-page-not-found.png` | Transversal |
+| 123 | sistemas | `CAP-IDA-USR-00-NAVIGATION-SISTEMAS` | `build/docs/screenshots/areas/sistemas/users/00-access-menu-main.png` | `CU-IDA-05` |
+| 124 | sistemas | `CAP-IDA-USR-01-LIST-SISTEMAS` | `build/docs/screenshots/areas/sistemas/users/01-list.png` | `CU-IDA-05`, `CU-IDA-09` |
+| 125 | sistemas | `CAP-IDA-USR-02-CREATE-SISTEMAS` | `build/docs/screenshots/areas/sistemas/users/02-form-creation.png` | `CU-IDA-06` |
+| 126 | sistemas | `CAP-IDA-USR-03-EDIT-SISTEMAS` | `build/docs/screenshots/areas/sistemas/users/03-form-edit.png` | `CU-IDA-07` |
+| 127 | sistemas | `CAP-IDA-USR-04-PASSWORD-SISTEMAS` | `build/docs/screenshots/areas/sistemas/users/04-change-password.png` | `CU-IDA-08` |
+| 128 | sistemas | `CAP-IDA-USR-05-EXPORT-SISTEMAS` | `build/docs/screenshots/areas/sistemas/users/05-export-report.png` | `CU-IDA-09` |
+| 129 | sistemas | `CAP-REP-MOV-MAT-00-NAVIGATION-SISTEMAS` | `build/docs/screenshots/areas/sistemas/material-movements/00-access-menu-main.png` | `CU-ALM-07` |
+| 130 | sistemas | `CAP-REP-MOV-MAT-01-LIST-SISTEMAS` | `build/docs/screenshots/areas/sistemas/material-movements/01-history-and-filters.png` | `CU-ALM-07` |
+| 131 | sistemas | `CAP-REP-MOV-MAT-02-EXPORT-SISTEMAS` | `build/docs/screenshots/areas/sistemas/material-movements/02-export-report.png` | `CU-ALM-08` |
+| 132 | sistemas | `CAP-REP-MOV-WAS-00-NAVIGATION-SISTEMAS` | `build/docs/screenshots/areas/sistemas/waste-movements/00-access-menu-main.png` | `CU-ALM-15` |
+| 133 | sistemas | `CAP-REP-MOV-WAS-01-LIST-SISTEMAS` | `build/docs/screenshots/areas/sistemas/waste-movements/01-history-and-filters.png` | `CU-ALM-15` |
+| 134 | sistemas | `CAP-REP-MOV-WAS-02-EXPORT-SISTEMAS` | `build/docs/screenshots/areas/sistemas/waste-movements/02-export-report.png` | `CU-ALM-16` |
+| 135 | almacen | `CAP-ERR-404-NOT-FOUND-ALMACEN` | `build/docs/screenshots/areas/almacen/errors/01-page-not-found.png` | Transversal |
+| 136 | sistemas | `CAP-ERR-404-NOT-FOUND-SISTEMAS` | `build/docs/screenshots/areas/sistemas/errors/01-page-not-found.png` | Transversal |
 
 ## Cobertura adicional necesaria
 
@@ -229,9 +229,9 @@ carga inicial y la actualización filtrada del listado, y sólo entonces busca `
 tanto en salidas de material como de merma. Este recorrido reutiliza el mismo envío de filtros de
 tabla usado en compras y los
 demás listados. Para las vistas protegidas, el script abre contextos independientes e inicia sesión
-con `DOCS_WAREHOUSE_LOGIN_NAME` y `DOCS_WAREHOUSE_LOGIN_PASSWORD` para Almacén, y con
-`DOCS_ADMIN_LOGIN_NAME` y `DOCS_ADMIN_LOGIN_PASSWORD` para Sistemas. Como alternativa reutiliza
-`DOCS_WAREHOUSE_STORAGE_STATE` o `DOCS_ADMIN_STORAGE_STATE`, respectivamente. La
+con `DOCS_ALMACEN_LOGIN_NAME` y `DOCS_ALMACEN_LOGIN_PASSWORD` para Almacén, y con
+`DOCS_SISTEMAS_LOGIN_NAME` y `DOCS_SISTEMAS_LOGIN_PASSWORD` para Sistemas. Como alternativa reutiliza
+`DOCS_ALMACEN_STORAGE_STATE` o `DOCS_SISTEMAS_STORAGE_STATE`, respectivamente. La
 automatización no obtiene ni guarda esas credenciales: Playwright las escribe directamente en el
 formulario de acceso y conserva las cookies resultantes sólo en la memoria del contexto del área
 mientras genera las imágenes. No crea archivos de sesión. Las variables `DOCS_*_STORAGE_STATE`
@@ -249,8 +249,8 @@ ficticia: las credenciales pueden definirse en el mismo comando y el inicio de s
 ese momento:
 
 ```bash
-DOCS_WAREHOUSE_LOGIN_NAME='usuario-almacen' DOCS_WAREHOUSE_LOGIN_PASSWORD='valor-temporal' \
-DOCS_ADMIN_LOGIN_NAME='usuario-sistemas' DOCS_ADMIN_LOGIN_PASSWORD='otro-valor-temporal' \
+DOCS_ALMACEN_LOGIN_NAME='usuario-almacen' DOCS_ALMACEN_LOGIN_PASSWORD='valor-temporal' \
+DOCS_SISTEMAS_LOGIN_NAME='usuario-sistemas' DOCS_SISTEMAS_LOGIN_PASSWORD='otro-valor-temporal' \
 npm run docs:screenshots
 ```
 
@@ -344,8 +344,8 @@ al área visible de 1440 × 1000 píxeles, sin agregar el contenido que queda de
 En los pasos con modal se conserva el contexto visible que lo rodea; no se recorta sólo el modal.
 Sólo entonces las imágenes revisadas se referencian desde el recorrido correspondiente del
 manual. Al completar todo el
-inventario, si se proporcionaron archivos mediante `DOCS_WAREHOUSE_STORAGE_STATE` o
-`DOCS_ADMIN_STORAGE_STATE`, el script elimina automáticamente cada archivo utilizado;
+inventario, si se proporcionaron archivos mediante `DOCS_ALMACEN_STORAGE_STATE` o
+`DOCS_SISTEMAS_STORAGE_STATE`, el script elimina automáticamente cada archivo utilizado;
 si la ejecución falla, los conserva para permitir un reintento y deben eliminarse manualmente
 cuando ya no se vayan a utilizar. Las credenciales automáticas sólo permanecen en las variables del
 proceso y deben retirarse de la terminal después de generar las capturas.
