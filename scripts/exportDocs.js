@@ -7,6 +7,7 @@ import process from 'node:process';
 import { pathToFileURL } from 'node:url';
 import { bundleOpenApiContract } from './openApiContractUtils.js';
 import { getDocumentExportRequest, getDocumentOutputPlan } from './documentExportFormats.js';
+import { externalDocumentLinkLabel } from './documentExportContentUtils.js';
 import { prepareMermaidCli } from './prepareMermaidCli.js';
 import { hasInvalidSvgGeometry, normalizeMermaidSource } from './mermaidExportUtils.js';
 import { validatePdfOutput } from './pdfExportUtils.js';
@@ -326,6 +327,7 @@ const prepareLinks = (
     source,
     publicationSources,
     linkedOutputs,
+    sourceContents,
     currentOutput,
     outputFormat
 ) => content.replace(
@@ -351,7 +353,13 @@ const prepareLinks = (
             path.dirname(currentOutput),
             linkedOutput.replace(/\.docx$/, `.${ outputFormat }`)
         ).split(path.sep).join('/');
-        return `[${label}](${relativeOutput}${fragment ? `#${documentAnchor(resolvedTarget, fragment)}` : ''}${suffix})`;
+        const externalDocumentLabel = externalDocumentLinkLabel({
+            label,
+            linkedOutput,
+            fragment,
+            targetContent: sourceContents.get(resolvedTarget)
+        });
+        return `[${externalDocumentLabel}](${relativeOutput}${fragment ? `#${documentAnchor(resolvedTarget, fragment)}` : ''}${suffix})`;
     }
 );
 
@@ -380,7 +388,7 @@ const addFigureAnchors = (content, source, firstFigureNumber) => {
         /^(\s*)(!\[([^\]]+)\]\([^)]+\))$/gm,
         (figure, indentation, image, title) => (
             `${indentation}${image.replace(`![${title}]`, `![Figura ${figureNumber}. ${title}]`)}`
-            + `{#${documentAnchor(source, `figura-${figureNumber++}`)}}`
+            + `{#${documentAnchor(source, `figura-${figureNumber++}`)} width=90%}`
         )
     );
 };
@@ -395,7 +403,7 @@ const buildDocumentIndexes = async (preparedSources) => {
             title: match[2],
             link: `#${match[3]}`
         })).filter(({ level }) => level <= 3));
-        figures.push(...[...content.matchAll(/^\s*!\[([^\]]+)\]\([^)]+\)\{#([^}]+)\}$/gm)].map((match) => ({
+        figures.push(...[...content.matchAll(/^\s*!\[([^\]]+)\]\([^)]+\)\{#([^ }]+)[^}]*\}$/gm)].map((match) => ({
             title: match[1],
             link: `#${match[2]}`
         })));
@@ -516,6 +524,13 @@ const publications = await Promise.all(publicationParts.map(async ({ publication
     return { publication, document, directory, sources, imageReferences };
 }));
 
+const sourceContents = new Map((await Promise.all(
+    [...new Set(publications.flatMap(({ sources }) => sources))].map(async (source) => [
+        source,
+        await readFile(path.join(ROOT, source), 'utf8')
+    ])
+)));
+
 const linkedOutputs = new Map();
 for (const { document, directory, sources } of publications) {
     const output = directory ? path.join(directory, `${document}.docx`) : `${document}.docx`;
@@ -576,6 +591,7 @@ const prepareSource = async (source, publicationSources, firstFigureNumber, curr
         source,
         publicationSources,
         linkedOutputs,
+        sourceContents,
         currentOutput,
         outputFormat
     ), source).replace(/(!\[[^\]]*\]\()([^) ]+)/g, (reference, prefix, image) => (
