@@ -7,6 +7,7 @@ import process from 'node:process';
 import { pathToFileURL } from 'node:url';
 import { bundleOpenApiContract } from './openApiContractUtils.js';
 import { getDocumentExportRequest, getDocumentOutputPlan } from './documentExportFormats.js';
+import { externalDocumentLinkLabel } from './documentExportContentUtils.js';
 import { prepareMermaidCli } from './prepareMermaidCli.js';
 import { hasInvalidSvgGeometry, normalizeMermaidSource } from './mermaidExportUtils.js';
 import { validatePdfOutput } from './pdfExportUtils.js';
@@ -321,7 +322,15 @@ const diagramCaption = (content, index) => {
     return `Diagrama — ${heading}`;
 };
 
-const prepareLinks = (content, source, publicationSources) => content.replace(
+const prepareLinks = (
+    content,
+    source,
+    publicationSources,
+    linkedOutputs,
+    sourceContents,
+    currentOutput,
+    outputFormat
+) => content.replace(
     markdownLink,
     (reference, label, link, suffix) => {
         if (externalLink.test(link)) return reference;
@@ -333,9 +342,24 @@ const prepareLinks = (content, source, publicationSources) => content.replace(
             ROOT,
             path.resolve(ROOT, path.dirname(source), target)
         ).split(path.sep).join('/');
-        return target.endsWith('.md') && publicationSources.has(resolvedTarget)
-            ? `[${label}](#${documentAnchor(resolvedTarget, fragment)}${suffix})`
-            : label;
+        if (target.endsWith('.md') && publicationSources.has(resolvedTarget)) {
+            return `[${label}](#${documentAnchor(resolvedTarget, fragment)}${suffix})`;
+        }
+        const outputCandidates = linkedOutputs.get(resolvedTarget) ?? [];
+        const linkedOutput = outputCandidates.find(output => path.dirname(output) === path.dirname(currentOutput))
+            ?? (outputCandidates.length === 1 ? outputCandidates[0] : null);
+        if (!target.endsWith('.md') || !linkedOutput) return label;
+        const relativeOutput = path.relative(
+            path.dirname(currentOutput),
+            linkedOutput.replace(/\.docx$/, `.${ outputFormat }`)
+        ).split(path.sep).join('/');
+        const externalDocumentLabel = externalDocumentLinkLabel({
+            label,
+            linkedOutput,
+            fragment,
+            targetContent: sourceContents.get(resolvedTarget)
+        });
+        return `[${externalDocumentLabel}](${relativeOutput}${fragment ? `#${documentAnchor(resolvedTarget, fragment)}` : ''}${suffix})`;
     }
 );
 
@@ -364,7 +388,7 @@ const addFigureAnchors = (content, source, firstFigureNumber) => {
         /^(\s*)(!\[([^\]]+)\]\([^)]+\))$/gm,
         (figure, indentation, image, title) => (
             `${indentation}${image.replace(`![${title}]`, `![Figura ${figureNumber}. ${title}]`)}`
-            + `{#${documentAnchor(source, `figura-${figureNumber++}`)}}`
+            + `{#${documentAnchor(source, `figura-${figureNumber++}`)} width=90%}`
         )
     );
 };
@@ -379,7 +403,7 @@ const buildDocumentIndexes = async (preparedSources) => {
             title: match[2],
             link: `#${match[3]}`
         })).filter(({ level }) => level <= 3));
-        figures.push(...[...content.matchAll(/^\s*!\[([^\]]+)\]\([^)]+\)\{#([^}]+)\}$/gm)].map((match) => ({
+        figures.push(...[...content.matchAll(/^\s*!\[([^\]]+)\]\([^)]+\)\{#([^ }]+)[^}]*\}$/gm)].map((match) => ({
             title: match[1],
             link: `#${match[2]}`
         })));
@@ -500,6 +524,23 @@ const publications = await Promise.all(publicationParts.map(async ({ publication
     return { publication, document, directory, sources, imageReferences };
 }));
 
+const sourceContents = new Map((await Promise.all(
+    [...new Set(publications.flatMap(({ sources }) => sources))].map(async (source) => [
+        source,
+        await readFile(path.join(ROOT, source), 'utf8')
+    ])
+)));
+
+const linkedOutputs = new Map();
+for (const { document, directory, sources } of publications) {
+    const output = directory ? path.join(directory, `${document}.docx`) : `${document}.docx`;
+    for (const source of sources) {
+        const outputs = linkedOutputs.get(source) ?? [];
+        if (!outputs.includes(output)) outputs.push(output);
+        linkedOutputs.set(source, outputs);
+    }
+}
+
 if (checkOnly) {
     for (const { publication, document, sources, imageReferences } of publications) {
         console.log(`Paquete ${publication}/${document}: ${sources.length} fuentes y ${imageReferences.length} imágenes válidas.`);
@@ -539,13 +580,21 @@ await Promise.all([
 ]);
 const mermaidExecutable = path.join(ROOT, 'node_modules', '@mermaid-js', 'mermaid-cli', 'src', 'cli.js');
 
-const prepareSource = async (source, publicationSources, firstFigureNumber) => {
+const prepareSource = async (source, publicationSources, firstFigureNumber, currentOutput, outputFormat) => {
     const content = await readFile(path.join(ROOT, source), 'utf8');
     const blocks = [...content.matchAll(mermaidBlock)];
 
     const renderedSource = path.join(temporaryDirectory, source);
     await mkdir(path.dirname(renderedSource), { recursive: true });
-    let renderedContent = addInternalAnchors(prepareLinks(content, source, publicationSources), source).replace(/(!\[[^\]]*\]\()([^) ]+)/g, (reference, prefix, image) => (
+    let renderedContent = addInternalAnchors(prepareLinks(
+        content,
+        source,
+        publicationSources,
+        linkedOutputs,
+        sourceContents,
+        currentOutput,
+        outputFormat
+    ), source).replace(/(!\[[^\]]*\]\()([^) ]+)/g, (reference, prefix, image) => (
         `${prefix}${path.resolve(ROOT, path.dirname(source), image)}`
     ));
     for (const match of blocks) {
@@ -623,7 +672,13 @@ try {
         const publicationSources = new Set(sources);
         let nextFigureNumber = 1;
         for (const source of sources) {
-            const prepared = await prepareSource(source, publicationSources, nextFigureNumber);
+            const prepared = await prepareSource(
+                source,
+                publicationSources,
+                nextFigureNumber,
+                relativeDocxOutput,
+                'docx'
+            );
             if (!prepared) {
                 failedStatus = 1;
                 break;
@@ -657,6 +712,52 @@ try {
             console.log(`Documento DOCX generado en ${path.relative(ROOT, docxOutput)}.`);
         }
         if (outputPlan.generatePdf) {
+            let conversionInput = docxOutput;
+            const pdfPreparedSources = [];
+            let pdfFigureNumber = 1;
+            for (const source of sources) {
+                const prepared = await prepareSource(
+                    source,
+                    publicationSources,
+                    pdfFigureNumber,
+                    relativePdfOutput,
+                    'pdf'
+                );
+                if (!prepared) {
+                    failedStatus = 1;
+                    break;
+                }
+                pdfPreparedSources.push(prepared.renderedSource);
+                pdfFigureNumber = prepared.nextFigureNumber;
+            }
+            if (failedStatus) break;
+            const pdfFirstSource = pdfPreparedSources[0];
+            const pdfFirstContent = await readFile(pdfFirstSource, 'utf8');
+            await writeFile(pdfFirstSource, insertAfterDocumentData(
+                pdfFirstContent,
+                await buildDocumentIndexes(pdfPreparedSources)
+            ));
+            conversionInput = path.join(temporaryDirectory, 'pdf-input', relativeDocxOutput);
+            await mkdir(path.dirname(conversionInput), { recursive: true });
+            const pdfDocxArguments = [
+                ...pdfPreparedSources.map(source => path.relative(temporaryDirectory, source)),
+                '--from=markdown+header_attributes+implicit_figures',
+                '--standalone',
+                '--metadata=lang:es-MX',
+                `--output=${conversionInput}`,
+                `--resource-path=${[ROOT, path.join(ROOT, 'docs')].join(path.delimiter)}`
+            ];
+            if (process.env.DOCS_REFERENCE_DOC) {
+                pdfDocxArguments.push(`--reference-doc=${process.env.DOCS_REFERENCE_DOC}`);
+            }
+            const pdfDocxResult = spawnSync('pandoc', pdfDocxArguments, {
+                cwd: temporaryDirectory,
+                stdio: 'inherit'
+            });
+            if (pdfDocxResult.error || pdfDocxResult.status !== 0 || !existsSync(conversionInput)) {
+                failedStatus = pdfDocxResult.status ?? 1;
+                break;
+            }
             const conversion = spawnSync(pdfConverter, [
                 `-env:UserInstallation=${pathToFileURL(path.join(temporaryDirectory, 'libreoffice-profile')).href}`,
                 '--headless',
@@ -664,7 +765,7 @@ try {
                 'pdf',
                 '--outdir',
                 path.dirname(pdfOutput),
-                docxOutput
+                conversionInput
             ], {
                 cwd: ROOT,
                 env: preparePdfConverterEnvironment(),

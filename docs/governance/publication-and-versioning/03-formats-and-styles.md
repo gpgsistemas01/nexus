@@ -46,6 +46,8 @@ Todas las figuras de un paquete reciben una leyenda correlativa `Figura N. …`,
 el índice y asociada a la misma referencia interna que la imagen. La numeración se materializa
 durante cada exportación, en vez de depender de campos `SEQ` de Word, para que DOCX y PDF
 publiquen el mismo número y para que los paquetes generados sin Microsoft Word sean completos.
+Cada figura se ajusta como máximo al `90 %` del ancho disponible y conserva su proporción para
+evitar que una captura o un diagrama sobrepase los márgenes de la página.
 
 Las anclas explícitas que preceden a un encabezado se preparan como un bloque independiente.
 La separación evita que Pandoc interprete el encabezado y su atributo interno como texto visible;

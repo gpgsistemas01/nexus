@@ -18,17 +18,19 @@ if (argumentCaptureArea && environmentCaptureArea && argumentCaptureArea !== env
 const selectedCaptureArea = argumentCaptureArea ?? environmentCaptureArea;
 const captureAreaPrefix = selectedCaptureArea?.toUpperCase();
 const authenticatedAreas = Object.freeze({
-    warehouse: {
+    almacen: {
         label: 'Almacén',
-        loginName: process.env.DOCS_WAREHOUSE_LOGIN_NAME,
-        loginPassword: process.env.DOCS_WAREHOUSE_LOGIN_PASSWORD,
-        storageState: process.env.DOCS_WAREHOUSE_STORAGE_STATE
+        environmentPrefix: 'ALMACEN',
+        loginName: process.env.DOCS_ALMACEN_LOGIN_NAME,
+        loginPassword: process.env.DOCS_ALMACEN_LOGIN_PASSWORD,
+        storageState: process.env.DOCS_ALMACEN_STORAGE_STATE
     },
-    administration: {
+    sistemas: {
         label: 'Sistemas',
-        loginName: process.env.DOCS_ADMIN_LOGIN_NAME,
-        loginPassword: process.env.DOCS_ADMIN_LOGIN_PASSWORD,
-        storageState: process.env.DOCS_ADMIN_STORAGE_STATE
+        environmentPrefix: 'SISTEMAS',
+        loginName: process.env.DOCS_SISTEMAS_LOGIN_NAME,
+        loginPassword: process.env.DOCS_SISTEMAS_LOGIN_PASSWORD,
+        storageState: process.env.DOCS_SISTEMAS_STORAGE_STATE
     }
 });
 const requestedCaptureIds = (process.env[`DOCS_${ captureAreaPrefix }_CAPTURE_IDS`] ?? '')
@@ -202,11 +204,14 @@ const captures = captureTemplates.flatMap(capture => {
     }
     return [
         capture,
-        { ...capture, id: `${ capture.id }-SISTEMAS`, area: 'sistemas' }
+        { ...capture, area: 'sistemas' }
     ];
-});
+}).map(capture => ({
+    ...capture,
+    id: `${ capture.id.replace(/-(?:ALMACEN|SISTEMAS)(?=-|$)/, '') }-${ capture.area.toUpperCase() }`
+}));
 
-const authenticationArea = area => area === 'almacen' ? 'warehouse' : 'administration';
+const authenticationArea = area => area;
 
 const validateInventory = () => {
     const ids = new Set();
@@ -490,9 +495,9 @@ if (recoverMissingCaptures && !selectedCaptures.length) {
 const protectedCaptures = selectedCaptures.filter(item => !item.unauthenticated);
 const selectedAreas = [...new Set(protectedCaptures.map(capture => authenticationArea(capture.area)))];
 for (const area of selectedAreas) {
-    const { label, loginName, loginPassword, storageState } = authenticatedAreas[area];
+    const { label, environmentPrefix, loginName, loginPassword, storageState } = authenticatedAreas[area];
     if (Boolean(loginName) !== Boolean(loginPassword)) {
-        throw new Error(`DOCS_${ area === 'warehouse' ? 'WAREHOUSE' : 'ADMIN' }_LOGIN_NAME y DOCS_${ area === 'warehouse' ? 'WAREHOUSE' : 'ADMIN' }_LOGIN_PASSWORD deben definirse juntos.`);
+        throw new Error(`DOCS_${ environmentPrefix }_LOGIN_NAME y DOCS_${ environmentPrefix }_LOGIN_PASSWORD deben definirse juntos.`);
     }
     if (storageState && loginName) {
         throw new Error(`Use credenciales automáticas o el archivo de sesión de ${ label }, no ambos mecanismos.`);
@@ -517,7 +522,7 @@ if (requestedCaptureIds.length || requestedCaptureFrom || recoverMissingCaptures
 } else {
     // Una ejecución completa sustituye todo el inventario. Una ejecución selectiva
     // conserva las capturas no solicitadas para poder reintentar únicamente las fallidas.
-    await rm(outputRoot, { recursive: true, force: true });
+    await rm(path.join(outputRoot, 'areas', selectedCaptureArea), { recursive: true, force: true });
 }
 
 const { chromium } = await import('playwright');

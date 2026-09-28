@@ -16,7 +16,7 @@
    🟨 **ADVERTENCIA:** surtir descuenta existencias. Confirme el material y la cantidad de cada
    renglón seleccionado antes de continuar.
 
-3. Revise la existencia y seleccione **Editar detalles de la**.
+3. Revise la existencia y seleccione **Surtir**.
 
 Después de confirmar, compruebe cuáles renglones quedaron surtidos y la existencia mostrada. Si el
 resultado es incierto, actualice la salida antes de intentar surtir nuevamente.
