@@ -4,7 +4,7 @@ Los paquetes `manual-administrador` y `manual-almacen`
 incluyen capturas de la aplicación, pero `docs:export` **no toma capturas ni abre Nexus**. Antes de
 exportar uno de esos paquetes se requieren:
 
-- las herramientas indicadas en [Preparar las herramientas](#preparar-las-herramientas);
+- las herramientas indicadas en [Preparar las herramientas](03-prepare-the-tools.md);
 - todos los Markdown del paquete actualizados;
 - todas las imágenes referenciadas presentes en `docs/user-manual/images/`, revisadas y
   correspondientes a la versión del manual.

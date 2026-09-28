@@ -10,19 +10,10 @@ La exportación de los manuales y la generación de capturas son procesos separa
   versionadas. `build/` está ignorado por Git, por lo que las capturas pueden conservarse y
   entregarse como artefactos separados.
 
-## Exportar todos los documentos
-
-Valide primero todos los paquetes y genere el formato requerido igual que para el resto de la
-documentación:
-
-```powershell
-npm run docs:export -- todos --check
-npm run docs:export -- todos docx
-```
-
-Puede sustituir `docx` por `pdf` o `ambos`. Este paso es independiente de las sesiones de
-Playwright: no requiere iniciar Nexus, preparar una base de datos ni definir variables
-`DOCS_*_STORAGE_STATE`.
+La sintaxis completa de ambos scripts se concentra en [Comandos](04-commands.md). Para exportar
+todos los documentos consulte el [flujo general de exportación](06-flow-general-of-export.md). Ese
+flujo es independiente de las sesiones de Playwright: no requiere iniciar Nexus, preparar una base
+de datos ni definir variables `DOCS_*_STORAGE_STATE`.
 
 ## Generar las capturas por área
 
@@ -33,8 +24,8 @@ archivo de sesión temporal con Playwright para un área y ejecutar inmediatamen
 Antes de comenzar:
 
 1. Prepare una base de prueba con los permisos y registros ficticios de
-   [Datos de prueba requeridos](user-manual/screenshot-inventory.md#datos-de-prueba-requeridos) y
-   complete la [configuración inicial de Nexus](../README.md#configuración-inicial). No utilice
+   [Datos de prueba requeridos](../../user-manual/screenshot-inventory.md#datos-de-prueba-requeridos) y
+   complete la [configuración inicial de Nexus](../../../README.md#configuración-inicial). No utilice
    producción ni datos personales reales.
 2. Desde la raíz del repositorio, inicie Nexus en una primera terminal y déjela abierta durante la
    preparación de las dos sesiones y las dos ejecuciones de capturas:
@@ -121,7 +112,7 @@ build/docs/screenshots/areas/sistemas/
 ```
 
 Revise los PNG conforme a
-[Revisión antes de publicar](user-manual/screenshot-inventory.md#revisión-antes-de-publicar). Una
+[Revisión antes de publicar](../../user-manual/screenshot-inventory.md#revisión-antes-de-publicar). Una
 pantalla compartida se captura una vez por área para conservar la interfaz que realmente produce
 cada sesión.
 
