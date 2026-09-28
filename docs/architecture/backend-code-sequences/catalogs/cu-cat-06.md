@@ -32,11 +32,11 @@ sequenceDiagram
         Route->>Controller: registerClient(req, res)
         activate Controller
         Controller->>ClientDto: createClientDtoForRegister(req.body)
-        ClientDto-->>Controller: clientDto normalizado
+        ClientDto-->>Controller: createClientDtoForRegister(): Object (clientDto)
         Controller->>Domain: clientService.createClient({ clientDto }) persiste Client
         activate Domain
         alt Servicio resuelto
-            Domain-->>Controller: clientService.createClient() devuelve client creado y persistido
+            Domain-->>Controller: clientService.createClient(): Promise[Client]
             Controller-->>Client: HTTP 2xx { code, data }
         else AppError propagado
             Domain-->>Controller: throw AppError { code, message, meta, statusCode }

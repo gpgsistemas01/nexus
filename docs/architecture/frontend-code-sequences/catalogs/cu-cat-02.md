@@ -34,10 +34,13 @@ sequenceDiagram
         HTTP->>Transport: POST /api/warehouse/suppliers
         alt Alta resuelta
             Transport-->>HTTP: HTTP 200 { code, data: { supplier } }
-            HTTP-->>Request: apiRequest() resuelve response.data
-            Request-->>Application: registerSupplierRequest() resuelve response.data
-            Application-->>View: registerSupplier() devuelve { message, data: supplier }
-            View->>View: handleSubmit(...) ejecuta notifications.showSuccess,<br/>closeModal(form) y reloadMainTable({ resetPaging: true })
+            HTTP-->>Request: apiRequest(): Promise[AxiosResponse]
+            Request-->>Application: registerSupplierRequest(): Promise[AxiosResponse]
+            Application-->>View: registerSupplier(): Promise[{ message: string, data: Supplier }]
+            View->>View: handleSubmit(...)
+            View->>View: notifications.showSuccess(...)
+            View->>View: closeModal(form)
+            View->>View: reloadMainTable({ resetPaging: true })
             opt form.onSave definido por el selector operativo
                 View->>Select: form.onSave(supplier)
                 Select->>Select: toggleSupplierOption(...) agrega y selecciona
@@ -45,9 +48,9 @@ sequenceDiagram
             end
         else Alta rechazada
             Transport-->>HTTP: HTTP error { code, message, meta }
-            HTTP-->>Request: apiRequest() rechaza error normalizado
-            Request-->>Application: registerSupplierRequest() propaga error
-            Application-->>View: registerSupplier() rechaza
+            HTTP-->>Request: apiRequest(): throw { status: number, data: Object | null, message: string, raw: Error }
+            Request-->>Application: registerSupplierRequest(): throw { status: number, data: Object | null, message: string, raw: Error }
+            Application-->>View: registerSupplier(): throw { status: number, data: Object | null, message: string, raw: Error }
             View-->>Browser: useForm conserva supplierForm y handleApiError muestra el error
         end
     end

@@ -17,7 +17,7 @@ sequenceDiagram
     Controller->>Domain: goodsIssueService.findAllGoodsIssues({ query: req.query }) consulta documentos y estados
     activate Domain
     alt Servicio resuelto
-        Domain-->>Controller: goodsIssueService.findAllGoodsIssues() devuelve { data, recordsTotal, recordsFiltered } para la tabla solicitada
+        Domain-->>Controller: goodsIssueService.findAllGoodsIssues(): Promise[{ data: GoodsIssue[], recordsTotal: number, recordsFiltered: number }]
         Controller-->>Client: HTTP 2xx { code, data }
     else AppError propagado
         Domain-->>Controller: throw AppError { code, message, meta, statusCode }

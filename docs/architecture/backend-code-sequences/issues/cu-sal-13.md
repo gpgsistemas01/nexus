@@ -30,7 +30,7 @@ sequenceDiagram
     else Pipeline aceptado
         Router->>Controller: registerWasteIssueDetailReturn(req, res)
         Controller->>ReturnDto: createWasteIssueDtoForReturn(req.body)
-        ReturnDto-->>Controller: returnDto normalizado
+        ReturnDto-->>Controller: createWasteIssueDtoForReturn(): Object (returnDto)
         Controller->>Service: returnWasteIssueDetail({ id, detailId, returnDto, userId })
         Service->>Prisma: getDb().$transaction(async tx => ...)
         Service->>Prisma: tx.wasteIssueDetail.findFirst({ where: { id: detailId, wasteIssueId: id } })
@@ -47,7 +47,7 @@ sequenceDiagram
                 Service->>Prisma: tx.wasteIssue.update({ where: { id }, data })
             end
             Prisma-->>Service: salida de merma actualizada y commit
-            Service-->>Controller: wasteIssueReturn
+            Service-->>Controller: returnWasteIssueDetail(): Promise[WasteIssueReturn]
             Controller->>Socket: emitInventoryUpdated({ context: 'waste', source: 'waste-issue-return-created' })
             Controller-->>Client: 200 devolución registrada
         end

@@ -48,16 +48,19 @@ sequenceDiagram
         HTTP->>Transport: envía POST /api/warehouse/goods-issues
         alt Alta resuelta
             Transport-->>HTTP: HTTP 200 { code, data: { goodsIssue } }
-            HTTP-->>Request: apiRequest() resuelve response.data
-            Request-->>Application: registerGoodsIssueRequest() resuelve response.data
-            Application-->>View: registerGoodsIssue() devuelve { message }
-            View->>View: handleSubmit(...) ejecuta notifications.showSuccess,<br/>closeModal(form) y reloadMainTable({ resetPaging: true })
+            HTTP-->>Request: apiRequest(): Promise[AxiosResponse]
+            Request-->>Application: registerGoodsIssueRequest(): Promise[AxiosResponse]
+            Application-->>View: registerGoodsIssue(): Promise[{ message: string }]
+            View->>View: handleSubmit(...)
+            View->>View: notifications.showSuccess(...)
+            View->>View: closeModal(form)
+            View->>View: reloadMainTable({ resetPaging: true })
             View-->>Browser: modal cerrado y #table recargada
         else Alta rechazada
             Transport-->>HTTP: HTTP error { code, message, meta }
-            HTTP-->>Request: apiRequest() rechaza error normalizado
-            Request-->>Application: registerGoodsIssueRequest() propaga error
-            Application-->>View: registerGoodsIssue() rechaza
+            HTTP-->>Request: apiRequest(): throw { status: number, data: Object | null, message: string, raw: Error }
+            Request-->>Application: registerGoodsIssueRequest(): throw { status: number, data: Object | null, message: string, raw: Error }
+            Application-->>View: registerGoodsIssue(): throw { status: number, data: Object | null, message: string, raw: Error }
             View-->>Browser: useForm conserva goodsIssueForm y handleApiError muestra el error
         end
         deactivate Application

@@ -1,10 +1,10 @@
 # 7. Exportar los manuales
 
-Los paquetes `manual-administrador` y `manual-almacen`
-incluyen capturas de la aplicación, pero `docs:export` **no toma capturas ni abre Nexus**. Antes de
-exportar uno de esos paquetes se requieren:
+El paquete `manuales`
+incluye capturas de la aplicación, pero `docs:export` **no toma capturas ni abre Nexus**. Antes de
+exportarlo se requieren:
 
-- las herramientas indicadas en [Preparar las herramientas](#preparar-las-herramientas);
+- las herramientas indicadas en [Preparar las herramientas](03-prepare-the-tools.md);
 - todos los Markdown del paquete actualizados;
 - todas las imágenes referenciadas presentes en `docs/user-manual/images/`, revisadas y
   correspondientes a la versión del manual.
@@ -13,12 +13,13 @@ Si se cumplen esos requisitos, no necesita una base de datos, una sesión ni Pla
 exportar. Valide y genere el manual:
 
 ```bash
-npm run docs:export -- manual-administrador --check
-npm run docs:export -- manual-administrador docx
+npm run docs:export -- manuales --check
+npm run docs:export -- manuales docx
 ```
 
-Sustituya `manual-administrador` por `manual-almacen` y `docx` por `pdf` cuando corresponda. Use
-`ambos` si desea solicitar explícitamente los dos formatos con un solo comando. Si falta una
+La exportación siempre genera todos los documentos de los dos actores; no acepta un actor ni una
+sección específica. Sustituya `docx` por `pdf` cuando corresponda o use `ambos` si desea solicitar
+explícitamente los dos formatos con un solo comando. Si falta una
 imagen, `--check` detiene el proceso; en ese caso ejecute primero el flujo independiente siguiente.
 
 El resultado se organiza primero por actor y después según los módulos visibles de `navList.ejs`,

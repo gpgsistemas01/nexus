@@ -36,15 +36,15 @@ sequenceDiagram
         HTTP->>Transport: POST /api/warehouse/materials { data }
         alt HTTP 200
             Transport-->>HTTP: { material: supplierMaterial, code }
-            HTTP-->>Request: apiRequest() resuelve response.data
-            Request-->>Application: registerMaterialRequest() resuelve response.data
-            Application-->>View: registerMaterial() resuelve supplierMaterial
+            HTTP-->>Request: apiRequest(): Promise[AxiosResponse]
+            Request-->>Application: registerMaterialRequest(): Promise[AxiosResponse]
+            Application-->>View: registerMaterial(): Promise[{ message: string, data: SupplierMaterial }]
             View-->>Browser: onSave(supplierMaterial) y cierre del modal
         else HTTP 4xx/5xx
             Transport-->>HTTP: { code, message, meta }
-            HTTP-->>Request: apiRequest() rechaza error normalizado
-            Request-->>Application: registerMaterialRequest() propaga error
-            Application-->>View: registerMaterial() rechaza
+            HTTP-->>Request: apiRequest(): throw { status: number, data: Object | null, message: string, raw: Error }
+            Request-->>Application: registerMaterialRequest(): throw { status: number, data: Object | null, message: string, raw: Error }
+            Application-->>View: registerMaterial(): throw { status: number, data: Object | null, message: string, raw: Error }
             View-->>Browser: handleSubmit() conserva formulario y muestra mensaje
         end
         deactivate Application

@@ -17,10 +17,11 @@ sequenceDiagram
     participant ErrorHandler as src/app.js
 
     Client->>Route: GET /api/warehouse/wastes/material-templates
-    Route->>Auth: verifyApiTokenRequired(req, res, next) y authorizeUserApi(PERMISSIONS.WASTES_READ)
+    Route->>Auth: verifyApiTokenRequired(req, res, next)
+    Route->>Auth: authorizeUserApi(PERMISSIONS.WASTES_READ)(req, res, next)
     Route->>Controller: getWasteMaterialTemplates(req, res)
     Controller->>Domain: findWasteMaterialTemplates({ search, skip, take, supplierId })
-    Domain-->>Controller: plantillas activas de material, presentación y unidad
+    Domain-->>Controller: findWasteMaterialTemplates(): Promise[Object[]]
     Controller-->>Client: HTTP 200 { code, data: templates }
 
     Client->>Route: POST /api/warehouse/wastes
@@ -37,9 +38,9 @@ sequenceDiagram
         Route->>Controller: registerWaste(req, res)
         activate Controller
         Controller->>WasteDto: createWasteDtoForRegister(req.body)
-        WasteDto-->>Controller: wasteDto normalizado
+        WasteDto-->>Controller: createWasteDtoForRegister(): Object (wasteDto)
         Controller->>Formatter: sanitizeEmptyStrings(wasteDto)
-        Formatter-->>Controller: sanitizedWasteDto
+        Formatter-->>Controller: sanitizeEmptyStrings(): Object (sanitizedWasteDto)
         Controller->>Domain: createWasteWithInitialStockAdjustment({ wasteDto: sanitizedWasteDto, userId: req.user.id })
         activate Domain
         Domain->>Domain: findWasteByIdentity({ tx, supplierId, name, base, height })
@@ -49,7 +50,7 @@ sequenceDiagram
             Domain->>Domain: createWasteWithInitialStockAdjustment({ wasteDto, userId }) crea merma, ajuste y movimiento inicial
         end
         alt Registro confirmado
-            Domain-->>Controller: merma con existencia inicial y relaciones persistidas
+            Domain-->>Controller: createWasteWithInitialStockAdjustment(): Promise[Waste]
             Controller->>Socket: emitInventoryUpdated({ context: 'waste', source: 'waste-created' })
             Controller-->>Client: HTTP 2xx { code, data }
         else AppError propagado

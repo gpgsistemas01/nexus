@@ -41,7 +41,7 @@ sequenceDiagram
     else Pipeline aceptado
         Router->>Controller: registerGoodsReceipt(req, res)
         Controller->>ReceiptDto: createGoodsReceiptDtoForRegister(req.body)
-        ReceiptDto-->>Controller: goodsReceiptDto
+        ReceiptDto-->>Controller: createGoodsReceiptDtoForRegister(): Object (goodsReceiptDto)
         Controller->>Controller: sanitizeEmptyStrings(goodsReceiptDto)
         Controller->>Service: createGoodsReceipt({ goodsReceiptDto: sanitizedGoodsReceiptDto })
         activate Service
@@ -49,20 +49,21 @@ sequenceDiagram
         Service->>Invoice: assertGoodsReceiptInvoiceAvailable({ supplierId, invoice })
         Service->>Person: findPersonById({ id: receivedById })
         Service->>DetailBuilder: buildGoodsReceiptDetails(details, { supplierId })
-        DetailBuilder-->>Service: processedDetails
+        DetailBuilder-->>Service: buildGoodsReceiptDetails(): Promise[Object[]]
         Service->>DetailBuilder: calculateGoodsReceiptTotals(processedDetails)
-        DetailBuilder-->>Service: totals
+        DetailBuilder-->>Service: calculateGoodsReceiptTotals(): Object
         Service->>Prisma: getDb().$transaction(async tx => ...)
         Service->>Reference: generateYearlyReferenceNumber({ type: GOODS_RECEIPT, tx })
-        Reference-->>Service: referenceNumber
+        Reference-->>Service: generateYearlyReferenceNumber(): Promise[string]
         Service->>Prisma: tx.goodsReceipt.create({ data: encabezado, totals, processedDetails })
-        Prisma-->>Service: goodsReceipt con details
+        Prisma-->>Service: create(): Promise[GoodsReceipt]
         Service->>Inventory: applyInventoryMovement({ tx, reference, details, movementType: ENTRY })
-        Inventory->>Prisma: tx.supplierMaterial.update(...) y tx.movement.create(...)
+        Inventory->>Prisma: tx.supplierMaterial.update(...)
+        Inventory->>Prisma: tx.movement.create(...)
         Prisma-->>Service: commit
         Service->>Material: updateMaterialUnitCostIfHigher({ supplierId, details })
-        Material-->>Service: updateMaterialUnitCostIfHigher() resuelve después del commit
-        Service-->>Controller: goodsReceipt
+        Material-->>Service: updateMaterialUnitCostIfHigher(): Promise[void]
+        Service-->>Controller: createGoodsReceipt(): Promise[GoodsReceipt]
         deactivate Service
         Controller->>Socket: emitInventoryUpdated({ context: 'material', source: 'goods-receipt-created' })
         Controller-->>Browser: HTTP 200 { goodsReceipt, code }

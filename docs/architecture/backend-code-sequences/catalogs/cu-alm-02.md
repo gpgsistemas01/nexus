@@ -34,16 +34,16 @@ sequenceDiagram
         Route->>Controller: registerMaterial(req, res)
         Controller->>MaterialDto: createMaterialDtoForRegister(req.body)
         alt req.body.creationContext es goodsReceipt
-            MaterialDto-->>Controller: materialDto sin maxUnitCost, newStock ni observations
+            MaterialDto-->>Controller: createMaterialDtoForRegister(): Object (materialDto)
         else Alta directa de material
-            MaterialDto-->>Controller: materialDto con maxUnitCost, newStock y observations
+            MaterialDto-->>Controller: createMaterialDtoForRegister(): Object (materialDto)
         end
         Controller->>Controller: sanitizeEmptyStrings(materialDto)
         Controller->>Domain: createMaterial({ materialDto: sanitizedMaterialDto, userId: req.user.id })
         activate Domain
         Domain->>Prisma: getDb().$transaction(async tx => ...)
         Domain->>Helpers: prepareMaterialData({ tx, materialDto: materialData })
-        Helpers-->>Domain: { rest, relations }
+        Helpers-->>Domain: prepareMaterialData(): Promise[Object ({ rest, relations })]
         Domain->>Prisma: tx.material.findFirst({ identidad })
         alt Identidad existente
             Domain->>Prisma: tx.supplierMaterial.findUnique({ supplierId_materialId })
@@ -52,18 +52,18 @@ sequenceDiagram
             end
         else Identidad nueva
             Domain->>Prisma: tx.material.create({ data: buildMaterialData(...) })
-            Prisma-->>Domain: { id: materialId }
+            Prisma-->>Domain: create(): Promise[{ id: number }]
         end
         Domain->>Relations: syncSupplierMaterial({ tx, supplierId, materialId, maxUnitCost, isActive })
         opt Alta directa con newStock
             Domain->>Reason: findInitialStockAdjustmentReason({ tx })
-            Reason-->>Domain: initialStockReason
+            Reason-->>Domain: findInitialStockAdjustmentReason(): Promise[Object]
             Domain->>Adjustment: createStockAdjustment({ tx, materialId, supplierId, reasonId, observations, newStock, userId })
         end
         Domain->>SupplierMaterial: findSupplierMaterialByIds({ tx, materialId, supplierId })
-        SupplierMaterial-->>Domain: supplierMaterial
+        SupplierMaterial-->>Domain: findSupplierMaterialByIds(): Promise[SupplierMaterial]
         Prisma-->>Domain: commit
-        Domain-->>Controller: supplierMaterial
+        Domain-->>Controller: createMaterial(): Promise[SupplierMaterial]
         Controller-->>Client: HTTP 200 { material: supplierMaterial, code }
         opt AppError o error de persistencia
             Domain-->>Controller: throw AppError { code, message, meta, statusCode }

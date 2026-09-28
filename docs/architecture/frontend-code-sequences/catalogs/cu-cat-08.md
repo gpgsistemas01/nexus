@@ -17,20 +17,20 @@ sequenceDiagram
     Initiator->>Browser: inicia CU-CAT-08 — Generar reporte de clientes
     Browser->>View: Botón Excel de clientDatatable.js
     View->>Dialog: showFilteredExportDialog()
-    Dialog-->>View: Promise<boolean> con confirmación o cancelación
+    Dialog-->>View: showFilteredExportDialog(): Promise[boolean]
     View->>Application: exportClientReport({ params })
     Application->>Request: exportClientReportRequest({ params })
     activate Application
     Request->>HTTP: apiRequest({ method: 'get', url, params })
     HTTP->>Transport: descarga GET /api/sales/reports/clients/excel
     Transport-->>HTTP: HTTP 2xx { code, data }
-    HTTP-->>Request: apiRequest() resuelve response.data
-    Request-->>Application: exportClientReportRequest() resuelve response.data
+    HTTP-->>Request: apiRequest(): Promise[AxiosResponse]
+    Request-->>Application: exportClientReportRequest(): Promise[AxiosResponse]
     alt Respuesta exitosa
-        Application-->>View: exportClientReport() resuelve response.data
+        Application-->>View: exportClientReport(): Promise[Blob]
         View-->>Browser: DOM o DataTable actualizado con response.data
     else Respuesta rechazada
-        Application-->>View: error Axios normalizado { code, message, meta }
+        Application-->>View: throw { status: number, data: Object | null, message: string, raw: Error }
         View-->>Browser: formulario o filtros conservados, mensaje visible
     end
     deactivate Application

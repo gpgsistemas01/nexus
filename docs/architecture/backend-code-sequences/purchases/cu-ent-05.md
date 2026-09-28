@@ -17,7 +17,7 @@ sequenceDiagram
     Controller->>Domain: cancelGoodsReceiptDetailLine({ id: req.params.id, detailId: req.params.detailId, userId: req.user.id }) revierte stock/movimiento y conserva historial
     activate Domain
     alt Servicio resuelto
-        Domain-->>Controller: cancelGoodsReceiptDetailLine() devuelve detalle cancelado, stock revertido y totales recalculados
+        Domain-->>Controller: cancelGoodsReceiptDetailLine(): Promise[{ updatedDetail: GoodsReceiptDetail, updatedReceipt: GoodsReceipt, detailChange: GoodsReceiptDetailChange, movement: Object }]
         Controller-->>Client: HTTP 2xx { code, data }
     else AppError propagado
         Domain-->>Controller: throw AppError { code, message, meta, statusCode }

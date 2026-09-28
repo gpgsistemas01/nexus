@@ -1,12 +1,16 @@
 const DEFAULT_PUBLICATION = 'todos';
 const DEFAULT_FORMAT = 'ambos';
+const EXPORT_FORMATS = new Set(['docx', 'pdf', 'ambos']);
 
 export const getDocumentExportRequest = (argumentsList = []) => {
     const positionalArguments = argumentsList.filter((argument) => argument !== '--check');
+    const [publication = DEFAULT_PUBLICATION, documentOrFormat, explicitFormat] = positionalArguments;
+    const hasDocument = Boolean(documentOrFormat && !EXPORT_FORMATS.has(documentOrFormat));
 
     return {
-        publication: positionalArguments[0] ?? DEFAULT_PUBLICATION,
-        format: positionalArguments[1] ?? DEFAULT_FORMAT,
+        publication,
+        document: hasDocument ? documentOrFormat : null,
+        format: (hasDocument ? explicitFormat : documentOrFormat) ?? DEFAULT_FORMAT,
         checkOnly: argumentsList.includes('--check')
     };
 };

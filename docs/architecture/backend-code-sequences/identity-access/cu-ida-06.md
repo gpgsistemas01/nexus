@@ -28,11 +28,11 @@ sequenceDiagram
         Route->>Controller: registerUser(req, res)
         activate Controller
         Controller->>UserDto: createUserDtoForRegister(req.body)
-        UserDto-->>Controller: userDto normalizado
+        UserDto-->>Controller: createUserDtoForRegister(): Object (userDto)
         Controller->>Domain: userService.createUser({ userDto }) crea cuenta, contraseña cifrada y acceso
         activate Domain
         alt Servicio resuelto
-            Domain-->>Controller: userService.createUser() devuelve user creado y persistido
+            Domain-->>Controller: userService.createUser(): Promise[User]
             Controller-->>Client: HTTP 2xx { code, data }
         else AppError propagado
             Domain-->>Controller: throw AppError { code, message, meta, statusCode }

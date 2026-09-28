@@ -214,7 +214,7 @@ npm start
 | `npm run docs:architecture` | Regenera el mapa de código, el esquema de base de datos y el diccionario técnico derivados del código y Prisma. |
 | `npm run docs:check` | Comprueba sin modificar archivos que la documentación generada esté actualizada. |
 | `npm run docs:export` | Genera todos los paquetes en DOCX y PDF; acepta opcionalmente `<paquete> <docx\|pdf\|ambos>` para limitar la ejecución. |
-| `npm run docs:screenshots` | Comprueba o inicia Nexus, genera en Chromium todas las capturas y detiene la instancia temporal al terminar. |
+| `npm run docs:screenshots -- --area <almacen\|sistemas>` | Comprueba o inicia Nexus, genera en Chromium las capturas del área y detiene la instancia temporal al terminar. |
 
 ## Publicación de documentos y capturas
 
@@ -229,6 +229,8 @@ La guía completa y secuencial —instalación por sistema operativo, validació
 creación y eliminación del estado de sesión, cierre de Playwright y detención de Nexus— está en
 [Exportar la documentación](docs/governance/document-export-guide/index.md). No ejecute
 `docs:screenshots` sólo para exportar: Pandoc reutiliza las imágenes ya revisadas.
+La sintaxis admitida para ambos procesos se concentra en la sección
+[Comandos](docs/governance/document-export-guide/04-commands.md).
 
 ## Rutas principales
 

@@ -8,6 +8,7 @@ describe('getDocumentOutputPlan', () => {
     it('genera todos los paquetes en ambos formatos de forma predeterminada', () => {
         expect(getDocumentExportRequest([])).toEqual({
             publication: 'todos',
+            document: null,
             format: 'ambos',
             checkOnly: false
         });
@@ -20,7 +21,23 @@ describe('getDocumentOutputPlan', () => {
     it('conserva los filtros de paquete, formato y validación', () => {
         expect(getDocumentExportRequest(['arquitectura', 'docx', '--check'])).toEqual({
             publication: 'arquitectura',
+            document: null,
             format: 'docx',
+            checkOnly: true
+        });
+    });
+
+    it('conserva la sección para generar únicamente ese documento', () => {
+        expect(getDocumentExportRequest(['arquitectura', 'backend', 'pdf'])).toEqual({
+            publication: 'arquitectura',
+            document: 'backend',
+            format: 'pdf',
+            checkOnly: false
+        });
+        expect(getDocumentExportRequest(['arquitectura', 'backend', '--check'])).toEqual({
+            publication: 'arquitectura',
+            document: 'backend',
+            format: 'ambos',
             checkOnly: true
         });
     });

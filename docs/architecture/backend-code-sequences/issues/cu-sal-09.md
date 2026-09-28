@@ -28,7 +28,7 @@ sequenceDiagram
         Route->>Controller: registerWasteIssue(req, res)
         activate Controller
         Controller->>IssueDto: createWasteIssueDtoForRegister(req.body)
-        IssueDto-->>Controller: wasteIssueDto normalizado
+        IssueDto-->>Controller: createWasteIssueDtoForRegister(): Object (wasteIssueDto)
         Controller->>Domain: wasteIssueService.createWasteIssue({ wasteIssueDto }) crea encabezado y detalles de merma
         activate Domain
         alt Hay una merma repetida o inactiva
@@ -36,7 +36,7 @@ sequenceDiagram
         else Las mermas son únicas
         end
         alt Servicio resuelto
-            Domain-->>Controller: wasteIssueService.createWasteIssue() devuelve wasteIssue creado y persistido
+            Domain-->>Controller: wasteIssueService.createWasteIssue(): Promise[WasteIssue]
             Controller-->>Client: HTTP 2xx { code, data }
         else AppError propagado
             Domain-->>Controller: throw AppError { code, message, meta, statusCode }

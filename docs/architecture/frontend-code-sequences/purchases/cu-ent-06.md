@@ -17,20 +17,20 @@ sequenceDiagram
     Initiator->>Browser: inicia CU-ENT-06 — Generar reporte de compras de material
     Browser->>View: Botón Excel de goodsReceiptDatatable.js
     View->>Dialog: showReportExportDialog(currentMonth)
-    Dialog-->>View: Promise<boolean> con confirmación o cancelación
+    Dialog-->>View: showReportExportDialog(): Promise[boolean]
     View->>Application: exportGoodsReceiptReport({ params })
     Application->>Request: exportGoodsReceiptReportRequest({ params })
     activate Application
     Request->>HTTP: apiRequest({ method: 'get', url, params })
     HTTP->>Transport: descarga GET /api/warehouse/reports/goods-receipts/excel
     Transport-->>HTTP: HTTP 2xx { code, data }
-    HTTP-->>Request: apiRequest() resuelve response.data
-    Request-->>Application: exportGoodsReceiptReportRequest() resuelve response.data
+    HTTP-->>Request: apiRequest(): Promise[AxiosResponse]
+    Request-->>Application: exportGoodsReceiptReportRequest(): Promise[AxiosResponse]
     alt Respuesta exitosa
-        Application-->>View: exportGoodsReceiptReport() resuelve response.data
+        Application-->>View: exportGoodsReceiptReport(): Promise[Blob]
         View-->>Browser: DOM o DataTable actualizado con response.data
     else Respuesta rechazada
-        Application-->>View: error Axios normalizado { code, message, meta }
+        Application-->>View: throw { status: number, data: Object | null, message: string, raw: Error }
         View-->>Browser: formulario o filtros conservados, mensaje visible
     end
     deactivate Application

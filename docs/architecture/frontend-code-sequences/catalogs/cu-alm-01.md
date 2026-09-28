@@ -22,17 +22,17 @@ sequenceDiagram
     Request->>HTTP: apiRequest({ method: 'get', url, params })
     HTTP->>Transport: consulta GET /api/warehouse/materials
     Transport-->>HTTP: HTTP 200 { data: [{ id de SupplierMaterial, material, supplier, ... }], recordsTotal, recordsFiltered }
-    HTTP-->>Request: apiRequest() resuelve response.data
-    Request-->>Application: getAllMaterialsRequest() resuelve response.data
+    HTTP-->>Request: apiRequest(): Promise[AxiosResponse]
+    Request-->>Application: getAllMaterialsRequest(): Promise[AxiosResponse]
     alt Respuesta exitosa
-        Application-->>View: getAllMaterials() resuelve response.data
+        Application-->>View: getAllMaterials(): Promise[AxiosResponse]
         View-->>Browser: DataTable renderiza el contrato anidado mediante getters de inventario
         opt Actor abre edición o ajuste
             View->>RowAdapter: mapMaterialRowToFormData(fila SupplierMaterial)
-            RowAdapter-->>View: contrato plano del formulario con id del material
+            RowAdapter-->>View: mapMaterialRowToFormData(): Object (materialFormData)
         end
     else Respuesta rechazada
-        Application-->>View: error Axios normalizado { code, message, meta }
+        Application-->>View: throw { status: number, data: Object | null, message: string, raw: Error }
         View-->>Browser: formulario o filtros conservados, mensaje visible
     end
     deactivate Application

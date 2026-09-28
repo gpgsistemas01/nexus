@@ -17,7 +17,7 @@ sequenceDiagram
     Controller->>Domain: findAllWasteMovements(getMovementListParams(req))
     activate Domain
     alt Servicio resuelto
-        Domain-->>Controller: findAllWasteMovements() devuelve { data, recordsTotal, recordsFiltered } para la tabla solicitada
+        Domain-->>Controller: findAllWasteMovements(): Promise[{ data: WasteMovement[], recordsTotal: number, recordsFiltered: number }]
         Controller-->>Client: HTTP 2xx { code, data }
     else AppError propagado
         Domain-->>Controller: throw AppError { code, message, meta, statusCode }

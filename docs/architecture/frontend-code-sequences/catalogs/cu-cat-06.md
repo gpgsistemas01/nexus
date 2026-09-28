@@ -34,10 +34,13 @@ sequenceDiagram
         HTTP->>Transport: POST /api/sales/clients
         alt Alta resuelta
             Transport-->>HTTP: HTTP 200 { code, data: { client } }
-            HTTP-->>Request: apiRequest() resuelve response.data
-            Request-->>Application: createClientRequest() resuelve response.data
-            Application-->>View: registerClient() devuelve { message, data: client }
-            View->>View: handleSubmit(...) ejecuta notifications.showSuccess,<br/>closeModal(form) y reloadMainTable({ resetPaging: true })
+            HTTP-->>Request: apiRequest(): Promise[AxiosResponse]
+            Request-->>Application: createClientRequest(): Promise[AxiosResponse]
+            Application-->>View: registerClient(): Promise[{ message: string, data: Client }]
+            View->>View: handleSubmit(...)
+            View->>View: notifications.showSuccess(...)
+            View->>View: closeModal(form)
+            View->>View: reloadMainTable({ resetPaging: true })
             opt form.onSave definido por el selector de salida
                 View->>Select: form.onSave(client)
                 Select->>Select: toggleClientOption(...) agrega y selecciona
@@ -45,9 +48,9 @@ sequenceDiagram
             end
         else Alta rechazada
             Transport-->>HTTP: HTTP error { code, message, meta }
-            HTTP-->>Request: apiRequest() rechaza error normalizado
-            Request-->>Application: createClientRequest() propaga error
-            Application-->>View: registerClient() rechaza
+            HTTP-->>Request: apiRequest(): throw { status: number, data: Object | null, message: string, raw: Error }
+            Request-->>Application: createClientRequest(): throw { status: number, data: Object | null, message: string, raw: Error }
+            Application-->>View: registerClient(): throw { status: number, data: Object | null, message: string, raw: Error }
             View-->>Browser: useForm conserva clientForm y handleApiError muestra el error
         end
     end

@@ -32,7 +32,7 @@ sequenceDiagram
     else Pipeline aceptado
         Router->>Controller: editWasteStock(req, res)
         Controller->>StockDto: createWasteDtoForStockUpdate(req.body)
-        StockDto-->>Controller: wasteStockDto normalizado
+        StockDto-->>Controller: createWasteDtoForStockUpdate(): Object (wasteStockDto)
         Controller->>Service: updateWasteStock({ id, wasteStockDto, userId })
         Service->>Prisma: getDb().$transaction(async tx => ...)
         Service->>Prisma: tx.waste.findUnique({ where: { id } })
@@ -43,8 +43,8 @@ sequenceDiagram
         Adjustment->>Movement: createWasteMovement({ tx, type: ADJUSTMENT, details })
         Adjustment->>Prisma: tx.waste.update({ where, data })
         alt Commit confirmado
-            Prisma-->>Service: merma actualizada
-            Service-->>Controller: waste
+            Prisma-->>Service: $transaction(): Promise[Waste]
+            Service-->>Controller: updateWasteStock(): Promise[Waste]
             Controller->>Socket: emitInventoryUpdated()
             Controller-->>Client: 200 { waste, code }
         else Regla de stock o persistencia rechazada

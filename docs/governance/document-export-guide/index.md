@@ -17,7 +17,7 @@ Pandoc y Playwright intervienen en etapas distintas y ninguno sustituye al otro:
 | Node.js y dependencias (`npm ci`) | Ejecutan los scripts del repositorio. | Todos los comandos `npm run docs:*`. |
 | Playwright y Chromium (instalación automática) | Abren Nexus y generan las capturas del manual. Sólo se necesitan al actualizar imágenes. | `npm run docs:screenshots` |
 | Mermaid CLI (instalación automática) | Convierte cada bloque Mermaid en una imagen temporal para la exportación. | `docs:export` lo instala temporalmente cuando debe generar un diagrama y todavía no está disponible. |
-| Pandoc (herramienta del sistema) | Ensambla el Markdown y las imágenes existentes, convierte la navegación del paquete en hipervínculos internos y genera el DOCX. | `npm run docs:export -- <paquete> <formato>` |
+| Pandoc (herramienta del sistema) | Ensambla el Markdown y las imágenes existentes, convierte la navegación del paquete en hipervínculos internos y genera el DOCX. | `npm run docs:export -- <paquete> [seccion] <formato>` |
 | LibreOffice (instalación automática) | Convierte a PDF el DOCX que acaba de generar el exportador. | Sólo `docs:export` con formato `pdf`; si falta, el comando intenta instalarlo con el gestor de paquetes del sistema. |
 
 Una extensión de Playwright para Visual Studio Code tampoco reemplaza estas herramientas: puede

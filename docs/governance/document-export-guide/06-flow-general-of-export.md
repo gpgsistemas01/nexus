@@ -2,7 +2,7 @@
 
 Para generar la entrega completa:
 
-1. Complete la [preparación de herramientas](#preparar-las-herramientas).
+1. Complete la [preparación de herramientas](03-prepare-the-tools.md).
 2. Desde la raíz del repositorio, valide todas las fuentes, enlaces e imágenes sin generar archivos:
 
    ```bash
@@ -22,6 +22,7 @@ Para generar la entrega completa:
    comando en vez de anunciarse como documento generado.
 
 Antes debe comprobar también que las capturas requeridas por los dos manuales ya existan y estén
-aprobadas. Actualizarlas es una acción independiente de la exportación. Para regenerar sólo una
-parte o un formato durante la revisión, use
-`npm run docs:export -- <paquete> <docx|pdf|ambos>`.
+aprobadas. Actualizarlas es una acción independiente de la exportación. Para regenerar sólo un
+documento técnico durante la revisión, use
+`npm run docs:export -- <paquete> <seccion> <docx|pdf|ambos>`. Si omite la sección, se reconstruye
+el paquete completo. `manuales` siempre reconstruye todos los manuales y `todos` toda la entrega.

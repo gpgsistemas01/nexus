@@ -32,11 +32,11 @@ sequenceDiagram
         Route->>Controller: registerSupplier(req, res)
         activate Controller
         Controller->>SupplierDto: createSupplierDtoForRegister(req.body)
-        SupplierDto-->>Controller: supplierDto normalizado
+        SupplierDto-->>Controller: createSupplierDtoForRegister(): Object (supplierDto)
         Controller->>Domain: supplierService.createSupplier({ supplierDto }) persiste el proveedor
         activate Domain
         alt Servicio resuelto
-            Domain-->>Controller: supplierService.createSupplier() devuelve supplier creado y persistido
+            Domain-->>Controller: supplierService.createSupplier(): Promise[Supplier]
             Controller-->>Client: HTTP 2xx { code, data }
         else AppError propagado
             Domain-->>Controller: throw AppError { code, message, meta, statusCode }

@@ -28,11 +28,11 @@ sequenceDiagram
         Route->>Controller: editGoodsIssue(req, res)
         activate Controller
         Controller->>IssueDto: createGoodsIssueDtoForEdit(req.body)
-        IssueDto-->>Controller: goodsIssueDto normalizado
+        IssueDto-->>Controller: createGoodsIssueDtoForEdit(): Object (goodsIssueDto)
         Controller->>Domain: goodsIssueService.updateGoodsIssue({ id: req.params.id, goodsIssueDto }) actualiza encabezado y detalles todavía editables
         activate Domain
         alt Servicio resuelto
-            Domain-->>Controller: goodsIssueService.updateGoodsIssue() devuelve la salida pendiente actualizada
+            Domain-->>Controller: goodsIssueService.updateGoodsIssue(): Promise[GoodsIssue]
             Controller-->>Client: HTTP 2xx { code, data }
         else AppError propagado
             Domain-->>Controller: throw AppError { code, message, meta, statusCode }

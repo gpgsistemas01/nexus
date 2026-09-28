@@ -28,11 +28,11 @@ sequenceDiagram
         Route->>Controller: editUserPassword(req, res)
         activate Controller
         Controller->>PasswordDto: createUserPasswordDtoForEdit(req.body)
-        PasswordDto-->>Controller: userPasswordDto normalizado
+        PasswordDto-->>Controller: createUserPasswordDtoForEdit(): Object (userPasswordDto)
         Controller->>Domain: userService.updateUserPassword({ id: req.params.id, userPasswordDto }) cifra y sustituye la contraseña
         activate Domain
         alt Servicio resuelto
-            Domain-->>Controller: userService.updateUserPassword() devuelve userPassword actualizado y persistido
+            Domain-->>Controller: userService.updateUserPassword(): Promise[User]
             Controller-->>Client: HTTP 2xx { code, data }
         else AppError propagado
             Domain-->>Controller: throw AppError { code, message, meta, statusCode }

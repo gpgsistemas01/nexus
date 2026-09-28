@@ -32,7 +32,7 @@ sequenceDiagram
     else Pipeline aceptado
         Router->>Controller: editWasteIssueDetails(req, res)
         Controller->>IssueDto: createWasteIssueDetailsDtoForEdit(req.body)
-        IssueDto-->>Controller: wasteIssueDto normalizado
+        IssueDto-->>Controller: createWasteIssueDetailsDtoForEdit(): Object (wasteIssueDto)
         Controller->>Service: updateWasteIssueDetails({ id, details: wasteIssueDto.details })
         Service->>Prisma: updateWasteIssueDetailsTransaction({ id, wasteIssueDto }) abre getDb().$transaction()
         Service->>Service: updateWasteIssueDetailsTransaction() valida estado, ids y snapshots
@@ -48,7 +48,7 @@ sequenceDiagram
         Service->>Rules: resolveIssueFulfillmentStatus(details)
         Service->>Prisma: tx.wasteIssue.update({ where, data })
         alt Commit confirmado
-            Service-->>Controller: wasteIssue actualizado
+            Service-->>Controller: updateWasteIssueDetails(): Promise[WasteIssue]
             Controller->>Socket: emitInventoryUpdated()
             Controller-->>Client: 200 { wasteIssue, code }
         else Stock insuficiente, estado inválido o error Prisma

@@ -2,7 +2,7 @@
 
 No es necesario eliminar manualmente un resultado antes de ejecutar nuevamente los comandos:
 
-- `npm run docs:export -- <paquete> <formato>` escribe los editables en
+- `npm run docs:export -- <paquete> [seccion] <formato>` escribe los editables en
   `build/docs/docx/` y los PDF en `build/docs/pdf/`; reemplaza el archivo de la misma combinación de
   paquete y formato y conserva la caché de diagramas de `build/docs/diagrams/` para evitar
   conversiones repetidas;
@@ -19,6 +19,12 @@ mezclar entregables editables y finales y permite conservar ambos durante la rev
 entregar, seleccione el archivo recién generado y, si va a compartir la carpeta completa, retire de
 ella los resultados antiguos que no formen parte de la entrega. Nunca elimine los Markdown fuente
 de `docs/` para regenerar un documento.
+
+Para generar una sección técnica específica sin reconstruir las demás, indique su nombre entre el
+paquete y el formato, por ejemplo `npm run docs:export -- arquitectura backend docx`. Si omite la
+sección, se reconstruyen todos los documentos del paquete. Los manuales son una unidad de entrega:
+`npm run docs:export -- manuales docx` siempre genera todos los documentos de ambos actores y no
+admite seleccionar un actor o una sección.
 
 Para generar todos los documentos al mismo tiempo, use `todos`. El comando valida primero las
 fuentes e imágenes de los seis paquetes y después crea cada archivo técnico o conjunto funcional:

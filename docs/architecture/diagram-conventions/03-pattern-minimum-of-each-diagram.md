@@ -113,7 +113,7 @@ sólo para la clasificación que Mermaid no puede expresar directamente.
 | Línea de vida | Línea vertical discontinua bajo cada cabecera | Existencia del participante en el intervalo representado, leído de arriba hacia abajo. |
 | Activación | Barra vertical entre `activate` y `deactivate` | Periodo en que un participante controla la colaboración; no expresa duración real. |
 | Mensaje síncrono | Flecha continua `->>` | Llamada o interacción cuyo orden importa. El texto prioriza el método que permite seguir la realización del caso. |
-| Respuesta | Flecha discontinua `-->>` | Resultado, estado HTTP, payload o error observable. |
+| Respuesta | Flecha discontinua `-->>` | Tipo de retorno (`Promise[Material]`, `Object (materialDto)`, etc.), estado HTTP, payload o error observable. |
 | Auto-mensaje | Flecha que vuelve al mismo participante | Validación o regla dentro del mismo archivo, sin inventar otro componente. |
 | `alt` / `else` | Fragmento combinado con ramas | Caminos mutuamente excluyentes elegidos por una condición. |
 | `opt` | Fragmento combinado de una rama | Comportamiento opcional que sólo ocurre si se cumple su guarda. |
@@ -174,10 +174,19 @@ Para que una secuencia sea detallada sin mezclar niveles, se aplican estas regla
   participantes ni líneas de vida;
 - `alt`/`opt` se usa sólo para una decisión que cambia el recorrido y `rect` sólo para
   señalar un límite relevante, como una transacción;
-- las respuestas discontinuas muestran resultados o errores observables, no repiten la
-  llamada anterior;
-- una respuesta nombra el método que resolvió la promesa, el estado y contrato HTTP, el
-  objeto de dominio devuelto o el efecto visible concreto. Se evitan etiquetas ambiguas
+- las respuestas discontinuas de métodos muestran el tipo de retorno con la forma
+  `metodo(): Tipo`; para funciones asíncronas se conserva `Promise[Tipo]`. Los DTO
+  construidos se rotulan como `Object (nombreDto)` y las colecciones o contratos
+  tabulares indican su estructura (`Tipo[]`, `{ data: Tipo[], recordsTotal: number,
+  recordsFiltered: number }`). Los corchetes
+  expresan el parámetro del tipo sin introducir separadores incompatibles con Mermaid;
+  estos nombres describen el contrato conceptual que devuelve JavaScript y no añaden
+  TypeScript a la implementación. No se inventa un alias si el código devuelve un objeto
+  literal, un `AxiosResponse` o un `Blob`;
+- una respuesta sin invocación representa en cambio un resultado observable: el estado
+  y contrato HTTP, el error propagado o el efecto visible concreto. No se sustituye el
+  tipo de retorno de un método por una oración sobre datos «normalizados», «resueltos» o
+  «persistidos». Se evitan además etiquetas ambiguas
   como “resultado del servicio”, “respuesta normalizada”, “actualizar la vista” o
   “mostrar el mensaje” sin identificar el dato, método o efecto correspondiente;
 - un error no se modela como participante ni como `«object»`: se representa mediante una

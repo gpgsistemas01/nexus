@@ -29,7 +29,7 @@ sequenceDiagram
         Controller->>Domain: updateCatalogEntry(req.params.catalog, req.params.id, req.body) normaliza y actualiza únicamente los campos permitidos
         activate Domain
         alt Servicio resuelto
-            Domain-->>Controller: updateCatalogEntry() devuelve catalogEntry actualizado y persistido
+            Domain-->>Controller: updateCatalogEntry(): Promise[Object]
             Controller-->>Client: HTTP 2xx { code, data }
         else AppError propagado
             Domain-->>Controller: throw AppError { code, message, meta, statusCode }

@@ -28,11 +28,11 @@ sequenceDiagram
         Route->>Controller: editMaterial(req, res)
         activate Controller
         Controller->>MaterialDto: createMaterialDtoForEdit(req.body)
-        MaterialDto-->>Controller: materialDto normalizado
+        MaterialDto-->>Controller: createMaterialDtoForEdit(): Object (materialDto)
         Controller->>Domain: materialService.updateMaterial({ id: req.params.id, materialDto }) sincroniza datos y relación
         activate Domain
         alt Servicio resuelto
-            Domain-->>Controller: materialService.updateMaterial() devuelve material actualizado y persistido
+            Domain-->>Controller: materialService.updateMaterial(): Promise[Material]
             Controller-->>Client: HTTP 2xx { code, data }
         else AppError propagado
             Domain-->>Controller: throw AppError { code, message, meta, statusCode }

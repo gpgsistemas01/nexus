@@ -36,13 +36,13 @@ sequenceDiagram
         Request->>HTTP: apiRequest({ method: 'post', url, data })
         HTTP->>Transport: envía POST /api/warehouse/wastes/:id/stock-additions
         Transport-->>HTTP: HTTP 2xx { code, data }
-        HTTP-->>Request: apiRequest() resuelve response.data
-        Request-->>Application: addWasteStockRequest() resuelve response.data
+        HTTP-->>Request: apiRequest(): Promise[AxiosResponse]
+        Request-->>Application: addWasteStockRequest(): Promise[AxiosResponse]
         alt Respuesta exitosa
-            Application-->>Form: addWasteStock() resuelve response.data
+            Application-->>Form: addWasteStock(): Promise[{ message: string, data: Waste }]
             Form-->>Browser: DOM o DataTable actualizado con response.data
         else Respuesta rechazada
-            Application-->>Form: error Axios normalizado { code, message, meta }
+            Application-->>Form: throw { status: number, data: Object | null, message: string, raw: Error }
             Form-->>Browser: formulario o filtros conservados, mensaje visible
         end
         deactivate Application

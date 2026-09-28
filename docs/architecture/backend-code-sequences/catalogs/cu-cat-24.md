@@ -29,7 +29,7 @@ sequenceDiagram
         Controller->>Domain: findAllCatalogEntries(req.params.catalog) consulta el modelo permitido por la lista blanca
         activate Domain
         alt Servicio resuelto
-            Domain-->>Controller: findAllCatalogEntries() devuelve { data, recordsTotal, recordsFiltered } para la tabla solicitada
+            Domain-->>Controller: findAllCatalogEntries(): Promise[{ data: Object[], recordsTotal: number, recordsFiltered: number }]
             Controller-->>Client: HTTP 2xx { code, data }
         else AppError propagado
             Domain-->>Controller: throw AppError { code, message, meta, statusCode }
