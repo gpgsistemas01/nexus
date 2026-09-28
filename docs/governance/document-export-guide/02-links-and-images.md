@@ -30,8 +30,8 @@ DOCX y PDF. Se aplican estas reglas:
   expresa con un enlace Markdown junto al diagrama, porque esos enlaces internos de Mermaid no
   funcionan de manera uniforme en DOCX y PDF.
 
-`docs:export -- <paquete> <formato> --check` comprueba que las rutas locales declaradas existan y
-rechaza rutas locales absolutas en enlaces e imágenes. Durante la exportación, el script puede
+`docs:export -- <paquete> [seccion] <formato> --check` comprueba que las rutas locales declaradas
+existan y rechaza rutas locales absolutas en enlaces e imágenes. Durante la exportación, el script puede
 usar rutas absolutas únicamente dentro de su copia temporal para que Pandoc encuentre los
 recursos; esas rutas no se escriben en los Markdown originales. DOCX y PDF incorporan las imágenes
 dentro del documento final.

@@ -91,7 +91,7 @@ Las reglas siguientes indican cómo validar el resultado una vez clasificado:
    cambio y, después de fusionarla, regenera y versiona el mapa de código, el esquema de
    base de datos y el diccionario técnico en `main` si fuera necesario.
 4. Antes de publicar: validar el paquete con
-   `npm run docs:export -- <paquete> --check`; generar DOCX o PDF sólo en desarrollo/CI.
+   `npm run docs:export -- <paquete> [seccion] --check`; generar DOCX o PDF sólo en desarrollo/CI.
    Las capturas se actualizan mediante `npm run docs:screenshots` con un
    entorno y una sesión de prueba preparados.
 

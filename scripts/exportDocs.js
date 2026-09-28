@@ -270,13 +270,18 @@ const PUBLICATIONS = Object.freeze({
 });
 const {
     publication: requestedPublication,
+    document: requestedDocument,
     format: requestedFormat,
     checkOnly
 } = getDocumentExportRequest(process.argv.slice(2));
 const formats = new Set(['docx', 'pdf', 'ambos']);
 const outputPlan = getDocumentOutputPlan(requestedFormat);
+const positionalArgumentCount = process.argv.slice(2)
+    .filter((argument) => argument !== '--check').length;
 let pdfConverter = process.env.DOCS_PDF_CONVERTER;
-const publicationNames = [...Object.keys(MANUALS), ...Object.keys(PUBLICATIONS)];
+const manualNames = Object.keys(MANUALS);
+const publicationNames = [...manualNames, ...Object.keys(PUBLICATIONS)];
+const selectablePublicationNames = ['manuales', ...Object.keys(PUBLICATIONS)];
 const mermaidBlock = /^```mermaid\r?\n([\s\S]*?)^```\r?$/gm;
 const externalLink = /^(?:https?:|mailto:)/;
 const markdownLink = /(?<!!)\[([^\]]+)\]\(([^) ]+)([^)]*)\)/g;
@@ -404,16 +409,29 @@ const insertAfterDocumentData = (content, insertion) => {
     return `${content.slice(0, insertionIndex)}\n\n${insertion}\n${content.slice(insertionIndex).replace(/^\r?\n+/, '')}`;
 };
 
-if ((requestedPublication !== 'todos' && !PUBLICATIONS[requestedPublication] && !MANUALS[requestedPublication])
+const selectedDefinition = PUBLICATIONS[requestedPublication];
+const invalidDocument = requestedDocument && (
+    !selectedDefinition?.parts[requestedDocument]
+    || requestedPublication === 'todos'
+    || requestedPublication === 'manuales'
+);
+if ((requestedPublication !== 'todos' && !selectablePublicationNames.includes(requestedPublication))
+    || invalidDocument
+    || positionalArgumentCount > 3
     || (checkOnly ? requestedFormat && !formats.has(requestedFormat) : !formats.has(requestedFormat))) {
-    console.error('Uso: npm run docs:export -- [todos|manual-administrador|manual-almacen|requisitos|datos|arquitectura|pruebas] [docx|pdf|ambos] [--check]');
+    console.error('Uso: npm run docs:export -- [todos|manuales|requisitos|datos|arquitectura|pruebas] [seccion] [docx|pdf|ambos] [--check]');
     process.exit(1);
 }
 
-const requestedPublications = requestedPublication === 'todos' ? publicationNames : [requestedPublication];
+const requestedPublications = requestedPublication === 'todos'
+    ? publicationNames
+    : requestedPublication === 'manuales' ? manualNames : [requestedPublication];
 const publicationParts = requestedPublications.flatMap((publication) => {
     const definition = MANUALS[publication] ?? PUBLICATIONS[publication];
-    return Object.entries(definition.parts).map(([document, sources]) => ({
+    const parts = requestedDocument
+        ? [[requestedDocument, definition.parts[requestedDocument]]]
+        : Object.entries(definition.parts);
+    return parts.map(([document, sources]) => ({
         publication,
         document,
         directory: definition.directory,
@@ -668,7 +686,8 @@ try {
             }
             console.log(`Documento PDF generado en ${path.relative(ROOT, pdfOutput)}.`);
         }
-        if (publication === 'arquitectura') {
+        if (publication === 'arquitectura'
+            && (!requestedDocument || requestedDocument === 'contrato-api')) {
             const openApiOutput = path.join(openApiOutputDirectory, 'openapi.json');
             const openApiContract = await bundleOpenApiContract(path.join(ROOT, OPENAPI_SOURCE));
             await writeFile(openApiOutput, `${JSON.stringify(openApiContract, null, 2)}\n`);
