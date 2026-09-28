@@ -11,17 +11,19 @@ DOCX y PDF. Se aplican estas reglas:
 | Referencia hacia otra sección del mismo archivo | Un enlace Markdown al ancla, por ejemplo `[preparación](#preparar-las-herramientas)`. | Una ruta al archivo fuente. |
 | Referencia hacia otro Markdown incluido en el paquete | Un enlace Markdown relativo, por ejemplo `[casos de uso](requirements/use-cases/index.md)`. El exportador lo convierte en una referencia interna única al ensamblar el paquete. | Un enlace hacia el archivo `.md` dentro del DOCX o PDF. |
 | Sitio externo | Una URL absoluta `https://` o un enlace `mailto:`. | Una ruta local o dependiente de la estación de trabajo. |
-| Markdown, código u otro recurso local no incluido en el paquete | Puede conservar el enlace relativo en la fuente para navegar por el repositorio; al exportar se presenta sólo su etiqueta. | Un hipervínculo que el lector del DOCX o PDF no pueda abrir. |
+| Markdown publicado en otro archivo de la misma ejecución | Un enlace Markdown relativo hacia la fuente. | Una ruta escrita manualmente hacia `build/`. |
+| Código u otro recurso local no incluido en el paquete | Puede conservar el enlace relativo en la fuente para navegar por el repositorio; al exportar se presenta sólo su etiqueta. | Un hipervínculo que el lector del DOCX o PDF no pueda abrir. |
 
 - los enlaces hacia otro Markdown, código o imagen del repositorio usan rutas **relativas al
   archivo que contiene el enlace**; así funcionan en el repositorio, en otros clones y durante la
   validación;
 - sólo los sitios externos usan URL absolutas `https://`;
-- un hipervínculo se conserva en el documento exportado sólo cuando su destino también forma parte
-  del paquete, es una sección del mismo documento o es un sitio externo. El exportador convierte la
-  ruta relativa en un ancla única del paquete antes de ensamblar las fuentes; los enlaces locales
-  hacia fuentes no incluidas se convierten en texto para no publicar destinos `.md`, rutas de código
-  o referencias que dependan del repositorio;
+- un hipervínculo se conserva cuando su destino forma parte del mismo documento, corresponde a
+  otro archivo generado en la misma ejecución o es un sitio externo. El exportador convierte los
+  enlaces internos en anclas y los enlaces entre archivos en rutas relativas desde el documento
+  actual dentro de `build/docs/docx/` o `build/docs/pdf/`, según el formato. Los enlaces locales
+  hacia fuentes no publicadas se convierten en texto para no exponer destinos `.md` ni rutas del
+  repositorio;
 - las imágenes y los diagramas renderizados sí deben tener una **referencia documental**: texto
   alternativo o leyenda que identifique la figura y una mención dentro de la sección que la
   explica. El exportador reúne esas leyendas en un **Índice de imágenes** navegable; no debe
@@ -43,9 +45,11 @@ generar DOCX, el exportador crea una tabla de contenido y un **Índice de imáge
 navegables a partir de los títulos y leyendas preparados; no deja campos pendientes de
 actualización al abrir el archivo en Word. Las leyendas se numeran de forma correlativa como
 `Figura N. …` para que el mismo identificador y número se publiquen en DOCX y PDF, sin depender
-de campos `SEQ` de Word. El PDF conserva los índices materializados primero en el DOCX. Los enlaces
-Markdown entre fuentes del mismo paquete se resuelven durante el ensamblado y
-quedan como hipervínculos internos: el artefacto publicado no navega hacia archivos `.md`.
+de campos `SEQ` de Word. El PDF conserva los índices materializados primero en el DOCX. Los enlaces Markdown entre fuentes del mismo archivo se resuelven durante el ensamblado y quedan
+como hipervínculos internos. Cuando la fuente pertenece a otro archivo exportado, Word recibe una
+ruta relativa hacia el DOCX y el PDF una ruta relativa hacia el PDF equivalente. Por ello debe
+conservarse la estructura completa bajo `build/docs/` al distribuir documentos enlazados; ningún
+artefacto publicado navega hacia archivos `.md`.
 
 Por tanto, las imágenes que existen como archivos sí tienen una referencia
 `![descripción](ruta/relativa.png)` dentro del

@@ -15,8 +15,8 @@ de la pantalla. Cuando hay un modal, conserva también el contexto visible de la
 recortar únicamente el cuadro de diálogo.
 
 Playwright es una herramienta opcional de desarrollo y no se incluye en producción. Se configuran
-`DOCS_BASE_URL` y, para páginas protegidas, `DOCS_WAREHOUSE_STORAGE_STATE` y
-`DOCS_ADMIN_STORAGE_STATE` con sesiones ficticias separadas por área. El inventario cubre
+`DOCS_BASE_URL` y, para páginas protegidas, `DOCS_ALMACEN_STORAGE_STATE` y
+`DOCS_SISTEMAS_STORAGE_STATE` con sesiones ficticias separadas por área. El inventario cubre
 los listados principales; cada modal o paso nuevo agrega al mismo script una acción localizada y
 otra captura numerada. El acceso puede capturarse sin sesión; el resto debe fallar si la cuenta no
 posee el permiso que el manual pretende demostrar.

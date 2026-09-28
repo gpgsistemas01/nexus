@@ -59,6 +59,11 @@ lector.
 Las capturas siempre se solicitan para un área. El comando acepta `almacen` o `sistemas`, y no
 genera documentos ni actualiza por sí solo las imágenes versionadas:
 
+Los nombres técnicos de área se escriben en español, en minúsculas y sin acento en argumentos y
+rutas (`almacen`, `sistemas`), y en mayúsculas sin acento dentro de variables e identificadores
+(`ALMACEN`, `SISTEMAS`). No use los nombres de actor `warehouse`, `admin` o `administrador` como
+alias del área.
+
 | Objetivo | Comando |
 | --- | --- |
 | Consultar el inventario completo | `npm run docs:screenshots -- --list` |
