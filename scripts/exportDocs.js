@@ -50,9 +50,12 @@ const manualErrorCatalog = 'docs/user-manual/error-messages.md';
 const manualValidationMatrix = 'docs/user-manual/form-validation-matrix.md';
 const manualPart = (actor, cases) => [
     actor,
+    ...cases
+];
+const manualAdditionalPart = (actor) => [
+    actor,
     manualOverview,
     manualProcedures,
-    ...cases,
     manualValidationMatrix,
     manualErrorCatalog
 ];
@@ -65,6 +68,7 @@ const MANUALS = Object.freeze({
     'manual-administrador': {
         directory: 'manuales/administrador',
         parts: {
+            'informacion-general-y-anexos': manualAdditionalPart(administrator),
             autenticacion: manualPart(administrator, manualCases.authentication),
             'movimientos-materiales': manualPart(administrator, manualCaseFiles('reports', [
                 '01-cap-rep-mov-mat-01-list.md',
@@ -80,8 +84,23 @@ const MANUALS = Object.freeze({
                 '06-cap-ida-usr-03-edit.md',
                 '07-cap-ida-usr-04-password.md'
             ])),
-            catalogos: manualPart(administrator, manualCaseFiles('catalogs', [
-                '01-catalogs-auxiliary.md'
+            'catalogo-areas': manualPart(administrator, manualCaseFiles('catalogs', [
+                '01-catalog-areas.md'
+            ])),
+            'catalogo-roles': manualPart(administrator, manualCaseFiles('catalogs', [
+                '01-catalog-roles.md'
+            ])),
+            'catalogo-presentaciones': manualPart(administrator, manualCaseFiles('catalogs', [
+                '01-catalog-presentations.md'
+            ])),
+            'catalogo-unidades-medida': manualPart(administrator, manualCaseFiles('catalogs', [
+                '01-catalog-unit-measures.md'
+            ])),
+            'catalogo-motivos-ajuste': manualPart(administrator, manualCaseFiles('catalogs', [
+                '01-catalog-adjustment-reasons.md'
+            ])),
+            'catalogo-estados-cumplimiento': manualPart(administrator, manualCaseFiles('catalogs', [
+                '01-catalog-fulfillment-statuses.md'
             ])),
             personas: manualPart(administrator, manualCaseFiles('identity-access', [
                 '01-cap-ida-per-01-list.md',
@@ -103,6 +122,7 @@ const MANUALS = Object.freeze({
     'manual-almacen': {
         directory: 'manuales/almacen',
         parts: {
+            'informacion-general-y-anexos': manualAdditionalPart(warehouse),
             autenticacion: manualPart(warehouse, manualCases.authentication),
             'almacen-materiales': manualPart(warehouse, manualCaseFiles('catalogs', [
                 '02-cap-cat-mat-01-list.md',
@@ -515,8 +535,13 @@ const prepareSource = async (source, publicationSources, firstFigureNumber) => {
         const id = createHash('sha256').update(diagram).digest('hex').slice(0, 16);
         const input = path.join(diagramSourceDirectory, `${id}.mmd`);
         const image = path.join(diagramOutputDirectory, `${id}.png`);
+        const validationMarker = path.join(diagramOutputDirectory, `${id}.validated`);
         await writeFile(input, diagram);
-        if (!existsSync(image)) {
+        if (!existsSync(image) || !existsSync(validationMarker)) {
+            await Promise.all([
+                rm(image, { force: true }),
+                rm(validationMarker, { force: true })
+            ]);
             try {
                 prepareMermaidCli({ executable: mermaidExecutable });
             } catch (error) {
@@ -527,17 +552,28 @@ const prepareSource = async (source, publicationSources, firstFigureNumber) => {
             if (result.stdout) process.stdout.write(result.stdout);
             if (result.stderr) process.stderr.write(result.stderr);
             if (result.error?.code === 'ENOENT') {
-                await rm(image, { force: true });
+                await Promise.all([
+                    rm(image, { force: true }),
+                    rm(validationMarker, { force: true })
+                ]);
                 console.error('Mermaid CLI no pudo ejecutarse después de preparar la dependencia.');
                 return null;
             }
             if (result.status !== 0 || hasInvalidSvgGeometry(`${result.stdout ?? ''}\n${result.stderr ?? ''}`)) {
-                await rm(image, { force: true });
+                await Promise.all([
+                    rm(image, { force: true }),
+                    rm(validationMarker, { force: true })
+                ]);
                 if (result.status === 0) {
                     console.error(`Mermaid produjo geometría inválida al renderizar ${source}.`);
                 }
                 return null;
             }
+            if (!existsSync(image)) {
+                console.error(`Mermaid no generó la imagen esperada para ${source}.`);
+                return null;
+            }
+            await writeFile(validationMarker, `${id}\n`);
         }
         renderedContent = renderedContent.replace(match[0], `![${diagramCaption(content, match.index)}](${image})`);
     }

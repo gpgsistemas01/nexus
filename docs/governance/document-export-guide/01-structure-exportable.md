@@ -17,7 +17,9 @@ publicar, todavía se debe revisar lo siguiente:
 - las figuras experimentales de participantes de secuencia se normalizan a participantes
   rectangulares durante la publicación, porque algunas versiones de Mermaid/Chromium producen
   coordenadas `NaN` o infinitas al rasterizarlas; el exportador también rechaza explícitamente esa
-  geometría si Mermaid la reporta, en vez de incorporar una imagen dañada;
+  geometría si Mermaid la reporta, en vez de incorporar una imagen dañada. Cada imagen reutilizable
+  conserva una marca de validación; una imagen de una ejecución anterior que no tenga esa marca se
+  vuelve a generar y no puede ocultar el error en una exportación posterior;
 - una captura generada sólo se referencia después de ser revisada y existir en la estación
   que ensambla el documento.
 
