@@ -16,7 +16,8 @@ sequenceDiagram
     Initiator->>Browser: inicia CU-ALM-02 — Crear material
     Browser->>View: openMaterialModal({ mode: CREATE, creationContext, data, onSave })
     alt creationContext es goodsReceipt
-        View->>View: setFormSectionVisibility(...) oculta maxUnitCost y stock-data-section
+        View->>View: setFormSectionVisibility({ form, selector: '.stock-data-section',<br/>isVisible: false })
+        View->>View: setFormSectionVisibility({ form, isVisible: false,<br/>fieldNames: ['maxUnitCost'] })
         View->>View: validateFields(goodsReceiptMaterialCreateValidation, formData)
     else Alta directa
         View->>View: validateFields(materialCreateValidation, formData)
