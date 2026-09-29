@@ -22,16 +22,21 @@ DOCX y PDF. Se aplican estas reglas:
   otro archivo generado en la misma ejecución o es un sitio externo. El exportador convierte los
   enlaces internos en anclas y los enlaces entre archivos en rutas relativas desde el documento
   actual dentro de `build/docs/docx/` o `build/docs/pdf/`, según el formato. Si el enlace declara
-  un fragmento válido, la etiqueta identifica la sección y el documento de destino; sin fragmento,
-  conserva como referencia predeterminada sólo el nombre del documento. Los enlaces locales
-  hacia fuentes no publicadas se convierten en texto para no exponer destinos `.md` ni rutas del
-  repositorio;
+  un fragmento válido, la etiqueta muestra `Sección — Documento`, sin repetir además la etiqueta
+  original ni expresiones como «sección del documento». El ancla exportada se deriva del título
+  real de esa sección, incluso cuando la fuente usa un alias explícito. El identificador generado
+  es estable y compatible con los marcadores de DOCX para
+  que, al abrir el enlace, el lector quede situado en esa sección; sin fragmento, conserva como
+  referencia predeterminada sólo el nombre del documento.
+  Los enlaces locales hacia fuentes no publicadas se convierten en texto para no exponer destinos
+  `.md` ni rutas del repositorio;
 - las imágenes y los diagramas renderizados sí deben tener una **referencia documental**: texto
   alternativo o leyenda que identifique la figura y una mención dentro de la sección que la
   explica. El exportador reúne esas leyendas en un **Índice de imágenes** navegable; no debe
   envolverse la imagen en otro enlace sólo para abrir el archivo;
-- el exportador limita cada figura al `90 %` del ancho disponible. La proporción original se
-  conserva para que las capturas y los diagramas no rebasen los márgenes de la hoja ni se deformen;
+- el exportador limita cada figura al `90 %` del ancho disponible o a `7 in` de alto, según cuál
+  alcance primero. La proporción original se conserva para que las capturas y los diagramas no
+  rebasen los márgenes de la hoja ni se deformen;
 - los diagramas Mermaid no usan instrucciones `click`: la navegación hacia otro documento se
   expresa con un enlace Markdown junto al diagrama, porque esos enlaces internos de Mermaid no
   funcionan de manera uniforme en DOCX y PDF.

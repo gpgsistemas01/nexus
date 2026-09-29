@@ -20,11 +20,7 @@ Ante un mensaje, siga siempre este orden y después consulte la fila específica
    estado es incierto, el error es del servidor o el mismo mensaje reaparece, no repita la escritura
    y entregue a soporte el texto, folio, módulo y momento aproximado.
 
-Las tablas reúnen mensajes que comparten la misma recuperación para evitar repetir instrucciones
-en cada procedimiento. El procedimiento enlaza la sección aplicable y sólo incorpora una advertencia
-local cuando el riesgo o la acción de recuperación son exclusivos de ese paso. No se necesita una
-captura para cada notificación: se incluye únicamente si ayuda a reconocer el estado, localizar el
-control de salida o distinguir una pantalla que no puede explicarse con claridad mediante el texto.
+Las tablas siguientes agrupan los mensajes por operación y muestran la recuperación recomendada.
 
 | Situación | Presentación | Acción recomendada |
 |---|---|---|
@@ -165,11 +161,3 @@ Seleccione **Volver**. Con una sesión válida, el botón conduce al inventario 
 sesión, conduce al inicio de sesión. Si el error apareció desde una opción visible de Nexus,
 conserve la dirección y repórtela. No modifique manualmente la URL para intentar acceder a otra
 área.
-
-La captura automatizada tiene el ID `CAP-ERR-404-NOT-FOUND` y la ruta
-`docs/user-manual/images/errors/01-page-not-found.png`. Se incorpora al manual únicamente
-después de generar y revisar la imagen real.
-
-Una petición técnica a una ruta de API inexistente recibe el mensaje **Ruta no encontrada.** en
-formato JSON; este caso corresponde a integraciones y no requiere una acción distinta del usuario
-final.

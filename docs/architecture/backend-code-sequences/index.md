@@ -1,79 +1,36 @@
 # Diagramas de secuencia del código backend
 
-Esta colección **no es un catálogo de diagramas de casos de uso**. Es la lectura técnica
-complementaria del catálogo funcional: cada `CU-*` sirve como vínculo de trazabilidad,
-pero el bloque Mermaid describe cómo se ejecuta el código mediante endpoint, controller,
-servicios y efectos. Para comprender el objetivo con lenguaje de
-negocio se consulta primero el [modelo y los diagramas funcionales de casos de uso](../../requirements/domain-and-use-cases/03-cases-of-use-current.md).
+Cada `CU-*` muestra la ejecución backend desde la petición HTTP hasta la respuesta y sus efectos.
+El objetivo y el flujo de negocio permanecen en los [casos de uso](../../requirements/domain-and-use-cases/03-cases-of-use-current.md),
+y la [matriz técnica](../backend-technical-documentation/04-application-of-all-the-cases-to-the-code-backend.md)
+relaciona cada caso con su implementación y diagrama.
 
-La [matriz técnica de backend](../backend-technical-documentation/04-application-of-all-the-cases-to-the-code-backend.md)
-es el índice único de trazabilidad: relaciona caso, entrada HTTP, implementación y
-diagrama. Esta colección no vuelve a copiar esa relación en cada sección. Los
-participantes identifican su archivo concreto; los métodos y la URL HTTP se indican
-en los mensajes que ejecutan cada proceso para no repetirlos en las entidades.
-La figura `control` marca el adaptador HTTP sin repetir el estereotipo textual de
-controlador. Los módulos de servicio, rutas y utilidades no se presentan como objetos:
-los DTO JSON que el controller construye se distinguen mediante un participante con
-línea de vida y nombre de instancia subrayado, junto con la función y el archivo
-`src/dtos/` que los originan. En el recorrido
-común se separan cliente,
-ruta, controller y servicio de dominio; sólo las coordinaciones atómicas
-despliegan módulos colaboradores, persistencia o publicación como participantes
-adicionales. De este modo se conservan pocas entidades sin ocultar el controller ni el
-módulo responsable. Los mensajes conservan las llamadas y sus parámetros relevantes en
-orden (`req.params`, `req.body`/DTO, parámetros de consulta y `tx`) para hacer visible el
-contrato entre participantes. Esos parámetros no se declaran como participantes ni se
-enumeran en una nota separada. El pipeline completo y reutilizado de middleware se
-explica una sola vez en `DIA-PAT-FRO-001`. El recorrido de un caso incorpora como
-participante un middleware sólo cuando su alternativa cambia la interpretación de ese
-caso; entonces identifica el archivo, el validador y el símbolo ejecutado, nunca una
-etiqueta genérica como «ejecutar middleware». La ruta enlazada sigue siendo la fuente de
-verdad del orden completo. En particular, la validación de entrada del backend ocurre en
-los arreglos de `src/validators/forms` y en
-`validatorMiddleware.validate(req, res, next)` **antes** del controller; el DTO
-normaliza datos aceptados y no sustituye esa validación. Todos explicitan activación de responsabilidades,
-resultado HTTP y propagación de error; las coordinaciones complejas agregan sus
-colaboradores y límites transaccionales.
-Las respuestas de métodos declaran su tipo con `metodo(): Tipo`: los servicios
-asíncronos usan `Promise[Tipo]`, los listados muestran su estructura real
-`{ data: Tipo[], recordsTotal: number, recordsFiltered: number }` y los DTO JavaScript
-usan `Object (nombreDto)`. La descripción narrativa del estado persistido no
-sustituye al tipo de dato; los mensajes HTTP y los efectos observables conservan su
-contrato o descripción porque no son retornos de un método interno.
-Las variables
-locales mecánicas permanecen en el código para no convertir el diagrama en una
-transcripción ilegible. Cada caso mantiene una secuencia específica aunque reutilice un
-patrón, porque cambian módulos, firmas, rutas, datos o efectos.
-La frontera que origina una petición se rotula siempre **Navegador** o
-**Cliente HTTP / web**; el rol humano pertenece a la ficha funcional y no sustituye al
-cliente técnico en una secuencia backend. Incluso las vistas que amplían una coordinación
-atómica conservan esa entidad y muestran la petición de entrada y su resultado.
-Cuando la persistencia participa explícitamente se usa la figura visual `database` para
-**Prisma / PostgreSQL**, no el texto `«database»` sobre un rectángulo ordinario. De igual
-forma, la figura `control` distingue controllers o fronteras HTTP y los DTO conservan su
-notación visual de instancia subrayada; no se agregan estereotipos textuales redundantes.
+| Aspecto | Contenido de la secuencia backend |
+| --- | --- |
+| Inicio | Navegador o cliente HTTP, método, ruta registrada y parámetros. |
+| Recorrido | Ruta → middleware relevante → controller/DTO → servicio → persistencia o efecto. |
+| Validación | Validator y middleware cuando modifican una alternativa del caso; el DTO sólo normaliza datos aceptados. |
+| Transacción | Límites y propagación de `tx` únicamente cuando participan en el flujo. |
+| Respuesta | Tipo real, resultado HTTP y propagación del error. |
+| Participantes | Archivo concreto de cada responsabilidad; se omiten variables y temporales mecánicos. |
+
+El pipeline común se explica en `DIA-PAT-FRO-001`. Cada secuencia incorpora sólo los middleware y
+colaboradores que cambian o prueban el recorrido del caso.
 
 ### Relación con la documentación técnica
 
-Esta colección es la **fuente canónica del recorrido secuencial por caso**: si cambia el
-orden ruta → controller → servicio → persistencia o efecto, se actualiza en el capítulo funcional correspondiente. La
-[documentación técnica del backend](../backend-technical-documentation/06-views-technical-applied.md#relación-entre-la-colección-canónica-y-las-vistas-adicionales)
-explica responsabilidades, mantiene la matriz de trazabilidad y sólo conserva otra vista
-cuando responde una pregunta distinta, por ejemplo una actividad centrada en decisiones,
-un ciclo transaccional o una coordinación transversal. Esas vistas complementarias
-enlazan el `DIA-BE-CU-*` correspondiente; no lo sustituyen ni autorizan mantener una
-segunda secuencia del mismo recorrido.
+Esta colección es la fuente canónica del recorrido ruta → controller → servicio → persistencia o
+efecto. Las [vistas técnicas adicionales](../backend-technical-documentation/06-views-technical-applied.md#relación-entre-la-colección-canónica-y-las-vistas-adicionales)
+sólo complementan decisiones, transacciones o coordinaciones que requieren otra representación.
 
 ### Regla de identificación y lectura
 
-El encabezado `CU-<grupo>-<número> — <nombre>` conserva el identificador y el nombre
-normativos de la ficha funcional. El identificador enlaza la trazabilidad; el nombre permite
-reconocer el objetivo sin interpretar solamente el código. El diagrama de esa sección se identifica de forma determinista como
-`DIA-BE-CU-<grupo>-<número>`; por ejemplo, la sección `CU-ENT-02` contiene
-`DIA-BE-CU-ENT-02`. La matriz técnica mantiene el enlace navegable y la evidencia de
-código. Aquí se conserva solamente la información propia de la vista: patrones,
-participantes, llamadas, datos de frontera, decisiones y efectos. El objetivo, actor y
-flujo de negocio no se repiten porque pertenecen a la ficha del caso de uso.
+| Elemento | Convención |
+| --- | --- |
+| Encabezado | `CU-<grupo>-<número> — <nombre>` |
+| Diagrama | `DIA-BE-CU-<grupo>-<número>` |
+| Contenido propio | Patrones, participantes, llamadas, datos de frontera, decisiones y efectos. |
+| Contenido referenciado | Objetivo, actor, reglas y flujo normativo del caso de uso. |
 
 ## Índice rápido de patrones por caso
 
@@ -122,4 +79,3 @@ afecta la lectura técnica de su entrada.
 - [Almacén y catálogos](catalogs/index.md): casos `CU-ALM-*` y `CU-CAT-*`.
 - [Compras y entradas](purchases/index.md): casos `CU-ENT-*`.
 - [Salidas](issues/index.md): casos `CU-SAL-*`.
-- [Nota histórica sobre infraestructura de consultas y exportaciones](reports/index.md): los casos y diagramas están dentro de su grupo propietario.

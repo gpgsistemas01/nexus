@@ -8,23 +8,25 @@ sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route as src/routes/api/admin/reportApiRoute.js
     participant Controller@{ "type": "control" } as src/controllers/api/admin/reportController.js
-    participant Domain as src/services/admin/person/personService.js<br/>src/utils/reportExcelUtils.js
+    participant Query as src/services/admin/person/personService.js
+    participant Excel as src/utils/reportExcelUtils.js
     participant ErrorHandler as src/app.js
 
     Client->>Route: GET /api/admin/reports/persons/excel
     Route->>Controller: exportPersonReport(req, res)
     activate Controller
-    Controller->>Domain: personService.findAllPersons({ query: req.query }) prepara filas y el controller llama sendExcelReport
-    activate Domain
+    Controller->>Query: personService.findAllPersons({ departments, includeAccesses: true, skip: 0, take: 0, search: getDataTableSearch(req.query), orderBy, orderDir })
+    activate Query
     alt Servicio resuelto
-        Domain-->>Controller: personService.findAllPersons(): Promise[{ data: Person[], recordsTotal: number, recordsFiltered: number }]
-        Controller-->>Client: HTTP 2xx { code, data }
+        Query-->>Controller: personService.findAllPersons(): Promise[{ data: Person[], recordsTotal: number, recordsFiltered: number }]
+        Controller->>Excel: sendExcelReport({ res, data, sheetName, filename })
+        Excel-->>Client: HTTP 200 archivo XLSX
     else AppError propagado
-        Domain-->>Controller: throw AppError { code, message, meta, statusCode }
+        Query-->>Controller: throw AppError { code, message, meta, statusCode }
         Controller->>ErrorHandler: next(error)
         ErrorHandler-->>Client: res.status(error.statusCode).json({ code, message, meta })
     end
-    deactivate Domain
+    deactivate Query
     deactivate Controller
 ```
 

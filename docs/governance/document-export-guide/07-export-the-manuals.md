@@ -9,6 +9,10 @@ exportarlo se requieren:
 - todas las imágenes referenciadas presentes en `docs/user-manual/images/`, revisadas y
   correspondientes a la versión del manual.
 
+Esta guía concentra los comandos de generación y mantenimiento. Los documentos entregados a cada
+actor contienen sólo instrucciones para operar Nexus; no incluyen comandos, rutas del repositorio,
+criterios editoriales ni relaciones técnicas con requisitos, diagramas o código.
+
 Si se cumplen esos requisitos, no necesita una base de datos, una sesión ni Playwright para
 exportar. Valide y genere el manual:
 

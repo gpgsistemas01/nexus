@@ -7,7 +7,10 @@ import process from 'node:process';
 import { pathToFileURL } from 'node:url';
 import { bundleOpenApiContract } from './openApiContractUtils.js';
 import { getDocumentExportRequest, getDocumentOutputPlan } from './documentExportFormats.js';
+import { getFigureSizeAttribute, getPngDimensions } from './documentExportImageUtils.js';
 import {
+    documentExportAnchor,
+    externalDocumentAnchorFragment,
     externalDocumentLinkLabel,
     prepareManualEntry
 } from './documentExportContentUtils.js';
@@ -304,11 +307,6 @@ const preparedDocumentData = new RegExp(
     `^## Datos generales del documento(?: \\{#[^}]+\\})?\\r?\\n\\r?\\n${documentDataTable}$`,
     'm'
 );
-const documentAnchor = (source, fragment) => [
-    'documento',
-    source.replace(/\.md$/, '').replace(/[^\p{L}\p{N}]+/gu, '-'),
-    fragment
-].filter(Boolean).join('-').toLowerCase();
 const headingFragment = (title) => title
     .replace(/[`*_\[\]]/g, '')
     .toLowerCase()
@@ -339,7 +337,7 @@ const prepareLinks = (
     (reference, label, link, suffix) => {
         if (externalLink.test(link)) return reference;
         if (link.startsWith('#')) {
-            return `[${label}](#${documentAnchor(source, link.slice(1))}${suffix})`;
+            return `[${label}](#${documentExportAnchor(source, link.slice(1))}${suffix})`;
         }
         const [target, fragment] = link.split('#');
         const resolvedTarget = path.relative(
@@ -347,7 +345,7 @@ const prepareLinks = (
             path.resolve(ROOT, path.dirname(source), target)
         ).split(path.sep).join('/');
         if (target.endsWith('.md') && publicationSources.has(resolvedTarget)) {
-            return `[${label}](#${documentAnchor(resolvedTarget, fragment)}${suffix})`;
+            return `[${label}](#${documentExportAnchor(resolvedTarget, fragment)}${suffix})`;
         }
         const outputCandidates = linkedOutputs.get(resolvedTarget) ?? [];
         const linkedOutput = outputCandidates.find(output => path.dirname(output) === path.dirname(currentOutput))
@@ -358,19 +356,25 @@ const prepareLinks = (
             linkedOutput.replace(/\.docx$/, `.${ outputFormat }`)
         ).split(path.sep).join('/');
         const externalDocumentLabel = externalDocumentLinkLabel({
-            label,
             linkedOutput,
             fragment,
             targetContent: sourceContents.get(resolvedTarget)
         });
-        return `[${externalDocumentLabel}](${relativeOutput}${fragment ? `#${documentAnchor(resolvedTarget, fragment)}` : ''}${suffix})`;
+        const externalAnchorFragment = externalDocumentAnchorFragment({
+            fragment,
+            targetContent: sourceContents.get(resolvedTarget)
+        });
+        const externalAnchor = externalAnchorFragment
+            ? `#${documentExportAnchor(resolvedTarget, externalAnchorFragment)}`
+            : '';
+        return `[${externalDocumentLabel}](${relativeOutput}${externalAnchor}${suffix})`;
     }
 );
 
 const addInternalAnchors = (content, source) => {
     const anchorOccurrences = new Map();
     const uniqueDocumentAnchor = (fragment) => {
-        const anchor = documentAnchor(source, fragment);
+        const anchor = documentExportAnchor(source, fragment);
         const occurrence = (anchorOccurrences.get(anchor) ?? 0) + 1;
         anchorOccurrences.set(anchor, occurrence);
         return occurrence === 1 ? anchor : `${anchor}-${occurrence}`;
@@ -383,18 +387,21 @@ const addInternalAnchors = (content, source) => {
         /^(#{1,6})\s+(.+)$/gm,
         (heading, level, title) => `${level} ${title} {#${uniqueDocumentAnchor(headingFragment(title))}}`
     );
-    return `[]{#${documentAnchor(source)}}\n\n${anchoredHeadings}`;
+    return `[]{#${documentExportAnchor(source)}}\n\n${anchoredHeadings}`;
 };
 
-const addFigureAnchors = (content, source, firstFigureNumber) => {
+const addFigureAnchors = async (content, source, firstFigureNumber) => {
     let figureNumber = firstFigureNumber;
-    return content.replace(
-        /^(\s*)(!\[([^\]]+)\]\([^)]+\))$/gm,
-        (figure, indentation, image, title) => (
-            `${indentation}${image.replace(`![${title}]`, `![Figura ${figureNumber}. ${title}]`)}`
-            + `{#${documentAnchor(source, `figura-${figureNumber++}`)} width=90%}`
-        )
-    );
+    const figurePattern = /^(\s*)(!\[([^\]]+)\]\(([^)]+)\))$/gm;
+    const figures = [...content.matchAll(figurePattern)];
+    let preparedContent = content;
+    for (const [figure, indentation, image, title, imagePath] of figures) {
+        const dimensions = getPngDimensions(await readFile(imagePath));
+        const replacement = `${indentation}${image.replace(`![${title}]`, `![Figura ${figureNumber}. ${title}]`)}`
+            + `{#${documentExportAnchor(source, `figura-${figureNumber++}`)} ${getFigureSizeAttribute(dimensions)}}`;
+        preparedContent = preparedContent.replace(figure, replacement);
+    }
+    return preparedContent;
 };
 
 const buildDocumentIndexes = async (preparedSources) => {
@@ -651,7 +658,7 @@ const prepareSource = async (source, publicationSources, firstFigureNumber, curr
         }
         renderedContent = renderedContent.replace(match[0], `![${diagramCaption(content, match.index)}](${image})`);
     }
-    renderedContent = addFigureAnchors(renderedContent, source, firstFigureNumber);
+    renderedContent = await addFigureAnchors(renderedContent, source, firstFigureNumber);
     await writeFile(renderedSource, renderedContent);
     return {
         renderedSource,

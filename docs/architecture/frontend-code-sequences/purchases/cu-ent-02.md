@@ -25,16 +25,16 @@ sequenceDiagram
     Modal->>Modal: openGoodsReceiptModal({ mode: create })
     opt El proveedor no está catalogado
         Browser->>SupplierSelect: escribir nombre y seleccionar Nuevo proveedor
-        SupplierSelect->>SupplierSelect: runAfterSelect2Close(...)
+        SupplierSelect->>SupplierSelect: runAfterSelect2Close({ selector: supplierSelector, action })
         SupplierSelect->>SupplierModal: openSupplierModal({ data: { tradeName }, onSave })
         Note over SupplierModal,SupplierSelect: registerSupplier() y POST /api/warehouse/suppliers<br/>se detallan en DIA-FE-CU-CAT-02
         SupplierModal->>SupplierSelect: form.onSave(createdSupplier)
-        SupplierSelect->>SupplierSelect: toggleSupplierOption(...) agrega y selecciona
+        SupplierSelect->>SupplierSelect: toggleSupplierOption({ selector: supplierSelector,<br/>id: createdSupplier.id, name: createdSupplier.tradeName })
         SupplierSelect-->>Browser: continuar compra sin abrir /proveedores
     end
     opt El material no está catalogado
-        DetailUI->>MaterialUI: setupMaterialSelect({ creationContext: 'goodsReceipt' }) abre openMaterialModal(...)
-        MaterialUI->>MaterialUI: openMaterialModal({ creationContext: 'goodsReceipt' }) oculta maxUnitCost y sección newStock/observations
+        DetailUI->>MaterialUI: setupMaterialSelect({ modalSelector, supplierSelector,<br/>materialSelector, allowCreate: true, creationContext: 'goodsReceipt' })
+        MaterialUI->>MaterialUI: openMaterialModal({ creationContext: 'goodsReceipt',<br/>data: { name, supplier: { id, tradeName } }, onSave })
         MaterialUI->>MaterialApp: registerMaterial({ formData, creationContext: 'goodsReceipt' })
         MaterialApp->>MaterialApp: buildGoodsReceiptMaterialData(data) omite maxUnitCost y newStock
         MaterialApp->>MaterialRequest: registerMaterialRequest({ data })
@@ -45,7 +45,7 @@ sequenceDiagram
             MaterialApp-->>MaterialUI: registerMaterial(): Promise[{ message: string, data: SupplierMaterial }]
             MaterialUI->>MaterialUI: onSave()
             MaterialUI->>MaterialUI: mapSelectMaterialData(supplierMaterial)
-            MaterialUI->>MaterialUI: toggleMaterialOption(...)
+            MaterialUI->>MaterialUI: toggleMaterialOption({ selector: baseSelector,<br/>data: mapSelectMaterialData(supplierMaterial) })
         else Alta rechazada
             HTTP-->>MaterialRequest: apiRequest(): throw { status: number, data: Object | null, message: string, raw: Error }
             MaterialRequest-->>MaterialApp: registerMaterialRequest(): throw { status: number, data: Object | null, message: string, raw: Error }
@@ -64,8 +64,8 @@ sequenceDiagram
         Form-->>Browser: mostrar campos inválidos sin enviar request
     else Captura válida
         Form->>App: registerGoodsReceipt({ formData })
-        App->>Request: createCrudApplication.register({ data })
-        Request->>HTTP: apiRequest({ method: 'post', url, data })
+        App->>Request: registerGoodsReceiptRequest({ data: formData })
+        Request->>HTTP: apiRequest({ method: 'post',<br/>url: GOODS_RECEIPTS_API_ROUTE, data: formData })
         HTTP->>API: POST /api/warehouse/goods-receipts
         alt La factura ya existe para el proveedor
             API-->>HTTP: 409 { code, message, meta }
@@ -78,8 +78,8 @@ sequenceDiagram
             HTTP-->>Request: apiRequest(): Promise[AxiosResponse]
             Request-->>App: registerGoodsReceiptRequest(): Promise[AxiosResponse]
             App-->>Form: registerGoodsReceipt(): Promise[{ message: string }]
-            Form->>Form: handleSubmit(...)
-            Form->>Form: notifications.showSuccess(...)
+            Form->>Form: handleSubmit({ form, formData,<br/>create: registerGoodsReceipt, update: editGoodsReceipt })
+            Form->>Form: notifications.showSuccess(response.message)
             Form->>Form: closeModal(form)
             Form->>Form: reloadMainTable({ resetPaging: true })
             Form-->>Browser: modal cerrado y #table recargada

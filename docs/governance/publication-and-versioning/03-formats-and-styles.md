@@ -30,9 +30,14 @@ archivos temporales se eliminan al finalizar.
 Antes de convertir, cada enlace local con fragmento se valida contra un título o ancla
 explícita real. Las referencias entre fuentes incluidas se declaran con una ruta Markdown
 relativa al archivo de origen; el exportador las convierte en referencias internas únicas
-antes de ensamblar el paquete. Un enlace a otro documento sin fragmento lleva al inicio de
-ese documento. Los enlaces a fuentes que no forman parte del paquete se presentan como
-texto. No es necesario distribuir los Markdown junto al DOCX o PDF: sus referencias pasan
+antes de ensamblar el paquete. Cuando el destino pertenece a otro documento, el ancla exportada
+se deriva del título de la sección de destino y no del alias usado por el enlace fuente. La
+etiqueta visible se limita a `Sección — Documento`: conserva el contexto necesario sin duplicar
+la etiqueta original ni describir el vínculo con una oración. Su
+identificador estable respeta los límites de los marcadores de DOCX para que el enlace abra el
+documento en esa sección. Un enlace a otro documento sin fragmento lleva al inicio. Los enlaces a
+fuentes que no forman parte del paquete se presentan como texto. No es necesario distribuir los
+Markdown junto al DOCX o PDF: sus referencias pasan
 a ser internas; sólo los enlaces web conservan una URL absoluta. Mermaid se limita a producir
 la figura y no usa `click`, porque el hipervínculo dejaría de ser uniforme al renderizar el
 bloque como imagen para DOCX o PDF.
@@ -46,8 +51,9 @@ Todas las figuras de un paquete reciben una leyenda correlativa `Figura N. …`,
 el índice y asociada a la misma referencia interna que la imagen. La numeración se materializa
 durante cada exportación, en vez de depender de campos `SEQ` de Word, para que DOCX y PDF
 publiquen el mismo número y para que los paquetes generados sin Microsoft Word sean completos.
-Cada figura se ajusta como máximo al `90 %` del ancho disponible y conserva su proporción para
-evitar que una captura o un diagrama sobrepase los márgenes de la página.
+Cada figura se ajusta como máximo al `90 %` del ancho disponible o a `7 in` de alto, según cuál
+límite alcance primero, y conserva su proporción para evitar que una captura o un diagrama
+sobrepase los márgenes de la página.
 
 Las anclas explícitas que preceden a un encabezado se preparan como un bloque independiente.
 La separación evita que Pandoc interprete el encabezado y su atributo interno como texto visible;

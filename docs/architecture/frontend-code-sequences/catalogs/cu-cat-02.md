@@ -21,7 +21,7 @@ sequenceDiagram
         Origin->>View: openSupplierModal({ mode: create })
     else Almacén inicia desde una compra autorizada
         Browser->>Select: escribir proveedor inexistente y seleccionar Nuevo proveedor
-        Select->>Select: runAfterSelect2Close(...)
+        Select->>Select: runAfterSelect2Close({ selector: supplierSelector, action })
         Select->>View: openSupplierModal({ data: { tradeName }, onSave })
     end
     View->>View: validateFields(supplierValidation, formData)
@@ -29,21 +29,21 @@ sequenceDiagram
         View-->>Browser: conservar datos y mostrar errores por campo
     else Formulario válido
         View->>Application: registerSupplier({ formData })
-        Application->>Request: registerSupplierRequest({ formData })
-        Request->>HTTP: apiRequest({ method: 'post', url, data })
+        Application->>Request: registerSupplierRequest({ data: formData })
+        Request->>HTTP: apiRequest({ method: 'post',<br/>url: SUPPLIERS_API_ROUTE, data: formData })
         HTTP->>Transport: POST /api/warehouse/suppliers
         alt Alta resuelta
             Transport-->>HTTP: HTTP 200 { code, data: { supplier } }
             HTTP-->>Request: apiRequest(): Promise[AxiosResponse]
             Request-->>Application: registerSupplierRequest(): Promise[AxiosResponse]
             Application-->>View: registerSupplier(): Promise[{ message: string, data: Supplier }]
-            View->>View: handleSubmit(...)
-            View->>View: notifications.showSuccess(...)
+            View->>View: handleSubmit({ form, formData,<br/>create: registerSupplier, update: editSupplier })
+            View->>View: notifications.showSuccess(response.message)
             View->>View: closeModal(form)
             View->>View: reloadMainTable({ resetPaging: true })
             opt form.onSave definido por el selector operativo
                 View->>Select: form.onSave(supplier)
-                Select->>Select: toggleSupplierOption(...) agrega y selecciona
+                Select->>Select: toggleSupplierOption({ selector: supplierSelector,<br/>id: supplier.id, name: supplier.tradeName })
                 Select-->>Browser: continuar en la compra sin abrir /proveedores
             end
         else Alta rechazada

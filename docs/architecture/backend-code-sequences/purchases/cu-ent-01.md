@@ -9,13 +9,18 @@ sequenceDiagram
     participant Route as src/routes/api/warehouse/goodsReceiptApiRoute.js
     participant Controller@{ "type": "control" } as src/controllers/api/warehouse/goodsReceiptController.js
     participant Domain as src/services/warehouse/goodsReceipts/goodsReceiptService.js
+    participant Prisma@{ "type": "database" } as Prisma / PostgreSQL
     participant ErrorHandler as src/app.js
 
     Client->>Route: GET /api/warehouse/goods-receipts
     Route->>Controller: getAllGoodsReceipts(req, res)
     activate Controller
-    Controller->>Domain: goodsReceiptService.findAllGoodsReceipts({ query: req.query }) consulta entradas y totales
+    Controller->>Domain: goodsReceiptService.findAllGoodsReceipts({ skip, take, search, startDate, endDate, supplierId, personId, orderBy, orderDir })
     activate Domain
+    Domain->>Prisma: goodsReceipt.findMany({ where, include, skip, take, orderBy })
+    Prisma-->>Domain: findMany(): Promise[GoodsReceipt[]]
+    Domain->>Prisma: goodsReceipt.count({ where })
+    Prisma-->>Domain: count(): Promise[number]
     alt Servicio resuelto
         Domain-->>Controller: goodsReceiptService.findAllGoodsReceipts(): Promise[{ data: GoodsReceipt[], recordsTotal: number, recordsFiltered: number }]
         Controller-->>Client: HTTP 2xx { code, data }
