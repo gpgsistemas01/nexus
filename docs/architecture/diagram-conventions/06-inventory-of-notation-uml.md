@@ -22,7 +22,7 @@ migrarse a UML estricto cuando una entrega contractual lo exija.
 
 | Decisión | Criterio |
 | --- | --- |
-| Conservar `DIA-ARQ-CMP-001` | Muestra los componentes principales y sus dependencias. |
+| Conservar `DIA-ARQ-CMP-001..002` | Muestran los componentes principales y la reutilización frontend sin repetir consumidores. |
 | No crear un diagrama por `CU-*` | Las secuencias frontend y backend ya muestran la realización concreta. |
 | Agregar otra vista | Sólo cuando aparezca una frontera estable que no esté representada. |
 

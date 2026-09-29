@@ -1,4 +1,4 @@
-# 2. Arquitectura del sistema
+# Arquitectura del sistema
 
 ### Diagrama de contexto del sistema
 
@@ -129,54 +129,6 @@ flowchart LR
 
     browserTarget -.->|"HTTPS"| ingress
     nexusContainer -.->|"DATABASE_URL / DIRECT_URL"| targetDatabase
-```
-
-### Componentes de aplicación
-
-Esta vista UML de componentes complementa los contenedores: muestra contratos y
-dependencias de diseño, no cada import concreto. El detalle mecánico permanece en el
-[mapa generado](../../generated/code-map.md).
-
-```mermaid
-classDiagram
-    class Rutas {
-        <<component>>
-        +autorizar()
-        +validar()
-    }
-    class Controladores {
-        <<component>>
-        +traducirHTTP()
-    }
-    class DTO {
-        <<component>>
-        +normalizarEntrada()
-        +normalizarSalida()
-    }
-    class ServiciosDominio {
-        <<component>>
-        +ejecutarCasoDeUso()
-    }
-    class RepositorioPrisma {
-        <<component>>
-        +consultar()
-        +persistir()
-    }
-    class AplicacionCliente {
-        <<component>>
-        +coordinarCRUD()
-    }
-    class ComponentesUI {
-        <<component>>
-        +presentarEstado()
-    }
-
-    Rutas --> Controladores
-    Controladores --> DTO
-    Controladores --> ServiciosDominio
-    ServiciosDominio --> RepositorioPrisma
-    AplicacionCliente --> Rutas : HTTP
-    ComponentesUI --> AplicacionCliente
 ```
 
 ### Recorrido de una interacción

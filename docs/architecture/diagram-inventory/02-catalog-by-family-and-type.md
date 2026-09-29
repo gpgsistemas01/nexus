@@ -5,7 +5,7 @@
 | `DIA-ARQ-CTX-001` | Contexto inspirado en C4 | `architecture-and-web-views/index.md#diagrama-de-contexto-del-sistema` | 1 | Actores, sistema y dependencias externas; curado. |
 | `DIA-ARQ-CON-001` | Contenedores y capas | `architecture-and-web-views/index.md#contenedores-y-capas` | 1 | Entornos y responsabilidades; curado. |
 | `DIA-ARQ-DEP-001..002` | Despliegue actual y objetivo | Secciones “Despliegue” de `architecture-and-web-views/index.md` | 2 | Infraestructura y configuración; curado. |
-| `DIA-ARQ-CMP-001` | Componentes | `architecture-and-web-views/index.md#componentes-de-aplicación` | 1 | Diseño por capas; curado. |
+| `DIA-ARQ-CMP-001..002` | Componentes y reutilización | `architecture-and-web-views/04-organization-consistent-of-frontend-and-back.md` | 2 | Capas de aplicación y factories/UI compartidas de frontend; curado. |
 | `DIA-ARQ-SEQ-001` | Secuencia extremo a extremo | `architecture-and-web-views/index.md#recorrido-de-una-interacción` | 1 | Interacción representativa; curado. |
 | `DIA-ARQ-EST-001` | Estados de acceso | `web-navigation-and-screen-catalog/index.md#estados-de-acceso-y-sesión` | 1 | Sesión y rutas; curado. |
 | `DIA-ARQ-NAV-001..002` | Navegación y redirecciones | Mapa de sitio y redirecciones de `web-navigation-and-screen-catalog/index.md` | 2 | Rutas web y menú; curado. |

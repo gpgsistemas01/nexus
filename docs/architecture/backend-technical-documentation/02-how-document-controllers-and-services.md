@@ -1,4 +1,9 @@
-# 2. Cómo documentar controladores y servicios
+# Guía de documentación backend
+
+Esta referencia cubre `src/routes`, `src/middleware`, `src/controllers`, `src/dtos`,
+`src/services`, `src/repository` y Prisma. El contrato consumible permanece en el
+[contrato API](../api-contract/index.md); aquí se explican responsabilidades,
+colaboraciones y límites transaccionales.
 
 El mapa generado mantiene inventarios separados de símbolos exportados por
 [controladores](../../generated/code-map.md#símbolos-exportados-por-controladores) y
@@ -86,3 +91,19 @@ requieren vista técnica, cada una muestra sus participantes, modelos, errores y
 No se genera automáticamente esa semántica desde imports: el inventario puede comprobar
 que `controller` y `service` existen, pero no puede determinar de forma segura quién es
 propietario de una regla, qué error es contractual ni dónde debe ocurrir un efecto.
+## Selección y revisión de vistas
+
+- Una adaptación HTTP o CRUD homogéneo usa su secuencia `DIA-BE-CU-*`; no necesita una
+  segunda secuencia genérica.
+- Coordinación entre servicios o efectos posteriores al commit se representa como
+  secuencia; decisiones con ramas, como actividad; estados persistentes y relaciones
+  se enlazan desde requisitos y el ER generado.
+- Una escritura compuesta identifica inicio, commit, rollback y propagación de `tx`;
+  no se infiere atomicidad sólo desde imports.
+- Consultas y exportaciones permanecen en el caso del recurso propietario, no en un
+  capítulo independiente de reportes.
+
+Antes de publicar se contrastan método, URL, middleware, DTO, retorno, errores, modelos
+y pruebas con el código. También se revisan imports y exports y se ejecuta
+`npm run docs:check`; si cambiaron rutas, imports o Prisma, se regenera antes con
+`npm run docs:architecture`.

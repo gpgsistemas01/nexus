@@ -1,6 +1,6 @@
 # 3. Control de completitud y coherencia
 
-El total se obtiene de cada bloque Mermaid de `docs`: arquitectura (183), generados
+El total se obtiene de cada bloque Mermaid de `docs`: arquitectura (185), generados
 (6), requisitos (106), pruebas (2) y manual de usuario (1). Al agregar, retirar o mover
 un bloque se actualiza su fila, cantidad y enlace en el mismo cambio. Los diagramas
 generados nunca se editan a
