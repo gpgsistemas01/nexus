@@ -10,7 +10,7 @@ sequenceDiagram
     participant Auth as src/middleware/authMiddleware.js
     participant Validator as src/validators/forms/personValidations.js<br/>src/middleware/validatorMiddleware.js
     participant Controller@{ "type": "control" } as src/controllers/api/admin/personController.js
-    participant PersonDto as <u>personDto: Object</u><br/>src/dtos/personDTO.js
+    participant PersonDto as personDto: Object<br/>src/dtos/personDTO.js
     participant Domain as src/services/admin/person/personService.js
     participant ErrorHandler as src/app.js
 

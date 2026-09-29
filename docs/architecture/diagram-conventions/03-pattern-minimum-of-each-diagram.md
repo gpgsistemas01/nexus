@@ -80,11 +80,12 @@ cabecera y línea de vida; un estereotipo escrito por sí solo no sustituye esa
 representación. La figura `control` identifica el adaptador que recibe la interacción
 (controller HTTP o frontera API que lo contiene), por lo que **no** repite el
 estereotipo `«controller»`. Un objeto JSON o instancia de clase se representa con la
-figura rectangular de participante y el nombre de instancia subrayado en formato
-`instancia: Tipo`, conforme a la notación de objeto UML; no se rotula solamente con
-`«object»`. Esta notación no identifica archivos, módulos, servicios, vistas, helpers ni
-funciones. Cuando un controller crea un DTO JSON del dominio que interviene en el
-recorrido, la secuencia incorpora, por ejemplo, `<u>materialDto: Object</u>`, y mantiene
+figura rectangular de participante y el nombre de instancia en formato
+`instancia: Tipo`; se evita envolverlo en HTML porque algunos renderizadores muestran
+las etiquetas como texto en lugar de aplicar el formato. Tampoco se rotula solamente
+con `«object»`. Esta notación no identifica archivos, módulos, servicios, vistas,
+helpers ni funciones. Cuando un controller crea un DTO JSON del dominio que interviene
+en el recorrido, la secuencia incorpora, por ejemplo, `materialDto: Object`, y mantiene
 el archivo `src/dtos/` que prueba su construcción. Los demás
 participantes ejecutables se identifican sólo por sus archivos y el símbolo exacto se
 muestra en el mensaje que representa su ejecución.
@@ -93,7 +94,7 @@ La distinción visual combina los tipos de participante de Mermaid con la notaci
 estereotipos. Un controller se declara como
 `participant Controller@{ "type": "control" }` y su nombre de archivo basta en la
 cabecera. Un objeto conserva la figura rectangular estándar de `participant`, la línea
-de vida y el nombre de instancia subrayado: en UML de secuencia esa combinación
+de vida y el nombre de instancia: esa combinación
 representa visualmente una instancia, y `object` no es un tipo nativo de Mermaid. No
 debe sustituirse por `entity`, que expresa
 una entidad de dominio y no cualquier objeto o DTO. Tampoco se usa `actor` para simular
@@ -107,7 +108,7 @@ sólo para la clasificación que Mermaid no puede expresar directamente.
 | --- | --- | --- |
 | Actor | Figura humana declarada con `actor` | Persona, rol o sistema externo autónomo que inicia o recibe una interacción. |
 | Controlador o frontera | Figura de control declarada con `@{ "type": "control" }` | Adaptador HTTP o frontera API. La figura reemplaza el estereotipo textual `«controller»`. |
-| Objeto/DTO | Rectángulo de `participant` con línea de vida, nombre subrayado `instancia: Tipo` y archivo | Instancia concreta que transporta datos; no es un estereotipo textual ni una entidad de persistencia. |
+| Objeto/DTO | Rectángulo de `participant` con línea de vida, nombre `instancia: Tipo` y archivo | Instancia concreta que transporta datos; no es un estereotipo textual ni una entidad de persistencia. |
 | Participante | Rectángulo de `participant` y ruta de archivo | Módulo, vista, servicio o helper propietario de las acciones enviadas a su línea de vida; no implica un objeto de dominio. |
 | Base de datos | Figura `database` cuando se necesita distinguir persistencia | Almacén persistente externo al proceso. Si agrupa Prisma/PostgreSQL, los mensajes aclaran la operación. |
 | Línea de vida | Línea vertical discontinua bajo cada cabecera | Existencia del participante en el intervalo representado, leído de arriba hacia abajo. |
@@ -168,7 +169,7 @@ Para que una secuencia sea detallada sin mezclar niveles, se aplican estas regla
   nombra ambos archivos y el mensaje nombra el símbolo ejecutado;
 - una instancia sólo obtiene línea de vida y nombre cuando es un objeto del dominio o un
   DTO de dominio que participa en la colaboración; se representa visualmente con
-  rectángulo, línea de vida y nombre de instancia subrayado. Los parámetros escalares,
+  rectángulo, línea de vida y nombre de instancia. Los parámetros escalares,
   identificadores, filtros, payloads y `tx` pueden
   aparecer dentro de un mensaje cuando explican el contrato, pero no se convierten en
   participantes ni líneas de vida;

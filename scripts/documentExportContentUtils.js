@@ -59,6 +59,25 @@ export const exportedDocumentTitle = (output) => {
     return `${words[0][0].toUpperCase()}${words[0].slice(1)} ${words.slice(1).join(' ')}`.trim();
 };
 
+export const prepareManualEntry = (content, output) => {
+    if (!output.startsWith(`manuales${path.sep}`)
+        || path.basename(output, path.extname(output)) === 'informacion-general-y-anexos') {
+        return content;
+    }
+
+    const title = exportedDocumentTitle(output);
+    const documentData = content.match(
+        /^## Datos generales del documento\r?\n\r?\n(?:\|[^\r\n]+\|\r?\n){3}/m
+    );
+    if (!documentData) return content;
+
+    const end = documentData.index + documentData[0].length;
+    return content.slice(0, end)
+        .replace(/^(title:\s*)(.+)$/m, `$1$2 — ${title}`)
+        .replace(/^(# .+)$/m, `$1 — ${title}`)
+        .replace(/\s*$/, '\n');
+};
+
 export const getHeadingTitle = (content, fragment) => {
     const decodedFragment = decodeURIComponent(fragment);
     const headings = [...content.matchAll(/^#{1,6}\s+(.+)$/gm)];

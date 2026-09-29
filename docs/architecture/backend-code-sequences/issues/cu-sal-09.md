@@ -10,8 +10,14 @@ sequenceDiagram
     participant Auth as src/middleware/authMiddleware.js
     participant Validator as src/validators/forms/wasteIssueValidations.js<br/>src/middleware/validatorMiddleware.js
     participant Controller@{ "type": "control" } as src/controllers/api/warehouse/wasteIssueController.js
-    participant IssueDto as <u>wasteIssueDto: Object</u><br/>src/dtos/wasteIssueDTO.js
+    participant IssueDto as wasteIssueDto: Object<br/>src/dtos/wasteIssueDTO.js
     participant Domain as src/services/warehouse/wasteIssues/wasteIssueService.js
+    participant Operation as src/services/serviceErrorHandler.js
+    participant Fulfillment as src/services/warehouse/wasteIssues/wasteIssueFulfillmentService.js
+    participant Header as src/services/warehouse/issues/issueHeaderService.js
+    participant Stock as src/services/inventory/stockHelpers.js
+    participant Reference as src/services/document/referenceNumberService.js
+    participant Prisma@{ "type": "database" } as Prisma / PostgreSQL
     participant ErrorHandler as src/app.js
 
     Client->>Route: POST /api/warehouse/waste-issues
@@ -29,16 +35,39 @@ sequenceDiagram
         activate Controller
         Controller->>IssueDto: createWasteIssueDtoForRegister(req.body)
         IssueDto-->>Controller: createWasteIssueDtoForRegister(): Object (wasteIssueDto)
-        Controller->>Domain: wasteIssueService.createWasteIssue({ wasteIssueDto }) crea encabezado y detalles de merma
+        Controller->>Controller: sanitizeEmptyStrings(wasteIssueDto)
+        Controller->>Domain: createWasteIssue({ wasteIssueDto: sanitizedWasteIssueDto, userId: req.user.id })
         activate Domain
-        alt Hay una merma repetida o inactiva
-            Domain-->>Controller: WASTE_ISSUE_STATE_CONFLICT sin crear la salida
-        else Las mermas son únicas
-        end
-        alt Servicio resuelto
-            Domain-->>Controller: wasteIssueService.createWasteIssue(): Promise[WasteIssue]
-            Controller-->>Client: HTTP 2xx { code, data }
-        else AppError propagado
+        Domain->>Operation: executeServiceOperation({ action: createWasteIssueTransaction, fallbackError })
+        Operation->>Domain: createWasteIssueTransaction({ wasteIssueDto, userId })
+        Domain->>Prisma: getDb().$transaction(async tx => ...)
+        alt Datos relacionados, detalles y persistencia válidos
+            Domain->>Fulfillment: findWasteIssueFulfillmentStatusIds(tx)
+            Fulfillment->>Prisma: tx.fulfillmentStatus.findMany(...)
+            Prisma-->>Fulfillment: findMany(): Promise[FulfillmentStatus[]]
+            Fulfillment-->>Domain: findWasteIssueFulfillmentStatusIds(): Promise[Map]
+            Domain->>Domain: buildWasteIssueDetails({ tx, details: requestedDetails, fulfillmentStatusId: pendingStatusId })
+            Domain->>Prisma: tx.waste.findMany({ id: uniqueIds, isActive: true })
+            Prisma-->>Domain: findMany(): Promise[Waste[]]
+            loop Cada detalle solicitado
+                Domain->>Stock: calculateConvertedQuantity({ quantity, base, height })
+                Stock-->>Domain: calculateConvertedQuantity(): number
+            end
+            Domain->>Header: resolveIssueHeaderData({ tx, requesterId, advisorId, departmentId, clientId, issueData, statusName: APPROVED })
+            Header-->>Domain: resolveIssueHeaderData(): Promise[Object]
+            Domain->>Reference: generateYearlyReferenceNumber({ type: WASTE_ISSUE, tx })
+            Reference->>Prisma: tx.referenceNumberCounter.upsert(...)
+            Prisma-->>Reference: upsert(): Promise[ReferenceNumberCounter]
+            Reference-->>Domain: generateYearlyReferenceNumber(): Promise[string]
+            Domain->>Prisma: tx.wasteIssue.create({ headerData, referenceNumber, createdBy, fulfillmentStatus: PENDING, details })
+            Prisma-->>Domain: create(): Promise[WasteIssue]
+            Prisma-->>Domain: commit
+            Domain-->>Operation: createWasteIssueTransaction(): Promise[WasteIssue]
+            Operation-->>Domain: executeServiceOperation(): Promise[WasteIssue]
+            Domain-->>Controller: createWasteIssue(): Promise[WasteIssue]
+            Controller-->>Client: HTTP 201 { wasteIssue, code: CREATED_WASTE_ISSUE }
+        else Merma repetida o inactiva, encabezado inválido, referencia o persistencia fallida
+            Prisma-->>Domain: rollback
             Domain-->>Controller: throw AppError { code, message, meta, statusCode }
             Controller->>ErrorHandler: next(error)
             ErrorHandler-->>Client: res.status(error.statusCode).json({ code, message, meta })
@@ -47,4 +76,3 @@ sequenceDiagram
         deactivate Controller
     end
 ```
-

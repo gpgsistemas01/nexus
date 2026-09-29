@@ -10,7 +10,7 @@ sequenceDiagram
     participant Auth as src/middleware/authMiddleware.js
     participant Validator as src/validators/forms/goodsIssueValidations.js<br/>src/middleware/validatorMiddleware.js
     participant Controller@{ "type": "control" } as src/controllers/api/warehouse/goodsIssueController.js
-    participant ReturnDto as <u>returnDto: Object</u><br/>src/dtos/goodsIssueDTO.js
+    participant ReturnDto as returnDto: Object<br/>src/dtos/goodsIssueDTO.js
     participant Service as src/services/warehouse/goodsIssues/detailReturns/goodsIssueReturnService.js
     participant Inventory as src/services/inventory/movementService.js
     participant Status as src/services/warehouse/issues/issueFulfillmentRules.js
