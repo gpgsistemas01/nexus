@@ -11,6 +11,7 @@ sequenceDiagram
     participant Validator as src/validators/forms/catalogValidations.js<br/>src/middleware/validatorMiddleware.js
     participant Controller@{ "type": "control" } as src/controllers/api/admin/catalogController.js
     participant Domain as src/services/admin/catalogService.js
+    participant Prisma@{ "type": "database" } as Prisma / PostgreSQL
     participant ErrorHandler as src/app.js
 
     Client->>Route: GET /api/admin/catalogs/departments
@@ -26,8 +27,14 @@ sequenceDiagram
     else Pipeline aceptado
         Route->>Controller: getAllCatalogEntries(req, res)
         activate Controller
-        Controller->>Domain: findAllCatalogEntries(req.params.catalog) consulta el modelo permitido por la lista blanca
+        Controller->>Domain: findAllCatalogEntries(req.params.catalog, { skip, take, search })
         activate Domain
+        Domain->>Prisma: model.findMany({ where, skip, take, orderBy: { name: 'asc' } })
+        Prisma-->>Domain: findMany(): Promise[Object[]]
+        Domain->>Prisma: model.count()
+        Prisma-->>Domain: count(): Promise[number]
+        Domain->>Prisma: model.count({ where })
+        Prisma-->>Domain: count(): Promise[number]
         alt Servicio resuelto
             Domain-->>Controller: findAllCatalogEntries(): Promise[{ data: Object[], recordsTotal: number, recordsFiltered: number }]
             Controller-->>Client: HTTP 2xx { code, data }
