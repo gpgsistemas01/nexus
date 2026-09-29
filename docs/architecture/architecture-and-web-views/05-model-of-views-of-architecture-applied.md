@@ -1,4 +1,4 @@
-# 5. Modelo de vistas de arquitectura aplicado
+# Modelo de vistas de arquitectura aplicado
 
 Nexus usa un modelo **Viewpoint/View inspirado en ISO/IEC/IEEE 42010**, organizado como
 una adaptación práctica de **4+1** y apoyado por los niveles contexto/contenedor de C4.
@@ -23,3 +23,7 @@ mantiene únicamente el tramo dinámico de su responsabilidad. El
 [inventario de diagramas](../diagram-inventory/index.md) permite localizar cada vista y la
 [matriz de trazabilidad](../traceability-matrix/index.md) recorre requisito, implementación y
 prueba.
+
+Como recordatorio de mantenimiento: se modifica la vista curada cuando cambia una
+decisión o colaboración, y se ejecuta `npm run docs:architecture` cuando cambian rutas,
+imports o Prisma. `npm run docs:check` verifica ambos tipos antes de publicar.

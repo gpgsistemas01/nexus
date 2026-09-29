@@ -70,7 +70,6 @@ enlaces intercambiables ni copias de una misma vista:
 | ¿Qué datos recibe y devuelve una ruta HTTP? | [Contrato de la API](api-contract/index.md). | Curado junto con rutas, validadores, DTO, controladores y pruebas HTTP. |
 | ¿Qué dependencias existen realmente en el código? | Mapa generado y diagramas vigentes del código. | `npm run docs:architecture` y revisión manual, respectivamente. |
 | ¿Cómo se ejecuta un caso de uso concreto? | Secuencias de código de [backend](backend-code-sequences/index.md) y [frontend](frontend-code-sequences/index.md), divididas por grupo funcional. | Curado junto con el caso afectado. |
-| ¿Por qué se eligió una alternativa arquitectónica transversal? | [Registros de decisiones](decisions/index.md). | Crear o reemplazar un ADR cuando cambie una decisión relevante. |
 | ¿Cómo navega una persona por las pantallas? | Navegación y catálogo de pantallas web. | Curado junto con rutas, permisos y vistas. |
 | ¿Qué diagramas existen y qué notación usan? | [Inventario](diagram-inventory/index.md) y [convenciones](diagram-conventions/index.md). | Actualizar al agregar, retirar o cambiar una vista. |
 

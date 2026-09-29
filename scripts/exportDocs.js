@@ -251,10 +251,8 @@ const PUBLICATIONS = Object.freeze({
                 ...getDirectoryDocuments('docs/architecture/diagram-conventions'),
                 ...getDirectoryDocuments('docs/architecture/diagram-inventory')
             ]),
-            'estandar-y-decisiones': packagePart(ARCHITECTURE_ENTRY, [
-                ...getDirectoryDocuments('docs/architecture/coding-standards'),
-                'docs/architecture/decisions/index.md',
-                'docs/architecture/decisions/ADR-001-sequences-by-perspective-and-group.md'
+            estandar: packagePart(ARCHITECTURE_ENTRY, [
+                ...getDirectoryDocuments('docs/architecture/coding-standards')
             ]),
             ...Object.fromEntries(sequenceGroups.flatMap((group) => ['backend', 'frontend'].map((side) => [
                 `secuencias-${side}-${group}`,

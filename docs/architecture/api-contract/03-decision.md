@@ -5,7 +5,7 @@ La [especificación versionada](../openapi/openapi.json) documenta el contrato H
 parámetros, payloads, respuestas, errores y autenticación—; Swagger UI sería sólo una
 interfaz opcional para consultar y probar ese contrato.
 
-El contrato OpenAPI publica las 61 operaciones actuales y sus esquemas de entrada y
+El contrato OpenAPI publica las operaciones registradas y sus esquemas de entrada y
 salida. `npm run docs:check` compara sus operaciones con el
 [mapa generado](../../generated/code-map.md), de modo que una ruta nueva, eliminada o
 renombrada exige actualizar ambos artefactos. La comprobación no infiere la semántica de
