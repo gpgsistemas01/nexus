@@ -21,7 +21,7 @@ sequenceDiagram
     activate Application
     Request->>HTTP: apiRequest({ method: 'get', url, params })
     HTTP->>Transport: consulta GET /api/warehouse/materials
-    Transport-->>HTTP: HTTP 200 { data: [{ id de SupplierMaterial, material, supplier, ... }], recordsTotal, recordsFiltered }
+    Transport-->>HTTP: HTTP 200 { data: SupplierMaterial[],<br/>recordsTotal: number, recordsFiltered: number }
     HTTP-->>Request: apiRequest(): Promise[AxiosResponse]
     Request-->>Application: getAllMaterialsRequest(): Promise[AxiosResponse]
     alt Respuesta exitosa

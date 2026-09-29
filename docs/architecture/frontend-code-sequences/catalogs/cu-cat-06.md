@@ -21,7 +21,7 @@ sequenceDiagram
         Origin->>View: openClientModal({ mode: create })
     else Almacén inicia desde una salida autorizada
         Browser->>Select: escribir cliente inexistente y seleccionar Nuevo cliente
-        Select->>Select: runAfterSelect2Close(...)
+        Select->>Select: runAfterSelect2Close({ selector: baseSelector, action })
         Select->>View: openClientModal({ data: { name }, onSave })
     end
     View->>View: validateFields(clientValidation, formData)
@@ -29,21 +29,21 @@ sequenceDiagram
         View-->>Browser: conservar datos y mostrar errores por campo
     else Formulario válido
         View->>Application: registerClient({ formData })
-        Application->>Request: createClientRequest({ formData })
-        Request->>HTTP: apiRequest({ method: 'post', url, data })
+        Application->>Request: createClientRequest({ data: formData })
+        Request->>HTTP: apiRequest({ method: 'post',<br/>url: CLIENTS_API_ROUTE, data: formData })
         HTTP->>Transport: POST /api/sales/clients
         alt Alta resuelta
             Transport-->>HTTP: HTTP 200 { code, data: { client } }
             HTTP-->>Request: apiRequest(): Promise[AxiosResponse]
             Request-->>Application: createClientRequest(): Promise[AxiosResponse]
             Application-->>View: registerClient(): Promise[{ message: string, data: Client }]
-            View->>View: handleSubmit(...)
-            View->>View: notifications.showSuccess(...)
+            View->>View: handleSubmit({ form, formData,<br/>create: registerClient, update: editClient })
+            View->>View: notifications.showSuccess(response.message)
             View->>View: closeModal(form)
             View->>View: reloadMainTable({ resetPaging: true })
             opt form.onSave definido por el selector de salida
                 View->>Select: form.onSave(client)
-                Select->>Select: toggleClientOption(...) agrega y selecciona
+                Select->>Select: toggleClientOption({ selector: baseSelector,<br/>id: client.id, name: client.name })
                 Select-->>Browser: continuar en la salida sin abrir /clientes
             end
         else Alta rechazada

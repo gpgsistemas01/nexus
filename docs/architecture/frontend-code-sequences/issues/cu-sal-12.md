@@ -16,7 +16,10 @@ sequenceDiagram
     Initiator->>Browser: inicia CU-SAL-12 — Surtir merma
     Browser->>View: Acción Surtir dentro de los detalles de merma
     View->>View: mapIssueDetailsToSupplyRequest(details)
-    View->>View: validateDetailsFields(...) aplica validateFields(issueProjectQuantityDetailsValidation, detail) a cada detalle
+    View->>View: validateDetailsFields(issueProjectQuantityDetailsValidation,<br/>mapIssueDetailsToSupplyRequest(details))
+    loop Cada detalle seleccionado
+        View->>View: validateFields(issueProjectQuantityDetailsValidation, detail)
+    end
     alt No hay detalle seleccionado o alguna cantidad es inválida
         View-->>Browser: useForm.getErrors() conserva datos y muestra el error por detalle
     else Detalles de surtimiento válidos

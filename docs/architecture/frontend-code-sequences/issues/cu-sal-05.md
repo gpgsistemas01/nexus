@@ -16,7 +16,10 @@ sequenceDiagram
     Initiator->>Browser: inicia CU-SAL-05 — Surtir material
     Browser->>View: Acción Surtir dentro de los detalles de salida
     View->>View: mapIssueDetailsToSupplyRequest(goodsIssueDetails)
-    View->>View: validateDetailsFields(...) aplica validateFields(issueProjectQuantityDetailsValidation, detail) a cada detalle
+    View->>View: validateDetailsFields(issueProjectQuantityDetailsValidation,<br/>mapIssueDetailsToSupplyRequest(goodsIssueDetails))
+    loop Cada detalle seleccionado
+        View->>View: validateFields(issueProjectQuantityDetailsValidation, detail)
+    end
     alt No hay detalle seleccionado o alguna cantidad es inválida
         View-->>Browser: useForm.getErrors() conserva datos y muestra el error por detalle
     else Detalles de surtimiento válidos
