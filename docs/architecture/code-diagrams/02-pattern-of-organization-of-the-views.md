@@ -20,9 +20,9 @@ flowchart LR
 | --- | --- | --- | --- |
 | Contexto | ¿Quién usa Nexus y de qué sistemas externos depende? | `architecture-and-web-views/index.md#diagrama-de-contexto-del-sistema` | Límite del sistema; no describe un patrón de implementación. |
 | Contenedores | ¿Dónde se ejecutan interfaz, servidor y persistencia? | `architecture-and-web-views/index.md#contenedores-y-capas` | Aplicación web monolítica desplegable y separación cliente/servidor. |
-| Estructura | ¿Qué superficie y dominios internos existen? | Secciones 2 y 3 de este documento. | **Monolito modular** y **arquitectura por capas**. |
-| Dinámica | ¿Cómo atraviesa las capas una petición o transacción? | Sección 4 de este documento y diagramas de requisitos enlazados. | **Pipeline de middleware**, **Transaction Script** y publicación de eventos. |
-| Reutilización | ¿Qué se configura o compone antes de crear otra variante? | Sección 5 de este documento. | **Factory functions**, composición de objetos y componentes compartidos. |
+| Estructura | ¿Qué superficie y dominios internos existen? | Capítulos 3 y 4 de este documento. | **Monolito modular** y **arquitectura por capas**. |
+| Dinámica | ¿Cómo atraviesa las capas una petición o transacción? | Capítulo 5 de este documento y diagramas de requisitos enlazados. | **Pipeline de middleware**, **Transaction Script** y publicación de eventos. |
+| Reutilización | ¿Qué se configura o compone y en qué módulos se aplica actualmente? | Capítulo 6 de este documento. | **Factory functions**, composición de objetos y componentes compartidos. |
 
 Contexto y contenedores no se dibujan otra vez aquí: se reutilizan las vistas canónicas.
 Esto aplica **Single Source of Truth** como criterio documental y evita que dos diagramas
