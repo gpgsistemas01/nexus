@@ -34,8 +34,9 @@ DOCX y PDF. Se aplican estas reglas:
   alternativo o leyenda que identifique la figura y una mención dentro de la sección que la
   explica. El exportador reúne esas leyendas en un **Índice de imágenes** navegable; no debe
   envolverse la imagen en otro enlace sólo para abrir el archivo;
-- el exportador limita cada figura al `90 %` del ancho disponible. La proporción original se
-  conserva para que las capturas y los diagramas no rebasen los márgenes de la hoja ni se deformen;
+- el exportador limita cada figura al `90 %` del ancho disponible o a `7 in` de alto, según cuál
+  alcance primero. La proporción original se conserva para que las capturas y los diagramas no
+  rebasen los márgenes de la hoja ni se deformen;
 - los diagramas Mermaid no usan instrucciones `click`: la navegación hacia otro documento se
   expresa con un enlace Markdown junto al diagrama, porque esos enlaces internos de Mermaid no
   funcionan de manera uniforme en DOCX y PDF.
