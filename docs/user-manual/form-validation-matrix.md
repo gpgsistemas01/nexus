@@ -6,8 +6,7 @@ Esta referencia reúne las validaciones que el operador puede comprobar en panta
 las reglas del servidor ni convierte todos los formularios en un flujo idéntico. Consulte también
 el [catálogo de mensajes](error-messages.md#errores-validacion) cuando Nexus rechace un dato.
 
-Los avisos del manual usan una marca de color que también permanece visible al exportar a DOCX o
-PDF:
+Los avisos se distinguen mediante una marca y una etiqueta textual:
 
 - 🟨 **ADVERTENCIA:** una condición que debe comprobarse antes de continuar;
 - 🟥 **DATO SENSIBLE:** información que no debe copiarse a capturas, archivos ni soporte;
@@ -34,8 +33,8 @@ PDF:
 | Devolución | Detalle surtido, cantidad positiva no mayor a la retornable y observaciones admitidas | Después de elegir **Devolver detalle** | Capture como máximo la cantidad retornable mostrada; los datos originales permanecen bloqueados. |
 | Exportación | Alcance, filtros o periodo admitidos | Antes de generar el archivo | Conserve filtros; si la conexión falla, compruebe el listado antes de repetir. |
 
-🟥 **DATO SENSIBLE:** usuario, contraseña, cookies, tokens, datos personales y registros reales no
-deben aparecer en las capturas del manual. Use exclusivamente cuentas y datos ficticios.
+🟥 **DATO SENSIBLE:** no copie usuarios, contraseñas, cookies, tokens ni datos personales en
+archivos o solicitudes de soporte.
 
 ## Modos de edición
 
@@ -68,6 +67,3 @@ Estas acciones conservan historia y efectos de inventario, por lo que no siguen 
 | Cantidad retornable | Parte surtida que todavía puede devolverse; limita el valor aceptado en una devolución. |
 | Nueva existencia total | Resultado que debe quedar después de un ajuste; no representa un incremento. |
 | Sólo lectura | Modo de consulta en el que la información se muestra pero no puede confirmarse como cambio. |
-
-Los conceptos internos de DTO, router, transacción o permiso API permanecen en la documentación
-técnica: no son necesarios para completar un formulario y por eso no se trasladan al manual.

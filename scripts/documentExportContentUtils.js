@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto';
 import path from 'node:path';
 
 const documentTitles = new Map([
@@ -59,6 +60,12 @@ export const exportedDocumentTitle = (output) => {
     return `${words[0][0].toUpperCase()}${words[0].slice(1)} ${words.slice(1).join(' ')}`.trim();
 };
 
+export const documentExportAnchor = (source, fragment) => {
+    const destination = [source.replace(/\.md$/, ''), fragment].filter(Boolean).join('#');
+    const identifier = createHash('sha256').update(destination).digest('hex').slice(0, 32);
+    return `nexus_${identifier}`;
+};
+
 export const prepareManualEntry = (content, output) => {
     if (!output.startsWith(`manuales${path.sep}`)
         || path.basename(output, path.extname(output)) === 'informacion-general-y-anexos') {
@@ -90,11 +97,14 @@ export const getHeadingTitle = (content, fragment) => {
     return explicitHeading ? cleanHeadingTitle(explicitHeading[2]) : null;
 };
 
-export const externalDocumentLinkLabel = ({ label, linkedOutput, fragment, targetContent }) => {
+export const externalDocumentAnchorFragment = ({ fragment, targetContent }) => {
+    if (!fragment) return null;
+    const sectionTitle = getHeadingTitle(targetContent, fragment);
+    return sectionTitle ? headingFragment(sectionTitle) : fragment;
+};
+
+export const externalDocumentLinkLabel = ({ linkedOutput, fragment, targetContent }) => {
     const documentTitle = exportedDocumentTitle(linkedOutput);
     const sectionTitle = fragment ? getHeadingTitle(targetContent, fragment) : null;
-    const destination = sectionTitle
-        ? `sección «${sectionTitle}» del documento «${documentTitle}»`
-        : `documento «${documentTitle}»`;
-    return `${label} — ${destination}`;
+    return sectionTitle ? `${sectionTitle} — ${documentTitle}` : documentTitle;
 };

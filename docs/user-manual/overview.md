@@ -2,12 +2,9 @@
 
 ## Acceso por actor y seguridad
 
-Documentar los módulos disponibles para cada actor no debilita la seguridad: evita que
-el manual indique operaciones que ese actor no puede ejecutar. Se describen capacidades
-y recorridos, pero nunca credenciales, tokens ni técnicas para eludir controles. El
-servidor siempre vuelve a autorizar cada solicitud. **Catálogos** corresponde sólo al
-administrador del sistema; **Consumibles** pertenece a Almacén y usa el acceso de
-consulta de materiales.
+Las opciones disponibles dependen del actor autenticado y de los permisos asignados. Nexus
+comprueba la autorización en cada operación. **Catálogos** corresponde sólo al administrador del
+sistema; **Consumibles** pertenece a Almacén y usa el acceso de consulta de materiales.
 
 ## Antes de comenzar
 
@@ -24,10 +21,6 @@ capturas, exportaciones o solicitudes de soporte.
 2. Capture sus credenciales y seleccione **Iniciar sesión**.
 3. Compruebe que se muestre la página autorizada para su cuenta.
 
-La captura se genera al ejecutar `npm run docs:screenshots` en un entorno de prueba. El script
-elimina primero el directorio de imágenes y vuelve a crear el juego completo, por lo que una
-exportación nunca debe mezclar capturas de ejecuciones distintas.
-
 ## Módulos
 
 Las secciones de entradas, salidas, inventario, materiales, mermas, clientes, proveedores,
@@ -37,20 +30,13 @@ resultado**. Cada procedimiento muestra la captura estable al aparecer la pantal
 y advierte si modifica existencias o genera un archivo. Esa entrada divide el recorrido por grupo
 funcional y ofrece guías específicas para administrador, almacén y usuarios de consultas y reportes.
 
-Los identificadores, nombres, orden, casos de uso cubiertos y datos de prueba necesarios se
-definen en el [inventario de capturas](screenshot-inventory.md). El inventario sigue el recorrido
-real de las vistas y es la fuente para la automatización; no se deben agregar imágenes aisladas
-sin incorporarlas también a esa secuencia.
-
 La [matriz de validación y modos de formulario](form-validation-matrix.md) permite localizar los
 campos comprobados, la recuperación esperada y las excepciones de edición sin duplicar las reglas
 en cada procedimiento.
 
 ### Continuidad de consultas y exportaciones
 
-Los reportes **no se documentan como un módulo independiente del manual**, porque la
-interfaz no ofrece un recorrido general de reportes. Cada exportación se explica como el
-último paso del módulo donde el usuario consultó y filtró la información:
+Cada exportación se realiza desde el módulo donde se consultó y filtró la información:
 
 - materiales y su reporte de inventario;
 - proveedores y clientes con su exportación desde el listado;
@@ -60,10 +46,7 @@ interfaz no ofrece un recorrido general de reportes. Cada exportación se explic
 - personas y usuarios con su exportación desde el listado;
 - movimientos de material o merma y su reporte correspondiente.
 
-Así se conserva la continuidad **abrir módulo → consultar → filtrar → exportar → recibir
-archivo** sin obligar al lector a saltar a una sección artificial de reportes. El grupo
-`REP` de requisitos sigue siendo válido para trazabilidad normativa, pero no define la
-navegación ni la estructura del manual.
+El recorrido es **abrir módulo → consultar → filtrar → exportar → recibir archivo**.
 
 ## Solución de problemas
 

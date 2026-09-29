@@ -30,9 +30,14 @@ archivos temporales se eliminan al finalizar.
 Antes de convertir, cada enlace local con fragmento se valida contra un título o ancla
 explícita real. Las referencias entre fuentes incluidas se declaran con una ruta Markdown
 relativa al archivo de origen; el exportador las convierte en referencias internas únicas
-antes de ensamblar el paquete. Un enlace a otro documento sin fragmento lleva al inicio de
-ese documento. Los enlaces a fuentes que no forman parte del paquete se presentan como
-texto. No es necesario distribuir los Markdown junto al DOCX o PDF: sus referencias pasan
+antes de ensamblar el paquete. Cuando el destino pertenece a otro documento, el ancla exportada
+se deriva del título de la sección de destino y no del alias usado por el enlace fuente. La
+etiqueta visible se limita a `Sección — Documento`: conserva el contexto necesario sin duplicar
+la etiqueta original ni describir el vínculo con una oración. Su
+identificador estable respeta los límites de los marcadores de DOCX para que el enlace abra el
+documento en esa sección. Un enlace a otro documento sin fragmento lleva al inicio. Los enlaces a
+fuentes que no forman parte del paquete se presentan como texto. No es necesario distribuir los
+Markdown junto al DOCX o PDF: sus referencias pasan
 a ser internas; sólo los enlaces web conservan una URL absoluta. Mermaid se limita a producir
 la figura y no usa `click`, porque el hipervínculo dejaría de ser uniforme al renderizar el
 bloque como imagen para DOCX o PDF.
