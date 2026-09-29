@@ -2,11 +2,11 @@
 
 Referencia del navegador organizada por responsabilidad, no como inventario de cada
 archivo. La vista estructural compartida se mantiene en
-[componentes y reutilización](../architecture-and-web-views/04-organization-consistent-of-frontend-and-back.md).
+[componentes y reutilización](../architecture-and-web-views/02-organization-consistent-of-frontend-and-back.md).
 
-## Contenido
+## Capítulos
 
-- [Guía de documentación frontend](01-frontend-guide.md): capas, criterio de diagramas y revisión.
-- [Catálogo de componentes](04-catalog-complete-of-records-frontend.md): responsabilidades por flujo.
-- [Matriz caso–código](05-application-of-all-the-cases-to-the-code-frontend.md): trazabilidad completa.
-- [Vistas técnicas aplicadas](07-views-technical-applied-by-flow-frontend.md): sólo dinámicas o estados que agregan información.
+1. [1. Guía de documentación frontend](01-frontend-guide.md): capas, criterio de diagramas y revisión.
+2. [2. Catálogo de componentes](02-catalog-complete-of-records-frontend.md): responsabilidades por flujo.
+3. [3. Matriz caso–código](03-application-of-all-the-cases-to-the-code-frontend.md): trazabilidad completa.
+4. [4. Vistas técnicas aplicadas](04-views-technical-applied-by-flow-frontend.md): sólo dinámicas o estados que agregan información.

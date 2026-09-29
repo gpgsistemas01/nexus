@@ -1,4 +1,4 @@
-# Guía de documentación frontend
+# 1. Guía de documentación frontend
 
 Esta referencia cubre el código del navegador y su composición EJS en `src/public/js`,
 `src/views/pages` y `src/views/shared`. Enlaza el contrato API, pero no vuelve a declarar
@@ -31,7 +31,7 @@ o listener cuando el código ya responde esa pregunta.
 | Petición directa, CRUD homogéneo o exportación | Secuencia `DIA-FE-CU-*` del caso propietario. | Un grupo genérico de “Reportes” o una segunda secuencia trivial. |
 
 Los diagramas frontend terminan en método y URL. La vista de
-[componentes y reutilización](../architecture-and-web-views/04-organization-consistent-of-frontend-and-back.md#reutilización-comprobada-en-el-frontend)
+[componentes y reutilización](../architecture-and-web-views/02-organization-consistent-of-frontend-and-back.md#reutilización-comprobada-en-el-frontend)
 concentra las factories compartidas; cada secuencia conserva únicamente participantes,
 datos y efectos propios del caso.
 

@@ -1,4 +1,4 @@
-# 7. Relaciones de inventario en el cliente web
+# 5. Relaciones de inventario en el cliente web
 
 Los datos de inventario consumidos por los formularios y listados CRUD conservan las
 relaciones `presentation` y `unitMeasure` como objetos. Cuando Select2 las transporta

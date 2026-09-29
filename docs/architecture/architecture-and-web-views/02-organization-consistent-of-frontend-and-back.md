@@ -1,4 +1,4 @@
-# Componentes y reutilización de frontend y backend
+# 2. Componentes y reutilización de frontend y backend
 
 Esta vista sustituye una descripción archivo por archivo por las responsabilidades y
 puntos de reutilización que condicionan la solución. La unidad de organización es el
@@ -94,7 +94,7 @@ mediante `createReportApplication`.
 3. Mantener una sola transacción backend para escrituras compuestas y propagar `tx` a
    cada colaborador.
 4. Representar una colaboración nueva en este diagrama sólo si cambia la estructura;
-   el detalle de imports y rutas pertenece al [mapa generado](../../generated/code-map.md)
+   el detalle de imports y rutas pertenece al [mapa generado](../views/development/code-map.md)
    y las secuencias concretas a las colecciones de
    [frontend](../frontend-code-sequences/index.md) y
    [backend](../backend-code-sequences/index.md).

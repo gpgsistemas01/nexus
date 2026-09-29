@@ -99,7 +99,7 @@ visual del formulario en un estado persistido del documento.
 
 1. La tabla describe capacidades del producto, no personas autorizadas. La política de
    roles y departamentos se consulta en
-   [usuarios y permisos](../data/database-users-and-permissions-analysis.md).
+   [usuarios y permisos](../architecture/views/logical/data-and-persistence/01-database-users-and-permissions-analysis.md).
 2. Los permisos de visualización de página son distintos de los permisos API y se
    comprueban en las rutas web; no se mezclan aquí con operaciones sobre datos.
 3. «Modelado» o «Parcial» no significa permitido. Un modelo, permiso declarado o
@@ -114,7 +114,7 @@ visual del formulario en un estado persistido del documento.
 - **Disponibilidad:** rutas registradas bajo `src/routes/api` y estado de los requisitos.
 - **Permisos:** `src/constants/permissions.js`; esta matriz conserva el valor público del
   permiso y no duplica sus listas de roles/departamentos.
-- **Método y URL exactos:** [mapa generado](../generated/code-map.md).
+- **Método y URL exactos:** [mapa generado](../architecture/views/development/code-map.md).
 - **Criterio funcional:** [especificación de requisitos](requirements-specification/index.md).
 - **Cobertura:** matriz CRUD del [plan de pruebas](../testing/test-plan.md).
 

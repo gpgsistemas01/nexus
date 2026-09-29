@@ -5,7 +5,7 @@
 Este glosario forma parte de la línea base de requisitos. Define el vocabulario que
 usuarios, responsables funcionales, desarrollo y pruebas deben interpretar de la misma
 forma. No es un inventario de columnas: el
-[diccionario técnico de datos](../generated/data-dictionary.md) describe nombres, tipos y
+[diccionario técnico de datos](../architecture/views/logical/data-and-persistence/generated/data-dictionary.md) describe nombres, tipos y
 restricciones de Prisma, mientras este documento describe significado, alcance y
 sinónimos aceptados en el negocio.
 
@@ -36,6 +36,7 @@ fuente de verdad.
 | Aprobador | Persona que autoriza una transición cuando el flujo lo requiere. | Que un modelo permita `approver` no implica que el flujo de aprobación esté disponible. |
 | Persona que recibe | Persona a cuyo nombre se registra la recepción de una compra. | No es necesariamente el usuario que captura la entrada ni el proveedor que entrega el material. En código corresponde a `receivedBy`. |
 | Personal de almacén | Actor funcional que mantiene catálogos y ejecuta operaciones de almacén cuando sus accesos le conceden el permiso correspondiente. | No es una persona concreta, un rol único ni el campo técnico `warehouseStaff`; cada operación conserva su propia política de autorización. |
+| Administrador del sistema | Actor funcional del área Sistemas que administra identidades y catálogos y puede ejecutar las capacidades operativas vigentes, siempre sujeto a la autorización del servidor. | No equivale a omitir permisos ni a conceder acceso por el nombre de una cuenta; sus capacidades proceden de una asignación de acceso válida. |
 | Asesor | Persona asociada como dato del contexto comercial de un cliente o salida. | No es actor ni usuario del sistema y no debe inferirse a partir del usuario autenticado. |
 | Actor de auditoría | Usuario al que se atribuye una escritura o cambio crítico. | Puede conservarse como nulo únicamente en los casos técnicos previstos por la auditoría. |
 
@@ -49,6 +50,7 @@ fuente de verdad.
 | Presentación | Forma comercial o física en que se identifica un material. | Es catálogo auxiliar; no es la unidad de medida. |
 | Unidad de medida | Unidad y símbolo usados para expresar cantidades de un material. | Debe conservarse separada de factores o cantidades convertidas. |
 | Catálogo auxiliar | Conjunto controlado de opciones que clasifica o configura otros registros, como presentación, unidad, motivo o estado de cumplimiento. | Su lectura dentro de un selector operativo no concede mantenimiento; las seis variantes registradas sólo pueden administrarse desde sus pantallas protegidas con `catalogs:manage`. |
+| Alta contextual | Creación de un registro desde el selector de otra operación para incorporarlo y seleccionarlo en el formulario de origen. | Reutiliza el alta autorizada, pero no concede acceso al listado independiente ni a las acciones de consulta, edición o reporte del catálogo. En el alcance vigente aplica a materiales desde una compra, proveedores desde formularios operativos y clientes desde una salida. |
 | Proveedor | Organización que suministra materiales y participa en entradas de compra. | Sus nombres legal y comercial son datos distintos. |
 | Oferta proveedor-material | Relación única entre proveedor y material que conserva costo máximo, existencia y estado activo asociados. | En código corresponde a `SupplierMaterial`; no es un material duplicado. |
 | Inventario | Vista conjunta de las existencias de materiales por proveedor o de las existencias independientes de merma. | No es un único saldo global: materiales y mermas mantienen relaciones, movimientos y reportes separados. |
@@ -98,6 +100,7 @@ fuente de verdad.
 | Cantidad devuelta | Acumulado reingresado después de un suministro. | Cada incremento requiere trazabilidad con su movimiento de reversa. |
 | Cantidad convertida | Cantidad expresada mediante la conversión definida por el contexto del material o merma. | Debe nombrarse junto con la unidad o regla de conversión aplicable. |
 | Cantidad de proyecto | Cantidad informada al surtir para comparar el consumo previsto por el proyecto con la cantidad convertida del detalle. | No sustituye la cantidad solicitada ni determina por sí sola cuánto stock se descuenta; la diferencia se conserva por separado. |
+| Cantidad a agregar | Cantidad positiva que se suma a la existencia vigente mediante **Agregar stock** de una merma y queda respaldada por un documento individual de entrada y su movimiento. | Es incremental: no representa el saldo final, no requiere una razón de ajuste y no sustituye una entrada de compra ni **Ajustar stock**. |
 | Nueva cantidad | Existencia total que debe quedar después de un alta o ajuste. | Sustituye el stock vigente; no representa un incremento que Nexus sumará automáticamente. |
 | Costo por presentación | Costo capturado para la cantidad expresada en la presentación de un detalle de compra. | Se usa para calcular los montos del renglón y el costo por unidad convertida; no es el costo máximo. |
 | Monto sin/con IVA | Importe de un detalle o compra antes o después de aplicar el IVA utilizado por Nexus. | El monto con IVA se calcula a partir del monto sin IVA; ninguno representa una cantidad de inventario. |

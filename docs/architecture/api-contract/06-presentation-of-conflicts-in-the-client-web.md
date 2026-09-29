@@ -1,4 +1,4 @@
-# 8. Presentación de conflictos en el cliente web
+# 6. Presentación de conflictos en el cliente web
 
 Las respuestas HTTP `409` conservan un código de error estable en `code` y una
 descripción legible en `message`. El cliente muestra ambos valores en el modal de

@@ -7,7 +7,7 @@ interfaz opcional para consultar y probar ese contrato.
 
 El contrato OpenAPI publica las operaciones registradas y sus esquemas de entrada y
 salida. `npm run docs:check` compara sus operaciones con el
-[mapa generado](../../generated/code-map.md), de modo que una ruta nueva, eliminada o
+[mapa generado](../views/development/code-map.md), de modo que una ruta nueva, eliminada o
 renombrada exige actualizar ambos artefactos. La comprobación no infiere la semántica de
 `express-validator`, DTO, controllers y servicios: sus cambios deben reflejarse
 deliberadamente en los componentes afectados del contrato.

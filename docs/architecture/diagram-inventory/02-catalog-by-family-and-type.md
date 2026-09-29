@@ -5,7 +5,7 @@
 | `DIA-ARQ-CTX-001` | Contexto inspirado en C4 | `architecture-and-web-views/index.md#diagrama-de-contexto-del-sistema` | 1 | Actores, sistema y dependencias externas; curado. |
 | `DIA-ARQ-CON-001` | Contenedores y capas | `architecture-and-web-views/index.md#contenedores-y-capas` | 1 | Entornos y responsabilidades; curado. |
 | `DIA-ARQ-DEP-001..002` | Despliegue actual y objetivo | Secciones “Despliegue” de `architecture-and-web-views/index.md` | 2 | Infraestructura y configuración; curado. |
-| `DIA-ARQ-CMP-001..002` | Componentes y reutilización | `architecture-and-web-views/04-organization-consistent-of-frontend-and-back.md` | 2 | Capas de aplicación y factories/UI compartidas de frontend; curado. |
+| `DIA-ARQ-CMP-001..002` | Componentes y reutilización | `architecture-and-web-views/02-organization-consistent-of-frontend-and-back.md` | 2 | Capas de aplicación y factories/UI compartidas de frontend; curado. |
 | `DIA-ARQ-SEQ-001` | Secuencia extremo a extremo | `architecture-and-web-views/index.md#recorrido-de-una-interacción` | 1 | Interacción representativa; curado. |
 | `DIA-ARQ-EST-001` | Estados de acceso | `web-navigation-and-screen-catalog/index.md#estados-de-acceso-y-sesión` | 1 | Sesión y rutas; curado. |
 | `DIA-ARQ-NAV-001..002` | Navegación y redirecciones | Mapa de sitio y redirecciones de `web-navigation-and-screen-catalog/index.md` | 2 | Rutas web y menú; curado. |
@@ -24,8 +24,8 @@
 | `DIA-PAT-EST-001`, `DIA-PAT-FRO-001`, `DIA-PAT-CON-001`, `DIA-PAT-DIN-001`, `DIA-PAT-TST-001` | Estructura, frontera, construcción, dinámica y pruebas de patrones aplicados | `design-and-construction-patterns/04-catalog-visual-of-patterns-applied.md` | 5 | Símbolos y consumidores comprobables; sus códigos se referencian desde cada caso frontend/backend. |
 | `DIA-DOC-FLU-001` | Actividad documental | `technical-code-documentation/index.md#recorrido-para-incorporar-documentación` | 1 | Gobierno técnico; curado. |
 | `DIA-API-SEQ-001` | Secuencia de middleware | `api-contract/01-how-document-a-route-api.md#prefijo-montaje-y-orden-de-middleware` | 1 | Registro Express; curado. |
-| `DIA-GEN-COD-001` | Dependencias generadas | `generated/code-map.md#dependencias-entre-áreas` | 1 | `src`; regenerar. |
-| `DIA-GEN-ER-001..005` | Entidad–relación | Cuatro áreas y relaciones transversales de `generated/database-schema.md` | 5 | Prisma; regenerar. |
+| `DIA-GEN-COD-001` | Dependencias generadas | `views/development/code-map.md#dependencias-entre-áreas` | 1 | `src`; regenerar. |
+| `DIA-GEN-ER-001..005` | Entidad–relación | Cuatro áreas y relaciones transversales de `views/logical/data-and-persistence/generated/database-schema.md` | 5 | Prisma; regenerar. |
 | `DIA-REQ-DOM-001` | Clases de dominio conceptual | `domain-and-use-cases/02-model-of-domain-conceptual.md` | 1 | Requisitos y glosario; curado. |
 | `DIA-REQ-CU-GRP-AUT..SAL` | Casos de uso por seis grupos propietarios | `domain-and-use-cases/03-cases-of-use-current.md` | 6 | Los reportes se integran con el grupo del recurso que los inicia; curado. |
 | `DIA-REQ-EST-001` | Estados/datos por acción | `domain-and-use-cases/04-states-and-data-modified-by-action.md` | 1 | Reglas de dominio; curado. |

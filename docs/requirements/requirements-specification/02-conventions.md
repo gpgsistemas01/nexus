@@ -45,7 +45,7 @@ originó el cambio.
 
 Los requisitos usan los términos canónicos del
 [glosario del negocio](../business-glossary.md). El glosario define significado compartido
-para usuarios y responsables; el [diccionario técnico](../../generated/data-dictionary.md)
+para usuarios y responsables; el [diccionario técnico](../../architecture/views/logical/data-and-persistence/generated/data-dictionary.md)
 documenta cómo se representan los datos persistentes. Ninguno debe sustituir al otro.
 
 La [matriz de operaciones](../requirements-operations-matrix.md) resume las capacidades

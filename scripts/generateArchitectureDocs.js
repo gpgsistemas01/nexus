@@ -4,9 +4,9 @@ import process from 'node:process';
 
 const ROOT = process.cwd();
 const OUTPUTS = {
-    codeMap: path.join(ROOT, 'docs/generated/code-map.md'),
-    database: path.join(ROOT, 'docs/generated/database-schema.md'),
-    dataDictionary: path.join(ROOT, 'docs/generated/data-dictionary.md')
+    codeMap: path.join(ROOT, 'docs/architecture/views/development/code-map.md'),
+    database: path.join(ROOT, 'docs/architecture/views/logical/data-and-persistence/generated/database-schema.md'),
+    dataDictionary: path.join(ROOT, 'docs/architecture/views/logical/data-and-persistence/generated/data-dictionary.md')
 };
 const CHECK = process.argv.includes('--check');
 const SOURCE_AREAS = [
@@ -458,7 +458,7 @@ const getLayerDependencies = async (sourceFiles) => {
 const table = (routes) => [
     '| Método | Ruta | Definición |',
     '| --- | --- | --- |',
-    ...routes.map(({ method, route, file }) => `| \`${method}\` | \`${route}\` | [\`${file}\`](../../${file}) |`)
+    ...routes.map(({ method, route, file }) => `| \`${method}\` | \`${route}\` | [\`${file}\`](../../../../${file}) |`)
 ].join('\n');
 
 const getNamedExports = (source) => [...source.matchAll(
@@ -483,7 +483,7 @@ const moduleExportsTable = (modules) => [
     '| Módulo | Símbolos exportados |',
     '| --- | --- |',
     ...modules.map(({ file, exports }) => (
-        `| [\`${file}\`](../../${file}) | ${exports.map((name) => `\`${name}\``).join(', ')} |`
+        `| [\`${file}\`](../../../../${file}) | ${exports.map((name) => `\`${name}\``).join(', ')} |`
     ))
 ].join('\n');
 
@@ -508,7 +508,7 @@ const generateCodeMap = async () => {
 Este inventario se genera **a partir del código fuente**. Ejecuta \`npm run docs:architecture\`
 después de cambiar rutas o dependencias entre capas; \`npm run docs:check\` detecta si esta
 versión quedó desactualizada. La semántica y el patrón de esta vista se describen en las
-[convenciones de diagramas](../architecture/diagram-conventions/index.md).
+[convenciones de diagramas](../../diagram-conventions/index.md).
 
 ## Dependencias entre áreas
 
@@ -538,7 +538,7 @@ ${table(webRoutes)}
 Este inventario enumera los nombres públicos declarados por los módulos bajo
 \`src/controllers\`. Permite localizar el adaptador HTTP o web sin inferir su propósito
 desde el nombre. La responsabilidad, entrada, salida y servicio coordinado se explican
-en la [documentación técnica del backend](../architecture/backend-technical-documentation/index.md)
+en la [documentación técnica del backend](../../backend-technical-documentation/index.md)
 cuando el flujo necesita una vista curada.
 
 ${moduleExportsTable(controllerModules)}
@@ -691,7 +691,7 @@ Estos diagramas ER se generan desde los modelos y relaciones de
 \`prisma/schema.prisma\`. Se separan por área para que puedan leerse y revisarse en
 GitHub; las relaciones que cruzan áreas se describen en la sección final. La semántica
 y el patrón de esta vista se describen en las
-[convenciones de diagramas](../architecture/diagram-conventions/index.md).
+[convenciones de diagramas](../../../../diagram-conventions/index.md).
 
 La marca \`PK\` identifica claves primarias, \`FK\` claves foráneas y \`UK\` campos
 únicos. Los campos compuestos y demás restricciones siguen teniendo como fuente de
@@ -736,15 +736,15 @@ const generateDataDictionary = async () => {
 Este inventario se genera desde \`prisma/schema.prisma\` y enumera campos escalares,
 obligatoriedad, claves, valores predeterminados, tipos de base de datos y relaciones
 propietarias. Se aplican las
-[convenciones de diagramas](../architecture/diagram-conventions/index.md).
+[convenciones de diagramas](../../../../diagram-conventions/index.md).
 
 El tipo Prisma y el atributo \`@db\` describen la representación técnica. Prisma y las
 migraciones son la fuente de verdad para restricciones completas, índices, acciones
 referenciales y SQL. El propósito de negocio de los agregados se explica en el
-[modelo de dominio y casos de uso](../requirements/domain-and-use-cases/index.md); este generador no inventa
+[modelo de dominio y casos de uso](../../../../../requirements/domain-and-use-cases/index.md); este generador no inventa
 definiciones de negocio a partir de nombres de tablas. La terminología compartida con
 usuarios y responsables se mantiene en el
-[glosario del negocio](../requirements/business-glossary.md).
+[glosario del negocio](../../../../../requirements/business-glossary.md).
 
 ## Cómo leerlo
 
