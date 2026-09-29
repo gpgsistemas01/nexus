@@ -7,6 +7,7 @@ import process from 'node:process';
 import { pathToFileURL } from 'node:url';
 import { bundleOpenApiContract } from './openApiContractUtils.js';
 import { getDocumentExportRequest, getDocumentOutputPlan } from './documentExportFormats.js';
+import { getFigureSizeAttribute, getPngDimensions } from './documentExportImageUtils.js';
 import {
     documentExportAnchor,
     externalDocumentAnchorFragment,
@@ -389,15 +390,18 @@ const addInternalAnchors = (content, source) => {
     return `[]{#${documentExportAnchor(source)}}\n\n${anchoredHeadings}`;
 };
 
-const addFigureAnchors = (content, source, firstFigureNumber) => {
+const addFigureAnchors = async (content, source, firstFigureNumber) => {
     let figureNumber = firstFigureNumber;
-    return content.replace(
-        /^(\s*)(!\[([^\]]+)\]\([^)]+\))$/gm,
-        (figure, indentation, image, title) => (
-            `${indentation}${image.replace(`![${title}]`, `![Figura ${figureNumber}. ${title}]`)}`
-            + `{#${documentExportAnchor(source, `figura-${figureNumber++}`)} width=90%}`
-        )
-    );
+    const figurePattern = /^(\s*)(!\[([^\]]+)\]\(([^)]+)\))$/gm;
+    const figures = [...content.matchAll(figurePattern)];
+    let preparedContent = content;
+    for (const [figure, indentation, image, title, imagePath] of figures) {
+        const dimensions = getPngDimensions(await readFile(imagePath));
+        const replacement = `${indentation}${image.replace(`![${title}]`, `![Figura ${figureNumber}. ${title}]`)}`
+            + `{#${documentExportAnchor(source, `figura-${figureNumber++}`)} ${getFigureSizeAttribute(dimensions)}}`;
+        preparedContent = preparedContent.replace(figure, replacement);
+    }
+    return preparedContent;
 };
 
 const buildDocumentIndexes = async (preparedSources) => {
@@ -654,7 +658,7 @@ const prepareSource = async (source, publicationSources, firstFigureNumber, curr
         }
         renderedContent = renderedContent.replace(match[0], `![${diagramCaption(content, match.index)}](${image})`);
     }
-    renderedContent = addFigureAnchors(renderedContent, source, firstFigureNumber);
+    renderedContent = await addFigureAnchors(renderedContent, source, firstFigureNumber);
     await writeFile(renderedSource, renderedContent);
     return {
         renderedSource,
