@@ -1,12 +1,28 @@
 import { describe, expect, it } from 'vitest';
 import {
+    documentExportAnchor,
     exportedDocumentTitle,
+    externalDocumentAnchorFragment,
     externalDocumentLinkLabel,
     getHeadingTitle,
     prepareManualEntry
 } from '../../../scripts/documentExportContentUtils.js';
 
 describe('documentExportContentUtils', () => {
+    it('genera anclas compatibles con marcadores de documentos', () => {
+        const anchor = documentExportAnchor(
+            'docs/user-manual/error-messages.md',
+            'errores-de-validación-de-formularios'
+        );
+
+        expect(anchor).toMatch(/^nexus_[a-f0-9]{32}$/);
+        expect(anchor.length).toBeLessThanOrEqual(40);
+        expect(documentExportAnchor(
+            'docs/user-manual/error-messages.md',
+            'errores-catalogos'
+        )).not.toBe(anchor);
+    });
+
     it('deriva un nombre legible del archivo exportado', () => {
         expect(exportedDocumentTitle('manuales/almacen/informacion-general-y-anexos.docx'))
             .toBe('Información general y anexos');
@@ -55,21 +71,37 @@ describe('documentExportContentUtils', () => {
             .toBe('Errores de validación de formularios');
     });
 
-    it('indica la sección cuando el enlace tiene ancla y el documento cuando no la tiene', () => {
+    it('deriva el ancla externa del título de la sección enlazada', () => {
+        const targetContent = [
+            '# Catálogo de mensajes',
+            '',
+            '<a id="errores-validacion"></a>',
+            '## Errores de validación de formularios'
+        ].join('\n');
+
+        expect(externalDocumentAnchorFragment({
+            fragment: 'errores-validacion',
+            targetContent
+        })).toBe('errores-de-validación-de-formularios');
+        expect(externalDocumentAnchorFragment({
+            fragment: 'ancla-sin-titulo',
+            targetContent
+        })).toBe('ancla-sin-titulo');
+    });
+
+    it('identifica el destino externo sin repetir la etiqueta del enlace fuente', () => {
         const targetContent = '# Compras\n\n## Registro de una compra';
         const linkedOutput = 'manuales/almacen/compras.docx';
 
         expect(externalDocumentLinkLabel({
-            label: 'registro',
             linkedOutput,
             fragment: 'registro-de-una-compra',
             targetContent
-        })).toBe('registro — sección «Registro de una compra» del documento «Compras»');
+        })).toBe('Registro de una compra — Compras');
         expect(externalDocumentLinkLabel({
-            label: 'compras',
             linkedOutput,
             fragment: undefined,
             targetContent
-        })).toBe('compras — documento «Compras»');
+        })).toBe('Compras');
     });
 });

@@ -1,100 +1,42 @@
 # Procedimientos y casos
 
-Este capítulo integra las capturas generadas con los pasos que las requieren. El texto situado
-sobre cada imagen es su ID actualizado y estable; los casos de uso asociados permiten verificar
-la trazabilidad. Antes de exportar, compruebe que las imágenes existentes estén completas,
-revisadas y correspondan a la versión del manual. Ejecute `npm run docs:screenshots` sólo si falta
-una captura o cambió una pantalla; actualizar capturas y exportar el manual son acciones distintas.
+## Cómo seguir un procedimiento
 
-## Convenciones del recorrido
+Cada procedimiento indica su propósito, las condiciones previas, los controles necesarios, los
+pasos y el resultado que debe comprobar. Use sólo las acciones visibles para su cuenta y para el
+estado actual del registro.
 
-Cada procedimiento conserva una explicación breve del flujo: **para qué sirve, qué debe estar
-preparado, qué controles intervienen, qué pasos sigue la persona y qué resultado debe comprobar**.
-No describe la implementación interna ni repite todas las reglas del sistema. Una tarea se amplía
-sólo cuando existe una decisión, un cambio de estado, un efecto sobre existencias o una forma de
-recuperación que la persona necesita conocer para completarla sin ayuda.
-
-- **Precondiciones:** use una cuenta ficticia autorizada y los datos indicados en el inventario.
-- **Alternativas y errores:** si una acción no aparece, no cambie de cuenta; valide permisos y
-  estado del registro. Si una validación impide continuar, corrija el dato señalado sin repetir
-  una operación cuyo resultado sea incierto.
-- **Capturas:** consulte cada imagen inmediatamente después de que aparezca la pantalla que
-  representa y antes de capturar datos o ejecutar la siguiente acción. En listados y páginas
-  iniciales, la referencia es el primer paso; en formularios y diálogos, sigue a la acción que
-  los abre. La captura no se coloca después de guardar, descargar o regresar porque no muestra
-  el resultado de esas acciones.
+- **Precondiciones:** confirme que cuenta con autorización y que los registros relacionados están
+  vigentes.
+- **Alternativas y errores:** si una acción no aparece, valide sus permisos y el estado del
+  registro. Si Nexus rechaza un dato, corrija el campo señalado. Antes de repetir una escritura,
+  compruebe si el registro o la existencia cambiaron.
+- **Capturas:** utilícelas para localizar controles y reconocer el modo o estado descrito.
 - **Resultado:** confirme el mensaje y el estado visible. Las acciones de existencia, surtido,
   devolución y corrección modifican inventario; las de exportación generan un archivo.
 
 🟨 **ADVERTENCIA:** antes de confirmar una escritura, revise la
-[matriz de validación y modos](form-validation-matrix.md); una acción visible después de surtir,
+[matriz de validación y modos](form-validation-matrix.md). Una acción visible después de surtir,
 devolver, corregir o cancelar puede habilitar menos campos que la edición general.
 
-### Resaltado y advertencias
-
-El manual no colorea párrafos completos ni usa el color como único significado. La negrita se
-reserva para controles y mensajes literales de Nexus; los identificadores técnicos se presentan
-como código. Los avisos usan además una etiqueta textual, de modo que continúan siendo comprensibles
-en una impresión sin color o para quien utiliza tecnologías de asistencia:
-
-- 🟨 **ADVERTENCIA:** una condición que debe revisarse antes de actuar o una operación que puede
-  cambiar información, estados o existencias;
-- 🟥 **DATO SENSIBLE:** información que no debe incluirse en capturas, archivos o solicitudes de
-  soporte.
-
-Un aviso general aparece una sola vez cuando aplica de la misma forma a todo el manual. Se repite
-dentro de un procedimiento únicamente junto al paso donde ignorarlo puede causar un resultado
-difícil de revertir o cuando la recuperación cambia para ese caso. Las notas informativas que no
-requieren una decisión se redactan como parte del paso, sin añadir otro color.
-
-### Extensión y uso de capturas
-
-Los pasos describen acciones observables y una comprobación final; no enumeran clics evidentes ni
-copian el catálogo completo de validaciones. Una captura se incluye cuando permite ubicar controles,
-distinguir un modo o estado, o reconocer dónde recuperarse. No se agrega una imagen por cada mensaje:
-un mensaje breve con una única acción se documenta como texto, y sólo un diálogo, estado o error cuya
-disposición visual aporte información conserva una captura junto al paso que lo produce.
+🟥 **DATO SENSIBLE:** no incluya contraseñas, cookies, tokens ni datos personales en archivos,
+capturas o solicitudes de soporte.
 
 ## Casos por grupo funcional
 
-Los procedimientos se dividen por grupo para localizar una tarea sin recorrer un único archivo extenso:
+Seleccione el grupo correspondiente a la tarea que necesita completar:
 
 - [Autenticación y navegación](cases/authentication/index.md): iniciar sesión y recuperarse de una página no encontrada.
 - [Identidad y acceso](cases/identity-access/index.md): administrar personas, accesos, usuarios y contraseñas.
 - [Catálogos e inventario](cases/catalogs/index.md): consultar y mantener materiales, proveedores, clientes y mermas.
 - [Compras de material](cases/purchases/index.md): registrar, editar, corregir y exportar compras.
 - [Salidas de material y merma](cases/issues/index.md): registrar, surtir, devolver y exportar salidas.
-- [Exportaciones desde consultas](cases/reports/index.md): usar el modal de exportación de inventarios y movimientos desde su consulta propietaria.
-
-### Relación con requisitos y arquitectura
-
-El manual explica **cómo opera la persona usuaria**; no sustituye la descripción normativa ni
-las secuencias técnicas. Para revisar un cambio sin perder detalle, use el identificador y nombre
-`CU-*` del procedimiento para recorrer las siguientes vistas del mismo grupo. El capítulo de
-[exportaciones desde consultas](cases/reports/index.md) complementa los grupos propietarios y
-no constituye un grupo adicional:
-
-| Grupo | Descripción normativa | Diagramas funcionales | Secuencia frontend | Secuencia backend | Procedimiento operativo |
-| --- | --- | --- | --- | --- | --- |
-| `AUT` | [Fichas de autenticación](../requirements/use-cases/authentication/index.md#grupo-funcional-aut--autenticación) | [Flujos `CU-AUT`](../requirements/diagrams/authentication/index.md#grupo-funcional-aut--autenticación) | [Frontend](../architecture/frontend-code-sequences/authentication/index.md) | [Backend](../architecture/backend-code-sequences/authentication/index.md) | [Acceso](cases/authentication/index.md) |
-| `IDA` | [Fichas de identidad y acceso](../requirements/use-cases/identity-access/index.md#grupo-funcional-ida--identidad-y-acceso) | [Flujos `CU-IDA`](../requirements/diagrams/identity-access/index.md#grupo-funcional-ida--identidad-y-acceso) | [Frontend](../architecture/frontend-code-sequences/identity-access/index.md) | [Backend](../architecture/backend-code-sequences/identity-access/index.md) | [Personas y usuarios](cases/identity-access/index.md) |
-| `ALM` | [Fichas de almacén](../requirements/use-cases/catalogs/index.md#grupo-funcional-alm--almacén) | [Flujos `CU-ALM`](../requirements/diagrams/catalogs/index.md#grupo-funcional-alm--almacén) | [Frontend](../architecture/frontend-code-sequences/catalogs/index.md) | [Backend](../architecture/backend-code-sequences/catalogs/index.md) | [Catálogos e inventario](cases/catalogs/index.md) |
-| `CAT` | [Fichas de catálogos](../requirements/use-cases/catalogs/index.md#grupo-funcional-cat--catálogos) | [Flujos `CU-CAT`](../requirements/diagrams/catalogs/index.md#grupo-funcional-cat--catálogos) | [Frontend](../architecture/frontend-code-sequences/catalogs/index.md) | [Backend](../architecture/backend-code-sequences/catalogs/index.md) | [Catálogos auxiliares y comerciales](cases/catalogs/index.md) |
-| `ENT` | [Fichas de compras](../requirements/use-cases/purchases/index.md#grupo-funcional-ent--compras-de-material) | [Flujos `CU-ENT`](../requirements/diagrams/purchases/index.md#grupo-funcional-ent--compras-de-material) | [Frontend](../architecture/frontend-code-sequences/purchases/index.md) | [Backend](../architecture/backend-code-sequences/purchases/index.md) | [Compras](cases/purchases/index.md) |
-| `SAL` | [Fichas de salidas](../requirements/use-cases/issues/index.md#grupo-funcional-sal--salidas-de-material-y-de-merma) | [Flujos `CU-SAL`](../requirements/diagrams/issues/index.md#grupo-funcional-sal--salidas-de-material-y-de-merma) | [Frontend](../architecture/frontend-code-sequences/issues/index.md) | [Backend](../architecture/backend-code-sequences/issues/index.md) | [Salidas](cases/issues/index.md) |
-
-Al mantener un caso, conserve el mismo **identificador y nombre** en estas vistas. Actualice la
-ficha normativa si cambia el objetivo, actor, disparador, precondición, flujo, excepción o
-postcondición; el procedimiento si cambia un control o recorrido visible; y las secuencias si
-cambia la colaboración del código. Una pantalla deshabilitada para revisar un registro cancelado
-pertenece al caso de **consulta**, no al caso de edición o cancelación, porque no confirma ninguna
-escritura.
+- [Exportaciones desde consultas](cases/reports/index.md): exportar inventarios y movimientos desde su consulta correspondiente.
 
 ## Manuales por actor
 
-Cada guía de actor funciona como punto de entrada y enlaza únicamente los grupos que corresponden a sus responsabilidades:
+- [Administrador del sistema](actors/administrator.md): administración, catálogos, operación e
+  historiales autorizados.
+- [Personal de almacén](actors/warehouse.md): inventario, compras y salidas permitidas.
 
-- [Administrador del sistema](actors/administrator.md).
-- [Personal de almacén](actors/warehouse.md).
-Los reportes se incluyen en el manual del actor que puede abrir el módulo; no se mantiene
-un manual global que mezcle capacidades incompatibles.
+Los reportes aparecen únicamente en el manual del actor que puede abrir el módulo.
