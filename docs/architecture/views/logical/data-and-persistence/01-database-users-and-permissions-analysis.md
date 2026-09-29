@@ -1,4 +1,4 @@
-# Usuarios, escrituras y permisos
+# 1. Usuarios, escrituras y permisos
 
 Este documento contiene una **decisión de diseño de acceso**, no la definición de los
 requisitos ni el inventario de tablas. El recorrido hacia requisitos, modelo y evidencia
@@ -13,7 +13,7 @@ se mantiene en el [mapa de datos, persistencia y acceso](index.md).
   guardar al actor explícito o emitir un evento de auditoría transaccional.
 - No se necesita una cuenta PostgreSQL por cada usuario de Nexus. La aplicación usa
   una cuenta técnica; la separación de cuentas de runtime/migración se describe en
-  [`postgresql-runtime-and-migration-roles.md`](postgresql-runtime-and-migration-roles.md).
+  [`02-postgresql-runtime-and-migration-roles.md`](02-postgresql-runtime-and-migration-roles.md).
 
 ## Modelo actual de acceso
 

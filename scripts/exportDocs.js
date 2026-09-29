@@ -214,11 +214,11 @@ const PUBLICATIONS = Object.freeze({
     datos: {
         parts: {
             datos: [
-                'docs/data/index.md',
-                'docs/data/database-users-and-permissions-analysis.md',
-                'docs/data/postgresql-runtime-and-migration-roles.md',
-                'docs/generated/database-schema.md',
-                'docs/generated/data-dictionary.md'
+                'docs/architecture/views/logical/data-and-persistence/index.md',
+                'docs/architecture/views/logical/data-and-persistence/01-database-users-and-permissions-analysis.md',
+                'docs/architecture/views/logical/data-and-persistence/02-postgresql-runtime-and-migration-roles.md',
+                'docs/architecture/views/logical/data-and-persistence/generated/database-schema.md',
+                'docs/architecture/views/logical/data-and-persistence/generated/data-dictionary.md'
             ]
         }
     },
@@ -233,7 +233,7 @@ const PUBLICATIONS = Object.freeze({
             'documentacion-tecnica-comun': packagePart(ARCHITECTURE_ENTRY, [
                 ...getDirectoryDocuments('docs/architecture/technical-code-documentation'),
                 ...getDirectoryDocuments('docs/architecture/design-and-construction-patterns'),
-                'docs/generated/code-map.md'
+                'docs/architecture/views/development/code-map.md'
             ]),
             backend: packagePart(ARCHITECTURE_ENTRY, [
                 ...getDirectoryDocuments('docs/architecture/backend-technical-documentation')

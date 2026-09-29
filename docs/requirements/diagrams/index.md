@@ -5,7 +5,7 @@ capacidades y atributos de calidad. La definición, estado, criterios de aceptac
 reglas de negocio se detallan en la
 [especificación de requisitos](../requirements-specification/index.md). Este archivo es un mapa
 para conversación y revisión: las rutas del
-[mapa generado](../../generated/code-map.md), el esquema Prisma y las pruebas siguen siendo
+[mapa generado](../../architecture/views/development/code-map.md), el esquema Prisma y las pruebas siguen siendo
 las fuentes verificables de implementación. Estas vistas aplican las
 [convenciones y patrones para diagramas](../../architecture/diagram-conventions/index.md): cada sección conserva
 un propósito, alcance, semántica y fuente de verdad definidos.

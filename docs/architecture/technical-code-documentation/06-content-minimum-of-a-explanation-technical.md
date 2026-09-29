@@ -10,7 +10,7 @@ aportan información al cambio:
    componente o transacción ya existente;
 4. **reglas y estados relevantes:** enlace al requisito propietario en vez de copiarlo;
 5. **persistencia y efectos:** modelos afectados, límite transaccional y eventos, con
-   enlace a la familia de datos cuando corresponda;
+   enlace a la vista arquitectónica de datos cuando corresponda;
 6. **errores y seguridad:** validaciones, permisos y errores observables que forman
    parte del contrato;
 7. **evidencia:** ruta de la prueba o brecha registrada, sin declarar cobertura que no

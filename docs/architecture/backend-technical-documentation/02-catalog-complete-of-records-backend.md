@@ -1,9 +1,9 @@
-# 3. Catálogo completo de fichas backend
+# 2. Catálogo completo de fichas backend
 
 La ficha se mantiene por **capacidad cohesiva**: agrupa las rutas, controladores y
 servicios que implementan el mismo contrato, pero nombra todos los módulos cubiertos.
 El inventario literal de cada export permanece en el
-[mapa generado](../../generated/code-map.md#símbolos-exportados-por-controladores); estas
+[mapa generado](../views/development/code-map.md#símbolos-exportados-por-controladores); estas
 fichas agregan entrada, salida, reglas, persistencia y criterio de diagrama sin convertir
 un ejemplo en la documentación de todo el backend.
 
@@ -38,7 +38,7 @@ un ejemplo en la documentación de todo el backend.
 | Movimientos y exportaciones contextuales: `movementController.js`, `movementQueryService.js`, `inventory/reportService.js`, controladores/servicios `report` de admin, ventas y almacén | La consulta del módulo aporta filtros y produce filas paginadas; su acción de exportar devuelve el Excel correspondiente con cabeceras HTTP. | Sólo lectura; cada reporte reutiliza la consulta de su contexto y transforma resultados sin modificar inventario. No existe un dominio funcional independiente de “reportes”. | **Flujo de datos del caso propietario**; no se crea una secuencia transversal que sustituya las exportaciones específicas. |
 | Numeración documental: `document/referenceNumberService.js` | Año/ámbito y cliente opcional producen o validan una referencia. | Comprueba duplicados e incrementa contadores usando el `tx` recibido cuando forma parte de creación documental. | Participante de secuencias de alta; **actividad** si cambia la estrategia anual/no anual. |
 
-El [mapa generado de servicios](../../generated/code-map.md#símbolos-exportados-por-servicios)
+El [mapa generado de servicios](../views/development/code-map.md#símbolos-exportados-por-servicios)
 completa, símbolo por símbolo, las constantes y helpers de cada módulo de la tabla. Una
 nueva exportación debe pertenecer a una de estas fichas o crear una capacidad nueva; no
 puede quedar documentada sólo como “otro ejemplo”.

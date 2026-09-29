@@ -1,4 +1,4 @@
-# 5. Aplicación de todos los casos al código frontend
+# 3. Aplicación de todos los casos al código frontend
 
 Esta matriz documenta cada `CU-*` desde el código que se ejecuta en el navegador. Una
 fila puede señalar que no existe pantalla independiente: en ese caso identifica el

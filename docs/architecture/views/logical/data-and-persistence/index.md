@@ -6,6 +6,15 @@
 | --- | --- | --- | --- | --- |
 | 1.0 | 1.0.0 | En revisión | 2026-09-10 | Equipo Nexus |
 
+## Capítulos
+
+1. [1. Usuarios, escrituras y permisos](01-database-users-and-permissions-analysis.md).
+2. [2. Separación de cuentas PostgreSQL para migraciones y aplicación](02-postgresql-runtime-and-migration-roles.md).
+
+El [diagrama ER](generated/database-schema.md) y el
+[diccionario técnico](generated/data-dictionary.md) son referencias generadas, no
+capítulos editoriales; por eso conservan nombres descriptivos sin prefijo numérico.
+
 ## Propósito
 
 Esta página es la entrada única a la documentación relacionada con datos. No vuelve a
@@ -43,12 +52,12 @@ por fecha produciría una trazabilidad que el sistema no garantiza.
 
 | Pregunta | Artefacto propietario | Evidencia o vista complementaria |
 | --- | --- | --- |
-| ¿Qué comportamiento o restricción debe cumplir Nexus? | [Especificación de requisitos](../requirements/requirements-specification/index.md) y [políticas transversales](../requirements/requirements-specification/04-unified-catalog-by-scope/05-policies-cross-cutting-of-the-business.md#45-políticas-transversales-del-negocio). | Los [casos de uso](../requirements/use-cases/index.md) organizan la interacción; no redefinen columnas. |
-| ¿Qué significa un concepto para el negocio? | [Glosario](../requirements/business-glossary.md) y [modelo de dominio](../requirements/domain-and-use-cases/index.md). | El diccionario técnico enlaza estos artefactos, pero no infiere significado desde nombres de tablas. |
-| ¿Cómo se separan cuenta, persona, asignación y autorización? | [Análisis de usuarios y permisos](database-users-and-permissions-analysis.md), como decisión de diseño de acceso. | `prisma/schema.prisma`, políticas del servidor y el [diagrama ER](../generated/database-schema.md) son evidencia. |
-| ¿Qué estructura persistente existe? | `prisma/schema.prisma` y las migraciones de `prisma/migrations`. | El [diagrama ER](../generated/database-schema.md) y el [diccionario técnico](../generated/data-dictionary.md) se generan desde Prisma. |
-| ¿Qué cuenta de PostgreSQL ejecuta la aplicación o las migraciones? | [Roles PostgreSQL](postgresql-runtime-and-migration-roles.md), como decisión operativa de infraestructura. | `DATABASE_URL`, `DIRECT_URL`, `prisma.config.ts` y `docker-entrypoint.sh` prueban el enrutamiento; el proveedor administra los privilegios reales. |
-| ¿Cuál es el contrato HTTP de un dato? | [Contrato de la API](../architecture/api-contract/index.md) y [OpenAPI 3.1](../architecture/openapi/openapi.json). | Rutas, validadores, DTO, controladores y pruebas de integración aportan la evidencia que debe conservarse sincronizada con el contrato procesable. |
+| ¿Qué comportamiento o restricción debe cumplir Nexus? | [Especificación de requisitos](../../../../requirements/requirements-specification/index.md) y [políticas transversales](../../../../requirements/requirements-specification/04-unified-catalog-by-scope/05-policies-cross-cutting-of-the-business.md#45-políticas-transversales-del-negocio). | Los [casos de uso](../../../../requirements/use-cases/index.md) organizan la interacción; no redefinen columnas. |
+| ¿Qué significa un concepto para el negocio? | [Glosario](../../../../requirements/business-glossary.md) y [modelo de dominio](../../../../requirements/domain-and-use-cases/index.md). | El diccionario técnico enlaza estos artefactos, pero no infiere significado desde nombres de tablas. |
+| ¿Cómo se separan cuenta, persona, asignación y autorización? | [Análisis de usuarios y permisos](01-database-users-and-permissions-analysis.md), como decisión de diseño de acceso. | `prisma/schema.prisma`, políticas del servidor y el [diagrama ER](generated/database-schema.md) son evidencia. |
+| ¿Qué estructura persistente existe? | `prisma/schema.prisma` y las migraciones de `prisma/migrations`. | El [diagrama ER](generated/database-schema.md) y el [diccionario técnico](generated/data-dictionary.md) se generan desde Prisma. |
+| ¿Qué cuenta de PostgreSQL ejecuta la aplicación o las migraciones? | [Roles PostgreSQL](02-postgresql-runtime-and-migration-roles.md), como decisión operativa de infraestructura. | `DATABASE_URL`, `DIRECT_URL`, `prisma.config.ts` y `docker-entrypoint.sh` prueban el enrutamiento; el proveedor administra los privilegios reales. |
+| ¿Cuál es el contrato HTTP de un dato? | [Contrato de la API](../../../api-contract/index.md) y [OpenAPI 3.1](../../../openapi/openapi.json). | Rutas, validadores, DTO, controladores y pruebas de integración aportan la evidencia que debe conservarse sincronizada con el contrato procesable. |
 
 ## Recorrido de trazabilidad
 

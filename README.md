@@ -177,8 +177,8 @@ están definidas. Los comandos de base de datos se encuentran en la tabla de scr
 
 Consulta las guías específicas para evitar duplicar aquí decisiones y procedimientos:
 
-- [roles PostgreSQL de ejecución y migración](docs/data/postgresql-runtime-and-migration-roles.md);
-- [usuarios, personas, auditoría y permisos](docs/data/database-users-and-permissions-analysis.md).
+- [roles PostgreSQL de ejecución y migración](docs/architecture/views/logical/data-and-persistence/02-postgresql-runtime-and-migration-roles.md);
+- [usuarios, personas, auditoría y permisos](docs/architecture/views/logical/data-and-persistence/01-database-users-and-permissions-analysis.md).
 
 ## Ejecución
 
@@ -347,7 +347,7 @@ El objetivo es mover la aplicación a un **VPS**. Hasta definir y versionar el p
 inverso, TLS, automatización, respaldos y monitoreo, esa topología permanece propuesta.
 También debe decidirse expresamente si el VPS conservará Supabase como base de datos
 administrada o alojará una instancia propia de PostgreSQL. Consulta la
-[vista de despliegue actual y objetivo](docs/architecture/architecture-and-web-views/02-architecture-of-the-system.md).
+[vista de despliegue actual y objetivo](docs/architecture/architecture-and-web-views/01-architecture-of-the-system.md).
 
 La documentación (`README.md` y `docs/`) **se conserva y versiona en este
 repositorio**. Las reglas de `.dockerignore` únicamente la excluyen del contexto de

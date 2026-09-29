@@ -10,7 +10,7 @@
 - Consulta `docs/architecture/coding-standards/index.md` para formato, nombres, capas, imports, errores y convenciones de frontend y pruebas.
 - Consulta `docs/README.md` para identificar el documento propietario de arquitectura, requisitos, datos, pruebas o gobierno antes de editar documentación.
 - Trata `prisma/schema.prisma` como fuente técnica del modelo de datos y `src/routes` como fuente de las rutas registradas.
-- No edites manualmente `docs/generated/`; regenera esos archivos con `npm run docs:architecture`.
+- No edites manualmente `docs/architecture/views/development/code-map.md` ni `docs/architecture/views/logical/data-and-persistence/generated/`; regenera esos archivos con `npm run docs:architecture`.
 
 ## Arquitectura y responsabilidades
 

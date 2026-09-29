@@ -1,4 +1,4 @@
-# Arquitectura del sistema
+# 1. Arquitectura del sistema
 
 ### Diagrama de contexto del sistema
 

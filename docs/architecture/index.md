@@ -34,12 +34,13 @@ Ambas vistas se conectan mediante la
 
 ## Forma arquitectónica y criterios normativos
 
-El [modelo de vistas aplicado](architecture-and-web-views/05-model-of-views-of-architecture-applied.md)
+El [modelo de vistas aplicado](architecture-and-web-views/03-model-of-views-of-architecture-applied.md)
 es la fuente propietaria del enfoque Viewpoint/View, su adaptación de 4+1 y el apoyo de
 los niveles de C4. Los [criterios documentales](../governance/documentation-standards/03-application-by-type-of-document.md)
 determinan qué orientan ISO/IEC/IEEE 42010, 29148, 1016 y 15289, qué entrega conserva cada
 contenido y los límites de la adopción. Este índice sólo dirige a esas decisiones: no
-mantiene otra versión de las normas ni del modelo de vistas.
+mantiene otra versión de las normas ni del modelo de vistas. El
+[índice de vistas](views/index.md) organiza los artefactos que materializan ese modelo.
 
 ## Orden de lectura recomendado
 
@@ -57,7 +58,9 @@ enlaces intercambiables ni copias de una misma vista:
    colaboraciones y reutilización observada.
 5. **Inventario curado de interfaz:** [Navegación y catálogo de pantallas web](web-navigation-and-screen-catalog/index.md): estados
    de acceso, mapa del menú, pantallas y redirecciones.
-6. **Evidencia generada:** [Mapa generado del código](../generated/code-map.md): rutas, dependencias reales entre
+6. **Vista lógica — datos y persistencia:** [Datos, persistencia y acceso](views/logical/data-and-persistence/index.md): decisiones de acceso,
+   operación de base de datos, estructura persistente y evidencia derivada de Prisma.
+7. **Vista de desarrollo — evidencia generada:** [Mapa generado del código](views/development/code-map.md): rutas, dependencias reales entre
    áreas y exportaciones detectadas automáticamente.
 
 ## Vistas y responsabilidades
@@ -71,6 +74,7 @@ enlaces intercambiables ni copias de una misma vista:
 | ¿Qué dependencias existen realmente en el código? | Mapa generado y diagramas vigentes del código. | `npm run docs:architecture` y revisión manual, respectivamente. |
 | ¿Cómo se ejecuta un caso de uso concreto? | Secuencias de código de [backend](backend-code-sequences/index.md) y [frontend](frontend-code-sequences/index.md), divididas por grupo funcional. | Curado junto con el caso afectado. |
 | ¿Cómo navega una persona por las pantallas? | Navegación y catálogo de pantallas web. | Curado junto con rutas, permisos y vistas. |
+| ¿Cómo se persisten y protegen los datos? | [Datos, persistencia y acceso](views/logical/data-and-persistence/index.md), junto con las vistas generadas de Prisma. | Curado para decisiones; `npm run docs:architecture` para estructura derivada. |
 | ¿Qué diagramas existen y qué notación usan? | [Inventario](diagram-inventory/index.md) y [convenciones](diagram-conventions/index.md). | Actualizar al agregar, retirar o cambiar una vista. |
 
 ## Regla de división

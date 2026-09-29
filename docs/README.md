@@ -16,23 +16,35 @@ se mantienen en inglés; `index.md`, `README.md` y los identificadores estables 
 `cu-cat-01.md` se conservan por convención. Los títulos, el contenido y los nombres de
 los paquetes exportables se presentan en español:
 
+La carpeta `views/` aplica las vistas **Lógica** y **Desarrollo** de la adaptación 4+1
+definida por Nexus. `views/logical/data-and-persistence/` reúne las decisiones y
+evidencias de base de datos; `views/development/code-map.md` describe la organización
+estática del código. Una subcarpeta `generated/` indica la forma de mantenimiento del
+artefacto, no una vista arquitectónica adicional. ISO/IEC/IEEE 42010 aporta los
+conceptos *viewpoint/view*, pero no impone estos nombres: proceden del modelo 4+1
+adoptado por el proyecto.
+
+Cada colección de capítulos curados conserva un `index.md` sin numerar y usa prefijos
+consecutivos `01-`, `02-`, etc. Las referencias generadas mantienen nombres descriptivos
+estables porque se regeneran y no forman parte de la secuencia editorial.
+
 ```text
 docs/
-├── architecture/  # Arquitectura, construcción y convenciones técnicas
-├── data/          # Datos persistentes, acceso y permisos
+├── architecture/  # Arquitectura y construcción
+│   └── views/
+│       ├── logical/      # Datos y persistencia
+│       └── development/  # Organización estática del código
 ├── governance/    # Criterios para mantener la documentación
 ├── user-manual/   # Entrada, capítulos e imágenes del manual
 ├── requirements/  # Entrada, requisitos, casos de uso e imágenes
 ├── styles/        # Estilos y plantillas de publicación
-├── testing/       # Estrategia, cobertura y plan de pruebas CRUD
-└── generated/     # Inventarios derivados; no se editan manualmente
+└── testing/       # Estrategia, cobertura y plan de pruebas CRUD
 ```
 
 | Familia | Artefacto principal | Artefactos complementarios | Evidencia generada |
 | --- | --- | --- | --- |
-| Arquitectura y construcción | [Documento de arquitectura y construcción](architecture/index.md) | [Descripción de arquitectura](architecture/architecture-and-web-views/index.md), [contrato API](architecture/api-contract/index.md), [navegación web](architecture/web-navigation-and-screen-catalog/index.md), referencias de [backend](architecture/backend-technical-documentation/index.md) y [frontend](architecture/frontend-technical-documentation/index.md), [secuencias](architecture/backend-code-sequences/index.md), [diagramas](architecture/code-diagrams/index.md), [patrones](architecture/design-and-construction-patterns/index.md) y [convenciones](architecture/diagram-conventions/index.md) | [Mapa del código](generated/code-map.md), derivado de rutas e importaciones de `src` |
+| Arquitectura, construcción y datos | [Documento de arquitectura y construcción](architecture/index.md) | [Descripción de arquitectura](architecture/architecture-and-web-views/index.md), [datos, persistencia y acceso](architecture/views/logical/data-and-persistence/index.md), [contrato API](architecture/api-contract/index.md), [navegación web](architecture/web-navigation-and-screen-catalog/index.md), referencias de [backend](architecture/backend-technical-documentation/index.md) y [frontend](architecture/frontend-technical-documentation/index.md), [secuencias](architecture/backend-code-sequences/index.md), [diagramas](architecture/code-diagrams/index.md), [patrones](architecture/design-and-construction-patterns/index.md) y [convenciones](architecture/diagram-conventions/index.md) | [Mapa del código](architecture/views/development/code-map.md), [esquema de base de datos](architecture/views/logical/data-and-persistence/generated/database-schema.md) y [diccionario técnico](architecture/views/logical/data-and-persistence/generated/data-dictionary.md) |
 | Dominio y requisitos | [Índice y portada del paquete](requirements/index.md); la [SRS](requirements/requirements-specification/index.md) y las [fichas de casos de uso](requirements/use-cases/index.md) son las fuentes normativas complementarias | [Visión y alcance](requirements/vision-scope-and-requirements/index.md), [dominio y casos de uso](requirements/domain-and-use-cases/index.md), [matriz de operaciones](requirements/requirements-operations-matrix.md), [diagramas de requisitos](requirements/diagrams/index.md) y [glosario](requirements/business-glossary.md) | No aplica; el estado funcional requiere revisión humana |
-| Datos, acceso y operación | [Mapa de datos, persistencia y acceso](data/index.md) | [Análisis de usuarios y permisos](data/database-users-and-permissions-analysis.md) y [roles PostgreSQL](data/postgresql-runtime-and-migration-roles.md) | [Esquema de base de datos](generated/database-schema.md) y [diccionario técnico](generated/data-dictionary.md), derivados de `prisma/schema.prisma` |
 | Pruebas | [Estrategia de pruebas](testing/service-test-coverage.md) | [Plan de pruebas](testing/test-plan.md), [ambiente, estrategia y catálogo unitario](testing/unit-test-catalog.md), y [resultados unitarios](testing/unit-test-results.md) de la última ejecución verificada | La evidencia ejecutable vive en `tests`; el catálogo y el resumen versionado complementan la salida de Vitest/CI |
 | Gobierno documental | [Normas y criterios](governance/documentation-standards/index.md) | [Buenas prácticas de organización](governance/documentation-practices/index.md), [revisión de estructura](governance/non-use-case-document-review/index.md), [registro de aplicación de normas](governance/standards-application/index.md) y [convenciones de diagramas](architecture/diagram-conventions/index.md), compartidas también con arquitectura | No aplica |
 
@@ -51,8 +63,9 @@ fuente normativa de capacidades y permisos; ambas matrices responden preguntas d
 Un artefacto puede apoyar más de una familia, pero conserva una sola responsabilidad. Por
 ejemplo, las convenciones de diagramas gobiernan la notación y no reemplazan los diagramas
 de arquitectura o requisitos. Del mismo modo, el esquema y el diccionario pertenecen a la
-familia de datos: complementan el análisis curado, mientras Prisma conserva la fuente
-técnica de modelos, campos y relaciones.
+vista arquitectónica de datos: complementan el análisis curado, mientras Prisma conserva
+la fuente técnica de modelos, campos y relaciones. El paquete exportable de datos es una
+selección de esa vista y no una familia documental independiente.
 
 ### Límite entre visión, SRS y arquitectura
 
@@ -73,8 +86,8 @@ arquitectónico mediante la matriz de trazabilidad.
 
 | Tipo | Ubicación | Fuente de verdad | Forma de actualización |
 | --- | --- | --- | --- |
-| Curado | `docs/{architecture,data,governance,requirements,testing}/*.md` | Decisiones, requisitos y comportamiento revisado | Se edita junto con el cambio que altera su contenido. |
-| Generado | `docs/generated/*.md` | `src` o `prisma/schema.prisma`, según la familia indicada arriba | `npm run docs:architecture`; no se edita manualmente. |
+| Curado | `docs/{architecture,governance,requirements,testing}/*.md` | Decisiones, requisitos y comportamiento revisado | Se edita junto con el cambio que altera su contenido. |
+| Generado | `docs/architecture/views/development/code-map.md` y `docs/architecture/views/logical/data-and-persistence/generated/*.md` | `src` o `prisma/schema.prisma`, según la preocupación propietaria indicada arriba | `npm run docs:architecture`; no se edita manualmente. |
 | Ejecutable | `tests` | Casos automatizados y datos de prueba | Sigue la ubicación y las estrategias definidas por la familia de pruebas. |
 | Operativo | `README.md`, configuración y scripts | Código y configuración versionados | Se actualiza cuando cambia la instalación, ejecución o automatización. |
 

@@ -13,8 +13,8 @@ negocio.
 | Casos con estados | Máquina de estados de salidas, surtimientos y devoluciones | Curada en requisitos. | Los nombres y transiciones combinan reglas y cantidades; el código es evidencia, no única fuente normativa. |
 | Casos transaccionales | Secuencia específica cuando la coordinación técnica aporta información adicional | Curada en requisitos o en la referencia técnica correspondiente y enlazada al servicio. | Explica el límite atómico y rollback del caso sin fusionarlo con otra operación. |
 | Código de routers | Superficie API/Web por área y método | Curada en `code-diagrams/index.md` y comprobada contra el mapa de rutas. | Montajes y métodos son verificables, pero la vista se actualiza explícitamente junto al cambio para conservar agrupaciones comprensibles. |
-| Código JavaScript | Dependencias entre áreas | Generada en `generated/code-map.md`. | Los `import` relativos permiten reconstruir aristas deterministas. |
-| Prisma | Entidad-relación por área | Generada en `generated/database-schema.md`. | Modelos, claves y relaciones pertenecen al esquema versionado. |
+| Código JavaScript | Dependencias entre áreas | Generada en `views/development/code-map.md`. | Los `import` relativos permiten reconstruir aristas deterministas. |
+| Prisma | Entidad-relación por área | Generada en `views/logical/data-and-persistence/generated/database-schema.md`. | Modelos, claves y relaciones pertenecen al esquema versionado. |
 | Código + `CU-*` | Trazabilidad de cada caso hacia endpoint, permiso, servicio y prueba | Matriz curada, no diagrama automático por ahora. | Asociar una ruta con un objetivo exige interpretación; coincidir por verbo o nombre produciría falsos vínculos. |
 
 ### Diagramas descartados en la revisión
