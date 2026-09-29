@@ -2,7 +2,8 @@ import { describe, expect, it } from 'vitest';
 import {
     exportedDocumentTitle,
     externalDocumentLinkLabel,
-    getHeadingTitle
+    getHeadingTitle,
+    prepareManualEntry
 } from '../../../scripts/documentExportContentUtils.js';
 
 describe('documentExportContentUtils', () => {
@@ -11,6 +12,34 @@ describe('documentExportContentUtils', () => {
             .toBe('Información general y anexos');
         expect(exportedDocumentTitle('manuales/almacen/almacen-materiales.pdf'))
             .toBe('Almacén de materiales');
+    });
+
+    it('evita repetir la introducción del actor en cada documento modular del manual', () => {
+        const content = [
+            '---',
+            'title: Manual del personal de almacén',
+            '---',
+            '',
+            '# Manual del personal de almacén',
+            '',
+            '## Datos generales del documento',
+            '',
+            '| Versión | Sistema | Estado | Fecha | Responsable |',
+            '| --- | --- | --- | --- | --- |',
+            '| 0.2 | 1.0 | Revisión | 2026-09-10 | Nexus |',
+            '',
+            '## Responsabilidades y límites',
+            '',
+            'Contenido común.'
+        ].join('\n');
+
+        const prepared = prepareManualEntry(content, 'manuales/almacen/compras.docx');
+
+        expect(prepared).toContain('title: Manual del personal de almacén — Compras');
+        expect(prepared).toContain('# Manual del personal de almacén — Compras');
+        expect(prepared).not.toContain('Responsabilidades y límites');
+        expect(prepareManualEntry(content, 'manuales/almacen/informacion-general-y-anexos.docx'))
+            .toBe(content);
     });
 
     it('resuelve títulos implícitos y anclas explícitas', () => {

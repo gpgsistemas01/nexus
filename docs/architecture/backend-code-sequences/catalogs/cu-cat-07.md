@@ -10,7 +10,7 @@ sequenceDiagram
     participant Auth as src/middleware/authMiddleware.js
     participant Validator as src/validators/forms/clientValidations.js<br/>src/middleware/validatorMiddleware.js
     participant Controller@{ "type": "control" } as src/controllers/api/sales/clientController.js
-    participant ClientDto as <u>clientDto: Object</u><br/>src/dtos/clientDTO.js
+    participant ClientDto as clientDto: Object<br/>src/dtos/clientDTO.js
     participant Domain as src/services/sales/clientService.js
     participant ErrorHandler as src/app.js
 

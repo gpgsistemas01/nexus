@@ -10,7 +10,7 @@ sequenceDiagram
     participant Auth as src/middleware/authMiddleware.js
     participant Validator as src/validators/forms/materialValidations.js<br/>src/middleware/validatorMiddleware.js
     participant Controller@{ "type": "control" } as src/controllers/api/warehouse/materialController.js
-    participant StockDto as <u>materialDto: Object</u><br/>src/dtos/materialDTO.js
+    participant StockDto as materialDto: Object<br/>src/dtos/materialDTO.js
     participant Service as src/services/warehouse/materials/materialService.js
     participant Adjustment as src/services/warehouse/adjustmentService.js
     participant Reference as src/services/document/referenceNumberService.js

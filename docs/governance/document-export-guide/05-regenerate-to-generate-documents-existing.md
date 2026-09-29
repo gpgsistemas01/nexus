@@ -20,6 +20,11 @@ entregar, seleccione el archivo recién generado y, si va a compartir la carpeta
 ella los resultados antiguos que no formen parte de la entrega. Nunca elimine los Markdown fuente
 de `docs/` para regenerar un documento.
 
+En Windows, Word, LibreOffice, la vista previa o el Explorador pueden mantener bloqueado un DOCX.
+El exportador reintenta el reemplazo ante un bloqueo transitorio y, si el archivo continúa ocupado,
+termina con una indicación legible en lugar de mostrar la excepción interna de Node.js. Cierre el
+archivo indicado y repita el mismo comando; los documentos generados anteriormente se conservan.
+
 Para generar una sección técnica específica sin reconstruir las demás, indique su nombre entre el
 paquete y el formato, por ejemplo `npm run docs:export -- arquitectura backend docx`. Si omite la
 sección, se reconstruyen todos los documentos del paquete. Los manuales son una unidad de entrega:

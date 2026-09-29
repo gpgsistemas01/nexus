@@ -7,7 +7,11 @@ import process from 'node:process';
 import { pathToFileURL } from 'node:url';
 import { bundleOpenApiContract } from './openApiContractUtils.js';
 import { getDocumentExportRequest, getDocumentOutputPlan } from './documentExportFormats.js';
-import { externalDocumentLinkLabel } from './documentExportContentUtils.js';
+import {
+    externalDocumentLinkLabel,
+    prepareManualEntry
+} from './documentExportContentUtils.js';
+import { removeDocumentOutput } from './documentOutputUtils.js';
 import { prepareMermaidCli } from './prepareMermaidCli.js';
 import { hasInvalidSvgGeometry, normalizeMermaidSource } from './mermaidExportUtils.js';
 import { validatePdfOutput } from './pdfExportUtils.js';
@@ -581,7 +585,10 @@ await Promise.all([
 const mermaidExecutable = path.join(ROOT, 'node_modules', '@mermaid-js', 'mermaid-cli', 'src', 'cli.js');
 
 const prepareSource = async (source, publicationSources, firstFigureNumber, currentOutput, outputFormat) => {
-    const content = await readFile(path.join(ROOT, source), 'utf8');
+    const sourceContent = await readFile(path.join(ROOT, source), 'utf8');
+    const content = source.startsWith('docs/user-manual/actors/')
+        ? prepareManualEntry(sourceContent, currentOutput)
+        : sourceContent;
     const blocks = [...content.matchAll(mermaidBlock)];
 
     const renderedSource = path.join(temporaryDirectory, source);
@@ -665,13 +672,13 @@ try {
             mkdir(path.dirname(pdfOutput), { recursive: true })
         ]);
         await Promise.all([
-            rm(docxOutput, { force: true }),
-            ...(outputPlan.generatePdf ? [rm(pdfOutput, { force: true })] : [])
+            ...(outputPlan.generateDocx ? [removeDocumentOutput(docxOutput)] : []),
+            ...(outputPlan.generatePdf ? [removeDocumentOutput(pdfOutput)] : [])
         ]);
         const preparedSources = [];
         const publicationSources = new Set(sources);
         let nextFigureNumber = 1;
-        for (const source of sources) {
+        for (const source of outputPlan.generateDocx ? sources : []) {
             const prepared = await prepareSource(
                 source,
                 publicationSources,
@@ -688,27 +695,27 @@ try {
         }
         if (failedStatus) break;
 
-        const firstSource = preparedSources[0];
-        const firstContent = await readFile(firstSource, 'utf8');
-        const indexes = await buildDocumentIndexes(preparedSources);
-        await writeFile(firstSource, insertAfterDocumentData(firstContent, indexes));
-
-        const scopedSources = preparedSources.map((source) => path.relative(temporaryDirectory, source));
-        const args = [
-            ...scopedSources,
-            '--from=markdown+header_attributes+implicit_figures',
-            '--standalone',
-            '--metadata=lang:es-MX',
-            `--output=${docxOutput}`,
-            `--resource-path=${[ROOT, path.join(ROOT, 'docs')].join(path.delimiter)}`
-        ];
-        if (process.env.DOCS_REFERENCE_DOC) args.push(`--reference-doc=${process.env.DOCS_REFERENCE_DOC}`);
-        const result = spawnSync('pandoc', args, { cwd: temporaryDirectory, stdio: 'inherit' });
-        if (result.error || result.status !== 0 || !existsSync(docxOutput)) {
-            failedStatus = result.status ?? 1;
-            break;
-        }
         if (outputPlan.generateDocx) {
+            const firstSource = preparedSources[0];
+            const firstContent = await readFile(firstSource, 'utf8');
+            const indexes = await buildDocumentIndexes(preparedSources);
+            await writeFile(firstSource, insertAfterDocumentData(firstContent, indexes));
+
+            const scopedSources = preparedSources.map((source) => path.relative(temporaryDirectory, source));
+            const args = [
+                ...scopedSources,
+                '--from=markdown+header_attributes+implicit_figures',
+                '--standalone',
+                '--metadata=lang:es-MX',
+                `--output=${docxOutput}`,
+                `--resource-path=${[ROOT, path.join(ROOT, 'docs')].join(path.delimiter)}`
+            ];
+            if (process.env.DOCS_REFERENCE_DOC) args.push(`--reference-doc=${process.env.DOCS_REFERENCE_DOC}`);
+            const result = spawnSync('pandoc', args, { cwd: temporaryDirectory, stdio: 'inherit' });
+            if (result.error || result.status !== 0 || !existsSync(docxOutput)) {
+                failedStatus = result.status ?? 1;
+                break;
+            }
             console.log(`Documento DOCX generado en ${path.relative(ROOT, docxOutput)}.`);
         }
         if (outputPlan.generatePdf) {
@@ -795,6 +802,9 @@ try {
             console.log(`Contrato OpenAPI exportado en ${path.relative(ROOT, openApiOutput)}.`);
         }
     }
+} catch (error) {
+    console.error(error.message);
+    failedStatus = 1;
 } finally {
     await rm(temporaryDirectory, { recursive: true, force: true });
 }

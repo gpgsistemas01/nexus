@@ -41,7 +41,7 @@ sequenceDiagram
     participant Auth@{ "type": "control" } as middleware/authMiddleware.js
     participant Validation@{ "type": "control" } as validators/forms/* + validatorMiddleware.validate
     participant Controller@{ "type": "control" } as controllers/api/*Controller.js
-    participant Dto as <u>resourceDto: Object</u><br/>dtos/*DTO.js
+    participant Dto as resourceDto: Object<br/>dtos/*DTO.js
     participant Service as services/*Service.js
 
     Client->>Route: enviar petición

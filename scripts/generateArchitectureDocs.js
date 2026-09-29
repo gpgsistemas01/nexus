@@ -326,8 +326,8 @@ const validateUseCaseDiagramCoverage = async () => {
                     failures.push(`diagramas ${side}: ${id} representa ${alias} sólo con el estereotipo «object» en vez de una instancia visual`);
                 }
                 const paths = label.match(SOURCE_PATH_PATTERN) ?? [];
-                if (label.includes('src/dtos/') && !/^<u>[A-Za-z_$][\w$]*Dto: Object<\/u><br\/>src\/dtos\//.test(label)) {
-                    failures.push(`diagramas ${side}: ${id} no representa ${alias} con nombre de instancia subrayado, tipo Object y archivo src/dtos/`);
+                if (label.includes('src/dtos/') && !/^[A-Za-z_$][\w$]*Dto: Object<br\/>src\/dtos\//.test(label)) {
+                    failures.push(`diagramas ${side}: ${id} no representa ${alias} con nombre de instancia, tipo Object y archivo src/dtos/`);
                 }
                 if (!paths.length && !EXTERNAL_SEQUENCE_PARTICIPANTS.has(label)) {
                     failures.push(`diagramas ${side}: ${id} identifica ${alias} sin archivo src/ ni límite externo reconocido (${label})`);

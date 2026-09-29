@@ -44,7 +44,9 @@ portada, procedimiento y capturas, e identifica la referencia común aplicable a
 errores. De esta manera, una corrección transversal tiene una sola copia publicada y
 los documentos por módulo no crecen con contenido idéntico.
 
-Cada archivo conserva la portada del actor, los recorridos permitidos y sólo las capturas
+Cada archivo modular conserva una portada breve que identifica al actor y al módulo, pero no repite
+sus responsabilidades, límites ni recorrido recomendado. Ese contenido aparece una sola vez en
+`informacion-general-y-anexos`; cada módulo incluye únicamente sus procedimientos y las capturas
 referenciadas por esos recorridos. Por ejemplo, Almacén no recibe el ajuste absoluto de existencia,
 personas, usuarios, clientes, proveedores independientes, catálogos auxiliares o movimientos; los
 formularios contextuales usados dentro de compras o salidas permanecen en el documento operativo
