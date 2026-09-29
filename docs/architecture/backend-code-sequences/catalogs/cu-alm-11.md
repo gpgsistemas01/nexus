@@ -10,7 +10,7 @@ sequenceDiagram
     participant Auth as src/middleware/authMiddleware.js
     participant Validator as src/validators/forms/wasteValidations.js<br/>src/middleware/validatorMiddleware.js
     participant Controller@{ "type": "control" } as src/controllers/api/warehouse/wasteController.js
-    participant WasteDto as <u>wasteDto: Object</u><br/>src/dtos/wasteDTO.js
+    participant WasteDto as wasteDto: Object<br/>src/dtos/wasteDTO.js
     participant Domain as src/services/warehouse/wastes/wasteService.js
     participant ErrorHandler as src/app.js
 

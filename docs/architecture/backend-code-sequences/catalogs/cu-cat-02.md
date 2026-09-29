@@ -14,7 +14,7 @@ sequenceDiagram
     participant Auth as src/middleware/authMiddleware.js
     participant Validator as src/validators/forms/supplierValidations.js<br/>src/middleware/validatorMiddleware.js
     participant Controller@{ "type": "control" } as src/controllers/api/warehouse/supplierController.js
-    participant SupplierDto as <u>supplierDto: Object</u><br/>src/dtos/supplierDTO.js
+    participant SupplierDto as supplierDto: Object<br/>src/dtos/supplierDTO.js
     participant Domain as src/services/warehouse/supplierService.js
     participant ErrorHandler as src/app.js
 

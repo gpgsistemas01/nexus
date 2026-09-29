@@ -11,7 +11,7 @@ sequenceDiagram
     participant Auth as src/middleware/authMiddleware.js
     participant Validator as src/validators/forms/goodsIssueValidations.js<br/>src/middleware/validatorMiddleware.js
     participant Controller@{ "type": "control" } as src/controllers/api/warehouse/goodsIssueController.js
-    participant IssueDto as <u>goodsIssueDto: Object</u><br/>src/dtos/goodsIssueDTO.js
+    participant IssueDto as goodsIssueDto: Object<br/>src/dtos/goodsIssueDTO.js
     participant Service as src/services/warehouse/goodsIssues/goodsIssueService.js
     participant Inventory as src/services/inventory/movementService.js
     participant Prisma@{ "type": "database" } as Prisma / PostgreSQL

@@ -15,7 +15,7 @@ sequenceDiagram
     participant Auth as src/middleware/authMiddleware.js
     participant Validator as src/validators/forms/goodsReceiptValidations.js<br/>src/middleware/validatorMiddleware.js
     participant Controller@{ "type": "control" } as src/controllers/api/warehouse/goodsReceiptController.js
-    participant ReceiptDto as <u>goodsReceiptDto: Object</u><br/>src/dtos/goodsReceiptDTO.js
+    participant ReceiptDto as goodsReceiptDto: Object<br/>src/dtos/goodsReceiptDTO.js
     participant Service as src/services/warehouse/goodsReceipts/goodsReceiptService.js
     participant Supplier as src/services/warehouse/supplierService.js
     participant Invoice as src/services/warehouse/goodsReceipts/goodsReceiptInvoiceService.js
