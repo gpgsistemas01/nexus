@@ -1,4 +1,4 @@
-# Modelo de vistas de arquitectura aplicado
+# 3. Modelo de vistas de arquitectura aplicado
 
 Nexus usa un modelo **Viewpoint/View inspirado en ISO/IEC/IEEE 42010**, organizado como
 una adaptación práctica de **4+1** y apoyado por los niveles contexto/contenedor de C4.
@@ -10,9 +10,9 @@ arquitectura.
 | Vista adaptada | Pregunta | Diagramas canónicos |
 | --- | --- | --- |
 | Escenarios (+1) | ¿Qué objetivo del actor condiciona o valida la arquitectura? | Referencias a casos de uso y trazabilidad de requisitos; sus fichas y flujos permanecen en la SRS. |
-| Lógica | ¿Qué dominios, capas, componentes, estados y datos colaboran? | Dominio conceptual, componentes, dependencias y ER generado. |
+| Lógica | ¿Qué dominios, capas, componentes, estados y datos colaboran? | Dominio conceptual, componentes, dependencias y [ER generado](../views/logical/data-and-persistence/generated/database-schema.md). |
 | Procesos | ¿En qué orden se coordinan y dónde están decisiones/transacciones? | Secuencias, actividades y máquinas de estados. |
-| Desarrollo | ¿Cómo se organiza y reutiliza el código de frontend y backend? | Superficie HTTP, fábrica CRUD, componentes y mapa generado. |
+| Desarrollo | ¿Cómo se organiza y reutiliza el código de frontend y backend? | Superficie HTTP, fábrica CRUD, componentes y [mapa generado](../views/development/code-map.md). |
 | Física | ¿Dónde se ejecuta y despliega? | Contexto, contenedores y despliegues actual/objetivo. |
 
 La combinación mínima recomendada para comprender un cambio es: **referencia al caso de uso +

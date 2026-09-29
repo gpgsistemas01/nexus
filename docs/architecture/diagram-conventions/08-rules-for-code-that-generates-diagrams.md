@@ -6,7 +6,8 @@ El generador sigue el patrón **extraer → normalizar → representar → compr
 2. normaliza rutas, áreas, entidades y relaciones en estructuras intermedias;
 3. representa tablas y bloques Mermaid mediante funciones sin modificar las fuentes;
 4. con `--check` compara el resultado esperado sin escribir, y sin esa opción actualiza
-   únicamente `docs/generated`.
+   únicamente `docs/architecture/views/development/code-map.md` y
+   `docs/architecture/views/logical/data-and-persistence/generated`.
 
 Para extenderlo se reutilizan funciones de recorrido y representación antes de crear
 otro script. Las listas como `SOURCE_AREAS` y `DATABASE_AREAS` son configuración

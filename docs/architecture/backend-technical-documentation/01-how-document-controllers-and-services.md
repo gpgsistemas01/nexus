@@ -1,4 +1,4 @@
-# Guía de documentación backend
+# 1. Guía de documentación backend
 
 Esta referencia cubre `src/routes`, `src/middleware`, `src/controllers`, `src/dtos`,
 `src/services`, `src/repository` y Prisma. El contrato consumible permanece en el
@@ -6,8 +6,8 @@ Esta referencia cubre `src/routes`, `src/middleware`, `src/controllers`, `src/dt
 colaboraciones y límites transaccionales.
 
 El mapa generado mantiene inventarios separados de símbolos exportados por
-[controladores](../../generated/code-map.md#símbolos-exportados-por-controladores) y
-[servicios](../../generated/code-map.md#símbolos-exportados-por-servicios). Esos inventarios
+[controladores](../views/development/code-map.md#símbolos-exportados-por-controladores) y
+[servicios](../views/development/code-map.md#símbolos-exportados-por-servicios). Esos inventarios
 responden **qué existe y dónde**; esta guía define cómo explicar **qué contrato cumple y
 por qué colabora con otros elementos**. No se crea una página por función ni se copia el
 cuerpo completo del módulo.

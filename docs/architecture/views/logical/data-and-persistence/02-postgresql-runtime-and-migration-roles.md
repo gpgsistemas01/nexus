@@ -1,4 +1,4 @@
-# Separación de cuentas PostgreSQL para migraciones y aplicación
+# 2. Separación de cuentas PostgreSQL para migraciones y aplicación
 
 Este documento contiene una **decisión operativa de infraestructura**. No define los
 permisos funcionales de Nexus ni la estructura del modelo persistente; esas fuentes y su

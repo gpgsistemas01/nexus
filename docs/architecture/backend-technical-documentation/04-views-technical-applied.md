@@ -1,4 +1,4 @@
-# 6. Vistas técnicas aplicadas
+# 4. Vistas técnicas aplicadas
 
 ### Relación entre la colección canónica y las vistas adicionales
 

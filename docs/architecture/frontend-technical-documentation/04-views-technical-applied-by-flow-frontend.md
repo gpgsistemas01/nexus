@@ -1,4 +1,4 @@
-# 7. Vistas técnicas aplicadas por flujo frontend
+# 4. Vistas técnicas aplicadas por flujo frontend
 
 ### Relación entre la colección canónica y las vistas adicionales
 

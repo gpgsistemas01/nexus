@@ -3,7 +3,7 @@
 Estas vistas representan manualmente la estructura observable del código actual. No las
 produce `scripts/generateArchitectureDocs.js`: se revisan en el mismo cambio que modifica
 routers, capas, coordinación de servicios o componentes reutilizables. El
-[mapa generado](../../generated/code-map.md) sigue siendo el inventario verificable de rutas
+[mapa generado](../views/development/code-map.md) sigue siendo el inventario verificable de rutas
 e imports; estos diagramas agrupan esa evidencia para que una persona pueda comprenderla
 sin recorrer todos los archivos.
 

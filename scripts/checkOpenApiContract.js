@@ -5,7 +5,7 @@ import { bundleOpenApiContract } from './openApiContractUtils.js';
 
 const ROOT = process.cwd();
 const contractPath = path.join(ROOT, 'docs/architecture/openapi/openapi.json');
-const codeMapPath = path.join(ROOT, 'docs/generated/code-map.md');
+const codeMapPath = path.join(ROOT, 'docs/architecture/views/development/code-map.md');
 
 const contract = await bundleOpenApiContract(contractPath);
 const codeMap = await readFile(codeMapPath, 'utf8');

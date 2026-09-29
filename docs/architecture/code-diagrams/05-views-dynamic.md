@@ -70,7 +70,7 @@ función o un estado persistido:
 | Entidades y cardinalidades | No aplica a una ruta individual | `prisma/schema.prisma` | El ER y el diccionario son generados; una relación Prisma no prueba que exista un flujo HTTP completo. |
 
 Para seguir una fila hasta método y URL exactos se usa el
-[mapa generado](../../generated/code-map.md); para seguirla hasta permiso y estado de
+[mapa generado](../views/development/code-map.md); para seguirla hasta permiso y estado de
 implementación se usa la
 [matriz de operaciones](../../requirements/requirements-operations-matrix.md). Las pruebas
 no se inventan a partir del dibujo: la cobertura existente y sus faltantes se mantienen

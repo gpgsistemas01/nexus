@@ -2,10 +2,10 @@
 
 Este documento es propietario del contrato HTTP y no de las reglas de negocio ni del
 esquema persistente. La relación con requisitos, diseño y evidencia se consulta en el
-[mapa de datos, persistencia y acceso](../../data/index.md).
+[mapa de datos, persistencia y acceso](../views/logical/data-and-persistence/index.md).
 
 La documentación de una ruta combina información de varias capas, pero conserva una
-sola ficha contractual en esta familia. El [mapa generado](../../generated/code-map.md)
+sola ficha contractual en esta familia. El [mapa generado](../views/development/code-map.md)
 mantiene el inventario de métodos, URLs y archivos; una ficha se agrega aquí sólo cuando
 necesita explicar cómo consumir la operación. La explicación interna de nombres y
 colaboraciones se mantiene en la
@@ -18,7 +18,7 @@ Este artefacto es una referencia curada del comportamiento implementado. La
 [especificación OpenAPI 3.1](../openapi/openapi.json) complementaria describe de forma procesable
 los esquemas de solicitud y respuesta de todas las operaciones registradas; no es un
 mecanismo de validación en tiempo de ejecución.
-El [mapa generado](../../generated/code-map.md) es el inventario exhaustivo de
+El [mapa generado](../views/development/code-map.md) es el inventario exhaustivo de
 métodos y rutas registradas. Este documento añade las reglas transversales y las fichas
 que necesitan contexto; por tanto, que una ruta
 aparezca sólo en el mapa no significa que tenga documentados aquí todos sus parámetros,
@@ -310,4 +310,4 @@ reglas de negocio.
 Los conflictos y errores de dominio concretos de esta operación deben añadirse a la
 ficha cuando estén respaldados por pruebas HTTP. El flujo técnico de una operación
 transaccional más compleja se encuentra en la
-[actividad de surtimiento de materiales](../backend-technical-documentation/06-views-technical-applied.md#actividad-de-decisión-y-surtimiento-de-materiales).
+[actividad de surtimiento de materiales](../backend-technical-documentation/04-views-technical-applied.md#actividad-de-decisión-y-surtimiento-de-materiales).
