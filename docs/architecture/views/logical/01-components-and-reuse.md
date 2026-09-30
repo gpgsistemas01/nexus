@@ -71,6 +71,27 @@ por `CU-*` muestran el orden temporal. Por tanto, se actualiza el diagrama de co
 cuando cambia una pieza o un canal entre frontend y backend, y una secuencia cuando cambia
 el orden de colaboración de un flujo.
 
+## Componentes que realizan un caso de uso
+
+Un diagrama de componentes también puede acotarse a un `CU-*`. En ese caso no representa
+el flujo temporal del caso, sino el conjunto de componentes que lo realiza y las
+interfaces entre ellos. Debe titularse con un solo identificador de caso de uso y omitir
+capas o infraestructura que no participan en ese objetivo.
+
+La vista de componentes y la secuencia por caso responden preguntas distintas y pueden
+coexistir:
+
+| Vista | Pregunta | Cuándo mantenerla |
+| --- | --- | --- |
+| Componentes por `CU-*` | ¿Qué piezas implementan este caso y de qué interfaces dependen? | Cuando la composición particular del caso aporta información que no muestra la vista global. |
+| Secuencia `DIA-FE-CU-*` o `DIA-BE-CU-*` | ¿En qué orden colaboran esas piezas y qué alternativas aparecen? | Para el recorrido ejecutable frontend o backend del caso. |
+
+No se exige duplicar los 73 casos con ambos tipos de diagrama. Las colecciones de
+secuencias ya aseguran una vista técnica individual por caso; se agrega una vista de
+componentes individual sólo cuando ayuda a explicar una frontera, una reutilización o
+una colaboración estructural propia. Si varios casos usan exactamente la misma
+composición, se enlaza esta vista general en vez de copiarla.
+
 ## Reutilización comprobada en el frontend
 
 **Diagrama:** `DIA-ARQ-CMP-002`. Esta vista responde específicamente dónde se reutiliza

@@ -7,7 +7,7 @@ reglas de negocio se detallan en la
 para conversación y revisión: las rutas del
 [mapa generado](../../architecture/views/development/code-map.md), el esquema Prisma y las pruebas siguen siendo
 las fuentes verificables de implementación. Estas vistas aplican las
-[convenciones y patrones para diagramas](../../architecture/diagram-conventions/index.md): cada sección conserva
+[catálogo de diagramas](../../architecture/diagram-inventory/index.md): cada sección conserva
 un propósito, alcance, semántica y fuente de verdad definidos.
 
 ## Vista de requisitos y dependencias

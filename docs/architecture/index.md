@@ -49,8 +49,8 @@ La organización separa las **vistas del sistema** de los **artefactos de apoyo*
 1. [Vistas arquitectónicas](views/index.md): escenarios, lógica, procesos, desarrollo y
    física. Bajo `views/` se mantiene todo artefacto cuyo propósito principal es
    representar la solución desde una de esas perspectivas.
-2. **Apoyo transversal:** contrato API, trazabilidad, inventario y convenciones de
-   diagramas, y estándar de codificación. Permanecen en la raíz de `architecture/`
+2. **Apoyo transversal:** contrato API, trazabilidad, catálogo de diagramas y estándar
+   de codificación. Permanecen en la raíz de `architecture/`
    porque sirven a varias vistas o establecen reglas, pero no representan por sí mismos
    una perspectiva del sistema.
 
@@ -66,7 +66,6 @@ architecture/
 ├── openapi/          # Contrato HTTP procesable
 ├── traceability-matrix/
 ├── diagram-inventory/
-├── diagram-conventions/
 └── coding-standards/
 ```
 

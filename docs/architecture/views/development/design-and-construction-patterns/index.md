@@ -16,5 +16,4 @@
 12. [12. Composición y propiedad de componentes visuales](12-composition-and-ownership-of-components-visual.md)
 13. [13. Orden de métodos por comportamiento](13-order-of-methods-by-behavior.md)
 14. [14. Patrones de construcción de pruebas](14-patterns-of-construction-of-tests.md)
-15. [15. Decisión antes de crear otro flujo](15-decision-before-of-create-another-flow.md)
-16. [16. Mantenimiento](16-maintenance.md)
+15. [15. Mantenimiento](15-maintenance.md)
