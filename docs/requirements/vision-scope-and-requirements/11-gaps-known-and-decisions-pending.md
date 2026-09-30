@@ -8,7 +8,7 @@
    administrados y cuáles pertenecen exclusivamente al seed.
 3. **Auditoría incompleta.** Algunos hechos registran `User` creador/aprobador, mientras
    otros solo conservan una `Person` participante o marcas de tiempo. La ampliación de
-   auditoría está detallada en `docs/architecture/views/logical/data-and-persistence/01-database-users-and-permissions-analysis.md`.
+   auditoría está detallada en `docs/architecture/views/logical/02-identity-access-and-audit.md`.
 4. **Criterios de producto.** Faltan propietarios de negocio, metas cuantificables,
    SLA, política de retención y recuperación, clasificación de datos y criterios de
    aceptación acordados con usuarios. Este documento no inventa esos compromisos.

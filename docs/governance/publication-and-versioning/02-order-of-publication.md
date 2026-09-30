@@ -17,13 +17,12 @@ documental, versión del sistema, estado, fecha y responsable. El exportador ins
 tabla de contenido después de estos datos generales; los capítulos, anexos y artefactos
 generados no repiten la tabla porque forman parte del mismo documento publicado.
 
-Los paquetes recomendados son **Requisitos**, **Datos, acceso y operación**, **Diseño y
+Los paquetes recomendados son **Requisitos**, **Datos**, **Diseño y
 arquitectura**, **Plan y evidencia de pruebas** y **Manual de usuario**. Cada paquete tiene su
 propio archivo de entrada y carpeta de imágenes; no se exporta toda la carpeta `docs` como un
-único documento. El paquete de datos incorpora tanto los documentos curados de
-`docs/architecture/views/logical/data-and-persistence/` como el esquema y el diccionario de
-`docs/architecture/views/logical/data-and-persistence/generated/`; estos últimos se regeneran desde Prisma
-antes de exportar y no se editan manualmente. El contrato API pertenece al paquete de arquitectura
+único documento. El paquete de datos incorpora la entrada del modelo persistente, el
+esquema y el diccionario de `docs/architecture/views/logical/data-and-persistence/generated/`;
+estos últimos se regeneran desde Prisma antes de exportar y no se editan manualmente. El contrato API pertenece al paquete de arquitectura
 porque describe la interfaz HTTP y el transporte JSON; no se incluye en datos por el solo hecho de
 que sus cuerpos transporten información.
 
@@ -43,6 +42,8 @@ bajo `user-manual/cases/<área>/`. Esta división permite revisar y navegar un c
 las demás fichas, figuras o instrucciones, mientras el manifiesto `requisitos` conserva la
 entrega completa requerida para auditoría como una carpeta de documentos por sección y grupo
 funcional, en lugar de ensamblar un único archivo difícil de revisar. Arquitectura sigue el mismo
-criterio: separa vistas, documentación técnica, contrato, trazabilidad, convenciones y las
-secuencias por perspectiva y grupo. Dividir la fuente o la salida no crea copias normativas ni cambia
+criterio: separa vistas, documentación técnica, contrato, trazabilidad, catálogo y las
+secuencias por perspectiva y grupo. Su exportación de visión incorpora el diagrama
+canónico de casos de uso desde requisitos como parte de la vista de escenarios, sin
+duplicar su fuente ni incorporar todas las actividades por caso. Dividir la fuente o la salida no crea copias normativas ni cambia
 los identificadores `CU-*` y `DIA-*`.

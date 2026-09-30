@@ -1,4 +1,4 @@
-# 4. Precisión de valores decimales
+# 2. Precisión de valores decimales
 
 Los payloads de creación y edición aceptan hasta **8 dígitos enteros y 6 decimales**
 para precios, existencias, cantidades y medidas. La API conserva esos seis decimales y

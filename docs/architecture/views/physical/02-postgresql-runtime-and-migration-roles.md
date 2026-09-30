@@ -2,7 +2,7 @@
 
 Este documento contiene una **decisión operativa de infraestructura**. No define los
 permisos funcionales de Nexus ni la estructura del modelo persistente; esas fuentes y su
-relación se localizan desde el [mapa de datos, persistencia y acceso](index.md).
+relación se localizan desde el [modelo persistente](../logical/data-and-persistence/index.md).
 
 ## ¿Ya está resuelto?
 

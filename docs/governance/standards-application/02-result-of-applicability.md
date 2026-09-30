@@ -19,7 +19,7 @@ concreta, sin convertir cada archivo en un documento independiente.
 | --- | --- | --- |
 | Elemento de diseño | Se identifican archivo, símbolo o ruta con un nombre literal y una responsabilidad. | Tablas de las referencias técnicas de backend y frontend. |
 | Relación e interfaz | Se documentan llamadas entre router, middleware, DTO, controller, servicio, inventario y persistencia. | Tabla de operaciones y diagrama de secuencia del surtimiento. |
-| Vista | Cada diagrama declara alcance, semántica y evento que obliga a revisarlo. | Diagramas de montaje, secuencia y decisiones; convenciones de diagramas. |
+| Vista | Cada diagrama declara alcance y semántica junto a la propia vista. | Diagramas de montaje, secuencia y decisiones. |
 | Justificación | La prosa explica separación entre transporte y dominio, reutilización y límite transaccional cuando no son evidentes por el nombre. | Bloques explicados y referencias al patrón propietario. |
 | Trazabilidad | La explicación enlaza código, contrato HTTP, requisito y evidencia ejecutable sin copiar sus reglas. | Guía técnica, contrato API, mapa generado y plan de pruebas. |
 
@@ -27,8 +27,7 @@ Las correspondencias entre vistas también se adoptan de manera selectiva. En Ne
 una secuencia aplicada declara códigos `FE-P*` o `BE-P*`, y el índice de su colección
 los relaciona con un identificador canónico `DIA-PAT-*`. Así puede recorrerse la
 manifestación concreta hacia el patrón sin incrustar un diagrama dentro de otro. La
-[convención de enlace](../../architecture/diagram-conventions/06-inventory-of-notation-uml.md#enlaces-entre-diagramas-y-patrones)
-es local: 42010 y 1016 orientan la separación, las relaciones y la trazabilidad entre
+convención de enlace es local: 42010 y 1016 orientan la separación, las relaciones y la trazabilidad entre
 vistas, pero no prescriben esos códigos, Markdown ni Mermaid.
 
 Los campos **nombre, firma, entrada/salida, efecto y evidencia** son la plantilla local
