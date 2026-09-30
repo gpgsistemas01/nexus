@@ -36,14 +36,18 @@ Las exportaciones y sus secuencias pertenecen al módulo que inicia la consulta,
 publica un documento independiente de reportes sin recorrido propio en la navegación.
 
 Las colecciones extensas de requisitos se mantienen en Markdown por grupo funcional bajo
-`requirements/use-cases/` y `requirements/diagrams/`, con un archivo por cada `CU-*`. Los
-diagramas transversales viven en su propia colección y cada procedimiento del manual se separa
+`requirements/use-cases/`, con un archivo por cada `CU-*`. Los diagramas normativos se
+mantienen junto al capítulo de dominio que explican y cada procedimiento del manual se separa
 bajo `user-manual/cases/<área>/`. Esta división permite revisar y navegar un caso sin cargar
 las demás fichas, figuras o instrucciones, mientras el manifiesto `requisitos` conserva la
 entrega completa requerida para auditoría como una carpeta de documentos por sección y grupo
 funcional, en lugar de ensamblar un único archivo difícil de revisar. Arquitectura sigue el mismo
-criterio: separa vistas, documentación técnica, contrato, trazabilidad, catálogo y las
+criterio: separa vistas, documentación técnica, contrato, trazabilidad y las
 secuencias por perspectiva y grupo. Su exportación de visión incorpora el diagrama
 canónico de casos de uso desde requisitos como parte de la vista de escenarios, sin
 duplicar su fuente ni incorporar todas las actividades por caso. Dividir la fuente o la salida no crea copias normativas ni cambia
 los identificadores `CU-*` y `DIA-*`.
+
+No se publica un catálogo separado de diagramas. Cada figura pertenece al capítulo que
+responde su pregunta y declara allí su propósito, semántica y fuente de verdad; los
+índices de requisitos y arquitectura proporcionan la navegación necesaria.

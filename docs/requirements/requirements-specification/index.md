@@ -13,5 +13,4 @@ cómo la solución realiza y evidencia estas obligaciones sin redefinirlas.
 2. [2. Convenciones](02-conventions.md)
 3. [3. Actores y responsabilidad del sistema](03-actors-and-responsibility-of-the-system.md)
 4. [4. Catálogo unificado por ámbito](04-unified-catalog-by-scope/index.md)
-5. [5. Criterio de terminado y trazabilidad](05-criterion-of-done-and-traceability.md)
-6. [6. Mantenimiento y decisiones pendientes](06-maintenance-and-decisions-pending.md)
+5. [5. Reglas de trazabilidad de requisitos](05-requirement-traceability-rules.md)

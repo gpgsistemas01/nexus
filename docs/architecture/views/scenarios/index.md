@@ -14,7 +14,8 @@ mantener una copia dentro de `architecture/`:
 3. [Matriz de trazabilidad](../../traceability-matrix/index.md): correspondencia entre
    requisitos, solución y evidencia.
 
-Las [fichas](../../../requirements/use-cases/index.md) y los flujos de actividad
-individuales permanecen en sus paquetes de requisitos porque especifican comportamiento
-funcional. La exportación de esta vista incorpora el diagrama de casos de uso canónico,
-no las 73 actividades ni una segunda versión de sus asociaciones.
+Las [fichas](../../../requirements/use-cases/index.md) conservan el comportamiento
+funcional actor–sistema. La exportación de esta vista incorpora el diagrama de casos de
+uso canónico, no un segundo flujo gráfico por cada ficha ni otra versión de sus
+asociaciones. Las actividades técnicas selectivas pertenecen a la
+[vista de procesos](../processes/index.md).

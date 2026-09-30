@@ -62,9 +62,8 @@ de compra o salida, en cambio, los estados y el cumplimiento se derivan de crear
 corregir, cancelar, surtir o devolver conforme a sus reglas; el actor no los captura
 como un campo libre.
 
-El efecto del indicador en consultas, reportes, altas y surtimientos se representa en
-[`DIA-REQ-ACT-001`](diagrams/index.md#impacto-del-estado-activo-en-los-procesos-de-almacén).
-Los recursos inactivos no pueden incorporarse a operaciones nuevas. Una salida existente
+El efecto del indicador en consultas, reportes, altas y surtimientos se define mediante
+`RN-023` y se resume en esta matriz. Los recursos inactivos no pueden incorporarse a operaciones nuevas. Una salida existente
 con pendientes sí puede completarse después de la desactivación: usa su detalle histórico
 y exige stock, pero no vuelve a seleccionar el recurso ni crea otra relación.
 
@@ -90,7 +89,7 @@ y exige stock, pero no vuelve a seleccionar el recurso ni crea otra relación.
 | Salida de material o merma / consultar | `view`; salida cancelada | ninguno | formulario y detalles permanecen en sólo lectura |
 
 Los nombres técnicos de los campos HTTP pertenecen al
-[contrato API](../architecture/api-contract/index.md); las reglas observables pertenecen a la
+[contrato API](../architecture/api-contract.md); las reglas observables pertenecen a la
 [especificación](requirements-specification/index.md). Esta matriz enumera los controles por
 modo para hacer verificable qué puede modificar el operador, sin convertir el estado
 visual del formulario en un estado persistido del documento.

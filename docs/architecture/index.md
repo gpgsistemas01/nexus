@@ -49,7 +49,7 @@ La organización separa las **vistas del sistema** de los **artefactos de apoyo*
 1. [Vistas arquitectónicas](views/index.md): escenarios, lógica, procesos, desarrollo y
    física. Bajo `views/` se mantiene todo artefacto cuyo propósito principal es
    representar la solución desde una de esas perspectivas.
-2. **Apoyo transversal:** contrato API, trazabilidad, catálogo de diagramas y estándar
+2. **Apoyo transversal:** contrato API, trazabilidad y estándar
    de codificación. Permanecen en la raíz de `architecture/`
    porque sirven a varias vistas o establecen reglas, pero no representan por sí mismos
    una perspectiva del sistema.
@@ -62,10 +62,9 @@ architecture/
 │   ├── processes/    # Secuencias, decisiones y estados dinámicos
 │   ├── development/  # Organización, implementación, patrones y mapa del código
 │   └── physical/     # Contexto, contenedores y despliegue
-├── api-contract/     # Referencia HTTP transversal
+├── api-contract.md   # Referencia HTTP transversal
 ├── openapi/          # Contrato HTTP procesable
 ├── traceability-matrix/
-├── diagram-inventory/
 └── coding-standards/
 ```
 
@@ -79,7 +78,7 @@ su propiedad normativa.
    [vista lógica](views/logical/index.md) → patrón relevante en la
    [vista de desarrollo](views/development/index.md).
 2. Para revisar una interacción web: [vista de escenarios](views/scenarios/index.md) →
-   [contrato API](api-contract/index.md) → [vista de procesos](views/processes/index.md).
+   [contrato API](api-contract.md) → [vista de procesos](views/processes/index.md).
 3. Para revisar persistencia: [vista lógica](views/logical/index.md) → esquema y
    diccionario generados → servicio en la [vista de desarrollo](views/development/index.md).
 4. Para comprobar cobertura: [matriz de trazabilidad](traceability-matrix/index.md) →

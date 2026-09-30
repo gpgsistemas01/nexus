@@ -21,9 +21,7 @@ const DATABASE_AREAS = [
 ];
 const USE_CASE_DOCUMENTS = {
     catalog: path.join(ROOT, 'docs/requirements/use-cases'),
-    backendMatrix: path.join(ROOT, 'docs/architecture/views/development/backend-technical-documentation'),
     backendDiagrams: path.join(ROOT, 'docs/architecture/views/processes/backend-code-sequences'),
-    frontendMatrix: path.join(ROOT, 'docs/architecture/views/development/frontend-technical-documentation'),
     frontendDiagrams: path.join(ROOT, 'docs/architecture/views/processes/frontend-code-sequences')
 };
 
@@ -112,7 +110,7 @@ const validateUseCaseDiagramCoverage = async () => {
     const sources = new Map(await Promise.all(
         Object.entries(USE_CASE_DOCUMENTS).map(async ([name, file]) => [
             name,
-            await readDocumentSource(file, name.endsWith('Matrix'))
+            await readDocumentSource(file)
         ])
     ));
     const expectedIds = getUseCaseTableIds(sources.get('catalog'));
@@ -154,29 +152,6 @@ const validateUseCaseDiagramCoverage = async () => {
             failures.push(`${name}: la cobertura o el orden no coincide con el catálogo de casos de uso`);
         }
     };
-
-    for (const side of ['backend', 'frontend']) {
-        const matrix = sources.get(`${side}Matrix`);
-        const prefix = side === 'backend' ? 'BE' : 'FE';
-        validateIds(`matriz ${side}`, getUseCaseTableIds(matrix));
-        for (const id of expectedIds) {
-            const group = id.split('-')[1];
-            const groupFiles = {
-                AUT: 'authentication',
-                IDA: 'identity-access',
-                ALM: 'catalogs',
-                CAT: 'catalogs',
-                ENT: 'purchases',
-                SAL: 'issues',
-                REP: 'reports'
-            };
-            const diagramFile = `../../processes/${side}-code-sequences/${groupFiles[group]}/${id.toLowerCase()}.md`;
-            const diagramReference = `[\`DIA-${prefix}-${id}\`](${diagramFile}#${id.toLowerCase()})`;
-            if (!matrix.includes(diagramReference)) {
-                failures.push(`matriz ${side}: ${id} no enlaza su diagrama aplicado`);
-            }
-        }
-    }
 
     for (const side of ['backend', 'frontend']) {
         const source = sources.get(`${side}Diagrams`);
@@ -370,17 +345,6 @@ const validateUseCaseDiagramCoverage = async () => {
         }
     }
 
-    for (const side of ['backend', 'frontend']) {
-        const source = sources.get(`${side}Matrix`);
-        const contextualIds = [...source.matchAll(/\*\*Caso:\*\* `(CU-[A-Z]+-\d+)`/g)]
-            .map((match) => match[1]);
-        const expectedOrder = new Map(expectedIds.map((id, index) => [id, index]));
-        if (contextualIds.some((id, index) => (
-            index > 0 && expectedOrder.get(id) < expectedOrder.get(contextualIds[index - 1])
-        ))) {
-            failures.push(`vistas dinámicas ${side}: los diagramas no siguen el orden del catálogo de casos de uso`);
-        }
-    }
 
     const documentationFiles = (await walk(path.join(ROOT, 'docs')))
         .filter((file) => file.endsWith('.md'));

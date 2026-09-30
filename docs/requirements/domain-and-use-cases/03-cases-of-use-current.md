@@ -349,9 +349,10 @@ no se dibujan como actores porque no inician estos casos mediante acceso a Nexus
 Cada caso pertenece a un único grupo funcional propietario; no quedan casos sueltos ni
 un paquete independiente de reportes dentro del límite de Nexus. Los identificadores se numeran secuencialmente dentro de su grupo propietario y los
 reportes se muestran junto a la consulta o recurso desde el que se inician. Los identificadores son los mismos del catálogo
-operativo y permiten pasar de cada objetivo visual a su descripción y a su diagrama de
-flujo específico en
-[Diagramas de requisitos](../diagrams/index.md#flujos-de-cada-caso-de-uso).
+operativo y permiten pasar de cada objetivo visual a su
+[ficha normativa](../use-cases/index.md). No se mantiene un segundo diagrama de flujo por
+caso: la ficha conserva el comportamiento actor–sistema y las secuencias de arquitectura
+describen su realización técnica.
 No se usa «administrar» o «mantener» como objetivo: cada óvalo expresa una operación
 observable.
 
