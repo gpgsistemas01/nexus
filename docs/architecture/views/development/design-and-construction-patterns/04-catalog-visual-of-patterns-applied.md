@@ -1,9 +1,9 @@
 # 4. Catálogo visual de patrones aplicados
 
-Estas vistas representan únicamente patrones con implementación y consumidores
-verificables. En las vistas estructurales, una caja nombra el patrón o estrategia, el
+Estos diagramas representan únicamente patrones con implementación y consumidores
+verificables. En los diagramas estructurales, una caja nombra el patrón o estrategia, el
 nodo siguiente identifica el símbolo o carpeta que lo implementa y el último nodo
-muestra consumidores reales. Las flechas de esas vistas no significan herencia salvo
+muestra consumidores reales. Las flechas no significan herencia salvo
 que se indique expresamente.
 Los diagramas estructurales localizan implementaciones y consumidores; las secuencias
 de frontera y dinámica muestran orden, alternativas y límites temporales. En estas
@@ -180,7 +180,7 @@ flowchart LR
 
 Cada diagrama específico declara una línea **Patrones** con los códigos resueltos por el
 índice rápido de frontend o backend. Así se identifica la solución aplicada sin repetir
-su explicación ni añadir vistas intermedias en los 73 casos de cada perspectiva. La
+su explicación ni añadir diagramas intermedios en los 73 casos de cada perspectiva. La
 cadena de lectura es **patrón aplicado → recorrido concreto del caso**: una
 refactorización cambia primero este catálogo y sus implementaciones, y los códigos
 permiten localizar después todos los casos afectados. `DIA-PAT-TST-001` representa

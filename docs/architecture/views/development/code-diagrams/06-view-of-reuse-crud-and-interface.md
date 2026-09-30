@@ -1,6 +1,6 @@
-# 6. Vista de reutilización: CRUD e interfaz
+# 6. Diagramas de reutilización: CRUD e interfaz
 
-Esta vista evita representar cliente, proveedor, material o merma como implementaciones
+El primer diagrama evita representar cliente, proveedor, material o merma como implementaciones
 aisladas cuando el código ya ofrece piezas comunes. Una flecha discontinua significa que
 el recurso configura o consume el componente, no que todos tengan idénticas reglas. Se
 aplican **Factory functions** y **composición sobre herencia**: el recurso inyecta su
@@ -41,7 +41,7 @@ abstracción para sus consumidores actuales:
 | Responder catálogos tabulares de sólo lectura | `createDataTableListController` | Función de consulta y mensaje de error del recurso. |
 | Adaptar una exportación a un archivo descargable | `createReportApplication` | Request, endpoint y nombre de reporte de cada dominio. |
 
-### Perspectiva de realización de la reutilización
+### Diagrama de realización de la reutilización
 
 **Identificador:** `DIA-COD-REU-002`. **Pregunta:** ¿cómo llegan las abstracciones
 compartidas a los módulos de dominio que las aplican actualmente?
@@ -76,7 +76,7 @@ flowchart LR
     report -. inyecta request .-> reportModules --> reportContract
 ```
 
-Esta perspectiva se lee de izquierda a derecha: la pieza común concentra el mecanismo,
+Este diagrama se lee de izquierda a derecha: la pieza común concentra el mecanismo,
 el módulo intermedio inyecta dependencias y conserva nombres del dominio, y el último
 nodo muestra el contrato que reciben sus consumidores. Las líneas discontinuas expresan
 configuración o composición; las continuas, el resultado que expone cada adaptador. Así
@@ -93,7 +93,7 @@ comparten sus reglas.
 La concentración de un mecanismo y la existencia de adaptadores pequeños hacen visible
 el **resultado estructural** de una refactorización de extracción. El código vigente no
 demuestra por sí solo cuándo ocurrió esa transformación; para afirmar su evolución se
-necesita además el historial de cambios. Esta vista documenta cómo queda aplicada hoy,
+necesita además el historial de cambios. Este diagrama documenta cómo queda aplicada hoy,
 no reconstruye un “antes y después” hipotético.
 
 Para analizar el impacto se sigue una columna completa: pieza común, configuradores y
@@ -102,8 +102,8 @@ recorrido de cada caso y su línea **Patrones** enlaza la colaboración canónic
 `DIA-PAT-*`. Los imports del mapa generado y las pruebas de la pieza y sus consumidores
 aportan la evidencia que el diagrama no sustituye.
 
-Esta vista resume la aplicación arquitectónica. Cada diagrama `DIA-FE-CU-*` o
+Este capítulo resume la aplicación arquitectónica. Cada diagrama `DIA-FE-CU-*` o
 `DIA-BE-CU-*` indica mediante su línea **Patrones** qué pieza compartida consume y
 reserva el bloque Mermaid para el recorrido concreto. Cuando una refactorización
-extrae, sustituye o elimina una pieza común, se actualizan primero esta vista y el
+extrae, sustituye o elimina una pieza común, se actualizan primero estos diagramas y el
 catálogo de patrones, y luego se revisan los casos localizados por esos códigos.

@@ -1,6 +1,6 @@
 # 7. Lista de revisión manual
 
-Al cambiar el código, Codex o cualquier contribuidor debe actualizar estas vistas cuando:
+Al cambiar el código, Codex o cualquier contribuidor debe actualizar estos diagramas cuando:
 
 1. se agrega, elimina o mueve una ruta API o web;
 2. cambia la cadena `middleware → controller → DTO → service → Prisma`;

@@ -18,25 +18,25 @@
 14. [14. Patrones de construcción de pruebas](14-patterns-of-construction-of-tests.md)
 15. [15. Mantenimiento](15-maintenance.md)
 
-## Cobertura visual y refactorizaciones
+## Cobertura visual
 
-Los patrones y la reutilización sí admiten representación visual cuando el diagrama
-responde una pregunta estructural o dinámica comprobable. No se crea, en cambio, un
-“diagrama de refactorización” por cada cambio: una refactorización es una transformación
-del código, no una vista arquitectónica estable. Se representa su **resultado vigente**
-o, si existe una migración aprobada todavía en curso, un antes/después explícitamente
-rotulado como actual y objetivo.
+Cada patrón confirmado tiene un diagrama canónico o un capítulo visual propio. Los
+capítulos textuales conservan definición, límites y reglas de construcción; no repiten
+la colaboración que ya explica el diagrama enlazado.
 
-| Preocupación | Vista canónica | Decisión de representación |
+| Patrón o preocupación | Diagrama canónico | Capítulo de detalle |
 | --- | --- | --- |
-| Forma de los patrones aplicados | [Catálogo visual](04-catalog-visual-of-patterns-applied.md) | Conserva estructura, pipeline, construcción, coordinación transaccional y test harness; no se repite en cada capítulo textual. |
-| Reutilización CRUD y de interfaz | [Vista de reutilización](../code-diagrams/06-view-of-reuse-crud-and-interface.md) | Muestra la pieza común, sus configuradores/consumidores y la variación que sigue perteneciendo al dominio. |
-| Componentes compartidos entre frontend y backend | [Componentes y reutilización](../../logical/01-components-and-reuse.md) | Expone fronteras y conexiones estables; las secuencias por caso muestran el orden de ejecución. |
-| Composición de componentes visuales | [Composición y propiedad](12-composition-and-ownership-of-components-visual.md) | Se documenta con tablas y vistas locales sólo cuando aclaran ownership, ciclo de vida o contrato DOM. |
-| Extracción o consolidación realizada | [Perspectiva de realización](../code-diagrams/06-view-of-reuse-crud-and-interface.md#perspectiva-de-realización-de-la-reutilización) | El diagrama presenta la estructura resultante y sus consumidores; el historial del cambio permanece en Git. |
-| Refactorización propuesta | No crea una vista por defecto. | Sólo merece un diagrama actual/objetivo cuando existe una decisión aprobada, impacto entre componentes y una transición que deba coordinarse. |
+| Registro seguro de catálogos | [`DIA-ARQ-CAT-001..004`](01-registration-of-catalogs-with-checklist-allowlist.md#diagrama-del-patrón-de-catálogos-administrables) | [Registro con lista blanca](01-registration-of-catalogs-with-checklist-allowlist.md) |
+| Monolito modular y capas | [`DIA-PAT-EST-001`](04-catalog-visual-of-patterns-applied.md#estructura-por-dominio-capas-y-fronteras) | [Arquitectura por capas](05-monolith-modular-by-domain-and-architecture-by-layers.md) |
+| Pipeline, DTO y políticas | [`DIA-PAT-FRO-001`](04-catalog-visual-of-patterns-applied.md#pipeline-dto-y-políticas-declarativas) | [Pipeline](06-pipeline-of-middleware.md) y [DTO/políticas](07-dto-functional-and-policies-declarative.md) |
+| Factories y composición | [`DIA-PAT-CON-001`](04-catalog-visual-of-patterns-applied.md#factories-y-composición-sobre-herencia) | [Factory functions](08-factory-functions-and-composition-of-applications.md) |
+| Transacción, eventos y auditoría | [`DIA-PAT-DIN-001`](04-catalog-visual-of-patterns-applied.md#transacción-eventos-y-auditoría) | [Transacción](09-context-transactional-and-consistency-atomic.md), [eventos](10-publication-of-events-of-inventory.md) y [auditoría](11-audit-trail-cross-cutting.md) |
+| Composición y ownership visual | [`DIA-PAT-UI-001`, `DIA-PAT-OWN-001`, `DIA-PAT-DET-001` y `DIA-PAT-SEL-001`](12-composition-and-ownership-of-components-visual.md#composición-de-la-interfaz) | [Componentes visuales](12-composition-and-ownership-of-components-visual.md) |
+| Orden de métodos | [`DIA-PAT-ORD-001`](13-order-of-methods-by-behavior.md) | [Orden por comportamiento](13-order-of-methods-by-behavior.md) |
+| Test harness | [`DIA-PAT-TST-001`](04-catalog-visual-of-patterns-applied.md#test-harness-configurable) | [Construcción de pruebas](14-patterns-of-construction-of-tests.md) |
+| Adaptación de detalles | [Diagrama del contrato](15-maintenance.md#diagrama-del-contrato-de-datos-de-los-detalles) | [Mantenimiento](15-maintenance.md) |
 
-Por tanto, la revisión no requiere otra familia de diagramas. Al cambiar un patrón o una
-abstracción reutilizada se actualiza la vista canónica anterior, sus consumidores y las
-pruebas; una lista de archivos movidos o pasos mecánicos de edición queda fuera de la
-documentación arquitectónica.
+Una refactorización no genera un diagrama por defecto: se representa el resultado
+vigente o, si existe una migración aprobada, un antes/después rotulado como actual y
+objetivo. Al cambiar un patrón se actualizan su diagrama canónico, consumidores y
+pruebas; el historial mecánico de archivos permanece en Git.

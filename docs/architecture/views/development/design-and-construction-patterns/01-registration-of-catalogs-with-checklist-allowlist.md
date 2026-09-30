@@ -73,7 +73,7 @@ visibles para consulta y reactivación.
 
 ### Diagrama del patrón de catálogos administrables
 
-**Diagrama:** `DIA-ARQ-CAT-001`. La vista muestra la variante permitida por la lista blanca
+**Diagrama:** `DIA-ARQ-CAT-001`. El diagrama muestra la variante permitida por la lista blanca
 y la correspondencia del estado activo a través de las capas, sin confundir clientes o
 proveedores con estrategias del registro auxiliar.
 
@@ -102,7 +102,7 @@ negocio y de experiencia, no dependencia del registro.
 **Diagrama:** `DIA-ARQ-CAT-002`. Una sola actividad representa el ciclo común porque
 consultar, crear y editar pasan por la misma composición de pantalla, autorización,
 validación, persistencia y refresco. No se mantiene un diagrama por acción ni por catálogo:
-esas copias repetirían el patrón sin aportar decisiones diferentes. Se crea una vista
+esas copias repetirían el patrón sin aportar decisiones diferentes. Se crea un diagrama
 adicional únicamente cuando una operación incorpore otra coordinación, por ejemplo una
 transacción de inventario o una política de eliminación propia.
 
@@ -137,7 +137,7 @@ cada dominio permanecen fuera de este ciclo y sólo ofrecen opciones activas.
 
 ### Secuencias técnicas del patrón CRUD en frontend y backend
 
-Las vistas técnicas se dividen por frontera de ejecución. `DIA-ARQ-CAT-003` explica la
+Los diagramas técnicos se dividen por frontera de ejecución. `DIA-ARQ-CAT-003` explica la
 reutilización dentro del navegador y termina en la petición HTTP;
 `DIA-ARQ-CAT-004` comienza en esa petición y explica la selección segura del catálogo y
 su persistencia. Separarlas mantiene legibles los participantes de cada lado sin
@@ -239,6 +239,6 @@ sequenceDiagram
 No se requiere una secuencia separada para cada catálogo ni para cada verbo HTTP: los
 fragmentos de cada lado hacen explícitas las únicas bifurcaciones del CRUD vigente. Si se
 incorpora una eliminación real o una operación con transacción o efectos adicionales,
-esa coordinación sí debe representarse en otra vista. Ambos diagramas deben revisarse
+esa coordinación sí debe representarse en otro diagrama. Ambos diagramas deben revisarse
 cuando cambie la composición compartida, el contrato HTTP, el orden de middleware o la
 resolución de `MANAGED_CATALOGS`; `npm run docs:check` comprueba sus rutas y referencias.
