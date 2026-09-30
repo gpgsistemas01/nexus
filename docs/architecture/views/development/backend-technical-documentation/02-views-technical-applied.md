@@ -1,9 +1,9 @@
-# 3. Vistas técnicas aplicadas
+# 2. Vistas técnicas aplicadas
 
 ### Relación entre la colección canónica y las vistas adicionales
 
-La columna **Diagrama aplicado** de la matriz anterior enlaza los 73 recorridos
-`DIA-BE-CU-*` de `backend-code-sequences/index.md`. Esa colección es propietaria del
+Los 73 recorridos `DIA-BE-CU-*` de `backend-code-sequences/index.md` forman la colección
+canónica por caso. Esa colección es propietaria del
 orden ruta → controller → servicio → persistencia o efecto. Este documento es propietario
 de las fichas, los criterios de documentación y las vistas que contestan una pregunta
 adicional. Una vista adicional complementa la secuencia enlazada; no la reemplaza, no
@@ -92,8 +92,9 @@ evidencia del adaptador está en
 [`goodsIssueControllerTest.js`](../../../../../tests/unit/controllers/api/warehouse/goodsIssueControllerTest.js);
 la cobertura y brechas de servicios permanecen en el [plan de pruebas](../../../../testing/test-plan.md).
 La aplicación por caso y su evidencia se consulta en la
-[matriz de trazabilidad técnica](../../../traceability-matrix/index.md), y todos los identificadores
-gráficos están en el [catálogo de diagramas](../../../diagram-inventory/index.md).
+[matriz de trazabilidad técnica](../../../traceability-matrix/index.md). El identificador,
+propósito y fuente de verdad de cada gráfico se mantienen junto a su vista, sin otro
+inventario manual.
 
 ### Secuencia transversal de auditoría de escrituras
 

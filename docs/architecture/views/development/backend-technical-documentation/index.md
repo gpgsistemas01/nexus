@@ -1,10 +1,20 @@
 # Documentación técnica del backend
 
-Referencia del servidor organizada por capacidades implementadas y trazabilidad hacia
-rutas, servicios, persistencia y casos de uso.
+Referencia del servidor organizada por responsabilidades de diseño implementadas. Su
+propósito es explicar límites, contratos internos, reglas, transacciones, errores y
+colaboraciones que no se comprenden con una lista de archivos.
+
+Esta sección **no mantiene otra matriz de trazabilidad por caso**. La correspondencia
+entre requisito, caso, evidencia técnica y prueba pertenece a la
+[matriz transversal](../../../traceability-matrix/index.md); la ruta y los símbolos se
+consultan en el [mapa generado](../code-map.md), y el recorrido concreto de cada `CU-*`
+en las [secuencias backend](../../processes/backend-code-sequences/index.md). Tampoco
+repite el contrato HTTP procesable, que pertenece a OpenAPI.
 
 ## Capítulos
 
-1. [1. Catálogo de componentes](01-catalog-complete-of-records-backend.md): responsabilidades por capacidad.
-2. [2. Matriz caso–código](02-application-of-all-the-cases-to-the-code-backend.md): trazabilidad completa.
-3. [3. Vistas técnicas aplicadas](03-views-technical-applied.md): actividades, estados o coordinaciones que agregan información.
+1. [1. Catálogo de componentes](01-catalog-complete-of-records-backend.md):
+   responsabilidades, entradas, efectos y límites transaccionales por capacidad.
+2. [2. Vistas técnicas aplicadas](02-views-technical-applied.md): sólo actividades,
+   estados o coordinaciones que agregan una decisión no visible en el mapa o las
+   secuencias por caso.

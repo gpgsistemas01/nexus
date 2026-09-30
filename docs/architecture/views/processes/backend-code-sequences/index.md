@@ -1,9 +1,10 @@
 # Diagramas de secuencia del código backend
 
-Cada `CU-*` muestra la ejecución backend desde la petición HTTP hasta la respuesta y sus efectos.
-El objetivo y el flujo de negocio permanecen en los [casos de uso](../../../../requirements/domain-and-use-cases/03-cases-of-use-current.md),
-y la [matriz técnica](../../development/backend-technical-documentation/02-application-of-all-the-cases-to-the-code-backend.md)
-relaciona cada caso con su implementación y diagrama.
+Cada `CU-*` muestra la ejecución del servidor desde la interacción de entrada hasta la
+respuesta y sus efectos. El objetivo y el flujo de negocio permanecen en los
+[casos de uso](../../../../requirements/domain-and-use-cases/03-cases-of-use-current.md).
+Esta colección es la evidencia detallada caso–código; la documentación técnica conserva
+responsabilidades y decisiones reutilizables sin mantener una segunda matriz equivalente.
 
 | Aspecto | Contenido de la secuencia backend |
 | --- | --- |
@@ -20,7 +21,7 @@ colaboradores que cambian o prueban el recorrido del caso.
 ### Relación con la documentación técnica
 
 Esta colección es la fuente canónica del recorrido ruta → controller → servicio → persistencia o
-efecto. Las [vistas técnicas adicionales](../../development/backend-technical-documentation/03-views-technical-applied.md#relación-entre-la-colección-canónica-y-las-vistas-adicionales)
+efecto. Las [vistas técnicas adicionales](../../development/backend-technical-documentation/02-views-technical-applied.md#relación-entre-la-colección-canónica-y-las-vistas-adicionales)
 sólo complementan decisiones, transacciones o coordinaciones que requieren otra representación.
 
 ### Regla de identificación y lectura

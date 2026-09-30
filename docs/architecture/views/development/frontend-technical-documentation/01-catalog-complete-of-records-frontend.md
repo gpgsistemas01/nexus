@@ -4,7 +4,7 @@ La unidad de documentación es el **flujo funcional**, no un archivo aislado. Ca
 cubre todos sus módulos propietarios de servicio, aplicación, página y EJS; los símbolos
 compartidos aparecen después en una ficha transversal. De este modo no se presenta
 materiales como si fuera el único flujo documentado ni se repite una ficha idéntica por
-cada operación CRUD. Las rutas concretas se verifican en el [contrato API](../../../api-contract/index.md)
+cada operación CRUD. Las rutas concretas se verifican en el [contrato API](../../../api-contract.md)
 y las páginas publicadas en el [mapa generado](../code-map.md#rutas-web-19).
 
 ### Fichas de flujos funcionales

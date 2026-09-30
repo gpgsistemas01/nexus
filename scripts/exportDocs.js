@@ -204,10 +204,6 @@ const PUBLICATIONS = Object.freeze({
             ...Object.fromEntries(collectionGroups.map((group) => [
                 `casos-de-uso-${group}`,
                 packagePart(REQUIREMENT_ENTRY, getCollectionDocuments('docs/requirements/use-cases', [group]))
-            ])),
-            ...Object.fromEntries([...collectionGroups, 'cross-cutting'].map((group) => [
-                `diagramas-${group}`,
-                packagePart(REQUIREMENT_ENTRY, getCollectionDocuments('docs/requirements/diagrams', [group]))
             ]))
         }
     },
@@ -247,13 +243,10 @@ const PUBLICATIONS = Object.freeze({
                 ...getDirectoryDocuments('docs/architecture/views/development/frontend-technical-documentation')
             ]),
             'contrato-api': packagePart(ARCHITECTURE_ENTRY, [
-                ...getDirectoryDocuments('docs/architecture/api-contract')
+                'docs/architecture/api-contract.md'
             ]),
             trazabilidad: packagePart(ARCHITECTURE_ENTRY, [
                 ...getDirectoryDocuments('docs/architecture/traceability-matrix')
-            ]),
-            'catalogo-diagramas': packagePart(ARCHITECTURE_ENTRY, [
-                ...getDirectoryDocuments('docs/architecture/diagram-inventory')
             ]),
             estandar: packagePart(ARCHITECTURE_ENTRY, [
                 ...getDirectoryDocuments('docs/architecture/coding-standards')
