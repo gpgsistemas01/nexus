@@ -16,13 +16,14 @@ se mantienen en inglés; `index.md`, `README.md` y los identificadores estables 
 `cu-cat-01.md` se conservan por convención. Los títulos, el contenido y los nombres de
 los paquetes exportables se presentan en español:
 
-La carpeta `views/` aplica las vistas **Lógica** y **Desarrollo** de la adaptación 4+1
-definida por Nexus. `views/logical/data-and-persistence/` reúne las decisiones y
-evidencias de base de datos; `views/development/code-map.md` describe la organización
-estática del código. Una subcarpeta `generated/` indica la forma de mantenimiento del
-artefacto, no una vista arquitectónica adicional. ISO/IEC/IEEE 42010 aporta los
-conceptos *viewpoint/view*, pero no impone estos nombres: proceden del modelo 4+1
-adoptado por el proyecto.
+El [índice de vistas arquitectónicas](architecture/views/index.md) organiza bajo
+`architecture/views/` las cinco perspectivas de la adaptación 4+1 de Nexus: escenarios,
+lógica, procesos, desarrollo y física. Cada subcarpeta contiene los artefactos cuyo
+propósito principal es representar el sistema desde esa perspectiva. El contrato API,
+OpenAPI, la trazabilidad, las convenciones y el estándar de codificación permanecen en
+la raíz de `architecture/` como apoyo transversal, porque sirven a varias vistas o
+definen reglas en lugar de representar una sola perspectiva. Una subcarpeta
+`generated/` indica la forma de mantenimiento, no una vista adicional.
 
 Cada colección de capítulos curados conserva un `index.md` sin numerar y usa prefijos
 consecutivos `01-`, `02-`, etc. Las referencias generadas mantienen nombres descriptivos
@@ -31,9 +32,9 @@ estables porque se regeneran y no forman parte de la secuencia editorial.
 ```text
 docs/
 ├── architecture/  # Arquitectura y construcción
-│   └── views/
-│       ├── logical/      # Datos y persistencia
-│       └── development/  # Organización estática del código
+│   ├── views/        # Escenarios, lógica, procesos, desarrollo y física
+│   ├── api-contract/ # Referencia HTTP transversal
+│   └── openapi/      # Contrato procesable
 ├── governance/    # Criterios para mantener la documentación
 ├── user-manual/   # Entrada, capítulos e imágenes del manual
 ├── requirements/  # Entrada, requisitos, casos de uso e imágenes
@@ -43,10 +44,10 @@ docs/
 
 | Familia | Artefacto principal | Artefactos complementarios | Evidencia generada |
 | --- | --- | --- | --- |
-| Arquitectura, construcción y datos | [Documento de arquitectura y construcción](architecture/index.md) | [Descripción de arquitectura](architecture/architecture-and-web-views/index.md), [datos, persistencia y acceso](architecture/views/logical/data-and-persistence/index.md), [contrato API](architecture/api-contract/index.md), [navegación web](architecture/web-navigation-and-screen-catalog/index.md), referencias de [backend](architecture/backend-technical-documentation/index.md) y [frontend](architecture/frontend-technical-documentation/index.md), [secuencias](architecture/backend-code-sequences/index.md), [diagramas](architecture/code-diagrams/index.md), [patrones](architecture/design-and-construction-patterns/index.md) y [convenciones](architecture/diagram-conventions/index.md) | [Mapa del código](architecture/views/development/code-map.md), [esquema de base de datos](architecture/views/logical/data-and-persistence/generated/database-schema.md) y [diccionario técnico](architecture/views/logical/data-and-persistence/generated/data-dictionary.md) |
+| Arquitectura, construcción y datos | [Documento de arquitectura y construcción](architecture/index.md) | [Descripción de arquitectura](architecture/views/index.md), [datos, persistencia y acceso](architecture/views/logical/data-and-persistence/index.md), [contrato API](architecture/api-contract/index.md), [navegación web](architecture/views/scenarios/web-navigation-and-screen-catalog/index.md), referencias de [backend](architecture/views/development/backend-technical-documentation/index.md) y [frontend](architecture/views/development/frontend-technical-documentation/index.md), [secuencias](architecture/views/processes/backend-code-sequences/index.md), [diagramas](architecture/views/development/code-diagrams/index.md), [patrones](architecture/views/development/design-and-construction-patterns/index.md) y [convenciones](architecture/diagram-conventions/index.md) | [Mapa del código](architecture/views/development/code-map.md), [esquema de base de datos](architecture/views/logical/data-and-persistence/generated/database-schema.md) y [diccionario técnico](architecture/views/logical/data-and-persistence/generated/data-dictionary.md) |
 | Dominio y requisitos | [Índice y portada del paquete](requirements/index.md); la [SRS](requirements/requirements-specification/index.md) y las [fichas de casos de uso](requirements/use-cases/index.md) son las fuentes normativas complementarias | [Visión y alcance](requirements/vision-scope-and-requirements/index.md), [dominio y casos de uso](requirements/domain-and-use-cases/index.md), [matriz de operaciones](requirements/requirements-operations-matrix.md), [diagramas de requisitos](requirements/diagrams/index.md) y [glosario](requirements/business-glossary.md) | No aplica; el estado funcional requiere revisión humana |
 | Pruebas | [Estrategia de pruebas](testing/service-test-coverage.md) | [Plan de pruebas](testing/test-plan.md), [ambiente, estrategia y catálogo unitario](testing/unit-test-catalog.md), y [resultados unitarios](testing/unit-test-results.md) de la última ejecución verificada | La evidencia ejecutable vive en `tests`; el catálogo y el resumen versionado complementan la salida de Vitest/CI |
-| Gobierno documental | [Normas y criterios](governance/documentation-standards/index.md) | [Buenas prácticas de organización](governance/documentation-practices/index.md), [revisión de estructura](governance/non-use-case-document-review/index.md), [registro de aplicación de normas](governance/standards-application/index.md) y [convenciones de diagramas](architecture/diagram-conventions/index.md), compartidas también con arquitectura | No aplica |
+| Gobierno documental | [Normas y criterios](governance/documentation-standards/index.md) | [Registro de aplicación de normas](governance/standards-application/index.md) y [convenciones de diagramas](architecture/diagram-conventions/index.md), compartidas también con arquitectura | No aplica |
 
 La [guía de publicación y versionado](governance/publication-and-versioning/index.md) define
 portadas, formatos, idioma, capturas, paquetes exportables y la relación entre las
@@ -93,9 +94,8 @@ arquitectónico mediante la matriz de trazabilidad.
 
 ## Regla de actualización
 
-La [matriz de criterios para actualizar documentación y sistema](governance/documentation-practices/08-criteria-for-update-documentation-and-system.md)
-determina si un hallazgo exige modificar sólo documentación, sólo implementación o ambas.
-Las reglas siguientes indican cómo validar el resultado una vez clasificado:
+Las [convenciones mínimas adoptadas](governance/documentation-standards/04-conventions-minimum-adopted.md)
+distinguen los artefactos curados de las evidencias generadas. Para validar una modificación:
 
 1. Cambios en routers, imports o Prisma: ejecutar `npm run docs:architecture`.
 2. Cambios de diseño, comportamiento o decisiones: editar el documento curado
