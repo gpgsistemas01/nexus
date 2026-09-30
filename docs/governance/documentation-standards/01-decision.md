@@ -20,6 +20,3 @@ mantiene en otros artefactos.
 La aplicación concreta, las evidencias revisadas y las brechas se registran en
 [Aplicación de normas en Nexus](../standards-application/index.md). Este documento decide **qué
 criterio se adopta**; el registro indica **dónde se aplica y cómo se comprueba**.
-Las [buenas prácticas de organización](../documentation-practices/index.md) complementan esta
-decisión con criterios de audiencia, tipo de contenido, división, navegación y
-mantenimiento. No sustituyen las obligaciones contractuales ni se presentan como normas.

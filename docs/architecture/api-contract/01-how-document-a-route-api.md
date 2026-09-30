@@ -8,9 +8,8 @@ La documentación de una ruta combina información de varias capas, pero conserv
 sola ficha contractual en esta familia. El [mapa generado](../views/development/code-map.md)
 mantiene el inventario de métodos, URLs y archivos; una ficha se agrega aquí sólo cuando
 necesita explicar cómo consumir la operación. La explicación interna de nombres y
-colaboraciones se mantiene en la
-[documentación técnica del código](../technical-code-documentation/index.md), sin
-copiar el contrato HTTP.
+colaboraciones se mantiene en las referencias técnicas de [backend](../views/development/backend-technical-documentation/index.md) y
+[frontend](../views/development/frontend-technical-documentation/index.md), sin copiar el contrato HTTP.
 
 ### Alcance y nivel de cobertura
 
@@ -310,4 +309,4 @@ reglas de negocio.
 Los conflictos y errores de dominio concretos de esta operación deben añadirse a la
 ficha cuando estén respaldados por pruebas HTTP. El flujo técnico de una operación
 transaccional más compleja se encuentra en la
-[actividad de surtimiento de materiales](../backend-technical-documentation/04-views-technical-applied.md#actividad-de-decisión-y-surtimiento-de-materiales).
+[actividad de surtimiento de materiales](../views/development/backend-technical-documentation/03-views-technical-applied.md#actividad-de-decisión-y-surtimiento-de-materiales).

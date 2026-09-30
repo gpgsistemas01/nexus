@@ -10,8 +10,8 @@
 - Un cambio de comportamiento actualiza requisitos, arquitectura o datos en el artefacto
   curado propietario. Cambios en routers, imports entre áreas o Prisma regeneran los
   documentos mediante `npm run docs:architecture`.
-- La [guía de documentación técnica](../technical-code-documentation/index.md) decide cuándo la
-  explicación permanece junto al código, actualiza una vista Mermaid o enlaza un
-  diagrama ya existente.
+- El [índice de arquitectura](../index.md#organización-de-la-documentación-arquitectónica)
+  identifica el artefacto propietario; una explicación se agrega allí o enlaza una
+  vista existente en lugar de duplicarla.
 - La documentación usa los términos canónicos del glosario y enlaza la fuente de verdad
   en lugar de copiar extensamente su contenido.

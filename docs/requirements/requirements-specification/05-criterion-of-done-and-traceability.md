@@ -6,7 +6,7 @@ Cualquier requisito o regla nuevo o modificado se considera listo para revisión
 2. usa la terminología canónica o actualiza el glosario con validación funcional;
 3. enlaza su ruta, permiso, validadores, controller/DTO, servicio y persistencia;
 4. reutiliza el proceso CRUD o componente aplicable antes de introducir otro flujo,
-   consultando los [patrones aplicados](../../architecture/design-and-construction-patterns/index.md);
+   consultando los [patrones aplicados](../../architecture/views/development/design-and-construction-patterns/index.md);
 5. incluye pruebas relacionadas con el CRUD en la ubicación y con las estrategias de
    [pruebas](../../testing/service-test-coverage.md) correspondientes, y actualiza la matriz del
    [plan de pruebas](../../testing/test-plan.md) cuando cambia el alcance;

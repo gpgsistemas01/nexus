@@ -33,5 +33,5 @@ fábricas: muestra los puntos de extensión disponibles que deben revisarse ante
 crear otro flujo.
 
 La clasificación, límites y reglas de reutilización se detallan en
-[patrones de diseño y construcción](../design-and-construction-patterns/index.md). Este documento
+[patrones de diseño y construcción](../views/development/design-and-construction-patterns/index.md). Este documento
 visual sólo resume los patrones que necesitan aparecer en diagramas.

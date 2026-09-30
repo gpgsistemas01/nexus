@@ -226,20 +226,20 @@ const PUBLICATIONS = Object.freeze({
         directory: 'arquitectura',
         parts: {
             'vision-y-navegacion': packagePart(ARCHITECTURE_ENTRY, [
-                ...getDirectoryDocuments('docs/architecture/architecture-and-web-views'),
-                ...getDirectoryDocuments('docs/architecture/web-navigation-and-screen-catalog'),
-                ...getDirectoryDocuments('docs/architecture/code-diagrams')
+                'docs/architecture/views/physical/01-system-runtime-and-deployment.md',
+                'docs/architecture/views/logical/01-components-and-reuse.md',
+                ...getDirectoryDocuments('docs/architecture/views/scenarios/web-navigation-and-screen-catalog')
             ]),
-            'documentacion-tecnica-comun': packagePart(ARCHITECTURE_ENTRY, [
-                ...getDirectoryDocuments('docs/architecture/technical-code-documentation'),
-                ...getDirectoryDocuments('docs/architecture/design-and-construction-patterns'),
+            'patrones-y-mapa-de-codigo': packagePart(ARCHITECTURE_ENTRY, [
+                ...getDirectoryDocuments('docs/architecture/views/development/design-and-construction-patterns'),
+                ...getDirectoryDocuments('docs/architecture/views/development/code-diagrams'),
                 'docs/architecture/views/development/code-map.md'
             ]),
             backend: packagePart(ARCHITECTURE_ENTRY, [
-                ...getDirectoryDocuments('docs/architecture/backend-technical-documentation')
+                ...getDirectoryDocuments('docs/architecture/views/development/backend-technical-documentation')
             ]),
             frontend: packagePart(ARCHITECTURE_ENTRY, [
-                ...getDirectoryDocuments('docs/architecture/frontend-technical-documentation')
+                ...getDirectoryDocuments('docs/architecture/views/development/frontend-technical-documentation')
             ]),
             'contrato-api': packagePart(ARCHITECTURE_ENTRY, [
                 ...getDirectoryDocuments('docs/architecture/api-contract')
@@ -257,7 +257,7 @@ const PUBLICATIONS = Object.freeze({
             ...Object.fromEntries(sequenceGroups.flatMap((group) => ['backend', 'frontend'].map((side) => [
                 `secuencias-${side}-${group}`,
                 packagePart(ARCHITECTURE_ENTRY, getCollectionDocuments(
-                    `docs/architecture/${side}-code-sequences`,
+                    `docs/architecture/views/processes/${side}-code-sequences`,
                     [group]
                 ))
             ])))
