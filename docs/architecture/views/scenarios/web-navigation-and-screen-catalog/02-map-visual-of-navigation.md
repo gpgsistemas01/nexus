@@ -14,6 +14,8 @@ pero no a la inversa.
 
 ## Acceso y sesión compartidos
 
+**Identificador:** `DIA-ARQ-EST-001`.
+
 La raíz dirige a la autenticación o al área protegida según la sesión. Este recorrido es
 común a ambos actores y no representa una pantalla adicional para el área autenticada.
 
@@ -24,6 +26,7 @@ stateDiagram-v2
     state "Inicio de sesión<br/>/inicio-sesion" as Login
     state "Área autenticada" as Authenticated
     state "Renovar sesión<br/>/revocar-sesion" as Refresh
+    state "Cerrar sesión<br/>/cerrar-sesion" as Logout
     state "No encontrada<br/>/error/404" as NotFound
 
     Root --> Login: sin sesión
@@ -32,7 +35,8 @@ stateDiagram-v2
     Authenticated --> Refresh: token vencido
     Refresh --> Authenticated: renovación válida
     Refresh --> Login: renovación inválida
-    Authenticated --> Login: cerrar sesión
+    Authenticated --> Logout: solicitud POST
+    Logout --> Login: sesión cerrada
     Authenticated --> NotFound: URL inexistente o acceso denegado
     NotFound --> Root: volver al inicio
 ```
@@ -40,56 +44,56 @@ stateDiagram-v2
 ## Personal de almacén
 
 **Identificador:** `DIA-ARQ-NAV-001`. El mapa muestra la navegación operativa base del
-actor. La pantalla Personas sólo aparece cuando su asignación efectiva incluye
-`persons:page-view`; los accesos independientes de administración, movimientos,
-clientes, proveedores y catálogos auxiliares no forman parte de este recorrido.
+actor. Las etiquetas de las flechas indican el permiso que hace visible cada destino.
+Los accesos independientes de administración, movimientos, clientes, proveedores y
+catálogos auxiliares no forman parte de este recorrido.
 
 ```mermaid
 flowchart TB
     actor["Personal de almacén"] --> menu(["Menú principal"])
     menu --> warehouse(["Almacén"])
-    warehouse --> materials["Materiales<br/>/almacen/materiales"]
-    warehouse --> consumables["Consumibles<br/>/almacen/consumibles"]
-    warehouse --> wastes["Mermas<br/>/almacen/mermas"]
-    menu --> purchases["Compras<br/>/compras"]
+    warehouse -->|"materials:read"| materials["Materiales<br/>/almacen/materiales"]
+    warehouse -->|"materials:read"| consumables["Consumibles<br/>/almacen/consumibles"]
+    warehouse -->|"wastes:page-view"| wastes["Mermas<br/>/almacen/mermas"]
+    menu -->|"goods:receipts-page-view"| purchases["Compras<br/>/compras"]
     menu --> issues(["Salidas"])
-    issues --> goodsIssues["Materiales<br/>/salidas/materiales"]
-    issues --> wasteIssues["Mermas<br/>/salidas/mermas"]
-    menu -. "si posee persons:page-view" .-> persons["Personas<br/>/personas"]
+    issues -->|"goods:issues-page-view"| goodsIssues["Materiales<br/>/salidas/materiales"]
+    issues -->|"waste:issues-page-view"| wasteIssues["Mermas<br/>/salidas/mermas"]
+    menu -->|"persons:page-view"| persons["Personas<br/>/personas"]
 ```
 
 ## Administrador del sistema
 
 **Identificador:** `DIA-ARQ-NAV-002`. Este actor dispone de la navegación operativa y de
 los destinos administrativos. El diagrama expande todos los destinos para que pueda
-leerse sin depender del mapa anterior; cada opción continúa condicionada por el permiso
-indicado en el menú compartido.
+leerse sin depender del mapa anterior; las etiquetas reproducen el permiso comprobado
+por el menú compartido para mostrar cada opción.
 
 ```mermaid
 flowchart TB
     actor["Administrador del sistema"] --> menu(["Menú principal"])
     menu --> warehouse(["Almacén"])
-    warehouse --> materials["Materiales<br/>/almacen/materiales"]
-    warehouse --> consumables["Consumibles<br/>/almacen/consumibles"]
-    warehouse --> wastes["Mermas<br/>/almacen/mermas"]
-    menu --> purchases["Compras<br/>/compras"]
+    warehouse -->|"materials:read"| materials["Materiales<br/>/almacen/materiales"]
+    warehouse -->|"materials:read"| consumables["Consumibles<br/>/almacen/consumibles"]
+    warehouse -->|"wastes:page-view"| wastes["Mermas<br/>/almacen/mermas"]
+    menu -->|"goods:receipts-page-view"| purchases["Compras<br/>/compras"]
     menu --> issues(["Salidas"])
-    issues --> goodsIssues["Materiales<br/>/salidas/materiales"]
-    issues --> wasteIssues["Mermas<br/>/salidas/mermas"]
+    issues -->|"goods:issues-page-view"| goodsIssues["Materiales<br/>/salidas/materiales"]
+    issues -->|"waste:issues-page-view"| wasteIssues["Mermas<br/>/salidas/mermas"]
     menu --> movements(["Movimientos"])
-    movements --> materialMovements["Materiales<br/>/movimientos/materiales"]
-    movements --> wasteMovements["Mermas<br/>/movimientos/mermas"]
-    menu --> users["Usuarios<br/>/usuarios-sistemas"]
+    movements -->|"movements:read"| materialMovements["Materiales<br/>/movimientos/materiales"]
+    movements -->|"movements:read"| wasteMovements["Mermas<br/>/movimientos/mermas"]
+    menu -->|"users:manage"| users["Usuarios<br/>/usuarios-sistemas"]
     menu --> catalogs(["Catálogos"])
-    catalogs --> departments["Áreas<br/>/catalogos/departments"]
-    catalogs --> roles["Roles<br/>/catalogos/roles"]
-    catalogs --> presentations["Presentaciones<br/>/catalogos/presentations"]
-    catalogs --> units["Unidades de medida<br/>/catalogos/unit-measures"]
-    catalogs --> reasons["Motivos de ajuste<br/>/catalogos/reasons"]
-    catalogs --> fulfillment["Estados de cumplimiento<br/>/catalogos/fulfillment-statuses"]
-    menu --> persons["Personas<br/>/personas"]
-    menu --> clients["Clientes<br/>/clientes"]
-    menu --> suppliers["Proveedores<br/>/proveedores"]
+    catalogs -->|"catalogs:manage"| departments["Áreas<br/>/catalogos/departments"]
+    catalogs -->|"catalogs:manage"| roles["Roles<br/>/catalogos/roles"]
+    catalogs -->|"catalogs:manage"| presentations["Presentaciones<br/>/catalogos/presentations"]
+    catalogs -->|"catalogs:manage"| units["Unidades de medida<br/>/catalogos/unit-measures"]
+    catalogs -->|"catalogs:manage"| reasons["Motivos de ajuste<br/>/catalogos/reasons"]
+    catalogs -->|"catalogs:manage"| fulfillment["Estados de cumplimiento<br/>/catalogos/fulfillment-statuses"]
+    menu -->|"persons:page-view"| persons["Personas<br/>/personas"]
+    menu -->|"clients:page-view"| clients["Clientes<br/>/clientes"]
+    menu -->|"suppliers:page-view"| suppliers["Proveedores<br/>/proveedores"]
 ```
 
 Los modales CRUD no se dibujan como pantallas porque reutilizan la página propietaria y
