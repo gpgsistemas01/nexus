@@ -15,6 +15,6 @@ repite el contrato HTTP procesable, que pertenece a OpenAPI.
 
 1. [1. Catálogo de componentes](01-catalog-complete-of-records-backend.md):
    responsabilidades, entradas, efectos y límites transaccionales por capacidad.
-2. [2. Vistas técnicas aplicadas](02-views-technical-applied.md): sólo actividades,
+2. [2. Diagramas técnicos complementarios](02-views-technical-applied.md): sólo actividades,
    estados o coordinaciones que agregan una decisión no visible en el mapa o las
    secuencias por caso.

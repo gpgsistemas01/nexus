@@ -95,8 +95,8 @@ composición, se enlaza esta vista general en vez de copiarla.
 ## Reutilización comprobada en el frontend
 
 La representación detallada de factories, configuradores, consumidores y contratos se
-mantiene una sola vez en la
-[vista de reutilización de código](../development/code-diagrams/06-view-of-reuse-crud-and-interface.md).
+mantiene una sola vez en los
+[diagramas de reutilización de código](../development/code-diagrams/06-view-of-reuse-crud-and-interface.md).
 Esta vista lógica no conserva otro diagrama con los mismos nodos: `DIA-COD-REU-001`
 localiza las piezas comunes y `DIA-COD-REU-002` muestra cómo cada dominio las configura.
 El diagrama de componentes anterior conserva únicamente las fronteras de alto nivel

@@ -11,7 +11,7 @@ organiza desde el recorrido general hacia la realización concreta de cada caso:
    cada `CU-*`.
 3. [Secuencias frontend](frontend-code-sequences/index.md): ejecución en el navegador
    para cada `CU-*`.
-4. Vistas técnicas adicionales de [backend](../development/backend-technical-documentation/02-views-technical-applied.md)
+4. Diagramas técnicos complementarios de [backend](../development/backend-technical-documentation/02-views-technical-applied.md)
    y [frontend](../development/frontend-technical-documentation/02-views-technical-applied-by-flow-frontend.md):
    actividades o estados que responden una pregunta distinta de la secuencia canónica.
 
@@ -27,9 +27,9 @@ se elimina en lugar de trasladarla o actualizar dos representaciones equivalente
 | Actividad conservada | Ubicación propietaria | Por qué se requiere |
 | --- | --- | --- |
 | Ciclo compartido de catálogos | [Registro de catálogos](../development/design-and-construction-patterns/01-registration-of-catalogs-with-checklist-allowlist.md#diagrama-del-ciclo-crud-compartido) | Expresa una decisión reutilizable entre consulta, alta, edición y estado activo; evita una actividad repetida por catálogo. |
-| Cancelación de detalle de entrada | [Vistas técnicas backend](../development/backend-technical-documentation/02-views-technical-applied.md#actividad-de-cancelación-de-un-detalle-de-entrada) | Hace visibles las guardas de existencia, motivo y reversión de stock que producen rechazo o rollback. |
-| Surtimiento de materiales | [Vistas técnicas backend](../development/backend-technical-documentation/02-views-technical-applied.md#actividad-de-decisión-y-surtimiento-de-materiales) | Separa actualización y surtimiento, y muestra las decisiones que derivan movimiento y estado. |
-| Alta de merma desde plantilla | [Vistas técnicas frontend](../development/frontend-technical-documentation/02-views-technical-applied-by-flow-frontend.md#alta-de-merma-desde-una-plantilla-de-material) | Explica la habilitación y el mapeo dependientes de proveedor y plantilla antes del envío. |
+| Cancelación de detalle de entrada | [Diagramas técnicos backend](../development/backend-technical-documentation/02-views-technical-applied.md#actividad-de-cancelación-de-un-detalle-de-entrada) | Hace visibles las guardas de existencia, motivo y reversión de stock que producen rechazo o rollback. |
+| Surtimiento de materiales | [Diagramas técnicos backend](../development/backend-technical-documentation/02-views-technical-applied.md#actividad-de-decisión-y-surtimiento-de-materiales) | Separa actualización y surtimiento, y muestra las decisiones que derivan movimiento y estado. |
+| Alta de merma desde plantilla | [Diagramas técnicos frontend](../development/frontend-technical-documentation/02-views-technical-applied-by-flow-frontend.md#alta-de-merma-desde-una-plantilla-de-material) | Explica la habilitación y el mapeo dependientes de proveedor y plantilla antes del envío. |
 
 No se requiere otra actividad para autenticación, CRUD directo, reportes, corrección de
 entrada o devoluciones: sus decisiones ya quedan cubiertas por la ficha normativa, la

@@ -1,10 +1,10 @@
 # 1. Propósito y mantenimiento
 
-Estas vistas representan manualmente la estructura observable del código actual. No las
+Estos diagramas representan manualmente la estructura observable del código actual. No los
 produce `scripts/generateArchitectureDocs.js`: se revisan en el mismo cambio que modifica
 routers, capas, coordinación de servicios o componentes reutilizables. El
 [mapa generado](../code-map.md) sigue siendo el inventario verificable de rutas
-e imports; estos diagramas agrupan esa evidencia para que una persona pueda comprenderla
+e imports; estas representaciones agrupan esa evidencia para que una persona pueda comprenderla
 sin recorrer todos los archivos.
 
 Las flechas continuas significan llamada o delegación; las discontinuas significan
