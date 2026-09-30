@@ -34,7 +34,7 @@ Ambas vistas se conectan mediante la
 
 ## Forma arquitectónica y criterios normativos
 
-El [modelo de vistas aplicado](architecture-and-web-views/03-model-of-views-of-architecture-applied.md)
+El [modelo de vistas aplicado](views/index.md)
 es la fuente propietaria del enfoque Viewpoint/View, su adaptación de 4+1 y el apoyo de
 los niveles de C4. Los [criterios documentales](../governance/documentation-standards/03-application-by-type-of-document.md)
 determinan qué orientan ISO/IEC/IEEE 42010, 29148, 1016 y 15289, qué entrega conserva cada
@@ -42,40 +42,49 @@ contenido y los límites de la adopción. Este índice sólo dirige a esas decis
 mantiene otra versión de las normas ni del modelo de vistas. El
 [índice de vistas](views/index.md) organiza los artefactos que materializan ese modelo.
 
-## Orden de lectura recomendado
+## Organización de la documentación arquitectónica
 
-Cada enlace siguiente nombra también la clase de artefacto a la que conduce; no son
-enlaces intercambiables ni copias de una misma vista:
+La organización separa las **vistas del sistema** de los **artefactos de apoyo**:
 
-1. **Descripción arquitectónica curada:** [Arquitectura y construcción](architecture-and-web-views/index.md): contexto,
-   contenedores, despliegue, componentes, recorrido extremo a extremo y organización de
-   las capas.
-2. **Catálogo de patrones curado:** [Patrones de diseño y construcción](design-and-construction-patterns/index.md): definición,
-   evidencia y reglas de aplicación de los patrones confirmados.
-3. **Contratos de interfaz:** [Contrato de la API](api-contract/index.md) y [especificación OpenAPI 3.1](openapi/openapi.json): transporte JSON,
-   rutas, esquemas de solicitud y respuesta, errores y validaciones observables.
-4. **Vistas técnicas curadas:** [Diagramas vigentes del código](code-diagrams/index.md): superficie HTTP, dominios,
-   colaboraciones y reutilización observada.
-5. **Inventario curado de interfaz:** [Navegación y catálogo de pantallas web](web-navigation-and-screen-catalog/index.md): estados
-   de acceso, mapa del menú, pantallas y redirecciones.
-6. **Vista lógica — datos y persistencia:** [Datos, persistencia y acceso](views/logical/data-and-persistence/index.md): decisiones de acceso,
-   operación de base de datos, estructura persistente y evidencia derivada de Prisma.
-7. **Vista de desarrollo — evidencia generada:** [Mapa generado del código](views/development/code-map.md): rutas, dependencias reales entre
-   áreas y exportaciones detectadas automáticamente.
+1. [Vistas arquitectónicas](views/index.md): escenarios, lógica, procesos, desarrollo y
+   física. Bajo `views/` se mantiene todo artefacto cuyo propósito principal es
+   representar la solución desde una de esas perspectivas.
+2. **Apoyo transversal:** contrato API, trazabilidad, inventario y convenciones de
+   diagramas, y estándar de codificación. Permanecen en la raíz de `architecture/`
+   porque sirven a varias vistas o establecen reglas, pero no representan por sí mismos
+   una perspectiva del sistema.
 
-## Vistas y responsabilidades
+```text
+architecture/
+├── views/
+│   ├── scenarios/    # Navegación y relación con objetivos del actor
+│   ├── logical/      # Componentes, dominios y persistencia
+│   ├── processes/    # Secuencias, decisiones y estados dinámicos
+│   ├── development/  # Organización, implementación, patrones y mapa del código
+│   └── physical/     # Contexto, contenedores y despliegue
+├── api-contract/     # Referencia HTTP transversal
+├── openapi/          # Contrato HTTP procesable
+├── traceability-matrix/
+├── diagram-inventory/
+├── diagram-conventions/
+└── coding-standards/
+```
 
-| Pregunta | Vista propietaria | Mantenimiento |
-| --- | --- | --- |
-| ¿Quién usa Nexus y de qué sistemas externos depende? | Contexto en la descripción de arquitectura. | Curado cuando cambia el límite del sistema. |
-| ¿Dónde se ejecutan cliente, servidor y persistencia? | Contenedores y despliegue en la descripción de arquitectura. | Curado cuando cambia la topología. |
-| ¿Cuál es el patrón arquitectónico y cómo se dividen las responsabilidades? | Componentes y organización por capas en la descripción; catálogo de patrones para la justificación. | Curado cuando cambia una decisión de diseño. |
-| ¿Qué datos recibe y devuelve una ruta HTTP? | [Contrato de la API](api-contract/index.md). | Curado junto con rutas, validadores, DTO, controladores y pruebas HTTP. |
-| ¿Qué dependencias existen realmente en el código? | Mapa generado y diagramas vigentes del código. | `npm run docs:architecture` y revisión manual, respectivamente. |
-| ¿Cómo se ejecuta un caso de uso concreto? | Secuencias de código de [backend](backend-code-sequences/index.md) y [frontend](frontend-code-sequences/index.md), divididas por grupo funcional. | Curado junto con el caso afectado. |
-| ¿Cómo navega una persona por las pantallas? | Navegación y catálogo de pantallas web. | Curado junto con rutas, permisos y vistas. |
-| ¿Cómo se persisten y protegen los datos? | [Datos, persistencia y acceso](views/logical/data-and-persistence/index.md), junto con las vistas generadas de Prisma. | Curado para decisiones; `npm run docs:architecture` para estructura derivada. |
-| ¿Qué diagramas existen y qué notación usan? | [Inventario](diagram-inventory/index.md) y [convenciones](diagram-conventions/index.md). | Actualizar al agregar, retirar o cambiar una vista. |
+Los índices de cada vista conducen a sus colecciones sin duplicar contenido. Los casos
+de uso continúan en requisitos: la vista de escenarios los referencia, pero no adquiere
+su propiedad normativa.
+
+## Recorridos de lectura
+
+1. Para comprender el sistema: [vista física](views/physical/index.md) →
+   [vista lógica](views/logical/index.md) → patrón relevante en la
+   [vista de desarrollo](views/development/index.md).
+2. Para revisar una interacción web: [vista de escenarios](views/scenarios/index.md) →
+   [contrato API](api-contract/index.md) → [vista de procesos](views/processes/index.md).
+3. Para revisar persistencia: [vista lógica](views/logical/index.md) → esquema y
+   diccionario generados → servicio en la [vista de desarrollo](views/development/index.md).
+4. Para comprobar cobertura: [matriz de trazabilidad](traceability-matrix/index.md) →
+   requisito o caso de uso → vista técnica y prueba enlazadas.
 
 ## Regla de división
 

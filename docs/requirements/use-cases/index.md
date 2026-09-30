@@ -217,7 +217,7 @@ conjunto; el cambio de identificador no modifica el alcance funcional del caso.
 
 - [AUT — Autenticación](authentication/index.md)
 - [IDA — Identidad y acceso](identity-access/index.md)
-- [ALM — Almacén](../use-cases/catalogs/index.md)
+- [ALM — Almacén](catalogs/index.md)
 - [CAT — Catálogos](catalogs/index.md)
 - [ENT — Compras de material](purchases/index.md)
 - [SAL — Salidas de material y de merma](issues/index.md)
@@ -232,7 +232,7 @@ conjunto; el cambio de identificador no modifica el alcance funcional del caso.
 | Consulta y exportación | `CU-IDA-04`, `CU-IDA-09`, `CU-ALM-06`, `CU-ALM-08`, `CU-ALM-14`, `CU-ALM-16`, `CU-CAT-04`, `CU-CAT-08`, `CU-ENT-06`, `CU-SAL-07` y `CU-SAL-14` y casos de consulta de cada familia | Filtros, paginación, dependencias entre selects y utilidades Excel. | Columnas, agrupaciones, fórmulas y permiso de cada reporte. |
 
 Reutilizar no significa fusionar reglas de negocio. Antes de crear otro flujo se revisan
-los [patrones de diseño y construcción](../../architecture/design-and-construction-patterns/index.md), se replica
+los [patrones de diseño y construcción](../../architecture/views/development/design-and-construction-patterns/index.md), se replica
 el proceso existente sólo cuando cambia el contexto, y se mantienen explícitas sus
 validaciones, transacciones y pruebas CRUD.
 
