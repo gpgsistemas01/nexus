@@ -1,5 +1,20 @@
 # 13. Orden de métodos por comportamiento
 
+**Identificador:** `DIA-PAT-ORD-001`. **Pregunta:** ¿en qué orden se localizan las
+operaciones equivalentes a través de las capas?
+
+```mermaid
+flowchart LR
+    list["1 · Consulta"] --> create["2 · Creación"]
+    create --> update["3 · Actualización general"]
+    update --> specialized["4 · Actualizaciones especializadas<br/>encabezado · detalles · devolución"]
+    specialized --> remove["5 · Eliminación"]
+
+    route["route"] -. mismo orden .-> controller["controller"]
+    controller -. mismo orden .-> service["service"]
+    service -. mismo orden .-> client["servicio HTTP y application"]
+```
+
 Los módulos que representan el mismo tipo de recurso conservan un orden de lectura
 común aunque cambien los nombres del dominio. Para un CRUD, el orden es: **consulta,
 creación, actualización general, actualizaciones especializadas y eliminación**. Las

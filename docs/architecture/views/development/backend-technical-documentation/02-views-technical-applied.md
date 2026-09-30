@@ -1,31 +1,39 @@
-# 2. Vistas técnicas aplicadas
+# 2. Diagramas técnicos complementarios
 
-### Relación entre la colección canónica y las vistas adicionales
+### Relación con la colección canónica
 
 Los 73 recorridos `DIA-BE-CU-*` de `backend-code-sequences/index.md` forman la colección
-canónica por caso. Esa colección es propietaria del
-orden ruta → controller → servicio → persistencia o efecto. Este documento es propietario
-de las fichas, los criterios de documentación y las vistas que contestan una pregunta
-adicional. Una vista adicional complementa la secuencia enlazada; no la reemplaza, no
+canónica por caso y son propietarios del orden ruta → controller → servicio →
+persistencia o efecto. Este documento conserva únicamente diagramas que contestan una
+pregunta adicional. Un diagrama complementario no reemplaza la secuencia enlazada, no
 amplía su cobertura y no obliga a copiarla.
 
-La revisión de las vistas existentes produjo esta decisión:
+```mermaid
+flowchart LR
+    case["CU-* y requisito"] --> canonical["DIA-BE-CU-*<br/>recorrido canónico"]
+    canonical -. decisión o ciclo adicional .-> activity["Actividad o estado<br/>complementario"]
+    canonical --> code["Ruta · controller · servicio · datos"]
+    activity -. no sustituye .-> canonical
+```
 
-| Vista conservada aquí | Pregunta adicional y razón | Conexión e impacto |
+| Diagrama conservado | Pregunta adicional | Complementa |
 | --- | --- | --- |
-| Registro de rutas | ¿Cómo se monta la superficie Express completa? Es transversal y estructural, no el recorrido de un `CU-*`. | Se conecta con `src/app.js`, `API_ROUTES`, el mapa generado y la vista de superficie de `code-diagrams/index.md`. Si cambia el montaje se revisan las entradas de los `DIA-BE-CU-*` afectados, no sus reglas de dominio. |
-| `DIA-BE-ACT-002` · `CU-ENT-05` | ¿Qué decisiones provocan rechazo, rollback o cancelación? La actividad prioriza ramas y errores que una secuencia lineal hace menos visibles. | Complementa `DIA-BE-CU-ENT-05`; comparte servicio y transacción, pero no altera el orden canónico. Un cambio de condición exige revisar ambas vistas y la máquina normativa si cambia un estado de negocio. |
-| `DIA-BE-ACT-001` · `CU-SAL-05` | ¿Cómo se clasifican actualizaciones y surtimientos y qué errores impiden continuar? | Complementa `DIA-BE-CU-SAL-05` y referencia la máquina de estados de requisitos. Cambios de participantes actualizan la secuencia; cambios de ramas actualizan la actividad; cambios de estados también actualizan requisitos. |
-| `DIA-BE-SEQ-006` · `RN-008` | ¿Cuándo se ejecuta la auditoría transversal y puede revertir la operación? Se conserva porque cruza todas las escrituras y establece la garantía *best effort*, no porque detalle otro caso. | Se conecta con el middleware de auditoría y con todo `DIA-BE-CU-*` de escritura mediante el evento `finish`. Un cambio en auditoría no modifica la transacción de cada caso, salvo que deje de ser posterior o pase a ser obligatoria. |
-| `DIA-BE-TEC-EST-AUT-01` | ¿Qué estado efectivo debe conservar una cuenta para atravesar `authorizeUserApi` o `authorizeUserWeb`? | Complementa las secuencias autenticadas: distingue un token válido de un usuario activo y autorizado sin repetir cada ruta protegida. |
-| `DIA-BE-TEC-EST-CU-ENT-04` | ¿Cuál es el ciclo técnico de la corrección entre recepción, commit/rollback, evento y respuesta? | Complementa `DIA-BE-CU-ENT-04`. No sustituye los estados funcionales de requisitos; sólo obliga a revisar la secuencia si cambia el límite transaccional o la publicación posterior. |
+| `DIA-BE-TEC-EST-RUT-01` · registro de rutas | ¿Cómo se monta la superficie Express completa? | `src/app.js`, `API_ROUTES` y el mapa generado; no representa un `CU-*`. |
+| `DIA-BE-ACT-002` · `CU-ENT-05` | ¿Qué decisiones provocan rechazo, rollback o cancelación? | `DIA-BE-CU-ENT-05` y la máquina normativa si cambia un estado de negocio. |
+| `DIA-BE-ACT-001` · `CU-SAL-05` | ¿Cómo se separan actualización, surtimiento y errores? | `DIA-BE-CU-SAL-05` y los estados normativos de salidas. |
+| `DIA-BE-SEQ-006` · `RN-008` | ¿Cuándo ocurre la auditoría y puede revertir la operación? | Escrituras API observadas mediante `finish`; documenta la garantía *best effort*. |
+| `DIA-BE-TEC-EST-AUT-01` | ¿Qué condiciones permiten superar autorización? | Secuencias autenticadas; distingue token, cuenta activa y permiso efectivo. |
+| `DIA-BE-TEC-EST-CU-ENT-04` | ¿Cuál es el ciclo técnico de una corrección? | `DIA-BE-CU-ENT-04`, su transacción y la publicación posterior. |
 
 Las antiguas secuencias selectivas de autenticación, ajustes, entrada, corrección,
 surtimientos y devoluciones no se mantienen aquí: respondían la misma pregunta que sus
 `DIA-BE-CU-*`. Su detalle quedó consolidado en la colección canónica. Así, una operación
-compleja puede tener más de una **vista**, pero nunca dos fuentes para el mismo recorrido.
+compleja puede tener más de un **diagrama**, pero nunca dos fuentes para el mismo recorrido.
 
 ### Registro de rutas
+
+**Identificador:** `DIA-BE-TEC-EST-RUT-01`. **Pregunta:** ¿cómo se registra la
+superficie HTTP y dónde terminan las peticiones que no encuentran una ruta?
 
 ```mermaid
 flowchart LR
@@ -46,7 +54,7 @@ Se revisa si cambia el orden de montaje en `src/app.js`, el contrato de
 
 ### Actividad de cancelación de un detalle de entrada
 
-**Identificador:** `DIA-BE-ACT-002`. **Caso:** `CU-ENT-05`. Esta vista enfatiza las
+**Identificador:** `DIA-BE-ACT-002`. **Caso:** `CU-ENT-05`. Este diagrama enfatiza las
 decisiones exclusivas de cancelación y la ausencia de una segunda identidad corregida.
 
 ```mermaid
@@ -93,7 +101,7 @@ evidencia del adaptador está en
 la cobertura y brechas de servicios permanecen en el [plan de pruebas](../../../../testing/test-plan.md).
 La aplicación por caso y su evidencia se consulta en la
 [matriz de trazabilidad técnica](../../../traceability-matrix/index.md). El identificador,
-propósito y fuente de verdad de cada gráfico se mantienen junto a su vista, sin otro
+propósito y fuente de verdad de cada gráfico se mantienen junto al diagrama, sin otro
 inventario manual.
 
 ### Secuencia transversal de auditoría de escrituras
@@ -130,11 +138,11 @@ sequenceDiagram
 
 ### Estados técnicos complementarios
 
-Estas vistas permanecen aquí porque añaden ciclos técnicos que no repite la colección
+Estos diagramas permanecen aquí porque añaden ciclos técnicos que no repite la colección
 de secuencias por caso.
 
 **Estado técnico complementario:** `DIA-BE-TEC-EST-AUT-01`. Una máquina de estados es
-la vista adecuada porque la pregunta es si la cuenta conserva las condiciones para
+la representación adecuada porque la pregunta es si la cuenta conserva las condiciones para
 atravesar el middleware entre peticiones; una secuencia explica el orden de una petición,
 pero no expresa con igual claridad la pérdida de elegibilidad. `getLoggedUser(userId)`
 vuelve a consultar estas condiciones en `authorizeUserApi` y `authorizeUserWeb`.

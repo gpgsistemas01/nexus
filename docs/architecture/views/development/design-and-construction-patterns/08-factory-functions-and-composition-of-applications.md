@@ -1,90 +1,57 @@
 # 8. Factory functions y composición de aplicaciones
 
-### CRUD común del navegador
+La construcción canónica se muestra en
+[`DIA-PAT-CON-001`](04-catalog-visual-of-patterns-applied.md#factories-y-composición-sobre-herencia)
+y sus consumidores en los
+[diagramas de reutilización](../code-diagrams/06-view-of-reuse-crud-and-interface.md).
+Este capítulo conserva únicamente las variantes y reglas de exposición.
 
-`createCrudApplication` recibe requests y claves de respuesta, y construye un objeto
-inmutable con `getAll`, `register` y `edit`. `createApplicationMutation` concentra la
-adaptación de `formData`, `id`, `detailId`, opciones adicionales de contexto y la
-respuesta exitosa. La opción `additionalMutations` agrega al mismo objeto operaciones
-con ese contrato, usando una clave de respuesta por nombre cuando corresponde.
-Personas, usuarios, clientes, proveedores, materiales, mermas, entradas y salidas
-configuran esta misma construcción; cada módulo conserva sus nombres de dominio y
-adapta únicamente el payload que realmente difiere.
+```mermaid
+flowchart LR
+    requests["Requests y claves<br/>del recurso"] --> crud["createCrudApplication"]
+    crud --> operations["getAll · register · edit<br/>additionalMutations"]
+    operations --> domain["Exports con nombres<br/>del dominio"]
 
-La aplicación no vuelve a enumerar campos que ya fueron seleccionados por el formulario
-y normalizados por el DTO del servidor. Materiales envía el objeto recibido sin
-reconstruirlo; su único adaptador de registro elimina `maxUnitCost` cuando el contexto
-es una entrada de compra, porque ese costo procede del detalle de la entrada. Esta
-excepción contextual no sustituye los mapeos existentes ni crea un segundo DTO en el
-navegador.
+    crud -. compone .-> issue["createIssueApplication"]
+    issue --> issueOps["editHeader · editDetails<br/>returnDetail"]
 
-Los listados CRUD devuelven la respuesta del recurso; no agregan métodos `get*Options`
-si Select2 ya dispone de `mapOption` para construir `{ id, text }`. Proveedores y
-materiales usan directamente `getAllSuppliers` y `getAllMaterials`, tanto en el AJAX del
-select como en filtros. Un adaptador de opciones sólo permanece cuando resuelve una
-necesidad distinta, por ejemplo precargar «Pendiente» o elegir la primera persona de un
-departamento antes de inicializar el filtro.
+    query["Consulta + columnas + orden"] --> list["createDataTableListController"]
+    list --> controller["Controller tabular<br/>del dominio"]
+```
 
-El objeto construido permanece privado dentro del módulo de contexto. La frontera
-pública son exports nombrados en lenguaje de dominio (`registerUser`,
-`editGoodsReceiptHeader`, `registerWasteIssueDetailReturn`, etc.), no un export del objeto
-genérico. Así los consumidores no dependen de claves como `register`, `edit` o de la
-forma interna de la factory; además pueden importar sólo la capacidad que utilizan.
-Las referencias exportadas conservan también el formato de entrada de la factory:
-`deleteMaterial` recibe `{ id }`, igual que las demás mutaciones, para que datatable,
-aplicación y servicio no alternen firmas.
+### Contratos configurables
 
-### Especialización de salidas
+| Construcción | Configuración recibida | Resultado y consumidores |
+| --- | --- | --- |
+| `createCrudApplication` | requests, claves de respuesta y mutaciones adicionales | objeto privado con consulta y mutaciones; personas, usuarios, clientes, proveedores, inventario y documentos |
+| `createIssueApplication` | requests y claves de material o merma | CRUD compuesto con encabezado, detalles y devolución |
+| `createApplicationList` | request con contrato `{ params }` | lectura uniforme para CRUD y catálogos de sólo lectura |
+| `createDataTableListController` | consulta, columnas y orden seguro | controller DataTable de roles, áreas y catálogos operativos |
 
-`createIssueApplication` configura `createCrudApplication` con `editHeader`,
-`editDetails` y `returnDetail` como mutaciones adicionales. Salidas de material y de
-merma inyectan sus requests y claves; no duplican la coordinación. Entradas de compra
-replican el mismo criterio directamente con corrección y cancelación de detalle,
-porque sus nombres y reglas de documento son distintos aunque el transporte coincida.
+`createApplicationMutation` adapta `formData`, identificadores, contexto adicional y la
+respuesta exitosa. Una diferencia exclusiva permanece en el módulo propietario: por
+ejemplo, materiales omite `maxUnitCost` cuando el alta ocurre desde una entrada, y las
+compras conservan corrección y cancelación bajo `goodsReceipts/detailChanges` porque sus
+reglas difieren de una devolución de salida.
 
-Las mutaciones de detalle especializadas conservan una carpeta explícita dentro de su
-recurso. Compras agrupa sus cambios en `goodsReceipts/detailChanges`; las devoluciones
-de material y merma se ubican en `goodsIssues/detailReturns` y
-`wasteIssues/detailReturns`. En el navegador, cada salida mantiene la coordinación de
-su devolución en `pages/warehouse/<recurso>/returns`, mientras el formulario y el modal
-permanecen en `ui/issues` y `views/shared/issues` porque ambos contextos reutilizan el
-mismo componente. Así la organización no duplica el flujo compartido ni mezcla la
-mutación especializada con el modal principal del CRUD.
+Los listados reutilizan la respuesta del recurso. No se crea `get*Options` cuando el
+mapper de Select2 ya puede producir `{ id, text }`; sólo se mantiene un adaptador cuando
+resuelve otra decisión, como precargar `Pendiente` o seleccionar una persona por área.
+De igual forma, `getIssueDataTableQuery` comparte el parsing de filtros, pero cada
+controller conserva columnas, servicio y autorización propios.
 
-Se exporta **la función constructora** `createIssueApplication`, no una aplicación de
-salida ya creada. Es un punto de composición compartido: cada módulo de salida la llama
-con sus propios requests, guarda localmente la instancia resultante y publica sólo sus
-operaciones de dominio. Mantener exportable el constructor permite que material y
-merma repliquen el mismo proceso sin compartir estado ni exponer el objeto genérico a
-la UI.
+### Exposición y extensión
 
-### Listados de catálogos
+1. La instancia producida permanece privada en el módulo de contexto.
+2. El módulo exporta referencias nombradas en lenguaje de dominio, no las claves
+   genéricas `register` o `edit`.
+3. La firma pública conserva el contrato de la factory; una adaptación sólo se agrega
+   cuando el dominio realmente difiere.
+4. Primero se configura una factory existente. Se amplía únicamente si la nueva
+   operación conserva el mismo contrato en al menos dos contextos.
+5. Se exporta una función constructora compartida cuando existen varios consumidores;
+   su resultado no comparte estado entre ellos.
 
-`createApplicationList` concentra el contrato de lectura de la capa de aplicación:
-recibe un request y produce una operación que siempre lo invoca con `{ params }`. El
-CRUD reutiliza esa operación para `getAll`; los catálogos de departamentos, roles,
-presentaciones, motivos y unidades de medida configuran la misma función sin repetir
-adaptadores equivalentes. Los listados que transforman la respuesta a opciones
-conservan su adaptador de dominio.
-
-`createDataTableListController` construye controllers de lectura configurando función
-de consulta, columnas y orden predeterminado. Roles, departamentos, presentaciones,
-unidades, motivos y estados de cumplimiento reutilizan el mismo parsing de DataTable.
-Las salidas de material y merma, que agregan el mismo conjunto de filtros operativos,
-reutilizan `utils/issueQueryUtils.getIssueDataTableQuery`; cada controller conserva su
-lista segura de columnas, servicio de dominio y alcance de acceso. El parser permanece
-en `utils` porque normaliza la query HTTP sin responder ni coordinar el caso de uso.
-
-Son **factory functions**, no los patrones GoF *Factory Method* o *Abstract Factory*:
-no existe jerarquía de creadores/productos. Tampoco `createIssueApplication` es
-*Template Method*, porque especializa por composición de objetos y no por herencia.
-
-**Regla de construcción:** primero se intenta configurar una factory existente. Sólo se
-amplía la abstracción si la nueva operación conserva el mismo contrato en al menos dos
-contextos; una diferencia exclusiva permanece en el módulo propietario.
-
-**Regla de exposición:** no se exporta la instancia producida por la factory desde un
-módulo de contexto. Se exportan referencias nombradas a sus operaciones, o un adaptador
-cuando la firma de dominio difiere. Una función constructora puede exportarse desde un
-módulo compartido cuando al menos dos contextos la consumen; su resultado permanece
-privado en cada consumidor.
+Estas construcciones son **factory functions**, no *Factory Method*, *Abstract Factory*
+ni *Template Method*: no existen jerarquías de creadores o productos y la
+especialización se realiza por composición de objetos, no por herencia.

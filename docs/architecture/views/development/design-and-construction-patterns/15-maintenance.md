@@ -23,9 +23,9 @@ select y tabla obtiene el nombre del material y del proveedor mediante getters q
 encapsulan las variantes del contrato (`material`, `supplierMaterial` o valores ya
 aplanados), en lugar de repetir navegación opcional dentro del formateador.
 
-#### Vista del contrato de datos de los detalles
+#### Diagrama del contrato de datos de los detalles
 
-Esta vista focalizada responde, para desarrollo y revisión, **qué identidad conserva
+Este diagrama focalizado responde, para desarrollo y revisión, **qué identidad conserva
 cada etapa** entre la respuesta HTTP, la tabla y los requests de una salida. Su alcance
 es sólo la adaptación en el navegador; no sustituye el futuro contrato OpenAPI ni el
 diagrama ER. La fuente de verdad son los DTO de salidas y los adaptadores de
@@ -57,5 +57,5 @@ Las flechas expresan transformación de datos, no llamadas entre capas. `id` sie
 identifica el detalle documental; `materialId` y `wasteId` identifican el elemento de
 inventario según el contexto. El diagrama se revisa cuando cambien los DTO de salida,
 los campos permitidos de un request o `mapIssueDetailToTable`; `npm run docs:check`
-continúa validando únicamente las vistas generadas, por lo que esta vista curada también
+continúa validando únicamente los artefactos generados, por lo que este diagrama curado también
 requiere revisión visual de Mermaid.
