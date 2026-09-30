@@ -1,26 +1,32 @@
-# 2. Vistas técnicas aplicadas por flujo frontend
+# 2. Diagramas técnicos complementarios del frontend
 
-### Relación entre la colección canónica y las vistas adicionales
+### Relación con la colección canónica
 
-La columna **Diagrama aplicado** de la matriz anterior enlaza los 73 recorridos
-`DIA-FE-CU-*` de `frontend-code-sequences/index.md`. Esa colección es propietaria del
-orden interacción → UI → aplicación → request → endpoint → resultado visible. Este
-documento es propietario de las fichas por tipo de módulo, los límites del navegador y
-las vistas que responden una pregunta adicional. Ninguna vista adicional extiende la
-seguridad del frontend hacia el servidor ni sustituye la secuencia enlazada.
+La columna **Diagrama aplicable** del catálogo de componentes orienta hacia los 73
+recorridos `DIA-FE-CU-*` de `frontend-code-sequences/index.md`. Esa colección es propietaria del orden
+interacción → UI → aplicación → request → endpoint → resultado visible. Este documento
+conserva sólo diagramas que responden una pregunta adicional sobre los límites del
+navegador. Ningún diagrama complementario extiende la seguridad hacia el servidor ni
+sustituye la secuencia enlazada.
 
-La revisión de las vistas existentes produjo esta decisión:
+```mermaid
+flowchart LR
+    interaction["Interacción del actor"] --> canonical["DIA-FE-CU-*<br/>recorrido canónico"]
+    canonical -. decisión o modo adicional .-> complement["Actividad o estado<br/>complementario"]
+    canonical --> endpoint["UI · application · request · endpoint"]
+    complement -. no sustituye .-> canonical
+```
 
-| Vista conservada aquí | Pregunta adicional y razón | Conexión e impacto |
+| Diagrama conservado | Pregunta adicional | Complementa |
 | --- | --- | --- |
-| `DIA-FE-ACT-001` · `CU-ALM-10` | ¿Cómo condicionan proveedor y plantilla la habilitación, el mapeo de *snapshots* y el envío? La actividad hace visibles decisiones de UI, no la persistencia. | Complementa `DIA-FE-CU-ALM-10` y termina en su mismo `POST`. Cambios en decisiones visuales actualizan la actividad; cambios en módulos, payload o endpoint actualizan la secuencia canónica; las reglas definitivas permanecen en backend. |
-| `DIA-FE-TEC-EST-CU-IDA-08` | ¿Qué modos del formulario separan consulta, edición y cambio de contraseña, y a cuál vuelve tras éxito o error? | Complementa `DIA-FE-CU-IDA-08` y se conecta con los recorridos de consulta/edición relacionados. No crea otro caso ni otra API; si cambia el modo se revisan sus controles y la secuencia cuya mutación activa. |
-| `DIA-FE-TEC-EST-CU-ALM-05` | ¿Cómo evoluciona el modo de ajuste entre consulta, validación visual, envío y error? | Complementa `DIA-FE-CU-ALM-05` y termina en el mismo `PATCH`. No representa estados persistidos ni validación definitiva; un cambio de endpoint afecta la secuencia, mientras un cambio de modo afecta esta vista. |
+| `DIA-FE-ACT-001` · `CU-ALM-10` | ¿Cómo condicionan proveedor y plantilla la habilitación y el envío? | `DIA-FE-CU-ALM-10`; muestra decisiones de UI y termina en el mismo `POST`. |
+| `DIA-FE-TEC-EST-CU-IDA-08` | ¿Cómo alterna el formulario entre consulta, edición y contraseña? | `DIA-FE-CU-IDA-08`; no crea otro caso ni otra API. |
+| `DIA-FE-TEC-EST-CU-ALM-05` | ¿Cómo evoluciona el modo de ajuste ante validación, envío y error? | `DIA-FE-CU-ALM-05`; no representa estado persistido ni validación definitiva. |
 
 Las antiguas secuencias selectivas de login, ajuste, corrección y devoluciones no se
 mantienen aquí: repetían la pregunta ya contestada por sus `DIA-FE-CU-*`. Su detalle se
 consolidó en la colección canónica. La reutilización de factories o UI compartida se
-conecta mediante el código de patrón y las vistas estructurales; no exige duplicar la
+conecta mediante el código de patrón y los diagramas estructurales; no exige duplicar la
 secuencia de cada consumidor.
 
 ### Alta de merma desde una plantilla de material
@@ -45,7 +51,7 @@ flowchart TB
 
 ### Estados técnicos complementarios
 
-Estas vistas permanecen aquí porque añaden ciclos técnicos que no repite la colección
+Estos diagramas permanecen aquí porque añaden ciclos técnicos que no repite la colección
 de secuencias por caso.
 
 **Estado técnico complementario:** `DIA-FE-TEC-EST-CU-IDA-08`. Expone los modos
