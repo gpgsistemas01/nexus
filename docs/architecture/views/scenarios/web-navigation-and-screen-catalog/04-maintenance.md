@@ -14,7 +14,5 @@ Al agregar, renombrar o retirar una vista web:
    se ejecuta automáticamente en CI para pull requests y pushes a la rama principal.
 
 Los diagramas describen el diseño a nivel de sistema; el código sigue siendo la fuente
-de verdad para los detalles de endpoints, payloads y reglas de autorización. Las vistas
-nuevas deben seguir las [convenciones y patrones para diagramas](../../../diagram-conventions/index.md),
-incluida la distinción entre notación visual, patrón documental y patrón con evidencia
-en el código.
+de verdad para los detalles de endpoints, payloads y reglas de autorización. Las vistas nuevas deben declarar su alcance y semántica junto al diagrama, y registrar
+su identificador y ubicación en el [catálogo de diagramas](../../../diagram-inventory/index.md).

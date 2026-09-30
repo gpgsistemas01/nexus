@@ -99,7 +99,7 @@ visual del formulario en un estado persistido del documento.
 
 1. La tabla describe capacidades del producto, no personas autorizadas. La política de
    roles y departamentos se consulta en
-   [usuarios y permisos](../architecture/views/logical/data-and-persistence/01-database-users-and-permissions-analysis.md).
+   [usuarios y permisos](../architecture/views/logical/02-identity-access-and-audit.md).
 2. Los permisos de visualización de página son distintos de los permisos API y se
    comprueban en las rutas web; no se mezclan aquí con operaciones sobre datos.
 3. «Modelado» o «Parcial» no significa permitido. Un modelo, permiso declarado o

@@ -10,7 +10,7 @@
 
 Los nombres de actor expresan responsabilidades, no conceden acceso por sí mismos. La
 autorización efectiva se calcula con las asignaciones de usuario, rol y departamento
-descritas en [usuarios y permisos](../../architecture/views/logical/data-and-persistence/01-database-users-and-permissions-analysis.md).
+descritas en [usuarios y permisos](../../architecture/views/logical/02-identity-access-and-audit.md).
 
 El [diagrama de casos de uso](../domain-and-use-cases/03-cases-of-use-current.md) conserva
 las asociaciones y generalizaciones de actores; cada [ficha `CU-*`](../use-cases/index.md)

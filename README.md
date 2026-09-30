@@ -177,8 +177,8 @@ están definidas. Los comandos de base de datos se encuentran en la tabla de scr
 
 Consulta las guías específicas para evitar duplicar aquí decisiones y procedimientos:
 
-- [roles PostgreSQL de ejecución y migración](docs/architecture/views/logical/data-and-persistence/02-postgresql-runtime-and-migration-roles.md);
-- [usuarios, personas, auditoría y permisos](docs/architecture/views/logical/data-and-persistence/01-database-users-and-permissions-analysis.md).
+- [roles PostgreSQL de ejecución y migración](docs/architecture/views/physical/02-postgresql-runtime-and-migration-roles.md);
+- [usuarios, personas, auditoría y permisos](docs/architecture/views/logical/02-identity-access-and-audit.md).
 
 ## Ejecución
 

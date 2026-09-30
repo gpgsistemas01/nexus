@@ -1,4 +1,4 @@
-# 2. Exportación mensual de reportes
+# 1. Exportación mensual de reportes
 
 Los endpoints de exportación de compras, salidas y movimientos aceptan
 `monthlyReport=true`. En ese modo ignoran los filtros aplicados al listado y consultan

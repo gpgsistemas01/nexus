@@ -93,7 +93,7 @@ evidencia del adaptador está en
 la cobertura y brechas de servicios permanecen en el [plan de pruebas](../../../../testing/test-plan.md).
 La aplicación por caso y su evidencia se consulta en la
 [matriz de trazabilidad técnica](../../../traceability-matrix/index.md), y todos los identificadores
-gráficos están en el [inventario de diagramas](../../../diagram-inventory/index.md).
+gráficos están en el [catálogo de diagramas](../../../diagram-inventory/index.md).
 
 ### Secuencia transversal de auditoría de escrituras
 

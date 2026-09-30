@@ -215,8 +215,6 @@ const PUBLICATIONS = Object.freeze({
         parts: {
             datos: [
                 'docs/architecture/views/logical/data-and-persistence/index.md',
-                'docs/architecture/views/logical/data-and-persistence/01-database-users-and-permissions-analysis.md',
-                'docs/architecture/views/logical/data-and-persistence/02-postgresql-runtime-and-migration-roles.md',
                 'docs/architecture/views/logical/data-and-persistence/generated/database-schema.md',
                 'docs/architecture/views/logical/data-and-persistence/generated/data-dictionary.md'
             ]
@@ -226,9 +224,16 @@ const PUBLICATIONS = Object.freeze({
         directory: 'arquitectura',
         parts: {
             'vision-y-navegacion': packagePart(ARCHITECTURE_ENTRY, [
-                'docs/architecture/views/physical/01-system-runtime-and-deployment.md',
+                'docs/architecture/views/index.md',
+                'docs/architecture/views/scenarios/index.md',
+                'docs/requirements/domain-and-use-cases/03-cases-of-use-current.md',
+                ...getDirectoryDocuments('docs/architecture/views/scenarios/web-navigation-and-screen-catalog'),
+                'docs/architecture/views/logical/index.md',
                 'docs/architecture/views/logical/01-components-and-reuse.md',
-                ...getDirectoryDocuments('docs/architecture/views/scenarios/web-navigation-and-screen-catalog')
+                'docs/architecture/views/logical/02-identity-access-and-audit.md',
+                'docs/architecture/views/physical/index.md',
+                'docs/architecture/views/physical/01-system-runtime-and-deployment.md',
+                'docs/architecture/views/physical/02-postgresql-runtime-and-migration-roles.md'
             ]),
             'patrones-y-mapa-de-codigo': packagePart(ARCHITECTURE_ENTRY, [
                 ...getDirectoryDocuments('docs/architecture/views/development/design-and-construction-patterns'),
@@ -247,8 +252,7 @@ const PUBLICATIONS = Object.freeze({
             trazabilidad: packagePart(ARCHITECTURE_ENTRY, [
                 ...getDirectoryDocuments('docs/architecture/traceability-matrix')
             ]),
-            'diagramas-y-convenciones': packagePart(ARCHITECTURE_ENTRY, [
-                ...getDirectoryDocuments('docs/architecture/diagram-conventions'),
+            'catalogo-diagramas': packagePart(ARCHITECTURE_ENTRY, [
                 ...getDirectoryDocuments('docs/architecture/diagram-inventory')
             ]),
             estandar: packagePart(ARCHITECTURE_ENTRY, [

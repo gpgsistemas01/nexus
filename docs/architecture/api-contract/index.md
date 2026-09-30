@@ -1,18 +1,25 @@
 # Contrato de la API
 
-OpenAPI es la referencia procesable de solicitudes y respuestas. Las rutas registradas,
-validadores, DTO, controladores y pruebas permiten contrastarla; el mapa generado aporta
-el inventario, pero ninguno de esos artefactos reemplaza por sí solo el contrato.
+La [especificación OpenAPI 3.1](../openapi/openapi.json) es la referencia procesable de
+métodos, rutas, parámetros, cuerpos, respuestas y autenticación. Sus fuentes modulares se
+organizan por dominio bajo `docs/architecture/openapi/`; la exportación las resuelve en
+un solo archivo para herramientas externas.
 
-## Capítulos
+Las rutas registradas en `src/routes/api` son la fuente de la superficie HTTP y el
+[mapa generado](../views/development/code-map.md) permite contrastarlas. Validadores,
+DTO, controladores y pruebas verifican el comportamiento implementado. Cuando cambia
+una operación, se actualizan su definición OpenAPI, sus componentes reutilizados y las
+pruebas relacionadas; `npm run docs:check` comprueba que las operaciones registradas y
+publicadas permanezcan sincronizadas.
 
-1. [1. Cómo documentar una ruta API](01-how-document-a-route-api.md).
-2. [2. Exportación mensual de reportes](02-export-monthly-of-reports.md).
-3. [3. Decisión](03-decision.md).
-4. [4. Precisión de valores decimales](04-precision-of-values-decimal.md).
-5. [5. Relaciones de inventario en el cliente web](05-relationships-of-inventory-in-the-client-web.md).
-6. [6. Presentación de conflictos en el cliente web](06-presentation-of-conflicts-in-the-client-web.md).
+## Reglas contractuales complementarias
 
-Como recordatorio, todo cambio HTTP actualiza la operación, sus componentes reutilizados
-y sus pruebas en la misma modificación. `npm run docs:check` valida el contrato; Swagger
-UI sólo lo visualiza y debe permanecer deshabilitado o protegido en producción.
+1. [Exportación mensual de reportes](01-export-monthly-of-reports.md): parámetros y
+   selección del periodo para las descargas mensuales.
+2. [Precisión de valores decimales](02-precision-of-values-decimal.md): precisión
+   aceptada y diferencia entre transporte, persistencia y presentación.
+
+Las reglas de negocio permanecen en requisitos, la estructura persistente en Prisma y
+la coordinación interna en las referencias técnicas. Este documento no repite tutoriales
+de JSON, criterios personales para redactar fichas ni detalles de presentación del
+cliente web.
