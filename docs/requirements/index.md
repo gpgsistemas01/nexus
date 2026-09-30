@@ -38,21 +38,21 @@ ocurrir y **arquitectura** explica cómo se construye y ejecuta la solución.
 2. [Especificación de requisitos](requirements-specification/index.md).
 3. [Dominio y casos de uso](domain-and-use-cases/index.md).
 4. [Descripciones de casos de uso](use-cases/index.md).
-5. [Diagramas de requisitos](diagrams/index.md).
-6. [Matriz de requisitos y operaciones](requirements-operations-matrix.md).
-7. [Glosario del negocio](business-glossary.md).
+5. [Matriz de requisitos y operaciones](requirements-operations-matrix.md).
+6. [Glosario del negocio](business-glossary.md).
 
-Las fichas y los diagramas se subdividen primero por los grupos `AUT`, `IDA`, `CAT`, `ENT` y
-`SAL`, y después en un Markdown por cada `CU-*`. Sus índices conservan reglas comunes, resúmenes
-y navegación; cada archivo individual contiene únicamente la ficha o el diagrama de su caso. El exportador
+Las fichas se subdividen primero por los grupos `AUT`, `IDA`, `CAT`, `ENT` y `SAL`, y
+después en un Markdown por cada `CU-*`. Sus índices conservan reglas comunes, resúmenes
+y navegación; cada archivo individual contiene únicamente la ficha de su caso. El exportador
 ensambla los capítulos en el orden anterior para producir
 una entrega normativa completa, pero una revisión focalizada puede abrir sólo el Markdown del
 grupo afectado.
 
 La especificación y los casos se conectan con frontend, API, backend, persistencia y
-pruebas mediante la [matriz de trazabilidad técnica](../architecture/traceability-matrix/index.md);
-el [catálogo de diagramas](../architecture/diagram-inventory/index.md) localiza los identificadores
-estables a todas sus vistas.
+pruebas mediante la [matriz de trazabilidad técnica](../architecture/traceability-matrix/index.md).
+Los diagramas normativos de casos de uso y estados se mantienen en
+[dominio y casos de uso](domain-and-use-cases/index.md); las actividades y secuencias de
+realización pertenecen a las vistas de procesos y desarrollo de arquitectura.
 
 `scripts/exportDocs.js` conserva este mismo orden al generar el paquete `requisitos`.
 Las imágenes que se incorporen a estas secciones pertenecen a

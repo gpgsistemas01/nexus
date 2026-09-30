@@ -64,7 +64,7 @@ controladores web; el JavaScript del navegador consume las rutas API mediante lo
 servicios HTTP y `axiosInstanceApi`; Socket.IO comunica actualizaciones iniciadas por el
 servidor. Toda entrada vuelve a autenticarse, autorizarse y validarse en Express.
 
-Este diagrama no sustituye otros artefactos. El [contrato API](../../api-contract/index.md)
+Este diagrama no sustituye otros artefactos. El [contrato API](../../api-contract.md)
 y OpenAPI definen métodos, rutas y payloads; el
 [recorrido extremo a extremo](../processes/01-end-to-end-interaction.md) y las secuencias
 por `CU-*` muestran el orden temporal. Por tanto, se actualiza el diagrama de componentes
@@ -94,36 +94,18 @@ composición, se enlaza esta vista general en vez de copiarla.
 
 ## Reutilización comprobada en el frontend
 
-**Diagrama:** `DIA-ARQ-CMP-002`. Esta vista responde específicamente dónde se reutiliza
-comportamiento y dónde permanece la configuración del dominio.
+La representación detallada de factories, configuradores, consumidores y contratos se
+mantiene una sola vez en la
+[vista de reutilización de código](../development/code-diagrams/06-view-of-reuse-crud-and-interface.md).
+Esta vista lógica no conserva otro diagrama con los mismos nodos: `DIA-COD-REU-001`
+localiza las piezas comunes y `DIA-COD-REU-002` muestra cómo cada dominio las configura.
+El diagrama de componentes anterior conserva únicamente las fronteras de alto nivel
+entre navegador y servidor.
 
-```mermaid
-flowchart TB
-    crud["createCrudApplication"] --> clients["clientes"]
-    crud --> people["personas y usuarios"]
-    crud --> inventory["materiales y mermas"]
-
-    crud --> issueFactory["createIssueApplication"]
-    mutation["createApplicationMutation"] --> issueFactory
-    issueFactory --> goodsIssues["salidas de material"]
-    issueFactory --> wasteIssues["salidas de merma"]
-
-    report["createReportApplication"] --> adminReport["report · admin"]
-    report --> salesReport["report · sales"]
-    report --> warehouseReport["report · warehouse"]
-
-    formUI["formUI / formStateUI / formErrorsUI"] --> domainForms["formularios de dominio"]
-    issueUI["issueFormUI / issueReturnUI"] --> goodsPages["UI de salidas de material"]
-    issueUI --> wastePages["UI de salidas de merma"]
-    modalUI["modalUI"] --> domainForms
-```
-
-Las factories reciben requests, claves de respuesta y mutaciones del contexto; no
-exponen una instancia genérica a la UI. Cada módulo mantiene exports con nombres del
-dominio, mientras los formularios y páginas reutilizan los helpers visuales sin mover
-selectores o reglas específicas a `ui`. Las exportaciones Excel siguen el mismo
-criterio: el caso permanece en la pantalla propietaria y sólo la descarga se comparte
-mediante `createReportApplication`.
+Para el orden temporal de construcción y uso de una factory se consulta
+[`DIA-PAT-CON-001`](../development/design-and-construction-patterns/04-catalog-visual-of-patterns-applied.md#factories-y-composición-sobre-herencia).
+No es una copia de la vista estructural: la secuencia explica cuándo se crean las
+*closures*, cuándo se inyectan requests y cuándo la página invoca el contrato resultante.
 
 ## Criterio para extender un flujo
 

@@ -1,9 +1,10 @@
 # Diagramas de secuencia del código frontend
 
-Cada `CU-*` muestra la ejecución frontend desde la interacción hasta el resultado visible. El
-objetivo y el flujo de negocio permanecen en los [casos de uso](../../../../requirements/domain-and-use-cases/03-cases-of-use-current.md),
-y la [matriz técnica](../../development/frontend-technical-documentation/02-application-of-all-the-cases-to-the-code-frontend.md)
-relaciona cada caso con su implementación y diagrama.
+Cada `CU-*` muestra la ejecución del navegador desde la interacción de entrada hasta la
+respuesta y sus efectos. El objetivo y el flujo de negocio permanecen en los
+[casos de uso](../../../../requirements/domain-and-use-cases/03-cases-of-use-current.md).
+Esta colección es la evidencia detallada caso–código; la documentación técnica conserva
+responsabilidades y decisiones reutilizables sin mantener una segunda matriz equivalente.
 
 | Aspecto | Contenido de la secuencia frontend |
 | --- | --- |
@@ -20,7 +21,7 @@ firmas, rutas, datos o efectos.
 ### Relación con la documentación técnica
 
 Esta colección es la fuente canónica del recorrido interacción → UI → aplicación → request →
-endpoint → resultado. Las [vistas técnicas adicionales](../../development/frontend-technical-documentation/03-views-technical-applied-by-flow-frontend.md#relación-entre-la-colección-canónica-y-las-vistas-adicionales)
+endpoint → resultado. Las [vistas técnicas adicionales](../../development/frontend-technical-documentation/02-views-technical-applied-by-flow-frontend.md#relación-entre-la-colección-canónica-y-las-vistas-adicionales)
 sólo complementan decisiones o modos que requieren otra representación.
 
 ### Regla de identificación y lectura

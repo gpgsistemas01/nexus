@@ -40,15 +40,16 @@ El código confirma varias coordinaciones que no se entienden sólo con el diagr
 
 | Operación | Evidencia del código | Vista que explica el comportamiento |
 | --- | --- | --- |
-| Crear/editar usuario, acceso o contraseña | `src/services/admin/userService.js`, cifrado y asignaciones `UserRoleDepartment`. | [Secuencia de identidad y acceso](../../../../requirements/diagrams/cross-cutting/14-create-or-edit-user-and-access-cu-ida-06-cu-ida-07-cu-ida-08.md#14-crear-o-editar-usuario-y-acceso--cu-ida-06-cu-ida-07-cu-ida-08). |
-| Eliminar material o relación de proveedor | `materialService.deleteMaterial` y relaciones de uso en `supplierMaterialService.js`. | [Decisión de eliminación](../../../../requirements/diagrams/cross-cutting/15-remove-material-or-relationship-of-supplier-cu-alm-04.md#15-eliminar-material-o-relación-de-proveedor--cu-alm-04). |
-| Registrar una entrada | `goodsReceiptService.createGoodsReceipt`, referencias y servicios de inventario/costo. | [Secuencia de registro](../../../../requirements/diagrams/cross-cutting/16-create-purchase-of-material-cu-ent-02.md#16-crear-compra-de-material--cu-ent-02). |
-| Corregir o cancelar detalle de entrada | `src/services/warehouse/goodsReceipts/detailChanges` y servicios de inventario. | [Secuencia atómica](../../../../requirements/diagrams/cross-cutting/18-coordination-atomic-of-corrections-of-receipt.md#18-coordinación-atómica-de-correcciones-de-entrada). |
-| Surtir o devolver detalle de salida | Servicios de salidas de material/merma, reglas de cumplimiento y movimientos. | [Máquina de estados](../../../../requirements/diagrams/cross-cutting/index.md#estados-de-surtimiento-y-devolución). |
-| Generar reporte Excel | Controllers de reporte, servicios de consulta y `reportExcelUtils.js`. | [Canal de generación](../../../../requirements/diagrams/cross-cutting/17-generate-reports-specific-cu-ida-04-cu-ida-09-cu-alm-06-cu-alm-08-cu-.md#17-generar-reportes-específicos--cu-ida-04-cu-ida-09-cu-alm-06-cu-alm-08-cu-cat-04-cu-cat-08-cu-alm-14-cu-alm-16-cu-ent-06-cu-sal-07-y-cu-sal-14). |
+| Crear/editar usuario, acceso o contraseña | `src/services/admin/userService.js`, cifrado y asignaciones `UserRoleDepartment`. | Secuencias backend de [`CU-IDA-06`](../../processes/backend-code-sequences/identity-access/cu-ida-06.md), [`CU-IDA-07`](../../processes/backend-code-sequences/identity-access/cu-ida-07.md) y [`CU-IDA-08`](../../processes/backend-code-sequences/identity-access/cu-ida-08.md). |
+| Eliminar material o relación de proveedor | `materialService.deleteMaterial` y relaciones de uso en `supplierMaterialService.js`. | [Secuencia backend de `CU-ALM-04`](../../processes/backend-code-sequences/catalogs/cu-alm-04.md). |
+| Registrar una entrada | `goodsReceiptService.createGoodsReceipt`, referencias y servicios de inventario/costo. | [Secuencia backend de `CU-ENT-02`](../../processes/backend-code-sequences/purchases/cu-ent-02.md). |
+| Corregir o cancelar detalle de entrada | `src/services/warehouse/goodsReceipts/detailChanges` y servicios de inventario. | Secuencias backend de [`CU-ENT-04`](../../processes/backend-code-sequences/purchases/cu-ent-04.md) y [`CU-ENT-05`](../../processes/backend-code-sequences/purchases/cu-ent-05.md), complementadas por la [actividad de cancelación](../backend-technical-documentation/02-views-technical-applied.md#actividad-de-cancelación-de-un-detalle-de-entrada). |
+| Surtir o devolver detalle de salida | Servicios de salidas de material/merma, reglas de cumplimiento y movimientos. | [Estados normativos](../../../../requirements/domain-and-use-cases/04-states-and-data-modified-by-action.md) y secuencias backend del grupo [SAL](../../processes/backend-code-sequences/issues/index.md). |
+| Generar reporte Excel | Controllers de reporte, servicios de consulta y `reportExcelUtils.js`. | Secuencias backend de los casos propietarios, localizadas desde el [índice por grupos](../../processes/backend-code-sequences/index.md). |
 
-No se duplican aquí esas vistas: combinan reglas de coordinación compleja con evidencia
-del código, por lo que su fuente normativa sigue siendo la documentación de requisitos.
+No se duplican aquí esas vistas. Los estados y reglas observables permanecen en
+requisitos; la coordinación entre capas se mantiene en las secuencias y actividades de
+arquitectura.
 
 ### 5.3 Resultado de la revisión de trazabilidad diagrama–código
 

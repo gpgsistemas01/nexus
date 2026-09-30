@@ -19,12 +19,10 @@ una pregunta arquitectónica y enlaza los artefactos que la contestan.
 No todo documento de arquitectura es una vista. Las referencias y reglas transversales
 permanecen fuera de `views/` porque se consultan desde varias perspectivas:
 
-- [Contrato de la API](../api-contract/index.md) y [OpenAPI](../openapi/openapi.json):
+- [Contrato de la API](../api-contract.md) y [OpenAPI](../openapi/openapi.json):
   interfaz HTTP compartida por escenarios, procesos y desarrollo.
 - [Matriz de trazabilidad](../traceability-matrix/index.md): correspondencia entre
   requisitos, vistas, implementación y pruebas.
-- [Catálogo de diagramas](../diagram-inventory/index.md): identificadores, tipos y
-  ubicaciones canónicas.
 - [Estándar de codificación](../coding-standards/index.md): reglas de construcción del
   código, no descripción de la solución.
 

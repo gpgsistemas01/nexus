@@ -33,9 +33,9 @@ estables porque se regeneran y no forman parte de la secuencia editorial.
 docs/
 ├── architecture/  # Arquitectura y construcción
 │   ├── views/        # Escenarios, lógica, procesos, desarrollo y física
-│   ├── api-contract/ # Referencia HTTP transversal
+│   ├── api-contract.md # Referencia HTTP transversal
 │   └── openapi/      # Contrato procesable
-├── governance/    # Criterios para mantener la documentación
+├── governance/    # Criterios transversales para mantener la documentación
 ├── user-manual/   # Entrada, capítulos e imágenes del manual
 ├── requirements/  # Entrada, requisitos, casos de uso e imágenes
 ├── styles/        # Estilos y plantillas de publicación
@@ -44,8 +44,8 @@ docs/
 
 | Familia | Artefacto principal | Artefactos complementarios | Evidencia generada |
 | --- | --- | --- | --- |
-| Arquitectura, construcción y datos | [Documento de arquitectura y construcción](architecture/index.md) | [Descripción de arquitectura](architecture/views/index.md), [modelo persistente](architecture/views/logical/data-and-persistence/index.md), [contrato API](architecture/api-contract/index.md), [navegación web](architecture/views/scenarios/web-navigation-and-screen-catalog/index.md), referencias de [backend](architecture/views/development/backend-technical-documentation/index.md) y [frontend](architecture/views/development/frontend-technical-documentation/index.md), [secuencias](architecture/views/processes/backend-code-sequences/index.md), [diagramas](architecture/views/development/code-diagrams/index.md), [patrones](architecture/views/development/design-and-construction-patterns/index.md) y [catálogo de diagramas](architecture/diagram-inventory/index.md) | [Mapa del código](architecture/views/development/code-map.md), [esquema de base de datos](architecture/views/logical/data-and-persistence/generated/database-schema.md) y [diccionario técnico](architecture/views/logical/data-and-persistence/generated/data-dictionary.md) |
-| Dominio y requisitos | [Índice y portada del paquete](requirements/index.md); la [SRS](requirements/requirements-specification/index.md) y las [fichas de casos de uso](requirements/use-cases/index.md) son las fuentes normativas complementarias | [Visión y alcance](requirements/vision-scope-and-requirements/index.md), [dominio y casos de uso](requirements/domain-and-use-cases/index.md), [matriz de operaciones](requirements/requirements-operations-matrix.md), [diagramas de requisitos](requirements/diagrams/index.md) y [glosario](requirements/business-glossary.md) | No aplica; el estado funcional requiere revisión humana |
+| Arquitectura, construcción y datos | [Documento de arquitectura y construcción](architecture/index.md) | [Descripción de arquitectura](architecture/views/index.md), [modelo persistente](architecture/views/logical/data-and-persistence/index.md), [contrato API](architecture/api-contract.md), [navegación web](architecture/views/scenarios/web-navigation-and-screen-catalog/index.md), referencias de [backend](architecture/views/development/backend-technical-documentation/index.md) y [frontend](architecture/views/development/frontend-technical-documentation/index.md), [secuencias](architecture/views/processes/backend-code-sequences/index.md), [diagramas](architecture/views/development/code-diagrams/index.md) y [patrones](architecture/views/development/design-and-construction-patterns/index.md) | [Mapa del código](architecture/views/development/code-map.md), [esquema de base de datos](architecture/views/logical/data-and-persistence/generated/database-schema.md) y [diccionario técnico](architecture/views/logical/data-and-persistence/generated/data-dictionary.md) |
+| Dominio y requisitos | [Índice y portada del paquete](requirements/index.md); la [SRS](requirements/requirements-specification/index.md) y las [fichas de casos de uso](requirements/use-cases/index.md) son las fuentes normativas complementarias | [Visión y alcance](requirements/vision-scope-and-requirements/index.md), [dominio y casos de uso](requirements/domain-and-use-cases/index.md), [matriz de operaciones](requirements/requirements-operations-matrix.md) y [glosario](requirements/business-glossary.md) | No aplica; el estado funcional requiere revisión humana |
 | Pruebas | [Estrategia de pruebas](testing/service-test-coverage.md) | [Plan de pruebas](testing/test-plan.md), [ambiente, estrategia y catálogo unitario](testing/unit-test-catalog.md), y [resultados unitarios](testing/unit-test-results.md) de la última ejecución verificada | La evidencia ejecutable vive en `tests`; el catálogo y el resumen versionado complementan la salida de Vitest/CI |
 | Gobierno documental | [Normas y criterios](governance/documentation-standards/index.md) | [Registro de aplicación de normas](governance/standards-application/index.md) | No aplica |
 
@@ -61,9 +61,9 @@ El manual incluye una [matriz de validación y modos de formulario](user-manual/
 como referencia operativa exportable. La matriz de operaciones de requisitos sigue siendo la
 fuente normativa de capacidades y permisos; ambas matrices responden preguntas distintas.
 
-Un artefacto puede apoyar más de una familia, pero conserva una sola responsabilidad. Por
-ejemplo, el catálogo localiza los diagramas, pero no reemplaza las vistas de arquitectura
-o requisitos. Del mismo modo, el esquema y el diccionario pertenecen a la
+Un artefacto puede apoyar más de una familia, pero conserva una sola responsabilidad.
+Los diagramas se mantienen junto a la vista o regla que explican, en lugar de repetir
+su ubicación en un inventario manual. Del mismo modo, el esquema y el diccionario pertenecen a la
 vista arquitectónica de datos: complementan el análisis curado, mientras Prisma conserva
 la fuente técnica de modelos, campos y relaciones. El paquete exportable de datos es una
 selección de esa vista y no una familia documental independiente.
