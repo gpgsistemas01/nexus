@@ -64,7 +64,9 @@ repeticiones.
 
 El [resumen por caso de uso](use-case-test-types.md) registra evidencia funcional;
 el [catálogo unitario](unit-test-catalog.md) registra los diseños `DP-UNIT-*`, casos
-`CP-UNIT-*`, técnicas, datos y resultados esperados de la suite.
+`CP-UNIT-*`, técnicas, datos y resultados esperados de la suite, y el
+[índice de casos automatizados](automated-test-case-index.md) enumera cada caso unitario
+o de integración declarado en el código.
 
 ## Cobertura CRUD mínima
 

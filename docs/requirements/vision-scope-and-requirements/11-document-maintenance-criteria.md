@@ -1,4 +1,4 @@
-# 12. Criterio para mantener este documento
+# 11. Criterio para mantener este documento
 
 Un cambio está documentalmente completo cuando: (1) el requisito afectado conserva su
 identificador o registra su reemplazo; (2) alcance, rutas y modelo no se contradicen;

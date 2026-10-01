@@ -3,9 +3,10 @@
 Este documento resume qué servicios ya tienen pruebas y qué falta cubrir a nivel de
 integración. La intención es evitar listar como “faltante” un servicio que ya está
 cubierto por su propia suite o por una integración directa con la base de pruebas. La
-[matriz de diseño, ejecución y resultados por caso de uso](use-case-test-types.md) documenta
-para cada `CU-*` las pruebas ejecutadas, su tipo, los datos necesarios, el resultado esperado y el
-resultado obtenido.
+[matriz de cobertura por caso de uso](use-case-test-types.md) relaciona cada `CU-*` con
+la evidencia funcional automatizada y sus brechas. El diseño, los casos y las ejecuciones
+se documentan por separado según el [plan de pruebas](test-plan.md), para no confundir la
+existencia de una prueba con un resultado aprobado.
 
 ## Servicios con pruebas actuales
 
