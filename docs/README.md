@@ -29,6 +29,31 @@ Cada colección de capítulos curados conserva un `index.md` sin numerar y usa p
 consecutivos `01-`, `02-`, etc. Las referencias generadas mantienen nombres descriptivos
 estables porque se regeneran y no forman parte de la secuencia editorial.
 
+### Criterio y revisión de los índices
+
+Un `index.md` se conserva sólo cuando actúa como entrada de un paquete exportable, una
+vista, una colección con reglas comunes o un grupo que puede publicarse por separado. No
+se agrega para reflejar mecánicamente cada carpeta ni como envoltura de un único archivo.
+Si desaparece esa responsabilidad, se retiran juntos el índice, sus enlaces y la
+selección correspondiente de `scripts/exportDocs.js`.
+
+La revisión de todas las familias produjo el siguiente resultado:
+
+| Familia | Índices que se conservan | Razón | Decisión |
+| --- | --- | --- | --- |
+| Arquitectura | Paquete, modelo de vistas, cada vista y colecciones técnicas. Los grupos de secuencias frontend/backend mantienen su índice. | Las vistas responden preguntas distintas; las referencias técnicas y cada grupo de secuencias tienen reglas, cobertura, orden y exportación propios. | Conservar los actuales. No agregar `components/index.md`, `general/index.md` ni índices por cada diagrama. |
+| Requisitos | Paquete, visión, SRS, dominio, catálogo de casos y grupos `AUT`, `IDA`, `CAT`, `ENT` y `SAL`. | Separan fuentes normativas y permiten publicar o revisar cada grupo sin repetir sus reglas comunes. | Conservar los actuales. |
+| Gobierno | Cada colección de normas, aplicación, publicación y exportación. | Cada carpeta es un artefacto curado independiente con capítulos ordenados. | Conservar los actuales. |
+| Manual de usuario | Colección de casos y sus áreas. | Los manuales se ensamblan por actor; los índices de área aportan contexto y orden, aunque el actor seleccione sólo algunos procedimientos. | Conservar los actuales; no crear una portada general que mezcle actores. |
+| Pruebas | No usa índices de carpeta; mantiene documentos propietarios independientes. | El plan, la estrategia, el catálogo y los resultados responden preguntas distintas y se seleccionan explícitamente al exportar. | No agregar índices mientras no se conviertan en una colección capitulada. |
+
+Para los diagramas de componentes, la entrada vigente sigue siendo
+[Componentes y reutilización](architecture/views/logical/01-components-and-reuse.md),
+enlazada desde el índice de la vista lógica. Si las vistas `DIA-CMP-CU-*` llegan a
+publicarse como archivos separados, se crea una sola colección con un único `index.md`;
+no se subdivide por autenticación, almacén, entradas o salidas salvo que esos grupos se
+conviertan en entregables independientes.
+
 ```text
 docs/
 ├── architecture/  # Arquitectura y construcción
