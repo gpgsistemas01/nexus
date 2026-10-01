@@ -29,31 +29,6 @@ Cada colección de capítulos curados conserva un `index.md` sin numerar y usa p
 consecutivos `01-`, `02-`, etc. Las referencias generadas mantienen nombres descriptivos
 estables porque se regeneran y no forman parte de la secuencia editorial.
 
-### Criterio y revisión de los índices
-
-Un `index.md` se conserva sólo cuando actúa como entrada de un paquete exportable, una
-vista, una colección con reglas comunes o un grupo que puede publicarse por separado. No
-se agrega para reflejar mecánicamente cada carpeta ni como envoltura de un único archivo.
-Si desaparece esa responsabilidad, se retiran juntos el índice, sus enlaces y la
-selección correspondiente de `scripts/exportDocs.js`.
-
-La revisión de todas las familias produjo el siguiente resultado:
-
-| Familia | Índices que se conservan | Razón | Decisión |
-| --- | --- | --- | --- |
-| Arquitectura | Paquete, modelo de vistas, cada vista y colecciones técnicas. Los grupos de secuencias frontend/backend mantienen su índice. | Las vistas responden preguntas distintas; las referencias técnicas y cada grupo de secuencias tienen reglas, cobertura, orden y exportación propios. | Conservar los actuales. No agregar `components/index.md`, `general/index.md` ni índices por cada diagrama. |
-| Requisitos | Paquete, visión, SRS, dominio, catálogo de casos y grupos `AUT`, `IDA`, `CAT`, `ENT` y `SAL`. | Separan fuentes normativas y permiten publicar o revisar cada grupo sin repetir sus reglas comunes. | Conservar los actuales. |
-| Gobierno | Cada colección de normas, aplicación, publicación y exportación. | Cada carpeta es un artefacto curado independiente con capítulos ordenados. | Conservar los actuales. |
-| Manual de usuario | Colección de casos y sus áreas. | Los manuales se ensamblan por actor; los índices de área aportan contexto y orden, aunque el actor seleccione sólo algunos procedimientos. | Conservar los actuales; no crear una portada general que mezcle actores. |
-| Pruebas | No usa índices de carpeta; mantiene documentos propietarios independientes. | El plan, la estrategia, el catálogo y los resultados responden preguntas distintas y se seleccionan explícitamente al exportar. | No agregar índices mientras no se conviertan en una colección capitulada. |
-
-Para los diagramas de componentes, la entrada vigente sigue siendo
-[Componentes y reutilización](architecture/views/logical/01-components-and-reuse.md),
-enlazada desde el índice de la vista lógica. Si las vistas `DIA-CMP-CU-*` llegan a
-publicarse como archivos separados, se crea una sola colección con un único `index.md`;
-no se subdivide por autenticación, almacén, entradas o salidas salvo que esos grupos se
-conviertan en entregables independientes.
-
 ```text
 docs/
 ├── architecture/  # Arquitectura y construcción
@@ -71,7 +46,7 @@ docs/
 | --- | --- | --- | --- |
 | Arquitectura, construcción y datos | [Documento de arquitectura y construcción](architecture/index.md) | [Descripción de arquitectura](architecture/views/index.md), [modelo persistente](architecture/views/logical/data-and-persistence/index.md), [contrato API](architecture/api-contract.md), [navegación web](architecture/views/scenarios/web-navigation-and-screen-catalog/index.md), referencias de [backend](architecture/views/development/backend-technical-documentation/index.md) y [frontend](architecture/views/development/frontend-technical-documentation/index.md), [secuencias](architecture/views/processes/backend-code-sequences/index.md), [diagramas](architecture/views/development/code-diagrams/index.md) y [patrones](architecture/views/development/design-and-construction-patterns/index.md) | [Mapa del código](architecture/views/development/code-map.md), [esquema de base de datos](architecture/views/logical/data-and-persistence/generated/database-schema.md) y [diccionario técnico](architecture/views/logical/data-and-persistence/generated/data-dictionary.md) |
 | Dominio y requisitos | [Índice y portada del paquete](requirements/index.md); la [SRS](requirements/requirements-specification/index.md) y las [fichas de casos de uso](requirements/use-cases/index.md) son las fuentes normativas complementarias | [Visión y alcance](requirements/vision-scope-and-requirements/index.md), [dominio y casos de uso](requirements/domain-and-use-cases/index.md), [matriz de operaciones](requirements/requirements-operations-matrix.md) y [glosario](requirements/business-glossary.md) | No aplica; el estado funcional requiere revisión humana |
-| Pruebas | [Estrategia de pruebas](testing/service-test-coverage.md) | [Plan de pruebas](testing/test-plan.md), [ambiente, estrategia y catálogo unitario](testing/unit-test-catalog.md), y [resultados unitarios](testing/unit-test-results.md) de la última ejecución verificada | La evidencia ejecutable vive en `tests`; el catálogo y el resumen versionado complementan la salida de Vitest/CI |
+| Pruebas | [Estrategia de pruebas](testing/service-test-coverage.md) | [Plan de pruebas](testing/test-plan.md), [cobertura automatizada relevante por caso de uso](testing/use-case-test-types.md), [ambiente, estrategia y catálogo unitario](testing/unit-test-catalog.md), y [resultados unitarios](testing/unit-test-results.md) de la última ejecución verificada | La evidencia ejecutable vive en `tests`; el catálogo y el resumen versionado complementan la salida de Vitest/CI |
 | Gobierno documental | [Normas y criterios](governance/documentation-standards/index.md) | [Registro de aplicación de normas](governance/standards-application/index.md) | No aplica |
 
 La [guía de publicación y versionado](governance/publication-and-versioning/index.md) define
