@@ -8,7 +8,7 @@ rutas vuelven a comprobar la autorización en el servidor.
 
 Los diagramas se contrastan con el partial compartido `src/views/layout/ui/navList.ejs`.
 La definición normativa de los actores permanece en la
-[SRS](../../../../requirements/requirements-specification/03-actors-and-responsibility-of-the-system.md):
+[SRS](../../../../requirements/requirements-specification/03-actors-and-system-responsibilities.md):
 el Administrador del sistema hereda las capacidades operativas del Personal de almacén,
 pero no a la inversa.
 

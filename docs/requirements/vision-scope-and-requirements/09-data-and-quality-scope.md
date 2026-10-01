@@ -1,8 +1,8 @@
 # 9. Alcance de datos y calidad
 
 La visión tampoco duplica los enunciados de datos o calidad. Los ámbitos de
-[persistencia e integridad](../requirements-specification/04-unified-catalog-by-scope/06-persistence-and-integrity-of-information.md#46-persistencia-e-integridad-de-información)
-y de [operación y calidad](../requirements-specification/04-unified-catalog-by-scope/07-operation-and-quality-of-the-product.md#47-operación-y-calidad-del-producto)
+[persistencia e integridad](../requirements-specification/04-unified-catalog-by-scope/06-information-persistence-and-integrity.md#46-persistencia-e-integridad-de-información)
+y de [operación y calidad](../requirements-specification/04-unified-catalog-by-scope/07-product-operation-and-quality.md#47-operación-y-calidad-del-producto)
 son sus fuentes normativas.
 
 | Área | Requisitos normativos | Alcance resumido |

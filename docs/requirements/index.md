@@ -1,6 +1,6 @@
 ---
 title: Especificación de requisitos de Nexus
-document-version: 1.2
+document-version: 1.3
 system-version: 1.0.0
 status: En revisión
 ---
@@ -11,7 +11,7 @@ status: En revisión
 
 | Versión documental | Versión del sistema | Estado | Fecha | Responsable |
 | --- | --- | --- | --- | --- |
-| 1.2 | 1.0.0 | En revisión | 2026-09-17 | Equipo Nexus |
+| 1.3 | 1.0.0 | En revisión | 2026-10-01 | Equipo Nexus |
 
 Este es el punto de entrada y la portada del paquete exportable de requisitos. La
 [especificación de requisitos](requirements-specification/index.md) conserva la definición
