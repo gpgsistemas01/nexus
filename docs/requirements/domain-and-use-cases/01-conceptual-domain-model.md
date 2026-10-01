@@ -1,4 +1,4 @@
-# 2. Modelo de dominio conceptual
+# 1. Modelo de dominio conceptual
 
 Se usa `classDiagram`, notación UML soportada por Mermaid. Las clases no representan
 clases JavaScript ni copian tablas: son conceptos del negocio. La multiplicidad indica

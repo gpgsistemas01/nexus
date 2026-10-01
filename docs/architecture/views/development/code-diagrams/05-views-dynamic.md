@@ -44,7 +44,7 @@ El código confirma varias coordinaciones que no se entienden sólo con el diagr
 | Eliminar material o relación de proveedor | `materialService.deleteMaterial` y relaciones de uso en `supplierMaterialService.js`. | [Secuencia backend de `CU-ALM-04`](../../processes/backend-code-sequences/catalogs/cu-alm-04.md). |
 | Registrar una entrada | `goodsReceiptService.createGoodsReceipt`, referencias y servicios de inventario/costo. | [Secuencia backend de `CU-ENT-02`](../../processes/backend-code-sequences/purchases/cu-ent-02.md). |
 | Corregir o cancelar detalle de entrada | `src/services/warehouse/goodsReceipts/detailChanges` y servicios de inventario. | Secuencias backend de [`CU-ENT-04`](../../processes/backend-code-sequences/purchases/cu-ent-04.md) y [`CU-ENT-05`](../../processes/backend-code-sequences/purchases/cu-ent-05.md), complementadas por la [actividad de cancelación](../backend-technical-documentation/02-views-technical-applied.md#actividad-de-cancelación-de-un-detalle-de-entrada). |
-| Surtir o devolver detalle de salida | Servicios de salidas de material/merma, reglas de cumplimiento y movimientos. | [Estados normativos](../../../../requirements/domain-and-use-cases/04-states-and-data-changed-by-action.md) y secuencias backend del grupo [SAL](../../processes/backend-code-sequences/issues/index.md). |
+| Surtir o devolver detalle de salida | Servicios de salidas de material/merma, reglas de cumplimiento y movimientos. | [Estados normativos](../../../../requirements/domain-and-use-cases/03-states-and-data-changed-by-action.md) y secuencias backend del grupo [SAL](../../processes/backend-code-sequences/issues/index.md). |
 | Generar reporte Excel | Controllers de reporte, servicios de consulta y `reportExcelUtils.js`. | Secuencias backend de los casos propietarios, localizadas desde el [índice por grupos](../../processes/backend-code-sequences/index.md). |
 
 No se duplican aquí esas representaciones. Los estados y reglas observables permanecen en
@@ -73,7 +73,7 @@ función o un estado persistido:
 Para seguir una fila hasta método y URL exactos se usa el
 [mapa generado](../code-map.md); para seguirla hasta permiso y estado de
 implementación se usa la
-[matriz de operaciones](../../../../requirements/requirements-operations-matrix.md). Las pruebas
+[modos, precondiciones y efectos](../../../../requirements/requirements-specification/06-operation-modes-and-effects.md). Las pruebas
 no se inventan a partir del dibujo: la cobertura existente y sus faltantes se mantienen
 en el [plan de pruebas](../../../../testing/test-plan.md). Así, cada enlace tiene una sola fuente
 de verdad y una brecha de cobertura permanece visible en vez de presentarse como

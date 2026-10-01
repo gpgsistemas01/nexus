@@ -4,7 +4,7 @@ La unidad de documentación es el **flujo funcional**, no un archivo aislado. Ca
 cubre todos sus módulos propietarios de servicio, aplicación, página y EJS; los símbolos
 compartidos aparecen después en una ficha transversal. De este modo no se presenta
 materiales como si fuera el único flujo documentado ni se repite una ficha idéntica por
-cada operación CRUD. Las rutas concretas se verifican en el [contrato API](../../../api-contract.md)
+cada operación CRUD. Las rutas concretas se verifican en el [contrato API](../../../openapi/api-contract.md)
 y las páginas publicadas en el [mapa generado](../code-map.md#rutas-web-19).
 
 ### Fichas de flujos funcionales
@@ -79,6 +79,6 @@ ello el frontend no ofrece esos estados como campos editables.
 | Salida de material o merma | `view` | Ninguno. | Encabezado y detalles de una salida cancelada. |
 
 La regla funcional equivalente y los estados requeridos se mantienen en la
-[matriz de operaciones](../../../../requirements/requirements-operations-matrix.md#modos-precondiciones-y-datos-modificados);
+[modos, precondiciones y efectos](../../../../requirements/requirements-specification/06-operation-modes-and-effects.md);
 las secuencias muestran únicamente la coordinación que cruza componentes o transporte,
 no vuelven a enumerar cada control.

@@ -48,6 +48,8 @@ Los requisitos usan los términos canónicos del
 para usuarios y responsables; el [diccionario técnico](../../architecture/views/logical/data-and-persistence/generated/data-dictionary.md)
 documenta cómo se representan los datos persistentes. Ninguno debe sustituir al otro.
 
-La [matriz de operaciones](../requirements-operations-matrix.md) resume las capacidades
-permitidas por módulo y contexto, incluidas las parciales o modeladas. La autorización
-efectiva continúa determinada por los permisos del servidor, no por la matriz.
+Los [modos, precondiciones y efectos](06-operation-modes-and-effects.md) conservan el
+contrato funcional de las operaciones. La composición técnica se consulta en el
+[diagrama de componentes](../../architecture/views/logical/01-components-and-reuse.md),
+los métodos y rutas en [OpenAPI](../../architecture/openapi/openapi.json) y la
+autorización efectiva en la política del servidor.

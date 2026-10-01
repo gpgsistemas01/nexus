@@ -1,12 +1,12 @@
 # Contrato de la API
 
-La [especificación OpenAPI 3.1](openapi/openapi.json) es la referencia procesable de
+La [especificación OpenAPI 3.1](openapi.json) es la referencia procesable de
 métodos, rutas, parámetros, cuerpos, respuestas y autenticación. Sus fuentes modulares se
 organizan por dominio bajo `docs/architecture/openapi/`; la exportación las resuelve en
 un solo archivo para herramientas externas.
 
 Las rutas registradas en `src/routes/api` son la fuente de la superficie HTTP y el
-[mapa generado](views/development/code-map.md) permite contrastarlas. Validadores, DTO,
+[mapa generado](../views/development/code-map.md) permite contrastarlas. Validadores, DTO,
 controladores y pruebas verifican el comportamiento implementado. Cuando cambia una
 operación, se actualizan su definición OpenAPI, sus componentes reutilizados y las
 pruebas relacionadas; `npm run docs:check` comprueba que las operaciones registradas y
@@ -20,14 +20,14 @@ completo se divide en cuatro fuentes procesables:
 
 | Área HTTP | Operaciones y contratos propietarios |
 | --- | --- |
-| [`auth`](openapi/paths/auth.json) | Inicio, consulta y renovación de sesión; esquemas de autenticación. |
-| [`sales`](openapi/paths/sales.json) | Clientes y su exportación. |
-| [`warehouse`](openapi/paths/warehouse.json) | Materiales, mermas, proveedores, entradas, salidas, devoluciones, inventario, catálogos operativos y reportes. |
-| [`admin`](openapi/paths/admin.json) | Personas, usuarios, accesos, movimientos, catálogos administrables y reportes administrativos. |
+| [`auth`](paths/auth.json) | Inicio, consulta y renovación de sesión; esquemas de autenticación. |
+| [`sales`](paths/sales.json) | Clientes y su exportación. |
+| [`warehouse`](paths/warehouse.json) | Materiales, mermas, proveedores, entradas, salidas, devoluciones, inventario, catálogos operativos y reportes. |
+| [`admin`](paths/admin.json) | Personas, usuarios, accesos, movimientos, catálogos administrables y reportes administrativos. |
 
 Los esquemas reutilizables viven en `docs/architecture/openapi/components/` —por
-ejemplo, [esquemas comunes](openapi/components/common-schemas.json) y
-[respuestas compartidas](openapi/components/responses.json)— y el documento raíz enlaza
+ejemplo, [esquemas comunes](components/common-schemas.json) y
+[respuestas compartidas](components/responses.json)— y el documento raíz enlaza
 cada `Path Item` mediante `$ref`. `npm run docs:check` resuelve esas referencias y
 compara cada método/ruta con el mapa generado; por eso no se agrega una tabla manual de
 endpoints en Markdown. La salida de esa validación informa el total de operaciones

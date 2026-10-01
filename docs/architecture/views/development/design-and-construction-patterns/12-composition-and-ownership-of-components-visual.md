@@ -89,7 +89,7 @@ permiten agregar, sustituir o eliminar detalles en modo `Pendiente`; la fila con
 mapper de cada formulario envía únicamente los campos admitidos por su contrato.
 
 El estado de surtimiento no se redefine aquí: sus transiciones y datos afectados están
-en la [matriz de operaciones](../../../../requirements/requirements-operations-matrix.md#modos-precondiciones-y-datos-modificados)
+en la [modos, precondiciones y efectos](../../../../requirements/requirements-specification/06-operation-modes-and-effects.md)
 y su representación física en el
 [diccionario generado](../../logical/data-and-persistence/generated/data-dictionary.md).
 

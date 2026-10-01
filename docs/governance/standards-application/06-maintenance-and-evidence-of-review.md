@@ -4,7 +4,7 @@ Al modificar requisitos se debe:
 
 1. aplicar la tabla binaria de ISO/IEC/IEEE 29148 a cada requisito afectado;
 2. comprobar que casos de uso y diagramas conservan los mismos `CU-*`;
-3. revisar actores, glosario, matriz de operaciones y estados;
+3. revisar actores, glosario, modos y efectos de las operaciones y estados;
 4. mantener las pruebas unitarias junto a su artefacto y las integraciones CRUD en
    `tests/integration/controllers`;
 5. ejecutar `npm run docs:check` y las pruebas relacionadas;

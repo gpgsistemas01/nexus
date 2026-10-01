@@ -115,7 +115,7 @@ fuente de verdad.
 3. El responsable funcional valida definiciones nuevas o ambiguas antes de aceptar el
    requisito. Desarrollo verifica su correspondencia con rutas, DTO, servicios y datos.
 4. Cambiar el significado de un término obliga a revisar requisitos, casos de uso,
-   [matriz de operaciones](requirements-operations-matrix.md), diagramas de dominio,
-   contrato API, mensajes visibles y pruebas relacionadas.
+   [modos y efectos de las operaciones](requirements-specification/06-operation-modes-and-effects.md),
+   diagramas de dominio, contrato API, mensajes visibles y pruebas relacionadas.
 5. El glosario no enumera todos los campos ni valores permitidos. Esos detalles se
    mantienen en el diccionario técnico, Prisma, validadores o catálogos según su fuente.

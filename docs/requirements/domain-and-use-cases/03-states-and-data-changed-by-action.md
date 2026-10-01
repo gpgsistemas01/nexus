@@ -1,4 +1,4 @@
-# 4. Estados y datos modificados por acción
+# 3. Estados y datos modificados por acción
 
 Los modos de formulario (`crear`, `editar`, `surtir`, `devolver`) no son estados del
 documento. El siguiente UML usa exclusivamente los nombres persistidos que resuelve el
@@ -9,7 +9,7 @@ de material y merma. El estado de cada detalle y el del encabezado se derivan de
 la operación, no se asignan desde el formulario.
 
 Las diferencias de permisos, campos y efectos se consultan en la
-[matriz de operaciones](../requirements-operations-matrix.md#modos-precondiciones-y-datos-modificados),
+[modos, precondiciones y efectos](../requirements-specification/06-operation-modes-and-effects.md),
 y las reglas verificables están en `src/constants/warehouseStatuses.js`,
 `src/services/warehouse/issues/issueFulfillmentRules.js` y los servicios específicos de
 salidas de material y merma.
