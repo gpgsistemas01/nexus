@@ -7,7 +7,7 @@ compartida se mantiene en
 
 Esta sección no duplica una matriz caso–código. La cobertura entre requisitos,
 arquitectura, código y pruebas se conserva en la
-[matriz transversal](../../../traceability-matrix/index.md); los archivos e imports se
+[vista de componentes](../../logical/01-components-and-reuse.md); los archivos e imports se
 localizan en el [mapa generado](../code-map.md), y cada interacción concreta se consulta
 en las [secuencias frontend](../../processes/frontend-code-sequences/index.md). Quedan
 fuera también los pasos normativos del actor, que pertenecen a las fichas `CU-*`, y la

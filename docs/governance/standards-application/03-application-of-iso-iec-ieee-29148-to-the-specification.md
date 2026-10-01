@@ -11,7 +11,7 @@ considera listo para revisión sólo cuando todas las respuestas aplicables son 
 | Claridad | ¿Usa sujeto, verbo obligatorio, objeto y condiciones sin «adecuado», «rápido» o «cuando sea posible»? | Texto normativo y glosario. |
 | Factibilidad | ¿La evidencia o el estado distingue implementado, parcial, modelado y propuesto? | Columna Estado y decisiones pendientes. |
 | Verificabilidad | ¿Indica un resultado observable y una forma de comprobación reproducible? | Criterio de aceptación y evidencia/prueba. |
-| Consistencia | ¿Usa términos del glosario y no contradice casos, diagramas, matriz de operaciones o permisos? | Revisión de referencias `CU-*`, `RF-*`, rutas y actores. |
+| Consistencia | ¿Usa términos del glosario y no contradice casos, diagramas, modos de operación o permisos? | Revisión de referencias `CU-*`, `RF-*`, rutas y actores. |
 | Trazabilidad | ¿Se puede recorrer requisito → permiso/validación → servicio/persistencia → prueba? | Evidencia principal, mapa generado y estrategia de pruebas. |
 | Modificabilidad | ¿El cambio puede localizarse sin repetir la misma regla normativa en varios archivos? | Fuente de verdad declarada y documentos complementarios enlazados. |
 

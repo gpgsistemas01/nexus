@@ -16,29 +16,8 @@ Cada prueba nueva debe identificar el requisito o regla, la operación CRUD y el
 efecto observable. No se agrega cobertura sólo para aumentar conteos ni para fijar
 detalles de HTML, estilos, selectores, eventos o estructura de archivos.
 
-Como marco selectivo se usa **ISO/IEC/IEEE 29119-2** para separar planificación,
-diseño, ejecución, reporte y cierre, e **ISO/IEC/IEEE 29119-3** para recordar la
-información mínima de los artefactos. Nexus no declara conformidad: adopta un vocabulario
-comprensible y conserva la evidencia ejecutable en el repositorio.
-
-La referencia aplicable a la pregunta de **cómo documentar** es ISO/IEC/IEEE 29119-3
-(*Test Documentation*). ISO/IEC/IEEE 29119-2 define el proceso en el que se producen y
-mantienen esos artefactos, mientras que ISO/IEC/IEEE 29119-4 describe técnicas de diseño
-como particiones, valores frontera, tablas de decisión y transiciones de estado. Las
-ediciones contractuales deben consultarse en el catálogo de ISO o IEEE; este plan no
-reproduce sus plantillas ni convierte su uso selectivo en una certificación.
-
-| Actividad inspirada en ISO 29119 | Aplicación sencilla en Nexus | Evidencia |
-| --- | --- | --- |
-| Planificar | Delimitar requisito, riesgo, nivel, ambiente y criterio de salida. | Incidencia y este plan. |
-| Diseñar | Preparar precondiciones, datos, pasos y resultados esperados, incluidos alternos y errores. | Prueba o caso manual trazado a `RF-*`, `RN-*` o `CU-*`. |
-| Ejecutar | Registrar comando, versión/commit, ambiente y resultado real. | Salida de Vitest/CI y consultas Prisma. |
-| Informar | Distinguir aprobado, fallido, bloqueado y no ejecutado. | Resumen de solicitud de cambio. |
-| Cerrar | Confirmar criterios, defectos pendientes y evidencia conservada. | Revisión de la entrega. |
-
-Una prueba se redacta como **Dado / Cuando / Entonces** cuando mejora la lectura, sin
-forzar una biblioteca BDD. Alternativas y excepciones se mantienen como casos separados
-para que un fallo señale una causa concreta.
+Nexus usa de forma selectiva ISO/IEC/IEEE 29119-2 para el proceso, 29119-3 para
+los artefactos y 29119-4 para las técnicas de diseño, sin declarar conformidad.
 
 ## Forma de documentar diseño, casos y ejecución
 
@@ -73,15 +52,6 @@ reproducibles; no se copian credenciales ni datos personales reales.
 | --- | --- | --- | --- | --- | --- |
 | `CP-<DOM>-NNN-01` | Estado, permisos, fixture y ambiente requeridos | Valores concretos que se envían o registran, clase de equivalencia o frontera y su procedencia | Operación reproducible o nombre del `it` | Respuesta esperada (estado y contenido relevante) y datos persistidos; ante rechazo, error y ausencia de efectos | Restauración requerida o `No aplica` |
 
-Cuando varias combinaciones comparten preparación y acción se documentan como tabla de
-decisión y se materializan con `it.each` si son automatizadas. Cada fila conserva su
-propio resultado esperado:
-
-| Regla | Condición A | Condición B | Datos representativos | Resultado esperado |
-| --- | --- | --- | --- | --- |
-| `R1` | Verdadera | Verdadera | Fixture o valores de la combinación | Acción o respuesta permitida |
-| `R2` | Verdadera | Falsa | Fixture o valores de la combinación | Rechazo y ausencia de escritura |
-
 ### 3. Registro de ejecución y resultado real
 
 El resultado esperado pertenece al diseño y no se sobrescribe después de ejecutar. El
@@ -92,45 +62,9 @@ repeticiones.
 | --- | --- | --- | --- | --- | --- | --- |
 | `EP-NNN` | ID del caso, `SU-*`, ruta o comando focalizado | Commit, Node/Vitest, SO y servicios usados | Fecha y persona o CI | Conteos y observación obtenida | Aprobado, fallido, bloqueado o no ejecutado | Salida de CI, consulta verificable o incidencia |
 
-El [resumen de cobertura automatizada por caso de uso](use-case-test-types.md) aplica
-este formato sólo a evidencia funcional relevante y agrupa `CU-*` con el mismo diseño.
-Las pruebas de frontend conservadas se limitan a validadores y transformaciones de datos;
-las de DOM, plugins, selectores, entrypoints y delegación de requests se retiraron por
-bajo valor funcional. El resumen no sustituye la evidencia ejecutable.
-El [catálogo de pruebas unitarias](unit-test-catalog.md) mantiene el diseño agrupado de
-la suite y el [registro de resultados unitarios](unit-test-results.md) mantiene su última
-ejecución. No se duplican 281 filas
-si los nombres y datos ya están en el código; sí se crea o amplía una ficha cuando el
-caso es manual, regula una aceptación contractual, introduce una técnica o ambiente no
-catalogado, o necesita evidencia que el runner no conserva.
-
-### Grafos y modelos de comportamiento
-
-Un grafo no sustituye las tablas anteriores ni es obligatorio para cada prueba. Se usa
-cuando las relaciones, caminos o estados aportan información que una lista ocultaría:
-
-- **transición de estados:** nodos como estados del negocio y aristas como acciones; cada
-  transición permitida o rechazada se vincula con un caso;
-- **flujo o camino:** nodos como decisiones observables y aristas como alternativas,
-  manteniendo separados el camino feliz y los fallos;
-- **dependencia de datos:** nodos como fixtures o entidades cuando el orden de creación y
-  limpieza afecta la reproducibilidad.
-
-```mermaid
-flowchart LR
-    R[Requisito o riesgo] --> D[DP: condición y técnica]
-    D --> C1[CP: datos y resultado esperado]
-    D --> C2[CP alterno o de error]
-    C1 --> E[EP: resultado real y evidencia]
-    C2 --> E
-    E -->|coincide| P[Aprobado]
-    E -->|difiere| F[Fallido y defecto]
-    E -->|no puede ejecutarse| B[Bloqueado]
-```
-
-Los grafos se escriben en Mermaid. Debajo de cada grafo
-se documentan su propósito, alcance, fuente y límites; los IDs visibles deben coincidir
-con las tablas y con la prueba ejecutable.
+El [resumen por caso de uso](use-case-test-types.md) registra evidencia funcional;
+el [catálogo unitario](unit-test-catalog.md) registra los diseños `DP-UNIT-*`, casos
+`CP-UNIT-*`, técnicas, datos y resultados esperados de la suite.
 
 ## Cobertura CRUD mínima
 
@@ -161,29 +95,8 @@ No se crea un nivel unitario para componentes visuales o infraestructura inciden
 Si un helper compartido coordina datos CRUD, se prueba una vez en la ruta paralela a su
 módulo y los contextos reutilizan ese contrato.
 
-El runtime, el aislamiento, las técnicas y las suites incluidas en el nivel unitario se
-detallan en el [ambiente, estrategia y catálogo unitario](unit-test-catalog.md).
-
-## Registro de aplicación de pruebas unitarias
-
-Además del código, esta tabla registra **cómo** se aplica el nivel unitario. La fuente
-ejecutable continúa en `tests/unit`; la tabla explica intención, aislamiento y evidencia
-sin copiar cada `it`. La trazabilidad funcional se mantiene en la
-[matriz técnica](../architecture/traceability-matrix/index.md).
-
-| Unidad / ubicación | Técnica aplicada | Resultado que se observa | Ejemplos vigentes |
-| --- | --- | --- | --- |
-| Servicios de dominio | Colaboradores Prisma/servicios sustituidos; entradas límite y errores por caso | Regla, argumentos, retorno y ausencia de colaboración inválida | identidad de material, consulta de movimientos, relaciones proveedor-material, reportes y mermas. |
-| Controllers API | Harness Express/Supertest con servicio simulado | status/body, DTO y efecto posterior como evento de inventario | entradas, salidas, materiales, mermas y reportes de almacén. |
-| Rutas y políticas | Router aislado y combinaciones tabuladas | orden/acceso positivo y rechazo antes del controller | rutas de merma y permisos rol–departamento. |
-| DTO, validadores y helpers | Funciones puras con clases de equivalencia y fronteras decimales | selección, normalización, precisión, totales o error | DTO de entrada/merma, validaciones y helpers de inventario. |
-
-Cada incorporación registra en el nombre `describe/it` la regla o `RF/RN/CU` cuando
-resulte útil, conserva preparación–ejecución–aserción y evita probar imports o detalles
-privados. La salida de Vitest en CI/PR registra comando, commit, ambiente y resultado; el
-[registro de resultados unitarios](unit-test-results.md) conserva además el último
-resumen verificado dentro del paquete documental. Este documento no se marca como
-“aprobado” sólo porque exista el archivo.
+El [catálogo de pruebas unitarias](unit-test-catalog.md) registra la suite, el ambiente,
+las técnicas, los datos y los resultados observados por grupo.
 
 ## Cobertura prioritaria
 

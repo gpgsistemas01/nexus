@@ -5,12 +5,13 @@ completitud de la SRS; ya no funciona como una lista genérica de “terminado�
 de mantenimiento del repositorio pertenecen a gobierno documental y las brechas o
 decisiones pendientes a [visión y alcance](../vision-scope-and-requirements/11-known-gaps-and-pending-decisions.md).
 
-La evidencia técnica de un requisito se enlaza mediante la
-[matriz de trazabilidad](../../architecture/traceability-matrix/index.md), sin repetir en
-la SRS cada endpoint, componente o prueba. El mapa generado localiza rutas y exports;
-las secuencias frontend/backend explican la realización de cada caso. Un diagrama de
-componentes puede mostrar responsables y dependencias, pero no sustituye la relación
-verificable y bidireccional `requisito ↔ caso ↔ diseño ↔ código ↔ prueba`.
+La evidencia técnica de un requisito se recorre sin mantener una matriz paralela: la
+[vista de componentes](../../architecture/views/logical/01-components-and-reuse.md)
+muestra responsables y dependencias; las secuencias frontend/backend identificadas por
+`CU-*` explican cada realización; el mapa generado localiza rutas y exports; y el
+[catálogo de pruebas](../../testing/use-case-test-types.md) registra cobertura y brechas.
+Los identificadores compartidos conservan la relación bidireccional
+`requisito ↔ caso ↔ diseño ↔ código ↔ prueba`.
 
 No todo requisito debe crear un caso de uso independiente. Los requisitos de soporte
 para selectores operativos, unicidad de relaciones, validaciones compartidas, permisos

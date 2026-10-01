@@ -38,8 +38,7 @@ ocurrir y **arquitectura** explica cómo se construye y ejecuta la solución.
 2. [Especificación de requisitos](requirements-specification/index.md).
 3. [Dominio y casos de uso](domain-and-use-cases/index.md).
 4. [Descripciones de casos de uso](use-cases/index.md).
-5. [Matriz de requisitos y operaciones](requirements-operations-matrix.md).
-6. [Glosario del negocio](business-glossary.md).
+5. [Glosario del negocio](business-glossary.md).
 
 Las fichas se subdividen primero por los grupos `AUT`, `IDA`, `CAT`, `ENT` y `SAL`, y
 después en un Markdown por cada `CU-*`. Sus índices conservan reglas comunes, resúmenes
@@ -48,8 +47,10 @@ ensambla los capítulos en el orden anterior para producir
 una entrega normativa completa, pero una revisión focalizada puede abrir sólo el Markdown del
 grupo afectado.
 
-La especificación y los casos se conectan con frontend, API, backend, persistencia y
-pruebas mediante la [matriz de trazabilidad técnica](../architecture/traceability-matrix/index.md).
+La especificación y los casos se conectan con frontend, API, backend y persistencia
+mediante la [vista de componentes](../architecture/views/logical/01-components-and-reuse.md)
+y las secuencias por `CU-*`; la cobertura se consulta en el
+[catálogo por caso de uso](../testing/use-case-test-types.md).
 Los diagramas normativos de casos de uso y estados se mantienen en
 [dominio y casos de uso](domain-and-use-cases/index.md); las actividades y secuencias de
 realización pertenecen a las vistas de procesos y desarrollo de arquitectura.
