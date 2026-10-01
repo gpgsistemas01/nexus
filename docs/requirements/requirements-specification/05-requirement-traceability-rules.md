@@ -3,7 +3,7 @@
 Este capítulo se conserva porque define relaciones normativas que permiten comprobar la
 completitud de la SRS; ya no funciona como una lista genérica de “terminado”. Las reglas
 de mantenimiento del repositorio pertenecen a gobierno documental y las brechas o
-decisiones pendientes a [visión y alcance](../vision-scope-and-requirements/11-gaps-known-and-decisions-pending.md).
+decisiones pendientes a [visión y alcance](../vision-scope-and-requirements/11-known-gaps-and-pending-decisions.md).
 
 La evidencia técnica de un requisito se enlaza mediante la
 [matriz de trazabilidad](../../architecture/traceability-matrix/index.md), sin repetir en

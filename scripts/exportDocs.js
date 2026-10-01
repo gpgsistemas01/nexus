@@ -222,7 +222,7 @@ const PUBLICATIONS = Object.freeze({
             'vision-y-navegacion': packagePart(ARCHITECTURE_ENTRY, [
                 'docs/architecture/views/index.md',
                 'docs/architecture/views/scenarios/index.md',
-                'docs/requirements/domain-and-use-cases/03-cases-of-use-current.md',
+                'docs/requirements/domain-and-use-cases/03-current-use-cases.md',
                 ...getDirectoryDocuments('docs/architecture/views/scenarios/web-navigation-and-screen-catalog'),
                 'docs/architecture/views/logical/index.md',
                 'docs/architecture/views/logical/01-components-and-reuse.md',
