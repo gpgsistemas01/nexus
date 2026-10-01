@@ -88,9 +88,14 @@ repeticiones.
 | --- | --- | --- | --- | --- | --- | --- |
 | `EP-NNN` | ID del caso, `SU-*`, ruta o comando focalizado | Commit, Node/Vitest, SO y servicios usados | Fecha y persona o CI | Conteos y observación obtenida | Aprobado, fallido, bloqueado o no ejecutado | Salida de CI, consulta verificable o incidencia |
 
+El [resumen de cobertura automatizada por caso de uso](use-case-test-types.md) aplica
+este formato sólo a evidencia funcional relevante y agrupa `CU-*` con el mismo diseño.
+Las pruebas de frontend conservadas se limitan a validadores y transformaciones de datos;
+las de DOM, plugins, selectores, entrypoints y delegación de requests se retiraron por
+bajo valor funcional. El resumen no sustituye la evidencia ejecutable.
 El [catálogo de pruebas unitarias](unit-test-catalog.md) mantiene el diseño agrupado de
 la suite y el [registro de resultados unitarios](unit-test-results.md) mantiene su última
-ejecución. No se duplican 295 filas
+ejecución. No se duplican 281 filas
 si los nombres y datos ya están en el código; sí se crea o amplía una ficha cuando el
 caso es manual, regula una aceptación contractual, introduce una técnica o ambiente no
 catalogado, o necesita evidencia que el runner no conserva.
@@ -168,8 +173,6 @@ sin copiar cada `it`. La trazabilidad funcional se mantiene en la
 | Controllers API | Harness Express/Supertest con servicio simulado | status/body, DTO y efecto posterior como evento de inventario | entradas, salidas, materiales, mermas y reportes de almacén. |
 | Rutas y políticas | Router aislado y combinaciones tabuladas | orden/acceso positivo y rechazo antes del controller | rutas de merma y permisos rol–departamento. |
 | DTO, validadores y helpers | Funciones puras con clases de equivalencia y fronteras decimales | selección, normalización, precisión, totales o error | DTO de entrada/merma, validaciones y helpers de inventario. |
-| Aplicación del navegador | Requests simulados e inyección de configuración | adaptación del payload/respuesta y reutilización sin DOM | fábricas CRUD, salida y reporte; contextos y catálogos. |
-| UI, plugins y utilidades del navegador | DOM mínimo o doubles de plugin; eventos observables | estado visual contractual, callback y transformación | formularios, DataTable, Select2, MDB, Flatpickr y utilidades. |
 
 Cada incorporación registra en el nombre `describe/it` la regla o `RF/RN/CU` cuando
 resulte útil, conserva preparación–ejecución–aserción y evita probar imports o detalles
