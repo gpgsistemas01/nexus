@@ -62,12 +62,16 @@ resultados independientes.
 ### 2. Especificación del caso y datos
 
 Cada caso registra al menos los datos de entrada y el resultado esperado que permiten
-decidir objetivamente si pasa. Los valores sensibles se reemplazan por fixtures o
-referencias reproducibles; no se copian credenciales ni datos personales reales.
+decidir objetivamente si pasa. En operaciones de escritura, los datos de prueba deben
+identificar los valores que se intentan registrar y el resultado esperado debe indicar
+tanto la respuesta que devuelve el sistema como los datos que deben quedar persistidos
+o la ausencia de escritura. No basta con anotar «registro correcto» o únicamente el
+código HTTP. Los valores sensibles se reemplazan por fixtures o referencias
+reproducibles; no se copian credenciales ni datos personales reales.
 
 | ID de caso | Precondiciones y estado inicial | Datos de prueba | Acción / pasos | Resultado esperado | Limpieza |
 | --- | --- | --- | --- | --- | --- |
-| `CP-<DOM>-NNN-01` | Estado, permisos, fixture y ambiente requeridos | Valores concretos, clase de equivalencia o frontera y su procedencia | Operación reproducible o nombre del `it` | Respuesta, cambio persistido, ausencia de efecto o error observable | Restauración requerida o `No aplica` |
+| `CP-<DOM>-NNN-01` | Estado, permisos, fixture y ambiente requeridos | Valores concretos que se envían o registran, clase de equivalencia o frontera y su procedencia | Operación reproducible o nombre del `it` | Respuesta esperada (estado y contenido relevante) y datos persistidos; ante rechazo, error y ausencia de efectos | Restauración requerida o `No aplica` |
 
 Cuando varias combinaciones comparten preparación y acción se documentan como tabla de
 decisión y se materializan con `it.each` si son automatizadas. Cada fila conserva su

@@ -110,22 +110,48 @@ es un caso genérico: remite al nombre completo que Vitest materializa como evid
 ejecutable y evita mantener una segunda copia de los 281 nombres.
 
 Todos los casos comparten las precondiciones, el ambiente y la limpieza de la ficha
-`SU-UNIT-001`. La siguiente tabla agrega los datos variables y el resultado esperado de
-cada diseño. Si un caso deja de corresponder a esta fila, se actualiza el grupo o se crea
-otro antes de registrar su ejecución.
+`SU-UNIT-001`. Los datos y resultados se registran a continuación con el formato propio
+de cada técnica: una tabla de decisión necesita combinaciones y decisiones; una frontera
+necesita el límite y sus valores vecinos; una transición necesita estado inicial, evento
+y estado final; una prueba de interacción o fallo necesita colaboradores observados y
+efectos permitidos o prohibidos. Un diseño puede aparecer en más de una tabla cuando
+combina técnicas. Si un caso deja de corresponder a estas filas, se actualiza el diseño
+o se crea otro antes de registrar su ejecución.
 
-| Diseño / casos | Condición que se debe probar | Datos de prueba vigentes | Resultado esperado del grupo |
+### Tablas de decisión y particiones de equivalencia
+
+| Diseño / casos | Regla o partición | Datos representativos registrados | Resultado esperado |
 | --- | --- | --- | --- |
-| `DP-UNIT-G01` / `CP-UNIT-G01-*` | Decisión de acceso por rol, departamento y operación. | Combinaciones tabuladas de administrador, almacén y asesor; permisos CRUD de salidas. | Cada combinación devuelve exactamente permitido o denegado y un asesor no obtiene acceso operativo. |
-| `DP-UNIT-G02` / `CP-UNIT-G02-*` | Contrato HTTP aislado de controllers de almacén en caminos exitosos, límites y fallos. | Requests con filtros, DTO válidos o manipulados, valores máximos, IDs existentes/inexistentes y errores de servicios simulados. | Status/body y argumentos enviados al servicio coinciden con el contrato; campos no permitidos se descartan y los efectos posteriores sólo ocurren tras el éxito. |
-| `DP-UNIT-G03` / `CP-UNIT-G03-*` | Normalización y conservación de identidad en DTO de entradas y mermas. | Facturas con variantes de formato, nombres, IDs, detalles repetidos, opcionales y decimales. | El DTO produce el payload normalizado esperado sin fusionar ni perder identidades o partidas válidas. |
-| `DP-UNIT-G04` / `CP-UNIT-G04-*` | Cálculo de stock/movimientos y frontera transaccional ante éxito o error. | Cantidades con/sin dimensiones, cero, decimales, stock suficiente/insuficiente y callbacks que resuelven o lanzan error. | Cálculos y agrupaciones conservan los detalles; la transacción revierte siempre y propaga el error original cuando corresponde. |
-| `DP-UNIT-G05` / `CP-UNIT-G05-*` | Colecciones y validaciones de entradas, materiales y mermas. | Colecciones vacías o repetidas, IDs de cliente/documento, campos ausentes/válidos y valores de frontera. | Se agrega, sustituye o elimina el renglón correcto sin afectar otros; los validadores devuelven la configuración o error esperado. |
-| `DP-UNIT-G06` / `CP-UNIT-G06-*` | Orden de middleware, autorización y enlace de handlers en rutas de merma. | Requests por rol/departamento y spies de middleware/controller para rutas API y web. | El acceso autorizado alcanza el handler en el orden previsto y el no autorizado se rechaza antes del controller. |
-| `DP-UNIT-G07` / `CP-UNIT-G07-*` | Reglas y consultas de servicios con persistencia sustituida. | Identidades completas/incompletas, filtros, snapshots, relaciones, facturas duplicadas/no duplicadas y errores Prisma simulados. | Retorno y argumentos Prisma respetan filtros y relaciones; entradas inválidas o fallos no disparan colaboraciones posteriores. |
-| `DP-UNIT-G08` / `CP-UNIT-G08-*` | Transformación compartida de formatos, Excel, queries e identidad de inventario. | Mes válido/inválido o bisiesto, paginación negativa, rangos, fórmulas, relaciones serializadas y colecciones vacías. | Fechas, filtros, filas, fórmulas y representación canónica coinciden con el contrato y usan defaults seguros. |
-| `DP-UNIT-G09` / `CP-UNIT-G09-*` | Clases de equivalencia y fronteras de validadores del servidor. | Campo ausente/nulo/válido, cantidad positiva/no positiva y decimales dentro/fuera de precisión. | Cada valor válido se acepta; cada clase inválida devuelve el código correspondiente sin aceptar datos fuera del límite. |
-| `DP-UNIT-G10` / `CP-UNIT-G10-*` | Contratos de los scripts de publicación y capturas documentales. | Formatos solicitados, archivos temporales, imágenes válidas/inválidas, disponibilidad de convertidores y estados de recuperación. | Cada helper produce el plan o recurso esperado y rechaza argumentos, geometrías o herramientas no válidas sin ocultar el fallo. |
+| `DP-UNIT-G01` / `CP-UNIT-G01-*` | Acceso por rol, departamento y operación. | Administrador, almacén y asesor combinados con permisos de consulta, creación, edición y eliminación de salidas. | Cada fila devuelve el booleano de acceso definido; el administrador conserva acceso, almacén recibe sólo las operaciones asignadas y el asesor no obtiene acceso operativo. |
+| `DP-UNIT-G03` / `CP-UNIT-G03-*` | DTO válido, incompleto o con identidades repetidas. | Facturas con variantes de formato; nombres e IDs presentes o ausentes; detalles repetidos; opcionales y decimales. | Cada entrada válida produce el payload normalizado esperado; las identidades y partidas distintas no se fusionan ni se pierden. |
+| `DP-UNIT-G05` / `CP-UNIT-G05-*` | Colección vacía, elemento nuevo, repetido o sustituido; formulario válido o incompleto. | IDs de cliente/documento, detalles vacíos o repetidos y campos ausentes o informados de entradas, materiales y mermas. | Se agrega, sustituye o elimina sólo el renglón correspondiente; cada formulario devuelve la configuración válida o el error de su partición. |
+| `DP-UNIT-G09` / `CP-UNIT-G09-*` | Campo ausente, nulo, válido o inválido. | Cantidades positivas y no positivas, detalles presentes/ausentes y decimales dentro/fuera de la precisión admitida. | La clase válida se acepta y cada clase inválida devuelve su código de validación sin continuar con datos no admitidos. |
+
+### Análisis de valores frontera
+
+| Diseño / casos | Frontera | Valores registrados alrededor del límite | Resultado esperado |
+| --- | --- | --- | --- |
+| `DP-UNIT-G02` / `CP-UNIT-G02-*` | Máximos admitidos por los controllers de almacén. | Valor máximo válido y valor inmediato fuera del límite, además de IDs existentes e inexistentes. | El máximo válido llega al servicio y conserva el cuerpo esperado; el valor fuera del límite o el ID inexistente devuelve el status/error correspondiente sin efecto posterior. |
+| `DP-UNIT-G04` / `CP-UNIT-G04-*` | Cantidad y existencia disponible. | Cero, decimales y cantidades inmediatamente dentro o fuera del stock, con y sin dimensiones. | Los valores admitidos producen el cálculo y movimiento exactos; cero o stock insuficiente se rechazan sin perder ni duplicar detalles. |
+| `DP-UNIT-G08` / `CP-UNIT-G08-*` | Fechas, paginación, rangos y colecciones. | Mes válido, inválido y bisiesto; paginación negativa; colección vacía y rangos con extremos. | Se devuelven fechas, filtros, filas y valores por defecto del contrato, sin generar rangos o páginas inválidos. |
+| `DP-UNIT-G09` / `CP-UNIT-G09-*` | Signo y precisión decimal. | Cantidad `0`, negativa y positiva; decimal en la precisión máxima y decimal que la excede. | La cantidad positiva y la precisión admitida pasan; cero, negativos y exceso de precisión devuelven el código de error correspondiente. |
+
+### Transiciones de estado
+
+| Diseño / casos | Estado inicial registrado | Acción o evento | Estado o resultado esperado |
+| --- | --- | --- | --- |
+| `DP-UNIT-G02` / `CP-UNIT-G02-*` | Documento editable, entregado, devuelto o inexistente, según el controller. | Registrar, editar, entregar, devolver o cancelar. | La transición permitida devuelve el status/body previsto y dispara su efecto posterior; la transición no permitida conserva el estado y devuelve el error de dominio. |
+| `DP-UNIT-G04` / `CP-UNIT-G04-*` | Existencia suficiente o insuficiente y transacción activa. | Aplicar movimiento o hacer que el callback termine o lance error. | El éxito devuelve el cálculo agrupado; el error revierte la transacción y se propaga sin dejar un resultado parcial. |
+| `DP-UNIT-G07` / `CP-UNIT-G07-*` | Factura duplicada/no duplicada, snapshot presente/ausente o identidad completa/incompleta. | Consultar o ejecutar la regla del servicio. | El estado válido devuelve la entidad o consulta esperada; duplicidad, ausencia o identidad inválida produce el error previsto y no inicia colaboraciones posteriores. |
+
+### Interacción, fallos y resultados de colaboradores
+
+| Diseño / casos | Entrada y colaboradores registrados | Interacción o fallo provocado | Resultado esperado y efectos observables |
+| --- | --- | --- | --- |
+| `DP-UNIT-G02` / `CP-UNIT-G02-*` | Request con filtros o DTO válido/manipulado; servicio y evento simulados. | El servicio resuelve, rechaza o recibe campos no permitidos. | Status/body y argumentos coinciden con el contrato; los campos no permitidos se descartan y el evento posterior sólo ocurre después del éxito. |
+| `DP-UNIT-G06` / `CP-UNIT-G06-*` | Request por rol/departamento y spies de middleware y controller en rutas API/web. | Autorizar o rechazar la combinación registrada. | El caso autorizado alcanza el handler en el orden esperado; el rechazado termina antes del controller. |
+| `DP-UNIT-G07` / `CP-UNIT-G07-*` | Filtros, identidades, relaciones y snapshots; Prisma y servicios colaboradores simulados. | El colaborador devuelve datos, informa duplicidad o lanza un error Prisma. | Retorno y argumentos respetan filtros/relaciones; un dato inválido o fallo conserva el error y no llama colaboradores posteriores. |
+| `DP-UNIT-G10` / `CP-UNIT-G10-*` | Formato solicitado, archivo temporal, imagen válida/inválida y convertidor disponible/ausente. | Generar el recurso o forzar argumento, geometría o herramienta inválida. | El helper devuelve el plan/recurso esperado; la variante inválida rechaza explícitamente y no oculta el fallo. |
 
 La acción reproducible de cada `CP-UNIT-*` es la invocación descrita por su nombre
 `it`; el detalle de fixtures permanece junto a esa invocación. El registro de ejecución
@@ -136,7 +162,7 @@ que conserva revisión, ambiente, fecha, conteos, resultado real y observaciones
 
 Sí se justifica un diagrama para esta suite porque permite localizar rápidamente las
 familias de comportamiento y sus fronteras. No representa pasos de ejecución ni sustituye
-los datos y resultados esperados de la tabla anterior. Cada nodo terminal referencia un
+los datos y resultados esperados de las tablas anteriores. Cada nodo terminal referencia un
 diseño vigente; por tanto, un área sin nodo se considera fuera del alcance unitario hasta
 que se incorpore y catalogue una prueba.
 
