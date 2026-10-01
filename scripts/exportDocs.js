@@ -195,7 +195,6 @@ const PUBLICATIONS = Object.freeze({
             ]),
             especificacion: packagePart(REQUIREMENT_ENTRY, [
                 ...getDirectoryDocuments('docs/requirements/requirements-specification'),
-                'docs/requirements/requirements-operations-matrix.md',
                 'docs/requirements/business-glossary.md'
             ]),
             'dominio-y-casos-de-uso': packagePart(REQUIREMENT_ENTRY, [
@@ -222,7 +221,7 @@ const PUBLICATIONS = Object.freeze({
             'vision-y-navegacion': packagePart(ARCHITECTURE_ENTRY, [
                 'docs/architecture/views/index.md',
                 'docs/architecture/views/scenarios/index.md',
-                'docs/requirements/domain-and-use-cases/03-current-use-cases.md',
+                'docs/requirements/domain-and-use-cases/02-current-use-cases.md',
                 ...getDirectoryDocuments('docs/architecture/views/scenarios/web-navigation-and-screen-catalog'),
                 'docs/architecture/views/logical/index.md',
                 'docs/architecture/views/logical/01-components-and-reuse.md',
@@ -243,10 +242,7 @@ const PUBLICATIONS = Object.freeze({
                 ...getDirectoryDocuments('docs/architecture/views/development/frontend-technical-documentation')
             ]),
             'contrato-api': packagePart(ARCHITECTURE_ENTRY, [
-                'docs/architecture/api-contract.md'
-            ]),
-            trazabilidad: packagePart(ARCHITECTURE_ENTRY, [
-                ...getDirectoryDocuments('docs/architecture/traceability-matrix')
+                'docs/architecture/openapi/api-contract.md'
             ]),
             estandar: packagePart(ARCHITECTURE_ENTRY, [
                 ...getDirectoryDocuments('docs/architecture/coding-standards')
@@ -266,8 +262,7 @@ const PUBLICATIONS = Object.freeze({
                 'docs/testing/test-plan.md',
                 'docs/testing/service-test-coverage.md',
                 'docs/testing/use-case-test-types.md',
-                'docs/testing/unit-test-catalog.md',
-                'docs/testing/unit-test-results.md'
+                'docs/testing/unit-test-catalog.md'
             ]
         }
     }

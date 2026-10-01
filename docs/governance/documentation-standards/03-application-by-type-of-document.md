@@ -29,7 +29,7 @@ Por tanto, las tablas de símbolos, firmas y bloques de código de las referenci
 [backend](../../architecture/views/development/backend-technical-documentation/index.md) y
 [frontend](../../architecture/views/development/frontend-technical-documentation/index.md) son una convención local
 alineada selectivamente con 1016. Las fichas actuales del
-[contrato API](../../architecture/api-contract.md) se complementan con la
+[contrato API](../../architecture/openapi/api-contract.md) se complementan con la
 [especificación OpenAPI 3.1](../../architecture/openapi/openapi.json). No se atribuye a ninguna ISO
 una plantilla que la norma no proporciona.
 

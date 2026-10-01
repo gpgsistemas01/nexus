@@ -6,7 +6,7 @@ colaboraciones que no se comprenden con una lista de archivos.
 
 Esta sección **no mantiene otra matriz de trazabilidad por caso**. La correspondencia
 entre requisito, caso, evidencia técnica y prueba pertenece a la
-[matriz transversal](../../../traceability-matrix/index.md); la ruta y los símbolos se
+[vista de componentes](../../logical/01-components-and-reuse.md); la ruta y los símbolos se
 consultan en el [mapa generado](../code-map.md), y el recorrido concreto de cada `CU-*`
 en las [secuencias backend](../../processes/backend-code-sequences/index.md). Tampoco
 repite el contrato HTTP procesable, que pertenece a OpenAPI.

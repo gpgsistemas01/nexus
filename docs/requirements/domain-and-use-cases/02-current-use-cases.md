@@ -1,4 +1,4 @@
-# 3. Casos de uso vigentes
+# 2. Casos de uso vigentes
 
 El diagrama se mantiene en Mermaid para que GitHub lo represente correctamente. Es una
 **aproximación visual a un diagrama UML de casos de uso**, no UML estricto: Mermaid no

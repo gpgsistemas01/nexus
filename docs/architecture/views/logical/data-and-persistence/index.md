@@ -30,7 +30,7 @@ de negocio.
 | ¿Cómo se separan cuenta, persona, asignación y autorización? | [Identidad, acceso y auditoría](../02-identity-access-and-audit.md), como decisión de diseño. | `prisma/schema.prisma`, políticas del servidor y el [diagrama ER](generated/database-schema.md) son evidencia. |
 | ¿Qué estructura persistente existe? | `prisma/schema.prisma` y las migraciones de `prisma/migrations`. | El [diagrama ER](generated/database-schema.md) y el [diccionario técnico](generated/data-dictionary.md) se generan desde Prisma. |
 | ¿Qué cuenta de PostgreSQL ejecuta la aplicación o las migraciones? | [Roles PostgreSQL](../../physical/02-postgresql-runtime-and-migration-roles.md), en la vista física. | `DATABASE_URL`, `DIRECT_URL`, `prisma.config.ts` y `docker-entrypoint.sh` prueban el enrutamiento; el proveedor administra los privilegios reales. |
-| ¿Cuál es el contrato HTTP de un dato? | [Contrato de la API](../../../api-contract.md) y [OpenAPI 3.1](../../../openapi/openapi.json). | Rutas, validadores, DTO, controladores y pruebas de integración aportan la evidencia que debe conservarse sincronizada con el contrato procesable. |
+| ¿Cuál es el contrato HTTP de un dato? | [Contrato de la API](../../../openapi/api-contract.md) y [OpenAPI 3.1](../../../openapi/openapi.json). | Rutas, validadores, DTO, controladores y pruebas de integración aportan la evidencia que debe conservarse sincronizada con el contrato procesable. |
 
 ## Recorrido de trazabilidad
 

@@ -100,7 +100,7 @@ evidencia del adaptador está en
 [`goodsIssueControllerTest.js`](../../../../../tests/unit/controllers/api/warehouse/goodsIssueControllerTest.js);
 la cobertura y brechas de servicios permanecen en el [plan de pruebas](../../../../testing/test-plan.md).
 La aplicación por caso y su evidencia se consulta en la
-[matriz de trazabilidad técnica](../../../traceability-matrix/index.md). El identificador,
+[vista de componentes](../../logical/01-components-and-reuse.md). El identificador,
 propósito y fuente de verdad de cada gráfico se mantienen junto al diagrama, sin otro
 inventario manual.
 

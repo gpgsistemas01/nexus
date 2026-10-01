@@ -29,8 +29,8 @@ conducta normativa de los actores:
 Que los servicios ejecuten un “caso de uso” o que las secuencias técnicas se organicen
 por `CU-*` no cambia la propiedad documental. La ficha funcional permanece en la SRS;
 backend y frontend muestran colaboraciones internas, errores técnicos y persistencia.
-Ambas vistas se conectan mediante la
-[matriz de trazabilidad](traceability-matrix/index.md).
+Ambas vistas se conectan mediante identificadores `CU-*` compartidos por los
+[componentes](views/logical/01-components-and-reuse.md), las secuencias y las pruebas.
 
 ## Forma arquitectónica y criterios normativos
 
@@ -49,10 +49,10 @@ La organización separa las **vistas del sistema** de los **artefactos de apoyo*
 1. [Vistas arquitectónicas](views/index.md): escenarios, lógica, procesos, desarrollo y
    física. Bajo `views/` se mantiene todo artefacto cuyo propósito principal es
    representar la solución desde una de esas perspectivas.
-2. **Apoyo transversal:** contrato API, trazabilidad y estándar
-   de codificación. Permanecen en la raíz de `architecture/`
-   porque sirven a varias vistas o establecen reglas, pero no representan por sí mismos
-   una perspectiva del sistema.
+2. **Apoyo transversal:** contrato API y estándar de codificación. El contrato se
+   mantiene junto a su especificación OpenAPI; el estándar permanece en arquitectura
+   porque gobierna la construcción del sistema. El gobierno de la documentación, en
+   cambio, pertenece a `docs/governance`.
 
 ```text
 architecture/
@@ -62,9 +62,7 @@ architecture/
 │   ├── processes/    # Secuencias, decisiones y estados dinámicos
 │   ├── development/  # Organización, implementación, patrones y mapa del código
 │   └── physical/     # Contexto, contenedores y despliegue
-├── api-contract.md   # Referencia HTTP transversal
-├── openapi/          # Contrato HTTP procesable
-├── traceability-matrix/
+├── openapi/          # Referencia HTTP y contrato procesable
 └── coding-standards/
 ```
 
@@ -78,11 +76,12 @@ su propiedad normativa.
    [vista lógica](views/logical/index.md) → patrón relevante en la
    [vista de desarrollo](views/development/index.md).
 2. Para revisar una interacción web: [vista de escenarios](views/scenarios/index.md) →
-   [contrato API](api-contract.md) → [vista de procesos](views/processes/index.md).
+   [contrato API](openapi/api-contract.md) → [vista de procesos](views/processes/index.md).
 3. Para revisar persistencia: [vista lógica](views/logical/index.md) → esquema y
    diccionario generados → servicio en la [vista de desarrollo](views/development/index.md).
-4. Para comprobar cobertura: [matriz de trazabilidad](traceability-matrix/index.md) →
-   requisito o caso de uso → vista técnica y prueba enlazadas.
+4. Para comprobar realización y cobertura: requisito o caso de uso →
+   [componentes](views/logical/01-components-and-reuse.md) y secuencia `CU-*` →
+   [catálogo de pruebas](../testing/use-case-test-types.md).
 
 ## Regla de división
 

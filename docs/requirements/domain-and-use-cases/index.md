@@ -1,10 +1,12 @@
-# Modelo de dominio, casos de uso y relación entre vistas
+# Modelo de dominio y casos de uso
 
+Esta colección conserva sólo vistas normativas del dominio: el vocabulario conceptual,
+los objetivos de los actores y los estados observables. El detalle verificable pertenece
+a la [SRS](../requirements-specification/index.md); los componentes, secuencias,
+persistencia y despliegue pertenecen a [arquitectura](../../architecture/index.md).
 
 ## Capítulos
 
-1. [1. Alcance de las vistas](01-view-scope.md)
-2. [2. Modelo de dominio conceptual](02-conceptual-domain-model.md)
-3. [3. Casos de uso vigentes](03-current-use-cases.md)
-4. [4. Estados y datos modificados por acción](04-states-and-data-changed-by-action.md)
-5. [5. Vistas de diseño del sistema](05-system-design-views.md)
+1. [1. Modelo de dominio conceptual](01-conceptual-domain-model.md)
+2. [2. Casos de uso vigentes](02-current-use-cases.md)
+3. [3. Estados y datos modificados por acción](03-states-and-data-changed-by-action.md)

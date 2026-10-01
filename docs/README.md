@@ -19,10 +19,10 @@ los paquetes exportables se presentan en español:
 El [índice de vistas arquitectónicas](architecture/views/index.md) organiza bajo
 `architecture/views/` las cinco perspectivas de la adaptación 4+1 de Nexus: escenarios,
 lógica, procesos, desarrollo y física. Cada subcarpeta contiene los artefactos cuyo
-propósito principal es representar el sistema desde esa perspectiva. El contrato API,
-OpenAPI, la trazabilidad, las convenciones y el estándar de codificación permanecen en
-la raíz de `architecture/` como apoyo transversal, porque sirven a varias vistas o
-definen reglas en lugar de representar una sola perspectiva. Una subcarpeta
+propósito principal es representar el sistema desde esa perspectiva. El contrato API se
+mantiene junto a OpenAPI; el estándar de codificación permanece en `architecture/` como
+regla de construcción transversal. Las normas para mantener y publicar documentos
+permanecen en `governance/`. Una subcarpeta
 `generated/` indica la forma de mantenimiento, no una vista adicional.
 
 Cada colección de capítulos curados conserva un `index.md` sin numerar y usa prefijos
@@ -33,8 +33,7 @@ estables porque se regeneran y no forman parte de la secuencia editorial.
 docs/
 ├── architecture/  # Arquitectura y construcción
 │   ├── views/        # Escenarios, lógica, procesos, desarrollo y física
-│   ├── api-contract.md # Referencia HTTP transversal
-│   └── openapi/      # Contrato procesable
+│   └── openapi/      # Referencia HTTP y contrato procesable
 ├── governance/    # Criterios transversales para mantener la documentación
 ├── user-manual/   # Entrada, capítulos e imágenes del manual
 ├── requirements/  # Entrada, requisitos, casos de uso e imágenes
@@ -44,9 +43,9 @@ docs/
 
 | Familia | Artefacto principal | Artefactos complementarios | Evidencia generada |
 | --- | --- | --- | --- |
-| Arquitectura, construcción y datos | [Documento de arquitectura y construcción](architecture/index.md) | [Descripción de arquitectura](architecture/views/index.md), [modelo persistente](architecture/views/logical/data-and-persistence/index.md), [contrato API](architecture/api-contract.md), [navegación web](architecture/views/scenarios/web-navigation-and-screen-catalog/index.md), referencias de [backend](architecture/views/development/backend-technical-documentation/index.md) y [frontend](architecture/views/development/frontend-technical-documentation/index.md), [secuencias](architecture/views/processes/backend-code-sequences/index.md), [diagramas](architecture/views/development/code-diagrams/index.md) y [patrones](architecture/views/development/design-and-construction-patterns/index.md) | [Mapa del código](architecture/views/development/code-map.md), [esquema de base de datos](architecture/views/logical/data-and-persistence/generated/database-schema.md) y [diccionario técnico](architecture/views/logical/data-and-persistence/generated/data-dictionary.md) |
-| Dominio y requisitos | [Índice y portada del paquete](requirements/index.md); la [SRS](requirements/requirements-specification/index.md) y las [fichas de casos de uso](requirements/use-cases/index.md) son las fuentes normativas complementarias | [Visión y alcance](requirements/vision-scope-and-requirements/index.md), [dominio y casos de uso](requirements/domain-and-use-cases/index.md), [matriz de operaciones](requirements/requirements-operations-matrix.md) y [glosario](requirements/business-glossary.md) | No aplica; el estado funcional requiere revisión humana |
-| Pruebas | [Estrategia de pruebas](testing/service-test-coverage.md) | [Plan de pruebas](testing/test-plan.md), [cobertura automatizada relevante por caso de uso](testing/use-case-test-types.md), [ambiente, estrategia y catálogo unitario](testing/unit-test-catalog.md), y [resultados unitarios](testing/unit-test-results.md) de la última ejecución verificada | La evidencia ejecutable vive en `tests`; el catálogo y el resumen versionado complementan la salida de Vitest/CI |
+| Arquitectura, construcción y datos | [Documento de arquitectura y construcción](architecture/index.md) | [Descripción de arquitectura](architecture/views/index.md), [modelo persistente](architecture/views/logical/data-and-persistence/index.md), [contrato API](architecture/openapi/api-contract.md), [navegación web](architecture/views/scenarios/web-navigation-and-screen-catalog/index.md), referencias de [backend](architecture/views/development/backend-technical-documentation/index.md) y [frontend](architecture/views/development/frontend-technical-documentation/index.md), [secuencias](architecture/views/processes/backend-code-sequences/index.md), [diagramas](architecture/views/development/code-diagrams/index.md) y [patrones](architecture/views/development/design-and-construction-patterns/index.md) | [Mapa del código](architecture/views/development/code-map.md), [esquema de base de datos](architecture/views/logical/data-and-persistence/generated/database-schema.md) y [diccionario técnico](architecture/views/logical/data-and-persistence/generated/data-dictionary.md) |
+| Dominio y requisitos | [Índice y portada del paquete](requirements/index.md); la [SRS](requirements/requirements-specification/index.md) y las [fichas de casos de uso](requirements/use-cases/index.md) son las fuentes normativas complementarias | [Visión y alcance](requirements/vision-scope-and-requirements/index.md), [dominio y casos de uso](requirements/domain-and-use-cases/index.md) y [glosario](requirements/business-glossary.md) | No aplica; el estado funcional requiere revisión humana |
+| Pruebas | [Estrategia de pruebas](testing/service-test-coverage.md) | [Plan de pruebas](testing/test-plan.md), [cobertura automatizada relevante por caso de uso](testing/use-case-test-types.md), [catálogo de pruebas unitarias](testing/unit-test-catalog.md) | La evidencia ejecutable vive en `tests`; CI conserva el resultado de cada push sin versionar una instantánea obsoleta |
 | Gobierno documental | [Normas y criterios](governance/documentation-standards/index.md) | [Registro de aplicación de normas](governance/standards-application/index.md) | No aplica |
 
 La [guía de publicación y versionado](governance/publication-and-versioning/index.md) define
@@ -58,8 +57,9 @@ exclusivamente por actor desde `user-manual/actors/`; comparten
 conserva su propia portada y selección de casos. No se mantiene un manual general que mezcle recorridos y permisos.
 
 El manual incluye una [matriz de validación y modos de formulario](user-manual/form-validation-matrix.md)
-como referencia operativa exportable. La matriz de operaciones de requisitos sigue siendo la
-fuente normativa de capacidades y permisos; ambas matrices responden preguntas distintas.
+como referencia operativa exportable. Los modos y efectos normativos permanecen en la
+[SRS](requirements/requirements-specification/06-operation-modes-and-effects.md); las
+interfaces y autorizaciones técnicas se verifican en arquitectura, OpenAPI y el servidor.
 
 Un artefacto puede apoyar más de una familia, pero conserva una sola responsabilidad.
 Los diagramas se mantienen junto a la vista o regla que explican, en lugar de repetir
@@ -81,7 +81,7 @@ identificador para explicar su realización. Los diagramas de secuencia de front
 backend no son una segunda descripción del caso: muestran cómo colaboran las piezas de
 la solución para satisfacerlo. Esta separación permite cambiar una decisión técnica sin
 reescribir el objetivo del actor y cambiar un requisito obligando a revisar su impacto
-arquitectónico mediante la matriz de trazabilidad.
+arquitectónico mediante los identificadores compartidos por componentes, secuencias y pruebas.
 
 ### Tipos de mantenimiento
 
