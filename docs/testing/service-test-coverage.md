@@ -1,6 +1,11 @@
 # Estrategia y cobertura de pruebas de servicios
 
-Este documento resume qué servicios ya tienen pruebas y qué falta cubrir a nivel de integración. La intención es evitar listar como “faltante” un servicio que ya está cubierto por su propia suite o por una integración directa con la base de pruebas.
+Este documento resume qué servicios ya tienen pruebas y qué falta cubrir a nivel de
+integración. La intención es evitar listar como “faltante” un servicio que ya está
+cubierto por su propia suite o por una integración directa con la base de pruebas. La
+[matriz de diseño, ejecución y resultados por caso de uso](use-case-test-types.md) documenta
+para cada `CU-*` las pruebas ejecutadas, su tipo, los datos necesarios, el resultado esperado y el
+resultado obtenido.
 
 ## Servicios con pruebas actuales
 

@@ -265,6 +265,7 @@ const PUBLICATIONS = Object.freeze({
             pruebas: [
                 'docs/testing/test-plan.md',
                 'docs/testing/service-test-coverage.md',
+                'docs/testing/use-case-test-types.md',
                 'docs/testing/unit-test-catalog.md',
                 'docs/testing/unit-test-results.md'
             ]

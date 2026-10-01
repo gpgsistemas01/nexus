@@ -11,18 +11,25 @@ El inventario corresponde a la revisión indicada en el
 [registro de resultados](unit-test-results.md). Cuando se agrega, elimina o reclasifica
 un archivo de prueba, se actualizan conjuntamente este catálogo y ese registro.
 
+La revisión de valor retiró 39 archivos dedicados exclusivamente a aplicaciones con
+requests simulados, constantes/selectores, entrypoints/páginas, DataTable y otros
+plugins, DOM y componentes UI. Se conservan cuatro pruebas frontend de colecciones y
+validaciones porque comprueban reglas y fronteras de datos. La reducción no cambia el
+código de aplicación; concentra la suite en contratos con resultado funcional o técnico
+estable.
+
 ## Ficha de la suite unitaria
 
 La referencia estable de la ejecución completa es **`SU-UNIT-001` — Suite unitaria de
 Nexus**. El término *suite* designa aquí el conjunto seleccionado por Vitest; cada
 `*Test.js` es un archivo de prueba y cada `it` o fila materializada por `it.each` es un
-caso. Esta distinción evita presentar los 73 archivos como si fueran 73 ejecuciones
-independientes.
+caso. Esta distinción evita presentar cada uno de los 60 archivos como una ejecución
+independiente.
 
 | Campo | Definición de `SU-UNIT-001` |
 | --- | --- |
 | Objetivo | Detectar regresiones en reglas, transformaciones, decisiones, contratos entre capas y efectos observables que pueden aislarse de infraestructura real. |
-| Elemento bajo prueba | Módulos de servidor y navegador localizados por los 73 archivos de prueba inventariados en este documento. |
+| Elemento bajo prueba | Módulos de servidor y validadores frontend localizados por los 60 archivos de prueba inventariados en este documento. |
 | Orquestador | Script `test:unit` de `package.json`, con selección y exclusiones definidas en `vitestConfig.js`. |
 | Precondiciones | Dependencias instaladas mediante `npm ci`, runtime admitido y ejecución desde la raíz. No requiere servidor, navegador, Redis ni PostgreSQL activos. |
 | Preparación | Cada archivo construye fixtures y dobles locales; los hooks `beforeEach`/`afterEach` restablecen mocks o globals cuando corresponde. |
@@ -33,7 +40,7 @@ independientes.
 | Fuera de alcance | Persistencia real, migraciones, contrato HTTP con servicios reales, renderizado en navegador y pruebas manuales; corresponden a integración, esquema o validación manual. |
 
 La suite completa se referencia por `SU-UNIT-001` en resultados y solicitudes de
-cambio. Los grupos `SU-UNIT-001-G01` a `SU-UNIT-001-G15` permiten indicar qué parte se
+cambio. Los grupos `SU-UNIT-001-G01` a `SU-UNIT-001-G10` permiten indicar qué parte se
 afecta o se ejecuta de forma focalizada sin inventar una suite distinta para cada
 archivo.
 
@@ -48,9 +55,9 @@ archivo.
 | Ambiente Vitest | Ambiente `node` predeterminado. No se configura `jsdom` ni un navegador real. |
 | Estado compartido | No hay `setupFiles`, `globalSetup` ni `teardown` en `vitestConfig.js`; cada suite prepara y restaura sus dobles y globals. |
 | Base de datos | Las unitarias no requieren migraciones ni una conexión real. Prisma, transacciones y servicios colaboradores se sustituyen cuando forman parte del borde de la unidad. La persistencia real pertenece a `npm run test:integration`. |
-| Interfaz web | Las suites crean stubs mínimos de `window`, `document`, jQuery o plugins. No validan renderizado en un motor de navegador. |
+| Interfaz web | Sólo se conservan funciones puras de colecciones y validación; no se simulan DOM, plugins ni renderizado. |
 | HTTP | Los controllers que requieren el borde HTTP reutilizan `createControllerTestApp` y Supertest con servicios simulados; no levantan el servidor completo ni abren un puerto. |
-| Red y servicios externos | No son precondición de la suite. Requests, plugins y dependencias externas se reemplazan por dobles controlados. |
+| Red y servicios externos | No son precondición de la suite. Las dependencias externas se reemplazan por dobles controlados. |
 
 Para reproducir el ambiente se ejecuta `npm ci` con una versión admitida de Node.js y,
 desde la raíz del repositorio, `npm run test:unit`. La evidencia de una entrega registra
@@ -61,7 +68,7 @@ desviación del ambiente anterior.
 
 | Estrategia | Técnica | Aplicación en los casos |
 | --- | --- | --- |
-| Aislamiento de unidad | Mocks, spies, stubs y funciones inyectadas | Sustituir Prisma, servicios, requests y plugins; verificar retorno, error, argumentos y ausencia de efectos no permitidos. |
+| Aislamiento de unidad | Mocks, spies, stubs y funciones inyectadas | Sustituir Prisma, servicios y dependencias; verificar retorno, error, argumentos y ausencia de efectos no permitidos. |
 | Partición de equivalencia | Casos válidos, inválidos, ausentes y de estado | Separar caminos aceptados y rechazados en DTO, validadores, permisos, controllers y reglas de interfaz. |
 | Análisis de valores frontera | Cero, negativos, máximos, precisión decimal y colecciones vacías | Probar cantidades, costos, existencias, retornos y campos obligatorios en sus límites. |
 | Tablas de decisión | `it.each` y matrices de rol, departamento, estado o contexto | Verificar combinaciones sin duplicar preparación y mantener visible el resultado esperado de cada fila. |
@@ -80,21 +87,16 @@ declaran expresamente.
 | --- | --- | --- | --- |
 | `SU-UNIT-001-G01` Permisos | `tests/unit/constants/permissionsTest.js` (1) | Acceso permitido y denegado por combinación de rol y departamento. | Tabla de decisión; particiones positivas y negativas. |
 | `SU-UNIT-001-G02` Controllers de almacén | `tests/unit/controllers/api/warehouse/*Test.js` (8) | Recepciones, salidas, materiales, mermas, reportes, registro y eventos posteriores; respuestas exitosas, validaciones, inexistencia y fallos de colaboradores. | Harness HTTP o invocación aislada, servicios simulados, spies y pruebas negativas/de interacción. |
-| `SU-UNIT-001-G03` DTO | `tests/unit/dtos/*Test.js` (2) | Normalización y conservación de datos de recepción y merma, incluidos valores opcionales y decimales. | Partición de equivalencia y valores frontera sobre funciones puras. |
+| `SU-UNIT-001-G03` DTO | `tests/unit/dtos/*Test.js` (3) | Normalización y conservación de datos de recepción y merma, incluidos valores opcionales y decimales. | Partición de equivalencia y valores frontera sobre funciones puras. |
 | `SU-UNIT-001-G04` Inventario y transacción | `tests/unit/helpers/rollbackTransactionTest.js`, `tests/unit/inventory/*Test.js` y `tests/unit/warehouse/goodsReceiptHelpersTest.js` (4) | Commit/rollback controlado, movimientos, cálculo y validación de existencias, y transformaciones de detalles de recepción. | Dobles del cliente transaccional, fronteras numéricas y prueba negativa de fallo. |
-| `SU-UNIT-001-G05` Aplicaciones cliente | `tests/unit/public/js/application/**/*Test.js` (7) | Fábricas CRUD y reportes, configuraciones de catálogos/contextos, materiales y salidas; payloads, callbacks, reutilización y errores. | Inyección de configuración y requests simulados; interacción y tablas de contexto. |
-| `SU-UNIT-001-G06` Constantes cliente | `tests/unit/public/js/constants/*Test.js` (2) | Mensajes de recepción y selectores públicos esperados por consumidores. | Prueba de contrato exportado y particiones por mensaje/contexto. |
-| `SU-UNIT-001-G07` Páginas cliente | `tests/unit/public/js/pages/**/*Test.js` (2) | Edición de detalles de recepción y ciclo del modal de merma. | Stubs mínimos del DOM, eventos/callbacks observables y transiciones de modo. |
-| `SU-UNIT-001-G08` DataTable | `tests/unit/public/js/plugins/datatable/**/*Test.js` (10) | Acciones, operaciones, filtros, dependencias, estado, inventario, columnas/encabezados/reglas de detalles y filas de material. | Datos tabulados, callbacks simulados y transformaciones puras; casos vacíos, activos y editables. |
-| `SU-UNIT-001-G09` Plugins de fecha, MDB y Select2 | `tests/unit/public/js/plugins/flatpickr/*Test.js`, `tests/unit/public/js/plugins/mdb/*Test.js` y `tests/unit/public/js/plugins/select2/**/*Test.js` (6) | Inicialización y reutilización de instancias, selección de merma/material y sincronización de valores. | Dobles de plugin, `window`/`document` controlados, spies y equivalencias con/sin selección. |
-| `SU-UNIT-001-G10` Interfaz cliente | `tests/unit/public/js/ui/**/*Test.js` (5) | Estado de formularios, totales, modal/selector de inventario y permisos de edición de salidas según estado. | Stubs del DOM, tablas de estado y verificación de propiedades/callbacks observables. |
-| `SU-UNIT-001-G11` Utilidades y validadores cliente | `tests/unit/public/js/utils/**/*Test.js` (5) | Colecciones de detalles, operaciones DOM y validaciones de recepción, material y merma. | Funciones puras o DOM mínimo; equivalencias, fronteras y entradas ausentes. |
-| `SU-UNIT-001-G12` Rutas | `tests/unit/routes/api/warehouse/*Test.js` y `tests/unit/routes/web/warehouse/*Test.js` (3) | Orden de middleware, autorización y enlace de controllers para merma y salida de merma. | Router aislado, spies y decisiones de acceso positivas/negativas. |
-| `SU-UNIT-001-G13` Servicios | `tests/unit/services/**/*Test.js` (10) | Identidad y consulta de movimientos, detalles de salidas, factura de recepción, relación proveedor-material, reportes, listado/material/snapshot de merma. | Prisma y colaboradores simulados; fronteras, errores, argumentos y ausencia de colaboración inválida. |
-| `SU-UNIT-001-G14` Utilidades de servidor | `tests/unit/utils/*Test.js` (5) | Formato, exportación Excel, query/paginación, relaciones de selección e identidad canónica del inventario. | Funciones puras, tablas de entrada, colecciones vacías y valores frontera. |
-| `SU-UNIT-001-G15` Validadores de servidor | `tests/unit/validators/*Test.js` (4) | Precisión decimal, detalles de compra, cantidad de devolución y obligatoriedad de campos. | Clases de equivalencia y análisis de límites con casos aceptados y rechazados. |
+| `SU-UNIT-001-G05` Utilidades y validadores cliente | `tests/unit/public/js/utils/**/*Test.js` (4) | Colecciones de detalles y validaciones de recepción, material y merma. | Funciones puras; equivalencias, fronteras y entradas ausentes. |
+| `SU-UNIT-001-G06` Rutas | `tests/unit/routes/**/*Test.js` (6) | Orden de middleware, autorización y enlace de controllers para personas, clientes, merma y salida de merma. | Router aislado, spies y decisiones de acceso positivas/negativas. |
+| `SU-UNIT-001-G07` Servicios | `tests/unit/services/**/*Test.js` (12) | Identidad y consulta de movimientos, detalles de salidas, factura de recepción, relación proveedor-material, reportes, listado/material/snapshot de merma. | Prisma y colaboradores simulados; fronteras, errores, argumentos y ausencia de colaboración inválida. |
+| `SU-UNIT-001-G08` Utilidades de servidor | `tests/unit/utils/*Test.js` (5) | Formato, exportación Excel, query/paginación, relaciones de selección e identidad canónica del inventario. | Funciones puras, tablas de entrada, colecciones vacías y valores frontera. |
+| `SU-UNIT-001-G09` Validadores de servidor | `tests/unit/validators/*Test.js` (6) | Precisión decimal, detalles de compra, cantidad de devolución y obligatoriedad de campos. | Clases de equivalencia y análisis de límites con casos aceptados y rechazados. |
+| `SU-UNIT-001-G10` Scripts documentales | `tests/unit/scripts/*Test.js` (11) | Formatos y salida de exportación, imágenes, Mermaid, PDF e inventario/recuperación de capturas. | Funciones aisladas, fixtures temporales, equivalencias de argumentos y pruebas negativas de herramientas ausentes. |
 
-La suite contiene **73 archivos de prueba**. El número de casos puede cambiar cuando se
+La suite contiene **60 archivos de prueba**. El número de casos puede cambiar cuando se
 amplían tablas parametrizadas; el conteo efectivo y su estado se toman siempre de la
 ejecución de Vitest registrada, no de una suma manual de llamadas a `it`.
 
@@ -105,7 +107,7 @@ explícita su correspondencia con el formato del [plan de pruebas](test-plan.md)
 grupo recibe un ID `DP-UNIT-GNN`; sus casos son los `it` y las filas de `it.each` de los
 archivos indicados, identificados documentalmente como `CP-UNIT-GNN-*`. El asterisco no
 es un caso genérico: remite al nombre completo que Vitest materializa como evidencia
-ejecutable y evita mantener una segunda copia de los 295 nombres.
+ejecutable y evita mantener una segunda copia de los 281 nombres.
 
 Todos los casos comparten las precondiciones, el ambiente y la limpieza de la ficha
 `SU-UNIT-001`. La siguiente tabla agrega los datos variables y el resultado esperado de
@@ -118,17 +120,12 @@ otro antes de registrar su ejecución.
 | `DP-UNIT-G02` / `CP-UNIT-G02-*` | Contrato HTTP aislado de controllers de almacén en caminos exitosos, límites y fallos. | Requests con filtros, DTO válidos o manipulados, valores máximos, IDs existentes/inexistentes y errores de servicios simulados. | Status/body y argumentos enviados al servicio coinciden con el contrato; campos no permitidos se descartan y los efectos posteriores sólo ocurren tras el éxito. |
 | `DP-UNIT-G03` / `CP-UNIT-G03-*` | Normalización y conservación de identidad en DTO de entradas y mermas. | Facturas con variantes de formato, nombres, IDs, detalles repetidos, opcionales y decimales. | El DTO produce el payload normalizado esperado sin fusionar ni perder identidades o partidas válidas. |
 | `DP-UNIT-G04` / `CP-UNIT-G04-*` | Cálculo de stock/movimientos y frontera transaccional ante éxito o error. | Cantidades con/sin dimensiones, cero, decimales, stock suficiente/insuficiente y callbacks que resuelven o lanzan error. | Cálculos y agrupaciones conservan los detalles; la transacción revierte siempre y propaga el error original cuando corresponde. |
-| `DP-UNIT-G05` / `CP-UNIT-G05-*` | Reutilización del contrato CRUD/reporte por cada contexto de aplicación cliente. | Configuraciones de catálogo, materiales, salidas y reportes; respuestas presentes/ausentes, IDs y payloads por contexto. | Cada instancia conserva aislamiento, adapta sólo las claves configuradas y envía el request/callback esperado sin duplicar el contrato común. |
-| `DP-UNIT-G06` / `CP-UNIT-G06-*` | Contrato público de mensajes y selectores consumidos por la interfaz. | Contextos y claves exportadas de recepción y selectores. | Las claves resuelven el mensaje o selector contractual esperado para cada consumidor. |
-| `DP-UNIT-G07` / `CP-UNIT-G07-*` | Transiciones de modo en páginas de detalle y modal. | Detalles de recepción y apertura/cierre del modal de merma con DOM simulado. | La edición actualiza el detalle correcto y el modal restaura el estado observable al cambiar de modo. |
-| `DP-UNIT-G08` / `CP-UNIT-G08-*` | Decisiones de columnas, acciones, filtros y filas en DataTable. | Modos crear/editar/devolver, estados pendiente/surtido/cancelado, permisos, filas vacías/activas y filtros dependientes. | Sólo aparecen acciones y columnas permitidas; filtros, dependencias, estado y transformaciones producen los valores esperados sin mutación accidental. |
-| `DP-UNIT-G09` / `CP-UNIT-G09-*` | Inicialización, reutilización y sincronización de plugins de fecha, MDB y Select2. | Instancia existente/ausente, selección con/sin valor, inputs de texto/número y estado habilitado/deshabilitado. | Se crea o reutiliza una sola instancia y el valor/estado se refleja en el input y wrapper correspondientes. |
-| `DP-UNIT-G10` / `CP-UNIT-G10-*` | Estado contractual de formularios, resumen e inventario según modo y estado documental. | Alta/edición, documento pendiente/cancelado, selección presente/ausente y detalles nuevos/existentes. | Identidad, campos, totales, permisos y callbacks quedan habilitados, bloqueados, completados o limpiados según la regla. |
-| `DP-UNIT-G11` / `CP-UNIT-G11-*` | Colecciones, DOM y validaciones de entradas, materiales y mermas. | Colecciones vacías o repetidas, IDs de cliente/documento, campos ausentes/válidos y valores de frontera. | Se agrega, sustituye o elimina el renglón correcto sin afectar otros; selectores y validadores devuelven la configuración o error esperado. |
-| `DP-UNIT-G12` / `CP-UNIT-G12-*` | Orden de middleware, autorización y enlace de handlers en rutas de merma. | Requests por rol/departamento y spies de middleware/controller para rutas API y web. | El acceso autorizado alcanza el handler en el orden previsto y el no autorizado se rechaza antes del controller. |
-| `DP-UNIT-G13` / `CP-UNIT-G13-*` | Reglas y consultas de servicios con persistencia sustituida. | Identidades completas/incompletas, filtros, snapshots, relaciones, facturas duplicadas/no duplicadas y errores Prisma simulados. | Retorno y argumentos Prisma respetan filtros y relaciones; entradas inválidas o fallos no disparan colaboraciones posteriores. |
-| `DP-UNIT-G14` / `CP-UNIT-G14-*` | Transformación compartida de formatos, Excel, queries e identidad de inventario. | Mes válido/inválido o bisiesto, paginación negativa, rangos, fórmulas, relaciones serializadas y colecciones vacías. | Fechas, filtros, filas, fórmulas y representación canónica coinciden con el contrato y usan defaults seguros. |
-| `DP-UNIT-G15` / `CP-UNIT-G15-*` | Clases de equivalencia y fronteras de validadores del servidor. | Campo ausente/nulo/válido, cantidad positiva/no positiva y decimales dentro/fuera de precisión. | Cada valor válido se acepta; cada clase inválida devuelve el código correspondiente sin aceptar datos fuera del límite. |
+| `DP-UNIT-G05` / `CP-UNIT-G05-*` | Colecciones y validaciones de entradas, materiales y mermas. | Colecciones vacías o repetidas, IDs de cliente/documento, campos ausentes/válidos y valores de frontera. | Se agrega, sustituye o elimina el renglón correcto sin afectar otros; los validadores devuelven la configuración o error esperado. |
+| `DP-UNIT-G06` / `CP-UNIT-G06-*` | Orden de middleware, autorización y enlace de handlers en rutas de merma. | Requests por rol/departamento y spies de middleware/controller para rutas API y web. | El acceso autorizado alcanza el handler en el orden previsto y el no autorizado se rechaza antes del controller. |
+| `DP-UNIT-G07` / `CP-UNIT-G07-*` | Reglas y consultas de servicios con persistencia sustituida. | Identidades completas/incompletas, filtros, snapshots, relaciones, facturas duplicadas/no duplicadas y errores Prisma simulados. | Retorno y argumentos Prisma respetan filtros y relaciones; entradas inválidas o fallos no disparan colaboraciones posteriores. |
+| `DP-UNIT-G08` / `CP-UNIT-G08-*` | Transformación compartida de formatos, Excel, queries e identidad de inventario. | Mes válido/inválido o bisiesto, paginación negativa, rangos, fórmulas, relaciones serializadas y colecciones vacías. | Fechas, filtros, filas, fórmulas y representación canónica coinciden con el contrato y usan defaults seguros. |
+| `DP-UNIT-G09` / `CP-UNIT-G09-*` | Clases de equivalencia y fronteras de validadores del servidor. | Campo ausente/nulo/válido, cantidad positiva/no positiva y decimales dentro/fuera de precisión. | Cada valor válido se acepta; cada clase inválida devuelve el código correspondiente sin aceptar datos fuera del límite. |
+| `DP-UNIT-G10` / `CP-UNIT-G10-*` | Contratos de los scripts de publicación y capturas documentales. | Formatos solicitados, archivos temporales, imágenes válidas/inválidas, disponibilidad de convertidores y estados de recuperación. | Cada helper produce el plan o recurso esperado y rechaza argumentos, geometrías o herramientas no válidas sin ocultar el fallo. |
 
 La acción reproducible de cada `CP-UNIT-*` es la invocación descrita por su nombre
 `it`; el detalle de fixtures permanece junto a esa invocación. El registro de ejecución
@@ -147,30 +144,24 @@ que se incorpore y catalogue una prueba.
 flowchart TB
     SU[SU-UNIT-001<br/>Suite unitaria]
     SU --> BE[Servidor]
-    SU --> FE[Navegador simulado]
     SU --> CT[Contratos transversales]
 
     BE --> G02[G02 Controllers HTTP]
     BE --> G03[G03 DTO]
     BE --> G04[G04 Inventario y transacción]
-    BE --> G12[G12 Rutas]
-    BE --> G13[G13 Servicios]
-    BE --> G14[G14 Utilidades]
-    BE --> G15[G15 Validadores]
+    BE --> G06[G06 Rutas]
+    BE --> G07[G07 Servicios]
+    BE --> G08[G08 Utilidades]
+    BE --> G09[G09 Validadores]
 
-    FE --> G05[G05 Aplicaciones CRUD]
-    FE --> G07[G07 Páginas]
-    FE --> G08[G08 DataTable]
-    FE --> G09[G09 Plugins]
-    FE --> G10[G10 Interfaz]
-    FE --> G11[G11 Utilidades y validadores]
 
     CT --> G01[G01 Permisos]
-    CT --> G06[G06 Mensajes y selectores]
+    CT --> G05[G05 Validadores cliente]
+    CT --> G10[G10 Scripts documentales]
 ```
 
 **Propósito:** identificar qué debe comprobar la suite y ubicar su ficha de diseño.
-**Alcance:** los 15 grupos y 73 archivos seleccionados por `vitestConfig.js`.
+**Alcance:** los 10 grupos y 60 archivos seleccionados por `vitestConfig.js`.
 **Fuente:** tabla de grupos, archivos `tests/unit/**/*Test.js` y configuración de
 Vitest. **Límite:** muestra cobertura estructural documentada, no porcentaje de código,
 persistencia real, navegador real ni integración entre capas.

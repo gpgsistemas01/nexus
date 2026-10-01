@@ -72,10 +72,6 @@ Los índices de cada vista conducen a sus colecciones sin duplicar contenido. Lo
 de uso continúan en requisitos: la vista de escenarios los referencia, pero no adquiere
 su propiedad normativa.
 
-El criterio transversal y el resultado de la revisión de índices se mantienen en el
-[índice general de documentación](../README.md#criterio-y-revisión-de-los-índices);
-arquitectura sólo conserva aquí la navegación propia de su paquete.
-
 ## Recorridos de lectura
 
 1. Para comprender el sistema: [vista física](views/physical/index.md) →
