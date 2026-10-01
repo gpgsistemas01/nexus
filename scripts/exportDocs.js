@@ -262,7 +262,8 @@ const PUBLICATIONS = Object.freeze({
                 'docs/testing/test-plan.md',
                 'docs/testing/service-test-coverage.md',
                 'docs/testing/use-case-test-types.md',
-                'docs/testing/unit-test-catalog.md'
+                'docs/testing/unit-test-catalog.md',
+                'docs/testing/automated-test-case-index.md'
             ]
         }
     }
