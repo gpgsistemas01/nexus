@@ -2,7 +2,7 @@
 
 Cada `CU-*` muestra la ejecución del servidor desde la interacción de entrada hasta la
 respuesta y sus efectos. El objetivo y el flujo de negocio permanecen en los
-[casos de uso](../../../../requirements/domain-and-use-cases/03-cases-of-use-current.md).
+[casos de uso](../../../../requirements/domain-and-use-cases/03-current-use-cases.md).
 Esta colección es la evidencia detallada caso–código; la documentación técnica conserva
 responsabilidades y decisiones reutilizables sin mantener una segunda matriz equivalente.
 

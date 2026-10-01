@@ -140,9 +140,8 @@ flowchart LR
 El grupo de **Almacén** concentra los casos operativos de material y merma porque comparten
 actor, reglas de inventario, ciclo de consulta y operación sobre la misma área funcional.
 Los recursos comerciales y de configuración quedan para `CAT`, mientras los documentos de
-entrada y salida mantienen su propio grupo de negocio. La numeración `CU-ALM-*` sustituye en
-este ámbito el uso previo de `CU-CAT-*` para material y merma, sin cambiar la intención del
-objetivo ni la lógica del flujo.
+entrada y salida mantienen su propio grupo de negocio. Los identificadores vigentes de este
+grupo usan la familia estable `CU-ALM-*`.
 
 ### Grupo funcional CAT — Catálogos
 

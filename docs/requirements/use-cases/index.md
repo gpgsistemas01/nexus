@@ -3,14 +3,16 @@
 ## Propósito y alcance
 
 Este catálogo desarrolla los objetivos representados en el
-[diagrama de casos de uso](../domain-and-use-cases/03-cases-of-use-current.md). Agrupa los
+[diagrama de casos de uso](../domain-and-use-cases/03-current-use-cases.md). Agrupa los
 casos que comparten tema, actor, ciclo CRUD o efectos de inventario para revisar sus
-semejanzas sin crear un documento por módulo.
+semejanzas sin concentrar recorridos distintos en una sola ficha. Cada `CU-*` conserva
+su propio archivo y los índices de grupo reúnen únicamente navegación y reglas comunes.
 
 Las descripciones expresan comportamiento de negocio, no endpoints ni permisos. La
 [matriz de operaciones](../requirements-operations-matrix.md) detalla operaciones y
 permisos; la [especificación de requisitos](../requirements-specification/index.md) contiene
-criterios verificables, reglas y evidencia técnica. Una capacidad parcial, modelada o
+criterios verificables y reglas. La evidencia técnica pertenece a arquitectura y pruebas,
+enlazadas mediante la matriz de trazabilidad. Una capacidad parcial, modelada o
 fuera de alcance no se incorpora como caso vigente.
 
 Las descripciones **sí nombran el objeto de negocio** cuando permite distinguir el
