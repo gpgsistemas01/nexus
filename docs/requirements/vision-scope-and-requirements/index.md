@@ -18,6 +18,5 @@ la solución técnica. Esas responsabilidades pertenecen respectivamente a la
 7. [7. Criterios de calidad para redactar requisitos](07-quality-criteria-for-requirements.md)
 8. [8. Alcance funcional por grupo](08-functional-scope-by-group.md)
 9. [9. Alcance de datos y calidad](09-data-and-quality-scope.md)
-10. [10. Matriz de trazabilidad resumida](10-summary-traceability-matrix.md)
-11. [11. Brechas conocidas y decisiones pendientes](11-known-gaps-and-pending-decisions.md)
-12. [12. Criterio para mantener este documento](12-document-maintenance-criteria.md)
+10. [10. Brechas conocidas y decisiones pendientes](10-known-gaps-and-pending-decisions.md)
+11. [11. Criterio para mantener este documento](11-document-maintenance-criteria.md)

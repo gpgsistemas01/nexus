@@ -1,4 +1,4 @@
-# 11. Brechas conocidas y decisiones pendientes
+# 10. Brechas conocidas y decisiones pendientes
 
 1. **Proyectos sin CRUD.** `Project` participa en salidas, pero no tiene
    rutas ni servicio de administración. Debe definirse su fuente de datos y responsable.
