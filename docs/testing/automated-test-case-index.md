@@ -12,12 +12,12 @@ de mermas, stock y movimientos, surtido/devolución, y todas las integraciones. 
 unitarias permanecen en la suite y en la matriz por caso de uso cuando aportan evidencia
 funcional, sin transcribir cada `it`.
 
-## Niveles y ambiente
+## Ambiente de pruebas
 
-| Nivel | Alcance | Ambiente y comando |
+| Suite | Ambiente | Comando |
 | --- | --- | --- |
-| Unitario | Regla o colaboración aislada; no demuestra persistencia real. | Node.js 22–24 y Vitest, sin base real; `npm run test:unit`. |
-| Integración | HTTP, controller, servicios y Prisma; no es una prueba de navegador o aceptación. | `NODE_ENV=test`, PostgreSQL aislado en `DATABASE_TEST_URL`, migraciones y ejecución serial; `npm run test:integration`. |
+| Unitaria | Node.js 22–24 y Vitest, sin base de datos real; dependencias externas simuladas cuando corresponde. | `npm run test:unit` |
+| Integración | `NODE_ENV=test`, PostgreSQL aislado en `DATABASE_TEST_URL`, migraciones aplicadas y ejecución serial. La URL debe ser distinta de `DATABASE_URL`. | `npm run test:integration` |
 
 Los resultados de cada ejecución se conservan en CI o en la solicitud de cambio. La
 configuración y limpieza del ambiente de integración siguen el [plan de
