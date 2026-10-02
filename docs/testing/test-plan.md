@@ -9,7 +9,9 @@
 ## Objetivo y alcance
 
 Este plan es la fuente de verdad de la estrategia, las técnicas, la ubicación, la
-cobertura CRUD mínima y la ejecución de pruebas de Nexus. La
+cobertura CRUD mínima y la ejecución de pruebas de Nexus. El
+[registro selectivo de casos automatizados](automated-test-case-index.md) conserva las
+fichas que necesitan trazabilidad documental por su riesgo, mientras la
 [cobertura por caso de uso](use-case-test-types.md) es una vista complementaria de la
 evidencia funcional vigente y de sus brechas.
 
@@ -24,12 +26,12 @@ los artefactos y 29119-4 para las técnicas de diseño, sin declarar conformidad
 
 Nexus separa tres registros para no confundir lo que se planeó con lo que realmente se
 ejecutó. En una prueba automatizada, el archivo, sus fixtures y sus nombres
-`describe`/`it` son la implementación ejecutable; el
-[índice de casos automatizados](automated-test-case-index.md) documenta cada caso con la
-ficha definida en este plan. La vista por caso de uso enlaza sólo la evidencia funcional
-relevante. Una prueba manual o una validación de aceptación sin archivo ejecutable
-conserva las tres tablas en la incidencia o en un documento de la familia
-`docs/testing`.
+`describe`/`it` son la especificación ejecutable y la fuente de verdad de sus datos y
+aserciones. El [registro selectivo](automated-test-case-index.md) añade una ficha sólo
+para los casos que requieren trazabilidad estable fuera del código. La vista por caso de
+uso enlaza únicamente la evidencia funcional relevante. Una prueba manual o una
+validación de aceptación sin archivo ejecutable conserva las tres tablas en la
+incidencia o en un documento de la familia `docs/testing`.
 
 ### 1. Diseño y trazabilidad
 
@@ -43,7 +45,8 @@ resultados independientes.
 
 ### 2. Especificación del caso y datos
 
-Cada caso registra al menos los datos de entrada y el resultado esperado que permiten
+Cada caso que requiere ficha documental registra al menos los datos de entrada y el
+resultado esperado que permiten
 decidir objetivamente si pasa. En operaciones de escritura, los datos de prueba deben
 identificar los valores que se intentan registrar y el resultado esperado debe indicar
 tanto la respuesta que devuelve el sistema como los datos que deben quedar persistidos
@@ -65,16 +68,16 @@ repeticiones.
 | --- | --- | --- | --- | --- | --- | --- |
 | `EP-NNN` | ID del caso, `SU-*`, ruta o comando focalizado | Commit, Node/Vitest, SO y servicios usados | Fecha y persona o CI | Conteos y observación obtenida | Aprobado, fallido, bloqueado o no ejecutado | Salida de CI, consulta verificable o incidencia |
 
-El [índice de casos automatizados](automated-test-case-index.md) registra las fichas de
-las pruebas escritas en el código. El [resumen por caso de uso](use-case-test-types.md)
-registra únicamente su trazabilidad funcional. Los resultados reales se conservan en
-CI o en la solicitud de cambio, no en un archivo versionado.
+El [registro selectivo de casos automatizados](automated-test-case-index.md) registra las
+fichas que justifican documentación adicional. El [resumen por caso de
+uso](use-case-test-types.md) registra únicamente su trazabilidad funcional. Los
+resultados reales se conservan en CI o en la solicitud de cambio, no en un archivo
+versionado.
 
-Al agregar, eliminar o modificar un `it` o una fila materializada por `it.each`, se
-actualiza en el mismo cambio su ficha `CP-*`: precondiciones, datos, acción, resultado
-esperado y limpieza. El identificador permanece estable mientras el objetivo del caso
-no cambie; un objetivo nuevo recibe un identificador nuevo y un caso retirado se elimina
-del índice.
+No se replica cada `it`: se documentan las integraciones HTTP/Prisma, las unitarias de
+autorización o integridad crítica y los criterios de aceptación que necesiten un
+identificador estable. Las variaciones de una misma regla pueden compartir ficha; las
+demás pruebas permanecen descritas por su nombre y aserciones ejecutables.
 
 ## Cobertura CRUD mínima
 
@@ -94,16 +97,19 @@ stock, movimientos, detalles y rollback cuando esos efectos formen parte del flu
 
 ## Niveles y ubicación
 
-| Nivel | Ubicación | Uso |
-| --- | --- | --- |
-| Unitario | `tests/unit/<ruta paralela al código>` | reglas, límites, decisiones y transformaciones de un registro o consulta |
-| Integración | `tests/integration/controllers` | CRUD por HTTP con servicios reales y comprobación mediante Prisma |
-| Esquema | migraciones sobre `DATABASE_TEST_URL` | restricciones, relaciones y atomicidad no demostrables con mocks |
-| Documentación | `npm run docs:check` | documentos generados sincronizados con código y Prisma |
+| Nivel | Ubicación | Alcance | Lo que no demuestra |
+| --- | --- | --- | --- |
+| Unitario | `tests/unit/<ruta paralela al código>` | Una regla, función o colaboración aislada; sustituye dependencias cuando corresponde. | Persistencia real ni el flujo completo entre capas. |
+| Integración | `tests/integration/controllers` | Request HTTP, controller, servicios y Prisma contra una base aislada. | Recorrido de navegador ni aceptación del usuario. |
 
 No se crea un nivel unitario para componentes visuales o infraestructura incidental.
 Si un helper compartido coordina datos CRUD, se prueba una vez en la ruta paralela a su
 módulo y los contextos reutilizan ese contrato.
+
+Las migraciones aplicadas sobre `DATABASE_TEST_URL` preparan el esquema para
+integración; `npm run docs:check` valida documentación. Son comprobaciones de soporte,
+no niveles adicionales de prueba funcional. Actualmente no existe una suite automatizada
+de sistema, navegador o aceptación; cuando se requiera, se registra de forma separada.
 
 ### Técnicas de diseño
 
@@ -118,9 +124,13 @@ crea otro inventario paralelo al índice de casos:
 | Transiciones y atomicidad | Cambios de estado, duplicidad, movimientos y rollback sin efectos parciales. |
 | Interacción y fallos | Contratos entre capas y detención de colaboradores posteriores ante un error. |
 
-### Estrategia de integración con base de datos
+### Ambiente de pruebas e integración con base de datos
 
-Las integraciones se ejecutan contra `DATABASE_TEST_URL`, guardan y consultan datos
+Las unitarias se ejecutan con Node.js 22–24 y Vitest, sin una base real. Las integraciones
+usan `NODE_ENV=test`, se ejecutan de forma serial y trabajan contra PostgreSQL mediante
+`DATABASE_TEST_URL`, que debe ser distinta de `DATABASE_URL`.
+
+Las integraciones guardan y consultan datos
 reales y limpian únicamente los fixtures identificables de su suite. La limpieza se
 realiza al preparar cada integración, en `afterAll` cuando el agregado lo requiera y,
 como red de seguridad, mediante `tests/teardownTestDatabase.js`. No se vacían catálogos
