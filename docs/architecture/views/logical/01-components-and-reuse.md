@@ -7,95 +7,46 @@ La vista muestra los componentes compartidos por `auth`, `admin`, `sales` y `war
 **Diagrama de componentes:** `DIA-ARQ-CMP-001`.
 
 ```mermaid
-classDiagram
-    direction LR
+flowchart LR
+    VisualComponents[["«component»<br/>VisualComponents<br/>Page, formularios, modales y tablas"]]
+    FrontendApplication[["«component»<br/>FrontendApplication<br/>CRUD, reportes y salidas por dominio"]]
+    HttpClient[["«component»<br/>HttpClient<br/>Servicios frontend y axiosInstanceApi"]]
+    SocketClient[["«component»<br/>SocketClient<br/>window.io e indexPage"]]
+    WebMvc[["«component»<br/>WebMvc<br/>Rutas web, controllers, EJS y layout"]]
+    StaticFiles[["«component»<br/>StaticFiles<br/>express.static"]]
+    ApiBoundary[["«component»<br/>ApiBoundary<br/>Rutas API, middleware, controllers y DTO"]]
+    DomainServices[["«component»<br/>DomainServices<br/>Reglas y transacciones por dominio"]]
+    SharedServices[["«component»<br/>SharedServices<br/>Auditoría, documentos e inventario"]]
+    Persistence[["«component»<br/>Persistence<br/>baseRepository y Prisma"]]
+    RealtimeServer[["«component»<br/>RealtimeServer<br/>socketUtils y publicación de eventos"]]
+    WebHttp(("«interface»<br/>WebHttp"))
+    StaticHttp(("«interface»<br/>StaticHttp"))
+    OperationalApi(("«interface»<br/>OperationalApi"))
+    RealtimeEvents(("«interface»<br/>RealtimeEvents"))
 
-    class VisualComponents {
-        <<component>>
-        Page, formularios, modales y tablas
-    }
-    class FrontendApplication {
-        <<component>>
-        CRUD, reportes y salidas por dominio
-    }
-    class HttpClient {
-        <<component>>
-        Servicios frontend y axiosInstanceApi
-    }
-    class SocketClient {
-        <<component>>
-        window.io e indexPage
-    }
-    class WebMvc {
-        <<component>>
-        Rutas web, controllers, EJS y layout
-    }
-    class StaticFiles {
-        <<component>>
-        express.static
-    }
-    class ApiBoundary {
-        <<component>>
-        Rutas API, middleware, controllers y DTO
-    }
-    class DomainServices {
-        <<component>>
-        Reglas y transacciones por dominio
-    }
-    class SharedServices {
-        <<component>>
-        Auditoría, documentos e inventario
-    }
-    class Persistence {
-        <<component>>
-        baseRepository y Prisma
-    }
-    class RealtimeServer {
-        <<component>>
-        socketUtils y publicación de eventos
-    }
-
-    class WebHttp {
-        <<interface>>
-        +renderPage()
-    }
-    class StaticHttp {
-        <<interface>>
-        +getAsset()
-    }
-    class OperationalApi {
-        <<interface>>
-        +requestJson()
-        +downloadBlob()
-    }
-    class RealtimeEvents {
-        <<interface>>
-        +inventoryUpdated(context)
-    }
-
-    VisualComponents ..> FrontendApplication : delegates
-    FrontendApplication ..> HttpClient : requires transport
-    SocketClient ..> VisualComponents : dispatches CustomEvent
-    WebHttp <|.. WebMvc : provides
-    VisualComponents ..> WebHttp : requires navigation and HTML
-    StaticHttp <|.. StaticFiles : provides
-    VisualComponents ..> StaticHttp : requires JS and CSS
-    OperationalApi <|.. ApiBoundary : provides
-    HttpClient ..> OperationalApi : requires
-    ApiBoundary ..> DomainServices : delegates
-    DomainServices ..> SharedServices : collaborates
-    DomainServices ..> Persistence : persists
-    SharedServices ..> Persistence : persists
-    RealtimeEvents <|.. RealtimeServer : provides
-    SocketClient ..> RealtimeEvents : requires
-    ApiBoundary ..> RealtimeServer : publishes after mutation
+    VisualComponents -.->|"delegates"| FrontendApplication
+    FrontendApplication -.->|"requires transport"| HttpClient
+    SocketClient -.->|"dispatches CustomEvent"| VisualComponents
+    WebMvc ---|"provides"| WebHttp
+    VisualComponents -.->|"requires navigation and HTML"| WebHttp
+    StaticFiles ---|"provides"| StaticHttp
+    VisualComponents -.->|"requires JS and CSS"| StaticHttp
+    ApiBoundary ---|"provides"| OperationalApi
+    HttpClient -.->|"requires"| OperationalApi
+    ApiBoundary -.->|"delegates"| DomainServices
+    DomainServices -.->|"collaborates"| SharedServices
+    DomainServices -.->|"persists"| Persistence
+    SharedServices -.->|"persists"| Persistence
+    RealtimeServer ---|"provides"| RealtimeEvents
+    SocketClient -.->|"requires"| RealtimeEvents
+    ApiBoundary -.->|"publishes after mutation"| RealtimeServer
 ```
 
 Mermaid no reproduce de forma nativa el glifo de componente, los puertos y los conectores
-*ball-and-socket* de UML. Esta vista usa su representación equivalente mediante
-clasificadores: `<<component>>` identifica componentes, `<<interface>>` identifica
-contratos, la realización `<|..` une una interfaz con quien la provee y la dependencia
-`..>` parte de quien la requiere. Las convenciones y el límite de esta aproximación se
+*ball-and-socket* de UML. Para evitar confundir esta vista con un diagrama de clases, se
+usa `flowchart`: `«component»` identifica figuras rectangulares de doble borde lateral,
+`«interface»` identifica figuras circulares compactas, la línea continua parte del
+proveedor y la flecha discontinua parte del consumidor. Las convenciones y el límite se
 detallan en las
 [colaboraciones enfocadas por capacidad](03-component-collaborations-by-capability.md#notación-uml-adoptada-en-mermaid).
 

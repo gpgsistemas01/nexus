@@ -19,23 +19,72 @@ provistas y requeridas, y las dependencias estructurales que permiten ensamblarl
 puertos sólo se agregan cuando identifican un punto de interacción distinto dentro del
 mismo componente; no representan automáticamente cada método o endpoint.
 
-Mermaid no dispone de una sintaxis nativa de diagrama de componentes UML que dibuje a la
-vez el glifo de componente, puertos cuadrados y conectores *ball-and-socket*. Usar círculos
-de `flowchart` para todas las interfaces no distingue una interfaz provista de una
-requerida y puede confundirse con un conector de ensamblaje. Por ello estas vistas usan
-la representación UML equivalente mediante clasificadores:
+Mermaid no dispone de una sintaxis nativa de diagrama de componentes UML. Para no
+presentar estas vistas como diagramas de clases, se usa `flowchart` con una convención
+visual explícita:
 
-- `<<component>>` identifica cada componente.
-- `<<interface>>` identifica un contrato estable, no una llamada aislada.
-- `Interfaz <|.. Componente` expresa que el componente **realiza y provee** la interfaz.
-- `Consumidor ..> Interfaz` expresa que el componente **requiere** esa interfaz.
-- La etiqueta de una dependencia indica el endpoint o la operación relevante cuando
-  hace falta desambiguar el contrato.
+- una figura rectangular de doble borde lateral con `«component»` aproxima el contorno
+  reconocible de un componente;
+- una figura circular compacta con `«interface»` aproxima el punto de interfaz sin
+  convertirlo en otra caja de implementación;
+- una línea continua parte del componente que **provee** la interfaz;
+- una flecha discontinua parte del componente que **requiere** la interfaz; y
+- la etiqueta del conector identifica la operación o condición relevante.
+
+No se agrega un estilo de color personalizado: las figuras, estereotipos, direcciones y
+etiquetas ya distinguen cada responsabilidad con el tema predeterminado de Mermaid.
+Las operaciones detalladas no se escriben dentro de los círculos para evitar que Mermaid
+los expanda hasta convertirlos en óvalos grandes; permanecen en las etiquetas necesarias,
+OpenAPI y las secuencias enlazadas.
 
 Esta notación conserva la semántica UML aunque Mermaid no replique exactamente la forma
 visual de los ejemplos con lollipop, socket y puertos. Las llamadas internas privadas,
 helpers y objetos DTO no se elevan a componentes: aparecen en las secuencias cuando son
 necesarios para seguir la ejecución.
+
+## Decisión sobre PlantUML
+
+Mermaid no es la única herramienta que puede aplicarse. Es la única que ya funciona en
+Nexus **como código embebido en Markdown**, con vista automática en GitHub y conversión
+automática durante `docs:export`. diagrams.net puede incorporarse hoy como una imagen
+versionada; PlantUML puede incorporarse cuando se implemente su generación local o en CI.
+
+No basta con registrar código PlantUML para que GitHub genere el diagrama. GitHub
+[renderiza Mermaid de forma nativa](https://docs.github.com/es/get-started/writing-on-github/working-with-advanced-formatting/creating-diagrams#creating-mermaid-diagrams),
+pero no procesa un bloque `plantuml`: lo muestra como código. Para verlo como diagrama
+habría que generar antes un PNG o SVG, versionarlo o publicarlo desde CI y enlazarlo desde
+el Markdown.
+
+Tampoco se exportaría automáticamente en Nexus. El flujo existente reconoce bloques
+`mermaid`, los guarda como `.mmd`, ejecuta Mermaid CLI y entrega el PNG temporal a
+Pandoc. Para PlantUML habría que implementar y mantener otro procesador antes de poder
+reutilizar la etapa común de imagen hacia DOCX o PDF.
+
+Por estas razones **no se cambia Mermaid por PlantUML**. Mermaid satisface las dos
+necesidades operativas actuales —vista inmediata en GitHub y exportación reproducible—,
+aunque aproxime la notación de componentes mediante figuras y estereotipos. PlantUML sólo
+sería preferible si un entregable exigiera los glifos UML estrictos y se aceptara ampliar
+`docs:export`, `docs:check` y CI, además de perder la vista nativa del código fuente en
+GitHub.
+
+### Alternativa según la necesidad
+
+- Si la prioridad es escribir código en Markdown y ver el resultado automáticamente en
+  GitHub, se debe usar **Mermaid**; no hay otra herramienta de UML de componentes con
+  integración nativa equivalente en el flujo actual.
+- Si la prioridad es obtener el aspecto UML estricto sin modificar el exportador, se
+  puede usar [diagrams.net](https://www.diagrams.net/) y versionar tanto la fuente
+  editable `.drawio` como un PNG exportado. El Markdown enlazaría el PNG mediante el
+  mecanismo de imágenes versionadas que `docs:export` ya admite. La desventaja es que la
+  imagen debe regenerarse en el editor cada vez que cambie su fuente.
+- Si la prioridad es conservar el diagrama como código y obtener UML estricto, se puede
+  usar **PlantUML**, pero acompañado de una tarea local o de CI que genere el PNG. Esta
+  opción requiere ampliar y probar la canalización; no es un reemplazo inmediato.
+
+Para Nexus se recomienda continuar con Mermaid. Si aparece un requisito formal de
+notación UML estricta, la alternativa de menor impacto es probar primero diagrams.net con
+un único diagrama; PlantUML sólo conviene cuando también sea requisito generar las
+imágenes automáticamente desde texto.
 
 ## Registro de una compra de material
 
@@ -46,95 +95,41 @@ sus propios contratos en `CU-CAT-02` y `CU-ALM-10`; entregan identificadores al 
 de la compra, pero no forman parte de su transacción.
 
 ```mermaid
-classDiagram
-    direction LR
+flowchart LR
+    PurchaseUI[["«component»<br/>PurchaseUI<br/>Formulario y detalles de compra"]]
+    PurchaseClient[["«component»<br/>PurchaseClient<br/>Aplicación y transporte HTTP"]]
+    PurchaseApi[["«component»<br/>PurchaseApi<br/>Ruta, middleware, controller y DTO"]]
+    PurchaseService[["«component»<br/>PurchaseService<br/>Reglas y transacción de la compra"]]
+    PurchaseReferences[["«component»<br/>PurchaseReferences<br/>Referencias documentales"]]
+    MaterialInventory[["«component»<br/>MaterialInventory<br/>Movimientos y existencias"]]
+    SupplierMaterials[["«component»<br/>SupplierMaterials<br/>Materiales y costo unitario"]]
+    Persistence[["«component»<br/>Persistence<br/>Prisma y PostgreSQL"]]
+    InventoryEvents[["«component»<br/>InventoryEvents<br/>Publicación Socket.IO"]]
+    PurchaseApplication(("«interface»<br/>PurchaseApplication"))
+    PurchaseHttp(("«interface»<br/>PurchaseHttp"))
+    PurchaseDomain(("«interface»<br/>PurchaseDomain"))
+    ReferenceGeneration(("«interface»<br/>ReferenceGeneration"))
+    MaterialMovements(("«interface»<br/>MaterialMovements"))
+    MaterialCosts(("«interface»<br/>MaterialCosts"))
+    TransactionalStore(("«interface»<br/>TransactionalStore"))
+    InventoryNotifications(("«interface»<br/>InventoryNotifications"))
 
-    class PurchaseUI {
-        <<component>>
-        Formulario y detalles de compra
-    }
-    class PurchaseClient {
-        <<component>>
-        Aplicación y transporte HTTP
-    }
-    class PurchaseApi {
-        <<component>>
-        Ruta, middleware, controller y DTO
-    }
-    class PurchaseService {
-        <<component>>
-        Reglas y transacción de la compra
-    }
-    class PurchaseReferences {
-        <<component>>
-        Referencias documentales
-    }
-    class MaterialInventory {
-        <<component>>
-        Movimientos y existencias
-    }
-    class SupplierMaterials {
-        <<component>>
-        Materiales y costo unitario
-    }
-    class Persistence {
-        <<component>>
-        Prisma y PostgreSQL
-    }
-    class InventoryEvents {
-        <<component>>
-        Publicación Socket.IO
-    }
-
-    class PurchaseApplication {
-        <<interface>>
-        +registerGoodsReceipt(formData)
-    }
-    class PurchaseHttp {
-        <<interface>>
-        +POST goods-receipts
-    }
-    class PurchaseDomain {
-        <<interface>>
-        +createGoodsReceipt(goodsReceiptDto)
-    }
-    class ReferenceGeneration {
-        <<interface>>
-        +generateYearlyReferenceNumber(tx)
-    }
-    class MaterialMovements {
-        <<interface>>
-        +applyInventoryMovement(tx, ENTRY)
-    }
-    class MaterialCosts {
-        <<interface>>
-        +updateMaterialUnitCostIfHigher()
-    }
-    class TransactionalStore {
-        <<interface>>
-        +transaction()
-    }
-    class InventoryNotifications {
-        <<interface>>
-        +emitInventoryUpdated(material)
-    }
-
-    PurchaseApplication <|.. PurchaseClient : provides
-    PurchaseUI ..> PurchaseApplication : requires
-    PurchaseHttp <|.. PurchaseApi : provides
-    PurchaseClient ..> PurchaseHttp : requires POST /api/warehouse/goods-receipts
-    PurchaseDomain <|.. PurchaseService : provides
-    PurchaseApi ..> PurchaseDomain : requires
-    ReferenceGeneration <|.. PurchaseReferences : provides
-    PurchaseService ..> ReferenceGeneration : requires with tx
-    MaterialMovements <|.. MaterialInventory : provides
-    PurchaseService ..> MaterialMovements : requires with tx
-    MaterialCosts <|.. SupplierMaterials : provides
-    PurchaseService ..> MaterialCosts : requires after commit
-    TransactionalStore <|.. Persistence : provides
-    PurchaseService ..> TransactionalStore : requires
-    InventoryNotifications <|.. InventoryEvents : provides
-    PurchaseApi ..> InventoryNotifications : requires after success
+    PurchaseClient ---|"provides"| PurchaseApplication
+    PurchaseUI -.->|"requires"| PurchaseApplication
+    PurchaseApi ---|"provides"| PurchaseHttp
+    PurchaseClient -.->|"requires POST /api/warehouse/goods-receipts"| PurchaseHttp
+    PurchaseService ---|"provides"| PurchaseDomain
+    PurchaseApi -.->|"requires"| PurchaseDomain
+    PurchaseReferences ---|"provides"| ReferenceGeneration
+    PurchaseService -.->|"requires with tx"| ReferenceGeneration
+    MaterialInventory ---|"provides"| MaterialMovements
+    PurchaseService -.->|"requires with tx"| MaterialMovements
+    SupplierMaterials ---|"provides"| MaterialCosts
+    PurchaseService -.->|"requires after commit"| MaterialCosts
+    Persistence ---|"provides"| TransactionalStore
+    PurchaseService -.->|"requires"| TransactionalStore
+    InventoryEvents ---|"provides"| InventoryNotifications
+    PurchaseApi -.->|"requires after success"| InventoryNotifications
 ```
 
 El servicio de compra es propietario de la transacción y pasa el mismo `tx` a las
@@ -154,102 +149,45 @@ de apoyo, pero exponen operaciones distintas y conservan componentes propietario
 separados.
 
 ```mermaid
-classDiagram
-    direction LR
+flowchart LR
+    PurchaseDetailClient[["«component»<br/>PurchaseDetailClient<br/>Modal, formulario, aplicación y request"]]
+    PurchaseApi[["«component»<br/>PurchaseApi<br/>Ruta, autorización, validación, controller y DTO"]]
+    CorrectionService[["«component»<br/>CorrectionService<br/>Corrección de detalle"]]
+    CancellationService[["«component»<br/>CancellationService<br/>Cancelación de detalle"]]
+    DetailChanges[["«component»<br/>DetailChanges<br/>Consulta, movimiento y auditoría del cambio"]]
+    ChangeReasons[["«component»<br/>ChangeReasons<br/>Motivos de cambio"]]
+    SupplierMaterials[["«component»<br/>SupplierMaterials<br/>Recálculo del costo"]]
+    Persistence[["«component»<br/>Persistence<br/>Prisma y PostgreSQL"]]
+    InventoryEvents[["«component»<br/>InventoryEvents<br/>Publicación Socket.IO"]]
+    PurchaseDetailHttp(("«interface»<br/>PurchaseDetailHttp"))
+    CorrectPurchaseDetail(("«interface»<br/>CorrectPurchaseDetail"))
+    CancelPurchaseDetail(("«interface»<br/>CancelPurchaseDetail"))
+    DetailChangeOperations(("«interface»<br/>DetailChangeOperations"))
+    ReasonLookup(("«interface»<br/>ReasonLookup"))
+    MaterialCostRecalculation(("«interface»<br/>MaterialCostRecalculation"))
+    TransactionalStore(("«interface»<br/>TransactionalStore"))
+    InventoryNotifications(("«interface»<br/>InventoryNotifications"))
 
-    class PurchaseDetailClient {
-        <<component>>
-        Modal, formulario, aplicación y request
-    }
-    class PurchaseApi {
-        <<component>>
-        Ruta, autorización, validación, controller y DTO
-    }
-    class CorrectionService {
-        <<component>>
-        Corrección de detalle
-    }
-    class CancellationService {
-        <<component>>
-        Cancelación de detalle
-    }
-    class DetailChanges {
-        <<component>>
-        Consulta, movimiento y auditoría del cambio
-    }
-    class ChangeReasons {
-        <<component>>
-        Motivos de cambio
-    }
-    class SupplierMaterials {
-        <<component>>
-        Recálculo del costo
-    }
-    class Persistence {
-        <<component>>
-        Prisma y PostgreSQL
-    }
-    class InventoryEvents {
-        <<component>>
-        Publicación Socket.IO
-    }
-
-    class PurchaseDetailHttp {
-        <<interface>>
-        +correctDetail()
-        +cancelDetail()
-    }
-    class CorrectPurchaseDetail {
-        <<interface>>
-        +correctGoodsReceiptDetailLine()
-    }
-    class CancelPurchaseDetail {
-        <<interface>>
-        +cancelGoodsReceiptDetailLine()
-    }
-    class DetailChangeOperations {
-        <<interface>>
-        +findDetail(tx)
-        +updateStockAndMovement(tx)
-        +recordChange(tx)
-    }
-    class ReasonLookup {
-        <<interface>>
-        +findChangeReason(tx)
-    }
-    class MaterialCostRecalculation {
-        <<interface>>
-        +recalculateMaterialUnitCosts()
-    }
-    class TransactionalStore {
-        <<interface>>
-        +transaction()
-    }
-    class InventoryNotifications {
-        <<interface>>
-        +emitInventoryUpdated(material)
-    }
-
-    PurchaseDetailHttp <|.. PurchaseApi : provides
-    PurchaseDetailClient ..> PurchaseDetailHttp : requires PATCH corrections or cancel
-    CorrectPurchaseDetail <|.. CorrectionService : provides
-    PurchaseApi ..> CorrectPurchaseDetail : requires for CU-ENT-04
-    CancelPurchaseDetail <|.. CancellationService : provides
-    PurchaseApi ..> CancelPurchaseDetail : requires for CU-ENT-05
-    DetailChangeOperations <|.. DetailChanges : provides
-    CorrectionService ..> DetailChangeOperations : requires with tx
-    CancellationService ..> DetailChangeOperations : requires with tx
-    ReasonLookup <|.. ChangeReasons : provides
-    CorrectionService ..> ReasonLookup : requires with tx
-    CancellationService ..> ReasonLookup : requires with tx
-    MaterialCostRecalculation <|.. SupplierMaterials : provides
-    CorrectionService ..> MaterialCostRecalculation : requires after commit
-    CancellationService ..> MaterialCostRecalculation : requires after commit
-    TransactionalStore <|.. Persistence : provides
-    CorrectionService ..> TransactionalStore : requires
-    CancellationService ..> TransactionalStore : requires
-    InventoryNotifications <|.. InventoryEvents : provides
-    PurchaseApi ..> InventoryNotifications : requires after success
+    PurchaseApi ---|"provides"| PurchaseDetailHttp
+    PurchaseDetailClient -.->|"requires PATCH corrections or cancel"| PurchaseDetailHttp
+    CorrectionService ---|"provides"| CorrectPurchaseDetail
+    PurchaseApi -.->|"requires for CU-ENT-04"| CorrectPurchaseDetail
+    CancellationService ---|"provides"| CancelPurchaseDetail
+    PurchaseApi -.->|"requires for CU-ENT-05"| CancelPurchaseDetail
+    DetailChanges ---|"provides"| DetailChangeOperations
+    CorrectionService -.->|"requires with tx"| DetailChangeOperations
+    CancellationService -.->|"requires with tx"| DetailChangeOperations
+    ChangeReasons ---|"provides"| ReasonLookup
+    CorrectionService -.->|"requires with tx"| ReasonLookup
+    CancellationService -.->|"requires with tx"| ReasonLookup
+    SupplierMaterials ---|"provides"| MaterialCostRecalculation
+    CorrectionService -.->|"requires after commit"| MaterialCostRecalculation
+    CancellationService -.->|"requires after commit"| MaterialCostRecalculation
+    Persistence ---|"provides"| TransactionalStore
+    CorrectionService -.->|"requires"| TransactionalStore
+    CancellationService -.->|"requires"| TransactionalStore
+    InventoryEvents ---|"provides"| InventoryNotifications
+    PurchaseApi -.->|"requires after success"| InventoryNotifications
 ```
 
 `PurchaseDetailHttp` agrupa dos operaciones del mismo contrato HTTP, pero las interfaces
@@ -268,114 +206,48 @@ visible el contrato compartido de cumplimiento y las implementaciones de inventa
 propias de material y merma sin presentar ambos recursos como un solo componente.
 
 ```mermaid
-classDiagram
-    direction LR
+flowchart LR
+    IssueClient[["«component»<br/>IssueClient<br/>Detalles, devolución, aplicación y request"]]
+    GoodsIssueApi[["«component»<br/>GoodsIssueApi<br/>Frontera API de material"]]
+    WasteIssueApi[["«component»<br/>WasteIssueApi<br/>Frontera API de merma"]]
+    GoodsIssues[["«component»<br/>GoodsIssues<br/>Surtimiento y devolución de material"]]
+    WasteIssues[["«component»<br/>WasteIssues<br/>Surtimiento y devolución de merma"]]
+    FulfillmentRules[["«component»<br/>FulfillmentRules<br/>Estados de detalle y encabezado"]]
+    MaterialInventory[["«component»<br/>MaterialInventory<br/>Movimientos de material"]]
+    WasteInventory[["«component»<br/>WasteInventory<br/>Movimientos y existencia de merma"]]
+    Persistence[["«component»<br/>Persistence<br/>Prisma y PostgreSQL"]]
+    InventoryEvents[["«component»<br/>InventoryEvents<br/>Publicación Socket.IO"]]
+    GoodsIssueHttp(("«interface»<br/>GoodsIssueHttp"))
+    WasteIssueHttp(("«interface»<br/>WasteIssueHttp"))
+    GoodsIssueOperations(("«interface»<br/>GoodsIssueOperations"))
+    WasteIssueOperations(("«interface»<br/>WasteIssueOperations"))
+    FulfillmentResolution(("«interface»<br/>FulfillmentResolution"))
+    MaterialMovements(("«interface»<br/>MaterialMovements"))
+    WasteMovements(("«interface»<br/>WasteMovements"))
+    TransactionalStore(("«interface»<br/>TransactionalStore"))
+    InventoryNotifications(("«interface»<br/>InventoryNotifications"))
 
-    class IssueClient {
-        <<component>>
-        Detalles, devolución, aplicación y request
-    }
-    class GoodsIssueApi {
-        <<component>>
-        Frontera API de material
-    }
-    class WasteIssueApi {
-        <<component>>
-        Frontera API de merma
-    }
-    class GoodsIssues {
-        <<component>>
-        Surtimiento y devolución de material
-    }
-    class WasteIssues {
-        <<component>>
-        Surtimiento y devolución de merma
-    }
-    class FulfillmentRules {
-        <<component>>
-        Estados de detalle y encabezado
-    }
-    class MaterialInventory {
-        <<component>>
-        Movimientos de material
-    }
-    class WasteInventory {
-        <<component>>
-        Movimientos y existencia de merma
-    }
-    class Persistence {
-        <<component>>
-        Prisma y PostgreSQL
-    }
-    class InventoryEvents {
-        <<component>>
-        Publicación Socket.IO
-    }
-
-    class GoodsIssueHttp {
-        <<interface>>
-        +supplyGoodsIssue()
-        +returnGoodsIssueDetail()
-    }
-    class WasteIssueHttp {
-        <<interface>>
-        +supplyWasteIssue()
-        +returnWasteIssueDetail()
-    }
-    class GoodsIssueOperations {
-        <<interface>>
-        +editGoodsIssue()
-        +returnGoodsIssueDetail()
-    }
-    class WasteIssueOperations {
-        <<interface>>
-        +updateWasteIssueDetails()
-        +returnWasteIssueDetail()
-    }
-    class FulfillmentResolution {
-        <<interface>>
-        +resolveDetailStatus()
-        +resolveIssueStatus()
-    }
-    class MaterialMovements {
-        <<interface>>
-        +applyInventoryMovement(tx, ISSUE_OR_ENTRY)
-    }
-    class WasteMovements {
-        <<interface>>
-        +applyWasteMovement(tx)
-        +applyWasteStockChange(tx)
-    }
-    class TransactionalStore {
-        <<interface>>
-        +transaction()
-    }
-    class InventoryNotifications {
-        <<interface>>
-        +emitInventoryUpdated(context)
-    }
-
-    GoodsIssueHttp <|.. GoodsIssueApi : provides
-    IssueClient ..> GoodsIssueHttp : requires goods endpoints
-    WasteIssueHttp <|.. WasteIssueApi : provides
-    IssueClient ..> WasteIssueHttp : requires waste endpoints
-    GoodsIssueOperations <|.. GoodsIssues : provides
-    GoodsIssueApi ..> GoodsIssueOperations : requires
-    WasteIssueOperations <|.. WasteIssues : provides
-    WasteIssueApi ..> WasteIssueOperations : requires
-    FulfillmentResolution <|.. FulfillmentRules : provides
-    GoodsIssues ..> FulfillmentResolution : requires
-    WasteIssues ..> FulfillmentResolution : requires
-    MaterialMovements <|.. MaterialInventory : provides
-    GoodsIssues ..> MaterialMovements : requires with tx
-    WasteMovements <|.. WasteInventory : provides
-    WasteIssues ..> WasteMovements : requires with tx
-    TransactionalStore <|.. Persistence : provides
-    GoodsIssues ..> TransactionalStore : requires
-    WasteIssues ..> TransactionalStore : requires
-    InventoryNotifications <|.. InventoryEvents : provides
-    GoodsIssueApi ..> InventoryNotifications : requires after success
-    WasteIssueApi ..> InventoryNotifications : requires after success
+    GoodsIssueApi ---|"provides"| GoodsIssueHttp
+    IssueClient -.->|"requires goods endpoints"| GoodsIssueHttp
+    WasteIssueApi ---|"provides"| WasteIssueHttp
+    IssueClient -.->|"requires waste endpoints"| WasteIssueHttp
+    GoodsIssues ---|"provides"| GoodsIssueOperations
+    GoodsIssueApi -.->|"requires"| GoodsIssueOperations
+    WasteIssues ---|"provides"| WasteIssueOperations
+    WasteIssueApi -.->|"requires"| WasteIssueOperations
+    FulfillmentRules ---|"provides"| FulfillmentResolution
+    GoodsIssues -.->|"requires"| FulfillmentResolution
+    WasteIssues -.->|"requires"| FulfillmentResolution
+    MaterialInventory ---|"provides"| MaterialMovements
+    GoodsIssues -.->|"requires with tx"| MaterialMovements
+    WasteInventory ---|"provides"| WasteMovements
+    WasteIssues -.->|"requires with tx"| WasteMovements
+    Persistence ---|"provides"| TransactionalStore
+    GoodsIssues -.->|"requires"| TransactionalStore
+    WasteIssues -.->|"requires"| TransactionalStore
+    InventoryEvents ---|"provides"| InventoryNotifications
+    GoodsIssueApi -.->|"requires after success"| InventoryNotifications
+    WasteIssueApi -.->|"requires after success"| InventoryNotifications
 ```
 
 Las cuatro operaciones reutilizan autorización, validación, transacción y resolución de
