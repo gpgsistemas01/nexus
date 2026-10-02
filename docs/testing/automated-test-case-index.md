@@ -1,80 +1,27 @@
 # Registro selectivo de casos de prueba automatizados
 
-## Propósito y alcance
+## Alcance
 
-La suite completa vive en `tests` y se descubre con la configuración de Vitest. Este
-registro no copia cada bloque `it` ni cada fila de `it.each`: esos nombres, fixtures,
-datos y aserciones cambian junto con el código y constituyen su especificación
-ejecutable. Duplicarlos manualmente produjo un catálogo extenso con poco valor adicional
-y riesgo de desincronización.
+Los archivos de `tests` son la especificación ejecutable. Este registro añade una ficha
+sólo para integraciones HTTP/Prisma, autorización, invariantes críticas de integridad o
+criterios de aceptación que requieran trazabilidad estable. Las variaciones de una misma
+regla pueden agruparse en una ficha.
 
-Aquí se mantienen únicamente:
+La revisión actual seleccionó los casos de permisos y rutas protegidas, límites y flujo
+de mermas, stock y movimientos, surtido/devolución, y todas las integraciones. Las demás
+unitarias permanecen en la suite y en la matriz por caso de uso cuando aportan evidencia
+funcional, sin transcribir cada `it`.
 
-1. un inventario breve para localizar las suites unitarias; y
-2. fichas `CP-*` de casos seleccionados por riesgo que necesitan trazabilidad estable.
+## Ambiente de pruebas
 
-La [matriz por caso de uso](use-case-test-types.md) indica qué evidencia funcional existe
-y qué brechas permanecen. El [plan de pruebas](test-plan.md) define los criterios de
-selección, los niveles y el registro de resultados. CI o la solicitud de cambio conserva
-el resultado real de cada ejecución; este documento no afirma que una prueba esté
-aprobada.
-
-## Qué se documenta con ficha
-
-Toda integración HTTP/Prisma recibe ficha porque comprueba persistencia fuera de mocks.
-Entre las unitarias sólo se seleccionan autorización y seguridad, invariantes críticas
-de integridad —transacción, rollback, stock, movimiento o transición— y criterios de
-aceptación que requieran identificador estable. No se crea una ficha separada para
-variaciones tabuladas de la misma regla: el caso y sus datos pueden permanecer agrupados
-en el bloque ejecutable.
-
-Las pruebas unitarias de transformaciones, formato, wiring, helpers, DTO, validadores o
-scripts siguen siendo obligatorias cuando protegen comportamiento útil, pero no se
-transcriben aquí por defecto. Al modificarlas basta actualizar el ejecutable y, si cambia
-la cobertura funcional, la matriz por caso de uso. Una ficha se actualiza sólo si el
-caso entra en los criterios anteriores o ya está registrado.
-
-## Inventario de suites unitarias
-
-Este inventario señala dónde buscar la especificación ejecutable sin enumerar todos sus
-casos. Las rutas son relativas a `tests/unit/`.
-
-| Área | Ubicación | Responsabilidad cubierta |
+| Suite | Ambiente | Comando |
 | --- | --- | --- |
-| Permisos | `constants/` | Matriz de autorización por rol, área y operación. |
-| Controllers | `controllers/` | Traducción HTTP, sanitización, delegación y propagación de errores. |
-| DTO | `dtos/` | Normalización de contratos y campos opcionales. |
-| Transacciones e inventario | `helpers/`, `inventory/`, `warehouse/` | Rollback, stock, movimientos y helpers del dominio. |
-| Frontend funcional | `public/js/` | Colecciones y validaciones de datos observables; no detalles puramente visuales. |
-| Rutas | `routes/` | Orden y presencia de validación, autorización y handlers. |
-| Servicios | `services/` | Reglas de negocio y colaboración con persistencia simulada. |
-| Utilidades | `utils/` | Queries, formatos, cálculos y generación de reportes. |
-| Validadores | `validators/` | Obligatorios, tipos, precisión, límites y detalles. |
-| Herramientas documentales | `scripts/` | Exportación, imágenes, PDF, Mermaid y capturas. |
+| Unitaria | Node.js 22–24 y Vitest, sin base de datos real; dependencias externas simuladas cuando corresponde. | `npm run test:unit` |
+| Integración | `NODE_ENV=test`, PostgreSQL aislado en `DATABASE_TEST_URL`, migraciones aplicadas y ejecución serial. La URL debe ser distinta de `DATABASE_URL`. | `npm run test:integration` |
 
-Las unitarias se ejecutan con `npm run test:unit`. El nombre del archivo y la jerarquía
-`describe`/`it` deben expresar la condición y el resultado verificable, de modo que el
-reporte de Vitest sea el inventario detallado cuando se necesite revisar toda la suite.
-
-## Resultado de la revisión
-
-Se revisó la suite vigente contra los criterios del plan. Una ficha puede agrupar varios
-`it` cuando comparten riesgo, precondición y resultado de negocio; esto evita volver a
-crear el catálogo exhaustivo.
-
-| Decisión | Casos o suites | Motivo |
-| --- | --- | --- |
-| Documentar | `permissionsTest.js` y las seis suites de `tests/unit/routes/` | Protegen autorización por contexto y la presencia/orden de autenticación, validación y permisos. |
-| Documentar | `wasteControllerFlowTest.js` y `wasteRegistrationBoundaryTest.js` | Protegen identidad, límites persistentes, alta y ajustes de existencias de merma. |
-| Documentar | `stockHelpersTest.js`, `movementHelpersTest.js`, el caso de stock final de `supplierMaterialServiceTest.js`, `wasteMovementServiceTest.js` y `wasteStockEntryServiceTest.js` | Protegen stock no negativo, agrupación y signos de movimientos, saldos, folio y actor. |
-| Documentar | Casos de surtido/devolución de `goodsIssueControllerTest.js` y `wasteIssueControllerTest.js` | Protegen actor, cantidades y estados que el cliente no puede imponer. |
-| Documentar | Los cuatro archivos de `tests/integration/controllers/` | Demuestran HTTP, persistencia real, estados y ausencia de efectos parciales. |
-| No documentar por caso | DTO, formato, queries, reportes, validadores generales, frontend funcional y servicios CRUD aislados | Sus nombres y aserciones son suficientes; la matriz por caso de uso conserva la trazabilidad funcional cuando aplica. |
-| No documentar por caso | Helpers de pruebas y scripts documentales | Validan infraestructura del repositorio, no un riesgo o criterio de aceptación del producto. |
-
-Un archivo clasificado como «no documentar por caso» no pierde cobertura ni deja de
-ejecutarse. Si posteriormente incorpora autorización, persistencia, stock, movimiento,
-rollback o una transición crítica, se revisa únicamente ese nuevo bloque.
+Los resultados de cada ejecución se conservan en CI o en la solicitud de cambio. La
+configuración y limpieza del ambiente de integración siguen el [plan de
+pruebas](test-plan.md).
 
 ## Casos unitarios seleccionados
 

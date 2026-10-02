@@ -74,24 +74,10 @@ uso](use-case-test-types.md) registra únicamente su trazabilidad funcional. Los
 resultados reales se conservan en CI o en la solicitud de cambio, no en un archivo
 versionado.
 
-No se replica manualmente cada `it` ni cada fila materializada por `it.each`: mantener
-dos inventarios completos haría divergir la documentación del ejecutable. La selección
-se realiza en este orden:
-
-1. se documenta toda integración HTTP/Prisma que compruebe persistencia fuera de mocks;
-2. de las unitarias se documentan sólo las que protegen autorización o una invariante
-   crítica de integridad —transacción, rollback, stock, movimiento o transición—;
-3. se añade cualquier otro caso únicamente si un criterio de aceptación o riesgo
-   regulatorio exige un identificador estable.
-
-Una interacción ordinaria con un repository simulado, una transformación, un DTO o una
-validación general no entra por el solo hecho de tocar datos. Las variaciones de una
-misma regla se agrupan en una ficha cuando comparten precondición y resultado de negocio.
-
-Las demás unitarias se mantienen mediante su archivo, nombre y aserciones; el registro
-selectivo conserva únicamente un inventario de suites para localizarlas. Si un caso
-entra o sale de los criterios anteriores, su ficha se agrega, actualiza o retira en el
-mismo cambio. El identificador permanece estable mientras no cambie su objetivo.
+No se replica cada `it`: se documentan las integraciones HTTP/Prisma, las unitarias de
+autorización o integridad crítica y los criterios de aceptación que necesiten un
+identificador estable. Las variaciones de una misma regla pueden compartir ficha; las
+demás pruebas permanecen descritas por su nombre y aserciones ejecutables.
 
 ## Cobertura CRUD mínima
 
@@ -135,9 +121,13 @@ crea otro inventario paralelo al índice de casos:
 | Transiciones y atomicidad | Cambios de estado, duplicidad, movimientos y rollback sin efectos parciales. |
 | Interacción y fallos | Contratos entre capas y detención de colaboradores posteriores ante un error. |
 
-### Estrategia de integración con base de datos
+### Ambiente de pruebas e integración con base de datos
 
-Las integraciones se ejecutan contra `DATABASE_TEST_URL`, guardan y consultan datos
+Las unitarias se ejecutan con Node.js 22–24 y Vitest, sin una base real. Las integraciones
+usan `NODE_ENV=test`, se ejecutan de forma serial y trabajan contra PostgreSQL mediante
+`DATABASE_TEST_URL`, que debe ser distinta de `DATABASE_URL`.
+
+Las integraciones guardan y consultan datos
 reales y limpian únicamente los fixtures identificables de su suite. La limpieza se
 realiza al preparar cada integración, en `afterAll` cuando el agregado lo requiera y,
 como red de seguridad, mediante `tests/teardownTestDatabase.js`. No se vacían catálogos
