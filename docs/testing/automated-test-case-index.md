@@ -1,9 +1,9 @@
 # Índice de casos de prueba automatizados
 
 Este índice enumera todos los casos unitarios que materializa `npm run test:unit` y los
-casos de integración declarados para `npm run test:integration`. Complementa el
-[catálogo unitario](unit-test-catalog.md), que registra el diseño y la técnica de cada
-grupo. Cada fila de este índice aplica la ficha de especificación del
+casos de integración declarados para `npm run test:integration`. Es el catálogo
+curado que documenta las pruebas escritas en el código sin crear un segundo inventario
+por técnica o por carpeta. Cada fila aplica la ficha de especificación del
 [plan de pruebas](test-plan.md): ID, precondiciones, datos, acción reproducible, resultado
 esperado y limpieza. La acción conserva la ruta y los nombres `describe`/`it` que enlazan
 la documentación con la especificación ejecutable.
@@ -11,6 +11,20 @@ la documentación con la especificación ejecutable.
 El estado de ejecución no se conserva en esta tabla. Se registra como `EP-*` en CI o en
 la solicitud de cambio conforme al [plan de pruebas](test-plan.md). La existencia de una
 fila no significa que el caso esté aprobado en una ejecución concreta.
+
+## Técnicas aplicadas verificadas en el código
+
+La técnica se asigna por la construcción y los datos observables de la prueba, no sólo
+por el nombre de su carpeta. Una misma prueba puede aplicar más de una técnica.
+
+| Técnica | Evidencia en el código de prueba | Datos ejecutables representativos | Grupos documentados |
+| --- | --- | --- | --- |
+| Particiones de equivalencia | `tests/unit/validators/requiredFieldValidationTest.js`, `tests/unit/controllers/api/warehouse/wasteRegistrationBoundaryTest.js` y `tests/unit/dtos/*Test.js` separan entradas válidas, ausentes, mal formadas o de distinto tipo. | Campo omitido, `null`, `not-a-uuid`, identificadores válidos y opcionales presentes o ausentes. | `G03`, `G05`, `G09`; casos de validación de `G02`. |
+| Valores frontera | Los validadores y helpers prueban el valor exacto y el primero fuera del rango o precisión. | `0`, `-0.000001`, `1.0000001`, `100000000`, seis/siete decimales, 51 caracteres sobre el límite de factura y 500/501 caracteres de observaciones. | `G02`, `G04`, `G05`, `G08`, `G09`. |
+| Tablas de decisión | Los bloques `it.each` materializan combinaciones independientes de condición y resultado. | Rol–departamento–operación, catálogo–payload–código, campo–valor–mensaje y existencia de dimensiones. | `G01`, `G02`, `G05`, `G07`, `G09`; casos tabulados de `G10`. |
+| Transiciones de estado | Controllers, servicios e integraciones parten de un estado documental y comprueban el siguiente o el rechazo. | Pendiente→surtida, salida parcial, entidad activa/inactiva, alta duplicada y edición de detalles. | `G02`, `G04`, `G07` e integración. |
+| Interacción y propagación de errores | Mocks y spies verifican argumentos, retorno, error y ausencia de llamadas posteriores. | Rechazos Prisma `P2023`/`P2025`, herramienta ausente, timeout, servicio rechazado y middleware que detiene el handler. | `G02`, `G06`, `G07`, `G10`. |
+| Integración CRUD y atomicidad | Las suites `tests/integration/controllers/*DbTest.js` realizan requests y leen Prisma; el caso negativo de salidas comprueba rollback. | Payloads de catálogos, clientes, proveedores y salidas; stock insuficiente sin persistencia parcial. | `CP-INT-*`. |
 
 ## G01 — Permisos
 

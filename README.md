@@ -281,7 +281,7 @@ Las pruebas que escriben datos usan exclusivamente la base indicada por
 Cuando un flujo acepta el cliente transaccional sin sustituir el comportamiento que se
 quiere probar, puede reutilizarse `tests/helpers/rollbackTransaction.js` para forzar
 rollback. La estrategia y ubicación de cada tipo de prueba están detalladas en
-[`docs/testing/service-test-coverage.md`](docs/testing/service-test-coverage.md).
+[`docs/testing/test-plan.md`](docs/testing/test-plan.md).
 
 Flujo recomendado para pruebas con base de datos (el comando valida la URL aislada, aplica las
 migraciones, genera Prisma y ejecuta la integración):
