@@ -7,66 +7,110 @@ La vista muestra los componentes compartidos por `auth`, `admin`, `sales` y `war
 **Diagrama de componentes:** `DIA-ARQ-CMP-001`.
 
 ```mermaid
-flowchart LR
-    user["Usuario"] --> browser["Navegador"]
+classDiagram
+    direction LR
 
-    subgraph frontend["Frontend entregado al navegador"]
-        direction TB
-        visual["«component»<br/>Componentes visuales<br/>Page · formularios · modales · tablas<br/>public/js/ui · DataTable · Select2 · SweetAlert"]
-        application["«component»<br/>Aplicación y composición<br/>application/&lt;dominio&gt;<br/>CRUD · reportes · salidas"]
-        http["«component»<br/>Transporte HTTP<br/>services/{auth, admin, sales, warehouse}<br/>axiosInstanceApi"]
-        socketClient["«component»<br/>Cliente Socket.IO<br/>window.io · indexPage"]
+    class VisualComponents {
+        <<component>>
+        Page, formularios, modales y tablas
+    }
+    class FrontendApplication {
+        <<component>>
+        CRUD, reportes y salidas por dominio
+    }
+    class HttpClient {
+        <<component>>
+        Servicios frontend y axiosInstanceApi
+    }
+    class SocketClient {
+        <<component>>
+        window.io e indexPage
+    }
+    class WebMvc {
+        <<component>>
+        Rutas web, controllers, EJS y layout
+    }
+    class StaticFiles {
+        <<component>>
+        express.static
+    }
+    class ApiBoundary {
+        <<component>>
+        Rutas API, middleware, controllers y DTO
+    }
+    class DomainServices {
+        <<component>>
+        Reglas y transacciones por dominio
+    }
+    class SharedServices {
+        <<component>>
+        Auditoría, documentos e inventario
+    }
+    class Persistence {
+        <<component>>
+        baseRepository y Prisma
+    }
+    class RealtimeServer {
+        <<component>>
+        socketUtils y publicación de eventos
+    }
 
-        visual --> application --> http
-        socketClient -->|"CustomEvent"| visual
-    end
+    class WebHttp {
+        <<interface>>
+        +renderPage()
+    }
+    class StaticHttp {
+        <<interface>>
+        +getAsset()
+    }
+    class OperationalApi {
+        <<interface>>
+        +requestJson()
+        +downloadBlob()
+    }
+    class RealtimeEvents {
+        <<interface>>
+        +inventoryUpdated(context)
+    }
 
-    browser -->|"ejecuta y presenta"| visual
-
-    webInterface(("«interface»<br/>HTTP web"))
-    staticInterface(("«interface»<br/>HTTP estático"))
-    apiInterface(("«interface»<br/>HTTP /api"))
-    eventInterface(("«interface»<br/>Socket.IO"))
-
-    subgraph server["Backend · Node.js / Express"]
-        direction TB
-        web["«component»<br/>Web MVC<br/>routes/web · controllers/web<br/>views/pages · views/shared · layout"]
-        static["«component»<br/>Archivos estáticos<br/>Express<br/>express.static"]
-        api["«component»<br/>Frontera API<br/>routes/api · middleware<br/>controllers/api · DTO"]
-        domain["«component»<br/>Servicios backend<br/>auth · admin · sales · warehouse<br/>Reglas de negocio y transacciones"]
-        shared["«component»<br/>Servicios compartidos<br/>auditoría · documentos · inventario<br/>Capacidades reutilizadas entre dominios"]
-        persistence["«component»<br/>Persistencia<br/>baseRepository · Prisma<br/>Acceso a datos"]
-        realtime["«component»<br/>Servidor Socket.IO<br/>socketUtils<br/>Publicación de eventos"]
-
-        api --> domain
-        domain --> shared
-        domain --> persistence
-        shared --> persistence
-        api -->|"emite después de la escritura"| realtime
-    end
-
-    web ---|"provee"| webInterface
-    visual -.->|"usa · navegación y HTML"| webInterface
-    static ---|"provee"| staticInterface
-    visual -.->|"usa · JS y CSS"| staticInterface
-    api ---|"provee"| apiInterface
-    http -.->|"usa · JSON, query o descarga"| apiInterface
-    realtime ---|"provee"| eventInterface
-    socketClient -.->|"usa · conexión y eventos"| eventInterface
+    VisualComponents ..> FrontendApplication : delegates
+    FrontendApplication ..> HttpClient : requires transport
+    SocketClient ..> VisualComponents : dispatches CustomEvent
+    WebHttp <|.. WebMvc : provides
+    VisualComponents ..> WebHttp : requires navigation and HTML
+    StaticHttp <|.. StaticFiles : provides
+    VisualComponents ..> StaticHttp : requires JS and CSS
+    OperationalApi <|.. ApiBoundary : provides
+    HttpClient ..> OperationalApi : requires
+    ApiBoundary ..> DomainServices : delegates
+    DomainServices ..> SharedServices : collaborates
+    DomainServices ..> Persistence : persists
+    SharedServices ..> Persistence : persists
+    RealtimeEvents <|.. RealtimeServer : provides
+    SocketClient ..> RealtimeEvents : requires
+    ApiBoundary ..> RealtimeServer : publishes after mutation
 ```
 
-Mermaid no ofrece un elemento de interfaz dentro de `C4Component`; por eso esta vista
-usa `flowchart` y conserva explícitamente los estereotipos visuales de componente e
-interfaz. Cada contrato que cruza las fronteras se representa por separado: HTTP web,
-HTTP estático, HTTP `/api` y Socket.IO. De este modo, agregar otra interfaz no obliga a
-fusionarla con las existentes ni a tratarla como un componente. La línea continua une
-la interfaz con el componente que la provee; la flecha discontinua parte del componente
-que la usa. Un componente puede conectarse con tantas interfaces como contratos exponga
-o consuma.
+Mermaid no reproduce de forma nativa el glifo de componente, los puertos y los conectores
+*ball-and-socket* de UML. Esta vista usa su representación equivalente mediante
+clasificadores: `<<component>>` identifica componentes, `<<interface>>` identifica
+contratos, la realización `<|..` une una interfaz con quien la provee y la dependencia
+`..>` parte de quien la requiere. Las convenciones y el límite de esta aproximación se
+detallan en las
+[colaboraciones enfocadas por capacidad](03-component-collaborations-by-capability.md#notación-uml-adoptada-en-mermaid).
+
+Cada contrato que cruza las fronteras se representa por separado: HTTP web, HTTP
+estático, HTTP `/api` y Socket.IO. De este modo, agregar otra interfaz no obliga a
+fusionarla con las existentes ni a tratarla como un componente. Un componente puede
+realizar o requerir tantas interfaces como contratos estables exponga o consuma.
 
 El diagrama general se complementa con [OpenAPI](../../openapi/openapi.json), las
 [secuencias por caso de uso](../processes/index.md) y el
 [patrón de componentes visuales](../development/design-and-construction-patterns/12-composition-and-ownership-of-components-visual.md).
+Las [colaboraciones enfocadas por capacidad](03-component-collaborations-by-capability.md)
+seleccionan de esta vista únicamente los componentes e interfaces necesarios cuando un
+recorrido coordina varios dominios o mecanismos de inventario; no sustituyen las
+secuencias ni duplican un diagrama por cada caso de uso.
 
 ### Canales comprobados en la implementación
 
