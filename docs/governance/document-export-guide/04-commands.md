@@ -24,7 +24,7 @@ estos valores cuando no necesite la entrega completa:
 | `requisitos` | Especificación y trazabilidad de requisitos. | Para revisión funcional. |
 | `datos` | Mapa de datos, decisiones de acceso, esquema y diccionario técnico generados. | Para revisar persistencia y acceso a los datos. |
 | `arquitectura` | Diseño, documentación técnica y contrato API con estructuras JSON y validaciones. | Para revisión técnica y de integraciones HTTP. |
-| `pruebas` | Plan, cobertura, cobertura automatizada relevante por caso de uso, catálogo y resultados de pruebas. | Para evidencia de calidad. |
+| `pruebas` | Plan, fichas de casos automatizados y cobertura relevante por caso de uso. | Para estrategia, especificación y trazabilidad de pruebas sin duplicar los resultados de CI. |
 | `todos` | Los dos manuales por conjuntos y los cuatro documentos técnicos anteriores. | Para preparar una entrega documental completa con un solo comando. |
 
 Al indicar sólo un paquete técnico se reconstruyen todos sus documentos. Para regenerar uno solo,

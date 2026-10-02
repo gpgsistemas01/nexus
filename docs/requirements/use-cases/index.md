@@ -246,7 +246,7 @@ validaciones, transacciones y pruebas CRUD.
    operaciones y el plan de pruebas.
 3. Las pruebas unitarias conservan la ruta paralela al código; las integraciones CRUD
    atraviesan HTTP y Prisma en `tests/integration/controllers/*DbTest.js`, conforme a
-   la [estrategia de pruebas](../../testing/service-test-coverage.md).
+   el [plan de pruebas](../../testing/test-plan.md).
 4. Un caso nuevo debe completar identificador, nombre, actor y disparador,
    participación de actores y sistema, precondiciones, pasos granulares del flujo
    principal, secuencias actor–Nexus y destino para cada alternativa, excepciones,

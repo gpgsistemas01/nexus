@@ -29,11 +29,11 @@ decisión y transiciones. Nexus no declara conformidad.
 - Varios `CU-*` se agrupan sólo cuando comparten evidencia, datos y resultado esperado.
 
 Cada fila es trazabilidad resumida, no una especificación ni un registro de ejecución.
-Los diseños y casos unitarios se identifican como `DP-UNIT-*` y `CP-UNIT-*` en el
-[catálogo unitario](unit-test-catalog.md); los datos concretos, la acción y las
-aserciones permanecen en el `it` enlazado. Una ejecución sólo se declara aprobada cuando
-su evidencia registra revisión, ambiente, fecha, resultado real y estado conforme a la
-tabla `EP-*` del [plan](test-plan.md).
+La ficha completa está en el
+[índice de casos automatizados](automated-test-case-index.md), mientras la preparación y
+las aserciones permanecen en el archivo ejecutable enlazado. Una ejecución sólo se
+declara aprobada cuando su evidencia registra revisión, ambiente, fecha, resultado real
+y estado conforme a la tabla `EP-*` del [plan](test-plan.md).
 
 ## Cobertura vigente
 
@@ -76,4 +76,5 @@ entrypoints, mensajes, configuración visual o delegación de requests se retira
 su costo de mantenimiento no aportaba evidencia suficiente de los casos de uso. Se
 conservan los validadores y transformaciones de datos del navegador que sí protegen
 reglas y fronteras observables. Cuando cambie este criterio, se actualizan en el mismo
-cambio la suite, esta matriz, el catálogo y el registro de resultados.
+cambio la suite, el índice de casos y esta matriz; el resultado de la ejecución
+permanece en CI o en la solicitud de cambio.

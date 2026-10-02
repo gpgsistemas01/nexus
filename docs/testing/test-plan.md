@@ -8,9 +8,10 @@
 
 ## Objetivo y alcance
 
-Este plan acepta cambios de Nexus mediante evidencia de los flujos que registran o
-consultan datos. La [estrategia de pruebas](service-test-coverage.md) define técnicas y
-ubicación; este documento establece la cobertura CRUD mínima y la ejecución.
+Este plan es la fuente de verdad de la estrategia, las técnicas, la ubicación, la
+cobertura CRUD mínima y la ejecución de pruebas de Nexus. La
+[cobertura por caso de uso](use-case-test-types.md) es una vista complementaria de la
+evidencia funcional vigente y de sus brechas.
 
 Cada prueba nueva debe identificar el requisito o regla, la operación CRUD y el dato o
 efecto observable. No se agrega cobertura sólo para aumentar conteos ni para fijar
@@ -22,11 +23,13 @@ los artefactos y 29119-4 para las técnicas de diseño, sin declarar conformidad
 ## Forma de documentar diseño, casos y ejecución
 
 Nexus separa tres registros para no confundir lo que se planeó con lo que realmente se
-ejecutó. En una prueba automatizada, el archivo y los nombres `describe`/`it` son la
-especificación ejecutable; una tabla de este paquete puede agrupar casos equivalentes y
-debe enlazar la ruta o grupo correspondiente. Una prueba manual o una validación de
-aceptación que no tenga archivo ejecutable conserva las tres tablas en la incidencia o
-en un documento de la familia `docs/testing`.
+ejecutó. En una prueba automatizada, el archivo, sus fixtures y sus nombres
+`describe`/`it` son la implementación ejecutable; el
+[índice de casos automatizados](automated-test-case-index.md) documenta cada caso con la
+ficha definida en este plan. La vista por caso de uso enlaza sólo la evidencia funcional
+relevante. Una prueba manual o una validación de aceptación sin archivo ejecutable
+conserva las tres tablas en la incidencia o en un documento de la familia
+`docs/testing`.
 
 ### 1. Diseño y trazabilidad
 
@@ -62,11 +65,16 @@ repeticiones.
 | --- | --- | --- | --- | --- | --- | --- |
 | `EP-NNN` | ID del caso, `SU-*`, ruta o comando focalizado | Commit, Node/Vitest, SO y servicios usados | Fecha y persona o CI | Conteos y observación obtenida | Aprobado, fallido, bloqueado o no ejecutado | Salida de CI, consulta verificable o incidencia |
 
-El [resumen por caso de uso](use-case-test-types.md) registra evidencia funcional;
-el [catálogo unitario](unit-test-catalog.md) registra los diseños `DP-UNIT-*`, casos
-`CP-UNIT-*`, técnicas, datos y resultados esperados de la suite, y el
-[índice de casos automatizados](automated-test-case-index.md) enumera cada caso unitario
-o de integración declarado en el código.
+El [índice de casos automatizados](automated-test-case-index.md) registra las fichas de
+las pruebas escritas en el código. El [resumen por caso de uso](use-case-test-types.md)
+registra únicamente su trazabilidad funcional. Los resultados reales se conservan en
+CI o en la solicitud de cambio, no en un archivo versionado.
+
+Al agregar, eliminar o modificar un `it` o una fila materializada por `it.each`, se
+actualiza en el mismo cambio su ficha `CP-*`: precondiciones, datos, acción, resultado
+esperado y limpieza. El identificador permanece estable mientras el objetivo del caso
+no cambie; un objetivo nuevo recibe un identificador nuevo y un caso retirado se elimina
+del índice.
 
 ## Cobertura CRUD mínima
 
@@ -97,8 +105,35 @@ No se crea un nivel unitario para componentes visuales o infraestructura inciden
 Si un helper compartido coordina datos CRUD, se prueba una vez en la ruta paralela a su
 módulo y los contextos reutilizan ese contrato.
 
-El [catálogo de pruebas unitarias](unit-test-catalog.md) registra la suite, el ambiente,
-las técnicas, los datos y los resultados observados por grupo.
+### Técnicas de diseño
+
+Se elige la técnica según el riesgo observable. La técnica orienta el diseño, pero no
+crea otro inventario paralelo al índice de casos:
+
+| Técnica | Aplicación |
+| --- | --- |
+| Particiones de equivalencia | Entradas válidas, inválidas o ausentes y decisiones de autorización. |
+| Valores frontera | Cero, negativos, máximos, precisión decimal, fechas, páginas y colecciones vacías. |
+| Tablas de decisión | Combinaciones de rol, departamento, operación o estado; pueden materializarse con `it.each`. |
+| Transiciones y atomicidad | Cambios de estado, duplicidad, movimientos y rollback sin efectos parciales. |
+| Interacción y fallos | Contratos entre capas y detención de colaboradores posteriores ante un error. |
+
+### Estrategia de integración con base de datos
+
+Las integraciones se ejecutan contra `DATABASE_TEST_URL`, guardan y consultan datos
+reales y limpian únicamente los fixtures identificables de su suite. La limpieza se
+realiza al preparar cada integración, en `afterAll` cuando el agregado lo requiera y,
+como red de seguridad, mediante `tests/teardownTestDatabase.js`. No se vacían catálogos
+compartidos ni se sustituye con mocks la transacción que constituye el objeto de la
+integración.
+
+Cada integración CRUD HTTP se ubica en
+`tests/integration/controllers/<dominio>ControllerDbTest.js`, comprueba la respuesta y
+el estado persistido con Prisma, y cubre al menos una regla de rechazo relevante. Los
+flujos entre dominios se demuestran en la integración propietaria en lugar de duplicar
+la misma prueba unitaria. `npm run test:integration` valida que la URL de pruebas sea
+distinta de `DATABASE_URL`, aplica las migraciones y genera el cliente antes de ejecutar
+Vitest.
 
 ## Cobertura prioritaria
 
